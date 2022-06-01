@@ -38,22 +38,6 @@ class TestHelpController extends ElkArteCommonSetupTest
 	}
 
 	/**
-	 * Cuz we all need a little help
-	 */
-	public function testActionHelp()
-	{
-		global $context;
-
-		// Get the controller, call index
-		$controller = new Help(new EventManager());
-		$controller->setUser(User::$info);
-		$controller->action_index();
-
-		// Check that the send topic template was set
-		$this->assertEquals('manual', $context['sub_template']);
-	}
-
-	/**
 	 * Test some quickhelp
 	 */
 	public function testActionQuickhelp()

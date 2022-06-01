@@ -41,8 +41,7 @@ class ManageSecurity extends AbstractController
 	{
 		global $context, $txt;
 
-		Txt::load('Help');
-		Txt::load('ManageSettings');
+		Txt::load('Help+ManageSettings');
 
 		$subActions = array(
 			'general' => array($this, 'action_securitySettings_display', 'permission' => 'admin_forum'),

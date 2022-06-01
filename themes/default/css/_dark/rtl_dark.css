@@ -1,0 +1,407 @@
+/* INTRODUCTION
+/* This variant is the standard, light, Elkarte RTL theme.
+/* This is eye candy only. All the layout code is in rtl.css.
+/*
+/* ------------------------------------------------------- */
+/*
+/*		$GENERAL.............Global resets, clearfixes, etc.
+/*		$COMMON..............Common classes to drive you bonkers.
+/*		$BBC.................Quotes, code blocks, BBC styles.
+/*		$AJAX................The "loading" bar (quick edit, etc).
+/*
+/*		$MAIN................Forum header, wrapper, and footer.
+/*		$MENUS...............Main and secondary menus.
+/*		$LINKTREE............The breadcrumbs.
+/*		$BUTTONS.............Most button strips.
+/*		$PAGELINKS...........Page navigation links.
+/*
+/*		$TABLES..............Generic tables (memberlist, error log, etc).
+/*		$SETTINGS............Generic lists for settings pages.
+/*		$BOARDS..............Board index, sub-boards, and message index.
+/*
+/*		$TOPICS..............The display template (topic view), including send.
+/*		$EDITOR..............Main editor (posts, events, polls) and topic summary.
+/*		$MODERATE............Move topic, split topic, merge topic.
+/*
+/*		$PROFILE.............The profile areas.
+/*		$PERSONAL............The personal messages (PM) areas.
+/*		$CALENDAR............Wombats (and the calendar).
+/*		$STATISTICS..........The statistics centre.
+/*
+/*		$HELP................Help pages, help icons and pop-ups, tooltips.
+/*		$SEARCH..............Search pages, including memberlist search.
+/*		$LOGIN...............Login and registration, maintenance mode.
+/*
+/*		$ERRORS..............Error messages.
+/*		$PROGRESS............Nifty progress bars.
+/*		$MEDIA...............Experimental media queries.
+/* ------------------------------------------------------- */
+
+:root {
+	/* flip right and left colors for RTL */
+	--primary_border_right: #C7C7C7;
+	--primary_border_left: #CCCCCC;
+
+	--secondary_border_right: #BFBFBF;
+	--secondary_border_left: #AFAFAF;
+}
+
+/* -------------------------------------------------------
+ *	$GENERAL
+ * -------------------------------------------------------
+ */
+
+body {
+	background-image: linear-gradient(to left, var(--body_grad_1) 0%, var(--body_grad_2) 50%, var(--body_grad_1) 100%);
+}
+
+fieldset {
+	box-shadow: inset 1px -1px 3px var(--box_shadow);
+}
+
+/* Dont show disabled buttons as active on hover */
+input[type=submit][disabled]:hover, button[disabled], button[disabled]:hover {
+	border-right: 1px solid var(--secondary_border_right);
+	border-left: 1px solid var(--secondary_border_left);
+}
+
+/* Common button styling. */
+input[type="submit"], .drop_area_fileselect_text, button[type="submit"], input[type="button"],
+	/* Anchors styled to look like buttons. */
+.linkbutton:link, .linkbutton:visited {
+	border-right: 1px solid var(--secondary_border_right);
+	border-left: 1px solid var(--secondary_border_left);
+	box-shadow: -1px 1px 2px var(--box_shadow);
+}
+
+/* Hover effects. */
+input[type="submit"]:hover, button[type="submit"]:hover, input[type="button"]:hover, .linkbutton:hover {
+	border-right-color: var(--primary_border_top);
+	border-left-color: var(--primary_border_left);
+	box-shadow: -2px 1px 1px var(--opacity10) inset;
+}
+
+/* Styles for main headers. */
+.category_header, .forum_category .category_header {
+	text-shadow: -1px 1px 0 var(--box_shadow);
+}
+
+/* Styles for subsection headers. @todo */
+.secondary_header {
+	text-shadow: -1px 1px 0 var(--primary_white);
+}
+
+/* -------------------------------------------------------
+ * $BBC
+ * -------------------------------------------------------
+ */
+/* Extra quote styling */
+.bbc_quote, .quoteheader {
+	box-shadow: -2px 2px 2px var(--box_shadow);
+}
+
+/* -------------------------------------------------------
+ * $AJAX
+ * -------------------------------------------------------
+ */
+
+/* -------------------------------------------------------
+ * $MAIN
+ * -------------------------------------------------------
+ */
+
+#search_form .input_text {
+	border-right: 1px solid var(--primary_border_right);
+}
+
+#search_form select {
+	border-color: var(--transparent);
+}
+
+.forumtitle > a {
+	text-shadow: -1px 1px 0 var(--primary_white);
+}
+
+/* -------------------------------------------------------
+ * $MENUS
+ * -------------------------------------------------------
+ */
+
+/* Level 1 Menu bar: link or button. General styling. */
+.linklevel1, .linklevel1:link, .linklevel1:visited, .quickbuttons .inline_mod_check {
+	border-right: 1px solid var(--secondary_border_right);
+	border-left: 1px solid var(--secondary_border_left);
+	box-shadow: -1px 1px 2px var(--box_shadow);
+}
+
+/* Level 1 button hover and focus effects. */
+.linklevel1:hover, .listlevel1:hover .linklevel1,
+.linklevel2:hover, .listlevel2:hover .linklevel2,
+.linklevel3:hover, .listlevel3:hover .linklevel3,
+#menu_sidebar .linklevel1:hover, #menu_sidebar .listlevel1:hover .linklevel1 {
+	border-right: 1px solid var(--secondary_border_right);
+	border-left: 1px solid var(--secondary_border_right);
+	box-shadow: -2px 1px 1px var(--opacity10) inset;
+}
+
+.poster li.poster_online:hover .linklevel1 {
+	border-right: 1px solid var(--secondary_border_right);
+	border-left: 1px solid var(--secondary_border_left);
+	box-shadow: -2px 1px 1px var(--opacity10) inset;
+}
+
+.poster li.poster_online .nolink {
+	border-right: 1px solid var(--secondary_border_right);
+	border-left: 1px solid var(--secondary_border_left);
+	box-shadow: -1px 1px 2px var(--box_shadow);
+}
+
+/* Level 1 active buttons. */
+.linklevel1.active, .listlevel1:hover .active,
+#collapse_button .linklevel1, .pm_indicator {
+	box-shadow: -1px 1px 2px #BBBBBB;
+}
+
+/* Hover effects for those buttons. */
+.linklevel1.active:hover, .listlevel1:hover .linklevel1.active,
+#collapse_button .linklevel1:hover, .linklevel1:hover .pm_indicator {
+	border-right-color: var(--menu_border_hover_top);
+	border-left-color: var(--menu_border_hover);
+	box-shadow: -1px 1px 1px var(--opacity30) inset;
+}
+
+/* Levels 2 and 3: drop menu wrapper. */
+.menulevel2, .menulevel3 {
+	border-right: 1px solid var(--secondary_border_right);
+	border-left: 1px solid var(--secondary_border_left);
+	box-shadow: -3px 3px 3px var(--opacity20);
+}
+
+/* Tricky PM indicator. Define it carefully */
+.pm_indicator {
+	box-shadow: -2px 2px 3px var(--opacity20), 0 -1px 0 var(--menu_button_active) inset;
+}
+
+.likes_indicator {
+	box-shadow: -2px 2px 2px var(--opacity20);
+}
+
+/* -------------------------------------------------------
+ * $BOARDICONS
+ * -------------------------------------------------------
+ */
+
+
+/* -------------------------------------------------------
+ *	$LINKTREE / $BREADCRUMBS
+ * -------------------------------------------------------
+ */
+.navigate_section {
+	box-shadow: -1px 2px 3px var(--box_shadow);
+}
+
+.breadcrumb .crumb.active:after, .breadcrumb .crumb:hover:after, .breadcrumb .crumb:last-child {
+	background-image: linear-gradient(0deg, var(--menu_button_active), var(--menu_button_active_2));
+}
+
+/* -------------------------------------------------------
+ * $BUTTONS
+ * This section contains code for the quickbuttons (quote, quick edit, etc)
+ * and for the buttonlist class (reply, add poll, notify, etc).
+ * These classes share some styling.
+ * Declarations are amalgamated where styling is shared.
+ * -------------------------------------------------------
+ */
+
+/* The active one */
+.buttonlist li a.active {
+	box-shadow: -1px 1px 2px var(--box_shadow);
+}
+
+/* -------------------------------------------------------
+ *	$PAGELINKS
+ * -------------------------------------------------------
+ */
+.pagelinks .navPages:hover, .pagelinks .current_page {
+	border-right: 1px solid var(--secondary_border_right);
+	border-left: 1px solid var(--secondary_border_left);
+	box-shadow: -2px 1px 1px var(--opacity10) inset;
+}
+
+/* -------------------------------------------------------
+ *	$TABLES
+ * -------------------------------------------------------
+ */
+
+/* -------------------------------------------------------
+ *	$BOARDS
+ * -------------------------------------------------------
+ */
+
+/* The board categories and newsfader - some shared styling. */
+.forum_category, .forumposts, .content_category {
+	box-shadow: -1px 2px 3px var(--box_shadow);
+}
+
+.board_latest {
+	border-right: 1px solid var(--secondary_border_right);
+}
+
+/* The board description and who-is-viewing stuff. */
+#description_board {
+	box-shadow: -1px 2px 4px var(--box_shadow);
+}
+
+.topic_listing {
+	box-shadow: -1px 2px 4px var(--box_shadow);
+}
+
+.jump_to_header {
+	box-shadow: -2px 1px var(--opacity10) inset;
+}
+
+/* -------------------------------------------------------
+ *	$TOPICS
+ * -------------------------------------------------------
+ */
+
+/* On to the posts */
+.forumposts {
+	box-shadow: -1px 2px 4px var(--box_shadow);
+}
+
+/* @todo - Save code by amalgamating common button background declarations. */
+.poster_online .linklevel1 {
+	border-right: 1px solid var(--secondary_border_right);
+	border-left: 1px solid var(--secondary_border_left);
+	box-shadow: -1px 1px 2px var(--box_shadow);
+}
+
+.poster_online .linklevel1:hover {
+	border-right: 1px solid var(--primary_border_right);
+	border-left: 1px solid var(--primary_border_left);
+	box-shadow: -1px 1px 1px var(--opacity10) inset;
+}
+
+/* Do one override here for .poster. Still saves code all round. */
+.poster_avatar .linklevel1, .poster_avatar:hover .linklevel1,
+.poster_avatar .linklevel1:focus,
+.name.linklevel1, .name.linklevel1:hover, .name.linklevel1:focus {
+	border: none;
+	background: none;
+	box-shadow: none;
+}
+
+/* -------------------------------------------------------
+ *	$EDITOR
+ * -------------------------------------------------------
+ */
+
+/* -------------------------------------------------------
+ *	$MODERATE
+ * -------------------------------------------------------
+ */
+
+/* -------------------------------------------------------
+ * $TABS
+ * --------------------------------------------------------
+ */
+.ui-tabs .ui-state-hover {
+	border-right: 1px solid var(--secondary_border_right);
+	border-left: 1px solid var(--secondary_border_left);
+}
+
+/* -------------------------------------------------------
+ * $PROFILE
+ * -------------------------------------------------------
+ */
+.profile_pie {
+	background: url(../../images/_light/stats_pie_rtl.png);
+}
+
+/* -------------------------------------------------------
+ * $PERSONAL
+ * ------------------------------------------------------- */
+#personal_messages .capacity_bar span {
+	border-right-color: var(--transparent);
+	border-left: 1px solid var(--secondary_border_left);
+}
+
+/* -------------------------------------------------------
+ * $CALENDAR
+ * -------------------------------------------------------
+ */
+
+/* -------------------------------------------------------
+ * $HELP
+ * -------------------------------------------------------
+ */
+
+/* Styles for the tooltips. */
+.tooltip {
+	box-shadow: -3px 3px 3px var(--opacity30);
+}
+
+/* -------------------------------------------------------
+ * $SEARCH
+ * -------------------------------------------------------
+ */
+
+/* -------------------------------------------------------
+ * $LOGIN
+ * -------------------------------------------------------
+ */
+
+/* -------------------------------------------------------
+ * $ERRORS
+ * -------------------------------------------------------
+ */
+
+/* -------------------------------------------------------
+ * $PROGRESS
+ * -------------------------------------------------------
+ */
+
+/* -------------------------------------------------------
+ * $STATISTICS
+ * -------------------------------------------------------
+ */
+.stats.floatleft {
+	border-right-color: var(--transparent);
+	border-left: 1px solid var(--secondary_border_left);
+}
+
+/* -------------------------------------------------------
+ * $MEDIA
+ * -------------------------------------------------------
+ */
+
+/* This one does 800 screens at default font size.
+   -------------------------------------------------------------------------------------------*/
+
+@media screen and (max-width: 50em) {
+	#menu_sidebar {
+		box-shadow: -3px 3px 3px var(--opacity30);
+	}
+}
+
+/* This one does up to 540 screens.
+   -------------------------------------------------------------------------------------------*/
+
+@media screen and (max-width: 33.750em) {
+	.board_latest {
+		border-right-color: var(--transparent);
+	}
+
+	.topic_listing > li {
+		box-shadow: -3px 3px 6px var(--box_shadow);
+	}
+
+	.forumposts .content {
+		box-shadow: -3px 3px 6px var(--box_shadow);
+	}
+
+	.linktree:after {
+		content: "";
+	}
+}

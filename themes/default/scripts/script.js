@@ -41,11 +41,19 @@ var ua = navigator.userAgent.toLowerCase(),
  * @param {string} sUrl
  * @param {function} funcCallback
  * @param {string} sType xml, json, html, defaults to xml
+ * @param {boolean} bHeader true sends X-Requested-With, expected by elkarte
  */
-function fetchDocument(sUrl, funcCallback, sType)
+function fetchDocument(sUrl, funcCallback, sType, bHeader = true)
 {
 	let oCaller = this,
-		init = {credentials: 'same-origin', method: 'GET', cache: 'default', mode: 'cors'};
+		headers = bHeader ? {'X-Requested-With': 'XMLHttpRequest'} : {},
+		init = {
+			credentials: 'same-origin',
+			method: 'GET',
+			cache: 'default',
+			mode: 'cors',
+			headers: headers,
+		};
 
 	sType = sType || 'xml';
 
@@ -1251,6 +1259,7 @@ function onJumpReceived(oXMLDoc)
  *
  * @param {type} oJumpToOptions
  */
+
 // This'll contain all JumpTo objects on the page.
 var aJumpTo = [];
 
@@ -1260,33 +1269,28 @@ function JumpTo(oJumpToOptions)
 	this.dropdownList = null;
 	this.showSelect();
 
-	createEventListener(this.dropdownList);
-
-	if (is_mobile && is_touch)
-	{
-		this.dropdownList.addEventListener('touchstart', grabJumpToContent);
-	}
-	else
-	{
-		this.dropdownList.addEventListener('mouseenter', grabJumpToContent);
-	}
+	// No need to wait until a mouse event, poor usability, page jump, etc
+	window.addEventListener('load', grabJumpToContent);
 }
 
 // Remove all the options in the select. Method of the JumpTo class.
 JumpTo.prototype.removeAll = function ()
 {
-//	var dropdownList = document.getElementById(this.opt.sContainerId + '_select');
-	for (var i = this.dropdownList.options.length; i > 0; i--)
+	for (let i = this.dropdownList.options.length; i > 0; i--)
+	{
 		this.dropdownList.remove(i - 1);
+	}
 };
 
 // Show the initial select box (onload). Method of the JumpTo class.
 JumpTo.prototype.showSelect = function ()
 {
-	var sChildLevelPrefix = '';
+	let sChildLevelPrefix = '';
 
-	for (var i = this.opt.iCurBoardChildLevel; i > 0; i--)
+	for (let i = this.opt.iCurBoardChildLevel; i > 0; i--)
+	{
 		sChildLevelPrefix += this.opt.sBoardChildLevelIndicator;
+	}
 
 	if (sChildLevelPrefix !== '')
 	{
@@ -1297,55 +1301,46 @@ JumpTo.prototype.showSelect = function ()
 	this.dropdownList = document.getElementById(this.opt.sContainerId + '_select');
 };
 
-// Fill the jump to box with entries. Method of the JumpTo class.
+// Fill the select box with entries. Method of the JumpTo class.
 JumpTo.prototype.fillSelect = function (aBoardsAndCategories)
 {
 	this.removeAll();
 
-	if (is_mobile && is_touch)
-	{
-		this.dropdownList.removeEventListener('touchstart', grabJumpToContent);
-	}
-	else
-	{
-		this.dropdownList.removeEventListener('mouseenter', grabJumpToContent);
-	}
-
-	// Create a document fragment that'll allowing inserting big parts at once.
-	var oListFragment = document.createDocumentFragment(),
+	// Create a document fragment that'll allow inserting big parts at once.
+	let oListFragment = document.createDocumentFragment(),
 		oOptgroupFragment = document.createElement('optgroup');
 
 	// Loop through all items to be added.
-	for (var i = 0, n = aBoardsAndCategories.length; i < n; i++)
-	{
-		var j,
+	aBoardsAndCategories.forEach((boardOrCategory) => {
+		let j,
 			sChildLevelPrefix = '',
 			oOption,
 			oText;
 
-		if (aBoardsAndCategories[i].isCategory)
+		if (boardOrCategory.isCategory)
 		{
 			oOptgroupFragment = document.createElement('optgroup');
-			oOptgroupFragment.label = aBoardsAndCategories[i].name;
+			oOptgroupFragment.label = boardOrCategory.name;
 			oListFragment.appendChild(oOptgroupFragment);
-			continue;
-		}
-		else
-		{
-			for (j = aBoardsAndCategories[i].childLevel, sChildLevelPrefix = ''; j > 0; j--)
-				sChildLevelPrefix += this.opt.sBoardChildLevelIndicator;
 
-			if (sChildLevelPrefix !== '')
-			{
-				sChildLevelPrefix += this.opt.sBoardPrefix;
-			}
+			return;
+		}
+
+		for (j = boardOrCategory.childLevel, sChildLevelPrefix = ''; j > 0; j--)
+		{
+			sChildLevelPrefix += this.opt.sBoardChildLevelIndicator;
+		}
+
+		if (sChildLevelPrefix !== '')
+		{
+			sChildLevelPrefix += this.opt.sBoardPrefix;
 		}
 
 		oOption = document.createElement('option');
 		oText = document.createElement('span');
-		oText.innerHTML = sChildLevelPrefix + aBoardsAndCategories[i].name;
+		oText.innerHTML = sChildLevelPrefix + boardOrCategory.name;
 
-		if (aBoardsAndCategories[i].id === this.opt.iCurBoardId)
+		if (boardOrCategory.id === this.opt.iCurBoardId)
 		{
 			oOption.selected = 'selected';
 		}
@@ -1354,15 +1349,15 @@ JumpTo.prototype.fillSelect = function (aBoardsAndCategories)
 
 		if (!this.opt.bNoRedirect)
 		{
-			oOption.value = '?board=' + aBoardsAndCategories[i].id + '.0';
+			oOption.value = '?board=' + boardOrCategory.id + '.0';
 		}
 		else
 		{
-			oOption.value = aBoardsAndCategories[i].id;
+			oOption.value = boardOrCategory.id;
 		}
 
 		oOptgroupFragment.appendChild(oOption);
-	}
+	});
 
 	// Add the remaining items after the currently selected item.
 	this.dropdownList.appendChild(oListFragment);
@@ -1372,7 +1367,7 @@ JumpTo.prototype.fillSelect = function (aBoardsAndCategories)
 	{
 		this.dropdownList.onchange = function ()
 		{
-			if (this.selectedIndex > 0 && this.options[this.selectedIndex].value)
+			if (this.selectedIndex >= 0 && this.options[this.selectedIndex].value)
 			{
 				window.location.href = elk_scripturl + this.options[this.selectedIndex].value.substr(elk_scripturl.indexOf('?') === -1 || this.options[this.selectedIndex].value.substr(0, 1) !== '?' ? 0 : 1);
 			}

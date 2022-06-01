@@ -19,6 +19,7 @@ namespace ElkArte\Controller;
 use ElkArte\AbstractController;
 use ElkArte\Action;
 use ElkArte\Exceptions\Exception;
+use ElkArte\Languages\Txt;
 use ElkArte\MembersList;
 
 /**
@@ -286,7 +287,7 @@ class ProfileHistory extends AbstractController
 
 		theme()->getTemplates()->load('Profile');
 		theme()->getTemplates()->load('ProfileHistory');
-		\ElkArte\Languages\Txt::load('Profile');
+		Txt::load('Profile');
 
 		if ($this->_memID === 0)
 		{

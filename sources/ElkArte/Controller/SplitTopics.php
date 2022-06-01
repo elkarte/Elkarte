@@ -68,7 +68,7 @@ class SplitTopics extends AbstractController
 		}
 
 		// Load up the "dependencies" - the template, getMsgMemberID().
-		if (!isset($this->_req->query->xml))
+		if (!$this->getApi())
 		{
 			theme()->getTemplates()->load('SplitTopics');
 		}
@@ -242,25 +242,25 @@ class SplitTopics extends AbstractController
 			'messages' => array(),
 		);
 
-		$context['selected'] = array(
+		$context['selected'] = [
 			'num_messages' => 0,
 			'start' => $this->_req->getQuery('start2', 'intval', 0),
-			'messages' => array(),
-		);
+			'messages' => [],
+		];
 
-		$context['topic'] = array(
+		$context['topic'] = [
 			'id' => $topic,
 			'subject' => urlencode($_SESSION['new_topic_subject']),
-		);
+		];
 
 		// Some stuff for our favorite template.
 		$context['new_subject'] = $_SESSION['new_topic_subject'];
 
 		// Using the "select" sub template.
-		$context['sub_template'] = isset($this->_req->query->xml) ? 'split' : 'select';
+		$context['sub_template'] = $this->getApi() ? 'split' : 'select';
 
 		// All of the js for topic split selection is needed
-		if (!isset($this->_req->query->xml))
+		if (!$this->getApi())
 		{
 			loadJavascriptFile('topic.js');
 		}
@@ -269,16 +269,16 @@ class SplitTopics extends AbstractController
 		$context['messages_per_page'] = empty($modSettings['disableCustomPerPage']) && !empty($options['messages_per_page']) ? $options['messages_per_page'] : $modSettings['defaultMaxMessages'];
 
 		// Get the message ID's from before the move.
-		if (isset($this->_req->query->xml))
+		if ($this->getApi())
 		{
-			$original_msgs = array(
-				'not_selected' => messageAt($context['not_selected']['start'], $topic, array(
-					'not_in' => empty($_SESSION['split_selection'][$topic]) ? array() : $_SESSION['split_selection'][$topic],
+			$original_msgs = [
+				'not_selected' => messageAt($context['not_selected']['start'], $topic, [
+					'not_in' => empty($_SESSION['split_selection'][$topic]) ? [] : $_SESSION['split_selection'][$topic],
 					'only_approved' => !$modSettings['postmod_active'] || !allowedTo('approve_posts'),
 					'limit' => $context['messages_per_page'],
-				)),
-				'selected' => array(),
-			);
+				]),
+				'selected' => [],
+			];
 
 			// You can't split the last message off.
 			if (empty($context['not_selected']['start']) && count($original_msgs['not_selected']) <= 1 && $this->_req->query->move === 'down')
@@ -361,20 +361,20 @@ class SplitTopics extends AbstractController
 		}
 
 		// The XMLhttp method only needs the stuff that changed, so let's compare.
-		if (isset($this->_req->query->xml))
+		if ($this->getApi())
 		{
-			$changes = array(
-				'remove' => array(
+			$changes = [
+				'remove' => [
 					'not_selected' => array_diff($original_msgs['not_selected'], array_keys($context['not_selected']['messages'])),
 					'selected' => array_diff($original_msgs['selected'], array_keys($context['selected']['messages'])),
-				),
-				'insert' => array(
+				],
+				'insert' => [
 					'not_selected' => array_diff(array_keys($context['not_selected']['messages']), $original_msgs['not_selected']),
 					'selected' => array_diff(array_keys($context['selected']['messages']), $original_msgs['selected']),
-				),
-			);
+				],
+			];
 
-			$context['changes'] = array();
+			$context['changes'] = [];
 			foreach ($changes as $change_type => $change_array)
 			{
 				foreach ($change_array as $section => $msg_array)

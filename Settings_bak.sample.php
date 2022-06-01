@@ -35,7 +35,7 @@ $mbname = 'My Community';
  * The default language file set for the forum.
  * @var string
  */
-$language = 'english';
+$language = 'English';
 
 /**
  * URL to your forum's folder. (without the trailing /!)

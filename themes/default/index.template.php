@@ -173,8 +173,8 @@ function template_body_above()
 	// Go to top/bottom of page links and skipnav link for a11y.
 	echo '
 	<a id="top" href="#skipnav" tabindex="0">', $txt['skip_nav'], '</a>
-	<a href="#top" id="gotop" title="', $txt['go_up'], '">&#8593;</a>
-	<a href="#bot" id="gobottom" title="', $txt['go_down'], '">&#8595;</a>';
+	<a id="gotop" href="#top_section"  title="', $txt['go_up'], '">&#8593;</a>
+	<a id="gobottom" href="#footer_section" title="', $txt['go_down'], '">&#8595;</a>';
 
 	echo '
 	<header id="top_section">
@@ -287,23 +287,22 @@ function template_search_form()
 	}
 
 	// Search within current topic?
-	if (!empty($context['current_topic']) && !empty($modSettings['search_dropdown']))
+	if (!empty($context['current_topic']))
 	{
 		echo '
 				<input type="hidden" name="', (!empty($modSettings['search_dropdown']) ? 'sd_topic' : 'topic'), '" value="', $context['current_topic'], '" />';
 	}
 
 	// If we're on a certain board, limit it to this board ;).
-	if (!empty($context['current_board']) && !empty($modSettings['search_dropdown']))
+	if (!empty($context['current_board']))
 	{
 		echo '
 				<input type="hidden" name="', (!empty($modSettings['search_dropdown']) ? 'sd_brd[' : 'brd['), $context['current_board'], ']"', ' value="', $context['current_board'], '" />';
 	}
 
 	echo '					
-				<label for="quicksearch">
-					<input type="search" name="search" id="quicksearch" value="" class="linklevel1" placeholder="', $txt['search'], '" />
-				</label>
+				<label for="quicksearch" class="hide">', $txt['search'], '</label>
+				<input type="search" name="search" id="quicksearch" value="" class="linklevel1" placeholder="', $txt['search'], '" />
 				<button type="submit" aria-label="' . $txt['search'] . '" name="search;sa=results" class="', (!empty($modSettings['search_dropdown'])) ? 'with_select' : '', '">
 					<i class="icon i-search icon-shade"><s>', $txt['search'], '</s></i>
 				</button>
@@ -317,20 +316,20 @@ function template_search_form()
 }
 
 /**
- * Search bar menu icon
+ * Search bar main menu icon
  */
 function template_mb_search_bar()
 {
 	global $txt;
 
 	echo '
-			<li id="search_form_button" class="listlevel1" role="none">
-				<label for="search_form_check">
-					<a class="linklevel1 panel_search" role="menuitem">
-						<i class="main-menu-icon i-search colorize-white"><s>', $txt['search'], '</s></i>
-					</a>
-				</label>
-			</li>';
+						<li id="search_form_button" class="listlevel1" role="none">
+							<label for="search_form_check">
+								<a class="linklevel1 panel_search" role="menuitem">
+									<i class="main-menu-icon i-search colorize-white"><s>', $txt['search'], '</s></i>
+								</a>
+							</label>
+						</li>';
 }
 
 /**
@@ -368,7 +367,7 @@ function template_body_below()
 	// Show RSS link, as well as the copyright.
 	// Footer is full-width. Wrapper inside automatically matches admin width setting.
 	echo '
-	<footer id="footer_section"><a id="bot"></a>
+	<footer id="footer_section">
 		<div class="wrapper">
 			<ul>
 				<li class="copyright">',
@@ -494,7 +493,7 @@ function template_menu()
 				
 				<nav id="menu_nav" aria-label="', $txt['main_menu'], '">
 					<div class="wrapper no_js">
-					<input type="checkbox" id="search_form_check">
+					<input type="checkbox" id="search_form_check" aria-hidden="true" />
 					<ul id="main_menu" aria-label="', $txt['main_menu'], '" role="menubar">';
 
 	// Add any additional menu buttons from addons
@@ -523,7 +522,7 @@ function template_menu()
 		$target = isset($button['target']) ? ' target="' . $button['target'] . '"' : '';
 		$onclick = isset($button['onclick']) ? ' onclick="' . $button['onclick'] . '"' : '';
 		$altTitle = 'title="' . (!empty($button['alttitle']) ? $button['alttitle'] : $button['title']) . '"';
-		$ally = !empty($button['active_button']) ? 'aria-current="page"' : '';
+		$ally = !empty($button['active_button']) ? ' aria-current="page"' : '';
 
 		echo '
 						<li id="button_', $act, '" class="listlevel1', !empty($button['sub_buttons']) ? ' subsections"' : '"', ' role="none">
@@ -588,7 +587,7 @@ function template_menu()
 		template_search_form();
 	}
 
-	echo '</div>
+	echo '	</div>
 				</nav>';
 
 	// Define the upper_section toggle in javascript.
@@ -655,7 +654,7 @@ function template_button_strip($button_strip, $class = '', $strip_options = arra
 
 	if (!is_array($strip_options))
 	{
-		$strip_options = array();
+		$strip_options = [];
 	}
 
 	// List the buttons in reverse order for RTL languages.
@@ -678,7 +677,7 @@ function template_button_strip($button_strip, $class = '', $strip_options = arra
 			{
 				$subMenu[] = '
 						<li class="listlevel2">
-							<a href="' . $value['url'] . '" class="linklevel2 button_strip_' . $key . (isset($value['custom']) ? ' ' . $value['custom'] : '') . '>' . $txt[$value['text']] . '</a>
+							<a href="' . $value['url'] . '" class="linklevel2 button_strip_' . $key . (isset($value['custom']) ? '" ' . $value['custom'] : '"') . '>' . $txt[$value['text']] . '</a>
 						</li>';
 				continue;
 			}
@@ -706,9 +705,9 @@ function template_button_strip($button_strip, $class = '', $strip_options = arra
 	if (!empty($buttons))
 	{
 		echo '
-						<ul role="menubar" class="no_js buttonlist', !empty($class) ? ' ' . $class : '', '"', (!empty($strip_options['id']) ? ' id="' . $strip_options['id'] . '"' : ''), '>
-							', implode('', $buttons), '
-						</ul>';
+					<ul role="menubar" class="no_js buttonlist', !empty($class) ? ' ' . $class : '', '"', (!empty($strip_options['id']) ? ' id="' . $strip_options['id'] . '"' : ''), '>
+						', implode('', $buttons), '
+					</ul>';
 	}
 }
 
@@ -742,7 +741,7 @@ function template_quickbutton_strip($strip, $tests = array())
 
 	foreach ($strip as $key => $value)
 	{
-		if (!empty($value['checkbox']) && ((!empty($options['display_quick_mod']) && $options['display_quick_mod'] == 1) || $value['checkbox'] === 'always'))
+		if (!empty($value['checkbox']) && (!empty($options['display_quick_mod']) || $value['checkbox'] === 'always'))
 		{
 			$buttons[] = '
 					<li class="listlevel1 ' . $key . '">
@@ -900,7 +899,7 @@ function template_pagesection($button_strip = false, $strip_direction = '', $opt
 
 	if (!empty($options['page_index_markup']))
 	{
-		$pages = '<ul ' . (isset($options['page_index_id']) ? 'id="' . $options['page_index_id'] . '" ' : '') . 'class="pagelinks" role="navigation">' . $options['page_index_markup'] . '</ul>';
+		$pages = '<ul ' . (isset($options['page_index_id']) ? 'id="' . $options['page_index_id'] . '" ' : '') . 'class="pagelinks">' . $options['page_index_markup'] . '</ul>';
 	}
 	else
 	{
@@ -909,7 +908,7 @@ function template_pagesection($button_strip = false, $strip_direction = '', $opt
 			$options['page_index'] = 'page_index';
 		}
 
-		$pages = empty($context[$options['page_index']]) ? '' : '<ul ' . (isset($options['page_index_id']) ? 'id="' . $options['page_index_id'] . '" ' : '') . 'class="pagelinks" role="navigation">' . $context[$options['page_index']] . '</ul>';
+		$pages = empty($context[$options['page_index']]) ? '' : '<ul ' . (isset($options['page_index_id']) ? 'id="' . $options['page_index_id'] . '" ' : '') . 'class="pagelinks">' . $context[$options['page_index']] . '</ul>';
 	}
 
 	if (!isset($options['extra']))

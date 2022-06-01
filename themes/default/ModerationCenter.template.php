@@ -321,7 +321,7 @@ function template_reported_posts()
 	}
 	else
 	{
-		template_pagesection(false, '', array('extra' => !$context['view_closed'] && !empty($options['display_quick_mod']) && $options['display_quick_mod'] == 1 ? '<input type="submit" name="close_selected" value="' . $txt['mc_reportedp_close_selected'] . '" class="right_submit" />' : ''));
+		template_pagesection(false, '', array('extra' => !$context['view_closed'] && !empty($options['display_quick_mod']) ? '<input type="submit" name="close_selected" value="' . $txt['mc_reportedp_close_selected'] . '" class="right_submit" />' : ''));
 	}
 
 	echo '
@@ -369,7 +369,7 @@ function template_unapproved_posts()
 
 	// Quick moderation checkbox action selection
 	$quick_mod = '';
-	if (!empty($options['display_quick_mod']) && $options['display_quick_mod'] == 1 && !empty($context['unapproved_items']))
+	if (!empty($options['display_quick_mod']) && !empty($context['unapproved_items']))
 	{
 		$quick_mod = '
 					<div class="floatright">

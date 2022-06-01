@@ -373,8 +373,7 @@ class CoreFeatures extends AbstractController
 		// You need to be an admin to edit settings!
 		isAllowedTo('admin_forum');
 
-		Txt::load('Help');
-		Txt::load('ManageSettings');
+		Txt::load('Help+ManageSettings');
 
 		$context['sub_template'] = 'show_settings';
 

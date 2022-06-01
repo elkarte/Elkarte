@@ -1153,11 +1153,11 @@ function ssi_login($redirect_to = '', $output_method = 'echo')
 				<dl>
 					<dt>', $txt['username'], ':</dt>
 					<dd>
-						<input type="text" name="user" size="20" value="', $context['default_username'], '" class="input_text" autofocus="autofocus" placeholder="', $txt['username'], '" />
+						<input type="text" name="user" size="20" value="', $context['default_username'], '" class="input_text" autofocus="autofocus" autocomplete="username" placeholder="', $txt['username'], '" />
 					</dd>
 					<dt>', $txt['password'], ':</dt>
 					<dd>
-						<input type="password" name="passwrd" value="" size="20" class="input_password" placeholder="', $txt['password'], '" />
+						<input type="password" name="passwrd" value="" size="20" class="input_password" autocomplete="current-password" placeholder="', $txt['password'], '" />
 					</dd>
 				</dl>
 				<input type="submit" value="', $txt['login'], '" />

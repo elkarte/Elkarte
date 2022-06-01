@@ -27,6 +27,7 @@ use ElkArte\Themes\Theme as BaseTheme;
 use ElkArte\Languages\Txt;
 use ElkArte\User;
 use ElkArte\Util;
+use Patchwork\JSqueeze;
 
 /**
  * Class Theme
@@ -81,6 +82,7 @@ class Theme extends BaseTheme
 			'theme_variants' => array(
 				'light',
 				'besocial',
+				'dark',
 			),
 
 			/*
@@ -118,11 +120,11 @@ class Theme extends BaseTheme
 			// @todo - God it's still ugly though. Can't we just have links where we need them, without all those spans?
 			// How do we get anchors only, where they will work? Spans and strong only where necessary?
 			'page_index_template' => array(
-				'base_link' => '<li class="linavPages"><a class="navPages" href="{base_link}" role="menuitem">%2$s</a></li>',
+				'base_link' => '<li class="linavPages"><a class="navPages" href="{base_link}">%2$s</a></li>',
 				'previous_page' => '<span class="previous_page">{prev_txt}</span>',
-				'current_page' => '<li class="linavPages"><strong class="current_page" role="menuitem">%1$s</strong></li>',
+				'current_page' => '<li class="linavPages"><strong class="current_page">%1$s</strong></li>',
 				'next_page' => '<span class="next_page">{next_txt}</span>',
-				'expand_pages' => '<li class="linavPages expand_pages" role="menuitem" {custom}> <a href="#">&#8230;</a> </li>',
+				'expand_pages' => '<li class="linavPages expand_pages" {custom}> <a href="#">&#8230;</a> </li>',
 				'all' => '<span class="linavPages all_pages">{all_txt}</span>',
 			),
 
@@ -706,8 +708,9 @@ class Theme extends BaseTheme
 		// Using a specified version of jquery or what was shipped 3.6.0  / 1.13.1
 		$jquery_version = (!empty($modSettings['jquery_default']) && !empty($modSettings['jquery_version'])) ? $modSettings['jquery_version'] : '3.6.0';
 		$jqueryui_version = (!empty($modSettings['jqueryui_default']) && !empty($modSettings['jqueryui_version'])) ? $modSettings['jqueryui_version'] : '1.13.1';
+
 		$jquery_cdn = 'https://ajax.googleapis.com/ajax/libs/jquery/' . $jquery_version . '/jquery.min.js';
-		$jqueryui_cdn = 'https://ajax.googleapis.com/ajax/libs/jquery/' . $jqueryui_version . '/jquery-ui.min.js';
+		$jqueryui_cdn = 'https://ajax.googleapis.com/ajax/libs/jqueryui/' . $jqueryui_version . '/jquery-ui.min.js';
 
 		switch ($modSettings['jquery_source'])
 		{
@@ -861,9 +864,7 @@ class Theme extends BaseTheme
 	}
 
 	/**
-	 * Function to indent inline JS with consistent number of tabs
-	 * to allow the source code to flow normally and let the HTML
-	 * output (for those who peek) look well constructed.  Fluff really.
+	 * Function to either compress or pretty indent inline JS
 	 *
 	 * @param array $files
 	 * @param int $tabs
@@ -872,6 +873,26 @@ class Theme extends BaseTheme
 	 */
 	private function formatInlineJS($files, $tabs = 3)
 	{
+		global $modSettings;
+
+		// Scrunch
+		if (!empty($modSettings['minify_css_js']))
+		{
+			// Inline can have user prefs etc. so caching is not a viable option
+			// Benchmarked: at 0.01627s wall clock, 16.26ms for computations, 42% size reduction
+			// for large load, 10.3ms (.0104s) for normal sized inline.
+			require_once(EXTDIR . '/JSqueeze.php');
+			$jsqueeze = new JSqueeze();
+
+			foreach ($files as $i => $js_block)
+			{
+				$files[$i] = $jsqueeze->squeeze($js_block);
+			}
+
+			return $files;
+		}
+
+		// Or pretty
 		foreach ($files as $i => $js_block)
 		{
 			// Lines in this block

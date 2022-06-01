@@ -43,7 +43,7 @@ function list_getLanguages()
 
 	$db = database();
 
-	$languages = array();
+	$languages = [];
 	// Keep our old entries.
 	$old_txt = $txt;
 	$backup_actual_theme_dir = $settings['actual_theme_dir'];
@@ -74,7 +74,7 @@ function list_getLanguages()
 			'id' => basename($lang['filename'], '.php'),
 			'count' => 0,
 			'char_set' => 'UTF-8',
-			'default' => $language == $lang['name'] || ($language == '' && strtolower($lang['name']) == 'english'),
+			'default' => $language === $lang['name'] || ($language === '' && strtolower($lang['name']) === 'english'),
 			'locale' => $txt['lang_locale'],
 			'name' => Util::ucwords(strtr($lang['name'], array('_' => ' ', '-utf8' => ''))),
 		);

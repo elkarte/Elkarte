@@ -116,15 +116,16 @@ function template_topic_listing_above()
 	echo '
 							</ul>
 						</li>
-						<li class="listlevel1 topic_sorting_row" aria-sort="',  $context['sort_direction'] === 'up' ? 'ascending"' : 'descending"', '>
+						<li class="listlevel1 topic_sorting_row">
 							<a class="sort topicicon i-sort', $context['sort_direction'], '" href="', $current_header['url'], '" title="', $context['sort_title'], '"></a>
 						</li>';
 
-	if (!empty($context['can_quick_mod']) && $options['display_quick_mod'] == 1)
+	if (!empty($context['can_quick_mod']) && !empty($options['display_quick_mod']))
 	{
 		echo '
 						<li class="listlevel1 quickmod_select_all">
-							<input type="checkbox" onclick="invertAll(this, document.getElementById(\'quickModForm\'), \'topics[]\');" />
+							<label for="select_all" class="hide">', $txt['all'], '</label>
+							<input type="checkbox" id="select_all" onclick="invertAll(this, document.getElementById(\'quickModForm\'), \'topics[]\');" />
 						</li>';
 	}
 
@@ -145,13 +146,13 @@ function template_topic_listing()
 	if (!$context['no_topic_listing'])
 	{
 		// If Quick Moderation is enabled start the form.
-		if (!empty($context['can_quick_mod']) && $options['display_quick_mod'] > 0 && !empty($context['topics']))
+		if (!empty($context['can_quick_mod']) && !empty($options['display_quick_mod']) && !empty($context['topics']))
 		{
 			echo '
 	<form action="', $scripturl, '?action=quickmod;board=', $context['current_board'], '.', $context['start'], '" method="post" accept-charset="UTF-8" class="clear" name="quickModForm" id="quickModForm">';
 		}
 
-		// If this person can approve items and we have some awaiting approval tell them.
+		// If this person can approve items, and we have some awaiting approval tell them.
 		if (!empty($context['unapproved_posts_message']))
 		{
 			echo '
@@ -247,7 +248,7 @@ function template_topic_listing()
 					</div>
 					<div class="topic_starter">
 						', sprintf($txt['topic_started_by'], $topic['first_post']['member']['link']), !empty($topic['pages']) ? '
-						<ul class="small_pagelinks" id="pages' . $topic['first_post']['id'] . '" role="navigation">' . $topic['pages'] . '</ul>' : '', '
+						<ul class="small_pagelinks" id="pages' . $topic['first_post']['id'] . '">' . $topic['pages'] . '</ul>' : '', '
 					</div>
 				</div>';
 
@@ -260,7 +261,7 @@ function template_topic_listing()
 				echo '
 					<span class="board_avatar">
 						<a href="', $topic['last_post']['member']['href'], '">
-							<img class="avatar" src="', $topic['last_post']['member']['avatar']['href'], '" alt="', $topic['last_post']['member']['name'], '" />
+							<img class="avatar" src="', $topic['last_post']['member']['avatar']['href'], '" alt="', $topic['last_post']['member']['name'], '" loading="lazy" />
 						</a>
 					</span>';
 			}
@@ -296,46 +297,11 @@ function template_topic_listing()
 				</div>';
 
 			// Show the quick moderation options?
-			if (!empty($context['can_quick_mod']))
+			if (!empty($context['can_quick_mod']) && !empty($options['display_quick_mod']))
 			{
 				echo '
-				<div class="topic_moderation', $options['display_quick_mod'] == 1 ? '' : '_alt', '" >';
-
-				if ($options['display_quick_mod'] == 1)
-				{
-					echo '
-						<input type="checkbox" name="topics[]" value="', $topic['id'], '" />';
-				}
-				else
-				{
-					// Check permissions on each and show only the ones they are allowed to use.
-					if ($topic['quick_mod']['remove'])
-					{
-						echo '<a class="topicicon i-remove" href="', $scripturl, '?action=quickmod;board=', $context['current_board'], '.', $context['start'], ';actions%5B', $topic['id'], '%5D=remove;', $context['session_var'], '=', $context['session_id'], '" onclick="return confirm(\'', $txt['quickmod_confirm'], '\');" title="', $txt['remove_topic'], '"></a>';
-					}
-
-					if ($topic['quick_mod']['lock'])
-					{
-						echo '<a class="topicicon i-locked" href="', $scripturl, '?action=quickmod;board=', $context['current_board'], '.', $context['start'], ';actions%5B', $topic['id'], '%5D=lock;', $context['session_var'], '=', $context['session_id'], '" onclick="return confirm(\'', $txt['quickmod_confirm'], '\');" title="', $txt[$topic['is_locked'] ? 'set_unlock' : 'set_lock'], '"></a>';
-					}
-
-					if ($topic['quick_mod']['lock'] || $topic['quick_mod']['remove'])
-					{
-						echo '<br />';
-					}
-
-					if ($topic['quick_mod']['sticky'])
-					{
-						echo '<a class="topicicon i-sticky" href="', $scripturl, '?action=quickmod;board=', $context['current_board'], '.', $context['start'], ';actions%5B', $topic['id'], '%5D=sticky;', $context['session_var'], '=', $context['session_id'], '" onclick="return confirm(\'', $txt['quickmod_confirm'], '\');" title="', $txt[$topic['is_sticky'] ? 'set_nonsticky' : 'set_sticky'], '"></a>';
-					}
-
-					if ($topic['quick_mod']['move'])
-					{
-						echo '<a class="topicicon i-move" href="', $scripturl, '?action=movetopic;current_board=', $context['current_board'], ';board=', $context['current_board'], '.', $context['start'], ';topic=', $topic['id'], '.0" title="', $txt['move_topic'], '"></a>';
-					}
-				}
-
-				echo '
+				<div class="topic_moderation">
+					<input type="checkbox" name="topics[]" aria-label="check ', $topic['id'], '" value="', $topic['id'], '" />
 				</div>';
 			}
 
@@ -347,24 +313,13 @@ function template_topic_listing()
 		</ul>
 		</main>';
 
-		if (!empty($context['can_quick_mod']) && $options['display_quick_mod'] == 1 && !empty($context['topics']))
+		// Show the moderation buttons
+		if (!empty($context['can_quick_mod']) && !empty($options['display_quick_mod']) && !empty($context['topics']))
 		{
 			echo '
-			<div class="qaction_row">
-				<select class="qaction" name="qaction"', $context['can_move'] ? ' onchange="this.form.move_to.disabled = (this.options[this.selectedIndex].value != \'move\');"' : '', '>
-					<option value="">&nbsp;</option>';
+			<div id="moderationbuttons">';
 
-			foreach ($context['qmod_actions'] as $qmod_action)
-			{
-				if ($context['can_' . $qmod_action])
-				{
-					echo '
-					<option value="' . $qmod_action . '">&#10148;&nbsp;', $txt['quick_mod_' . $qmod_action] . '</option>';
-				}
-			}
-
-			echo '
-				</select>';
+			template_button_strip($context['mod_buttons'], '', ['id' => 'moderationbuttons_strip']);
 
 			// Show a list of boards they can move the topic to.
 			if ($context['can_move'])
@@ -374,16 +329,10 @@ function template_topic_listing()
 			}
 
 			echo '
-				<input type="submit" value="', $txt['quick_mod_go'], '" onclick="return document.forms.quickModForm.qaction.value != \'\' &amp;&amp; confirm(\'', $txt['quickmod_confirm'], '\');" />
-			</div>';
-		}
-
-		// Finish off the form - again.
-		if (!empty($context['can_quick_mod']) && $options['display_quick_mod'] > 0 && !empty($context['topics']))
-		{
-			echo '
-	<input type="hidden" name="' . $context['session_var'] . '" value="' . $context['session_id'] . '" />
-	</form>';
+			</div>
+			<input type="hidden" name="qaction" id="qaction" value="na" />
+			<input type="hidden" name="' . $context['session_var'] . '" value="' . $context['session_id'] . '" />
+		</form>';
 		}
 	}
 }
@@ -414,6 +363,60 @@ function template_topic_listing_below()
 		template_basicicons_legend();
 	}
 
+	if (!empty($context['can_quick_mod']) && !empty($options['display_quick_mod']) && !empty($context['topics']))
+	{
+		theme()->addInlineJavascript('
+			let oInTopicListModeration = new InTopicListModeration({
+				aQmActions: ["restore", "markread", "merge", "sticky", "approve", "lock", "remove", "move"],
+				sButtonStrip: "moderationbuttons",
+				sButtonStripDisplay: "moderationbuttons_strip",
+				bUseImageButton: false,
+				bHideStrip: true,
+				sFormId: "quickModForm",
+				
+				bCanRemove: ' . (!empty($context['allow_qm']['can_remove']) ? 'true' : 'false') . ',
+				aActionRemove: [' . implode(',', $context['allow_qm']['can_remove']) . '],
+				sRemoveButtonLabel: "' . $txt['remove_topic'] . '",
+				sRemoveButtonImage: "i-delete",
+				sRemoveButtonConfirm: "' . $txt['quickmod_confirm'] . '",
+				
+				bCanMove: ' . (!empty($context['allow_qm']['can_move']) ? 'true' : 'false') . ',
+				aActionMove: [' . implode(',', $context['allow_qm']['can_move']) . '],
+				sMoveButtonLabel: "' . $txt['move_topic'] . '",
+				sMoveButtonImage: "i-move",
+				sMoveButtonConfirm: "' . $txt['quickmod_confirm'] . '",
+
+				bCanLock: ' . ($context['allow_qm']['can_lock'] ? 'true' : 'false') . ',
+				aActionLock: [' . implode(',', $context['allow_qm']['can_lock']) . '],
+				sLockButtonLabel: "' . $txt['set_lock'] . '",
+				sLockButtonImage: "i-lock",
+				
+				bCanApprove: ' . (!empty($context['allow_qm']['can_approve']) ? 'true' : 'false') . ',
+				aActionApprove: [' . implode(',', $context['allow_qm']['can_approve']) . '],
+				sApproveButtonLabel: "' . $txt['approve'] . '",
+				sApproveButtonImage: "i-check",
+				sApproveButtonConfirm: "' . $txt['quickmod_confirm'] . '",				
+				
+				bCanSticky: ' . ($context['can_sticky'] ? 'true' : 'false') . ',
+				sStickyButtonLabel: "' . $txt['set_sticky'] . '",
+				sStickyButtonImage: "i-pin",
+				
+				bCanMerge: ' . ($context['can_merge'] ? 'true' : 'false') . ',
+				sMergeButtonLabel: "' . $txt['merge'] . '",
+				sMergeButtonImage: "i-merge",
+				
+				bCanMarkread: ' . ($context['can_markread'] ? 'true' : 'false') . ',
+				sMarkreadButtonLabel: "' . $txt['mark_read_short'] . '",
+				sMarkreadButtonImage: "i-view",
+				sMarkreadButtonConfirm: "' . $txt['mark_these_as_read_confirm'] . '",				
+
+				bCanRestore: ' . ($context['can_restore'] ? 'true' : 'false') . ',
+				sRestoreButtonLabel: "' . $txt['restore_topic'] . '",
+				sRestoreButtonImage: "i-recycle",
+				sRestoreButtonConfirm: "' . $txt['quickmod_confirm'] . '",
+			});', true);
+	}
+
 	echo '
 			<script>';
 
@@ -423,7 +426,7 @@ function template_topic_listing_below()
 				$(\'.topic_latest\').addClass(\'relative\');';
 	}
 
-	if (!empty($context['can_quick_mod']) && $options['display_quick_mod'] == 1 && !empty($context['topics']) && $context['can_move'])
+	if (!empty($context['can_quick_mod']) && !empty($options['display_quick_mod']) && !empty($context['topics']) && $context['can_move'])
 	{
 		echo '
 				aJumpTo[aJumpTo.length] = new JumpTo({
@@ -459,11 +462,11 @@ function template_topic_listing_below()
 			</script>
 	</footer>';
 
-	// Javascript for inline editing.
+	// Javascript for inline editing, double-clicking to edit subject
 	echo '
 	<script>
-		var oQuickModifyTopic = new QuickModifyTopic({
-			aHidePrefixes: Array("lockicon", "stickyicon", "pages", "newicon"),
+		let oQuickModifyTopic = new QuickModifyTopic({
+			aHidePrefixes: Array("pages", "newicon"),
 			bMouseOnDiv: false
 		});
 	</script>';

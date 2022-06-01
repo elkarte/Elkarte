@@ -177,11 +177,13 @@ class TopicsMerge
 			}
 
 			// We can't see unapproved topics here?
-			if ($modSettings['postmod_active'] && !$row['approved'] && $can_approve_boards != array(0) && in_array($row['id_board'], $can_approve_boards))
+			if ($modSettings['postmod_active'] && !$row['approved'] && $can_approve_boards != array(0) && !in_array($row['id_board'], $can_approve_boards))
 			{
+				unset($this->_topics[$row['id_topic']]);
 				continue;
 			}
-			elseif (!$row['approved'])
+
+			if (!$row['approved'])
 			{
 				$this->_boardTotals[$row['id_board']]['unapproved_topics']++;
 			}

@@ -1,5 +1,5 @@
 /* INTRODUCTION
- * This is the standard Elkarte default theme.
+ * This is the standard Elkarte theme.
  * This file contains essential layout code only.
  *
  * Colors, gradients, images, etc. are in index_variant.css in the _variant directory
@@ -157,7 +157,7 @@ body, input, button, select, textarea, .editor {
 /* Use a specific demi bold font weight for some areas, less jarring then 700/bold,
    with fallback to default font stack if not available. */
 .codeheader, .quoteheader, .expand_pages, .table_head > th, .topic_sorting_row > h3, .topic_name h4 a,
-.poster .name, .keyinfo h5 a, .keyinfo h5 a strong, .ui-dialog .ui-dialog-titlebar,
+.poster .name, .keyinfo h3 a, .keyinfo h3 a strong, .ui-dialog .ui-dialog-titlebar,
 #creator dt strong, .settings label, .popup_heading {
 	font-family: "Segoe UI Semibold", "Segoe UI", "Helvetica Neue Medium", -apple-system, BlinkMacSystemFont, "Roboto", "Oxygen", "Ubuntu", "Cantarell", "Droid Sans", "Helvetica Neue", "Trebuchet MS", Arial, sans-serif;
 	font-weight: 600;
@@ -799,6 +799,7 @@ em, .em {
 .codeheader, .bbc_quote > cite {
 	font-size: var(--font13);
 	font-weight: 600;
+	margin-bottom: .5em;
 	padding: .2em .4em;
 	border-bottom: 1px solid;
 }
@@ -809,6 +810,7 @@ em, .em {
 
 .codeheader {
 	margin-top: .4em;
+	margin-bottom: 0;
 	border-top: 3px solid;
 	border-bottom: none;
 }
@@ -1179,12 +1181,12 @@ a.bbc_link {
 	opacity: 1;
 }
 
-#search_form_check:checked ~ #main_menu {
+#search_form_check:checked + #main_menu {
 	transition: opacity .5s;
 	opacity: 0;
 }
 
-#search_form_check ~ #main_menu {
+#search_form_check + #main_menu {
 	visibility: visible;
 	transition: opacity .5s;
 	opacity: 1;
@@ -1548,6 +1550,8 @@ a.bbc_link {
 	content: '';
 	transition: 350ms all 125ms ease-in;
 	transform: rotate(-45deg);
+	/* Clips the bottom of the rotated square so it does not bleed into dropdown content */
+	clip-path: polygon(25% 75%, 0% 0%, 100% 0%, 100% 100%);
 	opacity: 0;
 	border: 1px solid;
 	/* Simple variable to change if you want to change the size */
@@ -1896,8 +1900,9 @@ nav > .quickbuttons, menu > .quickbuttons {
 }
 
 .quickbuttons .inline_mod_check {
-	margin: .25em .25em .25em 0;
-	padding: 0 .25em;
+	margin: .25em .1em;
+	padding: 0 4px 1px 4px;
+	border: 1px solid;
 }
 
 .quickbuttons .linklevel1 {
@@ -2023,7 +2028,7 @@ nav > .quickbuttons, menu > .quickbuttons {
 }
 
 /* Radius right end of the last button. */
-.quickbuttons .listlevel1.subsections a, .linklevel1.post_options, .linklevel1.remove_button {
+.quickbuttons li:first-child, .quickbuttons li:first-child a {
 	border-radius: 0 4px 4px 0;
 }
 
@@ -2097,7 +2102,7 @@ nav > .quickbuttons, menu > .quickbuttons {
 	align-items: center;
 	flex-wrap: wrap;
 	max-width: 100%;
-	padding: .2em .25em;
+	padding: .4em .25em .2em .25em;
 }
 
 .pagesection.rtl {
@@ -2355,6 +2360,7 @@ nav > .quickbuttons, menu > .quickbuttons {
 	float: left;
 	clear: both;
 	width: 45%;
+	min-height: 2em;
 	margin: 0 0 .7em 0;
 }
 
@@ -2384,6 +2390,10 @@ nav > .quickbuttons, menu > .quickbuttons {
 .settings .smalltext {
 	display: inline-block;
 	padding-left: 1em;
+}
+
+.settings dd .linkbutton:link {
+	margin: 0;
 }
 
 /* -------------------------------------------------------
@@ -2801,11 +2811,23 @@ nav > .quickbuttons, menu > .quickbuttons {
 }
 
 /* Actions and icons below the message listing */
+#qaction_bar.sticky {
+	position: sticky;
+	z-index: 10;
+	bottom: 0;
+	padding: 8px 0;
+	border: 1px solid;
+}
+
 .qaction_row {
 	display: flex;
 	align-content: center;
 	justify-content: flex-end;
 	padding: .5em;
+}
+
+.qaction_row > label {
+	padding-top: 2px;
 }
 
 #message_index_jump_to.qaction_row {
@@ -2849,6 +2871,7 @@ nav > .quickbuttons, menu > .quickbuttons {
 
 #poll, #edit_poll {
 	overflow: hidden;
+	margin-bottom: 2em;
 }
 
 #poll_main #question, #poll_main .poll_main input {
@@ -3267,16 +3290,29 @@ footer nav {
 	grid-row: quickbuttons;
 }
 
+/* All the signatures used in the forum. */
 footer .signature {
 	grid-row: signature;
 }
 
-/* All the signatures used in the forum. */
-.signature, .custom_fields_above_signature {
+.signature {
 	font-size: var(--font13);
 	overflow: auto;
+	margin-top: 1em;
 	padding: 8px 0;
 	border-top: 1px solid;
+}
+
+.custom_fields_above_signature {
+	margin-top: 0;
+	padding: 0 0 8px 0;
+}
+
+.likes_above_signature {
+	font-size: var(--font15);
+	margin-bottom: 8px;
+	padding-bottom: 8px;
+	border-bottom: 1px solid;
 }
 
 /* On to the posts, this is the main container for all posts on a page */
@@ -3527,7 +3563,25 @@ footer .signature {
 #moderationbuttons {
 	display: flex;
 	align-items: center;
-	margin: 1em 0 .5em 0;
+	flex-wrap: wrap;
+	margin: .5em 0;
+	padding: 8px 0;
+}
+
+#moderationbuttons_strip {
+	flex-wrap: wrap;
+}
+
+#moderationbuttons.sticky {
+	position: sticky;
+	z-index: 10;
+	bottom: 0;
+	border-top: 3px solid;
+	border-bottom: 2px solid;
+}
+
+#moderationbuttons.sticky > #display_jump_to {
+	display: none;
 }
 
 /* The jump to box */
@@ -3557,6 +3611,14 @@ footer .signature {
 /* The QR buttons may be better suited not being over the topic buttons */
 #post_confirm_buttons {
 	justify-content: flex-start;
+}
+
+#post_confirm_buttons input:first-child {
+	border-radius: 4px 0 0 4px;
+}
+
+#post_confirm_buttons input:nth-last-child(2) {
+	border-radius: 0 4px 4px 0;
 }
 
 /* The rest is for the share/send topic popup window. */
@@ -4058,6 +4120,7 @@ ul.post_options li {
 /* The split topic section. */
 #selected, #not_selected {
 	width: 50%;
+	padding: 1px;
 }
 
 .split_messages .content {
@@ -4143,7 +4206,7 @@ dl.merge_topic dd {
 	position: absolute;
 	z-index: 999;
 	left: -9999px;
-	max-width: 350px;
+	max-width: 40%;
 	padding: .4em 9px;
 	border: 1px solid;
 	border-radius: 4px;
@@ -4883,7 +4946,7 @@ Stef                       ^
 	float: right;
 	width: 50%;
 	min-height: 1.467em;
-	margin: 0 0 .25em 0;
+	margin: .1em 0 .25em 0;
 	padding: 0 .25em 0 0;
 	border: 1px solid;
 }
@@ -4899,11 +4962,11 @@ Stef                       ^
 /* Absolute positioning stops these breaking the bars on narrow screens. */
 .statsbar .righttext {
 	font-size: var(--font13);
-	line-height: 1.75;
 	position: absolute;
 	z-index: 2;
 	top: 0;
 	right: 0;
+	height: 100%;
 	padding: 0 .25em;
 }
 
@@ -5350,6 +5413,15 @@ Stef                       ^
  * -------------------------------------------------------
  */
 
+#registration > h2 {
+	display: flex;
+	align-items: center;
+}
+
+#registration > h2 > select {
+	margin: 0 2em;
+}
+
 /* Styles for the login areas. */
 .login {
 	max-width: 640px;
@@ -5451,7 +5523,7 @@ Stef                       ^
 	padding-right: 32px;
 }
 
-.form_field.w_icon > a {
+.form_field.w_icon > a, .form_field.w_icon > span > a, .form_field.w_icon > span > i {
 	position: absolute;
 	top: 0;
 	right: 0;
@@ -5512,17 +5584,10 @@ Stef                       ^
 }
 
 /* description & information used below headers, others used to how a result message */
-.description, .information, .warningbox, .successbox, .infobox, .errorbox, .genericbox {
+.description, .information, .warningbox, .successbox, .infobox, .errorbox {
 	margin: 0 0 1.1em 0;
 	padding: .8em .8em;
 	border: 1px solid;
-}
-
-.genericbox {
-	font-size: var(--font15);
-	display: flex;
-	align-items: center;
-	padding: .4em .4em;
 }
 
 .information p {

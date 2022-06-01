@@ -27,7 +27,7 @@ class User
 	 *
 	 * @var \ElkArte\ValuesContainer
 	 */
-	public static $info = null;
+	public static $info;
 
 	/**
 	 * Contains the data read from the db.
@@ -35,14 +35,14 @@ class User
 	 *
 	 * @var \ElkArte\ValuesContainerReadOnly
 	 */
-	public static $settings = null;
+	public static $settings;
 
 	/**
 	 * The user object
 	 *
 	 * @var \ElkArte\UserSettings
 	 */
-	protected static $instance = null;
+	protected static $instance;
 
 	/**
 	 * The user id

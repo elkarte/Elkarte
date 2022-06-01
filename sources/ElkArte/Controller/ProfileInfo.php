@@ -745,10 +745,10 @@ class ProfileInfo extends AbstractController
 						'function' => function ($rowData) {
 							if ($rowData['is_image'] && !empty($rowData['id_thumb']))
 							{
-								return '<img src="' . getUrl('action', ['action' => 'dlattach', 'attach' => $rowData['id_thumb'], 'image']) . '" />';
+								return '<img src="' . getUrl('action', ['action' => 'dlattach', 'attach' => $rowData['id_thumb'], 'image']) . '" loading="lazy" />';
 							}
 
-							return '<img src="' . getUrl('action', ['action' => 'dlattach', 'attach' => $rowData['id'], 'thumb']) . '" />';
+							return '<img src="' . getUrl('action', ['action' => 'dlattach', 'attach' => $rowData['id'], 'thumb']) . '" loading="lazy" />';
 						},
 						'class' => 'centertext recent_attachments',
 					),
@@ -1515,29 +1515,29 @@ class ProfileInfo extends AbstractController
 				{
 					if (!empty($attachment['id_thumb']))
 					{
-						$context['thumbs'][$i]['img'] = '<img id="thumb_' . $attachment['id'] . '" src="' . getUrl('action', ['action' => 'dlattach', 'topic' => $attachment['topic'] . '.0', 'attach' => $attachment['id_thumb'], 'image']) . '" title="" alt="" />';
+						$context['thumbs'][$i]['img'] = '<img id="thumb_' . $attachment['id'] . '" src="' . getUrl('action', ['action' => 'dlattach', 'topic' => $attachment['topic'] . '.0', 'attach' => $attachment['id_thumb'], 'image']) . '" title="" alt="" loading="lazy" />';
 					}
 					elseif (!empty($modSettings['attachmentThumbWidth']) && !empty($modSettings['attachmentThumbHeight']))
 					{
 						// No thumbnail available ... use html instead
 						if ($attachment['width'] > $modSettings['attachmentThumbWidth'] || $attachment['height'] > $modSettings['attachmentThumbHeight'])
 						{
-							$context['thumbs'][$i]['img'] = '<img id="thumb_' . $attachment['id'] . '" src="' . getUrl('action', ['action' => 'dlattach', 'topic' => $attachment['topic'] . '.0', 'attach' => $attachment['id']]) . '" title="" alt="" width="' . $modSettings['attachmentThumbWidth'] . '" height="' . $modSettings['attachmentThumbHeight'] . '" />';
+							$context['thumbs'][$i]['img'] = '<img id="thumb_' . $attachment['id'] . '" src="' . getUrl('action', ['action' => 'dlattach', 'topic' => $attachment['topic'] . '.0', 'attach' => $attachment['id']]) . '" title="" alt="" width="' . $modSettings['attachmentThumbWidth'] . '" height="' . $modSettings['attachmentThumbHeight'] . '" loading="lazy" />';
 						}
 						else
 						{
-							$context['thumbs'][$i]['img'] = '<img id="thumb_' . $attachment['id'] . '" src="' . getUrl('action', ['action' => 'dlattach', 'topic' => $attachment['topic'] . '.0', 'attach' => $attachment['id']]) . '" title="" alt="" width="' . $attachment['width'] . '" height="' . $attachment['height'] . '" />';
+							$context['thumbs'][$i]['img'] = '<img id="thumb_' . $attachment['id'] . '" src="' . getUrl('action', ['action' => 'dlattach', 'topic' => $attachment['topic'] . '.0', 'attach' => $attachment['id']]) . '" title="" alt="" width="' . $attachment['width'] . '" height="' . $attachment['height'] . '" loading="lazy" />';
 						}
 					}
 				}
 				// Not an image so set a mime thumbnail based off the filetype
 				elseif ((!empty($modSettings['attachmentThumbWidth']) && !empty($modSettings['attachmentThumbHeight'])) && (128 > $modSettings['attachmentThumbWidth'] || 128 > $modSettings['attachmentThumbHeight']))
 				{
-					$context['thumbs'][$i]['img'] = '<img src="' . $mime_images_url . (!FileFunctions::instance()->fileExists($mime_path . $attachment['fileext'] . '.png') ? 'default' : $attachment['fileext']) . '.png" title="" alt="" width="' . $modSettings['attachmentThumbWidth'] . '" height="' . $modSettings['attachmentThumbHeight'] . '" />';
+					$context['thumbs'][$i]['img'] = '<img src="' . $mime_images_url . (!FileFunctions::instance()->fileExists($mime_path . $attachment['fileext'] . '.png') ? 'default' : $attachment['fileext']) . '.png" title="" alt="" width="' . $modSettings['attachmentThumbWidth'] . '" height="' . $modSettings['attachmentThumbHeight'] . '" loading="lazy" />';
 				}
 				else
 				{
-					$context['thumbs'][$i]['img'] = '<img src="' . $mime_images_url . (!FileFunctions::instance()->fileExists($mime_path . $attachment['fileext'] . '.png') ? 'default' : $attachment['fileext']) . '.png" title="" alt="" />';
+					$context['thumbs'][$i]['img'] = '<img src="' . $mime_images_url . (!FileFunctions::instance()->fileExists($mime_path . $attachment['fileext'] . '.png') ? 'default' : $attachment['fileext']) . '.png" title="" alt="" loading="lazy" />';
 				}
 			}
 		}

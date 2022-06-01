@@ -115,7 +115,10 @@ class Avatars
 		}
 
 		// Delete any temporary file if it still exists
-		$this->file_functions->delete($_FILES['attachment']['tmp_name']);
+		if (isset($_FILES['attachment']['tmp_name']))
+		{
+			$this->file_functions->delete($_FILES['attachment']['tmp_name']);
+		}
 
 		return $check ? true : 'bad_avatar';
 	}

@@ -19,44 +19,26 @@ namespace ElkArte\Search\API;
 use ElkArte\Search\Cache\Session;
 
 /**
- * SearchAPI-Standard.class.php, Standard non full index, non custom index search
+ * SearchAPI-Standard.class.php, Standard non-full index, non-custom index search
  *
  * @package Search
  */
 class Standard extends AbstractAPI
 {
-	/**
-	 * This is the last version of ElkArte that this was tested on, to protect against API changes.
-	 *
-	 * @var string
-	 */
+	/** @var string This is the last version of ElkArte that this was tested on, to protect against API changes */
 	public $version_compatible = 'ElkArte 2.0 dev';
 
-	/**
-	 * This won't work with versions of ElkArte less than this.
-	 *
-	 * @var string
-	 */
+	/** @var string This won't work with versions of ElkArte less than this. */
 	public $min_elk_version = 'ElkArte 1.0 Beta';
 
-	/**
-	 * Standard search is supported by default.
-	 *
-	 * @var bool
-	 */
+	/** @var bool Standard search is supported by default. */
 	public $is_supported = true;
 
-	/**
-	 *
-	 * @var object
-	 */
-	protected $_search_cache = null;
+	/** @var object */
+	protected $_search_cache;
 
-	/**
-	 *
-	 * @var int
-	 */
-	protected $_num_results = 0;
+	/** @var int total count of search results */
+	protected $_num_results;
 
 	/**
 	 * Wrapper for searchQuery of the SearchAPI
@@ -64,9 +46,8 @@ class Standard extends AbstractAPI
 	 * @param string[] $search_words
 	 * @param string[] $excluded_words
 	 * @param bool[] $participants
-	 * @param string[] $search_results
 	 *
-	 * @return mixed[]
+	 * @return array
 	 * @throws \Exception
 	 */
 	public function searchQuery($search_words, $excluded_words, &$participants)
@@ -80,6 +61,7 @@ class Standard extends AbstractAPI
 		if ($this->_search_cache->existsWithParams($context['params']) === false)
 		{
 			$search_id = $this->_search_cache->increaseId($modSettings['search_pointer'] ?? 0);
+
 			// Store the new id right off.
 			updateSettings([
 				'search_pointer' => $search_id
@@ -311,7 +293,7 @@ class Standard extends AbstractAPI
 	/**
 	 * Inserts the data into log_search_results
 	 *
-	 * @param mixed[] $main_query - An array holding all the query parts.
+	 * @param array $main_query - An array holding all the query parts.
 	 *   Structure:
 	 *        'select' => string[] - the select columns
 	 *        'from' => string - the table for the FROM clause
@@ -420,14 +402,13 @@ class Standard extends AbstractAPI
 				'id_search' => $id_search,
 				'relevance' => '0',
 			),
-			'weights' => array(),
 			'from' => '{db_prefix}topics AS t',
 			'inner_join' => array(
 				'{db_prefix}messages AS m ON (m.id_topic = t.id_topic)'
 			),
-			'left_join' => array(),
-			'where' => array(),
-			'group_by' => array(),
+			'left_join' => [],
+			'where' => [],
+			'group_by' => [],
 			'parameters' => array(
 				'min_msg' => $this->_searchParams->_minMsg,
 				'recent_message' => $this->_searchParams->_recentMsg,
@@ -510,16 +491,16 @@ class Standard extends AbstractAPI
 		// Not using an index? All conditions have to be carried over.
 		else
 		{
-			$orWhere = array();
+			$orWhere = [];
 			$count = 0;
 			$excludedWords = $this->_searchArray->getExcludedWords();
 			foreach ($this->_searchWords as $words)
 			{
-				$where = array();
+				$where = [];
 				foreach ($words['all_words'] as $regularWord)
 				{
 					$where[] = 'm.body' . (in_array($regularWord, $excludedWords) ? ' {not_' : '{') . (empty($modSettings['search_match_words']) || $this->noRegexp() ? 'ilike} ' : 'rlike} ') . '{string:all_word_body_' . $count . '}';
-					if (in_array($regularWord, $excludedWords))
+					if (in_array($regularWord, $excludedWords, true))
 					{
 						$where[] = 'm.subject ' . (empty($modSettings['search_match_words']) || $this->noRegexp() ? ' {not_ilike} ' : ' {not_rlike} ') . '{string:all_word_body_' . $count . '}';
 					}
@@ -896,7 +877,7 @@ class Standard extends AbstractAPI
 	/**
 	 * Determines and add the relevance to the results
 	 *
-	 * @param mixed[] $topics - The search results (passed by reference)
+	 * @param array $topics - The search results (passed by reference)
 	 * @param int $id_search - the id of the search
 	 * @param int $start - Results are shown starting from here
 	 * @param int $limit - No more results than this

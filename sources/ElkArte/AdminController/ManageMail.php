@@ -48,8 +48,7 @@ class ManageMail extends AbstractController
 	{
 		global $context, $txt;
 
-		Txt::load('Help');
-		Txt::load('ManageMail');
+		Txt::load('Help+ManageMail');
 
 		$subActions = array(
 			'browse' => array($this, 'action_browse', 'permission' => 'admin_forum'),

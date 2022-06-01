@@ -14,9 +14,7 @@
 document.addEventListener("DOMContentLoaded", function ()
 {
 	// If they touch the screen, then we switch to click menus
-	window.addEventListener('touchstart', function onFirstTouch() {
-		useClickMenu();
-	}, false);
+	window.addEventListener('touchstart', onFirstTouch, false);
 
 	// Or if they specifically only want click menus
 	if (use_click_menu)
@@ -35,19 +33,19 @@ document.addEventListener("DOMContentLoaded", function ()
 $(function ()
 {
 	// Smooth scroll to top.
-	$("a[href='#top']").on("click", function (e)
+	$("#gotop").on("click", function (e)
 	{
 		e.preventDefault();
 		$("html,body").animate({scrollTop: 0}, 700);
 	});
 
 	// Smooth scroll to bottom.
-	$("a[href='#bot']").on("click", function (e)
+	$("#gobottom").on("click", function (e)
 	{
 		e.preventDefault();
 
 		// Don't scroll all the way down to the footer, just the content bottom
-		let link = $('#bot'),
+		let link = $('#footer_section'),
 			link_y = link.height();
 
 		$("html,body").animate({scrollTop: link.offset().top + link_y - $(window).height()}, 700);
@@ -189,7 +187,13 @@ function elk_addButton(sButtonStripId, bUseImage, oOptions)
 		oNewButton.id = oOptions.sId;
 	}
 
-	oNewButton.innerHTML = '<a class="linklevel1" href="' + oOptions.sUrl + '" ' + ('sCustom' in oOptions ? oOptions.sCustom : '') + '><span class="last"' + ('sId' in oOptions ? ' id="' + oOptions.sId + '_text"' : '') + '>' + oOptions.sText + '</span></a>';
+	oNewButton.innerHTML = '' +
+		'<a class="linklevel1" href="' + oOptions.sUrl + '" ' + ('sCustom' in oOptions ? oOptions.sCustom : '') + '>' +
+		('sImage' in oOptions && bUseImage ? '<i class="icon ' + oOptions.sImage + '"></i>' : '') +
+		'   <span class="last"' + ('sId' in oOptions ? ' id="' + oOptions.sId + '_text"' : '') + '>' +
+				oOptions.sText +
+		'   </span>' +
+		'</a>';
 
 	if (oOptions.aEvents)
 	{
@@ -200,6 +204,10 @@ function elk_addButton(sButtonStripId, bUseImage, oOptions)
 	}
 
 	oButtonStripList.appendChild(oNewButton);
+}
+
+function onFirstTouch() {
+	useClickMenu();
 }
 
 function useClickMenu()

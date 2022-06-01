@@ -21,9 +21,10 @@ namespace ElkArte;
  */
 class Unread
 {
+	/** @var int  */
 	public const UNREAD = 0;
+	/** @var int  */
 	public const UNREADREPLIES = 1;
-
 	/** @var bool */
 	private $_ascending = false;
 	/** @var string */
@@ -37,22 +38,22 @@ class Unread
 	/** @var int */
 	private $_earliest_msg = 0;
 	/** @var bool */
-	private $_showing_all_topics = false;
+	private $_showing_all_topics;
 	/** @var int */
 	private $_user_id = 0;
 	/** @var bool */
-	private $_post_mod = false;
+	private $_post_mod ;
 	/** @var bool */
-	private $_unwatch = false;
-	/** @var \ElkArte\Database\QueryInterface|null */
-	private $_db = null;
+	private $_unwatch ;
+	/** @var \ElkArte\Database\QueryInterface */
+	private $_db;
 	/** @var int|string */
 	private $_preview_bodies = 0;
 
 	/**
 	 * Parameters for the main query.
 	 */
-	private $_query_parameters = array();
+	private $_query_parameters = [];
 
 	/**
 	 * Constructor
@@ -80,7 +81,7 @@ class Unread
 	 */
 	public function setBoards($boards)
 	{
-		$this->_query_parameters['boards'] = is_array($boards) ? $boards : array($boards);
+		$this->_query_parameters['boards'] = is_array($boards) ? $boards : [$boards];
 	}
 
 	/**
@@ -90,7 +91,7 @@ class Unread
 	 */
 	public function setAction($action)
 	{
-		if (in_array($action, array(self::UNREAD, self::UNREADREPLIES)))
+		if (in_array($action, [self::UNREAD, self::UNREADREPLIES]))
 		{
 			$this->_action = $action;
 		}
@@ -174,7 +175,8 @@ class Unread
 	private function _countRecentTopics($is_first_login, $id_msg_last_visit = 0)
 	{
 		$request = $this->_db->fetchQuery('
-			SELECT COUNT(*), MIN(t.id_last_msg)
+			SELECT 
+				COUNT(*), MIN(t.id_last_msg)
 			FROM {db_prefix}topics AS t
 				LEFT JOIN {db_prefix}log_topics AS lt ON (lt.id_topic = t.id_topic AND lt.id_member = {int:current_member})
 				LEFT JOIN {db_prefix}log_mark_read AS lmr ON (lmr.id_board = t.id_board AND lmr.id_member = {int:current_member})
@@ -184,12 +186,12 @@ class Unread
 				AND COALESCE(lt.id_msg, lmr.id_msg, 0) < t.id_last_msg' .
 			($this->_post_mod ? ' AND t.approved = {int:is_approved}' : '') .
 			($this->_unwatch ? ' AND COALESCE(lt.unwatched, 0) != 1' : ''),
-			array_merge($this->_query_parameters, array(
+			array_merge($this->_query_parameters, [
 				'current_member' => $this->_user_id,
 				'earliest_msg' => $this->_earliest_msg,
 				'id_msg_last_visit' => $id_msg_last_visit,
 				'is_approved' => 1,
-			))
+			])
 		);
 		list ($this->_num_topics, $this->_min_message) = $request->fetch_row();
 		$request->free_result();
@@ -212,10 +214,10 @@ class Unread
 				AND COALESCE(lt.id_msg, lmr.id_msg, 0) < t.id_last_msg' . ($this->_post_mod ? '
 				AND t.approved = {int:is_approved}' : '') . ($this->_unwatch ? '
 				AND COALESCE(lt.unwatched, 0) != 1' : ''),
-			array_merge($this->_query_parameters, array(
+			array_merge($this->_query_parameters, [
 				'current_member' => $this->_user_id,
 				'is_approved' => 1,
-			))
+			])
 		);
 		list ($this->_num_topics, $this->_min_message) = $request->fetch_row();
 		$request->free_result();
@@ -229,7 +231,7 @@ class Unread
 	 * @param int $start - position to start the query
 	 * @param int $limit - number of entries to grab
 	 * @param bool $include_avatars - if avatars should be retrieved as well
-	 * @return mixed[] - see \ElkArte\TopicUtil::prepareContext
+	 * @return array - see \ElkArte\TopicUtil::prepareContext
 	 */
 	public function getUnreads($join, $start, $limit, $include_avatars)
 	{
@@ -251,42 +253,29 @@ class Unread
 	 * @param int $start - position to start the query
 	 * @param int $limit - number of entries to grab
 	 * @param bool|int $include_avatars - if avatars should be retrieved as well
-	 * @return mixed[] - see \ElkArte\TopicUtil::prepareContext
+	 * @return array - see \ElkArte\TopicUtil::prepareContext
 	 */
 	private function _getUnreadTopics($join, $start, $limit, $include_avatars = false)
 	{
-		if ($this->_preview_bodies == 'all')
-		{
-			$body_query = 'ml.body AS last_body, ms.body AS first_body,';
-		}
-		elseif (empty($this->_preview_bodies))
-		// If empty, no preview at all
-		{
-			$body_query = '';
-		}
-		// Default: a SUBSTRING
-		else
-		{
-			$body_query = 'SUBSTRING(ml.body, 1, ' . ($this->_preview_bodies + 256) . ') AS last_body, SUBSTRING(ms.body, 1, ' . ($this->_preview_bodies + 256) . ') AS first_body,';
-		}
+		$body_query = $this->_setBodyQuery();
 
 		if (!empty($include_avatars))
 		{
 			if ($include_avatars === 1 || $include_avatars === 3)
 			{
-				$custom_selects = array('meml.avatar', 'COALESCE(a.id_attach, 0) AS id_attach', 'a.filename', 'a.attachment_type', 'meml.email_address');
-				$custom_joins = array('LEFT JOIN {db_prefix}attachments AS a ON (a.id_member = ml.id_member AND a.id_member != 0)');
+				$custom_selects = ['meml.avatar', 'COALESCE(a.id_attach, 0) AS id_attach', 'a.filename', 'a.attachment_type', 'meml.email_address'];
+				$custom_joins = ['LEFT JOIN {db_prefix}attachments AS a ON (a.id_member = ml.id_member AND a.id_member != 0)'];
 			}
 			else
 			{
-				$custom_selects = array();
-				$custom_joins = array();
+				$custom_selects = [];
+				$custom_joins = [];
 			}
 
 			if ($include_avatars === 2 || $include_avatars === 3)
 			{
-				$custom_selects = array_merge($custom_selects, array('memf.avatar AS avatar_first', 'COALESCE(af.id_attach, 0) AS id_attach_first', 'af.filename AS filename_first', 'af.attachment_type AS attachment_type_first', 'memf.email_address AS email_address_first'));
-				$custom_joins = array_merge($custom_joins, array('LEFT JOIN {db_prefix}attachments AS af ON (af.id_member = mf.id_member AND af.id_member != 0)'));
+				$custom_selects = array_merge($custom_selects, ['memf.avatar AS avatar_first', 'COALESCE(af.id_attach, 0) AS id_attach_first', 'af.filename AS filename_first', 'af.attachment_type AS attachment_type_first', 'memf.email_address AS email_address_first']);
+				$custom_joins = array_merge($custom_joins, ['LEFT JOIN {db_prefix}attachments AS af ON (af.id_member = mf.id_member AND af.id_member != 0)']);
 			}
 		}
 
@@ -318,14 +307,14 @@ class Unread
 			($this->_unwatch ? ' AND COALESCE(lt.unwatched, 0) != 1' : '') . '
 			ORDER BY {raw:order}
 			LIMIT {int:limit} OFFSET {int:offset}',
-			array_merge($this->_query_parameters, array(
+			array_merge($this->_query_parameters, [
 				'current_member' => $this->_user_id,
 				'min_message' => $this->_min_message,
 				'is_approved' => 1,
 				'order' => $this->_sort_query . ($this->_ascending ? '' : ' DESC'),
 				'offset' => $start,
 				'limit' => $limit,
-			))
+			])
 		);
 		$topics = $request->fetch_all();
 		$request->free_result();
@@ -339,12 +328,13 @@ class Unread
 	 * @param int $start - position to start the query
 	 * @param int $limit - number of entries to grab
 	 * @param bool|int $include_avatars - if avatars should be retrieved as well
-	 * @return mixed[]|bool - see \ElkArte\TopicUtil::prepareContext
+	 * @return array|bool - see \ElkArte\TopicUtil::prepareContext
 	 */
 	private function _getUnreadReplies($start, $limit, $include_avatars = false)
 	{
 		$request = $this->_db->fetchQuery('
-			SELECT t.id_topic, ' . $this->_sort_query . '
+			SELECT 
+				t.id_topic, ' . $this->_sort_query . '
 			FROM {db_prefix}topics AS t
 				INNER JOIN {db_prefix}messages AS m ON (m.id_topic = t.id_topic AND m.id_member = {int:current_member})' . (strpos($this->_sort_query, 'ms.') === false ? '' : '
 				INNER JOIN {db_prefix}messages AS ms ON (ms.id_msg = t.id_first_msg)') . (strpos($this->_sort_query, 'mems.') === false ? '' : '
@@ -358,16 +348,16 @@ class Unread
 			($this->_unwatch ? ' AND COALESCE(lt.unwatched, 0) != 1' : '') . '
 			ORDER BY {raw:order}
 			LIMIT {int:limit} OFFSET {int:offset}',
-			array_merge($this->_query_parameters, array(
+			array_merge($this->_query_parameters, [
 				'current_member' => $this->_user_id,
 				'min_message' => $this->_min_message,
 				'is_approved' => 1,
 				'order' => $this->_sort_query . ($this->_ascending ? '' : ' DESC'),
 				'offset' => $start,
 				'limit' => $limit,
-			))
+			])
 		);
-		$topics = array();
+		$topics = [];
 		while (($row = $request->fetch_assoc()))
 		{
 			$topics[] = $row['id_topic'];
@@ -380,38 +370,25 @@ class Unread
 			return false;
 		}
 
-		if ($this->_preview_bodies == 'all')
-		{
-			$body_query = 'ml.body AS last_body, ms.body AS first_body,';
-		}
-		elseif (empty($this->_preview_bodies))
-		{
-			// If empty, no preview at all
-			$body_query = '';
-		}
-		// Default: a SUBSTRING
-		else
-		{
-			$body_query = 'SUBSTRING(ml.body, 1, ' . ($this->_preview_bodies + 256) . ') AS last_body, SUBSTRING(ms.body, 1, ' . ($this->_preview_bodies + 256) . ') AS first_body,';
-		}
+		$body_query = $this->_setBodyQuery();
 
 		if (!empty($include_avatars))
 		{
 			if ($include_avatars === 1 || $include_avatars === 3)
 			{
-				$custom_selects = array('meml.avatar', 'COALESCE(a.id_attach, 0) AS id_attach', 'a.filename', 'a.attachment_type', 'meml.email_address');
-				$custom_joins = array('LEFT JOIN {db_prefix}attachments AS a ON (a.id_member = ml.id_member AND a.id_member != 0)');
+				$custom_selects = ['meml.avatar', 'COALESCE(a.id_attach, 0) AS id_attach', 'a.filename', 'a.attachment_type', 'meml.email_address'];
+				$custom_joins = ['LEFT JOIN {db_prefix}attachments AS a ON (a.id_member = ml.id_member AND a.id_member != 0)'];
 			}
 			else
 			{
-				$custom_selects = array();
-				$custom_joins = array();
+				$custom_selects = [];
+				$custom_joins = [];
 			}
 
 			if ($include_avatars === 2 || $include_avatars === 3)
 			{
-				$custom_selects = array_merge($custom_selects, array('memf.avatar AS avatar_first', 'COALESCE(af.id_attach, 0) AS id_attach_first', 'af.filename AS filename_first', 'af.attachment_type AS attachment_type_first', 'memf.email_address AS email_address_first'));
-				$custom_joins = array_merge($custom_joins, array('LEFT JOIN {db_prefix}attachments AS af ON (af.id_member = ms.id_member AND af.id_member != 0)'));
+				$custom_selects = array_merge($custom_selects, ['memf.avatar AS avatar_first', 'COALESCE(af.id_attach, 0) AS id_attach_first', 'af.filename AS filename_first', 'af.attachment_type AS attachment_type_first', 'memf.email_address AS email_address_first']);
+				$custom_joins = array_merge($custom_joins, ['LEFT JOIN {db_prefix}attachments AS af ON (af.id_member = ms.id_member AND af.id_member != 0)']);
 			}
 		}
 
@@ -438,16 +415,38 @@ class Unread
 			WHERE t.id_topic IN ({array_int:topic_list})
 			ORDER BY {raw:order}
 			LIMIT {int:limit}',
-			array(
+			[
 				'current_member' => $this->_user_id,
 				'order' => $this->_sort_query . ($this->_ascending ? '' : ' DESC'),
 				'topic_list' => $topics,
 				'limit' => count($topics),
-			)
+			]
 		);
 		$return = $request->fetch_all();
 		$request->free_result();
 
 		return TopicUtil::prepareContext($return, true, ((int) $this->_preview_bodies) + 128);
+	}
+
+	/**
+	 * Set the body query
+	 *
+	 * @return string
+	 */
+	private function _setBodyQuery()
+	{
+		if ($this->_preview_bodies === 'all')
+		{
+			return 'ml.body AS last_body, ms.body AS first_body,';
+		}
+
+		// If empty, no preview at all
+		if (empty($this->_preview_bodies))
+		{
+			return '';
+		}
+
+		// Default: a SUBSTRING
+		return 'SUBSTRING(ml.body, 1, ' . ($this->_preview_bodies + 256) . ') AS last_body, SUBSTRING(ms.body, 1, ' . ($this->_preview_bodies + 256) . ') AS first_body,';
 	}
 }

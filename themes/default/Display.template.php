@@ -61,6 +61,7 @@ function template_messages_informations_above()
 	{
 		echo '
 			<div class="generalinfo">';
+
 		if (!empty($settings['display_who_viewing']))
 		{
 			echo '
@@ -105,8 +106,8 @@ function template_messages()
 {
 	global $context, $settings, $options, $txt, $scripturl;
 
-	$context['quick_reply_removableMessageIDs'] = array();
-	$context['quick_reply_ignoredMsgs'] = array();
+	$context['quick_reply_removableMessageIDs'] = [];
+	$context['quick_reply_ignoredMsgs'] = [];
 
 	// Get all the messages...
 	$reset = isset($context['reset_renderer']);
@@ -184,9 +185,9 @@ function template_messages()
 							<span id="messageicon_', $message['id'], '" class="messageicon', ($message['icon_url'] !== $settings['images_url'] . '/post/xx.png') ? '"' : ' hide"', '>
 								<img src="', $message['icon_url'] . '" alt=""', $message['can_modify'] ? ' id="msg_icon_' . $message['id'] . '"' : '', ' />
 							</span>
-							<h5 id="info_', $message['id'], '">', !empty($message['counter']) ? '
+							<h3 id="info_', $message['id'], '">', !empty($message['counter']) ? '
 								<a href="' . $message['href'] . '" rel="nofollow">' . sprintf($txt['reply_number'], $message['counter']) . '</a> &ndash; ' : '', $message['html_time'], '
-							</h5>
+							</h3>
 							<div id="msg_', $message['id'], '_quick_mod"', $ignoring ? ' class="hide"' : '', '></div>
 						</header>';
 
@@ -227,8 +228,8 @@ function template_messages()
 					<nav>
 						<ul id="buttons_', $message['id'], '" class="quickbuttons no_js">';
 
-		// Show a checkbox for quick moderation?
-		if (!empty($options['display_quick_mod']) && $options['display_quick_mod'] == 1 && $message['can_remove'])
+		// Reserve a checkbox location for quick moderation?
+		if (!empty($options['display_quick_mod']) && $message['can_remove'])
 		{
 			echo '
 							<li class="listlevel1 inline_mod_check hide" id="in_topic_mod_check_', $message['id'], '"></li>';
@@ -367,7 +368,7 @@ function template_messages()
 			{
 				echo '
 							<li class="listlevel1', !empty($message['like_counter']) ? ' liked"' : '"', '>
-								<a href="javascript:void(0)" role="button" title="', !empty($message['like_counter']) ? $txt['liked_by'] . ' ' . implode(', ', $context['likes'][$message['id']]['member']) : '', '" class="linklevel1 reacts_button">',
+								<a href="javascript:void(0)" role="button" class="linklevel1 reacts_button">',
 									!empty($message['like_counter']) ? '<span class="likes_indicator">' . $message['like_counter'] . '</span>&nbsp;' . $txt['likes'] : '&nbsp;', '
 								</a>
 							</li>';
@@ -416,6 +417,30 @@ function template_messages()
 						</ul>
 					</nav>';
 
+		// Start of grid-row: signature seen as "footer .signature" in css
+		// This could use some cleanup, but the idea is to prevent multiple borders in this grid area
+		// it should just have a division line and then likes, custom fields, signature (any or none may be present)
+		if ($message['likes_enabled'] && !empty($message['like_counter']))
+		{
+			echo '
+					<div class="signature">
+						<div class="likes_above_signature">
+							<i class="icon icon-small i-thumbup"></i>
+							 ', implode(', ', $context['likes'][$message['id']]['member']), '
+						</div>';
+		}
+		elseif ((empty($message['member']['signature']) || !empty($options['show_no_signatures']) || !$context['signature_enabled'])
+			&& (empty($message['member']['custom_fields'])))
+		{
+			echo '
+					<div>';
+		}
+		else
+		{
+			echo '
+					<div class="signature">';
+		}
+
 		// Are there any custom profile fields for above the signature?
 		// Show them if signatures are enabled and you want to see them.
 		if (!empty($message['member']['custom_fields']) && empty($options['show_no_signatures']) && $context['signature_enabled'])
@@ -452,10 +477,11 @@ function template_messages()
 		if (!empty($message['member']['signature']) && empty($options['show_no_signatures']) && $context['signature_enabled'])
 		{
 			echo '
-							<div id="msg_', $message['id'], '_signature" class="signature', $ignoring ? ' hide"' : '"', '>', $message['member']['signature'], '</div>';
+						<div id="msg_', $message['id'], '_signature" class="', $ignoring ? ' hide"' : '"', '>', $message['member']['signature'], '</div>';
 		}
 
 		echo '
+							</div>
 						</footer>
 					</div>
 				</article>
@@ -502,7 +528,7 @@ function template_quickreply_below()
 		echo '
 				<div class="postarea', empty($options['hide_poster_area']) ? '' : '2', '">
 					<header class="category_header">
-						<h5>', $txt['reply'], '</h5>
+						<h4>', $txt['reply'], '</h4>
 					</header>
 					<div id="quickReplyOptions" class="', empty($context['minmax_preferences']['qreply']) ? '"' : ' hide"', '>
 						<form action="', getUrl('action', ['action' => 'post2', 'board' => $context['current_board']]), '" method="post" accept-charset="UTF-8" name="postmodify" id="postmodify" onsubmit="submitonce(this);', (!empty($modSettings['mentions_enabled']) ? 'revalidateMentions(\'postmodify\', \'' . (empty($options['use_editor_quick_reply']) ? 'message' : $context['post_box_name']) . '\');' : ''), '">
@@ -553,8 +579,8 @@ function template_quickreply_below()
 		}
 
 		echo '
-							', $context['is_locked'] ? '<p class="alert smalltext">' . $txt['quick_reply_warning'] . '</p>' : '',
-							$context['oldTopicError'] ? '<p class="alert smalltext">' . sprintf($txt['error_old_topic'], $modSettings['oldTopicDays']) . '</p>' : '', '
+							', $context['is_locked'] ? '<p class="warningbox smalltext">' . $txt['quick_reply_warning'] . '</p>' : '',
+							$context['oldTopicError'] ? '<p class="warningbox smalltext"></i>' . sprintf($txt['error_old_topic'], $modSettings['oldTopicDays']) . '</p>' : '', '
 							', $context['can_reply_approved'] ? '' : '<em>' . $txt['wait_for_approval'] . '</em>', '
 							', !$context['can_reply_approved'] && $context['require_verification'] ? '<br />' : '';
 
@@ -633,7 +659,7 @@ function template_quickreply_below()
 		});', true);
 
 	// Quick moderation options
-	if (!empty($options['display_quick_mod']) && $options['display_quick_mod'] == 1 && $context['can_remove_post'])
+	if (!empty($options['display_quick_mod']) && $context['can_remove_post'])
 	{
 		theme()->addInlineJavascript('
 			let oInTopicModeration = new InTopicModeration({
@@ -644,18 +670,18 @@ function template_quickreply_below()
 				sButtonStrip: "moderationbuttons",
 				sButtonStripDisplay: "moderationbuttons_strip",
 				sButtonStripClass: "menuitem",
-				bUseImageButton: false,
+				bUseImageButton: true,
 				bCanRemove: ' . ($context['can_remove_post'] ? 'true' : 'false') . ',
 				sRemoveButtonLabel: "' . $txt['quickmod_delete_selected'] . '",
-				sRemoveButtonImage: "delete_selected.png",
+				sRemoveButtonImage: "i-delete",
 				sRemoveButtonConfirm: "' . $txt['quickmod_confirm'] . '",
 				bCanRestore: ' . ($context['can_restore_msg'] ? 'true' : 'false') . ',
 				sRestoreButtonLabel: "' . $txt['quick_mod_restore'] . '",
-				sRestoreButtonImage: "restore_selected.png",
+				sRestoreButtonImage: "i-recycle",
 				sRestoreButtonConfirm: "' . $txt['quickmod_confirm'] . '",
 				bCanSplit: ' . ($context['can_split'] ? 'true' : 'false') . ',
 				sSplitButtonLabel: "' . $txt['quickmod_split_selected'] . '",
-				sSplitButtonImage: "split_selected.png",
+				sSplitButtonImage: "i-split",
 				sSplitButtonConfirm: "' . $txt['quickmod_confirm'] . '",
 				sFormId: "quickModForm"
 			});', true);
@@ -812,14 +838,14 @@ function template_display_poll_above()
 	}
 
 	echo '
-				</div>
-			</div>
 			<div id="pollmoderation">';
 
 	template_button_strip($context['poll_buttons']);
 
 	echo '
-			</div>';
+			</div>
+		</div>
+	</div>';
 }
 
 /**
@@ -959,18 +985,18 @@ function template_display_attachments($message, $ignoring)
 			{
 				echo '
 											<a href="', $attachment['href'], ';image" id="link_', $attachment['id'], '" ', $attachment['thumbnail']['lightbox'], '>
-												<img class="attachment_image" src="', $attachment['thumbnail']['href'], '" alt="" id="thumb_', $attachment['id'], '" />
+												<img class="attachment_image" src="', $attachment['thumbnail']['href'], '" alt="" id="thumb_', $attachment['id'], '" loading="lazy" />
 											</a>';
 			}
 			else
 			{
 				echo '
-											<img class="attachment_image" src="', $attachment['href'], ';image" alt="" style="max-width:100%; max-height:' . $attachment['height'] . 'px;"/>';
+											<img class="attachment_image" src="', $attachment['href'], ';image" alt="" style="max-width:100%; max-height:' . $attachment['height'] . 'px;" loading="lazy"/>';
 			}
 		}
 		elseif (!empty($modSettings['attachmentShowImages']))
 		{
-			echo '							<img class="attachment_image" src="', $attachment['href'], ';thumb" alt="" style="max-width:' . $modSettings['attachmentThumbWidth'] . 'px; max-height:' . $modSettings['attachmentThumbHeight'] . 'px;" />';
+			echo '							<img class="attachment_image" src="', $attachment['href'], ';thumb" alt="" style="max-width:' . $modSettings['attachmentThumbWidth'] . 'px; max-height:' . $modSettings['attachmentThumbHeight'] . 'px;" loading="lazy" />';
 		}
 
 		echo '

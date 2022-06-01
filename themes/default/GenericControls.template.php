@@ -32,9 +32,8 @@ function template_control_richedit($editor_id, $smileyContainer = null, $bbcCont
 
 	echo '
 		<div id="editor_toolbar_container"></div>
-		<label for="', $editor_id, '">
-			<textarea class="editor', $class, '" name="', $editor_id, '" id="', $editor_id, '" tabindex="', $context['tabindex']++, '" style="', $style, ';" required="required">', $editor_context['value'], '</textarea>
-		</label>
+		<label for="', $editor_id, '" class="hide">', $editor_id, '</label>
+		<textarea class="editor', $class, '" name="', $editor_id, '" id="', $editor_id, '" tabindex="', $context['tabindex']++, '" style="', $style, ';" required="required">', $editor_context['value'], '</textarea>
 		<input type="hidden" name="', $editor_id, '_mode" id="', $editor_id, '_mode" value="0" />
 		<script>
 			let $editor_data = {},
@@ -141,6 +140,7 @@ function template_control_richedit($editor_id, $smileyContainer = null, $bbcCont
 					: '', '
 			}
 		</script>
+		
 		<script type="module">
 			$(function() {
 				elk_editor();
@@ -175,18 +175,18 @@ function template_control_richedit_buttons($editor_id)
 	echo '
 			', $context['shortcuts_text'], '
 		</span>
-		<input type="submit" name="', $editor_context['labels']['post_name'] ?? 'post', '" type="button" value="', $editor_context['labels']['post_button'] ?? $txt['post'], '" tabindex="', $context['tabindex']++, '" onclick="return submitThisOnce(this);" accesskey="s" />';
+		<input type="submit" name="', $editor_context['labels']['post_name'] ?? 'post', '" value="', $editor_context['labels']['post_button'] ?? $txt['post'], '" tabindex="', $context['tabindex']++, '" onclick="return submitThisOnce(this);" accesskey="s" />';
 
 	if ($editor_context['preview_type'])
 	{
 		echo '
-		<input type="submit" name="preview" type="button" value="', $editor_context['labels']['preview_button'] ?? $txt['preview'], '" tabindex="', $context['tabindex']++, '" onclick="', $editor_context['preview_type'] == 2 ? 'return event.ctrlKey || previewControl();' : 'return submitThisOnce(this);', '" accesskey="p" />';
+		<input type="button" name="preview" value="', $editor_context['labels']['preview_button'] ?? $txt['preview'], '" tabindex="', $context['tabindex']++, '" onclick="', $editor_context['preview_type'] == 2 ? 'return event.ctrlKey || previewControl();' : 'return submitThisOnce(this);', '" accesskey="p" />';
 	}
 
 	foreach ($editor_context['buttons'] as $button)
 	{
 		echo '
-		<input type="submit" name="', $button['name'], '" type="button" value="', $button['value'], '" tabindex="', $context['tabindex']++, '" ', $button['options'], ' />';
+		<input type="button" name="', $button['name'], '" value="', $button['value'], '" tabindex="', $context['tabindex']++, '" ', $button['options'], ' />';
 	}
 
 	foreach ($editor_context['hidden_fields'] as $hidden)

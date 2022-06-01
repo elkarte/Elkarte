@@ -4,10 +4,10 @@
 :root {
 	--body_text: #4D4F53; /* Body text, text areas, editor, inputs, more */
 	--content-background: #FEFEFE; /* background for many divs, input controls, etc */
-	--seconday_border: #AFAFAF; /* darker border */
-	--seconday_border_top: #CFCFCF; /* complimentary for hover effects */
-	--seconday_border_left: #BFBFBF; /* complimentary for hover effects */
-	--seconday_border_bottom: #BBBBBB;
+	--secondary_border: #AFAFAF; /* darker border */
+	--secondary_border_top: #CFCFCF; /* complimentary for hover effects */
+	--secondary_border_left: #BFBFBF; /* complimentary for hover effects */
+	--secondary_border_bottom: #BBBBBB;
 	--primary_white: #FEFEFE; /* Used in shadows, backgrounds or text, many places */
 	--primary_white_compliment: #E4E4E4; /* Used with --primary_white for gradients */
 	--box_shadow: #E4E4E4; /* Used on many box shadows */
@@ -60,7 +60,7 @@ ul, ol {
 table, td {
 	min-width: 2em;
 	empty-cells: show;
-	border: 1px dotted var(--seconday_border);
+	border: 1px dotted var(--secondary_border);
 }
 
 code, code::before {
@@ -83,9 +83,9 @@ code {
 	margin-top: 1.5em;
 	padding: .25em;
 	white-space: pre;
-	border: 1px solid var(--seconday_border);
-	border-top: 2px solid var(--seconday_border_top);
-	border-bottom: 3px solid var(--seconday_border_bottom);
+	border: 1px solid var(--secondary_border);
+	border-top: 2px solid var(--secondary_border_top);
+	border-bottom: 3px solid var(--secondary_border_bottom);
 	background: var(--content-background);
 }
 
@@ -93,7 +93,7 @@ blockquote {
 	overflow: auto;
 	margin: 0 0 1em 0;
 	padding: 6px 10px;
-	border: 1px solid var(--seconday_border);
+	border: 1px solid var(--secondary_border);
 	background: var(--primary_white);
 	box-shadow: 2px 2px 2px var(--box_shadow);
 }

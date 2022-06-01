@@ -25,7 +25,9 @@ function template_ProfileOptions_init()
 	{
 		loadJavascriptFile('jquery.multiselect.min.js');
 		theme()->addInlineJavascript('
-		$(\'.select_multiple\').multiselect({\'language_strings\': {\'Select all\': ' . JavascriptEscape($txt['notify_select_all']) . '}});', true);
+			$(\'.select_multiple\').multiselect({\'language_strings\': {\'Select all\': ' . JavascriptEscape($txt['notify_select_all']) . '}});'
+		,true);
+
 		loadCSSFile('multiselect.css');
 	}
 }
@@ -798,11 +800,8 @@ function template_profile_theme_settings()
 								<label for="display_quick_mod">', $txt['display_quick_mod'], '</label>
 							</dt>
 							<dd>
-								<select name="default_options[display_quick_mod]" id="display_quick_mod">
-									<option value="0"', empty($context['member']['options']['display_quick_mod']) ? ' selected="selected"' : '', '>', $txt['display_quick_mod_none'], '</option>
-									<option value="1"', !empty($context['member']['options']['display_quick_mod']) && $context['member']['options']['display_quick_mod'] == 1 ? ' selected="selected"' : '', '>', $txt['display_quick_mod_check'], '</option>
-									<option value="2"', !empty($context['member']['options']['display_quick_mod']) && $context['member']['options']['display_quick_mod'] != 1 ? ' selected="selected"' : '', '>', $txt['display_quick_mod_image'], '</option>
-								</select>
+								<input type="hidden" name="default_options[display_quick_mod]" value="0" />
+								<input type="checkbox" name="default_options[display_quick_mod]" id="display_quick_mod" value="1"', !empty($context['member']['options']['display_quick_mod']) ? ' checked="checked"' : '', ' />
 							</dd>';
 }
 
@@ -1562,7 +1561,7 @@ function template_authentication_method()
 								<em>', $txt['choose_pass'], ':</em>
 							</dt>
 							<dd>
-								<input type="password" name="passwrd1" id="elk_autov_pwmain" size="30" tabindex="', $context['tabindex']++, '" class="input_password" placeholder="', $txt['choose_pass'], '" />
+								<input type="password" name="passwrd1" id="elk_autov_pwmain" size="30" autocomplete="new-password" tabindex="', $context['tabindex']++, '" class="input_password" placeholder="', $txt['choose_pass'], '" />
 								<span id="elk_autov_pwmain_div" class="hide">
 									<i id="elk_autov_pwmain_img" class="icon i-warn" alt="*"></i>
 								</span>
@@ -1573,7 +1572,7 @@ function template_authentication_method()
 								<em for="elk_autov_pwverify">', $txt['verify_pass'], ':</em>
 							</dt>
 							<dd>
-								<input type="password" name="passwrd2" id="elk_autov_pwverify" size="30" tabindex="', $context['tabindex']++, '" class="input_password" placeholder="', $txt['verify_pass'], '" />
+								<input type="password" name="passwrd2" id="elk_autov_pwverify" size="30" autocomplete="new-password" tabindex="', $context['tabindex']++, '" class="input_password" placeholder="', $txt['verify_pass'], '" />
 								<span id="elk_autov_pwverify_div" class="hide">
 									<i id="elk_autov_pwverify_img" class="icon i-warn" alt="*"></i>
 								</span>

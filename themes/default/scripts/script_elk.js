@@ -826,7 +826,7 @@ function add_elk_mention(selector, oOptions)
 				// And with the post data prepared, lets make the ajax request
 				$.ajax({
 					type: "POST",
-					url: elk_scripturl + "?action=xmlhttp;sa=" + oSettings.sa + ";api=xml",
+					url: elk_prepareScriptUrl(elk_scripturl) + "action=xmlhttp;sa=" + oSettings.sa + ";api=xml",
 					dataType: "xml",
 					data: postdata
 				})
@@ -1101,7 +1101,7 @@ function setBoardIds()
 		// Determine where we are going to place the tooltip, while trying to keep it on screen
 		let positionTooltip = function (event)
 		{
-			var iPosx = 0,
+			let iPosx = 0,
 				iPosy = 0,
 				$_tip = $('#' + oSettings.tooltipID);
 
@@ -1137,7 +1137,7 @@ function setBoardIds()
 				h: $(window).height() - 24
 			};
 
-			// Don't go off screen with our tooltip
+			// Don't go off-screen with our tooltip
 			if ((oPosition.y + oPosition.h > oLimits.y + oLimits.h) && (oPosition.x + oPosition.w > oLimits.x + oLimits.w))
 			{
 				oPosition.x = (oPosition.x - oPosition.w) - 45;
@@ -1179,7 +1179,7 @@ function setBoardIds()
 			return $('<span>').text(string).html();
 		}
 
-		// For all of the elements that match the selector on the page, lets set up some actions
+		// For all elements that match the selector on the page, lets set up some actions
 		return this.each(function ()
 		{
 			let timer;
@@ -1209,11 +1209,12 @@ function setBoardIds()
 							ttContent.text($this.children('.' + oSettings.tooltipSwapClass).text());
 						}
 
-						// Show then position or it may position off screen
+						// Show then position or it may position off-screen
 						showTooltip();
 						positionTooltip($event);
 				}
-			},500);}, function() {
+			},750);},
+			function() {
 				let $this = $(this);
 				// on mouse out, cancel the timer
 				clearTimeout(timer);
@@ -1596,7 +1597,7 @@ function loadAddNewPoll(button, id_board, form_name)
 
 	// Retrieve the poll area
 	$.ajax({
-			url: elk_scripturl + '?action=poll;sa=interface;board=' + id_board,
+			url: elk_prepareScriptUrl(elk_scripturl) + 'action=poll;sa=interface;board=' + id_board,
 			type: "GET",
 			dataType: "html",
 			beforeSend: ajax_indicator(true)
@@ -1712,7 +1713,7 @@ function disableAutoComplete()
 				cache: false,
 				dataType: 'json',
 				timeout: 1500,
-				url: elk_scripturl + "?action=mentions;sa=fetch;api=json;lastsent=" + lastTime
+				url: elk_prepareScriptUrl(elk_scripturl) + "action=mentions;sa=fetch;api=json;lastsent=" + lastTime
 			})
 			.done(function (request)
 			{
@@ -2122,11 +2123,9 @@ elkMenu.prototype.initMenu = function ()
 		this.keysAsClick(document.getElementById('skipnav'));
 	}
 
-	// Removing this class prevents the standard hover effect, assuming the CSS is setup correctly
-	if (this.menu.classList.contains('no_js'))
-	{
-		this.menu.classList.remove('no_js');
-	}
+	// Removing this class prevents the standard hover effect, assuming the CSS is set up correctly
+	this.menu.classList.remove('no_js');
+	this.menu.parentElement.classList.remove('no_js');
 
 	// The subMenus (ul.menulevel#)
 	let subMenu = this.menu.querySelectorAll('a + ul');
@@ -2237,7 +2236,7 @@ elkMenu.prototype.submenuReveal = function (subMenu)
 			parentLi.classList.add('open');
 			e.currentTarget.classList.add('open');
 
-			// Open the the UL menu
+			// Open the UL menu
 			currentMenu.classList.remove('un_selected');
 			currentMenu.classList.add('selected');
 			currentMenu.setAttribute('aria-hidden', 'false');

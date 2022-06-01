@@ -1764,7 +1764,7 @@ class InstallInstructions_install_2_0
 			'{db_prefix}membergroups',
 			array('group_name' => 'string', 'description' => 'string', 'online_color' => 'string', 'min_posts' => 'int', 'icons' => 'string', 'group_type' => 'int'),
 			array(
-				array('{$default_administrator_group}', '', '#CD0000', -1, '5#iconadmin.png', 1),
+				array('{$default_administrator_group}', '', '#ED0000', -1, '5#iconadmin.png', 1),
 				array('{$default_global_moderator_group}', '', '#0066FF', -1, '5#icongmod.png', 0),
 				array('{$default_moderator_group}', '', '', -1, '5#iconmod.png', 0),
 				array('{$default_newbie_group}', '', '', 0, '1#icon.png', 0),

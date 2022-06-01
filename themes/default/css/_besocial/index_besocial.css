@@ -1,6 +1,6 @@
 /* INTRODUCTION
  *
- * This is a very basic version of the Elkarte default theme.
+ * This is a very basic version of the Elkarte theme.
  * It is intended primarily as a "clean slate" for custom theming.
  * This is eye candy only. All the layout code is in index.css.
  *
@@ -122,10 +122,10 @@
 	--primary_border_top: #EEEEEE;
 	--primary_border_left: #C7C7C7;
 	--primary_border_bottom: #DDDDDD;
-	--seconday_border: #AFAFAF; /* darker border */
-	--seconday_border_top: #CFCFCF; /* complimentary for hover effects */
-	--seconday_border_left: #BFBFBF; /* complimentary for hover effects */
-	--seconday_border_bottom: #BBBBBB;
+	--secondary_border: #AFAFAF; /* darker border */
+	--secondary_border_top: #CFCFCF; /* complimentary for hover effects */
+	--secondary_border_left: #BFBFBF; /* complimentary for hover effects */
+	--secondary_border_bottom: #BBBBBB;
 
 	--transparent: transparent; /* Used on borders to hide them but keep sizing intact */
 	--box_shadow: #CCCCCC; /* Used on many box shadows */
@@ -244,9 +244,9 @@ input[type="submit"], .drop_area_fileselect_text, button[type="submit"], input[t
    These have standard body text size. Can be chained with smalltext class. */
 .linkbutton:link, .linkbutton:visited {
 	color: var(--menu_text);
-	border-color: var(--seconday_border);
-	border-top-color: var(--seconday_border_top);
-	border-left-color: var(--seconday_border_left);
+	border-color: var(--secondary_border);
+	border-top-color: var(--secondary_border_top);
+	border-left-color: var(--secondary_border_left);
 	background-image: linear-gradient(to bottom, var(--primary_white), var(--primary_white_compliment));
 	box-shadow: 1px 1px 2px var(--box_shadow);
 }
@@ -282,8 +282,8 @@ input[type="submit"]:hover, button[type="submit"]:hover, input[type="button"]:ho
 
 /* Standard horizontal rule.. ([hr], etc.) */
 hr {
-	border-top-color: var(--seconday_border_bottom);
-	border-bottom-color: var(--seconday_border_bottom);
+	border-top-color: var(--secondary_border_bottom);
+	border-bottom-color: var(--secondary_border_bottom);
 	background: var(--mid_grey_background);
 }
 
@@ -306,7 +306,7 @@ hr {
 
 /* Single ones a bit darker than board index ones. */
 #forumposts .category_header, .content_category .category_header {
-	border-color: var(--seconday_border);
+	border-color: var(--secondary_border);
 	background: var(--category_header_grad_4);
 }
 
@@ -398,11 +398,11 @@ hr {
 
 /* Styles used by the auto suggest control. */
 .auto_suggest_div {
-	border-color: var(--seconday_border);
+	border-color: var(--secondary_border);
 }
 
 .auto_suggest_div:focus {
-	border-color: var(--seconday_border);
+	border-color: var(--secondary_border);
 }
 
 .auto_suggest_item {
@@ -428,7 +428,7 @@ hr {
 }
 
 .codeheader {
-	border-top-color: var(--seconday_border);
+	border-top-color: var(--secondary_border);
 }
 
 /* A quote, perhaps from another post. */
@@ -451,8 +451,8 @@ input[type=checkbox].quote-show-more {
 
 /* Extra code block styling. */
 .bbc_code {
-	border-top-color: var(--seconday_border);
-	border-bottom-color: var(--seconday_border);
+	border-top-color: var(--secondary_border);
+	border-bottom-color: var(--secondary_border);
 	background: var(--content_background);
 }
 
@@ -478,7 +478,7 @@ input[type=checkbox].quote-show-more {
 .inner > .bbc_table_container > .bbc_table th,
 .messageContent > .bbc_table_container > .bbc_table th {
 	border-right: 1px solid var(--primary_border);
-	border-bottom: 1px solid var(--seconday_border_bottom);
+	border-bottom: 1px solid var(--secondary_border_bottom);
 }
 
 .inner > .bbc_table_container > .bbc_table td:last-child,
@@ -499,7 +499,7 @@ input[type=checkbox].quote-show-more {
 }
 
 div.bbc_footnotes {
-	border-top-color: var(--seconday_border);
+	border-top-color: var(--secondary_border);
 }
 
 .bbc_footnotes .target:target {
@@ -646,12 +646,12 @@ sup.bbc_footnotes, sup.bbc_footnotes a {
  */
 
 /* Level 1 Menu bar: link or button. General styling. */
-.linklevel1, .linklevel1:link, .linklevel1:visited {
+.linklevel1, .linklevel1:link, .linklevel1:visited, .quickbuttons .inline_mod_check {
 	font-size: var(--font13);
 	color: var(--strong_text);
-	border-color: var(--seconday_border);
-	border-top-color: var(--seconday_border_top);
-	border-left-color: var(--seconday_border_left);
+	border-color: var(--secondary_border);
+	border-top-color: var(--secondary_border_top);
+	border-left-color: var(--secondary_border_left);
 	border-radius: 2px;
 	background-image: linear-gradient(to bottom, var(--primary_white), var(--primary_white_compliment));
 	box-shadow: 1px 1px 2px var(--box_shadow);
@@ -668,8 +668,8 @@ sup.bbc_footnotes, sup.bbc_footnotes a {
 	text-decoration: none;
 	color: var(--menu_text);
 	border-color: var(--primary_border);
-	border-top-color: var(--seconday_border);
-	border-left-color: var(--seconday_border);
+	border-top-color: var(--secondary_border);
+	border-left-color: var(--secondary_border);
 	background: var(--grey_background);
 	box-shadow: 2px 1px 1px var(--opacity10) inset;
 }
@@ -741,7 +741,7 @@ sup.bbc_footnotes, sup.bbc_footnotes a {
 /* ......and for secondary admin/profile/etc menu strip. */
 #adm_submenus .active {
 	color: var(--primary_white);
-	border-color: var(--seconday_border);
+	border-color: var(--secondary_border);
 	background-image: linear-gradient(to bottom, var(--menu_button_active), var(--menu_button_active_2));
 }
 
@@ -809,7 +809,7 @@ a.active {
 
 /* Levels 2 and 3: drop menu wrapper. */
 .menulevel2, .menulevel3 {
-	border-color: var(--seconday_border);
+	border-color: var(--secondary_border);
 	background: var(--primary_white);
 	box-shadow: 1px 2px 4px var(--box_shadow);
 }
@@ -1128,7 +1128,7 @@ nav.breadcrumb {
 }
 
 .post_wrapper {
-	border-color: var(--seconday_border_top);
+	border-color: var(--secondary_border_top);
 	border-radius: 10px;
 }
 
@@ -1177,7 +1177,7 @@ nav.breadcrumb {
 }
 
 #sort_by.topic_sorting_recent {
-	border-color: var(--seconday_border);
+	border-color: var(--secondary_border);
 }
 
 #sort_by .topic_sorting_row:hover .i-last::before, #sort_by .topic_sorting_row:hover .i-last_post::before {
@@ -1236,7 +1236,12 @@ nav.breadcrumb {
 }
 
 .new_post_separator::before {
-	border-color: var(--seconday_border_bottom) var(--transparent);
+	border-color: var(--secondary_border_bottom) var(--transparent);
+}
+
+#moderationbuttons.sticky {
+	border-color: var(--primary_border);
+	background: var(--notice);
 }
 
 /* Poll results */
@@ -1295,17 +1300,17 @@ nav.breadcrumb {
 .poster li.poster_online:hover .linklevel1 {
 	color: var(--menu_text);
 	border-color: var(--primary_border);
-	border-top-color: var(--seconday_border);
-	border-left-color: var(--seconday_border);
+	border-top-color: var(--secondary_border);
+	border-left-color: var(--secondary_border);
 	background: var(--mid_grey_background);
 	box-shadow: 2px 1px 1px var(--opacity10) inset;
 }
 
 .poster li.poster_online .nolink {
 	color: var(--user_highlight);
-	border-color: var(--seconday_border);
-	border-top-color: var(--seconday_border_top);
-	border-left-color: var(--seconday_border_left);
+	border-color: var(--secondary_border);
+	border-top-color: var(--secondary_border_top);
+	border-left-color: var(--secondary_border_left);
 	background-image: linear-gradient(to bottom, var(--primary_white), var(--primary_white_compliment));
 	box-shadow: 1px 1px 2px var(--box_shadow);
 }
@@ -1347,7 +1352,7 @@ nav.breadcrumb {
 }
 
 /* Reply # */
-.keyinfo h5 a, .keyinfo h5 a strong {
+.keyinfo h3 a, .keyinfo h3 a strong {
 	color: var(--topic_name);
 }
 
@@ -1392,7 +1397,7 @@ nav.breadcrumb {
 /* Attachment details below thumbnails */
 .attachment_name, .attachment_details {
 	color: var(--body_text) !important;
-	border: solid 1px var(--seconday_border);
+	border: solid 1px var(--secondary_border);
 }
 
 .attachment_name {
@@ -1464,9 +1469,9 @@ nav.breadcrumb {
 }
 
 .ila_container {
-	border-color: var(--seconday_border);
-	border-top-color: var(--seconday_border_top);
-	border-left-color: var(--seconday_border_left);
+	border-color: var(--secondary_border);
+	border-top-color: var(--secondary_border_top);
+	border-left-color: var(--secondary_border_left);
 	background-image: linear-gradient(to bottom, var(--primary_white), var(--primary_white_compliment));
 	box-shadow: 1px 1px 2px var(--box_shadow);
 }
@@ -1578,7 +1583,7 @@ nav.breadcrumb {
 
 /* Profile colors */
 .activity_stats li span {
-	border-color: var(--seconday_border_bottom);
+	border-color: var(--secondary_border_bottom);
 	border-right-style: none;
 	border-left-style: none;
 	background: var(--mid_grey_background);
@@ -1638,7 +1643,7 @@ nav.breadcrumb {
 
 /* Used to indicate the current day. */
 #main_grid .calendar_today, #month_grid .calendar_today {
-	border-color: var(--seconday_border);
+	border-color: var(--secondary_border);
 	background: var(--currentday);
 }
 
@@ -1667,7 +1672,7 @@ nav.breadcrumb {
 }
 
 #top_row .stats dd, .statsbar {
-	border-color: var(--seconday_border);
+	border-color: var(--secondary_border);
 	background: var(--content_background);
 }
 
@@ -1701,7 +1706,7 @@ nav.breadcrumb {
 
 /* Styles for the tooltips. */
 .tooltip {
-	border-color: var(--seconday_border);
+	border-color: var(--secondary_border);
 	background: var(--content_background);
 	box-shadow: 3px 3px 3px var(--opacity30);
 }
@@ -1721,7 +1726,7 @@ nav.breadcrumb {
 
 /* The text content, hopefully helpful. */
 .popup_content {
-	border-color: var(--seconday_border);
+	border-color: var(--secondary_border);
 	border-radius: 6px 6px 2px 2px;
 	background: var(--content_background);
 	box-shadow: 0 -2px 3px var(--opacity20);
@@ -1866,7 +1871,7 @@ nav.breadcrumb {
  */
 
 .progress_bar {
-	border-color: var(--seconday_border);
+	border-color: var(--secondary_border);
 	background: var(--primary_white);
 	box-shadow: inset 0 1px 1px var(--opacity10);
 }
@@ -2012,7 +2017,7 @@ nav.breadcrumb {
 	}
 
 	#menu_sidebar {
-		border-color: var(--seconday_border);
+		border-color: var(--secondary_border);
 		background: var(--content_background);
 		box-shadow: 3px 3px 3px var(--opacity30);
 	}

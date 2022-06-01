@@ -90,7 +90,7 @@ class SearchParams extends ValuesContainer
 
 		// Test for gzuncompress failing, our ErrorException will die on any E_WARNING with no
 		// Exception, so turn it off/on for this check.
-		set_error_handler(function () { /* ignore errors */ });
+		set_error_handler(static function () { /* ignore errors */ });
 		try
 		{
 			$check = gzuncompress($temp_params);
@@ -129,7 +129,7 @@ class SearchParams extends ValuesContainer
 
 		// Due to some potential browser/server limitations, attempt to compress
 		// old IE's 2083 character limit, we have to compress long search
-		set_error_handler(function () { /* ignore errors */ });
+		set_error_handler(static function () { /* ignore errors */ });
 		try
 		{
 			$compressed = gzcompress($encoded);
@@ -150,7 +150,7 @@ class SearchParams extends ValuesContainer
 	 * Merge search params extracted with SearchParams::prepare
 	 * with those present in the $param array (usually $_REQUEST['params'])
 	 *
-	 * @param mixed[] $params - An array of search parameters
+	 * @param array $params - An array of search parameters
 	 * @param int $recentPercentage - A coefficient to calculate the lowest
 	 *                message id to start search from
 	 * @param int $maxMembersToSearch - The maximum number of members to consider
@@ -482,9 +482,9 @@ class SearchParams extends ValuesContainer
 			{
 				throw new Exception('topic_gone', false);
 			}
-
 			$this->_search_params['brd'] = [];
-			$brd = (int) $request->fetch_row();
+			$brd = (int) $request->fetch_row()[0];
+
 			$request->free_result();
 
 			return [$brd];

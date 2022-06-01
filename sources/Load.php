@@ -966,7 +966,7 @@ function loadAssetFile($filenames, $params = array(), $id = '')
 	}
 
 	$cache = Cache::instance();
-	$fileFunc = \ElkArte\FileFunctions::instance();
+	$fileFunc = FileFunctions::instance();
 
 	if (!is_array($filenames))
 	{
@@ -989,7 +989,7 @@ function loadAssetFile($filenames, $params = array(), $id = '')
 
 	// Whoa ... we've done this before yes?
 	$cache_name = 'load_' . $params['extension'] . '_' . hash('md5', $settings['theme_dir'] . implode('_', $filenames));
-	$temp = array();
+	$temp = [];
 	if ($cache->getVar($temp, $cache_name, 600))
 	{
 		if (empty($context[$params['index_name']]))
@@ -1216,7 +1216,7 @@ function getLanguages($use_cache = true)
 	$cache = Cache::instance();
 
 	// Either we don't use the cache, or its expired.
-	$languages = array();
+	$languages = [];
 	$language_dir = SOURCEDIR . '/ElkArte/Languages/Index';
 
 	if (!$use_cache || !$cache->getVar($languages, 'known_languages', $cache->levelLowerThan(2) ? 86400 : 3600))
@@ -1296,7 +1296,7 @@ function determineAvatar($profile)
 
 	if (empty($profile))
 	{
-		return array();
+		return [];
 	}
 
 	$avatar_protocol = substr(strtolower($profile['avatar']), 0, 7);
@@ -1317,7 +1317,7 @@ function determineAvatar($profile)
 
 		$avatar = array(
 			'name' => $profile['avatar'],
-			'image' => '<img class="avatar avatarresize" src="' . $avatar_url . '" alt="' . $alt . '" />',
+			'image' => '<img class="avatar avatarresize" src="' . $avatar_url . '" alt="' . $alt . '" loading="lazy" />',
 			'href' => $avatar_url,
 			'url' => '',
 		);
@@ -1327,7 +1327,7 @@ function determineAvatar($profile)
 	{
 		$avatar = array(
 			'name' => $profile['avatar'],
-			'image' => '<img class="avatar avatarresize" src="' . $profile['avatar'] . '" alt="' . $alt . '" />',
+			'image' => '<img class="avatar avatarresize" src="' . $profile['avatar'] . '" alt="' . $alt . '" loading="lazy" />',
 			'href' => $profile['avatar'],
 			'url' => $profile['avatar'],
 		);
@@ -1339,7 +1339,7 @@ function determineAvatar($profile)
 		$gravatar_url = $gravatar;
 		$avatar = array(
 			'name' => $profile['avatar'],
-			'image' => '<img class="avatar avatarresize" src="' . $gravatar_url . '" alt="' . $alt . '" />',
+			'image' => '<img class="avatar avatarresize" src="' . $gravatar_url . '" alt="' . $alt . '" loading="lazy" />',
 			'href' => $gravatar_url,
 			'url' => $gravatar_url,
 		);
@@ -1349,7 +1349,7 @@ function determineAvatar($profile)
 	{
 		$avatar = array(
 			'name' => $profile['avatar'],
-			'image' => '<img class="avatar avatarresize" src="' . $modSettings['avatar_url'] . '/' . $profile['avatar'] . '" alt="' . $alt . '" />',
+			'image' => '<img class="avatar avatarresize" src="' . $modSettings['avatar_url'] . '/' . $profile['avatar'] . '" alt="' . $alt . '" loading="lazy" />',
 			'href' => $modSettings['avatar_url'] . '/' . $profile['avatar'],
 			'url' => $modSettings['avatar_url'] . '/' . $profile['avatar'],
 		);
@@ -1373,7 +1373,7 @@ function determineAvatar($profile)
 			// TODO: This should be incorporated into the theme.
 			$avatar = array(
 				'name' => '',
-				'image' => '<img class="avatar avatarresize" src="' . $href .'" alt="' . $alt . '" />',
+				'image' => '<img class="avatar avatarresize" src="' . $href .'" alt="' . $alt . '" loading="lazy" />',
 				'href' => $href,
 				'url' => 'https://',
 			);

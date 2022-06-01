@@ -174,7 +174,7 @@ function loadDefaultMenuButtons()
 			'sub_buttons' => array(
 				'help' => array(
 					'title' => $txt['help'],
-					'href' => getUrl('action', ['action' => 'help']),
+					'href' => 'https://github.com/elkarte/Elkarte/wiki/User-Home',
 					'show' => true,
 				),
 				'search' => array(

@@ -66,7 +66,8 @@ function template_postarea_above()
 					', empty($context['preview_message']) ? '<br />' : $context['preview_message'], '
 				</div>
 			</div>
-			<div id="forumposts">', isset($context['current_topic']) ? '<input type="hidden" name="topic" value="' . $context['current_topic'] . '" />' : '', '
+			<div id="forumposts">', isset($context['current_topic']) ? '
+				<input type="hidden" name="topic" value="' . $context['current_topic'] . '" />' : '', '
 				<h2 class="category_header">', $context['page_title'], '</h2>
 				<div class="forumposts">
 					<div class="editor_wrapper">';

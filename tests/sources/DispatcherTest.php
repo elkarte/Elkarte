@@ -30,7 +30,7 @@ class DispatcherTest extends TestCase
 			'calendar' => array('calendar', 'ical', 'post'),
 			'emailuser' => array('sendtopic', 'email'),
 			'groups' => array('index', 'members', 'requests'),
-			'help' => array('index', 'help'),
+			'help' => array('index'),
 			'topic' => array('lock', 'printpage', 'sticky'),
 			'profile' => array('index'),
 			'reminder' => array('picktype', 'secret2', 'setpassword', 'setpassword2'),
