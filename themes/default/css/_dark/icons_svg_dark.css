@@ -623,11 +623,11 @@
 
 /* The expand / collapse triangles, done as simple geometry */
 legend::before, .i-caret-down::before {
-	background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='black' fill-opacity='.7' viewBox='0 0 32 32'%3E%3Cpolygon points='0 16, 32 16, 16 32'/%3E%3C/svg%3E");
+	content: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='black' fill-opacity='.7' viewBox='0 0 32 32'%3E%3Cpolygon points='0 16, 32 16, 16 32'/%3E%3C/svg%3E");
 }
 
 .collapsed legend::before, .i-caret-up::before {
-	background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='black' fill-opacity='.7' viewBox='0 0 32 32'%3E%3Cpolygon points='16 0, 16 32, 32 16'/%3E%3C/svg%3E");
+	content: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='black' fill-opacity='.7' viewBox='0 0 32 32'%3E%3Cpolygon points='16 0, 16 32, 32 16'/%3E%3C/svg%3E");
 }
 
 /* ---------------
