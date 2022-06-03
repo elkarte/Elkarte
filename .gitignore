@@ -4,12 +4,12 @@ db_last_error.txt
 cache/data*.php
 Packages/backups/*
 Packages/temp
-smileys/emojitwo/*
-!smileys/emojitwo/emojitwo.zip
+smileys/open-moji/*
+!smileys/open-moji/open-moji.zip
 smileys/noto-emoji/*
 !smileys/noto-emoji/noto-emoji.zip
-smileys/twemoji/*
-!smileys/twemoji/twemoji.zip
+smileys/tw-emoji/*
+!smileys/tw-emoji/tw-emoji.zip
 attachments/
 avatars_user/
 !avatars_user/index.php
