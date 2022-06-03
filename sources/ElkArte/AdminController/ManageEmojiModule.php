@@ -38,12 +38,12 @@ abstract class ManageEmojiModule extends AbstractController
 
 		// All the options, well at least some of them!
 		$config_vars[] = '';
-		$config_vars[] = array('select', 'emoji_selection', array(
-			'noemoji' => $txt['emoji_disabled'],
-			'emojitwo' => $txt['emoji_open'],
-			'twemoji' => $txt['emoji_twitter'],
+		$config_vars[] = ['select', 'emoji_selection', [
+			'no-emoji' => $txt['emoji_disabled'],
+			'open-moji' => $txt['emoji_open'],
+			'tw-emoji' => $txt['emoji_twitter'],
 			'noto-emoji' => $txt['emoji_google'],
-		));
+		]];
 	}
 
 	/**
@@ -55,7 +55,7 @@ abstract class ManageEmojiModule extends AbstractController
 
 		if (empty($req->post->emoji_selection))
 		{
-			$req->post->emoji_selection = 'noemoji';
+			$req->post->emoji_selection = 'no-emoji';
 			return;
 		}
 
@@ -87,7 +87,8 @@ abstract class ManageEmojiModule extends AbstractController
 			}
 		}
 
-		$req->post->emoji_selection = 'noemoji';
+		$req->post->emoji_selection = 'no-emoji';
+
 		return false;
 	}
 
@@ -120,5 +121,7 @@ abstract class ManageEmojiModule extends AbstractController
 				}
 			}
 		}
+
+		return true;
 	}
 }
