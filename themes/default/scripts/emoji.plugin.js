@@ -7,6 +7,8 @@
  *
  */
 
+/** global: elk_smileys_url */
+
 /**
  * This file contains javascript associated with the :emoji: function as it
  * relates to a sceditor invocation

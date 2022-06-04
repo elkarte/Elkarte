@@ -549,8 +549,10 @@ function prepareCreditsData()
 		'graphics' => array(
 			'<a href="http://p.yusukekamiyamane.com/">Fugue Icons</a> | &copy; 2012 Yusuke Kamiyamane | These icons are licensed under a Creative Commons Attribution 3.0 License',
 			'<a href="https://icomoon.io">IcoMoon Free Icons</a> | These icons are licensed under <a href="https://creativecommons.org/licenses/by/4.0/">CC BY-SA 4.0</a>',
+			'<a href="https://github.com/googlefonts/noto-emoji">Noto Emoji</a> | &copy; Googlefonts | Licensed under <a href="https://www.apache.org/licenses/LICENSE-2.0">Apache License, Version 2.0</a>',
+			'<a href="https://openmoji.org">OpenMoji</a> | &copy; OpenMoji | Licensed under <a href="https://creativecommons.org/licenses/by-sa/4.0/">Creative Commons Attribution-ShareAlike 4.0</a>',
 			'<a href="http://www.oxygen-icons.org/">Oxygen Icons</a> | These icons are licensed under <a href="https://creativecommons.org/licenses/by-sa/3.0/">CC BY-SA 3.0</a>',
-		),
+			'<a href="https://github.com/twitter/twemoji">Twitter Emoji</a> | &copy; Twitter, Inc and other contributors | Licensed under <a href="https://github.com/twitter/twemoji/blob/master/LICENSE/">MIT</a>',		),
 		'fonts' => array(
 			'<a href="http://openfontlibrary.org/en/font/architect-s-daughter">Architect\'s Daughter</a> | &copy; 2010 <a href="http://kimberlygeswein.com/">Kimberly Geswein</a> | This font is licensed under the SIL Open Font License, Version 1.1',
 			'<a href="http://openfontlibrary.org/en/font/klaudia-and-berenika">Berenika</a> | &copy; 2011 wmk69 | This font is licensed under the SIL Open Font License, Version 1.1',
@@ -562,22 +564,20 @@ function prepareCreditsData()
 		),
 		'software' => array(
 			'<a href="https://ichord.github.com/At.js">At.js</a> | &copy; Chord Luo | Licensed under <a href="https://opensource.org/licenses/MIT">The MIT License (MIT)</a>',
+			'<a href="http://lab.ejci.net/favico.js/">Favico.js</a> | &copy; Miroslav Magda | Licensed under <a href="https://opensource.org/licenses/MIT">The MIT License (MIT)</a>',
 			'<a href="https://code.google.com/p/google-code-prettify/">Google Code Prettify</a> | Licensed under <a href="https://opensource.org/licenses/Apache-2.0">Apache License, Version 2.0</a>',
 			'<a href="http://pajhome.org.uk/crypt/md5">Javascript Crypt</a> | &copy; Angel Marin, Paul Johnston | Licensed under <a href="https://opensource.org/licenses/BSD-3-Clause">The BSD License</a>',
 			'<a href="https://jquery.com/">JQuery</a> | &copy; jQuery Foundation and other contributors | Licensed under <a href="https://opensource.org/licenses/MIT">The MIT License (MIT)</a>',
 			'<a href="https://jqueryui.com/">JQuery UI</a> | &copy; jQuery Foundation and other contributors | Licensed under <a href="https://opensource.org/licenses/MIT">The MIT License (MIT)</a>',
 			'<a href="https://github.com/tchwork/jsqueeze">Jsqueeze</a> &copy Nicolas Grekas| Licensed under <a href="https://www.apache.org/licenses/LICENSE-2.0">Apache License, Version 2.0</a>',
 			'<a href="https://github.com/mailcheck">MailCheck</a> | &copy; Received Inc | Licensed under <a href="https://opensource.org/licenses/MIT">The MIT License (MIT)</a>',
+			'<a href="https://github.com/mneofit/multiselect">Multiselect</a> | &copy; Mikhail Neofitov | Licensed under <a href="https://opensource.org/licenses/MIT">The MIT License (MIT)</a>',
 			'<a href="https://github.com/michelf/php-markdown">PHP Markdown Lib</a> | &copy; Michel Fortin | Licensed under <a href="https://github.com/michelf/php-markdown/blob/lib/License.md">BSD-style open source</a>',
+			'<a href="https://github.com/ttsvetko/HTML5-Desktop-Notifications">Push.js</a> | &copy; Tyler Nickerson | Licensed under <a href="https://opensource.org/licenses/MIT">The MIT License (MIT)</a>',
 			'<a href="https://www.sceditor.com/">SCEditor</a> | &copy; Sam Clarke | Licensed under <a href="https://opensource.org/licenses/MIT">The MIT License (MIT)</a>',
 			'<a href="https://sourceforge.net/projects/simplehtmldom/">Simple HTML DOM</a> | Licensed under <a href="https://opensource.org/licenses/MIT">The MIT License (MIT)</a>',
 			'<a href="http://www.simplemachines.org/">Simple Machines</a> | &copy; Simple Machines | Licensed under <a href="https://www.simplemachines.org/about/smf/license.php">The BSD License</a>',
 			'<a href="https://github.com/tubalmartin/YUI-CSS-compressor-PHP-port">YUI-CSS compressor (PHP port)</a> | &copy; Yahoo! Inc | Licensed under <a href="https://opensource.org/licenses/BSD-3-Clause">The BSD License</a>',
-			'<a href="http://lab.ejci.net/favico.js/">favico.js</a> | &copy; Miroslav Magda | Licensed under <a href="https://opensource.org/licenses/MIT">The MIT License (MIT)</a>',
-			'<a href="https://github.com/ttsvetko/HTML5-Desktop-Notifications">Push.js</a> | &copy; Tyler Nickerson | Licensed under <a href="https://opensource.org/licenses/MIT">The MIT License (MIT)</a>',
-			'<a href="https://github.com/mneofit/multiselect">Multiselect</a> | &copy; Mikhail Neofitov | Licensed under <a href="https://opensource.org/licenses/MIT">The MIT License (MIT)</a>',
-			'<a href="#">EmojiOne</a> | &copy; Emoji One | Licensed under <a href="https://creativecommons.org/licenses/by-sa/4.0/">Creative Commons Attribution-ShareAlike 4.0 International</a>',
-			'<a href="https://github.com/twitter/twemoji">Twitter Emoji</a> | &copy; Twitter, Inc and other contributors | Licensed under <a href="https://github.com/twitter/twemoji/blob/master/LICENSE/">MIT</a>',
 			'<a href="https://github.com/Frenzie/elk-quick-quote">Quick Quote</a> | &copy; Frans de Jonge | Licensed under <a href="https://opensource.org/licenses/BSD-3-Clause">The BSD License</a>',
 		),
 	);
@@ -590,7 +590,7 @@ function prepareCreditsData()
 	call_integration_hook('integrate_credits', array(&$credits));
 
 	// Copyright information
-	$credits['copyrights']['elkarte'] = '&copy; 2012 - 2021 ElkArte Forum contributors';
+	$credits['copyrights']['elkarte'] = '&copy; 2012 - 2022 ElkArte Forum contributors';
 
 	return $credits;
 }
