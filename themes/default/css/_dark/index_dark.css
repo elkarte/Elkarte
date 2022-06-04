@@ -887,6 +887,12 @@ sup.bbc_footnotes, sup.bbc_footnotes a {
 	background-image: url(../../images/_dark/quickbuttons.png);
 }
 
+.quick_quote_button > .warning {
+	border-color: var(--primary_border);
+	background: var(--description);
+	box-shadow: 0 0 15px 1px var(--opacity30);
+}
+
 /* -------------------------------------------------------
  *	$PAGELINKS
  * -------------------------------------------------------

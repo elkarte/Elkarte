@@ -52,7 +52,7 @@ class BBCParser
 	/** @var bool */
 	protected $do_smileys = true;
 	/** @var array */
-	protected $open_tags = array();
+	protected $open_tags = [];
 	/** @var string|null This is the actual tag that's open */
 	protected $inside_tag;
 	/** @var Autolink|null */
@@ -70,15 +70,13 @@ class BBCParser
 	/** @var int */
 	protected $lastAutoPos = 0;
 	/** @var array content fo the footnotes */
-	protected $fn_content = array();
+	protected $fn_content = [];
 	/** @var array */
-	protected $tag_possible = array();
+	protected $tag_possible = [];
 	/** @var int */
 	protected $fn_count = 0;
 	/** @var int */
 	protected $fn_num = 0;
-	/** @var int */
-	protected $read_more_length = 525;
 
 	/**
 	 * BBCParser constructor.
@@ -630,7 +628,8 @@ class BBCParser
 		//		</blockquote> .. with a max height that is removed on input click
 		// </div>
 		// Should you alter this markup, be sure to check handleCollapsedQuotes()
-		if ($first_quote === 0)
+		$read_more = empty($GLOBALS['modSettings']['charactersBeforeShowMore']) ? 0 : (int) $GLOBALS['modSettings']['charactersBeforeShowMore'];
+		if ($first_quote === 0 && $read_more !== 0)
 		{
 			$tag[Codes::ATTR_BEFORE] = str_replace('<blockquote class="bbc_quote">', '<div class="quote-read-more"><input type="checkbox" title="show" class="quote-show-more"><blockquote class="bbc_quote">', $tag[Codes::ATTR_BEFORE]);
 			$tag[Codes::ATTR_AFTER] = str_replace('</blockquote>', '</blockquote></div>', $tag[Codes::ATTR_AFTER]);
@@ -1280,6 +1279,11 @@ class BBCParser
 		$end_len = 19; // '</blockquote></div>'
 		$input_len = 60; // '<input type="checkbox" title="show" class="quote-show-more">'
 		$input = '<input type="checkbox" title="show" class="quote-show-more">';
+		$read_more = empty($GLOBALS['modSettings']['charactersBeforeShowMore']) ? 0 : (int) $GLOBALS['modSettings']['charactersBeforeShowMore'];
+		if ($read_more === 0)
+		{
+			return;
+		}
 
 		// While we have parent quotes, lets test the content length.
 		while ($start = stripos($this->message, '<div class="quote-read-more">', $end))
@@ -1295,7 +1299,7 @@ class BBCParser
 			$quote = substr($this->message, $start, $end - $start);
 			$quoteText = explode('<blockquote class="bbc_quote">', $quote, 2);
 			$quoteText = $quoteText[1] ?? $quote;
-			if (substr_count($quote, '<br />') < 6 && Util::strlen(strip_tags($quoteText)) < $this->read_more_length)
+			if (substr_count($quote, '<br />') < 6 && Util::strlen(strip_tags($quoteText)) < $read_more)
 			{
 				// Not so chatty, first remove the input quote-show-more
 				$input_start = stripos($this->message, $input, $start + $start_len);

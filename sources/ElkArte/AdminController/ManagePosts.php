@@ -304,27 +304,31 @@ class ManagePosts extends AbstractController
 		global $txt;
 
 		// Initialize it with our settings
-		$config_vars = array(
-			// Simple post options...
-			array('int', 'removeNestedQuotes'),
-			array('check', 'enableCodePrettify'),
+		$config_vars = [
+			// Quote options...
+			['int', 'removeNestedQuotes', 'postinput' => $txt['zero_for_none']],
+			['int', 'charactersBeforeShowMore', 'postinput' => $txt['zero_to_disable']],
+			['check', 'hideQuickQuoteButton'],
 			'',
-			array('check', 'enableVideoEmbeding'),
-			array('int', 'video_embed_limit', 'postinput' => $txt['video_embed_limit_note']),
+			// Video options
+			['check', 'enableVideoEmbeding'],
+			['int', 'video_embed_limit', 'postinput' => $txt['video_embed_limit_note']],
 			'',
 			// Posting limits...
-			array('int', 'max_messageLength', 'subtext' => $txt['max_messageLength_zero'], 'postinput' => $txt['manageposts_characters']),
-			array('int', 'topicSummaryPosts', 'postinput' => $txt['manageposts_posts']),
+			['int', 'max_messageLength', 'subtext' => $txt['max_messageLength_zero'], 'postinput' => $txt['manageposts_characters']],
+			['int', 'topicSummaryPosts', 'postinput' => $txt['manageposts_posts']],
 			'',
 			// Posting time limits...
-			array('int', 'spamWaitTime', 'postinput' => $txt['manageposts_seconds']),
-			array('int', 'edit_wait_time', 'postinput' => $txt['manageposts_seconds']),
-			array('int', 'edit_disable_time', 'subtext' => $txt['edit_disable_time_zero'], 'postinput' => $txt['manageposts_minutes']),
+			['int', 'spamWaitTime', 'postinput' => $txt['manageposts_seconds']],
+			['int', 'edit_wait_time', 'postinput' => $txt['manageposts_seconds']],
+			['int', 'edit_disable_time', 'subtext' => $txt['edit_disable_time_zero'], 'postinput' => $txt['manageposts_minutes']],
 			'',
 			// First & Last message preview lengths
-			array('select', 'message_index_preview', array($txt['message_index_preview_off'], $txt['message_index_preview_first'], $txt['message_index_preview_last'])),
-			array('int', 'preview_characters', 'subtext' => $txt['preview_characters_zero'], 'postinput' => $txt['preview_characters_units']),
-		);
+			['select', 'message_index_preview', [$txt['message_index_preview_off'], $txt['message_index_preview_first'], $txt['message_index_preview_last']]],
+			['int', 'preview_characters', 'subtext' => $txt['preview_characters_zero'], 'postinput' => $txt['preview_characters_units']],
+			// Misc
+			['check', 'enableCodePrettify'],
+		];
 
 		// Add new settings with a nice hook, makes them available for admin settings search as well
 		call_integration_hook('integrate_modify_post_settings', array(&$config_vars));

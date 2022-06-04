@@ -926,6 +926,11 @@ nav.breadcrumb {
 	line-height: 1.8em;
 }
 
+.quick_quote_button > .warning {
+	border-color: var(--primary_border);
+	background: var(--description);
+}
+
 /* -------------------------------------------------------
  *	$PAGELINKS
  * -------------------------------------------------------

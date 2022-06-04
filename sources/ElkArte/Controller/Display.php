@@ -237,18 +237,18 @@ class Display extends AbstractController
 		loadJavascriptFile('topic.js');
 
 		// Create the editor for the QR area
-		$editorOptions = array(
+		$editorOptions = [
 			'id' => 'message',
 			'value' => '',
-			'labels' => array(
+			'labels' => [
 				'post_button' => $txt['post'],
-			),
+			],
 			// add height and width for the editor
 			'height' => '250px',
 			'width' => '100%',
 			// We do XML preview here.
 			'preview_type' => 1,
-		);
+		];
 
 		// Load the template basics now as template_layers is requested by the prepare_context event
 		theme()->getTemplates()->load('Display');
@@ -311,8 +311,15 @@ class Display extends AbstractController
 		// Quick reply & modify enabled?
 		if ($context['can_reply'] && !empty($options['display_quick_reply']))
 		{
-			loadJavascriptFile('mentioning.js');
+			loadJavascriptFile(['mentioning.js', 'quickQuote.js'], ['defer' => true]);
 			$this->_template_layers->addBefore('quickreply', 'moderation_buttons');
+			theme()->addInlineJavascript("
+				let opt = {
+					hideButton: " . (empty($modSettings['hideQuickQuoteButton']) ? 'false' : 'true') . ",
+					infoText: " . JavaScriptEscape($txt['quote_quick_help']) . ",
+				};
+				document.addEventListener('DOMContentLoaded', () => new Elk_QuickQuote(opt), false);", true
+			);
 		}
 	}
 

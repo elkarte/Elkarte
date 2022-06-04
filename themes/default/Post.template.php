@@ -702,7 +702,7 @@ function template_topic_replies_below()
 			<h2 class="category_header">', $txt['topic_summary'], '</h2>
 			<span id="new_replies"></span>';
 
-		$ignored_posts = array();
+		$ignored_posts = [];
 		foreach ($context['previous_posts'] as $post)
 		{
 			$ignoring = false;
@@ -715,17 +715,20 @@ function template_topic_replies_below()
 			<div class="content forumposts">
 				<div class="postarea2" id="msg', $post['id'], '">
 					<div class="keyinfo">
-						<h5>
+						<h3>
 							', $txt['posted_by'], ' <span class="name">', $post['poster'], '</span> &ndash; ', $post['html_time'], '
-						</h5>';
+						</h3>';
 
 			if ($context['can_quote'])
 			{
 				echo '
 						<nav>
-							<ul class="quickbuttons" id="msg_', $post['id'], '_quote">
+							<ul class="quickbuttons" id="buttons_', $post['id'], '">
 								<li class="listlevel1">
-									<a href="#postmodify" onmousedown="return insertQuoteFast(', $post['id'], ');" class="linklevel1 quote_button">', $txt['bbc_quote'], '</a>
+									<a href="#postmodify" onclick="return insertQuoteFast(', $post['id'], ');" role="button" class="linklevel1 quote_button">', $txt['bbc_quote'], '</a>
+								</li>
+								<li class="listlevel1 hide">
+									<a href="javascript:void(0);" id="qq_', $post['id'], '" role="button" class="linklevel1 quick_quote_button">', $txt['quick_quote'], '</a>
 								</li>
 							</ul>
 						</nav>';
@@ -744,7 +747,7 @@ function template_topic_replies_below()
 			}
 
 			echo '
-					<section class="messageContent" id="msg_', $post['id'], '_body">', $post['body'], '</section>
+					<section class="messageContent" id="msg_', $post['id'], '_body" data-msgid="', $post['id'], '">', $post['body'], '</section>
 				</div>
 			</div>';
 		}

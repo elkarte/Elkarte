@@ -212,7 +212,7 @@ function template_messages()
 
 		// Show the post itself, finally!
 		echo '
-						<section id="msg_', $message['id'], '" class="messageContent', $ignoring ? ' hide"' : '"', '>',
+						<section id="msg_', $message['id'], '" data-msgid="',$message['id'], '" class="messageContent', $ignoring ? ' hide"' : '"', '>',
 							$message['body'], '
 						</section>
 						<footer>';
@@ -389,7 +389,10 @@ function template_messages()
 		{
 			echo '
 							<li class="listlevel1">
-								<a href="', $scripturl, '?action=post;quote=', $message['id'], ';topic=', $context['current_topic'], '.', $context['start'], ';last_msg=', $context['topic_last_message'], '" role="button" onclick="return oQuickReply.quote(', $message['id'], ');" class="linklevel1 quote_button">', $txt['quote'], '</a>
+								<a href="', $scripturl, '?action=post;quote=', $message['id'], ';topic=', $context['current_topic'], '.', $context['start'], ';last_msg=', $context['topic_last_message'], '" role="button" onclick="return oQuickReply.quote(', $message['id'], ');" class="linklevel1 quote_button last">', $txt['quote'], '</a>
+							</li>
+							<li class="listlevel1 hide">
+								<a href="javascript:void(0);" id="qq_', $message['id'], '" role="button" class="linklevel1 quick_quote_button">', $txt['quick_quote'], '</a>
 							</li>';
 		}
 		// So... quick reply is off, but they *can* reply?

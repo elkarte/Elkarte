@@ -2023,7 +2023,7 @@ nav > .quickbuttons, menu > .quickbuttons {
 }
 
 /* Radius left end of the first (Quote) button, last-child as this is in reverse order */
-.quickbuttons li:last-child a {
+.quickbuttons li:last-child a, .quickbuttons li a.last {
 	border-radius: 4px 0 0 4px;
 }
 
@@ -2087,6 +2087,15 @@ nav > .quickbuttons, menu > .quickbuttons {
 .quickbuttons .linklevel2 {
 	line-height: 2.1;
 	padding: 0 .4em 0 26px;
+}
+
+.quick_quote_button > .warning {
+	position: absolute;
+	z-index: 10;
+	top: -3px;
+	left: 0;
+	padding: 0.4em;
+	border: 1px solid;
 }
 
 /* -------------------------------------------------------
