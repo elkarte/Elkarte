@@ -106,10 +106,6 @@ html, body {
 	line-height: 1.5;
 }
 
-body {
-	color: #141414;
-}
-
 /* Global box sizing, for stabilising fluid layouts.
    Remove margin and padding in all browsers. */
 * {
@@ -2991,6 +2987,10 @@ aside > .poster {
 	white-space: normal;
 	text-overflow: ellipsis;
 	word-break: normal;
+}
+
+.poster .poster_avatar {
+	margin-top: 2px;
 }
 
 /* No border around the poster name on hover */

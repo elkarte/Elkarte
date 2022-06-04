@@ -587,9 +587,12 @@ sup.bbc_footnotes, sup.bbc_footnotes a {
 	color: var(--attention);
 }
 
-.forumtitle > a {
-	color: var(--title);
-	text-shadow: 1px 1px 0 var(--primary_white);
+#forumtitle > a {
+	font-weight: 600;
+	color: var(--transparent);
+	background: linear-gradient(95deg, var(--medium_dark_green), var(--title));
+	-webkit-background-clip: text;
+	background-clip: text;
 }
 
 /* News section. */
@@ -784,9 +787,8 @@ sup.bbc_footnotes, sup.bbc_footnotes a {
 	box-shadow: 2px 2px 3px var(--opacity20);
 }
 
-/* Poster flyout gets a reverse shadow to hide some background */
 .poster .menulevel2 {
-	box-shadow: 2px 2px 3px var(--opacity20), -5px -5px 1px var(--primary_content_background);
+	box-shadow: 2px 2px 3px 1px var(--opacity20);
 }
 
 .poster_div_details {
