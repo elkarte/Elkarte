@@ -29,7 +29,7 @@ class EmojiIntegrate
 	{
 		global $modSettings;
 
-		if (empty($modSettings['emoji_selection']) || $modSettings['emoji_selection'] === 'noemoji')
+		if (empty($modSettings['emoji_selection']) || $modSettings['emoji_selection'] === 'no-emoji')
 		{
 			return [];
 		}
@@ -72,8 +72,9 @@ class EmojiIntegrate
 	/**
 	 * integrate_pre_bbc_parser, called from BBCParser
 	 *
+	 * What it does:
 	 * - Allow addons access before entering the main parse_bbc loop
-	 * - searches message for emoji :smile: tags and converts to image
+	 * - searches message for emoji :smile: tags and converts to svg image
 	 *
 	 * @param string $message
 	 * @param mixed[] $parse_tags

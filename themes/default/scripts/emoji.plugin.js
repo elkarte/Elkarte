@@ -7,6 +7,8 @@
  *
  */
 
+/** global: elk_smileys_url */
+
 /**
  * This file contains javascript associated with the :emoji: function as it
  * relates to a sceditor invocation
@@ -62,36 +64,21 @@ var disableDrafts = false;
 		/**
 		 * Create the dropdown selection list
 		 * Inserts the site image location when one is selected.
-		 * Uses the CDN for the pulldown image to reduce site calls
 		 */
 		let tpl,
 			emoji_url = this.opts.emoji_url,
 			emoji_group = this.opts.emoji_group;
 
-		// Use CDN calls to populate the atwho selection list
-		switch(emoji_group) {
-			case 'twemoji':
-				//tpl = "https://twemoji.maxcdn.com/16x16/${key}.png";
-				tpl = "https://twemoji.maxcdn.com/svg/${key}.svg";
-				break;
-			case 'emojitwo':
-				tpl = "https://rawcdn.githack.com/EmojiTwo/emojitwo/d79b4477eb8f9110fc3ce7bed2cc66030a77933e/svg/${key}.svg";
-				break;
-			case 'noto-emoji':
-				tpl = "https://rawcdn.githack.com/googlefonts/noto-emoji/e7ac893b3315181f51710de3ba16704ec95e3f51/svg/emoji_u${key}.svg";
-				break;
-			default:
-				tpl = "http://cdn.jsdelivr.net/emojione/assets/png/${key}.png";
-		}
+		tpl = elk_smileys_url + "../" + emoji_group + "/${key}.svg";
 
 		// Create the emoji select list and insert choice in to the editor
 		$element.atwho({
 			at: ":",
 			data: emojies,
-			maxLen: 25,
-			limit: 8,
+			maxLen: 35,
+			limit: 12,
 			acceptSpaceBar: true,
-			displayTpl: "<li data-value=':${name}:'><img class='emoji_tpl' src='" + tpl + "' />${name}</li>",
+			displayTpl: "<li data-value=':${name}:'><img class='emoji_tpl " + emoji_group + "' src='" + tpl + "' />${name}</li>",
 			insertTpl: "${name} | ${key}",
 			callbacks: {
 				filter: function (query, items, search_key)
@@ -119,7 +106,7 @@ var disableDrafts = false;
 				{
 					try
 					{
-						return tpl.replace(/\$\{([^\}]*)\}/g, function(tag, key, pos)
+						return tpl.replace(/\$\{([^}]*)}/g, function(tag, key, pos)
 						{
 							return map[key];
 						});

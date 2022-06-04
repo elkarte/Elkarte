@@ -3382,6 +3382,15 @@ footer .signature {
 	vertical-align: text-bottom;
 }
 
+/* Adjust for various emoji sets */
+.open-moji {
+	max-width: 30px;
+}
+
+.tw-emoji {
+	max-width: 24px;
+}
+
 .emoji_tpl {
 	max-width: 22px;
 	padding: 0 .13em 0 0;

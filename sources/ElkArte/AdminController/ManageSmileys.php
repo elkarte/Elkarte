@@ -621,11 +621,11 @@ class ManageSmileys extends AbstractController
 			}
 
 			// Retrieve all potential smiley set directories.
-			$context['smiley_set_dirs'] = array();
+			$context['smiley_set_dirs'] = [];
 			if (!empty($modSettings['smileys_dir']) && $fileFunc->isDir($modSettings['smileys_dir']))
 			{
 				// Do not include our emoji directories
-				$disallow = ['.', '..', 'emojitwo', 'twemoji', 'noto-emoji'];
+				$disallow = ['.', '..', 'open-moji', 'tw-emoji', 'noto-emoji'];
 
 				$dir = dir($modSettings['smileys_dir']);
 				while (($entry = $dir->read()) !== false)
@@ -633,12 +633,12 @@ class ManageSmileys extends AbstractController
 					if (!in_array($entry, $disallow)
 						&& $fileFunc->isDir($modSettings['smileys_dir'] . '/' . $entry))
 					{
-						$context['smiley_set_dirs'][] = array(
+						$context['smiley_set_dirs'][] = [
 							'id' => $entry,
 							'path' => $modSettings['smileys_dir'] . '/' . $entry,
-							'selectable' => $entry == $context['current_set']['path'] || !in_array($entry, explode(',', $modSettings['smiley_sets_known'])),
-							'current' => $entry == $context['current_set']['path'],
-						);
+							'selectable' => $entry === $context['current_set']['path'] || !in_array($entry, explode(',', $modSettings['smiley_sets_known'])),
+							'current' => $entry === $context['current_set']['path'],
+						];
 					}
 				}
 				$dir->close();

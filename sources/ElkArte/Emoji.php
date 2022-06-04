@@ -24,7 +24,7 @@ use ElkArte\Cache\Cache;
 class Emoji extends AbstractModel
 {
 	/** @var null|\ElkArte\Emoji holds the instance of this class */
-	private static $instance = null;
+	private static $instance;
 
 	/** @var string holds the url of where the emojis are stored */
 	public $smileys_url;
@@ -70,12 +70,12 @@ class Emoji extends AbstractModel
 		for ($i = 0, $n = count($parts); $i < $n; $i++)
 		{
 			// It goes 0 = outside, 1 = begin tag, 2 = inside, 3 = close tag, repeat.
-			if ($i % 4 == 0)
+			if ($i % 4 === 0)
 			{
-				// :emoji: must be at the start of a line, or have a leading space or be after a bbc ] tag
+				// :emoji: must be at the start of a line, or have a leading space or be after a bbc ']' tag
 				$parts[$i] = preg_replace_callback('~(?:\s?|^|]|<br />|<br>)(:([-+\w]+):\s?)~i', [$emoji, 'emojiToImage'], $parts[$i]);
 
-				// Check for embeded html / hex emoji
+				// Check for embedded html / hex emoji
 				$parts[$i] = $this->keyboardEmojiToImage($parts[$i]);
 			}
 		}
@@ -84,8 +84,12 @@ class Emoji extends AbstractModel
 	}
 
 	/**
-	 * Find emoji codes that were keyboard entered, or HTML &#xxx codes, if found
-	 * and replaceable with our SVG standard ones, do it
+	 * Find emoji codes that are HTML &#xxx codes or pure 😀 codes. If found
+	 * replace them with our SVG version.
+	 *
+	 * Given &#128512; or 😀, aka grinning face, will convert to 1f600
+	 * and search for available svg image, retuning <img /> or original
+	 * string if not found.
 	 *
 	 * @param string $string
 	 * @return string
@@ -100,15 +104,18 @@ class Emoji extends AbstractModel
 	/**
 	 * Search and replace on &#xHEX; &#DEC; style emoji
 	 *
+	 * Given &#128512;; aka 😀 grinning face, will search on 1f600 and
+	 * if found return as <img /> string pointing to SVG
+	 *
 	 * @param string $string
-	 * @return string|string[]|null
+	 * @return string
 	 */
 	public function emojiFromHTML($string)
 	{
-		$result = preg_replace_callback('~&#([\d]+);|&#x([0-9a-fA-F]+);~', function ($match) {
+		$result = preg_replace_callback('~&#(\d+);|&#x([0-9a-fA-F]+);~', function ($match) {
 			// See if we have an Emoji version of this HTML entity
 			$entity = !empty($match[1]) ? dechex($match[1]) : $match[2];
-			$found = $this->searchEmojiByHex($entity);
+			$found = $this->findEmojiByCode($entity);
 
 			// Replace it with or emoji <img>
 			if ($found !== false)
@@ -123,17 +130,19 @@ class Emoji extends AbstractModel
 	}
 
 	/**
-	 * Search the Emoji array by hex code
+	 * Search the Emoji array by unicode number
+	 *
+	 * Given unicode 1f600, aka 😀 grinning face, returns grinning
 	 *
 	 * @param $hex
 	 * @return string|false
 	 */
-	public function searchEmojiByHex($hex)
+	public function findEmojiByCode($hex)
 	{
 		$this->loadEmoji();
 
 		// Is it one we have in our library?
-		if (!empty($hex) && $key = (array_search($hex, $this->shortcode_replace)))
+		if (!empty($hex) && $key = (array_search($hex, $this->shortcode_replace, true)))
 		{
 			return $key;
 		}
@@ -172,24 +181,23 @@ class Emoji extends AbstractModel
 		$alt = trim(strtr($m[1], [':' => '&#58;', '(' => '&#40;', ')' => '&#41;', '$' => '&#36;', '[' => '&#091;']));
 		$title = ucwords(strtr(htmlspecialchars($m[2]), [':' => '&#58;', '(' => '&#40;', ')' => '&#41;', '$' => '&#36;', '[' => '&#091;', '_' => ' ']));
 
-		return '<img class="smiley emoji" src="' . $filename . '" alt="' . $alt . '" title="' . $title . '" data-emoji-name="' . $alt . '" data-emoji-code="' . $this->shortcode_replace[$m[2]] . '" />';
+		return '<img class="smiley emoji ' . $this->_modSettings['emoji_selection'] . '" src="' . $filename . '" alt="' . $alt . '" title="' . $title . '" data-emoji-name="' . $alt . '" data-emoji-code="' . $this->shortcode_replace[$m[2]] . '" />';
 	}
 
 	/**
 	 * Searches a string for unicode points and replaces them with emoji <img> tags
 	 *
 	 * Instead of searching in specific groups of emoji code points, such as:
+	 *  - flags -> (?:\x{1F3F4}[\x{E0060}-\x{E00FF}]{1,6})|[\x{1F1E0}-\x{1F1FF}]{2}
+	 *  - dingbats -> [\x{2700}-\x{27bf}]\x{FE0F}
+	 *  - emoticons -> [\x{1F000}-\x{1F6FF}\x{1F900}-\x{1F9FF}]\x{FE0F}?
+	 *  - symbols -> [\x{2600}-\x{26ff}]\x{FE0F}?
+	 *  - peeps -> (?:[\x{1F466}-\x{1F469}]+\x{FE0F}?[\x{1F3FB}-\x{1F3FF}]?)
 	 *
-	 * flags -> (?:\x{1F3F4}[\x{E0060}-\x{E00FF}]{1,6})|[\x{1F1E0}-\x{1F1FF}]{2}
-	 * dingbats -> [\x{2700}-\x{27bf}]\x{FE0F}
-	 * emoticons -> [\x{1F000}-\x{1F6FF}\x{1F900}-\x{1F9FF}]\x{FE0F}?
-	 * symbols -> [\x{2600}-\x{26ff}]\x{FE0F}?
-	 * peeps -> (?:[\x{1F466}-\x{1F469}]+\x{FE0F}?[\x{1F3FB}-\x{1F3FF}]?)
-	 *
-	 * We will use \p{S} which will match anything in the symbol area including
+	 * We instead use \p{S} which will match anything in the symbol area including
 	 * symbols, currency signs, dingbats, box-drawing characters, etc.  This is an
-	 * easier regex but with more "false" hits for what we want.  The array searching
-	 * should be faster than the detailed regex.
+	 * easier regex but with more "false" hits for what we want.  Array searching
+	 * should be faster than multiple detailed regex.
 	 *
 	 * @param $string
 	 * @return string|string[]|null
@@ -197,7 +205,8 @@ class Emoji extends AbstractModel
 	public function emojiFromUni($string)
 	{
 		$result = preg_replace_callback('~\p{S}~u', function ($match) {
-			$found = $this->knownEmojiCode($match[0]);
+			$hex_str = $this->unicodeCharacterToNumber($match[0]);
+			$found = $this->findEmojiByCode($hex_str);
 
 			// Hey I know you, your :space_invader:
 			if ($found !== false)
@@ -212,21 +221,25 @@ class Emoji extends AbstractModel
 	}
 
 	/**
-	 * Given a unicode convert to hex for emoji array searching
+	 * Given a unicode character, convert to a Unicode number which can be
+	 * used for emoji array searching
+	 *
+	 * Given 😀 aka grinning face returns unicode 1f600
+	 * Given 😮‍💨 aka face exhaling returns unicode 1f62e-200d-1f4a8
 	 *
 	 * @param string $code
-	 * @return string|false
+	 * @return string
 	 */
-	public function knownEmojiCode($code)
+	public function unicodeCharacterToNumber($code)
 	{
 		$points = [];
+
 		for ($i = 0; $i < Util::strlen($code); $i++)
 		{
-			$points[] = strtolower(dechex($this->uniord(Util::substr($code, $i, 1))));
+			$points[] = str_pad(strtolower(dechex($this->uniord(Util::substr($code, $i, 1)))), 4, '0', STR_PAD_LEFT);
 		}
-		$hex_str = implode('-', $points);
 
-		return $this->searchEmojiByHex($hex_str);
+		return implode('-', $points);
 	}
 
 	/**
@@ -286,8 +299,9 @@ class Emoji extends AbstractModel
 				$this->shortcode_replace[$name] = $key;
 			}
 
-			Cache::instance()->put('shortcode_replace', $this->shortcode_replace, 480);
-			call_integration_hook('integrate_custom_emoji', array(&$this->shortcode_replace));
+			// Stash for an hour, not like this is going to change
+			Cache::instance()->put('shortcode_replace', $this->shortcode_replace, 3600);
+			call_integration_hook('integrate_custom_emoji', [&$this->shortcode_replace]);
 		}
 	}
 
