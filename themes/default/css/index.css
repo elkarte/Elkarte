@@ -77,6 +77,7 @@
 	--font28: 1.8667rem;
 	--font29: 1.9333rem;
 	--font30: 2.0rem;
+	--quote_height: 12em;
 }
 
 /* -------------------------------------------------------
@@ -454,11 +455,6 @@ em, .em {
 	display: none;
 }
 
-/* HTML5 additions for deprecated tags. */
-.tt {
-	font-family: monospace;
-}
-
 /* Alternative for u tag. */
 .underline {
 	text-decoration: underline;
@@ -787,8 +783,8 @@ em, .em {
  */
 
 /* Set a consistent monospace font */
-.bbc_code, .bbc_tt, .bbc_pre {
-	font-family: "DejaVu Sans Mono", Monaco, Menlo, Consolas, 'Roboto Mono', 'Andale Mono', 'Ubuntu Mono', monospace;
+.bbc_code, .bbc_tt, .bbc_pre, .tt {
+	font-family: "DejaVu Sans Mono", SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
 }
 
 /* The "Quote:" and "Code:" header parts... */
@@ -820,7 +816,7 @@ em, .em {
 .bbc_quote,
 /* A code block - maybe PHP ;) - shared styles. */
 .bbc_code {
-	font-size: var(--font13);
+	font-size: var(--font14);
 	overflow: auto;
 	margin: 0 0 1em 0;
 	padding: .4em .67em;
@@ -840,8 +836,8 @@ em, .em {
 
 /* Constrain the quote area height.  Use max height so we can have a smooth transition */
 .quote-read-more > .bbc_quote {
-	overflow: hidden;
-	max-height: 12em;
+	overflow: auto;
+	max-height: var(--quote_height);
 }
 
 /* Specific targeting of our checkbox.  100% wide with a gradient to cover/fade the bottom
