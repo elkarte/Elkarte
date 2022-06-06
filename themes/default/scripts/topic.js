@@ -77,6 +77,7 @@ QuickModifyTopic.prototype.onDocReceived_modify_topic = function (XMLDoc)
 	if (!XMLDoc || !XMLDoc.getElementsByTagName('message'))
 	{
 		this.modify_topic_cancel();
+		ajax_indicator(false);
 		return true;
 	}
 
