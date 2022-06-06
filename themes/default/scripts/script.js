@@ -1116,53 +1116,36 @@ elk_Toggle.prototype.toggle = function ()
 
 /**
  * Creates and shows or hides the sites ajax in progress indicator
+ * Prepares options and initiates an ElkInfoBar
  *
  * @param {boolean} turn_on
- * @returns {undefined}
  */
 function ajax_indicator(turn_on)
 {
 	if (ajax_indicator_ele === null)
 	{
-		ajax_indicator_ele = document.getElementById('ajax_in_progress');
+		let opt = {
+			text: ajax_notification_text || '',
+			class: '',
+			hide_delay: 2000,
+			error_class: 'error',
+			success_class: 'success'
+		};
 
-		if (ajax_indicator_ele === null && typeof (ajax_notification_text) !== null)
-		{
-			create_ajax_indicator_ele();
-		}
+		ajax_indicator_ele = new ElkInfoBar('ajax_in_progress', opt);
 	}
 
 	if (ajax_indicator_ele !== null)
 	{
-		ajax_indicator_ele.style.display = turn_on ? 'block' : 'none';
+		if (turn_on)
+		{
+			ajax_indicator_ele.showBar();
+		}
+		else
+		{
+			ajax_indicator_ele.hide();
+		}
 	}
-}
-
-/**
- * Creates the ajax notification div and adds it to the current screen
- */
-function create_ajax_indicator_ele()
-{
-	// Create the div for the indicator.
-	ajax_indicator_ele = document.createElement('div');
-
-	// Set the id so it'll style properly.
-	ajax_indicator_ele.id = 'ajax_in_progress';
-
-	// Add the image in and link to turn it off.
-	let cancel_link = document.createElement('a');
-
-	cancel_link.href = 'javascript:ajax_indicator(false)'; // jshint ignore:line
-	cancel_link.className = 'icon i-remove';
-
-	// Add the cancel link to the indicator.
-	ajax_indicator_ele.appendChild(cancel_link);
-
-	// Set the text.  (Note: You MUST append here and not overwrite.)
-	ajax_indicator_ele.innerHTML += ajax_notification_text + '<span class="icon i-concentric"></span>';
-
-	// Finally attach the element to the body.
-	document.body.appendChild(ajax_indicator_ele);
 }
 
 /**
@@ -1660,23 +1643,12 @@ function elkSelectText(oCurElement, bActOnElement)
 		return false;
 	}
 
-	// Start off with internet explorer < 9.
-	if ('createTextRange' in document.body)
-	{
-		var oCurRange = document.body.createTextRange();
-		oCurRange.moveToElementText(oCodeArea);
-		oCurRange.select();
-	}
-	// All the rest
-	else if (window.getSelection)
-	{
-		var oCurSelection = window.getSelection(),
-			curRange = document.createRange();
+	let oCurSelection = window.getSelection(),
+		curRange = document.createRange();
 
-		curRange.selectNodeContents(oCodeArea);
-		oCurSelection.removeAllRanges();
-		oCurSelection.addRange(curRange);
-	}
+	curRange.selectNodeContents(oCodeArea);
+	oCurSelection.removeAllRanges();
+	oCurSelection.addRange(curRange);
 
 	return false;
 }

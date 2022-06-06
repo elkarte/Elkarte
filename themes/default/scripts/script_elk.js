@@ -1174,7 +1174,7 @@ function setBoardIds()
 				oPosition.y -= (((oPosition.y + oPosition.h) - (oLimits.y + oLimits.h)) + 24);
 			}
 
-			// Finally set the position we determined
+			// Finally, set the position we determined
 			$_tip.css({'left': oPosition.x + 'px', 'top': oPosition.y + 'px'});
 		};
 
@@ -2013,81 +2013,87 @@ var ElkNotifier = new ElkNotifications();
  */
 (function ()
 {
-	var ElkInfoBar = (function (elem_id, opt)
+	let ElkInfoBar = (function (elem_id, opt)
 	{
 		'use strict';
 
-		opt = $.extend({
+		let defaults = {
 			text: '',
 			class: 'ajax_infobar',
 			hide_delay: 4000,
 			error_class: 'error',
 			success_class: 'success'
-		}, opt);
+		};
 
-		let $elem = $('#' + elem_id),
+		let settings = Object.assign({}, defaults, opt);
+
+		let elem = document.getElementById(elem_id),
 			time_out = null,
-			init = function (elem_id, opt)
+			init = function (elem_id, settings)
 			{
 				clearTimeout(time_out);
-				if ($elem.length === 0)
+				if (elem === null)
 				{
-					$elem = $('<div id="' + elem_id + '" class="' + opt.class + ' hide" />');
-					$('body').append($elem);
-					$elem.attr('id', elem_id);
-					$elem.addClass(opt.class);
-					$elem.text(opt.text);
+					elem = document.createElement('div');
+					elem.id = elem_id;
+					elem.className = settings.class;
+					elem.innerHTML = settings.text + '<span class="icon i-concentric"></span>';
+					document.body.appendChild(elem);
 				}
 			},
 			changeText = function (text)
 			{
 				clearTimeout(time_out);
-				$elem.html(text);
+				elem.innerHTML = text;
 				return this;
 			},
 			addClass = function (aClass)
 			{
-				$elem.addClass(aClass);
+				elem.classList.add(aClass);
 				return this;
 			},
 			removeClass = function (aClass)
 			{
-				$elem.removeClass(aClass);
+				elem.classList.remove(aClass);
 				return this;
 			},
 			showBar = function ()
 			{
 				clearTimeout(time_out);
-				$elem.fadeIn();
+				elem.style.opacity = '1';
 
-				if (opt.hide_delay !== 0)
+				if (settings.hide_delay !== 0)
 				{
 					time_out = setTimeout(function ()
 					{
 						hide();
-					}, opt.hide_delay);
+					}, settings.hide_delay);
 				}
 				return this;
 			},
 			isError = function ()
 			{
-				removeClass(opt.success_class);
-				addClass(opt.error_class);
+				removeClass(settings.success_class);
+				addClass(settings.error_class);
 			},
 			isSuccess = function ()
 			{
-				removeClass(opt.error_class);
-				addClass(opt.success_class);
+				removeClass(settings.error_class);
+				addClass(settings.success_class);
 			},
 			hide = function ()
 			{
+				// Short delay to avoid removing opacity while it is still be added
+				window.setTimeout(function () {
+					elem.style.opacity = '0';
+				}, 300);
+
 				clearTimeout(time_out);
-				$elem.slideUp();
 				return this;
 			};
 
 		// Call the init function by default
-		init(elem_id, opt);
+		init(elem_id, settings);
 
 		return {
 			changeText: changeText,

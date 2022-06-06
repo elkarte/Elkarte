@@ -1056,6 +1056,8 @@ a.bbc_link {
 	padding: 1em;
 	text-align: center;
 	border-bottom: 4px solid;
+	opacity: 0;
+	transition: opacity .5s;
 }
 
 /* Spinner and close button */
