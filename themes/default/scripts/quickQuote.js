@@ -9,6 +9,8 @@
 /**
  * This particular function was based on My Opera Enhancements and is
  * licensed under the BSD license.
+ *
+ * Some specific refactoring done for ElkArte core inclusion
  */
 function Elk_QuickQuote(oOptions)
 {
@@ -625,7 +627,7 @@ Elk_QuickQuote.prototype.showWarnSpan = function(event)
 	{
 		event.currentTarget.blur();
 
-		var warning = event.currentTarget.appendChild(document.createElement('span'));
+		let warning = event.currentTarget.appendChild(document.createElement('span'));
 		warning.textContent = this.opts.infoText;
 		warning.className = 'warning';
 
