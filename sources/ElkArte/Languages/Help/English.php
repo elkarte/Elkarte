@@ -286,7 +286,7 @@ $helptxt['compactTopicPagesEnable'] = 'This will show the supplied number of sur
 		&quot;5&quot; to display: 1 ... 3 4 [5] 6 7 ... 9';
 $helptxt['timeLoadPageEnable'] = 'This will show the time in seconds taken to create that page at the bottom of the board.';
 $helptxt['removeNestedQuotes'] = 'This will remove, or limit the number of, nested quotes in a reply when citing the post via the quote link.';
-$helptxt['charactersBeforeShowMore'] = 'This will limit the number of characters allowed in a quote block.  Quotes exceeding this size will be limited with a "read more" link to see the full quote.';
+$helptxt['heightBeforeShowMore'] = 'This will limit the height of a quote block.  Quotes exceeding this size will have a "read more" option applied to allow seeing the full quote.';
 $helptxt['hideQuickQuoteButton'] = 'This will hide the "Quote Selection" button until the user selects some text.';
 $helptxt['search_dropdown'] = 'This will show a search selection dropdown next to the quick search box.  From this you can choose to search the current site, current board (if in a board), current topic (if in a topic) or search for members.';
 $helptxt['max_image_width'] = 'This allows you to set a maximum size for posted pictures. Pictures smaller than the maximum will not be affected. This also determines how attached images are displayed when a thumbnail is clicked on.';

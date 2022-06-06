@@ -621,7 +621,7 @@ $txt['mm_emailtemplates'] = 'Templates';
 $txt['mm_emailsettings'] = 'Settings';
 
 $txt['removeNestedQuotes'] = 'Allowed nested quoting depth';
-$txt['charactersBeforeShowMore'] = 'Quote length before adding a "read more" link.';
+$txt['heightBeforeShowMore'] = 'Quote height (px) before adding a "read more" link.';
 $txt['hideQuickQuoteButton'] = 'Hide the Quick Quote button, until text is selected.';
 $txt['enableVideoEmbeding'] = 'Enable auto-embedding of video links.';
 $txt['video_embed_limit'] = 'Maximum allowed embedded videos per page';

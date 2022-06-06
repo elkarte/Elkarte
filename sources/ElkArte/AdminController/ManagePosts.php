@@ -279,6 +279,12 @@ class ManagePosts extends AbstractController
 				$this->_req->post->preview_characters = (int) min(max(0, $this->_req->post->preview_characters), 512);
 			}
 
+			// Set a min quote length of 3 lines of text (@ default font size)
+			if (!empty($this->_req->post->heightBeforeShowMore))
+			{
+				$this->_req->post->heightBeforeShowMore = (int) max((int) $this->_req->post->heightBeforeShowMore, 155);
+			}
+
 			call_integration_hook('integrate_save_post_settings');
 
 			$settingsForm->setConfigValues((array) $this->_req->post);
@@ -307,7 +313,7 @@ class ManagePosts extends AbstractController
 		$config_vars = [
 			// Quote options...
 			['int', 'removeNestedQuotes', 'postinput' => $txt['zero_for_none']],
-			['int', 'charactersBeforeShowMore', 'postinput' => $txt['zero_to_disable']],
+			['int', 'heightBeforeShowMore', 'postinput' => $txt['zero_to_disable']],
 			['check', 'hideQuickQuoteButton'],
 			'',
 			// Video options

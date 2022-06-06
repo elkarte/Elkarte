@@ -24,19 +24,41 @@
  */
 function elk_codefix()
 {
-	$('.bbc_code').each(function ()
-	{
-		let $this = $(this);
+	let codeBlock = document.querySelectorAll('.bbc_code');
+	codeBlock.forEach((code) => {
+		let style = window.getComputedStyle(code, null),
+			height = parseInt(style.getPropertyValue('height'));
 
-		// If it has a scroll bar, allow the user to resize it vertically
-		if ($this.get(0).scrollHeight > Math.round($this.innerHeight()))
+		if (code.scrollHeight > height)
 		{
-			$this.css('height', $this.height());
-			$this.css('max-height', 'none');
+			code.style.maxHeight = 'none';
+			code.style.height = height + 'px';
 		}
 		else
 		{
-			$this.css('resize', 'none');
+			code.style.resize = 'none';
+		}
+	});
+}
+
+/**
+ * Removes the read more overlay from quote blocks that do not need them, and for
+ * ones that do, hides so the read more input can expand it out.
+ */
+function elk_quotefix()
+{
+	let quotes = document.querySelectorAll('.quote-read-more');
+
+	quotes.forEach((quote) => {
+		let bbc_quote = quote.querySelector('.bbc_quote');
+
+		if (bbc_quote.scrollHeight > bbc_quote.clientHeight)
+		{
+			bbc_quote.style.overflow = 'hidden';
+		}
+		else
+		{
+			quote.querySelector('.quote-show-more').remove();
 		}
 	});
 }
