@@ -143,20 +143,20 @@ a:hover, a.new_win:hover {
 }
 
 body, input, button, select, textarea, .editor {
-	/* Set a font-family
-	   Start with calling OSx system’s UI font with -apple-system, BlinkMacSystemFont this will pull in
-	   (San Francisco, Neue Helvetica and Lucida Grande depends on OS version)
-	   Then Windows (Segoe UI), Android (Roboto), Unix (KDE, Ubuntu, Gnome), Old Android (Droid Sans),
-	   OSx pre apple-system support (Helvetica Neue), fallbacks (Arial, sans-serif) */
-	font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen", "Ubuntu", "Cantarell", "Droid Sans", "Helvetica Neue", "Trebuchet MS", Arial, sans-serif;
+	/* Set a font-family stack
+	   Start with system-ui which should use the existing OS font
+	   Then -apple-system, BlinkMacSystemFont which are equivalent to system-ui, but used for OSx browsers that lack support
+	   Then Windows (Segoe UI), Android (Roboto), and *nix running KDE, Ubuntu, Gnome
+	   Followed by fallbacks droid specific, Helvetica Neue, Arial, sans-serif) */
+	font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue", Arial, sans-serif;
 }
 
 /* Use a specific demi bold font weight for some areas, less jarring then 700/bold,
    with fallback to default font stack if not available. */
 .codeheader, .quoteheader, .expand_pages, .table_head > th, .topic_sorting_row > h3, .topic_name h4 a,
-.poster .name, .keyinfo h3 a, .keyinfo h3 a strong, .ui-dialog .ui-dialog-titlebar,
+.poster .name, .keyinfo h3 a, .keyinfo h3 a strong, .ui-dialog .ui-dialog-titlebar, .bbc_quote > cite,
 #creator dt strong, .settings label, .popup_heading {
-	font-family: "Segoe UI Semibold", "Segoe UI", "Helvetica Neue Medium", -apple-system, BlinkMacSystemFont, "Roboto", "Oxygen", "Ubuntu", "Cantarell", "Droid Sans", "Helvetica Neue", "Trebuchet MS", Arial, sans-serif;
+	font-family: "Segoe UI Semibold", "Helvetica Neue Medium", system-ui, -apple-system, BlinkMacSystemFont, "Roboto", "Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue", Arial, sans-serif;
 	font-weight: 600;
 	/* Apple specific fixes */
 	-webkit-font-smoothing: antialiased;
@@ -784,13 +784,13 @@ em, .em {
 
 /* Set a consistent monospace font */
 .bbc_code, .bbc_tt, .bbc_pre, .tt {
-	font-family: "DejaVu Sans Mono", SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+	font-family: SFMono-Regular, ui-monospace, Menlo, Monaco, Consolas, "DejaVu Sans Mono", "Liberation Mono", "Courier New", monospace;
+	font-variant-numeric: tabular-nums;
 }
 
 /* The "Quote:" and "Code:" header parts... */
 .codeheader, .bbc_quote > cite {
 	font-size: var(--font13);
-	font-weight: 600;
 	margin-bottom: .5em;
 	padding: .2em .4em;
 	border-bottom: 1px solid;
