@@ -437,8 +437,7 @@ function template_load_likes_button_above()
 					error_occurred : ' . JavaScriptEscape($txt['error_occurred']) . ',
 					are_you_sure: ' . JavaScriptEscape($txt['likemsg_are_you_sure']) . '
 				}),
+				bTooltips: false,
 			});
-
-			$(".react_button, .unreact_button, .reacts_button").SiteTooltip();
 		});', true);
 }

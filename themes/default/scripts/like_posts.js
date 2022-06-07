@@ -24,6 +24,7 @@
 	likePosts.prototype = function ()
 	{
 		let oTxt = {},
+			bTooltips = false,
 
 			/**
 			 * Initiate likePosts with this method
@@ -33,6 +34,17 @@
 			init = function (params)
 			{
 				oTxt = params.oTxt;
+
+				// If we are using tooltips, init that function
+				bTooltips = params.bTooltips || bTooltips;
+				if (bTooltips)
+				{
+					$(".react_button, .unreact_button, .reacts_button").SiteTooltip();
+				}
+				else
+				{
+					$(".react_button, .unreact_button, .reacts_button").removeAttr('title');
+				}
 			},
 
 			/**
@@ -122,7 +134,6 @@
 				// Swap the button class as needed, update the text for the hover
 				$(params.elem).removeClass(currentClass).addClass(nextClass);
 				$(params.elem).html('&nbsp;' + params.text);
-				$(params.elem).attr('title', params.title);
 
 				// Update the count bubble if needed
 				if (params.count !== 0)
@@ -131,7 +142,11 @@
 				}
 
 				// Changed the title text, update the tooltips
-				$("." + nextClass).SiteTooltip();
+				if (bTooltips)
+				{
+					$(params.elem).attr('title', params.title);
+					$("." + nextClass).SiteTooltip();
+				}
 			},
 
 			/**
