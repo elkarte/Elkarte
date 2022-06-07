@@ -1094,9 +1094,6 @@ function setBoardIds()
 	$.fn.SiteTooltip = function (oInstanceSettings)
 	{
 		$.fn.SiteTooltip.oDefaultsSettings = {
-			followMouse: 1,
-			positionTop: 12,
-			positionLeft: 12,
 			tooltipID: 'site_tooltip', // ID used on the outer div
 			tooltipTextID: 'site_tooltipText', // as above but on the inner div holding the text
 			tooltipClass: 'tooltip', // The class applied to the outer div (that displays on hover), use this in your css
@@ -1117,14 +1114,15 @@ function setBoardIds()
 		$(this).each(function ()
 		{
 			let sTitle = $('<span class="' + oSettings.tooltipSwapClass + '">' + this.title + '</span>').hide();
+
 			$(this).append(sTitle).attr('title', '');
 		});
 
 		// Determine where we are going to place the tooltip, while trying to keep it on screen
 		let positionTooltip = function (event)
 		{
-			let iPosx = 0,
-				iPosy = 0,
+			let iPosx,
+				iPosy,
 				$_tip = $('#' + oSettings.tooltipID);
 
 			if (!event)
@@ -1132,21 +1130,14 @@ function setBoardIds()
 				event = window.event;
 			}
 
-			if (event.pageX || event.pageY)
-			{
-				iPosx = event.pageX;
-				iPosy = event.pageY;
-			}
-			else if (event.clientX || event.clientY)
-			{
-				iPosx = event.clientX + document.body.scrollLeft + document.documentElement.scrollLeft;
-				iPosy = event.clientY + document.body.scrollTop + document.documentElement.scrollTop;
-			}
+			let target = $(event.currentTarget);
+			iPosx = target.position().left;
+			iPosy = target.position().top;
 
 			// Position of the tooltip top left corner and its size
 			let oPosition = {
-				x: iPosx + oSettings.positionLeft,
-				y: iPosy + oSettings.positionTop,
+				x: iPosx,
+				y: iPosy + target.height() + 5,
 				w: $_tip.width(),
 				h: $_tip.height()
 			};
@@ -1155,23 +1146,14 @@ function setBoardIds()
 			let oLimits = {
 				x: $(window).scrollLeft(),
 				y: $(window).scrollTop(),
-				w: $(window).width() - 24,
-				h: $(window).height() - 24
+				w: $(window).width(),
+				h: $(window).height()
 			};
 
-			// Don't go off-screen with our tooltip
-			if ((oPosition.y + oPosition.h > oLimits.y + oLimits.h) && (oPosition.x + oPosition.w > oLimits.x + oLimits.w))
+			// Don't go off-screen bottom with our tooltip
+			if (oPosition.y + oPosition.h > oLimits.y + oLimits.h)
 			{
-				oPosition.x = (oPosition.x - oPosition.w) - 45;
-				oPosition.y = (oPosition.y - oPosition.h) - 45;
-			}
-			else if ((oPosition.x + oPosition.w) > (oLimits.x + oLimits.w))
-			{
-				oPosition.x -= (((oPosition.x + oPosition.w) - (oLimits.x + oLimits.w)) + 24);
-			}
-			else if (oPosition.y + oPosition.h > oLimits.y + oLimits.h)
-			{
-				oPosition.y -= (((oPosition.y + oPosition.h) - (oLimits.y + oLimits.h)) + 24);
+				oPosition.y -= oPosition.h + target.height() + 20;
 			}
 
 			// Finally, set the position we determined
@@ -1181,7 +1163,7 @@ function setBoardIds()
 		// Used to show a tooltip
 		let showTooltip = function ()
 		{
-			$('#' + oSettings.tooltipID + ' #' + oSettings.tooltipTextID).slideDown(150);
+			$('#' + oSettings.tooltipID + ' #' + oSettings.tooltipTextID).fadeIn(150);
 		};
 
 		// Used to hide a tooltip
@@ -1195,19 +1177,13 @@ function setBoardIds()
 			});
 		};
 
-		// Used to keep html encoded
-		function htmlspecialchars(string)
-		{
-			return $('<span>').text(string).html();
-		}
-
 		// For all elements that match the selector on the page, lets set up some actions
 		return this.each(function ()
 		{
 			let timer;
 
 			// Plain old hover it is
-			$(this).hover(function(event) {
+			$(this).on('mouseenter', function(event) {
 				let $this = $(this),
 					$event = event;
 
@@ -1235,24 +1211,13 @@ function setBoardIds()
 						showTooltip();
 						positionTooltip($event);
 				}
-			},750);},
-			function() {
+			},750);})
+			.mouseleave(function() {
 				let $this = $(this);
-				// on mouse out, cancel the timer
+
 				clearTimeout(timer);
 				hideTooltip($this);
 			});
-
-			// Create the tip move with the cursor
-			if (oSettings.followMouse)
-			{
-				$(this).on("mousemove", function (event)
-				{
-					positionTooltip(event);
-
-					return false;
-				});
-			}
 
 			// Clear the tip on a click
 			$(this).on("click", function ()
