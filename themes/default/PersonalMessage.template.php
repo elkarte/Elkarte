@@ -84,7 +84,7 @@ function template_pm_below()
  */
 function template_folder()
 {
-	global $context, $scripturl, $options, $txt;
+	global $context, $options, $txt;
 
 	$start = true;
 	$reset = true;
@@ -174,95 +174,7 @@ function template_folder()
 								<section class="messageContent" data-msgid="', $message['id'], '" >', $message['body'], '</section>';
 
 		// Show our quick buttons like quote and reply
-		echo '
-								<nav>
-									<ul class="quickbuttons no_js">';
-
-		// Showing all then give a remove item checkbox
-		if (empty($context['display_mode']))
-		{
-			echo '
-										<li class="listlevel1 quickmod_check">
-											<input type="checkbox" name="pms[]" id="deletedisplay', $message['id'], '" value="', $message['id'], '" onclick="document.getElementById(\'deletelisting', $message['id'], '\').checked = this.checked;" />
-										</li>';
-		}
-
-		// Maybe there is something...more :P (this is the more button)
-		if (!empty($context['additional_pm_drop_buttons']))
-		{
-			echo '
-										<li class="listlevel1 subsections" aria-haspopup="true">
-											<a class="linklevel1 post_options">', $txt['post_options'], '</a>
-											<ul class="menulevel2">';
-
-			foreach ($context['additional_pm_drop_buttons'] as $key => $button)
-			{
-				echo '
-												<li class="listlevel2">
-													<a href="' . $button['href'] . '" class="linklevel2 ', $key, '">' . $button['text'] . '</a>
-												</li>';
-			}
-
-			echo '
-											</ul>
-										</li>';
-		}
-
-		// Remove is always an option
-		echo '
-										<li class="listlevel1">
-											<a href="', $scripturl, '?action=pm;sa=pmactions;pm_actions%5B', $message['id'], '%5D=delete;f=', $context['folder'], ';start=', $context['start'], $context['current_label_id'] != -1 ? ';l=' . $context['current_label_id'] : '', ';', $context['session_var'], '=', $context['session_id'], '" onclick="return confirm(\'', addslashes($txt['remove_message']), '?\');" class="linklevel1 remove_button">', $txt['delete'], '</a>
-										</li>';
-
-		// Show reply buttons if you have the permission to send PMs.
-		if ($context['can_send_pm'])
-		{
-			// You can't really reply if the member is gone.
-			if (!$message['member']['is_guest'])
-			{
-				// Is there than more than one recipient you can reply to?
-				if ($message['number_recipients'] > 1)
-				{
-					echo '
-										<li class="listlevel1">
-											<a href="', $scripturl, '?action=pm;sa=send;f=', $context['folder'], $context['current_label_id'] != -1 ? ';l=' . $context['current_label_id'] : '', ';pmsg=', $message['id'], ';quote;u=all" role="button" class="linklevel1 reply_all_button">', $txt['reply_to_all'], '</a>
-										</li>';
-				}
-
-				// Reply, Quote
-				echo '
-										<li class="listlevel1">
-											<a href="', $scripturl, '?action=pm;sa=send;f=', $context['folder'], $context['current_label_id'] != -1 ? ';l=' . $context['current_label_id'] : '', ';pmsg=', $message['id'], ';u=', $message['member']['id'], '" role="button" class="linklevel1 reply_button">', $txt['reply'], '</a>
-										</li>
-										<li class="listlevel1">
-											<a href="', $scripturl, '?action=pm;sa=send;f=', $context['folder'], $context['current_label_id'] != -1 ? ';l=' . $context['current_label_id'] : '', ';pmsg=', $message['id'], ';quote', $context['folder'] === 'sent' ? '' : ';u=' . $message['member']['id'], '" role="button" class="linklevel1 quote_button">', $txt['quote'], '</a>
-										</li>';
-			}
-			// This is for "forwarding" - even if the member is gone.
-			else
-			{
-				echo '
-										<li class="listlevel1">
-											<a href="', $scripturl, '?action=pm;sa=send;f=', $context['folder'], $context['current_label_id'] != -1 ? ';l=' . $context['current_label_id'] : '', ';pmsg=', $message['id'], ';quote" role="button" class="linklevel1 quote_button">', $txt['reply_quote'], '</a>
-										</li>';
-			}
-		}
-
-		// Anything else added by mods for example?
-		if (!empty($context['additional_quick_pm_buttons']))
-		{
-			foreach ($context['additional_quick_pm_buttons'] as $key => $button)
-			{
-				echo '
-										<li class="listlevel1">
-											<a href="' . $button['href'] . '" class="linklevel1 ', $key, '">' . $button['text'] . '</a>
-										</li>';
-			}
-		}
-
-		echo '
-									</ul>
-								</nav>';
+		template_button_strip($message['pmbuttons'], 'quickbuttons no_js', ['no-class' => true]);
 
 		// Add a selection box if we have labels enabled.
 		if ($context['folder'] !== 'sent' && !empty($context['currently_using_labels']) && $context['display_mode'] != 2)
@@ -270,7 +182,7 @@ function template_folder()
 			echo '
 								<div class="labels">';
 
-			// Add the label drop down box.
+			// Add the label drop box.
 			if (!empty($context['currently_using_labels']))
 			{
 				echo '
@@ -318,8 +230,14 @@ function template_folder()
 								</div>';
 		}
 
+		$has_top_border =(!empty($message['member']['signature']) && empty($options['show_no_signatures']) && $context['signature_enabled'])
+			|| (!empty($message['member']['custom_fields']) && empty($options['show_no_signatures']) && $context['signature_enabled']);
+
+		echo '
+								<div class="signature' . (!$has_top_border ? ' without_top_border' : '') . '">';
+
 		// Are there any custom profile fields for above the signature?
-		// Show them if signatures are enabled and you want to see them.
+		// Show them if signatures are enabled, and you want to see them.
 		if (!empty($message['member']['custom_fields']) && empty($options['show_no_signatures']) && $context['signature_enabled'])
 		{
 			$shown = false;
@@ -354,10 +272,11 @@ function template_folder()
 		if (!empty($message['member']['signature']) && empty($options['show_no_signatures']) && $context['signature_enabled'])
 		{
 			echo '
-								<div class="signature">', $message['member']['signature'], '</div>';
+								<div id="msg_', $message['id'], '_signature">', $message['member']['signature'], '</div>';
 		}
 
 		echo '
+							</div>
 							</div>
 						</article>';
 	}
@@ -377,7 +296,7 @@ function template_pm_pages_and_buttons_above()
 	// Show a few buttons if we are in conversation mode and outputting the first message.
 	if ($context['display_mode'] == 2)
 	{
-		template_pagesection('conversation_buttons', 'right', array('page_index' => false));
+		template_pagesection('conversation_buttons', 'right', ['page_index' => false]);
 	}
 	else
 	{
@@ -399,7 +318,7 @@ function template_pm_pages_and_buttons_below()
 	// Show a few buttons if we are in conversation mode and outputting the first message.
 	elseif ($context['display_mode'] == 2 && isset($context['conversation_buttons']))
 	{
-		template_pagesection('conversation_buttons', 'right', array('page_index' => false));
+		template_pagesection('conversation_buttons', 'right', ['page_index' => false]);
 	}
 }
 
@@ -483,7 +402,7 @@ function template_subject_list()
 
 	// Use the query callback to get the subject list
 	$controller = $context['get_psubject'][0];
-	while (($message = $controller->{$context['get_psubject'][1]}()))
+	while ($message = $controller->{$context['get_psubject'][1]}())
 	{
 		$discussion_url = $context['display_mode'] == 0 || $context['current_pm'] == $message['id'] ? '' : ($scripturl . '?action=pm;pmid=' . $message['id'] . ';kstart;f=' . $context['folder'] . ';start=' . $context['start'] . ';sort=' . $context['sort_by'] . ($context['sort_direction'] == 'up' ? ';asc' : ';desc') . ($context['current_label_id'] != -1 ? ';l=' . $context['current_label_id'] : ''));
 
@@ -685,8 +604,10 @@ function template_search()
 		{
 			echo '
 					<li>
-						<label for="searchlabel_', $label['id'], '"><input type="checkbox" id="searchlabel_', $label['id'], '" name="searchlabel[', $label['id'], ']" value="', $label['id'], '" ', $label['checked'] ? 'checked="checked"' : '', ' />
-						', $label['name'], '</label>
+						<label for="searchlabel_', $label['id'], '">
+							<input type="checkbox" id="searchlabel_', $label['id'], '" name="searchlabel[', $label['id'], ']" value="', $label['id'], '" ', $label['checked'] ? 'checked="checked"' : '', ' />
+							', $label['name'], '
+						</label>
 					</li>';
 		}
 
@@ -852,38 +773,10 @@ function template_search_results()
 						', $message['body'], '
 					</div>';
 
-			if ($context['can_send_pm'])
-			{
-				echo '
-					<nav>
-						<ul class="quickbuttons">';
-
-				// You can only reply if they are not a guest...
-				if (!$message['member']['is_guest'])
-				{
-					echo '
-							<li class="listlevel1">
-								<a class="linklevel1 reply_button" href="', $scripturl, '?action=pm;sa=send;f=', $context['folder'], $context['current_label_id'] != -1 ? ';l=' . $context['current_label_id'] : '', ';pmsg=', $message['id'], ';u=', $message['member']['id'], '">', $txt['reply'], '</a>
-							</li>
-							<li class="listlevel1">
-								<a class="linklevel1 quote_button" href="', $scripturl, '?action=pm;sa=send;f=', $context['folder'], $context['current_label_id'] != -1 ? ';l=' . $context['current_label_id'] : '', ';pmsg=', $message['id'], ';quote;u=', $context['folder'] == 'sent' ? '' : $message['member']['id'], '">', $txt['quote'], '</a>
-							</li>';
-				}
-				// This is for "forwarding" - even if the member is gone.
-				else
-				{
-					echo '
-							<li class="listlevel1">
-								<a class="linklevel1 quote_button" href="', $scripturl, '?action=pm;sa=send;f=', $context['folder'], $context['current_label_id'] != -1 ? ';l=' . $context['current_label_id'] : '', ';pmsg=', $message['id'], ';quote">', $txt['quote'], '</a>
-							</li>';
-				}
-				echo '
-						</ul>
-					</nav>';
-			}
+			template_button_strip($message['pmbuttons'], 'quickbuttons no_js', ['no-class' => true]);
 
 			echo '
-					</li>';
+				</li>';
 		}
 		// Otherwise just a simple list!
 		else
@@ -1165,13 +1058,11 @@ function template_send()
 					<h3>
 						', $txt['from'], ' <span class="name">', $context['quoted_message']['member']['name'], '</span> &ndash; ', $context['quoted_message']['html_time'], '
 					</h3>
-					<nav>
-						<ul class="quickbuttons" id="buttons_', $context['quoted_message']['id'], '">
-							<li class="listlevel1 hide">
-								<a href="javascript:void(0);" id="qq_', $context['quoted_message']['id'], '" role="button" class="linklevel1 quick_quote_button">', $txt['quick_quote'], '</a>
-							</li>
-						</ul>
-					</nav>
+					<ul class="quickbuttons" id="buttons_', $context['quoted_message']['id'], '">
+						<li class="listlevel1 hide">
+							<a href="javascript:void(0);" id="button_strip_qq_', $context['quoted_message']['id'], '" role="button" class="linklevel1 quick_quote_button">', $txt['quick_quote'], '</a>
+						</li>
+					</ul>
 				</div>	
 				<section class="messageContent" data-msgid="', $context['quoted_message']['id'], '">
 					', $context['quoted_message']['body'], '
@@ -1700,9 +1591,9 @@ function template_showPMDrafts()
 		<div class="content">
 			<div class="counter">', $draft['counter'], '</div>
 			<div class="topic_details">
-				<h5>
+				<h3>
 					<strong>', $draft['subject'], '</strong>&nbsp;
-				</h5>
+				</h3>
 				<span class="smalltext">&#171;&nbsp;<strong>', $txt['draft_saved_on'], ':</strong> ', sprintf($txt['draft_days_ago'], $draft['age']), (!empty($draft['remaining']) ? ', ' . sprintf($txt['draft_retain'], $draft['remaining']) : ''), '&#187;</span>
 				<br />
 				<span class="smalltext">&#171;&nbsp;<strong>', $txt['to'], ':</strong> ', implode(', ', $draft['recipients']['to']), '&nbsp;&#187;</span>
@@ -1711,17 +1602,11 @@ function template_showPMDrafts()
 			</div>
 			<div class="messageContent">
 				', $draft['body'], '
-			</div>
-			<nav>
-				<ul class="quickbuttons">
-					<li class="listlevel1">
-						<a href="', $scripturl, '?action=pm;sa=showpmdrafts;id_draft=', $draft['id_draft'], ';', $context['session_var'], '=', $context['session_id'], '" class="linklevel1 reply_button">', $txt['draft_edit'], '</a>
-					</li>
-					<li class="listlevel1">
-						<a href="', $scripturl, '?action=pm;sa=showpmdrafts;delete=', $draft['id_draft'], ';', $context['session_var'], '=', $context['session_id'], '" onclick="return confirm(\'', $txt['draft_remove'], '?\');" class="linklevel1 remove_button">', $txt['draft_delete'], '</a>
-					</li>
-				</ul>
-			</nav>	
+			</div>';
+
+		template_button_strip($draft['buttons'], 'quickbuttons', ['no-class' => true]);
+
+		echo '	
 		</div>';
 		}
 	}
