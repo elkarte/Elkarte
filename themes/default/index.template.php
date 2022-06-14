@@ -35,6 +35,17 @@
  * wants and or needs.
  */
 
+use ElkArte\Errors\Errors;
+
+/**
+ * Start off the template by loading some helpers like
+ * quick buttons, page index, etc
+ */
+function template_Index_init()
+{
+	theme()->getTemplates()->load('GenericHelpers');
+}
+
 /**
  * Simplify the use of callbacks in the templates.
  *
@@ -177,7 +188,7 @@ function template_body_above()
 	<a id="gobottom" href="#footer_section" title="', $txt['go_down'], '">&#8595;</a>';
 
 	echo '
-	<header id="top_section">
+	<header id="top_section" class="', (empty($context['minmax_preferences']['upshrink']) ? 'th_expand' : 'th_collapse'), '">
 		<aside id="top_header" class="wrapper">';
 
 	// Load in all register header templates
@@ -605,7 +616,7 @@ function template_menu()
 					titleExpanded: ' . JavaScriptEscape($txt['upshrink_description']) . ',
 					classCollapsed: \'chevricon i-chevron-down icon-lg\',
 					titleCollapsed: ' . JavaScriptEscape($txt['upshrink_description']) . '
-				}
+				},
 			],
 			oThemeOptions: {
 				bUseThemeSettings: ' . ($context['user']['is_guest'] ? 'false' : 'true') . ',
@@ -617,164 +628,19 @@ function template_menu()
 			oCookieOptions: {
 				bUseCookie: elk_member_id == 0 ? true : false,
 				sCookieName: \'upshrink\'
-			}
+			},
+			funcOnBeforeCollapse: function () {
+				let header = document.getElementById(\'top_section\');
+				header.classList.add(\'th_collapse\');
+				header.classList.remove(\'th_expand\');
+			},
+			funcOnBeforeExpand: function () {
+				let header = document.getElementById(\'top_section\');
+				header.classList.add(\'th_expand\');
+				header.classList.remove(\'th_collapse\');
+			},
 		});
 	', true);
-}
-
-/**
- * Generate a strip of buttons (like those present at the top of the message display)
- *
- * What it does:
- *
- * - Create a button list area, pass an array of the button name with key values
- * - array('somename' => array(url => '' text => '' custom => '' test => '', lang => bool, submenu => bool))
- *      - text => text to display in the button
- *      - custom => custom action to perform, generally used to add 'onclick' events (optional)
- *      - test => permission key to check in the $tests array before showing the button (optional)
- * 		- url => link to call when button is pressed
- * 		- lang => bool
- *      - submenu => if the button should be shown in a "more" button
- * 		- id => css id to use on link as #button_strip_ID (optional)
- *
- * @param mixed[] $button_strip
- * @param string $class = ''
- * @param string[] $strip_options = array()
- * @return void string as echoed content
- */
-function template_button_strip($button_strip, $class = '', $strip_options = array())
-{
-	global $context, $txt, $options;
-
-	// Not sure if this can happen, but people can misuse functions very efficiently
-	if (empty($button_strip))
-	{
-		return;
-	}
-
-	if (!is_array($strip_options))
-	{
-		$strip_options = [];
-	}
-
-	// List the buttons in reverse order for RTL languages.
-	if ($context['right_to_left'])
-	{
-		$class .= ' rtl';
-	}
-
-	// Create the buttons... now with cleaner markup (yay!).
-	$buttons = [];
-	$subMenu = [];
-	foreach ($button_strip as $key => $value)
-	{
-		$id = (isset($value['id']) ? ' id="button_strip_' . $value['id'] . '"' : '');
-
-		// Don't need any or have the right permission, you get a button
-		if (!isset($value['test']) || !empty($context[$value['test']]))
-		{
-			if (!empty($value['submenu']))
-			{
-				$subMenu[] = '
-						<li class="listlevel2">
-							<a href="' . $value['url'] . '" class="linklevel2 button_strip_' . $key . (isset($value['custom']) ? '" ' . $value['custom'] : '"') . '>' . $txt[$value['text']] . '</a>
-						</li>';
-				continue;
-			}
-
-			$buttons[] = '
-						<li role="menuitem">
-							<a' . $id . ' class="linklevel1 button_strip_' . $key . (!empty($value['active']) ? ' active' : '') . '" href="' . $value['url'] . '"' . (isset($value['custom']) ? ' ' . $value['custom'] : '') . '>' . $txt[$value['text']] . '</a>
-						</li>';
-		}
-	}
-
-	// Is a more options button needed, if so, it goes at the end
-	if (!empty($subMenu))
-	{
-		$buttons[] = '
-						<li class="listlevel1 subsections" aria-haspopup="true" role="menuitem">
-							<a href="#" ' . (!empty($options['use_click_menu']) ? '' : 'onclick="event.stopPropagation();return false;"') . ' class="linklevel1 post_options">' .
-								$txt['post_options'] . '
-							</a>
-							<ul class="menulevel2">' . implode("\n", $subMenu) . '</ul>
-						</li>';
-	}
-
-	// No buttons? No button strip either.
-	if (!empty($buttons))
-	{
-		echo '
-					<ul role="menubar" class="no_js buttonlist', !empty($class) ? ' ' . $class : '', '"', (!empty($strip_options['id']) ? ' id="' . $strip_options['id'] . '"' : ''), '>
-						', implode('', $buttons), '
-					</ul>';
-	}
-}
-
-/**
- * Generate a strip of "quick" buttons (those present next to each message)
- *
- * What it does:
- *
- * - Create a quick button, pass an array of the button name with key values
- * - array('somename' => array(href => '' text => '' custom => '' test => ''))
- *      - href => link to call when button is pressed
- *      - text => text to display in the button
- *      - custom => custom action to perform, generally used to add 'onclick' events (optional)
- *      - test => key to check in the $tests array before showing the button (optional)
- *      - override => full and complete <li></li> to use for the button
- * - checkboxes can be shown as well as buttons,
- *      - use array('check' => array(checkbox => (true | always), name => value =>)
- *      - if true follows show moderation as checkbox setting, always will always show
- *      - name => name of the checkbox array, like delete, will have [] added for the form
- *      - value => value for the checkbox to return in the post
- *
- * @param array $strip - the $context index where the strip is stored
- * @param bool[] $tests - an array of tests to determine if the button should be displayed or not
- * @return void echos a string of buttons
- */
-function template_quickbutton_strip($strip, $tests = array())
-{
-	global $options;
-
-	$buttons = [];
-
-	foreach ($strip as $key => $value)
-	{
-		if (!empty($value['checkbox']) && (!empty($options['display_quick_mod']) || $value['checkbox'] === 'always'))
-		{
-			$buttons[] = '
-					<li class="listlevel1 ' . $key . '">
-						<input class="input_check ' . $key . '_check" type="checkbox" name="' . $value['name'] . '[]" value="' . $value['value'] . '" />
-					</li>';
-
-			continue;
-		}
-
-		// No special permission needed, or you have valid permission, then get a button!
-		if (!isset($value['test']) || !empty($tests[$value['test']]))
-		{
-			if (!empty($value['override']))
-			{
-				$buttons[] = $value['override'];
-				continue;
-			}
-
-			$buttons[] = '
-					<li class="listlevel1">
-						<a href="' . $value['href'] . '" class="linklevel1 ' . $key . '_button"' . (isset($value['custom']) ? ' ' . $value['custom'] : '') . '>' . $value['text'] . '</a>
-					</li>';
-			}
-		}
-
-	// No buttons? No button strip either.
-	if (!empty($buttons))
-	{
-		echo '
-					<ul class="quickbuttons">', implode('
-						', $buttons), '
-					</ul>';
-	}
 }
 
 /**
@@ -881,55 +747,6 @@ function template_uc_generic_infobox()
 }
 
 /**
- * Another used and abused piece of template that can be found everywhere
- *
- * @param string|bool $button_strip index of $context to create the button strip
- * @param string $strip_direction direction of the button strip (see template_button_strip for details)
- * @param array $options array of optional values, possible values:
- *     - 'page_index' (string) index of $context where is located the pages index generated by constructPageIndex
- *     - 'page_index_markup' (string) markup for the page index, overrides 'page_index' and can be used if
- *        the page index code is not in the first level of $context
- *     - 'extra' (string) used to add html markup at the end of the template
- *
- * @return string as echoed content
- */
-function template_pagesection($button_strip = false, $strip_direction = '', $options = array())
-{
-	global $context;
-
-	if (!empty($options['page_index_markup']))
-	{
-		$pages = '<ul ' . (isset($options['page_index_id']) ? 'id="' . $options['page_index_id'] . '" ' : '') . 'class="pagelinks">' . $options['page_index_markup'] . '</ul>';
-	}
-	else
-	{
-		if (!isset($options['page_index']))
-		{
-			$options['page_index'] = 'page_index';
-		}
-
-		$pages = empty($context[$options['page_index']]) ? '' : '<ul ' . (isset($options['page_index_id']) ? 'id="' . $options['page_index_id'] . '" ' : '') . 'class="pagelinks">' . $context[$options['page_index']] . '</ul>';
-	}
-
-	if (!isset($options['extra']))
-	{
-		$options['extra'] = '';
-	}
-
-	if (!empty($strip_direction) && $strip_direction === 'left')
-	{
-		$strip_direction = 'rtl';
-	}
-
-	echo '
-			<nav class="pagesection">
-				', $pages, '
-				', !empty($button_strip) && !empty($context[$button_strip]) ? template_button_strip($context[$button_strip], $strip_direction) : '',
-				$options['extra'], '
-			</nav>';
-}
-
-/**
  * This is the news fader
  */
 function template_news_fader()
@@ -994,7 +811,8 @@ function template_member_email($member, $text = false)
 
 			return $txt['hidden'];
 		}
-		elseif ($member['show_email'] !== 'no')
+
+		if ($member['show_email'] !== 'no')
 		{
 			return '<a href="' . $scripturl . '?action=emailuser;sa=email;uid=' . $member['id'] . '" class="icon i-envelope-o' . ($member['online']['is_online'] ? '' : '-blank') . '" title="' . $txt['email'] . ' ' . $member['name'] . '"><s>' . $txt['email'] . ' ' . $member['name'] . '</s></a>';
 		}
