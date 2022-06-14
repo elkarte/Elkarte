@@ -372,10 +372,7 @@ function template_results()
 			// Quote, Reply, etc ... only when not viewing compact
 			if (!empty($topic['buttons']))
 			{
-				echo '
-						<nav>',
-							template_quickbutton_strip($topic['buttons'], $topic['tests']),
-						'</nav>';
+				template_button_strip($topic['buttons'], 'quickbuttons no_js', ['no-class' => true]);
 			}
 
 			// Show QM checkbox, by the count indicator, only if compact view is on
