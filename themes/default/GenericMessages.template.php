@@ -386,7 +386,7 @@ function template_build_poster_div($message, $ignoring = false)
  * - date => frequently the "posted on", but can be anything
  * - body => message body (mandatory)
  * - buttons => an associative array that allows to create a "quickbutton" strip
- *  (see template_quickbutton_strip for details on the parameters)
+ *  (see template_button_strip for details on the parameters)
  */
 function template_simple_message($msg)
 {
@@ -402,16 +402,11 @@ function template_simple_message($msg)
 				</header>
 				<section class="messageContent">
 					', $msg['body'], '
-				</section>
-				<nav>';
+				</section>';
 
-	if (!empty($msg['buttons']))
-	{
-					template_quickbutton_strip($msg['buttons'], !empty($msg['tests']) ? $msg['tests'] : array());
-	}
+	template_button_strip($msg['buttons'], 'quickbuttons no_js', ['no-class' => true]);
 
 	echo '
-				</nav>
 			</article>';
 }
 
