@@ -773,7 +773,7 @@ a.active {
 	box-shadow: 1px 1px 2px var(--primary_background);
 }
 
-.likes_indicator {
+.button_indicator {
 	color: var(--primary_white);
 	border-color: var(--transparent);
 	border-radius: 4px;

@@ -182,7 +182,7 @@ input[type="submit"]:hover, button[type="submit"]:hover, input[type="button"]:ho
 	box-shadow: -2px 2px 3px var(--opacity20), 0 -1px 0 var(--menu_button_active) inset;
 }
 
-.likes_indicator {
+.button_indicator {
 	box-shadow: -2px 2px 2px var(--opacity20);
 }
 

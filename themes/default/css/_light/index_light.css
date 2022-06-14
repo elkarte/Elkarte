@@ -735,7 +735,7 @@ sup.bbc_footnotes, sup.bbc_footnotes a {
 
 /* Level 1 active buttons. */
 .linklevel1.active, .listlevel1:hover .active,
-#collapse_button .linklevel1, .pm_indicator, .likes_indicator,
+#collapse_button .linklevel1, .pm_indicator, .button_indicator,
 #search_form_button .linklevel1 {
 	color: var(--primary_white);
 	border-color: var(--menu_button_border_active);
@@ -801,7 +801,7 @@ sup.bbc_footnotes, sup.bbc_footnotes a {
 	box-shadow: 2px 2px 3px var(--opacity20), 0 -1px 0 var(--menu_button_active) inset;
 }
 
-.likes_indicator {
+.button_indicator {
 	box-shadow: 2px 2px 2px var(--opacity20);
 }
 
@@ -890,8 +890,7 @@ sup.bbc_footnotes, sup.bbc_footnotes a {
 	color: var(--strong_text);
 }
 
-/* Cancel generic border-radius. */
-.quickbuttons .linklevel1 {
+.quickbuttons .linklevel1:not(.active) {
 	color: var(--menu_text);
 }
 
@@ -1284,7 +1283,6 @@ sup.bbc_footnotes, sup.bbc_footnotes a {
 }
 
 .likes_above_signature {
-	border-top-color: var(--secondary_border);
 	border-bottom-color: var(--secondary_border);
 }
 
