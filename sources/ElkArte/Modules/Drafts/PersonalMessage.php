@@ -31,35 +31,19 @@ use ElkArte\ValuesContainer;
  */
 class PersonalMessage extends AbstractModule
 {
-	/**
-	 * Autosave enabled
-	 *
-	 * @var bool
-	 */
+	/** @var bool Autosave enabled */
 	protected static $_autosave_enabled = false;
 
-	/**
-	 * How often to autosave if enabled
-	 *
-	 * @var int
-	 */
+	/** @var int How often to autosave if enabled */
 	protected static $_autosave_frequency = 30000;
 
-	/**
-	 * Subject length
-	 *
-	 * @var int
-	 */
+	/** @var int Subject length */
 	protected static $_subject_length = 32;
 
-	/**
-	 * @var \ElkArte\EventManager
-	 */
+	/** @var \ElkArte\EventManager */
 	protected static $_eventsManager = null;
 
-	/**
-	 * @var \ElkArte\ValuesContainer
-	 */
+	/** @var \ElkArte\ValuesContainer */
 	protected $_loaded_draft;
 
 	/**
@@ -97,16 +81,16 @@ class PersonalMessage extends AbstractModule
 			}
 
 			// Events
-			return array(
-				array('before_set_context', array('\\ElkArte\\Modules\\Drafts\\PersonalMessage', 'before_set_context'), array('pmsg')),
-				array('prepare_send_context', array('\\ElkArte\\Modules\\Drafts\\PersonalMessage', 'prepare_send_context'), array('editorOptions')),
-				array('before_sending', array('\\ElkArte\\Modules\\Drafts\\PersonalMessage', 'before_sending'), array('recipientList')),
-				array('message_sent', array('\\ElkArte\\Modules\\Drafts\\PersonalMessage', 'message_sent'), array('failed')),
-			);
+			return [
+				['before_set_context', ['\\ElkArte\\Modules\\Drafts\\PersonalMessage', 'before_set_context'], ['pmsg']],
+				['prepare_send_context', ['\\ElkArte\\Modules\\Drafts\\PersonalMessage', 'prepare_send_context'], ['editorOptions']],
+				['before_sending', ['\\ElkArte\\Modules\\Drafts\\PersonalMessage', 'before_sending'], ['recipientList']],
+				['message_sent', ['\\ElkArte\\Modules\\Drafts\\PersonalMessage', 'message_sent'], ['failed']],
+			];
 		}
 		else
 		{
-			return array();
+			return [];
 		}
 	}
 
@@ -217,7 +201,7 @@ class PersonalMessage extends AbstractModule
 	{
 		global $scripturl, $context, $txt;
 
-		$context['drafts'] = array();
+		$context['drafts'] = [];
 
 		// Need a member
 		if (empty($member_id))
@@ -326,14 +310,14 @@ class PersonalMessage extends AbstractModule
 			&& !empty($context['drafts_pm_save']) && isset($_POST['id_pm_draft']))
 		{
 			// Prepare the data
-			$draft = array(
+			$draft = [
 				'id_pm_draft' => empty($_POST['id_pm_draft']) ? 0 : (int) $_POST['id_pm_draft'],
 				'reply_id' => empty($_POST['replied_to']) ? 0 : (int) $_POST['replied_to'],
 				'body' => Util::htmlspecialchars($_POST['message'], ENT_QUOTES, 'UTF-8', true),
-				'subject' => strtr(Util::htmlspecialchars($_POST['subject']), array("\r" => '', "\n" => '', "\t" => '')),
+				'subject' => strtr(Util::htmlspecialchars($_POST['subject']), ["\r" => '', "\n" => '', "\t" => '']),
 				'id_member' => $this->user->id,
 				'is_usersaved' => (int) empty($_REQUEST['autosave']),
-			);
+			];
 
 			if ($this->getApi() !== false)
 			{

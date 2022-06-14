@@ -108,25 +108,25 @@ class Draft extends Post
 
 		// Start counting at the number of the first message displayed.
 		$counter = $reverse ? $context['start'] + $maxIndex + 1 : $context['start'];
-		$context['posts'] = array();
+		$context['posts'] = [];
 		foreach ($user_drafts as $row)
 		{
 			$this->_prepare_body_subject($row['body'], $row['subject'], $txt['drafts_none'], (bool) $row['smileys_enabled']);
 
 			// And the data used by the template
-			$context['drafts'][$counter += $reverse ? -1 : 1] = array(
+			$context['drafts'][$counter += $reverse ? -1 : 1] = [
 				'body' => $row['body'],
 				'counter' => $counter,
 				'alternate' => $counter % 2,
-				'board' => array(
+				'board' => [
 					'name' => $row['bname'],
 					'id' => $row['id_board'],
 					'link' => '<a href="' . getUrl('board', ['board' => $row['id_board'], 'start' => '0', 'name' => $row['bname']]) . '">' . $row['bname'] . '</a>',
-				),
-				'topic' => array(
+				],
+				'topic' => [
 					'id' => $row['id_topic'],
 					'link' => empty($row['id_topic']) ? $row['subject'] : '<a href="' . getUrl('topic', ['topic' => $row['id_topic'], 'start' => '0', 'subject' => $row['subject']]) . '">' . $row['subject'] . '</a>',
-				),
+				],
 				'subject' => $row['subject'],
 				'time' => standardTime($row['poster_time']),
 				'html_time' => htmlTime($row['poster_time']),
@@ -137,23 +137,29 @@ class Draft extends Post
 				'sticky' => $row['is_sticky'],
 				'age' => floor((time() - $row['poster_time']) / 86400),
 				'remaining' => (!empty($modSettings['drafts_keep_days']) ? round($modSettings['drafts_keep_days'] - ((time() - $row['poster_time']) / 86400)) : 0),
-				'buttons' => array(
-					'inline_mod_check' => array(
+				'buttons' => [
+					'inline_mod_check' => [
+						'class' => 'inline_mod_check',
 						'checkbox' => 'always',
 						'value' => $row['id_draft'],
 						'name' => 'delete',
-					),
-					'remove' => array(
-						'href' => getUrl('profile', ['action' => 'profile', 'area' => 'showdrafts', 'u' => $context['member']['id'], 'name' => $context['member']['name'], 'delete' => $row['id_draft'], 'start' => $context['start'], '{session_data}']),
-						'text' => $txt['draft_delete'],
+						'enabled' => true,
+					],
+					'remove' => [
+						'url' => getUrl('profile', ['action' => 'profile', 'area' => 'showdrafts', 'u' => $context['member']['id'], 'name' => $context['member']['name'], 'delete' => $row['id_draft'], 'start' => $context['start'], '{session_data}']),
+						'text' => 'draft_delete',
+						'icon' => 'delete',
+						'enabled' => true,
 						'custom' => 'onclick="return confirm(' . JavaScriptEscape($txt['draft_remove'] . '?') . ');"',
-					),
-					'edit' => array(
-						'href' => getUrl('action', ['action' => 'post', empty($row['id_topic']) ? 'board' : 'topic' => empty($row['id_topic']) ? $row['id_board'] . '.0' : $row['id_topic'] . '.0', 'id_draft' => $row['id_draft']]),
-						'text' => $txt['draft_edit'],
-					),
-				)
-			);
+					],
+					'edit' => [
+						'url' => getUrl('action', ['action' => 'post', empty($row['id_topic']) ? 'board' : 'topic' => empty($row['id_topic']) ? $row['id_board'] . '.0' : $row['id_topic'] . '.0', 'id_draft' => $row['id_draft']]),
+						'text' => 'draft_edit',
+						'icon' => 'modify',
+						'enabled' => true,
+					],
+				]
+			];
 		}
 
 		// If the drafts were retrieved in reverse order, get them right again.
@@ -296,7 +302,6 @@ class Draft extends Post
 		// Quick check how we got here.
 		if ($this->_memID !== $this->user->id)
 		{
-			// empty($modSettings['drafts_enabled']) || empty($modSettings['drafts_pm_enabled']))
 			throw new Exception('no_access', false);
 		}
 
@@ -351,7 +356,7 @@ class Draft extends Post
 			}
 
 			// Add the items to the array for template use
-			$context['drafts'][$counter += $reverse ? -1 : 1] = array(
+			$context['drafts'][$counter += $reverse ? -1 : 1] = [
 				'body' => $row['body'],
 				'counter' => $counter,
 				'alternate' => $counter % 2,
@@ -363,7 +368,21 @@ class Draft extends Post
 				'recipients' => $recipients,
 				'age' => floor((time() - $row['poster_time']) / 86400),
 				'remaining' => (!empty($modSettings['drafts_keep_days']) ? floor($modSettings['drafts_keep_days'] - ((time() - $row['poster_time']) / 86400)) : 0),
-			);
+				'buttons' => [
+					'reply_button' => [
+						'url' => getUrl('action', ['action' => 'pm', 'sa' => 'showpmdrafts', 'id_draft' => $row['id_draft'], '{session_data}']),
+						'text' => 'draft_edit',
+						'icon' => 'modify',
+						'enabled' => true,
+					],
+					'remove_button' => [
+						'url' => getUrl('action', ['action' => 'pm', 'sa' => 'showpmdrafts', 'delete' => $row['id_draft'], '{session_data}']),
+						'text' => 'draft_delete',
+						'icon' => 'delete',
+						'enabled' => true,
+					],
+				]
+			];
 		}
 
 		// If the drafts were retrieved in reverse order, then put them in the right order again.
