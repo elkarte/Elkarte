@@ -242,16 +242,16 @@ class Recent extends AbstractController implements FrontpageInterface
 			// Likes are always a bit particular
 			$post['you_liked'] = !empty($context['likes'][$counter]['member'])
 				&& isset($context['likes'][$counter]['member'][$this->user->id]);
-			$post['use_likes'] = allowedTo('like_posts') && empty($context['is_locked'])
+			$post['use_likes'] = !empty($post['tests']['can_like']) && allowedTo('like_posts') && empty($context['is_locked'])
 				&& ($post['poster']['id'] != $this->user->id || !empty($modSettings['likeAllowSelf']))
-				&& (empty($modSettings['likeMinPosts']) ? true : $modSettings['likeMinPosts'] <= $this->user->posts);
-			$post['like_count'] = !empty($context['likes'][$counter]['count']) ? $context['likes'][$counter]['count'] : 0;
-			$post['can_like'] = !empty($post['tests']['can_like']) && $post['use_likes'];
+				&& (empty($modSettings['likeMinPosts']) || $modSettings['likeMinPosts'] <= $this->user->posts);
+			$post['like_counter'] = !empty($context['likes'][$counter]['count']) ? $context['likes'][$counter]['count'] : 0;
+			$post['can_like'] = $post['use_likes'] && !$post['you_liked'];
 			$post['can_unlike'] = $post['use_likes'] && $post['you_liked'];
-			$post['like_counter'] = $post['like_count'];
+			$post['likes_enabled'] = !empty($modSettings['likes_enabled']) && ($post['use_likes'] || ($post['like_counter'] != 0));
 
 			// Let's add some buttons here!
-			$context['posts'][$counter]['buttons'] = $this->_addButtons($post);
+			$context['posts'][$counter]['buttons'] = $this->_addButtons($post, $context['posts'][$counter]['tests']);
 		}
 	}
 
@@ -403,70 +403,81 @@ class Recent extends AbstractController implements FrontpageInterface
 	}
 
 	/**
-	 * Create the buttons that are available for this post
+	 * Create the buttons array for this post
+	 * Array is used by template_button_strip(), see that function for parameter details
 	 *
-	 * @param $post
+	 * @param array $post Details of this post
+	 * @param array $tests array holding true false values for various test keys, like can_quote;
 	 * @return array
 	 */
-	private function _addButtons($post)
+	private function _addButtons($post, $tests)
 	{
-		global $context, $txt;
+		global $txt;
 
-		$txt_like_post = '<li></li>';
-
-		// Can they like/unlike this post?
-		if ($post['can_like'] || $post['can_unlike'])
-		{
-			$txt_like_post = '
-				<li class="listlevel1' . (!empty($post['like_counter']) ? ' liked"' : '"') . '>
-					<a class="linklevel1 ' . ($post['can_unlike'] ? 'unreact_button' : 'react_button') . '" href="javascript:void(0)" title="' . (!empty($post['like_counter']) ? $txt['liked_by'] . ' ' . implode(', ', $context['likes'][$post['id']]['member']) : '') . '" onclick="likePosts.prototype.likeUnlikePosts(event,' . $post['id'] . ', ' . $post['topic'] . '); return false;">' .
-				(!empty($post['like_counter']) ? '<span class="likes_indicator">' . $post['like_counter'] . '</span>&nbsp;' . $txt['likes'] : $txt['like_post']) . '
-					</a>
-				</li>';
-		}
-		// Or just view the count
-		elseif (!empty($post['like_counter']))
-		{
-			$txt_like_post = '
-				<li class="listlevel1 liked">
-					<a href="javascript:void(0)" title="' . $txt['liked_by'] . ' ' . implode(', ', $context['likes'][$post['id']]['member']) . '" class="linklevel1 reacts_button">
-						<span class="likes_indicator">' . $post['like_counter'] . '</span>&nbsp;' . $txt['likes'] . '
-					</a>
-				</li>';
-		}
-
-		return array(
+		$postButtons = [
 			// How about... even... remove it entirely?!
-			'remove' => array(
-				'href' => getUrl('action', ['action' => 'deletemsg', 'msg' => $post['id'], 'topic' => $post['topic'], 'recent', '{session_data}']),
-				'text' => $txt['remove'],
-				'test' => 'can_delete',
+			'remove' => [
+				'url' => getUrl('action', ['action' => 'deletemsg', 'msg' => $post['id'], 'topic' => $post['topic'], 'recent', '{session_data}']),
+				'text' => 'remove',
+				'icon' => 'delete',
+				'enabled' => $tests['can_delete'],
 				'custom' => 'onclick="return confirm(' . JavaScriptEscape($txt['remove_message'] . '?') . ');"',
-			),
+			],
 			// Can we request notification of topics?
-			'notify' => array(
-				'href' => getUrl('action', ['action' => 'notify', 'topic' => $post['topic'] . '.' . $post['start']]),
-				'text' => $txt['notify'],
-				'test' => 'can_mark_notify',
-			),
+			'notify' => [
+				'url' => getUrl('action', ['action' => 'notify', 'topic' => $post['topic'] . '.' . $post['start']]),
+				'text' => 'notify',
+				'icon' => 'comment',
+				'enabled' => $tests['can_mark_notify'],
+			],
 			// If they *can* reply?
-			'reply' => array(
-				'href' => getUrl('action', ['action' => 'post', 'topic' => $post['topic'] . '.' . $post['start']]),
-				'text' => $txt['reply'],
-				'test' => 'can_reply',
-			),
+			'reply' => [
+				'url' => getUrl('action', ['action' => 'post', 'topic' => $post['topic'] . '.' . $post['start']]),
+				'text' => 'reply',
+				'icon' => 'modify',
+				'enabled' => $tests['can_reply'],
+			],
 			// If they *can* quote?
-			'quote' => array(
-				'href' => getUrl('action', ['action' => 'post', 'topic' => $post['topic'] . '.' . $post['start'], 'quote' => $post['id']]),
-				'text' => $txt['quote'],
-				'test' => 'can_quote',
-			),
-			// If they *can* like?
-			'like' => array(
-				'override' => $txt_like_post,
-				'test' => 'can_like',
-			),
-		);
+			'quote' => [
+				'text' => 'quote',
+				'url' => getUrl('action', ['action' => 'post', 'topic' => $post['topic'] . '.' . $post['start'], 'quote' => $post['id']]),
+				'class' => 'quote_button last',
+				'icon' => 'quote',
+				'enabled' => $tests['can_quote'],
+			],
+			// If they *can* like / unlike / just see totals
+			'react' => [
+				'text' => 'like_post',
+				'url' => 'javascript:void(0);',
+				'custom' => 'onclick="likePosts.prototype.likeUnlikePosts(event,' . $post['id'] . ',' . $post['topic'] . '); return false;"',
+				'linkclass' => 'react_button',
+				'icon' => 'thumbsup',
+				'enabled' => $post['likes_enabled'] && $post['can_like'],
+				'counter' => $post['like_counter'] ?? 0,
+			],
+			'unreact' => [
+				'text' => 'unlike_post',
+				'url' => 'javascript:void(0);',
+				'custom' => 'onclick="likePosts.prototype.likeUnlikePosts(event,' . $post['id'] . ',' . $post['topic'] . '); return false;"',
+				'linkclass' => 'unreact_button',
+				'icon' => 'thumbsdown',
+				'enabled' => $post['likes_enabled'] && $post['can_unlike'],
+				'counter' => $post['like_counter'] ?? 0,
+			],
+			'liked' => [
+				'text' => 'likes',
+				'url' => 'javascript:void(0);',
+				'custom' => 'onclick="this.blur();"',
+				'icon' => 'thumbsup',
+				'enabled' => $post['likes_enabled'] && !$post['can_unlike'] && !$post['can_like'],
+				'counter' => $post['like_counter'] ?? 0,
+			],
+		];
+
+		// Drop all non-enabled ones
+		return array_filter($postButtons, function ($button) use ($tests) {
+			return !isset($button['enabled']) ||$button['enabled'] !== false;
+		});
 	}
 
 	/**
