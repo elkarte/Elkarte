@@ -520,7 +520,7 @@ Elk_QuickQuote.prototype.prepareQuickQuoteButton = function (event)
 
 	// The poster and time of post being quoted
 	let msgid = parseInt(postArea.getAttribute('data-msgid')),
-		link = document.getElementById('qq_' + msgid),
+		link = document.getElementById('button_strip_qq_' + msgid),
 		username = '',
 		time_unix = 0;
 
@@ -531,10 +531,10 @@ Elk_QuickQuote.prototype.prepareQuickQuoteButton = function (event)
 		link.parentElement.classList.remove('hide');
 
 		// Style the previous button, if there is one
-		let previous = link.parentElement.previousElementSibling;
+		let previous = link.parentElement.nextElementSibling;
 		if (previous)
 		{
-			previous.firstElementChild.classList.remove('last');
+			previous.classList.remove('last');
 		}
 
 		// Topic Display, Grab the name from the aside area
@@ -569,10 +569,10 @@ Elk_QuickQuote.prototype.prepareQuickQuoteButton = function (event)
 			link.parentElement.classList.add('hide');
 
 			// Style the end element, if there is one.
-			let previous = link.parentElement.previousElementSibling;
+			let previous = link.parentElement.nextElementSibling;
 			if (previous)
 			{
-				previous.firstElementChild.classList.add('last');
+				previous.classList.add('last');
 			}
 		}
 
@@ -603,7 +603,7 @@ Elk_QuickQuote.prototype.removeQuickQuote = function ()
 				// Button Strip for the message
 				buttonList = document.getElementById('buttons_' + msgid);
 				// li of quick_quote_button link
-				buttonList.querySelector('.quick_quote_button').parentElement.classList.add('hide');
+				buttonList.querySelector('.quick_quote_button').classList.add('hide');
 				// link of button (usually quote) add style class
 				let previous = buttonList.lastElementChild.previousElementSibling;
 				if (previous)
