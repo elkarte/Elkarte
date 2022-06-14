@@ -12,14 +12,6 @@
  */
 
 /**
- * Start things off with some generic templates we can use
- */
-function template_Maintenance_init()
-{
-	theme()->getTemplates()->load('GenericHelpers');
-}
-
-/**
  * Template for the database maintenance tasks.
  */
 function template_maintain_database()

@@ -13,14 +13,6 @@
  */
 
 /**
- * Load in the generic helpers
- */
-function template_ManageSmileys_init()
-{
-	theme()->getTemplates()->load('GenericHelpers');
-}
-
-/**
  * Editing the smiley sets.
  */
 function template_editsets()

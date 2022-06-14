@@ -13,14 +13,6 @@
  */
 
 /**
- * Generic reuse templates is where its at
- */
-function template_SplitTopics_init()
-{
-	theme()->getTemplates()->load('GenericHelpers');
-}
-
-/**
  * Show an interface to ask the user the options for split topics.
  */
 function template_ask()

@@ -13,14 +13,6 @@
  */
 
 /**
- * Have the generic templates available
- */
-function template_MoveTopic_init()
-{
-	theme()->getTemplates()->load('GenericHelpers');
-}
-
-/**
  * Show an interface for selecting which board to move a post to.
  */
 function template_move_topic()

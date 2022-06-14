@@ -13,14 +13,6 @@
  */
 
 /**
- * Loads the GenericHelpers template
- */
-function template_MergeTopics_init()
-{
-	theme()->getTemplates()->load('GenericHelpers');
-}
-
-/**
  * Template for the bit to show when merge topics is finished.
  */
 function template_merge_done()

@@ -13,14 +13,6 @@
  */
 
 /**
- * Start of the template, just calls in the helpers
- */
-function template_ManageNews_init()
-{
-	theme()->getTemplates()->load('GenericHelpers');
-}
-
-/**
  * Template for the email to members page in admin panel.
  * It allows to select members and membergroups.
  */
