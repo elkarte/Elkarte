@@ -49,7 +49,7 @@
 
 			/**
 			 * This is bound to a click event on the page like/unlike buttons
-			 * likePosts.prototype.likeUnlikePosts(event, messageID, topidID)
+			 * likePosts.prototype.likeUnlikePosts(event, messageID, topicID)
 			 */
 			likeUnlikePosts = function (e, mId, tId)
 			{
@@ -63,12 +63,14 @@
 					return false;
 				}
 
+				e.target.blur();
+
 				// Set the subAction to what they are doing
 				if (check.indexOf('unreact_button') >= 0)
 				{
 					if (!confirm(oTxt.are_you_sure))
 					{
-						return;
+						return false;
 					}
 
 					subAction = 'unlikepost';
@@ -99,11 +101,12 @@
 					{
 						// Update the page with the new likes information
 						updateUi({
-							'elem': $(e.target),
 							'count': resp.count,
 							'text': resp.text,
 							'title': resp.title,
-							'action': subAction
+							'action': subAction,
+							'messageId': messageId,
+							'event': e.target,
 						});
 					}
 					// Some failure trying to process the request
@@ -128,23 +131,42 @@
 			 */
 			updateUi = function (params)
 			{
-				let currentClass = (params.action === 'unlikepost') ? 'unreact_button' : 'react_button',
-					nextClass = (params.action === 'unlikepost') ? 'react_button' : 'unreact_button';
+				let likesList = document.getElementById('likes_for_' + params.messageId),
+					currentClass = (params.action === 'unlikepost') ? 'unreact_button' : 'react_button',
+					nextClass = (params.action === 'unlikepost') ? 'react_button' : 'unreact_button',
+					icon = '<i class="icon icon-small i-' + ((params.action === 'unlikepost') ? 'thumbup' : 'thumbdown') + '"></i>';
 
-				// Swap the button class as needed, update the text for the hover
-				$(params.elem).removeClass(currentClass).addClass(nextClass);
-				$(params.elem).html('&nbsp;' + params.text);
+				// Swap the button class as needed, update the button icon / text
+				params.event.classList.remove(currentClass);
+				params.event.classList.add(nextClass);
+				params.text = icon + params.text;
 
-				// Update the count bubble if needed
+				// Update the count bubble and like list line if it exists
 				if (params.count !== 0)
 				{
-					$(params.elem).html('<span class="likes_indicator">' + params.count + '</span>&nbsp;' + params.text);
+					params.event.innerHTML = '<span class="button_indicator">' + params.count + '</span>&nbsp;' + params.text;
+
+					if (likesList)
+					{
+						likesList.classList.remove('hide');
+						likesList.innerHTML = '<i class="icon icon-small i-thumbup"></i>&nbsp;' + params.title;
+					}
+				}
+				else
+				{
+					params.event.innerHTML = params.text;
+
+					if (likesList)
+					{
+						likesList.innerHTML = '';
+						likesList.classList.add('hide');
+					}
 				}
 
 				// Changed the title text, update the tooltips
 				if (bTooltips)
 				{
-					$(params.elem).attr('title', params.title);
+					params.event.attr('title', params.title);
 					$("." + nextClass).SiteTooltip();
 				}
 			},

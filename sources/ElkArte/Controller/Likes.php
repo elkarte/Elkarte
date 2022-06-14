@@ -20,6 +20,7 @@ use ElkArte\MembersList;
 use ElkArte\Notifications;
 use ElkArte\NotificationsTask;
 use ElkArte\Languages\Txt;
+use ElkArte\User;
 
 /**
  * This class contains one likable use, which allows members to like a post
@@ -240,14 +241,15 @@ class Likes extends AbstractController
 		{
 			$details = loadLikes($this->_id_liked, true);
 			$count = empty($details) ? 0 : $details[$this->_id_liked]['count'];
-			$text = $count !== 0 ? $txt['likes'] : $txt['like_post'];
+			$youLiked = $count !== 0 && array_key_exists(User::$info->id , $details[$this->_id_liked]['member']);
+			$text = $count !== 0 ? ($youLiked ? $txt['unlike_post'] : $txt['likes']) : $txt['like_post'];
 			$title = empty($details) ? '' : $txt['liked_by'] . ' ' . implode(', ', $details[$this->_id_liked]['member']);
-			$this->_likes_response = array(
+			$this->_likes_response = [
 				'result' => true,
 				'text' => $text,
 				'count' => $count,
 				'title' => $title
-			);
+			];
 		}
 
 		// Provide the response
