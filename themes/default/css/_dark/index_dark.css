@@ -50,14 +50,14 @@
 :root {
 	--html_background: #0B0B0B; /* HTML & footer Background */
 	--body_grad_1: #0B0B0B; /* Body Gradient */
-	--body_grad_2: #0B0B0B; /* Body Gradient */
+	--body_grad_2: #E0E0E0; /* Body Gradient */
 
 	/* Top section above the navigation menu */
 	--top_section_border: #232323; /* Header */
 	--top_section_top_border: #232323; /* Top border */
 	--top_section_bottom_border: #363738; /* Top section lower border */
 	--top_section: #232323; /* Background */
-	--top_section_compliment: #0200204; /* Used with above for gradient */
+	--top_section_compliment: #020020; /* Used with above for gradient */
 
 	/* Menu nav background if a different background from top_section is wanted */
 	--menu_nav_grad_1: transparant; /* Top Menu nav bar background */
@@ -239,7 +239,10 @@ html {
 
 body {
 	color: var(--body_text);
-	background-image: linear-gradient(to right, var(--body_grad_1) 0%, var(--body_grad_2) 50%, var(--body_grad_1) 100%);
+	background-image: radial-gradient(50% 50% at top center, rgba(0, 0, 0, .7), var(--body_grad_1)), linear-gradient(180deg, var(--body_grad_2), var(--body_grad_1));
+	background-repeat: no-repeat;
+	background-position: top 100px center;
+	background-size: 120% 2000px, 100% 2000px;
 }
 
 fieldset {
@@ -605,6 +608,7 @@ sup.bbc_footnotes, sup.bbc_footnotes a {
 /* Main forum area.
    Box-shadow only on this one. */
 #wrapper {
+	margin-top: 2em;
 	border-color: var(--transparent);
 	border-top-color: var(--transparent);
 	border-bottom-color: var(--transparent);
@@ -724,7 +728,7 @@ sup.bbc_footnotes, sup.bbc_footnotes a {
 
 /* Level 1 active buttons. */
 .linklevel1.active, .listlevel1:hover .active,
-#collapse_button .linklevel1, .likes_indicator,
+#collapse_button .linklevel1, .button_indicator,
 #search_form_button .linklevel1, #search_form_button_close .linklevel1 {
 	color: var(--primary_white);
 	border-color: var(--menu_button_border_active);
@@ -792,7 +796,7 @@ sup.bbc_footnotes, sup.bbc_footnotes a {
 	background: var(--title);
 }
 
-.likes_indicator {
+.button_indicator {
 	box-shadow: 2px 2px 2px var(--transparent);
 }
 
@@ -884,10 +888,6 @@ sup.bbc_footnotes, sup.bbc_footnotes a {
 /* Cancel generic border-radius. */
 .quickbuttons .linklevel1 {
 	color: var(--menu_text);
-}
-
-.quickbuttons .linklevel1::before, .quickbuttons .linklevel2::before {
-	background-image: url(../../images/_dark/quickbuttons.png);
 }
 
 .quick_quote_button > .warning {

@@ -252,7 +252,7 @@ h2 a.collapse {
 }
 
 /* Tricky PM indicator. Define it carefully */
-.pm_indicator, .likes_indicator {
+.pm_indicator, .button_indicator {
 	right: auto;
 	left: -0.4em;
 	float: right;

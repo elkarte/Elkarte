@@ -1091,6 +1091,12 @@ a.bbc_link {
 	border-bottom: 4px solid;
 }
 
+#top_section.th_collapse {
+	position: sticky;
+	z-index: 1000;
+	top: 0;
+}
+
 /* Very top bar, holds search and login (top_section_notice) forms */
 #top_header {
 	display: flex;
@@ -1141,7 +1147,7 @@ a.bbc_link {
 	height: 2.3em;
 }
 
-/* This are simply to collapse the search from into a single element */
+/* This to simply collapse the search from into a single element */
 #search_form_menu select, #search_form_menu input, #search_form_menu button[type="submit"] {
 	margin-right: -1px;
 	border-right: none;
@@ -1647,7 +1653,7 @@ a.bbc_link {
 
 /* Tricky PM / Likes indicator. Define it carefully,
   just in case someone tries to use this class elsewhere. */
-.pm_indicator, .likes_indicator {
+.pm_indicator, .button_indicator {
 	font-size: var(--font14);
 	font-weight: 700;
 	line-height: 1.7;
@@ -1661,7 +1667,7 @@ a.bbc_link {
 	border-radius: 8px 8px 8px 0;
 }
 
-.likes_indicator {
+.button_indicator {
 	font-size: .857em;
 	line-height: 1.467;
 	top: -1.2em;
@@ -1849,16 +1855,11 @@ a.bbc_link {
 
 /* The quick buttons like quote, quick edit, etc. */
 .quickbuttons {
-	margin: .5em 0 .4em 0;
-	padding-top: .5em;
-	text-align: right;
-}
-
-nav > .quickbuttons, menu > .quickbuttons {
 	display: flex;
 	align-items: center;
-	/* The buttons are in reverse order in the markup bleh! */
-	flex-direction: row-reverse;
+	justify-content: flex-end;
+	margin: .5em 0 .4em auto;
+	padding-top: .5em;
 }
 
 .quickbuttons li {
@@ -1895,134 +1896,25 @@ nav > .quickbuttons, menu > .quickbuttons {
 
 .quickbuttons .inline_mod_check {
 	margin: .25em .1em;
-	padding: 0 4px 1px 4px;
+	padding: 0 4px;
 	border: 1px solid;
 }
 
 .quickbuttons .linklevel1 {
 	line-height: 2.1;
 	float: left;
-	padding: 1px .4em 0 1.5em;
+	padding: 0 .4em;
 	cursor: pointer;
 	border-radius: 0;
 }
 
-/* The icons in front of them. */
-.quickbuttons .linklevel1::before, .quickbuttons .linklevel2::before {
-	position: absolute;
-	z-index: 5;
-	top: 50%;
-	left: 3px;
-	display: block;
-	width: 18px;
-	height: 24px;
-	margin-top: -.8em;
-	content: "";
-	background-image: url(../images/theme/quickbuttons.png);
-	/* A rare example of where longhand background declarations work well. */
-	background-repeat: no-repeat;
-}
-
-.quickmod_check {
-	left: 3px;
-}
-
-/* The long list of sprite coordinates is much less verbose this way. */
-.quote_button::before {
-	background-position: 0 0;
-}
-
-.remove_button::before {
-	background-position: 0 -24px;
-}
-
-.modify_button::before {
-	background-position: 0 -48px;
-}
-
-.approve_button::before {
-	background-position: 0 -72px;
-}
-
-.restore_button::before {
-	background-position: 0 -96px;
-}
-
-.split_button::before {
-	background-position: 0 -120px;
-}
-
-.reply_button::before {
-	background-position: 0 -144px;
-}
-
-.reply_all_button::before {
-	background-position: 0 -144px;
-}
-
-.notify_button::before {
-	background-position: 0 -168px;
-}
-
-.unapprove_button::before {
-	background-position: 0 -192px;
-}
-
-.close_button::before {
-	background-position: 0 -216px;
-}
-
-.im_reply_button::before {
-	background-position: 0 -240px;
-}
-
-.details_button::before {
-	background-position: 0 -264px;
-}
-
-.ignore_button::before {
-	background-position: 0 -288px;
-}
-
-.report_button::before {
-	background-position: 0 -312px;
-}
-
-.warn_button::before {
-	background-position: 0 -336px;
-}
-
-.quotetonew_button::before {
-	background-position: 0 -360px;
-}
-
-.react_button::before {
-	background-position: 0 -384px;
-}
-
-.unreact_button::before {
-	background-position: 0 -408px;
-}
-
-.star_button::before {
-	background-position: 0 -432px;
-}
-
-.quick_edit::before {
-	background-position: 0 -456px;
-}
-
-.reacts_button::before {
-	background-position: 0 -480px;
-}
-
-/* Radius left end of the first (Quote) button, last-child as this is in reverse order */
-.quickbuttons li:last-child a, .quickbuttons li a.last {
+/* Radius left end of the first (Quote) button */
+.quickbuttons li:first-child a, .quickbuttons li.last a {
 	border-radius: 4px 0 0 4px;
 }
 
 /* Radius right end of the last button. */
-.quickbuttons li:first-child, .quickbuttons li:first-child a {
+.quickbuttons li:last-child, .quickbuttons li:last-child a {
 	border-radius: 0 4px 4px 0;
 }
 
@@ -2035,11 +1927,6 @@ nav > .quickbuttons, menu > .quickbuttons {
 .linklevel1.post_options::before,
 .follow_ups .linklevel1::before {
 	display: none;
-}
-
-/* "More..." and Followup gets custom padding (no icon). */
-.linklevel1.post_options, .follow_ups .linklevel1 {
-	padding: 1px .4em 0 .4em;
 }
 
 /* Quickbutton, Buttonlist, and follow ups drop menus, flyout to the left.
@@ -2060,15 +1947,6 @@ nav > .quickbuttons, menu > .quickbuttons {
 	text-align: left;
 }
 
-/* Show appropriate like/unlike action */
-.react_button::before, .reacts_button::before {
-	background-position: 0 -480px;
-}
-
-.react_button:hover::before {
-	background-position: 0 -384px;
-}
-
 .follow_ups .listlevel2 {
 	width: 20em;
 }
@@ -2080,7 +1958,7 @@ nav > .quickbuttons, menu > .quickbuttons {
 
 .quickbuttons .linklevel2 {
 	line-height: 2.1;
-	padding: 0 .4em 0 26px;
+	padding: 0 .4em;
 }
 
 .quick_quote_button > .warning {
@@ -3305,9 +3183,12 @@ footer .signature {
 .signature {
 	font-size: var(--font13);
 	overflow: auto;
-	margin-top: 1em;
 	padding: 8px 0;
 	border-top: 1px solid;
+}
+
+.signature.without_top_border {
+	border-top: none;
 }
 
 .custom_fields_above_signature {
@@ -3858,12 +3739,12 @@ ul.post_options li {
 }
 
 #topic_summary .quickbuttons {
-	margin: 0;
 	padding: 0;
+	margin: 0 0 0 auto;
 }
 
 #topic_summary .keyinfo nav {
-	margin-left: auto;
+	/*margin-left: auto;*/
 }
 
 /* The event editor section. */
@@ -4675,7 +4556,7 @@ ul.cf_icons li:not(:first-child)::before {
 
 /* If you have labels, these are the drop down selector under quote, reply, delete */
 #personal_messages .labels {
-	padding: .1em 0 0;
+	padding: .1em 0 1em 0;
 }
 
 div.labels {
@@ -4768,10 +4649,9 @@ div.labels {
 }
 
 .previous_month, .next_month {
-	font-size: var(--font9);
-	display: block;
+	font-size: var(--font12);
 	float: left;
-	margin: -0.1em 0 0 0;
+	margin-top: .5em;
 }
 
 .next_month {
@@ -4863,23 +4743,6 @@ div.labels {
 #calendar_navigation .buttonlist {
 	padding: 0 .4em;
 }
-
-/* See, I told you there was antz in here.
-              ,
-      _,-'\   /|   .    .    /`.
-  _,-'     \_/_|_  |\   |`. /   `._,--===--.__
- ^       _/"/  " \ : \__|_ /.   ,'    :.  :. .`-._
-        // ^   /7 t'""    "`-._/ ,'\   :   :  :  .`.
-        Y      L/ )\         ]],'   \  :   :  :   : `.
-        |        /  `.n_n_n,','\_    \ ;   ;  ;   ;  _>
-        |__    ,'     |  \`-'    `-.__\_______.==---'
-       //  `""\\      |   \            \
-       \|     |/      /    \            \
-                     /     |             `.
-                    /      |               ^
-                   ^       |
-Stef                       ^
-*/
 
 /* -------------------------------------------------------
  * MENTIONS
@@ -5215,12 +5078,12 @@ Stef                       ^
 }
 
 /* Shown when using show results as messages */
-.search_results_posts nav {
+.search_results_posts .quickbuttons {
 	grid-column-start: span 2;
 	grid-row-start: 3;
 }
 
-.search_results_posts nav .quickbuttons {
+.search_results_posts .quickbuttons {
 	margin: 0 1.5em;
 }
 
@@ -5713,6 +5576,9 @@ Stef                       ^
  *	$LIKE STATS
  * -------------------------------------------------------
  */
+.like_post_stats_menu {
+	margin-bottom: 5px;
+}
 
 .like_post_stats {
 	position: relative;
@@ -6135,7 +6001,7 @@ Stef                       ^
 		overflow-wrap: break-word;
 	}
 
-	nav > .quickbuttons, menu > .quickbuttons {
+	.quickbuttons {
 		flex-wrap: wrap;
 	}
 
@@ -6854,7 +6720,7 @@ Stef                       ^
 		width: 100%;
 	}
 
-	nav > .quickbuttons, menu > .quickbuttons {
+	.quickbuttons {
 		justify-content: space-evenly;
 	}
 

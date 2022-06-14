@@ -1211,7 +1211,7 @@ function setBoardIds()
 						showTooltip();
 						positionTooltip($event);
 				}
-			},750);})
+			},1250);})
 			.mouseleave(function() {
 				let $this = $(this);
 

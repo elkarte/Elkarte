@@ -133,7 +133,7 @@ function template_action_showPosts()
 				', empty($context['is_topics']) ? $txt['showMessages'] : $txt['showTopics'], $context['user']['is_owner'] ? '' : ' - ' . $context['member']['name'], '
 			</h2>';
 
-	// No posts? Just end the table with a informative message.
+	// No posts? Just end the table with an informative message.
 	if (empty($context['posts']))
 	{
 		echo '
