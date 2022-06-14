@@ -152,17 +152,17 @@ class Display extends AbstractController
 		}
 
 		// Taking care of member specific settings
-		$limit_settings = array(
+		$limit_settings = [
 			'messages_per_page' => $this->messages_per_page,
 			'start' => $start,
 			'offset' => $limit,
-		);
+		];
 
 		// Get each post and poster in this topic.
 		$topic_details = getTopicsPostsAndPoster($this->topicinfo['id_topic'], $limit_settings, $ascending);
 		$messages = $topic_details['messages'];
 
-		// Add the viewing member so their information is available for use in QR
+		// Add the viewing member so their information is available for use in enhanced QR
 		$posters = array_unique($topic_details['all_posters'] + [-1 => $this->user->id]);
 		$all_posters = $topic_details['all_posters'];
 		unset($topic_details);
@@ -182,12 +182,12 @@ class Display extends AbstractController
 			// Mark the board as read or not ... calls updateReadNotificationsFor() sets $context['is_marked_notify']
 			$this->markRead($messages, $board);
 
-			$msg_parameters = array(
+			$msg_parameters = [
 				'message_list' => $messages,
 				'new_from' => $this->topicinfo['new_from'],
-			);
-			$msg_selects = array();
-			$msg_tables = array();
+			];
+			$msg_selects = [];
+			$msg_tables = [];
 			call_integration_hook('integrate_message_query', array(&$msg_selects, &$msg_tables, &$msg_parameters));
 
 			MembersList::loadGuest();
@@ -198,7 +198,6 @@ class Display extends AbstractController
 				MembersList::load($posters);
 			}
 
-			// Load in the likes for this group of messages
 			// If using quick reply, load the user into context for the poster area
 			$this->prepareQuickReply();
 
@@ -219,19 +218,18 @@ class Display extends AbstractController
 		// Are we showing the signatures?
 		$this->setSignatureShowStatus();
 
+		// Now set all the wonderful, wonderful permissions... like moderation ones...
+		$this->setTopicCanPermissions();
+
 		// Set the callback.  (do you REALIZE how much memory all the messages would take?!?)
 		// This will be called from the template.
-		$bodyParser = new Normal(array(), false);
+		$bodyParser = new Normal([], false);
 		$opt = new ValuesContainer([
 			'icon_sources' => new MessageTopicIcons(!empty($modSettings['messageIconChecks_enable']), $settings['theme_dir']),
 			'show_signatures' => $this->_show_signatures,
 		]);
 		$renderer = new DisplayRenderer($messages_request, $this->user, $bodyParser, $opt);
-
-		$context['get_message'] = array($renderer, 'getContext');
-
-		// Now set all the wonderful, wonderful permissions... like moderation ones...
-		$this->setTopicCanPermissions();
+		$context['get_message'] = [$renderer, 'getContext'];
 
 		// Load up the Quick ModifyTopic and Quick Reply scripts
 		loadJavascriptFile('topic.js');
@@ -257,7 +255,7 @@ class Display extends AbstractController
 		$context['sub_template'] = 'messages';
 
 		// Trigger the prepare_context event for modules that have tied in to it
-		$this->_events->trigger('prepare_context', array('editorOptions' => &$editorOptions, 'use_quick_reply' => !empty($options['display_quick_reply'])));
+		$this->_events->trigger('prepare_context', ['editorOptions' => &$editorOptions, 'use_quick_reply' => !empty($options['display_quick_reply'])]);
 
 		// Load up the "double post" sequencing magic.
 		if (!empty($options['display_quick_reply']))
@@ -274,16 +272,16 @@ class Display extends AbstractController
 			}
 		}
 
-		theme()->addJavascriptVar(array('notification_topic_notice' => $context['is_marked_notify'] ? $txt['notification_disable_topic'] : $txt['notification_enable_topic']), true);
+		theme()->addJavascriptVar(['notification_topic_notice' => $context['is_marked_notify'] ? $txt['notification_disable_topic'] : $txt['notification_enable_topic']], true);
 
 		if ($context['can_send_topic'])
 		{
-			theme()->addJavascriptVar(array(
+			theme()->addJavascriptVar([
 				'sendtopic_cancel' => $txt['modify_cancel'],
 				'sendtopic_back' => $txt['back'],
 				'sendtopic_close' => $txt['find_close'],
 				'sendtopic_error' => $txt['send_error_occurred'],
-				'required_field' => $txt['require_field']), true);
+				'required_field' => $txt['require_field']], true);
 		}
 
 		// Build the common to all buttons like Reply Notify Mark ....
@@ -304,6 +302,7 @@ class Display extends AbstractController
 		{
 			$this->_template_layers->add('report_sent');
 		}
+
 		// All of our buttons and bottom navigation
 		$this->_template_layers->add('moderation_buttons');
 		$this->_template_layers->add('pages_and_buttons');
@@ -904,44 +903,44 @@ class Display extends AbstractController
 		global $context, $txt;
 
 		// Build the normal button array.
-		$context['normal_buttons'] = array(
-			'reply' => array(
+		$context['normal_buttons'] = [
+			'reply' => [
 				'test' => 'can_reply',
 				'text' => 'reply',
 				'lang' => true,
 				'url' => getUrl('action', ['action' => 'post', 'topic' => $context['current_topic'] . '.' . $context['start'], 'last_msg' => $this->topicinfo['id_last_msg']]),
 				'active' => true,
-			),
-			'notify' => array(
+			],
+			'notify' => [
 				'test' => 'can_mark_notify',
 				'text' => $context['is_marked_notify'] ? 'unnotify' : 'notify',
 				'lang' => true,
 				'custom' => 'onclick="return notifyButton(this);"',
 				'url' => getUrl('action', ['action' => 'notify', 'sa' => $context['is_marked_notify'] ? 'off' : 'on', 'topic' => $context['current_topic'] . '.' . $context['start'], '{session_data}']),
-			),
-			'mark_unread' => array(
+			],
+			'mark_unread' => [
 				'test' => 'can_mark_unread',
 				'text' => 'mark_unread',
 				'lang' => true,
 				'url' => getUrl('action', ['action' => 'markasread', 'sa' => 'topic', 't' => $context['mark_unread_time'], 'topic' => $context['current_topic'] . '.' . $context['start'], '{session_data}']),
-			),
-			'unwatch' => array(
+			],
+			'unwatch' => [
 				'test' => 'can_unwatch',
 				'text' => ($context['topic_unwatched'] ? '' : 'un') . 'watch',
 				'lang' => true,
 				'custom' => 'onclick="return unwatchButton(this);"',
 				'url' => getUrl('action', ['action' => 'unwatchtopic', 'sa' => $context['topic_unwatched'] ? 'off' : 'on', 'topic' => $context['current_topic'] . '.' . $context['start'], '{session_data}']),
 				'submenu' => true,
-			),
-			'send' => array(
+			],
+			'send' => [
 				'test' => 'can_send_topic',
 				'text' => 'send_topic',
 				'lang' => true,
 				'url' => getUrl('action', ['action' => 'emailuser', 'sa' => 'sendtopic', 'topic' => $context['current_topic'] . '.0']),
 				'custom' => 'onclick="return sendtopicOverlayDiv(this.href, \'' . $txt['send_topic'] . '\');"',
 				'submenu' => true,
-			),
-			'print' => array(
+			],
+			'print' => [
 				'test' => 'can_print',
 				'text' => 'print',
 				'lang' => true,
@@ -949,8 +948,8 @@ class Display extends AbstractController
 				'class' => 'new_win',
 				'url' => getUrl('action', ['action' => 'topic', 'sa' => 'printpage', 'topic' => $context['current_topic'] . '.0']),
 				'submenu' => true,
-			),
-		);
+			],
+		];
 
 		// Allow adding new buttons easily.
 		call_integration_hook('integrate_display_buttons');

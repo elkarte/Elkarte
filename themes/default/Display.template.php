@@ -223,229 +223,54 @@ function template_messages()
 			template_display_attachments($message, $ignoring);
 		}
 
-		// Show the quickbuttons, for various operations on posts.
 		echo '
-					<nav>
-						<ul id="buttons_', $message['id'], '" class="quickbuttons no_js">';
-
-		// Reserve a checkbox location for quick moderation?
-		if (!empty($options['display_quick_mod']) && $message['can_remove'])
-		{
-			echo '
-							<li class="listlevel1 inline_mod_check hide" id="in_topic_mod_check_', $message['id'], '"></li>';
-		}
+					<div class="generic_menu">';
 
 		// Show "Last Edit: Time by Person" if this post was edited.
 		if ($settings['show_modify'])
 		{
 			echo '
-							<li id="modified_', $message['id'], '" class="listlevel1 modified', !empty($message['modified']['name']) ? '"' : ' hide"', '>
-								', !empty($message['modified']['name']) ? $message['modified']['last_edit_text'] : '', '
-							</li>';
+						<span id="modified_', $message['id'], '" class="smalltext modified', !empty($message['modified']['name']) ? '"' : ' hide"', '>
+							', !empty($message['modified']['name']) ? $message['modified']['last_edit_text'] : '', '
+						</span>';
 		}
 
-		// Maybe they can modify the post (this is the more button)
-		if ($message['can_modify'] || ($context['can_report_moderator']))
-		{
-			echo '
-							<li class="listlevel1 subsections" aria-haspopup="true">
-								<a href="#" ', !empty($options['use_click_menu']) ? '' : 'onclick="event.stopPropagation();return false;" ', 'class="linklevel1 post_options">',
-									$txt['post_options'], '
-								</a>';
-		}
-
-		if ($message['can_modify'] || $message['can_remove'] || !empty($context['can_follow_up']) || ($context['can_split'] && !empty($context['real_num_replies'])) || $context['can_restore_msg'] || $message['can_approve'] || $message['can_unapprove'] || $context['can_report_moderator'])
-		{
-			// Show them the other options they may have in a nice pulldown
-			echo '
-								<ul class="menulevel2">';
-
-			// Can the user modify the contents of this post?
-			if ($message['can_modify'])
-			{
-				echo '
-									<li class="listlevel2">
-										<a href="', $scripturl, '?action=post;msg=', $message['id'], ';topic=', $context['current_topic'], '.', $context['start'], '" class="linklevel2 modify_button">', $txt['modify'], '</a>
-									</li>';
-			}
-
-			// How about... even... remove it entirely?!
-			if ($message['can_remove'])
-			{
-				echo '
-									<li class="listlevel2">
-										<a href="', $scripturl, '?action=deletemsg;topic=', $context['current_topic'], '.', $context['start'], ';msg=', $message['id'], ';', $context['session_var'], '=', $context['session_id'], '" onclick="return confirm(\'', $txt['remove_message'], '?\');" class="linklevel2 remove_button">', $txt['remove'], '</a>
-									</li>';
-			}
-
-			// Can they quote to a new topic? @todo - This needs rethinking for GUI layout.
-			if (!empty($context['can_follow_up']))
-			{
-				echo '
-									<li class="listlevel2">
-										<a href="', $scripturl, '?action=post;board=', $context['current_board'], ';quote=', $message['id'], ';followup=', $message['id'], '" class="linklevel2 quotetonew_button">', $txt['quote_new'], '</a>
-									</li>';
-			}
-
-			// What about splitting it off the rest of the topic?
-			if ($context['can_split'] && !empty($context['real_num_replies']) && $context['topic_first_message'] !== $message['id'])
-			{
-				echo '
-									<li class="listlevel2">
-										<a href="', $scripturl, '?action=splittopics;topic=', $context['current_topic'], '.0;at=', $message['id'], '" class="linklevel2 split_button">', $txt['split_topic'], '</a>
-									</li>';
-			}
-
-			// Can we restore topics?
-			if ($context['can_restore_msg'])
-			{
-				echo '
-									<li class="listlevel2">
-										<a href="', $scripturl, '?action=restoretopic;msgs=', $message['id'], ';', $context['session_var'], '=', $context['session_id'], '" class="linklevel2 restore_button">', $txt['restore_message'], '</a>
-									</li>';
-			}
-
-			// Maybe we can approve it, maybe we should?
-			if ($message['can_approve'])
-			{
-				echo '
-									<li class="listlevel2">
-										<a href="', $scripturl, '?action=moderate;area=postmod;sa=approve;topic=', $context['current_topic'], '.', $context['start'], ';msg=', $message['id'], ';', $context['session_var'], '=', $context['session_id'], '"  class="linklevel2 approve_button">', $txt['approve'], '</a>
-									</li>';
-			}
-
-			// Maybe we can unapprove it?
-			if ($message['can_unapprove'])
-			{
-				echo '
-									<li class="listlevel2">
-										<a href="', $scripturl, '?action=moderate;area=postmod;sa=approve;topic=', $context['current_topic'], '.', $context['start'], ';msg=', $message['id'], ';', $context['session_var'], '=', $context['session_id'], '"  class="linklevel2 unapprove_button">', $txt['unapprove'], '</a>
-									</li>';
-			}
-
-			// Maybe they want to report this post to the moderator(s)?
-			if ($context['can_report_moderator'])
-			{
-				echo '
-									<li class="listlevel2">
-										<a href="' . $scripturl . '?action=reporttm;topic=' . $context['current_topic'] . '.' . $message['counter'] . ';msg=' . $message['id'] . '" class="linklevel2 warn_button">' . $txt['report_to_mod'] . '</a>
-									</li>';
-			}
-
-			// Anything else added by mods for example?
-			if (!empty($context['additional_drop_buttons']))
-			{
-				foreach ($context['additional_drop_buttons'] as $key => $button)
-				{
-					echo '
-									<li class="listlevel2">
-										<a href="' . $button['href'] . '" class="linklevel2 ', $key, '">' . $button['text'] . '</a>
-									</li>';
-				}
-			}
-
-			echo '
-								</ul>
-							</li>';
-		}
-
-		// Hide likes if its off
-		if ($message['likes_enabled'])
-		{
-			// Can they like/unlike this post?
-			if ($message['can_like'] || $message['can_unlike'])
-			{
-				echo '
-							<li class="listlevel1', !empty($message['like_counter']) ? ' liked"' : '"', '>
-								<a class="linklevel1 ', $message['can_unlike'] ? 'unreact_button' : 'react_button', '" role="button" href="javascript:void(0)"', !empty($message['like_counter']) ? ' title="' . $txt['liked_by'] . ' ' . implode(', ', $context['likes'][$message['id']]['member']) . '"' : '', ' onclick="likePosts.prototype.likeUnlikePosts(event,', $message['id'], ', ', $context['current_topic'], '); return false;">',
-									!empty($message['like_counter']) ? '<span class="likes_indicator">' . $message['like_counter'] . '</span>&nbsp;' . $txt['likes'] : $txt['like_post'], '
-								</a>
-							</li>';
-			}
-
-			// Or just view the count
-			else
-			{
-				echo '
-							<li class="listlevel1', !empty($message['like_counter']) ? ' liked"' : '"', '>
-								<a href="javascript:void(0)" role="button" class="linklevel1 reacts_button">',
-									!empty($message['like_counter']) ? '<span class="likes_indicator">' . $message['like_counter'] . '</span>&nbsp;' . $txt['likes'] : '&nbsp;', '
-								</a>
-							</li>';
-			}
-		}
-
-		// Can the user quick modify the contents of this post?  Show the quick (inline) modify button.
-		if ($message['can_modify'])
-		{
-			echo '
-							<li id="modify_button_', $message['id'], '" class="listlevel1 quick_edit hide">
-								<a class="linklevel1 quick_edit" role="button" onclick="oQuickModify.modifyMsg(\'', $message['id'], '\')">', $txt['quick_edit'], '</a>
-							</li>';
-		}
-
-		// Can they reply? Have they turned on quick reply?
-		if ($context['can_quote'] && !empty($options['display_quick_reply']))
-		{
-			echo '
-							<li class="listlevel1">
-								<a href="', $scripturl, '?action=post;quote=', $message['id'], ';topic=', $context['current_topic'], '.', $context['start'], ';last_msg=', $context['topic_last_message'], '" role="button" onclick="return oQuickReply.quote(', $message['id'], ');" class="linklevel1 quote_button last">', $txt['quote'], '</a>
-							</li>
-							<li class="listlevel1 hide">
-								<a href="javascript:void(0);" id="qq_', $message['id'], '" role="button" class="linklevel1 quick_quote_button">', $txt['quick_quote'], '</a>
-							</li>';
-		}
-		// So... quick reply is off, but they *can* reply?
-		elseif ($context['can_quote'])
-		{
-			echo '
-							<li class="listlevel1">
-								<a href="', $scripturl, '?action=post;quote=', $message['id'], ';topic=', $context['current_topic'], '.', $context['start'], ';last_msg=', $context['topic_last_message'], '" role="button" class="linklevel1 quote_button">', $txt['quote'], '</a>
-							</li>';
-		}
-
-		// Anything else added by mods for example?
-		if (!empty($context['additional_quick_buttons']))
-		{
-			foreach ($context['additional_quick_buttons'] as $key => $button)
-			{
-				echo '
-								<li class="listlevel1">
-									<a href="' . $button['href'] . '" class="linklevel1 ', $key, '">' . $button['text'] . '</a>
-								</li>';
-			}
-		}
+		// Show the quickbuttons, for various operations on posts.
+		template_button_strip($message['postbuttons'], 'quickbuttons no_js', ['no-class' => true, 'id' => 'buttons_' . $message['id']]);
 
 		echo '
-						</ul>
-					</nav>';
+						
+					</div>';
 
-		// Start of grid-row: signature seen as "footer .signature" in css
+		// Start of grid-row: signature seen as "<footer> .signature" in css
 		// This could use some cleanup, but the idea is to prevent multiple borders in this grid area
-		// it should just have a division line and then likes, custom fields, signature (any or none may be present)
-		if ($message['likes_enabled'] && !empty($message['like_counter']))
+		// It should just have a division line and then likes, custom fields, signature (any or none may be present)
+		// or no line if there are no items
+		$has_top_border = ($message['likes_enabled'] && !empty($message['like_counter']))
+			|| (!empty($message['member']['signature']) && empty($options['show_no_signatures']) && $context['signature_enabled'])
+			|| (!empty($message['member']['custom_fields']) && empty($options['show_no_signatures']) && $context['signature_enabled']);
+
+		echo '
+					<div class="signature' . (!$has_top_border ? ' without_top_border' : '') . '">';
+
+		if ($message['likes_enabled'])
 		{
 			echo '
-					<div class="signature">
-						<div class="likes_above_signature">
-							<i class="icon icon-small i-thumbup"></i>
-							 ', implode(', ', $context['likes'][$message['id']]['member']), '
+						<div id="likes_for_' . $message['id'] . '" class="likes_above_signature' . (empty($message['like_counter']) ? ' hide' : '') . '">';
+
+			if (!empty($message['like_counter']))
+			{
+				echo '
+							<i class="icon icon-small i-thumbup"></i>',
+							 $txt['liked_by'], ' ', implode(', ', $context['likes'][$message['id']]['member']);
+			}
+
+			echo '
 						</div>';
-		}
-		elseif ((empty($message['member']['signature']) || !empty($options['show_no_signatures']) || !$context['signature_enabled'])
-			&& (empty($message['member']['custom_fields'])))
-		{
-			echo '
-					<div>';
-		}
-		else
-		{
-			echo '
-					<div class="signature">';
 		}
 
 		// Are there any custom profile fields for above the signature?
-		// Show them if signatures are enabled and you want to see them.
+		// Show them if signatures are enabled, and you want to see them.
 		if (!empty($message['member']['custom_fields']) && empty($options['show_no_signatures']) && $context['signature_enabled'])
 		{
 			$shown = false;
