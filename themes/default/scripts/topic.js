@@ -463,7 +463,11 @@ QuickModify.prototype.onMessageReceived = function (XMLDoc)
 	// If this is not valid then simply give up.
 	if (!document.getElementById(this.sCurMessageId))
 	{
-		console.log('no id');
+		if ('console' in window)
+		{
+			window.console.info('no id');
+		}
+
 		return this.modifyCancel();
 	}
 
