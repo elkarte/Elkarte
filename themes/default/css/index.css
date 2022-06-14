@@ -1409,6 +1409,8 @@ a.bbc_link {
 	align-items: center;
 	justify-content: flex-start;
 	padding: .4em 0;
+	row-gap: 5px;
+	flex-wrap: wrap;
 }
 
 /* When using the above adm_submenus / generic_menu tabs, this is the content div
@@ -5842,7 +5844,7 @@ div.labels {
 	}
 
 	#unread.topic_listing > li {
-		grid-template-columns: [topic_icon] 50px [topic_info] auto [topic_latest] 350px [topic_moderation] 25px;
+		grid-template-columns: [topic_icon] 50px [topic_info] auto [topic_latest] 40% [topic_moderation] minmax(25px, 35px);
 	}
 
 	.topic_name h4 .new_posts, .new_posts, .require_approval {
@@ -5886,6 +5888,10 @@ div.labels {
 		max-height: 4em;
 	}
 
+	.breadcrumb > .crumb {
+		padding: 0 0.5em 0 2.5em;
+	}
+
 	/* menu to icons */
 	#main_menu .icon-menu {
 		display: inline-block;
@@ -5893,7 +5899,7 @@ div.labels {
 		height: 45px;
 		margin: .05em;
 		padding: .35em;
-		border: 4px solid;
+		border: 2px solid;
 		border-radius: .25em;
 	}
 
@@ -5950,7 +5956,7 @@ div.labels {
 
 	/* board listing */
 	.category_boards .board_row {
-		grid-template-columns: [bicon] 40px [info] auto [latest] 55% [end];
+		grid-template-columns: [bicon] 40px [info] auto [latest] 45% [end];
 	}
 
 	.board_avatar {
@@ -5968,6 +5974,13 @@ div.labels {
 
 	.board_info .moderators, .childboards {
 		margin: 0 0 0 4px;
+	}
+
+	/* allow for a 2 line post subject */
+	.board_row .lastpost_link {
+		white-space: pre-wrap;
+		max-height: 3.1em;
+		height: 2em;
 	}
 
 	/* message listing */
@@ -6005,7 +6018,15 @@ div.labels {
 		flex-wrap: wrap;
 	}
 
+	.smalltext.modified {
+		max-width: 45%;
+	}
+
 	#forumposts .views_text {
+		display: none;
+	}
+
+	#display_jump_to {
 		display: none;
 	}
 
@@ -6035,8 +6056,9 @@ div.labels {
 
 	/* our stats page */
 	.stats {
-		width: 100%;
+		min-width: 100%;
 		margin: 0;
+		float: none;
 	}
 
 	.stats dt {
@@ -6044,8 +6066,11 @@ div.labels {
 	}
 
 	.statistics .category_header {
-		width: 100%;
+		min-width: 100%;
+		margin: 0;
 	}
+
+
 
 	/* member list, turn off most columns */
 	.mlist li div:nth-child(n+6), .mlist li .website {
@@ -6262,13 +6287,14 @@ div.labels {
 
 	/* Button / pages / Navigation adjustments */
 	nav.breadcrumb .crumb:not(:first-child):not(:last-child) a {
-		width: 6em;
 		white-space: nowrap;
 		text-overflow: ellipsis;
 	}
 
 	.buttonlist {
 		justify-content: space-evenly;
+		flex-wrap: wrap;
+		row-gap: 5px;
 	}
 
 	.buttonlist > li {
@@ -6361,7 +6387,7 @@ div.labels {
 	.topic_listing > li {
 		grid-template-columns: [topic_icon] 0 [topic_info] auto [topic_latest] 225px [topic_moderation] 10px [end];
 		grid-template-rows: [topic_info] auto [topic_latest] auto;
-		margin-bottom: .7em;
+		margin-bottom: .5em;
 		border: 1px solid;
 	}
 
@@ -6729,7 +6755,7 @@ div.labels {
 	}
 
 	.quickbuttons {
-		margin: .4em 0;
+		margin: .4em 0 .4em auto;
 	}
 
 	/* Board Listing */

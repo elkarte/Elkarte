@@ -1017,6 +1017,10 @@ sup.bbc_footnotes, sup.bbc_footnotes a {
 	background: var(--primary_content_background);
 }
 
+.board_row {
+	margin-bottom: .5em;
+}
+
 .board_name > a {
 	color: var(--title);
 }
@@ -1995,7 +1999,7 @@ ul.cf_icons {
 
 	/* This provides a bottom border, seen when crumbs wrap */
 	.breadcrumb .crumb:not(:last-child) {
-		box-shadow: 0 -1px 0 1px var(--box_shadow), 0 0 0 1px var(--body_text);
+		box-shadow: 0 -1px 0 1px var(--hover_text), 0 0 0 1px var(--hover_text);
 	}
 }
 

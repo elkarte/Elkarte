@@ -196,7 +196,9 @@ function template_ic_recent_posts()
 	echo '
 			<li class="basic_row" id="recent_posts_content">
 				<h3 class="ic_section_header">
-					<a href="', getUrl('action', ['action' => 'recent']), '"><i class="icon i-post-text"></i>', $txt['recent_posts'], '</a>
+					<a href="', getUrl('action', ['action' => 'recent']), '">
+						<i class="icon i-post-text"></i>', $txt['recent_posts'], '
+					</a>
 				</h3>';
 
 	// Only show one post.
@@ -314,7 +316,10 @@ function template_ic_show_stats()
 	echo '
 			<li class="basic_row">
 				<h3 class="ic_section_header">
-					', $context['show_stats'] ? '<a href="' . getUrl('action', ['action' => 'stats']) . '" title="' . $txt['more_stats'] . '"><i class="icon i-pie-chart"></i>' . $txt['forum_stats'] . '</a>' : $txt['forum_stats'], '
+					', $context['show_stats'] ? '
+						<a href="' . getUrl('action', ['action' => 'stats']) . '" title="' . $txt['more_stats'] . '">
+							<i class="icon i-pie-chart"></i>' . $txt['forum_stats'] . '
+						</a>' : $txt['forum_stats'], '
 				</h3>
 				<p class="inline">
 					', $context['common_stats']['boardindex_total_posts'], '', !empty($settings['show_latest_member']) ? ' - ' . $txt['latest_member'] . ': <strong> ' . $context['common_stats']['latest_member']['link'] . '</strong>' : '', ' - ', $txt['most_online_today'], ': ', comma_format($modSettings['mostOnlineToday']), '<br />

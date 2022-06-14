@@ -200,7 +200,7 @@ $txt['last_post'] = 'Last post';
 $txt['first_post'] = 'First post';
 $txt['last_poster'] = 'Last post author';
 
-$txt['last_post_message'] = '<span class="lastpost_link">%2$s </span><span class="board_lastposter">by %1$s</span><span class="board_lasttime"><strong>Last post: </strong>%3$s</span>';
+$txt['last_post_message'] = '<p class="lastpost_link">%2$s </p><p class="board_lastposter">by %1$s</p><p class="board_lasttime"><strong>Last post: </strong>%3$s</p>';
 $txt['boardindex_total_posts'] = '%1$s Posts in %2$s Topics by %3$s Members';
 $txt['show'] = 'Show';
 $txt['hide'] = 'Hide';
