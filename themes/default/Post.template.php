@@ -13,14 +13,6 @@
  */
 
 /**
- * Load in the generic templates for use
- */
-function template_Post_init()
-{
-	theme()->getTemplates()->load('GenericHelpers');
-}
-
-/**
  * The area above the post box,
  * Typically holds subject, preview, info messages, message icons, etc
  */
@@ -722,16 +714,14 @@ function template_topic_replies_below()
 			if ($context['can_quote'])
 			{
 				echo '
-						<nav>
-							<ul class="quickbuttons" id="buttons_', $post['id'], '">
-								<li class="listlevel1">
-									<a href="#postmodify" onclick="return insertQuoteFast(', $post['id'], ');" role="button" class="linklevel1 quote_button">', $txt['bbc_quote'], '</a>
-								</li>
-								<li class="listlevel1 hide">
-									<a href="javascript:void(0);" id="qq_', $post['id'], '" role="button" class="linklevel1 quick_quote_button">', $txt['quick_quote'], '</a>
-								</li>
-							</ul>
-						</nav>';
+						<ul class="quickbuttons" id="buttons_', $post['id'], '">
+							<li class="listlevel1 hide">
+								<a href="javascript:void(0);" id="button_strip_qq_', $post['id'], '" role="button" class="linklevel1 quick_quote_button">', $txt['quick_quote'], '</a>
+							</li>
+							<li class="listlevel1">
+								<a href="#postmodify" onclick="return insertQuoteFast(', $post['id'], ');" role="button" class="linklevel1 quote_button">', $txt['bbc_quote'], '</a>
+							</li>
+						</ul>';
 			}
 
 			echo '

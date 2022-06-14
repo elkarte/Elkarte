@@ -114,18 +114,17 @@ function template_generic_menu_dropdown_above()
 	$menu_context = &$context['menu_data_' . $context['cur_menu_id']];
 
 	echo '
-				<nav id="generic_nav_', $context['cur_menu_id'], '">
-					<ul class="admin_menu no_js" id="dropdown_menu_', $context['cur_menu_id'], '" role="menubar">';
+				<ul class="admin_menu no_js" id="dropdown_menu_', $context['cur_menu_id'], '" role="menubar">';
 
 	// Main areas first.
 	foreach ($menu_context['sections'] as $section)
 	{
 		echo '
-						<li class="listlevel1', !empty($section['areas']) ? ' subsections' : '', '" role="none">
-							<a class="linklevel1', !empty($section['selected']) ? ' active" aria-current="page"' : '"', ' href="', $section['url'], '" role="menuitem"', !empty($section['areas']) ? ' aria-haspopup="true"' : '', '>',
-								$section['label'], '
-							</a>
-							<ul class="menulevel2" role="menu">';
+					<li class="listlevel1', !empty($section['areas']) ? ' subsections' : '', '" role="none">
+						<a class="linklevel1', !empty($section['selected']) ? ' active" aria-current="page"' : '"', ' href="', $section['url'], '" role="menuitem"', !empty($section['areas']) ? ' aria-haspopup="true"' : '', '>',
+							$section['label'], '
+						</a>
+						<ul class="menulevel2" role="menu">';
 
 		// For every area of this section show a link to that area (bold if it's currently selected.)
 		$section['areas'] = $section['areas'] ?? [];
@@ -138,16 +137,16 @@ function template_generic_menu_dropdown_above()
 			}
 
 			echo '
-								<li class="listlevel2', !empty($area['subsections']) ? ' subsections' : '', '" role="none">
-									<a class="linklevel2', !empty($area['selected']) ? ' chosen' : '', '" href="', $area['url'], '"', !empty($area['subsections']) ? ' aria-haspopup="true"' : '', ' role="menuitem">',
-										$area['icon'], $area['label'], '
-									</a>';
+							<li class="listlevel2', !empty($area['subsections']) ? ' subsections' : '', '" role="none">
+								<a class="linklevel2', !empty($area['selected']) ? ' chosen' : '', '" href="', $area['url'], '"', !empty($area['subsections']) ? ' aria-haspopup="true"' : '', ' role="menuitem">',
+									$area['icon'], $area['label'], '
+								</a>';
 
 			// Are there any subsections?
 			if (!empty($area['subsections']))
 			{
 				echo '
-									<ul class="menulevel3" role="menu">';
+								<ul class="menulevel3" role="menu">';
 
 				foreach ($area['subsections'] as $sub)
 				{
@@ -157,29 +156,28 @@ function template_generic_menu_dropdown_above()
 					}
 
 					echo '
-										<li class="listlevel3" role="none">
-											<a class="linklevel3', !empty($sub['selected']) ? ' chosen ' : '', '" href="', $sub['url'], '" role="menuitem">',
-												$sub['label'], '
-											</a>
-										</li>';
+									<li class="listlevel3" role="none">
+										<a class="linklevel3', !empty($sub['selected']) ? ' chosen ' : '', '" href="', $sub['url'], '" role="menuitem">',
+											$sub['label'], '
+										</a>
+									</li>';
 				}
 
 				echo '
-									</ul>';
+								</ul>';
 			}
 
 			echo '
-								</li>';
+							</li>';
 		}
 
 		echo '
-							</ul>
-						</li>';
+						</ul>
+					</li>';
 	}
 
 	echo '
-					</ul>
-				</nav>';
+				</ul>';
 
 	// This is the main table - we need it so we can keep the content to the right of it.
 	echo '
