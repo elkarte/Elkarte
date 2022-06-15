@@ -138,7 +138,7 @@
 	--hr_background: #E4E4E4;
 
 	/* Misc */
-	--title: #9D8860;; /* forum title, news, board names */
+	--title: #9D8860; /* forum title, news, board names */
 	--topic_name: #3B72F0; /* Subject line, poster name and keyinfo */
 	--links: #9D8860; /*#5784FF; /* normal links */
 	--bbclinks: #9D8860; /* bbc links */
@@ -226,7 +226,7 @@
 
 /* Normal, standard links. */
 a, a:link, a:visited,
-	/* Links that open in a new window. */
+/* Links that open in a new window. */
 a.new_win:link, a.new_win:visited {
 	color: var(--links);
 }
@@ -284,8 +284,8 @@ input[disabled].input_text, input[disabled].input_password {
 
 /* Common button styling. */
 input[type="submit"], .drop_area_fileselect_text, button[type="submit"], input[type="button"], button[type="button"],
-	/* Anchors styled to look like buttons.
-	   These have standard body text size. Can be chained with smalltext class. */
+/* Anchors styled to look like buttons.
+   These have standard body text size. Can be chained with smalltext class. */
 .linkbutton:link, .linkbutton:visited {
 	color: var(--input_text);
 	border-color: var(--input_submit_border);
@@ -475,7 +475,7 @@ strong {
 
 /* A quote, perhaps from another post. */
 .bbc_quote,
-	/* A code block - maybe PHP ;) - shared styles. */
+/* A code block - maybe PHP ;) - shared styles. */
 .bbc_code {
 	border-color: var(--primary_border);
 	background: var(--primary_content_background);

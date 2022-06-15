@@ -580,9 +580,9 @@ em, .em {
 	display: inline-block;
 	width: 24px;
 	height: 24px;
+	margin: 0 .25em 0 0;
 	content: "";
 	vertical-align: text-bottom;
-	margin: 0 .25em 0 0;
 }
 
 /* Expand/Collapse image in the various headers */
@@ -953,10 +953,10 @@ a.bbc_link {
 	left: 0;
 	width: 100%;
 	padding: 1em;
-	text-align: center;
-	border-bottom: 4px solid;
-	opacity: 0;
 	transition: opacity .5s;
+	text-align: center;
+	opacity: 0;
+	border-bottom: 4px solid;
 }
 
 /* Spinner and close button */
@@ -1306,10 +1306,10 @@ a.bbc_link {
 .generic_menu {
 	display: flex;
 	align-items: center;
+	flex-wrap: wrap;
 	justify-content: flex-start;
 	padding: .4em 0;
 	row-gap: 5px;
-	flex-wrap: wrap;
 }
 
 /* When using the above adm_submenus / generic_menu tabs, this is the content div
@@ -1452,9 +1452,9 @@ a.bbc_link {
 	transition: 350ms all 125ms ease-in;
 	transform: rotate(-45deg);
 	/* Clips the bottom of the rotated square so it does not bleed into dropdown content */
-	clip-path: polygon(25% 75%, 0% 0%, 100% 0%, 100% 100%);
 	opacity: 0;
 	border: 1px solid;
+	clip-path: polygon(25% 75%, 0% 0%, 100% 0%, 100% 100%);
 	/* Simple variable to change if you want to change the size */
 	--pointersize: 12px;
 }
@@ -3648,8 +3648,8 @@ ul.post_options li {
 }
 
 #topic_summary .quickbuttons {
-	padding: 0;
 	margin: 0 0 0 auto;
+	padding: 0;
 }
 
 #topic_summary .keyinfo nav {
@@ -4986,9 +4986,6 @@ div.labels {
 .search_results_posts .quickbuttons {
 	grid-column-start: span 2;
 	grid-row-start: 3;
-}
-
-.search_results_posts .quickbuttons {
 	margin: 0 1.5em;
 }
 
@@ -5881,9 +5878,9 @@ div.labels {
 
 	/* allow for a 2 line post subject */
 	.board_row .lastpost_link {
-		white-space: pre-wrap;
-		max-height: 3.1em;
 		height: 2em;
+		max-height: 3.1em;
+		white-space: pre-wrap;
 	}
 
 	/* message listing */
@@ -5959,9 +5956,9 @@ div.labels {
 
 	/* our stats page */
 	.stats {
+		float: none;
 		min-width: 100%;
 		margin: 0;
-		float: none;
 	}
 
 	.stats dt {
@@ -6195,8 +6192,8 @@ div.labels {
 	}
 
 	.buttonlist {
-		justify-content: space-evenly;
 		flex-wrap: wrap;
+		justify-content: space-evenly;
 		row-gap: 5px;
 	}
 
@@ -6651,14 +6648,11 @@ div.labels {
 
 	.quickbuttons {
 		justify-content: space-evenly;
+		margin: .4em 0 .4em auto;
 	}
 
 	.quickbuttons .modified {
 		white-space: normal;
-	}
-
-	.quickbuttons {
-		margin: .4em 0 .4em auto;
 	}
 
 	/* Board Listing */
