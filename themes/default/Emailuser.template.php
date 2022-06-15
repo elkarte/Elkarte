@@ -67,7 +67,7 @@ function template_send_topic()
 	echo '
 	<div id="send_topic">
 		<form action="', $scripturl, '?action=emailuser;sa=sendtopic;topic=', $context['current_topic'], '.', $context['start'], '" method="post" accept-charset="UTF-8">
-			<h2 class="category_header hdicon cat_img_mail">
+			<h2 class="category_header hdicon i-envelope">
 				', $context['page_title'], '
 			</h2>
 			<div class="content">
@@ -130,7 +130,7 @@ function template_custom_email()
 	echo '
 	<div id="send_topic">
 		<form action="', $scripturl, '?action=emailuser;sa=email" method="post" accept-charset="UTF-8">
-			<h2 class="category_header hdicon cat_img_mail">
+			<h2 class="category_header hdicon i-envelope">
 				', $context['page_title'], '
 			</h2>
 			<div class="content">

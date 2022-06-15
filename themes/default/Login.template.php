@@ -22,7 +22,7 @@ function template_login()
 	echo '
 		<form action="', $scripturl, '?action=login2" name="frmLogin" id="frmLogin" method="post" accept-charset="UTF-8" ', empty($context['disable_login_hashing']) ? ' onsubmit="hashLoginPassword(this, \'' . $context['session_id'] . '\');"' : '', '>
 			<div class="login">
-				<h2 class="category_header hdicon cat_img_login centertext">
+				<h2 class="category_header hdicon i-menu-login centertext">
 					', $txt['login'], '
 				</h2>
 				<div class="well">';
@@ -139,7 +139,7 @@ function template_kick_guest()
 	// And now the login information.
 	echo '
 			</p>
-			<h2 class="category_header hdicon cat_img_login centertext">
+			<h2 class="category_header hdicon i-menu-login centertext">
 				', $txt['login'], '
 			</h2>
 			<div class="well">
@@ -239,7 +239,7 @@ function template_admin_login()
 	echo '
 <form action="', $scripturl, $context['get_data'], '" method="post" accept-charset="UTF-8" name="frmLogin" id="frmLogin" onsubmit="hash', ucfirst($context['sessionCheckType']), 'Password(this, \'', $context['user']['username'], '\', \'', $context['session_id'], '\', \'' . (!empty($context['login_token']) ? $context['login_token'] : '') . '\');">
 	<div class="login" id="admin_login">
-		<h2 class="category_header hdicon cat_img_login">
+		<h2 class="category_header hdicon i-menu-login">
 			', $txt['login'], '
 		</h2>
 		<div class="well">';

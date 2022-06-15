@@ -178,7 +178,7 @@ function template_action_showPermissions()
 	global $context, $scripturl, $txt;
 
 	echo '
-		<h2 class="category_header hdicon cat_img_profile">
+		<h2 class="category_header hdicon i-user">
 			', $txt['showPermissions'], '
 		</h2>';
 
@@ -384,7 +384,7 @@ function template_action_statPanel()
 	echo '
 		<div class="separator"></div>
 		<div id="activitytime" class="flow_hidden">
-			<h2 class="category_header hdicon cat_img_clock">
+			<h2 class="category_header hdicon i-calendar">
 				', $txt['statPanel_activityTime'], '
 			</h2>
 			<div class="content content_noframe">';
@@ -418,7 +418,7 @@ function template_action_statPanel()
 	echo '
 		<div class="flow_hidden">
 			<div id="popularposts">
-				<h2 class="category_header hdicon cat_img_write">
+				<h2 class="category_header hdicon i-pencil">
 					', $txt['statPanel_topBoards'], '
 				</h2>
 				<div class="content content_noframe">';
@@ -453,7 +453,7 @@ function template_action_statPanel()
 				</div>
 			</div>
 			<div id="popularactivity">
-				<h2 class="category_header hdicon cat_img_piechart">
+				<h2 class="category_header hdicon i-pie-chart">
 					', $txt['statPanel_topBoardsActivity'], '
 				</h2>
 				<div class="content content_noframe">';
@@ -519,7 +519,7 @@ function template_viewWarning()
 	template_load_warning_variables();
 
 	echo '
-		<h2 class="category_header hdicon cat_img_profile">
+		<h2 class="category_header hdicon i-user">
 			', sprintf($txt['profile_viewwarning_for_user'], $context['member']['name']), '
 		</h2>
 		<p class="description">', $txt['viewWarning_help'], '</p>
@@ -571,7 +571,7 @@ function template_profile_block_summary()
 
 	echo '
 			<div class="profileblock_left">
-				<h2 class="category_header hdicon cat_img_profile">
+				<h2 class="category_header hdicon i-user">
 					', ($context['user']['is_owner']) ? '<a href="' . getUrl('profile', ['action' => 'profile', 'area' => 'forumprofile', 'u' => $context['member']['id'], 'name' => $context['member']['name']]) . '">' . $txt['profile_user_summary'] . '</a>' : $txt['profile_user_summary'], '
 				</h2>
 				<div id="basicinfo">
@@ -673,7 +673,7 @@ function template_profile_block_user_info()
 
 	echo '
 		<div class="profileblock_right">
-			<h2 class="category_header hdicon cat_img_stats_info">
+			<h2 class="category_header hdicon i-pie-chart">
 				', ($context['user']['is_owner']) ? '<a href="' . getUrl('profile', ['action' => 'profile', 'area' => 'forumprofile', 'u' => $context['member']['id'], 'name' => $context['member']['name']]) . '">' . $txt['profile_user_info'] . '</a>' : $txt['profile_user_info'], '
 			</h2>
 			<div class="profileblock">
@@ -755,7 +755,7 @@ function template_profile_block_contact()
 
 	echo '
 		<div class="profileblock_left">
-			<h2 class="category_header hdicon cat_img_contacts">
+			<h2 class="category_header hdicon i-contact">
 				', $txt['profile_contact'], '
 			</h2>
 			<div class="profileblock">
@@ -868,7 +868,7 @@ function template_profile_block_other_info()
 
 	echo '
 		<div class="profileblock_right">
-			<h2 class="category_header hdicon cat_img_write">
+			<h2 class="category_header hdicon i-pencil">
 				', ($context['user']['is_owner']) ? '<a href="' . getUrl('profile', ['action' => 'profile', 'area' => 'forumprofile', 'u' => $context['member']['id'], 'name' => $context['member']['name']]) . '">' . $txt['profile_more'] . '</a>' : $txt['profile_more'], '
 			</h2>
 			<div class="profileblock profileblock_signature">';
@@ -941,7 +941,7 @@ function template_profile_block_user_customprofileinfo()
 
 	echo '
 		<div class="profileblock_left">
-			<h2 class="category_header hdicon cat_img_plus">
+			<h2 class="category_header hdicon i-user-plus">
 				', ($context['user']['is_owner']) ? '<a href="' . getUrl('profile', ['action' => 'profile', 'area' => 'forumprofile', 'u' => $context['member']['id'], 'name' => $context['member']['name']]) . '">' . $txt['profile_info'] . '</a>' : $txt['profile_info'], '
 			</h2>
 			<div class="profileblock">';
@@ -1000,7 +1000,7 @@ function template_profile_block_moderation()
 	{
 		echo '
 		<div class="profileblock_right">
-			<h2 class="category_header hdicon cat_img_moderation">
+			<h2 class="category_header hdicon i-warning">
 				', $txt['profile_moderation'], '
 			</h2>
 			<div class="profileblock">';
@@ -1092,7 +1092,7 @@ function template_profile_block_buddies()
 	if (!empty($modSettings['enable_buddylist']) && $context['user']['is_owner'])
 	{
 		echo '
-		<h2 class="category_header hdicon cat_img_buddies">
+		<h2 class="category_header hdicon i-users">
 			<a href="', $scripturl, '?action=profile;area=lists;sa=buddies;u=', $context['member']['id'], '">', $txt['buddies'], '</a>
 		</h2>
 		<div class="flow_auto" ', (isset($div_height) ? 'style="max-height: ' . $div_height . 'px;"' : ''), '>
@@ -1191,7 +1191,7 @@ function template_profile_block_attachments()
 
 	// The attachment div
 	echo '
-	<h2 class="category_header hdicon cat_img_attachments">
+	<h2 class="category_header hdicon i-clip">
 		<a href="', getUrl('profile', ['action' => 'profile', 'area' => 'showposts', 'sa' => 'attach', 'u' => $context['member']['id'], 'name' => $context['member']['name']]), '">', $txt['profile_attachments'], '</a>
 	</h2>
 	<div class="attachments">';
@@ -1237,7 +1237,7 @@ function template_profile_block_posts()
 
 	// The posts block
 	echo '
-	<h2 class="category_header hdicon cat_img_posts">
+	<h2 class="category_header hdicon i-post-text">
 		<a href="', getUrl('profile', ['action' => 'profile', 'area' => 'showposts', 'sa' => 'messages', 'u' => $context['member']['id'], 'name' => $context['member']['name']]), '">', $txt['profile_recent_posts'], '</a>
 	</h2>
 	<div class="flow_auto">
@@ -1290,7 +1290,7 @@ function template_profile_block_topics()
 
 	// The topics block
 	echo '
-	<h2 class="category_header hdicon cat_img_topics">
+	<h2 class="category_header hdicon i-directory">
 		<a href="', getUrl('profile', ['action' => 'profile', 'area' => 'showposts', 'sa' => 'topics', 'u' => $context['member']['id'], 'name' => $context['member']['name']]), '">', $txt['profile_topics'], '</a>
 	</h2>
 	<div class="flow_auto">

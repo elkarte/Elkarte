@@ -704,7 +704,7 @@ function template_search_results()
 
 	echo '
 		<div class="search_results_posts', empty($context['search_params']['show_complete']) ? ' compact_view' : '', '">
-			<h2 class="category_header hdicon cat_img_search">
+			<h2 class="category_header hdicon i-search">
 				', $txt['mlist_search_results'], ':&nbsp;', $context['search_params']['search'], '
 			</h2>';
 
@@ -866,7 +866,7 @@ function template_send()
 	// Main message editing box.
 	echo '
 	<form id="pmFolder" action="', $scripturl, '?action=pm;sa=send2" method="post" accept-charset="UTF-8" name="pmFolder" onsubmit="submitonce(this);smc_saveEntities(\'pmFolder\', [\'subject\', \'message\']);">
-		<h2 class="category_header hdicon cat_img_write">
+		<h2 class="category_header hdicon i-pencil">
 			', $txt['new_message'], '
 		</h2>';
 
@@ -1289,7 +1289,7 @@ function template_report_message_complete()
 	global $context, $txt, $scripturl;
 
 	echo '
-		<h2 class="category_header hdicon cat_img_moderation">', $txt['pm_report_title'], '</h2>
+		<h2 class="category_header hdicon i-warning">', $txt['pm_report_title'], '</h2>
 		<div class="well">
 			<div class="content">
 				<p>', $txt['pm_report_done'], '</p>
@@ -1567,7 +1567,7 @@ function template_showPMDrafts()
 	global $context, $txt;
 
 	echo '
-		<h2 class="category_header hdicon cat_img_talk">
+		<h2 class="category_header hdicon i-comments">
 			', $txt['drafts_show'], '
 		</h2>';
 	template_pagesection();
@@ -1602,7 +1602,7 @@ function template_showPMDrafts()
 				', $draft['body'], '
 			</div>';
 
-		template_button_strip($draft['buttons'], 'quickbuttons', ['no-class' => true]);
+		template_button_strip($draft['buttons'], 'quickbuttons no_js', ['no-class' => true]);
 
 		echo '	
 		</div>';

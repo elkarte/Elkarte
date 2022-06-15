@@ -331,7 +331,7 @@ function template_view_package()
 	elseif ($context['ftp_needed'])
 	{
 		echo '
-			<h2 class="category_header hdicon cat_img_moderation">', $txt['package_ftp_necessary'], '</h2>
+			<h2 class="category_header hdicon i-warning">', $txt['package_ftp_necessary'], '</h2>
 
 			<div>
 				', template_control_chmod(), '

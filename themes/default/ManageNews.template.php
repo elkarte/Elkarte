@@ -306,7 +306,7 @@ function template_email_members_send()
 	<div id="admincenter">
 		<form action="', $scripturl, '?action=admin;area=news;sa=mailingsend" method="post" accept-charset="UTF-8" name="autoSubmit" id="autoSubmit">
 			<h2 class="category_header">
-				<a class="hdicon cat_img_helptopics help" href="', $scripturl, '?action=quickhelp;help=email_members" onclick="return reqOverlayDiv(this.href);" title="', $txt['help'], '"></a> ', $txt['admin_newsletters'], '
+				<a class="hdicon i-help help" href="', $scripturl, '?action=quickhelp;help=email_members" onclick="return reqOverlayDiv(this.href);" title="', $txt['help'], '"></a> ', $txt['admin_newsletters'], '
 			</h2>
 			<div class="content">
 				<div class="progress_bar">
@@ -352,7 +352,7 @@ function template_email_members_succeeded()
 	echo '
 	<div id="admincenter">
 		<h2 class="category_header">
-			<a class="hdicon cat_img_helptopics help" href="', $scripturl, '?action=quickhelp;help=email_members" onclick="return reqOverlayDiv(this.href);" title="', $txt['help'], '"></a> ', $txt['admin_newsletters'], '
+			<a class="hdicon i-help help" href="', $scripturl, '?action=quickhelp;help=email_members" onclick="return reqOverlayDiv(this.href);" title="', $txt['help'], '"></a> ', $txt['admin_newsletters'], '
 		</h2>
 		<div class="content">
 			<div class="successbox">

@@ -20,7 +20,7 @@ function template_notification_settings()
 	global $context, $txt, $scripturl;
 
 	echo '
-		<h2 class="category_header hdicon cat_img_mail">
+		<h2 class="category_header hdicon i-envelope">
 			', $txt['notify'], '
 		</h2>
 		<div class="well centertext">
@@ -39,7 +39,7 @@ function template_notify_board()
 	global $context, $txt, $scripturl;
 
 	echo '
-		<h2 class="category_header hdicon cat_img_mail">
+		<h2 class="category_header hdicon i-envelope">
 			', $txt['notify'], '
 		</h2>
 		<div class="well centertext">
@@ -58,7 +58,7 @@ function template_notify_unsubscribe()
 	global $context, $txt;
 
 	echo '
-		<h2 class="category_header hdicon cat_img_mail">
+		<h2 class="category_header hdicon i-envelope">
 			', $txt['unnotify'], '
 		</h2>
 		<div class="well centertext">

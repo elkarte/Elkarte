@@ -64,7 +64,7 @@ function template_general_statistics()
 
 	echo '
 			<li class="flow_hidden" id="top_row">
-				<h2 class="category_header hdicon cat_img_stats_info">
+				<h2 class="category_header hdicon i-pie-chart">
 					', $txt['general_stats'], '
 				</h2>
 				<dl class="stats floatleft">';
@@ -129,7 +129,7 @@ function template_top_statistics()
 	[$data, $labels, $tooltips] = getChartData($context['top']['posters'], 'num_posts');
 	echo '
 			<li class="flow_hidden">
-				<h2 class="category_header floatleft hdicon cat_img_star">
+				<h2 class="category_header floatleft hdicon i-user-plus">
 					', $txt['top_posters'], '
 				</h2>
 				<div class="stats floatleft">
@@ -141,7 +141,7 @@ function template_top_statistics()
 	// Top Boards
 	[$data, $labels, $tooltips] = getChartData($context['top']['boards'], 'num_posts');
 	echo '
-				<h2 class="category_header hdicon cat_img_topics">
+				<h2 class="category_header hdicon i-directory">
 					', $txt['top_boards'], '
 				</h2>
 				<div class="stats">
@@ -155,7 +155,7 @@ function template_top_statistics()
 	[$data, $labels, $tooltips] = getChartData($context['top']['topics_replies'], 'num_replies');
 	echo '
 			<li class="flow_hidden">
-				<h2 class="category_header floatleft hdicon cat_img_talk">
+				<h2 class="category_header floatleft hdicon i-comments">
 					', $txt['top_topics_replies'], '
 				</h2>
 				<div class="stats floatleft">
@@ -167,7 +167,7 @@ function template_top_statistics()
 	// Top Views
 	[$data, $labels, $tooltips] = getChartData($context['top']['topics_views'], 'num_views');
 	echo '
-				<h2 class="category_header hdicon cat_img_eye">
+				<h2 class="category_header hdicon i-view">
 					', $txt['top_topics_views'], '
 				</h2>
 				<div class="stats">
@@ -182,7 +182,7 @@ function template_top_statistics()
 
 	echo '
 			<li class="flow_hidden">
-				<h2 class="category_header floatleft hdicon cat_img_write">
+				<h2 class="category_header floatleft hdicon i-pencil">
 					', $txt['top_starters'], '
 				</h2>
 				<div class="stats floatleft">
@@ -194,7 +194,7 @@ function template_top_statistics()
 	// Top Time Online
 	[$data, $labels, $tooltips] = getChartData($context['top']['time_online'], 'time_online', true);
 	echo '
-				<h2 class="category_header hdicon cat_img_clock">
+				<h2 class="category_header hdicon i-calendar">
 					', $txt['most_time_online'], '
 				</h2>
 				<div class="stats">
@@ -215,7 +215,7 @@ function template_forum_chart()
 	// Type of stat views available above the chart
 	echo '
 	<div id="forum_history" class="forum_category">
-		<h2 class="category_header hdicon cat_img_piechart">
+		<h2 class="category_header hdicon i-pie-chart">
 			', $txt['yearly_summary'], '
 		</h2>
 		<div class="flow_hidden">
@@ -271,7 +271,7 @@ function template_forum_history()
 	// Onto the standard tabulated data
 	echo '
 	<div id="forum_history" class="forum_category">
-		<h2 class="category_header hdicon cat_img_clock">
+		<h2 class="category_header hdicon i-calendar">
 			', $txt['forum_history'], '
 		</h2>
 		<div class="flow_hidden">';

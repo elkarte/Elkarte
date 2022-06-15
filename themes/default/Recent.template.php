@@ -31,7 +31,7 @@ function template_recent()
 
 	echo '
 		<main id="recentposts">
-			<header class="category_header hdicon cat_img_posts">', $txt['recent_posts'], '</header>';
+			<header class="category_header hdicon i-post-text">', $txt['recent_posts'], '</header>';
 
 	foreach ($context['posts'] as $post)
 	{
