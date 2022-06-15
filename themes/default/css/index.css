@@ -575,115 +575,14 @@ em, .em {
 	border: 1px solid;
 }
 
-/* Category Header icons as sprites, many available to custom themes */
+/* Category Header icons, chain i-xyz from icons_svg */
 .hdicon::before {
 	display: inline-block;
-	width: 30px;
+	width: 24px;
 	height: 24px;
 	content: "";
 	vertical-align: text-bottom;
-	background-image: url(../images/icons/header.png);
-	background-repeat: no-repeat;
-}
-
-.cat_img_attachments::before {
-	background-position: 0 0;
-}
-
-.cat_img_buddies::before {
-	background-position: 0 -24px;
-}
-
-.cat_img_config::before {
-	background-position: 0 -48px;
-}
-
-.cat_img_contacts::before {
-	background-position: 0 -72px;
-}
-
-.cat_img_helptopics::before {
-	background-position: 0 -96px;
-}
-
-.cat_img_inbox::before {
-	background-position: 0 -120px;
-}
-
-.cat_img_login::before {
-	background-position: 0 -144px;
-}
-
-.cat_img_mail::before {
-	background-position: 0 -168px;
-}
-
-.cat_img_moderation::before {
-	background-position: 0 -192px;
-}
-
-.cat_img_plus::before {
-	background-position: 0 -216px;
-}
-
-.cat_img_posts::before {
-	background-position: 0 -240px;
-}
-
-.cat_img_profile::before {
-	background-position: 0 -264px;
-}
-
-.cat_img_search::before {
-	background-position: 0 -288px;
-}
-
-.cat_img_stats_info::before {
-	background-position: 0 -312px;
-}
-
-.cat_img_topics::before {
-	background-position: 0 -336px;
-}
-
-.cat_img_write::before {
-	background-position: 0 -360px;
-}
-
-.cat_img_database::before {
-	background-position: 0 -384px;
-}
-
-.cat_img_address::before {
-	background-position: 0 -408px;
-}
-
-.cat_img_calendar::before {
-	background-position: 0 -432px;
-}
-
-.cat_img_minus::before {
-	background-position: 0 -456px;
-}
-
-.cat_img_star::before {
-	background-position: 0 -480px;
-}
-
-.cat_img_clock::before {
-	background-position: 0 -504px;
-}
-
-.cat_img_eye::before {
-	background-position: 0 -528px;
-}
-
-.cat_img_piechart::before {
-	background-position: 0 -552px;
-}
-
-.cat_img_talk::before {
-	background-position: 0 -576px;
+	margin: 0 .25em 0 0;
 }
 
 /* Expand/Collapse image in the various headers */
@@ -4929,15 +4828,11 @@ div.labels {
 .help .icon, .hdicon.help {
 	margin: 0;
 	cursor: help;
-	opacity: 0.8;
+	opacity: 0.7;
 }
 
 .hdicon.help {
 	vertical-align: top;
-}
-
-.hdicon.help::before {
-	margin: .13em 0 0;
 }
 
 .help .icon:hover, .hdicon.help:hover {
