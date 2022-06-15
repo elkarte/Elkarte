@@ -76,17 +76,17 @@ class DisplayRenderer extends Renderer
 
 		$output = parent::_buildOutputArray();
 		$href = getUrl('topic', ['topic' => $topic, 'start' => 'msg' . $this->_this_message['id_msg'], 'subject' => $this->_this_message['subject']]) . '#msg' . $this->_this_message['id_msg'];
-		$output += array(
+		$output += [
 			'href' => $href,
 			'link' => '<a href="' . $href . '" rel="nofollow">' . $this->_this_message['subject'] . '</a>',
 			'icon' => $this->_options->icon_sources->getIconName($this->_this_message['icon']),
 			'icon_url' => $this->_options->icon_sources->getIconURL($this->_this_message['icon']),
-			'modified' => array(
+			'modified' => [
 				'time' => standardTime($this->_this_message['modified_time']),
 				'html_time' => htmlTime($this->_this_message['modified_time']),
 				'timestamp' => forum_time(true, $this->_this_message['modified_time']),
 				'name' => $this->_this_message['modified_name']
-			),
+			],
 			'new' => empty($this->_this_message['is_read']),
 			'approved' => $this->_this_message['approved'],
 			'first_new' => isset($context['start_from']) && $context['start_from'] == $this->_counter,
@@ -100,8 +100,8 @@ class DisplayRenderer extends Renderer
 			'can_unlike' => $this->_this_message['use_likes'] && $this->_this_message['you_liked'],
 			'like_counter' => $this->_this_message['like_count'],
 			'likes_enabled' => !empty($modSettings['likes_enabled']) && ($this->_this_message['use_likes'] || ($this->_this_message['like_count'] != 0)),
-			'classes' => array(),
-		);
+			'classes' => [],
+		];
 
 		if (!empty($output['modified']['name']))
 		{
