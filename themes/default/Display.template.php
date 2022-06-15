@@ -47,7 +47,7 @@ function template_messages_informations_above()
 	echo '
 		<main id="forumposts">
 			<header class="category_header">
-				<img src="', $settings['images_url'], '/topic/', $context['class'], '.png" alt="" />
+				<i class="hdicon ', $context['class'], '"></i>
 				', $txt['topic'], ': ', $context['subject'], '&nbsp;<span class="views_text">(', $context['num_views_text'], ')</span>
 				<span class="nextlinks">',
 					!empty($context['links']['go_prev']) ? '<a href="' . $context['links']['go_prev'] . '">' . $txt['previous_next_back'] . '</a>' : '',
@@ -244,7 +244,7 @@ function template_messages()
 		template_button_strip($message['postbuttons'], 'quickbuttons no_js', ['no-class' => true, 'id' => 'buttons_' . $message['id']]);
 
 		echo '
-						
+
 							</div>';
 
 		// Start of grid-row: signature seen as "<footer> .signature" in css
