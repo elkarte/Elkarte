@@ -217,6 +217,11 @@ function template_messages()
 						</section>
 						<footer>';
 
+		// This is the floating Quick Quote button.
+		echo '
+							<button id="button_float_qq_', $message['id'], '" type="submit" role="button" class="quick_quote_button hide">', $txt['quick_quote'], '</button>';
+
+
 		// Assuming there are attachments...
 		if (!empty($message['attachment']))
 		{
@@ -224,15 +229,15 @@ function template_messages()
 		}
 
 		echo '
-					<div class="generic_menu">';
+							<div class="generic_menu">';
 
 		// Show "Last Edit: Time by Person" if this post was edited.
 		if ($settings['show_modify'])
 		{
 			echo '
-						<span id="modified_', $message['id'], '" class="smalltext modified', !empty($message['modified']['name']) ? '"' : ' hide"', '>
-							', !empty($message['modified']['name']) ? $message['modified']['last_edit_text'] : '', '
-						</span>';
+								<span id="modified_', $message['id'], '" class="smalltext modified', !empty($message['modified']['name']) ? '"' : ' hide"', '>
+									', !empty($message['modified']['name']) ? $message['modified']['last_edit_text'] : '', '
+								</span>';
 		}
 
 		// Show the quickbuttons, for various operations on posts.
@@ -240,7 +245,7 @@ function template_messages()
 
 		echo '
 						
-					</div>';
+							</div>';
 
 		// Start of grid-row: signature seen as "<footer> .signature" in css
 		// This could use some cleanup, but the idea is to prevent multiple borders in this grid area
@@ -251,22 +256,22 @@ function template_messages()
 			|| (!empty($message['member']['custom_fields']) && empty($options['show_no_signatures']) && $context['signature_enabled']);
 
 		echo '
-					<div class="signature' . (!$has_top_border ? ' without_top_border' : '') . '">';
+							<div class="signature' . (!$has_top_border ? ' without_top_border' : '') . '">';
 
 		if ($message['likes_enabled'])
 		{
 			echo '
-						<div id="likes_for_' . $message['id'] . '" class="likes_above_signature' . (empty($message['like_counter']) ? ' hide' : '') . '">';
+								<div id="likes_for_' . $message['id'] . '" class="likes_above_signature' . (empty($message['like_counter']) ? ' hide' : '') . '">';
 
 			if (!empty($message['like_counter']))
 			{
 				echo '
-							<i class="icon icon-small i-thumbup"></i>',
-							 $txt['liked_by'], ' ', implode(', ', $context['likes'][$message['id']]['member']);
+									<i class="icon icon-small i-thumbup"></i>',
+									 $txt['liked_by'], ' ', implode(', ', $context['likes'][$message['id']]['member']);
 			}
 
 			echo '
-						</div>';
+								</div>';
 		}
 
 		// Are there any custom profile fields for above the signature?
@@ -285,19 +290,19 @@ function template_messages()
 				{
 					$shown = true;
 					echo '
-							<div class="custom_fields_above_signature">
-								<ul>';
+								<div class="custom_fields_above_signature">
+									<ul>';
 				}
 
 				echo '
-									<li>', $custom['value'], '</li>';
+										<li>', $custom['value'], '</li>';
 			}
 
 			if ($shown)
 			{
 				echo '
-								</ul>
-							</div>';
+									</ul>
+								</div>';
 			}
 		}
 
@@ -305,7 +310,7 @@ function template_messages()
 		if (!empty($message['member']['signature']) && empty($options['show_no_signatures']) && $context['signature_enabled'])
 		{
 			echo '
-						<div id="msg_', $message['id'], '_signature" class="', $ignoring ? ' hide"' : '"', '>', $message['member']['signature'], '</div>';
+								<div id="msg_', $message['id'], '_signature" class="', $ignoring ? ' hide"' : '"', '>', $message['member']['signature'], '</div>';
 		}
 
 		echo '

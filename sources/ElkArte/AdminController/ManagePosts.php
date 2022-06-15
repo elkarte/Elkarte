@@ -314,7 +314,6 @@ class ManagePosts extends AbstractController
 			// Quote options...
 			['int', 'removeNestedQuotes', 'postinput' => $txt['zero_for_none']],
 			['int', 'heightBeforeShowMore', 'postinput' => $txt['zero_to_disable']],
-			['check', 'hideQuickQuoteButton'],
 			'',
 			// Video options
 			['check', 'enableVideoEmbeding'],

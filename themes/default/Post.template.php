@@ -715,9 +715,6 @@ function template_topic_replies_below()
 			{
 				echo '
 						<ul class="quickbuttons" id="buttons_', $post['id'], '">
-							<li class="listlevel1 hide">
-								<a href="javascript:void(0);" id="button_strip_qq_', $post['id'], '" role="button" class="linklevel1 quick_quote_button">', $txt['quick_quote'], '</a>
-							</li>
 							<li class="listlevel1">
 								<a href="#postmodify" onclick="return insertQuoteFast(', $post['id'], ');" role="button" class="linklevel1 quote_button">', $txt['bbc_quote'], '</a>
 							</li>
@@ -737,7 +734,18 @@ function template_topic_replies_below()
 			}
 
 			echo '
-					<section class="messageContent" id="msg_', $post['id'], '_body" data-msgid="', $post['id'], '">', $post['body'], '</section>
+					<section class="messageContent" id="msg_', $post['id'], '_body" data-msgid="', $post['id'], '">
+						', $post['body'], '
+					</section>';
+
+			// Add the hidden quick quote button
+			if ($context['can_quote'])
+				echo '
+					<footer>
+						<button id="button_float_qq_', $post['id'], '" type="submit" role="button" class="quick_quote_button hide">', $txt['quick_quote'], '</button>
+					</footer>';
+
+			echo '
 				</div>
 			</div>';
 		}

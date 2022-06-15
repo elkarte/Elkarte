@@ -314,7 +314,6 @@ class Display extends AbstractController
 			$this->_template_layers->addBefore('quickreply', 'moderation_buttons');
 			theme()->addInlineJavascript("
 				let opt = {
-					hideButton: " . (empty($modSettings['hideQuickQuoteButton']) ? 'false' : 'true') . ",
 					infoText: " . JavaScriptEscape($txt['quote_quick_help']) . ",
 				};
 				document.addEventListener('DOMContentLoaded', () => new Elk_QuickQuote(opt), false);", true

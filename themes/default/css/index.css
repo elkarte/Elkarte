@@ -1963,6 +1963,14 @@ a.bbc_link {
 	padding: 0 .4em;
 }
 
+button[type="submit"].quick_quote_button.hide {
+	display: none;
+}
+
+.quick_quote_button {
+	position: absolute;
+}
+
 .quick_quote_button > .warning {
 	position: absolute;
 	z-index: 10;

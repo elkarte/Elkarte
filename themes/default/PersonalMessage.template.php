@@ -1058,15 +1058,13 @@ function template_send()
 					<h3>
 						', $txt['from'], ' <span class="name">', $context['quoted_message']['member']['name'], '</span> &ndash; ', $context['quoted_message']['html_time'], '
 					</h3>
-					<ul class="quickbuttons" id="buttons_', $context['quoted_message']['id'], '">
-						<li class="listlevel1 hide">
-							<a href="javascript:void(0);" id="button_strip_qq_', $context['quoted_message']['id'], '" role="button" class="linklevel1 quick_quote_button">', $txt['quick_quote'], '</a>
-						</li>
-					</ul>
 				</div>	
 				<section class="messageContent" data-msgid="', $context['quoted_message']['id'], '">
 					', $context['quoted_message']['body'], '
 				</section>
+				<footer>
+					<button id="button_float_qq_', $context['quoted_message']['id'], '" type="submit" role="button" class="quick_quote_button hide">', $txt['quick_quote'], '</button>
+				</footer>
 			</div>
 		</div>
 	</div>';
@@ -1545,7 +1543,7 @@ function template_add_rule()
 	<script>
 		initUpdateRulesActions();';
 
-	// If this isn't a new rule and we have JS enabled remove the JS compatibility stuff.
+	// If this isn't a new rule, and we have JS enabled remove the JS compatibility stuff.
 	if ($context['rid'])
 	{
 		echo '
@@ -1566,7 +1564,7 @@ function template_add_rule()
  */
 function template_showPMDrafts()
 {
-	global $context, $scripturl, $txt;
+	global $context, $txt;
 
 	echo '
 		<h2 class="category_header hdicon cat_img_talk">

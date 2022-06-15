@@ -134,14 +134,6 @@ class DisplayRenderer extends Renderer
 
 		$postButtons = [
 			// Can they reply? Have they turned on quick reply?
-			'quick_quote' => [
-				'text' => 'quick_quote',
-				'id' => 'qq_' . $output['id'],
-				'url' => 'javascript:void(0)',
-				'class' => 'quick_quote_button hide',
-				'icon' => 'quote',
-				'enabled' => !empty($context['can_quote']),
-			],
 			'quote' => [
 				'text' => 'quote',
 				'url' => getUrl('action', ['action' => 'post', 'topic' => $topic . '.' . $context['start'], 'quote' => $output['id'], 'last_msg' => $context['topic_last_message']]),
