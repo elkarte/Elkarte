@@ -1299,6 +1299,7 @@ a.bbc_link {
 	display: flex;
 	align-items: center;
 	justify-content: flex-start;
+	margin-bottom: 5px;
 	padding: 0 3px;
 }
 

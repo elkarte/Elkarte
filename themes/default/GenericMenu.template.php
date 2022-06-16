@@ -206,7 +206,7 @@ function template_generic_menu_dropdown_below()
  */
 function template_generic_menu_tabs($tab_context)
 {
-	global $settings, $scripturl, $txt;
+	global $scripturl, $txt;
 
 	if (!empty($tab_context['title']))
 	{
@@ -255,7 +255,7 @@ function template_generic_menu_tabs($tab_context)
 	{
 		// The admin tabs.
 		echo '
-					<ul id="adm_submenus">';
+					<ul id="adm_submenus" role="menubar">';
 
 		foreach ($tab_context['tabs'] as $tab)
 		{
@@ -265,8 +265,8 @@ function template_generic_menu_tabs($tab_context)
 			}
 
 			echo '
-						<li class="listlevel1">
-							<a class="linklevel1', !empty($tab['selected']) ? ' active' : '', '" href="', $tab['url'], $tab['add_params'] ?? '', '">', $tab['label'], '</a>
+						<li class="listlevel1" role="none">
+							<a class="linklevel1', !empty($tab['selected']) ? ' active' : '', '" href="', $tab['url'], $tab['add_params'] ?? '', '" role="menuitem">', $tab['label'], '</a>
 						</li>';
 		}
 
