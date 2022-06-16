@@ -469,7 +469,7 @@ function addAttachment()
  */
 function cleanFileInput(idElement)
 {
-	var oElement = $('#' + idElement);
+	let oElement = $('#' + idElement);
 
 	// Wrap the element in its own form, then reset the wrapper form
 	oElement.wrap('<form>').closest('form').get(0).reset();
@@ -495,26 +495,34 @@ function insertQuoteFast(messageid)
  */
 function onDocReceived(XMLDoc)
 {
-	var text = '';
+	let text = '',
+		$editor = $editor_data[post_box_name];
 
-	for (var i = 0, n = XMLDoc.getElementsByTagName('quote')[0].childNodes.length; i < n; i++)
-		text += XMLDoc.getElementsByTagName('quote')[0].childNodes[i].nodeValue + "\n";
+	for (let i = 0, n = XMLDoc.getElementsByTagName('quote')[0].childNodes.length; i < n; i++)
+		text += XMLDoc.getElementsByTagName('quote')[0].childNodes[i].nodeValue;
 
-	$editor_data[post_box_name].insert(text);
+	$editor.insert(text);
+
+	// In wizzy mode, we need to move the cursor out of the quote block
+	let
+		rangeHelper = $editor.getRangeHelper(),
+		parent = rangeHelper.parentNode();
+
+	if (parent && parent.nodeName === 'BLOCKQUOTE')
+	{
+		let range = rangeHelper.selectedRange();
+
+		range.setStartAfter(parent);
+		rangeHelper.selectRange(range);
+	}
+	else
+	{
+		$editor.insert('\n');
+	}
 
 	document.getElementById("editor_toolbar_container").scrollIntoView();
 
 	ajax_indicator(false);
-}
-
-/**
- * Insert text in to the editor
- *
- * @param {string} text
- */
-function onReceiveOpener(text)
-{
-	$editor_data[post_box_name].insert(text);
 }
 
 /**
