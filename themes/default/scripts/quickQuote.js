@@ -371,12 +371,16 @@ Elk_QuickQuote.prototype.getSmileyCode = function (img)
 Elk_QuickQuote.prototype.executeQuickQuote = function (event)
 {
 	event.preventDefault();
+	event.stopImmediatePropagation();
 
 	let startTag = event.target.startTag,
 		endTag = event.target.endTag;
 
 	// isCollapsed is true for an empty selection
 	let selection = (window.getSelection().isCollapsed ? null : window.getSelection().getRangeAt(0));
+
+	// Always clear out the button
+	this.removeQuickQuote(event, true);
 
 	if (selection)
 	{
@@ -426,8 +430,29 @@ Elk_QuickQuote.prototype.executeQuickQuote = function (event)
 
 		if (typeof oQuickReply === 'undefined' || oQuickReply.bIsFull)
 		{
-			// Full editor
-			$editor_data[post_box_name].insert(startTag + selectedText + endTag);
+			// Full Editor
+			let $editor = $editor_data[post_box_name],
+				text = startTag + selectedText + endTag;
+
+			// Add the text to the editor
+			$editor.insert(this.trim(text));
+
+			// In wizzy mode, we need to move the cursor out of the quote block
+			let
+				rangeHelper = $editor.getRangeHelper(),
+				parent = rangeHelper.parentNode();
+
+			if (parent && parent.nodeName === 'BLOCKQUOTE')
+			{
+				let range = rangeHelper.selectedRange();
+
+				range.setStartAfter(parent);
+				rangeHelper.selectRange(range);
+			}
+			else
+			{
+				$editor.insert('\n');
+			}
 		}
 		else
 		{
@@ -516,9 +541,8 @@ Elk_QuickQuote.prototype.prepareQuickQuoteButton = function (event)
 		time_unix = 0;
 
 	// If there is some text selected
-	if (!window.getSelection().isCollapsed)
+	if (!window.getSelection().isCollapsed && this.trim(window.getSelection().toString()) !== '')
 	{
-		// Show and position the quick quote button
 		let selectionRange = window.getSelection().getRangeAt(0).cloneRange(),
 			relativePos = document.body.parentNode.getBoundingClientRect();
 
@@ -526,6 +550,7 @@ Elk_QuickQuote.prototype.prepareQuickQuoteButton = function (event)
 		selectionRange.collapse(false);
 		let selectionBox = selectionRange.getClientRects();
 
+		// Show and position the quick quote button
 		if (selectionBox.length > 0)
 		{
 			link.classList.remove('hide');
@@ -561,7 +586,7 @@ Elk_QuickQuote.prototype.prepareQuickQuoteButton = function (event)
 		link.startTag = '[quote' +
 			(username ? ' author=' + username : '') +
 			((msgid && time_unix) ? ' link=msg=' + msgid + ' date=' + time_unix : '') + ']\n';
-		link.endTag = '\n[/quote]' + "\n";
+		link.endTag = '\n[/quote]';
 
 		link.addEventListener('click', this.executeQuickQuote.bind(this));
 
@@ -578,11 +603,16 @@ Elk_QuickQuote.prototype.prepareQuickQuoteButton = function (event)
 
 /**
  * Removes all QQ button click listeners and hides them all.
+ *
+ * @param {PointerEvent} event
+ * @param {boolean} always
  */
-Elk_QuickQuote.prototype.removeQuickQuote = function ()
+Elk_QuickQuote.prototype.removeQuickQuote = function (event, always = false)
 {
+	event.stopImmediatePropagation();
+
 	// Nothing selected, reset the UI and listeners
-	if (window.getSelection().isCollapsed)
+	if (window.getSelection().isCollapsed || always)
 	{
 		let topicContents = document.querySelectorAll('.messageContent'),
 			msgid;
