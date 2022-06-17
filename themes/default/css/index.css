@@ -730,8 +730,8 @@ em, .em {
 	white-space: pre-wrap;
 	border: 1px solid;
 	border-radius: 2px;
-	box-decoration-break: clone;
 	-webkit-box-decoration-break: clone;
+	box-decoration-break: clone;
 }
 
 .bbc_quote {
