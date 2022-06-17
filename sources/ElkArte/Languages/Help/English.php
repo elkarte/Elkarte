@@ -361,6 +361,17 @@ $helptxt['enablePostHTML'] = 'This will allow the posting of some basic HTML tag
 		<li>&lt;pre&gt;, &lt;blockquote&gt;</li>
 	</ul>';
 
+$helptxt['enablePostMarkdown'] = 'This will allow the posting of some basic Markdown tags:
+	<ul class="normallist enablePostMarkdown">
+		<li>**Text** or __Text__ => [b]Text[/b]</li>
+		<li>*Text* or _Text_ => [i]Text[/i]</li>
+		<li>~~Text~~ => [s]Text[/s]</li>
+		<li>`Text` => [icode]Text[/icode]</li>
+		<li>```Text``` => [code]Text[/code]</li>
+		<li>> Text => [quote]Text[/quote]</li>
+		<li>--- or *** or ___ => [hr]</li>
+	</ul>';
+
 // Initial theme settings - Manage and Install
 $helptxt['themes'] = 'Here you can select whether the default theme can be chosen, what theme guests will use, as well as other options. Click on a theme to the right to change the settings for it.';
 $helptxt['theme_install'] = 'This section permits you to install new themes. You do this by uploading an archived file for the theme from your personal computer, installing from a theme directory on the host server or by copying the default theme and renaming that copied file.<br /><br />Please remember this: the archived file or directory must have a <span class="alert">theme_info.xml</span> definition file as a part of the archive or the directory.';
