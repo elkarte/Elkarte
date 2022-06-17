@@ -718,7 +718,23 @@ sceditor.formats.bbcode
 				from = '<cite>' + sceditor.escapeEntities(attrs.defaultattr) + '</cite>';
 			}
 
-			return '<code>' + from + content.replace('[', '&#91;') + '</code>';
+			return '<code>' + from + content + '</code>';
+		}
+	})
+	.set('icode', {
+		tags: {
+			icode: null
+		},
+		isInline: true,
+		allowedChildren: ['#'],
+		format: function (element, content)
+		{
+			return '[icode]' + content.replace('&#91;', '[') + '[/icode]';
+		},
+		html: function (element, attrs, content)
+		{
+			console.log(content);
+			return '<icode>' + content.replace('[', '&#91;') + '</icode>';
 		}
 	})
 	.set('quote', {
