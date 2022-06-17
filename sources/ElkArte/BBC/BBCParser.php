@@ -15,8 +15,6 @@
 
 namespace BBC;
 
-use ElkArte\Util;
-
 /**
  * Class BBCParser
  *
@@ -59,8 +57,12 @@ class BBCParser
 	protected $autolinker;
 	/** @var bool */
 	protected $possible_html;
+	/** @var bool */
+	protected $possible_markdown;
 	/** @var HtmlParser|null */
 	protected $html_parser;
+	/** @var MarkdownParser|null */
+	protected $markdown_parser;
 	/** @var bool if we can cache the message or not (some tags disallow caching) */
 	protected $can_cache = true;
 	/** @var int footnote tracker */
@@ -84,8 +86,9 @@ class BBCParser
 	 * @param \BBC\Codes $bbc
 	 * @param \BBC\Autolink|null $autolinker
 	 * @param \BBC\HtmlParser|null $html_parser
+	 * @param \BBC\MarkdownParser|null $markdown_parser
 	 */
-	public function __construct(Codes $bbc, Autolink $autolinker = null, HtmlParser $html_parser = null)
+	public function __construct(Codes $bbc, Autolink $autolinker = null, HtmlParser $html_parser = null, MarkdownParser $markdown_parser = null)
 	{
 		$this->bbc = $bbc;
 
@@ -96,6 +99,7 @@ class BBCParser
 		$this->loadAutolink();
 
 		$this->html_parser = $html_parser;
+		$this->markdown_parser = $markdown_parser;
 	}
 
 	/**
@@ -143,7 +147,6 @@ class BBCParser
 
 		$this->resetParser();
 
-		// @todo change this to <br> (it will break tests and previews and ...)
 		$this->message = str_replace("\n", '<br />', $this->message);
 
 		// Check if the message might have a link or email to save a bunch of parsing in autolink()
@@ -157,7 +160,21 @@ class BBCParser
 			$this->loadHtmlParser();
 		}
 
-		// This handles pretty much all of the parsing. It is a separate method so it is easier to override and profile.
+		$this->possible_markdown = !empty($GLOBALS['modSettings']['enablePostMarkdown']);
+
+		// Don't load the Markdown Parser unless we have to
+		if ($this->possible_markdown)
+		{
+			if ($this->markdown_parser === null)
+			{
+				$this->loadMarkdownParser();
+			}
+
+			// To protect bbc tags inside `icode` and ```code``` blocks, we need to process them up front
+			$this->message = $this->markdown_parser->inlineCodeTags($this->message);
+		}
+
+		// This handles pretty much all the parsing. It is a separate method, so it is easier to override and profile.
 		$this->parse_loop();
 
 		// Close any remaining tags.
@@ -476,6 +493,28 @@ class BBCParser
 	protected function parseHTML($data)
 	{
 		return $this->html_parser->parse($data);
+	}
+
+	/**
+	 * Load the Markdown parsing engine
+	 */
+	public function loadMarkdownParser()
+	{
+		$parser = new MarkdownParser();
+		call_integration_hook('integrate_bbc_load_markdown_parser', [&$parser]);
+		$this->markdown_parser = $parser;
+	}
+
+	/**
+	 * Parse any Markdown in a string
+	 *
+	 * @param string $data
+	 *
+	 * @return string
+	 */
+	protected function parseMarkdown($data)
+	{
+		return $this->markdown_parser->parse($data);
 	}
 
 	/**
@@ -1198,6 +1237,12 @@ class BBCParser
 		{
 			// @todo new \Parser\BBC\HTML;
 			$data = $this->parseHTML($data);
+		}
+
+		// Take care of some Markdown!
+		if ($this->possible_markdown)
+		{
+			$data = $this->parseMarkdown($data);
 		}
 
 		if (!empty($GLOBALS['modSettings']['autoLinkUrls']))
