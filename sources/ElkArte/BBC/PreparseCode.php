@@ -229,26 +229,32 @@ class PreparseCode
 	private function _tokenizeCodeBlocks()
 	{
 		// Split up the message on the code start/end tags/
-		$parts = preg_split('~(\[\/code\]|\[code(?:=[^\]]+)?\])~i', $this->message, -1, PREG_SPLIT_DELIM_CAPTURE);
+		$patterns = [];
+		$patterns[] = '~(\[/code\]|\[code(?:=[^\]]+)?\])~i';
+		$patterns[] = '~(\[/icode\]|\[icode(?:=[^\]]+)?\])~i';
 
 		// Token generator
 		$tokenizer = new TokenHash();
 
-		foreach ($parts as $i => $part)
+		foreach ($patterns as $pattern)
 		{
-			// It goes 0 = outside, 1 = begin tag, 2 = inside, 3 = close tag, repeat.
-			if ($i % 4 === 0 && isset($parts[$i + 3]))
+			$parts = preg_split($pattern, $this->message, -1, PREG_SPLIT_DELIM_CAPTURE);
+			foreach ($parts as $i => $part)
 			{
-				// Create a unique key to put in place of the code block
-				$key = $tokenizer->generate_hash(8);
+				// It goes 0 = outside, 1 = begin tag, 2 = inside, 3 = close tag, repeat.
+				if ($i % 4 === 0 && isset($parts[$i + 3]))
+				{
+					// Create a unique key to put in place of the code block
+					$key = $tokenizer->generate_hash(8);
 
-				// Save what is there [code]stuff[/code]
-				$this->code_blocks['%%' . $key . '%%'] = $parts[$i + 1] . $parts[$i + 2] . $parts[$i + 3];
+					// Save what is there [code]stuff[/code]
+					$this->code_blocks['%%' . $key . '%%'] = $parts[$i + 1] . $parts[$i + 2] . $parts[$i + 3];
 
-				// Replace the code block with %%$key%% so its protected from further preparsecode processing
-				$parts[$i + 1] = '%%';
-				$parts[$i + 2] = $key;
-				$parts[$i + 3] = '%%';
+					// Replace the code block with %%$key%% so its protected from further preparsecode processing
+					$parts[$i + 1] = '%%';
+					$parts[$i + 2] = $key;
+					$parts[$i + 3] = '%%';
+				}
 			}
 		}
 
