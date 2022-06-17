@@ -614,14 +614,12 @@ Elk_QuickQuote.prototype.removeQuickQuote = function (event, always = false)
 	// Nothing selected, reset the UI and listeners
 	if (window.getSelection().isCollapsed || always)
 	{
-		let topicContents = document.querySelectorAll('.messageContent'),
-			msgid;
+		let topicContents = document.querySelectorAll('.messageContent');
 
 		// reset the UI on de-selection
 		topicContents.forEach((message) =>
 		{
 			message.removeEventListener('click', this.prepareQuickQuoteButton);
-			msgid = parseInt(message.getAttribute('data-msgid'));
 			message.parentElement.querySelector('.quick_quote_button').classList.add('hide');
 		});
 	}

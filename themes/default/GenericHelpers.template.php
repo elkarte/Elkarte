@@ -122,7 +122,7 @@ function template_select_boards($name, $label = '', $extra = '', $all = false)
  *
  * @param mixed[] $button_strip the above definition array
  * @param string $class overall class to append to "buttonlist no_js" on the list UL
- * @param string[] $strip_options = [] of options applied to the outer <UL>
+ * @param array $strip_options = [] of options applied to the outer <UL>
  * 		'id' => id to use on the UL
  * 		'no-class' => do not apply the default "buttonlist no_js" to the ul (will still use passed $class)
  * @return void string as echoed content as buttons | submenu | checkbox
@@ -303,7 +303,7 @@ function template_quickbutton_strip($strip, $tests = array())
 	global $options;
 
 	// Annoy devs so they stop using this function
-	Errors::instance()->log_error('Depreciated: template_quickbutton_strip usage', 'depreciated');
+	\ElkArte\Errors\Errors::instance()->log_error('Depreciated: template_quickbutton_strip usage', 'depreciated');
 
 	$buttons = [];
 

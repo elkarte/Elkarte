@@ -475,7 +475,7 @@ class Recent extends AbstractController implements FrontpageInterface
 		];
 
 		// Drop all non-enabled ones
-		return array_filter($postButtons, function ($button) use ($tests) {
+		return array_filter($postButtons, function ($button) {
 			return !isset($button['enabled']) ||$button['enabled'] !== false;
 		});
 	}
