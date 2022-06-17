@@ -77,6 +77,7 @@ QuickModifyTopic.prototype.onDocReceived_modify_topic = function (XMLDoc)
 	if (!XMLDoc || !XMLDoc.getElementsByTagName('message'))
 	{
 		this.modify_topic_cancel();
+		ajax_indicator(false);
 		return true;
 	}
 
@@ -462,7 +463,11 @@ QuickModify.prototype.onMessageReceived = function (XMLDoc)
 	// If this is not valid then simply give up.
 	if (!document.getElementById(this.sCurMessageId))
 	{
-		console.log('no id');
+		if ('console' in window)
+		{
+			window.console.info('no id');
+		}
+
 		return this.modifyCancel();
 	}
 
@@ -500,7 +505,7 @@ QuickModify.prototype.onMessageReceived = function (XMLDoc)
 	}
 
 	// Position the editor in the window
-	location.hash = '#info_' + this.sCurMessageId.substring(this.sCurMessageId.lastIndexOf("_") + 1);
+	document.getElementById('info_' + this.sCurMessageId.substring(this.sCurMessageId.lastIndexOf("_") + 1)).scrollIntoView();
 
 	// Handle custom function hook before showing the new select.
 	if ('funcOnAfterCreate' in this.opt)
@@ -702,6 +707,12 @@ QuickModify.prototype.onModifyDone = function (XMLDoc)
 		{
 			$(this).next().children().slideToggle("fast");
 		});
+
+		// Re-Fix quote blocks
+		if (typeof elk_quotefix === 'function')
+		{
+			elk_quotefix();
+		}
 
 		// Re-Fix code blocks
 		if (typeof elk_codefix === 'function')

@@ -756,7 +756,6 @@ class Post extends AbstractController
 				loadJavascriptFile('quickQuote.js', ['defer' => true]);
 				theme()->addInlineJavascript("
 					let opt = {
-						hideButton: " . (empty($modSettings['hideQuickQuoteButton']) ? 'false' : 'true') . ",
 						infoText: " . JavaScriptEscape($txt['quote_quick_help']) . ",
 					};
 					document.addEventListener('DOMContentLoaded', () => new Elk_QuickQuote(opt), false);", true

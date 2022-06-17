@@ -586,9 +586,9 @@ class Search extends AbstractController
 			}
 			else
 			{
-				$verificationOptions = array(
+				$verificationOptions = [
 					'id' => 'search',
-				);
+				];
 				$context['require_verification'] = VerificationControlsIntegrate::create($verificationOptions, true);
 
 				if (is_array($context['require_verification']))

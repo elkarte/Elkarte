@@ -63,7 +63,7 @@ function template_issueWarning()
 
 	echo '
 	<form action="', getUrl('profile', ['action' => 'profile', 'area' => 'issuewarning', 'u' => $context['id_member'], 'name' => $context['member']['name']]), '" method="post" class="flow_hidden" accept-charset="UTF-8">
-		<h2 class="category_header hdicon cat_img_profile">
+		<h2 class="category_header hdicon i-user">
 			', $context['user']['is_owner'] ? $txt['profile_warning_level'] : $txt['profile_issue_warning'], '
 		</h2>';
 
@@ -232,7 +232,7 @@ function template_deleteAccount()
 	// The main containing header.
 	echo '
 		<form id="creator" action="', $scripturl, '?action=profile;area=deleteaccount;u=', $context['id_member'], '" method="post" accept-charset="UTF-8" name="creator">
-			<h2 class="category_header hdicon cat_img_profile">
+			<h2 class="category_header hdicon i-user">
 				', $txt['deleteAccount'], '
 			</h2>';
 

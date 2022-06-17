@@ -29,7 +29,7 @@ function template_searchform()
 
 	echo '
 				<form id="searchform" action="', $scripturl, '?action=search;sa=results" method="post" accept-charset="UTF-8" name="searchform">
-					<h2 class="category_header', !empty($settings['use_buttons']) ? ' hdicon cat_img_search' : '', '">
+					<h2 class="category_header', !empty($settings['use_buttons']) ? ' hdicon i-search' : '', '">
 						', $txt['set_parameters'], '
 					</h2>';
 
@@ -277,7 +277,7 @@ function template_results()
 	}
 
 	echo '
-				<h2 class="category_header hdicon cat_img_search">
+				<h2 class="category_header hdicon i-search">
 					<span class="floatright">';
 
 	if (!empty($options['display_quick_mod']))
@@ -372,10 +372,7 @@ function template_results()
 			// Quote, Reply, etc ... only when not viewing compact
 			if (!empty($topic['buttons']))
 			{
-				echo '
-						<nav>',
-							template_quickbutton_strip($topic['buttons'], $topic['tests']),
-						'</nav>';
+				template_button_strip($topic['buttons'], 'quickbuttons no_js', ['no-class' => true]);
 			}
 
 			// Show QM checkbox, by the count indicator, only if compact view is on

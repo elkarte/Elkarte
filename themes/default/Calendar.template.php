@@ -15,14 +15,6 @@
 use ElkArte\Util;
 
 /**
- * Start the calendar
- */
-function template_Calendar_init()
-{
-	theme()->getTemplates()->load('GenericHelpers');
-}
-
-/**
  * The main calendar - January, for example.
  */
 function template_show_calendar()

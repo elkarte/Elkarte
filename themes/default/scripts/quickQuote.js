@@ -9,16 +9,18 @@
 /**
  * This particular function was based on My Opera Enhancements and is
  * licensed under the BSD license.
+ *
+ * Some specific refactoring done for ElkArte core inclusion
  */
 function Elk_QuickQuote(oOptions)
 {
 	'use strict';
 
 	this.defaults = {
-		hideButton: false,
-		infoText: 'Please select some text !'
+		infoText: 'Please select some text !',
 	};
-	this.opts = $.extend({}, this.defaults, oOptions);
+
+	this.opts = Object.assign({}, this.defaults, oOptions);
 
 	this.init();
 }
@@ -43,15 +45,6 @@ Elk_QuickQuote.prototype.init = function ()
 	document.querySelectorAll('.messageContent').forEach((message) =>
 	{
 		message.addEventListener('mouseup', this.prepareQuickQuoteButton.bind(this), false);
-	});
-
-	document.querySelectorAll('.quick_quote_button').forEach((element) => {
-		if (this.opts.hideButton === false)
-		{
-			// Show all the buttons, bind a help message to each
-			element.parentElement.classList.remove('hide');
-			element.addEventListener('click', this.showWarnSpan.bind(this), false);
-		}
 	});
 };
 
@@ -378,12 +371,16 @@ Elk_QuickQuote.prototype.getSmileyCode = function (img)
 Elk_QuickQuote.prototype.executeQuickQuote = function (event)
 {
 	event.preventDefault();
+	event.stopImmediatePropagation();
 
 	let startTag = event.target.startTag,
 		endTag = event.target.endTag;
 
 	// isCollapsed is true for an empty selection
 	let selection = (window.getSelection().isCollapsed ? null : window.getSelection().getRangeAt(0));
+
+	// Always clear out the button
+	this.removeQuickQuote(event, true);
 
 	if (selection)
 	{
@@ -433,8 +430,29 @@ Elk_QuickQuote.prototype.executeQuickQuote = function (event)
 
 		if (typeof oQuickReply === 'undefined' || oQuickReply.bIsFull)
 		{
-			// Full editor
-			$editor_data[post_box_name].insert(startTag + selectedText + endTag);
+			// Full Editor
+			let $editor = $editor_data[post_box_name],
+				text = startTag + selectedText + endTag;
+
+			// Add the text to the editor
+			$editor.insert(this.trim(text));
+
+			// In wizzy mode, we need to move the cursor out of the quote block
+			let
+				rangeHelper = $editor.getRangeHelper(),
+				parent = rangeHelper.parentNode();
+
+			if (parent && parent.nodeName === 'BLOCKQUOTE')
+			{
+				let range = rangeHelper.selectedRange();
+
+				range.setStartAfter(parent);
+				rangeHelper.selectRange(range);
+			}
+			else
+			{
+				$editor.insert('\n');
+			}
 		}
 		else
 		{
@@ -518,21 +536,37 @@ Elk_QuickQuote.prototype.prepareQuickQuoteButton = function (event)
 
 	// The poster and time of post being quoted
 	let msgid = parseInt(postArea.getAttribute('data-msgid')),
-		link = document.getElementById('qq_' + msgid),
+		link = document.getElementById('button_float_qq_' + msgid),
 		username = '',
 		time_unix = 0;
 
 	// If there is some text selected
-	if (!window.getSelection().isCollapsed)
+	if (!window.getSelection().isCollapsed && this.trim(window.getSelection().toString()) !== '')
 	{
-		// Show the quick quote button
-		link.parentElement.classList.remove('hide');
+		let selectionRange = window.getSelection().getRangeAt(0).cloneRange(),
+			relativePos = document.body.parentNode.getBoundingClientRect();
 
-		// Style the previous button, if there is one
-		let previous = link.parentElement.previousElementSibling;
-		if (previous)
+		// Use the end of selection range (false) vs start (true)
+		selectionRange.collapse(false);
+		let selectionBox = selectionRange.getClientRects();
+
+		// Show and position the quick quote button
+		if (selectionBox.length > 0)
 		{
-			previous.firstElementChild.classList.remove('last');
+			link.classList.remove('hide');
+
+			let buttonTop = parseInt(selectionBox[0].bottom - relativePos.top + 5),
+				buttonBottom = buttonTop + link.offsetHeight,
+				windowBottom = window.scrollY + window.innerHeight;
+
+			// Don't position the button out of view
+			if (buttonBottom > windowBottom)
+			{
+				buttonTop = selectionBox[0].top - relativePos.top - link.offsetHeight;
+			}
+
+			link.style.top = buttonTop + 'px';
+			link.style.right = -parseInt(selectionBox[0].right - relativePos.right) + 'px';
 		}
 
 		// Topic Display, Grab the name from the aside area
@@ -552,86 +586,41 @@ Elk_QuickQuote.prototype.prepareQuickQuoteButton = function (event)
 		link.startTag = '[quote' +
 			(username ? ' author=' + username : '') +
 			((msgid && time_unix) ? ' link=msg=' + msgid + ' date=' + time_unix : '') + ']\n';
-		link.endTag = '\n[/quote]' + "\n";
+		link.endTag = '\n[/quote]';
 
-		link.addEventListener('click', this.executeQuickQuote.bind(this), false);
+		link.addEventListener('click', this.executeQuickQuote.bind(this));
 
 		// Provide a way to escape should they click anywhere in the window
-		window.addEventListener('click', this.removeQuickQuote.bind(this), false);
+		window.addEventListener('click', this.removeQuickQuote.bind(this));
 	}
 	// Clicked, no selection, in the message area
 	else
 	{
-		if (this.opts.hideButton === true)
-		{
-			link.parentElement.classList.add('hide');
-
-			// Style the end element, if there is one.
-			let previous = link.parentElement.previousElementSibling;
-			if (previous)
-			{
-				previous.firstElementChild.classList.add('last');
-			}
-		}
-
+		link.classList.add('hide');
 		link.removeEventListener('click', this.executeQuickQuote);
 	}
 };
 
 /**
  * Removes all QQ button click listeners and hides them all.
+ *
+ * @param {PointerEvent} event
+ * @param {boolean} always
  */
-Elk_QuickQuote.prototype.removeQuickQuote = function ()
+Elk_QuickQuote.prototype.removeQuickQuote = function (event, always = false)
 {
-	// Nothing selected, reset the UI and listeners
-	if (window.getSelection().isCollapsed)
-	{
-		let topicContents = document.querySelectorAll('.messageContent'),
-			msgid,
-			buttonList;
+	event.stopImmediatePropagation();
 
-		// Sledgehammer :P reset the UI on de-selection
+	// Nothing selected, reset the UI and listeners
+	if (window.getSelection().isCollapsed || always)
+	{
+		let topicContents = document.querySelectorAll('.messageContent');
+
+		// reset the UI on de-selection
 		topicContents.forEach((message) =>
 		{
-			message.removeEventListener('click', this.prepareQuickQuoteButton, false);
-			msgid = parseInt(message.getAttribute('data-msgid'));
-
-			if (this.opts.hideButton === true)
-			{
-				// Button Strip for the message
-				buttonList = document.getElementById('buttons_' + msgid);
-				// li of quick_quote_button link
-				buttonList.querySelector('.quick_quote_button').parentElement.classList.add('hide');
-				// link of button (usually quote) add style class
-				let previous = buttonList.lastElementChild.previousElementSibling;
-				if (previous)
-				{
-					previous.firstElementChild.classList.add('last');
-				}
-			}
+			message.removeEventListener('click', this.prepareQuickQuoteButton);
+			message.parentElement.querySelector('.quick_quote_button').classList.add('hide');
 		});
-	}
-};
-
-/**
- * Show a helpful message that they must select something first
- *
- * @param {Event} event
- */
-Elk_QuickQuote.prototype.showWarnSpan = function(event)
-{
-	// Nothing selected!
-	if (window.getSelection().isCollapsed)
-	{
-		event.currentTarget.blur();
-
-		var warning = event.currentTarget.appendChild(document.createElement('span'));
-		warning.textContent = this.opts.infoText;
-		warning.className = 'warning';
-
-		// Remove the item after 1.5 seconds
-		setTimeout(function(link) {
-			link.removeChild(link.lastChild);
-		}, 1500, event.currentTarget);
 	}
 };

@@ -60,7 +60,7 @@ function template_latest_news()
 
 	echo '
 								<h2 class="category_header">
-									<a class="hdicon cat_img_helptopics help" href="', $scripturl, '?action=quickhelp;help=live_news" onclick="return reqOverlayDiv(this.href);" title="', $txt['help'], '"></a> ', $txt['mc_latest_news'], '
+									<a class="hdicon i-help help" href="', $scripturl, '?action=quickhelp;help=live_news" onclick="return reqOverlayDiv(this.href);" title="', $txt['help'], '"></a> ', $txt['mc_latest_news'], '
 								</h2>
 								<div class="content">
 									<div id="ourAnnouncements" class="smalltext">', $txt['mc_cannot_connect_sm'], '</div>
@@ -104,7 +104,7 @@ function template_group_requests_block()
 	global $context, $txt, $scripturl;
 
 	echo '
-								<h2 class="category_header hdicon cat_img_plus">
+								<h2 class="category_header hdicon i-user-plus">
 									<a href="', $scripturl, '?action=groups;sa=requests">', $txt['mc_group_requests'], '</a>
 								</h2>
 								<div class="content modbox">
@@ -140,7 +140,7 @@ function template_reported_posts_block()
 	global $context, $txt, $scripturl;
 
 	echo '
-								<h2 class="category_header hdicon cat_img_talk">
+								<h2 class="category_header hdicon i-comments">
 									<a href="', $scripturl, '?action=moderate;area=', $context['admin_area'], '">', $txt['mc_recent_reports'], '</a>
 								</h2>
 								<div class="content modbox">
@@ -176,7 +176,7 @@ function template_watched_users()
 	global $context, $txt, $scripturl;
 
 	echo '
-						<h2 class="category_header hdicon cat_img_eye">
+						<h2 class="category_header hdicon i-view">
 							<a href="', $scripturl, '?action=moderate;area=userwatch">', $txt['mc_watched_users'], '</a>
 						</h2>
 						<div class="content modbox">
@@ -213,7 +213,7 @@ function template_notes()
 
 	echo '
 						<form action="', $scripturl, '?action=moderate;area=index" method="post">
-							<h2 class="category_header hdicon cat_img_write">', $txt['mc_notes'], '</h2>
+							<h2 class="category_header hdicon i-pencil">', $txt['mc_notes'], '</h2>
 							<div class="content modbox">
 								<div class="submitbutton">
 									<input type="text" name="new_note" placeholder="', $txt['mc_click_add_note'], '" style="width: 89%" class="floatleft input_text" />
@@ -258,7 +258,7 @@ function template_action_required()
 	global $context, $txt, $scripturl;
 
 	echo '
-						<h2 class="category_header hdicon cat_img_moderation">', $txt['mc_required'], ' : ', $context['mc_required'], '</h2>
+						<h2 class="category_header hdicon i-warning">', $txt['mc_required'], ' : ', $context['mc_required'], '</h2>
 						<div class="content modbox">
 							<ul>';
 
@@ -340,7 +340,7 @@ function template_unapproved_posts()
 	// Just a big div of it all really...
 	echo '
 				<form action="', $scripturl, '?action=moderate;area=postmod;start=', $context['start'], ';sa=', $context['current_view'], '" method="post" accept-charset="UTF-8">
-						<h2 class="category_header hdicon cat_img_posts">
+						<h2 class="category_header hdicon i-post-text">
 							', $context['header_title'], '
 						</h2>';
 
@@ -412,17 +412,11 @@ function template_viewmodreport()
 								<p class="warningbox">', $context['section_descripion'], '</p>
 								<div class="content">
 									', $context['report']['body'], '
-								</div>
-								<nav>
-									<ul class="quickbuttons">
-										<li class="listlevel1">
-											<a class="linklevel1 close_button" href="', $scripturl, '?action=moderate;area=', $context['admin_area'], ';close=', (int) !$context['report']['closed'], ';rid=', $context['report']['id'], ';', $context['session_var'], '=', $context['session_id'], '">', $context['report']['closed'] ? $txt['mc_reportedp_open'] : $txt['mc_reportedp_close'], '</a>
-										</li>
-										<li class="listlevel1">
-											<a class="linklevel1 ignore_button" href="', $scripturl, '?action=moderate;area=', $context['admin_area'], ';ignore=', (int) !$context['report']['ignore'], ';rid=', $context['report']['id'], ';', $context['session_var'], '=', $context['session_id'], '" ', !$context['report']['ignore'] ? 'onclick="return confirm(' . JavaScriptEscape($txt['mc_reportedp_ignore_confirm']) . ');"' : '', '>', $context['report']['ignore'] ? $txt['mc_reportedp_unignore'] : $txt['mc_reportedp_ignore'], '</a>
-										</li>
-									</ul>
-								</nav>
+								</div>';
+
+	template_button_strip($context['mod_buttons'], 'quickbuttons no_js', ['no-class' => true]);
+
+	echo '
 							</div>
 							<h2 class="category_header">', $txt['mc_modreport_whoreported_title'], '</h2>';
 
@@ -492,16 +486,14 @@ function template_user_watch_post_callback($post)
 	if ($post['can_delete'])
 	{
 		$output_html .= '
-						<nav>
-							<ul class="quickbuttons">
-								<li class="listlevel1">
-									<input type="checkbox" name="delete[]" value="' . $post['id'] . '" />
-								</li>
-								<li class="listlevel1">
-									<a class="linklevel1 remove_button" href="' . $scripturl . '?action=moderate;area=userwatch;sa=post;delete=' . $post['id'] . ';start=' . $context['start'] . ';' . $context['session_var'] . '=' . $context['session_id'] . '" onclick="return confirm(\'' . $txt['mc_watched_users_delete_post'] . '\');">' . $txt['remove'] . '</a>
-								</li>
-							</ul>
-						</nav>';
+						<ul class="quickbuttons">
+							<li class="listlevel1">
+								<a class="linklevel1 remove_button" href="' . $scripturl . '?action=moderate;area=userwatch;sa=post;delete=' . $post['id'] . ';start=' . $context['start'] . ';' . $context['session_var'] . '=' . $context['session_id'] . '" onclick="return confirm(\'' . $txt['mc_watched_users_delete_post'] . '\');">' . $txt['remove'] . '</a>
+							</li>
+							<li class="listlevel1 inline_mod_check">
+								<input type="checkbox" name="delete[]" value="' . $post['id'] . '" />
+							</li>
+						</ul>';
 	}
 
 	$output_html .= '

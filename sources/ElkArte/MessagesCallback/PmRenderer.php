@@ -52,8 +52,8 @@ class PmRenderer extends Renderer
 			'time' => 'msgtime',
 		]);
 
-		$this->_temp_pm_selected = $_SESSION['pm_selected'] ?? array();
-		$_SESSION['pm_selected'] = array();
+		$this->_temp_pm_selected = $_SESSION['pm_selected'] ?? [];
+		$_SESSION['pm_selected'] = [];
 	}
 
 	/**
@@ -97,7 +97,7 @@ class PmRenderer extends Renderer
 	 */
 	protected function _buildOutputArray()
 	{
-		global $context, $modSettings, $txt;
+		global $context, $modSettings;
 
 		$id_pm = $this->_this_message['id_pm'];
 
@@ -114,26 +114,6 @@ class PmRenderer extends Renderer
 			'can_report' => !empty($modSettings['enableReportPM']),
 		);
 
-		$context['additional_pm_drop_buttons'] = array();
-
-		// Can they report this message
-		if (!empty($output['can_report']) && $context['folder'] !== 'sent' && $output['member']['id'] != $this->user->id)
-		{
-			$context['additional_pm_drop_buttons']['warn_button'] = array(
-				'href' => getUrl('action', ['action' => 'pm', 'sa' => 'report', 'l' => $context['current_label_id'], 'pmsg' => $output['id'], '{session_data}']),
-				'text' => $txt['pm_report_to_admin']
-			);
-		}
-
-		// Or mark it as unread
-		if (empty($output['is_unread']) && $context['folder'] !== 'sent' && $output['member']['id'] != $this->user->id)
-		{
-			$context['additional_pm_drop_buttons']['restore_button'] = array(
-				'href' => getUrl('action', ['action' => 'pm', 'sa' => 'markunread', 'l' => $context['current_label_id'], 'pmsg' => $output['id'], '{session_data}']),
-				'text' => $txt['pm_mark_unread']
-			);
-		}
-
 		// Or give / take karma for a PM
 		if (!empty($output['member']['karma']['allow']))
 		{
@@ -143,6 +123,98 @@ class PmRenderer extends Renderer
 			);
 		}
 
+		// Build the PM buttons, like reply, report, etc.
+		$output += $this->_buildPmButtons($output);
+
 		return $output;
+	}
+
+	/**
+	 * Generates a PM button array suitable for consumption by template_button_strip
+	 *
+	 * @param $output
+	 * @return array
+	 */
+	protected function _buildPmButtons($output)
+	{
+		global $context, $txt;
+
+		$pmButtons = [
+			// Show reply buttons if you have the permission to send PMs.
+			// Is there than more than one recipient you can reply to?
+			'reply_all_button' => [
+				'text' => 'reply_to_all',
+				'url' => getUrl('action', ['action' => 'pm', 'sa' => 'send', 'f' => $context['folder'], 'pmsg' => $output['id'], 'quote' => '', 'u' => 'all']) . ($context['current_label_id'] != -1 ? ';l=' . $context['current_label_id'] : ''),
+				'class' => 'reply_all_button',
+				'icon' => 'comments',
+				'enabled' => !$output['member']['is_guest'] && $output['number_recipients'] > 1 && $context['can_send_pm'],
+			],
+			// Reply, Quote
+			'reply_button' => [
+				'text' => 'reply',
+				'url' => getUrl('action', ['action' => 'pm', 'sa' => 'send', 'f' => $context['folder'], 'pmsg' => $output['id'], 'u' => $output['member']['id']]) . ($context['current_label_id'] != -1 ? ';l=' . $context['current_label_id'] : ''),
+				'class' => 'reply_button',
+				'icon' => 'modify',
+				'enabled' => !$output['member']['is_guest'] && $context['can_send_pm'],
+			],
+			'quote_button' => [
+				'text' => 'quote',
+				'url' => getUrl('action', ['action' => 'pm', 'sa' => 'send', 'f' => $context['folder'], 'pmsg' => $output['id'], 'quote' => '']) . ($context['current_label_id'] != -1 ? ';l=' . $context['current_label_id'] : '') . ($context['folder'] === 'sent' ? '' : ';u=' . $output['member']['id']),
+				'class' => 'quote_button',
+				'icon' => 'quote',
+				'enabled' => !$output['member']['is_guest'] && $context['can_send_pm'],
+			],
+			// This is for "forwarding" - even if the member is gone.
+			'reply_quote_button' => [
+				'text' => 'reply_quote',
+				'url' => getUrl('action', ['action' => 'pm', 'sa' => 'send', 'f' => $context['folder'], 'pmsg' => $output['id'], 'quote' => '']) . ($context['current_label_id'] != -1 ? ';l=' . $context['current_label_id'] : ''),
+				'class' => 'reply_button',
+				'icon' => 'modify',
+				'enabled' => $output['member']['is_guest'] && $context['can_send_pm'],
+			],
+			// Remove is always an option
+			'remove_button' => [
+				'text' => 'delete',
+				'url' => getUrl('action', ['action' => 'pm', 'sa' => 'pmactions', 'pm_actions[' . $output['id'] . ']' => 'delete', 'f' => $context['folder'], 'start' => $context['start'], '{session_data}']) . ($context['current_label_id'] != -1 ? ';l=' . $context['current_label_id'] : ''),
+				'icon' => 'delete',
+				'custom' => 'onclick="return confirm(\'' . addslashes($txt['remove_message']) . '?\');"',
+			],
+			// Maybe there is something...more :P (this is the more button)
+			// *** Submenu
+			//
+			// Or mark it as unread
+			'restore_button' => [
+				'text' => 'pm_mark_unread',
+				'url' => getUrl('action', ['action' => 'pm', 'sa' => 'markunread', 'l' => $context['current_label_id'], 'pmsg' => $output['id'], '{session_data}']),
+				'icon' => 'recycle',
+				'enabled' => empty($output['is_unread']) && $context['folder'] !== 'sent' && $output['member']['id'] != $this->user->id,
+				'submenu' => true,
+			],
+			// Can they report this message
+			'warn_button' => [
+				'text' => 'pm_report_to_admin',
+				'url' => getUrl('action', ['action' => 'pm', 'sa' => 'report', 'l' => $context['current_label_id'], 'pmsg' => $output['id'], '{session_data}']),
+				'icon' => 'warn',
+				'enabled' => !empty($output['can_report']) && $context['folder'] !== 'sent' && $output['member']['id'] != $this->user->id,
+				'submenu' => true,
+			],
+			// Showing all then give a remove item checkbox
+			'inline_mod_check' => [
+				'id' => 'deletedisplay' . $output['id'],
+				'class' => 'inline_mod_check',
+				'enabled' => empty($context['display_mode']),
+				'custom' => 'onclick="document.getElementById(\'deletelisting', $output['id'], '\').checked = this.checked;"',
+				'checkbox' => 'always',
+				'name' => 'pms',
+				'value' => $output['id'],
+			]
+		];
+
+		// Drop any non-enabled ones
+		$pmButtons = array_filter($pmButtons, static function ($button) {
+			return !isset($button['enabled']) || $button['enabled'] !== false;
+		});
+
+		return ['pmbuttons' => $pmButtons];
 	}
 }

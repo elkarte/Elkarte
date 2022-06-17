@@ -24,19 +24,41 @@
  */
 function elk_codefix()
 {
-	$('.bbc_code').each(function ()
-	{
-		let $this = $(this);
+	let codeBlock = document.querySelectorAll('.bbc_code');
+	codeBlock.forEach((code) => {
+		let style = window.getComputedStyle(code, null),
+			height = parseInt(style.getPropertyValue('height'));
 
-		// If it has a scroll bar, allow the user to resize it vertically
-		if ($this.get(0).scrollHeight > Math.round($this.innerHeight()))
+		if (code.scrollHeight > height)
 		{
-			$this.css('height', $this.height());
-			$this.css('max-height', 'none');
+			code.style.maxHeight = 'none';
+			code.style.height = height + 'px';
 		}
 		else
 		{
-			$this.css('resize', 'none');
+			code.style.resize = 'none';
+		}
+	});
+}
+
+/**
+ * Removes the read more overlay from quote blocks that do not need them, and for
+ * ones that do, hides so the read more input can expand it out.
+ */
+function elk_quotefix()
+{
+	let quotes = document.querySelectorAll('.quote-read-more');
+
+	quotes.forEach((quote) => {
+		let bbc_quote = quote.querySelector('.bbc_quote');
+
+		if (bbc_quote.scrollHeight > bbc_quote.clientHeight)
+		{
+			bbc_quote.style.overflow = 'hidden';
+		}
+		else
+		{
+			quote.querySelector('.quote-show-more').remove();
 		}
 	});
 }
@@ -1072,9 +1094,6 @@ function setBoardIds()
 	$.fn.SiteTooltip = function (oInstanceSettings)
 	{
 		$.fn.SiteTooltip.oDefaultsSettings = {
-			followMouse: 1,
-			positionTop: 12,
-			positionLeft: 12,
 			tooltipID: 'site_tooltip', // ID used on the outer div
 			tooltipTextID: 'site_tooltipText', // as above but on the inner div holding the text
 			tooltipClass: 'tooltip', // The class applied to the outer div (that displays on hover), use this in your css
@@ -1095,14 +1114,15 @@ function setBoardIds()
 		$(this).each(function ()
 		{
 			let sTitle = $('<span class="' + oSettings.tooltipSwapClass + '">' + this.title + '</span>').hide();
+
 			$(this).append(sTitle).attr('title', '');
 		});
 
 		// Determine where we are going to place the tooltip, while trying to keep it on screen
 		let positionTooltip = function (event)
 		{
-			let iPosx = 0,
-				iPosy = 0,
+			let iPosx,
+				iPosy,
 				$_tip = $('#' + oSettings.tooltipID);
 
 			if (!event)
@@ -1110,21 +1130,14 @@ function setBoardIds()
 				event = window.event;
 			}
 
-			if (event.pageX || event.pageY)
-			{
-				iPosx = event.pageX;
-				iPosy = event.pageY;
-			}
-			else if (event.clientX || event.clientY)
-			{
-				iPosx = event.clientX + document.body.scrollLeft + document.documentElement.scrollLeft;
-				iPosy = event.clientY + document.body.scrollTop + document.documentElement.scrollTop;
-			}
+			let target = $(event.currentTarget);
+			iPosx = target.position().left;
+			iPosy = target.position().top;
 
 			// Position of the tooltip top left corner and its size
 			let oPosition = {
-				x: iPosx + oSettings.positionLeft,
-				y: iPosy + oSettings.positionTop,
+				x: iPosx,
+				y: iPosy + target.height() + 5,
 				w: $_tip.width(),
 				h: $_tip.height()
 			};
@@ -1133,33 +1146,24 @@ function setBoardIds()
 			let oLimits = {
 				x: $(window).scrollLeft(),
 				y: $(window).scrollTop(),
-				w: $(window).width() - 24,
-				h: $(window).height() - 24
+				w: $(window).width(),
+				h: $(window).height()
 			};
 
-			// Don't go off-screen with our tooltip
-			if ((oPosition.y + oPosition.h > oLimits.y + oLimits.h) && (oPosition.x + oPosition.w > oLimits.x + oLimits.w))
+			// Don't go off-screen bottom with our tooltip
+			if (oPosition.y + oPosition.h > oLimits.y + oLimits.h)
 			{
-				oPosition.x = (oPosition.x - oPosition.w) - 45;
-				oPosition.y = (oPosition.y - oPosition.h) - 45;
-			}
-			else if ((oPosition.x + oPosition.w) > (oLimits.x + oLimits.w))
-			{
-				oPosition.x -= (((oPosition.x + oPosition.w) - (oLimits.x + oLimits.w)) + 24);
-			}
-			else if (oPosition.y + oPosition.h > oLimits.y + oLimits.h)
-			{
-				oPosition.y -= (((oPosition.y + oPosition.h) - (oLimits.y + oLimits.h)) + 24);
+				oPosition.y -= oPosition.h + target.height() + 20;
 			}
 
-			// Finally set the position we determined
+			// Finally, set the position we determined
 			$_tip.css({'left': oPosition.x + 'px', 'top': oPosition.y + 'px'});
 		};
 
 		// Used to show a tooltip
 		let showTooltip = function ()
 		{
-			$('#' + oSettings.tooltipID + ' #' + oSettings.tooltipTextID).slideDown(150);
+			$('#' + oSettings.tooltipID + ' #' + oSettings.tooltipTextID).fadeIn(150);
 		};
 
 		// Used to hide a tooltip
@@ -1173,19 +1177,13 @@ function setBoardIds()
 			});
 		};
 
-		// Used to keep html encoded
-		function htmlspecialchars(string)
-		{
-			return $('<span>').text(string).html();
-		}
-
 		// For all elements that match the selector on the page, lets set up some actions
 		return this.each(function ()
 		{
 			let timer;
 
 			// Plain old hover it is
-			$(this).hover(function(event) {
+			$(this).on('mouseenter', function(event) {
 				let $this = $(this),
 					$event = event;
 
@@ -1213,24 +1211,13 @@ function setBoardIds()
 						showTooltip();
 						positionTooltip($event);
 				}
-			},750);},
-			function() {
+			},1250);})
+			.mouseleave(function() {
 				let $this = $(this);
-				// on mouse out, cancel the timer
+
 				clearTimeout(timer);
 				hideTooltip($this);
 			});
-
-			// Create the tip move with the cursor
-			if (oSettings.followMouse)
-			{
-				$(this).on("mousemove", function (event)
-				{
-					positionTooltip(event);
-
-					return false;
-				});
-			}
 
 			// Clear the tip on a click
 			$(this).on("click", function ()
@@ -1991,81 +1978,87 @@ var ElkNotifier = new ElkNotifications();
  */
 (function ()
 {
-	var ElkInfoBar = (function (elem_id, opt)
+	let ElkInfoBar = (function (elem_id, opt)
 	{
 		'use strict';
 
-		opt = $.extend({
+		let defaults = {
 			text: '',
 			class: 'ajax_infobar',
 			hide_delay: 4000,
 			error_class: 'error',
 			success_class: 'success'
-		}, opt);
+		};
 
-		let $elem = $('#' + elem_id),
+		let settings = Object.assign({}, defaults, opt);
+
+		let elem = document.getElementById(elem_id),
 			time_out = null,
-			init = function (elem_id, opt)
+			init = function (elem_id, settings)
 			{
 				clearTimeout(time_out);
-				if ($elem.length === 0)
+				if (elem === null)
 				{
-					$elem = $('<div id="' + elem_id + '" class="' + opt.class + ' hide" />');
-					$('body').append($elem);
-					$elem.attr('id', elem_id);
-					$elem.addClass(opt.class);
-					$elem.text(opt.text);
+					elem = document.createElement('div');
+					elem.id = elem_id;
+					elem.className = settings.class;
+					elem.innerHTML = settings.text + '<span class="icon i-concentric"></span>';
+					document.body.appendChild(elem);
 				}
 			},
 			changeText = function (text)
 			{
 				clearTimeout(time_out);
-				$elem.html(text);
+				elem.innerHTML = text;
 				return this;
 			},
 			addClass = function (aClass)
 			{
-				$elem.addClass(aClass);
+				elem.classList.add(aClass);
 				return this;
 			},
 			removeClass = function (aClass)
 			{
-				$elem.removeClass(aClass);
+				elem.classList.remove(aClass);
 				return this;
 			},
 			showBar = function ()
 			{
 				clearTimeout(time_out);
-				$elem.fadeIn();
+				elem.style.opacity = '1';
 
-				if (opt.hide_delay !== 0)
+				if (settings.hide_delay !== 0)
 				{
 					time_out = setTimeout(function ()
 					{
 						hide();
-					}, opt.hide_delay);
+					}, settings.hide_delay);
 				}
 				return this;
 			},
 			isError = function ()
 			{
-				removeClass(opt.success_class);
-				addClass(opt.error_class);
+				removeClass(settings.success_class);
+				addClass(settings.error_class);
 			},
 			isSuccess = function ()
 			{
-				removeClass(opt.error_class);
-				addClass(opt.success_class);
+				removeClass(settings.error_class);
+				addClass(settings.success_class);
 			},
 			hide = function ()
 			{
+				// Short delay to avoid removing opacity while it is still be added
+				window.setTimeout(function () {
+					elem.style.opacity = '0';
+				}, 300);
+
 				clearTimeout(time_out);
-				$elem.slideUp();
 				return this;
 			};
 
 		// Call the init function by default
-		init(elem_id, opt);
+		init(elem_id, settings);
 
 		return {
 			changeText: changeText,

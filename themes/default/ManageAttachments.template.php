@@ -21,7 +21,7 @@ function template_maintenance()
 
 	echo '
 	<div id="manage_attachments">
-		<h2 class="category_header hdicon cat_img_stats_info">', $txt['attachment_stats'], '</h2>
+		<h2 class="category_header hdicon i-pie-chart">', $txt['attachment_stats'], '</h2>
 		<div class="content">
 			<dl class="settings">
 				<dt><label>', $txt['attachment_total'], ':</label></dt>

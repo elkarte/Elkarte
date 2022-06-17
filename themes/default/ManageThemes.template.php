@@ -28,7 +28,7 @@ function template_manage_themes()
 		<div id="admin_form_wrapper">
 			<form action="', $scripturl, '?action=admin;area=theme;sa=admin" method="post" accept-charset="UTF-8">
 				<h2 class="category_header">
-					<a class="hdicon cat_img_helptopics help" href="', $scripturl, '?action=quickhelp;help=theme_forum_theme" onclick="return reqOverlayDiv(this.href);" id="theme_forum_theme" title="', $txt['help'], '"></a> ', $txt['theme_forum_theme'], '
+					<a class="hdicon i-help help" href="', $scripturl, '?action=quickhelp;help=theme_forum_theme" onclick="return reqOverlayDiv(this.href);" id="theme_forum_theme" title="', $txt['help'], '"></a> ', $txt['theme_forum_theme'], '
 				</h2>
 				<div class="content">
 					<dl class="settings">
@@ -110,7 +110,7 @@ function template_manage_themes()
 
 	echo '
 			<h2 class="category_header">
-				<a class="hdicon cat_img_helptopics help" href="', $scripturl, '?action=quickhelp;help=theme_install" onclick="return reqOverlayDiv(this.href);" id="theme_install" title="', $txt['help'], '"></a> ', $txt['theme_install'], '
+				<a class="hdicon i-help help" href="', $scripturl, '?action=quickhelp;help=theme_install" onclick="return reqOverlayDiv(this.href);" id="theme_install" title="', $txt['help'], '"></a> ', $txt['theme_install'], '
 			</h2>
 			<form action="', $scripturl, '?action=admin;area=theme;sa=install" method="post" accept-charset="UTF-8" enctype="multipart/form-data" onsubmit="return confirm(\'', $txt['theme_install_new_confirm'], '\');">
 				<div class="content">';
@@ -204,7 +204,7 @@ function template_list_themes()
 		else
 		{
 			echo '
-						<a class="hdicon cat_img_helptopics help floatleft" href="' . $scripturl . '?action=quickhelp;help=themeadmin_delete_help" onclick="return reqOverlayDiv(this.href);" id="themeadmin_delete_help" title="' . $txt['help'] . '"></a>';
+						<a class="hdicon i-help help floatleft" href="' . $scripturl . '?action=quickhelp;help=themeadmin_delete_help" onclick="return reqOverlayDiv(this.href);" id="themeadmin_delete_help" title="' . $txt['help'] . '"></a>';
 		}
 
 		echo '
@@ -223,7 +223,7 @@ function template_list_themes()
 
 	echo '
 			<h2 class="category_header">
-				<a class="hdicon cat_img_helptopics help" href="', $scripturl, '?action=quickhelp;help=themeadmin_list_reset" onclick="return reqOverlayDiv(this.href);" id="themeadmin_list_reset" title="', $txt['help'], '"></a> ', $txt['themeadmin_list_reset'], '
+				<a class="hdicon i-help help" href="', $scripturl, '?action=quickhelp;help=themeadmin_list_reset" onclick="return reqOverlayDiv(this.href);" id="themeadmin_list_reset" title="', $txt['help'], '"></a> ', $txt['themeadmin_list_reset'], '
 			</h2>
 			<dl class="content settings themes_list">
 				<dt>
@@ -417,12 +417,12 @@ function template_set_settings()
 	echo '
 	<div id="admincenter">
 		<h2 class="category_header">
-			<a class="hdicon cat_img_helptopics help" href="', $scripturl, '?action=quickhelp;help=theme_settings" onclick="return reqOverlayDiv(this.href);" title="', $txt['help'], '"></a> ', $txt['theme_settings'], ' - ', $context['theme_settings']['name'], '
+			<a class="hdicon i-help help" href="', $scripturl, '?action=quickhelp;help=theme_settings" onclick="return reqOverlayDiv(this.href);" title="', $txt['help'], '"></a> ', $txt['theme_settings'], ' - ', $context['theme_settings']['name'], '
 		</h2>
 		<form id="admin_form_wrapper" action="', $scripturl, '?action=admin;area=theme;sa=list;th=', $context['theme_settings']['theme_id'], '" method="post" accept-charset="UTF-8">';
 
 	echo '
-			<h2 class="category_header hdicon cat_img_config">
+			<h2 class="category_header hdicon i-cog">
 				', $txt['theme_url_config'], '
 			</h2>
 			<div class="content theme_settings">
@@ -458,7 +458,7 @@ function template_set_settings()
 	if (!empty($context['theme_variants']))
 	{
 		echo '
-			<h2 class="category_header hdicon cat_img_config">
+			<h2 class="category_header hdicon i-cog">
 				', $txt['theme_variants'], '
 			</h2>
 			<div class="content">
@@ -491,7 +491,7 @@ function template_set_settings()
 	}
 
 	echo '
-			<h2 class="category_header hdicon cat_img_config">
+			<h2 class="category_header hdicon i-cog">
 				', $txt['theme_options'], '
 			</h2>
 			<div class="content">

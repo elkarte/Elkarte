@@ -41,7 +41,7 @@ function template_editBuddies()
 
 	echo '
 	<div id="edit_buddies">
-		<h2 class="category_header hdicon cat_img_buddies">
+		<h2 class="category_header hdicon i-users">
 			', $txt['editBuddies'], '
 		</h2>
 		<table class="table_grid">
@@ -165,7 +165,7 @@ function template_editIgnoreList()
 
 	echo '
 	<div id="edit_buddies">
-		<h2 class="category_header hdicon cat_img_profile">
+		<h2 class="category_header hdicon i-user">
 			', $txt['editIgnoreList'], '
 		</h2>
 		<table class="table_grid">
@@ -274,7 +274,7 @@ function template_edit_options()
 	// The main header!
 	echo '
 		<form action="', (!empty($context['profile_custom_submit_url']) ? $context['profile_custom_submit_url'] : getUrl('action', ['action' => 'profile', 'area' => $context['menu_item_selected'], 'u' => $context['id_member']])), '" method="post" accept-charset="UTF-8" name="creator" id="creator" enctype="multipart/form-data" onsubmit="return checkProfileSubmit();">
-			<h2 class="category_header hdicon cat_img_profile">';
+			<h2 class="category_header hdicon i-user">';
 
 	// Don't say "Profile" if this isn't the profile...
 	if (!empty($context['profile_header_text']))
@@ -815,7 +815,7 @@ function template_action_notification()
 	// The main containing header.
 	echo '
 		<form id="creator" class="flow_hidden" action="', getUrl('action', ['action' => 'profile', 'area' => 'notification']), '" method="post" accept-charset="UTF-8">
-			<h2 class="category_header hdicon cat_img_profile">
+			<h2 class="category_header hdicon i-user">
 				', $txt['profile'], '
 			</h2>
 			<p class="description">', $txt['notification_info'], '</p>
@@ -961,7 +961,7 @@ function template_groupMembership()
 	// The main containing header.
 	echo '
 		<form action="', getUrl('action', ['action' => 'profile', 'area' => 'groupmembership']), '" method="post" accept-charset="UTF-8" name="creator" id="creator">
-			<h2 class="category_header hdicon cat_img_profile">
+			<h2 class="category_header hdicon i-user">
 				', $txt['profile'], '
 			</h2>
 			<p class="description">', $txt['groupMembership_info'], '</p>';
@@ -1140,7 +1140,7 @@ function template_ignoreboards()
 	// The main containing header.
 	echo '
 	<form id="creator" action="', getUrl('action', ['action' => 'profile', 'area' => 'ignoreboards']), '" method="post" accept-charset="UTF-8" name="creator">
-		<h2 class="category_header hdicon cat_img_profile">
+		<h2 class="category_header hdicon i-user">
 			', $txt['profile'], '
 		</h2>
 		<p class="description">', $txt['ignoreboards_info'], '</p>
@@ -1545,7 +1545,7 @@ function template_authentication_method()
 	// The main header!
 	echo '
 		<form action="', getUrl('action', ['action' => 'profile', 'area' => 'authentication']), '" method="post" accept-charset="UTF-8" name="creator" id="creator" enctype="multipart/form-data">
-			<h2 class="category_header hdicon cat_img_profile">
+			<h2 class="category_header hdicon i-user">
 				', $txt['authentication'], '
 			</h2>
 			<p class="description">', $txt['change_authentication'], '</p>

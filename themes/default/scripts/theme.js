@@ -27,6 +27,11 @@ document.addEventListener("DOMContentLoaded", function ()
 	{
 		elk_codefix();
 	}
+
+	if (typeof elk_quotefix === 'function')
+	{
+		elk_quotefix();
+	}
 });
 
 // Jquery document ready

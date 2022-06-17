@@ -710,27 +710,27 @@ function setOldUrl($index = 'old_url')
  */
 function determineTopicClass(&$topic_context)
 {
+
+	$topic_context['class'] = !empty($topic_context['is_poll']) ? 'i-poll' : 'i-normal';
+
 	// Set topic class depending on locked status and number of replies.
-	$topic_context['class'] = 'normal';
 	if ($topic_context['is_very_hot'])
 	{
-		$topic_context['class'] = 'veryhot';
+		$topic_context['class'] = 'i-hot colorize-red';
 	}
 	elseif ($topic_context['is_hot'])
 	{
-		$topic_context['class'] = 'hot';
-	}
-
-	$topic_context['class'] .= !empty($topic_context['is_poll']) ? '_poll' : '_post';
-
-	if ($topic_context['is_locked'])
-	{
-		$topic_context['class'] .= '_locked';
+		$topic_context['class'] = 'i-hot colorize-yellow';
 	}
 
 	if ($topic_context['is_sticky'])
 	{
-		$topic_context['class'] .= '_sticky';
+		$topic_context['class'] = 'i-sticky';
+	}
+
+	if ($topic_context['is_locked'])
+	{
+		$topic_context['class'] = 'i-locked';
 	}
 }
 

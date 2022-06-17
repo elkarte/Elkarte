@@ -181,9 +181,6 @@ class BBCParser
 			$this->handleFootnotes();
 		}
 
-		// Collapse quotes so they are less overwhelming.
-		$this->handleCollapsedQuotes();
-
 		// Allow addons access to what the parser created, formally
 		// called as integrate_post_parsebbc
 		$message = $this->message;
@@ -627,9 +624,7 @@ class BBCParser
 		//			No man can win every battle, but no man should fall without a struggle.
 		//		</blockquote> .. with a max height that is removed on input click
 		// </div>
-		// Should you alter this markup, be sure to check handleCollapsedQuotes()
-		$read_more = empty($GLOBALS['modSettings']['charactersBeforeShowMore']) ? 0 : (int) $GLOBALS['modSettings']['charactersBeforeShowMore'];
-		if ($first_quote === 0 && $read_more !== 0)
+		if ($first_quote === 0)
 		{
 			$tag[Codes::ATTR_BEFORE] = str_replace('<blockquote class="bbc_quote">', '<div class="quote-read-more"><input type="checkbox" title="show" class="quote-show-more"><blockquote class="bbc_quote">', $tag[Codes::ATTR_BEFORE]);
 			$tag[Codes::ATTR_AFTER] = str_replace('</blockquote>', '</blockquote></div>', $tag[Codes::ATTR_AFTER]);
@@ -1265,55 +1260,6 @@ class BBCParser
 		$this->fn_content[] = '<div class="target" id="fn' . $this->fn_num . '_' . $this->fn_count . '"><sup>' . $this->fn_num . '&nbsp;</sup>' . $matches[2] . '<a class="footnote_return" href="#ref' . $this->fn_num . '_' . $this->fn_count . '">&crarr;</a></div>';
 
 		return '<a class="target" href="#fn' . $this->fn_num . '_' . $this->fn_count . '" id="ref' . $this->fn_num . '_' . $this->fn_count . '">[' . $this->fn_num . ']</a>';
-	}
-
-	/**
-	 * Look at each parent quote in this message and determine the amount of text each contains
-	 *   - over the read more threshold, do nothing,
-	 *   - under, remove the parent show-more wrapper
-	 */
-	protected function handleCollapsedQuotes()
-	{
-		$end = 0;
-		$start_len = 29; // '<div class="quote-read-more">';
-		$end_len = 19; // '</blockquote></div>'
-		$input_len = 60; // '<input type="checkbox" title="show" class="quote-show-more">'
-		$input = '<input type="checkbox" title="show" class="quote-show-more">';
-		$read_more = empty($GLOBALS['modSettings']['charactersBeforeShowMore']) ? 0 : (int) $GLOBALS['modSettings']['charactersBeforeShowMore'];
-		if ($read_more === 0)
-		{
-			return;
-		}
-
-		// While we have parent quotes, lets test the content length.
-		while ($start = stripos($this->message, '<div class="quote-read-more">', $end))
-		{
-			// End of the parent wrapper
-			$end = stripos($this->message, '</blockquote></div>', $start + $start_len);
-			if ($end === false)
-			{
-				break;
-			}
-
-			// How many newlines and how much text does this parent contain
-			$quote = substr($this->message, $start, $end - $start);
-			$quoteText = explode('<blockquote class="bbc_quote">', $quote, 2);
-			$quoteText = $quoteText[1] ?? $quote;
-			if (substr_count($quote, '<br />') < 6 && Util::strlen(strip_tags($quoteText)) < $read_more)
-			{
-				// Not so chatty, first remove the input quote-show-more
-				$input_start = stripos($this->message, $input, $start + $start_len);
-				$this->message = substr_replace($this->message, '', $input_start, $input_len);
-				$end -= $input_len;
-
-				// Now remove the outer div quote-read-more wrapper
-				$this->message = substr_replace($this->message, '</blockquote>', $end, $end_len);
-				$this->message = substr_replace($this->message, '', $start, $start_len);
-
-				// The end is closer than you may think (</div> = 6)
-				$end -= $start_len - 6;
-			}
-		}
 	}
 
 	/**

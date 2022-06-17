@@ -34,7 +34,7 @@ function template_admin()
 	echo '
 				<div id="live_news" class="floatleft">
 					<h2 class="category_header">
-						<a href="', getUrl('action', ['action' => 'quickhelp', 'help' => 'live_news']), '" onclick="return reqOverlayDiv(this.href);" class="hdicon cat_img_helptopics help"></a>', $txt['live'], '
+						<a href="', getUrl('action', ['action' => 'quickhelp', 'help' => 'live_news']), '" onclick="return reqOverlayDiv(this.href);" class="hdicon i-help help"></a>', $txt['live'], '
 					</h2>
 					<div class="content">
 						<div id="ourAnnouncements">', $txt['lfyi'], '</div>
@@ -45,7 +45,7 @@ function template_admin()
 	echo '
 				<div id="supportVersionsTable" class="floatright">
 					<h2 class="category_header">
-						<a class="hdicon cat_img_plus" href="', getUrl('admin', ['action' => 'admin', 'area' => 'credits']), '">', $txt['support_title'], '</a>
+						<a class="hdicon i-user-plus" href="', getUrl('admin', ['action' => 'admin', 'area' => 'credits']), '">', $txt['support_title'], '</a>
 					</h2>
 						<div class="content">
 						<div id="version_details">
@@ -491,7 +491,7 @@ function template_show_settings()
 					if (empty($config_var['class']))
 					{
 						echo '
-						<a href="' . getUrl('action', ['action' => 'quickhelp', 'help' => $config_var['helptext']]) . '" onclick="return reqOverlayDiv(this.href);" class="hdicon cat_img_helptopics help" title="' . $txt['help'] . '"></a>';
+						<a href="' . getUrl('action', ['action' => 'quickhelp', 'help' => $config_var['helptext']]) . '" onclick="return reqOverlayDiv(this.href);" class="hdicon i-help help" title="' . $txt['help'] . '"></a>';
 					}
 					else
 					{
@@ -762,7 +762,7 @@ function template_admin_search_results()
 	global $context, $txt;
 
 	echo '
-					<h2 class="category_header hdicon cat_img_search">
+					<h2 class="category_header hdicon i-search">
 						', sprintf($txt['admin_search_results_desc'], $context['search_term']) . template_admin_quick_search() . '
 					</h2>
 					<div class="generic_list_wrapper">

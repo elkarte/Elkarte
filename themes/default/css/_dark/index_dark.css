@@ -50,23 +50,23 @@
 :root {
 	--html_background: #0B0B0B; /* HTML & footer Background */
 	--body_grad_1: #0B0B0B; /* Body Gradient */
-	--body_grad_2: #0B0B0B; /* Body Gradient */
+	--body_grad_2: #E0E0E0; /* Body Gradient */
 
 	/* Top section above the navigation menu */
 	--top_section_border: #232323; /* Header */
 	--top_section_top_border: #232323; /* Top border */
 	--top_section_bottom_border: #363738; /* Top section lower border */
 	--top_section: #232323; /* Background */
-	--top_section_compliment: #232323; /* Used with above for gradient */
+	--top_section_compliment: #020020; /* Used with above for gradient */
 
 	/* Menu nav background if a different background from top_section is wanted */
-	--menu_nav_grad_1: #232323; /* Top Menu nav bar background */
-	--menu_nav_grad_2: #232323; /* Top Menu nav bar background */
+	--menu_nav_grad_1: transparant; /* Top Menu nav bar background */
+	--menu_nav_grad_2: transparant; /* Top Menu nav bar background */
 
 	/* Footer */
 	--footer_text: #BBBBBB; /* Text used in the footer */
 	--footer_background: #0B0B0B; /* Footer Background */
-	--footer_top_border: #00214C; /* Border that separates footer from body */
+	--footer_top_border: #012050; /* Border that separates footer from body */
 
 	/* Input controls, input, button, select, textarea */
 	--input-background: #0B0B0B; /* Generic inputs background */
@@ -120,7 +120,7 @@
 	--icon_menu_hover_border: #232323;
 
 	/* Category Headers */
-	--category_header_text: #30884A; /* Text in the category bars */
+	--category_header_text: #9D8860; /* Text in the category bars */
 	--category_border: #131417; /* Main border color used around most everything that has a border */
 	--category_border_top: #131417;
 	--category_border_bottom: #131417;
@@ -138,10 +138,10 @@
 	--hr_background: #E4E4E4;
 
 	/* Misc */
-	--title: #30AD55; /* forum title, news, board names */
+	--title: #9D8860; /* forum title, news, board names */
 	--topic_name: #3B72F0; /* Subject line, poster name and keyinfo */
-	--links: #5784FF; /* normal links */
-	--bbclinks: #30AD55; /* bbc links */
+	--links: #9D8860; /*#5784FF; /* normal links */
+	--bbclinks: #9D8860; /* bbc links */
 
 	--me: #30AD55; /* me and footnotes */
 	--gradient_bar_top: #30AD55; /* Various bars, poll, stats, capacity */
@@ -163,7 +163,7 @@
 
 	--progress_bar_blue: #0000FF; /* Blue progress bar, as in maintance */
 	--birthday: #B73DE8; /* Birthday color on calendar */
-	--holiday: #555080; /* Holiday color on calendar */
+	--holiday: #847BAD; /* Holiday color on calendar */
 	--currentday: #1B644E; /* Calendar current day */
 	--infobox_border: #3A87AD; /* Light shade of blue in infobox */
 	--infobox: #2C64AB; /* Very light blue, infobox background */
@@ -182,7 +182,7 @@
 	--primary_white: #DBDBDB; /* Used in shadows, backgrounds or text, many places */
 	--primary_white_compliment: #E4E4E4; /* Used with --primary_white for gradients */
 	--pure_green: #008000; /* Success, progress mainly background | border */
-	--medium_dark_green: #006F1C; /* New button, approve background, other */
+	--medium_dark_orange: #64533F; /* New button, approve background, other */
 
 	/* Text colors */
 	--hover_text: #444444; /* When you need a darker text color on hover or elsewhere */
@@ -226,7 +226,7 @@
 
 /* Normal, standard links. */
 a, a:link, a:visited,
-	/* Links that open in a new window. */
+/* Links that open in a new window. */
 a.new_win:link, a.new_win:visited {
 	color: var(--links);
 }
@@ -239,7 +239,10 @@ html {
 
 body {
 	color: var(--body_text);
-	background-image: linear-gradient(to right, var(--body_grad_1) 0%, var(--body_grad_2) 50%, var(--body_grad_1) 100%);
+	background-image: radial-gradient(50% 50% at top center, rgba(0, 0, 0, .7), var(--body_grad_1)), linear-gradient(180deg, var(--body_grad_2), var(--body_grad_1));
+	background-repeat: no-repeat;
+	background-position: top 100px center;
+	background-size: 120% 2000px, 100% 2000px;
 }
 
 fieldset {
@@ -281,8 +284,8 @@ input[disabled].input_text, input[disabled].input_password {
 
 /* Common button styling. */
 input[type="submit"], .drop_area_fileselect_text, button[type="submit"], input[type="button"], button[type="button"],
-	/* Anchors styled to look like buttons.
-	   These have standard body text size. Can be chained with smalltext class. */
+/* Anchors styled to look like buttons.
+   These have standard body text size. Can be chained with smalltext class. */
 .linkbutton:link, .linkbutton:visited {
 	color: var(--input_text);
 	border-color: var(--input_submit_border);
@@ -313,13 +316,13 @@ input[type=submit][disabled]:hover, button[disabled], button[disabled]:hover {
 /* the new "button" */
 .new_posts, .new_posts:visited, .new_posts:link {
 	color: var(--primary_white);
-	background: var(--medium_dark_green);
+	background: var(--medium_dark_orange);
 }
 
 /* approval indicator */
 .require_approval {
 	color: var(--primary_white);
-	background: var(--medium_dark_green);
+	background: var(--medium_dark_orange);
 }
 
 /* Standard horizontal rule.. ([hr], etc.) */
@@ -472,7 +475,7 @@ strong {
 
 /* A quote, perhaps from another post. */
 .bbc_quote,
-	/* A code block - maybe PHP ;) - shared styles. */
+/* A code block - maybe PHP ;) - shared styles. */
 .bbc_code {
 	border-color: var(--primary_border);
 	background: var(--primary_content_background);
@@ -502,7 +505,7 @@ input[type=checkbox].quote-show-more {
 
 .bbc_link:hover {
 	color: var(--links);
-	box-shadow: 0 -1px 0 var(--medium_dark_green) inset;
+	box-shadow: 0 -1px 0 var(--medium_dark_orange) inset;
 }
 
 /* Styling for tables inside posts */
@@ -582,9 +585,12 @@ sup.bbc_footnotes, sup.bbc_footnotes a {
 	color: var(--attention);
 }
 
-.forumtitle > a {
-	color: var(--title);
-	text-shadow: 1px 1px 0 var(--primary_white);
+#forumtitle > a {
+	font-weight: 700;
+	color: var(--transparent);
+	background: linear-gradient(15deg, var(--medium_dark_orange), var(--title));
+	-webkit-background-clip: text;
+	background-clip: text;
 }
 
 /* News section. */
@@ -602,6 +608,7 @@ sup.bbc_footnotes, sup.bbc_footnotes a {
 /* Main forum area.
    Box-shadow only on this one. */
 #wrapper {
+	margin-top: 2em;
 	border-color: var(--transparent);
 	border-top-color: var(--transparent);
 	border-bottom-color: var(--transparent);
@@ -623,7 +630,7 @@ sup.bbc_footnotes, sup.bbc_footnotes a {
 
 .action_viewquery a, .action_viewquery strong,
 #debug_logging a, #debug_logging strong {
-	color: var(--pure_green);
+	color: var(--links);
 }
 
 #debug_logging {
@@ -721,7 +728,7 @@ sup.bbc_footnotes, sup.bbc_footnotes a {
 
 /* Level 1 active buttons. */
 .linklevel1.active, .listlevel1:hover .active,
-#collapse_button .linklevel1, .likes_indicator,
+#collapse_button .linklevel1, .button_indicator,
 #search_form_button .linklevel1, #search_form_button_close .linklevel1 {
 	color: var(--primary_white);
 	border-color: var(--menu_button_border_active);
@@ -778,10 +785,10 @@ sup.bbc_footnotes, sup.bbc_footnotes a {
 /* PM and Notification bubble indicator */
 .pm_indicator {
 	/* overriding structure, make this a small circle, no counter (off screen) */
-	top: 2px;
-	right: 3px;
-	width: .75em;
-	height: .75em;
+	top: -4px;
+	right: -2px;
+	width: 1em;
+	height: 1em;
 	padding: 0;
 	text-indent: -9999px;
 	color: var(--input-background) !important;
@@ -789,7 +796,7 @@ sup.bbc_footnotes, sup.bbc_footnotes a {
 	background: var(--title);
 }
 
-.likes_indicator {
+.button_indicator {
 	box-shadow: 2px 2px 2px var(--transparent);
 }
 
@@ -881,10 +888,6 @@ sup.bbc_footnotes, sup.bbc_footnotes a {
 /* Cancel generic border-radius. */
 .quickbuttons .linklevel1 {
 	color: var(--menu_text);
-}
-
-.quickbuttons .linklevel1::before, .quickbuttons .linklevel2::before {
-	background-image: url(../../images/_dark/quickbuttons.png);
 }
 
 .quick_quote_button > .warning {
@@ -1012,6 +1015,10 @@ sup.bbc_footnotes, sup.bbc_footnotes a {
 .content_category > li {
 	border-color: var(--secondary_border);
 	background: var(--primary_content_background);
+}
+
+.board_row {
+	margin-bottom: .5em;
 }
 
 .board_name > a {
@@ -1348,13 +1355,13 @@ sup.bbc_footnotes, sup.bbc_footnotes a {
 
 /* Used by share topic */
 .requiredfield:before {
-	border-bottom-color: var(--medium_dark_green);
+	border-bottom-color: var(--medium_dark_orange);
 }
 
 .requiredfield {
 	color: var(--primary_white);
 	border-color: var(--menu_border_hover_top);
-	background: var(--medium_dark_green);
+	background: var(--medium_dark_orange);
 }
 
 /* -------------------------------------------------------
@@ -1936,8 +1943,8 @@ ul.cf_icons {
 }
 
 .iconline {
-	border-color: var(--medium_dark_green);
-	background-image: linear-gradient(to bottom, var(--icon_online_grad) 0%, var(--medium_dark_green) 50%, var(--icon_online_grad) 100%);
+	border-color: var(--medium_dark_orange);
+	background-image: linear-gradient(to bottom, var(--icon_online_grad) 0%, var(--medium_dark_orange) 50%, var(--icon_online_grad) 100%);
 }
 
 .icoffline {
@@ -1992,7 +1999,7 @@ ul.cf_icons {
 
 	/* This provides a bottom border, seen when crumbs wrap */
 	.breadcrumb .crumb:not(:last-child) {
-		box-shadow: 0 -1px 0 1px var(--box_shadow), 0 0 0 1px var(--body_text);
+		box-shadow: 0 -1px 0 1px var(--hover_text), 0 0 0 1px var(--hover_text);
 	}
 }
 

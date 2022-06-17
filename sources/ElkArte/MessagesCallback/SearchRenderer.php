@@ -89,7 +89,7 @@ class SearchRenderer extends Renderer
 	 */
 	protected function _buildOutputArray()
 	{
-		global $modSettings, $context, $options, $txt;
+		global $modSettings, $context, $options;
 
 		// Make sure we don't end up with a practically empty message body.
 		$this->_this_message['body'] = preg_replace('~^(?:&nbsp;)+$~', '', $this->_this_message['body']);
@@ -101,11 +101,6 @@ class SearchRenderer extends Renderer
 
 		$output = array_merge($context['topics'][$this->_this_message['id_msg']], $output_pre);
 		$output['posted_in'] = !empty($this->_participants[$this->_this_message['id_topic']]);
-		$output['tests'] = [
-			'can_reply' => in_array($this->_this_message['id_board'], $this->_options['boards_can']['post_reply_any']) || in_array(0, $this->_options['boards_can']['post_reply_any']),
-			'can_quote' => (in_array($this->_this_message['id_board'], $this->_options['boards_can']['post_reply_any']) || in_array(0, $this->_options['boards_can']['post_reply_any'])) && $quote_enabled,
-			'can_mark_notify' => in_array($this->_this_message['id_board'], $this->_options['boards_can']['mark_any_notify']) || in_array(0, $this->_options['boards_can']['mark_any_notify']) && !$context['user']['is_guest'],
-		];
 		$href = getUrl('board', ['board' => $this->_this_message['id_board'], 'start' => '0', 'name' => $this->_this_message['bname']]);
 
 		$output['board'] = [
@@ -194,41 +189,66 @@ class SearchRenderer extends Renderer
 			],
 			'body' => $this->_this_message['body'],
 			'body_highlighted' => $body_highlighted,
-			'start' => 'msg' . $this->_this_message['id_msg']
+			'start' => 'msg' . $this->_this_message['id_msg'],
 		];
+
+		$output['buttons'] = $this->_buildSearchButtons($output, $quote_enabled);
+
+		return $output;
+	}
+
+	/**
+	 * Generates a PM button array suitable for consumption by template_button_strip
+	 *
+	 * @param array $output
+	 * @param bool $quote_enabled
+	 * @return array
+	 */
+	protected function _buildSearchButtons($output, $quote_enabled)
+	{
+		global $context;
+
+		$searchButtons = [];
 
 		if (!$context['compact'])
 		{
-			$output['buttons'] = [
+			$searchButtons = [
 				// If they can moderate
 				'inline_mod_check' => [
+					'class' => 'inline_mod_check',
 					'value' => $output['id'],
-					'checkbox' => 'check',
+					'checkbox' => 'always',
 					'name' => 'topics',
-					'test' => 'can_quick_mod',
+					'enabled' => $context['can_quick_mod'],
 				],
 				// Can we request notification of topics?
 				'notify' => [
-					'href' => getUrl('action', ['action' => 'notify', 'topic' => $output['id'] . '.msg' . $this->_this_message['id_msg']]),
-					'text' => $txt['notify'],
-					'test' => 'can_mark_notify',
+					'url' => getUrl('action', ['action' => 'notify', 'topic' => $output['id'] . '.msg' . $this->_this_message['id_msg']]),
+					'text' => 'notify',
+					'icon' => 'envelope',
+					'enabled' => in_array($output['board']['id'], $this->_options['boards_can']['mark_any_notify']) || in_array(0, $this->_options['boards_can']['mark_any_notify']) && !$context['user']['is_guest'],
 				],
 				// If they *can* reply?
 				'reply' => [
-					'href' => getUrl('action', ['action' => 'post', 'topic' => $output['id'] . '.msg' . $this->_this_message['id_msg']]),
-					'text' => $txt['reply'],
-					'test' => 'can_reply',
+					'url' => getUrl('action', ['action' => 'post', 'topic' => $output['id'] . '.msg' . $this->_this_message['id_msg']]),
+					'text' => 'reply',
+					'icon' => 'modify',
+					'enabled' => in_array($output['board']['id'], $this->_options['boards_can']['post_reply_any']) || in_array(0, $this->_options['boards_can']['post_reply_any']),
 				],
 				// If they *can* quote?
 				'quote' => [
-					'href' => getUrl('action', ['action' => 'post', 'topic' => $output['id'] . '.msg' . $this->_this_message['id_msg'], 'quote' => $this->_this_message['id_msg']]),
-					'text' => $txt['quote'],
-					'test' => 'can_quote',
+					'url' => getUrl('action', ['action' => 'post', 'topic' => $output['id'] . '.msg' . $this->_this_message['id_msg'], 'quote' => $this->_this_message['id_msg']]),
+					'text' => 'quote',
+					'icon' => 'quote',
+					'enabled' => (in_array($output['board']['id'], $this->_options['boards_can']['post_reply_any']) || in_array(0, $this->_options['boards_can']['post_reply_any'])) && $quote_enabled,
 				],
 			];
 		}
 
-		return $output;
+		// Drop any non-enabled ones
+		return array_filter($searchButtons, static function ($button) {
+			return !isset($button['enabled']) || $button['enabled'] !== false;
+		});
 	}
 
 	/**

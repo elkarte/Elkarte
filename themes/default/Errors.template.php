@@ -45,7 +45,7 @@ function template_error_log()
 	echo '
 		<form class="generic_list_wrapper" action="', $scripturl, '?action=admin;area=logs;sa=errorlog', $context['sort_direction'] === 'down' ? ';desc' : '', ';start=', $context['start'], $context['has_filter'] ? $context['$page_filter'] : '', '" method="post" accept-charset="UTF-8">
 			<h2 class="category_header">
-				<a class="hdicon cat_img_helptopics help" href="', $scripturl, '?action=quickhelp;help=error_log" onclick="return reqOverlayDiv(this.href);" title="', $txt['help'], '"></a> ', $txt['errlog'], '
+				<a class="hdicon i-help help" href="', $scripturl, '?action=quickhelp;help=error_log" onclick="return reqOverlayDiv(this.href);" title="', $txt['help'], '"></a> ', $txt['errlog'], '
 			</h2>
 			<div class="flow_flex">';
 

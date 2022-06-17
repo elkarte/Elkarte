@@ -77,6 +77,7 @@
 	--font28: 1.8667rem;
 	--font29: 1.9333rem;
 	--font30: 2.0rem;
+	--quote_height: 12em;
 }
 
 /* -------------------------------------------------------
@@ -104,10 +105,6 @@ html, body {
 	font-size: 15px;
 	font-weight: 400;
 	line-height: 1.5;
-}
-
-body {
-	color: #141414;
 }
 
 /* Global box sizing, for stabilising fluid layouts.
@@ -146,20 +143,20 @@ a:hover, a.new_win:hover {
 }
 
 body, input, button, select, textarea, .editor {
-	/* Set a font-family
-	   Start with calling OSx system’s UI font with -apple-system, BlinkMacSystemFont this will pull in
-	   (San Francisco, Neue Helvetica and Lucida Grande depends on OS version)
-	   Then Windows (Segoe UI), Android (Roboto), Unix (KDE, Ubuntu, Gnome), Old Android (Droid Sans),
-	   OSx pre apple-system support (Helvetica Neue), fallbacks (Arial, sans-serif) */
-	font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen", "Ubuntu", "Cantarell", "Droid Sans", "Helvetica Neue", "Trebuchet MS", Arial, sans-serif;
+	/* Set a font-family stack
+	   Start with system-ui which should use the existing OS font
+	   Then -apple-system, BlinkMacSystemFont which are equivalent to system-ui, but used for OSx browsers that lack support
+	   Then Windows (Segoe UI), Android (Roboto), and *nix running KDE, Ubuntu, Gnome
+	   Followed by fallbacks droid specific, Helvetica Neue, Arial, sans-serif) */
+	font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue", Arial, sans-serif;
 }
 
 /* Use a specific demi bold font weight for some areas, less jarring then 700/bold,
    with fallback to default font stack if not available. */
 .codeheader, .quoteheader, .expand_pages, .table_head > th, .topic_sorting_row > h3, .topic_name h4 a,
-.poster .name, .keyinfo h3 a, .keyinfo h3 a strong, .ui-dialog .ui-dialog-titlebar,
+.poster .name, .keyinfo h3 a, .keyinfo h3 a strong, .ui-dialog .ui-dialog-titlebar, .bbc_quote > cite,
 #creator dt strong, .settings label, .popup_heading {
-	font-family: "Segoe UI Semibold", "Segoe UI", "Helvetica Neue Medium", -apple-system, BlinkMacSystemFont, "Roboto", "Oxygen", "Ubuntu", "Cantarell", "Droid Sans", "Helvetica Neue", "Trebuchet MS", Arial, sans-serif;
+	font-family: "Segoe UI Semibold", "Helvetica Neue Medium", system-ui, -apple-system, BlinkMacSystemFont, "Roboto", "Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue", Arial, sans-serif;
 	font-weight: 600;
 	/* Apple specific fixes */
 	-webkit-font-smoothing: antialiased;
@@ -458,11 +455,6 @@ em, .em {
 	display: none;
 }
 
-/* HTML5 additions for deprecated tags. */
-.tt {
-	font-family: monospace;
-}
-
 /* Alternative for u tag. */
 .underline {
 	text-decoration: underline;
@@ -583,115 +575,14 @@ em, .em {
 	border: 1px solid;
 }
 
-/* Category Header icons as sprites, many available to custom themes */
+/* Category Header icons, chain i-xyz from icons_svg */
 .hdicon::before {
 	display: inline-block;
-	width: 30px;
+	width: 24px;
 	height: 24px;
+	margin: 0 .25em 0 0;
 	content: "";
 	vertical-align: text-bottom;
-	background-image: url(../images/icons/header.png);
-	background-repeat: no-repeat;
-}
-
-.cat_img_attachments::before {
-	background-position: 0 0;
-}
-
-.cat_img_buddies::before {
-	background-position: 0 -24px;
-}
-
-.cat_img_config::before {
-	background-position: 0 -48px;
-}
-
-.cat_img_contacts::before {
-	background-position: 0 -72px;
-}
-
-.cat_img_helptopics::before {
-	background-position: 0 -96px;
-}
-
-.cat_img_inbox::before {
-	background-position: 0 -120px;
-}
-
-.cat_img_login::before {
-	background-position: 0 -144px;
-}
-
-.cat_img_mail::before {
-	background-position: 0 -168px;
-}
-
-.cat_img_moderation::before {
-	background-position: 0 -192px;
-}
-
-.cat_img_plus::before {
-	background-position: 0 -216px;
-}
-
-.cat_img_posts::before {
-	background-position: 0 -240px;
-}
-
-.cat_img_profile::before {
-	background-position: 0 -264px;
-}
-
-.cat_img_search::before {
-	background-position: 0 -288px;
-}
-
-.cat_img_stats_info::before {
-	background-position: 0 -312px;
-}
-
-.cat_img_topics::before {
-	background-position: 0 -336px;
-}
-
-.cat_img_write::before {
-	background-position: 0 -360px;
-}
-
-.cat_img_database::before {
-	background-position: 0 -384px;
-}
-
-.cat_img_address::before {
-	background-position: 0 -408px;
-}
-
-.cat_img_calendar::before {
-	background-position: 0 -432px;
-}
-
-.cat_img_minus::before {
-	background-position: 0 -456px;
-}
-
-.cat_img_star::before {
-	background-position: 0 -480px;
-}
-
-.cat_img_clock::before {
-	background-position: 0 -504px;
-}
-
-.cat_img_eye::before {
-	background-position: 0 -528px;
-}
-
-.cat_img_piechart::before {
-	background-position: 0 -552px;
-}
-
-.cat_img_talk::before {
-	background-position: 0 -576px;
 }
 
 /* Expand/Collapse image in the various headers */
@@ -791,14 +682,14 @@ em, .em {
  */
 
 /* Set a consistent monospace font */
-.bbc_code, .bbc_tt, .bbc_pre {
-	font-family: "DejaVu Sans Mono", Monaco, Menlo, Consolas, 'Roboto Mono', 'Andale Mono', 'Ubuntu Mono', monospace;
+.bbc_code, .bbc_tt, .bbc_pre, .tt {
+	font-family: SFMono-Regular, ui-monospace, Menlo, Monaco, Consolas, "DejaVu Sans Mono", "Liberation Mono", "Courier New", monospace;
+	font-variant-numeric: tabular-nums;
 }
 
 /* The "Quote:" and "Code:" header parts... */
 .codeheader, .bbc_quote > cite {
 	font-size: var(--font13);
-	font-weight: 600;
 	margin-bottom: .5em;
 	padding: .2em .4em;
 	border-bottom: 1px solid;
@@ -824,7 +715,7 @@ em, .em {
 .bbc_quote,
 /* A code block - maybe PHP ;) - shared styles. */
 .bbc_code {
-	font-size: var(--font13);
+	font-size: var(--font14);
 	overflow: auto;
 	margin: 0 0 1em 0;
 	padding: .4em .67em;
@@ -844,8 +735,8 @@ em, .em {
 
 /* Constrain the quote area height.  Use max height so we can have a smooth transition */
 .quote-read-more > .bbc_quote {
-	overflow: hidden;
-	max-height: 12em;
+	overflow: auto;
+	max-height: var(--quote_height);
 }
 
 /* Specific targeting of our checkbox.  100% wide with a gradient to cover/fade the bottom
@@ -1062,7 +953,9 @@ a.bbc_link {
 	left: 0;
 	width: 100%;
 	padding: 1em;
+	transition: opacity .5s;
 	text-align: center;
+	opacity: 0;
 	border-bottom: 4px solid;
 }
 
@@ -1095,6 +988,12 @@ a.bbc_link {
 #top_section {
 	border-top: 4px solid;
 	border-bottom: 4px solid;
+}
+
+#top_section.th_collapse {
+	position: sticky;
+	z-index: 1000;
+	top: 0;
 }
 
 /* Very top bar, holds search and login (top_section_notice) forms */
@@ -1147,7 +1046,7 @@ a.bbc_link {
 	height: 2.3em;
 }
 
-/* This are simply to collapse the search from into a single element */
+/* This to simply collapse the search from into a single element */
 #search_form_menu select, #search_form_menu input, #search_form_menu button[type="submit"] {
 	margin-right: -1px;
 	border-right: none;
@@ -1400,6 +1299,7 @@ a.bbc_link {
 	display: flex;
 	align-items: center;
 	justify-content: flex-start;
+	margin-bottom: 5px;
 	padding: 0 3px;
 }
 
@@ -1407,8 +1307,10 @@ a.bbc_link {
 .generic_menu {
 	display: flex;
 	align-items: center;
+	flex-wrap: wrap;
 	justify-content: flex-start;
 	padding: .4em 0;
+	row-gap: 5px;
 }
 
 /* When using the above adm_submenus / generic_menu tabs, this is the content div
@@ -1551,9 +1453,9 @@ a.bbc_link {
 	transition: 350ms all 125ms ease-in;
 	transform: rotate(-45deg);
 	/* Clips the bottom of the rotated square so it does not bleed into dropdown content */
-	clip-path: polygon(25% 75%, 0% 0%, 100% 0%, 100% 100%);
 	opacity: 0;
 	border: 1px solid;
+	clip-path: polygon(25% 75%, 0% 0%, 100% 0%, 100% 100%);
 	/* Simple variable to change if you want to change the size */
 	--pointersize: 12px;
 }
@@ -1653,7 +1555,7 @@ a.bbc_link {
 
 /* Tricky PM / Likes indicator. Define it carefully,
   just in case someone tries to use this class elsewhere. */
-.pm_indicator, .likes_indicator {
+.pm_indicator, .button_indicator {
 	font-size: var(--font14);
 	font-weight: 700;
 	line-height: 1.7;
@@ -1667,7 +1569,7 @@ a.bbc_link {
 	border-radius: 8px 8px 8px 0;
 }
 
-.likes_indicator {
+.button_indicator {
 	font-size: .857em;
 	line-height: 1.467;
 	top: -1.2em;
@@ -1855,16 +1757,11 @@ a.bbc_link {
 
 /* The quick buttons like quote, quick edit, etc. */
 .quickbuttons {
-	margin: .5em 0 .4em 0;
-	padding-top: .5em;
-	text-align: right;
-}
-
-nav > .quickbuttons, menu > .quickbuttons {
 	display: flex;
 	align-items: center;
-	/* The buttons are in reverse order in the markup bleh! */
-	flex-direction: row-reverse;
+	justify-content: flex-end;
+	margin: .5em 0 .4em auto;
+	padding-top: .5em;
 }
 
 .quickbuttons li {
@@ -1901,134 +1798,25 @@ nav > .quickbuttons, menu > .quickbuttons {
 
 .quickbuttons .inline_mod_check {
 	margin: .25em .1em;
-	padding: 0 4px 1px 4px;
+	padding: 0 4px;
 	border: 1px solid;
 }
 
 .quickbuttons .linklevel1 {
 	line-height: 2.1;
 	float: left;
-	padding: 1px .4em 0 1.5em;
+	padding: 0 .4em;
 	cursor: pointer;
 	border-radius: 0;
 }
 
-/* The icons in front of them. */
-.quickbuttons .linklevel1::before, .quickbuttons .linklevel2::before {
-	position: absolute;
-	z-index: 5;
-	top: 50%;
-	left: 3px;
-	display: block;
-	width: 18px;
-	height: 24px;
-	margin-top: -.8em;
-	content: "";
-	background-image: url(../images/theme/quickbuttons.png);
-	/* A rare example of where longhand background declarations work well. */
-	background-repeat: no-repeat;
-}
-
-.quickmod_check {
-	left: 3px;
-}
-
-/* The long list of sprite coordinates is much less verbose this way. */
-.quote_button::before {
-	background-position: 0 0;
-}
-
-.remove_button::before {
-	background-position: 0 -24px;
-}
-
-.modify_button::before {
-	background-position: 0 -48px;
-}
-
-.approve_button::before {
-	background-position: 0 -72px;
-}
-
-.restore_button::before {
-	background-position: 0 -96px;
-}
-
-.split_button::before {
-	background-position: 0 -120px;
-}
-
-.reply_button::before {
-	background-position: 0 -144px;
-}
-
-.reply_all_button::before {
-	background-position: 0 -144px;
-}
-
-.notify_button::before {
-	background-position: 0 -168px;
-}
-
-.unapprove_button::before {
-	background-position: 0 -192px;
-}
-
-.close_button::before {
-	background-position: 0 -216px;
-}
-
-.im_reply_button::before {
-	background-position: 0 -240px;
-}
-
-.details_button::before {
-	background-position: 0 -264px;
-}
-
-.ignore_button::before {
-	background-position: 0 -288px;
-}
-
-.report_button::before {
-	background-position: 0 -312px;
-}
-
-.warn_button::before {
-	background-position: 0 -336px;
-}
-
-.quotetonew_button::before {
-	background-position: 0 -360px;
-}
-
-.react_button::before {
-	background-position: 0 -384px;
-}
-
-.unreact_button::before {
-	background-position: 0 -408px;
-}
-
-.star_button::before {
-	background-position: 0 -432px;
-}
-
-.quick_edit::before {
-	background-position: 0 -456px;
-}
-
-.reacts_button::before {
-	background-position: 0 -480px;
-}
-
-/* Radius left end of the first (Quote) button, last-child as this is in reverse order */
-.quickbuttons li:last-child a, .quickbuttons li a.last {
+/* Radius left end of the first (Quote) button */
+.quickbuttons li:first-child a, .quickbuttons li.last a {
 	border-radius: 4px 0 0 4px;
 }
 
 /* Radius right end of the last button. */
-.quickbuttons li:first-child, .quickbuttons li:first-child a {
+.quickbuttons li:last-child, .quickbuttons li:last-child a {
 	border-radius: 0 4px 4px 0;
 }
 
@@ -2041,11 +1829,6 @@ nav > .quickbuttons, menu > .quickbuttons {
 .linklevel1.post_options::before,
 .follow_ups .linklevel1::before {
 	display: none;
-}
-
-/* "More..." and Followup gets custom padding (no icon). */
-.linklevel1.post_options, .follow_ups .linklevel1 {
-	padding: 1px .4em 0 .4em;
 }
 
 /* Quickbutton, Buttonlist, and follow ups drop menus, flyout to the left.
@@ -2066,15 +1849,6 @@ nav > .quickbuttons, menu > .quickbuttons {
 	text-align: left;
 }
 
-/* Show appropriate like/unlike action */
-.react_button::before, .reacts_button::before {
-	background-position: 0 -480px;
-}
-
-.react_button:hover::before {
-	background-position: 0 -384px;
-}
-
 .follow_ups .listlevel2 {
 	width: 20em;
 }
@@ -2086,7 +1860,15 @@ nav > .quickbuttons, menu > .quickbuttons {
 
 .quickbuttons .linklevel2 {
 	line-height: 2.1;
-	padding: 0 .4em 0 26px;
+	padding: 0 .4em;
+}
+
+button[type="submit"].quick_quote_button.hide {
+	display: none;
+}
+
+.quick_quote_button {
+	position: absolute;
 }
 
 .quick_quote_button > .warning {
@@ -2993,6 +2775,10 @@ aside > .poster {
 	word-break: normal;
 }
 
+.poster .poster_avatar {
+	margin-top: 2px;
+}
+
 /* No border around the poster name on hover */
 .linklevel1.name:hover, .poster:hover a.name {
 	border: none;
@@ -3307,9 +3093,12 @@ footer .signature {
 .signature {
 	font-size: var(--font13);
 	overflow: auto;
-	margin-top: 1em;
 	padding: 8px 0;
 	border-top: 1px solid;
+}
+
+.signature.without_top_border {
+	border-top: none;
 }
 
 .custom_fields_above_signature {
@@ -3860,12 +3649,12 @@ ul.post_options li {
 }
 
 #topic_summary .quickbuttons {
-	margin: 0;
+	margin: 0 0 0 auto;
 	padding: 0;
 }
 
 #topic_summary .keyinfo nav {
-	margin-left: auto;
+	/*margin-left: auto;*/
 }
 
 /* The event editor section. */
@@ -4677,7 +4466,7 @@ ul.cf_icons li:not(:first-child)::before {
 
 /* If you have labels, these are the drop down selector under quote, reply, delete */
 #personal_messages .labels {
-	padding: .1em 0 0;
+	padding: .1em 0 1em 0;
 }
 
 div.labels {
@@ -4770,10 +4559,9 @@ div.labels {
 }
 
 .previous_month, .next_month {
-	font-size: var(--font9);
-	display: block;
+	font-size: var(--font12);
 	float: left;
-	margin: -0.1em 0 0 0;
+	margin-top: .5em;
 }
 
 .next_month {
@@ -4865,23 +4653,6 @@ div.labels {
 #calendar_navigation .buttonlist {
 	padding: 0 .4em;
 }
-
-/* See, I told you there was antz in here.
-              ,
-      _,-'\   /|   .    .    /`.
-  _,-'     \_/_|_  |\   |`. /   `._,--===--.__
- ^       _/"/  " \ : \__|_ /.   ,'    :.  :. .`-._
-        // ^   /7 t'""    "`-._/ ,'\   :   :  :  .`.
-        Y      L/ )\         ]],'   \  :   :  :   : `.
-        |        /  `.n_n_n,','\_    \ ;   ;  ;   ;  _>
-        |__    ,'     |  \`-'    `-.__\_______.==---'
-       //  `""\\      |   \            \
-       \|     |/      /    \            \
-                     /     |             `.
-                    /      |               ^
-                   ^       |
-Stef                       ^
-*/
 
 /* -------------------------------------------------------
  * MENTIONS
@@ -5058,15 +4829,11 @@ Stef                       ^
 .help .icon, .hdicon.help {
 	margin: 0;
 	cursor: help;
-	opacity: 0.8;
+	opacity: 0.7;
 }
 
 .hdicon.help {
 	vertical-align: top;
-}
-
-.hdicon.help::before {
-	margin: .13em 0 0;
 }
 
 .help .icon:hover, .hdicon.help:hover {
@@ -5217,12 +4984,9 @@ Stef                       ^
 }
 
 /* Shown when using show results as messages */
-.search_results_posts nav {
+.search_results_posts .quickbuttons {
 	grid-column-start: span 2;
 	grid-row-start: 3;
-}
-
-.search_results_posts nav .quickbuttons {
 	margin: 0 1.5em;
 }
 
@@ -5715,6 +5479,9 @@ Stef                       ^
  *	$LIKE STATS
  * -------------------------------------------------------
  */
+.like_post_stats_menu {
+	margin-bottom: 5px;
+}
 
 .like_post_stats {
 	position: relative;
@@ -5978,7 +5745,7 @@ Stef                       ^
 	}
 
 	#unread.topic_listing > li {
-		grid-template-columns: [topic_icon] 50px [topic_info] auto [topic_latest] 350px [topic_moderation] 25px;
+		grid-template-columns: [topic_icon] 50px [topic_info] auto [topic_latest] 40% [topic_moderation] minmax(25px, 35px);
 	}
 
 	.topic_name h4 .new_posts, .new_posts, .require_approval {
@@ -6022,6 +5789,10 @@ Stef                       ^
 		max-height: 4em;
 	}
 
+	.breadcrumb > .crumb {
+		padding: 0 0.5em 0 2.5em;
+	}
+
 	/* menu to icons */
 	#main_menu .icon-menu {
 		display: inline-block;
@@ -6029,7 +5800,7 @@ Stef                       ^
 		height: 45px;
 		margin: .05em;
 		padding: .35em;
-		border: 4px solid;
+		border: 2px solid;
 		border-radius: .25em;
 	}
 
@@ -6086,7 +5857,7 @@ Stef                       ^
 
 	/* board listing */
 	.category_boards .board_row {
-		grid-template-columns: [bicon] 40px [info] auto [latest] 55% [end];
+		grid-template-columns: [bicon] 40px [info] auto [latest] 45% [end];
 	}
 
 	.board_avatar {
@@ -6104,6 +5875,13 @@ Stef                       ^
 
 	.board_info .moderators, .childboards {
 		margin: 0 0 0 4px;
+	}
+
+	/* allow for a 2 line post subject */
+	.board_row .lastpost_link {
+		height: 2em;
+		max-height: 3.1em;
+		white-space: pre-wrap;
 	}
 
 	/* message listing */
@@ -6137,11 +5915,19 @@ Stef                       ^
 		overflow-wrap: break-word;
 	}
 
-	nav > .quickbuttons, menu > .quickbuttons {
+	.quickbuttons {
 		flex-wrap: wrap;
 	}
 
+	.smalltext.modified {
+		max-width: 45%;
+	}
+
 	#forumposts .views_text {
+		display: none;
+	}
+
+	#display_jump_to {
 		display: none;
 	}
 
@@ -6171,7 +5957,8 @@ Stef                       ^
 
 	/* our stats page */
 	.stats {
-		width: 100%;
+		float: none;
+		min-width: 100%;
 		margin: 0;
 	}
 
@@ -6180,8 +5967,11 @@ Stef                       ^
 	}
 
 	.statistics .category_header {
-		width: 100%;
+		min-width: 100%;
+		margin: 0;
 	}
+
+
 
 	/* member list, turn off most columns */
 	.mlist li div:nth-child(n+6), .mlist li .website {
@@ -6398,13 +6188,14 @@ Stef                       ^
 
 	/* Button / pages / Navigation adjustments */
 	nav.breadcrumb .crumb:not(:first-child):not(:last-child) a {
-		width: 6em;
 		white-space: nowrap;
 		text-overflow: ellipsis;
 	}
 
 	.buttonlist {
+		flex-wrap: wrap;
 		justify-content: space-evenly;
+		row-gap: 5px;
 	}
 
 	.buttonlist > li {
@@ -6497,7 +6288,7 @@ Stef                       ^
 	.topic_listing > li {
 		grid-template-columns: [topic_icon] 0 [topic_info] auto [topic_latest] 225px [topic_moderation] 10px [end];
 		grid-template-rows: [topic_info] auto [topic_latest] auto;
-		margin-bottom: .7em;
+		margin-bottom: .5em;
 		border: 1px solid;
 	}
 
@@ -6856,16 +6647,13 @@ Stef                       ^
 		width: 100%;
 	}
 
-	nav > .quickbuttons, menu > .quickbuttons {
+	.quickbuttons {
 		justify-content: space-evenly;
+		margin: .4em 0 .4em auto;
 	}
 
 	.quickbuttons .modified {
 		white-space: normal;
-	}
-
-	.quickbuttons {
-		margin: .4em 0;
 	}
 
 	/* Board Listing */

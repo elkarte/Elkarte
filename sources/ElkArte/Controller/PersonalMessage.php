@@ -421,7 +421,7 @@ class PersonalMessage extends AbstractController
 		{
 			$context['display_mode'] = $context['display_mode'] > 1 ? 0 : $context['display_mode'] + 1;
 			require_once(SUBSDIR . '/Members.subs.php');
-			updateMemberData($this->user->id, array('pm_prefs' => (User::$settings['pm_prefs'] & 252) | $context['display_mode']));
+			updateMemberData($this->user->id, ['pm_prefs' => (User::$settings['pm_prefs'] & 252) | $context['display_mode']]);
 		}
 
 		// Make sure the starting location is valid.
@@ -554,13 +554,13 @@ class PersonalMessage extends AbstractController
 		}
 
 		// Determine the navigation context
-		$context['links'] += array(
+		$context['links'] += [
 			'prev' => $start >= $modSettings['defaultMaxMessages'] ? $scripturl . '?action=pm;start=' . ($start - $modSettings['defaultMaxMessages']) : '',
 			'next' => $start + $modSettings['defaultMaxMessages'] < $max_messages ? $scripturl . '?action=pm;start=' . ($start + $modSettings['defaultMaxMessages']) : '',
-		);
+		];
 
 		// We now know what they want, so lets fetch those PM's
-		list ($pms, $posters, $recipients, $lastData) = loadPMs(array(
+		list ($pms, $posters, $recipients, $lastData) = loadPMs([
 			'sort_by_query' => $sort_by_query,
 			'display_mode' => $context['display_mode'],
 			'sort_by' => $sort_by,
@@ -571,7 +571,7 @@ class PersonalMessage extends AbstractController
 			'limit' => $modSettings['defaultMaxMessages'],
 			'folder' => $context['folder'],
 			'pmid' => $pmID ?? 0,
-		), $this->user->id);
+		], $this->user->id);
 
 		// Make sure that we have been given a correct head pm id if we are in conversation mode
 		if ($context['display_mode'] == 2 && !empty($pmID) && $pmID != $lastData['id'])
@@ -634,7 +634,7 @@ class PersonalMessage extends AbstractController
 			if ($context['display_mode'] != 0)
 			{
 				// Get the order right.
-				$orderBy = array();
+				$orderBy = [];
 				foreach (array_reverse($pms) as $pm)
 				{
 					$orderBy[] = 'pm.id_pm = ' . $pm;
@@ -664,11 +664,11 @@ class PersonalMessage extends AbstractController
 		$bodyParser = new Normal(array(), false);
 		$opt = new ValuesContainer(['recipients' => $recipients]);
 		$renderer = new PmRenderer($messages_request, $this->user, $bodyParser, $opt);
-		$subject_renderer = new PmRenderer($subjects_request, $this->user, $bodyParser, $opt);
+		$subject_renderer = new PmRenderer($subjects_request ?? $messages_request, $this->user, $bodyParser, $opt);
 
 		// Subject and Message
-		$context['get_pmessage'] = array($renderer, 'getContext');
-		$context['get_psubject'] = array($subject_renderer, 'getContext');
+		$context['get_pmessage'] = [$renderer, 'getContext'];
+		$context['get_psubject'] = [$subject_renderer, 'getContext'];
 
 		// Prepare some items for the template
 		$context['topic_starter_id'] = 0;
@@ -834,7 +834,6 @@ class PersonalMessage extends AbstractController
 			loadJavascriptFile('quickQuote.js', ['defer' => true]);
 			theme()->addInlineJavascript("
 				let opt = {
-					hideButton: " . (empty($modSettings['hideQuickQuoteButton']) ? 'false' : 'true') . ",
 					infoText: " . JavaScriptEscape($txt['quote_quick_help']) . ",
 				};
 				document.addEventListener('DOMContentLoaded', () => new Elk_QuickQuote(opt), false);", true
@@ -2532,10 +2531,10 @@ class PersonalMessage extends AbstractController
 				// If there's no subject, use the default.
 				$row['subject'] = $row['subject'] === '' ? $txt['no_subject'] : $row['subject'];
 
-				// Load this posters context info, if its not there then fill in the essentials...
+				// Load this poster context info, if not there, then fill in the essentials...
 				$member = MembersList::get($row['id_member_from']);
 				$member->loadContext(true);
-				if (!$member->isEmpty())
+				if ($member->isEmpty())
 				{
 					$member['name'] = $row['from_name'];
 					$member['id'] = 0;
@@ -2573,7 +2572,7 @@ class PersonalMessage extends AbstractController
 				// Set a link using the first label information
 				$href = $scripturl . '?action=pm;f=' . $context['folder'] . (isset($context['first_label'][$row['id_pm']]) ? ';l=' . $context['first_label'][$row['id_pm']] : '') . ';pmid=' . ($context['display_mode'] == 2 && isset($real_pm_ids[$head_pms[$row['id_pm']]]) && $context['folder'] === 'inbox' ? $real_pm_ids[$head_pms[$row['id_pm']]] : $row['id_pm']) . '#msg_' . $row['id_pm'];
 
-				$context['personal_messages'][] = array(
+				$context['personal_messages'][] = [
 					'id' => $row['id_pm'],
 					'member' => $member,
 					'subject' => $subject_highlighted,
@@ -2588,7 +2587,8 @@ class PersonalMessage extends AbstractController
 					'href' => $href,
 					'link' => '<a href="' . $href . '">' . $subject_highlighted . '</a>',
 					'counter' => ++$counter,
-				);
+					'pmbuttons' => $this->_setSearchPmButtons($row['id_pm'], $member),
+				];
 			}
 		}
 
@@ -2600,6 +2600,49 @@ class PersonalMessage extends AbstractController
 			'url' => getUrl('action', ['action' => 'pm', 'sa' => 'search']),
 			'name' => $txt['pm_search_bar_title'],
 		);
+	}
+
+	/**
+	 * Return buttons for search results, used when viewing full message as result
+	 *
+	 * @param int $id of the PM
+	 * @param array $member member information
+	 * @return array[]
+	 */
+	private function _setSearchPmButtons($id, $member)
+	{
+		global $context;
+
+		$pmButtons = [
+			// Reply, Quote
+			'reply_button' => [
+				'text' => 'reply',
+				'url' => getUrl('action', ['action' => 'pm', 'sa' => 'send', 'f' => $context['folder'], 'pmsg' => $id, 'u' => $member['id']]) . ($context['current_label_id'] != -1 ? ';l=' . $context['current_label_id'] : ''),
+				'class' => 'reply_button',
+				'icon' => 'modify',
+				'enabled' => !$member['is_guest'] && $context['can_send_pm'],
+			],
+			'quote_button' => [
+				'text' => 'quote',
+				'url' => getUrl('action', ['action' => 'pm', 'sa' => 'send', 'f' => $context['folder'], 'pmsg' => $id, 'quote' => '']) . ($context['current_label_id'] != -1 ? ';l=' . $context['current_label_id'] : '') . ($context['folder'] === 'sent' ? '' : ';u=' . $member['id']),
+				'class' => 'quote_button',
+				'icon' => 'quote',
+				'enabled' => !$member['is_guest'] && $context['can_send_pm'],
+			],
+			// This is for "forwarding" - even if the member is gone.
+			'reply_quote_button' => [
+				'text' => 'reply_quote',
+				'url' => getUrl('action', ['action' => 'pm', 'sa' => 'send', 'f' => $context['folder'], 'pmsg' => $id, 'quote' => '']) . ($context['current_label_id'] != -1 ? ';l=' . $context['current_label_id'] : ''),
+				'class' => 'reply_button',
+				'icon' => 'modify',
+				'enabled' => $member['is_guest'] && $context['can_send_pm'],
+			]
+		];
+
+		// Drop any non-enabled ones
+		return array_filter($pmButtons, static function ($button) {
+			return !isset($button['enabled']) || $button['enabled'] !== false;
+		});
 	}
 
 	/**

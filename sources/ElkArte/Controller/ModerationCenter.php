@@ -532,23 +532,27 @@ class ModerationCenter extends AbstractController
 				'closed' => $row['closed'],
 				'ignore' => $row['ignore_all'],
 				'buttons' => array(
-					'quickmod_check' => array(
-						'checkbox' => !$context['view_closed'],
+					'inline_mod_check' => array(
+						'checkbox' => 'always',
+						'enabled' => !$context['view_closed'],
 						'name' => 'close',
 						'value' => $row['id_report'],
 					),
 					'details' => array(
-						'href' => getUrl('action', ['action' => 'moderate', 'area' => $context['admin_area'], 'report' => $row['id_report']]),
-						'text' => $txt['mc_reportedp_details'],
+						'url' => getUrl('action', ['action' => 'moderate', 'area' => $context['admin_area'], 'report' => $row['id_report']]),
+						'text' => 'mc_reportedp_details',
+						'icon' => 'post-text',
 					),
 					'ignore' => array(
-						'href' => getUrl('action', ['action' => 'moderate', 'area' => $context['admin_area'], 'sa' => ($context['view_closed'] ? 'closed' : ''), 'ignore' => (int) !$row['ignore_all'], 'rid' => $row['id_report'], 'start' => $context['start'], '{session_data}']),
-						'text' => $row['ignore_all'] ? $txt['mc_reportedp_unignore'] : $txt['mc_reportedp_ignore'],
+						'url' => getUrl('action', ['action' => 'moderate', 'area' => $context['admin_area'], 'sa' => ($context['view_closed'] ? 'closed' : ''), 'ignore' => (int) !$row['ignore_all'], 'rid' => $row['id_report'], 'start' => $context['start'], '{session_data}']),
+						'text' => $row['ignore_all'] ? 'mc_reportedp_unignore' : 'mc_reportedp_ignore',
 						'custom' => $row['ignore_all'] ? '' : 'onclick="return confirm(' . JavaScriptEscape($txt['mc_reportedp_ignore_confirm']) . ');"',
+						'icon' => 'delete'
 					),
 					'close' => array(
-						'href' => getUrl('action', ['action' => 'moderate', 'area' => $context['admin_area'], 'sa' => ($context['view_closed'] ? 'closed' : ''), 'close' => (int) !$row['closed'], 'rid' => $row['id_report'], 'start' => $context['start'], '{session_data}']),
-						'text' => $context['view_closed'] ? $txt['mc_reportedp_open'] : $txt['mc_reportedp_close'],
+						'url' => getUrl('action', ['action' => 'moderate', 'area' => $context['admin_area'], 'sa' => ($context['view_closed'] ? 'closed' : ''), 'close' => (int) !$row['closed'], 'rid' => $row['id_report'], 'start' => $context['start'], '{session_data}']),
+						'text' => $context['view_closed'] ? 'mc_reportedp_open' : 'mc_reportedp_close',
+						'icon' =>  $context['view_closed'] ?  'sign-in' : 'close',
 					),
 				),
 			);
@@ -836,6 +840,20 @@ class ModerationCenter extends AbstractController
 			$context['section_title'] = sprintf($txt['mc_viewmodreport'], $context['report']['message_link'], $context['report']['author']['link']);
 			$context['section_descripion'] = sprintf($txt['mc_modreport_summary'], $context['report']['num_reports'], $context['report']['last_updated']);
 		}
+
+		$context['mod_buttons'] = [
+			'ignore' => [
+				'url' => getUrl('action', ['action' => 'moderate', 'area' => $context['admin_area'], 'ignore' => (int) !$context['report'] ['ignore'], 'rid' => $context['report'] ['id'], '{session_data}']),
+				'text' => $context['report'] ['ignore'] ? 'mc_reportedp_unignore' : 'mc_reportedp_ignore',
+				'custom' => $context['report'] ['ignore'] ? '' : 'onclick="return confirm(' . JavaScriptEscape($txt['mc_reportedp_ignore_confirm']) . ');"',
+				'icon' => 'delete'
+			],
+			'close' => [
+				'url' => getUrl('action', ['action' => 'moderate', 'area' => $context['admin_area'], 'close' => (int) !$context['report'] ['closed'], 'rid' => $context['report'] ['id'], '{session_data}']),
+				'text' => $context['report'] ['closed'] ? 'mc_reportedp_open' : 'mc_reportedp_close',
+				'icon' =>  $context['report'] ['closed'] ?  'sign-in' : 'close',
+			],
+		];
 
 		$context['sub_template'] = 'viewmodreport';
 	}

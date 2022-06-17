@@ -24,7 +24,7 @@ function template_modify_weights()
 	<div id="admincenter">
 		<form id="admin_form_wrapper" action="', $scripturl, '?action=admin;area=managesearch;sa=weights" method="post" accept-charset="UTF-8">
 			<h2 class="category_header">
-				<a class="hdicon cat_img_helptopics help" href="', $scripturl, '?action=quickhelp;help=search_weight_commonheader" onclick="return reqOverlayDiv(this.href);" title="', $txt['help'], '"></a> ', $txt['search_weights'], '
+				<a class="hdicon i-help help" href="', $scripturl, '?action=quickhelp;help=search_weight_commonheader" onclick="return reqOverlayDiv(this.href);" title="', $txt['help'], '"></a> ', $txt['search_weights'], '
 			</h2>';
 
 	if (!empty($modSettings['search_index']) && (stripos($modSettings['search_index'], 'sphinx') === 0))
