@@ -54,6 +54,14 @@ class PrepaseBBC extends TestCase
 				'some list[code][list][li]one[/list][/code]',
 				'some list[code][list][li]one[/list][/code]',
 			),
+			array(
+				'something [icode]that is not closed',
+				'something [icode]that is not closed[/icode]',
+			),
+			array(
+				'something inside an [icode]that is [b]not closed[/icode]',
+				'something inside an [icode]that is [b]not closed[/icode]',
+			),
 		);
 	}
 
