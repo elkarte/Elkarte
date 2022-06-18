@@ -264,8 +264,7 @@ class FileFunctions
 		// Walk down the path until we find a part that exists
 		for ($i = $count - 1; $i >= 0; $i--)
 		{
-			$partialTree = implode('/', array_slice($tree, 0, $i + 1));
-
+			$partialTree = $directory . DIRECTORY_SEPARATOR . implode('/', array_slice($tree, 0, $i + 1));
 			// If this exists, lets ensure it is a directory
 			if (file_exists($partialTree))
 			{
