@@ -189,7 +189,7 @@ class PreparseCode
 			foreach ($matches[0] as $match)
 			{
 				// Closing?
-				if ($match[0][1] === '/')
+				if ($match[1] === '/')
 				{
 					// If it's closing and we're not in a tag we need to open it...
 					if (!$in_tag)
