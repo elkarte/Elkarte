@@ -1719,7 +1719,7 @@ function removeNestedQuotes($text)
 	}
 
 	// Remove just -some- of the quotes, we need to find them all
-	preg_match_all('(\[\/?quote(?:=(.*?))?\])', $text, $matches, PREG_OFFSET_CAPTURE);
+	preg_match_all('~(\[\/?quote(?:=(.*?))?\])~i', $text, $matches, PREG_OFFSET_CAPTURE);
 	$depth = 0;
 	$remove = [];
 	$start_pos = 0;
