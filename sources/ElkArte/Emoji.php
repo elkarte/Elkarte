@@ -32,6 +32,9 @@ class Emoji extends AbstractModel
 	/** @var string[] Array of keys with known emoji names */
 	public $shortcode_replace = [];
 
+	/** @var array Holds code blocks so we do not render smileys inside */
+	protected $save_code_blocks = [];
+
 	/**
 	 * Emoji constructor.
 	 *
@@ -63,24 +66,76 @@ class Emoji extends AbstractModel
 	{
 		$emoji = self::instance();
 
-		// Only work on the areas outside of code tags
-		$parts = preg_split('~(\[/code]|\[code(?:=[^]]+)?])~i', $string, -1, PREG_SPLIT_DELIM_CAPTURE);
+		// Make sure we do not process emoji in code or icode tags
+		$string = $this->_protectCodeBlocks($string);
 
-		// Only converts :tags: outside.
-		for ($i = 0, $n = count($parts); $i < $n; $i++)
+		// :emoji: must be at the start of a line, or have a leading space or be after a bbc ']' tag
+		$string = preg_replace_callback('~(?:\s?|^|]|<br />|<br>)(:([-+\w]+):\s?)~i', [$emoji, 'emojiToImage'], $string);
+
+		// Check for any embedded html / hex emoji
+		$string = $this->keyboardEmojiToImage($string);
+
+		return $this->_restoreCodeBlocks($string);
+	}
+
+	/**
+	 * Replace [code] and [icode] blocks with tokens.  Both may exist on a page, as such you
+	 * can't search for one and process and then the next. i.e. [code]bla[/code] xx [icode]bla[/icode]
+	 * would process whats outside of code tags, which is an icode !
+	 *
+	 * @param string $string
+	 * @return string
+	 */
+	private function _protectCodeBlocks($string)
+	{
+		// Quick sniff, was that you? I thought so !
+		if (strpos($string, ':') === false)
 		{
-			// It goes 0 = outside, 1 = begin tag, 2 = inside, 3 = close tag, repeat.
-			if ($i % 4 === 0)
-			{
-				// :emoji: must be at the start of a line, or have a leading space or be after a bbc ']' tag
-				$parts[$i] = preg_replace_callback('~(?:\s?|^|]|<br />|<br>)(:([-+\w]+):\s?)~i', [$emoji, 'emojiToImage'], $parts[$i]);
-
-				// Check for embedded html / hex emoji
-				$parts[$i] = $this->keyboardEmojiToImage($parts[$i]);
-			}
+			return $string;
 		}
 
-		return implode('', $parts);
+		// Protect code and icode blocks
+		$tokenizer = new TokenHash();
+		$patterns = ['~(\[\/code\]|\[code(?:=[^\]]+)?\])~i', '~(\[\/icode\]|\[icode(?:=[^\]]+)?\])~i'];
+		foreach ($patterns as $pattern)
+		{
+			$parts = preg_split($pattern, $string, -1, PREG_SPLIT_DELIM_CAPTURE);
+			foreach ($parts as $i => $part)
+			{
+				if ($i % 4 === 0 && isset($parts[$i + 3]))
+				{
+					// Create a unique key to put in place of the code block
+					$key = $tokenizer->generate_hash(8);
+
+					// Save what is there [code]stuff[/code]
+					$this->save_code_blocks['%%' . $key . '%%'] = $parts[$i + 1] . $parts[$i + 2] . $parts[$i + 3];
+
+					// Replace the code block with %%$key%%
+					$parts[$i + 1] = '%%';
+					$parts[$i + 2] = $key;
+					$parts[$i + 3] = '%%';
+				}
+			}
+
+			$string = implode('', $parts);
+		}
+
+		return $string;
+	}
+
+	/**
+	 * Replace any code tokens with the saved blocks
+	 *
+	 * @return string
+	 */
+	private function _restoreCodeBlocks($string)
+	{
+		if (!empty($this->save_code_blocks))
+		{
+			$string = str_replace(array_keys($this->save_code_blocks), array_values($this->save_code_blocks), $string);
+		}
+
+		return $string;
 	}
 
 	/**
@@ -200,7 +255,7 @@ class Emoji extends AbstractModel
 	 * should be faster than multiple detailed regex.
 	 *
 	 * @param $string
-	 * @return string|string[]|null
+	 * @return string
 	 */
 	public function emojiFromUni($string)
 	{

@@ -267,9 +267,7 @@ class PreparseCode
 	private function _tokenizeCodeBlocks()
 	{
 		// Split up the message on the code start/end tags/
-		$patterns = [];
-		$patterns[] = '~(\[\/code\]|\[code(?:=[^\]]+)?\])~i';
-		$patterns[] = '~(\[\/icode\]|\[icode(?:=[^\]]+)?\])~i';
+		$patterns = ['~(\[\/code\]|\[code(?:=[^\]]+)?\])~i', '~(\[\/icode\]|\[icode(?:=[^\]]+)?\])~i'];
 
 		// Token generator
 		$tokenizer = new TokenHash();
