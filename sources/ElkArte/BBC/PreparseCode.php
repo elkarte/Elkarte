@@ -230,8 +230,8 @@ class PreparseCode
 	{
 		// Split up the message on the code start/end tags/
 		$patterns = [];
-		$patterns[] = '~(\[/code\]|\[code(?:=[^\]]+)?\])~i';
-		$patterns[] = '~(\[/icode\]|\[icode(?:=[^\]]+)?\])~i';
+		$patterns[] = '~(\[\/code\]|\[code(?:=[^\]]+)?\])~i';
+		$patterns[] = '~(\[\/icode\]|\[icode(?:=[^\]]+)?\])~i';
 
 		// Token generator
 		$tokenizer = new TokenHash();
@@ -256,10 +256,10 @@ class PreparseCode
 					$parts[$i + 3] = '%%';
 				}
 			}
-		}
 
-		// The message with code blocks as %%tokens%%
-		$this->message = implode('', $parts);
+			// The message with code blocks as %%tokens%%
+			$this->message = implode('', $parts);
+		}
 	}
 
 	/**
