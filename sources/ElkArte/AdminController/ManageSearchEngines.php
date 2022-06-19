@@ -265,7 +265,7 @@ class ManageSearchEngines extends AbstractController
 					),
 					'data' => array(
 						'function' => function ($rowData) {
-							return sprintf('<a href=' . getUrl('admin', ['action' => 'admin', 'area' => 'sengines', 'sa' => 'editspiders', 'sid' => '%1$d']) . '">%2$s</a>', $rowData['id_spider'], htmlspecialchars($rowData['spider_name'], ENT_COMPAT, 'UTF-8'));
+							return sprintf('<a href=' . getUrl('admin', ['action' => 'admin', 'area' => 'sengines', 'sa' => 'editspiders', 'sid' => $rowData['id_spider']]) . '">%2$s</a>', htmlspecialchars($rowData['spider_name'], ENT_COMPAT, 'UTF-8'));
 						},
 					),
 					'sort' => array(

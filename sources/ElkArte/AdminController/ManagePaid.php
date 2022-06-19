@@ -306,7 +306,7 @@ class ManagePaid extends AbstractController
 					),
 					'data' => array(
 						'function' => function ($rowData) {
-							return sprintf('<a href="' . getUrl('admin', ['action' => 'admin', 'area' => 'paidsubscribe', 'sa' => 'viewsub', 'sid' => '%1$s']) . '">%2$s</a>', $rowData['id'], $rowData['name']);
+							return sprintf('<a href="' . getUrl('admin', ['action' => 'admin', 'area' => 'paidsubscribe', 'sa' => 'viewsub', 'sid' => $rowData['id']]) . '">%1$s</a>', $rowData['name']);
 						},
 					),
 				),
