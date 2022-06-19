@@ -143,6 +143,7 @@ class ManageEditor extends AbstractController
 			array('title', 'mods_cat_modifications_misc'),
 			array('check', 'autoLinkUrls'), // @todo not editor or bbc
 			array('check', 'enablePostHTML'),
+			array('check', 'enablePostMarkdown'),
 		);
 
 		// Add new settings with a nice hook, makes them available for admin settings search as well

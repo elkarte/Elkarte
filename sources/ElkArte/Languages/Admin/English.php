@@ -644,6 +644,7 @@ $txt['message_index_preview_last'] = 'Show the text of the last post';
 
 $txt['enableBBC'] = 'Enable bulletin board code (BBC)';
 $txt['enablePostHTML'] = 'Enable basic HTML in posts';
+$txt['enablePostMarkdown'] = 'Enable basic Markdown in posts';
 $txt['autoLinkUrls'] = 'Automatically link posted URLs';
 $txt['disabledBBC'] = 'Enabled BBC tags';
 $txt['bbcTagsToUse'] = 'Enabled BBC tags';
