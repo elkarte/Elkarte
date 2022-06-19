@@ -358,7 +358,7 @@ class Codes
 				self::ATTR_TAG => 'code',
 				self::ATTR_TYPE => self::TYPE_UNPARSED_CONTENT,
 				self::ATTR_CONTENT => '<div class="codeheader">' . $txt['code'] . ': <a href="#" onclick="return elkSelectText(this);" class="codeoperation">' . $txt['code_select'] . '</a></div><pre class="bbc_code prettyprint">$1</pre>',
-				self::ATTR_VALIDATE => $this->isDisabled('code') ? null : function (&$data) {
+				self::ATTR_VALIDATE => $this->isDisabled('code') ? null : static function (&$data) {
 					$data = tabToHtmlTab(strtr($data, array('[' => '&#91;', ']' => '&#93;')));
 				},
 				self::ATTR_BLOCK_LEVEL => true,
@@ -369,7 +369,7 @@ class Codes
 				self::ATTR_TAG => 'code',
 				self::ATTR_TYPE => self::TYPE_UNPARSED_EQUALS_CONTENT,
 				self::ATTR_CONTENT => '<div class="codeheader">' . $txt['code'] . ': ($2) <a href="#" onclick="return elkSelectText(this);" class="codeoperation">' . $txt['code_select'] . '</a></div><pre class="bbc_code prettyprint">$1</pre>',
-				self::ATTR_VALIDATE => $this->isDisabled('code') ? null : function (&$data) {
+				self::ATTR_VALIDATE => $this->isDisabled('code') ? null : static function (&$data) {
 					$data[0] = tabToHtmlTab(strtr($data[0], array('[' => '&#91;', ']' => '&#93;')));
 				},
 				self::ATTR_BLOCK_LEVEL => true,
