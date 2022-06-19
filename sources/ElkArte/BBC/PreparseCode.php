@@ -118,8 +118,8 @@ class PreparseCode
 		$this->_fixMistakes();
 
 		// Remove empty bbc tags
-		$this->message = preg_replace('~\[[bisu]\]\s*\[/[bisu]\]~', '', $this->message);
-		$this->message = preg_replace('~\[quote\]\s*\[/quote\]~', '', $this->message);
+		$this->message = preg_replace('~\[[bisu]\]\s*\[/[bisu]\]~i', '', $this->message);
+		$this->message = preg_replace('~\[quote\]\s*\[/quote\]~i', '', $this->message);
 
 		// Fix color tags of many forms so they parse properly
 		$this->message = preg_replace('~\[color=(?:#[\da-fA-F]{3}|#[\da-fA-F]{6}|[A-Za-z]{1,20}|rgb\(\d{1,3}, ?\d{1,3}, ?\d{1,3}\))\]\s*\[/color\]~', '', $this->message);
@@ -232,7 +232,6 @@ class PreparseCode
 	 */
 	private function _validateICodeBlocks()
 	{
-		// [icode] is _not_ for spanning lines, its inline!
 		$lines = explode("\n", $this->message);
 		foreach ($lines as $number => $line)
 		{
@@ -259,6 +258,9 @@ class PreparseCode
 
 		// Put it back together
 		$this->message = implode("\n", $lines);
+
+		// Clear empty ones caused by linebreaks inside of icode tags.
+		$this->message = preg_replace('~\[icode\]\s*\[/icode\]~i', '', $this->message);
 	}
 
 	/**
