@@ -1442,7 +1442,7 @@ a.bbc_link {
 	min-width: calc(100% + 30px);
 	padding: 0.6em;
 	/* Speed of transition during on/off focus/hover plus a 350ms delay for a hover intent */
-	transition: 350ms all 125ms ease-in;
+	transition: 100ms linear 450ms;
 	/* Rotate it in to the page to provide a transition element */
 	transform: rotateX(-90deg);
 	transform-origin: top left;
@@ -1461,7 +1461,7 @@ a.bbc_link {
 	width: var(--pointersize);
 	height: var(--pointersize);
 	content: '';
-	transition: 350ms all 125ms ease-in;
+	transition: 100ms linear 450ms;
 	transform: rotate(-45deg);
 	/* Clips the bottom of the rotated square so it does not bleed into dropdown content */
 	opacity: 0;
