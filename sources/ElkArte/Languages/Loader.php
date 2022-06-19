@@ -134,13 +134,16 @@ class Loader
 			// That couldn't be found!  Log the error, but *try* to continue normally.
 			if (!$found && $fatal)
 			{
-				Errors::instance()->log_error(
-					sprintf(
-						$txt['theme_language_error'],
-						$file . '.' . $this->language,
-						'template'
-					)
-				);
+				if ($file !== 'Addons')
+				{
+					Errors::instance()->log_error(
+						sprintf(
+							$txt['theme_language_error'],
+							$file . '.' . $this->language,
+							'template'
+						)
+					);
+				}
 
 				// If we do have a fallback it may not be necessary to break out.
 				if ($found_fallback === false)

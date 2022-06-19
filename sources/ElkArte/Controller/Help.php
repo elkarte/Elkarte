@@ -43,7 +43,15 @@ class Help extends AbstractController
 	public function action_index()
 	{
 		// I need help!
-		// $this->action_help();
+		$this->action_help();
+	}
+
+	/**
+	 * Simply redirects to the ElkArte wiki
+	 */
+	public function action_help()
+	{
+		redirectexit('https://github.com/elkarte/Elkarte/wiki');
 	}
 
 	/**
@@ -110,8 +118,8 @@ class Help extends AbstractController
 			{
 				$context['help_text'] .= $txt[$help];
 			}
+			// nothing :(
 			else
-				// nothing :(
 			{
 				$context['help_text'] .= $help;
 			}
