@@ -682,7 +682,7 @@ em, .em {
  */
 
 /* Set a consistent monospace font */
-.bbc_code, .bbc_tt, .bbc_pre, .tt {
+.bbc_code, .bbc_tt, .bbc_pre, .tt, .bbc_code_inline {
 	font-family: SFMono-Regular, ui-monospace, Menlo, Monaco, Consolas, "DejaVu Sans Mono", "Liberation Mono", "Courier New", monospace;
 	font-variant-numeric: tabular-nums;
 }
@@ -721,6 +721,17 @@ em, .em {
 	padding: .4em .67em;
 	border: 1px solid;
 	border-top: none;
+}
+
+.bbc_code_inline {
+	font-size: var(--font14);
+	margin: 0;
+	padding: 1px 3px;
+	white-space: pre-wrap;
+	border: 1px solid;
+	border-radius: 2px;
+	-webkit-box-decoration-break: clone;
+	box-decoration-break: clone;
 }
 
 .bbc_quote {
@@ -1431,7 +1442,7 @@ a.bbc_link {
 	min-width: calc(100% + 30px);
 	padding: 0.6em;
 	/* Speed of transition during on/off focus/hover plus a 350ms delay for a hover intent */
-	transition: 350ms all 125ms ease-in;
+	transition: 100ms linear 450ms;
 	/* Rotate it in to the page to provide a transition element */
 	transform: rotateX(-90deg);
 	transform-origin: top left;
@@ -1450,7 +1461,7 @@ a.bbc_link {
 	width: var(--pointersize);
 	height: var(--pointersize);
 	content: '';
-	transition: 350ms all 125ms ease-in;
+	transition: 100ms linear 450ms;
 	transform: rotate(-45deg);
 	/* Clips the bottom of the rotated square so it does not bleed into dropdown content */
 	opacity: 0;
@@ -4892,8 +4903,9 @@ div.labels {
 }
 
 /* Some styles used in help entries (language strings) */
-.enablePostHTML {
-	margin-bottom: 0;
+.enablePostHTML, .enablePostMarkdown {
+	margin: 0 1em;
+	list-style: circle;
 }
 
 .custom_mask {

@@ -456,6 +456,17 @@ class Codes
 				self::ATTR_LENGTH => 1,
 			),
 			array(
+				self::ATTR_TAG => 'icode',
+				self::ATTR_TYPE => self::TYPE_UNPARSED_CONTENT,
+				self::ATTR_CONTENT => '<span class="bbc_code_inline">$1</span>',
+				self::ATTR_VALIDATE => $this->isDisabled('icode') ? null : function (&$data) {
+					$data = strtr($data, array('[' => '&#91;', ']' => '&#93;'));
+				},
+				self::ATTR_BLOCK_LEVEL => false,
+				self::ATTR_AUTOLINK => false,
+				self::ATTR_LENGTH => 5,
+			),
+			array(
 				self::ATTR_TAG => 'img',
 				self::ATTR_TYPE => self::TYPE_UNPARSED_CONTENT,
 				self::ATTR_PARAM => array(

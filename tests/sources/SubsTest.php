@@ -84,4 +84,19 @@ class TestSubs extends TestCase
 		foreach ($testemails as $email)
 			$this->assertTrue(isValidEmail($email) !== false);
 	}
+
+	public function testRemoveNestedQuotes()
+	{
+		global $modSettings;
+
+		$testquote = '[quote]1[quote]2[quote]3[/quote][/quote][/quote]';
+
+		$modSettings['removeNestedQuotes'] = 0;
+		$test = removeNestedQuotes($testquote);
+		$this->assertEmpty($test, 'Expected empty but found' . $test);
+
+		$modSettings['removeNestedQuotes'] = 1;
+		$test = removeNestedQuotes($testquote);
+		$this->assertEquals('[quote]1[/quote]', $test, 'Expected one quote but found'  . $test);
+	}
 }

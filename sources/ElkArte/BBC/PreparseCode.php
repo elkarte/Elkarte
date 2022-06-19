@@ -72,6 +72,9 @@ class PreparseCode
 		$this->message = $message;
 		$this->previewing = $previewing;
 
+		// Clean out control characters
+		$this->message = preg_replace('/[\x00-\x08\x0B\x0C\x0E-\x1F]/', '', $this->message);
+
 		// This line makes all languages *theoretically* work even with the wrong charset ;).
 		$this->message = preg_replace('~&amp;#(\d{4,5}|[2-9]\d{2,4}|1[2-9]\d);~', '&#$1;', $this->message);
 
@@ -91,6 +94,7 @@ class PreparseCode
 
 		// Validate code blocks are properly closed.
 		$this->_validateCodeBlocks();
+		$this->_validateICodeBlocks();
 
 		// Protect CODE blocks from further processing
 		$this->_tokenizeCodeBlocks();
@@ -180,12 +184,12 @@ class PreparseCode
 		$had_tag = false;
 		$code_open = false;
 
-		if (preg_match_all('~(\[(/)*code(?:=[^\]]+)?\])~is', $this->message, $matches))
+		if (preg_match_all('~(\[\/?code(?:=[^\]]+)?\])~i', $this->message, $matches))
 		{
-			foreach ($matches[0] as $index => $dummy)
+			foreach ($matches[0] as $match)
 			{
 				// Closing?
-				if (!empty($matches[2][$index]))
+				if ($match[1] === '/')
 				{
 					// If it's closing and we're not in a tag we need to open it...
 					if (!$in_tag)
@@ -224,36 +228,74 @@ class PreparseCode
 	}
 
 	/**
-	 * Protects code blocks from preparse by replacing them with %%token%% values
+	 * Find all icode blocks, ensure they are complete pairs and do not span lines
+	 */
+	private function _validateICodeBlocks()
+	{
+		// [icode] is _not_ for spanning lines, its inline!
+		$lines = explode("\n", $this->message);
+		foreach ($lines as $number => $line)
+		{
+			$depth = 0;
+			preg_match_all('~(\[\/?icode(?:=[^\]]+)?\])~i', $line, $matches);
+			foreach ($matches[0] as $match)
+			{
+				// Closing icode
+				if ($match[1] === '/')
+				{
+					--$depth;
+					continue;
+				}
+
+				++$depth;
+			}
+
+			// Open any ones that need to be open, or close if left open
+			if ($depth !== 0)
+			{
+				$lines[$number] = $depth > 0 ? $line . '[/icode]' : '[icode]' . $line;
+			}
+		}
+
+		// Put it back together
+		$this->message = implode("\n", $lines);
+	}
+
+	/**
+	 * Protects code / icode blocks from preparse by replacing them with %%token%% values
 	 */
 	private function _tokenizeCodeBlocks()
 	{
 		// Split up the message on the code start/end tags/
-		$parts = preg_split('~(\[\/code\]|\[code(?:=[^\]]+)?\])~i', $this->message, -1, PREG_SPLIT_DELIM_CAPTURE);
+		$patterns = ['~(\[\/code\]|\[code(?:=[^\]]+)?\])~i', '~(\[\/icode\]|\[icode(?:=[^\]]+)?\])~i'];
 
 		// Token generator
 		$tokenizer = new TokenHash();
 
-		foreach ($parts as $i => $part)
+		foreach ($patterns as $pattern)
 		{
-			// It goes 0 = outside, 1 = begin tag, 2 = inside, 3 = close tag, repeat.
-			if ($i % 4 === 0 && isset($parts[$i + 3]))
+			$parts = preg_split($pattern, $this->message, -1, PREG_SPLIT_DELIM_CAPTURE);
+			foreach ($parts as $i => $part)
 			{
-				// Create a unique key to put in place of the code block
-				$key = $tokenizer->generate_hash(8);
+				// It goes 0 = outside, 1 = begin tag, 2 = inside, 3 = close tag, repeat.
+				if ($i % 4 === 0 && isset($parts[$i + 3]))
+				{
+					// Create a unique key to put in place of the code block
+					$key = $tokenizer->generate_hash(8);
 
-				// Save what is there [code]stuff[/code]
-				$this->code_blocks['%%' . $key . '%%'] = $parts[$i + 1] . $parts[$i + 2] . $parts[$i + 3];
+					// Save what is there [code]stuff[/code]
+					$this->code_blocks['%%' . $key . '%%'] = $parts[$i + 1] . $parts[$i + 2] . $parts[$i + 3];
 
-				// Replace the code block with %%$key%% so its protected from further preparsecode processing
-				$parts[$i + 1] = '%%';
-				$parts[$i + 2] = $key;
-				$parts[$i + 3] = '%%';
+					// Replace the code block with %%$key%% so its protected from further preparsecode processing
+					$parts[$i + 1] = '%%';
+					$parts[$i + 2] = $key;
+					$parts[$i + 3] = '%%';
+				}
 			}
-		}
 
-		// The message with code blocks as %%tokens%%
-		$this->message = implode('', $parts);
+			// The message with code blocks as %%tokens%%
+			$this->message = implode('', $parts);
+		}
 	}
 
 	/**

@@ -38,7 +38,7 @@ body {
 }
 
 [contenteditable="true"] {
-	font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen", "Ubuntu", "Cantarell", "Droid Sans", "Helvetica Neue", "Trebuchet MS", Arial, sans-serif;
+	font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue", Arial, sans-serif;
 }
 
 a, a:link, a:visited {
@@ -77,8 +77,8 @@ code:before {
 }
 
 code {
-	font-family: "DejaVu Sans Mono", Monaco, Consolas, monospace;
-	font-size: 0.8667rem;
+	font-family: SFMono-Regular, ui-monospace, Menlo, Monaco, Consolas, "DejaVu Sans Mono", "Liberation Mono", "Courier New", monospace;
+	font-size: .933em;
 	position: relative;
 	margin-top: 1.5em;
 	padding: .25em;
@@ -87,6 +87,21 @@ code {
 	border-top: 2px solid var(--secondary_border_top);
 	border-bottom: 3px solid var(--secondary_border_bottom);
 	background: var(--content-background);
+	font-variant-numeric: tabular-nums;
+}
+
+icode {
+	font-family: SFMono-Regular, ui-monospace, Menlo, Monaco, Consolas, "DejaVu Sans Mono", "Liberation Mono", "Courier New", monospace;
+	font-size: .933em;
+	margin: 0;
+	padding: 1px 3px;
+	white-space: pre-wrap;
+	border: 1px solid var(--secondary_border);
+	border-radius: 2px;
+	background: var(--content-background);
+	-webkit-box-decoration-break: clone;
+	box-decoration-break: clone;
+	font-variant-numeric: tabular-nums;
 }
 
 blockquote {
@@ -99,7 +114,7 @@ blockquote {
 }
 
 blockquote cite, code cite {
-	font-size: 0.8667rem;
+	font-size: 1em;
 	display: block;
 	padding: 0 0 4px;
 	color: var(--body_text);
@@ -141,7 +156,7 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 aside:before {
-	font-size: 0.8667rem;
+	font-size: 0.8667em;
 	content: "[*]";
 	vertical-align: super;
 }
@@ -184,7 +199,7 @@ aside {
 }
 
 me:before {
-	font-size: 1.4667rem;
+	font-size: 1.4667em;
 	line-height: 1em;
 	content: "\270c";
 }

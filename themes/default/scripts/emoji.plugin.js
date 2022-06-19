@@ -179,7 +179,7 @@ var disableDrafts = false;
 		let instance, // sceditor instance
 			str, // current html in the editor
 			emoji_regex = new RegExp("(:([-+\\w]+):)", "gi"), // find emoji
-			code_regex = new RegExp("(</code>|<code(?:[^>]+)?>)", "gi"), // split around code tags
+			code_regex = ["(</code>|<code(?:[^>]+)?>)", "(</icode>|<icode(?:[^>]+)?>)"], // split around code/icode tags
 			str_split,
 			i,
 			n;
@@ -188,23 +188,28 @@ var disableDrafts = false;
 		instance = sceditor.instance(document.getElementById(opts.editor_id));
 		str = instance.getWysiwygEditorValue(false);
 
-		// Only convert emoji outside <code> tags.
-		str_split = str.split(code_regex);
-		n = str_split.length;
-
-		// Process the strings
-		for (i = 0; i < n; i++)
+		// Only convert emoji outside <code> tags.  *Note* if you have both icode and code tags in the
+		// same message and they both have emoji, this may process one or both, but its wizzy so it is
+		// not actually supposed to be correct :P  Post will be correct.
+		code_regex.forEach((split_regex) =>
 		{
-			// Only look for emoji outside the code tags
-			if (i % 4 === 0)
-			{
-				// Search for emoji :tags: and replace known ones with the right image
-				str_split[i] = str_split[i].replace(emoji_regex, Elk_Emoji.prototype.process).replace('{emoji_url}', opts.emoji_url);
-			}
-		}
+			str_split = str.split(new RegExp(split_regex, "gi"));
+			n = str_split.length;
 
-		// Put it all back together
-		str = str_split.join('');
+			// Process the strings
+			for (i = 0; i < n; i++)
+			{
+				// Only look for emoji outside the code tags
+				if (i % 4 === 0)
+				{
+					// Search for emoji :tags: and replace known ones with the right image
+					str_split[i] = str_split[i].replace(emoji_regex, Elk_Emoji.prototype.process).replace('{emoji_url}', opts.emoji_url);
+				}
+			}
+
+			// Put it all back together
+			str = str_split.join('');
+		});
 
 		// Replace the editors html with the update html
 		instance.val(str, false);

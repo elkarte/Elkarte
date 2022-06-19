@@ -476,7 +476,7 @@ strong {
 /* A quote, perhaps from another post. */
 .bbc_quote,
 /* A code block - maybe PHP ;) - shared styles. */
-.bbc_code {
+.bbc_code, .bbc_code_inline {
 	border-color: var(--primary_border);
 	background: var(--primary_content_background);
 }
@@ -491,7 +491,7 @@ input[type=checkbox].quote-show-more {
 }
 
 /* Extra code block styling. */
-.bbc_code {
+.bbc_code, .bbc_code_inline {
 	border-top-color: var(--secondary_border_top);
 	border-bottom-color: var(--secondary_border_bottom);
 	background: var(--content-background);
