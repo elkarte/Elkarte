@@ -320,10 +320,10 @@ function template_results()
 	$controller = $context['get_topics'][0];
 	while (($topic = $controller->{$context['get_topics'][1]}()))
 	{
-		$context['allow_qm']['can_remove'][] = $topic['quick_mod']['remove'] ? $topic['id'] : null;
-		$context['allow_qm']['can_move'][] = $topic['quick_mod']['move'] ? $topic['id'] : null;
-		$context['allow_qm']['can_lock'][] = $topic['quick_mod']['lock'] ? $topic['id'] : null;
-		$context['allow_qm']['can_sticky'][] = $topic['quick_mod']['sticky'] ? $topic['id'] : null;
+		$context['allow_qm']['can_remove'][] = isset($topic['quick_mod']['remove']) ? $topic['id'] : null;
+		$context['allow_qm']['can_move'][] = isset($topic['quick_mod']['move']) ? $topic['id'] : null;
+		$context['allow_qm']['can_lock'][] = isset($topic['quick_mod']['lock']) ? $topic['id'] : null;
+		$context['allow_qm']['can_sticky'][] = isset($topic['quick_mod']['sticky']) ? $topic['id'] : null;
 
 		if ($context['compact'])
 		{

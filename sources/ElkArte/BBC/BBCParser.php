@@ -914,6 +914,9 @@ class BBCParser
 		// Find the next closer
 		$this->pos2 = stripos($this->message, '[/' . $tag[Codes::ATTR_TAG] . ']', $this->pos1);
 
+		// Account for basic tag nesting
+		$this->handleUnparsedContentNesting($tag);
+
 		// No closer
 		if ($this->pos2 === false)
 		{
@@ -939,6 +942,30 @@ class BBCParser
 		$this->last_pos = $this->pos + 1;
 
 		return false;
+	}
+
+	/**
+	 * Account for the most basic nesting of same unparsed tags
+	 *  - [code][code]x[/code][/code]
+	 *  - [code][code]x[/code]<br />[/code]
+	 */
+	protected function handleUnparsedContentNesting($tag)
+	{
+		$nest_advance = $this->pos2 + $tag[Codes::ATTR_LENGTH] + 3;
+
+		$nest_check = stripos($this->message, '<br />[/' . $tag[Codes::ATTR_TAG] . ']', $nest_advance);
+		if ($nest_check && $nest_check === $nest_advance)
+		{
+			$this->pos2 = $nest_advance + 6;
+		}
+		else
+		{
+			$nest_check = stripos($this->message, '[/' . $tag[Codes::ATTR_TAG] . ']', $nest_advance);
+			if ($nest_check && $nest_check === $nest_advance)
+			{
+				$this->pos2 = $nest_advance;
+			}
+		}
 	}
 
 	/**

@@ -1159,15 +1159,16 @@ class Register extends AbstractController
 		global $context, $scripturl;
 
 		$verification_id = $this->_req->query->vid ?? '';
-		$code = $verification_id && isset($_SESSION[$verification_id . '_vv']) ? $_SESSION[$verification_id . '_vv']['code'] : ($_SESSION['visual_verification_code'] ?? '');
+		$code = $verification_id && isset($_SESSION[$verification_id . '_vv']['code']) ? $_SESSION[$verification_id . '_vv']['code'] : ($_SESSION['visual_verification_code'] ?? '');
 
 		// Somehow no code was generated or the session was lost.
 		if (empty($code))
 		{
 			dieGif();
 		}
+
 		// Show a window that will play the verification code (play sound)
-		elseif (isset($this->_req->query->sound))
+		if (isset($this->_req->query->sound))
 		{
 			Txt::load('Login');
 			theme()->getTemplates()->load('Register');

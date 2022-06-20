@@ -145,6 +145,7 @@ class MarkdownParser
 		// convert rule
 		$data = preg_replace('~(^|\n|<br \/>)---+?(^|\n|<br \/>)~', '$1[hr]', $data);
 		$data = preg_replace('~(^|\n|<br \/>)___+?(^|\n|<br \/>)~', '$1[hr]', $data);
+
 		return preg_replace('~(^|\n|<br \/>)\*\*\*+?(^|\n|<br \/>)~', '$1[hr]', $data);
 	}
 
@@ -171,7 +172,7 @@ class MarkdownParser
 		// \2 Find Group 2 results again
 		// (?!\2) NegativeLookahead do not find Group 2 results, e.g. no ***
 		// (\s|$|<br \/>) Group 4 match WhiteSpaceCharacter or EndOfLine or <br />
-		$regex = '~(^|\s|<br \/>)([' . $md . '])\2(?!\2)(.+?)\2\2(?!\2)(\s|$|<br \/>)~sm';
+		$regex = '~(^|\s|;|<br \/>)([' . $md . '])\2(?!\2)(.+?)\2\2(?!\2)(\s|$|&|<br \/>)~sm';
 
 		return preg_replace($regex, '$1[' . $bbc . ']$3[/' . $bbc . ']$4', $data);
 	}
@@ -188,13 +189,13 @@ class MarkdownParser
 	private function tagConvert($md, $bbc, $data)
 	{
 		$md = preg_quote($md, '~');
-		$regex = '~(^|\s|<br \/>)([' . $md . '])(?!\2)(.+?)\2(?!\2)(\s|$|<br \/>)~sm';
+		$regex = '~(^|\s|;|<br \/>)([' . $md . '])(?!\2)(.+?)\2(?!\2)(\s|$|&|<br \/>)~sm';
 
 		return preg_replace($regex, '$1[' . $bbc . ']$3[/' . $bbc . ']$4', $data);
 	}
 
 	/**
-	 * Convert `Text` to [icode]Text[/icode]
+	 * Convert `Text` to [icode]Text[/icode] and ```Text``` to [code]Text[/code]
 	 *
 	 * Should be called at beginning of bbc processing to prevent conversion of BBC tags inside `'s
 	 *
@@ -207,15 +208,20 @@ class MarkdownParser
 		// code block
 		if (strpos($data, '```') !== false)
 		{
-			$data = preg_replace_callback('~```\s*<br \/>([\s\S]+?(?=<br \/>```))<br \/>```~', static function ($match) {
+			$data = preg_replace_callback('~(?<=\s|^|<br />)```\s*(?:\n|<br />)([\s\S]+?(?=(<br />|\n)```))(?:<br />|\n)```~u', static function ($match) {
 				return '[code]' . strtr($match[1], ['[' => '&#91;', ']' => '&#93;']) . '[/code]';
 			}, $data);
 		}
 
-		// code line
+		// icode line
 		if (strpos($data, '`') !== false)
 		{
-			$data = preg_replace_callback('~`((?!`|\n|<br />).*?)`~', static function ($match) {
+			$data = preg_replace_callback('~(?<=\W|^)`([^`]+)`(?=\W|$)~u', static function ($match) {
+				if (strpos($match[1], '<br />'))
+				{
+					return $match[0];
+				}
+
 				return '[icode]'. strtr($match[1], ['[' => '&#91;', ']' => '&#93;']) . '[/icode]';
 			}, $data);
 		}
