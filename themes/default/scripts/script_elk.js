@@ -58,7 +58,11 @@ function elk_quotefix()
 		}
 		else
 		{
-			quote.querySelector('.quote-show-more').remove();
+			let check = quote.querySelector('.quote-show-more');
+			if (check)
+			{
+				check.remove();
+			}
 		}
 	});
 }
