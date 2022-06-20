@@ -573,13 +573,13 @@ Elk_QuickQuote.prototype.prepareQuickQuoteButton = function (event)
 		if (this.postSelector === '.postarea')
 		{
 			username = (postArea.parentNode.previousElementSibling.querySelector('.name').textContent).trim();
-			time_unix = postArea.parentNode.querySelector('time').getAttribute('data-timestamp');
+			time_unix = postArea.parentNode.querySelector('time').getAttribute('data-forumtime');
 		}
 		// Topic Summary on post page
 		else
 		{
 			username = (postArea.parentNode.querySelector('.name').textContent).trim();
-			time_unix = postArea.parentNode.querySelector('time').getAttribute('data-timestamp');
+			time_unix = postArea.parentNode.querySelector('time').getAttribute('data-forumtime');
 		}
 
 		// Build the quick quote wrapper and set the button click event

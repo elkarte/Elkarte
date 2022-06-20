@@ -412,12 +412,13 @@ function htmlTime($timestamp)
 		return '';
 	}
 
+	$forumtime = forum_time(false, $timestamp);
 	$timestamp = forum_time(true, $timestamp);
 	$time = date('Y-m-d H:i', $timestamp);
 	$stdtime = standardTime($timestamp, true, true);
 
 	// @todo maybe htmlspecialchars on the title attribute?
-	return '<time title="' . (!empty($context['using_relative_time']) ? $stdtime : $txt['last_post']) . '" datetime="' . $time . '" data-timestamp="' . $timestamp . '">' . $stdtime . '</time>';
+	return '<time title="' . (!empty($context['using_relative_time']) ? $stdtime : $txt['last_post']) . '" datetime="' . $time . '" data-timestamp="' . $timestamp . '" data-forumtime="' . $forumtime . '">' . $stdtime . '</time>';
 }
 
 /**
