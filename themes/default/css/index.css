@@ -1437,7 +1437,7 @@ a.bbc_link {
 	position: absolute;
 	z-index: 90;
 	/* Pull up to slightly overlap the parent */
-	top: calc(100% - 1px);
+	top: calc(100% + 4px);
 	visibility: hidden;
 	min-width: calc(100% + 30px);
 	padding: 0.6em;
@@ -1454,8 +1454,8 @@ a.bbc_link {
 .listlevel1.subsections::after {
 	position: absolute;
 	z-index: 90;
-	/* 1/2 the diagonal length of this box, the +1px is for the menu offset above) */
-	top: calc(100% - (1.4142 * var(--pointersize)) / 2 + 1px);
+	/* 1/2 the diagonal length of this box, the +5px is for the menu top offset above) */
+	top: calc(100% - (1.4142 * var(--pointersize)) / 2 + 5px);
 	left: 10%;
 	display: block;
 	width: var(--pointersize);
@@ -1463,9 +1463,9 @@ a.bbc_link {
 	content: '';
 	transition: 125ms linear 375ms;
 	transform: rotate(-45deg);
-	/* Clips the bottom of the rotated square so it does not bleed into dropdown content */
 	opacity: 0;
 	border: 1px solid;
+	/* Clips the bottom of the rotated square so it does not bleed into dropdown content */
 	clip-path: polygon(25% 75%, 0% 0%, 100% 0%, 100% 100%);
 	/* Simple variable to change if you want to change the size */
 	--pointersize: 12px;
@@ -1479,6 +1479,17 @@ a.bbc_link {
 .listlevel2 .menulevel3.selected {
 	visibility: visible;
 	transform: rotateX(0);
+}
+
+/* This is a gap filler to allow the drop menu to be positioned away from the button
+   but still allow the menu to remain exposed while the pointer is in the gap */
+.no_js .listlevel1:hover.subsections::before {
+	position: absolute;
+	top: 100%;
+	display: block;
+	width: 100%;
+	padding-top: 10px;
+	content: "";
 }
 
 .no_js .listlevel1:hover.subsections::after,
