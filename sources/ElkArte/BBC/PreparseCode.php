@@ -260,7 +260,7 @@ class PreparseCode
 		$this->message = implode("\n", $lines);
 
 		// Clear empty ones caused by linebreaks inside of icode tags.
-		$this->message = preg_replace('~\[icode\]\s*\[/icode\]~i', '', $this->message);
+		$this->message = preg_replace('~(?<!\[icode\])\[icode\]\s*\[\/icode\]~i', '', $this->message);
 	}
 
 	/**
