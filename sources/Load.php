@@ -545,10 +545,10 @@ function loadPermissions()
 		return;
 	}
 
-	$removals = array();
+	$permissions = [];
+	$removals = [];
 
 	$cache = Cache::instance();
-
 	if ($cache->isEnabled())
 	{
 		$cache_groups = User::$info->groups;
@@ -563,7 +563,6 @@ function loadPermissions()
 		$cache_key = 'permissions:' . $cache_groups;
 		$cache_board_key = 'permissions:' . $cache_groups . ':' . $board;
 
-		$temp = array();
 		if ($cache->levelHigherThan(1) && !empty($board) && $cache->getVar($temp, $cache_board_key, 240) && time() - 240 > $modSettings['settings_updated'])
 		{
 			list (User::$info->permissions) = $temp;
@@ -571,11 +570,12 @@ function loadPermissions()
 
 			return;
 		}
-		elseif ($cache->getVar($temp, $cache_key, 240) && time() - 240 > $modSettings['settings_updated'])
+
+		if ($cache->getVar($temp, $cache_key, 240) && time() - 240 > $modSettings['settings_updated'])
 		{
 			if (is_array($temp))
 			{
-				list (User::$info->permissions, $removals) = $temp;
+				list ($permissions, $removals) = $temp;
 			}
 		}
 	}
@@ -583,38 +583,35 @@ function loadPermissions()
 	// If it is detected as a robot, and we are restricting permissions as a special group - then implement this.
 	$spider_restrict = User::$info->possibly_robot && !empty($modSettings['spider_group']) ? ' OR (id_group = {int:spider_group} AND add_deny = 0)' : '';
 
-	if (empty(User::$info->permissions))
+	if (empty($permissions))
 	{
 		// Get the general permissions.
-		$request = $db->query('', '
+		$db->fetchQuery('
 			SELECT
 				permission, add_deny
 			FROM {db_prefix}permissions
 			WHERE id_group IN ({array_int:member_groups})
 				' . $spider_restrict,
-			array(
+			[
 				'member_groups' => User::$info->groups,
 				'spider_group' => !empty($modSettings['spider_group']) && $modSettings['spider_group'] != 1 ? $modSettings['spider_group'] : 0,
-			)
+			]
+		)->fetch_callback(
+			function ($row) use (&$removals, &$permissions) {
+				if (empty($row['add_deny']))
+				{
+					$removals[] = $row['permission'];
+				}
+				else
+				{
+					$permissions[] = $row['permission'];
+				}
+			}
 		);
-		$permissions = [];
-		while (($row = $request->fetch_assoc()))
-		{
-			if (empty($row['add_deny']))
-			{
-				$removals[] = $row['permission'];
-			}
-			else
-			{
-				$permissions[] = $row['permission'];
-			}
-		}
-		User::$info->permissions = $permissions;
-		$request->free_result();
 
 		if (isset($cache_key))
 		{
-			$cache->put($cache_key, array((array) User::$info->permissions, !empty($removals) ? $removals : array()), 2);
+			$cache->put($cache_key, [$permissions, $removals], 240);
 		}
 	}
 
@@ -651,9 +648,9 @@ function loadPermissions()
 				}
 			}
 		);
-
-		User::$info->permissions = $permissions;
 	}
+
+	User::$info->permissions = $permissions;
 
 	// Remove all the permissions they shouldn't have ;).
 	if (!empty($modSettings['permission_enable_deny']))
@@ -663,7 +660,7 @@ function loadPermissions()
 
 	if (isset($cache_board_key) && !empty($board) && $cache->levelHigherThan(1))
 	{
-		$cache->put($cache_board_key, array(User::$info->permissions, null), 240);
+		$cache->put($cache_board_key, [User::$info->permissions, null], 240);
 	}
 
 	// Banned?  Watch, don't touch..
