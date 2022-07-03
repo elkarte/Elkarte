@@ -13,11 +13,11 @@
 
 namespace ElkArte\Notifiers\Methods;
 
-use ElkArte\Notifiers\AbstractNotifier;
-use ElkArte\Mentions\MentionType\NotificationInterface;
-use ElkArte\NotificationsTask;
-use ElkArte\Mentions\Mentioning;
 use ElkArte\DataValidator;
+use ElkArte\Mentions\Mentioning;
+use ElkArte\Mentions\MentionType\NotificationInterface;
+use ElkArte\Notifications\NotificationsTask;
+use ElkArte\Notifiers\AbstractNotifier;
 
 
 /**
@@ -61,7 +61,7 @@ class Notification extends AbstractNotifier
 	 * Inserts a new mention in the database (those that appear in the mentions area).
 	 *
 	 * @param \ElkArte\Mentions\MentionType\NotificationInterface $obj
-	 * @param \ElkArte\NotificationsTask $task
+	 * @param \ElkArte\Notifications\NotificationsTask $task
 	 * @param array $bodies
 	 */
 	protected function _send_notification($obj, $task, $bodies)

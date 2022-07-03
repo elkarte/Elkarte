@@ -26,9 +26,9 @@ use ElkArte\DataValidator;
 use ElkArte\Errors\ErrorContext;
 use ElkArte\Exceptions\ControllerRedirectException;
 use ElkArte\Exceptions\Exception;
-use ElkArte\Notifications;
-use ElkArte\NotificationsTask;
 use ElkArte\Languages\Txt;
+use ElkArte\Notifications\Notifications;
+use ElkArte\Notifications\NotificationsTask;
 use ElkArte\User;
 use ElkArte\Util;
 

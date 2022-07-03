@@ -14,8 +14,8 @@
  *
  */
 
-use ElkArte\Notifications;
-use ElkArte\NotificationsTask;
+use ElkArte\Notifications\Notifications;
+use ElkArte\Notifications\NotificationsTask;
 use ElkArte\User;
 
 /**

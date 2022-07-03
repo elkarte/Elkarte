@@ -14,8 +14,8 @@
 namespace ElkArte\Mentions\MentionType;
 
 use ElkArte\Database\QueryInterface;
-use ElkArte\NotificationsTask;
 use ElkArte\Languages\Txt;
+use ElkArte\Notifications\NotificationsTask;
 use ElkArte\UserInfo;
 
 /**
@@ -47,7 +47,7 @@ abstract class AbstractNotificationMessage implements NotificationInterface
 	/**
 	 * The \ElkArte\NotificationsTask in use
 	 *
-	 * @var \ElkArte\NotificationsTask
+	 * @var \ElkArte\Notifications\NotificationsTask
 	 */
 	protected $_task;
 
@@ -179,7 +179,7 @@ abstract class AbstractNotificationMessage implements NotificationInterface
 	 * @param string $template An email template to load
 	 * @param string[] $keys Pair values to match the $txt indexes to subject and body
 	 * @param int[] $members
-	 * @param \ElkArte\NotificationsTask $task
+	 * @param \ElkArte\Notifications\NotificationsTask $task
 	 * @param string[] $lang_files Language files to load (optional)
 	 * @param string[] $replacements Additional replacements for the loadEmailTemplate function (optional)
 	 * @return mixed[]
@@ -254,7 +254,7 @@ abstract class AbstractNotificationMessage implements NotificationInterface
 		$langtxt = array();
 		foreach ($langs as $lang)
 		{
-			$langtxt[$lang] = loadEmailTemplate($template, $replacements, $lang, true, array('digest', 'snippet'), $lang_files);
+			$langtxt[$lang] = loadEmailTemplate($template, $replacements, $lang, false, true, array('digest', 'snippet'), $lang_files);
 		}
 
 		// Better be sure we have the correct language loaded (though it may be useless)

@@ -12,9 +12,14 @@
  *
  */
 
-namespace ElkArte;
+namespace ElkArte\Notifications;
 
+use ElkArte\AbstractModel;
+use ElkArte\DataValidator;
+use ElkArte\Exceptions;
+use ElkArte\Mentions;
 use ElkArte\Mentions\MentionType\NotificationInterface;
+use ElkArte\User;
 
 /**
  * Class Notifications
@@ -54,7 +59,7 @@ class Notifications extends AbstractModel
 	/**
 	 * List of notifications to send
 	 *
-	 * @var \ElkArte\NotificationsTask[]
+	 * @var \ElkArte\Notifications\NotificationsTask[]
 	 */
 	protected $_to_send;
 
@@ -151,7 +156,7 @@ class Notifications extends AbstractModel
 	 * Let's add it to the queue, later on (just before shutting down)
 	 * we will take care of sending it (see send)
 	 *
-	 * @param \ElkArte\NotificationsTask $task
+	 * @param \ElkArte\Notifications\NotificationsTask $task
 	 */
 	public function add(NotificationsTask $task)
 	{
@@ -180,7 +185,7 @@ class Notifications extends AbstractModel
 	/**
 	 * Process a certain task in order to send out the notifications.
 	 *
-	 * @param \ElkArte\NotificationsTask $task
+	 * @param \ElkArte\Notifications\NotificationsTask $task
 	 */
 	protected function _send_task(NotificationsTask $task)
 	{
@@ -271,7 +276,7 @@ class Notifications extends AbstractModel
 	 * Inserts a new mention in the database (those that appear in the mentions area).
 	 *
 	 * @param \ElkArte\Mentions\MentionType\NotificationInterface $obj
-	 * @param \ElkArte\NotificationsTask $task
+	 * @param \ElkArte\Notifications\NotificationsTask $task
 	 * @param mixed[] $bodies
 	 */
 	protected function _send_notification(NotificationInterface $obj, NotificationsTask $task, $bodies)
@@ -294,7 +299,7 @@ class Notifications extends AbstractModel
 	 * Sends an immediate email notification.
 	 *
 	 * @param \ElkArte\Mentions\MentionType\NotificationInterface $obj
-	 * @param \ElkArte\NotificationsTask $task
+	 * @param \ElkArte\Notifications\NotificationsTask $task
 	 * @param mixed[] $bodies
 	 */
 	protected function _send_email(NotificationInterface $obj, NotificationsTask $task, $bodies)
@@ -313,7 +318,7 @@ class Notifications extends AbstractModel
 	 * Stores data in the database to send a daily digest.
 	 *
 	 * @param \ElkArte\Mentions\MentionType\NotificationInterface $obj
-	 * @param \ElkArte\NotificationsTask $task
+	 * @param \ElkArte\Notifications\NotificationsTask $task
 	 * @param mixed[] $bodies
 	 */
 	protected function _send_daily_email(NotificationInterface $obj, NotificationsTask $task, $bodies)
@@ -358,7 +363,7 @@ class Notifications extends AbstractModel
 	 * Stores data in the database to send a weekly digest.
 	 *
 	 * @param \ElkArte\Mentions\MentionType\NotificationInterface $obj
-	 * @param \ElkArte\NotificationsTask $task
+	 * @param \ElkArte\Notifications\NotificationsTask $task
 	 * @param mixed[] $bodies
 	 */
 	protected function _send_weekly_email(NotificationInterface $obj, NotificationsTask $task, $bodies)

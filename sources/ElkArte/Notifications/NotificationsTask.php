@@ -12,7 +12,9 @@
  *
  */
 
-namespace ElkArte;
+namespace ElkArte\Notifications;
+
+use ElkArte\ValuesContainer;
 
 /**
  * Class NotificationsTask

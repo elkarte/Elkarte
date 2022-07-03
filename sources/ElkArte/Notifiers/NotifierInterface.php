@@ -15,7 +15,7 @@
 namespace ElkArte\Notifiers;
 
 use ElkArte\Mentions\MentionType\NotificationInterface;
-use ElkArte\NotificationsTask;
+use ElkArte\Notifications\NotificationsTask;
 
 /**
  * Class Notifications
@@ -28,7 +28,7 @@ Interface NotifierInterface
 	 * Process a certain task in order to send out the notifications.
 	 *
 	 * @param \ElkArte\Mentions\MentionType\NotificationInterface $obj
-	 * @param \ElkArte\NotificationsTask $task
+	 * @param \ElkArte\Notifications\NotificationsTask $task
 	 * @param string[] $bodies
 	 */
 	public function send(NotificationInterface $obj, NotificationsTask $task, $bodies);

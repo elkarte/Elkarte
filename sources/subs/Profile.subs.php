@@ -20,9 +20,9 @@ use ElkArte\Controller\Avatars;
 use ElkArte\DataValidator;
 use ElkArte\Errors\ErrorContext;
 use ElkArte\FileFunctions;
-use ElkArte\MembersList;
-use ElkArte\Notifications;
 use ElkArte\Languages\Txt;
+use ElkArte\MembersList;
+use ElkArte\Notifications\Notifications;
 use ElkArte\User;
 use ElkArte\Util;
 

@@ -21,12 +21,12 @@ use ElkArte\Debug;
 use ElkArte\GenericList;
 use ElkArte\Hooks;
 use ElkArte\Http\Headers;
-use ElkArte\Notifications;
+use ElkArte\Languages\Loader;
+use ElkArte\Notifications\Notifications;
 use ElkArte\Search\Search;
 use ElkArte\UrlGenerator\UrlGenerator;
 use ElkArte\User;
 use ElkArte\Util;
-use ElkArte\Languages\Loader;
 
 /**
  * Updates the settings table as well as $modSettings... only does one at a time if $update is true.

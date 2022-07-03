@@ -13,8 +13,10 @@
  *
  */
 
-namespace ElkArte;
+namespace ElkArte\Notifications;
 
+use ElkArte\AbstractModel;
+use ElkArte\DataValidator;
 use ElkArte\Languages\Txt;
 
 /**

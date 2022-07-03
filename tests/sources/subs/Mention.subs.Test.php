@@ -1,14 +1,13 @@
 <?php
 
 use ElkArte\DataValidator;
+use ElkArte\Languages\Loader;
 use ElkArte\Mentions\Mentioning;
-use ElkArte\Notifications;
-use ElkArte\NotificationsTask;
-use ElkArte\Themes\ThemeLoader;
+use ElkArte\Notifications\Notifications;
+use ElkArte\Notifications\NotificationsTask;
 use ElkArte\User;
 use ElkArte\UserInfo;
 use PHPUnit\Framework\TestCase;
-use ElkArte\Languages\Loader;
 
 /**
  * TestCase class for mention subs.
