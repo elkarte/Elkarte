@@ -223,13 +223,13 @@ class Display_Controller extends Action_Controller
 			$total_visible_posts = $context['num_replies'] + $topicinfo['unapproved_posts'] + ($topicinfo['approved'] ? 1 : 0);
 
 		// When was the last time this topic was replied to?  Should we warn them about it?
+		$context['oldTopicError'] = false;
 		if (!empty($modSettings['oldTopicDays']))
 		{
 			$mgsOptions = basicMessageInfo($topicinfo['id_last_msg'], true);
-			$context['oldTopicError'] = $mgsOptions['poster_time'] + $modSettings['oldTopicDays'] * 86400 < time() && empty($topicinfo['is_sticky']);
+			if ($mgsOptions !== false)
+				$context['oldTopicError'] = $mgsOptions['poster_time'] + $modSettings['oldTopicDays'] * 86400 < time() && empty($topicinfo['is_sticky']);
 		}
-		else
-			$context['oldTopicError'] = false;
 
 		// The start isn't a number; it's information about what to do, where to go.
 		if (!is_numeric($this->_start))
