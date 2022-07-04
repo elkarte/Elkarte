@@ -9,7 +9,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.1.7
+ * @version 1.1.9
  *
  */
 
@@ -604,7 +604,7 @@ function template_topic_replies_below()
 				<div class="postarea2" id="msg', $post['id'], '">
 					<div class="keyinfo">
 						<h5 class="floatleft">
-							<span>', $txt['posted_by'], '</span>&nbsp;', $post['poster'], '&nbsp;-&nbsp;', $post['time'], '
+							', $txt['posted_by'], ' <span class="name">', $post['poster'], '</span> &ndash; ', $post['html_time'], '
 						</h5>';
 
 			if ($context['can_quote'])
