@@ -361,7 +361,8 @@ input[type=submit][disabled]:hover, button[disabled], button[disabled]:hover {
 	padding: 1px 4px 2px 4px;
 	font-weight: bold;
 	font-size: .643em;
-	font-family: verdana, sans-serif;
+	font-family: verdana, sans-serif !important;
+	margin: 0 1px;
 }
 
 .new_posts:hover {
@@ -5746,6 +5747,10 @@ a > i {
 
 /* This one does 800 screens at default font size. */
 @media screen and (max-width: 50em) {
+	#gotop, #gobottom {
+		display: none;
+	}
+
 	.icon-menu {
 		display: inline-block;
 		margin: .05em;
@@ -5865,15 +5870,20 @@ a > i {
 	}
 
 	.board_name {
-		margin-top: 7px;
+		margin-top: 5px;
+		margin-bottom: 5px;
 		padding: 0;
+	}
+
+	.board_lastpost {
+		min-width: 14em;
 	}
 
 	.board_lastposter {
 		display: block;
 	}
 
-	.board_lastpost, .board_latest {
+	.board_latest {
 		min-width: 14em;
 	}
 
@@ -5885,6 +5895,10 @@ a > i {
 
 	.board_info .board_description, .board_info .moderators, .childboards {
 		margin: 0 0 0 8px;
+	}
+
+	.icon_anchor {
+		min-width: initial;
 	}
 
 	/* Playing silly buggers with a sidebar menu option for narrow screens. */
@@ -5967,6 +5981,14 @@ a > i {
 		width: 100%;
 		text-align: right;
 		white-space: normal;
+	}
+
+	.ui-tabs .ui-tabs-panel {
+		padding: 1em 0 !important;
+	}
+
+	.profile_content {
+		padding: 0 2px;
 	}
 
 	#search_options {
