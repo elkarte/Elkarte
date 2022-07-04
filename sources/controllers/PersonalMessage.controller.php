@@ -1227,7 +1227,7 @@ class PersonalMessage_Controller extends Action_Controller
 		if (!empty($context['send_log']['sent']) && !empty($replied_to) && $box === 'inbox')
 		{
 			require_once(SUBSDIR . '/PersonalMessage.subs.php');
-			setPMRepliedStatus($user_info['id'], (int) $this->_req->post->replied_to);
+			setPMRepliedStatus($user_info['id'], $replied_to);
 		}
 
 		$failed = !empty($context['send_log']['failed']);
