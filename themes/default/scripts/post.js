@@ -458,6 +458,19 @@ function onDocReceived(XMLDoc)
 
 	$editor_data[post_box_name].insert(text);
 
+	// In wizzy mode, we need to move the cursor out of the quote block
+	let
+		rangeHelper = $editor_data[post_box_name].getRangeHelper(),
+		parent = rangeHelper.parentNode();
+
+	if (parent && parent.nodeName === 'BLOCKQUOTE')
+	{
+		let range = rangeHelper.selectedRange();
+
+		range.setStartAfter(parent);
+		rangeHelper.selectRange(range);
+	}
+
 	ajax_indicator(false);
 }
 
