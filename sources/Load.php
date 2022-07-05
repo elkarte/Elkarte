@@ -847,7 +847,7 @@ function loadPermissions()
 		$db->free_result($request);
 
 		if (isset($cache_groups))
-			$cache->put('permissions:' . $cache_groups, array($user_info['permissions'], !empty($removals) ? $removals : array()), 2);
+			$cache->put('permissions:' . $cache_groups, array($user_info['permissions'], !empty($removals) ? $removals : array()), 240);
 	}
 
 	// Get the board permissions.
@@ -1814,7 +1814,7 @@ function loadUserContext()
 		'is_mod' => &$user_info['is_mod'],
 		'is_moderator' => &$user_info['is_moderator'],
 		// A user can mod if they have permission to see the mod center, or they are a board/group/approval moderator.
-		'can_mod' => allowedTo('access_mod_center') || (!$user_info['is_guest'] && ($user_info['mod_cache']['gq'] != '0=1' || $user_info['mod_cache']['bq'] != '0=1' || ($modSettings['postmod_active'] && !empty($user_info['mod_cache']['ap'])))),
+		'can_mod' => allowedTo('access_mod_center') || (!$user_info['is_guest'] && !empty($user_info['mod_cache']) && ($user_info['mod_cache']['gq'] != '0=1' || $user_info['mod_cache']['bq'] != '0=1' || ($modSettings['postmod_active'] && !empty($user_info['mod_cache']['ap'])))),
 		'username' => $user_info['username'],
 		'language' => $user_info['language'],
 		'email' => $user_info['email'],
