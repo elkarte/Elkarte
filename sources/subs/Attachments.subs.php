@@ -14,7 +14,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.1.7
+ * @version 1.1.9
  *
  */
 
@@ -481,7 +481,7 @@ function processAttachments($id_msg = null)
 		if (empty($errors))
 		{
 			$_SESSION['temp_attachments'][$attachID] = array(
-				'name' => htmlspecialchars(basename($_FILES['attachment']['name'][$n]), ENT_COMPAT, 'UTF-8'),
+				'name' => Util::clean_4byte_chars(Util::htmlspecialchars(basename($_FILES['attachment']['name'][$n]))),
 				'tmp_name' => $destName,
 				'attachid' => $attachID,
 				'public_attachid' => 'post_tmp_' . $user_info['id'] . '_' . md5(mt_rand()),
