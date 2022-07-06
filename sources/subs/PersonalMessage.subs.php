@@ -967,7 +967,7 @@ function sendpm($recipients, $subject, $message, $store_outbox = true, $from = n
 		{
 			// Off the notification email goes!
 			$mail = loadEmailTemplate($email_template, $replacements, $lang, true);
-			$sendMail->buildEmail($notification_list, $mail['subject'], $mail['body'], null, 'p' . $id_pm, true, 2, null, true);
+			$sendMail->buildEmail($notification_list, $mail['subject'], $mail['body'], null, 'p' . $id_pm, true, 2, true);
 		}
 	}
 

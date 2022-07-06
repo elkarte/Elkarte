@@ -172,7 +172,6 @@ class PostNotifications extends AbstractModel
 	{
 		return (!empty($pbe['user_info']['id']) && !empty($this->_modSettings['maillist_enabled']))
 			? (int) $pbe['user_info']['id'] : User::$info->id;
-
 	}
 
 	/**
@@ -194,7 +193,7 @@ class PostNotifications extends AbstractModel
 	 * @param int $user_id the poster
 	 * @param int[] $boards_index the boards the topic(s) are on
 	 * @param string $type see Notify Types
-	 * @param int[] $members_only if only sending to a select list of members
+	 * @param int|int[] $members_only if only sending to a select list of members
 	 */
 	public function sendBoardTopicNotifications($topicData, $user_id, $boards_index, $type, $members_only)
 	{
@@ -513,11 +512,11 @@ class PostNotifications extends AbstractModel
 					$email_from = $this->_getEmailFrom($topicNotifications[$notifyDatum['id_topic']]);
 					$from_wrapper = $this->_getFromWrapper();
 
-					$sendMail->buildEmail($notifyDatum['email_address'], $emaildata['subject'], $emaildata['body'], $email_from, 'm' . $topicData[$notifyDatum['id_topic']]['last_id'], true, 3, false, $from_wrapper, $notifyDatum['id_topic']);
+					$sendMail->buildEmail($notifyDatum['email_address'], $emaildata['subject'], $emaildata['body'], $email_from, 'm' . $topicNotifications[$notifyDatum['id_topic']]['last_id'], true, 3, false, $from_wrapper, $notifyDatum['id_topic']);
 				}
 				else
 				{
-					$sendMail->buildEmail($notifyDatum['email_address'], $emaildata['subject'], $emaildata['body'], null, 'm' . $topicData[$notifyDatum['id_topic']]['last_id'], true);
+					$sendMail->buildEmail($notifyDatum['email_address'], $emaildata['subject'], $emaildata['body'], null, 'm' . $topicNotifications[$notifyDatum['id_topic']]['last_id'], true);
 				}
 
 				$this->sent++;
@@ -598,7 +597,7 @@ class PostNotifications extends AbstractModel
 				continue;
 			}
 
-			$sentOnceAlready = 0;
+			$sentOnceAlready = false;
 
 			// For each message we need to send (from this board to this member)
 			foreach ($boards[$notifyDatum['id_board']] as $key)
@@ -639,7 +638,7 @@ class PostNotifications extends AbstractModel
 					}
 				}
 
-				$sentOnceAlready = 1;
+				$sentOnceAlready = true;
 			}
 		}
 

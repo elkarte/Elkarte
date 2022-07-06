@@ -677,7 +677,7 @@ function fetchBoardNotifications($user_id, $boards_index, $type, $members_only)
  * @param int $user_id some goon, e.g. the originator of the action who WILL NOT get a notification
  * @param int[] $topics array of topic id's that have updates
  * @param string $type type of notification like reply or lock
- * @param int[] $members_only if not empty, only send notices to these members
+ * @param int|int[] $members_only if not empty, only send notices to these members
  * @return array
  */
 function fetchTopicNotifications($user_id, $topics, $type, $members_only)

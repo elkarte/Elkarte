@@ -79,7 +79,6 @@ class Emoji extends AbstractModel
 
 			// Check for any embedded html / hex emoji
 			$string = $this->keyboardEmojiToImage($string);
-
 		}
 
 		return $this->_restoreCodeBlocks($string);
@@ -194,7 +193,7 @@ class Emoji extends AbstractModel
 	public function emojiToImage($m)
 	{
 		// No :tag: found or not a complete result, return
-		if (!is_array($m) || empty($m[2]))
+		if (empty($m[2]))
 		{
 			return $m[0];
 		}
