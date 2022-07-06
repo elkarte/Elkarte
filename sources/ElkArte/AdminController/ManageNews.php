@@ -891,17 +891,7 @@ class ManageNews extends AbstractController
 				$last_id_member = $row['id_member'];
 
 				// What groups are we looking at here?
-				if (empty($row['additional_groups']))
-				{
-					$groups = array($row['id_group'], $row['id_post_group']);
-				}
-				else
-				{
-					$groups = array_merge(
-						array($row['id_group'], $row['id_post_group']),
-						explode(',', $row['additional_groups'])
-					);
-				}
+				$groups = array_merge([$row['id_group'], $row['id_post_group']], (empty($row['additional_groups']) ? [] : explode(',', $row['additional_groups'])));
 
 				// Excluded groups?
 				if (array_intersect($groups, $context['recipients']['exclude_groups']) !== [])
