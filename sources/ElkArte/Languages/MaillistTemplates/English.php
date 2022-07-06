@@ -1,10 +1,11 @@
 <?php
 // Version: 2.0; MaillistTemplates
 
-// Do not translate anything that is between {}, they are used as replacement variables and MUST remain exactly how they are.
-// 		Additionally do not translate the @additional_params: line or the variable names in the lines that follow it.  You may
-//		translate the description of the variable.
-//		Do not translate @description:, however you may translate the rest of that line.
+// Do not translate anything that is between {}, they are used as replacement variables and MUST
+// remain exactly how they are.
+// Additionally do not translate the @additional_params: line or the variable names in the lines that follow it.  You may
+// translate the description of the variable.
+// Do not translate @description:, however you may translate the rest of that line.
 
 /*
 	@additional_params: pbe_notify_boards_once_body
@@ -40,7 +41,7 @@ You can reply to this email and have it posted as a topic reply.
 <*> You can see this message by using this link:
     {TOPICLINK}
 
-<*> Unsubscribe to this board by using this link:
+<*> Unsubscribe to this {SUBSCRIPTION} by using this link:
     {UNSUBSCRIBELINK}
 
 {EMAILREGARDS}';
@@ -67,8 +68,8 @@ $txt['pbe_notify_boards_body_body'] = '
 
 ------------------------------------
 Posting Information:
-{POSTERNAME} started the topic \'{TOPICSUBJECT}\' on the \'{BOARDNAME}\' Board.
-You can reply to this email and have it posted as a topic reply.
+{POSTERNAME} started a new topic \'{TOPICSUBJECT}\' on the \'{BOARDNAME}\' Board.
+You can reply to this email and have it posted as a reply.
 
 {FORUMNAMESHORT} Links:
 
@@ -81,7 +82,7 @@ You can reply to this email and have it posted as a topic reply.
 <*> You can go to your first unread message by using this link:
     {TOPICLINKNEW}
 
-<*> Unsubscribe to this board by using this link:
+<*> Unsubscribe to this {SUBSCRIPTION} by using this link:
     {UNSUBSCRIBELINK}
 
 {EMAILREGARDS}';
@@ -127,6 +128,13 @@ You can reply to this email and have it posted as a topic reply.
 
 {EMAILREGARDS}';
 
+/**
+	@additional_params: pbe_notification_reply
+	@description: when a topic reply gets approved
+ */
+$txt['pbe_notification_reply_once_subject'] = $txt['pbe_notification_reply_body_subject'];
+$txt['pbe_notification_reply_once_body'] = $txt['pbe_notification_reply_body_body'];
+
 /*
 	@additional_params: pbe_notification_reply_body_once
 		TOPICSUBJECT: The subject of the topic causing the notification
@@ -138,7 +146,7 @@ You can reply to this email and have it posted as a topic reply.
 		BOARDNAME: Name of the board the post was made in
 		SIGNATURE: The signature of the member who made the post
 		EMAILREGARDS: The site name signature
-	@description: Full body email notifcation for the first new reply in a topic
+	@description: Full body email notification for the first new reply in a topic
 */
 $txt['pbe_notification_reply_body_once_subject'] = 'Re: [{FORUMNAMESHORT}] {TOPICSUBJECT}';
 $txt['pbe_notification_reply_body_once_body'] = '
@@ -169,10 +177,17 @@ You can reply to this email and have it posted as a reply.
 
 {EMAILREGARDS}';
 
+/**
+	@additional_params: pbe_notification_reply_once
+	@description: New reply due to it being approved
+ */
+$txt['pbe_notification_reply_once_subject'] = $txt['pbe_notification_reply_body_once_subject'];
+$txt['pbe_notification_reply_once_body'] = $txt['pbe_notification_reply_body_once_body'];
+
 /*
 	@additional_params: pbe_new_pm_body
 		SUBJECT: The personal message subject.
-		SENDER:  The user name for the member sending the personal message.
+		SENDER:  The username for the member sending the personal message.
 		MESSAGE:  The text of the personal message.
 		REPLYLINK:  The link to directly access the reply page.
 		FORUMNAMESHORT: Short or nickname for the forum
@@ -184,8 +199,11 @@ The message they sent you is:
 
 {MESSAGE}
 
+{SIGNATURE}
+
+
 ------------------------------------
-Posting Information:
+Personal Message Information:
 You can reply to this email and have it sent as a PM response to {SENDER}
 
 {FORUMNAMESHORT} Links:
@@ -210,7 +228,7 @@ You can reply to this email and have it sent as a PM response to {SENDER}
 $txt['pbe_new_pm_body_tolist_subject'] = 'New Personal Message: {SUBJECT}';
 $txt['pbe_new_pm_body_tolist_body'] = '{TOLIST} have just been sent a personal message by {SENDER} on {FORUMNAME}
 
-The message they sent is:
+The group message they sent is:
 
 {MESSAGE}
 
@@ -220,7 +238,7 @@ The message they sent is:
 <*> To visit {FORUMNAMESHORT} on the web, go to:
     {FORUMURL}
 
-<*> Reply to this Personal Message here::
+<*> Reply to this Personal Message here:
     {REPLYLINK}
 
 {EMAILREGARDS}';

@@ -115,8 +115,8 @@ $txt['notify_send_type_everything_own'] = 'Moderation only if I started the topi
 $txt['notify_send_type_only_replies'] = 'Only replies';
 $txt['notify_send_type_only_replies_pbe'] = 'All messages';
 $txt['notify_send_type_nothing'] = 'Nothing at all';
-$txt['notify_send_body'] = 'When sending notifications of a reply to a topic, send the post in the email (but please don\'t reply to these emails.)';
-$txt['notify_send_body_pbe'] = 'When sending email notifications, send the full text of the post in the email';
+$txt['notify_send_body'] = 'Send the full text of the post in the email (but please don\'t reply to these emails.)';
+$txt['notify_send_body_pbe'] = 'Send the full text of the post in the email';
 $txt['notify_send_body_pbe_post'] = '<strong>NOT</strong> available with Daily / Weekly summary';
 
 $txt['notify_method'] = 'Notification and:';
