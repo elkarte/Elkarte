@@ -505,6 +505,11 @@ input[type=checkbox].quote-show-more {
 }
 
 /* Styling for tables inside posts */
+.inner > .bbc_table_container > .bbc_table,
+.messageContent > .bbc_table_container > .bbc_table {
+	box-shadow: 1px 1px 2px 2px var(--opacity10);
+}
+
 .inner > .bbc_table_container > .bbc_table td,
 .messageContent > .bbc_table_container > .bbc_table td {
 	border-right: 1px solid var(--primary_border_right);

@@ -1802,8 +1802,6 @@ a.bbc_link {
 /* Most of them. */
 .quickbuttons .listlevel1 {
 	font-size: var(--font13);
-	margin: .12em 0;
-	padding: .12em 0;
 }
 
 /* Odd cases. */
@@ -1891,15 +1889,7 @@ button[type="submit"].quick_quote_button.hide {
 
 .quick_quote_button {
 	position: absolute;
-}
-
-.quick_quote_button > .warning {
-	position: absolute;
-	z-index: 10;
-	top: -3px;
-	left: 0;
-	padding: 0.4em;
-	border: 1px solid;
+	z-index: 10000;
 }
 
 /* -------------------------------------------------------
@@ -5810,10 +5800,20 @@ div.labels {
 	/* limit to two lines of them */
 	.breadcrumb {
 		max-height: 4em;
+		margin-top: .25em;
+		margin-bottom: .75em;
 	}
 
 	.breadcrumb > .crumb {
-		padding: 0 0.5em 0 2.5em;
+		padding: 0 0.5em 0 2em;
+	}
+
+	.breadcrumb .crumb:first-child {
+		padding: 0 0.6em 0 1em;
+	}
+
+	.breadcrumb .crumb:first-child:last-child {
+		padding: 0 1.1em 0 1em;
 	}
 
 	/* menu to icons */
@@ -6243,6 +6243,10 @@ div.labels {
 		margin-bottom: 4px;
 	}
 
+	.quick_quote_button {
+		width: 50%;
+	}
+
 	/* Board View */
 	.board_row {
 		padding: 15px 0 7px 0;
@@ -6345,7 +6349,7 @@ div.labels {
 		white-space: normal;
 	}
 
-	#whoisviewing {
+	.generalinfo {
 		display: none;
 	}
 

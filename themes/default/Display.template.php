@@ -414,8 +414,7 @@ function template_quickreply_below()
 		echo '
 							', $context['is_locked'] ? '<p class="warningbox smalltext">' . $txt['quick_reply_warning'] . '</p>' : '',
 							$context['oldTopicError'] ? '<p class="warningbox smalltext"></i>' . sprintf($txt['error_old_topic'], $modSettings['oldTopicDays']) . '</p>' : '', '
-							', $context['can_reply_approved'] ? '' : '<em>' . $txt['wait_for_approval'] . '</em>', '
-							', !$context['can_reply_approved'] && $context['require_verification'] ? '<br />' : '';
+							', $context['can_reply_approved'] ? '' : '<p class="infobox">' . $txt['wait_for_approval'] . '</p>';
 
 		echo '
 							<div id="post_confirm_buttons" class="submitbutton">
