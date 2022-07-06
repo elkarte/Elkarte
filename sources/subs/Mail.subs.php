@@ -34,8 +34,8 @@ use ElkArte\User;
  * @param string|null $message_id = null - if specified, it will be used as local part of the Message-ID header.
  * @param bool $send_html = false, whether the message is HTML vs. plain text
  * @param int $priority = 3 Primarily used for queue priority.  0 = send now, >3 = no PBE
- * @param bool|null $hotmail_fix = null  No longer used, left for old function calls
- * @param bool $is_private Hides to/from names when viewing the mail queue
+ * @param bool|null $hotmail_fix = null  ** No longer used, left only for old function calls **
+ * @param bool $is_private - Hides to/from names when viewing the mail queue
  * @param string|null $from_wrapper - used to provide envelope from wrapper based on if we share users display name
  * @param int|null $reference - The parent topic id for use in a References header
  * @return bool whether the email was accepted properly.
@@ -62,7 +62,7 @@ function sendmail($to, $subject, $message, $from = null, $message_id = null, $se
  * @return bool
  * @package Mail
  */
-function AddMailQueue($flush = false, $to_array = array(), $subject = '', $message = '', $headers = '', $send_html = false, $priority = 3, $is_private = false, $message_id = '')
+function AddMailQueue($flush = false, $to_array = [], $subject = '', $message = '', $headers = '', $send_html = false, $priority = 3, $is_private = false, $message_id = '')
 {
 	global $context;
 
@@ -73,7 +73,7 @@ function AddMailQueue($flush = false, $to_array = array(), $subject = '', $messa
 
 	if ($cur_insert_len == 0)
 	{
-		$cur_insert = array();
+		$cur_insert = [];
 	}
 
 	// If we're flushing, make the final inserts - also if we're near the MySQL length limit!
@@ -93,7 +93,7 @@ function AddMailQueue($flush = false, $to_array = array(), $subject = '', $messa
 			array('id_mail')
 		);
 
-		$cur_insert = array();
+		$cur_insert = [];
 		$context['flush_mail'] = false;
 	}
 
@@ -141,12 +141,12 @@ function AddMailQueue($flush = false, $to_array = array(), $subject = '', $messa
 			);
 
 			// Clear this out.
-			$cur_insert = array();
+			$cur_insert = [];
 			$cur_insert_len = 0;
 		}
 
 		// Now add the current insert to the array...
-		$cur_insert[] = array(time(), (string) $to, (string) $message, (string) $subject, (string) $headers, ($send_html ? 1 : 0), $priority, (int) $is_private, (string) $message_id);
+		$cur_insert[] = [time(), (string) $to, (string) $message, (string) $subject, (string) $headers, ($send_html ? 1 : 0), $priority, (int) $is_private, (string) $message_id];
 		$cur_insert_len += $this_insert_len;
 	}
 
@@ -233,8 +233,14 @@ function mail_insert_key($message, $unq_head, $line_break)
 	// Append the key to the bottom of the plain section, it is always the first one
 	$message = preg_replace($regex['plain'], "$1{$line_break}{$line_break}[{$unq_head}]{$line_break}$2", $message);
 
-	// Quoted Printable, we can also just append the key section as the key is all standard ASCII
-	$message = preg_replace($regex['qp'], "$1$2{$line_break}{$line_break}[{$unq_head}]{$line_break}$3", $message);
+	// Quoted Printable section, add the key in background color so the html message looks good
+	if (preg_match($regex['qp'], $message, $match))
+	{
+		$qp_message = quoted_printable_decode($match[2]);
+		$qp_message = str_replace('<span class="key-holder">[]</span>', '<span style="color: #F6F6F6">[' . $unq_head . ']</span>', $qp_message);
+		$qp_message = quoted_printable_encode($qp_message);
+		$message = str_replace($match[2], $qp_message, $message);
+	}
 
 	// base64 the harder one as it must match RFC 2045 semantics
 	// Find the sections, decode, add in the new key, and encode the new message
@@ -257,6 +263,7 @@ function mail_insert_key($message, $unq_head, $line_break)
  * @param string $template
  * @param mixed[] $replacements
  * @param string $lang = ''
+ * @param bool $html = false - If to prepare the template for HTML output (newlines to BR, <a></a> links)
  * @param bool $loadLang = true
  * @param string[] $suffixes - Additional suffixes to find and return
  * @param string[] $additional_files - Additional language files to load
@@ -264,9 +271,8 @@ function mail_insert_key($message, $unq_head, $line_break)
  * @return array
  * @throws \ElkArte\Exceptions\Exception email_no_template
  * @package Mail
- *
  */
-function loadEmailTemplate($template, $replacements = array(), $lang = '', $loadLang = true, $suffixes = array(), $additional_files = array())
+function loadEmailTemplate($template, $replacements = [], $lang = '', $html = false, $loadLang = true, $suffixes = [], $additional_files = array())
 {
 	global $txt, $mbname, $scripturl, $settings, $boardurl, $modSettings;
 
@@ -294,10 +300,11 @@ function loadEmailTemplate($template, $replacements = array(), $lang = '', $load
 		throw new \ElkArte\Exceptions\Exception('email_no_template', 'template', array($template));
 	}
 
-	$ret = array(
+	$ret = [
 		'subject' => $txt[$template . '_subject'],
 		'body' => $txt[$template . '_body'],
-	);
+	];
+
 	if (!empty($suffixes))
 	{
 		foreach ($suffixes as $key)
@@ -307,7 +314,7 @@ function loadEmailTemplate($template, $replacements = array(), $lang = '', $load
 	}
 
 	// Add in the default replacements.
-	$replacements += array(
+	$replacements += [
 		'FORUMNAME' => $mbname,
 		'FORUMNAMESHORT' => (!empty($modSettings['maillist_sitename']) ? $modSettings['maillist_sitename'] : $mbname),
 		'EMAILREGARDS' => (!empty($modSettings['maillist_sitename_regards']) ? $modSettings['maillist_sitename_regards'] : ''),
@@ -317,28 +324,47 @@ function loadEmailTemplate($template, $replacements = array(), $lang = '', $load
 		'IMAGESURL' => $settings['images_url'],
 		'DEFAULT_THEMEURL' => $settings['default_theme_url'],
 		'REGARDS' => replaceBasicActionUrl($txt['regards_team']),
-	);
+	];
 
 	// Split the replacements up into two arrays, for use with str_replace
-	$find = array();
-	$replace = array();
+	$find = [];
+	$replace = [];
 
 	foreach ($replacements as $f => $r)
 	{
 		$find[] = '{' . $f . '}';
-		$replace[] = $r;
+		$replace[] = $html && strpos($r, 'http') === 0 ? '<a href="' . $r . '">' . $r . '</a>' : $r;
 	}
 
 	// Do the variable replacements.
 	foreach ($ret as $key => $val)
 	{
 		$val = str_replace($find, $replace, $val);
+
 		// Now deal with the {USER.variable} items.
 		$ret[$key] = preg_replace_callback('~{USER.([^}]+)}~', 'user_info_callback', $val);
 	}
 
-	// Finally return the email to the caller so they can send it out.
+	// If we want this template to be used as HTML,
+	$ret['body'] = $html ? templateToHtml($ret['body']) : $ret['body'];
+
+	// Finally return the email to the caller, so they can send it out.
 	return $ret;
+}
+
+/**
+ * Used to preserve the Pre formatted look of txt template's when sending HTML
+ *
+ * @param $string
+ * @return string
+ */
+function templateToHtml($string)
+{
+	$newString = preg_replace('~^-{3,40}$~m', '<hr />', $string);
+
+	$newString = str_replace("\n", '<br />', $newString);
+
+	return $newString ?? $string;
 }
 
 /**
