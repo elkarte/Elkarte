@@ -36,7 +36,7 @@ class Mail extends BaseMail
 	{
 		$message_id = $this->setMessageType($message_id);
 
-		$to = is_array($to) ? $to : array($to);
+		$to = is_array($to) ? $to : [$to];
 
 		if ($this->useSendmail)
 		{
@@ -61,17 +61,22 @@ class Mail extends BaseMail
 		global $webmaster_email, $modSettings, $txt;
 
 		$mail_result = true;
-		$subject = strtr($subject, array("\r" => '', "\n" => ''));
+		$subject = strtr($subject, ["\r" => '', "\n" => '']);
 
 		// Looks like another hidden beauty here
 		if (!empty($modSettings['mail_strip_carriage']))
 		{
-			$message = strtr($message, array("\r" => ''));
-			$headers = strtr($headers, array("\r" => ''));
+			$message = strtr($message, ["\r" => '']);
+			$headers = strtr($headers, ["\r" => '']);
 		}
 
 		$mid = strstr(empty($modSettings['maillist_mail_from']) ? $webmaster_email : $modSettings['maillist_mail_from'], '@');
 		$this->setReturnPath();
+
+		// This is frequently not set, or not set according to the needs of PBE and bounce detection
+		// We have to use ini_set, since "-f <address>" doesn't work on Windows systems, so we need both
+		$old_return = ini_set('sendmail_from', $this->returnPath);
+
 		$sent = [];
 		foreach ($mail_to_array as $key => $sendTo)
 		{
@@ -85,9 +90,6 @@ class Mail extends BaseMail
 				$message = mail_insert_key($message, $unq_head, $this->lineBreak);
 			}
 
-			// This is frequently not set, or not set according to the needs of PBE and bounce detection
-			// We have to use ini_set, since "-f <address>" doesn't work on Windows systems, so we need both
-			$old_return = ini_set('sendmail_from', $this->returnPath);
 			$sendTo = strtr($sendTo, ["\r" => '', "\n" => '']);
 			if (!mail($sendTo, $subject, $message, $headers . $this->lineBreak . $messageHeader, '-f ' . $this->returnPath))
 			{
@@ -107,16 +109,16 @@ class Mail extends BaseMail
 				// Track total emails sent
 				if (!empty($modSettings['trackStats']))
 				{
-					trackStats(array('email' => '+'));
+					trackStats(['email' => '+']);
 				}
 			}
-
-			// Put it back
-			ini_set('sendmail_from', $old_return);
 
 			// Wait, wait, I'm still sending here!
 			detectServer()->setTimeLimit(300);
 		}
+
+		// Put it back
+		ini_set('sendmail_from', $old_return);
 
 		// Log each email that we sent, such that they can be replied to
 		if (!empty($sent))
@@ -149,7 +151,7 @@ class Mail extends BaseMail
 		if (empty($modSettings['smtp_client']))
 		{
 			$modSettings['smtp_client'] = detectServer()->getFQDN(empty($modSettings['smtp_host']) ? '' : $modSettings['smtp_host']);
-			updateSettings(array('smtp_client' => $modSettings['smtp_client']));
+			updateSettings(['smtp_client' => $modSettings['smtp_client']]);
 		}
 
 		// Shortcuts
@@ -172,7 +174,7 @@ class Mail extends BaseMail
 		}
 
 		// Fix the message for any lines beginning with a period! (the first is ignored, you see.)
-		$message = strtr($message, array("\r\n" . '.' => "\r\n" . '..'));
+		$message = strtr($message, ["\r\n" . '.' => "\r\n" . '..']);
 
 		$mid = strstr(empty($modSettings['maillist_mail_from']) ? $webmaster_email : $modSettings['maillist_mail_from'], '@');
 		$this->setReturnPath();
@@ -231,7 +233,7 @@ class Mail extends BaseMail
 			// track the number of emails sent
 			if (!empty($modSettings['trackStats']))
 			{
-				trackStats(array('email' => '+'));
+				trackStats(['email' => '+']);
 			}
 
 			// Keep our post via email log
@@ -281,7 +283,7 @@ class Mail extends BaseMail
 				$socket = fsockopen($smtp_host, 465, $errno, $errstr, 3);
 				if (is_resource($socket))
 				{
-					updateSettings(array('smtp_port' => 465));
+					updateSettings(['smtp_port' => 465]);
 					Errors::instance()->log_error($txt['smtp_port_ssl']);
 				}
 			}
