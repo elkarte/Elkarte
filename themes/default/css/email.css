@@ -144,6 +144,7 @@ blockquote cite {
 }
 
 /* RESPONSIVE / MOBILE FRIENDLY STYLES */
+
 @media only screen and (max-width: 620px) {
 	table.body p,
 	table.body ul,
@@ -176,6 +177,7 @@ blockquote cite {
 
 /* When an email is pulled into Outlook.com / Hotmail, any style rules present in the email are
    appended with .ExternalClass. Normalizing a few of these helps */
+
 @media all {
 	.ExternalClass {
 		width: 100%;

@@ -16,9 +16,15 @@ class TestEmoji extends ElkArteCommonSetupTest
 	 */
 	protected function setUp(): void
 	{
+		global $modSettings, $settings;
+
 		parent::setUp();
 
+		// Not running from the web, so need to point to the actual file
+		$settings['default_theme_dir'] = '/home/runner/work/Elkarte/Elkarte/elkarte/themes/default';
+
 		// Unpack the emoji set
+		$modSettings['emoji_selection'] = 'tw-emoji';
 		$req = HttpReq::instance();
 		$req->post->emoji_selection = 'tw-emoji';
 		ManageEmojiModule::integrate_save_smiley_settings();
@@ -27,7 +33,7 @@ class TestEmoji extends ElkArteCommonSetupTest
 	/**
 	 * Test the showing the Likes Listing
 	 */
-	public function testShowLikes()
+	public function testEmoji2Image()
 	{
 		global $modSettings;
 
@@ -37,6 +43,11 @@ class TestEmoji extends ElkArteCommonSetupTest
 		$result = $emoji->emojiNameToImage(':smiley:');
 
 		// Let us see that beautiful smile
-		$this->assertEquals('<img class="smiley emoji tw-emoji" src="http://127.0.0.1/smileys/tw-emoji/1f603.svg" alt=":smiley:" title="Smiley" data-emoji-name=":smiley:" data-emoji-code="1f603">', $result);
+		$this->assertEquals('<img class="smiley emoji tw-emoji" src="http://127.0.0.1/smileys/tw-emoji/1f603.svg" alt="&#58;smiley&#58;" title="Smiley" data-emoji-name="&#58;smiley&#58;" data-emoji-code="1f603" />', $result);
+
+		$result = $emoji->emojiNameToImage(':face_exhaling:', true);
+
+		// Let us see that beautiful smile
+		$this->assertEquals('&#x1f62e;&#x200d;&#x1f4a8;', $result);
 	}
 }
