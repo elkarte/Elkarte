@@ -97,7 +97,7 @@ class PreparseCode
 		$this->_validateICodeBlocks();
 
 		// Protect CODE blocks from further processing
-		$this->_tokenizeCodeBlocks();
+		$this->message = $this->tokenizeCodeBlocks($this->message);
 
 		//  Now that we've fixed all the code tags, let's fix the img and url tags...
 		$this->_fixTags();
@@ -134,7 +134,7 @@ class PreparseCode
 		call_integration_hook('integrate_preparse_tokenized_code', array(&$this->message, $previewing, $this->code_blocks));
 
 		// Put it back together!
-		$this->_restoreCodeBlocks();
+		$this->message = $this->restoreCodeBlocks($this->message);
 
 		// Allow integration to do further processing
 		call_integration_hook('integrate_preparse_code', array(&$this->message, 0, $previewing));
@@ -265,8 +265,11 @@ class PreparseCode
 
 	/**
 	 * Protects code / icode blocks from preparse by replacing them with %%token%% values
+	 *
+	 * @param string $message
+	 * @return string
 	 */
-	private function _tokenizeCodeBlocks()
+	public function tokenizeCodeBlocks($message)
 	{
 		// Split up the message on the code start/end tags/
 		$patterns = ['~(\[\/code\]|\[code(?:=[^\]]+)?\])~i', '~(\[\/icode\]|\[icode(?:=[^\]]+)?\])~i'];
@@ -276,7 +279,7 @@ class PreparseCode
 
 		foreach ($patterns as $pattern)
 		{
-			$parts = preg_split($pattern, $this->message, -1, PREG_SPLIT_DELIM_CAPTURE);
+			$parts = preg_split($pattern, $message, -1, PREG_SPLIT_DELIM_CAPTURE);
 			foreach ($parts as $i => $part)
 			{
 				// It goes 0 = outside, 1 = begin tag, 2 = inside, 3 = close tag, repeat.
@@ -296,8 +299,10 @@ class PreparseCode
 			}
 
 			// The message with code blocks as %%tokens%%
-			$this->message = implode('', $parts);
+			$message = implode('', $parts);
 		}
+
+		return $message;
 	}
 
 	/**
@@ -666,13 +671,18 @@ class PreparseCode
 
 	/**
 	 * Replace our token-ized message with the saved code blocks
+	 *
+	 * @param string $message
+	 * @return string
 	 */
-	private function _restoreCodeBlocks()
+	public function restoreCodeBlocks($message)
 	{
 		if (!empty($this->code_blocks))
 		{
-			$this->message = str_replace(array_keys($this->code_blocks), array_values($this->code_blocks), $this->message);
+			$message = str_replace(array_keys($this->code_blocks), array_values($this->code_blocks), $message);
 		}
+
+		return $message;
 	}
 
 	/**
@@ -762,17 +772,16 @@ class PreparseCode
 	public function un_preparsecode($message)
 	{
 		// Protect CODE blocks from further processing
-		$this->message = $message;
-		$this->_tokenizeCodeBlocks();
+		$message = $this->tokenizeCodeBlocks($message);
 
 		// Pass integration the tokenized message and array
-		call_integration_hook('integrate_unpreparse_code', array(&$this->message, &$this->code_blocks, 0));
+		call_integration_hook('integrate_unpreparse_code', [&$message, &$this->code_blocks, 0]);
 
 		// Restore the code blocks
-		$this->_restoreCodeBlocks();
+		$message = $this->restoreCodeBlocks($message);
 
 		// Change breaks back to \n's and &nsbp; back to spaces.
-		return preg_replace('~<br( /)?' . '>~', "\n", str_replace('&nbsp;', ' ', $this->message));
+		return preg_replace('~<br( /)?' . '>~', "\n", str_replace('&nbsp;', ' ', $message));
 	}
 
 	/**
