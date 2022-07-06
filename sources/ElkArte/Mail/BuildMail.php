@@ -13,6 +13,8 @@
 
 namespace ElkArte\Mail;
 
+use ElkArte\Converters\Html2Md;
+
 class BuildMail extends BaseMail
 {
 	/** @var array All the required headers to send */
@@ -20,6 +22,9 @@ class BuildMail extends BaseMail
 
 	/** @var string Mime message composed of various sections/boundaries */
 	public $message;
+
+	/** @var array Optional method to allow template replacements array insertion */
+	public $replacements = [];
 
 	/**
 	 * This function builds an email and its headers.
@@ -53,17 +58,14 @@ class BuildMail extends BaseMail
 		// Set line breaks as required by OS and Transport
 		$message = $this->setMessageLineBreak($message);
 
-		// Set Message type and clean message_id
-		$message_id = $this->setMessageType($message_id);
-
 		// If the recipient list isn't an array, make it one.
-		$to_array = is_array($to) ? $to : array($to);
+		$to_array = is_array($to) ? $to : [$to];
 
 		// Get rid of entities in the subject line
 		$subject = un_htmlspecialchars($subject);
 
 		// Make the message use the proper line breaks.
-		$message = str_replace(array("\r", "\n"), array('', $this->lineBreak), $message);
+		$message = str_replace(["\r", "\n"], ['', $this->lineBreak], $message);
 
 		// Support Basic DMARC Compliance when in MLM mode
 		$from = $this->setDMARCFrom($from, $from_wrapper);
@@ -89,7 +91,7 @@ class BuildMail extends BaseMail
 		$this->setDigestHeaders($priority);
 
 		// Pass this to the integration before we start modifying the output -- it'll make it easier later.
-		if (in_array(false, call_integration_hook('integrate_outgoing_email', array(&$subject, &$message, &$this->headers)), true))
+		if (in_array(false, call_integration_hook('integrate_outgoing_email', [&$subject, &$message, &$this->headers]), true))
 		{
 			return false;
 		}
@@ -107,12 +109,12 @@ class BuildMail extends BaseMail
 		$headers = implode($this->lineBreak, $this->headers);
 
 		// Now build our message with various encodings
-		$message = $this->getMessage($send_html, $mime_boundary, $message);
+		$message = $this->getMessage($send_html, $mime_boundary, $message, $subject);
 
 		// Are we using the mail queue, if so this is where we butt in...
 		if (!empty($modSettings['mail_queue']) && $priority !== 0)
 		{
-			return AddMailQueue(false, $to_array, $subject, $message, $headers, $send_html, $priority, $is_private, $this->messageType . $message_id);
+			return AddMailQueue(false, $to_array, $subject, $message, $headers, $send_html, $priority, $is_private, $message_id);
 		}
 
 		// If it's a priority mail, send it now - note though that this should NOT be used for sending many at once.
@@ -128,11 +130,12 @@ class BuildMail extends BaseMail
 				$new_queue_stat = $last_mail_time . '|' . ((int) $mails_this_minute + 1);
 			}
 
-			updateSettings(array('mail_recent' => $new_queue_stat));
+			updateSettings(['mail_recent' => $new_queue_stat]);
 		}
 
 		// SMTP or sendmail?
 		$mail = new Mail();
+		$mail->mailList = $this->mailList;
 		$mail_result = $mail->sendMail($to_array, $subject, $headers, $message, $message_id);
 
 		// Clear out the stat cache.
@@ -151,7 +154,7 @@ class BuildMail extends BaseMail
 	public function setMessageLineBreak($message)
 	{
 		// Make the message use the proper line breaks.
-		return str_replace(array("\r", "\n"), array('', $this->lineBreak), $message);
+		return str_replace(["\r", "\n"], ['', $this->lineBreak], $message);
 	}
 
 	/**
@@ -220,7 +223,7 @@ class BuildMail extends BaseMail
 	 * What it does:
 	 *
 	 * - In case there are higher ASCII characters in the given string, this
-	 * function will attempt the transport method 'quoted-printable'.
+	 * function will attempt the transport method 'base64'.
 	 * - Otherwise the transport method '7bit' is used.
 	 *
 	 * @param string $string
@@ -239,10 +242,10 @@ class BuildMail extends BaseMail
 			$string = base64_encode($string);
 			$string = '=?UTF-8?B?' . $string . '?=';
 
-			return array($string, 'base64');
+			return [$string, 'base64'];
 		}
 
-		return array($string, '7bit');
+		return [$string, '7bit'];
 	}
 
 	/**
@@ -360,28 +363,29 @@ class BuildMail extends BaseMail
 	 * to utf-8 characters.  The result is then encoded with quoted printable which does the needed line
 	 * flowing.  This will be marked as text/plain or text/html based on $send_html flag
 	 *
-	 * @param $send_html
-	 * @param $mime_boundary
-	 * @param $orig_message
+	 * @param bool $send_html
+	 * @param string $mime_boundary
+	 * @param string $orig_message
+	 * @param string $subject
 	 * @return string
 	 */
-	public function getMessage($send_html, $mime_boundary, $orig_message)
+	public function getMessage($send_html, $mime_boundary, $orig_message, $subject)
 	{
-		$ascii_message = $send_html ? $this->getPlainFromHTML($orig_message) : $orig_message;
-		$ascii_message = $this->get7bitVersion($ascii_message);
+		$plain_text = $send_html ? $this->getPlainFromHTML($orig_message) : $orig_message;
+		$ascii_message = $this->get7bitVersion($plain_text);
 
 		// This is the plain text version.  Even if no one sees it, we need it for spam checkers.
 		$message = $ascii_message . $this->lineBreak . '--' . $mime_boundary . $this->lineBreak;
 
 		// This is base64 message, more accurate than plain as it true UTF-8
-		$mine_message = $this->getBase64Version($orig_message);
+		$mine_message = $this->getBase64Version($plain_text);
 		$message .= 'Content-Type: text/plain; charset=UTF-8' . $this->lineBreak;
 		$message .= 'Content-Transfer-Encoding: base64' . $this->lineBreak . $this->lineBreak;
 		$message .= $mine_message . $this->lineBreak . '--' . $mime_boundary . $this->lineBreak;
 
-		// This is the actual HTML message, prim and proper.  If we wanted images, they could be
-		// inlined here (with multipart/related, etc.)
-		$html_message = $this->getQuotedPrintableVersion($orig_message);
+		// This is the actual HTML message, prim and proper.
+		$html_message = $send_html ? $this->getEmailWrapper($orig_message, $subject) : $orig_message;
+		$html_message = $this->getQuotedPrintableVersion($html_message);
 		$message .= 'Content-Type: text/' . ($send_html ? 'html' : 'plain') . '; charset=UTF-8' . $this->lineBreak;
 		$message .= 'Content-Transfer-Encoding: Quoted-Printable' . $this->lineBreak . $this->lineBreak;
 		$message .= $html_message . $this->lineBreak . '--' . $mime_boundary . '--';
@@ -414,19 +418,15 @@ class BuildMail extends BaseMail
 	 */
 	public function getPlainFromHTML($string)
 	{
-		// Remove any basic control characters, allowing for tab, LF and CR
+		// Remove any basic control characters, allowing only for tab, LF and CR
 		$string = preg_replace('/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]/', '', $string);
 
-		// No html in plain text, but insert some block level line breaks
-		$trans = [
-			'</title>' => $this->lineBreak,
-			'</div>' => $this->lineBreak,
-			'</p>' => $this->lineBreak,
-			'</br>' => $this->lineBreak,
-			'</br />' => $this->lineBreak,
-			'</blockquote>' => $this->lineBreak];
+		// Convert to markdown, provides some intent should the receiver only accept plain text
+		$mark_down = new Html2Md($string);
+		$string = $mark_down->get_markdown();
 
-		return un_htmlspecialchars(strip_tags(strtr($string, $trans)));
+		// No html in plain text
+		return un_htmlspecialchars(strip_tags($string));
 	}
 
 	/**
@@ -462,7 +462,7 @@ class BuildMail extends BaseMail
 		// Get a pure UTF8 character string
 		$string = $this->getValidUTF8String($string);
 
-		// Base64 encode.
+		// Quoted Printable encode.
 		return quoted_printable_encode($string);
 	}
 
@@ -490,8 +490,45 @@ class BuildMail extends BaseMail
 	{
 		global $scripturl;
 
-		$string = strtr($string, array($this->lineBreak => '<br />' . $this->lineBreak));
+		$string = strtr($string, [$this->lineBreak => '<br />' . $this->lineBreak]);
 
 		return preg_replace('~\b(' . preg_quote($scripturl, '~') . '(?:[?/][\w-%.,?@!:&;=#]+)?)~', '<a href="$1" target="_blank" rel="noopener">$1</a>', $string);
+	}
+
+	/**
+	 * Builds a body wrapper for the HTML message, because HTML Email design is in the dark ages.
+	 *
+	 * - Email clients provide inconsistent CSS support, that is why we have a special CSS style
+	 * and layout. Not all clients support all CSS properties, for example here is Gmail`s list
+	 * https://developers.google.com/gmail/design/reference/supported_css
+	 * - Due to the numerous email clients and devices, the email will be rendered by a variety of engines
+	 * including WebKit, IE, MS Word, Blink plus clients will add their own styles "to help"
+	 * - In general, use tables over divs, CSS2, HTML4, HTML attributes instead of CSS, go old school
+	 *
+	 * @return string
+	 */
+	public function getEmailWrapper($message, $subject)
+	{
+		global $settings;
+
+		$replacements = [
+			'TOPICSUBJECT' => $subject,
+			'MESSAGE' => $message,
+			'EMAILCSS' => file_get_contents($settings['default_theme_dir'] . '/css/email.css'),
+		] + $this->replacements;
+
+		$emaildata = loadEmailTemplate('notify_html_email', $replacements);
+
+		return $emaildata['body'];
+	}
+
+	/**
+	 * Provide a way to supply the template replacement values
+	 *
+	 * @param array $replacements
+	 */
+	public function setEmailReplacements($replacements)
+	{
+		$this->replacements = $replacements;
 	}
 }
