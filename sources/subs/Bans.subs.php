@@ -1523,26 +1523,26 @@ function list_getBans($start, $items_per_page, $sort)
 /**
  * Gets the number of ban items belonging to a certain ban group
  *
+ * @param int $ban_group_id
  * @return int
  * @package Bans
  */
-function list_getNumBanItems()
+function list_getNumBanItems($ban_group_id = 0)
 {
-	global $context;
-
 	$db = database();
 
-	$ban_group_id = isset($context['ban_group_id']) ? (int) $context['ban_group_id'] : 0;
+	$ban_group_id = (int) $ban_group_id;
 
 	$request = $db->query('', '
-		SELECT COUNT(bi.id_ban)
+		SELECT 
+			COUNT(bi.id_ban)
 		FROM {db_prefix}ban_groups AS bg
 			LEFT JOIN {db_prefix}ban_items AS bi ON (bi.id_ban_group = bg.id_ban_group)
 			LEFT JOIN {db_prefix}members AS mem ON (mem.id_member = bi.id_member)
 		WHERE bg.id_ban_group = {int:current_ban}',
-		array(
+		[
 			'current_ban' => $ban_group_id,
-		)
+		]
 	);
 	list ($banNumber) = $request->fetch_row();
 	$request->free_result();
