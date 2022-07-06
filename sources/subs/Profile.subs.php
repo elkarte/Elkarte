@@ -349,7 +349,7 @@ function loadCustomFields($memID, $area = 'summary', array $custom_fields = arra
 
 			if (in_array($row['field_type'], array('radio', 'select')))
 			{
-				$replacements['{KEY}'] = $row['col_name'] . '_' . $key;
+				$replacements['{KEY}'] = $row['col_name'] . '_' . ($key ?? 0);
 			}
 
 			$output_html = strtr($row['enclose'], $replacements);
