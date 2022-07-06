@@ -40,6 +40,11 @@ class TestHTML2Md extends TestCase
 				'`    code block indented by spaces` ',
 			),
 			array(
+				'ICode Span',
+				'<span class="bbc_code_inline">some code</span>',
+				'`some code`',
+			),
+			array(
 				'Code Block',
 				"<pre><code>the lines in this block  \nall contain trailing spaces  \n</code></pre>",
 				"```\nthe lines in this block  \nall contain trailing spaces  \n\n```",
@@ -78,6 +83,11 @@ class TestHTML2Md extends TestCase
 				'Quotes',
 				'<blockquote><br /><p>Example:</p><pre><code>sub status {<br />    print "working";<br />}<br /></code></pre><p>Or:</p><pre><code>sub status {<br />    return "working";<br />}<br /></code></pre></blockquote>',
 				"> Example:\n> \n> ```\n> sub status {\n>     print \"working\";\n> }\n> \n> ```\n>   \n> \n> \n> Or:\n> \n> ```\n> sub status {\n>     return \"working\";\n> }\n> \n> ```\n	",
+			),
+			array(
+				'Quotes with Cite',
+				'<div class="quote-read-more"><blockquote class="bbc_quote"><cite>Quote from: Spuds</cite>testcase</blockquote></div>',
+				"> Quote from: Spuds\n> testcase",
 			),
 			array(
 				'Nested Quotes',

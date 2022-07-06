@@ -12,7 +12,9 @@
  *
  */
 
-namespace ElkArte;
+namespace ElkArte\Notifications;
+
+use ElkArte\ValuesContainer;
 
 /**
  * Class NotificationsTask
@@ -77,7 +79,7 @@ class NotificationsTask extends ValuesContainer
 	/**
 	 * Sets the members that have to receive the notification.
 	 *
-	 * @param int|int[] An array of member id
+	 * @param int|int[] $members An array of member id
 	 */
 	public function setMembers($members)
 	{

@@ -155,7 +155,7 @@
 
 	--user_highlight: #D8FFDF; /* User highlighted text */
 	--link_shadow: #CEDCCB; /* BBC link underline */
-	--notice: #FFF5CD; /* This is a light yellow, approve bg, warn bg etc */
+	--notice: #332D1A; /* This is a dark desaturated yellow. yellow, approve bg, warn bg etc */
 	--sticky_row: #8E8E2C; /* sticky row background */
 	--locked_row: #CF1876; /* locked row background */
 	--status_bar_border: #A9CCD1; /* Status bar in attachment upload progress */
@@ -688,7 +688,7 @@ sup.bbc_footnotes, sup.bbc_footnotes a {
 	border-color: var(--transparent);
 	border-top-color: var(--primary_border);
 	border-right-color: var(--primary_border);
-	background: var(--menu_nav_grad_1);
+	background: var(--menu_background);
 }
 
 .poster .linklevel2, .poster .linklevel2:focus,

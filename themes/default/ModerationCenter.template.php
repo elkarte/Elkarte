@@ -340,17 +340,17 @@ function template_unapproved_posts()
 	// Just a big div of it all really...
 	echo '
 				<form action="', $scripturl, '?action=moderate;area=postmod;start=', $context['start'], ';sa=', $context['current_view'], '" method="post" accept-charset="UTF-8">
-						<h2 class="category_header hdicon i-post-text">
-							', $context['header_title'], '
-						</h2>';
+					<h2 class="category_header hdicon i-post-text">
+						', $context['header_title'], '
+					</h2>';
 
 	// No posts?
 	if (empty($context['unapproved_items']))
 	{
 		echo '
-						<div class="content">
-							<p class="centertext">', $txt['mc_unapproved_' . $context['current_view'] . '_none_found'], '</p>
-						</div>';
+					<div class="content">
+						<p class="centertext">', $txt['mc_unapproved_' . $context['current_view'] . '_none_found'], '</p>
+					</div>';
 	}
 	else
 	{

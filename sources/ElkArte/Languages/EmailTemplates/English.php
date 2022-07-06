@@ -854,7 +854,7 @@ $txt['paid_subscription_error_subject'] = 'Paid Subscription Error Occurred';
 $txt['paid_subscription_error_body'] = 'Dear {REALNAME},
 
 The following error occurred when processing a paid subscription
----------------------------------------------------------------
+------------------------------------
 {ERROR}
 
 {REGARDS}';
@@ -1006,6 +1006,7 @@ $txt['notify_mentionmem_snippet'] = '{MSGLINK}';
 		ACTIONNAME:  The user name of the member that quoted someone's message.
 		MSGLINK:  The url to the message where someone has been quoted.
 		SUBJECT: The subject of the message
+  		UNSUBSCRIBELINK: Link to unsubscribe from notifications.
 	@description: A notification email sent to the members quoted in someone else message
 */
 $txt['notify_quotedmem_subject'] = 'Your message has been quoted';
@@ -1024,6 +1025,68 @@ You can unsubscribe to further "quoted message" notifications by using this link
 ';
 $txt['notify_quotedmem_digest'] = 'Your messages have been quoted in:';
 $txt['notify_quotedmem_snippet'] = '{MSGLINK}';
+
+/**
+	@additional_params: notify_html_email
+		FORUMNAMESHORT: Short or nickname for the forum
+		TOPICSUBJECT: The subject of the message.
+		MESSAGE: This is the body of the message.
+		EMAILCSS: The location of the stylesheet.
+		UNSUBSCRIBELINK: Link to unsubscribe from notifications.
+	@description: A basic HTML wrapper to place around a prepared HTML email
+ */
+$txt['notify_html_email_subject'] = '';
+$txt['notify_html_email_body'] = '<!DOCTYPE html>
+<html>
+<head>
+	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+	<title>{TOPICSUBJECT}</title>
+	<style>
+		{EMAILCSS}
+	</style>
+</head>
+<body>
+<table role="presentation" border="0" cellpadding="0" cellspacing="0" class="body">
+	<tr>
+		<td class="container">
+			<div class="content">
+				<table role="presentation" class="main">
+					<tr>
+						<td class="wrapper">
+							<table role="presentation" border="0" cellpadding="0" cellspacing="0">
+								<tr>
+									<td>
+										<p>{MESSAGE}</p>
+									</td>
+								</tr>
+							</table>
+						</td>
+					</tr>
+				</table>
+				<div class="footer">
+					<table role="presentation" border="0" cellpadding="0" cellspacing="0">
+						<tr>
+							<td class="content-block">
+								<span class="apple-link">{FORUMNAMESHORT}</span>
+								<br>
+								Dont like these emails? <a href="{UNSUBSCRIBELINK}">Unsubscribe</a>.
+							</td>
+						</tr>
+						<tr>
+							<td>
+								<span class="key-holder">[]</span>
+							</td>
+						</tr>
+					</table>
+				</div>
+			</div>
+		</td>
+	</tr>
+</table>
+</body>
+</html>
+';
 
 /**
 	@additional_params: happy_birthday

@@ -13,12 +13,12 @@
 
 namespace ElkArte\Mentions\MentionType\Event;
 
-use ElkArte\Mentions\MentionType\AbstractEventBoardAccess;
-use ElkArte\Mentions\MentionType\CommonConfigTrait;
 use ElkArte\DataValidator;
 use ElkArte\Mentions\Mentioning;
-use ElkArte\Notifications;
-use ElkArte\NotificationsTask;
+use ElkArte\Mentions\MentionType\AbstractEventBoardAccess;
+use ElkArte\Mentions\MentionType\CommonConfigTrait;
+use ElkArte\Notifications\Notifications;
+use ElkArte\Notifications\NotificationsTask;
 
 /**
  * Class Quotedmem

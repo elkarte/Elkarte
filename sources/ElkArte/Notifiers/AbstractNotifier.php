@@ -15,9 +15,9 @@
 namespace ElkArte\Notifiers;
 
 use ElkArte\Database\QueryInterface;
-use ElkArte\UserInfo;
 use ElkArte\Mentions\MentionType\NotificationInterface;
-use ElkArte\NotificationsTask;
+use ElkArte\Notifications\NotificationsTask;
+use ElkArte\UserInfo;
 
 
 /**

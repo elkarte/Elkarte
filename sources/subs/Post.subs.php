@@ -624,7 +624,6 @@ function modifyPost(&$msgOptions, &$topicOptions, &$posterOptions)
  *
  * @return bool|void
  * @package Posts
- *
  */
 function approvePosts($msgs, $approve = true)
 {
@@ -634,7 +633,7 @@ function approvePosts($msgs, $approve = true)
 
 	if (!is_array($msgs))
 	{
-		$msgs = array($msgs);
+		$msgs = [$msgs];
 	}
 
 	if (empty($msgs))
@@ -645,9 +644,10 @@ function approvePosts($msgs, $approve = true)
 	// May as well start at the beginning, working out *what* we need to change.
 	$request = $db->query('', '
 		SELECT 
-			m.id_msg, m.approved, m.id_topic, m.id_board, t.id_first_msg, t.id_last_msg,
-			m.body, m.subject, COALESCE(mem.real_name, m.poster_name) AS poster_name, m.id_member,
-			t.approved AS topic_approved, b.count_posts
+			m.id_msg, m.approved, m.id_topic, m.id_board, m.body, m.subject, m.id_member,
+			t.id_first_msg, t.id_last_msg, t.approved AS topic_approved,
+			COALESCE(mem.real_name, m.poster_name) AS poster_name, mem.signature,
+			b.count_posts
 		FROM {db_prefix}messages AS m
 			INNER JOIN {db_prefix}topics AS t ON (t.id_topic = m.id_topic)
 			INNER JOIN {db_prefix}boards AS b ON (b.id_board = m.id_board)
@@ -659,14 +659,14 @@ function approvePosts($msgs, $approve = true)
 			'approved_state' => $approve ? 0 : 1,
 		)
 	);
-	$msgs = array();
-	$topics = array();
-	$topic_changes = array();
-	$board_changes = array();
-	$notification_topics = array();
-	$notification_posts = array();
-	$member_post_changes = array();
-	while (($row = $request->fetch_assoc()))
+	$msgs = [];
+	$topics = [];
+	$topic_changes = [];
+	$board_changes = [];
+	$notification_topics = [];
+	$notification_posts = [];
+	$member_post_changes = [];
+	while ($row = $request->fetch_assoc())
 	{
 		// Easy...
 		$msgs[] = $row['id_msg'];
@@ -675,25 +675,25 @@ function approvePosts($msgs, $approve = true)
 		// Ensure our change array exists already.
 		if (!isset($topic_changes[$row['id_topic']]))
 		{
-			$topic_changes[$row['id_topic']] = array(
+			$topic_changes[$row['id_topic']] = [
 				'id_last_msg' => $row['id_last_msg'],
 				'approved' => $row['topic_approved'],
 				'replies' => 0,
 				'unapproved_posts' => 0,
-			);
+			];
 		}
 		if (!isset($board_changes[$row['id_board']]))
 		{
-			$board_changes[$row['id_board']] = array(
+			$board_changes[$row['id_board']] = [
 				'posts' => 0,
 				'topics' => 0,
 				'unapproved_posts' => 0,
 				'unapproved_topics' => 0,
-			);
+			];
 		}
 
 		// If it's the first message then the topic state changes!
-		if ($row['id_msg'] == $row['id_first_msg'])
+		if ($row['id_msg'] === $row['id_first_msg'])
 		{
 			$topic_changes[$row['id_topic']]['approved'] = $approve ? 1 : 0;
 
@@ -701,7 +701,7 @@ function approvePosts($msgs, $approve = true)
 			$board_changes[$row['id_board']]['topics'] += $approve ? 1 : -1;
 
 			// Note we need to ensure we announce this topic!
-			$notification_topics[] = array(
+			$notification_topics[] = [
 				'body' => $row['body'],
 				'subject' => $row['subject'],
 				'name' => $row['poster_name'],
@@ -709,7 +709,8 @@ function approvePosts($msgs, $approve = true)
 				'topic' => $row['id_topic'],
 				'msg' => $row['id_first_msg'],
 				'poster' => $row['id_member'],
-			);
+				'signature' => $row['signature'],
+			];
 		}
 		else
 		{
@@ -718,13 +719,14 @@ function approvePosts($msgs, $approve = true)
 			// This will be a post... but don't notify unless it's not followed by approved ones.
 			if ($row['id_msg'] > $row['id_last_msg'])
 			{
-				$notification_posts[$row['id_topic']][] = array(
+				$notification_posts[$row['id_topic']][] = [
 					'id' => $row['id_msg'],
 					'body' => $row['body'],
 					'subject' => $row['subject'],
 					'name' => $row['poster_name'],
 					'topic' => $row['id_topic'],
-				);
+					'signature' => $row['signature'],
+				];
 			}
 		}
 
@@ -762,13 +764,13 @@ function approvePosts($msgs, $approve = true)
 		UPDATE {db_prefix}messages
 		SET approved = {int:approved_state}
 		WHERE id_msg IN ({array_int:message_list})',
-		array(
+		[
 			'message_list' => $msgs,
 			'approved_state' => $approve ? 1 : 0,
-		)
+		]
 	);
 
-	// If we were unapproving find the last msg in the topics...
+	// If we were un-approving find the last msg in the topics...
 	if (!$approve)
 	{
 		$db->fetchQuery('
@@ -800,13 +802,13 @@ function approvePosts($msgs, $approve = true)
 				num_replies = CASE WHEN num_replies + {int:num_replies} < 0 THEN 0 ELSE num_replies + {int:num_replies} END,
 				id_last_msg = {int:id_last_msg}
 			WHERE id_topic = {int:id_topic}',
-			array(
+			[
 				'approved' => $changes['approved'],
 				'unapproved_posts' => $changes['unapproved_posts'],
 				'num_replies' => $changes['replies'],
 				'id_last_msg' => $changes['id_last_msg'],
 				'id_topic' => $id,
-			)
+			]
 		);
 	}
 
@@ -850,13 +852,13 @@ function approvePosts($msgs, $approve = true)
 			DELETE FROM {db_prefix}approval_queue
 			WHERE id_msg IN ({array_int:message_list})
 				AND id_attach = {int:id_attach}',
-			array(
+			[
 				'message_list' => $msgs,
 				'id_attach' => 0,
-			)
+			]
 		);
 	}
-	// If unapproving add to the approval queue!
+	// If un-approving add to the approval queue!
 	else
 	{
 		$msgInserts = array();
@@ -867,9 +869,9 @@ function approvePosts($msgs, $approve = true)
 
 		$db->insert('ignore',
 			'{db_prefix}approval_queue',
-			array('id_msg' => 'int'),
+			['id_msg' => 'int'],
 			$msgInserts,
-			array('id_msg')
+			['id_msg']
 		);
 	}
 
@@ -888,7 +890,7 @@ function approvePosts($msgs, $approve = true)
 		require_once(SUBSDIR . '/Members.subs.php');
 		foreach ($member_post_changes as $id_member => $count_change)
 		{
-			updateMemberData($id_member, array('posts' => 'posts ' . ($approve ? '+' : '-') . ' ' . $count_change));
+			updateMemberData($id_member, ['posts' => 'posts ' . ($approve ? '+' : '-') . ' ' . $count_change]);
 		}
 	}
 

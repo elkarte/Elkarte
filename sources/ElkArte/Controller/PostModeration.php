@@ -45,6 +45,7 @@ class PostModeration extends AbstractController
 	{
 		// @todo We'll shift these later bud.
 		Txt::load('ModerationCenter');
+
 		theme()->getTemplates()->load('ModerationCenter');
 
 		// Allowed sub-actions, you know the drill by now!
@@ -273,26 +274,23 @@ class PostModeration extends AbstractController
 
 		foreach ($context['unapproved_items'] as $key => $item)
 		{
-			$context['unapproved_items'][$key]['buttons'] = array(
-				'quickmod_check' => array(
-					'checkbox' => true,
+			$context['unapproved_items'][$key]['buttons'] = [
+				'quickmod_check' => [
+					'class' => 'inline_mod_check',
+					'checkbox' => 'always',
 					'name' => 'item',
 					'value' => $item['id'],
-				),
-				'approve' => array(
-					'href' => getUrl('action', ['action' => 'moderate', 'area' => 'postmod', 'sa' => $context['current_view'], 'start' => $context['start'], '{session_data}', 'approve' => $item['id']]),
-					'text' => $txt['approve'],
-				),
-				'unapprove' => array(
-					'href' => getUrl('action', ['action' => 'moderate', 'area' => 'postmod', 'sa' => $context['current_view'], 'start' => $context['start'], '{session_data}', 'delete' => $item['id']]),
-					'text' => $txt['remove'],
-					'test' => 'can_delete',
-				),
-			);
-
-			$context['unapproved_items'][$key]['tests'] = array(
-				'can_delete' => $item['can_delete']
-			);
+				],
+				'approve' => [
+					'url' => getUrl('action', ['action' => 'moderate', 'area' => 'postmod', 'sa' => $context['current_view'], 'start' => $context['start'], '{session_data}', 'approve' => $item['id']]),
+					'text' => 'approve',
+				],
+				'unapprove' => [
+					'url' => getUrl('action', ['action' => 'moderate', 'area' => 'postmod', 'sa' => $context['current_view'], 'start' => $context['start'], '{session_data}', 'delete' => $item['id']]),
+					'text' => 'remove',
+					'enabled' => $item['can_delete'],
+				],
+			];
 		}
 
 		$context['sub_template'] = 'unapproved_posts';

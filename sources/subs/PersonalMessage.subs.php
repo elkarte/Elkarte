@@ -20,6 +20,8 @@
 
 use ElkArte\Cache\Cache;
 use ElkArte\Languages\Txt;
+use ElkArte\Mail\BuildMail;
+use ElkArte\Mail\PreparseMail;
 use ElkArte\User;
 use ElkArte\Util;
 
@@ -777,9 +779,7 @@ function sendpm($recipients, $subject, $message, $store_outbox = true, $from = n
 		}
 
 		// We need to know this members groups.
-		$groups = explode(',', $row['additional_groups']);
-		$groups[] = $row['id_group'];
-		$groups[] = $row['id_post_group'];
+		$groups = array_merge([$row['id_group'], $row['id_post_group']], (empty($row['additional_groups']) ? [] : explode(',', $row['additional_groups'])));
 
 		$message_limit = -1;
 
@@ -916,15 +916,9 @@ function sendpm($recipients, $subject, $message, $store_outbox = true, $from = n
 	if (!$maillist && !empty($modSettings['disallow_sendBody']))
 	{
 		$message = '';
-		$subject = censor($subject);
-	}
-	else
-	{
-		require_once(SUBSDIR . '/Emailpost.subs.php');
-		pbe_prepare_text($message, $subject);
 	}
 
-	$to_names = array();
+	$to_names = [];
 	if (count($to_list) > 1)
 	{
 		require_once(SUBSDIR . '/Members.subs.php');
@@ -935,20 +929,25 @@ function sendpm($recipients, $subject, $message, $store_outbox = true, $from = n
 		}
 	}
 
-	$replacements = array(
-		'SUBJECT' => $subject,
-		'MESSAGE' => $message,
+	$mailPreparse = new PreparseMail();
+	$replacements = [
+		'SUBJECT' => $mailPreparse->preparseSubject($subject),
+		'MESSAGE' => $mailPreparse->preparseHtml($message),
 		'SENDER' => un_htmlspecialchars($from['name']),
 		'READLINK' => $scripturl . '?action=pm;pmsg=' . $id_pm . '#msg' . $id_pm,
 		'REPLYLINK' => $scripturl . '?action=pm;sa=send;f=inbox;pmsg=' . $id_pm . ';quote;u=' . $from['id'],
 		'TOLIST' => implode(', ', $to_names),
-	);
+		'UNSUBSCRIBELINK' => $scripturl . '?action=pm;sa=settings',
+	];
 
 	// Select the right template
 	$email_template = ($maillist && empty($modSettings['disallow_sendBody']) ? 'pbe_' : '') . 'new_pm' . (empty($modSettings['disallow_sendBody']) ? '_body' : '') . (!empty($to_names) ? '_tolist' : '');
 
 	foreach ($notifications as $lang => $notification_list)
 	{
+		$sendMail = new BuildMail();
+		$sendMail->setEmailReplacements($replacements);
+
 		// Using maillist functionality
 		if ($maillist)
 		{
@@ -956,18 +955,19 @@ function sendpm($recipients, $subject, $message, $store_outbox = true, $from = n
 			$from_wrapper = !empty($modSettings['maillist_mail_from']) ? $modSettings['maillist_mail_from'] : (empty($modSettings['maillist_sitename_address']) ? $webmaster_email : $modSettings['maillist_sitename_address']);
 
 			// Add in the signature
-			$replacements['SIGNATURE'] = $sender_details['signature'];
+			$replacements['SIGNATURE'] = $mailPreparse->preparseSignature($sender_details['signature']);
 
 			// And off it goes, looking a bit more personal
-			$mail = loadEmailTemplate($email_template, $replacements, $lang);
+			$mail = loadEmailTemplate($email_template, $replacements, $lang, true);
 			$reference = !empty($pm_head) ? $pm_head : null;
-			sendmail($notification_list, $mail['subject'], $mail['body'], $from['name'], 'p' . $id_pm, false, 2, null, true, $from_wrapper, $reference);
+
+			$sendMail->buildEmail($notification_list, $mail['subject'], $mail['body'], $from['name'], 'p' . $id_pm, true, 2, true, $from_wrapper, $reference);
 		}
 		else
 		{
 			// Off the notification email goes!
-			$mail = loadEmailTemplate($email_template, $replacements, $lang);
-			sendmail($notification_list, $mail['subject'], $mail['body'], null, 'p' . $id_pm, false, 2, null, true);
+			$mail = loadEmailTemplate($email_template, $replacements, $lang, true);
+			$sendMail->buildEmail($notification_list, $mail['subject'], $mail['body'], null, 'p' . $id_pm, true, 2, true);
 		}
 	}
 
@@ -993,6 +993,38 @@ function sendpm($recipients, $subject, $message, $store_outbox = true, $from = n
 	}
 
 	return $log;
+}
+
+/**
+ * Fetches the senders email wrapper details
+ *
+ * - Gets the senders signature for inclusion in the email
+ * - Gets the senders email address and visibility flag
+ *
+ * @param string $from
+ * @return array
+ */
+function query_sender_wrapper($from)
+{
+	$db = database();
+
+	// The signature and email visibility details
+	$request = $db->query('', '
+		SELECT
+			hide_email, email_address, signature
+		FROM {db_prefix}members
+		WHERE id_member  = {int:uid}
+			AND is_activated = {int:act}
+		LIMIT 1',
+		[
+			'uid' => $from,
+			'act' => 1,
+		]
+	);
+	$result = $request->fetch_assoc();
+	$request->free_result();
+
+	return $result;
 }
 
 /**

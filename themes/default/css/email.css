@@ -1,0 +1,203 @@
+img {
+	max-width: 100%;
+	border: none;
+}
+
+img.smiley.emoji {
+	max-width: 18px;
+	vertical-align: text-bottom;
+}
+
+body {
+	font-family: sans-serif;
+	font-size: 15px;
+	line-height: 1.5;
+	margin: 0;
+	padding: 0;
+	background-color: #F6F6F6;
+	-webkit-font-smoothing: antialiased;
+	-ms-text-size-adjust: 100%;
+	-webkit-text-size-adjust: 100%;
+}
+
+table {
+	width: 100%;
+	border-collapse: separate;
+	/* outlook specific table helpers */
+	mso-table-lspace: 0;
+	mso-table-rspace: 0;
+}
+
+table td {
+	font-family: sans-serif;
+	font-size: 15px;
+	vertical-align: top;
+}
+
+.body {
+	width: 100%;
+	background-color: #F6F6F6;
+}
+
+.container {
+	display: block;
+	width: 800px;
+	max-width: 800px;
+	margin: 0 auto !important;
+	padding: 10px;
+}
+
+.content {
+	display: block;
+	box-sizing: border-box;
+	max-width: 800px;
+	margin: 0 auto;
+	padding: 10px;
+}
+
+.main {
+	width: 100%;
+	word-break: break-word;
+	border-radius: 4px;
+	background: #FFFFFF;
+}
+
+.wrapper {
+	box-sizing: border-box;
+	padding: 20px;
+}
+
+.content-block {
+	padding-top: 10px;
+	padding-bottom: 10px;
+}
+
+.footer {
+	clear: both;
+	width: 100%;
+	margin-top: 10px;
+	text-align: center;
+}
+
+.footer td, .footer p, .footer span, .footer a {
+	font-size: 12px;
+	text-align: center;
+	color: #999999;
+}
+
+p, ul, ol {
+	font-family: sans-serif;
+	font-size: 15px;
+	font-weight: normal;
+	line-height: 1.5;
+	margin: 0 0 0 15px;
+}
+
+p li, ul li, ol li {
+	margin-left: 5px;
+	list-style-position: inside;
+}
+
+a {
+	text-decoration: underline;
+	color: #49643D;
+}
+
+hr {
+	overflow: visible;
+	height: 0;
+	margin: 15px 0;
+	border-top: 1px solid #AFAFAF;
+	border-bottom: 1px solid #AFAFAF;
+	border-left: 0;
+}
+
+blockquote, code {
+	font-size: 14px;
+	overflow: auto;
+	margin: 8px 0 15px 0;
+	padding: 8px 10px;
+	border: 1px solid #AFAFAF;
+}
+
+code {
+	font-family: monospace;
+	display: block;
+	width: 800px;
+	padding: 4px 10px;
+	white-space: nowrap;
+}
+
+.bbc_code_inline {
+	font-family: monospace;
+	font-size: 14px;
+	margin: 0;
+	padding: 1px 3px 1px 3px;
+	white-space: pre-wrap;
+	border: 1px solid #AFAFAF
+}
+
+blockquote cite {
+	font-size: 13px;
+	margin-bottom: 8px;
+	padding: 4px 8px;
+}
+
+/* RESPONSIVE / MOBILE FRIENDLY STYLES */
+
+@media only screen and (max-width: 620px) {
+	table.body p,
+	table.body ul,
+	table.body ol,
+	table.body td,
+	table.body span,
+	table.body a {
+		font-size: 16px !important;
+	}
+
+	table.body .wrapper {
+		padding: 10px !important;
+	}
+
+	table.body .content {
+		padding: 0 !important;
+	}
+
+	table.body .container {
+		width: 100% !important;
+		padding: 0 !important;
+	}
+
+	table.body .main {
+		border-right-width: 0 !important;
+		border-left-width: 0 !important;
+		border-radius: 0 !important;
+	}
+}
+
+/* When an email is pulled into Outlook.com / Hotmail, any style rules present in the email are
+   appended with .ExternalClass. Normalizing a few of these helps */
+
+@media all {
+	.ExternalClass {
+		width: 100%;
+	}
+
+	.ExternalClass,
+	.ExternalClass p,
+	.ExternalClass span,
+	.ExternalClass font,
+	.ExternalClass td,
+	.ExternalClass div {
+		line-height: 100%;
+	}
+
+	#MessageViewBody a {
+		font-family: inherit;
+		font-size: inherit;
+		font-weight: inherit;
+		line-height: inherit;
+		text-decoration: none;
+		color: inherit;
+	}
+}

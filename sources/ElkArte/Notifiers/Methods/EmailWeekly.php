@@ -13,9 +13,9 @@
 
 namespace ElkArte\Notifiers\Methods;
 
-use ElkArte\Notifiers\AbstractNotifier;
 use ElkArte\Mentions\MentionType\NotificationInterface;
-use ElkArte\NotificationsTask;
+use ElkArte\Notifications\NotificationsTask;
+use ElkArte\Notifiers\AbstractNotifier;
 
 /**
  * Class Notifications
@@ -60,7 +60,7 @@ class EmailWeekly extends AbstractNotifier
 	 * Stores data in the database to send a weekly digest.
 	 *
 	 * @param \ElkArte\Mentions\MentionType\NotificationInterface $obj
-	 * @param \ElkArte\NotificationsTask $task
+	 * @param \ElkArte\Notifications\NotificationsTask $task
 	 * @param mixed[] $bodies
 	 */
 	protected function _send_weekly_email(NotificationInterface $obj, NotificationsTask $task, $bodies)

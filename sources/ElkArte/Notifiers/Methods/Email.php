@@ -13,9 +13,9 @@
 
 namespace ElkArte\Notifiers\Methods;
 
-use ElkArte\Notifiers\AbstractNotifier;
 use ElkArte\Mentions\MentionType\NotificationInterface;
-use ElkArte\NotificationsTask;
+use ElkArte\Notifications\NotificationsTask;
+use ElkArte\Notifiers\AbstractNotifier;
 
 /**
  * Class Notifications
@@ -53,7 +53,7 @@ class Email extends AbstractNotifier
 	 * Sends an immediate email notification.
 	 *
 	 * @param \ElkArte\Mentions\MentionType\NotificationInterface $obj
-	 * @param \ElkArte\NotificationsTask $task
+	 * @param \ElkArte\Notifications\NotificationsTask $task
 	 * @param mixed[] $bodies
 	 */
 	protected function _send_email(NotificationInterface $obj, NotificationsTask $task, $bodies)

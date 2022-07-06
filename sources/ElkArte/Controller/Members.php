@@ -19,8 +19,8 @@ namespace ElkArte\Controller;
 use ElkArte\AbstractController;
 use ElkArte\Action;
 use ElkArte\Exceptions\Exception;
-use ElkArte\Notifications;
-use ElkArte\NotificationsTask;
+use ElkArte\Notifications\Notifications;
+use ElkArte\Notifications\NotificationsTask;
 
 /**
  * Members Controller class.

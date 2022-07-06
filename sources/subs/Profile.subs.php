@@ -20,9 +20,9 @@ use ElkArte\Controller\Avatars;
 use ElkArte\DataValidator;
 use ElkArte\Errors\ErrorContext;
 use ElkArte\FileFunctions;
-use ElkArte\MembersList;
-use ElkArte\Notifications;
 use ElkArte\Languages\Txt;
+use ElkArte\MembersList;
+use ElkArte\Notifications\Notifications;
 use ElkArte\User;
 use ElkArte\Util;
 
@@ -349,7 +349,7 @@ function loadCustomFields($memID, $area = 'summary', array $custom_fields = arra
 
 			if (in_array($row['field_type'], array('radio', 'select')))
 			{
-				$replacements['{KEY}'] = $row['col_name'] . '_' . $key;
+				$replacements['{KEY}'] = $row['col_name'] . '_' . ($key ?? 0);
 			}
 
 			$output_html = strtr($row['enclose'], $replacements);

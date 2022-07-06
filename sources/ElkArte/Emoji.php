@@ -11,6 +11,7 @@
 
 namespace ElkArte;
 
+use BBC\PreparseCode;
 use ElkArte\Cache\Cache;
 
 /**
@@ -31,9 +32,6 @@ class Emoji extends AbstractModel
 
 	/** @var string[] Array of keys with known emoji names */
 	public $shortcode_replace = [];
-
-	/** @var array Holds code blocks so we do not render smileys inside */
-	protected $save_code_blocks = [];
 
 	/**
 	 * Emoji constructor.
@@ -60,9 +58,10 @@ class Emoji extends AbstractModel
 	 * - Called from integrate_pre_bbc_parser
 	 *
 	 * @param string $string
+	 * @param bool $uni false returns an emoji image tag, true returns the unicode point
 	 * @return string
 	 */
-	public function emojiNameToImage($string)
+	public function emojiNameToImage($string, $uni = false)
 	{
 		$emoji = self::instance();
 
@@ -70,10 +69,17 @@ class Emoji extends AbstractModel
 		$string = $this->_protectCodeBlocks($string);
 
 		// :emoji: must be at the start of a line, or have a leading space or be after a bbc ']' tag
-		$string = preg_replace_callback('~(?:\s?|^|]|<br />|<br>)(:([-+\w]+):\s?)~i', [$emoji, 'emojiToImage'], $string);
+		if ($uni)
+		{
+			$string = preg_replace_callback('~(?:\s?|^|]|<br />|<br>)(:([-+\w]+):\s?)~i', [$emoji, 'emojiToUni'], $string);
+		}
+		else
+		{
+			$string = preg_replace_callback('~(?:\s?|^|]|<br />|<br>)(:([-+\w]+):\s?)~i', [$emoji, 'emojiToImage'], $string);
 
-		// Check for any embedded html / hex emoji
-		$string = $this->keyboardEmojiToImage($string);
+			// Check for any embedded html / hex emoji
+			$string = $this->keyboardEmojiToImage($string);
+		}
 
 		return $this->_restoreCodeBlocks($string);
 	}
@@ -95,32 +101,7 @@ class Emoji extends AbstractModel
 		}
 
 		// Protect code and icode blocks
-		$tokenizer = new TokenHash();
-		$patterns = ['~(\[\/code\]|\[code(?:=[^\]]+)?\])~i', '~(\[\/icode\]|\[icode(?:=[^\]]+)?\])~i'];
-		foreach ($patterns as $pattern)
-		{
-			$parts = preg_split($pattern, $string, -1, PREG_SPLIT_DELIM_CAPTURE);
-			foreach ($parts as $i => $part)
-			{
-				if ($i % 4 === 0 && isset($parts[$i + 3]))
-				{
-					// Create a unique key to put in place of the code block
-					$key = $tokenizer->generate_hash(8);
-
-					// Save what is there [code]stuff[/code]
-					$this->save_code_blocks['%%' . $key . '%%'] = $parts[$i + 1] . $parts[$i + 2] . $parts[$i + 3];
-
-					// Replace the code block with %%$key%%
-					$parts[$i + 1] = '%%';
-					$parts[$i + 2] = $key;
-					$parts[$i + 3] = '%%';
-				}
-			}
-
-			$string = implode('', $parts);
-		}
-
-		return $string;
+		return PreparseCode::instance('')->tokenizeCodeBlocks($string);
 	}
 
 	/**
@@ -130,12 +111,7 @@ class Emoji extends AbstractModel
 	 */
 	private function _restoreCodeBlocks($string)
 	{
-		if (!empty($this->save_code_blocks))
-		{
-			$string = str_replace(array_keys($this->save_code_blocks), array_values($this->save_code_blocks), $string);
-		}
-
-		return $string;
+		return PreparseCode::instance('')->restoreCodeBlocks($string);
 	}
 
 	/**
@@ -217,7 +193,7 @@ class Emoji extends AbstractModel
 	public function emojiToImage($m)
 	{
 		// No :tag: found or not a complete result, return
-		if (!is_array($m) || empty($m[2]))
+		if (empty($m[2]))
 		{
 			return $m[0];
 		}
@@ -273,6 +249,41 @@ class Emoji extends AbstractModel
 		}, $string);
 
 		return empty($result) ? $string : $result;
+	}
+
+	/**
+	 * Takes a shortcode array and, if available, converts it to a html unicode points emoji
+	 *
+	 * - Uses input array of the form m[2] = 'doughnut' m[1]= ':doughnut:' m[0]= original
+	 * - If shortcode does not exist in the emoji returns m[0] the preg full match
+	 *
+	 * - Given unicode 1f62e-200d-1f4a8 returns &#x1f62e;&#x200d;&#x1f4a8;
+	 *
+	 * @param array $m results from preg_replace_callback or other array
+	 * @return string
+	 */
+	public function emojiToUni($m)
+	{
+		// No :tag: found or not a complete result, return
+		if (!is_array($m) || empty($m[2]))
+		{
+			return $m[0];
+		}
+
+		// Need our known codes
+		$this->loadEmoji();
+
+		// It is not a known :tag:, just return what was passed
+		if (!isset($this->shortcode_replace[$m[2]]))
+		{
+			return $m[0];
+		}
+
+		// Otherwise, we have some Emoji :dancer:
+		$uniCode = $this->shortcode_replace[$m[2]];
+		$uniCode = str_replace('-', ';&#x', $uniCode);
+
+		return '&#x' . $uniCode . ';';
 	}
 
 	/**

@@ -11,6 +11,8 @@
 
 namespace ElkArte;
 
+use BBC\ParserWrapper;
+
 /**
  * Class EmojiIntegrate, adds hooks to the system when called
  *
@@ -84,8 +86,10 @@ class EmojiIntegrate
 		$req = HttpReq::instance();
 		$sa = $req->getQuery('sa', 'trim');
 
+		$canUseSmiley = ParserWrapper::instance()->getSmileysEnabled();
+
 		// If we are doing smileys, then we are doing emoji!
-		if ((empty($sa) || $sa !== 'install2') && $message !== false)
+		if ((empty($sa) || $sa !== 'install2') && $message !== false && $canUseSmiley)
 		{
 			$emoji = Emoji::instance();
 			$message = $emoji->emojiNameToImage($message);

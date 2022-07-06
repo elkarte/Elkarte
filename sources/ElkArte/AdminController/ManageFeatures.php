@@ -21,9 +21,9 @@ use ElkArte\AbstractController;
 use ElkArte\Action;
 use ElkArte\Exceptions\Exception;
 use ElkArte\Hooks;
-use ElkArte\Notifications;
-use ElkArte\SettingsForm\SettingsForm;
 use ElkArte\Languages\Txt;
+use ElkArte\Notifications\Notifications;
+use ElkArte\SettingsForm\SettingsForm;
 use ElkArte\Util;
 
 /**

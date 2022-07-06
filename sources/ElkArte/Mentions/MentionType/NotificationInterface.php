@@ -13,7 +13,7 @@
 
 namespace ElkArte\Mentions\MentionType;
 
-use ElkArte\NotificationsTask;
+use ElkArte\Notifications\NotificationsTask;
 
 /**
  * Interface \ElkArte\Mentions\MentionType\NotificationInterface
@@ -50,7 +50,7 @@ interface NotificationInterface
 	 * The \ElkArte\NotificationsTask contains few data that may be necessary for the processing
 	 * of the mention.
 	 *
-	 * @param \ElkArte\NotificationsTask $task
+	 * @param \ElkArte\Notifications\NotificationsTask $task
 	 */
 	public function setTask(NotificationsTask $task);
 
