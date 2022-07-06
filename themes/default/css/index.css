@@ -6351,14 +6351,11 @@ div.labels {
 
 	.generalinfo {
 		display: none;
+		overflow: hidden;
 	}
 
 	#forumposts .content {
 		padding: 5px;
-	}
-
-	.generalinfo {
-		overflow: hidden;
 	}
 
 	.post_wrapper {
