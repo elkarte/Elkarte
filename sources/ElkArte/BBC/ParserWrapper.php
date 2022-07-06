@@ -107,6 +107,16 @@ final class ParserWrapper
 	}
 
 	/**
+	 * Return if smileys are enabled for this instance of the parser
+	 *
+	 * @return bool
+	 */
+	public function getSmileysEnabled()
+	{
+		return $this->smileys_enabled;
+	}
+
+	/**
 	 * Get parsers based on where it will be used
 	 *
 	 * @param string $area Where it is being called from
