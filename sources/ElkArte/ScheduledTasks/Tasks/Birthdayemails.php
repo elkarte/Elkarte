@@ -99,7 +99,7 @@ class Birthdayemails implements ScheduledTaskInterface
 					'REALNAME' => $recp['name'],
 				);
 
-				$emaildata = loadEmailTemplate('happy_birthday', $replacements, $lang, false);
+				$emaildata = loadEmailTemplate('happy_birthday', $replacements, $lang, false, false);
 
 				sendmail($recp['email'], $emaildata['subject'], $emaildata['body'], null, null, false, 4);
 

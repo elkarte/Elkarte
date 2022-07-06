@@ -87,7 +87,7 @@ class QueueMail
 		require_once(SUBSDIR . '/Maillist.subs.php');
 
 		// We have some to send, lets send them!
-		$failed_emails = array();
+		$failed_emails = [];
 		$mail = new Mail();
 		foreach ($emails as $email)
 		{
@@ -105,7 +105,7 @@ class QueueMail
 			// Hopefully it sent?
 			if (!$result)
 			{
-				$failed_emails[] = array(time(), $email['to'], $email['body'], $email['subject'], $email['headers'], $email['send_html'], $email['priority'], $email['private'], $email['message_id']);
+				$failed_emails[] = [time(), $email['to'], $email['body'], $email['subject'], $email['headers'], $email['send_html'], $email['priority'], $email['private'], $email['message_id']];
 			}
 		}
 
