@@ -18,12 +18,13 @@ use ElkArte\Cache\Cache;
 use ElkArte\Converters\Html2BBC;
 use ElkArte\Converters\Html2Md;
 use ElkArte\EmailFormat;
+use ElkArte\Languages\Txt;
+use ElkArte\Mail\PreparseMail;
 use ElkArte\MembersList;
-use ElkArte\Notifications;
-use ElkArte\NotificationsTask;
+use ElkArte\Notifications\Notifications;
+use ElkArte\Notifications\NotificationsTask;
 use ElkArte\TemporaryAttachment;
 use ElkArte\TemporaryAttachmentsList;
-use ElkArte\Languages\Txt;
 use ElkArte\Util;
 
 /**
@@ -987,93 +988,14 @@ function pbe_find_board_number($email_address)
  */
 function pbe_prepare_text(&$message, &$subject = '', &$signature = '')
 {
-	Txt::load('Maillist');
-
-	// Server?
-	detectServer();
-
-	// Clean it up, can't have naughty words in an email
-	$message = censor($message);
-	$signature = censor($signature);
-	$subject = censor(un_htmlspecialchars($subject));
-
-	// Convert bbc [quotes] before we go to parsebbc so they are easier to plain-textify later
-	$message = preg_replace_callback('~(\[quote)\s?author=(.*)\s?link=(.*)\s?date=(\d{10})(])~sU', 'quote_callback', $message);
-	$message = preg_replace_callback('~(\[quote)\s?author=(.*)\s?date=(\d{10})\s?link=(.*)(])~sU', 'quote_callback_2', $message);
-	$message = preg_replace('~(\[quote\s?])~U', "\n" . '<blockquote>', $message);
-	$message = str_replace('[/quote]', "</blockquote>\n\n", $message);
-
-	// Prevent img tags from getting linked
-	$message = preg_replace('~\[img](.*?)\[/img]~is', '`&lt;img src="\\1">', $message);
-
-	// Leave code tags as code tags for the conversion
-	$message = preg_replace('~\[code(.*?)](.*?)\[/code]~is', '`&lt;code\\1>\\2`&lt;/code>', $message);
-
-	// Allow addons to account for their own unique bbc additions e.g. gallery's etc.
-	call_integration_hook('integrate_mailist_pre_parsebbc', array(&$message));
-
-	// Convert the remaining bbc to html
-	$bbc_wrapper = ParserWrapper::instance();
-	$message = $bbc_wrapper->parseMessage($message, false);
-
-	// Change list style to something standard to make text conversion easier
-	$message = preg_replace('~<ul class=\"bbc_list\" style=\"list-style-type: decimal;\">(.*?)</ul>~si', '<ol>\\1</ol>', $message);
-
-	// Do we have any tables? if so we add in th's based on the number of cols.
-	$table_content = array();
-	if (preg_match_all('~<table class="bbc_table">(.*?)</tr>.*?</table>~si', $message, $table_content, PREG_SET_ORDER))
-	{
-		// The answer is yes ... work on each one
-		foreach ($table_content as $table_temp)
-		{
-			$cols = substr_count($table_temp[1], '<td>');
-			$table_header = '';
-
-			// Build the th line for this table
-			for ($i = 1; $i <= $cols; $i++)
-			{
-				$table_header .= '<th>- ' . $i . ' -</th>';
-			}
-
-			// Insert it in to the table tag
-			$table_header = '<tr>' . $table_header . '</tr>';
-			$new_table = str_replace('<table class="bbc_table">', '<br /><table>' . $table_header, $table_temp[0]);
-
-			// Replace the old table with the new th enabled one
-			$message = str_replace($table_temp[0], $new_table, $message);
-		}
-	}
-
-	// Allow addons to account for their own unique bbc additions e.g. gallery's etc.
-	call_integration_hook('integrate_mailist_pre_markdown', array(&$message));
-
-	// Convert the protected (hidden) entities back for the final conversion
-	$message = strtr($message, array(
-			'&#91;' => '[',
-			'&#93;' => ']',
-			'`&lt;' => '<',
-		)
-	);
+	$mailPreparse = new PreparseMail();
+	$message = $mailPreparse->preparseHtml($message);
+	$subject = $mailPreparse->preparseSubject($subject);
+	$signature = $mailPreparse->preparseSignature($signature);
 
 	// Convert this to text (markdown)
 	$mark_down = new Html2Md($message);
 	$message = $mark_down->get_markdown();
-
-	// Finally, the sig, its goes as just plain text
-	if ($signature !== '')
-	{
-		call_integration_hook('integrate_mailist_pre_sig_parsebbc', array(&$signature));
-
-		$signature = $bbc_wrapper->parseSignature($signature, false);
-		$signature = trim(un_htmlspecialchars(strip_tags(strtr($signature, array(
-			'</tr>' => "  \n",
-			'<br />' => "  \n",
-			'</div>' => "  \n",
-			'</li>' => "  \n",
-			'&#91;' => '[',
-			'&#93;' => ']')
-		))));
-	}
 }
 
 /**
@@ -1148,7 +1070,8 @@ function pbe_disable_user_notify($email_message)
 }
 
 /**
- * Replace full bbc quote tags with html blockquote version
+ * Replace full bbc quote tags with html blockquote version where the cite line
+ * is used as the first line of the quote.
  *
  * - Callback for pbe_prepare_text
  * - Only changes the leading [quote], the closing /quote is not changed but
@@ -1162,25 +1085,20 @@ function quote_callback($matches)
 {
 	global $txt;
 
-	return "\n" . '<blockquote>' . $txt['email_on'] . ': ' . date('D M j, Y', $matches[4]) . ' ' . $matches[2] . ' ' . $txt['email_wrote'] . ': ';
-}
+	$date = '';
+	$author = '';
 
-/**
- * Replace full bbc quote tags with an html blockquote version
- *
- * - Callback for pbe_prepare_text
- * - Only changes the leading [quote], the closing /quote is not changed but
- * handled back in the main function
- *
- * @param string[] $matches array of matches from the regex in the preg_replace
- *
- * @return string
- */
-function quote_callback_2($matches)
-{
-	global $txt;
+	if (preg_match('~date=(\d{8,10})~ui', $matches[0], $match) === 1)
+	{
+		$date =  $txt['email_on'] . ': ' . date('D M j, Y', $match[1]);
+	}
 
-	return "\n" . '<blockquote>' . $txt['email_on'] . ': ' . date('D M j, Y', $matches[3]) . ' ' . $matches[2] . ' ' . $txt['email_wrote'] . ': ';
+	if (preg_match('~author=([^<>\n]+?)(?=(?:link=|date=|\]))~ui', $matches[0], $match) === 1)
+	{
+		$author = $match[1] .  $txt['email_wrote'] . ': ';
+	}
+
+	return "\n" . '<blockquote>' . $date . ' ' . $author;
 }
 
 /**
@@ -1340,47 +1258,6 @@ function query_load_permissions($type, &$pbe, $topic_info = array())
 	{
 		$pbe['user_info']['permissions'] = array_diff($pbe['user_info']['permissions'], $removals);
 	}
-}
-
-/**
- * Fetches the senders email wrapper details
- *
- * - Gets the senders signature for inclusion in the email
- * - Gets the senders email address and visibility flag
- *
- * @param string $from
- * @return array
- * @package Maillist
- */
-function query_sender_wrapper($from)
-{
-	$db = database();
-
-	// The signature and email visibility details
-	$request = $db->query('', '
-		SELECT
-			hide_email, email_address, signature
-		FROM {db_prefix}members
-		WHERE id_member  = {int:uid}
-			AND is_activated = {int:act}
-		LIMIT 1',
-		array(
-			'uid' => $from,
-			'act' => 1,
-		)
-	);
-	$result = $request->fetch_assoc();
-
-	// Clean up the signature line
-	if (!empty($result['signature']))
-	{
-		$bbc_wrapper = ParserWrapper::instance();
-		$result['signature'] = trim(un_htmlspecialchars(strip_tags(strtr($bbc_wrapper->parseSignature($result['signature'], false), array('</tr>' => "   \n", '<br />' => "   \n", '</div>' => "\n", '</li>' => "   \n", '&#91;' => '[', '&#93;' => ']')))));
-	}
-
-	$request->free_result();
-
-	return $result;
 }
 
 /**
