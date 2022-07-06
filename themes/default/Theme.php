@@ -301,11 +301,6 @@ class Theme extends BaseTheme
 		// Setup the main menu items.
 		$this->setupMenuContext();
 
-		if (empty($settings['theme_version']))
-		{
-			$context['show_vBlogin'] = $context['show_quick_login'];
-		}
-
 		// This is here because old index templates might still use it.
 		$context['show_news'] = !empty($settings['enable_news']);
 
@@ -454,7 +449,7 @@ class Theme extends BaseTheme
 
 		// All the buttons we can possibly want and then some, try pulling the final list of buttons from cache first.
 		if ((time() - $cacheTime <= $modSettings['settings_updated'])
-			|| $menu_buttons = $cache->get('menu_buttons-' . implode('_', $this->user->groups) . '-' . $this->user->language, $cacheTime) === null)
+			|| ($menu_buttons = $cache->get('menu_buttons-' . implode('_', $this->user->groups) . '-' . $this->user->language, $cacheTime)) === null)
 		{
 			// Start things up: this is what we know by default
 			require_once(SUBSDIR . '/Menu.subs.php');
