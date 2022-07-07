@@ -5,7 +5,7 @@
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * @version 1.1.7
+ * @version 1.1.9
  *
  */
 
@@ -16,7 +16,7 @@ $GLOBALS['databases']['mysql'] = array(
 	'version_check' => function($db_connection) {
 		return min(
 			mysqli_get_server_info($db_connection),
-			mysqli_get_client_info($db_connection)
+			mysqli_get_client_info()
 		);},
 	'supported' => function_exists('mysqli_connect'),
 	'additional_file' => '',
