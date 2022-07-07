@@ -25,7 +25,7 @@ class Profile extends Standard
 	 */
 	public function generate($params)
 	{
-		$args = array();
+		$args = [];
 		foreach ($params as $k => $v)
 		{
 			if (is_int($k))
@@ -46,7 +46,7 @@ class Profile extends Standard
 				continue;
 			}
 
-			$args[$k] = $k . '=' . urlencode($v);
+			$args[$k] = $k . '=' . urlencode($v ?? '');
 
 		}
 
