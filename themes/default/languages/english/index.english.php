@@ -88,6 +88,7 @@ $txt['search'] = 'Search';
 $txt['calendar'] = 'Calendar';
 $txt['members'] = 'Members';
 $txt['recent_posts'] = 'Recent Posts';
+$txt['recent_topics'] = 'Recent Topics';
 
 $txt['admin'] = 'Admin';
 // Sub menu labels
