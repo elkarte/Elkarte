@@ -62,6 +62,9 @@ class Database_MySQL extends Database_Abstract
 		else
 			$db_port = 0;
 
+		// PHP 8.1 default is to throw exceptions, this reverts it to the <=php8 semantics
+		mysqli_report(MYSQLI_REPORT_OFF);
+
 		// Select the database. Maybe.
 		if (empty($db_options['dont_select_db']))
 			$connection = @mysqli_connect((!empty($db_options['persist']) ? 'p:' : '') . $db_server, $db_user, $db_passwd, $db_name, $db_port);
