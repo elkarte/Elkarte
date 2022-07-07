@@ -284,12 +284,13 @@ class Bootstrap
 	 */
 	private function setDebug()
 	{
-		global $db_show_debug;
+		global $db_show_debug, $ssi_error_reporting;
 
 		// Show lots of debug information below the page, not for production sites
 		if ($db_show_debug === true)
 		{
 			Debug::instance()->rusage('start', $this->rusage_start);
+			$ssi_error_reporting = error_reporting(E_ALL | E_STRICT & ~8192);
 		}
 	}
 
