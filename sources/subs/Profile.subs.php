@@ -269,7 +269,7 @@ function loadCustomFields($memID, $area = 'summary', array $custom_fields = arra
 		// Only thing left, a textbox for you
 		else
 		{
-			$input_html = '<textarea id="' . $row['col_name'] . '" name="customfield[' . $row['col_name'] . ']" ' . (!empty($rows) ? 'rows="' . $row['rows'] . '"' : '') . ' ' . (!empty($cols) ? 'cols="' . $row['cols'] . '"' : '') . '>' . $value . '</textarea>';
+			$input_html = '<textarea id="' . $row['col_name'] . '" name="customfield[' . $row['col_name'] . ']" ' . (!empty($row['rows']) ? 'rows="' . $row['rows'] . '"' : '') . ' ' . (!empty($row['cols']) ? 'cols="' . $row['cols'] . '"' : '') . '>' . $value . '</textarea>';
 		}
 
 		// Parse BBCode
