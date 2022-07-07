@@ -135,7 +135,7 @@ function template_info_center_below()
 	echo '
 	<aside id="info_center" class="forum_category">
 		<h2 class="category_header panel_toggle">
-				<i id="upshrink_ic" class="hide chevricon i-chevron-', empty($context['minmax_preferences']['info']) ? 'up' : 'down', '" title="', $txt['hide'], '"></i>
+			<i id="upshrink_ic" class="hide chevricon i-chevron-', empty($context['minmax_preferences']['info']) ? 'up' : 'down', '" title="', $txt['hide'], '"></i>
 			<a href="#" id="upshrink_link">', sprintf($txt['info_center_title'], $context['forum_name_html_safe']), '</a>
 		</h2>
 		<ul id="upshrinkHeaderIC" class="category_boards', empty($context['minmax_preferences']['info']) ? '' : ' hide', '">';
@@ -197,7 +197,7 @@ function template_ic_recent_posts()
 			<li class="basic_row" id="recent_posts_content">
 				<h3 class="ic_section_header">
 					<a href="', getUrl('action', ['action' => 'recent']), '">
-						<i class="icon i-post-text"></i>', $txt['recent_posts'], '
+						<i class="icon i-post-text"></i>', empty($settings['recent_post_topics']) ? $txt['recent_posts'] : $txt['recent_topics'], '
 					</a>
 				</h3>';
 
