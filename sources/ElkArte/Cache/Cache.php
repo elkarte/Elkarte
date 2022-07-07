@@ -29,7 +29,7 @@ class Cache
 	protected static $_instance;
 
 	/** @var mixed[] Array of options for the methods (if needed) */
-	protected $_options = array();
+	protected $_options = [];
 
 	/** @var bool If the cache is enabled or not. */
 	protected $enabled = false;
@@ -44,7 +44,7 @@ class Cache
 	protected $_accelerator;
 
 	/** @var string[] Cached keys */
-	protected $_cached_keys = array();
+	protected $_cached_keys = [];
 
 	/** @var object|bool The caching object */
 	protected $_cache_obj;
@@ -58,8 +58,6 @@ class Cache
 	 */
 	public function __construct($level, $accelerator, $options)
 	{
-		$this->setLevel($level);
-
 		// Default to file based, so we can slow everything down :P
 		if (empty($accelerator))
 		{
@@ -67,6 +65,8 @@ class Cache
 		}
 
 		$this->_accelerator = $accelerator;
+
+		$this->setLevel($level);
 
 		if ($level > 0)
 		{
