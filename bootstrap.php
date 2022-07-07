@@ -11,7 +11,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.1.8
+ * @version 1.1.9
  *
  */
 
@@ -49,7 +49,7 @@ class Bootstrap
 		$db_show_debug = false;
 
 		// Report errors but not depreciated ones
-		$ssi_error_reporting = error_reporting(E_ALL | E_STRICT & ~8192);
+		$ssi_error_reporting = error_reporting(E_ALL & ~E_DEPRECATED);
 
 		// Get the things needed for ALL modes
 		$this->bringUpBasics();
@@ -279,12 +279,13 @@ class Bootstrap
 	 */
 	private function setDebug()
 	{
-		global $db_show_debug, $rusage_start;
+		global $db_show_debug, $rusage_start, $ssi_error_reporting;
 
 		// Show lots of debug information below the page, not for production sites
 		if ($db_show_debug === true)
 		{
 			Debug::instance()->rusage('start', $rusage_start);
+			$ssi_error_reporting = error_reporting(E_ALL | E_STRICT & ~8192);
 		}
 	}
 
