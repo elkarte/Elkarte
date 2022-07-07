@@ -13,10 +13,10 @@ $GLOBALS['databases']['mysqli'] = array(
 	'name' => 'MySQL',
 	'extension' => 'MySQL Improved (MySQLi)',
 	'version' => '5.7.0',
-	'version_check' => function($db_connection) {
+	'version_check' => static function($db_connection) {
 		return min(
 			mysqli_get_server_info($db_connection),
-			mysqli_get_client_info($db_connection)
+			mysqli_get_client_info()
 		);},
 	'supported' => function_exists('mysqli_connect'),
 	'additional_file' => '',
@@ -26,7 +26,7 @@ $GLOBALS['databases']['mysqli'] = array(
 	'default_port' => 'mysqli.default_port',
 	'test_collation' => true,
 	'alter_support' => true,
-	'validate_prefix' => function (&$value) {
+	'validate_prefix' => static function (&$value) {
 		$value = preg_replace('~[^A-Za-z0-9_\$]~', '', $value);
 		return true;
 	},
