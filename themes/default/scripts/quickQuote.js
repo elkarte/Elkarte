@@ -16,15 +16,18 @@ function Elk_QuickQuote(oOptions)
 {
 	'use strict';
 
-	this.defaults = {
-		infoText: 'Please select some text !',
-	};
-
 	this.opts = Object.assign({}, this.defaults, oOptions);
+
+	this.pointerDirection = 'right';
+	this.startPointerX = 0;
+	this.endPointerX = 0;
 
 	this.init();
 }
 
+/**
+ * Get things rolling
+ */
 Elk_QuickQuote.prototype.init = function ()
 {
 	this.treeToBBCode.defaults = {
@@ -41,11 +44,166 @@ Elk_QuickQuote.prototype.init = function ()
 
 	this.postSelector = document.getElementById('topic_summary') ? '.postarea2' : '.postarea';
 
-	// Initialize Quick Quote, set mouseup event listener to all messageContent areas
+	// Check if passive is supported, should be for most browsers since 2016
+	let supportsPassive = false;
+	try {
+		let opts = Object.defineProperty({}, 'passive', {get: function() {supportsPassive = true;}});
+		window.addEventListener('test', null, opts);
+	} catch (e) {}
+
+	// Pointer event capabilities
+	let hasPointerEvents = (('PointerEvent' in window) || (window.navigator && 'msPointerEnabled' in window.navigator));
+	this.mouseDown = hasPointerEvents ? 'pointerdown' : is_touch ? 'touchstart' : 'mousedown';
+	this.mouseUp = hasPointerEvents ? 'pointerup' : is_touch ? 'touchend' : 'mouseup';
+
+	// Initialize Quick Quote, set event listener to all messageContent areas
 	document.querySelectorAll('.messageContent').forEach((message) =>
 	{
-		message.addEventListener('mouseup', this.prepareQuickQuoteButton.bind(this), false);
+		message.addEventListener(this.mouseDown, this.getEventStartPosition.bind(this), supportsPassive ? {passive: true} : false);
+		message.addEventListener(this.mouseUp, this.getEventEndPosition.bind(this), supportsPassive ? {passive: true} : false);
+		message.addEventListener(this.mouseUp, this.prepareQuickQuoteButton.bind(this), supportsPassive ? {passive: true} : false);
+
+		// Needed for android touch chrome as the mouseUp event is held by the context menu ribbon
+		if (is_touch)
+		{
+			message.addEventListener('contextmenu', this.prepareQuickQuoteButton.bind(this), false);
+		}
 	});
+};
+
+/**
+ * Get the X coordinate of the pointer down event
+ *
+ * @param {TouchEvent|MouseEvent} event
+ */
+Elk_QuickQuote.prototype.getEventStartPosition = function (event)
+{
+	if (typeof event.changedTouches !== 'undefined')
+	{
+		this.startPointerX = event.changedTouches[0].pageX;
+	}
+	else
+	{
+		this.startPointerX = event.clientX;
+	}
+};
+
+/**
+ * Get the X coordinate of the pointer up event, Set right or left for movement
+ *
+ * @param {TouchEvent|MouseEvent} event
+ */
+Elk_QuickQuote.prototype.getEventEndPosition = function (event)
+{
+	if (typeof event.changedTouches !== 'undefined')
+	{
+		this.endPointerX = event.changedTouches[0].pageX;
+	}
+	else
+	{
+		this.endPointerX = event.clientX;
+	}
+
+	this.pointerDirection = this.endPointerX > this.startPointerX ? 'right' : 'left';
+};
+
+/**
+ * Determine the window position of the selected text.  If the selection
+ * can not be determined (multi click or other) then the event location would be used.
+ *
+ * @param {PointerEvent} event
+ * @return {Object} Returns the x and y position
+ */
+Elk_QuickQuote.prototype.getEventPosition = function (event)
+{
+	// Set an approximate position as a backup
+	let posRight = window.innerWidth - event.pageX - 10,
+		posLeft = event.pageX,
+		posBottom = event.pageY + 15,
+		posTop = event.pageY - 5;
+
+	let selectionRange = window.getSelection().getRangeAt(0).cloneRange(),
+		relativePos = document.body.parentNode.getBoundingClientRect();
+
+	// Collapse on start or end based on pointer movement direction
+	selectionRange.collapse(this.pointerDirection === 'left');
+	let selectionBox = selectionRange.getClientRects();
+
+	if (selectionBox.length > 0)
+	{
+		posRight = -Math.round(selectionBox[0].right - relativePos.right);
+		posLeft = Math.round(selectionBox[0].left - relativePos.left);
+
+		posBottom = Math.round(selectionBox[0].bottom - relativePos.top + 5);
+		posTop = Math.round(selectionBox[0].top - relativePos.top - 5);
+	}
+
+	return {
+		right: posRight,
+		left: posLeft,
+		bottom: posBottom,
+		top: posTop
+	};
+};
+
+/**
+ * Positions the button close to the mouse/touch up location for best
+ * user interaction
+ *
+ * @param {PointerEvent} event The event
+ * @param {HTMLElement} button The element to position
+ */
+Elk_QuickQuote.prototype.setButtonPosition = function (event, button)
+{
+	let clickCoords = this.getEventPosition(event),
+		buttonBottom = clickCoords.bottom + button.offsetHeight,
+		windowBottom = window.scrollY + window.innerHeight;
+
+	// Don't go off the bottom of the viewport
+	if (buttonBottom > windowBottom)
+	{
+		button.style.top = clickCoords.top - button.offsetHeight + 'px';
+	}
+	else
+	{
+		button.style.top = clickCoords.bottom + 'px';
+	}
+
+	// For touch devices we need to account for selection bounding handles.  There is not a consistent
+	// way to disable the default selection menu, so positioning below the text + handles is the
+	// only available option
+	if (is_touch)
+	{
+		button.style.top = clickCoords.bottom + 25 + 'px';
+	}
+
+	// Don't go outside our message area
+	// @todo simplify
+	let postPos = event.currentTarget.getBoundingClientRect();
+	if (this.pointerDirection === 'right')
+	{
+		if (clickCoords.left - button.offsetWidth < postPos.left)
+		{
+			let shift = postPos.left - (clickCoords.left - button.offsetWidth);
+			button.style.right = Math.round(clickCoords.right - shift - 10) + 'px';
+		}
+		else
+		{
+			button.style.right = clickCoords.right + "px";
+		}
+	}
+	else
+	{
+		if (clickCoords.left + button.offsetWidth > postPos.right)
+		{
+			let shift = (clickCoords.left + button.offsetWidth) - postPos.right;
+			button.style.right = Math.round(clickCoords.right - shift - 10) + "px";
+		}
+		else
+		{
+			button.style.right = clickCoords.right - button.offsetWidth + "px";
+		}
+	}
 };
 
 /**
@@ -377,7 +535,7 @@ Elk_QuickQuote.prototype.executeQuickQuote = function (event)
 		endTag = event.target.endTag;
 
 	// isCollapsed is true for an empty selection
-	let selection = (window.getSelection().isCollapsed ? null : window.getSelection().getRangeAt(0));
+	let selection = window.getSelection().isCollapsed ? null : window.getSelection().getRangeAt(0);
 
 	// Always clear out the button
 	this.removeQuickQuote(event, true);
@@ -527,47 +685,25 @@ Elk_QuickQuote.prototype.handleQuote = function(selectionAncestor)
  * Called when the user selects some text.  It prepares the Quick Quote Button
  * action
  *
- * @param {Event} event
+ * @param {PointerEvent} event
  */
 Elk_QuickQuote.prototype.prepareQuickQuoteButton = function (event)
 {
-	// The message that this event was attached to
+	// The message that this event is attached to
 	let postArea = event.currentTarget;
 
-	// The poster and time of post being quoted
+	// The link button to show, poster and time of post being quoted
 	let msgid = parseInt(postArea.getAttribute('data-msgid')),
 		link = document.getElementById('button_float_qq_' + msgid),
-		username = '',
-		time_unix = 0;
+		username,
+		time_unix;
 
 	// If there is some text selected
-	if (!window.getSelection().isCollapsed && this.trim(window.getSelection().toString()) !== '')
+	if (!window.getSelection().isCollapsed && link.classList.contains('hide'))
 	{
-		let selectionRange = window.getSelection().getRangeAt(0).cloneRange(),
-			relativePos = document.body.parentNode.getBoundingClientRect();
-
-		// Use the end of selection range (false) vs start (true)
-		selectionRange.collapse(false);
-		let selectionBox = selectionRange.getClientRects();
-
-		// Show and position the quick quote button
-		if (selectionBox.length > 0)
-		{
-			link.classList.remove('hide');
-
-			let buttonTop = parseInt(selectionBox[0].bottom - relativePos.top + 5),
-				buttonBottom = buttonTop + link.offsetHeight,
-				windowBottom = window.scrollY + window.innerHeight;
-
-			// Don't position the button out of view
-			if (buttonBottom > windowBottom)
-			{
-				buttonTop = selectionBox[0].top - relativePos.top - link.offsetHeight;
-			}
-
-			link.style.top = buttonTop + 'px';
-			link.style.right = -parseInt(selectionBox[0].right - relativePos.right) + 'px';
-		}
+		// Show and then position the button
+		link.classList.remove('hide');
+		this.setButtonPosition(event, link);
 
 		// Topic Display, Grab the name from the aside area
 		if (this.postSelector === '.postarea')
@@ -588,16 +724,15 @@ Elk_QuickQuote.prototype.prepareQuickQuoteButton = function (event)
 			((msgid && time_unix) ? ' link=msg=' + msgid + ' date=' + time_unix : '') + ']\n';
 		link.endTag = '\n[/quote]';
 
-		link.addEventListener('click', this.executeQuickQuote.bind(this));
+		// Save the function pointers (due to bind) so we can remove the EventListeners
+		this.execute = this.executeQuickQuote.bind(this);
+		this.remove = this.removeQuickQuote.bind(this);
+
+		// Button click
+		link.addEventListener(this.mouseDown, this.execute, true);
 
 		// Provide a way to escape should they click anywhere in the window
-		window.addEventListener('click', this.removeQuickQuote.bind(this));
-	}
-	// Clicked, no selection, in the message area
-	else
-	{
-		link.classList.add('hide');
-		link.removeEventListener('click', this.executeQuickQuote);
+		document.addEventListener('click', this.remove, false);
 	}
 };
 
@@ -614,13 +749,17 @@ Elk_QuickQuote.prototype.removeQuickQuote = function (event, always = false)
 	// Nothing selected, reset the UI and listeners
 	if (window.getSelection().isCollapsed || always)
 	{
-		let topicContents = document.querySelectorAll('.messageContent');
+		document.removeEventListener('click', this.remove, false);
 
-		// reset the UI on de-selection
+		let topicContents = document.querySelectorAll('.messageContent'),
+			link;
+
+		// Reset the UI on de-selection
 		topicContents.forEach((message) =>
 		{
-			message.removeEventListener('click', this.prepareQuickQuoteButton);
-			message.parentElement.querySelector('.quick_quote_button').classList.add('hide');
+			link = message.parentElement.querySelector('.quick_quote_button');
+			link.classList.add('hide');
+			link.removeEventListener(this.mouseDown, this.execute, true);
 		});
 	}
 };
