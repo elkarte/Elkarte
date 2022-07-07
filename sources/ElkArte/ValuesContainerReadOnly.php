@@ -41,7 +41,7 @@ class ValuesContainerReadOnly extends ValuesContainer
 	 * @param mixed|mixed[] $offset
 	 * @param string $value
 	 */
-	public function offsetSet($offset, $value)
+	public function offsetSet($offset, $value) : void
 	{
 	}
 
@@ -51,7 +51,7 @@ class ValuesContainerReadOnly extends ValuesContainer
 	 *
 	 * @param string|int $offset
 	 */
-	public function offsetUnset($offset)
+	public function offsetUnset($offset) : void
 	{
 	}
 

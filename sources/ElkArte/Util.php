@@ -295,6 +295,11 @@ class Util
 	{
 		global $modSettings;
 
+		if (empty($string))
+		{
+			return 0;
+		}
+
 		if (empty($modSettings['disableEntityCheck']))
 		{
 			$ent_list = '&(#\d{1,7}|quot|amp|lt|gt|nbsp);';

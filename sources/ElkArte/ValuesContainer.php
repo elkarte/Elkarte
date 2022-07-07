@@ -27,7 +27,7 @@ class ValuesContainer implements \ArrayAccess
 	 *
 	 * @var mixed[]
 	 */
-	protected $data = array();
+	protected $data = [];
 
 	/**
 	 * Constructor
@@ -110,7 +110,7 @@ class ValuesContainer implements \ArrayAccess
 	 * @param mixed|mixed[] $offset
 	 * @param string $value
 	 */
-	public function offsetSet($offset, $value)
+	public function offsetSet($offset, $value) : void
 	{
 		if (is_null($offset))
 		{
@@ -128,7 +128,7 @@ class ValuesContainer implements \ArrayAccess
 	 * @param string|int $offset
 	 * @return bool
 	 */
-	public function offsetExists($offset)
+	public function offsetExists($offset) : bool
 	{
 		return isset($this->data[$offset]);
 	}
@@ -138,7 +138,7 @@ class ValuesContainer implements \ArrayAccess
 	 *
 	 * @param string|int $offset
 	 */
-	public function offsetUnset($offset)
+	public function offsetUnset($offset) : void
 	{
 		unset($this->data[$offset]);
 	}
@@ -147,9 +147,9 @@ class ValuesContainer implements \ArrayAccess
 	 * Returns the value associated to a certain offset.
 	 *
 	 * @param string|int $offset
-	 * @return mixed|array
+	 * @return mixed
 	 */
-	public function offsetGet($offset)
+	public function offsetGet($offset) : mixed
 	{
 		return $this->data[$offset] ?? null;
 	}
