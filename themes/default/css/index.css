@@ -742,11 +742,14 @@ em, .em {
 /* Expanding quotes */
 .quote-read-more {
 	position: relative;
+	display: flex;
+	min-width: 100%;
 }
 
 /* Constrain the quote area height.  Use max height so we can have a smooth transition */
 .quote-read-more > .bbc_quote {
 	overflow: auto;
+	width: 100%;
 	max-height: var(--quote_height);
 }
 
