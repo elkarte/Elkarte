@@ -149,7 +149,8 @@ class ValuesContainer implements \ArrayAccess
 	 * @param string|int $offset
 	 * @return mixed
 	 */
-	public function offsetGet($offset) : mixed
+	#[\ReturnTypeWillChange]
+	public function offsetGet($offset)
 	{
 		return $this->data[$offset] ?? null;
 	}
