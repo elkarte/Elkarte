@@ -10,7 +10,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.1.7
+ * @version 1.1.9
  *
  */
 
@@ -1525,7 +1525,7 @@ class BBCParser
 	 */
 	protected function trimWhiteSpace($offset = null)
 	{
-		if (preg_match('~(<br />|&nbsp;|\s)*~', $this->message, $matches, null, $offset) !== 0 && isset($matches[0]) && $matches[0] !== '')
+		if (preg_match('~(<br />|&nbsp;|\s)*~', $this->message, $matches, 0, $offset) !== 0 && isset($matches[0]) && $matches[0] !== '')
 		{
 			$this->message = substr_replace($this->message, '', $offset, strlen($matches[0]));
 		}
