@@ -7,7 +7,7 @@
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * @version 1.1
+ * @version 1.1.9
  *
  */
 
@@ -110,6 +110,7 @@ class ValuesContainer implements \ArrayAccess
 	 * @param mixed|mixed[] $offset
 	 * @param string $value
 	 */
+	#[\ReturnTypeWillChange]
 	public function offsetSet($offset, $value)
 	{
 		if (is_null($offset))
@@ -128,6 +129,7 @@ class ValuesContainer implements \ArrayAccess
 	 * @param string|int $offset
 	 * @return bool
 	 */
+	#[\ReturnTypeWillChange]
 	public function offsetExists($offset)
 	{
 		return isset($this->data[$offset]);
@@ -138,6 +140,7 @@ class ValuesContainer implements \ArrayAccess
 	 *
 	 * @param string|int $offset
 	 */
+	#[\ReturnTypeWillChange]
 	public function offsetUnset($offset)
 	{
 		unset($this->data[$offset]);
@@ -147,8 +150,9 @@ class ValuesContainer implements \ArrayAccess
 	 * Returns the value associated to a certain offset.
 	 *
 	 * @param string|int $offset
-	 * @return mixed|mixed[]
+	 * @return mixed
 	 */
+	#[\ReturnTypeWillChange]
 	public function offsetGet($offset)
 	{
 		return isset($this->data[$offset]) ? $this->data[$offset] : null;

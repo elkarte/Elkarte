@@ -11,7 +11,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.1.7
+ * @version 1.1.9
  *
  */
 
@@ -27,6 +27,7 @@ class DatabaseHandler extends SessionHandler
 	/**
 	 * {@inheritdoc}
 	 */
+	#[\ReturnTypeWillChange]
 	public function destroy($sessionId)
 	{
 		// Better safe than sorry
@@ -50,6 +51,7 @@ class DatabaseHandler extends SessionHandler
 	/**
 	 * {@inheritdoc}
 	 */
+	#[\ReturnTypeWillChange]
 	public function gc($maxLifetime)
 	{
 		// Just set to the default or lower?  Ignore it for a higher value. (hopefully)
@@ -73,6 +75,7 @@ class DatabaseHandler extends SessionHandler
 	/**
 	 * {@inheritdoc}
 	 */
+	#[\ReturnTypeWillChange]
 	public function read($sessionId)
 	{
 		if (preg_match('~^[A-Za-z0-9,-]{16,64}$~', $sessionId) == 0)
@@ -99,6 +102,7 @@ class DatabaseHandler extends SessionHandler
 	/**
 	 * {@inheritdoc}
 	 */
+	#[\ReturnTypeWillChange]
 	public function write($sessionId, $data)
 	{
 		if (preg_match('~^[A-Za-z0-9,-]{16,64}$~', $sessionId) == 0)
