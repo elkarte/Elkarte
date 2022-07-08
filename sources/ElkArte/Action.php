@@ -96,7 +96,7 @@ class Action
 
 		$this->_subActions = array_filter(
 			$subActions,
-			function ($subAction) {
+			static function ($subAction) {
 				if (isset($subAction['disabled']) && $subAction['disabled'] == true)
 				{
 					return false;
