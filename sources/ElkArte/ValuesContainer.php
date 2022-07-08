@@ -25,7 +25,7 @@ class ValuesContainer implements \ArrayAccess
 	/**
 	 * The array that holds all the data collected by the object.
 	 *
-	 * @var mixed[]
+	 * @var array
 	 */
 	protected $data = [];
 
@@ -107,7 +107,7 @@ class ValuesContainer implements \ArrayAccess
 	/**
 	 * Assigns a value to a certain offset.
 	 *
-	 * @param mixed|mixed[] $offset
+	 * @param mixed|array $offset
 	 * @param string $value
 	 */
 	public function offsetSet($offset, $value) : void
@@ -169,7 +169,7 @@ class ValuesContainer implements \ArrayAccess
 	 * Merges the passed array into the existing one.
 	 * Works the same as array_merge.
 	 *
-	 * @param mixed[] $new_data
+	 * @param array $new_data
 	 */
 	public function mergeWith($new_data)
 	{
@@ -187,7 +187,7 @@ class ValuesContainer implements \ArrayAccess
 	/**
 	 * Returns the data of the user in an array format
 	 *
-	 * @return mixed[]
+	 * @return array
 	 */
 	public function toArray()
 	{

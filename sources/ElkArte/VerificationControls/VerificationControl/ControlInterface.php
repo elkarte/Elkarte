@@ -66,7 +66,7 @@ interface ControlInterface
 	/**
 	 * Handles the ACP for the control
 	 *
-	 * @return mixed[]
+	 * @return array
 	 */
 	public function settings();
 }

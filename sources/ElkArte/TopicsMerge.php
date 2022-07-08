@@ -27,7 +27,7 @@ class TopicsMerge
 	/**
 	 * For each topic a set of information (id, board, subject, poll, etc.)
 	 *
-	 * @var mixed[]
+	 * @var array
 	 */
 	public $topic_data = array();
 
@@ -77,7 +77,7 @@ class TopicsMerge
 	 * An array of "totals" (number of topics/messages, unapproved, etc.) for
 	 * each board involved
 	 *
-	 * @var mixed[]
+	 * @var array
 	 */
 	private $_boardTotals = array();
 
@@ -279,7 +279,7 @@ class TopicsMerge
 	/**
 	 * Returns the polls information if any of the topics has a poll.
 	 *
-	 * @return mixed[]
+	 * @return array
 	 */
 	public function getPolls()
 	{
@@ -320,7 +320,7 @@ class TopicsMerge
 	/**
 	 * Performs the merge operations
 	 *
-	 * @param mixed[] $details
+	 * @param array $details
 	 * @return bool|int[]
 	 * @throws \ElkArte\Exceptions\Exception
 	 */

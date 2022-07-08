@@ -44,7 +44,7 @@ class Event
 	/**
 	 * Add a new event with a certain priority.
 	 *
-	 * @param mixed[] $event An array describing the event we want to trigger:
+	 * @param array $event An array describing the event we want to trigger:
 	 *    array(
 	 *      0 => string - the position at which the event will be triggered
 	 *      1 => string[] - the class and method we want to call:
@@ -95,7 +95,7 @@ class Event
 	/**
 	 * Returns the list of sorted events to be triggered.
 	 *
-	 * @return mixed[]
+	 * @return array
 	 */
 	public function getEvents()
 	{

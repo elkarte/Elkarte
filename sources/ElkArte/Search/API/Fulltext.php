@@ -169,8 +169,8 @@ class Fulltext extends Standard
 	 *
 	 * Search for indexed words.
 	 *
-	 * @param mixed[] $words Words to index
-	 * @param mixed[] $search_data
+	 * @param array $words Words to index
+	 * @param array $search_data
 	 *
 	 * @return \ElkArte\Database\AbstractResult|boolean
 	 */

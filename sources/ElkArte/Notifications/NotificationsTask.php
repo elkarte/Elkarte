@@ -25,7 +25,7 @@ class NotificationsTask extends ValuesContainer
 	 * Data of the members to notify.
 	 * Populated only if the getMembersData method is called.
 	 *
-	 * @var mixed[]
+	 * @var array
 	 */
 	protected $_members_data = null;
 
@@ -33,7 +33,7 @@ class NotificationsTask extends ValuesContainer
 	 * Data of the member generating the notification.
 	 * Populated only if the getNotifierData method is called.
 	 *
-	 * @var mixed[]
+	 * @var array
 	 */
 	protected $_notifier_data = null;
 
@@ -44,7 +44,7 @@ class NotificationsTask extends ValuesContainer
 	 * @param string $type The notification type we are dealing with
 	 * @param int $id The id of the target (can be a message, a topic, a member, whatever)
 	 * @param int $id_member The id of the member generating the notification
-	 * @param mixed[] $data An array of data that can be necessary in the process
+	 * @param array $data An array of data that can be necessary in the process
 	 * @param string $namespace A namespace for the class if different from the
 	 *               default \ElkArte\Mentions\MentionType\Notification\
 	 */
@@ -89,7 +89,7 @@ class NotificationsTask extends ValuesContainer
 	/**
 	 * Returns the data from getBasicMemberData about the members to be notified.
 	 *
-	 * @return mixed[]
+	 * @return array
 	 */
 	public function getMembersData()
 	{
@@ -116,7 +116,7 @@ class NotificationsTask extends ValuesContainer
 	 * Returns the data from getBasicMemberData about the member that
 	 * generated the notification
 	 *
-	 * @return mixed[]
+	 * @return array
 	 */
 	public function getNotifierData()
 	{

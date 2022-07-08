@@ -36,7 +36,7 @@ interface NotificationInterface
 	 * @param array $lang_data
 	 * @param int[] $members
 	 *
-	 * @return mixed[] array(array(
+	 * @return array array(array(
 	 *                  id_member_to (int),
 	 *                  email_address (text),
 	 *                  subject (text),

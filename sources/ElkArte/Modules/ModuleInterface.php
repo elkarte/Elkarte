@@ -29,7 +29,7 @@ interface ModuleInterface
 	 *
 	 * @param \ElkArte\EventManager $eventsManager an instance of the event manager
 	 *
-	 * @return mixed[]
+	 * @return array
 	 */
 	public static function hooks(EventManager $eventsManager);
 }

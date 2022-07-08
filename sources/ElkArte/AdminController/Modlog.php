@@ -331,7 +331,7 @@ class Modlog extends AbstractController
 	 * @param int $items_per_page The number of items to show per page
 	 * @param string $sort A string indicating how to sort the results
 	 * @param string $query_string
-	 * @param mixed[] $query_params
+	 * @param array $query_params
 	 * @param int $log_type
 	 *
 	 * @return array
@@ -348,7 +348,7 @@ class Modlog extends AbstractController
 	 * Uses list_getModLogEntryCount in modlog subs
 	 *
 	 * @param string $query_string
-	 * @param mixed[] $query_params
+	 * @param array $query_params
 	 * @param int $log_type
 	 *
 	 * @return int number of entries

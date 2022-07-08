@@ -33,7 +33,7 @@ class SearchRenderer extends Renderer
 	public const BEFORE_PREPARE_HOOK = 'integrate_before_prepare_search_context';
 	public const CONTEXT_HOOK = 'integrate_prepare_search_context';
 
-	/** @var mixed[] */
+	/** @var array */
 	protected $_participants = [];
 
 	/**
@@ -47,7 +47,7 @@ class SearchRenderer extends Renderer
 	}
 
 	/**
-	 * @param mixed[] $participants
+	 * @param array $participants
 	 */
 	public function setParticipants($participants)
 	{

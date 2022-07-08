@@ -30,7 +30,7 @@ class QueryAnalysis
 	/**
 	 * Analyze the text of a query and the execution time of a query
 	 *
-	 * @param mixed[] $query_data array of information regarding the query
+	 * @param array $query_data array of information regarding the query
 	 * @return string[] - 'text', 'is_select', 'position_time'
 	 */
 	public function extractInfo($query_data)

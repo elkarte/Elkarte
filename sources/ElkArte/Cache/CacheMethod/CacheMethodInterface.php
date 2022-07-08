@@ -41,7 +41,7 @@ interface CacheMethodInterface
 	 * Puts value in the cache under key for ttl seconds.
 	 *
 	 * @param string $key
-	 * @param string|int|mixed[]|null $value
+	 * @param string|int|array|null $value
 	 * @param int $ttl = 120
 	 */
 	public function put($key, $value, $ttl = 120);
@@ -52,7 +52,7 @@ interface CacheMethodInterface
 	 *
 	 * @param string $key
 	 * @param int $ttl = 120
-	 * @return null|mixed[]
+	 * @return null|array
 	 */
 	public function get($key, $ttl = 120);
 

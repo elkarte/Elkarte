@@ -134,8 +134,8 @@ class Custom extends Standard
 	/**
 	 * Search for indexed words.
 	 *
-	 * @param mixed[] $words An array of words
-	 * @param mixed[] $search_data An array of search data
+	 * @param array $words An array of words
+	 * @param array $search_data An array of search data
 	 *
 	 * @return \ElkArte\Database\AbstractResult|boolean
 	 */
@@ -211,9 +211,9 @@ class Custom extends Standard
 	/**
 	 * After a post is made, we update the search index database
 	 *
-	 * @param mixed[] $msgOptions Contains the post data
-	 * @param mixed[] $topicOptions Not used in this API
-	 * @param mixed[] $posterOptions Not used in this API
+	 * @param array $msgOptions Contains the post data
+	 * @param array $topicOptions Not used in this API
+	 * @param array $posterOptions Not used in this API
 	 */
 	public function postCreated($msgOptions, $topicOptions, $posterOptions)
 	{
@@ -239,9 +239,9 @@ class Custom extends Standard
 	/**
 	 * After a post is modified, we update the search index database.
 	 *
-	 * @param mixed[] $msgOptions The post data
-	 * @param mixed[] $topicOptions Not used in this API
-	 * @param mixed[] $posterOptions Not used in this API
+	 * @param array $msgOptions The post data
+	 * @param array $topicOptions Not used in this API
+	 * @param array $posterOptions Not used in this API
 	 */
 	public function postModified($msgOptions, $topicOptions, $posterOptions)
 	{

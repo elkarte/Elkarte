@@ -79,7 +79,7 @@ class EmojiIntegrate
 	 * - searches message for emoji :smile: tags and converts to svg image
 	 *
 	 * @param string $message
-	 * @param mixed[] $parse_tags
+	 * @param array $parse_tags
 	 */
 	public static function integrate_pre_bbc_parser(&$message, &$parse_tags)
 	{

@@ -38,7 +38,7 @@ class Editor
 	/** @var Loader */
 	protected $loaders = [];
 
-	/** @var mixed[] */
+	/** @var array */
 	protected $txt = '';
 
 	/** @var array|string  */

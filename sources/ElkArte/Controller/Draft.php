@@ -215,7 +215,7 @@ class Draft extends Post
 	 * @param int $msgCount - Total number of drafts
 	 * @param int $maxIndex - The maximum number of messages
 	 *
-	 * @return mixed[] - an array consisting of: $maxIndex, $reverse, $limit, $order
+	 * @return array - an array consisting of: $maxIndex, $reverse, $limit, $order
 	 */
 	private function _query_limits($msgCount, $maxIndex)
 	{

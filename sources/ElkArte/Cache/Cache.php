@@ -28,7 +28,7 @@ class Cache
 	/** @var object Holds our static instance of the class */
 	protected static $_instance;
 
-	/** @var mixed[] Array of options for the methods (if needed) */
+	/** @var array Array of options for the methods (if needed) */
 	protected $_options = [];
 
 	/** @var bool If the cache is enabled or not. */
@@ -54,7 +54,7 @@ class Cache
 	 *
 	 * @param int $level The level of caching
 	 * @param string $accelerator The accelerator used
-	 * @param mixed[] $options Any setting necessary to the caching engine
+	 * @param array $options Any setting necessary to the caching engine
 	 */
 	public function __construct($level, $accelerator, $options)
 	{
@@ -262,7 +262,7 @@ class Cache
 	 *   - Zend: http://files.zend.com/help/Zend-Platform/zend_cache_functions.htm
 	 *
 	 * @param string $key
-	 * @param string|int|mixed[]|null $value
+	 * @param string|int|array|null $value
 	 * @param int $ttl = 120
 	 */
 	public function put($key, $value, $ttl = 120)
@@ -309,7 +309,7 @@ class Cache
 	 * @param string $key cache entry key
 	 * @param string $file file to include
 	 * @param string $function function to call
-	 * @param mixed[] $params parameters sent to the function
+	 * @param array $params parameters sent to the function
 	 * @param int $level = 1
 	 *
 	 * @return array

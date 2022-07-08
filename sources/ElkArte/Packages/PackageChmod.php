@@ -41,7 +41,7 @@ class PackageChmod extends AbstractModel
 	 * Create a chmod control for, you guessed it, chmod-ing files / directories.
 	 *
 	 * @param string[] $chmodFiles
-	 * @param mixed[] $chmodOptions  -- force_find_error, crash_on_error, destination_url
+	 * @param array $chmodOptions  -- force_find_error, crash_on_error, destination_url
 	 * @param bool $restore_write_status
 	 * @return array|bool
 	 * @package Packages

@@ -54,7 +54,7 @@ class Search extends AbstractController
 
 	/**
 	 *
-	 * @var mixed[]
+	 * @var array
 	 */
 	protected $_participants = [];
 
@@ -282,9 +282,9 @@ class Search extends AbstractController
 	/**
 	 * Fills the empty spaces in an array with the default values for search params
 	 *
-	 * @param mixed[] $array
+	 * @param array $array
 	 *
-	 * @return mixed[]
+	 * @return array
 	 */
 	private function _fill_default_search_params($array)
 	{

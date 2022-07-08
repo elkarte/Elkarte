@@ -76,7 +76,7 @@ class EventManager
 	 * $this->_events->trigger('area', args)
 	 *
 	 * @param string $position The "identifier" of the event, such as prepare_post
-	 * @param mixed[] $args The arguments passed to the methods registered
+	 * @param array $args The arguments passed to the methods registered
 	 *
 	 * @return bool
 	 */
@@ -238,7 +238,7 @@ class EventManager
 	 * Registers an event at a certain position with a defined priority.
 	 *
 	 * @param string $position The position at which the event will be triggered
-	 * @param mixed[] $event An array describing the event we want to trigger:
+	 * @param array $event An array describing the event we want to trigger:
 	 *   0 => string - the position at which the event will be triggered
 	 *   1 => string[] - the class and method we want to call:
 	 *      array(

@@ -45,9 +45,9 @@ class Post extends AbstractModule
 	/**
 	 * Create a followup.
 	 *
-	 * @param mixed[] $msgOptions
-	 * @param mixed[] $topicOptions
-	 * @param mixed[] $posterOptions
+	 * @param array $msgOptions
+	 * @param array $topicOptions
+	 * @param array $posterOptions
 	 */
 	public static function followup_create_topic($msgOptions, $topicOptions, $posterOptions)
 	{

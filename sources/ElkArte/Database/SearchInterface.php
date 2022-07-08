@@ -23,7 +23,7 @@ interface SearchInterface
 	 *
 	 * @param string $identifier
 	 * @param string $db_string
-	 * @param mixed[] $db_values
+	 * @param array $db_values
 	 *
 	 * @return \ElkArte\Database\AbstractResult|boolean
 	 */
@@ -61,8 +61,8 @@ interface SearchInterface
 	 * A wrapper around DbTable::create_table setting the 'temporary' parameter.
 	 *
 	 * @param string $name
-	 * @param mixed[] $columns in the format specified.
-	 * @param mixed[] $indexes default array(), in the format specified.
+	 * @param array $columns in the format specified.
+	 * @param array $indexes default array(), in the format specified.
 	 */
 	public function createTemporaryTable($name, $columns, $indexes);
 }

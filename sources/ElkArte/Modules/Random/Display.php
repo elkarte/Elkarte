@@ -99,7 +99,7 @@ class Display extends AbstractModule
 	/**
 	 * Prepares the data for the droppy with "child topics".
 	 *
-	 * @param mixed[] $topicinfo
+	 * @param array $topicinfo
 	 * @param int $topic
 	 * @param bool $includeUnapproved
 	 */

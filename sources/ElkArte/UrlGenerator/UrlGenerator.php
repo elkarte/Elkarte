@@ -53,7 +53,7 @@ class UrlGenerator
 	/**
 	 * The begin of all
 	 *
-	 * @param mixed[] $options
+	 * @param array $options
 	 */
 	public function __construct($options)
 	{
@@ -136,7 +136,7 @@ class UrlGenerator
 	 * Takes care of building the URL
 	 *
 	 * @param string $type The type of URL we want to build
-	 * @param mixed[] $params The URL parameters
+	 * @param array $params The URL parameters
 	 *
 	 * @return string The whole URL
 	 */
@@ -152,7 +152,7 @@ class UrlGenerator
 	 * This doesn't append the script URL at the beginning.
 	 *
 	 * @param string $type The type of URL we want to build
-	 * @param mixed[] $params The URL parameters
+	 * @param array $params The URL parameters
 	 *
 	 * @return string The query part of the URL
 	 */

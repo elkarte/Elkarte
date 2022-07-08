@@ -160,10 +160,10 @@ class MembersList
 	/**
 	 * Adds data to a certain member's object.
 	 *
-	 * @param mixed[] $data The data to append
+	 * @param array $data The data to append
 	 * @param string $type The type of data to append (by default only 'options' for custom fields
 	 * @param int $id The id of the member
-	 * @param mixed[] $display_fields - Basically the content of $modSettings['displayFields']
+	 * @param array $display_fields - Basically the content of $modSettings['displayFields']
 	 */
 	public function appendTo($data, $type, $id, $display_fields = [])
 	{

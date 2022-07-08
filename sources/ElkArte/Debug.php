@@ -37,7 +37,7 @@ class Debug
 	/**
 	 * A list of known debug entities (here to preserve a kind of order)
 	 *
-	 * @var mixed[]
+	 * @var array
 	 */
 	private $_debugs = array(
 		'templates' => array(),
@@ -52,7 +52,7 @@ class Debug
 	/**
 	 * Holds the output ot the getrusage php function
 	 *
-	 * @var mixed[]
+	 * @var array
 	 */
 	private $_rusage = array();
 	/**
@@ -70,7 +70,7 @@ class Debug
 	/**
 	 * All the queries executed
 	 *
-	 * @var mixed[]
+	 * @var array
 	 */
 	private $_db_cache = array();
 	/**
@@ -104,7 +104,7 @@ class Debug
 	/**
 	 * Adds a new cache hits
 	 *
-	 * @param mixed[] $value contains the relevant cache info, in the form:
+	 * @param array $value contains the relevant cache info, in the form:
 	 *         d => method: put or get
 	 *         k => cache key
 	 *         t => time taken to get/put the entry
@@ -124,7 +124,7 @@ class Debug
 	/**
 	 * Adds a new database query
 	 *
-	 * @param mixed[] $value contains the relevant queries info, in the form:
+	 * @param array $value contains the relevant queries info, in the form:
 	 *         q => the query string (only for the first 50 queries, after that only a "...")
 	 *         f => the file in which the query has been executed
 	 *         l => the line at which the query has been executed
@@ -145,7 +145,7 @@ class Debug
 	/**
 	 * Merges the values passed with the current database entries
 	 *
-	 * @param mixed[] $value An array of queries info, see the db method for details
+	 * @param array $value An array of queries info, see the db method for details
 	 */
 	public function merge_db($value)
 	{

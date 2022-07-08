@@ -85,7 +85,7 @@ class EmptyField implements ControlInterface
 	/**
 	 * Get things rolling
 	 *
-	 * @param mixed[]|null $verificationOptions no_empty_field,
+	 * @param array|null $verificationOptions no_empty_field,
 	 */
 	public function __construct($verificationOptions = null)
 	{

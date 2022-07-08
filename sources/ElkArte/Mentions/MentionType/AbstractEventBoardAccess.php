@@ -63,7 +63,7 @@ abstract class AbstractEventBoardAccess extends AbstractEventMessage
 	 * are in.
 	 *
 	 * @param int[] $boards Array of board ids
-	 * @param mixed[] $mentions
+	 * @param array $mentions
 	 * @param int[] $unset_keys Array of board ids
 	 *
 	 * @return bool

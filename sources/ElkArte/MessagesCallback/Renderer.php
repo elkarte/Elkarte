@@ -91,7 +91,7 @@ abstract class Renderer
 	 *
 	 * @param bool $reset
 	 *
-	 * @return bool|mixed[]
+	 * @return bool|array
 	 */
 	public function getContext($reset = false)
 	{
@@ -277,7 +277,7 @@ abstract class Renderer
 	 * as first statement in order to have a starting point and
 	 * some commonly used content for the array.
 	 *
-	 * @return mixed[]
+	 * @return array
 	 */
 	protected function _buildOutputArray()
 	{

@@ -147,7 +147,7 @@ class UserNotification extends AbstractModel
 	/**
 	 * Returns the configurations for the feature.
 	 *
-	 * @return mixed[]
+	 * @return array
 	 */
 	public function addConfig()
 	{

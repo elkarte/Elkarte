@@ -28,7 +28,7 @@ class Payment implements PaymentInterface
 	/**
 	 * Holds the IPN response data
 	 *
-	 * @var string|mixed[]
+	 * @var string|array
 	 */
 	private $return_data;
 

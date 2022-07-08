@@ -61,7 +61,7 @@ class EmailWeekly extends AbstractNotifier
 	 *
 	 * @param \ElkArte\Mentions\MentionType\NotificationInterface $obj
 	 * @param \ElkArte\Notifications\NotificationsTask $task
-	 * @param mixed[] $bodies
+	 * @param array $bodies
 	 */
 	protected function _send_weekly_email(NotificationInterface $obj, NotificationsTask $task, $bodies)
 	{
@@ -83,7 +83,7 @@ class EmailWeekly extends AbstractNotifier
 	/**
 	 * Do the insert into the database for daily and weekly digests.
 	 *
-	 * @param mixed[] $insert_array
+	 * @param array $insert_array
 	 */
 	protected function _insert_delayed($insert_array)
 	{

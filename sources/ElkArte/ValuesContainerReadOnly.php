@@ -38,7 +38,7 @@ class ValuesContainerReadOnly extends ValuesContainer
 	 * Dummy setter.
 	 * In order to make the array read-only this method does nothing.
 	 *
-	 * @param mixed|mixed[] $offset
+	 * @param mixed|array $offset
 	 * @param string $value
 	 */
 	public function offsetSet($offset, $value) : void
@@ -59,7 +59,7 @@ class ValuesContainerReadOnly extends ValuesContainer
 	 * Dummy merger.
 	 * In order to make the array read-only this method does nothing.
 	 *
-	 * @param mixed[] $new_data
+	 * @param array $new_data
 	 */
 	public function mergeWith($new_data)
 	{

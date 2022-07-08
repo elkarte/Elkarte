@@ -34,7 +34,7 @@ class FtpConnection
 	/** @var string Holds last message from the server */
 	public $last_message;
 
-	/** @var mixed[] Passive connection */
+	/** @var array Passive connection */
 	public $pasv;
 
 	/** @var string Holds last response message from the server */

@@ -366,7 +366,7 @@ class Search
 	 * Sets the query, calls the searchQuery method of the API in use
 	 *
 	 * @param \ElkArte\Search\SearchApiWrapper $searchAPI
-	 * @return mixed[]
+	 * @return array
 	 */
 	public function searchQuery($searchAPI)
 	{

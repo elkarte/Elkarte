@@ -182,7 +182,7 @@ abstract class AbstractNotificationMessage implements NotificationInterface
 	 * @param \ElkArte\Notifications\NotificationsTask $task
 	 * @param string[] $lang_files Language files to load (optional)
 	 * @param string[] $replacements Additional replacements for the loadEmailTemplate function (optional)
-	 * @return mixed[]
+	 * @return array
 	 * @throws \ElkArte\Exceptions\Exception
 	 */
 	protected function _getNotificationStrings($template, $keys, $members, NotificationsTask $task, $lang_files = array(), $replacements = array())
@@ -232,11 +232,11 @@ abstract class AbstractNotificationMessage implements NotificationInterface
 	 *
 	 * @param string $template An email template to load
 	 * @param int[] $users
-	 * @param mixed[] $users_data Should at least contain the lngfile index
+	 * @param array $users_data Should at least contain the lngfile index
 	 * @param string[] $lang_files Language files to load (optional)
 	 * @param string[] $replacements Additional replacements for the loadEmailTemplate function (optional)
 	 *
-	 * @return mixed[]
+	 * @return array
 	 * @throws \ElkArte\Exceptions\Exception
 	 */
 	protected function _loadStringsByTemplate($template, $users, $users_data, $lang_files = array(), $replacements = array())

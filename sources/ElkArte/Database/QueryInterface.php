@@ -34,7 +34,7 @@ interface QueryInterface
 	 * their current values from User::$info.
 	 * In addition, it performs checks and sanitation on the values sent to the database.
 	 *
-	 * @param mixed[] $matches
+	 * @param array $matches
 	 */
 	public function replacement__callback($matches);
 
@@ -43,7 +43,7 @@ interface QueryInterface
 	 * but it doesn't execute the query.
 	 *
 	 * @param string $db_string
-	 * @param mixed[] $db_values
+	 * @param array $db_values
 	 * @return string
 	 */
 	public function quote($db_string, $db_values);
@@ -53,7 +53,7 @@ interface QueryInterface
 	 *
 	 * @param string $identifier
 	 * @param string $db_string
-	 * @param mixed[]|false $db_values = array()
+	 * @param array|false $db_values = array()
 	 *
 	 * @return bool|\ElkArte\Database\AbstractResult
 	 * @throws \ElkArte\Exceptions\Exception
@@ -64,8 +64,8 @@ interface QueryInterface
 	 * Do a query, and returns the results.
 	 *
 	 * @param string $db_string
-	 * @param mixed[] $db_values = array()
-	 * @param mixed[]|null
+	 * @param array $db_values = array()
+	 * @param array|null
 	 * @return bool|\ElkArte\Database\AbstractResult
 	 */
 	public function fetchQuery($db_string, $db_values = array());
@@ -113,8 +113,8 @@ interface QueryInterface
 	 *
 	 * @param string $method - options 'replace', 'ignore', 'insert'
 	 * @param string $table
-	 * @param mixed[] $columns
-	 * @param mixed[] $data
+	 * @param array $columns
+	 * @param array $data
 	 * @param string[] $keys
 	 * @param bool $disable_trans = false
 	 * @return bool|resource
@@ -125,8 +125,8 @@ interface QueryInterface
 	 * Replaces data.
 	 *
 	 * @param string $table
-	 * @param mixed[] $columns
-	 * @param mixed[] $data
+	 * @param array $columns
+	 * @param array $data
 	 * @param string[] $keys
 	 * @param bool $disable_trans = false
 	 * @return bool|resource

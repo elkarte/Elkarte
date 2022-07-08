@@ -41,7 +41,7 @@ class Admin extends AbstractModule
 	/**
 	 * Used to add the Calendar entry to the admin menu.
 	 *
-	 * @param mixed[] $admin_areas The admin menu array
+	 * @param array $admin_areas The admin menu array
 	 */
 	public function addMenu(&$admin_areas)
 	{
@@ -66,7 +66,7 @@ class Admin extends AbstractModule
 	 *
 	 * @param string[] $language_files
 	 * @param string[] $include_files
-	 * @param mixed[] $settings_search
+	 * @param array $settings_search
 	 */
 	public function addSearch(&$language_files, &$include_files, &$settings_search)
 	{

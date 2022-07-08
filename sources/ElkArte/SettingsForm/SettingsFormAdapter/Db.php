@@ -131,7 +131,7 @@ class Db extends Adapter
 	}
 
 	/**
-	 * @param mixed[] $configVar
+	 * @param array $configVar
 	 */
 	private function handleSelect(array $configVar)
 	{
@@ -160,7 +160,7 @@ class Db extends Adapter
 	}
 
 	/**
-	 * @param mixed[] $configVar
+	 * @param array $configVar
 	 * @param string $str
 	 *
 	 * @return string
@@ -175,7 +175,7 @@ class Db extends Adapter
 	}
 
 	/**
-	 * @param mixed[] $configVar
+	 * @param array $configVar
 	 * @param string $str
 	 * @param array $known_rules
 	 *
@@ -210,7 +210,7 @@ class Db extends Adapter
 	}
 
 	/**
-	 * @param mixed[] $configVar
+	 * @param array $configVar
 	 */
 	private function allowOverrides(array $configVar)
 	{
@@ -416,7 +416,7 @@ class Db extends Adapter
 	}
 
 	/**
-	 * @param mixed[] $configVar
+	 * @param array $configVar
 	 * @param string $str
 	 *
 	 * @return string

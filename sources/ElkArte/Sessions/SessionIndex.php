@@ -26,7 +26,7 @@ class SessionIndex extends ValuesContainer
 	 * Constructor
 	 *
 	 * @param string $idx The index of to be used in $_SESSION
-	 * @param mixed[]|null $data Any array of data used to initialize the object (optional)
+	 * @param array|null $data Any array of data used to initialize the object (optional)
 	 */
 	public function __construct($idx, $data = null)
 	{

@@ -1074,7 +1074,7 @@ class ManagePaid extends AbstractController
 	 * @param string $sort A string indicating how to sort the results
 	 * @param int $id_sub
 	 * @param string $search_string
-	 * @param mixed[] $search_vars
+	 * @param array $search_vars
 	 *
 	 * @return array
 	 */
@@ -1090,7 +1090,7 @@ class ManagePaid extends AbstractController
 	 *
 	 * @param int $id_sub
 	 * @param string $search_string
-	 * @param mixed[] $search_vars
+	 * @param array $search_vars
 	 *
 	 * @return int
 	 */
