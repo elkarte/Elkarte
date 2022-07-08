@@ -224,7 +224,7 @@ class ManageCalendarModule_Controller extends Action_Controller
 
 		$context['is_new'] = !isset($this->_req->query->holiday);
 		$context['cal_minyear'] = $modSettings['cal_minyear'];
-		$context['cal_maxyear'] = date('Y') + $modSettings['cal_limityear'];
+		$context['cal_maxyear'] = (int) date('Y') + (int) $modSettings['cal_limityear'];
 		$context['page_title'] = $context['is_new'] ? $txt['holidays_add'] : $txt['holidays_edit'];
 		$context['sub_template'] = 'edit_holiday';
 

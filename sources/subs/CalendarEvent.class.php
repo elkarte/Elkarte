@@ -87,7 +87,7 @@ class Calendar_Event
 			// Check the month and year...
 			if ($event['month'] < 1 || $event['month'] > 12)
 				throw new Elk_Exception('invalid_month', false);
-			if ($event['year'] < $this->_settings['cal_minyear'] || $event['year'] > date('Y') + $this->_settings['cal_limityear'])
+			if ($event['year'] < $this->_settings['cal_minyear'] || $event['year'] > (int) date('Y') + $this->_settings['cal_limityear'])
 				throw new Elk_Exception('invalid_year', false);
 
 			// No day?
