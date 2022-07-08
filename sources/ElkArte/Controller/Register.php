@@ -29,6 +29,7 @@ use ElkArte\Http\Headers;
 use ElkArte\PrivacyPolicy;
 use ElkArte\Languages\Txt;
 use ElkArte\Util;
+use JetBrains\PhpStorm\NoReturn;
 
 /**
  * It registers new members, and it allows the administrator moderate member registration
@@ -859,7 +860,7 @@ class Register extends AbstractController
 		if (empty($this->_req->query->u) && empty($this->_req->post->user))
 		{
 			// Immediate 0 or disabled 3 means no need to try and activate
-			if (empty($modSettings['registration_method']) || $modSettings['registration_method'] == '3')
+			if (empty($modSettings['registration_method']) || $modSettings['registration_method'] === '3')
 			{
 				throw new Exception('no_access', false);
 			}
@@ -868,7 +869,7 @@ class Register extends AbstractController
 			$context['member_id'] = 0;
 			$context['sub_template'] = 'resend';
 			$context['page_title'] = $txt['invalid_activation_resend'];
-			$context['can_activate'] = empty($modSettings['registration_method']) || $modSettings['registration_method'] == '1';
+			$context['can_activate'] = $modSettings['registration_method'] === '1';
 			$context['default_username'] = $this->_req->getPost('user', 'trim', '');
 
 			return;
