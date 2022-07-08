@@ -172,13 +172,13 @@ class HtmlParser
 					// For images, we'll want this
 					list ($width, $height) = url_image_size($imgtag);
 
-					if (!empty($modSettings['max_image_width']) && $width > $modSettings['max_image_width'])
+					if ($width > $modSettings['max_image_width'])
 					{
 						$height = (int) (($modSettings['max_image_width'] * $height) / $width);
 						$width = $modSettings['max_image_width'];
 					}
 
-					if (!empty($modSettings['max_image_height']) && $height > $modSettings['max_image_height'])
+					if ($height > $modSettings['max_image_height'])
 					{
 						$width = (int) (($modSettings['max_image_height'] * $width) / $height);
 						$height = $modSettings['max_image_height'];
