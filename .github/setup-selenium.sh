@@ -74,4 +74,10 @@ else
 
     # Run the phpunit selenium tests
     vendor/bin/phpunit --verbose --debug --configuration .github/phpunit-webtest.xml
+
+    # Agents will merge all coverage data...
+    if [[ "${GITHUB_EVENT_NAME}" == "pull_request" ]]
+    then
+        bash <(curl -s https://codecov.io/bash) -s "/tmp" -f '*.clover'
+    fi
 fi

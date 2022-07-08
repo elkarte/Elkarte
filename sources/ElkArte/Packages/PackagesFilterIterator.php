@@ -25,7 +25,7 @@ class PackagesFilterIterator extends \FilterIterator
 	 *
 	 * @return bool
 	 */
-	public function accept()
+	public function accept() : bool
 	{
 		$current = $this->current();
 		$filename = $current->getFilename();
