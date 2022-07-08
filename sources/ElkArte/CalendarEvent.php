@@ -33,7 +33,7 @@ class CalendarEvent
 	/**
 	 * The general settings (in fact a copy of $modSettings).
 	 *
-	 * @var mixed[]
+	 * @var array
 	 */
 	protected $_settings = array();
 
@@ -42,7 +42,7 @@ class CalendarEvent
 	 *
 	 * @param null|int $event_id Obviously the id of the event.
 	 *                  If null or -1 the event is considered new
-	 * @param mixed[] $settings An array of settings ($modSettings is the current one)
+	 * @param array $settings An array of settings ($modSettings is the current one)
 	 * @see \ElkArte\CalendarEvent::isNew
 	 */
 	public function __construct($event_id, $settings = array())
@@ -100,7 +100,7 @@ class CalendarEvent
 			{
 				throw new Exceptions\Exception('invalid_month', false);
 			}
-			if ($event['year'] < $this->_settings['cal_minyear'] || $event['year'] > date('Y') + $this->_settings['cal_limityear'])
+			if ($event['year'] < $this->_settings['cal_minyear'] || $event['year'] > (int) date('Y') + $this->_settings['cal_limityear'])
 			{
 				throw new Exceptions\Exception('invalid_year', false);
 			}
@@ -223,7 +223,7 @@ class CalendarEvent
 	 *              some of the defaults in case of new events.
 	 * @param int $member_id - the id of the member saving the event
 	 *
-	 * @return mixed[] The event structure.
+	 * @return array The event structure.
 	 * @throws \ElkArte\Exceptions\Exception no_access
 	 */
 	public function load($options, $member_id)

@@ -121,7 +121,7 @@ class BuildMail extends BaseMail
 		if (!empty($modSettings['mail_queue']) && !empty($modSettings['mail_period_limit']))
 		{
 			list ($last_mail_time, $mails_this_minute) = @explode('|', $modSettings['mail_recent']);
-			if (empty($mails_this_minute) || time() > $last_mail_time + 60)
+			if (empty($mails_this_minute) || time() > (int) $last_mail_time + 60)
 			{
 				$new_queue_stat = time() . '|' . 1;
 			}
