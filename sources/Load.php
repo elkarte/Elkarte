@@ -353,8 +353,8 @@ function loadBoard()
 			);
 
 			// Load the membergroups allowed, and check permissions.
-			$board_info['groups'] = $row['member_groups'] == '' ? array() : explode(',', $row['member_groups']);
-			$board_info['deny_groups'] = $row['deny_member_groups'] == '' ? array() : explode(',', $row['deny_member_groups']);
+			$board_info['groups'] = $row['member_groups'] === '' ? array() : explode(',', $row['member_groups']);
+			$board_info['deny_groups'] = $row['deny_member_groups'] === '' ? array() : explode(',', $row['deny_member_groups']);
 
 			call_integration_hook('integrate_loaded_board', array(&$board_info, &$row));
 
