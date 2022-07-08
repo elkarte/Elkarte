@@ -150,16 +150,23 @@ class TestHooks extends TestCase
 	private function _parse_hooks($hook_string)
 	{
 		$hooks = array();
-		$functions = explode(',', $hook_string);
-		foreach ($functions as $function)
+		if (!empty($hook_string))
 		{
-			$function = trim($function);
-			if (strpos($function, '|') !== false)
-				list ($call, $file) = explode('|', $function);
-			else
-				$call = $function;
+			$functions = explode(',', $hook_string);
+			foreach ($functions as $function)
+			{
+				$function = trim($function);
+				if (strpos($function, '|') !== false)
+				{
+					list ($call, $file) = explode('|', $function);
+				}
+				else
+				{
+					$call = $function;
+				}
 
-			$hooks[] = array('call' => $call, 'file' => !empty($file) ? $file : '');
+				$hooks[] = array('call' => $call, 'file' => !empty($file) ? $file : '');
+			}
 		}
 
 		return $hooks;

@@ -122,13 +122,26 @@ class TestMenuSubs extends ElkArteCommonSetupTest
 		// Setup the menu
 		$test_include_data = createMenu($this->test_areas, $this->test_options);
 
-		$expected = array('controller' => 'Area1_Controller', 'function' => 'action_area1',
-			'icon' => 'transparent.png', 'class' => 'test_img_area1', 'hidden' => false,
-			'password' => false, 'subsections' => array(), 'label' => 'Area1 Label',
+		$expected = array(
+			'controller' => 'Area1_Controller',
+			'function' => 'action_area1',
+			'icon' => 'transparent.png',
+			'class' => 'test_img_area1',
+			'hidden' => false,
+			'password' => false,
+			'subsections' => array(),
+			'label' => 'Area1 Label',
 			'url' => 'http://127.0.0.1/index.php?action=section1;area=area1;extra=param;elk_test_session=elk_test_session',
-			'permission' => array(), 'enabled' => true, 'current_action' => 'section1', 'current_area' => 'area1',
-			'current_section' => 'section1', 'current_subsection' => ''
+			'permission' => array(),
+			'enabled' => true,
+			'current_action' => 'section1',
+			'current_area' => 'area1',
+			'current_section' => 'section1',
+			'current_subsection' => ''
 		);
+
+		ksort($expected);
+		ksort($test_include_data);
 
 		$this->assertSame($expected, $test_include_data);
 	}
@@ -143,16 +156,28 @@ class TestMenuSubs extends ElkArteCommonSetupTest
 		$test_include_data = createMenu($this->test_areas, $this->test_options);
 
 		$expected = array(
-			'controller' => 'Area3_Controller', 'function' => 'action_area3',
-			'icon' => 'transparent.png', 'class' => 'test_img_area3', 'hidden' => false,
+			'controller' => 'Area3_Controller',
+			'function' => 'action_area3',
+			'icon' => 'transparent.png',
+			'class' => 'test_img_area3',
+			'hidden' => false,
 			'password' => false,
 			'subsections' => array(
 				'sub1' => array('label' => 'Sub One', 'counter' => '', 'url' => 'some url', 'permission' => array(), 'enabled' => true),
 				'sub2' => array('label' => 'Sub Two', 'counter' => '', 'url' => '', 'permission' => array(), 'enabled' => false),
 			),
-			'label' => 'Area3 Label', 'url' => 'http://127.0.0.1/index.php?action=section2;area=area3;extra=param;elk_test_session=elk_test_session',
+			'label' => 'Area3 Label',
+			'url' => 'http://127.0.0.1/index.php?action=section2;area=area3;extra=param;elk_test_session=elk_test_session',
 			'permission' => array(0 => 'area3 permission'),
-			'enabled' => true, 'current_action' => 'section2', 'current_area' => 'area3', 'current_section' => 'section2', 'current_subsection' => 'sub1');
+			'enabled' => true,
+			'current_action' => 'section2',
+			'current_area' => 'area3',
+			'current_section' => 'section2',
+			'current_subsection' => 'sub1'
+		);
+
+		ksort($expected);
+		ksort($test_include_data);
 
 		$this->assertSame($expected, $test_include_data);
 	}
