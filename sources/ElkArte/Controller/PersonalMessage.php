@@ -181,7 +181,7 @@ class PersonalMessage extends AbstractController
 	{
 		global $context, $txt;
 
-		$userLabels = explode(',', User::$settings['message_labels']);
+		$userLabels = explode(',', User::$settings['message_labels'] ?? '');
 
 		foreach ($userLabels as $id_label => $label_name)
 		{
@@ -190,21 +190,21 @@ class PersonalMessage extends AbstractController
 				continue;
 			}
 
-			$context['labels'][(int) $id_label] = array(
+			$context['labels'][(int) $id_label] = [
 				'id' => $id_label,
 				'name' => trim($label_name),
 				'messages' => 0,
 				'unread_messages' => 0,
-			);
+			];
 		}
 
 		// The default inbox is always available
-		$context['labels'][-1] = array(
+		$context['labels'][-1] = [
 			'id' => -1,
 			'name' => $txt['pm_msg_label_inbox'],
 			'messages' => 0,
 			'unread_messages' => 0,
-		);
+		];
 	}
 
 	/**

@@ -881,6 +881,11 @@ class EmailParse
 	 */
 	private function _decode_body($val)
 	{
+		if (empty($val))
+		{
+			return $val;
+		}
+
 		// The encoding tag can be missing in the headers or just wrong
 		if (preg_match('~(?:=C2|=A0|=D2|=D4|=96)~', $val))
 		{

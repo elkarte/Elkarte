@@ -462,6 +462,11 @@ function forum_time($use_user_offset = true, $timestamp = null)
  */
 function un_htmlspecialchars($string)
 {
+	if (empty($string))
+	{
+		return $string;
+	}
+
 	$string = htmlspecialchars_decode($string, ENT_QUOTES);
 
 	return str_replace('&nbsp;', ' ', $string);

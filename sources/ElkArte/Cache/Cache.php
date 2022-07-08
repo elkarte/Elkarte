@@ -164,7 +164,7 @@ class Cache
 			global $cache_accelerator, $cache_enable, $cache_memcached;
 
 			$options = array();
-			if (strpos($cache_accelerator, 'memcache') === 0)
+			if (strpos($cache_accelerator ?? '', 'memcache') === 0)
 			{
 				$options = array(
 					'servers' => explode(',', $cache_memcached),
