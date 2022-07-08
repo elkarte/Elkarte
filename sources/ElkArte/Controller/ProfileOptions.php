@@ -180,9 +180,9 @@ class ProfileOptions extends AbstractController
 			preg_match_all('~"([^"]+)"~', $new_buddy, $matches);
 			$new_buddies = array_unique(array_merge($matches[1], explode(',', preg_replace('~"[^"]+"~', '', $new_buddy))));
 
-			foreach ($new_buddies as $k => $dummy)
+			foreach ($new_buddies as $k => $buddy)
 			{
-				$new_buddies[$k] = strtr(trim($new_buddies[$k]), array('\'' => '&#039;'));
+				$new_buddies[$k] = strtr(trim($buddy), ['\'' => '&#039;']);
 
 				if ($new_buddies[$k] === '' || in_array($new_buddies[$k], array($this->_profile['member_name'], $this->_profile['real_name'])))
 				{
@@ -296,9 +296,9 @@ class ProfileOptions extends AbstractController
 			preg_match_all('~"([^"]+)"~', $new_ignore, $matches);
 			$new_entries = array_unique(array_merge($matches[1], explode(',', preg_replace('~"[^"]+"~', '', $new_ignore))));
 
-			foreach ($new_entries as $k => $dummy)
+			foreach ($new_entries as $k => $entry)
 			{
-				$new_entries[$k] = strtr(trim($new_entries[$k]), array('\'' => '&#039;'));
+				$new_entries[$k] = strtr(trim($entry), array('\'' => '&#039;'));
 
 				if ($new_entries[$k] === '' || in_array($new_entries[$k], array($this->_profile['member_name'], $this->_profile['real_name'])))
 				{
@@ -957,7 +957,7 @@ class ProfileOptions extends AbstractController
 	 * @param string $sort A string indicating how to sort the results
 	 * @param int $memID id_member
 	 *
-	 * @return mixed[] array of board notifications
+	 * @return array array of board notifications
 	 * @uses template_ignoreboards()
 	 */
 	public function list_getBoardNotifications($start, $items_per_page, $sort, $memID)
