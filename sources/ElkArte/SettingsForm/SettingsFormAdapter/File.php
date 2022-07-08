@@ -302,7 +302,7 @@ class File extends Db
 	 * Recursively checks if a value exists in an array
 	 *
 	 * @param string $needle
-	 * @param mixed[] $haystack
+	 * @param array $haystack
 	 *
 	 * @return bool
 	 */
@@ -494,9 +494,9 @@ class File extends Db
 				}
 
 				// Rewrite the definition a bit.
-				if (is_array($configVar) && $configVar[2] === 'db')
+				if ($configVar[2] === 'db')
 				{
-					return array($configVar[3], $configVar[0]);
+					return [$configVar[3], $configVar[0]];
 				}
 
 				// This is a regular config var requiring no special treatment.
