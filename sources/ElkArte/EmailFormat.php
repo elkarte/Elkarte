@@ -47,7 +47,7 @@ class EmailFormat
 	/**
 	 * The full message section broken in to parts
 	 *
-	 * @var mixed[]
+	 * @var array
 	 */
 	private $_body_array = array();
 

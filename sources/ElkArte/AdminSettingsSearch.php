@@ -51,7 +51,7 @@ class AdminSettingsSearch
 	 * @param string[] $language_files - Language file names
 	 * @param string[] $include_files - File names to include (see _include_files
 	 * for details on the structure)
-	 * @param mixed[] $settings_search - Settings to search in (see
+	 * @param array $settings_search - Settings to search in (see
 	 * _load_settings for details on the structure)
 	 */
 	public function __construct($language_files = array(), $include_files = array(), $settings_search = array())
@@ -108,7 +108,7 @@ class AdminSettingsSearch
 	/**
 	 * Loads all the settings
 	 *
-	 * @param mixed[] $settings_search - An array that defines where to look
+	 * @param array $settings_search - An array that defines where to look
 	 * for settings. The structure is:
 	 * array(
 	 * 		method name

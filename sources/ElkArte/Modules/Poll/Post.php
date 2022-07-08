@@ -358,7 +358,7 @@ class Post extends AbstractModule
 	/**
 	 * Creates a poll based on an array (of POST'ed data)
 	 *
-	 * @param mixed[] $options
+	 * @param array $options
 	 * @param string $user_name The username of the member that creates the poll
 	 *
 	 * @return int - the id of the newly created poll

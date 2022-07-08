@@ -137,7 +137,7 @@ class Permissions
 	 *
 	 * @param string[] $permissions
 	 * @param string[] $where
-	 * @param mixed[] $where_parameters = array() or values used in the where statement
+	 * @param array $where_parameters = array() or values used in the where statement
 	 * @throws \ElkArte\Exceptions\Exception
 	 */
 	public function deletePermissions($permissions, $where = array(), $where_parameters = array())
@@ -160,7 +160,7 @@ class Permissions
 	/**
 	 * This function updates the permissions of any groups based on the given groups.
 	 *
-	 * @param mixed[]|int $parents (array or int) group or groups whose children are to be updated
+	 * @param array|int $parents (array or int) group or groups whose children are to be updated
 	 * @param int|null $profile = null an int or null for the customized profile, if any
 	 *
 	 * @return bool

@@ -95,7 +95,7 @@ class Censor
 	 */
 	public function censor($text, $force = false)
 	{
-		if (empty($this->vulgar) || (!$force && !$this->doCensor()))
+		if (empty($text) || empty($this->vulgar) || (!$force && !$this->doCensor()))
 		{
 			return $text;
 		}

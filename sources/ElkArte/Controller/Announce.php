@@ -223,11 +223,11 @@ class Announce extends AbstractController
 	/**
 	 * Handles the sending of an announcement.
 	 *
-	 * @param mixed[] $member_info - An array of members' data, in particular:
+	 * @param array $member_info - An array of members' data, in particular:
 	 *                 - language
 	 *                 - id
 	 *                 - email
-	 * @param mixed[] $topic_info - Some basic information about the topic.
+	 * @param array $topic_info - Some basic information about the topic.
 	 *                 It must contain:
 	 *                  - subject: the subject of the topic
 	 *                  - body: the body of the topic

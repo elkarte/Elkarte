@@ -295,6 +295,11 @@ class Util
 	{
 		global $modSettings;
 
+		if (empty($string))
+		{
+			return 0;
+		}
+
 		if (empty($modSettings['disableEntityCheck']))
 		{
 			$ent_list = '&(#\d{1,7}|quot|amp|lt|gt|nbsp);';
@@ -628,7 +633,7 @@ class Util
 		}
 
 		// Attempt to unserialize, mask errors
-		set_error_handler(function () { /* ignore errors */ });
+		set_error_handler(static function () { /* ignore errors */ });
 		try
 		{
 			if (unserialize($string, ['allowed_classes' => false]) !== false)
@@ -743,5 +748,112 @@ class Util
 		}
 
 		return self::strftime($format, $timestamp);
+	}
+
+	/**
+	 * Checks if the string contains any 4byte chars (emoji) and if so,
+	 * converts them into &#x...; HTML entities.
+	 *
+	 * @param string $string
+	 * @return string
+	 */
+	public static function clean_4byte_chars($string)
+	{
+		global $modSettings;
+
+		if (!empty($modSettings['using_utf8mb4']))
+		{
+			return $string;
+		}
+
+		$result = $string;
+		$ord = array_map('ord', str_split($string));
+
+		// If we are in the 4-byte range
+		if (max($ord) >= 240)
+		{
+			// Byte length
+			$length = strlen($string);
+			$result = '';
+
+			// Look for a 4byte marker
+			for ($i = 0; $i < $length; $i++)
+			{
+				// The first byte of a 4-byte character encoding starts with the bytes 0xF0-0xF4 (240 <-> 244)
+				// but look all the way to 247 for safe measure
+				$ord1 = $ord[$i];
+				if ($ord1 >= 240 && $ord1 <= 247)
+				{
+					// Replace it with the corresponding html entity
+					$entity = self::uniord(chr($ord[$i]) . chr($ord[$i + 1]) . chr($ord[$i + 2]) . chr($ord[$i + 3]));
+
+					if ($entity === false)
+					{
+						$result .= "\xEF\xBF\xBD";
+					}
+					else
+					{
+						$result .= '&#x' . dechex($entity) . ';';
+					}
+
+					$i += 3;
+				}
+				else
+				{
+					$result .= $string[$i];
+				}
+			}
+		}
+
+		return $result;
+	}
+
+	/**
+	 * Converts a 4byte char into the corresponding HTML entity code.
+	 *
+	 * This function is derived from:
+	 * http://www.greywyvern.com/code/php/utf8_html
+	 *
+	 * @param string $c
+	 * @return integer|false
+	 */
+	static function uniord($c)
+	{
+		if (ord($c[0]) >= 0 && ord($c[0]) <= 127)
+		{
+			return ord($c[0]);
+		}
+
+		if (ord($c[0]) >= 192 && ord($c[0]) <= 223)
+		{
+			return (ord($c[0]) - 192) * 64 + (ord($c[1]) - 128);
+		}
+
+		if (ord($c[0]) >= 224 && ord($c[0]) <= 239)
+		{
+			return (ord($c[0]) - 224) * 4096 + (ord($c[1]) - 128) * 64 + (ord($c[2]) - 128);
+		}
+
+		if (ord($c[0]) >= 240 && ord($c[0]) <= 247)
+		{
+			return (ord($c[0]) - 240) * 262144 + (ord($c[1]) - 128) * 4096 + (ord($c[2]) - 128) * 64 + (ord($c[3]) - 128);
+		}
+
+		if (ord($c[0]) >= 248 && ord($c[0]) <= 251)
+		{
+			return (ord($c[0]) - 248) * 16777216 + (ord($c[1]) - 128) * 262144 + (ord($c[2]) - 128) * 4096 + (ord($c[3]) - 128) * 64 + (ord($c[4]) - 128);
+		}
+
+		if (ord($c[0]) >= 252 && ord($c[0]) <= 253)
+		{
+			return (ord($c[0]) - 252) * 1073741824 + (ord($c[1]) - 128) * 16777216 + (ord($c[2]) - 128) * 262144 + (ord($c[3]) - 128) * 4096 + (ord($c[4]) - 128) * 64 + (ord($c[5]) - 128);
+		}
+
+		if (ord($c[0]) >= 254 && ord($c[0]) <= 255)
+		{
+			return false;
+		}
+
+		return 0;
 	}
 }

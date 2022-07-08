@@ -449,7 +449,7 @@ class HttpReq
 	 * @param string $name the key name in the _param array
 	 * @param string|null $sanitize comma separated list of rules
 	 *
-	 * @return mixed|mixed[]|null
+	 * @return mixed|array|null
 	 */
 	public function cleanValue($name, $sanitize = null)
 	{

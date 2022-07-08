@@ -353,8 +353,8 @@ function loadBoard()
 			);
 
 			// Load the membergroups allowed, and check permissions.
-			$board_info['groups'] = $row['member_groups'] == '' ? array() : explode(',', $row['member_groups']);
-			$board_info['deny_groups'] = $row['deny_member_groups'] == '' ? array() : explode(',', $row['deny_member_groups']);
+			$board_info['groups'] = $row['member_groups'] === '' ? array() : explode(',', $row['member_groups']);
+			$board_info['deny_groups'] = $row['deny_member_groups'] === '' ? array() : explode(',', $row['deny_member_groups']);
 
 			call_integration_hook('integrate_loaded_board', array(&$board_info, &$row));
 
@@ -1296,12 +1296,12 @@ function determineAvatar($profile)
 		return [];
 	}
 
-	$avatar_protocol = substr(strtolower($profile['avatar']), 0, 7);
+	$avatar_protocol = empty($profile['avatar']) ? '' : strtolower(substr($profile['avatar'], 0, 7));
 	$alt = $profile['member_name'] ?? '';
 
 	// Build the gravatar request once.
 	$gravatar = '//www.gravatar.com/avatar/' .
-		hash('md5', strtolower($profile['email_address'])) .
+		hash('md5', strtolower($profile['email_address'] ?? '')) .
 		'?s=' . $modSettings['avatar_max_height'] .
 		(!empty($modSettings['gravatar_rating']) ? ('&amp;r=' . $modSettings['gravatar_rating']) : '') .
 		((!empty($modSettings['gravatar_default']) && $modSettings['gravatar_default'] !== 'none') ? ('&amp;d=' . $modSettings['gravatar_default']) : '');

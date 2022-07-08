@@ -104,7 +104,7 @@ class Menu
 	/**
 	 * Parses the supplied menu data in to the relevant menu array structure
 	 *
-	 * @param mixed[] $menuData the menu array
+	 * @param array $menuData the menu array
 	 */
 	public function addMenuData($menuData)
 	{

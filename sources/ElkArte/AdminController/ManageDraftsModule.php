@@ -30,7 +30,7 @@ class ManageDraftsModule extends AbstractController
 	/**
 	 * Used to add the Drafts entry to the Core Features list.
 	 *
-	 * @param mixed[] $core_features The core features array
+	 * @param array $core_features The core features array
 	 */
 	public static function addCoreFeature(&$core_features)
 	{

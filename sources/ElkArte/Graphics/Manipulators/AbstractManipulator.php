@@ -219,6 +219,6 @@ abstract class AbstractManipulator
 			$dst_height = max(1, $max_width / $image_ratio);
 		}
 
-		return [$dst_width, $dst_height];
+		return [round($dst_width), round($dst_height)];
 	}
 }

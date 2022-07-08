@@ -37,7 +37,7 @@ class Loader
 	/** @var bool if to fallback when we can find a request language area file */
 	protected $load_fallback = true;
 
-	/** @var mixed[] */
+	/** @var array */
 	protected $variable = true;
 
 	/** @var string[] Holds the name of the files already loaded to load them only once */

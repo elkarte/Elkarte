@@ -115,7 +115,7 @@ class GenericList
 	/**
 	 * Validate the options sent
 	 *
-	 * @param mixed[] $listOptions
+	 * @param array $listOptions
 	 */
 	protected function validateListOptions($listOptions)
 	{

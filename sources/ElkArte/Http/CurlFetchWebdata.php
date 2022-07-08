@@ -41,7 +41,7 @@ class CurlFetchWebdata
 	/**
 	 * Set the default items for this class
 	 *
-	 * @var mixed[]
+	 * @var array
 	 */
 	private $default_options = array(
 		CURLOPT_RETURNTRANSFER => 1, // Get returned value as a string (don't output it)
@@ -75,7 +75,7 @@ class CurlFetchWebdata
 	/**
 	 * Holds the passed user options array
 	 *
-	 * @var mixed[]
+	 * @var array
 	 */
 	private $_user_options = array();
 
@@ -96,14 +96,14 @@ class CurlFetchWebdata
 	/**
 	 * Holds response headers to the request
 	 *
-	 * @var mixed[]
+	 * @var array
 	 */
 	private $_headers = array();
 
 	/**
 	 * Holds the options for this request
 	 *
-	 * @var mixed[]
+	 * @var array
 	 */
 	private $_options = array();
 
@@ -112,7 +112,7 @@ class CurlFetchWebdata
 	 *
 	 * - Allow for user override values
 	 *
-	 * @param mixed[] $options cURL options as an array
+	 * @param array $options cURL options as an array
 	 * @param int $max_redirect Maximum number of redirects
 	 */
 	public function __construct($options = array(), $max_redirect = 3)
@@ -133,7 +133,7 @@ class CurlFetchWebdata
 	 * - Calls _setOptions to set the curl opts array values based on the defaults and user input
 	 *
 	 * @param string $url the site we are going to fetch
-	 * @param mixed[]|string $post_data data to send in the curl request as post data
+	 * @param array|string $post_data data to send in the curl request as post data
 	 *
 	 * @return CurlFetchWebdata
 	 */
@@ -164,9 +164,9 @@ class CurlFetchWebdata
 	 * - Forms the date (for post) in to a string var=xyz&var2=abc&var3=123
 	 * - Drops vars with @ since we don't support sending files (uploading)
 	 *
-	 * @param mixed[] $post_data
+	 * @param array $post_data
 	 *
-	 * @return mixed[]|string
+	 * @return array|string
 	 */
 	private function _buildPostData($post_data)
 	{

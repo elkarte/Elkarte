@@ -325,7 +325,7 @@ class News extends AbstractController
 	 * The array will be generated to match the format.
 	 *
 	 * @param string $xml_format
-	 * @return mixed[]
+	 * @return array
 	 */
 	public function action_xmlmembers($xml_format)
 	{
@@ -395,7 +395,7 @@ class News extends AbstractController
 	 * The returned array will be generated to match the xmf_format.
 	 *
 	 * @param string $xml_format one of rss, rss2, rdf, atom
-	 * @return mixed[] array of topics
+	 * @return array array of topics
 	 */
 	public function action_xmlnews($xml_format)
 	{
@@ -503,7 +503,7 @@ class News extends AbstractController
 	 * The returned array will be generated to match the xml_format.
 	 *
 	 * @param string $xml_format one of rss, rss2, rdf, atom
-	 * @return mixed[] of recent posts
+	 * @return array of recent posts
 	 */
 	public function action_xmlrecent($xml_format)
 	{
@@ -618,7 +618,7 @@ class News extends AbstractController
 	 * which will be generated to match the xml_format.
 	 *
 	 * @param string $xml_format one of rss, rss2, rdf, atom
-	 * @return mixed[] array of profile data.
+	 * @return array array of profile data.
 	 */
 	public function action_xmlprofile($xml_format)
 	{

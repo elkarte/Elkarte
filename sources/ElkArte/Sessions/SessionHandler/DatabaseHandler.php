@@ -30,14 +30,14 @@ class DatabaseHandler extends \SessionHandler
 	 *
 	 * @var \ElkArte\Database\QueryInterface
 	 */
-	protected $_db = null;
+	protected $_db;
 
 	/**
 	 * The modSettings
 	 *
 	 * @var object
 	 */
-	protected $_modSettings = array();
+	protected $_modSettings = [];
 
 	/**
 	 * Make "global" items available to the class
@@ -56,7 +56,7 @@ class DatabaseHandler extends \SessionHandler
 	/**
 	 * {@inheritdoc}
 	 */
-	public function destroy($sessionId)
+	public function destroy($sessionId) : bool
 	{
 		// Better safe than sorry
 		if (preg_match('~^[A-Za-z0-9,-]{16,64}$~', $sessionId) == 0)
@@ -79,6 +79,7 @@ class DatabaseHandler extends \SessionHandler
 	/**
 	 * {@inheritdoc}
 	 */
+	#[\ReturnTypeWillChange]
 	public function gc($maxLifetime)
 	{
 		// Just set to the default or lower?  Ignore it for a higher value. (hopefully)
@@ -102,7 +103,7 @@ class DatabaseHandler extends \SessionHandler
 	/**
 	 * {@inheritdoc}
 	 */
-	public function read($sessionId)
+	public function read($sessionId) : string
 	{
 		if (preg_match('~^[A-Za-z0-9,-]{16,64}$~', $sessionId) == 0)
 		{
@@ -128,7 +129,7 @@ class DatabaseHandler extends \SessionHandler
 	/**
 	 * {@inheritdoc}
 	 */
-	public function write($sessionId, $data)
+	public function write($sessionId, $data) : bool
 	{
 		if (preg_match('~^[A-Za-z0-9,-]{16,64}$~', $sessionId) == 0)
 		{
@@ -138,9 +139,9 @@ class DatabaseHandler extends \SessionHandler
 		// Update the session data, replace if necessary
 		$this->_db->replace(
 			'{db_prefix}sessions',
-			array('session_id' => 'string', 'data' => 'string', 'last_update' => 'int'),
-			array($sessionId, $data, time()),
-			array('session_id')
+			['session_id' => 'string', 'data' => 'string', 'last_update' => 'int'],
+			[$sessionId, $data, time()],
+			['session_id']
 		);
 
 		return true;

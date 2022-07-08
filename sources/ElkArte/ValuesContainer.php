@@ -25,9 +25,9 @@ class ValuesContainer implements \ArrayAccess
 	/**
 	 * The array that holds all the data collected by the object.
 	 *
-	 * @var mixed[]
+	 * @var array
 	 */
-	protected $data = array();
+	protected $data = [];
 
 	/**
 	 * Constructor
@@ -107,10 +107,10 @@ class ValuesContainer implements \ArrayAccess
 	/**
 	 * Assigns a value to a certain offset.
 	 *
-	 * @param mixed|mixed[] $offset
+	 * @param mixed|array $offset
 	 * @param string $value
 	 */
-	public function offsetSet($offset, $value)
+	public function offsetSet($offset, $value) : void
 	{
 		if (is_null($offset))
 		{
@@ -128,7 +128,7 @@ class ValuesContainer implements \ArrayAccess
 	 * @param string|int $offset
 	 * @return bool
 	 */
-	public function offsetExists($offset)
+	public function offsetExists($offset) : bool
 	{
 		return isset($this->data[$offset]);
 	}
@@ -138,7 +138,7 @@ class ValuesContainer implements \ArrayAccess
 	 *
 	 * @param string|int $offset
 	 */
-	public function offsetUnset($offset)
+	public function offsetUnset($offset) : void
 	{
 		unset($this->data[$offset]);
 	}
@@ -147,8 +147,9 @@ class ValuesContainer implements \ArrayAccess
 	 * Returns the value associated to a certain offset.
 	 *
 	 * @param string|int $offset
-	 * @return mixed|array
+	 * @return mixed
 	 */
+	#[\ReturnTypeWillChange]
 	public function offsetGet($offset)
 	{
 		return $this->data[$offset] ?? null;
@@ -168,7 +169,7 @@ class ValuesContainer implements \ArrayAccess
 	 * Merges the passed array into the existing one.
 	 * Works the same as array_merge.
 	 *
-	 * @param mixed[] $new_data
+	 * @param array $new_data
 	 */
 	public function mergeWith($new_data)
 	{
@@ -186,7 +187,7 @@ class ValuesContainer implements \ArrayAccess
 	/**
 	 * Returns the data of the user in an array format
 	 *
-	 * @return mixed[]
+	 * @return array
 	 */
 	public function toArray()
 	{

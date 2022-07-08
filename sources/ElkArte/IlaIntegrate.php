@@ -80,7 +80,7 @@ class IlaIntegrate
 	/**
 	 * - Adds in new BBC code tags for use with inline images
 	 *
-	 * @param mixed[] $additional_bbc
+	 * @param array $additional_bbc
 	 */
 	public static function integrate_additional_bbc(&$additional_bbc)
 	{

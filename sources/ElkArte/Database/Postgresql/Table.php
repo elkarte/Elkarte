@@ -735,7 +735,7 @@ class Table extends AbstractTable
 	/**
 	 * Creates a query for a column
 	 *
-	 * @param mixed[] $column
+	 * @param array $column
 	 * @param string $table_name
 	 *
 	 * @return string

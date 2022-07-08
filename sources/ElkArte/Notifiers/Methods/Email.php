@@ -54,7 +54,7 @@ class Email extends AbstractNotifier
 	 *
 	 * @param \ElkArte\Mentions\MentionType\NotificationInterface $obj
 	 * @param \ElkArte\Notifications\NotificationsTask $task
-	 * @param mixed[] $bodies
+	 * @param array $bodies
 	 */
 	protected function _send_email(NotificationInterface $obj, NotificationsTask $task, $bodies)
 	{

@@ -78,7 +78,7 @@ class Captcha implements ControlInterface
 	 * set the letters we will use to avoid confusion
 	 * set graphics capability
 	 *
-	 * @param mixed[]|null $verificationOptions override_range, override_visual, id
+	 * @param array|null $verificationOptions override_range, override_visual, id
 	 */
 	public function __construct($verificationOptions = null)
 	{

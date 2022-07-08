@@ -191,7 +191,7 @@ class UserSettingsLoader
 	/**
 	 * Prepares the $this->settings property
 	 *
-	 * @param mixed[] $user_settings
+	 * @param array $user_settings
 	 */
 	protected function initSettings($user_settings)
 	{
@@ -201,7 +201,7 @@ class UserSettingsLoader
 	/**
 	 * Prepares the basic data necessary for $this->info
 	 *
-	 * @return mixed[]
+	 * @return array
 	 */
 	protected function initUser()
 	{
@@ -289,7 +289,7 @@ class UserSettingsLoader
 	/**
 	 * Initialize the data necessary to "load" a guest
 	 *
-	 * @return mixed[]
+	 * @return array
 	 */
 	protected function initGuest()
 	{
@@ -325,7 +325,7 @@ class UserSettingsLoader
 	/**
 	 * Fills up the $this->info variable
 	 *
-	 * @param mixed[] $user_info
+	 * @param array $user_info
 	 */
 	protected function compileInfo($user_info)
 	{
@@ -436,7 +436,7 @@ class UserSettingsLoader
 	/**
 	 * Prepares the data of the avatar (path, url, etc.)
 	 *
-	 * @return mixed[]
+	 * @return array
 	 */
 	protected function buildAvatarArray()
 	{

@@ -218,11 +218,8 @@ class MergeTopics extends AbstractController
 		}
 
 		// The parameters of action_mergeExecute were set, so this must've been an internal call.
-		if (!empty($topics))
-		{
-			isAllowedTo('merge_any', $merger->boards);
-			theme()->getTemplates()->load('MergeTopics');
-		}
+		isAllowedTo('merge_any', $merger->boards);
+		theme()->getTemplates()->load('MergeTopics');
 
 		// Get the boards a user is allowed to merge in.
 		$allowedto_merge_boards = boardsAllowedTo('merge_any');

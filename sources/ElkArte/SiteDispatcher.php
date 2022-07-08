@@ -291,7 +291,6 @@ class SiteDispatcher
 				&& in_array('action_index', get_class_methods($this->_controller_name)))
 			{
 				$this->_function_name = 'action_index';
-				return;
 			}
 		}
 		// This should never happen, that's why its here :P

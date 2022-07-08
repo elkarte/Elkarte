@@ -35,7 +35,7 @@ interface FrontpageInterface
 	 *
 	 * - e.g. specify a topic ID or a board listing
 	 *
-	 * @return mixed[]
+	 * @return array
 	 */
 	public static function frontPageOptions();
 

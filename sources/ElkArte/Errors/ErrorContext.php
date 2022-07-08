@@ -116,7 +116,7 @@ final class ErrorContext
 	/**
 	 * Add an error to the list
 	 *
-	 * @param mixed[]|mixed $error error code
+	 * @param array|mixed $error error code
 	 * @param string|int|null $severity error severity
 	 * @param string|null $lang_file lang_file
 	 */
@@ -140,9 +140,9 @@ final class ErrorContext
 	 * Finds the "name" of the error (either the string, the first element
 	 * of the array, or the result of getName)
 	 *
-	 * @param mixed|mixed[] $error error code
+	 * @param mixed|array $error error code
 	 *
-	 * @return mixed|mixed[]
+	 * @return mixed|array
 	 */
 	protected function getErrorName($error)
 	{
@@ -171,7 +171,7 @@ final class ErrorContext
 	/**
 	 * Remove an error from the list
 	 *
-	 * @param mixed[]|mixed $error error code
+	 * @param array|mixed $error error code
 	 */
 	public function removeError($error)
 	{
@@ -221,7 +221,7 @@ final class ErrorContext
 	/**
 	 * Return an error based on the id of the error set when adding the error itself.
 	 *
-	 * @param mixed|mixed[] $error error code
+	 * @param mixed|array $error error code
 	 *
 	 * @return null|mixed whatever the error is (string, object, array), noll if not found
 	 */
@@ -391,7 +391,7 @@ final class ErrorContext
 	 * Finds the "value" of the error (Usually applicable only to
 	 * array of strings, being the second element of the array)
 	 *
-	 * @param mixed|mixed[] $error error code
+	 * @param mixed|array $error error code
 	 *
 	 * @return null
 	 */

@@ -41,8 +41,8 @@ class VerificationControls
 	 * Obviously the entry point of verification
 	 *
 	 * @param \ElkArte\Sessions\SessionIndex $sessionVal
-	 * @param mixed[] $settings Basically $modSettings
-	 * @param mixed[] $verificationOptions
+	 * @param array $settings Basically $modSettings
+	 * @param array $verificationOptions
 	 * @param bool $isNew If the control was initialized before
 	 * @param bool $force_refresh If the controls should be re-initialized
 	 */
@@ -74,7 +74,7 @@ class VerificationControls
 	/**
 	 * This method returns the verification controls found in the file system
 	 *
-	 * @param mixed[] $config_vars
+	 * @param array $config_vars
 	 * @return false|string
 	 */
 	public static function discoverControls(&$config_vars = null)
@@ -196,7 +196,7 @@ class VerificationControls
 	 * Instantiate the verification controls
 	 *
 	 * @param bool $force_refresh If the controls should be re-initialized
-	 * @return mixed[]
+	 * @return array
 	 */
 	public function create($force_refresh = false)
 	{

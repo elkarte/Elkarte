@@ -39,7 +39,7 @@ interface EventInterface
 	 * Used by \ElkArte\Controller\Mentions to filter the mentions to display in the list.
 	 *
 	 * @param string $type
-	 * @param mixed[] $mentions
+	 * @param array $mentions
 	 */
 // 	public function view($type, &$mentions);
 

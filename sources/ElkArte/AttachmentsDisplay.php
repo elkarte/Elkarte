@@ -18,7 +18,7 @@ class AttachmentsDisplay
 	/** @var array The good old attachments array */
 	protected $messages = [];
 
-	/** @var mixed[] The good old attachments array */
+	/** @var array The good old attachments array */
 	protected $attachments = [];
 
 	/** @var bool If unapproved posts/attachments should be shown */
@@ -61,7 +61,7 @@ class AttachmentsDisplay
 	 * @param int[] $messages array of messages ids
 	 * @param bool $includeUnapproved = false
 	 * @param string|null $filter name of a callback function
-	 * @param mixed[] $all_posters
+	 * @param array $all_posters
 	 *
 	 * @package Attachments
 	 */

@@ -51,7 +51,7 @@ abstract class AbstractUrlGenerator
 	/**
 	 * Actually builds the URL (only the query part.
 	 *
-	 * @param mixed[] $params The parameters of the URL
+	 * @param array $params The parameters of the URL
 	 */
 	abstract public function generate($params);
 

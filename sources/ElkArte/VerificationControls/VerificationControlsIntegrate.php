@@ -53,7 +53,7 @@ class VerificationControlsIntegrate
 	/**
 	 * Create a anti-bot verification control?
 	 *
-	 * @param mixed[] $verificationOptions
+	 * @param array $verificationOptions
 	 * @param bool $do_test = false If we are validating the input to a verification control
 	 *
 	 * @return array|bool

@@ -63,7 +63,7 @@ class Display implements DisplayInterface
 	 * - Called from Profile-Actions.php to return a unique set of fields for the given gateway
 	 *
 	 * @param int $unique_id
-	 * @param mixed[] $sub_data
+	 * @param array $sub_data
 	 * @param int $value
 	 * @param string $period
 	 * @param string $return_url

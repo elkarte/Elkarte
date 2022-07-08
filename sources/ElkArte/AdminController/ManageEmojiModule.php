@@ -28,7 +28,7 @@ abstract class ManageEmojiModule extends AbstractController
 	/**
 	 * Adds the necessary settings to the smiley area of the ACP
 	 *
-	 * @param mixed[] $config_vars
+	 * @param array $config_vars
 	 */
 	public static function integrate_modify_smiley_settings(&$config_vars)
 	{

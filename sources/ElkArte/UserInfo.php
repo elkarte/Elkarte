@@ -34,10 +34,10 @@ class UserInfo extends ValuesContainer
 	{
 		return allowedTo('access_mod_center')
 			|| ($this->data['is_guest'] === false
+				&& !empty($this->data['mod_cache'])
 				&& ($this->data['mod_cache']['gq'] != '0=1'
 					|| $this->data['mod_cache']['bq'] != '0=1'
-					|| ($postmodActive && !empty($this->data['mod_cache']['ap']))
-				)
+					|| ($postmodActive && !empty($this->data['mod_cache']['ap'])))
 			);
 	}
 }

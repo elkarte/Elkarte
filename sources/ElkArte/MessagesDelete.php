@@ -1066,8 +1066,8 @@ class MessagesDelete
 	 * Performs all the permission checks to see if the current user can
 	 * delete the topic/message he would like to delete
 	 *
-	 * @param mixed[] $row Details on the message
-	 * @param mixed[] $board The the user is in (?)
+	 * @param array $row Details on the message
+	 * @param array $board The the user is in (?)
 	 *
 	 * @return bool|string
 	 * @throws \ElkArte\Exceptions\Exception cannot_delete_replies, cannot_delete_own, modify_post_time_passed

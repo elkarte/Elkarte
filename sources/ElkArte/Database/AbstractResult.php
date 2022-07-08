@@ -88,7 +88,7 @@ abstract class AbstractResult
 	/**
 	 * Update details
 	 *
-	 * @param mixed[] $details
+	 * @param array $details
 	 */
 	public function updateDetails($details)
 	{
@@ -160,7 +160,7 @@ abstract class AbstractResult
 	 * by the query from the database.
 	 *
 	 * @param callable|null|object|string $callback
-	 * @param mixed[]|null
+	 * @param array|null
 	 * @return array
 	 */
 	public function fetch_callback($callback, $seeds = null)

@@ -166,9 +166,9 @@ class Mentionmem extends AbstractEventBoardAccess
 	/**
 	 * Listener attached to the after_save_post event of the Post controller.
 	 *
-	 * @param mixed[] $msgOptions
+	 * @param array $msgOptions
 	 * @param bool $becomesApproved
-	 * @param mixed[] $posterOptions
+	 * @param array $posterOptions
 	 */
 	public function post_after_save_post($msgOptions, $becomesApproved, $posterOptions)
 	{

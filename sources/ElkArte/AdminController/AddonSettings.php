@@ -146,7 +146,7 @@ class AddonSettings extends AbstractController
 	 * This function makes sure the requested subaction does exist,
 	 * if it doesn't, it sets a default action or.
 	 *
-	 * @param mixed[] $subActions An array containing all possible subactions.
+	 * @param array $subActions An array containing all possible subactions.
 	 * @param string $defaultAction the default action to be called if no valid subaction was found.
 	 *
 	 * @throws \ElkArte\Exceptions\Exception

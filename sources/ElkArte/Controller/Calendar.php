@@ -81,7 +81,7 @@ class Calendar extends AbstractController
 		// Is this a week view?
 		$context['view_week'] = isset($_GET['viewweek']);
 		$context['cal_minyear'] = $modSettings['cal_minyear'];
-		$context['cal_maxyear'] = date('Y') + $modSettings['cal_limityear'];
+		$context['cal_maxyear'] = (int) date('Y') + (int) $modSettings['cal_limityear'];
 
 		// Don't let search engines index weekly calendar pages.
 		if ($context['view_week'])
@@ -273,7 +273,7 @@ class Calendar extends AbstractController
 		$context['sub_template'] = 'unlinked_event_post';
 
 		$context['cal_minyear'] = $modSettings['cal_minyear'];
-		$context['cal_maxyear'] = date('Y') + $modSettings['cal_limityear'];
+		$context['cal_maxyear'] = (int) date('Y') + (int) $modSettings['cal_limityear'];
 		$context['page_title'] = $event->isNew() ? $txt['calendar_edit'] : $txt['calendar_post_event'];
 		$context['linktree'][] = array(
 			'name' => $context['page_title'],
@@ -418,8 +418,8 @@ class Calendar extends AbstractController
 		$headers
 			->header('Pragma', 'no-cache')
 			->header('Cache-Control', 'no-cache')
-			->header('Expires', '' . gmdate('D, d M Y H:i:s', time() + 525600 * 60) . ' GMT')
-			->header('Last-Modified', '' . gmdate('D, d M Y H:i:s', time()) . 'GMT')
+			->header('Expires', gmdate('D, d M Y H:i:s', time() + 525600 * 60) . ' GMT')
+			->header('Last-Modified', gmdate('D, d M Y H:i:s', time()) . 'GMT')
 			->header('Accept-Ranges', 'bytes')
 			->header('Connection', 'close')
 			->header('Content-Disposition', 'attachment; filename="' . $event['title'] . '.ics"');

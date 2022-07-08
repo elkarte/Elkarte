@@ -38,7 +38,7 @@ class Suggest
 
 	/**
 	 * @param $search
-	 * @param mixed[]
+	 * @param array
 	 */
 	public function __construct($search, $params)
 	{

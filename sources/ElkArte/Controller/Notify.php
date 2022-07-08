@@ -467,7 +467,7 @@ class Notify extends AbstractController
 	/**
 	 * Does the actual area unsubscribe toggle
 	 *
-	 * @param mixed[] $member Member info from getBasicMemberData
+	 * @param array $member Member info from getBasicMemberData
 	 * @param string $area area they want to be removed from
 	 * @param string $extra parameters needed for some areas
 	 */
@@ -512,7 +512,7 @@ class Notify extends AbstractController
 	/**
 	 * Pass unsubscribe information to the appropriate "addon" mention class/method
 	 *
-	 * @param mixed[] $member Member info from getBasicMemberData
+	 * @param array $member Member info from getBasicMemberData
 	 * @param string $area area they want to be removed from
 	 * @param string $extra parameters needed for some
 	 *
@@ -540,7 +540,7 @@ class Notify extends AbstractController
 	 *  - Finds the member claimed in the token
 	 *  - Runs crypt on member data to validate it matches the supplied hash
 	 *
-	 * @param mixed[] $member Member info from getBasicMemberData
+	 * @param array $member Member info from getBasicMemberData
 	 * @param string $area area they want to be removed from
 	 * @param string $extra parameters needed for some areas
 	 * @return bool

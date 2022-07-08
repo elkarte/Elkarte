@@ -55,7 +55,7 @@ class Post extends AbstractModule
 		}
 		$context['make_event'] = self::$_make_event;
 		$context['cal_minyear'] = $modSettings['cal_minyear'];
-		$context['cal_maxyear'] = date('Y') + $modSettings['cal_limityear'];
+		$context['cal_maxyear'] = (int) date('Y') + (int) $modSettings['cal_limityear'];
 
 		if (self::$_make_event)
 		{
@@ -251,7 +251,7 @@ class Post extends AbstractModule
 				throw new Exception('invalid_month', false);
 			}
 
-			if ($context['event']['year'] < $modSettings['cal_minyear'] || $context['event']['year'] > date('Y') + $modSettings['cal_limityear'])
+			if ($context['event']['year'] < $modSettings['cal_minyear'] || $context['event']['year'] > (int) date('Y') + $modSettings['cal_limityear'])
 			{
 				throw new Exception('invalid_year', false);
 			}

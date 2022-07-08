@@ -339,7 +339,7 @@ class XmlArray
 	/**
 	 * Callback for the preg_replace in _from_cdata
 	 *
-	 * @param mixed[] $match An array of data
+	 * @param array $match An array of data
 	 *
 	 * @return string
 	 */
@@ -489,12 +489,12 @@ class XmlArray
 	/**
 	 * Get a specific array by path, one level down. (privately used...)
 	 *
-	 * @param mixed[] $array An array of data
+	 * @param array $array An array of data
 	 * @param string $path The path
 	 * @param int $level How far deep into the array we should go
 	 * @param bool $no_error Whether or not to ignore errors
 	 *
-	 * @return array|bool|mixed|mixed[]
+	 * @return array|bool|mixed|array
 	 */
 	protected function _path($array, $path, $level, $no_error = false)
 	{
@@ -573,7 +573,7 @@ class XmlArray
 	/**
 	 * Get a specific element's xml. (privately used...)
 	 *
-	 * @param mixed[] $array
+	 * @param array $array
 	 * @param null|int $indent
 	 *
 	 * @return string
@@ -857,7 +857,7 @@ class XmlArray
 	/**
 	 * Return an element as an array
 	 *
-	 * @param mixed[] $array An array of data
+	 * @param array $array An array of data
 	 *
 	 * @return array|string
 	 */

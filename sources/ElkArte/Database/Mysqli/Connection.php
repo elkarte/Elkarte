@@ -38,6 +38,9 @@ class Connection implements ConnectionInterface
 
 		$db_server = (!empty($db_options['persist']) ? 'p:' : '') . $db_server;
 
+		// PHP 8.1 default is to throw exceptions, this reverts it to the <=php8 semantics
+		mysqli_report(MYSQLI_REPORT_OFF);
+
 		$connection = @mysqli_connect($db_server, $db_user, $db_passwd, $db_name, $db_port);
 
 		// Something's wrong, show an error if its fatal (which we assume it is)

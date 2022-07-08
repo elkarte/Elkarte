@@ -277,7 +277,7 @@ class Notifications extends AbstractModel
 	 *
 	 * @param \ElkArte\Mentions\MentionType\NotificationInterface $obj
 	 * @param \ElkArte\Notifications\NotificationsTask $task
-	 * @param mixed[] $bodies
+	 * @param array $bodies
 	 */
 	protected function _send_notification(NotificationInterface $obj, NotificationsTask $task, $bodies)
 	{
@@ -300,7 +300,7 @@ class Notifications extends AbstractModel
 	 *
 	 * @param \ElkArte\Mentions\MentionType\NotificationInterface $obj
 	 * @param \ElkArte\Notifications\NotificationsTask $task
-	 * @param mixed[] $bodies
+	 * @param array $bodies
 	 */
 	protected function _send_email(NotificationInterface $obj, NotificationsTask $task, $bodies)
 	{
@@ -319,7 +319,7 @@ class Notifications extends AbstractModel
 	 *
 	 * @param \ElkArte\Mentions\MentionType\NotificationInterface $obj
 	 * @param \ElkArte\Notifications\NotificationsTask $task
-	 * @param mixed[] $bodies
+	 * @param array $bodies
 	 */
 	protected function _send_daily_email(NotificationInterface $obj, NotificationsTask $task, $bodies)
 	{
@@ -341,7 +341,7 @@ class Notifications extends AbstractModel
 	/**
 	 * Do the insert into the database for daily and weekly digests.
 	 *
-	 * @param mixed[] $insert_array
+	 * @param array $insert_array
 	 */
 	protected function _insert_delayed($insert_array)
 	{
@@ -364,7 +364,7 @@ class Notifications extends AbstractModel
 	 *
 	 * @param \ElkArte\Mentions\MentionType\NotificationInterface $obj
 	 * @param \ElkArte\Notifications\NotificationsTask $task
-	 * @param mixed[] $bodies
+	 * @param array $bodies
 	 */
 	protected function _send_weekly_email(NotificationInterface $obj, NotificationsTask $task, $bodies)
 	{
