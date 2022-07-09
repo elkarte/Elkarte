@@ -521,12 +521,13 @@ function htmlTime($timestamp)
 	if (empty($timestamp))
 		return '';
 
+	$forumtime = forum_time(false, $timestamp);
 	$timestamp = forum_time(true, $timestamp);
 	$time = date('Y-m-d H:i', $timestamp);
 	$stdtime = standardTime($timestamp, true, true);
 
 	// @todo maybe htmlspecialchars on the title attribute?
-	return '<time title="' . (!empty($context['using_relative_time']) ? $stdtime : $txt['last_post']) . '" datetime="' . $time . '" data-timestamp="' . $timestamp . '">' . $stdtime . '</time>';
+	return '<time title="' . (!empty($context['using_relative_time']) ? $stdtime : $txt['last_post']) . '" datetime="' . $time . '" data-timestamp="' . $timestamp . '" data-forumtime="' . $forumtime . '">' . $stdtime . '</time>';
 }
 
 /**
@@ -566,6 +567,9 @@ function forum_time($use_user_offset = true, $timestamp = null)
  */
 function un_htmlspecialchars($string)
 {
+	if (empty($string))
+		return $string;
+
 	$string = htmlspecialchars_decode($string, ENT_QUOTES);
 	$string = str_replace('&nbsp;', ' ', $string);
 
@@ -1246,6 +1250,8 @@ function host_from_ip($ip)
 			$test = @shell_exec('host -W 1 ' . @escapeshellarg($ip));
 		else
 			$test = @shell_exec('host ' . @escapeshellarg($ip));
+
+		$test = isset($test) ? $test : '';
 
 		// Did host say it didn't find anything?
 		if (strpos($test, 'not found') !== false)
