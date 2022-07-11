@@ -165,7 +165,7 @@ function template_list_boards(array $boards, $id)
 		echo '
 					</div>';
 
-		if (!empty($board['last_post']['member']['avatar']))
+		if (!empty($board['last_post']['member']['avatar']['href']))
 		{
 			echo '
 					<div class="board_avatar">
@@ -189,9 +189,7 @@ function template_list_boards(array $boards, $id)
 		if (!empty($board['last_post']['id']))
 		{
 			echo '
-						<p class="board_lastpost">
-							', $board['last_post']['last_post_message'], '
-						</p>';
+						', $board['last_post']['last_post_message'];
 		}
 
 		// Show some basic information about the number of posts, etc.
