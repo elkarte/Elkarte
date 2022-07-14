@@ -12,7 +12,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.1.7
+ * @version 1.1.9
  *
  */
 
@@ -595,7 +595,7 @@ class Auth_Controller extends Action_Controller
 			if ($pw_strlen === 64)
 			{
 				// Snitz style
-				$other_passwords[] = bin2hex(hash('sha256', $_POST['passwrd']));
+				$other_passwords[] = bin2hex(hash('sha256', $_POST['passwrd'], true));
 
 				// Normal SHA-256
 				$other_passwords[] = hash('sha256', $_POST['passwrd']);
@@ -668,8 +668,7 @@ class Auth_Controller extends Action_Controller
 		// ElkArte's sha1 function can give a funny result on Linux (Not our fault!). If we've now got the real one let the old one be valid!
 		if (stripos(PHP_OS, 'win') !== 0)
 		{
-			require_once(SUBSDIR . '/Compat.subs.php');
-			$other_passwords[] = sha1_smf(strtolower($user_settings['member_name']) . un_htmlspecialchars($_POST['passwrd']));
+			$other_passwords[] = bin2hex(hash('sha1', strtolower($user_settings['member_name']) . un_htmlspecialchars($_POST['passwrd']), true));
 		}
 
 		// Allows mods to easily extend the $other_passwords array
