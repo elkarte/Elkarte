@@ -591,21 +591,34 @@ class BBCParser
 	{
 		// Start with standard
 		$quote_alt = false;
+		$first_quote = 0;
+
 		foreach ($this->open_tags as $open_quote)
 		{
 			// Every parent quote this quote has flips the styling
 			if (isset($open_quote[Codes::ATTR_TAG]) && $open_quote[Codes::ATTR_TAG] === 'quote')
 			{
 				$quote_alt = !$quote_alt;
+				$first_quote++;
 			}
 		}
+
 		// Add a class to the quote and quoteheader to style alternating blockquotes
 		//  - Example: class="quoteheader" and class="quoteheader bbc_alt_quoteheader" on the header
 		//             class="bbc_quote" and class="bbc_quote bbc_alternate_quote" on the blockquote
 		// This allows simpler CSS for themes (like default) which do not use the alternate styling,
 		// but still allow it for themes that want it.
-		$tag[Codes::ATTR_BEFORE] = str_replace('<div class="quoteheader">', '<div class="quoteheader' . ($quote_alt ? ' bbc_alt_quoteheader' : '') . '">', $tag[Codes::ATTR_BEFORE]);
-		$tag[Codes::ATTR_BEFORE] = str_replace('<blockquote>', '<blockquote class="bbc_quote' . ($quote_alt ? ' bbc_alternate_quote' : '') . '">', $tag[Codes::ATTR_BEFORE]);
+		if ($first_quote === 0)
+		{
+			$tag[Codes::ATTR_BEFORE] = str_replace('<div class="quoteheader">', '<div class="quote-read-more"><input type="checkbox" title="show" class="quote-show-more"><div class="quoteheader">', $tag[Codes::ATTR_BEFORE]);
+			$tag[Codes::ATTR_BEFORE] = str_replace('<blockquote>', '<blockquote class="bbc_quote">', $tag[Codes::ATTR_BEFORE]);
+			$tag[Codes::ATTR_AFTER] = str_replace('</blockquote>', '</blockquote></div>', $tag[Codes::ATTR_AFTER]);
+		}
+		else
+		{
+			$tag[Codes::ATTR_BEFORE] = str_replace('<div class="quoteheader">', '<div class="quoteheader' . ($quote_alt ? ' bbc_alt_quoteheader' : '') . '">', $tag[Codes::ATTR_BEFORE]);
+			$tag[Codes::ATTR_BEFORE] = str_replace('<blockquote>', '<blockquote class="bbc_quote' . ($quote_alt ? ' bbc_alternate_quote' : '') . '">', $tag[Codes::ATTR_BEFORE]);
+		}
 	}
 
 	/**

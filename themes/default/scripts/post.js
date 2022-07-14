@@ -7,7 +7,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.1
+ * @version 1.1.9
  */
 
 /**
@@ -362,6 +362,9 @@ function onDocSent(XMLDoc)
 		$(this).next().children().slideToggle("fast");
 	});
 
+	// Show more quote blocks
+	if (typeof elk_quotefix === 'function')
+		elk_quotefix();
 	// Fix and Prettify code blocks
 	if (typeof elk_codefix === 'function')
 		elk_codefix();

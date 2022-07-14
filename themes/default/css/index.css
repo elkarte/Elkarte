@@ -729,6 +729,52 @@ em, .em {
 	font-weight: normal;
 }
 
+/* Expanding quotes */
+.quote-read-more {
+	position: relative;
+}
+
+/* Constrain the quote area height.  Use max height so we can have a smooth transition */
+.quote-read-more > .bbc_quote {
+	overflow: auto;
+	max-height: var(--quote_height);
+}
+
+/* Specific targeting of our checkbox.  100% wide with a gradient to cover/fade the bottom
+   of the blockquote */
+input[type=checkbox].quote-show-more {
+	position: absolute;
+	bottom: 0;
+	width: 100%;
+	min-height: 8em;
+	margin: 0 1px 1px 1px;
+	padding-top: 6em;
+	cursor: pointer;
+	text-align: center;
+	-webkit-appearance: none;
+	-moz-appearance: none;
+	appearance: none;
+}
+
+/* The read moar, with the 100% width clicking anywhere in the quote base will work
+   note content: "More" is defined in themes/default/Theme.php controller for localization */
+input[type=checkbox].quote-show-more:after {
+	font-size: 1.1em;
+	font-weight: 600;
+}
+
+/* When clicked, hide the checkbox and expand the quote */
+input[type=checkbox].quote-show-more:checked {
+	display: none;
+}
+
+/* max-height 750em is simply to avoid the clipping of any length quote, do not use none as
+   it will not provide a smooth transition */
+input[type=checkbox].quote-show-more:checked ~ .bbc_quote {
+	max-height: 750em;
+	transition: 1.5s max-height ease-in;
+}
+
 /* A quote, perhaps from another post. */
 .bbc_quote,
 /* A code block - maybe PHP ;) - shared styles. */
@@ -1849,6 +1895,11 @@ nav > .quickbuttons {
 .quickbuttons .linklevel2 {
 	padding: 0 6px 0 26px;
 	line-height: 2.1em;
+}
+
+.quick_quote_button {
+	position: absolute;
+	z-index: 10000;
 }
 
 /* -------------------------------------------------------
@@ -3317,19 +3368,39 @@ img.new_posts {
 
 .elk_video a img, .elk_video embed {
 	display: block;
+	width: 100%;
 	margin: 0 auto;
+	aspect-ratio: 16 / 9;
+	max-height: 360px;
+	object-fit: cover;
 }
 
 .elk_videoheader {
-	padding: 0 4px 0 6px;
-	max-width: 98%;
-	width: 630px;
+	width: 640px;
+	max-width: 100%;
 	border: 1px solid;
+}
+
+.elk_videoheader > a {
+	padding: 0 4px;
 }
 
 .elk_previewvideo {
 	max-width: 640px;
 	height: auto;
+}
+
+/* These deal with 9/16 videos (like tiktok) */
+.elk_video.portrait {
+	max-width: 480px;
+	min-height: 480px;
+	width: 100%;
+	max-height: initial;
+}
+
+.elk_videoheader.portrait {
+	width: 480px;
+	margin: 0px 0 -18px 0;
 }
 
 /* Basic stuff for the bottom of Display.template.php. */

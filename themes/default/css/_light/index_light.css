@@ -333,6 +333,11 @@ strong {
 	background: #FEFEFE;
 }
 
+input[type=checkbox].quote-show-more {
+	background: linear-gradient(to bottom, transparent 0%, transparent 25%, #FEFEFE 100%);
+	box-shadow: 0 1px 0 1px #E4E4E4;
+}
+
 /* Extra quote styling */
 .bbc_quote, .quoteheader {
 	box-shadow: 2px 2px 2px #DDDDDD;
