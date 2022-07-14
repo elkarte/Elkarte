@@ -679,7 +679,13 @@ class Display_Controller extends Action_Controller
 
 		// Quick reply & modify enabled?
 		if ($context['can_reply'] && !empty($options['display_quick_reply']))
+		{
+			loadJavascriptFile('quickQuote.js', array('defer' => true));
 			$this->_template_layers->add('quickreply');
+			theme()->addInlineJavascript("
+				document.addEventListener('DOMContentLoaded', () => new Elk_QuickQuote(), false);", true
+			);
+		}
 
 		$this->_template_layers->add('pages_and_buttons');
 
