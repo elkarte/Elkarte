@@ -11,7 +11,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.1
+ * @version 1.1.9
  *
  */
 
@@ -303,7 +303,7 @@ class ManagePosts_Controller extends Action_Controller
 		// Initialize it with our settings
 		$config_vars = array(
 			// Simple post options...
-			array('check', 'removeNestedQuotes'),
+			array('int', 'removeNestedQuotes', 'postinput' => $txt['zero_to_disable']),
 			array('check', 'enableVideoEmbeding'),
 			array('check', 'enableCodePrettify'),
 			// Note show the warning as read if pspell not installed!
