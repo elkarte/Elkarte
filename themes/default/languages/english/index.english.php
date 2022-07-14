@@ -913,10 +913,11 @@ $txt['debug_script_cpu_load'] = 'Script CPU Time (user/system): ';
 
 // Video embedding
 $txt['preview_image'] = 'Video Preview Image';
-$txt['ctp_video'] = 'Click to play video, double click to load video';
+$txt['ctp_video'] = 'Click to play video';
 $txt['hide_video'] = 'Show/Hide video';
 $txt['youtube'] = 'YouTube video:';
 $txt['vimeo'] = 'Vimeo video:';
+$txt['tiktok'] = 'TikTok video:';
 $txt['dailymotion'] = 'Dailymotion video:';
 
 // Spoiler BBC

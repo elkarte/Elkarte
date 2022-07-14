@@ -512,6 +512,7 @@ class Theme extends \Theme
 				hide_video : ' . JavaScriptEscape($txt['hide_video']) . ',
 				youtube : ' . JavaScriptEscape($txt['youtube']) . ',
 				vimeo : ' . JavaScriptEscape($txt['vimeo']) . ',
+				tiktok : ' . JavaScriptEscape($txt['tiktok']) . ',
 				dailymotion : ' . JavaScriptEscape($txt['dailymotion']) . '
 			});', true);
 
