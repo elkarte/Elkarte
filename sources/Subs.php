@@ -972,6 +972,8 @@ function host_from_ip($ip)
 			$test = @shell_exec('host ' . @escapeshellarg($ip));
 		}
 
+		$test = $test ?? '';
+
 		// Did host say it didn't find anything?
 		if (strpos($test, 'not found') !== false)
 		{
@@ -1725,7 +1727,7 @@ function removeNestedQuotes($text)
 	}
 
 	// Remove just -some- of the quotes, we need to find them all
-	preg_match_all('~(\[\/?quote(?:=(.*?))?\])~i', $text, $matches, PREG_OFFSET_CAPTURE);
+	preg_match_all('~(\[\/?quote(?:(.*?))?\])~i', $text, $matches, PREG_OFFSET_CAPTURE);
 	$depth = 0;
 	$remove = [];
 	$start_pos = 0;
