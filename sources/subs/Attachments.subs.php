@@ -1266,11 +1266,9 @@ function isAttachmentImage($id_attach)
 			INNER JOIN {db_prefix}boards AS b ON (b.id_board = m.id_board AND {query_see_board})
 		WHERE id_attach = {int:attach}
 			AND attachment_type = {int:type}
-			AND a.approved = {int:approved}
 		LIMIT 1',
 		array(
 			'attach' => $id_attach,
-			'approved' => 1,
 			'type' => 0,
 		)
 	);
@@ -1280,6 +1278,7 @@ function isAttachmentImage($id_attach)
 		$attachmentData = $db->fetch_assoc($request);
 		$attachmentData['is_image'] = substr($attachmentData['mime_type'], 0, 5) === 'image';
 		$attachmentData['size'] = byte_format($attachmentData['size']);
+		$attachmentData['is_approved'] = $attachmentData['approved'] === '1';
 	}
 	$db->free_result($request);
 
