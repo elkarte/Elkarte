@@ -736,7 +736,7 @@ em, .em {
 
 .bbc_quote {
 	margin: .4em 0 1em 0;
-	border: 1px solid;
+	border-top: 1px solid;
 }
 
 /* Expanding quotes */

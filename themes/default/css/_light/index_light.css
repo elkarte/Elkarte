@@ -479,6 +479,7 @@ strong {
 
 input[type=checkbox].quote-show-more {
 	background: linear-gradient(to bottom, var(--transparent) 0%, var(--transparent) 40%, var(--primary_content_background) 100%);
+	box-shadow: 0 0 0 1px var(--box_shadow);
 }
 
 /* Extra quote styling */
@@ -897,12 +898,6 @@ sup.bbc_footnotes, sup.bbc_footnotes a {
 
 .quickbuttons .linklevel1:not(.active) {
 	color: var(--menu_text);
-}
-
-.quick_quote_button > .warning {
-	border-color: var(--primary_border);
-	background: var(--description);
-	box-shadow: 0 0 15px 1px var(--opacity30);
 }
 
 /* -------------------------------------------------------
