@@ -660,9 +660,11 @@ Elk_QuickQuote.prototype.handleQuote = function(selectionAncestor)
 		data_quoted = cite.textContent.split(':')[1].trim();
 	}
 
-	if (data_quoted.includes(String.fromCharCode(160)))
+	// Name and date may be separated by &ndash; as author - date
+	let separator = ' ' + String.fromCharCode(8211) + ' ';
+	if (data_quoted.includes(separator))
 	{
-		data_quoted = data_quoted.split(String.fromCharCode(160))[0].trim();
+		data_quoted = data_quoted.split(separator)[0].trim();
 	}
 
 	if (cite.firstElementChild && cite.firstElementChild.hasAttribute('href'))
