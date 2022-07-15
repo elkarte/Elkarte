@@ -709,6 +709,12 @@ class BBCParser
 		// +1 for [, then the length of the tag, then a space
 		$this->pos1 = $this->pos + 1 + $possible[Codes::ATTR_LENGTH] + 1;
 
+		// If we need to reset content attr, this is where we step in
+		if (isset($possible[Codes::ATTR_RESET]))
+		{
+			$possible[Codes::ATTR_CONTENT] = $possible[Codes::ATTR_RESET];
+		}
+
 		// This is long, but it makes things much easier and cleaner.
 		if (!empty($possible[Codes::ATTR_PARAM]))
 		{

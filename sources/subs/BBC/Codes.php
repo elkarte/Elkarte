@@ -170,6 +170,11 @@ class Codes
 	 */
 	const ATTR_NO_CACHE = 25;
 
+	/**
+	 * If to reset ATTR_CONTENT to a new value, useful when build content tag in addons
+	 */
+	const ATTR_RESET = 26;
+
 	/** [tag]parsed content[/tag] */
 	const TYPE_PARSED_CONTENT = 0;
 
