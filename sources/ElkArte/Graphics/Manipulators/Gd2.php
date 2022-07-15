@@ -461,27 +461,37 @@ class Gd2 extends AbstractManipulator
 
 		$text_color = imagecolorallocate($image, 109, 109, 109);
 		$font = $settings['default_theme_dir'] . '/fonts/VDS_New.ttf';
+		$true_type = function_exists('imagettftext');
+
+		if (!$true_type)
+		{
+			// @todo If using imagestring, (no freetype) we would need to output each line then advance the position
+			$text = str_replace("\n", ' ', $text);
+			$text_length = strlen($text);
+		}
 
 		// The loop is to try to fit the text into the image.
-		$true_type = function_exists('imagettftext');
 		$font_size = $true_type ? 28 : 5;
 		do
 		{
 			if ($true_type)
 			{
 				$metric = imagettfbbox($font_size, 0, $font, $text);
-				$text_width = abs($metric[4] - $metric[0]);
-				$text_height = abs($metric[5] - $metric[1]);
+				$text_width = abs($metric[4] - $metric[6]);
+				$text_height = abs($metric[5] - $metric[3]);
+				$text_offset = $metric[7];
 			}
 			else
 			{
-				$text_width = imagefontwidth($font_size) * strlen($text);
+				$text_width = imagefontwidth($font_size) * $text_length;
 				$text_height = imagefontheight($font_size);
 			}
 		} while ($text_width > $width && $font_size-- > 1);
 
-		$w_offset = ($width - $text_width) / 2;
-		$h_offset = $true_type ? ($height / 2) + ($text_height / 2) : ($height - $text_height) / 2;
+		// Center the image on the canvas
+		$w_offset = floor(($width - $text_width) / 2);
+		$h_offset = floor(($height - $text_height) / 2);
+		$h_offset = $true_type ? $h_offset - $text_offset : $h_offset;
 
 		if ($true_type)
 		{
@@ -495,8 +505,7 @@ class Gd2 extends AbstractManipulator
 		// Capture the image string
 		ob_start();
 		$result = $create_function($image);
-		$image = ob_get_contents();
-		ob_end_clean();
+		$image = ob_get_clean();
 		$this->__destruct();
 
 		return $result ? $image : false;
