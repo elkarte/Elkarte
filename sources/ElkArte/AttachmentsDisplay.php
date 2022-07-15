@@ -182,7 +182,7 @@ class AttachmentsDisplay
 		if ($have_unapproved)
 		{
 			// Unapproved attachments go first.
-			usort($attachmentData, function ($a, $b) {
+			usort($attachmentData, static function ($a, $b) {
 				if ($a['is_approved'] === $b['is_approved'])
 				{
 					return 0;
