@@ -15,7 +15,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.1.7
+ * @version 1.1.9
  *
  */
 
@@ -1486,6 +1486,7 @@ function generateTextImageWithGD($text, $width = 100, $height = 100, $format = '
 			$metric = imagettfbbox($font_size, 0, $font, $text);
 			$text_width = abs($metric[4] - $metric[0]);
 			$text_height = abs($metric[5] - $metric[1]);
+			$text_offset = $metric[7];
 		}
 		else
 		{
@@ -1494,8 +1495,9 @@ function generateTextImageWithGD($text, $width = 100, $height = 100, $format = '
 		}
 	} while ($text_width > $width && $font_size-- > 1);
 
-	$w_offset = ($width - $text_width) / 2;
-	$h_offset = $true_type ? ($height / 2) + ($text_height / 2) : ($height - $text_height) / 2;
+	$w_offset = floor(($width - $text_width) / 2);
+	$h_offset = floor(($height - $text_height) / 2);
+	$h_offset = $true_type ? $h_offset - $text_offset : $h_offset;
 
 	if ($true_type)
 	{
