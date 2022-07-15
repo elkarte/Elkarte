@@ -313,10 +313,7 @@ class Display extends AbstractController
 			loadJavascriptFile(['mentioning.js', 'quickQuote.js'], ['defer' => true]);
 			$this->_template_layers->addBefore('quickreply', 'moderation_buttons');
 			theme()->addInlineJavascript("
-				let opt = {
-					infoText: " . JavaScriptEscape($txt['quote_quick_help']) . ",
-				};
-				document.addEventListener('DOMContentLoaded', () => new Elk_QuickQuote(opt), false);", true
+				document.addEventListener('DOMContentLoaded', () => new Elk_QuickQuote(), false);", true
 			);
 		}
 	}
