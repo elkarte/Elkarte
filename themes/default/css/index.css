@@ -3162,7 +3162,7 @@ img.new_posts {
 }
 
 .smiley {
-	vertical-align: bottom;
+	vertical-align: text-bottom;
 }
 
 /* All the signatures used in the forum. */
