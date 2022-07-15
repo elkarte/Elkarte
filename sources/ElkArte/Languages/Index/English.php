@@ -534,7 +534,6 @@ $txt['quote_from'] = 'Quote from';
 $txt['quote'] = 'Quote';
 $txt['quick_quote'] = 'Quote Selected';
 $txt['quote_new'] = 'New topic';
-$txt['quote_quick_help'] = 'Please select some text';
 $txt['follow_ups'] = 'Follow-ups';
 $txt['topic_derived_from'] = 'Topic derived from %1$s';
 $txt['edit'] = 'Edit';
