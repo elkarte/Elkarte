@@ -18,7 +18,7 @@
 namespace ElkArte\Subscriptions\PaymentGateway;
 
 /**
- * Class of functions to validate a twocheckout payment response and provide details of the payment
+ * Class of functions to validate a payment response and provide details of the payment
  *
  * @package Subscriptions
  */
