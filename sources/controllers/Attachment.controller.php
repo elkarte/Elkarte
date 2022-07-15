@@ -288,16 +288,25 @@ class Attachment_Controller extends Action_Controller
 	 */
 	public function action_dlattach()
 	{
-		global $modSettings, $user_info, $context, $topic, $board, $settings;
+		global $modSettings, $user_info, $context, $topic, $board, $settings, $txt;
 
 		// Some defaults that we need.
 		$context['no_last_modified'] = true;
 		$filename = null;
 
 		// Make sure some attachment was requested!
-		if (!isset($this->_req->query->attach) && !isset($this->_req->query->id))
+		if (!isset($this->_req->query->attach))
 		{
-			return $this->action_no_attach();
+			if (!isset($this->_req->query->id))
+				$this->action_no_attach();
+
+			if ($this->_req->query->id === 'ila')
+			{
+				loadLanguage('index');
+				$this->action_no_attach($txt['awaiting_approval']);
+			}
+
+			return;
 		}
 
 		// We need to do some work on attachments and avatars.
