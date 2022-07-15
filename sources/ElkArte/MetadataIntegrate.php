@@ -128,7 +128,6 @@ class MetadataIntegrate
 			&& $start === 0
 			&& (!empty($context['get_message'][0]) && is_object($context['get_message'][0])))
 		{
-
 			// Grab the first post of the thread
 			$controller = $context['get_message'][0];
 			$smd = $controller->{$context['get_message'][1]}();
@@ -236,6 +235,7 @@ class MetadataIntegrate
 			'author' => [
 				'@type' => 'Person',
 				'name' => $this->data['member']['name'],
+				'url' => $this->data['member']['href']
 			],
 			'url' => $this->data['href'],
 			'articleBody' => $this->data['html_body'],
