@@ -456,7 +456,7 @@ class Auth extends AbstractController
 			if ($pw_strlen === 64)
 			{
 				// Snitz style
-				$other_passwords[] = bin2hex(hash('sha256', $posted_password));
+				$other_passwords[] = bin2hex(hash('sha256', $posted_password, true));
 
 				// Normal SHA-256
 				$other_passwords[] = hash('sha256', $posted_password);
@@ -533,8 +533,7 @@ class Auth extends AbstractController
 		// ElkArte's sha1 function can give a funny result on Linux (Not our fault!). If we've now got the real one let the old one be valid!
 		if (strpos(PHP_OS_FAMILY, 'Win') !== 0)
 		{
-			require_once(SUBSDIR . '/Compat.subs.php');
-			$other_passwords[] = sha1_smf(strtolower($member_name) . un_htmlspecialchars($posted_password));
+			$other_passwords[] = bin2hex(hash('sha1', strtolower($member_name) . un_htmlspecialchars($posted_password), true));
 		}
 
 		// Allows mods to easily extend the $other_passwords array
