@@ -219,7 +219,7 @@ function template_messages()
 
 		// This is the floating Quick Quote button.
 		echo '
-							<button id="button_float_qq_', $message['id'], '" type="submit" role="button" class="quick_quote_button hide">', $txt['quick_quote'], '</button>';
+							<button id="button_float_qq_', $message['id'], '" type="submit" role="button" class="quick_quote_button hide">', !empty($txt['quick_quote']) ? $txt['quick_quote'] : $txt['quote'], '</button>';
 
 
 		// Assuming there are attachments...
