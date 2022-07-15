@@ -399,17 +399,24 @@ function onDocSent(XMLDoc)
 		$(this).next().children().slideToggle("fast");
 	});
 
+	// Show more quote blocks
+	if (typeof elk_quotefix === 'function')
+	{
+		elk_quotefix();
+	}
+
 	// Fix and Prettify code blocks
 	if (typeof elk_codefix === 'function')
 	{
 		elk_codefix();
 	}
+
 	if (typeof prettyPrint === 'function')
 	{
 		prettyPrint();
 	}
 
-	// Prevent lighbox or default action on the preview
+	// Prevent lightbox or default action on the preview
 	$('[data-lightboximage]').on('click.elk_lb', function (e)
 	{
 		e.preventDefault();
