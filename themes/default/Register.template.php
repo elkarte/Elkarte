@@ -298,7 +298,10 @@ function template_registration_form()
 				<label for="checkbox_agreement">
 					<input type="checkbox" name="checkbox_agreement" id="checkbox_agreement" value="1"', ($context['registration_passed_agreement'] ? ' checked="checked"' : ''), ' tabindex="', $context['tabindex']++, '" />
 					', $txt['checkbox_agreement'], '
-				</label>
+				</label>';
+
+		if (!empty($context['privacy_policy']))
+			echo '	
 				<div id="privacypol_box">
 					', $context['privacy_policy'], '
 				</div>
