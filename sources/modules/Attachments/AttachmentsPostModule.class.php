@@ -11,7 +11,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.1.2
+ * @version 1.1.9
  *
  */
 
@@ -464,6 +464,7 @@ class Attachments_Post_Module extends ElkArte\sources\modules\Abstract_Module
 						if (!empty($attachmentOptions['thumb']))
 							$this->_saved_attach_id[] = $attachmentOptions['thumb'];
 
+						$msgOptions['body'] = preg_replace('~\[attachurl(?:.*?)\]' . $attachment['public_attachid'] . '\[\/attachurl\]~', '[attachurl]' . $attachmentOptions['id'] . '[/attachurl]', $msgOptions['body']);
 						$msgOptions['body'] = preg_replace('~\[attach(.*?)\]' . $attachment['public_attachid'] . '\[\/attach\]~', '[attach$1]' . $attachmentOptions['id'] . '[/attach]', $msgOptions['body']);
 					}
 				}
