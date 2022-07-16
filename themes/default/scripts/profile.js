@@ -301,6 +301,30 @@ function previewExternalAvatar(src)
 }
 
 /**
+ * Allows for the previewing of an uploaded avatar
+ *
+ * @param {object} src
+ */
+function previewUploadedAvatar(src)
+{
+	if (src.files && src.files[0])
+	{
+		let reader = new FileReader();
+
+		reader.readAsDataURL(src.files[0]);
+		reader.onload = function ()
+		{
+			let current_avatar = document.getElementById('current_avatar'),
+				current_avatar_new = document.getElementById('current_avatar_new');
+
+			current_avatar_new.src = String(reader.result);
+			current_avatar_new.classList.remove('hide');
+			current_avatar.classList.add('hide');
+		};
+	}
+}
+
+/**
  * Disable notification boxes as required.  This is in response to selecting the
  * notify user checkbox in the issue a warning screen
  */
