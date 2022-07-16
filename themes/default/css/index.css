@@ -1751,8 +1751,9 @@ nav > .quickbuttons {
 }
 
 .quickbuttons .inline_mod_check {
-	margin: 4px 4px 4px 0;
+	margin: 4px 0 0 0;
 	padding: 0 4px;
+	border: 1px solid;
 }
 
 /* @todo - Save code by amalgamating common button background declarations. */
@@ -1824,13 +1825,12 @@ nav > .quickbuttons {
 .quick_edit:before        {background-position: 0 -456px;}
 .reacts_button:before      {background-position: 0 -480px;}
 
-/* Radius left end of the first (Quote) button. */
-.linklevel1.quote_button {
+/* Radius the ends of the first/last button. */
+.quickbuttons li:last-child, .quickbuttons li:last-child a {
 	border-radius: 2px 0 0 2px;
 }
 
-/* Radius right end of the last button. */
-.linklevel1.post_options, .linklevel1.remove_button {
+.quickbuttons li:first-child, .quickbuttons li:first-child a {
 	border-radius: 0 2px 2px 0;
 }
 
