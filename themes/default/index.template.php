@@ -84,10 +84,16 @@ function template_html_above()
 	<title>', $context['page_title_html_safe'], '</title>
 	<meta charset="utf-8" />';
 
+	$description = $context['page_title_html_safe'];
+	if (isset($context['page_description']))
+	{
+		$description .= ': ' . $context['page_description'];
+	}
+
 	echo '
 	<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 	<meta name="mobile-web-app-capable" content="yes" />
-	<meta name="description" content="', $context['page_title_html_safe'], '" />';
+	<meta name="description" content="', $description, '" />';
 
 	// Please don't index these Mr Robot.
 	if (!empty($context['robot_no_index']))

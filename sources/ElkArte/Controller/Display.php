@@ -24,6 +24,7 @@ use ElkArte\MessagesCallback\DisplayRenderer;
 use ElkArte\MessagesDelete;
 use ElkArte\MessageTopicIcons;
 use ElkArte\User;
+use ElkArte\Util;
 use ElkArte\ValuesContainer;
 
 /**
@@ -83,7 +84,7 @@ class Display extends AbstractController
 		global $txt, $modSettings, $context, $settings, $options, $topic, $board;
 		global $messages_request;
 
-		$this->_events->trigger('pre_load', array('_REQUEST' => &$_REQUEST, 'topic' => $topic, 'board' => &$board));
+		$this->_events->trigger('pre_load', ['_REQUEST' => &$_REQUEST, 'topic' => $topic, 'board' => &$board]);
 
 		// What are you gonna display if these are empty?!
 		if (empty($topic))
@@ -627,24 +628,25 @@ class Display extends AbstractController
 		$context['signature_enabled'] = strpos($modSettings['signature_settings'], '1') === 0;
 		$context['disabled_fields'] = isset($modSettings['disabled_profile_fields']) ? array_flip(explode(',', $modSettings['disabled_profile_fields'])) : [];
 
-		// Page title
+		// Page title & description
 		$context['page_title'] = $this->topicinfo['subject'];
+		$context['page_description'] = Util::shorten_text(strip_tags($this->topicinfo['body']), 128);
 
 		// Create a previous next string if the selected theme has it as a selected option.
 		if ($modSettings['enablePreviousNext'])
 		{
-			$context['links'] += array(
+			$context['links'] += [
 				'go_prev' => getUrl('topic', ['topic' => $this->topicinfo['id_topic'], 'start' => '0', 'subject' => $this->topicinfo['subject'], 'prev_next' => 'prev']) . '#new',
 				'go_next' => getUrl('topic', ['topic' => $this->topicinfo['id_topic'], 'start' => '0', 'subject' => $this->topicinfo['subject'], 'prev_next' => 'next']) . '#new'
-			);
+			];
 		}
 
 		// Build the jump to box
-		$context['jump_to'] = array(
+		$context['jump_to'] = [
 			'label' => addslashes(un_htmlspecialchars($txt['jump_to'])),
-			'board_name' => htmlspecialchars(strtr(strip_tags($board_info['name']), array('&amp;' => '&')), ENT_COMPAT),
+			'board_name' => htmlspecialchars(strtr(strip_tags($board_info['name']), ['&amp;' => '&']), ENT_COMPAT),
 			'child_level' => $board_info['child_level'],
-		);
+		];
 
 		// Build a list of this board's moderators.
 		$context['moderators'] = &$board_info['moderators'];

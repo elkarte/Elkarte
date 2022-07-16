@@ -137,8 +137,9 @@ class BoardIndex extends AbstractController implements FrontpageInterface
 
 		$context['page_title'] = sprintf($txt['forum_index'], $context['forum_name']);
 		$context['sub_template'] = 'boards_list';
+		$context['page_description'] = implode(' | ', array_column($context['categories'], 'name'));
 
-		$context['info_center_callbacks'] = array();
+		$context['info_center_callbacks'] = [];
 		if (!empty($settings['number_recent_posts']) && (!empty($context['latest_posts']) || !empty($context['latest_post'])))
 		{
 			$context['info_center_callbacks'][] = 'recent_posts';

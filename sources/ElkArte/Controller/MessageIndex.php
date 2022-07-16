@@ -262,6 +262,7 @@ class MessageIndex extends AbstractController implements FrontpageInterface
 
 		// 'Print' the header and board info.
 		$context['page_title'] = strip_tags($board_info['name']);
+		$context['page_description'] = strip_tags($context['description']);
 
 		// Set the variables up for the template.
 		$context['can_mark_notify'] = allowedTo('mark_notify') && $this->user->is_guest === false;
