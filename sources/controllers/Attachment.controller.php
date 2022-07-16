@@ -11,7 +11,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.1.8
+ * @version 1.1.9
  *
  */
 
@@ -305,8 +305,6 @@ class Attachment_Controller extends Action_Controller
 				loadLanguage('index');
 				$this->action_no_attach($txt['awaiting_approval']);
 			}
-
-			return;
 		}
 
 		// We need to do some work on attachments and avatars.
