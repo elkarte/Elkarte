@@ -178,9 +178,9 @@ input[type="submit"]:hover, button[type="submit"]:hover, input[type="button"]:ho
 /* Standard horizontal rule.. ([hr], etc.) */
 hr {
 	border-top-color: #BBBBBB;
+	border-bottom-color: #E4E4E4;
 	background: #EEEEEE;
 }
-
 
 /* @todo - Test this everywhere. */
 .content {

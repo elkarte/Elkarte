@@ -3350,6 +3350,8 @@ img.new_posts {
 	display: block;
 	width: 0;
 	content: '';
+	border-width: 10px 10px 0;
+	border-style: solid;
 }
 
 .new_post_separator:before {
