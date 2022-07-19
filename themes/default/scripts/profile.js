@@ -315,9 +315,10 @@ function previewUploadedAvatar(src)
 		reader.onload = function ()
 		{
 			let current_avatar = document.getElementById('current_avatar'),
-				current_avatar_new = document.getElementById('current_avatar_new');
+				current_avatar_new = document.getElementById('current_avatar_new'),
+				current_avatar_new_preview = document.getElementById('current_avatar_new_preview');
 
-			current_avatar_new.src = String(reader.result);
+			current_avatar_new_preview.src = String(reader.result);
 			current_avatar_new.classList.remove('hide');
 			current_avatar.classList.add('hide');
 		};
