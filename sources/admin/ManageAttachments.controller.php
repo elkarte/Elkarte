@@ -11,7 +11,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.1.7
+ * @version 1.1.9
  *
  */
 
@@ -242,6 +242,15 @@ class ManageAttachments_Controller extends Action_Controller
 				}
 			}
 
+			// Allow webp extension if its being enabled
+			if (!empty($this->_req->post->attachment_webp_enable))
+			{
+				if (strpos($this->_req->post->attachmentExtensions, 'webp') === false)
+				{
+					$this->_req->post->attachmentExtensions .= ',webp';
+				}
+			}
+
 			call_integration_hook('integrate_save_attachment_settings');
 
 			$settingsForm->setConfigValues((array) $this->_req->post);
@@ -296,22 +305,21 @@ class ManageAttachments_Controller extends Action_Controller
 		$txt['basedirectory_for_attachments_warning'] = $txt['basedirectory_for_attachments_current'] . $txt['basedirectory_for_attachments_warning'];
 
 		// Perform a test to see if the GD module or ImageMagick are installed.
-		$testImg = get_extension_funcs('gd') || class_exists('Imagick');
+		require_once(SUBSDIR . '/Graphics.subs.php');
+		$testImg = checkGD() || checkImagick();
+		$testWebP = hasWebpSupport();
+		$testImgRotate = checkImagick() || (checkGD() && function_exists('exif_read_data'));
 
 		// See if we can find if the server is set up to support the attachment limits
 		$post_max_size = ini_get('post_max_size');
 		$upload_max_filesize = ini_get('upload_max_filesize');
 		$testPM = !empty($post_max_size) ? (memoryReturnBytes($post_max_size) >= (isset($modSettings['attachmentPostLimit']) ? $modSettings['attachmentPostLimit'] * 1024 : 0)) : true;
 		$testUM = !empty($upload_max_filesize) ? (memoryReturnBytes($upload_max_filesize) >= (isset($modSettings['attachmentSizeLimit']) ? $modSettings['attachmentSizeLimit'] * 1024 : 0)) : true;
-		$testImgRotate = class_exists('Imagick') || (get_extension_funcs('gd') && function_exists('exif_read_data'));
 
 		$config_vars = array(
 			array('title', 'attachment_manager_settings'),
 				// Are attachments enabled?
 				array('select', 'attachmentEnable', array($txt['attachmentEnable_deactivate'], $txt['attachmentEnable_enable_all'], $txt['attachmentEnable_disable_new'])),
-			'',
-				// Extension checks etc.
-				array('check', 'attachmentRecodeLineEndings'),
 			'',
 				// Directory and size limits.
 				array('select', 'automanage_attachments', array(0 => $txt['attachments_normal'], 1 => $txt['attachments_auto_space'], 2 => $txt['attachments_auto_years'], 3 => $txt['attachments_auto_months'], 4 => $txt['attachments_auto_16'])),
@@ -337,7 +345,9 @@ class ManageAttachments_Controller extends Action_Controller
 				array('warning', empty($testUM) ? 'attachment_filesize_warning' : ''),
 				array('int', 'attachmentSizeLimit', 'subtext' => $txt['zero_for_no_limit'], 6, 'postinput' => $txt['kilobyte']),
 				array('int', 'attachmentNumPerPostLimit', 'subtext' => $txt['zero_for_no_limit'], 6),
-				array('check', 'attachment_autorotate', 'postinput' => empty($testImgRotate) ? $txt['attachment_autorotate_na'] : ''),
+				'',
+				array('check', 'attachment_webp_enable', 'disabled' => !$testWebP, 'postinput' => $testWebP ? "" : $txt['attachment_webp_enable_na']),
+				array('check', 'attachment_autorotate', 'disabled' => !$testImgRotate, 'postinput' => $testImgRotate ? '' : $txt['attachment_autorotate_na']),
 			// Security Items
 			array('title', 'attachment_security_settings'),
 				// Extension checks etc.
@@ -354,7 +364,6 @@ class ManageAttachments_Controller extends Action_Controller
 			array('title', 'attachment_thumbnail_settings'),
 				array('check', 'attachmentShowImages'),
 				array('check', 'attachmentThumbnails'),
-				array('check', 'attachment_thumb_png'),
 				array('check', 'attachment_thumb_memory', 'subtext' => $txt['attachment_thumb_memory_note1'], 'postinput' => $txt['attachment_thumb_memory_note2']),
 				array('text', 'attachmentThumbWidth', 6),
 				array('text', 'attachmentThumbHeight', 6),

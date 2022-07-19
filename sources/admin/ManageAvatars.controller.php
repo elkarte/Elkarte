@@ -159,7 +159,7 @@ class ManageAvatars_Controller extends Action_Controller
 				array('warning', 'avatar_paranoid_warning'),
 				array('check', 'avatar_paranoid'),
 			'',
-				array('check', 'avatar_download_png'),
+				//array('check', 'avatar_download_png'),
 				array('select', 'custom_avatar_enabled', array($txt['option_attachment_dir'], $txt['option_specified_dir']), 'onchange' => 'fUpdateStatus();'),
 				array('text', 'custom_avatar_dir', 40, 'subtext' => $txt['custom_avatar_dir_desc'], 'invalid' => !$context['valid_custom_avatar_dir']),
 				array('text', 'custom_avatar_url', 40),

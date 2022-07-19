@@ -33,12 +33,12 @@
  */
 function createThumbnail($source, $max_width, $max_height)
 {
-	global $modSettings;
-
 	$destName = $source . '_thumb.tmp';
+	$max_width = max(16, $max_width);
+	$max_height = max(16, $max_height);
 
 	// Do the actual resize, thumbnails by default strip EXIF data to save space
-	$format = !empty($modSettings['attachment_thumb_png']) ? 3 : 0;
+	$format = setDefaultFormat($source);
 	$success = resizeImageFile($source, $destName, $max_width, $max_height, $format, true);
 
 	// Okay, we're done with the temporary stuff.
@@ -72,6 +72,7 @@ function createThumbnail($source, $max_width, $max_height)
  *   - 3 for png
  *   - 6 for bmp
  *   - 15 for wbmp
+ *   - 18 for webp
  *
  * @return boolean true on success, false on failure.
  */
@@ -184,6 +185,28 @@ function checkImagick()
 }
 
 /**
+ * Check if the system supports webP
+ *
+ * @return bool
+ */
+function hasWebpSupport()
+{
+	if (checkImagick())
+	{
+		$check = Imagick::queryformats();
+		return in_array('WEBP', $check);
+	}
+
+	if (checkGD())
+	{
+		$check = gd_info();
+		return !empty($check['WebP Support']);
+	}
+
+	return false;
+}
+
+/**
  * See if we have enough memory to thumbnail an image
  *
  * @package Graphics
@@ -242,6 +265,8 @@ function imageMemoryCheck($sizes)
  */
 function resizeImageFile($source, $destination, $max_width, $max_height, $preferred_format = 0, $strip = false, $force_resize = true)
 {
+	global $modSettings;
+
 	// Nothing to do without GD or IM
 	if (!checkGD() && !checkImagick())
 		return false;
@@ -251,12 +276,13 @@ function resizeImageFile($source, $destination, $max_width, $max_height, $prefer
 		return false;
 	}
 
-	static $default_formats = array(
-		'1' => 'gif',
-		'2' => 'jpeg',
-		'3' => 'png',
-		'6' => 'bmp',
-		'15' => 'wbmp'
+	$default_formats = array(
+		1 => 'gif',
+		2 => 'jpeg',
+		3 => 'png',
+		6 => 'bmp',
+		15 => 'wbmp',
+		18 => 'webp'
 	);
 
 	require_once(SUBSDIR . '/Package.subs.php');
@@ -295,8 +321,15 @@ function resizeImageFile($source, $destination, $max_width, $max_height, $prefer
 	else
 		$sizes = array(-1, -1, -1);
 
+	if ($sizes[0] === -1)
+		return false;
+
 	// See if we have -or- can get the needed memory for this operation
 	if (checkGD() && !imageMemoryCheck($sizes))
+		return false;
+
+	// Not allowed to save webp or can't support webp input
+	if ((empty($modSettings['attachment_webp_enable']) && $preferred_format == 18) || ($sizes[2] == 18 && !hasWebpSupport()))
 		return false;
 
 	// A known and supported format?
@@ -306,10 +339,15 @@ function resizeImageFile($source, $destination, $max_width, $max_height, $prefer
 	}
 	elseif (checkGD() && isset($default_formats[$sizes[2]]) && function_exists('imagecreatefrom' . $default_formats[$sizes[2]]))
 	{
-		$imagecreatefrom = 'imagecreatefrom' . $default_formats[$sizes[2]];
-		if ($src_img = @$imagecreatefrom($destination))
+		try
 		{
+			$imagecreatefrom = 'imagecreatefrom' . $default_formats[$sizes[2]];
+			$src_img = $imagecreatefrom($destination);
 			return resizeImage($src_img, $destination, imagesx($src_img), imagesy($src_img), $max_width === null ? imagesx($src_img) : $max_width, $max_height === null ? imagesy($src_img) : $max_height, $force_resize, $preferred_format, $strip);
+		}
+		catch (\Exception $e)
+		{
+			return false;
 		}
 	}
 
@@ -345,24 +383,31 @@ function resizeImageFile($source, $destination, $max_width, $max_height, $prefer
  *   - 3 for png
  *   - 6 for bmp
  *   - 15 for wbmp
+ *   - 18 for webp
  * @param bool $strip Whether to have IM strip EXIF data as GD will
  *
  * @return bool Whether resize was successful.
  */
 function resizeImage($src_img, $destName, $src_width, $src_height, $max_width, $max_height, $force_resize = false, $preferred_format = 0, $strip = false)
 {
-	global $gd2;
+	global $gd2, $modSettings;
 
 	if (checkImagick())
 	{
 		// These are the file formats we know about
-		static $default_formats = array(
-			'1' => 'gif',
-			'2' => 'jpeg',
-			'3' => 'png',
-			'6' => 'bmp',
-			'15' => 'wbmp'
+		$default_formats = array(
+			1 => 'gif',
+			2 => 'jpeg',
+			3 => 'png',
+			6 => 'bmp',
+			15 => 'wbmp',
+			18 => 'webp'
 		);
+
+		// Just to be sure, if the admin does not want webp
+		if (empty($modSettings['attachment_webp_enable']))
+			unset($default_formats[18]);
+
 		$preferred_format = empty($preferred_format) || !isset($default_formats[$preferred_format]) ? 2 : $preferred_format;
 
 		// Since Imagick can throw exceptions, lets catch them
@@ -384,6 +429,19 @@ function resizeImage($src_img, $destName, $src_width, $src_height, $max_width, $
 			{
 				$imagick->borderImage('white', 0, 0);
 				$imagick->setImageCompression(Imagick::COMPRESSION_JPEG);
+				$imagick->setImageCompressionQuality(80);
+			}
+
+			// With PNG Save a few bytes the only way, realistically, we can
+			if ($default_formats[$preferred_format] === 'png')
+			{
+				$imagick->setOption('png:compression-level', '9');
+				$imagick->setOption('png:exclude-chunk', 'all');
+			}
+
+			// Webp
+			if ($default_formats[$preferred_format] === 'webp')
+			{
 				$imagick->setImageCompressionQuality(80);
 			}
 
@@ -436,22 +494,19 @@ function resizeImage($src_img, $destName, $src_width, $src_height, $max_width, $
 				{
 					$dst_img = imagecreatetruecolor($dst_width, $dst_height);
 
-					// Deal nicely with a PNG - because we can.
-					if ((!empty($preferred_format)) && ($preferred_format == 3))
-					{
-						imagealphablending($dst_img, false);
-						if (function_exists('imagesavealpha'))
-							imagesavealpha($dst_img, true);
-					}
+					// Make a true color image, because it just looks better for resizing.
+					imagesavealpha($dst_img, true);
+					$color = imagecolorallocatealpha($dst_img, 255, 255, 255, 127);
+					imagefill($dst_img, 0, 0, $color);
+
+					// Resize it!
+					imagecopyresampled($dst_img, $src_img, 0, 0, 0, 0, $dst_width, $dst_height, $src_width, $src_height);
 				}
 				else
+				{
 					$dst_img = imagecreate($dst_width, $dst_height);
-
-				// Resize it!
-				if ($gd2)
-					imagecopyresampled($dst_img, $src_img, 0, 0, 0, 0, $dst_width, $dst_height, $src_width, $src_height);
-				else
 					imagecopyresamplebicubic($dst_img, $src_img, 0, 0, 0, 0, $dst_width, $dst_height, $src_width, $src_height);
+				}
 			}
 			else
 				$dst_img = $src_img;
@@ -461,9 +516,11 @@ function resizeImage($src_img, $destName, $src_width, $src_height, $max_width, $
 
 		// Save the image as ...
 		if (!empty($preferred_format) && ($preferred_format == 3) && function_exists('imagepng'))
-			$success = imagepng($dst_img, $destName);
+			$success = imagepng($dst_img, $destName, 9, PNG_ALL_FILTERS);
 		elseif (!empty($preferred_format) && ($preferred_format == 1) && function_exists('imagegif'))
 			$success = imagegif($dst_img, $destName);
+		elseif (!empty($preferred_format) && $preferred_format == 18 && function_exists('imagewebp'))
+			$success = imagewebp($dst_img, $destName, 80);
 		elseif (function_exists('imagejpeg'))
 			$success = imagejpeg($dst_img, $destName, 80);
 
@@ -477,6 +534,150 @@ function resizeImage($src_img, $destName, $src_width, $src_height, $max_width, $
 	// Without Imagick or GD, no image resizing at all.
 	else
 		return false;
+}
+
+/*
+ * Determines if an image has any alpha pixels
+ *
+ * @param string $fileName
+ * @return bool
+ */
+function hasTransparency($fileName, $png = true)
+{
+	if (empty($fileName) || !file_exists($fileName))
+		return false;
+
+	$header = file_get_contents($fileName, false, null, 0, 26);
+
+	// Does it even claim to have been saved with transparency
+	if ($png && !ord($header[25]) & 4)
+		return false;
+
+	// Webp has its own
+	if (!$png)
+	{
+		if (($header[15] === 'L' && !(ord($header[24]) & 16)) || ($header[15] === 'X' && !(ord($header[20]) & 16)))
+		{
+			return false;
+		}
+	}
+
+	// Saved with transparency is only a start, now Pixel inspection
+	if (checkImagick())
+	{
+		try
+		{
+			$transparency = false;
+			$image = new Imagick($fileName);
+			$pixel_iterator = $image->getPixelIterator();
+
+			// Look at each one, or until we find the first alpha pixel
+			foreach ($pixel_iterator as $pixels)
+			{
+				foreach ($pixels as $pixel)
+				{
+					$color = $pixel->getColor();
+					if ($color['a'] < 1)
+					{
+						$transparency = true;
+						break 2;
+					}
+				}
+			}
+		}
+		catch (\ImagickException $e)
+		{
+			// We don't know what it is, so don't mess with it
+			return false;
+		}
+
+		return $transparency;
+	}
+
+	if (checkGD())
+	{
+		// Go through the image pixel by pixel until we find a transparent pixel
+		$transparency = false;
+		list ($width, $height, $type) = elk_getimagesize($fileName);
+
+		if ($type === 18 && hasWebpSupport())
+			$image = imagecreatefromwebp($fileName);
+		elseif ($type === 3)
+			$image = imagecreatefrompng($fileName);
+		else
+			return false;
+
+		for ($i = 0; $i < $width; $i++)
+		{
+			for ($j = 0; $j < $height; $j++)
+			{
+				if (imagecolorat($image, $i, $j) & 0x7F000000)
+				{
+					$transparency = true;
+					break 2;
+				}
+			}
+		}
+
+		return $transparency;
+	}
+
+	return false;
+}
+
+/**
+ * Sets the best output format for a given image's thumbnail
+ *
+ * - If webP is on, and supported, use that as it gives the smallest size
+ * - If webP support is available, but not on, save as png if it has alpha channel pixels
+ * - If the image has alpha, we preserve it as PNG
+ * - Finally good ol' jpeg
+ *
+ * @return int 2, 3, or 18
+ */
+function setDefaultFormat($fileName = '')
+{
+	global $modSettings;
+
+	// Webp is the best choice if server supports
+	if (!empty($modSettings['attachment_webp_enable']) && hasWebpSupport())
+	{
+		return 18;
+	}
+
+	$mime = getMimeType($fileName);
+
+	// They uploaded a webp image, but ACP does not allow saving webp images, then
+	// if the server supports and its alpha save it as a png
+	if ($mime === 'image/webp' && hasWebpSupport() && hasTransparency($fileName, false))
+	{
+		return 3;
+	}
+
+	// If you have alpha channels, best keep them with PNG
+	if ($mime === 'image/png' && hasTransparency($fileName))
+	{
+		return 3;
+	}
+
+	// The default, JPG
+	return 2;
+}
+
+/**
+ * Best determination of the mime type.
+ *
+ * @return string
+ */
+function getMimeType($fileName)
+{
+	// Try Exif which reads the file headers, most accurate for images
+	if (function_exists('exif_imagetype'))
+	{
+		return image_type_to_mime_type(exif_imagetype($fileName));
+	}
+
+	return get_finfo_mime($fileName);
 }
 
 /**

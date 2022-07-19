@@ -521,6 +521,7 @@ function processAttachments($id_msg = null)
 		// Want to correct for phonetographer photos?
 		if (!empty($modSettings['attachment_autorotate']) && empty($_SESSION['temp_attachments'][$attachID]['errors']) && substr($_SESSION['temp_attachments'][$attachID]['type'], 0, 5) === 'image')
 		{
+			require_once(SUBSDIR . '/Graphics.subs.php');
 			autoRotateImage($_SESSION['temp_attachments'][$attachID]['tmp_name']);
 		}
 
@@ -726,6 +727,8 @@ function attachmentChecks($attachID)
 
 	$db = database();
 
+	require_once(SUBSDIR . '/Graphics.subs.php');
+
 	// No data or missing data .... Not necessarily needed, but in case a mod author missed something.
 	if (empty($_SESSION['temp_attachments'][$attachID]))
 		$error = '$_SESSION[\'temp_attachments\'][$attachID]';
@@ -747,13 +750,31 @@ function attachmentChecks($attachID)
 		return false;
 	}
 
-	// First, the dreaded security check. Sorry folks, but this should't be avoided
+	// Allow addons to make pre checks or adjustments
+	call_integration_hook('integrate_attachment_checks', array($attachID));
+
 	$size = elk_getimagesize($_SESSION['temp_attachments'][$attachID]['tmp_name']);
 	$valid_mime = getValidMimeImageType($size[2]);
 
+	// If it is a webp image, and ACP support is OFF, but server is capable, then convert it!
+	if (empty($modSettings['attachment_webp_enable']) && $size[2] == 18 && hasWebpSupport())
+	{
+		// We do this before the checks as it will increase the filesize
+		$format = setDefaultFormat($_SESSION['temp_attachments'][$attachID]['tmp_name']);
+		if (reencodeImage($_SESSION['temp_attachments'][$attachID]['tmp_name'], $format))
+		{
+			// Update to what it now is (webp to png or jpg)
+			$size = elk_getimagesize($_SESSION['temp_attachments'][$attachID]['tmp_name']);
+			$valid_mime = getValidMimeImageType($size[2]);
+			$_SESSION['temp_attachments'][$attachID]['type'] = $valid_mime;
+			$_SESSION['temp_attachments'][$attachID]['name'] .= '.' . substr($valid_mime, strpos($valid_mime, '/') + 1);
+			$_SESSION['temp_attachments'][$attachID]['size'] = filesize($_SESSION['temp_attachments'][$attachID]['tmp_name']);
+		}
+	}
+
+	// First, the dreaded security check. Sorry folks, but this should't be avoided
 	if ($valid_mime !== '')
 	{
-		require_once(SUBSDIR . '/Graphics.subs.php');
 		if (!checkImageContents($_SESSION['temp_attachments'][$attachID]['tmp_name'], !empty($modSettings['attachment_image_paranoid'])))
 		{
 			// It's bad. Last chance, maybe we can re-encode it?
@@ -775,6 +796,8 @@ function attachmentChecks($attachID)
 				if ($valid_mime !== '')
 				{
 					$_SESSION['temp_attachments'][$attachID]['type'] = $valid_mime;
+					$_SESSION['temp_attachments'][$attachID]['name'] .= '.' . substr($valid_mime, strpos($valid_mime, '/') + 1);
+					$_SESSION['temp_attachments'][$attachID]['size'] = filesize($_SESSION['temp_attachments'][$attachID]['tmp_name']);
 				}
 			}
 		}
@@ -1335,14 +1358,24 @@ function saveAvatar($temporary_path, $memID, $max_width, $max_height)
 
 	$db = database();
 
-	$ext = !empty($modSettings['avatar_download_png']) ? 'png' : 'jpeg';
-	$destName = 'avatar_' . $memID . '_' . time() . '.' . $ext;
-
 	// Just making sure there is a non-zero member.
 	if (empty($memID))
 		return false;
 
+	require_once(SUBSDIR . '/Graphics.subs.php');
 	require_once(SUBSDIR . '/ManageAttachments.subs.php');
+
+	$valid_avatar_extensions = array(
+		2 => 'jpeg',
+		3 => 'png',
+		18 => 'webp'
+	);
+
+ 	$format = setDefaultFormat($temporary_path);
+	$ext = $valid_avatar_extensions[$format];
+	$destName = 'avatar_' . $memID . '_' . time() . '.' . $ext;
+
+	// Clear out any this member may have
 	removeAttachments(array('id_member' => $memID));
 
 	$id_folder = getAttachmentPathID();
@@ -1370,11 +1403,7 @@ function saveAvatar($temporary_path, $memID, $max_width, $max_height)
 	$destName = empty($avatar_hash) ? $destName : $path . '/' . $attachID . '_' . $avatar_hash . '.elk';
 
 	// Resize it.
-	require_once(SUBSDIR . '/Graphics.subs.php');
-	if (!empty($modSettings['avatar_download_png']))
-		$success = resizeImageFile($temporary_path, $tempName, $max_width, $max_height, 3);
-	else
-		$success = resizeImageFile($temporary_path, $tempName, $max_width, $max_height);
+	$success = resizeImageFile($temporary_path, $tempName, $max_width, $max_height, $format);
 
 	if ($success)
 	{
@@ -1940,7 +1969,10 @@ function loadAttachmentContext($id_msg)
 			if (!empty($modSettings['attachmentThumbnails']) && !empty($modSettings['attachmentThumbWidth']) && !empty($modSettings['attachmentThumbHeight']) && ($attachment['width'] > $modSettings['attachmentThumbWidth'] || $attachment['height'] > $modSettings['attachmentThumbHeight']) && strlen($attachment['filename']) < 249)
 			{
 				// A proper thumb doesn't exist yet? Create one! Or, it needs update.
-				if (empty($attachment['id_thumb']) || $attachment['thumb_width'] > $modSettings['attachmentThumbWidth'] || $attachment['thumb_height'] > $modSettings['attachmentThumbHeight'] || ($attachment['thumb_width'] < $modSettings['attachmentThumbWidth'] && $attachment['thumb_height'] < $modSettings['attachmentThumbHeight']))
+				if (empty($attachment['id_thumb'])
+					|| $attachment['thumb_width'] > $modSettings['attachmentThumbWidth']
+					|| $attachment['thumb_height'] > $modSettings['attachmentThumbHeight'])
+					//|| ($attachment['thumb_width'] < $modSettings['attachmentThumbWidth'] && $attachment['thumb_height'] < $modSettings['attachmentThumbHeight']))
 				{
 					$filename = getAttachmentFilename($attachment['filename'], $attachment['id_attach'], $attachment['id_folder'], false, $attachment['file_hash']);
 					$attachment = array_merge($attachment, updateAttachmentThumbnail($filename, $attachment['id_attach'], $id_msg, $attachment['id_thumb'], $attachment['filename']));
@@ -2312,7 +2344,8 @@ function getValidMimeImageType($mime)
 		7 => 'tiff',
 		8 => 'tiff',
 		9 => 'jpeg',
-		14 => 'iff'
+		14 => 'iff',
+		18 => 'webp'
 	);
 
 	if ((int) $mime > 0)
