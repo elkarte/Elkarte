@@ -3,14 +3,14 @@
 /**
  * TestCase class for language files integrity
  */
-class TestLanguageStrings extends PHPUnit_Framework_TestCase
+class TestLanguageStrings extends PHPUnit\Framework\TestCase
 {
 	/**
 	 * Prepare what is necessary to use in these tests.
 	 *
 	 * setUp() is run automatically by the testing framework before each test method.
 	 */
-	public function setUp()
+	protected function setUp(): void
 	{
 	}
 
@@ -19,7 +19,7 @@ class TestLanguageStrings extends PHPUnit_Framework_TestCase
 	 *
 	 * tearDown() is run automatically by the testing framework after each test method.
 	 */
-	public function tearDown()
+	protected function tearDown(): void
 	{
 	}
 

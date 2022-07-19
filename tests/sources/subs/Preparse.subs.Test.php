@@ -1,13 +1,13 @@
 <?php
 
-class PrepaseBBC extends PHPUnit_Framework_TestCase
+class PrepaseBBC extends PHPUnit\Framework\TestCase
 {
 	/**
 	 * Prepare what is necessary to use in these tests.
 	 *
 	 * setUp() is run automatically by the testing framework before each test method.
 	 */
-	public function setUp()
+	protected function setUp(): void
 	{
 		require_once(SUBSDIR . '/Post.subs.php');
 

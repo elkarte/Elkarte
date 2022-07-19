@@ -4,14 +4,14 @@
  * TestCase class for (ideally) all the functions in the Subs.php file
  * that do not fit in any other test
  */
-class TestSubs extends PHPUnit_Framework_TestCase
+class TestSubs extends PHPUnit\Framework\TestCase
 {
 	/**
 	 * Prepare what is necessary to use in these tests.
 	 *
 	 * setUp() is run automatically by the testing framework before each test method.
 	 */
-	public function setUp()
+	protected function setUp(): void
 	{
 	}
 
@@ -20,7 +20,7 @@ class TestSubs extends PHPUnit_Framework_TestCase
 	 *
 	 * tearDown() is run automatically by the testing framework after each test method.
 	 */
-	public function tearDown()
+	protected function tearDown(): void
 	{
 	}
 

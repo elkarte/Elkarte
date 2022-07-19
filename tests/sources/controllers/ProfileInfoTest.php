@@ -3,12 +3,12 @@
 /**
  * TestCase class for the Profile Info Controller
  */
-class TestProfileInfo extends PHPUnit_Framework_TestCase
+class TestProfileInfo extends PHPUnit\Framework\TestCase
 {
 	/**
 	 * Initialize or add whatever necessary for these tests
 	 */
-	function setUp()
+	protected function setUp() : void
 	{
 		global $modSettings, $user_info, $settings;
 
@@ -60,7 +60,7 @@ class TestProfileInfo extends PHPUnit_Framework_TestCase
 	 *
 	 * tearDown() is run automatically by the testing framework after each test method.
 	 */
-	public function tearDown()
+	protected function tearDown(): void
 	{
 		global $modSettings, $user_info, $settings;
 

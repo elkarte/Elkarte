@@ -18,7 +18,7 @@ class TestRegister_Controller extends ElkArteWebTest
 	/**
 	 * Initialize or add whatever is necessary for these tests
 	 */
-	public function setUp()
+	protected function setUp(): void
 	{
 		global $modSettings;
 
@@ -39,7 +39,7 @@ class TestRegister_Controller extends ElkArteWebTest
 	 *
 	 * tearDown() is run automatically by the testing framework after each test method.
 	 */
-	public function tearDown()
+	protected function tearDown(): void
 	{
 		// Restore it to default
 		updateSettings(array('registration_method' => $this->registration_method));

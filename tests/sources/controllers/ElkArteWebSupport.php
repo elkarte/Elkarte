@@ -15,7 +15,7 @@
  * It extends PHPUnit_Extensions_Selenium2TestCase and provides additional functions
  * as well as sets up the common environments for all tests
  */
-abstract class ElkArteWebTest extends PHPUnit_Extensions_Selenium2TestCase
+abstract class ElkArteWebSupport extends PHPUnit_Extensions_Selenium2TestCase
 {
 	protected $coverageScriptUrl = 'http://127.0.0.1/phpunit_coverage.php';
 	protected $captureScreenshotOnFailure = true;
@@ -33,7 +33,7 @@ abstract class ElkArteWebTest extends PHPUnit_Extensions_Selenium2TestCase
 	 *
 	 * This method is used to configure the Selenium Server session, url/browser
 	 */
-	protected function setUp()
+	protected function setUp() : void
 	{
 		// Set the browser to be used by Selenium, it must be available on localhost
 		$this->setBrowser($this->browser);
@@ -46,7 +46,7 @@ abstract class ElkArteWebTest extends PHPUnit_Extensions_Selenium2TestCase
 	/**
 	 * Any common teardown functions
 	 */
-	protected function tearDown()
+	protected function tearDown() : void
 	{
 		$this->timeouts()->implicitWait(0);
 

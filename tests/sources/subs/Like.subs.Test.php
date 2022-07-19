@@ -6,14 +6,16 @@
  * WARNING. These tests work directly with the local database. Don't run
  * them if you need to keep your data untouched!
  */
-class TestLikes extends PHPUnit_Framework_TestCase
+class TestLikes extends PHPUnit\Framework\TestCase
 {
+	protected $backupGlobalsBlacklist = ['user_info'];
+
 	/**
 	 * Prepare some test data, to use in these tests.
 	 *
 	 * setUp() is run automatically by the testing framework before each test method.
 	 */
-	public function setUp()
+	protected function setUp(): void
 	{
 		// Lets make sure a topic exists by creating one
 		require_once(SUBSDIR . '/Likes.subs.php');
@@ -55,7 +57,7 @@ class TestLikes extends PHPUnit_Framework_TestCase
 	 *
 	 * tearDown() is run automatically by the testing framework after each test method.
 	 */
-	public function tearDown()
+	protected function tearDown(): void
 	{
 		// remove temporary test data
 		require_once(SUBSDIR . '/Topic.subs.php');

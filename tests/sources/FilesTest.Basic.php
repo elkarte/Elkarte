@@ -3,7 +3,7 @@
 /**
  * TestCase class for file integrity
  */
-class TestFiles extends PHPUnit_Framework_TestCase
+class TestFiles extends PHPUnit\Framework\TestCase
 {
 	protected $_ourFiles = array();
 
@@ -12,7 +12,7 @@ class TestFiles extends PHPUnit_Framework_TestCase
 	 *
 	 * setUp() is run automatically by the testing framework before each test method.
 	 */
-	public function setUp()
+	protected function setUp(): void
 	{
 		$this->_ourFiles = array();
 
@@ -39,7 +39,7 @@ class TestFiles extends PHPUnit_Framework_TestCase
 	 *
 	 * tearDown() is run automatically by the testing framework after each test method.
 	 */
-	public function tearDown()
+	protected function tearDown(): void
 	{
 	}
 

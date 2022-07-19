@@ -3,12 +3,12 @@
 /**
  * TestCase class for recent posts
  */
-class TestRecentPosts extends PHPUnit_Framework_TestCase
+class TestRecentPosts extends PHPUnit\Framework\TestCase
 {
 	/**
 	 * Initialize or add whatever necessary for these tests
 	 */
-	function setUp()
+	protected function setUp() : void
 	{
 		global $modSettings, $user_info, $settings;
 
@@ -59,7 +59,7 @@ class TestRecentPosts extends PHPUnit_Framework_TestCase
 	 *
 	 * tearDown() is run automatically by the testing framework after each test method.
 	 */
-	public function tearDown()
+	protected function tearDown(): void
 	{
 		global $modSettings, $user_info, $settings;
 

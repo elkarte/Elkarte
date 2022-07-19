@@ -7,7 +7,7 @@
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * @version 1.1
+ * @version 1.1.9
  */
 
 namespace ElkArte\sources\subs\SettingsFormAdapter;
@@ -70,12 +70,8 @@ class InlinePermissions extends Adapter
 
 		// Load the permission settings that guests cannot have
 		$this->illegal_guest_permissions = array_intersect(
-			array_map(
-				function ($permission)
-				{
-					return str_replace(array('_any', '_own'), '', $permission[1]);
-				}, $this->permissions
-			), $this->permissionsObject->getIllegalGuestPermissions()
+			$this->permissionList,
+			$this->permissionsObject->getIllegalGuestPermissions()
 		);
 	}
 

@@ -6,13 +6,13 @@
  * WARNING. These tests work directly with the local database. Don't run
  * them if you need to keep your data untouched!
  */
-class TestPoll extends PHPUnit_Framework_TestCase
+class TestPoll extends PHPUnit\Framework\TestCase
 {
 	/**
 	 * Prepare some test data, to use in these tests.
 	 * setUp() is run automatically by the testing framework before each test method.
 	 */
-	public function setUp()
+	protected function setUp(): void
 	{
 		// make sure a topic exists
 		require_once(SUBSDIR . '/Poll.subs.php');
@@ -53,7 +53,7 @@ class TestPoll extends PHPUnit_Framework_TestCase
 	 * Cleanup data we no longer need at the end of the tests in this class.
 	 * tearDown() is run automatically by the testing framework after each test method.
 	 */
-	public function tearDown()
+	protected function tearDown(): void
 	{
 		// remove temporary test data
 		require_once(SUBSDIR . '/Topic.subs.php');
@@ -128,7 +128,6 @@ class TestPoll extends PHPUnit_Framework_TestCase
 		$this->assertEquals($pollOptions[1]['id_choice'], 1);
 		$this->assertEquals($pollOptions[0]['votes'], 0);
 		$this->assertEquals($pollOptions[1]['votes'], 0);
-
 	}
 
 	/**

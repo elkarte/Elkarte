@@ -3,12 +3,12 @@
 /**
  * TestCase class for manage boards settings
  */
-class TestManageBoardsSettings extends PHPUnit_Framework_TestCase
+class TestManageBoardsSettings extends PHPUnit\Framework\TestCase
 {
 	/**
 	 * Initialize or add whatever necessary for these tests
 	 */
-	function setUp()
+	protected function setUp() : void
 	{
 		loadLanguage('ManagePermissions', 'english', true, true);
 	}

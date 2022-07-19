@@ -1,6 +1,6 @@
 <?php
 
-class TestInlinePermissionsForm extends PHPUnit_Framework_TestCase
+class TestInlinePermissionsForm extends PHPUnit\Framework\TestCase
 {
 	protected $permissionsForm;
 	protected $permissionsObject;
@@ -14,7 +14,7 @@ class TestInlinePermissionsForm extends PHPUnit_Framework_TestCase
 	 *
 	 * setUp() is run automatically by the testing framework before each test method.
 	 */
-	public function setUp()
+	protected function setUp(): void
 	{
 		global $user_info;
 
@@ -63,7 +63,7 @@ class TestInlinePermissionsForm extends PHPUnit_Framework_TestCase
 		// Load the permission settings that guests cannot have
 		$this->illegal_guest_permissions = array_intersect(
 			array_map(
-				function ($permission)
+				static function ($permission)
 				{
 					return str_replace(array('_any', '_own'), '', $permission[1]);
 				}, $this->config_vars
@@ -117,7 +117,9 @@ class TestInlinePermissionsForm extends PHPUnit_Framework_TestCase
 				continue;
 			}
 
-			$this->assertEquals($result[$permission[1]], $context['permissions'][$permission[1]]);
+			$this->assertEquals($result[$permission[1]][-1], $context['permissions'][$permission[1]][-1]);
+			$this->assertEquals($result[$permission[1]][0], $context['permissions'][$permission[1]][0]);
+			$this->assertEquals($result[$permission[1]][2], $context['permissions'][$permission[1]][2]);
 		}
 	}
 
