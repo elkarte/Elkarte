@@ -427,7 +427,7 @@ class Attachment_Controller extends Action_Controller
 		}
 
 		$eTag = '"' . substr($id_attach . $real_filename . @filemtime($filename), 0, 64) . '"';
-		$use_compression = !empty($modSettings['enableCompressedOutput']) && @filesize($filename) <= 4194304 && in_array($file_ext, array('txt', 'html', 'htm', 'js', 'doc', 'docx', 'rtf', 'css', 'php', 'log', 'xml', 'sql', 'c', 'java'));
+		$use_compression = $this->useCompression($mime_type);
 		$disposition = !isset($this->_req->query->image) ? 'attachment' : 'inline';
 		$do_cache = false === (!isset($this->_req->query->image) && getValidMimeImageType($file_ext) !== '');
 
@@ -446,51 +446,61 @@ class Attachment_Controller extends Action_Controller
 		}
 
 		$this->_send_headers($filename, $eTag, $mime_type, $use_compression, $disposition, $real_filename, $do_cache);
-
-		// Recode line endings for text files, if enabled.
-		if (!empty($modSettings['attachmentRecodeLineEndings']) && !isset($this->_req->query->image) && in_array($file_ext, array('txt', 'css', 'htm', 'html', 'php', 'xml')))
-		{
-			$req = request();
-			if (strpos($req->user_agent(), 'Windows') !== false)
-				$callback = function ($buffer) {
-					return preg_replace('~[\r]?\n~', "\r\n", $buffer);
-				};
-			elseif (strpos($req->user_agent(), 'Mac') !== false)
-				$callback = function ($buffer) {
-					return preg_replace('~[\r]?\n~', "\r", $buffer);
-				};
-			else
-				$callback = function ($buffer) {
-					return preg_replace('~[\r]?\n~', "\n", $buffer);
-				};
-		}
-
-		// Since we don't do output compression for files this large...
-		if (filesize($filename) > 4194304)
-		{
-			// Forcibly end any output buffering going on.
-			while (ob_get_level() > 0)
-				@ob_end_clean();
-
-			$fp = fopen($filename, 'rb');
-			while (!feof($fp))
-			{
-				if (isset($callback))
-					echo $callback(fread($fp, 8192));
-				else
-					echo fread($fp, 8192);
-
-				flush();
-			}
-			fclose($fp);
-		}
-		// On some of the less-bright hosts, readfile() is disabled.  It's just a faster, more byte safe, version of what's in the if.
-		elseif (isset($callback) || @readfile($filename) === null)
-		{
-			echo isset($callback) ? $callback(file_get_contents($filename)) : file_get_contents($filename);
-		}
+		$this->send_file($filename, $mime_type);
 
 		obExit(false);
+	}
+
+	/**
+	 * If the mime type benefits from compression e.g. text/xyz and gzencode is
+	 * available and the user agent accepts gzip, then return true, else false
+	 *
+	 * @param string $mime_type
+	 * @return bool if we should compress the file
+	 */
+	public function useCompression($mime_type)
+	{
+		global $modSettings;
+
+		// Not compressible, or not supported / requested by client
+		if (!preg_match('~^(?:text/|application/(?:json|xml|rss\+xml)$)~i', $mime_type)
+			|| (!isset($_SERVER['HTTP_ACCEPT_ENCODING']) || strpos($_SERVER['HTTP_ACCEPT_ENCODING'], 'gzip') === false))
+		{
+			return false;
+		}
+
+		// Support is available on the server
+		if (!function_exists('gzencode') || empty($modSettings['enableCompressedOutput']))
+		{
+			return false;
+		}
+
+		return true;
+	}
+
+	/**
+	 * Sends the requested file to the user.  If the file is compressible e.g.
+	 * has a mine type of text/??? may compress the file prior to sending.
+	 *
+	 * @param string $filename
+	 * @param string $mime_type
+	 */
+	public function send_file($filename, $mime_type)
+	{
+		$body = file_get_contents($filename);
+		$use_compression = $this->useCompression($mime_type);
+
+		// If we can/should compress this file
+		if ($use_compression && strlen($body) > 250)
+		{
+			$body = gzencode($body, 2);
+			header('Content-Encoding: gzip');
+			header('Vary: Accept-Encoding');
+		}
+
+		// Someone is getting a present
+		header('Content-Length: ', strlen($body));
+		echo $body;
 	}
 
 	/**
@@ -559,12 +569,13 @@ class Attachment_Controller extends Action_Controller
 		}
 
 		$eTag = '"' . substr($id_attach . $real_filename . filemtime($filename), 0, 64) . '"';
-		$use_compression = !empty($modSettings['enableCompressedOutput']) && @filesize($filename) <= 4194304 && in_array($file_ext, array('txt', 'html', 'htm', 'js', 'doc', 'docx', 'rtf', 'css', 'php', 'log', 'xml', 'sql', 'c', 'java'));
+		$use_compression = $this->useCompression($mime_type);
 		$do_cache = false === (!isset($this->_req->query->image) && getValidMimeImageType($file_ext) !== '');
 
 		$this->_send_headers($filename, $eTag, $mime_type, $use_compression, 'inline', $real_filename, $do_cache);
 
-		if ($resize && resizeImageFile($filename, $filename . '_thumb', 100, 100))
+		$format = setDefaultFormat($filename);
+		if ($resize && resizeImageFile($filename, $filename . '_thumb', 100, 100, $format))
 		{
 			if (!empty($modSettings['attachment_autorotate']))
 			{
@@ -574,11 +585,7 @@ class Attachment_Controller extends Action_Controller
 			$filename = $filename . '_thumb';
 		}
 
-		if (empty($modSettings['enableCompressedOutput']) || filesize($filename) > 4194304)
-			header('Content-Length: ' . filesize($filename));
-
-		if (@readfile($filename) === null)
-			echo file_get_contents($filename);
+		$this->send_file($filename, $mime_type);
 
 		obExit(false);
 	}
@@ -589,7 +596,7 @@ class Attachment_Controller extends Action_Controller
 	 * @param string $filename Full path+file name of the file in the filesystem
 	 * @param string $eTag ETag cache validator
 	 * @param string $mime_type The mime-type of the file
-	 * @param boolean $use_compression If use gzip compression
+	 * @param boolean $use_compression If use gzip compression - Deprecated since 1.1.9
 	 * @param string $disposition The value of the Content-Disposition header
 	 * @param string $real_filename The original name of the file
 	 * @param boolean $do_cache If send the a max-age header or not
@@ -599,14 +606,12 @@ class Attachment_Controller extends Action_Controller
 	{
 		global $txt;
 
-		obStart($use_compression);
-
 		// No point in a nicer message, because this is supposed to be an attachment anyway...
 		if ($check_filename === true && !file_exists($filename))
 		{
 			loadLanguage('Errors');
 
-			header((preg_match('~HTTP/1\.[01]~i', $this->_req->server->SERVER_PROTOCOL) ? $this->_req->server->SERVER_PROTOCOL : 'HTTP/1.0') . ' 404 Not Found');
+			header((preg_match('~HTTP/1\.[01]~i', $_SERVER['SERVER_PROTOCOL']) ? $_SERVER['SERVER_PROTOCOL'] : 'HTTP/1.0') . ' 404 Not Found');
 			header('Content-Type: text/plain; charset=UTF-8');
 
 			// We need to die like this *before* we send any anti-caching headers as below.
@@ -614,9 +619,9 @@ class Attachment_Controller extends Action_Controller
 		}
 
 		// If it hasn't been modified since the last time this attachment was retrieved, there's no need to display it again.
-		if (!empty($this->_req->server->HTTP_IF_MODIFIED_SINCE))
+		if (!empty($_SERVER['HTTP_IF_MODIFIED_SINCE']))
 		{
-			list ($modified_since) = explode(';', $this->_req->server->HTTP_IF_MODIFIED_SINCE);
+			list ($modified_since) = explode(';', $_SERVER['HTTP_IF_MODIFIED_SINCE']);
 			if ($check_filename === false || strtotime($modified_since) >= filemtime($filename))
 			{
 				@ob_end_clean();
@@ -628,7 +633,7 @@ class Attachment_Controller extends Action_Controller
 		}
 
 		// Check whether the ETag was sent back, and cache based on that...
-		if (!empty($this->_req->server->HTTP_IF_NONE_MATCH) && strpos($this->_req->server->HTTP_IF_NONE_MATCH, $eTag) !== false)
+		if (!empty($_SERVER['HTTP_IF_NONE_MATCH']) && strpos($_SERVER['HTTP_IF_NONE_MATCH'], $eTag) !== false)
 		{
 			@ob_end_clean();
 
@@ -645,22 +650,22 @@ class Attachment_Controller extends Action_Controller
 
 		if (!empty($mime_type) && strpos($mime_type, 'image/') === 0)
 		{
-			header('Content-Type: ' . strtr($mime_type, array('image/bmp' => 'image/x-ms-bmp')));
+			header('Content-Type: ' . $mime_type);
 		}
 		else
 		{
-			header('Content-Type: ' . (isBrowser('ie') || isBrowser('opera') ? 'application/octetstream' : 'application/octet-stream'));
+			header('Content-Type: application/octet-stream');
 		}
 
 		// Different browsers like different standards...
-		if (isBrowser('firefox'))
-			header('Content-Disposition: ' . $disposition . '; filename*=UTF-8\'\'' . rawurlencode(preg_replace_callback('~&#(\d{3,8});~', 'fixchar__callback', $real_filename)));
-		elseif (isBrowser('opera'))
-			header('Content-Disposition: ' . $disposition . '; filename="' . preg_replace_callback('~&#(\d{3,8});~', 'fixchar__callback', $real_filename) . '"');
-		elseif (isBrowser('ie'))
-			header('Content-Disposition: ' . $disposition . '; filename="' . urlencode(preg_replace_callback('~&#(\d{3,8});~', 'fixchar__callback', $real_filename)) . '"');
-		else
-			header('Content-Disposition: ' . $disposition . '; filename="' . $real_filename . '"');
+		$filename = str_replace('"', '', $real_filename);
+
+		// Send as UTF-8 if the name requires that
+		$altName = '';
+		if (preg_match('~[\x80-\xFF]~', $filename))
+			$altName = "; filename*=UTF-8''" . rawurlencode($filename);
+
+		header('Content-Disposition: ' . $disposition . '; filename="' . $filename . '"' . $altName);
 
 		// If this has an "image extension" - but isn't actually an image - then ensure it isn't cached cause of silly IE.
 		if ($do_cache === true)
