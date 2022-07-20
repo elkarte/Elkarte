@@ -27,7 +27,7 @@ global $ssi_db_user, $ssi_db_passwd;
 if (!defined('ELK'))
 {
 	DEFINE('ELK', '1');
-	DEFINE('CACHE_STALE', '?R11B2');
+	DEFINE('CACHE_STALE', '?R119');
 
 	// Get the forum's settings for database and file paths.
 	require_once('Settings.php');
@@ -72,19 +72,19 @@ cleanRequest();
 loadDatabase();
 Hooks::init(database(), Debug::instance());
 reloadSettings();
-elk_seed_generator();
 loadSession();
 loadUserSettings();
 loadBoard();
 loadPermissions();
-loadTheme();
 
 // It should be added to the install and upgrade scripts.
 // But since the converters need to be updated also. This is easier.
 updateSettings(array(
 	'attachmentUploadDir' => serialize(array(1 => $modSettings['attachmentUploadDir'])),
 	'currentAttachmentUploadDir' => 1,
+	'disableQueryCheck' => 1,
 ));
+loadTheme();
 
 // Basic language is good to have for functional tests
 loadLanguage('index+Errors');

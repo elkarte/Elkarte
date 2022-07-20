@@ -18,8 +18,6 @@ class TestSettingsForm extends PHPUnit\Framework\TestCase
 		loadLanguage('Admin', 'english', true, true);
 
 		// Elevate the user.
-		$user_info['permissions'] = [];
-		$context['permissions'] = [];
 		$user_info['permissions'][] = 'manage_permissions';
 
 		$this->configVars = array(

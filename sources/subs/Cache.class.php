@@ -507,6 +507,7 @@ class Cache
 		{
 			global $cache_accelerator, $cache_enable, $cache_uid, $cache_password, $cache_memcached;
 
+			$cache_accelerator = empty($cache_accelerator) ? 'filebased' : $cache_accelerator;
 			$options = array();
 			if ($cache_accelerator === 'xcache')
 			{

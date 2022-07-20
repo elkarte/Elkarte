@@ -163,24 +163,4 @@ class TestPoll extends PHPUnit\Framework\TestCase
 		$pollinfo = pollinfo($id_poll);
 		$this->assertTrue(empty($pollinfo));
 	}
-
-	/**
-	 * Modify a poll
-	 */
-	public function testModifyPoll()
-	{
-		// Values to create it first
-		$question = 'Who is the next best contender for Grudge award?';
-		$id_member = 0;
-		$poster_name = 'test';
-
-		// Create the poll.
-		$id_poll = createPoll($question, $id_member, $poster_name);
-
-		// Link the poll to the topic.
-		associatedPoll($this->id_topic, $id_poll);
-
-		// Modify it. Hmm... we haz no modify function :P
-		// @todo
-	}
 }

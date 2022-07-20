@@ -29,6 +29,8 @@ class TestFiles extends PHPUnit\Framework\TestCase
 				continue;
 			if (strpos($file, '/vendor/') !== false)
 				continue;
+			if (strpos($file, '/install/') !== false)
+				continue;
 
 			$this->_ourFiles[] = $file;
 		}

@@ -103,9 +103,9 @@ class TestDataValidator extends PHPUnit\Framework\TestCase
 		foreach ($this->invalid_data as $key => $value)
 		{
 			$test = $validation->validation_errors($key);
-			$test[0] = isset($test[0]) ? $test[0] : $key;
+			$test = $test === false ? $key : $test[0];
 			$value = is_array($value) ? implode(' | ', $value) : $value;
-			$this->assertNotFalse($validation->validation_errors($key), 'Test: ' . $test[0] . ' passed data: ' . $value . ' but it should have failed');
+			$this->assertNotFalse($validation->validation_errors($key), 'Test: ' . $test . ' passed data: ' . $value . ' but it should have failed');
 		}
 
 		// These should all pass
@@ -117,9 +117,9 @@ class TestDataValidator extends PHPUnit\Framework\TestCase
 		foreach ($this->valid_data as $key => $value)
 		{
 			$test = $validation->validation_errors($key);
-			$test[0] = isset($test[0]) ? $test[0] : $key;
+			$test = $test === false ? $key : $test[0];
 			$value = is_array($value) ? implode(' | ', $value) : $value;
-			$this->assertFalse($validation->validation_errors($key), 'Test: ' . $test[0] . ' failed data: ' . $value . ' but it should have passed');
+			$this->assertFalse($validation->validation_errors($key), 'Test: ' . $test . ' failed data: ' . $value . ' but it should have passed');
 		}
 	}
 

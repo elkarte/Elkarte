@@ -147,6 +147,9 @@ class TestHooks extends PHPUnit\Framework\TestCase
 	private function _parse_hooks($hook_string)
 	{
 		$hooks = array();
+		if (empty($hook_string))
+			return $hooks;
+
 		$functions = explode(',', $hook_string);
 		foreach ($functions as $function)
 		{

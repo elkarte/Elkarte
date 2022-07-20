@@ -117,9 +117,12 @@ class TestInlinePermissionsForm extends PHPUnit\Framework\TestCase
 				continue;
 			}
 
-		//	$this->assertEquals($result[$permission[1]][-1], $context['permissions'][$permission[1]][-1]);
-			$this->assertEquals($result[$permission[1]][0], $context['permissions'][$permission[1]][0]);
-			$this->assertEquals($result[$permission[1]][2], $context['permissions'][$permission[1]][2]);
+			// Other test are adding groups somewhere, or not isolated or ??
+			$test = array_filter($context['permissions'][$permission[1]], static function($k) {
+				return $k['id'] < 3;
+			});
+
+			$this->assertEquals($result[$permission[1]], $test, $permission[1]);
 		}
 	}
 
@@ -129,8 +132,6 @@ class TestInlinePermissionsForm extends PHPUnit\Framework\TestCase
 	 */
 	public function testSave()
 	{
-		global $context;
-
 		// Dummy data for setting permissions...
 		$_POST = array(
 			'my_dummy_permission1' => array(-1 => 'on', 0 => 'on', 2 => 'on'),
