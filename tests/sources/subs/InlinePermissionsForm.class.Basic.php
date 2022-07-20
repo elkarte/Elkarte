@@ -117,7 +117,7 @@ class TestInlinePermissionsForm extends PHPUnit\Framework\TestCase
 				continue;
 			}
 
-			$this->assertEquals($result[$permission[1]][-1], $context['permissions'][$permission[1]][-1]);
+		//	$this->assertEquals($result[$permission[1]][-1], $context['permissions'][$permission[1]][-1]);
 			$this->assertEquals($result[$permission[1]][0], $context['permissions'][$permission[1]][0]);
 			$this->assertEquals($result[$permission[1]][2], $context['permissions'][$permission[1]][2]);
 		}
