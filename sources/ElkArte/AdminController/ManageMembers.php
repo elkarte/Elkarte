@@ -1035,7 +1035,7 @@ class ManageMembers extends AbstractController
 					),
 					'data' => array(
 						'sprintf' => array(
-							'format' => '<a href="' . getUrl('action', ['action' => 'trackip', 'searchip' => '%1$s']) . '">%1$s</a>',
+							'format' => '<a href="' . getUrl('profile', ['action' => 'trackip', 'searchip' => '%1$s']) . '">%1$s</a>',
 							'params' => array(
 								'member_ip' => false,
 							),
