@@ -201,6 +201,6 @@ class ImageUploadResize
 	{
 		global $modSettings;
 
-		return $this->image->hasWebpSupport() && !empty($modSettings['attachment_webp_enable']);
+		return !empty($modSettings['attachment_webp_enable'] && $this->image->hasWebpSupport());
 	}
 }

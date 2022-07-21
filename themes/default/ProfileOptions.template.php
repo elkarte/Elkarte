@@ -1404,7 +1404,10 @@ function template_profile_avatar_select()
 									', ($context['member']['avatar']['id_attach'] > 0 ? '
 									<br /><br />
 									<img id="current_avatar" class="avatar avatarresize" src="' . $context['member']['avatar']['href'] . (strpos($context['member']['avatar']['href'], '?') === false ? '?' : '&') . 'time=' . time() . '" alt="" />
-									<img id="current_avatar_new" class="avatar avatarresize hide border_error" alt="" src="" />
+									<div id="current_avatar_new" class="hide">
+										<img id="current_avatar_new_preview" class="avatar avatarresize border_error" style="vertical-align: middle" alt="" src="" />
+										<span>' . $txt['preview'] . '</span>
+									</div>
 									<input type="hidden" name="id_attach" value="' . $context['member']['avatar']['id_attach'] . '" />' : ''), '
 								</div>';
 	}

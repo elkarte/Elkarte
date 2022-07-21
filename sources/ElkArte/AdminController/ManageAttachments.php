@@ -250,6 +250,15 @@ class ManageAttachments extends AbstractController
 				}
 			}
 
+			// Allow or not webp extensions.
+			if (!empty($this->_req->post->attachment_webp_enable))
+			{
+				if (strpos($this->_req->post->attachmentExtensions, 'webp') === false)
+				{
+					$this->_req->post->attachmentExtensions .= ',webp';
+				}
+			}
+
 			call_integration_hook('integrate_save_attachment_settings');
 
 			$settingsForm->setConfigValues((array) $this->_req->post);
@@ -355,7 +364,7 @@ class ManageAttachments extends AbstractController
 			array('int', 'attachmentSizeLimit', 'step' => 32, 'subtext' => $upload_max_filesize_text, 6, 'postinput' => empty($testUM) ? $txt['attachment_postsize_warning'] : $txt['kilobyte'], 'invalid' => empty($testUM)),
 			array('int', 'attachmentNumPerPostLimit', 'subtext' => $txt['zero_for_no_limit'], 6),
 			'',
-			array('check', 'attachment_webp_enable', 'disabled' => !$testWebP, 'postinput' => $testWebP ? "" : $txt['attachment_autorotate_na']),
+			array('check', 'attachment_webp_enable', 'disabled' => !$testWebP, 'postinput' => $testWebP ? "" : $txt['attachment_webp_enable_na']),
 			array('check', 'attachment_autorotate', 'disabled' => !$testImgRotate, 'postinput' => $testImgRotate ? '' : $txt['attachment_autorotate_na']),
 			// Resize limits
 			array('title', 'attachment_image_resize'),

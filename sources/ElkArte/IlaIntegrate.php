@@ -419,8 +419,8 @@ class IlaIntegrate
 	 */
 	public static function integrate_modify_attachment_settings(&$config_vars)
 	{
-		$config_vars[] = array('title', 'attachment_inline_title');
-		$config_vars[] = array('check', 'attachment_inline_enabled');
-		$config_vars[] = array('check', 'attachment_inline_quotes');
+		$config_vars[] = ['title', 'attachment_inline_title'];
+		$config_vars[] = ['check', 'attachment_inline_enabled'];
+		$config_vars[] = ['check', 'attachment_inline_quotes'];
 	}
 }

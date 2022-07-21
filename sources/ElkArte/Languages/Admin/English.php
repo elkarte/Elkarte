@@ -402,7 +402,6 @@ $txt['attachment_image_reencode_note'] = '(requires GD module or ImageMagick)';
 $txt['attachment_autorotate'] = 'Detect and fix improperly rotated images';
 $txt['attachment_autorotate_na'] = '(Not available on this system)';
 $txt['attachmentThumbnails'] = 'Resize images when showing under posts';
-$txt['attachmentThumbnails'] = 'Resize images when showing under posts';
 $txt['attachment_webp_enable'] = 'Enable WebP support';
 $txt['attachment_webp_enable_na'] = '(WebP support is not available on this server)';
 $txt['attachmentThumbWidth'] = 'Maximum width of thumbnails';

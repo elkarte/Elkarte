@@ -85,7 +85,7 @@ class Image
 	 */
 	public function hasWebpSupport()
 	{
-		if (Imagick::canUse() && !$this->_force_gd)
+		if (!$this->_force_gd && Imagick::canUse())
 		{
 			$check = \Imagick::queryformats();
 			if (!array_search('WEBP', $check))
@@ -285,19 +285,26 @@ class Image
 	{
 		global $modSettings;
 
-		// Best choice if server supports
-		if ($this->hasWebpSupport() && !empty($modSettings['attachment_webp_enable']))
+		// Webp is the best choice if server supports
+		if (!empty($modSettings['attachment_webp_enable']) && $this->hasWebpSupport())
 		{
 			return IMAGETYPE_WEBP;
 		}
 
-		// If you have alpha channels, best keep them
+		// They uploaded a webp image, but ACP does not allow saving webp images, then
+		// if the server supports and its alpha save it as a png
+		if ($this->getMimeType() === 'image/webp' && $this->hasWebpSupport() && $this->getTransparency(false))
+		{
+			return IMAGETYPE_PNG;
+		}
+
+		// If you have alpha channels, best keep them with PNG
 		if ($this->getMimeType() === 'image/png' && $this->getTransparency())
 		{
 			return IMAGETYPE_PNG;
 		}
 
-		// The default
+		// The default, JPG
 		return IMAGETYPE_JPEG;
 	}
 
@@ -444,16 +451,29 @@ class Image
 	 *
 	 *  - Checks file header for saved with Alpha space flag
 	 *  - 8 Bit (256 color) PNG's are not handled.
+	 *  - If png is flase, will instead check webp headers for transparency flag
 	 *  - If the alpha flag is set, will go pixel by pixel to validate true alpha pixels exist
 	 *
 	 * @return bool
 	 */
-	public function getTransparency()
+	public function getTransparency($png = true)
 	{
 		// If it claims transparency, we do pixel inspection
-		if (ord(file_get_contents($this->_fileName, false, null, 25, 1)) & 4)
+		$header = file_get_contents($this->_fileName, false, null, 0, 26);
+
+		// Does it even claim to have been saved with transparency
+		if ($png && ord($header[25]) & 4)
 		{
 			return $this->_manipulator->getTransparency();
+		}
+
+		// Webp has its own unique headers
+		if (!$png)
+		{
+			if (($header[15] === 'L' && (ord($header[24]) & 16)) || ($header[15] === 'X' && (ord($header[20]) & 16)))
+			{
+				return $this->_manipulator->getTransparency();
+			}
 		}
 
 		return false;

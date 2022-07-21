@@ -201,7 +201,7 @@ class TemporaryAttachment extends ValuesContainer
 		// Let's get their attention.
 		if (!empty($error))
 		{
-			throw new ElkException('attach_check_nag', 'debug', array($error));
+			throw new ElkException('attach_check_nag', 'debug', [$error]);
 		}
 
 		// Just in case this slipped by the first checks, we stop it here and now
@@ -211,6 +211,9 @@ class TemporaryAttachment extends ValuesContainer
 
 			return false;
 		}
+
+		// Allow addons to make their own pre checks / adjustments
+		call_integration_hook('integrate_attachment_checks', [$this->data['attachid']]);
 
 		// Did you pack this bag yourself?
 		$this->checkImageContents();

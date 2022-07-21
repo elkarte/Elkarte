@@ -677,7 +677,7 @@ class ManageSearch extends AbstractController
 		$server = $server === 'localhost' ? '127.0.0.1' : $server;
 		$port = !empty($modSettings['sphinxql_searchd_port']) ? $modSettings['sphinxql_searchd_port'] : '9306';
 
-		set_error_handler(function () { /* ignore errors */ });
+		set_error_handler(static function () { /* ignore errors */ });
 		try
 		{
 			$result = mysqli_connect($server, '', '', '', (int) $port);

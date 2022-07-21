@@ -29,7 +29,6 @@ use ElkArte\Http\Headers;
 use ElkArte\PrivacyPolicy;
 use ElkArte\Languages\Txt;
 use ElkArte\Util;
-use JetBrains\PhpStorm\NoReturn;
 
 /**
  * It registers new members, and it allows the administrator moderate member registration

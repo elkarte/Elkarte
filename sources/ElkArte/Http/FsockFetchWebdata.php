@@ -22,40 +22,40 @@ namespace ElkArte\Http;
 class FsockFetchWebdata
 {
 	/** @var bool Use the same connection on redirects */
-	private $_keep_alive = false;
+	private $_keep_alive;
 
 	/** @var int Holds the passed or default value for redirects */
-	private $_max_redirect = 3;
+	private $_max_redirect;
 
 	/** @var int Holds the current redirect count for the request */
 	private $_current_redirect = 0;
 
 	/** @var null|string Used on redirect when keep alive is true */
-	private $_keep_alive_host = null;
+	private $_keep_alive_host;
 
 	/** @var null|resource the fp resource to reuse */
-	private $_keep_alive_fp = null;
+	private $_keep_alive_fp;
 
 	/** @var int how much we will read */
 	private $_content_length = 0;
 
 	/** @var array the parsed url with host, port, path, etc */
-	private $_url = array();
+	private $_url = [];
 
 	/** @var null|resource the fsockopen resource */
-	private $_fp = null;
+	private $_fp;
 
 	/** @var mixed[] Holds the passed user options array (only option is max_length) */
-	private $_user_options = array();
+	private $_user_options;
 
 	/** @var string|string[] Holds any data that will be posted to a form */
 	private $_post_data = '';
 
 	/** @var string[] Holds the response to the request, headers, data, code */
-	private $_response = array('url' => '', 'code' => 404, 'error' => '', 'redirects' => 0, 'size' => 0, 'headers' => array(), 'body' => '');
+	private $_response = ['url' => '', 'code' => 404, 'error' => '', 'redirects' => 0, 'size' => 0, 'headers' => [], 'body' => ''];
 
-	/** @var array() Holds the last headers response to the request */
-	private $_headers = array();
+	/** @var array() Holds the last header response to the request */
+	private $_headers = [];
 
 	/** @var string the HTTP response from the server 200/404/302 etc */
 	private $_server_response;
@@ -70,7 +70,7 @@ class FsockFetchWebdata
 	 * @param int $max_redirect
 	 * @param bool $keep_alive
 	 */
-	public function __construct($options = array(), $max_redirect = 3, $keep_alive = false)
+	public function __construct($options = [], $max_redirect = 3, $keep_alive = false)
 	{
 		// Initialize class variables
 		$this->_max_redirect = (int) $max_redirect;
@@ -96,7 +96,7 @@ class FsockFetchWebdata
 			}
 			else
 			{
-				$this->_post_data = http_build_query(array(trim($post_data)), '', '&');
+				$this->_post_data = http_build_query([trim($post_data)], '', '&');
 			}
 		}
 
@@ -121,7 +121,7 @@ class FsockFetchWebdata
 			return false;
 		}
 
-		// reuse the socket if this is a keep alive
+		// Reuse the socket if this is a keep alive
 		if ($this->_keep_alive && $this->_url['host'] === $this->_keep_alive_host)
 		{
 			$this->_fp = $this->_keep_alive_fp;
@@ -172,7 +172,7 @@ class FsockFetchWebdata
 	 */
 	private function _setOptions($url)
 	{
-		$this->_url = array();
+		$this->_url = [];
 		$this->_response['url'] = $url;
 		$this->_content_length = !empty($this->_user_options['max_length']) ? (int) $this->_user_options['max_length'] : 0;
 
@@ -210,6 +210,7 @@ class FsockFetchWebdata
 		// no socket, then we need to open one to do much
 		if (!is_resource($this->_fp))
 		{
+			set_error_handler(static function () { /* ignore errors */ });
 			try
 			{
 				$this->_fp = fsockopen($this->_url['host'], $this->_url['port'], $errno, $errstr, 5);
@@ -218,6 +219,10 @@ class FsockFetchWebdata
 			catch (\Exception $e)
 			{
 				return false;
+			}
+			finally
+			{
+				restore_error_handler();
 			}
 		}
 
@@ -279,7 +284,7 @@ class FsockFetchWebdata
 	 */
 	private function _readHeaders()
 	{
-		$this->_headers = array();
+		$this->_headers = [];
 		$headers = '';
 
 		// Read / request more data, Looking for a blank line which separates headers from body

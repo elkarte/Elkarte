@@ -276,7 +276,7 @@ class Sphinxql extends AbstractAPI
 	{
 		global $modSettings;
 
-		set_error_handler(function () { /* ignore errors */ });
+		set_error_handler(static function () { /* ignore errors */ });
 		try
 		{
 			$mySphinx = mysqli_connect(($modSettings['sphinx_searchd_server'] === 'localhost' ? '127.0.0.1' : $modSettings['sphinx_searchd_server']), '', '', '', (int) $modSettings['sphinxql_searchd_port']);

@@ -1878,7 +1878,7 @@ function stop_prefetching()
 		@ob_end_clean();
 		Headers::instance()
 			->removeHeader('all')
-			->headerSpecial('HTTP/1.1 403 Forbidden')
+			->headerSpecial('HTTP/1.1 403 Prefetch Forbidden')
 			->sendHeaders();
 		die;
 	}

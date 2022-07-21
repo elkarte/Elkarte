@@ -187,9 +187,9 @@
 		};
 
 		// Get a Vimeo video thumbnail
-		imgHandlers.getVimeoIMG = function(videoID, callback)
+		imgHandlers.getVimeoIMG = function(eURL, callback)
 		{
-			fetchDocument('https://vimeo.com/api/v2/video/' + videoID + '.json', vimeoResponse, 'json', false);
+			fetchDocument(eURL, vimeoResponse, 'json', false);
 			function vimeoResponse(data)
 			{
 				if (typeof data[0].thumbnail_large !== 'undefined')

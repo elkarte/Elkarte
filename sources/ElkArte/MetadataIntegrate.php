@@ -128,8 +128,7 @@ class MetadataIntegrate
 			&& $start === 0
 			&& (!empty($context['get_message'][0]) && is_object($context['get_message'][0])))
 		{
-
-			// Grab the first post of the thread
+			// Grab the first post of the thread to get proper thread author data
 			$controller = $context['get_message'][0];
 			$smd = $controller->{$context['get_message'][1]}();
 
@@ -144,7 +143,7 @@ class MetadataIntegrate
 			$smd['html_body'] = preg_replace('~<([bse][a-z0-9]*)[^>]*?(/?)>~i', '<$1$2>', $smd['html_body']);
 			$smd['html_body'] = Util::shorten_html($smd['html_body'], 375);
 
-			// Create a short plain text description
+			// Create a short plain text description // $context['page_description']
 			$description = empty($context['description'])
 				? preg_replace('~\s\s+|&nbsp;|&quot;|&#039;~', ' ', $smd['raw_body'])
 				: $context['description'];
@@ -166,22 +165,22 @@ class MetadataIntegrate
 		// Snag us a site logo
 		$logo = $this->getLogo();
 
-		$slogan = $settings['site_slogan'] ??  un_htmlspecialchars($mbname);
+		$slogan = !empty($settings['site_slogan']) ? $settings['site_slogan'] : un_htmlspecialchars($mbname);
 
 		// The sites organizational card
-		return array(
+		return [
 			'@context' => 'https://schema.org',
 			'@type' => 'Organization',
 			'url' => !empty($context['canonical_url']) ? $context['canonical_url'] : $boardurl,
-			'logo' => array(
+			'logo' => [
 				'@type' => 'ImageObject',
 				'url' => $logo[2],
 				'width' => $logo[0],
 				'height' => $logo[1],
-			),
+			],
 			'name' => un_htmlspecialchars($context['forum_name']),
 			'slogan' => $slogan,
-		);
+		];
 	}
 
 	/**
@@ -236,6 +235,7 @@ class MetadataIntegrate
 			'author' => [
 				'@type' => 'Person',
 				'name' => $this->data['member']['name'],
+				'url' => $this->data['member']['href']
 			],
 			'url' => $this->data['href'],
 			'articleBody' => $this->data['html_body'],
@@ -367,9 +367,9 @@ class MetadataIntegrate
 		global $context, $settings, $mbname;
 
 		// Supplied one, simply use it.
-		if (!empty($context['description']))
+		if (!empty($context['page_description']) || !empty(!empty($context['description'])))
 		{
-			return $context['description'];
+			return $context['page_description'] ?? $context['description'];
 		}
 
 		// Build out a default that makes some sense

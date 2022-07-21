@@ -1088,9 +1088,8 @@ class Maintenance extends AbstractController
 
 		// Last thing: are we able to gain time?
 		$current_time_limit = (int) ini_get('max_execution_time');
-		@set_time_limit(159); //something strange just to be sure
-		$new_time_limit = ini_get('max_execution_time');
-		@set_time_limit($current_time_limit);
+		$new_time_limit = detectServer()->setTimeLimit(159); //something strange just to be sure
+		detectServer()->setTimeLimit($current_time_limit);
 
 		$context['use_maintenance'] = 0;
 
