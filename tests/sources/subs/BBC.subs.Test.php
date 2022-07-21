@@ -292,27 +292,27 @@ Should be an empty line in between.',
 			array(
 				'Quoting is a pain 8',
 				'[quote author=an author link=board=1;topic=123 date=12345678]This is a quote[/quote]',
-				'<div class="quote-read-more"><input type="checkbox" title="show" class="quote-show-more"><blockquote class="bbc_quote"><cite><a href="http://127.0.0.1/index.php?topic=123">Quote from: an author on ' . htmlTime(12345678) . '</a></cite>This is a quote</blockquote></div>',
+				'<div class="quote-read-more"><input type="checkbox" title="show" class="quote-show-more"><blockquote class="bbc_quote"><cite><a href="http://127.0.0.1/index.php?topic=123">Quote from: an author &ndash; on ' . htmlTime(12345678) . '</a></cite>This is a quote</blockquote></div>',
 			),
 			array(
 				'Quoting is a pain 9',
 				'[quote author=an author link=topic=123.msg123#msg123 date=12345678]This is a quote[/quote]',
-				'<div class="quote-read-more"><input type="checkbox" title="show" class="quote-show-more"><blockquote class="bbc_quote"><cite><a href="http://127.0.0.1/index.php?topic=123.msg123#msg123">Quote from: an author on ' . htmlTime(12345678) . '</a></cite>This is a quote</blockquote></div>',
+				'<div class="quote-read-more"><input type="checkbox" title="show" class="quote-show-more"><blockquote class="bbc_quote"><cite><a href="http://127.0.0.1/index.php?topic=123.msg123#msg123">Quote from: an author &ndash; on ' . htmlTime(12345678) . '</a></cite>This is a quote</blockquote></div>',
 			),
 			array(
 				'Quoting is a pain 10',
 				'[quote author=an author link=threadid=123.msg123#msg123 date=12345678]This is a quote[/quote]',
-				'<div class="quote-read-more"><input type="checkbox" title="show" class="quote-show-more"><blockquote class="bbc_quote"><cite><a href="http://127.0.0.1/index.php?threadid=123.msg123#msg123">Quote from: an author on ' . htmlTime(12345678) . '</a></cite>This is a quote</blockquote></div>',
+				'<div class="quote-read-more"><input type="checkbox" title="show" class="quote-show-more"><blockquote class="bbc_quote"><cite><a href="http://127.0.0.1/index.php?threadid=123.msg123#msg123">Quote from: an author &ndash; on ' . htmlTime(12345678) . '</a></cite>This is a quote</blockquote></div>',
 			),
 			array(
 				'Quoting is a pain 11',
 				'[quote author=an author link=action=profile;u=123 date=12345678]This is a quote[/quote]',
-				'<div class="quote-read-more"><input type="checkbox" title="show" class="quote-show-more"><blockquote class="bbc_quote"><cite><a href="http://127.0.0.1/index.php?action=profile;u=123">Quote from: an author on ' . htmlTime(12345678) . '</a></cite>This is a quote</blockquote></div>',
+				'<div class="quote-read-more"><input type="checkbox" title="show" class="quote-show-more"><blockquote class="bbc_quote"><cite><a href="http://127.0.0.1/index.php?action=profile;u=123">Quote from: an author &ndash; on ' . htmlTime(12345678) . '</a></cite>This is a quote</blockquote></div>',
 			),
 			array(
 				'Quoting is a pain 12',
 				'[quote author=an author date=1486679559 link=msg=123][quote]This is a quote[/quote]Of a quote[/quote]',
-				'<div class="quote-read-more"><input type="checkbox" title="show" class="quote-show-more"><blockquote class="bbc_quote"><cite><a href="http://127.0.0.1/index.php?msg=123">Quote from: an author on ' . htmlTime(1486679559) . '</a></cite><blockquote class="bbc_quote bbc_alternate_quote"><cite>Quote</cite>This is a quote</blockquote>Of a quote</blockquote></div>',
+				'<div class="quote-read-more"><input type="checkbox" title="show" class="quote-show-more"><blockquote class="bbc_quote"><cite><a href="http://127.0.0.1/index.php?msg=123">Quote from: an author &ndash; on ' . htmlTime(1486679559) . '</a></cite><blockquote class="bbc_quote bbc_alternate_quote"><cite>Quote</cite>This is a quote</blockquote>Of a quote</blockquote></div>',
 			),
 			array(
 				'Quoting is a pain 13',
