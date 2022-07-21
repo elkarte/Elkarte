@@ -654,7 +654,8 @@ function increaseDownloadCounter($id_attach)
  *
  * What it does:
  *
- * - supports GIF, JPG, PNG, BMP and WBMP formats.
+ * - supports input of GIF, JPG, PNG, BMP, WEBP and WBMP formats
+ * - outputs png, jpg or webp based on best choice
  * - uses createThumbnail() to resize to max_width by max_height, and saves the result to a file.
  * - updates the database info for the member's avatar.
  * - returns whether the download and resize was successful.
@@ -783,7 +784,7 @@ function saveAvatar($temporary_path, $memID, $max_width, $max_height)
 function url_image_size($url)
 {
 	// Can we pull this from the cache... please please?
-	$temp = array();
+	$temp = [];
 	if (Cache::instance()->getVar($temp, 'url_image_size-' . md5($url), 3600))
 	{
 		return $temp;
@@ -817,29 +818,31 @@ function url_image_size($url)
 			$range = 0;
 	}
 
-	$image = new FsockFetchWebdata(array('max_length' => $range));
+	$image = new FsockFetchWebdata(['max_length' => $range]);
 	$image->get_url_data($url);
 
 	// The server may not understand Range: so lets try to fetch the entire thing
-	// assuming we were not simply turned away
-	if ($image->result('code') != 200 && $image->result('code') != 403)
+	// assuming we were not simply turned away and did not already try
+	if ($range !== 0 && $image->result('code') != 200 && $image->result('code') != 403)
 	{
-		$image = new FsockFetchWebdata(array());
+		$image = new FsockFetchWebdata([]);
 		$image->get_url_data($url);
 	}
 
 	// Here is the data, getimagesizefromstring does not care if its a complete image, it only
 	// searches for size headers in a given data set.
 	$data = $image->result('body');
-	$size = getimagesizefromstring($data);
+	unset($image);
+	$size = empty($data) ? elk_getimagesize($url) : getimagesizefromstring($data);
 
 	// Well, ok, umm, fail!
-	if ($data === false || $size === false)
+	if ($size === false || $data === false)
 	{
-		return array(-1, -1, -1);
+		$size = [-1, -1, -1];
 	}
 
-	// Save this for 1hour, its not like the image size is going to change
+	// Save this for 1hour, its not like the image size is going to change, and if we
+	// failed, no sense trying again and again!
 	Cache::instance()->put('url_image_size-' . md5($url), $size, 3600);
 
 	return $size;
@@ -860,12 +863,12 @@ function getServerStoredAvatars($directory)
 	$file_functions = FileFunctions::instance();
 
 	// You can always have no avatar
-	$result[] = array(
+	$result[] = [
 		'filename' => 'blank.png',
-		'checked' => in_array($context['member']['avatar']['server_pic'], array('', 'blank.png')),
+		'checked' => in_array($context['member']['avatar']['server_pic'], ['', 'blank.png']),
 		'name' => $txt['no_pic'],
 		'is_dir' => false
-	);
+	];
 
 	// Not valid is easy
 	$avatarDir = $modSettings['avatar_directory'] . (!empty($directory) ? '/' : '') . $directory;
@@ -889,13 +892,13 @@ function getServerStoredAvatars($directory)
 		if ($entry->isDir())
 		{
 			// Add a new directory
-			$result[] = array(
+			$result[] = [
 				'filename' => htmlspecialchars(basename($entry), ENT_COMPAT, 'UTF-8'),
 				'checked' => strpos($context['member']['avatar']['server_pic'], basename($entry) . '/') !== false,
 				'name' => '[' . htmlspecialchars(str_replace('_', ' ', basename($entry)), ENT_COMPAT, 'UTF-8') . ']',
 				'is_dir' => true,
 				'files' => []
-			);
+			];
 			$key++;
 
 			continue;
@@ -1210,7 +1213,7 @@ function elk_getimagesize($file, $error = 'array')
 	// Can't get it, what shall we return
 	if (empty($sizes))
 	{
-		$sizes = $error === 'array' ? array(-1, -1, -1) : false;
+		$sizes = $error === 'array' ? [-1, -1, -1] : false;
 	}
 
 	return $sizes;
