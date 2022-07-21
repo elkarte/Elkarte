@@ -398,8 +398,8 @@ class Attachment extends AbstractController
 			isAllowedTo('approve_posts', $id_board ?? $board);
 		}
 
-		// Update the download counter (unless it's a thumbnail or an avatar).
-		if (!empty($id_attach) && empty($is_avatar) || $attachment_type != 3)
+		// Update the download counter (unless it's a thumbnail).
+		if (!empty($id_attach && $attachment_type != 3))
 		{
 			increaseDownloadCounter($id_attach);
 		}
@@ -547,7 +547,7 @@ class Attachment extends AbstractController
 		}
 
 		// Check whether the ETag was sent back, and cache based on that...
-		if (!empty($this->_req->server->HTTP_IF_NONE_MATCH) && strpos($this->_req->server->HTTP_IF_NONE_MATCH, $eTag) !== false)
+		if (!empty($_SERVER['HTTP_IF_NONE_MATCH']) && strpos($_SERVER['HTTP_IF_NONE_MATCH'], $eTag) !== false)
 		{
 			@ob_end_clean();
 
