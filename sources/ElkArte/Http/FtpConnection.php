@@ -72,7 +72,7 @@ class FtpConnection
 	public function connect($ftp_server, $ftp_port = 21, $ftp_user = 'anonymous', $ftp_pass = 'ftpclient@yourdomain.org')
 	{
 		// Connect to the FTP server.
-		set_error_handler(function () { /* ignore errors */ });
+		set_error_handler(static function () { /* ignore errors */ });
 		$ftp_server = $this->getServer($ftp_server);
 		$this->connection = stream_socket_client($ftp_server . ':' . $ftp_port, $err_code, $err, 5);
 		restore_error_handler();
@@ -299,7 +299,7 @@ class FtpConnection
 		fwrite($this->connection, 'STOR ' . $ftp_file . "\r\n");
 
 		// Okay, now we connect to the data port.  If it doesn't work out, it's probably "file already exists", etc.
-		set_error_handler(function () { /* ignore errors */ });
+		set_error_handler(static function () { /* ignore errors */ });
 		$fp = stream_socket_client($this->pasv['ip'] . ':' . $this->pasv['port'], $err_code, $err, 5);
 		restore_error_handler();
 		if ($fp === false || $err_code !== 0 || !$this->check_response(150))
