@@ -578,7 +578,7 @@ em, .em {
 /* Category Header icons, chain i-xyz from icons_svg */
 .hdicon::before {
 	display: inline-block;
-	width: 24px;
+	width: 20px;
 	height: 24px;
 	margin: 0 .25em 0 0;
 	content: "";

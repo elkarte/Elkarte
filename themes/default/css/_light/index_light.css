@@ -745,7 +745,7 @@ sup.bbc_footnotes, sup.bbc_footnotes a {
 #search_form_button .linklevel1 {
 	color: var(--primary_white);
 	border-color: var(--menu_button_border_active);
-	border-top-color: var(--menu_button_border_active_top);
+	border-top-color: var(--menu_border_top);
 	background-image: linear-gradient(to bottom, var(--menu_button_active_2), var(--menu_button_active));
 	box-shadow: 1px 1px 2px var(--box_shadow);
 }
