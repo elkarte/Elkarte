@@ -57,13 +57,18 @@ class Gd2 extends AbstractManipulator
 	}
 
 	/**
-	 * Loads a image file into the image engine for processing
+	 * Loads an image file into the image engine for processing
 	 *
 	 * @return bool
 	 */
 	public function createImageFromFile()
 	{
 		$this->setImageDimensions();
+
+		if ($this->imageDimensions[2] === IMAGETYPE_WEBP && !$this->hasWebpSupport())
+		{
+			return false;
+		}
 
 		if (isset(Image::DEFAULT_FORMATS[$this->imageDimensions[2]]))
 		{
@@ -509,6 +514,18 @@ class Gd2 extends AbstractManipulator
 		$this->__destruct();
 
 		return $result ? $image : false;
+	}
+
+	/**
+	 * If this installation of GD supports webP
+	 *
+	 * @return bool
+	 */
+	public function hasWebpSupport()
+	{
+		$check = gd_info();
+
+		return !empty($check['WebP Support']);
 	}
 
 	/**

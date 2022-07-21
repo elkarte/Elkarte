@@ -122,13 +122,13 @@ abstract class AbstractManipulator
 		}
 		catch (\Exception $e)
 		{
-			$this->imageDimensions = array();
+			$this->imageDimensions = [];
 		}
 
 		// Can't get it, what shall we return
 		if (empty($this->imageDimensions))
 		{
-			$this->imageDimensions = array(-1, -1, -1);
+			$this->imageDimensions = [-1, -1, -1];
 		}
 	}
 
@@ -220,5 +220,18 @@ abstract class AbstractManipulator
 		}
 
 		return [round($dst_width), round($dst_height)];
+	}
+
+	public function canUseWebp()
+	{
+		global $modSettings;
+
+		// Enabled?
+		if (empty($modSettings['attachment_webp_enable']))
+		{
+			return false;
+		}
+
+		return true;
 	}
 }

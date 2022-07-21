@@ -67,6 +67,11 @@ class Imagick extends AbstractManipulator
 	{
 		$this->setImageDimensions();
 
+		if ($this->imageDimensions[2] === IMAGETYPE_WEBP && !$this->hasWebpSupport())
+		{
+			return false;
+		}
+
 		if (isset(Image::DEFAULT_FORMATS[$this->imageDimensions[2]]))
 		{
 			try
@@ -469,6 +474,18 @@ class Imagick extends AbstractManipulator
 		{
 			return false;
 		}
+	}
+
+	/**
+	 * Check if this installation supports webP
+	 *
+	 * @return bool
+	 */
+	public function hasWebpSupport()
+	{
+		$check = Imagick::queryformats();
+
+		return in_array('WEBP', $check);
 	}
 
 	/**
