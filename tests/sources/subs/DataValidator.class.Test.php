@@ -114,9 +114,9 @@ class TestDataValidator extends ElkArteCommonSetupTest
 		foreach ($this->invalid_data as $key => $value)
 		{
 			$test = $validation->validation_errors($key);
-			$test[0] = isset($test[0]) ? $test[0] : $key;
+			$test = $test === false ? $key : $test[0];
 			$value = is_array($value) ? implode(' | ', $value) : $value;
-			$this->assertNotFalse($validation->validation_errors($key), 'Test: ' . $test[0] . ' passed data: ' . $value . ' but it should have failed');
+			$this->assertFalse($validation->validation_errors($key), 'Test: ' . $test . ' failed data: ' . $value . ' but it should have passed');
 		}
 
 		// These should all pass
