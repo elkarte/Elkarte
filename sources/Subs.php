@@ -1035,13 +1035,13 @@ function setMemoryLimit($needed, $in_use = false)
  */
 function memoryReturnBytes($val)
 {
-	if (is_integer($val))
-		return $val;
+	// Treat blank values as 0
+	$val = is_bool($val) || empty($val) ? 0 : trim($val);
 
 	// Separate the number from the designator
-	$val = trim($val);
-	$num = intval(substr($val, 0, strlen($val) - 1));
-	$last = strtolower(substr($val, -1));
+	preg_match('~(\d+)(.*)~', $val, $val);
+	$num = intval($val[1]);
+	$last = strtolower(substr(!empty($val[2]) ? $val[2] : '', 0, 1));
 
 	// Convert to bytes
 	switch ($last)
