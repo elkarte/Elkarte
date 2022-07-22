@@ -521,12 +521,13 @@ function htmlTime($timestamp)
 	if (empty($timestamp))
 		return '';
 
+	$forumtime = forum_time(false, $timestamp);
 	$timestamp = forum_time(true, $timestamp);
 	$time = date('Y-m-d H:i', $timestamp);
 	$stdtime = standardTime($timestamp, true, true);
 
 	// @todo maybe htmlspecialchars on the title attribute?
-	return '<time title="' . (!empty($context['using_relative_time']) ? $stdtime : $txt['last_post']) . '" datetime="' . $time . '" data-timestamp="' . $timestamp . '">' . $stdtime . '</time>';
+	return '<time title="' . (!empty($context['using_relative_time']) ? $stdtime : $txt['last_post']) . '" datetime="' . $time . '" data-timestamp="' . $timestamp . '" data-forumtime="' . $forumtime . '">' . $stdtime . '</time>';
 }
 
 /**
@@ -566,6 +567,9 @@ function forum_time($use_user_offset = true, $timestamp = null)
  */
 function un_htmlspecialchars($string)
 {
+	if (empty($string))
+		return $string;
+
 	$string = htmlspecialchars_decode($string, ENT_QUOTES);
 	$string = str_replace('&nbsp;', ' ', $string);
 
@@ -1031,13 +1035,13 @@ function setMemoryLimit($needed, $in_use = false)
  */
 function memoryReturnBytes($val)
 {
-	if (is_integer($val))
-		return $val;
+	// Treat blank values as 0
+	$val = is_bool($val) || empty($val) ? 0 : trim($val);
 
 	// Separate the number from the designator
-	$val = trim($val);
-	$num = intval(substr($val, 0, strlen($val) - 1));
-	$last = strtolower(substr($val, -1));
+	preg_match('~(\d+)(.*)~', $val, $val);
+	$num = intval($val[1]);
+	$last = strtolower(substr(!empty($val[2]) ? $val[2] : '', 0, 1));
 
 	// Convert to bytes
 	switch ($last)
@@ -1246,6 +1250,8 @@ function host_from_ip($ip)
 			$test = @shell_exec('host -W 1 ' . @escapeshellarg($ip));
 		else
 			$test = @shell_exec('host ' . @escapeshellarg($ip));
+
+		$test = isset($test) ? $test : '';
 
 		// Did host say it didn't find anything?
 		if (strpos($test, 'not found') !== false)
@@ -1914,7 +1920,7 @@ function addProtocol($url, $protocols = array())
 }
 
 /**
- * Removes nested quotes from a text string.
+ * Removes all, or those over a limit, of nested quotes from a text string.
  *
  * @param string $text - The body we want to remove nested quotes from
  *
@@ -1924,15 +1930,62 @@ function removeNestedQuotes($text)
 {
 	global $modSettings;
 
-	// Remove any nested quotes, if necessary.
-	if (!empty($modSettings['removeNestedQuotes']))
-	{
-		return preg_replace(array('~\n?\[quote.*?\].+?\[/quote\]\n?~is', '~^\n~', '~\[/quote\]~'), '', $text);
-	}
-	else
+	if (!isset($modSettings['removeNestedQuotes']))
 	{
 		return $text;
 	}
+
+	// How many levels will we allow?
+	$max_depth = (int) $modSettings['removeNestedQuotes'];
+
+	// Remove all nested quotes?
+	if ($max_depth === 0)
+	{
+		return preg_replace(array('~\n?\[quote.*?\].+?\[/quote\]\n?~is', '~^\n~', '~\[/quote\]~'), '', $text);
+	}
+
+	// Remove just -some- of the quotes, then we need to find them all
+	preg_match_all('~(\[\/?quote(?:(.*?))?\])~i', $text, $matches, PREG_OFFSET_CAPTURE);
+	$depth = 0;
+	$remove = array();
+	$start_pos = 0;
+
+	// Mark ones that are in excess of the limit.  $match[0] will be the found tag
+	// such as [quote=some author] or [/quote], $match[1] is the starting position of that tag.
+	foreach ($matches[0] as $match)
+	{
+		// Closing quote
+		if ($match[0][1] === '/')
+		{
+			--$depth;
+
+			// To many, mark it for removal
+			if ($depth === $max_depth)
+			{
+				// This quote position in the string, note [/quote] = 8
+				$end_pos = $match[1] + 8;
+				$length = $end_pos - $start_pos;
+				$remove[] = array($start_pos, $length);
+			}
+
+			continue;
+		}
+
+		// Another quote level inward
+		++$depth;
+		if ($depth === $max_depth + 1)
+		{
+			$start_pos = $match[1];
+		}
+	}
+
+	// Time to cull the herd
+	foreach (array_reverse($remove) as list($start_pos, $length))
+	{
+		$text = substr_replace($text, '', $start_pos, $length);
+	}
+
+	return $text;
 }
 
 /**

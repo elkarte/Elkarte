@@ -23,6 +23,7 @@ class PackagesFilterIterator extends \FilterIterator
 	 *
 	 * @return bool
 	 */
+	#[\ReturnTypeWillChange]
 	public function accept()
 	{
 		$current = $this->current();

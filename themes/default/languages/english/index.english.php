@@ -88,6 +88,7 @@ $txt['search'] = 'Search';
 $txt['calendar'] = 'Calendar';
 $txt['members'] = 'Members';
 $txt['recent_posts'] = 'Recent Posts';
+$txt['recent_topics'] = 'Recent Topics';
 
 $txt['admin'] = 'Admin';
 // Sub menu labels
@@ -530,6 +531,7 @@ $txt['code'] = 'Code';
 $txt['code_select'] = '[Select]';
 $txt['quote_from'] = 'Quote from';
 $txt['quote'] = 'Quote';
+$txt['quick_quote'] = 'Quote Selected';
 $txt['quote_new'] = 'New topic';
 $txt['follow_ups'] = 'Follow-ups';
 $txt['topic_derived_from'] = 'Topic derived from %1$s';
@@ -912,10 +914,11 @@ $txt['debug_script_cpu_load'] = 'Script CPU Time (user/system): ';
 
 // Video embedding
 $txt['preview_image'] = 'Video Preview Image';
-$txt['ctp_video'] = 'Click to play video, double click to load video';
+$txt['ctp_video'] = 'Click to play video';
 $txt['hide_video'] = 'Show/Hide video';
 $txt['youtube'] = 'YouTube video:';
 $txt['vimeo'] = 'Vimeo video:';
+$txt['tiktok'] = 'TikTok video:';
 $txt['dailymotion'] = 'Dailymotion video:';
 
 // Spoiler BBC

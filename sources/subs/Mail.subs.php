@@ -228,7 +228,7 @@ function sendmail($to, $subject, $message, $from = null, $message_id = null, $se
 	elseif (!empty($modSettings['mail_queue']) && !empty($modSettings['mail_period_limit']))
 	{
 		list ($last_mail_time, $mails_this_minute) = @explode('|', $modSettings['mail_recent']);
-		if (empty($mails_this_minute) || time() > $last_mail_time + 60)
+		if (empty($mails_this_minute) || time() > (int) $last_mail_time + 60)
 			$new_queue_stat = time() . '|' . 1;
 		else
 			$new_queue_stat = $last_mail_time . '|' . ((int) $mails_this_minute + 1);

@@ -11,7 +11,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.1.7
+ * @version 1.1.9
  *
  */
 
@@ -456,7 +456,7 @@ class ManageSmileys_Controller extends Action_Controller
 					$dir = dir($modSettings['smileys_dir'] . '/' . $context['current_set']['path']);
 					while ($entry = $dir->read())
 					{
-						if (in_array(strrchr($entry, '.'), array('.jpg', '.gif', '.jpeg', '.png')))
+						if (in_array(strrchr($entry, '.'), array('.jpg', '.gif', '.jpeg', '.png', '.webp')))
 							$smileys[strtolower($entry)] = $entry;
 					}
 					$dir->close();
@@ -554,7 +554,7 @@ class ManageSmileys_Controller extends Action_Controller
 			checkSession();
 
 			// Some useful arrays... types we allow - and ports we don't!
-			$allowedTypes = array('jpeg', 'jpg', 'gif', 'png', 'bmp');
+			$allowedTypes = array('jpeg', 'jpg', 'gif', 'png', 'bmp', 'webp');
 			$disabledFiles = array('con', 'com1', 'com2', 'com3', 'com4', 'prn', 'aux', 'lpt1', '.htaccess', 'index.php');
 
 			$this->_req->post->smiley_code = $this->_req->getPost('smiley_code', 'Util::htmltrim', '');
@@ -733,7 +733,7 @@ class ManageSmileys_Controller extends Action_Controller
 				$dir = dir($context['smileys_dir'] . '/' . un_htmlspecialchars($smiley_set['path']));
 				while ($entry = $dir->read())
 				{
-					if (!in_array($entry, $context['filenames']) && in_array(strrchr($entry, '.'), array('.jpg', '.gif', '.jpeg', '.png')))
+					if (!in_array($entry, $context['filenames']) && in_array(strrchr($entry, '.'), array('.jpg', '.gif', '.jpeg', '.png', '.webp')))
 						$context['filenames'][strtolower($entry)] = array(
 							'id' => htmlspecialchars($entry, ENT_COMPAT, 'UTF-8'),
 							'selected' => false,
@@ -1101,7 +1101,7 @@ class ManageSmileys_Controller extends Action_Controller
 					$dir = dir($context['smileys_dir'] . '/' . un_htmlspecialchars($smiley_set['path']));
 					while ($entry = $dir->read())
 					{
-						if (!in_array($entry, $context['filenames']) && in_array(strrchr($entry, '.'), array('.jpg', '.gif', '.jpeg', '.png')))
+						if (!in_array($entry, $context['filenames']) && in_array(strrchr($entry, '.'), array('.jpg', '.gif', '.jpeg', '.png', '.webp')))
 							$context['filenames'][strtolower($entry)] = array(
 								'id' => htmlspecialchars($entry, ENT_COMPAT, 'UTF-8'),
 								'selected' => false,
@@ -1700,7 +1700,7 @@ class ManageSmileys_Controller extends Action_Controller
 		$dir = dir($modSettings['smileys_dir'] . '/' . $smileyPath);
 		while ($entry = $dir->read())
 		{
-			if (in_array(strrchr($entry, '.'), array('.jpg', '.gif', '.jpeg', '.png')))
+			if (in_array(strrchr($entry, '.'), array('.jpg', '.gif', '.jpeg', '.png', '.webp')))
 				$smileys[strtolower($entry)] = $entry;
 		}
 		$dir->close();

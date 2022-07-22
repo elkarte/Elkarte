@@ -607,7 +607,8 @@ $txt['mm_emailparsers'] = 'Parsers';
 $txt['mm_emailtemplates'] = 'Templates';
 $txt['mm_emailsettings'] = 'Settings';
 
-$txt['removeNestedQuotes'] = 'Remove nested quotes when quoting';
+$txt['removeNestedQuotes'] = 'Allowed nested quoting depth';
+$txt['heightBeforeShowMore'] = 'Quote height (px) before adding a "read more" link.';
 $txt['enableSpellChecking'] = 'Enable spell checking';
 $txt['enableSpellChecking_warning'] = 'this does not work on all servers.';
 $txt['enableSpellChecking_error'] = 'this does not work on your server.';

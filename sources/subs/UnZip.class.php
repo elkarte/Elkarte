@@ -7,7 +7,7 @@
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * @version 1.1
+ * @version 1.1.9
  *
  */
 
@@ -279,6 +279,8 @@ class UnZip
 
 			// Extract all file standard length information for this record, its the 42 bytes following the signature
 			$temp = unpack('vversion/vversion_needed/vgeneral_purpose/vcompress_method/vfile_time/vfile_date/Vcrc/Vcompressed_size/Vsize/vfilename_length/vextra_field_length/vcomment_length/vdisk_number_start/vinternal_attributes/vexternal_attributes1/vexternal_attributes2/Vrelative_offset', substr($this->_data_cdr, $pointer + 4, 42));
+			if ($temp === false)
+				return false;
 
 			// Extract the variable length data, filename, etc
 			$pointer = $pointer + 46;

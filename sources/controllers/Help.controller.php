@@ -11,7 +11,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.1
+ * @version 1.1.9
  *
  */
 
@@ -62,12 +62,12 @@ class Help_Controller extends Action_Controller
 		// Sections we are going to link...
 		$context['manual_sections'] = array(
 			'registering' => 'Registering',
-			'logging_in' => 'Logging_In',
+			'logging_in' => 'Logging In',
 			'profile' => 'Profile',
 			'search' => 'Search',
 			'posting' => 'Posting',
-			'bbc' => 'Bulletin_board_code',
-			'personal_messages' => 'Personal_messages',
+			'bbc' => 'BBC',
+			'personal_messages' => 'Personal Messages',
 			'memberlist' => 'Memberlist',
 			'calendar' => 'Calendar',
 			'features' => 'Features',

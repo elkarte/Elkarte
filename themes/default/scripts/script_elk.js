@@ -40,6 +40,32 @@ function elk_codefix()
 }
 
 /**
+ * Removes the read more overlay from quote blocks that do not need them, and for
+ * ones that do, hides so the read more input can expand it out.
+ */
+function elk_quotefix()
+{
+	let quotes = document.querySelectorAll('.quote-read-more');
+
+	quotes.forEach((quote) => {
+		let bbc_quote = quote.querySelector('.bbc_quote');
+
+		if (bbc_quote.scrollHeight > bbc_quote.clientHeight)
+		{
+			bbc_quote.style.overflow = 'hidden';
+		}
+		else
+		{
+			let check = quote.querySelector('.quote-show-more');
+			if (check)
+			{
+				check.remove();
+			}
+		}
+	});
+}
+
+/**
  * Turn a regular url button in to an ajax request
  *
  * @param {string} btn string representing this, generally the anchor link tag <a class="" href="" onclick="">

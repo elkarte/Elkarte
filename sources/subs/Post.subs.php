@@ -13,7 +13,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.1.6
+ * @version 1.1.9
  *
  */
 
@@ -584,7 +584,7 @@ function approvePosts($msgs, $approve = true)
 	$request = $db->query('', '
 		SELECT m.id_msg, m.approved, m.id_topic, m.id_board, t.id_first_msg, t.id_last_msg,
 			m.body, m.subject, COALESCE(mem.real_name, m.poster_name) AS poster_name, m.id_member,
-			t.approved AS topic_approved, b.count_posts
+			t.approved AS topic_approved, b.count_posts, mem.signature
 		FROM {db_prefix}messages AS m
 			INNER JOIN {db_prefix}topics AS t ON (t.id_topic = m.id_topic)
 			INNER JOIN {db_prefix}boards AS b ON (b.id_board = m.id_board)
@@ -642,6 +642,7 @@ function approvePosts($msgs, $approve = true)
 				'topic' => $row['id_topic'],
 				'msg' => $row['id_first_msg'],
 				'poster' => $row['id_member'],
+				'signature' => $row['signature'],
 			);
 		}
 		else
@@ -656,6 +657,7 @@ function approvePosts($msgs, $approve = true)
 					'subject' => $row['subject'],
 					'name' => $row['poster_name'],
 					'topic' => $row['id_topic'],
+					'signature' => $row['signature'],
 				);
 		}
 

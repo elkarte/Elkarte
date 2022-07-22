@@ -9,7 +9,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.1.6
+ * @version 1.1.9
  *
  */
 
@@ -542,6 +542,9 @@ class Install_Controller
 			if (!defined('SOURCEDIR'))
 				define('SOURCEDIR', TMP_BOARDDIR . '/sources');
 
+			if (!defined('SUBSDIR'))
+				define('SUBSDIR', TMP_BOARDDIR . '/sources/subs');
+
 			// Better find the database file!
 			if (!file_exists(SOURCEDIR . '/database/Db-' . $db_type . '.class.php'))
 			{
@@ -554,6 +557,7 @@ class Install_Controller
 			$modSettings['disableQueryCheck'] = true;
 
 			require_once(SOURCEDIR . '/database/Database.subs.php');
+			require_once(SUBSDIR . '/Util.class.php');
 
 			// Attempt a connection.
 			$db_connection = elk_db_initiate($db_server, $db_name, $db_user, $db_passwd, $db_prefix, array('non_fatal' => true, 'dont_select_db' => true, 'port' => $db_port), $db_type);
@@ -641,6 +645,11 @@ class Install_Controller
 
 		$incontext['sub_template'] = 'forum_settings';
 		$incontext['page_title'] = $txt['install_settings'];
+
+		if (!defined('SUBSDIR'))
+			define('SUBSDIR', TMP_BOARDDIR . '/sources/subs');
+
+		require_once(SUBSDIR . '/Util.class.php');
 
 		// Let's see if we got the database type correct.
 		if (isset($_POST['db_type'], $databases[$_POST['db_type']]))
@@ -919,8 +928,8 @@ class Install_Controller
 		$can_alter_table = $db->query('', "
 			ALTER TABLE {$db_prefix}log_digest
 			ORDER BY id_topic",
-			array()
-		) === false;
+				array()
+			) === false;
 
 		if (!empty($databases[$db_type]['alter_support']) && $can_alter_table)
 		{

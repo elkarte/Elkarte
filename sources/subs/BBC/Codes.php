@@ -170,6 +170,11 @@ class Codes
 	 */
 	const ATTR_NO_CACHE = 25;
 
+	/**
+	 * If to reset ATTR_CONTENT to a new value, useful when build content tag in addons
+	 */
+	const ATTR_RESET = 26;
+
 	/** [tag]parsed content[/tag] */
 	const TYPE_PARSED_CONTENT = 0;
 
@@ -681,7 +686,7 @@ class Codes
 						self::PARAM_ATTR_VALIDATE => 'htmlTime',
 					),
 				),
-				self::ATTR_BEFORE => '<div class="quoteheader"><a href="' . $scripturl . '?{link}">' . $txt['quote_from'] . ': {author} ' . ($modSettings['todayMod'] == 3 ? ' - ' : $txt['search_on']) . ' {date}</a></div><blockquote>',
+				self::ATTR_BEFORE => '<div class="quoteheader"><a href="' . $scripturl . '?{link}">' . $txt['quote_from'] . ': {author} &ndash;' . ($modSettings['todayMod'] == 3 ? '' : ' ' . $txt['search_on']) . ' {date}</a></div><blockquote>',
 				self::ATTR_AFTER => '</blockquote>',
 				self::ATTR_BLOCK_LEVEL => true,
 				self::ATTR_AUTOLINK => true,

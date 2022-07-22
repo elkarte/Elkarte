@@ -190,9 +190,13 @@ function template_messages()
 
 		// Show the post itself, finally!
 		echo '
-						<section id="msg_', $message['id'], '" class="messageContent', $ignoring ? ' hide"' : '"', '>',
+						<section id="msg_', $message['id'], '" data-msgid="',$message['id'], '" class="messageContent', $ignoring ? ' hide"' : '"', '>',
 							$message['body'], '
 						</section>';
+
+		// This is the floating Quick Quote button.
+		echo '
+						<button id="button_float_qq_', $message['id'], '" type="submit" role="button" style="display: none" class="quick_quote_button hide">', !empty($txt['quick_quote']) ? $txt['quick_quote'] : $txt['quote'], '</button>';
 
 		// Assuming there are attachments...
 		if (!empty($message['attachment']))
@@ -884,14 +888,14 @@ function template_display_attachments($message, $ignoring)
 			if ($attachment['thumbnail']['has_thumb'])
 				echo '
 											<a href="', $attachment['href'], ';image" id="link_', $attachment['id'], '" ', $attachment['thumbnail']['lightbox'], '>
-												<img class="attachment_image" src="', $attachment['thumbnail']['href'], '" alt="" id="thumb_', $attachment['id'], '" />
+												<img class="attachment_image" src="', $attachment['thumbnail']['href'], '" alt="" id="thumb_', $attachment['id'], '" loading="lazy" />
 											</a>';
 			else
 				echo '
-											<img class="attachment_image" src="', $attachment['href'], ';image" alt="" style="max-width:100%; max-height:' . $attachment['height'] . 'px;"/>';
+											<img class="attachment_image" src="', $attachment['href'], ';image" alt="" style="max-width:100%; max-height:' . $attachment['height'] . 'px;" loading="lazy" />';
 		}
 		elseif (!empty($modSettings['attachmentShowImages']))
-			echo '							<img class="attachment_image" src="', $attachment['href'], ';thumb" alt="" style="max-width:' . $modSettings['attachmentThumbWidth'] . 'px; max-height:' . $modSettings['attachmentThumbHeight'] . 'px;" />';
+			echo '							<img class="attachment_image" src="', $attachment['href'], ';thumb" alt="" style="max-width:' . $modSettings['attachmentThumbWidth'] . 'px; max-height:' . $modSettings['attachmentThumbHeight'] . 'px;" loading="lazy" />';
 
 		echo '
 											<a href="', $attachment['href'], '" class="attachment_name">

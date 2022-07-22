@@ -9,7 +9,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.1.4
+ * @version 1.1.9
  *
  */
 
@@ -190,7 +190,7 @@ function template_ic_recent_posts()
 	echo '
 			<li class="board_row hslice" id="recent_posts_content">
 				<h3 class="ic_section_header">
-					<a href="', $scripturl, '?action=recent"><i class="icon i-post-text"></i>', $txt['recent_posts'], '</a>
+					<a href="', $scripturl, '?action=recent"><i class="icon i-post-text"></i>', empty($settings['recent_post_topics']) ? $txt['recent_posts'] : $txt['recent_topics'], '</a>
 				</h3>';
 
 	// Only show one post.

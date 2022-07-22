@@ -278,10 +278,7 @@ QuickReply.prototype.quote = function (iMessageId, xDeprecated)
 		getXMLDocument(elk_prepareScriptUrl(this.opt.sScriptUrl) + 'action=quotefast;quote=' + iMessageId + ';xml', this.onQuoteReceived);
 
 	// Move the view to the quick reply box.
-	if (navigator.appName === 'Microsoft Internet Explorer')
-		window.location.hash = this.opt.sJumpAnchor;
-	else
-		window.location.hash = '#' + this.opt.sJumpAnchor;
+	document.getElementById(this.opt.sJumpAnchor).scrollIntoView();
 
 	return false;
 };
@@ -460,7 +457,7 @@ QuickModify.prototype.onMessageReceived = function (XMLDoc)
 	}
 
 	// Position the editor in the window
-	location.hash = '#info_' + this.sCurMessageId.substr(this.sCurMessageId.lastIndexOf("_") + 1);
+	document.getElementById('info_' + this.sCurMessageId.substring(this.sCurMessageId.lastIndexOf("_") + 1)).scrollIntoView();
 
 	// Handle custom function hook before showing the new select.
 	if ('funcOnAfterCreate' in this.opt)

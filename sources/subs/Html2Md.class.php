@@ -543,10 +543,10 @@ class Html_2_Md
 		if ($node->getAttribute('data-lightboximage') || $node->getAttribute('data-lightboxmessage'))
 			return '~`skip`~';
 
-		$href = htmlspecialchars_decode($node->getAttribute('href'));
+		$href = str_replace('\_', '_', htmlspecialchars_decode($node->getAttribute('href')));
 		$title = $node->getAttribute('title');
 		$class = $node->getAttribute('class');
-		$value = trim($this->_get_value($node), "\t\n\r\0\x0B");
+		$value = str_replace('\_', '_', trim($this->_get_value($node), "\t\n\r\0\x0B"));
 
 		// Provide a more compact [name] if none is given
 		if ($value == $node->getAttribute('href') || empty($value))
@@ -1192,7 +1192,7 @@ class Html_2_Md
 	{
 		global $txt;
 
-		return '[' . $txt['link'] . '](' . trim($matches[0]) . ')';
+		return '[' . $txt['link'] . '](' . trim(str_replace('\_', '_', $matches[0])) . ')';
 	}
 
 	/**
