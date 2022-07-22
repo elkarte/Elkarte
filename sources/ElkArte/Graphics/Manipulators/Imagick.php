@@ -483,7 +483,7 @@ class Imagick extends AbstractManipulator
 	 */
 	public function hasWebpSupport()
 	{
-		$check = Imagick::queryformats();
+		$check = \Imagick::queryformats();
 
 		return in_array('WEBP', $check);
 	}
