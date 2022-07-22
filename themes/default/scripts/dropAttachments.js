@@ -19,7 +19,7 @@
 	let dragDropAttachment = (function (params)
 	{
 		// Few internal global vars
-		let allowedExtensions = [],
+		var allowedExtensions = [],
 			curFileNum = 0,
 			totalSizeAllowed = null,
 			individualSizeAllowed = null,

@@ -218,6 +218,9 @@ class TemporaryAttachment extends ValuesContainer
 		// Did you pack this bag yourself?
 		$this->checkImageContents();
 
+		// WebP may require special processing that will affect size/type
+		$this->convertFromWebp();
+
 		// We may allow resizing uploaded images, so they take less room
 		$this->adjustImageSizeType();
 
@@ -303,6 +306,50 @@ class TemporaryAttachment extends ValuesContainer
 		{
 			$autoSizer = new ImageUploadResize();
 			$autoSizer->autoResize($this->data);
+		}
+	}
+
+	/**
+	 * If the admin does not want to save webP (attachment_webp_enable is off) but they accept
+	 * webp extensions and the server has webp capabilities, then webP -> PNG or -> JPG (best choice)
+	 * based on input image
+	 *
+	 * @return void
+	 */
+	public function convertFromWebp()
+	{
+		global $modSettings;
+
+		// We may have to adjust for webp based on ACP settings
+		if (empty($this->data['imagesize'][2])
+			|| $this->data['imagesize'][2] !== IMAGETYPE_WEBP
+			|| !empty($modSettings['attachment_webp_enable'])
+			|| (!empty($modSettings['attachmentCheckExtensions']) && stripos($modSettings['attachmentExtensions'], ',webp') === false))
+		{
+			return;
+		}
+
+		// Is a webp image and manipulation is possible?
+		$image = new Image($this->data['tmp_name']);
+		if ($image->hasWebpSupport())
+		{
+			$format = $image->getDefaultFormat();
+			if ($image->isImageLoaded() && $image->saveImage($this->data['tmp_name'], $format))
+			{
+				$valid_mime = getValidMimeImageType($format);
+
+				// Update to what it now is (webp to png or jpg)
+				$update = [
+					'size' => $image->getFilesize(),
+					'imagesize' => $image->getImageDimensions(),
+					'resized' => true,
+					'type' => $valid_mime,
+					'mime' => $valid_mime,
+					'name' => $this->data['name'] . '.' . substr($valid_mime, strpos($valid_mime, '/') + 1)
+				];
+
+				$this->data = array_merge($this->data, $update);
+			}
 		}
 	}
 
