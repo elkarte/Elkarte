@@ -1,14 +1,13 @@
-name: MaxPain
+name: UnitTests
 
 on:
   push:
     branches:        # Run tests when commits are pushed to these branches
-      - master
       - '**'
   pull_request:      # Run tests when pull requests are made on these branches
     branches:
       - master
-      - '**'
+      - 'patch_1-1-9'
 
 env:
   WEBSERVER: 'none'
@@ -45,7 +44,7 @@ jobs:
       - name: Checkout ElkArte
         uses: actions/checkout@v2
         with:
-          repository: Spuds/elkarte
+          repository: elkarte/elkarte
           fetch-depth: 10
           ref: ${{ env.ELKARTE_BRANCH }}
           path: elkarte
@@ -122,7 +121,7 @@ jobs:
       - name: Checkout ElkArte
         uses: actions/checkout@v2
         with:
-          repository: Spuds/elkarte
+          repository: elkarte/elkarte
           fetch-depth: 10
           ref: ${{ env.ELKARTE_BRANCH }}
           path: elkarte
