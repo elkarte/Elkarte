@@ -27,10 +27,10 @@ global $ssi_db_user, $ssi_db_passwd;
 if (!defined('ELK'))
 {
 	DEFINE('ELK', '1');
-	DEFINE('CACHE_STALE', '?R11B2');
+	DEFINE('CACHE_STALE', '?R119');
 
 	// Get the forum's settings for database and file paths.
-	require_once('/var/www/Settings.php');
+	require_once('Settings.php');
 
 	// Set our site "variable" constants
 	DEFINE('BOARDDIR', $boarddir);
@@ -45,7 +45,7 @@ if (!defined('ELK'))
 }
 else
 {
-	require_once('/var/www/Settings.php');
+	require_once('Settings.php');
 }
 
 // A few files we cannot live without and will not be autoload
@@ -72,19 +72,19 @@ cleanRequest();
 loadDatabase();
 Hooks::init(database(), Debug::instance());
 reloadSettings();
-elk_seed_generator();
 loadSession();
 loadUserSettings();
 loadBoard();
 loadPermissions();
-loadTheme();
 
 // It should be added to the install and upgrade scripts.
 // But since the converters need to be updated also. This is easier.
 updateSettings(array(
 	'attachmentUploadDir' => serialize(array(1 => $modSettings['attachmentUploadDir'])),
 	'currentAttachmentUploadDir' => 1,
+	'disableQueryCheck' => 1,
 ));
+loadTheme();
 
 // Basic language is good to have for functional tests
 loadLanguage('index+Errors');
@@ -92,8 +92,8 @@ loadLanguage('index+Errors');
 // If we are running functional tests as well
 if (defined('PHPUNIT_SELENIUM'))
 {
-	require_once('/var/www/tests/sources/controllers/ElkArteWebTest.php');
+	require_once('tests/sources/controllers/ElkArteWebTest.php');
 	PHPUnit_Extensions_Selenium2TestCase::shareSession(true);
 }
 
-file_put_contents('/var/www/bootstrapcompleted.lock', '1');
+file_put_contents('bootstrapcompleted.lock', '1');

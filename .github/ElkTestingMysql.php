@@ -12,12 +12,6 @@
  *
  */
 
-define('TESTDIR', dirname(__FILE__));
-define('BOARDDIR', dirname(__FILE__) . '/../..');
-define('CACHEDIR', BOARDDIR . '/cache');
-define('ELK', '1');
-
-require_once(TESTDIR . '/setup.php');
 require_once(BOARDDIR . '/sources/database/Db-mysql.class.php');
 require_once(BOARDDIR . '/sources/database/DbTable.class.php');
 require_once(BOARDDIR . '/sources/database/DbTable-mysql.php');
@@ -55,7 +49,7 @@ class DbTable_MySQL_Install extends DbTable_MySQL
 
 	/**
 	 * Static method that allows to retrieve or create an instance of this class.
-`	 *
+	 *
 	 * @param object $db - A Database_MySQL object
 	 *
 	 * @return object - A DbTable_MySQL object
@@ -74,14 +68,14 @@ class DbTable_MySQL_Install extends DbTable_MySQL
 /**
  * Extend Elk_Testing_Setup with MySql values
  */
-class Elk_Testing_mysql extends Elk_Testing_Setup
+class ElkTestingMysql extends ElkTestingSetup
 {
 	public function init()
 	{
 		global $db_name, $db_prefix;
 
 		$this->_boardurl = 'http://127.0.0.1';
-		$this->_db_server = 'localhost';
+		$this->_db_server = '127.0.0.1';
 		$this->_db_type = 'mysql';
 		$db_name = $this->_db_name = 'elkarte_test';
 		$this->_db_user = 'root';
@@ -109,5 +103,5 @@ class Elk_Testing_mysql extends Elk_Testing_Setup
 	}
 }
 
-$setup = new Elk_Testing_mysql();
+$setup = new ElkTestingMysql();
 $setup->init();

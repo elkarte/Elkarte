@@ -1,13 +1,13 @@
 <?php
 
-class TestEmailpost extends PHPUnit_Framework_TestCase
+class TestEmailpost extends PHPUnit\Framework\TestCase
 {
 	/**
 	 * Prepare what is necessary to use in these tests.
 	 *
 	 * setUp() is run automatically by the testing framework before each test method.
 	 */
-	public function setUp()
+	protected function setUp(): void
 	{
 		require_once(SUBSDIR . '/Emailpost.subs.php');
 

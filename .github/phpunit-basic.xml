@@ -7,11 +7,14 @@
          convertWarningsToExceptions="true"
          processIsolation="false"
          stopOnFailure="false"
-         syntaxCheck="false"
          verbose="true">
   <testsuites>
-      <testsuite name="ElkArte Basic Tests">
-          <directory suffix="Basic.php">/var/www/tests</directory>
+      <testsuite name="Basic Tests">
+          <directory suffix="Basic.php">../tests</directory>
       </testsuite>
   </testsuites>
+
+  <logging>
+      <log type="coverage-text" target="php://stdout" />
+  </logging>
 </phpunit>

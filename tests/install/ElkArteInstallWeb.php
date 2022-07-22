@@ -26,7 +26,7 @@ class ElkArteInstallWeb extends ElkArteWebTest
 	 *
 	 * This method is used to configure the Selenium Server session, url/browser
 	 */
-	protected function setUp()
+	protected function setUp() : void
 	{
 		// Set the browser to be used by Selenium, it must be available on localhost
 		$this->setBrowser($this->browser);

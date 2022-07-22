@@ -1,6 +1,6 @@
 <?php
 
-class TestBBCHTML extends PHPUnit_Framework_TestCase
+class TestBBCHTML extends PHPUnit\Framework\TestCase
 {
 	protected $bbcTestCases;
 
@@ -9,7 +9,7 @@ class TestBBCHTML extends PHPUnit_Framework_TestCase
 	 *
 	 * setUp() is run automatically by the testing framework before each test method.
 	 */
-	public function setUp()
+	protected function setUp(): void
 	{
 		$GLOBALS['modSettings']['user_access_mentions'] = array();
 		$GLOBALS['modSettings']['enablePostHTML'] = 1;

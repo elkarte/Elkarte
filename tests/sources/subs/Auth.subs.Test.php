@@ -1,6 +1,6 @@
 <?php
 
-class TestAuthsubs extends PHPUnit_Framework_TestCase
+class TestAuthsubs extends PHPUnit\Framework\TestCase
 {
 	protected $passwd = 'test_admin_pwd';
 	protected $user = 'test_admin';
@@ -11,7 +11,7 @@ class TestAuthsubs extends PHPUnit_Framework_TestCase
 	 *
 	 * setUp() is run automatically by the testing framework before each test method.
 	 */
-	public function setUp()
+	protected function setUp(): void
 	{
 		require_once(SUBSDIR . '/Auth.subs.php');
 	}
@@ -21,7 +21,7 @@ class TestAuthsubs extends PHPUnit_Framework_TestCase
 	 *
 	 * tearDown() is run automatically by the testing framework after each test method.
 	 */
-	public function tearDown()
+	protected function tearDown(): void
 	{
 	}
 

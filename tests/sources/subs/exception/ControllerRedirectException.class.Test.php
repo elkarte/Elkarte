@@ -3,7 +3,7 @@
 /**
  * TestCase class for Controller_Redirect_Exception class.
  */
-class TestControllerRedirectException extends PHPUnit_Framework_TestCase
+class TestControllerRedirectException extends PHPUnit\Framework\TestCase
 {
 	public function testBasicRedirect()
 	{

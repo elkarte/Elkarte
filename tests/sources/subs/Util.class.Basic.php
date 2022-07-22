@@ -1,6 +1,6 @@
 <?php
 
-class TestUtilclass extends PHPUnit_Framework_TestCase
+class TestUtilclass extends PHPUnit\Framework\TestCase
 {
 	protected $string = '';
 
@@ -9,7 +9,7 @@ class TestUtilclass extends PHPUnit_Framework_TestCase
 	 *
 	 * setUp() is run automatically by the testing framework before each test method.
 	 */
-	public function setUp()
+	protected function setUp(): void
 	{
 		// Create a utf-8 string with 4 byte characters
 		$this->string = html_entity_decode('Some 4 byte characters&#x2070e;&#x20731;&#x20779; for elkarte testing', ENT_COMPAT, 'UTF-8');
@@ -20,7 +20,7 @@ class TestUtilclass extends PHPUnit_Framework_TestCase
 	 *
 	 * tearDown() is run automatically by the testing framework after each test method.
 	 */
-	public function tearDown()
+	protected function tearDown(): void
 	{
 	}
 

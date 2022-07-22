@@ -6,14 +6,14 @@ require_once(SUBSDIR . '/Logging.subs.php');
  * TestCase class for logging
  * @backupGlobals disabled
  */
-class TestLogging extends PHPUnit_Framework_TestCase
+class TestLogging extends PHPUnit\Framework\TestCase
 {
 	/**
 	 * Prepare what is necessary to use in these tests.
 	 *
 	 * setUp() is run automatically by the testing framework before each test method.
 	 */
-	public function setUp()
+	protected function setUp(): void
 	{
 		require_once(SUBSDIR . '/ProfileHistory.subs.php');
 	}
@@ -23,7 +23,7 @@ class TestLogging extends PHPUnit_Framework_TestCase
 	 *
 	 * tearDown() is run automatically by the testing framework after each test method.
 	 */
-	public function tearDown()
+	protected function tearDown(): void
 	{
 		// remove data
 	}

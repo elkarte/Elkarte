@@ -13,6 +13,10 @@
 
 global $txt;
 
+define('BOARDDIR', dirname(__FILE__) . '/..');
+define('CACHEDIR', BOARDDIR . '/cache');
+define('ELK', '1');
+
 // Lots of needs
 require_once(BOARDDIR . '/sources/database/Db.php');
 require_once(BOARDDIR . '/sources/database/Db-abstract.class.php');
@@ -20,6 +24,7 @@ require_once(BOARDDIR . '/sources/Subs.php');
 require_once(BOARDDIR . '/sources/subs/Cache.subs.php');
 require_once(BOARDDIR . '/sources/database/Database.subs.php');
 require_once(BOARDDIR . '/install/installcore.php');
+require_once(BOARDDIR . '/sources/subs/Util.class.php');
 
 // Composer-Autoloader
 require_once(BOARDDIR . '/vendor/autoload.php');
@@ -27,7 +32,7 @@ require_once(BOARDDIR . '/vendor/autoload.php');
 /**
  * Used to install ElkArte SQL files to a database scheme
  */
-Class Elk_Testing_Setup
+Class ElkTestingSetup
 {
 	protected $_db;
 	protected $_install_instance;

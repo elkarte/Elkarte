@@ -16,7 +16,7 @@ class MockMemcached extends ElkArte\sources\subs\CacheMethod\Memcached
 /**
  * TestCase class for caching classes.
  */
-class TestCache extends PHPUnit_Framework_TestCase
+class TestCache extends PHPUnit\Framework\TestCase
 {
 	private $_cache_obj = null;
 
@@ -25,7 +25,7 @@ class TestCache extends PHPUnit_Framework_TestCase
 	 *
 	 * setUp() is run automatically by the testing framework before each test method.
 	 */
-	public function setUp()
+	protected function setUp(): void
 	{
 		Elk_Autoloader::instance()->register(SUBSDIR . '/CacheMethod', '\\ElkArte\\sources\\subs\\CacheMethod');
 	}
