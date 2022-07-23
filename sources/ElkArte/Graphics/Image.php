@@ -107,6 +107,29 @@ class Image
 	}
 
 	/**
+	 * Returns if the acp allows saving webP images
+	 *
+	 * @return bool
+	 */
+	public function canUseWebp()
+	{
+		global $modSettings;
+
+		// Enabled?
+		if (empty($modSettings['attachment_webp_enable']))
+		{
+			return false;
+		}
+
+		if (!empty($modSettings['attachmentCheckExtensions']) && stripos($modSettings['attachmentExtensions'], ',webp') === false)
+		{
+			return false;
+		}
+
+		return true;
+	}
+
+	/**
 	 * Load an image from a file or web address into the active graphics library
 	 */
 	protected function loadImage()

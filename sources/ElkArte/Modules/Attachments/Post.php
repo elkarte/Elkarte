@@ -191,7 +191,7 @@ class Post extends AbstractModule
 						if ($context['current_action'] !== 'post2')
 						{
 							$txt['error_attach_errors'] = empty($txt['error_attach_errors']) ? '<br />' : '';
-							$txt['error_attach_errors'] .= vsprintf($txt['attach_warning'], $attachment->getName()) . '<div class="attachmenterrors">';
+							$txt['error_attach_errors'] .= sprintf($txt['attach_warning'], $attachment->getName()) . '<div class="attachmenterrors">';
 							foreach ($attachment->getErrors() as $error)
 							{
 								$txt['error_attach_errors'] .= (is_array($error) ? vsprintf($txt[$error[0]], $error[1]) : $txt[$error]) . '<br  />';

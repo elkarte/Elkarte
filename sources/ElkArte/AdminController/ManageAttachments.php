@@ -360,8 +360,8 @@ class ManageAttachments extends AbstractController
 			array('int', 'attachmentDirSizeLimit', 'subtext' => $txt['zero_for_no_limit'], 6, 'postinput' => $txt['kilobyte']),
 			'',
 			// Posting limits
-			array('int', 'attachmentPostLimit', 'step' => 32, 'subtext' => $post_max_size_text, 6, 'postinput' => empty($testPM) ? $txt['attachment_postsize_warning'] : $txt['kilobyte'], 'invalid' => empty($testPM)),
-			array('int', 'attachmentSizeLimit', 'step' => 32, 'subtext' => $upload_max_filesize_text, 6, 'postinput' => empty($testUM) ? $txt['attachment_postsize_warning'] : $txt['kilobyte'], 'invalid' => empty($testUM)),
+			array('int', 'attachmentPostLimit', 'subtext' => $post_max_size_text, 6, 'postinput' => empty($testPM) ? $txt['attachment_postsize_warning'] : $txt['kilobyte'], 'invalid' => empty($testPM)),
+			array('int', 'attachmentSizeLimit', 'subtext' => $upload_max_filesize_text, 6, 'postinput' => empty($testUM) ? $txt['attachment_postsize_warning'] : $txt['kilobyte'], 'invalid' => empty($testUM)),
 			array('int', 'attachmentNumPerPostLimit', 'subtext' => $txt['zero_for_no_limit'], 6),
 			'',
 			array('check', 'attachment_webp_enable', 'disabled' => !$testWebP, 'postinput' => $testWebP ? "" : $txt['attachment_webp_enable_na']),

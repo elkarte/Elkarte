@@ -221,17 +221,4 @@ abstract class AbstractManipulator
 
 		return [round($dst_width), round($dst_height)];
 	}
-
-	public function canUseWebp()
-	{
-		global $modSettings;
-
-		// Enabled?
-		if (empty($modSettings['attachment_webp_enable']))
-		{
-			return false;
-		}
-
-		return true;
-	}
 }
