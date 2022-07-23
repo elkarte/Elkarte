@@ -138,7 +138,7 @@ input[type="submit"], .drop_area_fileselect_text, button[type="submit"], input[t
 /* Anchors styled to look like buttons. */
 /* These have standard body text size. Can be chained with smalltext class. */
 .linkbutton:link, .linkbutton_right:link, .linkbutton_left:link,
-.linkbutton:visited, .linkbutton_right:visited, .linkbutton_left:visited {
+.linkbutton:visited, .linkbutton_right:visited, .linkbutton_left:visited, .ila {
 	border: 1px solid #AFAFAF;
 	border-top: 1px solid #CFCFCF;
 	border-left: 1px solid #BFBFBF;
@@ -151,7 +151,7 @@ input[type="submit"], .drop_area_fileselect_text, button[type="submit"], input[t
 
 /* Hover effects. */
 input[type="submit"]:hover, button[type="submit"]:hover, input[type="button"]:hover,
-.linkbutton:hover, .linkbutton_right:hover, .linkbutton_left:hover {
+.linkbutton:hover, .linkbutton_right:hover, .linkbutton_left:hover, .ila:hover {
 	border: 1px solid #CCCCCC;
 	border-top: 1px solid #AFAFAF;
 	border-left: 1px solid #AFAFAF;
@@ -1315,7 +1315,7 @@ a.active {
 	border: 2px solid #A8352F;
 }
 
-.share, .ila {
+.share {
 	background-color: #008000;
 }
 

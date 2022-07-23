@@ -756,8 +756,11 @@ function attachmentChecks($attachID)
 	$size = elk_getimagesize($_SESSION['temp_attachments'][$attachID]['tmp_name']);
 	$valid_mime = getValidMimeImageType($size[2]);
 
-	// If it is a webp image, and ACP support is OFF, but server is capable, then convert it!
-	if (empty($modSettings['attachment_webp_enable']) && $size[2] == 18 && hasWebpSupport())
+	// If it is a webp image, and ACP support is OFF, extension is on, server is capable, then convert it!
+	if (empty($modSettings['attachment_webp_enable'])
+		&& $size[2] === 18
+		&& hasWebpSupport()
+		&& (empty($modSettings['attachmentCheckExtensions']) || stripos($modSettings['attachmentExtensions'], ',webp') !== false))
 	{
 		// We do this before the checks as it will increase the filesize
 		$format = setDefaultFormat($_SESSION['temp_attachments'][$attachID]['tmp_name']);
@@ -766,8 +769,9 @@ function attachmentChecks($attachID)
 			// Update to what it now is (webp to png or jpg)
 			$size = elk_getimagesize($_SESSION['temp_attachments'][$attachID]['tmp_name']);
 			$valid_mime = getValidMimeImageType($size[2]);
+			$ext = str_replace('jpeg', 'jpg', substr($valid_mime, strpos($valid_mime, '/') + 1));
 			$_SESSION['temp_attachments'][$attachID]['type'] = $valid_mime;
-			$_SESSION['temp_attachments'][$attachID]['name'] .= '.' . substr($valid_mime, strpos($valid_mime, '/') + 1);
+			$_SESSION['temp_attachments'][$attachID]['name'] .= '.' . $ext;
 			$_SESSION['temp_attachments'][$attachID]['size'] = filesize($_SESSION['temp_attachments'][$attachID]['tmp_name']);
 		}
 	}
@@ -793,10 +797,11 @@ function attachmentChecks($attachID)
 			if (!(empty($size)) && ($size[2] !== $old_format))
 			{
 				$valid_mime = getValidMimeImageType($size[2]);
+				$ext = str_replace('jpeg', 'jpg', substr($valid_mime, strpos($valid_mime, '/') + 1));
 				if ($valid_mime !== '')
 				{
 					$_SESSION['temp_attachments'][$attachID]['type'] = $valid_mime;
-					$_SESSION['temp_attachments'][$attachID]['name'] .= '.' . substr($valid_mime, strpos($valid_mime, '/') + 1);
+					$_SESSION['temp_attachments'][$attachID]['name'] .= '.' . $ext;
 					$_SESSION['temp_attachments'][$attachID]['size'] = filesize($_SESSION['temp_attachments'][$attachID]['tmp_name']);
 				}
 			}

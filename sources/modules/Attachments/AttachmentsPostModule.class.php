@@ -131,13 +131,13 @@ class Attachments_Post_Module extends ElkArte\sources\modules\Abstract_Module
 		$context['attachments']['can']['post'] = self::$_attach_level == 1 && (allowedTo('post_attachment') || ($modSettings['postmod_active'] && allowedTo('post_unapproved_attachments')));
 		$context['attachments']['ila_enabled'] = !empty($modSettings['attachment_inline_enabled']);
 
+		// If there are attachments, calculate the total size and how many.
+		$attachments = array();
+		$attachments['total_size'] = 0;
+		$attachments['quantity'] = 0;
+
 		if ($context['attachments']['can']['post'])
 		{
-			// If there are attachments, calculate the total size and how many.
-			$attachments = array();
-			$attachments['total_size'] = 0;
-			$attachments['quantity'] = 0;
-
 			// If this isn't a new post, check the current attachments.
 			if (isset($_REQUEST['msg']))
 			{
@@ -250,7 +250,7 @@ class Attachments_Post_Module extends ElkArte\sources\modules\Abstract_Module
 						if ($context['current_action'] !== 'post2')
 						{
 							$txt['error_attach_errors'] = empty($txt['error_attach_errors']) ? '<br />' : '';
-							$txt['error_attach_errors'] .= vsprintf($txt['attach_warning'], $attachment['name']) . '<div class="attachmenterrors">';
+							$txt['error_attach_errors'] .= sprintf($txt['attach_warning'], $attachment['name']) . '<div class="attachmenterrors">';
 							foreach ($attachment['errors'] as $error)
 								$txt['error_attach_errors'] .= (is_array($error) ? vsprintf($txt[$error[0]], $error[1]) : $txt[$error]) . '<br  />';
 							$txt['error_attach_errors'] .= '</div>';
@@ -308,6 +308,8 @@ class Attachments_Post_Module extends ElkArte\sources\modules\Abstract_Module
 			// If they've unchecked an attachment, they may still want to attach that many more files, but don't allow more than num_allowed_attachments.
 			$context['attachments']['num_allowed'] = empty($modSettings['attachmentNumPerPostLimit']) ? 50 : min($modSettings['attachmentNumPerPostLimit'] - count($context['attachments']['current']), $modSettings['attachmentNumPerPostLimit']);
 			$context['attachments']['can']['post_unapproved'] = allowedTo('post_attachment');
+			$context['attachments']['total_size'] = $attachments['total_size'];
+			$context['attachments']['quantity'] = $attachments['quantity'];
 			$context['attachments']['restrictions'] = array();
 			if (!empty($modSettings['attachmentCheckExtensions']))
 				$context['attachments']['allowed_extensions'] = strtr(strtolower($modSettings['attachmentExtensions']), array(',' => ', '));
@@ -320,13 +322,15 @@ class Attachments_Post_Module extends ElkArte\sources\modules\Abstract_Module
 			{
 				if (!empty($modSettings[$type]))
 				{
-					$context['attachments']['restrictions'][] = sprintf($txt['attach_restrict_' . $type], comma_format($modSettings[$type], 0));
+					$context['attachments']['restrictions'][] = $type === 'attachmentNumPerPostLimit'
+						? sprintf($txt['attach_restrict_' . $type], comma_format($modSettings[$type], 0))
+						: sprintf($txt['attach_restrict_' . $type], byte_format($modSettings[$type] * 1024));
 
-					// Show some numbers. If they exist.
-					if ($type === 'attachmentNumPerPostLimit' && $attachments['quantity'] > 0)
-						$context['attachments']['restrictions'][] = sprintf($txt['attach_remaining'], $modSettings['attachmentNumPerPostLimit'] - $attachments['quantity']);
-					elseif ($type === 'attachmentPostLimit' && $attachments['total_size'] > 0)
-						$context['attachments']['restrictions'][] = sprintf($txt['attach_available'], comma_format(round(max($modSettings['attachmentPostLimit'] - ($attachments['total_size'] / 1028), 0)), 0));
+					// Show some numbers.
+					if ($type === 'attachmentNumPerPostLimit')
+						$context['attachments']['restrictions'][] = sprintf($txt['attach_remaining'], '<span id="' . $type . '">' . ($modSettings['attachmentNumPerPostLimit'] - $attachments['quantity']) . '</span>');
+					elseif ($type === 'attachmentPostLimit')
+						$context['attachments']['restrictions'][] = sprintf($txt['attach_available'], '<span id="' . $type . '">' . byte_format(max(($modSettings['attachmentPostLimit'] * 1024) - $attachments['total_size'], 0)) . '</span>');
 				}
 			}
 		}
