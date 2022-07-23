@@ -1430,7 +1430,6 @@ sup.bbc_footnotes, sup.bbc_footnotes a {
 	border-left-color: var(--secondary_border_left);
 	background-image: linear-gradient(to bottom, var(--primary_content_background) 0%, var(--primary_content_compliment) 100%);
 	box-shadow: 1px 1px 2px var(--box_shadow);
-
 }
 
 .ila_container:hover {
