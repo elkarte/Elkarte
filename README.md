@@ -12,31 +12,34 @@ Test ElkArte yourself by [visiting ElkArte.net](https://www.elkarte.net).
 
 Contributions to documentation are licensed under [CC-by-SA 3](http://creativecommons.org/licenses/by-sa/3.0). Third party libraries or sets of images, are under their own licenses.
 
-[![Build Status](http://img.shields.io/travis/elkarte/Elkarte/master.svg?style=flat)](https://travis-ci.org/elkarte/Elkarte)
-[![Open Issues](http://img.shields.io/github/issues/elkarte/Elkarte.svg?style=flat)](https://github.com/elkarte/Elkarte/issues)
+![Build Status](https://github.com/elkarte/Elkarte/workflows/UnitTests/badge.svg)
+[![Open Issues](https://img.shields.io/github/issues/elkarte/Elkarte.svg?style=flat)](https://github.com/elkarte/Elkarte/issues)
+[![Downloads](https://img.shields.io/github/downloads/elkArte/Elkarte/total)](https://github.com/elkarte/Elkarte/releases)
 [![Current Release](https://img.shields.io/github/release/elkarte/ElkArte.svg?style=flat)](https://github.com/elkarte/ElkArte/releases)
-[![License](http://img.shields.io/badge/License-BSD-green.svg?style=flat)](http://opensource.org/licenses/BSD-3-Clause)
+[![License](https://img.shields.io/badge/License-BSD-green.svg?style=flat)](http://opensource.org/licenses/BSD-3-Clause)
 
-## A small taste of new ElkArte features
-* @Mentioning users including notifications
+## A small sample of ElkArte's features
+* @Mentioning users including site and/or email notifications
 * Likes for posts and topics
 * Drafts, including auto save
 * OpenID 2.0 (BC Math must be available)
 * Two built in modern, responsive themes
-* Integrated video embedding for youtube, vimeo and dailymotion
-* Drag and drop ordering in the administration interface
-* Drag and drop file attachments
-* Improved Anti Spam measures
+* Integrated video embedding for youtube, tiktok, vimeo and dailymotion
+* Drag and drop post attachments
 * Improved password hashing using industry standards
+* Drag and drop ordering (boards, categories, custom profile fields) in the admin panel
+* Improved Anti Spam measures
 * Bad Behaviour built in
 * Automatic combining and minifying of JavaScript and CSS
-* Posting by Email
+* Posting and Replying by Email (PM's and Posts)
 * Ajax previews and responses throughout the user interface
 * Utilizes jQuery and Font Awesome
+* Quick Quote allows quoting selected text in your post
+* webP image support (GD or Imagick must have support)
 
 ## Requirements
 
-* PHP version 5.3 or newer
+* PHP version 5.3 or newer, (works on 8.1)
 * MySQL 5 and newer OR PostgreSQL 8.3 and newer
 
 On the client side, ElkArte will run & look good with its responsive theme in just about any modern browser, smartphone or tablet.
