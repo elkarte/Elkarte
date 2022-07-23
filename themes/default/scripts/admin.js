@@ -109,7 +109,9 @@ elk_AdminIndex.prototype.showCurrentVersion = function ()
 
 			var release = adminIndex.normalizeVersion(elem.tag_name);
 
-			if (!previous.hasOwnProperty('major') || verCompare.compareVersions(sCurrentVersion, elem.tag_name.replace('-', '').substring(1)))
+			let sCheckVersion = elem.tag_name.indexOf('v') === 0 ? elem.tag_name.substring(1) : elem.tag_name;
+			sCheckVersion.replace('-', '').substring(1);
+			if (!previous.hasOwnProperty('major') || verCompare.compareVersions(sCurrentVersion, sCheckVersion))
 			{
 				// Using a preprelease? Then you may need to know a new one is out!
 				if ((elem.prerelease && adminIndex.current.prerelease) || (!elem.prerelease))
