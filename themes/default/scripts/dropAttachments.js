@@ -3,7 +3,7 @@
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * @version 1.1
+ * @version 1.1.9
  */
 
 /**
@@ -28,6 +28,7 @@
 			filesUploadedSuccessfully = [],
 			uploadInProgress = false,
 			attachmentQueue = [],
+			resizeImageEnabled = false,
 			board = 0,
 			topic = 0,
 			oTxt = {},
@@ -62,8 +63,9 @@
 				totalSizeAllowed = (params.totalSizeAllowed === '') ? null : params.totalSizeAllowed;
 				individualSizeAllowed = (params.individualSizeAllowed === '') ? null : params.individualSizeAllowed;
 				numOfAttachmentAllowed = (params.numOfAttachmentAllowed === '') ? null : params.numOfAttachmentAllowed;
-				totalAttachSizeUploaded = params.totalAttachSizeUploaded / 1024;
+				totalAttachSizeUploaded = params.totalAttachSizeUploaded;
 				numAttachUploaded = params.numAttachUploaded;
+				resizeImageEnabled = params.resizeImageEnabled;
 				filesUploadedSuccessfully = [];
 				if (typeof params.topic !== 'undefined')
 					topic = params.topic;
@@ -72,6 +74,7 @@
 				$str = $(fileDisplayTemplate);
 				board = params.board;
 				oTxt = params.oTxt;
+				oTxt.totalSizeAllowed = oTxt.totalSizeAllowed.replace(/ KB\./ig, '.');
 				if (typeof params.existingSelector !== 'undefined')
 					processExisting($(params.existingSelector));
 			},
@@ -176,7 +179,7 @@
 								}
 							}
 							numAttachUploaded--;
-
+							totalAttachSizeUploaded -= fileSize;
 							populateErrors({
 								'errorMsgs': errorMsgs,
 								'serverErrorFiles': serverErrorFiles
@@ -189,8 +192,17 @@
 						sizeErrorFiles = [];
 
 					numAttachUploaded--;
-					errorMsgs.individualSizeErr = oTxt.postUploadError;
-					sizeErrorFiles.push(this.fileName.php_htmlspecialchars());
+					totalAttachSizeUploaded -= fileSize;
+
+					if (textStatus === 'abort')
+					{
+						errorMsgs.default = oTxt.uploadAbort;
+					}
+					else
+					{
+						errorMsgs.individualSizeErr = oTxt.postUploadError;
+						sizeErrorFiles.push(this.fileName.php_htmlspecialchars());
+					}
 					populateErrors({
 						'errorMsgs': errorMsgs,
 						'sizeErrorFiles': sizeErrorFiles
@@ -199,10 +211,59 @@
 
 				}).always(function() {
 					uploadInProgress = false;
+					updateStatusText();
 					runAttachmentQueue();
 				});
 				status.setAbort(jqXHR);
 			},
+
+		/**
+		* private function
+		*
+		* Updates the restrictions text line with current values
+		*/
+		updateStatusText = function() {
+			var numberAllowed = document.getElementById('attachmentNumPerPostLimit'),
+				totalSize = document.getElementById('attachmentPostLimit');
+
+			if (numberAllowed !== null)
+				numberAllowed.textContent = String(params.numOfAttachmentAllowed - numAttachUploaded);
+
+			if (totalSize !== null)
+				totalSize.textContent = formatBytes(params.totalSizeAllowed - totalAttachSizeUploaded);
+		},
+
+		/**
+		* private function
+		*
+		* Takes a number in bytes and returns a formatted string
+		*
+		* @param bytes
+		* @returns {string}
+		*/
+		formatBytes = function(bytes) {
+			if (bytes === 0)
+				return '0';
+
+			for (let kb of ['Bytes', 'KB', 'MB', 'GB']) {
+				if (bytes < 1024)
+					return parseFloat(bytes.toFixed(2)) + ' ' + kb;
+
+				bytes /= 1024;
+			}
+		},
+
+		/**
+		* private function
+		*
+		* Checks if the type is one of image/xyz
+		*
+        * @param file
+		* @returns {boolean}
+		*/
+		isFileImage = function(file) {
+			return file && file['type'].split('/')[0] === 'image';
+		},
 
 		/**
 		* private function
@@ -230,13 +291,15 @@
 				// Make sure we have a result:true in the response
 				if (resp.result) {
 					// Update our counters, number of files allowed and total data payload
-					totalAttachSizeUploaded -= filesUploadedSuccessfully[options.fileNum].size / 1024;
+					totalAttachSizeUploaded -= filesUploadedSuccessfully[options.fileNum].size;
 					numAttachUploaded--;
 					triggerEvt('RemoveSuccess', options.control, [dataToSend.attachid]);
 
 					// Done with this one, so remove it from existence
 					$('#' + dataToSend.attachid).off().remove();
-				} else if ('console' in window)
+					updateStatusText();
+				}
+				else if ('console' in window)
 					window.console.info(resp.data);
 			}).fail(function(jqXHR, textStatus, errorThrown) {
 				if ('console' in window) {
@@ -269,36 +332,39 @@
 
 			// Provide the file size in something more legible, like 100KB or 1.1MB
 			this.setFileNameSize = function(name, size) {
-				var sizeStr = "",
-					sizeKB = size / 1024,
-					sizeMB = sizeKB / 1024;
-
-				if (parseInt(sizeKB, 10) > 1024)
-					sizeStr = sizeMB.toFixed(2) + " MB";
-				else
-					sizeStr = sizeKB.toFixed(2) + " KB";
-
+				var sizeStr = formatBytes(size);
+				name = name.split(' (')[0].trim().php_htmlspecialchars();
 				$control.find('.info').html(name + ' (' + sizeStr + ')');
 			};
 
 			// Set the progress bar position
 			this.setProgress = function(progress) {
-				var /*$progressbar = $control.find('.progressBar'),*/
-					progressBarWidth = progress * $progressbar.width() / 100;
+				var progressBarWidth = progress * $progressbar.width() / 100;
 
 				$progressbar.find('div').animate({
 					width: progressBarWidth
 				}, 10).html(progress + "% ");
+
+				// Completed upload, server is making thumbs, doing checks, resize, etc
+				if (progress === 100) {
+					$progressbar.find('div').html(oTxt.processing);
+					$progressbar.after('<i class="icon i-spinner icon-spin"></i>');
+				}
 			};
 
-			// Provide a way to stop the upload before its done
-			this.setAbort = function(jqxhr) {
-				var sb = $control;
+			// Provide a way to stop the upload before it is done
+			this.setAbort = function (jqxhr)
+			{
+				let sb = $control,
+					pb = $progressbar;
 
-				$button.on('click', function(e) {
+				$button.on('click', function (e)
+				{
 					e.preventDefault();
 					jqxhr.abort();
 					sb.hide();
+					pb.siblings('.i-spinner').remove();
+					populateErrors({});
 				});
 			};
 
@@ -310,6 +376,8 @@
 			this.setServerFail = function(data) {
 				this.setProgress(0);
 				$button.removeClass('i-close').addClass('i-alert');
+				$progressbar.siblings('.icon .i-spinner .icon-spin').remove();
+				$progressbar.css("background-color", "var(--warn)");
 			};
 
 			// The file upload is successful, remove our abort event and swap the class
@@ -337,6 +405,10 @@
 			$control.attr('id', data.attachid);
 			$control.attr('data-size', data.size);
 
+			// We may have changed the name and size if resize is enabled
+			if (data.name)
+				$control.find('.info').html(data.name + ' (' + formatBytes(data.size) + ')');
+
 			// We need to tell Elk that the file should not be deleted
 			$button.after($('<input />')
 				.attr('type', 'hidden')
@@ -344,7 +416,8 @@
 				.attr('value', data.attachid));
 
 			var $img = $('<img />').attr('src', elk_scripturl + '?action=dlattach;sa=tmpattach;attach=' + $control.attr('id') + ';topic=' + topic),
-			    $progressbar = $control.find('.progressBar');
+				$progressbar = $control.find('.progressBar');
+			$progressbar.siblings('.i-spinner').remove();
 			$progressbar.after($('<div class="postattach_thumb" />').append($img));
 			$progressbar.remove();
 
@@ -360,6 +433,8 @@
 						'fileNum': fileNum,
 						'control': $control
 					});
+
+					populateErrors({});
 				}
 			});
 		},
@@ -380,7 +455,7 @@
 			for (var i = 0; i < files.length; i++) {
 				var fileExtensionCheck = /(?:\.([^.]+))?$/,
 					extension = fileExtensionCheck.exec(files[i].name)[1].toLowerCase(),
-					fileSize = files[i].size / 1024,
+					fileSize = files[i].size,
 					errorFlag = false;
 
 				// Make sure the server will allow this type of file
@@ -391,14 +466,14 @@
 				}
 
 				// Make sure the file is not larger than the server will accept
-				if (individualSizeAllowed !== null && fileSize > individualSizeAllowed) {
-					errorMsgs.individualSizeErr = '(' + parseInt(fileSize, 10) + ' KB) ' + oTxt.individualSizeAllowed;
+				if (individualSizeAllowed !== 0 && fileSize > individualSizeAllowed && !resizeImageEnabled && isFileImage(files[i])) {
+					errorMsgs.individualSizeErr = '(' + formatBytes(fileSize) + ' ) ' + oTxt.individualSizeAllowed;
 					sizeErrorFiles.push(files[i].name);
 					errorFlag = true;
 				}
 
 				// And you can't send too many
-				if (numAttachUploaded >= numOfAttachmentAllowed) {
+				if (numOfAttachmentAllowed !== 0 && numAttachUploaded >= numOfAttachmentAllowed) {
 					errorMsgs.maxNumErr = oTxt.numOfAttachmentAllowed;
 					sizeErrorFiles.push(files[i].name);
 					errorFlag = true;
@@ -408,9 +483,10 @@
 				if (errorFlag === false)
 					totalAttachSizeUploaded += fileSize;
 
-				if (totalSizeAllowed !== null && totalAttachSizeUploaded > totalSizeAllowed) {
-					errorMsgs.totalSizeError = oTxt.totalSizeAllowed.replace("%1$s", totalSizeAllowed).replace("%2$s", String(parseInt(totalSizeAllowed - (totalAttachSizeUploaded - fileSize), 10)));
+				if (totalSizeAllowed !== 0 && totalAttachSizeUploaded > totalSizeAllowed) {
+					errorMsgs.totalSizeError = oTxt.totalSizeAllowed.replace("%1$s", formatBytes(totalSizeAllowed)).replace("%2$s", formatBytes(parseInt(totalSizeAllowed - (totalAttachSizeUploaded - fileSize), 10)));
 					errorFlag = true;
+					totalAttachSizeUploaded -= fileSize;
 				}
 
 				// No errors, so update the counters (number, total size, etc)
@@ -602,8 +678,8 @@
 			});
 
 			// Rather click and select?
-			$input = obj.find('#attachment_click');
-			$input.change(function(e) {
+			var $input = obj.find('#attachment_click');
+			$input.on('change', function(e) {
 				e.preventDefault();
 				var files = $(this)[0].files;
 				handleFileUpload(files, obj);
