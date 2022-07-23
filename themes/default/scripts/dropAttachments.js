@@ -76,6 +76,7 @@
 				$str = $(params.fileDisplayTemplate);
 				board = params.board;
 				oTxt = params.oTxt;
+				oTxt.totalSizeAllowed = oTxt.totalSizeAllowed.replace(/ KB\./ig, '.');
 				if (typeof params.existingSelector !== 'undefined')
 				{
 					processExisting($(params.existingSelector));
@@ -400,6 +401,7 @@
 						jqxhr.abort();
 						sb.hide();
 						pb.siblings('.i-concentric').remove();
+						populateErrors({});
 					});
 				};
 
@@ -445,7 +447,7 @@
 				$control.attr('data-size', data.size);
 
 				// We may have changed the name and size if resize is enabled
-				if (data.resized === true)
+				if (data.name)
 				{
 					$control.find('.info').html(data.name + ' (' + formatBytes(data.size) + ')');
 				}
@@ -476,6 +478,8 @@
 							'fileNum': fileNum,
 							'control': $control
 						});
+
+						populateErrors({});
 					}
 				});
 			},
@@ -535,7 +539,7 @@
 
 					if (totalSizeAllowed !== 0 && totalAttachSizeUploaded > totalSizeAllowed)
 					{
-						errorMsgs.totalSizeError = oTxt.totalSizeAllowed.replace("%1$s", totalSizeAllowed).replace("%2$s", String(parseInt(totalSizeAllowed - (totalAttachSizeUploaded - fileSize), 10)));
+						errorMsgs.totalSizeError = oTxt.totalSizeAllowed.replace("%1$s", formatBytes(totalSizeAllowed)).replace("%2$s", formatBytes(totalSizeAllowed - (totalAttachSizeUploaded - fileSize)));
 						errorFlag = true;
 						totalAttachSizeUploaded -= fileSize;
 					}
