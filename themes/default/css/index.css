@@ -1754,6 +1754,7 @@ nav > .quickbuttons {
 	margin: 4px 0 0 0;
 	padding: 0 4px;
 	border: 1px solid;
+	line-height: 2.1em;
 }
 
 /* @todo - Save code by amalgamating common button background declarations. */
@@ -3790,10 +3791,13 @@ ul.post_options li {
 
 .statusbar .insertoverlay .button {
 	position: absolute;
-	left: 2.5em;
-	top: -2em;
 	margin: 0;
 	font-weight: bold;
+	top: -35px;
+	left: 2px;
+	width: 55px;
+	min-height: 34px;
+	border-radius: 4px;
 }
 
 .info {
@@ -3831,13 +3835,19 @@ ul.post_options li {
 .abort, .remove, .share, .ila {
 	float: right;
 	padding: 4px 5px 2px 5px;
-	max-width: 1em;
+	max-width: 2em;
 	cursor: pointer;
 	border-radius: 4px;
 }
 
 .share, .ila {
 	float: none;
+}
+
+.ila {
+	min-width: 3em;
+	border: 1px solid;
+	padding-top: 5px;
 }
 
 .drop_attachmnts_error {
@@ -6041,7 +6051,7 @@ a > i {
 	}
 
 	.quickbuttons .modified {
-		display: block;
+		display: none;
 		width: 100%;
 		text-align: left;
 	}
@@ -6129,9 +6139,7 @@ a > i {
 	.statusbar .insertoverlay .range {
 		max-width: 90%;
 	}
-	.statusbar .insertoverlay .button {
-		float: none;
-	}
+
 	.statusbar .insertoverlay .range,
 	.statusbar .insertoverlay .text,
 	.statusbar .insertoverlay .button {
@@ -6139,9 +6147,10 @@ a > i {
 		display: block;
 	}
 	.statusbar .insertoverlay .button {
+		float: none;
 		left: 0;
 		top: -3em;
-		border-radius: 4px;
+		margin: 0;
 	}
 
 	/*.listlevel1#button_profile .linklevel1 {
@@ -6249,7 +6258,7 @@ a > i {
 		height: 30px;
 	}
 
-	.quickbuttons {
+	.quickbuttons, .quickbuttons > .listlevel1 > a {
 		white-space: nowrap;
 	}
 
@@ -6798,6 +6807,14 @@ a > i {
 		max-width: 95% !important;
 	}
 
+	.settings > dt {
+		width: 60% !important;
+	}
+
+	.settings > dd {
+		width: 40% !important;
+	}
+
 	ul.post_options li {
 		width: 50%;
 	}
@@ -6828,6 +6845,24 @@ a > i {
 	.statusbar .insertoverlay .container input {
 		display: block;
 		float: none;
+	}
+
+	.progress_tracker {
+		padding-left: 0 !important;
+	}
+
+	.statusbar > .info {
+		width: 50%;
+	}
+
+	.attachment_block {
+		max-width: 49%;
+		min-width: 49%;
+		margin: 0 0 1em 0;
+	}
+
+	.attachment_block > .attachment_details, .attachment_block > .attachment_name {
+		width: initial;
 	}
 
 	#confirm_buttons input[type="submit"] {

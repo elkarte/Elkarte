@@ -121,7 +121,7 @@ input[type="submit"], .drop_area_fileselect_text, button[type="submit"], input[t
 /* Anchors styled to look like buttons. */
 /* These have standard body text size. Can be chained with smalltext class. */
 .linkbutton:link, .linkbutton_right:link, .linkbutton_left:link,
-.linkbutton:visited, .linkbutton_right:visited, .linkbutton_left:visited {
+.linkbutton:visited, .linkbutton_right:visited, .linkbutton_left:visited, .ila {
 	border-color: #AFAFAF;
 	border-top-color: #CFCFCF;
 	border-left-color: #BFBFBF;
@@ -133,7 +133,7 @@ input[type="submit"], .drop_area_fileselect_text, button[type="submit"], input[t
 
 /* Hover effects. */
 input[type="submit"]:hover, button[type="submit"]:hover, input[type="button"]:hover,
-.linkbutton:hover, .linkbutton_right:hover, .linkbutton_left:hover {
+.linkbutton:hover, .linkbutton_right:hover, .linkbutton_left:hover, .ila:hover {
 	border-color: #CCCCCC;
 	border-top-color: #AFAFAF;
 	border-left-color: #AFAFAF;
@@ -1476,7 +1476,7 @@ div.bbc_footnotes .meaction {
 	border: 2px solid #ff1310;
 }
 
-.share, .ila {
+.share {
 	background-color: #008000;
 }
 
