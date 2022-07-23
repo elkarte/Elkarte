@@ -571,7 +571,7 @@ function template_add_new_attachments()
 			},
 			RemoveSuccess: function(attachid) {
 				var inlineAttach = ElkInlineAttachments(\'#postAttachment2,#postAttachment\', \'' . $context['post_box_name'] . '\', {
-					trigger: $(\'<div class="share icon i-share" />\')
+					trigger: $(\'<div class="share icon i-inline" />\')
 				});
 				inlineAttach.removeAttach(attachid);
 			}

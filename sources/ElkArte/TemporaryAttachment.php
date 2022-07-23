@@ -66,7 +66,7 @@ class TemporaryAttachment extends ValuesContainer
 	/**
 	 * Returns an array of names of temporary attachments.
 	 *
-	 * @return mixed
+	 * @return string
 	 */
 	public function getName()
 	{
@@ -337,15 +337,15 @@ class TemporaryAttachment extends ValuesContainer
 			if ($image->isImageLoaded() && $image->saveImage($this->data['tmp_name'], $format))
 			{
 				$valid_mime = getValidMimeImageType($format);
+				$ext = str_replace('jpeg', 'jpg', substr($valid_mime, strpos($valid_mime, '/') + 1));
 
 				// Update to what it now is (webp to png or jpg)
 				$update = [
 					'size' => $image->getFilesize(),
 					'imagesize' => $image->getImageDimensions(),
-					'resized' => true,
 					'type' => $valid_mime,
 					'mime' => $valid_mime,
-					'name' => $this->data['name'] . '.' . substr($valid_mime, strpos($valid_mime, '/') + 1)
+					'name' => $this->data['name'] . '.' . $ext
 				];
 
 				$this->data = array_merge($this->data, $update);
