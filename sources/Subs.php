@@ -960,7 +960,10 @@ function host_from_ip($ip)
 
 	$t = microtime(true);
 
-	// Try the Linux host command, perhaps?
+	// Check if shell_exec is on the list of disabled functions. 
+	if( false == strpos(ini_get("disable_functions"), "shell_exec") ) {
+
+    // Try the Linux host command, perhaps?
 	if ((strpos(PHP_OS_FAMILY, 'Win') === false || strpos(PHP_OS_FAMILY, 'Darwin') !== false) && mt_rand(0, 1) === 1)
 	{
 		if (!isset($modSettings['host_to_dis']))
@@ -990,11 +993,12 @@ function host_from_ip($ip)
 			$host = $match[1];
 		}
 	}
+	
 
 	// This is nslookup; usually only Windows, but possibly some Unix?
 	if (empty($host) && strpos(PHP_OS_FAMILY, 'Win') !== false && strpos(PHP_OS_FAMILY, 'Darwin') === false && mt_rand(0, 1) === 1)
 	{
-		$test = @shell_exec('nslookup -timeout=1 ' . @escapeshellarg($ip));
+	//	$test = @shell_exec('nslookup -timeout=1 ' . @escapeshellarg($ip));
 
 		if (strpos($test, 'Non-existent domain') !== false)
 		{
@@ -1004,6 +1008,7 @@ function host_from_ip($ip)
 		{
 			$host = $match[1];
 		}
+	}
 	}
 
 	// This is the last try :/.
