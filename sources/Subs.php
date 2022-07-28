@@ -998,7 +998,7 @@ function host_from_ip($ip)
 	// This is nslookup; usually only Windows, but possibly some Unix?
 	if (empty($host) && strpos(PHP_OS_FAMILY, 'Win') !== false && strpos(PHP_OS_FAMILY, 'Darwin') === false && mt_rand(0, 1) === 1)
 	{
-	//	$test = @shell_exec('nslookup -timeout=1 ' . @escapeshellarg($ip));
+		$test = @shell_exec('nslookup -timeout=1 ' . @escapeshellarg($ip));
 
 		if (strpos($test, 'Non-existent domain') !== false)
 		{
