@@ -2569,6 +2569,7 @@ class InstallInstructions_install_2_0
 				array('avatar_max_height', '65'),
 				array('avatar_max_width', '65'),
 				array('avatar_action_too_large', 'option_resize'),
+				array('emoji_selection', 'no-emoji'),
 				array('avatar_download_png', '1'),
 				array('gravatar_rating', 'g'),
 				array('failed_login_threshold', '3'),
