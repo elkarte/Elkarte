@@ -11,7 +11,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.1.8
+ * @version 1.1.9
  *
  */
 
@@ -1360,7 +1360,7 @@ class Search
 		if (empty($this->_search_params['topic']) && empty($this->_search_params['show_complete']))
 		{
 			$main_query['select']['id_topic'] = 't.id_topic';
-			$main_query['select']['id_msg'] = 'MAX(m.id_msg) AS id_msg';
+			$main_query['select']['id_msg'] = 'MIN(m.id_msg) AS id_msg';
 			$main_query['select']['num_matches'] = 'COUNT(*) AS num_matches';
 			$main_query['weights'] = $this->_weight_factors;
 			$main_query['group_by'][] = 't.id_topic';
@@ -1378,6 +1378,10 @@ class Search
 				),
 				'first_message' => array(
 					'search' => 'CASE WHEN m.id_msg = t.id_first_msg THEN 1 ELSE 0 END',
+				),
+				// experimental, give longer messages more weight
+				'length' => array(
+					'search' => '(CASE WHEN LENGTH(m.body) - LENGTH(REPLACE(m.body, " ", "")) > 500 THEN 1 ELSE (LENGTH(m.body) - LENGTH(REPLACE(m.body, " ", "")) / 500) END)',
 				),
 			);
 
