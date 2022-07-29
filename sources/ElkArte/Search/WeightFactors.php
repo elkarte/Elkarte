@@ -55,7 +55,7 @@ class WeightFactors
 	{
 		$default_factors = $this->_weight_factors = array(
 			'frequency' => array(
-				'search' => 'COUNT(*) / (MAX(t.num_replies) + 1)',
+				'search' => 'COUNT(*) / (CASE WHEN MAX(t.num_replies) < {int:short_topic_posts} THEN {int:short_topic_posts} ELSE MAX(t.num_replies) + 1 END)',
 				'results' => '(t.num_replies + 1)',
 			),
 			'age' => array(
@@ -78,7 +78,7 @@ class WeightFactors
 				'results' => 't.is_sticky',
 			),
 			'likes' => array(
-				'search' => 'MAX(t.num_likes)',
+				'search' => 'CASE WHEN t.num_likes > 20 THEN 1 ELSE t.num_likes / 20 END',
 				'results' => 't.num_likes',
 			),
 		);
