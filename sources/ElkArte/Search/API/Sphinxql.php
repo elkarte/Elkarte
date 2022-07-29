@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Used when an Sphinx search daemon is running and Access is via Sphinx's own
+ * Used when the Sphinx search daemon is running and Access is via Sphinx's own
  * implementation of MySQL network protocol (SphinxQL)
  *
  * @package   ElkArte Forum
@@ -26,7 +26,7 @@ use ElkArte\User;
  *
  * What it does:
  *
- * - Used when an Sphinx search daemon is running
+ * - Used when the Sphinx search daemon is running
  * - Access is via Sphinx's own implementation of MySQL network protocol (SphinxQL)
  * - Requires Sphinx 2.3 or higher
  *
@@ -84,11 +84,9 @@ class Sphinxql extends AbstractAPI
 		parent::__construct($config, $searchParams);
 
 		// Is this database supported?
-		if (!in_array($this->_db->title(), $this->supported_databases))
+		if (!in_array($this->_db->title(), $this->supported_databases, true))
 		{
 			$this->is_supported = false;
-
-			return;
 		}
 	}
 
@@ -190,6 +188,7 @@ class Sphinxql extends AbstractAPI
 			}
 
 			$query .= ' ORDER BY ' . $sphinx_sort;
+			$query .= ' LIMIT ' . min(500, $modSettings['sphinx_max_results']);
 
 			// Set any options needed, like field weights.
 			// ranker is a modification of SPH_RANK_SPH04 sum((4*lcs+2*(min_hit_pos==1)+exact_hit)*user_weight)*1000+bm25
@@ -208,7 +207,7 @@ class Sphinxql extends AbstractAPI
 			// Execute the search query.
 			$request = mysqli_query($mySphinx, $query);
 
-			// Bad query, lets log the error and act like its not our fault
+			// Bad query, lets log the error and act like it's not our fault
 			if ($request === false)
 			{
 				// Just log the error.
@@ -221,14 +220,14 @@ class Sphinxql extends AbstractAPI
 			}
 
 			// Get the relevant information from the search results.
-			$cached_results = array(
+			$cached_results = [
 				'num_results' => 0,
 				'matches' => [],
-			);
+			];
 
 			if (mysqli_num_rows($request) !== 0)
 			{
-				while (($match = mysqli_fetch_assoc($request)))
+				while ($match = mysqli_fetch_assoc($request))
 				{
 					$num = 0;
 					if (empty($this->_searchParams->topic))
@@ -236,12 +235,12 @@ class Sphinxql extends AbstractAPI
 						$num = $match['num'] ?? ($match['@count'] ?? 0);
 					}
 
-					$cached_results['matches'][$match['id']] = array(
+					$cached_results['matches'][$match['id']] = [
 						'id' => $match['id_topic'],
 						'num_matches' => $num,
 						'matches' => [],
 						'relevance' => round($match['relevance'], 0),
-					);
+					];
 				}
 			}
 			mysqli_free_result($request);

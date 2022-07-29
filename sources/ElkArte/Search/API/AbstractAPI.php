@@ -215,8 +215,8 @@ abstract class AbstractAPI
 	 * Prepares the indexes
 	 *
 	 * @param string $word
-	 * @param string $wordsSearch
-	 * @param string $wordsExclude
+	 * @param array $wordsSearch
+	 * @param array $wordsExclude
 	 * @param boolean $isExcluded
 	 * @param string $excludedSubjectWords
 	 */
