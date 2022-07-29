@@ -12,7 +12,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.1.6
+ * @version 1.1.9
  *
  */
 
@@ -336,7 +336,7 @@ class Sphinxql extends SearchAPI
 			$cleanWords = $this->_cleanString($token[2]);
 
 			// Explode the cleanWords again in case the cleaning puts more spaces into it
-			$addWords = $phrase ? array('"' . $cleanWords . '"') : preg_split('~ ~u', $cleanWords, null, PREG_SPLIT_NO_EMPTY);
+			$addWords = $phrase ? array('"' . $cleanWords . '"') : preg_split('~ ~u', $cleanWords, -1, PREG_SPLIT_NO_EMPTY);
 
 			// Excluding this word?
 			if ($token[1] === '-')
