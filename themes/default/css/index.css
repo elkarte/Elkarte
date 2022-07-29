@@ -5313,7 +5313,7 @@ a.help .icon {
 	vertical-align: top;
 }
 
-.login p {
+.login p:not(.errorbox) {
 	text-align: center;
 }
 
@@ -5369,7 +5369,7 @@ a.help .icon {
 	border-radius: 7px;
 }
 
-.well p, .roundframe p {
+.well p:not(.errorbox), .roundframe p {
 	padding: 6px;
 }
 
