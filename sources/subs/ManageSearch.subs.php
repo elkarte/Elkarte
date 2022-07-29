@@ -87,10 +87,13 @@ function SphinxVersion()
 	$version = '0.0.0';
 
 	// Can we get the version that is running/installed?
-	@exec('searchd --help', $sphver);
-	if (!empty($sphver) && preg_match('~Sphinx (\d\.\d\.\d\d?)~', $sphver[0], $match))
+	if (function_exists('exec'))
 	{
-		$version = $match[1];
+		@exec('searchd --help', $sphver);
+		if (!empty($sphver) && preg_match('~Sphinx (\d\.\d\.\d\d?)~', $sphver[0], $match))
+		{
+			$version = $match[1];
+		}
 	}
 
 	return $version;
