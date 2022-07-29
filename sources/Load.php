@@ -1357,38 +1357,47 @@ function determineAvatar($profile)
 		// $settings not initialized? We can't do anything further..
 		if (!empty($settings))
 		{
-			$href = $settings['images_url'] . '/default_avatar.png';
-			$href_var = $settings['actual_theme_dir'] . '/images/' . $context['theme_variant'] . '/default_avatar.png';
-
-			if (!empty($context['theme_variant'])
-				&& FileFunctions::instance()->fileExists($href_var))
+			if (!empty($modSettings['avatar_gravatar_enabled']) && !empty($modSettings['gravatar_as_default'])
+				&& $modSettings['gravatar_default'] !== 'none')
 			{
-				$href = $settings['images_url'] . '/' . $context['theme_variant'] . '/default_avatar.png';
+				$href = $gravatar;
+			}
+			else
+			{
+				// Use the theme, or its variants, default image
+				$href = $settings['images_url'] . '/default_avatar.png';
+				$href_var = $settings['actual_theme_dir'] . '/images/' . $context['theme_variant'] . '/default_avatar.png';
+
+				if (!empty($context['theme_variant'])
+					&& FileFunctions::instance()->fileExists($href_var))
+				{
+					$href = $settings['images_url'] . '/' . $context['theme_variant'] . '/default_avatar.png';
+				}
 			}
 
 			// Let's proceed with the default avatar.
 			// TODO: This should be incorporated into the theme.
-			$avatar = array(
+			$avatar = [
 				'name' => '',
 				'image' => '<img class="avatar avatarresize" src="' . $href .'" alt="' . $alt . '" loading="lazy" />',
 				'href' => $href,
 				'url' => 'https://',
-			);
+			];
 		}
 		else
 		{
-			$avatar = array();
+			$avatar = [];
 		}
 	}
 	// finally ...
 	else
 	{
-		$avatar = array(
+		$avatar = [
 			'name' => '',
 			'image' => '',
 			'href' => '',
 			'url' => ''
-		);
+		];
 	}
 
 	// Make sure there's a preview for gravatars available.

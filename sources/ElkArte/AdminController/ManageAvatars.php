@@ -157,6 +157,7 @@ class ManageAvatars extends AbstractController
 			array('check', 'avatar_download_external', 0, 'onchange' => 'fUpdateStatus();'),
 			array('title', 'gravatar'),
 			array('check', 'avatar_gravatar_enabled'),
+			array('check', 'gravatar_as_default'),
 			array('select', 'gravatar_rating', ['g' => 'g', 'pg' => 'pg', 'r' => 'r', 'x' => 'x']),
 			array('select', 'gravatar_default', [
 				'none' => $txt['gravatar_none'],
