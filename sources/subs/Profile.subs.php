@@ -1605,7 +1605,7 @@ function makeCustomFieldChanges($memID, $area, $sanitize = true)
 			if (in_array($row['field_type'], array('radio', 'select')))
 			{
 				$user_profile[$memID]['options'][$row['col_name']] = $value;
-				$user_profile[$memID]['options'][$row['col_name'] . '_key'] = $row['col_name'] . '_' . $key;
+				$user_profile[$memID]['options'][$row['col_name'] . '_key'] = $row['col_name'] . '_' . (isset($key) ? $key : 0);
 			}
 			else
 			{

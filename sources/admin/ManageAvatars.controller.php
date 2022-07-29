@@ -7,7 +7,7 @@
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * @version 1.1
+ * @version 1.1.9
  *
  */
 
@@ -150,6 +150,14 @@ class ManageAvatars_Controller extends Action_Controller
 						'r' => 'r',
 						'x' => 'x',
 					),
+				),
+				array('select', 'gravatar_default', array(
+					'none' => $txt['gravatar_none'],
+					'identicon' => $txt['gravatar_identicon'],
+					'monsterid' => $txt['gravatar_monsterid'],
+					'wavatar' => $txt['gravatar_wavatar'],
+					'retro' => $txt['gravatar_retro'],
+					'robohash' => $txt['gravatar_robohash'])
 				),
 			// Upload-able avatars?
 			array('title', 'avatar_upload'),

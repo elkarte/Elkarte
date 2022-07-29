@@ -1244,35 +1244,52 @@ function host_from_ip($ip)
 	$t = microtime(true);
 
 	// Try the Linux host command, perhaps?
-	if ((strpos(strtolower(PHP_OS), 'win') === false || strpos(strtolower(PHP_OS), 'darwin') !== false) && mt_rand(0, 1) == 1)
+	if (function_exists('shell_exec'))
 	{
-		if (!isset($modSettings['host_to_dis']))
-			$test = @shell_exec('host -W 1 ' . @escapeshellarg($ip));
-		else
-			$test = @shell_exec('host ' . @escapeshellarg($ip));
+		if ((stripos(PHP_OS, 'win') === false || stripos(PHP_OS, 'darwin') !== false) && mt_rand(0, 1) == 1)
+		{
+			if (!isset($modSettings['host_to_dis']))
+			{
+				$test = @shell_exec('host -W 1 ' . @escapeshellarg($ip));
+			}
+			else
+			{
+				$test = @shell_exec('host ' . @escapeshellarg($ip));
+			}
 
-		$test = isset($test) ? $test : '';
+			$test = isset($test) ? $test : '';
 
-		// Did host say it didn't find anything?
-		if (strpos($test, 'not found') !== false)
-			$host = '';
-		// Invalid server option?
-		elseif ((strpos($test, 'invalid option') || strpos($test, 'Invalid query name 1')) && !isset($modSettings['host_to_dis']))
-			updateSettings(array('host_to_dis' => 1));
-		// Maybe it found something, after all?
-		elseif (preg_match('~\s([^\s]+?)\.\s~', $test, $match) == 1)
-			$host = $match[1];
-	}
+			// Did host say it didn't find anything?
+			if (strpos($test, 'not found') !== false)
+			{
+				$host = '';
+			}
+			// Invalid server option?
+			elseif ((strpos($test, 'invalid option') || strpos($test, 'Invalid query name 1')) && !isset($modSettings['host_to_dis']))
+			{
+				updateSettings(array('host_to_dis' => 1));
+			}
+			// Maybe it found something, after all?
+			elseif (preg_match('~\s([^\s]+?)\.\s~', $test, $match) == 1)
+			{
+				$host = $match[1];
+			}
+		}
 
-	// This is nslookup; usually only Windows, but possibly some Unix?
-	if (empty($host) && stripos(PHP_OS, 'win') !== false && strpos(strtolower(PHP_OS), 'darwin') === false && mt_rand(0, 1) == 1)
-	{
-		$test = @shell_exec('nslookup -timeout=1 ' . @escapeshellarg($ip));
+		// This is nslookup; usually only Windows, but possibly some Unix?
+		if (empty($host) && stripos(PHP_OS, 'win') !== false && stripos(PHP_OS, 'darwin') === false && mt_rand(0, 1) == 1)
+		{
+			$test = @shell_exec('nslookup -timeout=1 ' . @escapeshellarg($ip));
 
-		if (strpos($test, 'Non-existent domain') !== false)
-			$host = '';
-		elseif (preg_match('~Name:\s+([^\s]+)~', $test, $match) == 1)
-			$host = $match[1];
+			if (strpos($test, 'Non-existent domain') !== false)
+			{
+				$host = '';
+			}
+			elseif (preg_match('~Name:\s+([^\s]+)~', $test, $match) == 1)
+			{
+				$host = $match[1];
+			}
+		}
 	}
 
 	// This is the last try :/.
