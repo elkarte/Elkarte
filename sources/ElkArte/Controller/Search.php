@@ -19,14 +19,15 @@ namespace ElkArte\Controller;
 use ElkArte\AbstractController;
 use ElkArte\Cache\Cache;
 use ElkArte\Exceptions\Exception;
+use ElkArte\Languages\Txt;
 use ElkArte\MembersList;
+use ElkArte\MessagesCallback\BodyParser\Compact;
 use ElkArte\MessagesCallback\BodyParser\Normal;
 use ElkArte\MessagesCallback\SearchRenderer;
 use ElkArte\MessageTopicIcons;
 use ElkArte\Search\SearchApiWrapper;
 use ElkArte\Search\SearchParams;
 use ElkArte\Search\WeightFactors;
-use ElkArte\Languages\Txt;
 use ElkArte\Util;
 use ElkArte\ValuesContainer;
 use ElkArte\VerificationControls\VerificationControlsIntegrate;
@@ -334,6 +335,7 @@ class Search extends AbstractController
 
 		// Message length used to tweak messages relevance of the results
 		$humungousTopicPosts = 200;
+		$shortTopicPosts = 5;
 		$maxMembersToSearch = 500;
 
 		// Maximum number of results
@@ -477,6 +479,7 @@ class Search extends AbstractController
 		{
 			$search_config = new ValuesContainer(array(
 				'humungousTopicPosts' => $humungousTopicPosts,
+				'shortTopicPosts' => $shortTopicPosts,
 				'maxMessageResults' => $maxMessageResults,
 				'search_index' => !empty($modSettings['search_index']) ? $modSettings['search_index'] : '',
 				'banned_words' => empty($modSettings['search_banned_words']) ? array() : explode(',', $modSettings['search_banned_words']),
@@ -547,7 +550,15 @@ class Search extends AbstractController
 
 		// Set the callback.  (do you REALIZE how much memory all the messages would take?!?)
 		// This will be called from the template.
-		$bodyParser = new Normal($this->_search->getSearchArray(), empty($modSettings['search_method']));
+		if ($this->_search->isCompact())
+		{
+			$bodyParser = new Compact($this->_search->getSearchArray(), empty($modSettings['search_method']));
+		}
+		else
+		{
+			$bodyParser = new Normal($this->_search->getSearchArray(), empty($modSettings['search_method']));
+		}
+
 		$opt = new ValuesContainer([
 			'icon_sources' => $this->_icon_sources,
 			'show_signatures' => false,
