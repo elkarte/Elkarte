@@ -382,7 +382,7 @@ strong {
 }
 
 /* Other highlighted text, such as search results. */
-.highlight, highlight_sub {
+.highlight, .highlight_sub {
 	color: var(--search_highlight);
 }
 
