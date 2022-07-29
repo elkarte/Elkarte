@@ -607,8 +607,14 @@ em, .em {
 
 /* Other highlighted text, such as search results. */
 .highlight {
-	font-size: var(--font15);
+	font-size: var(--font16);
 	font-weight: bold;
+}
+
+.highlight_sub {
+	font-size: var(--font16);
+	font-weight: 600;
+	font-style: italic;
 }
 
 /* above/below create list items */

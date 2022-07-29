@@ -61,8 +61,8 @@ class SearchRenderer extends Renderer
 	{
 		global $txt;
 
-		$this->_this_message['first_subject'] = $this->_this_message['first_subject'] != '' ? $this->_this_message['first_subject'] : $txt['no_subject'];
-		$this->_this_message['last_subject'] = $this->_this_message['last_subject'] != '' ? $this->_this_message['last_subject'] : $txt['no_subject'];
+		$this->_this_message['first_subject'] = $this->_this_message['first_subject'] !== '' ? $this->_this_message['first_subject'] : $txt['no_subject'];
+		$this->_this_message['last_subject'] = $this->_this_message['last_subject'] !== '' ? $this->_this_message['last_subject'] : $txt['no_subject'];
 	}
 
 	/**
@@ -160,7 +160,8 @@ class SearchRenderer extends Renderer
 			$query = trim($query, '\*+');
 			$query = strtr(Util::htmlspecialchars($query), ['\\\'' => '\'']);
 
-			$body_highlighted = preg_replace_callback('/((<[^>]*)|\b' . preg_quote(strtr($query, array('\'' => '&#039;')), '/') . '\b)/iu',
+			$search_highlight = preg_quote(strtr($query, ['\'' => '&#039;']), '/');
+			$body_highlighted = preg_replace_callback('/((<[^>]*)|(\b' . $search_highlight . '\b)|' . $search_highlight . ')/iu',
 				function ($matches) {
 					return $this->_highlighted_callback($matches);
 				}, $body_highlighted);
@@ -254,7 +255,10 @@ class SearchRenderer extends Renderer
 	/**
 	 * Used to highlight body text with strings that match the search term
 	 *
-	 * Callback function used in $body_highlighted
+	 * Callback function used in $body_highlighted.
+	 * match[2] would contain terms that start with <
+	 * match[1] would be a word in a word, and could be just the word
+	 * match[3] would be the search term as a full word
 	 *
 	 * @param string[] $matches
 	 *
@@ -262,7 +266,17 @@ class SearchRenderer extends Renderer
 	 */
 	private function _highlighted_callback($matches)
 	{
-		return isset($matches[2]) && $matches[2] === $matches[1] ? stripslashes($matches[1]) : '<span class="highlight">' . $matches[1] . '</span>';
+		if (isset($matches[2]) && $matches[2] === $matches[1])
+		{
+			return stripslashes($matches[1]);
+		}
+
+		if (isset($matches[3]))
+		{
+			return '<span class="highlight">' . $matches[3] . '</span>';
+		}
+
+		return '<span class="highlight_sub">' . $matches[1] . '</span>';
 	}
 
 	/**
