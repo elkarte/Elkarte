@@ -73,6 +73,7 @@
 }
 
 .quick_tasks {
+	border-color: var(--primary_border);
 	background: var(--content-background);
 	box-shadow: none;
 }

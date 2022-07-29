@@ -35,8 +35,6 @@
  * wants and or needs.
  */
 
-use ElkArte\Errors\Errors;
-
 /**
  * Start off the template by loading some helpers like
  * quick buttons, page index, etc
@@ -251,7 +249,7 @@ function template_th_header_bar()
 	global $context, $txt, $scripturl;
 
 	echo '
-			<div id="top_section_notice" class="user">
+			<div id="top_section_notice" class="user', (empty($context['minmax_preferences']['upshrink']) ? '' : ' hide'), '">
 			</div>';
 }
 
