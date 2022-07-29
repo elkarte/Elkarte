@@ -26,7 +26,7 @@ use ElkArte\ValuesContainer;
 class SearchArray extends AbstractModel
 {
 	/**
-	 * The provided search orwell "striking thirteen" -movie
+	 * @var array The provided search orwell "striking thirteen" -movie
 	 *
 	 * That way, the URLs involved in a search page will be kept as short as possible.
 	 */
@@ -232,7 +232,7 @@ class SearchArray extends AbstractModel
 			$cleanWords = $this->cleanString($token[2]);
 
 			// Explode the cleanWords again in case the cleaning puts more spaces into it
-			$addWords = $phrase ? array('"' . $cleanWords . '"') : preg_split('~\s+~u', $cleanWords, null, PREG_SPLIT_NO_EMPTY);
+			$addWords = $phrase ? ['"' . $cleanWords . '"'] : preg_split('~\s+~u', $cleanWords, -1, PREG_SPLIT_NO_EMPTY);
 
 			// Excluding this word?
 			if ($token[1] === '-')

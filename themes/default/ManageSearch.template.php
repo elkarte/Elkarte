@@ -457,7 +457,7 @@ function template_manage_sphinx()
 
 	echo '
 			<div class="information">
-				', $context['page_description'], '
+				', $txt['sphinx_description'], '
 			</div>
 			<div class="content">
 				<dl class="settings">
