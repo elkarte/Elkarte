@@ -214,6 +214,7 @@ class Standard extends AbstractAPI
 				'min_msg' => $this->_searchParams->_minMsg,
 				'recent_message' => $this->_searchParams->_recentMsg,
 				'huge_topic_posts' => $this->config->humungousTopicPosts,
+				'short_topic_posts' => $this->config->shortTopicPosts,
 				'is_approved' => 1,
 				'limit' => empty($modSettings['search_max_results']) ? 0 : $modSettings['search_max_results'] - $numSubjectResults,
 			));
@@ -244,7 +245,7 @@ class Standard extends AbstractAPI
 	/**
 	 * Build the search relevance query
 	 *
-	 * @param null|int[] $factors - is factors are specified that array will
+	 * @param null|array $factors - is factors are specified that array will
 	 * be used to build the relevance value, otherwise the function will use
 	 * $this->_weight_factors
 	 *
@@ -316,8 +317,7 @@ class Standard extends AbstractAPI
 			INSERT IGNORE INTO {db_prefix}log_search_results
 				(' . implode(', ', array_keys($main_query['select'])) . ')') : '') . '
 			SELECT
-				' . implode(',
-				', $main_query['select']) . '
+				' . implode(', ', $main_query['select']) . '
 			FROM ' . $main_query['from'] . (!empty($main_query['inner_join']) ? '
 				INNER JOIN ' . implode('
 				INNER JOIN ', array_unique($main_query['inner_join'])) : '') . (!empty($main_query['left_join']) ? '
@@ -413,6 +413,7 @@ class Standard extends AbstractAPI
 				'min_msg' => $this->_searchParams->_minMsg,
 				'recent_message' => $this->_searchParams->_recentMsg,
 				'huge_topic_posts' => $this->config->humungousTopicPosts,
+				'short_topic_posts' => $this->config->shortTopicPosts,
 				'is_approved' => 1,
 				'limit' => $modSettings['search_max_results'],
 			),
@@ -421,7 +422,7 @@ class Standard extends AbstractAPI
 		if (empty($this->_searchParams['topic']) && empty($this->_searchParams['show_complete']))
 		{
 			$main_query['select']['id_topic'] = 't.id_topic';
-			$main_query['select']['id_msg'] = 'MAX(m.id_msg) AS id_msg';
+			$main_query['select']['id_msg'] = 'MIN(m.id_msg) AS id_msg';
 			$main_query['select']['num_matches'] = 'COUNT(*) AS num_matches';
 			$main_query['weights'] = $this->_weight_factors;
 			$main_query['group_by'][] = 't.id_topic';
@@ -439,6 +440,10 @@ class Standard extends AbstractAPI
 				),
 				'first_message' => array(
 					'search' => 'CASE WHEN m.id_msg = t.id_first_msg THEN 1 ELSE 0 END',
+				),
+				// experimental, give longer messages more weight
+				'length' => array(
+					'search' => '(CASE WHEN LENGTH(m.body) - LENGTH(REPLACE(m.body, " ", "")) > 500 THEN 1 ELSE (LENGTH(m.body) - LENGTH(REPLACE(m.body, " ", "")) / 500) END)',
 				),
 			);
 
@@ -580,6 +585,7 @@ class Standard extends AbstractAPI
 					'min_msg' => $this->_searchParams->_minMsg,
 					'recent_message' => $this->_searchParams->_recentMsg,
 					'huge_topic_posts' => $this->config->humungousTopicPosts,
+					'short_topic_posts' => $this->config->shortTopicPosts,
 					'limit' => empty($modSettings['search_max_results']) ? 0 : $modSettings['search_max_results'] - $num_results,
 				),
 			);

@@ -229,6 +229,8 @@ class TestSearchclass extends TestCase
 		$recentPercentage = 0.30;
 		$maxMembersToSearch = 500;
 		$humungousTopicPosts = 200;
+		$shortTopicPosts = 5;
+
 		$maxMessageResults = empty($modSettings['search_max_results']) ? 0 : $modSettings['search_max_results'];
 		$search_terms = [
 			'search' => 'search',
@@ -248,6 +250,7 @@ class TestSearchclass extends TestCase
 
 		$search_config = new ValuesContainer(array(
 			'humungousTopicPosts' => $humungousTopicPosts,
+			'shortTopicPosts' => $shortTopicPosts,
 			'maxMessageResults' => $maxMessageResults,
 			'search_index' => !empty($modSettings['search_index']) ? $modSettings['search_index'] : '',
 			'banned_words' => empty($modSettings['search_banned_words']) ? array() : explode(',', $modSettings['search_banned_words']),

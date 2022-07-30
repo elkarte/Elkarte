@@ -340,7 +340,7 @@ hr {
 }
 
 /* Other highlighted text, such as search results. */
-.highlight {
+.highlight, .highlight_sub {
 	color: var(--search_highlight);
 }
 

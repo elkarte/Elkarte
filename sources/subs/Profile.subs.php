@@ -1879,7 +1879,7 @@ function makeCustomFieldChanges($memID, $area, $sanitize = true)
 			if (in_array($row['field_type'], array('radio', 'select')))
 			{
 				$options[$row['col_name']] = $value;
-				$options[$row['col_name'] . '_key'] = $row['col_name'] . '_' . $key;
+				$options[$row['col_name'] . '_key'] = $row['col_name'] . '_' . ($key ?? 0);
 			}
 			else
 			{

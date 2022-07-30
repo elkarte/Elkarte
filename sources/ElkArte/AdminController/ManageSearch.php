@@ -473,7 +473,7 @@ class ManageSearch extends AbstractController
 	 * - Requires the admin_forum permission.
 	 * - Depending on the size of the message table, the process is divided in steps.
 	 *
-	 * @uses ManageSearch template, 'create_index', 'create_index_progress', and 'create_index_done'
+	 * @uses ManageSearch template, 'create_index_progress', and 'create_index_done'
 	 * sub-templates.
 	 */
 	public function action_create()
@@ -485,6 +485,7 @@ class ManageSearch extends AbstractController
 
 		$context[$context['admin_menu_name']]['current_subsection'] = 'method';
 		$context['page_title'] = $txt['search_index_custom'];
+		$context['sub_template'] = 'create_index_progress';
 
 		$messages_per_batch = 75;
 
@@ -500,7 +501,7 @@ class ManageSearch extends AbstractController
 		{
 			$context['index_settings'] = array();
 			$context['start'] = $this->_req->getPost('start', 'intval', 0);
-			$context['step'] = $this->_req->getPost('step', 'intval', 0);
+			$context['step'] = $this->_req->getPost('step', 'intval', 1);
 		}
 
 		checkSession('request');
@@ -602,7 +603,7 @@ class ManageSearch extends AbstractController
 		// Setup for the template
 		$context[$context['admin_menu_name']]['current_subsection'] = 'managesphinx';
 		$context['page_title'] = $txt['search_sphinx'];
-		$context['page_description'] = $txt['sphinx_description'];
+		$context['page_description'] = $txt['sphinx_create_config'];
 		$context['sub_template'] = 'manage_sphinx';
 		createToken('admin-mssphinx');
 	}

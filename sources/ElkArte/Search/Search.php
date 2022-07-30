@@ -33,7 +33,7 @@ class Search
 	/** @var \ElkArte\Search\SearchArray Holds the words and phrases to be searched on  */
 	private $_searchArray;
 
-	/** @var null|object Holds instance of the search api in use such as ElkArte\Search\API\Standard_Search */
+	/** @var null|object Holds instance of the search api in use such as \ElkArte\Search\API\Standard_Search */
 	private $_searchAPI;
 
 	/** @var \ElkArte\Database\QueryInterface Database instance */
@@ -365,7 +365,7 @@ class Search
 	/**
 	 * Sets the query, calls the searchQuery method of the API in use
 	 *
-	 * @param \ElkArte\Search\SearchApiWrapper $searchAPI
+	 * @param \ElkArte\Search\API\Standard $searchAPI
 	 * @return array
 	 */
 	public function searchQuery($searchAPI)

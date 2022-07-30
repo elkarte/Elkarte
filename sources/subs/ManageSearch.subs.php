@@ -87,10 +87,13 @@ function SphinxVersion()
 	$version = '0.0.0';
 
 	// Can we get the version that is running/installed?
-	@exec('searchd --help', $sphver);
-	if (!empty($sphver) && preg_match('~Sphinx (\d\.\d\.\d\d?)~', $sphver[0], $match))
+	if (function_exists('exec'))
 	{
-		$version = $match[1];
+		@exec('searchd --help', $sphver);
+		if (!empty($sphver) && preg_match('~Sphinx (\d\.\d\.\d\d?)~', $sphver[0], $match))
+		{
+			$version = $match[1];
+		}
 	}
 
 	return $version;
@@ -240,11 +243,12 @@ index ', $prefix, '_base_index
 	expand_keywords		= 1
 	regexp_filter		= \b(\d+)[.-/]+(\d+)\b => \1_\2
 	blend_chars			= +, &, U+23, -, !, @
-	blend_mode			= trim_head | trim_none
+	blend_mode			= trim_head, trim_none
 	source				= ', $prefix, '_source
-	path				= ', $modSettings['sphinx_data_path'], '/', $prefix, '_sphinx_base.index', empty($modSettings['sphinx_stopword_path']) ? '' : '
-	stopwords			= ', $modSettings['sphinx_stopword_path'], '
-	min_word_len		= 2
+	path				= ', $modSettings['sphinx_data_path'], '/', $prefix, '_sphinx_base.index', (empty($modSettings['sphinx_stopword_path']) ? '' : '
+	stopwords			= ' . $modSettings['sphinx_stopword_path']), '
+	# The default is 1.  Changing from that on Sphinx 3 stalls/fails the indexer with blended chars enabled.
+	min_word_len		= 1
 	charset_table		= 0..9, A..Z->a..z, _, a..z, U+451->U+435, U+401->U+435, U+410..U+42F->U+430..U+44F, U+430..U+44F
 	ignore_chars		= U+AD
 	morphology			= stem_en, soundex

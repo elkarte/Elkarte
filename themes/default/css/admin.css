@@ -49,7 +49,7 @@
 }
 
 /* @todo - A general admin wrapper class. */
-#admin_main_section, div.quick_tasks, #mod_main_section,
+#admin_main_section, .quick_tasks, #mod_main_section,
 #support_credits, #admin_newsletters,
 #core_features, #entry_form,
 #groupForm, #mailqueue_stats, #manage_maintenance,

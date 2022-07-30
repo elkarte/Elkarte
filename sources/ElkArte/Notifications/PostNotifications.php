@@ -379,13 +379,15 @@ class PostNotifications extends AbstractModel
 		// Do they want the body of the message sent too?
 		if ($type === self::NOTIFY_REPLY && $this->canSendPostBody($notifyDatum))
 		{
-			$replacements['MESSAGE'] = $mailPreparse->preparseHtml($topicDatum['body']);
+			$body = $topicDatum['body'];
 
 			// Any attachments? if so lets make a big deal about them!
 			if (!empty($topicDatum['attachments']))
 			{
-				$replacements['MESSAGE'] .= "\n\n" . sprintf($txt['message_attachments'], $topicDatum['attachments'], $replacements['TOPICLINK']);
+				$body .= "\n\n" . sprintf($txt['message_attachments'], $topicDatum['attachments'], $replacements['TOPICLINK']);
 			}
+
+			$replacements['MESSAGE'] = $mailPreparse->preparseHtml($body);
 		}
 
 		return $replacements;

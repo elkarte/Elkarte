@@ -295,4 +295,3 @@ class Custom extends Standard
 		}
 	}
 }
-//

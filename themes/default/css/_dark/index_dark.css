@@ -241,7 +241,7 @@ body {
 	color: var(--body_text);
 	background-image: radial-gradient(50% 50% at top center, rgba(0, 0, 0, .7), var(--body_grad_1)), linear-gradient(180deg, var(--body_grad_2), var(--body_grad_1));
 	background-repeat: no-repeat;
-	background-position: top 100px center;
+	background-position: top 0 center;
 	background-size: 120% 2000px, 100% 2000px;
 }
 
@@ -382,7 +382,7 @@ strong {
 }
 
 /* Other highlighted text, such as search results. */
-.highlight {
+.highlight, .highlight_sub {
 	color: var(--search_highlight);
 }
 
