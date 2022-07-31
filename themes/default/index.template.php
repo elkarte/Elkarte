@@ -477,7 +477,7 @@ function theme_linktree($default = 'linktree')
 		$tree['name'] = ($tree['extra_before'] ?? '') . $tree['name'] . ($tree['extra_after'] ?? '');
 
 		// Show the link, including a URL if it should have one.
-		echo $settings['linktree_link'] && isset($tree['url'])
+		echo isset($tree['url'])
 			? '
 			<span class="crumb">
 				<a href="' . $tree['url'] . '">' .
@@ -488,8 +488,8 @@ function theme_linktree($default = 'linktree')
 			</span>'
 			: '
 			<span class="crumb">
-				<a href="#">' . $tree['name'] . '</a>
-			<span>	';
+				' . $tree['name'] . '
+			</span>';
 	}
 
 	echo '
