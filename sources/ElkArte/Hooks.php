@@ -124,7 +124,7 @@ final class Hooks
 	{
 		// Loop through each function.
 		$functions = explode(',', $hook_calls);
-		$returns = array();
+		$returns = [];
 
 		foreach ($functions as $function)
 		{
@@ -137,6 +137,7 @@ final class Hooks
 			else
 			{
 				$call = $function;
+				$file = '';
 			}
 
 			// OOP static method
