@@ -3060,7 +3060,7 @@ footer .attachments {
 .attachment_block, .attachment {
 	display: inline-block;
 	overflow: hidden;
-	width: 225px;
+	min-width: 215px;
 	margin: 0 .4em 1em 0;
 	text-align: center;
 }
@@ -3081,6 +3081,7 @@ footer .attachments {
 	padding: 0 .5em;
 	white-space: nowrap;
 	text-overflow: ellipsis;
+	font-size: var(--font12);
 }
 
 .attachment_details {
