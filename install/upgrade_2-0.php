@@ -351,4 +351,41 @@ class UpgradeInstructions_upgrade_2_0
 			)
 		);
 	}
+
+	public function migrate_theme_settings()
+	{
+		return array(
+			array(
+				'debug_title' => 'Moving settings that are now site vs theme dependant...',
+				'function' => function()
+				{
+					$moved = array('show_modify', 'show_user_images', 'hide_post_group');
+
+					$request = $this->db->query('', '
+						SELECT 
+							variable, value
+						FROM {db_prefix}themes
+						WHERE variable IN({array_string:moved})
+							AND id_member = 0
+							AND id_theme = 1',
+						array(
+							'moved' => $moved,
+						)
+					);
+					$inserts = array();
+					while ($row = $this->db->fetch_assoc($request))
+					{
+						$inserts[] = array($row['variable'], $row['value']);
+					}
+					$this->db->free_result($request);
+					$this->db->insert('replace',
+						'{db_prefix}settings',
+						array('variable' => 'string', 'value' => 'string'),
+						$inserts,
+						array('variable')
+					);
+				}
+			)
+		);
+	}
 }
