@@ -120,11 +120,19 @@ class Compact implements BodyParserInterface
 					preg_match_all('/([^\s\W]{' . $charLimit . '}[\s\W]|[\s\W].{0,' . $charLimit . '}?[\s\W]|^)(' . $matchString . ')([\s\W].{0,' . $charLimit . '}[\s\W]|[\s\W][^\s\W]{0,' . $charLimit . '})/isu', $body, $matches);
 				}
 
-				$body = '';
-				foreach ($matches[0] as $match)
+				// Search term not found in the body
+				if (empty($matches[0]))
 				{
-					$match = strtr(htmlspecialchars($match, ENT_QUOTES, 'UTF-8'), array("\n" => '&nbsp;'));
-					$body .= '<strong>&hellip;&hellip;</strong>&nbsp;' . $match . '&nbsp;<strong>&hellip;&hellip;</strong>';
+					$body = Util::shorten_html($body, 500, '<strong>&hellip;&hellip;</strong>', false);
+				}
+				else
+				{
+					$body = '';
+					foreach ($matches[0] as $match)
+					{
+						$match = strtr(htmlspecialchars($match, ENT_QUOTES, 'UTF-8'), array("\n" => '&nbsp;'));
+						$body .= '<strong>&hellip;&hellip;</strong>&nbsp;' . $match . '&nbsp;<strong>&hellip;&hellip;</strong>';
+					}
 				}
 			}
 
