@@ -232,7 +232,7 @@ function template_messages()
 							<div class="generic_menu">';
 
 		// Show "Last Edit: Time by Person" if this post was edited.
-		if ($settings['show_modify'])
+		if ($modSettings['show_modify'])
 		{
 			echo '
 								<span id="modified_', $message['id'], '" class="smalltext modified', !empty($message['modified']['name']) ? '"' : ' hide"', '>
@@ -527,7 +527,7 @@ function template_quickreply_below()
 			sClassName: "quick_edit",
 			sIDSubject: "post_subject_",
 			sIDInfo: "info_",
-			bShowModify: ' . ($settings['show_modify'] ? 'true' : 'false') . ',
+			bShowModify: ' . ($modSettings['show_modify'] ? 'true' : 'false') . ',
 			iTopicId: ' . $context['current_topic'] . ',
 			sTemplateBodyEdit: ' . JavaScriptEscape('
 				<div id="quick_edit_body_container">
@@ -559,7 +559,7 @@ function template_quickreply_below()
 			sBackReference: "aIconLists[" + aIconLists.length + "]",
 			sIconIdPrefix: "msg_icon_",
 			sScriptUrl: elk_scripturl,
-			bShowModify: ' . ($settings['show_modify'] ? 'true' : 'false') . ',
+			bShowModify: ' . ($modSettings['show_modify'] ? 'true' : 'false') . ',
 			iBoardId: ' . $context['current_board'] . ',
 			iTopicId: ' . $context['current_topic'] . ',
 			sSessionId: elk_session_id,

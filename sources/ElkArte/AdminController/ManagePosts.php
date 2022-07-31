@@ -328,6 +328,10 @@ class ManagePosts extends AbstractController
 			['int', 'edit_wait_time', 'postinput' => $txt['manageposts_seconds']],
 			['int', 'edit_disable_time', 'subtext' => $txt['edit_disable_time_zero'], 'postinput' => $txt['manageposts_minutes']],
 			'',
+			['check', 'show_modify'],
+			['check', 'show_user_images'],
+			['check', 'hide_post_group'],
+			'',
 			// First & Last message preview lengths
 			['select', 'message_index_preview', [$txt['message_index_preview_off'], $txt['message_index_preview_first'], $txt['message_index_preview_last']]],
 			['int', 'preview_characters', 'subtext' => $txt['preview_characters_zero'], 'postinput' => $txt['preview_characters_units']],

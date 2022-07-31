@@ -642,6 +642,11 @@ $txt['message_index_preview_off'] = 'Do not show the previews';
 $txt['message_index_preview_first'] = 'Show the text of the first post';
 $txt['message_index_preview_last'] = 'Show the text of the last post';
 
+$txt['show_modify'] = 'Show last modification date on modified posts.';
+$txt['show_user_images'] = 'Show user avatars in message view.';
+$txt['hide_post_group'] = 'Hide post group titles for grouped members.';
+
+
 $txt['enableBBC'] = 'Enable bulletin board code (BBC)';
 $txt['enablePostHTML'] = 'Enable basic HTML in posts';
 $txt['enablePostMarkdown'] = 'Enable basic Markdown in posts';

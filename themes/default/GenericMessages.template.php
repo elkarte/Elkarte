@@ -55,7 +55,7 @@ function template_build_poster_div($message, $ignoring = false)
 				<div class="poster_div_container">
 					<div class="poster_div_avatar">';
 
-	if (!empty($settings['show_user_images']) && empty($options['show_no_avatars']) && !empty($message['member']['avatar']['image']))
+	if (!empty($modSettings['show_user_images']) && empty($options['show_no_avatars']) && !empty($message['member']['avatar']['image']))
 	{
 		$poster_div .= '
 		 				<img class="avatarresize" src="' . $message['member']['avatar']['href'] . '" alt="avatar' . ' &ndash; ' . $message['member']['name'] . '" />';
@@ -292,7 +292,7 @@ function template_build_poster_div($message, $ignoring = false)
 	// Show avatars, images, etc.?
 	if (empty($options['hide_poster_area']) && !$ignoring)
 	{
-		if (!empty($settings['show_user_images']) && empty($options['show_no_avatars']) && !empty($message['member']['avatar']['image']))
+		if (!empty($modSettings['show_user_images']) && empty($options['show_no_avatars']) && !empty($message['member']['avatar']['image']))
 		{
 			$poster_div .= '
 							<li class="listlevel1 poster_avatar">

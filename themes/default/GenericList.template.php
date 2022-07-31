@@ -71,7 +71,7 @@ function template_show_list($list_id = null)
 	}
 
 	// These are the main tabs that is used all around the template.
-	if (isset($cur_list['list_menu'], $cur_list['list_menu']['show_on']) && ($cur_list['list_menu']['show_on'] === 'both' || $cur_list['list_menu']['show_on'] == 'top'))
+	if (isset($cur_list['list_menu']['show_on']) && ($cur_list['list_menu']['show_on'] === 'both' || $cur_list['list_menu']['show_on'] === 'top'))
 	{
 		if (!$close_div)
 		{
