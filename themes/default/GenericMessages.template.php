@@ -64,7 +64,7 @@ function template_build_poster_div($message, $ignoring = false)
 	if (!$message['member']['is_guest'])
 	{
 		// Show the post group if and only if they have no other group or the option is on, and they are in a post group.
-		if ((empty($settings['hide_post_group']) || $message['member']['group'] === '') && $message['member']['post_group'] !== '')
+		if ((empty($modSettings['hide_post_group']) || $message['member']['group'] === '') && $message['member']['post_group'] !== '')
 		{
 			$poster_div .= '
 							<p class="listlevel2 postgroup">' . $message['member']['post_group'] . '</p>';
