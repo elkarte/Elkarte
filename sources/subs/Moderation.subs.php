@@ -1232,7 +1232,6 @@ function groupRequests()
 
 			$group_requests[] = array(
 				'id' => $row['id_request'],
-				'alternate' => $i % 2,
 				'request_href' => $scripturl . '?action=groups;sa=requests;gid=' . $row['id_group'],
 				'member' => array(
 					'id' => $row['id_member'],

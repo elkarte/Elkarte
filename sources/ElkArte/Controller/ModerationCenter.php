@@ -1985,7 +1985,6 @@ class ModerationCenter extends AbstractController
 		{
 			$context['reported_posts'][] = array(
 				'id' => $row['id_report'],
-				'alternate' => $i % 2,
 				'topic_href' => getUrl('topic', ['topic' => $row['id_topic'], 'msg' => $row['id_msg'], 'start' => $row['id_msg'], 'hash' => '#msg' . $row['id_msg']]),
 				'report_href' => getUrl('action', ['action' => 'moderate', 'area' =>  $context['admin_area'], 'report' => $row['id_report']]),
 				'author' => array(

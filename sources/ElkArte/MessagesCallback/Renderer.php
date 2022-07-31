@@ -282,7 +282,6 @@ abstract class Renderer
 	protected function _buildOutputArray()
 	{
 		return array(
-			'alternate' => $this->_counter % 2,
 			'id' => $this->_this_message[$this->_idx_mapper->id_msg],
 			'member' => MembersList::get($this->_this_message[$this->_idx_mapper->id_member]),
 			'subject' => $this->_this_message['subject'],

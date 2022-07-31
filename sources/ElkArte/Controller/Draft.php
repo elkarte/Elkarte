@@ -117,7 +117,6 @@ class Draft extends Post
 			$context['drafts'][$counter += $reverse ? -1 : 1] = [
 				'body' => $row['body'],
 				'counter' => $counter,
-				'alternate' => $counter % 2,
 				'board' => [
 					'name' => $row['bname'],
 					'id' => $row['id_board'],
@@ -359,7 +358,6 @@ class Draft extends Post
 			$context['drafts'][$counter += $reverse ? -1 : 1] = [
 				'body' => $row['body'],
 				'counter' => $counter,
-				'alternate' => $counter % 2,
 				'subject' => $row['subject'],
 				'time' => standardTime($row['poster_time']),
 				'html_time' => htmlTime($row['poster_time']),
