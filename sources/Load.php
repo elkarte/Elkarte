@@ -1465,7 +1465,7 @@ function doSecurityChecks()
 
 	$cache = Cache::instance();
 
-	if (allowedTo('admin_forum') && User::$info->is_guest === false)
+	if (User::$info->is_guest === false && allowedTo('admin_forum'))
 	{
 		// If agreement is enabled, at least the english version shall exists
 		if ($modSettings['requireAgreement'] && !file_exists(SOURCEDIR . '/ElkArte/Languages/Agreement/English.txt'))
