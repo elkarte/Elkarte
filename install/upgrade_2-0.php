@@ -388,4 +388,51 @@ class UpgradeInstructions_upgrade_2_0
 			)
 		);
 	}
+
+	public function migrate_session_settings()
+	{
+		return array(
+			array(
+				'debug_title' => 'Increase DB space for session data ...',
+				'function' => function () {
+					$this->table->change_column('{db_prefix}log_online',
+						'session',
+						array(
+							'type' => 'varchar',
+							'size' => 128,
+							'default' => ''
+						)
+					);
+					$this->table->change_column('{db_prefix}log_errors',
+						'session',
+						array(
+							'type' => 'varchar',
+							'size' => 128,
+							'default' => '                                                                ',
+						)
+					);
+					$this->table->change_column('{db_prefix}sessions',
+						'session_id',
+						array(
+							'type' => 'varchar',
+							'size' => 128,
+							'default' => ''
+						)
+					);
+				}
+			)
+		);
+	}
+
+	public function migrate_badbehavior_settings()
+	{
+		return array(
+			array(
+				'debug_title' => 'Drop Table log_badbehavior ...',
+				'function' => function () {
+					$this->table->drop_table('{db_prefix}log_badbehavior');
+				}
+			)
+		);
+	}
 }
