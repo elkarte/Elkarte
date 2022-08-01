@@ -201,12 +201,19 @@ class Search extends AbstractController
 
 		if (!empty($context['search_params']['minage']))
 		{
-			$context['search_params']['minage'] = (int) $context['search_params']['minage'];
+			$context['search_params']['minage'] = date("Y-m-d", strtotime('-' . $context['search_params']['minage'] . ' days'));
 		}
 
 		if (!empty($context['search_params']['maxage']))
 		{
-			$context['search_params']['maxage'] = (int) $context['search_params']['maxage'];
+			if ($context['search_params']['maxage'] === 9999)
+			{
+				$context['search_params']['maxage'] = 0;
+			}
+			else
+			{
+				$context['search_params']['maxage'] = date("Y-m-d", strtotime('-' . $context['search_params']['maxage'] . ' days'));
+			}
 		}
 
 		$context['search_params']['show_complete'] = !empty($context['search_params']['show_complete']);

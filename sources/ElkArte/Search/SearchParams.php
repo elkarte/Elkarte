@@ -213,6 +213,10 @@ class SearchParams extends ValuesContainer
 	{
 		$validator = new DataValidator();
 
+		// Convert dates to days between now and ...
+		$params['minage'] = $this->daysBetween($params['minage'], 0);
+		$params['maxage'] = $this->daysBetween($params['maxage'], 9999);
+
 		$validator->sanitation_rules(array(
 			'advanced' => 'intval',
 			'searchtype' => 'intval',
@@ -598,5 +602,39 @@ class SearchParams extends ValuesContainer
 	public function get()
 	{
 		return $this->_search_params;
+	}
+
+	/**
+	 * Number of days between today/now and some date.
+	 *
+	 * @param string $date
+	 * @param int $default
+	 * @return int
+	 */
+	private function daysBetween($date, $default)
+	{
+		// Already a number, validate
+		if (is_numeric($date))
+		{
+			return (max(min(0, $date), 9999));
+		}
+
+		// Nothing, then full range
+		if (empty($date))
+		{
+			return $default;
+		}
+
+		$startTimeStamp = time();
+		$endTimeStamp = strtotime($date);
+		$timeDiff = $startTimeStamp - ($endTimeStamp !== false ? $endTimeStamp : $startTimeStamp);
+
+		// Can't search into the future
+		if ($timeDiff < 1)
+		{
+			$timeDiff = 0;
+		}
+
+		return (int) $timeDiff / 86400;
 	}
 }
