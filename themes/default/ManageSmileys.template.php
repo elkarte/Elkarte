@@ -312,8 +312,8 @@ function template_addsmiley()
 	foreach ($context['smiley_sets'] as $smiley_set)
 	{
 		echo '
-					<dt>
-						', $txt['smileys_add_upload_for1'], ' <strong>', $smiley_set['name'], '</strong> ', $txt['smileys_add_upload_for2'], ':
+					<dt>',
+						sprintf($txt['smileys_add_upload_for'], $smiley_set['name']), '
 					</dt>
 					<dd>
 						<input type="file" name="individual_', $smiley_set['name'], '" onchange="selectMethod(\'upload\');" class="input_file" />
