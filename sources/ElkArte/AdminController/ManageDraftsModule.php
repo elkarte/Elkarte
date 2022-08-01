@@ -219,7 +219,6 @@ class ManageDraftsModule extends AbstractController
 		$context['sub_template'] = 'show_settings';
 		$context[$context['admin_menu_name']]['tab_data'] = array(
 			'title' => $txt['drafts'],
-			'help' => '',
 			'description' => $txt['managedrafts_settings_description'],
 		);
 

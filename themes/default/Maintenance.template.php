@@ -219,7 +219,7 @@ function template_maintain_members()
 			</form>
 		</div>
 		<h2 class="category_header">
-			<a class="hdicon cat_imgi-help_helptopics help" href="', $scripturl, '?action=quickhelp;help=maintenance_members" onclick="return reqOverlayDiv(this.href);" title="', $txt['help'], '"></a> ', $txt['maintain_members'], '
+			<a class="hdicon i-help_helptopics help" href="', $scripturl, '?action=quickhelp;help=maintenance_members" onclick="return reqOverlayDiv(this.href);" title="', $txt['help'], '"></a> ', $txt['maintain_members'], '
 		</h2>
 		<form action="', $scripturl, '?action=admin;area=maintain;sa=members;activity=purgeinactive" method="post" accept-charset="UTF-8" id="membersForm">
 			<div class="content">

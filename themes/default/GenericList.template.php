@@ -41,7 +41,7 @@ function template_show_list($list_id = null)
 	if (!empty($cur_list['title']))
 	{
 		echo '
-			<h2 class="category_header', !empty($cur_list['icon']) ? ' hdicon cat_img_' . $cur_list['icon'] : '', '">', $cur_list['title'], '</h2>';
+			<h2 class="category_header', !empty($cur_list['icon']) ? ' hdicon ' . $cur_list['icon'] : '', '">', $cur_list['title'], '</h2>';
 	}
 
 	// Show any data right after the title

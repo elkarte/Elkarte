@@ -444,7 +444,7 @@ function template_show_settings()
 	if (isset($context['settings_title']))
 	{
 		echo '
-			<h2 class="category_header', !empty($context['settings_icon']) ? ' hdicon cat_img_' . $context['settings_icon'] : '', '">', $context['settings_title'], '</h2>';
+			<h2 class="category_header', !empty($context['settings_icon']) ? ' hdicon ' . $context['settings_icon'] : '', '">', $context['settings_title'], '</h2>';
 	}
 
 	// any messages or errors to show?
@@ -502,7 +502,7 @@ function template_show_settings()
 				elseif (isset($config_var['icon']))
 				{
 					echo
-						'<span class="hdicon cat_img_' . $config_var['icon'] . '"></span>';
+						'<span class="hdicon ' . $config_var['icon'] . '"></span>';
 				}
 
 				echo

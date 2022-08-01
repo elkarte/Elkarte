@@ -634,7 +634,6 @@ class Admin extends AbstractController
 		$context['page_title'] = $txt['admin_center'];
 		$context[$context['admin_menu_name']]['tab_data'] = array(
 			'title' => $txt['admin_center'],
-			'help' => '',
 			'description' => '
 				<span class="bbc_strong">' . $txt['hello_guest'] . ' ' . $context['user']['name'] . '!</span>
 				' . sprintf($txt['admin_main_welcome'], $txt['admin_control_panel']),
@@ -675,8 +674,6 @@ class Admin extends AbstractController
 		// Load credits.
 		$context[$context['admin_menu_name']]['tab_data'] = array(
 			'title' => $txt['support_credits_title'],
-			'help' => '',
-			'description' => '',
 		);
 		Txt::load('Who');
 		$context += prepareCreditsData();

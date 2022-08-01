@@ -80,7 +80,7 @@ class Reports extends AbstractController
 		// Load up all the tabs...
 		$context[$context['admin_menu_name']]['tab_data'] = array(
 			'title' => $txt['generate_reports'],
-			'help' => '',
+			'class' => 'i-post-text',
 			'description' => $txt['generate_reports_desc'],
 		);
 

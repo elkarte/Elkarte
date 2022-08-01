@@ -122,6 +122,7 @@ class Packages extends AbstractController
 		$context[$context['admin_menu_name']]['tab_data'] = array(
 			'title' => $txt['package_manager'],
 			'description' => $txt['package_manager_desc'],
+			'class' => 'i-package',
 			'tabs' => array(
 				'browse' => array(),
 				'installed' => array(

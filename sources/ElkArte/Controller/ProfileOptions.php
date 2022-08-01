@@ -108,7 +108,7 @@ class ProfileOptions extends AbstractController
 		$context[$context['profile_menu_name']]['tab_data'] = array(
 			'title' => $txt['editBuddyIgnoreLists'],
 			'description' => $txt['buddy_ignore_desc'],
-			'class' => 'profile',
+			'class' => 'i-user',
 			'tabs' => array(
 				'buddies' => array(),
 				'ignore' => array(),
@@ -676,7 +676,7 @@ class ProfileOptions extends AbstractController
 		$context[$context['profile_menu_name']]['tab_data'] = array(
 			'title' => $txt['notify_settings'],
 			'description' => $txt['notification_info'],
-			'class' => 'profile',
+			'class' => 'i-contact',
 			'tabs' => array(
 				'settings' => array(),
 				'boards' => array(),

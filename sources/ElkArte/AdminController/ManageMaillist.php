@@ -1024,6 +1024,7 @@ class ManageMaillist extends AbstractController
 		);
 		$context[$context['admin_menu_name']]['tab_data'] = array(
 			'title' => $txt[$title],
+			'class' => 'i-envelope',
 			'description' => $txt['filters_title'],
 		);
 		$context[$context['admin_menu_name']]['current_subsection'] = 'emailfilters';

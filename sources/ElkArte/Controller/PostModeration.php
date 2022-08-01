@@ -517,7 +517,6 @@ class PostModeration extends AbstractController
 		$context['default_list'] = 'mc_unapproved_attach';
 		$context[$context['moderation_menu_name']]['tab_data'] = array(
 			'title' => $txt['mc_unapproved_attachments'],
-			'help' => '',
 			'description' => $txt['mc_unapproved_attachments_desc']
 		);
 	}

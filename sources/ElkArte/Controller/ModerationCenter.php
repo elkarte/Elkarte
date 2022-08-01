@@ -274,7 +274,6 @@ class ModerationCenter extends AbstractController
 		$context['moderation_menu_name'] = 'menu_data_' . $context['moderation_menu_id'];
 		$context[$context['moderation_menu_name']]['tab_data'] = array(
 			'title' => $txt['moderation_center'],
-			'help' => '',
 			'description' => sprintf($txt['mc_description'], $context['user']['name'], getUrl('action', ['action' => 'moderate', 'area' => 'settings'])));
 
 		// What a pleasant shortcut - even tho we're not *really* on the admin screen who cares...
@@ -423,7 +422,6 @@ class ModerationCenter extends AbstractController
 		// Put the open and closed options into tabs, because we can...
 		$context[$context['moderation_menu_name']]['tab_data'] = array(
 			'title' => $txt['mc_reported_posts'],
-			'help' => '',
 			'description' => $txt['mc_reported_posts_desc'],
 		);
 
@@ -453,7 +451,6 @@ class ModerationCenter extends AbstractController
 			// Put the open and closed options into tabs, because we can...
 			$context[$context['moderation_menu_name']]['tab_data'] = array(
 				'title' => $txt['mc_reported_pms'],
-				'help' => '',
 				'description' => $txt['mc_reported_pms_desc'],
 			);
 			$context['page_title'] = $txt['mc_reported_pms'];
@@ -871,7 +868,6 @@ class ModerationCenter extends AbstractController
 		$context['sub_template'] = 'moderation_settings';
 		$context[$context['moderation_menu_name']]['tab_data'] = array(
 			'title' => $txt['mc_prefs_title'],
-			'help' => '',
 			'description' => $txt['mc_prefs_desc']
 		);
 
@@ -992,7 +988,6 @@ class ModerationCenter extends AbstractController
 		// Put some pretty tabs on cause we're gonna be doing hot stuff here...
 		$context[$context['moderation_menu_name']]['tab_data'] = array(
 			'title' => $txt['mc_watched_users_title'],
-			'help' => '',
 			'description' => $txt['mc_watched_users_desc'],
 		);
 
