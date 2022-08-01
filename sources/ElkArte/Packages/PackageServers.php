@@ -38,7 +38,7 @@ class PackageServers extends AbstractController
 
 	/**
 	 * Called before all other methods when coming from the dispatcher or
-	 * action class.  Loads language and templates files so they are available
+	 * action class.  Loads language and templates files such that they are available
 	 * to the other methods.
 	 */
 	public function pre_dispatch()
@@ -50,6 +50,10 @@ class PackageServers extends AbstractController
 		theme()->getTemplates()->load('PackageServers');
 		loadCSSFile('admin.css');
 
+		// Load our subs.
+		require_once(SUBSDIR . '/Package.subs.php');
+
+		// Going to come in handy!
 		$this->fileFunc = FileFunctions::instance();
 	}
 
@@ -69,16 +73,6 @@ class PackageServers extends AbstractController
 		// This is for admins only.
 		isAllowedTo('admin_forum');
 
-		// Load our subs.
-		require_once(SUBSDIR . '/Package.subs.php');
-
-		// Use the Packages language file. (split servers?)
-		Txt::load('Packages');
-
-		// Use the PackageServers template.
-		theme()->getTemplates()->load('PackageServers');
-		loadCSSFile('admin.css');
-
 		$context['page_title'] = $txt['package_servers'];
 
 		// Here is a list of all the potentially valid actions.
@@ -94,6 +88,27 @@ class PackageServers extends AbstractController
 
 		// Set up action/subaction stuff.
 		$action = new Action('package_servers');
+
+		// Set up some tabs...
+		$context[$context['admin_menu_name']]['tab_data'] = [
+			'title' => $txt['package_manager'],
+			'description' => $txt['upload_packages_desc'],
+			'class' => 'i-package',
+			'tabs' => [
+				'browse' => [
+					'url' => getUrl('admin', ['action' => 'admin', 'area' => 'packages', 'sa' => 'browse']),
+					'label' => $txt['browse_packages'],
+				],
+				'installed' => [
+					'url' => getUrl('admin', ['action' => 'admin', 'area' => 'packages', 'sa' => 'installed', 'desc']),
+					'label' => $txt['installed_packages'],
+				],
+				'options' => [
+					'url' => getUrl('admin', ['action' => 'admin', 'area' => 'packages', 'sa' => 'options', 'desc']),
+					'label' => $txt['package_settings'],
+				],
+			],
+		];
 
 		// Now let's decide where we are taking this... call integrate_sa_package_servers
 		$subAction = $action->initialize($subActions, 'servers');
@@ -694,7 +709,7 @@ class PackageServers extends AbstractController
 	}
 
 	/**
-	 * Upload a new package to the packages directory.
+	 * Upload a new package to the package directory.
 	 *
 	 * - Accessed by action=admin;area=packageservers;sa=upload2
 	 */
@@ -707,11 +722,12 @@ class PackageServers extends AbstractController
 
 		// @todo Use FTP if the packages directory is not writable.
 		// Check the file was even sent!
-		if (!isset($_FILES['package']['name']) || $_FILES['package']['name'] == '')
+		if (!isset($_FILES['package']['name']) || $_FILES['package']['name'] === '')
 		{
 			throw new Exception('package_upload_error_nofile');
 		}
-		elseif (!is_uploaded_file($_FILES['package']['tmp_name']) || (ini_get('open_basedir') == '' && !$this->fileFunc->fileExists($_FILES['package']['tmp_name'])))
+
+		if (!is_uploaded_file($_FILES['package']['tmp_name']) || (ini_get('open_basedir') === '' && !$this->fileFunc->fileExists($_FILES['package']['tmp_name'])))
 		{
 			throw new Exception('package_upload_error_failed');
 		}
