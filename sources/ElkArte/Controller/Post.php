@@ -348,7 +348,7 @@ class Post extends AbstractController
 	 */
 	protected function _generatingMessage()
 	{
-		global $txt, $topic, $modSettings, $context, $options;
+		global $txt, $topic, $modSettings, $context, $options, $board_info;
 
 		// Convert / Clean the input elements
 		$msg = $this->_req->getRequest('msg', 'intval', null);
@@ -404,7 +404,12 @@ class Post extends AbstractController
 		}
 
 		// Check whether this is a really old post being bumped...
-		if (!empty($topic) && !empty($modSettings['oldTopicDays']) && $this->_topic_attributes['last_post_time'] + $modSettings['oldTopicDays'] * 86400 < time() && empty($this->_topic_attributes['is_sticky']) && !isset($_REQUEST['subject']))
+		if (!empty($topic)
+			&& !empty($board_info['old_posts'])
+			&& !empty($modSettings['oldTopicDays'])
+			&& $this->_topic_attributes['last_post_time'] + $modSettings['oldTopicDays'] * 86400 < time()
+			&& empty($this->_topic_attributes['is_sticky'])
+			&& !isset($_REQUEST['subject']))
 		{
 			$this->_post_errors->addError(array('old_topic', array($modSettings['oldTopicDays'])), 0);
 		}

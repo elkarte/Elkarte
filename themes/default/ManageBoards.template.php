@@ -644,6 +644,17 @@ function template_modify_board()
 							<input type="checkbox" id="count" name="count" ', $context['board']['count_posts'] ? ' checked="checked"' : '', ' />
 						</dd>
 					</dl>
+				</div>
+				<div id="old_posts_div">
+					<dl class="settings">
+						<dt>
+							<label for="old_post">', $txt['mboards_old_posts'], ':</label><br />
+							<span class="smalltext">', $txt['mboards_old_posts_desc'], '</span><br />
+						</dt>
+						<dd>
+							<input type="checkbox" id="old_post" name="old_post" ', $context['board']['old_posts'] ? ' checked="checked"' : '', ' />
+						</dd>
+					</dl>
 				</div>';
 
 	// Here the user can choose to force this board to use a theme other than the default theme for the forum.
@@ -759,7 +770,8 @@ function template_modify_board()
 			// What to show?
 			document.getElementById("override_theme_div").style.display = redirectEnabled || !nonDefaultTheme ? "none" : "";
 			document.getElementById("board_theme_div").style.display = redirectEnabled ? "none" : "";
-			document.getElementById("count_posts_div").style.display = redirectEnabled ? "none" : "";';
+			document.getElementById("count_posts_div").style.display = redirectEnabled ? "none" : "";
+			document.getElementById("old_posts_div").style.display = redirectEnabled ? "none" : "";';
 
 	if (!$context['board']['topics'] && empty($context['board']['is_recycle']))
 	{

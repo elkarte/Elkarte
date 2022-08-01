@@ -559,6 +559,7 @@ class InstallInstructions_install_2_0
 				array('name' => 'num_topics',         'type' => 'mediumint', 'size' => 8, 'unsigned' => true, 'default' => 0),
 				array('name' => 'num_posts',          'type' => 'mediumint', 'size' => 8, 'unsigned' => true, 'default' => 0),
 				array('name' => 'count_posts',        'type' => 'tinyint', 'size' => 4, 'default' => 0),
+				array('name' => 'old_posts',          'type' => 'tinyint', 'size' => 4, 'default' => 0),
 				array('name' => 'id_theme',           'type' => 'tinyint', 'size' => 4, 'unsigned' => true, 'default' => 0),
 				array('name' => 'override_theme',     'type' => 'tinyint', 'size' => 4, 'unsigned' => true, 'default' => 0),
 				array('name' => 'unapproved_posts',   'type' => 'smallint', 'size' => 5, 'default' => 0),

@@ -435,4 +435,25 @@ class UpgradeInstructions_upgrade_2_0
 			)
 		);
 	}
+
+	public function preparing_board_oldposts()
+	{
+		return array(
+			array(
+				'debug_title' => 'Add board based old post warning ...',
+				'function' => function () {
+					$this->table->add_column('{db_prefix}boards',
+						array(
+							'name' => 'old_posts',
+							'type' => 'tinyint',
+							'size' => 4,
+							'default' => 0
+						),
+						array(),
+						'ignore'
+					);
+				}
+			)
+		);
+	}
 }
