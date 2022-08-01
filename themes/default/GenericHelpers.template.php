@@ -163,6 +163,7 @@ function template_button_strip($button_strip, $class = '', $strip_options = [])
 		$linkClass = 'class="linklevel1 ' . (!empty($buttonParameters['active']) ? 'active ' : '') . (!empty($buttonParameters['linkclass']) ? $buttonParameters['linkclass'] : 'button_strip_' . $buttonName) . '"';
 		$icon = !empty($buttonParameters['icon']) ? '<i class="icon icon-small i-' . $buttonParameters['icon'] . '"></i>' : '';
 		$counter = !empty($buttonParameters['counter']) ? '<span class="button_indicator">' . $buttonParameters['counter'] . '</span>' : '';
+		$url = $buttonParameters['url'] ?? 'javascript:void(0);';
 
 		// Special case, the button checkbox.
 		if (!empty($buttonParameters['checkbox']) && (!empty($options['display_quick_mod']) || $buttonParameters['checkbox'] === 'always'))
@@ -181,7 +182,7 @@ function template_button_strip($button_strip, $class = '', $strip_options = [])
 		{
 			$subMenu[] = '
 						<li ' . $liClass . ' role="none">
-							<a href="' . $buttonParameters['url'] . '" class="linklevel2 button_strip_' . $buttonName . '" ' . ($buttonParameters['custom'] ?? '') . '>
+							<a href="' . $url . '" class="linklevel2 button_strip_' . $buttonName . '" ' . ($buttonParameters['custom'] ?? '') . '>
 							' . $icon . $txt[$buttonParameters['text']] . '
 							</a>
 						</li>';
@@ -191,7 +192,7 @@ function template_button_strip($button_strip, $class = '', $strip_options = [])
 		// This little button goes in a row
 		$buttons[] = '
 						<li ' . $liClass . ' role="none">
-							<a ' . $id . ' ' . $linkClass . ' role="menuitem" href="' . $buttonParameters['url'] . '" ' . ($buttonParameters['custom'] ?? '') . '>
+							<a ' . $id . ' ' . $linkClass . ' role="menuitem" href="' . $url . '" ' . ($buttonParameters['custom'] ?? '') . '>
 							' . $counter . $icon . $txt[$buttonParameters['text']] . '
 							</a>
 						</li>';
