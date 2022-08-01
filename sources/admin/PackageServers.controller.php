@@ -50,7 +50,7 @@ class PackageServers_Controller extends Action_Controller
 	 */
 	public function action_index()
 	{
-		global $txt, $context;
+		global $txt, $context, $scripturl;
 
 		// This is for admins only.
 		isAllowedTo('admin_forum');
@@ -80,6 +80,27 @@ class PackageServers_Controller extends Action_Controller
 
 		// Set up action/subaction stuff.
 		$action = new Action('package_servers');
+
+		// Set up some tabs...
+		$context[$context['admin_menu_name']]['tab_data'] = array(
+			'title' => $txt['package_manager'],
+			'description' => $txt['upload_packages_desc'],
+			'class' => 'database',
+			'tabs' => array(
+				'browse' => array(
+					'url' => $scripturl . '?action=admin;area=packages;sa=browse',
+					'label' => $txt['browse_packages'],
+				),
+				'installed' => array(
+					'url' => $scripturl . '?action=admin;area=packages;sa=installed',
+					'label' => $txt['installed_packages'],
+				),
+				'options' => array(
+					'url' => $scripturl . '?action=admin;area=packages;sa=options',
+					'label' => $txt['package_settings'],
+				),
+			),
+		);
 
 		// Now let's decide where we are taking this... call integrate_sa_package_servers
 		$subAction = $action->initialize($subActions, 'servers');
