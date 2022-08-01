@@ -136,7 +136,7 @@ class DisplayRenderer extends Renderer
 			// Can they reply? Have they turned on quick reply?
 			'quote' => [
 				'text' => 'quote',
-				'url' => getUrl('action', ['action' => 'post', 'topic' => $topic . '.' . $context['start'], 'quote' => $output['id'], 'last_msg' => $context['topic_last_message']]),
+				'url' => empty($options['display_quick_reply']) ? getUrl('action', ['action' => 'post', 'topic' => $topic . '.' . $context['start'], 'quote' => $output['id'], 'last_msg' => $context['topic_last_message']]) : null,
 				'custom' => !empty($options['display_quick_reply']) ? 'onclick="return oQuickReply.quote(' . $output['id'] . ');"' : '',
 				'class' => 'quote_button last',
 				'icon' => 'quote',
