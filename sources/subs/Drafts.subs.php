@@ -248,7 +248,7 @@ function load_draft($id_draft, $uid, $type = 0, $drafts_keep_days = 0, $check = 
 }
 
 /**
- * Loads all of the drafts for a user
+ * Loads all drafts for a user
  *
  * - Optionally can load just the drafts for a specific topic (post) or reply (pm)
  *
@@ -295,6 +295,49 @@ function load_user_drafts($member_id, $draft_type = 0, $topic = false, $order = 
 			'order' => $order,
 		)
 	)->fetch_all();
+}
+
+/**
+ * Returns if a user has any drafts for a given topic/pm
+ *
+ * @param int $member_id - user id to get drafts for
+ * @param int $draft_type - 0 for post, 1 for pm
+ * @param int $topic - if set, load drafts for that specific topic / pm
+ *
+ * @return int
+ * @package Drafts
+ */
+function count_user_drafts($member_id, $draft_type = 0, $topic = false)
+{
+	global $modSettings;
+
+	$db = database();
+	$number = 0;
+
+	// count the drafts that the user has available for the given type & action
+	$db->fetchQuery('
+		SELECT 
+			COUNT(id_draft) as number
+		FROM {db_prefix}user_drafts AS ud' . ($draft_type === 0 ? '
+			INNER JOIN {db_prefix}boards AS b ON (b.id_board = ud.id_board)' : '') . '
+		WHERE ud.id_member = {int:id_member}' . ($draft_type === 0 ? '
+			AND id_topic = {int:id_topic}' : '
+			AND id_reply = {int:id_topic}') . '
+			AND type = {int:draft_type}' . (!empty($modSettings['drafts_keep_days']) ? '
+			AND poster_time > {int:time}' : ''),
+		array(
+			'id_member' => $member_id,
+			'id_topic' => (int) $topic,
+			'draft_type' => $draft_type,
+			'time' => !empty($modSettings['drafts_keep_days']) ? (time() - ($modSettings['drafts_keep_days'] * 86400)) : 0,
+		)
+	)->fetch_callback(
+		function ($row) use (&$number) {
+			$number = $row['number'];
+		}
+	);
+
+	return $number;
 }
 
 /**

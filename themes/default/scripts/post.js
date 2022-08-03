@@ -547,3 +547,76 @@ function reActivate()
 {
 	document.forms.postmodify.message.readOnly = false;
 }
+
+/**
+ * Function to request a set of drafts for a topic
+ */
+function loadDrafts()
+{
+	let textFields = [],
+		numericFields = ['board', 'topic'],
+		checkboxFields = [],
+		formValues = [];
+
+	// Get the values from the form
+	formValues = getFields(textFields, numericFields, checkboxFields, form_name);
+	formValues[formValues.length] = 'load_drafts=1';
+
+	sendXMLDocument(elk_prepareScriptUrl(elk_scripturl) + 'action=post2;api=xml', formValues.join('&'), onDraftsReturned);
+}
+
+/**
+ * Callback used by loadDrafts, loads the draft section area with data and shows the box
+ *
+ * @param oXMLDoc
+ * @returns {boolean}
+ */
+function onDraftsReturned(oXMLDoc)
+{
+	let drafts = oXMLDoc.getElementsByTagName('drafts')[0].getElementsByTagName('draft'),
+		thisDL = document.getElementById("draft_selection"),
+		subject,
+		time,
+		link,
+		n,
+		i;
+
+	// No place ot add the data !
+	if (thisDL === null)
+	{
+		return false;
+	}
+
+	// Make sure the list is empty
+	while (thisDL.childNodes.length > 1)
+	{
+		thisDL.removeChild(thisDL.lastChild);
+	}
+
+	// Add each draft to the selection area
+	for (i = 0, n = drafts.length; i < n; i++)
+	{
+		let newDT = document.createElement('dt'),
+			newDD = document.createElement('dd');
+
+		subject = drafts[i].getElementsByTagName('subject')[0].textContent;
+		time = drafts[i].getElementsByTagName('time')[0].textContent;
+		link = drafts[i].getElementsByTagName('link')[0].textContent;
+
+		newDT.innerHTML = link;
+		newDD.innerHTML = time;
+
+		thisDL.appendChild(newDT);
+		thisDL.appendChild(newDD);
+	}
+
+	// Show the selection div and navigate to it
+	if (n > 0)
+	{
+		let container = document.getElementById('postDraftContainer');
+		container.classList.remove('hide');
+		container.scrollIntoView();
+	}
+
+	return false;
+}
