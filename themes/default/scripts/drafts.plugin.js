@@ -331,7 +331,7 @@
 		 */
 		base.init = function ()
 		{
-			// Grab this instance for use use in oDrafts
+			// Grab this instance for use in oDrafts
 			editor = this;
 
 			// Init the draft instance, load in the options

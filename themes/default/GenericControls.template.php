@@ -149,7 +149,7 @@ function template_control_richedit($editor_id, $smileyContainer = null, $bbcCont
 }
 
 /**
- * Shows the buttons that the user can see .. preview, etc
+ * Shows the buttons that the user can see .. preview, post, draft etc
  *
  * @param string $editor_id
  *

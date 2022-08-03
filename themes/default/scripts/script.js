@@ -535,14 +535,6 @@ function submitThisOnce(oControl, bReadOnly)
 	return !elk_formSubmitted;
 }
 
-function getInnerHTML(oElement)
-{
-	if (oElement)
-	{
-		return oElement.innerHTML;
-	}
-}
-
 /**
  * Set the "outer" HTML of an element.
  *

@@ -69,14 +69,19 @@ function create_control_richedit($editorOptions)
 		}
 
 		// JS makes the editor go round
-		loadJavascriptFile(array('jquery.sceditor.bbcode.min.js', 'jquery.sceditor.elkarte.js', 'post.js', 'dropAttachments.js'));
-		theme()->addJavascriptVar(array(
+		loadJavascriptFile([
+			'jquery.sceditor.bbcode.min.js',
+			'jquery.sceditor.elkarte.js',
+			'post.js',
+			'dropAttachments.js'
+		]);
+		theme()->addJavascriptVar([
 			'post_box_name' => $editorOptions['id'],
 			'elk_smileys_url' => $settings['smileys_url'],
 			'bbc_quote_from' => $txt['quote_from'],
 			'bbc_quote' => $txt['quote'],
 			'bbc_search_on' => $txt['search_on'],
-			'ila_filename' => $txt['file'] . ' ' . $txt['name']), true
+			'ila_filename' => $txt['file'] . ' ' . $txt['name']], true
 		);
 
 		// Editor language file
@@ -90,7 +95,7 @@ function create_control_richedit($editorOptions)
 	}
 
 	// Start off the editor...
-	$context['controls']['richedit'][$editorOptions['id']] = array(
+	$context['controls']['richedit'][$editorOptions['id']] = [
 		'id' => $editorOptions['id'],
 		'value' => $editorOptions['value'],
 		'rich_active' => !empty($options['wysiwyg_default']) || !empty($editorOptions['force_rich']) || !empty($_REQUEST[$editorOptions['id'] . '_mode']),
@@ -99,13 +104,13 @@ function create_control_richedit($editorOptions)
 		'height' => $editorOptions['height'] ?? '250px',
 		'form' => $editorOptions['form'] ?? 'postmodify',
 		'preview_type' => isset($editorOptions['preview_type']) ? (int) $editorOptions['preview_type'] : 1,
-		'labels' => !empty($editorOptions['labels']) ? $editorOptions['labels'] : array(),
+		'labels' => !empty($editorOptions['labels']) ? $editorOptions['labels'] : [],
 		'locale' => !empty($txt['lang_locale']) ? $txt['lang_locale'] : 'en_US',
-		'plugin_addons' => !empty($editorOptions['plugin_addons']) ? $editorOptions['plugin_addons'] : array(),
-		'plugin_options' => !empty($editorOptions['plugin_options']) ? $editorOptions['plugin_options'] : array(),
-		'buttons' => !empty($editorOptions['buttons']) ? $editorOptions['buttons'] : array(),
-		'hidden_fields' => !empty($editorOptions['hidden_fields']) ? $editorOptions['hidden_fields'] : array(),
-	);
+		'plugin_addons' => !empty($editorOptions['plugin_addons']) ? $editorOptions['plugin_addons'] : [],
+		'plugin_options' => !empty($editorOptions['plugin_options']) ? $editorOptions['plugin_options'] : [],
+		'buttons' => !empty($editorOptions['buttons']) ? $editorOptions['buttons'] : [],
+		'hidden_fields' => !empty($editorOptions['hidden_fields']) ? $editorOptions['hidden_fields'] : [],
+	];
 
 	// Allow addons an easy way to add plugins, initialization objects, etc to the editor control
 	call_integration_hook('integrate_editor_plugins', array($editorOptions['id']));
@@ -278,7 +283,7 @@ function loadEditorToolbar()
 	$bbc_tags = loadToolbarDefaults();
 	$disabledToolbar = getDisabledBBC();
 
-	// Build our toolbar, taking in to account any bbc codes from integration
+	// Build our toolbar, taking into account any bbc codes from integration
 	$bbcToolbar = [];
 	foreach ($bbc_tags as $row => $tagRow)
 	{

@@ -203,7 +203,7 @@ function template_show_list($list_id = null)
 	}
 
 	// Tabs at the bottom.  Usually bottom aligned.
-	if (isset($cur_list['list_menu'], $cur_list['list_menu']['show_on']) && ($cur_list['list_menu']['show_on'] == 'both' || $cur_list['list_menu']['show_on'] == 'bottom'))
+	if (isset($cur_list['list_menu']['show_on']) && ($cur_list['list_menu']['show_on'] === 'both' || $cur_list['list_menu']['show_on'] === 'bottom'))
 	{
 		template_create_list_menu($cur_list['list_menu']);
 	}

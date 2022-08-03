@@ -574,7 +574,7 @@ function template_browse()
 	if (!$adds_available)
 	{
 		echo '
-		<div class="infobox">', $context['sub_action'] == 'browse' ? $txt['no_packages'] : $txt['no_adds_installed'], '</div>';
+		<div class="infobox">', $context['sub_action'] === 'browse' ? $txt['no_packages'] : $txt['no_adds_installed'], '</div>';
 	}
 
 	echo '
