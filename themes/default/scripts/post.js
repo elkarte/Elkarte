@@ -620,3 +620,46 @@ function onDraftsReturned(oXMLDoc)
 
 	return false;
 }
+
+/**
+ * Checks for empty subject or body on post submit.  These are also checked server side
+ * but this provides a nice current page reminder.
+ *
+ * - If empty fields are found will use errorbox_handler to populate error(s)
+ * - If empty adds listener to fields to clear errors as they are fixed
+ *
+ * @returns {boolean} if false will block post submit
+ */
+function onPostSubmit() {
+	let body = $editor_data[post_box_name].val().trim(),
+		subject = document.getElementById('post_subject').value.trim();
+
+	let error = new errorbox_handler({
+		error_box_id: 'post_error',
+		error_code: 'no_message',
+	});
+
+	// Clear or set
+	error.checkErrors(body === '');
+	if (body === '')
+	{
+		$editor_data[post_box_name].addEvent(post_box_name, 'keyup', function ()
+		{
+			onPostSubmit();
+		});
+	}
+
+	error = new errorbox_handler({
+		error_box_id: 'post_error',
+		error_code: 'no_subject',
+	});
+
+	// Clear or set
+	error.checkErrors(subject === '');
+	if (subject === '')
+	{
+		document.getElementById('post_subject').setAttribute('onkeyup', 'onPostSubmit()');
+	}
+
+	return subject !== '' && body !== '';
+}
