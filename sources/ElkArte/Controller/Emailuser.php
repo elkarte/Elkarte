@@ -73,6 +73,12 @@ class Emailuser extends AbstractController
 		// Check permissions...
 		isAllowedTo('send_topic');
 
+		if ($this->getApi() === 'xml')
+		{
+			$this->action_sendtopic_api();
+			return;
+		}
+
 		// We need at least a topic... go away if you don't have one.
 		if (empty($topic))
 		{
@@ -205,7 +211,6 @@ class Emailuser extends AbstractController
 		global $topic, $modSettings, $txt, $context;
 
 		theme()->getTemplates()->load('Xml');
-
 		theme()->getLayers()->removeAll();
 		$context['sub_template'] = 'generic_xml_buttons';
 
