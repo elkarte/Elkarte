@@ -137,18 +137,19 @@ class Post extends AbstractController
 		require_once(SUBSDIR . '/Editor.subs.php');
 
 		// Now create the editor.
-		$editorOptions = array(
+		$editorOptions = [
 			'id' => 'message',
 			'value' => $context['message'],
-			'labels' => array(
+			'labels' => [
 				'post_button' => $context['submit_label'],
-			),
+			],
 			// add height and width for the editor
 			'height' => '275px',
 			'width' => '100%',
 			// We do XML preview here.
-			'preview_type' => 2
-		);
+			'preview_type' => 2,
+			'live_errors' => 1
+		];
 
 		// Trigger the finalize_post_form event
 		$this->_events->trigger('finalize_post_form', array('destination' => &$context['destination'], 'page_title' => &$context['page_title'], 'show_additional_options' => &$context['show_additional_options'], 'editorOptions' => &$editorOptions));

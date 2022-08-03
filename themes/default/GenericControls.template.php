@@ -175,7 +175,7 @@ function template_control_richedit_buttons($editor_id)
 	echo '
 			', $context['shortcuts_text'], '
 		</span>
-		<input type="submit" name="', $editor_context['labels']['post_name'] ?? 'post', '" value="', $editor_context['labels']['post_button'] ?? $txt['post'], '" tabindex="', $context['tabindex']++, '" onclick="return submitThisOnce(this);" accesskey="s" />';
+		<input type="submit" name="', $editor_context['labels']['post_name'] ?? 'post', '" value="', $editor_context['labels']['post_button'] ?? $txt['post'], '" tabindex="', $context['tabindex']++, '" onclick="return onPostSubmit() && submitThisOnce(this);" accesskey="s" />';
 
 	if ($editor_context['preview_type'])
 	{

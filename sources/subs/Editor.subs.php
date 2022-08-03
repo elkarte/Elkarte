@@ -75,6 +75,7 @@ function create_control_richedit($editorOptions)
 			'post.js',
 			'dropAttachments.js'
 		]);
+
 		theme()->addJavascriptVar([
 			'post_box_name' => $editorOptions['id'],
 			'elk_smileys_url' => $settings['smileys_url'],
@@ -146,42 +147,10 @@ function create_control_richedit($editorOptions)
 	{
 		Txt::load('Errors');
 		theme()->addInlineJavascript('
+		
 	error_txts[\'no_subject\'] = ' . JavaScriptEscape($txt['error_no_subject']) . ';
 	error_txts[\'no_message\'] = ' . JavaScriptEscape($txt['error_no_message']) . ';
-
-	var subject_err = new errorbox_handler({
-		self: \'subject_err\',
-		error_box_id: \'post_error\',
-		error_checks: [{
-			code: \'no_subject\',
-			efunction: function(box_value) {
-				if (box_value.length === 0)
-					return true;
-				else
-					return false;
-			}
-		}],
-		check_id: "post_subject"
-	});
-
-	var body_err_' . $editorOptions['id'] . ' = new errorbox_handler({
-		self: \'body_err_' . $editorOptions['id'] . '\',
-		error_box_id: \'post_error\',
-		error_checks: [{
-			code: \'no_message\',
-			efunction: function(box_value) {
-				if (box_value.length === 0)
-					return true;
-				else
-					return false;
-			}
-		}],
-		editor_id: \'' . $editorOptions['id'] . '\',
-		editor: ' . JavaScriptEscape('
-		(function () {
-			return $editor_data[\'' . $editorOptions['id'] . '\'].val();
-		});') . '
-	});', true);
+', true);
 	}
 }
 
