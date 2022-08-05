@@ -371,7 +371,15 @@ class Email_Parse
 			}
 			else
 			{
-				$this->headers[$header_key] .= ' ' . $this->_decode_header($header_value);
+				// Only one is ever valid, so use the last one and hope its right
+				if ($header_key === 'content-type' || $header_key === 'content-transfer-encoding')
+				{
+					$this->headers[$header_key] = $this->_decode_header($header_value);
+				}
+				else
+				{
+					$this->headers[$header_key] .= ' ' . $this->_decode_header($header_value);
+				}
 			}
 		}
 	}
