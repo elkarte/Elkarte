@@ -801,7 +801,13 @@ class Email_Parse
 		// If iconv mime is available just use it and be done
 		if (function_exists('iconv_mime_decode'))
 		{
-			return iconv_mime_decode($val, $strict ? 1 : 2, 'UTF-8');
+			$decoded = iconv_mime_decode($val, $strict ? 1 : 2, 'UTF-8');
+
+			// Bad decode, or partial decode
+			if ($decoded !== false && strpos($decoded, '=?iso') === false)
+			{
+				return $decoded;
+			}
 		}
 
 		// The RFC 2047-3 defines an encoded-word as a sequence of characters that
