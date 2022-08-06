@@ -7,7 +7,7 @@
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * @version 1.1.7
+ * @version 1.1.9
  *
  */
 
@@ -647,13 +647,12 @@ class Html_2_BBC
 		$height = $node->getAttribute('height');
 		$style = $node->getAttribute('style');
 
-		$bbc = '';
 		$size = '';
 
 		// First if this is an inline image, we don't support those
 		if (substr($src, 0, 4) === 'cid:')
 		{
-			return $bbc;
+			return $alt;
 		}
 
 		// Do the basic things first, title/alt
