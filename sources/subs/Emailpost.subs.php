@@ -8,7 +8,7 @@
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * @version 1.1.7
+ * @version 1.1.9
  *
  */
 
@@ -35,7 +35,7 @@ function pbe_email_to_bbc($text, $html)
 	$tags = array(
 		'~\*\*\s?(.*?)\*\*~is' => '**$1**',
 		'~<\*>~i' => '&lt;*&gt;',
-		'~-{20,}~' => '<hr>',
+		'~^-{3,}$~m' => '<hr>',
 		'~#([0-9a-fA-F]{4,6}\b)~' => '&#35;$1',
 	);
 
