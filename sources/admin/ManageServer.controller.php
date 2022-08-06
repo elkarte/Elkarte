@@ -137,6 +137,9 @@ class ManageServer_Controller extends Action_Controller
 		{
 			call_integration_hook('integrate_save_general_settings');
 
+			// Reset this in the event the server has changed, it will get set again if needed.
+			updateSettings(array('host_to_dis' => 0));
+
 			$settingsForm->setConfigValues((array) $this->_req->post);
 			$settingsForm->save();
 			redirectexit('action=admin;area=serversettings;sa=general;' . $context['session_var'] . '=' . $context['session_id'] . ';msg=' . (!empty($context['settings_message']) ? $context['settings_message'] : 'core_settings_saved'));
