@@ -364,7 +364,7 @@ class ManageScheduledTasks extends AbstractController
 		require_once(SUBSDIR . '/ScheduledTasks.subs.php');
 
 		// Lets load the language just in case we are outside the Scheduled area.
-		Txt::load('ManageScheduledTasks');
+		Txt::load('ManageScheduled');
 
 		// Empty the log?
 		if (!empty($this->_req->post->removeAll))
