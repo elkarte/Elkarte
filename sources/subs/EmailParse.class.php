@@ -549,14 +549,8 @@ class Email_Parse
 				// own Content Type and Encoding and we will process each as such
 				$this->_boundary_split($this->headers['x-parameters']['content-type']['boundary'], $html);
 
-				// Some multi-part messages ... are singletons :P
-				if ($this->_boundary_section_count === 1)
-				{
-					$this->body = $this->_boundary_section[0]->body;
-					$this->headers['x-parameters'] = $this->_boundary_section[0]->headers['x-parameters'];
-				}
 				// We found multiple sections, lets go through each
-				elseif ($this->_boundary_section_count > 1)
+				if ($this->_boundary_section_count > 0)
 				{
 					$html_ids = array();
 					$text_ids = array();
