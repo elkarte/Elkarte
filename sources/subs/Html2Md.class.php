@@ -286,7 +286,14 @@ class Html_2_Md
 		{
 			return $body[1];
 		}
-		elseif (preg_match('~<html>(.*)</html>~su', $text, $body))
+
+		if (preg_match('~<html>(.*)</html>~su', $text, $body))
+		{
+			return $body[1];
+		}
+
+		// Parsers may have clipped the ending body or html tag off with the quote/signature
+		if (preg_match('~<body>(.*)~su', $text, $body))
 		{
 			return $body[1];
 		}
