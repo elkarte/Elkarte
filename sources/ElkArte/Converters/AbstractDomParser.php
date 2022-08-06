@@ -130,6 +130,12 @@ abstract class AbstractDomParser
 			return $body[1];
 		}
 
+		// Parsers may have clipped the ending body or html tag off with the quote/signature
+		if (preg_match('~<body>(.*)~su', $text, $body))
+		{
+			return $body[1];
+		}
+
 		return $text;
 	}
 
