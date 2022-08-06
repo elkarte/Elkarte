@@ -5281,6 +5281,10 @@ a.help .icon {
 	max-width: 40em;
 }
 
+.login .well {
+	padding: 5px 35px
+}
+
 .login dl {
 	clear: right;
 	overflow: auto;

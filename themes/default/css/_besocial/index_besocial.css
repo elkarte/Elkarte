@@ -549,8 +549,13 @@ div.bbc_footnotes .meaction {
  * -------------------------------------------------------
  */
 
+/* Overide index.css due to font change */
+.listlevel1.inline_mod_check {
+	font-size: 11px !important;
+}
+
 /* Level 1 Menu bar: link or button. General styling. */
-.linklevel1, .linklevel1:link, .linklevel1:visited {
+.linklevel1, .linklevel1:link, .linklevel1:visited, .quickbuttons .inline_mod_check {
 	border: 1px solid #AFAFAF;
 	border-top: 1px solid #CFCFCF;
 	border-left: 1px solid #BFBFBF;
