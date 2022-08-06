@@ -194,9 +194,15 @@ class Html_2_BBC
 				if ($i % 4 == 0)
 				{
 					// protect << symbols from being stripped
-					$working = str_replace('<<', "[\xC2\xA0]", $parts[$i]);
+					$part = $parts[$i];
+					$working = htmlspecialchars($part, ENT_NOQUOTES, 'UTF-8');
 					$working = strip_tags($working);
-					$parts[$i] = str_replace("[\xC2\xA0]", '<<', $working);
+
+					// Strip can return nothing due to an error
+					if (empty($working))
+						$parts[$i] = $part;
+					else
+						$parts[$i] = htmlspecialchars_decode($working);
 				}
 			}
 			$bbc = implode('', $parts);
