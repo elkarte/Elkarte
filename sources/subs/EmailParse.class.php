@@ -716,7 +716,10 @@ class Email_Parse
 	 */
 	private function _process_attachments($i)
 	{
-		if ($this->_boundary_section[$i]->headers['content-disposition'] === 'attachment' || $this->_boundary_section[$i]->headers['content-disposition'] === 'inline' || isset($this->_boundary_section[$i]->headers['content-id']))
+		if ($this->_boundary_section[$i]->headers['content-disposition'] === 'attachment'
+			|| $this->_boundary_section[$i]->headers['content-disposition'] === 'inline'
+			|| $this->_boundary_section[$i]->headers['content-disposition'] === '*'
+			|| isset($this->_boundary_section[$i]->headers['content-id']))
 		{
 			// Get the attachments file name
 			if (isset($this->_boundary_section[$i]->headers['x-parameters']['content-disposition']['filename']))
@@ -731,6 +734,9 @@ class Email_Parse
 			{
 				return;
 			}
+
+			// Escape all potentially unsafe characters from the filename
+			$file_name = preg_replace('~(^\.)|/|[\n|\r]|(\.$)~m', '_', $file_name);
 
 			// Load the attachment data
 			$this->attachments[$file_name] = $this->_boundary_section[$i]->body;
