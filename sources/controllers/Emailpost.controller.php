@@ -7,7 +7,7 @@
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * @version 1.1.7
+ * @version 1.1.9
  *
  */
 
@@ -682,7 +682,7 @@ function pbe_create_topic($pbe, $email_message, $board_info)
  */
 function pbe_load_text(&$html, $email_message, $pbe)
 {
-	if (!$html || ($html && preg_match_all('~<table.*?>~i', $email_message->body, $match) >= 2))
+	if (!$html || ($html && preg_match_all('~<table.*?>~i', $email_message->body, $match) > 2))
 	{
 		// Some mobile responses wrap everything in a table structure so use plain text
 		$text = $email_message->plain_body;
