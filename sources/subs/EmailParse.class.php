@@ -572,7 +572,8 @@ class Email_Parse
 							$html_ids[] = $i;
 						}
 						// Plain section
-						elseif ($this->_boundary_section[$i]->headers['content-type'] === 'text/plain')
+						elseif ($this->_boundary_section[$i]->headers['content-type'] === 'text/plain'
+							&& $this->_boundary_section[$i]->headers['content-disposition'] !== 'attachment')
 						{
 							$text_ids[] = $i;
 						}
