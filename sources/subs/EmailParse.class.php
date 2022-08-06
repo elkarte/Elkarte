@@ -590,8 +590,19 @@ class Email_Parse
 					// We always return a plain text version for use
 					if (!empty($text_ids))
 					{
-						// As parts are ordered by increasing accuracy, use the last one found
-						$this->plain_body = $this->_boundary_section[end($text_ids)]->body;
+						foreach ($text_ids as $id)
+						{
+							// Join or use the last?
+							if ($this->headers['content-type'] === 'multipart/mixed')
+							{
+								$this->plain_body .= ' ' . $this->_boundary_section[$id]->body;
+							}
+							else
+							{
+								$this->plain_body = $this->_boundary_section[$id]->body;
+							}
+						}
+
 						if ($this->_boundary_section[end($text_ids)]->headers["content-transfer-encoding"] === 'base64')
 						{
 							$this->plain_body = str_replace("\n", '<br />', $this->plain_body);
