@@ -214,8 +214,8 @@ class SearchParams extends ValuesContainer
 		$validator = new DataValidator();
 
 		// Convert dates to days between now and ...
-		$params['minage'] = $this->daysBetween($params['minage'], 0);
-		$params['maxage'] = $this->daysBetween($params['maxage'], 9999);
+		$params['minage'] = $this->daysBetween($params['minage'] ?? null, 0);
+		$params['maxage'] = $this->daysBetween($params['maxage'] ?? null, 9999);
 
 		$validator->sanitation_rules(array(
 			'advanced' => 'intval',
