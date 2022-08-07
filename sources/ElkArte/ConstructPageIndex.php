@@ -116,8 +116,11 @@ class ConstructPageIndex extends AbstractModel
 
 		$this->setBaseLink();
 
-		// Compact pages is off or on?
-		if (empty($this->_modSettings['compactTopicPagesEnable']))
+		if ($this->max_value <= $this->num_per_page)
+		{
+			$pageindex = $this->noLinks();
+		}
+		elseif (empty($this->_modSettings['compactTopicPagesEnable']))
 		{
 			$pageindex = $this->simplelLinks();
 		}
@@ -184,6 +187,18 @@ class ConstructPageIndex extends AbstractModel
 			: strtr($this->base_url, array('%' => '%%')) . ';start=%1$d'), $settings['page_index_template']['base_link']);
 
 		$this->base_link = str_replace('{scripturl}', $scripturl, $base_link);
+	}
+
+	/**
+	 * When there is only one page, no need to show an index
+	 *
+	 * @return string
+	 */
+	private function noLinks()
+	{
+		global $settings;
+
+		return $settings['page_index_template']['none'] ?? '<li class="hide"></li>';
 	}
 
 	/**

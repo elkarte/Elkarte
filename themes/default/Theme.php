@@ -126,6 +126,7 @@ class Theme extends BaseTheme
 				'next_page' => '<span class="next_page">{next_txt}</span>',
 				'expand_pages' => '<li class="linavPages expand_pages" {custom}> <a href="#">&#8230;</a> </li>',
 				'all' => '<span class="linavPages all_pages">{all_txt}</span>',
+				'none' => '<li class="hide"><a href="#"></a></li>',
 			),
 
 			// @todo find a better place if we are going to create a notifications template
