@@ -120,18 +120,18 @@ abstract class AbstractDomParser
 	 */
 	public function getBodyText($text)
 	{
-		if (preg_match('~<body>(.*)</body>~su', $text, $body))
+		if (preg_match('~<body.*?>(.*)</body>~su', $text, $body))
 		{
 			return $body[1];
 		}
 
-		if (preg_match('~<html>(.*)</html>~su', $text, $body))
+		if (preg_match('~<html.*?>(.*)</html>~su', $text, $body))
 		{
 			return $body[1];
 		}
 
 		// Parsers may have clipped the ending body or html tag off with the quote/signature
-		if (preg_match('~<body>(.*)~su', $text, $body))
+		if (preg_match('~<body.*?>(.*)~su', $text, $body))
 		{
 			return $body[1];
 		}
@@ -200,7 +200,7 @@ abstract class AbstractDomParser
 		}
 
 		$strings = explode($break, $string);
-		$lines = array();
+		$lines = [];
 
 		foreach ($strings as $string)
 		{
