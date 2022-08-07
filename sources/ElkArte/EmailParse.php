@@ -40,6 +40,7 @@ namespace ElkArte;
  * - $email_message->raw_message // The entire message w/headers as read
  * - $email_message->plain_body // The plain text version of the message
  * - $email_message->attachments // Any attachments with key = filename
+ * - $email_message->inline_files // Any in-line attachments with key = filename
  *
  * Optional functions:
  * - $email_message->load_address(); // Returns array with to/from/cc addresses
@@ -57,10 +58,10 @@ class EmailParse
 	public $raw_message;
 
 	/** @var string[] Attachments found after the message */
-	public $attachments = array();
+	public $attachments = [];
 
 	/** @var string[] Attachments that we designated as inline with the text */
-	public $inline_files = array();
+	public $inline_files = [];
 
 	/** @var string Parsed and decoded message body, may be plain text or html */
 	public $body;
@@ -69,7 +70,7 @@ class EmailParse
 	public $plain_body;
 
 	/** @var mixed[] All the parsed message headers */
-	public $headers = array();
+	public $headers = [];
 
 	/** @var string Full security key */
 	public $message_key_id;
@@ -96,7 +97,7 @@ class EmailParse
 	public $subject;
 
 	/** @var mixed[] Holds the email to from & cc emails and names */
-	public $email = array();
+	public $email = [];
 
 	/** @var string|bool Holds the sending ip of the email */
 	public $ip = false;
@@ -108,7 +109,7 @@ class EmailParse
 	    indicating failed delivery */
 	public $_is_dsn = false;
 
-	/** @var mixed[] Holds the field/value/type report codes from DSN messages
+	/** @var array Holds the field/value/type report codes from DSN messages
 	    Accessible as [$field]['type'] and [$field]['value'] */
 	public $_dsn;
 
@@ -119,7 +120,7 @@ class EmailParse
 	private $_email_name;
 
 	/** @var string[] Holds each boundary section of the message */
-	private $_boundary_section = array();
+	private $_boundary_section = [];
 
 	/** @var int The total number of boundary sections */
 	private $_boundary_section_count = 0;
@@ -142,7 +143,6 @@ class EmailParse
 	 * @param bool $html - flag to determine if we are saving html or not
 	 * @param string $data - full header+message string
 	 * @param string $location - optional, used for debug
-	 * @throws \ElkArte\Exceptions\Exception
 	 */
 	public function read_email($html = false, $data = '', $location = '')
 	{
@@ -165,7 +165,6 @@ class EmailParse
 	 *
 	 * @param string $data optional, if supplied must be a full headers+body email string
 	 * @param string $location optional, used for debug
-	 * @throws \ElkArte\Exceptions\Exception
 	 */
 	public function read_data($data = '', $location = '')
 	{
@@ -192,7 +191,6 @@ class EmailParse
 	 * - Must have admin permissions
 	 *
 	 * @param string $location
-	 * @throws \ElkArte\Exceptions\Exception
 	 */
 	private function _readFailed($location)
 	{
@@ -230,7 +228,8 @@ class EmailParse
 		}
 
 		$request = $db->query('', '
-			SELECT message
+			SELECT 
+				message
 			FROM {db_prefix}postby_emails_error
 			WHERE id_email = {int:id}
 			LIMIT 1',
@@ -272,7 +271,7 @@ class EmailParse
 	 */
 	private function _parse_headers()
 	{
-		// Remove windows style \r's
+		// Remove windows style \r\n's
 		$this->_header_block = str_replace("\r\n", "\n", $this->_header_block);
 
 		// unfolding multi-line headers, a CRLF immediately followed by a LWSP-char is equivalent to the LWSP-char
@@ -296,14 +295,22 @@ class EmailParse
 			$header_value = substr($header, $pos + 1);
 			$header_key = strtolower(trim($header_key));
 
-			// Decode and add it in to our headers array
+			// Decode and add it in to our headers array, if we have content-type twice, overwrite.
 			if (!isset($this->headers[$header_key]))
 			{
 				$this->headers[$header_key] = $this->_decode_header($header_value);
 			}
 			else
 			{
-				$this->headers[$header_key] .= ' ' . $this->_decode_header($header_value);
+				// Only one is ever valid, so use the last one and hope its right
+				if ($header_key === 'content-type' || $header_key === 'content-transfer-encoding')
+				{
+					$this->headers[$header_key] = $this->_decode_header($header_value);
+				}
+				else
+				{
+					$this->headers[$header_key] .= ' ' . $this->_decode_header($header_value);
+				}
 			}
 		}
 	}
@@ -333,7 +340,13 @@ class EmailParse
 		// If iconv mime is available just use it and be done
 		if (function_exists('iconv_mime_decode'))
 		{
-			return iconv_mime_decode($val, $strict ? 1 : 2, 'UTF-8');
+			$decoded = iconv_mime_decode($val, $strict ? 1 : 2, 'UTF-8');
+
+			// Bad decode, or partial decode
+			if ($decoded !== false && strpos($decoded, '=?iso') === false)
+			{
+				return $decoded;
+			}
 		}
 
 		// The RFC 2047-3 defines an encoded-word as a sequence of characters that
@@ -342,7 +355,7 @@ class EmailParse
 		// is the manner in which it's being encoded into plain ASCII (Q=quoted printable, B=base64);
 		// and after the third question mark is the text itself.
 		// Subject: =?iso-8859-1?Q?=A1Hola,_se=F1or!?=
-		$matches = array();
+		$matches = [];
 		if (preg_match_all('~(.*?)(=\?([^?]+)\?(Q|B)\?([^?]*)\?=)([^=\(]*)~i', $val, $matches))
 		{
 			$decoded = '';
@@ -411,11 +424,16 @@ class EmailParse
 		// Decode if its quoted printable or base64 encoded
 		if ($encoding === 'quoted-printable')
 		{
+			$string = preg_replace('~(^|\r\n)=A0($|\r\n)~m', '=0D=0A=0D=0A', $string);
 			$string = quoted_printable_decode(preg_replace('~=\r?\n~', '', $string));
 		}
 		elseif ($encoding === 'base64')
 		{
 			$string = base64_decode($string);
+			if (isset($this->headers['content-type']) && strpos($this->headers['content-type'], 'text/') === false)
+			{
+				return $string;
+			}
 		}
 
 		// Convert this to utf-8 if needed.
@@ -424,7 +442,7 @@ class EmailParse
 			$string = $this->_charset_convert($string, strtoupper($charset), 'UTF-8');
 		}
 
-		return $string;
+		return str_replace("\r\n", "\n", $string ?? '');
 	}
 
 	/**
@@ -455,7 +473,14 @@ class EmailParse
 			{
 				// Replace unknown characters with a space
 				@ini_set('mbstring.substitute_character', '32');
-				$string = @mb_convert_encoding($string_save, $to, $from);
+				try
+				{
+					$string = mb_convert_encoding($string_save, $to, $from);
+				}
+				catch (\ValueError $e)
+				{
+					// nothing, bad character set
+				}
 			}
 			elseif (function_exists('recode_string'))
 			{
@@ -471,7 +496,7 @@ class EmailParse
 	}
 
 	/**
-	 * Content headers need to be set so we can properly decode the message body.
+	 * Content headers need to be set, so we can properly decode the message body.
 	 *
 	 * What it does:
 	 *
@@ -535,7 +560,7 @@ class EmailParse
 	 */
 	private function _parse_content_header_parameters($value, $key)
 	{
-		$matches = array();
+		$matches = [];
 
 		// Does the header key contain parameter values?
 		$pos = strpos($value, ';');
@@ -563,13 +588,13 @@ class EmailParse
 	}
 
 	/**
-	 * Based on the the message content type, determine how to best proceed
+	 * Based on the message content type, determine how to best proceed
 	 *
 	 * @param bool $html
 	 */
 	private function _parse_body($html = false)
 	{
-		// based on the content type for this body, determine what do do
+		// Based on the content type for this body, determine what to do
 		switch ($this->headers['content-type'])
 		{
 			// The text/plain content type is the generic subtype for plain text. It is the default specified by RFC 822.
@@ -626,36 +651,30 @@ class EmailParse
 			case 'message/rfc822':
 				if (!isset($this->headers['x-parameters']['content-type']['boundary']))
 				{
-					// No boundary's but presented as multipart?, then we must have a incomplete message
+					// No boundary's but presented as multipart?, then we must have an incomplete message
 					$this->body = '';
 
 					return;
 				}
 
 				// Break up the message on the boundary --sections, each boundary section will have its
-				// own Content Type and Encoding and we will process each as such
+				// own Content Type and Encoding, we will process each as such
 				$this->_boundary_split($this->headers['x-parameters']['content-type']['boundary'], $html);
 
-				// Some multi-part messages ... are singletons :P
-				if ($this->_boundary_section_count === 1)
-				{
-					$this->body = $this->_boundary_section[0]->body;
-					$this->headers['x-parameters'] = $this->_boundary_section[0]->headers['x-parameters'];
-				}
 				// We found multiple sections, lets go through each
-				elseif ($this->_boundary_section_count > 1)
+				if ($this->_boundary_section_count > 0)
 				{
-					$html_ids = array();
-					$text_ids = array();
+					$html_ids = [];
+					$text_ids = [];
 					$this->body = '';
 					$this->plain_body = '';
-					$bypass = array('application/pgp-encrypted', 'application/pgp-signature', 'application/pgp-keys');
+					$bypass = ['application/pgp-encrypted', 'application/pgp-signature', 'application/pgp-keys'];
 
 					// Go through each boundary section
 					for ($i = 0; $i < $this->_boundary_section_count; $i++)
 					{
 						// Stuff we can't or don't want to process
-						if (in_array($this->_boundary_section[$i]->headers['content-type'], $bypass))
+						if (in_array($this->_boundary_section[$i]->headers['content-type'], $bypass, true))
 						{
 							continue;
 						}
@@ -666,9 +685,10 @@ class EmailParse
 							$html_ids[] = $i;
 						}
 						// Plain section
-						elseif ($this->_boundary_section[$i]->headers['content-type'] === 'text/plain')
+						elseif ($this->_boundary_section[$i]->headers['content-type'] === 'text/plain'
+							&& $this->_boundary_section[$i]->headers['content-disposition'] !== 'attachment')
 						{
-							$text_ids[] = $i;
+								$text_ids[] = $i;
 						}
 						// Message is a DSN (Delivery Status Notification)
 						elseif ($this->_boundary_section[$i]->headers['content-type'] === 'message/delivery-status')
@@ -683,22 +703,30 @@ class EmailParse
 					// We always return a plain text version for use
 					if (!empty($text_ids))
 					{
-						// As parts are ordered by increasing accuracy, use the last one found
-						$this->plain_body = $this->_boundary_section[end($text_ids)]->body;
-						if ($this->_boundary_section[end($text_ids)]->headers["content-transfer-encoding"] === 'base64')
+						foreach ($text_ids as $id)
 						{
-							$this->plain_body = str_replace("\n", '<br />', $this->plain_body);
+							// Join or use the last?
+							if ($this->headers['content-type'] === 'multipart/mixed')
+							{
+								$this->plain_body .= ' ' . $this->_decode_body($this->_boundary_section[$id]->body);
+							}
+							// Such as multipart/alternative, use the last one as its will be most accurate
+							else
+							{
+								$this->plain_body = $this->_boundary_section[$id]->body;
+							}
 						}
 					}
 					elseif (!empty($html_ids))
 					{
-						// This should never run as emails should always have a plain text section to be valid, still ...
+						// For emails that have no plain text section, which they should to be valid, still ...
 						$this->plain_body .= $this->_boundary_section[0]->body;
 
 						$this->plain_body = str_ireplace('<p>', "\n\n", $this->plain_body);
-						$this->plain_body = str_ireplace(array('<br />', '<br>', '</p>', '</div>'), "\n", $this->plain_body);
+						$this->plain_body = str_ireplace(['<br />', '<br>', '</p>', '</div>'], "\n", $this->plain_body);
 						$this->plain_body = strip_tags($this->plain_body);
 					}
+
 					$this->plain_body = $this->_decode_body($this->plain_body);
 
 					// If they want the html section, and its available,  we need to set it
@@ -715,8 +743,8 @@ class EmailParse
 						{
 							$this->body = $this->_boundary_section[$id]->body;
 
-							// A section may have its own attachments if it had is own unique boundary sections
-							// so we need to check and add them in as needed
+							// A section may have its own attachments, if it had its own unique boundary sections
+							// we need to check and add them in as needed
 							foreach ($this->_boundary_section[$id]->attachments as $key => $value)
 							{
 								$this->attachments[$key] = $value;
@@ -768,7 +796,6 @@ class EmailParse
 			}
 
 			// Parse this section just like its was a separate email
-			// Parse this section just like its was a separate email
 			$boundary_section = new EmailParse();
 			$boundary_section->read_email($html, $part);
 
@@ -796,7 +823,7 @@ class EmailParse
 		// These sections often have extra blank lines, so cannot be counted on to be
 		// fully accessible in ->headers. The "body" of this section contains values
 		// formatted by FIELD: [TYPE;] VALUE
-		$dsn_body = array();
+		$dsn_body = [];
 		foreach (explode("\n", str_replace("\r\n", "\n", $this->_boundary_section[$i]->body)) as $line)
 		{
 			$type = '';
@@ -811,7 +838,7 @@ class EmailParse
 				$val = $rest;
 			}
 
-			$dsn_body[strtolower(trim($field))] = array('type' => trim($type), 'value' => trim($val));
+			$dsn_body[strtolower(trim($field))] = ['type' => trim($type), 'value' => trim($val)];
 		}
 
 		switch ($dsn_body['action']['value'])
@@ -823,7 +850,7 @@ class EmailParse
 			case 'failed':
 				// The email failed to be delivered.
 				$this->_is_dsn = true;
-				$this->_dsn = array('headers' => $this->_boundary_section[$i]->headers, 'body' => $dsn_body);
+				$this->_dsn = ['headers' => $this->_boundary_section[$i]->headers, 'body' => $dsn_body];
 				break;
 			default:
 				$this->_is_dsn = false;
@@ -839,7 +866,10 @@ class EmailParse
 	 */
 	private function _process_attachments($i)
 	{
-		if ($this->_boundary_section[$i]->headers['content-disposition'] === 'attachment' || $this->_boundary_section[$i]->headers['content-disposition'] === 'inline' || isset($this->_boundary_section[$i]->headers['content-id']))
+		if ($this->_boundary_section[$i]->headers['content-disposition'] === 'attachment'
+			|| $this->_boundary_section[$i]->headers['content-disposition'] === 'inline'
+			|| $this->_boundary_section[$i]->headers['content-disposition'] === '*'
+			|| isset($this->_boundary_section[$i]->headers['content-id']))
 		{
 			// Get the attachments file name
 			if (isset($this->_boundary_section[$i]->headers['x-parameters']['content-disposition']['filename']))
@@ -854,6 +884,9 @@ class EmailParse
 			{
 				return;
 			}
+
+			// Escape all potentially unsafe characters from the filename
+			$file_name = preg_replace('~(^\.)|/|[\n|\r]|(\.$)~m', '_', $file_name);
 
 			// Load the attachment data
 			$this->attachments[$file_name] = $this->_boundary_section[$i]->body;
@@ -899,23 +932,24 @@ class EmailParse
 			// UTF-8 these may be valid non smart quotes
 			if ($this->headers['x-parameters']['content-type']['charset'] !== 'UTF-8')
 			{
-				$val = str_replace(array('=D4', '=D5', '=D2', '=D3', '=A0'), array("'", "'", '"', '"', ''), $val);
+				$val = str_replace(['=D4', '=D5', '=D2', '=D3', '=A0'], ["'", "'", '"', '"', ''], $val);
 			}
+
 			$val = $this->_decode_string($val, 'quoted-printable');
 		}
-		// Lines end in the tell tail quoted printable ... wrap and decode
-		elseif (preg_match('~\s=[\r?\n]~', $val))
+		// Lines end in telltale quoted printable ... wrap and decode
+		elseif (preg_match('~\s=[\r\n]~', $val))
 		{
 			$val = preg_replace('~\s=[\r?\n]~', ' ', $val);
 			$val = $this->_decode_string($val, 'quoted-printable');
 		}
 		// Lines end in = but not ==
-		elseif (preg_match('~((?<!=)=[\r?\n])~', $val))
+		elseif (preg_match('~((?<!=)=[\r\n])~', $val))
 		{
 			$val = $this->_decode_string($val, 'quoted-printable');
 		}
 
-		return $val;
+		return str_replace("\r\n", "\n", $val ?? '');
 	}
 
 	/**
