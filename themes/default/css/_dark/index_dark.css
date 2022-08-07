@@ -70,7 +70,7 @@
 
 	/* Input controls, input, button, select, textarea */
 	--input-background: #0B0B0B; /* Generic inputs background */
-	--input_disabled_background: #E4E4E4; /* Disabled button background */
+	--input_disabled_background: rgba(255, 255, 255, 0.12); /* Disabled button background */
 	--input_border: #004299; /* Generic inputs border */
 	--input_border_hover: #2E7EE6; /* Hover for inputs */
 	--input_border_focus: #2E7EE6; /* Focus for inputs */
@@ -189,7 +189,7 @@
 	--body_text: #9D9D9D; /* Body text, text areas, editor, inputs, more */
 	--menu_text: #8B8B8B; /* used for text in menus, breadcrumbs, buttons */
 	--strong_text: #AAAAAA; /* like a demi bold */
-	--disabled_text: #585858; /* used in ACP */
+	--disabled_text: rgba(255, 255, 255, 0.3); /* used in ACP */
 
 	/* Special text colors */
 	--attention: #A80000; /* Various red notice and error sections */
@@ -284,6 +284,7 @@ input:focus, textarea:focus, button:focus, select:focus, .editor:focus {
 /* Give disabled text input elements a different background color. */
 input[disabled].input_text, input[disabled].input_password {
 	background: var(--input_disabled_background);
+	color: var(--disabled_text);
 }
 
 /* Common button styling. */
@@ -851,7 +852,7 @@ sup.bbc_footnotes, sup.bbc_footnotes a {
 }
 
 .breadcrumb .crumb.active a, .breadcrumb .crumb:hover a, .breadcrumb .crumb:last-child:hover a,
-.breadcrumb .crumb:last-child a, .breadcrumb .crumb:last-child strong {
+.breadcrumb .crumb:last-child a, .breadcrumb .crumb:last-child strong, .breadcrumb .crumb:last-child {
 	color: var(--primary_white);
 }
 

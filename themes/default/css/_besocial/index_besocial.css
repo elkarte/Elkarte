@@ -253,6 +253,7 @@ input[type="submit"], .drop_area_fileselect_text, button[type="submit"], input[t
 
 .linkbutton:link, .linkbutton:visited {
 	padding: .33em .4em;
+	font-size: var(--font13);
 }
 
 /* Hover effects. */

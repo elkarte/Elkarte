@@ -858,7 +858,7 @@ sup.bbc_footnotes, sup.bbc_footnotes a {
 }
 
 .breadcrumb .crumb.active a, .breadcrumb .crumb:hover a, .breadcrumb .crumb:last-child:hover a,
-.breadcrumb .crumb:last-child a, .breadcrumb .crumb:last-child strong {
+.breadcrumb .crumb:last-child a, .breadcrumb .crumb:last-child strong, .breadcrumb .crumb:last-child {
 	color: var(--primary_white);
 }
 
