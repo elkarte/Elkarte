@@ -58,7 +58,7 @@ class PreparseMail extends BaseMail
 
 		// Convert :emoji: tags to html versions
 		$emoji = Emoji::instance();
-		$message = $emoji->emojiNameToImage($message, true);
+		$message = $emoji->emojiNameToImage($message, true, false);
 
 		// Allow addons to account for their own unique bbc additions e.g. gallery's etc.
 		call_integration_hook('integrate_mailist_pre_parsebbc', [&$message]);
