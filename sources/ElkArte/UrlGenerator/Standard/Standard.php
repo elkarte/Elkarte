@@ -55,10 +55,16 @@ class Standard extends AbstractUrlGenerator
 			}
 
 			// A substitution token like $1 $2{stuff}, should be left alone
-			if (is_string($v) && preg_match('~^\$\d({.*})?$~m', $v) !== 0)
+			if (is_string($v) && $v !== '')
 			{
-				$args[$k] = $k . '=' . $v;
-				continue;
+				// A sprintf token (%1$d %2$s etc) should be left alone, as should
+				// a substitution token like $1 $2{stuff}
+				if (($v[0] === '$' && preg_match('~^\$\d({.*})?$~m', $v) !== 0)
+					|| ($v[0] === '%' && preg_match('~^%\d\$[ds]$~m', $v) !== 0))
+				{
+					$args[$k] = $k . '=' . $v;
+					continue;
+				}
 			}
 
 			$args[$k] = $k . '=' . urlencode($v);
