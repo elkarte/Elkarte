@@ -767,7 +767,6 @@ $txt['smileys_none'] = 'No Smileys';
 $txt['smileys_forum_board_default'] = 'Forum/Board Default';
 
 $txt['search_results'] = 'Search Results';
-$txt['search_no_results'] = 'Sorry, no matches were found';
 
 $txt['totalTimeLogged2'] = ' days, ';
 $txt['totalTimeLogged3'] = ' hours and ';

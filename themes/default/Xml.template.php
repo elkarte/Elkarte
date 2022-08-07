@@ -265,7 +265,7 @@ function template_results()
 	if (empty($context['topics']))
 	{
 		echo '
-		<noresults>', $txt['search_no_results'], '</noresults>';
+		<noresults>', $txt['find_no_results'], '</noresults>';
 	}
 	else
 	{
