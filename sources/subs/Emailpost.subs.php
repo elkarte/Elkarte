@@ -12,7 +12,6 @@
  *
  */
 
-use BBC\ParserWrapper;
 use ElkArte\AttachmentsDirectory;
 use ElkArte\Cache\Cache;
 use ElkArte\Converters\Html2BBC;
@@ -76,7 +75,7 @@ function pbe_email_to_bbc($text, $html)
 
 		// Attempt to fix textual ('>') quotes so we also fix wrapping issues first!
 		$text = pbe_fix_email_quotes($text, $gmail);
-		$text = str_replace(array('[quote]', '[/quote]'), array('&gt;blockquote>', '&gt;/blockquote>'), $text);
+		$text = str_replace(['[quote]', '[/quote]'], ['&gt;blockquote>', '&gt;/blockquote>'], $text);
 
 		// Convert this (markup) text to html
 		$text = preg_replace(array_keys($tags), array_values($tags), $text);
@@ -87,14 +86,15 @@ function pbe_email_to_bbc($text, $html)
 
 	// Convert the resulting HTML to BBC
 	$bbc_converter = new Html2BBC($text, !$html);
-	$bbc_converter->skip_tags(array('font', 'span'));
-	$bbc_converter->skip_styles(array('font-family', 'font-size', 'color'));
+	$bbc_converter->skip_tags(['font', 'span']);
+	$bbc_converter->skip_styles(['font-family', 'font-size', 'color']);
 	$text = $bbc_converter->get_bbc();
 
 	// Some tags often end up as just empty tags - remove those.
 	$emptytags = array(
 		'~\[[bisu]\]\s*\[/[bisu]\]~' => '',
 		'~\[quote\]\s*\[/quote\]~' => '',
+		'~\[center\]\s*\[/center\]~' => '',
 		'~(\n){3,}~si' => "\n\n",
 	);
 
@@ -110,6 +110,11 @@ function pbe_email_to_bbc($text, $html)
  */
 function pbe_run_parsers($text)
 {
+	if (empty($text))
+	{
+		return '';
+	}
+
 	// Run our parsers, as defined in the ACP, to remove the original "replied to" message
 	$text_save = $text;
 	$result = pbe_parse_email_message($text);
@@ -413,6 +418,11 @@ function pbe_parse_email_message(&$body)
  */
 function pbe_filter_email_message($text)
 {
+	if (empty($text))
+	{
+		return '';
+	}
+
 	$db = database();
 
 	// load up the text filters from the database, regex first and ordered by the filter order ...
@@ -1872,7 +1882,7 @@ function query_update_member_stats($pbe, $email_message, $topic_info = array())
 }
 
 /**
- * Calls the necessary functions to extract and format the message so its ready for posting
+ * Calls the necessary functions to extract and format the message for posting
  *
  * What it does:
  *
@@ -1888,15 +1898,13 @@ function query_update_member_stats($pbe, $email_message, $topic_info = array())
  */
 function pbe_load_text(&$html, $email_message, $pbe)
 {
-	if (!$html || preg_match_all('~<table.*?>~i', $email_message->body, $match) >= 2)
+	if (!$html)
 	{
-		// Some mobile responses wrap everything in a table structure so use plain text
 		$text = $email_message->plain_body;
-		$html = false;
 	}
 	else
 	{
-		$text = un_htmlspecialchars($email_message->body);
+		$text = pbe_load_html($email_message, $html);
 	}
 
 	// Run filters now, before the data is manipulated
@@ -1920,6 +1928,41 @@ function pbe_load_text(&$html, $email_message, $pbe)
 		// Prepare it for the database
 		require_once(SUBSDIR . '/Post.subs.php');
 		preparsecode($text);
+	}
+
+	return $text;
+}
+
+/**
+ * Checks and removes role=presentation tables.  If to many tables remain, returns the plain text
+ * version of the email as converting too many html tables to bbc simply will not look good
+ *
+ * @param \ElkArte\EmailParse $email_message
+ * @param bool $html
+ * @return string
+ */
+function pbe_load_html($email_message, &$html)
+{
+	$text = un_htmlspecialchars($email_message->body);
+
+	// If we are dealing with tables ....
+	if (preg_match('~<table.*?>~i', $text))
+	{
+		// Try and strip out purely presentational ones, for example how we send html emails
+		$text = preg_replace_callback('~(<table.*?role="presentation".*?>.*?</table>)~s',
+			static function ($matches) {
+				$result = preg_replace('~<table.*?role="presentation".*?>~', '', $matches[0]);
+				$result = str_replace('</table>', '', $result);
+				return preg_replace('~<tr.*?>|</tr>|<td.*?>|</td>|<tbody.*?>|</tbody>~', '', $result);
+			},
+			$text);
+
+		// Another check is in order, still to many tables?
+		if (preg_match_all('~<table.*?>~i', $text) > 2)
+		{
+			$text = $email_message->plain_body;
+			$html = false;
+		}
 	}
 
 	return $text;
