@@ -30,7 +30,7 @@ function calculateNextTrigger($tasks = array(), $forceUpdate = false)
 
 	if (!is_array($tasks))
 	{
-		$tasks = array($tasks);
+		$tasks = [$tasks];
 	}
 
 	// Actually have something passed?

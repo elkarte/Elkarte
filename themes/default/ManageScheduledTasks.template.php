@@ -72,9 +72,9 @@ function template_edit_scheduled_tasks()
 					<dt>
 						<label>', $txt['scheduled_tasks_name'], ':</label>
 					</dt>
-					<dd>
+					<dd class="well">
 						', $context['task']['name'], '<br />
-						<span class="smalltext">', $context['task']['desc'], '</span>
+						<p class="smalltext">&#10148;', $context['task']['desc'], '</p>
 					</dd>
 					<dt>
 						<label for="regularity">', $txt['scheduled_task_edit_interval'], ':</label>

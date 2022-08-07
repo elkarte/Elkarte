@@ -39,7 +39,7 @@ class Html2BBC extends AbstractDomParser
 	public $sizes_equivalence = [1 => '8px', '10px', '12px', '14px', '18px', '20px', '22px'];
 
 	/** @var bool|null Used to strip newlines inside 'p' and 'div' elements */
-	public $strip_newlines = null;
+	public $strip_newlines;
 
 	/** @var string[] Html tags to skip that would normally be converted */
 	protected $_skip_tags = [];

@@ -69,7 +69,7 @@ class Emailpost extends AbstractController
 			return false;
 		}
 
-		// Ask for an html version (if available) and some needed details
+		// Ask for the html version (if available) and some needed details
 		$email_message->read_email(true, $email_message->raw_message);
 		$html = $email_message->html_found;
 		$email_message->load_address();

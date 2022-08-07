@@ -53,7 +53,7 @@ class Loader
 	 */
 	public function __construct($lang, &$variable, QueryInterface $db, string $variable_name = 'txt')
 	{
-		if ($lang !== null)
+		if (!empty($lang))
 		{
 			$this->language = ucfirst($lang);
 		}
