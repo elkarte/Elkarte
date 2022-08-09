@@ -2011,8 +2011,11 @@ function featureEnabled($feature)
  */
 function cleanXml($string)
 {
-	// http://www.w3.org/TR/2000/REC-xml-20001006#NT-Char
-	return preg_replace('~[\x00-\x08\x0B\x0C\x0E-\x19\x{FFFE}\x{FFFF}]~u', '', $string);
+	// https://www.w3.org/TR/2008/REC-xml-20081126/#NT-Char
+	$string = preg_replace('~[\x00-\x08\x0B\x0C\x0E-\x1F\x{FFFE}\x{FFFF}]~u', '', $string);
+
+	// Discouraged
+	return preg_replace('~[\x7F-\x84\x86-\x9F\x{FDD0}-\x{FDEF}\x{1FFFE}-\x{1FFFF}\x{2FFFE}-\x{2FFFF}\x{3FFFE}-\x{3FFFF}\x{4FFFE}-\x{4FFFF}\x{5FFFE}-\x{5FFFF}\x{6FFFE}-\x{6FFFF}\x{7FFFE}-\x{7FFFF}\x{8FFFE}-\x{8FFFF}\x{9FFFE}-\x{9FFFF}\x{AFFFE}-\x{AFFFF}\x{BFFFE}-\x{BFFFF}\x{CFFFE}-\x{CFFFF}\x{DFFFE}-\x{DFFFF}\x{EFFFE}-\x{EFFFF}\x{FFFFE}-\x{FFFFF}\x{10FFFE}-\x{10FFFF}]~u', '', $string);
 }
 
 /**
