@@ -1916,6 +1916,7 @@ button[type="submit"].quick_quote_button.hide {
 	align-items: center;
 	flex-wrap: wrap;
 	max-width: 100%;
+	margin-top: 1em;
 	padding: .4em .25em .2em .25em;
 }
 
@@ -5392,7 +5393,7 @@ div.labels {
 
 /* description & information used below headers, others used to how a result message */
 .description, .information, .warningbox, .successbox, .infobox, .errorbox {
-	margin: 0 0 1.1em 0;
+	margin: 0 0 .4em 0;
 	padding: .8em .8em;
 	border: 1px solid;
 }
@@ -5407,10 +5408,6 @@ div.labels {
 	background-repeat: no-repeat;
 	background-position: 4px 50%;
 	background-size: 24px 24px;
-}
-
-.errorbox {
-	margin-bottom: 1em;
 }
 
 .border_error {

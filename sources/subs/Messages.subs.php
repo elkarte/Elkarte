@@ -142,7 +142,7 @@ function basicMessageInfo($id_msg, $override_permissions = false, $detailed = fa
  * @param int $id_msg
  * @param bool $modify
  *
- * @return bool
+ * @return array
  * @todo why it doesn't take into account post moderation?
  */
 function quoteMessageInfo($id_msg, $modify)
