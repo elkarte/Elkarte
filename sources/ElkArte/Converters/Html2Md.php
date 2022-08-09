@@ -400,12 +400,18 @@ class Html2Md extends AbstractDomParser
 	 */
 	private function _convertCode($node)
 	{
+		// Get the code block
+		$value = $this->getInnerHTML($node);
+
+		// Empty Block
+		if (empty($value))
+		{
+			return '` `';
+		}
+
 		// Turn off things that may mangle code tags
 		$this->strip_tags = false;
 		$this->body_width = 0;
-
-		// Get the code block
-		$value = html_entity_decode($this->getInnerHTML($node), ENT_COMPAT, 'UTF-8');
 
 		// If we have a multi line code block, we are working outside to in, and need to convert the br's ourselves
 		$value = preg_replace('~<br( /)?' . '>~', $this->line_end, str_replace('&nbsp;', ' ', $value));
@@ -910,8 +916,13 @@ class Html2Md extends AbstractDomParser
 	private function getBuffer($node)
 	{
 		$cut = $this->getOuterHTML($node);
-		$string = $this->getInnerHTML($this->getParent($node));
-		$string = substr($string, 0, strpos($string, $cut));
+		$parent = $this->getParent($node);
+
+		if ($this->getName($parent) !== 'body')
+		{
+			$string = $this->getInnerHTML($parent);
+			$string = substr($string, 0, strpos($string, $cut));
+		}
 
 		return empty($string) ? 0 : Util::strlen($string);
 	}

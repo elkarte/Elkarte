@@ -190,7 +190,7 @@ class Html2BBC extends AbstractDomParser
 				$bbc = $this->line_end . '[quote]' . $this->getValue($node) . '[/quote]' . $this->line_end;
 				break;
 			case 'br':
-				$bbc = $this->line_break;
+				$bbc = '[br]';
 				break;
 			case 'center':
 				$bbc = $this->line_end . '[center]' . $this->getValue($node) . '[/center]' . $this->line_end;
@@ -436,7 +436,9 @@ class Html2BBC extends AbstractDomParser
 	private function _convertCode($node)
 	{
 		$bbc = '';
+		$this->strip_newlines = false;
 		$value = $this->getInnerHTML($node);
+		$value = preg_replace('~<br( /)?>~', $this->line_end, $value);
 
 		// Get the number of lines of code that we have
 		$lines = preg_split('~\r\n|\r|\n~', $value);
