@@ -253,7 +253,7 @@ class EmailParse
 	private function _split_headers()
 	{
 		$this->_header_block = '';
-		$match = array();
+		$match = [];
 
 		// The header block ends based on condition (1) or (2)
 		if (!preg_match('~^(.*?)\r?\n(?:\r?\n|(?!(\t|[\w-]+:|[ ])))(.*)~s', $this->raw_message, $match))
@@ -261,8 +261,17 @@ class EmailParse
 			return;
 		}
 
-		$this->_header_block = $match[1];
-		$this->body = $match[3];
+		// Actually no headers in this boundary
+		if (empty($match[1]) || strpos($match[1], ':') === false)
+		{
+			$this->_header_block = '';
+			$this->body = $this->raw_message;
+		}
+		else
+		{
+			$this->_header_block = $match[1];
+			$this->body = $match[3];
+		}
 	}
 
 	/**
@@ -720,7 +729,7 @@ class EmailParse
 					elseif (!empty($html_ids))
 					{
 						// For emails that have no plain text section, which they should to be valid, still ...
-						$this->plain_body .= $this->_boundary_section[0]->body;
+						$this->plain_body .= $this->_boundary_section[key($html_ids)]->body;
 
 						$this->plain_body = str_ireplace('<p>', "\n\n", $this->plain_body);
 						$this->plain_body = str_ireplace(['<br />', '<br>', '</p>', '</div>'], "\n", $this->plain_body);
@@ -741,7 +750,16 @@ class EmailParse
 						// For all the chosen sections
 						foreach ($text_ids as $id)
 						{
-							$this->body = $this->_boundary_section[$id]->body;
+							// Join or use the last? These could be HTML sections as well
+							if ($this->headers['content-type'] === 'multipart/mixed')
+							{
+								$this->body .= ' ' . $this->_boundary_section[$id]->body;
+							}
+							// Such as multipart/alternative, use the last found
+							else
+							{
+								$this->body = $this->_boundary_section[$id]->body;
+							}
 
 							// A section may have its own attachments, if it had its own unique boundary sections
 							// we need to check and add them in as needed
