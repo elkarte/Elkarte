@@ -149,7 +149,7 @@ function quoteMessageInfo($id_msg, $modify)
 {
 	if (empty($id_msg))
 	{
-		return false;
+		return [];
 	}
 
 	$db = database();

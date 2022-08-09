@@ -59,7 +59,7 @@ class Emoji extends AbstractModel
 	 *
 	 * @param string $string
 	 * @param bool $uni false returns an emoji image tag, true returns the unicode point
-	 * @param bool protect if false will bypass codeblock protection (useful if already done!)
+	 * @param bool $protect if false will bypass codeblock protection (useful if already done!)
 	 * @return string
 	 */
 	public function emojiNameToImage($string, $uni = false, $protect = true)
