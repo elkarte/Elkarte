@@ -283,8 +283,8 @@ input:focus, textarea:focus, button:focus, select:focus, .editor:focus {
 
 /* Give disabled text input elements a different background color. */
 input[disabled].input_text, input[disabled].input_password {
-	background: var(--input_disabled_background);
 	color: var(--disabled_text);
+	background: var(--input_disabled_background);
 }
 
 /* Common button styling. */

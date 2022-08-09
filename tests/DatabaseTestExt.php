@@ -78,7 +78,6 @@ class TestDatabase extends TestCase
 			'follow_ups',
 			'log_actions',
 			'log_activity',
-			'log_badbehavior',
 			'log_banned',
 			'log_boards',
 			'log_comments',

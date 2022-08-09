@@ -43,7 +43,7 @@ class TestLike extends ElkArteCommonSetupTest
 		$controller->action_showProfileLikes();
 
 		// Lets see some items loaded into context, as createlist will have run
-		$this->assertEquals('Posts you liked', $context['menu_data_view_likes']['tab_data']['title']);
+		$this->assertEquals('Likes', $context['menu_data_view_likes']['tab_data']['title']);
 		$this->assertEquals(4, $context['view_likes']['num_columns']);
 		$this->assertEquals('Likes', $context['view_likes']['title']);
 	}

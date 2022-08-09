@@ -398,8 +398,8 @@ button[type="button"]:hover, .linkbutton:hover {
 
 /* Don't show disabled buttons as active on hover */
 input[type=submit][disabled]:hover, button[disabled], button[disabled]:hover, input[disabled].input_text {
-	border: 1px solid;
 	cursor: not-allowed;
+	border: 1px solid;
 }
 
 /* Use new class that is defined to suit, and with a sensible name. */
@@ -1744,6 +1744,7 @@ a.bbc_link {
 
 .breadcrumb .crumb:last-child {
 	font-size: var(--font14);
+	font-weight: 600;
 	padding-right: 1.8em;
 	border-radius: 0 calc(var(--arrow) / 6) calc(var(--arrow) / 6) 0;
 }
@@ -3078,13 +3079,13 @@ footer .attachments {
 }
 
 .attachment_name, .attachment_details {
+	font-size: var(--font12);
 	display: block;
 	overflow: hidden;
 	width: 100%;
 	padding: 0 .5em;
 	white-space: nowrap;
 	text-overflow: ellipsis;
-	font-size: var(--font12);
 }
 
 .attachment_details {

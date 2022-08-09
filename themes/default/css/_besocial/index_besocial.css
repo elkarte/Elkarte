@@ -252,8 +252,8 @@ input[type="submit"], .drop_area_fileselect_text, button[type="submit"], input[t
 }
 
 .linkbutton:link, .linkbutton:visited {
-	padding: .33em .4em;
 	font-size: var(--font13);
+	padding: .33em .4em;
 }
 
 /* Hover effects. */
@@ -1086,6 +1086,7 @@ nav.breadcrumb {
 
 .topic_listing > li {
 	grid-template-columns: [topic_icon] 50px [topic_info] auto [topic_latest] 300px [topic_stats] 125px [topic_moderation] 75px;
+	border-color: var(--transparent);
 }
 
 .topic_info {
@@ -1121,10 +1122,6 @@ nav.breadcrumb {
 }
 
 #description_board .generalinfo, #forumposts .generalinfo {
-	border-color: var(--transparent);
-}
-
-.topic_listing > li {
 	border-color: var(--transparent);
 }
 
@@ -1537,7 +1534,7 @@ nav.breadcrumb {
 	color: var(--primary_white);
 	border-color: var(--primary_border) !important;
 	border-bottom: none;
-	box-shadow: 2px 0x 0 var(--opacity30);
+	box-shadow: 2px 0 0 var(--opacity30);
 }
 
 .ui-tabs .ui-tabs-nav .ui-state-default .ui-tabs-anchor {
