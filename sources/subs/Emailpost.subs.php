@@ -12,6 +12,7 @@
  *
  */
 
+use BBC\PreparseCode;
 use ElkArte\AttachmentsDirectory;
 use ElkArte\Cache\Cache;
 use ElkArte\Converters\Html2BBC;
@@ -58,11 +59,11 @@ function pbe_email_to_bbc($text, $html)
 	// We are starting with HTML, our goal is to convert the best parts of it to BBC,
 	if ($html)
 	{
-		// upfront pre-process $tags, mostly for the email template strings
-		$text = preg_replace(array_keys($tags), array_values($tags), $text);
-
 		// Run the parsers on the html
 		$text = pbe_run_parsers($text);
+
+		// upfront pre-process $tags, mostly for the email template strings
+		$text = preg_replace(array_keys($tags), array_values($tags), $text);
 	}
 	// Starting with plain text, possibly even markdown style ;)
 	else
@@ -85,7 +86,7 @@ function pbe_email_to_bbc($text, $html)
 	}
 
 	// Convert the resulting HTML to BBC
-	$bbc_converter = new Html2BBC($text, !$html);
+	$bbc_converter = new Html2BBC($text, $html);
 	$bbc_converter->skip_tags(['font', 'span']);
 	$bbc_converter->skip_styles(['font-family', 'font-size', 'color']);
 	$text = $bbc_converter->get_bbc();
@@ -1898,17 +1899,14 @@ function query_update_member_stats($pbe, $email_message, $topic_info = array())
  */
 function pbe_load_text(&$html, $email_message, $pbe)
 {
-	if (!$html)
-	{
-		$text = $email_message->plain_body;
-	}
-	else
+	if ($html)
 	{
 		$text = pbe_load_html($email_message, $html);
 	}
-
-	// Run filters now, before the data is manipulated
-	$text = pbe_filter_email_message($text);
+	else
+	{
+		$text = $email_message->plain_body;
+	}
 
 	// Convert to BBC and format it, so it looks like a post
 	$text = pbe_email_to_bbc($text, $html);
@@ -1923,9 +1921,11 @@ function pbe_load_text(&$html, $email_message, $pbe)
 		return '';
 	}
 
+	// PM's are handled by sendpm
 	if ($email_message->message_type !== 'p')
 	{
 		// Prepare it for the database
+		$text = Util::htmlspecialchars($text, ENT_QUOTES, 'UTF-8', true);
 		require_once(SUBSDIR . '/Post.subs.php');
 		preparsecode($text);
 	}
@@ -1943,15 +1943,19 @@ function pbe_load_text(&$html, $email_message, $pbe)
  */
 function pbe_load_html($email_message, &$html)
 {
-	$text = un_htmlspecialchars($email_message->body);
+	// un_htmlspecialchars areas outside code blocks
+	$preparse = PreparseCode::instance('');
+	$text = $preparse->tokenizeCodeBlocks($email_message->body, true);
+	$text = un_htmlspecialchars($text);
+	$text = $preparse->restoreCodeBlocks($text);
 
 	// If we are dealing with tables ....
 	if (preg_match('~<table.*?>~i', $text))
 	{
 		// Try and strip out purely presentational ones, for example how we send html emails
-		$text = preg_replace_callback('~(<table.*?role="presentation".*?>.*?</table>)~s',
+		$text = preg_replace_callback('~(<table[^>].*?role="presentation".*?>.*?</table>)~s',
 			static function ($matches) {
-				$result = preg_replace('~<table.*?role="presentation".*?>~', '', $matches[0]);
+				$result = preg_replace('~<table[^>].*?role="presentation".*?>~', '', $matches[0]);
 				$result = str_replace('</table>', '', $result);
 				return preg_replace('~<tr.*?>|</tr>|<td.*?>|</td>|<tbody.*?>|</tbody>~', '', $result);
 			},
