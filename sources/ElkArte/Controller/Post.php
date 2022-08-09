@@ -1580,28 +1580,25 @@ class Post extends AbstractController
 			// Add a quote string on the front and end.
 			$context['quote']['xml'] = '[quote author=' . $row['poster_name'] . ' link=msg=' . (int) $_REQUEST['quote'] . ' date=' . $row['poster_time'] . "]\n" . $row['body'] . "\n[/quote]";
 			$context['quote']['text'] = strtr(un_htmlspecialchars($context['quote']['xml']), array('\'' => '\\\'', '\\' => '\\\\', "\n" => '\\n', '</script>' => '</\' + \'script>'));
-			$context['quote']['xml'] = strtr($context['quote']['xml'], array('&nbsp;' => '&#160;', '<' => '&lt;', '>' => '&gt;'));
-
-			$context['quote']['mozilla'] = strtr(Util::htmlspecialchars($context['quote']['text']), array('&quot;' => '"'));
+			$context['quote']['xml'] = strtr($context['quote']['xml'], ['&nbsp;' => '&#160;', '<' => '&lt;', '>' => '&gt;']);
 		}
 		//@todo Needs a nicer interface.
 		// In case our message has been removed in the meantime.
 		elseif (isset($_REQUEST['modify']))
 		{
 			$context['sub_template'] = 'modifyfast';
-			$context['message'] = array(
+			$context['message'] = [
 				'id' => 0,
 				'body' => '',
 				'subject' => '',
-			);
+			];
 		}
 		else
 		{
-			$context['quote'] = array(
+			$context['quote'] = [
 				'xml' => '',
-				'mozilla' => '',
 				'text' => '',
-			);
+			];
 		}
 	}
 
