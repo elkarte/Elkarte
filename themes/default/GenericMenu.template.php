@@ -218,7 +218,7 @@ function template_generic_menu_tabs($tab_context)
 		if (!empty($tab_context['class']))
 		{
 			echo '
-						<span class="hdicon cat_img_', $tab_context['class'], '"></span>';
+						<span class="hdicon ', $tab_context['class'], '"></span>';
 		}
 
 		if (!empty($tab_context['help']))

@@ -397,7 +397,8 @@ button[type="button"]:hover, .linkbutton:hover {
 }
 
 /* Don't show disabled buttons as active on hover */
-input[type=submit][disabled]:hover, button[disabled], button[disabled]:hover {
+input[type=submit][disabled]:hover, button[disabled], button[disabled]:hover, input[disabled].input_text {
+	cursor: not-allowed;
 	border: 1px solid;
 }
 
@@ -1742,6 +1743,8 @@ a.bbc_link {
 }
 
 .breadcrumb .crumb:last-child {
+	font-size: var(--font14);
+	font-weight: 600;
 	padding-right: 1.8em;
 	border-radius: 0 calc(var(--arrow) / 6) calc(var(--arrow) / 6) 0;
 }
@@ -1914,6 +1917,7 @@ button[type="submit"].quick_quote_button.hide {
 	align-items: center;
 	flex-wrap: wrap;
 	max-width: 100%;
+	margin-top: 1em;
 	padding: .4em .25em .2em .25em;
 }
 
@@ -3060,7 +3064,7 @@ footer .attachments {
 .attachment_block, .attachment {
 	display: inline-block;
 	overflow: hidden;
-	width: 225px;
+	min-width: 215px;
 	margin: 0 .4em 1em 0;
 	text-align: center;
 }
@@ -3075,6 +3079,7 @@ footer .attachments {
 }
 
 .attachment_name, .attachment_details {
+	font-size: var(--font12);
 	display: block;
 	overflow: hidden;
 	width: 100%;
@@ -5389,7 +5394,7 @@ div.labels {
 
 /* description & information used below headers, others used to how a result message */
 .description, .information, .warningbox, .successbox, .infobox, .errorbox {
-	margin: 0 0 1.1em 0;
+	margin: 0 0 .4em 0;
 	padding: .8em .8em;
 	border: 1px solid;
 }
@@ -5404,10 +5409,6 @@ div.labels {
 	background-repeat: no-repeat;
 	background-position: 4px 50%;
 	background-size: 24px 24px;
-}
-
-.errorbox {
-	margin-bottom: 1em;
 }
 
 .border_error {

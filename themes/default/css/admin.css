@@ -285,7 +285,7 @@ h3.category_header form {
 	position: absolute;
 	top: 12px;
 	right: 16px;
-	width: 75px;
+	max-height: 30px;
 }
 
 #support_credits .content p {

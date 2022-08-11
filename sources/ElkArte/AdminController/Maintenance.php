@@ -94,7 +94,7 @@ class Maintenance extends AbstractController
 		// This uses admin tabs - as it should!
 		$context[$context['admin_menu_name']]['tab_data'] = array(
 			'title' => $txt['maintain_title'],
-			'class' => 'database',
+			'class' => 'i-cog',
 			'description' => $txt['maintain_info'],
 			'tabs' => array(
 				'routine' => array(),

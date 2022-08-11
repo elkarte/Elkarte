@@ -19,6 +19,7 @@ namespace ElkArte\Modules\Drafts;
 use ElkArte\Errors\ErrorContext;
 use ElkArte\EventManager;
 use ElkArte\Exceptions\ControllerRedirectException;
+use ElkArte\HttpReq;
 use ElkArte\Modules\AbstractModule;
 use ElkArte\Languages\Txt;
 use ElkArte\Util;
@@ -43,13 +44,13 @@ class Post extends AbstractModule
 	protected static $_subject_length = 32;
 
 	/** @var \ElkArte\EventManager */
-	protected static $_eventsManager = null;
+	protected static $_eventsManager;
 
 	/** @var mixed Loading draft into the editor? */
 	protected $_loading_draft = false;
 
 	/**
-	 * {@inheritdoc }
+	 * {@inheritdoc}
 	 */
 	public static function hooks(EventManager $eventsManager)
 	{
@@ -74,21 +75,20 @@ class Post extends AbstractModule
 
 			self::$_drafts_save = allowedTo('post_draft');
 
-			$eventHooks = array(
-				array('prepare_modifying', array('\\ElkArte\\Modules\\Drafts\\Post', 'prepare_modifying'), array('really_previewing')),
-				array('finalize_post_form', array('\\ElkArte\\Modules\\Drafts\\Post', 'finalize_post_form'), array('editorOptions', 'board', 'topic', 'template_layers')),
-
-				array('prepare_save_post', array('\\ElkArte\\Modules\\Drafts\\Post', 'prepare_save_post'), array()),
-				array('before_save_post', array('\\ElkArte\\Modules\\Drafts\\Post', 'before_save_post'), array()),
-				array('after_save_post', array('\\ElkArte\\Modules\\Drafts\\Post', 'after_save_post'), array('msgOptions')),
-			);
+			$eventHooks = [
+				['prepare_modifying', ['\\ElkArte\\Modules\\Drafts\\Post', 'prepare_modifying'], ['really_previewing']],
+				['finalize_post_form', ['\\ElkArte\\Modules\\Drafts\\Post', 'finalize_post_form'], ['editorOptions', 'board', 'topic', 'template_layers']],
+				['prepare_save_post', ['\\ElkArte\\Modules\\Drafts\\Post', 'prepare_save_post'], []],
+				['before_save_post', ['\\ElkArte\\Modules\\Drafts\\Post', 'before_save_post'], []],
+				['after_save_post', ['\\ElkArte\\Modules\\Drafts\\Post', 'after_save_post'], ['msgOptions']],
+			];
 		}
 
 		return $eventHooks;
 	}
 
 	/**
-	 * Make sure its a preview and not saving a draft
+	 * Make sure we are doing a preview and not saving a draft
 	 *
 	 * @param bool $really_previewing
 	 */
@@ -119,19 +119,23 @@ class Post extends AbstractModule
 		// Are post drafts enabled?
 		$context['drafts_save'] = self::$_drafts_save;
 		$context['drafts_autosave'] = self::$_drafts_save && self::$_autosave_enabled && allowedTo('post_autosave_draft');
+		$context['hasDrafts'] = false;
+		$context['drafts'] = [];
 
 		// Build a list of drafts that they can load into the editor
 		if (!empty(self::$_drafts_save))
 		{
 			Txt::load('Drafts');
 
-			$this->_prepareDraftsContext($this->user->id, $topic);
+			$haveDrafts = $this->_user_has_drafts($this->user->id, $topic);
+			//$this->_prepareDraftsContext($this->user->id, $topic);
 
-			if (!empty($this->_loading_draft))
+			if (!empty($this->_load_draft()))
 			{
 				$editorOptions['value'] = $context['message'];
 			}
 
+			// A little auto save action?
 			if (!empty($context['drafts_autosave']) && !empty($options['drafts_autosave_enabled']))
 			{
 				$editorOptions['plugin_addons'] = $editorOptions['plugin_addons'] ?? [];
@@ -153,30 +157,88 @@ class Post extends AbstractModule
 						id_draft: ' . (empty($context['id_draft']) ? 0 : $context['id_draft']) . '
 					}';
 
-				loadJavascriptFile('drafts.plugin.js', array('defer' => true));
+				loadJavascriptFile('drafts.plugin.js', ['defer' => true]);
 			}
 
 			$context['shortcuts_text'] = $context['shortcuts_text'] ?? $txt['shortcuts_drafts'];
 
+			// We may be first in line
 			$editorOptions['buttons'] = $editorOptions['buttons'] ?? [];
 			$editorOptions['hidden_fields'] = $editorOptions['hidden_fields'] ?? [];
 
-			$editorOptions['buttons'][] = array(
+			$editorOptions['buttons'][] = [
 				'name' => 'save_draft',
 				'value' => $txt['draft_save'],
 				'options' => 'onclick="return confirm(' . JavaScriptEscape($txt['draft_save_note']) . ') && submitThisOnce(this);" accesskey="d"',
-			);
+			];
 
-			$editorOptions['hidden_fields'][] = array(
+			// Have drafts available, show a load button
+			if ($haveDrafts)
+			{
+				$context['hasDrafts'] = $haveDrafts;
+				$editorOptions['buttons'][] = [
+					'name' => 'load_draft',
+					'value' => $txt['draft_load'],
+					'options' => 'onclick="return event.ctrlKey || loadDrafts();" accesskey="l"',
+				];
+			}
+
+			$editorOptions['hidden_fields'][] = [
 				'name' => 'id_draft',
 				'value' => empty($context['id_draft']) ? 0 : $context['id_draft'],
-			);
+			];
 
-			if (!empty($context['drafts']))
+			if ($haveDrafts)
 			{
+				unset($context['minmax_preferences']['draft']);
 				$template_layers->add('load_drafts', 100);
 			}
 		}
+	}
+
+	/**
+	 * Checks if any drafts exist for this member/topic
+	 *
+	 * @param $member_id
+	 * @param $id_topic
+	 * @return int number of drafts found
+	 */
+	protected function _user_has_drafts($member_id, $id_topic)
+	{
+		if (empty($member_id))
+		{
+			return 0;
+		}
+
+		require_once(SUBSDIR . '/Drafts.subs.php');
+
+		return count_user_drafts($member_id, 0, $id_topic);
+	}
+
+	/**
+	 * If a draft has been selected, will use loadDraft function to fetch it into the editor
+	 *
+	 * @return bool true if a draft is laoded
+	 */
+	protected function _load_draft()
+	{
+		require_once(SUBSDIR . '/Drafts.subs.php');
+		$req = HttpReq::instance();
+
+		$subject = $req->getPost('subject', 'trim', '');
+		$message = $req->getPost('message', 'trim', '');
+		$id_draft = $req->getRequest('id_draft', 'intval', 0);
+
+		// Has a specific draft has been selected?  Load it up if there is not
+		// already a message already in the editor
+		if (!empty($id_draft) && empty($subject) && empty($message))
+		{
+			$this->_loading_draft = loadDraft($id_draft, 0, true, true);
+
+			return !empty($this->_loading_draft);
+		}
+
+		return false;
 	}
 
 	/**
@@ -196,37 +258,40 @@ class Post extends AbstractModule
 	{
 		global $scripturl, $context, $txt;
 
-		$context['drafts'] = array();
-
 		// Need a member
 		if (empty($member_id))
 		{
 			return false;
 		}
 
-		// We haz drafts
+		// We haz drafts?
 		Txt::load('Drafts');
 		require_once(SUBSDIR . '/Drafts.subs.php');
 
-		// has a specific draft has been selected?  Load it up if there is not already a message already in the editor
-		if (isset($_REQUEST['id_draft']) && empty($_POST['subject']) && empty($_POST['message']))
+		// A draft has been selected?
+		if ($this->_load_draft())
 		{
-			$this->_loading_draft = loadDraft((int) $_REQUEST['id_draft'], 0, true, true);
+			return true;
 		}
 
-		// load all the drafts for this user that meet the criteria
+		// load the recent drafts for this user that meet the topic criteria
 		$order = 'poster_time DESC';
-		$user_drafts = load_user_drafts($member_id, 0, $id_topic, $order);
+		$user_drafts = load_user_drafts($member_id, 0, $id_topic, $order, 10);
+
+		if (empty($user_drafts))
+		{
+			return false;
+		}
 
 		// Add them to the context draft array for template display
 		foreach ($user_drafts as $draft)
 		{
 			$short_subject = empty($draft['subject']) ? $txt['drafts_none'] : Util::shorten_text(stripslashes($draft['subject']), self::$_subject_length);
-			$context['drafts'][] = array(
+			$context['drafts'][] = [
 				'subject' => censor($short_subject),
 				'poster_time' => standardTime($draft['poster_time']),
-				'link' => '<a href="' . $scripturl . '?action=post;board=' . $draft['id_board'] . ';' . (!empty($draft['id_topic']) ? 'topic=' . $draft['id_topic'] . '.0;' : '') . 'id_draft=' . $draft['id_draft'] . '">' . (!empty($draft['subject']) ? $draft['subject'] : $txt['drafts_none']) . '</a>',
-			);
+				'link' => '<a href="' . $scripturl . '?action=post;board=' . $draft['id_board'] . ';' . (!empty($draft['id_topic']) ? 'topic=' . $draft['id_topic'] . '.0;' : '') . 'id_draft=' . $draft['id_draft'] . ';#post_subject">' . (!empty($draft['subject']) ? $draft['subject'] : $txt['drafts_none']) . '</a>',
+			];
 		}
 
 		return true;
@@ -234,14 +299,30 @@ class Post extends AbstractModule
 
 	/**
 	 * When the prepare_save_post event fires, checks if it was
-	 * in response to a save draft event
+	 * in response to a save or load draft event
 	 */
 	public function prepare_save_post()
 	{
 		// Drafts enabled and needed?
-		if (isset($_POST['save_draft']) || isset($_POST['id_draft']))
+		if (isset($_POST['save_draft']) || isset($_POST['id_draft']) || isset($_POST['load_drafts']))
 		{
 			require_once(SUBSDIR . '/Drafts.subs.php');
+		}
+	}
+
+	/**
+	 * Call the appropriate draft action, save, load or nothing
+	 */
+	public function before_save_post()
+	{
+		// If drafts are enabled, then pass this off
+		if (isset($_POST['save_draft']) && !empty(self::$_drafts_save))
+		{
+			$this->_save_draft();
+		}
+		elseif (isset($_POST['load_drafts']) && !empty(self::$_drafts_save))
+		{
+			$this->_load_drafts();
 		}
 	}
 
@@ -251,53 +332,83 @@ class Post extends AbstractModule
 	 * @throws ControllerRedirectException
 	 * @throws \ElkArte\Exceptions\Exception
 	 */
-	public function before_save_post()
+	private function _save_draft()
 	{
 		global $context, $board;
 
-		// If drafts are enabled, then pass this off
-		if (isset($_POST['save_draft']))
+		$req = HttpReq::instance();
+
+		// Prepare and clean the data, load the draft array
+		$icon = $req->getPost('icon', 'trim|strval', 'xx');
+		$subject = $req->getPost('subject', '\\ElkArte\\Util::htmlspecialchars', '');
+		$message = $req->getPost('message', 'trim', '');
+
+		$draft = [
+			'id_draft' => $req->getPost('id_draft', 'intval', 0),
+			'topic_id' => $req->getRequest('topic', 'intval', 0),
+			'board' => $board,
+			'icon' => preg_replace('~[\./\\\\*:"\'<>]~', '', $icon),
+			'smileys_enabled' => isset($_POST['ns']) ? 0 : 1,
+			'locked' => isset($_POST['lock']) ? (int) $_POST['lock'] : 0,
+			'sticky' => isset($_POST['sticky']) ? (int) $_POST['sticky'] : 0,
+			'subject' => strtr($subject, ["\r" => '', "\n" => '', "\t" => '']),
+			'body' => Util::htmlspecialchars($message, ENT_QUOTES, 'UTF-8', true),
+			'id_member' => $this->user->id,
+			'is_usersaved' => (int) empty($_REQUEST['autosave']),
+		];
+
+		self::$_eventsManager->trigger('before_save_draft', ['draft' => &$draft]);
+
+		saveDraft($draft, isset($_REQUEST['xml']));
+
+		// Cleanup
+		unset($_POST['save_draft']);
+
+		// Be ready for surprises
+		$post_errors = ErrorContext::context('post', 1);
+
+		// If we were called from the autosave function, send something back
+		if (!empty($context['id_draft']) && $this->getApi() !== false && !$post_errors->hasError('session_timeout'))
 		{
-			// Can you be, should you be ... here?
-			if (!empty(self::$_drafts_save))
-			{
-				// Prepare and clean the data, load the draft array
-				$draft = array(
-					'id_draft' => empty($_POST['id_draft']) ? 0 : (int) $_POST['id_draft'],
-					'topic_id' => empty($_REQUEST['topic']) ? 0 : (int) $_REQUEST['topic'],
-					'board' => $board,
-					'icon' => empty($_POST['icon']) ? 'xx' : preg_replace('~[\./\\\\*:"\'<>]~', '', $_POST['icon']),
-					'smileys_enabled' => isset($_POST['ns']) ? 0 : 1,
-					'locked' => isset($_POST['lock']) ? (int) $_POST['lock'] : 0,
-					'sticky' => isset($_POST['sticky']) ? (int) $_POST['sticky'] : 0,
-					'subject' => strtr(Util::htmlspecialchars($_POST['subject']), array("\r" => '', "\n" => '', "\t" => '')),
-					'body' => Util::htmlspecialchars($_POST['message'], ENT_QUOTES, 'UTF-8', true),
-					'id_member' => $this->user->id,
-					'is_usersaved' => (int) empty($_REQUEST['autosave']),
-				);
-
-				self::$_eventsManager->trigger('before_save_draft', array('draft' => &$draft));
-
-				saveDraft($draft, isset($_REQUEST['xml']));
-
-				// Cleanup
-				unset($_POST['save_draft']);
-
-				// Be ready for surprises
-				$post_errors = ErrorContext::context('post', 1);
-
-				// If we were called from the autosave function, send something back
-				if (!empty($context['id_draft']) && $this->getApi() !== false && !$post_errors->hasError('session_timeout'))
-				{
-					theme()->getTemplates()->load('Xml');
-					$context['sub_template'] = 'xml_draft';
-					$context['draft_saved_on'] = time();
-					obExit();
-				}
-
-				throw new ControllerRedirectException('\\ElkArte\\Controller\\Post', 'action_post');
-			}
+			theme()->getTemplates()->load('Xml');
+			$context['sub_template'] = 'xml_draft';
+			$context['draft_saved_on'] = time();
+			obExit();
 		}
+
+		throw new ControllerRedirectException('\\ElkArte\\Controller\\Post', 'action_post');
+	}
+
+	/**
+	 * Loads the drafts for the current topic/member for display
+	 *
+	 * @throws ControllerRedirectException
+	 * @throws \ElkArte\Exceptions\Exception
+	 */
+	private function _load_drafts()
+	{
+		global $context;
+
+		$req = HttpReq::instance();
+		$post_errors = ErrorContext::context('post', 1);
+		$topic = $req->getPost('topic', 'intval', 0);
+
+		// Validate the request
+		if (!empty($topic) && $this->getApi() !== false && !$post_errors->hasError('session_timeout'))
+		{
+			$this->_prepareDraftsContext($this->user->id, $topic);
+
+			// Cleanup? post controller still super global centric
+			unset($_POST['load_draft']);
+
+			// Return the draft listing to the calling JS
+			theme()->getTemplates()->load('Xml');
+			$context['sub_template'] = 'xml_load_draft';
+			obExit();
+		}
+
+		// Should not be here
+		throw new ControllerRedirectException('\\ElkArte\\Controller\\Post', 'action_post');
 	}
 
 	/**
@@ -305,10 +416,13 @@ class Post extends AbstractModule
 	 */
 	public function after_save_post()
 	{
-		// If we had a draft for this, its time to remove it since it was just posted
-		if (!empty($_POST['id_draft']))
+		$req = HttpReq::instance();
+		$id_draft = $req->getPost('id_draft', 'intval', 0);
+
+		// If we had a draft for this, it is time to remove it since it was just posted
+		if (!empty($id_draft))
 		{
-			deleteDrafts($_POST['id_draft'], $this->user->id);
+			deleteDrafts($id_draft, $this->user->id);
 		}
 	}
 }

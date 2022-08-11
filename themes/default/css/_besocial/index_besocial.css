@@ -252,6 +252,7 @@ input[type="submit"], .drop_area_fileselect_text, button[type="submit"], input[t
 }
 
 .linkbutton:link, .linkbutton:visited {
+	font-size: var(--font13);
 	padding: .33em .4em;
 }
 
@@ -446,7 +447,7 @@ input[type=checkbox].quote-show-more {
 
 /* Extra quote styling */
 .bbc_quote {
-	box-shadow: 2px 2px 2px var(--box_shadow);
+	box-shadow: 1px 0 0 1px var(--box_shadow);
 }
 
 /* Extra code block styling. */
@@ -644,6 +645,11 @@ sup.bbc_footnotes, sup.bbc_footnotes a {
  *	$MENUS
  * -------------------------------------------------------
  */
+
+/* Overide index.css due to font change */
+.listlevel1.inline_mod_check {
+	line-height: 1.8;
+}
 
 /* Level 1 Menu bar: link or button. General styling. */
 .linklevel1, .linklevel1:link, .linklevel1:visited, .quickbuttons .inline_mod_check {
@@ -1022,7 +1028,7 @@ nav.breadcrumb {
  */
 
 .category_boards .board_row {
-	grid-template-columns: [bicon] 85px [info] auto [stats] minmax(80px, 125px) [avatar] 65px [latest] 32% [end];
+	grid-template-columns: [bicon] 85px [info] auto [stats] minmax(80px, 125px) [avatar] 65px [latest] 25% [end];
 }
 
 .board_latest {
@@ -1078,6 +1084,11 @@ nav.breadcrumb {
  * -------------------------------------------------------
  */
 
+.topic_listing > li {
+	grid-template-columns: [topic_icon] 50px [topic_info] auto [topic_latest] 300px [topic_stats] 125px [topic_moderation] 75px;
+	border-color: var(--transparent);
+}
+
 .topic_info {
 	border-right-color: var(--transparent);
 }
@@ -1111,10 +1122,6 @@ nav.breadcrumb {
 }
 
 #description_board .generalinfo, #forumposts .generalinfo {
-	border-color: var(--transparent);
-}
-
-.topic_listing > li {
 	border-color: var(--transparent);
 }
 
@@ -1351,6 +1358,11 @@ nav.breadcrumb {
 	border: 1px solid transparent !important;
 }
 
+.poster_div_details {
+	border-right-color: var(--transparent);
+	border-left-color: var(--primary_border);
+}
+
 /* Reply # */
 .keyinfo h3 a, .keyinfo h3 a strong {
 	color: var(--topic_name);
@@ -1511,26 +1523,18 @@ nav.breadcrumb {
 	padding-top: 8px;
 }
 
+/* The container */
 .ui-tabs .ui-tabs-panel {
 	padding: 0 !important;
 	border-color: var(--transparent);
 }
 
+/* The tabs */
 .ui-tabs .ui-tabs-nav li {
 	color: var(--primary_white);
 	border-color: var(--primary_border) !important;
 	border-bottom: none;
-	box-shadow: 1px -1px 1px var(--opacity30);
-}
-
-.ui-tabs .ui-tabs-nav .ui-state-active a,
-.ui-tabs .ui-tabs-nav .ui-state-active {
-	font-weight: normal;
-}
-
-.ui-tabs .ui-tabs-nav .ui-tabs-anchor {
-	border-bottom-color: var(--primary_border_bottom);
-	background: var(--content_background);
+	box-shadow: 2px 0 0 var(--opacity30);
 }
 
 .ui-tabs .ui-tabs-nav .ui-state-default .ui-tabs-anchor {

@@ -300,7 +300,7 @@ function loadBoard()
 				c.id_cat, b.name AS bname, b.description, b.num_topics, b.member_groups, b.deny_member_groups,
 				b.id_parent, c.name AS cname, COALESCE(mem.id_member, 0) AS id_moderator,
 				mem.real_name' . (!empty($topic) ? ', b.id_board' : '') . ', b.child_level,
-				b.id_theme, b.override_theme, b.count_posts, b.id_profile, b.redirect,
+				b.id_theme, b.override_theme, b.count_posts, b.old_posts, b.id_profile, b.redirect,
 				b.unapproved_topics, b.unapproved_posts' . (!empty($topic) ? ', t.approved, t.id_member_started' : '') . (!empty($select_columns) ? ', ' . implode(', ', $select_columns) : '') . '
 			FROM {db_prefix}boards AS b' . (!empty($topic) ? '
 				INNER JOIN {db_prefix}topics AS t ON (t.id_topic = {int:current_topic})' : '') . (!empty($select_tables) ? '
@@ -348,6 +348,7 @@ function loadBoard()
 				'profile' => $row['id_profile'],
 				'redirect' => $row['redirect'],
 				'posts_count' => empty($row['count_posts']),
+				'old_posts' => empty($row['old_posts']),
 				'cur_topic_approved' => empty($topic) || $row['approved'],
 				'cur_topic_starter' => empty($topic) ? 0 : $row['id_member_started'],
 			);
@@ -1465,7 +1466,7 @@ function doSecurityChecks()
 
 	$cache = Cache::instance();
 
-	if (allowedTo('admin_forum') && User::$info->is_guest === false)
+	if (User::$info->is_guest === false && allowedTo('admin_forum'))
 	{
 		// If agreement is enabled, at least the english version shall exists
 		if ($modSettings['requireAgreement'] && !file_exists(SOURCEDIR . '/ElkArte/Languages/Agreement/English.txt'))

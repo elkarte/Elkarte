@@ -559,6 +559,7 @@ class InstallInstructions_install_2_0
 				array('name' => 'num_topics',         'type' => 'mediumint', 'size' => 8, 'unsigned' => true, 'default' => 0),
 				array('name' => 'num_posts',          'type' => 'mediumint', 'size' => 8, 'unsigned' => true, 'default' => 0),
 				array('name' => 'count_posts',        'type' => 'tinyint', 'size' => 4, 'default' => 0),
+				array('name' => 'old_posts',          'type' => 'tinyint', 'size' => 4, 'default' => 0),
 				array('name' => 'id_theme',           'type' => 'tinyint', 'size' => 4, 'unsigned' => true, 'default' => 0),
 				array('name' => 'override_theme',     'type' => 'tinyint', 'size' => 4, 'unsigned' => true, 'default' => 0),
 				array('name' => 'unapproved_posts',   'type' => 'smallint', 'size' => 5, 'default' => 0),
@@ -1144,33 +1145,6 @@ class InstallInstructions_install_2_0
 		);
 	}
 
-	public function table_log_badbehavior()
-	{
-		return $this->table->create_table('{db_prefix}log_badbehavior',
-			array(
-				array('name' => 'id',              'type' => 'int', 'size' => 10, 'auto' => true),
-				array('name' => 'ip',              'type' => 'char', 'size' => 19),
-				array('name' => 'date',            'type' => 'int', 'size' => 10, 'default' => 0),
-				array('name' => 'request_method',  'type' => 'varchar', 'size' => 255),
-				array('name' => 'request_uri',     'type' => 'varchar', 'size' => 255),
-				array('name' => 'server_protocol', 'type' => 'varchar', 'size' => 255),
-				array('name' => 'http_headers',    'type' => 'text'),
-				array('name' => 'user_agent',      'type' => 'varchar', 'size' => 255),
-				array('name' => 'request_entity',  'type' => 'varchar', 'size' => 255),
-				array('name' => 'valid',           'type' => 'varchar', 'size' => 255),
-				array('name' => 'id_member',       'type' => 'mediumint', 'size' => 8, 'unsigned' => true),
-				array('name' => 'session',         'type' => 'char', 'size' => 64, 'default' => ''),
-			),
-			array(
-				array('name' => 'id',         'columns' => array('id'), 'type' => 'primary'),
-				array('name' => 'ip',         'columns' => array('ip'), 'type' => 'index'),
-				array('name' => 'user_agent', 'columns' => array('user_agent'), 'type' => 'index'),
-			),
-			array(),
-			'ignore'
-		);
-	}
-
 	public function table_log_banned()
 	{
 		return $this->table->create_table('{db_prefix}log_banned',
@@ -1259,7 +1233,7 @@ class InstallInstructions_install_2_0
 				array('name' => 'ip',         'type' => 'char', 'size' => 16, 'default' => '                '),
 				array('name' => 'url',        'type' => 'text'),
 				array('name' => 'message',    'type' => 'text'),
-				array('name' => 'session',    'type' => 'char', 'size' => 64, 'default' => '                                                                '),
+				array('name' => 'session',    'type' => 'varchar', 'size' => 128, 'default' => '                                                                '),
 				array('name' => 'error_type', 'type' => 'char', 'size' => 15, 'default' => 'general'),
 				array('name' => 'file',       'type' => 'varchar', 'size' => 255, 'default' => ''),
 				array('name' => 'line',       'type' => 'mediumint', 'size' => 8, 'unsigned' => true, 'default' => 0),
@@ -1422,7 +1396,7 @@ class InstallInstructions_install_2_0
 	{
 		return $this->table->create_table('{db_prefix}log_online',
 			array(
-				array('name' => 'session',   'type' => 'varchar', 'size' => 64, 'default' => ''),
+				array('name' => 'session',   'type' => 'varchar', 'size' => 128, 'default' => ''),
 				array('name' => 'log_time',  'type' => 'int', 'size' => 10, 'default' => 0),
 				array('name' => 'id_member', 'type' => 'mediumint', 'size' => 8, 'unsigned' => true, 'default' => 0),
 				array('name' => 'id_spider', 'type' => 'smallint', 'size' => 5, 'unsigned' => true, 'default' => 0),
@@ -2473,7 +2447,7 @@ class InstallInstructions_install_2_0
 				array('karmaTimeRestrictAdmins', '1'),
 				array('enablePreviousNext', '1'),
 				array('pollMode', '1'),
-				array('modules_display', 'mentions,poll,verification,random'),
+				array('modules_display', 'mentions,poll,verification,random,attachments'),
 				array('modules_post', 'mentions,poll,attachments,verification,random'),
 				array('modules_personalmessage', 'labels,verification'),
 				array('modules_register', 'verification'),
@@ -2695,7 +2669,7 @@ class InstallInstructions_install_2_0
 	{
 		return $this->table->create_table('{db_prefix}sessions',
 			array(
-				array('name' => 'session_id',  'type' => 'char', 'size' => 64),
+				array('name' => 'session_id',  'type' => 'varchar', 'size' => 128),
 				array('name' => 'last_update', 'type' => 'int', 'size' => 10, 'unsigned' => true),
 				array('name' => 'data',        'type' => 'text'),
 			),

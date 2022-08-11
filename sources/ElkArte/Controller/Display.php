@@ -723,9 +723,9 @@ class Display extends AbstractController
 	 */
 	public function warnOldTopic()
 	{
-		global $modSettings;
+		global $modSettings, $board_info;
 
-		if (!empty($modSettings['oldTopicDays']))
+		if (!empty($modSettings['oldTopicDays']) && !empty($board_info['old_posts']))
 		{
 			$mgsOptions = basicMessageInfo($this->topicinfo['id_last_msg'], true);
 

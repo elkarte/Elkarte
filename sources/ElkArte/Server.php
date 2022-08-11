@@ -256,9 +256,10 @@ class Server extends \ArrayObject
 		}
 
 		// Try a reverse IP lookup on the server addr
-		if (!empty($_SERVER['SERVER_ADDR']) && $this->_isValidFQDN((host_from_ip($_SERVER['SERVER_ADDR']))))
+		$reverseIP = host_from_ip($_SERVER['SERVER_ADDR']);
+		if (!empty($_SERVER['SERVER_ADDR']) && $this->_isValidFQDN($reverseIP))
 		{
-			return host_from_ip($_SERVER['SERVER_ADDR']);
+			return $reverseIP;
 		}
 
 		// Literal it is, but some SMTP servers may not accept this

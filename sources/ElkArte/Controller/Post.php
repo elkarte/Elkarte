@@ -137,18 +137,19 @@ class Post extends AbstractController
 		require_once(SUBSDIR . '/Editor.subs.php');
 
 		// Now create the editor.
-		$editorOptions = array(
+		$editorOptions = [
 			'id' => 'message',
 			'value' => $context['message'],
-			'labels' => array(
+			'labels' => [
 				'post_button' => $context['submit_label'],
-			),
+			],
 			// add height and width for the editor
 			'height' => '275px',
 			'width' => '100%',
 			// We do XML preview here.
-			'preview_type' => 2
-		);
+			'preview_type' => 2,
+			'live_errors' => 1
+		];
 
 		// Trigger the finalize_post_form event
 		$this->_events->trigger('finalize_post_form', array('destination' => &$context['destination'], 'page_title' => &$context['page_title'], 'show_additional_options' => &$context['show_additional_options'], 'editorOptions' => &$editorOptions));
@@ -348,7 +349,7 @@ class Post extends AbstractController
 	 */
 	protected function _generatingMessage()
 	{
-		global $txt, $topic, $modSettings, $context, $options;
+		global $txt, $topic, $modSettings, $context, $options, $board_info;
 
 		// Convert / Clean the input elements
 		$msg = $this->_req->getRequest('msg', 'intval', null);
@@ -404,7 +405,12 @@ class Post extends AbstractController
 		}
 
 		// Check whether this is a really old post being bumped...
-		if (!empty($topic) && !empty($modSettings['oldTopicDays']) && $this->_topic_attributes['last_post_time'] + $modSettings['oldTopicDays'] * 86400 < time() && empty($this->_topic_attributes['is_sticky']) && !isset($_REQUEST['subject']))
+		if (!empty($topic)
+			&& !empty($board_info['old_posts'])
+			&& !empty($modSettings['oldTopicDays'])
+			&& $this->_topic_attributes['last_post_time'] + $modSettings['oldTopicDays'] * 86400 < time()
+			&& empty($this->_topic_attributes['is_sticky'])
+			&& !isset($_REQUEST['subject']))
 		{
 			$this->_post_errors->addError(array('old_topic', array($modSettings['oldTopicDays'])), 0);
 		}
@@ -1574,28 +1580,25 @@ class Post extends AbstractController
 			// Add a quote string on the front and end.
 			$context['quote']['xml'] = '[quote author=' . $row['poster_name'] . ' link=msg=' . (int) $_REQUEST['quote'] . ' date=' . $row['poster_time'] . "]\n" . $row['body'] . "\n[/quote]";
 			$context['quote']['text'] = strtr(un_htmlspecialchars($context['quote']['xml']), array('\'' => '\\\'', '\\' => '\\\\', "\n" => '\\n', '</script>' => '</\' + \'script>'));
-			$context['quote']['xml'] = strtr($context['quote']['xml'], array('&nbsp;' => '&#160;', '<' => '&lt;', '>' => '&gt;'));
-
-			$context['quote']['mozilla'] = strtr(Util::htmlspecialchars($context['quote']['text']), array('&quot;' => '"'));
+			$context['quote']['xml'] = strtr($context['quote']['xml'], ['&nbsp;' => '&#160;', '<' => '&lt;', '>' => '&gt;']);
 		}
 		//@todo Needs a nicer interface.
 		// In case our message has been removed in the meantime.
 		elseif (isset($_REQUEST['modify']))
 		{
 			$context['sub_template'] = 'modifyfast';
-			$context['message'] = array(
+			$context['message'] = [
 				'id' => 0,
 				'body' => '',
 				'subject' => '',
-			);
+			];
 		}
 		else
 		{
-			$context['quote'] = array(
+			$context['quote'] = [
 				'xml' => '',
-				'mozilla' => '',
 				'text' => '',
-			);
+			];
 		}
 	}
 

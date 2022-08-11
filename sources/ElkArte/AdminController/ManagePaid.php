@@ -82,7 +82,6 @@ class ManagePaid extends AbstractController
 		// Tabs for browsing the different subscription functions.
 		$context[$context['admin_menu_name']]['tab_data'] = array(
 			'title' => $txt['paid_subscriptions'],
-			'help' => '',
 			'description' => $txt['paid_subscriptions_desc'],
 			'tabs' => array(
 				'view' => array(

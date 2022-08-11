@@ -425,6 +425,8 @@ $helptxt['preview_characters'] = 'This option sets the number of available chara
 $helptxt['posts_require_captcha'] = 'This setting will force users to pass anti-spam bot verification each time they make a post to a board. Only users with a post count below the number set will need to enter the code - this should help combat automated spamming scripts.';
 $helptxt['lastActive'] = 'Set the number of minutes since their last activity to display people as active on the board index. Default is 15 minutes.';
 
+$helptxt['hide_post_group'] = 'Enabling this will not display a member\'s post group title on the message view if they are assigned to a non-post based group.';
+
 $helptxt['customoptions'] = 'This section defines the options that a user may choose from a drop down list. There are a few key points to note in this section:
 	<ul class="normallist">
 		<li><strong>Default Option:</strong> Whichever option box has the &quot;radio button&quot; next to it selected will be the default selection for the user when they enter their profile.</li>

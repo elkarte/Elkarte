@@ -176,7 +176,7 @@ function template_memberlist()
 			</ul>
 		</div>
 		<div class="infobox">
-			', $txt['search_no_results'], '
+			', $txt['find_no_results'], '
 		</div>';
 	}
 }

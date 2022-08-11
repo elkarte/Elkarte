@@ -165,6 +165,7 @@ function template_settings()
 			),
 			'type' => 'select',
 		),
+		'',
 		array(
 			'id' => 'smiley_sets_default',
 			'label' => $txt['smileys_default_set_for_theme'],
@@ -179,10 +180,6 @@ function template_settings()
 			'size' => 8,
 		),
 		'',
-		array(
-			'id' => 'linktree_link',
-			'label' => $txt['current_pos_text_img'],
-		),
 		array(
 			'id' => 'show_mark_read',
 			'label' => $txt['enable_mark_as_read'],
@@ -247,24 +244,6 @@ function template_settings()
 				2 => $txt['who_display_viewing_names'],
 			),
 			'type' => 'number',
-		),
-		'',
-		array(
-			'id' => 'show_modify',
-			'label' => $txt['last_modification'],
-		),
-		array(
-			'id' => 'show_profile_buttons',
-			'label' => $txt['show_view_profile_button'],
-		),
-		array(
-			'id' => 'show_user_images',
-			'label' => $txt['user_avatars'],
-		),
-		array(
-			'id' => 'hide_post_group',
-			'label' => $txt['hide_post_group'],
-			'description' => $txt['hide_post_group_desc'],
 		),
 		'',
 		array(

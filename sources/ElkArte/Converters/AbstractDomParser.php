@@ -112,7 +112,7 @@ abstract class AbstractDomParser
 
 	/**
 	 * Returns just the body of a html document such that we are not dealing with head
-	 * and any above head markup
+	 * and any above head markup.  multipart/mixed may have multiple sections that we concatenate
 	 *
 	 * @param $text
 	 *
@@ -120,14 +120,20 @@ abstract class AbstractDomParser
 	 */
 	public function getBodyText($text)
 	{
-		if (preg_match('~<body>(.*)</body>~su', $text, $body))
+		if (preg_match_all('~<body[^>]*?>(.*?)</body>~su', $text, $bodies))
 		{
-			return $body[1];
+			return implode("\n", $bodies[1]);
 		}
 
-		if (preg_match('~<html>(.*)</html>~su', $text, $body))
+		if (preg_match_all('~<html[^>]*?>(.*)</html>~su', $text, $bodies))
 		{
-			return $body[1];
+			return implode("\n", $bodies[1]);
+		}
+
+		// Parsers may have clipped the ending body or html tag off with the quote/signature
+		if (preg_match('~<body[^>]*?>(.*)~su', $text, $bodies))
+		{
+			return $bodies[1];
 		}
 
 		return $text;
@@ -194,7 +200,7 @@ abstract class AbstractDomParser
 		}
 
 		$strings = explode($break, $string);
-		$lines = array();
+		$lines = [];
 
 		foreach ($strings as $string)
 		{

@@ -118,13 +118,13 @@ function template_searchform()
 									<label for="subject_only">', $txt['search_subject_only'], '</label>
 								</dd>
 								<dt class="righttext between">
-									', $txt['search_post_age'], ':
+									', $txt['date'], ' ', $txt['search_between'], ': 
 								</dt>
 								<dd>
-									<label for="minage">', $txt['search_between'], '</label>&nbsp;
-									<input type="text" name="minage" id="minage" value="', $context['search_params']['minage'], '" size="5" maxlength="4" class="input_text" />&nbsp;
+									<label for="minage" hidden>', $txt['search_between'], '</label>&nbsp;
+									<input type="date" name="minage" id="minage" value="', $context['search_params']['minage'], '" class="input_text" />&nbsp;
 									<label for="maxage">', $txt['search_and'], '&nbsp;</label>
-									<input type="text" name="maxage" id="maxage" value="', $context['search_params']['maxage'], '" size="5" maxlength="4" class="input_text" /> ', $txt['days_word'], '
+									<input type="date" name="maxage" id="maxage" value="', $context['search_params']['maxage'], '" class="input_text" />
 								</dd>
 							</dl>
 						</div>

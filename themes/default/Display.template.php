@@ -104,7 +104,7 @@ function template_messages_informations_above()
  */
 function template_messages()
 {
-	global $context, $settings, $options, $txt, $scripturl;
+	global $context, $settings, $options, $txt, $modSettings;
 
 	$context['quick_reply_removableMessageIDs'] = [];
 	$context['quick_reply_ignoredMsgs'] = [];
@@ -232,7 +232,7 @@ function template_messages()
 							<div class="generic_menu">';
 
 		// Show "Last Edit: Time by Person" if this post was edited.
-		if ($settings['show_modify'])
+		if (!empty($modSettings['show_modify']))
 		{
 			echo '
 								<span id="modified_', $message['id'], '" class="smalltext modified', !empty($message['modified']['name']) ? '"' : ' hide"', '>
@@ -527,7 +527,7 @@ function template_quickreply_below()
 			sClassName: "quick_edit",
 			sIDSubject: "post_subject_",
 			sIDInfo: "info_",
-			bShowModify: ' . ($settings['show_modify'] ? 'true' : 'false') . ',
+			bShowModify: ' . (!empty($modSettings['show_modify']) ? 'true' : 'false') . ',
 			iTopicId: ' . $context['current_topic'] . ',
 			sTemplateBodyEdit: ' . JavaScriptEscape('
 				<div id="quick_edit_body_container">
@@ -543,9 +543,8 @@ function template_quickreply_below()
 				</div>') . ',
 			sTemplateBodyNormal: ' . JavaScriptEscape('%body%') . ',
 			sTemplateSubjectEdit: ' . JavaScriptEscape('<input type="text" style="width: 85%;" name="subject" value="%subject%" size="80" maxlength="80" tabindex="' . ($context['tabindex']++) . '" class="input_text" />') . ',
-			sTemplateSubjectNormal: ' . JavaScriptEscape('%subject%') . ',
-			sTemplateTopSubject: ' . JavaScriptEscape($txt['topic'] . ': %subject% &nbsp;(' . $context['num_views_text'] . ')') . ',
-			sTemplateInfoNormal: ' . JavaScriptEscape('<a href="' . $scripturl . '?topic=' . $context['current_topic'] . '.msg%msg_id%#msg%msg_id%" rel="nofollow">%subject%</a><span class="smalltext modified" id="modified_%msg_id%"></span>') . (($context['can_reply'] && !empty($options['display_quick_reply'])) ? ',
+			sTemplateSubjectNormal: ' . JavaScriptEscape('%subject%') .
+			(($context['can_reply'] && !empty($options['display_quick_reply'])) ? ',
 			sFormRemoveAccessKeys: "postmodify"' : '') . ',
 			funcOnAfterCreate: function () {
 				// Attach AtWho to the quick edit box
@@ -559,7 +558,7 @@ function template_quickreply_below()
 			sBackReference: "aIconLists[" + aIconLists.length + "]",
 			sIconIdPrefix: "msg_icon_",
 			sScriptUrl: elk_scripturl,
-			bShowModify: ' . ($settings['show_modify'] ? 'true' : 'false') . ',
+			bShowModify: ' . (!empty($modSettings['show_modify']) ? 'true' : 'false') . ',
 			iBoardId: ' . $context['current_board'] . ',
 			iTopicId: ' . $context['current_topic'] . ',
 			sSessionId: elk_session_id,

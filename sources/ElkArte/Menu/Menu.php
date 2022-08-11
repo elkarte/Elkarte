@@ -678,7 +678,7 @@ class Menu
 		// Subsections of the current area are tabs unless we are told otherwise.
 		if (!isset($tabContext['tabs']))
 		{
-			$tabContext['tabs'] = $currentArea['subsections'] ?? array();
+			$tabContext['tabs'] = $currentArea['subsections'] ?? [];
 		}
 
 		// Tabs are really just subactions.

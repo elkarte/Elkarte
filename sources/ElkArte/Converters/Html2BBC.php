@@ -36,16 +36,16 @@ class Html2BBC extends AbstractDomParser
 	public $line_break = "\n\n";
 
 	/** @var string[] Font numbers to pt size */
-	public $sizes_equivalence = array(1 => '8px', '10px', '12px', '14px', '18px', '20px', '22px');
+	public $sizes_equivalence = [1 => '8px', '10px', '12px', '14px', '18px', '20px', '22px'];
 
 	/** @var bool|null Used to strip newlines inside 'p' and 'div' elements */
-	public $strip_newlines = null;
+	public $strip_newlines;
 
 	/** @var string[] Html tags to skip that would normally be converted */
-	protected $_skip_tags = array();
+	protected $_skip_tags = [];
 
 	/** @var string[] Style attributes to skip that would normally be converted */
-	protected $_skip_style = array();
+	protected $_skip_style = [];
 
 	/**
 	 * Gets everything started using the built-in or external parser
@@ -66,7 +66,7 @@ class Html2BBC extends AbstractDomParser
 		$html = preg_replace('~<pre class="bbc_code.*?>(.*?)</pre>~us', '<code>$1</code>', $html);
 
 		// Escape items that are BBC tags
-		$html = strtr($html, array('[' => '&amp#91;', ']' => '&amp#93;'));
+		$html = strtr($html, ['[' => '&amp#91;', ']' => '&amp#93;']);
 
 		// Set a Parser then load the HTML
 		$this->strip_newlines = $strip;
@@ -190,7 +190,7 @@ class Html2BBC extends AbstractDomParser
 				$bbc = $this->line_end . '[quote]' . $this->getValue($node) . '[/quote]' . $this->line_end;
 				break;
 			case 'br':
-				$bbc = $this->line_break;
+				$bbc = '[br]';
 				break;
 			case 'center':
 				$bbc = $this->line_end . '[center]' . $this->getValue($node) . '[/center]' . $this->line_end;
@@ -436,7 +436,9 @@ class Html2BBC extends AbstractDomParser
 	private function _convertCode($node)
 	{
 		$bbc = '';
+		$this->strip_newlines = false;
 		$value = $this->getInnerHTML($node);
+		$value = preg_replace('~<br( /)?>~', $this->line_end, $value);
 
 		// Get the number of lines of code that we have
 		$lines = preg_split('~\r\n|\r|\n~', $value);
@@ -678,13 +680,12 @@ class Html2BBC extends AbstractDomParser
 		$height = $node->getAttribute('height');
 		$style = $node->getAttribute('style');
 
-		$bbc = '';
 		$size = '';
 
-		// First if this is an inline image, we don't support those
+		// First if this is an inline image, we don't support those, but will use any ALT found
 		if (substr($src, 0, 4) === 'cid:')
 		{
-			return $bbc;
+			return $alt;
 		}
 
 		// Do the basic things first, title/alt
@@ -829,9 +830,18 @@ class Html2BBC extends AbstractDomParser
 				if ($i % 4 === 0)
 				{
 					// protect << symbols from being stripped
-					$working = str_replace('<<', "[\xC2\xA0]", $part);
+					$working = htmlspecialchars($part, ENT_NOQUOTES, 'UTF-8');
 					$working = strip_tags($working);
-					$parts[$i] = str_replace("[\xC2\xA0]", '<<', $working);
+
+					// Strip can return nothing due to an error
+					if (empty($working))
+					{
+						$parts[$i] = $part;
+					}
+					else
+					{
+						$parts[$i] = htmlspecialchars_decode($working);
+					}
 				}
 			}
 		}

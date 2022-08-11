@@ -80,7 +80,7 @@ class Reports extends AbstractController
 		// Load up all the tabs...
 		$context[$context['admin_menu_name']]['tab_data'] = array(
 			'title' => $txt['generate_reports'],
-			'help' => '',
+			'class' => 'i-post-text',
 			'description' => $txt['generate_reports_desc'],
 		);
 
@@ -215,6 +215,7 @@ class Reports extends AbstractController
 			'num_topics' => $txt['board_num_topics'],
 			'num_posts' => $txt['board_num_posts'],
 			'count_posts' => $txt['board_count_posts'],
+			'old_posts' => $txt['board_old_posts'],
 			'theme' => $txt['board_theme'],
 			'override_theme' => $txt['board_override_theme'],
 			'profile' => $txt['board_profile'],
@@ -251,6 +252,7 @@ class Reports extends AbstractController
 				'num_posts' => $row['num_posts'],
 				'num_topics' => $row['num_topics'],
 				'count_posts' => empty($row['count_posts']) ? $txt['yes'] : $txt['no'],
+				'old_posts' => empty($row['old_posts']) ? $txt['yes'] : $txt['no'],
 				'theme' => $row['theme_name'],
 				'profile' => $profile_name,
 				'override_theme' => $row['override_theme'] ? $txt['yes'] : $txt['no'],

@@ -61,7 +61,7 @@ class BoardsTree
 		$request = $this->db->query('', '
 			SELECT
 				COALESCE(b.id_board, 0) AS id_board, b.id_parent, b.name AS board_name, b.description, b.child_level,
-				b.board_order, b.count_posts, b.member_groups, b.id_theme, b.override_theme, b.id_profile, b.redirect,
+				b.board_order, b.count_posts, b.old_posts, b.member_groups, b.id_theme, b.override_theme, b.id_profile, b.redirect,
 				b.num_posts, b.num_topics, b.deny_member_groups, c.id_cat, c.name AS cat_name, c.cat_order, c.can_collapse' . (!empty($query['select']) ?
 				$query['select'] : '') . '
 			FROM {db_prefix}categories AS c
@@ -113,6 +113,7 @@ class BoardsTree
 					'deny_groups' => explode(',', $row['deny_member_groups']),
 					'description' => $row['description'],
 					'count_posts' => empty($row['count_posts']),
+					'old_posts' => empty($row['old_posts']),
 					'posts' => $row['num_posts'],
 					'topics' => $row['num_topics'],
 					'theme' => $row['id_theme'],

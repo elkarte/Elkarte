@@ -25,7 +25,7 @@ $ssi_guest_access = false;
 global $settings, $user_info, $context, $modsettings;
 
 // Include the SSI file.
-require(dirname(__FILE__) . '/SSI.php');
+require(__DIR__ . '/SSI.php');
 
 // Viewing the homepage sample?
 if (isset($_GET['view']) && $_GET['view'] === 'home1')

@@ -46,7 +46,7 @@ class ManageScheduledTasks extends AbstractController
 	{
 		global $context, $txt;
 
-		Txt::load('ManageScheduledTasks');
+		Txt::load('ManageScheduled');
 		theme()->getTemplates()->load('ManageScheduledTasks');
 
 		$subActions = array(
@@ -61,7 +61,6 @@ class ManageScheduledTasks extends AbstractController
 		// Now for the lovely tabs. That we all love.
 		$context[$context['admin_menu_name']]['tab_data'] = array(
 			'title' => $txt['scheduled_tasks_title'],
-			'help' => '',
 			'description' => $txt['maintain_info'],
 			'tabs' => array(
 				'tasks' => array(
@@ -365,7 +364,7 @@ class ManageScheduledTasks extends AbstractController
 		require_once(SUBSDIR . '/ScheduledTasks.subs.php');
 
 		// Lets load the language just in case we are outside the Scheduled area.
-		Txt::load('ManageScheduledTasks');
+		Txt::load('ManageScheduled');
 
 		// Empty the log?
 		if (!empty($this->_req->post->removeAll))

@@ -858,7 +858,7 @@ sup.bbc_footnotes, sup.bbc_footnotes a {
 }
 
 .breadcrumb .crumb.active a, .breadcrumb .crumb:hover a, .breadcrumb .crumb:last-child:hover a,
-.breadcrumb .crumb:last-child a, .breadcrumb .crumb:last-child strong {
+.breadcrumb .crumb:last-child a, .breadcrumb .crumb:last-child strong, .breadcrumb .crumb:last-child {
 	color: var(--primary_white);
 }
 
@@ -1461,40 +1461,35 @@ sup.bbc_footnotes, sup.bbc_footnotes a {
 }
 
 /* -------------------------------------------------------
- * $TABS
+ * $TABS Yes they
  * -------------------------------------------------------
  */
 
+/* The container */
 .ui-tabs .ui-tabs-panel {
 	border-color: var(--primary_border);
 	background: var(--primary_content_background);
 }
 
+/* The tabs */
 .ui-tabs .ui-tabs-nav li {
 	color: var(--primary_white);
 	border-color: var(--primary_border) !important;
 }
 
-.ui-tabs .ui-tabs-nav .ui-tabs-anchor {
-	border-bottom-color: var(--primary_border);
-	background: var(--grey_background);
-}
-
-.ui-tabs .ui-tabs-nav .ui-state-default .ui-tabs-anchor {
-	background-image: linear-gradient(to bottom, var(--primary_content_background), var(--primary_content_compliment)) !important;
-}
-
+/* Active one */
 .ui-tabs .ui-tabs-nav .ui-state-active .ui-tabs-anchor,
 .ui-tabs .ui-tabs-nav .ui-state-active {
 	color: var(--primary_white);
 	background-image: linear-gradient(to bottom, var(--menu_button_active_2), var(--menu_button_active)) !important;
 }
 
+/* Hover effect */
 .ui-tabs .ui-tabs-nav li.ui-state-hover .ui-tabs-anchor {
 	color: var(--menu_text);
-	border-color: var(--primary_border);
-	border-top-color: var(--secondary_border);
-	border-left-color: var(--secondary_border);
+	border-color: var(--menu_border_hover);
+	border-top-color: var(--menu_border_hover_top);
+	border-left-color: var(--menu_border_hover_left);
 	background: var(--grey_background);
 }
 
@@ -1504,7 +1499,7 @@ li.ui-tab.ui-tabs-active.ui-state-active.ui-state-hover .ui-tabs-anchor {
 	border-color: var(--menu_border_hover);
 	border-top-color: var(--menu_border_hover_top);
 	border-left-color: var(--menu_border_hover_left);
-	background: var(--menu_button_active);
+	background: var(--menu_button_active_hover) !important;
 	box-shadow: 1px 1px 1px var(--opacity30) inset;
 }
 

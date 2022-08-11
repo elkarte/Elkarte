@@ -547,3 +547,119 @@ function reActivate()
 {
 	document.forms.postmodify.message.readOnly = false;
 }
+
+/**
+ * Function to request a set of drafts for a topic
+ */
+function loadDrafts()
+{
+	let textFields = [],
+		numericFields = ['board', 'topic'],
+		checkboxFields = [],
+		formValues = [];
+
+	// Get the values from the form
+	formValues = getFields(textFields, numericFields, checkboxFields, form_name);
+	formValues[formValues.length] = 'load_drafts=1';
+
+	sendXMLDocument(elk_prepareScriptUrl(elk_scripturl) + 'action=post2;api=xml', formValues.join('&'), onDraftsReturned);
+}
+
+/**
+ * Callback used by loadDrafts, loads the draft section area with data and shows the box
+ *
+ * @param oXMLDoc
+ * @returns {boolean}
+ */
+function onDraftsReturned(oXMLDoc)
+{
+	let drafts = oXMLDoc.getElementsByTagName('drafts')[0].getElementsByTagName('draft'),
+		thisDL = document.getElementById("draft_selection"),
+		subject,
+		time,
+		link,
+		n,
+		i;
+
+	// No place ot add the data !
+	if (thisDL === null)
+	{
+		return false;
+	}
+
+	// Make sure the list is empty
+	while (thisDL.childNodes.length > 1)
+	{
+		thisDL.removeChild(thisDL.lastChild);
+	}
+
+	// Add each draft to the selection area
+	for (i = 0, n = drafts.length; i < n; i++)
+	{
+		let newDT = document.createElement('dt'),
+			newDD = document.createElement('dd');
+
+		subject = drafts[i].getElementsByTagName('subject')[0].textContent;
+		time = drafts[i].getElementsByTagName('time')[0].textContent;
+		link = drafts[i].getElementsByTagName('link')[0].textContent;
+
+		newDT.innerHTML = link;
+		newDD.innerHTML = time;
+
+		thisDL.appendChild(newDT);
+		thisDL.appendChild(newDD);
+	}
+
+	// Show the selection div and navigate to it
+	if (n > 0)
+	{
+		let container = document.getElementById('postDraftContainer');
+		container.classList.remove('hide');
+		container.scrollIntoView();
+	}
+
+	return false;
+}
+
+/**
+ * Checks for empty subject or body on post submit.  These are also checked server side
+ * but this provides a nice current page reminder.
+ *
+ * - If empty fields are found will use errorbox_handler to populate error(s)
+ * - If empty adds listener to fields to clear errors as they are fixed
+ *
+ * @returns {boolean} if false will block post submit
+ */
+function onPostSubmit() {
+	let body = $editor_data[post_box_name].val().trim(),
+		subject = document.getElementById('post_subject').value.trim();
+
+	let error = new errorbox_handler({
+		error_box_id: 'post_error',
+		error_code: 'no_message',
+	});
+
+	// Clear or set
+	error.checkErrors(body === '');
+	if (body === '')
+	{
+		$editor_data[post_box_name].addEvent(post_box_name, 'keyup', function ()
+		{
+			onPostSubmit();
+		});
+	}
+
+	error = new errorbox_handler({
+		error_box_id: 'post_error',
+		error_code: 'no_subject',
+	});
+
+	// Clear or set
+	error.checkErrors(subject === '');
+	if (subject === '')
+	{
+		document.getElementById('post_subject').setAttribute('onkeyup', 'onPostSubmit()');
+	}
+
+	return subject !== '' && body !== '';
+}

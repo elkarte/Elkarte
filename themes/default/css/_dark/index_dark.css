@@ -70,7 +70,7 @@
 
 	/* Input controls, input, button, select, textarea */
 	--input-background: #0B0B0B; /* Generic inputs background */
-	--input_disabled_background: #E4E4E4; /* Disabled button background */
+	--input_disabled_background: rgba(255, 255, 255, 0.12); /* Disabled button background */
 	--input_border: #004299; /* Generic inputs border */
 	--input_border_hover: #2E7EE6; /* Hover for inputs */
 	--input_border_focus: #2E7EE6; /* Focus for inputs */
@@ -189,7 +189,7 @@
 	--body_text: #9D9D9D; /* Body text, text areas, editor, inputs, more */
 	--menu_text: #8B8B8B; /* used for text in menus, breadcrumbs, buttons */
 	--strong_text: #AAAAAA; /* like a demi bold */
-	--disabled_text: #585858; /* used in ACP */
+	--disabled_text: rgba(255, 255, 255, 0.3); /* used in ACP */
 
 	/* Special text colors */
 	--attention: #A80000; /* Various red notice and error sections */
@@ -224,6 +224,10 @@
  * ---------------
  */
 
+/* use a light calendar for chrome's data picker */
+::-webkit-calendar-picker-indicator {
+	background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24"><path fill="%23bbbbbb" d="M20 3h-1V1h-2v2H7V1H5v2H4c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 18H4V8h16v13z"/></svg>');
+}
 /* Normal, standard links. */
 a, a:link, a:visited,
 /* Links that open in a new window. */
@@ -279,6 +283,7 @@ input:focus, textarea:focus, button:focus, select:focus, .editor:focus {
 
 /* Give disabled text input elements a different background color. */
 input[disabled].input_text, input[disabled].input_password {
+	color: var(--disabled_text);
 	background: var(--input_disabled_background);
 }
 
@@ -847,7 +852,7 @@ sup.bbc_footnotes, sup.bbc_footnotes a {
 }
 
 .breadcrumb .crumb.active a, .breadcrumb .crumb:hover a, .breadcrumb .crumb:last-child:hover a,
-.breadcrumb .crumb:last-child a, .breadcrumb .crumb:last-child strong {
+.breadcrumb .crumb:last-child a, .breadcrumb .crumb:last-child strong, .breadcrumb .crumb:last-child {
 	color: var(--primary_white);
 }
 
@@ -1187,7 +1192,7 @@ sup.bbc_footnotes, sup.bbc_footnotes a {
 }
 
 /* On to the posts */
-#quickreplybox, #forumposts, #searchform, #recentposts, #pmFolder, #topic_summary, #preview_section {
+#quickreplybox, #forumposts, #recentposts, #pmFolder, #topic_summary, #preview_section {
 	background: var(--dark_grey_background);
 	box-shadow: 1px 2px 4px var(--box_shadow);
 }
@@ -1723,6 +1728,10 @@ ul.cf_icons {
  *	$SEARCH
  * -------------------------------------------------------
  */
+
+#searchform {
+	box-shadow: 1px 2px 4px var(--box_shadow);
+}
 
 #search_form_menu {
 	background: var(--menu_nav_grad_1);

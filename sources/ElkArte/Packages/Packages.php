@@ -68,6 +68,11 @@ class Packages extends AbstractController
 		// Generic subs for this controller
 		require_once(SUBSDIR . '/Package.subs.php');
 
+		// Load all the basic stuff.
+		Txt::load('Packages');
+		theme()->getTemplates()->load('Packages');
+		loadCSSFile('admin.css');
+
 		$this->fileFunc = FileFunctions::instance();
 	}
 
@@ -84,10 +89,6 @@ class Packages extends AbstractController
 		// Admins-only!
 		isAllowedTo('admin_forum');
 
-		// Load all the basic stuff.
-		Txt::load('Packages');
-		theme()->getTemplates()->load('Packages');
-		loadCSSFile('admin.css');
 		$context['page_title'] = $txt['package'];
 
 		// Delegation makes the world... that is, the package manager go 'round.
@@ -122,6 +123,7 @@ class Packages extends AbstractController
 		$context[$context['admin_menu_name']]['tab_data'] = array(
 			'title' => $txt['package_manager'],
 			'description' => $txt['package_manager_desc'],
+			'class' => 'i-package',
 			'tabs' => array(
 				'browse' => array(),
 				'installed' => array(

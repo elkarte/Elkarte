@@ -351,4 +351,109 @@ class UpgradeInstructions_upgrade_2_0
 			)
 		);
 	}
+
+	public function migrate_theme_settings()
+	{
+		return array(
+			array(
+				'debug_title' => 'Moving settings that are now site vs theme dependant...',
+				'function' => function()
+				{
+					$moved = array('show_modify', 'show_user_images', 'hide_post_group');
+
+					$request = $this->db->query('', '
+						SELECT 
+							variable, value
+						FROM {db_prefix}themes
+						WHERE variable IN({array_string:moved})
+							AND id_member = 0
+							AND id_theme = 1',
+						array(
+							'moved' => $moved,
+						)
+					);
+					$inserts = array();
+					while ($row = $this->db->fetch_assoc($request))
+					{
+						$inserts[] = array($row['variable'], $row['value']);
+					}
+					$this->db->free_result($request);
+					$this->db->insert('replace',
+						'{db_prefix}settings',
+						array('variable' => 'string', 'value' => 'string'),
+						$inserts,
+						array('variable')
+					);
+				}
+			)
+		);
+	}
+
+	public function migrate_session_settings()
+	{
+		return array(
+			array(
+				'debug_title' => 'Increase DB space for session data ...',
+				'function' => function () {
+					$this->table->change_column('{db_prefix}log_online',
+						'session',
+						array(
+							'type' => 'varchar',
+							'size' => 128,
+							'default' => ''
+						)
+					);
+					$this->table->change_column('{db_prefix}log_errors',
+						'session',
+						array(
+							'type' => 'varchar',
+							'size' => 128,
+							'default' => '                                                                ',
+						)
+					);
+					$this->table->change_column('{db_prefix}sessions',
+						'session_id',
+						array(
+							'type' => 'varchar',
+							'size' => 128,
+							'default' => ''
+						)
+					);
+				}
+			)
+		);
+	}
+
+	public function migrate_badbehavior_settings()
+	{
+		return array(
+			array(
+				'debug_title' => 'Drop Table log_badbehavior ...',
+				'function' => function () {
+					$this->table->drop_table('{db_prefix}log_badbehavior');
+				}
+			)
+		);
+	}
+
+	public function preparing_board_oldposts()
+	{
+		return array(
+			array(
+				'debug_title' => 'Add board based old post warning ...',
+				'function' => function () {
+					$this->table->add_column('{db_prefix}boards',
+						array(
+							'name' => 'old_posts',
+							'type' => 'tinyint',
+							'size' => 4,
+							'default' => 0
+						),
+						array(),
+						'ignore'
+					);
+				}
+			)
+		);
+	}
 }

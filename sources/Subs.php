@@ -953,66 +953,65 @@ function host_from_ip($ip)
 	$cache = Cache::instance();
 
 	$host = '';
-	if ($cache->getVar($host, 'hostlookup-' . $ip, 600) || empty($ip))
+	if (empty($ip) || $cache->getVar($host, 'hostlookup-' . $ip, 600))
 	{
 		return $host;
 	}
 
 	$t = microtime(true);
 
-	// Check if shell_exec is on the list of disabled functions. 
-	if( false == strpos(ini_get("disable_functions"), "shell_exec") ) {
-
-    // Try the Linux host command, perhaps?
-	if ((strpos(PHP_OS_FAMILY, 'Win') === false || strpos(PHP_OS_FAMILY, 'Darwin') !== false) && mt_rand(0, 1) === 1)
+	// Check if shell_exec is on the list of disabled functions.
+	if (function_exists('shell_exec'))
 	{
-		if (!isset($modSettings['host_to_dis']))
+		// Try the Linux host command, perhaps?
+		if (PHP_OS_FAMILY !== 'Windows' && mt_rand(0, 1) === 1)
 		{
-			$test = @shell_exec('host -W 1 ' . @escapeshellarg($ip));
-		}
-		else
-		{
-			$test = @shell_exec('host ' . @escapeshellarg($ip));
+			if (!isset($modSettings['host_to_dis']))
+			{
+				$test = @shell_exec('host -W 1 ' . @escapeshellarg($ip));
+			}
+			else
+			{
+				$test = @shell_exec('host ' . @escapeshellarg($ip));
+			}
+
+			$test = $test ?? '';
+
+			// Did host say it didn't find anything?
+			if (stripos($test, 'not found') !== false)
+			{
+				$host = '';
+			}
+			// Invalid server option?
+			elseif ((stripos($test, 'invalid option') || stripos($test, 'Invalid query name 1')) && !isset($modSettings['host_to_dis']))
+			{
+				updateSettings(array('host_to_dis' => 1));
+			}
+			// Maybe it found something, after all?
+			elseif (preg_match('~\s([^\s]+?)\.\s~', $test, $match) == 1)
+			{
+				$host = $match[1];
+			}
 		}
 
-		$test = $test ?? '';
+		// This is nslookup; usually default on Windows, and possibly some Unix with bind-utils
+		if ((empty($host) || PHP_OS_FAMILY === 'Windows') && mt_rand(0, 1) === 1)
+		{
+			$test = @shell_exec('nslookup -timeout=1 ' . @escapeshellarg($ip));
 
-		// Did host say it didn't find anything?
-		if (strpos($test, 'not found') !== false)
-		{
-			$host = '';
+			if (stripos($test, 'Non-existent domain') !== false)
+			{
+				$host = '';
+			}
+			elseif (preg_match('~(?:Name:|Name =)\s+([^\s]+)~i', $test, $match) === 1)
+			{
+				$host = $match[1];
+			}
 		}
-		// Invalid server option?
-		elseif ((strpos($test, 'invalid option') || strpos($test, 'Invalid query name 1')) && !isset($modSettings['host_to_dis']))
-		{
-			updateSettings(array('host_to_dis' => 1));
-		}
-		// Maybe it found something, after all?
-		elseif (preg_match('~\s([^\s]+?)\.\s~', $test, $match) == 1)
-		{
-			$host = $match[1];
-		}
-	}
-	
-
-	// This is nslookup; usually only Windows, but possibly some Unix?
-	if (empty($host) && strpos(PHP_OS_FAMILY, 'Win') !== false && strpos(PHP_OS_FAMILY, 'Darwin') === false && mt_rand(0, 1) === 1)
-	{
-		$test = @shell_exec('nslookup -timeout=1 ' . @escapeshellarg($ip));
-
-		if (strpos($test, 'Non-existent domain') !== false)
-		{
-			$host = '';
-		}
-		elseif (preg_match('~Name:\s+([^\s]+)~', $test, $match) == 1)
-		{
-			$host = $match[1];
-		}
-	}
 	}
 
 	// This is the last try :/.
-	if (!isset($host) || $host === false)
+	if (!isset($host))
 	{
 		$host = @gethostbyaddr($ip);
 	}
@@ -2012,8 +2011,11 @@ function featureEnabled($feature)
  */
 function cleanXml($string)
 {
-	// http://www.w3.org/TR/2000/REC-xml-20001006#NT-Char
-	return preg_replace('~[\x00-\x08\x0B\x0C\x0E-\x19\x{FFFE}\x{FFFF}]~u', '', $string);
+	// https://www.w3.org/TR/2008/REC-xml-20081126/#NT-Char
+	$string = preg_replace('~[\x00-\x08\x0B\x0C\x0E-\x1F\x{FFFE}\x{FFFF}]~u', '', $string);
+
+	// Discouraged
+	return preg_replace('~[\x7F-\x84\x86-\x9F\x{FDD0}-\x{FDEF}\x{1FFFE}-\x{1FFFF}\x{2FFFE}-\x{2FFFF}\x{3FFFE}-\x{3FFFF}\x{4FFFE}-\x{4FFFF}\x{5FFFE}-\x{5FFFF}\x{6FFFE}-\x{6FFFF}\x{7FFFE}-\x{7FFFF}\x{8FFFE}-\x{8FFFF}\x{9FFFE}-\x{9FFFF}\x{AFFFE}-\x{AFFFF}\x{BFFFE}-\x{BFFFF}\x{CFFFE}-\x{CFFFF}\x{DFFFE}-\x{DFFFF}\x{EFFFE}-\x{EFFFF}\x{FFFFE}-\x{FFFFF}\x{10FFFE}-\x{10FFFF}]~u', '', $string);
 }
 
 /**

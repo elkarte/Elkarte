@@ -74,7 +74,7 @@ class ProfileHistory extends AbstractController
 		$context[$context['profile_menu_name']]['tab_data'] = array(
 			'title' => $txt['history'],
 			'description' => $txt['history_description'],
-			'class' => 'profile',
+			'class' => 'i-poll',
 			'tabs' => array(
 				'activity' => array(),
 				'ip' => array(),

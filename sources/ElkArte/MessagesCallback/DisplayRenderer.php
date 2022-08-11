@@ -60,7 +60,7 @@ class DisplayRenderer extends Renderer
 		$this_member->loadContext();
 
 		$this_member['ip'] = $this->_this_message['poster_ip'] ?? '';
-		$this_member['show_profile_buttons'] = $settings['show_profile_buttons'] && (!empty($this_member['can_view_profile']) || (!empty($this_member['website']['url']) && !isset($context['disabled_fields']['website'])) || (in_array($this_member['show_email'], array('yes', 'yes_permission_override', 'no_through_forum'))) || $context['can_send_pm']);
+		$this_member['show_profile_buttons'] = (!empty($this_member['can_view_profile']) || (!empty($this_member['website']['url']) && !isset($context['disabled_fields']['website'])) || (in_array($this_member['show_email'], array('yes', 'yes_permission_override', 'no_through_forum'))) || $context['can_send_pm']);
 
 		$context['id_msg'] = $this->_this_message['id_msg'] ?? '';
 	}
@@ -136,7 +136,7 @@ class DisplayRenderer extends Renderer
 			// Can they reply? Have they turned on quick reply?
 			'quote' => [
 				'text' => 'quote',
-				'url' => getUrl('action', ['action' => 'post', 'topic' => $topic . '.' . $context['start'], 'quote' => $output['id'], 'last_msg' => $context['topic_last_message']]),
+				'url' => empty($options['display_quick_reply']) ? getUrl('action', ['action' => 'post', 'topic' => $topic . '.' . $context['start'], 'quote' => $output['id'], 'last_msg' => $context['topic_last_message']]) : null,
 				'custom' => !empty($options['display_quick_reply']) ? 'onclick="return oQuickReply.quote(' . $output['id'] . ');"' : '',
 				'class' => 'quote_button last',
 				'icon' => 'quote',

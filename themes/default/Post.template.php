@@ -618,14 +618,15 @@ function template_load_drafts_below()
 {
 	global $context, $txt;
 
-	// Show a draft selection box
+	// Show a draft selection box, shown with JS
 	echo '
+				<div id="postDraftContainer" class="hide">
 					<h3 id="postDraftOptionsHeader" class="category_header panel_toggle">
-							<i id="postDraftExpand" class="chevricon i-chevron-', empty($context['minmax_preferences']['draft']) ? 'up' : 'down', ' hide" title="', $txt['hide'], '"></i>
+						<i id="postDraftExpand" class="chevricon i-chevron-', empty($context['minmax_preferences']['draft']) ? 'up' : 'down', ' hide" title="', $txt['hide'], '"></i>
 						<a href="#" id="postDraftExpandLink">', $txt['draft_load'], '</a>
 					</h3>
 					<div id="postDraftOptions"', empty($context['minmax_preferences']['draft']) ? '' : ' class="hide"', '>
-						<dl class="settings">
+						<dl id="draft_selection" class="settings">
 							<dt>
 								<strong>', $txt['subject'], '</strong>
 							</dt>
@@ -633,6 +634,7 @@ function template_load_drafts_below()
 								<strong>', $txt['draft_saved_on'], '</strong>
 							</dd>';
 
+	// This is not set, left here in the event the JS loading is backed out
 	foreach ($context['drafts'] as $draft)
 	{
 		echo '
@@ -642,7 +644,8 @@ function template_load_drafts_below()
 
 	echo '
 						</dl>
-					</div>';
+					</div>
+				</div>';
 
 	// Code for showing and hiding drafts
 	theme()->addInlineJavascript('

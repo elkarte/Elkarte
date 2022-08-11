@@ -117,7 +117,6 @@ class Draft extends Post
 			$context['drafts'][$counter += $reverse ? -1 : 1] = [
 				'body' => $row['body'],
 				'counter' => $counter,
-				'alternate' => $counter % 2,
 				'board' => [
 					'name' => $row['bname'],
 					'id' => $row['id_board'],
@@ -171,10 +170,9 @@ class Draft extends Post
 		// Menu tab
 		$context[$context['profile_menu_name']]['tab_data'] = array(
 			'title' => $txt['drafts_show'],
-			'class' => 'talk',
+			'class' => 'i-comments',
 			'description' => $txt['drafts_show_desc'],
 		);
-
 		$context['sub_template'] = 'showDrafts';
 	}
 
@@ -359,7 +357,6 @@ class Draft extends Post
 			$context['drafts'][$counter += $reverse ? -1 : 1] = [
 				'body' => $row['body'],
 				'counter' => $counter,
-				'alternate' => $counter % 2,
 				'subject' => $row['subject'],
 				'time' => standardTime($row['poster_time']),
 				'html_time' => htmlTime($row['poster_time']),

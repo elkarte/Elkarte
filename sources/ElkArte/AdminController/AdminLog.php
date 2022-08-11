@@ -70,7 +70,6 @@ class AdminLog extends AbstractController
 		// Setup the tabs.
 		$context[$context['admin_menu_name']]['tab_data'] = array(
 			'title' => $txt['logs'],
-			'help' => '',
 			'description' => $txt['maintain_info'],
 			'tabs' => array(
 				'errorlog' => array(

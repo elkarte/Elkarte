@@ -138,7 +138,7 @@ function template_package_confirm()
 }
 
 /**
- * Shows all of the addon packs available on the package server
+ * Shows all addon packs available on the package server
  */
 function template_package_list()
 {

@@ -41,7 +41,7 @@ function template_show_list($list_id = null)
 	if (!empty($cur_list['title']))
 	{
 		echo '
-			<h2 class="category_header', !empty($cur_list['icon']) ? ' hdicon cat_img_' . $cur_list['icon'] : '', '">', $cur_list['title'], '</h2>';
+			<h2 class="category_header', !empty($cur_list['icon']) ? ' hdicon ' . $cur_list['icon'] : '', '">', $cur_list['title'], '</h2>';
 	}
 
 	// Show any data right after the title
@@ -71,7 +71,7 @@ function template_show_list($list_id = null)
 	}
 
 	// These are the main tabs that is used all around the template.
-	if (isset($cur_list['list_menu'], $cur_list['list_menu']['show_on']) && ($cur_list['list_menu']['show_on'] === 'both' || $cur_list['list_menu']['show_on'] == 'top'))
+	if (isset($cur_list['list_menu']['show_on']) && ($cur_list['list_menu']['show_on'] === 'both' || $cur_list['list_menu']['show_on'] === 'top'))
 	{
 		if (!$close_div)
 		{
@@ -203,7 +203,7 @@ function template_show_list($list_id = null)
 	}
 
 	// Tabs at the bottom.  Usually bottom aligned.
-	if (isset($cur_list['list_menu'], $cur_list['list_menu']['show_on']) && ($cur_list['list_menu']['show_on'] == 'both' || $cur_list['list_menu']['show_on'] == 'bottom'))
+	if (isset($cur_list['list_menu']['show_on']) && ($cur_list['list_menu']['show_on'] === 'both' || $cur_list['list_menu']['show_on'] === 'bottom'))
 	{
 		template_create_list_menu($cur_list['list_menu']);
 	}

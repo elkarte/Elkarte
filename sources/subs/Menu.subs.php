@@ -153,6 +153,7 @@ function callMenu($selectedMenu)
 	$action = new Action();
 	$action->initialize(['action' => $selectedMenu]);
 	$action->dispatch('action');
+	/** @var \ElkArte\Menu\Menu */
 	$context['menu_data_' . $context['max_menu_id']]['object']->prepareTabData();
 }
 

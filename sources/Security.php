@@ -299,7 +299,7 @@ function is_not_banned($forceCheck = false)
 		$flag_is_activated = false;
 
 		// Check both IP addresses.
-		foreach (array('ip', 'ip2') as $ip_number)
+		foreach (['ip', 'ip2'] as $ip_number)
 		{
 			if ($ip_number === 'ip2' && User::$info->ip2 === User::$info->ip)
 			{
@@ -309,10 +309,10 @@ function is_not_banned($forceCheck = false)
 			$ban_query[] = constructBanQueryIP(User::$info->{$ip_number});
 
 			// IP was valid, maybe there's also a hostname...
-			if (empty($modSettings['disableHostnameLookup']) && User::$info->{$ip_number} != 'unknown')
+			if (empty($modSettings['disableHostnameLookup']) && User::$info->{$ip_number} !== 'unknown')
 			{
 				$hostname = host_from_ip(User::$info->{$ip_number});
-				if (strlen($hostname) > 0)
+				if ($hostname !== '')
 				{
 					$ban_query[] = '({string:hostname} LIKE bi.hostname)';
 					$ban_query_vars['hostname'] = $hostname;
@@ -321,7 +321,7 @@ function is_not_banned($forceCheck = false)
 		}
 
 		// Is their email address banned?
-		if (strlen(User::$info->email) != 0)
+		if (User::$info->email !== '')
 		{
 			$ban_query[] = '({string:email} LIKE bi.email_address)';
 			$ban_query_vars['email'] = User::$info->email;

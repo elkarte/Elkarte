@@ -84,6 +84,7 @@ $txt['board_parent'] = 'Parent Board';
 $txt['board_num_topics'] = 'Number of Topics';
 $txt['board_num_posts'] = 'Number of Posts';
 $txt['board_count_posts'] = 'Count Posts';
+$txt['board_old_posts'] = 'Warn old Posts';
 $txt['board_theme'] = 'Board Theme';
 $txt['board_override_theme'] = 'Force Board Theme';
 $txt['board_profile'] = 'Permissions Profile';

@@ -59,14 +59,15 @@ class Emoji extends AbstractModel
 	 *
 	 * @param string $string
 	 * @param bool $uni false returns an emoji image tag, true returns the unicode point
+	 * @param bool $protect if false will bypass codeblock protection (useful if already done!)
 	 * @return string
 	 */
-	public function emojiNameToImage($string, $uni = false)
+	public function emojiNameToImage($string, $uni = false, $protect = true)
 	{
 		$emoji = self::instance();
 
 		// Make sure we do not process emoji in code or icode tags
-		$string = $this->_protectCodeBlocks($string);
+		$string = $protect ? $this->_protectCodeBlocks($string) : $string;
 
 		// :emoji: must be at the start of a line, or have a leading space or be after a bbc ']' tag
 		if ($uni)
@@ -81,7 +82,7 @@ class Emoji extends AbstractModel
 			$string = $this->keyboardEmojiToImage($string);
 		}
 
-		return $this->_restoreCodeBlocks($string);
+		return $protect ? $this->_restoreCodeBlocks($string) : $string;
 	}
 
 	/**

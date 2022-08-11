@@ -17,9 +17,10 @@ const itemCodes = ["*:disc", "@:disc", "+:square", "x:square", "#:decimal", "0:d
 	var extensionMethods = {
 		addEvent: function (id, event, func)
 		{
-			let current_event = event,
+			let current_event = event + '.elkAddEvent',
 				$_id = $('#' + id);
 
+			$_id.parent().find('textarea').off(current_event.id);
 			$_id.parent().on(current_event, 'textarea', func);
 
 			let oIframe = $_id.parent().find('iframe')[0],

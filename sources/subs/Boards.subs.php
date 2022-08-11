@@ -376,6 +376,13 @@ function modifyBoard($board_id, &$boardOptions)
 		$boardUpdateParameters['count_posts'] = $boardOptions['posts_count'] ? 0 : 1;
 	}
 
+	// Warn on old posts in this board
+	if (isset($boardOptions['old_posts']))
+	{
+		$boardUpdates[] = 'old_posts = {int:old_posts}';
+		$boardUpdateParameters['old_posts'] = $boardOptions['old_posts'] ? 0 : 1;
+	}
+
 	// Set the theme for this board.
 	if (isset($boardOptions['board_theme']))
 	{
@@ -567,6 +574,7 @@ function createBoard($boardOptions)
 	// Set every optional value to its default value.
 	$boardOptions += array(
 		'posts_count' => true,
+		'old_posts' => true,
 		'override_theme' => false,
 		'board_theme' => 0,
 		'access_groups' => array(),
@@ -1559,8 +1567,8 @@ function fetchBoardsInfo($conditions = 'all', $params = array())
 	*/
 	$known_selects = array(
 		'name' => 'b.id_board, b.name',
-		'posts' => 'b.id_board, b.count_posts, b.num_posts',
-		'detailed' => 'b.id_board, b.name, b.count_posts, b.num_posts',
+		'posts' => 'b.id_board, b.count_posts, b.old_posts, b.num_posts',
+		'detailed' => 'b.id_board, b.name, b.count_posts, b.old_posts, b.num_posts',
 		'permissions' => 'b.id_board, b.name, b.member_groups, b.id_profile',
 		'reports' => 'b.id_board, b.name, b.member_groups, b.id_profile, b.deny_member_groups',
 	);

@@ -73,7 +73,7 @@ class ManageBans extends AbstractController
 				'list' => array(
 					'description' => $txt['ban_description'],
 					'href' => getUrl('admin', ['action' => 'admin', 'area' => 'ban', 'sa' => 'list']),
-					'is_selected' => $subAction == 'list' || $subAction == 'edit' || $subAction == 'edittrigger',
+					'is_selected' => $subAction === 'list' || $subAction === 'edit' || $subAction === 'edittrigger',
 				),
 				'add' => array(
 					'description' => $txt['ban_description'],
@@ -566,7 +566,7 @@ class ManageBans extends AbstractController
 				'status' => isset($this->_req->post->expiration) && in_array($this->_req->post->expiration, array('never', 'one_day', 'expired')) ? $this->_req->post->expiration : 'never',
 				'days' => $ban_info['expire_date'],
 			);
-			$ban_info['db_expiration'] = $ban_info['expiration']['status'] == 'never' ? 'NULL' : ($ban_info['expiration']['status'] == 'one_day' ? time() + 24 * 60 * 60 * $ban_info['expire_date'] : 0);
+			$ban_info['db_expiration'] = $ban_info['expiration']['status'] === 'never' ? 'NULL' : ($ban_info['expiration']['status'] == 'one_day' ? time() + 24 * 60 * 60 * $ban_info['expire_date'] : 0);
 			$ban_info['full_ban'] = empty($this->_req->post->full_ban) ? 0 : 1;
 			$ban_info['reason'] = $this->_req->getPost('reason', '\\ElkArte\\Util::htmlspecialchars[ENT_QUOTES]', '');
 			$ban_info['name'] = $this->_req->getPost('ban_name', '\\ElkArte\\Util::htmlspecialchars[ENT_QUOTES]', '');

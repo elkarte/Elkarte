@@ -19,7 +19,6 @@ namespace ElkArte\Controller;
 use ElkArte\AbstractController;
 use ElkArte\Exceptions\Exception;
 use ElkArte\FrontpageInterface;
-use ElkArte\Languages\Txt;
 
 /**
  * Retrieve information about recent posts

@@ -265,7 +265,7 @@ function template_results()
 	if (empty($context['topics']))
 	{
 		echo '
-		<noresults>', $txt['search_no_results'], '</noresults>';
+		<noresults>', $txt['find_no_results'], '</noresults>';
 	}
 	else
 	{
@@ -395,7 +395,7 @@ function template_generic_xml_buttons()
 
 	foreach ($context['xml_data'] as $key => $val)
 	{
-		if ($key != 'error')
+		if ($key !== 'error')
 		{
 			echo '
 			<', $key, '><![CDATA[', cleanXml($val), ']]></', $key, '>';
@@ -649,5 +649,29 @@ function template_xml_draft()
 	echo '<?xml version="1.0" encoding="UTF-8"?>
 <drafts>
 	<draft id="', $context['id_draft'], '"><![CDATA[', $txt['draft_saved_on'], ': ', standardTime($context['draft_saved_on']), ']]></draft>
+</drafts>';
+}
+
+/**
+ * Returns xml response to a draft load request
+ * provides the subject of the draft saved and the link to load
+ */
+function template_xml_load_draft()
+{
+	global $context;
+
+	echo '<?xml version="1.0" encoding="UTF-8"?>
+<drafts>';
+	foreach ($context['drafts'] as $key => $draft)
+	{
+		echo '
+	<draft id="', $key, '">
+		<subject><![CDATA[', cleanXml($draft['subject']), ']]></subject>
+		<time><![CDATA[', cleanXml($draft['poster_time']), ']]></time>
+		<link><![CDATA[', cleanXml($draft['link']), ']]></link>
+	</draft>';
+	}
+
+	echo '
 </drafts>';
 }

@@ -15,7 +15,7 @@
  */
 
 /**
- * Gets all of the files in a directory and its children directories
+ * Gets all files in a directory and its children directories
  *
  * @param string $dir_path
  * @return array

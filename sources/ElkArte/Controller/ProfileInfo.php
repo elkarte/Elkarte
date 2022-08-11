@@ -127,7 +127,7 @@ class ProfileInfo extends AbstractController
 		$context['disabled_fields'] = isset($modSettings['disabled_profile_fields']) ? array_flip(explode(',', $modSettings['disabled_profile_fields'])) : array();
 
 		// Menu tab
-		$context[$context['profile_menu_name']]['tab_data'] = array();
+		$context[$context['profile_menu_name']]['tab_data'] = [];
 
 		// Profile summary tabs, like Summary, Recent, Buddies
 		$this->_register_summarytabs();
@@ -429,7 +429,7 @@ class ProfileInfo extends AbstractController
 		$context[$context['profile_menu_name']]['tab_data'] = array(
 			'title' => $txt['show' . $action_title],
 			'description' => sprintf($txt['showGeneric_help'], $txt['show' . $action_title]),
-			'class' => 'profile',
+			'class' => 'i-post-text',
 			'tabs' => array(
 				'messages' => array(),
 				'topics' => array(),
@@ -539,7 +539,6 @@ class ProfileInfo extends AbstractController
 			$context['posts'][$counter += $reverse ? -1 : 1] = array(
 				'body' => $row['body'],
 				'counter' => $counter,
-				'alternate' => $counter % 2,
 				'category' => array(
 					'name' => $row['cname'],
 					'id' => $row['id_cat']
@@ -1014,7 +1013,7 @@ class ProfileInfo extends AbstractController
 		// Menu tab
 		$context[$context['profile_menu_name']]['tab_data'] = array(
 			'title' => $txt['statPanel_generalStats'] . ' - ' . $context['member']['name'],
-			'class' => 'stats_info'
+			'class' => 'i-poll'
 		);
 
 		// Number of topics started.
@@ -1109,10 +1108,10 @@ class ProfileInfo extends AbstractController
 			$context['no_access_boards'][count($context['no_access_boards']) - 1]['is_last'] = true;
 		}
 
-		$context['member']['permissions'] = array(
-			'general' => array(),
-			'board' => array()
-		);
+		$context['member']['permissions'] = [
+			'general' => [],
+			'board' => []
+		];
 
 		// If you're an admin we know you can do everything, we might as well leave.
 		$context['member']['has_all_permissions'] = in_array(1, $curGroups);
@@ -1121,11 +1120,11 @@ class ProfileInfo extends AbstractController
 			return;
 		}
 
-		// Get all general permissions for the groups this member is in
-		$context['member']['permissions']['general'] = getMemberGeneralPermissions($curGroups);
-
-		// Get all board permissions for this member
-		$context['member']['permissions']['board'] = getMemberBoardPermissions($this->_memID, $curGroups, $board);
+		// Get all general and board permissions for the groups this member is in
+		$context['member']['permissions'] = [
+			'general' => getMemberGeneralPermissions($curGroups),
+			'board' => getMemberBoardPermissions($this->_memID, $curGroups, $board)
+		];
 	}
 
 	/**

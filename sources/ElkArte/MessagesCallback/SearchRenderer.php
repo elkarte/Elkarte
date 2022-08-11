@@ -172,7 +172,6 @@ class SearchRenderer extends Renderer
 		$output['matches'][] = [
 			'id' => $this->_this_message['id_msg'],
 			'attachment' => [],
-			'alternate' => $this->_counter % 2,
 			'member' => $member,
 			'icon' => $this->_options->icon_sources->getIconName($this->_this_message['icon']),
 			'icon_url' => $this->_options->icon_sources->getIconURL($this->_this_message['icon']),

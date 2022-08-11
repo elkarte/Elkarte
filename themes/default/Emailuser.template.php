@@ -13,31 +13,37 @@
  */
 
 /**
- * The report subtemplate needs some error stuff
+ * The report sub-template needs some error stuff
  */
 function template_Emailuser_init()
 {
 	global $context, $txt;
 
-	if (!empty($context['sub_template']) && $context['sub_template'] == 'report')
+	if (!empty($context['sub_template']) && $context['sub_template'] === 'report')
 	{
 		theme()->addInlineJavascript('
 		error_txts[\'post_too_long\'] = ' . JavaScriptEscape($txt['error_post_too_long']) . ';
 
-		var report_errors = new errorbox_handler({
-			self: \'report_errors\',
-			error_box_id: \'report_error\',
-			error_checks: [{
-				code: \'post_too_long\',
-				efunction: function(box_value) {
-					if (box_value.length > 254)
-						return true;
-					else
-						return false;
-				}
-			}],
-			check_id: "report_comment"
-		});', true);
+		function checkReportForm()
+		{
+			let checkID = \'report_comment\',
+				comment = document.getElementById(checkID).value.trim();
+		
+			let error = new errorbox_handler({
+				error_box_id: \'report_error\',
+				error_code: \'post_too_long\',
+			});
+		
+			error.checkErrors(comment.length > 254);
+			if (comment.length > 254)
+			{
+				document.getElementById(checkID).setAttribute(\'onkeyup\', \'checkReportForm()\');
+				return false;
+			}
+			
+			return true;
+		}
+		', true);
 	}
 }
 
@@ -89,7 +95,7 @@ function template_send_topic()
 							<label for="comment">', $txt['sendtopic_comment'], ':</label>
 						</dt>
 						<dd class="comment">
-							<input type="text" id="comment" name="comment" size="30" maxlength="100" class="input_text" />
+							<textarea id="comment" name="comment" cols="30" rows="3" maxlength="300"></textarea>
 						</dd>
 					</dl>
 				</fieldset>
@@ -282,7 +288,7 @@ function template_report()
 				</dl>
 				<div class="submitbutton">
 					<input type="hidden" name="msg" value="' . $context['message_id'] . '" />
-					<input type="submit" name="save" value="', $txt['rtm10'], '" />
+					<input type="submit" name="save" value="', $txt['rtm10'], '" onclick="return checkReportForm();" />
 					<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
 				</div>
 			</div>

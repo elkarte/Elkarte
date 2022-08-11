@@ -539,6 +539,7 @@ class ManageBoards extends AbstractController
 
 			// Checkboxes....
 			$boardOptions['posts_count'] = isset($this->_req->post->count);
+			$boardOptions['old_posts'] = isset($this->_req->post->old_posts);
 			$boardOptions['override_theme'] = isset($this->_req->post->override_theme);
 			$boardOptions['board_theme'] = (int) $this->_req->post->boardtheme;
 			$boardOptions['access_groups'] = array();
@@ -548,11 +549,11 @@ class ManageBoards extends AbstractController
 			{
 				foreach ($this->_req->post->groups as $group => $action)
 				{
-					if ($action == 'allow')
+					if ($action === 'allow')
 					{
 						$boardOptions['access_groups'][] = (int) $group;
 					}
-					elseif ($action == 'deny')
+					elseif ($action === 'deny')
 					{
 						$boardOptions['deny_groups'][] = (int) $group;
 					}
@@ -741,6 +742,7 @@ class ManageBoards extends AbstractController
 				'name' => $txt['mboards_new_board_name'],
 				'description' => '',
 				'count_posts' => 1,
+				'old_posts' => 1,
 				'posts' => 0,
 				'topics' => 0,
 				'theme' => 0,
