@@ -31,7 +31,7 @@ a:link, a:hover, a:visited {
 	border-top-color: var(--top_section_top_border);
 	border-bottom: 4px solid;
 	border-bottom-color: var(--top_section_bottom_border);
-	background-image: linear-gradient(to bottom, var(--primary_white), var(--primary_white_compliment));
+	background-image: linear-gradient(to bottom, var(--contrast_text), var(--contrast_text_compliment));
 }
 
 #content_section {
@@ -121,7 +121,7 @@ h1.forumtitle {
 	margin: 0.6em 0 0 4em;
 	border: 1px solid var(--primary_border);
 	border-radius: 6px;
-	background: var(--content-background);
+	background: var(--content_background);
 	box-shadow: 2px 2px 1px var(--box_shadow);
 }
 
@@ -193,7 +193,7 @@ h1.forumtitle {
 	font-weight: bold;
 	padding: .25em .5em;
 	text-decoration: none;
-	color: var(--hover_text);
+	color: var(--emphasize_text);
 }
 
 .content .button_submit:hover, .content .linkbutton:hover {
@@ -213,7 +213,7 @@ h1.forumtitle {
 	padding: .4em .5em .5em .5em;
 	border: 1px solid var(--primary_border);
 	border-radius: 5px;
-	background: var(--primary_white_compliment);
+	background: var(--contrast_text_compliment);
 	box-shadow: 0 -2px 2px var(--opacity10);
 }
 

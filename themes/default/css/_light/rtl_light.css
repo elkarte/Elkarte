@@ -88,7 +88,7 @@ input[type="submit"]:hover, button[type="submit"]:hover, input[type="button"]:ho
 
 /* Styles for subsection headers. @todo */
 .secondary_header {
-	text-shadow: -1px 1px 0 var(--primary_white);
+	text-shadow: -1px 1px 0 var(--contrast_text);
 }
 
 /* -------------------------------------------------------
@@ -120,7 +120,7 @@ input[type="submit"]:hover, button[type="submit"]:hover, input[type="button"]:ho
 }
 
 .forumtitle > a {
-	text-shadow: -1px 1px 0 var(--primary_white);
+	text-shadow: -1px 1px 0 var(--contrast_text);
 }
 
 /* -------------------------------------------------------

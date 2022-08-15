@@ -13,7 +13,7 @@
 }
 
 #admin_content .content {
-	background: var(--content-background);
+	background: var(--content_background);
 }
 
 #admin_main_section, .quick_tasks, #mod_main_section,
@@ -41,7 +41,7 @@
 /* This is the drag/drop placeholder, normally not visible */
 .ui-state-highlight {
 	border-color: var(--infobox_border) !important;
-	background-color: var(--content-background) !important;
+	background-color: var(--content_background) !important;
 }
 
 /* Styles for the manage membergroups.
@@ -56,7 +56,7 @@
 
 .ui-dialog {
 	border-color: var(--secondary_border);
-	background-color: var(--content-background);
+	background-color: var(--content_background);
 	box-shadow: 0 0 16px var(--opacity30);
 }
 
@@ -73,7 +73,7 @@
 .theme_options .content {
 	border-top-color: var(--primary_border_top);
 	border-bottom-color: var(--primary_border_bottom);
-	background: var(--content-background);
+	background: var(--content_background);
 }
 
 #quick_tasks li {
