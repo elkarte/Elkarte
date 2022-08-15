@@ -1905,7 +1905,7 @@ function pbe_load_text(&$html, $email_message, $pbe)
 	}
 	else
 	{
-		$text = $email_message->plain_body;
+		$text = $email_message->getPlainBody();
 	}
 
 	// Convert to BBC and format it, so it looks like a post
@@ -1964,7 +1964,7 @@ function pbe_load_html($email_message, &$html)
 		// Another check is in order, still to many tables?
 		if (preg_match_all('~<table.*?>~i', $text) > 2)
 		{
-			$text = $email_message->plain_body;
+			$text = $email_message->getPlainBody();
 			$html = false;
 		}
 	}

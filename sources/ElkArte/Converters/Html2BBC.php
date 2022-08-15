@@ -167,7 +167,11 @@ class Html2BBC extends AbstractDomParser
 		// Skipping over this tag?
 		if (in_array($tag, $this->_skip_tags))
 		{
-			$tag = '';
+			// Grab any inner content, dropping the tag
+			$bbc = $this->getInnerHTML($node);
+			$this->setTextNode($node, $bbc);
+
+			return;
 		}
 
 		// Based on the current tag, determine how to convert
