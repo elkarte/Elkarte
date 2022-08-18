@@ -577,7 +577,7 @@ class Html_2_Md
 		}
 		else
 		{
-			$markdown = '[X](' . $href . ' "' . $txt['link'] . '")';
+			$markdown = '[' . ($value === $txt['link'] ? 'X' : $value) . ']('  . $href . ' "' . $txt['link'] . '")';
 		}
 
 		$this->_check_line_length($markdown, $this->get_buffer($node));
