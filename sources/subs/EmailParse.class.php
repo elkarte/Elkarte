@@ -330,8 +330,17 @@ class Email_Parse
 			return;
 		}
 
-		$this->_header_block = $match[1];
-		$this->body = $match[3];
+		// Actually no headers in this boundary
+		if (empty($match[1]) || strpos($match[1], ':') === false)
+		{
+			$this->_header_block = '';
+			$this->body = $this->raw_message;
+		}
+		else
+		{
+			$this->_header_block = $match[1];
+			$this->body = $match[3];
+		}
 	}
 
 	/**
@@ -595,23 +604,18 @@ class Email_Parse
 							// Join or use the last?
 							if ($this->headers['content-type'] === 'multipart/mixed')
 							{
-								$this->plain_body .= ' ' . $this->_boundary_section[$id]->body;
+								$this->plain_body .= ' ' . $this->_decode_body($this->_boundary_section[$id]->body);
 							}
 							else
 							{
 								$this->plain_body = $this->_boundary_section[$id]->body;
 							}
 						}
-
-						if ($this->_boundary_section[end($text_ids)]->headers["content-transfer-encoding"] === 'base64')
-						{
-							$this->plain_body = str_replace("\n", '<br />', $this->plain_body);
-						}
 					}
 					elseif (!empty($html_ids))
 					{
-						// This should never run as emails should always have a plain text section to be valid, still ...
-						$this->plain_body .= $this->_boundary_section[0]->body;
+						// For emails that have no plain text section, which they should to be valid, still ...
+						$this->plain_body .= $this->_boundary_section[key($html_ids)]->body;
 						$this->plain_body = str_ireplace('<p>', "\n\n", $this->plain_body);
 						$this->plain_body = str_ireplace(array('<br />', '<br>', '</p>', '</div>'), "\n", $this->plain_body);
 						$this->plain_body = strip_tags($this->plain_body);
@@ -630,7 +634,16 @@ class Email_Parse
 						// For all the chosen sections
 						foreach ($text_ids as $id)
 						{
-							$this->body = $this->_boundary_section[$id]->body;
+							// Join or use the last? These could be HTML sections as well
+							if ($this->headers['content-type'] === 'multipart/mixed')
+							{
+								$this->body .= ' ' . $this->_boundary_section[$id]->body;
+							}
+							// Such as multipart/alternative, just use the last found
+							else
+							{
+								$this->body = $this->_boundary_section[$id]->body;
+							}
 
 							// A section may have its own attachments if it had is own unique boundary sections
 							// so we need to check and add them in as needed
@@ -924,18 +937,18 @@ class Email_Parse
 			$val = $this->_decode_string($val, 'quoted-printable');
 		}
 		// Lines end in the tell tail quoted printable ... wrap and decode
-		elseif (preg_match('~\s=[\r?\n]~s', $val))
+		elseif (preg_match('~\s=[\r\n]~s', $val))
 		{
-			$val = preg_replace('~\s=[\r?\n]~', ' ', $val);
+			$val = preg_replace('~\s=[\r\n]~', ' ', $val);
 			$val = $this->_decode_string($val, 'quoted-printable');
 		}
 		// Lines end in = but not ==
-		elseif (preg_match('~((?<!=)=[\r?\n])~s', $val))
+		elseif (preg_match('~((?<!=)=[\r\n])~', $val))
 		{
 			$val = $this->_decode_string($val, 'quoted-printable');
 		}
 
-		return $val;
+		return !empty($val) ? str_replace("\r\n", "\n", $val) : '';
 	}
 
 	/**
@@ -1363,11 +1376,14 @@ class Email_Parse
 		// Decode if its quoted printable or base64 encoded
 		if ($encoding === 'quoted-printable')
 		{
+			$string = preg_replace('~(^|\r\n)=A0($|\r\n)~m', '=0D=0A=0D=0A', $string);
 			$string = quoted_printable_decode(preg_replace('~=\r?\n~', '', $string));
 		}
 		elseif ($encoding === 'base64')
 		{
 			$string = base64_decode($string);
+			if (isset($this->headers['content-type']) && strpos($this->headers['content-type'], 'text/') === false)
+				return $string;
 		}
 
 		// Convert this to utf-8 if needed.
@@ -1376,7 +1392,7 @@ class Email_Parse
 			$string = $this->_charset_convert($string, strtoupper($charset), 'UTF-8');
 		}
 
-		return $string;
+		return !empty($string) ? str_replace("\r\n", "\n", $string) : '';
 	}
 
 	/**
@@ -1411,7 +1427,14 @@ class Email_Parse
 			{
 				// Replace unknown characters with a space
 				@ini_set('mbstring.substitute_character', '32');
-				$string = @mb_convert_encoding($string, $to, $from);
+				try
+				{
+					$string = mb_convert_encoding($string_save, $to, $from);
+				}
+				catch (\ValueError $e)
+				{
+					// nothing, bad character set
+				}
 			}
 			elseif (function_exists('recode_string'))
 			{
