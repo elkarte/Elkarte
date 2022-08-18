@@ -705,9 +705,11 @@ function pbe_load_text(&$html, $email_message, $pbe)
 	if (empty($text))
 		return '';
 
+	// This will be taken care of by sendpm
 	if ($email_message->message_type !== 'p')
 	{
 		// Prepare it for the database
+		$text = Util::htmlspecialchars($text, ENT_QUOTES, 'UTF-8', true);
 		require_once(SUBSDIR . '/Post.subs.php');
 		preparsecode($text);
 	}
