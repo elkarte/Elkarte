@@ -137,7 +137,10 @@ class WeeklyMaintenance implements ScheduledTaskInterface
 					)
 				)->fetch_callback(
 					function ($row) use (&$reports) {
-						$reports[] = $row[0];
+						if (isset($row[0]))
+						{
+							$reports[] = $row[0];
+						}
 					}
 				);
 
