@@ -282,18 +282,18 @@ class Html_2_Md
 	 */
 	private function _returnBodyText($text)
 	{
-		if (preg_match('~<body>(.*)</body>~su', $text, $body))
+		if (preg_match('~<body.*?>(.*)</body>~su', $text, $body))
 		{
 			return $body[1];
 		}
 
-		if (preg_match('~<html>(.*)</html>~su', $text, $body))
+		if (preg_match('~<html.*?>(.*)</html>~su', $text, $body))
 		{
 			return $body[1];
 		}
 
 		// Parsers may have clipped the ending body or html tag off with the quote/signature
-		if (preg_match('~<body>(.*)~su', $text, $body))
+		if (preg_match('~<body.*?>(.*)~su', $text, $body))
 		{
 			return $body[1];
 		}
@@ -407,7 +407,7 @@ class Html_2_Md
 				break;
 			case 'b':
 			case 'strong':
-				$markdown = $this->config['strong'] . $this->_get_value($node) . $this->config['strong'];
+				$markdown = $this->config['strong'] . trim($this->_get_value($node)) . $this->config['strong'];
 				break;
 			case 'blockquote':
 				$markdown = $this->_convert_blockquote($node);
@@ -417,6 +417,9 @@ class Html_2_Md
 				break;
 			case 'center':
 				$markdown = $this->line_end . $this->_get_value($node) . $this->line_end;
+				break;
+			case 'cite':
+				$markdown = $this->_convert_cite($node);
 				break;
 			case 'code':
 				$markdown = $this->_convert_code($node);
@@ -432,7 +435,7 @@ class Html_2_Md
 				break;
 			case 'em':
 			case 'i':
-				$markdown = $this->config['em'] . $this->_get_value($node) . $this->config['em'];
+				$markdown = $this->config['em'] . trim($this->_get_value($node)) . $this->config['em'];
 				break;
 			case 'hr':
 				$markdown = $this->line_end . '---' . $this->line_end;
@@ -489,8 +492,10 @@ class Html_2_Md
 				// Just skip over these as we handle them in the table tag itself
 				$markdown = '~`skip`~';
 				break;
-			case 'root':
 			case 'span':
+				$markdown = $this->_convert_span($node);
+				break;
+			case 'root':
 			case 'body':
 				// Remove these tags and simply replace with the text inside the tags
 				$markdown = $this->_get_innerHTML($node);
@@ -572,12 +577,12 @@ class Html_2_Md
 		}
 		else
 		{
-			$markdown = '[' . $value . '](' . $href . ')';
+			$markdown = '[X](' . $href . ' "' . $txt['link'] . '")';
 		}
 
-		$this->_check_line_lenght($markdown);
+		$this->_check_line_length($markdown, $this->get_buffer($node));
 
-		return $markdown;
+		return $markdown . $this->line_end;
 	}
 
 	/**
@@ -609,6 +614,29 @@ class Html_2_Md
 	}
 
 	/**
+	 * Converts cites to markdown with the assumption that they are in a blockquote
+	 *
+	 * html: <blockquote>quote</blockquote>
+	 * md: > quote
+	 *
+	 * @param object $node
+	 * @return string
+	 */
+	private function _convert_cite($node)
+	{
+		// All the contents of this cite
+		$markdown = trim($this->_get_value($node));
+
+		// Drop the link, just use the citation [bla](link)
+		if (preg_match('~\[(.*?)\]\(.*?\)~', $markdown, $match))
+		{
+			$markdown = $match[1];
+		}
+
+		return $this->line_end . $markdown . $this->line_end;
+	}
+
+	/**
 	 * Converts code tags to markdown span `code` or block code
 	 * Converts single line code to inline tick mark
 	 * Converts multi line to 4 space indented code
@@ -621,11 +649,17 @@ class Html_2_Md
 	 */
 	private function _convert_code($node)
 	{
+		$value = html_entity_decode($this->_get_innerHTML($node), ENT_COMPAT, 'UTF-8');
+
+		// Empty Block
+		if (empty($value))
+		{
+			return '``';
+		}
+
 		// Turn off things that may mangle code tags
 		$this->strip_tags = false;
 		$this->body_width = 0;
-
-		$value = html_entity_decode($this->_get_innerHTML($node), ENT_COMPAT, 'UTF-8');
 
 		// If we have a multi line code block, we are working outside to in, and need to convert the br's ourselves
 		$value = preg_replace('~<br( /)?' . '>~', $this->line_end, str_replace('&nbsp;', ' ', $value));
@@ -718,6 +752,13 @@ class Html_2_Md
 		$src = $node->getAttribute('src');
 		$alt = $node->getAttribute('alt');
 		$title = $node->getAttribute('title');
+		$parent = $this->_parser ? $node->parentNode : $node->parentNode();
+
+		// A plain linked image, just return the alt text for use in the link
+		if ($this->_get_name($parent) === 'a' && !($parent->getAttribute('data-lightboximage') || $parent->getAttribute('data-lightboxmessage')))
+		{
+			return !empty($alt) ? $alt : (!empty($title) ? $title : 'xXx');
+		}
 
 		if (!empty($title))
 		{
@@ -728,7 +769,9 @@ class Html_2_Md
 			$markdown = '![' . $alt . '](' . $src . ')';
 		}
 
-		return $markdown;
+		$this->_check_line_length($markdown, $this->get_buffer($node));
+
+		return $markdown . $this->line_end;
 	}
 
 	/**
@@ -759,11 +802,22 @@ class Html_2_Md
 		}
 
 		// Ordered lists need a number
-		$start = $this->_parser ? $node->parentNode->getAttribute('start') : $node->parentNode()->getAttribute('start');
+		$start = (int) ($this->_parser ? $node->parentNode->getAttribute('start') : $node->parentNode()->getAttribute('start'));
 		$start = $start > 0 ? $start - 1 : 0;
 		$number = $start + $this->_get_list_position($node);
 
 		return $loose . $number . '. ' . $value . $this->line_end;
+	}
+
+	/**
+	 * Generally returns the innerHTML
+	 *
+	 * @param object $node
+	 * @return string
+	 */
+	private function _convert_span($node)
+	{
+		return $this->getInnerHTML($node);
 	}
 
 	/**
@@ -782,7 +836,7 @@ class Html_2_Md
 			return '';
 		}
 
-		$th_parent = ($table_heading) ? ($this->_parser ? $this->_get_item($table_heading, 0)->parentNode->nodeName : $this->_get_item($table_heading, 0)->parentNode()->nodeName()) : false;
+		$th_parent = $this->_parser ? $this->_get_item($table_heading, 0)->parentNode->nodeName : $this->_get_item($table_heading, 0)->parentNode()->nodeName();
 
 		// Set up for a markdown table, then storm the castle
 		$align = array();
@@ -864,7 +918,7 @@ class Html_2_Md
 			}
 
 			// Adjust the word wrapping since this has a table, will get mussed by email anyway
-			$this->_check_line_lenght($rows[1], 2);
+			$this->_check_line_length($rows[1], 2);
 
 			// Return what we did so it can be swapped in
 			return implode($this->line_end, $rows);
@@ -977,6 +1031,7 @@ class Html_2_Md
 			if ($current_node === $node)
 			{
 				$position = $i + 1;
+				break;
 			}
 		}
 
@@ -1007,7 +1062,7 @@ class Html_2_Md
 				break;
 			case 'center':
 				$paddingNeeded = $max - $width;
-				$left = floor($paddingNeeded / 2);
+				$left = (int) floor($paddingNeeded / 2);
 				$right = $paddingNeeded - $left;
 				$content = str_repeat(' ', $left) . $content . str_repeat(' ', $right);
 				break;
@@ -1136,7 +1191,7 @@ class Html_2_Md
 	 * @param string $markdown
 	 * @param bool|int $buffer
 	 */
-	private function _check_line_lenght($markdown, $buffer = false)
+	private function _check_line_length($markdown, $buffer = false)
 	{
 		// Off we do nothing
 		if ($this->body_width === 0)
@@ -1183,7 +1238,7 @@ class Html_2_Md
 		// If we made changes, lets protect that link from wrapping
 		if ($count > 0)
 		{
-			$this->_check_line_lenght($text);
+			$this->_check_line_length($text);
 		}
 
 		return $text;
@@ -1250,5 +1305,28 @@ class Html_2_Md
 
 		// Join it all the shortened sections up on our break characters
 		return implode($break, $lines);
+	}
+
+	/**
+	 * Gets the length of html in front of a given node and its parent.
+	 *
+	 * - Used to add needed buffer to adjust length wrapping
+	 *
+	 * @param $node
+	 * @return int
+	 */
+	private function get_buffer($node)
+	{
+		$cut = $this->_get_outerHTML($node);
+
+		$parent = $this->_parser ? $node->parentNode : $node->parentNode();
+
+		if ($this->_get_name($parent) !== 'body')
+		{
+			$string = $this->_get_innerHTML($parent);
+			$string = substr($string, 0, strpos($string, $cut));
+		}
+
+		return empty($string) ? 0 : Util::strlen($string);
 	}
 }
