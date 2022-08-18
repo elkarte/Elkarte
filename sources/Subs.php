@@ -1994,7 +1994,7 @@ function featureEnabled($feature)
 		$context['admin_features'] = $features;
 	}
 
-	return in_array($feature, $features);
+	return in_array($feature, $features, true);
 }
 
 /**
