@@ -669,7 +669,7 @@ function validateLoginPassword(&$password, $hash, $user = '', $returnhash = fals
 	}
 
 	// Doing a password check?
-	return (bool) password_verify($password, $hash);
+	return password_verify($password, $hash);
 }
 
 /**
@@ -689,7 +689,7 @@ function rebuildModCache()
 	// What groups can they moderate?
 	$group_query = allowedTo('manage_membergroups') ? '1=1' : '0=1';
 
-	if ($group_query == '0=1')
+	if ($group_query === '0=1')
 	{
 		$groups = $db->fetchQuery('
 			SELECT 
@@ -711,7 +711,7 @@ function rebuildModCache()
 	// Then, same again, just the boards this time!
 	$board_query = allowedTo('moderate_forum') ? '1=1' : '0=1';
 
-	if ($board_query == '0=1')
+	if ($board_query === '0=1')
 	{
 		$boards = boardsAllowedTo('moderate_board', true);
 
@@ -840,7 +840,8 @@ function findUser($where, $where_params, $fatal = true)
 	// Find the user!
 	$request = $db->fetchQuery('
 		SELECT 
-			id_member, real_name, member_name, email_address, is_activated, validation_code, lngfile, secret_question, passwd
+			id_member, real_name, member_name, email_address, is_activated, validation_code, 
+			lngfile, secret_question, passwd
 		FROM {db_prefix}members
 		WHERE ' . $where . '
 		LIMIT 1',
@@ -854,7 +855,8 @@ function findUser($where, $where_params, $fatal = true)
 
 		$request = $db->fetchQuery('
 			SELECT 
-				id_member, real_name, member_name, email_address, is_activated, validation_code, lngfile, secret_question
+				id_member, real_name, member_name, email_address, is_activated, validation_code, 
+				lngfile, secret_question
 			FROM {db_prefix}members
 			WHERE email_address = {string:email_address}
 			LIMIT 1',
@@ -872,6 +874,9 @@ function findUser($where, $where_params, $fatal = true)
 	}
 
 	$member = $request->fetch_assoc();
+	$member['id_member'] = (int) $member['id_member'];
+	$member['is_activated'] = (int) $member['is_activated'];
+
 	$request->free_result();
 
 	return $member;
