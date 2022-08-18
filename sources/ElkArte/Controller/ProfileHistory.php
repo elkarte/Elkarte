@@ -61,7 +61,7 @@ class ProfileHistory extends AbstractController
 	 */
 	public function action_index()
 	{
-		global $context, $txt, $modSettings;
+		global $context, $txt;
 
 		$subActions = array(
 			'activity' => array('controller' => $this, 'function' => 'action_trackactivity', 'label' => $txt['trackActivity']),
@@ -70,16 +70,11 @@ class ProfileHistory extends AbstractController
 			'logins' => array('controller' => $this, 'function' => 'action_tracklogin', 'label' => $txt['trackLogins']),
 		);
 
-		// Create the tabs for the template.
+		// Create the tabs for the template. (Mostly done by prepareTabData function of Menu)
 		$context[$context['profile_menu_name']]['tab_data'] = array(
 			'title' => $txt['history'],
 			'description' => $txt['history_description'],
 			'class' => 'i-poll',
-			'tabs' => array(
-				'activity' => array(),
-				'ip' => array(),
-				'edits' => array(),
-			),
 		);
 
 		// Set up action/subaction stuff.
@@ -88,12 +83,6 @@ class ProfileHistory extends AbstractController
 		// Yep, sub-action time and call integrate_sa_profile_history as well
 		$subAction = $action->initialize($subActions, 'activity');
 		$context['sub_action'] = $subAction;
-
-		// Moderation must be on to track edits.
-		if (empty($modSettings['modlog_enabled']))
-		{
-			unset($context[$context['profile_menu_name']]['tab_data']['edits']);
-		}
 
 		// Set a page title.
 		$context['history_area'] = $subAction;
