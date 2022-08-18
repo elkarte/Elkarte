@@ -12,7 +12,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.1.7
+ * @version 1.1.9
  *
  */
 
@@ -533,7 +533,7 @@ class Notify_Controller extends Action_Controller
 		// Token was passed and matches our expected pattern
 		$token = $this->_req->getQuery('token', 'trim', '');
 		$token = urldecode($token);
-		if (empty($token) || preg_match('~^(\d+_[a-zA-Z0-9./]{53}_.*)$~', $token, $match) !== 1)
+		if (empty($token) || preg_match('~^(\d+_[a-zA-Z0-9./]{32,44}_[^)]*)~m', $token, $match) !== 1)
 		{
 			return false;
 		}
