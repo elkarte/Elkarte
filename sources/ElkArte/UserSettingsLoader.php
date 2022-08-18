@@ -163,7 +163,7 @@ class UserSettingsLoader
 			// SHA-256 passwords should be 64 characters long.
 			elseif (strlen($session_password) === 64)
 			{
-				$check = hash('sha256', ($user_settings['passwd'] . $user_settings['password_salt'])) === $session_password;
+				$check = hash_equals(hash('sha256', ($user_settings['passwd'] . $user_settings['password_salt'])), $session_password);
 			}
 			else
 			{
