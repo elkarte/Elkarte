@@ -580,6 +580,10 @@ $txt['censor_clickadd'] = 'Add another word';
 
 $txt['layout_controls'] = 'Forum';
 $txt['logs'] = 'Logs';
+$txt['log_settings'] = 'Log Settings';
+$txt['modlog_enabled'] = 'Enable moderation Logging';
+$txt['userlog_enabled'] = 'Enable profile edits Logging';
+
 $txt['generate_reports'] = 'Reports';
 
 $txt['update_available'] = 'Update Available';

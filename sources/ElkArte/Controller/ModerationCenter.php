@@ -142,7 +142,7 @@ class ModerationCenter extends AbstractController
 				'areas' => array(
 					'modlog' => array(
 						'label' => $txt['modlog_view'],
-						'enabled' => !empty($modSettings['modlog_enabled']) && $context['can_moderate_boards'],
+						'enabled' => featureEnabled('ml') && $context['can_moderate_boards'],
 						'controller' => '\\ElkArte\\AdminController\\Modlog',
 						'function' => 'action_log',
 						'class' => 'i-comments i-admin',

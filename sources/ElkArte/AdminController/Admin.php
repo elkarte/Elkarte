@@ -492,7 +492,7 @@ class Admin extends AbstractController
 							'banlog' => array($txt['ban_log'], 'manage_bans'),
 							'spiderlog' => array($txt['spider_logs'], 'admin_forum', 'enabled' => featureEnabled('sp')),
 							'tasklog' => array($txt['scheduled_log'], 'admin_forum'),
-							'pruning' => array($txt['pruning_title'], 'admin_forum'),
+							'pruning' => array($txt['settings'], 'admin_forum'),
 						),
 					),
 					'scheduledtasks' => array(

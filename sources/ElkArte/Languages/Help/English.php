@@ -459,6 +459,7 @@ $helptxt['pm_posts_per_hour'] = 'This will limit the number of personal messages
 $helptxt['default_personal_text'] = 'Sets the default text a new user will have as their &quot;personal text.&quot; This option is not available when personal text is disabled, or when users can set their personal text on registration for themselves.';
 
 $helptxt['modlog_enabled'] = 'Logs all moderation actions.';
+$helptxt['userlog_enabled'] = 'Logs all key changes a user makes to their profile.';
 
 $helptxt['registration_method'] = 'This option determines what method of registration is used for people wishing to join your forum. You can select from:<br /><br />
 	<ul class="normallist">
