@@ -817,7 +817,7 @@ class Html_2_Md
 	 */
 	private function _convert_span($node)
 	{
-		return $this->getInnerHTML($node);
+		return $this->_get_innerHTML($node);
 	}
 
 	/**
