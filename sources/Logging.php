@@ -276,7 +276,7 @@ function logActions($logs)
 	foreach ($logs as $log)
 	{
 		if (!isset($log_types[$log['log_type']]))
-			return false;
+			continue;
 
 		// Do we have something to log here, after all?
 		if (!is_array($log['extra']))
@@ -354,7 +354,12 @@ function logActions($logs)
 		);
 	}
 
-	require_once(SUBSDIR . '/Logging.subs.php');
+	if (!empty($inserts))
+	{
+		require_once(SUBSDIR . '/Logging.subs.php');
 
-	return insertLogActions($inserts);
+		return insertLogActions($inserts);
+	}
+
+	return 0;
 }
