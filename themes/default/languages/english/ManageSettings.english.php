@@ -60,6 +60,7 @@ $txt['approveAccountDeletion'] = 'Require admin approval when member deletes acc
 $txt['autoOptMaxOnline'] = 'Maximum users online when optimizing';
 $txt['autoFixDatabase'] = 'Automatically fix broken tables';
 $txt['allow_disableAnnounce'] = 'Allow users to disable announcements';
+$txt['metadata_enabled'] = 'Enable the creation of Open Graph and Schema.org microdata';
 $txt['disallow_sendBody'] = 'Don\'t allow post text in notifications';
 $txt['jquery_source'] = 'Source for the jQuery Library';
 $txt['jquery_local'] = 'Local';

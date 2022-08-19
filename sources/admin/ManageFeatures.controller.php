@@ -11,7 +11,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.1.8
+ * @version 1.1.9
  *
  */
 
@@ -172,12 +172,23 @@ class ManageFeatures_Controller extends Action_Controller
 
 			call_integration_hook('integrate_save_basic_settings');
 
+			// Microdata needs to enable its integration
+			if (!empty($this->_req->getPost('metadata_enabled')))
+			{
+				Hooks::instance()->enableIntegration('Metadata_Integrate');
+			}
+			else
+			{
+				Hooks::instance()->disableIntegration('Metadata_Integrate');
+			}
+
 			$settingsForm->setConfigValues((array) $this->_req->post);
 			$settingsForm->save();
 
 			writeLog();
 			redirectexit('action=admin;area=featuresettings;sa=basic');
 		}
+
 		if (isset($this->_req->post->cleanhives))
 		{
 			$clean_hives_result = theme()->cleanHives();
@@ -1252,6 +1263,7 @@ class ManageFeatures_Controller extends Action_Controller
 				array('check', 'hitStats'),
 			'',
 				// Option-ish things... miscellaneous sorta.
+				array('check', 'metadata_enabled'),
 				array('check', 'allow_disableAnnounce'),
 				array('check', 'disallow_sendBody'),
 				array('select', 'enable_contactform', array('disabled' => $txt['contact_form_disabled'], 'registration' => $txt['contact_form_registration'], 'menu' => $txt['contact_form_menu'])),
