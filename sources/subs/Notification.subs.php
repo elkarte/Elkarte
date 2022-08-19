@@ -7,7 +7,7 @@
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * @version 1.1.7
+ * @version 1.1.9
  *
  */
 
@@ -1028,26 +1028,25 @@ function getNotifierToken($memID, $memEmail, $memSalt, $area, $extra)
 {
 	global $modSettings;
 
-	// Generate a 22 digit random code suitable for Blowfish crypt.
 	$tokenizer = new \Token_Hash();
-	$blowfish_salt = '$2a$10$' . $tokenizer->generate_hash(22);
-	$now = time();
 
 	// Ideally we would just have a larger -per user- password_salt
 	if (empty($modSettings['unsubscribe_site_salt']))
 	{
-		// extra 10 digits of salt
-		$unsubscribe_site_salt = $tokenizer->generate_hash();
+		// Extra digits of salt
+		$unsubscribe_site_salt = $tokenizer->generate_hash(22);
 		updateSettings(array('unsubscribe_site_salt' => $unsubscribe_site_salt));
 	}
 
-	// Add member salt + site salt to the otherwise deterministic data
-	$hash = crypt($area . $extra . $now . $memEmail . $memSalt . $modSettings['unsubscribe_site_salt'], $blowfish_salt);
+	// Generate a code suitable for Blowfish crypt
+	$blowfish_salt = '$2a$07$' . $memSalt . $modSettings['unsubscribe_site_salt'] . '$';
+	$now = time();
+	$hash = crypt($area . $extra . $now . $memEmail . $memSalt, $blowfish_salt);
 
 	return urlencode(implode('_',
 		array(
 			$memID,
-			substr($hash, 7),
+			substr($hash, 28),
 			$area,
 			$extra,
 			$now
@@ -1062,7 +1061,7 @@ function getNotifierToken($memID, $memEmail, $memSalt, $area, $extra)
  *
  * @param string $memEmail member email address
  * @param string $memSalt member salt
- * @param string $area area to unsubscribe
+ * @param string $area data to validate = area + extra + time from link
  * @param string $hash the sent hash
  * @return bool
  */
@@ -1075,8 +1074,9 @@ function validateNotifierToken($memEmail, $memSalt, $area, $hash)
 		return false;
 	}
 
-	$expected = '$2a$10$' . $hash;
-	$check = crypt($area . $memEmail . $memSalt . $modSettings['unsubscribe_site_salt'], $expected);
+	$blowfish_salt = '$2a$07$' . $memSalt . $modSettings['unsubscribe_site_salt']. '$';
+	$expected = substr($blowfish_salt, 0, 28) . $hash;
+	$check = crypt($area . $memEmail . $memSalt, $blowfish_salt);
 
 	// Basic safe compare as hash_equals is PHP 5.6+
 	if (function_exists('hash_equals'))

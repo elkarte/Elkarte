@@ -7,7 +7,7 @@
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * @version 1.1.7
+ * @version 1.1.9
  *
  */
 
@@ -50,7 +50,7 @@ class Html_2_BBC
 	 * Line break character
 	 * @var string
 	 */
-	public $line_break = '[br]';
+	public $line_break = "\n\n";
 
 	/**
 	 * Font numbers to pt size
@@ -94,6 +94,7 @@ class Html_2_BBC
 		$html = preg_replace('/(?:(?<=\>)|(?<=\/\>))(\s+)(?=\<\/?)/', '', $html);
 		$html = strtr($html, array('[' => '&amp#91;', ']' => '&amp#93;'));
 		$this->strip_newlines = $strip;
+		$html = $this->_returnBodyText($html);
 
 		// Using PHP built in functions ...
 		if (class_exists('DOMDocument'))
@@ -166,7 +167,7 @@ class Html_2_BBC
 		if ($this->_parser)
 		{
 			// Using the internal DOM methods we need to do a little extra work
-			if (preg_match('~<body>(.*)</body>~s', $bbc, $body))
+			if (preg_match('~<body.*?>(.*)</body>~s', $bbc, $body))
 				$bbc = $body[1];
 		}
 
@@ -180,10 +181,7 @@ class Html_2_BBC
 
 		// Strip any excess leading/trailing blank lines we may have produced O:-)
 		$bbc = trim($bbc);
-		$bbc = preg_replace('~^(?:\[br\s*\/?\]\s*)+~', '', $bbc);
-		$bbc = preg_replace('~(?:\[br\s*\/?\]\s*)+$~', '', $bbc);
-		$bbc = preg_replace('~\s?(\[br\])\s?~', '[br]', $bbc);
-		$bbc = str_replace('[hr][br]', '[hr]', $bbc);
+		$bbc = preg_replace("~(?:\s?\n\s?){2,6}~", "\n\n", $bbc);
 
 		// Remove any html tags we left behind ( outside of code tags that is )
 		$parts = preg_split('~(\[/code\]|\[code(?:=[^\]]+)?\])~i', $bbc, -1, PREG_SPLIT_DELIM_CAPTURE);
@@ -194,9 +192,15 @@ class Html_2_BBC
 				if ($i % 4 == 0)
 				{
 					// protect << symbols from being stripped
-					$working = str_replace('<<', "[\xC2\xA0]", $parts[$i]);
+					$part = $parts[$i];
+					$working = htmlspecialchars($part, ENT_NOQUOTES, 'UTF-8');
 					$working = strip_tags($working);
-					$parts[$i] = str_replace("[\xC2\xA0]", '<<', $working);
+
+					// Strip can return nothing due to an error
+					if (empty($working))
+						$parts[$i] = $part;
+					else
+						$parts[$i] = htmlspecialchars_decode($working);
 				}
 			}
 			$bbc = implode('', $parts);
@@ -282,7 +286,13 @@ class Html_2_BBC
 
 		// Skipping over this tag?
 		if (in_array($tag, $this->_skip_tags))
-			$tag = '';
+		{
+			// Grab any inner content, dropping the tag
+			$bbc = $this->_get_innerHTML($node);
+			$this->set_text_node($node, $bbc);
+
+			return;
+		}
 
 		// Based on the current tag, determine how to convert
 		switch ($tag)
@@ -304,7 +314,7 @@ class Html_2_BBC
 				$bbc = '[quote]' . $this->_get_value($node) . '[/quote]';
 				break;
 			case 'br':
-				$bbc = $this->line_break . $this->line_end;
+				$bbc = '[br]';
 				break;
 			case 'center':
 				$bbc = '[center]' . $this->_get_value($node) . '[/center]' . $this->line_end;
@@ -420,14 +430,26 @@ class Html_2_BBC
 		{
 			$bbc = $needs_leading_break ? $this->line_break . $this->line_end . $bbc : $bbc;
 			$bbc = $needs_trailing_break ? $bbc . $this->line_break . $this->line_end : $bbc;
-			if ($this->_parser)
-			{
-				// Create a new text node with our bbc tag and replace the original node
-				$bbc_node = $this->doc->createTextNode($bbc);
-				$node->parentNode->replaceChild($bbc_node, $node);
-			}
-			else
-				$node->outertext = $bbc;
+			$this->set_text_node($node, $bbc);
+		}
+	}
+
+	/**
+	 * Sets a node to a text value, replacing what was there
+	 *
+	 * @param $node
+	 * @param $text
+	 */
+	public function set_text_node($node, $text)
+	{
+		if ($this->_parser)
+		{
+			$text_node = $this->doc->createTextNode($text);
+			$node->parentNode->replaceChild($text_node, $node);
+		}
+		else
+		{
+			$node->outertext = $text;
 		}
 	}
 
@@ -546,6 +568,7 @@ class Html_2_BBC
 	private function _convert_code($node)
 	{
 		$bbc = '';
+		$this->strip_newlines = false;
 		$value = $this->_get_innerHTML($node);
 
 		// Get the number of lines of code that we have
@@ -647,13 +670,12 @@ class Html_2_BBC
 		$height = $node->getAttribute('height');
 		$style = $node->getAttribute('style');
 
-		$bbc = '';
 		$size = '';
 
 		// First if this is an inline image, we don't support those
 		if (substr($src, 0, 4) === 'cid:')
 		{
-			return $bbc;
+			return $alt;
 		}
 
 		// Do the basic things first, title/alt
@@ -714,7 +736,7 @@ class Html_2_BBC
 
 		// Don't style it if its really just empty
 		$test_value = trim($value);
-		if ($test_value === '[br]' || $test_value === '<br>')
+		if (empty($test_value) || $test_value === '[br]' || $test_value === '<br>')
 		{
 			return $value;
 		}
@@ -944,5 +966,33 @@ class Html_2_BBC
 		$text = html_entity_decode(htmlspecialchars_decode($text, ENT_QUOTES), ENT_QUOTES, 'UTF-8');
 
 		return str_replace(array('&amp#91;', '&amp#93;'), array('&amp;#91;', '&amp;#93;'), $text);
+	}
+
+	/**
+	 * Looks for the text inside <body> and then <html>, returning just the inner
+	 *
+	 * @param $text
+	 *
+	 * @return string
+	 */
+	private function _returnBodyText($text)
+	{
+		if (preg_match_all('~<body[^>]*?>(.*?)</body>~su', $text, $bodies))
+		{
+			return implode("\n", $bodies[1]);
+		}
+
+		if (preg_match_all('~<html[^>]*?>(.*)</html>~su', $text, $bodies))
+		{
+			return implode("\n", $bodies[1]);
+		}
+
+		// Parsers may have clipped the ending body or html tag off with the quote/signature
+		if (preg_match('~<body[^>]*?>(.*)~su', $text, $bodies))
+		{
+			return $bodies[1];
+		}
+
+		return $text;
 	}
 }

@@ -7,7 +7,7 @@
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * @version 1.1.7
+ * @version 1.1.9
  *
  */
 
@@ -455,10 +455,10 @@ class Email_Format
 		// Starting a list like a) 1. 1) etc ...
 		$temp = $this->_in_plainlist;
 
-		if (preg_match('~^[a-j](\.|\)|-)\s~i', $var)
-			|| preg_match('~^[1-9](\.|\)|-)\s?~', $var)
+		if (preg_match('~^[a-j](\.|\)|-)\s~im', $var)
+			|| preg_match('~^[1-9]\s?(\.|\)|-)\s?~m', $var)
 			|| preg_match('~' . chr(187) . '~', $var)
-			|| preg_match('~^[ \t]?\* ?~', $var)
+			|| preg_match('~^[ \t]?\* ?~m', $var)
 		)
 			$this->_in_plainlist++;
 

@@ -47,7 +47,9 @@ Elk_QuickQuote.prototype.init = function ()
 	try {
 		let opts = Object.defineProperty({}, 'passive', {get: function() {supportsPassive = true;}});
 		window.addEventListener('test', null, opts);
-	} catch (e) {}
+	} catch (e) {
+		// Just fall through, it does not support passive mouse events
+	}
 
 	// Pointer event capabilities
 	let hasPointerEvents = (('PointerEvent' in window) || (window.navigator && 'msPointerEnabled' in window.navigator));

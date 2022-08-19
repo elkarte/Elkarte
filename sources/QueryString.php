@@ -12,7 +12,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.1
+ * @version 1.1.9
  *
  */
 
@@ -221,7 +221,7 @@ function htmltrim__recursive($var, $level = 0)
 function cleanXml($string)
 {
 	// http://www.w3.org/TR/2000/REC-xml-20001006#NT-Char
-	return preg_replace('~[\x00-\x08\x0B\x0C\x0E-\x19\x{FFFE}\x{FFFF}]~u', '', $string);
+	return preg_replace('~[\x00-\x08\x0B\x0C\x0E-\x1F\x{FFFE}\x{FFFF}]~u', '', $string);
 }
 
 /**

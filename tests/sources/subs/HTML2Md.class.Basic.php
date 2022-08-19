@@ -31,12 +31,12 @@ class TestHTML2Md extends PHPUnit\Framework\TestCase
 			array(
 				'Named links',
 				'<a href="http://www.elkarte.net/" class="bbc_link" target="_blank">ElkArte</a>',
-				'[ElkArte](http://www.elkarte.net/)',
+				'[ElkArte](http://www.elkarte.net/ "Link")',
 			),
 			array(
 				'URL link',
-				'<a href="http://www.elkarte.net/" class="bbc_link" target="_blank">http://www.elkarte.net/</a>',
-				'[Link](http://www.elkarte.net/)',
+				'<a href="https://www.elkarte.net/" class="bbc_link" target="_blank">https://www.elkarte.net/</a>',
+				'[X](https://www.elkarte.net/ "Link")',
 			),
 			array(
 				'Lists',

@@ -8,7 +8,7 @@
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * @version 1.1.7
+ * @version 1.1.9
  *
  */
 
@@ -35,7 +35,7 @@ function pbe_email_to_bbc($text, $html)
 	$tags = array(
 		'~\*\*\s?(.*?)\*\*~is' => '**$1**',
 		'~<\*>~i' => '&lt;*&gt;',
-		'~-{20,}~' => '<hr>',
+		'~^-{3,}$~m' => '<hr>',
 		'~#([0-9a-fA-F]{4,6}\b)~' => '&#35;$1',
 	);
 
@@ -80,7 +80,8 @@ function pbe_email_to_bbc($text, $html)
 	// Some tags often end up as just empty tags - remove those.
 	$emptytags = array(
 		'~\[[bisu]\]\s*\[/[bisu]\]~' => '',
-		'~\[[bisu]\]\s*\[/[bisu]\]~' => '',
+		'~\[quote\]\s*\[/quote\]~' => '',
+		'~\[center\]\s*\[/center\]~' => '',
 		'~(\n){3,}~si' => "\n\n",
 	);
 	$text = preg_replace(array_keys($emptytags), array_values($emptytags), $text);
@@ -183,7 +184,7 @@ function pbe_fix_email_quotes($body, $html)
 		{
 			foreach ($quotes as $quote)
 			{
-				$quotenew = preg_replace('~^.?> (.*)$~im', '$1', $quote[1] . "\n");
+				$quotenew = preg_replace('~^\s?> (.*)$~m', '$1', $quote[1] . "\n");
 				$body = str_replace($quote[0], '[quote]' . $quotenew . '[/quote]', $body);
 			}
 		}
@@ -272,9 +273,7 @@ function pbe_fix_email_quotes($body, $html)
 	$body_array[$i] = $quote_done;
 
 	// Join the array back together while dropping null index's
-	$body = implode("\n", array_values($body_array));
-
-	return $body;
+	return implode("\n", array_values($body_array));
 }
 
 /**

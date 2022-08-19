@@ -13,7 +13,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.1.1
+ * @version 1.1.9
  *
  */
 
@@ -285,7 +285,7 @@ class Profile_Controller extends Action_Controller
 						'subsections' => array(
 							'activity' => array($txt['trackActivity'], 'moderate_forum'),
 							'ip' => array($txt['trackIP'], 'moderate_forum'),
-							'edits' => array($txt['trackEdits'], 'moderate_forum'),
+							'edits' => array($txt['trackEdits'], 'moderate_forum', 'enabled' => !empty($modSettings['modlog_enabled'])),
 							'logins' => array($txt['trackLogins'], array('profile_view_own', 'moderate_forum')),
 						),
 						'permission' => array(
