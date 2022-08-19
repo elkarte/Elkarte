@@ -668,7 +668,7 @@ class Util
 	* @param int|null $timestamp to convert
 	* @return string|false
 	*/
-	function gmstrftime(string $format, int $timestamp = null)
+	public static function gmstrftime(string $format, int $timestamp = null)
 	{
 		if (function_exists('gmstrftime') && (PHP_VERSION_ID < 80100))
 			return \gmstrftime($format, $timestamp);
