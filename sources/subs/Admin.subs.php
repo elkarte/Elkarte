@@ -36,24 +36,9 @@ function getServerVersions($checkFor)
 
 	Txt::load('Admin');
 
-	$versions = array();
+	$versions = [];
 
-	// Is GD available?  If it is, we should show version information for it too.
-	if (in_array('gd', $checkFor) && function_exists('gd_info'))
-	{
-		$temp = gd_info();
-		$versions['gd'] = array('title' => $txt['support_versions_gd'], 'version' => $temp['GD Version']);
-	}
-
-	// Why not have a look at ImageMagick? If it is, we should show version information for it too.
-	if (in_array('imagick', $checkFor) && class_exists('Imagick'))
-	{
-		$temp = new Imagick();
-		$temp2 = $temp->getVersion();
-		$versions['imagick'] = array('title' => $txt['support_versions_imagick'], 'version' => $temp2['versionString']);
-	}
-
-	// Now lets check for the Database.
+	// Check for the Database.
 	if (in_array('db_server', $checkFor))
 	{
 		$conn = $db->connection();
@@ -63,20 +48,32 @@ function getServerVersions($checkFor)
 		}
 		else
 		{
-			$versions['db_server'] = array(
+			$versions['db_server'] = [
 				'title' => sprintf($txt['support_versions_db'], $db->title()),
-				'version' => $db->server_version());
+				'version' => $db->server_version()];
 		}
 	}
 
-	require_once(SUBSDIR . '/Cache.subs.php');
-	$cache_engines = loadCacheEngines();
-	foreach ($cache_engines as $name => $details)
+	// PHP Version and support
+	if (in_array('php', $checkFor))
 	{
-		if (in_array($name, $checkFor))
-		{
-			$versions[$name] = $details;
-		}
+		$versions['php_header'] = ['header' => $txt['phpinfo_settings']];
+		$versions['php'] = ['title' => 'PHP', 'version' => PHP_VERSION . ' (' . PHP_SAPI . ')', 'more' => '?action=admin;area=serversettings;sa=phpinfo'];
+	}
+
+	// Is GD available?  If it is, we should show version information for it too.
+	if (in_array('gd', $checkFor) && function_exists('gd_info'))
+	{
+		$temp = gd_info();
+		$versions['gd'] = array('title' => $txt['support_versions_gd'], 'version' => $temp['GD Version']);
+	}
+
+	// Why not have a look at ImageMagick? If installed, we should show version information for it too.
+	if (in_array('imagick', $checkFor) && class_exists('Imagick'))
+	{
+		$temp = new Imagick();
+		$temp2 = $temp->getVersion();
+		$versions['imagick'] = array('title' => $txt['support_versions_imagick'], 'version' => $temp2['versionString']);
 	}
 
 	if (in_array('opcache', $checkFor) && extension_loaded('Zend OPcache'))
@@ -84,29 +81,49 @@ function getServerVersions($checkFor)
 		$opcache_config = @opcache_get_configuration();
 		if (!empty($opcache_config['directives']['opcache.enable']))
 		{
-			$versions['opcache'] = array('title' => $opcache_config['version']['opcache_product_name'], 'version' => $opcache_config['version']['version']);
+			$versions['opcache'] = ['title' => $opcache_config['version']['opcache_product_name'], 'version' => $opcache_config['version']['version']];
 		}
 	}
 
-	// PHP Version
-	if (in_array('php', $checkFor))
+	// Cache engines in the system
+	require_once(SUBSDIR . '/Cache.subs.php');
+	$cache_engines = loadCacheEngines();
+	foreach ($cache_engines as $name => $details)
 	{
-		$versions['php'] = array('title' => 'PHP', 'version' => PHP_VERSION . ' (' . PHP_SAPI . ')', 'more' => '?action=admin;area=serversettings;sa=phpinfo');
+		if (in_array($name, $checkFor, true))
+		{
+			$versions[$name] = $details;
+		}
 	}
 
 	// Server info
 	if (in_array('server', $checkFor))
 	{
 		$req = request();
-		$versions['server'] = array('title' => $txt['support_versions_server'], 'version' => $req->server_software());
+		$versions['server_header'] = ['header' => $txt['admin_server_settings']];
+		$versions['server'] = ['title' => $txt['support_versions_server'], 'version' => $req->server_software()];
 
 		// Compute some system info, if we can
-		$versions['server_name'] = array('title' => $txt['support_versions'], 'version' => php_uname());
+		$versions['server_name'] = ['title' => $txt['support_versions'], 'version' => php_uname()];
 		require_once(SUBSDIR . '/Server.subs.php');
 		$loading = detectServerLoad();
+		$cores = detectServerCores();
+		$disk = detectDiskUsage();
+		$uptime = detectUpTime();
 		if ($loading !== false)
 		{
-			$versions['server_load'] = array('title' => $txt['loadavg'], 'version' => $loading);
+			$versions['server_load'] = ['title' => $txt['loadavg'], 'version' => round($loading, 3)];
+			$versions['server_cores'] = ['title' => $txt['server_cores'], 'version' => $cores];
+		}
+
+		if ($disk !== false)
+		{
+			$versions['server_diskused'] = ['title' => $txt['server_space'], 'version' => sprintf($txt['server_space2'], $disk[0], $disk[1])];
+		}
+
+		if ($uptime !== false)
+		{
+			$versions['server_uptime'] = ['title' => $txt['server_uptime'], 'version' => $uptime . ' ' . $txt['days_word']];
 		}
 	}
 

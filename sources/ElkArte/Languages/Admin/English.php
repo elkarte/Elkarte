@@ -346,11 +346,12 @@ $txt['support_versions'] = 'Version Information';
 $txt['support_resources'] = 'Support Resources';
 $txt['support_resources_p1'] = 'Our <a href="%1$s" target="_blank" class="new_win">Documentation Wiki</a> provides the main documentation for ElkArte. The ElkArte Online Manual has many documents to help answer support questions and explain <a href="%2$s" target="_blank" class="new_win">Features</a>, <a href="%3$s" target="_blank" class="new_win">Settings</a>, <a href="%4$s" target="_blank" class="new_win">Themes</a>, <a href="%5$s" target="_blank" class="new_win">Packages</a>, etc. The Online Manual documents each area of ElkArte thoroughly and should answer most questions quickly.';
 $txt['support_resources_p2'] = 'If you can\'t find the answers to your questions in the Documentation Wiki, you may want to search our <a href="%1$s" target="_blank" class="new_win">Support Community</a> or ask for assistance in our support boards. The ElkArte Support Community can be used for <a href="%2$s" target="_blank" class="new_win">support</a>, <a href="%3$s" target="_blank" class="new_win">customization</a>, and many other things such as discussing ElkArte, finding a host, and discussing administrative issues with other forum administrators.';
+$txt['server_cores'] = 'CPU Cores';
+$txt['server_space'] = 'Disk Space';
+$txt['server_space2'] = '%1$s Used, %2$s Remaining';
+$txt['server_uptime'] = 'Uptime';
 
 $txt['latest_updates'] = 'Latest noteworthy updates';
-$txt['new_in_1_0_2'] = 'The most significant change in ElkArte 1.0.2 is avatar permission management. Currently each method of setting an avatar is permission-based, requiring the enabling/disabling of each method for each group. With 1.0.2 avatars are simply enabled/disabled by user group, this allows the enabled groups to add an avatar (by all available methods).<br />
-The only permission available is a general one to allow members to change or not their avatars. Additionally there is only one setting for maximum width and height of avatars, these values apply to all avatar methods.<br /><br />
-Due to the nature of the changes it was not impossible to migrate existing settings to the new format, for that reason you are encouraged to visit the <a href="{admin_url};area=manageattachments;sa=avatars">Avatar Settings</a> page and set the options you prefer.';
 
 $txt['edit_permissions_info'] = 'Use permission settings to manage global and specific board features and what actions that guest, members and moderators can do.';
 $txt['membergroups_members'] = 'Regular Members';
