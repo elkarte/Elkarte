@@ -416,12 +416,12 @@ function logActions($logs)
 		);
 	}
 
-	if (empty($inserts))
+	if (!empty($inserts))
 	{
-		return true;
+		require_once(SUBSDIR . '/Logging.subs.php');
+
+		return insertLogActions($inserts);
 	}
 
-	require_once(SUBSDIR . '/Logging.subs.php');
-
-	return insertLogActions($inserts);
+	return 0;
 }
