@@ -608,7 +608,7 @@ class Admin extends AbstractController
 	 */
 	public function action_home()
 	{
-		global $txt, $context, $settings;
+		global $txt, $context;
 
 		// We need a little help
 		require_once(SUBSDIR . '/Membergroups.subs.php');

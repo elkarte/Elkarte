@@ -26,11 +26,11 @@ use ElkArte\ValuesContainer;
 class SearchArray extends AbstractModel
 {
 	/**
-	 * @var array The provided search orwell "striking thirteen" -movie
+	 * @var string The provided search orwell "striking thirteen" -movie
 	 *
 	 * That way, the URLs involved in a search page will be kept as short as possible.
 	 */
-	protected $_search_string = [];
+	protected $_search_string = '';
 
 	/** @var array Words not to be found in the search results (-word) */
 	private $_excludedWords = [];
