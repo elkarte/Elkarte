@@ -33,6 +33,13 @@ class Emoji extends AbstractModel
 	/** @var string[] Array of keys with known emoji names */
 	public $shortcode_replace = [];
 
+	/** @var string regex to check if any none letter characters appear */
+	public $possible_emoji = '~([^\p{L}\x00-\x7F]+)~u';
+
+	/** @var string regex to find html/mixed emoji as &#x1f937;‍♂️ or &#x1f937;&#x200d;&#x2642;&#xfe0f;
+	         This is needed due to the way they are stored in the db */
+	public $possible_html_emoji = '~((&#\d{3,6};|&#x[0-9a-fA-F]{3,6};)+([^\p{L}\x00-\x7F]+)?)~u';
+
 	/**
 	 * Emoji constructor.
 	 *
@@ -96,7 +103,8 @@ class Emoji extends AbstractModel
 	private function _protectCodeBlocks($string)
 	{
 		// Quick sniff, was that you? I thought so !
-		if (strpos($string, ':') === false)
+		if (strpos($string, ':') === false
+			&& !preg_match($this->possible_emoji, $string))
 		{
 			return $string;
 		}
@@ -144,9 +152,10 @@ class Emoji extends AbstractModel
 	 */
 	public function emojiFromHTML($string)
 	{
-		$result = preg_replace_callback('~&#(\d+);|&#x([0-9a-fA-F]+);~', function ($match) {
+		$result = preg_replace_callback($this->possible_html_emoji, function ($match) {
 			// See if we have an Emoji version of this HTML entity
-			$entity = !empty($match[1]) ? dechex($match[1]) : $match[2];
+			$entity = html_entity_decode($match[0], ENT_NOQUOTES | ENT_SUBSTITUTE | ENT_HTML401, 'UTF-8');
+			$entity = $this->unicodeCharacterToNumber($entity);
 			$found = $this->findEmojiByCode($entity);
 
 			// Replace it with or emoji <img>
@@ -165,6 +174,7 @@ class Emoji extends AbstractModel
 	 * Search the Emoji array by unicode number
 	 *
 	 * Given unicode 1f600, aka 😀 grinning face, returns grinning
+	 * Given unicode 1f6e9 or 1f6e9-fe0f, aka 🛩️ small airplane, returns small_airplane
 	 *
 	 * @param $hex
 	 * @return string|false
@@ -173,8 +183,20 @@ class Emoji extends AbstractModel
 	{
 		$this->loadEmoji();
 
+		if (empty($hex))
+		{
+			return false;
+		}
+
 		// Is it one we have in our library?
-		if (!empty($hex) && $key = (array_search($hex, $this->shortcode_replace, true)))
+		if ($key = (array_search($hex, $this->shortcode_replace, true)))
+		{
+			return $key;
+		}
+
+		// Does it end in -fe0f / Variation Selector-16? Libraries differ in its use or not.
+		if ((substr($hex, -5) === '-fe0f')
+			&& $key = (array_search(substr($hex, 0, -5), $this->shortcode_replace, true)))
 		{
 			return $key;
 		}
@@ -236,7 +258,7 @@ class Emoji extends AbstractModel
 	 */
 	public function emojiFromUni($string)
 	{
-		$result = preg_replace_callback('~\p{S}~u', function ($match) {
+		$result = preg_replace_callback($this->possible_emoji, function ($match) {
 			$hex_str = $this->unicodeCharacterToNumber($match[0]);
 			$found = $this->findEmojiByCode($hex_str);
 
@@ -303,47 +325,10 @@ class Emoji extends AbstractModel
 
 		for ($i = 0; $i < Util::strlen($code); $i++)
 		{
-			$points[] = str_pad(strtolower(dechex($this->uniord(Util::substr($code, $i, 1)))), 4, '0', STR_PAD_LEFT);
+			$points[] = str_pad(strtolower(dechex(Util::uniord(Util::substr($code, $i, 1)))), 4, '0', STR_PAD_LEFT);
 		}
 
 		return implode('-', $points);
-	}
-
-	/**
-	 * Converts a 4byte char into the corresponding HTML entity code.
-	 * Subset of function _uniord($c) found in query.php as we are only
-	 * dealing with the emoji space
-	 *
-	 * @param $c
-	 * @return false|int
-	 */
-	private function uniord($c)
-	{
-		$ord0 = ord($c[0]);
-		if ($ord0 >= 0 && $ord0 <= 127)
-		{
-			return $ord0;
-		}
-
-		$ord1 = ord($c[1]);
-		if ($ord0 >= 192 && $ord0 <= 223)
-		{
-			return ($ord0 - 192) * 64 + ($ord1 - 128);
-		}
-
-		$ord2 = ord($c[2]);
-		if ($ord0 >= 224 && $ord0 <= 239)
-		{
-			return ($ord0 - 224) * 4096 + ($ord1 - 128) * 64 + ($ord2 - 128);
-		}
-
-		$ord3 = ord($c[3]);
-		if ($ord0 >= 240 && $ord0 <= 247)
-		{
-			return ($ord0 - 240) * 262144 + ($ord1 - 128) * 4096 + ($ord2 - 128) * 64 + ($ord3 - 128);
-		}
-
-		return false;
 	}
 
 	/**
