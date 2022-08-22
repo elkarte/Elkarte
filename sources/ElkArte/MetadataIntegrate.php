@@ -138,6 +138,7 @@ class MetadataIntegrate
 			// Create a short body, leaving some very basic html
 			$smd['raw_body'] = trim(strip_tags($smd['body']));
 			$smd['html_body'] = trim(strip_tags($smd['body'], '<br><strong><em><blockquote>'));
+			$smd['html_body'] = str_replace(["\n", "\t"], '', $smd['html_body']);
 
 			// Strip attributes from any remaining tags
 			$smd['html_body'] = preg_replace('~<([bse][a-z0-9]*)[^>]*?(/?)>~i', '<$1$2>', $smd['html_body']);
@@ -294,7 +295,7 @@ class MetadataIntegrate
 		{
 			foreach ($this->data['attachment'] as $attachment)
 			{
-				if (isset($attachment['is_image']))
+				if (isset($attachment['is_image']) && !empty($attachment['is_approved']))
 				{
 					return [
 						'@type' => 'ImageObject',
@@ -311,13 +312,13 @@ class MetadataIntegrate
 		{
 			foreach ($this->data['ila'] as $ila)
 			{
-				if (isset($ila['is_image']))
+				if (isset($ila['is_image']) && !empty($ila['is_approved']))
 				{
 					return [
 						'@type' => 'ImageObject',
 						'url' => $boardurl . '/index.php?action=dlattach;attach=' . $ila['id'] . ';image',
-						'width' => $ila['width'],
-						'height' => $ila['height']
+						'width' => $ila['real_width'] ?? 0,
+						'height' => $ila['real_height'] ?? 0
 					];
 				}
 			}
