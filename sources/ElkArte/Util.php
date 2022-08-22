@@ -767,11 +767,12 @@ class Util
 		}
 
 		$result = $string;
-		$ord = array_map('ord', str_split($string));
 
-		// If we are in the 4-byte range
-		if (max($ord) >= 240)
+		//  If we are in the 4-byte range
+		if (preg_match('~[\x{10000}-\x{10FFFF}]~u', $string))
 		{
+			$ord = array_map('ord', str_split($string));
+
 			// Byte length
 			$length = strlen($string);
 			$result = '';
