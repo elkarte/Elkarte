@@ -427,6 +427,8 @@ class Ila_Integrate
 	{
 		global $context, $attachments;
 
+		$context['ila'] = array();
+
 		if (empty($context['ila_dont_show_attach_below']) || empty($attachments[$message['id_msg']]))
 		{
 			return;
@@ -438,6 +440,7 @@ class Ila_Integrate
 			if ($attachcheck['approved'] && in_array($attachcheck['id_attach'], $context['ila_dont_show_attach_below']))
 			{
 				unset($attachments[$message['id_msg']][$id]);
+				$context['ila'][] = $attachcheck;
 			}
 		}
 	}

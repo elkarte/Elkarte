@@ -155,6 +155,13 @@ function template_html_above()
 		echo '
 	<meta name="robots" content="noindex" />';
 
+	// If we have any Open Graph data, here is where is inserted.
+	if (!empty($context['open_graph']))
+	{
+		echo '
+	' .implode("\n\t", $context['open_graph']);
+	}
+
 	// load in any css from addons or themes so they can overwrite if wanted
 	template_css();
 
@@ -445,6 +452,24 @@ function template_html_below()
 
 	// load in any javascript that could be deferred to the end of the page
 	theme()->template_javascript(true);
+
+	// Schema microdata about the organization?
+	if (!empty($context['smd_site']))
+	{
+		echo '
+	<script type="application/ld+json">
+	', json_encode($context['smd_site'], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE), '
+	</script>';
+	}
+
+	// Schema microdata about the post?
+	if (!empty($context['smd_article']))
+	{
+		echo '
+	<script type="application/ld+json">
+	', json_encode($context['smd_article'], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE), '
+	</script>';
+	}
 
 	// Anything special to put out?
 	if (!empty($context['insert_after_template']))
