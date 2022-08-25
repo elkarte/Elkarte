@@ -24,6 +24,20 @@ use ElkArte\Cache\Cache;
  */
 class Emoji extends AbstractModel
 {
+	/** @var string ranges that emoji may be found, not all points in the range are emoji, this is
+	    used to check whether any char in the text is potentially in a unicode emoji range */
+	private const EMOJI_RANGES = '[\x{203C}-\x{3299}\x{1F004}-\x{1F251}\x{1F300}-\x{1FAF6}]';
+
+	/** @var string regex to find 4byte html as &#x1f937;‍️
+	    This is how 4byte characters are stored in the utf-8 db. */
+	private const POSSIBLE_HTML_EMOJI = '~(&#x[a-fA-F\d]{5,6};|&#\d{5,6};)~';
+
+	/** @var string regex to check if any none letter characters appear in the string */
+	private const POSSIBLE_EMOJI = '~([^\p{L}\x00-\x7F]+)~u';
+
+	/** @var string used to find :emoji: style codes */
+	private const EMOJI_NAME = '~(?:\s?|^|]|<br />|<br>)(:([-+\w]+):\s?)~i';
+
 	/** @var null|\ElkArte\Emoji holds the instance of this class */
 	private static $instance;
 
@@ -33,12 +47,8 @@ class Emoji extends AbstractModel
 	/** @var string[] Array of keys with known emoji names */
 	public $shortcode_replace = [];
 
-	/** @var string regex to check if any none letter characters appear */
-	public $possible_emoji = '~([^\p{L}\x00-\x7F]+)~u';
-
-	/** @var string regex to find html/mixed emoji as &#x1f937;‍♂️ or &#x1f937;&#x200d;&#x2642;&#xfe0f;
-	         This is needed due to the way they are stored in the db */
-	public $possible_html_emoji = '~((&#\d{3,6};|&#x[0-9a-fA-F]{3,6};)+([^\p{L}\x00-\x7F]+)?)~u';
+	/** @var string Supported emoji -> image regex */
+	public $emoji_regex = '';
 
 	/**
 	 * Emoji constructor.
@@ -79,11 +89,11 @@ class Emoji extends AbstractModel
 		// :emoji: must be at the start of a line, or have a leading space or be after a bbc ']' tag
 		if ($uni)
 		{
-			$string = preg_replace_callback('~(?:\s?|^|]|<br />|<br>)(:([-+\w]+):\s?)~i', [$emoji, 'emojiToUni'], $string);
+			$string = preg_replace_callback(self::EMOJI_NAME, [$emoji, 'emojiToUni'], $string);
 		}
 		else
 		{
-			$string = preg_replace_callback('~(?:\s?|^|]|<br />|<br>)(:([-+\w]+):\s?)~i', [$emoji, 'emojiToImage'], $string);
+			$string = preg_replace_callback(self::EMOJI_NAME, [$emoji, 'emojiToImage'], $string);
 
 			// Check for any embedded html / hex emoji
 			$string = $this->keyboardEmojiToImage($string);
@@ -104,7 +114,7 @@ class Emoji extends AbstractModel
 	{
 		// Quick sniff, was that you? I thought so !
 		if (strpos($string, ':') === false
-			&& !preg_match($this->possible_emoji, $string))
+			&& !preg_match(self::POSSIBLE_EMOJI, $string))
 		{
 			return $string;
 		}
@@ -152,22 +162,13 @@ class Emoji extends AbstractModel
 	 */
 	public function emojiFromHTML($string)
 	{
-		$result = preg_replace_callback($this->possible_html_emoji, function ($match) {
-			// See if we have an Emoji version of this HTML entity
-			$entity = html_entity_decode($match[0], ENT_NOQUOTES | ENT_SUBSTITUTE | ENT_HTML401, 'UTF-8');
-			$entity = $this->unicodeCharacterToNumber($entity);
-			$found = $this->findEmojiByCode($entity);
+		// If there are 4byte encoded values &#x1f123, change those back to utf8 characters
+		$count = 0;
+		$string = preg_replace_callback(self::POSSIBLE_HTML_EMOJI, static function ($match) {
+			return html_entity_decode($match[0], ENT_NOQUOTES | ENT_SUBSTITUTE | ENT_HTML401, 'UTF-8');
+		}, $string, -1, $count);
 
-			// Replace it with or emoji <img>
-			if ($found !== false)
-			{
-				return $this->emojiToImage([$match[0], ':' . $found . ':', $found]);
-			}
-
-			return $match[0];
-		}, $string);
-
-		return empty($result) ? $string : $result;
+		return $string;
 	}
 
 	/**
@@ -241,24 +242,25 @@ class Emoji extends AbstractModel
 	/**
 	 * Searches a string for unicode points and replaces them with emoji <img> tags
 	 *
-	 * Instead of searching in specific groups of emoji code points, such as:
-	 *  - flags -> (?:\x{1F3F4}[\x{E0060}-\x{E00FF}]{1,6})|[\x{1F1E0}-\x{1F1FF}]{2}
-	 *  - dingbats -> [\x{2700}-\x{27bf}]\x{FE0F}
-	 *  - emoticons -> [\x{1F000}-\x{1F6FF}\x{1F900}-\x{1F9FF}]\x{FE0F}?
-	 *  - symbols -> [\x{2600}-\x{26ff}]\x{FE0F}?
-	 *  - peeps -> (?:[\x{1F466}-\x{1F469}]+\x{FE0F}?[\x{1F3FB}-\x{1F3FF}]?)
-	 *
-	 * We instead use \p{S} which will match anything in the symbol area including
-	 * symbols, currency signs, dingbats, box-drawing characters, etc.  This is an
-	 * easier regex but with more "false" hits for what we want.  Array searching
-	 * should be faster than multiple detailed regex.
+	 * We instead use [^\p{L}\x00-\x7F]+ which will match any non letter character including
+	 * symbols, currency signs, dingbats, box-drawing characters, etc. This is an
+	 * easier regex but with more "false" hits for what we want.  If this passes then the
+	 * full emoji regex will be used to precisely find supported codepoints
 	 *
 	 * @param $string
 	 * @return string
 	 */
 	public function emojiFromUni($string)
 	{
-		$result = preg_replace_callback($this->possible_emoji, function ($match) {
+		$this->loadEmoji();
+
+		// Avoid the large regex if there is no emoji DNA
+		if (preg_match(self::POSSIBLE_EMOJI, $string) !== 1)
+		{
+			return $string;
+		}
+
+		$result = preg_replace_callback($this->emoji_regex, function ($match) {
 			$hex_str = $this->unicodeCharacterToNumber($match[0]);
 			$found = $this->findEmojiByCode($hex_str);
 
@@ -332,14 +334,17 @@ class Emoji extends AbstractModel
 	}
 
 	/**
-	 * Load the base emoji tags file and load to PHP array
+	 * Reads the base emoji tags file and load them to PHP array.
+	 *
+	 * Creates a regex to search text for known emoji sequences.  Uses generic search for
+	 * singleton emoji such as 1f600 as all multipoint ones would have already been found
+	 * and processed
 	 */
 	public function loadEmoji()
 	{
 		global $settings;
 
 		$this->_checkCache();
-
 		if (empty($this->shortcode_replace))
 		{
 			$emoji = file_get_contents($settings['default_theme_dir'] . '/scripts/emoji_tags.js');
@@ -349,11 +354,28 @@ class Emoji extends AbstractModel
 				$name = trim($match[1], "' ");
 				$key = trim($match[2], "' ");
 				$this->shortcode_replace[$name] = $key;
+
+				// Multipoint sequences use a unique regex to avoid collisions
+				if (strpos($key, '-') !== false)
+				{
+					$emoji_regex[] = '\x{' . implode('}\x{', explode('-', $key)) . '}';
+				}
 			}
+
+			call_integration_hook('integrate_custom_emoji', [&$this->shortcode_replace]);
+
+			// Longest to shortest to avoid any partial matches due to sequences
+			usort($emoji_regex, static function($a, $b) {
+				return strlen($b) <=> strlen($a);
+			});
+
+			// Build out the regex, append single point search at end.
+			$this->emoji_regex = '~' . implode('|', $emoji_regex) . '|' . self::EMOJI_RANGES . '~u';
+			unset($emoji_regex);
 
 			// Stash for an hour, not like this is going to change
 			Cache::instance()->put('shortcode_replace', $this->shortcode_replace, 3600);
-			call_integration_hook('integrate_custom_emoji', [&$this->shortcode_replace]);
+			Cache::instance()->put('emoji_regex', $this->emoji_regex, 3600);
 		}
 	}
 
@@ -364,15 +386,14 @@ class Emoji extends AbstractModel
 	 */
 	private function _checkCache()
 	{
-		if (!empty($this->shortcode_replace))
+		if (empty($this->shortcode_replace))
 		{
-			return;
+			Cache::instance()->getVar($this->shortcode_replace, 'shortcode_replace', 3600);
 		}
 
-		if (Cache::instance()->getVar($shortcode_replace, 'shortcode_replace', 480))
+		if (empty($this->emoji_regex))
 		{
-			$this->shortcode_replace = $shortcode_replace;
-			unset($shortcode_replace);
+			Cache::instance()->getVar($this->emoji_regex, 'emoji_regex', 3600);
 		}
 	}
 
