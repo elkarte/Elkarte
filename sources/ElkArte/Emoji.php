@@ -26,7 +26,7 @@ class Emoji extends AbstractModel
 {
 	/** @var string ranges that emoji may be found, not all points in the range are emoji, this is
 	    used to check whether any char in the text is potentially in a unicode emoji range */
-	private const EMOJI_RANGES = '[\x{203C}-\x{3299}\x{1F004}-\x{1F251}\x{1F300}-\x{1FAF6}]';
+	private const EMOJI_RANGES = '[\x{203C}-\x{3299}\x{1F004}-\x{1F251}\x{1F300}-\x{1FAF6}](?![\x{200d}\x{FE0F}])';
 
 	/** @var string regex to find 4byte html as &#x1f937;‍️
 	    This is how 4byte characters are stored in the utf-8 db. */
@@ -163,12 +163,16 @@ class Emoji extends AbstractModel
 	public function emojiFromHTML($string)
 	{
 		// If there are 4byte encoded values &#x1f123, change those back to utf8 characters
-		$count = 0;
-		$string = preg_replace_callback(self::POSSIBLE_HTML_EMOJI, static function ($match) {
-			return html_entity_decode($match[0], ENT_NOQUOTES | ENT_SUBSTITUTE | ENT_HTML401, 'UTF-8');
-		}, $string, -1, $count);
+		return preg_replace_callback(self::POSSIBLE_HTML_EMOJI, static function ($match) {
+			$replace = html_entity_decode($match[0], ENT_NOQUOTES | ENT_SUBSTITUTE | ENT_HTML401, 'UTF-8');
 
-		return $string;
+			// The Fitzpatrick Scale modifiers are not (well) supported across all graphics sets.  For now
+			// drop it, allowing it to display the generic/cartoon color.  IF not things would render as the
+			// individual images such as 🤷 🏻 ♂️ instead of just 🤷🏽‍
+			$replace = preg_replace('~[\x{1F3FB}-\x{1F3FF}]~u', '', $replace);
+
+			return $replace ?? $match[0];
+		}, $string);
 	}
 
 	/**
