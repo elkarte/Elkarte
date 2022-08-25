@@ -91,8 +91,10 @@ function detectServerCores()
  */
 function detectDiskUsage()
 {
-	$diskTotal = disk_total_space(strpos(PHP_OS_FAMILY, 'Win') !== 0 ? '/' : 'C:');
-	$diskFree = disk_free_space(strpos(PHP_OS_FAMILY, 'Win') !== 0 ? '/' : 'C:');
+	global $boarddir;
+
+	$diskTotal = disk_total_space($boarddir);
+	$diskFree = disk_free_space($boarddir);
 
 	if ($diskFree === false || $diskTotal === false)
 	{
