@@ -764,7 +764,7 @@ function memoryReturnBytes($val)
 
 	// Separate the number from the designator, if any
 	preg_match('~(\d+)(.*)~', $val, $val);
-	$num = intval($val[1]);
+	$num = (int) $val[1];
 	$last = strtolower(substr($val[2] ?? '', 0, 1));
 
 	// Convert to bytes
@@ -1994,7 +1994,7 @@ function featureEnabled($feature)
 		$context['admin_features'] = $features;
 	}
 
-	return in_array($feature, $features);
+	return in_array($feature, $features, true);
 }
 
 /**

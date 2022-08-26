@@ -448,7 +448,7 @@ function removeMembersFromGroups($members, $groups = null, $permissionCheckDone 
 	updatePostGroupStats($members);
 
 	// Do the log.
-	if (!empty($log_inserts) && !empty($modSettings['modlog_enabled']))
+	if (!empty($log_inserts) && featureEnabled('ml'))
 	{
 		foreach ($log_inserts as $extra)
 		{

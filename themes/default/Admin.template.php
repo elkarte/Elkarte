@@ -162,6 +162,13 @@ function template_credits()
 	// Display all the variables we have server information for.
 	foreach ($context['current_versions'] as $version)
 	{
+		if (isset($version['header']))
+		{
+			echo '
+								<h3><strong>' . $version['header'] . ':</strong></h3>';
+			continue;
+		}
+
 		echo '
 									', $version['title'], ':
 								<em>', $version['version'], '</em>';
@@ -257,13 +264,19 @@ function template_credits()
 	// This makes all the support information available to the support script...
 	echo '
 					<script>
-						var ourSupportVersions = {};
+						let ourSupportVersions = {};
 
 						ourSupportVersions.forum = "', $context['forum_version'], '";';
 
 	// Don't worry, none of this is logged, it's just used to give information that might be of use.
 	foreach ($context['current_versions'] as $variable => $version)
 	{
+		// Skip headers
+		if (empty($version['version']))
+		{
+			continue;
+		}
+
 		echo '
 						ourSupportVersions.', $variable, ' = "', $version['version'], '";';
 	}
@@ -548,7 +561,7 @@ function template_show_settings()
 			{
 				echo '
 					<dt></dt>
-					<dd', $config_var['type'] == 'warning' ? ' class="alert"' : '', (!empty($config_var['force_div_id']) ? ' id="' . $config_var['force_div_id'] . '_dd"' : ''), '>
+					<dd', $config_var['type'] === 'warning' ? ' class="alert"' : '', (!empty($config_var['force_div_id']) ? ' id="' . $config_var['force_div_id'] . '_dd"' : ''), '>
 						', $config_var['label'], '
 					</dd>';
 			}

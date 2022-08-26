@@ -11,12 +11,12 @@
 #groupForm, #mailqueue_stats, #manage_maintenance,
 #new_group, #view_group, #admin_form_wrapper, .action_admin .generic_list_wrapper {
 	border-color: var(--primary_border);
-	background: var(--content-background);
+	background: var(--content_background);
 	box-shadow: 0 -1px 1px var(--opacity20), 0 -2px 2px var(--opacity10);
 }
 
 #admin_content .content {
-	background: var(--content-background);
+	background: var(--content_background);
 	box-shadow: none;
 }
 
@@ -56,7 +56,7 @@
 	border-color: var(--primary_border);
 	border-top-color: var(--primary_border_top);
 	border-bottom-color: var(--primary_border_bottom);
-	background: var(--content-background);
+	background: var(--content_background);
 	box-shadow: 0 1px 1px var(--opacity30), 0 -1px 1px var(--opacity30)
 }
 
@@ -77,7 +77,7 @@
 }
 
 .quick_tasks {
-	background: var(--content-background);
+	background: var(--content_background);
 	box-shadow: none;
 }
 
@@ -96,7 +96,7 @@
 #find_code, #replace_code {
 	border-top-color: var(--secondary_border_top);
 	border-bottom-color: var(--secondary_border_bottom);
-	background: var(--content-background);
+	background: var(--content_background);
 }
 
 /* Styles for the D&D indicators
@@ -130,14 +130,14 @@
 #manage_boards li:nth-child(even) > li:nth-child(odd),
 #manage_boards li:nth-child(even) > li:nth-child(odd) > li:nth-child(even),
 #manage_boards li:nth-child(even) > li:nth-child(odd) > li:nth-child(even) > li:nth-child(odd) {
-	background: var(--primary_white_compliment);
+	background: var(--contrast_text_compliment);
 }
 
 #manage_boards li:nth-child(odd),
 #manage_boards li:nth-child(odd) > li:nth-child(even),
 #manage_boards li:nth-child(odd) > li:nth-child(even) > li:nth-child(odd),
 #manage_boards li:nth-child(odd) > li:nth-child(even) > li:nth-child(odd) > li:nth-child(even) {
-	background: var(--primary_white);
+	background: var(--contrast_text);
 }
 
 /* Styles for the manage maintenance section.
@@ -165,27 +165,27 @@
 }
 
 .perm_groups {
-	background-color: var(--content-background);
+	background-color: var(--content_background);
 }
 
 /* Styles for the moderation center.
 ------------------------------------------------- */
 #modcenter {
-	background: none repeat scroll 0 0 var(--content-background);
+	background: none repeat scroll 0 0 var(--content_background);
 	box-shadow: 1px 2px 3px var(--box_shadow);
 }
 
 #modcenter .content, #modcenter .generic_list_wrapper {
 	border-color: var(--primary_border);
 	border-bottom-color: var(--primary_border_bottom);
-	background: var(--content-background);
+	background: var(--content_background);
 }
 
 #mod_main_section .content {
 	border-color: var(--primary_border);
 	border-top-color: var(--primary_border_top);
 	border-bottom-color: var(--primary_border_bottom);
-	background: var(--content-background);
+	background: var(--content_background);
 	box-shadow: 0 2px 2px var(--opacity50), 0 -1px 2px var(--opacity10);
 }
 
@@ -209,7 +209,7 @@
 }
 
 .theme_options .content:nth-child(odd) {
-	background: var(--content-background)
+	background: var(--content_background)
 }
 
 #css_preview_box {
@@ -226,7 +226,7 @@
 }
 
 .ui-dialog .ui-dialog-titlebar {
-	background-color: var(--content-background);
+	background-color: var(--content_background);
 }
 
 .ui-widget-overlay {
@@ -237,7 +237,7 @@
 /* This is the drag/drop placeholder, normally not visible */
 .ui-state-highlight {
 	border-color: var(--pure_green) !important;
-	background-color: var(--content-background) !important;
+	background-color: var(--content_background) !important;
 }
 
 .sortable_smiley {

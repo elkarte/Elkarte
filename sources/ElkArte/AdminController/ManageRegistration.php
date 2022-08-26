@@ -1,8 +1,8 @@
 <?php
 
 /**
- * This file helps the administrator setting registration settings and policy
- * as well as allow the administrator to register new members themselves.
+ * This file allows the administrator to set registration and policy settings
+ * as well as allow them to register new members themselves.
  *
  * @package   ElkArte Forum
  * @copyright ElkArte Forum contributors
@@ -43,7 +43,7 @@ class ManageRegistration extends AbstractController
 {
 	/**
 	 * Entrance point for the registration center, it checks permissions and forwards
-	 * to the right method based on the subaction.
+	 * to the right method based on the sub-action.
 	 *
 	 * - Accessed by ?action=admin;area=regcenter.
 	 * - Requires either the moderate_forum or the admin_forum permission.
@@ -187,7 +187,7 @@ class ManageRegistration extends AbstractController
 			$reg_errors = ErrorContext::context('register', 0);
 			$memberID = registerMember($regOptions, 'register');
 
-			// If there are "important" errors and you are not an admin: log the first error
+			// If there are "important" errors, and you are not an admin: log the first error
 			// Otherwise grab all of them and don't log anything
 			$error_severity = $reg_errors->hasErrors(1) && !$this->user->is_admin ? 1 : null;
 			foreach ($reg_errors->prepareErrors($error_severity) as $error)

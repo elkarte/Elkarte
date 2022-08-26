@@ -1901,7 +1901,7 @@ function makeCustomFieldChanges($memID, $area, $sanitize = true)
 			array('variable', 'id_member')
 		);
 
-		if (!empty($log_changes) && !empty($modSettings['modlog_enabled']))
+		if (!empty($log_changes) && featureEnabled('ml') && !empty($modSettings['userlog_enabled']))
 		{
 			logActions($log_changes);
 		}

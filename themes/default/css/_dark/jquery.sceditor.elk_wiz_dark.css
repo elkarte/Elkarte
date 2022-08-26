@@ -3,13 +3,13 @@
 /* ------------------------------------------------------- */
 :root {
 	--body_text: #585858; /* Body text, text areas, editor, inputs, more */
-	--content-background: #FAFAFA; /* background for many divs, input controls, etc */
+	--content_background: #FAFAFA; /* background for many divs, input controls, etc */
 	--secondary_border: #AFAFAF; /* darker border */
 	--secondary_border_top: #CFCFCF; /* complimentary for hover effects */
 	--secondary_border_left: #BFBFBF; /* complimentary for hover effects */
 	--secondary_border_bottom: #BBBBBB;
-	--primary_white: #FEFEFE; /* Used in shadows, backgrounds or text, many places */
-	--primary_white_compliment: #E4E4E4; /* Used with --primary_white for gradients */
+	--contrast_text: #FEFEFE; /* Used in shadows, backgrounds or text, many places */
+	--contrast_text_compliment: #E4E4E4; /* Used with --contrast_text for gradients */
 	--box_shadow: #E4E4E4; /* Used on many box shadows */
 	--me: #5BA048; /* me and footnotes */
 }
@@ -86,7 +86,7 @@ code {
 	border: 1px solid var(--secondary_border);
 	border-top: 2px solid var(--secondary_border_top);
 	border-bottom: 3px solid var(--secondary_border_bottom);
-	background: var(--content-background);
+	background: var(--content_background);
 }
 
 blockquote {
@@ -94,7 +94,7 @@ blockquote {
 	margin: 0 0 1em 0;
 	padding: 6px 10px;
 	border: 1px solid var(--secondary_border);
-	background: var(--primary_white);
+	background: var(--contrast_text);
 	box-shadow: 2px 2px 2px var(--box_shadow);
 }
 
@@ -104,7 +104,7 @@ blockquote cite, code cite {
 	padding: 0 0 4px;
 	color: var(--body_text);
 	border-bottom: none;
-	background: var(--primary_white);
+	background: var(--contrast_text);
 }
 
 code cite {
@@ -118,12 +118,12 @@ code cite {
 /* Will correctly colour down to seventh level of nested quotes in editor. Can be extended easily enough. */
 body > blockquote, body > blockquote > blockquote, body > blockquote > blockquote > blockquote > blockquote,
 body > blockquote > blockquote > blockquote > blockquote > blockquote > blockquote {
-	background: var(--primary_white);
+	background: var(--contrast_text);
 }
 
 body > blockquote > blockquote > cite, body > blockquote > blockquote > blockquote > blockquote > cite,
 body > blockquote > blockquote > blockquote > blockquote > blockquote > blockquote > cite {
-	background: var(--primary_white);
+	background: var(--contrast_text);
 }
 
 blockquote cite a:link, blockquote cite a:visited {

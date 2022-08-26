@@ -568,7 +568,7 @@ em, .em {
 }
 
 /* Styles for subsection headers. */
-.secondary_header {
+.secondary_header, .content_category {
 	font-size: var(--font16);
 	line-height: 2;
 	margin-top: 0.4em;

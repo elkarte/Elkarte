@@ -1277,14 +1277,14 @@ class ManageMembers extends AbstractController
 				break;
 		}
 
-		// Log what we did?
-		if (!empty($modSettings['modlog_enabled']) && in_array($this->_req->post->todo, array('ok', 'okemail', 'require_activation', 'remind')))
+		// Log what we did? Core features Moderation Logging must be enabled
+		if (featureEnabled('ml') && in_array($this->_req->post->todo, ['ok', 'okemail', 'require_activation', 'remind']))
 		{
 			$log_action = $this->_req->post->todo === 'remind' ? 'remind_member' : 'approve_member';
 
 			foreach ($this->member_info as $member)
 			{
-				logAction($log_action, array('member' => $member['id']), 'admin');
+				logAction($log_action, ['member' => $member['id']], 'admin');
 			}
 		}
 

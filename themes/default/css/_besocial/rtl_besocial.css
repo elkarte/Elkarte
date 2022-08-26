@@ -56,12 +56,12 @@
 
 /* Styles for main headers. */
 .category_header, .forum_category .category_header {
-	text-shadow: -1px 1px 0 var(--primary_white_compliment);
+	text-shadow: -1px 1px 0 var(--contrast_text_compliment);
 }
 
 /* Styles for subsection headers */
 .secondary_header {
-	text-shadow: -1px 1px 0 var(--primary_white);
+	text-shadow: -1px 1px 0 var(--contrast_text);
 }
 
 /* More little boxes on a hillside. */
@@ -177,7 +177,7 @@ input[type="submit"]:hover, button[type="submit"]:hover, input[type="button"]:ho
  * -------------------------------------------------------
  */
 #forumtitle {
-	text-shadow: -1px 1px 2px var(--primary_white);
+	text-shadow: -1px 1px 2px var(--contrast_text);
 }
 
 /* -------------------------------------------------------
@@ -258,7 +258,7 @@ input[type="submit"]:hover, button[type="submit"]:hover, input[type="button"]:ho
 
 @media screen and (max-width: 33.750em) {
 	.topic_listing > li {
-		box-shadow: -3px 3px 6px var(--primary_white_compliment);
+		box-shadow: -3px 3px 6px var(--contrast_text_compliment);
 	}
 
 	.forumposts .windowbg, .forumposts .windowbg2 {

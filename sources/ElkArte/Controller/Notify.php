@@ -550,7 +550,7 @@ class Notify extends AbstractController
 		// Token was passed and matches our expected pattern
 		$token = $this->_req->getQuery('token', 'trim', '');
 		$token = urldecode($token);
-		if (empty($token) || preg_match('~^(\d+_[a-zA-Z0-9./]{53}_.*)$~', $token, $match) !== 1)
+		if (empty($token) || preg_match('~^(\d+_[a-zA-Z0-9./]{32,44}_[^)]*)~m', $token, $match) !== 1)
 		{
 			return false;
 		}
@@ -574,13 +574,13 @@ class Notify extends AbstractController
 		list ($id_member, $hash, $area, $extra, $time) = explode('_', $match[1]);
 
 		// The area is a known one
-		if (!in_array($area, $potentialAreas))
+		if (!in_array($area, $potentialAreas, true))
 		{
 			return false;
 		}
 
 		// Not so old, 2 weeks is plenty
-		if (time() - $time > 60 * 60 * 24 * 14)
+		if (time() - $time > (60 * 60 * 24 * 14))
 		{
 			return false;
 		}

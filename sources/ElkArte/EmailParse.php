@@ -113,6 +113,9 @@ class EmailParse
 	    Accessible as [$field]['type'] and [$field]['value'] */
 	public $_dsn;
 
+	/** @var array Wrapped multipart/mixed sections */
+	public $plain_parts = [];
+
 	/** @var string Holds the current email address, to, from, cc */
 	private $_email_address;
 
@@ -183,6 +186,21 @@ class EmailParse
 		{
 			$this->raw_message = file_get_contents('php://stdin');
 		}
+	}
+
+	/**
+	 * Compile, if available, the plain text sections into a single string
+	 *
+	 * @return string
+	 */
+	public function getPlainBody()
+	{
+		if (!empty($this->plain_parts))
+		{
+			return implode("\n", $this->plain_parts);
+		}
+
+		return $this->plain_body;
 	}
 
 	/**
@@ -697,7 +715,7 @@ class EmailParse
 						elseif ($this->_boundary_section[$i]->headers['content-type'] === 'text/plain'
 							&& $this->_boundary_section[$i]->headers['content-disposition'] !== 'attachment')
 						{
-								$text_ids[] = $i;
+							$text_ids[] = $i;
 						}
 						// Message is a DSN (Delivery Status Notification)
 						elseif ($this->_boundary_section[$i]->headers['content-type'] === 'message/delivery-status')
@@ -825,6 +843,16 @@ class EmailParse
 			$this->_boundary_section[$this->_boundary_section_count]['attachments'] = $boundary_section->attachments;
 			$this->_boundary_section[$this->_boundary_section_count]['inline_files'] = $boundary_section->inline_files;
 			$this->_boundary_section[$this->_boundary_section_count] = (object) $this->_boundary_section[$this->_boundary_section_count];
+
+			// Is this boundary section is part of an outer boundary section
+			if (!empty($boundary_section->plain_body
+				&& $this->headers["content-type"] === "multipart/mixed"
+				&& $this->headers['content-disposition'] !== 'attachment')
+				&& $this->_boundary_section[$this->_boundary_section_count]->headers['content-disposition'] !== 'attachment')
+			{
+				$this->plain_parts[] = $boundary_section->plain_body;
+			}
+
 			$this->_boundary_section_count++;
 
 			unset($boundary_section);

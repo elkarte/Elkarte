@@ -39,8 +39,8 @@ class EmojiIntegrate
 		// $hook, $function, $file
 		return [
 			[
-				'integrate_pre_bbc_parser',
-				'\\ElkArte\\EmojiIntegrate::integrate_pre_bbc_parser'
+				'integrate_pre_bbc_parser_loop',
+				'\\ElkArte\\EmojiIntegrate::integrate_pre_bbc_parser_loop'
 			],
 			[
 				'integrate_editor_plugins',
@@ -79,9 +79,8 @@ class EmojiIntegrate
 	 * - searches message for emoji :smile: tags and converts to svg image
 	 *
 	 * @param string $message
-	 * @param array $parse_tags
 	 */
-	public static function integrate_pre_bbc_parser(&$message, &$parse_tags)
+	public static function integrate_pre_bbc_parser_loop(&$message)
 	{
 		$req = HttpReq::instance();
 		$sa = $req->getQuery('sa', 'trim');

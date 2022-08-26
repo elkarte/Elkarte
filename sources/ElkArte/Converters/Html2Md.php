@@ -328,7 +328,7 @@ class Html2Md extends AbstractDomParser
 		}
 		else
 		{
-			$markdown = '[' . $value . '](' . $href . ')';
+			$markdown = '[' . ($value === $txt['link'] ? 'X' : $value) . ']('  . $href . ' "' . $txt['link'] . '")';
 		}
 
 		$this->_setBodyWidth($markdown, $this->getBuffer($node));

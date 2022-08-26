@@ -174,6 +174,9 @@ class BBCParser
 			$this->message = $this->markdown_parser->inlineCodeTags($this->message);
 		}
 
+		// Allow addons access before entering the main parse loop
+		call_integration_hook('integrate_pre_bbc_parser_loop', array(&$this->message, &$this->bbc));
+
 		// This handles pretty much all the parsing. It is a separate method, so it is easier to override and profile.
 		$this->parse_loop();
 

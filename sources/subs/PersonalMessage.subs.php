@@ -952,6 +952,13 @@ function sendpm($recipients, $subject, $message, $store_outbox = true, $from = n
 		if ($maillist)
 		{
 			$sender_details = query_sender_wrapper($from['id']);
+
+			// @todo guest contact us is routing through here
+			if (empty($sender_details))
+			{
+				continue;
+			}
+
 			$from_wrapper = !empty($modSettings['maillist_mail_from']) ? $modSettings['maillist_mail_from'] : (empty($modSettings['maillist_sitename_address']) ? $webmaster_email : $modSettings['maillist_sitename_address']);
 
 			// Add in the signature

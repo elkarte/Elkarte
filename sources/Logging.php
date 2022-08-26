@@ -37,10 +37,11 @@ function writeLog($force = false)
 		// Don't update for every page - this isn't wholly accurate but who cares.
 		if ($topic)
 		{
-			if (isset($_SESSION['last_topic_id']) && $_SESSION['last_topic_id'] == $topic)
+			if (isset($_SESSION['last_topic_id']) && $_SESSION['last_topic_id'] === $topic)
 			{
 				$force = false;
 			}
+
 			$_SESSION['last_topic_id'] = $topic;
 		}
 	}
@@ -273,13 +274,13 @@ function logAction($action, $extra = array(), $log_type = 'moderate')
 {
 	// Set up the array and pass through to logActions
 	return logActions(array(
-						array(
-								'action' => $action,
-								'log_type' => $log_type,
-								'extra' => $extra,
-							)
-						)
-					);
+		array(
+			'action' => $action,
+			'log_type' => $log_type,
+			'extra' => $extra,
+			)
+		)
+	);
 }
 
 /**
@@ -302,26 +303,27 @@ function logActions($logs)
 {
 	global $modSettings;
 
-	$inserts = array();
-	$log_types = array(
+	$inserts = [];
+	$log_types = [
 		'moderate' => 1,
 		'user' => 2,
 		'admin' => 3,
-	);
+	];
 
-	call_integration_hook('integrate_log_types', array(&$log_types));
-
-	// No point in doing anything, if the log isn't even enabled.
-	if (empty($modSettings['modlog_enabled']))
-	{
-		return false;
-	}
+	call_integration_hook('integrate_log_types', [&$log_types]);
 
 	foreach ($logs as $log)
 	{
 		if (!isset($log_types[$log['log_type']]))
 		{
-			return false;
+			continue;
+		}
+
+		// Not if the log is off
+		if (($log['log_type'] === 'moderate' && empty($modSettings['modlog_enabled']))
+			|| ($log['log_type'] === 'user' && empty($modSettings['userlog_enabled'])))
+		{
+			continue;
 		}
 
 		// Do we have something to log here, after all?
@@ -360,7 +362,6 @@ function logActions($logs)
 			$msg_id = 0;
 		}
 
-		// @todo cache this?
 		// Is there an associated report on this?
 		if (in_array($log['action'], array('move', 'remove', 'split', 'merge')))
 		{
@@ -415,7 +416,12 @@ function logActions($logs)
 		);
 	}
 
-	require_once(SUBSDIR . '/Logging.subs.php');
+	if (!empty($inserts))
+	{
+		require_once(SUBSDIR . '/Logging.subs.php');
 
-	return insertLogActions($inserts);
+		return insertLogActions($inserts);
+	}
+
+	return 0;
 }

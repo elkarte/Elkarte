@@ -63,16 +63,66 @@ function detectServerLoad()
  */
 function detectServerCores()
 {
-	$cores = @file_get_contents('/proc/cpuinfo');
+	if (strpos(PHP_OS_FAMILY, 'Win') === 0)
+	{
+		$cores = getenv("NUMBER_OF_PROCESSORS") + 0;
 
+		return $cores ?? 1;
+	}
+
+	$cores = @file_get_contents('/proc/cpuinfo');
 	if (!empty($cores))
 	{
-		$cores = preg_match_all('~^physical id~m', $cores, $matches);
+		$cores = preg_match_all('~^physical id~m', $cores);
 		if (!empty($cores))
 		{
-			return (int) $cores;
+			return $cores;
 		}
 	}
 
 	return 1;
+}
+
+/**
+ * Return the total disk used and remaining free space.  Returns array as
+ * 10.34MB, 110MB (used, free)
+ *
+ * @return bool|array
+ */
+function detectDiskUsage()
+{
+	global $boarddir;
+
+	$diskTotal = disk_total_space($boarddir);
+	$diskFree = disk_free_space($boarddir);
+
+	if ($diskFree === false || $diskTotal === false)
+	{
+		return false;
+	}
+
+	return [thousands_format($diskTotal - $diskFree), thousands_format($diskFree)];
+}
+
+/**
+ * Determine the number of days the server has been running since last reboot. *nix only
+ *
+ * @return bool|int
+ */
+function detectUpTime()
+{
+	if (strpos(PHP_OS_FAMILY, 'Win') === 0)
+	{
+		return false;
+	}
+
+	$upTime = trim(@file_get_contents('/proc/uptime'));
+	if (!empty($upTime))
+	{
+		$upTime = (int) preg_replace('~\.\d+~', '', $upTime);
+
+		return floor($upTime / 86400);
+	}
+
+	return 0;
 }

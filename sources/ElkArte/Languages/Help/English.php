@@ -273,7 +273,7 @@ $helptxt['cache_cachedir'] = 'This setting is only for the filesystem based cach
 $helptxt['enableErrorLogging'] = 'This will log any errors, like a failed login, so you can see what went wrong.';
 $helptxt['enableErrorQueryLogging'] = 'This will include the full query sent to the database in the error log.  Requires error logging to be turned on.<br /><br /><strong>Note:  This will affect the ability to filter the error log by the error message.</strong>';
 $helptxt['allow_disableAnnounce'] = 'This will allow users to opt out of notification of topics you announce by checking the &quot;announce topic&quot; checkbox when posting.';
-$helptxt['metadata_enabled'] = 'This will provide OG (Open Graph) and Schema.org microdata to allow themes, that support it, to embed into the HTML.  It allows search engines to better understand the information on your site pages, and provides for a better link sharing experience on social sites.  Data is made available to the board listing, topic listing and topic display views.';
+$helptxt['metadata_enabled'] = 'This will create OG (Open Graph) and Schema.org microdata suitable for HTML embedding (requires theme support).  It allows search engines to better understand the information on your site pages, and provides for a better link sharing experience on social sites.  When enabled, metadata will made available for the board listing, topic listing and topic display areas of your site.';
 $helptxt['disallow_sendBody'] = 'This option removes the possibility to receive the text of replies, posts and personal messages in notification emails.<br /><br />Often, members will reply to the notification email, which in most cases means the webmaster receives the reply.';
 $helptxt['enable_contactform'] = 'This option adds a contact us button to the registration screen';
 $helptxt['jquery_source'] = 'This will determine the source used to load the jQuery Library.  Auto will use the CDN first and if not available fall back to the local source.  Local will only use the local source, CDN will only load it from Google\'s Content Delivery Network';
@@ -459,6 +459,7 @@ $helptxt['pm_posts_per_hour'] = 'This will limit the number of personal messages
 $helptxt['default_personal_text'] = 'Sets the default text a new user will have as their &quot;personal text.&quot; This option is not available when personal text is disabled, or when users can set their personal text on registration for themselves.';
 
 $helptxt['modlog_enabled'] = 'Logs all moderation actions.';
+$helptxt['userlog_enabled'] = 'Logs all key changes a user makes to their profile.';
 
 $helptxt['registration_method'] = 'This option determines what method of registration is used for people wishing to join your forum. You can select from:<br /><br />
 	<ul class="normallist">

@@ -72,7 +72,7 @@ class TokenHash
 		$this->_salt = $salt;
 		$this->_gen_salt();
 
-		// A random lenght character password to hash
+		// A random length character password to hash
 		$password = bin2hex($this->get_random_bytes(mt_rand(10, 25)));
 
 		// Hash away, crypt allows us a full a-Z 0-9 set

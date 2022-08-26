@@ -263,7 +263,7 @@ function loadDefaultMenuButtons()
 						'modlog' => array(
 							'title' => $txt['modlog_view'],
 							'href' => $scripturl . '?action=moderate;area=modlog',
-							'show' => !empty($modSettings['modlog_enabled']) && !empty(User::$info->mod_cache) && User::$info->mod_cache['bq'] != '0=1',
+							'show' => featureEnabled('ml') && !empty($modSettings['modlog_enabled']) && !empty(User::$info->mod_cache) && User::$info->mod_cache['bq'] != '0=1',
 						),
 						'attachments' => array(
 							'title' => $txt['mc_unapproved_attachments'],
@@ -306,7 +306,7 @@ function loadDefaultMenuButtons()
 				'modlog' => array(
 					'title' => $txt['modlog_view'],
 					'href' => $scripturl . '?action=moderate;area=modlog',
-					'show' => !empty($modSettings['modlog_enabled']) && !empty(User::$info->mod_cache) && User::$info->mod_cache['bq'] != '0=1',
+					'show' => featureEnabled('ml') && !empty($modSettings['modlog_enabled']) && !empty(User::$info->mod_cache) && User::$info->mod_cache['bq'] != '0=1',
 				),
 				'attachments' => array(
 					'title' => $txt['mc_unapproved_attachments'],

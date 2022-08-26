@@ -52,12 +52,12 @@ class TestHTML2Md extends TestCase
 			array(
 				'Named links',
 				'<a href="https://www.elkarte.net/" class="bbc_link" target="_blank">ElkArte</a>',
-				'[ElkArte](https://www.elkarte.net/)',
+				'[ElkArte](https://www.elkarte.net/ "Link")',
 			),
 			array(
 				'URL link',
 				'<a href="https://www.elkarte.net/" class="bbc_link" target="_blank">https://www.elkarte.net/</a>',
-				'[Link](https://www.elkarte.net/)',
+				'[X](https://www.elkarte.net/ "Link")',
 			),
 			array(
 				'Lists',

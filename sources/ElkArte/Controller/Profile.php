@@ -281,7 +281,7 @@ class Profile extends AbstractController
 						'subsections' => array(
 							'activity' => array($txt['trackActivity'], 'moderate_forum'),
 							'ip' => array($txt['trackIP'], 'moderate_forum'),
-							'edits' => array($txt['trackEdits'], 'moderate_forum'),
+							'edits' => array($txt['trackEdits'], 'moderate_forum', 'enabled' => featureEnabled('ml') && !empty($modSettings['userlog_enabled'])),
 							'logins' => array($txt['trackLogins'], array('profile_view_own', 'moderate_forum')),
 						),
 						'permission' => array(
@@ -712,19 +712,19 @@ class Profile extends AbstractController
 				}
 
 				// Anything worth logging?
-				if (!empty($context['log_changes']) && !empty($modSettings['modlog_enabled']))
+				if (!empty($context['log_changes']) && !empty($modSettings['userlog_enabled']) && featureEnabled('ml'))
 				{
-					$log_changes = array();
+					$log_changes = [];
 					foreach ($context['log_changes'] as $k => $v)
 					{
-						$log_changes[] = array(
+						$log_changes[] = [
 							'action' => $k,
 							'log_type' => 'user',
-							'extra' => array_merge($v, array(
+							'extra' => array_merge($v, [
 								'applicator' => $this->user->id,
 								'member_affected' => $this->_memID,
-							)),
-						);
+							]),
+						];
 					}
 
 					logActions($log_changes);

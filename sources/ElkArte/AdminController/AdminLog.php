@@ -39,20 +39,21 @@ class AdminLog extends AbstractController
 	 */
 	public function action_index()
 	{
-		global $context, $txt;
+		global $context, $txt, $modSettings;
 
 		// These are the logs they can load.
 		$subActions = array(
 			'errorlog' => array(
 				'function' => 'action_index',
 				'controller' => '\\ElkArte\\AdminController\\ManageErrors'),
+				'disabled' => empty($modSettings['enableErrorLogging']),
 			'adminlog' => array(
 				'function' => 'action_log',
 				'controller' => '\\ElkArte\\AdminController\\Modlog'),
 			'modlog' => array(
 				'function' => 'action_log',
 				'controller' => '\\ElkArte\\AdminController\\Modlog',
-				'disabled' => featureEnabled('ml') === false),
+				'disabled' => !featureEnabled('ml') || empty($modSettings['modlog_enabled'])),
 			'banlog' => array(
 				'function' => 'action_log',
 				'controller' => '\\ElkArte\\AdminController\\ManageBans'),
@@ -75,12 +76,14 @@ class AdminLog extends AbstractController
 				'errorlog' => array(
 					'url' => getUrl('admin', ['action' => 'admin', 'area' => 'logs', 'sa' => 'errorlog', 'desc']),
 					'description' => sprintf($txt['errlog_desc'], $txt['remove']),
+					'disabled' => empty($modSettings['enableErrorLogging']),
 				),
 				'adminlog' => array(
 					'description' => $txt['admin_log_desc'],
 				),
 				'modlog' => array(
 					'description' => $txt['moderation_log_desc'],
+					'disabled' => !featureEnabled('ml') || empty($modSettings['modlog_enabled']),
 				),
 				'banlog' => array(
 					'description' => $txt['ban_log_description'],
@@ -129,7 +132,7 @@ class AdminLog extends AbstractController
 		// Make sure we understand what's going on.
 		Txt::load('ManageSettings');
 
-		$context['page_title'] = $txt['pruning_title'];
+		$context['page_title'] = $txt['log_settings'];
 
 		$settingsForm = new SettingsForm(SettingsForm::DB_ADAPTER);
 
@@ -144,22 +147,29 @@ class AdminLog extends AbstractController
 		{
 			checkSession();
 
-			$savevar = array(
-				array('text', 'pruningOptions')
-			);
+			$savevar = [
+				['check', 'enableErrorLogging'],
+				['check', 'enableErrorQueryLogging'],
+				['check', 'modlog_enabled'],
+				['check', 'userlog_enabled'],
+				['text', 'pruningOptions']
+			];
 
+			// If pruning is enabled, compile all pruneXYZlog options into a CSV string, yes
+			// this is really this badly thought out.
 			if (!empty($this->_req->post->pruningOptions))
 			{
-				$vals = array();
-				foreach ($config_vars as $index => $dummy)
+				$vals = [];
+				foreach ($config_vars as $index => $config_value)
 				{
-					if (!is_array($dummy) || $index === 'pruningOptions')
+					if (!is_array($config_value) || $index === 'pruningOptions' || strpos($config_value[1], 'prune') !== 0)
 					{
 						continue;
 					}
 
-					$vals[] = empty($this->_req->post->{$dummy[1]}) || $this->_req->post->{$dummy[1]} < 0 ? 0 : $this->_req->getPost($dummy[1], 'intval');
+					$vals[] = empty($this->_req->post->{$config_value[1]}) || $this->_req->post->{$config_value[1]} < 0 ? 0 : $this->_req->getPost($config_value[1], 'intval');
 				}
+
 				$_POST['pruningOptions'] = implode(',', $vals);
 			}
 			else
@@ -174,7 +184,7 @@ class AdminLog extends AbstractController
 		}
 
 		$context['post_url'] = getUrl('admin', ['action' => 'admin', 'area' => 'logs', 'sa' => 'pruning', 'save']);
-		$context['settings_title'] = $txt['pruning_title'];
+		$context['settings_title'] = $txt['log_settings'];
 		$context['sub_template'] = 'show_settings';
 
 		// Get the actual values
@@ -197,20 +207,31 @@ class AdminLog extends AbstractController
 	{
 		global $txt;
 
-		return array(
+		return [
+			// See all the mistakes the developers make
+			['check', 'enableErrorLogging'],
+			['check', 'enableErrorQueryLogging'],
+			// Moderation logging is a Core feature, it enables Admin, Moderation and Profile Edit logging.  This
+			// allows some fine-tuning of that features, e.g. only allow admin logging
+			featureEnabled('ml') ?
+			['check', 'modlog_enabled'] : '',
+			featureEnabled('ml') ?
+			['check', 'userlog_enabled'] : '',
 			// Even do the pruning?
-			// The array indexes are there so we can remove/change them before saving.
-			'pruningOptions' => array('check', 'pruningOptions'),
+			['title', 'pruning_title', 'force_div_id' => 'pruning_title'],
+			// The array indexes are here so, we can remove/change them before saving.
+			'pruningOptions' => ['check', 'pruningOptions'],
 			'',
 			// Various logs that could be pruned.
-			array('int', 'pruneErrorLog', 'postinput' => $txt['days_word'], 'subtext' => $txt['zero_to_disable']), // Error log.
-			array('int', 'pruneModLog', 'postinput' => $txt['days_word'], 'subtext' => $txt['zero_to_disable']), // Moderation log.
-			array('int', 'pruneBanLog', 'postinput' => $txt['days_word'], 'subtext' => $txt['zero_to_disable']), // Ban hit log.
-			array('int', 'pruneReportLog', 'postinput' => $txt['days_word'], 'subtext' => $txt['zero_to_disable']), // Report to moderator log.
-			array('int', 'pruneScheduledTaskLog', 'postinput' => $txt['days_word'], 'subtext' => $txt['zero_to_disable']), // Log of the scheduled tasks and how long they ran.
-			array('int', 'pruneSpiderHitLog', 'postinput' => $txt['days_word'], 'subtext' => $txt['zero_to_disable']), // Log of the scheduled tasks and how long they ran.
-			// If you add any additional logs make sure to add them after this point.  Additionally, make sure you add them to the weekly scheduled task.
-		);
+			['int', 'pruneErrorLog', 'postinput' => $txt['days_word'], 'subtext' => $txt['zero_to_disable']], // Error log.
+			['int', 'pruneModLog', 'postinput' => $txt['days_word'], 'subtext' => $txt['zero_to_disable']], // Moderation log.
+			['int', 'pruneBanLog', 'postinput' => $txt['days_word'], 'subtext' => $txt['zero_to_disable']], // Ban hit log.
+			['int', 'pruneReportLog', 'postinput' => $txt['days_word'], 'subtext' => $txt['zero_to_disable']], // Report to moderator log.
+			['int', 'pruneScheduledTaskLog', 'postinput' => $txt['days_word'], 'subtext' => $txt['zero_to_disable']], // Log of the scheduled tasks and how long they ran.
+			['int', 'pruneSpiderHitLog', 'postinput' => $txt['days_word'], 'subtext' => $txt['zero_to_disable']], // Log of the scheduled tasks and how long they ran.
+			// If you add any additional logs make sure to add them after this point.  Additionally, make sure you
+			// add them to the weekly scheduled task.
+		];
 	}
 
 	/**

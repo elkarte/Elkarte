@@ -662,13 +662,14 @@ class Attachment extends AbstractController
 				$file_hash = $attachment['file_hash'];
 				$file_ext = $attachment['fileext'];
 				$id_attach = $attachment['id_attach'];
-				$attachment_type = $attachment['attachment_type'];
+				$attachment_type = (int) $attachment['attachment_type'];
 				$mime_type = $attachment['mime_type'];
 				$is_approved = $attachment['approved'];
-				$id_member = $attachment['id_member'];
+				$id_member = (int) $attachment['id_member'];
 
 				// If it isn't yet approved, do they have permission to view it?
-				if (!$is_approved && ($id_member == 0 || $this->user->id !== $id_member) && ($attachment_type == 0 || $attachment_type == 3))
+				if (!$is_approved && ($id_member === 0 || $this->user->id !== $id_member)
+					&& ($attachment_type === 0 || $attachment_type === 3))
 				{
 					isAllowedTo('approve_posts');
 				}
@@ -702,7 +703,7 @@ class Attachment extends AbstractController
 			// Create a thumbnail image
 			$image = new Image($filename);
 
-			$filename = $filename . '_thumb';
+			$filename .= '_thumb';
 			$image->createThumbnail(100, 100, $filename, null,false);
 		}
 

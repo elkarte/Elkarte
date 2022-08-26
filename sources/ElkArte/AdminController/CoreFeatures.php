@@ -209,6 +209,7 @@ class CoreFeatures extends AbstractController
 				'url' => getUrl('admin', ['action' => 'admin', 'area' => 'logs', 'sa' => 'modlog', '{session_data}']),
 				'settings' => array(
 					'modlog_enabled' => 1,
+					'userlog_enabled' => 1,
 				),
 			),
 			// pe = post email

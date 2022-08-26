@@ -32,27 +32,23 @@ use ElkArte\Util;
 
 /**
  * It registers new members, and it allows the administrator moderate member registration
- *
- * is_activated value key is as follows, for reference again:
- * - > 10 Banned with activation status as value - 10
- * - 5 = Awaiting COPPA consent
- * - 4 = Awaiting Deletion approval
- * - 3 = Awaiting Admin approval
- * - 2 = Awaiting reactivation from email change
- * - 1 = Approved and active
- * - 0 = Not active
  */
 class Register extends AbstractController
 {
-	/**
-	 * Holds the results of a findUser() request
-	 *
-	 * @var array
-	 */
+	/** @var int is_activated value key is as follows */
+	private const STATUS_NOT_ACTIVE = 0;
+	private const STATUS_APPROVED_AND_ACTIVE = 1;
+	private const STATUS_AWAITING_REACTIVATION = 2;
+	private const STATUS_AWAITING_ADMIN = 3;
+	private const STATUS_AWAITING_DELETION = 4;
+	private const STATUS_AWAITING_COPPA  = 5;
+	private const STATUS_BANNED = 10;
+
+	/** @var array Holds the results of a findUser() request */
 	private $_row;
 
 	/**
-	 * {@inheritdoc }
+	 * {@inheritdoc}
 	 */
 	public function trackStats($action = '')
 	{
@@ -72,7 +68,7 @@ class Register extends AbstractController
 		global $modSettings;
 
 		// Check if the administrator has it disabled.
-		if (!empty($modSettings['registration_method']) && $modSettings['registration_method'] == '3')
+		if (!empty($modSettings['registration_method']) && (int) $modSettings['registration_method'] === 3)
 		{
 			throw new Exception('registration_disabled', false);
 		}
@@ -87,7 +83,7 @@ class Register extends AbstractController
 	 */
 	public function action_index()
 	{
-		// Add an subaction array to act accordingly
+		// Add the sub-action array to dispatch accordingly
 		$subActions = array(
 			'register' => array($this, 'action_register'),
 			'register2' => array($this, 'action_register2'),
@@ -124,7 +120,7 @@ class Register extends AbstractController
 		global $txt, $context, $modSettings, $scripturl;
 
 		// If this user is an admin - redirect them to the admin registration page.
-		if (allowedTo('moderate_forum') && $this->user->is_guest === false)
+		if ($this->user->is_guest === false && allowedTo('moderate_forum'))
 		{
 			redirectexit('action=admin;area=regcenter;sa=register');
 		}
@@ -769,7 +765,7 @@ class Register extends AbstractController
 				}
 			}
 
-			// No selected, or not found, use the site default
+			// Not selected, or not found, use the site default
 			$selectedLanguage = empty($_SESSION['language']) ? $language : $_SESSION['language'];
 
 			// Try to find our selected language.
@@ -943,8 +939,8 @@ class Register extends AbstractController
 		global $modSettings, $txt;
 
 		if (isset($this->_req->post->new_email, $this->_req->post->passwd)
-			&& validateLoginPassword($this->_req->post->passwd, $this->_row['passwd'], $this->_row['member_name'], true)
-			&& ($this->_row['is_activated'] == 0 || $this->_row['is_activated'] == 2))
+			&& ($this->_row['is_activated'] === self::STATUS_NOT_ACTIVE || $this->_row['is_activated'] === self::STATUS_AWAITING_REACTIVATION)
+			&& validateLoginPassword($this->_req->post->passwd, $this->_row['passwd'], $this->_row['member_name'], true))
 		{
 			if (empty($modSettings['registration_method']) || $modSettings['registration_method'] == 3)
 			{
@@ -994,7 +990,7 @@ class Register extends AbstractController
 		global $scripturl, $modSettings, $language, $txt, $context;
 
 		if (isset($this->_req->query->resend)
-			&& ($this->_row['is_activated'] == 0 || $this->_row['is_activated'] == 2)
+			&& ($this->_row['is_activated'] === self::STATUS_NOT_ACTIVE || $this->_row['is_activated'] === self::STATUS_AWAITING_REACTIVATION)
 			&& $this->_req->getPost('code', 'trim', '') === '')
 		{
 			require_once(SUBSDIR . '/Mail.subs.php');
@@ -1045,7 +1041,7 @@ class Register extends AbstractController
 
 		if ($code !== $this->_row['validation_code'])
 		{
-			if (!empty($this->_row['is_activated']) && $this->_row['is_activated'] == 1)
+			if (!empty($this->_row['is_activated']) && $this->_row['is_activated'] === self::STATUS_APPROVED_AND_ACTIVE)
 			{
 				throw new Exception('already_activated', false);
 			}
@@ -1088,7 +1084,7 @@ class Register extends AbstractController
 		$member = getBasicMemberData((int) $this->_req->query->member, array('authentication' => true));
 
 		// If doesn't exist or not pending coppa
-		if (empty($member) || $member['is_activated'] != 5)
+		if (empty($member) || (int) $member['is_activated'] !== self::STATUS_AWAITING_COPPA)
 		{
 			throw new Exception('no_access', false);
 		}
