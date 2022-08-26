@@ -49,3 +49,4 @@ $txt['setting_rlikemsg'] = 'Removed likes';
 $txt['setting_mentionmem'] = '@mentions';
 $txt['setting_quotedmem'] = 'Quoting';
 $txt['setting_mailfail'] = 'Delivery Failures';
+$txt['setting_watchedtopic'] = 'Watched Topics';
