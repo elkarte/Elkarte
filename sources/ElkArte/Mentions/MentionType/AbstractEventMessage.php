@@ -57,7 +57,7 @@ abstract class AbstractEventMessage implements EventInterface
 	}
 
 	/**
-	 * {@inheritdoc }
+	 * {@inheritdoc}
 	 */
 	public static function getModules($modules)
 	{

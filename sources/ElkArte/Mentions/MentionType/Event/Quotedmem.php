@@ -23,7 +23,7 @@ use ElkArte\Notifications\NotificationsTask;
 /**
  * Class Quotedmem
  *
- * Handles mentioning of members whose messages has been quoted
+ * Handles mentioning of members whose messages have been quoted
  */
 class Quotedmem extends AbstractEventBoardAccess
 {

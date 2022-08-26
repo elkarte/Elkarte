@@ -756,7 +756,7 @@ class Post extends AbstractController
 				}
 			}
 
-			// If there are previous posts, allow them to QQ them
+			// If there are previous posts, enable QQ for them
 			if (count($context['previous_posts']) > 0)
 			{
 				loadJavascriptFile('quickQuote.js', ['defer' => true]);
