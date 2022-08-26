@@ -19,9 +19,11 @@ html, body {
 	font-weight: 400;
 	line-height: 1.5;
 	overflow: auto;
+	margin: 0;
+	padding: 0;
 }
 
-html, body, p, code::before, table {
+p, code::before, table {
 	margin: 0;
 	padding: 0;
 	color: var(--body_text);
