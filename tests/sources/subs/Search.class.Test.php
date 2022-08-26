@@ -29,6 +29,8 @@ class TestSearchclass extends TestCase
 	{
 		// This is here to cheat with allowedTo
 		User::$info = new ValuesContainer([
+			'id' => 1,
+			'ip' => long2ip(rand(0, 2147483647)),
 			'is_admin' => true,
 			'is_guest' => false,
 			'possibly_robot' => false,
