@@ -2184,9 +2184,9 @@ button[type="submit"].quick_quote_button.hide {
 	float: right;
 	overflow: auto;
 	width: 55%;
-	min-height: 2em;
+	min-height: 2.5em;
 	margin: 0 0 3px 0;
-	padding: 0 0 0 .12em;
+	padding: 0 0 .25em .25em;
 }
 
 .settings img {
