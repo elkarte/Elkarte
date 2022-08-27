@@ -41,6 +41,7 @@ body {
 
 [contenteditable="true"] {
 	font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue", Arial, sans-serif;
+	color: var(--body_text);
 }
 
 a, a:link, a:visited {
@@ -219,8 +220,11 @@ me {
 	overflow: auto;
 }
 
-.emoji {
-	max-width: 24px;
-	padding: 0 2px;
+.smiley, .emoji {
+	max-width: 20px;
 	vertical-align: bottom;
+}
+
+.emoji {
+	margin: 0 4px;
 }

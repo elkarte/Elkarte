@@ -393,14 +393,7 @@ function loadEditorSmileys($editorOptions)
 	// Initialize smiley array... if not loaded before.
 	if (empty($context['smileys']) && empty($editorOptions['disable_smiley_box']))
 	{
-		// Load smileys - don't bother to run a query if we're not using the database's ones anyhow.
-		if (empty($modSettings['smiley_enable']) && User::$info->smiley_set !== 'none')
-		{
-			$smileys['postform'][] = loadDefaultSmileys();
-
-			return $smileys;
-		}
-
+		// Load smileys
 		if (User::$info->smiley_set !== 'none')
 		{
 			$temp = [];
@@ -456,111 +449,4 @@ function loadEditorSmileys($editorOptions)
 	}
 
 	return empty($context['smileys']) ? $smileys : $context['smileys'];
-}
-
-/**
- * Returns an array of default smileys that are enabled w/o any db
- * requirements
- *
- * @return array
- */
-function loadDefaultSmileys()
-{
-	global $txt;
-
-	return ['smileys' => [
-		[
-			'code' => ':)',
-			'filename' => 'smiley.gif',
-			'description' => $txt['icon_smiley'],
-		],
-		[
-			'code' => ';)',
-			'filename' => 'wink.gif',
-			'description' => $txt['icon_wink'],
-		],
-		[
-			'code' => ':D',
-			'filename' => 'cheesy.gif',
-			'description' => $txt['icon_cheesy'],
-		],
-		[
-			'code' => ';D',
-			'filename' => 'grin.gif',
-			'description' => $txt['icon_grin']
-		],
-		[
-			'code' => '>:(',
-			'filename' => 'angry.gif',
-			'description' => $txt['icon_angry'],
-		],
-		[
-			'code' => ':))',
-			'filename' => 'laugh.gif',
-			'description' => $txt['icon_laugh'],
-		],
-		[
-			'code' => ':(',
-			'filename' => 'sad.gif',
-			'description' => $txt['icon_sad'],
-		],
-		[
-			'code' => ':o',
-			'filename' => 'shocked.gif',
-			'description' => $txt['icon_shocked'],
-		],
-		[
-			'code' => '8)',
-			'filename' => 'cool.gif',
-			'description' => $txt['icon_cool'],
-		],
-		[
-			'code' => '???',
-			'filename' => 'huh.gif',
-			'description' => $txt['icon_huh'],
-		],
-		[
-			'code' => '::)',
-			'filename' => 'rolleyes.gif',
-			'description' => $txt['icon_rolleyes'],
-		],
-		[
-			'code' => ':P',
-			'filename' => 'tongue.gif',
-			'description' => $txt['icon_tongue'],
-		],
-		[
-			'code' => ':-[',
-			'filename' => 'embarrassed.gif',
-			'description' => $txt['icon_embarrassed'],
-		],
-		[
-			'code' => ':-X',
-			'filename' => 'lipsrsealed.gif',
-			'description' => $txt['icon_lips'],
-		],
-		[
-			'code' => ':-\\',
-			'filename' => 'undecided.gif',
-			'description' => $txt['icon_undecided'],
-		],
-		[
-			'code' => ':-*',
-			'filename' => 'kiss.gif',
-			'description' => $txt['icon_kiss'],
-		],
-		[
-			'code' => 'O:)',
-			'filename' => 'angel.gif',
-			'description' => $txt['icon_angel'],
-		],
-		[
-			'code' => ':\'(',
-			'filename' => 'cry.gif',
-			'description' => $txt['icon_cry'],
-			'isLast' => true,
-		],
-	],
-			'isLast' => true,
-	];
 }

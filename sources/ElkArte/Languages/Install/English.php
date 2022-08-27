@@ -44,7 +44,7 @@ $txt['default_karmaLabel'] = 'Karma:';
 $txt['default_karmaSmiteLabel'] = '[smite]';
 $txt['default_karmaApplaudLabel'] = '[applaud]';
 $txt['default_reserved_names'] = 'Admin\nWebmaster\nGuest\nroot';
-$txt['default_smileyset_name'] = 'Fugue\'s Set';
+$txt['default_smileyset_name'] = 'Default';
 $txt['default_theme_name'] = 'ElkArte Theme';
 
 $txt['default_administrator_group'] = 'Administrator';
@@ -73,8 +73,6 @@ $txt['default_undecided_smiley'] = 'Undecided';
 $txt['default_kiss_smiley'] = 'Kiss';
 $txt['default_cry_smiley'] = 'Cry';
 $txt['default_evil_smiley'] = 'Evil';
-$txt['default_azn_smiley'] = 'Azn';
-$txt['default_afro_smiley'] = 'Afro';
 $txt['default_laugh_smiley'] = 'Laugh';
 $txt['default_police_smiley'] = 'Police';
 $txt['default_angel_smiley'] = 'Angel';

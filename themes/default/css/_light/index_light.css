@@ -971,7 +971,7 @@ sup.bbc_footnotes, sup.bbc_footnotes a {
 .table_head > th {
 	color: var(--strong_text);
 	border-top-color: var(--primary_border_top);
-	border-bottom-color: var(--primary_border_bottom);
+	border-bottom-color: var(--secondary_category_border);
 	background: var(--primary_content_background);
 }
 
@@ -1994,11 +1994,6 @@ ul.cf_icons {
 
 	.mlist li div.posts {
 		border-right-color: var(--primary_border);
-	}
-
-	/* This provides a bottom border, seen when crumbs wrap */
-	.breadcrumb .crumb:not(:last-child) {
-		box-shadow: 0 -1px 0 1px var(--box_shadow), 0 0 0 1px var(--body_text);
 	}
 }
 

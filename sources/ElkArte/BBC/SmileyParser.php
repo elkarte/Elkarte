@@ -26,12 +26,16 @@ class SmileyParser
 {
 	/** @var bool Are smiley enabled */
 	protected $enabled = true;
+
 	/** @var string smiley regex for parse protection */
 	protected $search = '';
+
 	/** @var array The replacement images for the ;) */
-	protected $replace = array();
+	protected $replace = [];
+
 	/** @var string marker */
 	protected $marker = "\r";
+
 	/** @var string path */
 	protected $path = '';
 
@@ -93,11 +97,10 @@ class SmileyParser
 	}
 
 	/**
-	 * Parse smileys in the passed message.
+	 * Parse smileys in passed message.
 	 *
 	 * What it does:
 	 *   - The smiley parsing function which makes pretty faces appear :)
-	 *   - If custom smiley sets are turned off by smiley_enable, the default set of smileys will be used.
 	 *   - These are specifically not parsed in code tags [url=mailto:Dad@blah.com]
 	 *   - Caches the smileys from the database or array in memory.
 	 *   - Doesn't return anything, but rather modifies message directly.
@@ -191,7 +194,7 @@ class SmileyParser
 			}
 		}
 
-		// This smiley regex makes sure it doesn't parse smileys within code tags
+		// This smiley regex makes sure it doesn't parse smileys within bbc tags
 		// (so [url=mailto:David@bla.com] doesn't parse the :D smiley)
 		$this->search = '~(?<=[>:\?\.\s\x{A0}[\]()*\\\;]|^)(' . implode('|', $searchParts) . ')(?=[^[:alpha:]0-9]|$)~';
 	}
@@ -201,36 +204,10 @@ class SmileyParser
 	 */
 	protected function load()
 	{
-		global $modSettings;
-
-		// Use the default smileys if it is disabled. (better for "portability" of smileys.)
-		if (empty($modSettings['smiley_enable']))
-		{
-			list ($smileysfrom, $smileysto, $smileysdescs) = $this->getDefault();
-		}
-		else
-		{
-			list ($smileysfrom, $smileysto, $smileysdescs) = $this->getFromDB();
-		}
+		list ($smileysfrom, $smileysto, $smileysdescs) = $this->getFromDB();
 
 		// Build the search/replace regex
 		$this->setSearchReplace($smileysfrom, $smileysto, $smileysdescs);
-	}
-
-	/**
-	 * Returns the default / built in array of smileys
-	 *
-	 * @return array
-	 */
-	protected function getDefault()
-	{
-		global $txt;
-
-		$smileysfrom = array('>:D', ':D', '::)', '>:(', ':))', ':)', ';)', ';D', ':(', ':o', '8)', ':P', '???', ':-[', ':-X', ':-*', ':\'(', ':-\\', '^-^', 'O0', 'C:-)', 'O:)');
-		$smileysto = array('evil.gif', 'cheesy.gif', 'rolleyes.gif', 'angry.gif', 'laugh.gif', 'smiley.gif', 'wink.gif', 'grin.gif', 'sad.gif', 'shocked.gif', 'cool.gif', 'tongue.gif', 'huh.gif', 'embarrassed.gif', 'lipsrsealed.gif', 'kiss.gif', 'cry.gif', 'undecided.gif', 'azn.gif', 'afro.gif', 'police.gif', 'angel.gif');
-		$smileysdescs = array('', $txt['icon_cheesy'], $txt['icon_rolleyes'], $txt['icon_angry'], $txt['icon_laugh'], $txt['icon_smiley'], $txt['icon_wink'], $txt['icon_grin'], $txt['icon_sad'], $txt['icon_shocked'], $txt['icon_cool'], $txt['icon_tongue'], $txt['icon_huh'], $txt['icon_embarrassed'], $txt['icon_lips'], $txt['icon_kiss'], $txt['icon_cry'], $txt['icon_undecided'], '', '', '', $txt['icon_angel']);
-
-		return array($smileysfrom, $smileysto, $smileysdescs);
 	}
 
 	/**
@@ -241,16 +218,17 @@ class SmileyParser
 	protected function getFromDB()
 	{
 		// Load the smileys in reverse order by length so they don't get parsed wrong.
-		if (!Cache::instance()->getVar($temp, 'parsing_smileys', 480))
+		if (!Cache::instance()->getVar($temp, 'parsing_smileys', 600))
 		{
-			$smileysfrom = array();
-			$smileysto = array();
-			$smileysdescs = array();
+			$smileysfrom = [];
+			$smileysto = [];
+			$smileysdescs = [];
 
 			$db = database();
 
 			$db->fetchQuery('
-				SELECT code, filename, description
+				SELECT 
+				    code, filename, description
 				FROM {db_prefix}smileys
 				ORDER BY LENGTH(code) DESC',
 				[]
@@ -264,7 +242,7 @@ class SmileyParser
 
 			// Cache this for a bit
 			$temp = array($smileysfrom, $smileysto, $smileysdescs);
-			Cache::instance()->put('parsing_smileys', $temp, 480);
+			Cache::instance()->put('parsing_smileys', $temp, 600);
 		}
 
 		return $temp;

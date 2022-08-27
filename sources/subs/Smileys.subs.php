@@ -504,7 +504,7 @@ function list_getSmileySets($start, $items_per_page, $sort)
 			'id' => $id,
 			'path' => $cols['path'][$i],
 			'name' => $cols['name'][$i],
-			'selected' => $cols['path'][$i] == $modSettings['smiley_sets_default']
+			'selected' => $cols['path'][$i] === $modSettings['smiley_sets_default']
 		);
 	}
 

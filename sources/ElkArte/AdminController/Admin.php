@@ -334,9 +334,9 @@ class Admin extends AbstractController
 						'permission' => array('manage_smileys'),
 						'subsections' => array(
 							'editsets' => array($txt['smiley_sets']),
-							'addsmiley' => array($txt['smileys_add'], 'enabled' => !empty($modSettings['smiley_enable'])),
-							'editsmileys' => array($txt['smileys_edit'], 'enabled' => !empty($modSettings['smiley_enable'])),
-							'setorder' => array($txt['smileys_set_order'], 'enabled' => !empty($modSettings['smiley_enable'])),
+							'addsmiley' => array($txt['smileys_add']),
+							'editsmileys' => array($txt['smileys_edit']),
+							'setorder' => array($txt['smileys_set_order']),
 							'editicons' => array($txt['icons_edit_message_icons'], 'enabled' => !empty($modSettings['messageIcons_enable'])),
 							'settings' => array($txt['settings']),
 						),

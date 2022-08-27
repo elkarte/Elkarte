@@ -813,6 +813,10 @@ a.active {
 	color: var(--indicator);
 }
 
+.admin_menu .listlevel1.subsections .linklevel1.active::after {
+	border-top-color: var(--menu_dropdown_indicator);
+}
+
 /* Top level subsection indicators. */
 .pm_indicator {
 	font-size: var(--font12);

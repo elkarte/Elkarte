@@ -8,4 +8,4 @@ $txt['emoji_disabled'] = 'Disable Emoji';
 $txt['emoji_open'] = 'Open Moji';
 $txt['emoji_twitter'] = 'Twitter';
 $txt['emoji_google'] = 'Google Noto';
-$txt['emoji_selection'] = 'Library of Emoji to use.';
+$txt['emoji_selection'] = 'Emoji library';

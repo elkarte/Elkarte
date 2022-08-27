@@ -101,7 +101,7 @@ function template_modifyset()
 					</dd>';
 
 	// If this is a new smiley set they have the option to import smileys already in the directory.
-	if ($context['current_set']['is_new'] && !empty($modSettings['smiley_enable']))
+	if ($context['current_set']['is_new'])
 	{
 		echo '
 					<dt>

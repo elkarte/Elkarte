@@ -588,6 +588,10 @@ ul.package_servers li {
 	padding: .5em .8em;
 }
 
+#smiley_list .imagecolumn img {
+	max-height: 24px;
+}
+
 /* Styles for the manage members section. */
 .msearch_details {
 	display: block;
@@ -980,6 +984,10 @@ dl.themes_list dd {
 .sortable_smiley {
 	margin-top: 3px;
 	border-bottom: 1px solid;
+}
+
+.sortable_smiley img {
+	max-height: 24px;
 }
 
 .pagelink, .current_page, .expand_pages {
