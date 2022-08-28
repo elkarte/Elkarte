@@ -221,9 +221,6 @@ class ManageFeatures extends AbstractController
 		$context['post_url'] = getUrl('admin', ['action' => 'admin', 'area' => 'featuresettings', 'sa' => 'basic', 'save']);
 		$context['settings_title'] = $txt['mods_cat_features'];
 
-		// Show / hide custom jquery fields as required
-		theme()->addInlineJavascript('showhideJqueryOptions();', true);
-
 		$settingsForm->prepare();
 	}
 
@@ -246,10 +243,6 @@ class ManageFeatures extends AbstractController
 			'',
 			// Javascript and CSS options
 			array('select', 'jquery_source', array('auto' => $txt['jquery_auto'], 'local' => $txt['jquery_local'], 'cdn' => $txt['jquery_cdn'])),
-			array('check', 'jquery_default', 'onchange' => 'showhideJqueryOptions();'),
-			array('text', 'jquery_version', 'postinput' => $txt['jquery_custom_after']),
-			array('check', 'jqueryui_default', 'onchange' => 'showhideJqueryOptions();'),
-			array('text', 'jqueryui_version', 'postinput' => $txt['jqueryui_custom_after']),
 			array('check', 'minify_css_js', 'postinput' => '<a href="#" id="clean_hives" class="linkbutton">' . $txt['clean_hives'] . '</a>'),
 			array('check', 'combine_css_js'),
 			'',
