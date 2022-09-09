@@ -148,7 +148,8 @@ class ManageSecurity extends AbstractController
 			array('check', 'enable_password_conversion'),
 			'',
 			array('select', 'frame_security', array('SAMEORIGIN' => $txt['setting_frame_security_SAMEORIGIN'], 'DENY' => $txt['setting_frame_security_DENY'], 'DISABLE' => $txt['setting_frame_security_DISABLE'])),
-			'',
+			// Bad Behavior
+			array('title', 'badbehavior_title'),
 			array('check', 'badbehavior_accept_header'),
 			array('text', 'badbehavior_httpbl_key', 12, 'invalid' => $context['invalid_badbehavior_httpbl_key']),
 			array('int', 'badbehavior_httpbl_threat', 'postinput' => $txt['badbehavior_httpbl_threat_desc']),
