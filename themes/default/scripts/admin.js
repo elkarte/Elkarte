@@ -711,8 +711,80 @@ function selectMethod(element)
  */
 function updatePreview()
 {
-	var currentImage = document.getElementById("preview");
-	currentImage.src = elk_smiley_url + "/" + document.forms.smileyForm.set.value + "/" + document.forms.smileyForm.smiley_filename.value;
+	let currentImage = document.getElementById('preview'),
+		selected = document.getElementById('set'),
+		ext;
+
+	ext = selected.options[selected.selectedIndex].getAttribute('data-ext');
+
+	currentImage.src = elk_smiley_url + '/' + document.forms.smileyForm.set.value + '/' + document.forms.smileyForm.smiley_filename.value + '.' + ext;
+	currentImage.alt = '☒';
+}
+
+/**
+ * Called when making changes via Edit Smileys checkboxes.  Submits the form
+ * or asks for validation on delete.
+ *
+ * @param action
+ * @returns {boolean}
+ */
+function makeChanges(action)
+{
+	// No selection made
+	if (action === '-1')
+	{
+		return false;
+	}
+
+	if (action === 'delete')
+	{
+		if (confirm(txt_remove))
+		{
+			document.forms.smileyForm.submit();
+		}
+	}
+	else
+	{
+		document.forms.smileyForm.submit();
+	}
+
+	return true;
+}
+
+/**
+ * Called when swapping the smiley set in Edit Smileys.  Will swap the images to the
+ * ones in the chosen set.
+ *
+ * @param {string} newSet
+ */
+function changeSet(newSet)
+{
+	let currentImage,
+		i,
+		n,
+		ext,
+		knownSmileys = [],
+		selected = document.getElementById('set');
+
+	if (knownSmileys.length === 0)
+	{
+		for (i = 0, n = document.images.length; i < n; i++)
+		{
+			if (document.images[i].id.substring(0, 6) === 'smiley')
+			{
+				knownSmileys[knownSmileys.length] = document.images[i].id.substring(6);
+			}
+		}
+	}
+
+	ext = selected.options[selected.selectedIndex].getAttribute('data-ext');
+
+	for (i = 0; i < knownSmileys.length; i++)
+	{
+		currentImage = document.getElementById('smiley' + knownSmileys[i]);
+
+		currentImage.src = elk_smiley_url + '/' + newSet + '/' + document.forms.smileyForm['smileys[' + knownSmileys[i] + '][filename]'].value + '.' + ext;
+	}
 }
 
 /**
