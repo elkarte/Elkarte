@@ -352,6 +352,11 @@ class UpgradeInstructions_upgrade_2_0
 		);
 	}
 
+	public function migrate_theme_settings_title()
+	{
+		return 'Moving theme settings that are now site settings...';
+	}
+
 	public function migrate_theme_settings()
 	{
 		return array(
@@ -389,6 +394,11 @@ class UpgradeInstructions_upgrade_2_0
 		);
 	}
 
+	public function migrate_session_settings_title()
+	{
+		return 'Updating session data to provide more room...';
+	}
+
 	public function migrate_session_settings()
 	{
 		return array(
@@ -424,6 +434,11 @@ class UpgradeInstructions_upgrade_2_0
 		);
 	}
 
+	public function migrate_badbehavior_settings_title()
+	{
+		return 'Removing bad behavior log...';
+	}
+
 	public function migrate_badbehavior_settings()
 	{
 		return array(
@@ -432,15 +447,29 @@ class UpgradeInstructions_upgrade_2_0
 				'function' => function () {
 					$this->table->drop_table('{db_prefix}log_badbehavior');
 				}
+			),
+			array(
+				'debug_title' => 'Remove of badbehavior settings ...',
+				'function' => function () {
+					removeSettings(
+						array('badbehavior_enabled', 'badbehavior_logging', 'badbehavior_ip_wl',
+							  'badbehavior_ip_wl_desc', 'badbehavior_url_wl', 'badbehavior_url_wl_desc')
+					);
+				}
 			)
 		);
+	}
+
+	public function preparing_board_oldposts_title()
+	{
+		return 'Adding old post warning by board functionality...';
 	}
 
 	public function preparing_board_oldposts()
 	{
 		return array(
 			array(
-				'debug_title' => 'Add board based old post warning ...',
+				'debug_title' => 'Adding new old_column to board table...',
 				'function' => function () {
 					$this->table->add_column('{db_prefix}boards',
 						array(
@@ -452,6 +481,139 @@ class UpgradeInstructions_upgrade_2_0
 						array(),
 						'ignore'
 					);
+				}
+			)
+		);
+	}
+
+	public function preparing_smiley_title()
+	{
+		return 'Update smiley support to include emoji...';
+	}
+
+	public function preparing_smiley()
+	{
+		return array(
+			array(
+				'debug_title' => 'Remove extension from existing smiley filenames ...',
+				'function' => function () {
+					global $modSettings;
+
+					$request = $this->db->query('', '
+						SELECT 
+							filename
+						FROM {db_prefix}smileys',
+						array()
+					);
+					$inserts = array();
+					while ($row = $this->db->fetch_assoc($request))
+					{
+						$inserts[] = array(
+							'newname' => pathinfo($row['filename'], PATHINFO_FILENAME),
+							'oldname' => $row['filename']
+						);
+					}
+					$this->db->free_result($request);
+					foreach ($inserts as $insert)
+					{
+						$this->db->query('', '
+							UPDATE {db_prefix}smileys
+							SET filename = {string:newname}
+							WHERE filename = {string:oldname}',
+							array(
+								'newname' => $insert['newname'],
+								'oldname' => $insert['oldname'],
+							)
+						);
+					}
+
+					// Make sure the default directory is in the available sets
+					$sets = explode(',', $modSettings['smiley_sets_known']);
+					if (!in_array('default', $sets, true))
+					{
+						updateSettings(array(
+							'smiley_sets_known' => 'default,' . $modSettings['smiley_sets_known'],
+							'smiley_sets_names' => $modSettings['smiley_sets_names'] . "\n" . 'Default',
+							'smiley_sets_extensions' => 'svg,' . $modSettings['smiley_sets_extensions'],
+						));
+					}
+				}
+			),
+			array(
+				'debug_title' => 'Add new/missing smiley codes ...',
+				'function' => function () {
+					// Definitions of all emoji smiles we use in the editor
+					$emojiSmile = array(
+						array(':smiley:', 'smiley', '{$default_smiley_smiley}', 0, 2),
+						array(':wink:', 'wink', '{$default_wink_smiley}', 0, 2),
+						array(':cheesy:', 'cheesy', '{$default_cheesy_smiley}', 0, 2),
+						array(':grin:', 'grin', '{$default_grin_smiley}', 0, 2),
+						array(':angry:', 'angry', '{$default_angry_smiley}', 0, 2),
+						array(':sad:', 'sad', '{$default_sad_smiley}', 0, 2),
+						array(':shocked:', 'shocked', '{$default_shocked_smiley}', 0, 2),
+						array(':cool:', 'cool', '{$default_cool_smiley}', 0, 2),
+						array(':huh:', 'huh', '{$default_huh_smiley}', 0, 2),
+						array(':rolleyes:', 'rolleyes', '{$default_roll_eyes_smiley}', 0, 2),
+						array(':tongue:', 'tongue', '{$default_tongue_smiley}', 0, 2),
+						array(':embarrassed:', 'embarrassed', '{$default_embarrassed_smiley}', 0, 2),
+						array(':zipper_mouth:', 'lipsrsealed', '{$default_lips_sealed_smiley}', 0, 2),
+						array(':undecided:', 'undecided', '{$default_undecided_smiley}', 0, 2),
+						array(':kiss:', 'kiss', '{$default_kiss_smiley}', 0, 2),
+						array(':cry:', 'cry', '{$default_cry_smiley}', 0, 2),
+						array(':evil:', 'evil', '{$default_evil_smiley}', 0, 2),
+						array(':laugh:', 'laugh', '{$default_laugh_smiley}', 0, 2),
+						array(':rotating_light:', 'police', '{$default_police_smiley}', 0, 2),
+						array(':innocent:', 'angel', '{$default_angel_smiley}', 0, 2),
+						array(':thumbsup:', 'thumbsup', '{$default_thumbup_smiley}', 0, 2),
+						array(':thumbsdown:', 'thumbsdown', '{$default_thumbdown_smiley}', 0, 2),
+						array(':skull:', 'skull', '{$default_skull_smiley}', 0, 2),
+						array(':poop:', 'poop', '{$default_poop_smiley}', 0, 2),
+						array(':sweat:', 'sweat', '{$default_sweat_smiley}', 0, 2),
+						array(':heart_eyes:', 'heart', '{$default_heart_smiley}', 0, 2),
+						array(':grimacing:', 'grimacing', '{$default_grimace_smiley}', 0, 2),
+						array(':nerd:', 'nerd', '{$default_nerd_smiley}', 0, 2),
+						array(':head_bandage:', 'clumsy', '{$default_clumsy_smiley}', 0, 2),
+						array(':clown:', 'clown', '{$default_clown_smiley}', 0, 2),
+						array(':partying_face', 'party', '{$default_party_smiley}', 0, 2),
+						array(':zany_face:', 'zany', '{$default_wild_smiley}', 0, 2),
+						array(':shushing_face:', 'shh', '{$default_shh_smiley}', 0, 2),
+						array(':face_vomiting:', 'vomit', '{$default_vomit_smiley}', 0, 2)
+					);
+					$codes = array();
+					$inserts = array();
+					// Grab all existing codes
+					$request = $this->db->query('', '
+						SELECT 
+							code
+						FROM {db_prefix}smileys',
+						array()
+					);
+					while ($row = $this->db->fetch_assoc($request))
+					{
+						$codes[$row['code']] = $row['code'];
+					}
+					// Add any that are missing, to minimize admin trauma, they are added to the popup, unordered
+					foreach ($emojiSmile as $entry)
+					{
+						if (isset($codes[$entry[0]]))
+						{
+							continue;
+						}
+
+						$inserts[] = $entry;
+					}
+					$this->db->insert('ignore',
+						'{db_prefix}smileys',
+						array('code' => 'string', 'filename' => 'string', 'description' => 'string', 'smiley_order' => 'int', 'hidden' => 'int'),
+						$inserts,
+						array('id_smiley')
+					);
+				}
+			),
+			array(
+				'debug_title' => 'Drop user smiley set column ...',
+				'function' => function () {
+					$this->table->remove_column('{db_prefix}members', 'smiley_set');
 				}
 			)
 		);

@@ -51,7 +51,7 @@ $upcontext['database_step'] = 3;
 @ini_set('memory_limit', '256M');
 
 // Clean the upgrade path if this is from the client.
-if (!empty($_SERVER['argv']) && php_sapi_name() === 'cli' && empty($_SERVER['REMOTE_ADDR']))
+if (!empty($_SERVER['argv']) && PHP_SAPI === 'cli' && empty($_SERVER['REMOTE_ADDR']))
 {
 	for ($i = 1; $i < $_SERVER['argc']; $i++)
 	{
@@ -574,7 +574,7 @@ function initialize_inputs()
 
 	// Force a step, defaulting to 0.
 	$_GET['step'] = $_GET['step'] ?? 0;
-	$_GET['substep'] =$_GET['substep'] ?? 0;
+	$_GET['substep'] = $_GET['substep'] ?? 0;
 }
 
 /**
@@ -919,7 +919,7 @@ function checkLogin()
 				$temp = substr(@implode('', @file(SOURCEDIR . '/ElkArte/Languages/Index/' . $user_language . '.php')), 0, 4096);
 				preg_match('~(?://|/\*)\s*Version:\s+(.+?);\s*index(?:[\s]{2}|\*/)~i', $temp, $match);
 
-				if (empty($match[1]) || $match[1] != CURRENT_LANG_VERSION)
+				if (empty($match[1]) || $match[1] !== CURRENT_LANG_VERSION)
 				{
 					$upcontext['upgrade_options_warning'] = 'The language files for your selected language, ' . $user_language . ', have not been updated to the latest version. Upgrade will continue with the forum default, ' . $upcontext['language'] . '.';
 				}
