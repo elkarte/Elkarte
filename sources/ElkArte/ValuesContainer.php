@@ -54,7 +54,7 @@ class ValuesContainer implements \ArrayAccess
 	}
 
 	/**
-	 * Getter
+	 * Getter, return the value or null if its not set
 	 *
 	 * @param string|int $key
 	 * @return mixed
@@ -82,7 +82,7 @@ class ValuesContainer implements \ArrayAccess
 	}
 
 	/**
-	 * Calling as method uses the argument as default
+	 * Calling as method.  Return the key if found, if not return the argument value.
 	 *
 	 * @param string|int $key
 	 * @param array $args

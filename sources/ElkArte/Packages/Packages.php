@@ -36,6 +36,9 @@ use ElkArte\Util;
  */
 class Packages extends AbstractController
 {
+	/** @var array|boolean listing of files in a packages */
+	private $_extracted_files;
+
 	/** @var int The id from the DB or an installed package */
 	public $install_id;
 
@@ -197,7 +200,7 @@ class Packages extends AbstractController
 			$this->_create_temp_dir();
 		}
 
-		// Extract the files in to the temp so we can get things like the readme, etc.
+		// Extract the files in to the temp, so we can get things like the readme, etc.
 		$this->_extract_files_temp();
 
 		// Load up any custom themes we may want to install into...
@@ -347,12 +350,12 @@ class Packages extends AbstractController
 		if (is_file(BOARDDIR . '/packages/' . $this->_filename))
 		{
 			// Unpack the files in to the packages/temp directory
-			$extracted_files = read_tgz_file(BOARDDIR . '/packages/' . $this->_filename, BOARDDIR . '/packages/temp');
+			$this->_extracted_files = read_tgz_file(BOARDDIR . '/packages/' . $this->_filename, BOARDDIR . '/packages/temp');
 
 			// Determine the base path for the package
-			if ($extracted_files && !$this->fileFunc->fileExists(BOARDDIR . '/packages/temp/package-info.xml'))
+			if ($this->_extracted_files && !$this->fileFunc->fileExists(BOARDDIR . '/packages/temp/package-info.xml'))
 			{
-				foreach ($extracted_files as $file)
+				foreach ($this->_extracted_files as $file)
 				{
 					if (basename($file['filename']) === 'package-info.xml')
 					{
@@ -374,7 +377,7 @@ class Packages extends AbstractController
 			copytree(BOARDDIR . '/packages/' . $this->_filename, BOARDDIR . '/packages/temp');
 
 			// Get the file listing
-			$this->fileFunc->listtree(BOARDDIR . '/packages/temp');
+			$this->_extracted_files = $this->fileFunc->listtree(BOARDDIR . '/packages/temp');
 			$this->_base_path = '';
 		}
 		// Well we don't know what it is then, so we stop
@@ -685,6 +688,7 @@ class Packages extends AbstractController
 		$packageInfo['filename'] = $this->_filename;
 
 		$context['base_path'] = $this->_base_path;
+		$context['extracted_files'] = $this->_extracted_files;
 
 		// Create a backup file to roll back to! (but if they do this more than once, don't run it a zillion times.)
 		if (!empty($modSettings['package_make_full_backups']) && (!isset($_SESSION['last_backup_for']) || $_SESSION['last_backup_for'] != $this->_filename . ($this->_uninstalling ? '$$' : '$')))
@@ -1269,31 +1273,34 @@ class Packages extends AbstractController
 		// We need to extract this again.
 		if (is_file(BOARDDIR . '/packages/' . $context['filename']))
 		{
-			$context['extracted_files'] = read_tgz_file(BOARDDIR . '/packages/' . $context['filename'], BOARDDIR . '/packages/temp');
-			if ($context['extracted_files']
+			$this->_extracted_files = read_tgz_file(BOARDDIR . '/packages/' . $context['filename'], BOARDDIR . '/packages/temp');
+			if ($this->_extracted_files
 				&& !$this->fileFunc->fileExists(BOARDDIR . '/packages/temp/package-info.xml'))
 			{
-				foreach ($context['extracted_files'] as $file)
+				foreach ($this->_extracted_files as $file)
 				{
 					if (basename($file['filename']) === 'package-info.xml')
 					{
-						$context['base_path'] = dirname($file['filename']) . '/';
+						$this->_base_path = dirname($file['filename']) . '/';
 						break;
 					}
 				}
 			}
 
-			if (!isset($context['base_path']))
+			if (!isset($this->_base_path))
 			{
-				$context['base_path'] = '';
+				$this->_base_path = '';
 			}
 		}
 		elseif ($this->fileFunc->isDir(BOARDDIR . '/packages/' . $context['filename']))
 		{
 			copytree(BOARDDIR . '/packages/' . $context['filename'], BOARDDIR . '/packages/temp');
-			$context['extracted_files'] = $this->fileFunc->listtree(BOARDDIR . '/packages/temp');
-			$context['base_path'] = '';
+			$this->_extracted_files = $this->fileFunc->listtree(BOARDDIR . '/packages/temp');
+			$this->_base_path = '';
 		}
+
+		$context['base_path'] = $this->_base_path;
+		$context['extracted_files'] = $this->_extracted_files;
 
 		// Load up any custom themes we may want to install into...
 		$theme_paths = getThemesPathbyID();
