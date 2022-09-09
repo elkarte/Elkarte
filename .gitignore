@@ -27,6 +27,7 @@ nbproject/*
 composer.lock
 composer.phar
 themes/default/cache/hive*
+themes/default/scripts/custom_tags.js
 .github/workflows/*.yaml
 populator/
 testcases*/
