@@ -79,7 +79,7 @@ class DisplayRenderer extends Renderer
 		$output += [
 			'href' => $href,
 			'link' => '<a href="' . $href . '" rel="nofollow">' . $this->_this_message['subject'] . '</a>',
-			'icon' => $this->_options->icon_sources->getIconName($this->_this_message['icon']),
+			'icon' => $this->_options->icon_sources->getIconValue($this->_this_message['icon']),
 			'icon_url' => $this->_options->icon_sources->getIconURL($this->_this_message['icon']),
 			'modified' => [
 				'time' => standardTime($this->_this_message['modified_time']),

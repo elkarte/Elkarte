@@ -3200,8 +3200,8 @@ footer .signature {
 
 /* Emoji and smiley icons in the post */
 .smiley, .emoji {
-	vertical-align: text-bottom;
 	max-height: 20px;
+	vertical-align: text-bottom;
 }
 
 .emoji {
