@@ -42,7 +42,7 @@ use ElkArte\User;
  */
 function create_control_richedit($editorOptions)
 {
-	global $txt, $modSettings, $options, $context, $settings, $scripturl;
+	global $txt, $options, $context, $settings, $scripturl;
 
 	// Load the Post language file... for the moment at least.
 	Txt::load('Post');
@@ -57,8 +57,10 @@ function create_control_richedit($editorOptions)
 		// Store the name / ID we are creating for template compatibility.
 		$context['post_box_name'] = $editorOptions['id'];
 
-		// Some general stuff.
-		$settings['smileys_url'] = $context['user']['smiley_path'];
+		// Don't show the smileys if they are off or not wanted.
+		$editorOptions['disable_smiley_box'] = !empty($editorOptions['disable_smiley_box'])
+			|| $GLOBALS['context']['smiley_set'] === 'none'
+			|| !empty($GLOBALS['options']['show_no_smileys']);
 
 		// This really has some WYSIWYG stuff.
 		theme()->getTemplates()->load('GenericControls');
@@ -78,7 +80,8 @@ function create_control_richedit($editorOptions)
 
 		theme()->addJavascriptVar([
 			'post_box_name' => $editorOptions['id'],
-			'elk_smileys_url' => $settings['smileys_url'],
+			'elk_smileys_url' => $context['smiley_path'],
+			'elk_emoji_url' => $context['emoji_path'],
 			'bbc_quote_from' => $txt['quote_from'],
 			'bbc_quote' => $txt['quote'],
 			'bbc_search_on' => $txt['search_on'],
@@ -136,7 +139,7 @@ function create_control_richedit($editorOptions)
 	$context['plugins'] = loadEditorPlugins($context['controls']['richedit'][$editorOptions['id']]);
 	$context['plugin_options'] = getPluginOptions($context['controls']['richedit'][$editorOptions['id']], $editorOptions['id']);
 
-	// Switch the URLs back... now we're back to whatever the main sub template is.  (like folder in PersonalMessage.)
+	// Switch the URLs back... now we're back to whatever the main sub template is (like folder in PersonalMessage.)
 	if ($use_defaults)
 	{
 		list($settings['theme_url'], $settings['images_url'], $settings['theme_dir']) = $temp;
@@ -150,7 +153,7 @@ function create_control_richedit($editorOptions)
 		
 	error_txts[\'no_subject\'] = ' . JavaScriptEscape($txt['error_no_subject']) . ';
 	error_txts[\'no_message\'] = ' . JavaScriptEscape($txt['error_no_message']) . ';
-', true);
+		', true);
 	}
 }
 
@@ -376,7 +379,7 @@ function loadToolbarDefaults()
  *
  * What it does:
  * - Will load the default smileys or custom smileys as defined in ACP
- * - Caches the DB call for 8 mins
+ * - Caches the DB call for 10 mins
  * - Sorts smileys to proper array positions removing hidden ones
  *
  * @return array|array[]|mixed
@@ -393,59 +396,40 @@ function loadEditorSmileys($editorOptions)
 	// Initialize smiley array... if not loaded before.
 	if (empty($context['smileys']) && empty($editorOptions['disable_smiley_box']))
 	{
-		// Load smileys
-		if (User::$info->smiley_set !== 'none')
+		$temp = [];
+		if (!Cache::instance()->getVar($temp, 'posting_smileys', 600))
 		{
-			$temp = [];
-			if (!Cache::instance()->getVar($temp, 'posting_smileys', 480))
+			require_once(SUBSDIR . '/Smileys.subs.php');
+			$smileys = getEditorSmileys();
+			foreach ($smileys as $section => $smileyRows)
 			{
-				$db = database();
-				$db->fetchQuery('
-					SELECT 
-						code, filename, description, smiley_row, hidden
-					FROM {db_prefix}smileys
-					WHERE hidden IN (0, 2)
-					ORDER BY smiley_row, smiley_order',
-					array()
-				)->fetch_callback(
-					function ($row) use (&$smileys) {
-						$row['filename'] = htmlspecialchars($row['filename'], ENT_COMPAT, 'UTF-8');
-						$row['description'] = htmlspecialchars($row['description'], ENT_COMPAT, 'UTF-8');
-
-						$smileys[empty($row['hidden']) ? 'postform' : 'popup'][$row['smiley_row']]['smileys'][] = $row;
-					}
-				);
-
-				foreach ($smileys as $section => $smileyRows)
+				$last_row = null;
+				foreach ($smileyRows as $rowIndex => $smileRow)
 				{
-					$last_row = null;
-					foreach ($smileyRows as $rowIndex => $smileRow)
-					{
-						$smileys[$section][$rowIndex]['smileys'][count($smileRow['smileys']) - 1]['isLast'] = true;
-						$last_row = $rowIndex;
-					}
-
-					if ($last_row !== null)
-					{
-						$smileys[$section][$last_row]['isLast'] = true;
-					}
+					$smileys[$section][$rowIndex]['smileys'][count($smileRow['smileys']) - 1]['isLast'] = true;
+					$last_row = $rowIndex;
 				}
 
-				Cache::instance()->put('posting_smileys', $smileys, 480);
-			}
-			else
-			{
-				$smileys = $temp;
-			}
-
-			// The smiley popup may take advantage of Jquery UI ....
-			if (!empty($smileys['popup']))
-			{
-				$modSettings['jquery_include_ui'] = true;
+				if ($last_row !== null)
+				{
+					$smileys[$section][$last_row]['isLast'] = true;
+				}
 			}
 
-			return $smileys;
+			Cache::instance()->put('posting_smileys', $smileys, 600);
 		}
+		else
+		{
+			$smileys = $temp;
+		}
+
+		// The smiley popup may take advantage of Jquery UI ....
+		if (!empty($smileys['popup']))
+		{
+			$modSettings['jquery_include_ui'] = true;
+		}
+
+		return $smileys;
 	}
 
 	return empty($context['smileys']) ? $smileys : $context['smileys'];
