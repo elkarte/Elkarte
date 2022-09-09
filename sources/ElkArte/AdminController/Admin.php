@@ -243,7 +243,7 @@ class Admin extends AbstractController
 						'label' => $txt['admin_security_moderation'],
 						'controller' => '\\ElkArte\\AdminController\\ManageSecurity',
 						'function' => 'action_index',
-						'class' => 'i-lock i-admin',
+						'class' => 'i-key i-admin',
 						'subsections' => array(
 							'general' => array($txt['mods_cat_security_general']),
 							'spam' => array($txt['antispam_title']),
@@ -330,7 +330,7 @@ class Admin extends AbstractController
 						'label' => $txt['smileys_manage'],
 						'controller' => '\\ElkArte\\AdminController\\ManageSmileys',
 						'function' => 'action_index',
-						'class' => 'i-smiley i-admin',
+						'class' => 'i-smiley-blank i-admin',
 						'permission' => array('manage_smileys'),
 						'subsections' => array(
 							'editsets' => array($txt['smiley_sets']),
@@ -397,7 +397,7 @@ class Admin extends AbstractController
 						'label' => $txt['edit_permissions'],
 						'controller' => '\\ElkArte\\AdminController\\ManagePermissions',
 						'function' => 'action_index',
-						'class' => 'i-lock i-admin',
+						'class' => 'i-key i-admin',
 						'permission' => array('manage_permissions'),
 						'subsections' => array(
 							'index' => array($txt['permissions_groups'], 'manage_permissions'),
