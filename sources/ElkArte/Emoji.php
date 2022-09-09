@@ -36,7 +36,7 @@ class Emoji extends AbstractModel
 	private const POSSIBLE_EMOJI = '~([^\p{L}\x00-\x7F]+)~u';
 
 	/** @var string used to find :emoji: style codes */
-	private const EMOJI_NAME = '~(?:\s?|^|]|<br />|<br>)(:([-+\w]+):\s?)~i';
+	private const EMOJI_NAME = '~(?:\s?|^|]|<br />|<br>)(:([-+\w]+):\s?)~u';
 
 	/** @var null|\ElkArte\Emoji holds the instance of this class */
 	private static $instance;
@@ -75,7 +75,7 @@ class Emoji extends AbstractModel
 	 * - Called from integrate_pre_bbc_parser
 	 *
 	 * @param string $string
-	 * @param bool $uni false returns an emoji image tag, true returns the unicode point
+	 * @param bool $uni false returns an emoji image tag, true returns the unicode point, useful for mail
 	 * @param bool $protect if false will bypass codeblock protection (useful if already done!)
 	 * @return string
 	 */
@@ -186,7 +186,7 @@ class Emoji extends AbstractModel
 	 */
 	public function findEmojiByCode($hex)
 	{
-		$this->loadEmoji();
+		$this->setSearchReplaceRegex();
 
 		if (empty($hex))
 		{
@@ -227,7 +227,7 @@ class Emoji extends AbstractModel
 		}
 
 		// Finally, going to need these
-		$this->loadEmoji();
+		$this->setSearchReplaceRegex();
 
 		// It is not a known tag, just return what was passed
 		if (!isset($this->shortcode_replace[$m[2]]))
@@ -246,7 +246,7 @@ class Emoji extends AbstractModel
 	/**
 	 * Searches a string for unicode points and replaces them with emoji <img> tags
 	 *
-	 * We instead use [^\p{L}\x00-\x7F]+ which will match any non letter character including
+	 * We use [^\p{L}\x00-\x7F]+ which will match any non letter character including
 	 * symbols, currency signs, dingbats, box-drawing characters, etc. This is an
 	 * easier regex but with more "false" hits for what we want.  If this passes then the
 	 * full emoji regex will be used to precisely find supported codepoints
@@ -256,7 +256,7 @@ class Emoji extends AbstractModel
 	 */
 	public function emojiFromUni($string)
 	{
-		$this->loadEmoji();
+		$this->setSearchReplaceRegex();
 
 		// Avoid the large regex if there is no emoji DNA
 		if (preg_match(self::POSSIBLE_EMOJI, $string) !== 1)
@@ -300,7 +300,7 @@ class Emoji extends AbstractModel
 		}
 
 		// Need our known codes
-		$this->loadEmoji();
+		$this->setSearchReplaceRegex();
 
 		// It is not a known :tag:, just return what was passed
 		if (!isset($this->shortcode_replace[$m[2]]))
@@ -344,22 +344,28 @@ class Emoji extends AbstractModel
 	 * singleton emoji such as 1f600 as all multipoint ones would have already been found
 	 * and processed
 	 */
-	public function loadEmoji()
+	public function setSearchReplaceRegex()
 	{
 		global $settings;
 
 		$this->_checkCache();
 		if (empty($this->shortcode_replace))
 		{
+			$this->shortcode_replace = [];
 			$emoji = file_get_contents($settings['default_theme_dir'] . '/scripts/emoji_tags.js');
-			preg_match_all('~{name:(.*?), key:(.*?)}~s', $emoji, $matches, PREG_SET_ORDER);
+			preg_match_all('~{name:\s[\'"](.*?)[\'"], key:\s[\'"](.*?)[\'"](?:, type:\s[\'"](.*?)[\'"])?}~', $emoji, $matches, PREG_SET_ORDER);
 			foreach ($matches as $match)
 			{
-				$name = trim($match[1], "' ");
-				$key = trim($match[2], "' ");
+				if (isset($match[3]))
+				{
+					continue;
+				}
+
+				$name = trim($match[1]);
+				$key = trim($match[2]);
 				$this->shortcode_replace[$name] = $key;
 
-				// Multipoint sequences use a unique regex to avoid collisions
+				// Multipoint sequences use a unique, per key, regex to avoid collisions
 				if (strpos($key, '-') !== false)
 				{
 					$emoji_regex[] = '\x{' . implode('}\x{', explode('-', $key)) . '}';
@@ -373,7 +379,7 @@ class Emoji extends AbstractModel
 				return strlen($b) <=> strlen($a);
 			});
 
-			// Build out the regex, append single point search at end.
+			// Build out the regex, append the single point search at end.
 			$this->emoji_regex = '~' . implode('|', $emoji_regex) . '|' . self::EMOJI_RANGES . '~u';
 			unset($emoji_regex);
 
@@ -384,7 +390,7 @@ class Emoji extends AbstractModel
 	}
 
 	/**
-	 * Check the cache to see if we already have these loaded
+	 * Check the cache to see if we already have the regex created/loaded
 	 *
 	 * @return void
 	 */
