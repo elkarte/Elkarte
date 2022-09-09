@@ -148,7 +148,7 @@ $txt['manage_calendar'] = 'Calendar';
 $txt['manage_search'] = 'Search';
 $txt['viewmembers_online'] = 'Last Online';
 
-$txt['smileys_manage'] = 'Smileys and Message Icons';
+$txt['smileys_manage'] = 'Emoji and Message Icons';
 $txt['smileys_manage_info'] = 'Install new smiley sets, add smileys to existing sets or manage your message icons.';
 
 $txt['editor_manage'] = 'Editor & BBC settings';
@@ -764,7 +764,7 @@ $txt['search_sphinx'] = 'Configure Sphinx';
 $txt['smiley_sets'] = 'Smiley Sets';
 $txt['smileys_add'] = 'Add Smiley';
 $txt['smileys_edit'] = 'Edit Smileys';
-$txt['smileys_set_order'] = 'Set Smiley order';
+$txt['smileys_set_order'] = 'Smiley Order';
 $txt['icons_edit_message_icons'] = 'Edit message icons';
 
 $txt['membergroups_new_group'] = 'Add Member Group';

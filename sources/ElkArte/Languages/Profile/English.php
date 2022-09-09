@@ -315,6 +315,7 @@ $txt['poster'] = 'Poster';
 $txt['use_sidebar_menu'] = 'Use sidebar menu instead of dropdowns.';
 $txt['use_click_menu'] = 'Use click to open menus, instead of hover to open.';
 $txt['show_no_avatars'] = 'Don\'t show users\' avatars.';
+$txt['show_no_smileys'] = 'Don\'t show smileys / emoji in posts.';
 $txt['show_no_signatures'] = 'Don\'t show users\' signatures.';
 $txt['show_no_censored'] = 'Leave words uncensored.';
 $txt['topics_per_page'] = 'Topics to display per page:';
