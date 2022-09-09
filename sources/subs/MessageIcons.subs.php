@@ -18,7 +18,7 @@ use ElkArte\Cache\Cache;
 use ElkArte\Languages\Txt;
 
 /**
- * Gets a list of all available message icons.
+ * Gets a list of all available message icons for each board
  */
 function fetchMessageIconsDetails()
 {
@@ -31,9 +31,10 @@ function fetchMessageIconsDetails()
 
 	$db = database();
 
-	$icons = array();
+	$icons = [];
 	$last_icon = 0;
 	$trueOrder = 0;
+
 	$db->fetchQuery('
 		SELECT 
 			m.id_icon, m.title, m.filename, m.icon_order, m.id_board, b.name AS board_name
@@ -41,12 +42,12 @@ function fetchMessageIconsDetails()
 			LEFT JOIN {db_prefix}boards AS b ON (b.id_board = m.id_board)
 		WHERE ({query_see_board} OR b.id_board IS NULL)
 		ORDER BY m.icon_order',
-		array()
+		[]
 	)->fetch_callback(
 		function ($row) use (&$icons, &$last_icon, &$trueOrder) {
 			global $settings, $txt;
 
-			$icons[$row['id_icon']] = array(
+			$icons[$row['id_icon']] = [
 				'id' => $row['id_icon'],
 				'title' => $row['title'],
 				'filename' => $row['filename'],
@@ -56,7 +57,7 @@ function fetchMessageIconsDetails()
 				'order' => $row['icon_order'],
 				'true_order' => $trueOrder++,
 				'after' => $last_icon,
-			);
+			];
 			$last_icon = $row['id_icon'];
 		}
 	);
@@ -77,16 +78,16 @@ function deleteMessageIcons($icons)
 	$db->query('', '
 		DELETE FROM {db_prefix}message_icons
 		WHERE id_icon IN ({array_int:icon_list})',
-		array(
+		[
 			'icon_list' => $icons,
-		)
+		]
 	);
 }
 
 /**
  * Updates a message icon.
  *
- * @param mixed[] $icon array of values to use in the $db->insert
+ * @param array $icon array of values to use in the $db->insert
  */
 function updateMessageIcon($icon)
 {
@@ -94,16 +95,16 @@ function updateMessageIcon($icon)
 
 	$db->replace(
 		'{db_prefix}message_icons',
-		array('id_icon' => 'int', 'id_board' => 'int', 'title' => 'string-80', 'filename' => 'string-80', 'icon_order' => 'int'),
+		['id_icon' => 'int', 'id_board' => 'int', 'title' => 'string-80', 'filename' => 'string-80', 'icon_order' => 'int'],
 		$icon,
-		array('id_icon')
+		['id_icon']
 	);
 }
 
 /**
  * Adds a new message icon.
  *
- * @param mixed[] $icon associative array to use in the insert
+ * @param array $icon associative array to use in the insert
  */
 function addMessageIcon($icon)
 {
@@ -111,18 +112,22 @@ function addMessageIcon($icon)
 
 	$db->insert('',
 		'{db_prefix}message_icons',
-		array('id_board' => 'int', 'title' => 'string-80', 'filename' => 'string-80', 'icon_order' => 'int'),
+		['id_board' => 'int', 'title' => 'string-80', 'filename' => 'string-80', 'icon_order' => 'int'],
 		$icon,
-		array('id_icon')
+		['id_icon']
 	);
 }
 
 /**
  * Retrieves a list of message icons.
+ *
+ * What it does
  * - Based on the settings, the array will either contain a list of default
  *   message icons or a list of custom message icons retrieved from the database.
  * - The board_id is needed for the custom message icons (which can be set for
  *   each board individually).
+ * - Returns same array keys for either default or custom icons
+ * - Caches the results for 10 minutes
  *
  * @param int $board_id
  * @return array
@@ -133,62 +138,69 @@ function getMessageIcons($board_id)
 
 	$db = database();
 
+	$icons = [];
+	if (Cache::instance()->getVar($icons, 'posting_icons-' . $board_id, 600))
+	{
+		return $icons;
+	}
+
+	// Custom or using the i-icon css?
 	if (empty($modSettings['messageIcons_enable']))
 	{
 		Txt::load('Post');
 
-		$icons = array(
-			array('value' => 'xx', 'name' => $txt['standard']),
-			array('value' => 'thumbup', 'name' => $txt['thumbs_up']),
-			array('value' => 'thumbdown', 'name' => $txt['thumbs_down']),
-			array('value' => 'exclamation', 'name' => $txt['exclamation_point']),
-			array('value' => 'question', 'name' => $txt['question_mark']),
-			array('value' => 'lamp', 'name' => $txt['lamp']),
-			array('value' => 'smiley', 'name' => $txt['icon_smiley']),
-			array('value' => 'angry', 'name' => $txt['icon_angry']),
-			array('value' => 'cheesy', 'name' => $txt['icon_cheesy']),
-			array('value' => 'grin', 'name' => $txt['icon_grin']),
-			array('value' => 'sad', 'name' => $txt['icon_sad']),
-			array('value' => 'wink', 'name' => $txt['icon_wink']),
-			array('value' => 'poll', 'name' => $txt['icon_poll']),
-		);
+		$default_icons = [
+			['filename' => 'xx', 'name' => $txt['standard']],
+			['filename' => 'thumbup', 'name' => $txt['thumbs_up']],
+			['filename' => 'thumbdown', 'name' => $txt['thumbs_down']],
+			['filename' => 'exclamation', 'name' => $txt['exclamation_point']],
+			['filename' => 'question', 'name' => $txt['question_mark']],
+			['filename' => 'lamp', 'name' => $txt['lamp']],
+			['filename' => 'smiley', 'name' => $txt['icon_smiley']],
+			['filename' => 'angry', 'name' => $txt['icon_angry']],
+			['filename' => 'cheesy', 'name' => $txt['icon_cheesy']],
+			['filename' => 'grin', 'name' => $txt['icon_grin']],
+			['filename' => 'sad', 'name' => $txt['icon_sad']],
+			['filename' => 'wink', 'name' => $txt['icon_wink']],
+			['filename' => 'poll', 'name' => $txt['icon_poll']],
+		];
 
-		foreach ($icons as $k => $dummy)
+		foreach ($default_icons as $icon)
 		{
-			$icons[$k]['url'] = $settings['images_url'] . '/post/' . $dummy['value'] . '.png';
-			$icons[$k]['is_last'] = false;
+			$icons[$icon['filename']] = [
+				'value' => $icon['filename'],
+				'name' => $icon['name'],
+				'url' => $settings['images_url'] . '/post/' . $icon['filename'] . '.png',
+				'is_last' => false
+			];
 		}
 	}
 	// Otherwise load the icons, and check we give the right image too...
 	else
 	{
-		$icons = array();
-		if (!Cache::instance()->getVar($icons, 'posting_icons-' . $board_id, 480))
+		$icon_data = $db->fetchQuery('
+			SELECT 
+				title, filename
+			FROM {db_prefix}message_icons
+			WHERE id_board IN (0, {int:board_id})
+			ORDER BY icon_order',
+			[
+				'board_id' => $board_id,
+			]
+		);
+		$icons = [];
+		foreach ($icon_data->fetch_all() as $icon)
 		{
-			$icon_data = $db->fetchQuery('
-				SELECT 
-					title, filename
-				FROM {db_prefix}message_icons
-				WHERE id_board IN (0, {int:board_id})
-				ORDER BY icon_order',
-				array(
-					'board_id' => $board_id,
-				)
-			);
-			$icons = array();
-			foreach ($icon_data->fetch_all() as $icon)
-			{
-				$icons[$icon['filename']] = array(
-					'value' => $icon['filename'],
-					'name' => $icon['title'],
-					'url' => $settings[file_exists($settings['theme_dir'] . '/images/post/' . $icon['filename'] . '.png') ? 'images_url' : 'default_images_url'] . '/post/' . $icon['filename'] . '.png',
-					'is_last' => false,
-				);
-			}
-
-			Cache::instance()->put('posting_icons-' . $board_id, $icons, 480);
+			$icons[$icon['filename']] = [
+				'value' => $icon['filename'],
+				'name' => $icon['title'],
+				'url' => $settings[file_exists($settings['theme_dir'] . '/images/post/' . $icon['filename'] . '.png') ? 'images_url' : 'default_images_url'] . '/post/' . $icon['filename'] . '.png',
+				'is_last' => false,
+			];
 		}
 	}
 
-	return array_values($icons);
+	Cache::instance()->put('posting_icons-' . $board_id, $icons, 600);
+
+	return $icons;
 }

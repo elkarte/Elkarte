@@ -777,7 +777,7 @@ class Post extends AbstractController
 
 		// Message icons - customized or not, retrieve them...
 		require_once(SUBSDIR . '/MessageIcons.subs.php');
-		$context['icons'] = getMessageIcons($board);
+		$context['icons'] = array_values(getMessageIcons($board));
 
 		$context['icon_url'] = '';
 
