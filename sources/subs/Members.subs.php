@@ -600,7 +600,6 @@ function registerMember(&$regOptions, $ErrorContext = 'register')
 		'default_template',
 		'images_url',
 		'number_recent_posts',
-		'smiley_sets_default',
 		'theme_dir',
 		'theme_id',
 		'theme_layers',

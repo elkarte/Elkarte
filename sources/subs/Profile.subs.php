@@ -971,52 +971,6 @@ function loadProfileFields($force_reload = false)
 			'permission' => 'profile_identity',
 			'enabled' => !empty($modSettings['allow_hideOnline']) || allowedTo('moderate_forum'),
 		),
-		'smiley_set' => array(
-			'type' => 'callback',
-			'callback_func' => 'smiley_pick',
-			'enabled' => !empty($modSettings['smiley_sets_enable']),
-			'permission' => 'profile_extra',
-			'preload' => function () {
-				global $modSettings, $context, $txt, $cur_profile;
-
-				$smiley_set = ['id' => '', 'name' => ''];
-
-				$smiley_set['id'] = empty($cur_profile['smiley_set']) ? '' : $cur_profile['smiley_set'];
-				$context['smiley_sets'] = explode(',', 'none,,' . $modSettings['smiley_sets_known']);
-				$set_names = explode("\n", $txt['smileys_none'] . "\n" . $txt['smileys_forum_board_default'] . "\n" . $modSettings['smiley_sets_names']);
-				foreach ($context['smiley_sets'] as $i => $set)
-				{
-					$context['smiley_sets'][$i] = array(
-						'id' => htmlspecialchars($set, ENT_COMPAT, 'UTF-8'),
-						'name' => htmlspecialchars($set_names[$i], ENT_COMPAT, 'UTF-8'),
-						'selected' => $set == $smiley_set['id']
-					);
-
-					if ($context['smiley_sets'][$i]['selected'])
-					{
-						$smiley_set['name'] = $set_names[$i];
-					}
-				}
-
-				$context['member']['smiley_set'] = [
-					'id' => $smiley_set['id'],
-					'name' => $smiley_set['name']
-				];
-
-				return true;
-			},
-			'input_validate' => function (&$value) {
-				global $modSettings;
-
-				$smiley_sets = explode(',', $modSettings['smiley_sets_known']);
-				if (!in_array($value, $smiley_sets) && $value !== 'none')
-				{
-					$value = '';
-				}
-
-				return true;
-			},
-		),
 		// Pretty much a dummy entry - it populates all the theme settings.
 		'theme_settings' => array(
 			'type' => 'callback',
