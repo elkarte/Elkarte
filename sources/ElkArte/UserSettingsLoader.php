@@ -39,19 +39,19 @@ class UserSettingsLoader
 	protected $username = '';
 
 	/** @var \ElkArte\Database\QueryInterface The database object */
-	protected $db = null;
+	protected $db;
 
 	/** @var \ElkArte\Cache\Cache The cache object */
-	protected $cache = null;
+	protected $cache;
 
 	/** @var \ElkArte\Request The request object */
-	protected $req = null;
+	protected $req;
 
 	/** @var \ElkArte\ValuesContainerReadOnly The settings data */
-	protected $settings = null;
+	protected $settings;
 
 	/** @var \ElkArte\ValuesContainer The into data */
-	protected $info = null;
+	protected $info;
 
 	/**
 	 * Constructor
@@ -350,7 +350,6 @@ class UserSettingsLoader
 			'time_format' => $this->settings->getEmpty('time_format', $modSettings['time_format']),
 			'time_offset' => (int) $this->settings->time_offset,
 			'avatar' => $this->buildAvatarArray(),
-			'smiley_set' => determineSmileySet($this->settings->smiley_set(''), $modSettings['smiley_sets_known']),
 			'messages' => (int) $this->settings->personal_messages,
 			'mentions' => max(0, (int) $this->settings->mentions),
 			'unread_messages' => (int) $this->settings->unread_messages,
