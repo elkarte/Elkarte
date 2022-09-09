@@ -7,7 +7,7 @@
  *
  */
 
-/** global: elk_smileys_url */
+/** global: elk_smileys_url, elk_emoji_url */
 
 /**
  * This file contains javascript associated with the :emoji: function as it
@@ -21,8 +21,9 @@ var disableDrafts = false;
 	// Editor instance
 	let editor;
 
-	// Populated with unicode key when shortname is found in emojies array
-	let emojieskey;
+	// Populated with unicode key and file type when shortname is found in emojies array
+	let emojieskey,
+		emojiestype;
 
 	/**
 	 * Load in options
@@ -43,11 +44,13 @@ var disableDrafts = false;
 	 */
 	Elk_Emoji.prototype.emojiExists = function (emoji)
 	{
-		return emojies.some(function (el)
+		return emojies.find(function (el)
 		{
 			if (el.name === emoji)
 			{
 				emojieskey = el.key;
+				emojiestype = el.type || 'svg';
+
 				return true;
 			}
 		});
@@ -69,7 +72,7 @@ var disableDrafts = false;
 			emoji_url = this.opts.emoji_url,
 			emoji_group = this.opts.emoji_group;
 
-		tpl = elk_smileys_url + "../" + emoji_group + "/${key}.svg";
+		tpl =  this.opts.emoji_url + "${key}.${type}";
 
 		// Create the emoji select list and insert choice in to the editor
 		$element.atwho({
@@ -79,7 +82,7 @@ var disableDrafts = false;
 			limit: 12,
 			acceptSpaceBar: true,
 			displayTpl: "<li data-value=':${name}:'><img class='emoji_tpl " + emoji_group + "' src='" + tpl + "' />${name}</li>",
-			insertTpl: "${name} | ${key}",
+			insertTpl: "${name} | ${key} | ${type}",
 			callbacks: {
 				filter: function (query, items, search_key)
 				{
@@ -100,10 +103,12 @@ var disableDrafts = false;
 						return ":" + tpl[0] + ":";
 					}
 
-					return "<img class='emoji' data-sceditor-emoticon=':" + tpl[0] + ":' alt=':" + tpl[1] + ":' title='" + tpl[0] + "' src='" + emoji_url + tpl[1] + ".svg' />";
+					return "<img class='emoji' data-sceditor-emoticon=':" + tpl[0] + ":' alt=':" + tpl[1] + ":' title='" + tpl[0] + "' src='" + emoji_url + tpl[1] + "." + tpl[2] + "' />";
 				},
 				tplEval: function (tpl, map)
 				{
+					map.type = map.type || 'svg';
+
 					try
 					{
 						return tpl.replace(/\$\{([^}]*)}/g, function(tag, key, pos)
@@ -178,7 +183,7 @@ var disableDrafts = false;
 	{
 		let instance, // sceditor instance
 			str, // current html in the editor
-			emoji_regex = new RegExp("(:([-+\\w]+):)", "gi"), // find emoji
+			emoji_regex = new RegExp("(?<=[^\"'])(:([-+\\w]+):)", "gi"), // find emoji
 			code_regex = ["(</code>|<code(?:[^>]+)?>)", "(</icode>|<icode(?:[^>]+)?>)"], // split around code/icode tags
 			str_split,
 			i,
@@ -215,6 +220,14 @@ var disableDrafts = false;
 		instance.val(str, false);
 	};
 
+	/**
+	 * Callback function on emoji matching, swaps out :emoji: with correct image
+	 *
+	 * @param {string} match
+	 * @param {string} tag
+	 * @param {string} shortname
+	 * @returns {string|*}
+	 */
 	Elk_Emoji.prototype.process = function(match, tag, shortname)
 	{
 		// Replace all valid emoji tags with the image tag
@@ -223,7 +236,35 @@ var disableDrafts = false;
 			return match;
 		}
 
-		return '<img data-sceditor-emoticon="' + tag + '" class="emoji" alt="' + tag + '" title="' + shortname + '" src="{emoji_url}' + emojieskey + '.svg" />';
+		return '<img data-sceditor-emoticon="' + tag + '" class="emoji" alt="' + tag + '" title="' + shortname + '" src="{emoji_url}' + emojieskey + '.' + emojiestype + '" />';
+	};
+
+	/**
+	 * Combines default emoji codes from emoji_tags.js with any defined in custom_tags.js.  This
+	 * will add new and replace duplicates, e.g. array_merge
+	 */
+	Elk_Emoji.prototype.compile = function ()
+	{
+		if (custom === undefined || custom.length === 0)
+		{
+			return;
+		}
+
+		// Creates an object map of name to object in emojies
+		const emojiesMap = emojies.reduce((acc, o) =>
+		{
+			acc[o.name] = o;
+			return acc;
+		});
+
+		// Update corresponding name in emojiesMap from custom, creates a new object if none exists
+		custom.forEach(o =>
+		{
+			emojiesMap[o.name] = o;
+		});
+
+		// Return the merged values in emojiesMap back as the emojies array
+		emojies = Object.values(emojiesMap);
 	};
 
 	/**
@@ -261,45 +302,63 @@ var disableDrafts = false;
 		base.signalReady = function ()
 		{
 			// Set up the options
-			this.opts.emojiOptions.emoji_url = elk_smileys_url.replace("default", this.opts.emojiOptions.emoji_group);
+			this.opts.emojiOptions.emoji_url = elk_emoji_url;
 			if (typeof this.opts.emojiOptions.editor_id === 'undefined')
 			{
 				this.opts.emojiOptions.editor_id = post_box_name;
 			}
 
-			// Load the emoji file, then call start the instance
-			let promise = base.getScript(elk_default_theme_url + '/scripts/emoji_tags.js');
-			promise.then(
-				script =>
+			// Load the emoji file(s), then call start the instance
+			Promise.all([
+				base.getScript(elk_default_theme_url + '/scripts/emoji_tags.js'),
+				base.getScript(elk_default_theme_url + '/scripts/custom_tags.js')
+			])
+			.then(() =>
+			{
+				// No custom or an error page ... seed a blank
+				if (typeof custom === 'undefined')
 				{
-					// Init the emoji instance, load in the options
-					oEmoji = new Elk_Emoji(this.opts.emojiOptions);
-
-					let original_textarea = document.getElementById(oEmoji.opts.editor_id),
-						instance = sceditor.instance(original_textarea),
-						sceditor_textarea = instance.getContentAreaContainer().nextSibling;
-
-					// Attach atwho to the editors source textarea
-					oEmoji.attachAtWho($(sceditor_textarea), {});
-
-					// Using wysiwyg, then lets attach atwho to the wysiwyg container as well
-					if (!instance.opts.runWithoutWysiwygSupport)
-					{
-						// We need to monitor the iframe window and body to text input
-						let oIframe = instance.getContentAreaContainer(),
-							oIframeWindow = oIframe.contentWindow,
-							oIframeBody = oIframe.contentDocument.body;
-
-						oEmoji.attachAtWho($(oIframeBody), oIframeWindow);
-					}
-				},
-				error => {
+					let inlineScript = document.createElement('script');
+					inlineScript.innerHTML = 'let custom = [];';
+					document.head.append(inlineScript);
 					if ('console' in window)
 					{
-						window.console.info(`Error: ${error.message}`);
+						window.console.info('custom_tags.js file missing or in error');
 					}
 				}
-			);
+			})
+			.then(() => {
+				// Init the emoji instance, load in the options
+				oEmoji = new Elk_Emoji(this.opts.emojiOptions);
+
+				// Account for any custom tags, set the emojies array
+				oEmoji.compile();
+
+				let original_textarea = document.getElementById(oEmoji.opts.editor_id),
+					instance = sceditor.instance(original_textarea),
+					sceditor_textarea = instance.getContentAreaContainer().nextSibling;
+
+				// Attach atwho to the editors source textarea
+				oEmoji.attachAtWho($(sceditor_textarea), {});
+
+				// Using wysiwyg, then lets attach atwho to the wysiwyg container as well
+				if (!instance.opts.runWithoutWysiwygSupport)
+				{
+					// We need to monitor the iframe window and body to text input
+					let oIframe = instance.getContentAreaContainer(),
+						oIframeWindow = oIframe.contentWindow,
+						oIframeBody = oIframe.contentDocument.body;
+
+					oEmoji.attachAtWho($(oIframeBody), oIframeWindow);
+				}
+			},
+			error =>
+			{
+				if ('console' in window)
+				{
+					window.console.info(`Error: ${error.message}`);
+				}
+			});
 		};
 
 		/**
@@ -310,9 +369,10 @@ var disableDrafts = false;
 		base.getScript = function(scriptUrl) {
 			return new Promise(function(resolve, reject)
 			{
-				const script = document.createElement('script');
+				let script = document.createElement('script');
 
 				script.src = scriptUrl;
+				script.async = true;
 				script.onload = () => resolve(script);
 				script.onerror = () => reject(new Error(`Script load error for ${src}`));
 
