@@ -110,9 +110,9 @@
 	--menu_border: #363738; /* linklevel 1 border */
 	--menu_border_top: #363738;
 	--menu_border_left: #363738;
-	--menu_background: #232323; /* linklevel 1  background */
+	--menu_background: #232323; /* linklevel 1 background */
 	--menu_background_compliment: #232323;
-	--menu_border_hover_top: #0B0B0B; /*  menu border color top */
+	--menu_border_hover_top: #0B0B0B; /* menu border color top */
 	--menu_border_hover_left: #0B0B0B; /* menu border color left */
 	--menu_border_hover: #0B0B0B; /* Hover border */
 	--menu_button_hover_background: #0B0B0B; /* A background used on non active menu hovers */
@@ -134,16 +134,16 @@
 	--secondary_category_bottom: #BBBBBB;
 
 	/* Standard horizontal rule.. ([hr], etc.) */
-	--hr_border_bottom: #BBBBBB;
-	--hr_border_top: #BBBBBB;
-	--hr_background: #E4E4E4;
+	--hr_border_bottom: #64533F;
+	--hr_border_top: #64533F;
+	--hr_background: #9D8860;
 
 	/* Misc */
 	--links: #9D8860; /*#5784FF; /* normal links */
 	--bbclinks: #9D8860; /* bbc links */
 	--bbclinks_hover: #64533F; /* bbc link hover effect */
 	--bbclinks_shadow: #CEDCCB; /* BBC link underline */
-	--valid: #EBFFD8; /*  used as valid background color */
+	--valid: #EBFFD8; /* used as valid background color */
 	--invalid: #FFEEEE; /* very pale red, used as invalid input color */
 	--information: #1B644E; /* information box background */
 	--description: #003A47; /* description box background */
@@ -189,7 +189,7 @@
 	--news_background: #0B0B0B; /* Background of news section */
 	--action_available: #64533F; /* new button, approval button */
 	--mid_grey_background: #C4C4C4; /* Various uses where a slightly darker background is needed */
-	--dark_grey_background: #888888; /* A bit darker, useful in some places */
+	--dark_background: #64533F; /* A bit darker, useful in some places */
 
 	/* Text colors */
 	--emphasize_text: #444444; /* When you need a darker text color on hover or elsewhere */
@@ -1030,11 +1030,14 @@ sup.bbc_footnotes, sup.bbc_footnotes a {
 .content_category > div,
 .content_category > li {
 	border-color: var(--secondary_border);
+	border-right-color: var(--transparent);
+	border-left-color: var(--transparent);
 	background: var(--primary_content_background);
 }
 
 .board_row {
 	margin-bottom: .5em;
+	border-bottom-color: var(--transparent);
 }
 
 .board_name > a {
@@ -1099,6 +1102,8 @@ sup.bbc_footnotes, sup.bbc_footnotes a {
 
 #description_board .generalinfo, #forumposts .generalinfo {
 	border-color: var(--primary_border);
+	border-right-color: var(--transparent);
+	border-left-color: var(--transparent);
 	background: var(--primary_content_background);
 }
 
@@ -1114,6 +1119,8 @@ sup.bbc_footnotes, sup.bbc_footnotes a {
 
 .topic_listing > li {
 	border-color: var(--primary_border);
+	border-right-color: var(--transparent);
+	border-left-color: var(--transparent);
 }
 
 .basic_row {
@@ -1210,7 +1217,7 @@ sup.bbc_footnotes, sup.bbc_footnotes a {
 
 /* On to the posts */
 #quickreplybox, #forumposts, #recentposts, #pmFolder, #topic_summary, #preview_section {
-	background: var(--dark_grey_background);
+	background: var(--dark_background);
 	box-shadow: 1px 2px 4px var(--box_shadow);
 }
 
@@ -1981,7 +1988,7 @@ ul.cf_icons {
 
 .icoffline {
 	border-color: var(--primary_border);
-	background-image: linear-gradient(to bottom, var(--mid_grey_background) 0%, var(--dark_grey_background) 50%, var(--mid_grey_background) 100%);
+	background-image: linear-gradient(to bottom, var(--mid_grey_background) 0%, var(--dark_background) 50%, var(--mid_grey_background) 100%);
 }
 
 /* -------------------------------------------------------

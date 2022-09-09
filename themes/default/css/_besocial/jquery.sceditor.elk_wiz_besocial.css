@@ -42,6 +42,7 @@ body {
 [contenteditable="true"] {
 	font: 90%/130% Helvetica, Arial, "Nimbus Sans L", sans-serif;
 	color: var(--body_text);
+	padding: 0 5px;
 }
 
 a, a:link, a:visited {

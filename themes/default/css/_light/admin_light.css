@@ -231,7 +231,7 @@
 
 .ui-widget-overlay {
 	opacity: 0.6;
-	background-color: var(--dark_grey_background);
+	background-color: var(--dark_background);
 }
 
 /* This is the drag/drop placeholder, normally not visible */

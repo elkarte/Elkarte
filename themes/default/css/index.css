@@ -1119,8 +1119,8 @@ a.bbc_link {
 
 /* The main title. */
 #forumtitle, .rightheader #forumtitle {
-	font-size: var(--font28);
-	padding: .8em .4em .4em .4em;
+	font-size: var(--font30);
+	padding: .4em;
 }
 
 .centerheader .forumlink {
@@ -1133,7 +1133,7 @@ a.bbc_link {
 
 /* Holds the logo and slogan */
 #logobox {
-	margin: 0 auto;
+	margin: -.5em auto 0 auto;
 	text-align: center;
 }
 
@@ -2528,11 +2528,15 @@ button[type="submit"].quick_quote_button.hide {
 	place-self: center left;
 }
 
+.topic_icons > img {
+	max-width: 18px;
+}
+
 /* Indicator if you posted in this topic */
 .fred::before {
 	position: relative;
 	top: -14px;
-	right: 4px;
+	right: 2px;
 	max-width: .8em;
 }
 
@@ -2612,6 +2616,10 @@ button[type="submit"].quick_quote_button.hide {
 	width: 18px;
 	height: 18px;
 	content: "";
+}
+
+.topicicon {
+	vertical-align: middle;
 }
 
 /* sticky / locked icons for the upper right of the topic_info div */
@@ -3193,7 +3201,7 @@ footer .signature {
 /* Emoji and smiley icons in the post */
 .smiley, .emoji {
 	vertical-align: text-bottom;
-	max-width: 20px;
+	max-height: 20px;
 }
 
 .emoji {

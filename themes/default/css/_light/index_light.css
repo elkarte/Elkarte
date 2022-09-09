@@ -189,7 +189,7 @@
 	--news_background: #FAFAFA; /* Background of news section */
 	--action_available: #21873C; /* new button, approval links */
 	--mid_grey_background: #E4E4E4; /* Various uses where a slightly darker background is needed */
-	--dark_grey_background: #989898; /* A bit darker, useful in some places */
+	--dark_background: #989898; /* A bit darker, useful in some places */
 
 	/* Text colors */
 	--emphasize_text: #444444; /* When you need a darker text color on hover or elsewhere */
@@ -780,7 +780,7 @@ sup.bbc_footnotes, sup.bbc_footnotes a {
 }
 
 .linklevel1.active:hover .pm_indicator {
-	border-bottom-color: var(--menu_border_hover_top);
+	border-bottom-color: var(--menu_border_active_hover_top);
 }
 
 /* Do one override here for .poster. Still saves code all round. */
@@ -1948,7 +1948,7 @@ ul.cf_icons {
 
 .icoffline {
 	border-color: var(--primary_border);
-	background-image: linear-gradient(to bottom, var(--mid_grey_background) 0%, var(--dark_grey_background) 50%, var(--mid_grey_background) 100%);
+	background-image: linear-gradient(to bottom, var(--mid_grey_background) 0%, var(--dark_background) 50%, var(--mid_grey_background) 100%);
 }
 
 /* -------------------------------------------------------

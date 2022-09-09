@@ -51,6 +51,14 @@
 	border-radius: 0 0 4px 4px;
 }
 
+.sceditor-container iframe {
+	padding: 0 !important;
+}
+
+[contenteditable=true] {
+	padding: 0 5px;
+}
+
 /* Necessary for stabilising font-size in source mode! */
 .sceditor-container textarea, .sceditor-container textarea:focus {
 	box-shadow: none;
@@ -121,11 +129,13 @@
 #sceditor-smileycontainer {
 	display: flex;
 	align-items: center;
+	flex-wrap: wrap;
+	width: 90%;
 }
 
 .sceditor-insertemoticon img, .sceditor-smileyPopup img {
 	max-width: 20px;
-	margin: 6px 4px 4px 4px;
+	margin: 2px 6px 6px 6px;
 	cursor: pointer;
 }
 
