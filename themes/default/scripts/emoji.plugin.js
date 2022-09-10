@@ -7,7 +7,7 @@
  *
  */
 
-/** global: elk_smileys_url, elk_emoji_url */
+/** global: elk_smileys_url, elk_emoji_url, emojis, custom */
 
 /**
  * This file contains javascript associated with the :emoji: function as it
@@ -21,9 +21,9 @@ var disableDrafts = false;
 	// Editor instance
 	let editor;
 
-	// Populated with unicode key and file type when shortname is found in emojies array
-	let emojieskey,
-		emojiestype;
+	// Populated with unicode key and file type when shortname is found in emojis array
+	let emojiskey,
+		emojistype;
 
 	/**
 	 * Load in options
@@ -44,12 +44,12 @@ var disableDrafts = false;
 	 */
 	Elk_Emoji.prototype.emojiExists = function (emoji)
 	{
-		return emojies.find(function (el)
+		return emojis.find(function (el)
 		{
 			if (el.name === emoji)
 			{
-				emojieskey = el.key;
-				emojiestype = el.type || 'svg';
+				emojiskey = el.key;
+				emojistype = el.type || 'svg';
 
 				return true;
 			}
@@ -77,7 +77,7 @@ var disableDrafts = false;
 		// Create the emoji select list and insert choice in to the editor
 		$element.atwho({
 			at: ":",
-			data: emojies,
+			data: emojis,
 			maxLen: 35,
 			limit: 12,
 			acceptSpaceBar: true,
@@ -236,7 +236,7 @@ var disableDrafts = false;
 			return match;
 		}
 
-		return '<img data-sceditor-emoticon="' + tag + '" class="emoji" alt="' + tag + '" title="' + shortname + '" src="{emoji_url}' + emojieskey + '.' + emojiestype + '" />';
+		return '<img data-sceditor-emoticon="' + tag + '" class="emoji" alt="' + tag + '" title="' + shortname + '" src="{emoji_url}' + emojiskey + '.' + emojistype + '" />';
 	};
 
 	/**
@@ -245,26 +245,26 @@ var disableDrafts = false;
 	 */
 	Elk_Emoji.prototype.compile = function ()
 	{
-		if (custom === undefined || custom.length === 0)
+		if (typeof custom === 'undefined' || custom.length === 0)
 		{
 			return;
 		}
 
-		// Creates an object map of name to object in emojies
-		const emojiesMap = emojies.reduce((acc, o) =>
+		// Creates an object map of name to object in emojis
+		const emojisMap = emojis.reduce((acc, o) =>
 		{
 			acc[o.name] = o;
 			return acc;
 		});
 
-		// Update corresponding name in emojiesMap from custom, creates a new object if none exists
+		// Update corresponding name in emojisMap from custom, creates a new object if none exists
 		custom.forEach(o =>
 		{
-			emojiesMap[o.name] = o;
+			emojisMap[o.name] = o;
 		});
 
-		// Return the merged values in emojiesMap back as the emojies array
-		emojies = Object.values(emojiesMap);
+		// Return the merged values in emojisMap back as the emojis array
+		emojis = Object.values(emojisMap);
 	};
 
 	/**
@@ -331,7 +331,7 @@ var disableDrafts = false;
 				// Init the emoji instance, load in the options
 				oEmoji = new Elk_Emoji(this.opts.emojiOptions);
 
-				// Account for any custom tags, set the emojies array
+				// Account for any custom tags, set the emojis array
 				oEmoji.compile();
 
 				let original_textarea = document.getElementById(oEmoji.opts.editor_id),

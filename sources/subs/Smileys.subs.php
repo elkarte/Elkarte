@@ -310,7 +310,7 @@ function moveSmileyPosition($smiley, $source)
  *
  * @param int $id
  * @param int $row
- * @param int $location
+ * @param string $location
  */
 function updateSmileyRow($id, $row, $location)
 {

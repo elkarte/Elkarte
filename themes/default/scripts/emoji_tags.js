@@ -7,7 +7,7 @@
  *
  */
 
-let emojies = [
+let emojis = [
 	{name: 'grinning', key: '1f600'},
 	{name: 'smiley', key: '1f603'},
 	{name: 'smile', key: '1f604'},

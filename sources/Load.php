@@ -752,7 +752,7 @@ function loadUserContext()
  */
 function loadSmileyEmojiData()
 {
-	global $context, $modSettings, $options;
+	global $context, $modSettings, $options, $settings;
 
 	// Using the theme specific or global set
 	$context['smiley_set'] = !empty($settings['smiley_sets_default']) ? $settings['smiley_sets_default'] : $modSettings['smiley_sets_default'];
