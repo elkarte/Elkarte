@@ -97,7 +97,7 @@ var disableDrafts = false;
 				filter: function (query, items, search_key)
 				{
 					// Don't show the list until they have entered at least two characters
-					if (query.length < 2)
+					if (typeof query === 'undefined' || query.length < 2 || query.length > 25)
 					{
 						return [];
 					}
@@ -155,13 +155,16 @@ var disableDrafts = false;
 				beforeReposition: function (offset)
 				{
 					// We only need to adjust when in wysiwyg and only on first appearance
-					if (editor.inSourceMode() || Object.keys(corrected_offset).length !== 0)
+					if (editor.inSourceMode())
 					{
 						return offset;
 					}
 
-					// Get the caret position, so we can add the emoji box there
-					corrected_offset = editor.findCursorPosition(':');
+					if (Object.keys(corrected_offset).length === 0)
+					{
+						// Get the caret position, so we can add the emoji box there
+						corrected_offset = editor.findCursorPosition(':');
+					}
 
 					offset.top = corrected_offset.top;
 					offset.left = corrected_offset.left;
