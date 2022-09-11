@@ -327,7 +327,8 @@ const itemCodes = ["*:disc", "@:disc", "+:square", "x:square", "#:decimal", "0:d
 				// Found the start tag
 				if (atPos > -1)
 				{
-					parent.insertBefore(placefinder, prev.splitText(atPos + 1));
+					// <span>\u200B</span>@somename add one if you want it after @
+					parent.insertBefore(placefinder, prev.splitText(atPos));
 					break;
 				}
 
