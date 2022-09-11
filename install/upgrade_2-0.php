@@ -497,8 +497,6 @@ class UpgradeInstructions_upgrade_2_0
 			array(
 				'debug_title' => 'Remove extension from existing smiley filenames ...',
 				'function' => function () {
-					global $modSettings;
-
 					$request = $this->db->query('', '
 						SELECT 
 							filename
@@ -526,58 +524,95 @@ class UpgradeInstructions_upgrade_2_0
 							)
 						);
 					}
+				}
+			),
+			array(
+				'debug_title' => 'Add new smiley extension values...',
+				'function' => function () {
+					global $modSettings;
 
-					// Make sure the default directory is in the available sets
-					$sets = explode(',', $modSettings['smiley_sets_known']);
-					if (!in_array('default', $sets, true))
+					// Not defined is easy, but unlikely
+					if (empty($modSettings['smiley_sets_known']))
 					{
-						updateSettings(array(
-							'smiley_sets_known' => 'default,' . $modSettings['smiley_sets_known'],
-							'smiley_sets_names' => $modSettings['smiley_sets_names'] . "\n" . 'Default',
-							'smiley_sets_extensions' => 'svg,' . $modSettings['smiley_sets_extensions'],
-						));
+						$smiley_sets_known = 'default';
+						$smiley_sets_names = 'Default';
+						$smiley_sets_extensions = 'svg';
 					}
+					else
+					{
+						// Set up the extensions modSettings based on existing sets
+						require_once(SUBSDIR . '/Smileys.subs.php');
+						$smiley_sets_extensions = setSmileyExtensionArray();
+
+						$sets = explode(',', $modSettings['smiley_sets_known']);
+						$key = array_search('default', $sets, true);
+
+						// default does not exist, easy, add it as the first
+						if (empty($key))
+						{
+							$smiley_sets_known = 'default,' . $modSettings['smiley_sets_known'];
+							$smiley_sets_names = 'Default' . "\n" . $modSettings['smiley_sets_names'];
+							$smiley_sets_extensions = 'svg,' . $smiley_sets_extensions;
+						}
+						// Otherwise, force the extension to svg for the default set
+						else
+						{
+							$smiley_sets_known = $modSettings['smiley_sets_known'];
+							$smiley_sets_names = $modSettings['smiley_sets_names'];
+							$smiley_sets_extensions = explode(',', $smiley_sets_extensions);
+							$smiley_sets_extensions[$key] = 'svg';
+							$smiley_sets_extensions = implode(',', $smiley_sets_extensions);
+						}
+					}
+
+					updateSettings(array(
+						'smiley_sets_known' => $smiley_sets_known,
+						'smiley_sets_names' => $smiley_sets_names,
+						'smiley_sets_extensions' => $smiley_sets_extensions,
+					));
 				}
 			),
 			array(
 				'debug_title' => 'Add new/missing smiley codes ...',
 				'function' => function () {
+					global $txt;
+
 					// Definitions of all emoji smiles we use in the editor
 					$emojiSmile = array(
-						array(':smiley:', 'smiley', '{$default_smiley_smiley}', 0, 2),
-						array(':wink:', 'wink', '{$default_wink_smiley}', 0, 2),
-						array(':cheesy:', 'cheesy', '{$default_cheesy_smiley}', 0, 2),
-						array(':grin:', 'grin', '{$default_grin_smiley}', 0, 2),
-						array(':angry:', 'angry', '{$default_angry_smiley}', 0, 2),
-						array(':sad:', 'sad', '{$default_sad_smiley}', 0, 2),
-						array(':shocked:', 'shocked', '{$default_shocked_smiley}', 0, 2),
-						array(':cool:', 'cool', '{$default_cool_smiley}', 0, 2),
-						array(':huh:', 'huh', '{$default_huh_smiley}', 0, 2),
-						array(':rolleyes:', 'rolleyes', '{$default_roll_eyes_smiley}', 0, 2),
-						array(':tongue:', 'tongue', '{$default_tongue_smiley}', 0, 2),
-						array(':embarrassed:', 'embarrassed', '{$default_embarrassed_smiley}', 0, 2),
-						array(':zipper_mouth:', 'lipsrsealed', '{$default_lips_sealed_smiley}', 0, 2),
-						array(':undecided:', 'undecided', '{$default_undecided_smiley}', 0, 2),
-						array(':kiss:', 'kiss', '{$default_kiss_smiley}', 0, 2),
-						array(':cry:', 'cry', '{$default_cry_smiley}', 0, 2),
-						array(':evil:', 'evil', '{$default_evil_smiley}', 0, 2),
-						array(':laugh:', 'laugh', '{$default_laugh_smiley}', 0, 2),
-						array(':rotating_light:', 'police', '{$default_police_smiley}', 0, 2),
-						array(':innocent:', 'angel', '{$default_angel_smiley}', 0, 2),
-						array(':thumbsup:', 'thumbsup', '{$default_thumbup_smiley}', 0, 2),
-						array(':thumbsdown:', 'thumbsdown', '{$default_thumbdown_smiley}', 0, 2),
-						array(':skull:', 'skull', '{$default_skull_smiley}', 0, 2),
-						array(':poop:', 'poop', '{$default_poop_smiley}', 0, 2),
-						array(':sweat:', 'sweat', '{$default_sweat_smiley}', 0, 2),
-						array(':heart_eyes:', 'heart', '{$default_heart_smiley}', 0, 2),
-						array(':grimacing:', 'grimacing', '{$default_grimace_smiley}', 0, 2),
-						array(':nerd:', 'nerd', '{$default_nerd_smiley}', 0, 2),
-						array(':head_bandage:', 'clumsy', '{$default_clumsy_smiley}', 0, 2),
-						array(':clown:', 'clown', '{$default_clown_smiley}', 0, 2),
-						array(':partying_face', 'party', '{$default_party_smiley}', 0, 2),
-						array(':zany_face:', 'zany', '{$default_wild_smiley}', 0, 2),
-						array(':shushing_face:', 'shh', '{$default_shh_smiley}', 0, 2),
-						array(':face_vomiting:', 'vomit', '{$default_vomit_smiley}', 0, 2)
+						array(':smiley:', 'smiley', $txt['default_smiley_smiley'], 0, 2),
+						array(':wink:', 'wink', $txt['default_wink_smiley'], 0, 2),
+						array(':cheesy:', 'cheesy', $txt['default_cheesy_smiley'], 0, 2),
+						array(':grin:', 'grin', $txt['default_grin_smiley'], 0, 2),
+						array(':angry:', 'angry', $txt['default_angry_smiley'], 0, 2),
+						array(':sad:', 'sad', $txt['default_sad_smiley'], 0, 2),
+						array(':shocked:', 'shocked', $txt['default_shocked_smiley'], 0, 2),
+						array(':cool:', 'cool', $txt['default_cool_smiley'], 0, 2),
+						array(':huh:', 'huh', $txt['default_huh_smiley'], 0, 2),
+						array(':rolleyes:', 'rolleyes', $txt['default_roll_eyes_smiley'], 0, 2),
+						array(':tongue:', 'tongue', $txt['default_tongue_smiley'], 0, 2),
+						array(':embarrassed:', 'embarrassed', $txt['default_embarrassed_smiley'], 0, 2),
+						array(':zipper_mouth:', 'lipsrsealed', $txt['default_lips_sealed_smiley'], 0, 2),
+						array(':undecided:', 'undecided', $txt['default_undecided_smiley'], 0, 2),
+						array(':kiss:', 'kiss', $txt['default_kiss_smiley'], 0, 2),
+						array(':cry:', 'cry', $txt['default_cry_smiley'], 0, 2),
+						array(':evil:', 'evil', $txt['default_evil_smiley'], 0, 2),
+						array(':laugh:', 'laugh', $txt['default_laugh_smiley'], 0, 2),
+						array(':rotating_light:', 'police', $txt['default_police_smiley'], 0, 2),
+						array(':innocent:', 'angel', $txt['default_angel_smiley'], 0, 2),
+						array(':thumbsup:', 'thumbsup', $txt['default_thumbup_smiley'], 0, 2),
+						array(':thumbsdown:', 'thumbsdown', $txt['default_thumbdown_smiley'], 0, 2),
+						array(':skull:', 'skull', $txt['default_skull_smiley'], 0, 2),
+						array(':poop:', 'poop', $txt['default_poop_smiley'], 0, 2),
+						array(':sweat:', 'sweat', $txt['default_sweat_smiley'], 0, 2),
+						array(':heart_eyes:', 'heart', $txt['default_heart_smiley'], 0, 2),
+						array(':grimacing:', 'grimacing', $txt['default_grimace_smiley'], 0, 2),
+						array(':nerd:', 'nerd', $txt['default_nerd_smiley'], 0, 2),
+						array(':head_bandage:', 'clumsy', $txt['default_clumsy_smiley'], 0, 2),
+						array(':clown:', 'clown', $txt['default_clown_smiley'], 0, 2),
+						array(':partying_face', 'party', $txt['default_party_smiley'], 0, 2),
+						array(':zany_face:', 'zany', $txt['default_wild_smiley'], 0, 2),
+						array(':shushing_face:', 'shh', $txt['default_shh_smiley'], 0, 2),
+						array(':face_vomiting:', 'vomit', $txt['default_vomit_smiley'], 0, 2)
 					);
 					$codes = array();
 					$inserts = array();
