@@ -21,9 +21,10 @@ var disableDrafts = false;
 	// Editor instance
 	let editor;
 
-	// Populated with unicode key and file type when shortname is found in emojis array
+	// Populated with unicode key, file type and location when shortname is found in emojis array
 	let emojiskey,
-		emojistype;
+		emojistype,
+		emojisurl;
 
 	/**
 	 * Load in options
@@ -49,7 +50,18 @@ var disableDrafts = false;
 			if (el.name === emoji)
 			{
 				emojiskey = el.key;
-				emojistype = el.type || 'svg';
+
+				// Only custom_tag will have a type set
+				if (typeof (el.type) !== 'undefined')
+				{
+					emojisurl = elk_smileys_url;
+					emojistype = el.type;
+				}
+				else
+				{
+					emojisurl = elk_emoji_url;
+					emojistype = 'svg';
+				}
 
 				return true;
 			}
@@ -68,21 +80,19 @@ var disableDrafts = false;
 		 * Create the dropdown selection list
 		 * Inserts the site image location when one is selected.
 		 */
-		let tpl,
-			emoji_url = this.opts.emoji_url,
-			emoji_group = this.opts.emoji_group;
-
-		tpl =  this.opts.emoji_url + "${key}.${type}";
+		let tpl = '${url}${key}.${type}',
+			emoji_group = this.opts.emoji_group,
+			corrected_offset = {};
 
 		// Create the emoji select list and insert choice in to the editor
 		$element.atwho({
 			at: ":",
 			data: emojis,
-			maxLen: 35,
+			maxLen: 20,
 			limit: 12,
-			acceptSpaceBar: true,
+			acceptSpaceBar: false,
 			displayTpl: "<li data-value=':${name}:'><img class='emoji_tpl " + emoji_group + "' src='" + tpl + "' />${name}</li>",
-			insertTpl: "${name} | ${key} | ${type}",
+			insertTpl: "${name} | ${key} | ${type} | ${url}",
 			callbacks: {
 				filter: function (query, items, search_key)
 				{
@@ -96,6 +106,10 @@ var disableDrafts = false;
 				},
 				beforeInsert: function (value)
 				{
+					// Set up for a new pull-down box/location
+					corrected_offset = {};
+
+					// Grab the values
 					tpl = value.split(" | ");
 
 					if (editor.inSourceMode())
@@ -103,11 +117,23 @@ var disableDrafts = false;
 						return ":" + tpl[0] + ":";
 					}
 
-					return "<img class='emoji' data-sceditor-emoticon=':" + tpl[0] + ":' alt=':" + tpl[1] + ":' title='" + tpl[0] + "' src='" + emoji_url + tpl[1] + "." + tpl[2] + "' />";
+					return "<img class='emoji' data-sceditor-emoticon=':" + tpl[0] + ":' alt=':" + tpl[1] + ":' title='" + tpl[0] + "' src='" + tpl[3] + tpl[1] + "." + tpl[2] + "' />";
 				},
 				tplEval: function (tpl, map)
 				{
-					map.type = map.type || 'svg';
+					// Set the url location if we have not already done this for this item
+					if (typeof map.url === 'undefined')
+					{
+						if (typeof (map.type) !== 'undefined')
+						{
+							map.url = elk_smileys_url;
+						}
+						else
+						{
+							map.type = 'svg';
+							map.url = elk_emoji_url;
+						}
+					}
 
 					try
 					{
@@ -128,19 +154,24 @@ var disableDrafts = false;
 				},
 				beforeReposition: function (offset)
 				{
-					// We only need to adjust when in wysiwyg
-					if (editor.inSourceMode())
+					// We only need to adjust when in wysiwyg and only on first appearance
+					if (editor.inSourceMode() || Object.keys(corrected_offset).length !== 0)
 					{
 						return offset;
 					}
 
 					// Get the caret position, so we can add the emoji box there
-					let corrected_offset = editor.findCursorPosition(':');
+					corrected_offset = editor.findCursorPosition(':');
 
 					offset.top = corrected_offset.top;
 					offset.left = corrected_offset.left;
 
 					return offset;
+				},
+				afterMatchFailed: function (at, el)
+				{
+					// Clear the offset
+					corrected_offset = {};
 				}
 			}
 		});
@@ -177,7 +208,7 @@ var disableDrafts = false;
 	};
 
 	/**
-	 * Fetches the HTML from the editor window and updates any emoji :tags: with img tags
+	 * Fetches from the editor window and updates any emoji :tags: with img tags
 	 */
 	Elk_Emoji.prototype.processEmoji = function (opts)
 	{
@@ -208,7 +239,7 @@ var disableDrafts = false;
 				if (i % 4 === 0)
 				{
 					// Search for emoji :tags: and replace known ones with the right image
-					str_split[i] = str_split[i].replace(emoji_regex, Elk_Emoji.prototype.process).replace('{emoji_url}', opts.emoji_url);
+					str_split[i] = str_split[i].replace(emoji_regex, Elk_Emoji.prototype.process);
 				}
 			}
 
@@ -236,7 +267,7 @@ var disableDrafts = false;
 			return match;
 		}
 
-		return '<img data-sceditor-emoticon="' + tag + '" class="emoji" alt="' + tag + '" title="' + shortname + '" src="{emoji_url}' + emojiskey + '.' + emojistype + '" />';
+		return '<img data-sceditor-emoticon="' + tag + '" class="emoji" alt="' + tag + '" title="' + shortname + '" src="' + emojisurl + emojiskey + '.' + emojistype + '" />';
 	};
 
 	/**
@@ -302,7 +333,6 @@ var disableDrafts = false;
 		base.signalReady = function ()
 		{
 			// Set up the options
-			this.opts.emojiOptions.emoji_url = elk_emoji_url;
 			if (typeof this.opts.emojiOptions.editor_id === 'undefined')
 			{
 				this.opts.emojiOptions.editor_id = post_box_name;
