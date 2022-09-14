@@ -5,8 +5,6 @@
  * specially as needed for avatars (uploaded avatars), attachments, or
  * visual verification images.
  *
- * TrueType fonts supplied by www.LarabieFonts.com
- *
  * @name      ElkArte Forum
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
@@ -1319,9 +1317,9 @@ function showCodeImage($code)
 	{
 		$font_list = !empty($font_list) ? array($font_list[0]) : $font_list;
 
-		// Try use Screenge if we can - it looks good!
-		if (in_array('VDS_New.ttf', $ttfont_list))
-			$ttfont_list = array('VDS_New.ttf');
+		// Try use OpenSans if we can - it looks good!
+		if (in_array('OpenSans.ttf', $ttfont_list))
+			$ttfont_list = array('OpenSans.ttf');
 		else
 			$ttfont_list = empty($ttfont_list) ? array() : array($ttfont_list[0]);
 	}
@@ -1346,7 +1344,8 @@ function showCodeImage($code)
 			$loaded_fonts[$font_index] = imageloadfont($settings['default_theme_dir'] . '/fonts/' . $font_list[$font_index]);
 
 	// Determine the dimensions of each character.
-	$total_width = $character_spacing * strlen($code) + 50;
+	$extra = ($imageType == 4 || $imageType == 5) ? 80 : 45;
+	$total_width = $character_spacing * strlen($code) + $extra;
 	$max_height = 0;
 	foreach ($characters as $char_index => $character)
 	{
@@ -1361,7 +1360,7 @@ function showCodeImage($code)
 			$img_box = imagettfbbox($font_size, 0, $settings['default_theme_dir'] . '/fonts/' . $ttfont_list[$character['font']], $character['id']);
 
 			$characters[$char_index]['width'] = abs($img_box[2] - $img_box[0]);
-			$characters[$char_index]['height'] = abs($img_box[7] - $img_box[1]);
+			$characters[$char_index]['height'] = abs(max($img_box[1] - $img_box[7], $img_box[5] - $img_box[3]));
 		}
 		else
 		{
@@ -1369,8 +1368,8 @@ function showCodeImage($code)
 			$characters[$char_index]['height'] = imagefontheight($loaded_fonts[$character['font']]);
 		}
 
-		$max_height = max($characters[$char_index]['height'] + 15, $max_height);
-		$total_width += $characters[$char_index]['width'] + 2;
+		$max_height = max($characters[$char_index]['height'] + 10, $max_height);
+		$total_width += $characters[$char_index]['width'];
 	}
 
 	// Create an image.
@@ -1394,12 +1393,14 @@ function showCodeImage($code)
 	// Some squares/rectangles for new extreme level
 	if ($noiseType == 'extreme')
 	{
-		for ($i = 0; $i < rand(1, 5); $i++)
+		$width4 = (int) ($total_width / 4);
+		$height3 = (int) ($max_height / 3);
+		for ($i = 0; $i < mt_rand(1, 5); $i++)
 		{
-			$x1 = rand(0, $total_width / 4);
-			$x2 = $x1 + round(rand($total_width / 4, $total_width));
-			$y1 = rand(0, $max_height);
-			$y2 = $y1 + round(rand(0, $max_height / 3));
+			$x1 = mt_rand(0, $width4);
+			$x2 = $x1 + mt_rand($width4, $total_width);
+			$y1 = mt_rand(0, $max_height);
+			$y2 = $y1 + mt_rand(0, $height3);
 			imagefilledrectangle($code_image, $x1, $y1, $x2, $y2, mt_rand(0, 1) ? $fg_color : $randomness_color);
 		}
 	}
@@ -1467,7 +1468,10 @@ function showCodeImage($code)
 					$can_do_ttf = false;
 				elseif ($is_reverse !== false)
 				{
-					imagefilledpolygon($code_image, $fontcord, 4, $fg_color);
+					if (version_compare(PHP_VERSION, '8.1.0') === -1)
+						imagefilledpolygon($code_image, $fontcord, 4, $fg_color);
+					else
+						imagefilledpolygon($code_image, $fontcord, $fg_color);
 
 					// Put the character back!
 					imagettftext($code_image, $font_size, $angle, $font_x, $font_y, $randomness_color, $fontface, $character['id']);
@@ -1541,12 +1545,17 @@ function showCodeImage($code)
 		{
 			// Put in some ellipse
 			$num_ellipse = $noiseType == 'extreme' ? mt_rand(6, 12) : mt_rand(2, 6);
+			$width4 = (int) ($total_width / 4);
+			$width2 = (int) ($total_width / 2);
+			$height4 = (int) ($max_height / 4);
+			$height2 = (int) ($max_height / 2);
+
 			for ($i = 0; $i < $num_ellipse; $i++)
 			{
-				$x1 = round(rand(($total_width / 4) * -1, $total_width + ($total_width / 4)));
-				$x2 = round(rand($total_width / 2, 2 * $total_width));
-				$y1 = round(rand(($max_height / 4) * -1, $max_height + ($max_height / 4)));
-				$y2 = round(rand($max_height / 2, 2 * $max_height));
+				$x1 = mt_rand($width4 * -1, $total_width + $width4);
+				$x2 = mt_rand($width2, 2 * $total_width);
+				$y1 = mt_rand($height4 * -1, $max_height + $height4);
+				$y2 = mt_rand($height2, 2 * $max_height);
 				imageellipse($code_image, $x1, $y1, $x2, $y2, mt_rand(0, 1) ? $fg_color : $randomness_color);
 			}
 		}
