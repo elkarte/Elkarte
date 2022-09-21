@@ -2,8 +2,9 @@ Settings.php
 Settings_bak.php
 db_last_error.txt
 cache/data*.php
-Packages/backups/*
-Packages/temp
+packages/backups/*
+packages/temp
+packages/installed.list
 smileys/open-moji/*
 !smileys/open-moji/open-moji.zip
 smileys/noto-emoji/*
@@ -27,6 +28,7 @@ nbproject/*
 composer.lock
 composer.phar
 themes/default/cache/hive*
+themes/default/scripts/custom_tags.js
 .github/workflows/*.yaml
 populator/
 testcases*/

@@ -692,7 +692,6 @@ function loadPermissions()
  * - validate that the theme is valid and that the user has permission to use it
  * - load the users theme settings and site settings into $options.
  * - prepares the list of folders to search for template loading.
- * - identify what smiley set to use.
  * - sets up $context['user']
  * - detects the users browser and sets a mobile friendly environment if needed
  * - loads default JS variables for use in every theme
@@ -717,7 +716,7 @@ function loadUserContext()
 	global $context, $txt, $modSettings;
 
 	// Set up the contextual user array.
-	$context['user'] = array(
+	$context['user'] = [
 		'id' => (int) User::$info->id,
 		'is_logged' => User::$info->is_guest === false,
 		'is_guest' => (bool) User::$info->is_guest,
@@ -730,7 +729,7 @@ function loadUserContext()
 		'language' => User::$info->language,
 		'email' => User::$info->email,
 		'ignoreusers' => User::$info->ignoreusers,
-	);
+	];
 
 	// @todo Base language is being loaded to late, placed here temporarily
 	Txt::load('index+Addons', true, true);
@@ -745,33 +744,41 @@ function loadUserContext()
 		$context['user']['name'] = $txt['guest_title'];
 	}
 
-	$context['user']['smiley_set'] = determineSmileySet(User::$info->smiley_set, $modSettings['smiley_sets_known']);
-	$context['smiley_enabled'] = User::$info->smiley_set !== 'none';
-	$context['user']['smiley_path'] = $modSettings['smileys_url'] . '/' . $context['user']['smiley_set'] . '/';
+	loadSmileyEmojiData();
 }
 
 /**
- * Determine the current user's smiley set
- *
- * @param array $user_smiley_set
- * @param array $known_smiley_sets
- *
- * @return mixed
+ * Sets path, set, type and enabled status for smile and emoji
  */
-function determineSmileySet($user_smiley_set, $known_smiley_sets)
+function loadSmileyEmojiData()
 {
-	global $modSettings, $settings;
+	global $context, $modSettings, $options, $settings;
 
-	if ((!in_array($user_smiley_set, explode(',', $known_smiley_sets)) && $user_smiley_set !== 'none') || empty($modSettings['smiley_sets_enable']))
+	// Using the theme specific or global set
+	$context['smiley_set'] = !empty($settings['smiley_sets_default']) ? $settings['smiley_sets_default'] : $modSettings['smiley_sets_default'];
+	$context['emoji_set'] = $modSettings['emoji_selection'] ?? 'no-emoji';
+
+	// Where are current smiley and emoji sets are located
+	$context['smiley_path'] = $modSettings['smileys_url'] . '/' . $context['smiley_set'] . '/';
+	$context['smiley_dir'] = $modSettings['smileys_dir'] . '/' . $context['smiley_set'] . '/';
+	$context['emoji_path'] = $modSettings['smileys_url'] . '/' . $context['emoji_set'] . '/';
+
+	// Normally set, but after an upgrade can be missing
+	if (!isset($modSettings['smiley_sets_extensions']))
 	{
-		$set = !empty($settings['smiley_sets_default']) ? $settings['smiley_sets_default'] : $modSettings['smiley_sets_default'];
-	}
-	else
-	{
-		$set = $user_smiley_set;
+		require_once(SUBSDIR . '/Smileys.subs.php');
+		$modSettings['smiley_sets_extensions'] = setSmileyExtensionArray();
 	}
 
-	return $set;
+	// And what type of smiley library is this, gif, png, etc.
+	$smiley_sets_extensions = explode(',', $modSettings['smiley_sets_extensions']);
+	$set_paths = explode(',', $modSettings['smiley_sets_known']);
+	$context['smiley_extension'] = $smiley_sets_extensions[array_search($context['smiley_set'], $set_paths, true)];
+	$context['smiley_extension'] = $context['smiley_extension'] ?? 'svg';
+
+	// Do they even want to see smileys
+	$context['smiley_enabled'] = empty($options['show_no_smileys']) && $context['smiley_set'] !== 'none';
+	$context['emoji_enabled'] = empty($options['show_no_smileys']) && $context['emoji_set'] !== 'no-emoji';
 }
 
 /**

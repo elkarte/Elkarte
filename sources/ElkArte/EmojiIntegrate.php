@@ -11,8 +11,6 @@
 
 namespace ElkArte;
 
-use BBC\ParserWrapper;
-
 /**
  * Class EmojiIntegrate, adds hooks to the system when called
  *
@@ -29,19 +27,8 @@ class EmojiIntegrate
 	 */
 	public static function register()
 	{
-		global $modSettings;
-
-		if (empty($modSettings['emoji_selection']) || $modSettings['emoji_selection'] === 'no-emoji')
-		{
-			return [];
-		}
-
 		// $hook, $function, $file
 		return [
-			[
-				'integrate_pre_bbc_parser_loop',
-				'\\ElkArte\\EmojiIntegrate::integrate_pre_bbc_parser_loop'
-			],
 			[
 				'integrate_editor_plugins',
 				'\\ElkArte\\EmojiIntegrate::integrate_editor_plugins'
@@ -72,30 +59,6 @@ class EmojiIntegrate
 	}
 
 	/**
-	 * integrate_pre_bbc_parser, called from BBCParser
-	 *
-	 * What it does:
-	 * - Allow addons access before entering the main parse_bbc loop
-	 * - searches message for emoji :smile: tags and converts to svg image
-	 *
-	 * @param string $message
-	 */
-	public static function integrate_pre_bbc_parser_loop(&$message)
-	{
-		$req = HttpReq::instance();
-		$sa = $req->getQuery('sa', 'trim');
-
-		$canUseSmiley = ParserWrapper::instance()->getSmileysEnabled();
-
-		// If we are doing smileys, then we are doing emoji!
-		if ((empty($sa) || $sa !== 'install2') && $message !== false && $canUseSmiley)
-		{
-			$emoji = Emoji::instance();
-			$message = $emoji->emojiNameToImage($message);
-		}
-	}
-
-	/**
 	 * integrate_editor_plugins called from Editor.subs.php
 	 *
 	 * What it does:
@@ -108,6 +71,11 @@ class EmojiIntegrate
 	public static function integrate_editor_plugins($editor_id)
 	{
 		global $context, $modSettings;
+
+		if (empty($context['emoji_enabled']))
+		{
+			return;
+		}
 
 		// Need caret and atwho to be available
 		if (empty($context['mentions_enabled']))

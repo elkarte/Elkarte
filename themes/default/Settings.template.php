@@ -31,6 +31,11 @@ function template_options()
 			'default' => true,
 		),
 		array(
+			'id' => 'show_no_smileys',
+			'label' => $txt['show_no_smileys'],
+			'default' => true,
+		),
+		array(
 			'id' => 'hide_poster_area',
 			'label' => $txt['hide_poster_area'],
 			'default' => true,

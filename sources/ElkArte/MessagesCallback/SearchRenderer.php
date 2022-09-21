@@ -173,7 +173,7 @@ class SearchRenderer extends Renderer
 			'id' => $this->_this_message['id_msg'],
 			'attachment' => [],
 			'member' => $member,
-			'icon' => $this->_options->icon_sources->getIconName($this->_this_message['icon']),
+			'icon' => $this->_options->icon_sources->getIconValue($this->_this_message['icon']),
 			'icon_url' => $this->_options->icon_sources->getIconURL($this->_this_message['icon']),
 			'subject' => $this->_this_message['subject'],
 			'subject_highlighted' => $subject_highlighted,

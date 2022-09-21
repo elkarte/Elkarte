@@ -21,40 +21,20 @@ class MessageTopicIcons extends ValuesContainer
 	public const IMAGE_URL = 'images_url';
 	public const DEFAULT_URL = 'default_images_url';
 
-	/**
-	 * Whether to check if the icon exists in the expected location
-	 *
-	 * @var bool
-	 */
+	/** @var bool Whether to check if the icon exists in the expected location */
 	protected $_check = false;
 
-	/**
-	 * Theme directory path
-	 *
-	 * @var string
-	 */
+	/** @var string Theme directory path */
 	protected $_theme_dir = '';
 
-	/**
-	 * Default icon code
-	 *
-	 * @var string
-	 */
+	/** @var string Default icon code */
 	protected $_default_icon = 'xx';
 
-	/**
-	 * Icons that are default with ElkArte
-	 *
-	 * @var array
-	 */
-	protected $_stable_icons = array();
+	/** @var array Icons passed to the class, merged with site defined */
+	protected $_custom_icons = [];
 
-	/**
-	 * Icons to load in addition to the default
-	 *
-	 * @var array
-	 */
-	protected $_custom_icons = array();
+	/** @var array Icons to load in addition to the default */
+	protected $_icons = [];
 
 	/**
 	 * This simple function returns the message topic icon array.
@@ -64,7 +44,7 @@ class MessageTopicIcons extends ValuesContainer
 	 * @param array topic icons to load in addition to default
 	 * @param string $default
 	 */
-	public function __construct($icon_check = false, $theme_dir = '', $custom = array(), $default = 'xx')
+	public function __construct($icon_check = false, $theme_dir = '', $custom = [], $default = 'xx')
 	{
 		parent::__construct();
 
@@ -74,117 +54,117 @@ class MessageTopicIcons extends ValuesContainer
 		$this->_default_icon = $default;
 		$this->_custom_icons = $custom;
 
-		// Set default icons
-		$this->_loadStableIcons();
-
 		// Merge in additional ones
-		$custom_icons = array_map(function ($element) {
-			return $element['first_icon'];
-		}, $custom);
-		$this->_stable_icons = array_merge($this->_stable_icons, $custom_icons);
-
+		$this->_loadSiteIcons();
+		$this->_merge_all_icons();
 		$this->_loadIcons();
 	}
 
 	/**
-	 * Load the stable icon array
+	 * Load in  site icons, default or custom message icons.
 	 */
-	protected function _loadStableIcons()
+	private function _loadSiteIcons()
 	{
-		// Setup the default topic icons...
-		$this->_stable_icons = array(
-			'xx',
-			'thumbup',
-			'thumbdown',
-			'exclamation',
-			'question',
-			'lamp',
-			'smiley',
-			'angry',
-			'cheesy',
-			'grin',
-			'sad',
-			'wink',
-			'poll',
-			'moved',
-			'recycled',
-			'wireless',
-			'clip'
-		);
+		global $board;
+
+		require_once(SUBSDIR . '/MessageIcons.subs.php');
+		$this->_icons = getMessageIcons(empty($board) ? 0 : $board);
 	}
 
 	/**
-	 * Return the icon specified by idx, or the default icon for invalid names
+	 * This function merges in any passed custom icons with our site defined ones.
+	 */
+	private function _merge_all_icons()
+	{
+		// Merge in additional ones
+		$custom_icons = array_map(static function ($element) {
+			return $element['value'];
+		}, $this->_custom_icons);
+
+		$this->_icons = array_merge($this->_icons, $custom_icons);
+	}
+
+	/**
+	 * Return the icon specified by key, or the default icon for invalid names
 	 *
-	 * @param int|string $idx
+	 * @param int|string $key
 	 *
 	 * @return string
 	 */
-	public function __get($idx)
+	public function __get($key)
 	{
-		// Not a standard topic icon
-		if (!isset($this->data[$idx]))
+		// If not a known icon, set a default
+		if (!isset($this->data[$key]))
 		{
-			$this->_setUrl($idx);
+			$this->_setUrl($key);
 		}
 
-		return $this->data[$idx];
+		return $this->data[$key];
 	}
 
 	/**
 	 * Return the icon URL specified by idx
 	 *
-	 * @param int|string $idx
+	 * @param int|string $key
 	 * @return string
 	 */
-	public function getIconURL($idx)
+	public function getIconURL($key)
 	{
-		$this->_checkValue($idx);
+		$this->_checkValue($key);
 
-		return $this->data[$idx]['url'];
+		return $this->data[$key]['url'];
 	}
 
 	/**
-	 * Return the name of the icon specified by idx
+	 * Return the name of the icon specified by key
 	 *
-	 * @param int|string $idx
+	 * @param int|string $key
 	 * @return string
 	 */
-	public function getIconName($idx)
+	public function getIconName($key)
 	{
-		$this->_checkValue($idx);
+		$this->_checkValue($key);
 
-		return $this->data[$idx]['name'];
+		return htmlspecialchars($this->data[$key]['name']);
 	}
 
 	/**
-	 * If the icon does not exist, sets a default
+	 * Return the Value of the icon specified by key
 	 *
-	 * @param $idx
+	 * @param int|string $key
+	 * @return string
 	 */
-	private function _checkValue($idx)
+	public function getIconValue($key)
 	{
-		// Not a standard topic icon
-		if (!isset($this->data[$idx]))
+		$this->_checkValue($key);
+
+		return $this->data[$key]['value'];
+	}
+
+	/**
+	 * If the icon does not exist, set a default
+	 *
+	 * @param $key
+	 */
+	private function _checkValue($key)
+	{
+		// Not a known topic icon, set the xx default
+		if (!isset($this->data[$key]))
 		{
-			$this->data[$idx]['url'] = $this->data[$this->_default_icon]['url'];
-			$this->data[$idx]['name'] = $this->_default_icon;
+			$this->data[$key]['url'] = $this->data[$this->_default_icon]['url'];
+			$this->data[$key]['value'] = $this->_default_icon;
 		}
 	}
 
 	/**
-	 * This simple function returns the message topic icon array.
+	 * This simple function sets the message topic icon array.
 	 */
 	protected function _loadIcons()
 	{
 		// Allow addons to add to the message icon array
-		call_integration_hook('integrate_messageindex_icons', array(&$this->_stable_icons));
+		call_integration_hook('integrate_messageindex_icons', [&$this->_icons]);
 
-		$this->data = array();
-		foreach ($this->_stable_icons as $icon)
-		{
-			$this->_setUrl($icon);
-		}
+		$this->data = $this->_icons;
 	}
 
 	/**
@@ -199,14 +179,8 @@ class MessageTopicIcons extends ValuesContainer
 		if ($this->_check)
 		{
 			$this->data[$icon]['url'] = $settings[file_exists($this->_theme_dir . '/images/post/' . $icon . '.png')
-					? self::IMAGE_URL
-					: self::DEFAULT_URL] . '/post/' . $icon . '.png';
+				? self::IMAGE_URL
+				: self::DEFAULT_URL] . '/post/' . $icon . '.png';
 		}
-		else
-		{
-			$this->data[$icon]['url'] = $settings[self::IMAGE_URL] . '/post/' . $icon . '.png';
-		}
-
-		$this->data[$icon]['name'] = $icon;
 	}
 }

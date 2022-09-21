@@ -600,7 +600,6 @@ function registerMember(&$regOptions, $ErrorContext = 'register')
 		'default_template',
 		'images_url',
 		'number_recent_posts',
-		'smiley_sets_default',
 		'theme_dir',
 		'theme_id',
 		'theme_layers',
@@ -651,24 +650,23 @@ function registerMember(&$regOptions, $ErrorContext = 'register')
 		'secret_answer' => '',
 		'additional_groups' => '',
 		'ignore_boards' => '',
-		'smiley_set' => '',
 		'notify_announcements' => (!empty($regOptions['notify_announcements']) ? 1 : 0),
 	);
 
 	// Setup the activation status on this new account so it is correct - firstly is it an under age account?
-	if ($regOptions['require'] == 'coppa')
+	if ($regOptions['require'] === 'coppa')
 	{
 		$regOptions['register_vars']['is_activated'] = 5;
 		// @todo This should be changed.  To what should be it be changed??
 		$regOptions['register_vars']['validation_code'] = '';
 	}
 	// Maybe it can be activated right away?
-	elseif ($regOptions['require'] == 'nothing')
+	elseif ($regOptions['require'] === 'nothing')
 	{
 		$regOptions['register_vars']['is_activated'] = 1;
 	}
 	// Maybe it must be activated by email?
-	elseif ($regOptions['require'] == 'activation')
+	elseif ($regOptions['require'] === 'activation')
 	{
 		$regOptions['register_vars']['is_activated'] = 0;
 	}

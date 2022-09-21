@@ -47,7 +47,6 @@ class ThemeLoader
 	 * - validate that the theme is valid and that the user has permission to use it
 	 * - load the users theme settings and site settings into $options.
 	 * - prepares the list of folders to search for template loading.
-	 * - identify what smiley set to use.
 	 * - sets up $context['user']
 	 * - detects the users browser and sets a mobile friendly environment if needed
 	 * - loads default JS variables for use in every theme
@@ -140,18 +139,14 @@ class ThemeLoader
 		]);
 
 		// Just some mobile-friendly settings
-		$req = request();
-		if (strpos($req->user_agent(), 'Mobi'))
+		if (strpos(request()->user_agent(), 'Mobi'))
 		{
 			// Disable the search dropdown.
 			$modSettings['search_dropdown'] = false;
 		}
 
 		// @todo Hummm this seems a bit wanky
-		if (!isset($txt))
-		{
-			$txt = [];
-		}
+		$txt = $txt ?? [];
 
 		// Defaults in case of odd things
 		$settings['avatars_on_indexes'] = 0;

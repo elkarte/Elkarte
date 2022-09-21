@@ -29,8 +29,8 @@
 	width: 100%;
 	border: 1px solid #BBBBBB;
 	border-bottom: 0;
-	border-top-left-radius: 4px;
-	border-top-right-radius: 4px;
+	border-top-left-radius: 0;
+	border-top-right-radius: 0;
 }
 
 .sceditor-container.resizing {
@@ -119,35 +119,17 @@
 	padding: 5px;
 }
 
-#sceditor-smileycontainer, .sceditor-more {
-	display: inline-block;
-	vertical-align: middle;
+#sceditor-smileycontainer {
+	display: flex;
+	align-items: center;
+	flex-wrap: wrap;
+	width: 90%;
 }
 
 .sceditor-insertemoticon img, .sceditor-smileyPopup img {
-	margin: 6px 4px 4px 4px;
+	max-width: 20px;
+	margin: 2px 6px 6px 6px;
 	cursor: pointer;
-}
-
-.sceditor-more {
-	margin: 2px 0 0 !important;
-	padding: 0 3px !important;
-	border-top: 1px solid #CCCCCC;
-	border-right: 1px solid #BBBBBB;
-	border-bottom: 1px solid #AAAAAA;
-	border-radius: 3px;
-	background: #FFFFFF;
-	box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05) inset;
-	color: #444444;
-	cursor: pointer;
-}
-
-.sceditor-more:hover {
-	border: 1px solid #CCCCCC;
-	border-top: 1px solid #AAAAAA;
-	border-left: none;
-	background: #FAFAFA;
-	box-shadow: 1px 1px 1px rgba(0, 0, 0, 0.07) inset;
 }
 
 .sceditor-smileyPopup {
@@ -216,7 +198,7 @@
 	overflow: hidden;
 	padding: 5px 5px 0 5px;
 	border-bottom: 1px solid #AAAAAA;
-	border-radius: 4px 4px 0 0;
+	border-radius: 0;
 	background: #FAFAFA;
 	box-shadow: 0 -1px 2px rgba(0, 0, 0, 0.1) inset;
 }

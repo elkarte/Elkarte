@@ -143,7 +143,7 @@
 	--news_background: #F6F6F6; /* Background of news section */
 	--action_available: #7BB128; /* new button, approval button */
 	--mid_grey_background: #EEEEEE; /* Various uses where a slightly darker background is needed */
-	--dark_grey_background: #989898; /* A bit darker, useful in some places */
+	--dark_background: #989898; /* A bit darker, useful in some places */
 
 	/* Text colors */
 	--emphasize_text: #333333; /* When you need a darker text color on hover or elsewhere */
@@ -813,6 +813,10 @@ a.active {
 	color: var(--indicator);
 }
 
+.admin_menu .listlevel1.subsections .linklevel1.active::after {
+	border-top-color: var(--menu_dropdown_indicator);
+}
+
 /* Top level subsection indicators. */
 .pm_indicator {
 	font-size: var(--font12);
@@ -921,7 +925,7 @@ a.active {
 #menu_sidebar .linklevel2:hover, #menu_sidebar .linklevel2:focus {
 	text-decoration: none;
 	color: var(--reverse_text);
-	border-color: var(--dark_grey_background);
+	border-color: var(--dark_background);
 	background: var(--input_submit_background_compliment);
 }
 
@@ -1016,7 +1020,7 @@ nav.breadcrumb {
 #gotop, #gobottom {
 	opacity: 0.2;
 	color: var(--contrast_text_compliment);
-	border-color: var(--dark_grey_background);
+	border-color: var(--dark_background);
 	background: var(--html_background);
 }
 
@@ -1963,7 +1967,7 @@ nav.breadcrumb {
 
 .icoffline {
 	border-color: var(--primary_border);
-	background-image: linear-gradient(to bottom, var(--mid_grey_background) 0%, var(--dark_grey_background) 50%, var(--mid_grey_background) 100%);
+	background-image: linear-gradient(to bottom, var(--mid_grey_background) 0%, var(--dark_background) 50%, var(--mid_grey_background) 100%);
 }
 
 /* -------------------------------------------------------

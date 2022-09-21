@@ -122,7 +122,7 @@ class EmailParse
 	/** @var string Holds the current email name */
 	private $_email_name;
 
-	/** @var string[] Holds each boundary section of the message */
+	/** @var array Holds each boundary section of the message */
 	private $_boundary_section = [];
 
 	/** @var int The total number of boundary sections */

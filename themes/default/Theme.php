@@ -704,9 +704,9 @@ class Theme extends BaseTheme
 	{
 		global $modSettings, $settings;
 
-		// Using a specified version of jquery or what was shipped 3.6.0  / 1.13.1
-		$jquery_version = (!empty($modSettings['jquery_default']) && !empty($modSettings['jquery_version'])) ? $modSettings['jquery_version'] : '3.6.0';
-		$jqueryui_version = (!empty($modSettings['jqueryui_default']) && !empty($modSettings['jqueryui_version'])) ? $modSettings['jqueryui_version'] : '1.13.1';
+		// Use a specified version of jquery 3.6.1  / 1.13.2
+		$jquery_version = '3.6.1';
+		$jqueryui_version = '1.13.2';
 
 		$jquery_cdn = 'https://ajax.googleapis.com/ajax/libs/jquery/' . $jquery_version . '/jquery.min.js';
 		$jqueryui_cdn = 'https://ajax.googleapis.com/ajax/libs/jqueryui/' . $jqueryui_version . '/jquery-ui.min.js';

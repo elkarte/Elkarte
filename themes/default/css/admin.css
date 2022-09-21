@@ -242,32 +242,33 @@ h3.category_header form {
 	float: left;
 	overflow: auto;
 	width: 50%;
-	height: 8em;
+	min-height: 7em;
 	padding: 10px 6px 10px 6px;
 	list-style: none;
 	border-top: 1px solid;
 	border-bottom: 1px solid;
 }
 
-#quick_tasks li a {
-	line-height: 1.6em;
+#quick_tasks h5 {
+	font-weight: 600;
 }
 
 .home_image {
 	float: left;
 	margin: 2px 10px;
+	max-height: 48px;
 }
 
 #quick_tasks li span {
 	display: block;
-	margin: 0 0 0 70px;
+	margin: 0 0 0 80px;
 }
 
 #quick_tasks li:first-child, #quick_tasks li:nth-child(2) {
 	border-top: none;
 }
 
-#quick_tasks li:last-child, #quick_tasks li:nth-child(7) {
+#quick_tasks li:last-child, #quick_tasks li:nth-last-child(2) {
 	border-bottom: none;
 }
 
@@ -586,6 +587,10 @@ ul.package_servers li {
 /* Styles for the manage smiley section. */
 #smiley_list .imagecolumn {
 	padding: .5em .8em;
+}
+
+#smiley_list .imagecolumn img {
+	max-height: 24px;
 }
 
 /* Styles for the manage members section. */
@@ -980,6 +985,10 @@ dl.themes_list dd {
 .sortable_smiley {
 	margin-top: 3px;
 	border-bottom: 1px solid;
+}
+
+.sortable_smiley img {
+	max-height: 24px;
 }
 
 .pagelink, .current_page, .expand_pages {

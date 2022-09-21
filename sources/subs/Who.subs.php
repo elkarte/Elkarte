@@ -547,7 +547,6 @@ function prepareCreditsData()
 	// Give credit to any graphic library's, software library's, plugins etc
 	$credits['credits_software_graphics'] = array(
 		'graphics' => array(
-			'<a href="http://p.yusukekamiyamane.com/">Fugue Icons</a> | &copy; 2012 Yusuke Kamiyamane | These icons are licensed under a Creative Commons Attribution 3.0 License',
 			'<a href="https://icomoon.io">IcoMoon Free Icons</a> | These icons are licensed under <a href="https://creativecommons.org/licenses/by/4.0/">CC BY-SA 4.0</a>',
 			'<a href="https://github.com/googlefonts/noto-emoji">Noto Emoji</a> | &copy; Googlefonts | Licensed under <a href="https://www.apache.org/licenses/LICENSE-2.0">Apache License, Version 2.0</a>',
 			'<a href="https://openmoji.org">OpenMoji</a> | &copy; OpenMoji | Licensed under <a href="https://creativecommons.org/licenses/by-sa/4.0/">Creative Commons Attribution-ShareAlike 4.0</a>',

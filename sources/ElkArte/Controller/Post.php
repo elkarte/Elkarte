@@ -756,7 +756,7 @@ class Post extends AbstractController
 				}
 			}
 
-			// If there are previous posts, allow them to QQ them
+			// If there are previous posts, enable QQ for them
 			if (count($context['previous_posts']) > 0)
 			{
 				loadJavascriptFile('quickQuote.js', ['defer' => true]);
@@ -777,7 +777,7 @@ class Post extends AbstractController
 
 		// Message icons - customized or not, retrieve them...
 		require_once(SUBSDIR . '/MessageIcons.subs.php');
-		$context['icons'] = getMessageIcons($board);
+		$context['icons'] = array_values(getMessageIcons($board));
 
 		$context['icon_url'] = '';
 

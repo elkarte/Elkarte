@@ -32,6 +32,8 @@ final class ParserWrapper
 	protected $html_parser;
 	/** @var  \BBC\Autolink */
 	protected $autolink_parser;
+	/** @var \BBC\MarkdownParser */
+	protected $markdown_parser;
 	/** @var bool If smileys are enabled */
 	protected $smileys_enabled = true;
 	/** @var ParserWrapper */
@@ -129,6 +131,7 @@ final class ParserWrapper
 			'html' => false,
 			'bbc' => false,
 			'smiley' => false,
+			'markdown' => false,
 		);
 
 		// First see if any hooks set a parser.
@@ -193,7 +196,9 @@ final class ParserWrapper
 		}
 
 		$parsers = $this->getParsersByArea($area);
-		$smileys_enabled = $this->smileys_enabled && $GLOBALS['user_info']['smiley_set'] !== 'none';
+		$smileys_enabled = $this->smileys_enabled
+			&& $GLOBALS['context']['smiley_set'] !== 'none'
+			&& empty($GLOBALS['options']['show_no_smileys']);
 
 		if (!$this->isEnabled())
 		{
@@ -445,12 +450,12 @@ final class ParserWrapper
 
 		if ($this->smiley_parser === null)
 		{
-			if (!isset($context['user']['smiley_path']))
+			if (!isset($context['smiley_path']))
 			{
 				loadUserContext();
 			}
 
-			$this->smiley_parser = new SmileyParser($context['user']['smiley_path']);
+			$this->smiley_parser = new SmileyParser($context['smiley_set']);
 			$this->smiley_parser->setEnabled($context['smiley_enabled']);
 		}
 
@@ -470,5 +475,20 @@ final class ParserWrapper
 		}
 
 		return $this->html_parser;
+	}
+
+	/**
+	 * Return an, that's right not and, just an, like a single instance of the Markdown parser
+	 *
+	 * @return MarkdownParser
+	 */
+	public function getMarkdownParser()
+	{
+		if ($this->markdown_parser === null)
+		{
+			$this->markdown_parser = new MarkdownParser();
+		}
+
+		return $this->markdown_parser;
 	}
 }

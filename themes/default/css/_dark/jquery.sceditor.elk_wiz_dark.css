@@ -2,16 +2,16 @@
 /* This is the ElkArte css used when the editor is in wysiwyg mode.
 /* ------------------------------------------------------- */
 :root {
-	--body_text: #585858; /* Body text, text areas, editor, inputs, more */
-	--content_background: #FAFAFA; /* background for many divs, input controls, etc */
-	--secondary_border: #AFAFAF; /* darker border */
-	--secondary_border_top: #CFCFCF; /* complimentary for hover effects */
-	--secondary_border_left: #BFBFBF; /* complimentary for hover effects */
-	--secondary_border_bottom: #BBBBBB;
+	--body_text: #9D9D9D; /* Body text, text areas, editor, inputs, more */
+	--content_background: #0B0B0B; /* background for many divs, input controls, etc */
+	--secondary_border: #232323; /* darker border */
+	--secondary_border_top: #232323; /* complimentary for hover effects */
+	--secondary_border_left: #232323; /* complimentary for hover effects */
+	--secondary_border_bottom: #232323;
 	--contrast_text: #FEFEFE; /* Used in shadows, backgrounds or text, many places */
 	--contrast_text_compliment: #E4E4E4; /* Used with --contrast_text for gradients */
-	--box_shadow: #E4E4E4; /* Used on many box shadows */
-	--me: #5BA048; /* me and footnotes */
+	--box_shadow: transparent; /* Used on many box shadows */
+	--me: #30AD55; /* me and footnotes */
 }
 
 html, body {
@@ -19,9 +19,12 @@ html, body {
 	font-weight: 400;
 	line-height: 1.5;
 	overflow: auto;
+	margin: 0;
+	padding: 0;
+	background: var(--content_background);
 }
 
-html, body, p, code:before, table {
+p, code::before, table {
 	margin: 0;
 	padding: 0;
 	color: var(--body_text);
@@ -39,6 +42,8 @@ body {
 
 [contenteditable="true"] {
 	font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen", "Ubuntu", "Cantarell", "Droid Sans", "Helvetica Neue", "Trebuchet MS", Arial, sans-serif;
+	color: var(--body_text);
+	padding: 0 5px;
 }
 
 a, a:link, a:visited {
@@ -63,12 +68,12 @@ table, td {
 	border: 1px dotted var(--secondary_border);
 }
 
-code, code:before {
+code, code::before {
 	display: block;
 	text-align: left;
 }
 
-code:before {
+code::before {
 	font-size: 1em;
 	position: absolute;
 	top: -1.7em;
@@ -140,7 +145,7 @@ h1, h2, h3, h4, h5, h6 {
 	padding: 0;
 }
 
-aside:before {
+aside::before {
 	font-size: 0.8667rem;
 	content: "[*]";
 	vertical-align: super;
@@ -183,7 +188,7 @@ aside {
 	content: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='%23828282' viewBox='0 0 32 32'%3E%3Cpath d='M20.807 10.22l-2.03-2.03-10.15 10.15c-1.682 1.68-1.682 4.407 0 6.088s4.408 1.68 6.09 0l12.18-12.178c2.804-2.802 2.804-7.346 0-10.148-2.802-2.803-7.347-2.803-10.15 0L3.96 14.89c-.01.008-.02.017-.027.025-3.91 3.91-3.91 10.245 0 14.153 3.908 3.908 10.246 3.908 14.156 0 .006-.01.013-.018.023-.027v.004l8.73-8.728-2.03-2.03-8.73 8.728c-.01.008-.018.018-.026.026-2.785 2.782-7.313 2.782-10.097 0-2.782-2.784-2.782-7.31 0-10.094l.03-.026v-.003L18.78 4.13c1.678-1.678 4.41-1.678 6.09 0s1.678 4.412 0 6.09L12.69 22.398c-.56.56-1.47.56-2.03 0-.56-.56-.56-1.47 0-2.03L20.81 10.22z'/%3E%3C/svg%3E");
 }
 
-me:before {
+me::before {
 	font-size: 1.4667rem;
 	line-height: 1em;
 	content: "\270c";
@@ -202,8 +207,11 @@ me {
 	overflow: auto;
 }
 
-.emoji {
-	max-width: 24px;
-	padding: 0 2px;
+.smiley, .emoji {
+	max-width: 20px;
 	vertical-align: bottom;
+}
+
+.emoji {
+	margin: 0 4px;
 }

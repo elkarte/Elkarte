@@ -14,6 +14,9 @@
  *
  */
 
+use ElkArte\Emoji;
+use ElkArte\FileFunctions;
+
 /**
  * Validates, if a smiley already exists
  *
@@ -24,15 +27,21 @@ function smileyExists($smileys)
 {
 	$db = database();
 
-	$found = array();
+	$found = [];
+
+	if (empty($smileys))
+	{
+		return $found;
+	}
+
 	$db->fetchQuery('
 		SELECT 
 			filename
 		FROM {db_prefix}smileys
 		WHERE filename IN ({array_string:smiley_list})',
-		array(
+		[
 			'smiley_list' => $smileys,
-		)
+		]
 	)->fetch_callback(
 		function ($row) use (&$found) {
 			$found[] = $row['filename'];
@@ -59,10 +68,10 @@ function validateDuplicateSmiley($code, $current = null)
 		FROM {db_prefix}smileys
 		WHERE code = {string_case_sensitive:smiley_code}' . (!isset($current) ? '' : '
 			AND id_smiley != {int:current_smiley}'),
-		array(
+		[
 			'current_smiley' => $current,
 			'smiley_code' => $code,
-		)
+		]
 	)->num_rows() > 0;
 }
 
@@ -78,14 +87,15 @@ function nextSmileyLocation($location)
 	$db = database();
 
 	$request = $db->fetchQuery('
-		SELECT MAX(smiley_order) + 1
+		SELECT 
+			MAX(smiley_order) + 1
 		FROM {db_prefix}smileys
 		WHERE hidden = {int:smiley_location}
 			AND smiley_row = {int:first_row}',
-		array(
+		[
 			'smiley_location' => $location,
 			'first_row' => 0,
-		)
+		]
 	);
 	list ($smiley_order) = $request->fetch_row();
 	$request->free_result();
@@ -96,7 +106,7 @@ function nextSmileyLocation($location)
 /**
  * Adds a smiley to the database
  *
- * @param mixed[] $param associative array to use in the insert
+ * @param array $param associative array to use in the insert
  */
 function addSmiley($param)
 {
@@ -104,12 +114,12 @@ function addSmiley($param)
 
 	$db->insert('',
 		'{db_prefix}smileys',
-		array(
+		[
 			'code' => 'string-30', 'filename' => 'string-48', 'description' => 'string-80',
 			'hidden' => 'int', 'smiley_order' => 'int',
-		),
+		],
 		$param,
-		array('id_smiley')
+		['id_smiley']
 	);
 }
 
@@ -125,9 +135,9 @@ function deleteSmileys($smileys)
 	$db->query('', '
 		DELETE FROM {db_prefix}smileys
 		WHERE id_smiley IN ({array_int:checked_smileys})',
-		array(
+		[
 			'checked_smileys' => $smileys,
-		)
+		]
 	);
 }
 
@@ -146,17 +156,17 @@ function updateSmileyDisplayType($smileys, $display_type)
 		SET 
 			hidden = {int:display_type}
 		WHERE id_smiley IN ({array_int:checked_smileys})',
-		array(
+		[
 			'checked_smileys' => $smileys,
 			'display_type' => $display_type,
-		)
+		]
 	);
 }
 
 /**
  * Updates a smiley.
  *
- * @param mixed[] $param
+ * @param array $param
  */
 function updateSmiley($param)
 {
@@ -170,13 +180,13 @@ function updateSmiley($param)
 			description = {string:smiley_description},
 			hidden = {int:smiley_location}
 		WHERE id_smiley = {int:current_smiley}',
-		array(
+		[
 			'smiley_location' => $param['smiley_location'],
 			'current_smiley' => $param['smiley'],
 			'smiley_code' => $param['smiley_code'],
 			'smiley_filename' => $param['smiley_filename'],
 			'smiley_description' => $param['smiley_description'],
-		)
+		]
 	);
 }
 
@@ -192,21 +202,34 @@ function getSmiley($id)
 {
 	$db = database();
 
-	$request = $db->fetchQuery('
+	$current_smiley = [];
+	$db->fetchQuery('
 		SELECT 
 			id_smiley AS id, code, filename, description, hidden AS location, 0 AS is_new, smiley_row AS row
 		FROM {db_prefix}smileys
 		WHERE id_smiley = {int:current_smiley}',
-		array(
+		[
 			'current_smiley' => $id,
-		)
+		]
+	)->fetch_callback(
+		function ($row) use (&$current_smiley)
+		{
+			$current_smiley = [
+				'id' => $row['id'],
+				'code' => $row['code'],
+				'filename' => pathinfo($row['filename'], PATHINFO_FILENAME),
+				'description' => $row['description'],
+				'row' => $row['row'],
+				'is_new' => 0,
+				'location' => $row['location']
+			];
+		}
 	);
-	if ($request->num_rows() != 1)
+
+	if (empty($current_smiley))
 	{
 		throw new \ElkArte\Exceptions\Exception('smiley_not_found');
 	}
-	$current_smiley = $request->fetch_assoc();
-	$request->free_result();
 
 	return $current_smiley;
 }
@@ -223,7 +246,7 @@ function getSmileyPosition($location, $id)
 {
 	$db = database();
 
-	$smiley = array();
+	$smiley = [];
 
 	$request = $db->query('', '
 		SELECT 
@@ -231,10 +254,10 @@ function getSmileyPosition($location, $id)
 		FROM {db_prefix}smileys
 		WHERE hidden = {int:location}
 			AND id_smiley = {int:id_smiley}',
-		array(
+		[
 			'location' => $location,
 			'id_smiley' => $id,
-		)
+		]
 	);
 	list ($smiley['row'], $smiley['order'], $smiley['location']) = $request->fetch_row();
 	$request->free_result();
@@ -259,11 +282,11 @@ function moveSmileyPosition($smiley, $source)
 		WHERE hidden = {int:new_location}
 			AND smiley_row = {int:smiley_row}
 			AND smiley_order > {int:smiley_order}',
-		array(
+		[
 			'new_location' => $smiley['location'],
 			'smiley_row' => $smiley['row'],
 			'smiley_order' => $smiley['order'],
-		)
+		]
 	);
 
 	$db->query('', '
@@ -273,12 +296,12 @@ function moveSmileyPosition($smiley, $source)
 			smiley_row = {int:smiley_row},
 			hidden = {int:new_location}
 		WHERE id_smiley = {int:current_smiley}',
-		array(
+		[
 			'smiley_order' => $smiley['order'],
 			'smiley_row' => $smiley['row'],
 			'new_location' => $smiley['location'],
 			'current_smiley' => $source,
-		)
+		]
 	);
 }
 
@@ -287,7 +310,7 @@ function moveSmileyPosition($smiley, $source)
  *
  * @param int $id
  * @param int $row
- * @param int $location
+ * @param string $location
  */
 function updateSmileyRow($id, $row, $location)
 {
@@ -299,11 +322,11 @@ function updateSmileyRow($id, $row, $location)
 			smiley_row = {int:new_row}
 		WHERE smiley_row = {int:current_row}
 			AND hidden = {int:location}',
-		array(
+		[
 			'new_row' => $id,
 			'current_row' => $row,
-			'location' => $location == 'postform' ? '0' : '2',
-		)
+			'location' => $location === 'postform' ? '0' : '2',
+		]
 	);
 }
 
@@ -322,50 +345,61 @@ function updateSmileyOrder($id, $order)
 		SET 
 			smiley_order = {int:new_order}
 		WHERE id_smiley = {int:current_smiley}',
-		array(
+		[
 			'new_order' => $order,
 			'current_smiley' => $id,
-		)
+		]
 	);
 }
 
 /**
  * Get a list of all visible smileys.
+ *
+ * hidden = 0 is post form, 1 is hidden, 2 is popup,
  */
 function getSmileys()
 {
 	$db = database();
 
-	$smileys = array(
-		'postform' => array(
-			'rows' => array(),
-		),
-		'popup' => array(
-			'rows' => array(),
-		),
-	);
+	$smileys = [
+		'postform' => [
+			'rows' => [],
+		],
+		'popup' => [
+			'rows' => [],
+		],
+	];
 
 	$db->fetchQuery('
 		SELECT 
 			id_smiley, code, filename, description, smiley_row, smiley_order, hidden
 		FROM {db_prefix}smileys
-		WHERE hidden != {int:popup}
+		WHERE hidden != {int:hidden}
 		ORDER BY smiley_order, smiley_row',
-		array(
-			'popup' => 1,
-		)
+		[
+			'hidden' => 1,
+		]
 	)->fetch_callback(
 		function ($row) use (&$smileys) {
+			global $context;
+
 			$location = empty($row['hidden']) ? 'postform' : 'popup';
-			$smileys[$location]['rows'][$row['smiley_row']][] = array(
+			$filename = pathinfo($row['filename'], PATHINFO_FILENAME) . '.' . $context['smiley_extension'];
+			if (possibleSmileEmoji($row))
+			{
+				$filename = $row['emoji'] . '.svg';
+			}
+
+			$smileys[$location]['rows'][$row['smiley_row']][] = [
 				'id' => $row['id_smiley'],
 				'code' => htmlspecialchars($row['code'], ENT_COMPAT, 'UTF-8'),
-				'filename' => htmlspecialchars($row['filename'], ENT_COMPAT, 'UTF-8'),
+				'filename' => htmlspecialchars($filename, ENT_COMPAT, 'UTF-8'),
 				'description' => htmlspecialchars($row['description'], ENT_COMPAT, 'UTF-8'),
 				'row' => $row['smiley_row'],
 				'order' => $row['smiley_order'],
 				'selected' => !empty($_REQUEST['move']) && $_REQUEST['move'] == $row['id_smiley'],
-			);
+				'emoji' => $row['emoji'] ?? null,
+			];
 		}
 	);
 
@@ -390,17 +424,17 @@ function isSmileySetInstalled($set)
 			AND install_state != {int:not_installed}
 		ORDER BY time_installed DESC
 		LIMIT 1',
-		array(
+		[
 			'not_installed' => 0,
 			'current_package' => $set,
-		)
+		]
 	)->num_rows() <= 0;
 }
 
 /**
  * Logs the installation of a new smiley set.
  *
- * @param mixed[] $param
+ * @param array $param
  */
 function logPackageInstall($param)
 {
@@ -408,19 +442,19 @@ function logPackageInstall($param)
 
 	$db->insert('',
 		'{db_prefix}log_packages',
-		array(
+		[
 			'filename' => 'string', 'name' => 'string', 'package_id' => 'string', 'version' => 'string',
 			'id_member_installed' => 'int', 'member_installed' => 'string', 'time_installed' => 'int',
 			'install_state' => 'int', 'failed_steps' => 'string', 'themes_installed' => 'string',
 			'member_removed' => 'int', 'db_changes' => 'string', 'credits' => 'string',
-		),
-		array(
+		],
+		[
 			$param['filename'], $param['name'], $param['package_id'], $param['version'],
 			$param['id_member'], $param['member_name'], time(),
 			1, '', '',
 			0, '', $param['credits_tag'],
-		),
-		array('id_install')
+		],
+		['id_install']
 	);
 }
 
@@ -439,10 +473,10 @@ function getMaxSmileyOrder()
 		FROM {db_prefix}smileys
 		WHERE hidden = {int:postform}
 			AND smiley_row = {int:first_row}',
-		array(
+		[
 			'postform' => 0,
 			'first_row' => 0,
-		)
+		]
 	);
 	list ($smiley_order) = $request->fetch_row();
 	$request->free_result();
@@ -466,13 +500,14 @@ function list_getSmileySets($start, $items_per_page, $sort)
 
 	$known_sets = explode(',', $modSettings['smiley_sets_known']);
 	$set_names = explode("\n", $modSettings['smiley_sets_names']);
+	$set_exts = explode(',', $modSettings['smiley_sets_extensions']);
 
-	$cols = array(
-		'id' => array(),
-		'selected' => array(),
-		'path' => array(),
-		'name' => array(),
-	);
+	$cols = [
+		'id' => [],
+		'selected' => [],
+		'path' => [],
+		'name' => [],
+	];
 
 	foreach ($known_sets as $i => $set)
 	{
@@ -480,32 +515,38 @@ function list_getSmileySets($start, $items_per_page, $sort)
 		$cols['selected'][] = $i;
 		$cols['path'][] = $set;
 		$cols['name'][] = stripslashes($set_names[$i]);
+		$cols['ext'][] = $set_exts[$i];
 	}
 
 	$sort_flag = strpos($sort, 'DESC') === false ? SORT_ASC : SORT_DESC;
 
-	if (substr($sort, 0, 4) === 'name')
+	if (strpos($sort, 'name') === 0)
 	{
-		array_multisort($cols['name'], $sort_flag, SORT_REGULAR, $cols['path'], $cols['selected'], $cols['id']);
+		array_multisort($cols['name'], $sort_flag, SORT_REGULAR, $cols['path'], $cols['selected'], $cols['id'], $cols['ext']);
 	}
-	elseif (substr($sort, 0, 4) === 'path')
+	elseif (strpos($sort, 'ext') === 0)
 	{
-		array_multisort($cols['path'], $sort_flag, SORT_REGULAR, $cols['name'], $cols['selected'], $cols['id']);
+		array_multisort($cols['ext'], $sort_flag, SORT_REGULAR, $cols['name'], $cols['selected'], $cols['id'], $cols['path']);
+	}
+	elseif (strpos($sort, 'path') === 0)
+	{
+		array_multisort($cols['path'], $sort_flag, SORT_REGULAR, $cols['name'], $cols['selected'], $cols['id'], $cols['ext']);
 	}
 	else
 	{
-		array_multisort($cols['selected'], $sort_flag, SORT_REGULAR, $cols['path'], $cols['name'], $cols['id']);
+		array_multisort($cols['selected'], $sort_flag, SORT_REGULAR, $cols['path'], $cols['name'], $cols['id'], $cols['ext']);
 	}
 
-	$smiley_sets = array();
+	$smiley_sets = [];
 	foreach ($cols['id'] as $i => $id)
 	{
-		$smiley_sets[] = array(
+		$smiley_sets[] = [
 			'id' => $id,
 			'path' => $cols['path'][$i],
 			'name' => $cols['name'][$i],
-			'selected' => $cols['path'][$i] == $modSettings['smiley_sets_default']
-		);
+			'ext' => $cols['ext'][$i],
+			'selected' => $cols['path'][$i] === $modSettings['smiley_sets_default']
+		];
 	}
 
 	return $smiley_sets;
@@ -534,14 +575,29 @@ function list_getSmileys($start, $items_per_page, $sort)
 {
 	$db = database();
 
-	return $db->fetchQuery('
+	$result = [];
+	$db->fetchQuery('
 		SELECT 
 			id_smiley, code, filename, description, smiley_row, smiley_order, hidden
 		FROM {db_prefix}smileys
 		ORDER BY ' . $sort . '
 		LIMIT ' . $items_per_page . '  OFFSET ' . $start,
-		array()
-	)->fetch_all();
+		[]
+	)->fetch_callback(
+		function($row) use(&$result) {
+			$result[] = [
+				'id_smiley' => $row['id_smiley'],
+				'code' => $row['code'],
+				'filename' => pathinfo($row['filename'], PATHINFO_FILENAME),
+				'description' => $row['description'],
+				'smiley_row' => $row['smiley_row'],
+				'smiley_order' => $row['smiley_order'],
+				'hidden' => $row['hidden'],
+			];
+		}
+	);
+
+	return $result;
 }
 
 /**
@@ -555,10 +611,137 @@ function list_getNumSmileys()
 		SELECT 
 			COUNT(*)
 		FROM {db_prefix}smileys',
-		array()
+		[]
 	);
 	list ($numSmileys) = $request->fetch_row();
 	$request->free_result();
 
 	return $numSmileys;
+}
+
+/**
+ * Reads all smiley directories, and sets the image type for the set(s).  Saves this information
+ * in modSettings.
+ *
+ * @return string a csv string in the same order as smiley_sets_known
+ */
+function setSmileyExtensionArray()
+{
+	global $modSettings;
+
+	$smiley_types =  ['jpg', 'gif', 'jpeg', 'png', 'webp', 'svg'];
+	$smileys_dir = empty($modSettings['smileys_dir']) ? BOARDDIR . '/smileys' : $modSettings['smileys_dir'];
+	$fileFunc = FileFunctions::instance();
+	$extensionTypes = [];
+
+	$smiley_sets_known = explode(',', $modSettings['smiley_sets_known']);
+	foreach ($smiley_sets_known as $set)
+	{
+		$smiles = $fileFunc->listTree($smileys_dir . '/' . $set);
+
+		// What type of set is this, svg, gif, png
+		foreach ($smiles as $smile)
+		{
+			$temp = pathinfo($smile['filename'], PATHINFO_EXTENSION);
+			if (in_array($temp, $smiley_types, true))
+			{
+				$extensionTypes[] = $temp;
+				break;
+			}
+		}
+	}
+
+	$extensionTypes = implode(',', $extensionTypes);
+	updateSettings(['smiley_sets_extensions' => $extensionTypes]);
+
+	return $extensionTypes;
+}
+
+/**
+ * Fetch and prepare the smileys for use in the post editor
+ *
+ * What it does:
+ * - Old smiles as :) are processed as normal, requiring an image file in its smile set directory
+ * - Emoji :smile:
+ *   - first checked if the image file exists in the smile set directory
+ *   - if not found it will use the emoji class to check if the code exists in the emoji code list and if found
+ * the image will be set appropriately and a flag set to indicate an emoji, not smile, image
+ *   - if not found treated as a missing image
+ *   - Does not process any defined with hidden = 1 (hidden / custom)
+ *
+ * @return array composed of smiley location and row in that location
+ */
+function getEditorSmileys()
+{
+	global $context;
+
+	$db = database();
+
+	$smileys = [];
+
+	$db->fetchQuery('
+		SELECT 
+			code, filename, description, smiley_row, hidden
+		FROM {db_prefix}smileys
+		WHERE hidden IN (0, 2)
+		ORDER BY smiley_row, smiley_order',
+		[]
+	)->fetch_callback(
+		function ($row) use (&$smileys, $context) {
+			$filename = $row['filename'] . '.' . $context['smiley_extension'];
+			if (possibleSmileEmoji($row))
+			{
+				$filename = $row['emoji'] . '.svg';
+			}
+
+			$row['description'] = htmlspecialchars($row['description'], ENT_COMPAT, 'UTF-8');
+			$row['filename'] = htmlspecialchars($filename, ENT_COMPAT, 'UTF-8');
+
+			$smileys[empty($row['hidden']) ? 'postform' : 'popup'][$row['smiley_row']]['smileys'][] = $row;
+		}
+	);
+
+	return $smileys;
+}
+
+/**
+ * Checks if a defined smiley code as :smile: exists
+ *
+ * What it does:
+ * - Looks in the smile directory for example, smile.png.
+ * - If not found, checks if :smile: is a legitimate emoji short code.
+ * - If so, sets an ['emoji'] row to the proper utf8 value.
+ *
+ * @param array $row
+ * @param string $path
+ * @param string $ext
+ * @return bool if the code is a legitimate emoji short code and no image exists in the smile/smile_set directory
+ */
+function possibleSmileEmoji(&$row, $path = null, $ext = null)
+{
+	global $context;
+
+	$ext = $ext ?? $context['smiley_extension'];
+	$path = $path ?? $context['smiley_dir'];
+	$path = rtrim($path, '/\\') . DIRECTORY_SEPARATOR;
+
+	// At least 4 characters long, starts and ends with :  -- Marginally faster than preg_match
+	$possibleEmoji = isset($row['code'][3]) && $row['code'][0] === ':' && substr($row['code'], -1, 1) === ':';
+
+	// If this is possibly an emoji and the image does not exist in the smile set
+	if ($possibleEmoji && !FileFunctions::instance()->fileExists($path . $row['filename'] . '.' . $ext))
+	{
+		$emoji = Emoji::instance();
+
+		// Check if we have an emoji image for this smiley code
+		$test = preg_replace_callback('~(:([-+\w]+):)~u', [$emoji, 'emojiToImage'], $row['code']);
+		if ($test !== $row['filename'] && preg_match('~data-emoji-code=["\'](.*?)["\']~', $test, $result))
+		{
+			// Valid emoji, set the filename to the proper emoji file and type
+			$row['emoji'] =  $result[1];
+			return true;
+		}
+	}
+
+	return false;
 }

@@ -81,14 +81,15 @@ function template_control_richedit($editor_id, $smileyContainer = null, $bbcCont
 
 			$numRows = count($smileyRows);
 
-			// This is needed because otherwise the editor will remove all the duplicate (empty) keys and leave only 1 additional line
+			// This is needed because otherwise the editor will remove all the duplicate (empty)
+			// keys and leave only 1 additional line
 			$emptyPlaceholder = 0;
 			foreach ($smileyRows as $smileyRow)
 			{
 				foreach ($smileyRow['smileys'] as $smiley)
 				{
 					echo '
-							', JavaScriptEscape($smiley['code']), ': {url: ', JavaScriptEscape(rtrim($settings['smileys_url'], '/\\') . '/' . $smiley['filename']), ', tooltip: ', JavaScriptEscape($smiley['description']), '}', empty($smiley['isLast']) ? ',' : '';
+						', JavaScriptEscape($smiley['code']), ': {url: ', JavaScriptEscape((isset($smiley['emoji']) ? $context['emoji_path'] : $context['smiley_path']) . $smiley['filename']), ', tooltip: ', JavaScriptEscape($smiley['description']), '}', empty($smiley['isLast']) ? ',' : '';
 				}
 
 				if (empty($smileyRow['isLast']) && $numRows !== 1)
@@ -99,7 +100,7 @@ function template_control_richedit($editor_id, $smileyContainer = null, $bbcCont
 			}
 
 			echo '
-						}', $countLocations != 0 ? ',' : '';
+						}', $countLocations !== 0 ? ',' : '';
 		}
 
 		echo '

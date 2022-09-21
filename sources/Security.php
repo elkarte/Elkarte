@@ -919,12 +919,12 @@ function createToken($action, $type = 'post')
  *
  * What it does:
  *
- * - Validates that the received token is correct
- * - 1. The token exists in session.
- * - 2. The {$type} variable should exist.
- * - 3. We concatenate the variable we received with the user agent
- * - 4. Match that result against what is in the session.
- * - 5. If it matches, success, otherwise we fallout.
+ * Validates that the received token is correct
+ *  1. The token exists in session.
+ *  2. The {$type} variable should exist.
+ *  3. We concatenate the variable we received with the user agent
+ *  4. Match that result against what is in the session.
+ *  5. If it matches, success, otherwise we fallout.
  *
  * @param string $action
  * @param string $type = 'post' (get, request, or post)
@@ -1710,6 +1710,12 @@ function runBadBehavior()
 	if (!empty($modSettings['badbehavior_accept_header']) && !array_key_exists('HTTP_ACCEPT', $_SERVER))
 	{
 		return true;
+	}
+
+	// Do not block private IP ranges 10.0.0.0/8, 172.16.0.0/12, 192.168.0.0/16 or 127.0.0.0/8
+	if (preg_match('~^((10|172\.(1[6-9]|2\d|3[01])|192\.168|127)\.)~', $_SERVER['REMOTE_ADDR']) === 1)
+	{
+		return false;
 	}
 
 	// Project honey pot blacklist check [Your Access Key] [Octet-Reversed IP] [List-Specific Domain]

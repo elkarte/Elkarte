@@ -383,8 +383,8 @@ input[type="submit"], button[type="submit"], input[type="button"], button[type="
 	border-radius: 2px;
 }
 
-.linkbutton:link, .linkbutton:visited {
-	font-size: var(--font15);
+.linkbutton, .linkbutton:link, .linkbutton:visited {
+	font-size: var(--font14);
 	position: relative;
 	height: 2em;
 }
@@ -578,10 +578,10 @@ em, .em {
 
 /* Category Header icons, chain i-xyz from icons_svg */
 .hdicon::before {
-	display: inline-block;
+	display: inline-flex;
 	width: 20px;
 	height: 24px;
-	margin: 0 .25em 0 0;
+	margin: 0 .2em 0 0;
 	content: "";
 	vertical-align: text-bottom;
 }
@@ -1119,8 +1119,8 @@ a.bbc_link {
 
 /* The main title. */
 #forumtitle, .rightheader #forumtitle {
-	font-size: var(--font28);
-	padding: .8em .4em .4em .4em;
+	font-size: var(--font30);
+	padding: .4em;
 }
 
 .centerheader .forumlink {
@@ -1133,7 +1133,7 @@ a.bbc_link {
 
 /* Holds the logo and slogan */
 #logobox {
-	margin: 0 auto;
+	margin: -.5em auto 0 auto;
 	text-align: center;
 }
 
@@ -1687,11 +1687,13 @@ a.bbc_link {
 .breadcrumb {
 	display: flex;
 	overflow: hidden;
+	align-items: center;
 	flex-wrap: wrap;
 	margin-top: 1em;
 	border-radius: 4px;
 	/* Defines the breadcrumb height */
 	--arrow: 30px;
+	row-gap: 6px;
 }
 
 .breadcrumb .crumb {
@@ -1700,6 +1702,7 @@ a.bbc_link {
 	position: relative;
 	flex: 0 1 auto;
 	flex-wrap: wrap;
+	height: var(--arrow);
 	padding: 0 .7em 0 2.5em;
 	text-decoration: none;
 	outline: none;
@@ -1733,7 +1736,7 @@ a.bbc_link {
 }
 
 .breadcrumb > .crumb > a > i {
-	margin: 0 0 -3px 0;
+	margin: 0;
 	padding: 0;
 }
 
@@ -2184,12 +2187,13 @@ button[type="submit"].quick_quote_button.hide {
 	float: right;
 	overflow: auto;
 	width: 55%;
-	min-height: 2em;
+	min-height: 2.5em;
 	margin: 0 0 3px 0;
-	padding: 0 0 0 .12em;
+	padding: 0 0 .25em .25em;
 }
 
 .settings img {
+	max-height: 24px;
 	margin: 0 .67em 0 0;
 	vertical-align: middle;
 }
@@ -2524,11 +2528,15 @@ button[type="submit"].quick_quote_button.hide {
 	place-self: center left;
 }
 
+.topic_icons > img {
+	max-width: 18px;
+}
+
 /* Indicator if you posted in this topic */
 .fred::before {
 	position: relative;
 	top: -14px;
-	right: 4px;
+	right: 2px;
 	max-width: .8em;
 }
 
@@ -2608,6 +2616,10 @@ button[type="submit"].quick_quote_button.hide {
 	width: 18px;
 	height: 18px;
 	content: "";
+}
+
+.topicicon {
+	vertical-align: middle;
 }
 
 /* sticky / locked icons for the upper right of the topic_info div */
@@ -3187,14 +3199,13 @@ footer .signature {
 }
 
 /* Emoji and smiley icons in the post */
-.smiley {
+.smiley, .emoji {
+	max-height: 20px;
 	vertical-align: text-bottom;
 }
 
 .emoji {
-	max-width: 26px;
-	padding: 0 .13em;
-	vertical-align: text-bottom;
+	margin: 0 4px;
 }
 
 /* Adjust for various emoji sets */
@@ -3203,7 +3214,7 @@ footer .signature {
 }
 
 .tw-emoji {
-	max-width: 24px;
+	max-width: 20px;
 }
 
 .emoji_tpl {
@@ -4858,10 +4869,6 @@ div.labels {
 	opacity: 0.7;
 }
 
-.hdicon.help {
-	vertical-align: top;
-}
-
 .help .icon:hover, .hdicon.help:hover {
 	opacity: 1;
 }
@@ -5239,6 +5246,7 @@ div.labels {
 
 .login .well {
 	padding: .7em 15%;
+	border-radius: 0 0 7px 7px;
 }
 
 .login input[type="submit"] {
@@ -5809,20 +5817,25 @@ div.labels {
 
 	/* limit to two lines of them */
 	.breadcrumb {
-		max-height: 4em;
+		max-height: 6em;
 		margin-top: .25em;
 		margin-bottom: .75em;
+		row-gap: 2px;
 	}
 
 	.breadcrumb > .crumb {
-		padding: 0 0.5em 0 2em;
+		padding: 0 0.5em 0 1.2em;
+	}
+
+	.breadcrumb > .crumb::after {
+		transform: scale(0.35) rotate(45deg);
 	}
 
 	.breadcrumb .crumb:first-child {
 		padding: 0 0.6em 0 1em;
 	}
 
-	.breadcrumb .crumb:first-child:last-child {
+	.breadcrumb .crumb:last-child {
 		padding: 0 1.1em 0 1em;
 	}
 
@@ -6004,8 +6017,6 @@ div.labels {
 		margin: 0;
 	}
 
-
-
 	/* member list, turn off most columns */
 	.mlist li div:nth-child(n+6), .mlist li .website {
 		display: none;
@@ -6163,11 +6174,7 @@ div.labels {
 	}
 
 	#gobottom, #gotop {
-		padding: 0.2em 0.25em 0.2em 0.1em;
-	}
-
-	#gotop:hover, #gobottom:hover {
-		text-decoration: none;
+		display: none;
 	}
 
 	#message_index_jump_to {
@@ -6177,6 +6184,10 @@ div.labels {
 
 	.forum_category, .content_category {
 		border: none;
+	}
+
+	#display_jump_to select, #message_index_jump_to_select {
+		max-width: 12em;
 	}
 
 	select, .input_text, .input_password {

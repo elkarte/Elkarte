@@ -50,13 +50,13 @@ const itemCodes = ["*:disc", "@:disc", "+:square", "x:square", "#:decimal", "0:d
 					})
 					.on('click', function (e)
 					{
-						var start = '',
+						let start = '',
 							end = '';
 
 						if (base.opts.emoticonsCompat)
 						{
 							start = '<span> ';
-							end = ' </span>';
+							end = '&nbsp;</span>';
 						}
 
 						if (base.inSourceMode())
@@ -65,17 +65,17 @@ const itemCodes = ["*:disc", "@:disc", "+:square", "x:square", "#:decimal", "0:d
 						}
 						else
 						{
-							base.wysiwygEditorInsertHtml(start + '<img src="' + $(this).attr("src") + '" data-sceditor-emoticon="' + $(this).attr('alt') + '" />' + end);
+							base.wysiwygEditorInsertHtml(start + '<img src="' + $(this).attr("src") + '" class="smiley" data-sceditor-emoticon="' + $(this).attr('alt') + '" />' + end);
 						}
 
 						e.preventDefault();
 					});
-				line.append($('<span class="smiley"></span>').append($img));
+				line.append($img);
 			}
 		},
 		createPermanentDropDown: function ()
 		{
-			var emoticons = $.extend({}, this.opts.emoticons.dropdown);
+			let emoticons = $.extend({}, this.opts.emoticons.dropdown);
 
 			base = this;
 			content = $('<div class="sceditor-insertemoticon" />');
@@ -85,9 +85,9 @@ const itemCodes = ["*:disc", "@:disc", "+:square", "x:square", "#:decimal", "0:d
 			if (!$.isEmptyObject(this.opts.emoticons.popup))
 			{
 				this.opts.emoticons.more = this.opts.emoticons.popup;
-				moreButton = $('<div class="sceditor-more" />').text(this._('More')).on('click', function ()
+				moreButton = $('<button type="submit" />').text(this._('More')).on('click', function ()
 				{
-					var popup_box = $('.sceditor-smileyPopup');
+					let popup_box = $('.sceditor-smileyPopup');
 
 					if (popup_box.length > 0)
 					{
@@ -95,7 +95,7 @@ const itemCodes = ["*:disc", "@:disc", "+:square", "x:square", "#:decimal", "0:d
 					}
 					else
 					{
-						var emoticons = $.extend({}, base.opts.emoticons.popup),
+						let emoticons = $.extend({}, base.opts.emoticons.popup),
 							titlebar = $('<div class="category_header sceditor-popup-grip"/>');
 
 						popupContent = $('<div id="sceditor-popup" />');
@@ -140,6 +140,8 @@ const itemCodes = ["*:disc", "@:disc", "+:square", "x:square", "#:decimal", "0:d
 							e.stopPropagation();
 						});
 					}
+
+					return false;
 				});
 			}
 
@@ -156,7 +158,7 @@ const itemCodes = ["*:disc", "@:disc", "+:square", "x:square", "#:decimal", "0:d
 			// Show the more button on the editor if we have more
 			if (typeof moreButton !== 'undefined')
 			{
-				content.append(moreButton);
+				line.append(moreButton);
 			}
 		},
 		/**
@@ -734,7 +736,6 @@ sceditor.formats.bbcode
 		},
 		html: function (element, attrs, content)
 		{
-			console.log(content);
 			return '<icode>' + content.replace('[', '&#91;') + '</icode>';
 		}
 	})

@@ -26,76 +26,41 @@ use ElkArte\Languages\Txt;
  */
 class Mentions extends AbstractController
 {
-	/**
-	 * Will hold all available mention types
-	 *
-	 * @var array
-	 */
-	protected $_known_mentions = array();
+	/** @var array Will hold all available mention types */
+	protected $_known_mentions = [];
 
-	/**
-	 * The type of the mention we are looking at (if empty means all of them)
-	 *
-	 * @var string
-	 */
+	/** @var string The type of the mention we are looking at (if empty means all of them) */
 	protected $_type = '';
 
-	/**
-	 * The url of the display mentions button (all, unread, etc)
-	 *
-	 * @var string
-	 */
+	/** @var string The url of the display mentions button (all, unread, etc) */
 	protected $_url_param = '';
 
-	/**
-	 * Used for pagenation, keeps track of the current start point
-	 *
-	 * @var int
-	 */
+	/** @var int Used for pagenation, keeps track of the current start point */
 	protected $_page = 0;
 
-	/**
-	 * Number of items per page
-	 *
-	 * @var int
-	 */
+	/** @var int Number of items per page */
 	protected $_items_per_page = 20;
 
-	/**
-	 * Default sorting column
-	 *
-	 * @var string
-	 */
+	/** @var string Default sorting column */
 	protected $_default_sort = 'log_time';
 
-	/**
-	 * User chosen sorting column
-	 *
-	 * @var string
-	 */
+	/** @var string User chosen sorting column */
 	protected $_sort = '';
 
-	/**
-	 * The sorting methods we know
-	 *
-	 * @var string[]
-	 */
-	protected $_known_sorting = array();
+	/** @var string[] The sorting methods we know */
+	protected $_known_sorting = [];
 
-	/**
-	 * Determine if we are looking only at unread mentions or any kind of
-	 *
-	 * @var bool
-	 */
+	/** @var bool Determine if we are looking only at unread mentions or any kind of */
 	protected $_all = false;
 
 	/**
+	 * Good old constructor
 	 *
 	 * @param \ElkArte\EventManager $eventManager
 	 */
 	public function __construct($eventManager)
 	{
-		$this->_known_sorting = array('id_member_from', 'type', 'log_time');
+		$this->_known_sorting = ['id_member_from', 'type', 'log_time'];
 
 		parent::__construct($eventManager);
 	}
@@ -130,7 +95,7 @@ class Mentions extends AbstractController
 
 		if (empty($modSettings['enabled_mentions']))
 		{
-			return array();
+			return [];
 		}
 
 		return array_filter(array_unique(explode(',', $modSettings['enabled_mentions'])));
@@ -182,9 +147,9 @@ class Mentions extends AbstractController
 		}
 
 		// We only know AJAX for this particular action
-		$context['json_data'] = array(
+		$context['json_data'] = [
 			'timelast' => getTimeLastMention($this->user->id)
-		);
+		];
 
 		if (!empty($modSettings['usernotif_favicon_enable']))
 		{
@@ -193,12 +158,12 @@ class Mentions extends AbstractController
 
 		if (!empty($modSettings['usernotif_desktop_enable']))
 		{
-			$context['json_data']['desktop_notifications'] = array(
+			$context['json_data']['desktop_notifications'] = [
 				'new_from_last' => getNewMentions($this->user->id, $lastsent),
 				'title' => sprintf($txt['forum_notification'], strip_tags(un_htmlspecialchars($context['forum_name']))),
 				'link' => '/index.php?action=mentions',
-			);
-			$context['json_data']['desktop_notifications']['message'] = sprintf($txt[$lastsent == 0 ? 'unread_notifications' : 'new_from_last_notifications'], $context['json_data']['desktop_notifications']['new_from_last']);
+			];
+			$context['json_data']['desktop_notifications']['message'] = sprintf($txt[$lastsent === 0 ? 'unread_notifications' : 'new_from_last_notifications'], $context['json_data']['desktop_notifications']['new_from_last']);
 		}
 
 		$_SESSION['notifications_lastseen'] = $context['json_data']['timelast'];
@@ -221,7 +186,7 @@ class Mentions extends AbstractController
 
 		$this->_buildUrl();
 
-		$list_options = array(
+		$list_options = [
 			'id' => 'list_mentions',
 			'title' => empty($this->_all) ? $txt['my_unread_mentions'] : $txt['my_mentions'],
 			'items_per_page' => $this->_items_per_page,
@@ -229,86 +194,86 @@ class Mentions extends AbstractController
 			'default_sort_col' => $this->_default_sort,
 			'default_sort_dir' => 'default',
 			'no_items_label' => $this->_all ? $txt['no_mentions_yet'] : $txt['no_new_mentions'],
-			'get_items' => array(
-				'function' => array($this, 'list_loadMentions'),
-				'params' => array(
+			'get_items' => [
+				'function' => [$this, 'list_loadMentions'],
+				'params' => [
 					$this->_all,
 					$this->_type,
-				),
-			),
-			'get_count' => array(
-				'function' => array($this, 'list_getMentionCount'),
-				'params' => array(
+				],
+			],
+			'get_count' => [
+				'function' => [$this, 'list_getMentionCount'],
+				'params' => [
 					$this->_all,
 					$this->_type,
-				),
-			),
-			'columns' => array(
-				'id_member_from' => array(
-					'header' => array(
+				],
+			],
+			'columns' => [
+				'id_member_from' => [
+					'header' => [
 						'value' => $txt['mentions_from'],
-					),
-					'data' => array(
+					],
+					'data' => [
 						'function' => function ($row) {
 							global $settings;
 
 							if (isset($settings['mentions']['mentioner_template']))
 							{
 								return str_replace(
-									array(
+									[
 										'{avatar_img}',
 										'{mem_url}',
 										'{mem_name}',
-									),
-									array(
+									],
+									[
 										$row['avatar']['image'],
 										!empty($row['id_member_from']) ? getUrl('action', ['action' => 'profile', 'u' => $row['id_member_from']]) : '#',
 										$row['mentioner'],
-									),
+									],
 									$settings['mentions']['mentioner_template']);
 							}
 
 							return '';
 						},
-					),
-					'sort' => array(
+					],
+					'sort' => [
 						'default' => 'mtn.id_member_from',
 						'reverse' => 'mtn.id_member_from DESC',
-					),
-				),
-				'type' => array(
-					'header' => array(
+					],
+				],
+				'type' => [
+					'header' => [
 						'value' => $txt['mentions_what'],
-					),
-					'data' => array(
+					],
+					'data' => [
 						'db' => 'message',
-					),
-					'sort' => array(
+					],
+					'sort' => [
 						'default' => 'mtn.mention_type',
 						'reverse' => 'mtn.mention_type DESC',
-					),
-				),
-				'log_time' => array(
-					'header' => array(
+					],
+				],
+				'log_time' => [
+					'header' => [
 						'value' => $txt['mentions_when'],
 						'class' => 'mention_log_time',
-					),
-					'data' => array(
+					],
+					'data' => [
 						'db' => 'log_time',
 						'timeformat' => 'html_time',
 						'class' => 'mention_log_time',
-					),
-					'sort' => array(
+					],
+					'sort' => [
 						'default' => 'mtn.log_time DESC',
 						'reverse' => 'mtn.log_time',
-					),
-				),
-				'action' => array(
-					'header' => array(
+					],
+				],
+				'action' => [
+					'header' => [
 						'value' => $txt['mentions_action'],
 						'class' => 'listaction grid8',
-					),
-					'data' => array(
+					],
+					'data' => [
 						'function' => function ($row) {
 							global $txt, $settings;
 
@@ -318,56 +283,56 @@ class Mentions extends AbstractController
 							return $opts . '<a href="' . getUrl('action', ['action' => 'mentions', 'sa' => 'updatestatus', 'mark' => 'delete', 'item' => $row['id_mention'], '{session_data}']) . '"><i class="icon i-remove" title="' . $txt['delete'] . '"><s>' . $txt['delete'] . '</s></i></a>';
 						},
 						'class' => 'listaction grid8',
-					),
-				),
-			),
-			'list_menu' => array(
+					],
+				],
+			],
+			'list_menu' => [
 				'show_on' => 'top',
-				'links' => array(
-					array(
+				'links' => [
+					[
 						'href' => getUrl('action', ['action' => 'mentions'] + (!empty($this->_all) ? ['all'] : [])),
 						'is_selected' => empty($this->_type),
 						'label' => $txt['mentions_type_all']
-					),
-				),
-			),
-			'additional_rows' => array(
-				array(
+					],
+				],
+			],
+			'additional_rows' => [
+				[
 					'position' => 'above_column_headers',
 					'class' => 'flow_flex_right',
 					'value' => '<a class="linkbutton" href="' . $scripturl . '?action=mentions' . (!empty($this->_all) ? '' : ';all') . str_replace(';all', '', $this->_url_param) . '">' . (!empty($this->_all) ? $txt['mentions_unread'] : $txt['mentions_all']) . '</a>',
-				),
-				array(
+				],
+				[
 					'class' => 'submitbutton',
 					'position' => 'below_table_data',
 					'value' => '<a class="linkbutton" href="' . $scripturl . '?action=mentions;sa=updatestatus;mark=readall' . str_replace(';all', '', $this->_url_param) . ';' . $context['session_var'] . '=' . $context['session_id'] . '">' . $txt['mentions_mark_all_read'] . '</a>',
-				),
-			),
-		);
+				],
+			],
+		];
 
 		foreach ($this->_known_mentions as $mention)
 		{
-			$list_options['list_menu']['links'][] = array(
+			$list_options['list_menu']['links'][] = [
 				'href' => getUrl('action', ['action' => 'mentions', 'type' => $mention] + (!empty($this->_all) ? ['all'] : [])),
 				'is_selected' => $this->_type === $mention,
 				'label' => $txt['mentions_type_' . $mention]
-			);
+			];
 		}
 
 		createList($list_options);
 
 		$context['page_title'] = $txt['my_mentions'] . (!empty($this->_page) ? ' - ' . sprintf($txt['my_mentions_pages'], $this->_page) : '');
-		$context['linktree'][] = array(
+		$context['linktree'][] = [
 			'url' => getUrl('action', ['action' => 'mentions']),
 			'name' => $txt['my_mentions'],
-		);
+		];
 
 		if (!empty($this->_type))
 		{
-			$context['linktree'][] = array(
+			$context['linktree'][] = [
 				'url' => getUrl('action', ['action' => 'mentions', 'type' => $this->_type]),
 				'name' => $txt['mentions_type_' . $this->_type],
-			);
+			];
 		}
 	}
 
@@ -377,8 +342,8 @@ class Mentions extends AbstractController
 	protected function _buildUrl()
 	{
 		$this->_all = $this->_req->getQuery('all') !== null;
-		$this->_sort = in_array($this->_req->getQuery('sort', 'trim'), $this->_known_sorting) ? $this->_req->getQuery('sort', 'trim') : $this->_default_sort;
-		$this->_type = in_array($this->_req->getQuery('type', 'trim'), $this->_known_mentions) ? $this->_req->getQuery('type', 'trim') : '';
+		$this->_sort = in_array($this->_req->getQuery('sort', 'trim'), $this->_known_sorting, true) ? $this->_req->getQuery('sort', 'trim') : $this->_default_sort;
+		$this->_type = in_array($this->_req->getQuery('type', 'trim'), $this->_known_mentions, true) ? $this->_req->getQuery('type', 'trim') : '';
 		$this->_page = $this->_req->getQuery('start', 'trim', '');
 
 		$this->_url_param = ($this->_all ? ';all' : '') . (!empty($this->_type) ? ';type=' . $this->_type : '') . ($this->_req->getQuery('start') !== null ? ';start=' . $this->_req->getQuery('start') : '');
@@ -400,8 +365,7 @@ class Mentions extends AbstractController
 
 	/**
 	 * Did you read the mention? Then let's move it to the graveyard.
-	 * Used in Display.controller.php, it may be merged to action_updatestatus
-	 * though that would require to add an optional parameter to avoid the redirect
+	 * Used by Events registered to the prepare_context event of the Display controller
 	 */
 	public function action_markread()
 	{
@@ -464,7 +428,7 @@ class Mentions extends AbstractController
 	public function list_loadMentions($start, $limit, $sort, $all, $type)
 	{
 		$totalMentions = countUserMentions($all, $type);
-		$mentions = array();
+		$mentions = [];
 		$round = 0;
 		Txt::load('Mentions');
 
@@ -475,7 +439,7 @@ class Mentions extends AbstractController
 			$possible_mentions = getUserMentions($start, $limit, $sort, $all, $type);
 			$count_possible = count($possible_mentions);
 
-			$this->_events->trigger('view_mentions', array($type, &$possible_mentions));
+			$this->_events->trigger('view_mentions', [$type, &$possible_mentions]);
 
 			foreach ($possible_mentions as $mention)
 			{
@@ -491,7 +455,7 @@ class Mentions extends AbstractController
 			$round++;
 
 			// If nothing has been removed OR there are not enough
-			if (count($mentions) !== $count_possible || count($mentions) === $limit || ($totalMentions - $start < $limit))
+			if (($totalMentions - $start < $limit) || count($mentions) !== $count_possible || count($mentions) === $limit)
 			{
 				break;
 			}
@@ -517,11 +481,11 @@ class Mentions extends AbstractController
 	{
 		if (!empty($type))
 		{
-			$to_register = array('\\ElkArte\\Mentions\\MentionType\\Event\\' . ucfirst($type));
+			$to_register = ['\\ElkArte\\Mentions\\MentionType\\Event\\' . ucfirst($type)];
 		}
 		else
 		{
-			$to_register = array_map(function ($name) {
+			$to_register = array_map(static function ($name) {
 				return '\\ElkArte\\Mentions\\MentionType\\Event\\' . ucfirst($name);
 			}, $this->_known_mentions);
 		}

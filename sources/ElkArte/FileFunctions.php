@@ -335,7 +335,7 @@ class FileFunctions
 	}
 
 	/**
-	 * Recursivly removes a directory and all files and subdirectories contained within.
+	 * Recursively removes a directory and all files and subdirectories contained within.
 	 * Use with *caution*, it is thorough, destructive and irreversible.
 	 *
 	 * @param string $path
@@ -422,9 +422,14 @@ class FileFunctions
 	 */
 	public function listTree($path)
 	{
+		$tree = [];
+		if (!$this->isDir($path))
+		{
+			return $tree;
+		}
+
 		$iterator = new \RecursiveDirectoryIterator($path, \FilesystemIterator::SKIP_DOTS);
 		$files = new \RecursiveIteratorIterator($iterator, \RecursiveIteratorIterator::CHILD_FIRST, \RecursiveIteratorIterator::CATCH_GET_CHILD);
-		$tree = [];
 		/** @var \SplFileInfo $file */
 		foreach ($files as $file)
 		{
@@ -435,11 +440,11 @@ class FileFunctions
 
 			$sub_path = str_replace($path,'', $file->getPath());
 
-			$tree[] = array(
+			$tree[] = [
 				'filename' => $sub_path === '' ? $file->getFilename() : $sub_path . '/' . $file->getFilename(),
 				'size' => $file->getSize(),
 				'skipped' => false,
-			);
+			];
 		}
 
 		return $tree;

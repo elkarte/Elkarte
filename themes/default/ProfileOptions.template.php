@@ -676,6 +676,13 @@ function template_profile_theme_settings()
 								<input type="checkbox" name="default_options[show_no_avatars]" id="show_no_avatars" value="1"', !empty($context['member']['options']['show_no_avatars']) ? ' checked="checked"' : '', ' />
 							</dd>
 							<dt>
+								<label for="show_no_smileys">', $txt['show_no_smileys'], '</label>
+							</dt>
+							<dd>
+								<input type="hidden" name="default_options[show_no_smileys]" value="0" />
+								<input type="checkbox" name="default_options[show_no_smileys]" id="show_no_smileys" value="1"', !empty($context['member']['options']['show_no_smileys']) ? ' checked="checked"' : '', ' />
+							</dd>
+							<dt>
 								<label for="hide_poster_area">', $txt['hide_poster_area'], '</label>
 							</dt>
 							<dd>
@@ -1509,32 +1516,6 @@ function template_profile_theme_pick()
 							</dt>
 							<dd>
 								', $context['member']['theme']['name'], ' <a class="linkbutton" href="', getUrl('action', ['action' => 'profile', 'area' => 'pick', 'u' => $context['id_member'], '{session_data}']), '">', $txt['change'], '</a>
-							</dd>';
-}
-
-/**
- * Smiley set picker.
- */
-function template_profile_smiley_pick()
-{
-	global $txt, $context, $modSettings, $settings;
-
-	echo '
-							<dt>
-								<label for="smiley_set">', $txt['smileys_current'], '</label>
-							</dt>
-							<dd>
-								<select name="smiley_set" id="smiley_set" onchange="document.getElementById(\'smileypr\').src = this.selectedIndex == 0 ? \'', $settings['images_url'], '/blank.png\' : \'', $modSettings['smileys_url'], '/\' + (this.selectedIndex != 1 ? this.options[this.selectedIndex].value : \'', !empty($settings['smiley_sets_default']) ? $settings['smiley_sets_default'] : $modSettings['smiley_sets_default'], '\') + \'/smiley.gif\';">';
-
-	foreach ($context['smiley_sets'] as $set)
-	{
-		echo '
-									<option value="', $set['id'], '"', $set['selected'] ? ' selected="selected"' : '', '>', $set['name'], '</option>';
-	}
-
-	echo '
-								</select>
-								<img id="smileypr" class="icon-middle" src="', $context['member']['smiley_set']['id'] != 'none' ? $modSettings['smileys_url'] . '/' . ($context['member']['smiley_set']['id'] != '' ? $context['member']['smiley_set']['id'] : (!empty($settings['smiley_sets_default']) ? $settings['smiley_sets_default'] : $modSettings['smiley_sets_default'])) . '/smiley.gif' : $settings['images_url'] . '/blank.png', '" alt=":)"  style="padding-left: 1.25em;" />
 							</dd>';
 }
 

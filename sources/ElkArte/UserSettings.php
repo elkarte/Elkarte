@@ -58,7 +58,7 @@ class UserSettings extends ValuesContainerReadOnly
 	 */
 	public function fixSalt($force = false)
 	{
-		// Correct password, but they've got no salt; fix it!
+		// Correct password, but they've got no salt or not enough; fix it!
 		if ($this->data['password_salt'] === '' || $force || strlen($this->data['password_salt']) < 10)
 		{
 			$tokenizer = new TokenHash();

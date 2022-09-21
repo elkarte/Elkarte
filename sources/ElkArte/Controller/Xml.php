@@ -110,7 +110,7 @@ class Xml extends AbstractController
 
 		require_once(SUBSDIR . '/MessageIcons.subs.php');
 
-		$context['icons'] = getMessageIcons($board);
+		$context['icons'] = array_values(getMessageIcons($board));
 		$context['sub_template'] = 'message_icons';
 	}
 
@@ -545,7 +545,6 @@ class Xml extends AbstractController
 		$errors = array();
 		$order = array();
 
-		// Chances are I wear a silly ;D
 		Txt::load('Errors');
 		Txt::load('ManageSmileys');
 		require_once(SUBSDIR . '/Smileys.subs.php');
@@ -600,8 +599,8 @@ class Xml extends AbstractController
 
 					// Now get the updated row, location, order
 					$smiley = array();
-					$smiley['row'] = !isset($smile_received_row) ? $smile_moved_details['row'] : $smile_received_row;
-					$smiley['location'] = !isset($smile_received_location) ? $smile_moved_details['location'] : $smile_received_location;
+					$smiley['row'] = $smile_received_row;
+					$smiley['location'] = $smile_received_location;
 					$smiley['order'] = -1;
 
 					// If the node after the drop zone is in the same row/container, we use its position

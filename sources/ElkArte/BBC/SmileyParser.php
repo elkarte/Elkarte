@@ -16,6 +16,8 @@
 namespace BBC;
 
 use ElkArte\Cache\Cache;
+use ElkArte\Emoji;
+use ElkArte\FileFunctions;
 
 /**
  * Class SmileyParser
@@ -26,23 +28,30 @@ class SmileyParser
 {
 	/** @var bool Are smiley enabled */
 	protected $enabled = true;
+
 	/** @var string smiley regex for parse protection */
 	protected $search = '';
+
 	/** @var array The replacement images for the ;) */
-	protected $replace = array();
+	protected $replace = [];
+
 	/** @var string marker */
 	protected $marker = "\r";
-	/** @var string path */
+
+	/** @var string path to the smiley set */
 	protected $path = '';
+
+	/** @var string dir to the smiley set */
+	protected $dir = '';
 
 	/**
 	 * SmileyParser constructor.
 	 *
-	 * @param string $path
+	 * @param string $set The smiley set to use
 	 */
-	public function __construct($path)
+	public function __construct($set)
 	{
-		$this->setPath($path);
+		$this->setPath($set);
 
 		if ($this->enabled)
 		{
@@ -81,26 +90,26 @@ class SmileyParser
 	/**
 	 * Set the image path to the smileys
 	 *
-	 * @param string $path
+	 * @param string $set
 	 *
 	 * @return $this
 	 */
-	public function setPath($path)
+	public function setPath($set)
 	{
-		$this->path = htmlspecialchars($path);
+		$this->path = $GLOBALS['modSettings']['smileys_url'] . '/' . htmlspecialchars($set) . '/';
+		$this->dir = $GLOBALS['modSettings']['smileys_dir'] . '/' . $set . '/';
 
 		return $this;
 	}
 
 	/**
-	 * Parse smileys in the passed message.
+	 * Parse smileys in passed message.
 	 *
 	 * What it does:
 	 *   - The smiley parsing function which makes pretty faces appear :)
-	 *   - If custom smiley sets are turned off by smiley_enable, the default set of smileys will be used.
-	 *   - These are specifically not parsed in code tags [url=mailto:Dad@blah.com]
+	 *   - These are specifically not parsed in bbc/code tags [url=mailto:Dad@blah.com]
 	 *   - Caches the smileys from the database or array in memory.
-	 *   - Doesn't return anything, but rather modifies message directly.
+	 *   - Returns the modified message directly.
 	 *
 	 * @param string $message
 	 *
@@ -109,7 +118,9 @@ class SmileyParser
 	public function parseBlock($message)
 	{
 		// No smiley set at all?!
-		if (!$this->enabled || trim($message) === '')
+		if (!$this->enabled
+			|| empty($GLOBALS['context']['smiley_enabled'])
+			|| trim($message) === '')
 		{
 			return $message;
 		}
@@ -119,6 +130,34 @@ class SmileyParser
 			function (array $matches) {
 				return $this->parser_callback($matches);
 			}, $message);
+	}
+
+	/**
+	 * Parse emoji in passed message.
+	 *
+	 * What it does:
+	 *   - The smiley parsing function which makes emoji appear :man_shrugging:
+	 *   - Replaces found tags with image from chosen set
+	 *   - Finds keyboard entered emoji text and converts to site image for constitent look
+	 *   - Specifically not parsed in bbc/code tags [url=mailto:Dad@blah.com] (defined by BBC Parser)
+	 *   - Uses the emoji class to do the replacements
+	 *
+	 * @param string $message
+	 *
+	 * @return string
+	 */
+	public function parseEmoji($message)
+	{
+		// No Emoji set or message at all?!
+		if (!$this->enabled
+			|| empty($GLOBALS['context']['emoji_enabled'])
+			|| trim($message) === '')
+		{
+			return $message;
+		}
+
+		// Replace away!
+		return Emoji::instance()->emojiNameToImage($message, false, false);
 	}
 
 	/**
@@ -133,19 +172,17 @@ class SmileyParser
 		{
 			$message_parts = explode($this->marker, $message);
 
-			// first part (0) parse smileys. Then every other one after that parse smileys
+			// first part (0) parse smileys/emoji. Then every other one after that parse smileys
 			for ($i = 0, $n = count($message_parts); $i < $n; $i += 2)
 			{
-				$message_parts[$i] = $this->parseBlock($message_parts[$i]);
+				$message_parts[$i] = $this->parseEmoji($this->parseBlock($message_parts[$i]));
 			}
 
 			return implode('', $message_parts);
 		}
-		// No smileys, just get rid of the markers.
-		else
-		{
-			return str_replace($this->marker, '', $message);
-		}
+
+		// No smileys, or not enabled, just get rid of the markers.
+		return str_replace($this->marker, '', $message);
 	}
 
 	/**
@@ -173,25 +210,33 @@ class SmileyParser
 	 */
 	protected function setSearchReplace($smileysfrom, $smileysto, $smileysdescs)
 	{
-		$searchParts = array();
-
-		$replace = array(':' => '&#58;', '(' => '&#40;', ')' => '&#41;', '$' => '&#36;', '[' => '&#091;');
+		$searchParts = [];
+		$fileFunc = FileFunctions::instance();
+		$replace = [':' => '&#58;', '(' => '&#40;', ')' => '&#41;', '$' => '&#36;', '[' => '&#091;'];
 
 		foreach ($smileysfrom as $i => $smileysfrom_i)
 		{
 			$specialChars = htmlspecialchars($smileysfrom_i, ENT_QUOTES);
-			$smileyCode = '<img src="' . $this->path . $smileysto[$i] . '" alt="' . strtr($specialChars, $replace) . '" title="' . strtr(htmlspecialchars($smileysdescs[$i]), $replace) . '" class="smiley" />';
-			$this->replace[$smileysfrom_i] = $smileyCode;
 
-			$searchParts[] = preg_quote($smileysfrom_i, '~');
-			if ($smileysfrom_i != $specialChars)
+			// If an :emoji: tag, from smiles ACP, does not have an img file, leave it for emoji parsing
+			$possibleEmoji = isset($smileysfrom_i[3]) && $smileysfrom_i[0] === ':' && substr($smileysfrom_i, -1, 1) === ':';
+			$filename = $this->dir . $smileysto[$i] . '.' . $GLOBALS['context']['smiley_extension'];
+			if (!$possibleEmoji || $fileFunc->fileExists($filename))
 			{
-				$this->replace[$specialChars] = $smileyCode;
-				$searchParts[] = preg_quote($specialChars, '~');
+				// Either a smiley :) or emoji :smile: with a defined image
+				$smileyCode = '<img src="' . $this->path . $smileysto[$i] . '.' . $GLOBALS['context']['smiley_extension'] . '" alt="' . strtr($specialChars, $replace) . '" title="' . strtr(htmlspecialchars($smileysdescs[$i]), $replace) . '" class="smiley" />';
+				$this->replace[$smileysfrom_i] = $smileyCode;
+
+				$searchParts[] = preg_quote($smileysfrom_i, '~');
+				if ($smileysfrom_i !== $specialChars)
+				{
+					$this->replace[$specialChars] = $smileyCode;
+					$searchParts[] = preg_quote($specialChars, '~');
+				}
 			}
 		}
 
-		// This smiley regex makes sure it doesn't parse smileys within code tags
+		// This smiley regex makes sure it doesn't parse smileys within bbc tags
 		// (so [url=mailto:David@bla.com] doesn't parse the :D smiley)
 		$this->search = '~(?<=[>:\?\.\s\x{A0}[\]()*\\\;]|^)(' . implode('|', $searchParts) . ')(?=[^[:alpha:]0-9]|$)~';
 	}
@@ -201,36 +246,10 @@ class SmileyParser
 	 */
 	protected function load()
 	{
-		global $modSettings;
-
-		// Use the default smileys if it is disabled. (better for "portability" of smileys.)
-		if (empty($modSettings['smiley_enable']))
-		{
-			list ($smileysfrom, $smileysto, $smileysdescs) = $this->getDefault();
-		}
-		else
-		{
-			list ($smileysfrom, $smileysto, $smileysdescs) = $this->getFromDB();
-		}
+		list ($smileysfrom, $smileysto, $smileysdescs) = $this->getFromDB();
 
 		// Build the search/replace regex
 		$this->setSearchReplace($smileysfrom, $smileysto, $smileysdescs);
-	}
-
-	/**
-	 * Returns the default / built in array of smileys
-	 *
-	 * @return array
-	 */
-	protected function getDefault()
-	{
-		global $txt;
-
-		$smileysfrom = array('>:D', ':D', '::)', '>:(', ':))', ':)', ';)', ';D', ':(', ':o', '8)', ':P', '???', ':-[', ':-X', ':-*', ':\'(', ':-\\', '^-^', 'O0', 'C:-)', 'O:)');
-		$smileysto = array('evil.gif', 'cheesy.gif', 'rolleyes.gif', 'angry.gif', 'laugh.gif', 'smiley.gif', 'wink.gif', 'grin.gif', 'sad.gif', 'shocked.gif', 'cool.gif', 'tongue.gif', 'huh.gif', 'embarrassed.gif', 'lipsrsealed.gif', 'kiss.gif', 'cry.gif', 'undecided.gif', 'azn.gif', 'afro.gif', 'police.gif', 'angel.gif');
-		$smileysdescs = array('', $txt['icon_cheesy'], $txt['icon_rolleyes'], $txt['icon_angry'], $txt['icon_laugh'], $txt['icon_smiley'], $txt['icon_wink'], $txt['icon_grin'], $txt['icon_sad'], $txt['icon_shocked'], $txt['icon_cool'], $txt['icon_tongue'], $txt['icon_huh'], $txt['icon_embarrassed'], $txt['icon_lips'], $txt['icon_kiss'], $txt['icon_cry'], $txt['icon_undecided'], '', '', '', $txt['icon_angel']);
-
-		return array($smileysfrom, $smileysto, $smileysdescs);
 	}
 
 	/**
@@ -240,17 +259,18 @@ class SmileyParser
 	 */
 	protected function getFromDB()
 	{
-		// Load the smileys in reverse order by length so they don't get parsed wrong.
-		if (!Cache::instance()->getVar($temp, 'parsing_smileys', 480))
+		// Load the smileys in reverse order by length, so they don't get parsed wrong.
+		if (!Cache::instance()->getVar($temp, 'parsing_smileys', 600))
 		{
-			$smileysfrom = array();
-			$smileysto = array();
-			$smileysdescs = array();
+			$smileysfrom = [];
+			$smileysto = [];
+			$smileysdescs = [];
 
 			$db = database();
 
 			$db->fetchQuery('
-				SELECT code, filename, description
+				SELECT 
+				    code, filename, description
 				FROM {db_prefix}smileys
 				ORDER BY LENGTH(code) DESC',
 				[]
@@ -263,8 +283,8 @@ class SmileyParser
 			);
 
 			// Cache this for a bit
-			$temp = array($smileysfrom, $smileysto, $smileysdescs);
-			Cache::instance()->put('parsing_smileys', $temp, 480);
+			$temp = [$smileysfrom, $smileysto, $smileysdescs];
+			Cache::instance()->put('parsing_smileys', $temp, 600);
 		}
 
 		return $temp;

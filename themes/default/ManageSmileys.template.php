@@ -64,7 +64,7 @@ function template_modifyset()
 					<dd>
 						', $modSettings['smileys_url'], '/';
 
-	if ($context['current_set']['id'] == 'default')
+	if ($context['current_set']['id'] === 'default')
 	{
 		echo '
 						<strong>default</strong>
@@ -101,7 +101,7 @@ function template_modifyset()
 					</dd>';
 
 	// If this is a new smiley set they have the option to import smileys already in the directory.
-	if ($context['current_set']['is_new'] && !empty($modSettings['smiley_enable']))
+	if ($context['current_set']['is_new'])
 	{
 		echo '
 					<dt>
@@ -142,12 +142,12 @@ function template_modifysmiley()
 						<label>', $txt['smiley_preview'], ': </label>
 					</dt>
 					<dd>
-						<img src="', $modSettings['smileys_url'], '/', $modSettings['smiley_sets_default'], '/', $context['current_smiley']['filename'], '" id="preview" alt="" /> (', $txt['smiley_preview_using'], ': <select name="set" onchange="updatePreview();">';
+						<img src="', $modSettings['smileys_url'], '/', $modSettings['smiley_sets_default'], '/', $context['current_smiley']['filename'] . '.' . $context['smiley_extension'], '" id="preview" alt="" /> (', $txt['smiley_preview_using'], ': <select id="set" name="set" onchange="updatePreview();">';
 
 	foreach ($context['smiley_sets'] as $smiley_set)
 	{
 		echo '
-							<option value="', $smiley_set['path'], '"', $context['selected_set'] == $smiley_set['path'] ? ' selected="selected"' : '', '>', $smiley_set['name'], '</option>';
+							<option data-ext="' . $smiley_set['ext'] . '" value="', $smiley_set['path'], '"', $context['selected_set'] === $smiley_set['path'] ? ' selected="selected"' : '', '>', $smiley_set['name'], '</option>';
 	}
 
 	echo '
@@ -235,27 +235,31 @@ function template_addsmiley()
 			<div class="content">
 				<ul>
 					<li>
-						<label for="method-existing"><input type="radio" onclick="switchType();" name="method" id="method-existing" value="existing" checked="checked" /> ', $txt['smileys_add_existing'], '</label>
+						<label for="method-existing">
+							<input type="radio" onclick="switchType();" name="method" id="method-existing" value="existing" checked="checked" /> ', $txt['smileys_add_existing'], '
+						</label>
 					</li>
 					<li>
-						<label for="method-upload"><input type="radio" onclick="switchType();" name="method" id="method-upload" value="upload" /> ', $txt['smileys_add_upload'], '</label>
+						<label for="method-upload">
+							<input type="radio" onclick="switchType();" name="method" id="method-upload" value="upload" /> ', $txt['smileys_add_upload'], '
+						</label>
 					</li>
 				</ul>
 				<br />
 				<fieldset id="ex_settings">
 					<dl class="settings">
 						<dt>
-							<img src="', $modSettings['smileys_url'], '/', $modSettings['smiley_sets_default'], '/', $context['filenames'][0]['id'], '" id="preview" alt="" />
+							<label for="set">', $txt['smiley_sets_preview'], '</label>
 						</dt>
 						<dd>
-							', $txt['smiley_preview_using'], ': <select name="set" onchange="updatePreview();selectMethod(\'existing\');">
-
-						';
+							<img src="', $modSettings['smileys_url'], '/', $modSettings['smiley_sets_default'], '/', $context['filenames'][0]['id'] . '.' . $context['smiley_extension'], '" id="preview" alt="" />
+							', $txt['smiley_preview_using'], ': 
+							<select id="set" name="set" onchange="updatePreview();selectMethod(\'existing\');">';
 
 	foreach ($context['smiley_sets'] as $smiley_set)
 	{
 		echo '
-									<option value="', $smiley_set['path'], '"', $context['selected_set'] == $smiley_set['path'] ? ' selected="selected"' : '', '>', $smiley_set['name'], '</option>';
+								<option data-ext="' . $smiley_set['ext'] . '" value="', $smiley_set['path'], '"', $context['selected_set'] === $smiley_set['path'] ? ' selected="selected"' : '', '>', $smiley_set['name'], '</option>';
 	}
 
 	echo '
@@ -369,7 +373,7 @@ function template_addsmiley()
  */
 function template_setorder()
 {
-	global $context, $settings, $scripturl, $txt, $modSettings;
+	global $context, $scripturl, $txt, $modSettings;
 
 	echo '
 	<div id="admincenter">';
@@ -404,10 +408,12 @@ function template_setorder()
 			{
 				if (empty($context['move_smiley']))
 				{
+					$image = (isset($smiley['emoji']) ? $context['emoji_path'] : $context['smiley_path']) . $smiley['filename'];
+
 					echo '
 					<li id="smile_' . $smiley['id'] . '">
 						<a href="', $scripturl, '?action=admin;area=smileys;sa=setorder;move=', $smiley['id'], '">
-							<img src="', $modSettings['smileys_url'], '/', $modSettings['smiley_sets_default'], '/', $smiley['filename'], '" style="padding: 2px; border: 0px solid black;" alt="', $smiley['description'], '" />
+							<img src="', $image, '" style="padding: 2px; border: 0px solid black;" alt="', $smiley['description'], '" />
 						</a>
 					</li>';
 				}

@@ -3,6 +3,8 @@
 use ElkArte\Controller\MessageIndex;
 use ElkArte\EventManager;
 use ElkArte\User;
+use ElkArte\Languages\Loader;
+
 
 /**
  * TestCase class for the Message Index Controller
@@ -16,12 +18,15 @@ class TestMessageIndex extends ElkArteCommonSetupTest
 	 */
 	protected function setUp(): void
 	{
-		global $board;
+		global $board, $txt;
 
 		parent::setUp();
 
 		$board = 1;
 		loadBoard();
+
+		$lang = new Loader('english', $txt, database());
+		$lang->load('Post');
 	}
 
 	/**
