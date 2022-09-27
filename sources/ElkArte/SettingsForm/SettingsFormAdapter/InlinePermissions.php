@@ -78,7 +78,7 @@ class InlinePermissions extends Adapter
 
 		// Load the permission list
 		$this->permissionList = array_map(
-			function ($permission) {
+			static function ($permission) {
 				return $permission[1];
 			}, $this->permissions
 		);
@@ -252,6 +252,7 @@ class InlinePermissions extends Adapter
 			{
 				$excluded_groups += $permission['excluded_groups'];
 			}
+
 			foreach ($excluded_groups as $group)
 			{
 				if (isset($this->context[$permission[1]][$group]))
@@ -260,13 +261,13 @@ class InlinePermissions extends Adapter
 				}
 			}
 			// Is this permission one that guests can't have?
-			if (in_array($permission[1], $this->illegal_guest_permissions))
+			if (in_array($permission[1], $this->illegal_guest_permissions, true))
 			{
 				unset($this->context[$permission[1]][-1]);
 			}
 
 			// Is this permission outright disabled?
-			if (in_array($permission[1], $this->illegal_permissions))
+			if (in_array($permission[1], $this->illegal_permissions, true))
 			{
 				unset($this->context[$permission[1]]);
 			}
@@ -278,7 +279,7 @@ class InlinePermissions extends Adapter
 	 * variables for each permission.
 	 *
 	 * @uses ManagePermissions template
-	 * @uses ManagePermissions languuge
+	 * @uses ManagePermissions language
 	 */
 	protected function prepareContext()
 	{
@@ -294,6 +295,7 @@ class InlinePermissions extends Adapter
 			{
 				$this->context[$permission[1]][-1]['name'] = $txt['membergroups_guests'];
 			}
+
 			if (isset($this->context[$permission[1]][0]))
 			{
 				$this->context[$permission[1]][0]['name'] = $txt['membergroups_members'];

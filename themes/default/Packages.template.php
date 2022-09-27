@@ -591,10 +591,11 @@ function template_install_options()
 	echo '
 	<div id="admincenter">
 		<h2 class="category_header">', $txt['package_install_options'], '</h2>
-		<div class="information">
+		<div class="description">
 			', $txt['package_install_options_ftp_why'], '
 		</div>
 		<form id="admin_form_wrapper" action="', $scripturl, '?action=admin;area=packages;sa=options" method="post" accept-charset="UTF-8">
+			<div class="content">
 			<dl class="settings">
 				<dt>
 					<label for="pack_server">', $txt['package_install_options_ftp_server'], ':</label>
@@ -633,6 +634,7 @@ function template_install_options()
 			<div class="submitbutton">
 				<input type="submit" name="save" value="', $txt['save'], '" />
 				<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
+			</div>
 			</div>
 		</form>
 	</div>';

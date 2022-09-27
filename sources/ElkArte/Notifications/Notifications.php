@@ -196,18 +196,28 @@ class Notifications extends AbstractModel
 		$obj = new $class($this->_db, $this->user);
 		$obj->setTask($task);
 
+		// The enabled notification methods (on site, email ...) for this type (mention, liked, buddy ...)
 		require_once(SUBSDIR . '/Notification.subs.php');
-
 		$active_notifiers = filterNotificationMethods(array_keys($this->_notifiers), $class::getType());
 
 		// Cleanup the list of members to notify,
 		// in certain cases it may differ from the list passed (if any)
 		$obj->setUsersToNotify();
+
+		// How do these members actually want to be notified
 		$notif_prefs = $this->_getNotificationPreferences($active_notifiers, $task->notification_type, $task->getMembers());
 
+		// For each notification method enabled for this (on site, email etc)
 		foreach ($notif_prefs as $notifier => $members)
 		{
+			// No members signed up for this combo
+			if (empty($members))
+			{
+				continue;
+			}
+
 			$bodies = $obj->getNotificationBody($this->_notifiers[$notifier]->lang_data, $members);
+
 			// Just in case...
 			if (empty($bodies))
 			{
@@ -248,6 +258,7 @@ class Notifications extends AbstractModel
 			{
 				continue;
 			}
+
 			$this_prefs = $preferences[$member][$notification_type];
 			foreach ($this_prefs as $this_pref)
 			{
@@ -255,6 +266,7 @@ class Notifications extends AbstractModel
 				{
 					continue;
 				}
+
 				$notification_methods[$this_pref][] = $member;
 			}
 		}

@@ -79,7 +79,7 @@ function template_ban_edit()
 					<input type="radio" name="expiration" value="one_day" id="expires_one_day" onclick="fUpdateStatus();"', $context['ban']['expiration']['status'] == 'one_day' ? ' checked="checked"' : '', ' /> <label for="expires_one_day">', $txt['ban_will_expire_within'], '</label>: <input type="text" name="expire_date" id="expire_date" size="3" value="', $context['ban']['expiration']['days'], '" class="input_text" /> ', $txt['ban_days'], '<br />
 					<input type="radio" name="expiration" value="expired" id="already_expired" onclick="fUpdateStatus();"', $context['ban']['expiration']['status'] == 'expired' ? ' checked="checked"' : '', ' /> <label for="already_expired">', $txt['ban_expired'], '</label>
 				</fieldset>
-				<fieldset class="ban_settings floatright">
+				<fieldset class="ban_settings floatleft">
 					<legend>
 						', $txt['ban_restriction'], '
 					</legend>

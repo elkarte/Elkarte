@@ -43,6 +43,7 @@ class Buddy extends AbstractNotificationMessage
 		$keys = array('subject' => 'notify_new_buddy_' . $lang_data['subject'], 'body' => 'notify_new_buddy_' . $lang_data['body']);
 
 		$notifier = $this->_task->getNotifierData();
+
 		$replacements = array(
 			'ACTIONNAME' => $notifier['real_name'],
 		);

@@ -218,13 +218,13 @@ function template_generic_menu_tabs($tab_context)
 		if (!empty($tab_context['class']))
 		{
 			echo '
-						<span class="hdicon ', $tab_context['class'], '"></span>';
+							<span class="hdicon ', $tab_context['class'], '"></span>';
 		}
 
 		if (!empty($tab_context['help']))
 		{
 			echo '
-						<a class="hdicon i-help help" href="', $scripturl, '?action=quickhelp;help=', $tab_context['help'], '" onclick="return reqOverlayDiv(this.href);" label="', $txt['help'], '"></a>';
+							<a class="hdicon i-help help" href="', $scripturl, '?action=quickhelp;help=', $tab_context['help'], '" onclick="return reqOverlayDiv(this.href);" label="', $txt['help'], '"></a>';
 		}
 
 		echo '
