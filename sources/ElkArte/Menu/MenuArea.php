@@ -20,7 +20,7 @@ use ElkArte\Errors\Errors;
  *
  * This class will set and access the menu area options. The supported options are:
  *
- * areas is an named index as follows:
+ * areas is a named index as follows:
  *   - array $permission  => Array of permissions to determine who can access this area
  *   - string $label      => Optional text string for link (Otherwise $txt[$index] will be used)
  *   - string $controller => Name of controller required for this area

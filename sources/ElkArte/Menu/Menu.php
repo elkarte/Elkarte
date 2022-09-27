@@ -33,19 +33,19 @@ class Menu
 	protected $req;
 
 	/** @var array Will hold the created $context */
-	protected $menuContext = [];
+	public $menuContext = [];
 
 	/** @var string Used for profile menu for own / any */
-	protected $permissionSet;
+	public $permissionSet;
 
 	/** @var bool If we found the menu item selected */
-	protected $foundSection = false;
+	public $foundSection = false;
 
 	/** @var string Current area */
-	protected $currentArea = '';
+	public $currentArea = '';
 
 	/** @var null|string The current subaction of the system */
-	protected $currentSubaction = '';
+	public $currentSubaction = '';
 
 	/** @var array Will hold the selected menu data that is returned to the caller */
 	private $includeData = [];
@@ -99,6 +99,8 @@ class Menu
 	public function addOptions(array $menuOptions)
 	{
 		$this->menuOptions = MenuOptions::buildFromArray($menuOptions);
+
+		return $this;
 	}
 
 	/**
@@ -133,6 +135,8 @@ class Menu
 			unset($section['areas']);
 			$this->addSection($section_id, MenuSection::buildFromArray($section + $newAreas));
 		}
+
+		return $this;
 	}
 
 	/**
@@ -151,9 +155,40 @@ class Menu
 	}
 
 	/**
+	 * Adds sections/subsections to the existing menu.  Generally used by addons via hook
+	 *
+	 * @param array $section_data
+	 * @param string $location optional menu item after which you want to add the section
+	 *
+	 * @return $this
+	 */
+	public function insertSection($section_data, $location = '')
+	{
+		foreach ($section_data as $section_id => $section)
+		{
+			foreach ($section as $area_id => $area)
+			{
+				$newSubsections = ['subsections' => []];
+				if (!empty($area['subsections']))
+				{
+					foreach ($area['subsections'] as $sa => $sub)
+					{
+						$newSubsections['subsections'][$sa] = MenuSubsection::buildFromArray($sub, $sa);
+					}
+				}
+
+				/** @var \ElkArte\Menu\MenuSection $section */
+				$section = $this->menuData[$section_id];
+				$section->insertArea($area_id, $location, MenuArea::buildFromArray($area + $newSubsections));
+			}
+		}
+
+		return $this;
+	}
+
+	/**
 	 * Create a menu.  Expects that addOptions and addMenuData (or equivalent) have been called
 	 *
-	 * @return array
 	 * @throws \ElkArte\Exceptions\Exception
 	 */
 	public function prepareMenu()
@@ -187,25 +222,41 @@ class Menu
 		}
 
 		// For consistency with the past, clean up the returned array
-		$this->includeData = array_filter($this->includeData, function ($value) {
+		$this->includeData = array_filter($this->includeData, static function ($value) {
 			return !is_null($value) && $value !== '';
 		});
 
-		// Finally - return information on the selected item.
-		return $this->includeData + [
-				'current_action' => $this->menuContext['current_action'],
-				'current_area' => $this->currentArea,
-				'current_section' => !empty($this->menuContext['current_section']) ? $this->menuContext['current_section'] : '',
-				'current_subsection' => $this->currentSubaction,
-			];
+		// Set information on the selected item.
+		$this->includeData += [
+			'current_action' => $this->menuContext['current_action'],
+			'current_area' => $this->currentArea,
+			'current_section' => !empty($this->menuContext['current_section']) ? $this->menuContext['current_section'] : '',
+			'current_subsection' => $this->currentSubaction,
+		];
+
+		return $this;
+	}
+
+	/**
+	 * Return the computed include data array
+	 *
+	 * @return array
+	 */
+	public function getIncludeData()
+	{
+		return $this->includeData;
 	}
 
 	/**
 	 * Allow extending *any* menu with a single hook
+	 *
+	 * - Call hook name defined in options as integrate_supplied name_areas
+	 * - example, integrate_profile_areas, integrate_admin_areas
+	 * - Hooks are passed $this
 	 */
 	public function callHook()
 	{
-		// Allow extend *any* menu with a single hook
+		// Allow to extend *any* menu with a single hook
 		if ($this->menuOptions->getHook())
 		{
 			call_integration_hook($this->menuOptions->getHook(), array($this));
@@ -554,8 +605,8 @@ class Menu
 		// Is this the current subsection?
 		$subIdCheck = $this->req->getQuery('sa', 'trim', null);
 		if ($subIdCheck === $subId
+			|| (empty($this->currentSubaction) && $sub->isDefault())
 			|| in_array($subIdCheck, $sub->getActive(), true)
-			|| empty($this->currentSubaction) && $sub->isDefault()
 		)
 		{
 			$this->currentSubaction = $subId;
@@ -649,52 +700,79 @@ class Menu
 		// Set it all to context for template consumption
 		$this->menuContext['layer_name'] = $this->menuOptions->getLayerName();
 		$this->menuContext['can_toggle_drop_down'] = $this->menuOptions->isDropDownToggleable();
-		$context['max_menu_id'] = $this->maxMenuId;
+
+		// Keep track of where we are
+		$this->menuContext['current_area'] = $this->currentArea;
 		$context['current_subaction'] = $this->currentSubaction;
 		$this->menuContext['current_subsection'] = $this->currentSubaction;
-		$this->menuContext['current_area'] = $this->currentArea;
+
+		// Make a note of the Unique ID for this menu.
+		$context['max_menu_id'] = $this->maxMenuId;
 		$context['menu_data_' . $this->maxMenuId] = $this->menuContext;
 		$context['menu_data_' . $this->maxMenuId]['object'] = $this;
+
+		return $this;
 	}
 
 	/**
-	 * Prepares tabs for the template.
+	 * Prepares tabs for the template, specifically for template_generic_menu_tabs
 	 *
-	 * This should be called after the area is dispatched, because areas
-	 * are usually in their own file. Those files, once dispatched to, hold
-	 * some data for the tabs which must be specially combined with subaction
-	 * data for everything to work properly.
+	 * This should be called after the menu area is dispatched, because areas are usually in their
+	 * own controller file. Those files, once dispatched to, hold data for the tabs (descriptions,
+	 * disabled, extra tabs, etc), which must be combined with subaction data for everything to work properly.
 	 *
 	 * Seems complicated, yes.
+	 *
+	 * @param array $tabArray named key array holding details on how to build a tab area
 	 */
-	public function prepareTabData()
+	public function prepareTabData($tabArray = [])
 	{
 		global $context;
 
-		// Handy shortcuts.
-		$tabContext = &$context['menu_data_' . $this->maxMenuId]['tab_data'];
 		$currentArea = $this->menuContext['sections'][$this->menuContext['current_section']]['areas'][$this->currentArea];
 
-		// Subsections of the current area are tabs unless we are told otherwise.
-		if (!isset($tabContext['tabs']))
-		{
-			$tabContext['tabs'] = $currentArea['subsections'] ?? [];
-		}
+		// Build out the tab title/description area
+		$tabBuilder = new MenuTabs($this->menuContext['current_area'], $this->currentSubaction);
+		$tabBuilder
+			->setDescription($tabArray['description'] ?? '')
+			->setTitle($tabArray['title'] ?? '')
+			->setPrefix($tabArray['prefix'] ?? '')
+			->setClass($tabArray['class'] ?? null)
+			->setHelp($tabArray['help'] ?? null);
+		$tabContext = $tabBuilder->setHeader();
 
-		// Tabs are really just subactions.
-		if (isset($tabContext['tabs'], $currentArea['subsections']))
+		// Nothing supplied, then subsections of the current area are used as tabs.
+		if (!isset($tabArray['tabs']) && isset($currentArea['subsections']))
 		{
+			$tabContext['tabs'] = $tabBuilder->getTabs($currentArea);
+		}
+		// Tabs specified with area subsections, combine them
+		elseif (isset($tabArray['tabs'], $currentArea['subsections']))
+		{
+			// Tabs are really just subactions.
 			$tabContext['tabs'] = array_replace_recursive(
-				$tabContext['tabs'],
-				$currentArea['subsections']
+				$tabBuilder->getTabs($currentArea),
+				$tabArray['tabs']
 			);
-
-			// Has it been deemed selected?
-			if (isset($tabContext['tabs'][$this->currentSubaction]))
-			{
-				$tabContext = array_merge($tabContext, $tabContext['tabs'][$this->currentSubaction]);
-			}
 		}
+		// Custom loading tabs
+		else
+		{
+			$tabContext['tabs'] = $tabArray['tabs'] ?? [];
+		}
+
+		// Drop any non-enabled ones
+		$tabContext['tabs'] = array_filter($tabContext['tabs'], static function ($tab) {
+			return !isset($tab['disabled']) || $tab['disabled'] === false;
+		});
+
+		// Has it been deemed selected?
+		if (isset($tabContext['tabs'][$this->currentSubaction]))
+		{
+			$tabContext = array_merge($tabContext, $tabContext['tabs'][$this->currentSubaction]);
+		}
+
+		$context['menu_data_' . $this->maxMenuId]['tab_data'] = $tabContext;
 	}
 
 	/**

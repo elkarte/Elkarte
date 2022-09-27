@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This class contains a standard way of displaying side/drop down menus.
+ * This class contains a standard way of preparing the subsections of the menu
  *
  * @package   ElkArte Forum
  * @copyright ElkArte Forum contributors
@@ -18,10 +18,11 @@ namespace ElkArte\Menu;
  *
  * This class will set and access the menu subsection options. The supported options are:
  *
- * $subsections sub array is a unnamed index array interpreted as follows,
+ * 'xyz' => [$txt['abc'], 'admin_forum', optional bool, 'enabled' => true/false, 'url' => getUrl()]
+ * $subsections sub array is both an unnamed index array and named array ... interpreted as follows,
  *   - string 0     => Label for this subsection
  *   - array 1      => Array of permissions to check for this subsection.
- *   - bool 2       => Is this the default subaction - if not set for any will default to first...
+ *   - bool 2       => Optional. Is this the default subaction - if not set for any will default to first...
  *   - bool enabled => Enabled or not
  *   - array active => Show the button active for other subsections.
  *   - string url   => Custom url for the subsection
