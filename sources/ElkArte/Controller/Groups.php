@@ -484,9 +484,9 @@ class Groups extends AbstractController
 		// Set up the template stuff...
 		$context['page_title'] = $txt['mc_group_requests'];
 		$context['sub_template'] = 'show_list';
-		$context[$context['moderation_menu_name']]['tab_data'] = array(
+		$context[$context['moderation_menu_name']]['object']->prepareTabData([
 			'title' => $txt['mc_group_requests'],
-		);
+		]);
 
 		// Verify we can be here.
 		if ($this->user->mod_cache['gq'] == '0=1')

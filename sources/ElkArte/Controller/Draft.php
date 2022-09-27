@@ -168,11 +168,11 @@ class Draft extends Post
 		}
 
 		// Menu tab
-		$context[$context['profile_menu_name']]['tab_data'] = array(
-			'title' => $txt['drafts_show'],
+		$context[$context['profile_menu_name']]['object']->prepareTabData([
+			'title' => 'drafts_show',
 			'class' => 'i-comments',
-			'description' => $txt['drafts_show_desc'],
-		);
+			'description' => 'drafts_show_desc',
+		]);
 		$context['sub_template'] = 'showDrafts';
 	}
 

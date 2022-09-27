@@ -123,28 +123,28 @@ class Packages extends AbstractController
 		$action = new Action('packages');
 
 		// Set up some tabs...
-		$context[$context['admin_menu_name']]['tab_data'] = array(
-			'title' => $txt['package_manager'],
-			'description' => $txt['package_manager_desc'],
+		$context[$context['admin_menu_name']]['object']->prepareTabData([
+			'title' => 'package_manager',
+			'description' => 'package_manager_desc',
 			'class' => 'i-package',
-			'tabs' => array(
-				'browse' => array(),
-				'installed' => array(
+			// All valid subactions will be added, here you just specify unique tab data
+			'tabs' => [
+				'installed' => [
 					'description' => $txt['installed_packages_desc'],
-				),
+				],
 				// The following two belong to PackageServers,
 				// for UI's sake moved here at least temporarily
-				'servers' => array(
+				'servers' => [
 					'description' => $txt['download_packages_desc'],
-				),
-				'upload' => array(
+				],
+				'upload' => [
 					'description' => $txt['upload_packages_desc'],
-				),
-				'options' => array(
+				],
+				'options' => [
 					'description' => $txt['package_install_options_desc'],
-				),
-			),
-		);
+				],
+			],
+		]);
 
 		// Work out exactly who it is we are calling. call integrate_sa_packages
 		$subAction = $action->initialize($subActions, 'browse');

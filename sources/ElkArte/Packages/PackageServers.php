@@ -89,8 +89,14 @@ class PackageServers extends AbstractController
 		// Set up action/subaction stuff.
 		$action = new Action('package_servers');
 
+		// Now let's decide where we are taking this... call integrate_sa_package_servers
+		$subAction = $action->initialize($subActions, 'servers');
+
+		// For the template
+		$context['sub_action'] = $subAction;
+
 		// Set up some tabs...
-		$context[$context['admin_menu_name']]['tab_data'] = [
+		$context[$context['admin_menu_name']]['object']->prepareTabData([
 			'title' => $txt['package_manager'],
 			'description' => $txt['upload_packages_desc'],
 			'class' => 'i-package',
@@ -103,18 +109,20 @@ class PackageServers extends AbstractController
 					'url' => getUrl('admin', ['action' => 'admin', 'area' => 'packages', 'sa' => 'installed', 'desc']),
 					'label' => $txt['installed_packages'],
 				],
+				'servers' => [
+					'url' => getUrl('admin', ['action' => 'admin', 'area' => 'packages', 'sa' => 'servers', 'desc']),
+					'description' => $txt['download_packages_desc'],
+				],
+				'upload' => [
+					'url' => getUrl('admin', ['action' => 'admin', 'area' => 'packages', 'sa' => 'upload', 'desc']),
+					'description' => $txt['upload_packages_desc'],
+				],
 				'options' => [
 					'url' => getUrl('admin', ['action' => 'admin', 'area' => 'packages', 'sa' => 'options', 'desc']),
 					'label' => $txt['package_settings'],
 				],
 			],
-		];
-
-		// Now let's decide where we are taking this... call integrate_sa_package_servers
-		$subAction = $action->initialize($subActions, 'servers');
-
-		// For the template
-		$context['sub_action'] = $subAction;
+		]);
 
 		// Lets just do it!
 		$action->dispatch($subAction);
