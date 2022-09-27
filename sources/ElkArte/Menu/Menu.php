@@ -729,10 +729,15 @@ class Menu
 	{
 		global $context;
 
-		$currentArea = $this->menuContext['sections'][$this->menuContext['current_section']]['areas'][$this->currentArea];
+		$tabBuilder = new MenuTabs($this->menuContext['current_area'] ?? '', $this->currentSubaction ?? '');
+
+		$currentArea = '';
+		if (!empty($this->menuContext['sections']))
+		{
+			$currentArea = $this->menuContext['sections'][$this->menuContext['current_section']]['areas'][$this->currentArea];
+		}
 
 		// Build out the tab title/description area
-		$tabBuilder = new MenuTabs($this->menuContext['current_area'], $this->currentSubaction);
 		$tabBuilder
 			->setDescription($tabArray['description'] ?? '')
 			->setTitle($tabArray['title'] ?? '')

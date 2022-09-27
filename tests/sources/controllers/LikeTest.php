@@ -3,6 +3,7 @@
 use ElkArte\Controller\Likes;
 use ElkArte\EventManager;
 use ElkArte\HttpReq;
+use ElkArte\Menu\Menu;
 use ElkArte\User;
 use ElkArte\Languages\Loader;
 
@@ -34,7 +35,9 @@ class TestLike extends ElkArteCommonSetupTest
 		global $context, $modSettings;
 
 		$modSettings['likes_enabled'] = 1;
-		$context['profile_menu_name'] = 'menu_data_view_likes';
+		$context['profile_menu_name'] = 'menu_data_1';
+		$context['menu_data_1']['object'] = new Menu();
+
 		require_once(SUBSDIR . '/Profile.subs.php');
 
 		$controller = new Likes(new EventManager());
@@ -43,7 +46,7 @@ class TestLike extends ElkArteCommonSetupTest
 		$controller->action_showProfileLikes();
 
 		// Lets see some items loaded into context, as createlist will have run
-		$this->assertEquals('Likes', $context['menu_data_view_likes']['tab_data']['title']);
+		$this->assertEquals('Likes', $context['menu_data_1']['tab_data']['title']);
 		$this->assertEquals(4, $context['view_likes']['num_columns']);
 		$this->assertEquals('Likes', $context['view_likes']['title']);
 	}

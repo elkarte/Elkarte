@@ -3,6 +3,7 @@
 use ElkArte\EventManager;
 use ElkArte\HttpReq;
 use ElkArte\Languages\Loader;
+use ElkArte\Menu\Menu;
 use ElkArte\Packages\Packages;
 use ElkArte\Packages\PackageServers;
 use ElkArte\User;
@@ -37,8 +38,10 @@ class TestPackagesController extends ElkArteCommonSetupTest
 		$lang = new Loader('english', $txt, database());
 		$lang->load('Packages');
 
+		// Initialize a menu object
 		$context['admin_menu_id'] = 1;
 		$context['admin_menu_name'] = 'menu_data_' . $context['admin_menu_id'];
+		$context['menu_data_1']['object'] = new Menu();
 	}
 
 	/**

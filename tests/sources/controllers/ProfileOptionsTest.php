@@ -3,6 +3,7 @@
 use ElkArte\Controller\ProfileOptions;
 use ElkArte\EventManager;
 use ElkArte\MembersList;
+use ElkArte\Menu\Menu;
 use ElkArte\User;
 use ElkArte\Languages\Loader;
 
@@ -122,6 +123,7 @@ class TestProfileOptions extends ElkArteCommonSetupTest
 		$context['profile-u1_token_var'] = 'profile-u1';
 		$context['profile-u1_token'] = 'profile-u1';
 		$context['profile_menu_name'] = 'menu_data_1';
+		$context['menu_data_1']['object'] = new Menu();
 
 		$controller = new ProfileOptions(new EventManager());
 		$controller->setUser(User::$info);

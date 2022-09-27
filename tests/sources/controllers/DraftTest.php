@@ -2,6 +2,7 @@
 
 use ElkArte\Controller\Draft;
 use ElkArte\EventManager;
+use ElkArte\Menu\Menu;
 use ElkArte\User;
 use ElkArte\Languages\Loader;
 
@@ -37,7 +38,7 @@ class TestDraft extends ElkArteCommonSetupTest
 		global $context;
 
 		$context['profile_menu_name'] = 'profile_menu';
-		$context['profile_menu']['tab_data'] = [];
+		$context['profile_menu']['object'] = new Menu();
 
 		// Get the controller, call draft listing the long way
 		$controller = new Draft(new EventManager());
