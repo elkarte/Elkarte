@@ -35,7 +35,7 @@ class VerificationControls
 	protected $_known_verifications = array();
 	protected $_verification_options = array();
 	protected $_verification_instances = array();
-	protected $_sessionVal = null;
+	protected $_sessionVal;
 
 	/**
 	 * Obviously the entry point of verification
@@ -88,7 +88,7 @@ class VerificationControls
 
 			try
 			{
-				$obj = new $class(array());
+				$obj = new $class([]);
 				if ($obj instanceof VerificationControl\ControlInterface)
 				{
 					$new_settings = $obj->settings();
@@ -109,7 +109,7 @@ class VerificationControls
 			}
 		}
 		$to_update = json_encode($working_verifications);
-		updateSettings(array('known_verifications' => $to_update));
+		updateSettings(['known_verifications' => $to_update]);
 
 		return $to_update;
 	}
@@ -200,7 +200,6 @@ class VerificationControls
 	 */
 	public function create($force_refresh = false)
 	{
-
 		foreach ($this->_verification_instances as $test => $instance)
 		{
 			$instance->createTest($this->_sessionVal, $force_refresh);
@@ -212,12 +211,12 @@ class VerificationControls
 			}
 		}
 
-		return array(
+		return [
 			'id' => $this->_verification_options['id'],
 			'max_errors' => $this->_verification_options['max_errors'] ?? 3,
 			'render' => $this->_verification_options['render'],
 			'test' => $this->_verification_options['test']
-		);
+		];
 	}
 
 	/**

@@ -26,6 +26,7 @@ interface ControlInterface
 	/**
 	 * Used to build the control and return if it should be shown or not
 	 *
+	 * @param \ElkArte\Sessions\SessionIndex $sessionVal
 	 * @param bool $isNew
 	 * @param bool $force_refresh
 	 *
@@ -36,6 +37,7 @@ interface ControlInterface
 	/**
 	 * Create the actual test that will be used
 	 *
+	 * @param \ElkArte\Sessions\SessionIndex $sessionVal
 	 * @param bool $refresh
 	 *
 	 * @return void
@@ -43,7 +45,13 @@ interface ControlInterface
 	public function createTest($sessionVal, $refresh = true);
 
 	/**
-	 * Prepare the context for use in the template
+	 * Prepare the context for use in the template.
+	 *
+	 * Required keys template => string, values => []
+	 * Template function must exist in VerificationControls,template
+	 * Will called as template_verification_control_' . 'template('id', 'values')
+	 *
+	 * @param \ElkArte\Sessions\SessionIndex $sessionVal
 	 *
 	 * @return void
 	 */
@@ -51,6 +59,8 @@ interface ControlInterface
 
 	/**
 	 * Run the test, return if it passed or not
+	 *
+	 * @param \ElkArte\Sessions\SessionIndex $sessionVal
 	 *
 	 * @return string|bool
 	 */

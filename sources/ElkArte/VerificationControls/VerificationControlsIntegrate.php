@@ -1,8 +1,7 @@
 <?php
 
 /**
- * This file contains the integration functions that start the
- * verification controls.
+ * This file contains the integration functions that start the verification controls.
  *
  * @package   ElkArte Forum
  * @copyright ElkArte Forum contributors
@@ -37,9 +36,9 @@ class VerificationControlsIntegrate
 	public static function settingsRegister()
 	{
 		// $hook, $function, $file
-		return array(
-			array('integrate_spam_settings', '\\ElkArte\\VerificationControls\\VerificationControlsIntegrate::integrate_spam_settings'),
-		);
+		return [
+			['integrate_spam_settings', '\\ElkArte\\VerificationControls\\VerificationControlsIntegrate::integrate_spam_settings'],
+		];
 	}
 
 	/**
@@ -51,7 +50,7 @@ class VerificationControlsIntegrate
 	}
 
 	/**
-	 * Create a anti-bot verification control?
+	 * Create a anti-bot verification control
 	 *
 	 * @param array $verificationOptions
 	 * @param bool $do_test = false If we are validating the input to a verification control
@@ -65,7 +64,7 @@ class VerificationControlsIntegrate
 
 		// We need to remember this because when failing the page is reloaded and the
 		// code must remain the same (unless it has to change)
-		static $all_instances = array();
+		static $all_instances = [];
 
 		// Always have an ID.
 		assert(isset($verificationOptions['id']));
@@ -88,7 +87,8 @@ class VerificationControlsIntegrate
 		{
 			return false;
 		}
-		elseif (!$isNew && !$do_test)
+
+		if (!$isNew && !$do_test)
 		{
 			return true;
 		}
@@ -118,7 +118,7 @@ class VerificationControlsIntegrate
 		if ($verification_errors->hasErrors())
 		{
 			// @todo temporary until the error class is implemented in register
-			$error_codes = array();
+			$error_codes = [];
 			foreach ($verification_errors->getErrors() as $errors)
 			{
 				foreach ($errors as $error)
@@ -129,8 +129,9 @@ class VerificationControlsIntegrate
 
 			return $error_codes;
 		}
+
 		// If we had a test that one, make a note.
-		elseif ($do_test)
+		if ($do_test)
 		{
 			$sessionVal['did_pass'] = true;
 		}
