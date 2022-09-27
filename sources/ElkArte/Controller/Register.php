@@ -52,11 +52,6 @@ class Register extends AbstractController
 	 */
 	public function trackStats($action = '')
 	{
-		if ($this->_req->get('sa') === 'verificationcode')
-		{
-			return false;
-		}
-
 		return parent::trackStats($action);
 	}
 
@@ -90,7 +85,6 @@ class Register extends AbstractController
 			'usernamecheck' => array($this, 'action_registerCheckUsername'),
 			'activate' => array($this, 'action_activate'),
 			'contact' => array($this, 'action_contact'),
-			'verificationcode' => array($this, 'action_verificationcode'),
 			'coppa' => array($this, 'action_coppa'),
 			'agrelang' => array($this, 'action_agrelang'),
 			'privacypol' => array($this, 'action_privacypol'),
@@ -1143,67 +1137,6 @@ class Register extends AbstractController
 				'id' => $this->_req->query->member,
 			);
 		}
-	}
-
-	/**
-	 * Show the verification code or let it hear.
-	 *
-	 * - Accessed by ?action=register;sa=verificationcode
-	 */
-	public function action_verificationcode()
-	{
-		global $context, $scripturl;
-
-		$verification_id = $this->_req->query->vid ?? '';
-		$code = $verification_id && isset($_SESSION[$verification_id . '_vv']['code']) ? $_SESSION[$verification_id . '_vv']['code'] : ($_SESSION['visual_verification_code'] ?? '');
-
-		// Somehow no code was generated or the session was lost.
-		if (empty($code))
-		{
-			dieGif();
-		}
-
-		// Show a window that will play the verification code (play sound)
-		if (isset($this->_req->query->sound))
-		{
-			Txt::load('Login');
-			theme()->getTemplates()->load('Register');
-
-			$context['verification_sound_href'] = $scripturl . '?action=register;sa=verificationcode;rand=' . md5(mt_rand()) . ($verification_id ? ';vid=' . $verification_id : '') . ';format=.wav';
-			$context['sub_template'] = 'verification_sound';
-			theme()->getLayers()->removeAll();
-
-			obExit();
-		}
-		// If we have GD, try the nice code. (new image)
-		elseif (empty($this->_req->query->format))
-		{
-			require_once(SUBSDIR . '/Graphics.subs.php');
-
-			if (!showCodeImage($code))
-			{
-				Headers::instance()
-					->removeHeader('all')
-					->headerSpecial('HTTP/1.1 400 Bad Request')
-					->sendHeaders();
-			}
-		}
-		// Or direct link to the sound
-		elseif ($this->_req->query->format === '.wav')
-		{
-			require_once(SUBSDIR . '/Sound.subs.php');
-
-			if (!createWaveFile($code))
-			{
-				Headers::instance()
-					->removeHeader('all')
-					->headerSpecial('HTTP/1.1 400 Bad Request')
-					->sendHeaders();
-			}
-		}
-
-		// Why die when we can exit to live another day...
-		exit();
 	}
 
 	/**
