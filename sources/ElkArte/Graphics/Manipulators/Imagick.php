@@ -453,7 +453,7 @@ class Imagick extends AbstractManipulator
 			$draw->setFillColor(new \ImagickPixel('#A9A9A9'));
 			$draw->setStrokeWidth(1);
 			$draw->setTextAlignment(\Imagick::ALIGN_CENTER);
-			$draw->setFont($settings['default_theme_dir'] . '/fonts/VDS_New.ttf');
+			$draw->setFont($settings['default_theme_dir'] . '/fonts/OpenSans.ttf');
 
 			// Make sure the text will fit the allowed space
 			do

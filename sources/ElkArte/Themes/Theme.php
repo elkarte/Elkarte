@@ -112,7 +112,6 @@ abstract class Theme
 			'login',
 			'reminder',
 			'register',
-			'verificationcode',
 			'contact'
 		);
 

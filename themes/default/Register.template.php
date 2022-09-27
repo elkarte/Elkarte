@@ -110,7 +110,7 @@ function template_registration_agreement()
 	{
 		echo '
 				<br /><br />
-				<input type="submit" name="show_contact" value="', $txt['contact'], '" />';
+				<input type="submit" id="show_contact" name="show_contact" value="', $txt['contact'], '" />';
 	}
 
 	if (!empty($context['register_subaction']))
@@ -344,13 +344,13 @@ function template_registration_form()
 	else
 	{
 		echo '
-				<input type="submit" name="regSubmit" value="', $txt['register'], '" tabindex="', $context['tabindex']++, '" />';
+				<input type="submit" id="regSubmit" name="regSubmit" value="', $txt['register'], '" tabindex="', $context['tabindex']++, '" />';
 	}
 
 	if ($context['show_contact_button'])
 	{
 		echo '
-				<input type="submit" name="show_contact" value="', $txt['contact'], '" />';
+				<input type="submit" id="show_contact" name="show_contact" value="', $txt['contact'], '" />';
 	}
 
 	echo '
@@ -594,7 +594,7 @@ function template_admin_register()
 						</div>
 					</div>
 					<div class="submitbutton centertext">
-						<input type="submit" name="regSubmit" value="', $txt['register'], '" tabindex="', $context['tabindex']++, '" class="right_submit" />
+						<input type="submit" id="regSubmit" name="regSubmit" value="', $txt['register'], '" tabindex="', $context['tabindex']++, '" class="right_submit" />
 						<input type="hidden" name="sa" value="register" />
 						<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
 						<input type="hidden" name="', $context['admin-regc_token_var'], '" value="', $context['admin-regc_token'], '" />

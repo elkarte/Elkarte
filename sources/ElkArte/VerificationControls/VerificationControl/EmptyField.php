@@ -1,15 +1,11 @@
 <?php
 
 /**
- * This file contains those functions specific to the various verification controls
- * used to challenge users, and hopefully robots as well.
+ * This file contains those functions specific to the empty field verification controls
  *
  * @package   ElkArte Forum
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
- *
- * This file contains code covered by:
- * copyright: 2011 Simple Machines (http://www.simplemachines.org)
  *
  * @version 2.0 dev
  *
@@ -18,7 +14,7 @@
 namespace ElkArte\VerificationControls\VerificationControl;
 
 /**
- * This class shows an anti spam bot box in the form
+ * This class shows an anti-spam bot box in the form
  * The proper response is to leave the field empty, bots however will see this
  * much like a session field and populate it with a value.
  *
@@ -26,61 +22,26 @@ namespace ElkArte\VerificationControls\VerificationControl;
  */
 class EmptyField implements ControlInterface
 {
-	/**
-	 * Hold the options passed to the class
-	 *
-	 * @var array
-	 */
-	private $_options = null;
+	/** @var array Hold the options passed to the class */
+	private $_options;
 
-	/**
-	 * If its going to be used or not on a form
-	 *
-	 * @var bool
-	 */
-	private $_empty_field = null;
+	/** @var bool If it is going to be used or not on a form */
+	private $_empty_field;
 
-	/**
-	 * Holds a randomly generated field name
-	 *
-	 * @var string
-	 */
-	private $_field_name = null;
+	/** @var string Holds a randomly generated field name */
+	private $_field_name;
 
-	/**
-	 * If the validation test has been run
-	 *
-	 * @var bool
-	 */
+	/** @var bool If the validation test has been run */
 	private $_tested = false;
 
-	/**
-	 * What the user may have entered in the field
-	 *
-	 * @var string
-	 */
-	private $_user_value = null;
+	/** @var string What the user entered */
+	private $_user_value;
 
-	/**
-	 * Hash value used to generate the field name
-	 *
-	 * @var string
-	 */
-	private $_hash = null;
+	/** @var string[] Array of terms used in building the field name */
+	private $_terms = ['gadget', 'device', 'uid', 'gid', 'guid', 'uuid', 'unique', 'identifier', 'bb2'];
 
-	/**
-	 * Array of terms used in building the field name
-	 *
-	 * @var string[]
-	 */
-	private $_terms = array('gadget', 'device', 'uid', 'gid', 'guid', 'uuid', 'unique', 'identifier', 'bb2');
-
-	/**
-	 * Secondary array used to build out the field name
-	 *
-	 * @var string[]
-	 */
-	private $_second_terms = array('hash', 'cipher', 'code', 'key', 'unlock', 'bit', 'value', 'screener');
+	/** @var string[] Secondary array used to build out the field name */
+	private $_second_terms = ['hash', 'cipher', 'code', 'key', 'unlock', 'bit', 'value', 'screener'];
 
 	/**
 	 * Get things rolling
@@ -96,7 +57,7 @@ class EmptyField implements ControlInterface
 	}
 
 	/**
-	 * {@inheritdoc }
+	 * {@inheritdoc}
 	 */
 	public function showVerification($sessionVal, $isNew, $force_refresh = true)
 	{
@@ -119,7 +80,7 @@ class EmptyField implements ControlInterface
 	}
 
 	/**
-	 * {@inheritdoc }
+	 * {@inheritdoc}
 	 */
 	public function createTest($sessionVal, $refresh = true)
 	{
@@ -132,8 +93,8 @@ class EmptyField implements ControlInterface
 		if ($refresh || !isset($sessionVal['empty_field']))
 		{
 			$start = mt_rand(0, 27);
-			$this->_hash = substr(md5(time()), $start, 6);
-			$this->_field_name = $this->_terms[array_rand($this->_terms)] . '-' . $this->_second_terms[array_rand($this->_second_terms)] . '-' . $this->_hash;
+			$_hash = substr(md5(time()), $start, 6);
+			$this->_field_name = $this->_terms[array_rand($this->_terms)] . '-' . $this->_second_terms[array_rand($this->_second_terms)] . '-' . $_hash;
 			$sessionVal['empty_field'] = $this->_field_name;
 		}
 		else
@@ -144,15 +105,15 @@ class EmptyField implements ControlInterface
 	}
 
 	/**
-	 * {@inheritdoc }
+	 * {@inheritdoc}
 	 */
 	public function prepareContext($sessionVal)
 	{
 		theme()->getTemplates()->load('VerificationControls');
 
-		return array(
+		return [
 			'template' => 'emptyfield',
-			'values' => array(
+			'values' => [
 				'is_error' => $this->_tested && !$this->_verifyField($sessionVal),
 				// Can be used in the template to show the normally hidden field to add some spice to things
 				'show' => !empty($sessionVal['empty_field']) && (mt_rand(1, 100) > 60),
@@ -160,12 +121,12 @@ class EmptyField implements ControlInterface
 				'field_name' => $this->_field_name,
 				// Can be used in the template to randomly add a value to the empty field that needs to be removed when show is on
 				'clear' => (mt_rand(1, 100) > 60),
-			)
-		);
+			]
+		];
 	}
 
 	/**
-	 * Test the field, easy, its on, its is set and it is empty
+	 * Test the field, easy, it is on, it is set, and it is empty
 	 */
 	private function _verifyField($sessionVal)
 	{
@@ -173,7 +134,7 @@ class EmptyField implements ControlInterface
 	}
 
 	/**
-	 * {@inheritdoc }
+	 * {@inheritdoc}
 	 */
 	public function doTest($sessionVal)
 	{
@@ -188,7 +149,7 @@ class EmptyField implements ControlInterface
 	}
 
 	/**
-	 * {@inheritdoc }
+	 * {@inheritdoc}
 	 */
 	public function hasVisibleTemplate()
 	{
@@ -196,15 +157,15 @@ class EmptyField implements ControlInterface
 	}
 
 	/**
-	 * {@inheritdoc }
+	 * {@inheritdoc}
 	 */
 	public function settings()
 	{
 		// Empty field verification.
-		return array(
-			array('title', 'configure_emptyfield'),
-			array('desc', 'configure_emptyfield_desc'),
-			array('check', 'enable_emptyfield'),
-		);
+		return [
+			['title', 'configure_emptyfield'],
+			['desc', 'configure_emptyfield_desc'],
+			['check', 'enable_emptyfield'],
+		];
 	}
 }

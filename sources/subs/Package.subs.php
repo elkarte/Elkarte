@@ -1706,15 +1706,15 @@ function fetch_web_data($url, $post_data = '', $keep_alive = false, $redirection
 		// Choose the fastest and most robust way
 		if (function_exists('curl_init'))
 		{
-			$fetch_data = new CurlFetchWebdata(array(), $redirection_level);
+			$fetch_data = new CurlFetchWebdata([], $redirection_level);
 		}
 		elseif (empty(ini_get('allow_url_fopen')))
 		{
-			$fetch_data = new StreamFetchWebdata(array(), $redirection_level, $keep_alive);
+			$fetch_data = new StreamFetchWebdata([], $redirection_level, $keep_alive);
 		}
 		else
 		{
-			$fetch_data = new FsockFetchWebdata(array(), $redirection_level, $keep_alive);
+			$fetch_data = new FsockFetchWebdata([], $redirection_level, $keep_alive);
 		}
 
 		// no errors and a 200 result, then we have a good dataset, well we at least have data ;)

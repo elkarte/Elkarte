@@ -27,7 +27,8 @@ var disableDrafts = false;
 
 	Elk_Mentions.prototype.attachAtWho = function (oMentions, $element, oIframeWindow)
 	{
-		let mentioned = $('#mentioned');
+		let mentioned = $('#mentioned'),
+			corrected_offset = {};
 
 		// Create / use a container to hold the results
 		if (mentioned.length === 0)
@@ -56,20 +57,20 @@ var disableDrafts = false;
 						return oMentions.opts.cache.names[query];
 					}
 
-					return [];
+					return items;
 				},
 				// Well then lets make a find member suggest call
 				remoteFilter: function (query, callback)
 				{
 					// Let be easy-ish on the server, don't go looking until we have at least two characters
-					if (query.length < 2)
+					if (typeof query === 'undefined' || query.length < 2 || query.length > 25)
 					{
 						return;
 					}
 
 					// No slamming the server either
-					let current_call = Math.round(new Date().getTime() / 1000);
-					if (oMentions.opts._last_call !== 0 && oMentions.opts._last_call + 0.5 > current_call)
+					let current_call = Math.round(new Date().getTime());
+					if (oMentions.opts._last_call !== 0 && oMentions.opts._last_call + 150 > current_call)
 					{
 						callback(oMentions.opts._names);
 						return;
@@ -99,35 +100,35 @@ var disableDrafts = false;
 				},
 				beforeInsert: function (value, $li)
 				{
+					// Set up for a new pull-down box/location
+					corrected_offset = {};
+
 					oMentions.addUID($li.data('id'), $li.data('value'));
 
 					return value;
 				},
 				matcher: function (flag, subtext, should_startWithSpace, acceptSpaceBar)
 				{
-					let _a, _y, match, regexp, space;
+					let match, space, regex_matcher;
 
-					flag = flag.replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, "\\$&");
+					if (!subtext || subtext.length < 3)
+						return null;
 
 					if (should_startWithSpace)
 					{
 						flag = '(?:^|\\s)' + flag;
 					}
 
-					// Allow À - ÿ
-					_a = decodeURI("%C3%80");
-					_y = decodeURI("%C3%BF");
-
 					// Allow first last name entry?
 					space = acceptSpaceBar ? "\ " : "";
 
 					// regexp = new RegExp(flag + '([^ <>&"\'=\\\\\n]*)$|' + flag + '([^\\x00-\\xff]*)$', 'gi');
-					regexp = new RegExp(flag + "([A-Za-z" + _a + "-" + _y + "0-9_" + space + "\\[\\]\'\.\+\-]*)$|" + flag + "([^\\x00-\\xff]*)$", 'gi');
-					match = regexp.exec(subtext);
+					regex_matcher = new RegExp(flag + "([\\p{L}0-9_" + space + "\\[\\]\'\.\+\-]*)$", 'u');
+					match = regex_matcher.exec(subtext);
 
 					if (match)
 					{
-						return match[2] || match[1];
+						return match[1];
 					}
 					else
 					{
@@ -136,7 +137,7 @@ var disableDrafts = false;
 				},
 				highlighter: function (li, query)
 				{
-					let regexp;
+					let regex_highlight;
 
 					if (!query)
 					{
@@ -146,8 +147,8 @@ var disableDrafts = false;
 					// Preg Quote regexp from http://phpjs.org/functions/preg_quote/
 					query = query.replace(new RegExp('[.\\\\+*?\\[\\^\\]$(){}=!<>|:\\-]', 'g'), '\\$&');
 
-					regexp = new RegExp(">\\s*(\\w*)(" + query.replace("+", "\\+") + ")(\\w*)\\s*<", 'ig');
-					return li.replace(regexp, function (str, $1, $2, $3)
+					regex_highlight = new RegExp(">\\s*(\\w*)(" + query.replace("+", "\\+") + ")(\\w*)\\s*<", 'ig');
+					return li.replace(regex_highlight, function (str, $1, $2, $3)
 					{
 						return '> ' + $1 + '<strong>' + $2 + '</strong>' + $3 + ' <';
 					});
@@ -160,13 +161,21 @@ var disableDrafts = false;
 						return offset;
 					}
 
-					// Lets get the caret position so we can add the mentions box there
-					let corrected_offset = editor.findCursorPosition('@');
+					if (Object.keys(corrected_offset).length === 0)
+					{
+						// Get the caret position, so we can add the mentions box there
+						corrected_offset = editor.findCursorPosition('@');
+					}
 
 					offset.top = corrected_offset.top;
 					offset.left = corrected_offset.left;
 
 					return offset;
+				},
+				afterMatchFailed: function (at, el)
+				{
+					// Clear the offset
+					corrected_offset = {};
 				}
 			}
 		});
