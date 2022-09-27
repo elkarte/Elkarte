@@ -47,7 +47,7 @@ $txt['error_bounced_short'] = 'The message could not be delivered';
 
 // Maillist page items
 $txt['ml_admin_configuration'] = 'Maillist Configuration';
-$txt['ml_configuration_desc'] = 'This section allows you to set some preferences for all posting by email related activities';
+$txt['ml_configuration_desc'] = 'This section allows you to set preferences for all posting by email related activities.  This includes setting up filters, handling failed emails and defining site mail settings.';
 $txt['ml_emailerror_none'] = 'There are no failed entries requiring moderation';
 $txt['ml_emailerror'] = 'Failed Emails';
 $txt['ml_emailsettings'] = 'Settings';
@@ -241,7 +241,7 @@ $txt['message_attachments'] = '<*> This message has %d attachments associated wi
 <*> To see them please follow this link: %s';
 
 // Help
-$txt['maillist_help'] = 'For help in setting up the maillist feature, please visit the maillist section on the <a href="https://github.com/elkarte/Elkarte/wiki/Posting-by-Email-Feature" target="_blank" class="new_win">ElkArte Wiki</a>';
+$txt['maillist_help'] = 'For help in setting up the maillist feature, please visit the maillist section on the <a href="https://github.com/elkarte/Elkarte/wiki/Posting-by-Email-Feature" target="_blank" class="new_win linkbutton">ElkArte Wiki</a>';
 
 // Email bounce templates
 $txt['ml_bounce_templates_title'] = 'Custom bounce email templates';

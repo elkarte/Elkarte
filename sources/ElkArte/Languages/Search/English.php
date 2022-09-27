@@ -40,7 +40,7 @@ $txt['search_weight_likes'] = 'Relative search weight for topic likes';
 $txt['search_settings_desc'] = 'Here you can change the basic settings of the search function.';
 $txt['search_settings_title'] = 'Search Settings';
 
-$txt['search_weights_desc'] = 'Here you can change the individual components of the relevance rating.';
+$txt['search_weights_desc'] = 'Here you can fine-tune the individual weight components used in the relevance rating.';
 $txt['search_weights_sphinx'] = 'To update weight factors with Sphinx, you must generate and install a new sphinx.conf file.';
 $txt['search_weights_title'] = 'Search - weights';
 $txt['search_weights_total'] = 'Total';
@@ -73,6 +73,7 @@ $txt['search_index_size'] = 'Size';
 $txt['search_index_create_custom'] = 'Create custom index';
 $txt['search_index_custom_remove'] = 'Remove custom index';
 
+$txt['search_managesphinx_desc'] = 'Here you can set up the config file for Sphinx.';
 $txt['search_index_sphinx'] = 'SphinxAPI';
 $txt['search_index_sphinx_desc'] = 'To adjust Sphinx settings, use <a class="linkbutton" href="{managesearch_url}">Configure Sphinx</a>';
 $txt['search_index_sphinxql'] = 'SphinxQL';
