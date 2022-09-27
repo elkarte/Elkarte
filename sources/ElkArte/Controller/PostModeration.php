@@ -248,11 +248,11 @@ class PostModeration extends AbstractController
 		$context['start'] = $this->_req->query->start;
 
 		// We have enough to make some pretty tabs!
-		$context[$context['moderation_menu_name']]['tab_data'] = array(
+		$context[$context['moderation_menu_name']]['object']->prepareTabData([
 			'title' => $txt['mc_unapproved_posts'],
 			'help' => 'postmod',
 			'description' => $txt['mc_unapproved_posts_desc'],
-		);
+		]);
 
 		// Update the tabs with the correct number of actions to account for brd filtering
 		$context['menu_data_' . $context['moderation_menu_id']]['sections']['posts']['areas']['postmod']['subsections']['posts']['label'] = $context['menu_data_' . $context['moderation_menu_id']]['sections']['posts']['areas']['postmod']['subsections']['posts']['label'] . ' [' . $context['total_unapproved_posts'] . ']';
@@ -515,10 +515,10 @@ class PostModeration extends AbstractController
 
 		$context['sub_template'] = 'show_list';
 		$context['default_list'] = 'mc_unapproved_attach';
-		$context[$context['moderation_menu_name']]['tab_data'] = array(
+		$context[$context['moderation_menu_name']]['object']->prepareTabData([
 			'title' => $txt['mc_unapproved_attachments'],
 			'description' => $txt['mc_unapproved_attachments_desc']
-		);
+		]);
 	}
 
 	/**
