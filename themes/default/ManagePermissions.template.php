@@ -113,7 +113,7 @@ function template_permission_index()
 
 		foreach ($context['permissions'] as $permissionType)
 		{
-			if ($permissionType['id'] == 'membergroup' && !empty($context['profile']))
+			if ($permissionType['id'] === 'membergroup' && !empty($context['profile']))
 			{
 				continue;
 			}
@@ -129,6 +129,7 @@ function template_permission_index()
 
 					echo '
 									<option value="" disabled="disabled">[', $permissionGroup['name'], ']</option>';
+
 					foreach ($permissionGroup['permissions'] as $perm)
 					{
 						if ($perm['hidden'])
@@ -780,14 +781,15 @@ function template_modify_group_classic($type)
  * Show a collapsible box to set a specific permission.
  *
  * @param string $permission
+ * @param bool $collapsed start of collapsed or not
  */
-function template_inline_permissions($permission)
+function template_inline_permissions($permission, $collapsed)
 {
 	global $context, $txt, $modSettings;
 
 	echo '
 		<fieldset id="ip_', $permission, '">
-			<legend>', $txt['avatar_select_permission'], '</legend>';
+			<legend ' . ($collapsed ? 'data-collapsed="true"' : '') . '>', $txt['avatar_select_permission'], '</legend>';
 
 	if (empty($modSettings['permission_enable_deny']))
 	{
