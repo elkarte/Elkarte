@@ -60,17 +60,17 @@ class RepairBoards extends AbstractController
 		// Print out the top of the webpage.
 		$context['page_title'] = $txt['admin_repair'];
 		$context['sub_template'] = 'repair_boards';
+		$context['sub_action'] = 'routine';
 		$context[$context['admin_menu_name']]['current_subsection'] = 'general';
 
 		// Load the language file.
 		Txt::load('Maintenance');
 
 		// Make sure the tabs stay nice.
-		$context[$context['admin_menu_name']]['tab_data'] = array(
-			'title' => $txt['maintain_title'],
-			'description' => $txt['maintain_info'],
-			'tabs' => array(),
-		);
+		$context[$context['admin_menu_name']]['object']->prepareTabData([
+			'title' => 'maintain_title',
+			'description' => 'maintain_info',
+		]);
 
 		// Start displaying errors without fixing them.
 		if (isset($this->_req->query->fixErrors))

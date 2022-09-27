@@ -60,33 +60,30 @@ class ManagePosts extends AbstractController
 		// Good old action handle
 		$action = new Action('manage_posts');
 
-		// Tabs for browsing the different post functions.
-		$context[$context['admin_menu_name']]['tab_data'] = array(
-			'title' => $txt['manageposts_title'],
-			'help' => 'posts_and_topics',
-			'description' => $txt['manageposts_description'],
-			'tabs' => array(
-				'posts' => array(
-					'description' => $txt['manageposts_settings_description'],
-				),
-				'bbc' => array(
-					'description' => $txt['manageposts_bbc_settings_description'],
-				),
-				'censor' => array(
-					'description' => $txt['admin_censored_desc'],
-				),
-				'topics' => array(
-					'description' => $txt['manageposts_topic_settings_description'],
-				),
-			),
-		);
-
 		// Default the sub-action to 'posts'. call integrate_sa_manage_posts
 		$subAction = $action->initialize($subActions, 'posts');
 
 		// Just for the template
 		$context['page_title'] = $txt['manageposts_title'];
 		$context['sub_action'] = $subAction;
+
+		// Tabs for browsing the different post functions.
+		$context[$context['admin_menu_name']]['object']->prepareTabData([
+			'title' => 'manageposts_title',
+			'help' => 'posts_and_topics',
+			'description' => 'manageposts_description',
+			'tabs' => [
+				'posts' => [
+					'description' => $txt['manageposts_settings_description'],
+				],
+				'censor' => [
+					'description' => $txt['admin_censored_desc'],
+				],
+				'topics' => [
+					'description' => $txt['manageposts_topic_settings_description'],
+				],
+			]]
+		);
 
 		// Call the right function for this sub-action.
 		$action->dispatch($subAction);

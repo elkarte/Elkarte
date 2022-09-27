@@ -125,10 +125,12 @@ class CoreFeatures extends AbstractController
 
 		$context['sub_template'] = 'core_features';
 		$context['page_title'] = $txt['core_settings_title'];
-		$context[$context['admin_menu_name']]['tab_data'] = array(
-			'title' => $txt['core_settings_title'],
-			'description' => $txt['core_settings_desc'],
-		);
+
+		$context[$context['admin_menu_name']]['object']->prepareTabData([
+			'title' => 'core_settings_title',
+			'description' => 'core_settings_desc',
+		]);
+
 		theme()->addJavascriptVar(array(
 			'token_name' => '',
 			'token_value' => '',

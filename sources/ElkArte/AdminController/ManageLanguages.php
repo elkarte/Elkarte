@@ -64,12 +64,6 @@ class ManageLanguages extends AbstractController
 		// Get ready for action
 		$action = new Action('manage_languages');
 
-		// Load up all the tabs...
-		$context[$context['admin_menu_name']]['tab_data'] = array(
-			'title' => $txt['language_configuration'],
-			'description' => $txt['language_description'],
-		);
-
 		// By default we're managing languages, call integrate_sa_manage_languages
 		$subAction = $action->initialize($subActions, 'edit');
 
@@ -77,6 +71,12 @@ class ManageLanguages extends AbstractController
 		$context['sub_action'] = $subAction;
 		$context['page_title'] = $txt['edit_languages'];
 		$context['sub_template'] = 'show_settings';
+
+		// Load up all the tabs...
+		$context[$context['admin_menu_name']]['object']->prepareTabData([
+			'title' => 'language_configuration',
+			'description' => 'language_description',
+		]);
 
 		// Call the right function for this sub-action.
 		$action->dispatch($subAction);

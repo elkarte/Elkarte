@@ -69,13 +69,6 @@ class ManageServer extends AbstractController
 
 		$action = new Action('server_settings');
 
-		// Load up all the tabs...
-		$context[$context['admin_menu_name']]['tab_data'] = array(
-			'title' => $txt['admin_server_settings'],
-			'help' => 'serversettings',
-			'description' => $txt['admin_basic_settings'],
-		);
-
 		// By default we're editing the core settings, call integrate_sa_server_settings
 		$subAction = $action->initialize($subActions, 'general');
 
@@ -83,6 +76,13 @@ class ManageServer extends AbstractController
 		$context['sub_action'] = $subAction;
 		$context['page_title'] = $txt['admin_server_settings'];
 		$context['sub_template'] = 'show_settings';
+
+		// Load up all the tabs...
+		$context[$context['admin_menu_name']]['object']->prepareTabData([
+			'title' => 'admin_server_settings',
+			'help' => 'serversettings',
+			'description' => 'admin_basic_settings',
+		]);
 
 		// Any messages to speak of?
 		$context['settings_message'] = (isset($this->_req->query->msg, $txt[$this->_req->query->msg])) ? $txt[$this->_req->query->msg] : '';

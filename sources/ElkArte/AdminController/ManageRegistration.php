@@ -93,36 +93,36 @@ class ManageRegistration extends AbstractController
 		// Action controller
 		$action = new Action('manage_registrations');
 
-		// Next create the tabs for the template.
-		$context[$context['admin_menu_name']]['tab_data'] = array(
-			'title' => $txt['registration_center'],
-			'help' => 'registrations',
-			'description' => $txt['admin_settings_desc'],
-			'tabs' => array(
-				'register' => array(
-					'description' => $txt['admin_register_desc'],
-				),
-				'agreement' => array(
-					'description' => $txt['registration_agreement_desc'],
-				),
-				'privacypol' => array(
-					'description' => $txt['privacy_policy_desc'],
-				),
-				'reservednames' => array(
-					'description' => $txt['admin_reserved_desc'],
-				),
-				'settings' => array(
-					'description' => $txt['admin_settings_desc'],
-				)
-			)
-		);
-
 		// Work out which to call... call integrate_sa_manage_registrations
 		$subAction = $action->initialize($subActions, 'register');
 
 		// Final bits
 		$context['page_title'] = $txt['maintain_title'];
 		$context['sub_action'] = $subAction;
+
+		// Next create the tabs for the template.
+		$context[$context['admin_menu_name']]['object']->prepareTabData([
+			'title' => 'registration_center',
+			'help' => 'registrations',
+			'description' => 'admin_settings_desc',
+			'tabs' => [
+				'register' => [
+					'description' => $txt['admin_register_desc'],
+				],
+				'agreement' => [
+					'description' => $txt['registration_agreement_desc'],
+				],
+				'privacypol' => [
+					'description' => $txt['privacy_policy_desc'],
+				],
+				'reservednames' => [
+					'description' => $txt['admin_reserved_desc'],
+				],
+				'settings' => [
+					'description' => $txt['admin_settings_desc'],
+				]
+			]
+		]);
 
 		// Call the right function for this sub-action.
 		$action->dispatch($subAction);

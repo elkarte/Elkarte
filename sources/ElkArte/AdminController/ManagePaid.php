@@ -79,26 +79,19 @@ class ManagePaid extends AbstractController
 		// Some actions
 		$action = new Action('manage_subscriptions');
 
-		// Tabs for browsing the different subscription functions.
-		$context[$context['admin_menu_name']]['tab_data'] = array(
-			'title' => $txt['paid_subscriptions'],
-			'description' => $txt['paid_subscriptions_desc'],
-			'tabs' => array(
-				'view' => array(
-					'description' => $txt['paid_subs_view_desc'],
-				),
-				'settings' => array(
-					'description' => $txt['paid_subs_settings_desc'],
-				),
-			),
-		);
-
 		// Load in the subActions, call integrate_sa_manage_subscriptions
 		$subAction = $action->initialize($subActions, !empty($modSettings['paid_currency_symbol']) ? 'view' : 'settings');
 
 		// Final things for the template
 		$context['page_title'] = $txt['paid_subscriptions'];
 		$context['sub_action'] = $subAction;
+
+		// Tabs for browsing the different subscription functions.
+		$context[$context['admin_menu_name']]['object']->prepareTabData([
+			'title' => 'paid_subscriptions',
+			'description' => 'paid_subscriptions_desc',
+			'prefix' => 'paid_subs',
+		]);
 
 		// Call the right function for this sub-action.
 		$action->dispatch($subAction);

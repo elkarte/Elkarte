@@ -57,13 +57,10 @@ class AddonSettings extends AbstractController
 		// END $this->loadGeneralSettingParameters();
 
 		// Load up all the tabs...
-		$context[$context['admin_menu_name']]['tab_data'] = array(
-			'title' => $txt['admin_modifications'],
+		$context[$context['admin_menu_name']]['object']->prepareTabData([
+			'title' => 'admin_modifications',
 			'help' => 'addonsettings',
-			'description' => $txt['modification_settings_desc'],
-			'tabs' => array(
-				'general' => array(),
-			),
+			'description' => 'modification_settings_desc']
 		);
 
 		// Set up the action controller

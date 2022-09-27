@@ -32,9 +32,9 @@ use ElkArte\Util;
 /**
  * This class is the administration maillist controller.
  *
- *  - handles maillist configuration
- *  - handles the showing, repairing, deleting and bouncing failed emails
- *  - handles the adding / editing / removing of both filters and parsers
+ *  - Handles maillist configuration
+ *  - Handles the showing, repairing, deleting and bouncing failed emails
+ *  - Handles the adding / editing / removing of both filters and parsers
  *
  * @package Maillist
  */
@@ -82,19 +82,27 @@ class ManageMaillist extends AbstractController
 		// Help is needed in most places, so load it up front
 		require_once(SUBSDIR . '/Maillist.subs.php');
 
-		// Create the title area for the template.
-		$context[$context['admin_menu_name']]['tab_data'] = array(
-			'title' => $txt['ml_admin_configuration'],
-			'help' => 'maillist_help_short',
-			'description' => $txt['ml_configuration_desc'],
-		);
-
 		// Default to sub action 'emaillist' if none was given, call integrate_sa_manage_maillist
 		$subAction = $action->initialize($subActions, 'emaillist');
 
 		// Final bits
 		$context['page_title'] = $txt['ml_admin_configuration'];
 		$context['sub_action'] = $subAction;
+
+		// Create the tab area for the template.
+		$context[$context['admin_menu_name']]['object']->prepareTabData([
+			'title' => 'ml_admin_configuration',
+			'help' => 'maillist_help_short',
+			'description' => 'ml_configuration_desc',
+			'tabs' => [
+				'emailfilters' => [
+					'description' => $txt['filters_title'],
+				],
+				'emailparser' => [
+					'description' => $txt['parsers_title'],
+				],
+			]
+		]);
 
 		// If you have the permissions, then go Play
 		$action->dispatch($subAction);
@@ -304,8 +312,9 @@ class ManageMaillist extends AbstractController
 			),
 			'additional_rows' => array(
 				array(
-					'position' => 'top_of_list',
-					'value' => isset($this->_req->session->email_error) ? '<div class="' . (isset($this->_req->session->email_error_type) ? 'successbox' : 'errorbox') . '">' . $this->_req->session->email_error . '</div>' : $txt['heading'],
+					'position' => 'after_title',
+					'class' => isset($_SESSION['email_error'], $_SESSION['email_error_type']) ? 'successbox' : (isset($_SESSION['email_error']) ? 'errorbox' : 'description'),
+					'value' => $this->_req->session->email_error ?? $txt['heading'],
 				),
 			),
 		);
@@ -448,7 +457,6 @@ class ManageMaillist extends AbstractController
 				if (!empty($temp_email[0]['key']) && (!in_array($temp_email[0]['error_code'], array('error_no_message', 'error_not_find_board', 'error_topic_gone'))))
 				{
 					// Set up the details needed to get this posted
-					$force = true;
 					$key = $temp_email[0]['key'] . '-' . $temp_email[0]['type'] . $temp_email[0]['message'];
 					$data = $temp_email[0]['body'];
 
@@ -464,10 +472,10 @@ class ManageMaillist extends AbstractController
 						}
 					}
 
-					// Lets TRY AGAIN to make a post!
+					// Let's TRY AGAIN to make a post!
 					$controller = new Emailpost(new EventManager());
 					$controller->setUser(User::$info);
-					$text = $controller->action_pbe_post($data, $force, $key);
+					$text = $controller->action_pbe_post($data, true, $key);
 
 					// Assuming all went well, remove this entry and file since we are done.
 					if ($text)
@@ -581,7 +589,7 @@ class ManageMaillist extends AbstractController
 		}
 
 		// Check if they are sending the notice
-		if (isset($this->_req->post->bounce) && isset($temp_email))
+		if (isset($this->_req->post->bounce, $temp_email))
 		{
 			checkSession('post');
 			validateToken('admin-ml');
@@ -589,7 +597,7 @@ class ManageMaillist extends AbstractController
 			// They did check the box, how else could they have posted
 			if (isset($this->_req->post->warn_notify))
 			{
-				// lets make sure we have the items to send it
+				// let's make sure we have the items to send it
 				$check_emails = explode('=>', $temp_email[0]['from']);
 				$to = trim($check_emails[0]);
 				$subject = trim($this->_req->post->warn_sub);
@@ -744,8 +752,9 @@ class ManageMaillist extends AbstractController
 			),
 			'additional_rows' => array(
 				array(
-					'position' => isset($this->_req->query->saved) ? 'top_of_list' : 'after_title',
-					'value' => isset($this->_req->query->saved) ? '<div class="successbox">' . $txt['saved'] . '</div>' : $txt['filters_title'],
+					'position' => 'top_of_list',
+					'class' => isset($this->_req->query->saved) ? 'successbox' : '',
+					'value' => isset($this->_req->query->saved) ? $txt['saved'] : '',
 				),
 				array(
 					'position' => 'below_table_data',
@@ -875,7 +884,6 @@ class ManageMaillist extends AbstractController
 		$context['page_title'] = $txt['filters'];
 		$context['sub_template'] = 'show_list';
 		$context['default_list'] = 'sort_email_fp';
-		$context[$context['admin_menu_name']]['current_subsection'] = 'emailfilters';
 
 		// Create the list.
 		createList($listOptions);
@@ -951,7 +959,7 @@ class ManageMaillist extends AbstractController
 		}
 		else
 		{
-			// Setup place holders for adding a new one instead
+			// Setup placeholders for adding a new one instead
 			$modSettings['filter_type'] = '';
 			$modSettings['filter_to'] = '';
 			$modSettings['filter_from'] = '';
@@ -980,7 +988,7 @@ class ManageMaillist extends AbstractController
 			$editId = isset($this->_req->query->edit) && $this->_req->query->edit !== 'new' ? (int) $this->_req->query->edit : -1;
 			$editName = isset($this->_req->query->edit) && $this->_req->query->edit !== 'new' ? 'id_filter' : '';
 
-			// If its regex we do a quick check to see if its valid or not
+			// If its regex we do a quick check for validity
 			if ($this->_req->post->filter_type === 'regex')
 			{
 				$valid = @preg_replace($this->_req->post->filter_from, $this->_req->post->filter_to, 'ElkArte') !== null;
@@ -1022,12 +1030,6 @@ class ManageMaillist extends AbstractController
 			'url' => getUrl('admin', ['action' => 'admin', 'area' => 'maillist', 'sa' => 'editfilter']),
 			'name' => ($context['editing']) ? $txt['edit_filter'] : $txt['add_filter'],
 		);
-		$context[$context['admin_menu_name']]['tab_data'] = array(
-			'title' => $txt[$title],
-			'class' => 'i-envelope',
-			'description' => $txt['filters_title'],
-		);
-		$context[$context['admin_menu_name']]['current_subsection'] = 'emailfilters';
 
 		// Load and show
 		$settingsForm->prepare();
@@ -1188,8 +1190,9 @@ class ManageMaillist extends AbstractController
 			),
 			'additional_rows' => array(
 				array(
-					'position' => isset($this->_req->query->saved) ? 'top_of_list' : 'after_title',
-					'value' => isset($this->_req->query->saved) ? '<div class="successbox">' . $txt['saved'] . '</div>' : $txt['parsers_title'],
+					'position' => 'top_of_list',
+					'class' => isset($this->_req->query->saved) ? 'successbox' : '',
+					'value' => isset($this->_req->query->saved) ? $txt['saved'] : '',
 				),
 				array(
 					'position' => 'below_table_data',
@@ -1310,7 +1313,6 @@ class ManageMaillist extends AbstractController
 		$context['page_title'] = $txt['parsers'];
 		$context['sub_template'] = 'show_list';
 		$context['default_list'] = 'sort_email_fp';
-		$context[$context['admin_menu_name']]['current_subsection'] = 'emailparser';
 
 		// Create the list.
 		createList($listOptions);
@@ -1350,7 +1352,7 @@ class ManageMaillist extends AbstractController
 		}
 		else
 		{
-			// Setup place holders for adding a new one instead
+			// Setup placeholders for adding a new one instead
 			$modSettings['filter_type'] = '';
 			$modSettings['filter_name'] = '';
 			$modSettings['filter_from'] = '';
@@ -1421,11 +1423,6 @@ class ManageMaillist extends AbstractController
 			'url' => getUrl('admin', ['action' => 'admin', 'area' => 'maillist', 'sa' => 'editparser']),
 			'name' => ($context['editing']) ? $txt['edit_parser'] : $txt['add_parser'],
 		);
-		$context[$context['admin_menu_name']]['tab_data'] = array(
-			'title' => $txt[$title],
-			'description' => $txt['parsers_title'],
-		);
-		$context[$context['admin_menu_name']]['current_subsection'] = 'emailparser';
 
 		// prep it, load it, show it
 		$settingsForm->prepare();
@@ -1562,7 +1559,7 @@ class ManageMaillist extends AbstractController
 					}
 
 					// Valid board id?
-					if (!isset($boardtocheck[$key]) || !isset($boards[$key]))
+					if (!isset($boardtocheck[$key], $boards[$key]))
 					{
 						$board_error = $checkme;
 						$context['error_type'] = 'notice';
@@ -1744,8 +1741,9 @@ class ManageMaillist extends AbstractController
 		{
 			return $this->action_modify_bounce_templates();
 		}
+
 		// Deleting and existing one
-		elseif (isset($this->_req->post->delete) && !empty($this->_req->post->deltpl))
+		if (isset($this->_req->post->delete) && !empty($this->_req->post->deltpl))
 		{
 			checkSession('post');
 			validateToken('mod-mlt');
@@ -1868,7 +1866,8 @@ class ManageMaillist extends AbstractController
 		// Standard template things, you know the drill
 		$context['page_title'] = $context['is_edit'] ? $txt['ml_bounce_template_modify'] : $txt['ml_bounce_template_add'];
 		$context['sub_template'] = 'bounce_template';
-		$context[$context['admin_menu_name']]['current_subsection'] = 'templates';
+
+		//$context[$context['admin_menu_name']]['current_subsection'] = 'templates';
 
 		// Defaults to show
 		$context['template_data'] = array(

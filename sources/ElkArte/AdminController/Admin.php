@@ -91,7 +91,10 @@ class Admin extends AbstractController
 		$admin_include_data = $this->loadMenu();
 		$this->buildLinktree($admin_include_data);
 
-		callMenu($admin_include_data);
+		// And off we go, only one action, the chosen menu area
+		$action = new Action();
+		$action->initialize(['action' => $admin_include_data]);
+		$action->dispatch('action');
 	}
 
 	/**
@@ -170,9 +173,9 @@ class Admin extends AbstractController
 						'subsections' => array(
 							'browse' => array($txt['browse_packages']),
 							'installed' => array($txt['installed_packages']),
-							'options' => array($txt['package_settings']),
 							'servers' => array($txt['download_packages']),
 							'upload' => array($txt['upload_packages']),
+							'options' => array($txt['package_settings']),
 						),
 					),
 					'packageservers' => array(
@@ -188,7 +191,8 @@ class Admin extends AbstractController
 						'function' => 'action_search',
 						'permission' => array('admin_forum'),
 						'class' => 'i-search i-admin',
-						'select' => 'index'
+						'select' => 'index',
+						'hidden' => true,
 					),
 					'adminlogoff' => array(
 						'controller' => '\\ElkArte\\AdminController\\Admin',
@@ -362,8 +366,8 @@ class Admin extends AbstractController
 						'class' => 'i-search i-admin',
 						'permission' => array('admin_forum'),
 						'subsections' => array(
-							'weights' => array($txt['search_weights']),
 							'method' => array($txt['search_method']),
+							'weights' => array($txt['search_weights']),
 							'managesphinx' => array($txt['search_sphinx']),
 							'settings' => array($txt['settings']),
 						),
@@ -543,11 +547,13 @@ class Admin extends AbstractController
 		);
 
 		// Actually create the menu!
-		$menu = new Menu();
-		$menu->addMenuData($admin_areas);
-		$menu->addOptions($menuOptions);
-		$admin_include_data = $menu->prepareMenu();
-		$menu->setContext();
+		$admin_include_data = (new Menu())
+			->addMenuData($admin_areas)
+			->addOptions($menuOptions)
+			->prepareMenu()
+			->setContext()
+			->getIncludeData();
+
 		unset($admin_areas);
 
 		// Make a note of the Unique ID for this menu.
@@ -632,12 +638,12 @@ class Admin extends AbstractController
 		$context['can_admin'] = allowedTo('admin_forum');
 		$context['sub_template'] = 'admin';
 		$context['page_title'] = $txt['admin_center'];
-		$context[$context['admin_menu_name']]['tab_data'] = array(
-			'title' => $txt['admin_center'],
+		$context[$context['admin_menu_name']]['object']->prepareTabData([
+			'title' => 'admin_center',
 			'description' => '
 				<span class="bbc_strong">' . $txt['hello_guest'] . ' ' . $context['user']['name'] . '!</span>
 				' . sprintf($txt['admin_main_welcome'], $txt['admin_control_panel']),
-		);
+		]);
 
 		// Load in the admin quick tasks
 		$context['quick_admin_tasks'] = getQuickAdminTasks();
@@ -672,9 +678,10 @@ class Admin extends AbstractController
 		}
 
 		// Load credits.
-		$context[$context['admin_menu_name']]['tab_data'] = array(
-			'title' => $txt['support_credits_title'],
-		);
+		$context[$context['admin_menu_name']]['object']->prepareTabData([
+			'title' => 'support_credits_title',
+			'description' => 'support_credits_desc',
+		]);
 		Txt::load('Who');
 		$context += prepareCreditsData();
 
@@ -831,15 +838,19 @@ class Admin extends AbstractController
 		$this->_events->trigger('search', array('language_files' => &$language_files, 'include_files' => &$include_files, 'settings_search' => &$settings_search));
 
 		// Go through all the search data trying to find this text!
-		$search_term = strtolower(un_htmlspecialchars($context['search_term']));
-		$search = new AdminSettingsSearch($language_files, $include_files, $settings_search);
-		$search->initSearch($context['admin_menu_name'], array(
-			array('COPPA', 'area=regcenter;sa=settings'),
-			array('CAPTCHA', 'area=securitysettings;sa=spam'),
-		));
+		$context['search_results'] = [];
+		if (isset($context['search_term']))
+		{
+			$search_term = strtolower(un_htmlspecialchars($context['search_term'] ?? ''));
+			$search = new AdminSettingsSearch($language_files, $include_files, $settings_search);
+			$search->initSearch($context['admin_menu_name'], array(
+				array('COPPA', 'area=regcenter;sa=settings'),
+				array('CAPTCHA', 'area=securitysettings;sa=spam'),
+			));
+			$context['search_results'] = $search->doSearch($search_term);
+		}
 
 		$context['page_title'] = $txt['admin_search_results'];
-		$context['search_results'] = $search->doSearch($search_term);
 	}
 
 	/**

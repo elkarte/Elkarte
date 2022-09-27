@@ -124,36 +124,35 @@ class ManagePermissions extends AbstractController
 		// Action controller
 		$action = new Action('manage_permissions');
 
-		// Create the tabs for the template.
-		$context[$context['admin_menu_name']]['tab_data'] = array(
-			'title' => $txt['permissions_title'],
-			'help' => 'permissions',
-			'description' => '',
-			'tabs' => array(
-				'index' => array(
-					'description' => $txt['permissions_groups'],
-				),
-				'board' => array(
-					'description' => $txt['permission_by_board_desc'],
-				),
-				'profiles' => array(
-					'description' => $txt['permissions_profiles_desc'],
-				),
-				'postmod' => array(
-					'description' => $txt['permissions_post_moderation_desc'],
-				),
-				'settings' => array(
-					'description' => $txt['permission_settings_desc'],
-				),
-			),
-		);
-
 		// Load the subactions, call integrate_sa_manage_permissions
 		$subAction = $action->initialize($subActions, (allowedTo('manage_permissions') ? 'index' : 'settings'));
 
 		// Last items needed
 		$context['page_title'] = $txt['permissions_title'];
 		$context['sub_action'] = $subAction;
+
+		// Create the tabs for the template.
+		$context[$context['admin_menu_name']]['object']->prepareTabData([
+			'title' => 'permissions_title',
+			'help' => 'permissions',
+			'tabs' => [
+				'index' => [
+					'description' => $txt['permissions_groups'],
+				],
+				'board' => [
+					'description' => $txt['permission_by_board_desc'],
+				],
+				'profiles' => [
+					'description' => $txt['permissions_profiles_desc'],
+				],
+				'postmod' => [
+					'description' => $txt['permissions_post_moderation_desc'],
+				],
+				'settings' => [
+					'description' => $txt['permission_settings_desc'],
+				],
+			],
+		]);
 
 		// Call the right function for this sub-action.
 		$action->dispatch($subAction);
