@@ -61,7 +61,7 @@
 }
 
 #live_news div.content dl {
-	color: var(--dark_text);
+	color: var(--emphasize_text);
 }
 
 #ourAnnouncements dt {
@@ -82,7 +82,7 @@
 }
 
 #quick_tasks li {
-	border-top-color: var(--primary_border_top);
+	border-top-color: var(--transparent);
 	border-bottom-color: var(--primary_border_bottom);
 }
 

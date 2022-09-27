@@ -35,7 +35,7 @@
 }
 
 #manage_boards .post_group, #manage_boards .regular_members {
-	border-bottom-color: var(--dark_text);
+	border-bottom-color: var(--emphasize_text);
 }
 
 /* This is the drag/drop placeholder, normally not visible */
