@@ -653,4 +653,23 @@ class UpgradeInstructions_upgrade_2_0
 			)
 		);
 	}
+
+	public function migrate_misc_settings_title()
+	{
+		return 'Updating misc data ...';
+	}
+
+	public function migrate_misc_session_settings()
+	{
+		return array(
+			array(
+				'debug_title' => 'Removing / Changing misc modSetting data ...',
+				'function' => function () {
+					removeSettings(
+						array('visual_verification_type', 'visual_verification_num_chars')
+					);
+				}
+			)
+		);
+	}
 }
