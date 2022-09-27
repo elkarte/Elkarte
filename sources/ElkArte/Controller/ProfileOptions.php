@@ -105,15 +105,11 @@ class ProfileOptions extends AbstractController
 		$subAction = $action->initialize($subActions, 'buddies');
 
 		// Create the tabs for the template.
-		$context[$context['profile_menu_name']]['tab_data'] = array(
+		$context[$context['profile_menu_name']]['object']->prepareTabData([
 			'title' => $txt['editBuddyIgnoreLists'],
 			'description' => $txt['buddy_ignore_desc'],
 			'class' => 'i-user',
-			'tabs' => array(
-				'buddies' => array(),
-				'ignore' => array(),
-			),
-		);
+		]);
 
 		// Pass on to the actual function.
 		$action->dispatch($subAction);
@@ -673,16 +669,11 @@ class ProfileOptions extends AbstractController
 		$subAction = $action->initialize($subActions, 'settings');
 
 		// Create the header for the template.
-		$context[$context['profile_menu_name']]['tab_data'] = array(
+		$context[$context['profile_menu_name']]['object']->prepareTabData([
 			'title' => $txt['notify_settings'],
 			'description' => $txt['notification_info'],
 			'class' => 'i-contact',
-			'tabs' => array(
-				'settings' => array(),
-				'boards' => array(),
-				'topics' => array(),
-			),
-		);
+		]);
 
 		// Pass on to the actual function.
 		$action->dispatch($subAction);

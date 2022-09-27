@@ -126,7 +126,7 @@ class ProfileInfo extends AbstractController
 		// Are there things we don't show?
 		$context['disabled_fields'] = isset($modSettings['disabled_profile_fields']) ? array_flip(explode(',', $modSettings['disabled_profile_fields'])) : array();
 
-		// Menu tab
+		// Disable Menu tab
 		$context[$context['profile_menu_name']]['tab_data'] = [];
 
 		// Profile summary tabs, like Summary, Recent, Buddies
@@ -426,17 +426,11 @@ class ProfileInfo extends AbstractController
 		theme()->getTemplates()->load('ProfileInfo');
 
 		// Create the tabs for the template.
-		$context[$context['profile_menu_name']]['tab_data'] = array(
+		$context[$context['profile_menu_name']]['object']->prepareTabData([
 			'title' => $txt['show' . $action_title],
 			'description' => sprintf($txt['showGeneric_help'], $txt['show' . $action_title]),
 			'class' => 'i-post-text',
-			'tabs' => array(
-				'messages' => array(),
-				'topics' => array(),
-				'unwatchedtopics' => array(),
-				'attach' => array(),
-			),
-		);
+		]);
 
 		// Set the page title
 		$context['page_title'] = $txt['showPosts'] . ' - ' . $this->_profile['real_name'];
@@ -1011,10 +1005,10 @@ class ProfileInfo extends AbstractController
 		$context['likes_received'] = comma_format($this->_profile['likes_received']);
 
 		// Menu tab
-		$context[$context['profile_menu_name']]['tab_data'] = array(
+		$context[$context['profile_menu_name']]['object']->prepareTabData([
 			'title' => $txt['statPanel_generalStats'] . ' - ' . $context['member']['name'],
 			'class' => 'i-poll'
-		);
+		]);
 
 		// Number of topics started.
 		$context['num_topics'] = UserStatsTopicsStarted($this->_memID);

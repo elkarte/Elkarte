@@ -71,11 +71,11 @@ class ProfileHistory extends AbstractController
 		);
 
 		// Create the tabs for the template. (Mostly done by prepareTabData function of Menu)
-		$context[$context['profile_menu_name']]['tab_data'] = array(
+		$context[$context['profile_menu_name']]['object']->prepareTabData([
 			'title' => $txt['history'],
 			'description' => $txt['history_description'],
 			'class' => 'i-poll',
-		);
+		]);
 
 		// Set up action/subaction stuff.
 		$action = new Action('profile_history');
