@@ -43,69 +43,41 @@ class CurlFetchWebdata
 	 *
 	 * @var array
 	 */
-	private $default_options = array(
-		CURLOPT_RETURNTRANSFER => 1, // Get returned value as a string (don't output it)
-		CURLOPT_HEADER => 1, // We need the headers to do our own redirect
-		CURLOPT_FOLLOWLOCATION => 0, // Don't follow, we will do it ourselves so safe mode and open_basedir will dig it
+	private $default_options = [
+		CURLOPT_RETURNTRANSFER => true, // Get returned value as a string (don't output it)
+		CURLOPT_HEADER => true, // We need the headers to do our own redirect
+		CURLOPT_FOLLOWLOCATION => false, // Don't follow, we will do it ourselves so safe mode and open_basedir will dig it
 		CURLOPT_USERAGENT => 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML like Gecko) Chrome/51.0.2704.79 Safari/537.36 Edge/14.14931', // set a normal looking user agent
 		CURLOPT_CONNECTTIMEOUT => 10, // Don't wait forever on a connection
 		CURLOPT_TIMEOUT => 10, // A page should load in this amount of time
 		CURLOPT_MAXREDIRS => 3, // stop after this many redirects
 		CURLOPT_ENCODING => 'gzip,deflate', // accept gzip and decode it
-		CURLOPT_SSL_VERIFYPEER => 0, // stop cURL from verifying the peer's certificate
+		CURLOPT_SSL_VERIFYPEER => false, // stop cURL from verifying the peer's certificate
 		CURLOPT_SSL_VERIFYHOST => 0, // stop cURL from verifying the peer's host
-		CURLOPT_POST => 0, // no post data unless its passed
-		CURLOPT_HTTPHEADER => [], // no special headers unless supplied
-	);
+		CURLOPT_POST => false, // no post data unless its passed
+		CURLOPT_HTTPHEADER => ['Accept-Encoding: gzip,compress,identity'], // no special headers unless supplied
+	];
 
-	/**
-	 * Holds the passed or default value for redirects
-	 *
-	 * @var int
-	 */
-	private $_max_redirect = 3;
+	/** @var int Holds the passed or default value for redirects */
+	private $_max_redirect;
 
-	/**
-	 * Holds the current redirect count for the request
-	 *
-	 * @var int
-	 */
+	/** @var int Holds the current redirect count for the request */
 	private $_current_redirect = 0;
 
-	/**
-	 * Holds the passed user options array
-	 *
-	 * @var array
-	 */
-	private $_user_options = array();
+	/** @var array Holds the passed user options array */
+	private $_user_options;
 
-	/**
-	 * Holds any data that will be posted to a form
-	 *
-	 * @var string
-	 */
+	/** @var string Holds any data that will be posted to a form */
 	private $_post_data = '';
 
-	/**
-	 * Holds the response to the cURL request, headers, data, code, etc
-	 *
-	 * @var string[]
-	 */
-	private $_response = array();
+	/** @var string[] Holds the response to the cURL request, headers, data, code, etc */
+	private $_response = [];
 
-	/**
-	 * Holds response headers to the request
-	 *
-	 * @var array
-	 */
-	private $_headers = array();
+	/** @var array Holds response headers to the request */
+	private $_headers = [];
 
-	/**
-	 * Holds the options for this request
-	 *
-	 * @var array
-	 */
-	private $_options = array();
+	/** @var array Holds the options for this request */
+	private $_options = [];
 
 	/**
 	 * Start the cURL object
@@ -115,10 +87,10 @@ class CurlFetchWebdata
 	 * @param array $options cURL options as an array
 	 * @param int $max_redirect Maximum number of redirects
 	 */
-	public function __construct($options = array(), $max_redirect = 3)
+	public function __construct($options = [], $max_redirect = 3)
 	{
 		// Initialize class variables
-		$this->_max_redirect = intval($max_redirect);
+		$this->_max_redirect = (int) $max_redirect;
 		$this->_user_options = $options;
 	}
 
@@ -137,7 +109,7 @@ class CurlFetchWebdata
 	 *
 	 * @return CurlFetchWebdata
 	 */
-	public function get_url_data($url, $post_data = array())
+	public function get_url_data($url, $post_data = [])
 	{
 		// POSTing some data perhaps?
 		if (!empty($post_data) && is_array($post_data))
@@ -172,20 +144,19 @@ class CurlFetchWebdata
 	{
 		if (is_array($post_data))
 		{
-			$postvars = array();
+			$post_vars = [];
 
-			// Build the post data, drop ones with leading @'s since those can be used to send files, we don't support that.
+			// Build the post data, drop ones with leading @'s since those can be used to send files,
+			// we don't support that.
 			foreach ($post_data as $name => $value)
 			{
-				$postvars[] = $name . '=' . urlencode($value[0] == '@' ? '' : $value);
+				$post_vars[] = $name . '=' . urlencode($value[0] === '@' ? '' : $value);
 			}
 
-			return implode('&', $postvars);
+			return implode('&', $post_vars);
 		}
-		else
-		{
-			return $post_data;
-		}
+
+		return $post_data;
 	}
 
 	/**
@@ -257,7 +228,7 @@ class CurlFetchWebdata
 	 * Makes the actual cURL call
 	 *
 	 * What it does
-	 * - Stores responses (url, code, error, headers, body) in the response array
+	 * - Store responses (url, code, error, headers, body) in the response array
 	 * - Detects 301, 302, 307 codes and will redirect to the given response header location
 	 *
 	 * @param string $url site to fetch
@@ -281,7 +252,7 @@ class CurlFetchWebdata
 		if (!$redirect)
 		{
 			$this->_current_redirect = 1;
-			$this->_response = array();
+			$this->_response = [];
 		}
 
 		// Initialize the curl object and make the call
@@ -301,17 +272,17 @@ class CurlFetchWebdata
 		curl_close($cr);
 
 		// Store this 'loops' data, someone may want all of these :O
-		$this->_response[] = array(
+		$this->_response[] = [
 			'url' => $url,
 			'code' => $http_code,
 			'error' => $error,
 			'size' => !empty($curl_info['download_content_length']) ? $curl_info['download_content_length'] : 0,
 			'headers' => !empty($this->_headers) ? $this->_headers : false,
 			'body' => $body,
-		);
+		];
 
 		// If this a redirect with a location header and we have not given up, then we play it again Sam
-		if (preg_match('~30[127]~i', $http_code) === 1 && !empty($this->_headers['location']) && $this->_current_redirect <= $this->_max_redirect)
+		if (!empty($this->_headers['location']) && $this->_current_redirect <= $this->_max_redirect && preg_match('~30[127]~', $http_code) === 1)
 		{
 			$this->_current_redirect++;
 			$header_location = $this->_getRedirectURL($url, $this->_headers['location']);
@@ -385,10 +356,8 @@ class CurlFetchWebdata
 		{
 			return $this->_response[$max_result];
 		}
-		else
-		{
-			return $this->_response[$max_result][$area] ?? $this->_response[$max_result];
-		}
+
+		return $this->_response[$max_result][$area] ?? $this->_response[$max_result];
 	}
 
 	/**
@@ -409,11 +378,9 @@ class CurlFetchWebdata
 		{
 			return $this->_response;
 		}
-		else
-		{
-			$response_number = min($response_number, count($this->_response) - 1);
 
-			return $this->_response[$response_number];
-		}
+		$response_number = min($response_number, count($this->_response) - 1);
+
+		return $this->_response[$response_number];
 	}
 }
