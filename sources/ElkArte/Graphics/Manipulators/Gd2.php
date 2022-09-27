@@ -465,7 +465,7 @@ class Gd2 extends AbstractManipulator
 		}
 
 		$text_color = imagecolorallocate($image, 109, 109, 109);
-		$font = $settings['default_theme_dir'] . '/fonts/VDS_New.ttf';
+		$font = $settings['default_theme_dir'] . '/fonts/OpenSans.ttf';
 		$true_type = function_exists('imagettftext');
 
 		if (!$true_type)

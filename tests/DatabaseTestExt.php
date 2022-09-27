@@ -166,7 +166,7 @@ class TestDatabase extends TestCase
 			'permission_profiles' => 4,
 			'permissions' => 40,
 			'scheduled_tasks' => 14,
-			'settings' => 201,
+			'settings' => 199,
 			'smileys' => 54,
 			'spiders' => 31,
 			'themes' => 22,
