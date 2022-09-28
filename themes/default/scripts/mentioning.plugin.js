@@ -123,7 +123,7 @@ var disableDrafts = false;
 					space = acceptSpaceBar ? "\ " : "";
 
 					// regexp = new RegExp(flag + '([^ <>&"\'=\\\\\n]*)$|' + flag + '([^\\x00-\\xff]*)$', 'gi');
-					regex_matcher = new RegExp(flag + "([\\p{L}0-9_" + space + "\\[\\]\'\.\+\-]*)$", 'u');
+					regex_matcher = new RegExp(flag + "([\\p{L}0-9_" + space + "\\[\\]\'\.\+\-]*)$", 'um');
 					match = regex_matcher.exec(subtext);
 
 					if (match)

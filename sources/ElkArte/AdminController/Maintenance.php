@@ -92,18 +92,11 @@ class Maintenance extends AbstractController
 		theme()->getTemplates()->load('Maintenance');
 
 		// This uses admin tabs - as it should!
-		$context[$context['admin_menu_name']]['tab_data'] = array(
-			'title' => $txt['maintain_title'],
-			'class' => 'i-cog',
-			'description' => $txt['maintain_info'],
-			'tabs' => array(
-				'routine' => array(),
-				'database' => array(),
-				'members' => array(),
-				'topics' => array(),
-				'hooks' => array(),
-				'attachments' => array('label' => $txt['maintain_sub_attachments']),
-			),
+		// Create the tabs
+		$context[$context['admin_menu_name']]['object']->prepareTabData([
+			'title' => 'maintain_title',
+			'description' => 'maintain_info',
+			'class' => 'i-cog']
 		);
 
 		// So many things you can do - but frankly I won't let you - just these!

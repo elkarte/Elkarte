@@ -39,10 +39,8 @@ class Mentionmem extends AbstractNotificationBoardAccess
 		{
 			return $this->_getNotificationStrings('', array('subject' => static::$_type, 'body' => static::$_type), $members, $this->_task);
 		}
-		else
-		{
-			$keys = array('subject' => 'notify_mentionmem_' . $lang_data['subject'], 'body' => 'notify_mentionmem_' . $lang_data['body']);
-		}
+
+		$keys = array('subject' => 'notify_mentionmem_' . $lang_data['subject'], 'body' => 'notify_mentionmem_' . $lang_data['body']);
 
 		$replacements = array(
 			'ACTIONNAME' => $this->_task['source_data']['notifier_data']['name'],

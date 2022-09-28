@@ -21,6 +21,7 @@ use ElkArte\AbstractController;
 use ElkArte\Action;
 use ElkArte\Cache\Cache;
 use ElkArte\Exceptions\Exception;
+use ElkArte\Menu\Menu;
 use ElkArte\MessagesDelete;
 use ElkArte\Languages\Txt;
 use ElkArte\User;
@@ -48,7 +49,10 @@ class ModerationCenter extends AbstractController
 		// Set up moderation menu.
 		$this->prepareModcenter();
 
-		callMenu($this->_mod_include_data);
+		// And off we go
+		$action = new Action();
+		$action->initialize(['action' => $this->_mod_include_data]);
+		$action->dispatch('action');
 	}
 
 	/**
@@ -67,8 +71,8 @@ class ModerationCenter extends AbstractController
 			return;
 		}
 
-		$context['can_moderate_boards'] = $this->user->mod_cache['bq'] != '0=1';
-		$context['can_moderate_groups'] = $this->user->mod_cache['gq'] != '0=1';
+		$context['can_moderate_boards'] = $this->user->mod_cache['bq'] !== '0=1';
+		$context['can_moderate_groups'] = $this->user->mod_cache['gq'] !== '0=1';
 		$context['can_moderate_approvals'] = $modSettings['postmod_active'] && !empty($this->user->mod_cache['ap']);
 
 		// Everyone using this area must be allowed here!
@@ -266,15 +270,23 @@ class ModerationCenter extends AbstractController
 		);
 
 		// Setup the menu
-		$mod_include_data = createMenu($moderation_areas, $menuOptions);
+		$mod_include_data = (new Menu())
+			->addMenuData($moderation_areas)
+			->addOptions($menuOptions)
+			->prepareMenu()
+			->setContext()
+			->getIncludeData();
+
 		unset($moderation_areas);
 
 		// Retain the ID information in case required by a subaction.
 		$context['moderation_menu_id'] = $context['max_menu_id'];
 		$context['moderation_menu_name'] = 'menu_data_' . $context['moderation_menu_id'];
-		$context[$context['moderation_menu_name']]['tab_data'] = array(
+
+		$context[$context['moderation_menu_name']]['object']->prepareTabData([
 			'title' => $txt['moderation_center'],
-			'description' => sprintf($txt['mc_description'], $context['user']['name'], getUrl('action', ['action' => 'moderate', 'area' => 'settings'])));
+			'description' => sprintf($txt['mc_description'], $context['user']['name'], getUrl('action', ['action' => 'moderate', 'area' => 'settings']))
+		]);
 
 		// What a pleasant shortcut - even tho we're not *really* on the admin screen who cares...
 		$context['admin_area'] = $mod_include_data['current_area'];
@@ -285,21 +297,21 @@ class ModerationCenter extends AbstractController
 			'name' => $txt['moderation_center'],
 		);
 
-		if (isset($mod_include_data['current_area']) && $mod_include_data['current_area'] != 'index')
+		if (isset($mod_include_data['current_area']) && $mod_include_data['current_area'] !== 'index')
 		{
-			$context['linktree'][] = array(
+			$context['linktree'][] = [
 				'url' => getUrl('action', ['action' => 'moderate', 'area' => $mod_include_data['current_area']]),
 				'name' => $mod_include_data['label'],
-			);
+			];
 		}
 
 		if (!empty($mod_include_data['current_subsection']) && isset($mod_include_data['subsections'][$mod_include_data['current_subsection']]['label'])
 			&& $mod_include_data['subsections'][$mod_include_data['current_subsection']]['label'] !== $mod_include_data['label'])
 		{
-			$context['linktree'][] = array(
+			$context['linktree'][] = [
 				'url' => getUrl('action', ['action' => 'moderate', 'area' => $mod_include_data['current_area'], 'sa' => $mod_include_data['current_subsection']]),
 				'name' => $mod_include_data['subsections'][$mod_include_data['current_subsection']]['label'],
-			);
+			];
 		}
 
 		// Finally, store this, so that if we're called from the class, it can use it.
@@ -420,10 +432,10 @@ class ModerationCenter extends AbstractController
 		require_once(SUBSDIR . '/Moderation.subs.php');
 
 		// Put the open and closed options into tabs, because we can...
-		$context[$context['moderation_menu_name']]['tab_data'] = array(
+		$context[$context['moderation_menu_name']]['object']->prepareTabData([
 			'title' => $txt['mc_reported_posts'],
 			'description' => $txt['mc_reported_posts_desc'],
-		);
+		]);
 
 		// Set up the comforting bits...
 		$context['page_title'] = $txt['mc_reported_posts'];
@@ -449,10 +461,10 @@ class ModerationCenter extends AbstractController
 			isAllowedTo('admin_forum');
 
 			// Put the open and closed options into tabs, because we can...
-			$context[$context['moderation_menu_name']]['tab_data'] = array(
+			$context[$context['moderation_menu_name']]['object']->prepareTabData([
 				'title' => $txt['mc_reported_pms'],
 				'description' => $txt['mc_reported_pms_desc'],
-			);
+			]);
 			$context['page_title'] = $txt['mc_reported_pms'];
 		}
 
@@ -866,10 +878,10 @@ class ModerationCenter extends AbstractController
 		theme()->getTemplates()->load('ModerationCenter');
 		$context['page_title'] = $txt['mc_settings'];
 		$context['sub_template'] = 'moderation_settings';
-		$context[$context['moderation_menu_name']]['tab_data'] = array(
+		$context[$context['moderation_menu_name']]['object']->prepareTabData([
 			'title' => $txt['mc_prefs_title'],
 			'description' => $txt['mc_prefs_desc']
-		);
+		]);
 
 		// What blocks can this user see?
 		$context['homepage_blocks'] = array(
@@ -986,10 +998,10 @@ class ModerationCenter extends AbstractController
 		$modSettings['warning_watch'] = empty($modSettings['warning_watch']) ? 1 : $modSettings['warning_watch'];
 
 		// Put some pretty tabs on cause we're gonna be doing hot stuff here...
-		$context[$context['moderation_menu_name']]['tab_data'] = array(
+		$context[$context['moderation_menu_name']]['object']->prepareTabData([
 			'title' => $txt['mc_watched_users_title'],
 			'description' => $txt['mc_watched_users_desc'],
-		);
+		]);
 
 		// First off - are we deleting?
 		if (!empty($this->_req->query->delete) || !empty($this->_req->post->delete))
@@ -1780,10 +1792,10 @@ class ModerationCenter extends AbstractController
 		);
 
 		// Setup the admin tabs.
-		$context[$context['moderation_menu_name']]['tab_data'] = array(
+		$context[$context['moderation_menu_name']]['object']->prepareTabData([
 			'title' => $txt['mc_warnings'],
 			'description' => $txt['mc_warnings_description'],
-		);
+		]);
 
 		// Call the right function.
 		$action = new Action('moderation_center');

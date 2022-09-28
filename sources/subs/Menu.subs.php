@@ -72,8 +72,6 @@ use ElkArte\Menu\Menu;
  */
 function createMenu($menuData, $menuOptions = [])
 {
-	$menu = new Menu();
-
 	// Call the hook in compatibility mode
 	if (!empty($menuOptions['hook']))
 	{
@@ -81,15 +79,13 @@ function createMenu($menuData, $menuOptions = [])
 		$menuOptions['hook'] = '';
 	}
 
-	// Process options and data
-	$menu->addOptions($menuOptions);
-	$menu->addMenuData($menuData);
-
-	// Set it to context
-	$include_data = $menu->prepareMenu();
-	$menu->setContext();
-
-	return $include_data;
+	return (new Menu())
+		// Process options and data
+		->addMenuData($menuData)
+		->addOptions($menuOptions)
+		->prepareMenu()
+		->setContext()
+		->getIncludeData();
 }
 
 /**

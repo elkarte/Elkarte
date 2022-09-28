@@ -58,26 +58,26 @@ class ManageScheduledTasks extends AbstractController
 		// Control those actions
 		$action = new Action('manage_scheduled_tasks');
 
-		// Now for the lovely tabs. That we all love.
-		$context[$context['admin_menu_name']]['tab_data'] = array(
-			'title' => $txt['scheduled_tasks_title'],
-			'description' => $txt['maintain_info'],
-			'tabs' => array(
-				'tasks' => array(
-					'description' => $txt['maintain_tasks_desc'],
-				),
-				'tasklog' => array(
-					'description' => $txt['scheduled_log_desc'],
-				),
-			),
-		);
-
 		// We need to find what's the action. call integrate_sa_manage_scheduled_tasks
 		$subAction = $action->initialize($subActions, 'tasks');
 
 		// Page details
 		$context['page_title'] = $txt['maintain_info'];
 		$context['sub_action'] = $subAction;
+
+		// Now for the lovely tabs. That we all love.
+		$context[$context['admin_menu_name']]['object']->prepareTabData([
+			'title' => 'scheduled_tasks_title',
+			'description' => 'maintain_info',
+			'tabs' => [
+				'tasks' => [
+					'description' => $txt['maintain_tasks_desc'],
+				],
+				'tasklog' => [
+					'description' => $txt['scheduled_log_desc'],
+				],
+			]]
+		);
 
 		// Call the right function for this sub-action.
 		$action->dispatch($subAction);

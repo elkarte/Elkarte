@@ -76,31 +76,17 @@ class ManageSmileys extends AbstractController
 		$this->_initSmileyContext();
 
 		// Load up all the tabs...
-		$context[$context['admin_menu_name']]['tab_data'] = [
-			'title' => $txt['smileys_manage'],
+		$context[$context['admin_menu_name']]['object']->prepareTabData([
+			'title' => 'smileys_manage',
 			'help' => 'smileys',
-			'description' => $txt['smiley_settings_explain'],
+			'description' => 'smiley_settings_explain',
+			'prefix' => 'smiley',
 			'tabs' => [
-				'editsets' => [
-					'description' => $txt['smiley_editsets_explain'],
-				],
-				'addsmiley' => [
-					'description' => $txt['smiley_addsmiley_explain'],
-				],
-				'editsmileys' => [
-					'description' => $txt['smiley_editsmileys_explain'],
-				],
-				'setorder' => [
-					'description' => $txt['smiley_setorder_explain'],
-				],
 				'editicons' => [
 					'description' => $txt['icons_edit_icons_explain'],
 				],
-				'settings' => [
-					'description' => $txt['smiley_settings_explain'],
-				],
 			],
-		];
+		]);
 
 		// Default the sub-action to 'edit smiley settings'. call integrate_sa_manage_smileys
 		$subAction = $action->initialize($subActions, 'editsets');

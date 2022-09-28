@@ -75,7 +75,8 @@ $(function ()
 		$(this).parent().toggleClass("collapsed");
 	});
 
-	$('legend', function ()
+	// For any legends with data-collapsed="true", start them collapsed
+	$('legend').each(function ()
 	{
 		if ($(this).data('collapsed'))
 		{

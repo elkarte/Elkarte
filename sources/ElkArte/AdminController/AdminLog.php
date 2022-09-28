@@ -68,36 +68,36 @@ class AdminLog extends AbstractController
 				'function' => 'action_pruningSettings_display'),
 		);
 
-		// Setup the tabs.
-		$context[$context['admin_menu_name']]['tab_data'] = array(
-			'title' => $txt['logs'],
-			'description' => $txt['maintain_info'],
-			'tabs' => array(
-				'errorlog' => array(
+		// Setup the custom tabs.
+		$context[$context['admin_menu_name']]['object']->prepareTabData([
+			'title' => 'logs',
+			'description' => 'maintain_info',
+			'tabs' => [
+				'errorlog' => [
 					'url' => getUrl('admin', ['action' => 'admin', 'area' => 'logs', 'sa' => 'errorlog', 'desc']),
 					'description' => sprintf($txt['errlog_desc'], $txt['remove']),
 					'disabled' => empty($modSettings['enableErrorLogging']),
-				),
-				'adminlog' => array(
+				],
+				'adminlog' => [
 					'description' => $txt['admin_log_desc'],
-				),
-				'modlog' => array(
+				],
+				'modlog' => [
 					'description' => $txt['moderation_log_desc'],
 					'disabled' => !featureEnabled('ml') || empty($modSettings['modlog_enabled']),
-				),
-				'banlog' => array(
+				],
+				'banlog' => [
 					'description' => $txt['ban_log_description'],
-				),
-				'spiderlog' => array(
+				],
+				'spiderlog' => [
 					'description' => $txt['spider_log_desc'],
-				),
-				'tasklog' => array(
+				],
+				'tasklog' => [
 					'description' => $txt['scheduled_log_desc'],
-				),
-				'pruning' => array(
+				],
+				'pruning' => [
 					'description' => $txt['pruning_log_desc'],
-				),
-			),
+				],
+			]]
 		);
 
 		// If there is no sa set it must have come here for first time,
@@ -120,7 +120,7 @@ class AdminLog extends AbstractController
 	/**
 	 * Allow to edit the settings on the pruning screen.
 	 *
-	 * @event integrate_prune_settings add additonal settings to the auto pruning display.  If you add any
+	 * @event integrate_prune_settings add additional settings to the auto pruning display.  If you add any
 	 * additional logs make sure to add them at the end.  Additionally, make sure you add them to the
 	 * weekly scheduled task.
 	 * @uses _pruningSettings form.

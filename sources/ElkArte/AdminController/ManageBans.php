@@ -64,42 +64,39 @@ class ManageBans extends AbstractController
 		// Default the sub-action to 'view ban list'.
 		$subAction = $action->initialize($subActions, 'list');
 
-		// Tabs for browsing the different ban functions.
-		$context[$context['admin_menu_name']]['tab_data'] = array(
-			'title' => $txt['ban_title'],
-			'help' => 'ban_members',
-			'description' => $txt['ban_description'],
-			'tabs' => array(
-				'list' => array(
-					'description' => $txt['ban_description'],
-					'href' => getUrl('admin', ['action' => 'admin', 'area' => 'ban', 'sa' => 'list']),
-					'is_selected' => $subAction === 'list' || $subAction === 'edit' || $subAction === 'edittrigger',
-				),
-				'add' => array(
-					'description' => $txt['ban_description'],
-					'href' => getUrl('admin', ['action' => 'admin', 'area' => 'ban', 'sa' => 'add']),
-					'is_selected' => $subAction == 'add',
-				),
-				'browse' => array(
-					'description' => $txt['ban_trigger_browse_description'],
-					'href' => getUrl('admin', ['action' => 'admin', 'area' => 'ban', 'sa' => 'browse']),
-					'is_selected' => $subAction == 'browse',
-				),
-				'log' => array(
-					'description' => $txt['ban_log_description'],
-					'href' => getUrl('admin', ['action' => 'admin', 'area' => 'ban', 'sa' => 'log']),
-					'is_selected' => $subAction == 'log',
-					'is_last' => true,
-				),
-			),
-		);
-
 		// Make the call to integrate-manage_bans
 		call_integration_hook('integrate_manage_bans', array(&$subActions));
 
 		// Prepare some items for the template
 		$context['page_title'] = $txt['ban_title'];
 		$context['sub_action'] = $subAction;
+
+		// Tabs for browsing the different ban functions.
+		$context[$context['admin_menu_name']]['object']->prepareTabData([
+			'title' => 'ban_title',
+			'help' => 'ban_members',
+			'description' => 'ban_description',
+			'tabs' => [
+				'list' => [
+					'description' => $txt['ban_description'],
+					'href' => getUrl('admin', ['action' => 'admin', 'area' => 'ban', 'sa' => 'list']),
+					'selected' => $subAction === 'list' || $subAction === 'edit' || $subAction === 'edittrigger',
+				],
+				'add' => [
+					'description' => $txt['ban_description'],
+					'href' => getUrl('admin', ['action' => 'admin', 'area' => 'ban', 'sa' => 'add']),
+				],
+				'browse' => [
+					'description' => $txt['ban_trigger_browse_description'],
+					'href' => getUrl('admin', ['action' => 'admin', 'area' => 'ban', 'sa' => 'browse']),
+				],
+				'log' => [
+					'description' => $txt['ban_log_description'],
+					'href' => getUrl('admin', ['action' => 'admin', 'area' => 'ban', 'sa' => 'log']),
+					'is_last' => true,
+				],
+			],
+		]);
 
 		// Call the right function for this sub-action.
 		$action->dispatch($subAction);

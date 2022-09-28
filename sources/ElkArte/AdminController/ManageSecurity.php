@@ -52,20 +52,6 @@ class ManageSecurity extends AbstractController
 		// Action control
 		$action = new Action('modify_security');
 
-		// Load up all the tabs...
-		$context[$context['admin_menu_name']]['tab_data'] = array(
-			'title' => $txt['admin_security_moderation'],
-			'help' => 'securitysettings',
-			'description' => $txt['security_settings_desc'],
-			'tabs' => array(
-				'general' => array(),
-				'spam' => array(
-					'description' => $txt['antispam_Settings_desc'],
-				),
-				'moderation' => array(),
-			),
-		);
-
 		// By default, do the basic settings, call integrate_sa_modify_security
 		$subAction = $action->initialize($subActions, 'general');
 
@@ -73,6 +59,13 @@ class ManageSecurity extends AbstractController
 		$context['sub_action'] = $subAction;
 		$context['page_title'] = $txt['admin_security_moderation'];
 		$context['sub_template'] = 'show_settings';
+
+		// Load up all the tabs...
+		$context[$context['admin_menu_name']]['object']->prepareTabData([
+			'title' => 'admin_security_moderation',
+			'help' => 'securitysettings',
+			'description' => 'security_settings_desc',
+		]);
 
 		// Call the right function for this sub-action.
 		$action->dispatch($subAction);

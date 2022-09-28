@@ -121,24 +121,13 @@ class ManageThemes extends AbstractController
 		// Action controller
 		$action = new Action('manage_themes');
 
-		// @todo Layout Settings?
 		if (!empty($context['admin_menu_name']))
 		{
-			$context[$context['admin_menu_name']]['tab_data'] = array(
-				'title' => $txt['themeadmin_title'],
-				'description' => $txt['themeadmin_description'],
-				'tabs' => array(
-					'admin' => array(
-						'description' => $txt['themeadmin_admin_desc'],
-					),
-					'list' => array(
-						'description' => $txt['themeadmin_list_desc'],
-					),
-					'reset' => array(
-						'description' => $txt['themeadmin_reset_desc'],
-					),
-				),
-			);
+			$context[$context['admin_menu_name']]['object']->prepareTabData([
+				'title' => 'themeadmin_title',
+				'description' => 'themeadmin_description',
+				'prefix' => 'themeadmin',
+			]);
 		}
 
 		// Follow the sa or just go to administration, call integrate_sa_manage_themes

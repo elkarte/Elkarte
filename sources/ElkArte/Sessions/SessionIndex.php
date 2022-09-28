@@ -16,7 +16,7 @@ namespace ElkArte\Sessions;
 use ElkArte\ValuesContainer;
 
 /**
- *
+ * Class SessionIndex
  */
 class SessionIndex extends ValuesContainer
 {

@@ -54,18 +54,18 @@ class ManageSearchEngines extends AbstractController
 		// Control
 		$action = new Action('manage_search_engines');
 
-		// Some more tab data.
-		$context[$context['admin_menu_name']]['tab_data'] = array(
-			'title' => $txt['search_engines'],
-			'description' => $txt['search_engines_description'],
-		);
-
 		// Ensure we have a valid subaction. call integrate_sa_manage_search_engines
 		$subAction = $action->initialize($subActions, 'stats');
 
 		// Some contextual data for the template.
 		$context['sub_action'] = $subAction;
 		$context['page_title'] = $txt['search_engines'];
+
+		// Some more tab data.
+		$context[$context['admin_menu_name']]['object']->prepareTabData([
+			'title' => 'search_engines',
+			'description' => 'search_engines_description',
+		]);
 
 		// Call the right function for this sub-action.
 		$action->dispatch($subAction);

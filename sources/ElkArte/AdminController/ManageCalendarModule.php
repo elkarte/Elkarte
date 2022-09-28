@@ -82,18 +82,18 @@ class ManageCalendarModule extends AbstractController
 		$action = new Action('manage_calendar');
 
 		// Set up the two tabs here...
-		$context[$context['admin_menu_name']]['tab_data'] = array(
-			'title' => $txt['manage_calendar'],
+		$context[$context['admin_menu_name']]['object']->prepareTabData([
+			'title' => 'manage_calendar',
+			'description' => 'calendar_settings_desc',
 			'help' => 'calendar',
-			'description' => $txt['calendar_settings_desc'],
-			'tabs' => array(
-				'holidays' => array(
+			'tabs' => [
+				'holidays' => [
 					'description' => $txt['manage_holidays_desc'],
-				),
-				'settings' => array(
+				],
+				'settings' => [
 					'description' => $txt['calendar_settings_desc'],
-				),
-			),
+				],
+			]]
 		);
 
 		// Set up the default subaction, call integrate_sa_manage_calendar

@@ -416,11 +416,11 @@ class Likes extends AbstractController
 		);
 
 		// Menu tabs
-		$context[$context['profile_menu_name']]['tab_data'] = [
+		$context[$context['profile_menu_name']]['object']->prepareTabData([
 			'title' => $txt['likes'],
-			'description' =>  $txt['likes_received'],
+			'description' => $txt['likes_received'],
 			'class' => 'i-thumbsup',
-		];
+		]);
 
 		// Set the context values
 		$context['page_title'] = $txt['likes'];
@@ -554,11 +554,11 @@ class Likes extends AbstractController
 		);
 
 		// Menu tabs
-		$context[$context['profile_menu_name']]['tab_data'] = [
+		$context[$context['profile_menu_name']]['object']->prepareTabData([
 			'title' => $txt['likes'],
 			'description' => $txt['likes_given'],
 			'class' => 'i-thumbsup',
-		];
+		]);
 
 		// Set the context values
 		$context['page_title'] = $txt['likes'];

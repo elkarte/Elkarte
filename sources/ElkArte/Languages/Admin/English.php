@@ -334,6 +334,7 @@ $txt['membergroups'] = 'Member groups';
 $txt['confirm_delete_members'] = 'Are you sure you want to delete the selected members?';
 
 $txt['support_credits_title'] = 'Support &amp; Credits';
+$txt['support_credits_desc'] = 'Forum information, resources and credits for the ElkArte project.';
 $txt['support_credits_info'] = 'Support links for most common issues, the relevant forum version information you will be asked for when you request help and a list of contributors to the ElkArte project.';
 $txt['support_title'] = 'Support Information';
 $txt['support_versions_current'] = 'Current version';
@@ -344,7 +345,7 @@ $txt['support_versions_gd'] = 'GD version';
 $txt['support_versions_imagick'] = 'Imagick version';
 $txt['support_versions'] = 'Version Information';
 $txt['support_resources'] = 'Support Resources';
-$txt['support_resources_p1'] = 'Our <a href="%1$s" target="_blank" class="new_win">Documentation Wiki</a> provides the main documentation for ElkArte. The ElkArte Online Manual has many documents to help answer support questions and explain <a href="%2$s" target="_blank" class="new_win">Features</a>, <a href="%3$s" target="_blank" class="new_win">Settings</a>, <a href="%4$s" target="_blank" class="new_win">Themes</a>, <a href="%5$s" target="_blank" class="new_win">Packages</a>, etc. The Online Manual documents each area of ElkArte thoroughly and should answer most questions quickly.';
+$txt['support_resources_p1'] = 'Our <a href="%1$s" target="_blank" class="new_win linkbutton">Documentation Wiki</a> provides the main documentation for ElkArte. The ElkArte Online Manual has many documents to help answer support questions and explain <a href="%2$s" target="_blank" class="new_win">Features</a>, <a href="%3$s" target="_blank" class="new_win">Settings</a>, <a href="%4$s" target="_blank" class="new_win">Themes</a>, <a href="%5$s" target="_blank" class="new_win">Packages</a>, etc. The Online Manual documents each area of ElkArte thoroughly and should answer most questions quickly.';
 $txt['support_resources_p2'] = 'If you can\'t find the answers to your questions in the Documentation Wiki, you may want to search our <a href="%1$s" target="_blank" class="new_win">Support Community</a> or ask for assistance in our support boards. The ElkArte Support Community can be used for <a href="%2$s" target="_blank" class="new_win">support</a>, <a href="%3$s" target="_blank" class="new_win">customization</a>, and many other things such as discussing ElkArte, finding a host, and discussing administrative issues with other forum administrators.';
 $txt['server_cores'] = 'CPU Cores';
 $txt['server_space'] = 'Disk Space';

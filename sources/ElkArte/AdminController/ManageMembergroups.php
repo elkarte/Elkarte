@@ -84,10 +84,10 @@ class ManageMembergroups extends AbstractController
 		$action = new Action('manage_membergroups');
 
 		// Setup the admin tabs.
-		$context[$context['admin_menu_name']]['tab_data'] = array(
-			'title' => $txt['membergroups_title'],
-			'help' => 'membergroups',
-			'description' => $txt['membergroups_description'],
+		$context[$context['admin_menu_name']]['object']->prepareTabData([
+			'title' => 'membergroups_title',
+			'description' => 'membergroups_description',
+			'help' => 'membergroups']
 		);
 
 		// Set that subaction, call integrate_sa_manage_membergroups

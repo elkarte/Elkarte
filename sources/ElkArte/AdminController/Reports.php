@@ -78,11 +78,11 @@ class Reports extends AbstractController
 		call_integration_hook('integrate_report_types');
 
 		// Load up all the tabs...
-		$context[$context['admin_menu_name']]['tab_data'] = array(
-			'title' => $txt['generate_reports'],
+		$context[$context['admin_menu_name']]['object']->prepareTabData([
+			'title' => 'generate_reports',
 			'class' => 'i-post-text',
-			'description' => $txt['generate_reports_desc'],
-		);
+			'description' => 'generate_reports_desc',
+		]);
 
 		$is_first = 0;
 		foreach ($context['report_types'] as $k => $temp)

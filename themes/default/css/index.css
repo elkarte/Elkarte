@@ -633,9 +633,13 @@ em, .em {
 }
 
 .generic_list_wrapper .additional_row {
-	margin: 0;
+	margin: 1em 0 0 0;
 	padding: .67em 0 0;
 	border-radius: 0;
+}
+
+.generic_list_wrapper .additional_row.after_title, .generic_list_wrapper .additional_row.top_of_list {
+	margin: 0;
 }
 
 .generic_list_wrapper .title_bar {
@@ -1674,9 +1678,9 @@ a.bbc_link {
 	margin: 8% 50% 0 0;
 }
 
-/* Used on the sidebar, elsewhere ? */
+/* Used on the sidebar, admin menu dropdown selected area */
 .linklevel1.chosen, .linklevel2.chosen {
-	font-weight: 700;
+	font-weight: 600;
 }
 
 /* -------------------------------------------------------
@@ -5306,12 +5310,12 @@ div.labels {
 	overflow: hidden;
 	max-width: 640px;
 	margin: .12em auto 0 auto;
-	padding: 1em;
+	padding: 0 1em;
 }
 
 .form_field {
 	position: relative;
-	margin: 1.5em auto .75em auto;
+	margin: 1.25em auto .5em auto;
 }
 
 /* Move label text to be the placeholder text for text elements */
@@ -5413,7 +5417,7 @@ div.labels {
 
 /* Make room for the little icon */
 .warningbox, .successbox, .infobox, .errorbox {
-	padding-left: 2.75em;
+	padding-left: 2.75em !important;
 	background-repeat: no-repeat;
 	background-position: 4px 50%;
 	background-size: 24px 24px;

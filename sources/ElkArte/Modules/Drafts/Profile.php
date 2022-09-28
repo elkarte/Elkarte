@@ -17,6 +17,7 @@
 namespace ElkArte\Modules\Drafts;
 
 use ElkArte\EventManager;
+use ElkArte\Menu\MenuArea;
 use ElkArte\Modules\AbstractModule;
 use ElkArte\Languages\Txt;
 
@@ -51,13 +52,13 @@ class Profile extends AbstractModule
 	/**
 	 * If drafts are enabled, provides an interface to display them for the user
 	 *
-	 * @param array $profile_areas
+	 * @param \ElkArte\Menu\Menu $profile_areas
 	 */
-	public static function integrate_profile_areas(&$profile_areas)
+	public static function integrate_profile_areas($profile_areas)
 	{
 		global $txt, $context;
 
-		$profile_areas['info']['areas'] = elk_array_insert($profile_areas['info']['areas'], 'showposts', array(
+		$new_areas['info'] = array(
 			'showdrafts' => array(
 				'label' => $txt['drafts_show'],
 				'controller' => '\\ElkArte\\Controller\\Draft',
@@ -67,7 +68,10 @@ class Profile extends AbstractModule
 					'own' => 'profile_view_own',
 					'any' => array(),
 				),
-			)), 'after');
+			)
+		);
+
+		return $profile_areas->insertSection($new_areas, 'showposts');
 	}
 
 	/**

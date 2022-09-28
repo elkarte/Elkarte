@@ -115,6 +115,10 @@ class ManageMembers extends AbstractController
 			}
 		}
 
+		// Last items for the template
+		$context['page_title'] = $txt['admin_members'];
+		$context['sub_action'] = $subAction;
+
 		// For the page header... do we show activation?
 		$context['show_activate'] = (!empty($modSettings['registration_method']) && $modSettings['registration_method'] == 1) || !empty($context['awaiting_activation']);
 
@@ -122,68 +126,42 @@ class ManageMembers extends AbstractController
 		$context['show_approve'] = (!empty($modSettings['registration_method']) && $modSettings['registration_method'] == 2) || !empty($context['awaiting_approval']) || !empty($modSettings['approveAccountDeletion']);
 
 		// Setup the admin tabs.
-		$context[$context['admin_menu_name']]['tab_data'] = array(
-			'title' => $txt['admin_members'],
+		$context[$context['admin_menu_name']]['object']->prepareTabData([
+			'title' => 'admin_members',
 			'help' => 'view_members',
-			'description' => $txt['admin_members_list'],
-			'tabs' => array(),
-		);
-
-		$context['tabs'] = array(
-			'viewmembers' => array(
-				'label' => $txt['view_all_members'],
-				'description' => $txt['admin_members_list'],
-				'url' => getUrl('admin', ['action' => 'admin', 'area' => 'viewmembers', 'sa' => 'all']),
-				'is_selected' => $subAction === 'all',
-			),
-			'search' => array(
-				'label' => $txt['mlist_search'],
-				'description' => $txt['admin_members_list'],
-				'url' => getUrl('admin', ['action' => 'admin', 'area' => 'viewmembers', 'sa' => 'search']),
-				'is_selected' => $subAction === 'search' || $subAction === 'query',
-			),
-			'approve' => array(
-				'label' => sprintf($txt['admin_browse_awaiting_approval'], $context['awaiting_approval']),
-				'description' => $txt['admin_browse_approve_desc'],
-				'url' => getUrl('admin', ['action' => 'admin', 'area' => 'viewmembers', 'sa' => 'browse', 'type' => 'approve']),
-				'is_selected' => false,
-			),
-			'activate' => array(
-				'label' => sprintf($txt['admin_browse_awaiting_activate'], $context['awaiting_activation']),
-				'description' => $txt['admin_browse_activate_desc'],
-				'url' => getUrl('admin', ['action' => 'admin', 'area' => 'viewmembers', 'sa' => 'browse', 'type' => 'activate']),
-				'is_selected' => false,
-				'is_last' => true,
-			),
-		);
+			'description' => 'admin_members_list',
+			'tabs' => [
+				'viewmembers' => [
+					'label' => $txt['view_all_members'],
+					'description' => $txt['admin_members_list'],
+					'url' => getUrl('admin', ['action' => 'admin', 'area' => 'viewmembers', 'sa' => 'all']),
+					'selected' => $subAction === 'all',
+				],
+				'search' => [
+					'label' => $txt['mlist_search'],
+					'description' => $txt['admin_members_list'],
+					'url' => getUrl('admin', ['action' => 'admin', 'area' => 'viewmembers', 'sa' => 'search']),
+					'selected' => $subAction === 'search' || $subAction === 'query',
+				],
+				'approve' => [
+					'label' => sprintf($txt['admin_browse_awaiting_approval'], $context['awaiting_approval']),
+					'description' => $txt['admin_browse_approve_desc'],
+					'url' => getUrl('admin', ['action' => 'admin', 'area' => 'viewmembers', 'sa' => 'browse', 'type' => 'approve']),
+					'disabled' => !$context['show_approve'] && ($subAction !== 'browse' || $this->_req->query->type !== 'approve'),
+					'selected' => ($subAction !== 'browse' || $this->_req->query->type === 'approve'),
+				],
+				'activate' => [
+					'label' => sprintf($txt['admin_browse_awaiting_activate'], $context['awaiting_activation']),
+					'description' => $txt['admin_browse_activate_desc'],
+					'url' => getUrl('admin', ['action' => 'admin', 'area' => 'viewmembers', 'sa' => 'browse', 'type' => 'activate']),
+					'disabled' => !$context['show_activate'] && ($subAction !== 'browse' || $this->_req->query->type !== 'activate'),
+					'selected' => ($subAction !== 'browse' || $this->_req->query->type === 'activate'),
+				],
+			]
+		]);
 
 		// Call integrate_manage_members
 		call_integration_hook('integrate_manage_members', array(&$subActions));
-
-		// Sort out the tabs for the ones which may not exist!
-		if (!$context['show_activate'] && ($subAction !== 'browse' || $this->_req->query->type !== 'activate'))
-		{
-			$context['tabs']['approve']['is_last'] = true;
-			unset($context['tabs']['activate']);
-		}
-
-		// Unset approval tab if it shouldn't be there.
-		if (!$context['show_approve'] && ($subAction !== 'browse' || $this->_req->query->type !== 'approve'))
-		{
-			if (!$context['show_activate'] && ($subAction !== 'browse' || $this->_req->query->type !== 'activate'))
-			{
-				$context['tabs']['search']['is_last'] = true;
-			}
-
-			unset($context['tabs']['approve']);
-		}
-
-		// This is a cheat but prepareTabData is called earlier and we need to add them
-		$context['menu_data_' . $context['max_menu_id']]['tab_data']['tabs'] = $context['tabs'];
-
-		// Last items for the template
-		$context['page_title'] = $txt['admin_members'];
-		$context['sub_action'] = $subAction;
 
 		// Off we go
 		$action->dispatch($subAction);

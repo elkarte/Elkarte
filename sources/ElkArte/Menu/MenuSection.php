@@ -74,4 +74,24 @@ class MenuSection extends MenuItem
 
 		return $this;
 	}
+
+	/**
+	 * Allow to insert a new menu section after a supplied location
+	 *
+	 * @param string $id the name of the new section
+	 * @param string $location the name of the section after which to insert $id
+	 * @param MenuArea $area the area as processed by MenuArea::buildFromArray
+	 *
+	 * @return $this
+	 */
+	public function insertArea($id, $location, $area)
+	{
+		$current = $this->getAreas();
+
+		$current = elk_array_insert($current, $location, [$id => $area], 'after');
+
+		$this->areas = $current;
+
+		return $this;
+	}
 }

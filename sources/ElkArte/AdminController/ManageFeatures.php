@@ -113,29 +113,6 @@ class ManageFeatures extends AbstractController
 		// Set up the action control
 		$action = new Action('modify_features');
 
-		// Load up all the tabs...
-		$context[$context['admin_menu_name']]['tab_data'] = array(
-			'title' => $txt['modSettings_title'],
-			'help' => 'featuresettings',
-			'description' => sprintf($txt['modSettings_desc'], getUrl('admin', ['action' => 'admin', 'area' => 'theme', 'sa' => 'list', 'th' => $settings['theme_id'], '{session_data}'])),
-			'tabs' => array(
-				'basic' => array(),
-				'layout' => array(),
-				'pmsettings' => array(),
-				'karma' => array(),
-				'likes' => array(),
-				'mention' => array(
-					'description' => $txt['mentions_settings_desc'],
-				),
-				'sig' => array(
-					'description' => $txt['signature_settings_desc'],
-				),
-				'profile' => array(
-					'description' => $txt['custom_profile_desc'],
-				),
-			),
-		);
-
 		// By default do the basic settings, call integrate_sa_modify_features
 		$subAction = $action->initialize($subActions, 'basic');
 
@@ -143,6 +120,25 @@ class ManageFeatures extends AbstractController
 		$context['sub_template'] = 'show_settings';
 		$context['sub_action'] = $subAction;
 		$context['page_title'] = $txt['modSettings_title'];
+
+		// Load up all the tabs...
+		$context[$context['admin_menu_name']]['object']->prepareTabData([
+			'title' => 'modSettings_title',
+			'help' => 'featuresettings',
+			'description' => sprintf($txt['modSettings_desc'], getUrl('admin', ['action' => 'admin', 'area' => 'theme', 'sa' => 'list', 'th' => $settings['theme_id'], '{session_data}'])),
+			// All valid $subActions will be added, here you just specify any special tab data
+			'tabs' => [
+				'mention' => [
+					'description' => $txt['mentions_settings_desc'],
+				],
+				'sig' => [
+					'description' => $txt['signature_settings_desc'],
+				],
+				'profile' => [
+					'description' => $txt['custom_profile_desc'],
+				],
+			],
+		]);
 
 		// Call the right function for this sub-action.
 		$action->dispatch($subAction);

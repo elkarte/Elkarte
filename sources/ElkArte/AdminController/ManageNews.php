@@ -89,28 +89,28 @@ class ManageNews extends AbstractController
 		// Action control
 		$action = new Action('manage_news');
 
-		// Create the tabs for the template.
-		$context[$context['admin_menu_name']]['tab_data'] = array(
-			'title' => $txt['news_title'],
-			'help' => 'edit_news',
-			'description' => $txt['admin_news_desc'],
-			'tabs' => array(
-				'editnews' => array(),
-				'mailingmembers' => array(
-					'description' => $txt['news_mailing_desc'],
-				),
-				'settings' => array(
-					'description' => $txt['news_settings_desc'],
-				),
-			),
-		);
-
 		// Give integration its shot via integrate_sa_manage_news
 		$subAction = $action->initialize($subActions, (allowedTo('edit_news') ? 'editnews' : (allowedTo('send_mail') ? 'mailingmembers' : 'settings')));
 
 		// Some bits for the template
 		$context['page_title'] = $txt['news_title'];
 		$context['sub_action'] = $subAction;
+
+		// Create the tabs for the template.
+		$context[$context['admin_menu_name']]['object']->prepareTabData([
+			'title' => 'news_title',
+			'help' => 'edit_news',
+			'description' => 'admin_news_desc',
+			'tabs' => [
+				'editnews' => [],
+				'mailingmembers' => [
+					'description' => $txt['news_mailing_desc'],
+				],
+				'settings' => [
+					'description' => $txt['news_settings_desc'],
+				],
+			],
+		]);
 
 		// Force the right area...
 		if (substr($subAction, 0, 7) === 'mailing')
@@ -1018,8 +1018,8 @@ class ManageNews extends AbstractController
 		$config_vars = array(
 			array('title', 'settings'),
 			// Inline permissions.
-			array('permissions', 'edit_news', 'help' => ''),
-			array('permissions', 'send_mail'),
+			array('permissions', 'edit_news', 'help' => '', 'collapsed' => true),
+			array('permissions', 'send_mail', 'collapsed' => true),
 			'',
 			// Just the remaining settings.
 			array('check', 'xmlnews_enable', 'onclick' => 'document.getElementById(\'xmlnews_maxlen\').disabled = !this.checked;document.getElementById(\'xmlnews_limit\').disabled = !this.checked;'),

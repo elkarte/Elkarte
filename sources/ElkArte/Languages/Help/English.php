@@ -569,9 +569,6 @@ $helptxt['posts_and_topics'] = '
 			<strong>Post Settings</strong><br />
 			Modify the settings related to the posting of messages and the way messages are shown.
 		</li><li>
-			<strong>Bulletin Board Code</strong><br />
-			Enable the code that allows to format forum messages. Also adjust which BBCodes are allowed and which aren\'t.
-		</li><li>
 			<strong>Censored Words</strong>
 			In order to keep the language on your forum under control, you can censor certain words. This function allows you to convert forbidden words into innocent versions.
 		</li><li>

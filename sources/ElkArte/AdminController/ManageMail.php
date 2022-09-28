@@ -59,19 +59,19 @@ class ManageMail extends AbstractController
 		// Action control
 		$action = new Action('manage_mail');
 
-		// Load up all the tabs...
-		$context[$context['admin_menu_name']]['tab_data'] = array(
-			'title' => $txt['mailqueue_title'],
-			'class' => 'i-envelope',
-			'description' => $txt['mailqueue_desc'],
-		);
-
 		// By default we want to browse, call integrate_sa_manage_mail
 		$subAction = $action->initialize($subActions, 'browse');
 
 		// Final bits
 		$context['sub_action'] = $subAction;
 		$context['page_title'] = $txt['mailqueue_title'];
+
+		// Load up all the tabs...
+		$context[$context['admin_menu_name']]['object']->prepareTabData([
+			'title' => 'mailqueue_title',
+			'class' => 'i-envelope',
+			'description' => 'mailqueue_desc',
+		]);
 
 		// Call the right function for this sub-action.
 		$action->dispatch($subAction);

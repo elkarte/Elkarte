@@ -70,30 +70,20 @@ class ManageSearch extends AbstractController
 		// Control for actions
 		$action = new Action('manage_search');
 
-		// Create the tabs for the template.
-		$context[$context['admin_menu_name']]['tab_data'] = array(
-			'title' => $txt['manage_search'],
-			'help' => 'search',
-			'description' => $txt['search_settings_desc'],
-			'tabs' => array(
-				'method' => array(
-					'description' => $txt['search_method_desc'],
-				),
-				'weights' => array(
-					'description' => $txt['search_weights_desc'],
-				),
-				'settings' => array(
-					'description' => $txt['search_settings_desc'],
-				),
-			),
-		);
-
 		// Default the sub-action to 'edit search method'.  Call integrate_sa_manage_search
 		$subAction = $action->initialize($subActions, 'method');
 
 		// Final bits
 		$context['sub_action'] = $subAction;
 		$context['page_title'] = $txt['search_settings_title'];
+
+		// Create the tabs
+		$context[$context['admin_menu_name']]['object']->prepareTabData([
+			'title' => 'manage_search',
+			'description' => 'search_settings_desc',
+			'prefix' => 'search',
+			'help' => 'search']
+		);
 
 		// Call the right function for this sub-action.
 		$action->dispatch($subAction);
@@ -190,12 +180,11 @@ class ManageSearch extends AbstractController
 		// What are we editing anyway?
 		$config_vars = array(
 			// Permission...
-			array('permissions', 'search_posts'),
+			array('permissions', 'search_posts', 'collapsed' => 'true'),
 			// Some simple settings.
 			array('check', 'search_dropdown'),
 			array('int', 'search_results_per_page'),
 			array('int', 'search_max_results', 'subtext' => $txt['search_max_results_disable']),
-			'',
 			// Some limitations.
 			array('int', 'search_floodcontrol_time', 'subtext' => $txt['search_floodcontrol_time_desc'], 6, 'postinput' => $txt['seconds']),
 			array('title', 'additional_search_engines'),

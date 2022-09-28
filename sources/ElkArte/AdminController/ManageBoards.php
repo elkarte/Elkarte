@@ -105,26 +105,20 @@ class ManageBoards extends AbstractController
 				'permission' => 'admin_forum'),
 		);
 
-		// Create the tabs for the template.
-		$context[$context['admin_menu_name']]['tab_data'] = array(
-			'title' => $txt['boards_and_cats'],
-			'help' => 'manage_boards',
-			'description' => $txt['boards_and_cats_desc'],
-			'tabs' => array(
-				'main' => array(),
-				'newcat' => array(),
-				'settings' => array(
-					'description' => $txt['mboards_settings_desc'],
-				),
-			),
-		);
-
 		// You way will end here if you don't have permission.
 		$action = new Action('manage_boards');
 
 		// Default to sub-action 'main' or 'settings' depending on permissions.
 		$subAction = $action->initialize($subActions, allowedTo('manage_boards') ? 'main' : 'settings');
 		$context['sub_action'] = $subAction;
+
+		// Create the tabs for the template.
+		$context[$context['admin_menu_name']]['object']->prepareTabData([
+			'title' => 'boards_and_cats',
+			'help' => 'manage_boards',
+			'description' => 'boards_and_cats_desc',
+			'prefix' => 'mboards',
+		]);
 
 		$action->dispatch($subAction);
 	}

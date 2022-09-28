@@ -3,14 +3,13 @@
 
 /* Special styling for admin descriptions. */
 .action_admin .generic_list_wrapper .information {
-	margin: .5em 0;
-	padding: .25em .75em .25em 1em;
+	margin: 0 0 .5em 0;
 	border: 1px solid;
-	border-radius: 2px;
+	border-radius: 0 0 2px 2px;
 }
 
-.action_admin .generic_list_wrapper .information div {
-	background: none;
+.action_admin .generic_list_wrapper .information .additional_row {
+	padding: .75em;
 }
 
 .information a {
@@ -231,22 +230,20 @@ h3.category_header form {
 
 /* Links to handy sections of admin.
 ----------------------------------*/
-/* The <li>'s here have been set to a height in em with hidden overflow.
-   Yes, this will clip the blurb when using very large font sizes on a narrowish screen.
-   However, more than enough content is still available for clarity,
-   and the advantage is that a clean layout is always maintained.
-   The <li>'s could be set to auto overflow instead, but that just clutters things up with scrollbars.
-   Scrollbars here look worse, take up space, and don't really add anything useful in this context. */
+
+#quick_tasks {
+	column-count: 2;
+	column-gap: 10px;
+}
 
 #quick_tasks li {
-	float: left;
 	overflow: auto;
-	width: 50%;
-	min-height: 7em;
-	padding: 10px 6px 10px 6px;
+	min-height: 8em;
+	padding: 10px 0;
 	list-style: none;
 	border-top: 1px solid;
 	border-bottom: 1px solid;
+	break-inside: avoid-column;
 }
 
 #quick_tasks h5 {
@@ -262,14 +259,6 @@ h3.category_header form {
 #quick_tasks li span {
 	display: block;
 	margin: 0 0 0 80px;
-}
-
-#quick_tasks li:first-child, #quick_tasks li:nth-child(2) {
-	border-top: none;
-}
-
-#quick_tasks li:last-child, #quick_tasks li:nth-last-child(2) {
-	border-bottom: none;
 }
 
 /* Styles for the support and credits page.
@@ -646,6 +635,10 @@ ul.package_servers li {
 	width: 80%;
 }
 
+#verification_image {
+	max-height: 60px;
+}
+
 /* Styles for the manage permissions section. */
 #permissionForm .table_grid {
 	width: 100%;
@@ -694,7 +687,8 @@ ul.package_servers li {
 }
 
 .ban_settings {
-	width: 46%;
+	width: 45%;
+	margin: 0 1em 0 0;
 }
 
 .ban_text {
@@ -710,6 +704,10 @@ ul.package_servers li {
 
 #manage_bans fieldset dl.settings {
 	margin-bottom: 0;
+}
+
+#admin_form_wrapper legend .input_check {
+	vertical-align: middle;
 }
 
 /* Styles for the manage subscriptions section. */

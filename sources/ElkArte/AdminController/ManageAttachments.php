@@ -116,16 +116,16 @@ class ManageAttachments extends AbstractController
 		// Default page title is good.
 		$context['page_title'] = $txt['attachments_avatars'];
 
-		// This uses admin tabs - as it should!
-		$context[$context['admin_menu_name']]['tab_data'] = array(
-			'title' => $txt['attachments_avatars'],
-			'help' => 'manage_files',
-			'description' => $txt['attachments_desc'],
-		);
-
 		// Get the subAction, call integrate_sa_manage_attachments
 		$subAction = $action->initialize($subActions, 'browse');
 		$context['sub_action'] = $subAction;
+
+		// This uses admin tabs - as it should!
+		$context[$context['admin_menu_name']]['object']->prepareTabData([
+			'title' => 'attachments_avatars',
+			'help' => 'manage_files',
+			'description' => 'attachments_desc',
+		]);
 
 		// Finally, go to where we want to go
 		$action->dispatch($subAction);

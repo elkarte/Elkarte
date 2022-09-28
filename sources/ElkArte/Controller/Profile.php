@@ -19,11 +19,13 @@
 namespace ElkArte\Controller;
 
 use ElkArte\AbstractController;
+use ElkArte\Action;
 use ElkArte\Cache\Cache;
 use ElkArte\EventManager;
 use ElkArte\Exceptions\Exception;
 use ElkArte\MembersList;
 use ElkArte\Languages\Txt;
+use ElkArte\Menu\Menu;
 use ElkArte\User;
 use ElkArte\Util;
 
@@ -124,10 +126,6 @@ class Profile extends AbstractController
 		$this->_profile_include_data['permission'] = $this->_profile_include_data['permission'][$context['user']['is_owner'] ? 'own' : 'any'];
 		isAllowedTo($this->_profile_include_data['permission']);
 
-		// Make a note of the Unique ID for this menu.
-		$context['profile_menu_id'] = $context['max_menu_id'];
-		$context['profile_menu_name'] = 'menu_data_' . $context['profile_menu_id'];
-
 		// Set the selected item - now it's been validated.
 		$this->_current_area = $this->_profile_include_data['current_area'];
 		$this->_current_subsection = $this->_profile_include_data['current_subsection'] ?? '';
@@ -175,13 +173,16 @@ class Profile extends AbstractController
 			redirectexit('action=profile' . ($context['user']['is_owner'] ? '' : ';u=' . $this->_memID) . ';area=' . $this->_current_area);
 		}
 
-		callMenu($this->_profile_include_data);
-
 		// Set the page title if it's not already set...
 		if (!isset($context['page_title']))
 		{
 			$context['page_title'] = $txt['profile'] . (isset($txt[$this->_current_area]) ? ' - ' . $txt[$this->_current_area] : '');
 		}
+
+		// And off we go,
+		$action = new Action();
+		$action->initialize(['action' => $this->_profile_include_data]);
+		$action->dispatch('action');
 	}
 
 	/**
@@ -493,17 +494,27 @@ class Profile extends AbstractController
 		);
 
 		// Set a few options for the menu.
-		$menuOptions = array(
+		$menuOptions = [
 			'disable_url_session_check' => true,
 			'hook' => 'profile',
-			'extra_url_parameters' => array(
+			'extra_url_parameters' => [
 				'u' => $context['id_member'],
-			),
-		);
+			],
+		];
 
 		// Actually create the menu!
-		$this->_profile_include_data = createMenu($profile_areas, $menuOptions);
+		$this->_profile_include_data = (new Menu())
+			->addMenuData($profile_areas)
+			->addOptions($menuOptions)
+			->prepareMenu()
+			->setContext()
+			->getIncludeData();
+
 		unset($profile_areas);
+
+		// Make a note of the Unique ID for this menu.
+		$context['profile_menu_id'] = $context['max_menu_id'];
+		$context['profile_menu_name'] = 'menu_data_' . $context['profile_menu_id'];
 	}
 
 	/**
@@ -513,7 +524,7 @@ class Profile extends AbstractController
 	{
 		global $context;
 
-		// Check the session if required and they are trying to save
+		// Check the session, if required, and they are trying to save
 		$this->completedSave = false;
 		if (isset($this->_profile_include_data['sc']) && (isset($this->isSaving) || $context['do_preview']))
 		{
