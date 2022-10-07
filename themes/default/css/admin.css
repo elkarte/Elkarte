@@ -1069,6 +1069,11 @@ Adjusts display of wording and selections to one line.
 	padding: 0 .25em;
 }
 
+#admin_register_form dt span {
+	display: block;
+	padding: 0;
+}
+
 /* Styles for the moderation center.
 ------------------------------------------------- */
 #modcenter {
