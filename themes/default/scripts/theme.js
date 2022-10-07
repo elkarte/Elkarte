@@ -62,7 +62,7 @@ $(function() {
 		$(this).parent().toggleClass("collapsed");
 	});
 
-	$('legend', function () {
+	$('legend').each(function () {
 		if ($(this).data('collapsed'))
 			$(this).click();
 	});
