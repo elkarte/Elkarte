@@ -500,6 +500,13 @@ class Attachment_Controller extends Action_Controller
 
 		// Someone is getting a present
 		header('Content-Length: ', strlen($body));
+
+		// Forcibly end any output buffering going on.
+		while (@ob_get_level() > 0)
+		{
+			@ob_end_clean();
+		}
+
 		echo $body;
 	}
 
