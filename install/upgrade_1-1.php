@@ -850,6 +850,31 @@ class UpgradeInstructions_upgrade_1_1
 		);
 	}
 
+	public function passwd_size_title()
+	{
+		return 'More space for passwd hash...';
+	}
+
+	public function passwd_size()
+	{
+		return array(
+			array(
+				'debug_title' => 'Altering passwd column to varchar(255)...',
+				'function' => function()
+				{
+					$this->table->db_change_column('{db_prefix}members',
+						'passwd',
+						array(
+							'type' => 'varchar',
+							'size' => 255,
+							'default' => ''
+						)
+					);
+				}
+			)
+		);
+	}
+
 	public function update_settings_title()
 	{
 		return 'Updating needed settings...';

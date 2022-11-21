@@ -9,7 +9,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.1
+ * @version 1.1.9
  *
  */
 
@@ -1853,7 +1853,7 @@ class InstallInstructions_install_1_1
 				array('name' => 'pm_prefs',             'type' => 'mediumint', 'size' => 8, 'default' => 2),
 				array('name' => 'mod_prefs',            'type' => 'varchar', 'size' => 20, 'default' => ''),
 				array('name' => 'message_labels',       'type' => 'text'),
-				array('name' => 'passwd',               'type' => 'varchar', 'size' => 64, 'default' => ''),
+				array('name' => 'passwd',               'type' => 'varchar', 'size' => 255, 'default' => ''),
 				array('name' => 'openid_uri',           'type' => 'text'),
 				array('name' => 'email_address',        'type' => 'varchar', 'size' => 255, 'default' => ''),
 				array('name' => 'birthdate',            'type' => 'date', 'default' => '0001-01-01'),
