@@ -35,7 +35,7 @@ function template_quotefast()
 
 	echo '<', '?xml version="1.0" encoding="UTF-8"?', '>
 <elk>
-	<quote><![CDATA[', cleanXml($context['quote']['xml']), ']]></quote>
+	<quote>', cleanXml($context['quote']['xml']), '</quote>
 </elk>';
 }
 

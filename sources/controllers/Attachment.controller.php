@@ -462,15 +462,15 @@ class Attachment_Controller extends Action_Controller
 	{
 		global $modSettings;
 
-		// Not compressible, or not supported / requested by client
-		if (!preg_match('~^(?:text/|application/(?:json|xml|rss\+xml)$)~i', $mime_type)
-			|| (!isset($_SERVER['HTTP_ACCEPT_ENCODING']) || strpos($_SERVER['HTTP_ACCEPT_ENCODING'], 'gzip') === false))
+		// Support is available on the server
+		if (!function_exists('gzencode') || empty($modSettings['enableCompressedOutput']))
 		{
 			return false;
 		}
 
-		// Support is available on the server
-		if (!function_exists('gzencode') || empty($modSettings['enableCompressedOutput']))
+		// Not compressible, or not supported / requested by client
+		if (!preg_match('~^(?:text/|application/(?:json|xml|rss\+xml)$)~i', $mime_type)
+			|| (!isset($_SERVER['HTTP_ACCEPT_ENCODING']) || strpos($_SERVER['HTTP_ACCEPT_ENCODING'], 'gzip') === false))
 		{
 			return false;
 		}
@@ -489,17 +489,29 @@ class Attachment_Controller extends Action_Controller
 	{
 		$body = file_get_contents($filename);
 		$use_compression = $this->useCompression($mime_type);
+		$length = filesize($filename);
 
 		// If we can/should compress this file
 		if ($use_compression && strlen($body) > 250)
 		{
 			$body = gzencode($body, 2);
+			$length = strlen($body);
 			header('Content-Encoding: gzip');
 			header('Vary: Accept-Encoding');
 		}
 
 		// Someone is getting a present
-		header('Content-Length: ', strlen($body));
+		if (!empty($length))
+		{
+			header('Content-Length: ' . $length);
+		}
+
+		// Forcibly end any output buffering going on.
+		while (ob_get_level() > 0)
+		{
+			@ob_end_clean();
+		}
+
 		echo $body;
 	}
 

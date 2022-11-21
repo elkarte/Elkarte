@@ -413,6 +413,7 @@ function resizeImage($src_img, $destName, $src_width, $src_height, $max_width, $
 		{
 			// Get a new instance of Imagick for use
 			$imagick = new Imagick($destName);
+			$imagick->setFirstIterator();
 
 			// Set the input and output image size
 			$src_width = empty($src_width) ? $imagick->getImageWidth() : $src_width;
@@ -445,7 +446,10 @@ function resizeImage($src_img, $destName, $src_width, $src_height, $max_width, $
 
 			// Create a new image in our preferred format and resize it if needed
 			$imagick->setImageFormat($default_formats[$preferred_format]);
-			$imagick->resizeImage($dest_width, $dest_height, Imagick::FILTER_LANCZOS, 1, true);
+			if (substr($destName, -6) === '_thumb')
+				$imagick->thumbnailImage($dest_width, $dest_height, true);
+			else
+				$imagick->resizeImage($dest_width, $dest_height, imagick::FILTER_LANCZOS, 1, true);
 
 			// Remove EXIF / ICC data?
 			if ($strip)
@@ -454,7 +458,10 @@ function resizeImage($src_img, $destName, $src_width, $src_height, $max_width, $
 			}
 
 			// Save the new image in the destination location
-			$success = $imagick->writeImage($destName);
+			if ($preferred_format === IMAGETYPE_GIF && $imagick->getNumberImages() !== 0)
+				$success = $imagick->writeImages($destName, true);
+			else
+				$success = $imagick->writeImage($destName);
 
 			// Free resources associated with the Imagick object
 			$imagick->clear();
@@ -563,10 +570,17 @@ function hasTransparency($fileName, $png = true)
 	// Saved with transparency is only a start, now Pixel inspection
 	if (checkImagick())
 	{
+		$transparency = false;
 		try
 		{
-			$transparency = false;
 			$image = new Imagick($fileName);
+			if ($image->getImageWidth() > 1024 || $image->getImageHeight() > 1024)
+			{
+				// Used to look for transparency, it is not intended to be a quality image.
+				$scaleValue = getImageScaleFactor($image->getImageWidth(), $image->getImageHeight());
+				$image->scaleImage($scaleValue[0], $scaleValue[1], true);
+			}
+
 			$pixel_iterator = $image->getPixelIterator();
 
 			// Look at each one, or until we find the first alpha pixel
@@ -586,8 +600,11 @@ function hasTransparency($fileName, $png = true)
 		catch (\ImagickException $e)
 		{
 			// We don't know what it is, so don't mess with it
-			return false;
+			unset($image);
+			return true;
 		}
+
+		unset($image);
 
 		return $transparency;
 	}
@@ -605,9 +622,23 @@ function hasTransparency($fileName, $png = true)
 		else
 			return false;
 
-		for ($i = 0; $i < $width; $i++)
+		// Large image, scale down to reduce processing time
+		if ($width > 1024 || $height > 1024)
 		{
-			for ($j = 0; $j < $height; $j++)
+			// Single pass scale down, not looking for quality here
+			$scaleValue = getImageScaleFactor($width, $height);
+			$image = imagescale($image, $scaleValue[0], $scaleValue[1], IMG_NEAREST_NEIGHBOUR);
+			if (!$image)
+			{
+				return true;
+			}
+		}
+
+		$x = imagesx($image);
+		$y = imagesy($image);
+		for ($i = 0; $i < $x; $i++)
+		{
+			for ($j = 0; $j < $y; $j++)
 			{
 				if (imagecolorat($image, $i, $j) & 0x7F000000)
 				{
@@ -617,10 +648,40 @@ function hasTransparency($fileName, $png = true)
 			}
 		}
 
+		unset($image);
+
 		return $transparency;
 	}
 
-	return false;
+	// Don't know so assume true
+	return true;
+}
+
+/**
+ * Provides image scaling factors that maintain existing aspect ratio
+ *
+ * @param int $width current width
+ * @param int $height current height
+ * @param int $limit desired width/height limit
+ * @return int[]
+ */
+function getImageScaleFactor($width, $height, $limit = 800)
+{
+	$thumb_w = $limit;
+	$thumb_h = $limit;
+
+	// Landscape
+	if ($width > $height)
+	{
+		$thumb_h = max (1, $height * ($limit / $width));
+	}
+	// Portrait
+	elseif ($width < $height)
+	{
+		$thumb_w = max(1, $width * ($limit / $height));
+	}
+
+	return array((int) $thumb_w, (int) $thumb_h);
 }
 
 /**
@@ -768,10 +829,17 @@ function autoRotateImageWithGD($image_name)
 		case 8:
 			$source = rotateImageGD($source, 90);
 			break;
+		default:
+			$orientation = 1;
+			break;
 	}
 
 	// Save the updated image, free resources
-	imagejpeg($source, $image_name);
+	if ($orientation >= 2)
+	{
+		imagejpeg($source, $image_name);
+	}
+
 	imagedestroy($source);
 
 	return true;
@@ -792,6 +860,15 @@ function autoRotateImageWithGD($image_name)
  */
 function autoRotateImageWithIM($image_name)
 {
+	// We only process jpeg images
+	$sizes = elk_getimagesize($image_name);
+
+	// Not a jpeg, no need to process
+	if ($sizes[2] !== IMAGETYPE_JPEG)
+	{
+		return false;
+	}
+
 	try
 	{
 		// Get a new instance of Imagick for use
@@ -841,26 +918,29 @@ function autoRotateImageWithIM($image_name)
 			case Imagick::ORIENTATION_LEFTBOTTOM:
 				$image->rotateImage('#000', -90);
 				break;
+			default:
+				$orientation = 1;
+				break;
 		}
 
 		// Now that it's auto-rotated, make sure the EXIF data is correctly updated
 		if ($orientation >= 2)
 		{
 			$image->setImageOrientation(Imagick::ORIENTATION_TOPLEFT);
-		}
 
-		// Save the new image in the destination location
-		$success = $image->writeImage($image_name);
+			// Save the new image in the destination location
+			$image->writeImage($image_name);
+		}
 
 		// Free resources associated with the Imagick object
 		$image->clear();
 	}
-	catch (Exception $e)
+	catch (\ImagickException $e)
 	{
-		$success = false;
+		// pass through;
 	}
 
-	return $success;
+	return true;
 }
 
 /**

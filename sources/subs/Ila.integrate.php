@@ -309,6 +309,9 @@ class Ila_Integrate
 				}
 			}
 
+			// The above indentation needs to be removed, otherwise it will appear in the final markup
+			self::$typeTag = preg_replace('~[\n\t]~', '', self::$typeTag);
+
 			self::trackIlaUsage($num);
 		};
 	}
@@ -360,6 +363,8 @@ class Ila_Integrate
 					<i class="icon icon-small i-paperclip"></i>&nbsp;' . $num . '
 				</a>';
 			}
+
+			$data = preg_replace('~[\n\t]~', '', $data);
 
 			self::trackIlaUsage($num);
 		};
