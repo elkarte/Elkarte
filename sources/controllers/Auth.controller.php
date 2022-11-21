@@ -314,9 +314,19 @@ class Auth_Controller extends Action_Controller
 
 			// Maybe we were too hasty... let's try some other authentication methods.
 			$other_passwords = $this->_other_passwords($user_settings);
+			$conversionPassword = in_array($user_settings['passwd'], $other_passwords, true);
+
+			// Maybe we have a "standard" password_hash (xenforo, smf2.1, phpbb3.3, vbulletin5...)
+			if (!$conversionPassword && !empty($modSettings['enable_password_conversion']) && strpos($user_settings['passwd'], '$') === 0)
+			{
+				// Some common hash generation arrangements
+				$conversionPassword = password_verify(Util::strtolower($user_settings['member_name']) . $_POST['passwrd'], $user_settings['passwd']);
+				$conversionPassword = $conversionPassword || password_verify($_POST['passwrd'], $user_settings['passwd']);
+				$conversionPassword = $conversionPassword || password_verify(md5($_POST['passwrd']), $user_settings['passwd']);
+			}
 
 			// Whichever encryption it was using, let's make it use ElkArte's now ;).
-			if (in_array($user_settings['passwd'], $other_passwords))
+			if ($conversionPassword)
 			{
 				updateMemberSalt($user_settings['id_member']);
 				$user_settings['passwd'] = validateLoginPassword($sha_passwd, '', '', true);
