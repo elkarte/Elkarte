@@ -220,7 +220,7 @@ function bb2_insert($settings, $package, $key)
 	// Add it
 	return "INSERT INTO {db_prefix}log_badbehavior
 		(ip, date, request_method, request_uri, server_protocol, http_headers, user_agent, request_entity, valid, id_member, session) VALUES
-		('$ip', '$date', '$request_method', '$request_uri', '$server_protocol', '$headers', '$user_agent', '$request_entity', '$key', '$member_id' , '$session')";
+		(\"$ip\", \"$date\", \"$request_method\", \"$request_uri\", \"$server_protocol\", \"$headers\", \"$user_agent\", \"$request_entity\", \"$key\", \"$member_id\" , \"$session\")";
 }
 
 /**
