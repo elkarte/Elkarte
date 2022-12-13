@@ -167,14 +167,14 @@ function bb2_insert($settings, $package, $key)
 		return '';
 
 	// Clean the data that bb sent us
-	$ip = bb2_db_escape($package['ip']);
+	$ip = bb2_db_escape(substr($package['ip'], 0, 19));
 	$date = (int) bb2_db_date();
 	$request_method = bb2_db_escape($package['request_method']);
-	$request_uri = substr(bb2_db_escape($package['request_uri']), 0, 254);
+	$request_uri = bb2_db_escape(substr($package['request_uri'], 0, 254));
 	$server_protocol = bb2_db_escape($package['server_protocol']);
 	$user_agent = bb2_db_escape($package['user_agent']);
-	$member_id = (int) !empty($user_info['id']) ? $user_info['id'] : 0;
-	$session = !empty($_SESSION['session_value']) ? (string) $_SESSION['session_value'] : '';
+	$member_id = !empty($user_info['id']) ? (int) $user_info['id'] : 0;
+	$session = !empty($_SESSION['session_value']) ? bb2_db_escape((string) $_SESSION['session_value']) : '';
 
 	// Prepare the headers etc for db insertion
 	// We are passed at least
@@ -184,14 +184,15 @@ function bb2_insert($settings, $package, $key)
 	$skip = array('User-Agent', 'Accept-Encoding', 'DNT', 'X-Wap-Profile');
 	foreach ($package['headers'] as $h => $v)
 	{
-		if (!in_array($h, $skip))
+		$v = trim($v);
+		if ($v !== '' && !in_array($h, $skip))
 		{
 			// Make sure this header it will fit in the db, if not move on to the next
 			// @todo increase the db space to 512 or convert to text?
-			$check = $length + Util::strlen($h) + Util::strlen($v) + 2;
-			if ($check < 255)
+			$check = $length + strlen($h) + strlen($v) + 2;
+			if ($check < 254)
 			{
-				$headers .= bb2_db_escape($h . ': ' .  $v . "\n");
+				$headers .= bb2_db_escape("$h: $v\n");
 				$length = $check;
 			}
 		}
@@ -203,18 +204,26 @@ function bb2_insert($settings, $package, $key)
 		foreach ($package['request_entity'] as $h => $v)
 		{
 			if (is_array($v))
-				$v = bb2_multi_implode($v, ' | ');
+				$v = bb2_multi_implode($v, ' | ', true);
 
-			$request_entity .= bb2_db_escape("$h: $v\n");
+			$v = trim($v);
+			if ($v !== '')
+				$request_entity .= bb2_db_escape("$h: $v\n");
 		}
 
 		// Only such much space in this column, so brutally cut it
-		// @todo in 1.1 improve logging or drop this?
-		$request_entity = substr($request_entity, 0, 254);
+		$request_entity = trim($request_entity);
+		$request_entity = bb2_db_escape(substr($request_entity, 0, 254));
+	}
 
-		// Make it safe for the db
-		while (preg_match('~[\'\\\\]$~', substr($request_entity, -1)) === 1)
-			$request_entity = substr($request_entity, 0, -1);
+	// Make it safe for the db
+	foreach (array('ip', 'date', 'request_method', 'request_uri', 'server_protocol', 'headers', 'user_agent', 'request_entity', 'key', 'member_id', 'session') as $id)
+	{
+		$$id = trim($$id);
+		while (preg_match('~[\'\\\\]$~', substr($$id, -1)) === 1)
+			$$id = trim(substr($$id, 0, -1));
+
+		$$id = str_replace("'", '_', $$id);
 	}
 
 	// Add it

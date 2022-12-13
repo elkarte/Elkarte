@@ -586,8 +586,10 @@ class Attachment_Controller extends Action_Controller
 
 		$this->_send_headers($filename, $eTag, $mime_type, $use_compression, 'inline', $real_filename, $do_cache);
 
+		$max_width = $this->_req->is_set('thumb') && !empty($modSettings['attachmentThumbWidth']) ? $modSettings['attachmentThumbWidth'] : 250;
+		$max_height = $this->_req->is_set('thumb') && !empty($modSettings['attachmentThumbHeight']) ? $modSettings['attachmentThumbHeight'] : 250;
 		$format = setDefaultFormat($filename);
-		if ($resize && resizeImageFile($filename, $filename . '_thumb', 100, 100, $format))
+		if ($resize && resizeImageFile($filename, $filename . '_thumb', $max_width, $max_height, $format, false, false))
 		{
 			if (!empty($modSettings['attachment_autorotate']))
 			{

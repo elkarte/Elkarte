@@ -587,12 +587,12 @@ function smtp_mail($mail_to_array, $subject, $message, $headers, $priority, $mes
 	}
 
 	// Try to connect to the SMTP server... if it doesn't exist, only wait three seconds.
-	if (!$socket = fsockopen($modSettings['smtp_host'], empty($modSettings['smtp_port']) ? 25 : $modSettings['smtp_port'], $errno, $errstr, 3))
+	if (!$socket = @fsockopen($modSettings['smtp_host'], empty($modSettings['smtp_port']) ? 25 : $modSettings['smtp_port'], $errno, $errstr, 3))
 	{
 		// Maybe we can still save this?  The port might be wrong.
 		if (substr($modSettings['smtp_host'], 0, 4) == 'ssl:' && (empty($modSettings['smtp_port']) || $modSettings['smtp_port'] == 25))
 		{
-			if ($socket = fsockopen($modSettings['smtp_host'], 465, $errno, $errstr, 3))
+			if ($socket = @fsockopen($modSettings['smtp_host'], 465, $errno, $errstr, 3))
 				Errors::instance()->log_error($txt['smtp_port_ssl']);
 		}
 
