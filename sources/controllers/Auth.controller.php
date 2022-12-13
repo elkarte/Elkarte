@@ -629,9 +629,10 @@ class Auth_Controller extends Action_Controller
 			// Hmm.. p'raps it's Invision 2 style?
 			$other_passwords[] = md5(md5($user_settings['password_salt']) . md5($_POST['passwrd']));
 
-			// Some common md5 ones.
+			// Some common md5 ones, like myBB
 			$other_passwords[] = md5($user_settings['password_salt'] . $_POST['passwrd']);
 			$other_passwords[] = md5($_POST['passwrd'] . $user_settings['password_salt']);
+			$other_passwords[] = md5(md5($user_settings['password_salt']) . md5($_POST['passwrd']));
 		}
 		// The hash is 40 characters, lets try some SHA-1 style auth
 		elseif ($pw_strlen === 40)
