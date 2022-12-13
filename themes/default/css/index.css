@@ -979,7 +979,7 @@ a.bbc_link {
 	width: 100%;
 	margin-bottom: 10px;
 	padding: 2px;
-	box-sizing: border-box
+	box-sizing: border-box;
 }
 #quick_edit_body_container .input_text {
 	width: 85%;
