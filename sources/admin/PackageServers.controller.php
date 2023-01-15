@@ -634,7 +634,7 @@ class PackageServers_Controller extends Action_Controller
 					{
 						@unlink($destination);
 						loadLanguage('Errors');
-						throw new Elk_Exception('package_upload_already_exists', 'general', $package->getFilename());
+						throw new Elk_Exception('package_upload_already_exists', 'general', array($package->getFilename()));
 					}
 				}
 			}
