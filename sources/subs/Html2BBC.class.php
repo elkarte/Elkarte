@@ -716,7 +716,7 @@ class Html_2_BBC
 		}
 
 		if (!empty($size))
-			$bbc = str_replace('[img', '[img ' . $size, $bbc);
+			$bbc = str_replace('[img', '[img ' . trim($size), $bbc);
 
 		return $bbc;
 	}
@@ -965,7 +965,7 @@ class Html_2_BBC
 
 		$text = html_entity_decode(htmlspecialchars_decode($text, ENT_QUOTES), ENT_QUOTES, 'UTF-8');
 
-		return str_replace(array('&amp#91;', '&amp#93;'), array('&amp;#91;', '&amp;#93;'), $text);
+		return str_replace(array('&amp#91;', '&amp#93;'), array('[', ']'), $text);
 	}
 
 	/**
