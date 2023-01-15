@@ -488,8 +488,16 @@ function template_quickreply_below()
 								<input type="button" name="save_draft" value="', $txt['draft_save'], '" onclick="return confirm(' . JavaScriptEscape($txt['draft_save_note']) . ') && submitThisOnce(this);" accesskey="d" tabindex="', $context['tabindex']++, '" />
 								<input type="hidden" id="id_draft" name="id_draft" value="', empty($context['id_draft']) ? 0 : $context['id_draft'], '" />';
 
-			echo '
+			// Show the draft last saved on area
+			if (!empty($context['drafts_autosave']) && !empty($options['drafts_autosave_enabled']))
+				echo '
+							<div class="draftautosave">
+								<span id="throbber" class="hide"><i class="icon icon-spin i-spinner"></i>&nbsp;</span>
+								<span id="draft_lastautosave"></span>
 							</div>';
+			echo '
+						</div>
+					</div>';
 		}
 		else
 		{
@@ -502,14 +510,6 @@ function template_quickreply_below()
 								', template_control_richedit_buttons($context['post_box_name']), '
 							</div>';
 		}
-
-		// Show the draft last saved on area
-		if (!empty($context['drafts_autosave']) && !empty($options['drafts_autosave_enabled']))
-			echo '
-							<div class="draftautosave">
-								<span id="throbber" class="hide"><i class="icon icon-spin i-spinner"></i>&nbsp;</span>
-								<span id="draft_lastautosave"></span>
-							</div>';
 
 		echo '
 						</form>
