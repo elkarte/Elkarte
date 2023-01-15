@@ -345,6 +345,9 @@ function bb2_insert_head()
 {
 	global $bb2_javascript;
 
+	if (empty($bb2_javascript))
+		return '';
+
 	// Prepare it so we can use addInlineJavascript by removing the script tags hats its pre wrapped in
 	$temp = str_replace('<script type="text/javascript">' . "\n" . '<!--' . "\n", '', $bb2_javascript);
 	$temp = str_replace('// --></script>', '', $temp);

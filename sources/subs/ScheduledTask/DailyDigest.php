@@ -11,7 +11,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.1.7
+ * @version 1.1.9
  *
  */
 
@@ -221,7 +221,7 @@ class Daily_Digest implements Scheduled_Task_Interface
 			return true;
 
 		// Fix the last reply message so its suitable for previewing
-		if ($maillist)
+		if ($maillist && !empty($types['reply']))
 		{
 			foreach ($types['reply'] as $id => $board)
 			{
