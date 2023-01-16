@@ -12,7 +12,7 @@ DB=$1
 PHP_VERSION=$2
 
 # Agents will merge all coverage data...
-if [[ "${GITHUB_EVENT_NAME}" == "pull_request" ]]
-then
-    bash <(curl -s https://codecov.io/bash) -s "/tmp" -f '*.clover'
-fi
+#if [[ "${GITHUB_EVENT_NAME}" == "pull_request" ]]
+#then
+#    bash <(curl -s https://codecov.io/bash) -s "/tmp" -f '*.clover'
+#fi
