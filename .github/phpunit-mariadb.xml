@@ -39,5 +39,6 @@
 
   <php>
       <const name="DBTYPE" value="MySQL"/>
+      <ini name="memory_limit" value="512M"/>
   </php>
 </phpunit>
