@@ -61,7 +61,7 @@ jobs:
         with:
           php-version: ${{ matrix.php }}
           extensions: dom, curl, libxml, mbstring, zip, mysqli, gd, exif, iconv, apcu, memcached
-          coverage: xdebug
+          coverage: pcov
           tools: composer:v2
           ini-values: error_reporting=E_ALL, allow_url_fopen=On, opcache.enable=0, apc.enable_cli=1
 
@@ -138,7 +138,7 @@ jobs:
         with:
           php-version: ${{ matrix.php }}
           extensions: dom, curl, libxml, mbstring, zip, pgsql, imagick, exif, iconv, apcu, memcached
-          coverage: xdebug
+          coverage: pcov
           tools: composer:v2
           ini-values: error_reporting=E_ALL, allow_url_fopen=On, opcache.enable=0, apc.enable_cli=1
 
