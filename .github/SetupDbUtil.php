@@ -232,13 +232,13 @@ Class ElkTestingSetup
 		global $ssi_db_user, $scripturl, $ssi_db_passwd, $db_passwd;
 		global $sourcedir, $boarddir;
 
-		DEFINE('SUBSDIR', BOARDDIR . '/sources/subs');
-		DEFINE('EXTDIR', BOARDDIR . '/sources/ext');
-		DEFINE('SOURCEDIR', BOARDDIR . '/sources');
-		DEFINE('LANGUAGEDIR', BOARDDIR . '/themes/default/languages');
-		DEFINE('ADMINDIR', SOURCEDIR . '/admin');
-		DEFINE('CONTROLLERDIR', SOURCEDIR . '/controllers');
-		DEFINE('ADDONSDIR', SOURCEDIR . '/addons');
+		defined('SUBSDIR') || DEFINE('SUBSDIR', BOARDDIR . '/sources/subs');
+		defined('EXTDIR') || DEFINE('EXTDIR', BOARDDIR . '/sources/ext');
+		defined('SOURCEDIR') || DEFINE('SOURCEDIR', BOARDDIR . '/sources');
+		defined('LANGUAGEDIR') || DEFINE('LANGUAGEDIR', BOARDDIR . '/themes/default/languages');
+		defined('ADMINDIR') || DEFINE('ADMINDIR', SOURCEDIR . '/admin');
+		defined('CONTROLLERDIR') || DEFINE('CONTROLLERDIR', SOURCEDIR . '/controllers');
+		defined('ADDONSDIR') || DEFINE('ADDONSDIR', SOURCEDIR . '/addons');
 
 		require_once(BOARDDIR . '/Settings.php');
 		require_once(SOURCEDIR . '/Subs.php');
@@ -286,7 +286,7 @@ Class ElkTestingSetup
 
 		if (date_default_timezone_set($timezone_id))
 		{
-			$db->insert('',
+			$db->insert('replace',
 				$db_prefix . 'settings',
 				array(
 					'variable' => 'string-255', 'value' => 'string-65534',

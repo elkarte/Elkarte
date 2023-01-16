@@ -39,6 +39,7 @@
 
   <php>
       <const name="DBTYPE" value="PostgreSQL"/>
+      <ini name="memory_limit" value="512M"/>
   </php>
 
 </phpunit>
