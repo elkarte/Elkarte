@@ -9,7 +9,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.1.7
+ * @version 1.1.9
  *
  */
 
@@ -517,6 +517,10 @@ function load_database()
 		require_once(__DIR__ . '/DatabaseCode.php');
 
 		$db_connection = elk_db_initiate($db_server, $db_name, $db_user, $db_passwd, $db_prefix, array('persist' => $db_persist, 'port' => $db_port), $db_type);
+
+		// Make php8.1 behave as <= 8.0 (don't throw exceptions)
+		if ($db_type === 'mysql')
+			mysqli_report(MYSQLI_REPORT_OFF);
 	}
 
 	return database();
