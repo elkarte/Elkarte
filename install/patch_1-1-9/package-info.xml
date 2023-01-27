@@ -1,0 +1,64 @@
+<?xml version="1.0"?>
+<!DOCTYPE package-info SYSTEM "https://www.elkarte.net/site/package-info">
+<package-info xmlns="https://www.elkarte.net/site/package-info" xmlns:elk="https://www.elkarte.net/">
+	<id>Elkarte Contributors:ElkArte_119_patch</id>
+	<name>ElkArte 1.1.9 patch</name>
+	<version>1.0</version>
+	<type>modification</type>
+		<install for="1.1.8">
+			<modification>modifications.xml</modification>
+			
+			<require-dir name="1.1.9/markdown" destination="EXTDIR" />
+			<require-dir name="1.1.9/scripts" destination="THEMEDIR" />
+			<require-dir name="1.1.9/fonts" destination="THEMEDIR" />
+
+			<require-file name="1.1.9/Html2BBC.class.php" destination="SUBSDIR" />
+			<require-file name="1.1.9/Html2Md.class.php" destination="SUBSDIR" />
+			<require-file name="1.1.9/Ila.integrate.php" destination="SUBSDIR" />
+			<require-file name="1.1.9/Metadata.integrate.php" destination="SUBSDIR" />
+			<require-file name="1.1.9/PasswordHash.php" destination="EXTDIR" />
+			<require-file name="1.1.9/badbehavior-plugin.php" destination="EXTDIR/bad-behavior" />
+
+			<code>code.php</code>
+		</install>
+		<uninstall for="1.1.9">
+			<modification reverse="true">modifications.xml</modification>
+			
+			<require-file name="1.1.8/markdown/Readme.md" destination="EXTDIR/markdown" />
+			<require-file name="1.1.8/markdown/License.md" destination="EXTDIR/markdown" />
+			<require-file name="1.1.8/markdown/Michelf/Markdown.php" destination="EXTDIR/markdown/Michelf" />
+			<require-file name="1.1.8/markdown/Michelf/MarkdownExtra.php" destination="EXTDIR/markdown/Michelf" />
+			<require-file name="1.1.8/markdown/Michelf/MarkdownInterface.php" destination="EXTDIR/markdown/Michelf" />
+			
+			<require-file name="1.1.8/scripts/dropAttachments.js" destination="THEMEDIR/scripts" />
+			<require-file name="1.1.8/scripts/elk_jquery_embed.js" destination="THEMEDIR/scripts" />
+			<require-file name="1.1.8/scripts/undo.plugin.min.js" destination="THEMEDIR/scripts" />
+
+			<remove-file name="THEMEDIR/scripts/quickQuote.js" />
+
+			<require-file name="1.1.8/Html2BBC.class.php" destination="SUBSDIR" />
+			<require-file name="1.1.8/Html2Md.class.php" destination="SUBSDIR" />
+			<require-file name="1.1.8/Ila.integrate.php" destination="SUBSDIR" />
+			<require-file name="1.1.8/PasswordHash.php" destination="EXTDIR" />
+			<remove-file name="SUBSDIR/Metadata.integrate.php" />
+			
+			<require-file name="1.1.8/badbehavior-plugin.php" destination="EXTDIR/bad-behavior" />
+
+			<require-file name="1.1.8/fonts/OFL.txt" destination="THEMEDIR/fonts" />
+			<require-file name="1.1.8/fonts/PressStart2P - License.txt" destination="THEMEDIR/fonts" />
+			<require-file name="1.1.8/fonts/PressStart2P.ttf" destination="THEMEDIR/fonts" />
+			<require-file name="1.1.8/fonts/Segment14.ttf" destination="THEMEDIR/fonts" />
+			<require-file name="1.1.8/fonts/vSHexagonica - License.txt" destination="THEMEDIR/fonts" />
+			<require-file name="1.1.8/fonts/vSHexagonica.ttf" destination="THEMEDIR/fonts" />
+			<remove-file name="THEMEDIR/fonts/adler- License.txt" />
+			<remove-file name="THEMEDIR/fonts/Adler.ttf" />
+			<remove-file name="THEMEDIR/fonts/Facon- License.txt" />
+			<remove-file name="THEMEDIR/fonts/Facon.ttf" />
+			<remove-file name="THEMEDIR/fonts/if- License.txt" />
+			<remove-file name="THEMEDIR/fonts/If.ttf" />
+			<remove-file name="THEMEDIR/fonts/OpenSans- License.txt" />
+			<remove-file name="THEMEDIR/fonts/OpenSans.ttf" />
+			<code>uninstall.php</code>
+
+		</uninstall>
+</package-info>
