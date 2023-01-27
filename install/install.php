@@ -6,10 +6,10 @@
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
  * This file contains code covered by:
- * copyright:	2011 Simple Machines (http://www.simplemachines.org)
- * license:  	BSD, See included LICENSE.TXT for terms and conditions.
+ * copyright:    2011 Simple Machines (http://www.simplemachines.org)
+ * license:    BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.1.7
+ * @version 1.1.9
  *
  */
 
@@ -57,7 +57,9 @@ function initialize_inputs()
 	error_reporting(E_ALL & ~E_DEPRECATED);
 
 	if (!defined('TMP_BOARDDIR'))
+	{
 		define('TMP_BOARDDIR', realpath(__DIR__ . '/..'));
+	}
 
 	// This is the test for support of compression
 	if (isset($_GET['obgz']))
@@ -68,22 +70,32 @@ function initialize_inputs()
 
 	// This is really quite simple; if ?delete is on the URL, delete the installer...
 	if (isset($_GET['delete']))
+	{
 		return action_deleteInstaller();
+	}
 
 	ob_start();
 
 	if (ini_get('session.save_handler') === 'user')
+	{
 		@ini_set('session.save_handler', 'files');
+	}
 	if (function_exists('session_start'))
+	{
 		@session_start();
+	}
 
 	// Add slashes, as long as they aren't already being added.
 	foreach ($_POST as $k => $v)
 	{
 		if (strpos($k, 'password') === false && strpos($k, 'passwd') === false)
+		{
 			$_POST[$k] = addslashes($v);
+		}
 		else
+		{
 			$_POST[$k] = addcslashes($v, '\'');
+		}
 	}
 
 	// PHP 5 might cry if we don't do this now.
@@ -119,7 +131,9 @@ function load_lang_file()
 		while ($entry = $dir->read())
 		{
 			if (is_dir($dir->path . '/' . $entry) && file_exists($dir->path . '/' . $entry . '/Install.' . $entry . '.php'))
+			{
 				$incontext['detected_languages']['Install.' . $entry . '.php'] = ucfirst($entry);
+			}
 		}
 		$dir->close();
 	}
@@ -157,25 +171,30 @@ function load_lang_file()
 
 	// Override the language file?
 	if (isset($_GET['lang_file']))
+	{
 		$_SESSION['installer_temp_lang'] = $_GET['lang_file'];
+	}
 
 	// Make sure it exists, if it doesn't reset it.
-	if (!isset($_SESSION['installer_temp_lang']) || preg_match('~[^\\w_\\-.]~', $_SESSION['installer_temp_lang']) === 1 || !file_exists(TMP_BOARDDIR . '/themes/default/languages/' . substr($_SESSION['installer_temp_lang'], 8, strlen($_SESSION['installer_temp_lang']) - 12) . '/' . $_SESSION['installer_temp_lang']))
+	if (!isset($_SESSION['installer_temp_lang']) || preg_match('~[^\\w_\\-.]~', $_SESSION['installer_temp_lang']) === 1 || !file_exists(TMP_BOARDDIR . '/themes/default/languages/' . substr($_SESSION['installer_temp_lang'], 8, -4) . '/' . $_SESSION['installer_temp_lang']))
 	{
 		// Use the first one...
 		list ($_SESSION['installer_temp_lang']) = array_keys($incontext['detected_languages']);
 
 		// If we have english and some other language, use the other language.  We Americans hate english :P.
 		if ($_SESSION['installer_temp_lang'] == 'Install.english.php' && count($incontext['detected_languages']) > 1)
+		{
 			list (, $_SESSION['installer_temp_lang']) = array_keys($incontext['detected_languages']);
+		}
 	}
 
 	// And now include the actual language file itself.
-	require_once(TMP_BOARDDIR . '/themes/default/languages/' . substr($_SESSION['installer_temp_lang'], 8, strlen($_SESSION['installer_temp_lang']) - 12) . '/' . $_SESSION['installer_temp_lang']);
+	require_once(TMP_BOARDDIR . '/themes/default/languages/' . substr($_SESSION['installer_temp_lang'], 8, -4) . '/' . $_SESSION['installer_temp_lang']);
 }
 
 /**
  * This is called upon exiting the installer, for template etc.
+ *
  * @param bool $fallThrough
  */
 function installExit($fallThrough = false)
@@ -222,7 +241,9 @@ function updateSettingsFile($config_vars)
 		@chmod(dirname(__FILE__, 2) . '/Settings.php', 0777);
 
 		if (!is_writeable(dirname(__FILE__, 2) . '/Settings.php'))
+		{
 			return false;
+		}
 	}
 
 	// Modify Settings.php.
@@ -230,7 +251,9 @@ function updateSettingsFile($config_vars)
 
 	// @todo Do we just want to read the file in clean, and split it this way always?
 	if (count($settingsArray) == 1)
+	{
 		$settingsArray = preg_split('~[\r\n]~', $settingsArray[0]);
+	}
 
 	return saveFileSettings($config_vars, $settingsArray);
 }
@@ -252,14 +275,14 @@ function parse_sqlLines($sql_file, $replaces)
 	$install_instance = new $class_name($db_wrapper, $db_table_wrapper);
 
 	$methods = get_class_methods($install_instance);
-	$tables = array_filter($methods, function($method) {
+	$tables = array_filter($methods, static function ($method) {
 		return strpos($method, 'table_') === 0;
 	});
-	$inserts = array_filter($methods, function($method) {
+	$inserts = array_filter($methods, static function ($method) {
 		return strpos($method, 'insert_') === 0;
 	});
-	$others = array_filter($methods, function($method) {
-		return substr($method, 0, 2) !== '__' && strpos($method, 'insert_') !== 0 && strpos($method, 'table_') !== 0;
+	$others = array_filter($methods, static function ($method) {
+		return strpos($method, '__') !== 0 && strpos($method, 'insert_') !== 0 && strpos($method, 'table_') !== 0;
 	});
 
 	foreach ($tables as $table_method)
@@ -303,12 +326,14 @@ function parse_sqlLines($sql_file, $replaces)
 
 		$result = $install_instance->{$insert_method}();
 
-		if ($result === false)
+		if ($result !== false)
+		{
+			$incontext['sql_results']['inserts'] += $result;
+		}
+		else
 		{
 			$incontext['failures'][] = $db->last_error();
 		}
-		else
-			$incontext['sql_results']['inserts'] += $result;
 	}
 
 	// Errors here are ignored
@@ -321,9 +346,13 @@ function parse_sqlLines($sql_file, $replaces)
 	foreach ($incontext['sql_results'] as $key => $number)
 	{
 		if ($number == 0)
+		{
 			unset($incontext['sql_results'][$key]);
+		}
 		else
+		{
 			$incontext['sql_results'][$key] = sprintf($txt['db_populate_' . $key], $number);
+		}
 	}
 }
 
@@ -343,41 +372,50 @@ function fixModSecurity()
 </IfModule>';
 
 	if (!function_exists('apache_get_modules') || !in_array('mod_security', apache_get_modules()))
+	{
 		return true;
-	elseif (file_exists(TMP_BOARDDIR . '/.htaccess') && is_writable(TMP_BOARDDIR . '/.htaccess'))
+	}
+
+	if (file_exists(TMP_BOARDDIR . '/.htaccess') && is_writable(TMP_BOARDDIR . '/.htaccess'))
 	{
 		$current_htaccess = implode('', file(TMP_BOARDDIR . '/.htaccess'));
 
 		// Only change something if mod_security hasn't been addressed yet.
-		if (strpos($current_htaccess, '<IfModule mod_security.c>') === false)
+		if (strpos($current_htaccess, '<IfModule mod_security.c>') !== false)
 		{
-			if ($ht_handle = fopen(TMP_BOARDDIR . '/.htaccess', 'a'))
-			{
-				fwrite($ht_handle, $htaccess_addition);
-				fclose($ht_handle);
-				return true;
-			}
-			else
-				return false;
-		}
-		else
 			return true;
-	}
-	elseif (file_exists(TMP_BOARDDIR . '/.htaccess'))
-		return strpos(implode('', file(TMP_BOARDDIR . '/.htaccess')), '<IfModule mod_security.c>') !== false;
-	elseif (is_writable(TMP_BOARDDIR))
-	{
-		if ($ht_handle = fopen(TMP_BOARDDIR . '/.htaccess', 'w'))
+		}
+
+		if ($ht_handle = fopen(TMP_BOARDDIR . '/.htaccess', 'ab'))
 		{
 			fwrite($ht_handle, $htaccess_addition);
 			fclose($ht_handle);
+
 			return true;
 		}
-		else
-			return false;
-	}
-	else
+
 		return false;
+	}
+
+	if (file_exists(TMP_BOARDDIR . '/.htaccess'))
+	{
+		return strpos(implode('', file(TMP_BOARDDIR . '/.htaccess')), '<IfModule mod_security.c>') !== false;
+	}
+
+	if (is_writable(TMP_BOARDDIR))
+	{
+		if ($ht_handle = fopen(TMP_BOARDDIR . '/.htaccess', 'wb'))
+		{
+			fwrite($ht_handle, $htaccess_addition);
+			fclose($ht_handle);
+
+			return true;
+		}
+
+		return false;
+	}
+
+	return false;
 }
 
 /**
