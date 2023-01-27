@@ -616,7 +616,7 @@ function saveFileSettings($config_vars, $settingsArray)
 	definePaths();
 	require_once(SOURCEDIR . '/Subs.php');
 
-	if (count($settingsArray) == 1)
+	if (count($settingsArray) === 1)
 		$settingsArray = preg_split('~[\r\n]~', $settingsArray[0]);
 
 	for ($i = 0, $n = count($settingsArray); $i < $n; $i++)
@@ -661,29 +661,31 @@ function saveFileSettings($config_vars, $settingsArray)
 	}
 
 	// Blank out the file - done to fix a oddity with some servers.
-	$fp = @fopen(TMP_BOARDDIR . '/Settings.php', 'w');
+	$fp = @fopen(TMP_BOARDDIR . '/Settings.php', 'wb');
 	if (!$fp)
 		return false;
 	fclose($fp);
 
-	clearstatcache();
-	$fp = fopen(TMP_BOARDDIR . '/Settings.php', 'r+');
+	$fp = fopen(TMP_BOARDDIR . '/Settings.php', 'rb+');
 
 	// Gotta have one of these ;)
-	if (trim($settingsArray[0]) != '<?php')
+	if (trim($settingsArray[0]) !== '<?php')
 		fwrite($fp, '<?php' . "\n");
 
 	$lines = count($settingsArray);
 	for ($i = 0; $i < $lines; $i++)
 	{
 		// Don't just write a bunch of blank lines.
-		if ($settingsArray[$i] != '' || (isset($settingsArray[$i - 1]) && $settingsArray[$i - 1] != ''))
+		if ($settingsArray[$i] !== '' || (isset($settingsArray[$i - 1]) && $settingsArray[$i - 1] !== ''))
 			fwrite($fp, strtr($settingsArray[$i], "\r", ''));
 	}
 	fclose($fp);
 
-	if (extension_loaded('Zend OPcache') && ini_get('opcache.enable') && stripos(BOARDDIR, ini_get('opcache.restrict_api')) !== 0)
+	if (extension_loaded('Zend OPcache') && ini_get('opcache.enable') &&
+		((ini_get('opcache.restrict_api') === '' || stripos(BOARDDIR, ini_get('opcache.restrict_api')) !== 0)))
 		opcache_invalidate(TMP_BOARDDIR . '/Settings.php', true);
+
+	clearstatcache(true, TMP_BOARDDIR . '/Settings.php');
 
 	return true;
 
