@@ -1353,7 +1353,8 @@ function action_databaseChanges()
 
 				return upgradeExit();
 			}
-			elseif ($support_js)
+
+			if ($support_js)
 			{
 				break;
 			}
