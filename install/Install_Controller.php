@@ -654,7 +654,6 @@ class Install_Controller
 		// Let's see if we got the database type correct.
 		if (isset($_POST['db_type'], $databases[$_POST['db_type']]))
 			$db_type = $_POST['db_type'];
-
 		// Else we'd better be able to get the connection.
 		else
 			load_database();
@@ -674,12 +673,12 @@ class Install_Controller
 		// Submitting?
 		if (isset($_POST['boardurl']))
 		{
-			if (substr($_POST['boardurl'], -10) == '/index.php')
+			if (substr($_POST['boardurl'], -10) === '/index.php')
 				$_POST['boardurl'] = substr($_POST['boardurl'], 0, -10);
-			elseif (substr($_POST['boardurl'], -1) == '/')
+			elseif (substr($_POST['boardurl'], -1) === '/')
 				$_POST['boardurl'] = substr($_POST['boardurl'], 0, -1);
 
-			if (substr($_POST['boardurl'], 0, 7) != 'http://' && substr($_POST['boardurl'], 0, 7) != 'file://' && substr($_POST['boardurl'], 0, 8) != 'https://')
+			if (substr($_POST['boardurl'], 0, 7) !== 'http://' && substr($_POST['boardurl'], 0, 7) !== 'file://' && substr($_POST['boardurl'], 0, 8) != 'https://')
 				$_POST['boardurl'] = 'http://' . $_POST['boardurl'];
 
 			// Save these variables.
