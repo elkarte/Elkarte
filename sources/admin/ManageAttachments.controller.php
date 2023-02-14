@@ -307,8 +307,11 @@ class ManageAttachments_Controller extends Action_Controller
 		// Perform a test to see if the GD module or ImageMagick are installed.
 		require_once(SUBSDIR . '/Graphics.subs.php');
 		$testImg = checkGD() || checkImagick();
-		$testWebP = hasWebpSupport();
 		$testImgRotate = checkImagick() || (checkGD() && function_exists('exif_read_data'));
+
+		$testWebP = hasWebpSupport();
+		if (!$testWebP && !empty($modSettings['attachment_webp_enable']))
+			updateSettings(array('attachment_webp_enable' => 0));
 
 		// See if we can find if the server is set up to support the attachment limits
 		$post_max_size = ini_get('post_max_size');
