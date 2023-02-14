@@ -187,21 +187,29 @@ function checkImagick()
  *
  * @return bool
  */
-function hasWebpSupport()
+function hasWebpSupport($type = false)
 {
+	$check_im = false;
+	$check_gd = false;
+
 	if (checkImagick())
 	{
 		$check = Imagick::queryformats();
-		return in_array('WEBP', $check);
+		$check_im = in_array('WEBP', $check);
 	}
 
 	if (checkGD())
 	{
 		$check = gd_info();
-		return !empty($check['WebP Support']);
+		$check_gd = !empty($check['WebP Support']);
 	}
 
-	return false;
+	if ($type)
+	{
+		return $check_im ? 'im' : ($check_gd ? 'gd' : '');
+	}
+
+	return $check_gd || $check_im;
 }
 
 /**
@@ -326,22 +334,27 @@ function resizeImageFile($source, $destination, $max_width, $max_height, $prefer
 	if (checkGD() && !imageMemoryCheck($sizes))
 		return false;
 
+	$webp_support = hasWebpSupport(true);
+
 	// Not allowed to save webp or can't support webp input
-	if ((empty($modSettings['attachment_webp_enable']) && $preferred_format == 18) || ($sizes[2] == 18 && !hasWebpSupport()))
+	if ((empty($modSettings['attachment_webp_enable']) && $preferred_format == 18) || ($sizes[2] == 18 && empty($webp_support)))
 		return false;
 
 	// A known and supported format?
-	if (checkImagick() && isset($default_formats[$sizes[2]]))
+	if (checkImagick() && isset($default_formats[$sizes[2]])
+		&& ($sizes[2] != 18 || $webp_support === 'im'))
 	{
 		return resizeImage(null, $destination, null, null, $max_width, $max_height, $force_resize, $preferred_format, $strip);
 	}
-	elseif (checkGD() && isset($default_formats[$sizes[2]]) && function_exists('imagecreatefrom' . $default_formats[$sizes[2]]))
+	elseif (checkGD() && isset($default_formats[$sizes[2]])
+		&& ($sizes[2] != 18 || $webp_support === 'gd')
+		&& function_exists('imagecreatefrom' . $default_formats[$sizes[2]]))
 	{
 		try
 		{
 			$imagecreatefrom = 'imagecreatefrom' . $default_formats[$sizes[2]];
 			$src_img = $imagecreatefrom($destination);
-			return resizeImage($src_img, $destination, imagesx($src_img), imagesy($src_img), $max_width === null ? imagesx($src_img) : $max_width, $max_height === null ? imagesy($src_img) : $max_height, $force_resize, $preferred_format, $strip);
+			return resizeImage($src_img, $destination, imagesx($src_img), imagesy($src_img), $max_width === null ? imagesx($src_img) : $max_width, $max_height === null ? imagesy($src_img) : $max_height, $force_resize, $preferred_format, $strip, true);
 		}
 		catch (\Exception $e)
 		{
@@ -383,14 +396,15 @@ function resizeImageFile($source, $destination, $max_width, $max_height, $prefer
  *   - 15 for wbmp
  *   - 18 for webp
  * @param bool $strip Whether to have IM strip EXIF data as GD will
+ * @param bool $force_gd Whether to force GD processing over IM
  *
  * @return bool Whether resize was successful.
  */
-function resizeImage($src_img, $destName, $src_width, $src_height, $max_width, $max_height, $force_resize = false, $preferred_format = 0, $strip = false)
+function resizeImage($src_img, $destName, $src_width, $src_height, $max_width, $max_height, $force_resize = false, $preferred_format = 0, $strip = false, $force_gd = false)
 {
 	global $gd2, $modSettings;
 
-	if (checkImagick())
+	if (checkImagick() && !$force_gd)
 	{
 		// These are the file formats we know about
 		$default_formats = array(
@@ -568,7 +582,8 @@ function hasTransparency($fileName, $png = true)
 	}
 
 	// Saved with transparency is only a start, now Pixel inspection
-	if (checkImagick())
+	$webp_support = hasWebpSupport(true);
+	if (checkImagick() && ($png || $webp_support === 'im'))
 	{
 		$transparency = false;
 		try
@@ -609,13 +624,13 @@ function hasTransparency($fileName, $png = true)
 		return $transparency;
 	}
 
-	if (checkGD())
+	if (checkGD() && ($png || $webp_support === 'gd'))
 	{
 		// Go through the image pixel by pixel until we find a transparent pixel
 		$transparency = false;
 		list ($width, $height, $type) = elk_getimagesize($fileName);
 
-		if ($type === 18 && hasWebpSupport())
+		if ($type === 18 && $webp_support === 'gd')
 			$image = imagecreatefromwebp($fileName);
 		elseif ($type === 3)
 			$image = imagecreatefrompng($fileName);
