@@ -44,6 +44,10 @@ class reCaptcha implements ControlInterface
 	{
 		global $modSettings;
 
+		// for development testing ONLY, compliments of a Google search for captcha keys
+		// site key of 6Ld-KCcTAAAAAJTLqpKC3yba2tZZlytk0gtSxy0_
+		// secret key of 6Ld-KCcTAAAAAOeMYwZdoI8QW4Pr_h0ZhW5WFHno
+		// @todo remove at release
 		$this->_site_key = !empty($modSettings['recaptcha_site_key']) ? $modSettings['recaptcha_site_key'] : '6Ld-KCcTAAAAAJTLqpKC3yba2tZZlytk0gtSxy0_';
 		$this->_secret_key = !empty($modSettings['recaptcha_secret_key']) ? $modSettings['recaptcha_secret_key'] : '6Ld-KCcTAAAAAOeMYwZdoI8QW4Pr_h0ZhW5WFHno';
 		$this->_userIP = User::$info->ip;
