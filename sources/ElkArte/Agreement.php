@@ -149,13 +149,19 @@ class Agreement
 	}
 
 	/**
-	 * Retrieves the BBC-parsed version of the agreement.
+	 * Checks to see if the file exists and is writable
 	 *
-	 * If the language passed to the class is empty, then it uses Agreement/English.txt.
+	 * If the file does not exist, attempts to create it.
 	 */
 	public function isWritable()
 	{
 		$filename = $this->buildName($this->_language);
+
+		if (!$this->fileFunc->fileExists($filename) && !$this->fileFunc->isDir($filename))
+		{
+			touch($this->fileFunc->fileExists($filename));
+			$this->fileFunc->chmod($filename);
+		}
 
 		return $this->fileFunc->fileExists($filename) && $this->fileFunc->isWritable($filename);
 	}
@@ -257,6 +263,12 @@ class Agreement
 		return true;
 	}
 
+	/**
+	 * Builds the name and location of the file
+	 *
+	 * @param string $language
+	 * @return string
+	 */
 	protected function buildName($language)
 	{
  		return SOURCEDIR . '/ElkArte/Languages/' . $this->_file_name . '/' . $language . '.txt';
