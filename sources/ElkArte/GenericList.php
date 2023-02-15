@@ -163,7 +163,7 @@ class GenericList
 			$this->descVar = $this->listOptions['request_vars']['desc'] ?? 'desc';
 			$sortReq = $this->req->getQuery($this->sortVar);
 
-			if (isset($this->listOptions['columns'][$sortReq], $this->listOptions['columns'][$sortReq]['sort']))
+			if (isset($this->listOptions['columns'][$sortReq]['sort']))
 			{
 				$this->context['sort'] = array(
 					'id' => $sortReq,
