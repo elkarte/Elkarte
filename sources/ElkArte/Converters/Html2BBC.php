@@ -741,7 +741,7 @@ class Html2BBC extends AbstractDomParser
 
 		if (!empty($size))
 		{
-			$bbc = str_replace('[img', '[img ' . $size, $bbc);
+			$bbc = str_replace('[img', '[img ' . trim($size), $bbc);
 		}
 
 		return $bbc;
