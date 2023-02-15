@@ -626,6 +626,10 @@ ul.package_servers li {
 	border-bottom: 1px solid;
 }
 
+#manage_maintenance .content fieldset {
+	border-bottom: none;
+}
+
 /* Styles for the add holidays manage calendar section. */
 .settings dt.small_caption {
 	width: 20%;
@@ -865,6 +869,11 @@ dl.themes_list dd {
 #agreement, #reserved {
 	width: 99%;
 	padding: 0 .25em;
+}
+
+#admin_register_form dt span {
+	display: block;
+	padding: 0;
 }
 
 /* Styles for the moderation center. */

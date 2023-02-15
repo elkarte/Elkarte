@@ -773,6 +773,7 @@ abstract class AbstractQuery implements QueryInterface
 		{
 			$insertRows[] = $this->quote($insertData, $this->_array_combine($indexed_columns, $dataRow));
 		}
+
 		return [$table, $indexed_columns, $insertRows];
 	}
 

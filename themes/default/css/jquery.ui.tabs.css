@@ -18,7 +18,7 @@
 }
 
 .ui-tabs .ui-tabs-nav .ui-state-active > a, .ui-tabs .ui-tabs-nav .ui-state-active {
-	font-family: "Segoe UI Semibold", "Segoe UI", "Helvetica Neue Medium", "Helvetica Neue", serif;
+	font-family: "Segoe UI Semibold", "Helvetica Neue Medium", system-ui, -apple-system, BlinkMacSystemFont, "Roboto", "Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue", Arial, sans-serif;
 	font-weight: 600;
 	-webkit-font-smoothing: antialiased;
 	-moz-osx-font-smoothing: grayscale;

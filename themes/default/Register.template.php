@@ -545,28 +545,40 @@ function template_admin_register()
 	}
 
 	echo '
-					<div class="form_container">
-						<div class="form_field" id="admin_register_form">
-							<input type="text" name="user" id="user_input" tabindex="', $context['tabindex']++, '" size="30" maxlength="25" class="input_text" />
-							<label for="user_input">', $txt['admin_register_username'], '</label>
+					<input type="password" name="autofill_honey_pot" class="hide" />
+					<div class="flow_auto">
+					<dl class="settings" id="admin_register_form">
+						<dt>
+							<label for="user_input">', $txt['admin_register_username'], ':</label>
 							<span class="smalltext">', $txt['admin_register_username_desc'], '</span>
-						</div>
-						<div class="form_field">
-							<input type="email" name="email" id="email_input" tabindex="', $context['tabindex']++, '" size="30" class="input_text" />
-							<label for="email_input">', $txt['admin_register_email'], '</label>
+						</dt>
+						<dd>
+							<input type="text" name="user" id="user_input" tabindex="', $context['tabindex']++, '" size="30" maxlength="25" class="input_text" />
+						</dd>
+						<dt>
+							<label for="email_input">', $txt['admin_register_email'], ':</label>
 							<span class="smalltext">', $txt['admin_register_email_desc'], '</span>
+						</dt>
+						<dd>
+							<input type="email" name="email" id="email_input" tabindex="', $context['tabindex']++, '" size="30" class="input_text" />
 							<span id="suggestion" class="smalltext"></span>
-						</div>
-						<div class="form_field">
-							<input type="password" name="password" id="password_input" tabindex="', $context['tabindex']++, '" size="30" class="input_password" onchange="onCheckChange();" />
-							<label for="password_input">', $txt['admin_register_password'], '</label>
+						</dd>
+						<dt>
+							<label for="password_input">', $txt['admin_register_password'], ':</label>
 							<span class="smalltext">', $txt['admin_register_password_desc'], '</span>
-						</div>';
+						</dt>
+						<dd>
+							<input type="password" name="password" id="password_input" tabindex="', $context['tabindex']++, '" size="30" class="input_password" onchange="onCheckChange();" />
+						</dd>';
 
 	if (!empty($context['member_groups']))
 	{
 		echo '
-						<div class="form_field_select">
+						<dt>
+							<label for="group_select">', $txt['admin_register_group'], ':</label>
+							<span class="smalltext">', $txt['admin_register_group_desc'], '</span>
+						</dt>
+						<dd>
 							<select name="group" id="group_select" tabindex="', $context['tabindex']++, '">';
 
 		foreach ($context['member_groups'] as $id => $name)
@@ -577,24 +589,27 @@ function template_admin_register()
 
 		echo '
 							</select>
-							<label for="group_select">', $txt['admin_register_group'], '</label>
-							<p class="smalltext">', $txt['admin_register_group_desc'], '</p>
-						</div>';
+						</dd>';
 	}
 
 	echo '
-						<div class="form_field_checkbox">
-							<input type="checkbox" name="emailPassword" id="emailPassword_check" tabindex="', $context['tabindex']++, '" checked="checked" disabled="disabled" />
-							<label for="emailPassword_check">', $txt['admin_register_email_detail'], '</label>
+						<dt>
+							<label for="emailPassword_check">', $txt['admin_register_email_detail'], ':</label>
 							<span class="smalltext">', $txt['admin_register_email_detail_desc'], '</span>
-						</div>
-						<div class="form_field_checkbox">
+						</dt>
+						<dd>
+							<input type="checkbox" name="emailPassword" id="emailPassword_check" tabindex="', $context['tabindex']++, '" checked="checked" disabled="disabled" />
+						</dd>
+						<dt>
+							<label for="emailActivate_check">', $txt['admin_register_email_activate'], ':</label>
+						</dt>
+						<dd>
 							<input type="checkbox" name="emailActivate" id="emailActivate_check" tabindex="', $context['tabindex']++, '"', !empty($modSettings['registration_method']) && $modSettings['registration_method'] == 1 ? ' checked="checked"' : '', ' onclick="onCheckChange();" />
-							<label for="emailActivate_check">', $txt['admin_register_email_activate'], '</label>
-						</div>
+						</dd>
+					</dl>
 					</div>
-					<div class="submitbutton centertext">
-						<input type="submit" id="regSubmit" name="regSubmit" value="', $txt['register'], '" tabindex="', $context['tabindex']++, '" class="right_submit" />
+					<div class="submitbutton">
+						<input type="submit" name="regSubmit" value="', $txt['register'], '" tabindex="', $context['tabindex']++, '" class="right_submit" />
 						<input type="hidden" name="sa" value="register" />
 						<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
 						<input type="hidden" name="', $context['admin-regc_token_var'], '" value="', $context['admin-regc_token'], '" />
@@ -621,7 +636,7 @@ function template_edit_agreement()
 	if (!empty($context['warning']))
 	{
 		echo '
-			<p class="error">', $context['warning'], '</p>';
+			<p class="warningbox">', $context['warning'], '</p>';
 	}
 
 	echo '

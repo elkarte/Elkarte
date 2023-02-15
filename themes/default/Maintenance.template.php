@@ -187,13 +187,17 @@ function template_maintain_members()
 				<p><strong>', $txt['reattribute_guest_posts'], '</strong></p>
 				<dl class="settings">
 					<dt>
-						<label for="type_email"><input type="radio" name="type" id="type_email" value="email" checked="checked" />', $txt['reattribute_email'], '</label>
+						<label for="type_email">
+							<input type="radio" name="type" id="type_email" value="email" checked="checked" />', $txt['reattribute_email'], '
+						</label>
 					</dt>
 					<dd>
 						<input type="text" name="from_email" id="from_email" value="" onclick="document.getElementById(\'type_email\').checked = \'checked\'; document.getElementById(\'from_name\').value = \'\';" />
 					</dd>
 					<dt>
-						<label for="type_name"><input type="radio" name="type" id="type_name" value="name" />', $txt['reattribute_username'], '</label>
+						<label for="type_name">
+							<input type="radio" name="type" id="type_name" value="name" />', $txt['reattribute_username'], '
+						</label>
 					</dt>
 					<dd>
 						<input type="text" name="from_name" id="from_name" value="" onclick="document.getElementById(\'type_name\').checked = \'checked\'; document.getElementById(\'from_email\').value = \'\';" class="input_text" />
@@ -235,15 +239,20 @@ function template_maintain_members()
 
 	echo '
 			<fieldset id="membersPanel">
-				<legend data-collapsed="true">', $txt['maintain_members_all'], '</legend>';
+				<legend data-collapsed="true">', $txt['maintain_members_all'], '</legend>
+				<ul style="column-count: 2"';
 
 	foreach ($context['membergroups'] as $group)
 	{
 		echo '
-				<label for="groups', $group['id'], '"><input type="checkbox" name="groups[', $group['id'], ']" id="groups', $group['id'], '" checked="checked" /> ', $group['name'], '</label><br />';
+					<label for="groups', $group['id'], '">
+						<input type="checkbox" name="groups[', $group['id'], ']" id="groups', $group['id'], '" checked="checked" /> ', $group['name'], '
+					</label>
+					<br />';
 	}
 
-	echo '
+	echo '	
+			</ul>
 			</fieldset>
 			<div class="submitbutton">
 				<input type="submit" value="', $txt['maintain_old_remove'], '" onclick="return confirm(\'', $txt['maintain_members_confirm'], '\');" />

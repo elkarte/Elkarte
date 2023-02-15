@@ -78,6 +78,7 @@
 	--font29: 1.9333rem;
 	--font30: 2.0rem;
 	--quote_height: 12em;
+	--max_width: 1600px;
 }
 
 /* -------------------------------------------------------
@@ -125,7 +126,7 @@ html, body {
 	/* Next controls forum width, when it is not set in admin. */
 	width: 90%;
 	/* Next limits maximum width on wide screens. */
-	max-width: 98%;
+	max-width: var(--max_width);
 	margin: 0 auto;
 }
 
@@ -5809,10 +5810,6 @@ div.labels {
 @media screen and (max-width: 50em) {
 	#logobox img {
 		max-width: 95%;
-	}
-
-	.wrapper {
-		min-width: 98%;
 	}
 
 	#password_login select {
