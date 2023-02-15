@@ -324,7 +324,13 @@ class ManageAttachments extends AbstractController
 		$image = new Image($settings['default_theme_dir'] . '/images/blank.png');
 		$testImg = Gd2::canUse() || Imagick::canUse();
 		$testImgRotate = Imagick::canUse() || (Gd2::canUse() && function_exists('exif_read_data'));
+
+		// Check on webp support, and correct if wrong
 		$testWebP = $image->hasWebpSupport();
+		if (!$testWebP && !empty($modSettings['attachment_webp_enable']))
+		{
+			updateSettings(['attachment_webp_enable' => 0]);
+		}
 
 		// Check if the server settings support these upload size values
 		$post_max_size = ini_get('post_max_size');
@@ -609,6 +615,7 @@ class ManageAttachments extends AbstractController
 			),
 			'list_menu' => array(
 				'show_on' => 'top',
+				'class' => 'flow_flex_right',
 				'links' => array(
 					array(
 						'href' => getUrl('admin', ['action' => 'admin', 'area' => 'manageattachments', 'sa' => 'browse']),
