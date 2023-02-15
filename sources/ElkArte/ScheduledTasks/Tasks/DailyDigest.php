@@ -244,7 +244,7 @@ class DailyDigest implements ScheduledTaskInterface
 		}
 
 		// Fix the last reply message so its suitable for previewing
-		if ($maillist)
+		if ($maillist && !empty($types['reply']))
 		{
 			foreach ($types['reply'] as $id => $board)
 			{
