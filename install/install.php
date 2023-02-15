@@ -109,7 +109,7 @@ function setTimeZone() {
 	}
 
 	// Validate this is a valid zone
-	if (!in_array($timezone_id, timezone_identifiers_list()))
+	if (!in_array($timezone_id, timezone_identifiers_list(), true))
 	{
 		// Tray and make one up
 		$server_offset = @mktime(0, 0, 0, 1, 1, 1970) * -1;
@@ -287,16 +287,14 @@ function parseSqlLines($sql_file, $replaces)
 
 	// Each method is a separate installation step
 	$methods = get_class_methods($install_instance);
-
-	// Find all the tables we need to create and inserts that need to be done
-	$tables = array_filter($methods, function ($method) {
+	$tables = array_filter($methods, static function ($method) {
 		return strpos($method, 'table_') === 0;
 	});
-	$inserts = array_filter($methods, function ($method) {
+	$inserts = array_filter($methods, static function ($method) {
 		return strpos($method, 'insert_') === 0;
 	});
-	$others = array_filter($methods, function ($method) {
-		return substr($method, 0, 2) !== '__' && strpos($method, 'insert_') !== 0 && strpos($method, 'table_') !== 0;
+	$others = array_filter($methods, static function ($method) {
+		return strpos($method, '__') !== 0 && strpos($method, 'insert_') !== 0 && strpos($method, 'table_') !== 0;
 	});
 
 	// Create tables if they do not exist
@@ -339,7 +337,7 @@ function parseSqlLines($sql_file, $replaces)
 		$table_name = substr($insert_method, 6);
 
 		// Don't insert data if the table already existed before we started
-		if (in_array($table_name, $exists))
+		if (in_array($table_name, $exists, true))
 		{
 			$db_wrapper->countMode();
 			$incontext['sql_results']['insert_dups'] += $install_instance->{$insert_method}();
@@ -371,7 +369,7 @@ function parseSqlLines($sql_file, $replaces)
 	// Sort out the context for the SQL.
 	foreach ($incontext['sql_results'] as $key => $number)
 	{
-		if ($number == 0)
+		if ($number === 0)
 		{
 			unset($incontext['sql_results'][$key]);
 		}
@@ -428,7 +426,7 @@ function fixModSecurity()
 
 	if (is_writable(TMP_BOARDDIR))
 	{
-		if ($ht_handle = fopen(TMP_BOARDDIR . '/.htaccess', 'w'))
+		if ($ht_handle = fopen(TMP_BOARDDIR . '/.htaccess', 'wb'))
 		{
 			fwrite($ht_handle, $htaccess_addition);
 			fclose($ht_handle);

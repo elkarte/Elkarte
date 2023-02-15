@@ -12,7 +12,10 @@
  *
  */
 
+use ElkArte\Agreement;
+use ElkArte\ext\Composer\Autoload\ClassLoader;
 use ElkArte\User;
+use ElkArte\Util;
 
 /**
  * This does the installation steps
@@ -306,7 +309,7 @@ class Install_Controller
 		$failed_files = array();
 
 		// On linux, it's easy - just use is_writable!
-		if (substr(__FILE__, 1, 2) != ':\\')
+		if (substr(__FILE__, 1, 2) !== ':\\')
 		{
 			foreach ($writable_files as $file)
 			{
@@ -339,12 +342,12 @@ class Install_Controller
 
 				// Funny enough, chmod actually does do something on windows - it removes the read only attribute.
 				@chmod(TMP_BOARDDIR . '/' . $file, 0777);
-				$fp = @fopen(TMP_BOARDDIR . '/' . $file, 'r+');
+				$fp = @fopen(TMP_BOARDDIR . '/' . $file, 'rb+');
 
 				// Hmm, okay, try just for write in that case...
 				if (!is_resource($fp))
 				{
-					$fp = @fopen(TMP_BOARDDIR . '/' . $file, 'w');
+					$fp = @fopen(TMP_BOARDDIR . '/' . $file, 'wb');
 				}
 
 				if (!is_resource($fp))
@@ -371,7 +374,7 @@ class Install_Controller
 		$incontext['failed_files'] = $failed_files;
 
 		// It's not going to be possible to use FTP on windows to solve the problem...
-		if ($failure && substr(__FILE__, 1, 2) == ':\\')
+		if ($failure && substr(__FILE__, 1, 2) === ':\\')
 		{
 			$incontext['error'] = $txt['error_windows_chmod'] . '
 						<ul style="margin: 2.5ex; font-family: monospace;">
@@ -417,7 +420,7 @@ class Install_Controller
 				{
 					$ftp = new Ftp_Connection(null);
 				}
-				// Save the error so we can mess with listing...
+				// Save the error, so we can mess with listing...
 				elseif ($ftp->error !== false && empty($incontext['ftp_errors']) && !empty($ftp->last_message))
 				{
 					$incontext['ftp_errors'][] = $ftp->last_message;
@@ -631,7 +634,7 @@ class Install_Controller
 
 			require_once(EXTDIR . '/ClassLoader.php');
 
-			$loader = new \ElkArte\ext\Composer\Autoload\ClassLoader();
+			$loader = new ClassLoader();
 			$loader->setPsr4('ElkArte\\', SOURCEDIR . '/ElkArte');
 			$loader->setPsr4('BBC\\', SOURCEDIR . '/ElkArte/BBC');
 			$loader->register();
@@ -662,7 +665,7 @@ class Install_Controller
 			if ($db === null || $db === false)
 			{
 				$db_user = $_POST['db_prefix'] . $db_user;
-				$db = test_db_connection(true);
+				$db = test_db_connection();
 				if ($db !== null && $db !== false)
 				{
 					$db_user = $_POST['db_prefix'] . $db_user;
@@ -678,11 +681,11 @@ class Install_Controller
 				return false;
 			}
 
-			// @todo This global $db_connection is currently required bu the upgrade code,
+			// @todo This global $db_connection is currently required by the upgrade code,
 			// of course it would be much better if gone and passed as argument
 			// it was possible to remove it.
 			$db_connection = $db->connection();
-			// Do they meet the install requirements?
+			// Do they meet the installation requirements?
 			// @todo Old client, new server?
 			if (!db_version_check($db))
 			{
@@ -692,7 +695,7 @@ class Install_Controller
 			}
 
 			// Let's try that database on for size... assuming we haven't already lost the opportunity.
-			if ($db_name != '')
+			if ($db_name !== '')
 			{
 				$db->skip_next_error();
 				$db->query('', "
@@ -764,7 +767,7 @@ class Install_Controller
 		$host = empty($_SERVER['HTTP_HOST']) ? $_SERVER['SERVER_NAME'] . (empty($_SERVER['SERVER_PORT']) || $_SERVER['SERVER_PORT'] == '80' ? '' : ':' . $_SERVER['SERVER_PORT']) : $_SERVER['HTTP_HOST'];
 
 		// Now, to put what we've learned together... and add a path.
-		$incontext['detected_url'] = 'http' . (!empty($_SERVER['HTTPS']) && strtolower($_SERVER['HTTPS']) == 'on' ? 's' : '') . '://' . $host . strtr(substr($_SERVER['PHP_SELF'], 0, strrpos($_SERVER['PHP_SELF'], '/')), array('/install' => ''));
+		$incontext['detected_url'] = 'http' . (!empty($_SERVER['HTTPS']) && strtolower($_SERVER['HTTPS']) === 'on' ? 's' : '') . '://' . $host . strtr(substr($_SERVER['PHP_SELF'], 0, strrpos($_SERVER['PHP_SELF'], '/')), array('/install' => ''));
 
 		// Check if the database sessions will even work.
 		$incontext['test_dbsession'] = ini_get('session.auto_start') != 1;
@@ -773,16 +776,16 @@ class Install_Controller
 		// Submitting?
 		if (isset($_POST['boardurl']))
 		{
-			if (substr($_POST['boardurl'], -10) == '/index.php')
+			if (substr($_POST['boardurl'], -10) === '/index.php')
 			{
 				$_POST['boardurl'] = substr($_POST['boardurl'], 0, -10);
 			}
-			elseif (substr($_POST['boardurl'], -1) == '/')
+			elseif (substr($_POST['boardurl'], -1) === '/')
 			{
 				$_POST['boardurl'] = substr($_POST['boardurl'], 0, -1);
 			}
 
-			if (substr($_POST['boardurl'], 0, 7) != 'http://' && substr($_POST['boardurl'], 0, 7) != 'file://' && substr($_POST['boardurl'], 0, 8) != 'https://')
+			if (substr($_POST['boardurl'], 0, 7) !== 'http://' && substr($_POST['boardurl'], 0, 7) !== 'file://' && substr($_POST['boardurl'], 0, 8) !== 'https://')
 			{
 				$_POST['boardurl'] = 'http://' . $_POST['boardurl'];
 			}
@@ -897,7 +900,7 @@ class Install_Controller
 
 		foreach ($txt as $key => $value)
 		{
-			if (substr($key, 0, 8) == 'default_')
+			if (substr($key, 0, 8) === 'default_')
 			{
 				$replaces['{$' . $key . '}'] = $value;
 			}
@@ -934,7 +937,7 @@ class Install_Controller
 			array('variable')
 		);
 
-		$agreement = new \ElkArte\Agreement('english');
+		$agreement = new Agreement('english');
 		$success = $agreement->storeBackup();
 		$db->insert('replace',
 			$db_prefix . 'settings',
@@ -956,13 +959,13 @@ class Install_Controller
 			$globalCookies = false;
 
 			// Okay... let's see.  Using a subdomain other than www.? (not a perfect check.)
-			if ($matches[2] != '' && (strpos(substr($matches[2], 1), '.') === false || in_array($matches[1], array('forum', 'board', 'community', 'forums', 'support', 'chat', 'help', 'talk', 'boards', 'www'))))
+			if ($matches[2] !== '' && (strpos(substr($matches[2], 1), '.') === false || in_array($matches[1], array('forum', 'board', 'community', 'forums', 'support', 'chat', 'help', 'talk', 'boards', 'www'))))
 			{
 				$globalCookies = true;
 			}
 
 			// If there's a / in the middle of the path, or it starts with ~... we want local.
-			if (isset($matches[3]) && strlen($matches[3]) > 3 && (substr($matches[3], 0, 2) == '/~' || strpos(substr($matches[3], 1), '/') !== false))
+			if (isset($matches[3]) && strlen($matches[3]) > 3 && (substr($matches[3], 0, 2) === '/~' || strpos(substr($matches[3], 1), '/') !== false))
 			{
 				$localCookies = true;
 			}
@@ -1290,7 +1293,7 @@ class Install_Controller
 		require_once(SUBSDIR . '/Auth.subs.php');
 		require_once(EXTDIR . '/ClassLoader.php');
 
-		$loader = new \ElkArte\ext\Composer\Autoload\ClassLoader();
+		$loader = new ClassLoader();
 		$loader->setPsr4('ElkArte\\', SOURCEDIR . '/ElkArte');
 		$loader->setPsr4('BBC\\', SOURCEDIR . '/ElkArte/BBC');
 		$loader->register();
@@ -1312,7 +1315,7 @@ class Install_Controller
 		$db->insert('ignore',
 			'{db_prefix}log_activity',
 			array('date' => 'date', 'topics' => 'int', 'posts' => 'int', 'registers' => 'int'),
-			array(\ElkArte\Util::strftime('%Y-%m-%d', time()), 1, 1, (!empty($incontext['member_id']) ? 1 : 0)),
+			array(Util::strftime('%Y-%m-%d', time()), 1, 1, (!empty($incontext['member_id']) ? 1 : 0)),
 			array('date')
 		);
 
