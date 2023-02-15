@@ -20,6 +20,7 @@ use BBC\ParserWrapper;
 use ElkArte\AbstractController;
 use ElkArte\Action;
 use ElkArte\BoardsTree;
+use ElkArte\Converters\Html2BBC;
 use ElkArte\Exceptions\Exception;
 use ElkArte\SettingsForm\SettingsForm;
 use ElkArte\Languages\Txt;
@@ -562,7 +563,9 @@ class ManageBoards extends AbstractController
 			// Change '1 & 2' to '1 &amp; 2', but not '&amp;' to '&amp;amp;'...
 			$boardOptions['board_name'] = preg_replace('~[&]([^;]{8}|[^;]{0,8}$)~', '&amp;$1', $this->_req->post->board_name);
 
-			$boardOptions['board_description'] = Util::htmlspecialchars($this->_req->post->desc);
+			// Convert any html to bbc
+			$parser = new Html2BBC($this->_req->post->desc);
+			$boardOptions['board_description'] = Util::htmlspecialchars($parser->get_bbc());
 			preparsecode($boardOptions['board_description']);
 
 			$boardOptions['moderator_string'] = $this->_req->post->moderators;
@@ -940,7 +943,7 @@ class ManageBoards extends AbstractController
 		$config_vars = array(
 			array('title', 'settings'),
 			// Inline permissions.
-			array('permissions', 'manage_boards', 'helptext' => $txt['permissionhelp_manage_boards']),
+			array('permissions', 'manage_boards', 'helptext' => $txt['permissionhelp_manage_boards'], 'collapsed' => true),
 			'',
 			// Other board settings.
 			array('check', 'countChildPosts'),
