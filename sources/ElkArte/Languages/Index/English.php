@@ -539,6 +539,7 @@ $txt['topic_derived_from'] = 'Topic derived from %1$s';
 $txt['edit'] = 'Edit';
 $txt['quick_edit'] = 'Quick Edit';
 $txt['post_options'] = 'More...';
+$txt['quote_expand'] = 'Show Quote';
 
 $txt['set_sticky'] = 'Pin';
 $txt['set_nonsticky'] = 'Unpin';

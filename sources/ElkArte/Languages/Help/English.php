@@ -306,7 +306,6 @@ $helptxt['attachment_image_resize_enabled'] = 'Master on/off switch for this fun
 	resize attachment images (.jpg, .png, .gif, .bmp, .webp) to fit within the specified bounds.  The image format 
 	will be maintained unless the resized image is over the specified max allowed file size.  In this event, if 
 	change format is enabled, the system may convert the image to WebP or JPEG for better compression.';
-$helptxt['attachment_image_resize_enabled_size'] = 'or larger than %s KB.';
 $helptxt['attachment_image_resize_reformat'] = '
 	Selecting this option will allow the system to change images into WebP, if available, or JPEG ONLY
 	when necessary.  The system will try to maintain the existing format unless the resized image is in
