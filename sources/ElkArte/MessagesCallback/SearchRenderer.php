@@ -247,7 +247,7 @@ class SearchRenderer extends Renderer
 
 		// Drop any non-enabled ones
 		return array_filter($searchButtons, static function ($button) {
-			return !isset($button['enabled']) || $button['enabled'] !== false;
+			return !isset($button['enabled']) || (bool) $button['enabled'] !== false;
 		});
 	}
 

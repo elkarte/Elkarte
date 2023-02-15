@@ -212,7 +212,7 @@ class PmRenderer extends Renderer
 
 		// Drop any non-enabled ones
 		$pmButtons = array_filter($pmButtons, static function ($button) {
-			return !isset($button['enabled']) || $button['enabled'] !== false;
+			return !isset($button['enabled']) || (bool) $button['enabled'] !== false;
 		});
 
 		return ['pmbuttons' => $pmButtons];

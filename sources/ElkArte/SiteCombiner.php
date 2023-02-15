@@ -589,7 +589,7 @@ class SiteCombiner
 
 		foreach ($glob as $file)
 		{
-			$return &= $fileFunc->delete($file->getPathname());
+			$return = $return && $fileFunc->delete($file->getPathname());
 		}
 
 		return $return;

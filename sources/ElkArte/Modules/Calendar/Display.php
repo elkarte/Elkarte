@@ -61,7 +61,7 @@ class Display extends AbstractModule
 			'url' => getUrl('action', ['action' => 'post', 'calendar', 'msg' => $context['topic_first_message'], 'topic' => $context['current_topic'] . '.0'])
 		];
 
-		$context['calendar_post'] &= allowedTo('modify_any') || ($context['user']['started'] && allowedTo('modify_own'));
+		$context['calendar_post'] = $context['calendar_post'] && (allowedTo('modify_any') || ($context['user']['started'] && allowedTo('modify_own')));
 	}
 
 	/**

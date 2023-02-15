@@ -466,7 +466,7 @@ class Post extends AbstractController
 		// In order to keep the approval status flowing through, we have to pass it through the form...
 		$context['becomes_approved'] = $not_approved;
 		$context['show_approval'] = isset($this->_req->post->approve) ? ($this->_req->post->approve ? 2 : 1) : 0;
-		$context['can_announce'] &= $context['becomes_approved'];
+		$context['can_announce'] = $context['can_announce'] && $context['becomes_approved'];
 
 		// Set up the inputs for the form.
 		$this->_form_subject = strtr(Util::htmlspecialchars($subject), array("\r" => '', "\n" => '', "\t" => ''));

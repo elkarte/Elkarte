@@ -73,8 +73,8 @@ class Display extends AbstractModule
 			$context[$contextual] = allowedTo($perm . '_any') || ($userStarted && allowedTo($perm . '_own'));
 		}
 
-		$context['can_add_poll'] &= self::$_enabled && $topicinfo['id_poll'] <= 0;
-		$context['can_remove_poll'] &= self::$_enabled && $topicinfo['id_poll'] > 0;
+		$context['can_add_poll'] = $context['can_add_poll'] && self::$_enabled && $topicinfo['id_poll'] <= 0;
+		$context['can_remove_poll'] = $context['can_remove_poll'] && self::$_enabled && $topicinfo['id_poll'] > 0;
 	}
 
 	/**
