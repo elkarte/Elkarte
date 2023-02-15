@@ -221,4 +221,28 @@ abstract class AbstractManipulator
 
 		return [round($dst_width), round($dst_height)];
 	}
+
+	/**
+	 * Scale an image to a maximum dimension, maintaining the aspect ratio
+	 *
+	 * @param int $limit max width or height, based on current aspect ratio
+	 * @return int[]
+	 */
+	function imageScaleFactor($limit = 800)
+	{
+		$thumb_w = $limit;
+		$thumb_h = $limit;
+
+		if ($this->_width > $this->_height)
+		{
+			$thumb_h = max (1, $this->_height * ($limit / $this->_width));
+		}
+		// Portrait
+		elseif ($this->_width < $this->_height)
+		{
+			$thumb_w = max(1, $this->_width * ($limit / $this->_height));
+		}
+
+		return [(int) $thumb_w, (int) $thumb_h];
+	}
 }

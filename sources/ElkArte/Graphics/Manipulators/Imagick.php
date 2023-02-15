@@ -161,10 +161,11 @@ class Imagick extends AbstractManipulator
 	 * @param int|null $max_height The maximum allowed height
 	 * @param bool $strip Whether to have IM strip EXIF data as GD will
 	 * @param bool $force_resize = false Whether to override defaults and resize it
+	 * @param bool $thumbnail True if creating a simple thumbnail
 	 *
 	 * @return bool Whether resize was successful.
 	 */
-	public function resizeImage($max_width = null, $max_height = null, $strip = false, $force_resize = false)
+	public function resizeImage($max_width = null, $max_height = null, $strip = false, $force_resize = false, $thumbnail = false)
 	{
 		$success = true;
 
@@ -188,7 +189,22 @@ class Imagick extends AbstractManipulator
 		// Don't bother resizing if it's already smaller...
 		if (!empty($dst_width) && !empty($dst_height) && ($dst_width < $src_width || $dst_height < $src_height || $force_resize))
 		{
-			$success = $this->_image->resizeImage($dst_width, $dst_height, \Imagick::FILTER_LANCZOS, .9891, true);
+			try
+			{
+				if ($thumbnail)
+				{
+					$success = $this->_image->thumbnailImage($dst_width, $dst_height, true);
+				}
+				else
+				{
+					$success = $this->_image->resizeImage($dst_width, $dst_height, \imagick::FILTER_LANCZOS, .9891, true);
+				}
+			}
+			catch (\ImagickException $e)
+			{
+				return false;
+			}
+
 			$this->_setImage();
 		}
 
@@ -249,7 +265,7 @@ class Imagick extends AbstractManipulator
 				break;
 			default:
 				$this->_image->borderImage('white', 0, 0);
-				$this->_image->setImageCompression(\Imagick::COMPRESSION_JPEG);
+				$this->_image->setImageCompression(\imagick::COMPRESSION_JPEG);
 				$this->_image->setImageCompressionQuality($quality);
 				$success = $this->_image->setImageFormat('jpeg');
 				break;
@@ -311,45 +327,45 @@ class Imagick extends AbstractManipulator
 			switch ($this->orientation)
 			{
 				// 0 & 1 Not set or Normal
-				case \Imagick::ORIENTATION_UNDEFINED:
-				case \Imagick::ORIENTATION_TOPLEFT:
+				case \imagick::ORIENTATION_UNDEFINED:
+				case \imagick::ORIENTATION_TOPLEFT:
 					break;
 				// 2 Mirror image, Normal orientation
-				case \Imagick::ORIENTATION_TOPRIGHT:
+				case \imagick::ORIENTATION_TOPRIGHT:
 					$this->_image->flopImage();
 					break;
 				// 3 Normal image, rotated 180
-				case \Imagick::ORIENTATION_BOTTOMRIGHT:
-					$this->_image->rotateImage('#000', 180);
+				case \imagick::ORIENTATION_BOTTOMRIGHT:
+					$this->_image->rotateImage(new \ImagickPixel('#00000000'), 180);
 					break;
 				// 4 Mirror image, rotated 180
-				case \Imagick::ORIENTATION_BOTTOMLEFT:
+				case \imagick::ORIENTATION_BOTTOMLEFT:
 					$this->_image->flipImage();
 					break;
 				// 5 Mirror image, rotated 90 CCW
-				case \Imagick::ORIENTATION_LEFTTOP:
-					$this->_image->rotateImage('#000', 90);
+				case \imagick::ORIENTATION_LEFTTOP:
+					$this->_image->rotateImage(new \ImagickPixel('#00000000'), 90);
 					$this->_image->flopImage();
 					break;
 				// 6 Normal image, rotated 90 CCW
-				case \Imagick::ORIENTATION_RIGHTTOP:
-					$this->_image->rotateImage('#000', 90);
+				case \imagick::ORIENTATION_RIGHTTOP:
+					$this->_image->rotateImage(new \ImagickPixel('#00000000'), 90);
 					break;
 				// 7 Mirror image, rotated 90 CW
-				case \Imagick::ORIENTATION_RIGHTBOTTOM:
-					$this->_image->rotateImage('#000', -90);
+				case \imagick::ORIENTATION_RIGHTBOTTOM:
+					$this->_image->rotateImage(new \ImagickPixel('#00000000'), -90);
 					$this->_image->flopImage();
 					break;
 				// 8 Normal image, rotated 90 CW
-				case \Imagick::ORIENTATION_LEFTBOTTOM:
-					$this->_image->rotateImage('#000', -90);
+				case \imagick::ORIENTATION_LEFTBOTTOM:
+					$this->_image->rotateImage(new \ImagickPixel('#00000000'), -90);
 					break;
 			}
 
 			// Now that it's auto-rotated, make sure the EXIF data is correctly updated
 			if ($this->orientation >= 2)
 			{
-				$this->_image->setImageOrientation(\Imagick::ORIENTATION_TOPLEFT);
+				$this->_image->setImageOrientation(\imagick::ORIENTATION_TOPLEFT);
 				$this->orientation = 1;
 				$this->_setImage();
 			}
@@ -384,7 +400,7 @@ class Imagick extends AbstractManipulator
 	}
 
 	/**
-	 * Returns if the image (png) has any alpha pixels
+	 * Returns if the image has any alpha pixels.
 	 *
 	 * @return bool
 	 */
@@ -396,10 +412,57 @@ class Imagick extends AbstractManipulator
 			return false;
 		}
 
+		$checkImage = clone $this->_image;
+
+		try
+		{
+			// Scale down large images to reduce processing time
+			if ($this->_width > 1024 || $this->_height > 1024)
+			{
+				// This is only used to look for transparency, it is not intended to be a quality image.
+				$scaleValue = $this->imageScaleFactor(800);
+				$checkImage->scaleImage($scaleValue[0], $scaleValue[1], true);
+			}
+		}
+		catch (\ImagickException $e)
+		{
+			$checkImage->destroy();
+
+			return true;
+		}
+
+		// First attempt by looking at the channel statistics (faster)
+		$transparent = $this->checkOpacityChannel($checkImage);
+		if ($transparent !== null)
+		{
+			// Failing channel stats?, resort to pixel inspection
+			$transparent = $this->checkOpacityPixelInspection($checkImage);
+		}
+
+		$checkImage->destroy();
+
+		return $transparent;
+	}
+
+	/**
+	 * Does pixel by pixel inspection to determine if any have an alpha value < 1
+	 *
+	 * - Any pixel alpha < 1 is not perfectly opaque.
+	 * - Resizes images > 1024x1024 to reduce pixel count
+	 * - Used as a backup function should checkOpacityChannel() fail
+	 *
+	 * @param \Imagick $checkImage
+	 * @return bool
+	 */
+	public function checkOpacityPixelInspection($checkImage)
+	{
+		$checkImage = $checkImage ?? clone $this->_image;
+
 		try
 		{
 			$transparency = false;
-			$pixel_iterator = $this->_image->getPixelIterator();
+
+			$pixel_iterator = $checkImage->getPixelIterator();
 
 			// Look at each one, or until we find the first alpha pixel
 			foreach ($pixel_iterator as $pixels)
@@ -418,10 +481,43 @@ class Imagick extends AbstractManipulator
 		catch (\ImagickException $e)
 		{
 			// We don't know what it is, so don't mess with it
-			return false;
+			return true;
 		}
 
 		return $transparency;
+	}
+
+	/**
+	 * Attempts to use imagick getImageChannelMean to determine alpha/opacity channel statistics
+	 *
+	 * - An opaque image will have 0 standard deviation and a mean of 1 (65535)
+	 * - If failure returns null, otherwise bool
+	 *
+	 * @param \Imagick $checkImage
+	 * @return bool|null
+	 */
+	public function checkOpacityChannel($checkImage)
+	{
+		$checkImage = $checkImage ?? clone $this->_image;
+
+		try
+		{
+			$transparent = true;
+			$stats = $checkImage->getImageChannelMean(\imagick::CHANNEL_OPACITY);
+
+			// If mean = 65535 and std = 0, then its perfectly opaque.
+			$mean = (int) $stats['mean'];
+			if (($mean === 65535 || $mean === 0) && (int) $stats['standardDeviation'] === 0)
+			{
+				$transparent = false;
+			}
+		}
+		catch (\ImagickException $e)
+		{
+			$transparent = null;
+		}
+
+		return $transparent;
 	}
 
 	/**
@@ -452,7 +548,7 @@ class Imagick extends AbstractManipulator
 			$draw->setStrokeColor(new \ImagickPixel("rgba(100%, 100%, 100%, 0)"));
 			$draw->setFillColor(new \ImagickPixel('#A9A9A9'));
 			$draw->setStrokeWidth(1);
-			$draw->setTextAlignment(\Imagick::ALIGN_CENTER);
+			$draw->setTextAlignment(\imagick::ALIGN_CENTER);
 			$draw->setFont($settings['default_theme_dir'] . '/fonts/OpenSans.ttf');
 
 			// Make sure the text will fit the allowed space
