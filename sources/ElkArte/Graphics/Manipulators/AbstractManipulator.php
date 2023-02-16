@@ -61,8 +61,9 @@ abstract class AbstractManipulator
 	 * @param int|null $max_height The maximum allowed height
 	 * @param bool $strip Whether to have IM strip EXIF data as GD will
 	 * @param bool $force_resize = false Whether to override defaults and resize it
+	 * @param bool $thumbnail True if creating a simple thumbnail
 	 */
-	abstract public function resizeImage($max_width = null, $max_height = null, $strip = false, $force_resize = true);
+	abstract public function resizeImage($max_width = null, $max_height = null, $strip = false, $force_resize = true, $thumbnail = false);
 
 	/**
 	 * Rotate an image based on its EXIF flag, used to correct for smart phone pictures.

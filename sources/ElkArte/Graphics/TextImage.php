@@ -148,7 +148,7 @@ class TextImage extends Image
 	 *
 	 * @return bool Always returns true.
 	 */
-	public function resizeImage($max_width, $max_height, $strip = false, $force_resize = true)
+	public function resizeImage($max_width, $max_height, $strip = false, $force_resize = true, $thumbnail = false)
 	{
 		return true;
 	}
