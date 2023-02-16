@@ -303,7 +303,7 @@
 			 * @returns {boolean}
 			 */
 			isFileImage = function(file) {
-				return file && file['type'].split('/')[0] === 'image';
+				return file && file.type.split('/')[0] === 'image';
 			},
 
 			/**

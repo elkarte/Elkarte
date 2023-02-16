@@ -3,11 +3,9 @@ name: MaxPain
 on:
   push:
     branches:        # Run tests when commits are pushed to these branches
-      - master
       - development
   pull_request:      # Run tests when pull requests are made on these branches
     branches:
-      - master
       - development
 
 env:
@@ -69,7 +67,7 @@ jobs:
       - name: Setup problem matchers for PHP
         run: echo "::add-matcher::${{ runner.tool_cache }}/php.json"
 
-      - name: Setup Server Enviroment
+      - name: Setup Server Environment
         env:
           DB: ${{ matrix.db }}
           PHP_VERSION: ${{ matrix.php }}
@@ -135,7 +133,7 @@ jobs:
       - name: Install NodeJS
         uses: actions/setup-node@v1
         with:
-          node-version: 12
+          node-version: 18
 
       - name: Install Linters
         run: npm install --save-dev jshint stylelint stylelint-order stylelint-config-recommended
@@ -210,7 +208,7 @@ jobs:
       - name: Setup problem matchers for PHP
         run: echo "::add-matcher::${{ runner.tool_cache }}/php.json"
 
-      - name: Setup Server Enviroment
+      - name: Setup Server Environment
         env:
           DB: ${{steps.database-type.outputs.db}}
           PHP_VERSION: ${{ matrix.php }}
