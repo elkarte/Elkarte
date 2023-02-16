@@ -460,9 +460,10 @@ function showBarChart($id, $data, $labels, $tooltips)
  */
 function getChartData($stats, $num = 'num_posts', $usePercent = false)
 {
-	$labels = [];
-	$data = [];
-	$tooltips = [];
+	// Just so we always have, at least, 10 bars to plot
+	$labels = array_fill(0, 10, "' '");
+	$data = array_fill(0, 10, '0');
+	$tooltips = array_fill(0, 10, null);
 
 	foreach ($stats as $value)
 	{

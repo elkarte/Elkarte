@@ -1252,7 +1252,7 @@ class PersonalMessage extends AbstractController
 			$recipientList[$recipientType] = array_unique($recipientList[$recipientType]);
 		}
 
-		// Are we changing the recipients some how?
+		// Are we changing the recipients somehow?
 		$is_recipient_change = !empty($this->_req->post->delete_recipient) || !empty($this->_req->post->to_submit) || !empty($this->_req->post->bcc_submit);
 
 		// Check if there's at least one recipient.
@@ -2638,7 +2638,7 @@ class PersonalMessage extends AbstractController
 
 		// Drop any non-enabled ones
 		return array_filter($pmButtons, static function ($button) {
-			return !isset($button['enabled']) || $button['enabled'] !== false;
+			return !isset($button['enabled']) || (bool) $button['enabled'] !== false;
 		});
 	}
 

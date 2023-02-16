@@ -155,10 +155,11 @@ class Gd2 extends AbstractManipulator
 	 * @param int|null $max_height The maximum allowed height
 	 * @param bool $strip if to remove the images Exif data (GD will always)
 	 * @param bool $force_resize = false Whether to override defaults and resize it
+	 * @param bool $thumbnail True if creating a simple thumbnail
 	 *
 	 * @return bool Whether resize was successful.
 	 */
-	public function resizeImage($max_width = null, $max_height = null, $strip = true, $force_resize = false)
+	public function resizeImage($max_width = null, $max_height = null, $strip = true, $force_resize = false, $thumbnail = false)
 	{
 		$success = false;
 
@@ -418,19 +419,31 @@ class Gd2 extends AbstractManipulator
 			return false;
 		}
 
+		$width = $this->_width;
+		$height = $this->_height;
+		$image = $this->_image;
+		if ($width > 1024 || $height > 1024)
+		{
+			// Single pass scale down, not looking for quality here
+			list($width, $height) = $this->imageScaleFactor(800);
+			$image = imagescale($this->_image, $width, $height, IMG_NEAREST_NEIGHBOUR);
+		}
+
 		// Go through the image pixel by pixel until we find a transparent pixel
 		$transparency = false;
-		for ($i = 0; $i < $this->_width; $i++)
+		for ($i = 0; $i < $width; $i++)
 		{
-			for ($j = 0; $j < $this->_height; $j++)
+			for ($j = 0; $j < $height; $j++)
 			{
-				if (imagecolorat($this->_image, $i, $j) & 0x7F000000)
+				if (imagecolorat($image, $i, $j) & 0x7F000000)
 				{
 					$transparency = true;
 					break 2;
 				}
 			}
 		}
+
+		unset($image);
 
 		return $transparency;
 	}
@@ -536,6 +549,7 @@ class Gd2 extends AbstractManipulator
 		if (gettype($this->_image) === 'object' && get_class($this->_image) === 'GdImage')
 		{
 			imagedestroy($this->_image);
+			unset($this->_image);
 		}
 	}
 }

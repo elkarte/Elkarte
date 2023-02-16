@@ -25,7 +25,7 @@ class TestGraphics extends TestCase
 				'format' => IMAGETYPE_JPEG
 			),
 			array(
-				'url' => 'http://weblogs.us/images/weblogs.us.png',
+				'url' => 'https://weblogs.us/wp-content/uploads/2023/02/weblogs.us-logo.png',
 				'width' => 432,
 				'height' => 78,
 				'format' => IMAGETYPE_PNG

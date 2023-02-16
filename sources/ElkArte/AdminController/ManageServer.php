@@ -295,7 +295,7 @@ class ManageServer extends AbstractController
 			call_integration_hook('integrate_save_cookie_settings');
 
 			// Its either local or global cookies
-			if (!empty($this->_req->post->localCookies) && empty($this->_req->post->globalCookies))
+			if (!empty($this->_req->post->localCookies) && !empty($this->_req->post->globalCookies))
 			{
 				unset($this->_req->post->globalCookies);
 			}
@@ -303,6 +303,11 @@ class ManageServer extends AbstractController
 			if (!empty($this->_req->post->globalCookiesDomain) && strpos($boardurl, $this->_req->post->globalCookiesDomain) === false)
 			{
 				throw new Exception('invalid_cookie_domain', false);
+			}
+
+			if ($this->_req->getPost('cookiename', 'trim', '') === '')
+			{
+				$this->_req->post->cookiename = $cookiename;
 			}
 
 			$settingsForm->setConfigValues((array) $this->_req->post);

@@ -385,7 +385,7 @@ class Theme extends BaseTheme
 		// Localization for the show more quote and its container height
 		$quote_height = !empty($modSettings['heightBeforeShowMore']) ? $modSettings['heightBeforeShowMore'] . 'px' : 'none';
 		$this->addCSSRules('
-		input[type=checkbox].quote-show-more:after {content: "' . $txt['post_options'] . '";}
+		input[type=checkbox].quote-show-more:after {content: "' . $txt['quote_expand'] . '";}
 		.quote-read-more > .bbc_quote {--quote_height: ' . $quote_height . ';}'
 		);
 	}

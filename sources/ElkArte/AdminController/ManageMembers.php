@@ -147,15 +147,15 @@ class ManageMembers extends AbstractController
 					'label' => sprintf($txt['admin_browse_awaiting_approval'], $context['awaiting_approval']),
 					'description' => $txt['admin_browse_approve_desc'],
 					'url' => getUrl('admin', ['action' => 'admin', 'area' => 'viewmembers', 'sa' => 'browse', 'type' => 'approve']),
-					'disabled' => !$context['show_approve'] && ($subAction !== 'browse' || $this->_req->query->type !== 'approve'),
-					'selected' => ($subAction !== 'browse' || $this->_req->query->type === 'approve'),
+					'disabled' => !$context['show_approve'] && ($subAction !== 'browse' || $this->_req->getQuery('type') !== 'approve'),
+					'selected' => $subAction === 'browse' && $this->_req->getQuery('type') === 'approve',
 				],
 				'activate' => [
 					'label' => sprintf($txt['admin_browse_awaiting_activate'], $context['awaiting_activation']),
 					'description' => $txt['admin_browse_activate_desc'],
 					'url' => getUrl('admin', ['action' => 'admin', 'area' => 'viewmembers', 'sa' => 'browse', 'type' => 'activate']),
 					'disabled' => !$context['show_activate'] && ($subAction !== 'browse' || $this->_req->query->type !== 'activate'),
-					'selected' => ($subAction !== 'browse' || $this->_req->query->type === 'activate'),
+					'selected' => $subAction === 'browse' && $this->_req->getQuery('type') === 'activate',
 				],
 			]
 		]);

@@ -272,7 +272,7 @@ class DisplayRenderer extends Renderer
 
 		// Drop any non-enabled ones
 		$postButtons = array_filter($postButtons, static function ($button) {
-			return !isset($button['enabled']) || $button['enabled'] !== false;
+			return !isset($button['enabled']) || (bool) $button['enabled'] !== false;
 		});
 
 		return ['postbuttons' => $postButtons];

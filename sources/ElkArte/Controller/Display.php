@@ -867,10 +867,10 @@ class Display extends AbstractController
 		}
 
 		// Cleanup all the permissions with extra stuff...
-		$context['can_mark_notify'] &= !$context['user']['is_guest'];
-		$context['can_reply'] &= empty($this->topicinfo['locked']) || allowedTo('moderate_board');
-		$context['can_reply_unapproved'] &= $modSettings['postmod_active'] && (empty($this->topicinfo['locked']) || allowedTo('moderate_board'));
-		$context['can_issue_warning'] &= featureEnabled('w') && !empty($modSettings['warning_enable']);
+		$context['can_mark_notify'] = $context['can_mark_notify'] && !$context['user']['is_guest'];
+		$context['can_reply'] = $context['can_reply'] && (empty($this->topicinfo['locked']) || allowedTo('moderate_board'));
+		$context['can_reply_unapproved'] = $context['can_reply_unapproved'] && $modSettings['postmod_active'] && (empty($this->topicinfo['locked']) || allowedTo('moderate_board'));
+		$context['can_issue_warning'] = $context['can_issue_warning']  && featureEnabled('w') && !empty($modSettings['warning_enable']);
 
 		// Handle approval flags...
 		$context['can_reply_approved'] = $context['can_reply'];
@@ -881,7 +881,7 @@ class Display extends AbstractController
 			$context['can_reply_approved'] = false;
 		}
 
-		$context['can_reply'] |= $context['can_reply_unapproved'];
+		$context['can_reply'] = $context['can_reply'] || $context['can_reply_unapproved'];
 		$context['can_quote'] = $context['can_reply'] && (empty($modSettings['disabledBBC']) || !in_array('quote', explode(',', $modSettings['disabledBBC'])));
 		$context['can_mark_unread'] = $this->user->is_guest === false && $settings['show_mark_read'];
 		$context['can_unwatch'] = $this->user->is_guest === false && $modSettings['enable_unwatch'];
@@ -892,8 +892,8 @@ class Display extends AbstractController
 		$context['can_remove_post'] = allowedTo('delete_any') || (allowedTo('delete_replies') && $this->didThisUserStart());
 
 		// Can restore topic?  That's if the topic is in the recycle board and has a previous restore state.
-		$context['can_restore_topic'] &= !empty($modSettings['recycle_enable']) && $modSettings['recycle_board'] == $board && !empty($this->topicinfo['id_previous_board']);
-		$context['can_restore_msg'] &= !empty($modSettings['recycle_enable']) && $modSettings['recycle_board'] == $board && !empty($this->topicinfo['id_previous_topic']);
+		$context['can_restore_topic'] = $context['can_restore_topic'] && !empty($modSettings['recycle_enable']) && $modSettings['recycle_board'] == $board && !empty($this->topicinfo['id_previous_board']);
+		$context['can_restore_msg'] = $context['can_restore_msg'] && !empty($modSettings['recycle_enable']) && $modSettings['recycle_board'] == $board && !empty($this->topicinfo['id_previous_topic']);
 	}
 
 	/**

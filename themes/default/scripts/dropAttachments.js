@@ -65,7 +65,7 @@
 				totalSizeAllowed = params.totalSizeAllowed || 0;
 				individualSizeAllowed = params.individualSizeAllowed || 0;
 				numOfAttachmentAllowed = params.numOfAttachmentAllowed || 0;
-				totalAttachSizeUploaded = totalAttachSizeUploaded || 0;
+				totalAttachSizeUploaded = params.totalAttachSizeUploaded || 0;
 				numAttachUploaded = params.numAttachUploaded || 0;
 				resizeImageEnabled = params.resizeImageEnabled;
 				filesUploadedSuccessfully = [];
@@ -180,6 +180,11 @@
 						filesUploadedSuccessfully.push(data);
 						data.curFileNum = curFileNum;
 						status.onUploadSuccess(data);
+
+						// Correct the upload size
+						if (resizeImageEnabled && fileSize !== data.size) {
+							totalAttachSizeUploaded -= fileSize - data.size;
+						}
 					}
 					else
 					{
@@ -287,6 +292,18 @@
 
 					bytes /= 1024;
 				}
+			},
+
+			/**
+			 * private function
+			 *
+			 * Checks if the type is one of image/xyz
+			 *
+			 * @param file
+			 * @returns {boolean}
+			 */
+			isFileImage = function(file) {
+				return file && file.type.split('/')[0] === 'image';
 			},
 
 			/**
@@ -516,9 +533,9 @@
 					}
 
 					// Make sure the file is not larger than the server will accept
-					if (individualSizeAllowed !== 0 && fileSize > individualSizeAllowed && !resizeImageEnabled)
+					if (individualSizeAllowed !== 0 && fileSize > individualSizeAllowed && !resizeImageEnabled && isFileImage(files[i]))
 					{
-						errorMsgs.individualSizeErr = '(' + parseInt(String(fileSize / 1024), 10) + ' KB) ' + oTxt.individualSizeAllowed;
+						errorMsgs.individualSizeErr = '(' + formatBytes(fileSize) + ' ) ' + oTxt.individualSizeAllowed;
 						sizeErrorFiles.push(files[i].name);
 						errorFlag = true;
 					}

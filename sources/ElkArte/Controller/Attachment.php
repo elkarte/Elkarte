@@ -29,6 +29,7 @@ use ElkArte\TemporaryAttachmentsList;
 use ElkArte\Themes\ThemeLoader;
 use ElkArte\Languages\Txt;
 use ElkArte\User;
+use ElkArte\Util;
 
 /**
  * Everything to do with attachment handling / processing
@@ -597,19 +598,31 @@ class Attachment extends AbstractController
 	{
 		$headers = Headers::instance();
 		$body = file_get_contents($filename);
+		$length = FileFunctions::instance()->fileSize($filename);
 		$use_compression = $this->useCompression($mime_type);
 
 		// If we can/should compress this file
 		if ($use_compression && strlen($body) > 250)
 		{
 			$body = gzencode($body, 2);
+			$length = strlen($body);
 			$headers
 				->header('Content-Encoding', 'gzip')
 				->header('Vary', 'Accept-Encoding');
 		}
 
+		if (!empty($length))
+		{
+			$headers->header('Content-Length', $length);
+		}
+
+		// Forcibly end any output buffering going on.
+		while (ob_get_level() > 0)
+		{
+			@ob_end_clean();
+		}
+
 		// Someone is getting a present
-		$headers->header('Content-Length', strlen($body));
 		$headers->send();
 		echo $body;
 	}
@@ -704,7 +717,10 @@ class Attachment extends AbstractController
 			$image = new Image($filename);
 
 			$filename .= '_thumb';
-			$image->createThumbnail(100, 100, $filename, null,false);
+			$max_width = $this->_req->isSet('thumb') && !empty($modSettings['attachmentThumbWidth']) ? $modSettings['attachmentThumbWidth'] : 250;
+			$max_height = $this->_req->isSet('thumb') && !empty($modSettings['attachmentThumbHeight']) ? $modSettings['attachmentThumbHeight'] : 250;
+
+			$image->createThumbnail($max_width, $max_height, $filename, null,false);
 		}
 
 		// With the headers complete, send the file data

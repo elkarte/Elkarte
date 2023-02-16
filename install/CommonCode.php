@@ -13,6 +13,7 @@
  */
 
 use ElkArte\ext\Composer\Autoload\ClassLoader;
+use ElkArte\FileFunctions;
 
 /**
  * Grabs all the files with db definitions and loads them.
@@ -109,9 +110,7 @@ function test_db_connection()
 	$class = '\\ElkArte\\Database\\' . ucfirst($type) . '\\Connection';
 	try
 	{
-		$db = $class::initiate($db_server, $db_name, $db_user, $db_passwd, $db_prefix, $db_options);
-
-		return $db;
+		return $class::initiate($db_server, $db_name, $db_user, $db_passwd, $db_prefix, $db_options);
 	}
 	catch (\Exception $e)
 	{
@@ -193,7 +192,8 @@ function action_deleteInstaller()
 	{
 		$secure = true;
 	}
-	elseif (!empty($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO'] == 'https' || !empty($_SERVER['HTTP_X_FORWARDED_SSL']) && $_SERVER['HTTP_X_FORWARDED_SSL'] == 'on')
+	elseif ((!empty($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO'] === 'https')
+		|| (!empty($_SERVER['HTTP_X_FORWARDED_SSL']) && $_SERVER['HTTP_X_FORWARDED_SSL'] === 'on'))
 	{
 		$secure = true;
 	}
@@ -240,7 +240,7 @@ function saveFileSettings($config_vars, $settingsArray)
 		// Update as requested
 		foreach ($config_vars as $var => $val)
 		{
-			if (strncasecmp($settingsArray[$i], '$' . $var, 1 + strlen($var)) == 0)
+			if (strncasecmp($settingsArray[$i], '$' . $var, 1 + strlen($var)) === 0)
 			{
 				if ($val === '#remove#')
 				{
@@ -270,7 +270,6 @@ function saveFileSettings($config_vars, $settingsArray)
 	}
 
 	// Write out the new settings.php file
-	clearstatcache();
 	if (trim($settingsArray[0]) != '<?php')
 	{
 		array_unshift($settingsArray,'<?php' . "\n" );
@@ -284,6 +283,8 @@ function saveFileSettings($config_vars, $settingsArray)
 	{
 		opcache_invalidate(TMP_BOARDDIR . '/Settings.php', true);
 	}
+
+	clearstatcache(true, TMP_BOARDDIR . '/Settings.php');
 
 	return $result !== false;
 }
@@ -304,13 +305,13 @@ function makeFilesWritable(&$files)
 
 	foreach ($files as $k => $file)
 	{
-		if (\ElkArte\FileFunctions::instance()->isWritable($file))
+		if (FileFunctions::instance()->isWritable($file))
 		{
 			unset($files[$k]);
 			continue;
 		}
 
-		if (\ElkArte\FileFunctions::instance()->chmod($file))
+		if (FileFunctions::instance()->chmod($file))
 		{
 			unset($files[$k]);
 		}
@@ -325,7 +326,7 @@ function makeFilesWritable(&$files)
 	$upcontext['chmod']['files'] = $files;
 
 	// If it's windows it's a mess...
-	if (substr(__FILE__, 1, 2) == ':\\')
+	if (substr(__FILE__, 1, 2) === ':\\')
 	{
 		$upcontext['chmod']['ftp_error'] = 'total_mess';
 
@@ -373,10 +374,10 @@ function makeFilesWritable(&$files)
 		{
 			$ftp = new Ftp_Connection(null);
 		}
-		// Save the error so we can mess with listing...
+		// Save the error, so we can mess with listing...
 		elseif ($ftp->error !== false && !isset($upcontext['chmod']['ftp_error']))
 		{
-			$upcontext['chmod']['ftp_error'] = $ftp->last_message === null ? '' : $ftp->last_message;
+			$upcontext['chmod']['ftp_error'] = $ftp->last_message ?? '';
 		}
 
 		list ($username, $detect_path, $found_path) = $ftp->detect_path(TMP_BOARDDIR);
@@ -399,7 +400,7 @@ function makeFilesWritable(&$files)
 		if (!in_array($upcontext['chmod']['path'], array('', '/')))
 		{
 			$ftp_root = strtr(BOARDDIR, array($upcontext['chmod']['path'] => ''));
-			if (substr($ftp_root, -1) == '/' && ($upcontext['chmod']['path'] == '' || $upcontext['chmod']['path'][0] === '/'))
+			if (substr($ftp_root, -1) === '/' && ($upcontext['chmod']['path'] === '' || $upcontext['chmod']['path'][0] === '/'))
 			{
 				$ftp_root = substr($ftp_root, 0, -1);
 			}
@@ -469,7 +470,7 @@ function makeFilesWritable(&$files)
 	// What remains?
 	$upcontext['chmod']['files'] = $files;
 
-	return empty($files) ? true : false;
+	return empty($files);
 }
 
 /**
@@ -644,8 +645,6 @@ class Ftp_Connection
 		if (!$this->check_response(230))
 		{
 			$this->error = 'bad_password';
-
-			return;
 		}
 	}
 
@@ -693,7 +692,7 @@ class Ftp_Connection
 			return false;
 		}
 
-		if ($ftp_file == '')
+		if ($ftp_file === '')
 		{
 			$ftp_file = '.';
 		}
@@ -944,15 +943,15 @@ class Ftp_Connection
 			// Okay, this file's name is:
 			$listing[$i] = $current_dir . '/' . trim(strlen($listing[$i]) > 30 ? strrchr($listing[$i], ' ') : $listing[$i]);
 
-			if ($file[0] == '*' && substr($listing[$i], -(strlen($file) - 1)) == substr($file, 1))
+			if ($file[0] === '*' && substr($listing[$i], -(strlen($file) - 1)) === substr($file, 1))
 			{
 				return $listing[$i];
 			}
-			if (substr($file, -1) == '*' && substr($listing[$i], 0, strlen($file) - 1) == substr($file, 0, -1))
+			if (substr($file, -1) === '*' && substr($listing[$i], 0, strlen($file) - 1) === substr($file, 0, -1))
 			{
 				return $listing[$i];
 			}
-			if (basename($listing[$i]) == $file || $listing[$i] == $file)
+			if (basename($listing[$i]) === $file || $listing[$i] === $file)
 			{
 				return $listing[$i];
 			}
@@ -1006,7 +1005,7 @@ class Ftp_Connection
 
 				$path = strtr($_SERVER['DOCUMENT_ROOT'], array('/home/' . $match[1] . '/' => '', '/home2/' . $match[1] . '/' => ''));
 
-				if (substr($path, -1) == '/')
+				if (substr($path, -1) === '/')
 				{
 					$path = substr($path, 0, -1);
 				}
@@ -1030,7 +1029,7 @@ class Ftp_Connection
 			$path = '';
 		}
 
-		if (is_resource($this->connection) && $this->list_dir($path) == '')
+		if (is_resource($this->connection) && $this->list_dir($path) === '')
 		{
 			$data = $this->list_dir('', true);
 
@@ -1039,6 +1038,7 @@ class Ftp_Connection
 				$lookup_file = $_SERVER['PHP_SELF'];
 			}
 
+			// @todo does dirname return bools ??
 			$found_path = dirname($this->locate('*' . basename(dirname($lookup_file)) . '/' . basename($lookup_file), $data));
 			if ($found_path == false)
 			{

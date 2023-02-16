@@ -274,7 +274,20 @@ class Mail extends BaseMail
 		global $txt;
 
 		// Try to connect to the SMTP server... if it doesn't exist, only wait three seconds.
-		$socket = fsockopen($smtp_host, $smtp_port, $errno, $errstr, 3);
+		set_error_handler(static function () { /* ignore errors */ });
+		try
+		{
+			$socket = fsockopen($smtp_host, $smtp_port, $errno, $errstr, 3);
+		}
+		catch (\Exception $e)
+		{
+			$socket = false;
+		}
+		finally
+		{
+			restore_error_handler();
+		}
+
 		if (!is_resource($socket))
 		{
 			// Maybe we can still save this?  The port might be wrong.

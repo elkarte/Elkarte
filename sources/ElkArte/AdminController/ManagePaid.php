@@ -91,6 +91,11 @@ class ManagePaid extends AbstractController
 			'title' => 'paid_subscriptions',
 			'description' => 'paid_subscriptions_desc',
 			'prefix' => 'paid_subs',
+			'tabs' => [
+				'view' => [
+					'disabled' => empty($modSettings['paid_currency_symbol']),
+				],
+			],
 		]);
 
 		// Call the right function for this sub-action.
@@ -123,7 +128,6 @@ class ManagePaid extends AbstractController
 		$context['page_title'] = $txt['settings'];
 		$context['sub_template'] = 'show_settings';
 		$context['settings_message'] = replaceBasicActionUrl($txt['paid_note']);
-		$context[$context['admin_menu_name']]['current_subsection'] = 'settings';
 
 		// Get the final touches in place.
 		$context['post_url'] = getUrl('admin', ['action' => 'admin', 'area' => 'paidsubscribe', 'save', 'sa' => 'settings']);

@@ -344,19 +344,19 @@ class ManageRegistration extends AbstractController
 		global $txt, $context, $modSettings;
 
 		// By default we look at Languages/PrivacyPolicy/English.txt.
-		$context['current_agreement'] = '';
+		$context['current_agreement'] = 'English';
 
 		// Is there more than one to edit?
 		$context['editable_agreements'] = array('' => $txt['admin_agreement_default']);
 
-		// Get our languages.
+		// Get our installed languages.
 		$languages = getLanguages();
 
 		// Try to figure out if we have more agreements.
 		$fileFunc = FileFunctions::instance();
 		foreach ($languages as $lang)
 		{
-			if ($fileFunc->fileExists(SOURCEDIR . '/ElkArte/Languages/PrivacyPolicy/' . $lang['filename'] . '.txt'))
+			if ($fileFunc->fileExists(SOURCEDIR . '/ElkArte/Languages/PrivacyPolicy/' . $lang['name'] . '.txt'))
 			{
 				$context['editable_agreements'][$lang['filename']] = $lang['name'];
 

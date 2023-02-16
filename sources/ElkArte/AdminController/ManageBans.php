@@ -238,7 +238,6 @@ class ManageBans extends AbstractController
 							{
 								return sprintf('<span class="error">%1$s</span>', $txt['ban_expired']);
 							}
-
 							// Still need to wait a few days for this ban to expire.
 							else
 							{
@@ -297,8 +296,8 @@ class ManageBans extends AbstractController
 			),
 			'additional_rows' => array(
 				array(
-					'class' => 'submitbutton',
-					'position' => 'bottom_of_list',
+					'class' => 'submitbutton flow_flex_additional_row',
+					'position' => 'below_table_data',
 					'value' => '<input type="submit" name="removeBans" value="' . $txt['ban_remove_selected'] . '" onclick="return confirm(\'' . $txt['ban_remove_selected_confirm'] . '\');" />',
 				),
 			),
@@ -1030,32 +1029,33 @@ class ManageBans extends AbstractController
 			),
 			'additional_rows' => array(
 				array(
-					'class' => 'submitbutton',
-					'position' => 'bottom_of_list',
+					'class' => 'submitbutton flow_flex_additional_row',
+					'position' => 'below_table_data',
 					'value' => '<input type="submit" name="remove_triggers" value="' . $txt['ban_remove_selected_triggers'] . '" onclick="return confirm(\'' . $txt['ban_remove_selected_triggers_confirm'] . '\');" />',
 				),
 			),
 			'list_menu' => array(
 				'show_on' => 'top',
+				'class' => 'flow_flex_right',
 				'links' => array(
 					array(
 						'href' => getUrl('admin', ['action' => 'admin', 'area' => 'ban', 'sa' => 'browse', 'entity' => 'ip']),
-						'is_selected' => $context['selected_entity'] == 'ip',
+						'is_selected' => $context['selected_entity'] === 'ip',
 						'label' => $txt['ip']
 					),
 					array(
 						'href' => getUrl('admin', ['action' => 'admin', 'area' => 'ban', 'sa' => 'browse', 'entity' => 'hostname']),
-						'is_selected' => $context['selected_entity'] == 'hostname',
+						'is_selected' => $context['selected_entity'] === 'hostname',
 						'label' => $txt['hostname']
 					),
 					array(
 						'href' => getUrl('admin', ['action' => 'admin', 'area' => 'ban', 'sa' => 'browse', 'entity' => 'email']),
-						'is_selected' => $context['selected_entity'] == 'email',
+						'is_selected' => $context['selected_entity'] === 'email',
 						'label' => $txt['email']
 					),
 					array(
 						'href' => getUrl('admin', ['action' => 'admin', 'area' => 'ban', 'sa' => 'browse', 'entity' => 'member']),
-						'is_selected' => $context['selected_entity'] == 'member',
+						'is_selected' => $context['selected_entity'] === 'member',
 						'label' => $txt['username']
 					)
 				),

@@ -50,7 +50,7 @@ function setLoginCookie($cookie_length, $id, $password = '')
 
 	if (isset($_COOKIE[$cookiename]))
 	{
-		$array = serializeToJson($_COOKIE[$cookiename], function ($array_from) use ($cookiename) {
+		$array = serializeToJson($_COOKIE[$cookiename], static function ($array_from) use ($cookiename) {
 			global $modSettings;
 
 			require_once(SUBSDIR . '/Auth.subs.php');
@@ -76,7 +76,7 @@ function setLoginCookie($cookie_length, $id, $password = '')
 	// If subdomain-independent cookies are on, unset the subdomain-dependent cookie too.
 	if (empty($id) && !empty($modSettings['globalCookies']))
 	{
-		elk_setcookie($cookiename, $data, time() + $cookie_length, $cookie_url[1], '');
+		elk_setcookie($cookiename, $data, time() + $cookie_length, $cookie_url[1]);
 	}
 
 	// Any alias URLs?  This is mainly for use with frames, etc.
@@ -294,7 +294,7 @@ function adminLogin_outputPostVars($k, $v)
 /**
  * Properly urlencodes a string to be used in a query
  *
- * @param mixed[] $get associative array from $_GET
+ * @param array $get associative array from $_GET
  * @return string query string
  * @package Authorization
  */
@@ -318,7 +318,7 @@ function construct_query_string($get)
 				$query_string .= urlencode($k) . '=' . urlencode($v) . ';';
 			}
 			// If it changed, put it out there, but with an ampersand.
-			elseif ($temp[$k] != $get[$k])
+			elseif ($temp[$k] != $v)
 			{
 				$query_string .= urlencode($k) . '=' . urlencode($v) . '&amp;';
 			}
@@ -630,10 +630,10 @@ function validatePassword($password, $username, $restrict_in = array())
 	}
 
 	// Otherwise, hard test next, check for numbers and letters, uppercase too.
-	$good = preg_match('~(\D\d|\d\D)~', $password) != 0;
-	$good &= Util::strtolower($password) !== $password;
+	$good = preg_match('~(\D\d|\d\D)~', $password) === 1;
+	$good = $good && Util::strtolower($password) !== $password;
 
-	return $good !== 0 ? null : 'chars';
+	return $good ? null : 'chars';
 }
 
 /**
@@ -713,7 +713,7 @@ function rebuildModCache()
 
 	if ($board_query === '0=1')
 	{
-		$boards = boardsAllowedTo('moderate_board', true);
+		$boards = boardsAllowedTo('moderate_board');
 
 		$board_query = empty($boards) ? '0=1' : 'id_board IN (' . implode(',', $boards) . ')';
 	}
@@ -825,10 +825,10 @@ function isFirstLogin($id_member)
  * Search for a member by given criteria
  *
  * @param string $where
- * @param mixed[] $where_params array of values to used in the where statement
+ * @param array $where_params array of values to used in the where statement
  * @param bool $fatal
  *
- * @return mixed[]|bool array of members data or false on failure
+ * @return array|bool array of members data or false on failure
  * @throws \ElkArte\Exceptions\Exception no_user_with_email
  * @package Authorization
  *
@@ -936,7 +936,7 @@ function generateValidationCode($length = 10)
  *
  * @param string $name
  * @param bool $is_id if true it treats $name as a member ID and try to load the data for that ID
- * @return mixed[]|false false if nothing is found
+ * @return array|false false if nothing is found
  * @package Authorization
  */
 function loadExistingMember($name, $is_id = false)

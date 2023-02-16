@@ -37,8 +37,8 @@ class TestManageBoardsSettings extends ElkArteCommonSetupTest
 
 		// Lets see some hardcoded setting for boards management...
 		$this->assertNotNull($settings);
-		$this->assertTrue(in_array(array('title', 'settings'), $settings));
-		$this->assertTrue(in_array(array('permissions', 'manage_boards', 'helptext' => $txt['permissionhelp_manage_boards']), $settings));
-		$this->assertTrue(in_array(array('check', 'countChildPosts'), $settings));
+		$this->assertContains(array('title', 'settings'), $settings);
+		$this->assertContains(array('permissions', 'manage_boards', 'helptext' => $txt['permissionhelp_manage_boards'], 'collapsed' => true), $settings);
+		$this->assertContains(array('check', 'countChildPosts'), $settings);
 	}
 }

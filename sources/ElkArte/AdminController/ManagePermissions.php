@@ -1041,7 +1041,7 @@ class ManagePermissions extends AbstractController
 		$config_vars = array(
 			array('title', 'settings'),
 			// Inline permissions.
-			array('permissions', 'manage_permissions'),
+			array('permissions', 'manage_permissions', 'collapsed' => true),
 			'',
 			// A few useful settings
 			array('check', 'permission_enable_deny'),

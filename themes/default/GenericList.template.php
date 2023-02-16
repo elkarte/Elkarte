@@ -257,8 +257,8 @@ function template_additional_rows($row_position, $cur_list)
  * Used this if you want your generic lists to have navigation menus.
  *
  * $cur_list['list_menu'] = array(
- *    // The position of the tabs/buttons.  Left or Right.  By default is set to left.
- *    'position' => 'left',
+ *    'style' => '',
+ *    'class' => '',
  *    // Links.  This is the core of the array.  It has all the info that we need.
  *    'links' => array(
  *      'name' => array(

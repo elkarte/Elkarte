@@ -459,7 +459,7 @@ function template_database_settings()
 	<script>
 		function validatePgsql()
 		{
-			var dbtype = document.getElementById(\'db_type_input\');
+			let dbtype = document.getElementById(\'db_type_input\');
 
 			if (dbtype !== null && dbtype.value == \'postgresql\')
 				document.getElementById(\'db_name_info_warning\').style.display = \'none\';

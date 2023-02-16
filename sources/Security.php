@@ -1202,7 +1202,7 @@ function allowedTo($permission, $boards = null)
 	$result = true;
 	while (($row = $request->fetch_assoc()))
 	{
-		$result &= !empty($row['add_deny']);
+		$result = $result && !empty($row['add_deny']);
 	}
 	$request->free_result();
 

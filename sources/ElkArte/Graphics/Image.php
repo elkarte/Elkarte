@@ -210,7 +210,7 @@ class Image
 	 */
 	protected function isWebAddress()
 	{
-		return substr($this->_fileName, 0, 7) === 'http://' || substr($this->_fileName, 0, 8) === 'https://';
+		return strpos($this->_fileName, 'http://') === 0 || strpos($this->_fileName, 'https://') === 0;
 	}
 
 	/**
@@ -248,7 +248,7 @@ class Image
 	 */
 	public function isImage()
 	{
-		return substr($this->getMimeType(), 0, 5) === 'image';
+		return strpos($this->getMimeType(), 'image') === 0;
 	}
 
 	/**
@@ -275,7 +275,7 @@ class Image
 		$max_height = max(16, $max_height);
 
 		// Do the actual resize, thumbnails by default strip EXIF data to save space
-		$success = $this->resizeImage($max_width, $max_height, true, $force ?? true);
+		$success = $this->resizeImage($max_width, $max_height, true, $force ?? true, true);
 
 		// Save our work
 		if ($success)
@@ -388,10 +388,11 @@ class Image
 	 * @param int $max_height The maximum allowed height
 	 * @param bool $strip Allow IM to remove exif data as GD always will
 	 * @param bool $force_resize Always resize the image (force scale up)
+	 * @param bool $thumbnail If the image is a small thumbnail version
 	 *
 	 * @return bool Whether the thumbnail creation was successful.
 	 */
-	public function resizeImage($max_width, $max_height, $strip = false, $force_resize = true)
+	public function resizeImage($max_width, $max_height, $strip = false, $force_resize = true, $thumbnail = false)
 	{
 		// Nothing to do without GD or IM or an Image
 		if ($this->_manipulator === null)
@@ -401,7 +402,7 @@ class Image
 
 		try
 		{
-			return $this->_manipulator->resizeImage($max_width, $max_height, $strip, $force_resize);
+			return $this->_manipulator->resizeImage($max_width, $max_height, $strip, $force_resize, $thumbnail);
 		}
 		catch (\Exception $e)
 		{

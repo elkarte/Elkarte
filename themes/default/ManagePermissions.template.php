@@ -268,7 +268,7 @@ function template_by_board()
 	foreach ($context['categories'] as $category)
 	{
 		echo '
-			<h2 class="category_header"><strong>', $category['name'], '</strong></h2>';
+			<h2 class="category_header">', $category['name'], '</h2>';
 
 		if (!empty($category['boards']))
 		{
