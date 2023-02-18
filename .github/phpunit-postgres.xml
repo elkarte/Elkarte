@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<phpunit backupGlobals="true"
+         colors="true"
+         convertErrorsToExceptions="true"
+         convertNoticesToExceptions="true"
+         convertWarningsToExceptions="true"
+         processIsolation="false"
+         stopOnFailure="false"
+         verbose="true"
+         bootstrap="bootstrap.php">
+  <testsuites>
+      <testsuite name="DB Tests">
+          <directory suffix="DatabaseTestExt.php">../tests</directory>
+      </testsuite>
+      <testsuite name="Unit Tests">
+          <directory suffix="Test.php">../tests/sources</directory>
+      </testsuite>
+      <testsuite name="Basic Tests">
+          <directory suffix="Basic.php">../tests/sources</directory>
+      </testsuite>
+      <testsuite name="Bootstrap Tests">
+          <directory suffix="BootstrapRunTestExt.php">../tests</directory>
+      </testsuite>
+  </testsuites>
+
+  <logging>
+      <log type="coverage-text" target="php://stdout" />
+  </logging>
+
+  <filter>
+      <whitelist addUncoveredFilesFromWhitelist="false">
+          <directory suffix=".php">../sources</directory>
+          <exclude>
+              <directory suffix=".php">../sources/ext</directory>
+          </exclude>
+      </whitelist>
+  </filter>
+
+  <php>
+      <const name="DBTYPE" value="PostgreSQL"/>
+      <ini name="memory_limit" value="512M"/>
+  </php>
+
+</phpunit>

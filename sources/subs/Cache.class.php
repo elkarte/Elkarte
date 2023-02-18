@@ -11,7 +11,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.1.4
+ * @version 1.1.9
  *
  */
 
@@ -77,8 +77,6 @@ class Cache
 	 */
 	public function __construct($level, $accelerator, $options)
 	{
-		$this->setLevel($level);
-
 		// Default to file based so we can slow everything down :P
 		if (empty($accelerator))
 		{
@@ -86,6 +84,8 @@ class Cache
 		}
 
 		$this->_accelerator = $accelerator;
+
+		$this->setLevel($level);
 
 		if ($level > 0)
 		{
@@ -507,6 +507,7 @@ class Cache
 		{
 			global $cache_accelerator, $cache_enable, $cache_uid, $cache_password, $cache_memcached;
 
+			$cache_accelerator = empty($cache_accelerator) ? 'filebased' : $cache_accelerator;
 			$options = array();
 			if ($cache_accelerator === 'xcache')
 			{

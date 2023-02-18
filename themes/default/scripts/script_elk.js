@@ -3,7 +3,7 @@
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * @version 1.1.7
+ * @version 1.1.9
  */
 
 /**
@@ -29,12 +29,38 @@ function elk_codefix()
 		var $this = $(this);
 
 		// If it has a scroll bar, allow the user to resize it vertically
-		if ($this.get(0).scrollHeight > $this.innerHeight()) {
+		if ($this.get(0).scrollHeight > Math.round($this.innerHeight())) {
 			$this.css('height', $this.height());
 			$this.css('max-height', 'none');
 		}
 		else {
 			$this.css('resize', 'none');
+		}
+	});
+}
+
+/**
+ * Removes the read more overlay from quote blocks that do not need them, and for
+ * ones that do, hides so the read more input can expand it out.
+ */
+function elk_quotefix()
+{
+	let quotes = document.querySelectorAll('.quote-read-more');
+
+	quotes.forEach((quote) => {
+		let bbc_quote = quote.querySelector('.bbc_quote');
+
+		if (bbc_quote.scrollHeight > bbc_quote.clientHeight)
+		{
+			bbc_quote.style.overflow = 'hidden';
+		}
+		else
+		{
+			let check = quote.querySelector('.quote-show-more');
+			if (check)
+			{
+				check.remove();
+			}
 		}
 	});
 }

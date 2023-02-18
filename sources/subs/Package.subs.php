@@ -11,7 +11,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.1.7
+ * @version 1.1.9
  *
  */
 
@@ -2494,7 +2494,7 @@ function package_create_backup($id = 'backup')
 			package_chmod(BOARDDIR . '/packages/backups');
 
 		// Name the output file, yyyy-mm-dd_before_package_name.tar.gz
-		$output_file = BOARDDIR . '/packages/backups/' . strftime('%Y-%m-%d_') . preg_replace('~[$\\\\/:<>|?*"\']~', '', $id);
+		$output_file = BOARDDIR . '/packages/backups/' . Util::strftime('%Y-%m-%d_') . preg_replace('~[$\\\\/:<>|?*"\']~', '', $id);
 		$output_ext = '.tar';
 
 		if (file_exists($output_file . $output_ext . '.gz'))
@@ -2700,11 +2700,6 @@ function fetch_web_data($url, $post_data = '', $keep_alive = false, $redirection
 	}
 
 	return $data;
-}
-
-if (!function_exists('crc32_compat'))
-{
-	require_once(SUBSDIR . '/Compat.subs.php');
 }
 
 /**

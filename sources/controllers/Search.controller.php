@@ -11,7 +11,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.1.8
+ * @version 1.1.9
  *
  */
 
@@ -737,7 +737,8 @@ class Search_Controller extends Action_Controller
 			$query = trim($query, '\*+');
 			$query = strtr(Util::htmlspecialchars($query), array('\\\'' => '\''));
 
-			$body_highlighted = preg_replace_callback('/((<[^>]*)|' . preg_quote(strtr($query, array('\'' => '&#039;')), '/') . ')/iu', array($this, '_highlighted_callback'), $body_highlighted);
+			$search_highlight = preg_quote(strtr($query, array('\'' => '&#039;')), '/');
+			$body_highlighted = preg_replace_callback('/((<[^>]*)|(\b' . $search_highlight . '\b)|'. $search_highlight . ')/iu', array($this, '_highlighted_callback'), $body_highlighted);
 			$subject_highlighted = preg_replace('/(' . preg_quote($query, '/') . ')/iu', '<strong class="highlight">$1</strong>', $subject_highlighted);
 		}
 
@@ -805,7 +806,19 @@ class Search_Controller extends Action_Controller
 	 */
 	private function _highlighted_callback($matches)
 	{
-		return isset($matches[2]) && $matches[2] == $matches[1] ? stripslashes($matches[1]) : '<span class="highlight">' . $matches[1] . '</span>';
+		if (isset($matches[2]) && $matches[2] === $matches[1])
+		{
+			return stripslashes($matches[1]);
+		}
+
+		// Full word match
+		if (isset($matches[3]))
+		{
+			return '<span class="highlight">' . $matches[3] . '</span>';
+		}
+
+		// Partial word match
+		return '<span class="highlight" style="font-weight: 600;font-style: italic;">' . $matches[1] . '</span>';
 	}
 
 	/**
@@ -817,7 +830,7 @@ class Search_Controller extends Action_Controller
 
 		$default_factors = $this->_weight_factors = array(
 			'frequency' => array(
-				'search' => 'COUNT(*) / (MAX(t.num_replies) + 1)',
+				'search' => 'COUNT(*) / (CASE WHEN MAX(t.num_replies) < 5 THEN 5 ELSE MAX(t.num_replies) + 1 END)',
 				'results' => '(t.num_replies + 1)',
 			),
 			'age' => array(
@@ -840,7 +853,7 @@ class Search_Controller extends Action_Controller
 				'results' => 't.is_sticky',
 			),
 			'likes' => array(
-				'search' => 'MAX(t.num_likes)',
+				'search' => 'CASE WHEN t.num_likes > 20 THEN 1 ELSE t.num_likes / 20 END',
 				'results' => 't.num_likes',
 			),
 		);

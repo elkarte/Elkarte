@@ -11,7 +11,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.1.7
+ * @version 1.1.9
  *
  */
 
@@ -269,7 +269,7 @@ function loadCustomFields($memID, $area = 'summary', array $custom_fields = arra
 		// Only thing left, a textbox for you
 		else
 		{
-			$input_html = '<textarea id="' . $row['col_name'] . '" name="customfield[' . $row['col_name'] . ']" ' . (!empty($rows) ? 'rows="' . $row['rows'] . '"' : '') . ' ' . (!empty($cols) ? 'cols="' . $row['cols'] . '"' : '') . '>' . $value . '</textarea>';
+			$input_html = '<textarea id="' . $row['col_name'] . '" name="customfield[' . $row['col_name'] . ']" ' . (!empty($row['rows']) ? 'rows="' . $row['rows'] . '"' : '') . ' ' . (!empty($row['cols']) ? 'cols="' . $row['cols'] . '"' : '') . '>' . $value . '</textarea>';
 		}
 
 		// Parse BBCode
@@ -290,7 +290,7 @@ function loadCustomFields($memID, $area = 'summary', array $custom_fields = arra
 			);
 			if (in_array($row['field_type'], array('radio', 'select')))
 			{
-				$replacements['{KEY}'] = $row['col_name'] . '_' . $key;
+				$replacements['{KEY}'] = $row['col_name'] . '_' . (isset($key) ? $key : 0);
 			}
 			$output_html = strtr($row['enclose'], $replacements);
 		}
@@ -448,7 +448,7 @@ function loadProfileFields($force_reload = false)
 		),
 		'date_registered' => array(
 			'type' => 'date',
-			'value' => empty($cur_profile['date_registered']) ? $txt['not_applicable'] : strftime('%Y-%m-%d', $cur_profile['date_registered'] + ($user_info['time_offset'] + $modSettings['time_offset']) * 3600),
+			'value' => empty($cur_profile['date_registered']) ? $txt['not_applicable'] : Util::strftime('%Y-%m-%d', $cur_profile['date_registered'] + ($user_info['time_offset'] + $modSettings['time_offset']) * 3600),
 			'label' => $txt['date_registered'],
 			'log_change' => true,
 			'permission' => 'moderate_forum',
@@ -459,10 +459,10 @@ function loadProfileFields($force_reload = false)
 				if (($value = strtotime($value)) === -1)
 				{
 					$value = $cur_profile['date_registered'];
-					return $txt['invalid_registration'] . ' ' . strftime('%d %b %Y ' . (strpos($user_info['time_format'], '%H') !== false ? '%I:%M:%S %p' : '%H:%M:%S'), forum_time(false));
+					return $txt['invalid_registration'] . ' ' . Util::strftime('%d %b %Y ' . (strpos($user_info['time_format'], '%H') !== false ? '%I:%M:%S %p' : '%H:%M:%S'), forum_time(false));
 				}
 				// As long as it doesn't equal "N/A"...
-				elseif ($value != $txt['not_applicable'] && $value != strtotime(strftime('%Y-%m-%d', $cur_profile['date_registered'] + ($user_info['time_offset'] + $modSettings['time_offset']) * 3600)))
+				elseif ($value != $txt['not_applicable'] && $value != strtotime(Util::strftime('%Y-%m-%d', $cur_profile['date_registered'] + ($user_info['time_offset'] + $modSettings['time_offset']) * 3600)))
 					$value = $value - ($user_info['time_offset'] + $modSettings['time_offset']) * 3600;
 				else
 					$value = $cur_profile['date_registered'];
@@ -927,8 +927,8 @@ function loadProfileFields($force_reload = false)
 
 				$context['member']['time_format'] = $cur_profile['time_format'];
 				$context['current_forum_time'] = standardTime(time() - $user_info['time_offset'] * 3600, false);
-				$context['current_forum_time_js'] = strftime('%Y,' . ((int) strftime('%m', time() + $modSettings['time_offset'] * 3600) - 1) . ',%d,%H,%M,%S', time() + $modSettings['time_offset'] * 3600);
-				$context['current_forum_time_hour'] = (int) strftime('%H', forum_time(false));
+				$context['current_forum_time_js'] = Util::strftime('%Y,' . ((int) Util::strftime('%m', time() + $modSettings['time_offset'] * 3600) - 1) . ',%d,%H,%M,%S', time() + $modSettings['time_offset'] * 3600);
+				$context['current_forum_time_hour'] = (int) Util::strftime('%H', forum_time(false));
 				return true;
 			},
 		),
@@ -1605,7 +1605,7 @@ function makeCustomFieldChanges($memID, $area, $sanitize = true)
 			if (in_array($row['field_type'], array('radio', 'select')))
 			{
 				$user_profile[$memID]['options'][$row['col_name']] = $value;
-				$user_profile[$memID]['options'][$row['col_name'] . '_key'] = $row['col_name'] . '_' . $key;
+				$user_profile[$memID]['options'][$row['col_name'] . '_key'] = $row['col_name'] . '_' . (isset($key) ? $key : 0);
 			}
 			else
 			{
@@ -2310,16 +2310,30 @@ function profileSaveAvatarData(&$value)
 				@unlink($_FILES['attachment']['tmp_name']);
 				return 'bad_avatar';
 			}
+
+			require_once(SUBSDIR . '/Graphics.subs.php');
+			require_once(SUBSDIR . '/Attachments.subs.php');
+
+			// If it is a webp image, and ACP support is OFF, but server is capable, then convert it!
+			if (empty($modSettings['attachment_webp_enable']) && $sizes[2] == 18 && hasWebpSupport())
+			{
+				// We do this before the checks as it will increase the filesize
+				$format = setDefaultFormat($_FILES['attachment']['tmp_name']);
+				if (reencodeImage($_FILES['attachment']['tmp_name'], $format))
+				{
+					// Update to what it now is (webp to png or jpg)
+					$sizes = elk_getimagesize($_FILES['attachment']['tmp_name']);
+				}
+			}
+
 			// Check whether the image is too large.
-			elseif ((!empty($modSettings['avatar_max_width']) && $sizes[0] > $modSettings['avatar_max_width']) || (!empty($modSettings['avatar_max_height']) && $sizes[1] > $modSettings['avatar_max_height']))
+			if ((!empty($modSettings['avatar_max_width']) && $sizes[0] > $modSettings['avatar_max_width']) || (!empty($modSettings['avatar_max_height']) && $sizes[1] > $modSettings['avatar_max_height']))
 			{
 				if (!empty($modSettings['avatar_action_too_large']) && $modSettings['avatar_action_too_large'] === 'option_download_and_resize')
 				{
 					// Attempt to chmod it.
 					@chmod($_FILES['attachment']['tmp_name'], 0644);
 
-					// @todo remove this require when appropriate
-					require_once(SUBSDIR . '/Attachments.subs.php');
 					if (!saveAvatar($_FILES['attachment']['tmp_name'], $memID, $modSettings['avatar_max_width'], $modSettings['avatar_max_height']))
 					{
 						// Something went wrong, so lets delete this offender
@@ -2337,15 +2351,12 @@ function profileSaveAvatarData(&$value)
 					// Attempt to chmod it.
 					@chmod($_FILES['attachment']['tmp_name'], 0644);
 
-					require_once(SUBSDIR . '/Graphics.subs.php');
 					if (!reencodeImage($_FILES['attachment']['tmp_name'], $sizes[2]))
 					{
 						@unlink($_FILES['attachment']['tmp_name']);
 						return 'bad_avatar';
 					}
 
-					// @todo remove this require when appropriate
-					require_once(SUBSDIR . '/Attachments.subs.php');
 					if (!saveAvatar($_FILES['attachment']['tmp_name'], $memID, $modSettings['avatar_max_width'], $modSettings['avatar_max_height']))
 					{
 						// Something went wrong, so lets delete this offender
@@ -2367,7 +2378,6 @@ function profileSaveAvatarData(&$value)
 			elseif (is_array($sizes))
 			{
 				// Now try to find an infection.
-				require_once(SUBSDIR . '/Graphics.subs.php');
 				if (!checkImageContents($_FILES['attachment']['tmp_name'], !empty($modSettings['avatar_paranoid'])))
 				{
 					// It's bad. Try to re-encode the contents?
@@ -2392,11 +2402,14 @@ function profileSaveAvatarData(&$value)
 					'1' => 'gif',
 					'2' => 'jpg',
 					'3' => 'png',
-					'6' => 'bmp'
+					'6' => 'bmp',
 				);
 
-				$extension = isset($extensions[$sizes[2]]) ? $extensions[$sizes[2]] : 'bmp';
-				$mime_type = 'image/' . ($extension === 'jpg' ? 'jpeg' : ($extension === 'bmp' ? 'x-ms-bmp' : $extension));
+				if (!empty($modSettings['attachment_webp_enable']))
+					$extensions['18'] = 'webp';
+
+				$extension = isset($extensions[$sizes[2]]) ? $extensions[$sizes[2]] : 'jpg';
+				$mime_type = 'image/' . ($extension === 'jpg' ? 'jpeg' : $extension);
 				$destName = 'avatar_' . $memID . '_' . time() . '.' . $extension;
 				list ($width, $height) = elk_getimagesize($_FILES['attachment']['tmp_name']);
 				$file_hash = empty($modSettings['custom_avatar_enabled']) ? getAttachmentFilename($destName, null, null, true) : '';

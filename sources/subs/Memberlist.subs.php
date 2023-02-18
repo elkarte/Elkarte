@@ -11,7 +11,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.1.7
+ * @version 1.1.9
  *
  */
 
@@ -342,7 +342,7 @@ function printMemberListRows($request)
 
 		$context['members'][$member] = $memberContext[$member];
 		$context['members'][$member]['post_percent'] = round(($context['members'][$member]['real_posts'] * 100) / $most_posts);
-		$context['members'][$member]['registered_date'] = strftime('%Y-%m-%d', $context['members'][$member]['registered_timestamp']);
+		$context['members'][$member]['registered_date'] = Util::strftime('%Y-%m-%d', $context['members'][$member]['registered_timestamp']);
 		$context['members'][$member]['real_name'] = $context['members'][$member]['link'];
 		$context['members'][$member]['avatar'] = '<a href="' . $context['members'][$member]['href'] . '">' . $context['members'][$member]['avatar']['image'] . '</a>';
 		$context['members'][$member]['email_address'] = $context['members'][$member]['email'];

@@ -687,22 +687,22 @@ class UpgradeInstructions_upgrade_1_1
 						switch ($row['col_name'])
 						{
 							case 'cust_skye':
-								$this->db->query('', 'UPDATE {db_prefix}custom_fields SET enclose=\'<a href="skype:{INPUT}?call" class="icon i-skype icon-big" title="Skype call {INPUT}"><s>Skype call {INPUT}</s></a>\' WHERE id_field=' . $row['id_field']);
+								$this->db->query('', 'UPDATE {db_prefix}custom_fields SET enclose="<a href=\"skype:{INPUT}?call\" class=\"icon i-skype icon-big\" title=\"Skype call {INPUT}\"><s>Skype call {INPUT}</s></a>" WHERE id_field=' . $row['id_field']);
 								break;
 							case 'cust_fbook':
-								$this->db->query('', 'UPDATE {db_prefix}custom_fields SET enclose=\'<a target="_blank" href="https://www.facebook.com/{INPUT}" class="icon i-facebook icon-big" title="Facebook"><s>Facebook</s></a>\' WHERE id_field=' . $row['id_field']);
+								$this->db->query('', 'UPDATE {db_prefix}custom_fields SET enclose="<a target=\"_blank\" href=\"https://www.facebook.com/{INPUT}\" class=\"icon i-facebook icon-big\" title=\"Facebook\"><s>Facebook</s></a>" WHERE id_field=' . $row['id_field']);
 								break;
 							case 'cust_twitt':
-								$this->db->query('', 'UPDATE {db_prefix}custom_fields SET enclose=\'<a target="_blank" href="https://www.twitter.com/{INPUT}" class="icon i-twitter icon-big" title="Twitter Profile"><s>Twitter Profile</s></a>\' WHERE id_field=' . $row['id_field']);
+								$this->db->query('', 'UPDATE {db_prefix}custom_fields SET enclose="<a target=\"_blank\" href=\"https://www.twitter.com/{INPUT}\" class=\"icon i-twitter icon-big\" title=\"Twitter Profile\"><s>Twitter Profile</s></a>" WHERE id_field=' . $row['id_field']);
 								break;
 							case 'cust_linked':
-								$this->db->query('', 'UPDATE {db_prefix}custom_fields SET enclose=\'<a href="{INPUT}" class="icon i-linkedin icon-big" title="Linkedin Profile"><s>Linkedin Profile</s></a>\' WHERE id_field=' . $row['id_field']);
+								$this->db->query('', 'UPDATE {db_prefix}custom_fields SET enclose="<a href=\"{INPUT}\" class=\"icon i-linkedin icon-big\" title=\"Linkedin Profile\"><s>Linkedin Profile</s></a>" WHERE id_field=' . $row['id_field']);
 								break;
 							case 'cust_gplus':
-								$this->db->query('', 'UPDATE {db_prefix}custom_fields SET enclose=\'<a target="_blank" href="{INPUT}" class="icon i-google-plus icon-big" title="G+ Profile"><s>G+ Profile</s></a>\' WHERE id_field=' . $row['id_field']);
+								$this->db->query('', 'UPDATE {db_prefix}custom_fields SET enclose="<a target=\"_blank\" href=\"{INPUT}\" class=\"icon i-google-plus icon-big\" title=\"G+ Profile\"><s>G+ Profile</s></a>" WHERE id_field=' . $row['id_field']);
 								break;
 							case 'cust_icq':
-								$this->db->query('', 'UPDATE {db_prefix}custom_fields SET enclose=\'<a class="icq" href="//www.icq.com/people/{INPUT}" target="_blank" title="ICQ - {INPUT}"><img src="http://status.icq.com/online.gif?img=5&icq={INPUT}" alt="ICQ - {INPUT}" width="18" height="18"></a>\' WHERE id_field=' . $row['id_field']);
+								$this->db->query('', 'UPDATE {db_prefix}custom_fields SET enclose="<a class=\"icq\" href=\"//www.icq.com/people/{INPUT}\" target=\"_blank\" title=\"ICQ - {INPUT}\"><img src=\"http://status.icq.com/online.gif?img=5&icq={INPUT}\" alt=\"ICQ - {INPUT}\" width=\"18\" height=\"18\"></a>" WHERE id_field=' . $row['id_field']);
 								break;
 						}
 					}
@@ -839,6 +839,31 @@ class UpgradeInstructions_upgrade_1_1
 				{
 					$this->table->db_change_column('{db_prefix}attachments',
 						'mime_type',
+						array(
+							'type' => 'varchar',
+							'size' => 255,
+							'default' => ''
+						)
+					);
+				}
+			)
+		);
+	}
+
+	public function passwd_size_title()
+	{
+		return 'More space for passwd hash...';
+	}
+
+	public function passwd_size()
+	{
+		return array(
+			array(
+				'debug_title' => 'Altering passwd column to varchar(255)...',
+				'function' => function()
+				{
+					$this->table->db_change_column('{db_prefix}members',
+						'passwd',
 						array(
 							'type' => 'varchar',
 							'size' => 255,

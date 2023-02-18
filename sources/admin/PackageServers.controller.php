@@ -12,7 +12,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.1.4
+ * @version 1.1.9
  *
  */
 
@@ -50,7 +50,7 @@ class PackageServers_Controller extends Action_Controller
 	 */
 	public function action_index()
 	{
-		global $txt, $context;
+		global $txt, $context, $scripturl;
 
 		// This is for admins only.
 		isAllowedTo('admin_forum');
@@ -80,6 +80,27 @@ class PackageServers_Controller extends Action_Controller
 
 		// Set up action/subaction stuff.
 		$action = new Action('package_servers');
+
+		// Set up some tabs...
+		$context[$context['admin_menu_name']]['tab_data'] = array(
+			'title' => $txt['package_manager'],
+			'description' => $txt['upload_packages_desc'],
+			'class' => 'database',
+			'tabs' => array(
+				'browse' => array(
+					'url' => $scripturl . '?action=admin;area=packages;sa=browse',
+					'label' => $txt['browse_packages'],
+				),
+				'installed' => array(
+					'url' => $scripturl . '?action=admin;area=packages;sa=installed',
+					'label' => $txt['installed_packages'],
+				),
+				'options' => array(
+					'url' => $scripturl . '?action=admin;area=packages;sa=options',
+					'label' => $txt['package_settings'],
+				),
+			),
+		);
 
 		// Now let's decide where we are taking this... call integrate_sa_package_servers
 		$subAction = $action->initialize($subActions, 'servers');
@@ -484,7 +505,7 @@ class PackageServers_Controller extends Action_Controller
 		if (!is_array($context['package']))
 			throw new Elk_Exception('package_cant_download', false);
 
-		if ($context['package']['type'] === 'modification')
+		if ($context['package']['type'] === 'modification' || $context['package']['type'] === 'addon')
 			$context['package']['install']['link'] = '<a class="linkbutton" href="' . $scripturl . '?action=admin;area=packages;sa=install;package=' . $context['package']['filename'] . '">' . $txt['install_mod'] . '</a>';
 		elseif ($context['package']['type'] === 'avatar')
 			$context['package']['install']['link'] = '<a class="linkbutton" href="' . $scripturl . '?action=admin;area=packages;sa=install;package=' . $context['package']['filename'] . '">' . $txt['use_avatars'] . '</a>';
@@ -613,7 +634,7 @@ class PackageServers_Controller extends Action_Controller
 					{
 						@unlink($destination);
 						loadLanguage('Errors');
-						throw new Elk_Exception('package_upload_already_exists', 'general', $package->getFilename());
+						throw new Elk_Exception('package_upload_already_exists', 'general', array($package->getFilename()));
 					}
 				}
 			}
@@ -623,7 +644,7 @@ class PackageServers_Controller extends Action_Controller
 			}
 		}
 
-		if ($context['package']['type'] === 'modification')
+		if ($context['package']['type'] === 'modification' || $context['package']['type'] === 'addon')
 			$context['package']['install']['link'] = '<a class="linkbutton" href="' . $scripturl . '?action=admin;area=packages;sa=install;package=' . $context['package']['filename'] . '">' . $txt['install_mod'] . '</a>';
 		elseif ($context['package']['type'] === 'avatar')
 			$context['package']['install']['link'] = '<a class="linkbutton" href="' . $scripturl . '?action=admin;area=packages;sa=install;package=' . $context['package']['filename'] . '">' . $txt['use_avatars'] . '</a>';

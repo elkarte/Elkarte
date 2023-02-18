@@ -12,7 +12,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.1.7
+ * @version 1.1.9
  *
  */
 
@@ -314,9 +314,19 @@ class Auth_Controller extends Action_Controller
 
 			// Maybe we were too hasty... let's try some other authentication methods.
 			$other_passwords = $this->_other_passwords($user_settings);
+			$conversionPassword = in_array($user_settings['passwd'], $other_passwords, true);
+
+			// Maybe we have a "standard" password_hash (xenforo, smf2.1, phpbb3.3, vbulletin5...)
+			if (!$conversionPassword && !empty($modSettings['enable_password_conversion']) && strpos($user_settings['passwd'], '$') === 0)
+			{
+				// Some common hash generation arrangements
+				$conversionPassword = password_verify(Util::strtolower($user_settings['member_name']) . $_POST['passwrd'], $user_settings['passwd']);
+				$conversionPassword = $conversionPassword || password_verify($_POST['passwrd'], $user_settings['passwd']);
+				$conversionPassword = $conversionPassword || password_verify(md5($_POST['passwrd']), $user_settings['passwd']);
+			}
 
 			// Whichever encryption it was using, let's make it use ElkArte's now ;).
-			if (in_array($user_settings['passwd'], $other_passwords))
+			if ($conversionPassword)
 			{
 				updateMemberSalt($user_settings['id_member']);
 				$user_settings['passwd'] = validateLoginPassword($sha_passwd, '', '', true);
@@ -595,7 +605,7 @@ class Auth_Controller extends Action_Controller
 			if ($pw_strlen === 64)
 			{
 				// Snitz style
-				$other_passwords[] = bin2hex(hash('sha256', $_POST['passwrd']));
+				$other_passwords[] = bin2hex(hash('sha256', $_POST['passwrd'], true));
 
 				// Normal SHA-256
 				$other_passwords[] = hash('sha256', $_POST['passwrd']);
@@ -619,9 +629,10 @@ class Auth_Controller extends Action_Controller
 			// Hmm.. p'raps it's Invision 2 style?
 			$other_passwords[] = md5(md5($user_settings['password_salt']) . md5($_POST['passwrd']));
 
-			// Some common md5 ones.
+			// Some common md5 ones, like myBB
 			$other_passwords[] = md5($user_settings['password_salt'] . $_POST['passwrd']);
 			$other_passwords[] = md5($_POST['passwrd'] . $user_settings['password_salt']);
+			$other_passwords[] = md5(md5($user_settings['password_salt']) . md5($_POST['passwrd']));
 		}
 		// The hash is 40 characters, lets try some SHA-1 style auth
 		elseif ($pw_strlen === 40)
@@ -668,8 +679,7 @@ class Auth_Controller extends Action_Controller
 		// ElkArte's sha1 function can give a funny result on Linux (Not our fault!). If we've now got the real one let the old one be valid!
 		if (stripos(PHP_OS, 'win') !== 0)
 		{
-			require_once(SUBSDIR . '/Compat.subs.php');
-			$other_passwords[] = sha1_smf(strtolower($user_settings['member_name']) . un_htmlspecialchars($_POST['passwrd']));
+			$other_passwords[] = bin2hex(hash('sha1', strtolower($user_settings['member_name']) . un_htmlspecialchars($_POST['passwrd']), true));
 		}
 
 		// Allows mods to easily extend the $other_passwords array

@@ -11,7 +11,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.1.6
+ * @version 1.1.9
  *
  */
 
@@ -45,7 +45,7 @@ class Calendar_Post_Module extends ElkArte\sources\modules\Abstract_Module
 		}
 		$context['make_event'] = self::$_make_event;
 		$context['cal_minyear'] = $modSettings['cal_minyear'];
-		$context['cal_maxyear'] = date('Y') + $modSettings['cal_limityear'];
+		$context['cal_maxyear'] = (int) date('Y') + (int) $modSettings['cal_limityear'];
 
 		if (self::$_make_event)
 			return array(
@@ -232,7 +232,7 @@ class Calendar_Post_Module extends ElkArte\sources\modules\Abstract_Module
 			if ($context['event']['month'] < 1 || $context['event']['month'] > 12)
 				throw new Elk_Exception('invalid_month', false);
 
-			if ($context['event']['year'] < $modSettings['cal_minyear'] || $context['event']['year'] > date('Y') + $modSettings['cal_limityear'])
+			if ($context['event']['year'] < $modSettings['cal_minyear'] || $context['event']['year'] > (int) date('Y') + (int) $modSettings['cal_limityear'])
 				throw new Elk_Exception('invalid_year', false);
 
 			// Get a list of boards they can post in.
@@ -252,7 +252,7 @@ class Calendar_Post_Module extends ElkArte\sources\modules\Abstract_Module
 		}
 
 		// Find the last day of the month.
-		$context['event']['last_day'] = (int) strftime('%d', mktime(0, 0, 0, $context['event']['month'] == 12 ? 1 : $context['event']['month'] + 1, 0, $context['event']['month'] == 12 ? $context['event']['year'] + 1 : $context['event']['year']));
+		$context['event']['last_day'] = (int) Util::strftime('%d', mktime(0, 0, 0, $context['event']['month'] == 12 ? 1 : $context['event']['month'] + 1, 0, $context['event']['month'] == 12 ? $context['event']['year'] + 1 : $context['event']['year']));
 
 		$context['event']['board'] = !empty($board) ? $board : $modSettings['cal_defaultboard'];
 	}

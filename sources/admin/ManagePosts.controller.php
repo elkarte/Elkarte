@@ -11,7 +11,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.1
+ * @version 1.1.9
  *
  */
 
@@ -276,6 +276,12 @@ class ManagePosts_Controller extends Action_Controller
 				$this->_req->post->preview_characters = (int) min(max(0, $this->_req->post->preview_characters), 512);
 			}
 
+			// Set a min quote length of 3 lines of text (@ default font size)
+			if (!empty($this->_req->post->heightBeforeShowMore))
+			{
+				$this->_req->post->heightBeforeShowMore = (int) max((int) $this->_req->post->heightBeforeShowMore, 155);
+			}
+
 			call_integration_hook('integrate_save_post_settings');
 
 			$settingsForm->setConfigValues((array) $this->_req->post);
@@ -302,8 +308,10 @@ class ManagePosts_Controller extends Action_Controller
 
 		// Initialize it with our settings
 		$config_vars = array(
+			// Quote options...
+			array('int', 'removeNestedQuotes', 'postinput' => $txt['zero_to_disable']),
+			array('int', 'heightBeforeShowMore', 'postinput' => $txt['zero_to_disable']),
 			// Simple post options...
-			array('check', 'removeNestedQuotes'),
 			array('check', 'enableVideoEmbeding'),
 			array('check', 'enableCodePrettify'),
 			// Note show the warning as read if pspell not installed!

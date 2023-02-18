@@ -11,7 +11,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.1
+ * @version 1.1.9
  *
  */
 
@@ -239,7 +239,7 @@ function trackStatsUsersOnline($total_users_online)
 			'mostDate' => time()
 		);
 
-	$date = strftime('%Y-%m-%d', forum_time(false));
+	$date = Util::strftime('%Y-%m-%d', forum_time(false));
 
 	// No entry exists for today yet?
 	if (!isset($modSettings['mostOnlineUpdated']) || $modSettings['mostOnlineUpdated'] != $date)

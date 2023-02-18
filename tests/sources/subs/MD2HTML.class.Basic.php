@@ -1,6 +1,6 @@
 <?php
 
-class TestMD2HTML extends PHPUnit_Framework_TestCase
+class TestMD2HTML extends PHPUnit\Framework\TestCase
 {
 	protected $mdTestCases = array();
 
@@ -9,7 +9,7 @@ class TestMD2HTML extends PHPUnit_Framework_TestCase
 	 *
 	 * setUp() is run automatically by the testing framework before each test method.
 	 */
-	public function setUp()
+	protected function setUp(): void
 	{
 		require_once(EXTDIR . '/markdown/markdown.php');
 
@@ -47,7 +47,7 @@ class TestMD2HTML extends PHPUnit_Framework_TestCase
 		);
 	}
 
-	public function tearDown()
+	protected function tearDown(): void
 	{
 
 	}

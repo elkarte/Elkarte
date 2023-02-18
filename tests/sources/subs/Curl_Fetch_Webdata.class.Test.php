@@ -1,6 +1,6 @@
 <?php
 
-class TestCurl_Fetch_Webdata extends PHPUnit_Framework_TestCase
+class TestCurl_Fetch_Webdata extends PHPUnit\Framework\TestCase
 {
 	protected $curl_fetch_testcases = array();
 	protected $curl_post_testcases = array();
@@ -10,7 +10,7 @@ class TestCurl_Fetch_Webdata extends PHPUnit_Framework_TestCase
 	 *
 	 * setUp() is run automatically by the testing framework before each test method.
 	 */
-	public function setUp()
+	protected function setUp(): void
 	{
 		// url
 		// post data
@@ -51,7 +51,7 @@ class TestCurl_Fetch_Webdata extends PHPUnit_Framework_TestCase
 	 * cleanup data we no longer need at the end of the tests in this class.
 	 * tearDown() is run automatically by the testing framework after each test method.
 	 */
-	public function tearDown()
+	protected function tearDown(): void
 	{
 	}
 
@@ -72,7 +72,7 @@ class TestCurl_Fetch_Webdata extends PHPUnit_Framework_TestCase
 			if (!empty($testcase[1]))
 				$this->assertEquals($testcase[1], $curl->result('code'));
 			if (!empty($testcase[2]))
-				$this->assertContains($testcase[2], $curl->result('body'));
+				$this->assertStringContainsString($testcase[2], $curl->result('body'));
 		}
 	}
 
@@ -93,7 +93,7 @@ class TestCurl_Fetch_Webdata extends PHPUnit_Framework_TestCase
 			if (!empty($testcase[2]))
 				$this->assertEquals($testcase[2], $curl->result('code'));
 			if (!empty($testcase[3]))
-				$this->assertContains($testcase[3], $curl->result('body'));
+				$this->assertStringContainsString($testcase[3], $curl->result('body'));
 		}
 	}
 }

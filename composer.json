@@ -1,14 +1,12 @@
 {
 	"name": "elkarte/elkarte",
 	"description": "ElkArte PHP-based community discussion forum.",
+	"version": "1.1",
 	"type": "project",
 	"keywords": ["elkarte", "forum", "discussion", "php", "community"],
 	"homepage": "https://www.elkarte.net",
+	"readme": "https://github.com/elkarte/Elkarte/README.md",
 	"license": "BSD-3-Clause",
-	"repository": {
-		"type": "git",
-		"url": "git+https://github.com/elkarte/Elkarte.git"
-	},
 	"authors": [
 		{
 			"name": "ElkArte Forum Contributors",
@@ -28,13 +26,33 @@
 	"replace": {
 	},
 	"require": {
-		"php": ">=5.3.3"
+		"php": ">=5.3.3",
+		"ext-gd": "*",
+		"ext-json": "*",
+		"ext-mysqli": "*",
+		"ext-fileinfo": "*"
+	},
+	"suggest": {
+		"ext-exif": "*",
+		"ext-curl": "*",
+		"ext-memcache": "*",
+		"ext-zlib": "*",
+		"ext-pgsql": "*",
+		"ext-imap": "*",
+		"ext-memcached": "*",
+		"ext-zend-opcache": "*",
+		"ext-mbstring": "*",
+		"ext-apcu": "*",
+		"ext-libxml": "*",
+		"ext-dom": "*",
+		"ext-apache": "*",
+		"ext-iconv": "*",
+		"ext-imagick": "*"
 	},
 	"require-dev": {
-		"phpunit/phpunit-selenium": "~3.0",
-		"phpunit/dbunit": "1.4.*",
-		"phpunit/phpunit": "~5.7",
-		"myclabs/deep-copy": "<=1.8.0"
+		"phpunit/phpunit-selenium": "8.*",
+		"phpunit/phpunit": "~8",
+		"myclabs/deep-copy": "1.11.0"
 	},
 	"autoload": {
 		"files": ["sources/Autoloader.class.php"],

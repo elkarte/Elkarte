@@ -9,7 +9,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.1.4
+ * @version 1.1.9
  *
  */
 
@@ -424,17 +424,25 @@ function template_registration_form()
 			</fieldset>');
 	}
 
-	if ($context['checkbox_agreement'] && $context['require_agreement'])
+	if ($context['checkbox_agreement'] && ($context['require_agreement'] || $context['require_privacypol']))
 	{
 		echo '
-			<fieldset class="content">
+			<fieldset class="content">';
+
+		if ($context['require_agreement'])
+			echo '
+				<h2 class="category_header">', $txt['registration_agreement'], '</h2>
 				<div id="agreement_box">
 					', $context['agreement'], '
 				</div>
 				<label for="checkbox_agreement">
 					<input type="checkbox" name="checkbox_agreement" id="checkbox_agreement" value="1"', ($context['registration_passed_agreement'] ? ' checked="checked"' : ''), ' tabindex="', $context['tabindex']++, '" />
 					', $txt['checkbox_agreement'], '
-				</label>
+				</label>';
+
+		if ($context['require_privacypol'])
+			echo '
+				<h2 class="category_header">', $txt['registration_privacy_policy'], '</h2>
 				<div id="privacypol_box">
 					', $context['privacy_policy'], '
 				</div>

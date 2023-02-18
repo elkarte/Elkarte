@@ -11,7 +11,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.1.6
+ * @version 1.1.9
  *
  */
 
@@ -87,7 +87,7 @@ class Calendar_Event
 			// Check the month and year...
 			if ($event['month'] < 1 || $event['month'] > 12)
 				throw new Elk_Exception('invalid_month', false);
-			if ($event['year'] < $this->_settings['cal_minyear'] || $event['year'] > date('Y') + $this->_settings['cal_limityear'])
+			if ($event['year'] < $this->_settings['cal_minyear'] || $event['year'] > (int) date('Y') + $this->_settings['cal_limityear'])
 				throw new Elk_Exception('invalid_year', false);
 
 			// No day?
@@ -170,7 +170,7 @@ class Calendar_Event
 		$eventOptions = array(
 			'title' => Util::substr($options['evtitle'], 0, 100),
 			'span' => $span,
-			'start_date' => strftime('%Y-%m-%d', mktime(0, 0, 0, (int) $options['month'], (int) $options['day'], (int) $options['year'])),
+			'start_date' => Util::strftime('%Y-%m-%d', mktime(0, 0, 0, (int) $options['month'], (int) $options['day'], (int) $options['year'])),
 			'id_board' => (int) $id_board,
 			'id_topic' => (int) $id_topic,
 		);
@@ -209,7 +209,7 @@ class Calendar_Event
 				'title' => '',
 				'span' => 1,
 			);
-			$event['last_day'] = (int) strftime('%d', mktime(0, 0, 0, $event['month'] == 12 ? 1 : $event['month'] + 1, 0, $event['month'] == 12 ? $event['year'] + 1 : $event['year']));
+			$event['last_day'] = (int) Util::strftime('%d', mktime(0, 0, 0, $event['month'] == 12 ? 1 : $event['month'] + 1, 0, $event['month'] == 12 ? $event['year'] + 1 : $event['year']));
 		}
 		else
 		{

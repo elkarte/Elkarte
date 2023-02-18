@@ -9,7 +9,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.1.7
+ * @version 1.1.9
  *
  */
 
@@ -190,9 +190,13 @@ function template_messages()
 
 		// Show the post itself, finally!
 		echo '
-						<section id="msg_', $message['id'], '" class="messageContent', $ignoring ? ' hide"' : '"', '>',
+						<section id="msg_', $message['id'], '" data-msgid="',$message['id'], '" class="messageContent', $ignoring ? ' hide"' : '"', '>',
 							$message['body'], '
 						</section>';
+
+		// This is the floating Quick Quote button.
+		echo '
+						<button id="button_float_qq_', $message['id'], '" type="submit" role="button" style="display: none" class="quick_quote_button hide">', !empty($txt['quick_quote']) ? $txt['quick_quote'] : $txt['quote'], '</button>';
 
 		// Assuming there are attachments...
 		if (!empty($message['attachment']))
@@ -304,7 +308,7 @@ function template_messages()
 			if ($message['can_like'] || $message['can_unlike'])
 				echo '
 							<li class="listlevel1', !empty($message['like_counter']) ? ' liked"' : '"', '>
-								<a class="linklevel1 ', $message['can_unlike'] ? 'unlike_button' : 'like_button', '" href="javascript:void(0)"', !empty($message['like_counter']) ? ' title="' . $txt['liked_by'] . ' ' . implode(', ', $context['likes'][$message['id']]['member']) . '"' : '', ' onclick="likePosts.prototype.likeUnlikePosts(event,', $message['id'], ', ', $context['current_topic'], '); return false;">',
+								<a class="linklevel1 ', $message['can_unlike'] ? 'unreact_button' : 'react_button', '" href="javascript:void(0)"', !empty($message['like_counter']) ? ' title="' . $txt['liked_by'] . ' ' . implode(', ', $context['likes'][$message['id']]['member']) . '"' : '', ' onclick="likePosts.prototype.likeUnlikePosts(event,', $message['id'], ', ', $context['current_topic'], '); return false;">',
 									!empty($message['like_counter']) ? '<span class="likes_indicator">' . $message['like_counter'] . '</span>&nbsp;' . $txt['likes'] : $txt['like_post'], '
 								</a>
 							</li>';
@@ -313,7 +317,7 @@ function template_messages()
 			else
 				echo '
 							<li class="listlevel1', !empty($message['like_counter']) ? ' liked"' : '"', '>
-								<a href="javascript:void(0)" role="button" title="', !empty($message['like_counter']) ? $txt['liked_by'] . ' ' . implode(', ', $context['likes'][$message['id']]['member']) : '', '" class="linklevel1 likes_button">',
+								<a href="javascript:void(0)" role="button" title="', !empty($message['like_counter']) ? $txt['liked_by'] . ' ' . implode(', ', $context['likes'][$message['id']]['member']) : '', '" class="linklevel1 reacts_button">',
 									!empty($message['like_counter']) ? '<span class="likes_indicator">' . $message['like_counter'] . '</span>&nbsp;' . $txt['likes'] : '&nbsp;', '
 								</a>
 							</li>';
@@ -484,8 +488,16 @@ function template_quickreply_below()
 								<input type="button" name="save_draft" value="', $txt['draft_save'], '" onclick="return confirm(' . JavaScriptEscape($txt['draft_save_note']) . ') && submitThisOnce(this);" accesskey="d" tabindex="', $context['tabindex']++, '" />
 								<input type="hidden" id="id_draft" name="id_draft" value="', empty($context['id_draft']) ? 0 : $context['id_draft'], '" />';
 
-			echo '
+			// Show the draft last saved on area
+			if (!empty($context['drafts_autosave']) && !empty($options['drafts_autosave_enabled']))
+				echo '
+							<div class="draftautosave">
+								<span id="throbber" class="hide"><i class="icon icon-spin i-spinner"></i>&nbsp;</span>
+								<span id="draft_lastautosave"></span>
 							</div>';
+			echo '
+						</div>
+					</div>';
 		}
 		else
 		{
@@ -498,14 +510,6 @@ function template_quickreply_below()
 								', template_control_richedit_buttons($context['post_box_name']), '
 							</div>';
 		}
-
-		// Show the draft last saved on area
-		if (!empty($context['drafts_autosave']) && !empty($options['drafts_autosave_enabled']))
-			echo '
-							<div class="draftautosave">
-								<span id="throbber" class="hide"><i class="icon icon-spin i-spinner"></i>&nbsp;</span>
-								<span id="draft_lastautosave"></span>
-							</div>';
 
 		echo '
 						</form>
@@ -884,14 +888,14 @@ function template_display_attachments($message, $ignoring)
 			if ($attachment['thumbnail']['has_thumb'])
 				echo '
 											<a href="', $attachment['href'], ';image" id="link_', $attachment['id'], '" ', $attachment['thumbnail']['lightbox'], '>
-												<img class="attachment_image" src="', $attachment['thumbnail']['href'], '" alt="" id="thumb_', $attachment['id'], '" />
+												<img class="attachment_image" src="', $attachment['thumbnail']['href'], '" alt="" id="thumb_', $attachment['id'], '" loading="lazy" />
 											</a>';
 			else
 				echo '
-											<img class="attachment_image" src="', $attachment['href'], ';image" alt="" style="max-width:100%; max-height:' . $attachment['height'] . 'px;"/>';
+											<img class="attachment_image" src="', $attachment['href'], ';image" alt="" style="max-width:100%; max-height:' . $attachment['height'] . 'px;" loading="lazy" />';
 		}
 		elseif (!empty($modSettings['attachmentShowImages']))
-			echo '							<img class="attachment_image" src="', $attachment['href'], ';thumb" alt="" style="max-width:' . $modSettings['attachmentThumbWidth'] . 'px; max-height:' . $modSettings['attachmentThumbHeight'] . 'px;" />';
+			echo '							<img class="attachment_image" src="', $attachment['href'], ';thumb" alt="" style="max-width:' . $modSettings['attachmentThumbWidth'] . 'px; max-height:' . $modSettings['attachmentThumbHeight'] . 'px;" loading="lazy" />';
 
 		echo '
 											<a href="', $attachment['href'], '" class="attachment_name">

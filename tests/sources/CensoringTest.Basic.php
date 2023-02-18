@@ -3,7 +3,7 @@
 /**
  * TestCase class for the censorText function
  */
-class CensoringTest extends PHPUnit_Framework_TestCase
+class CensoringTest extends PHPUnit\Framework\TestCase
 {
 	protected $tests;
 
@@ -11,7 +11,7 @@ class CensoringTest extends PHPUnit_Framework_TestCase
 	 * prepare what is necessary to use in these tests.
 	 * setUp() is run automatically by the testing framework before each test method.
 	 */
-	function setUp()
+	protected function setUp() : void
 	{
 		$this->tests = array(
 			'this' => array('this' => 'not_this'),
@@ -25,7 +25,7 @@ class CensoringTest extends PHPUnit_Framework_TestCase
 	 * cleanup data we no longer need at the end of the tests in this class.
 	 * tearDown() is run automatically by the testing framework after each test method.
 	 */
-	function tearDown()
+	protected function tearDown() : void
 	{
 	}
 

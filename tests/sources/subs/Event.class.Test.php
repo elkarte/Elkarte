@@ -3,7 +3,7 @@
 /**
  * TestCase class for Event class.
  */
-class TestEvent extends PHPUnit_Framework_TestCase
+class TestEvent extends PHPUnit\Framework\TestCase
 {
 	public function testEmpty()
 	{
@@ -108,6 +108,7 @@ class TestEvent extends PHPUnit_Framework_TestCase
 		$added = $event->getEvents();
 		// two of them actually
 		$this->assertTrue(count($added) === 2);
+
 		// And should be similar to the original one... inverted
 		$this->assertSame($added, array($event_def[1], $event_def[0]));
 	}

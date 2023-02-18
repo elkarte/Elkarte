@@ -405,10 +405,6 @@ h2 a.collapse {
 
 /* Styles for the standard button lists.
 /* ------------------------------------------------------- */
-.buttonlist li {
-	float: right;
-	margin: 0 4px 0 0;
-}
 
 /* The quick buttons. */
 /* ------------------------------------------------------- */
@@ -576,9 +572,11 @@ dl.settings img {
 /*	$BOARDS		*/
 /* ------------------------------------------------------- */
 /* The board categories and newsfader - some shared styling. */
+
 .icon_anchor {
-	padding: 2px 0 0 6px;
 	float: right;
+	padding: 2px 0 0 6px;
+	transform: scaleX(-1);
 }
 
 .board_info .board_description, .board_info .moderators {

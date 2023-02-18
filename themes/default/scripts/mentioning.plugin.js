@@ -3,7 +3,7 @@
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * @version 1.1.6
+ * @version 1.1.9
  */
 
 /**
@@ -48,7 +48,7 @@ var disableDrafts = false;
 						return oMentions.opts.cache.names[query];
 					}
 
-					return [];
+					return items;
 				},
 				// Well then lets make a find member suggest call
 				remoteFilter: function(query, callback) {
@@ -57,8 +57,8 @@ var disableDrafts = false;
 						return;
 
 					// No slamming the server either
-					var current_call = parseInt(new Date().getTime() / 1000);
-					if (oMentions.opts._last_call !== 0 && oMentions.opts._last_call + 0.5 > current_call) {
+					var current_call = parseInt(new Date().getTime());
+					if (oMentions.opts._last_call !== 0 && oMentions.opts._last_call + 150 > current_call) {
 						callback(oMentions.opts._names);
 						return;
 					}
@@ -90,27 +90,24 @@ var disableDrafts = false;
 					return value;
 				},
 				matcher: function(flag, subtext, should_startWithSpace, acceptSpaceBar) {
-					var _a, _y, match, regexp, space;
+					var match, regexp, space;
 
-					flag = flag.replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, "\\$&");
+					if (!subtext || subtext.length < 2)
+						return null;
 
 					if (should_startWithSpace) {
 						flag = '(?:^|\\s)' + flag;
 					}
 
-					// Allow À - ÿ
-					_a = decodeURI("%C3%80");
-					_y = decodeURI("%C3%BF");
-
 					// Allow first last name entry?
 					space = acceptSpaceBar ? "\ " : "";
 
 					// regexp = new RegExp(flag + '([^ <>&"\'=\\\\\n]*)$|' + flag + '([^\\x00-\\xff]*)$', 'gi');
-					regexp = new RegExp(flag + "([A-Za-z" + _a + "-" + _y + "0-9_" + space + "\\[\\]\'\.\+\-]*)$|" + flag + "([^\\x00-\\xff]*)$", 'gi');
+					regexp = new RegExp(flag + "([\\p{L}0-9_" + space + "\\[\\]\'\.\+\-]*)$", 'mu');
 					match = regexp.exec(subtext);
 
 					if (match) {
-						return match[2] || match[1];
+						return match[1];
 					}
 					else {
 						return null;
@@ -233,7 +230,7 @@ var disableDrafts = false;
 
 				// Found the start of @mention
 				if (atPos > -1) {
-					parent.insertBefore(placefinder, prev.splitText(atPos + 1));
+					parent.insertBefore(placefinder, prev.splitText(atPos));
 					break;
 				}
 

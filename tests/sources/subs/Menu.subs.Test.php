@@ -3,7 +3,7 @@
 /**
  * TestCase class for menu subs.
  */
-class TestMenuSubs extends PHPUnit_Framework_TestCase
+class TestMenuSubs extends PHPUnit\Framework\TestCase
 {
 	protected $test_areas;
 	protected $test_options;
@@ -13,7 +13,7 @@ class TestMenuSubs extends PHPUnit_Framework_TestCase
 	 *
 	 * setUp() is run automatically by the testing framework before each test method.
 	 */
-	protected function setUp()
+	protected function setUp() : void
 	{
 		global $context, $user_info;
 
@@ -104,7 +104,7 @@ class TestMenuSubs extends PHPUnit_Framework_TestCase
 	 * cleanup data we no longer need at the end of the tests in this class.
 	 * tearDown() is run automatically by the testing framework after each test method.
 	 */
-	protected function tearDown()
+	protected function tearDown() : void
 	{
 		destroyMenu('last');
 	}

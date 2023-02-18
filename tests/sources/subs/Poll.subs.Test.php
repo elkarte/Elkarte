@@ -6,13 +6,13 @@
  * WARNING. These tests work directly with the local database. Don't run
  * them if you need to keep your data untouched!
  */
-class TestPoll extends PHPUnit_Framework_TestCase
+class TestPoll extends PHPUnit\Framework\TestCase
 {
 	/**
 	 * Prepare some test data, to use in these tests.
 	 * setUp() is run automatically by the testing framework before each test method.
 	 */
-	public function setUp()
+	protected function setUp(): void
 	{
 		// make sure a topic exists
 		require_once(SUBSDIR . '/Poll.subs.php');
@@ -53,7 +53,7 @@ class TestPoll extends PHPUnit_Framework_TestCase
 	 * Cleanup data we no longer need at the end of the tests in this class.
 	 * tearDown() is run automatically by the testing framework after each test method.
 	 */
-	public function tearDown()
+	protected function tearDown(): void
 	{
 		// remove temporary test data
 		require_once(SUBSDIR . '/Topic.subs.php');
@@ -128,7 +128,6 @@ class TestPoll extends PHPUnit_Framework_TestCase
 		$this->assertEquals($pollOptions[1]['id_choice'], 1);
 		$this->assertEquals($pollOptions[0]['votes'], 0);
 		$this->assertEquals($pollOptions[1]['votes'], 0);
-
 	}
 
 	/**
@@ -163,25 +162,5 @@ class TestPoll extends PHPUnit_Framework_TestCase
 		// or, really removed, not only dissociated
 		$pollinfo = pollinfo($id_poll);
 		$this->assertTrue(empty($pollinfo));
-	}
-
-	/**
-	 * Modify a poll
-	 */
-	public function testModifyPoll()
-	{
-		// Values to create it first
-		$question = 'Who is the next best contender for Grudge award?';
-		$id_member = 0;
-		$poster_name = 'test';
-
-		// Create the poll.
-		$id_poll = createPoll($question, $id_member, $poster_name);
-
-		// Link the poll to the topic.
-		associatedPoll($this->id_topic, $id_poll);
-
-		// Modify it. Hmm... we haz no modify function :P
-		// @todo
 	}
 }

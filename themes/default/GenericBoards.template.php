@@ -9,7 +9,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.1
+ * @version 1.1.9
  *
  */
 
@@ -157,7 +157,7 @@ function template_list_boards(array $boards, $id)
 
 			if (!empty($board['last_post']['member']['avatar']))
 				echo '
-							<span class="board_avatar"><a href="', $board['last_post']['member']['href'], '"><img class="avatar" src="', $board['last_post']['member']['avatar']['href'], '" alt="" /></a></span>';
+							<span class="board_avatar"><a href="', $board['last_post']['member']['href'], '"><img class="avatar" src="', $board['last_post']['member']['avatar']['href'], '" alt="" loading="lazy" /></a></span>';
 			else
 				echo '
 							<span class="board_avatar"><a href="#"></a></span>';

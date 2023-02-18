@@ -7,7 +7,7 @@
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * @version 1.1.7
+ * @version 1.1.9
  *
  */
 
@@ -330,8 +330,17 @@ class Email_Parse
 			return;
 		}
 
-		$this->_header_block = $match[1];
-		$this->body = $match[3];
+		// Actually no headers in this boundary
+		if (empty($match[1]) || strpos($match[1], ':') === false)
+		{
+			$this->_header_block = '';
+			$this->body = $this->raw_message;
+		}
+		else
+		{
+			$this->_header_block = $match[1];
+			$this->body = $match[3];
+		}
 	}
 
 	/**
@@ -371,7 +380,15 @@ class Email_Parse
 			}
 			else
 			{
-				$this->headers[$header_key] .= ' ' . $this->_decode_header($header_value);
+				// Only one is ever valid, so use the last one and hope its right
+				if ($header_key === 'content-type' || $header_key === 'content-transfer-encoding')
+				{
+					$this->headers[$header_key] = $this->_decode_header($header_value);
+				}
+				else
+				{
+					$this->headers[$header_key] .= ' ' . $this->_decode_header($header_value);
+				}
 			}
 		}
 	}
@@ -541,14 +558,8 @@ class Email_Parse
 				// own Content Type and Encoding and we will process each as such
 				$this->_boundary_split($this->headers['x-parameters']['content-type']['boundary'], $html);
 
-				// Some multi-part messages ... are singletons :P
-				if ($this->_boundary_section_count === 1)
-				{
-					$this->body = $this->_boundary_section[0]->body;
-					$this->headers['x-parameters'] = $this->_boundary_section[0]->headers['x-parameters'];
-				}
 				// We found multiple sections, lets go through each
-				elseif ($this->_boundary_section_count > 1)
+				if ($this->_boundary_section_count > 0)
 				{
 					$html_ids = array();
 					$text_ids = array();
@@ -570,7 +581,8 @@ class Email_Parse
 							$html_ids[] = $i;
 						}
 						// Plain section
-						elseif ($this->_boundary_section[$i]->headers['content-type'] === 'text/plain')
+						elseif ($this->_boundary_section[$i]->headers['content-type'] === 'text/plain'
+							&& $this->_boundary_section[$i]->headers['content-disposition'] !== 'attachment')
 						{
 							$text_ids[] = $i;
 						}
@@ -587,17 +599,23 @@ class Email_Parse
 					// We always return a plain text version for use
 					if (!empty($text_ids))
 					{
-						// As parts are ordered by increasing accuracy, use the last one found
-						$this->plain_body = $this->_boundary_section[end($text_ids)]->body;
-						if ($this->_boundary_section[end($text_ids)]->headers["content-transfer-encoding"] === 'base64')
+						foreach ($text_ids as $id)
 						{
-							$this->plain_body = str_replace("\n", '<br />', $this->plain_body);
+							// Join or use the last?
+							if ($this->headers['content-type'] === 'multipart/mixed')
+							{
+								$this->plain_body .= ' ' . $this->_decode_body($this->_boundary_section[$id]->body);
+							}
+							else
+							{
+								$this->plain_body = $this->_boundary_section[$id]->body;
+							}
 						}
 					}
 					elseif (!empty($html_ids))
 					{
-						// This should never run as emails should always have a plain text section to be valid, still ...
-						$this->plain_body .= $this->_boundary_section[0]->body;
+						// For emails that have no plain text section, which they should to be valid, still ...
+						$this->plain_body .= $this->_boundary_section[key($html_ids)]->body;
 						$this->plain_body = str_ireplace('<p>', "\n\n", $this->plain_body);
 						$this->plain_body = str_ireplace(array('<br />', '<br>', '</p>', '</div>'), "\n", $this->plain_body);
 						$this->plain_body = strip_tags($this->plain_body);
@@ -616,7 +634,16 @@ class Email_Parse
 						// For all the chosen sections
 						foreach ($text_ids as $id)
 						{
-							$this->body = $this->_boundary_section[$id]->body;
+							// Join or use the last? These could be HTML sections as well
+							if ($this->headers['content-type'] === 'multipart/mixed')
+							{
+								$this->body .= ' ' . $this->_boundary_section[$id]->body;
+							}
+							// Such as multipart/alternative, just use the last found
+							else
+							{
+								$this->body = $this->_boundary_section[$id]->body;
+							}
 
 							// A section may have its own attachments if it had is own unique boundary sections
 							// so we need to check and add them in as needed
@@ -702,7 +729,10 @@ class Email_Parse
 	 */
 	private function _process_attachments($i)
 	{
-		if ($this->_boundary_section[$i]->headers['content-disposition'] === 'attachment' || $this->_boundary_section[$i]->headers['content-disposition'] === 'inline' || isset($this->_boundary_section[$i]->headers['content-id']))
+		if ($this->_boundary_section[$i]->headers['content-disposition'] === 'attachment'
+			|| $this->_boundary_section[$i]->headers['content-disposition'] === 'inline'
+			|| $this->_boundary_section[$i]->headers['content-disposition'] === '*'
+			|| isset($this->_boundary_section[$i]->headers['content-id']))
 		{
 			// Get the attachments file name
 			if (isset($this->_boundary_section[$i]->headers['x-parameters']['content-disposition']['filename']))
@@ -717,6 +747,9 @@ class Email_Parse
 			{
 				return;
 			}
+
+			// Escape all potentially unsafe characters from the filename
+			$file_name = preg_replace('~(^\.)|/|[\n|\r]|(\.$)~m', '_', $file_name);
 
 			// Load the attachment data
 			$this->attachments[$file_name] = $this->_boundary_section[$i]->body;
@@ -793,7 +826,13 @@ class Email_Parse
 		// If iconv mime is available just use it and be done
 		if (function_exists('iconv_mime_decode'))
 		{
-			return iconv_mime_decode($val, $strict ? 1 : 2, 'UTF-8');
+			$decoded = iconv_mime_decode($val, $strict ? 1 : 2, 'UTF-8');
+
+			// Bad decode, or partial decode
+			if ($decoded !== false && strpos($decoded, '=?iso') === false)
+			{
+				return $decoded;
+			}
 		}
 
 		// The RFC 2047-3 defines an encoded-word as a sequence of characters that
@@ -871,6 +910,11 @@ class Email_Parse
 	 */
 	private function _decode_body($val)
 	{
+		if (empty($val))
+		{
+			return $val;
+		}
+
 		// The encoding tag can be missing in the headers or just wrong
 		if (preg_match('~(?:=C2|=A0|=D2|=D4|=96){1}~s', $val))
 		{
@@ -893,18 +937,18 @@ class Email_Parse
 			$val = $this->_decode_string($val, 'quoted-printable');
 		}
 		// Lines end in the tell tail quoted printable ... wrap and decode
-		elseif (preg_match('~\s=[\r?\n]~s', $val))
+		elseif (preg_match('~\s=[\r\n]~s', $val))
 		{
-			$val = preg_replace('~\s=[\r?\n]~', ' ', $val);
+			$val = preg_replace('~\s=[\r\n]~', ' ', $val);
 			$val = $this->_decode_string($val, 'quoted-printable');
 		}
 		// Lines end in = but not ==
-		elseif (preg_match('~((?<!=)=[\r?\n])~s', $val))
+		elseif (preg_match('~((?<!=)=[\r\n])~', $val))
 		{
 			$val = $this->_decode_string($val, 'quoted-printable');
 		}
 
-		return $val;
+		return !empty($val) ? str_replace("\r\n", "\n", $val) : '';
 	}
 
 	/**
@@ -1332,11 +1376,14 @@ class Email_Parse
 		// Decode if its quoted printable or base64 encoded
 		if ($encoding === 'quoted-printable')
 		{
+			$string = preg_replace('~(^|\r\n)=A0($|\r\n)~m', '=0D=0A=0D=0A', $string);
 			$string = quoted_printable_decode(preg_replace('~=\r?\n~', '', $string));
 		}
 		elseif ($encoding === 'base64')
 		{
 			$string = base64_decode($string);
+			if (isset($this->headers['content-type']) && strpos($this->headers['content-type'], 'text/') === false)
+				return $string;
 		}
 
 		// Convert this to utf-8 if needed.
@@ -1345,7 +1392,7 @@ class Email_Parse
 			$string = $this->_charset_convert($string, strtoupper($charset), 'UTF-8');
 		}
 
-		return $string;
+		return !empty($string) ? str_replace("\r\n", "\n", $string) : '';
 	}
 
 	/**
@@ -1380,7 +1427,14 @@ class Email_Parse
 			{
 				// Replace unknown characters with a space
 				@ini_set('mbstring.substitute_character', '32');
-				$string = @mb_convert_encoding($string, $to, $from);
+				try
+				{
+					$string = mb_convert_encoding($string_save, $to, $from);
+				}
+				catch (\ValueError $e)
+				{
+					// nothing, bad character set
+				}
 			}
 			elseif (function_exists('recode_string'))
 			{

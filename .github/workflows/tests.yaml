@@ -1,0 +1,168 @@
+name: UnitTests
+
+on:
+  push:
+    branches:        # Run tests when commits are pushed to these branches
+      - '**'
+  pull_request:      # Run tests when pull requests are made on these branches
+    branches:
+      - master
+      - 'patch_1-1-9'
+
+env:
+  WEBSERVER: 'none'
+
+jobs:
+  # START MySQL / MariaDB Tests
+  mysql-tests:
+    runs-on: ubuntu-20.04
+    strategy:
+      matrix:
+        include:
+          - php: '8.1'
+            db: "mariadb:10.2"
+          - php: '7.2'
+            db: "mysql:5.7"
+
+    name: MySql/MariaDB (${{ matrix.php }} - DB ${{ matrix.db_alias != '' && matrix.db_alias || matrix.db }})
+
+    services:
+      mysql:
+        image: ${{ matrix.db }}
+        env:
+          MYSQL_ALLOW_EMPTY_PASSWORD: yes
+          MYSQL_DATABASE: elkarte_test
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=3
+
+    steps:
+      - name: Checkout ElkArte
+        uses: actions/checkout@v2
+        with:
+          repository: elkarte/elkarte
+          fetch-depth: 10
+          ref: ${{ env.ELKARTE_BRANCH }}
+          path: elkarte
+
+      - id: database-type
+        env:
+          MATRIX_DB: ${{ matrix.db }}
+        run: |
+          db=$(echo "${MATRIX_DB%%:*}")
+          echo "::set-output name=db::$db"
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php }}
+          extensions: dom, curl, libxml, mbstring, zip, mysqli, gd, exif, iconv, apcu, memcached
+          coverage: pcov
+          tools: composer:v2
+          ini-values: error_reporting=E_ALL, allow_url_fopen=On, opcache.enable=0, apc.enable_cli=1
+
+      - name: Setup problem matchers for PHP
+        run: echo "::add-matcher::${{ runner.tool_cache }}/php.json"
+
+      - name: Setup Server Environment
+        env:
+          DB: ${{steps.database-type.outputs.db}}
+          PHP_VERSION: ${{ matrix.php }}
+        run: .github/setup-elkarte.sh $DB $PHP_VERSION
+        working-directory: ./elkarte
+
+      - name: Install Database
+        env:
+          DB: ${{steps.database-type.outputs.db}}
+          PHP_VERSION: ${{ matrix.php }}
+        run: .github/setup-database.sh $DB $PHP_VERSION
+        working-directory: ./elkarte
+
+      - name: Run Unit Tests
+        env:
+          DB: ${{steps.database-type.outputs.db}}
+          PHP_VERSION: ${{ matrix.php }}
+        run: .github/setup-results.sh $DB $PHP_VERSION
+        working-directory: ./elkarte
+  # END MySQL and MariaDB Job
+
+  # START Postgres Tests
+  postgres-tests:
+    runs-on: ubuntu-20.04
+    strategy:
+      matrix:
+        include:
+          - php: '7.4'
+            db: "postgres:12"
+
+    name: Postgre (${{ matrix.php }} - DB ${{ matrix.db_alias != '' && matrix.db_alias || matrix.db }})
+
+    services:
+      postgres:
+        image: ${{ matrix.db }}
+        env:
+          POSTGRES_HOST: localhost
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+        ports:
+          - 5432:5432
+        options: >-
+          -v /var/run/postgresql:/var/run/postgresql
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      - name: Checkout ElkArte
+        uses: actions/checkout@v2
+        with:
+          repository: elkarte/elkarte
+          fetch-depth: 10
+          ref: ${{ env.ELKARTE_BRANCH }}
+          path: elkarte
+
+      - id: database-type
+        env:
+          MATRIX_DB: ${{ matrix.db }}
+        run: |
+          db=$(echo "${MATRIX_DB%%:*}")
+          echo "::set-output name=db::$db"
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php }}
+          extensions: dom, curl, libxml, mbstring, zip, pgsql, imagick, exif, iconv, apcu, memcached
+          coverage: pcov
+          tools: composer:v2
+          ini-values: error_reporting=E_ALL, allow_url_fopen=On, opcache.enable=0, apc.enable_cli=1
+
+      - name: Setup problem matchers for PHP
+        run: echo "::add-matcher::${{ runner.tool_cache }}/php.json"
+
+      - name: Setup Server Environment
+        env:
+          DB: ${{steps.database-type.outputs.db}}
+          PHP_VERSION: ${{ matrix.php }}
+        run: .github/setup-elkarte.sh $DB $PHP_VERSION
+        working-directory: ./elkarte
+
+      - name: Install Database
+        env:
+          DB: ${{steps.database-type.outputs.db}}
+          PHP_VERSION: ${{ matrix.php }}
+        run: .github/setup-database.sh $DB $PHP_VERSION
+        working-directory: ./elkarte
+
+      - name: Run Unit Tests
+        env:
+          DB: ${{steps.database-type.outputs.db}}
+          PHP_VERSION: ${{ matrix.php }}
+        run: .github/setup-results.sh $DB $PHP_VERSION
+        working-directory: ./elkarte
+  # END Postgres Job

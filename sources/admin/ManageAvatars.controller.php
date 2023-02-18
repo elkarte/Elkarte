@@ -7,7 +7,7 @@
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * @version 1.1
+ * @version 1.1.9
  *
  */
 
@@ -151,6 +151,14 @@ class ManageAvatars_Controller extends Action_Controller
 						'x' => 'x',
 					),
 				),
+				array('select', 'gravatar_default', array(
+					'none' => $txt['gravatar_none'],
+					'identicon' => $txt['gravatar_identicon'],
+					'monsterid' => $txt['gravatar_monsterid'],
+					'wavatar' => $txt['gravatar_wavatar'],
+					'retro' => $txt['gravatar_retro'],
+					'robohash' => $txt['gravatar_robohash'])
+				),
 			// Upload-able avatars?
 			array('title', 'avatar_upload'),
 				array('check', 'avatar_upload_enabled'),
@@ -159,7 +167,6 @@ class ManageAvatars_Controller extends Action_Controller
 				array('warning', 'avatar_paranoid_warning'),
 				array('check', 'avatar_paranoid'),
 			'',
-				array('check', 'avatar_download_png'),
 				array('select', 'custom_avatar_enabled', array($txt['option_attachment_dir'], $txt['option_specified_dir']), 'onchange' => 'fUpdateStatus();'),
 				array('text', 'custom_avatar_dir', 40, 'subtext' => $txt['custom_avatar_dir_desc'], 'invalid' => !$context['valid_custom_avatar_dir']),
 				array('text', 'custom_avatar_url', 40),

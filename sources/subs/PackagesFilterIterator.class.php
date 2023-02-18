@@ -7,7 +7,7 @@
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * @version 1.1
+ * @version 1.1.9
  *
  */
 
@@ -23,6 +23,7 @@ class PackagesFilterIterator extends \FilterIterator
 	 *
 	 * @return bool
 	 */
+	#[\ReturnTypeWillChange]
 	public function accept()
 	{
 		$current = $this->current();

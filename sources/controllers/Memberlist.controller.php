@@ -12,7 +12,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.1
+ * @version 1.1.9
  *
  */
 
@@ -479,7 +479,16 @@ class Memberlist_Controller extends Action_Controller
 			if (defined('DB_CASE_SENSITIVE'))
 			{
 				foreach ($fields as $key => $field)
+				{
+
+					if ($key === 2 && strpos($field, '(hide_email') === 0)
+					{
+						$fields[$key] = '(hide_email = 0 AND LOWER(email_address)';
+						continue;
+					}
+
 					$fields[$key] = 'LOWER(' . $field . ')';
+				}
 			}
 
 			$customJoin = array();

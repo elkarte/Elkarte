@@ -13,7 +13,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.1
+ * @version 1.1.9
  *
  */
 
@@ -137,6 +137,9 @@ class ManageServer_Controller extends Action_Controller
 		{
 			call_integration_hook('integrate_save_general_settings');
 
+			// Reset this in the event the server has changed, it will get set again if needed.
+			updateSettings(array('host_to_dis' => 0));
+
 			$settingsForm->setConfigValues((array) $this->_req->post);
 			$settingsForm->save();
 			redirectexit('action=admin;area=serversettings;sa=general;' . $context['session_var'] . '=' . $context['session_id'] . ';msg=' . (!empty($context['settings_message']) ? $context['settings_message'] : 'core_settings_saved'));
@@ -218,11 +221,14 @@ class ManageServer_Controller extends Action_Controller
 			call_integration_hook('integrate_save_cookie_settings');
 
 			// Its either local or global cookies
-			if (!empty($this->_req->post->localCookies) && empty($this->_req->post->globalCookies))
+			if (!empty($this->_req->post->localCookies) && !empty($this->_req->post->globalCookies))
 				unset($this->_req->post->globalCookies);
 
 			if (!empty($this->_req->post->globalCookiesDomain) && strpos($boardurl, $this->_req->post->globalCookiesDomain) === false)
 				throw new Elk_Exception('invalid_cookie_domain', false);
+
+			if ($this->_req->getPost('cookiename', 'trim', '') === '')
+				$this->_req->post->cookiename = $cookiename;
 
 			$settingsForm->setConfigValues((array) $this->_req->post);
 			$settingsForm->save();
@@ -520,7 +526,7 @@ class ManageServer_Controller extends Action_Controller
 				array('localCookies', $txt['localCookies'], 'subtext' => $txt['localCookies_note'], 'db', 'check', false, 'localCookies'),
 				array('globalCookies', $txt['globalCookies'], 'subtext' => $txt['globalCookies_note'], 'db', 'check', false, 'globalCookies'),
 				array('globalCookiesDomain', $txt['globalCookiesDomain'], 'subtext' => $txt['globalCookiesDomain_note'], 'db', 'text', false, 'globalCookiesDomain'),
-				array('secureCookies', $txt['secureCookies'], 'subtext' => $txt['secureCookies_note'], 'db', 'check', false, 'secureCookies', 'disabled' => !isset($this->_req->server->HTTPS) || !(strtolower($this->_req->server->HTTPS) === 'on' || strtolower($this->_req->server->HTTPS) == '1')),
+				array('secureCookies', $txt['secureCookies'], 'subtext' => $txt['secureCookies_note'], 'db', 'check', false, 'secureCookies', 'disabled' => !isset($_SERVER['HTTPS']) || !(strtolower($_SERVER['HTTPS']) === 'on' || strtolower($_SERVER['HTTPS']) == '1')),
 				array('httponlyCookies', $txt['httponlyCookies'], 'subtext' => $txt['httponlyCookies_note'], 'db', 'check', false, 'httponlyCookies'),
 			'',
 				// Sessions

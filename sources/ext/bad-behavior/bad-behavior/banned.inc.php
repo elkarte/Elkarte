@@ -10,7 +10,7 @@ function bb2_housekeeping($settings, $package)
 	if (!$settings['logging']) return;
 
 	// FIXME Yes, the interval's hard coded (again) for now.
-	$query = "DELETE FROM `" . $settings['log_table'] . "` WHERE `date` < DATE_SUB('" . bb2_db_date() . "', INTERVAL 7 DAY)";
+	$query = 'DELETE FROM `' . $settings['log_table'] . '` WHERE `date` < DATE_SUB("' . bb2_db_date() . '", INTERVAL 7 DAY)';
 	bb2_db_query($query);
 
 	// Waste a bunch more of the spammer's time, sometimes.

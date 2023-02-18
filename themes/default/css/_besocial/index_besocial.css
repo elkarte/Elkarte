@@ -138,7 +138,7 @@ input[type="submit"], .drop_area_fileselect_text, button[type="submit"], input[t
 /* Anchors styled to look like buttons. */
 /* These have standard body text size. Can be chained with smalltext class. */
 .linkbutton:link, .linkbutton_right:link, .linkbutton_left:link,
-.linkbutton:visited, .linkbutton_right:visited, .linkbutton_left:visited {
+.linkbutton:visited, .linkbutton_right:visited, .linkbutton_left:visited, .ila {
 	border: 1px solid #AFAFAF;
 	border-top: 1px solid #CFCFCF;
 	border-left: 1px solid #BFBFBF;
@@ -151,7 +151,7 @@ input[type="submit"], .drop_area_fileselect_text, button[type="submit"], input[t
 
 /* Hover effects. */
 input[type="submit"]:hover, button[type="submit"]:hover, input[type="button"]:hover,
-.linkbutton:hover, .linkbutton_right:hover, .linkbutton_left:hover {
+.linkbutton:hover, .linkbutton_right:hover, .linkbutton_left:hover, .ila:hover {
 	border: 1px solid #CCCCCC;
 	border-top: 1px solid #AFAFAF;
 	border-left: 1px solid #AFAFAF;
@@ -178,9 +178,9 @@ input[type="submit"]:hover, button[type="submit"]:hover, input[type="button"]:ho
 /* Standard horizontal rule.. ([hr], etc.) */
 hr {
 	border-top-color: #BBBBBB;
+	border-bottom-color: #E4E4E4;
 	background: #EEEEEE;
 }
-
 
 /* @todo - Test this everywhere. */
 .content {
@@ -371,6 +371,11 @@ hr {
 	background: #FFFFFF;
 }
 
+input[type=checkbox].quote-show-more {
+	background: linear-gradient(to bottom, transparent 0%, transparent 25%, #EFEFEF 100%);
+	box-shadow: 0 1px 0 1px #DDDDDD;
+}
+
 /* Extra quote styling */
 .bbc_quote, .quoteheader {
 	box-shadow: 2px 2px 2px #DDDDDD;
@@ -549,8 +554,13 @@ div.bbc_footnotes .meaction {
  * -------------------------------------------------------
  */
 
+/* Overide index.css due to font change */
+.listlevel1.inline_mod_check {
+	font-size: 11px !important;
+}
+
 /* Level 1 Menu bar: link or button. General styling. */
-.linklevel1, .linklevel1:link, .linklevel1:visited {
+.linklevel1, .linklevel1:link, .linklevel1:visited, .quickbuttons .inline_mod_check {
 	border: 1px solid #AFAFAF;
 	border-top: 1px solid #CFCFCF;
 	border-left: 1px solid #BFBFBF;

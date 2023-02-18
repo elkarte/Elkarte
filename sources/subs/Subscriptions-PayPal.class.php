@@ -11,7 +11,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.1
+ * @version 1.1.9
  *
  */
 
@@ -246,7 +246,7 @@ class PayPal_Payment
 
 		// Now that we have received a VERIFIED response from PayPal, we perform some checks
 		// before we assume that the IPN is legitimate. First check that this is intended for us.
-		if ($modSettings['paypal_email'] !== $_POST['business'] && (empty($modSettings['paypal_additional_emails']) || !in_array($_POST['business'], explode(',', $modSettings['paypal_additional_emails']))))
+		if (strtolower($modSettings['paypal_email']) !== strtolower($_POST['business']) && (empty($modSettings['paypal_additional_emails']) || !in_array(strtolower($_POST['business']), explode(',', strtolower($modSettings['paypal_additional_emails'])))))
 		{
 			exit;
 		}
@@ -445,7 +445,6 @@ class PayPal_Payment
 	{
 		// Set the post data.
 		curl_setopt($curl, CURLOPT_POST, true);
-		curl_setopt($curl, CURLOPT_POSTFIELDSIZE, 0);
 		curl_setopt($curl, CURLOPT_POSTFIELDS, $this->requestString);
 
 		// Set up the headers so paypal will accept the post

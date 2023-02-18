@@ -11,7 +11,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.1.4
+ * @version 1.1.9
  *
  */
 
@@ -270,7 +270,7 @@ class Recent_Controller extends Action_Controller implements Frontpage_Interface
 		{
 			$txt_like_post = '
 				<li class="listlevel1' . (!empty($post['like_counter']) ? ' liked"' : '"') . '>
-					<a class="linklevel1 ' . ($post['can_unlike'] ? 'unlike_button' : 'like_button') . '" href="javascript:void(0)" title="' . (!empty($post['like_counter']) ? $txt['liked_by'] . ' ' . implode(', ', $context['likes'][$post['id']]['member']) : '') . '" onclick="likePosts.prototype.likeUnlikePosts(event,' . $post['id'] . ', ' . $post['topic'] . '); return false;">' .
+					<a class="linklevel1 ' . ($post['can_unlike'] ? 'unreact_button' : 'react_button') . '" href="javascript:void(0)" title="' . (!empty($post['like_counter']) ? $txt['liked_by'] . ' ' . implode(', ', $context['likes'][$post['id']]['member']) : '') . '" onclick="likePosts.prototype.likeUnlikePosts(event,' . $post['id'] . ', ' . $post['topic'] . '); return false;">' .
 						(!empty($post['like_counter']) ? '<span class="likes_indicator">' . $post['like_counter'] . '</span>&nbsp;' . $txt['likes'] : $txt['like_post']) . '
 					</a>
 				</li>';
@@ -280,7 +280,7 @@ class Recent_Controller extends Action_Controller implements Frontpage_Interface
 		{
 			$txt_like_post = '
 				<li class="listlevel1 liked">
-					<a href="javascript:void(0)" title="' . $txt['liked_by'] . ' ' . implode(', ', $context['likes'][$post['id']]['member']) . '" class="linklevel1 likes_button">
+					<a href="javascript:void(0)" title="' . $txt['liked_by'] . ' ' . implode(', ', $context['likes'][$post['id']]['member']) . '" class="linklevel1 reacts_button">
 						<span class="likes_indicator">' . $post['like_counter'] . '</span>&nbsp;' . $txt['likes'] . '
 					</a>
 				</li>';
@@ -483,7 +483,7 @@ class Recent_Controller extends Action_Controller implements Frontpage_Interface
 					}),
 				});
 
-				$(".like_button, .unlike_button, .likes_button").SiteTooltip({
+				$(".react_button, .unreact_button, .reacts_button").SiteTooltip({
 					hoverIntent: {
 						sensitivity: 10,
 						interval: 150,

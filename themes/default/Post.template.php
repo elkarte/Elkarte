@@ -9,7 +9,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.1.7
+ * @version 1.1.9
  *
  */
 
@@ -408,7 +408,7 @@ function template_add_new_attachments()
 		if (empty($attachment['approved']))
 			$label .= ' (' . $txt['awaiting_approval'] . ')';
 		if (!empty($modSettings['attachmentPostLimit']) || !empty($modSettings['attachmentSizeLimit']))
-			$label .= sprintf($txt['attach_kb'], comma_format(round(max($attachment['size'], 1028) / 1028), 0));
+			$label .= sprintf($txt['attach_kb'], comma_format(round(max($attachment['size'], 1024) / 1024), 0));
 
 		echo '
 							<dd class="smalltext">
@@ -424,19 +424,19 @@ function template_add_new_attachments()
 	// Show some useful information such as allowed extensions, maximum size and amount of attachments allowed.
 	if (!empty($context['attachments']['allowed_extensions']))
 		echo '
-								', $txt['allowed_types'], ': ', $context['attachments']['allowed_extensions'], '<br />';
+								<p id="types">', $txt['allowed_types'], ': ', $context['attachments']['allowed_extensions'], '</p>';
 
 	if (!empty($context['attachments']['restrictions']))
 		echo '
-								', $txt['attach_restrictions'], ' ', implode(', ', $context['attachments']['restrictions']), '<br />';
+								<p id="restrictions">', $txt['attach_restrictions'], ' ', implode(', ', $context['attachments']['restrictions']), '</p>';
 
 	if ($context['attachments']['num_allowed'] == 0)
 		echo '
-								', $txt['attach_limit_nag'], '<br />';
+								<p class="infobox">', $txt['attach_limit_nag'], '</p>';
 
 	if (!$context['attachments']['can']['post_unapproved'])
 		echo '
-								<span class="alert">', $txt['attachment_requires_approval'], '</span>', '<br />';
+								<p class="warningbox">', $txt['attachment_requires_approval'], '</p>';
 
 	echo '
 							</dd>
@@ -448,7 +448,7 @@ function template_add_new_attachments()
 		var IlaDropEvents = {
 			UploadSuccess: function($button, data) {
 				var inlineAttach = ElkInlineAttachments(\'#postAttachment2,#postAttachment\', \'' . $context['post_box_name'] . '\', {
-					trigger: $(\'<div class="share icon i-share" />\'),
+					trigger: $(\'<div class="ila icon i-ila" />\'),
 					template: ' . JavaScriptEscape('<div class="insertoverlay">
 						<input type="button" class="button" value="' . $txt['insert'] . '">
 						<ul data-group="tabs" class="tabs">
@@ -474,7 +474,7 @@ function template_add_new_attachments()
 			},
 			RemoveSuccess: function(attachid) {
 				var inlineAttach = ElkInlineAttachments(\'#postAttachment2,#postAttachment\', \'' . $context['post_box_name'] . '\', {
-					trigger: $(\'<div class="share icon i-share" />\')
+					trigger: $(\'<div class="ila icon i-ila" />\')
 				});
 				inlineAttach.removeAttach(attachid);
 			}
@@ -491,11 +491,12 @@ function template_add_new_attachments()
 	var dropAttach = new dragDropAttachment({
 		board: ' . $context['current_board'] . ',
 		allowedExtensions: ' . JavaScriptEscape($context['attachments']['allowed_extensions']) . ',
-		totalSizeAllowed: ' . JavaScriptEscape(empty($modSettings['attachmentPostLimit']) ? '' : $modSettings['attachmentPostLimit']) . ',
-		individualSizeAllowed: ' . JavaScriptEscape(empty($modSettings['attachmentSizeLimit']) ? '' : $modSettings['attachmentSizeLimit']) . ',
-		numOfAttachmentAllowed: ' . $context['attachments']['num_allowed'] . ',
-		totalAttachSizeUploaded: ' . (isset($context['attachments']['total_size']) && !empty($context['attachments']['total_size']) ? $context['attachments']['total_size'] : 0) . ',
-		numAttachUploaded: ' . (isset($context['attachments']['quantity']) && !empty($context['attachments']['quantity']) ? $context['attachments']['quantity'] : 0) . ',
+		totalSizeAllowed: ' . (empty($modSettings['attachmentPostLimit']) ? 0 : $modSettings['attachmentPostLimit'] * 1024) . ',
+		totalAttachSizeUploaded: ' . $context['attachments']['total_size'] . ',
+		individualSizeAllowed: ' . (empty($modSettings['attachmentSizeLimit']) ? 0 : $modSettings['attachmentSizeLimit'] * 1024) . ',
+		numOfAttachmentAllowed: ' . (empty($modSettings['attachmentNumPerPostLimit']) ? 50 : $modSettings['attachmentNumPerPostLimit']) . ',
+		numAttachUploaded: ' . $context['attachments']['quantity'] . ',
+		resizeImageEnabled: ' . (empty($modSettings['attachment_image_resize_enabled']) ? 0 : 1) . ',
 		fileDisplayTemplate: \'<div class="statusbar"><div class="info"></div><div class="progressBar"><div></div></div><div class="control icon i-close"></div></div>\',
 		oTxt: {
 			allowedExtensions : ' . JavaScriptEscape(sprintf($txt['cant_upload_type'], $context['attachments']['allowed_extensions'])) . ',
@@ -503,7 +504,9 @@ function template_add_new_attachments()
 			individualSizeAllowed : ' . JavaScriptEscape(sprintf($txt['file_too_big'], comma_format($modSettings['attachmentSizeLimit'], 0))) . ',
 			numOfAttachmentAllowed : ' . JavaScriptEscape(sprintf($txt['attachments_limit_per_post'], $modSettings['attachmentNumPerPostLimit'])) . ',
 			postUploadError : ' . JavaScriptEscape($txt['post_upload_error']) . ',
-			areYouSure: ' . JavaScriptEscape($txt['ila_confirm_removal']) . '
+			areYouSure: ' . JavaScriptEscape($txt['ila_confirm_removal']) . ',
+			uploadAbort: ' . JavaScriptEscape($txt['attachment_upload_abort']) . ',
+			processing: ' . JavaScriptEscape($txt['attachment_processing']) . '
 		},
 		existingSelector: \'.inline_insert\',
 		events: IlaDropEvents' . (isset($context['current_topic']) ? ',
@@ -604,7 +607,7 @@ function template_topic_replies_below()
 				<div class="postarea2" id="msg', $post['id'], '">
 					<div class="keyinfo">
 						<h5 class="floatleft">
-							<span>', $txt['posted_by'], '</span>&nbsp;', $post['poster'], '&nbsp;-&nbsp;', $post['time'], '
+							', $txt['posted_by'], ' <span class="name">', $post['poster'], '</span> &ndash; ', $post['html_time'], '
 						</h5>';
 
 			if ($context['can_quote'])

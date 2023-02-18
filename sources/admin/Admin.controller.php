@@ -11,7 +11,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.1.6
+ * @version 1.1.9
  *
  */
 
@@ -980,7 +980,7 @@ class Admin_Controller extends Action_Controller
 		// Clean any admin tokens as well.
 		cleanTokens(false, '-admin');
 
-		if (isset($this->_req->query->redir, $this->_req->server->HTTP_REFERER))
+		if (isset($this->_req->query->redir, $_SERVER['HTTP_REFERER']))
 		{
 			redirectexit($_SERVER['HTTP_REFERER']);
 		}

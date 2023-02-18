@@ -7,7 +7,7 @@
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * @version 1.1.7
+ * @version 1.1.9
  *
  */
 
@@ -264,14 +264,13 @@ function load_user_drafts($member_id, $draft_type = 0, $topic = false, $order = 
 			AND type = {int:draft_type}' . (!empty($modSettings['drafts_keep_days']) ? '
 			AND poster_time > {int:time}' : '') . (!empty($order) ? '
 		ORDER BY {raw:order}' : '') . (!empty($limit) ? '
-		LIMIT {raw:limit}' : ''),
+		LIMIT ' . $limit : ''),
 		array(
 			'id_member' => $member_id,
 			'id_topic' => (int) $topic,
 			'draft_type' => $draft_type,
 			'time' => !empty($modSettings['drafts_keep_days']) ? (time() - ($modSettings['drafts_keep_days'] * 86400)) : 0,
 			'order' => $order,
-			'limit' => $limit,
 		)
 	);
 }

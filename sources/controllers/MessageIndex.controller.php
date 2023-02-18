@@ -12,7 +12,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.1.6
+ * @version 1.1.9
  *
  */
 
@@ -558,6 +558,8 @@ class MessageIndex_Controller extends Action_Controller implements Frontpage_Int
 			$possibleActions[] = 'lock';
 		if (!empty($boards_can['merge_any']))
 			$possibleActions[] = 'merge';
+		if (!empty($boards_can['approve_posts']))
+			$possibleActions[] = 'approve';
 
 		// Two methods: $_REQUEST['actions'] (id_topic => action), and $_REQUEST['topics'] and $this->_req->post->qaction.
 		// (if action is 'move', $_REQUEST['move_to'] or $_REQUEST['move_tos'][$topic] is used.)
@@ -606,6 +608,7 @@ class MessageIndex_Controller extends Action_Controller implements Frontpage_Int
 		$removeCache = array();
 		$lockCache = array();
 		$markCache = array();
+		$approveCache = array();
 
 		if (!empty($all_actions))
 		{
@@ -689,6 +692,9 @@ class MessageIndex_Controller extends Action_Controller implements Frontpage_Int
 					case 'lock':
 						$lockCache[] = $row['id_topic'];
 						break;
+					case 'approve':
+						$approveCache[] = $row['id_topic'];
+						break;
 				}
 			}
 		}
@@ -706,6 +712,10 @@ class MessageIndex_Controller extends Action_Controller implements Frontpage_Int
 		// Now delete the topics...
 		if (!empty($removeCache))
 			removeTopicsPermissions($removeCache);
+
+		// Approve the topics...
+		if (!empty($approveCache))
+			approveTopics($approveCache, true, true);
 
 		// And (almost) lastly, lock the topics...
 		if (!empty($lockCache))

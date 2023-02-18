@@ -11,7 +11,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.1
+ * @version 1.1.9
  *
  */
 
@@ -129,7 +129,7 @@ class Stats_Controller extends Action_Controller
 
 		// This would be the amount of time the forum has been up... in days...
 		$total_days_up = ceil((time() - strtotime($averages['date'])) / (60 * 60 * 24));
-		$date = strftime('%Y-%m-%d', forum_time(false));
+		$date = Util::strftime('%Y-%m-%d', forum_time(false));
 
 		// General forum stats
 		$context['general_statistics']['left'] = array(

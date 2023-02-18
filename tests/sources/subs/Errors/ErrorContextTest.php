@@ -7,7 +7,7 @@ use ElkArte\Errors\ErrorContext;
  *
  * Tests adding and removing errors and few other options
  */
-class TestErrorContext extends PHPUnit_Framework_TestCase
+class TestErrorContext extends PHPUnit\Framework\TestCase
 {
 	public function testSimpleError()
 	{

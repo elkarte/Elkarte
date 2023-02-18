@@ -3,7 +3,7 @@
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * @version 1.1.6
+ * @version 1.1.9
  */
 
 /**
@@ -44,7 +44,7 @@
 					return false;
 
 				// Set the subAction to what they are doing
-				if (check.indexOf('unlike_button') >= 0) {
+				if (check.indexOf('unreact_button') >= 0) {
 					if (!confirm(likemsg_are_you_sure))
 						return;
 
@@ -97,8 +97,8 @@
 			 * @param {object} params object of new values from the ajax request
 			 */
 			updateUi = function (params) {
-				var currentClass = (params.action === 'unlikepost') ? 'unlike_button' : 'like_button',
-					nextClass = (params.action === 'unlikepost') ? 'like_button' : 'unlike_button';
+				var currentClass = (params.action === 'unlikepost') ? 'unreact_button' : 'react_button',
+					nextClass = (params.action === 'unlikepost') ? 'react_button' : 'unreact_button';
 
 				// Swap the button class as needed, update the text for the hover
 				$(params.elem).removeClass(currentClass).addClass(nextClass);

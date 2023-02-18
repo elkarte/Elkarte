@@ -11,7 +11,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.1.6
+ * @version 1.1.9
  *
  */
 
@@ -73,10 +73,6 @@ class ProfileHistory_Controller extends Action_Controller
 		// Yep, sub-action time and call integrate_sa_profile_history as well
 		$subAction = $action->initialize($subActions, 'activity');
 		$context['sub_action'] = $subAction;
-
-		// Moderation must be on to track edits.
-		if (empty($modSettings['modlog_enabled']))
-			unset($context[$context['profile_menu_name']]['tab_data']['edits']);
 
 		// Set a page title.
 		$context['history_area'] = $subAction;

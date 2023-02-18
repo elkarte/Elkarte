@@ -11,7 +11,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.1.7
+ * @version 1.1.9
  *
  */
 
@@ -416,7 +416,7 @@ function byte_format($number)
  * - Applies all necessary time offsets to the timestamp, unless offset_type is set.
  * - If todayMod is set and show_today was not not specified or true, an
  *   alternate format string is used to show the date with something to show it is "today" or "yesterday".
- * - Performs localization (more than just strftime would do alone.)
+ * - Performs localization (more than just Util::strftime would do alone.)
  *
  * @param int $log_time A unix timestamp
  * @param string|bool $show_today = true show "Today"/"Yesterday",
@@ -480,31 +480,31 @@ function standardTime($log_time, $show_today = true, $offset_type = false)
 	if (setlocale(LC_TIME, $txt['lang_locale']))
 	{
 		if (!isset($non_twelve_hour))
-			$non_twelve_hour = trim(strftime('%p')) === '';
+			$non_twelve_hour = trim(Util::strftime('%p')) === '';
 		if ($non_twelve_hour && strpos($str, '%p') !== false)
-			$str = str_replace('%p', (strftime('%H', $time) < 12 ? $txt['time_am'] : $txt['time_pm']), $str);
+			$str = str_replace('%p', (Util::strftime('%H', $time) < 12 ? $txt['time_am'] : $txt['time_pm']), $str);
 
 		foreach (array('%a', '%A', '%b', '%B') as $token)
 			if (strpos($str, $token) !== false)
-				$str = str_replace($token, !empty($txt['lang_capitalize_dates']) ? Util::ucwords(strftime($token, $time)) : strftime($token, $time), $str);
+				$str = str_replace($token, !empty($txt['lang_capitalize_dates']) ? Util::ucwords(Util::strftime($token, $time)) : Util::strftime($token, $time), $str);
 	}
 	else
 	{
 		// Do-it-yourself time localization.  Fun.
 		foreach (array('%a' => 'days_short', '%A' => 'days', '%b' => 'months_short', '%B' => 'months') as $token => $text_label)
 			if (strpos($str, $token) !== false)
-				$str = str_replace($token, $txt[$text_label][(int) strftime($token === '%a' || $token === '%A' ? '%w' : '%m', $time)], $str);
+				$str = str_replace($token, $txt[$text_label][(int) Util::strftime($token === '%a' || $token === '%A' ? '%w' : '%m', $time)], $str);
 
 		if (strpos($str, '%p') !== false)
-			$str = str_replace('%p', (strftime('%H', $time) < 12 ? $txt['time_am'] : $txt['time_pm']), $str);
+			$str = str_replace('%p', (Util::strftime('%H', $time) < 12 ? $txt['time_am'] : $txt['time_pm']), $str);
 	}
 
-	// Windows doesn't support %e; on some versions, strftime fails altogether if used, so let's prevent that.
+	// Windows doesn't support %e; on some versions, Util::strftime fails altogether if used, so let's prevent that.
 	if ($support_e && strpos($str, '%e') !== false)
-		$str = str_replace('%e', ltrim(strftime('%d', $time), '0'), $str);
+		$str = str_replace('%e', ltrim(Util::strftime('%d', $time), '0'), $str);
 
 	// Format any other characters..
-	return strftime($str, $time);
+	return Util::strftime($str, $time);
 }
 
 /**
@@ -521,12 +521,13 @@ function htmlTime($timestamp)
 	if (empty($timestamp))
 		return '';
 
+	$forumtime = forum_time(false, $timestamp);
 	$timestamp = forum_time(true, $timestamp);
 	$time = date('Y-m-d H:i', $timestamp);
 	$stdtime = standardTime($timestamp, true, true);
 
 	// @todo maybe htmlspecialchars on the title attribute?
-	return '<time title="' . (!empty($context['using_relative_time']) ? $stdtime : $txt['last_post']) . '" datetime="' . $time . '" data-timestamp="' . $timestamp . '">' . $stdtime . '</time>';
+	return '<time title="' . (!empty($context['using_relative_time']) ? $stdtime : $txt['last_post']) . '" datetime="' . $time . '" data-timestamp="' . $timestamp . '" data-forumtime="' . $forumtime . '">' . $stdtime . '</time>';
 }
 
 /**
@@ -566,6 +567,9 @@ function forum_time($use_user_offset = true, $timestamp = null)
  */
 function un_htmlspecialchars($string)
 {
+	if (empty($string))
+		return $string;
+
 	$string = htmlspecialchars_decode($string, ENT_QUOTES);
 	$string = str_replace('&nbsp;', ' ', $string);
 
@@ -1031,13 +1035,13 @@ function setMemoryLimit($needed, $in_use = false)
  */
 function memoryReturnBytes($val)
 {
-	if (is_integer($val))
-		return $val;
+	// Treat blank values as 0
+	$val = is_bool($val) || empty($val) ? 0 : trim($val);
 
 	// Separate the number from the designator
-	$val = trim($val);
-	$num = intval(substr($val, 0, strlen($val) - 1));
-	$last = strtolower(substr($val, -1));
+	preg_match('~(\d+)(.*)~', $val, $val);
+	$num = intval($val[1]);
+	$last = strtolower(substr(!empty($val[2]) ? $val[2] : '', 0, 1));
 
 	// Convert to bytes
 	switch ($last)
@@ -1240,33 +1244,52 @@ function host_from_ip($ip)
 	$t = microtime(true);
 
 	// Try the Linux host command, perhaps?
-	if ((strpos(strtolower(PHP_OS), 'win') === false || strpos(strtolower(PHP_OS), 'darwin') !== false) && mt_rand(0, 1) == 1)
+	if (function_exists('shell_exec'))
 	{
-		if (!isset($modSettings['host_to_dis']))
-			$test = @shell_exec('host -W 1 ' . @escapeshellarg($ip));
-		else
-			$test = @shell_exec('host ' . @escapeshellarg($ip));
+		if ((stripos(PHP_OS, 'win') === false || stripos(PHP_OS, 'darwin') !== false) && mt_rand(0, 1) == 1)
+		{
+			if (!isset($modSettings['host_to_dis']))
+			{
+				$test = @shell_exec('host -W 1 ' . @escapeshellarg($ip));
+			}
+			else
+			{
+				$test = @shell_exec('host ' . @escapeshellarg($ip));
+			}
 
-		// Did host say it didn't find anything?
-		if (strpos($test, 'not found') !== false)
-			$host = '';
-		// Invalid server option?
-		elseif ((strpos($test, 'invalid option') || strpos($test, 'Invalid query name 1')) && !isset($modSettings['host_to_dis']))
-			updateSettings(array('host_to_dis' => 1));
-		// Maybe it found something, after all?
-		elseif (preg_match('~\s([^\s]+?)\.\s~', $test, $match) == 1)
-			$host = $match[1];
-	}
+			$test = isset($test) ? $test : '';
 
-	// This is nslookup; usually only Windows, but possibly some Unix?
-	if (empty($host) && stripos(PHP_OS, 'win') !== false && strpos(strtolower(PHP_OS), 'darwin') === false && mt_rand(0, 1) == 1)
-	{
-		$test = @shell_exec('nslookup -timeout=1 ' . @escapeshellarg($ip));
+			// Did host say it didn't find anything?
+			if (strpos($test, 'not found') !== false)
+			{
+				$host = '';
+			}
+			// Invalid server option?
+			elseif ((strpos($test, 'invalid option') || strpos($test, 'Invalid query name 1')) && !isset($modSettings['host_to_dis']))
+			{
+				updateSettings(array('host_to_dis' => 1));
+			}
+			// Maybe it found something, after all?
+			elseif (preg_match('~\s([^\s]+?)\.\s~', $test, $match) == 1)
+			{
+				$host = $match[1];
+			}
+		}
 
-		if (strpos($test, 'Non-existent domain') !== false)
-			$host = '';
-		elseif (preg_match('~Name:\s+([^\s]+)~', $test, $match) == 1)
-			$host = $match[1];
+		// This is nslookup; usually only Windows, but possibly some Unix?
+		if (empty($host) && stripos(PHP_OS, 'win') !== false && stripos(PHP_OS, 'darwin') === false && mt_rand(0, 1) == 1)
+		{
+			$test = @shell_exec('nslookup -timeout=1 ' . @escapeshellarg($ip));
+
+			if (strpos($test, 'Non-existent domain') !== false)
+			{
+				$host = '';
+			}
+			elseif (preg_match('~Name:\s+([^\s]+)~', $test, $match) == 1)
+			{
+				$host = $match[1];
+			}
+		}
 	}
 
 	// This is the last try :/.
@@ -1914,7 +1937,7 @@ function addProtocol($url, $protocols = array())
 }
 
 /**
- * Removes nested quotes from a text string.
+ * Removes all, or those over a limit, of nested quotes from a text string.
  *
  * @param string $text - The body we want to remove nested quotes from
  *
@@ -1924,15 +1947,62 @@ function removeNestedQuotes($text)
 {
 	global $modSettings;
 
-	// Remove any nested quotes, if necessary.
-	if (!empty($modSettings['removeNestedQuotes']))
-	{
-		return preg_replace(array('~\n?\[quote.*?\].+?\[/quote\]\n?~is', '~^\n~', '~\[/quote\]~'), '', $text);
-	}
-	else
+	if (!isset($modSettings['removeNestedQuotes']))
 	{
 		return $text;
 	}
+
+	// How many levels will we allow?
+	$max_depth = (int) $modSettings['removeNestedQuotes'];
+
+	// Remove all nested quotes?
+	if ($max_depth === 0)
+	{
+		return preg_replace(array('~\n?\[quote.*?\].+?\[/quote\]\n?~is', '~^\n~', '~\[/quote\]~'), '', $text);
+	}
+
+	// Remove just -some- of the quotes, then we need to find them all
+	preg_match_all('~(\[\/?quote(?:(.*?))?\])~i', $text, $matches, PREG_OFFSET_CAPTURE);
+	$depth = 0;
+	$remove = array();
+	$start_pos = 0;
+
+	// Mark ones that are in excess of the limit.  $match[0] will be the found tag
+	// such as [quote=some author] or [/quote], $match[1] is the starting position of that tag.
+	foreach ($matches[0] as $match)
+	{
+		// Closing quote
+		if ($match[0][1] === '/')
+		{
+			--$depth;
+
+			// To many, mark it for removal
+			if ($depth === $max_depth)
+			{
+				// This quote position in the string, note [/quote] = 8
+				$end_pos = $match[1] + 8;
+				$length = $end_pos - $start_pos;
+				$remove[] = array($start_pos, $length);
+			}
+
+			continue;
+		}
+
+		// Another quote level inward
+		++$depth;
+		if ($depth === $max_depth + 1)
+		{
+			$start_pos = $match[1];
+		}
+	}
+
+	// Time to cull the herd
+	foreach (array_reverse($remove) as list($start_pos, $length))
+	{
+		$text = substr_replace($text, '', $start_pos, $length);
+	}
+
+	return $text;
 }
 
 /**

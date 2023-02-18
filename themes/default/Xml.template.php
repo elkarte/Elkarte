@@ -9,7 +9,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.1.7
+ * @version 1.1.9
  *
  */
 
@@ -551,7 +551,7 @@ function template_feedatom()
 		<icon>', $context['favicon'] . '</icon>
 		<logo>', $context['header_logo_url_html_safe'], '</logo>
 
-		<updated>', gmstrftime('%Y-%m-%dT%H:%M:%SZ'), '</updated>
+		<updated>', Util::gmstrftime('%Y-%m-%dT%H:%M:%SZ'), '</updated>
 		<subtitle><![CDATA[', strip_tags(un_htmlspecialchars($txt['xml_rss_desc'])), ']]></subtitle>
 		<generator uri="https://www.elkarte.net" version="', strtr(FORUM_VERSION, array('ElkArte' => '')), '">ElkArte</generator>
 		<author>

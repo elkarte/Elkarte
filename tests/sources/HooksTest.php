@@ -4,7 +4,7 @@
  * TestCase class for hooks adding/removing/other stuff
  * @backupGlobals disabled
  */
-class TestHooks extends PHPUnit_Framework_TestCase
+class TestHooks extends PHPUnit\Framework\TestCase
 {
 	/**
 	 * Name of the hook used for testing
@@ -25,7 +25,7 @@ class TestHooks extends PHPUnit_Framework_TestCase
 	 * prepare what is necessary to use in these tests.
 	 * setUp() is run automatically by the testing framework before each test method.
 	 */
-	public function setUp()
+	protected function setUp(): void
 	{
 		$this->_tests = array(
 			// A simple one, just the function, default (i.e. in theory permanent)
@@ -51,7 +51,7 @@ class TestHooks extends PHPUnit_Framework_TestCase
 	 * cleanup data we no longer need at the end of the tests in this class.
 	 * tearDown() is run automatically by the testing framework after each test method.
 	 */
-	public function tearDown()
+	protected function tearDown(): void
 	{
 	}
 
@@ -147,6 +147,9 @@ class TestHooks extends PHPUnit_Framework_TestCase
 	private function _parse_hooks($hook_string)
 	{
 		$hooks = array();
+		if (empty($hook_string))
+			return $hooks;
+
 		$functions = explode(',', $hook_string);
 		foreach ($functions as $function)
 		{

@@ -11,7 +11,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.1.7
+ * @version 1.1.9
  *
  */
 
@@ -223,13 +223,13 @@ class Display_Controller extends Action_Controller
 			$total_visible_posts = $context['num_replies'] + $topicinfo['unapproved_posts'] + ($topicinfo['approved'] ? 1 : 0);
 
 		// When was the last time this topic was replied to?  Should we warn them about it?
+		$context['oldTopicError'] = false;
 		if (!empty($modSettings['oldTopicDays']))
 		{
 			$mgsOptions = basicMessageInfo($topicinfo['id_last_msg'], true);
-			$context['oldTopicError'] = $mgsOptions['poster_time'] + $modSettings['oldTopicDays'] * 86400 < time() && empty($topicinfo['is_sticky']);
+			if ($mgsOptions !== false)
+				$context['oldTopicError'] = $mgsOptions['poster_time'] + $modSettings['oldTopicDays'] * 86400 < time() && empty($topicinfo['is_sticky']);
 		}
-		else
-			$context['oldTopicError'] = false;
 
 		// The start isn't a number; it's information about what to do, where to go.
 		if (!is_numeric($this->_start))
@@ -489,7 +489,7 @@ class Display_Controller extends Action_Controller
 						}),
 					});
 
-					$(".like_button, .unlike_button, .likes_button").SiteTooltip({
+					$(".react_button, .unreact_button, .reacts_button").SiteTooltip({
 						hoverIntent: {
 							sensitivity: 10,
 							interval: 150,
@@ -679,7 +679,13 @@ class Display_Controller extends Action_Controller
 
 		// Quick reply & modify enabled?
 		if ($context['can_reply'] && !empty($options['display_quick_reply']))
+		{
+			loadJavascriptFile('quickQuote.js', array('defer' => true));
 			$this->_template_layers->add('quickreply');
+			theme()->addInlineJavascript("
+				document.addEventListener('DOMContentLoaded', () => new Elk_QuickQuote(), false);", true
+			);
+		}
 
 		$this->_template_layers->add('pages_and_buttons');
 

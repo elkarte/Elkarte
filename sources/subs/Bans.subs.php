@@ -11,7 +11,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.1
+ * @version 1.1.9
  *
  */
 
@@ -1397,16 +1397,14 @@ function list_getBans($start, $items_per_page, $sort)
 /**
  * Gets the number of ban items belonging to a certain ban group
  *
- * @package Bans
+ * @param int $ban_group_id
  * @return int
  */
-function list_getNumBanItems()
+function list_getNumBanItems($ban_group_id = 0)
 {
-	global $context;
-
 	$db = database();
 
-	$ban_group_id = isset($context['ban_group_id']) ? (int) $context['ban_group_id'] : 0;
+	$ban_group_id = (int) $ban_group_id;
 
 	$request = $db->query('', '
 		SELECT COUNT(bi.id_ban)

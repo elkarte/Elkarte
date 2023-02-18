@@ -7,7 +7,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.1
+ * @version 1.1.9
  */
 
 /**
@@ -362,6 +362,9 @@ function onDocSent(XMLDoc)
 		$(this).next().children().slideToggle("fast");
 	});
 
+	// Show more quote blocks
+	if (typeof elk_quotefix === 'function')
+		elk_quotefix();
 	// Fix and Prettify code blocks
 	if (typeof elk_codefix === 'function')
 		elk_codefix();
@@ -457,6 +460,19 @@ function onDocReceived(XMLDoc)
 		text += XMLDoc.getElementsByTagName('quote')[0].childNodes[i].nodeValue + "\n";
 
 	$editor_data[post_box_name].insert(text);
+
+	// In wizzy mode, we need to move the cursor out of the quote block
+	let
+		rangeHelper = $editor_data[post_box_name].getRangeHelper(),
+		parent = rangeHelper.parentNode();
+
+	if (parent && parent.nodeName === 'BLOCKQUOTE')
+	{
+		let range = rangeHelper.selectedRange();
+
+		range.setStartAfter(parent);
+		rangeHelper.selectRange(range);
+	}
 
 	ajax_indicator(false);
 }

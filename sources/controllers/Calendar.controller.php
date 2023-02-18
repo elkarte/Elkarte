@@ -12,7 +12,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.1
+ * @version 1.1.9
  *
  */
 
@@ -66,7 +66,7 @@ class Calendar_Controller extends Action_Controller
 		// Is this a week view?
 		$context['view_week'] = isset($_GET['viewweek']);
 		$context['cal_minyear'] = $modSettings['cal_minyear'];
-		$context['cal_maxyear'] = date('Y') + $modSettings['cal_limityear'];
+		$context['cal_maxyear'] = (int) date('Y') + (int) $modSettings['cal_limityear'];
 
 		// Don't let search engines index weekly calendar pages.
 		if ($context['view_week'])
@@ -237,7 +237,7 @@ class Calendar_Controller extends Action_Controller
 		$context['sub_template'] = 'unlinked_event_post';
 
 		$context['cal_minyear'] = $modSettings['cal_minyear'];
-		$context['cal_maxyear'] = date('Y') + $modSettings['cal_limityear'];
+		$context['cal_maxyear'] = (int) date('Y') + (int) $modSettings['cal_limityear'];
 		$context['page_title'] = $event->isNew() ? $txt['calendar_edit'] : $txt['calendar_post_event'];
 		$context['linktree'][] = array(
 			'name' => $context['page_title'],

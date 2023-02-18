@@ -361,7 +361,8 @@ input[type=submit][disabled]:hover, button[disabled], button[disabled]:hover {
 	padding: 1px 4px 2px 4px;
 	font-weight: bold;
 	font-size: .643em;
-	font-family: verdana, sans-serif;
+	font-family: verdana, sans-serif !important;
+	margin: 0 1px;
 }
 
 .new_posts:hover {
@@ -728,6 +729,52 @@ em, .em {
 	font-weight: normal;
 }
 
+/* Expanding quotes */
+.quote-read-more {
+	position: relative;
+}
+
+/* Constrain the quote area height.  Use max height so we can have a smooth transition */
+.quote-read-more > .bbc_quote {
+	overflow: auto;
+	max-height: var(--quote_height);
+}
+
+/* Specific targeting of our checkbox.  100% wide with a gradient to cover/fade the bottom
+   of the blockquote */
+input[type=checkbox].quote-show-more {
+	position: absolute;
+	bottom: 0;
+	width: 100%;
+	min-height: 8em;
+	margin: 0 1px 1px 1px;
+	padding-top: 6em;
+	cursor: pointer;
+	text-align: center;
+	-webkit-appearance: none;
+	-moz-appearance: none;
+	appearance: none;
+}
+
+/* The read moar, with the 100% width clicking anywhere in the quote base will work
+   note content: "More" is defined in themes/default/Theme.php controller for localization */
+input[type=checkbox].quote-show-more:after {
+	font-size: 1.1em;
+	font-weight: 600;
+}
+
+/* When clicked, hide the checkbox and expand the quote */
+input[type=checkbox].quote-show-more:checked {
+	display: none;
+}
+
+/* max-height 750em is simply to avoid the clipping of any length quote, do not use none as
+   it will not provide a smooth transition */
+input[type=checkbox].quote-show-more:checked ~ .bbc_quote {
+	max-height: 750em;
+	transition: 1.5s max-height ease-in;
+}
+
 /* A quote, perhaps from another post. */
 .bbc_quote,
 /* A code block - maybe PHP ;) - shared styles. */
@@ -932,7 +979,7 @@ a.bbc_link {
 	width: 100%;
 	margin-bottom: 10px;
 	padding: 2px;
-	box-sizing: border-box
+	box-sizing: border-box;
 }
 #quick_edit_body_container .input_text {
 	width: 85%;
@@ -1639,10 +1686,9 @@ a.bbc_link {
 	padding: 5px 5px 0 5px;
 }
 
-.buttonlist li {
-	float: left;
-	margin: 0 0 0 4px;
+.buttonlist > li {
 	line-height: 2.231em;
+	display: inline-block;
 }
 
 /* @todo - Save code by amalgamating common button background declarations. */
@@ -1705,8 +1751,10 @@ nav > .quickbuttons {
 }
 
 .quickbuttons .inline_mod_check {
-	margin: 4px 4px 4px 0;
+	margin: 4px 0 0 0;
 	padding: 0 4px;
+	border: 1px solid;
+	line-height: 2.1em;
 }
 
 /* @todo - Save code by amalgamating common button background declarations. */
@@ -1772,19 +1820,18 @@ nav > .quickbuttons {
 .report_button:before     {background-position: 0 -312px;}
 .warn_button:before       {background-position: 0 -336px;}
 .quotetonew_button:before {background-position: 0 -360px;}
-.like_button:before       {background-position: 0 -384px;}
-.unlike_button:before     {background-position: 0 -408px;}
+.react_button:before       {background-position: 0 -384px;}
+.unreact_button:before     {background-position: 0 -408px;}
 .star_button:before       {background-position: 0 -432px;}
 .quick_edit:before        {background-position: 0 -456px;}
-.likes_button:before      {background-position: 0 -480px;}
+.reacts_button:before      {background-position: 0 -480px;}
 
-/* Radius left end of the first (Quote) button. */
-.linklevel1.quote_button {
+/* Radius the ends of the first/last button. */
+.quickbuttons li:last-child, .quickbuttons li:last-child a {
 	border-radius: 2px 0 0 2px;
 }
 
-/* Radius right end of the last button. */
-.linklevel1.post_options, .linklevel1.remove_button {
+.quickbuttons li:first-child, .quickbuttons li:first-child a {
 	border-radius: 0 2px 2px 0;
 }
 
@@ -1821,15 +1868,15 @@ nav > .quickbuttons {
 }
 
 /* Show appropriate like/unlike action */
-.like_button:before, .likes_button:before, .unlike_button:before {
+.react_button:before, .reacts_button:before, .unreact_button:before {
 	background-position: 0 -480px;
 }
 
-.unlike_button:before {
+.unreact_button:before {
 	background-position: 0 -408px;
 }
 
-.like_button:hover:before {
+.react_button:hover:before {
 	background-position: 0 -384px;
 }
 
@@ -1849,6 +1896,11 @@ nav > .quickbuttons {
 .quickbuttons .linklevel2 {
 	padding: 0 6px 0 26px;
 	line-height: 2.1em;
+}
+
+.quick_quote_button {
+	position: absolute;
+	z-index: 10000;
 }
 
 /* -------------------------------------------------------
@@ -3111,7 +3163,7 @@ img.new_posts {
 }
 
 .smiley {
-	vertical-align: bottom;
+	vertical-align: text-bottom;
 }
 
 /* All the signatures used in the forum. */
@@ -3141,6 +3193,7 @@ img.new_posts {
 	overflow: hidden;
 	text-overflow: ellipsis;
 	padding: 0 .5em;
+	margin: 0 auto;
 }
 .attachment_name {
 	 margin: .5em 0 0 0;
@@ -3299,6 +3352,8 @@ img.new_posts {
 	display: block;
 	width: 0;
 	content: '';
+	border-width: 10px 10px 0;
+	border-style: solid;
 }
 
 .new_post_separator:before {
@@ -3317,19 +3372,39 @@ img.new_posts {
 
 .elk_video a img, .elk_video embed {
 	display: block;
+	width: 100%;
 	margin: 0 auto;
+	aspect-ratio: 16 / 9;
+	max-height: 360px;
+	object-fit: cover;
 }
 
 .elk_videoheader {
-	padding: 0 4px 0 6px;
-	max-width: 98%;
-	width: 630px;
+	width: 640px;
+	max-width: 100%;
 	border: 1px solid;
+}
+
+.elk_videoheader > a {
+	padding: 0 4px;
 }
 
 .elk_previewvideo {
 	max-width: 640px;
 	height: auto;
+}
+
+/* These deal with 9/16 videos (like tiktok) */
+.elk_video.portrait {
+	max-width: 480px;
+	min-height: 480px;
+	width: 100%;
+	max-height: initial;
+}
+
+.elk_videoheader.portrait {
+	width: 480px;
+	margin: 0px 0 -18px 0;
 }
 
 /* Basic stuff for the bottom of Display.template.php. */
@@ -3717,10 +3792,13 @@ ul.post_options li {
 
 .statusbar .insertoverlay .button {
 	position: absolute;
-	left: 2.5em;
-	top: -2em;
 	margin: 0;
 	font-weight: bold;
+	top: -35px;
+	left: 2px;
+	width: 55px;
+	min-height: 34px;
+	border-radius: 4px;
 }
 
 .info {
@@ -3755,16 +3833,22 @@ ul.post_options li {
 	vertical-align: middle;
 }
 
-.abort, .remove, .share {
+.abort, .remove, .share, .ila {
 	float: right;
 	padding: 4px 5px 2px 5px;
-	max-width: 1em;
+	max-width: 2em;
 	cursor: pointer;
 	border-radius: 4px;
 }
 
-.share {
+.share, .ila {
 	float: none;
+}
+
+.ila {
+	min-width: 3em;
+	border: 1px solid;
+	padding-top: 5px;
 }
 
 .drop_attachmnts_error {
@@ -5198,6 +5282,10 @@ a.help .icon {
 	max-width: 40em;
 }
 
+.login .well {
+	padding: 5px 35px
+}
+
 .login dl {
 	clear: right;
 	overflow: auto;
@@ -5230,7 +5318,7 @@ a.help .icon {
 	vertical-align: top;
 }
 
-.login p {
+.login p:not(.errorbox) {
 	text-align: center;
 }
 
@@ -5286,7 +5374,7 @@ a.help .icon {
 	border-radius: 7px;
 }
 
-.well p, .roundframe p {
+.well p:not(.errorbox), .roundframe p {
 	padding: 6px;
 }
 
@@ -5747,6 +5835,10 @@ a > i {
 
 /* This one does 800 screens at default font size. */
 @media screen and (max-width: 50em) {
+	#gotop, #gobottom {
+		display: none;
+	}
+
 	.icon-menu {
 		display: inline-block;
 		margin: .05em;
@@ -5866,15 +5958,20 @@ a > i {
 	}
 
 	.board_name {
-		margin-top: 7px;
+		margin-top: 5px;
+		margin-bottom: 5px;
 		padding: 0;
+	}
+
+	.board_lastpost {
+		min-width: 14em;
 	}
 
 	.board_lastposter {
 		display: block;
 	}
 
-	.board_lastpost, .board_latest {
+	.board_latest {
 		min-width: 14em;
 	}
 
@@ -5886,6 +5983,10 @@ a > i {
 
 	.board_info .board_description, .board_info .moderators, .childboards {
 		margin: 0 0 0 8px;
+	}
+
+	.icon_anchor {
+		min-width: initial;
 	}
 
 	/* Playing silly buggers with a sidebar menu option for narrow screens. */
@@ -5955,7 +6056,7 @@ a > i {
 	}
 
 	.quickbuttons .modified {
-		display: block;
+		display: none;
 		width: 100%;
 		text-align: left;
 	}
@@ -5968,6 +6069,14 @@ a > i {
 		width: 100%;
 		text-align: right;
 		white-space: normal;
+	}
+
+	.ui-tabs .ui-tabs-panel {
+		padding: 1em 0 !important;
+	}
+
+	.profile_content {
+		padding: 0 2px;
 	}
 
 	#search_options {
@@ -6035,9 +6144,7 @@ a > i {
 	.statusbar .insertoverlay .range {
 		max-width: 90%;
 	}
-	.statusbar .insertoverlay .button {
-		float: none;
-	}
+
 	.statusbar .insertoverlay .range,
 	.statusbar .insertoverlay .text,
 	.statusbar .insertoverlay .button {
@@ -6045,9 +6152,10 @@ a > i {
 		display: block;
 	}
 	.statusbar .insertoverlay .button {
+		float: none;
 		left: 0;
 		top: -3em;
-		border-radius: 4px;
+		margin: 0;
 	}
 
 	/*.listlevel1#button_profile .linklevel1 {
@@ -6155,7 +6263,7 @@ a > i {
 		height: 30px;
 	}
 
-	.quickbuttons {
+	.quickbuttons, .quickbuttons > .listlevel1 > a {
 		white-space: nowrap;
 	}
 
@@ -6704,6 +6812,14 @@ a > i {
 		max-width: 95% !important;
 	}
 
+	.settings > dt {
+		width: 60% !important;
+	}
+
+	.settings > dd {
+		width: 40% !important;
+	}
+
 	ul.post_options li {
 		width: 50%;
 	}
@@ -6734,6 +6850,24 @@ a > i {
 	.statusbar .insertoverlay .container input {
 		display: block;
 		float: none;
+	}
+
+	.progress_tracker {
+		padding-left: 0 !important;
+	}
+
+	.statusbar > .info {
+		width: 50%;
+	}
+
+	.attachment_block {
+		max-width: 49%;
+		min-width: 49%;
+		margin: 0 0 1em 0;
+	}
+
+	.attachment_block > .attachment_details, .attachment_block > .attachment_name {
+		width: initial;
 	}
 
 	#confirm_buttons input[type="submit"] {

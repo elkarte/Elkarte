@@ -121,7 +121,7 @@ input[type="submit"], .drop_area_fileselect_text, button[type="submit"], input[t
 /* Anchors styled to look like buttons. */
 /* These have standard body text size. Can be chained with smalltext class. */
 .linkbutton:link, .linkbutton_right:link, .linkbutton_left:link,
-.linkbutton:visited, .linkbutton_right:visited, .linkbutton_left:visited {
+.linkbutton:visited, .linkbutton_right:visited, .linkbutton_left:visited, .ila {
 	border-color: #AFAFAF;
 	border-top-color: #CFCFCF;
 	border-left-color: #BFBFBF;
@@ -133,7 +133,7 @@ input[type="submit"], .drop_area_fileselect_text, button[type="submit"], input[t
 
 /* Hover effects. */
 input[type="submit"]:hover, button[type="submit"]:hover, input[type="button"]:hover,
-.linkbutton:hover, .linkbutton_right:hover, .linkbutton_left:hover {
+.linkbutton:hover, .linkbutton_right:hover, .linkbutton_left:hover, .ila:hover {
 	border-color: #CCCCCC;
 	border-top-color: #AFAFAF;
 	border-left-color: #AFAFAF;
@@ -165,6 +165,7 @@ input[type=submit][disabled]:hover, button[disabled], button[disabled]:hover {
 /* Standard horizontal rule.. ([hr], etc.) */
 hr {
 	border-top-color: #BBBBBB;
+	border-bottom-color: #E4E4E4;
 	background: #EEEEEE;
 }
 
@@ -331,6 +332,11 @@ strong {
 .bbc_code {
 	border-color: #CCCCCC;
 	background: #FEFEFE;
+}
+
+input[type=checkbox].quote-show-more {
+	background: linear-gradient(to bottom, transparent 0%, transparent 25%, #FEFEFE 100%);
+	box-shadow: 0 1px 0 1px #E4E4E4;
 }
 
 /* Extra quote styling */
@@ -559,7 +565,7 @@ div.bbc_footnotes .meaction {
  */
 
 /* Level 1 Menu bar: link or button. General styling. */
-.linklevel1, .linklevel1:link, .linklevel1:visited {
+.linklevel1, .linklevel1:link, .linklevel1:visited, .quickbuttons .inline_mod_check {
 	border-color: #AFAFAF;
 	border-top-color: #CFCFCF;
 	border-left-color: #BFBFBF;
@@ -1120,7 +1126,6 @@ div.bbc_footnotes .meaction {
 }
 
 .qaction_row {
-	background: #FEFEFE;
 }
 
 .approvetopic_row, .approve_row {
@@ -1367,18 +1372,17 @@ div.bbc_footnotes .meaction {
 	color: #CCCCCC;
 }
 
-.new_post_separator {
-	display: block;
-}
-
-.new_post_separator:after, .new_post_separator:before {
-	border-width: 10px 10px 0;
-	border-style: solid;
+.new_post_separator:after {
 	border-color: #E4E4E4 transparent;
 }
 
 .new_post_separator:before {
 	border-color: #BBBBBB transparent;
+}
+
+.new_post_separator {
+	display: block;
+	overflow: visible;
 }
 
 /* Used by video embed JS when autolinking video links */

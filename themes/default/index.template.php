@@ -9,7 +9,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.1.7
+ * @version 1.1.9
  *
  */
 
@@ -154,6 +154,13 @@ function template_html_above()
 	if (!empty($context['robot_no_index']))
 		echo '
 	<meta name="robots" content="noindex" />';
+
+	// If we have any Open Graph data, here is where is inserted.
+	if (!empty($context['open_graph']))
+	{
+		echo '
+	' .implode("\n\t", $context['open_graph']);
+	}
 
 	// load in any css from addons or themes so they can overwrite if wanted
 	template_css();
@@ -446,6 +453,24 @@ function template_html_below()
 	// load in any javascript that could be deferred to the end of the page
 	theme()->template_javascript(true);
 
+	// Schema microdata about the organization?
+	if (!empty($context['smd_site']))
+	{
+		echo '
+	<script type="application/ld+json">
+	', json_encode($context['smd_site'], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE), '
+	</script>';
+	}
+
+	// Schema microdata about the post?
+	if (!empty($context['smd_article']))
+	{
+		echo '
+	<script type="application/ld+json">
+	', json_encode($context['smd_article'], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE), '
+	</script>';
+	}
+
 	// Anything special to put out?
 	if (!empty($context['insert_after_template']))
 		echo $context['insert_after_template'];
@@ -626,10 +651,6 @@ function template_button_strip($button_strip, $direction = '', $strip_options = 
 
 	if (!is_array($strip_options))
 		$strip_options = array();
-
-	// List the buttons in reverse order for RTL languages.
-	if ($context['right_to_left'])
-		$button_strip = array_reverse($button_strip, true);
 
 	// Create the buttons... now with cleaner markup (yay!).
 	$buttons = array();

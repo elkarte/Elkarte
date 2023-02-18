@@ -11,7 +11,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.1.7
+ * @version 1.1.9
  *
  */
 
@@ -212,7 +212,7 @@ function loadUserSettings()
 		});
 		$id_member = !empty($id_member) && strlen($password) > 0 ? (int) $id_member : 0;
 	}
-	elseif (empty($id_member) && isset($_SESSION['login_' . $cookiename]) && (!empty($modSettings['disableCheckUA']) || $_SESSION['USER_AGENT'] == $req->user_agent()))
+	elseif (empty($id_member) && isset($_SESSION['login_' . $cookiename]) && (!empty($modSettings['disableCheckUA']) || (!empty($_SESSION['USER_AGENT']) && $_SESSION['USER_AGENT'] == $req->user_agent())))
 	{
 		// @todo Perhaps we can do some more checking on this, such as on the first octet of the IP?
 		list ($id_member, $password, $login_span) = serializeToJson($_SESSION['login_' . $cookiename], function ($array_from) use ($cookiename) {
@@ -847,7 +847,7 @@ function loadPermissions()
 		$db->free_result($request);
 
 		if (isset($cache_groups))
-			$cache->put('permissions:' . $cache_groups, array($user_info['permissions'], !empty($removals) ? $removals : array()), 2);
+			$cache->put('permissions:' . $cache_groups, array($user_info['permissions'], !empty($removals) ? $removals : array()), 240);
 	}
 
 	// Get the board permissions.
@@ -1814,7 +1814,7 @@ function loadUserContext()
 		'is_mod' => &$user_info['is_mod'],
 		'is_moderator' => &$user_info['is_moderator'],
 		// A user can mod if they have permission to see the mod center, or they are a board/group/approval moderator.
-		'can_mod' => allowedTo('access_mod_center') || (!$user_info['is_guest'] && ($user_info['mod_cache']['gq'] != '0=1' || $user_info['mod_cache']['bq'] != '0=1' || ($modSettings['postmod_active'] && !empty($user_info['mod_cache']['ap'])))),
+		'can_mod' => allowedTo('access_mod_center') || (!$user_info['is_guest'] && !empty($user_info['mod_cache']) && ($user_info['mod_cache']['gq'] != '0=1' || $user_info['mod_cache']['bq'] != '0=1' || ($modSettings['postmod_active'] && !empty($user_info['mod_cache']['ap'])))),
 		'username' => $user_info['username'],
 		'language' => $user_info['language'],
 		'email' => $user_info['email'],
@@ -2636,7 +2636,14 @@ function determineAvatar($profile)
 	if (empty($profile))
 		return array();
 
-	$avatar_protocol = substr(strtolower($profile['avatar']), 0, 7);
+	$avatar_protocol = empty($profile['avatar']) ? '' : strtolower(substr($profile['avatar'], 0, 7));
+
+	// Build the gravatar request once.
+	$gravatar = '//www.gravatar.com/avatar/' .
+		hash('md5', strtolower(isset($profile['email_address']) ? $profile['email_address'] : '')) .
+		'?s=' . $modSettings['avatar_max_height'] .
+		(!empty($modSettings['gravatar_rating']) ? ('&amp;r=' . $modSettings['gravatar_rating']) : '') .
+		((!empty($modSettings['gravatar_default']) && $modSettings['gravatar_default'] !== 'none') ? ('&amp;d=' . $modSettings['gravatar_default']) : '');
 
 	// uploaded avatar?
 	if ($profile['id_attach'] > 0 && empty($profile['avatar']))
@@ -2646,7 +2653,7 @@ function determineAvatar($profile)
 
 		$avatar = array(
 			'name' => $profile['avatar'],
-			'image' => '<img class="avatar avatarresize" src="' . $avatar_url . '" alt="" />',
+			'image' => '<img class="avatar avatarresize" src="' . $avatar_url . '" alt="" loading="lazy" />',
 			'href' => $avatar_url,
 			'url' => '',
 		);
@@ -2656,7 +2663,7 @@ function determineAvatar($profile)
 	{
 		$avatar = array(
 			'name' => $profile['avatar'],
-			'image' => '<img class="avatar avatarresize" src="' . $profile['avatar'] . '" alt="" />',
+			'image' => '<img class="avatar avatarresize" src="' . $profile['avatar'] . '" alt="" loading="lazy" />',
 			'href' => $profile['avatar'],
 			'url' => $profile['avatar'],
 		);
@@ -2665,11 +2672,11 @@ function determineAvatar($profile)
 	elseif (!empty($profile['avatar']) && $profile['avatar'] === 'gravatar')
 	{
 		// Gravatars URL.
-		$gravatar_url = '//www.gravatar.com/avatar/' . hash('md5', strtolower($profile['email_address'])) . '?s=' . $modSettings['avatar_max_height'] . (!empty($modSettings['gravatar_rating']) ? ('&amp;r=' . $modSettings['gravatar_rating']) : '');
+		$gravatar_url = $gravatar;
 
 		$avatar = array(
 			'name' => $profile['avatar'],
-			'image' => '<img class="avatar avatarresize" src="' . $gravatar_url . '" alt="" />',
+			'image' => '<img class="avatar avatarresize" src="' . $gravatar_url . '" alt="" loading="lazy" />',
 			'href' => $gravatar_url,
 			'url' => $gravatar_url,
 		);
@@ -2679,7 +2686,7 @@ function determineAvatar($profile)
 	{
 		$avatar = array(
 			'name' => $profile['avatar'],
-			'image' => '<img class="avatar avatarresize" src="' . $modSettings['avatar_url'] . '/' . $profile['avatar'] . '" alt="" />',
+			'image' => '<img class="avatar avatarresize" src="' . $modSettings['avatar_url'] . '/' . $profile['avatar'] . '" alt="" loading="lazy" />',
 			'href' => $modSettings['avatar_url'] . '/' . $profile['avatar'],
 			'url' => $modSettings['avatar_url'] . '/' . $profile['avatar'],
 		);
@@ -2694,7 +2701,7 @@ function determineAvatar($profile)
 			// TODO: This should be incorporated into the theme.
 			$avatar = array(
 				'name' => '',
-				'image' => '<img class="avatar avatarresize" src="' . $settings['images_url'] . '/default_avatar.png" alt="" />',
+				'image' => '<img class="avatar avatarresize" src="' . $settings['images_url'] . '/default_avatar.png" alt="" loading="lazy" />',
 				'href' => $settings['images_url'] . '/default_avatar.png',
 				'url' => 'http://',
 			);
@@ -2714,7 +2721,7 @@ function determineAvatar($profile)
 		);
 
 	// Make sure there's a preview for gravatars available.
-	$avatar['gravatar_preview'] = '//www.gravatar.com/avatar/' . hash('md5', strtolower($profile['email_address'])) . '?s=' . $modSettings['avatar_max_height'] . (!empty($modSettings['gravatar_rating']) ? ('&amp;r=' . $modSettings['gravatar_rating']) : '');
+	$avatar['gravatar_preview'] = $gravatar;
 
 	call_integration_hook('integrate_avatar', array(&$avatar, $profile));
 

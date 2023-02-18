@@ -5,8 +5,6 @@
  * specially as needed for avatars (uploaded avatars), attachments, or
  * visual verification images.
  *
- * TrueType fonts supplied by www.LarabieFonts.com
- *
  * @name      ElkArte Forum
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
@@ -15,7 +13,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.1.7
+ * @version 1.1.9
  *
  */
 
@@ -33,12 +31,12 @@
  */
 function createThumbnail($source, $max_width, $max_height)
 {
-	global $modSettings;
-
 	$destName = $source . '_thumb.tmp';
+	$max_width = max(16, $max_width);
+	$max_height = max(16, $max_height);
 
 	// Do the actual resize, thumbnails by default strip EXIF data to save space
-	$format = !empty($modSettings['attachment_thumb_png']) ? 3 : 0;
+	$format = setDefaultFormat($source);
 	$success = resizeImageFile($source, $destName, $max_width, $max_height, $format, true);
 
 	// Okay, we're done with the temporary stuff.
@@ -72,6 +70,7 @@ function createThumbnail($source, $max_width, $max_height)
  *   - 3 for png
  *   - 6 for bmp
  *   - 15 for wbmp
+ *   - 18 for webp
  *
  * @return boolean true on success, false on failure.
  */
@@ -184,6 +183,36 @@ function checkImagick()
 }
 
 /**
+ * Check if the system supports webP
+ *
+ * @return bool
+ */
+function hasWebpSupport($type = false)
+{
+	$check_im = false;
+	$check_gd = false;
+
+	if (checkImagick())
+	{
+		$check = Imagick::queryformats();
+		$check_im = in_array('WEBP', $check);
+	}
+
+	if (checkGD())
+	{
+		$check = gd_info();
+		$check_gd = !empty($check['WebP Support']);
+	}
+
+	if ($type)
+	{
+		return $check_im ? 'im' : ($check_gd ? 'gd' : '');
+	}
+
+	return $check_gd || $check_im;
+}
+
+/**
  * See if we have enough memory to thumbnail an image
  *
  * @package Graphics
@@ -242,6 +271,8 @@ function imageMemoryCheck($sizes)
  */
 function resizeImageFile($source, $destination, $max_width, $max_height, $preferred_format = 0, $strip = false, $force_resize = true)
 {
+	global $modSettings;
+
 	// Nothing to do without GD or IM
 	if (!checkGD() && !checkImagick())
 		return false;
@@ -251,12 +282,13 @@ function resizeImageFile($source, $destination, $max_width, $max_height, $prefer
 		return false;
 	}
 
-	static $default_formats = array(
-		'1' => 'gif',
-		'2' => 'jpeg',
-		'3' => 'png',
-		'6' => 'bmp',
-		'15' => 'wbmp'
+	$default_formats = array(
+		1 => 'gif',
+		2 => 'jpeg',
+		3 => 'png',
+		6 => 'bmp',
+		15 => 'wbmp',
+		18 => 'webp'
 	);
 
 	require_once(SUBSDIR . '/Package.subs.php');
@@ -295,21 +327,38 @@ function resizeImageFile($source, $destination, $max_width, $max_height, $prefer
 	else
 		$sizes = array(-1, -1, -1);
 
+	if ($sizes[0] === -1)
+		return false;
+
 	// See if we have -or- can get the needed memory for this operation
 	if (checkGD() && !imageMemoryCheck($sizes))
 		return false;
 
+	$webp_support = hasWebpSupport(true);
+
+	// Not allowed to save webp or can't support webp input
+	if ((empty($modSettings['attachment_webp_enable']) && $preferred_format == 18) || ($sizes[2] == 18 && empty($webp_support)))
+		return false;
+
 	// A known and supported format?
-	if (checkImagick() && isset($default_formats[$sizes[2]]))
+	if (checkImagick() && isset($default_formats[$sizes[2]])
+		&& ($sizes[2] != 18 || $webp_support === 'im'))
 	{
 		return resizeImage(null, $destination, null, null, $max_width, $max_height, $force_resize, $preferred_format, $strip);
 	}
-	elseif (checkGD() && isset($default_formats[$sizes[2]]) && function_exists('imagecreatefrom' . $default_formats[$sizes[2]]))
+	elseif (checkGD() && isset($default_formats[$sizes[2]])
+		&& ($sizes[2] != 18 || $webp_support === 'gd')
+		&& function_exists('imagecreatefrom' . $default_formats[$sizes[2]]))
 	{
-		$imagecreatefrom = 'imagecreatefrom' . $default_formats[$sizes[2]];
-		if ($src_img = @$imagecreatefrom($destination))
+		try
 		{
-			return resizeImage($src_img, $destination, imagesx($src_img), imagesy($src_img), $max_width === null ? imagesx($src_img) : $max_width, $max_height === null ? imagesy($src_img) : $max_height, $force_resize, $preferred_format, $strip);
+			$imagecreatefrom = 'imagecreatefrom' . $default_formats[$sizes[2]];
+			$src_img = $imagecreatefrom($destination);
+			return resizeImage($src_img, $destination, imagesx($src_img), imagesy($src_img), $max_width === null ? imagesx($src_img) : $max_width, $max_height === null ? imagesy($src_img) : $max_height, $force_resize, $preferred_format, $strip, true);
+		}
+		catch (\Exception $e)
+		{
+			return false;
 		}
 	}
 
@@ -345,24 +394,32 @@ function resizeImageFile($source, $destination, $max_width, $max_height, $prefer
  *   - 3 for png
  *   - 6 for bmp
  *   - 15 for wbmp
+ *   - 18 for webp
  * @param bool $strip Whether to have IM strip EXIF data as GD will
+ * @param bool $force_gd Whether to force GD processing over IM
  *
  * @return bool Whether resize was successful.
  */
-function resizeImage($src_img, $destName, $src_width, $src_height, $max_width, $max_height, $force_resize = false, $preferred_format = 0, $strip = false)
+function resizeImage($src_img, $destName, $src_width, $src_height, $max_width, $max_height, $force_resize = false, $preferred_format = 0, $strip = false, $force_gd = false)
 {
-	global $gd2;
+	global $gd2, $modSettings;
 
-	if (checkImagick())
+	if (checkImagick() && !$force_gd)
 	{
 		// These are the file formats we know about
-		static $default_formats = array(
-			'1' => 'gif',
-			'2' => 'jpeg',
-			'3' => 'png',
-			'6' => 'bmp',
-			'15' => 'wbmp'
+		$default_formats = array(
+			1 => 'gif',
+			2 => 'jpeg',
+			3 => 'png',
+			6 => 'bmp',
+			15 => 'wbmp',
+			18 => 'webp'
 		);
+
+		// Just to be sure, if the admin does not want webp
+		if (empty($modSettings['attachment_webp_enable']))
+			unset($default_formats[18]);
+
 		$preferred_format = empty($preferred_format) || !isset($default_formats[$preferred_format]) ? 2 : $preferred_format;
 
 		// Since Imagick can throw exceptions, lets catch them
@@ -370,6 +427,7 @@ function resizeImage($src_img, $destName, $src_width, $src_height, $max_width, $
 		{
 			// Get a new instance of Imagick for use
 			$imagick = new Imagick($destName);
+			$imagick->setFirstIterator();
 
 			// Set the input and output image size
 			$src_width = empty($src_width) ? $imagick->getImageWidth() : $src_width;
@@ -387,9 +445,25 @@ function resizeImage($src_img, $destName, $src_width, $src_height, $max_width, $
 				$imagick->setImageCompressionQuality(80);
 			}
 
+			// With PNG Save a few bytes the only way, realistically, we can
+			if ($default_formats[$preferred_format] === 'png')
+			{
+				$imagick->setOption('png:compression-level', '9');
+				$imagick->setOption('png:exclude-chunk', 'all');
+			}
+
+			// Webp
+			if ($default_formats[$preferred_format] === 'webp')
+			{
+				$imagick->setImageCompressionQuality(80);
+			}
+
 			// Create a new image in our preferred format and resize it if needed
 			$imagick->setImageFormat($default_formats[$preferred_format]);
-			$imagick->resizeImage($dest_width, $dest_height, Imagick::FILTER_LANCZOS, 1, true);
+			if (substr($destName, -6) === '_thumb')
+				$imagick->thumbnailImage($dest_width, $dest_height, true);
+			else
+				$imagick->resizeImage($dest_width, $dest_height, imagick::FILTER_LANCZOS, 1, true);
 
 			// Remove EXIF / ICC data?
 			if ($strip)
@@ -398,7 +472,10 @@ function resizeImage($src_img, $destName, $src_width, $src_height, $max_width, $
 			}
 
 			// Save the new image in the destination location
-			$success = $imagick->writeImage($destName);
+			if ($preferred_format === IMAGETYPE_GIF && $imagick->getNumberImages() !== 0)
+				$success = $imagick->writeImages($destName, true);
+			else
+				$success = $imagick->writeImage($destName);
 
 			// Free resources associated with the Imagick object
 			$imagick->clear();
@@ -436,22 +513,19 @@ function resizeImage($src_img, $destName, $src_width, $src_height, $max_width, $
 				{
 					$dst_img = imagecreatetruecolor($dst_width, $dst_height);
 
-					// Deal nicely with a PNG - because we can.
-					if ((!empty($preferred_format)) && ($preferred_format == 3))
-					{
-						imagealphablending($dst_img, false);
-						if (function_exists('imagesavealpha'))
-							imagesavealpha($dst_img, true);
-					}
+					// Make a true color image, because it just looks better for resizing.
+					imagesavealpha($dst_img, true);
+					$color = imagecolorallocatealpha($dst_img, 255, 255, 255, 127);
+					imagefill($dst_img, 0, 0, $color);
+
+					// Resize it!
+					imagecopyresampled($dst_img, $src_img, 0, 0, 0, 0, $dst_width, $dst_height, $src_width, $src_height);
 				}
 				else
+				{
 					$dst_img = imagecreate($dst_width, $dst_height);
-
-				// Resize it!
-				if ($gd2)
-					imagecopyresampled($dst_img, $src_img, 0, 0, 0, 0, $dst_width, $dst_height, $src_width, $src_height);
-				else
 					imagecopyresamplebicubic($dst_img, $src_img, 0, 0, 0, 0, $dst_width, $dst_height, $src_width, $src_height);
+				}
 			}
 			else
 				$dst_img = $src_img;
@@ -461,9 +535,11 @@ function resizeImage($src_img, $destName, $src_width, $src_height, $max_width, $
 
 		// Save the image as ...
 		if (!empty($preferred_format) && ($preferred_format == 3) && function_exists('imagepng'))
-			$success = imagepng($dst_img, $destName);
+			$success = imagepng($dst_img, $destName, 9, PNG_ALL_FILTERS);
 		elseif (!empty($preferred_format) && ($preferred_format == 1) && function_exists('imagegif'))
 			$success = imagegif($dst_img, $destName);
+		elseif (!empty($preferred_format) && $preferred_format == 18 && function_exists('imagewebp'))
+			$success = imagewebp($dst_img, $destName, 80);
 		elseif (function_exists('imagejpeg'))
 			$success = imagejpeg($dst_img, $destName, 80);
 
@@ -477,6 +553,205 @@ function resizeImage($src_img, $destName, $src_width, $src_height, $max_width, $
 	// Without Imagick or GD, no image resizing at all.
 	else
 		return false;
+}
+
+/*
+ * Determines if an image has any alpha pixels
+ *
+ * @param string $fileName
+ * @return bool
+ */
+function hasTransparency($fileName, $png = true)
+{
+	if (empty($fileName) || !file_exists($fileName))
+		return false;
+
+	$header = file_get_contents($fileName, false, null, 0, 26);
+
+	// Does it even claim to have been saved with transparency
+	if ($png && !ord($header[25]) & 4)
+		return false;
+
+	// Webp has its own
+	if (!$png)
+	{
+		if (($header[15] === 'L' && !(ord($header[24]) & 16)) || ($header[15] === 'X' && !(ord($header[20]) & 16)))
+		{
+			return false;
+		}
+	}
+
+	// Saved with transparency is only a start, now Pixel inspection
+	$webp_support = hasWebpSupport(true);
+	if (checkImagick() && ($png || $webp_support === 'im'))
+	{
+		$transparency = false;
+		try
+		{
+			$image = new Imagick($fileName);
+			if ($image->getImageWidth() > 1024 || $image->getImageHeight() > 1024)
+			{
+				// Used to look for transparency, it is not intended to be a quality image.
+				$scaleValue = getImageScaleFactor($image->getImageWidth(), $image->getImageHeight());
+				$image->scaleImage($scaleValue[0], $scaleValue[1], true);
+			}
+
+			$pixel_iterator = $image->getPixelIterator();
+
+			// Look at each one, or until we find the first alpha pixel
+			foreach ($pixel_iterator as $pixels)
+			{
+				foreach ($pixels as $pixel)
+				{
+					$color = $pixel->getColor();
+					if ($color['a'] < 1)
+					{
+						$transparency = true;
+						break 2;
+					}
+				}
+			}
+		}
+		catch (\ImagickException $e)
+		{
+			// We don't know what it is, so don't mess with it
+			unset($image);
+			return true;
+		}
+
+		unset($image);
+
+		return $transparency;
+	}
+
+	if (checkGD() && ($png || $webp_support === 'gd'))
+	{
+		// Go through the image pixel by pixel until we find a transparent pixel
+		$transparency = false;
+		list ($width, $height, $type) = elk_getimagesize($fileName);
+
+		if ($type === 18 && $webp_support === 'gd')
+			$image = imagecreatefromwebp($fileName);
+		elseif ($type === 3)
+			$image = imagecreatefrompng($fileName);
+		else
+			return false;
+
+		// Large image, scale down to reduce processing time
+		if ($width > 1024 || $height > 1024)
+		{
+			// Single pass scale down, not looking for quality here
+			$scaleValue = getImageScaleFactor($width, $height);
+			$image = imagescale($image, $scaleValue[0], $scaleValue[1], IMG_NEAREST_NEIGHBOUR);
+			if (!$image)
+			{
+				return true;
+			}
+		}
+
+		$x = imagesx($image);
+		$y = imagesy($image);
+		for ($i = 0; $i < $x; $i++)
+		{
+			for ($j = 0; $j < $y; $j++)
+			{
+				if (imagecolorat($image, $i, $j) & 0x7F000000)
+				{
+					$transparency = true;
+					break 2;
+				}
+			}
+		}
+
+		unset($image);
+
+		return $transparency;
+	}
+
+	// Don't know so assume true
+	return true;
+}
+
+/**
+ * Provides image scaling factors that maintain existing aspect ratio
+ *
+ * @param int $width current width
+ * @param int $height current height
+ * @param int $limit desired width/height limit
+ * @return int[]
+ */
+function getImageScaleFactor($width, $height, $limit = 800)
+{
+	$thumb_w = $limit;
+	$thumb_h = $limit;
+
+	// Landscape
+	if ($width > $height)
+	{
+		$thumb_h = max (1, $height * ($limit / $width));
+	}
+	// Portrait
+	elseif ($width < $height)
+	{
+		$thumb_w = max(1, $width * ($limit / $height));
+	}
+
+	return array((int) $thumb_w, (int) $thumb_h);
+}
+
+/**
+ * Sets the best output format for a given image's thumbnail
+ *
+ * - If webP is on, and supported, use that as it gives the smallest size
+ * - If webP support is available, but not on, save as png if it has alpha channel pixels
+ * - If the image has alpha, we preserve it as PNG
+ * - Finally good ol' jpeg
+ *
+ * @return int 2, 3, or 18
+ */
+function setDefaultFormat($fileName = '')
+{
+	global $modSettings;
+
+	// Webp is the best choice if server supports
+	if (!empty($modSettings['attachment_webp_enable']) && hasWebpSupport())
+	{
+		return 18;
+	}
+
+	$mime = getMimeType($fileName);
+
+	// They uploaded a webp image, but ACP does not allow saving webp images, then
+	// if the server supports and its alpha save it as a png
+	if ($mime === 'image/webp' && hasWebpSupport() && hasTransparency($fileName, false))
+	{
+		return 3;
+	}
+
+	// If you have alpha channels, best keep them with PNG
+	if ($mime === 'image/png' && hasTransparency($fileName))
+	{
+		return 3;
+	}
+
+	// The default, JPG
+	return 2;
+}
+
+/**
+ * Best determination of the mime type.
+ *
+ * @return string
+ */
+function getMimeType($fileName)
+{
+	// Try Exif which reads the file headers, most accurate for images
+	if (function_exists('exif_imagetype'))
+	{
+		return image_type_to_mime_type(exif_imagetype($fileName));
+	}
+
+	return get_finfo_mime($fileName);
 }
 
 /**
@@ -569,10 +844,17 @@ function autoRotateImageWithGD($image_name)
 		case 8:
 			$source = rotateImageGD($source, 90);
 			break;
+		default:
+			$orientation = 1;
+			break;
 	}
 
 	// Save the updated image, free resources
-	imagejpeg($source, $image_name);
+	if ($orientation >= 2)
+	{
+		imagejpeg($source, $image_name);
+	}
+
 	imagedestroy($source);
 
 	return true;
@@ -593,6 +875,15 @@ function autoRotateImageWithGD($image_name)
  */
 function autoRotateImageWithIM($image_name)
 {
+	// We only process jpeg images
+	$sizes = elk_getimagesize($image_name);
+
+	// Not a jpeg, no need to process
+	if ($sizes[2] !== IMAGETYPE_JPEG)
+	{
+		return false;
+	}
+
 	try
 	{
 		// Get a new instance of Imagick for use
@@ -642,26 +933,29 @@ function autoRotateImageWithIM($image_name)
 			case Imagick::ORIENTATION_LEFTBOTTOM:
 				$image->rotateImage('#000', -90);
 				break;
+			default:
+				$orientation = 1;
+				break;
 		}
 
 		// Now that it's auto-rotated, make sure the EXIF data is correctly updated
 		if ($orientation >= 2)
 		{
 			$image->setImageOrientation(Imagick::ORIENTATION_TOPLEFT);
-		}
 
-		// Save the new image in the destination location
-		$success = $image->writeImage($image_name);
+			// Save the new image in the destination location
+			$image->writeImage($image_name);
+		}
 
 		// Free resources associated with the Imagick object
 		$image->clear();
 	}
-	catch (Exception $e)
+	catch (\ImagickException $e)
 	{
-		$success = false;
+		// pass through;
 	}
 
-	return $success;
+	return true;
 }
 
 /**
@@ -1118,9 +1412,9 @@ function showCodeImage($code)
 	{
 		$font_list = !empty($font_list) ? array($font_list[0]) : $font_list;
 
-		// Try use Screenge if we can - it looks good!
-		if (in_array('VDS_New.ttf', $ttfont_list))
-			$ttfont_list = array('VDS_New.ttf');
+		// Try use OpenSans if we can - it looks good!
+		if (in_array('OpenSans.ttf', $ttfont_list))
+			$ttfont_list = array('OpenSans.ttf');
 		else
 			$ttfont_list = empty($ttfont_list) ? array() : array($ttfont_list[0]);
 	}
@@ -1145,7 +1439,8 @@ function showCodeImage($code)
 			$loaded_fonts[$font_index] = imageloadfont($settings['default_theme_dir'] . '/fonts/' . $font_list[$font_index]);
 
 	// Determine the dimensions of each character.
-	$total_width = $character_spacing * strlen($code) + 50;
+	$extra = ($imageType == 4 || $imageType == 5) ? 80 : 45;
+	$total_width = $character_spacing * strlen($code) + $extra;
 	$max_height = 0;
 	foreach ($characters as $char_index => $character)
 	{
@@ -1160,7 +1455,7 @@ function showCodeImage($code)
 			$img_box = imagettfbbox($font_size, 0, $settings['default_theme_dir'] . '/fonts/' . $ttfont_list[$character['font']], $character['id']);
 
 			$characters[$char_index]['width'] = abs($img_box[2] - $img_box[0]);
-			$characters[$char_index]['height'] = abs($img_box[7] - $img_box[1]);
+			$characters[$char_index]['height'] = abs(max($img_box[1] - $img_box[7], $img_box[5] - $img_box[3]));
 		}
 		else
 		{
@@ -1168,8 +1463,8 @@ function showCodeImage($code)
 			$characters[$char_index]['height'] = imagefontheight($loaded_fonts[$character['font']]);
 		}
 
-		$max_height = max($characters[$char_index]['height'] + 15, $max_height);
-		$total_width += $characters[$char_index]['width'] + 2;
+		$max_height = max($characters[$char_index]['height'] + 10, $max_height);
+		$total_width += $characters[$char_index]['width'];
 	}
 
 	// Create an image.
@@ -1193,12 +1488,14 @@ function showCodeImage($code)
 	// Some squares/rectangles for new extreme level
 	if ($noiseType == 'extreme')
 	{
-		for ($i = 0; $i < rand(1, 5); $i++)
+		$width4 = (int) ($total_width / 4);
+		$height3 = (int) ($max_height / 3);
+		for ($i = 0; $i < mt_rand(1, 5); $i++)
 		{
-			$x1 = rand(0, $total_width / 4);
-			$x2 = $x1 + round(rand($total_width / 4, $total_width));
-			$y1 = rand(0, $max_height);
-			$y2 = $y1 + round(rand(0, $max_height / 3));
+			$x1 = mt_rand(0, $width4);
+			$x2 = $x1 + mt_rand($width4, $total_width);
+			$y1 = mt_rand(0, $max_height);
+			$y2 = $y1 + mt_rand(0, $height3);
 			imagefilledrectangle($code_image, $x1, $y1, $x2, $y2, mt_rand(0, 1) ? $fg_color : $randomness_color);
 		}
 	}
@@ -1266,7 +1563,10 @@ function showCodeImage($code)
 					$can_do_ttf = false;
 				elseif ($is_reverse !== false)
 				{
-					imagefilledpolygon($code_image, $fontcord, 4, $fg_color);
+					if (version_compare(PHP_VERSION, '8.1.0') === -1)
+						imagefilledpolygon($code_image, $fontcord, 4, $fg_color);
+					else
+						imagefilledpolygon($code_image, $fontcord, $fg_color);
 
 					// Put the character back!
 					imagettftext($code_image, $font_size, $angle, $font_x, $font_y, $randomness_color, $fontface, $character['id']);
@@ -1340,12 +1640,17 @@ function showCodeImage($code)
 		{
 			// Put in some ellipse
 			$num_ellipse = $noiseType == 'extreme' ? mt_rand(6, 12) : mt_rand(2, 6);
+			$width4 = (int) ($total_width / 4);
+			$width2 = (int) ($total_width / 2);
+			$height4 = (int) ($max_height / 4);
+			$height2 = (int) ($max_height / 2);
+
 			for ($i = 0; $i < $num_ellipse; $i++)
 			{
-				$x1 = round(rand(($total_width / 4) * -1, $total_width + ($total_width / 4)));
-				$x2 = round(rand($total_width / 2, 2 * $total_width));
-				$y1 = round(rand(($max_height / 4) * -1, $max_height + ($max_height / 4)));
-				$y2 = round(rand($max_height / 2, 2 * $max_height));
+				$x1 = mt_rand($width4 * -1, $total_width + $width4);
+				$x2 = mt_rand($width2, 2 * $total_width);
+				$y1 = mt_rand($height4 * -1, $max_height + $height4);
+				$y2 = mt_rand($height2, 2 * $max_height);
 				imageellipse($code_image, $x1, $y1, $x2, $y2, mt_rand(0, 1) ? $fg_color : $randomness_color);
 			}
 		}
@@ -1486,6 +1791,7 @@ function generateTextImageWithGD($text, $width = 100, $height = 100, $format = '
 			$metric = imagettfbbox($font_size, 0, $font, $text);
 			$text_width = abs($metric[4] - $metric[0]);
 			$text_height = abs($metric[5] - $metric[1]);
+			$text_offset = $metric[7];
 		}
 		else
 		{
@@ -1494,8 +1800,9 @@ function generateTextImageWithGD($text, $width = 100, $height = 100, $format = '
 		}
 	} while ($text_width > $width && $font_size-- > 1);
 
-	$w_offset = ($width - $text_width) / 2;
-	$h_offset = $true_type ? ($height / 2) + ($text_height / 2) : ($height - $text_height) / 2;
+	$w_offset = floor(($width - $text_width) / 2);
+	$h_offset = floor(($height - $text_height) / 2);
+	$h_offset = $true_type ? $h_offset - $text_offset : $h_offset;
 
 	if ($true_type)
 	{

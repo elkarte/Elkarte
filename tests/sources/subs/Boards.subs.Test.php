@@ -6,14 +6,14 @@
  * WARNING. These tests work directly with the local database. Don't run
  * them if you need to keep your data untouched!
  */
-class TestBoards extends PHPUnit_Framework_TestCase
+class TestBoards extends PHPUnit\Framework\TestCase
 {
 	/**
 	 * Prepare some test data, to use in these tests.
 	 *
 	 * setUp() is run automatically by the testing framework before each test method.
 	 */
-	public function setUp()
+	protected function setUp(): void
 	{
 		// Set up some data for testing
 		//
@@ -26,7 +26,7 @@ class TestBoards extends PHPUnit_Framework_TestCase
 	 *
 	 * tearDown() is run automatically by the testing framework after each test method.
 	 */
-	public function tearDown()
+	protected function tearDown(): void
 	{
 		// remove useless data.
 		// leave database in initial state!
@@ -43,7 +43,7 @@ class TestBoards extends PHPUnit_Framework_TestCase
 		// we expect the return to have a board name and some posts count for us
 		$this->assertNotNull($boardInfo['name']);
 		$this->assertNotNull($boardInfo['count_posts']);
-		$this->assertInternalType('numeric', $boardInfo['count_posts']);
+		$this->assertIsNumeric($boardInfo['count_posts']);
 	}
 
 	/**
@@ -58,6 +58,6 @@ class TestBoards extends PHPUnit_Framework_TestCase
 		$this->assertNotNull($post_counts[1]);
 		$num = is_numeric($post_counts[1]);
 		$this->assertTrue($num);
-		$this->assertInternalType('numeric', $post_counts[1]);
+		$this->assertIsNumeric($post_counts[1]);
 	}
 }

@@ -11,7 +11,7 @@
  * copyright:    2011 Simple Machines (http://www.simplemachines.org)
  * license:      BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.1.8
+ * @version 1.1.9
  *
  */
 
@@ -512,6 +512,7 @@ class Theme extends \Theme
 				hide_video : ' . JavaScriptEscape($txt['hide_video']) . ',
 				youtube : ' . JavaScriptEscape($txt['youtube']) . ',
 				vimeo : ' . JavaScriptEscape($txt['vimeo']) . ',
+				tiktok : ' . JavaScriptEscape($txt['tiktok']) . ',
 				dailymotion : ' . JavaScriptEscape($txt['dailymotion']) . '
 			});', true);
 
@@ -782,6 +783,13 @@ class Theme extends \Theme
 			$this->addCSSRules('
 		.wrapper {width: ' . $settings['forum_width'] . ';}');
 		}
+
+		// Localization for the show more quote and its container height
+		$quote_height = !empty($modSettings['heightBeforeShowMore']) ? $modSettings['heightBeforeShowMore'] . 'px' : 'none';
+		$this->addCSSRules('
+		input[type=checkbox].quote-show-more:after {content: "' . $txt['post_options'] . '";}
+		.quote-read-more > .bbc_quote {--quote_height: ' . $quote_height . ';}'
+		);
 	}
 
 	/**
@@ -855,7 +863,7 @@ class Theme extends \Theme
 			$this->addCSSRules('
 	.i-account:before {
 		content: "";
-		background-image: url("' . $user_info['avatar']['href'] . '");
+		background-image: url("' . htmlspecialchars_decode($user_info['avatar']['href']) . '");
 	}');
 		}
 

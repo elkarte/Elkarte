@@ -11,7 +11,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.1
+ * @version 1.1.9
  *
  */
 
@@ -89,7 +89,7 @@ function DumpDatabase2()
 	$scripturl = '';
 
 	// Send the proper headers to let them download this file.
-	header('Content-Disposition: attachment; filename="' . $db_name . '-' . (empty($_REQUEST['struct']) ? 'data' : (empty($_REQUEST['data']) ? 'structure' : 'complete')) . '_' . strftime('%Y-%m-%d') . $extension . '"');
+	header('Content-Disposition: attachment; filename="' . $db_name . '-' . (empty($_REQUEST['struct']) ? 'data' : (empty($_REQUEST['data']) ? 'structure' : 'complete')) . '_' . Util::strftime('%Y-%m-%d') . $extension . '"');
 	header('Cache-Control: private');
 	header('Connection: close');
 
