@@ -143,6 +143,15 @@ function template_upgrade_above()
 {
 	global $txt, $settings, $upcontext, $upgradeurl;
 
+	// Prevent initial localization php8 errors when we can't find non english install files
+	// @todo Temporary!
+	$txt['upgrade_upgrade_utility'] = isset($txt['upgrade_upgrade_utility']) ? $txt['upgrade_upgrade_utility'] : 'Upgrade';
+	$txt['upgrade_progress'] = isset($txt['upgrade_progress']) ? $txt['upgrade_progress'] : 'Progress';
+	$txt['upgrade_step'] = isset($txt['upgrade_step']) ? $txt['upgrade_step'] : 'Step';
+	$txt['upgrade_time_elapsed'] = isset($txt['upgrade_time_elapsed']) ? $txt['upgrade_time_elapsed'] : 'Time Elapsed';
+	$txt['upgrade_time_mins'] = isset($txt['upgrade_time_mins']) ? $txt['upgrade_time_mins'] : 'Minutes';
+	$txt['upgrade_time_secs'] = isset($txt['upgrade_time_secs']) ? $txt['upgrade_time_secs'] : 'Seconds';
+
 	echo '<!DOCTYPE html>
 <html ', $upcontext['right_to_left'] ? 'dir="rtl"' : '', '>
 	<head>
@@ -258,10 +267,12 @@ function template_upgrade_above()
 	$seconds = $elapsed - $mins * 60;
 
 	if (!empty($elapsed))
+	{
 		echo '
 						<div class="smalltext" style="padding: 5px; text-align: center;">', $txt['upgrade_time_elapsed'], ':
 							<span id="mins_elapsed">', $mins, '</span> ', $txt['upgrade_time_mins'], ', <span id="secs_elapsed">', $seconds, '</span> ', $txt['upgrade_time_secs'], '.
 						</div>';
+	}
 	echo '
 					</div>
 					<div id="main_screen" class="clear">

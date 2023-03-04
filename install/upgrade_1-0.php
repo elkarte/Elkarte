@@ -40,7 +40,7 @@ class UpgradeInstructions_upgrade_1_0
 	public function __construct($db, $table)
 	{
 		$this->db = $db;
-		return $this->table = $table;
+		$this->table = $table;
 	}
 
 	public function changes_101_title()
@@ -53,9 +53,9 @@ class UpgradeInstructions_upgrade_1_0
 		return array(
 			array(
 				'debug_title' => 'Adding new column to message_likes...',
-				'function' => function($db, $db_table)
+				'function' => function()
 				{
-					$db_table->db_add_column('{db_prefix}message_likes',
+					$this->table->db_add_column('{db_prefix}message_likes',
 						array(
 							'name' => 'like_timestamp',
 							'type' => 'int',
@@ -70,9 +70,9 @@ class UpgradeInstructions_upgrade_1_0
 			),
 			array(
 				'debug_title' => 'More space for email filters...',
-				'function' => function($db, $db_table)
+				'function' => function()
 				{
-					$db_table->db_add_column('{db_prefix}postby_emails_filters',
+					$this->table->db_add_column('{db_prefix}postby_emails_filters',
 						array(
 							'name' => 'filter_style',
 							'type' => 'char',
@@ -86,9 +86,9 @@ class UpgradeInstructions_upgrade_1_0
 			),
 			array(
 				'debug_title' => 'Possible wrong type for mail_queue...',
-				'function' => function($db, $db_table)
+				'function' => function()
 				{
-					$db_table->db_add_column('{db_prefix}mail_queue',
+					$this->table->db_add_column('{db_prefix}mail_queue',
 						array(
 							'name' => 'message_id',
 							'type' => 'varchar',
@@ -113,34 +113,34 @@ class UpgradeInstructions_upgrade_1_0
 		return array(
 			array(
 				'debug_title' => 'Remove unused avatar permissions...',
-				'function' => function($db, $db_table)
+				'function' => function()
 				{
 					global $modSettings;
 
-					$db->query('', '
+					$this->db->query('', '
 						DELETE FROM {db_prefix}permissions
-						WHERE permission = \'profile_upload_avatar\'',
+						WHERE permission = "profile_upload_avatar"',
 						array()
 					);
-					$db->query('', '
+					$this->db->query('', '
 						DELETE FROM {db_prefix}permissions
-						WHERE permission = \'profile_remote_avatar\'',
+						WHERE permission = "profile_remote_avatar"',
 						array()
 					);
-					$db->query('', '
+					$this->db->query('', '
 						DELETE FROM {db_prefix}permissions
-						WHERE permission = \'profile_gravatar\'',
+						WHERE permission = "profile_gravatar"',
 						array()
 					);
 
-					$db->query('', '
+					$this->db->query('', '
 						UPDATE {db_prefix}permissions
-						SET permission = \'profile_set_avatar\'
-						WHERE permission = \'profile_server_avatar\'',
+						SET permission = "profile_set_avatar"
+						WHERE permission = "profile_server_avatar"',
 						array()
 					);
 
-					$db->query('', '
+					$this->db->query('', '
 						UPDATE {db_prefix}settings
 						SET value = {string:value}
 						WHERE variable = {string:variable}',
@@ -150,7 +150,7 @@ class UpgradeInstructions_upgrade_1_0
 						)
 					);
 
-					$db->query('', '
+					$this->db->query('', '
 						UPDATE {db_prefix}settings
 						SET value = {string:value}
 						WHERE variable = {string:variable}',
@@ -181,14 +181,14 @@ class UpgradeInstructions_upgrade_1_0
 		return array(
 			array(
 				'debug_title' => 'Update to new package server...',
-				'function' => function($db, $db_table)
+				'function' => function()
 				{
-					$db->query('', '
+					$this->db->query('', '
 						UPDATE {db_prefix}package_servers
 						SET url = {string:value}
 						WHERE name = {string:name}',
 						array(
-							'value' => 'http://addons.elkarte.net/package.json',
+							'value' => 'https://addons.elkarte.net/package.json',
 							'name' => 'ElkArte Third-party Add-ons Site'
 						)
 					);
