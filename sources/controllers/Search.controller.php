@@ -11,7 +11,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.1.9
+ * @version 1.1.10
  *
  */
 
@@ -359,26 +359,20 @@ class Search_Controller extends Action_Controller
 		// Do we have captcha enabled?
 		if ($user_info['is_guest'] && !empty($modSettings['search_enable_captcha']) && empty($_SESSION['ss_vv_passed']) && (empty($_SESSION['last_ss']) || $_SESSION['last_ss'] != $this->_search->param('search')))
 		{
-			// If we come from another search box tone down the error...
-			if (!isset($_REQUEST['search_vv']))
-				$context['search_errors']['need_verification_code'] = true;
-			else
-			{
-				require_once(SUBSDIR . '/VerificationControls.class.php');
-				$verificationOptions = array(
-					'id' => 'search',
-				);
-				$context['require_verification'] = create_control_verification($verificationOptions, true);
+			require_once(SUBSDIR . '/VerificationControls.class.php');
+			$verificationOptions = array(
+				'id' => 'search',
+			);
+			$context['require_verification'] = create_control_verification($verificationOptions, true);
 
-				if (is_array($context['require_verification']))
-				{
-					foreach ($context['require_verification'] as $error)
-						$context['search_errors'][$error] = true;
-				}
-				// Don't keep asking for it - they've proven themselves worthy.
-				else
-					$_SESSION['ss_vv_passed'] = true;
+			if (is_array($context['require_verification']))
+			{
+				foreach ($context['require_verification'] as $error)
+					$context['search_errors'][$error] = true;
 			}
+			// Don't keep asking for it - they've proven themselves worthy.
+			else
+				$_SESSION['ss_vv_passed'] = true;
 		}
 
 		$context['params'] = $this->_search->compileURLparams();
