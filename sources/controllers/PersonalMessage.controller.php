@@ -13,7 +13,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.1.9
+ * @version 1.1.10
  *
  */
 
@@ -2032,7 +2032,7 @@ class PersonalMessage_Controller extends Action_Controller
 			$context['sub_template'] = 'add_rule';
 
 			// Any known rule
-			$js_rules = '';
+			$js_rules = [];
 			foreach ($context['known_rules'] as $rule)
 			{
 				$js_rules[$rule] = $txt['pm_rule_' . $rule];
@@ -2040,7 +2040,7 @@ class PersonalMessage_Controller extends Action_Controller
 			$js_rules = json_encode($js_rules);
 
 			// Any known label
-			$js_labels = '';
+			$js_labels = [];
 			foreach ($context['labels'] as $label)
 			{
 				if ($label['id'] != -1)
