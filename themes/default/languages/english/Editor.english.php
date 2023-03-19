@@ -1,5 +1,5 @@
 <?php
-// Version: 1.1; Editor
+// Version: 1.1.10; Editor
 
 global $editortxt;
 
@@ -62,3 +62,4 @@ $editortxt['Move'] = 'Move';
 $editortxt['Insert Spoiler'] = 'Insert Spoiler';
 $editortxt['Insert Footnote'] = 'Insert Footnote';
 $editortxt['Split Tag'] = 'Split quote at cursor (ctrl+enter)';
+$editortxt['Description (optional):'] = 'Description (optional):';
