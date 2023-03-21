@@ -596,31 +596,22 @@ class Search extends AbstractController
 		// Do we have captcha enabled?
 		if ($this->user->is_guest && !empty($modSettings['search_enable_captcha']) && empty($_SESSION['ss_vv_passed']) && (empty($_SESSION['last_ss']) || $_SESSION['last_ss'] !== $this->_search->param('search')))
 		{
-			// If we come from another search box tone down the error...
-			$searchvv = $this->_req->getRequest('search_vv', 'trim');
-			if (!isset($searchvv))
+			$verificationOptions = [
+				'id' => 'search',
+			];
+			$context['require_verification'] = VerificationControlsIntegrate::create($verificationOptions, true);
+
+			if (is_array($context['require_verification']))
 			{
-				$context['search_errors']['need_verification_code'] = true;
+				foreach ($context['require_verification'] as $error)
+				{
+					$context['search_errors'][$error] = true;
+				}
 			}
+			// Don't keep asking for it - they've proven themselves worthy.
 			else
 			{
-				$verificationOptions = [
-					'id' => 'search',
-				];
-				$context['require_verification'] = VerificationControlsIntegrate::create($verificationOptions, true);
-
-				if (is_array($context['require_verification']))
-				{
-					foreach ($context['require_verification'] as $error)
-					{
-						$context['search_errors'][$error] = true;
-					}
-				}
-				// Don't keep asking for it - they've proven themselves worthy.
-				else
-				{
-					$_SESSION['ss_vv_passed'] = true;
-				}
+				$_SESSION['ss_vv_passed'] = true;
 			}
 		}
 	}
