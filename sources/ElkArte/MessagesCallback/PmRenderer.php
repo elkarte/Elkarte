@@ -17,6 +17,7 @@
 
 namespace ElkArte\MessagesCallback;
 
+use ElkArte\Member;
 use ElkArte\MembersList;
 use ElkArte\MessagesCallback\BodyParser\BodyParserInterface;
 use ElkArte\ValuesContainer;
@@ -37,7 +38,7 @@ class PmRenderer extends Renderer
 	 *
 	 * @var int[]
 	 */
-	protected $_temp_pm_selected = null;
+	protected $_temp_pm_selected;
 
 	/**
 	 * {@inheritdoc }
@@ -89,7 +90,10 @@ class PmRenderer extends Renderer
 	{
 		global $context, $settings;
 
-		$member_context['show_profile_buttons'] = (!empty($member_context['can_view_profile']) || (!empty($member_context['website']['url']) && !isset($context['disabled_fields']['website'])) || (in_array($member_context['show_email'], array('yes', 'yes_permission_override', 'no_through_forum'))) || $context['can_send_pm']);
+		$member_context['show_profile_buttons'] = (!empty($member_context['can_view_profile'])
+			|| (!empty($member_context['website']['url']) && !isset($context['disabled_fields']['website']))
+			|| (in_array($member_context['show_email'], array('yes', 'yes_permission_override', 'no_through_forum')))
+			|| $context['can_send_pm']);
 	}
 
 	/**
@@ -97,12 +101,24 @@ class PmRenderer extends Renderer
 	 */
 	protected function _buildOutputArray()
 	{
-		global $context, $modSettings;
+		global $context, $modSettings, $scripturl;
 
 		$id_pm = $this->_this_message['id_pm'];
 
 		$output = parent::_buildOutputArray();
-		$output += array(
+
+		// Not a Member ValuesContainer.  Check if this was a subject listing and the data in that request
+		if (!$output['member'] instanceof Member && isset($this->_this_message['not_guest']))
+		{
+			$output['member'] = [
+				'id' => $this->_this_message['id_member_from'],
+				'name' => $this->_this_message['from_name'],
+				'link' => $this->_this_message['not_guest'] ? '<a href="' . $scripturl . '?action=profile;u=' . $this->_this_message['id_member_from'] . '">' . $this->_this_message['from_name'] . '</a>' : $this->_this_message['from_name'],
+				'is_guest' => (int) $this->_this_message['not_guest'] === 0,
+			];
+		}
+
+		$output += [
 			'recipients' => $this->_options->recipients[$id_pm],
 			'number_recipients' => count($this->_options->recipients[$id_pm]['to']),
 			'labels' => &$context['message_labels'][$id_pm],
@@ -110,9 +126,9 @@ class PmRenderer extends Renderer
 			'is_replied_to' => &$context['message_replied'][$id_pm],
 			'is_unread' => &$context['message_unread'][$id_pm],
 			'is_selected' => !empty($this->_temp_pm_selected) && in_array($id_pm, $this->_temp_pm_selected),
-			'is_message_author' => $this->_this_message['id_member_from'] == $this->user->id,
+			'is_message_author' => (int) $this->_this_message['id_member_from'] === (int) $this->user->id,
 			'can_report' => !empty($modSettings['enableReportPM']),
-		);
+		];
 
 		// Or give / take karma for a PM
 		if (!empty($output['member']['karma']['allow']))
