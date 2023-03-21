@@ -269,8 +269,6 @@ class PersonalMessage extends AbstractController
 	 * A menu to easily access different areas of the PM section
 	 *
 	 * @param string $area
-	 *
-	 * @throws \ElkArte\Exceptions\Exception no_access
 	 */
 	private function _messageIndexBar($area)
 	{
@@ -414,8 +412,9 @@ class PersonalMessage extends AbstractController
 	 *
 	 * Display mode: 0 = all at once, 1 = one at a time, 2 = as a conversation
 	 *
-	 * @uses folder sub template
+	 * @throws \ElkArte\Exceptions\Exception
 	 * @uses subject_list, pm template layers
+	 * @uses folder sub template
 	 */
 	public function action_folder()
 	{
@@ -446,7 +445,7 @@ class PersonalMessage extends AbstractController
 
 		// Set up some basic template stuff.
 		$context['from_or_to'] = $context['folder'] !== 'sent' ? 'from' : 'to';
-		$context['signature_enabled'] = strpos($modSettings['signature_settings'], 1) === 0;
+		$context['signature_enabled'] = strpos($modSettings['signature_settings'], '1') === 0;
 		$context['disabled_fields'] = isset($modSettings['disabled_profile_fields']) ? array_flip(explode(',', $modSettings['disabled_profile_fields'])) : array();
 
 		// Set the template layers we need
@@ -752,10 +751,10 @@ class PersonalMessage extends AbstractController
 
 		// Check whether we've gone over the limit of messages we can send per hour.
 		if (!empty($modSettings['pm_posts_per_hour'])
+			&& !allowedTo(array('admin_forum', 'moderate_forum', 'send_mail'))
 			&& $this->user->mod_cache['bq'] === '0=1'
-			&& $this->user->mod_cache['gq'] === '0=1'
-			&& !allowedTo(array('admin_forum', 'moderate_forum', 'send_mail')))
-				{
+			&& $this->user->mod_cache['gq'] === '0=1')
+		{
 			// How many messages have they sent this last hour?
 			$pmCount = pmCount($this->user->id, 3600);
 
@@ -1144,8 +1143,7 @@ class PersonalMessage extends AbstractController
 		if (!empty($modSettings['pm_posts_per_hour'])
 			&& !allowedTo(array('admin_forum', 'moderate_forum', 'send_mail'))
 			&& $this->user->mod_cache['bq'] === '0=1'
-			&& $this->user->mod_cache['gq'] === '0=1'
-		)
+			&& $this->user->mod_cache['gq'] === '0=1')
 		{
 			// How many have they sent this last hour?
 			$pmCount = pmCount($this->user->id, 3600);
