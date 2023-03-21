@@ -112,6 +112,7 @@ class MembersList
 	 */
 	public static function get($id)
 	{
+		$id = (int) $id;
 		$member = self::$instance->getById($id);
 
 		return $member !== false ? $member : new class() extends ValuesContainer

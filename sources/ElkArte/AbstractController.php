@@ -26,7 +26,7 @@ abstract class AbstractController
 	 *
 	 * @var object
 	 */
-	protected $_events = null;
+	protected $_events;
 
 	/**
 	 * The current hook.

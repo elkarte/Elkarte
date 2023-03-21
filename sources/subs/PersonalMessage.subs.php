@@ -1061,7 +1061,7 @@ function loadPMs($pm_options, $id_member)
 
 	// First work out what messages we need to see - if grouped is a little trickier...
 	// Conversation mode
-	if ($pm_options['display_mode'] == 2)
+	if ($pm_options['display_mode'] === 2)
 	{
 		// On a non-default sort, when using PostgreSQL we have to do a harder sort.
 		if ($db->title() === 'PostgreSQL' && $pm_options['sort_by_query'] !== 'pm.id_pm')
@@ -1119,7 +1119,7 @@ function loadPMs($pm_options, $id_member)
 				)
 			);
 		}
-		// Otherwise we can just use the the pm_conversation_list option
+		// Otherwise we can just use the pm_conversation_list option
 		else
 		{
 			$request = $db->query('pm_conversation_list', '
@@ -1198,7 +1198,7 @@ function loadPMs($pm_options, $id_member)
 			);
 		}
 
-		// Keep track of the last message so we know what the head is without another query!
+		// Keep track of the last message, so we know what the head is without another query!
 		if ((empty($pm_options['pmid']) && (empty($options['view_newest_pm_first']) || !isset($lastData))) || empty($lastData) || (!empty($pm_options['pmid']) && $pm_options['pmid'] == $row['id_pm']))
 		{
 			$lastData = array(
@@ -2135,7 +2135,7 @@ function loadPMRecipientInfo($all_pms, &$recipients, $folder = '', $search = fal
  *
  * @param int[] $pms array of PM ids to fetch
  * @param string[] $orderBy raw query defining how to order the results
- * @return bool|resource
+ * @return bool|\ElkArte\Database\AbstractResult
  * @package PersonalMessage
  */
 function loadPMSubjectRequest($pms, $orderBy)
@@ -2235,7 +2235,7 @@ function checkPMReceived($pmsg)
  * @param int $pmsg
  * @param bool $isReceived
  *
- * @return bool
+ * @return array
  * @package PersonalMessage
  */
 function loadPMQuote($pmsg, $isReceived)

@@ -229,7 +229,7 @@ abstract class AbstractManipulator
 	 * @param int $limit max width or height, based on current aspect ratio
 	 * @return int[]
 	 */
-	function imageScaleFactor($limit = 800)
+	public function imageScaleFactor($limit = 800)
 	{
 		$thumb_w = $limit;
 		$thumb_h = $limit;
