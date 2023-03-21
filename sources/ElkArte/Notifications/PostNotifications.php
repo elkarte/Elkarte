@@ -137,7 +137,7 @@ class PostNotifications extends AbstractModel
 		}
 
 		// Find the members with watch notifications set for this topic, it will skip any sent above
-		$this->sendTopicNotifications($user_id, $topics, $type, $members_only);
+		$this->sendTopicNotifications($user_id, $topicData, $type, $members_only);
 
 		if (!empty($this->current_language) && $this->current_language !== $user_language)
 		{
@@ -401,7 +401,12 @@ class PostNotifications extends AbstractModel
 	 */
 	private function canSendPostBody($data)
 	{
-		return $this->isUsingMailList() || (empty($this->_modSettings['disallow_sendBody']) && !empty($data['notify_send_body']));
+		if (empty($data['notify_send_body']))
+		{
+			return false;
+		}
+
+		return $this->isUsingMailList() || empty($this->_modSettings['disallow_sendBody']);
 	}
 
 	/**
@@ -457,17 +462,18 @@ class PostNotifications extends AbstractModel
 	 * Sends reply notifications to topics with new replies on watched topics
 	 *
 	 * @param int $user_id the poster
-	 * @param int[] $topics the topics that have new replies
+	 * @param array $topicData new replies topic data
 	 * @param string $type see Notify Types
 	 * @param int[] $members_only if only sending to a select list of members
 	 */
-	public function sendTopicNotifications($user_id, $topics, $type, $members_only)
+	public function sendTopicNotifications($user_id, $topicData, $type, $members_only)
 	{
 		global $language;
 
 		$maillist = $this->isUsingMailList();
 
-		// Find the members with watch notifications set for this topic.
+		// Find the members with watch notifications set for these topics.
+		$topics = array_keys($topicData);
 		$topicNotifications = fetchTopicNotifications($user_id, $topics, $type, $members_only);
 		foreach ($topicNotifications as $notifyDatum)
 		{
@@ -495,7 +501,7 @@ class PostNotifications extends AbstractModel
 			$this->_checkLanguage($needed_language);
 
 			$message_type = $this->setMessageTemplate($type, $notifyDatum);
-			$replacements = $this->setTemplateReplacements($topicNotifications[$notifyDatum['id_topic']], $notifyDatum, $notifyDatum['id_topic'], $type);
+			$replacements = $this->setTemplateReplacements($topicData[$notifyDatum['id_topic']], $notifyDatum, $notifyDatum['id_topic'], $type);
 
 			// Send only if once, is off or it's on, and it hasn't been sent.
 			if ($type !== self::NOTIFY_REPLY || empty($notifyDatum['notify_regularity']) || empty($notifyDatum['sent']))
@@ -510,7 +516,7 @@ class PostNotifications extends AbstractModel
 				// Using the maillist functions? Then adjust the from wrapper
 				if ($maillist && $email_perm && $type === self::NOTIFY_REPLY && !empty($notifyDatum['notify_send_body']))
 				{
-					// Set the from name based on group or maillist mode
+					// Set from name based on group or maillist mode
 					$email_from = $this->_getEmailFrom($topicNotifications[$notifyDatum['id_topic']]);
 					$from_wrapper = $this->_getFromWrapper();
 
