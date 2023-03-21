@@ -127,12 +127,12 @@ class Notify extends AbstractController
 	/**
 	 * Toggle a topic notification on/off
 	 */
-	private function _toggle_topic_notification()
+	private function _toggle_topic_notification($memID = null)
 	{
 		global $topic;
 
 		// Attempt to turn notifications on/off.
-		setTopicNotification($this->user->id, $topic, $this->_req->query->sa === 'on');
+		setTopicNotification($memID ?? $this->user->id, $topic, $this->_req->query->sa === 'on');
 	}
 
 	/**
@@ -262,7 +262,7 @@ class Notify extends AbstractController
 	/**
 	 * Toggle a board notification on/off
 	 */
-	private function _toggle_board_notification()
+	private function _toggle_board_notification($memID = null)
 	{
 		global $board;
 
@@ -270,7 +270,7 @@ class Notify extends AbstractController
 		require_once(SUBSDIR . '/Boards.subs.php');
 
 		// Turn notification on/off for this board.
-		setBoardNotification($this->user->id, $board, $this->_req->query->sa === 'on');
+		setBoardNotification($memID ?? $this->user->id, $board, $this->_req->query->sa === 'on');
 	}
 
 	/**
@@ -434,9 +434,8 @@ class Notify extends AbstractController
 			'text' => $this->_req->query->sa === 'on' ? $txt['watch'] : $txt['unwatch'],
 			'url' => getUrl('action', ['action' => 'unwatchtopic', 'sa' => ($this->_req->query->sa === 'on' ? 'off' : 'on'), 'topic' => $context['current_topic'] . '.' . $this->_req->query->start, '{session_data}', 'api' => '1'] + (isset($_REQUEST['json']) ? ['json'] : [])),
 		);
-		global $user_info, $topic;
 
-		setTopicWatch($user_info['id'], $topic, $this->_req->query->sa === 'on');
+		setTopicWatch($this->user->id, $topic, $this->_req->query->sa === 'on');
 	}
 
 	/**
@@ -484,18 +483,17 @@ class Notify extends AbstractController
 		}
 
 		// Look away while we stuff the old ballet box, power to the people!
-		$user_info['id'] = (int) $member['id_member'];
 		$this->_req->query->sa = 'off';
 
 		switch ($area)
 		{
 			case 'topic':
 				$topic = $extra;
-				$this->_toggle_topic_notification();
+				$this->_toggle_topic_notification($member['id_member']);
 				break;
 			case 'board':
 				$board = $extra;
-				$this->_toggle_board_notification();
+				$this->_toggle_board_notification($member['id_member']);
 				break;
 			case 'buddy':
 			case 'likemsg':

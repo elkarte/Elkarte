@@ -52,14 +52,19 @@ class PersonalMessage extends AbstractController
 	 *
 	 * @var array
 	 */
-	private $_search_params = array();
+	private $_search_params = [];
 
 	/**
 	 * $_searchq_parameters will carry all the values needed by S_search_params
 	 *
 	 * @var array
 	 */
-	private $_searchq_parameters = array();
+	private $_searchq_parameters = [];
+
+	/** @var int display_mode key is as follows */
+	private const DISPLAY_ALL_AT_ONCE = 0;
+	private const DISPLAY_ONE_AT_TIME = 1;
+	private const DISPLAY_AS_CONVERSATION = 2;
 
 	/**
 	 * This method is executed before any other in this file (when the class is
@@ -92,7 +97,7 @@ class PersonalMessage extends AbstractController
 			theme()->getTemplates()->load('PersonalMessage');
 		}
 
-		$this->_events->trigger('pre_dispatch', array('xml' => $this->getApi() !== false));
+		$this->_events->trigger('pre_dispatch', ['xml' => $this->getApi() !== false]);
 
 		// Load up the members maximum message capacity.
 		$this->_loadMessageLimit();
@@ -147,7 +152,7 @@ class PersonalMessage extends AbstractController
 		);
 
 		// Preferences...
-		$context['display_mode'] = User::$settings['pm_prefs'] & 3;
+		$context['display_mode'] = (int) User::$settings['pm_prefs'] & 3;
 	}
 
 	/**
@@ -264,8 +269,6 @@ class PersonalMessage extends AbstractController
 	 * A menu to easily access different areas of the PM section
 	 *
 	 * @param string $area
-	 *
-	 * @throws \ElkArte\Exceptions\Exception no_access
 	 */
 	private function _messageIndexBar($area)
 	{
@@ -339,7 +342,7 @@ class PersonalMessage extends AbstractController
 		}
 		else
 		{
-			// Note we send labels by id as it will have less problems in the query string.
+			// Note we send labels by id as it will have fewer problems in the query string.
 			$label_counters['labels_unread_total'] = 0;
 			foreach ($context['labels'] as $label)
 			{
@@ -409,8 +412,9 @@ class PersonalMessage extends AbstractController
 	 *
 	 * Display mode: 0 = all at once, 1 = one at a time, 2 = as a conversation
 	 *
-	 * @uses folder sub template
+	 * @throws \ElkArte\Exceptions\Exception
 	 * @uses subject_list, pm template layers
+	 * @uses folder sub template
 	 */
 	public function action_folder()
 	{
@@ -419,7 +423,7 @@ class PersonalMessage extends AbstractController
 		// Changing view?
 		if ($this->_req->isSet('view'))
 		{
-			$context['display_mode'] = $context['display_mode'] > 1 ? 0 : $context['display_mode'] + 1;
+			$context['display_mode'] = (int) $context['display_mode'] > 1 ? 0 : (int) $context['display_mode'] + 1;
 			require_once(SUBSDIR . '/Members.subs.php');
 			updateMemberData($this->user->id, ['pm_prefs' => (User::$settings['pm_prefs'] & 252) | $context['display_mode']]);
 		}
@@ -441,7 +445,7 @@ class PersonalMessage extends AbstractController
 
 		// Set up some basic template stuff.
 		$context['from_or_to'] = $context['folder'] !== 'sent' ? 'from' : 'to';
-		$context['signature_enabled'] = substr($modSettings['signature_settings'], 0, 1) == 1;
+		$context['signature_enabled'] = strpos($modSettings['signature_settings'], '1') === 0;
 		$context['disabled_fields'] = isset($modSettings['disabled_profile_fields']) ? array_flip(explode(',', $modSettings['disabled_profile_fields'])) : array();
 
 		// Set the template layers we need
@@ -574,7 +578,7 @@ class PersonalMessage extends AbstractController
 		], $this->user->id);
 
 		// Make sure that we have been given a correct head pm id if we are in conversation mode
-		if ($context['display_mode'] == 2 && !empty($pmID) && $pmID != $lastData['id'])
+		if ($context['display_mode'] === self::DISPLAY_AS_CONVERSATION && !empty($pmID) && $pmID != $lastData['id'])
 		{
 			throw new Exception('no_access', false);
 		}
@@ -588,18 +592,18 @@ class PersonalMessage extends AbstractController
 				$context['current_pm'] = 0;
 			}
 
-			$display_pms = $context['display_mode'] == 0 ? $pms : array($lastData['id']);
+			$display_pms = $context['display_mode'] === self::DISPLAY_ALL_AT_ONCE ? $pms : array($lastData['id']);
 
 			// At this point we know the main id_pm's. But if we are looking at conversations we need
 			// the PMs that make up the conversation
-			if ($context['display_mode'] == 2)
+			if ($context['display_mode'] === self::DISPLAY_AS_CONVERSATION)
 			{
 				list($display_pms, $posters) = loadConversationList($lastData['head'], $recipients, $context['folder']);
 
 				// Conversation list may expose additional PM's being displayed
 				$all_pms = array_unique(array_merge($pms, $display_pms));
 
-				// See if any of these 'listing' PM's are in a conversation thread that has unread entries
+				// See if any of these 'listing' PMs are in a conversation thread that has unread entries
 				$context['conversation_unread'] = loadConversationUnreadStatus($all_pms);
 			}
 			// This is pretty much EVERY pm!
@@ -612,7 +616,7 @@ class PersonalMessage extends AbstractController
 			list($context['message_labels'], $context['message_replied'], $context['message_unread']) = loadPMRecipientInfo($all_pms, $recipients, $context['folder']);
 
 			// Make sure we don't load any unnecessary data for one at a time mode
-			if ($context['display_mode'] == 1)
+			if ($context['display_mode'] === self::DISPLAY_ONE_AT_TIME)
 			{
 				foreach ($posters as $pm_key => $sender)
 				{
@@ -631,7 +635,7 @@ class PersonalMessage extends AbstractController
 			}
 
 			// If we're on grouped/restricted view get a restricted list of messages.
-			if ($context['display_mode'] != 0)
+			if ($context['display_mode'] !== self::DISPLAY_ALL_AT_ONCE)
 			{
 				// Get the order right.
 				$orderBy = [];
@@ -645,8 +649,8 @@ class PersonalMessage extends AbstractController
 			}
 
 			// Execute the load message query if a message has been chosen and let
-			// the callback fetch the results.  Otherwise just show the pm selection list
-			if (empty($pmsg) && empty($pmID) && $context['display_mode'] != 0)
+			// the callback fetch the results.  Otherwise, just show the pm selection list
+			if (empty($pmsg) && empty($pmID) && $context['display_mode'] !== self::DISPLAY_ALL_AT_ONCE)
 			{
 				$messages_request = false;
 			}
@@ -679,25 +683,22 @@ class PersonalMessage extends AbstractController
 		$context['sort_direction'] = $descending ? 'down' : 'up';
 		$context['sort_by'] = $sort_by;
 
-		if ($messages_request !== false && $messages_request->hasResults())
+		if ($messages_request !== false && !empty($context['show_delete']) && $messages_request->hasResults())
 		{
-			if (!empty($context['show_delete']))
-			{
-				theme()->getLayers()->addEnd('pm_pages_and_buttons');
-			}
+			theme()->getLayers()->addEnd('pm_pages_and_buttons');
 		}
 
 		// Set up the page index.
 		$context['page_index'] = constructPageIndex('{scripturl}?action=pm;f=' . $context['folder'] . (isset($this->_req->query->l) ? ';l=' . (int) $this->_req->query->l : '') . ';sort=' . $context['sort_by'] . ($descending ? ';desc' : ''), $start, $max_messages, $modSettings['defaultMaxMessages']);
 		$context['start'] = $start;
 
-		$context['pm_form_url'] = $scripturl . '?action=pm;sa=pmactions;' . ($context['display_mode'] == 2 ? 'conversation;' : '') . 'f=' . $context['folder'] . ';start=' . $context['start'] . ($context['current_label_id'] != -1 ? ';l=' . $context['current_label_id'] : '');
+		$context['pm_form_url'] = $scripturl . '?action=pm;sa=pmactions;' . ($context['display_mode'] === self::DISPLAY_AS_CONVERSATION ? 'conversation;' : '') . 'f=' . $context['folder'] . ';start=' . $context['start'] . ($context['current_label_id'] != -1 ? ';l=' . $context['current_label_id'] : '');
 
 		// Finally, mark the relevant messages as read.
 		if ($context['folder'] !== 'sent' && !empty($context['labels'][(int) $context['current_label_id']]['unread_messages']))
 		{
 			// If the display mode is "old sk00l" do them all...
-			if ($context['display_mode'] == 0)
+			if ($context['display_mode'] === self::DISPLAY_ALL_AT_ONCE)
 			{
 				markMessages(null, $context['current_label_id']);
 			}
@@ -709,7 +710,7 @@ class PersonalMessage extends AbstractController
 		}
 
 		// Build the conversation button array.
-		if ($context['display_mode'] === 2 && !empty($context['current_pm']))
+		if ($context['display_mode'] === self::DISPLAY_AS_CONVERSATION && !empty($context['current_pm']))
 		{
 			$context['conversation_buttons'] = array(
 				'delete' => array(
@@ -749,7 +750,10 @@ class PersonalMessage extends AbstractController
 		$context['reply'] = isset($this->_req->query->pmsg) || isset($this->_req->query->quote);
 
 		// Check whether we've gone over the limit of messages we can send per hour.
-		if (!empty($modSettings['pm_posts_per_hour']) && !allowedTo(array('admin_forum', 'moderate_forum', 'send_mail')) && $this->user->mod_cache['bq'] === '0=1' && $this->user->mod_cache['gq'] === '0=1')
+		if (!empty($modSettings['pm_posts_per_hour'])
+			&& !allowedTo(array('admin_forum', 'moderate_forum', 'send_mail'))
+			&& $this->user->mod_cache['bq'] === '0=1'
+			&& $this->user->mod_cache['gq'] === '0=1')
 		{
 			// How many messages have they sent this last hour?
 			$pmCount = pmCount($this->user->id, 3600);
@@ -795,7 +799,7 @@ class PersonalMessage extends AbstractController
 			$row_quoted['subject'] = censor($row_quoted['subject']);
 			$row_quoted['body'] = censor($row_quoted['body']);
 
-			// Lets make sure we mark this one as read
+			// Let's make sure we mark this one as read
 			markMessages($pmsg);
 
 			// Figure out which flavor or 'Re: ' to use
@@ -961,9 +965,9 @@ class PersonalMessage extends AbstractController
 	/**
 	 * An error in the message...
 	 *
-	 * @param mixed[] $named_recipients
-	 * @param mixed[] $recipient_ids array keys of [bbc] => int[] and [to] => int[]
-	 * @param mixed[] $msg_options body, subject and reply values
+	 * @param array $named_recipients
+	 * @param array $recipient_ids array keys of [bbc] => int[] and [to] => int[]
+	 * @param array $msg_options body, subject and reply values
 	 *
 	 * @throws \ElkArte\Exceptions\Exception pm_not_yours
 	 */
@@ -1034,10 +1038,8 @@ class PersonalMessage extends AbstractController
 				{
 					throw new Exception('pm_not_yours', false);
 				}
-				else
-				{
-					$error_types->addError('pm_not_yours');
-				}
+
+				$error_types->addError('pm_not_yours');
 			}
 			else
 			{
@@ -1141,8 +1143,7 @@ class PersonalMessage extends AbstractController
 		if (!empty($modSettings['pm_posts_per_hour'])
 			&& !allowedTo(array('admin_forum', 'moderate_forum', 'send_mail'))
 			&& $this->user->mod_cache['bq'] === '0=1'
-			&& $this->user->mod_cache['gq'] === '0=1'
-		)
+			&& $this->user->mod_cache['gq'] === '0=1')
 		{
 			// How many have they sent this last hour?
 			$pmCount = pmCount($this->user->id, 3600);
@@ -1153,10 +1154,8 @@ class PersonalMessage extends AbstractController
 				{
 					throw new Exception('pm_too_many_per_hour', true, array($modSettings['pm_posts_per_hour']));
 				}
-				else
-				{
-					$post_errors->addError('pm_too_many_per_hour');
-				}
+
+				$post_errors->addError('pm_too_many_per_hour');
 			}
 		}
 
@@ -1302,14 +1301,18 @@ class PersonalMessage extends AbstractController
 			preparsecode($message);
 
 			// Make sure there's still some content left without the tags.
-			if (Util::htmltrim(strip_tags($bbc_parser->parsePM(Util::htmlspecialchars($message, ENT_QUOTES)), '<img>')) === '' && (!allowedTo('admin_forum') || strpos($message, '[html]') === false))
+			if (Util::htmltrim(strip_tags($bbc_parser->parsePM(Util::htmlspecialchars($message, ENT_QUOTES)), '<img>')) === ''
+				&& (!allowedTo('admin_forum') || strpos($message, '[html]') === false))
 			{
 				$post_errors->addError('no_message');
 			}
 		}
 
 		// If they made any errors, give them a chance to make amends.
-		if ($post_errors->hasErrors() && !$is_recipient_change && !$this->_req->isSet('preview') && $this->getApi() === false)
+		if ($post_errors->hasErrors()
+			&& !$is_recipient_change
+			&& !$this->_req->isSet('preview')
+			&& $this->getApi() === false)
 		{
 			$this->messagePostError($namedRecipientList, $recipientList);
 
@@ -1339,8 +1342,8 @@ class PersonalMessage extends AbstractController
 
 			return false;
 		}
-		// Adding a recipient cause javascript ain't working?
-		elseif ($is_recipient_change)
+
+		if ($is_recipient_change)
 		{
 			// Maybe we couldn't find one?
 			foreach ($namesNotFound as $recipientType => $names)
@@ -1356,6 +1359,7 @@ class PersonalMessage extends AbstractController
 
 			return true;
 		}
+		// Adding a recipient cause javascript ain't working?
 
 		try
 		{
@@ -1431,10 +1435,8 @@ class PersonalMessage extends AbstractController
 			return false;
 		}
 		// Message sent successfully?
-		else
-		{
-			$context['current_label_redirect'] .= ';done=sent';
-		}
+
+		$context['current_label_redirect'] .= ';done=sent';
 
 		// Go back to the where they sent from, if possible...
 		redirectexit($context['current_label_redirect']);
@@ -1455,11 +1457,11 @@ class PersonalMessage extends AbstractController
 		// Sending in the single pm choice via GET
 		$pm_actions = $this->_req->getQuery('pm_actions', null, '');
 
-		// Set the action to apply to the pm's defined by pm_actions (yes its that brilliant)
+		// Set the action to apply to the PMs defined by pm_actions (yes it is that brilliant)
 		$pm_action = $this->_req->getPost('pm_action', 'trim', '');
 		$pm_action = empty($pm_action) && isset($this->_req->post->del_selected) ? 'delete' : $pm_action;
 
-		// Create a list of pm's that we need to work on
+		// Create a list of PMs that we need to work on
 		if ($pm_action != ''
 			&& !empty($this->_req->post->pms)
 			&& is_array($this->_req->post->pms))
@@ -1478,7 +1480,7 @@ class PersonalMessage extends AbstractController
 		}
 
 		// If we are in conversation, we may need to apply this to every message in that conversation.
-		if ($context['display_mode'] == 2 && isset($this->_req->query->conversation))
+		if ($context['display_mode'] === self::DISPLAY_AS_CONVERSATION && isset($this->_req->query->conversation))
 		{
 			$id_pms = array_map('intval', array_keys($pm_actions));
 			$pm_heads = getDiscussions($id_pms);
@@ -1494,7 +1496,7 @@ class PersonalMessage extends AbstractController
 			}
 		}
 
-		// Lets get to doing what we've been told
+		// Get to doing what we've been told
 		$to_delete = array();
 		$to_label = array();
 		$label_type = array();
@@ -1528,7 +1530,7 @@ class PersonalMessage extends AbstractController
 		// Deleting, it looks like?
 		if (!empty($to_delete))
 		{
-			deleteMessages($to_delete, $context['display_mode'] == 2 ? null : $context['folder']);
+			deleteMessages($to_delete, $context['display_mode'] === self::DISPLAY_AS_CONVERSATION ? null : $context['folder']);
 		}
 
 		// Are we labelling anything?
@@ -1705,7 +1707,8 @@ class PersonalMessage extends AbstractController
 					{
 						continue;
 					}
-					elseif (isset($this->_req->post->label_name[$id]))
+
+					if (isset($this->_req->post->label_name[$id]))
 					{
 						// Prepare the label name
 						$this->_req->post->label_name[$id] = trim(strtr(Util::htmlspecialchars($this->_req->post->label_name[$id]), array(',' => '&#044;')));
@@ -1759,7 +1762,7 @@ class PersonalMessage extends AbstractController
 					// Each action...
 					foreach ($rule['actions'] as $k2 => $action)
 					{
-						if ($action['t'] != 'lab' || !in_array($action['v'], $searchArray))
+						if ($action['t'] !== 'lab' || !in_array($action['v'], $searchArray))
 						{
 							continue;
 						}
@@ -2084,7 +2087,7 @@ class PersonalMessage extends AbstractController
 			}
 			$js_labels = json_encode($js_labels);
 
-			// And all of the groups as well
+			// And all the groups as well
 			$js_groups = json_encode($context['groups']);
 
 			// Oh my, we have a lot of text strings for this
@@ -2179,11 +2182,12 @@ class PersonalMessage extends AbstractController
 			foreach ($this->_req->post->ruletype as $ind => $type)
 			{
 				// Check everything is here...
-				if ($type === 'gid' && (!isset($this->_req->post->ruledefgroup[$ind]) || !isset($context['groups'][$this->_req->post->ruledefgroup[$ind]])))
+				if ($type === 'gid' && (!isset($this->_req->post->ruledefgroup[$ind], $context['groups'][$this->_req->post->ruledefgroup[$ind]])))
 				{
 					continue;
 				}
-				elseif ($type != 'bud' && !isset($this->_req->post->ruledef[$ind]))
+
+				if ($type !== 'bud' && !isset($this->_req->post->ruledef[$ind]))
 				{
 					continue;
 				}
@@ -2222,7 +2226,7 @@ class PersonalMessage extends AbstractController
 			foreach ($this->_req->post->acttype as $ind => $type)
 			{
 				// Picking a valid label?
-				if ($type === 'lab' && (!isset($this->_req->post->labdef[$ind]) || !isset($context['labels'][$this->_req->post->labdef[$ind] - 1])))
+				if ($type === 'lab' && (!isset($this->_req->post->labdef[$ind], $context['labels'][(int) $this->_req->post->labdef[$ind] - 1])))
 				{
 					continue;
 				}
@@ -2315,7 +2319,7 @@ class PersonalMessage extends AbstractController
 		// Searching for specific members
 		$userQuery = $this->_setUserQuery();
 
-		// Setup the sorting variables...
+		// Set up the sorting variables...
 		$this->_setSortParams();
 
 		// Sort out any labels we may be searching by.
@@ -2336,7 +2340,7 @@ class PersonalMessage extends AbstractController
 		// Change non-word characters into spaces.
 		$stripped_query = preg_replace('~(?:[\x0B\0\x{A0}\t\r\s\n(){}\\[\\]<>!@$%^*.,:+=`\~\?/\\\\]+|&(?:amp|lt|gt|quot);)+~u', ' ', $this->_search_params['search']);
 
-		// Make the query lower case since it will case insensitive anyway.
+		// Make the query lower case since it will case-insensitive anyway.
 		$stripped_query = un_htmlspecialchars(Util::strtolower($stripped_query));
 
 		// Extract phrase parts first (e.g. some words "this is a phrase" some more words.)
@@ -2493,7 +2497,7 @@ class PersonalMessage extends AbstractController
 		list($foundMessages, $posters, $head_pms) = loadPMSearchMessages($userQuery, $labelQuery, $timeQuery, $searchQuery, $this->_searchq_parameters, $this->_search_params);
 
 		// Find the real head pm when in conversation view
-		if ($context['display_mode'] == 2 && !empty($head_pms))
+		if ($context['display_mode'] === self::DISPLAY_AS_CONVERSATION && !empty($head_pms))
 		{
 			$real_pm_ids = loadPMSearchHeads($head_pms);
 		}
@@ -2567,7 +2571,7 @@ class PersonalMessage extends AbstractController
 				}
 
 				// Set a link using the first label information
-				$href = $scripturl . '?action=pm;f=' . $context['folder'] . (isset($context['first_label'][$row['id_pm']]) ? ';l=' . $context['first_label'][$row['id_pm']] : '') . ';pmid=' . ($context['display_mode'] == 2 && isset($real_pm_ids[$head_pms[$row['id_pm']]]) && $context['folder'] === 'inbox' ? $real_pm_ids[$head_pms[$row['id_pm']]] : $row['id_pm']) . '#msg_' . $row['id_pm'];
+				$href = $scripturl . '?action=pm;f=' . $context['folder'] . (isset($context['first_label'][$row['id_pm']]) ? ';l=' . $context['first_label'][$row['id_pm']] : '') . ';pmid=' . ($context['display_mode'] === self::DISPLAY_AS_CONVERSATION && isset($real_pm_ids[$head_pms[$row['id_pm']]]) && $context['folder'] === 'inbox' ? $real_pm_ids[$head_pms[$row['id_pm']]] : $row['id_pm']) . '#msg_' . $row['id_pm'];
 
 				$context['personal_messages'][] = [
 					'id' => $row['id_pm'],
@@ -2707,7 +2711,7 @@ class PersonalMessage extends AbstractController
 			$this->_search_params['maxage'] = !empty($this->_search_params['maxage']) ? (int) $this->_search_params['maxage'] : (int) $this->_req->post->maxage;
 		}
 
-		// Default the user name to a wildcard matching every user (*).
+		// Default the username to a wildcard matching every user (*).
 		if (!empty($this->_search_params['userspec']) || (!empty($this->_req->post->userspec) && $this->_req->post->userspec != '*'))
 		{
 			$this->_search_params['userspec'] = $this->_search_params['userspec'] ?? $this->_req->post->userspec;
@@ -2742,7 +2746,7 @@ class PersonalMessage extends AbstractController
 		// If there's no specific user, then don't mention it in the main query.
 		if (!empty($this->_search_params['userspec']))
 		{
-			// Set up so we can search by user name, wildcards, like, etc
+			// Set up, so we can search by username, wildcards, like, etc
 			$userString = strtr(Util::htmlspecialchars($this->_search_params['userspec'], ENT_QUOTES), array('&quot;' => '"'));
 			$userString = strtr($userString, array('%' => '\%', '_' => '\_', '*' => '%', '?' => '_'));
 
@@ -2789,7 +2793,7 @@ class PersonalMessage extends AbstractController
 					$memberlist[] = $id;
 				}
 
-				// Use the name as as sent from or sent to
+				// Use the name as sent from or sent to
 				if ($context['folder'] === 'inbox')
 				{
 					$uq = array();
@@ -2898,7 +2902,7 @@ class PersonalMessage extends AbstractController
 	}
 
 	/**
-	 * Encodes search params in an URL-compatible way
+	 * Encodes search params in a URL-compatible way
 	 *
 	 * @return string - the encoded string to be appended to the URL
 	 */
@@ -2922,7 +2926,7 @@ class PersonalMessage extends AbstractController
 	 * What it does:
 	 *
 	 * - accessed with ?action=pm;sa=search
-	 * - shows the screen to search pm's (?action=pm;sa=search)
+	 * - shows the screen to search PMs (?action=pm;sa=search)
 	 * - uses the search sub template of the PersonalMessage template.
 	 * - decodes and loads search parameters given in the URL (if any).
 	 * - the form redirects to index.php?action=pm;sa=search2.
@@ -3024,7 +3028,7 @@ class PersonalMessage extends AbstractController
 	}
 
 	/**
-	 * Allows the user to mark a personal message as unread so they remember to come back to it
+	 * Allows the user to mark a personal message as unread, so they remember to come back to it
 	 */
 	public function action_markunread()
 	{
@@ -3032,7 +3036,7 @@ class PersonalMessage extends AbstractController
 
 		checkSession('request');
 
-		$pmsg = !empty($this->_req->query->pmsg) ? (int) $this->_req->query->pmsg : null;
+		$pmsg = $this->_req->getQuery('pmsg', 'intval', null);
 
 		// Marking a message as unread, we need a message that was sent to them
 		// Can't mark your own reply as unread, that would be weird

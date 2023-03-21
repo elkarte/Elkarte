@@ -159,7 +159,7 @@ class Agreement
 
 		if (!$this->fileFunc->fileExists($filename) && !$this->fileFunc->isDir($filename))
 		{
-			touch($this->fileFunc->fileExists($filename));
+			touch($filename);
 			$this->fileFunc->chmod($filename);
 		}
 

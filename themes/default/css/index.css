@@ -939,7 +939,7 @@ a.bbc_link {
 	vertical-align: bottom;
 	white-space: nowrap;
 	text-overflow: ellipsis;
-	word-wrap: normal;
+	overflow-wrap: normal;
 }
 
 .bbc_link:hover {
@@ -2272,6 +2272,12 @@ button[type="submit"].quick_quote_button.hide {
 	grid-row-start: primary;
 }
 
+.category_boards .lastpost_link {
+	overflow: hidden;
+	text-overflow: ellipsis;
+	overflow-wrap: anywhere;
+}
+
 .category_boards .board_lastposter {
 	display: block;
 }
@@ -2555,7 +2561,7 @@ button[type="submit"].quick_quote_button.hide {
 
 .topic_name h4 {
 	line-height: 1.4;
-	overflow-wrap: break-word;
+	overflow-wrap: anywhere;
 }
 
 .topic_starter {
@@ -2884,7 +2890,7 @@ aside > .poster {
 	max-width: 80%;
 	vertical-align: middle;
 	text-overflow: ellipsis;
-	word-wrap: normal;
+	overflow-wrap: normal;
 }
 
 .warning .linklevel2 .warnicon {
@@ -6318,10 +6324,16 @@ div.labels {
 
 	.topic_name h4 {
 		font-size: var(--font20);
+		display: -webkit-box;
+		overflow: hidden;
+		max-height: 3em;
+		-webkit-line-clamp: 2;
+		line-clamp: 2 "...";
+		-webkit-box-orient: vertical;
 	}
 
 	.topic_name h4 a {
-		overflow-wrap: break-word;
+		text-overflow: ellipsis;
 	}
 
 	.lastpost_link, .board_lastposter {

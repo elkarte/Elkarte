@@ -436,7 +436,7 @@ function template_subject_list()
 									</a>
 								</td>
 								<td class="pm_from">
-									', ($context['from_or_to'] == 'from' ? $message['member']['link'] : (empty($message['recipients']['to']) ? '' : implode(', ', $message['recipients']['to']))), '
+									', ($context['from_or_to'] === 'from' ? $message['member']['link'] : (empty($message['recipients']['to']) ? '' : implode(', ', $message['recipients']['to']))), '
 								</td>
 								<td class="pm_quickmod">
 									<label for="deletelisting', $message['id'], '" class="hide">', $message['id'], ' - ', $message['subject'], '</label>
@@ -1239,13 +1239,11 @@ function template_labels()
 					<label for="add_label">', $txt['pm_label_name'], ':</label>
 				</dt>
 				<dd>
-					<input type="text" id="add_label" name="label" value="" size="30" maxlength="30" class="input_text" />
+					<input type="text" id="add_label" name="label" value="" size="30" maxlength="30" placeholder="', $txt['pm_label_name'], '"  />
+					<input type="submit" name="add" value="', $txt['pm_label_add_new'], '" />
+					<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
 				</dd>
 			</dl>
-			<div class="submitbutton">
-				<input type="submit" name="add" value="', $txt['pm_label_add_new'], '" />
-				<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
-			</div>
 		</div>
 	</form>';
 }
@@ -1363,12 +1361,7 @@ function template_rules()
 	if (!empty($context['rules']))
 	{
 		echo '
-			<a class="linkbutton" href="', $scripturl, '?action=pm;sa=manrules;apply;', $context['session_var'], '=', $context['session_id'], '" onclick="return confirm(\'', $txt['pm_js_apply_rules_confirm'], '\');">', $txt['pm_apply_rules'], '</a>';
-	}
-
-	if (!empty($context['rules']))
-	{
-		echo '
+			<a class="linkbutton" href="', $scripturl, '?action=pm;sa=manrules;apply;', $context['session_var'], '=', $context['session_id'], '" onclick="return confirm(\'', $txt['pm_js_apply_rules_confirm'], '\');">', $txt['pm_apply_rules'], '</a>
 			<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
 			<input type="submit" name="delselected" value="', $txt['pm_delete_selected_rule'], '" onclick="return confirm(\'', $txt['pm_js_delete_rule_confirm'], '\');" />';
 	}
