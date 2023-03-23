@@ -949,12 +949,12 @@ class Theme extends BaseTheme
 
 		if ($type === 'all' || $type === 'css')
 		{
-			$result &= $combiner->removeCssHives();
+			$result = $combiner->removeCssHives();
 		}
 
 		if ($type === 'all' || $type === 'js')
 		{
-			$result &= $combiner->removeJsHives();
+			$result = $result && $combiner->removeJsHives();
 		}
 
 		return $result;

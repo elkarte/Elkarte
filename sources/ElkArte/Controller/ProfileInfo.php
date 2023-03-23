@@ -663,10 +663,10 @@ class ProfileInfo extends AbstractController
 		}
 
 		// Clean up after posts that cannot be deleted and quoted.
-		$quote_enabled = empty($modSettings['disabledBBC']) || !in_array('quote', explode(',', $modSettings['disabledBBC']));
+		$quote_enabled = empty($modSettings['disabledBBC']) || !in_array('quote', explode(',', $modSettings['disabledBBC']), true);
 		foreach ($context['posts'] as $counter => $dummy)
 		{
-			$context['posts'][$counter]['tests']['can_delete'] &= $context['posts'][$counter]['delete_possible'];
+			$context['posts'][$counter]['tests']['can_delete'] = $context['posts'][$counter]['tests']['can_delete'] && $context['posts'][$counter]['delete_possible'];
 			$context['posts'][$counter]['tests']['can_quote'] = $context['posts'][$counter]['tests']['can_reply'] && $quote_enabled;
 		}
 	}
