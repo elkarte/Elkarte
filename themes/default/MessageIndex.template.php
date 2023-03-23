@@ -431,18 +431,18 @@ function template_topic_listing_below()
 		echo '
 				aJumpTo[aJumpTo.length] = new JumpTo({
 					sContainerId: "quick_mod_jump_to",
-					sClassName: "qaction",
 					sJumpToTemplate: "%dropdown_list%",
 					iCurBoardId: ', $context['current_board'], ',
 					iCurBoardChildLevel: ', $context['jump_to']['child_level'], ',
 					sCurBoardName: "', $context['jump_to']['board_name'], '",
 					sBoardChildLevelIndicator: "&#8195;",
 					sBoardPrefix: "&#10148;",
-					sCatClass: "jump_to_header",
 					sCatPrefix: "",
+					sCatClass: "jump_to_header",
+					sClassName: "qaction",
 					bNoRedirect: true,
-					bDisabled: true,
-					sCustomName: "move_to"
+					sCustomName: "move_to",
+					bOnLoad: true
 				});';
 	}
 
@@ -457,6 +457,7 @@ function template_topic_listing_below()
 					sBoardPrefix: "&#10148;",
 					sCatPrefix: "",
 					sCatClass: "jump_to_header",
+					bOnLoad: true,
 					sGoButtonLabel: "', $txt['quick_mod_go'], '"
 				});
 			</script>

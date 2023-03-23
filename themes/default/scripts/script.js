@@ -1194,7 +1194,7 @@ function grabJumpToContent()
  */
 function onJumpReceived(oXMLDoc)
 {
-	var aBoardsAndCategories = [],
+	let aBoardsAndCategories = [],
 		i,
 		n,
 		items = oXMLDoc.getElementsByTagName('elk')[0].getElementsByTagName('item');
@@ -1229,6 +1229,7 @@ function onJumpReceived(oXMLDoc)
  * sCatPrefix: Prefix to use in from of the categories
  * bNoRedirect: boolean for redirect
  * bDisabled: boolean for disabled
+ * bOnLoad: boolean if to load the select box on page load or wait until touch/enter
  * sCustomName: custom name to prefix for the select name=""
  * sGoButtonLabel: name for the goto button
  *
@@ -1245,7 +1246,21 @@ function JumpTo(oJumpToOptions)
 	this.showSelect();
 
 	// No need to wait until a mouse event, poor usability, page jump, etc
-	window.addEventListener('load', grabJumpToContent);
+	if (this.opt.bOnLoad)
+	{
+		window.addEventListener('load', grabJumpToContent);
+	}
+	else
+	{
+		if (is_mobile && is_touch)
+		{
+			this.dropdownList.addEventListener('touchstart', grabJumpToContent);
+		}
+		else
+		{
+			this.dropdownList.addEventListener('mouseenter', grabJumpToContent);
+		}
+	}
 }
 
 // Remove all the options in the select. Method of the JumpTo class.
