@@ -175,7 +175,7 @@ class Display extends AbstractController
 		$context['first_message'] = 0;
 		$context['first_new_message'] = false;
 
-		call_integration_hook('integrate_display_message_list', array(&$messages, &$posters));
+		call_integration_hook('integrate_display_message_list', array(&$messages, &$all_posters));
 
 		// If there _are_ messages here... (probably an error otherwise :!)
 		if (!empty($messages))
