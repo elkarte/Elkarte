@@ -188,7 +188,6 @@ function checkPassword($type, $hash = false)
  * @param bool $is_fatal = true
  *
  * @return bool
- * @throws \ElkArte\Exceptions\Exception
  */
 function is_not_guest($message = '', $is_fatal = true)
 {
@@ -1291,7 +1290,7 @@ function isAllowedTo($permission, $boards = null)
  *             permissions that were passed. Other than that, it's just the normal
  *             state of play that you're used to.
  *
- * @return array
+ * @return int[]
  * @throws \ElkArte\Exceptions\Exception
  */
 function boardsAllowedTo($permissions, $check_access = true, $simple = true)
@@ -1301,7 +1300,7 @@ function boardsAllowedTo($permissions, $check_access = true, $simple = true)
 	// Arrays are nice, most of the time.
 	if (!is_array($permissions))
 	{
-		$permissions = array($permissions);
+		$permissions = [$permissions];
 	}
 
 	// I am the master, the master of the universe!
@@ -1309,25 +1308,23 @@ function boardsAllowedTo($permissions, $check_access = true, $simple = true)
 	{
 		if ($simple)
 		{
-			return array(0);
+			return [0];
 		}
-		else
-		{
-			$boards = array();
-			foreach ($permissions as $permission)
-			{
-				$boards[$permission] = array(0);
-			}
 
-			return $boards;
+		$boards = [];
+		foreach ($permissions as $permission)
+		{
+			$boards[$permission] = [0];
 		}
+
+		return $boards;
 	}
 
 	// All groups the user is in except 'moderator'.
-	$groups = array_diff(User::$info->groups, array(3));
+	$groups = array_diff(User::$info->groups, [3]);
 
-	$boards = array();
-	$deny_boards = array();
+	$boards = [];
+	$deny_boards = [];
 	$db->fetchQuery('
 		SELECT 
 			b.id_board, bp.add_deny' . ($simple ? '' : ', bp.permission') . '
@@ -1350,20 +1347,20 @@ function boardsAllowedTo($permissions, $check_access = true, $simple = true)
 			{
 				if (empty($row['add_deny']))
 				{
-					$deny_boards[] = $row['id_board'];
+					$deny_boards[] = (int) $row['id_board'];
 				}
 				else
 				{
-					$boards[] = $row['id_board'];
+					$boards[] = (int) $row['id_board'];
 				}
 			}
 			elseif (empty($row['add_deny']))
 			{
-				$deny_boards[$row['permission']][] = $row['id_board'];
+				$deny_boards[$row['permission']][] = (int) $row['id_board'];
 			}
 			else
 			{
-				$boards[$row['permission']][] = $row['id_board'];
+				$boards[$row['permission']][] = (int) $row['id_board'];
 			}
 		}
 	);
@@ -1379,12 +1376,12 @@ function boardsAllowedTo($permissions, $check_access = true, $simple = true)
 			// Never had it to start with
 			if (empty($boards[$permission]))
 			{
-				$boards[$permission] = array();
+				$boards[$permission] = [];
 			}
 			else
 			{
 				// Or it may have been removed
-				$deny_boards[$permission] = $deny_boards[$permission] ?? array();
+				$deny_boards[$permission] = $deny_boards[$permission] ?? [];
 				$boards[$permission] = array_unique(array_values(array_diff($boards[$permission], $deny_boards[$permission])));
 			}
 		}
