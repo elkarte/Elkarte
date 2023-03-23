@@ -425,10 +425,10 @@ class BoardsList
 				$this->_current_boards[$row_board['id_parent']]['children'][$row_board['id_board']]['last_post'] = $this_last_post;
 
 				// If there are no posts in this board, it really can't be new...
-				$this->_current_boards[$row_board['id_parent']]['children'][$row_board['id_board']]['new'] &= $row_board['poster_name'] != '';
+				$this->_current_boards[$row_board['id_parent']]['children'][$row_board['id_board']]['new'] &= $row_board['poster_name'] !== '';
 			}
 			// No last post for this board?  It's not new then, is it..?
-			elseif ($row_board['poster_name'] == '')
+			elseif ($row_board['poster_name'] === '')
 			{
 				$this->_current_boards[$row_board['id_board']]['new'] = false;
 			}
