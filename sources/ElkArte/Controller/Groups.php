@@ -452,7 +452,7 @@ class Groups extends AbstractController
 
 			$context['members'][$id] = array(
 				'id' => $row['id_member'],
-				'name' => '<a href="' . getUrl('profile', ['action' => 'quickhelp', 'u' => $row['id_member'], 'name' => $row['real_name']]) . '">' . $row['real_name'] . '</a>',
+				'name' => '<a href="' . getUrl('profile', ['action' => 'profile', 'u' => $row['id_member'], 'name' => $row['real_name']]) . '">' . $row['real_name'] . '</a>',
 				'email' => $row['email_address'],
 				'show_email' => showEmailAddress(!empty($row['hide_email']), $row['id_member']),
 				'ip' => '<a href="' . getUrl('action', ['action' => 'trackip', 'searchip' => $row['member_ip']]) . '">' . $row['member_ip'] . '</a>',
