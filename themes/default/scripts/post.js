@@ -484,7 +484,7 @@ function cleanFileInput(idElement)
 }
 
 /**
- * Insert a quote to the editor via ajax
+ * Insert a quote to the editor via ajax.  Scroll the editor into view
  *
  * @param {string} messageid
  */

@@ -345,9 +345,16 @@ function template_quickreply_below()
 	{
 		// Wrap the Quick Reply area, making it look like a post / message.
 		echo '
-	<h3 class="category_header">', $txt['quick_reply'], '</h3>
+	<a id="quickreply"></a>
+	<h3 class="category_header category_toggle">
+		<span>
+			<a href="javascript:oQuickReply.swap();">
+				<i id="quickreplyexpand" class="chevricon i-chevron-', empty($context['minmax_preferences']['qreply']) ? 'up' : 'down', '" title="', $txt['hide'], '"></i>
+			</a>
+		</span>
+		<a href="javascript:oQuickReply.swap();">', $txt['quick_reply'], '</a>
+	</h3>
 	<div id="quickreplybox">
-		<a id="quickreply"></a>
 		<section>
 			<article class="post_wrapper forumposts">';
 
@@ -363,7 +370,7 @@ function template_quickreply_below()
 					<header class="category_header">
 						<h4>', $txt['reply'], '</h4>
 					</header>
-					<div id="quickReplyOptions" class="', empty($context['minmax_preferences']['qreply']) ? '"' : ' hide"', '>
+					<div id="quickReplyOptions">
 						<form action="', getUrl('action', ['action' => 'post2', 'board' => $context['current_board']]), '" method="post" accept-charset="UTF-8" name="postmodify" id="postmodify" onsubmit="submitonce(this);', (!empty($modSettings['mentions_enabled']) ? 'revalidateMentions(\'postmodify\', \'' . (empty($options['use_editor_quick_reply']) ? 'message' : $context['post_box_name']) . '\');' : ''), '">
 							<input type="hidden" name="topic" value="', $context['current_topic'], '" />
 							<input type="hidden" name="subject" value="', $context['response_prefix'], $context['subject'], '" />
@@ -468,15 +475,15 @@ function template_quickreply_below()
 			iStart: ' . $context['start'] . ',
 			sScriptUrl: elk_scripturl,
 			sImagesUrl: elk_images_url,
-			sContainerId: "quickReplyOptions",
-			sClassId: "quickReplyExpand",
+			sContainerId: "quickreplybox",
+			sClassId: "quickreplyexpand",
 			sClassCollapsed: "chevricon i-chevron-up",
 			sTitleCollapsed: ' . JavaScriptEscape($txt['show']) . ',
 			sClassExpanded: "chevricon i-chevron-down",
 			sTitleExpanded: ' . JavaScriptEscape($txt['hide']) . ',
 			sJumpAnchor: "quickreply",
 			bIsFull: ' . (!empty($options['use_editor_quick_reply']) ? 'true' . ',
-			sEditorId: ' . $options['use_editor_quick_reply'] : 'false') . ',
+			sEditorId: "' . $context['post_box_name'] . '"' : 'false') . ',
 			oThemeOptions: {
 				bUseThemeSettings: ' . ($context['user']['is_guest'] ? 'false' : 'true') . ',
 				sOptionName: "minmax_preferences",
