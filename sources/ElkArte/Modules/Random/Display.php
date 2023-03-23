@@ -67,7 +67,7 @@ class Display extends AbstractModule
 	}
 
 	/**
-	 * Show topics originated from the messages.
+	 * Show topics originated from the messages.  Called from integrate_display_message_list
 	 *
 	 * @param int[] $messages
 	 */
@@ -80,7 +80,7 @@ class Display extends AbstractModule
 	}
 
 	/**
-	 * Show likes.
+	 * Show likes.  Called from integrate_display_message_list
 	 *
 	 * @param int[] $messages
 	 */
