@@ -7,7 +7,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.1
+ * @version 1.1.10
  */
 
 /**
@@ -1413,7 +1413,7 @@ function initEditProfileBoards()
 	$('.edit_all_board_profiles').on('click', function(e) {
 		e.preventDefault();
 
-		$('.edit_board').off('click.elkarte');
+		$('.edit_board').trigger('click');
 	});
 
 	$('.edit_board').show().on('click.elkarte', function(e) {
@@ -1445,14 +1445,14 @@ function initEditProfileBoards()
 		$target.replaceWith($select);
 		$select.change();
 
-		$('.edit_all_board_profiles').replaceWith($('<input type="submit" class="right_submit" />')
+		$('.edit_all_board_profiles').replaceWith($('<input type="submit" />')
 			.attr('name', 'save_changes')
 			.attr('value', txt_save)
 		);
 		$icon.off('click.elkarte').on('click', function(e) {
 			e.preventDefault();
 			if ($(this).hasClass('changed'))
-				$('input[name="save_changes"]').off('click');
+				$('input[name="save_changes"]').trigger('click');
 		});
 	});
 }
