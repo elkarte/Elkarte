@@ -30,11 +30,11 @@ use ElkArte\Util;
  * @return int
  * @package Attachments
  */
-function approveAttachments($attachments)
+function approveAttachments($attachment_ids)
 {
 	$db = database();
 
-	if (empty($attachments))
+	if (empty($attachment_ids))
 	{
 		return 0;
 	}
@@ -49,7 +49,7 @@ function approveAttachments($attachments)
 		WHERE a.id_attach IN ({array_int:attachments})
 			AND a.attachment_type = {int:attachment_type}',
 		array(
-			'attachments' => $attachments,
+			'attachments' => $attachment_ids,
 			'attachment_type' => 0,
 		)
 	)->fetch_callback(
