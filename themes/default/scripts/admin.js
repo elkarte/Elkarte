@@ -1271,7 +1271,7 @@ function initEditProfileBoards()
 	{
 		e.preventDefault();
 
-		$('.edit_board').off('click.elkarte');
+		$('.edit_board').trigger('click');
 	});
 
 	$('.edit_board').show().on('click.elkarte', function (e)
@@ -1315,7 +1315,7 @@ function initEditProfileBoards()
 		$target.replaceWith($select);
 		$select.trigger('change');
 
-		$('.edit_all_board_profiles').replaceWith($('<input type="submit" class="right_submit" />')
+		$('.edit_all_board_profiles').replaceWith($('<input type="submit" />')
 			.attr('name', 'save_changes')
 			.attr('value', txt_save)
 		);
@@ -1325,7 +1325,7 @@ function initEditProfileBoards()
 			e.preventDefault();
 			if ($(this).hasClass('changed'))
 			{
-				$('input[name="save_changes"]').off('click');
+				$('input[name="save_changes"]').trigger('click');
 			}
 		});
 	});
