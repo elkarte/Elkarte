@@ -51,7 +51,7 @@ class ModerateAttachments extends AbstractController
 		// Is it approve or delete?
 		$is_approve = !isset($this->_req->query->sa) || $this->_req->query->sa !== 'reject';
 
-		$attachments = array();
+		$attachments = [];
 		require_once(SUBSDIR . '/ManageAttachments.subs.php');
 
 		// If we are approving all ID's in a message, get the ID's.
@@ -74,7 +74,7 @@ class ModerateAttachments extends AbstractController
 		// Now we have some ID's cleaned and ready to approve, but first - let's check we have permission!
 		$allowed_boards = !empty($this->user->mod_cache['ap']) ? $this->user->mod_cache['ap'] : boardsAllowedTo('approve_posts');
 
-		if ($allowed_boards == array(0))
+		if ($allowed_boards == [0])
 		{
 			$approve_query = '';
 		}
@@ -107,7 +107,7 @@ class ModerateAttachments extends AbstractController
 		}
 		else
 		{
-			removeAttachments(array('id_attach' => $attachments, 'do_logging' => true));
+			removeAttachments(['id_attach' => $attachments, 'do_logging' => true]);
 		}
 
 		// We approved or removed, either way we reset those numbers

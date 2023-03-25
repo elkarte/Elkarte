@@ -68,8 +68,7 @@ class AttachmentsDisplay
 	 * @param string|null $filter name of a callback function
 	 * @param array $all_posters
 	 *
-	 * @package Attachments
-	 */
+		 */
 	protected function getAttachments($messages, $includeUnapproved = false, $filter = null, $all_posters = array())
 	{
 		global $modSettings;
@@ -133,8 +132,7 @@ class AttachmentsDisplay
 	 * @return array of attachments
 	 * @todo change this pre-condition, too fragile and error-prone.
 	 *
-	 * @package Attachments
-	 */
+		 */
 	public function loadAttachmentContext($id_msg)
 	{
 		global $context, $modSettings, $scripturl, $topic;

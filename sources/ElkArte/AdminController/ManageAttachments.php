@@ -31,7 +31,6 @@ use ElkArte\Languages\Loader;
  * This is the attachments and avatars controller class.
  * It is doing the job of attachments and avatars maintenance and management.
  *
- * @package Attachments
  */
 class ManageAttachments extends AbstractController
 {
@@ -1113,8 +1112,7 @@ class ManageAttachments extends AbstractController
 	 * @param int $max_substep = 0
 	 * @throws \ElkArte\Exceptions\Exception
 	 * @todo Move to ManageAttachments.subs.php
-	 * @package Attachments
-	 */
+		 */
 	private function _pauseAttachmentMaintenance($to_fix, $max_substep = 0)
 	{
 		global $context, $txt, $time_start;
