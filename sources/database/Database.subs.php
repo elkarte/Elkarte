@@ -39,7 +39,7 @@ function elk_db_initiate($db_server, $db_name, $db_user, $db_passwd, $db_prefix,
  *                      instance will be lost and only the new one returned
  *
  * @return \ElkArte\Database\QueryInterface
- * @throws \Exception
+ * @throws \Exception if fatal is false
  */
 function database($fatal = true, $force = false)
 {
