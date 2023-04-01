@@ -88,12 +88,12 @@ class Stats extends AbstractController
 			$template_layers->removeAll();
 			$context['sub_template'] = 'stats';
 
-			getDailyStats('YEAR(date) = {int:year} AND MONTH(date) = {int:month}', array('year' => $year, 'month' => $month));
+			getDailyStats('YEAR(date) = {int:year} AND MONTH(date) = {int:month}', ['year' => $year, 'month' => $month]);
 
-			$context['yearly'][$year]['months'][$month]['date'] = array(
+			$context['yearly'][$year]['months'][$month]['date'] = [
 				'month' => sprintf('%02d', $month),
 				'year' => $year,
-			);
+			];
 
 			return true;
 		}
@@ -104,20 +104,20 @@ class Stats extends AbstractController
 		loadJavascriptFile(['stats.js', 'chart.min.js', 'elk_chart.js']);
 
 		// Build the link tree......
-		$context['linktree'][] = array(
+		$context['linktree'][] = [
 			'url' => getUrl('action', ['action' => 'stats']),
 			'name' => $txt['stats_center']
-		);
+		];
 
 		// Prepare some things for the template page
 		$context['page_title'] = $context['forum_name'] . ' - ' . $txt['stats_center'];
 		$context['sub_template'] = 'statistics';
 
 		// These are the templates that will be used to render the statistics
-		$context['statistics_callbacks'] = array(
+		$context['statistics_callbacks'] = [
 			'general_statistics',
 			'top_statistics',
-		);
+		];
 
 		// Call each area of statics to load our friend $context
 		$this->loadGeneralStatistics();
@@ -162,10 +162,10 @@ class Stats extends AbstractController
 		// Done looking at the details and want to fold it back up
 		if (!empty($collapse) && !empty($_SESSION['expanded_stats'][$year]))
 		{
-			$_SESSION['expanded_stats'][$year] = array_diff($_SESSION['expanded_stats'][$year], array($month));
+			$_SESSION['expanded_stats'][$year] = array_diff($_SESSION['expanded_stats'][$year], [$month]);
 		}
 
-		return array($year, $month);
+		return [$year, $month];
 	}
 
 	/**
@@ -185,44 +185,44 @@ class Stats extends AbstractController
 		$date = Util::strftime('%Y-%m-%d', forum_time(false));
 
 		// General forum stats
-		$context['general_statistics']['left'] = array(
+		$context['general_statistics']['left'] = [
 			'total_members' => allowedTo('view_mlist') ? '<a href="' . getUrl('action', ['action' => 'memberlist']) . '">' . comma_format($modSettings['totalMembers']) . '</a>' : comma_format($modSettings['totalMembers']),
 			'total_posts' => comma_format($modSettings['totalMessages']),
 			'total_topics' => comma_format($modSettings['totalTopics']),
 			'total_cats' => comma_format(numCategories()),
 			// How many users are online now.
 			'users_online' => comma_format(onlineCount()),
-			'most_online' => array(
+			'most_online' => [
 				'number' => comma_format($modSettings['mostOnline']),
 				'date' => standardTime($modSettings['mostDate'])
-			),
+			],
 			// Members online so far today.
 			'users_online_today' => comma_format(mostOnline($date)),
-		);
+		];
 
 		if (!empty($modSettings['hitStats']))
 		{
-			$context['general_statistics']['left'] += array(
+			$context['general_statistics']['left'] += [
 				'num_hits' => comma_format($averages['hits'], 0)
-			);
+			];
 		}
 
-		$context['general_statistics']['right'] = array(
+		$context['general_statistics']['right'] = [
 			'average_members' => comma_format(round($averages['registers'] / $total_days_up, 2)),
 			'average_posts' => comma_format(round($averages['posts'] / $total_days_up, 2)),
 			'average_topics' => comma_format(round($averages['topics'] / $total_days_up, 2)),
 			// Statistics such as number of boards, categories, etc.
-			'total_boards' => comma_format(countBoards('all', array('include_redirects' => false))),
+			'total_boards' => comma_format(countBoards('all', ['include_redirects' => false])),
 			'latest_member' => &$context['common_stats']['latest_member'],
 			'average_online' => comma_format(round($averages['most_on'] / $total_days_up, 2)),
 			'emails_sent' => comma_format(round($averages['email'] / $total_days_up, 2))
-		);
+		];
 
 		if (!empty($modSettings['hitStats']))
 		{
-			$context['general_statistics']['right'] += array(
+			$context['general_statistics']['right'] += [
 				'average_hits' => comma_format(round($averages['hits'] / $total_days_up, 2)),
-			);
+			];
 		}
 	}
 
@@ -268,7 +268,7 @@ class Stats extends AbstractController
 		// Activity by month.
 		monthlyActivity();
 
-		$context['collapsed_years'] = array();
+		$context['collapsed_years'] = [];
 		foreach ($context['yearly'] as $year => $data)
 		{
 			// This gets rid of the filesort on the query ;).
@@ -294,8 +294,8 @@ class Stats extends AbstractController
 			return false;
 		}
 
-		$condition_text = array();
-		$condition_params = array();
+		$condition_text = [];
+		$condition_params = [];
 		foreach ($_SESSION['expanded_stats'] as $year => $months)
 		{
 			if (!empty($months))
