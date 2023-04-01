@@ -160,6 +160,7 @@ class ManageFeatures extends AbstractController
 
 		// Initialize it with our settings
 		$settingsForm->setConfigVars($this->_basicSettings());
+		theme()->addJavascriptVar(['txt_invalid_response' => $txt['ajax_bad_response']], true);
 
 		// Saving?
 		if (isset($this->_req->query->save))
@@ -204,7 +205,6 @@ class ManageFeatures extends AbstractController
 
 			theme()->getLayers()->removeAll();
 			theme()->getTemplates()->load('Json');
-			theme()->addJavascriptVar(array('txt_invalid_response' => $txt['ajax_bad_response']), true);
 			$context['sub_template'] = 'send_json';
 			$context['json_data'] = array(
 				'success' => $clean_hives_result,
