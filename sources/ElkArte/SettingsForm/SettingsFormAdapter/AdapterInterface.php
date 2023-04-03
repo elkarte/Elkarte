@@ -45,7 +45,6 @@ interface AdapterInterface
 
 	public function prepare();
 
-
 	/**
 	 * This method saves the settings.
 	 *

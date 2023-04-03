@@ -58,17 +58,17 @@ class Db extends Adapter
 					continue;
 				}
 
-				$this->context[$configVar[1]] = array(
+				$this->context[$configVar[1]] = [
 					'type' => $configVar[0],
-					'size' => !empty($configVar[2]) && !is_array($configVar[2]) ? $configVar[2] : (in_array($configVar[0], array('int', 'float')) ? 6 : 0),
-					'data' => array(),
+					'size' => !empty($configVar[2]) && !is_array($configVar[2]) ? $configVar[2] : (in_array($configVar[0], ['int', 'float']) ? 6 : 0),
+					'data' => [],
 					'name' => str_replace(' ', '_', $configVar[1]),
-					'value' => isset($modSettings[$configVar[1]]) ? ($configVar[0] === 'select' ? $modSettings[$configVar[1]] : htmlspecialchars($modSettings[$configVar[1]], ENT_COMPAT, 'UTF-8')) : (in_array($configVar[0], array('int', 'float')) ? 0 : ''),
+					'value' => isset($modSettings[$configVar[1]]) ? ($configVar[0] === 'select' ? $modSettings[$configVar[1]] : htmlspecialchars($modSettings[$configVar[1]], ENT_COMPAT, 'UTF-8')) : (in_array($configVar[0], ['int', 'float']) ? 0 : ''),
 					'disabled' => false,
 					'invalid' => !empty($configVar['invalid']),
 					'javascript' => '',
-				);
-				foreach (array('helptext', 'message', 'preinput', 'postinput', 'icon') as $k)
+				];
+				foreach (['helptext', 'message', 'preinput', 'postinput', 'icon'] as $k)
 				{
 					if (isset($configVar[$k]))
 					{
@@ -76,7 +76,7 @@ class Db extends Adapter
 					}
 				}
 
-				$this->prepareLabel($configVar);
+				$this->context[$configVar[1]]['label'] = $this->prepareLabel($configVar);
 
 				// If this is a select box handle any data.
 				$this->handleSelect($configVar);
@@ -110,24 +110,25 @@ class Db extends Adapter
 		// See if there are any labels that might fit?
 		if (isset($configVar['text_label']))
 		{
-			$this->context[$configVar[1]]['label'] = $configVar['text_label'];
+			return $configVar['text_label'];
 		}
-		elseif (isset($txt[$configVar[1]]))
+
+		if (isset($txt[$configVar[1]]))
 		{
-			$this->context[$configVar[1]]['label'] = $txt[$configVar[1]];
+			return $txt[$configVar[1]];
 		}
-		elseif (isset($txt['setting_' . $configVar[1]]))
+
+		if (isset($txt['setting_' . $configVar[1]]))
 		{
-			$this->context[$configVar[1]]['label'] = $txt['setting_' . $configVar[1]];
+			return $txt['setting_' . $configVar[1]];
 		}
-		elseif (isset($txt['groups_' . $configVar[1]]))
+
+		if (isset($txt['groups_' . $configVar[1]]))
 		{
-			$this->context[$configVar[1]]['label'] = $txt['groups_' . $configVar[1]];
+			return $txt['groups_' . $configVar[1]];
 		}
-		else
-		{
-			$this->context[$configVar[1]]['label'] = $configVar[1];
-		}
+
+		return $configVar[1];
 	}
 
 	/**
@@ -141,7 +142,7 @@ class Db extends Adapter
 			if ($configVar[0] === 'select' && !empty($configVar['multiple']))
 			{
 				$this->context[$configVar[1]]['name'] .= '[]';
-				$this->context[$configVar[1]]['value'] = !empty($this->context[$configVar[1]]['value']) ? Util::unserialize($this->context[$configVar[1]]['value']) : array();
+				$this->context[$configVar[1]]['value'] = !empty($this->context[$configVar[1]]['value']) ? Util::unserialize($this->context[$configVar[1]]['value']) : [];
 			}
 
 			// If it's associative
@@ -153,7 +154,7 @@ class Db extends Adapter
 			{
 				foreach ($configVar[2] as $key => $item)
 				{
-					$this->context[$configVar[1]]['data'][] = array($key, $item);
+					$this->context[$configVar[1]]['data'][] = [$key, $item];
 				}
 			}
 		}
@@ -167,9 +168,9 @@ class Db extends Adapter
 	 */
 	private function revertMasks(array $configVar, $str)
 	{
-		$known_rules = array(
+		$known_rules = [
 			'nohtml' => 'htmlspecialchars_decode[' . ENT_NOQUOTES . ']',
-		);
+		];
 
 		return $this->applyMasks($configVar, $str, $known_rules);
 	}
@@ -185,22 +186,24 @@ class Db extends Adapter
 	{
 		if (isset($configVar['mask']))
 		{
-			$rules = array();
+			$rules = [];
 			if (!is_array($configVar['mask']))
 			{
-				$configVar['mask'] = array($configVar['mask']);
+				$configVar['mask'] = [$configVar['mask']];
 			}
+
 			foreach ($configVar['mask'] as $key => $mask)
 			{
 				$rules[$configVar[1]][] = $known_rules[$mask] ?? $mask;
 			}
+
 			if (!empty($rules))
 			{
 				$rules[$configVar[1]] = implode('|', $rules[$configVar[1]]);
 
 				$validator = new DataValidator();
 				$validator->sanitation_rules($rules);
-				$validator->validate(array($configVar[1] => $str));
+				$validator->validate([$configVar[1] => $str]);
 
 				return $validator->{$configVar[1]};
 			}
@@ -220,7 +223,7 @@ class Db extends Adapter
 		{
 			if (!is_numeric($k))
 			{
-				if (substr($k, 0, 2) === 'on')
+				if (strpos($k, 'on') === 0)
 				{
 					$this->context[$configVar[1]]['javascript'] .= ' ' . $k . '="' . $v . '"';
 				}
@@ -230,11 +233,14 @@ class Db extends Adapter
 				}
 			}
 		}
+
 		if (isset($configVar['message'], $txt[$configVar['message']]))
 		{
 			$this->context[$configVar[1]]['message'] = $txt[$configVar['message']];
 		}
-		if (isset($helptxt[$configVar[1]]))
+
+		// Is help available for this field based on its name
+		if (isset($helptxt[$configVar[1]]) && !isset($configVar['helptext']))
 		{
 			$this->context[$configVar[1]]['helptext'] = $configVar[1];
 		}
@@ -248,7 +254,7 @@ class Db extends Adapter
 		global $context;
 
 		$inlinePermissions = array_filter($this->configVars,
-			function ($configVar) {
+			static function ($configVar) {
 				return isset($configVar[0]) && $configVar[0] === 'permissions';
 			}
 		);
@@ -259,7 +265,7 @@ class Db extends Adapter
 		}
 
 		$permissionsForm = new InlinePermissions();
-		$permissionsForm->setExcludedGroups($context['permissions_excluded'] ?? array());
+		$permissionsForm->setExcludedGroups($context['permissions_excluded'] ?? []);
 		$permissionsForm->setPermissions($inlinePermissions);
 		$permissionsForm->prepare();
 	}
@@ -272,7 +278,7 @@ class Db extends Adapter
 		global $helptxt, $modSettings;
 
 		$bbcChoice = array_filter($this->configVars,
-			function ($configVar) {
+			static function ($configVar) {
 				return isset($configVar[0]) && $configVar[0] === 'bbc';
 			}
 		);
@@ -285,25 +291,25 @@ class Db extends Adapter
 		$codes = ParserWrapper::instance()->getCodes();
 		$bbcTags = $codes->getTags();
 		$bbcTags = array_unique($bbcTags);
-		$bbc_sections = array();
+		$bbc_sections = [];
 		foreach ($bbcTags as $tag)
 		{
-			$bbc_sections[] = array(
+			$bbc_sections[] = [
 				'tag' => $tag,
 				// @todo  'tag_' . ?
 				'show_help' => isset($helptxt[$tag]),
-			);
+			];
 		}
 
 		// Now put whatever BBC options we may have into context too!
 		foreach ($bbcChoice as $configVar)
 		{
 			$disabled = empty($modSettings['bbc_disabled_' . $configVar[1]]);
-			$this->context[$configVar[1]] = array_merge_recursive(array(
-				'disabled_tags' => $disabled ? array() : $modSettings['bbc_disabled_' . $configVar[1]],
+			$this->context[$configVar[1]] = array_merge_recursive([
+				'disabled_tags' => $disabled ? [] : $modSettings['bbc_disabled_' . $configVar[1]],
 				'all_selected' => $disabled,
 				'data' => $bbc_sections,
-			), $this->context[$configVar[1]]);
+			], $this->context[$configVar[1]]);
 		}
 	}
 
@@ -313,7 +319,7 @@ class Db extends Adapter
 	public function save()
 	{
 		list ($setArray) = $this->sanitizeVars();
-		$inlinePermissions = array();
+		$inlinePermissions = [];
 
 		foreach ($this->configVars as $var)
 		{
@@ -352,11 +358,11 @@ class Db extends Adapter
 	 */
 	protected function sanitizeVars()
 	{
-		$setTypes = array();
-		$setArray = array();
+		$setTypes = [];
+		$setArray = [];
 		foreach ($this->configVars as $var)
 		{
-			if (!isset($var[1]) || !isset($this->configValues[$var[1]]) && $var[0] !== 'check')
+			if (!isset($var[1]) || (!isset($this->configValues[$var[1]]) && $var[0] !== 'check'))
 			{
 				continue;
 			}
@@ -412,7 +418,7 @@ class Db extends Adapter
 			}
 		}
 
-		return array($setArray, $setTypes);
+		return [$setArray, $setTypes];
 	}
 
 	/**
@@ -423,11 +429,11 @@ class Db extends Adapter
 	 */
 	private function setMasks(array $configVar, $str)
 	{
-		$known_rules = array(
+		$known_rules = [
 			'nohtml' => '\\ElkArte\\Util::htmlspecialchars[' . ENT_QUOTES . ']',
 			'email' => 'valid_email',
 			'url' => 'valid_url',
-		);
+		];
 
 		return $this->applyMasks($configVar, $str, $known_rules);
 	}
@@ -444,11 +450,11 @@ class Db extends Adapter
 
 		if (!isset($this->configValues[$var[1] . '_enabledTags']))
 		{
-			$this->configValues[$var[1] . '_enabledTags'] = array();
+			$this->configValues[$var[1] . '_enabledTags'] = [];
 		}
 		elseif (!is_array($this->configValues[$var[1] . '_enabledTags']))
 		{
-			$this->configValues[$var[1] . '_enabledTags'] = array($this->configValues[$var[1] . '_enabledTags']);
+			$this->configValues[$var[1] . '_enabledTags'] = [$this->configValues[$var[1] . '_enabledTags']];
 		}
 
 		return implode(',', array_diff($bbcTags, $this->configValues[$var[1] . '_enabledTags']));

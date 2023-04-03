@@ -20,6 +20,10 @@
 	overflow: auto;
 }
 
+#adm_submenus {
+	margin-top: 5px;
+}
+
 #admin_content .content {
 	margin-bottom: .4em;
 	border: none;

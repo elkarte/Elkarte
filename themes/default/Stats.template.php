@@ -464,20 +464,22 @@ function getChartData($stats, $num = 'num_posts', $usePercent = false)
 	$labels = array_fill(0, 10, "' '");
 	$data = array_fill(0, 10, '0');
 	$tooltips = array_fill(0, 10, null);
+	$i = 0;
 
 	foreach ($stats as $value)
 	{
 		if ($usePercent)
 		{
-			$data[] = !empty($value['percent']) ? $value['percent'] : '0';
+			$data[$i] = !empty($value['percent']) ? $value['percent'] : '0';
 		}
 		else
 		{
-			$data[] = !empty($value[$num]) ? removeComma($value[$num]) : '0';
+			$data[$i] = !empty($value[$num]) ? removeComma($value[$num]) : '0';
 		}
 
-		$labels[] = "'" . Util::shorten_text(($value['name'] ?? strip_tags($value['link'])), 26, true, '...', true, 0) . "'";
-		$tooltips[] = "'" . $value[$num] . "'";
+		$labels[$i] = "'" . Util::shorten_text(($value['name'] ?? strip_tags($value['link'])), 26, true, '...', true, 0) . "'";
+		$tooltips[$i] = "'" . $value[$num] . "'";
+		$i++;
 	}
 
 	return [$data, $labels, $tooltips];

@@ -25,80 +25,40 @@ use ElkArte\Cache\Cache;
  */
 class BoardsList
 {
-	/**
-	 * All the options
-	 *
-	 * @var mixed[]
-	 */
+	/** @var array All the options */
 	private $_options;
 
-	/**
-	 * Some data regarding the current user
-	 *
-	 * @var mixed[]
-	 */
+	/** @var array Some data regarding the current user */
 	private $_user;
 
-	/**
-	 * Holds the info about the latest post of the series
-	 *
-	 * @var mixed[]
-	 */
-	private $_latest_post = array();
+	/** @var array Holds the info about the latest post of the series */
+	private $_latest_post = [];
 
-	/**
-	 * Remembers boards to easily scan the array to add moderators later
-	 *
-	 * @var int[]
-	 */
-	private $_boards = array();
+	/** @var int[] Remembers boards to easily scan the array to add moderators later */
+	private $_boards = [];
 
-	/**
-	 * An array containing all the data of the categories and boards requested
-	 *
-	 * @var mixed[]
-	 */
-	private $_categories = array();
+	/** @var array An array containing all the data of the categories and boards requested */
+	private $_categories = [];
 
-	/**
-	 * The category/board that is being processed "now"
-	 *
-	 * @var mixed[]
-	 */
-	private $_current_boards = array();
+	/** @var array The category/board that is being processed "now" */
+	private $_current_boards = [];
 
-	/**
-	 * The url where to find images
-	 *
-	 * @var string
-	 */
+	/** @var string The url where to find images */
 	private $_images_url;
 
-	/**
-	 * Cut the subject at this number of chars, set from modSettings
-	 *
-	 * @var int
-	 */
+	/** @var int Cut the subject at this number of chars, set from modSettings */
 	private $_subject_length = 48;
 
-	/**
-	 * The id of the recycle board (0 for none or not enabled)
-	 *
-	 * @var int
-	 */
+	/** @var int The id of the recycle board (0 for none or not enabled) */
 	private $_recycle_board = 0;
 
-	/**
-	 * The database!
-	 *
-	 * @var object
-	 */
+	/** @var \ElkArte\Database\QueryInterface The database! */
 	private $_db;
 
 	/**
 	 * Initialize the class
 	 *
-	 * @param mixed[] $options - Available options and corresponding defaults are:
+	 * @param array $options - Available options and corresponding defaults are:
 	 *   - 'include_categories' => false
 	 *   - 'countChildPosts' => false
 	 *   - 'base_level' => false
@@ -135,17 +95,17 @@ class BoardsList
 		// Start with an empty array.
 		if ($this->_options['include_categories'])
 		{
-			$this->_categories = array();
+			$this->_categories = [];
 		}
 		else
 		{
-			$this->_current_boards = array();
+			$this->_current_boards = [];
 		}
 
 		// For performance, track the latest post while going through the boards.
 		if (!empty($this->_options['set_latest_post']))
 		{
-			$this->_latest_post = array('timestamp' => 0);
+			$this->_latest_post = ['timestamp' => 0];
 		}
 
 		if (!empty($modSettings['recycle_enable']))
@@ -203,7 +163,7 @@ class BoardsList
 
 		$result_boards = $request->fetch_all();
 
-		usort($result_boards, function ($a, $b) {
+		usort($result_boards, static function ($a, $b) {
 			return $a['board_order'] <=> $b['board_order'];
 		});
 
@@ -333,7 +293,7 @@ class BoardsList
 				// @todo why this is not initialized outside the loop?
 				if (!isset($parent_map))
 				{
-					$parent_map = array();
+					$parent_map = [];
 				}
 
 				if (!isset($parent_map[$row_board['id_parent']]))
@@ -425,10 +385,10 @@ class BoardsList
 				$this->_current_boards[$row_board['id_parent']]['children'][$row_board['id_board']]['last_post'] = $this_last_post;
 
 				// If there are no posts in this board, it really can't be new...
-				$this->_current_boards[$row_board['id_parent']]['children'][$row_board['id_board']]['new'] &= $row_board['poster_name'] != '';
+				$this->_current_boards[$row_board['id_parent']]['children'][$row_board['id_board']]['new'] &= $row_board['poster_name'] !== '';
 			}
 			// No last post for this board?  It's not new then, is it..?
-			elseif ($row_board['poster_name'] == '')
+			elseif ($row_board['poster_name'] === '')
 			{
 				$this->_current_boards[$row_board['id_board']]['new'] = false;
 			}
@@ -445,7 +405,7 @@ class BoardsList
 			$this->_getBoardModerators();
 		}
 
-		usort($this->_categories, function ($a, $b) {
+		usort($this->_categories, static function ($a, $b) {
 			return $a['order'] <=> $b['order'];
 		});
 
@@ -506,7 +466,7 @@ class BoardsList
 	{
 		if (empty($this->_latest_post) || empty($this->_latest_post['link']))
 		{
-			return array();
+			return [];
 		}
 
 		return $this->_latest_post;

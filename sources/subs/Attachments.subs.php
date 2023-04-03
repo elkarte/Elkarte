@@ -40,7 +40,6 @@ use ElkArte\FileFunctions;
  * @param int $id_msg 0 or id of the message with attachments, if any.
  *                    If 0, this is an upload in progress for a new post.
  * @return bool
- * @package Attachments
  */
 function processAttachments($id_msg = 0)
 {
@@ -234,7 +233,6 @@ function processAttachments($id_msg = 0)
  * @param int $attachID
  *
  * @return array
- * @package Attachments
  */
 function attachmentUploadChecks($attachID)
 {
@@ -290,7 +288,6 @@ function attachmentUploadChecks($attachID)
  * @param mixed[] $attachmentOptions associative array of options
  *
  * @return bool
- * @package Attachments
  */
 function createAttachment(&$attachmentOptions)
 {
@@ -465,7 +462,6 @@ function createAttachment(&$attachmentOptions)
  * @param int $id_topic
  *
  * @return array
- * @package Attachments
  */
 function getAttachmentFromTopic($id_attach, $id_topic)
 {
@@ -510,7 +506,6 @@ function getAttachmentFromTopic($id_attach, $id_topic)
  * @param int $id_topic
  *
  * @return array
- * @package Attachments
  */
 function getAttachmentThumbFromTopic($id_attach, $id_topic)
 {
@@ -591,7 +586,6 @@ function getAttachmentThumbFromTopic($id_attach, $id_topic)
  * @param int $id_attach
  *
  * @return array|bool
- * @package Attachments
  */
 function isAttachmentImage($id_attach)
 {
@@ -633,7 +627,6 @@ function isAttachmentImage($id_attach)
  * - Does not check if it's a thumbnail.
  *
  * @param int $id_attach
- * @package Attachments
  */
 function increaseDownloadCounter($id_attach)
 {
@@ -665,7 +658,6 @@ function increaseDownloadCounter($id_attach)
  * @param int $max_width
  * @param int $max_height
  * @return bool whether the download and resize was successful.
- * @package Attachments
  */
 function saveAvatar($temporary_path, $memID, $max_width, $max_height)
 {
@@ -779,7 +771,6 @@ function saveAvatar($temporary_path, $memID, $max_width, $max_height)
  *
  * @param string $url
  * @return mixed[]|bool the image size as array(width, height), or false on failure
- * @package Attachments
  */
 function url_image_size($url)
 {
@@ -853,7 +844,6 @@ function url_image_size($url)
  *
  * @param string $directory
  * @return array
- * @package Attachments
  */
 function getServerStoredAvatars($directory)
 {
@@ -942,7 +932,6 @@ function getServerStoredAvatars($directory)
  * @param int $old_id_thumb = 0 id of thumbnail to remove, such as from our post form
  * @param string $real_filename the fully qualified hash name of where the file is
  * @return array The updated information
- * @package Attachments
  */
 function updateAttachmentThumbnail($filename, $id_attach, $id_msg, $old_id_thumb = 0, $real_filename = '')
 {
@@ -1018,7 +1007,6 @@ function updateAttachmentThumbnail($filename, $id_attach, $id_msg, $old_id_thumb
  *
  * @param int $id_msg
  * @param bool $include_count = true if true, it also returns the attachments count
- * @package Attachments
  * @return mixed
  */
 function attachmentsSizeForMessage($id_msg, $include_count = true)
@@ -1066,7 +1054,6 @@ function attachmentsSizeForMessage($id_msg, $include_count = true)
  * @param bool $new
  *
  * @return null|string|string[]
- * @package Attachments
  */
 function getLegacyAttachmentFilename($filename, $attachment_id, $dir = null, $new = false)
 {
@@ -1100,7 +1087,6 @@ function getLegacyAttachmentFilename($filename, $attachment_id, $dir = null, $ne
  *
  * @param int $id_msg
  * @param int[] $attachment_ids
- * @package Attachments
  */
 function bindMessageAttachments($id_msg, $attachment_ids)
 {
@@ -1167,7 +1153,6 @@ function getAttachmentFilename($filename, $attachment_id, $dir = null, $new = fa
  *
  * @param int $id_attach
  * @return int[]|bool on fail else an array of id_board, id_topic
- * @package Attachments
  */
 function getAttachmentPosition($id_attach)
 {

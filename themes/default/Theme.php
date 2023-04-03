@@ -27,7 +27,6 @@ use ElkArte\Themes\Theme as BaseTheme;
 use ElkArte\Languages\Txt;
 use ElkArte\User;
 use ElkArte\Util;
-use Patchwork\JSqueeze;
 
 /**
  * Class Theme
@@ -872,7 +871,7 @@ class Theme extends BaseTheme
 	 */
 	private function formatInlineJS($files, $tabs = 3)
 	{
-		global $modSettings;
+		global $modSettings, $settings;
 
 		// Scrunch
 		if (!empty($modSettings['minify_css_js']))
@@ -880,12 +879,10 @@ class Theme extends BaseTheme
 			// Inline can have user prefs etc. so caching is not a viable option
 			// Benchmarked: at 0.01627s wall clock, 16.26ms for computations, 42% size reduction
 			// for large load, 10.3ms (.0104s) for normal sized inline.
-			require_once(EXTDIR . '/JSqueeze.php');
-			$jsqueeze = new JSqueeze();
-
+			$combiner = new SiteCombiner($settings['default_theme_cache_dir'], $settings['default_theme_cache_url'], true);
 			foreach ($files as $i => $js_block)
 			{
-				$files[$i] = $jsqueeze->squeeze($js_block);
+				$files[$i] = $combiner->jsMinify($js_block);
 			}
 
 			return $files;
@@ -949,12 +946,12 @@ class Theme extends BaseTheme
 
 		if ($type === 'all' || $type === 'css')
 		{
-			$result &= $combiner->removeCssHives();
+			$result = $combiner->removeCssHives();
 		}
 
 		if ($type === 'all' || $type === 'js')
 		{
-			$result &= $combiner->removeJsHives();
+			$result = $result && $combiner->removeJsHives();
 		}
 
 		return $result;
@@ -1029,6 +1026,8 @@ class Theme extends BaseTheme
 	 */
 	public function template_inlinecss()
 	{
+		global $modSettings, $settings;
+
 		$style_tag = '';
 
 		// Combine and minify the CSS files to save bandwidth and requests?
@@ -1052,11 +1051,17 @@ class Theme extends BaseTheme
 			}
 		}
 
-		if (!empty($style_tag))
+		if ($style_tag !== '')
 		{
+			if (!empty($modSettings['minify_css_js']))
+			{
+				$combiner = new SiteCombiner($settings['default_theme_cache_dir'], $settings['default_theme_cache_url'], true);
+				$style_tag = $combiner->cssMinify($style_tag, true);
+			}
+
 			echo '
 	<style>
-		' . trim($style_tag) . '
+	' . $style_tag . '
 	</style>';
 		}
 	}

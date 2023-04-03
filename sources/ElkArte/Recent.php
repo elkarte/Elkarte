@@ -247,7 +247,7 @@ class Recent
 				$boards = boardsAllowedTo($permission);
 
 				// If 0 is the only thing in the array, they can do it everywhere!
-				if (!empty($boards) && $boards[0] == 0)
+				if (!empty($boards) && $boards[0] === 0)
 				{
 					$boards = array_keys($this->_board_ids[$type]);
 				}

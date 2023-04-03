@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This class handles display, edit, save, of forum settings.
+ * This class handles display, edit, save, of forum settings (Settings.php).
  *
  * @package   ElkArte Forum
  * @copyright ElkArte Forum contributors
@@ -30,10 +30,10 @@ class File extends Db
 	private $last_settings_change;
 
 	/** @var array */
-	private $settingsArray = array();
+	private $settingsArray = [];
 
 	/** @var array */
-	private $new_settings = array();
+	private $new_settings = [];
 
 	/** @var \ElkArte\FileFunctions */
 	private $fileFunc;
@@ -64,19 +64,19 @@ class File extends Db
 	{
 		global $modSettings;
 
-		$defines = array(
+		$defines = [
 			'boarddir',
 			'sourcedir',
 			'cachedir',
-		);
+		];
 
-		$safe_strings = array(
+		$safe_strings = [
 			'mtitle',
 			'mmessage',
 			'mbname',
-		);
+		];
 
-		foreach ($this->configVars as $identifier => $configVar)
+		foreach ($this->configVars as $configVar)
 		{
 			$new_setting = $configVar;
 
@@ -108,7 +108,7 @@ class File extends Db
 					if (in_array($varname, $safe_strings))
 					{
 						$new_setting['mask'] = 'nohtml';
-						$value = strtr($value, array(Util::htmlspecialchars('<br />') => "\n"));
+						$value = strtr($value, [Util::htmlspecialchars('<br />') => "\n"]);
 					}
 					$modSettings[$configVar[0]] = $value;
 				}
@@ -178,13 +178,13 @@ class File extends Db
 		$this->_fixBoardUrl();
 
 		// Any passwords?
-		$config_passwords = array(
+		$config_passwords = [
 			'db_passwd',
 			'ssi_db_passwd',
-		);
+		];
 
 		// All the strings to write.
-		$config_strs = array(
+		$config_strs = [
 			'mtitle',
 			'mmessage',
 			'language',
@@ -200,26 +200,26 @@ class File extends Db
 			'cache_accelerator',
 			'cache_memcached',
 			'url_format',
-		);
+		];
 
 		// These need HTML encoded. Be sure they all exist in $config_strs!
-		$safe_strings = array(
+		$safe_strings = [
 			'mtitle',
 			'mmessage',
 			'mbname',
-		);
+		];
 
 		// All the numeric variables.
-		$config_ints = array(
+		$config_ints = [
 			'cache_enable',
-		);
+		];
 
 		// All the checkboxes.
-		$config_bools = array(
+		$config_bools = [
 			'db_persist',
 			'db_error_send',
 			'maintenance',
-		);
+		];
 
 		// Now sort everything into a big array, and figure out arrays and etc.
 		foreach ($config_passwords as $configVar)
@@ -237,7 +237,7 @@ class File extends Db
 			{
 				if (in_array($configVar, $safe_strings))
 				{
-					$this->new_settings[$configVar] = '\'' . addcslashes(Util::htmlspecialchars(strtr($this->configValues[$configVar], array("\n" => '<br />', "\r" => '')), ENT_QUOTES), '\'\\') . '\'';
+					$this->new_settings[$configVar] = '\'' . addcslashes(Util::htmlspecialchars(strtr($this->configValues[$configVar], ["\n" => '<br />', "\r" => '']), ENT_QUOTES), '\'\\') . '\'';
 				}
 				else
 				{
@@ -294,7 +294,7 @@ class File extends Db
 				$this->configValues['boardurl'] = substr($this->configValues['boardurl'], 0, -1);
 			}
 
-			$this->configValues['boardurl'] = addProtocol($this->configValues['boardurl'], array('http://', 'https://', 'file://'));
+			$this->configValues['boardurl'] = addProtocol($this->configValues['boardurl'], ['http://', 'https://', 'file://']);
 		}
 	}
 
@@ -310,7 +310,7 @@ class File extends Db
 	{
 		foreach ($haystack as $item)
 		{
-			if ($item == $needle || (is_array($item) && $this->_array_value_exists__recursive($needle, $item)))
+			if ($item === $needle || (is_array($item) && $this->_array_value_exists__recursive($needle, $item)))
 			{
 				return true;
 			}
@@ -337,7 +337,7 @@ class File extends Db
 		// remove any /r's that made there way in here
 		foreach ($this->settingsArray as $k => $dummy)
 		{
-			$this->settingsArray[$k] = strtr($dummy, array("\r" => '')) . "\n";
+			$this->settingsArray[$k] = strtr($dummy, ["\r" => '']) . "\n";
 		}
 
 		// go line by line and see whats changing
@@ -432,7 +432,7 @@ class File extends Db
 			$tmp_cache = CACHEDIR;
 		}
 
-		$test_fp = @fopen($tmp_cache . '/settings_update.tmp', 'w+');
+		$test_fp = @fopen($tmp_cache . '/settings_update.tmp', 'wb+');
 		if ($test_fp)
 		{
 			fclose($test_fp);

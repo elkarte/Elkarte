@@ -233,7 +233,7 @@ class Recent extends AbstractController implements FrontpageInterface
 		foreach ($context['posts'] as $counter => $post)
 		{
 			// Some posts - the first posts - can't just be deleted.
-			$context['posts'][$counter]['tests']['can_delete'] &= $context['posts'][$counter]['delete_possible'];
+			$context['posts'][$counter]['tests']['can_delete'] = $context['posts'][$counter]['tests']['can_delete'] && $context['posts'][$counter]['delete_possible'];
 
 			// And some cannot be quoted...
 			$context['posts'][$counter]['tests']['can_quote'] = $context['posts'][$counter]['tests']['can_reply'] && $quote_enabled;

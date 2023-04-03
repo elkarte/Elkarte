@@ -60,7 +60,7 @@ class AttachmentsDirectory
 	protected $last_dirs = [];
 
 	/** @var \ElkArte\Database\QueryInterface|null */
-	protected $db = null;
+	protected $db;
 
 	/**
 	 * The constructor for attachment directories, controls where to add files
@@ -374,8 +374,7 @@ class AttachmentsDirectory
 	 * - Increments the above directory to the next available slot
 	 * - Uses createDirectory to create the incremental directory
 	 *
-	 * @package Attachments
-	 */
+		 */
 	public function manageBySpace()
 	{
 		if ($this->autoManageEnabled(self::AUTO_SEQUENCE))
@@ -461,8 +460,7 @@ class AttachmentsDirectory
 	 * @param string $updir
 	 * @return bool
 	 * @throws \Exception
-	 * @package Attachments
-	 *
+		 *
 	 */
 	public function createDirectory($updir)
 	{

@@ -20,32 +20,25 @@ use ElkArte\Languages\Txt;
  */
 class InlinePermissions extends Adapter
 {
-	/**
-	 * @var array
-	 */
-	private $permissions = array();
+	/** @var array */
+	private $permissions = [];
 
-	/**
-	 * @var string[]
-	 */
-	private $permissionList = array();
+	/** @var string[] */
+	private $permissionList = [];
 
-	/**
-	 * @var string[]
-	 */
-	private $illegal_permissions = array();
+	/** @var string[] */
+	private $illegal_permissions = [];
 
-	/**
-	 * @var string[]
-	 */
-	private $illegal_guest_permissions = array();
+	/** @var string[] */
+	private $illegal_guest_permissions = [];
 
-	/**
-	 * @var int[]
-	 */
-	private $excluded_groups = array();
+	/** @var int[] */
+	private $excluded_groups = [];
 
+	/** @var \ElkArte\Permissions */
 	private $permissionsObject;
+
+	/** @var \ElkArte\Database\QueryInterface|null */
 	private $db;
 
 	/**
@@ -116,7 +109,7 @@ class InlinePermissions extends Adapter
 		{
 			return;
 		}
-		$insertRows = array();
+		$insertRows = [];
 		foreach ($this->permissionList as $permission)
 		{
 			if (!isset($_POST[$permission]))
@@ -126,9 +119,9 @@ class InlinePermissions extends Adapter
 
 			foreach ($_POST[$permission] as $id_group => $value)
 			{
-				if (in_array($value, array('on', 'deny')) && !in_array($permission, $this->illegal_permissions))
+				if (in_array($value, ['on', 'deny']) && !in_array($permission, $this->illegal_permissions))
 				{
-					$insertRows[] = array($permission, (int) $id_group, $value == 'on' ? 1 : 0);
+					$insertRows[] = [$permission, (int) $id_group, $value === 'on' ? 1 : 0];
 				}
 			}
 		}
@@ -141,10 +134,10 @@ class InlinePermissions extends Adapter
 		replacePermission($insertRows);
 
 		// Do a full child update.
-		$this->permissionsObject->updateChild(array(), -1);
+		$this->permissionsObject->updateChild([], -1);
 
 		// Just in case we cached this.
-		updateSettings(array('settings_updated' => time()));
+		updateSettings(['settings_updated' => time()]);
 	}
 
 	/**
@@ -168,18 +161,18 @@ class InlinePermissions extends Adapter
 		// Load the permission settings for guests
 		foreach ($this->permissions as $permission)
 		{
-			$this->context[$permission[1]] = array(
-				-1 => array(
+			$this->context[$permission[1]] = [
+				-1 => [
 					'id' => -1,
 					'is_postgroup' => false,
 					'status' => 'off',
-				),
-				0 => array(
+				],
+				0 => [
 					'id' => 0,
 					'is_postgroup' => false,
 					'status' => 'off',
-				),
-			);
+				],
+			];
 		}
 
 		$this->db->fetchQuery('
@@ -188,12 +181,12 @@ class InlinePermissions extends Adapter
 			FROM {db_prefix}permissions
 			WHERE id_group IN (-1, 0)
 				AND permission IN ({array_string:permissions})',
-			array(
+			[
 				'denied' => 0,
 				'permissions' => $this->permissionList,
 				'deny' => 'deny',
 				'on' => 'on',
-			)
+			]
 		)->fetch_callback(
 			function ($row) {
 				$this->context[$row['permission']][$row['id_group']]['status'] = $row['status'];
@@ -209,12 +202,12 @@ class InlinePermissions extends Adapter
 				AND mg.id_parent = {int:not_inherited}' . (empty($modSettings['permission_enable_postgroups']) ? '
 				AND mg.min_posts = {int:min_posts}' : '') . '
 			ORDER BY mg.min_posts, CASE WHEN mg.id_group < {int:newbie_group} THEN mg.id_group ELSE 4 END, mg.group_name',
-			array(
+			[
 				'not_inherited' => -2,
 				'min_posts' => -1,
 				'newbie_group' => 4,
 				'permissions' => $this->permissionList,
-			)
+			]
 		)->fetch_callback(
 			function ($row) {
 				// Initialize each permission as being 'off' until proven otherwise.
@@ -222,16 +215,16 @@ class InlinePermissions extends Adapter
 				{
 					if (!isset($this->context[$permission[1]][$row['id_group']]))
 					{
-						$this->context[$permission[1]][$row['id_group']] = array(
+						$this->context[$permission[1]][$row['id_group']] = [
 							'id' => $row['id_group'],
 							'name' => $row['group_name'],
-							'is_postgroup' => $row['min_posts'] != -1,
+							'is_postgroup' => (int) $row['min_posts'] !== -1,
 							'status' => 'off',
-						);
+						];
 					}
 				}
 
-				$this->context[$row['permission']][$row['id_group']]['status'] = empty($row['status']) ? 'deny' : ($row['status'] == 1 ? 'on' : 'off');
+				$this->context[$row['permission']][$row['id_group']]['status'] = empty($row['status']) ? 'deny' : ((int) $row['status'] === 1 ? 'on' : 'off');
 
 			}
 		);
@@ -260,6 +253,7 @@ class InlinePermissions extends Adapter
 					unset($this->context[$permission[1]][$group]);
 				}
 			}
+
 			// Is this permission one that guests can't have?
 			if (in_array($permission[1], $this->illegal_guest_permissions, true))
 			{

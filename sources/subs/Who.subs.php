@@ -568,7 +568,7 @@ function prepareCreditsData()
 			'<a href="http://pajhome.org.uk/crypt/md5">Javascript Crypt</a> | &copy; Angel Marin, Paul Johnston | Licensed under <a href="https://opensource.org/licenses/BSD-3-Clause">The BSD License</a>',
 			'<a href="https://jquery.com/">JQuery</a> | &copy; jQuery Foundation and other contributors | Licensed under <a href="https://opensource.org/licenses/MIT">The MIT License (MIT)</a>',
 			'<a href="https://jqueryui.com/">JQuery UI</a> | &copy; jQuery Foundation and other contributors | Licensed under <a href="https://opensource.org/licenses/MIT">The MIT License (MIT)</a>',
-			'<a href="https://github.com/tchwork/jsqueeze">Jsqueeze</a> &copy Nicolas Grekas| Licensed under <a href="https://www.apache.org/licenses/LICENSE-2.0">Apache License, Version 2.0</a>',
+			'<a href="https://github.com/wikimedia/mediawiki-libs-Minify">JavaScriptMinifier</a> &copy Paul Copperman | Licensed under <a href="https://www.apache.org/licenses/LICENSE-2.0">Apache License, Version 2.0</a>',
 			'<a href="https://github.com/mailcheck">MailCheck</a> | &copy; Received Inc | Licensed under <a href="https://opensource.org/licenses/MIT">The MIT License (MIT)</a>',
 			'<a href="https://github.com/mneofit/multiselect">Multiselect</a> | &copy; Mikhail Neofitov | Licensed under <a href="https://opensource.org/licenses/MIT">The MIT License (MIT)</a>',
 			'<a href="https://github.com/michelf/php-markdown">PHP Markdown Lib</a> | &copy; Michel Fortin | Licensed under <a href="https://github.com/michelf/php-markdown/blob/lib/License.md">BSD-style open source</a>',
@@ -589,7 +589,7 @@ function prepareCreditsData()
 	call_integration_hook('integrate_credits', array(&$credits));
 
 	// Copyright information
-	$credits['copyrights']['elkarte'] = '&copy; 2012 - 2022 ElkArte Forum contributors';
+	$credits['copyrights']['elkarte'] = '&copy; 2012 - ' . Util::strftime('%Y', time()) . ' ElkArte Forum contributors';
 
 	return $credits;
 }

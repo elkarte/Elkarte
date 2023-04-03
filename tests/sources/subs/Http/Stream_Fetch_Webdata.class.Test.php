@@ -31,7 +31,7 @@ class TestStreamFetchWebdata extends TestCase
 				'https://www.elkarte.net/community/index.php?action=search;sa=results',
 				array('search' => 'stuff', 'search_selection' => 'all', 'advanced' => 0),
 				200,
-				'Please enter the verification code below to continue to the results',
+				'let you access this section',
 			),
 		);
 

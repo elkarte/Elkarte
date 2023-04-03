@@ -284,8 +284,11 @@ QuickReply.prototype.quote = function (iMessageId, xDeprecated)
 	// Collapsed on a quote, then simply got to the full post screen
 	if (this.bCollapsed)
 	{
-		window.location.href = elk_prepareScriptUrl(this.opt.sScriptUrl) + 'action=post;quote=' + iMessageId + ';topic=' + this.opt.iTopicId + '.' + this.opt.iStart;
-		return false;
+		// Instead of going to full post screen, lets expand the collapsed QR
+		this.swap(false, false);
+
+		//window.location.href = elk_prepareScriptUrl(this.opt.sScriptUrl) + 'action=post;quote=' + iMessageId + ';topic=' + this.opt.iTopicId + '.' + this.opt.iStart;
+		//return false;
 	}
 
 	// Insert the quote
@@ -299,18 +302,24 @@ QuickReply.prototype.quote = function (iMessageId, xDeprecated)
 	}
 
 	// Move the view to the quick reply box.
-	document.getElementById(this.opt.sJumpAnchor).scrollIntoView();
+	this.delay(250).then(() => document.getElementById(this.opt.sJumpAnchor).scrollIntoView());
 
 	return false;
+};
+
+QuickReply.prototype.delay = function(time) {
+	return new Promise(resolve => setTimeout(resolve, time));
 };
 
 // This is the callback function used after the XMLhttp request.
 QuickReply.prototype.onQuoteReceived = function (oXMLDoc)
 {
-	var sQuoteText = '';
+	let sQuoteText = '';
 
-	for (var i = 0; i < oXMLDoc.getElementsByTagName('quote')[0].childNodes.length; i++)
+	for (let i = 0; i < oXMLDoc.getElementsByTagName('quote')[0].childNodes.length; i++)
+	{
 		sQuoteText += oXMLDoc.getElementsByTagName('quote')[0].childNodes[i].nodeValue;
+	}
 
 	replaceText(sQuoteText, document.forms.postmodify.message);
 
@@ -320,13 +329,13 @@ QuickReply.prototype.onQuoteReceived = function (oXMLDoc)
 // The function handling the swapping of the quick reply area
 QuickReply.prototype.swap = function (bInit, bSavestate)
 {
-	var oQuickReplyContainer = document.getElementById(this.opt.sClassId),
-		sEditorId = this.opt.sContainerId,
+	let oQuickReplyContainer = document.getElementById(this.opt.sClassId),
+		sEditorId = this.opt.sEditorId || this.opt.sContainerId,
 		bIsFull = this.opt.bIsFull;
 
 	// Default bInit to false and bSavestate to true
-	bInit = typeof (bInit) !== 'undefined';
-	bSavestate = typeof (bSavestate) === 'undefined';
+	bInit = typeof (bInit) !== 'undefined' ? bInit : false;
+	bSavestate = typeof (bSavestate) === 'undefined' ? true : bSavestate;
 
 	// Flip our current state if not responding to an initial loading
 	if (!bInit)
@@ -335,7 +344,8 @@ QuickReply.prototype.swap = function (bInit, bSavestate)
 	}
 
 	// Swap the class on the expcol image as needed
-	var sTargetClass = !this.bCollapsed ? this.opt.sClassCollapsed : this.opt.sClassExpanded;
+	let sTargetClass = !this.bCollapsed ? this.opt.sClassCollapsed : this.opt.sClassExpanded;
+
 	if (oQuickReplyContainer.className !== sTargetClass)
 	{
 		oQuickReplyContainer.className = sTargetClass;
@@ -347,20 +357,22 @@ QuickReply.prototype.swap = function (bInit, bSavestate)
 	// Show or hide away
 	if (this.bCollapsed)
 	{
-		$('#' + this.opt.sContainerId).slideUp();
+		$('#' + this.opt.sContainerId).slideUp(250);
 	}
 	else
 	{
-		if ('console' in window)
+		$('#' + this.opt.sContainerId).slideDown(250, function()
 		{
-			window.console.info(bIsFull);
-		}
-
-		$('#' + this.opt.sContainerId).slideDown();
-		if (bIsFull)
-		{
-			$('#' + sEditorId).trigger('resize');
-		}
+			if (bIsFull)
+			{
+				// Force the editor to a min height, otherwise its just 2 lines
+				let	instance = sceditor.instance(document.getElementById(sEditorId));
+				if (instance)
+				{
+					instance.height(250);
+				}
+			}
+		});
 	}
 
 	// Using a cookie for guests?
@@ -806,7 +818,8 @@ InTopicModeration.prototype.handleClick = function (oCheckbox)
 		}
 
 		// Add the special selected buttons.
-		aButtonCounter.forEach((addButton) => {
+		aButtonCounter.forEach((addButton) =>
+		{
 			let upperButton = addButton[0].toUpperCase() + addButton.substring(1);
 
 			// As in bCanRemove etc.
@@ -1569,7 +1582,8 @@ InTopicListModeration.prototype.init = function ()
 		eSelectAll = document.getElementById('select_all');
 
 	// Bind a click event to each action button
-	eCheckboxes.forEach((eCheck) => {
+	eCheckboxes.forEach((eCheck) =>
+	{
 		eCheck.onclick = this.handleClick.bind(this, eCheck);
 	});
 
@@ -1582,7 +1596,10 @@ InTopicListModeration.prototype.init = function ()
 	// Watch for the select/unselect all click
 	if (eSelectAll !== null)
 	{
-		eSelectAll.addEventListener('change', () => {this.handleClick();});
+		eSelectAll.addEventListener('change', () =>
+		{
+			this.handleClick();
+		});
 	}
 };
 
@@ -1694,7 +1711,7 @@ InTopicListModeration.prototype.handleClick = function (oCheckbox)
 };
 
 // Add / modifying buttons as defined in the options
-InTopicListModeration.prototype.addButtons = function()
+InTopicListModeration.prototype.addButtons = function ()
 {
 	this.opt.aQmActions.forEach((action) =>
 	{

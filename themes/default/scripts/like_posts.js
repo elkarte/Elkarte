@@ -7,7 +7,7 @@
  */
 
 /**
- * Functions to provide ajax capability to the like / unlike button
+ * Functions to provide ajax capability to the like(react) / unlike(unreact) button
  * Makes the appropriate call in the background and updates the button text
  * and button hover title text with the new like totals / likers
  */
@@ -56,14 +56,15 @@
 				let messageId = parseInt(mId, 10),
 					topicId = parseInt(tId, 10),
 					subAction = '',
-					check = $(e.target).attr('class');
+					target = e.currentTarget,
+					check = target.getAttribute('class');
 
-				if (e.target.nodeName.toLowerCase() !== 'a')
+				if (e.currentTarget.nodeName.toLowerCase() !== 'a')
 				{
 					return false;
 				}
 
-				e.target.blur();
+				target.blur();
 
 				// Set the subAction to what they are doing
 				if (check.indexOf('unreact_button') >= 0)
@@ -83,7 +84,7 @@
 				// Need to know what we are liking of course
 				let values = {
 					'topic': topicId,
-					'msg': messageId
+					'msg': messageId,
 				};
 
 				// Make the ajax call to the likes system
@@ -106,7 +107,7 @@
 							'title': resp.title,
 							'action': subAction,
 							'messageId': messageId,
-							'event': e.target,
+							'event': target,
 						});
 					}
 					// Some failure trying to process the request

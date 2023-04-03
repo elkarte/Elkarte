@@ -14,6 +14,7 @@
  *
  *
  * Adding options to one of the setting screens isn't hard.
+ *
  * Call prepareDBSettingsContext;
  * The basic format for a checkbox is:
  *    array('check', 'nameInModSettingsAndSQL'),
@@ -58,6 +59,10 @@
 
 namespace ElkArte\SettingsForm;
 
+use ElkArte\SettingsForm\SettingsFormAdapter\Db;
+use ElkArte\SettingsForm\SettingsFormAdapter\DbTable;
+use ElkArte\SettingsForm\SettingsFormAdapter\File;
+
 /**
  * Settings Form class.
  * This class handles display, edit, save, of forum settings.
@@ -67,9 +72,9 @@ namespace ElkArte\SettingsForm;
  */
 class SettingsForm
 {
-	public const DB_ADAPTER = 'ElkArte\\SettingsForm\\SettingsFormAdapter\\Db';
-	public const DBTABLE_ADAPTER = 'ElkArte\\SettingsForm\\SettingsFormAdapter\\DbTable';
-	public const FILE_ADAPTER = 'ElkArte\\SettingsForm\\SettingsFormAdapter\\File';
+	public const DB_ADAPTER = Db::class;
+	public const DBTABLE_ADAPTER = DbTable::class;
+	public const FILE_ADAPTER = File::class;
 
 	/**
 	 * @var \ElkArte\SettingsForm\SettingsFormAdapter\Adapter

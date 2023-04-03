@@ -12,8 +12,8 @@
 
 namespace ElkArte;
 
-use Patchwork\JSqueeze;
 use tubalmartin\CssMin\Minifier as CSSmin;
+use Wikimedia\Minify\JavaScriptMinifier;
 
 /**
  * Used to combine css or js files in to a single file
@@ -22,7 +22,6 @@ use tubalmartin\CssMin\Minifier as CSSmin;
  *
  * - Checks if the files have changed, and if so rebuilds the amalgamation
  * - Calls minification classes to reduce size of css and js file saving bandwidth
- * - Can creates a .gz file, be would require .htaccess or the like to use
  */
 class SiteCombiner
 {
@@ -129,7 +128,7 @@ class SiteCombiner
 			$this->_combineFiles('js');
 
 			// Minify, or not, these files
-			$this->_minified_cache = $this->_minify ? $this->_jsCompiler() : trim($this->_cache);
+			$this->_minified_cache = $this->_minify ? $this->jsMinify($this->_cache) : trim($this->_cache);
 
 			// Combined any pre minimized + our string
 			$this->_minified_cache = $this->_min_cache . "\n" . $this->_minified_cache;
@@ -340,21 +339,13 @@ class SiteCombiner
 	 *
 	 * What it does:
 	 *
-	 * - Attempt to use JSqueeze
+	 * - Attempt to use JavaScriptMinifier
 	 * - Failing that will return original uncompressed file
 	 */
-	private function _jsCompiler()
+	public function jsMinify($js)
 	{
-		// To prevent a stack overflow segmentation fault, which silently kills Apache, we need to limit
-		// recursion on windows.  This may cause JSqueeze to fail, but at least its then catchable.
-		if (detectServer()->is('windows'))
-		{
-			@ini_set('pcre.recursion_limit', '524');
-		}
-
-		require_once(EXTDIR . '/JSqueeze.php');
-		$jsqueeze = new JSqueeze();
-		$fetch_data = $jsqueeze->squeeze($this->_cache);
+		require_once(EXTDIR . '/JavaScriptMinifier.php');
+		$fetch_data = JavaScriptMinifier::minify($js);
 
 		// If we have nothing to return, use the original data
 		return ($fetch_data === false || trim($fetch_data) === '') ? $this->_cache : $fetch_data;
@@ -417,7 +408,7 @@ class SiteCombiner
 				}
 				else
 				{
-					$this->_minified_cache = trim($this->_jsCompiler());
+					$this->_minified_cache = trim($this->jsMinify($this->_cache));
 				}
 
 				$this->_saveFiles();
@@ -475,7 +466,7 @@ class SiteCombiner
 			$this->_combineFiles('css');
 
 			// Compress with CssMin
-			$this->_minified_cache = $this->_minify ? $this->_cssCompiler() : trim($this->_cache);
+			$this->_minified_cache = $this->_minify ? $this->cssMinify($this->_cache) : trim($this->_cache);
 
 			// Combine in any pre minimized css files to our string
 			$this->_minified_cache .= "\n" . $this->_min_cache;
@@ -494,9 +485,25 @@ class SiteCombiner
 	 *
 	 * - Attempt to use CssMin
 	 * - Failing that will return original uncompressed file
+	 *
+	 * @param string $css data to minify
+	 * @param bool $fast if true, only remove whitespace to minify
+	 * @return string Minified CSS data
 	 */
-	private function _cssCompiler()
+	public function cssMinify($css = '', $fast = false)
 	{
+		if ($fast)
+		{
+			// Simple fast whitespace and comment removal
+			return trim(
+				str_replace(
+					['; ', ': ', ' {', '{ ', ', ', '} ', ';}', '( ', ' )', '[ ', ' ]'],
+					[';', ':', '{', '{', ',', '}', '}', '(', ')', '[', ']'],
+					preg_replace(['~\s+~', '~/\*.*?\*/~s'], [' ', ''], $css)
+				)
+			);
+		}
+
 		// Temporary manual loading of css min files
 		require_once(EXTDIR . '/CssMin/Minifier.php');
 		require_once(EXTDIR . '/CssMin/Colors.php');
@@ -504,11 +511,11 @@ class SiteCombiner
 		require_once(EXTDIR . '/CssMin/Command.php');
 
 		// CSSmin it to save some space
-		return (new CSSmin())->run($this->_cache);
+		return (new CSSmin())->run($css);
 	}
 
 	/**
-	 * Minify individual javascript files
+	 * Minify individual CSS files
 	 *
 	 * @param array $files array created by loadJavascriptFile() function
 	 *
@@ -541,7 +548,15 @@ class SiteCombiner
 			if ($this->_isStale())
 			{
 				$this->_combineFiles('css');
-				$this->_minified_cache = trim( $this->_cssCompiler());
+				if (!empty($this->_min_cache))
+				{
+					$this->_minified_cache = $this->_min_cache;
+				}
+				else
+				{
+					$this->_minified_cache = trim($this->cssMinify($this->_cache));
+				}
+
 				$this->_saveFiles();
 			}
 

@@ -59,7 +59,7 @@ class Display extends AbstractModule
 	}
 
 	/**
-	 * Loads up all the attachments
+	 * Loads up all the attachments.  Called from integrate_display_message_list
 	 */
 	public static function integrate_display_message_list(&$messages, &$posters)
 	{

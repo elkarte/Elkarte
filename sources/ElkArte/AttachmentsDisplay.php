@@ -46,9 +46,14 @@ class AttachmentsDisplay
 			// The filter returns false when:
 			//  - the attachment is unapproved, and
 			//  - the viewer is not the poster of the message where the attachment is
-			$this->getAttachments($this->messages, $this->includeUnapproved, static function ($attachment_info, $all_posters) {
-				return !(!$attachment_info['approved'] && (!isset($all_posters[$attachment_info['id_msg']]) || $all_posters[$attachment_info['id_msg']] != User::$info->id));
-			}, $posters);
+			$this->getAttachments(
+				$this->messages,
+				$this->includeUnapproved,
+				static function ($attachment_info, $all_posters) {
+					return !(!$attachment_info['approved'] && (!isset($all_posters[$attachment_info['id_msg']]) || $all_posters[$attachment_info['id_msg']] != User::$info->id));
+				},
+				$posters
+			);
 		}
 	}
 
@@ -63,8 +68,7 @@ class AttachmentsDisplay
 	 * @param string|null $filter name of a callback function
 	 * @param array $all_posters
 	 *
-	 * @package Attachments
-	 */
+		 */
 	protected function getAttachments($messages, $includeUnapproved = false, $filter = null, $all_posters = array())
 	{
 		global $modSettings;
@@ -128,8 +132,7 @@ class AttachmentsDisplay
 	 * @return array of attachments
 	 * @todo change this pre-condition, too fragile and error-prone.
 	 *
-	 * @package Attachments
-	 */
+		 */
 	public function loadAttachmentContext($id_msg)
 	{
 		global $context, $modSettings, $scripturl, $topic;

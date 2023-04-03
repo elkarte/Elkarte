@@ -29,7 +29,6 @@ use ElkArte\TemporaryAttachmentsList;
 use ElkArte\Themes\ThemeLoader;
 use ElkArte\Languages\Txt;
 use ElkArte\User;
-use ElkArte\Util;
 
 /**
  * Everything to do with attachment handling / processing
@@ -40,7 +39,6 @@ use ElkArte\Util;
  * - Handles the uploading of attachments via Ajax
  * - Increments the download count where applicable
  *
- * @package Attachments
  */
 class Attachment extends AbstractController
 {
@@ -421,7 +419,7 @@ class Attachment extends AbstractController
 			$mime_type = '';
 		}
 		// Does this have a mime type?
-		elseif (empty($mime_type) || !isset($this->_req->query->image) && getValidMimeImageType($file_ext) !== '')
+		elseif (empty($mime_type) || (!isset($this->_req->query->image) && getValidMimeImageType($file_ext) !== ''))
 		{
 			$mime_type = '';
 			if (isset($this->_req->query->image))

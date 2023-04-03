@@ -1201,7 +1201,7 @@ function template_profile_group_manage()
 							<dd>
 								<input type="hidden" name="additional_groups[]" value="0" />
 								<fieldset id="additional_groupsList">
-									<legend data-collapsed="true">', $txt['additional_membergroups_show'], '</legend>
+									<legend data-collapsed="', count($context['member_groups']) === 0 ? 'true' : 'false', '">', $txt['additional_membergroups_show'], '</legend>
 									<ul>';
 
 	// For each membergroup show a checkbox so members can be assigned to more than one group.
