@@ -127,6 +127,8 @@ $txt['cache_level3'] = 'Level 3 Caching (Not Recommended)';
 $txt['cache_memcached'] = 'Memcached settings';
 $txt['cache_memcache'] = 'Memcache settings';
 $txt['cache_memcached_servers'] = '<br />Added servers:<ul class="bbc_list"><li>';
+$txt['cache_redis'] = 'Redis settings';
+$txt['cache_redis_servers'] = 'Redis settings';
 $txt['cache_accelerator'] = 'Caching Accelerator';
 
 $txt['loadavg_warning'] = '<span class="error">Please note: the settings below are to be edited with care. Setting any of them too low may render your forum <strong>unusable</strong>! The current load average is <strong>%01.2f</strong></span>';
