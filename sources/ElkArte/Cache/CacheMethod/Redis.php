@@ -23,6 +23,9 @@ class Redis extends AbstractCacheMethod
 	/** @var \Redis Redis instance representing the connection to the Redis servers. */
 	protected $obj;
 
+	/** @var server */
+	protected $server = [];
+
 	/**
 	 * {@inheritdoc}
 	 */
@@ -30,16 +33,11 @@ class Redis extends AbstractCacheMethod
 	{
 		require_once(EXTDIR . '/predis/autoload.php');
 
-		if (empty($options['servers']))
-		{
-			$options['servers'] = array('');
-		}
-
-		parent::__construct($options);
 
 		if ($this->isAvailable())
 		{
-			$this->obj	= new \Predis\Client('tcp://172.19.0.5:6379');
+			parent::__construct($options);
+			$this->addServers();
 		}
 	}
 
@@ -52,26 +50,6 @@ class Redis extends AbstractCacheMethod
 	}
 
 	/**
-	 * If this should be done as a persistent connection
-	 *
-	 * @return string|null
-	 */
-	private function _is_persist()
-	{
-		global $db_persist;
-
-		return !empty($db_persist) ? $this->prefix . '_redis' : null;
-	}
-
-	/**
-	 * {@inheritdoc}
-	 */
-	protected function setOptions()
-	{
-	
-	}
-
-	/**
 	 * Add Redis servers.
 	 *
 	 * Don't add servers if they already exist. Ideal for persistent connections.
@@ -80,7 +58,31 @@ class Redis extends AbstractCacheMethod
 	 */
 	protected function addServers()
 	{
+		if(!empty($this->_options['servers']))
+		{
+			foreach ($this->_options['servers'] as $server)
+			{
+				$server		= explode(':', trim($server));
+				$server[0]	= !empty($server[0]) ? $server[0] : 'localhost';
+				$server[1]	= !empty($server[1]) ? $server[1] : 6379;
 
+				$params = [
+					'scheme' => 'tcp',
+					'host'   => $server[0],
+					'port'   => $server[1],
+				];
+
+				try {
+					$this->obj = new \Predis\Client($params);
+					$this->obj->connect();
+					$this->server[] = "tcp://{$server[0]}:{$server[1]}";
+				}
+				catch(\Predis\Connection\ConnectionException $e) {
+					// Clear the object, should we log an error here?
+					$this->obj = null;
+				}
+			}
+		}
 	}
 
 	/**
@@ -90,7 +92,7 @@ class Redis extends AbstractCacheMethod
 	 */
 	protected function getServers()
 	{
-
+		return $this->server;
 	}
 
 	/**
@@ -108,6 +110,11 @@ class Redis extends AbstractCacheMethod
 	 */
 	public function get($key, $ttl = 120)
 	{
+		if(!is_object($this->obj))
+		{
+			return '';
+		}
+
 		$result = $this->obj->get($key);
 		$this->is_miss = $result == null;
 
@@ -119,6 +126,11 @@ class Redis extends AbstractCacheMethod
 	 */
 	public function put($key, $value, $ttl = 120)
 	{
+		if(!is_object($this->obj))
+		{
+			return '';
+		}
+
 		if ($value === null)
 		{
 			$this->obj->del($key);
@@ -132,6 +144,11 @@ class Redis extends AbstractCacheMethod
 	 */
 	public function clean($type = '')
 	{
+		if(!is_object($this->obj))
+		{
+			return '';
+		}
+
 		// Clear it out, really invalidate whats there
 		$this->obj->flush();
 	}
@@ -141,6 +158,10 @@ class Redis extends AbstractCacheMethod
 	 */
 	public function details()
 	{
+		if(!is_object($this->obj))
+		{
+			return '';
+		}
 
 		$version = $this->obj->info()['Server'];
 
