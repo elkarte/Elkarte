@@ -11,7 +11,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.1.7
+ * @version 1.1.10
  *
  * This file contains functions that are specifically done by administrators.
  *
@@ -161,8 +161,8 @@ function getQuickAdminTasks()
 		'https://github.com/elkarte/Elkarte/wiki',
 		'https://github.com/elkarte/Elkarte/wiki/features',
 		'https://github.com/elkarte/Elkarte/wiki/options',
-		'https://github.com/elkarte/Elkarte/wiki/themes',
-		'https://github.com/elkarte/Elkarte/wiki/packages'
+		'https://elkarte.github.io/themes/',
+		'https://elkarte.github.io/addons/'
 	);
 	$txt['support_resources_p2'] = sprintf($txt['support_resources_p2'],
 		'https://www.elkarte.net/',
