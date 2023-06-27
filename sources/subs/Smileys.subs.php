@@ -11,7 +11,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.1.7
+ * @version 1.1.10
  *
  */
 
@@ -193,7 +193,7 @@ function getSmiley($id)
 	$db = database();
 
 	$request = $db->query('', '
-		SELECT id_smiley AS id, code, filename, description, hidden AS location, 0 AS is_new, smiley_row AS row
+		SELECT id_smiley AS id, code, filename, description, hidden AS location, 0 AS is_new, smiley_row
 		FROM {db_prefix}smileys
 		WHERE id_smiley = {int:current_smiley}',
 		array(
@@ -203,6 +203,7 @@ function getSmiley($id)
 	if ($db->num_rows($request) != 1)
 		throw new Elk_Exception('smiley_not_found');
 	$current_smiley = $db->fetch_assoc($request);
+	$current_smiley['row'] = $current_smiley['smiley_row'];
 	$db->free_result($request);
 
 	return $current_smiley;
