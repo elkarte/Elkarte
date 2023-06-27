@@ -11,7 +11,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.1.9
+ * @version 1.1.10
  *
  */
 
@@ -1633,8 +1633,8 @@ function loadTheme($id_theme = 0, $initialize = true)
 	$context['right_to_left'] = !empty($txt['lang_rtl']);
 
 	// Allow overriding the board wide time/number formats.
-	if (empty($user_settings['time_format']) && !empty($txt['time_format']))
-		$user_info['time_format'] = $txt['time_format'];
+	if (empty($user_settings['time_format']) && !empty($modSettings['time_format']))
+		$user_info['time_format'] = $modSettings['time_format'];
 
 	if (isset($settings['use_default_images']) && $settings['use_default_images'] == 'always')
 	{
