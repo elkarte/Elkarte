@@ -8,7 +8,7 @@
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * @version 1.1.9
+ * @version 1.1.10
  *
  */
 
@@ -31,6 +31,8 @@
  */
 function pbe_email_to_bbc($text, $html)
 {
+	require_once(SUBSDIR . '/Html2BBC.class.php');
+
 	// Define some things that need to be converted/modified, outside normal html or markup
 	$tags = array(
 		'~\*\*\s?(.*?)\*\*~is' => '**$1**',
