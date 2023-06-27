@@ -1955,13 +1955,7 @@ function removeNestedQuotes($text)
 	// How many levels will we allow?
 	$max_depth = (int) $modSettings['removeNestedQuotes'];
 
-	// Remove all nested quotes?
-	if ($max_depth === 0)
-	{
-		return preg_replace(array('~\n?\[quote.*?\].+?\[/quote\]\n?~is', '~^\n~', '~\[/quote\]~'), '', $text);
-	}
-
-	// Remove just -some- of the quotes, then we need to find them all
+	// Remove quotes over our limit, then we need to find them all
 	preg_match_all('~(\[\/?quote(?:(.*?))?\])~i', $text, $matches, PREG_OFFSET_CAPTURE);
 	$depth = 0;
 	$remove = array();
@@ -2002,7 +1996,7 @@ function removeNestedQuotes($text)
 		$text = substr_replace($text, '', $start_pos, $length);
 	}
 
-	return $text;
+	return trim($text);
 }
 
 /**
