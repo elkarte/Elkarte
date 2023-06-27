@@ -11,7 +11,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.1
+ * @version 1.1.10
  *
  */
 
@@ -28,7 +28,7 @@ function detectServerLoad()
 	$cores = detectServerCores();
 
 	// The internal function should always be available
-	if (function_exists('sys_getloadavg'))
+	if (function_exists('sys_getloadavg') && sys_getloadavg() !== false)
 	{
 		$sys_load = sys_getloadavg();
 		return $sys_load[0] / $cores;
