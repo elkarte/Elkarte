@@ -11,7 +11,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.1.9
+ * @version 1.1.10
  *
  */
 
@@ -160,6 +160,7 @@ class ManageFeatures_Controller extends Action_Controller
 
 		// Initialize it with our settings
 		$settingsForm->setConfigVars($this->_basicSettings());
+		addJavascriptVar(array('txt_invalid_response' => $txt['ajax_bad_response']), true);
 
 		// Saving?
 		if (isset($this->_req->query->save))
@@ -195,7 +196,6 @@ class ManageFeatures_Controller extends Action_Controller
 
 			Template_Layers::instance()->removeAll();
 			loadTemplate('Json');
-			addJavascriptVar(array('txt_invalid_response' => $txt['ajax_bad_response']), true);
 			$context['sub_template'] = 'send_json';
 			$context['json_data'] = array(
 				'success' => $clean_hives_result,
