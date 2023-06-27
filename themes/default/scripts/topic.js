@@ -7,7 +7,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.1.1
+ * @version 1.1.10
  */
 
 /**
@@ -649,6 +649,10 @@ QuickModify.prototype.onModifyDone = function (XMLDoc)
 		// Re-Fix code blocks
 		if (typeof elk_codefix === 'function')
 			elk_codefix();
+
+		// Re-Fix quote blocks
+		if (typeof elk_quotefix === 'function')
+			elk_quotefix();
 
 		// And pretty the code
 		if (typeof prettyPrint === 'function')
