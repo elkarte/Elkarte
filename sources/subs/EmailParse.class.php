@@ -7,7 +7,7 @@
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * @version 1.1.9
+ * @version 1.1.10
  *
  */
 
@@ -692,7 +692,7 @@ class Email_Parse
 			$type = '';
 			list($field, $rest) = array_pad(explode(':', $line), 2, '');
 
-			if (strpos($line, ';'))
+			if (strpos($line, ';') !== false)
 			{
 				list ($type, $val) = explode(';', $rest);
 			}

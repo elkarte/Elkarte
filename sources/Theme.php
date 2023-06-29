@@ -7,7 +7,7 @@
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * @version 1.1
+ * @version 1.1.10
  *
  */
 
@@ -106,6 +106,7 @@ abstract class Theme
 
 		$this->css_files = &$GLOBALS['context']['css_files'];
 		$this->js_files = &$GLOBALS['context']['js_files'];
+		$this->js_vars = &$GLOBALS['context']['js_vars'];
 		$this->css_rules = &$GLOBALS['context']['css_rules'];
 		if (empty($this->css_rules))
 		{

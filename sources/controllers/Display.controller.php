@@ -607,7 +607,7 @@ class Display_Controller extends Action_Controller
 			addInlineJavascript('
 		$(function() {
 			$().linkifyvideo(oEmbedtext);
-		});');
+		});', true);
 		}
 
 		// Now create the editor.

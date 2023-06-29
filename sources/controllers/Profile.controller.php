@@ -13,7 +13,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.1.9
+ * @version 1.1.10
  *
  */
 
@@ -118,7 +118,7 @@ class Profile_Controller extends Action_Controller
 			is_not_guest();
 
 		// No menu means no access at all.
-		if (!$this->_profile_include_data || (isset($this->_profile_include_data['enabled']) && $this->_profile_include_data['enabled'] === false))
+		if (!$this->_profile_include_data || (isset($this->_profile_include_data['enabled']) && $this->_profile_include_data['enabled'] === false) || !isset($this->_profile_include_data['function']))
 			throw new Elk_Exception('no_access', false);
 
 		// Make a note of the Unique ID for this menu.

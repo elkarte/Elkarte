@@ -12,7 +12,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.1.7
+ * @version 1.1.10
  *
  */
 
@@ -450,7 +450,7 @@ class ProfileInfo_Controller extends Action_Controller
 		// Create the tabs for the template.
 		$context[$context['profile_menu_name']]['tab_data'] = array(
 			'title' => $txt['show' . $action_title],
-			'description' => sprintf($txt['showGeneric_help'], $txt['show' . $action_title]),
+			'description' => $txt['show' . $action_title . '_help'] ?? sprintf($txt['showGeneric_help'], $txt['show' . $action_title]),
 			'class' => 'profile',
 			'tabs' => array(
 				'messages' => array(

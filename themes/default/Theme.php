@@ -11,7 +11,7 @@
  * copyright:    2011 Simple Machines (http://www.simplemachines.org)
  * license:      BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.1.9
+ * @version 1.1.10
  *
  */
 
@@ -169,15 +169,17 @@ class Theme extends \Theme
 		// Using a specified version of jquery or what was shipped 3.6.0  / 1.12.1
 		$jquery_version = (!empty($modSettings['jquery_default']) && !empty($modSettings['jquery_version'])) ? $modSettings['jquery_version'] : '3.6.0';
 		$jqueryui_version = (!empty($modSettings['jqueryui_default']) && !empty($modSettings['jqueryui_version'])) ? $modSettings['jqueryui_version'] : '1.12.1';
+		$jquery_cdn = 'https://ajax.googleapis.com/ajax/libs/jquery/' . $jquery_version . '/jquery.min.js';
+		$jqueryui_cdn = 'https://ajax.googleapis.com/ajax/libs/jqueryui/' . $jqueryui_version . '/jquery-ui.min.js';
 
 		switch ($modSettings['jquery_source'])
 		{
 			// Only getting the files from the CDN?
 			case 'cdn':
 				echo '
-	<script src="https://ajax.googleapis.com/ajax/libs/jquery/' . $jquery_version . '/jquery.min.js" id="jquery"></script>',
+	<script src="' . $jquery_cdn . '" id="jquery"></script>',
 				(!empty($modSettings['jquery_include_ui']) ? '
-	<script src="https://ajax.googleapis.com/ajax/libs/jqueryui/' . $jqueryui_version . '/jquery-ui.min.js" id="jqueryui"></script>' : '');
+	<script src="' . $jqueryui_cdn . '" id="jqueryui"></script>' : '');
 				break;
 			// Just use the local file
 			case 'local':
@@ -189,9 +191,9 @@ class Theme extends \Theme
 			// CDN with local fallback
 			case 'auto':
 				echo '
-	<script src="https://ajax.googleapis.com/ajax/libs/jquery/' . $jquery_version . '/jquery.min.js" id="jquery"></script>',
+	<script src="' . $jquery_cdn . '" id="jquery"></script>',
 				(!empty($modSettings['jquery_include_ui']) ? '
-	<script src="https://ajax.googleapis.com/ajax/libs/jqueryui/' . $jqueryui_version . '/jquery-ui.min.js" id="jqueryui"></script>' : '');
+	<script src="' . $jqueryui_cdn . '" id="jqueryui"></script>' : '');
 				echo '
 	<script>
 		window.jQuery || document.write(\'<script src="', $settings['default_theme_url'], '/scripts/jquery-' . $jquery_version . '.min.js"><\/script>\');',
@@ -214,10 +216,16 @@ class Theme extends \Theme
 	{
 		global $modSettings, $settings;
 
+		if (empty($this->js_files))
+			return;
+
 		// Combine and minify javascript source files to save bandwidth and requests
-		if (!empty($modSettings['minify_css_js']))
+		require_once(__DIR__ . '/SiteCombiner.class.php');
+
+		if (!empty($modSettings['combine_css_js']))
 		{
-			$combiner = new \Site_Combiner($settings['default_theme_cache_dir'], $settings['default_theme_cache_url']);
+			$minify = !empty($modSettings['minify_css_js']);
+			$combiner = new Site_Combiner($settings['default_theme_cache_dir'], $settings['default_theme_cache_url'], $minify);
 			$combine_name = $combiner->site_js_combine($this->js_files, $do_deferred);
 
 			call_integration_hook('post_javascript_combine', array(&$combine_name, $combiner));
@@ -237,7 +245,19 @@ class Theme extends \Theme
 				}
 			}
 		}
-		// Just give them the full load then
+		// Just want to minify and not combine
+		elseif (!empty($modSettings['minify_css_js']))
+		{
+			if (!$do_deferred)
+			{
+				$combiner = new Site_Combiner($settings['default_theme_cache_dir'], $settings['default_theme_cache_url']);
+				$this->js_files = $combiner->site_js_minify($this->js_files);
+
+				// Output all the files
+				$this->outputJavascriptFiles($this->js_files);
+			}
+		}
+		// Not combining or minifying, just give them the original files
 		else
 		{
 			// While we have Javascript files to place in the template
@@ -247,8 +267,33 @@ class Theme extends \Theme
 				{
 					echo '
 	<script src="', $js_file['filename'], '" id="', $id, '"', !empty($js_file['options']['async']) ? ' async="async"' : '', '></script>';
+
+					// Reset, templates can still add _files_, but they will be output in template_html_below.
+					unset($js_file['filename']);
 				}
 			}
+		}
+	}
+
+	/**
+	 * Outputs script tags to the template with appropriate defer, async or void attributes
+	 *
+	 * Called from template_html_above to output JS defined in the *CONTROLLERS*
+	 * Called from template_html_below to output JS defined in the *TEMPLATES*.
+	 *
+	 * @param array $files
+	 * @return void
+	 */
+	public function outputJavascriptFiles($files)
+	{
+		// While we have Javascript files to place in the template
+		foreach ($files as $id => $js_file)
+		{
+			$async = !empty($js_file['options']['async']) ? ' async="async"' : '';
+			$defer = !empty($js_file['options']['defer']) ? ' defer="defer"' : '';
+
+			echo '
+	<script src="', $js_file['filename'], '" id="', $id, '"', $async, $defer, '></script>';
 		}
 	}
 
@@ -294,7 +339,7 @@ class Theme extends \Theme
 	 */
 	public function template_javascript($do_deferred = false)
 	{
-		global $modSettings;
+		global $modSettings, $settings;
 
 		// First up, load jQuery and jQuery UI
 		if (isset($modSettings['jquery_source']) && !$do_deferred)
@@ -329,8 +374,17 @@ class Theme extends \Theme
 			if (!empty($this->js_inline['defer']) && $do_deferred)
 			{
 				// Combine them all in to one output
-				$this->js_inline['defer'] = array_map('trim', $this->js_inline['defer']);
-				$inline_defered_code = implode("\n\t\t", $this->js_inline['defer']);
+				if (!empty($modSettings['minify_css_js']))
+				{
+					$combiner = new Site_Combiner($settings['default_theme_cache_dir'], $settings['default_theme_cache_url'], true);
+					$inline_defered_code = implode("\n", $this->js_inline['defer']);
+					$inline_defered_code = $combiner->jsMinify($inline_defered_code);
+				}
+				else
+				{
+					$this->js_inline['defer'] = array_map('trim', $this->js_inline['defer']);
+					$inline_defered_code = implode("\n\t\t", $this->js_inline['defer']);
+				}
 
 				// Output the deferred script
 				echo '
@@ -342,12 +396,23 @@ class Theme extends \Theme
 			// Standard output, and our javascript vars, get output when we are not on a defered call
 			if (!empty($this->js_inline['standard']) && !$do_deferred)
 			{
-				$this->js_inline['standard'] = array_map('trim', $this->js_inline['standard']);
+				// Combine them all in to one output
+				if (!empty($modSettings['minify_css_js']))
+				{
+					$combiner = new Site_Combiner($settings['default_theme_cache_dir'], $settings['default_theme_cache_url'], true);
+					$inline_standard_code = implode("\n", $this->js_inline['standard']);
+					$inline_standard_code = $combiner->jsMinify($inline_standard_code);
+				}
+				else
+				{
+					$this->js_inline['standard'] = array_map('trim', $this->js_inline['standard']);
+					$inline_standard_code = implode("\n\t\t", $this->js_inline['standard']);
+				}
 
 				// And output the js vars and standard scripts to the page
 				echo '
 	<script>
-		', implode("\n\t\t", $this->js_inline['standard']), '
+		', $inline_standard_code, '
 	</script>';
 			}
 		}
@@ -367,11 +432,14 @@ class Theme extends \Theme
 		call_integration_hook('pre_css_output');
 
 		// Combine and minify the CSS files to save bandwidth and requests?
+		require_once(__DIR__ . '/SiteCombiner.class.php');
+
 		if (!empty($this->css_files))
 		{
-			if (!empty($modSettings['minify_css_js']))
+			if (!empty($modSettings['combine_css_js']))
 			{
-				$combiner = new \Site_Combiner($settings['default_theme_cache_dir'], $settings['default_theme_cache_url']);
+				$minify = !empty($modSettings['minify_css_js']);
+				$combiner = new Site_Combiner($settings['default_theme_cache_dir'], $settings['default_theme_cache_url'], $minify);
 				$combine_name = $combiner->site_css_combine($this->css_files);
 
 				call_integration_hook('post_css_combine', array(&$combine_name, $combiner));
@@ -383,6 +451,19 @@ class Theme extends \Theme
 				}
 
 				foreach ($combiner->getSpares() as $id => $file)
+				{
+					echo '
+	<link rel="stylesheet" href="', $file['filename'], '" id="', $id, '" />';
+				}
+			}
+			// Minify and not combine
+			elseif (!empty($modSettings['minify_css_js']))
+			{
+				$combiner = new Site_Combiner($settings['default_theme_cache_dir'], $settings['default_theme_cache_url'], true);
+				$this->css_files = $combiner->site_css_minify($this->css_files);
+
+				// Output all the files
+				foreach ($this->css_files as $id => $file)
 					echo '
 	<link rel="stylesheet" href="', $file['filename'], '" id="', $id, '" />';
 			}
@@ -400,6 +481,8 @@ class Theme extends \Theme
 	 */
 	public function template_inlinecss()
 	{
+		global $modSettings, $settings;
+
 		$style_tag = '';
 
 		// Combine and minify the CSS files to save bandwidth and requests?
@@ -424,8 +507,15 @@ class Theme extends \Theme
 
 		if (!empty($style_tag))
 		{
+			if (!empty($modSettings['minify_css_js']))
+			{
+				$combiner = new Site_Combiner($settings['default_theme_cache_dir'], $settings['default_theme_cache_url'], true);
+				$style_tag = $combiner->cssMinify($style_tag, true);
+			}
+
 			echo '
-	<style>' . $style_tag . '
+	<style>
+	' . $style_tag . '
 	</style>';
 		}
 	}
@@ -489,9 +579,7 @@ class Theme extends \Theme
 			loadJavascriptFile('prettify.min.js', array('defer' => true));
 
 			addInlineJavascript('
-			$(function() {
-				prettyPrint();
-			});', true);
+				document.addEventListener("DOMContentLoaded", () => {prettyPrint();});', true);
 		}
 	}
 
@@ -504,8 +592,10 @@ class Theme extends \Theme
 
 		if (!empty($modSettings['enableVideoEmbeding']))
 		{
+			loadJavascriptFile('elk_jquery_embed.js', array('defer' => true));
+
 			addInlineJavascript('
-			var oEmbedtext = ({
+				const oEmbedtext = ({
 				embed_limit : ' . (!empty($modSettings['video_embed_limit']) ? $modSettings['video_embed_limit'] : 25) . ',
 				preview_image : ' . JavaScriptEscape($txt['preview_image']) . ',
 				ctp_video : ' . JavaScriptEscape($txt['ctp_video']) . ',
@@ -514,9 +604,8 @@ class Theme extends \Theme
 				vimeo : ' . JavaScriptEscape($txt['vimeo']) . ',
 				tiktok : ' . JavaScriptEscape($txt['tiktok']) . ',
 				dailymotion : ' . JavaScriptEscape($txt['dailymotion']) . '
-			});', true);
-
-			loadJavascriptFile('elk_jquery_embed.js', array('defer' => true));
+				});
+				document.addEventListener("DOMContentLoaded", () => {$().linkifyvideo(oEmbedtext);});', true);
 		}
 	}
 
@@ -551,7 +640,7 @@ class Theme extends \Theme
 			addInlineJavascript('
 		function elkAutoTask()
 		{
-			var tempImage = new Image();
+			let tempImage = new Image();
 			tempImage.src = elk_scripturl + "?scheduled=' . $type . ';ts=' . $ts . '";
 		}
 		window.setTimeout("elkAutoTask();", 1);', true);
@@ -569,7 +658,7 @@ class Theme extends \Theme
 		if (!empty($modSettings['todayMod']) && $modSettings['todayMod'] > 2)
 		{
 			addInlineJavascript('
-			var oRttime = ({
+				const oRttime = ({
 				referenceTime : ' . forum_time() * 1000 . ',
 				now : ' . JavaScriptEscape($txt['rt_now']) . ',
 				minute : ' . JavaScriptEscape($txt['rt_minute']) . ',
@@ -585,7 +674,7 @@ class Theme extends \Theme
 				year : ' . JavaScriptEscape($txt['rt_year']) . ',
 				years : ' . JavaScriptEscape($txt['rt_years']) . ',
 			});
-			updateRelativeTime();', true);
+			document.addEventListener("DOMContentLoaded", () => {updateRelativeTime();});', true);
 
 			$context['using_relative_time'] = true;
 		}
@@ -1009,7 +1098,8 @@ class Theme extends \Theme
 		global $settings, $context, $modSettings, $scripturl, $txt, $options;
 
 		// Queue our Javascript
-		loadJavascriptFile(array('elk_jquery_plugins.js', 'script.js', 'script_elk.js', 'theme.js'));
+		loadJavascriptFile(array('script.js', 'script_elk.js'));
+		loadJavascriptFile(array('elk_jquery_plugins.js', 'theme.js'), array('defer' => true));
 
 		// Default JS variables for use in every theme
 		$this->addJavascriptVar(array(
