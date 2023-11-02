@@ -11,7 +11,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.1.7
+ * @version 1.1.10
  *
  */
 
@@ -795,6 +795,7 @@ class ManageMembers_Controller extends Action_Controller
 		$context['show_duplicates'] = !empty($_SESSION['showdupes']);
 
 		// Determine which actions we should allow on this page.
+		$context['allowed_actions'] = array();
 		if ($context['browse_type'] === 'approve')
 		{
 			// If we are approving deleted accounts we have a slightly different list... actually a mirror ;)
