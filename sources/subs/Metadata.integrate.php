@@ -1,14 +1,14 @@
 <?php
 
 /**
- * Implementing this interface will make controllers usable as a front page
- * replacing the classic board index.
+ * Implementing this interface will create OpenGraph (OG) and Schema Org microdata.
+ * This will be inserted (theme supported) into the rendered page to improve SEO.
  *
  * @name      ElkArte Forum
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * @version 1.1.9
+ * @version 1.1.10
  *
  */
 
@@ -235,11 +235,11 @@ class Metadata_Integrate
 			'author' => array(
 				'@type' => 'Person',
 				'name' => $this->data['member']['name'],
-				'url' => $this->data['member']['href']
+				'url' => $this->data['member']['href'] ?? ''
 			),
 			'url' => $this->data['href'],
 			'articleBody' => $this->data['html_body'],
-			'articleSection' => isset($board_info['name']) ? $board_info['name'] : '',
+			'articleSection' => $board_info['name'] ?? '',
 			'datePublished' => $this->data['time'],
 			'dateModified' => !empty($this->data['modified']['name']) ? $this->data['modified']['time'] : $this->data['time'],
 			'interactionStatistic' => array(
