@@ -7,7 +7,7 @@
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * @version 1.1
+ * @version 1.1.10
  *
  */
 
@@ -21,7 +21,7 @@ class Template_Layers extends Priority
 	/**
 	 * Layers not removed in case of errors
 	 */
-	private $_error_safe_layers = null;
+	private $_error_safe_layers = array();
 
 	/**
 	 * Are we handling an error?

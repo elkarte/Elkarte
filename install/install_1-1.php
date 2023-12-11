@@ -2026,6 +2026,7 @@ class InstallInstructions_install_1_1
 				array('name' => 'id_board',      'columns' => array('id_board', 'id_msg'), 'type' => 'unique'),
 				array('name' => 'id_member',     'columns' => array('id_member', 'id_msg'), 'type' => 'unique'),
 				array('name' => 'approved',      'columns' => array('approved'), 'type' => 'key'),
+				array('name' => 'poster_time',   'columns' => array('poster_time'), 'type' => 'key'),
 				array('name' => 'ip_index',      'columns' => array('poster_ip(15)', 'id_topic'), 'type' => 'key'),
 				array('name' => 'participation', 'columns' => array('id_member', 'id_topic'), 'type' => 'key'),
 				array('name' => 'show_posts',    'columns' => array('id_member', 'id_board'), 'type' => 'key'),

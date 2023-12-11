@@ -9,7 +9,7 @@
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * @version 1.1.7
+ * @version 1.1.10
  *
  */
 
@@ -58,7 +58,7 @@ class Elk_Exception extends Exception
 		global $txt;
 
 		$this->log = $log;
-		$this->sprintf = $sprintf;
+		$this->sprintf = is_array($sprintf) ? $sprintf : (array) $sprintf;
 
 		$this->index_message = $this->loadMessage($message);
 
@@ -147,9 +147,7 @@ class Elk_Exception extends Exception
 			E::instance()->display_minimal_error($message);
 		}
 
-		$msg = !isset($txt[$msg]) ? $msg : (empty($this->sprintf) ? $txt[$msg] : vsprintf($txt[$msg], $this->sprintf));
-
-		return $msg;
+		return !isset($txt[$msg]) ? $msg : (empty($this->sprintf) ? $txt[$msg] : vsprintf($txt[$msg], $this->sprintf));
 	}
 
 	/**

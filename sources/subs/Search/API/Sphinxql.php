@@ -12,7 +12,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.1.9
+ * @version 1.1.10
  *
  */
 
@@ -182,7 +182,7 @@ class Sphinxql extends SearchAPI
 			$extra_where = array();
 			if (!empty($search_params['min_msg_id']) || !empty($search_params['max_msg_id']))
 			{
-				$extra_where[] = 'id >= ' . $search_params['min_msg_id'] . ' AND id <= ' . (empty($search_params['max_msg_id']) ? (int) $modSettings['maxMsgID'] : $search_params['max_msg_id']);
+				$extra_where[] = 'id BETWEEN ' . $search_params['min_msg_id'] . ' AND ' . (empty($search_params['max_msg_id']) ? (int) $modSettings['maxMsgID'] : $search_params['max_msg_id']);
 			}
 			if (!empty($search_params['topic']))
 			{

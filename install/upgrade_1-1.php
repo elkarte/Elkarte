@@ -1,4 +1,5 @@
 <?php
+<?php
 
 /**
  * @name      ElkArte Forum
@@ -955,6 +956,24 @@ class UpgradeInstructions_upgrade_1_1
 						$success = $privacypol->storeBackup();
 						updateSettings(array('privacypolicyRevision' => $success));
 					}
+				}
+			)
+		);
+	}
+
+	public function message_postertime_title()
+	{
+		return 'Enhancing the Message Table Index...';
+	}
+
+	public function message_postertime()
+	{
+		return array(
+			array(
+				'debug_title' => 'Adding new poster time index...',
+				'function' => function()
+				{
+					$this->table->db_add_index('{db_prefix}messages', array('name' => 'poster_time', 'columns' => array('poster_time'), 'type' => 'key'));
 				}
 			)
 		);
