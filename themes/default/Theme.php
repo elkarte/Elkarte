@@ -62,7 +62,11 @@ class Theme extends \Theme
 		if ($this->headerSent('Content-Type') === false)
 		{
 			// Probably temporary ($_REQUEST['xml'] should be replaced by $_REQUEST['api'])
-			if (isset($_REQUEST['api']) && $_REQUEST['api'] === 'json')
+			if (isset($context['sub_template']) && $context['sub_template'] === 'fatal_error')
+			{
+				header('Content-Type: text/html; charset=UTF-8');
+			}
+			elseif (isset($_REQUEST['api']) && $_REQUEST['api'] === 'json')
 			{
 				header('Content-Type: application/json; charset=UTF-8');
 			}
@@ -1248,7 +1252,7 @@ class Theme extends \Theme
 			// Variant icon definitions?
 			if (file_exists($settings['theme_dir'] . '/css/' . $context['theme_variant'] . '/icons_svg' . $context['theme_variant'] . '.css'))
 			{
-				loadCSSFile($context['theme_variant'] .  '/icons_svg' . $context['theme_variant'] . '.css');
+				loadCSSFile($context['theme_variant'] . '/icons_svg' . $context['theme_variant'] . '.css');
 			}
 
 			// Load a theme variant custom CSS
