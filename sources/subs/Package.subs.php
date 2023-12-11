@@ -11,7 +11,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.1.9
+ * @version 1.1.10
  *
  */
 
@@ -2924,6 +2924,13 @@ function elk_chmod($file, $mode = null)
 	// Make sure we have a form of 0777 or '777' or '0777' so its safe for intval '8'
 	if (($mode % 10) >= 8)
 		$mode = decoct($mode);
+
+	if (ctype_digit((string) $mode) && preg_match('~[8-9]~', $mode))
+		$mode = decoct($mode);
+
+	if (in_array($mode, [511, 420, 436]))
+		$mode = decoct($mode);
+
 	if ($mode == decoct(octdec($mode)))
 		$result = @chmod($file, intval($mode, 8));
 
