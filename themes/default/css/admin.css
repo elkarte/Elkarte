@@ -317,13 +317,14 @@ fieldset dl {
 }
 
 #ourAnnouncements dt {
-	padding: 4px 6px 2px 6px;
+	padding: 4px 6px 0 6px;
 	border-top: 1px solid;
+
 }
 
 #ourAnnouncements dt a {
 	font-weight: bold;
-	display: block;
+	font-size: 1.1em;
 }
 
 #ourAnnouncements dd {
