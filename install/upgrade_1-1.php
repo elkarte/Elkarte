@@ -411,7 +411,7 @@ class UpgradeInstructions_upgrade_1_1
 							'ignore'
 						);
 
-						// Remove any improper data
+						// Remove any improper data v1.1.7
 						$this->db->query('',
 							'DELETE FROM {db_prefix}postby_emails
 							WHERE length(id_email) < 35'
@@ -853,14 +853,14 @@ class UpgradeInstructions_upgrade_1_1
 
 	public function passwd_size_title()
 	{
-		return 'More space for passwd hash...';
+		return 'v1.1.9 :: More space for passwd hash...';
 	}
 
 	public function passwd_size()
 	{
 		return array(
 			array(
-				'debug_title' => 'Altering passwd column to varchar(255)...',
+				'debug_title' => 'v1.1.9 :: Altering passwd column to varchar(255)...',
 				'function' => function()
 				{
 					$this->table->db_change_column('{db_prefix}members',
@@ -963,7 +963,7 @@ class UpgradeInstructions_upgrade_1_1
 
 	public function message_postertime_title()
 	{
-		return 'Enhancing the Message Table Index...';
+		return 'v1.1.10 :: Enhancing the Message Table Index...';
 	}
 
 	public function message_postertime()
@@ -973,7 +973,34 @@ class UpgradeInstructions_upgrade_1_1
 				'debug_title' => 'Adding new poster time index...',
 				'function' => function()
 				{
+					// Adding this index to large forums can take some time
+					detectServer()->setTimeLimit(600);
 					$this->table->db_add_index('{db_prefix}messages', array('name' => 'poster_time', 'columns' => array('poster_time'), 'type' => 'key'));
+				}
+			)
+		);
+	}
+
+	public function message_mimimize_title()
+	{
+		return 'v1.1.10 :: Changing behavior of JS/CSS Minimizer...';
+	}
+
+	public function message_mimimize()
+	{
+		return array(
+			array(
+				'debug_title' => 'Changing combine and minimize to minimize only...',
+				'function' => function()
+				{
+					// If they are using the option, change it to use minimize only
+					if (!empty($modSettings['combine_css_js']))
+					{
+						updateSettings(array(
+							'combine_css_js' => '0',
+							'minify_css_js' => '1',
+						));
+					}
 				}
 			)
 		);
