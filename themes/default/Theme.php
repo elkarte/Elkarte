@@ -105,7 +105,7 @@ class Theme extends \Theme
 		$sent = headers_list();
 		foreach ($sent as $header)
 		{
-			if (substr($header, 0, strlen($type)) === $type)
+			if (strpos($header, $type) === 0)
 			{
 				return true;
 			}
@@ -226,6 +226,7 @@ class Theme extends \Theme
 		// Combine and minify javascript source files to save bandwidth and requests
 		require_once(__DIR__ . '/SiteCombiner.class.php');
 
+		// Combining into a single hive is depreciated since 1.1.10
 		if (!empty($modSettings['combine_css_js']))
 		{
 			$minify = !empty($modSettings['minify_css_js']);
@@ -249,7 +250,7 @@ class Theme extends \Theme
 				}
 			}
 		}
-		// Just want to minify and not combine
+		// Just want to minify and not combine.  This is the preferred format
 		elseif (!empty($modSettings['minify_css_js']))
 		{
 			if (!$do_deferred)
@@ -397,10 +398,10 @@ class Theme extends \Theme
 	</script>';
 			}
 
-			// Standard output, and our javascript vars, get output when we are not on a defered call
+			// Standard output, and our javascript vars, get output when we are not on a deferred call
 			if (!empty($this->js_inline['standard']) && !$do_deferred)
 			{
-				// Combine them all in to one output
+				// Minimize the inline JS
 				if (!empty($modSettings['minify_css_js']))
 				{
 					$combiner = new Site_Combiner($settings['default_theme_cache_dir'], $settings['default_theme_cache_url'], true);
@@ -440,6 +441,7 @@ class Theme extends \Theme
 
 		if (!empty($this->css_files))
 		{
+			// Combining is depreciated since 1.1.10
 			if (!empty($modSettings['combine_css_js']))
 			{
 				$minify = !empty($modSettings['minify_css_js']);
@@ -460,7 +462,7 @@ class Theme extends \Theme
 	<link rel="stylesheet" href="', $file['filename'], '" id="', $id, '" />';
 				}
 			}
-			// Minify and not combine
+			// Minify and not combine, the preferred action
 			elseif (!empty($modSettings['minify_css_js']))
 			{
 				$combiner = new Site_Combiner($settings['default_theme_cache_dir'], $settings['default_theme_cache_url'], true);
@@ -509,6 +511,7 @@ class Theme extends \Theme
 			}
 		}
 
+		// Minimize inline style
 		if (!empty($style_tag))
 		{
 			if (!empty($modSettings['minify_css_js']))
