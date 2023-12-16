@@ -223,14 +223,11 @@ class Theme extends \Theme
 		if (empty($this->js_files))
 			return;
 
-		// Combine and minify javascript source files to save bandwidth and requests
-		require_once(__DIR__ . '/SiteCombiner.class.php');
-
 		// Combining into a single hive is depreciated since 1.1.10
 		if (!empty($modSettings['combine_css_js']))
 		{
 			$minify = !empty($modSettings['minify_css_js']);
-			$combiner = new Site_Combiner($settings['default_theme_cache_dir'], $settings['default_theme_cache_url'], $minify);
+			$combiner = new \Site_Combiner($settings['default_theme_cache_dir'], $settings['default_theme_cache_url'], $minify);
 			$combine_name = $combiner->site_js_combine($this->js_files, $do_deferred);
 
 			call_integration_hook('post_javascript_combine', array(&$combine_name, $combiner));
@@ -255,7 +252,7 @@ class Theme extends \Theme
 		{
 			if (!$do_deferred)
 			{
-				$combiner = new Site_Combiner($settings['default_theme_cache_dir'], $settings['default_theme_cache_url']);
+				$combiner = new \Site_Combiner($settings['default_theme_cache_dir'], $settings['default_theme_cache_url']);
 				$this->js_files = $combiner->site_js_minify($this->js_files);
 
 				// Output all the files
@@ -381,7 +378,7 @@ class Theme extends \Theme
 				// Combine them all in to one output
 				if (!empty($modSettings['minify_css_js']))
 				{
-					$combiner = new Site_Combiner($settings['default_theme_cache_dir'], $settings['default_theme_cache_url'], true);
+					$combiner = new \Site_Combiner($settings['default_theme_cache_dir'], $settings['default_theme_cache_url'], true);
 					$inline_defered_code = implode("\n", $this->js_inline['defer']);
 					$inline_defered_code = $combiner->jsMinify($inline_defered_code);
 				}
@@ -404,7 +401,7 @@ class Theme extends \Theme
 				// Minimize the inline JS
 				if (!empty($modSettings['minify_css_js']))
 				{
-					$combiner = new Site_Combiner($settings['default_theme_cache_dir'], $settings['default_theme_cache_url'], true);
+					$combiner = new \Site_Combiner($settings['default_theme_cache_dir'], $settings['default_theme_cache_url'], true);
 					$inline_standard_code = implode("\n", $this->js_inline['standard']);
 					$inline_standard_code = $combiner->jsMinify($inline_standard_code);
 				}
@@ -436,16 +433,13 @@ class Theme extends \Theme
 		// Use this hook to work with CSS files pre output
 		call_integration_hook('pre_css_output');
 
-		// Combine and minify the CSS files to save bandwidth and requests?
-		require_once(__DIR__ . '/SiteCombiner.class.php');
-
 		if (!empty($this->css_files))
 		{
 			// Combining is depreciated since 1.1.10
 			if (!empty($modSettings['combine_css_js']))
 			{
 				$minify = !empty($modSettings['minify_css_js']);
-				$combiner = new Site_Combiner($settings['default_theme_cache_dir'], $settings['default_theme_cache_url'], $minify);
+				$combiner = new \Site_Combiner($settings['default_theme_cache_dir'], $settings['default_theme_cache_url'], $minify);
 				$combine_name = $combiner->site_css_combine($this->css_files);
 
 				call_integration_hook('post_css_combine', array(&$combine_name, $combiner));
@@ -465,7 +459,7 @@ class Theme extends \Theme
 			// Minify and not combine, the preferred action
 			elseif (!empty($modSettings['minify_css_js']))
 			{
-				$combiner = new Site_Combiner($settings['default_theme_cache_dir'], $settings['default_theme_cache_url'], true);
+				$combiner = new \Site_Combiner($settings['default_theme_cache_dir'], $settings['default_theme_cache_url'], true);
 				$this->css_files = $combiner->site_css_minify($this->css_files);
 
 				// Output all the files
@@ -516,7 +510,7 @@ class Theme extends \Theme
 		{
 			if (!empty($modSettings['minify_css_js']))
 			{
-				$combiner = new Site_Combiner($settings['default_theme_cache_dir'], $settings['default_theme_cache_url'], true);
+				$combiner = new \Site_Combiner($settings['default_theme_cache_dir'], $settings['default_theme_cache_url'], true);
 				$style_tag = $combiner->cssMinify($style_tag, true);
 			}
 
