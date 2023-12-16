@@ -10,10 +10,10 @@
  */
 
 // Version Constants
-const CURRENT_VERSION = '1.1.9';
+const CURRENT_VERSION = '1.1.10';
 const CURRENT_LANG_VERSION = '1.1';
 const DB_SCRIPT_VERSION = '1-1';
-const REQUIRED_PHP_VERSION = '5.5.0';
+const REQUIRED_PHP_VERSION = '7.4.0';
 
 // String constants
 const SITE_SOFTWARE = 'https://www.elkarte.net';
