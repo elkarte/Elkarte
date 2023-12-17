@@ -11,7 +11,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.1.9
+ * @version 1.1.10
  *
  */
 
@@ -620,12 +620,13 @@ class Attachment_Controller extends Action_Controller
 	{
 		global $txt;
 
+		$protocol = detectServer()->getProtocol();
+
 		// No point in a nicer message, because this is supposed to be an attachment anyway...
 		if ($check_filename === true && !file_exists($filename))
 		{
 			loadLanguage('Errors');
-
-			header((preg_match('~HTTP/1\.[01]~i', $_SERVER['SERVER_PROTOCOL']) ? $_SERVER['SERVER_PROTOCOL'] : 'HTTP/1.0') . ' 404 Not Found');
+			header($protocol . ' 404 Not Found');
 			header('Content-Type: text/plain; charset=UTF-8');
 
 			// We need to die like this *before* we send any anti-caching headers as below.
@@ -641,7 +642,7 @@ class Attachment_Controller extends Action_Controller
 				@ob_end_clean();
 
 				// Answer the question - no, it hasn't been modified ;).
-				header('HTTP/1.1 304 Not Modified');
+				header($protocol . ' 304 Not Modified');
 				exit;
 			}
 		}
@@ -651,7 +652,7 @@ class Attachment_Controller extends Action_Controller
 		{
 			@ob_end_clean();
 
-			header('HTTP/1.1 304 Not Modified');
+			header($protocol . ' 304 Not Modified');
 			exit;
 		}
 

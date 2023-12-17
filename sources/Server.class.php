@@ -11,7 +11,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.1.7
+ * @version 1.1.10
  *
  */
 
@@ -257,6 +257,27 @@ class Server extends \ArrayObject
 		}
 
 		return $fallback;
+	}
+
+	/**
+	 * Determine what HTTP protocol the server is using, if unknown default to HTTP/1.0
+	 *
+	 * @return string
+	 */
+	public function getProtocol()
+	{
+		if (empty($_SERVER['SERVER_PROTOCOL']))
+		{
+			return 'HTTP/1.0';
+		}
+
+		// HTTP/1.0, HTTP/1.1, HTTP/2, HTTP/2.0 etc
+		if (preg_match('~^\s*(HTTP\/[123](\.\d)?)\s*$~i', $_SERVER['SERVER_PROTOCOL'], $matches) === 1)
+		{
+			return $matches[1];
+		}
+
+		return 'HTTP/1.0';
 	}
 
 	/**

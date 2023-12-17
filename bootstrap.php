@@ -92,10 +92,10 @@ class Bootstrap
 		define('ELKBOOT', '1');
 
 		// The software version
-		define('FORUM_VERSION', 'ElkArte 1.1.9');
+		define('FORUM_VERSION', 'ElkArte 1.1.10');
 
 		// Shortcut for the browser cache stale
-		define('CACHE_STALE', '?R119');
+		define('CACHE_STALE', '?R1110');
 	}
 
 	/**
