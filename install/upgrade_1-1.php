@@ -1,5 +1,4 @@
 <?php
-<?php
 
 /**
  * @name      ElkArte Forum
@@ -993,6 +992,8 @@ class UpgradeInstructions_upgrade_1_1
 				'debug_title' => 'Changing combine and minimize to minimize only...',
 				'function' => function()
 				{
+					theme()->cleanHives();
+
 					// If they are using the option, change it to use minimize only
 					if (!empty($modSettings['combine_css_js']))
 					{
