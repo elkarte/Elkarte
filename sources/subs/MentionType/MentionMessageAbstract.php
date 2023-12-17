@@ -7,7 +7,7 @@
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * @version 1.1.7
+ * @version 1.1.10
  *
  */
 
@@ -39,14 +39,14 @@ abstract class Mention_Message_Abstract implements Mention_Type_Interface
 	 *
 	 * @var \Database
 	 */
-	protected $_db = null;
+	protected $_db;
 
 	/**
 	 * The Notifications_Task in use
 	 *
 	 * @var \Notifications_Task
 	 */
-	protected $_task = null;
+	protected $_task;
 
 	/**
 	 * This static function is used to find the events to attach to a controller.
@@ -190,7 +190,7 @@ abstract class Mention_Message_Abstract implements Mention_Type_Interface
 					'id_member_to' => $member,
 					'email_address' => $members_data[$member]['email_address'],
 					'subject' => $keys['subject'],
-					'body' => $keys['body'],
+					'body' => $keys['body'] ?? '',
 					'last_id' => 0
 				);
 			}

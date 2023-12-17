@@ -7,7 +7,7 @@
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * @version 1.1
+ * @version 1.1.10
  *
  */
 
@@ -35,15 +35,19 @@ abstract class Mentions_Module_Abstract extends ElkArte\sources\modules\Abstract
 			Elk_Autoloader::instance()->register(SUBSDIR . '/MentionType', '\\ElkArte\\sources\\subs\\MentionType');
 
 			$mentions = explode(',', $modSettings['enabled_mentions']);
+			$mentions = array_unique($mentions);
 
 			foreach ($mentions as $mention)
 			{
 				$class = '\\ElkArte\\sources\\subs\\MentionType\\' . ucfirst($mention) . '_Mention';
-				$hooks = $class::getEvents($action);
-
-				foreach ($hooks as $method => $dependencies)
+				if (class_exists($class))
 				{
-					$eventsManager->register($method, array($method, array($class, $action . '_' . $method), $dependencies));
+					$hooks = $class::getEvents($action);
+
+					foreach ($hooks as $method => $dependencies)
+					{
+						$eventsManager->register($method, array($method, array($class, $action . '_' . $method), $dependencies));
+					}
 				}
 			}
 		}
