@@ -11,7 +11,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.1.7
+ * @version 1.1.10
  *
  */
 
@@ -171,9 +171,9 @@ class CoreFeatures_Controller extends Action_Controller
 					$current = !empty($modSettings['enabled_mentions']) ? explode(',', $modSettings['enabled_mentions']) : array();
 
 					if (!empty($value))
-						return array('enabled_mentions' => implode(',', array_merge($current, array('likemsg', 'rlikemsg'))));
+						return array('enabled_mentions' => implode(',', array_unique(array_merge($current, array('likemsg', 'rlikemsg')))));
 					else
-						return array('enabled_mentions' => implode(',', array_diff($current, array('likemsg', 'rlikemsg'))));
+						return array('enabled_mentions' => implode(',', array_unique(array_diff($current, array('likemsg', 'rlikemsg')))));
 				},
 			),
 			// ml = moderation log.
