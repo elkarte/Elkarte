@@ -353,7 +353,7 @@ function loadUserSettings()
 			list ($context['login_token_var'],,, $context['login_token']) = $_SESSION['token']['post-login'];
 
 		// Do we perhaps think this is a search robot? Check every five minutes just in case...
-		if ((!empty($modSettings['spider_mode']) || !empty($modSettings['spider_group'])) && (!isset($_SESSION['robot_check']) || $_SESSION['robot_check'] < time() - 300))
+		if ((!empty($modSettings['spider_mode']) || !empty($modSettings['spider_group'])) && (!isset($_SESSION['robot_check']) || $_SESSION['robot_check'] < time() - 0))
 		{
 			require_once(SUBSDIR . '/SearchEngines.subs.php');
 			$user_info['possibly_robot'] = spiderCheck();
@@ -366,6 +366,10 @@ function loadUserSettings()
 			$ci_user_agent = strtolower($req->user_agent());
 			$user_info['possibly_robot'] = (strpos($ci_user_agent, 'mozilla') === false && strpos($ci_user_agent, 'opera') === false) || preg_match('~(googlebot|slurp|crawl|msnbot|yandex|bingbot|baidu)~u', $ci_user_agent) == 1;
 		}
+
+		// If detected as a robot, and we are limiting to a single spider_group
+		if (!empty($user_info['possibly_robot']) && !empty($modSettings['spider_group']) && !empty($modSettings['spider_no_guest']))
+			$user_info['groups'] = array($modSettings['spider_group']);
 	}
 
 	// Set up the $user_info array.

@@ -1,5 +1,5 @@
 <?php
-// Version: 1.1; Search
+// Version: 1.1.10; Search
 
 $txt['set_parameters'] = 'Set Search Parameters';
 $txt['choose_board'] = 'Choose a board to search in, or search all';
@@ -127,6 +127,9 @@ $txt['spider_settings_desc'] = 'You can change settings for spider tracking from
 $txt['spider_group'] = 'Apply restrictive permissions from group';
 $txt['spider_group_note'] = 'To enable you to stop spiders indexing some pages.';
 $txt['spider_group_none'] = 'Disabled';
+
+$txt['spider_no_guest'] = 'Place the spider only in the resistive group';
+$txt['spider_no_guest_note'] = 'Enabling this removes the spider from the guest group';
 
 $txt['show_spider_online'] = 'Show spiders in the online list';
 $txt['show_spider_online_no'] = 'Not at all';
