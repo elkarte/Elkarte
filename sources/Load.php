@@ -353,7 +353,7 @@ function loadUserSettings()
 			list ($context['login_token_var'],,, $context['login_token']) = $_SESSION['token']['post-login'];
 
 		// Do we perhaps think this is a search robot? Check every five minutes just in case...
-		if ((!empty($modSettings['spider_mode']) || !empty($modSettings['spider_group'])) && (!isset($_SESSION['robot_check']) || $_SESSION['robot_check'] < time() - 300))
+		if ((!empty($modSettings['spider_mode']) || !empty($modSettings['spider_group'])) && (!isset($_SESSION['robot_check']) || $_SESSION['robot_check'] < time() - 0))
 		{
 			require_once(SUBSDIR . '/SearchEngines.subs.php');
 			$user_info['possibly_robot'] = spiderCheck();
