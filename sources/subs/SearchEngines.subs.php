@@ -11,7 +11,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.1.9
+ * @version 1.1.10
  *
  */
 
@@ -592,10 +592,10 @@ function spidersStatsDates()
 	list ($min_date, $max_date) = $db->fetch_row($request);
 	$db->free_result($request);
 
-	$min_year = (int) substr($min_date, 0, 4);
-	$max_year = (int) substr($max_date, 0, 4);
-	$min_month = (int) substr($min_date, 5, 2);
-	$max_month = (int) substr($max_date, 5, 2);
+	$min_year = (int) substr((string) $min_date, 0, 4);
+	$max_year = (int) substr((string) $max_date, 0, 4);
+	$min_month = (int) substr((string) $min_date, 5, 2);
+	$max_month = (int) substr((string) $max_date, 5, 2);
 
 	// Prepare the dates for the drop down.
 	$date_choices = array();
