@@ -261,7 +261,7 @@ class CoreFeatures_Controller extends Action_Controller
 				'setting_callback' => function ($value) {
 					// Turn off the spider group if disabling.
 					if (!$value)
-						return array('spider_group' => 0, 'show_spider_online' => 0);
+						return array('spider_group' => 0, 'show_spider_online' => 0, 'spider_no_guest' => 0);
 				},
 				'on_save' => function () {
 					require_once(SUBSDIR . '/SearchEngines.subs.php');
