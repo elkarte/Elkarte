@@ -31,7 +31,7 @@ function bb2_display_denial($settings, $package, $key, $previous_key = false)
 	$ip = explode(".", $package['ip']);
 	$ip_hex = "";
 	foreach ($ip as $octet) {
-		$ip_hex .= str_pad(dechex($octet), 2, 0, STR_PAD_LEFT);
+		$ip_hex .= str_pad(dechex((int) $octet), 2, 0, STR_PAD_LEFT);
 	}
 	$support_key = implode("-", str_split("$ip_hex$key", 4));
 
