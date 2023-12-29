@@ -11,7 +11,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.1.9
+ * @version 1.1.10
  *
  */
 
@@ -677,9 +677,12 @@ class ManageBoards_Controller extends Action_Controller
 			$boardOptions['board_name'] = preg_replace('~[&]([^;]{8}|[^;]{0,8}$)~', '&amp;$1', $this->_req->post->board_name);
 
 			// Convert any html to bbc
-			$parser = new Html_2_BBC($this->_req->post->desc);
-			$boardOptions['board_description'] = Util::htmlspecialchars($parser->get_bbc());
-			preparsecode($boardOptions['board_description']);
+			if (!empty($boardOptions['board_description']))
+			{
+				$parser = new Html_2_BBC($this->_req->post->desc);
+				$boardOptions['board_description'] = Util::htmlspecialchars($parser->get_bbc());
+				preparsecode($boardOptions['board_description']);
+			}
 
 			$boardOptions['moderator_string'] = $this->_req->post->moderators;
 
