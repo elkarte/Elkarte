@@ -7,7 +7,7 @@
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * @version 1.1.9
+ * @version 1.1.10
  *
  */
 
@@ -92,6 +92,7 @@ class Html_2_BBC
 	{
 		// Up front, remove whitespace between html tags
 		$html = preg_replace('/(?:(?<=\>)|(?<=\/\>))(\s+)(?=\<\/?)/', '', $html);
+		$html = preg_replace('~[^\S\n\t]~u', ' ', $html);
 		$html = strtr($html, array('[' => '&amp#91;', ']' => '&amp#93;'));
 		$this->strip_newlines = $strip;
 		$html = $this->_returnBodyText($html);
@@ -105,7 +106,7 @@ class Html_2_BBC
 
 			// Make it a utf-8 doc always and be silent about those html structure errors
 			libxml_use_internal_errors(true);
-			$this->doc->loadHTML('<?xml encoding="UTF-8">' . $html);
+			$this->doc->loadHTML('<?xml encoding="UTF-8"><html><head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"/></head><body>' . $html . '</body></html>');
 			$this->doc->encoding = 'UTF-8';
 			libxml_clear_errors();
 		}
