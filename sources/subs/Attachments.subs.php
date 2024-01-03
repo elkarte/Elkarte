@@ -14,7 +14,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.1.9
+ * @version 1.1.10
  *
  */
 
@@ -142,7 +142,7 @@ function automanage_attachments_create_directory($updir)
 	global $modSettings, $context;
 
 	$tree = get_directory_tree_elements($updir);
-	$count = count($tree);
+	$count = empty($tree) ? 0 : count($tree);
 
 	$directory = !empty($tree) ? attachments_init_dir($tree, $count) : false;
 	if ($directory === false)
