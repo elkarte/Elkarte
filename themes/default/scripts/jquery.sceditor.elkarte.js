@@ -196,12 +196,13 @@ $.sceditor.command
 	.set('spoiler', {
 		state: function () {
 			var currentNode = this.currentNode(),
-				currentRange = this.getRangeHelper();
+				currentRange = this.getRangeHelper(),
+				selectRange = currentRange.selectedRange;
 
 			// We don't have a node since we don't render the tag in the wizzy editor
 			// however we can spot check to see if the cursor is inside the tags.
-			if (currentRange.selectedRange()) {
-				var end = currentRange.selectedRange().startOffset,
+			if (typeof selectRange === 'function') {
+				var end = selectRange.startOffset,
 					text = $(currentNode).text();
 
 				// Left and right text from the cursor position and tag positions
@@ -228,13 +229,14 @@ $.sceditor.command
 	.set('footnote', {
 		state: function () {
 			var currentNode = this.currentNode(),
-				currentRange = this.getRangeHelper();
+				currentRange = this.getRangeHelper(),
+				selectRange = currentRange.selectedRange;
 
 			// We don't have an html node since we don't render the tag in the editor
 			// but we can do a spot check to see if the cursor is placed between plain tags.  This
 			// will miss with nested tags but its nicer than nothing.
-			if (currentRange.selectedRange()) {
-				var end = currentRange.selectedRange().startOffset,
+			if (typeof selectRange === 'function') {
+				var end = selectRange.startOffset,
 					text = $(currentNode).text();
 
 				// Left and right text from the cursor position and tag positions
