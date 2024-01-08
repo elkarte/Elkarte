@@ -7,7 +7,7 @@
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * @version 1.1.9
+ * @version 1.1.10
  *
  */
 
@@ -438,14 +438,21 @@ class Util
 		{
 			$ent_list = '&(#\d{1,7}|quot|amp|lt|gt|nbsp);';
 			if (function_exists('mb_strlen'))
-				return mb_strlen(preg_replace('~' . $ent_list . '|.~u', '_', $string), 'UTF-8');
+			{
+				$check = preg_replace('~' . $ent_list . '|.~u', '_', $string);
+				return $check === null ? 0 : mb_strlen($check, 'UTF-8');
+			}
 			else
-				return strlen(preg_replace('~' . $ent_list . '|.~u', '_', preg_replace_callback(self::$_entity_check_reg, 'entity_fix__callback', $string)));
+			{
+				$check = preg_replace('~' . $ent_list . '|.~u', '_', preg_replace_callback(self::$_entity_check_reg, 'entity_fix__callback', $string);
+				return $check === null ? 0 : strlen($check);
+			}
 		}
 		else
 		{
 			$ent_list = '&(#021|quot|amp|lt|gt|nbsp);';
-			return strlen(preg_replace('~' . $ent_list . '|.~u', '_', $string));
+			$check = preg_replace('~' . $ent_list . '|.~u', '_', $string);
+			return $check === null ? 0 : strlen($check);
 		}
 	}
 
