@@ -580,7 +580,12 @@ class Theme extends \Theme
 			loadJavascriptFile('prettify.min.js', array('defer' => true));
 
 			addInlineJavascript('
-				document.addEventListener("DOMContentLoaded", () => {prettyPrint();});', true);
+				document.addEventListener("DOMContentLoaded", () => {
+				if (typeof prettyPrint === "function")
+				{
+					prettyPrint();
+				}
+			});', true);
 		}
 	}
 
@@ -606,7 +611,12 @@ class Theme extends \Theme
 				tiktok : ' . JavaScriptEscape($txt['tiktok']) . ',
 				dailymotion : ' . JavaScriptEscape($txt['dailymotion']) . '
 				});
-				document.addEventListener("DOMContentLoaded", () => {$().linkifyvideo(oEmbedtext);});', true);
+				document.addEventListener("DOMContentLoaded", () => {
+					if ($.isFunction($.fn.linkifyvideo))
+					{
+						$().linkifyvideo(oEmbedtext);
+					}
+				});', true);
 		}
 	}
 
