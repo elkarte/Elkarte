@@ -444,7 +444,7 @@ class Util
 			}
 			else
 			{
-				$check = preg_replace('~' . $ent_list . '|.~u', '_', preg_replace_callback(self::$_entity_check_reg, 'entity_fix__callback', $string);
+				$check = preg_replace('~' . $ent_list . '|.~u', '_', preg_replace_callback(self::$_entity_check_reg, 'entity_fix__callback', $string));
 				return $check === null ? 0 : strlen($check);
 			}
 		}
