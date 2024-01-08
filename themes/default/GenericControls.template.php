@@ -9,7 +9,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.1.7
+ * @version 1.1.10
  *
  */
 
@@ -28,7 +28,7 @@ function template_control_richedit($editor_id, $smileyContainer = null, $bbcCont
 
 	$editor_context = &$context['controls']['richedit'][$editor_id];
 
-	$plugins = array_filter(array('bbcode', 'splittag', 'undo', (!empty($context['mentions_enabled']) ? 'mention' : '')));
+	$plugins = array_filter(array('bbcode', 'undo', 'moveTo', 'splittag', (!empty($context['mentions_enabled']) ? 'mention' : '')));
 
 	// Allow addons to insert additional editor plugin scripts
 	if (!empty($editor_context['plugin_addons']) && is_array($editor_context['plugin_addons']))
@@ -70,6 +70,8 @@ function template_control_richedit($editor_id, $smileyContainer = null, $bbcCont
 				$("#', $editor_id, '").sceditor({
 					style: "', $settings['theme_url'], '/css/', $context['theme_variant_url'], 'jquery.sceditor.elk_wiz', $context['theme_variant'], '.css', CACHE_STALE, '",
 					width: "100%",
+					autofocus: ', (!empty($context['site_action']) && $context['site_action'] !== 'display') ? 'true' : 'false', ',
+					autofocusEnd: false,
 					startInSourceMode: ', $editor_context['rich_active'] ? 'false' : 'true', ',
 					toolbarContainer: $("#editor_toolbar_container"),
 					resizeWidth: false,
@@ -150,17 +152,47 @@ function template_control_richedit($editor_id, $smileyContainer = null, $bbcCont
 				});
 				$editor_data["', $editor_id, '"] = $("#', $editor_id, '").data("sceditor");
 				$editor_container["', $editor_id, '"] = $(".sceditor-container");
-				$editor_data["', $editor_id, '"].css("code {white-space: pre;}").createPermanentDropDown();
-				if (!(is_ie || is_ff || is_opera || is_safari || is_chrome))
-					$(".sceditor-button-source").hide();
 				', isset($context['post_error']['errors']['no_message']) || isset($context['post_error']['errors']['long_message']) ? '
 				$editor_container["' . $editor_id . '"].find("textarea, iframe").addClass("border_error");' : '', '
+			}
+			
+			// Other Editor startup options, css, smiley box, validate wizzy, move into view
+			$.sceditor.plugins.moveTo = function() {
+				var base = this;
+				base.signalReady = function() {
+					let editor = this,
+						prototype = Object.getPrototypeOf(editor);
+
+					editor.css("code {white-space: pre;}");
+					editor.createPermanentDropDown();
+					if (prototype.constructor.isWysiwygSupported === false)
+					{
+						document.querySelectorAll(".sceditor-button-source").forEach((elem) => {elem.style.display = "none"});
+					}
+
+					// Move the editor into view
+					if (document.getElementById("adm_submenus") !== null)
+					{
+						// Do not scroll this menu off screen when present
+						return document.location.hash = "#adm_submenus";
+					}
+
+					if (document.getElementById("preview_section") !== null)
+					{
+						let editorLink = document.getElementById("preview_section"),
+						    jumpContainer = document.createElement("a");
+						    
+						// preview_section is hidden, so create a moveto point that can be used
+						jumpContainer.setAttribute("id", "MoveTo");   
+   						editorLink.parentNode.insertBefore(jumpContainer, editorLink.nextSibling);
+					    document.location.hash = "#MoveTo"
+       				}
+				};
 			}
 	
 			$(function() {
 				elk_editor();
 			});
-
 		</script>';
 }
 
