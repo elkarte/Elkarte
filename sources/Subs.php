@@ -218,6 +218,8 @@ function constructPageIndex($base_url, &$start, $max_value, $num_per_page, $flex
 
 	// Save whether $start was less than 0 or not.
 	$start = (int) $start;
+	$max_value = (int) $max_value;
+	$num_per_page = (int) $num_per_page;
 	$start_invalid = $start < 0;
 	$show_defaults = array(
 		'prev_next' => true,
@@ -231,12 +233,12 @@ function constructPageIndex($base_url, &$start, $max_value, $num_per_page, $flex
 		$start = 0;
 	// Not greater than the upper bound.
 	elseif ($start >= $max_value)
-		$start = max(0, (int) $max_value - (((int) $max_value % (int) $num_per_page) == 0 ? $num_per_page : ((int) $max_value % (int) $num_per_page)));
+		$start = max(0, $max_value - (($max_value % $num_per_page) === 0 ? $num_per_page : ($max_value % $num_per_page)));
 	// And it has to be a multiple of $num_per_page!
 	else
-		$start = max(0, (int) $start - ((int) $start % (int) $num_per_page));
+		$start = max(0, $start - ($start % $num_per_page));
 
-	$context['current_page'] = $start / $num_per_page;
+	$context['current_page'] = (int) ($start / $num_per_page);
 
 	$base_link = str_replace('{base_link}', ($flexible_start ? $base_url : strtr($base_url, array('%' => '%%')) . ';start=%1$d'), $settings['page_index_template']['base_link']);
 
@@ -244,7 +246,7 @@ function constructPageIndex($base_url, &$start, $max_value, $num_per_page, $flex
 	if (empty($modSettings['compactTopicPagesEnable']))
 	{
 		// Show the left arrow.
-		$pageindex = $start == 0 || !$show['prev_next'] ? ' ' : sprintf($base_link, $start - $num_per_page, str_replace('{prev_txt}', $txt['prev'], $settings['page_index_template']['previous_page']));
+		$pageindex = $start === 0 || !$show['prev_next'] ? ' ' : sprintf($base_link, $start - $num_per_page, str_replace('{prev_txt}', $txt['prev'], $settings['page_index_template']['previous_page']));
 
 		// Show all the pages.
 		$display_page = 1;
@@ -259,7 +261,7 @@ function constructPageIndex($base_url, &$start, $max_value, $num_per_page, $flex
 	else
 	{
 		// If they didn't enter an odd value, pretend they did.
-		$PageContiguous = (int) ($modSettings['compactTopicPagesContiguous'] - ($modSettings['compactTopicPagesContiguous'] % 2)) / 2;
+		$PageContiguous = (int) (($modSettings['compactTopicPagesContiguous'] - ($modSettings['compactTopicPagesContiguous'] % 2)) / 2);
 
 		// Show the "prev page" link. (>prev page< 1 ... 6 7 [8] 9 10 ... 15 next page)
 		if (!empty($start) && $show['prev_next'])
