@@ -11,7 +11,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.1.9
+ * @version 1.1.10
  *
  */
 
@@ -1441,9 +1441,9 @@ function membersBy($query, $query_params, $details = false, $only_active = true)
 		SELECT id_member' . ($details ? ', member_name, real_name, email_address, member_ip, date_registered, last_login,
 				hide_email, posts, is_activated, real_name' : '') . '
 		FROM {db_prefix}members
-		WHERE ' . $query_where . (isset($query_params['start']) ? '
-		LIMIT {int:start}, {int:limit}' : '') . (!empty($query_params['order']) ? '
-		ORDER BY {raw:order}' : ''),
+		WHERE ' . $query_where . (!empty($query_params['order']) ? '
+		ORDER BY {raw:order}' : '') . (isset($query_params['start']) ? '
+		LIMIT {int:start}, {int:limit}' : ''),
 		$query_params
 	);
 
