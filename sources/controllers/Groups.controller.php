@@ -12,7 +12,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.1.6
+ * @version 1.1.10
  *
  */
 
@@ -386,7 +386,8 @@ class Groups_Controller extends Action_Controller
 		$context['page_index'] = constructPageIndex($scripturl . '?action=' . ($context['group']['can_moderate'] ? 'moderate;area=viewgroups' : 'groups') . ';sa=members;group=' . $current_group . ';sort=' . $context['sort_by'] . (isset($this->_req->query->desc) ? ';desc' : ''), $this->_req->query->start, $context['total_members'], $modSettings['defaultMaxMembers']);
 
 		// Fetch the members that meet the where criteria
-		$context['members'] = membersBy($where, array($where => $current_group, 'order' => $querySort), true);
+		$query_params = array($where => $current_group, 'order' => $querySort, 'start' => $this->_req->query->start, 'limit' => $modSettings['defaultMaxMembers']);
+		$context['members'] = membersBy($where, $query_params, true);
 		foreach ($context['members'] as $id => $row)
 		{
 			$last_online = empty($row['last_login']) ? $txt['never'] : standardTime($row['last_login']);
