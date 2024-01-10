@@ -3,7 +3,7 @@
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * @version 1.1.9
+ * @version 1.1.10
  */
 
 /**
@@ -322,8 +322,9 @@
 				$like_post_message_data.html('');
 
 				// Build the new html to add to the page
+				const nFormat = new Intl.NumberFormat();
 				for (var i = 0, len = data.length; i < len; i++) {
-					messageUrl = elk_scripturl + '?topic=' + data[i].id_topic + '.msg' + data[i].id_msg;
+					messageUrl = elk_scripturl + '?topic=' + data[i].id_topic + '.msg' + data[i].id_msg + '#new';
 
 					htmlContent += '' +
 						'<div class="content forumposts">' +
@@ -332,21 +333,21 @@
 						'   </div>' +
 						'   <div class="like_stats_details">' +
 						'       <a class="poster_details largetext" href="' + data[i].member_received.href + '">' + data[i].member_received.name + '</a>' +
-						'       <div class="poster_details">' + txtStrings.totalPosts + ': ' + data[i].member_received.total_posts + '</div>' +
+						'       <div class="poster_details">' + txtStrings.totalPosts + ': ' + nFormat.format(data[i].member_received.total_posts) + '</div>' +
 						'   </div>' +
 						'   <div class="like_stats_subject largetext">' +
 						'      <a class="message_title" title="' + data[i].preview + '" href="' + messageUrl + '">' + txtStrings.topic + ': ' + data[i].subject + '</a>' +
 						'   </div>' +
 						'   <div class="separator"></div>' +
 						'   <div class="well">' +
-						'       <p>' + txtStrings.usersWhoLiked.easyReplace({1 : data[i].member_liked_data.length}) + '</p>';
+						'       <p>' + txtStrings.usersWhoLiked.easyReplace({1 : data[i].like_count.toLocaleString(undefined, {minimumFractionDigits: 0})}) + '</p>';
 
 					// All the members that liked this masterpiece of internet jibba jabba
 					for (var j = 0, likerslen = data[i].member_liked_data.length; j < likerslen; j++) {
 						htmlContent += '' +
 							'   <div class="like_stats_likers">' +
 							'       <a href="' + data[i].member_liked_data[j].href + '">' +
-							'           <img class="avatar" alt="" src="' + encodeURI(data[i].member_liked_data[j].avatar) + '" title="' + data[i].member_liked_data[j].real_name + '"/>' +
+							'           <img class="avatar" alt="" src="' + encodeURI(data[i].member_liked_data[j].avatar) + '" title="' + data[i].member_liked_data[j].real_name + '" loading="lazy"/>' +
 							'       </a> ' +
 							'   </div>';
 
@@ -384,28 +385,29 @@
 				$like_post_topic_data.html('');
 
 				// For each of the top X topics, output the info
+				const nFormat = new Intl.NumberFormat();
 				for (var i = 0, len = data.length; i < len; i++) {
 					topicUrl = elk_scripturl + '?topic=' + data[i].id_topic;
 
 					// Start with the topic info
 					htmlContent += '' +
 						'<div class="content forumposts">' +
-						'   <a class="largetext" href="' + topicUrl + '">' + data[i].msg_data[0].subject + '</a> ' + txtStrings.mostPopularTopicHeading1.easyReplace({1 : data[i].like_count}) +
+						'   <a class="largetext" href="' + topicUrl + '">' + data[i].msg_data[0].subject + '</a> ' + txtStrings.mostPopularTopicHeading1.easyReplace({1 : nFormat.format(data[i].like_count)}) +
 						'   <p class="panel_toggle secondary_header">'	+
 						'       <span class="topic_toggle">&nbsp' +
 						'           <span id="topic_toggle_img_' + i + '" class="chevricon i-chevron-up" title=""></span>' +
 						'       </span>' +
-						'       <a href="#" id="topic_toggle_link_' + i + '">' + txtStrings.mostPopularTopicSubHeading1.easyReplace({1 : data[i].msg_data.length, 2 : txtStrings.showPosts}) + '</a>' +
+						'       <a href="#" id="topic_toggle_link_' + i + '">' + txtStrings.mostPopularTopicSubHeading1.easyReplace({1 : nFormat.format(data[i].num_messages_liked), 2 : txtStrings.showPosts}) + '</a>' +
 						'   </p>' +
 						'   <div id="topic_container_' + i + '" class="hide">';
 
 					// Expand / collapse text strings for this area
 					collapse_txt[i] = txtStrings.mostPopularTopicSubHeading1.easyReplace({
-						1 : data[i].msg_data.length,
+						1 : nFormat.format(data[i].num_messages_liked),
 						2 : txtStrings.showPosts
 					});
 					expand_txt[i] = txtStrings.mostPopularTopicSubHeading1.easyReplace({
-						1 : data[i].msg_data.length,
+						1 : nFormat.format(data[i].num_messages_liked),
 						2 : txtStrings.hidePosts
 					});
 
@@ -449,6 +451,8 @@
 					boardUrl = elk_scripturl + '?board=' + data.id_board,
 					$like_post_board_data = $('.like_post_board_data');
 
+				const nFormat = new Intl.NumberFormat();
+
 				// Start off clean
 				$like_post_board_data.html('');
 
@@ -456,13 +460,13 @@
 				var htmlContent = '' +
 					'<div class="content forumposts">' +
 					'	<p>' +
-					'       <a class="largetext" href="' + boardUrl + '">' + data.name + '</a> ' + txtStrings.mostPopularBoardHeading1 + ' ' + data.like_count + ' ' + txtStrings.genricHeading1 +
+					'       <a class="largetext" href="' + boardUrl + '">' + data.name + '</a> ' + txtStrings.mostPopularBoardHeading1 + ' ' + nFormat.format(data.like_count) + ' ' + txtStrings.genricHeading1 +
 					'   </p>' +
 					'   <p>' +
-							txtStrings.mostPopularBoardSubHeading1 + ' ' + data.num_topics + ' ' + txtStrings.mostPopularBoardSubHeading2 + ' ' + data.topics_liked + ' ' + txtStrings.mostPopularBoardSubHeading3 +
+							txtStrings.mostPopularBoardSubHeading1 + ' ' + nFormat.format(data.num_topics) + ' ' + txtStrings.mostPopularBoardSubHeading2 + ' ' + nFormat.format(data.topics_liked) + ' ' + txtStrings.mostPopularBoardSubHeading3 +
 					'   </p>' +
 					'   <p>' +
-							txtStrings.mostPopularBoardSubHeading4 + ' ' + data.num_posts + ' ' + txtStrings.mostPopularBoardSubHeading5 + ' ' + data.msgs_liked + ' ' + txtStrings.mostPopularBoardSubHeading6 +
+							txtStrings.mostPopularBoardSubHeading4 + ' ' + nFormat.format(data.num_posts) + ' ' + txtStrings.mostPopularBoardSubHeading5 + ' ' + nFormat.format(data.msgs_liked) + ' ' + txtStrings.mostPopularBoardSubHeading6 +
 					'   </p>' +
 					'</div>';
 
@@ -502,6 +506,8 @@
 					collapse_txt = [],
 					$like_post_most_liked_user_data = $('.like_post_most_liked_user_data');
 
+				const nFormat = new Intl.NumberFormat();
+
 				// Clean the screen
 				$like_post_most_liked_user_data.html('').off();
 
@@ -515,8 +521,8 @@
 						'   </div>' +
 						'   <div class="like_stats_details">' +
 						'       <a class="poster_details largetext" href="' + data[i].member_received.href + '">' + data[i].member_received.name + '</a>' +
-						'       <div class="poster_details">' + txtStrings.totalPosts + ': ' + data[i].member_received.total_posts + '</div>' +
-						'       <div class="poster_details">' + txtStrings.totalLikesReceived + ': ' + data[i].like_count + '</div>' +
+						'       <div class="poster_details">' + txtStrings.totalPosts + ': ' + nFormat.format(data[i].member_received.total_posts) + '</div>' +
+						'       <div class="poster_details">' + txtStrings.totalLikesReceived + ': ' + nFormat.format(data[i].like_count) + '</div>' +
 						'   </div>' +
 						'   <p class="panel_toggle secondary_header">' +
 						'       <span class="liked_toggle">&nbsp' +
@@ -575,6 +581,8 @@
 					collapse_txt = [],
 					$like_post_most_likes_given_user_data = $('.like_post_most_likes_given_user_data');
 
+				const nFormat = new Intl.NumberFormat();
+
 				// Clear the div of any previous content
 				$like_post_most_likes_given_user_data.html('');
 
@@ -587,8 +595,8 @@
 						'   </div>' +
 						'   <div class="like_stats_details">' +
 						'       <a class="poster_details largetext" href="' + data[i].member_given.href + '">' + data[i].member_given.name + '</a>' +
-						'       <div class="poster_details">' + txtStrings.totalPosts + ': ' + data[i].member_given.total_posts + '</div>' +
-						'       <div class="poster_details">' + txtStrings.totalLikesGiven + ': ' + data[i].like_count + '</div>' +
+						'       <div class="poster_details">' + txtStrings.totalPosts + ': ' + nFormat.format(data[i].member_given.total_posts) + '</div>' +
+						'       <div class="poster_details">' + txtStrings.totalLikesGiven + ': ' + nFormat.format(data[i].like_count) + '</div>' +
 						'   </div>' +
 						'   <p class="panel_toggle secondary_header">' +
 						'       <span class="liker_toggle">&nbsp' +
