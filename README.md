@@ -2,49 +2,44 @@
 
 This is the **ElkArte** repository.
 
-ElkArte is a modern, free, powerful community building forum software. It is completely free and licensed with an open source [BSD 3-clause license](http://www.opensource.org/licenses/BSD-3-Clause).
-
-Initially based on Simple Machines Forum (SMF), it began as an overhaul of the code; to modernise, implement new features and make a forum software more relevant in a time of unprecedented social interaction. It has grown to become a modern and feature rich forum package to meet the demands of today's message board user.
+ElkArte is a modern, free, powerful community building forum software. It is completely free and licensed with an open source [BSD 3-clause license](http://www.opensource.org/licenses/BSD-3-Clause).  It has grown to become a modern and feature rich forum package to meet the demands of today's message board user.
 
 Enjoy the benefits of enthusiasts from around the world who spend time making ElkArte what it is today.
 
-Test ElkArte yourself by [visiting ElkArte.net](https://www.elkarte.net).
+Test ElkArte yourself by [visiting ElkArte.net](https://www.elkarte.net/community/index.php).
 
 Contributions to documentation are licensed under [CC-by-SA 3](http://creativecommons.org/licenses/by-sa/3.0). Third party libraries or sets of images, are under their own licenses.
 
 ![Build Status](https://github.com/elkarte/Elkarte/workflows/UnitTests/badge.svg)
-[![Open Issues](https://img.shields.io/github/issues/elkarte/Elkarte.svg?style=flat)](https://github.com/elkarte/Elkarte/issues)
 [![Downloads](https://img.shields.io/github/downloads/elkArte/Elkarte/total)](https://github.com/elkarte/Elkarte/releases)
 [![Current Release](https://img.shields.io/github/release/elkarte/ElkArte.svg?style=flat)](https://github.com/elkarte/ElkArte/releases)
 [![License](https://img.shields.io/badge/License-BSD-green.svg?style=flat)](http://opensource.org/licenses/BSD-3-Clause)
+[![Issues-closed](https://img.shields.io/github/issues-closed/elkarte/Elkarte.svg)](https://gitHub.com/elkarte/Elkarte/issues?q=is%3Aissue+is%3Aclosed)
+![GitHub Repo stars](https://img.shields.io/github/stars/elkarte/Elkarte?style=flat)
 
 ## A small sample of ElkArte's features
 * @Mentioning users including site and/or email notifications
 * Likes for posts and topics
 * Drafts, including auto save
-* OpenID 2.0 (BC Math must be available)
 * Two built in modern, responsive themes
 * Integrated video embedding for youtube, tiktok, vimeo and dailymotion
-* Drag and drop post attachments
+* Drag and drop attachments
 * Improved password hashing using industry standards
 * Drag and drop ordering (boards, categories, custom profile fields) in the admin panel
 * Improved Anti Spam measures
 * Bad Behaviour built in
-* Automatic combining and minifying of JavaScript and CSS
+* Automatic minifying of JavaScript and CSS
 * Posting and Replying by Email (PM's and Posts)
 * Ajax previews and responses throughout the user interface
-* Utilizes jQuery and Font Awesome
 * Quick Quote allows quoting selected text in your post
 * webP image support (GD or Imagick must have support)
 
 ## Requirements
 
-* PHP version 5.3 or newer, (works on 8.1)
+* PHP version 7.3 or newer, fully works with 8.x
 * MySQL 5 and newer OR PostgreSQL 8.3 and newer
 
 On the client side, ElkArte will run & look good with its responsive theme in just about any modern browser, smartphone or tablet.
-
-
 
 ## Setting up an ElkArte Forum:
 
@@ -81,10 +76,5 @@ Browse the collections of Themes and Addons created by our [awesome community](h
 Please see our [How to contribute](https://github.com/elkarte/Elkarte/blob/master/CONTRIBUTING.md) section for more information on how to contribute to the ElkArte Project.
 
 ## Class / Method / Function documentation
+
 ElkArte utilizes inline docblocks to provide descriptions for all of its classes, methods and functions.  This [API Documentation](https://elkarte.github.io/Doc/) is available online for viewing and searching.
-
-## Site and IRC
-
-Join us on IRC, on #elkarte channel on freenode.
-
-Project site: [www.elkarte.net](https://www.elkarte.net)
