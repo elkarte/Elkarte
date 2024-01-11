@@ -11,7 +11,7 @@
  *
  */
 
-	use BBC\ParserWrapper;
+use BBC\ParserWrapper;
 
 /**
  * Updates the like value for a post/member combo if there are no problems with

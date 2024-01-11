@@ -240,8 +240,8 @@ class Metadata_Integrate
 			'url' => $this->data['href'],
 			'articleBody' => $this->data['html_body'],
 			'articleSection' => $board_info['name'] ?? '',
-			'datePublished' => $this->data['time'],
-			'dateModified' => !empty($this->data['modified']['name']) ? $this->data['modified']['time'] : $this->data['time'],
+			'datePublished' => $this->utc_time($this->data['timestamp']),
+			'dateModified' => !empty($this->data['modified']['name']) ?  $this->utc_time($this->data['modified']['timestamp']) :  $this->utc_time($this->data['timestamp']),
 			'interactionStatistic' => array(
 				'@type' => 'InteractionCounter',
 				'interactionType' => 'https://schema.org/ReplyAction',
@@ -272,6 +272,43 @@ class Metadata_Integrate
 		}
 
 		return $smd;
+	}
+
+	/**
+	 * Convert a given timestamp to UTC time in the format of Atom date format.
+	 *
+	 * This method takes a timestamp as input and converts it to UTC time in the format of
+	 * Atom date format (YYYY-MM-DDTHH:MM:SS+00:00).
+	 *
+	 * It considers the user's time offset, system's time offset, and the default timezone setting
+	 * from the modifications/settings administration panel.
+	 *
+	 * @param int $timestamp The timestamp to convert to UTC time.
+	 * @return string The UTC time in the format of Atom date format.
+	 */
+	private function utc_time($timestamp)
+	{
+		global $user_info, $modSettings;
+
+		// We do not receive raw unix time from prepareDisplayContext_callback, so back it out
+		if (!empty($user_info['time_offset']))
+		{
+			$timestamp -= ($modSettings['time_offset'] + $user_info['time_offset']) * 3600;
+		}
+
+		// Using the system timezone offset, format the date
+		try
+		{
+			$tz = empty($modSettings['default_timezone']) ? 'UTC' : $modSettings['default_timezone'];
+			$date = new DateTime( '@'.$timestamp, new DateTimeZone($tz));
+		}
+		catch (Exception $e)
+		{
+			return standardTime($timestamp);
+		}
+
+		// Something like 2012-12-21T11:11:00+00:00
+		return $date->format(DateTimeInterface::ATOM);
 	}
 
 	/**
