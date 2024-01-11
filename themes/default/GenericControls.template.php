@@ -193,6 +193,7 @@ function template_control_richedit($editor_id, $smileyContainer = null, $bbcCont
 			$(function() {
 				elk_editor();
 			});
+
 		</script>';
 }
 
