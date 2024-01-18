@@ -12,7 +12,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.1.9
+ * @version 1.1.10
  *
  */
 
@@ -636,7 +636,8 @@ class Notify_Controller extends Action_Controller
 			case 'board':
 				require_once(SUBSDIR . '/Boards.subs.php');
 				$name = boardInfo((int) $extra);
-				$context['unsubscribe_message'] = sprintf($txt['notify_board_unsubscribed'], $name['name'], $email);
+				$name = $name === null ? '' : $name['name'];
+				$context['unsubscribe_message'] = sprintf($txt['notify_board_unsubscribed'], $name, $email);
 				break;
 			case 'buddy':
 			case 'likemsg':
