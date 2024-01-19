@@ -730,7 +730,7 @@ class Display extends AbstractController
 			$mgsOptions = basicMessageInfo($this->topicinfo['id_last_msg'], true);
 
 			// May return nothing if not approved
-			if ($mgsOptions)
+			if ($mgsOptions !== false)
 			{
 				return $mgsOptions['poster_time'] + $modSettings['oldTopicDays'] * 86400 < time()
 					&& empty($this->topicinfo['is_sticky']);
