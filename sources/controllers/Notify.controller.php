@@ -631,12 +631,13 @@ class Notify_Controller extends Action_Controller
 			case 'topic':
 				require_once(SUBSDIR . '/Topic.subs.php');
 				$subject = getSubject((int) $extra);
+				$subject = $subject ?? $txt['notify_unsubscribed_generic'];
 				$context['unsubscribe_message'] = sprintf($txt['notify_topic_unsubscribed'], $subject, $email);
 				break;
 			case 'board':
 				require_once(SUBSDIR . '/Boards.subs.php');
 				$name = boardInfo((int) $extra);
-				$name = $name === null ? '' : $name['name'];
+				$name = $name === null ? $txt['notify_unsubscribed_generic'] : $name['name'];
 				$context['unsubscribe_message'] = sprintf($txt['notify_board_unsubscribed'], $name, $email);
 				break;
 			case 'buddy':
