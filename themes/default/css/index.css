@@ -3831,7 +3831,7 @@ ul.post_options li {
 	border-radius: 4px;
 }
 
-.ila_container .icon.share {
+.ila_container .icon.ila {
 	width: 3em;
 	margin: 5px 5px 0 5px;
 	cursor: pointer;
@@ -6826,7 +6826,7 @@ div.labels {
 		display: inline-block;
 	}
 
-	.ila_container .icon.share {
+	.ila_container .icon.ila {
 		width: 2em;
 	}
 
