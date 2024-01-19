@@ -955,7 +955,7 @@ class Admin extends AbstractController
 		// Clean any admin tokens as well.
 		cleanTokens(false, '-admin');
 
-		if (isset($this->_req->query->redir, $this->_req->server->HTTP_REFERER))
+		if (isset($this->_req->query->redir, $_SERVER['HTTP_REFERER']))
 		{
 			redirectexit($_SERVER['HTTP_REFERER']);
 		}
