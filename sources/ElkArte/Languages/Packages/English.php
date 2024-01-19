@@ -193,6 +193,9 @@ $txt['operation_title'] = 'Operations';
 $txt['operation_ignore'] = 'Ignore Errors';
 $txt['operation_invalid'] = 'The operation that you selected is invalid.';
 
+$txt['package_file_perms_writable'] = 'Writable';
+$txt['package_file_perms_not_writable'] = 'Not Writable';
+
 $txt['package_restore_permissions'] = 'Restore file permissions';
 $txt['package_restore_permissions_desc'] = 'The following file permissions were changed in order to install the selected package(s). You can return these files back to their original status by clicking &quot;Restore&quot; below.';
 $txt['package_restore_permissions_restore'] = 'Restore';

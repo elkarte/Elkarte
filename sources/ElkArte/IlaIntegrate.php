@@ -285,7 +285,7 @@ class IlaIntegrate
 			$parameters = explode('~', $parameters);
 			$style = $parameters[0] ?? '';
 			$class = $parameters[1] ?? '';
-			$type = $parameters[2] ?? empty($style) ? ';thumb' : '';
+			$type = $parameters[2] ?? (empty($style) ? ';thumb' : '');
 
 			// Not approved gets a bland pending image
 			if (empty($attachment['is_approved']) && !$preview)
