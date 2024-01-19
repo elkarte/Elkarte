@@ -3,7 +3,7 @@
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
- * @version 1.1.9
+ * @version 1.1.10
  *
  * Original code from Aziz, redone and refactored for ElkArte
  */
@@ -118,7 +118,25 @@
 				tiktok: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 48 48'%3E%3Cpath fill='%23fff' fill-opacity='.01' d='M0 0h48v48H0z'/%3E%3Cpath fill='%232F88FF' stroke='%23000' stroke-linejoin='round' stroke-width='3.833' d='M21.358 19.14c-5.888-.284-9.982 1.815-12.28 6.299-3.446 6.724-.597 17.728 10.901 17.728 11.499 0 11.831-11.111 11.831-12.276V17.876c2.46 1.557 4.533 2.495 6.221 2.813 1.688.317 2.76.458 3.219.422v-6.476c-1.561-.188-2.911-.547-4.05-1.076-1.709-.794-5.096-2.997-5.096-6.226.002.016.002-.817 0-2.499h-7.118c-.021 15.816-.021 24.502 0 26.058.032 2.334-1.779 5.6-5.45 5.6-3.672 0-5.482-3.263-5.482-5.367 0-1.288.442-3.155 2.271-4.538 1.085-.82 2.59-1.147 5.033-1.147V19.14Z'/%3E%3C/svg%3E",
 				vimeo: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 455.731 455.731'%3E%3Cpath fill='%231ab7ea' d='M0 0h455.731v455.731H0z'/%3E%3Cpath fill='%23fff' d='m49.642 157.084 17.626 22.474s22.033-17.186 29.965-17.186c4.927 0 15.423 5.729 22.033 25.558 6.61 19.83 34.441 122.62 36.134 127.351 7.607 21.26 17.626 60.811 48.473 66.54s70.065-25.558 91.657-48.473c21.592-22.914 106.64-120.741 110.165-179.349 3.26-54.191-14.517-66.765-22.474-71.828-14.542-9.254-38.778-12.338-61.692-4.407s-57.726 33.931-66.98 80.2c0 0 31.287-11.457 42.744-.441s8.373 35.253-1.322 53.32-37.015 59.93-47.151 61.252c-10.135 1.322-18.067-18.508-19.389-23.796-1.322-5.288-18.067-77.997-24.236-120.3s-33.049-49.354-45.829-49.354c-12.779.001-34.812 9.696-109.724 78.439z'/%3E%3C/svg%3E",
 				dailymotion: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Cpath fill='%230066DC' fill-rule='evenodd' d='M0 512h512V0H0v512Zm441.5-68.635h-76.314v-29.928c-23.443 22.945-47.385 31.424-79.308 31.424-32.421 0-60.354-10.474-83.797-31.424-30.926-27.433-46.887-63.346-46.887-105.245 0-38.407 14.965-72.823 42.896-99.758 24.94-24.44 55.367-36.91 89.284-36.91 32.422 0 57.361 10.973 75.318 33.917V88.724L441.5 72.395v370.97Zm-141.157-202.01c-37.41 0-66.339 30.426-66.339 66.338 0 37.41 28.93 65.841 69.332 65.841 33.918 0 62.349-27.932 62.349-64.843 0-38.406-28.431-67.336-65.342-67.336Z'/%3E%3C/svg%3E",
+				youtube: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='-100 -100 661 661'%3E%3Cpath d='M365.257 67.393H95.744C42.866 67.393 0 110.259 0 163.137v134.728c0 52.878 42.866 95.744 95.744 95.744h269.513c52.878 0 95.744-42.866 95.744-95.744V163.137c0-52.878-42.866-95.744-95.744-95.744zm-64.751 169.663-126.06 60.123c-3.359 1.602-7.239-.847-7.239-4.568V168.607c0-3.774 3.982-6.22 7.348-4.514l126.06 63.881c3.748 1.899 3.683 7.274-.109 9.082z' style='fill:%23f61c0d'/%3E%3C/svg%3E",
 			};
+
+		// Get a Youtube video thumbnail
+		imgHandlers.getYoutubeIMG = function(eURL, callback)
+		{
+			$.getJSON(eURL, {format: 'json'},
+			function(data)
+			{
+				if (typeof data.thumbnail_url !== 'undefined')
+				{
+					callback(data.thumbnail_url);
+				}
+				else
+				{
+					callback(logos.youtube);
+				}
+			});
+		};
 
 		// Get a TikTok video thumbnail and embed data
 		imgHandlers.getTikTokEmbed = function(eURL, callback)
@@ -213,7 +231,14 @@
 			}
 
 			let embedURL = '//www.youtube-nocookie.com/embed/' + videoID + '?rel=0' + startAtPar,
-				tag = embedIMG(a, '//i.ytimg.com/vi/' + videoID + '/sddefault.jpg', embedURL + '&autoplay=1');
+				imgURL = '//www.youtube.com/oembed?url=https://www.youtube.com/watch?v=' + videoID + '&format=json',
+				tag = embedIMG(a, logos.youtube, embedURL + '?autoplay=1');
+
+			// Get the preview image / embed tag
+			imgHandlers.getYoutubeIMG(imgURL, function (img)
+			{
+				$(a).parent().next().find("img").attr("src", img);
+			});
 
 			return [oSettings.youtube, tag];
 		};
