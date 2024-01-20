@@ -289,7 +289,7 @@ function template_post_page()
 
 	// Show the actual posting area...
 	echo '
-					', template_control_richedit($context['post_box_name'], 'smileyBox_message', 'bbcBox_message');
+					', template_control_richedit($context['post_box_name']);
 
 	// A placeholder for our mention box if needed
 	if (!empty($context['member_ids']))

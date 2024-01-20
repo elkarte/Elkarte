@@ -231,7 +231,7 @@ function template_email_members_compose()
 
 	// Show BBC buttons, smileys and textbox.
 	echo '
-					', template_control_richedit($context['post_box_name'], 'smileyBox_message', 'bbcBox_message');
+					', template_control_richedit($context['post_box_name']);
 
 	echo '
 					<ul>

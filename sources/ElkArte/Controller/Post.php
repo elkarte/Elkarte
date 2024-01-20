@@ -148,6 +148,8 @@ class Post extends AbstractController
 			'width' => '100%',
 			// We do XML preview here.
 			'preview_type' => 2,
+			'smiley_container' => 'smileyBox_message',
+			'bbc_container' => 'bbcBox_message',
 			'live_errors' => 1
 		];
 

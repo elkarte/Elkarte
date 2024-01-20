@@ -338,7 +338,7 @@ function template_messages_informations_below()
  */
 function template_quickreply_below()
 {
-	global $context, $options, $settings, $txt, $modSettings, $scripturl;
+	global $context, $options, $txt, $modSettings;
 
 	// Using the quick reply box below the messages, and you can reply?
 	if ($context['can_reply'] && !empty($options['display_quick_reply']))
@@ -415,7 +415,7 @@ function template_quickreply_below()
 		else
 		{
 			echo '
-							', template_control_richedit($context['post_box_name'], 'smileyBox_message', 'bbcBox_message');
+							', template_control_richedit($context['post_box_name']);
 		}
 
 		echo '
