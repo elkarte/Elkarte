@@ -83,6 +83,21 @@ Elk_AdminIndex.prototype.setAnnouncement = function (announcement)
 	var oElem = document.getElementById(this.opt.sAnnouncementContainerId),
 		sMessages = this.init_news ? oElem.innerHTML : '';
 
+	announcement.body = announcement.body.replace('\r\n\r\n', '\n');
+
+	// Some markup to html conversion
+	let re = new RegExp('^#{1,4}(.*)$', 'ugm');
+	announcement.body = announcement.body.replace(re, '<strong>$1</strong>');
+
+	re = new RegExp('\\*\\*(.*)\\*\\*', 'ug');
+	announcement.body = announcement.body.replace(re, '<strong>$1</strong>');
+
+	re = new RegExp('^\\* (.*)$', 'ugm');
+	announcement.body = announcement.body.replace(re, '&#x2022; $1');
+
+	re = new RegExp('^ {0,1}- (.*)$', 'ugm');
+	announcement.body = announcement.body.replace(re, '&#x2022; $1');
+
 	sMessage = this.opt.sAnnouncementMessageTemplate.replace('%href%', announcement.html_url).replace('%subject%', announcement.name).replace('%time%', announcement.published_at.replace(/[TZ]/g, ' ')).replace('%message%', announcement.body).replace(/\n/g, '<br />').replace(/\r/g, '');
 
 	oElem.innerHTML = sMessages + this.opt.sAnnouncementTemplate.replace('%content%', sMessage);

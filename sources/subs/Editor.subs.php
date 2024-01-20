@@ -172,6 +172,13 @@ function loadEditorPlugins($editor_context)
 	$plugins = [];
 	$neededJS = [];
 
+	$plugins[] = 'initialLoad';
+	if (!empty($modSettings['moveTo']))
+	{
+		$plugins[] = 'moveTo';
+		$neededJS[] = 'moveTo.plugin.js';
+	}
+
 	if (!empty($modSettings['enableSplitTag']))
 	{
 		$plugins[] = 'splittag';

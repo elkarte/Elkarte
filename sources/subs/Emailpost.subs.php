@@ -57,20 +57,16 @@ function pbe_email_to_bbc($text, $html)
 	);
 
 	// We are starting with HTML, our goal is to convert the best parts of it to BBC,
+	$text = pbe_run_parsers($text);
+
 	if ($html)
 	{
-		// Run the parsers on the html
-		$text = pbe_run_parsers($text);
-
 		// upfront pre-process $tags, mostly for the email template strings
 		$text = preg_replace(array_keys($tags), array_values($tags), $text);
 	}
 	// Starting with plain text, possibly even markdown style ;)
 	else
 	{
-		// Run the parser to try and remove common mail clients "reply to" stuff
-		$text = pbe_run_parsers($text);
-
 		// Set a gmail flag for special quote processing since its quotes are strange
 		$gmail = (bool) preg_match('~<div class="gmail_quote">~i', $text);
 

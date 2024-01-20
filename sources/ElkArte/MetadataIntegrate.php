@@ -236,13 +236,13 @@ class MetadataIntegrate
 			'author' => [
 				'@type' => 'Person',
 				'name' => $this->data['member']['name'],
-				'url' => $this->data['member']['href']
+				'url' => $this->data['member']['href'] ?? ''
 			],
 			'url' => $this->data['href'],
 			'articleBody' => $this->data['html_body'],
 			'articleSection' => $board_info['name'] ?? '',
-			'datePublished' => $this->data['time'],
-			'dateModified' => !empty($this->data['modified']['name']) ? $this->data['modified']['time'] : $this->data['time'],
+			'datePublished' => utcTime($this->data['timestamp'], true),
+			'dateModified' => !empty($this->data['modified']['name']) ? utcTime($this->data['modified']['timestamp'], true) : utcTime($this->data['timestamp'], true),
 			'interactionStatistic' => [
 				'@type' => 'InteractionCounter',
 				'interactionType' => 'https://schema.org/ReplyAction',

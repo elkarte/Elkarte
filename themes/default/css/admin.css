@@ -218,7 +218,7 @@ h3.category_header form {
 
 #ourAnnouncements dt a {
 	font-weight: bold;
-	display: block;
+	font-size: 1.1em;
 }
 
 #ourAnnouncements dd {

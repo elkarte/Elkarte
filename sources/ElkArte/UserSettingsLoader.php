@@ -293,11 +293,11 @@ class UserSettingsLoader
 	 */
 	protected function initGuest()
 	{
-		global $cookiename, $context;
+		global $cookiename, $context, $modSettings;
 
 		// This is what a guest's variables should be.
 		$this->member_name = '';
-		$user_info = array('groups' => array(-1));
+		$user_info = ['groups' => [-1]];
 		$this->initSettings([]);
 
 		if (isset($_COOKIE[$cookiename]))
@@ -318,6 +318,12 @@ class UserSettingsLoader
 		// Do we perhaps think this is a search robot?
 		require_once(SUBSDIR . '/SearchEngines.subs.php');
 		$user_info['possibly_robot'] = spiderCheck();
+
+		// If detected as a robot, are we moving them to a special spider_group
+		if (!empty($user_info['possibly_robot']) && !empty($modSettings['spider_group']) && !empty($modSettings['spider_no_guest']))
+		{
+			$user_info['groups'] = [$modSettings['spider_group']];
+		}
 
 		return $user_info;
 	}

@@ -858,36 +858,37 @@ class ManageMembers extends AbstractController
 		$context['show_duplicates'] = !empty($_SESSION['showdupes']);
 
 		// Determine which actions we should allow on this page.
+		$context['allowed_actions'] = [];
 		if ($context['browse_type'] === 'approve')
 		{
 			// If we are approving deleted accounts we have a slightly different list... actually a mirror ;)
 			if ($context['current_filter'] == 4)
 			{
-				$context['allowed_actions'] = array(
+				$context['allowed_actions'] = [
 					'reject' => $txt['admin_browse_w_approve_deletion'],
 					'ok' => $txt['admin_browse_w_reject'],
-				);
+				];
 			}
 			else
 			{
-				$context['allowed_actions'] = array(
+				$context['allowed_actions'] = [
 					'ok' => $txt['admin_browse_w_approve'],
 					'okemail' => $txt['admin_browse_w_approve'] . ' ' . $txt['admin_browse_w_email'],
 					'require_activation' => $txt['admin_browse_w_approve_require_activate'],
 					'reject' => $txt['admin_browse_w_reject'],
 					'rejectemail' => $txt['admin_browse_w_reject'] . ' ' . $txt['admin_browse_w_email'],
-				);
+				];
 			}
 		}
 		elseif ($context['browse_type'] === 'activate')
 		{
-			$context['allowed_actions'] = array(
+			$context['allowed_actions'] = [
 				'ok' => $txt['admin_browse_w_activate'],
 				'okemail' => $txt['admin_browse_w_activate'] . ' ' . $txt['admin_browse_w_email'],
 				'delete' => $txt['admin_browse_w_delete'],
 				'deleteemail' => $txt['admin_browse_w_delete'] . ' ' . $txt['admin_browse_w_email'],
 				'remind' => $txt['admin_browse_w_remind'] . ' ' . $txt['admin_browse_w_email'],
-			);
+			];
 		}
 
 		// Create an option list for actions allowed to be done with selected members.

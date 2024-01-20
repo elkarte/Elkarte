@@ -198,11 +198,11 @@ class CoreFeatures extends AbstractController
 
 					if (!empty($value))
 					{
-						return array('enabled_mentions' => implode(',', array_merge($current, array('likemsg', 'rlikemsg'))));
+						return array('enabled_mentions' => implode(',', array_unique(array_merge($current, array('likemsg', 'rlikemsg')))));
 					}
 					else
 					{
-						return array('enabled_mentions' => implode(',', array_diff($current, array('likemsg', 'rlikemsg'))));
+						return array('enabled_mentions' => implode(',', array_unique(array_diff($current, array('likemsg', 'rlikemsg')))));
 					}
 				},
 			),
@@ -298,7 +298,7 @@ class CoreFeatures extends AbstractController
 					// Turn off the spider group if disabling.
 					if (!$value)
 					{
-						return array('spider_group' => 0, 'show_spider_online' => 0);
+						return array('spider_group' => 0, 'show_spider_online' => 0, 'spider_no_guest' => 0);
 					}
 				},
 				'on_save' => function () {

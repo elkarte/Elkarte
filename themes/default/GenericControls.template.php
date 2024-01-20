@@ -44,6 +44,8 @@ function template_control_richedit($editor_id, $smileyContainer = null, $bbcCont
 				sceditor.createEx(eTextarea, {
 					style: "', $settings['theme_url'], '/css/', $context['theme_variant_url'], 'jquery.sceditor.elk_wiz', $context['theme_variant'], '.css', CACHE_STALE, '",
 					width: "100%",
+					autofocus: ', (!empty($context['site_action']) && $context['site_action'] !== 'display') ? 'true' : 'false', ',
+					autofocusEnd: false,
 					startInSourceMode: ', $editor_context['rich_active'] ? 'false' : 'true', ',
 					toolbarContainer: document.getElementById("editor_toolbar_container"),
 					resizeWidth: false,
@@ -134,11 +136,41 @@ function template_control_richedit($editor_id, $smileyContainer = null, $bbcCont
 
 	echo '});
 				$editor_data.', $editor_id, ' = sceditor.instance(eTextarea);
-				$editor_container.', $editor_id, ' = $(".sceditor-container");
-				$editor_data.', $editor_id, '.css("code {white-space: pre;}").createPermanentDropDown();',
+				$editor_container.', $editor_id, ' = $(".sceditor-container");',
 				isset($context['post_error']['errors']['no_message']) || isset($context['post_error']['errors']['long_message'])
 					? '$editor_container.' . $editor_id . '.find("eTextarea, iframe").addClass("border_error");'
 					: '', '
+			}
+			
+			// Core Editor startup options, css, smiley box, validate wizzy, move into view
+			$.sceditor.plugins.initialLoad = function() {
+				var base = this;
+				base.signalReady = function() {
+					let editor = this,
+						prototype = Object.getPrototypeOf(editor);
+					editor.css("code {white-space: pre;}");
+					editor.createPermanentDropDown();
+					if (prototype.constructor.isWysiwygSupported === false)
+					{
+						document.querySelectorAll(".sceditor-button-source").forEach((elem) => {elem.style.display = "none"});
+					}
+					// Move the editor into view
+					if (document.getElementById("adm_submenus") !== null)
+					{
+						// Do not scroll this menu off screen when present
+						return document.location.hash = "#adm_submenus";
+					}
+					if (document.getElementById("preview_section") !== null)
+					{
+						let editorLink = document.getElementById("preview_section"),
+						    jumpContainer = document.createElement("a");
+						    
+						// preview_section is hidden, so create a moveto point that can be used
+						jumpContainer.setAttribute("id", "MoveTo");   
+   						editorLink.parentNode.insertBefore(jumpContainer, editorLink.nextSibling);
+					    document.location.hash = "#MoveTo"
+       				}
+				};
 			}
 		</script>
 		

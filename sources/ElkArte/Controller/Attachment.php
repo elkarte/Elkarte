@@ -512,13 +512,13 @@ class Attachment extends AbstractController
 		global $txt;
 
 		$headers = Headers::instance();
+		$protocol = detectServer()->getProtocol();
 
 		// No point in a nicer message, because this is supposed to be an attachment anyway...
 		if ($check_filename && !FileFunctions::instance()->fileExists($filename))
 		{
 			Txt::load('Errors');
 
-			$protocol = preg_match('~HTTP/1\.[01]~i', $this->_req->server->SERVER_PROTOCOL) ? $this->_req->server->SERVER_PROTOCOL : 'HTTP/1.0';
 			$headers
 				->removeHeader('all')
 				->headerSpecial($protocol . ' 404 Not Found')
@@ -539,7 +539,7 @@ class Attachment extends AbstractController
 				// Answer the question - no, it hasn't been modified ;).
 				$headers
 					->removeHeader('all')
-					->headerSpecial('HTTP/1.1 304 Not Modified')
+					->headerSpecial($protocol . ' 304 Not Modified')
 					->sendHeaders();
 				exit;
 			}
@@ -552,7 +552,7 @@ class Attachment extends AbstractController
 
 			$headers
 				->removeHeader('all')
-				->headerSpecial('HTTP/1.1 304 Not Modified')
+				->headerSpecial($protocol . ' 304 Not Modified')
 				->sendHeaders();
 			exit;
 		}

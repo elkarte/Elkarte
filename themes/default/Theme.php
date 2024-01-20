@@ -156,31 +156,31 @@ class Theme extends BaseTheme
 
 		$this->setupThemeContext();
 		$header = Headers::instance();
+		$api = $this->_req->getRequest('api', 'trim');
 
 		// Print stuff to prevent caching of pages (except on attachment errors, etc.)
 		if (empty($context['no_last_modified']))
 		{
 			$header
 				->header('Expires', 'Mon, 26 Jul 1997 05:00:00 GMT')
-				->header('Last-Modified', gmdate('D, d M Y H:i:s') . ' GMT')
-				->contentType('text/html', 'UTF-8');
+				->header('Last-Modified', gmdate('D, d M Y H:i:s') . ' GMT');
 		}
 
-		$api = $this->_req->getRequest('api', 'trim');
-		if (isset($api))
+		if (isset($context['sub_template']) && $context['sub_template'] === 'fatal_error')
 		{
-			if ($api === 'json')
-			{
-				$header->contentType('application/json', 'UTF-8');
-			}
-			elseif ($api === 'xml')
-			{
-				$header->contentType('text/xml', 'UTF-8');
-			}
-			else
-			{
-				$header->contentType('text/html', 'UTF-8');
-			}
+			$header->contentType('text/html', 'UTF-8');
+		}
+		elseif($api === 'json')
+		{
+			$header->contentType('application/json', 'UTF-8');
+		}
+		elseif ($api === 'xml')
+		{
+			$header->contentType('text/xml', 'UTF-8');
+		}
+		else
+		{
+			$header->contentType('text/html', 'UTF-8');
 		}
 
 		foreach ($this->getLayers()->prepareContext() as $layer)
@@ -1184,7 +1184,12 @@ class Theme extends BaseTheme
 					facebook : ' . JavaScriptEscape($txt['facebook']) . ',
 					instagram : ' . JavaScriptEscape($txt['instagram']) . ',
 				});
-				document.addEventListener("DOMContentLoaded", () => {$().linkifyvideo(oEmbedtext);});', true);
+				document.addEventListener("DOMContentLoaded", () => {
+					if ($.isFunction($.fn.linkifyvideo))
+					{
+						$().linkifyvideo(oEmbedtext);
+					}
+				});', true);
 		}
 	}
 
@@ -1201,7 +1206,12 @@ class Theme extends BaseTheme
 			loadJavascriptFile('prettify.min.js', array('defer' => true));
 
 			$this->addInlineJavascript('
-				document.addEventListener("DOMContentLoaded", () => {prettyPrint();});', true);
+				document.addEventListener("DOMContentLoaded", () => {
+				if (typeof prettyPrint === "function")
+				{
+					prettyPrint();
+				}
+			});', true);
 		}
 	}
 

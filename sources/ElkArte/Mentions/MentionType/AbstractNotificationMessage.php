@@ -218,7 +218,7 @@ abstract class AbstractNotificationMessage implements NotificationInterface
 					'id_member_to' => $member,
 					'email_address' => $members_data[$member]['email_address'],
 					'subject' => $keys['subject'],
-					'body' => $keys['body'],
+					'body' => $keys['body'] ?? '',
 					'last_id' => 0
 				);
 			}

@@ -598,6 +598,7 @@ $helptxt['show_spider_online'] = 'This setting allows you to select whether spid
 			As above except only Administrators can see spider status - to all other users spiders appear as guests.
 		</li>
 	</ul>';
+$helptxt['spider_no_guest'] = 'By selecting this, the spider will only be a member of the restrictive group and have the permissions and board access of that group (no guest access). You can use this to provide lesser access to a search engine than you would a normal guest. You might for example wish to remove spiders from indexing certain boards while still allowing guest viewing.';
 
 $helptxt['birthday_email'] = 'Choose the index of the birthday email message to use.  A preview will be shown in the Email Subject and Email Body fields.<br /><strong>Note:</strong> Setting this option does not automatically enable birthday emails.  To enable birthday emails use the <a href="%1$s?action=admin;area=scheduledtasks;%3$s=%2$s" target="_blank" class="new_win">Scheduled Tasks</a> page and enable the birthday email task.';
 $helptxt['pm_bcc'] = 'When sending a personal message you can choose to add a recipient as BCC or &quot;Blind Carbon Copy&quot;. BCC recipients do not have their identities revealed to other recipients of the message.';

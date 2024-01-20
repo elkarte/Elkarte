@@ -29,7 +29,7 @@ function detectServerLoad()
 	$cores = detectServerCores();
 
 	// The internal function should always be available
-	if (function_exists('sys_getloadavg'))
+	if (function_exists('sys_getloadavg') && sys_getloadavg() !== false)
 	{
 		$sys_load = sys_getloadavg();
 

@@ -205,7 +205,7 @@ function getSmiley($id)
 	$current_smiley = [];
 	$db->fetchQuery('
 		SELECT 
-			id_smiley AS id, code, filename, description, hidden AS location, 0 AS is_new, smiley_row AS row
+			id_smiley AS id, code, filename, description, hidden AS location, 0 AS is_new, smiley_row
 		FROM {db_prefix}smileys
 		WHERE id_smiley = {int:current_smiley}',
 		[
@@ -219,7 +219,7 @@ function getSmiley($id)
 				'code' => $row['code'],
 				'filename' => pathinfo($row['filename'], PATHINFO_FILENAME),
 				'description' => $row['description'],
-				'row' => $row['row'],
+				'row' => $row['smiley_row'],
 				'is_new' => 0,
 				'location' => $row['location']
 			];

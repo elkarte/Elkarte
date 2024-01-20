@@ -82,7 +82,20 @@ class FileFunctions
 			$mode = decoct($mode);
 		}
 
-		if ($mode == decoct(octdec("$mode")))
+		// All numbers and outside octal range, safely convert to octal
+		if (ctype_digit((string) $mode) && preg_match('~[8-9]~', $mode))
+		{
+			$mode = decoct($mode);
+		}
+
+		// Happens when passed the octal value 0777 (not string) which is 511 decimal, we work on the
+		// assumption no one is trying to do a chmod 511
+		if (in_array($mode, [511, 420, 436], true))
+		{
+			$mode = decoct($mode);
+		}
+
+		if ($mode == decoct(octdec($mode)))
 		{
 			$result = @chmod($item, intval($mode, 8));
 		}
@@ -243,7 +256,7 @@ class FileFunctions
 		$path = str_replace('\\', DIRECTORY_SEPARATOR, $path);
 		$path = rtrim($path, DIRECTORY_SEPARATOR);
 		$tree = explode(DIRECTORY_SEPARATOR, $path);
-		$count = count($tree);
+		$count = empty($tree) ? 0 : count($tree);
 		$partialTree = '';
 
 		// Make sure we have a valid path format
@@ -252,7 +265,7 @@ class FileFunctions
 		{
 			// Maybe it's just the folder name
 			$tree = explode(DIRECTORY_SEPARATOR,BOARDDIR . DIRECTORY_SEPARATOR . $path);
-			$count = count($tree);
+			$count = empty($tree) ? 0 : count($tree);
 
 			$directory = !empty($tree) ? $this->_initDir($tree, $count) : false;
 			if ($directory === false)
