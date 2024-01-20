@@ -153,7 +153,7 @@
 				{
 					callback(data.thumbnail_url);
 				}
-			});
+			}
 		};
 
 		// Get a twitter embed html
