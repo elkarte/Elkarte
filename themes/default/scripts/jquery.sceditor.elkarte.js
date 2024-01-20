@@ -7,7 +7,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.1.7
+ * @version 1.1.10
  */
 
 /** global: elk_session_var, elk_session_id, ila_filename, elk_scripturl  */
@@ -195,19 +195,19 @@ $.sceditor.command
 	.set('space', {})
 	.set('spoiler', {
 		state: function () {
-			var currentNode = this.currentNode(),
-				currentRange = this.getRangeHelper(),
-				selectRange = currentRange.selectedRange;
+			let currentNode = this.currentNode(),
+				currentRange = this.getRangeHelper();
 
 			// We don't have a node since we don't render the tag in the wizzy editor
 			// however we can spot check to see if the cursor is inside the tags.
-			if (typeof selectRange === 'function') {
-				var end = selectRange.startOffset,
-					text = $(currentNode).text();
+			if (currentRange.selectedRange() && typeof currentRange.selectedRange() !== 'undefined')
+			{
+				let end = currentRange.selectedRange().startOffset,
+					text = typeof currentNode !== 'undefined' ? currentNode.textContent : '';
 
 				// Left and right text from the cursor position and tag positions
-				var left = text.substr(0, end),
-					right = text.substr(end),
+				var left = text.substring(0, end),
+					right = text.substring(end),
 					l1 = left.lastIndexOf("[spoiler]"),
 					l2 = left.lastIndexOf("[/spoiler]"),
 					r1 = right.indexOf("[spoiler]"),
@@ -228,20 +228,20 @@ $.sceditor.command
 	})
 	.set('footnote', {
 		state: function () {
-			var currentNode = this.currentNode(),
-				currentRange = this.getRangeHelper(),
-				selectRange = currentRange.selectedRange;
+			let currentNode = this.currentNode(),
+				currentRange = this.getRangeHelper();
 
 			// We don't have an html node since we don't render the tag in the editor
 			// but we can do a spot check to see if the cursor is placed between plain tags.  This
 			// will miss with nested tags but its nicer than nothing.
-			if (typeof selectRange === 'function') {
-				var end = selectRange.startOffset,
-					text = $(currentNode).text();
+			if (currentRange.selectedRange() && typeof currentRange.selectedRange() !== 'undefined')
+			{
+				let end = currentRange.selectedRange().startOffset,
+					text = typeof currentNode !== 'undefined' ? currentNode.textContent : '';
 
 				// Left and right text from the cursor position and tag positions
-				var left = text.substr(0, end),
-					right = text.substr(end),
+				var left = text.substring(0, end),
+					right = text.substring(end),
 					l1 = left.lastIndexOf("[footnote]"),
 					l2 = left.lastIndexOf("[/footnote]"),
 					r1 = right.indexOf("[footnote]"),

@@ -866,6 +866,7 @@ function dbMostLikesReceivedUser($limit = 10)
 			INNER JOIN {db_prefix}messages AS m ON (m.id_msg = lp.id_msg)
 			INNER JOIN {db_prefix}members AS mem ON (mem.id_member = m.id_member)
 			LEFT JOIN {db_prefix}attachments AS a ON (a.id_member = m.id_member)
+		ORDER BY like_count DESC	
 		LIMIT {int:limit}',
 		array(
 			'limit' => $limit
@@ -985,7 +986,8 @@ function dbMostLikesGivenUser($limit = 10)
 		) AS lp
 			INNER JOIN {db_prefix}messages AS m ON (m.id_msg = lp.id_msg)
 			INNER JOIN {db_prefix}members AS mem ON (mem.id_member = lp.id_member)
-			LEFT JOIN {db_prefix}attachments AS a ON (a.id_member = lp.id_member)',
+			LEFT JOIN {db_prefix}attachments AS a ON (a.id_member = lp.id_member)
+		ORDER BY like_count DESC',
 		array(
 			'limit' => $limit
 		)

@@ -91,23 +91,6 @@
 			return getIMG(a, src, eURLa);
 		}
 
-		/**
-		 * Creates and inserts a document fragment.  Doing this vs inner/outer HTML ensures that any script
-		 * tags in the embed code will execute.
-		 *
-		 * @param {Element} a the link we are working with
-		 * @param {object} data the data from the ajax call
-		 */
-		function createFragment(a, data)
-		{
-			// Since data.html may contain a script tag that needs to run, we have to add it like this
-			let parent = a.parentNode,
-				frag = document.createRange().createContextualFragment('<div class="elk_video">' + data.html + '</div>');
-
-			parent.parentNode.appendChild(frag);
-			parent.nextSibling.outerHTML = '';
-		}
-
 		// The embed code
 		let domain_regex = /^[^:]*:\/\/(?:www\.)?([^\/]+)(\/.*)$/,
 			embedded_count = 0,
