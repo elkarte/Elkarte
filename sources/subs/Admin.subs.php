@@ -196,8 +196,8 @@ function getQuickAdminTasks()
 		'https://github.com/elkarte/Elkarte/wiki',
 		'https://github.com/elkarte/Elkarte/wiki/features',
 		'https://github.com/elkarte/Elkarte/wiki/options',
-		'https://github.com/elkarte/Elkarte/wiki/themes',
-		'https://github.com/elkarte/Elkarte/wiki/packages'
+		'https://elkarte.github.io/themes/',
+		'https://elkarte.github.io/addons/'
 	);
 	$txt['support_resources_p2'] = sprintf($txt['support_resources_p2'],
 		'https://www.elkarte.net/',

@@ -470,7 +470,7 @@ function likesPostsReceived($start, $items_per_page, $sort, $memberID)
 }
 
 /**
- * Function to load all of the likers of a message
+ * Function to load all likers of a message
  *
  * @param int $start The item to start with (for pagination purposes)
  * @param int $items_per_page The number of items to show per page
@@ -603,6 +603,7 @@ function dbMostLikedMessage($limit = 10)
 			INNER JOIN {db_prefix}boards AS b ON (b.id_board = m.id_board)
 			LEFT JOIN {db_prefix}attachments AS a ON (a.id_member = m.id_member)
 		WHERE {query_wanna_see_board}
+		ORDER BY like_count DESC
 		LIMIT {int:limit}',
 		[
 			'limit' => $limit,
@@ -643,7 +644,7 @@ function dbMostLikedMessage($limit = 10)
 					'href' => !empty($row['id_member']) ? $scripturl . '?action=profile;u=' . $row['id_member'] : '',
 					'avatar' => $avatar['href'],
 				],
-				'member_liked_data' => postLikers(0, 20, 'l.id_member DESC', $row['id_msg'], false),
+				'member_liked_data' => postLikers(0, min($row['like_count'], 50), 'l.id_member DESC', $row['id_msg'], false),
 			];
 		}
 	);
@@ -786,16 +787,20 @@ function dbMostLikedTopic($board = null, $limit = 10)
 		LIMIT {int:limit}',
 		[
 			'id_board' => $board,
-			'limit' => $limit * 5,
+			'limit' => $limit * 10,
 		]
 	)->fetch_callback(
 		function ($row) use (&$mostLikedTopics) {
+			$row['num_replies'] = (int) $row['num_replies'];
+			$row['like_count']  = (int) $row['like_count'];
+			$row['distinct_likers'] = (int) $row['distinct_likers'];
+			$row['num_messages_liked'] = (int) $row['num_messages_liked'];
 			$mostLikedTopics[$row['id_topic']] = $row;
 
-			$log = log($row['like_count'] / ($row['num_replies'] + ($row['num_replies'] == 0 || $row['like_count'] == $row['num_replies'] ? 1 : 0)));
+			$log = log($row['like_count'] / ($row['num_replies'] + ($row['num_replies'] === 0 || $row['like_count'] === $row['num_replies'] ? 1 : 0)));
 			$distinct_likers = max(1,
 				min($row['distinct_likers'],
-					1 / ($log == 0 ? 1 : $log)));
+					1 / ($log === 0 ? 1 : $log)));
 
 			$mostLikedTopics[$row['id_topic']]['relevance'] = $row['distinct_likers'] +
 				$row['distinct_likers'] / $row['num_messages_liked'] +
@@ -925,6 +930,7 @@ function dbMostLikesReceivedUser($limit = 10)
 			INNER JOIN {db_prefix}messages AS m ON (m.id_msg = lp.id_msg)
 			INNER JOIN {db_prefix}members AS mem ON (mem.id_member = m.id_member)
 			LEFT JOIN {db_prefix}attachments AS a ON (a.id_member = m.id_member)
+		ORDER BY like_count DESC	
 		LIMIT {int:limit}',
 		[
 			'limit' => $limit
@@ -1048,7 +1054,8 @@ function dbMostLikesGivenUser($limit = 10)
 		) AS lp
 			INNER JOIN {db_prefix}messages AS m ON (m.id_msg = lp.id_msg)
 			INNER JOIN {db_prefix}members AS mem ON (mem.id_member = lp.id_member)
-			LEFT JOIN {db_prefix}attachments AS a ON (a.id_member = lp.id_member)',
+			LEFT JOIN {db_prefix}attachments AS a ON (a.id_member = lp.id_member)
+		ORDER BY like_count DESC',
 		[
 			'limit' => $limit
 		]

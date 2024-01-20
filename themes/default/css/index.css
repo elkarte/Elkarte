@@ -3831,7 +3831,7 @@ ul.post_options li {
 	border-radius: 4px;
 }
 
-.ila_container .icon.share {
+.ila_container .icon.ila {
 	width: 3em;
 	margin: 5px 5px 0 5px;
 	cursor: pointer;
@@ -5573,12 +5573,15 @@ div.labels {
 
 .like_stats_likers, .like_stats_subject, .like_stats_details, #lp_preloader, .like_stats_avatar {
 	display: inline-block;
+	padding: 1px;
 }
 
 .like_stats_likers img, .like_stats_small_avatar {
-	max-width: 35px;
+	width: 40px;
+	height: 40px;
+	object-fit: cover;
 	vertical-align: middle;
-	border-radius: 5px;
+	border-radius: 50%;
 }
 
 /* -------------------------------------------------------
@@ -6826,7 +6829,7 @@ div.labels {
 		display: inline-block;
 	}
 
-	.ila_container .icon.share {
+	.ila_container .icon.ila {
 		width: 2em;
 	}
 

@@ -136,7 +136,7 @@ class Query extends AbstractQuery
 		// Use "ORDER BY null" to prevent Mysql doing filesorts for Group By clauses without an Order By
 		if (strpos($db_string, 'GROUP BY') !== false
 			&& strpos($db_string, 'ORDER BY') === false
-			&& strpos($db_string, 'INSERT INTO') === false)
+			&& preg_match('~^\s+SELECT~i', $db_string))
 		{
 			if (($pos = strpos($db_string, 'LIMIT ')) !== false)
 			{

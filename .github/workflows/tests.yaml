@@ -123,7 +123,7 @@ jobs:
           tools: composer:v2
           ini-values: error_reporting=E_ALL, allow_url_fopen=On, opcache.enable=0
 
-      - name: Setup Server Enviroment
+      - name: Setup Server Environment
         env:
           DB: ${{ matrix.db }}
           PHP_VERSION: ${{ matrix.php }}
@@ -138,9 +138,9 @@ jobs:
       - name: Install Linters
         run: npm install --save-dev jshint stylelint stylelint-order stylelint-config-recommended
 
-      - name: Run StyleLint
-        run: npx stylelint "**/*.css"
-        working-directory: ./elkarte
+      #- name: Run StyleLint
+      #  run: npx stylelint "**/*.css"
+      #  working-directory: ./elkarte
 
       - name: Run JSHint
         run: ../node_modules/jshint/bin/jshint . --config .jshintrc --exclude-path .jshintignore

@@ -186,9 +186,9 @@ class ThemeLoader
 			empty($settings['header_logo_url']) ? $settings['images_url'] . '/' . $context['theme_variant_url'] . 'logo_elk.png' : Util::htmlspecialchars($settings['header_logo_url']);
 
 		// Allow overriding the board wide time/number formats.
-		if (empty(User::$settings['time_format']) && !empty($txt['time_format']))
+		if (empty(User::$settings['time_format']) && !empty($modSettings['time_format']))
 		{
-			$this->user->time_format = $txt['time_format'];
+			$this->user->time_format = $modSettings['time_format'];
 		}
 
 		if (isset($settings['use_default_images']) && $settings['use_default_images'] === 'always')

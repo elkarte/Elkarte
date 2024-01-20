@@ -875,7 +875,7 @@ class EmailParse
 			$type = '';
 			list($field, $rest) = array_pad(explode(':', $line), 2, '');
 
-			if (strpos($line, ';'))
+			if (strpos($line, ';') !== false)
 			{
 				list ($type, $val) = explode(';', $rest);
 			}

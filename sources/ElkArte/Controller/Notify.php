@@ -651,6 +651,7 @@ class Notify extends AbstractController
 				try
 				{
 					$subject = getSubject((int) $extra);
+					$subject = $subject ?? $txt['notify_unsubscribed_generic'];
 					$context['unsubscribe_message'] = sprintf($txt['notify_topic_unsubscribed'], $subject, $email);
 				}
 				catch (Exception $e)
@@ -661,7 +662,8 @@ class Notify extends AbstractController
 			case 'board':
 				require_once(SUBSDIR . '/Boards.subs.php');
 				$name = boardInfo((int) $extra);
-				$context['unsubscribe_message'] = sprintf($txt['notify_board_unsubscribed'], $name['name'], $email);
+				$name = $name === null ? $txt['notify_unsubscribed_generic'] : $name['name'];
+				$context['unsubscribe_message'] = sprintf($txt['notify_board_unsubscribed'], $name, $email);
 				break;
 			case 'buddy':
 			case 'likemsg':

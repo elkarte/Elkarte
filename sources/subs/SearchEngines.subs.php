@@ -103,7 +103,8 @@ function spiderCheck()
 						{
 							break;
 						}
-						elseif (($key == 7 && strpos($_SERVER['REMOTE_ADDR'], ':') !== false) || ($key == 3 && strpos($_SERVER['REMOTE_ADDR'], ':') === false))
+
+						if (($key == 7 && strpos($_SERVER['REMOTE_ADDR'], ':') !== false) || ($key == 3 && strpos($_SERVER['REMOTE_ADDR'], ':') === false))
 						{
 							$_SESSION['id_robot'] = $spider['id_spider'];
 						}

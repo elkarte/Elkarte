@@ -732,6 +732,12 @@ QuickModify.prototype.onModifyDone = function (XMLDoc)
 			elk_codefix();
 		}
 
+		// Re-Fix quote blocks
+		if (typeof elk_quotefix === 'function')
+		{
+			elk_quotefix();
+		}
+
 		// And pretty the code
 		if (typeof prettyPrint === 'function')
 		{

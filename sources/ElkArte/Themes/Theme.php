@@ -89,9 +89,10 @@ abstract class Theme
 		$this->layers = new TemplateLayers();
 		$this->templates = new Templates($dirs);
 
-		$this->css_files = &$GLOBALS['context']['css_files'];
 		$this->js_files = &$GLOBALS['context']['js_files'];
+		$this->js_vars = &$GLOBALS['context']['js_vars'];
 
+		$this->css_files = &$GLOBALS['context']['css_files'];
 		$this->css_rules = &$GLOBALS['context']['css_rules'];
 		if (empty($this->css_rules))
 		{

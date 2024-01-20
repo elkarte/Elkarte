@@ -364,13 +364,15 @@
 					messageUrl = '',
 					$like_post_message_data = $('.like_post_message_data');
 
+				const nFormat = new Intl.NumberFormat();
+
 				// Clear anything that was in place
 				$like_post_message_data.html('');
 
 				// Build the new html to add to the page
 				data.forEach((point) =>
 				{
-					messageUrl = elk_scripturl + '?topic=' + point.id_topic + '.msg' + point.id_msg;
+					messageUrl = elk_scripturl + '?topic=' + point.id_topic + '.msg' + point.id_msg + '#new';
 
 					htmlContent += '' +
 						'<div class="content forumposts">' +
@@ -379,14 +381,14 @@
 						'   </div>' +
 						'   <div class="like_stats_details">' +
 						'       <a class="poster_details largetext" href="' + point.member_received.href + '">' + point.member_received.name + '</a>' +
-						'       <div class="poster_details">' + txtStrings.totalPosts + ': ' + point.member_received.total_posts + '</div>' +
+						'       <div class="poster_details">' + txtStrings.totalPosts + ': ' + nFormat.format(point.member_received.total_posts) + '</div>' +
 						'   </div>' +
 						'   <div class="like_stats_subject largetext">' +
 						'      <a class="message_title" title="' + point.preview + '" href="' + messageUrl + '">' + txtStrings.topic + ': ' + point.subject + '</a>' +
 						'   </div>' +
 						'   <div class="separator"></div>' +
 						'   <div class="well">' +
-						'       <p>' + txtStrings.usersWhoLiked.easyReplace({1: point.member_liked_data.length}) + '</p>';
+						'		<p>' + txtStrings.usersWhoLiked.easyReplace({1 : point.like_count.toLocaleString(undefined, {minimumFractionDigits: 0})}) + '</p>';
 
 					// All the members that liked this masterpiece of internet jibba jabba
 					point.member_liked_data.forEach((member_liked_data) =>
@@ -394,10 +396,9 @@
 						htmlContent += '' +
 							'   <div class="like_stats_likers">' +
 							'       <a href="' + member_liked_data.href + '">' +
-							'           <img class="avatar" alt="" src="' + encodeURI(member_liked_data.avatar) + '" title="' + member_liked_data.real_name + '"/>' +
+							'           <img class="avatar" alt="" src="' + encodeURI(member_liked_data.avatar) + '" title="' + member_liked_data.real_name + '" loading="lazy" />' +
 							'       </a> ' +
 							'   </div>';
-
 					});
 
 					htmlContent += '' +
@@ -412,7 +413,7 @@
 				$like_post_message_data.append(htmlContent).show();
 
 				// Hover subject link to show message body preview
-				$('.message_title').SiteTooltip();
+				//$('.message_title').SiteTooltip();
 
 				// All done with this
 				hideSpinnerOverlay();
@@ -429,6 +430,8 @@
 					collapse_txt = [],
 					$like_post_topic_data = $('.like_post_topic_data');
 
+				const nFormat = new Intl.NumberFormat();
+
 				// Clear the area
 				$like_post_topic_data.html('');
 
@@ -440,13 +443,13 @@
 					// Start with the topic info
 					htmlContent += '' +
 						'<div class="content forumposts">' +
-						'   <a class="largetext" href="' + topicUrl + '">' + point.msg_data[0].subject + '</a> ' + txtStrings.mostPopularTopicHeading1.easyReplace({1: point.like_count}) +
+						'   <a class="largetext" href="' + topicUrl + '">' + point.msg_data[0].subject + '</a> ' + txtStrings.mostPopularTopicHeading1.easyReplace({1: nFormat.format(point.like_count)}) +
 						'   <p class="panel_toggle secondary_header">' +
 						'       <span class="topic_toggle">&nbsp' +
 						'           <span id="topic_toggle_img_' + index + '" class="chevricon i-chevron-up" title=""></span>' +
 						'       </span>' +
 						'       <a href="#" id="topic_toggle_link_' + index + '">' + txtStrings.mostPopularTopicSubHeading1.easyReplace({
-							1: point.msg_data.length,
+							1: nFormat.format(point.num_messages_liked),
 							2: txtStrings.showPosts
 						}) + '</a>' +
 						'   </p>' +
@@ -454,11 +457,11 @@
 
 					// Expand / collapse text strings for this area
 					collapse_txt[index] = txtStrings.mostPopularTopicSubHeading1.easyReplace({
-						1: point.msg_data.length,
+						1: nFormat.format(point.num_messages_liked),
 						2: txtStrings.showPosts
 					});
 					expand_txt[index] = txtStrings.mostPopularTopicSubHeading1.easyReplace({
-						1: point.msg_data.length,
+						1: nFormat.format(point.num_messages_liked),
 						2: txtStrings.hidePosts
 					});
 
@@ -504,6 +507,8 @@
 					boardUrl = elk_scripturl + '?board=' + data.id_board,
 					$like_post_board_data = $('.like_post_board_data');
 
+				const nFormat = new Intl.NumberFormat();
+
 				// Start off clean
 				$like_post_board_data.html('');
 
@@ -511,13 +516,13 @@
 				let htmlContent = '' +
 					'<div class="content forumposts">' +
 					'	<p>' +
-					'       <a class="largetext" href="' + boardUrl + '">' + data.name + '</a> ' + txtStrings.mostPopularBoardHeading1 + ' ' + data.like_count + ' ' + txtStrings.genricHeading1 +
+					'       <a class="largetext" href="' + boardUrl + '">' + data.name + '</a> ' + txtStrings.mostPopularBoardHeading1 + ' ' + nFormat.format(data.like_count) + ' ' + txtStrings.genricHeading1 +
 					'   </p>' +
 					'   <p>' +
-					txtStrings.mostPopularBoardSubHeading1 + ' ' + data.num_topics + ' ' + txtStrings.mostPopularBoardSubHeading2 + ' ' + data.topics_liked + ' ' + txtStrings.mostPopularBoardSubHeading3 +
+					txtStrings.mostPopularBoardSubHeading1 + ' ' + data.num_topics + ' ' + txtStrings.mostPopularBoardSubHeading2 + ' ' + nFormat.format(data.topics_liked) + ' ' + txtStrings.mostPopularBoardSubHeading3 +
 					'   </p>' +
 					'   <p>' +
-					txtStrings.mostPopularBoardSubHeading4 + ' ' + data.num_posts + ' ' + txtStrings.mostPopularBoardSubHeading5 + ' ' + data.msgs_liked + ' ' + txtStrings.mostPopularBoardSubHeading6 +
+					txtStrings.mostPopularBoardSubHeading4 + ' ' + data.num_posts + ' ' + txtStrings.mostPopularBoardSubHeading5 + ' ' + nFormat.format(data.msgs_liked) + ' ' + txtStrings.mostPopularBoardSubHeading6 +
 					'   </p>' +
 					'</div>';
 
@@ -559,6 +564,8 @@
 					collapse_txt = [],
 					$like_post_most_liked_user_data = $('.like_post_most_liked_user_data');
 
+				const nFormat = new Intl.NumberFormat();
+
 				// Clean the screen
 				$like_post_most_liked_user_data.html('').off();
 
@@ -573,8 +580,8 @@
 						'   </div>' +
 						'   <div class="like_stats_details">' +
 						'       <a class="poster_details largetext" href="' + point.member_received.href + '">' + point.member_received.name + '</a>' +
-						'       <div class="poster_details">' + txtStrings.totalPosts + ': ' + point.member_received.total_posts + '</div>' +
-						'       <div class="poster_details">' + txtStrings.totalLikesReceived + ': ' + point.like_count + '</div>' +
+						'       <div class="poster_details">' + txtStrings.totalPosts + ': ' + nFormat.format(point.member_received.total_posts) + '</div>' +
+						'       <div class="poster_details">' + txtStrings.totalLikesReceived + ': ' + nFormat.format(point.like_count) + '</div>' +
 						'   </div>' +
 						'   <p class="panel_toggle secondary_header">' +
 						'       <span class="liked_toggle">&nbsp' +
@@ -635,6 +642,8 @@
 					collapse_txt = [],
 					$like_post_most_likes_given_user_data = $('.like_post_most_likes_given_user_data');
 
+				const nFormat = new Intl.NumberFormat();
+
 				// Clear the div of any previous content
 				$like_post_most_likes_given_user_data.html('');
 
@@ -648,8 +657,8 @@
 						'   </div>' +
 						'   <div class="like_stats_details">' +
 						'       <a class="poster_details largetext" href="' + point.member_given.href + '">' + point.member_given.name + '</a>' +
-						'       <div class="poster_details">' + txtStrings.totalPosts + ': ' + point.member_given.total_posts + '</div>' +
-						'       <div class="poster_details">' + txtStrings.totalLikesGiven + ': ' + point.like_count + '</div>' +
+						'       <div class="poster_details">' + txtStrings.totalPosts + ': ' + nFormat.format(point.member_given.total_posts) + '</div>' +
+						'       <div class="poster_details">' + txtStrings.totalLikesGiven + ': ' + nFormat.format(point.like_count) + '</div>' +
 						'   </div>' +
 						'   <p class="panel_toggle secondary_header">' +
 						'       <span class="liker_toggle">&nbsp' +
@@ -675,7 +684,7 @@
 							'   <div class="content forumposts">' +
 							'	    <div class="topic_details">' +
 							'           <h5 class="like_stats_likers">' +
-							txtStrings.postedAt + ' ' + post_data.html_time +
+											txtStrings.postedAt + ' ' + post_data.html_time +
 							'           </h5>' +
 							'       </div>' +
 							'       <div class="messageContent">' + post_data.body + '</div>' +

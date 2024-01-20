@@ -428,7 +428,7 @@ class ProfileInfo extends AbstractController
 		// Create the tabs for the template.
 		$context[$context['profile_menu_name']]['object']->prepareTabData([
 			'title' => $txt['show' . $action_title],
-			'description' => sprintf($txt['showGeneric_help'], $txt['show' . $action_title]),
+			'description' => $txt['show' . $action_title . '_help'] ?? sprintf($txt['showGeneric_help'], $txt['show' . $action_title]),
 			'class' => 'i-post-text',
 		]);
 

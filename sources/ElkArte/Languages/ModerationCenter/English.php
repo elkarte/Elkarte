@@ -4,7 +4,6 @@
 $txt['moderation_center'] = 'Moderation Center';
 $txt['mc_main'] = 'Main';
 $txt['mc_logs'] = 'Logs';
-$txt['mc_posts'] = 'Posts';
 $txt['mc_groups'] = 'Members and groups';
 
 $txt['mc_view_groups'] = 'View Membergroups';
