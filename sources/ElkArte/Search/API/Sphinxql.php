@@ -319,7 +319,7 @@ class Sphinxql extends AbstractAPI
 
 		if (!empty($this->_searchParams->_minMsgID) || !empty($this->_searchParams->_maxMsgID))
 		{
-			$extra_where[] = 'id BETWEEN ' . this->_searchParams->_minMsgID . ' AND ' . (empty($this->_searchParams->_maxMsgID) ? (int) $modSettings['maxMsgID'] : $this->_searchParams->_maxMsgID);
+			$extra_where[] = 'id BETWEEN ' . $this->_searchParams->_minMsgID . ' AND ' . (empty($this->_searchParams->_maxMsgID) ? (int) $modSettings['maxMsgID'] : $this->_searchParams->_maxMsgID);
 		}
 
 		if (!empty($this->_searchParams->topic))
