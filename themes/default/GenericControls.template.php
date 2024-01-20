@@ -159,34 +159,23 @@ function template_control_richedit($editor_id, $smileyContainer = null, $bbcCont
 			// Other Editor startup options, css, smiley box, validate wizzy, move into view
 			$.sceditor.plugins.moveTo = function() {
 				var base = this;
-				base.signalReady = function() {
-					let editor = this,
-						prototype = Object.getPrototypeOf(editor);
 
-					editor.css("code {white-space: pre;}");
-					editor.createPermanentDropDown();
-					if (prototype.constructor.isWysiwygSupported === false)
+				base.signalReady = function() {
+					let editor = this;
+
+					if ($.sceditor.isWysiwygSupported === false)
 					{
 						document.querySelectorAll(".sceditor-button-source").forEach((elem) => {elem.style.display = "none"});
 					}
 
 					// Move the editor into view
-					if (document.getElementById("adm_submenus") !== null)
+					if (document.getElementById("dropdown_menu_1") !== null || document.getElementById("preview_section") !== null)
 					{
-						// Do not scroll this menu off screen when present
-						return document.location.hash = "#adm_submenus";
+						document.getElementById("skipnav").scrollIntoView();
 					}
 
-					if (document.getElementById("preview_section") !== null)
-					{
-						let editorLink = document.getElementById("preview_section"),
-						    jumpContainer = document.createElement("a");
-						    
-						// preview_section is hidden, so create a moveto point that can be used
-						jumpContainer.setAttribute("id", "MoveTo");   
-   						editorLink.parentNode.insertBefore(jumpContainer, editorLink.nextSibling);
-					    document.location.hash = "#MoveTo"
-       				}
+					editor.css("code {white-space: pre;}");
+					editor.createPermanentDropDown();
 				};
 			}
 	
