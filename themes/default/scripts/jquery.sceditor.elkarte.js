@@ -172,12 +172,11 @@ const itemCodes = ["*:disc", "@:disc", "+:square", "x:square", "#:decimal", "0:d
 		checkInsideSourceTag: function (tag)
 		{
 			let currentNode = this.currentNode(),
-				currentRange = this.getRangeHelper(),
-				selectRange = currentRange.selectedRange;
+				currentRange = this.getRangeHelper();
 
-			if (typeof selectRange === 'function')
+			if (currentRange.selectedRange() && typeof currentRange.selectedRange() !== 'undefined')
 			{
-				let end = selectRange.startOffset,
+				let end = currentRange.selectedRange().startOffset,
 					text = typeof currentNode !== 'undefined' ? currentNode.textContent : '';
 
 				// Left and right text from the cursor position and tag positions
