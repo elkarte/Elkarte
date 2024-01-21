@@ -237,6 +237,9 @@ var disableDrafts = false;
 		}
 	};
 
+	/**
+	 * Called when a name is selected from the mentions list
+	 */
 	Elk_Mentions.prototype.addUID = function (user_id, name)
 	{
 		this.opts._mentioned.append($('<input type="hidden" name="uid[]" />').val(user_id).attr('data-name', name));

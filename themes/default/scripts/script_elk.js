@@ -548,125 +548,83 @@ relativeTime.prototype.years = function ()
 	return false;
 };
 
-/**
- * Used to tag mentioned names when they are entered inline but NOT selected from the dropdown list
- * The name must have appeared in the dropdown and be found in that cache list
- *
- * @param {string} sForm the form that holds the container, only used for plain text QR
- * @param {string} sInput the container that atWho is attached
- */
-function revalidateMentions(sForm, sInput)
+function getMentionsFromPlugin(all_elk, boundaries_pattern)
 {
-	var cached_names,
-		cached_queries,
-		body,
-		mentions,
-		pos = -1,
-		// Some random punctuation marks that may appear next to a name
-		boundaries_pattern = /[ \.,;!\?'-\\\/="]/i;
+	let $editor = $editor_data[all_elk.selector],
+		cached_names = $editor.opts.mentionOptions.cache.names,
+		cached_queries = $editor.opts.mentionOptions.cache.queries,
+		// Clean up the newlines and spacing to find the @mentions
+		body = $editor.val().replace(/[\u00a0\r\n]/g, ' '),
+		mentions = $($editor.opts.mentionOptions.cache.mentions);
 
-	for (var i = 0, count = all_elk_mentions.length; i < count; i++)
-	{
-		/* jshint loopfunc: true */
-		// Make sure this mention object is for this selector, safety first
-		if (all_elk_mentions[i].selector === sInput || all_elk_mentions[i].selector === '#' + sInput)
-		{
-			// Was this invoked as the editor plugin?
-			if (all_elk_mentions[i].oOptions.isPlugin)
+	return validateMentions(body, cached_names, cached_queries, mentions, boundaries_pattern);
+}
+
+function getMentionsFromPlainText(all_elk, sForm, sInput, boundaries_pattern)
+{
+	let cached_names = all_elk.oMention.cached_names,
+		cached_queries = all_elk.oMention.cached_queries,
+		// Keep everything separated with spaces, not newlines or no breakable
+		body = document.forms[sForm][sInput].value.replace(/[\u00a0\r\n]/g, ' '),
+		mentions = $(all_elk.oMention.mentions);
+
+	return validateMentions(body, cached_names, cached_queries, mentions, boundaries_pattern);
+}
+
+function validateMentions(body, cached_names, cached_queries, mentions, boundaries_pattern)
+{
+	body = ' ' + body + ' ';
+	removeInvalidMentions(mentions, body, boundaries_pattern);
+
+	cached_queries.forEach(query => {
+		cached_names[query].forEach(name => {
+			let pos = checkWordOccurrence(body, name.name);
+			if (pos !== -1)
 			{
-				var $editor = $editor_data[all_elk_mentions[i].selector];
-
-				cached_names = $editor.opts.mentionOptions.cache.names;
-				cached_queries = $editor.opts.mentionOptions.cache.queries;
-
-				// Clean up the newlines and spacing so we can find the @mentions
-				body = $editor.val().replace(/[\u00a0\r\n]/g, ' ');
-				mentions = $($editor.opts.mentionOptions.cache.mentions);
+				mentions.append($('<input type="hidden" name="uid[]" />').val(name.id));
 			}
-			// Or just our plain text quick reply box?
+		});
+	});
+}
+
+function removeInvalidMentions(mentions, body, boundaries_pattern)
+{
+	$(mentions).find('input').each(function (idx, elem) {
+		let name = $(elem).data('name'),
+			next_char,
+			prev_char,
+			index = body.indexOf(name);
+
+		if (typeof name !== 'undefined')
+		{
+			if (index === -1)
+			{
+				$(elem).remove();
+			}
 			else
 			{
-				cached_names = all_elk_mentions[i].oMention.cached_names;
-				cached_queries = all_elk_mentions[i].oMention.cached_queries;
+				next_char = body.charAt(index + name.length);
+				prev_char = body.charAt(index - 1);
 
-				// Keep everything separated with spaces, not newlines or no breakable
-				body = document.forms[sForm][sInput].value.replace(/[\u00a0\r\n]/g, ' ');
-
-				// The last pulldown box that atWho populated
-				mentions = $(all_elk_mentions[i].oMention.mentions);
-			}
-
-			// Adding a space at the beginning to facilitate catching of mentions at the 1st char
-			// and one at the end to simplify catching any last thing in the text
-			body = ' ' + body + ' ';
-
-			// @todo Functions declared within loops referencing an outer scoped variable may
-			// lead to confusing semantics.
-			//
-			// First check if all those in the list are really mentioned
-			$(mentions).find('input').each(function (idx, elem)
-			{
-				var name = $(elem).data('name'),
-					next_char,
-					prev_char,
-					index = body.indexOf(name);
-
-				// It is undefined coming from a preview
-				if (typeof (name) !== 'undefined')
+				if (next_char !== '' && next_char.search(boundaries_pattern) !== 0)
 				{
-					if (index === -1)
-					{
-						$(elem).remove();
-					}
-					else
-					{
-						next_char = body.charAt(index + name.length);
-						prev_char = body.charAt(index - 1);
-
-						if (next_char !== '' && next_char.search(boundaries_pattern) !== 0)
-						{
-							$(elem).remove();
-						}
-						else if (prev_char !== '' && prev_char.search(boundaries_pattern) !== 0)
-						{
-							$(elem).remove();
-						}
-					}
+					$(elem).remove();
 				}
-			});
-
-			for (var k = 0, ccount = cached_queries.length; k < ccount; k++)
-			{
-				var names = cached_names[cached_queries[k]];
-
-				for (var l = 0, ncount = names.length; l < ncount; l++)
+				else if (prev_char !== '' && prev_char.search(boundaries_pattern) !== 0)
 				{
-					if (checkWordOccurrence(body, names[l].name))
-					{
-						pos = body.indexOf(' @' + names[l].name);
-
-						// If there is something like "{space}@username" AND the following char is a space or a punctuation mark
-						if (pos !== -1 && body.charAt(pos + 2 + names[l].name.length + 1).search(boundaries_pattern) === 0)
-						{
-							mentions.append($('<input type="hidden" name="uid[]" />').val(names[l].id));
-						}
-					}
+					$(elem).remove();
 				}
 			}
 		}
-	}
+	});
 }
 
 /**
  * Check whether the word exists in a given paragraph
- *
- * @param paragraph to check
- * @param word to match
  */
-
 function checkWordOccurrence(paragraph, word)
 {
-	return new RegExp('\\b' + word + '\\b', 'i').test(paragraph);
+	return paragraph.search(new RegExp(' @\\b' + word + '\\b[ .,;!?\'\\-\\\\\\/="]', 'iu'));
 }
 
 /**
@@ -698,6 +656,31 @@ function add_elk_mention(selector, oOptions)
 		selector: selector,
 		oOptions: oOptions
 	};
+}
+
+/**
+ * Revalidates mentions, called from post form submittals.
+ *
+ * - Checks for invalid mentions, ones that were selected but then had spacing/lettering changed
+ * - Used to tag mentioned names when they are entered inline but NOT selected from the dropdown list.  In that
+ * case the name must have appeared in the dropdown and be found in that cache list
+ */
+function revalidateMentions(sForm, sInput)
+{
+	let boundaries_pattern = /[ .,;!?'\-\\\/="]/i;
+	all_elk_mentions.forEach(mention => {
+		if (mention.selector === sInput || mention.selector === '#' + sInput)
+		{
+			if (mention.oOptions.isPlugin)
+			{
+				getMentionsFromPlugin(mention, boundaries_pattern);
+			}
+			else
+			{
+				getMentionsFromPlainText(mention, sForm, sInput, boundaries_pattern);
+			}
+		}
+	});
 }
 
 /**
