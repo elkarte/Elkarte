@@ -588,58 +588,32 @@ Elk_QuickQuote.prototype.executeQuickQuote = function (event)
 
 		let selectedText = this.trim(this.treeToBBCode(selectionContents));
 
-		if (typeof oQuickReply === 'undefined' || oQuickReply.bIsFull)
+		// Full Editor
+		let $editor = $editor_data[post_box_name],
+			text = startTag + selectedText + endTag;
+
+		// Add the text to the editor
+		$editor.insert(this.trim(text));
+
+		// In wizzy mode, we need to move the cursor out of the quote block
+		let
+			rangeHelper = $editor.getRangeHelper(),
+			parent = rangeHelper.parentNode();
+
+		if (parent && parent.nodeName === 'BLOCKQUOTE')
 		{
-			// Full Editor
-			let $editor = $editor_data[post_box_name],
-				text = startTag + selectedText + endTag;
+			let range = rangeHelper.selectedRange();
 
-			// Add the text to the editor
-			$editor.insert(this.trim(text));
-
-			// In wizzy mode, we need to move the cursor out of the quote block
-			let
-				rangeHelper = $editor.getRangeHelper(),
-				parent = rangeHelper.parentNode();
-
-			if (parent && parent.nodeName === 'BLOCKQUOTE')
-			{
-				let range = rangeHelper.selectedRange();
-
-				range.setStartAfter(parent);
-				rangeHelper.selectRange(range);
-			}
-			else
-			{
-				$editor.insert('\n');
-			}
+			range.setStartAfter(parent);
+			rangeHelper.selectRange(range);
 		}
 		else
 		{
-			// Just the textarea
-			let textarea = document.querySelector('#postmodify').message,
-				newText = (textarea.value ? textarea.value + '\n' : '') + startTag + selectedText + endTag + '\n';
-
-			textarea.value = newText;
-
-			// Reading again, to get normalized white-space
-			newText = textarea.value;
-			textarea.setSelectionRange(newText.length, newText.length);
-
-			// Needed for Webkit/Blink
-			textarea.blur();
-			textarea.focus();
+			$editor.insert('\n');
 		}
 
 		// Move to the editor
-		if (typeof oQuickReply !== 'undefined')
-		{
-			document.getElementById(oQuickReply.opt.sJumpAnchor).scrollIntoView();
-		}
-		else
-		{
-			document.getElementById("editor_toolbar_container").scrollIntoView();
-		}
+		document.getElementById("editor_toolbar_container").scrollIntoView();
 	}
 };
 

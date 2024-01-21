@@ -266,11 +266,10 @@ class Display extends AbstractController
 			checkSubmitOnce('register');
 			$context['name'] = $_SESSION['guest_name'] ?? '';
 			$context['email'] = $_SESSION['guest_email'] ?? '';
-			if (!empty($options['use_editor_quick_reply']) && $context['can_reply'])
+			if ($context['can_reply'])
 			{
 				// Needed for the editor and message icons.
 				require_once(SUBSDIR . '/Editor.subs.php');
-
 				create_control_richedit($editorOptions);
 			}
 		}

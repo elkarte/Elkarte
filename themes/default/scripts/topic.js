@@ -267,7 +267,6 @@ function QuickReply(oOptions)
 {
 	this.opt = oOptions;
 	this.bCollapsed = this.opt.bDefaultCollapsed;
-	this.bIsFull = this.opt.bIsFull;
 
 	// If the initial state is to be collapsed, collapse it.
 	if (this.bCollapsed)
@@ -292,14 +291,7 @@ QuickReply.prototype.quote = function (iMessageId, xDeprecated)
 	}
 
 	// Insert the quote
-	if (this.bIsFull)
-	{
-		insertQuoteFast(iMessageId);
-	}
-	else
-	{
-		getXMLDocument(elk_prepareScriptUrl(this.opt.sScriptUrl) + 'action=quotefast;quote=' + iMessageId + ';api=xml', this.onQuoteReceived);
-	}
+	insertQuoteFast(iMessageId);
 
 	// Move the view to the quick reply box.
 	this.delay(250).then(() => document.getElementById(this.opt.sJumpAnchor).scrollIntoView());
@@ -330,8 +322,7 @@ QuickReply.prototype.onQuoteReceived = function (oXMLDoc)
 QuickReply.prototype.swap = function (bInit, bSavestate)
 {
 	let oQuickReplyContainer = document.getElementById(this.opt.sClassId),
-		sEditorId = this.opt.sEditorId || this.opt.sContainerId,
-		bIsFull = this.opt.bIsFull;
+		sEditorId = this.opt.sEditorId || this.opt.sContainerId;
 
 	// Default bInit to false and bSavestate to true
 	bInit = typeof (bInit) !== 'undefined' ? bInit : false;
@@ -363,14 +354,11 @@ QuickReply.prototype.swap = function (bInit, bSavestate)
 	{
 		$('#' + this.opt.sContainerId).slideDown(250, function()
 		{
-			if (bIsFull)
+			// Force the editor to a min height, otherwise its just 2 lines
+			let	instance = sceditor.instance(document.getElementById(sEditorId));
+			if (instance)
 			{
-				// Force the editor to a min height, otherwise its just 2 lines
-				let	instance = sceditor.instance(document.getElementById(sEditorId));
-				if (instance)
-				{
-					instance.height(250);
-				}
+				instance.height(250);
 			}
 		});
 	}

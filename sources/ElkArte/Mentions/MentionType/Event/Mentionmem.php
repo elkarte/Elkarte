@@ -76,7 +76,7 @@ class Mentionmem extends AbstractEventBoardAccess
 	 */
 	public function display_prepare_context($virtual_msg)
 	{
-		global $options, $modSettings, $context;
+		global $modSettings, $context;
 
 		// Mark the mention as read if requested
 		if (isset($_REQUEST['mentionread']) && !empty($virtual_msg))
@@ -87,31 +87,23 @@ class Mentionmem extends AbstractEventBoardAccess
 
 		$context['mentions_enabled'] = true;
 
-		$this->_setup_editor(empty($options['use_editor_quick_reply']));
+		$this->_setup_editor();
 	}
 
 	/**
 	 * Takes care of setting up the editor javascript.
-	 *
-	 * @param bool $simple If true means the plain textarea, otherwise SCEditor.
 	 */
-	protected function _setup_editor($simple = false)
+	protected function _setup_editor()
 	{
-		// Just using the plain text quick reply and not the editor
-		if ($simple)
-		{
-			loadJavascriptFile(array('jquery.atwho.min.js', 'jquery.caret.min.js'));
-		}
-
-		loadJavascriptFile(array('mentioning.js'));
-
 		loadCSSFile('jquery.atwho.css');
 
 		theme()->addInlineJavascript('
-		$(function() {
-			for (var i = 0, count = all_elk_mentions.length; i < count; i++)
-				all_elk_mentions[i].oMention = new elk_mentions(all_elk_mentions[i].oOptions);
-		});');
+			document.addEventListener("DOMContentLoaded", function () {
+				all_elk_mentions.forEach(elk_mention => {
+					elk_mention.oMention = new elk_mentions(elk_mention.oOptions);
+				});
+			});
+		');
 	}
 
 	/**

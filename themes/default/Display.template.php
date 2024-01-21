@@ -371,7 +371,7 @@ function template_quickreply_below()
 						<h4>', $txt['reply'], '</h4>
 					</header>
 					<div id="quickReplyOptions">
-						<form action="', getUrl('action', ['action' => 'post2', 'board' => $context['current_board']]), '" method="post" accept-charset="UTF-8" name="postmodify" id="postmodify" onsubmit="submitonce(this);', (!empty($modSettings['mentions_enabled']) ? 'revalidateMentions(\'postmodify\', \'' . (empty($options['use_editor_quick_reply']) ? 'message' : $context['post_box_name']) . '\');' : ''), '">
+						<form action="', getUrl('action', ['action' => 'post2', 'board' => $context['current_board']]), '" method="post" accept-charset="UTF-8" name="postmodify" id="postmodify" onsubmit="submitonce(this);', (!empty($modSettings['mentions_enabled']) ? 'revalidateMentions(\'postmodify\', \'' . $context['post_box_name'] . '\');' : ''), '">
 							<input type="hidden" name="topic" value="', $context['current_topic'], '" />
 							<input type="hidden" name="subject" value="', $context['response_prefix'], $context['subject'], '" />
 							<input type="hidden" name="icon" value="xx" />
@@ -404,19 +404,8 @@ function template_quickreply_below()
 							<strong>' . $txt['verification'] . ':</strong>', '<br />');
 		}
 
-		// Using the full editor or a plain text box?
-		if (empty($options['use_editor_quick_reply']))
-		{
-			echo '
-							<div class="quickReplyContent">
-								<textarea cols="600" rows="7" class="quickreply" name="message" id="message" tabindex="', $context['tabindex']++, '"></textarea>
-							</div>';
-		}
-		else
-		{
-			echo '
+		echo '
 							', template_control_richedit($context['post_box_name']);
-		}
 
 		echo '
 							', $context['is_locked'] ? '<p class="warningbox smalltext">' . $txt['quick_reply_warning'] . '</p>' : '',
@@ -456,15 +445,6 @@ function template_quickreply_below()
 			</article>
 		</section>
 	</div>';
-
-		// Using the plain text box we need to load in some additional javascript
-		if (empty($options['use_editor_quick_reply']))
-		{
-			echo '
-			<script type="module">
-				add_elk_mention("#message");
-			</script>';
-		}
 	}
 
 	// Finally, enable the quick reply quote function
@@ -482,8 +462,7 @@ function template_quickreply_below()
 			sClassExpanded: "chevricon i-chevron-down",
 			sTitleExpanded: ' . JavaScriptEscape($txt['hide']) . ',
 			sJumpAnchor: "quickreply",
-			bIsFull: ' . (!empty($options['use_editor_quick_reply']) ? 'true' . ',
-			sEditorId: "' . $context['post_box_name'] . '"' : 'false') . ',
+			sEditorId: "' . $context['post_box_name'] . '",
 			oThemeOptions: {
 				bUseThemeSettings: ' . ($context['user']['is_guest'] ? 'false' : 'true') . ',
 				sOptionName: "minmax_preferences",
