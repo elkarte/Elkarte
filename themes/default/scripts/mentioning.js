@@ -8,7 +8,7 @@
 
 /**
  * This file contains javascript associated with the mentioning function as it
- * relates to a plain text box (no sceditor invocation) eg quick reply no editor
+ * relates to a plain text box as found in quick modify/edit
  */
 
 /**
@@ -24,18 +24,14 @@ function elk_mentions(oOptions)
 	this.cached_queries = [];
 	this.mentions = null;
 	this.$atwho = null;
-
 	this.opt = oOptions;
 	this.attachAtWho();
 }
 
 /**
  * Invoke the atWho functions on the object specified
- *
- * @returns {undefined}
  */
-elk_mentions.prototype.attachAtWho = function ()
-{
+elk_mentions.prototype.attachAtWho = function () {
 	var _self = this;
 
 	// We need a container to display the names in
@@ -46,22 +42,29 @@ elk_mentions.prototype.attachAtWho = function ()
 	// Attach the atwho to our container
 	_self.$atwho.atwho({
 		at: "@",
-		limit: 7,
+		limit: 8,
 		maxLen: 25,
 		displayTpl: "<li data-value='${atwho-at}${name}' data-id='${id}'>${name}</li>",
 		callbacks: {
-			filter: function (query, items, search_key)
-			{
-				var current_call = parseInt(new Date().getTime() / 1000);
+			filter: function (query, items, search_key) {
+				// Already cached this query, then use it
+				if (typeof _self.cached_names[query] !== 'undefined')
+				{
+					return _self.cached_names[query];
+				}
 
+				return items;
+			},
+			remoteFilter: function (query, callback) {
 				// Let be easy-ish on the server, don't go looking until we have at least two characters
-				if (query.length < 2)
+				if (typeof query === 'undefined' || query.length < 2 || query.length > 25)
 				{
 					return [];
 				}
 
 				// No slamming the server either
-				if (_self.last_call !== 0 && _self.last_call + 1 > current_call)
+				let current_call = Math.round(new Date().getTime());
+				if (_self.last_call !== 0 && _self.last_call + 150 > current_call)
 				{
 					return _self.names;
 				}
@@ -78,103 +81,105 @@ elk_mentions.prototype.attachAtWho = function ()
 					return [];
 				}
 
-				// Well then lets make a find member suggest call
-				_self.names = [];
-
 				// What we want
-				var obj = {
+				let obj = {
 					"suggest_type": "member",
 					"search": query.php_urlencode(),
 					"time": current_call
 				};
-				obj[elk_session_var] = elk_session_id;
 
-				// And how to ask for it
-				$.ajax({
-					url: elk_scripturl + "?action=suggest;api=xml",
-					data: obj,
-					type: "post",
-					async: false
-				})
-					.done(function (request)
-					{
-						$(request).find('item').each(function (idx, item)
-						{
-							// New request, lets start fresh
-							if (typeof (_self.names[_self.names.length]) === 'undefined')
-							{
-								_self.names[_self.names.length] = {};
-							}
+				// And now ask for a list of names
+				suggest(obj, function () {
+					// Update the time gate
+					_self.last_call = current_call;
 
-							// Add each one to the dropdown list for view/selection
-							_self.names[_self.names.length - 1].id = $(item).attr('id');
-							_self.names[_self.names.length - 1].name = $(item).text();
-						});
-					})
-					.fail(function (jqXHR, textStatus, errorThrown)
-					{
-						if ('console' in window)
-						{
-							window.console.info('Error:', textStatus, errorThrown.name);
-							window.console.info(jqXHR.responseText);
-						}
-					});
+					// Update the cache
+					_self.cached_names[query] = _self.names;
+					_self.cached_queries[_self.cached_queries.length] = query;
 
-				// Save this information so we can reuse it
-				_self.last_call = current_call;
-
-				// Save it to the cache for this mention
-				_self.cached_names[query] = _self.names;
-				_self.cached_queries[_self.cached_queries.length] = query;
-
-				return _self.names;
+					callback(_self.names);
+				});
 			},
-			beforeInsert: function (value, $li)
-			{
+			beforeInsert: function (value, $li) {
 				_self.mentions.append($('<input type="hidden" name="uid[]" />').val($li.data('id')).attr('data-name', $li.data('value')));
 
 				return value;
 			},
-			matcher: function (flag, subtext, should_start_with_space)
-			{
-				var match,
-					regexp;
+			matcher: function (flag, subtext, should_start_with_space, acceptSpaceBar) {
+				let match, regex_matcher, space;
 
-				flag = flag.replace(/[\-\[\]\/\{}\(\)\*\+\?\.\\\^\$\|]/g, "\\$&");
+				if (!subtext || subtext.length < 3)
+					return null;
 
 				if (should_start_with_space)
 				{
 					flag = '(?:^|\\s)' + flag;
 				}
 
-				regexp = new RegExp(flag + '([^ <>&"\'=\\\\\n]*)$|' + flag + '([^\\x00-\\xff]*)$', 'gi');
-				match = regexp.exec(subtext.replace());
+				// Allow first last name entry?
+				space = acceptSpaceBar ? "\ " : "";
+
+				regex_matcher = new RegExp(flag + "([\\p{L}0-9_" + space + "\\[\\]\'\.\+\-]*)$", 'um');
+				match = regex_matcher.exec(subtext);
 				if (match)
 				{
-					return match[2] || match[1];
+					return match[1];
 				}
 				else
 				{
 					return null;
 				}
 			},
-			highlighter: function (li, query)
-			{
-				var regexp;
+			highlighter: function (li, query) {
+				let regex_highlight;
 
 				if (!query)
 				{
 					return li;
 				}
 
-				// regexp from http://phpjs.org/functions/preg_quote/
-				query = (query + '').replace(new RegExp('[.\\\\+*?\\[\\^\\]$(){}=!<>|:\\-]', 'g'), '\\$&');
-				regexp = new RegExp(">\\s*(\\w*)(" + query.replace("+", "\\+") + ")(\\w*)\\s*<", 'ig');
-				return li.replace(regexp, function (str, $1, $2, $3)
-				{
+				// Preg Quote regexp from http://phpjs.org/functions/preg_quote/
+				query = query.replace(new RegExp('[.\\\\+*?\\[^\\]$(){}=!<>|:\\-]', 'g'), '\\$&');
+
+				regex_highlight = new RegExp(">\\s*(\\w*)(" + query.replace("+", "\\+") + ")(\\w*)\\s*<", 'ig');
+				return li.replace(regex_highlight, function (str, $1, $2, $3) {
 					return '> ' + $1 + '<strong>' + $2 + '</strong>' + $3 + ' <';
 				});
 			}
 		}
 	});
+
+	function suggest(obj, callback)
+	{
+		let postString = "jsonString=" + JSON.stringify(obj) + "&" + elk_session_var + "=" + elk_session_id;
+		_self.names = [];
+
+		// And how to ask for it
+		$.ajax({
+			url: elk_scripturl + "?action=suggest;api=xml",
+			data: postString,
+			type: "post",
+			async: true
+		})
+			.done(function (request) {
+				$(request).find('item').each(function (idx, item) {
+					// Add each one to the dropdown list for view/selection
+					_self.names[idx] = {
+						"id": $(item).attr('id'),
+						"name": $(item).text()
+					};
+				});
+
+				callback();
+			})
+			.fail(function (jqXHR, textStatus, errorThrown) {
+				if ('console' in window)
+				{
+					window.console.info('Error:', textStatus, errorThrown.name);
+					window.console.info(jqXHR.responseText);
+				}
+
+				callback();
+			});
+	}
 };
