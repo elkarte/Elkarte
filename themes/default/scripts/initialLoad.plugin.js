@@ -22,7 +22,7 @@
 
             if (sceditor.isWysiwygSupported === false)
             {
-                document.querySelectorAll(".sceditor-button-source").forEach((elem) => {elem.style.display = "none"});
+                document.querySelectorAll(".sceditor-button-source").forEach((elem) => {elem.style.display = "none";});
             }
 
             // Move the editor into view

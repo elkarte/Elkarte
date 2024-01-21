@@ -21,7 +21,7 @@ use ElkArte\Languages\Txt;
 /**
  * Creates a box that can be used for richedit stuff like BBC, Smileys etc.
  *
- * @param mixed[] $editorOptions associative array of options => value
+ * @param array $editorOptions associative array of options => value
  *  Must contain:
  *   - id => unique id for the css
  *   - value => text for the editor or blank
