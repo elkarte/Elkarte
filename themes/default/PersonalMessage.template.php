@@ -931,7 +931,7 @@ function template_send()
 				</dl>';
 
 	// Show BBC buttons, smileys and textbox.
-	template_control_richedit($context['post_box_name'], 'smileyBox_message', 'bbcBox_message');
+	template_control_richedit($context['post_box_name']);
 
 	// Require an image to be typed to save spamming?
 	if (!empty($context['require_verification']))

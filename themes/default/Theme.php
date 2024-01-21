@@ -703,8 +703,8 @@ class Theme extends BaseTheme
 	{
 		global $modSettings, $settings;
 
-		// Use a specified version of jquery 3.6.1  / 1.13.2
-		$jquery_version = '3.6.1';
+		// Use a specified version of jquery 3.7.1  / 1.13.2
+		$jquery_version = '3.7.1';
 		$jqueryui_version = '1.13.2';
 
 		$jquery_cdn = 'https://ajax.googleapis.com/ajax/libs/jquery/' . $jquery_version . '/jquery.min.js';

@@ -400,6 +400,8 @@ class ManageNews extends AbstractController
 			'labels' => array(
 				'post_button' => $txt['sendtopic_send'],
 			),
+			'smiley_container' => 'smileyBox_message',
+			'bbc_container' => 'bbcBox_message',
 			'preview_type' => 2,
 		);
 		create_control_richedit($editorOptions);

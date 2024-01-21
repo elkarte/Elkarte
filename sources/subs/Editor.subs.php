@@ -17,15 +17,16 @@
 
 use ElkArte\Cache\Cache;
 use ElkArte\Languages\Txt;
-use ElkArte\User;
 
 /**
  * Creates a box that can be used for richedit stuff like BBC, Smileys etc.
  *
- * @param mixed[] $editorOptions associative array of options => value
+ * @param array $editorOptions associative array of options => value
  *  Must contain:
  *   - id => unique id for the css
  *   - value => text for the editor or blank
+ *   - smiley_container => ID for where the smileys will be placed
+ *   - bbc_container => ID for where the toolbar will be placed
  * Optionally:
  *   - height => height of the initial box
  *   - width => width of the box (100%)
@@ -56,11 +57,14 @@ function create_control_richedit($editorOptions)
 	{
 		// Store the name / ID we are creating for template compatibility.
 		$context['post_box_name'] = $editorOptions['id'];
+		$context['smiley_box_name'] = $editorOptions['smiley_container'] ?? null;
+		$context['bbc_box_name'] = $editorOptions['bbc_container'] ?? null;
 
 		// Don't show the smileys if they are off or not wanted.
 		$editorOptions['disable_smiley_box'] = !empty($editorOptions['disable_smiley_box'])
 			|| $GLOBALS['context']['smiley_set'] === 'none'
-			|| !empty($GLOBALS['options']['show_no_smileys']);
+			|| !empty($GLOBALS['options']['show_no_smileys'])
+			|| empty($editorOptions['smiley_container']);
 
 		// This really has some WYSIWYG stuff.
 		theme()->getTemplates()->load('GenericControls');
@@ -103,7 +107,7 @@ function create_control_richedit($editorOptions)
 		'id' => $editorOptions['id'],
 		'value' => $editorOptions['value'],
 		'rich_active' => !empty($options['wysiwyg_default']) || !empty($editorOptions['force_rich']) || !empty($_REQUEST[$editorOptions['id'] . '_mode']),
-		'disable_smiley_box' => !empty($editorOptions['disable_smiley_box']),
+		'disable_smiley_box' => $editorOptions['disable_smiley_box'],
 		'width' => $editorOptions['width'] ?? '100%',
 		'height' => $editorOptions['height'] ?? '250px',
 		'form' => $editorOptions['form'] ?? 'postmodify',
@@ -120,7 +124,7 @@ function create_control_richedit($editorOptions)
 	call_integration_hook('integrate_editor_plugins', array($editorOptions['id']));
 
 	// Switch between default images and back... mostly in case you don't have an PersonalMessage template, but do have a Post template.
-	$use_defaults = isset($settings['use_default_images']) && $settings['use_default_images'] == 'defaults' && isset($settings['default_template']);
+	$use_defaults = isset($settings['use_default_images'], $settings['default_template']) && $settings['use_default_images'] === 'defaults';
 	if ($use_defaults)
 	{
 		$temp = [];
@@ -135,7 +139,9 @@ function create_control_richedit($editorOptions)
 
 	// Setup the toolbar, smileys, plugins
 	$context['bbc_toolbar'] = loadEditorToolbar();
-	$context['smileys'] = loadEditorSmileys($context['controls']['richedit'][$editorOptions['id']]);
+	$context['editor_bbc_toolbar'] = buildBBCToolbar($context['bbc_box_name']);
+	$context['smileys'] = empty($editorOptions['disable_smiley_box']) ? loadEditorSmileys($context['controls']['richedit'][$editorOptions['id']]) : '';
+	$context['editor_smileys_toolbar'] = buildSmileyToolbar(empty($editorOptions['disable_smiley_box']));
 	$context['plugins'] = loadEditorPlugins($context['controls']['richedit'][$editorOptions['id']]);
 	$context['plugin_options'] = getPluginOptions($context['controls']['richedit'][$editorOptions['id']], $editorOptions['id']);
 
@@ -173,11 +179,7 @@ function loadEditorPlugins($editor_context)
 	$neededJS = [];
 
 	$plugins[] = 'initialLoad';
-	if (!empty($modSettings['moveTo']))
-	{
-		$plugins[] = 'moveTo';
-		$neededJS[] = 'moveTo.plugin.js';
-	}
+	$neededJS[] = 'initialLoad.plugin.js';
 
 	if (!empty($modSettings['enableSplitTag']))
 	{
@@ -440,4 +442,84 @@ function loadEditorSmileys($editorOptions)
 	}
 
 	return empty($context['smileys']) ? $smileys : $context['smileys'];
+}
+
+function buildSmileyToolbar($useSmileys)
+{
+	global $context;
+
+	if (!$useSmileys)
+	{
+		return ', emoticons: {}';
+	}
+
+	$emoticons = ',
+		emoticons: {';
+
+	$countLocations = count($context['smileys']);
+	foreach ($context['smileys'] as $location => $smileyRows)
+	{
+		$countLocations--;
+		if ($location === 'postform')
+		{
+			$emoticons .= '
+				dropdown: {';
+		}
+
+		if ($location === 'popup')
+		{
+			$emoticons .= '
+				popup: {';
+		}
+
+		$numRows = count($smileyRows);
+
+		// This is needed because otherwise the editor will remove all the duplicate (empty)
+		// keys and leave only 1 additional line
+		$emptyPlaceholder = 0;
+		foreach ($smileyRows as $smileyRow)
+		{
+			foreach ($smileyRow['smileys'] as $smiley)
+			{
+				$emoticons .= '
+					' . JavaScriptEscape($smiley['code']) . ': {url: ' . (JavaScriptEscape((isset($smiley['emoji']) ? $context['emoji_path'] : $context['smiley_path']) . $smiley['filename'])) . ', tooltip: ' . JavaScriptEscape($smiley['description']) . '}' . (empty($smiley['isLast']) ? ',' : '');
+			}
+
+			if (empty($smileyRow['isLast']) && $numRows !== 1)
+			{
+				$emoticons .= ",'-" . $emptyPlaceholder++ . "': '',";
+			}
+		}
+
+		$emoticons .= '
+			}' . ($countLocations !== 0 ? ',' : '');
+	}
+
+	return $emoticons . '
+	}';
+}
+
+function buildBBCToolbar($bbcContainer)
+{
+	global $context;
+
+	if ($bbcContainer === null)
+	{
+		return ', 
+			toolbar: "source"';
+	}
+
+	// Show all the editor command buttons
+	$toolbar = ',
+		toolbar: "';
+
+	// Create the tooltag rows to display the buttons in the editor
+	foreach ($context['bbc_toolbar'] as $i => $buttonRow)
+	{
+		$toolbar .= $buttonRow[0] . '||';
+	}
+
+	$toolbar .= '"';
+
+	return $toolbar;
 }

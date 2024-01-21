@@ -121,6 +121,22 @@
 			parent.nextSibling.outerHTML = '';
 		}
 
+		/**
+		 * Converts a given time value from an array to seconds using a multiplier.
+		 *
+		 * @param {Array} timeArray - The array containing time values.
+		 * @param {number} timeIndex - The index of the time value to convert.
+		 * @param {number} multiplier - The multiplier to apply to the converted time value.
+		 * @return {number} - The converted time value in seconds, or 0 if the time array is undefined or the timeIndex is out of range.
+		 */
+		function convertToSeconds(timeArray, timeIndex, multiplier) {
+			if (typeof timeArray[timeIndex] !== 'undefined') {
+				return parseInt(timeArray[timeIndex]) * multiplier;
+			}
+
+			return 0;
+		}
+
 		// The embed code
 		let domain_regex = /^[^:]*:\/\/(?:www\.)?([^\/]+)(\/.*)$/,
 			embedded_count = 0,
@@ -242,23 +258,9 @@
 			{
 				let startAtSeconds = 0;
 
-				// Hours
-				if (typeof startAt[1] !== 'undefined')
-				{
-					startAtSeconds += parseInt(startAt[1]) * 3600;
-				}
-
-				// Minutes
-				if (typeof startAt[2] !== 'undefined')
-				{
-					startAtSeconds += parseInt(startAt[2]) * 60;
-				}
-
-				// Seconds
-				if (typeof startAt[3] !== 'undefined')
-				{
-					startAtSeconds += parseInt(startAt[3]);
-				}
+				startAtSeconds += convertToSeconds(startAt, 1, 3600);  // Hours
+				startAtSeconds += convertToSeconds(startAt, 2, 60);    // Minutes
+				startAtSeconds += convertToSeconds(startAt, 3, 1);     // Seconds
 
 				startAtPar = '&start=' + startAtSeconds.toString();
 			}

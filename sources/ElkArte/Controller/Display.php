@@ -245,6 +245,8 @@ class Display extends AbstractController
 			// add height and width for the editor
 			'height' => '250px',
 			'width' => '100%',
+			'smiley_container' => 'smileyBox_message',
+			'bbc_container' => 'bbcBox_message',
 			// We do XML preview here.
 			'preview_type' => 1,
 		];

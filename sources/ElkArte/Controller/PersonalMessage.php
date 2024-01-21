@@ -947,6 +947,8 @@ class PersonalMessage extends AbstractController
 			'labels' => array(
 				'post_button' => $txt['send_message'],
 			),
+			'smiley_container' => 'smileyBox_message',
+			'bbc_container' => 'bbcBox_message',
 			'preview_type' => 2,
 		);
 
@@ -1091,6 +1093,8 @@ class PersonalMessage extends AbstractController
 			'labels' => array(
 				'post_button' => $txt['send_message'],
 			),
+			'smiley_container' => 'smileyBox_message',
+			'bbc_container' => 'bbcBox_message',
 			'preview_type' => 2,
 		);
 

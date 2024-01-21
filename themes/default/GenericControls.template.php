@@ -16,17 +16,14 @@
  * This function displays all the goodies you get with a richedit box - BBC, smileys etc.
  *
  * @param string $editor_id
- * @param string|null $smileyContainer if set show the smiley container id
- * @param string|null $bbcContainer show the bbc container id
  *
  * @return void echo output
  */
-function template_control_richedit($editor_id, $smileyContainer = null, $bbcContainer = null)
+function template_control_richedit($editor_id)
 {
 	global $context, $settings;
 
 	$editor_context = &$context['controls']['richedit'][$editor_id];
-	$useSmileys = (!empty($context['smileys']['postform']) || !empty($context['smileys']['popup'])) && !$editor_context['disable_smiley_box'] && $smileyContainer !== null;
 	$class = isset($context['post_error']['errors']['no_message']) || isset($context['post_error']['errors']['long_message']) ? ' border_error' : '';
 	$style = 'width:' . $editor_context['width'] . ';height: ' . $editor_context['height'];
 
@@ -36,10 +33,10 @@ function template_control_richedit($editor_id, $smileyContainer = null, $bbcCont
 		<textarea class="editor', $class, '" name="', $editor_id, '" id="', $editor_id, '" tabindex="', $context['tabindex']++, '" style="', $style, ';" required="required">', $editor_context['value'], '</textarea>
 		<input type="hidden" name="', $editor_id, '_mode" id="', $editor_id, '_mode" value="0" />
 		<script>
-			let $editor_data = {},
-				$editor_container = {},
-				eTextarea = document.getElementById("', $editor_id, '");
-
+			let eTextarea = document.getElementById("', $editor_id, '"),
+				$editor_data = {},
+				$editor_container = {};
+				
 			function elk_editor() {
 				sceditor.createEx(eTextarea, {
 					style: "', $settings['theme_url'], '/css/', $context['theme_variant_url'], 'jquery.sceditor.elk_wiz', $context['theme_variant'], '.css', CACHE_STALE, '",
@@ -51,7 +48,7 @@ function template_control_richedit($editor_id, $smileyContainer = null, $bbcCont
 					resizeWidth: false,
 					resizeMaxHeight: -1,
 					emoticonsCompat: true,
-					emoticonsEnabled: ', $useSmileys ? 'true' : 'false', ',
+					emoticonsEnabled: ', $editor_context['disable_smiley_box'] ? 'false' : 'true', ',
 					locale: "', !empty($editor_context['locale']) ? $editor_context['locale'] : 'en_US', '",
 					rtl: ', empty($context['right_to_left']) ? 'false' : 'true', ',
 					colors: "black,red,yellow,pink,green,orange,purple,blue,beige,brown,teal,navy,maroon,limegreen,white",
@@ -61,124 +58,24 @@ function template_control_richedit($editor_id, $smileyContainer = null, $bbcCont
 					', trim(implode(',', $context['plugin_options']));
 
 	// Show the smileys.
-	if ($useSmileys)
-	{
-		echo ',
-					emoticons: {';
-		$countLocations = count($context['smileys']);
-		foreach ($context['smileys'] as $location => $smileyRows)
-		{
-			$countLocations--;
-			if ($location === 'postform')
-			{
-				echo '
-						dropdown: {';
-			}
-
-			if ($location === 'popup')
-			{
-				echo '
-						popup: {';
-			}
-
-			$numRows = count($smileyRows);
-
-			// This is needed because otherwise the editor will remove all the duplicate (empty)
-			// keys and leave only 1 additional line
-			$emptyPlaceholder = 0;
-			foreach ($smileyRows as $smileyRow)
-			{
-				foreach ($smileyRow['smileys'] as $smiley)
-				{
-					echo '
-						', JavaScriptEscape($smiley['code']), ': {url: ', JavaScriptEscape((isset($smiley['emoji']) ? $context['emoji_path'] : $context['smiley_path']) . $smiley['filename']), ', tooltip: ', JavaScriptEscape($smiley['description']), '}', empty($smiley['isLast']) ? ',' : '';
-				}
-
-				if (empty($smileyRow['isLast']) && $numRows !== 1)
-				{
-					echo ',
-						\'-', $emptyPlaceholder++, '\': \'\',';
-				}
-			}
-
-			echo '
-						}', $countLocations !== 0 ? ',' : '';
-		}
-
-		echo '
-					}';
-	}
-	else
-	{
-		echo ',
-					emoticons: {}';
-	}
+	echo $context['editor_smileys_toolbar'];
 
 	// Show all the editor command buttons
-	if ($bbcContainer !== null)
-	{
-		echo ',
-					toolbar: "';
+	echo $context['editor_bbc_toolbar'];
 
-		// Create the tooltag rows to display the buttons in the editor
-		foreach ($context['bbc_toolbar'] as $i => $buttonRow)
-		{
-			echo $buttonRow[0], '||';
-		}
-
-		echo '"';
-	}
-	else
-	{
-		echo ',
-					toolbar: "source"';
-	}
-
-	echo '});
-				$editor_data.', $editor_id, ' = sceditor.instance(eTextarea);
-				$editor_container.', $editor_id, ' = $(".sceditor-container");',
-				isset($context['post_error']['errors']['no_message']) || isset($context['post_error']['errors']['long_message'])
-					? '$editor_container.' . $editor_id . '.find("eTextarea, iframe").addClass("border_error");'
-					: '', '
-			}
-			
-			// Core Editor startup options, css, smiley box, validate wizzy, move into view
-			$.sceditor.plugins.initialLoad = function() {
-				var base = this;
-				base.signalReady = function() {
-					let editor = this,
-						prototype = Object.getPrototypeOf(editor);
-					editor.css("code {white-space: pre;}");
-					editor.createPermanentDropDown();
-					if (prototype.constructor.isWysiwygSupported === false)
-					{
-						document.querySelectorAll(".sceditor-button-source").forEach((elem) => {elem.style.display = "none"});
-					}
-					// Move the editor into view
-					if (document.getElementById("adm_submenus") !== null)
-					{
-						// Do not scroll this menu off screen when present
-						return document.location.hash = "#adm_submenus";
-					}
-					if (document.getElementById("preview_section") !== null)
-					{
-						let editorLink = document.getElementById("preview_section"),
-						    jumpContainer = document.createElement("a");
-						    
-						// preview_section is hidden, so create a moveto point that can be used
-						jumpContainer.setAttribute("id", "MoveTo");   
-   						editorLink.parentNode.insertBefore(jumpContainer, editorLink.nextSibling);
-					    document.location.hash = "#MoveTo"
-       				}
-				};
-			}
-		</script>
+	echo '
+		});
 		
-		<script type="module">
-			$(function() {
-				elk_editor();
-			});
-		</script>';
+		$editor_data.', $editor_id, ' = sceditor.instance(eTextarea);
+		$editor_container.', $editor_id, ' = $(".sceditor-container");',
+		isset($context['post_error']['errors']['no_message']) || isset($context['post_error']['errors']['long_message'])
+			? '$editor_container.' . $editor_id . '.find("eTextarea, iframe").addClass("border_error");'
+			: '', '
+	};
+	</script>
+	<script type="module">
+		elk_editor();
+	</script>';
 }
 
 /**
