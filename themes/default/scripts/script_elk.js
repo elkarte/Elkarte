@@ -3,7 +3,7 @@
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * @version 1.1.9
+ * @version 1.1.10
  */
 
 /**
@@ -495,7 +495,7 @@ function revalidateMentions(sForm, sInput)
 		mentions,
 		pos = -1,
 		// Some random punctuation marks that may appear next to a name
-		boundaries_pattern = /[ \.,;!\?'-\\\/="]/i;
+		boundaries_pattern = /[ .,;!?'\-\\\/="]/i;
 
 	for (var i = 0, count = all_elk_mentions.length; i < count; i++)
 	{
