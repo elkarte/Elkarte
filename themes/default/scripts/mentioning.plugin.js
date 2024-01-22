@@ -145,7 +145,7 @@ var disableDrafts = false;
 					}
 
 					// Preg Quote regexp from http://phpjs.org/functions/preg_quote/
-					query = query.replace(new RegExp('[.\\\\+*?\\[\\^\\]$(){}=!<>|:\\-]', 'g'), '\\$&');
+					query = query.replace(new RegExp('[.\\\\+*?\\[^\\]$(){}=!<>|:\\-]', 'g'), '\\$&');
 
 					regex_highlight = new RegExp(">\\s*(\\w*)(" + query.replace("+", "\\+") + ")(\\w*)\\s*<", 'ig');
 					return li.replace(regex_highlight, function (str, $1, $2, $3)
@@ -209,6 +209,7 @@ var disableDrafts = false;
 			$.ajax({
 				url: elk_scripturl + "?action=suggest;api=xml",
 				type: "post",
+				async: true,
 				data: postString,
 				dataType: "xml"
 			})
@@ -237,6 +238,9 @@ var disableDrafts = false;
 		}
 	};
 
+	/**
+	 * Called when a name is selected from the mentions list
+	 */
 	Elk_Mentions.prototype.addUID = function (user_id, name)
 	{
 		this.opts._mentioned.append($('<input type="hidden" name="uid[]" />').val(user_id).attr('data-name', name));

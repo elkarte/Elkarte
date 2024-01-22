@@ -93,61 +93,44 @@ class Display extends AbstractModule
 
 			if ($context['drafts_autosave'])
 			{
-				// WYSIWYG editor
-				if (!empty($options['use_editor_quick_reply']))
-				{
-					Txt::load('Post');
+				Txt::load('Post');
 
-					$editorOptions['plugin_addons'] = $editorOptions['plugin_addons'] ?? [];
-					$editorOptions['plugin_options'] = $editorOptions['plugin_options'] ?? [];
+				$editorOptions['plugin_addons'] = $editorOptions['plugin_addons'] ?? [];
+				$editorOptions['plugin_options'] = $editorOptions['plugin_options'] ?? [];
 
-					// @todo remove
-					$context['drafts_autosave_frequency'] = self::$_autosave_frequency;
+				// @todo remove
+				$context['drafts_autosave_frequency'] = self::$_autosave_frequency;
 
-					$editorOptions['plugin_addons'][] = 'draft';
-					$editorOptions['plugin_options'][] = '
-						draftOptions: {
-							sLastNote: \'draft_lastautosave\',
-							sSceditorID: \'' . $editorOptions['id'] . '\',
-							sType: \'post\',
-							iBoard: ' . $board . ',
-							iFreq: ' . self::$_autosave_frequency . ',
-							sLastID: \'id_draft\',
-							sTextareaID: \'' . $editorOptions['id'] . '\',
-							id_draft: ' . (empty($context['id_draft']) ? 0 : $context['id_draft']) . '
-						}';
+				$editorOptions['plugin_addons'][] = 'draft';
+				$editorOptions['plugin_options'][] = '
+					draftOptions: {
+						sLastNote: \'draft_lastautosave\',
+						sSceditorID: \'' . $editorOptions['id'] . '\',
+						sType: \'post\',
+						iBoard: ' . $board . ',
+						iFreq: ' . self::$_autosave_frequency . ',
+						sLastID: \'id_draft\',
+						sTextareaID: \'' . $editorOptions['id'] . '\',
+						id_draft: ' . (empty($context['id_draft']) ? 0 : $context['id_draft']) . '
+					}';
 
-					$context['shortcuts_text'] = $txt['shortcuts_drafts'];
+				$context['shortcuts_text'] = $txt['shortcuts_drafts'];
 
-					$editorOptions['buttons'] = $editorOptions['buttons'] ?? [];
-					$editorOptions['hidden_fields'] = $editorOptions['hidden_fields'] ?? [];
+				$editorOptions['buttons'] = $editorOptions['buttons'] ?? [];
+				$editorOptions['hidden_fields'] = $editorOptions['hidden_fields'] ?? [];
 
-					$editorOptions['buttons'][] = array(
-						'name' => 'save_draft',
-						'value' => $txt['draft_save'],
-						'options' => 'onclick="return confirm(' . JavaScriptEscape($txt['draft_save_note']) . ') && submitThisOnce(this);" accesskey="d"',
-					);
+				$editorOptions['buttons'][] = array(
+					'name' => 'save_draft',
+					'value' => $txt['draft_save'],
+					'options' => 'onclick="return confirm(' . JavaScriptEscape($txt['draft_save_note']) . ') && submitThisOnce(this);" accesskey="d"',
+				);
 
-					$editorOptions['hidden_fields'][] = array(
-						'name' => 'id_draft',
-						'value' => empty($context['id_draft']) ? 0 : $context['id_draft'],
-					);
+				$editorOptions['hidden_fields'][] = array(
+					'name' => 'id_draft',
+					'value' => empty($context['id_draft']) ? 0 : $context['id_draft'],
+				);
 
-					loadJavascriptFile('drafts.plugin.js', array('defer' => true));
-				}
-				// Plain text area
-				else
-				{
-					loadJavascriptFile('drafts.js');
-					theme()->addInlineJavascript('
-				new elk_DraftAutoSave({
-					sLastNote: \'draft_lastautosave\',
-					sTextareaID: \'message\',
-					sLastID: \'id_draft\',
-					iBoard: ' . $board . ',
-					iFreq: ' . self::$_autosave_frequency . '
-				});', true);
-				}
+				loadJavascriptFile('drafts.plugin.js', array('defer' => true));
 			}
 		}
 	}
