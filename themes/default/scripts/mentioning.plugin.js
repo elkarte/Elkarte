@@ -3,7 +3,7 @@
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * @version 1.1.9
+ * @version 1.1.10
  */
 
 /**
@@ -167,8 +167,9 @@ var disableDrafts = false;
 			$.ajax({
 				url: elk_scripturl + "?action=suggest;xml",
 				type: "post",
+				async: true,
 				data: postString,
-				dataType: "xml"
+				dataType: "xml",
 			})
 			.done(function(data) {
 				$(data).find('item').each(function (idx, item) {
