@@ -42,8 +42,14 @@ class EventManager
 	/** @var object Instances of the controller. */
 	protected $_source = null;
 
+	/** @var object Instances of the modules. */
+	protected $_modules = [];
+
 	/** @var string[] List of classes already registered. */
 	protected $_classes = array();
+
+	/** @var int Remembers the depth of nested modules triggers. */
+	protected $depth = 0;
 
 	/** @var null|string[] List of classes declared, kept here just to
 	    avoid call get_declared_classes at each trigger */
@@ -67,6 +73,7 @@ class EventManager
 	public function setSource($source)
 	{
 		$this->_source = $source;
+		$this->_modules[0] = ['i' => $source, 'c' => ''];
 	}
 
 	/**
@@ -80,8 +87,17 @@ class EventManager
 	 *
 	 * @return bool
 	 */
-	public function trigger($position, $args = array())
+	public function trigger($partial_position, $args = array())
 	{
+		if ($this->depth == 0)
+		{
+			$position = $partial_position;
+		}
+		else
+		{
+			$position = $this->_modules[$this->depth]['c'] . '.' . $partial_position;
+		}
+
 		// Nothing registered against this event, just return
 		if (!array_key_exists($position, $this->_registered_events) || !$this->_registered_events[$position]->hasEvents())
 		{
@@ -114,7 +130,7 @@ class EventManager
 					else
 					{
 						// Access to the calling classes properties
-						$this->_source->provideDependencies($dep, $dependencies);
+						$this->_modules[$this->depth]['i']->provideDependencies($dep, $dependencies);
 					}
 				}
 			}
@@ -131,6 +147,8 @@ class EventManager
 			// Do what we know we should do... if we find it.
 			if (is_callable(array($instance, $method_name)))
 			{
+				$instance->setEventManager($this);
+				$this->pushModule($instance, $class_name);
 				// Don't send $dependencies if there are none / the method can't use them
 				if (empty($dependencies))
 				{
@@ -141,8 +159,21 @@ class EventManager
 					$this->_checkParameters($class_name, $method_name, $dependencies);
 					call_user_func_array(array($instance, $method_name), $dependencies);
 				}
+				$this->unsetModule($this->depth);
 			}
 		}
+	}
+
+	protected function pushModule($instance, $class_name)
+	{
+		$this->depth += 1;
+		$this->_modules[$this->depth] = ['i' => $instance, 'c' => $class_name];
+	}
+
+	protected function unsetModule($depth)
+	{
+		unset($this->_modules[$this->depth]);
+		$this->depth = $depth - 1;
 	}
 
 	/**

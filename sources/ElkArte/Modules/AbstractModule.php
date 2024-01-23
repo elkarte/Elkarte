@@ -15,6 +15,7 @@ namespace ElkArte\Modules;
 
 use ElkArte\HttpReq;
 use ElkArte\UserInfo;
+use ElkArte\EventManager;
 
 /**
  * Abstract AbstractModule Provides some standard values to modules
@@ -29,6 +30,9 @@ abstract class AbstractModule implements ModuleInterface
 	/** @var \ElkArte\UserInfo|null User Info ValuesContainer */
 	protected $user;
 
+	/** @var \ElkArte\EventManager|null Events for all our fans! */
+	protected $event;
+
 	/**
 	 * AbstractModule constructor.
 	 *
@@ -39,6 +43,16 @@ abstract class AbstractModule implements ModuleInterface
 	{
 		$this->_req = $req;
 		$this->user = $user;
+	}
+
+	/**
+	 * Sets the event manager.
+	 *
+	 * @param \ElkArte\EventManager $event
+	 */
+	public function setEventManager(EventManager $event)
+	{
+		$this->event = $event;
 	}
 
 	/**

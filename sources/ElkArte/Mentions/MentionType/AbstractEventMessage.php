@@ -15,11 +15,13 @@ namespace ElkArte\Mentions\MentionType;
 
 use ElkArte\HttpReq;
 use ElkArte\UserInfo;
+use ElkArte\Modules\AbstractModule;
+use ElkArte\EventManager;
 
 /**
  * Class AbstractEventMessage
  */
-abstract class AbstractEventMessage implements EventInterface
+abstract class AbstractEventMessage extends AbstractModule implements EventInterface
 {
 	/** @var string The identifier of the mention (the name that is stored in the db) */
 	protected static $_type = '';
@@ -40,6 +42,14 @@ abstract class AbstractEventMessage implements EventInterface
 	{
 		$this->_request = $http_req;
 		$this->user = $user;
+	}
+
+	/**
+	 * {@inheritdoc }
+	 */
+	public static function hooks(EventManager $eventsManager)
+	{
+		return [];
 	}
 
 	/**
