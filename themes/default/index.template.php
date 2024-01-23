@@ -172,10 +172,35 @@ function template_html_above()
 	echo $context['html_headers'];
 
 	echo '
-</head>
-<body class="action_', !empty($context['current_action']) ? htmlspecialchars($context['current_action'], ENT_COMPAT, 'UTF-8') : (!empty($context['current_board']) ?
-	'messageindex' : (!empty($context['current_topic']) ? 'display' : 'home')),
-	!empty($context['current_board']) ? ' board_' . htmlspecialchars($context['current_board'], ENT_COMPAT, 'UTF-8') : '', '">';
+	</head>';
+
+	// Start defining the body class
+	$bodyClass = 'action_';
+
+	if (!empty($context['current_action']))
+	{
+		$bodyClass .= htmlspecialchars($context['current_action'], ENT_COMPAT, 'UTF-8');
+	}
+	elseif (!empty($context['current_board']))
+	{
+		$bodyClass .= 'messageindex';
+	}
+	elseif (!empty($context['current_topic']))
+	{
+		$bodyClass .= 'display';
+	}
+	else
+	{
+		$bodyClass .= 'home';
+	}
+
+	if (!empty($context['current_board']))
+	{
+		$bodyClass .= ' board_' . htmlspecialchars($context['current_board'], ENT_COMPAT, 'UTF-8');
+	}
+
+	echo '
+	<body class="', $bodyClass .  '">';
 }
 
 /**
