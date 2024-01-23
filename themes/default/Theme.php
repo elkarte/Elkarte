@@ -17,11 +17,11 @@
 namespace ElkArte\Themes\DefaultTheme;
 
 use BBC\ParserWrapper;
-use ElkArte\Cache\Cache;
 use ElkArte\Controller\ScheduledTasks;
 use ElkArte\EventManager;
 use ElkArte\FileFunctions;
 use ElkArte\Http\Headers;
+use ElkArte\Menu\MenuContext;
 use ElkArte\SiteCombiner;
 use ElkArte\Themes\Theme as BaseTheme;
 use ElkArte\Languages\Txt;
@@ -37,6 +37,16 @@ use ElkArte\Util;
  */
 class Theme extends BaseTheme
 {
+	/** @var string */
+	private const DEFAULT_EXPIRES = 'Mon, 26 Jul 1997 05:00:00 GMT';
+
+	/** @var array */
+	private const CONTENT_TYPES = [
+		'fatal_error' => 'text/html',
+		'json' => 'application/json',
+		'xml' => 'text/xml'
+	];
+
 	/**
 	 * Initialize the template... mainly little settings.
 	 *
@@ -44,7 +54,7 @@ class Theme extends BaseTheme
 	 */
 	public function getSettings()
 	{
-		return array(
+		return [
 			/*
 			 * Specifies whether images from default theme shall be
 			 * fetched instead of the current theme when using
@@ -78,11 +88,11 @@ class Theme extends BaseTheme
 			 * Example:
 			 * - _light/index_light.css is loaded when index.css is needed.
 			 */
-			'theme_variants' => array(
+			'theme_variants' => [
 				'light',
 				'besocial',
 				'dark',
-			),
+			],
 
 			/*
 			 * Provides avatars for use on various indexes.
@@ -105,20 +115,18 @@ class Theme extends BaseTheme
 			 * unread messages, moderation reports, etc. You can
 			 * style each menu level indicator as desired.
 			 */
-			'menu_numeric_notice' => array(
+			'menu_numeric_notice' => [
 				// Top level menu entries
 				0 => ' <span class="pm_indicator">%1$s</span>',
 				// First dropdown
 				1 => ' <span>[<strong>%1$s</strong>]</span>',
 				// Second level dropdown
 				2 => ' <span>[<strong>%1$s</strong>]</span>',
-			),
+			],
 
 			// This slightly more complex array, instead, will deal with page indexes as frequently requested by Ant :P
 			// Oh no you don't. :D This slightly less complex array now has cleaner markup. :P
-			// @todo - God it's still ugly though. Can't we just have links where we need them, without all those spans?
-			// How do we get anchors only, where they will work? Spans and strong only where necessary?
-			'page_index_template' => array(
+			'page_index_template' => [
 				'base_link' => '<li class="linavPages"><a class="navPages" href="{base_link}">%2$s</a></li>',
 				'previous_page' => '<span class="previous_page">{prev_txt}</span>',
 				'current_page' => '<li class="linavPages"><strong class="current_page">%1$s</strong></li>',
@@ -126,13 +134,13 @@ class Theme extends BaseTheme
 				'expand_pages' => '<li class="linavPages expand_pages" {custom}> <a href="#">&#8230;</a> </li>',
 				'all' => '<span class="linavPages all_pages">{all_txt}</span>',
 				'none' => '<li class="hide"><a href="#"></a></li>',
-			),
+			],
 
 			// @todo find a better place if we are going to create a notifications template
-			'mentions' => array(
+			'mentions' => [
 				'mentioner_template' => '<a href="{mem_url}" class="mentionavatar">{avatar_img}{mem_name}</a>',
-			)
-		);
+			]
+		];
 	}
 
 	/**
@@ -148,46 +156,56 @@ class Theme extends BaseTheme
 	/**
 	 * The header template
 	 */
-	public function template_header()
+	public function template_header(): void
 	{
 		global $context, $settings;
 
 		doSecurityChecks();
-
 		$this->setupThemeContext();
+
 		$header = Headers::instance();
-		$api = $this->_req->getRequest('api', 'trim');
-
-		// Print stuff to prevent caching of pages (except on attachment errors, etc.)
-		if (empty($context['no_last_modified']))
-		{
-			$header
-				->header('Expires', 'Mon, 26 Jul 1997 05:00:00 GMT')
-				->header('Last-Modified', gmdate('D, d M Y H:i:s') . ' GMT');
-		}
-
-		if (isset($context['sub_template']) && $context['sub_template'] === 'fatal_error')
-		{
-			$header->contentType('text/html', 'UTF-8');
-		}
-		elseif($api === 'json')
-		{
-			$header->contentType('application/json', 'UTF-8');
-		}
-		elseif ($api === 'xml')
-		{
-			$header->contentType('text/xml', 'UTF-8');
-		}
-		else
-		{
-			$header->contentType('text/html', 'UTF-8');
-		}
+		$this->setupHeadersExpiration($header, $context);
+		$this->setupHeadersContentType($header, $context, $this->getRequestAPI());
 
 		foreach ($this->getLayers()->prepareContext() as $layer)
 		{
 			$this->getTemplates()->loadSubTemplate($layer . '_above', 'ignore');
 		}
 
+		$this->loadDefaultThemeSettings($settings);
+
+		$header->sendHeaders();
+	}
+
+	private function getRequestAPI(): string
+	{
+		return $this->_req->getRequest('api', 'trim', '');
+	}
+
+	private function setupHeadersExpiration(Headers $header, array $context): void
+	{
+		if (empty($context['no_last_modified']))
+		{
+			$header
+				->header('Expires', self::DEFAULT_EXPIRES)
+				->header('Last-Modified', gmdate('D, d M Y H:i:s') . ' GMT');
+		}
+	}
+
+	private function setupHeadersContentType(Headers $header, array $context, string $api): void
+	{
+		if (isset($context['sub_template']))
+		{
+			$api = $context['sub_template'];
+		}
+
+		$contentType = self::CONTENT_TYPES[$api] ?? 'text/html';
+
+		$header->contentType($contentType, 'UTF-8');
+	}
+
+	private function loadDefaultThemeSettings(array &$settings): void
+	{
 		if (isset($settings['use_default_images'], $settings['default_template'])
 			&& $settings['use_default_images'] === 'defaults')
 		{
@@ -195,8 +213,6 @@ class Theme extends BaseTheme
 			$settings['images_url'] = $settings['default_images_url'];
 			$settings['theme_dir'] = $settings['default_theme_dir'];
 		}
-
-		$header->sendHeaders();
 	}
 
 	/**
@@ -206,7 +222,7 @@ class Theme extends BaseTheme
 	 */
 	public function setupThemeContext($forceload = false)
 	{
-		global $modSettings, $scripturl, $context, $settings, $options, $txt, $boardurl;
+		global $context;
 
 		static $loaded = false;
 
@@ -221,90 +237,177 @@ class Theme extends BaseTheme
 
 		$context['current_time'] = standardTime(time(), false);
 		$context['current_action'] = $this->_req->getQuery('action', 'trim', '');
-		$context['robot_no_index'] = in_array($context['current_action'], $this->no_index_actions);
+		$context['robot_no_index'] = in_array($context['current_action'], $this->no_index_actions, true);
+		$context['additional_dropdown_search'] = prepareSearchEngines();
 
-		$bbc_parser = ParserWrapper::instance();
+		$this->setupNewsLines();
+		$this->setupCurrentUserContext();
+		//$this->setupMenuContext();
+		(new MenuContext())->setupMenuContext();
+		$this->setContextShowPmPopup();
+		$this->setContextCommonStats();
+		$this->setContextThemeData();
+		$this->loadCustomCSS();
+	}
 
-		// Get some news...
+	/**
+	 * Sets up the news lines for display
+	 *
+	 * What it does:
+	 *  - Retrieves the news lines from the modSettings variable
+	 *  - Filters out empty lines and trims whitespace
+	 *  - Parses the news lines using the BBC parser
+	 *  - Sets a random news line as the 'random_news_line' variable in the context
+	 *  - Adds the 'news_fader' callback to the 'upper_content_callbacks' array in the context
+	 *  - Sets the 'show_news' variable in the context based on the 'enable_news' setting in $settings
+	 */
+	private function setupNewsLines()
+	{
+		global $context, $modSettings, $settings;
+
 		$context['news_lines'] = array_filter(explode("\n", str_replace("\r", '', trim(addslashes($modSettings['news'])))));
+		$bbc_parser = ParserWrapper::instance();
 		foreach ($context['news_lines'] as $i => $iValue)
 		{
 			if (trim($iValue) === '')
 			{
 				continue;
 			}
-
-			// Clean it up for presentation ;).
 			$context['news_lines'][$i] = $bbc_parser->parseNews(stripslashes(trim($iValue)));
 		}
 
-		// If we have some, setup for display
-		if (!empty($context['news_lines']))
+		if (empty($context['news_lines']))
 		{
-			$context['random_news_line'] = $context['news_lines'][mt_rand(0, count($context['news_lines']) - 1)];
-			$context['upper_content_callbacks'][] = 'news_fader';
+			return;
 		}
 
-		if ($this->user->is_guest === false)
-		{
-			$context['user']['messages'] = $this->user->messages;
-			$context['user']['unread_messages'] = $this->user->unread_messages;
-			$context['user']['mentions'] = $this->user->mentions;
-
-			// Personal message popup...
-			if ($this->user->unread_messages > ($_SESSION['unread_messages'] ?? 0))
-			{
-				$context['user']['popup_messages'] = true;
-			}
-			else
-			{
-				$context['user']['popup_messages'] = false;
-			}
-
-			$_SESSION['unread_messages'] = $this->user->unread_messages;
-
-			$context['user']['avatar'] = array(
-				'href' => !empty($this->user->avatar['href']) ? $this->user->avatar['href'] : '',
-				'image' => !empty($this->user->avatar['image']) ? $this->user->avatar['image'] : '',
-			);
-
-			// Figure out how long they've been logged in.
-			$context['user']['total_time_logged_in'] = array(
-				'days' => floor($this->user->total_time_logged_in / 86400),
-				'hours' => floor(($this->user->total_time_logged_in % 86400) / 3600),
-				'minutes' => floor(($this->user->total_time_logged_in % 3600) / 60)
-			);
-		}
-		else
-		{
-			$context['user']['messages'] = 0;
-			$context['user']['unread_messages'] = 0;
-			$context['user']['mentions'] = 0;
-			$context['user']['avatar'] = array();
-			$context['user']['total_time_logged_in'] = array('days' => 0, 'hours' => 0, 'minutes' => 0);
-			$context['user']['popup_messages'] = false;
-
-			if (!empty($modSettings['registration_method']) && $modSettings['registration_method'] == 1)
-			{
-				$txt['welcome_guest'] .= $txt['welcome_guest_activate'];
-			}
-
-			$txt['welcome_guest'] = replaceBasicActionUrl($txt['welcome_guest']);
-
-			// If we've upgraded recently, go easy on the passwords.
-			if (!empty($modSettings['enable_password_conversion']))
-			{
-				$context['disable_login_hashing'] = true;
-			}
-		}
-
-		// Setup the main menu items.
-		$this->setupMenuContext();
+		$context['random_news_line'] = $context['news_lines'][mt_rand(0, count($context['news_lines']) - 1)];
+		$context['upper_content_callbacks'][] = 'news_fader';
 
 		// This is here because old index templates might still use it.
 		$context['show_news'] = !empty($settings['enable_news']);
+	}
 
-		$context['additional_dropdown_search'] = prepareSearchEngines();
+	/**
+	 * Sets up the information context for the current user
+	 *
+	 * What it does:
+	 * - Sets the current time and current action
+	 * - Checks if the current action should be indexed by robots
+	 * - Calls setupLoggedUserContext if the user is not a guest
+	 * - Calls setupGuestContext if the user is a guest
+	 * - Checks if the PM popup should be shown and adds the necessary JavaScript code
+	 */
+	private function setupCurrentUserContext()
+	{
+		global $scripturl, $context, $options, $txt;
+
+		$context['current_time'] = standardTime(time(), false);
+		$context['current_action'] = $this->_req->getQuery('action', 'trim', '');
+		$context['robot_no_index'] = in_array($context['current_action'], $this->no_index_actions, true);
+
+		if ($this->user->is_guest === false)
+		{
+			$this->setupLoggedUserContext();
+		}
+		else
+		{
+			$this->setupGuestContext();
+		}
+
+		$context['show_pm_popup'] = $context['user']['popup_messages'] && !empty($options['popup_messages']) && $context['current_action'] !== 'pm';
+		if ($context['show_pm_popup'])
+		{
+			$this->addInlineJavascript('
+        $(function() {
+            new elk_Popup({
+                heading: ' . JavaScriptEscape($txt['show_personal_messages_heading']) . ',
+                content: ' . JavaScriptEscape(sprintf($txt['show_personal_messages'], $context['user']['unread_messages'], $scripturl . '?action=pm')) . ',
+                icon: \'i-envelope\'
+            });
+        });', true);
+		}
+	}
+
+	/**
+	 * Setup the logged user context
+	 *
+	 * What it does:
+	 *  - Copies relevant user data from the user object to the global context.
+	 */
+	private function setupLoggedUserContext()
+	{
+		global $context;
+
+		$context['user']['messages'] = $this->user->messages;
+		$context['user']['unread_messages'] = $this->user->unread_messages;
+		$context['user']['mentions'] = $this->user->mentions;
+
+		// Personal message popup...
+		if ($this->user->unread_messages > ($_SESSION['unread_messages'] ?? 0))
+		{
+			$context['user']['popup_messages'] = true;
+		}
+		else
+		{
+			$context['user']['popup_messages'] = false;
+		}
+
+		$_SESSION['unread_messages'] = $this->user->unread_messages;
+
+		$context['user']['avatar'] = [
+			'href' => !empty($this->user->avatar['href']) ? $this->user->avatar['href'] : '',
+			'image' => !empty($this->user->avatar['image']) ? $this->user->avatar['image'] : '',
+		];
+
+		// Figure out how long they've been logged in.
+		$context['user']['total_time_logged_in'] = [
+			'days' => floor($this->user->total_time_logged_in / 86400),
+			'hours' => floor(($this->user->total_time_logged_in % 86400) / 3600),
+			'minutes' => floor(($this->user->total_time_logged_in % 3600) / 60)
+		];
+	}
+
+	/**
+	 * Setup guest context
+	 *
+	 * What it does:
+	 *  - Initializes global variables for guest user context
+	 */
+	private function setupGuestContext()
+	{
+		global $modSettings, $context, $txt;
+
+		$context['user']['messages'] = 0;
+		$context['user']['unread_messages'] = 0;
+		$context['user']['mentions'] = 0;
+		$context['user']['avatar'] = [];
+		$context['user']['total_time_logged_in'] = ['days' => 0, 'hours' => 0, 'minutes' => 0];
+		$context['user']['popup_messages'] = false;
+
+		if (!empty($modSettings['registration_method']) && (int) $modSettings['registration_method'] === 1)
+		{
+			$txt['welcome_guest'] .= $txt['welcome_guest_activate'];
+		}
+
+		$txt['welcome_guest'] = replaceBasicActionUrl($txt['welcome_guest']);
+
+		// If we've upgraded recently, go easy on the passwords.
+		if (!empty($modSettings['enable_password_conversion']))
+		{
+			$context['disable_login_hashing'] = true;
+		}
+	}
+
+	/**
+	 * Set the context for showing the PM popup
+	 *
+	 * What it does:
+	 *  - Sets the context variable $context['show_pm_popup'] based on user preferences and current action
+	 */
+	private function setContextShowPmPopup()
+	{
+		global $context, $options, $txt, $scripturl;
 
 		// This is done to allow theme authors to customize it as they want.
 		$context['show_pm_popup'] = $context['user']['popup_messages'] && !empty($options['popup_messages']) && $context['current_action'] !== 'pm';
@@ -313,58 +416,88 @@ class Theme extends BaseTheme
 		if ($context['show_pm_popup'])
 		{
 			$this->addInlineJavascript('
-			$(function() {
-				new elk_Popup({
-					heading: ' . JavaScriptEscape($txt['show_personal_messages_heading']) . ',
-					content: ' . JavaScriptEscape(sprintf($txt['show_personal_messages'], $context['user']['unread_messages'], $scripturl . '?action=pm')) . ',
-					icon: \'i-envelope\'
-				});
-			});', true);
+		$(function() {
+			new elk_Popup({
+				heading: ' . JavaScriptEscape($txt['show_personal_messages_heading']) . ',
+				content: ' . JavaScriptEscape(sprintf($txt['show_personal_messages'], $context['user']['unread_messages'], $scripturl . '?action=pm')) . ',
+				icon: \'i-envelope\'
+			});
+		});', true);
 		}
+	}
+
+	/**
+	 * Set the common stats in the context
+	 *
+	 * What it does:
+	 *  - Sets the total posts, total topics, total members, and latest member stats in the common_stats array of the context
+	 *  - Sets the formatted string for displaying the total posts in the boardindex_total_posts variable of the context
+	 */
+	private function setContextCommonStats()
+	{
+		global $context, $txt, $modSettings;
 
 		// This looks weird, but it's because BoardIndex.controller.php references the variable.
 		$href = getUrl('profile', ['action' => 'profile', 'u' => $modSettings['latestMember'], 'name' => $modSettings['latestRealName']]);
-		$context['common_stats']['latest_member'] = array(
-			'id' => $modSettings['latestMember'],
-			'name' => $modSettings['latestRealName'],
-			'href' => $href,
-			'link' => '<a href="' . $href . '">' . $modSettings['latestRealName'] . '</a>',
-		);
 
-		$context['common_stats'] = array(
+		$context['common_stats'] = [
 			'total_posts' => comma_format($modSettings['totalMessages']),
 			'total_topics' => comma_format($modSettings['totalTopics']),
 			'total_members' => comma_format($modSettings['totalMembers']),
-			'latest_member' => $context['common_stats']['latest_member'],
-		);
+			'latest_member' => [
+				'id' => $modSettings['latestMember'],
+				'name' => $modSettings['latestRealName'],
+				'href' => $href,
+				'link' => '<a href="' . $href . '">' . $modSettings['latestRealName'] . '</a>',
+			],
+		];
 
 		$context['common_stats']['boardindex_total_posts'] = sprintf($txt['boardindex_total_posts'], $context['common_stats']['total_posts'], $context['common_stats']['total_topics'], $context['common_stats']['total_members']);
+	}
+
+	/**
+	 * Set the context theme data
+	 *
+	 * What it does:
+	 *  - Sets the theme data in the context array
+	 *  - Adds necessary JavaScript variables
+	 *  - Sets the page title and favicon
+	 *  - Updates the HTML headers
+	 */
+	private function setContextThemeData()
+	{
+		global $context, $scripturl, $settings, $boardurl, $modSettings, $txt;
 
 		if (empty($settings['theme_version']))
 		{
-			$this->addJavascriptVar(array('elk_scripturl' => $scripturl), true);
-		}
-		$this->addJavascriptVar(array('elk_forum_action' =>  getUrlQuery('action', $modSettings['default_forum_action'])), true);
-
-		if (!isset($context['page_title']))
-		{
-			$context['page_title'] = '';
+			$this->addJavascriptVar(['elk_scripturl' => $scripturl], true);
 		}
 
-		// Set some specific vars.
-		$context['page_title_html_safe'] = Util::htmlspecialchars(un_htmlspecialchars($context['page_title'])) . (!empty($context['current_page']) ? ' - ' . $txt['page'] . ' ' . ($context['current_page'] + 1) : '');
+		$this->addJavascriptVar(['elk_forum_action' => getUrlQuery('action', $modSettings['default_forum_action'])], true);
 
+		$context['page_title'] = $context['page_title'] ?? '';
+		$context['page_title_html_safe'] = Util::htmlspecialchars(un_htmlspecialchars($context['page_title'])) . (!empty($context['current_page']) ? ' - ' . $txt['page'] . (' ' . ($context['current_page'] + 1)) : '');
 		$context['favicon'] = $boardurl . '/mobile.png';
 
-		$this->loadSupportCSS();
+		$context['html_headers'] = $context['html_headers'] ?? '';
+	}
+
+	/**
+	 * Adds required support CSS files.
+	 */
+	public function loadCustomCSS()
+	{
+		global $settings, $modSettings, $txt;
+
+		// Load a base theme custom CSS file?
+		$fileFunc = FileFunctions::instance();
+		if ($fileFunc->fileExists($settings['theme_dir'] . '/css/custom.css'))
+		{
+			loadCSSFile('custom.css');
+		}
 
 		// Since it's nice to have avatars all the same size, and in some cases the size detection may fail,
 		// let's add the css in any case
-		if (!isset($context['html_headers']))
-		{
-			$context['html_headers'] = '';
-		}
-
 		if (!empty($modSettings['avatar_max_width']) || !empty($modSettings['avatar_max_height']))
 		{
 			$this->addCSSRules('
@@ -387,54 +520,6 @@ class Theme extends BaseTheme
 		input[type=checkbox].quote-show-more:after {content: "' . $txt['quote_expand'] . '";}
 		.quote-read-more > .bbc_quote {--quote_height: ' . $quote_height . ';}'
 		);
-	}
-
-	/**
-	 * Sets up all the top menu buttons
-	 *
-	 * What it does:
-	 *
-	 * - Defines every master item in the menu, as well as any sub-items
-	 * - Ensures the chosen action is set so the menu is highlighted
-	 * - Saves them in the cache if it is available and on
-	 * - Places the results in $context
-	 */
-	public function setupMenuContext()
-	{
-		global $context, $modSettings, $settings;
-
-		// Set up the menu privileges.
-		$context['allow_search'] = !empty($modSettings['allow_guestAccess']) ? allowedTo('search_posts') : ($this->user->is_guest === false && allowedTo('search_posts'));
-		$context['allow_admin'] = allowedTo(array('admin_forum', 'manage_boards', 'manage_permissions', 'moderate_forum', 'manage_membergroups', 'manage_bans', 'send_mail', 'edit_news', 'manage_attachments', 'manage_smileys'));
-		$context['allow_edit_profile'] = $this->user->is_guest === false && allowedTo(array('profile_view_own', 'profile_view_any', 'profile_identity_own', 'profile_identity_any', 'profile_extra_own', 'profile_extra_any', 'profile_remove_own', 'profile_remove_any', 'moderate_forum', 'manage_membergroups', 'profile_title_own', 'profile_title_any'));
-		$context['allow_memberlist'] = allowedTo('view_mlist');
-		$context['allow_calendar'] = allowedTo('calendar_view') && !empty($modSettings['cal_enabled']);
-		$context['allow_moderation_center'] = $context['user']['can_mod'];
-		$context['allow_pm'] = allowedTo('pm_read');
-		$cache = Cache::instance();
-
-		call_integration_hook('integrate_setup_allow');
-
-		if ($context['allow_search'])
-		{
-			$context['theme_header_callbacks'] = elk_array_insert($context['theme_header_callbacks'], 'login_bar', array('search_bar'), 'after');
-		}
-
-		// Add in a top section notice callback
-		$context['theme_header_callbacks'][] = 'header_bar';
-
-		$cacheTime = $modSettings['lastActive'] * 60;
-
-		// Update the Moderation menu items with action item totals
-		if ($context['allow_moderation_center'])
-		{
-			// Get the numbers for the menu ...
-			require_once(SUBSDIR . '/Moderation.subs.php');
-			$menu_count = loadModeratorMenuCounts();
-		}
-
-		$menu_count['unread_messages'] = $context['user']['unread_messages'];
-		$menu_count['mentions'] = $context['user']['mentions'];
 
 		if (!empty($this->user->avatar['href']))
 		{
@@ -445,157 +530,6 @@ class Theme extends BaseTheme
 			background-position: center;
 			filter: unset;
 		}');
-		}
-
-		// All the buttons we can possibly want and then some, try pulling the final list of buttons from cache first.
-		if ((time() - $cacheTime <= $modSettings['settings_updated'])
-			|| ($menu_buttons = $cache->get('menu_buttons-' . implode('_', $this->user->groups) . '-' . $this->user->language, $cacheTime)) === null)
-		{
-			// Start things up: this is what we know by default
-			require_once(SUBSDIR . '/Menu.subs.php');
-			$buttons = loadDefaultMenuButtons();
-
-			// Allow editing menu buttons easily.
-			call_integration_hook('integrate_menu_buttons', array(&$buttons, &$menu_count));
-
-			// Now we put the buttons in the context so the theme can use them.
-			$menu_buttons = [];
-			foreach ($buttons as $act => $button)
-			{
-				if (!empty($button['show']))
-				{
-					$button['active_button'] = false;
-
-					// This button needs some action.
-					if (isset($button['action_hook']))
-					{
-						$needs_action_hook = true;
-					}
-
-					// This button has a [#] indicator
-					if (isset($button['counter']) && !empty($menu_count[$button['counter']]))
-					{
-						$button['alttitle'] = $button['title'] . ' [' . $menu_count[$button['counter']] . ']';
-						if (!empty($settings['menu_numeric_notice'][0]))
-						{
-							$button['title'] .= sprintf($settings['menu_numeric_notice'][0], $menu_count[$button['counter']]);
-							$button['indicator'] = true;
-						}
-					}
-
-					// Go through the sub buttons if there are any.
-					if (isset($button['sub_buttons']))
-					{
-						foreach ($button['sub_buttons'] as $key => $subbutton)
-						{
-							if (empty($subbutton['show']))
-							{
-								unset($button['sub_buttons'][$key]);
-							}
-							elseif (isset($subbutton['counter']) && !empty($menu_count[$subbutton['counter']]))
-							{
-								$button['sub_buttons'][$key]['alttitle'] = $subbutton['title'] . ' [' . $menu_count[$subbutton['counter']] . ']';
-								if (!empty($settings['menu_numeric_notice'][1]))
-								{
-									$button['sub_buttons'][$key]['title'] .= sprintf($settings['menu_numeric_notice'][1], $menu_count[$subbutton['counter']]);
-								}
-
-								// 2nd level sub buttons next...
-								if (isset($subbutton['sub_buttons']))
-								{
-									foreach ($subbutton['sub_buttons'] as $key2 => $subbutton2)
-									{
-										$button['sub_buttons'][$key]['sub_buttons'][$key2] = $subbutton2;
-										if (empty($subbutton2['show']))
-										{
-											unset($button['sub_buttons'][$key]['sub_buttons'][$key2]);
-										}
-										elseif (isset($subbutton2['counter']) && !empty($menu_count[$subbutton2['counter']]))
-										{
-											$button['sub_buttons'][$key]['sub_buttons'][$key2]['alttitle'] = $subbutton2['title'] . ' [' . $menu_count[$subbutton2['counter']] . ']';
-											if (!empty($settings['menu_numeric_notice'][2]))
-											{
-												$button['sub_buttons'][$key]['sub_buttons'][$key2]['title'] .= sprintf($settings['menu_numeric_notice'][2], $menu_count[$subbutton2['counter']]);
-											}
-											unset($menu_count[$subbutton2['counter']]);
-										}
-									}
-								}
-							}
-						}
-					}
-
-					$menu_buttons[$act] = $button;
-				}
-			}
-
-			if ($cache->levelHigherThan(1))
-			{
-				$cache->put('menu_buttons-' . implode('_', $this->user->groups) . '-' . $this->user->language, $menu_buttons, $cacheTime);
-			}
-		}
-
-		if (!empty($menu_buttons['profile']['sub_buttons']['logout']))
-		{
-			$menu_buttons['profile']['sub_buttons']['logout']['href'] .= ';' . $context['session_var'] . '=' . $context['session_id'];
-		}
-
-		$context['menu_buttons'] = $menu_buttons;
-
-		// Figure out which action we are doing, so we can set the active tab.
-		// Default to home.
-		$current_action = 'home';
-
-		if (isset($context['menu_buttons'][$context['current_action']]))
-		{
-			$current_action = $context['current_action'];
-		}
-		elseif ($context['current_action'] === 'profile')
-		{
-			$current_action = 'pm';
-		}
-		elseif ($context['current_action'] === 'theme')
-		{
-			$sa = $this->_req->getRequest('sa', 'trim', '');
-			$current_action = $sa === 'pick' ? 'profile' : 'admin';
-		}
-		elseif ($context['current_action'] === 'login2' || ($this->user->is_guest && $context['current_action'] === 'reminder'))
-		{
-			$current_action = 'login';
-		}
-		elseif ($context['current_action'] === 'groups' && $context['allow_moderation_center'])
-		{
-			$current_action = 'moderate';
-		}
-		elseif ($context['current_action'] === 'moderate' && $context['allow_admin'])
-		{
-			$current_action = 'admin';
-		}
-
-		// Not all actions are simple.
-		if (!empty($needs_action_hook))
-		{
-			call_integration_hook('integrate_current_action', array(&$current_action));
-		}
-
-		if (isset($context['menu_buttons'][$current_action]))
-		{
-			$context['menu_buttons'][$current_action]['active_button'] = true;
-		}
-	}
-
-	/**
-	 * Adds required support CSS files.
-	 */
-	public function loadSupportCSS()
-	{
-		global $settings;
-
-		// Load a base theme custom CSS file?
-		$fileFunc = FileFunctions::instance();
-		if ($fileFunc->fileExists($settings['theme_dir'] . '/css/custom.css'))
-		{
-			loadCSSFile('custom.css');
 		}
 	}
 
@@ -768,7 +702,7 @@ class Theme extends BaseTheme
 			$combine_standard_name = $combiner->site_js_combine($this->js_files, false);
 			$combine_deferred_name = $combiner->site_js_combine($this->js_files, true);
 
-			call_integration_hook('post_javascript_combine', array(&$combine_standard_name, &$combine_deferred_name, $combiner));
+			call_integration_hook('post_javascript_combine', [&$combine_standard_name, &$combine_deferred_name, $combiner]);
 
 			if (!empty($combine_standard_name))
 			{
@@ -983,7 +917,7 @@ class Theme extends BaseTheme
 			$combiner = new SiteCombiner($settings['default_theme_cache_dir'], $settings['default_theme_cache_url'], $minify);
 			$combine_name = $combiner->site_css_combine($this->css_files);
 
-			call_integration_hook('post_css_combine', array(&$combine_name, $combiner));
+			call_integration_hook('post_css_combine', [&$combine_name, $combiner]);
 
 			if (!empty($combine_name))
 			{
@@ -1120,11 +1054,11 @@ class Theme extends BaseTheme
 		global $settings, $context, $modSettings, $scripturl, $txt, $options;
 
 		// Queue our Javascript
-		loadJavascriptFile(array('script.js', 'script_elk.js'));
-		loadJavascriptFile(array('elk_jquery_plugins.js', 'theme.js'), ['defer' => true]);
+		loadJavascriptFile(['script.js', 'script_elk.js']);
+		loadJavascriptFile(['elk_jquery_plugins.js', 'theme.js'], ['defer' => true]);
 
 		// Default JS variables for use in every theme
-		$this->addJavascriptVar(array(
+		$this->addJavascriptVar([
 			'elk_theme_url' => JavaScriptEscape($settings['theme_url']),
 			'elk_default_theme_url' => JavaScriptEscape($settings['default_theme_url']),
 			'elk_images_url' => JavaScriptEscape($settings['images_url']),
@@ -1139,7 +1073,7 @@ class Theme extends BaseTheme
 			'ajax_notification_cancel_text' => JavaScriptEscape($txt['modify_cancel']),
 			'help_popup_heading_text' => JavaScriptEscape($txt['help_popup']),
 			'use_click_menu' => !empty($options['use_click_menu']) ? 'true' : 'false',
-			'todayMod' => !empty($modSettings['todayMod']) ? (int) $modSettings['todayMod'] : 0)
+			'todayMod' => !empty($modSettings['todayMod']) ? (int) $modSettings['todayMod'] : 0]
 		);
 
 		// Auto video embedding enabled, then load the needed JS
@@ -1168,7 +1102,7 @@ class Theme extends BaseTheme
 
 		if (!empty($modSettings['enableVideoEmbeding']))
 		{
-			loadJavascriptFile('elk_jquery_embed.js', array('defer' => true));
+			loadJavascriptFile('elk_jquery_embed.js', ['defer' => true]);
 
 			$this->addInlineJavascript('
 				const oEmbedtext = ({
@@ -1203,7 +1137,7 @@ class Theme extends BaseTheme
 		if (!empty($modSettings['enableCodePrettify']))
 		{
 			$this->loadVariant('prettify');
-			loadJavascriptFile('prettify.min.js', array('defer' => true));
+			loadJavascriptFile('prettify.min.js', ['defer' => true]);
 
 			$this->addInlineJavascript('
 				document.addEventListener("DOMContentLoaded", () => {
@@ -1321,13 +1255,13 @@ class Theme extends BaseTheme
 	{
 		global $settings;
 
-		$simpleActions = array(
+		$simpleActions = [
 			'quickhelp',
 			'printpage',
 			'quotefast',
-		);
+		];
 
-		call_integration_hook('integrate_simple_actions', array(&$simpleActions));
+		call_integration_hook('integrate_simple_actions', [&$simpleActions]);
 
 		// Output is fully XML
 		$api = $this->_req->getRequest('api', 'trim', '');
