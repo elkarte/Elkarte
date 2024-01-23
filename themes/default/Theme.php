@@ -216,13 +216,13 @@ class Theme extends BaseTheme
 		if ($context['show_pm_popup'])
 		{
 			$this->addInlineJavascript('
-        $(function() {
-            new elk_Popup({
-                heading: ' . JavaScriptEscape($txt['show_personal_messages_heading']) . ',
-                content: ' . JavaScriptEscape(sprintf($txt['show_personal_messages'], $context['user']['unread_messages'], $scripturl . '?action=pm')) . ',
-                icon: \'i-envelope\'
-            });
-        });', true);
+		$(function() {
+			new elk_Popup({
+				heading: ' . JavaScriptEscape($txt['show_personal_messages_heading']) . ',
+				content: ' . JavaScriptEscape(sprintf($txt['show_personal_messages'], $context['user']['unread_messages'], $scripturl . '?action=pm')) . ',
+				icon: \'i-envelope\'
+			});
+		});', true);
 		}
 	}
 
