@@ -25,10 +25,8 @@ class Server extends \ArrayObject
 {
 	/** @var mixed */
 	public $SERVER_SOFTWARE;
-
 	/** @var mixed */
 	public $HTTPS;
-
 	/** @var mixed */
 	public $SERVER_PORT;
 
@@ -41,7 +39,7 @@ class Server extends \ArrayObject
 	{
 		if (!is_array($server))
 		{
-			$server = $_SERVER ?? array();
+			$server = $_SERVER ?? [];
 		}
 
 		parent::__construct($server, \ArrayObject::ARRAY_AS_PROPS);
@@ -211,10 +209,26 @@ class Server extends \ArrayObject
 	public function supportsSSL()
 	{
 		return
-			(isset($this->HTTPS) && ($this->HTTPS === 'on' || $this->HTTPS == 1))
+			(isset($this->HTTPS) && ($this->HTTPS === 'on' || (int) $this->HTTPS === 1))
 			|| (isset($this->REQUEST_SCHEME) && $this->REQUEST_SCHEME === 'https')
-			|| (isset($this->SERVER_PORT) && $this->SERVER_PORT == 443)
+			|| (isset($this->SERVER_PORT) && (int) $this->SERVER_PORT === 443)
 			|| (isset($this->HTTP_X_FORWARDED_PROTO) && $this->HTTP_X_FORWARDED_PROTO === 'https');
+	}
+
+	public function getHost()
+	{
+		$host = $this->HTTP_HOST;
+		if (!$host)
+		{
+			$host = $this->SERVER_NAME;
+			$port = (int) $this->SERVER_PORT;
+			if ($port && $port !== 80 && $port !== 443)
+			{
+				$host .= ":$port";
+			}
+		}
+
+		return $host;
 	}
 
 	/**
