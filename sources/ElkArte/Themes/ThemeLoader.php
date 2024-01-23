@@ -1,7 +1,7 @@
 <?php
 
 /**
- * The main abstract theme class
+ * The main ThemeLoader class
  *
  * @package   ElkArte Forum
  * @copyright ElkArte Forum contributors
@@ -23,28 +23,44 @@ use ElkArte\Util;
 use ElkArte\Languages\Txt;
 
 /**
- * Class ThemeLoader
+ * The ThemeLoader class is responsible for loading and initializing themes in ElkArte.
  */
 class ThemeLoader
 {
-	/** @var mixed|\ElkArte\ValuesContainer */
+	/** @var mixed|ValuesContainer */
 	public $user;
-
 	/** @var int The id of the theme being used */
 	private $id;
-
 	/** @var Theme The current theme. */
 	private $theme;
-
 	/** @var Directories The list of directories. */
 	protected static $dirs;
+	/** @var string[] Theme items we shouldn't be able to change */
+	protected $immutable_theme_data = [
+		'actual_theme_url',
+		'actual_images_url',
+		'base_theme_dir',
+		'base_theme_url',
+		'default_images_url',
+		'default_theme_dir',
+		'default_theme_url',
+		'default_template',
+		'images_url',
+		'number_recent_posts',
+		'smiley_sets_default',
+		'theme_dir',
+		'theme_id',
+		'theme_layers',
+		'theme_templates',
+		'theme_url',
+	];
 
 	/**
 	 * Load a theme, by ID.
 	 *
 	 * What it does:
 	 * - identify the theme to be loaded.
-	 * - validate that the theme is valid and that the user has permission to use it
+	 * - Checks that the theme is valid and that the user has permission to use it
 	 * - load the users theme settings and site settings into $options.
 	 * - prepares the list of folders to search for template loading.
 	 * - sets up $context['user']
@@ -71,7 +87,8 @@ class ThemeLoader
 		$this->loadThemeUrls();
 		loadUserContext();
 
-		// Set up some additional interface preference context
+		// Set up some additional UI preference context
+		$context['admin_preferences'] = [];
 		if (!empty($options['admin_preferences']))
 		{
 			$context['admin_preferences'] = serializeToJson($options['admin_preferences'], function ($array_form) {
@@ -82,16 +99,12 @@ class ThemeLoader
 				updateAdminPreferences();
 			});
 		}
-		else
-		{
-			$context['admin_preferences'] = [];
-		}
 
 		if ($this->user->is_guest === false)
 		{
 			if (!empty($options['minmax_preferences']))
 			{
-				$context['minmax_preferences'] = serializeToJson($options['minmax_preferences'], function ($array_form) {
+				$context['minmax_preferences'] = serializeToJson($options['minmax_preferences'], static function ($array_form) {
 					global $settings;
 
 					// Update the option.
@@ -144,9 +157,6 @@ class ThemeLoader
 			// Disable the search dropdown.
 			$modSettings['search_dropdown'] = false;
 		}
-
-		// @todo Hummm this seems a bit wanky
-		$txt = $txt ?? [];
 
 		// Defaults in case of odd things
 		$settings['avatars_on_indexes'] = 0;
@@ -223,21 +233,21 @@ class ThemeLoader
 		if (!empty($_SESSION['agreement_accepted']))
 		{
 			$_SESSION['agreement_accepted'] = null;
-			$context['accepted_agreement'] = array(
-				'errors' => array(
+			$context['accepted_agreement'] = [
+				'errors' => [
 					'accepted_agreement' => $txt['agreement_accepted']
-				)
-			);
+				]
+			];
 		}
 
 		if (!empty($_SESSION['privacypolicy_accepted']))
 		{
 			$_SESSION['privacypolicy_accepted'] = null;
-			$context['accepted_agreement'] = array(
-				'errors' => array(
+			$context['accepted_agreement'] = [
+				'errors' => [
 					'accepted_privacy_policy' => $txt['privacypolicy_accepted']
-				)
-			);
+				]
+			];
 		}
 
 		$this->theme->loadThemeJavascript();
@@ -282,8 +292,6 @@ class ThemeLoader
 			? 'DefaultTheme'
 			: ucfirst(basename($settings['theme_dir']));
 
-		// The require should not be necessary, but I guess it's better to stay on the safe side.
-		require_once(EXTDIR . '/ClassLoader.php');
 		$loader = new ClassLoader();
 		$loader->setPsr4('ElkArte\\Themes\\' . $themeName . '\\', $themeData[0]['default_theme_dir']);
 		$loader->register();
@@ -349,7 +357,7 @@ class ThemeLoader
 			$this->id = (int) $this->id;
 		}
 		// The theme was specified by Get or Post.
-		elseif (!empty($_req->getRequest('theme', 'intval', null)))
+		elseif (!empty($_req->getRequest('theme', 'intval')))
 		{
 			$this->id = $_req->get('theme');
 			$_SESSION['theme'] = $this->id;
@@ -423,24 +431,7 @@ class ThemeLoader
 		{
 			$db = database();
 
-			$immutable_theme_data = [
-				'actual_theme_url',
-				'actual_images_url',
-				'base_theme_dir',
-				'base_theme_url',
-				'default_images_url',
-				'default_theme_dir',
-				'default_theme_url',
-				'default_template',
-				'images_url',
-				'number_recent_posts',
-				'smiley_sets_default',
-				'theme_dir',
-				'theme_id',
-				'theme_layers',
-				'theme_templates',
-				'theme_url',
-			];
+			$immutable_theme_data = $this->immutable_theme_data;
 
 			// Load variables from the current or default theme, global or this user's.
 			$db->fetchQuery('
@@ -448,7 +439,7 @@ class ThemeLoader
 				variable, value, id_member, id_theme
 			FROM {db_prefix}themes
 			WHERE id_member' . (empty($themeData[0]) ? ' IN (-1, 0, {int:id_member})' : ' = {int:id_member}') . '
-				AND id_theme' . ($this->id == 1 ? ' = {int:id_theme}' : ' IN ({int:id_theme}, 1)'),
+				AND id_theme' . ($this->id === 1 ? ' = {int:id_theme}' : ' IN ({int:id_theme}, 1)'),
 				[
 					'id_theme' => $this->id,
 					'id_member' => $member,
@@ -456,22 +447,22 @@ class ThemeLoader
 			)->fetch_callback(
 				function ($row) use ($immutable_theme_data, &$themeData) {
 					// There are just things we shouldn't be able to change as members.
-					if ($row['id_member'] != 0 && in_array($row['variable'], $immutable_theme_data))
+					if ((int) $row['id_member'] !== 0 && in_array($row['variable'], $immutable_theme_data, true))
 					{
 						return;
 					}
 
 					// If this is the theme_dir of the default theme, store it.
-					if ($row['id_theme'] == 1 && empty($row['id_member'])
+					if ((int) $row['id_theme'] === 1 && empty($row['id_member'])
 						&& in_array($row['variable'], ['theme_dir', 'theme_url', 'images_url']))
 					{
 						$themeData[0]['default_' . $row['variable']] = $row['value'];
 					}
 
 					// If this isn't set yet, is a theme option, or is not the default theme..
-					if (!isset($themeData[$row['id_member']][$row['variable']]) || $row['id_theme'] != 1)
+					if (!isset($themeData[$row['id_member']][$row['variable']]) || (int) $row['id_theme'] !== 1)
 					{
-						$themeData[$row['id_member']][$row['variable']] = substr($row['variable'], 0, 5) === 'show_' ? $row['value'] == 1 : $row['value'];
+						$themeData[$row['id_member']][$row['variable']] = strpos($row['variable'], 'show_') === 0 ? (int) $row['value'] === 1 : $row['value'];
 					}
 				}
 			);
@@ -531,7 +522,7 @@ class ThemeLoader
 			$detected_url .= empty($_SERVER['HTTP_HOST']) ? $_SERVER['SERVER_NAME'] . (empty($_SERVER['SERVER_PORT']) || $_SERVER['SERVER_PORT'] == '80' ? '' : ':' . $_SERVER['SERVER_PORT']) : $_SERVER['HTTP_HOST'];
 			$temp = preg_replace('~/' . basename($scripturl) . '(/.+)?$~', '',
 				strtr(dirname($_SERVER['PHP_SELF']), '\\', '/'));
-			if ($temp != '/')
+			if ($temp !== '/')
 			{
 				$detected_url .= $temp;
 			}
@@ -559,7 +550,7 @@ class ThemeLoader
 
 			// Hmm... check #2 - is it just different by a www?  Send them to the correct place!!
 			if (empty($do_fix) && strtr($detected_url,
-					['://' => '://www.']) == $boardurl && (empty($_GET) || count($_GET) === 1) && ELK !== 'SSI'
+					['://' => '://www.']) === $boardurl && (empty($_GET) || count($_GET) === 1) && ELK !== 'SSI'
 			)
 			{
 				// Okay, this seems weird, but we don't want an endless loop - this will make $_GET not empty ;).
@@ -574,14 +565,14 @@ class ThemeLoader
 			}
 
 			// #3 is just a check for SSL...
-			if (strtr($detected_url, ['https://' => 'http://']) == $boardurl)
+			if (strtr($detected_url, ['https://' => 'http://']) === $boardurl)
 			{
 				$do_fix = true;
 			}
 
 			// Okay, #4 - perhaps it's an IP address?  We're gonna want to use that one, then. (assuming it's the IP or something...)
 			if (!empty($do_fix) || preg_match('~^http[s]?://(?:[\d\.:]+|\[[\d:]+\](?::\d+)?)(?:$|/)~',
-					$detected_url) == 1
+					$detected_url) === 1
 			)
 			{
 				$this->fixThemeUrls($detected_url);
@@ -604,39 +595,39 @@ class ThemeLoader
 
 		// Fix $boardurl and $scripturl.
 		$boardurl = $detected_url;
-		$scripturl = strtr($scripturl, array($oldurl => $boardurl));
-		$_SERVER['REQUEST_URL'] = strtr($_SERVER['REQUEST_URL'], array($oldurl => $boardurl));
+		$scripturl = strtr($scripturl, [$oldurl => $boardurl]);
+		$_SERVER['REQUEST_URL'] = strtr($_SERVER['REQUEST_URL'], [$oldurl => $boardurl]);
 
 		// Fix the theme urls...
-		$settings['theme_url'] = strtr($settings['theme_url'], array($oldurl => $boardurl));
-		$settings['default_theme_url'] = strtr($settings['default_theme_url'], array($oldurl => $boardurl));
-		$settings['actual_theme_url'] = strtr($settings['actual_theme_url'], array($oldurl => $boardurl));
-		$settings['images_url'] = strtr($settings['images_url'], array($oldurl => $boardurl));
-		$settings['default_images_url'] = strtr($settings['default_images_url'], array($oldurl => $boardurl));
-		$settings['actual_images_url'] = strtr($settings['actual_images_url'], array($oldurl => $boardurl));
+		$settings['theme_url'] = strtr($settings['theme_url'], [$oldurl => $boardurl]);
+		$settings['default_theme_url'] = strtr($settings['default_theme_url'], [$oldurl => $boardurl]);
+		$settings['actual_theme_url'] = strtr($settings['actual_theme_url'], [$oldurl => $boardurl]);
+		$settings['images_url'] = strtr($settings['images_url'], [$oldurl => $boardurl]);
+		$settings['default_images_url'] = strtr($settings['default_images_url'], [$oldurl => $boardurl]);
+		$settings['actual_images_url'] = strtr($settings['actual_images_url'], [$oldurl => $boardurl]);
 
 		// And just a few mod settings :).
-		$modSettings['smileys_url'] = strtr($modSettings['smileys_url'], array($oldurl => $boardurl));
-		$modSettings['avatar_url'] = strtr($modSettings['avatar_url'], array($oldurl => $boardurl));
+		$modSettings['smileys_url'] = strtr($modSettings['smileys_url'], [$oldurl => $boardurl]);
+		$modSettings['avatar_url'] = strtr($modSettings['avatar_url'], [$oldurl => $boardurl]);
 
 		// Clean up after loadBoard().
 		if (isset($board_info['moderators']))
 		{
 			foreach ($board_info['moderators'] as $k => $dummy)
 			{
-				$board_info['moderators'][$k]['href'] = strtr($dummy['href'], array($oldurl => $boardurl));
-				$board_info['moderators'][$k]['link'] = strtr($dummy['link'], array('"' . $oldurl => '"' . $boardurl));
+				$board_info['moderators'][$k]['href'] = strtr($dummy['href'], [$oldurl => $boardurl]);
+				$board_info['moderators'][$k]['link'] = strtr($dummy['link'], ['"' . $oldurl => '"' . $boardurl]);
 			}
 		}
 
 		foreach ($context['linktree'] as $k => $dummy)
 		{
-			$context['linktree'][$k]['url'] = strtr($dummy['url'], array($oldurl => $boardurl));
+			$context['linktree'][$k]['url'] = strtr($dummy['url'], [$oldurl => $boardurl]);
 		}
 	}
 
 	/**
-	 * Loads various theme related settings into context and sets system wide theme defaults
+	 * Loads various theme related settings into context and sets system-wide theme defaults
 	 */
 	private function loadThemeContext()
 	{
@@ -692,8 +683,7 @@ class ThemeLoader
 	 * This loads the bare minimum data.
 	 *
 	 * - Needed by scheduled tasks,
-	 * - Needed by any other code that needs language files before the forum (the theme)
-	 * is loaded.
+	 * - Needed by any other code that needs language files before the forum (the theme) is loaded.
 	 */
 	public static function loadEssentialThemeData()
 	{
@@ -729,7 +719,7 @@ class ThemeLoader
 				];
 
 				// Is this the default theme?
-				if ($row['id_theme'] == '1' && in_array($row['variable'], $indexes_to_default))
+				if ($row['id_theme'] === '1' && in_array($row['variable'], $indexes_to_default, true))
 				{
 					$settings['default_' . $row['variable']] = $row['value'];
 				}
@@ -738,7 +728,7 @@ class ThemeLoader
 
 		static::$dirs = new Directories($settings);
 
-		// Check we have some directories setup.
+		// Check we have some directories' setup.
 		if (static::$dirs->hasDirectories() === false)
 		{
 			static::$dirs->reloadDirectories($settings);
@@ -765,12 +755,13 @@ class ThemeLoader
 	 */
 	public static function loadLanguageFiles(
 		array $template_name,
-		$lang = '',
-		$fatal = true,
-		$force_reload = false
-	) {
-		global $language, $settings, $modSettings;
-		global $db_show_debug, $txt;
+			  $lang = '',
+			  $fatal = true,
+			  $force_reload = false
+	)
+	{
+		// Needed by the loaded files
+		global $language, $settings, $modSettings, $db_show_debug, $txt;
 		static $already_loaded = [];
 
 		// For each file open it up and write it out!
@@ -802,7 +793,8 @@ class ThemeLoader
 		$lang = '',
 		$fatal = false, // @todo reset to true when appropriate
 		$force_reload = false
-	) {
+	)
+	{
 		return static::loadLanguageFiles(
 			explode('+', $template_name),
 			$lang,
