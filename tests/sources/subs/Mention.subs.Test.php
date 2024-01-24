@@ -19,7 +19,7 @@ class TestMentions extends TestCase
 {
 	protected $_posterOptions = null;
 	protected $_msgOptions = null;
-	protected $backupGlobalsBlacklist = ['user_info'];
+	protected $backupGlobalsExcludeList = ['user_info'];
 
 	/**
 	 * Prepare some test data, to use in these tests.
@@ -263,7 +263,7 @@ class TestMentions extends TestCase
 
 		$mentions = getUserMentions(0, 10, 'mtn.id_mention', true);
 
-		$this->assertEquals(1, count($mentions));
+		$this->assertCount(1, $mentions);
 
 		User::$info = new UserInfo([
 			'id' => 2,
@@ -271,10 +271,10 @@ class TestMentions extends TestCase
 
 		// User 2 has 1 total mentions
 		$mentions = getUserMentions(1, 10, 'mtn.id_mention', true);
-		$this->assertEquals(0, count($mentions));
+		$this->assertCount(0, $mentions);
 
 		// User 2 has 0 unread mention because it has been marked as read in testReadMention
 		$mentions = getUserMentions(1, 10, 'mtn.id_mention', false);
-		$this->assertEquals(0, count($mentions));
+		$this->assertCount(0, $mentions);
 	}
 }

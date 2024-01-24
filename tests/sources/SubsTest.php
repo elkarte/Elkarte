@@ -8,7 +8,7 @@ use PHPUnit\Framework\TestCase;
  */
 class TestSubs extends TestCase
 {
-	protected $backupGlobalsBlacklist = ['user_info'];
+	protected $backupGlobalsExcludeList = ['user_info'];
 	/**
 	 * Prepare what is necessary to use in these tests.
 	 *

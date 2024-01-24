@@ -7,7 +7,7 @@ class TestMenuSubs extends ElkArteCommonSetupTest
 {
 	protected $test_areas;
 	protected $test_options;
-	protected $backupGlobalsBlacklist = ['user_info'];
+	protected $backupGlobalsExcludeList = ['user_info'];
 
 	/**
 	 * Prepare some test data, to use in these tests.

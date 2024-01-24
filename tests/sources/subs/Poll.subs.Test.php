@@ -10,7 +10,7 @@ use PHPUnit\Framework\TestCase;
  */
 class TestPoll extends TestCase
 {
-	protected $backupGlobalsBlacklist = ['user_info'];
+	protected $backupGlobalsExcludeList = ['user_info'];
 	/**
 	 * Prepare some test data, to use in these tests.
 	 * setUp() is run automatically by the testing framework before each test method.
@@ -114,7 +114,7 @@ class TestPoll extends TestCase
 		$this->assertTrue($this->id_topic > 2); // extra-test just to double-check
 
 		$id_poll = associatedPoll($this->id_topic);
-		$this->assertTrue(!empty($id_poll)); // extra-test, just in case.
+		$this->assertNotEmpty($id_poll); // extra-test, just in case.
 
 		$options = array(
 			'Ema, is that even a question?',
@@ -154,18 +154,18 @@ class TestPoll extends TestCase
 		$id_poll = associatedPoll($this->id_topic);
 
 		// we have something, right?
-		$this->assertTrue(!empty($id_poll));
+		$this->assertNotEmpty($id_poll);
 
 		removePoll($id_poll);
 		associatedPoll($this->id_topic, 0); // hmm. Shouldn't we detach the poll in removePoll()?
 
 		// was it removed from topic?
 		$id_poll_new = associatedPoll($this->id_topic);
-		$this->assertTrue(empty($id_poll_new));
+		$this->assertEmpty($id_poll_new);
 
 		// or, really removed, not only dissociated
 		$pollinfo = pollInfo($id_poll);
-		$this->assertTrue(empty($pollinfo));
+		$this->assertEmpty($pollinfo);
 	}
 
 	/**
@@ -184,6 +184,6 @@ class TestPoll extends TestCase
 		// Link the poll to the topic.
 		associatedPoll($this->id_topic, $id_poll);
 
-		$this->assertTrue(!empty($id_poll));
+		$this->assertNotEmpty($id_poll);
 	}
 }

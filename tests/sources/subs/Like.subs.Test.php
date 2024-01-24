@@ -11,7 +11,7 @@ use ElkArte\Languages\Loader;
  */
 class TestLikes extends TestCase
 {
-	protected $backupGlobalsBlacklist = ['user_info'];
+	protected $backupGlobalsExcludeList = ['user_info'];
 	/**
 	 * Prepare some test data, to use in these tests.
 	 *

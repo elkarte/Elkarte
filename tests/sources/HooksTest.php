@@ -8,7 +8,7 @@ use PHPUnit\Framework\TestCase;
  */
 class TestHooks extends TestCase
 {
-	protected $backupGlobalsBlacklist = ['user_info'];
+	protected $backupGlobalsExcludeList = ['user_info'];
 	/**
 	 * Name of the hook used for testing
 	 */

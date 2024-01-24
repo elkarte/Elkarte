@@ -12,7 +12,7 @@ use PHPUnit\Framework\TestCase;
 class TestMembers extends TestCase
 {
 	private $memberID = null;
-	protected $backupGlobalsBlacklist = ['user_info'];
+	protected $backupGlobalsExcludeList = ['user_info'];
 
 	/**
 	 * Prepare some test data, to use in these tests.
@@ -72,18 +72,21 @@ class TestMembers extends TestCase
 
 		// A test with relaxed query
 		$result = membersByIP('127.0.0.*', 'relaxed');
-		$mem_id = array();
+
+		$mem_id = [];
 		foreach ($result as $mem)
-			$mem_id[] = $mem['id_member'];
-		$this->assertTrue(in_array($this->memberID, $mem_id));
+		{
+			$mem_id[] = (int) $mem['id_member'];
+		}
+		$this->assertContains($this->memberID, $mem_id);
 
 		// An hopefully non existing IP
 		$result = membersByIP('127.0.0.3');
-		$this->assertTrue(empty($result));
+		$this->assertEmpty($result);
 
 		// Again
 		$result = membersByIP('127.0.*.5', 'relaxed');
-		$this->assertTrue(empty($result));
+		$this->assertEmpty($result);
 
 		// Now let's check IP2
 		$result = membersByIP('127.0.0.3', 'exact', true);

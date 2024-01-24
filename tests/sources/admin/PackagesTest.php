@@ -16,7 +16,7 @@ use ElkArte\User;
  */
 class TestPackagesController extends ElkArteCommonSetupTest
 {
-	protected $backupGlobalsBlacklist = ['user_info'];
+	protected $backupGlobalsExcludeList = ['user_info'];
 
 	/**
 	 * Initialize or add whatever necessary for these tests
@@ -104,7 +104,7 @@ class TestPackagesController extends ElkArteCommonSetupTest
 		$req->query->sa = null;
 		$req->query->area = null;
 
-		$this->assertEquals(false, $context['is_installed']);
+		$this->assertFalse($context['is_installed']);
 		$this->assertEquals('<strong>Test successful</strong>', $context['actions'][7]['description'], $context['actions'][7]['description']);
 	}
 }

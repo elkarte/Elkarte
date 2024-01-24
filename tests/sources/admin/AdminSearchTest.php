@@ -12,7 +12,7 @@ use PHPUnit\Framework\TestCase;
  */
 class TestAdminSearch extends TestCase
 {
-	protected $backupGlobalsBlacklist = ['user_info'];
+	protected $backupGlobalsExcludeList = ['user_info'];
 
 	/**
 	 * Cleans up the environment after running a test.

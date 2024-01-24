@@ -9,7 +9,7 @@ use PHPUnit\Framework\TestCase;
 class CensoringTest extends TestCase
 {
 	protected $tests;
-	protected $backupGlobalsBlacklist = ['user_info'];
+	protected $backupGlobalsExcludeList = ['user_info'];
 
 	/**
 	 * prepare what is necessary to use in these tests.

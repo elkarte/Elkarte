@@ -5,7 +5,7 @@ use ElkArte\Languages\Loader;
 
 class TestDataValidator extends ElkArteCommonSetupTest
 {
-	protected $backupGlobalsBlacklist = ['user_info'];
+	protected $backupGlobalsExcludeList = ['user_info'];
 	/**
 	 * Prepare what is necessary to use in these tests.
 	 *

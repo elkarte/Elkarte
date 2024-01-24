@@ -11,7 +11,7 @@ class TestBBC extends TestCase
 	protected $bbcTestCases;
 	protected $bbcInvalidTestCases;
 	protected $bbcPreparseTestCases;
-	protected $backupGlobalsBlacklist = ['user_info'];
+	protected $backupGlobalsExcludeList = ['user_info'];
 
 	/**
 	 * Prepare what is necessary to use in these tests.

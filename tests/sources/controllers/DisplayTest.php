@@ -14,7 +14,7 @@ use ElkArte\Languages\Loader;
  */
 class TestDisplayIndex extends ElkArteCommonSetupTest
 {
-	protected $backupGlobalsBlacklist = ['user_info'];
+	protected $backupGlobalsExcludeList = ['user_info'];
 
 	/**
 	 * Initialize or add whatever necessary for these tests
@@ -57,7 +57,7 @@ class TestDisplayIndex extends ElkArteCommonSetupTest
 		$this->assertIsNumeric($context['real_num_replies']);
 		$this->assertEquals(0, $context['start_from']);
 		$this->assertEquals('Welcome to ElkArte!', $context['subject']);
-		$this->assertEquals(5, count($context['mod_buttons']));
+		$this->assertCount(5, $context['mod_buttons']);
 
 		// Give the renderer a check as well
 		$controller = $context['get_message'][0];

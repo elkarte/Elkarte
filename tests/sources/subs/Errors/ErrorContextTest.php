@@ -10,7 +10,7 @@ use PHPUnit\Framework\TestCase;
  */
 class TestErrorContext extends TestCase
 {
-	protected $backupGlobalsBlacklist = ['user_info'];
+	protected $backupGlobalsExcludeList = ['user_info'];
 	public function testSimpleError()
 	{
 		$errorContext = ErrorContext::context();

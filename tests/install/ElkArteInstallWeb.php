@@ -17,7 +17,7 @@
 class ElkArteInstallWeb extends ElkArteWebSupport
 {
 	protected $forumPath = '.';
-	protected $backupGlobalsBlacklist = ['user_info'];
+	protected $backupGlobalsExcludeList = ['user_info'];
 
 	/**
 	 * Called just before a test run, but after setUp() use to

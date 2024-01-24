@@ -15,7 +15,7 @@ class TestInlinePermissionsForm extends TestCase
 	protected $results = array();
 	private $illegal_permissions = array();
 	private $illegal_guest_permissions = array();
-	protected $backupGlobalsBlacklist = ['user_info'];
+	protected $backupGlobalsExcludeList = ['user_info'];
 
 	/**
 	 * Prepare what is necessary to use in these tests.

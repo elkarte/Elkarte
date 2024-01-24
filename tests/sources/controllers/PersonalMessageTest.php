@@ -14,7 +14,7 @@ use ElkArte\Languages\Loader;
  */
 class TestPersonalMessageController extends ElkArteCommonSetupTest
 {
-	protected $backupGlobalsBlacklist = ['user_info'];
+	protected $backupGlobalsExcludeList = ['user_info'];
 
 	/**
 	 * Initialize or add whatever necessary for these tests
@@ -72,7 +72,7 @@ class TestPersonalMessageController extends ElkArteCommonSetupTest
 
 		// Check if some things are set for the form.
 		$this->assertEquals('', $context['bcc_value']);
-		$this->assertEquals(false, $context['quoted_message']);
+		$this->assertFalse($context['quoted_message']);
 		$this->assertEquals('', $context['subject']);
 
 		// Lets try and send it now

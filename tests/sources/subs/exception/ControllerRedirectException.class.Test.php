@@ -9,7 +9,7 @@ use PHPUnit\Framework\TestCase;
  */
 class TestControllerRedirectException extends TestCase
 {
-	protected $backupGlobalsBlacklist = ['user_info'];
+	protected $backupGlobalsExcludeList = ['user_info'];
 	public function testBasicRedirect()
 	{
 		$exception = new ControllerRedirectException('Mock_Controller', 'action_plain');

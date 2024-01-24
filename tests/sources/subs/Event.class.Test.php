@@ -9,7 +9,7 @@ use PHPUnit\Framework\TestCase;
  */
 class TestEvent extends TestCase
 {
-	protected $backupGlobalsBlacklist = ['user_info'];
+	protected $backupGlobalsExcludeList = ['user_info'];
 	public function testEmpty()
 	{
 		$event = new Event(new Priority());

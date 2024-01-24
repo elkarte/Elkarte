@@ -13,7 +13,7 @@ use ElkArte\Languages\Loader;
  */
 class TestEmailPostController extends ElkArteCommonSetupTest
 {
-	protected $backupGlobalsBlacklist = ['user_info'];
+	protected $backupGlobalsExcludeList = ['user_info'];
 	protected $data = '';
 
 	/**

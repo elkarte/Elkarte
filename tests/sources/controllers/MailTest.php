@@ -12,7 +12,7 @@ use ElkArte\Languages\Loader;
  */
 class TestMail extends ElkArteCommonSetupTest
 {
-	protected $backupGlobalsBlacklist = ['user_info'];
+	protected $backupGlobalsExcludeList = ['user_info'];
 	protected $data = '';
 	protected $replacements;
 

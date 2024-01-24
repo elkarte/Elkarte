@@ -5,7 +5,7 @@ use PHPUnit\Framework\TestCase;
 
 class TestHTML2BBC extends TestCase
 {
-	protected $backupGlobalsBlacklist = ['user_info'];
+	protected $backupGlobalsExcludeList = ['user_info'];
 	/**
 	 * Prepare what is necessary to use in these tests.
 	 *

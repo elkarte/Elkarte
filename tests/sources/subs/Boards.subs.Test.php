@@ -11,7 +11,7 @@ use PHPUnit\Framework\TestCase;
  */
 class TestBoards extends ElkArteCommonSetupTest
 {
-	protected $backupGlobalsBlacklist = ['user_info'];
+	protected $backupGlobalsExcludeList = ['user_info'];
 
 	/**
 	 * Prepare some test data, to use in these tests.

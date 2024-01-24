@@ -10,7 +10,7 @@ use ElkArte\Languages\Loader;
  */
 class TestProfileInfo extends ElkArteCommonSetupTest
 {
-	protected $backupGlobalsBlacklist = ['user_info'];
+	protected $backupGlobalsExcludeList = ['user_info'];
 
 	/**
 	 * Initialize or add whatever necessary for these tests
@@ -42,7 +42,7 @@ class TestProfileInfo extends ElkArteCommonSetupTest
 
 		// Lets see some items loaded into context, there should some data
 		$this->assertNotNull($context);
-		$this->assertEquals(true, $context['can_see_ip']);
-		$this->assertEquals(true, $modSettings['jquery_include_ui']);
+		$this->assertTrue($context['can_see_ip']);
+		$this->assertTrue($modSettings['jquery_include_ui']);
 	}
 }

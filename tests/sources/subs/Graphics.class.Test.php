@@ -8,7 +8,7 @@ use PHPUnit\Framework\TestCase;
 class TestGraphics extends TestCase
 {
 	protected $image_testcases = array();
-	protected $backupGlobalsBlacklist = ['user_info'];
+	protected $backupGlobalsExcludeList = ['user_info'];
 
 	/**
 	 * Prepare what is necessary to use in these tests.
@@ -76,7 +76,7 @@ class TestGraphics extends TestCase
 		$modSettings['attachment_autorotate'] = 1;
 
 		$success = Gd2::canUse();
-		$this->assertEquals(true, $success, 'GD NOT INSTALLED');
+		$this->assertTrue($success, 'GD NOT INSTALLED');
 
 		foreach ($this->image_testcases as $image)
 		{
@@ -84,7 +84,7 @@ class TestGraphics extends TestCase
 			$success = $current_image->createThumbnail(100, 100, '/tmp/test', $image['format']);
 
 			// Check for correct results
-			$this->assertEquals(true, $success !== false, $image['url']);
+			$this->assertTrue($success !== false, $image['url']);
 		}
 	}
 
@@ -94,6 +94,6 @@ class TestGraphics extends TestCase
 		$success = $images->generate(100, 75, 'png');
 		$success = !empty($success);
 
-		$this->assertEquals(true, $success);
+		$this->assertTrue($success);
 	}
 }

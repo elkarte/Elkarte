@@ -142,7 +142,6 @@ abstract class BaseMenuTest extends ElkArteCommonSetupTest
 
 class MenuTest extends BaseMenuTest
 {
-	private $req;
 	private $sections = [];
 	private $options = [];
 	private $menuObjects = [];
@@ -302,8 +301,8 @@ class MenuTest extends BaseMenuTest
 
 	public function prepareMenu()
 	{
-		$this->req = HttpReq::instance();
-		$this->menuObjects[] = new Menu($this->req);
+		$req = HttpReq::instance();
+		$this->menuObjects[] = new Menu($req);
 		foreach ($this->sections as list ($section_id, $section))
 		{
 			$this->menuObjects[count($this->menuObjects) - 1]->addSection($section_id, $section);
