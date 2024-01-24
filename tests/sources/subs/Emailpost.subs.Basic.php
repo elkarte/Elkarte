@@ -4,7 +4,9 @@ use PHPUnit\Framework\TestCase;
 
 class TestEmailpost extends TestCase
 {
-	protected $backupGlobalsBlacklist = ['user_info'];
+	protected $backupGlobalsExcludeList = ['user_info'];
+	public $bbcTestCases;
+
 	/**
 	 * Prepare what is necessary to use in these tests.
 	 *
@@ -14,31 +16,31 @@ class TestEmailpost extends TestCase
 	{
 		require_once(SUBSDIR . '/Emailpost.subs.php');
 
-		$this->bbcTestCases = array(
-			array(
+		$this->bbcTestCases = [
+			[
 				'Test bold',
 				'**bold**',
 				'[b]bold[/b]',
-			),
-			array(
+			],
+			[
 				'Named links',
 				'[ElkArte](http://www.elkarte.net/)',
 				'[url=http://www.elkarte.net/]ElkArte[/url]',
-			),
-			array(
+			],
+			[
 				'URL link',
 				'[http://www.elkarte.net/](http://www.elkarte.net/)',
 				'[url=http://www.elkarte.net/]http://www.elkarte.net/[/url]',
-			),
+			],
 			// This test is here only to remind that the Markdown library doesn't support nested lists
-			array(
+			[
 				'Lists',
 				'* item
     * sub item
 *item',
 				'[list][li]item[/li][li]sub item*item[/li][/list]',
-			),
-		);
+			],
+		];
 	}
 
 	/**

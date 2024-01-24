@@ -9,7 +9,7 @@ class TestAuthsubs extends TestCase
 	protected $passwd = 'test_admin_pwd';
 	protected $user = 'test_admin';
 	protected $useremail = 'email@testadmin.tld';
-	protected $backupGlobalsBlacklist = ['user_info'];
+	protected $backupGlobalsExcludeList = ['user_info'];
 
 	/**
 	 * Prepare what is necessary to use in these tests.

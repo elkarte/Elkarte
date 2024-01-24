@@ -7,7 +7,7 @@ use PHPUnit\Framework\TestCase;
  */
 class TestLanguageStrings extends TestCase
 {
-	protected $backupGlobalsBlacklist = ['user_info'];
+	protected $backupGlobalsExcludeList = ['user_info'];
 
 	/**
 	 * Prepare what is necessary to use in these tests.

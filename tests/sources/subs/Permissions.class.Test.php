@@ -10,7 +10,7 @@ use ElkArte\ValuesContainer;
 
 class TestPermissionsClass extends ElkArteCommonSetupTest
 {
-	protected $backupGlobalsBlacklist = ['user_info'];
+	protected $backupGlobalsExcludeList = ['user_info'];
 
 	/**
 	 * Load and verify default illegal permissions

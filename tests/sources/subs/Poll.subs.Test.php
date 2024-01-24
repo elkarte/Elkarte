@@ -10,7 +10,9 @@ use PHPUnit\Framework\TestCase;
  */
 class TestPoll extends TestCase
 {
-	protected $backupGlobalsBlacklist = ['user_info'];
+	protected $backupGlobalsExcludeList = ['user_info'];
+	public $id_topic;
+
 	/**
 	 * Prepare some test data, to use in these tests.
 	 * setUp() is run automatically by the testing framework before each test method.
@@ -22,28 +24,28 @@ class TestPoll extends TestCase
 		require_once(SUBSDIR . '/Post.subs.php');
 
 		// post variables
-		$msgOptions = array(
+		$msgOptions = [
 			'id' => 0,
 			'subject' => 'Test poll topic',
 			'smileys_enabled' => true,
 			'body' => 'This is a test poll.',
-			'attachments' => array(),
+			'attachments' => [],
 			'approved' => 1
-		);
+		];
 
-		$topicOptions = array(
+		$topicOptions = [
 			'id' => 0,
 			'board' => 1,
 			'mark_as_read' => false
-		);
+		];
 
-		$posterOptions = array(
+		$posterOptions = [
 			'id' => 1,
 			'name' => 'test',
 			'email' => 'noemail@test.tes',
 			'update_post_count' => false,
 			'ip' => long2ip(rand(0, 2147483647))
-		);
+		];
 
 		// Attempt to make the new topic.
 		createPost($msgOptions, $topicOptions, $posterOptions);
@@ -114,13 +116,13 @@ class TestPoll extends TestCase
 		$this->assertTrue($this->id_topic > 2); // extra-test just to double-check
 
 		$id_poll = associatedPoll($this->id_topic);
-		$this->assertTrue(!empty($id_poll)); // extra-test, just in case.
+		$this->assertNotEmpty($id_poll); // extra-test, just in case.
 
-		$options = array(
+		$options = [
 			'Ema, is that even a question?',
 			'Ant. He broke error log. (no, he didn\'t, but we\'ll say he did.)',
 			'No one this year',
-		);
+		];
 		addPollOptions($id_poll, $options);
 
 		// Ok, what do we have now.
@@ -154,18 +156,18 @@ class TestPoll extends TestCase
 		$id_poll = associatedPoll($this->id_topic);
 
 		// we have something, right?
-		$this->assertTrue(!empty($id_poll));
+		$this->assertNotEmpty($id_poll);
 
 		removePoll($id_poll);
 		associatedPoll($this->id_topic, 0); // hmm. Shouldn't we detach the poll in removePoll()?
 
 		// was it removed from topic?
 		$id_poll_new = associatedPoll($this->id_topic);
-		$this->assertTrue(empty($id_poll_new));
+		$this->assertEmpty($id_poll_new);
 
 		// or, really removed, not only dissociated
 		$pollinfo = pollInfo($id_poll);
-		$this->assertTrue(empty($pollinfo));
+		$this->assertEmpty($pollinfo);
 	}
 
 	/**
@@ -184,6 +186,6 @@ class TestPoll extends TestCase
 		// Link the poll to the topic.
 		associatedPoll($this->id_topic, $id_poll);
 
-		$this->assertTrue(!empty($id_poll));
+		$this->assertNotEmpty($id_poll);
 	}
 }

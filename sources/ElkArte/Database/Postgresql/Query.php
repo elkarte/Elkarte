@@ -324,7 +324,7 @@ class Query extends AbstractQuery
 	 */
 	public function escape_string($string)
 	{
-		return pg_escape_string($string);
+		return pg_escape_string($this->connection, $string);
 	}
 
 	/**

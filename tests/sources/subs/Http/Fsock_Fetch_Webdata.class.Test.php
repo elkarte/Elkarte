@@ -7,7 +7,7 @@ class TestFsockFetchWebdata extends TestCase
 {
 	protected $fetch_testcases = array();
 	protected $post_testcases = array();
-	protected $backupGlobalsBlacklist = ['user_info'];
+	protected $backupGlobalsExcludeList = ['user_info'];
 
 	/**
 	 * Prepare what is necessary to use in these tests.

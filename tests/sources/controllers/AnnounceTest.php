@@ -12,7 +12,7 @@ use ElkArte\User;
  */
 class TestAnnounce extends ElkArteCommonSetupTest
 {
-	protected $backupGlobalsBlacklist = ['user_info'];
+	protected $backupGlobalsExcludeList = ['user_info'];
 
 	/**
 	 * Initialize or add whatever necessary for these tests
@@ -48,6 +48,6 @@ class TestAnnounce extends ElkArteCommonSetupTest
 
 		// Check
 		$this->assertEquals('Welcome to ElkArte!', $context['topic_subject'], $context['topic_subject']);
-		$this->assertFalse(empty($context['groups']), 'Groups is empty');
+		$this->assertNotEmpty($context['groups'], 'Groups is empty');
 	}
 }

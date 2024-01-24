@@ -5,7 +5,9 @@ use PHPUnit\Framework\TestCase;
 
 class TestHTML2BBC extends TestCase
 {
-	protected $backupGlobalsBlacklist = ['user_info'];
+	protected $backupGlobalsExcludeList = ['user_info'];
+	public $bbcTestCases;
+
 	/**
 	 * Prepare what is necessary to use in these tests.
 	 *
@@ -13,33 +15,33 @@ class TestHTML2BBC extends TestCase
 	 */
 	protected function setUp(): void
 	{
-		$this->bbcTestCases = array(
-			array(
+		$this->bbcTestCases = [
+			[
 				'Test bold',
 				'<strong class="bbc_strong">bold</strong>',
 				'[b]bold[/b]',
-			),
-			array(
+			],
+			[
 				'Named links',
 				'<a href="http://www.elkarte.net/" class="bbc_link" target="_blank">ElkArte</a>',
 				'[url=http://www.elkarte.net/]ElkArte[/url]',
-			),
-			array(
+			],
+			[
 				'URL link',
 				'<a href="http://www.elkarte.net/" class="bbc_link" target="_blank">http://www.elkarte.net/</a>',
 				'[url=http://www.elkarte.net/]http://www.elkarte.net/[/url]',
-			),
-			array(
+			],
+			[
 				'Lists',
 				'<ul class="bbc_list"><li>item</li><li><ul class="bbc_list"><li>sub item</li></ul></li><li>item</li></ul>',
 				'[list][li]item[/li][li][list][li]sub item[/li][/list][/li][li]item[/li][/list]'
-			),
-			array(
+			],
+			[
 				'Tables',
 				'<table class="bbc_table"><tr><td><table class="bbc_table"><tr><td>test</td></tr></table></td></tr></table>',
 				'[table][tr][td][table][tr][td]test[/td][/tr][/table][/td][/tr][/table]',
-			),
-		);
+			],
+		];
 	}
 
 	/**

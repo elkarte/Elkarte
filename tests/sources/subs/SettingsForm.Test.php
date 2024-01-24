@@ -11,7 +11,7 @@ class TestSettingsForm extends TestCase
 	protected $configVars = array();
 	protected $permissionResults = array();
 	protected $configValues = array();
-	protected $backupGlobalsBlacklist = ['user_info'];
+	protected $backupGlobalsExcludeList = ['user_info'];
 
 	/**
 	 * Prepare what is necessary to use in these tests.

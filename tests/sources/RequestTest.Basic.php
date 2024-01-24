@@ -9,7 +9,9 @@ use PHPUnit\Framework\TestCase;
  */
 class TestRequest extends TestCase
 {
-	protected $backupGlobalsBlacklist = ['user_info'];
+	protected $backupGlobalsExcludeList = ['user_info'];
+	public $request;
+
 	/**
 	 * Prepare what is necessary to use in these tests.
 	 *
@@ -18,9 +20,9 @@ class TestRequest extends TestCase
 	protected function setUp(): void
 	{
 		// clean slate please.
-		$_REQUEST = array();
-		$_GET = array();
-		$_POST = array();
+		$_REQUEST = [];
+		$_GET = [];
+		$_POST = [];
 
 		$this->request = request();
 	}
@@ -33,9 +35,9 @@ class TestRequest extends TestCase
 	protected function tearDown(): void
 	{
 		// Remove useless data.
-		$_REQUEST = array();
-		$_GET = array();
-		$_POST = array();
+		$_REQUEST = [];
+		$_GET = [];
+		$_POST = [];
 	}
 
 	/**

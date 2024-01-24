@@ -11,7 +11,9 @@ use ElkArte\Languages\Loader;
  */
 class TestLikes extends TestCase
 {
-	protected $backupGlobalsBlacklist = ['user_info'];
+	protected $backupGlobalsExcludeList = ['user_info'];
+	public $id_topic;
+
 	/**
 	 * Prepare some test data, to use in these tests.
 	 *
@@ -25,28 +27,28 @@ class TestLikes extends TestCase
 		require_once(SUBSDIR . '/Post.subs.php');
 
 		// post variables
-		$msgOptions = array(
+		$msgOptions = [
 			'id' => 0,
 			'subject' => 'A New Topic',
 			'smileys_enabled' => true,
 			'body' => 'Something for us to like, like bacon on a burger',
-			'attachments' => array(),
+			'attachments' => [],
 			'approved' => 1
-		);
+		];
 
-		$topicOptions = array(
+		$topicOptions = [
 			'id' => 0,
 			'board' => 1,
 			'mark_as_read' => false
-		);
+		];
 
-		$posterOptions = array(
+		$posterOptions = [
 			'id' => 1,
 			'name' => 'test',
 			'email' => 'noemail@test.tes',
 			'update_post_count' => false,
 			'ip' => long2ip(rand(0, 2147483647))
-		);
+		];
 
 		// Attempt to make the new topic.
 		createPost($msgOptions, $topicOptions, $posterOptions);

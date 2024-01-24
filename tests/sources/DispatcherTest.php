@@ -17,7 +17,7 @@ use PHPUnit\Framework\TestCase;
  */
 class DispatcherTest extends TestCase
 {
-	protected $backupGlobalsBlacklist = ['user_info'];
+	protected $backupGlobalsExcludeList = ['user_info'];
 	/**
 	 * Tests automagical routing to an action
 	 */
@@ -168,12 +168,12 @@ class DispatcherTest extends TestCase
 		foreach ($tests as $test)
 		{
 			// Prepare some variables
-			$topic = isset($test['topic']) ? $test['topic'] : null;
-			$board = isset($test['board']) ? $test['board'] : null;
+			$topic = $test['topic'] ?? null;
+			$board = $test['board'] ?? null;
 
 			$req = HttpReq::instance();
-			$req->query->action = isset($test['action']) ? $test['action'] : null;
-			$req->query->sa = isset($test['action']) ? $test['action'] : null;
+			$req->query->action = $test['action'] ?? null;
+			$req->query->sa = $test['action'] ?? null;
 
 			// Start a new dispatcher every time (the dispatching is done on __construct)
 			$dispatcher = New SiteDispatcher_Tester($req);
@@ -208,7 +208,7 @@ class SiteDispatcher_Tester extends SiteDispatcher
 	 * This method compares the values of _function_name and
 	 * _controller_name obtained from the SiteDispatcher and the expected values
 	 *
-	 * @param array An array containing the expected results of a dispaching in the form:
+	 * @param array $action An array containing the expected results of a dispaching in the form:
 	 *              'function_name' => 'function_name',
 	 *              'controller_name' => 'controller_name',
 	 * @return true if exactly the same, false otherwise

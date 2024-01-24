@@ -12,7 +12,7 @@ use ElkArte\Languages\Loader;
 class TestPBE extends TestCase
 {
 	protected $_email;
-	protected $backupGlobalsBlacklist = ['user_info'];
+	protected $backupGlobalsExcludeList = ['user_info'];
 
 	/**
 	 * Prepare what is necessary to use in these tests.

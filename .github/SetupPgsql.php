@@ -13,7 +13,7 @@
  *
  */
 
-define('TESTDIR', dirname(__FILE__));
+define('TESTDIR', __DIR__);
 
 require_once(TESTDIR . '/SetupDbUtil.php');
 require_once(TESTDIR . '/ElkTestingPsql.php');

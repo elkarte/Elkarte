@@ -16,7 +16,7 @@ use PHPUnit\Framework\TestCase;
  */
 class TestSearchclass extends TestCase
 {
-	protected $backupGlobalsBlacklist = ['user_info'];
+	protected $backupGlobalsExcludeList = ['user_info'];
 	protected $member_full_access;
 	protected $member_limited_access;
 
@@ -177,7 +177,7 @@ class TestSearchclass extends TestCase
 		$this->loadUser($this->member_full_access);
 
 		$topics = $this->_performSearch();
-		$this->assertEquals(2, count($topics), 'Admin search results not correct, found ' . count($topics) . ' instead of 2');
+		$this->assertCount(2, $topics, 'Admin search results not correct, found ' . count($topics) . ' instead of 2');
 	}
 
 	/**
@@ -190,7 +190,7 @@ class TestSearchclass extends TestCase
 		$this->loadUser($this->member_limited_access);
 
 		$topics = $this->_performSearch();
-		$this->assertEquals(1, count($topics), 'Normal member search results not correct, found ' . count($topics) . ' instead of 1');
+		$this->assertCount(1, $topics, 'Normal member search results not correct, found ' . count($topics) . ' instead of 1');
 	}
 
 	/**
@@ -204,7 +204,7 @@ class TestSearchclass extends TestCase
 		$this->expectExceptionMessage('query_not_specific_enough');
 		$topics = $this->_performSearch();
 
-		$this->assertEquals(0, count($topics), 'Guest search results not correct, found ' . count($topics) . ' instead of 0');
+		$this->assertCount(0, $topics, 'Guest search results not correct, found ' . count($topics) . ' instead of 0');
 	}
 
 	protected function loadUser($id)
@@ -221,7 +221,7 @@ class TestSearchclass extends TestCase
 	/**
 	 * Sets up the search parameters, runs search, and returns the results
 	 *
-	 * @return mixed[]
+	 * @return array
 	 * @throws \ElkArte\Exceptions\Exception
 	 */
 	protected function _performSearch()

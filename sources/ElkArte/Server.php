@@ -264,25 +264,25 @@ class Server extends \ArrayObject
 		}
 
 		// This is likely a sitename vs host
-		if (!empty($_SERVER['SERVER_NAME']) && $this->_isValidFQDN($_SERVER['SERVER_NAME']))
+		if (!empty($this->SERVER_NAME) && $this->_isValidFQDN($this->SERVER_NAME))
 		{
-			return $_SERVER['SERVER_NAME'];
+			return $this->SERVER_NAME;
 		}
 
 		// Try a reverse IP lookup on the server addr
-		$reverseIP = host_from_ip($_SERVER['SERVER_ADDR']);
-		if (!empty($_SERVER['SERVER_ADDR']) && $this->_isValidFQDN($reverseIP))
+		$reverseIP = host_from_ip($this->SERVER_ADDR);
+		if (!empty($this->SERVER_ADDR) && $this->_isValidFQDN($reverseIP))
 		{
 			return $reverseIP;
 		}
 
 		// Literal it is, but some SMTP servers may not accept this
-		if (!empty($_SERVER['SERVER_ADDR']) && $fallback === '[127.0.0.1]')
+		if (!empty($this->SERVER_ADDR) && $fallback === '[127.0.0.1]')
 		{
 			// Set the address literal prefix
-			$prefix = strpos($_SERVER['SERVER_ADDR'], ':' !== false) ? 'IPv6:' : '';
+			$prefix = strpos($this->SERVER_ADDR, ':') !== false ? 'IPv6:' : '';
 
-			return  '[' . $prefix . $_SERVER['SERVER_ADDR'] . ']';
+			return  '[' . $prefix . $this->SERVER_ADDR . ']';
 		}
 
 		return $fallback;
@@ -317,13 +317,13 @@ class Server extends \ArrayObject
 	 */
 	public function getProtocol()
 	{
-		if (empty($_SERVER['SERVER_PROTOCOL']))
+		if (empty($this->SERVER_PROTOCOL))
 		{
 			return 'HTTP/1.0';
 		}
 
 		// HTTP/1.0, HTTP/1.1, HTTP/2, HTTP/2.0 etc
-		if (preg_match('~^\s*(HTTP\/[123](\.\d)?)\s*$~i', $_SERVER['SERVER_PROTOCOL'], $matches) === 1)
+		if (preg_match('~^\s*(HTTP\/[123](\.\d)?)\s*$~i', $this->SERVER_PROTOCOL, $matches) === 1)
 		{
 			return $matches[1];
 		}

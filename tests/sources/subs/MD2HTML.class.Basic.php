@@ -5,7 +5,7 @@ use PHPUnit\Framework\TestCase;
 class TestMD2HTML extends TestCase
 {
 	protected $mdTestCases = array();
-	protected $backupGlobalsBlacklist = ['user_info'];
+	protected $backupGlobalsExcludeList = ['user_info'];
 
 	/**
 	 * Prepare what is necessary to use in these tests.

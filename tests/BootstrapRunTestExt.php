@@ -4,7 +4,7 @@ use PHPUnit\Framework\TestCase;
 
 class BootstrapRunTest extends TestCase
 {
-	protected $backupGlobalsBlacklist = ['user_info'];
+	protected $backupGlobalsExcludeList = ['user_info'];
 
 	/**
 	 * Verifies the bootstrap run until the end.
@@ -14,6 +14,6 @@ class BootstrapRunTest extends TestCase
 	 */
 	public function testBootstraplock()
 	{
-		$this->assertTrue(file_exists('bootstrapcompleted.lock'));
+		$this->assertFileExists('bootstrapcompleted.lock');
 	}
 }

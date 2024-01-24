@@ -13,7 +13,7 @@ use ElkArte\Languages\Loader;
  */
 class TestPost extends ElkArteCommonSetupTest
 {
-	protected $backupGlobalsBlacklist = ['user_info'];
+	protected $backupGlobalsExcludeList = ['user_info'];
 
 	/**
 	 * Initialize or add whatever necessary for these tests

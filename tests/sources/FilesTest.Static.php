@@ -8,7 +8,7 @@ use PHPUnit\Framework\TestCase;
 class TestFiles extends TestCase
 {
 	protected $_ourFiles = array();
-	protected $backupGlobalsBlacklist = ['user_info'];
+	protected $backupGlobalsExcludeList = ['user_info'];
 
 	/**
 	 * Prepare what is necessary to use in these tests.
@@ -25,7 +25,7 @@ class TestFiles extends TestCase
 
 		$directory = new \RecursiveDirectoryIterator(BOARDDIR);
 		$iterator = new \RecursiveIteratorIterator($directory);
-		$regex = new \RegexIterator($iterator, '/^.+\.php$/i', \RecursiveRegexIterator::GET_MATCH);
+		$regex = new \RegexIterator($iterator, '/^.+\.php$/i', RegexIterator::GET_MATCH);
 
 		foreach ($regex as $fileo)
 		{

@@ -13,7 +13,7 @@ use ElkArte\User;
  */
 class TestMemberListController extends ElkArteCommonSetupTest
 {
-	protected $backupGlobalsBlacklist = ['user_info'];
+	protected $backupGlobalsExcludeList = ['user_info'];
 
 	/**
 	 * Initialize or add whatever necessary for these tests
@@ -42,7 +42,7 @@ class TestMemberListController extends ElkArteCommonSetupTest
 		// With no options this will call the mlall action as well
 		$controller->action_index();
 
-		$this->assertEquals(8, count($context['columns']), count($context['columns']));
+		$this->assertCount(8, $context['columns'], count($context['columns']));
 		$this->assertEquals(1, $context['num_members'], $context['num_members']);
 		$this->assertEquals('t', $context['members'][1]['sort_letter'], $context['members'][1]['sort_letter']);
 	}

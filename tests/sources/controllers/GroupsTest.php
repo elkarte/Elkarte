@@ -15,7 +15,7 @@ use ElkArte\Languages\Loader;
 class TestGroups extends ElkArteCommonSetupTest
 {
 	protected $controller;
-	protected $backupGlobalsBlacklist = ['user_info'];
+	protected $backupGlobalsExcludeList = ['user_info'];
 
 	/**
 	 * Initialize or add whatever necessary for these tests
