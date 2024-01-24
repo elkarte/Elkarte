@@ -171,14 +171,18 @@ class Bootstrap
 					$redirec_file = 'install.php';
 				}
 
+				// To early for constants or autoloader
+				require_once($boarddir . '/sources/ElkArte/Server.php');
+				$server = new \ElkArte\Server($_SERVER);
+
 				$version_running = str_replace('ElkArte ', '', FORUM_VERSION);
-				$proto = 'http' . (!empty($_SERVER['HTTPS']) && strtolower($_SERVER['HTTPS']) === 'on' ? 's' : '');
-				$port = empty($_SERVER['SERVER_PORT']) || $_SERVER['SERVER_PORT'] === '80' ? '' : ':' . $_SERVER['SERVER_PORT'];
-				$host = empty($_SERVER['HTTP_HOST']) ? $_SERVER['SERVER_NAME'] . $port : $_SERVER['HTTP_HOST'];
-				$path = strtr(dirname($_SERVER['PHP_SELF']), '\\', '/') == '/' ? '' : strtr(dirname($_SERVER['PHP_SELF']), '\\', '/');
+				$location = $server->supportsSSL() ? 'https://' : 'http://';
+				$location .= $server->getHost();
+				$temp = preg_replace('~/' . preg_quote(basename($boardurl . '/index.php'), '~') . '(/.+)?$~', '', str_replace('\\', '/', dirname($_SERVER['PHP_SELF'])));
+				$location .= ($temp !== '/') ? $temp : '';
 
 				// Too early to use Headers class etc.
-				header('Location:' . $proto . '://' . $host . $path . '/install/' . $redirec_file . '?v=' . $version_running);
+				header('Location:' . $location. '/install/' . $redirec_file . '?v=' . $version_running);
 				die();
 			}
 		}

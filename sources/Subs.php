@@ -1377,13 +1377,13 @@ function entity_fix__callback($matches)
 /**
  * Retrieve additional search engines, if there are any, as an array.
  *
- * @return mixed[] array of engines
+ * @return array array of engines
  */
 function prepareSearchEngines()
 {
 	global $modSettings;
 
-	$engines = array();
+	$engines = [];
 	if (!empty($modSettings['additional_search_engines']))
 	{
 		$search_engines = ElkArte\Util::unserialize($modSettings['additional_search_engines']);
