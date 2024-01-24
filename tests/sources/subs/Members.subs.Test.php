@@ -78,7 +78,8 @@ class TestMembers extends TestCase
 		{
 			$mem_id[] = (int) $mem['id_member'];
 		}
-		$this->assertContains($this->memberID, $mem_id);
+
+		$this->assertContains((int) $this->memberID, $mem_id, 'Could not find the MemberID');
 
 		// An hopefully non existing IP
 		$result = membersByIP('127.0.0.3');
