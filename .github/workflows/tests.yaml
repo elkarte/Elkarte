@@ -19,7 +19,7 @@ jobs:
       matrix:
         include:
           - db: "mysql:5.7"
-            php: '7.2'
+            php: '8.2'
 
     name: WebTest (PHP ${{ matrix.php }} - DB ${{ matrix.db_alias != '' && matrix.db_alias || matrix.db }})
 
@@ -51,7 +51,7 @@ jobs:
           MATRIX_DB: ${{ matrix.db }}
         run: |
           db=$(echo "${MATRIX_DB%%:*}")
-          echo "::set-output name=db::$db"
+          echo "db=$db" >> $GITHUB_OUTPUT
           .github/setup-webtest-php.sh
         working-directory: ./elkarte
 
@@ -101,7 +101,7 @@ jobs:
       matrix:
         include:
           - db: 'none'
-            php: '7.2'
+            php: '8.2'
 
     name: Static Tests
 
@@ -157,11 +157,11 @@ jobs:
     strategy:
       matrix:
         include:
-          - php: '7.4'
+          - php: '8.2'
             db: "mariadb:10.2"
-          - php: '7.2'
-            db: "mysql:5.7"
           - php: '8.1'
+            db: "mysql:5.7"
+          - php: '8.2'
             db: "mysql:8.0"
 
     name: MySql/MariaDB (${{ matrix.php }} - DB ${{ matrix.db_alias != '' && matrix.db_alias || matrix.db }})
@@ -194,7 +194,7 @@ jobs:
           MATRIX_DB: ${{ matrix.db }}
         run: |
           db=$(echo "${MATRIX_DB%%:*}")
-          echo "::set-output name=db::$db"
+          echo "db=$db" >> $GITHUB_OUTPUT
 
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
@@ -236,9 +236,9 @@ jobs:
     strategy:
       matrix:
         include:
-          - php: '7.2'
+          - php: '8.1'
             db: "postgres:9"
-          - php: '7.4'
+          - php: '8.2'
             db: "postgres:12"
 
     name: Postgre (${{ matrix.php }} - DB ${{ matrix.db_alias != '' && matrix.db_alias || matrix.db }})
@@ -273,7 +273,7 @@ jobs:
           MATRIX_DB: ${{ matrix.db }}
         run: |
           db=$(echo "${MATRIX_DB%%:*}")
-          echo "::set-output name=db::$db"
+          echo "db=$db" >> $GITHUB_OUTPUT
 
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
