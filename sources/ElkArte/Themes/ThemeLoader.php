@@ -30,7 +30,7 @@ class ThemeLoader
 {
 	/** @var Directories The list of directories. */
 	protected static $dirs;
-	/** @var mixed|ValuesContainer */
+	/** @var \ElkArte\ValuesContainer  */
 	public $user;
 	/** @var string[] Theme items we shouldn't be able to change */
 	protected $immutable_theme_data = [
@@ -380,7 +380,7 @@ class ThemeLoader
 			// Hmm... check #2 - is it just different by a www?  Send them to the correct place!!
 			if ($do_fix === false)
 			{
-				$this->checkWWWRedirect();
+				$this->checkWWWRedirect($detected_url);
 			}
 
 			// #3 is just a check for SSL...

@@ -23,11 +23,11 @@ namespace ElkArte;
  */
 class Server extends \ArrayObject
 {
-	/** @var mixed */
+	/** @var array */
 	public $SERVER_SOFTWARE;
-	/** @var mixed */
+	/** @var array */
 	public $HTTPS;
-	/** @var mixed */
+	/** @var array */
 	public $SERVER_PORT;
 
 	/**
