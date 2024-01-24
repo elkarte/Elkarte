@@ -5,6 +5,9 @@ use PHPUnit\Framework\TestCase;
 class TestDbAbstraction extends TestCase
 {
 	protected $backupGlobalsExcludeList = ['user_info'];
+	public $_dummy_db;
+	public $tests;
+
 	/**
 	 * Prepare what is necessary to use in these tests.
 	 *
@@ -14,40 +17,40 @@ class TestDbAbstraction extends TestCase
 	{
 		$this->_dummy_db = database();
 
-		$this->tests = array(
-			array(
+		$this->tests = [
+			[
 				'string_test' => '{string_case_sensitive:a_string}',
-				'params_test' => array('a_string' => 'a_string'),
-				'results' => array(
+				'params_test' => ['a_string' => 'a_string'],
+				'results' => [
 					'MySQL' => 'BINARY \'a_string\'',
 					'PostgreSQL' => '\'a_string\'',
-				)
-			),
-			array(
+				]
+			],
+			[
 				'string_test' => '{string_case_insensitive:a_string}',
-				'params_test' => array('a_string' => 'a_string'),
-				'results' => array(
+				'params_test' => ['a_string' => 'a_string'],
+				'results' => [
 					'MySQL' => '\'a_string\'',
 					'PostgreSQL' => 'LOWER(\'a_string\')',
-				)
-			),
-			array(
+				]
+			],
+			[
 				'string_test' => '{array_string_case_insensitive:a_string}',
-				'params_test' => array('a_string' => array('a_string', 'another_string')),
-				'results' => array(
+				'params_test' => ['a_string' => ['a_string', 'another_string']],
+				'results' => [
 					'MySQL' => '\'a_string\', \'another_string\'',
 					'PostgreSQL' => 'LOWER(\'a_string\'), LOWER(\'another_string\')',
-				)
-			),
-			array(
+				]
+			],
+			[
 				'string_test' => '{column_case_insensitive:a_string}',
-				'params_test' => array('a_string' => array('a_string', 'another_string')),
-				'results' => array(
+				'params_test' => ['a_string' => ['a_string', 'another_string']],
+				'results' => [
 					'MySQL' => 'a_string',
 					'PostgreSQL' => 'LOWER(a_string)',
-				)
-			),
-		);
+				]
+			],
+		];
 	}
 
 	public function testCallback()

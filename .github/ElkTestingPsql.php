@@ -13,10 +13,13 @@
  *
  */
 
+use ElkArte\Database\Postgresql\Connection;
+use ElkArte\Database\Postgresql\Table;
+
 /**
  * Sets up a Database_PostgreSQL object
  */
-class DbTable_PostgreSQL_Install extends \ElkArte\Database\Postgresql\Table
+class DbTable_PostgreSQL_Install extends Table
 {
 	public static $_tbl_inst = null;
 
@@ -30,7 +33,7 @@ class DbTable_PostgreSQL_Install extends \ElkArte\Database\Postgresql\Table
 		global $db_prefix;
 
 		// We are doing install, of course we want to do any remove on these
-		$this->_reservedTables = array();
+		$this->_reservedTables = [];
 
 		foreach ($this->_reservedTables as $k => $table_name)
 		{
@@ -38,7 +41,7 @@ class DbTable_PostgreSQL_Install extends \ElkArte\Database\Postgresql\Table
 		}
 
 		// let's be sure.
-		$this->_package_log = array();
+		$this->_package_log = [];
 
 		// This executes queries and things
 		$this->_db = $db;
@@ -71,8 +74,7 @@ class Elk_Testing_psql extends ElkTestingSetup
 {
 	public function init()
 	{
-		global $db_name, $db_prefix, $db_type, $boardurl, $db_server, $db_user, $db_passwd;
-		global $modSettings;
+		global $db_name, $db_prefix, $db_type, $boardurl, $db_server, $db_user, $db_passwd, $modSettings;
 
 		$boardurl = $this->_boardurl = 'http://127.0.0.1';
 		$db_server = $this->_db_server = '127.0.0.1';
@@ -96,7 +98,7 @@ class Elk_Testing_psql extends ElkTestingSetup
 		try
 		{
 			// Start the database interface
-			$this->_db = \ElkArte\Database\Postgresql\Connection::initiate($this->_db_server, $this->_db_name, $this->_db_user, $this->_db_passwd, $this->_db_prefix);
+			$this->_db = Connection::initiate($this->_db_server, $this->_db_name, $this->_db_user, $this->_db_passwd, $this->_db_prefix);
 			$this->_db_table = DbTable_PostgreSQL_Install::db_table($this->_db, $this->_db_prefix);
 		}
 		catch (\Exception $e)
@@ -117,7 +119,6 @@ class Elk_Testing_psql extends ElkTestingSetup
 
 		if (empty($result))
 			return 1;
-
 
 		// Prepare Settings.php, add a member, set time
 		$this->prepare();

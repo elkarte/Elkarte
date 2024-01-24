@@ -32,7 +32,7 @@ class DbTable_MySQL_Install extends Table
 		global $db_prefix;
 
 		// We are installing, of course we want to do any remove on these
-		$this->_reservedTables = array();
+		$this->_reservedTables = [];
 
 		foreach ($this->_reservedTables as $k => $table_name)
 		{
@@ -40,7 +40,7 @@ class DbTable_MySQL_Install extends Table
 		}
 
 		// let's be sure.
-		$this->_package_log = array();
+		$this->_package_log = [];
 
 		// This executes queries and things
 		$this->_db = $db;

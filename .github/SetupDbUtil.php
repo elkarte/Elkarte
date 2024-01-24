@@ -15,7 +15,7 @@ use ElkArte\ext\Composer\Autoload\ClassLoader;
 
 global $txt;
 
-define('BOARDDIR', dirname(__FILE__) . '/..');
+define('BOARDDIR', __DIR__ . '/..');
 define('CACHEDIR', BOARDDIR . '/cache');
 define('ELK', '1');
 
@@ -62,7 +62,7 @@ class ElkTestingSetup
 	 */
 	public function run_queries()
 	{
-		$exists = array();
+		$exists = [];
 		$success = true;
 		foreach ($this->_queries['tables'] as $table_method)
 		{
@@ -88,7 +88,7 @@ class ElkTestingSetup
 		{
 			$table_name = substr($insert_method, 6);
 
-			if (in_array($table_name, $exists))
+			if (in_array($table_name, $exists, true))
 			{
 				continue;
 			}
@@ -135,14 +135,14 @@ class ElkTestingSetup
 				$replaces['{$' . $key . '}'] = $value;
 			}
 		}
-		$replaces['{$default_reserved_names}'] = strtr($replaces['{$default_reserved_names}'], array('\\\\n' => '\\n'));
+		$replaces['{$default_reserved_names}'] = strtr($replaces['{$default_reserved_names}'], ['\\\\n' => '\\n']);
 
 		$this->_db->skip_next_error();
 		$db_wrapper = new DbWrapper($this->_db, $replaces);
 		$db_table_wrapper = new DbTableWrapper($this->_db_table);
 
 		$current_statement = '';
-		$exists = array();
+		$exists = [];
 
 		require_once($sql_file);
 
@@ -162,7 +162,7 @@ class ElkTestingSetup
 
 		$this->_queries['others'] = array_filter($methods, function ($method)
 		{
-			return substr($method, 0, 2) !== '__' && strpos($method, 'insert_') !== 0 && strpos($method, 'table_') !== 0;
+			return strpos($method, '__') !== 0 && strpos($method, 'insert_') !== 0 && strpos($method, 'table_') !== 0;
 		});
 	}
 
@@ -270,7 +270,7 @@ class ElkTestingSetup
 
 		$db->insert('', '
 			{db_prefix}members',
-			array(
+			[
 				'member_name' => 'string-25', 'real_name' => 'string-25', 'passwd' => 'string', 'email_address' => 'string',
 				'id_group' => 'int', 'posts' => 'int', 'date_registered' => 'int', 'hide_email' => 'int',
 				'password_salt' => 'string', 'lngfile' => 'string', 'avatar' => 'string',
@@ -278,8 +278,8 @@ class ElkTestingSetup
 				'message_labels' => 'string', 'website_title' => 'string', 'website_url' => 'string',
 				'signature' => 'string', 'usertitle' => 'string', 'secret_question' => 'string',
 				'additional_groups' => 'string', 'ignore_boards' => 'string',
-			),
-			array(
+			],
+			[
 				'test_admin', 'test_admin', $passwd, 'email@testadmin.tld',
 				1, 0, time(), 0,
 				substr(md5(mt_rand()), 0, 4), '', '',
@@ -287,8 +287,8 @@ class ElkTestingSetup
 				'', '', '',
 				'', '', '',
 				'', '',
-			),
-			array('id_member')
+			],
+			['id_member']
 		);
 
 		// The old Etc/GMT value is discouraged and does not work in some installs
@@ -298,13 +298,13 @@ class ElkTestingSetup
 		{
 			$db->insert('',
 				$db_prefix . 'settings',
-				array(
+				[
 					'variable' => 'string-255', 'value' => 'string-65534',
-				),
-				array(
+				],
+				[
 					'default_timezone', $timezone_id,
-				),
-				array('variable')
+				],
+				['variable']
 			);
 		}
 	}
@@ -314,7 +314,7 @@ class DbWrapper
 {
 	protected $db = null;
 	protected $count_mode = false;
-	protected $replaces = array();
+	protected $replaces = [];
 
 	public function __construct($db, $replaces)
 	{
@@ -324,7 +324,7 @@ class DbWrapper
 
 	public function __call($name, $args)
 	{
-		return call_user_func_array(array($this->db, $name), $args);
+		return call_user_func_array([$this->db, $name], $args);
 	}
 
 	public function insert()
@@ -344,9 +344,9 @@ class DbWrapper
 			}
 		}
 
-		call_user_func_array(array($this->db, 'insert'), $args);
+		call_user_func_array([$this->db, 'insert'], $args);
 
-		return $this->db->affected_rows();
+		//return $this->db->affected_rows();
 	}
 
 	public function countMode($on = true)
