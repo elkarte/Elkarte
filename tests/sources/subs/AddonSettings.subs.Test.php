@@ -39,7 +39,7 @@ class TestAddonSettingssubs extends TestCase
 		$hooks = list_integration_hooks_data(0, 10, 'hook_name');
 
 		// We should find integrate_additional_bbc in the system
-		$key = array_search('integrate_additional_bbc', array_column($hooks, 'hook_name'), true);
+		$key = array_search('integrate_editor_plugins', array_column($hooks, 'hook_name'), true);
 
 		$this->assertNotFalse($key);
 	}
