@@ -20,6 +20,7 @@ class TestMentions extends TestCase
 	protected $_posterOptions = null;
 	protected $_msgOptions = null;
 	protected $backupGlobalsExcludeList = ['user_info'];
+	public $id_msg;
 
 	/**
 	 * Prepare some test data, to use in these tests.

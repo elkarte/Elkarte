@@ -11,6 +11,8 @@ use PHPUnit\Framework\TestCase;
 class TestPoll extends TestCase
 {
 	protected $backupGlobalsExcludeList = ['user_info'];
+	public $id_topic;
+
 	/**
 	 * Prepare some test data, to use in these tests.
 	 * setUp() is run automatically by the testing framework before each test method.
@@ -22,28 +24,28 @@ class TestPoll extends TestCase
 		require_once(SUBSDIR . '/Post.subs.php');
 
 		// post variables
-		$msgOptions = array(
+		$msgOptions = [
 			'id' => 0,
 			'subject' => 'Test poll topic',
 			'smileys_enabled' => true,
 			'body' => 'This is a test poll.',
-			'attachments' => array(),
+			'attachments' => [],
 			'approved' => 1
-		);
+		];
 
-		$topicOptions = array(
+		$topicOptions = [
 			'id' => 0,
 			'board' => 1,
 			'mark_as_read' => false
-		);
+		];
 
-		$posterOptions = array(
+		$posterOptions = [
 			'id' => 1,
 			'name' => 'test',
 			'email' => 'noemail@test.tes',
 			'update_post_count' => false,
 			'ip' => long2ip(rand(0, 2147483647))
-		);
+		];
 
 		// Attempt to make the new topic.
 		createPost($msgOptions, $topicOptions, $posterOptions);
@@ -116,11 +118,11 @@ class TestPoll extends TestCase
 		$id_poll = associatedPoll($this->id_topic);
 		$this->assertNotEmpty($id_poll); // extra-test, just in case.
 
-		$options = array(
+		$options = [
 			'Ema, is that even a question?',
 			'Ant. He broke error log. (no, he didn\'t, but we\'ll say he did.)',
 			'No one this year',
-		);
+		];
 		addPollOptions($id_poll, $options);
 
 		// Ok, what do we have now.

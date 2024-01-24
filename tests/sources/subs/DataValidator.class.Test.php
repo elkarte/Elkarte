@@ -5,7 +5,11 @@ use ElkArte\Languages\Loader;
 
 class TestDataValidator extends ElkArteCommonSetupTest
 {
+	public $rules;
+	public $invalid_data;
+	public $valid_data;
 	protected $backupGlobalsExcludeList = ['user_info'];
+
 	/**
 	 * Prepare what is necessary to use in these tests.
 	 *
@@ -20,7 +24,7 @@ class TestDataValidator extends ElkArteCommonSetupTest
 		$lang = new Loader('english', $txt, database());
 		$lang->load('Validation');
 
-		$this->rules = array(
+		$this->rules = [
 			'required'      => 'required',
 			'max_length'    => 'max_length[1]',
 			'min_length'    => 'min_length[4]',
@@ -44,9 +48,9 @@ class TestDataValidator extends ElkArteCommonSetupTest
 			'limits'        => 'limits[0,10]',
 			'valid_color'   => 'valid_color',
 			'php_syntax'    => 'php_syntax'
-		);
+		];
 
-		$this->invalid_data = array(
+		$this->invalid_data = [
 			'required'      => '',
 			'max_length'    => '1234567890',
 			'min_length'    => '123',
@@ -66,13 +70,13 @@ class TestDataValidator extends ElkArteCommonSetupTest
 			'contains'      => 'premium',
 			'without'       => '1 way 2 do this',
 			'min_len_csv'   => '1234,12345, 123',
-			'min_len_array' => array('1234', '12345', '123'),
+			'min_len_array' => ['1234', '12345', '123'],
 			'limits'        => 11,
 			'valid_color'   => '#fffgff',
 			'php_syntax'    => 'if ($a == 1) {$b = true'
-		);
+		];
 
-		$this->valid_data = array(
+		$this->valid_data = [
 			'required'      => ':D',
 			'max_length'    => '1',
 			'min_length'    => '12345',
@@ -92,11 +96,11 @@ class TestDataValidator extends ElkArteCommonSetupTest
 			'contains'      => 'elk',
 			'without'       => 'this does not have one or two',
 			'min_len_csv'   => '1234,12345,123456',
-			'min_len_array' => array('1234', '12345', '123456'),
+			'min_len_array' => ['1234', '12345', '123456'],
 			'limits'        => 9,
 			'valid_color'   => '#ffffff',
 			'php_syntax'    => 'if ($a == 1) {$b = true;}'
-		);
+		];
 	}
 
 	/**
@@ -107,8 +111,8 @@ class TestDataValidator extends ElkArteCommonSetupTest
 		// These should all fail
 		$validation = new DataValidator();
 		$validation->validation_rules($this->rules);
-		$validation->sanitation_rules(array('min_len_csv' => 'trim'));
-		$validation->input_processing(array('min_len_csv' => 'csv', 'min_len_array' => 'array'));
+		$validation->sanitation_rules(['min_len_csv' => 'trim']);
+		$validation->input_processing(['min_len_csv' => 'csv', 'min_len_array' => 'array']);
 		$validation->validate($this->invalid_data);
 
 		foreach ($this->invalid_data as $key => $value)
@@ -122,7 +126,7 @@ class TestDataValidator extends ElkArteCommonSetupTest
 		// These should all pass
 		$validation = new DataValidator();
 		$validation->validation_rules($this->rules);
-		$validation->input_processing(array('min_len_csv' => 'csv', 'min_len_array' => 'array'));
+		$validation->input_processing(['min_len_csv' => 'csv', 'min_len_array' => 'array']);
 		$validation->validate($this->valid_data);
 
 		foreach ($this->valid_data as $key => $value)
@@ -137,9 +141,9 @@ class TestDataValidator extends ElkArteCommonSetupTest
 	public function testCsv()
 	{
 		$validation = new DataValidator();
-		$validation->validation_rules(array('csv' => 'limits[0,10]|without[1,2,3]'));
-		$validation->input_processing(array('csv' => 'csv'));
-		$validation->validate(array('csv' => '10,12,36,49,5'));
+		$validation->validation_rules(['csv' => 'limits[0,10]|without[1,2,3]']);
+		$validation->input_processing(['csv' => 'csv']);
+		$validation->validate(['csv' => '10,12,36,49,5']);
 		$result = $validation->validation_errors(true);
 
 		$this->assertCount(6, $result);
@@ -162,8 +166,8 @@ class TestDataValidator extends ElkArteCommonSetupTest
 	 */
 	public function testIsValidBoolean($value, $expected)
 	{
-		$data = array('value' => $value);
-		$result = DataValidator::is_valid($data, array('value' => 'boolean'));
+		$data = ['value' => $value];
+		$result = DataValidator::is_valid($data, ['value' => 'boolean']);
 		$this->assertSame($expected !== null, $result);
 	}
 
@@ -173,40 +177,40 @@ class TestDataValidator extends ElkArteCommonSetupTest
 		 * Try to mimic the output of filter_var() where it returns null
 		 * when casting to boolean fails.
 		 */
-		return array(
-			array('foo', null),
-			array(false, false),
-			array('baz', null),
-			array(array(1,2), null),
-			array(array(1), null),
-			array(array(0), null),
-			array(42, null),
-			array(-42, null),
-			array(true, true),
-			array('true', true),
-			array('on', true),
-			array('off', false),
-			array('yes', true),
-			array('1', true),
-			array('no', false),
-			array('ja', null),
-			array('nein', null),
-			array(null, false),
-			array(0, false),
-			array('false', false),
-			array('string', null),
-			array('0.0', null),
-			array('4.2', null),
-			array('0', false),
-			array('', false),
-			array(array(), null),
+		return [
+			['foo', null],
+			[false, false],
+			['baz', null],
+			[[1,2], null],
+			[[1], null],
+			[[0], null],
+			[42, null],
+			[-42, null],
+			[true, true],
+			['true', true],
+			['on', true],
+			['off', false],
+			['yes', true],
+			['1', true],
+			['no', false],
+			['ja', null],
+			['nein', null],
+			[null, false],
+			[0, false],
+			['false', false],
+			['string', null],
+			['0.0', null],
+			['4.2', null],
+			['0', false],
+			['', false],
+			[[], null],
 
 			/*
 			 * Objects (even empty ones) should not be able to evaluate to
 			 * a boolean without __tostring() defined. This was fixed in PHP 7.
 			 */
-			array(new stdClass, null),
-		);
+			[new stdClass, null],
+		];
 	}
 
 	/**
@@ -214,8 +218,8 @@ class TestDataValidator extends ElkArteCommonSetupTest
 	 */
 	public function testIsValidFloat($value, $expected)
 	{
-		$data = array('value' => $value);
-		$result = DataValidator::is_valid($data, array('value' => 'float'));
+		$data = ['value' => $value];
+		$result = DataValidator::is_valid($data, ['value' => 'float']);
 		$this->assertSame($expected, $result);
 	}
 
@@ -225,28 +229,28 @@ class TestDataValidator extends ElkArteCommonSetupTest
 		 * Several of these test cases seem silly, but we should document
 		 * all of these anyway so people know what to expect.
 		 */
-		return array(
-			array('foo', false),
-			array(false, false),
-			array('baz', false),
-			array(array(1,2), false),
-			array(array(1), false),
-			array(array(0), false),
-			array(42, true),
-			array(-42, true),
-			array(true, true),
-			array('1', true),
-			array(null, true),
-			array(0, true),
-			array('0.0', true),
-			array(4.2, true),
-			array('4.2', true),
-			array('0', true),
-			array('+0', true),
-			array('-0', true),
-			array('', false),
-			array(array(), false),
-		);
+		return [
+			['foo', false],
+			[false, false],
+			['baz', false],
+			[[1,2], false],
+			[[1], false],
+			[[0], false],
+			[42, true],
+			[-42, true],
+			[true, true],
+			['1', true],
+			[null, true],
+			[0, true],
+			['0.0', true],
+			[4.2, true],
+			['4.2', true],
+			['0', true],
+			['+0', true],
+			['-0', true],
+			['', false],
+			[[], false],
+		];
 	}
 
 	/**
@@ -254,8 +258,8 @@ class TestDataValidator extends ElkArteCommonSetupTest
 	 */
 	public function testIsValidInteger($value, $expected)
 	{
-		$data = array('value' => $value);
-		$result = DataValidator::is_valid($data, array('value' => 'integer'));
+		$data = ['value' => $value];
+		$result = DataValidator::is_valid($data, ['value' => 'integer']);
 		$this->assertSame($expected, $result);
 	}
 
@@ -264,27 +268,27 @@ class TestDataValidator extends ElkArteCommonSetupTest
 		/*
 		 * Some real head scratchers here.
 		 */
-		return array(
-			array('foo', false),
-			array(false, false),
-			array('baz', false),
-			array(array(1,2), false),
-			array(array(1), false),
-			array(array(0), false),
-			array(42, true),
-			array(-42, true),
-			array(true, true),
-			array('1', true),
-			array(null, true),
-			array(0, true),
-			array('0.0', false),
-			array(4.2, false),
-			array('4.2', false),
-			array('0', true),
-			array('+0', true),
-			array('-0', true),
-			array('', false),
-			array(array(), false),
-		);
+		return [
+			['foo', false],
+			[false, false],
+			['baz', false],
+			[[1,2], false],
+			[[1], false],
+			[[0], false],
+			[42, true],
+			[-42, true],
+			[true, true],
+			['1', true],
+			[null, true],
+			[0, true],
+			['0.0', false],
+			[4.2, false],
+			['4.2', false],
+			['0', true],
+			['+0', true],
+			['-0', true],
+			['', false],
+			[[], false],
+		];
 	}
 }
