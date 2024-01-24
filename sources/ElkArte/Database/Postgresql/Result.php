@@ -36,7 +36,7 @@ class Result extends AbstractResult
 		}
 
 		$resource = $this->result ?? $this->details->lastResult;
-		if (is_resource($resource) || $resource instanceof \PgSQL\Result)
+		if ($resource instanceof \PgSQL\Result)
 		{
 			return pg_affected_rows($resource);
 		}
