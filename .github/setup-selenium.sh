@@ -71,8 +71,7 @@ else
     echo "Selenium Success"
 
     # Copy phpunit_coverage.php into the webserver's document root directory.
-    # cp ./vendor/phpunit/phpunit-selenium/PHPUnit/Extensions/SeleniumCommon/phpunit_coverage.php .
-    cp ./tests/phpunit_coverage.php .
+    cp ./vendor/phpunit/phpunit-selenium/PHPUnit/Extensions/SeleniumCommon/phpunit_coverage.php .
 
     # Run the phpunit selenium tests
     vendor/bin/phpunit --verbose --debug --configuration .github/phpunit-webtest.xml

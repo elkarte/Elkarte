@@ -19,7 +19,7 @@ jobs:
       matrix:
         include:
           - db: "mysql:5.7"
-            php: '8.2'
+            php: '8.1'
 
     name: WebTest (PHP ${{ matrix.php }} - DB ${{ matrix.db_alias != '' && matrix.db_alias || matrix.db }})
 

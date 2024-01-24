@@ -11,7 +11,7 @@
          beStrictAboutTestsThatDoNotTestAnything="false"
          bootstrap="bootstrapInstall.php">
   <testsuites>
-      <testsuite name="Web Tests">
+      <testsuite name="Install Tests">
           <directory suffix="Web.php">../tests</directory>
       </testsuite>
   </testsuites>
