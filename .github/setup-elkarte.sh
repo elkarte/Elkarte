@@ -30,5 +30,5 @@ composer install --no-interaction --quiet
 if [[ "$WEBSERVER" != "none" ]]
 then
 	composer remove phpunit/phpunit phpunit/phpunit-selenium --dev
-	composer require phpunit/phpunit:9.3.* phpunit/phpunit-selenium:9.0.1 --dev --update-with-all-dependencies --ignore-platform-reqs
+	composer require phpunit/phpunit:8.5.36 phpunit/phpunit-selenium:8.0.0 --dev --update-with-all-dependencies --ignore-platform-reqs
 fi

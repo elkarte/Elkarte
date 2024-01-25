@@ -21,8 +21,8 @@ use PHPUnit\Extensions\Selenium2TestCase;
  */
 abstract class ElkArteWebSupport extends Selenium2TestCase
 {
-	//protected $coverageScriptUrl = 'http://127.0.0.1/phpunit_coverage.php';
-	protected $coverageScriptUrl = '';
+	protected $coverageScriptUrl = 'http://127.0.0.1/phpunit_coverage.php';
+	//protected $coverageScriptUrl = '';
 	protected $backupGlobalsExcludeList = ['user_info'];
 	protected $width = 2560;
 	protected $height = 1440;
