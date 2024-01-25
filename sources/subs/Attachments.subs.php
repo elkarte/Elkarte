@@ -19,6 +19,7 @@
 
 use ElkArte\Cache\Cache;
 use ElkArte\Errors\AttachmentErrorContext;
+use ElkArte\Errors\Errors;
 use ElkArte\Graphics\Image;
 use ElkArte\Http\FsockFetchWebdata;
 use ElkArte\TemporaryAttachment;
@@ -64,7 +65,7 @@ function processAttachments($id_msg = 0)
 	if (!$file_functions->isDir($attach_current_dir))
 	{
 		$tmp_attachments->setSystemError('attach_folder_warning');
-		\ElkArte\Errors\Errors::instance()->log_error(sprintf($txt['attach_folder_admin_warning'], $attach_current_dir), 'critical');
+		Errors::instance()->log_error(sprintf($txt['attach_folder_admin_warning'], $attach_current_dir), 'critical');
 	}
 
 	if ($tmp_attachments->hasSystemError() === false && !isset($context['attachments']['quantity']))
@@ -190,7 +191,7 @@ function processAttachments($id_msg = 0)
 				$attach_errors->addError(isset($error[1]) ? $error : $error[0]);
 				if (in_array($error[0], $log_these))
 				{
-					\ElkArte\Errors\Errors::instance()->log_error($temp_file->getName() . ': ' . $txt[$error[0]], 'critical');
+					Errors::instance()->log_error($temp_file->getName() . ': ' . $txt[$error[0]], 'critical');
 
 					// For critical errors, we don't want the file or session data to persist
 					$temp_file->remove(false);
@@ -257,18 +258,18 @@ function attachmentUploadChecks($attachID)
 				// 3 partially uploaded
 				// 4 no file uploaded
 				// 8 upload blocked by extension
-				\ElkArte\Errors\Errors::instance()->log_error($_FILES['attachment']['name'][$attachID] . ': ' . $txt['php_upload_error_' . $_FILES['attachment']['error'][$attachID]]);
+				Errors::instance()->log_error($_FILES['attachment']['name'][$attachID] . ': ' . $txt['php_upload_error_' . $_FILES['attachment']['error'][$attachID]]);
 				$errors[] = 'attach_php_error';
 				break;
 			case 6:
 			case 7:
 				// 6 Missing or a full a temp directory on the server
 				// 7 Failed to write file
-				\ElkArte\Errors\Errors::instance()->log_error($_FILES['attachment']['name'][$attachID] . ': ' . $txt['php_upload_error_' . $_FILES['attachment']['error'][$attachID]], 'critical');
+				Errors::instance()->log_error($_FILES['attachment']['name'][$attachID] . ': ' . $txt['php_upload_error_' . $_FILES['attachment']['error'][$attachID]], 'critical');
 				$errors[] = 'attach_php_error';
 				break;
 			default:
-				\ElkArte\Errors\Errors::instance()->log_error($_FILES['attachment']['name'][$attachID] . ': ' . $txt['php_upload_error_' . $_FILES['attachment']['error'][$attachID]]);
+				Errors::instance()->log_error($_FILES['attachment']['name'][$attachID] . ': ' . $txt['php_upload_error_' . $_FILES['attachment']['error'][$attachID]]);
 				$errors[] = 'attach_php_error';
 		}
 	}
