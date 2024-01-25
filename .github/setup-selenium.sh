@@ -73,6 +73,9 @@ else
     # Copy phpunit_coverage.php into the webserver's document root directory.
     cp ./vendor/phpunit/phpunit-selenium/PHPUnit/Extensions/SeleniumCommon/phpunit_coverage.php .
 
+    # Copy RemoteCoverage.php back to vendor, this version supports phpunit RawCodeCoverageData
+    sudo cp ./tests/RemoteCoverage.php ./vendor/phpunit/phpunit-selenium/PHPUnit/Extensions/SeleniumCommon
+
     # Run the phpunit selenium tests
     vendor/bin/phpunit --verbose --debug --configuration .github/phpunit-webtest.xml
 
