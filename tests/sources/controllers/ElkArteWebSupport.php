@@ -150,11 +150,25 @@ abstract class ElkArteWebSupport extends Selenium2TestCase
 	{
 		// Main page
 		$this->url('index.php');
+		$this->waitUntil(function ($testCase)
+		{
+			try
+			{
+				return $testCase->byId('menu_nav');
+			}
+			catch (PHPUnit\Extensions\Selenium2TestCase\WebDriverException $e)
+			{
+				return false;
+			}
+		}, 10000);
 
 		// Can we log in?
 		$check = $this->byId('menu_nav')->text();
 		if (strpos($check, 'Log in') !== false)
 		{
+			// Don't trip the spamProtection
+			$this->timeouts()->implicitWait(3000);
+
 			// Select login from the main page
 			$this->url('index.php?action=login');
 			$this->assertEquals('Log in', $this->title(), 'Unable to find the login forum');
@@ -172,11 +186,11 @@ abstract class ElkArteWebSupport extends Selenium2TestCase
 		}
 		else
 		{
+			// Already logged in
 			return;
 		}
 
 		// Hang about until the page refreshes
-		$this->url('index.php');
 		$this->waitUntil(function ($testCase)
 		{
 			try
@@ -187,7 +201,7 @@ abstract class ElkArteWebSupport extends Selenium2TestCase
 			{
 				return false;
 			}
-		}, 5000);
+		}, 10000);
 
 		// Should see the admin main menu button
 		$this->assertStringContainsString('Admin', $this->byId('menu_nav')->text(), $this->source());

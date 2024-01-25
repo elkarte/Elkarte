@@ -163,10 +163,14 @@ class SupportRegisterController extends ElkArteWebSupport
 	 */
 	public function testDeleteAccount()
 	{
+		global $txt;
+
+		$txt['guest_title'] = 'Guest';
+
 		// Register a member that we can delete
 		require_once(SUBSDIR . '/Members.subs.php');
 		$_SESSION['just_registered'] = 0;
-		$regOptions = array(
+		$regOptions = [
 			'interface' => 'admin',
 			'username' => 'user49',
 			'email' => 'user49@mydomain.com',
@@ -174,11 +178,11 @@ class SupportRegisterController extends ElkArteWebSupport
 			'password_check' => 'user49',
 			'require' => 'nothing',
 			'send_welcome_email' => false,
-		);
+		];
 
 		$reg_errors = ErrorContext::context('register', 0);
-		$memberID = registerMember($regOptions);
-		$this->assertFalse($memberID === 0, 'Failed to create member, code:: ' . $memberID);
+		$memberID = (int) registerMember($regOptions);
+		$this->assertNotSame($memberID, 0, 'Failed to create member, code:: ' . $memberID);
 		$this->assertFalse($reg_errors->hasErrors());
 
 		$_SESSION['just_registered'] = 0;

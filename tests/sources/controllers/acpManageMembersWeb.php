@@ -28,14 +28,20 @@ class SupportManageMembersController extends ElkArteWebSupport
 	 */
 	public function registerMembers()
 	{
+		global $settings;
+
+		$settings['theme_url'] = 'THEMEURL';
+		$settings['images_url'] = 'IMAGESURL';
+		$settings['default_theme_url'] ='DEFAULT_THEMEURL';
+
 		require_once(SUBSDIR . '/Members.subs.php');
-		$require = array('activation', 'approval');
+		$require = ['activation', 'approval'];
 		$_SESSION['just_registered'] = 0;
 
 		// Register a couple of members, like user0, user1
 		for ($i = 0; $i < 2; $i++)
 		{
-			$regOptions = array(
+			$regOptions = [
 				'interface' => 'admin',
 				'username' => 'user' . $i,
 				'email' => 'user' . $i . '@mydomain.com',
@@ -43,7 +49,7 @@ class SupportManageMembersController extends ElkArteWebSupport
 				'password_check' => 'user' . $i,
 				'require' => $require[$i],
 				'memberGroup' => 2,
-			);
+			];
 
 			// Will show sh: 1: sendmail: not found in the CI console
 			$id = registerMember($regOptions);
