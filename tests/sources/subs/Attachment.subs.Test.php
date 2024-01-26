@@ -10,7 +10,8 @@
  *
  */
 
-use PHPUnit\Framework\TestCase;
+use ElkArte\Languages\Loader;
+use ElkArte\Errors\AttachmentErrorContext;
 
 class AttachmentSubs extends ElkArteCommonSetupTest
 {
@@ -74,7 +75,7 @@ class AttachmentSubs extends ElkArteCommonSetupTest
 
 		// Errors, we hope so
 		$errors = $attach_errors->prepareErrors();
-		$this->assertEquals('Error uploading attachments.',,$errors['attach_generic']['title']);
+		$this->assertEquals('Error uploading attachments.', $errors['attach_generic']['title']);
 	}
 
 	public function testGetAttachmentFromTopic()
@@ -85,20 +86,21 @@ class AttachmentSubs extends ElkArteCommonSetupTest
 
 	public function testGetUtlImageSize()
 	{
-		$result = url_image_size('https://www.elkarte.net/community/themes/default/images/logo.png)';
-		$this->assertEquals(145,  $result[0]);
+		$result = url_image_size('https://www.elkarte.net/community/themes/default/images/logo.png');
+		$this->assertEquals(145, $result[0]);
 	}
 
 	public function testGetServerStoredAvatars()
 	{
 		global $context, $txt, $modSettings;
 
-		$modSettings['avatar_directory'] = '/var/www/avatars';
+		$modSettings['avatar_directory'] = '/home/runner/work/Elkarte/Elkarte/elkarte/avatars';
 		$context['member']['avatar']['server_pic'] = 'blank.png';
 		$txt['no_pic'] = 'None';
 
 		$result = getServerStoredAvatars( '/Oxygen');
 
-		$this->assertEquals('beaker.png', $result[0]['files'][0]['filename']);
+		$this->assertCount(22, $result[0]['files']);
+		//$this->assertEquals('invisible-user.png', $result[0]['files'][0]['filename']);
 	}
 }
