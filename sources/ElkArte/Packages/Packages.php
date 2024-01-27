@@ -153,7 +153,7 @@ class Packages extends AbstractController
 		}
 
 		// What are we trying to do
-		$this->_filename = (string) preg_replace('~[\.]+~', '.', $file);
+		$this->_filename = (string) preg_replace('~[.]+~', '.', $file);
 		$this->_uninstalling = $this->_req->query->sa === 'uninstall';
 
 		// If we can't find the file, our installation ends here

@@ -71,7 +71,7 @@ function template_servers()
 					<li>
 						<strong>' . $context['server']['name'] . '</strong>
 						<span class="package_server floatright">
-							<a class="linkbutton" href="' . $scripturl . '?action=admin;area=packageservers;sa=browse;server=' . $context['server']['id'] . '">' . $txt['package_browse'] . '</a>
+							<a class="linkbutton" href="' . $scripturl . '?action=admin;area=packageservers;sa=browse;server">' . $txt['package_browse'] . '</a>
 						</span>
 					</li>
 				</ul>
@@ -382,53 +382,6 @@ function template_downloaded()
 		</div>
 		<div class="submitbutton">
 			<a class="linkbutton" href="', $scripturl, '?action=admin;', (!empty($context['package_server']) ? 'area=packageservers;sa=browse;server=' . $context['package_server'] : 'area=packages;sa=browse'), '">', $txt['back'], '</a>
-		</div>
-	</div>';
-}
-
-/**
- * Shows a form to upload a package from the local computer.
- */
-function template_upload()
-{
-	global $context, $txt, $scripturl;
-
-	if (!empty($context['package_ftp']['error']))
-	{
-		echo '
-	<div class="errorbox">
-		', $context['package_ftp']['error'], '
-	</div>';
-	}
-
-	echo '
-	<div id="admin_form_wrapper">
-		<h2 class="category_header">', $txt['upload_new_package'], '</h2>';
-
-	if ($context['package_download_broken'])
-	{
-		template_ftp_form_required();
-
-		echo '
-			<h2 class="category_header">' . $txt['package_upload_title'] . '</h2>';
-	}
-
-	echo '
-		<div class="content">
-			<form action="' . $scripturl . '?action=admin;area=packageservers;sa=upload2" method="post" accept-charset="UTF-8" enctype="multipart/form-data">
-				<dl class="settings">
-					<dt>
-						<label for="package">' . $txt['package_upload_select'] . ':</label>
-					</dt>
-					<dd>
-						<input type="file" id="package" name="package" size="38" class="input_file" />
-					</dd>
-				</dl>
-				<div class="submitbutton">
-					<input type="submit" value="' . $txt['package_upload'] . '" />
-					<input type="hidden" name="' . $context['session_var'] . '" value="' . $context['session_id'] . '" />
-				</div>
-			</form>
 		</div>
 	</div>';
 }

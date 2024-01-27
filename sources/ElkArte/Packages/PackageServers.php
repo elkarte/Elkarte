@@ -33,7 +33,7 @@ use ElkArte\Util;
  */
 class PackageServers extends AbstractController
 {
-	/** @var \ElkArte\FileFunctions */
+	/** @var FileFunctions */
 	protected $fileFunc;
 
 	/**
@@ -78,11 +78,8 @@ class PackageServers extends AbstractController
 		// Here is a list of all the potentially valid actions.
 		$subActions = array(
 			'servers' => array($this, 'action_list'),
-			'add' => array($this, 'action_add'),
 			'browse' => array($this, 'action_browse'),
 			'download' => array($this, 'action_download'),
-			'remove' => array($this, 'action_remove'),
-			'upload' => array($this, 'action_upload'),
 			'upload2' => array($this, 'action_upload2'),
 		);
 
@@ -95,7 +92,7 @@ class PackageServers extends AbstractController
 		// For the template
 		$context['sub_action'] = $subAction;
 
-		// Set up some tabs, used when the add packages button (servers) is selected
+		// Set up some tabs, used when the add packages button (servers) is selected to mimic that controller
 		$context[$context['admin_menu_name']]['object']->prepareTabData([
 			'title' => $txt['package_manager'],
 			'description' => $txt['package_servers_desc'],
@@ -122,24 +119,20 @@ class PackageServers extends AbstractController
 	}
 
 	/**
-	 * Load a list of package servers.
+	 * Load the package servers into context.
 	 *
 	 * - Accessed by action=admin;area=packageservers;sa=servers
 	 */
 	public function action_list()
 	{
-		global $txt, $context, $modSettings;
-
-		require_once(SUBSDIR . '/PackageServers.subs.php');
+		global $txt, $context;
 
 		// Ensure we use the correct template, and page title.
 		$context['sub_template'] = 'servers';
 		$context['page_title'] .= ' - ' . $txt['download_packages'];
 
-		// Load the list of servers.
-		$modSettings['elkarte_addon_server'] = $modSettings['elkarte_addon_server'] ?? 'https://elkarte.github.io/addons/package.json';
-		$context['server']['id'] = $modSettings['elkarte_addon_server']; //fetchPackageServers();
-		$context['server']['name'] = 'ElkArte';
+		// Load the addon server.
+		[$context['server']['name'], $context['server']['id']] = $this->_package_server();
 
 		// Check if we will be able to write new archives in /packages folder.
 		$context['package_download_broken'] = !$this->fileFunc->isWritable(BOARDDIR . '/packages') || !$this->fileFunc->isWritable(BOARDDIR . '/packages/installed.list');
@@ -191,14 +184,12 @@ class PackageServers extends AbstractController
 			$ftp_path = $this->_req->getPost('ftp_path', 'trim');
 
 			$ftp = new FtpConnection($ftp_server, $ftp_port, $ftp_username, $ftp_password);
-			if ($ftp->error === false)
+
+			// I know, I know... but a lot of people want to type /home/xyz/... which is wrong, but logical.
+			if (($ftp->error === false) && !$ftp->chdir($ftp_path))
 			{
-				// I know, I know... but a lot of people want to type /home/xyz/... which is wrong, but logical.
-				if (!$ftp->chdir($ftp_path))
-				{
-					$ftp_error = $ftp->error;
-					$ftp->chdir(preg_replace('~^/home[2]?/[^/]+~', '', $ftp_path));
-				}
+				$ftp_error = $ftp->error;
+				$ftp->chdir(preg_replace('~^/home[2]?/[^/]+~', '', $ftp_path));
 			}
 		}
 
@@ -264,13 +255,10 @@ class PackageServers extends AbstractController
 	{
 		global $txt, $context;
 
-		// Load our subs worker.
-		require_once(SUBSDIR . '/PackageServers.subs.php');
-
-		// Browsing the packages from a server
+		// Want to browsing the packages from the addon server
 		if (isset($this->_req->query->server))
 		{
-			list($name, $url, $server) = $this->_package_server();
+			list($name, $url) = $this->_package_server();
 		}
 
 		// Minimum required parameter did not exist so dump out.
@@ -290,8 +278,8 @@ class PackageServers extends AbstractController
 
 		// Pick the correct template.
 		$context['sub_template'] = 'package_list';
-		$context['page_title'] = $txt['package_servers'] . ($name != '' ? ' - ' . $name : '');
-		$context['package_server'] = $server;
+		$context['page_title'] = $txt['package_servers'] . ($name !== '' ? ' - ' . $name : '');
+		$context['package_server'] = $name;
 
 		// If we received data
 		if (!empty($listing))
@@ -374,9 +362,7 @@ class PackageServers extends AbstractController
 					}
 
 					// Build the download to server link
-					$server_att = $server != '' ? ['server' => $server] : [];
-					$current_url = ['section' => $packageSection, 'num' => $section_count];
-					$package['download']['href'] = getUrl('admin', ['action' => 'admin', 'area' => 'packageservers', 'sa' => 'download'] + $server_att + $current_url + ['package' => $package['filename']] + ($package['download_conflict'] ? ['conflict'] : []) + ['{session_data}']);
+					$package['download']['href'] = getUrl('admin', ['action' => 'admin', 'area' => 'packageservers', 'sa' => 'download', 'server' => $name, 'section' => $packageSection, 'num' => $section_count, 'package' => $package['filename']] + ($package['download_conflict'] ? ['conflict'] : []) + ['{session_data}']);
 					$package['download']['link'] = '<a href="' . $package['download']['href'] . '">' . $package['name'] . '</a>';
 
 					// Add this package to the list
@@ -398,42 +384,22 @@ class PackageServers extends AbstractController
 	}
 
 	/**
-	 * Returns the contact details for a server
+	 * Returns the contact details for the ElkArte package server
 	 *
-	 * - Reads the database to fetch the server url and name
+	 * - This is no longer necessary, but a leftover from when you could add insecure servers
+	 * now it just returns what is saved in modSettings 'elkarte_addon_server'
 	 *
 	 * @return array
-	 * @throws \ElkArte\Exceptions\Exception couldnt_connect
 	 */
 	private function _package_server()
 	{
+		$modSettings['elkarte_addon_server'] = $modSettings['elkarte_addon_server'] ?? 'https://elkarte.github.io/addons/package.json';
+
 		// Initialize the required variables.
-		$name = '';
-		$url = '';
-		$server = '';
+		$name = 'ElkArte';
+		$url = $modSettings['elkarte_addon_server'];
 
-		if (isset($this->_req->query->server))
-		{
-			if ($this->_req->query->server == '')
-			{
-				redirectexit('action=admin;area=packageservers');
-			}
-
-			$server = $this->_req->getQuery('server', 'intval');
-
-			// Query the server table to find the requested server.
-			$packageserver = fetchPackageServers($server);
-			$url = $packageserver[0]['url'];
-			$name = $packageserver[0]['name'];
-
-			// If server does not exist then dump out.
-			if (empty($url))
-			{
-				throw new Exception('couldnt_connect', false);
-			}
-		}
-
-		return array($name, $url, $server);
+		return [$name, $url];
 	}
 
 	/**
@@ -518,7 +484,7 @@ class PackageServers extends AbstractController
 		{
 			// Name this master.zip based on repo name in the link
 			$path_parts = pathinfo($matches[4]);
-			list (, $newName,) = explode('/', $path_parts['dirname']);
+			list (, $newname,) = explode('/', $path_parts['dirname']);
 
 			// Just to be safe, no invalid file characters
 			$invalid = array_merge(array_map('chr', range(0, 31)), array('<', '>', ':', '"', '/', '\\', '|', '?', '*'));
@@ -531,12 +497,10 @@ class PackageServers extends AbstractController
 				$this->_req->query->auto = true;
 			}
 
-			return str_replace($invalid, '_', $newName) . $matches[6];
+			return str_replace($invalid, '_', $newname) . $matches[6];
 		}
-		else
-		{
-			return basename($name);
-		}
+
+		return basename($name);
 	}
 
 	/**
@@ -569,8 +533,6 @@ class PackageServers extends AbstractController
 	{
 		global $txt, $context;
 
-		require_once(SUBSDIR . '/PackageServers.subs.php');
-
 		// Use the downloaded sub template.
 		$context['sub_template'] = 'downloaded';
 
@@ -585,13 +547,13 @@ class PackageServers extends AbstractController
 		}
 
 		// Start off with nothing
-		$server = '';
 		$url = '';
+		$name = '';
 
 		// Download from a package server?
 		if (isset($this->_req->query->server))
 		{
-			list(, $url, $server) = $this->_package_server();
+			list($name, $url) = $this->_package_server();
 
 			// Fetch the package listing from the package server
 			$listing = json_decode(fetch_web_data($url));
@@ -608,6 +570,12 @@ class PackageServers extends AbstractController
 				$package_name = $this->_rename_master($section[$this->_req->query->num]->server[0]->download);
 				$path_url = pathinfo($section[$this->_req->query->num]->server[0]->download);
 				$url = isset($path_url['dirname']) ? $path_url['dirname'] . '/' : '';
+
+				// No extension ... set a default or nothing will show up in the listing
+				if (strrpos(substr($name, 0, -3), '.') === false)
+				{
+					$needs_extension = true;
+				}
 			}
 			// Not found or some monkey business
 			else
@@ -628,18 +596,27 @@ class PackageServers extends AbstractController
 			$package_name = $this->_rename_master($this->_req->post->package);
 		}
 
+		// First make sure it's a package.
+		$packageInfo = getPackageInfo($url . $package_id);
+		if (!is_array($packageInfo))
+		{
+			throw new Exception($packageInfo);
+		}
+
+		if (!empty($needs_extension) && isset($packageInfo['name']))
+		{
+			$package_name = $this->_rename_master($packageInfo['name']) . '.zip';
+		}
+
 		// Avoid over writing any existing package files of the same name
 		if (isset($this->_req->query->conflict) || (isset($this->_req->query->auto) && $this->fileFunc->fileExists(BOARDDIR . '/packages/' . $package_name)))
 		{
 			// Find the extension, change abc.tar.gz to abc_1.tar.gz...
+			$ext = '';
 			if (strrpos(substr($package_name, 0, -3), '.') !== false)
 			{
 				$ext = substr($package_name, strrpos(substr($package_name, 0, -3), '.'));
 				$package_name = substr($package_name, 0, strrpos(substr($package_name, 0, -3), '.')) . '_';
-			}
-			else
-			{
-				$ext = '';
 			}
 
 			// Find the first available free name
@@ -649,15 +626,7 @@ class PackageServers extends AbstractController
 				$i++;
 			}
 
-			$package_name = $package_name . $i . $ext;
-		}
-
-		// First make sure it's a package.
-		$packageInfo = getPackageInfo($url . $package_id);
-
-		if (!is_array($packageInfo))
-		{
-			throw new Exception($packageInfo);
+			$package_name .= $i . $ext;
 		}
 
 		// Save the package to disk, use FTP if necessary
@@ -676,7 +645,7 @@ class PackageServers extends AbstractController
 		package_put_contents(BOARDDIR . '/packages/' . $package_name, fetch_web_data($url . $package_id));
 
 		// You just downloaded an addon from SERVER_NAME_GOES_HERE.
-		$context['package_server'] = $server;
+		$context['package_server'] = $name;
 
 		// Read in the newly saved package information
 		$context['package'] = getPackageInfo($package_name);
@@ -686,24 +655,21 @@ class PackageServers extends AbstractController
 			throw new Exception('package_cant_download', false);
 		}
 
+		$context['package']['install']['link'] = '';
 		if ($context['package']['type'] === 'modification' || $context['package']['type'] === 'addon')
 		{
-			$context['package']['install']['link'] = '<a class="linkbutton" href="' . getUrl('admin', ['action' => 'admin', 'area' => 'packages', 'sa' => 'install', 'package' => $context['package']['filename']]) . '">' . $txt['install_mod'] . '</a>';
+			$context['package']['install']['link'] = $this->getInstallLink('install_mod', $context['package']['filename']);
 		}
 		elseif ($context['package']['type'] === 'avatar')
 		{
-			$context['package']['install']['link'] = '<a class="linkbutton" href="' . getUrl('admin', ['action' => 'admin', 'area' => 'packages', 'sa' => 'install', 'package' => $context['package']['filename']]) . '">' . $txt['use_avatars'] . '</a>';
+			$context['package']['install']['link'] = $this->getInstallLink('use_avatars', $context['package']['filename']);
 		}
 		elseif ($context['package']['type'] === 'language')
 		{
-			$context['package']['install']['link'] = '<a class="linkbutton" href="' . getUrl('admin', ['action' => 'admin', 'area' => 'packages', 'sa' => 'install', 'package' => $context['package']['filename']]) . '">' . $txt['add_languages'] . '</a>';
-		}
-		else
-		{
-			$context['package']['install']['link'] = '';
+			$context['package']['install']['link'] = $this->getInstallLink('add_languages',$context['package']['filename']);
 		}
 
-		$context['package']['list_files']['link'] = '<a class="linkbutton" href="' . getUrl('admin', ['action' => 'admin', 'area' => 'packages', 'sa' => 'list', 'package' => $context['package']['filename']]) . '">' . $txt['list_files'] . '</a>';
+		$context['package']['list_files']['link'] = $this->getInstallLink('list_files', $context['package']['filename'], 'list');
 
 		// Free a little bit of memory...
 		unset($context['package']['xml']);
@@ -810,24 +776,21 @@ class PackageServers extends AbstractController
 			}
 		}
 
+		$context['package']['install']['link'] = '';
 		if ($context['package']['type'] === 'modification' || $context['package']['type'] === 'addon')
 		{
-			$context['package']['install']['link'] = '<a class="linkbutton" href="' . getUrl('admin', ['action' => 'admin', 'area' => 'packages', 'sa' => 'install', 'package' => $context['package']['filename']]) . '">' . $txt['install_mod'] . '</a>';
+			$context['package']['install']['link'] = $this->getInstallLink('install_mod', $context['package']['filename']);
 		}
 		elseif ($context['package']['type'] === 'avatar')
 		{
-			$context['package']['install']['link'] = '<a class="linkbutton" href="' . getUrl('admin', ['action' => 'admin', 'area' => 'packages', 'sa' => 'install', 'package' => $context['package']['filename']]) . '">' . $txt['use_avatars'] . '</a>';
+			$context['package']['install']['link'] = $this->getInstallLink('use_avatars', $context['package']['filename']);
 		}
 		elseif ($context['package']['type'] === 'language')
 		{
-			$context['package']['install']['link'] = '<a class="linkbutton" href="' . getUrl('admin', ['action' => 'admin', 'area' => 'packages', 'sa' => 'install', 'package' => $context['package']['filename']]) . '">' . $txt['add_languages'] . '</a>';
-		}
-		else
-		{
-			$context['package']['install']['link'] = '';
+			$context['package']['install']['link'] = $this->getInstallLink('add_languages', $context['package']['filename']);
 		}
 
-		$context['package']['list_files']['link'] = '<a class="linkbutton" href="' . getUrl('admin', ['action' => 'admin', 'area' => 'packages', 'sa' => 'list', 'package' => $context['package']['filename']]) . '">' . $txt['list_files'] . '</a>';
+		$context['package']['list_files']['link'] = $this->getInstallLink('list_files', $context['package']['filename'], 'list');;
 
 		unset($context['package']['xml']);
 
@@ -835,82 +798,17 @@ class PackageServers extends AbstractController
 	}
 
 	/**
-	 * Add a package server to the list.
+	 * Generates an action link for a package.
 	 *
-	 * - Accessed by action=admin;area=packageservers;sa=add
-	 */
-	public function action_add()
-	{
-		// Load our subs file.
-		require_once(SUBSDIR . '/PackageServers.subs.php');
-
-		// Validate the user.
-		checkSession();
-
-		// If they put a slash on the end, get rid of it.
-		if (substr($this->_req->post->serverurl, -1) === '/')
-		{
-			$this->_req->post->serverurl = substr($this->_req->post->serverurl, 0, -1);
-		}
-
-		// Are they both nice and clean?
-		$servername = trim(Util::htmlspecialchars($this->_req->post->servername));
-		$serverurl = trim(Util::htmlspecialchars($this->_req->post->serverurl));
-
-		// Make sure the URL has the correct prefix.
-		$serverurl = addProtocol($serverurl, array('http://', 'https://'));
-
-		// Add it to the list of package servers.
-		addPackageServer($servername, $serverurl);
-
-		redirectexit('action=admin;area=packageservers');
-	}
-
-	/**
-	 * Remove a server from the list.
+	 * @param string $type The type of the package.
+	 * @param string $filename The filename of the package.
+	 * @param string $action (optional) The action to perform on the package. Default is 'install'.
 	 *
-	 * - Accessed by action=admin;area=packageservers;sa=remove
+	 * @return string Returns an HTML link for the package action.
 	 */
-	public function action_remove()
-	{
-		checkSession('get');
+	public function getInstallLink($type, $filename, $action = 'install') {
+		global $txt;
 
-		require_once(SUBSDIR . '/PackageServers.subs.php');
-
-		// We no longer browse this server.
-		$this->_req->query->server = (int) $this->_req->query->server;
-		deletePackageServer($this->_req->query->server);
-
-		redirectexit('action=admin;area=packageservers');
-	}
-
-	/**
-	 * Display the upload package form.
-	 */
-	public function action_upload()
-	{
-		global $txt, $context, $modSettings;
-
-		// Set up the upload template, and page title.
-		$context['sub_template'] = 'upload';
-		$context['page_title'] .= ' - ' . $txt['upload_packages'];
-
-		// Check if we will be able to write new archives in /packages folder.
-		$context['package_download_broken'] = !is_writable(BOARDDIR . '/packages') || !is_writable(BOARDDIR . '/packages/installed.list');
-
-		// Let's initialize ftp context
-		$context['package_ftp'] = array(
-			'server' => '',
-			'port' => '',
-			'username' => $modSettings['package_username'] ?? '',
-			'path' => '',
-			'error' => '',
-		);
-
-		// Give FTP a chance...
-		if ($context['package_download_broken'])
-		{
-			$this->ftp_connect();
-		}
+		return '<a class="linkbutton" href="' . getUrl('admin', ['action' => 'admin', 'area' => 'packages', 'sa' => $action, 'package' => $filename]) . '">' . $txt[$type] . '</a>';
 	}
 }
