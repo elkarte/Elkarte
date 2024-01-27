@@ -161,7 +161,7 @@ function loadInstalledPackages()
 	$found = array();
 	$db->fetchQuery('
 		SELECT 
-			id_install, package_id, filename, name, version
+			id_install, package_id, filename, name, version, time_installed
 		FROM {db_prefix}log_packages
 		WHERE install_state != {int:not_installed}
 		ORDER BY time_installed DESC',
@@ -171,19 +171,20 @@ function loadInstalledPackages()
 	)->fetch_callback(
 		function ($row) use (&$found, &$installed) {
 			// Already found this? If so don't add it twice!
-			if (in_array($row['package_id'], $found))
+			if (in_array((int) $row['package_id'], $found, true))
 			{
 				return;
 			}
 
-			$found[] = $row['package_id'];
+			$found[] = (int) $row['package_id'];
 
 			$installed[] = array(
-				'id' => $row['id_install'],
+				'id' => (int) $row['id_install'],
 				'name' => $row['name'],
 				'filename' => $row['filename'],
 				'package_id' => $row['package_id'],
 				'version' => $row['version'],
+				'time_installed' => !empty($row['time_installed']) ? $row['time_installed'] : 0,
 			);
 		}
 	);
@@ -199,37 +200,37 @@ function loadInstalledPackages()
  * - Otherwise returns a basic array of id, version, filename, and similar information.
  * - An \ElkArte\XmlArray is available in 'xml'.
  *
- * @param string $gzfilename
+ * @param string $gzFilename
  *
  * @return array|string error string on error array on success
  * @package Packages
  */
-function getPackageInfo($gzfilename)
+function getPackageInfo($gzFilename)
 {
-	$gzfilename = trim($gzfilename);
+	$gzFilename = trim($gzFilename);
 	$fileFunc = FileFunctions::instance();
 
 	// Extract package-info.xml from downloaded file. (*/ is used because it could be in any directory.)
-	if (preg_match('~^https?://~i', $gzfilename) === 1)
+	if (preg_match('~^https?://~i', $gzFilename) === 1)
 	{
-		$packageInfo = read_tgz_data(fetch_web_data($gzfilename, '', true), '*/package-info.xml', true);
+		$packageInfo = read_tgz_data(fetch_web_data($gzFilename, '', true), '*/package-info.xml', true);
 	}
 	else
 	{
 		// It must be in the package directory then
-		if (!$fileFunc->fileExists(BOARDDIR . '/packages/' . $gzfilename))
+		if (!$fileFunc->fileExists(BOARDDIR . '/packages/' . $gzFilename))
 		{
 			return 'package_get_error_not_found';
 		}
 
 		// Make sure a package.xml file is available
-		if ($fileFunc->fileExists(BOARDDIR . '/packages/' . $gzfilename))
+		if ($fileFunc->fileExists(BOARDDIR . '/packages/' . $gzFilename))
 		{
-			$packageInfo = read_tgz_file(BOARDDIR . '/packages/' . $gzfilename, '*/package-info.xml', true);
+			$packageInfo = read_tgz_file(BOARDDIR . '/packages/' . $gzFilename, '*/package-info.xml', true);
 		}
-		elseif ($fileFunc->fileExists(BOARDDIR . '/packages/' . $gzfilename . '/package-info.xml'))
+		elseif ($fileFunc->fileExists(BOARDDIR . '/packages/' . $gzFilename . '/package-info.xml'))
 		{
-			$packageInfo = file_get_contents(BOARDDIR . '/packages/' . $gzfilename . '/package-info.xml');
+			$packageInfo = file_get_contents(BOARDDIR . '/packages/' . $gzFilename . '/package-info.xml');
 		}
 		else
 		{
@@ -241,7 +242,7 @@ function getPackageInfo($gzfilename)
 	if (empty($packageInfo))
 	{
 		// Perhaps they are trying to install a theme, lets tell them nicely this is the wrong function
-		$packageInfo = read_tgz_file(BOARDDIR . '/packages/' . $gzfilename, '*/theme_info.xml', true);
+		$packageInfo = read_tgz_file(BOARDDIR . '/packages/' . $gzFilename, '*/theme_info.xml', true);
 		if (!empty($packageInfo))
 		{
 			return 'package_get_error_is_theme';
@@ -263,12 +264,12 @@ function getPackageInfo($gzfilename)
 	// Convert packageInfo to an array for use
 	$package = Util::htmlspecialchars__recursive($packageInfo->to_array());
 	$package['xml'] = $packageInfo;
-	$package['filename'] = $gzfilename;
+	$package['filename'] = $gzFilename;
 
 	// Set a default type if none was supplied in the package
 	if (!isset($package['type']))
 	{
-		$package['type'] = 'modification';
+		$package['type'] = 'addon';
 	}
 
 	return $package;

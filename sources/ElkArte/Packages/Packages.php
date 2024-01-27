@@ -60,7 +60,7 @@ class Packages extends AbstractController
 	/** @var bool If the package is installed, previously or not */
 	private $_is_installed;
 
-	/** @var \ElkArte\FileFunctions */
+	/** @var FileFunctions */
 	private $fileFunc;
 
 	/**
@@ -83,7 +83,7 @@ class Packages extends AbstractController
 	 * Entry point, the default method of this controller.
 	 *
 	 * @event integrate_sa_packages
-	 * @see \ElkArte\AbstractController::action_index()
+	 * @see AbstractController::action_index
 	 */
 	public function action_index()
 	{
@@ -104,7 +104,6 @@ class Packages extends AbstractController
 			'install2' => array($this, 'action_install2'),
 			'uninstall' => array($this, 'action_install'),
 			'uninstall2' => array($this, 'action_install2'),
-			'installed' => array($this, 'action_browse'),
 			'options' => array($this, 'action_options'),
 			'flush' => array($this, 'action_flush'),
 			'examine' => array($this, 'action_examine'),
@@ -129,9 +128,6 @@ class Packages extends AbstractController
 			'class' => 'i-package',
 			// All valid subactions will be added, here you just specify unique tab data
 			'tabs' => [
-				'installed' => [
-					'description' => $txt['installed_packages_desc'],
-				],
 				// The following two belong to PackageServers,
 				// for UI's sake moved here at least temporarily
 				'servers' => [
@@ -287,7 +283,7 @@ class Packages extends AbstractController
 		package_flush_cache(true);
 
 		// Clear the temp directory
-		if ($this->fileFunc->fileExists(BOARDDIR . '/packages/temp'))
+		if ($this->fileFunc->isDir(BOARDDIR . '/packages/temp'))
 		{
 			deltree(BOARDDIR . '/packages/temp');
 		}
@@ -1016,7 +1012,7 @@ class Packages extends AbstractController
 	}
 
 	/**
-	 * Browse a list of installed packages.
+	 * Browse a list of packages.
 	 */
 	public function action_browse()
 	{
@@ -1030,24 +1026,25 @@ class Packages extends AbstractController
 		$context['available_language'] = array();
 		$context['available_unknown'] = array();
 
-		$installed = $context['sub_action'] === 'installed';
-		$context['package_types'] = $installed ? array('addon') : array('addon', 'avatar', 'language', 'smiley', 'unknown');
+		$context['package_types'] = array('addon', 'avatar', 'language', 'smiley', 'unknown');
+
+		call_integration_hook('integrate_package_types');
 
 		foreach ($context['package_types'] as $type)
 		{
 			// Use the standard templates for showing this.
 			$listOptions = array(
 				'id' => 'packages_lists_' . $type,
-				'title' => $installed ? $txt['view_and_remove'] : $txt[($type === 'addon' ? 'modification' : $type) . '_package'],
+				'title' => $txt[($type === 'addon' ? 'modification' : $type) . '_package'],
 				'no_items_label' => $txt['no_packages'],
 				'get_items' => array(
 					'function' => array($this, 'list_packages'),
-					'params' => array('params' => $type, 'installed' => $installed),
+					'params' => array('params' => $type),
 				),
 				'base_href' => getUrl('admin', ['action' => 'admin', 'area' => 'packages', 'sa' => $context['sub_action'], 'type' => $type]),
-				'default_sort_col' => 'mod_name' . $type,
+				'default_sort_col' => 'pkg_name' . $type,
 				'columns' => array(
-					'mod_name' . $type => array(
+					'pkg_name' . $type => array(
 						'header' => array(
 							'value' => $txt['mod_name'],
 							'style' => 'width: 25%;',
@@ -1089,6 +1086,27 @@ class Packages extends AbstractController
 						'sort' => array(
 							'default' => 'version',
 							'reverse' => 'version',
+						),
+					),
+					'time_installed' . $type => array(
+						'header' => array(
+							'value' => $txt['package_installed_on'],
+						),
+						'data' => array(
+							'function' => function($package_md5) use ($type, $txt) {
+								global $context;
+
+								if (!empty($context['available_' . $type][$package_md5]['time_installed']))
+								{
+									return htmlTime($context['available_' . $type][$package_md5]['time_installed']);
+								}
+
+								return $txt['not_applicable'];
+							},
+						),
+						'sort' => array(
+							'default' => 'time_installed',
+							'reverse' => 'time_installed',
 						),
 					),
 					'operations' . $type => array(
@@ -1351,12 +1369,11 @@ class Packages extends AbstractController
 	 * @param int $items_per_page The number of items to show per page
 	 * @param string $sort A string indicating how to sort the results
 	 * @param string $params 'type' type of package
-	 * @param bool $installed
 	 *
 	 * @return mixed
 	 * @throws \ElkArte\Exceptions\Exception
 	 */
-	public function list_packages($start, $items_per_page, $sort, $params, $installed)
+	public function list_packages($start, $items_per_page, $sort, $params)
 	{
 		global $context;
 		static $instadds, $packages;
@@ -1422,29 +1439,12 @@ class Packages extends AbstractController
 				$installed_adds[$installed_add['package_id']] = array(
 					'id' => $installed_add['id'],
 					'version' => $installed_add['version'],
+					'time_installed' => $installed_add['time_installed'],
 				);
 			}
 
 			// Get a list of all the ids installed, so the latest packages won't include already installed ones.
 			$context['installed_adds'] = array_keys($installed_adds);
-		}
-
-		if ($installed)
-		{
-			$sort_id = 1;
-			foreach ($instadds as $installed_add)
-			{
-				$context['available_addon'][$installed_add['package_id']] = array(
-					'sort_id' => $sort_id++,
-					'can_uninstall' => true,
-					'name' => $installed_add['name'],
-					'filename' => $installed_add['filename'],
-					'installed_id' => $installed_add['id'],
-					'version' => $installed_add['version'],
-					'is_installed' => true,
-					'is_current' => true,
-				);
-			}
 		}
 
 		if (empty($packages))
@@ -1481,7 +1481,7 @@ class Packages extends AbstractController
 				// Skip directories or files that are named the same.
 				if ($package->isDir())
 				{
-					if (in_array($package, $dirs))
+					if (in_array($package, $dirs, true))
 					{
 						continue;
 					}
@@ -1489,7 +1489,7 @@ class Packages extends AbstractController
 				}
 				elseif (strtolower(substr($package->getFilename(), -7)) === '.tar.gz')
 				{
-					if (in_array(substr($package, 0, -7), $dirs))
+					if (in_array(substr($package, 0, -7), $dirs, true))
 					{
 						continue;
 					}
@@ -1497,7 +1497,7 @@ class Packages extends AbstractController
 				}
 				elseif (strtolower($package->getExtension()) === 'zip' || strtolower($package->getExtension()) === 'tgz')
 				{
-					if (in_array(substr($package->getBasename(), 0, -4), $dirs))
+					if (in_array(substr($package->getBasename(), 0, -4), $dirs, true))
 					{
 						continue;
 					}
@@ -1505,146 +1505,136 @@ class Packages extends AbstractController
 				}
 
 				$packageInfo = getPackageInfo($package->getFilename());
-				if (!is_array($packageInfo))
+				if (!is_array($packageInfo) || empty($packageInfo))
 				{
 					continue;
 				}
 
-				if (!empty($packageInfo))
-				{
-					$packageInfo['installed_id'] = isset($installed_adds[$packageInfo['id']]) ? $installed_adds[$packageInfo['id']]['id'] : 0;
-					$packageInfo['sort_id'] = $sort_id[$packageInfo['type']] ?? $sort_id['unknown'];
-					$packageInfo['is_installed'] = isset($installed_adds[$packageInfo['id']]);
-					$packageInfo['is_current'] = $packageInfo['is_installed'] && isset($installed_adds[$packageInfo['id']]) && ($installed_adds[$packageInfo['id']]['version'] == $packageInfo['version']);
-					$packageInfo['is_newer'] = $packageInfo['is_installed'] && isset($installed_adds[$packageInfo['id']]) && ($installed_adds[$packageInfo['id']]['version'] > $packageInfo['version']);
-					$packageInfo['can_install'] = false;
-					$packageInfo['can_uninstall'] = false;
-					$packageInfo['can_upgrade'] = false;
-					$packageInfo['can_emulate_install'] = false;
-					$packageInfo['can_emulate_uninstall'] = false;
+				$packageInfo['installed_id'] = isset($installed_adds[$packageInfo['id']]) ? $installed_adds[$packageInfo['id']]['id'] : 0;
+				$packageInfo['sort_id'] = $sort_id[$packageInfo['type']] ?? $sort_id['unknown'];
+				$packageInfo['is_installed'] = isset($installed_adds[$packageInfo['id']]);
+				$packageInfo['is_current'] = $packageInfo['is_installed'] && isset($installed_adds[$packageInfo['id']]) && ($installed_adds[$packageInfo['id']]['version'] == $packageInfo['version']);
+				$packageInfo['is_newer'] = $packageInfo['is_installed'] && isset($installed_adds[$packageInfo['id']]) && ($installed_adds[$packageInfo['id']]['version'] > $packageInfo['version']);
+				$packageInfo['can_install'] = false;
+				$packageInfo['can_uninstall'] = false;
+				$packageInfo['can_upgrade'] = false;
+				$packageInfo['can_emulate_install'] = false;
+				$packageInfo['can_emulate_uninstall'] = false;
+				$packageInfo['time_installed'] = $installed_adds[$packageInfo['id']]['time_installed'] ?? 0;
 
-					// This package is currently NOT installed.  Check if it can be.
-					if (!$packageInfo['is_installed'] && $packageInfo['xml']->exists('install'))
+				// This package is currently NOT installed.  Check if it can be.
+				if (!$packageInfo['is_installed'] && $packageInfo['xml']->exists('install'))
+				{
+					// Check if there's an install for *THIS* version
+					$installs = $packageInfo['xml']->set('install');
+					$packageInfo['time_installed'] = 0;
+					foreach ($installs as $install)
 					{
-						// Check if there's an install for *THIS* version
-						$installs = $packageInfo['xml']->set('install');
+						if (!$install->exists('@for') || matchPackageVersion($the_version, $install->fetch('@for')))
+						{
+							// Okay, this one is good to go.
+							$packageInfo['can_install'] = true;
+							break;
+						}
+					}
+
+					// no install found for our version, lets see if one exists for another
+					if ($packageInfo['can_install'] === false && $install->exists('@for') && empty($_SESSION['version_emulate']))
+					{
+						$reset = true;
+
+						// Get the highest install version that is available from the package
 						foreach ($installs as $install)
 						{
-							if (!$install->exists('@for') || matchPackageVersion($the_version, $install->fetch('@for')))
+							$packageInfo['can_emulate_install'] = matchHighestPackageVersion($install->fetch('@for'), $the_version, $reset);
+							$reset = false;
+						}
+					}
+				}
+				// An already installed, but old, package.  Can we upgrade it?
+				elseif ($packageInfo['is_installed'] && !$packageInfo['is_current'] && $packageInfo['xml']->exists('upgrade'))
+				{
+					$upgrades = $packageInfo['xml']->set('upgrade');
+
+					// First go through, and check against the current version of ElkArte.
+					foreach ($upgrades as $upgrade)
+					{
+						// Even if it is for this ElkArte, is it for the installed version of the mod?
+						if (!$upgrade->exists('@for') || matchPackageVersion($the_version, $upgrade->fetch('@for')))
+						{
+							if (!$upgrade->exists('@from') || matchPackageVersion($installed_adds[$packageInfo['id']]['version'], $upgrade->fetch('@from')))
 							{
-								// Okay, this one is good to go.
-								$packageInfo['can_install'] = true;
+								$packageInfo['can_upgrade'] = true;
 								break;
 							}
 						}
+					}
+				}
+				// Note that it has to be the current version to be uninstallable.  Shucks.
+				elseif ($packageInfo['is_installed'] && $packageInfo['is_current'] && $packageInfo['xml']->exists('uninstall'))
+				{
+					$uninstalls = $packageInfo['xml']->set('uninstall');
 
-						// no install found for our version, lets see if one exists for another
-						if ($packageInfo['can_install'] === false && $install->exists('@for') && empty($_SESSION['version_emulate']))
+					// Can we find any uninstallation methods that work for this ElkArte version?
+					foreach ($uninstalls as $uninstall)
+					{
+						if (!$uninstall->exists('@for') || matchPackageVersion($the_version, $uninstall->fetch('@for')))
 						{
-							$reset = true;
-
-							// Get the highest install version that is available from the package
-							foreach ($installs as $install)
-							{
-								$packageInfo['can_emulate_install'] = matchHighestPackageVersion($install->fetch('@for'), $the_version, $reset);
-								$reset = false;
-							}
+							$packageInfo['can_uninstall'] = true;
+							break;
 						}
 					}
-					// An already installed, but old, package.  Can we upgrade it?
-					elseif ($packageInfo['is_installed'] && !$packageInfo['is_current'] && $packageInfo['xml']->exists('upgrade'))
-					{
-						$upgrades = $packageInfo['xml']->set('upgrade');
 
-						// First go through, and check against the current version of ElkArte.
-						foreach ($upgrades as $upgrade)
-						{
-							// Even if it is for this ElkArte, is it for the installed version of the mod?
-							if (!$upgrade->exists('@for') || matchPackageVersion($the_version, $upgrade->fetch('@for')))
-							{
-								if (!$upgrade->exists('@from') || matchPackageVersion($installed_adds[$packageInfo['id']]['version'], $upgrade->fetch('@from')))
-								{
-									$packageInfo['can_upgrade'] = true;
-									break;
-								}
-							}
-						}
-					}
-					// Note that it has to be the current version to be uninstallable.  Shucks.
-					elseif ($packageInfo['is_installed'] && $packageInfo['is_current'] && $packageInfo['xml']->exists('uninstall'))
+					// No uninstall found for this version, lets see if one exists for another
+					if ($packageInfo['can_uninstall'] === false && $uninstall->exists('@for') && empty($_SESSION['version_emulate']))
 					{
-						$uninstalls = $packageInfo['xml']->set('uninstall');
+						$reset = true;
 
-						// Can we find any uninstallation methods that work for this ElkArte version?
+						// Get the highest install version that is available from the package
 						foreach ($uninstalls as $uninstall)
 						{
-							if (!$uninstall->exists('@for') || matchPackageVersion($the_version, $uninstall->fetch('@for')))
-							{
-								$packageInfo['can_uninstall'] = true;
-								break;
-							}
+							$packageInfo['can_emulate_uninstall'] = matchHighestPackageVersion($uninstall->fetch('@for'), $the_version, $reset);
+							$reset = false;
 						}
+					}
+				}
 
-						// No uninstall found for this version, lets see if one exists for another
-						if ($packageInfo['can_uninstall'] === false && $uninstall->exists('@for') && empty($_SESSION['version_emulate']))
-						{
-							$reset = true;
+				unset($packageInfo['xml']);
 
-							// Get the highest install version that is available from the package
-							foreach ($uninstalls as $uninstall)
-							{
-								$packageInfo['can_emulate_uninstall'] = matchHighestPackageVersion($uninstall->fetch('@for'), $the_version, $reset);
-								$reset = false;
-							}
-						}
-					}
-
-					// Add-on / Modification
-					if ($packageInfo['type'] === 'addon' || $packageInfo['type'] === 'modification' || $packageInfo['type'] === 'mod')
-					{
-						$sort_id['addon']++;
-						if ($installed)
-						{
-							if (!empty($context['available_addon'][$packageInfo['id']]))
-							{
-								$packages['addon'][strtolower($packageInfo[$sort]) . '_' . $sort_id['addon']] = $packageInfo['id'];
-								$context['available_addon'][$packageInfo['id']] = array_merge($context['available_addon'][$packageInfo['id']], $packageInfo);
-							}
-						}
-						else
-						{
-							$packages['addon'][strtolower($packageInfo[$sort]) . '_' . $sort_id['addon']] = md5($package->getFilename());
-							$context['available_addon'][md5($package->getFilename())] = $packageInfo;
-						}
-					}
-					// Avatar package.
-					elseif ($packageInfo['type'] === 'avatar')
-					{
-						$sort_id[$packageInfo['type']]++;
-						$packages['avatar'][strtolower($packageInfo[$sort]) . '_' . $sort_id['avatar']] = md5($package->getFilename());
-						$context['available_avatar'][md5($package->getFilename())] = $packageInfo;
-					}
-					// Smiley package.
-					elseif ($packageInfo['type'] === 'smiley')
-					{
-						$sort_id[$packageInfo['type']]++;
-						$packages['smiley'][strtolower($packageInfo[$sort]) . '_' . $sort_id['smiley']] = md5($package->getFilename());
-						$context['available_smiley'][md5($package->getFilename())] = $packageInfo;
-					}
-					// Language package.
-					elseif ($packageInfo['type'] === 'language')
-					{
-						$sort_id[$packageInfo['type']]++;
-						$packages['language'][strtolower($packageInfo[$sort]) . '_' . $sort_id['language']] = md5($package->getFilename());
-						$context['available_language'][md5($package->getFilename())] = $packageInfo;
-					}
-					// Other stuff.
-					else
-					{
-						$sort_id['unknown']++;
-						$packages['unknown'][strtolower($packageInfo[$sort]) . '_' . $sort_id['unknown']] = md5($package->getFilename());
-						$context['available_unknown'][md5($package->getFilename())] = $packageInfo;
-					}
+				// Add-on / Modification
+				if ($packageInfo['type'] === 'addon' || $packageInfo['type'] === 'modification' || $packageInfo['type'] === 'mod')
+				{
+					$sort_id['addon']++;
+					$packages['addon'][strtolower($packageInfo[$sort]) . '_' . $sort_id['addon']] = md5($package->getFilename());
+					$context['available_addon'][md5($package->getFilename())] = $packageInfo;
+				}
+				// Avatar package.
+				elseif ($packageInfo['type'] === 'avatar')
+				{
+					$sort_id[$packageInfo['type']]++;
+					$packages['avatar'][strtolower($packageInfo[$sort]) . '_' . $sort_id['avatar']] = md5($package->getFilename());
+					$context['available_avatar'][md5($package->getFilename())] = $packageInfo;
+				}
+				// Smiley package.
+				elseif ($packageInfo['type'] === 'smiley')
+				{
+					$sort_id[$packageInfo['type']]++;
+					$packages['smiley'][strtolower($packageInfo[$sort]) . '_' . $sort_id['smiley']] = md5($package->getFilename());
+					$context['available_smiley'][md5($package->getFilename())] = $packageInfo;
+				}
+				// Language package.
+				elseif ($packageInfo['type'] === 'language')
+				{
+					$sort_id[$packageInfo['type']]++;
+					$packages['language'][strtolower($packageInfo[$sort]) . '_' . $sort_id['language']] = md5($package->getFilename());
+					$context['available_language'][md5($package->getFilename())] = $packageInfo;
+				}
+				// Other stuff.
+				else
+				{
+					$sort_id['unknown']++;
+					$packages['unknown'][strtolower($packageInfo[$sort]) . '_' . $sort_id['unknown']] = md5($package->getFilename());
+					$context['available_unknown'][md5($package->getFilename())] = $packageInfo;
 				}
 			}
 		}

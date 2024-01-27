@@ -64,7 +64,7 @@ class PackageServers extends AbstractController
 	 * - Accessed by action=admin;area=packageservers
 	 *
 	 * @event integrate_sa_package_servers
-	 * @see \ElkArte\AbstractController::action_index()
+	 * @see AbstractController::action_index
 	 */
 	public function action_index()
 	{

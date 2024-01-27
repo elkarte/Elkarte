@@ -20,6 +20,7 @@ $txt['uninstall_mod'] = 'Uninstall Add-on';
 $txt['no_adds_installed'] = 'No addons currently installed';
 $txt['uninstall'] = 'Uninstall';
 $txt['delete_list'] = 'Delete Add-on List';
+$txt['package_installed_on'] = 'Installed On';
 $txt['package_delete_list_warning'] = 'Are you sure you wish to clear the installed addons list?';
 
 $txt['package_manager_desc'] = 'From this easy to use interface, you can download and install addons for use on your forum.';
