@@ -26,7 +26,7 @@ $txt['package_delete_list_warning'] = 'Are you sure you wish to clear the instal
 $txt['package_manager_desc'] = 'From this easy to use interface, you can download and install addons for use on your forum.';
 $txt['installed_packages_desc'] = 'You can use the interface below to view those packages currently installed on the forum, and remove the ones you no longer require.';
 $txt['download_packages_desc'] = 'From this section you can add or remove package servers, browse for packages, or download new packages from servers.';
-$txt['package_servers_desc'] = 'From this easy to use interface, you can manage your package servers and download addon archives on your forum.';
+$txt['package_servers_desc'] = 'From this easy to use interface, you can download addon packages to install your forum.';
 $txt['upload_packages_desc'] = 'From this section you can upload a package file from your local computer directly to the forum.';
 
 $txt['upload_new_package'] = 'Upload new package';
@@ -160,6 +160,8 @@ $txt['package_delete_bad'] = 'The package you are about to delete is currently i
 
 $txt['package_examine_file'] = 'View file in package';
 $txt['package_file_contents'] = 'Contents of file';
+
+$txt['package_from_addon_site'] = 'Download a package from the Addon Site';
 
 $txt['package_upload_title'] = 'Upload a Package';
 $txt['package_upload_select'] = 'Package to Upload';

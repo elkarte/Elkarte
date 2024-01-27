@@ -172,8 +172,7 @@ class Admin extends AbstractController
 						'class' => 'i-package i-admin',
 						'subsections' => array(
 							'browse' => array($txt['browse_packages']),
-							'servers' => array($txt['download_packages']),
-							'upload' => array($txt['upload_packages']),
+							'servers' => array($txt['add_packages']),
 							'options' => array($txt['package_settings']),
 						),
 					),

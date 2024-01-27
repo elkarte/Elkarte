@@ -126,20 +126,6 @@ class Packages extends AbstractController
 			'title' => 'package_manager',
 			'description' => 'package_manager_desc',
 			'class' => 'i-package',
-			// All valid subactions will be added, here you just specify unique tab data
-			'tabs' => [
-				// The following two belong to PackageServers,
-				// for UI's sake moved here at least temporarily
-				'servers' => [
-					'description' => $txt['download_packages_desc'],
-				],
-				'upload' => [
-					'description' => $txt['upload_packages_desc'],
-				],
-				'options' => [
-					'description' => $txt['package_install_options_desc'],
-				],
-			],
 		]);
 
 		// Work out exactly who it is we are calling. call integrate_sa_packages

@@ -49,46 +49,32 @@ function template_servers()
 	echo '
 		<div class="content">
 			<fieldset>
-				<legend>' . $txt['package_servers'] . '</legend>
-				<ul class="package_servers">';
-
-	foreach ($context['servers'] as $server)
-	{
-		echo '
-					<li>
-						<strong>' . $server['name'] . '</strong>
-						<span class="package_server floatright">
-							<a class="linkbutton" href="' . $scripturl . '?action=admin;area=packageservers;sa=browse;server=' . $server['id'] . '">' . $txt['package_browse'] . '</a>
-							&nbsp;<a class="linkbutton" href="' . $scripturl . '?action=admin;area=packageservers;sa=remove;server=' . $server['id'] . ';', $context['session_var'], '=', $context['session_id'], '">' . $txt['delete'] . '</a>
-						</span>
-					</li>';
-	}
-
-	echo '
-				</ul>
-			</fieldset>
-			<fieldset>
-				<legend>' . $txt['add_server'] . '</legend>
-				<form action="' . $scripturl . '?action=admin;area=packageservers;sa=add" method="post" accept-charset="UTF-8">
+				<legend>' . $txt['upload_new_package'] . '</legend>
+				<form action="' . $scripturl . '?action=admin;area=packageservers;sa=upload2" method="post" accept-charset="UTF-8" enctype="multipart/form-data">
 					<dl class="settings">
 						<dt>
-							<label for="servername">' . $txt['server_name'] . ':</label>
+							<label for="package">' . $txt['package_upload_select'] . ':</label>
 						</dt>
 						<dd>
-							<input type="text" id="servername" name="servername" size="44" value="ElkArte" class="input_text" />
-						</dd>
-						<dt>
-							<label for="serverurl">' . $txt['serverurl'] . ':</label>
-						</dt>
-						<dd>
-							<input type="text" id="serverurl" name="serverurl" size="44" value="http://" class="input_text" />
+							<input type="file" id="package" name="package" size="38" class="input_file" />
 						</dd>
 					</dl>
 					<div class="submitbutton">
-						<input type="submit" value="' . $txt['add_server'] . '" />
+						<input type="submit" value="' . $txt['package_upload'] . '" />
 						<input type="hidden" name="' . $context['session_var'] . '" value="' . $context['session_id'] . '" />
 					</div>
 				</form>
+			</fieldset>
+			<fieldset>
+				<legend>' . $txt['package_from_addon_site'] . '</legend>
+				<ul class="package_servers">
+					<li>
+						<strong>' . $context['server']['name'] . '</strong>
+						<span class="package_server floatright">
+							<a class="linkbutton" href="' . $scripturl . '?action=admin;area=packageservers;sa=browse;server=' . $context['server']['id'] . '">' . $txt['package_browse'] . '</a>
+						</span>
+					</li>
+				</ul>
 			</fieldset>
 			<fieldset>
 				<legend>', $txt['package_download_by_url'], '</legend>
@@ -98,7 +84,7 @@ function template_servers()
 							<label for="package">' . $txt['serverurl'] . ':</label>
 						</dt>
 						<dd>
-							<input type="text" id="package" name="package" size="44" value="http://" class="input_text" />
+							<input type="text" id="package" name="package" size="44" value="https://" class="input_text" />
 						</dd>
 						<dt>
 							<label for="filename">', $txt['package_download_filename'], ':</label>
@@ -179,71 +165,70 @@ function template_package_list()
 
 			// List of addons available in this section
 			echo '
-						<ol id="package_section_', $i, '">';
+						<ol id="package_section_', $i, '" class="package_area_section">';
 
 			foreach ($packageSection['items'] as $id => $package)
 			{
 				// 1. Some addon [ Download ].
 				echo '
 						<li>
-							<img id="ps_img_', $i, '_pkg_', $id, '" src="', $settings['images_url'], '/selected_open.png" alt="*" class="hide" /> ';
+							<span id="ps_img_', $i, '_pkg_', $id, '" class="package_id details_show"><i></i>', $package['name'], '</span>&nbsp;';
 
 				// Installed but newer one is available
 				if ($package['is_installed'] && $package['is_newer'])
 				{
 					echo '
-							<span class="package_id">', $package['name'], '</span>&nbsp;<a class="linkbutton" href="', $package['download']['href'], '">', $txt['download'], '</a>&nbsp;',
+							<a class="linkbutton" href="', $package['download']['href'], '">', $txt['download'], '</a>&nbsp;',
 					sprintf($txt['package_update'], '<i class="icon i-fail" title="' . $txt['package_installed_old'] . '"></i>', $txt['package_installed']);
 				}
 				// Installed but nothing newer is available
 				elseif ($package['is_installed'])
 				{
-
-
 					echo '
-							<span class="package_id">', $package['name'], '</span>&nbsp;',
+							',
 					sprintf($txt['package_current'], '<i class="icon i-check" title="' . $txt['package_installed_current'] . '"></i>', $txt['package_installed']);
 				}
 				// Downloaded, but there is a more recent version available
 				elseif ($package['is_downloaded'] && $package['is_newer'])
 				{
 					echo '
-							<span class="package_id">', $package['name'], '</span>&nbsp;<a class="linkbutton" href="', $package['download']['href'], '">', $txt['download'], '</a>&nbsp;',
+							<a class="linkbutton" href="', $package['download']['href'], '">', $txt['download'], '</a>&nbsp;',
 					sprintf($txt['package_update'], '<i class="icon i-warning " title="' . $txt['package_installed_old'] . '"></i>', $txt['package_downloaded']);
 				}
 				// Downloaded, and its current
 				elseif ($package['is_downloaded'])
 				{
 					echo '
-							<span class="package_id">', $package['name'], '</span>&nbsp;',
+							',
 					sprintf($txt['package_current'], '<i class="icon i-check" title="' . $txt['package_installed_current'] . '"></i>', $txt['package_downloaded']);
 				}
 				// Not downloaded or installed
 				else
 				{
 					echo '
-							<span class="package_id">', $package['name'], '</span>&nbsp;<a class="linkbutton" href="', $package['download']['href'], '">', $txt['download'], '</a>';
+							<a class="linkbutton" href="', $package['download']['href'], '">', $txt['download'], '</a>';
 				}
 
+				// Details about that package in hidden ul
 				echo '
 							<ul id="package_section_', $i, '_pkg_', $id, '" class="package_section">';
 
 				// Show the addon type?
-				if ($package['type'] != '')
+				if ($package['type'] !== '')
 				{
 					echo '
 								<li>', $txt['package_type'], ':&nbsp; ', Util::ucwords(Util::strtolower($package['type'])), '</li>';
 				}
 
 				// Show the version number?
-				if ($package['version'] != '')
+				if ($package['version'] !== '')
 				{
 					echo '
 								<li>', $txt['mod_version'], ':&nbsp; ', $package['version'], '</li>';
 				}
 
 				// Show the last date?
-				if ($package['date'] != '')
+				if ($package['date'] !== '')
 				{
 					echo '
 								<li>', $txt['mod_date'], ':&nbsp; ', $package['date'], '</li>';
@@ -257,7 +242,7 @@ function template_package_list()
 				}
 
 				// Nothing but hooks ?
-				if ($package['hooks'] != '' && in_array($package['hooks'], array('yes', 'true')))
+				if ($package['hooks'] !== '' && in_array($package['hooks'], array('yes', 'true')))
 				{
 					echo '
 								<li>', $txt['mod_hooks'], ' <i class="icon i-check"></i></li>';
@@ -350,13 +335,13 @@ function template_package_list()
 					aSwappableContainers: [
 						\'package_section_', $section, '_pkg_', $id, '\'
 					],
-					aSwapImages: [
+					aSwapClasses: [
 						{
 							sId: \'ps_img_', $section, '_pkg_', $id, '\',
-							srcExpanded: elk_images_url + \'/selected.png\',
-							altExpanded: \'*\',
-							srcCollapsed: elk_images_url + \'/selected_open.png\',
-							altCollapsed: \'*\'
+							classExpanded: \'package_id details_hide\',
+							titleExpanded: ', JavaScriptEscape($txt['hide']), ',
+							classCollapsed: \'package_id details_show\',
+							titleCollapsed: ', JavaScriptEscape($txt['show']), '
 						}
 					],
 					aSwapLinks: [

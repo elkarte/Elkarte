@@ -89,6 +89,14 @@
 	border-color: var(--secondary_border);
 }
 
+#package_list .package_area_section li {
+	border-color: var(--transparent);
+}
+
+ul.package_section {
+	border-color: var(--secondary_border);
+}
+
 #find_code, #replace_code {
 	border-top-color: var(--secondary_border_top);
 	border-bottom-color: var(--secondary_border_bottom);

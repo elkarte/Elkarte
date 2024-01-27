@@ -95,27 +95,20 @@ class PackageServers extends AbstractController
 		// For the template
 		$context['sub_action'] = $subAction;
 
-		// Set up some tabs...
+		// Set up some tabs, used when the add packages button (servers) is selected
 		$context[$context['admin_menu_name']]['object']->prepareTabData([
 			'title' => $txt['package_manager'],
-			'description' => $txt['upload_packages_desc'],
+			'description' => $txt['package_servers_desc'],
 			'class' => 'i-package',
 			'tabs' => [
 				'browse' => [
 					'url' => getUrl('admin', ['action' => 'admin', 'area' => 'packages', 'sa' => 'browse']),
 					'label' => $txt['browse_packages'],
 				],
-				'installed' => [
-					'url' => getUrl('admin', ['action' => 'admin', 'area' => 'packages', 'sa' => 'installed', 'desc']),
-					'label' => $txt['installed_packages'],
-				],
 				'servers' => [
 					'url' => getUrl('admin', ['action' => 'admin', 'area' => 'packages', 'sa' => 'servers', 'desc']),
-					'description' => $txt['download_packages_desc'],
-				],
-				'upload' => [
-					'url' => getUrl('admin', ['action' => 'admin', 'area' => 'packages', 'sa' => 'upload', 'desc']),
 					'description' => $txt['upload_packages_desc'],
+					'label' => $txt['add_packages'],
 				],
 				'options' => [
 					'url' => getUrl('admin', ['action' => 'admin', 'area' => 'packages', 'sa' => 'options', 'desc']),
@@ -135,7 +128,7 @@ class PackageServers extends AbstractController
 	 */
 	public function action_list()
 	{
-		global $txt, $context;
+		global $txt, $context, $modSettings;
 
 		require_once(SUBSDIR . '/PackageServers.subs.php');
 
@@ -144,7 +137,9 @@ class PackageServers extends AbstractController
 		$context['page_title'] .= ' - ' . $txt['download_packages'];
 
 		// Load the list of servers.
-		$context['servers'] = fetchPackageServers();
+		$modSettings['elkarte_addon_server'] = $modSettings['elkarte_addon_server'] ?? 'https://elkarte.github.io/addons/package.json';
+		$context['server']['id'] = $modSettings['elkarte_addon_server']; //fetchPackageServers();
+		$context['server']['name'] = 'ElkArte';
 
 		// Check if we will be able to write new archives in /packages folder.
 		$context['package_download_broken'] = !$this->fileFunc->isWritable(BOARDDIR . '/packages') || !$this->fileFunc->isWritable(BOARDDIR . '/packages/installed.list');
@@ -519,11 +514,11 @@ class PackageServers extends AbstractController
 	private function _rename_master($name)
 	{
 		// Is this a "master" package from github or bitbucket?
-		if (preg_match('~^http(s)?://(www.)?(bitbucket\.org|github\.com)/(.+?(master(\.zip|\.tar\.gz)))$~', $name, $matches) == 1)
+		if (preg_match('~^http(s)?://(www.)?(bitbucket\.org|github\.com)/(.+?(master(\.zip|\.tar\.gz)))$~', $name, $matches) === 1)
 		{
 			// Name this master.zip based on repo name in the link
 			$path_parts = pathinfo($matches[4]);
-			list (, $newname,) = explode('/', $path_parts['dirname']);
+			list (, $newName,) = explode('/', $path_parts['dirname']);
 
 			// Just to be safe, no invalid file characters
 			$invalid = array_merge(array_map('chr', range(0, 31)), array('<', '>', ':', '"', '/', '\\', '|', '?', '*'));
@@ -536,7 +531,7 @@ class PackageServers extends AbstractController
 				$this->_req->query->auto = true;
 			}
 
-			return str_replace($invalid, '_', $newname) . $matches[6];
+			return str_replace($invalid, '_', $newName) . $matches[6];
 		}
 		else
 		{
