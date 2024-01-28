@@ -68,6 +68,11 @@ class PreparseCode
 	 */
 	public function preparsecode(&$message, $previewing = false)
 	{
+		if (empty($message))
+		{
+			return '';
+		}
+
 		// Load passed values to the class
 		$this->message = $message;
 		$this->previewing = $previewing;
