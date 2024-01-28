@@ -175,7 +175,7 @@ class Packages extends AbstractController
 		$create_chmod_control->createChmodControl();
 
 		// Make sure our temp directory exists and is empty.
-		if ($this->fileFunc->fileExists(BOARDDIR . '/packages/temp'))
+		if ($this->fileFunc->isDir(BOARDDIR . '/packages/temp'))
 		{
 			deltree(BOARDDIR . '/packages/temp', false);
 		}
@@ -205,32 +205,10 @@ class Packages extends AbstractController
 		// See if it is installed?
 		$package_installed = isPackageInstalled($packageInfo['id'], $this->install_id);
 
-		$context['database_changes'] = [];
-		if (isset($packageInfo['uninstall']['database']))
-		{
-			$context['database_changes'][] = $txt['execute_database_changes'] . ' - ' . $packageInfo['uninstall']['database'];
-		}
-		elseif (!empty($package_installed['db_changes']))
-		{
-			foreach ($package_installed['db_changes'] as $change)
-			{
-				if (isset($change[2], $txt['package_db_' . $change[0]]))
-				{
-					$context['database_changes'][] = sprintf($txt['package_db_' . $change[0]], $change[1], $change[2]);
-				}
-				elseif (isset($txt['package_db_' . $change[0]]))
-				{
-					$context['database_changes'][] = sprintf($txt['package_db_' . $change[0]], $change[1]);
-				}
-				else
-				{
-					$context['database_changes'][] = $change[0] . '-' . $change[1] . (isset($change[2]) ? '-' . $change[2] : '');
-				}
-			}
-		}
+		// Any database actions
+		$this->determineDatabaseChanges($packageInfo, $package_installed);
 
 		$actions = $this->_get_package_actions($package_installed, $packageInfo);
-
 		$context['actions'] = [];
 		$context['ftp_needed'] = false;
 
@@ -276,7 +254,7 @@ class Packages extends AbstractController
 			deltree(BOARDDIR . '/packages/temp');
 		}
 
-		// Will we need chmod permissions to pull this off
+		// Will we require chmod permissions to pull this off
 		$this->chmod_files = !empty($pka->chmod_files) ? $pka->chmod_files : [];
 		if (!empty($this->chmod_files))
 		{
@@ -475,7 +453,7 @@ class Packages extends AbstractController
 			{
 				// Get the part of the file we'll be dealing with.
 				preg_match('~^\$(languagedir|languages_dir|imagesdir|themedir)(\\|/)*(.+)*~i', $action_data['unparsed_destination'], $matches);
-
+				$path = '';
 				if ($matches[1] === 'imagesdir')
 				{
 					$path = '/' . basename($settings['default_images_url']);
@@ -483,10 +461,6 @@ class Packages extends AbstractController
 				elseif ($matches[1] === 'languagedir' || $matches[1] === 'languages_dir')
 				{
 					$path = '/ElkArte/Languages';
-				}
-				else
-				{
-					$path = '';
 				}
 
 				if (!empty($matches[3]))
@@ -502,12 +476,13 @@ class Packages extends AbstractController
 				// Loop through each custom theme to note it's candidacy!
 				foreach ($this->theme_paths as $id => $theme_data)
 				{
-					if (isset($theme_data['theme_dir']) && $id != 1)
+					$id = (int) $id;
+					if (isset($theme_data['theme_dir']) && $id !== 1)
 					{
 						$real_path = $theme_data['theme_dir'] . $path;
 
 						// Confirm that we don't already have this dealt with by another entry.
-						if (!in_array(strtolower(strtr($real_path, ['\\' => '/'])), $themeFinds['other_themes']))
+						if (!in_array(strtolower(strtr($real_path, ['\\' => '/'])), $themeFinds['other_themes'], true))
 						{
 							// Check if we will need to chmod this.
 							if (!dirTest(dirname($real_path)))
@@ -606,7 +581,7 @@ class Packages extends AbstractController
 		);
 
 		// Make sure temp directory exists and is empty!
-		if ($this->fileFunc->fileExists(BOARDDIR . '/packages/temp'))
+		if ($this->fileFunc->isDir(BOARDDIR . '/packages/temp'))
 		{
 			deltree(BOARDDIR . '/packages/temp', false);
 		}
@@ -619,48 +594,13 @@ class Packages extends AbstractController
 		$this->_extract_files_temp();
 
 		// Are we installing this into any custom themes?
-		$custom_themes = [1];
-		$known_themes = explode(',', $modSettings['knownThemes']);
-		if (!empty($this->_req->post->custom_theme))
-		{
-			foreach ($this->_req->post->custom_theme as $tid)
-			{
-				if (in_array($tid, $known_themes))
-				{
-					$custom_themes[] = (int) $tid;
-				}
-			}
-		}
+		$custom_themes = $this->_getCustomThemes();
 
 		// Now load up the paths of the themes that we need to know about.
 		$this->theme_paths = getThemesPathbyID($custom_themes);
-		$themes_installed = [1];
 
 		// Are there any theme copying that we want to take place?
-		$context['theme_copies'] = [
-			'require-file' => [],
-			'require-dir' => [],
-		];
-
-		if (!empty($this->_req->post->theme_changes))
-		{
-			foreach ($this->_req->post->theme_changes as $change)
-			{
-				if (empty($change))
-				{
-					continue;
-				}
-
-				$theme_data = json_decode(base64_decode($change), true);
-				if (empty($theme_data['type']))
-				{
-					continue;
-				}
-
-				$themes_installed[] = $theme_data['id'];
-				$context['theme_copies'][$theme_data['type']][$theme_data['orig']][] = $theme_data['future'];
-			}
-		}
+		$themes_installed = $this->_installThemes();
 
 		// Get the package info...
 		$packageInfo = getPackageInfo($this->_filename);
@@ -800,27 +740,10 @@ class Packages extends AbstractController
 		}
 
 		// If there's database changes - and they want them removed - let's do it last!
-		if (!empty($package_installed['db_changes']) && !empty($this->_req->post->do_db_changes))
-		{
-			foreach ($package_installed['db_changes'] as $change)
-			{
-				if ($change[0] === 'remove_table' && isset($change[1]))
-				{
-					$table_installer->drop_table($change[1]);
-				}
-				elseif ($change[0] === 'remove_column' && isset($change[2]))
-				{
-					$table_installer->remove_column($change[1], $change[2]);
-				}
-				elseif ($change[0] === 'remove_index' && isset($change[2]))
-				{
-					$table_installer->remove_index($change[1], $change[2]);
-				}
-			}
-		}
+		$this->removeDatabaseChanges($package_installed, $table_installer);
 
 		// Clean house... get rid of the evidence ;).
-		if ($this->fileFunc->fileExists(BOARDDIR . '/packages/temp'))
+		if ($this->fileFunc->isDir(BOARDDIR . '/packages/temp'))
 		{
 			deltree(BOARDDIR . '/packages/temp');
 		}
@@ -834,6 +757,77 @@ class Packages extends AbstractController
 		// Restore file permissions?
 		$chmod_control = new PackageChmod();
 		$chmod_control->createChmodControl([], [], true);
+	}
+
+	/**
+	 * Get Custom Themes
+	 *
+	 * This method extracts custom themes from the requests and validates them.
+	 *
+	 * @return array
+	 */
+	private function _getCustomThemes()
+	{
+		global $modSettings;
+
+		$custom_themes = [1];
+		$known_themes = explode(',', $modSettings['knownThemes']);
+		$known_themes = array_map('intval', $known_themes);
+
+		if (!empty($this->_req->post->custom_theme))
+		{
+			foreach ($this->_req->post->custom_theme as $tid)
+			{
+				if (in_array($tid, $known_themes, true))
+				{
+					$custom_themes[] = $tid;
+				}
+			}
+		}
+
+		return $custom_themes;
+	}
+
+	/**
+	 * Install Themes
+	 *
+	 * This method installs the custom themes.
+	 *
+	 * @return array
+	 */
+	private function _installThemes()
+	{
+		global $context;
+
+		$themes_installed = [1];
+
+		$context['theme_copies'] = [
+			'require-file' => [],
+			'require-dir' => [],
+		];
+
+		if (!empty($this->_req->post->theme_changes))
+		{
+			foreach ($this->_req->post->theme_changes as $change)
+			{
+				if (empty($change))
+				{
+					continue;
+				}
+
+				$theme_data = json_decode(base64_decode($change), true);
+
+				if (empty($theme_data['type']))
+				{
+					continue;
+				}
+
+				$themes_installed[] = (int) $theme_data['id'];
+				$context['theme_copies'][$theme_data['type']][$theme_data['orig']][] = $theme_data['future'];
+			}
+		}
+
+		return $themes_installed;
 	}
 
 	/**
@@ -890,8 +884,8 @@ class Packages extends AbstractController
 			redirectexit('action=admin;area=packages');
 		}
 
-		$this->_req->query->package = preg_replace('~[\.]+~', '.', strtr($this->_req->query->package, ['/' => '_', '\\' => '_']));
-		$this->_req->query->file = preg_replace('~[\.]+~', '.', $this->_req->query->file);
+		$this->_req->query->package = preg_replace('~[.]+~', '.', strtr($this->_req->query->package, ['/' => '_', '\\' => '_']));
+		$this->_req->query->file = preg_replace('~[.]+~', '.', $this->_req->query->file);
 
 		if (isset($this->_req->query->raw))
 		{
@@ -1638,6 +1632,74 @@ class Packages extends AbstractController
 		}
 
 		return $packages[$params];
+	}
+
+	/**
+	 * Removes database changes if specified conditions are met.
+	 *
+	 * @param array $package_installed The installed package that contains the database changes.
+	 * @param TableInstaller $table_installer The object responsible for modifying database tables.
+	 *
+	 * @return void
+	 */
+	public function removeDatabaseChanges($package_installed, $table_installer): void
+	{
+		// If there's database changes - and they want them removed - let's do it last!
+		if (!empty($package_installed['db_changes']) && !empty($this->_req->post->do_db_changes))
+		{
+			foreach ($package_installed['db_changes'] as $change)
+			{
+				if ($change[0] === 'remove_table' && isset($change[1]))
+				{
+					$table_installer->drop_table($change[1]);
+				}
+				elseif ($change[0] === 'remove_column' && isset($change[2]))
+				{
+					$table_installer->remove_column($change[1], $change[2]);
+				}
+				elseif ($change[0] === 'remove_index' && isset($change[2]))
+				{
+					$table_installer->remove_index($change[1], $change[2]);
+				}
+			}
+		}
+	}
+
+	/**
+	 * Determine database changes based on the given package information and installed package.
+	 *
+	 * @param array $packageInfo The package information that may contain uninstall database changes.
+	 * @param array $package_installed The installed package that contains database changes.
+	 *
+	 * @return void
+	 */
+	public function determineDatabaseChanges($packageInfo, $package_installed)
+	{
+		global $context, $txt;
+
+		$context['database_changes'] = [];
+		if (isset($packageInfo['uninstall']['database']))
+		{
+			$context['database_changes'][] = $txt['execute_database_changes'] . ' - ' . $packageInfo['uninstall']['database'];
+		}
+		elseif (!empty($package_installed['db_changes']))
+		{
+			foreach ($package_installed['db_changes'] as $change)
+			{
+				if (isset($change[2], $txt['package_db_' . $change[0]]))
+				{
+					$context['database_changes'][] = sprintf($txt['package_db_' . $change[0]], $change[1], $change[2]);
+				}
+				elseif (isset($txt['package_db_' . $change[0]]))
+				{
+					$context['database_changes'][] = sprintf($txt['package_db_' . $change[0]], $change[1]);
+				}
+				else
+				{
+					$context['database_changes'][] = $change[0] . '-' . $change[1] . (isset($change[2]) ? '-' . $change[2] : '');
+				}
+			}
+		}
 	}
 
 	/**
