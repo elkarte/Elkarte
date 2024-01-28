@@ -1403,11 +1403,6 @@ class ManageThemes extends AbstractController
 		}
 		elseif (isset($this->_req->post->theme_gz))
 		{
-			if (!isAuthorizedServer($this->_req->post->theme_gz))
-			{
-				throw new Exception('not_valid_server');
-			}
-
 			read_tgz_file($this->_req->post->theme_gz, BOARDDIR . '/themes/' . $this->theme_name, false, true);
 		}
 	}

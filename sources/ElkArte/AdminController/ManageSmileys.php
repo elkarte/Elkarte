@@ -1685,12 +1685,6 @@ class ManageSmileys extends AbstractController
 			$name = Util::htmlspecialchars(strtok(basename($this->_req->query->set_gz), '.'));
 			$context['filename'] = $base_name;
 
-			// Check that the smiley is from and authorized server... maybe add mirroring later.
-			if (!isAuthorizedServer($this->_req->query->set_gz) == 0)
-			{
-				throw new Exception('not_valid_server');
-			}
-
 			$destination = BOARDDIR . '/packages/' . $base_name;
 
 			if ($fileFunc->fileExists($destination))

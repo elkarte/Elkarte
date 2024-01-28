@@ -24,6 +24,9 @@ use ElkArte\FileFunctions;
 use ElkArte\Http\FtpConnection;
 use ElkArte\Languages\Txt;
 use ElkArte\Util;
+use FilesystemIterator;
+use IteratorIterator;
+use UnexpectedValueException;
 
 /**
  * PackageServers controller handles browsing, adding and removing
@@ -76,12 +79,12 @@ class PackageServers extends AbstractController
 		$context['page_title'] = $txt['package_servers'];
 
 		// Here is a list of all the potentially valid actions.
-		$subActions = array(
-			'servers' => array($this, 'action_list'),
-			'browse' => array($this, 'action_browse'),
-			'download' => array($this, 'action_download'),
-			'upload2' => array($this, 'action_upload2'),
-		);
+		$subActions = [
+			'servers' => [$this, 'action_list'],
+			'browse' => [$this, 'action_browse'],
+			'download' => [$this, 'action_download'],
+			'upload2' => [$this, 'action_upload2'],
+		];
 
 		// Set up action/subaction stuff.
 		$action = new Action('package_servers');
@@ -166,13 +169,13 @@ class PackageServers extends AbstractController
 		}
 
 		// Let's initialize $context
-		$context['package_ftp'] = array(
+		$context['package_ftp'] = [
 			'server' => '',
 			'port' => '',
 			'username' => '',
 			'path' => '',
 			'error' => '',
-		);
+		];
 
 		// Are they connected to their FTP account already?
 		if (isset($this->_req->post->ftp_username))
@@ -222,13 +225,13 @@ class PackageServers extends AbstractController
 			}
 
 			// Fill the boxes for a FTP connection with data from the previous attempt too, if any
-			$context['package_ftp'] = array(
+			$context['package_ftp'] = [
 				'server' => $ftp_server ?? ($modSettings['package_server'] ?? 'localhost'),
 				'port' => $ftp_port ?? ($modSettings['package_port'] ?? '21'),
 				'username' => $ftp_username ?? ($modSettings['package_username'] ?? ''),
 				'path' => $ftp_path,
 				'error' => empty($ftp_error) ? null : $ftp_error,
-			);
+			];
 
 			// Announce the template it's time to display the ftp connection box.
 			$context['package_download_broken'] = true;
@@ -271,10 +274,10 @@ class PackageServers extends AbstractController
 		detectServer()->setTimeLimit(60);
 
 		// Fetch the package listing from the server and json decode
-		$listing = json_decode(fetch_web_data($url));
+		$packageListing = json_decode(fetch_web_data($url));
 
 		// List out the packages...
-		$context['package_list'] = array();
+		$context['package_list'] = [];
 
 		// Pick the correct template.
 		$context['sub_template'] = 'package_list';
@@ -282,102 +285,7 @@ class PackageServers extends AbstractController
 		$context['package_server'] = $name;
 
 		// If we received data
-		if (!empty($listing))
-		{
-			// Load the installed packages
-			$instadds = loadInstalledPackages();
-
-			// Look through the list of installed mods and get version information for the compare
-			$installed_adds = array();
-			foreach ($instadds as $installed_add)
-			{
-				$installed_adds[$installed_add['package_id']] = $installed_add['version'];
-			}
-
-			$the_version = strtr(FORUM_VERSION, array('ElkArte ' => ''));
-			if (!empty($_SESSION['version_emulate']))
-			{
-				$the_version = $_SESSION['version_emulate'];
-			}
-
-			// Parse the json file, each section contains a category of addons
-			$packageNum = 0;
-			foreach ($listing as $packageSection => $section_items)
-			{
-				// Section title / header for the category
-				$context['package_list'][$packageSection] = array(
-					'title' => Util::htmlspecialchars(ucwords($packageSection)),
-					'text' => '',
-					'items' => array(),
-				);
-
-				// Load each package array as an item
-				$section_count = 0;
-				foreach ($section_items as $thisPackage)
-				{
-					// Read in the package info from the fetched data
-					$package = $this->_load_package_json($thisPackage, $packageSection);
-					$package['possible_ids'] = $package['id'];
-
-					// Check the install status
-					$package['can_install'] = false;
-					$is_installed = array_intersect(array_keys($installed_adds), $package['possible_ids']);
-					$package['is_installed'] = !empty($is_installed);
-
-					// Set the ID from our potential list should the ID not be provided in the package .yaml
-					$package['id'] = $package['is_installed'] ? array_shift($is_installed) : $package['id'][0];
-
-					// Version installed vs version available
-					$package['is_current'] = !empty($package['is_installed']) && compareVersions($installed_adds[$package['id']], $package['version']) == 0;
-					$package['is_newer'] = !empty($package['is_installed']) && compareVersions($package['version'], $installed_adds[$package['id']]) > 0;
-
-					// Set the package filename for downloading and pre-existence checking
-					$base_name = $this->_rename_master($package['server']['download']);
-					$package['filename'] = basename($package['server']['download']);
-
-					// This package is either not installed, or installed but old.
-					if (!$package['is_installed'] || (!$package['is_current'] && !$package['is_newer']))
-					{
-						// Does it claim to install on this version of ElkArte?
-						$path_parts = pathinfo($base_name);
-						if (!empty($thisPackage->elkversion) && isset($path_parts['extension']) && in_array($path_parts['extension'], array('zip', 'tar', 'gz', 'tar.gz')))
-						{
-							// No install range given, then set one, it will all work out in the end.
-							$for = strpos($thisPackage->elkversion, '-') === false ? $thisPackage->elkversion . '-' . $the_version : $thisPackage->elkversion;
-							$package['can_install'] = matchPackageVersion($the_version, $for);
-						}
-					}
-
-					// See if this filename already exists on the server
-					$already_exists = getPackageInfo($base_name);
-					$package['download_conflict'] = is_array($already_exists) && in_array($already_exists['id'], $package['possible_ids']) && compareVersions($already_exists['version'], $package['version']) != 0;
-					$package['count'] = ++$packageNum;
-
-					// Maybe they have downloaded it but not installed it
-					$package['is_downloaded'] = !$package['is_installed'] && (is_array($already_exists) && in_array($already_exists['id'], $package['possible_ids']));
-					if ($package['is_downloaded'])
-					{
-						// Is the available package newer than whats been downloaded?
-						$package['is_newer'] = compareVersions($package['version'], $already_exists['version']) > 0;
-					}
-
-					// Build the download to server link
-					$package['download']['href'] = getUrl('admin', ['action' => 'admin', 'area' => 'packageservers', 'sa' => 'download', 'server' => $name, 'section' => $packageSection, 'num' => $section_count, 'package' => $package['filename']] + ($package['download_conflict'] ? ['conflict'] : []) + ['{session_data}']);
-					$package['download']['link'] = '<a href="' . $package['download']['href'] . '">' . $package['name'] . '</a>';
-
-					// Add this package to the list
-					$context['package_list'][$packageSection]['items'][$packageNum] = $package;
-					$section_count++;
-				}
-
-				// Sort them naturally
-				usort($context['package_list'][$packageSection]['items'], function ($a, $b) {
-					return $this->package_sort($a, $b);
-				});
-
-				$context['package_list'][$packageSection]['text'] = sprintf($txt['mod_section_count'], $section_count);
-			}
-		}
+		$this->ifWeReceivedData($packageListing, $name, $txt['mod_section_count']);
 
 		// Good time to sort the categories, the packages inside each category will be by last modification date.
 		asort($context['package_list']);
@@ -415,8 +323,8 @@ class PackageServers extends AbstractController
 	private function _load_package_json($thisPackage, $packageSection)
 	{
 		// Populate the package info from the fetched data
-		return array(
-			'id' => !empty($thisPackage->pkid) ? array($thisPackage->pkid) : $this->_assume_id($thisPackage),
+		return [
+			'id' => !empty($thisPackage->pkid) ? [$thisPackage->pkid] : $this->_assume_id($thisPackage),
 			'type' => $packageSection,
 			'name' => Util::htmlspecialchars($thisPackage->title),
 			'date' => htmlTime(strtotime($thisPackage->date)),
@@ -426,7 +334,7 @@ class PackageServers extends AbstractController
 			'elkversion' => $thisPackage->elkversion,
 			'license' => $thisPackage->license,
 			'hooks' => $thisPackage->allhooks,
-			'server' => array(
+			'server' => [
 				'download' => (strpos($thisPackage->server[0]->download, 'http://') === 0 || strpos($thisPackage->server[0]->download, 'https://') === 0) && filter_var($thisPackage->server[0]->download, FILTER_VALIDATE_URL)
 					? $thisPackage->server[0]->download : '',
 				'support' => (strpos($thisPackage->server[0]->support, 'http://') === 0 || strpos($thisPackage->server[0]->support, 'https://') === 0) && filter_var($thisPackage->server[0]->support, FILTER_VALIDATE_URL)
@@ -435,8 +343,8 @@ class PackageServers extends AbstractController
 					? $thisPackage->server[0]->bugs : '',
 				'link' => (strpos($thisPackage->server[0]->url, 'http://') === 0 || strpos($thisPackage->server[0]->url, 'https://') === 0) && filter_var($thisPackage->server[0]->url, FILTER_VALIDATE_URL)
 					? $thisPackage->server[0]->url : '',
-			),
-		);
+			],
+		];
 	}
 
 	/**
@@ -454,7 +362,7 @@ class PackageServers extends AbstractController
 		$under = str_replace(' ', '_', $thisPackage->title);
 		$none = str_replace(' ', '', $thisPackage->title);
 
-		return array(
+		return [
 			$thisPackage->author . ':' . $under,
 			$thisPackage->author . ':' . $none,
 			strtolower($thisPackage->author) . ':' . $under,
@@ -463,7 +371,7 @@ class PackageServers extends AbstractController
 			ucfirst($thisPackage->author) . ':' . $none,
 			strtolower($thisPackage->author . ':' . $under),
 			strtolower($thisPackage->author . ':' . $none),
-		);
+		];
 	}
 
 	/**
@@ -487,7 +395,7 @@ class PackageServers extends AbstractController
 			list (, $newname,) = explode('/', $path_parts['dirname']);
 
 			// Just to be safe, no invalid file characters
-			$invalid = array_merge(array_map('chr', range(0, 31)), array('<', '>', ':', '"', '/', '\\', '|', '?', '*'));
+			$invalid = array_merge(array_map('chr', range(0, 31)), ['<', '>', ':', '"', '/', '\\', '|', '?', '*']);
 
 			// We could read the package info and see if we have a duplicate id & version, however that is
 			// not always accurate, especially when dealing with repos.  So for now just put in no conflict mode
@@ -632,14 +540,14 @@ class PackageServers extends AbstractController
 		// Save the package to disk, use FTP if necessary
 		$create_chmod_control = new PackageChmod();
 		$create_chmod_control->createChmodControl(
-			array(BOARDDIR . '/packages/' . $package_name),
-			array(
+			[BOARDDIR . '/packages/' . $package_name],
+			[
 				'destination_url' => getUrl('admin', ['action' => 'admin', 'area' => 'packageservers', 'sa' => 'download', 'package' => $package_id, '{session_data}']
 					+ (isset($this->_req->query->server) ? ['server' => $this->_req->query->server] : [])
 					+ (isset($this->_req->query->auto) ? ['auto' => ''] : [])
 					+ (isset($this->_req->query->conflict) ? ['conflict' => ''] : [])),
 				'crash_on_error' => true
-			)
+			]
 		);
 
 		package_put_contents(BOARDDIR . '/packages/' . $package_name, fetch_web_data($url . $package_id));
@@ -702,11 +610,11 @@ class PackageServers extends AbstractController
 		}
 
 		// Make sure it has a sane filename.
-		$_FILES['package']['name'] = preg_replace(array('/\s/', '/\.[\.]+/', '/[^\w_\.\-]/'), array('_', '.', ''), $_FILES['package']['name']);
+		$_FILES['package']['name'] = preg_replace(['/\s/', '/\.[\.]+/', '/[^\w_\.\-]/'], ['_', '.', ''], $_FILES['package']['name']);
 
 		if (strtolower(substr($_FILES['package']['name'], -4)) !== '.zip' && strtolower(substr($_FILES['package']['name'], -4)) !== '.tgz' && strtolower(substr($_FILES['package']['name'], -7)) !== '.tar.gz')
 		{
-			throw new Exception('package_upload_error_supports', false, array('zip, tgz, tar.gz'));
+			throw new Exception('package_upload_error_supports', false, ['zip, tgz, tar.gz']);
 		}
 
 		// We only need the filename...
@@ -742,10 +650,10 @@ class PackageServers extends AbstractController
 		{
 			try
 			{
-				$dir = new \FilesystemIterator(BOARDDIR . '/packages', \FilesystemIterator::SKIP_DOTS);
+				$dir = new FilesystemIterator(BOARDDIR . '/packages', FilesystemIterator::SKIP_DOTS);
 
 				$filter = new PackagesFilterIterator($dir);
-				$packages = new \IteratorIterator($filter);
+				$packages = new IteratorIterator($filter);
 
 				foreach ($packages as $package)
 				{
@@ -770,7 +678,7 @@ class PackageServers extends AbstractController
 					}
 				}
 			}
-			catch (\UnexpectedValueException $e)
+			catch (UnexpectedValueException $e)
 			{
 				// @todo for now do nothing...
 			}
@@ -790,7 +698,7 @@ class PackageServers extends AbstractController
 			$context['package']['install']['link'] = $this->getInstallLink('add_languages', $context['package']['filename']);
 		}
 
-		$context['package']['list_files']['link'] = $this->getInstallLink('list_files', $context['package']['filename'], 'list');;
+		$context['package']['list_files']['link'] = $this->getInstallLink('list_files', $context['package']['filename'], 'list');
 
 		unset($context['package']['xml']);
 
@@ -810,5 +718,116 @@ class PackageServers extends AbstractController
 		global $txt;
 
 		return '<a class="linkbutton" href="' . getUrl('admin', ['action' => 'admin', 'area' => 'packages', 'sa' => $action, 'package' => $filename]) . '">' . $txt[$type] . '</a>';
+	}
+
+	/**
+	 * Process received data to generate a package list
+	 *
+	 * @param mixed $packageListing The data containing the package list
+	 * @param string $name The name of the package server
+	 * @param int $mod_section_count The count of sections for the package list
+	 *
+	 * @return void
+	 */
+	public function ifWeReceivedData(mixed $packageListing, string $name, $mod_section_count)
+	{
+		global $context;
+
+		if (!empty($packageListing))
+		{
+			// Load the installed packages
+			$installAdds = loadInstalledPackages();
+
+			// Look through the list of installed mods and get version information for the compare
+			$installed_adds = [];
+			foreach ($installAdds as $installed_add)
+			{
+				$installed_adds[$installed_add['package_id']] = $installed_add['version'];
+			}
+
+			$the_version = strtr(FORUM_VERSION, ['ElkArte ' => '']);
+			if (!empty($_SESSION['version_emulate']))
+			{
+				$the_version = $_SESSION['version_emulate'];
+			}
+
+			// Parse the json file, each section contains a category of addons
+			$packageNum = 0;
+			foreach ($packageListing as $packageSection => $section_items)
+			{
+				// Section title / header for the category
+				$context['package_list'][$packageSection] = [
+					'title' => Util::htmlspecialchars(ucwords($packageSection)),
+					'text' => '',
+					'items' => [],
+				];
+
+				// Load each package array as an item
+				$section_count = 0;
+				foreach ($section_items as $thisPackage)
+				{
+					// Read in the package info from the fetched data
+					$package = $this->_load_package_json($thisPackage, $packageSection);
+					$package['possible_ids'] = $package['id'];
+
+					// Check the installation status
+					$package['can_install'] = false;
+					$is_installed = array_intersect(array_keys($installed_adds), $package['possible_ids']);
+					$package['is_installed'] = !empty($is_installed);
+
+					// Set the ID from our potential list should the ID not be provided in the package .yaml
+					$package['id'] = $package['is_installed'] ? array_shift($is_installed) : $package['id'][0];
+
+					// Version installed vs version available
+					$package['is_current'] = !empty($package['is_installed']) && compareVersions($installed_adds[$package['id']], $package['version']) == 0;
+					$package['is_newer'] = !empty($package['is_installed']) && compareVersions($package['version'], $installed_adds[$package['id']]) > 0;
+
+					// Set the package filename for downloading and pre-existence checking
+					$base_name = $this->_rename_master($package['server']['download']);
+					$package['filename'] = basename($package['server']['download']);
+
+					// This package is either not installed, or installed but old.
+					if (!$package['is_installed'] || (!$package['is_current'] && !$package['is_newer']))
+					{
+						// Does it claim to install on this version of ElkArte?
+						$path_parts = pathinfo($base_name);
+						if (!empty($thisPackage->elkversion) && isset($path_parts['extension']) && in_array($path_parts['extension'], ['zip', 'tar', 'gz', 'tar.gz']))
+						{
+							// No install range given, then set one, it will all work out in the end.
+							$for = strpos($thisPackage->elkversion, '-') === false ? $thisPackage->elkversion . '-' . $the_version : $thisPackage->elkversion;
+							$package['can_install'] = matchPackageVersion($the_version, $for);
+						}
+					}
+
+					// See if this filename already exists on the server
+					$already_exists = getPackageInfo($base_name);
+					$package['download_conflict'] = is_array($already_exists) && in_array($already_exists['id'], $package['possible_ids']) && compareVersions($already_exists['version'], $package['version']) != 0;
+					$package['count'] = ++$packageNum;
+
+					// Maybe they have downloaded it but not installed it
+					$package['is_downloaded'] = !$package['is_installed'] && (is_array($already_exists) && in_array($already_exists['id'], $package['possible_ids']));
+					if ($package['is_downloaded'])
+					{
+						// Is the available package newer than whats been downloaded?
+						$package['is_newer'] = compareVersions($package['version'], $already_exists['version']) > 0;
+					}
+
+					// Build the download to server link
+					$package['download']['href'] = getUrl('admin', ['action' => 'admin', 'area' => 'packageservers', 'sa' => 'download', 'server' => $name, 'section' => $packageSection, 'num' => $section_count, 'package' => $package['filename']] + ($package['download_conflict'] ? ['conflict'] : []) + ['{session_data}']);
+					$package['download']['link'] = '<a href="' . $package['download']['href'] . '">' . $package['name'] . '</a>';
+
+					// Add this package to the list
+					$context['package_list'][$packageSection]['items'][$packageNum] = $package;
+					$section_count++;
+				}
+
+				// Sort them naturally
+				usort($context['package_list'][$packageSection]['items'], function ($a, $b) {
+					return $this->package_sort($a, $b);
+				});
+
+				$context['package_list'][$packageSection]['text'] = sprintf($mod_section_count, $section_count);
+			}
+		}
 	}
 }
