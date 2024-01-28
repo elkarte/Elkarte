@@ -568,7 +568,6 @@ class Packages extends AbstractController
 		// Installing in themes will require some help
 		require_once(SUBSDIR . '/Themes.subs.php');
 
-		// @todo Perhaps do it in steps, if necessary?
 		$this->_uninstalling = $this->_req->query->sa === 'uninstall2';
 
 		// Load up the package FTP information?
@@ -619,7 +618,6 @@ class Packages extends AbstractController
 		{
 			$_SESSION['last_backup_for'] = $this->_filename . ($this->_uninstalling ? '$$' : '$');
 
-			// @todo Internationalize this?
 			package_create_backup(($this->_uninstalling ? 'backup_' : 'before_') . strtok($this->_filename, '.'));
 		}
 
@@ -709,7 +707,7 @@ class Packages extends AbstractController
 						{
 							$tables[] = $log[1];
 						}
-						elseif (in_array($log[1], $tables))
+						elseif (in_array($log[1], $tables, true))
 						{
 							unset($db_package_log[$k]);
 						}

@@ -107,4 +107,80 @@ class TestPackagesController extends ElkArteCommonSetupTest
 		$this->assertFalse($context['is_installed']);
 		$this->assertEquals('<strong>Test successful</strong>', $context['actions'][7]['description'], $context['actions'][7]['description']);
 	}
+
+	public function testActionInstall2()
+	{
+		global $context;
+
+		$req = HttpReq::instance();
+		$req->query->ve = '1.1';
+		$req->query->package = 'elk_ResizeAttachedImages.zip';
+		$req->query->sa = 'install2';
+		$req->query->area = 'packages';
+
+		// Stupid package subs still uses the super global directly
+		$_REQUEST['ve'] = '1.1';
+		$_REQUEST['package'] = 'elk_ResizeAttachedImages.zip';
+
+		// Get the controller, call index
+		$controller = new Packages(new EventManager());
+		$controller->setUser(User::$info);
+		$controller->pre_dispatch();
+		$controller->action_index();
+		$req->query->sa = null;
+		$req->query->area = null;
+
+		$this->assertTrue($context['install_finished']);
+	}
+
+	public function testActionUninstall()
+	{
+		global $context;
+
+		$req = HttpReq::instance();
+		$req->query->ve = '1.1';
+		$req->query->package = 'elk_ResizeAttachedImages.zip';
+		$req->query->sa = 'uninstall';
+		$req->query->area = 'packages';
+
+		// Stupid package subs still uses the super global directly
+		$_REQUEST['ve'] = '1.1';
+		$_REQUEST['package'] = 'elk_ResizeAttachedImages.zip';
+
+		// Get the controller, call index
+		$controller = new Packages(new EventManager());
+		$controller->setUser(User::$info);
+		$controller->pre_dispatch();
+		$controller->action_index();
+		$req->query->sa = null;
+		$req->query->area = null;
+
+		$this->assertTrue($context['uninstalling']);
+	}
+
+	public function testActionUninstall2()
+	{
+		global $context;
+
+		$req = HttpReq::instance();
+		$req->query->ve = '1.1';
+		$req->query->package = 'elk_ResizeAttachedImages.zip';
+		$req->query->sa = 'uninstall2';
+		$req->query->area = 'packages';
+		$req->post->do_db_changes = 1;
+
+		// Stupid package subs still uses the super global directly
+		$_REQUEST['ve'] = '1.1';
+		$_REQUEST['package'] = 'elk_ResizeAttachedImages.zip';
+
+		// Get the controller, call index
+		$controller = new Packages(new EventManager());
+		$controller->setUser(User::$info);
+		$controller->pre_dispatch();
+		$controller->action_index();
+		$req->query->sa = null;
+		$req->query->area = null;
+
+		$this->assertFalse($context['is_installed']);
+	}
 }
