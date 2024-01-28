@@ -43,7 +43,7 @@ class Admin extends AbstractController
 	 * @var string[] areas to find current installed status and installed version
 	 */
 	private $_checkFor = array('gd', 'imagick', 'db_server', 'php', 'server',
-							   'zend', 'apc', 'memcache', 'memcached', 'xcache', 'opcache');
+							   'zend', 'apc', 'memcache', 'memcached', 'opcache');
 
 	/**
 	 * Pre Dispatch, called before other methods.
@@ -172,9 +172,7 @@ class Admin extends AbstractController
 						'class' => 'i-package i-admin',
 						'subsections' => array(
 							'browse' => array($txt['browse_packages']),
-							'installed' => array($txt['installed_packages']),
-							'servers' => array($txt['download_packages']),
-							'upload' => array($txt['upload_packages']),
+							'servers' => array($txt['add_packages']),
 							'options' => array($txt['package_settings']),
 						),
 					),
@@ -546,7 +544,7 @@ class Admin extends AbstractController
 			'hook' => 'admin',
 		);
 
-		// Actually create the menu!
+		// Actually create the admin menu!
 		$admin_include_data = (new Menu())
 			->addMenuData($admin_areas)
 			->addOptions($menuOptions)

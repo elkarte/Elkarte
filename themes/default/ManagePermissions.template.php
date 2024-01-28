@@ -58,7 +58,7 @@ function template_permission_index()
 	{
 		echo '
 			<h2 class="category_header panel_toggle">
-					<i id="upshrink_ic" class="chevricon i-chevron-', empty($context['admin_preferences']['app']) ? 'up' : 'down', ' hide" title="', $txt['hide'], '"></i>
+				<i id="upshrink_ic" class="chevricon i-chevron-', empty($context['admin_preferences']['app']) ? 'up' : 'down', ' hide" title="', $txt['hide'], '"></i>
 				<a href="#" id="permissions_panel_link">', $txt['permissions_advanced_options'], '</a>
 			</h2>
 			<div id="permissions_panel_advanced">

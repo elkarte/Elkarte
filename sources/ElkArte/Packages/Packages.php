@@ -26,6 +26,8 @@ use ElkArte\FileFunctions;
 use ElkArte\Languages\Txt;
 use ElkArte\User;
 use ElkArte\Util;
+use FilesystemIterator;
+use UnexpectedValueException;
 
 /**
  * This class is the administration package manager controller.
@@ -60,7 +62,7 @@ class Packages extends AbstractController
 	/** @var bool If the package is installed, previously or not */
 	private $_is_installed;
 
-	/** @var \ElkArte\FileFunctions */
+	/** @var FileFunctions */
 	private $fileFunc;
 
 	/**
@@ -83,7 +85,7 @@ class Packages extends AbstractController
 	 * Entry point, the default method of this controller.
 	 *
 	 * @event integrate_sa_packages
-	 * @see \ElkArte\AbstractController::action_index()
+	 * @see AbstractController::action_index
 	 */
 	public function action_index()
 	{
@@ -95,29 +97,28 @@ class Packages extends AbstractController
 		$context['page_title'] = $txt['package'];
 
 		// Delegation makes the world... that is, the package manager go 'round.
-		$subActions = array(
-			'browse' => array($this, 'action_browse'),
-			'remove' => array($this, 'action_remove'),
-			'list' => array($this, 'action_list'),
-			'ftptest' => array($this, 'action_ftptest'),
-			'install' => array($this, 'action_install'),
-			'install2' => array($this, 'action_install2'),
-			'uninstall' => array($this, 'action_install'),
-			'uninstall2' => array($this, 'action_install2'),
-			'installed' => array($this, 'action_browse'),
-			'options' => array($this, 'action_options'),
-			'flush' => array($this, 'action_flush'),
-			'examine' => array($this, 'action_examine'),
-			'showoperations' => array($this, 'action_showoperations'),
+		$subActions = [
+			'browse' => [$this, 'action_browse'],
+			'remove' => [$this, 'action_remove'],
+			'list' => [$this, 'action_list'],
+			'ftptest' => [$this, 'action_ftptest'],
+			'install' => [$this, 'action_install'],
+			'install2' => [$this, 'action_install2'],
+			'uninstall' => [$this, 'action_install'],
+			'uninstall2' => [$this, 'action_install2'],
+			'options' => [$this, 'action_options'],
+			'flush' => [$this, 'action_flush'],
+			'examine' => [$this, 'action_examine'],
+			'showoperations' => [$this, 'action_showoperations'],
 			// The following two belong to PackageServers,
 			// for UI's sake moved here at least temporarily
-			'servers' => array(
+			'servers' => [
 				'controller' => '\\ElkArte\\Packages\\PackageServers',
-				'function' => 'action_list'),
-			'upload' => array(
+				'function' => 'action_list'],
+			'upload' => [
 				'controller' => '\\ElkArte\\Packages\\PackageServers',
-				'function' => 'action_upload'),
-		);
+				'function' => 'action_upload'],
+		];
 
 		// Set up action/subaction stuff.
 		$action = new Action('packages');
@@ -127,23 +128,6 @@ class Packages extends AbstractController
 			'title' => 'package_manager',
 			'description' => 'package_manager_desc',
 			'class' => 'i-package',
-			// All valid subactions will be added, here you just specify unique tab data
-			'tabs' => [
-				'installed' => [
-					'description' => $txt['installed_packages_desc'],
-				],
-				// The following two belong to PackageServers,
-				// for UI's sake moved here at least temporarily
-				'servers' => [
-					'description' => $txt['download_packages_desc'],
-				],
-				'upload' => [
-					'description' => $txt['upload_packages_desc'],
-				],
-				'options' => [
-					'description' => $txt['package_install_options_desc'],
-				],
-			],
 		]);
 
 		// Work out exactly who it is we are calling. call integrate_sa_packages
@@ -171,7 +155,7 @@ class Packages extends AbstractController
 		}
 
 		// What are we trying to do
-		$this->_filename = (string) preg_replace('~[\.]+~', '.', $file);
+		$this->_filename = (string) preg_replace('~[.]+~', '.', $file);
 		$this->_uninstalling = $this->_req->query->sa === 'uninstall';
 
 		// If we can't find the file, our installation ends here
@@ -191,7 +175,7 @@ class Packages extends AbstractController
 		$create_chmod_control->createChmodControl();
 
 		// Make sure our temp directory exists and is empty.
-		if ($this->fileFunc->fileExists(BOARDDIR . '/packages/temp'))
+		if ($this->fileFunc->isDir(BOARDDIR . '/packages/temp'))
 		{
 			deltree(BOARDDIR . '/packages/temp', false);
 		}
@@ -221,33 +205,11 @@ class Packages extends AbstractController
 		// See if it is installed?
 		$package_installed = isPackageInstalled($packageInfo['id'], $this->install_id);
 
-		$context['database_changes'] = array();
-		if (isset($packageInfo['uninstall']['database']))
-		{
-			$context['database_changes'][] = $txt['execute_database_changes'] . ' - ' . $packageInfo['uninstall']['database'];
-		}
-		elseif (!empty($package_installed['db_changes']))
-		{
-			foreach ($package_installed['db_changes'] as $change)
-			{
-				if (isset($change[2], $txt['package_db_' . $change[0]]))
-				{
-					$context['database_changes'][] = sprintf($txt['package_db_' . $change[0]], $change[1], $change[2]);
-				}
-				elseif (isset($txt['package_db_' . $change[0]]))
-				{
-					$context['database_changes'][] = sprintf($txt['package_db_' . $change[0]], $change[1]);
-				}
-				else
-				{
-					$context['database_changes'][] = $change[0] . '-' . $change[1] . (isset($change[2]) ? '-' . $change[2] : '');
-				}
-			}
-		}
+		// Any database actions
+		$this->determineDatabaseChanges($packageInfo, $package_installed);
 
 		$actions = $this->_get_package_actions($package_installed, $packageInfo);
-
-		$context['actions'] = array();
+		$context['actions'] = [];
 		$context['ftp_needed'] = false;
 
 		// No actions found, return so we can display an error
@@ -266,10 +228,10 @@ class Packages extends AbstractController
 		$context['actions'] = $pka->ourActions;
 
 		// Change our last link tree item for more information on this Packages area.
-		$context['linktree'][count($context['linktree']) - 1] = array(
+		$context['linktree'][count($context['linktree']) - 1] = [
 			'url' =>getUrl('admin', ['action' => 'admin', 'area' => 'packages', 'sa' => 'browse']),
 			'name' => $this->_uninstalling ? $txt['package_uninstall_actions'] : $txt['install_actions']
-		);
+		];
 
 		// All things to make the template go round
 		$context['page_title'] .= ' - ' . ($this->_uninstalling ? $txt['package_uninstall_actions'] : $txt['install_actions']);
@@ -287,13 +249,13 @@ class Packages extends AbstractController
 		package_flush_cache(true);
 
 		// Clear the temp directory
-		if ($this->fileFunc->fileExists(BOARDDIR . '/packages/temp'))
+		if ($this->fileFunc->isDir(BOARDDIR . '/packages/temp'))
 		{
 			deltree(BOARDDIR . '/packages/temp');
 		}
 
-		// Will we need chmod permissions to pull this off
-		$this->chmod_files = !empty($pka->chmod_files) ? $pka->chmod_files : array();
+		// Will we require chmod permissions to pull this off
+		$this->chmod_files = !empty($pka->chmod_files) ? $pka->chmod_files : [];
 		if (!empty($this->chmod_files))
 		{
 			$chmod_control = new PackageChmod();
@@ -312,7 +274,7 @@ class Packages extends AbstractController
 	 * - Will try with FTP permissions for cases where the web server credentials
 	 * do not have "create" directory permissions
 	 *
-	 * @throws \ElkArte\Exceptions\Exception when no directory can be made
+	 * @throws Exception when no directory can be made
 	 */
 	private function _create_temp_dir()
 	{
@@ -324,11 +286,11 @@ class Packages extends AbstractController
 			deltree(BOARDDIR . '/packages/temp', false);
 			$chmod_control = new PackageChmod();
 			$chmod_control->createChmodControl(
-				array(BOARDDIR . '/packages/temp/delme.tmp'),
-				array(
+				[BOARDDIR . '/packages/temp/delme.tmp'],
+				[
 					'destination_url' => $scripturl . '?action=admin;area=packages;sa=' . $this->_req->query->sa . ';package=' . ($context['filename'] ?? ''),
 					'crash_on_error' => true
-				)
+				]
 			);
 
 			// No temp directory was able to be made, that's fatal
@@ -397,13 +359,13 @@ class Packages extends AbstractController
 	 * @param bool $testing passed to parsePackageInfo, true for test install, false for real install
 	 *
 	 * @return array
-	 * @throws \ElkArte\Exceptions\Exception package_cant_uninstall, package_uninstall_cannot
+	 * @throws Exception package_cant_uninstall, package_uninstall_cannot
 	 */
 	private function _get_package_actions($package_installed, $packageInfo, $testing = true)
 	{
 		global $context;
 
-		$actions = array();
+		$actions = [];
 
 		// Uninstalling?
 		if ($this->_uninstalling)
@@ -491,7 +453,7 @@ class Packages extends AbstractController
 			{
 				// Get the part of the file we'll be dealing with.
 				preg_match('~^\$(languagedir|languages_dir|imagesdir|themedir)(\\|/)*(.+)*~i', $action_data['unparsed_destination'], $matches);
-
+				$path = '';
 				if ($matches[1] === 'imagesdir')
 				{
 					$path = '/' . basename($settings['default_images_url']);
@@ -499,10 +461,6 @@ class Packages extends AbstractController
 				elseif ($matches[1] === 'languagedir' || $matches[1] === 'languages_dir')
 				{
 					$path = '/ElkArte/Languages';
-				}
-				else
-				{
-					$path = '';
 				}
 
 				if (!empty($matches[3]))
@@ -518,12 +476,13 @@ class Packages extends AbstractController
 				// Loop through each custom theme to note it's candidacy!
 				foreach ($this->theme_paths as $id => $theme_data)
 				{
-					if (isset($theme_data['theme_dir']) && $id != 1)
+					$id = (int) $id;
+					if (isset($theme_data['theme_dir']) && $id !== 1)
 					{
 						$real_path = $theme_data['theme_dir'] . $path;
 
 						// Confirm that we don't already have this dealt with by another entry.
-						if (!in_array(strtolower(strtr($real_path, array('\\' => '/'))), $themeFinds['other_themes']))
+						if (!in_array(strtolower(strtr($real_path, ['\\' => '/'])), $themeFinds['other_themes'], true))
 						{
 							// Check if we will need to chmod this.
 							if (!dirTest(dirname($real_path)))
@@ -546,31 +505,31 @@ class Packages extends AbstractController
 
 							if (!isset($context['theme_actions'][$id]))
 							{
-								$context['theme_actions'][$id] = array(
+								$context['theme_actions'][$id] = [
 									'name' => $theme_data['name'],
-									'actions' => array(),
-								);
+									'actions' => [],
+								];
 							}
 
 							if ($this->_uninstalling)
 							{
-								$context['theme_actions'][$id]['actions'][] = array(
+								$context['theme_actions'][$id]['actions'][] = [
 									'type' => $txt['package_delete'] . ' ' . ($action_data['type'] === 'require-dir' ? $txt['package_tree'] : $txt['package_file']),
-									'action' => strtr($real_path, array('\\' => '/', BOARDDIR => '.')),
+									'action' => strtr($real_path, ['\\' => '/', BOARDDIR => '.']),
 									'description' => '',
-									'value' => base64_encode(json_encode(array('type' => $action_data['type'], 'orig' => $action_data['filename'], 'future' => $real_path, 'id' => $id))),
+									'value' => base64_encode(json_encode(['type' => $action_data['type'], 'orig' => $action_data['filename'], 'future' => $real_path, 'id' => $id])),
 									'not_mod' => true,
-								);
+								];
 							}
 							else
 							{
-								$context['theme_actions'][$id]['actions'][] = array(
+								$context['theme_actions'][$id]['actions'][] = [
 									'type' => $txt['package_extract'] . ' ' . ($action_data['type'] === 'require-dir' ? $txt['package_tree'] : $txt['package_file']),
-									'action' => strtr($real_path, array('\\' => '/', BOARDDIR => '.')),
+									'action' => strtr($real_path, ['\\' => '/', BOARDDIR => '.']),
 									'description' => '',
-									'value' => base64_encode(json_encode(array('type' => $action_data['type'], 'orig' => $action_data['destination'], 'future' => $real_path, 'id' => $id))),
+									'value' => base64_encode(json_encode(['type' => $action_data['type'], 'orig' => $action_data['destination'], 'future' => $real_path, 'id' => $id])),
 									'not_mod' => true,
-								);
+								];
 							}
 						}
 					}
@@ -615,14 +574,14 @@ class Packages extends AbstractController
 		// Load up the package FTP information?
 		$chmod_control = new PackageChmod();
 		$chmod_control->createChmodControl(
-			array(),
-			array(
+			[],
+			[
 				'destination_url' => getUrl('admin', ['action' => 'admin', 'area' => 'packages', 'sa' =>  $this->_req->query->sa, 'package' => $this->_req->query->package])
-			)
+			]
 		);
 
 		// Make sure temp directory exists and is empty!
-		if ($this->fileFunc->fileExists(BOARDDIR . '/packages/temp'))
+		if ($this->fileFunc->isDir(BOARDDIR . '/packages/temp'))
 		{
 			deltree(BOARDDIR . '/packages/temp', false);
 		}
@@ -635,48 +594,13 @@ class Packages extends AbstractController
 		$this->_extract_files_temp();
 
 		// Are we installing this into any custom themes?
-		$custom_themes = array(1);
-		$known_themes = explode(',', $modSettings['knownThemes']);
-		if (!empty($this->_req->post->custom_theme))
-		{
-			foreach ($this->_req->post->custom_theme as $tid)
-			{
-				if (in_array($tid, $known_themes))
-				{
-					$custom_themes[] = (int) $tid;
-				}
-			}
-		}
+		$custom_themes = $this->_getCustomThemes();
 
 		// Now load up the paths of the themes that we need to know about.
 		$this->theme_paths = getThemesPathbyID($custom_themes);
-		$themes_installed = array(1);
 
 		// Are there any theme copying that we want to take place?
-		$context['theme_copies'] = array(
-			'require-file' => array(),
-			'require-dir' => array(),
-		);
-
-		if (!empty($this->_req->post->theme_changes))
-		{
-			foreach ($this->_req->post->theme_changes as $change)
-			{
-				if (empty($change))
-				{
-					continue;
-				}
-
-				$theme_data = json_decode(base64_decode($change), true);
-				if (empty($theme_data['type']))
-				{
-					continue;
-				}
-
-				$themes_installed[] = $theme_data['id'];
-				$context['theme_copies'][$theme_data['type']][$theme_data['orig']][] = $theme_data['future'];
-			}
-		}
+		$themes_installed = $this->_installThemes();
 
 		// Get the package info...
 		$packageInfo = getPackageInfo($this->_filename);
@@ -709,10 +633,10 @@ class Packages extends AbstractController
 		$install_log = $this->_get_package_actions($package_installed, $packageInfo, false);
 
 		// Set up the details for the sub template, linktree, etc
-		$context['linktree'][count($context['linktree']) - 1] = array(
+		$context['linktree'][count($context['linktree']) - 1] = [
 			'url' => getUrl('admin', ['action' => 'admin', 'area' => 'packages', 'sa' => 'browse']),
 			'name' => $this->_uninstalling ? $txt['uninstall'] : $txt['extracting']
-		);
+		];
 		$context['page_title'] .= ' - ' . ($this->_uninstalling ? $txt['uninstall'] : $txt['extracting']);
 		$context['sub_template'] = 'extract_package';
 		$context['filename'] = $this->_filename;
@@ -740,7 +664,7 @@ class Packages extends AbstractController
 
 			// See if this is already installed
 			$is_upgrade = false;
-			$old_db_changes = array();
+			$old_db_changes = [];
 			$package_check = isPackageInstalled($packageInfo['id']);
 
 			// Change the installed state as required.
@@ -754,7 +678,7 @@ class Packages extends AbstractController
 				{
 					// not uninstalling so must be an upgrade
 					$is_upgrade = true;
-					$old_db_changes = empty($package_check['db_changes']) ? array() : $package_check['db_changes'];
+					$old_db_changes = empty($package_check['db_changes']) ? [] : $package_check['db_changes'];
 				}
 			}
 
@@ -777,8 +701,8 @@ class Packages extends AbstractController
 				if (!empty($db_package_log))
 				{
 					// We're really just checking for entries which are create table AND add columns (etc).
-					$tables = array();
-					usort($db_package_log, array($this, '_sort_table_first'));
+					$tables = [];
+					usort($db_package_log, [$this, '_sort_table_first']);
 					foreach ($db_package_log as $k => $log)
 					{
 						if ($log[0] === 'remove_table')
@@ -816,40 +740,94 @@ class Packages extends AbstractController
 		}
 
 		// If there's database changes - and they want them removed - let's do it last!
-		if (!empty($package_installed['db_changes']) && !empty($this->_req->post->do_db_changes))
-		{
-			foreach ($package_installed['db_changes'] as $change)
-			{
-				if ($change[0] === 'remove_table' && isset($change[1]))
-				{
-					$table_installer->drop_table($change[1]);
-				}
-				elseif ($change[0] === 'remove_column' && isset($change[2]))
-				{
-					$table_installer->remove_column($change[1], $change[2]);
-				}
-				elseif ($change[0] === 'remove_index' && isset($change[2]))
-				{
-					$table_installer->remove_index($change[1], $change[2]);
-				}
-			}
-		}
+		$this->removeDatabaseChanges($package_installed, $table_installer);
 
 		// Clean house... get rid of the evidence ;).
-		if ($this->fileFunc->fileExists(BOARDDIR . '/packages/temp'))
+		if ($this->fileFunc->isDir(BOARDDIR . '/packages/temp'))
 		{
 			deltree(BOARDDIR . '/packages/temp');
 		}
 
 		// Log what we just did.
-		logAction($this->_uninstalling ? 'uninstall_package' : (!empty($is_upgrade) ? 'upgrade_package' : 'install_package'), array('package' => Util::htmlspecialchars($packageInfo['name']), 'version' => Util::htmlspecialchars($packageInfo['version'])), 'admin');
+		logAction($this->_uninstalling ? 'uninstall_package' : (!empty($is_upgrade) ? 'upgrade_package' : 'install_package'), ['package' => Util::htmlspecialchars($packageInfo['name']), 'version' => Util::htmlspecialchars($packageInfo['version'])], 'admin');
 
 		// Just in case, let's clear the whole cache to avoid anything going up the swanny.
 		Cache::instance()->clean();
 
 		// Restore file permissions?
 		$chmod_control = new PackageChmod();
-		$chmod_control->createChmodControl(array(), array(), true);
+		$chmod_control->createChmodControl([], [], true);
+	}
+
+	/**
+	 * Get Custom Themes
+	 *
+	 * This method extracts custom themes from the requests and validates them.
+	 *
+	 * @return array
+	 */
+	private function _getCustomThemes()
+	{
+		global $modSettings;
+
+		$custom_themes = [1];
+		$known_themes = explode(',', $modSettings['knownThemes']);
+		$known_themes = array_map('intval', $known_themes);
+
+		if (!empty($this->_req->post->custom_theme))
+		{
+			foreach ($this->_req->post->custom_theme as $tid)
+			{
+				if (in_array($tid, $known_themes, true))
+				{
+					$custom_themes[] = $tid;
+				}
+			}
+		}
+
+		return $custom_themes;
+	}
+
+	/**
+	 * Install Themes
+	 *
+	 * This method installs the custom themes.
+	 *
+	 * @return array
+	 */
+	private function _installThemes()
+	{
+		global $context;
+
+		$themes_installed = [1];
+
+		$context['theme_copies'] = [
+			'require-file' => [],
+			'require-dir' => [],
+		];
+
+		if (!empty($this->_req->post->theme_changes))
+		{
+			foreach ($this->_req->post->theme_changes as $change)
+			{
+				if (empty($change))
+				{
+					continue;
+				}
+
+				$theme_data = json_decode(base64_decode($change), true);
+
+				if (empty($theme_data['type']))
+				{
+					continue;
+				}
+
+				$themes_installed[] = (int) $theme_data['id'];
+				$context['theme_copies'][$theme_data['type']][$theme_data['orig']][] = $theme_data['future'];
+			}
+		}
+
+		return $themes_installed;
 	}
 
 	/**
@@ -866,10 +844,10 @@ class Packages extends AbstractController
 			redirectexit('action=admin;area=packages');
 		}
 
-		$context['linktree'][] = array(
+		$context['linktree'][] = [
 			'url' => getUrl('admin', ['action' => 'admin', 'area' => 'packages', 'sa' => 'list', 'package' => $package]),
 			'name' => $txt['list_file']
-		);
+		];
 		$context['page_title'] .= ' - ' . $txt['list_file'];
 		$context['sub_template'] = 'list';
 
@@ -906,8 +884,8 @@ class Packages extends AbstractController
 			redirectexit('action=admin;area=packages');
 		}
 
-		$this->_req->query->package = preg_replace('~[\.]+~', '.', strtr($this->_req->query->package, array('/' => '_', '\\' => '_')));
-		$this->_req->query->file = preg_replace('~[\.]+~', '.', $this->_req->query->file);
+		$this->_req->query->package = preg_replace('~[.]+~', '.', strtr($this->_req->query->package, ['/' => '_', '\\' => '_']));
+		$this->_req->query->file = preg_replace('~[.]+~', '.', $this->_req->query->file);
 
 		if (isset($this->_req->query->raw))
 		{
@@ -923,10 +901,10 @@ class Packages extends AbstractController
 			obExit(false);
 		}
 
-		$context['linktree'][count($context['linktree']) - 1] = array(
+		$context['linktree'][count($context['linktree']) - 1] = [
 			'url' => getUrl('admin', ['action' => 'admin', 'area' => 'packages', 'sa' => 'list', 'package' => $this->_req->query->package]),
 			'name' => $txt['package_examine_file']
-		);
+		];
 		$context['page_title'] .= ' - ' . $txt['package_examine_file'];
 		$context['sub_template'] = 'examine';
 
@@ -935,7 +913,7 @@ class Packages extends AbstractController
 		$context['filename'] = $this->_req->query->file;
 
 		// Let the unpacker do the work.... but make sure we handle images properly.
-		if (in_array(strtolower(strrchr($this->_req->query->file, '.')), array('.bmp', '.gif', '.jpeg', '.jpg', '.png')))
+		if (in_array(strtolower(strrchr($this->_req->query->file, '.')), ['.bmp', '.gif', '.jpeg', '.jpg', '.png']))
 		{
 			$context['filedata'] = '<img src="' . getUrl('admin', ['action' => 'admin', 'area' => 'packages', 'sa' => 'examine', 'package' => $this->_req->query->package, 'file' => $this->_req->query->file, 'raw']) . '" alt="' . $this->_req->query->file . '" />';
 		}
@@ -981,7 +959,7 @@ class Packages extends AbstractController
 		{
 			redirectexit('action=admin;area=packages;sa=browse');
 		}
-		$this->_req->query->package = preg_replace('~[\.]+~', '.', strtr($this->_req->query->package, array('/' => '_', '\\' => '_')));
+		$this->_req->query->package = preg_replace('~[\.]+~', '.', strtr($this->_req->query->package, ['/' => '_', '\\' => '_']));
 
 		// Can't delete what's not there.
 		if ($this->fileFunc->fileExists(BOARDDIR . '/packages/' . $this->_req->query->package)
@@ -994,11 +972,11 @@ class Packages extends AbstractController
 		{
 			$chmod_control = new PackageChmod();
 			$chmod_control->createChmodControl(
-				array(BOARDDIR . '/packages/' . $this->_req->query->package),
-				array(
+				[BOARDDIR . '/packages/' . $this->_req->query->package],
+				[
 					'destination_url' => getUrl('admin', ['action' => 'admin', 'area' => 'packages', 'sa' => 'remove', 'package' => $this->_req->query->package]),
 					'crash_on_error' => true
-				)
+				]
 			);
 
 			if ($this->fileFunc->isDir(BOARDDIR . '/packages/' . $this->_req->query->package))
@@ -1016,7 +994,7 @@ class Packages extends AbstractController
 	}
 
 	/**
-	 * Browse a list of installed packages.
+	 * Browse a list of packages.
 	 */
 	public function action_browse()
 	{
@@ -1024,35 +1002,36 @@ class Packages extends AbstractController
 
 		$context['page_title'] .= ' - ' . $txt['browse_packages'];
 		$context['forum_version'] = FORUM_VERSION;
-		$context['available_addon'] = array();
-		$context['available_avatar'] = array();
-		$context['available_smiley'] = array();
-		$context['available_language'] = array();
-		$context['available_unknown'] = array();
+		$context['available_addon'] = [];
+		$context['available_avatar'] = [];
+		$context['available_smiley'] = [];
+		$context['available_language'] = [];
+		$context['available_unknown'] = [];
 
-		$installed = $context['sub_action'] === 'installed';
-		$context['package_types'] = $installed ? array('addon') : array('addon', 'avatar', 'language', 'smiley', 'unknown');
+		$context['package_types'] = ['addon', 'avatar', 'language', 'smiley', 'unknown'];
+
+		call_integration_hook('integrate_package_types');
 
 		foreach ($context['package_types'] as $type)
 		{
 			// Use the standard templates for showing this.
-			$listOptions = array(
+			$listOptions = [
 				'id' => 'packages_lists_' . $type,
-				'title' => $installed ? $txt['view_and_remove'] : $txt[($type === 'addon' ? 'modification' : $type) . '_package'],
+				'title' => $txt[($type === 'addon' ? 'modification' : $type) . '_package'],
 				'no_items_label' => $txt['no_packages'],
-				'get_items' => array(
-					'function' => array($this, 'list_packages'),
-					'params' => array('params' => $type, 'installed' => $installed),
-				),
+				'get_items' => [
+					'function' => [$this, 'list_packages'],
+					'params' => ['params' => $type],
+				],
 				'base_href' => getUrl('admin', ['action' => 'admin', 'area' => 'packages', 'sa' => $context['sub_action'], 'type' => $type]),
-				'default_sort_col' => 'mod_name' . $type,
-				'columns' => array(
-					'mod_name' . $type => array(
-						'header' => array(
+				'default_sort_col' => 'pkg_name' . $type,
+				'columns' => [
+					'pkg_name' . $type => [
+						'header' => [
 							'value' => $txt['mod_name'],
 							'style' => 'width: 25%;',
-						),
-						'data' => array(
+						],
+						'data' => [
 							'function' => function ($package_md5) use ($type) {
 								global $context;
 
@@ -1063,18 +1042,18 @@ class Packages extends AbstractController
 
 								return '';
 							},
-						),
-						'sort' => array(
+						],
+						'sort' => [
 							'default' => 'name',
 							'reverse' => 'name',
-						),
-					),
-					'version' . $type => array(
-						'header' => array(
+						],
+					],
+					'version' . $type => [
+						'header' => [
 							'value' => $txt['mod_version'],
 							'style' => 'width: 25%;',
-						),
-						'data' => array(
+						],
+						'data' => [
 							'function' => function ($package_md5) use ($type) {
 								global $context;
 
@@ -1085,17 +1064,38 @@ class Packages extends AbstractController
 
 								return '';
 							},
-						),
-						'sort' => array(
+						],
+						'sort' => [
 							'default' => 'version',
 							'reverse' => 'version',
-						),
-					),
-					'operations' . $type => array(
-						'header' => array(
+						],
+					],
+					'time_installed' . $type => [
+						'header' => [
+							'value' => $txt['package_installed_on'],
+						],
+						'data' => [
+							'function' => function($package_md5) use ($type, $txt) {
+								global $context;
+
+								if (!empty($context['available_' . $type][$package_md5]['time_installed']))
+								{
+									return htmlTime($context['available_' . $type][$package_md5]['time_installed']);
+								}
+
+								return $txt['not_applicable'];
+							},
+						],
+						'sort' => [
+							'default' => 'time_installed',
+							'reverse' => 'time_installed',
+						],
+					],
+					'operations' . $type => [
+						'header' => [
 							'value' => '',
-						),
-						'data' => array(
+						],
+						'data' => [
 							'function' => function ($package_md5) use ($type) {
 								global $context, $txt;
 
@@ -1141,19 +1141,19 @@ class Packages extends AbstractController
 										: '') . '>' . $txt['package_delete'] . '</a>';
 							},
 							'class' => 'righttext',
-						),
-					),
-				),
-				'additional_rows' => array(
-					array(
+						],
+					],
+				],
+				'additional_rows' => [
+					[
 						'position' => 'bottom_of_list',
 						'class' => 'submitbutton',
 						'value' => ($context['sub_action'] === 'browse'
 							? ''
 							: '<a class="linkbutton" href="' . getUrl('admin', ['action' => 'admin', 'area' => 'packages', 'sa' => 'flush', '{session_data}']) . '" onclick="return confirm(\'' . $txt['package_delete_list_warning'] . '\');">' . $txt['delete_list'] . '</a>'),
-					),
-				),
-			);
+					],
+				],
+			];
 
 			createList($listOptions);
 		}
@@ -1175,7 +1175,7 @@ class Packages extends AbstractController
 
 		// Try to make the FTP connection.
 		$chmod_control = new PackageChmod();
-		$chmod_control->createChmodControl(array(), array('force_find_error' => true));
+		$chmod_control->createChmodControl([], ['force_find_error' => true]);
 
 		// Deal with the template stuff.
 		theme()->getTemplates()->load('Xml');
@@ -1183,21 +1183,21 @@ class Packages extends AbstractController
 		theme()->getLayers()->removeAll();
 
 		// Define the return data, this is simple.
-		$context['xml_data'] = array(
-			'results' => array(
+		$context['xml_data'] = [
+			'results' => [
 				'identifier' => 'result',
-				'children' => array(
-					array(
-						'attributes' => array(
+				'children' => [
+					[
+						'attributes' => [
 							'success' => !empty($package_ftp) ? 1 : 0,
-						),
+						],
 						'value' => !empty($package_ftp) ?
 							$txt['package_ftp_test_success']
 							: ($context['package_ftp']['error'] ?? $txt['package_ftp_test_failed']),
-					),
-				),
-			),
-		);
+					],
+				],
+			],
+		];
 	}
 
 	/**
@@ -1211,13 +1211,13 @@ class Packages extends AbstractController
 		{
 			checkSession();
 
-			updateSettings(array(
+			updateSettings([
 				'package_server' => $this->_req->getPost('pack_server', 'trim|\\ElkArte\\Util::htmlspecialchars'),
 				'package_port' => $this->_req->getPost('pack_port', 'trim|\\ElkArte\\Util::htmlspecialchars'),
 				'package_username' => $this->_req->getPost('pack_user', 'trim|\\ElkArte\\Util::htmlspecialchars'),
 				'package_make_backups' => !empty($this->_req->post->package_make_backups),
 				'package_make_full_backups' => !empty($this->_req->post->package_make_full_backups)
-			));
+			]);
 
 			redirectexit('action=admin;area=packages;sa=options');
 		}
@@ -1306,17 +1306,14 @@ class Packages extends AbstractController
 		$theme_paths = getThemesPathbyID();
 
 		// For uninstall operations we only consider the themes in which the package is installed.
-		if ($reverse && !empty($install_id))
+		if ($reverse && !empty($install_id) && $install_id > 0)
 		{
-			if ($install_id > 0)
+			$old_themes = loadThemesAffected($install_id);
+			foreach ($theme_paths as $id => $data)
 			{
-				$old_themes = loadThemesAffected($install_id);
-				foreach ($theme_paths as $id => $data)
+				if ((int) $id !== 1 && !in_array($id, $old_themes))
 				{
-					if ($id != 1 && !in_array($id, $old_themes))
-					{
-						unset($theme_paths[$id]);
-					}
+					unset($theme_paths[$id]);
 				}
 			}
 		}
@@ -1324,11 +1321,11 @@ class Packages extends AbstractController
 		$mod_actions = parseModification(@file_get_contents(BOARDDIR . '/packages/temp/' . $context['base_path'] . $this->_req->query->filename), true, $reverse, $theme_paths);
 
 		// Ok lets get the content of the file.
-		$context['operations'] = array(
-			'search' => strtr(htmlspecialchars($mod_actions[$operation_key]['search_original'], ENT_COMPAT), array('[' => '&#91;', ']' => '&#93;')),
-			'replace' => strtr(htmlspecialchars($mod_actions[$operation_key]['replace_original'], ENT_COMPAT), array('[' => '&#91;', ']' => '&#93;')),
+		$context['operations'] = [
+			'search' => strtr(htmlspecialchars($mod_actions[$operation_key]['search_original'], ENT_COMPAT), ['[' => '&#91;', ']' => '&#93;']),
+			'replace' => strtr(htmlspecialchars($mod_actions[$operation_key]['replace_original'], ENT_COMPAT), ['[' => '&#91;', ']' => '&#93;']),
 			'position' => $mod_actions[$operation_key]['position'],
-		);
+		];
 
 		// Let's do some formatting...
 		$operation_text = $context['operations']['position'] === 'replace' ? 'operation_replace' : ($context['operations']['position'] === 'before' ? 'operation_after' : 'operation_before');
@@ -1351,12 +1348,11 @@ class Packages extends AbstractController
 	 * @param int $items_per_page The number of items to show per page
 	 * @param string $sort A string indicating how to sort the results
 	 * @param string $params 'type' type of package
-	 * @param bool $installed
 	 *
 	 * @return mixed
-	 * @throws \ElkArte\Exceptions\Exception
+	 * @throws Exception
 	 */
-	public function list_packages($start, $items_per_page, $sort, $params, $installed)
+	public function list_packages($start, $items_per_page, $sort, $params)
 	{
 		global $context;
 		static $instadds, $packages;
@@ -1364,7 +1360,7 @@ class Packages extends AbstractController
 		// Start things up
 		if (!isset($packages[$params]))
 		{
-			$packages[$params] = array();
+			$packages[$params] = [];
 		}
 
 		// We need the packages directory to be writable for this.
@@ -1372,18 +1368,18 @@ class Packages extends AbstractController
 		{
 			$create_chmod_control = new PackageChmod();
 			$create_chmod_control->createChmodControl(
-				array(BOARDDIR . '/packages'),
-				array(
+				[BOARDDIR . '/packages'],
+				[
 					'destination_url' =>getUrl('admin', ['action' => 'admin', 'area' => 'packages']),
 					'crash_on_error' => true
-				)
+				]
 			);
 		}
 
 		list ($the_brand, $the_version) = explode(' ', FORUM_VERSION, 2);
 
 		// Here we have a little code to help those who class themselves as something of gods, version emulation ;)
-		if (isset($this->_req->query->version_emulate) && strtr($this->_req->query->version_emulate, array($the_brand => '')) == $the_version)
+		if (isset($this->_req->query->version_emulate) && strtr($this->_req->query->version_emulate, [$the_brand => '']) == $the_version)
 		{
 			unset($_SESSION['version_emulate']);
 		}
@@ -1396,7 +1392,7 @@ class Packages extends AbstractController
 			}
 			elseif ($this->_req->query->version_emulate !== 0)
 			{
-				$_SESSION['version_emulate'] = strtr($this->_req->query->version_emulate, array('-' => ' ', '+' => ' ', $the_brand . ' ' => ''));
+				$_SESSION['version_emulate'] = strtr($this->_req->query->version_emulate, ['-' => ' ', '+' => ' ', $the_brand . ' ' => '']);
 			}
 		}
 
@@ -1414,60 +1410,43 @@ class Packages extends AbstractController
 		if (empty($instadds))
 		{
 			$instadds = loadInstalledPackages();
-			$installed_adds = array();
+			$installed_adds = [];
 
 			// Look through the list of installed mods...
 			foreach ($instadds as $installed_add)
 			{
-				$installed_adds[$installed_add['package_id']] = array(
+				$installed_adds[$installed_add['package_id']] = [
 					'id' => $installed_add['id'],
 					'version' => $installed_add['version'],
-				);
+					'time_installed' => $installed_add['time_installed'],
+				];
 			}
 
 			// Get a list of all the ids installed, so the latest packages won't include already installed ones.
 			$context['installed_adds'] = array_keys($installed_adds);
 		}
 
-		if ($installed)
-		{
-			$sort_id = 1;
-			foreach ($instadds as $installed_add)
-			{
-				$context['available_addon'][$installed_add['package_id']] = array(
-					'sort_id' => $sort_id++,
-					'can_uninstall' => true,
-					'name' => $installed_add['name'],
-					'filename' => $installed_add['filename'],
-					'installed_id' => $installed_add['id'],
-					'version' => $installed_add['version'],
-					'is_installed' => true,
-					'is_current' => true,
-				);
-			}
-		}
-
 		if (empty($packages))
 		{
 			foreach ($context['package_types'] as $type)
 			{
-				$packages[$type] = array();
+				$packages[$type] = [];
 			}
 		}
 
 		try
 		{
-			$dir = new \FilesystemIterator(BOARDDIR . '/packages', \FilesystemIterator::SKIP_DOTS);
+			$dir = new FilesystemIterator(BOARDDIR . '/packages', FilesystemIterator::SKIP_DOTS);
 			$filtered_dir = new PackagesFilterIterator($dir);
 
-			$dirs = array();
-			$sort_id = array(
+			$dirs = [];
+			$sort_id = [
 				'addon' => 1,
 				'avatar' => 1,
 				'language' => 1,
 				'smiley' => 1,
 				'unknown' => 1,
-			);
+			];
 			foreach ($filtered_dir as $package)
 			{
 				foreach ($context['package_types'] as $type)
@@ -1481,7 +1460,7 @@ class Packages extends AbstractController
 				// Skip directories or files that are named the same.
 				if ($package->isDir())
 				{
-					if (in_array($package, $dirs))
+					if (in_array($package, $dirs, true))
 					{
 						continue;
 					}
@@ -1489,7 +1468,7 @@ class Packages extends AbstractController
 				}
 				elseif (strtolower(substr($package->getFilename(), -7)) === '.tar.gz')
 				{
-					if (in_array(substr($package, 0, -7), $dirs))
+					if (in_array(substr($package, 0, -7), $dirs, true))
 					{
 						continue;
 					}
@@ -1497,7 +1476,7 @@ class Packages extends AbstractController
 				}
 				elseif (strtolower($package->getExtension()) === 'zip' || strtolower($package->getExtension()) === 'tgz')
 				{
-					if (in_array(substr($package->getBasename(), 0, -4), $dirs))
+					if (in_array(substr($package->getBasename(), 0, -4), $dirs, true))
 					{
 						continue;
 					}
@@ -1505,150 +1484,140 @@ class Packages extends AbstractController
 				}
 
 				$packageInfo = getPackageInfo($package->getFilename());
-				if (!is_array($packageInfo))
+				if (!is_array($packageInfo) || empty($packageInfo))
 				{
 					continue;
 				}
 
-				if (!empty($packageInfo))
-				{
-					$packageInfo['installed_id'] = isset($installed_adds[$packageInfo['id']]) ? $installed_adds[$packageInfo['id']]['id'] : 0;
-					$packageInfo['sort_id'] = $sort_id[$packageInfo['type']] ?? $sort_id['unknown'];
-					$packageInfo['is_installed'] = isset($installed_adds[$packageInfo['id']]);
-					$packageInfo['is_current'] = $packageInfo['is_installed'] && isset($installed_adds[$packageInfo['id']]) && ($installed_adds[$packageInfo['id']]['version'] == $packageInfo['version']);
-					$packageInfo['is_newer'] = $packageInfo['is_installed'] && isset($installed_adds[$packageInfo['id']]) && ($installed_adds[$packageInfo['id']]['version'] > $packageInfo['version']);
-					$packageInfo['can_install'] = false;
-					$packageInfo['can_uninstall'] = false;
-					$packageInfo['can_upgrade'] = false;
-					$packageInfo['can_emulate_install'] = false;
-					$packageInfo['can_emulate_uninstall'] = false;
+				$packageInfo['installed_id'] = isset($installed_adds[$packageInfo['id']]) ? $installed_adds[$packageInfo['id']]['id'] : 0;
+				$packageInfo['sort_id'] = $sort_id[$packageInfo['type']] ?? $sort_id['unknown'];
+				$packageInfo['is_installed'] = isset($installed_adds[$packageInfo['id']]);
+				$packageInfo['is_current'] = $packageInfo['is_installed'] && isset($installed_adds[$packageInfo['id']]) && ($installed_adds[$packageInfo['id']]['version'] == $packageInfo['version']);
+				$packageInfo['is_newer'] = $packageInfo['is_installed'] && isset($installed_adds[$packageInfo['id']]) && ($installed_adds[$packageInfo['id']]['version'] > $packageInfo['version']);
+				$packageInfo['can_install'] = false;
+				$packageInfo['can_uninstall'] = false;
+				$packageInfo['can_upgrade'] = false;
+				$packageInfo['can_emulate_install'] = false;
+				$packageInfo['can_emulate_uninstall'] = false;
+				$packageInfo['time_installed'] = $installed_adds[$packageInfo['id']]['time_installed'] ?? 0;
 
-					// This package is currently NOT installed.  Check if it can be.
-					if (!$packageInfo['is_installed'] && $packageInfo['xml']->exists('install'))
+				// This package is currently NOT installed.  Check if it can be.
+				if (!$packageInfo['is_installed'] && $packageInfo['xml']->exists('install'))
+				{
+					// Check if there's an install for *THIS* version
+					$installs = $packageInfo['xml']->set('install');
+					$packageInfo['time_installed'] = 0;
+					foreach ($installs as $install)
 					{
-						// Check if there's an install for *THIS* version
-						$installs = $packageInfo['xml']->set('install');
+						if (!$install->exists('@for') || matchPackageVersion($the_version, $install->fetch('@for')))
+						{
+							// Okay, this one is good to go.
+							$packageInfo['can_install'] = true;
+							break;
+						}
+					}
+
+					// no install found for our version, lets see if one exists for another
+					if ($packageInfo['can_install'] === false && $install->exists('@for') && empty($_SESSION['version_emulate']))
+					{
+						$reset = true;
+
+						// Get the highest install version that is available from the package
 						foreach ($installs as $install)
 						{
-							if (!$install->exists('@for') || matchPackageVersion($the_version, $install->fetch('@for')))
+							$packageInfo['can_emulate_install'] = matchHighestPackageVersion($install->fetch('@for'), $the_version, $reset);
+							$reset = false;
+						}
+					}
+				}
+				// An already installed, but old, package.  Can we upgrade it?
+				elseif ($packageInfo['is_installed'] && !$packageInfo['is_current'] && $packageInfo['xml']->exists('upgrade'))
+				{
+					$upgrades = $packageInfo['xml']->set('upgrade');
+
+					// First go through, and check against the current version of ElkArte.
+					foreach ($upgrades as $upgrade)
+					{
+						// Even if it is for this ElkArte, is it for the installed version of the mod?
+						if (!$upgrade->exists('@for') || matchPackageVersion($the_version, $upgrade->fetch('@for')))
+						{
+							if (!$upgrade->exists('@from') || matchPackageVersion($installed_adds[$packageInfo['id']]['version'], $upgrade->fetch('@from')))
 							{
-								// Okay, this one is good to go.
-								$packageInfo['can_install'] = true;
+								$packageInfo['can_upgrade'] = true;
 								break;
 							}
 						}
+					}
+				}
+				// Note that it has to be the current version to be uninstallable.  Shucks.
+				elseif ($packageInfo['is_installed'] && $packageInfo['is_current'] && $packageInfo['xml']->exists('uninstall'))
+				{
+					$uninstalls = $packageInfo['xml']->set('uninstall');
 
-						// no install found for our version, lets see if one exists for another
-						if ($packageInfo['can_install'] === false && $install->exists('@for') && empty($_SESSION['version_emulate']))
+					// Can we find any uninstallation methods that work for this ElkArte version?
+					foreach ($uninstalls as $uninstall)
+					{
+						if (!$uninstall->exists('@for') || matchPackageVersion($the_version, $uninstall->fetch('@for')))
 						{
-							$reset = true;
-
-							// Get the highest install version that is available from the package
-							foreach ($installs as $install)
-							{
-								$packageInfo['can_emulate_install'] = matchHighestPackageVersion($install->fetch('@for'), $the_version, $reset);
-								$reset = false;
-							}
+							$packageInfo['can_uninstall'] = true;
+							break;
 						}
 					}
-					// An already installed, but old, package.  Can we upgrade it?
-					elseif ($packageInfo['is_installed'] && !$packageInfo['is_current'] && $packageInfo['xml']->exists('upgrade'))
-					{
-						$upgrades = $packageInfo['xml']->set('upgrade');
 
-						// First go through, and check against the current version of ElkArte.
-						foreach ($upgrades as $upgrade)
-						{
-							// Even if it is for this ElkArte, is it for the installed version of the mod?
-							if (!$upgrade->exists('@for') || matchPackageVersion($the_version, $upgrade->fetch('@for')))
-							{
-								if (!$upgrade->exists('@from') || matchPackageVersion($installed_adds[$packageInfo['id']]['version'], $upgrade->fetch('@from')))
-								{
-									$packageInfo['can_upgrade'] = true;
-									break;
-								}
-							}
-						}
-					}
-					// Note that it has to be the current version to be uninstallable.  Shucks.
-					elseif ($packageInfo['is_installed'] && $packageInfo['is_current'] && $packageInfo['xml']->exists('uninstall'))
+					// No uninstall found for this version, lets see if one exists for another
+					if ($packageInfo['can_uninstall'] === false && $uninstall->exists('@for') && empty($_SESSION['version_emulate']))
 					{
-						$uninstalls = $packageInfo['xml']->set('uninstall');
+						$reset = true;
 
-						// Can we find any uninstallation methods that work for this ElkArte version?
+						// Get the highest install version that is available from the package
 						foreach ($uninstalls as $uninstall)
 						{
-							if (!$uninstall->exists('@for') || matchPackageVersion($the_version, $uninstall->fetch('@for')))
-							{
-								$packageInfo['can_uninstall'] = true;
-								break;
-							}
+							$packageInfo['can_emulate_uninstall'] = matchHighestPackageVersion($uninstall->fetch('@for'), $the_version, $reset);
+							$reset = false;
 						}
+					}
+				}
 
-						// No uninstall found for this version, lets see if one exists for another
-						if ($packageInfo['can_uninstall'] === false && $uninstall->exists('@for') && empty($_SESSION['version_emulate']))
-						{
-							$reset = true;
+				unset($packageInfo['xml']);
 
-							// Get the highest install version that is available from the package
-							foreach ($uninstalls as $uninstall)
-							{
-								$packageInfo['can_emulate_uninstall'] = matchHighestPackageVersion($uninstall->fetch('@for'), $the_version, $reset);
-								$reset = false;
-							}
-						}
-					}
-
-					// Add-on / Modification
-					if ($packageInfo['type'] === 'addon' || $packageInfo['type'] === 'modification' || $packageInfo['type'] === 'mod')
-					{
-						$sort_id['addon']++;
-						if ($installed)
-						{
-							if (!empty($context['available_addon'][$packageInfo['id']]))
-							{
-								$packages['addon'][strtolower($packageInfo[$sort]) . '_' . $sort_id['addon']] = $packageInfo['id'];
-								$context['available_addon'][$packageInfo['id']] = array_merge($context['available_addon'][$packageInfo['id']], $packageInfo);
-							}
-						}
-						else
-						{
-							$packages['addon'][strtolower($packageInfo[$sort]) . '_' . $sort_id['addon']] = md5($package->getFilename());
-							$context['available_addon'][md5($package->getFilename())] = $packageInfo;
-						}
-					}
-					// Avatar package.
-					elseif ($packageInfo['type'] === 'avatar')
-					{
-						$sort_id[$packageInfo['type']]++;
-						$packages['avatar'][strtolower($packageInfo[$sort]) . '_' . $sort_id['avatar']] = md5($package->getFilename());
-						$context['available_avatar'][md5($package->getFilename())] = $packageInfo;
-					}
-					// Smiley package.
-					elseif ($packageInfo['type'] === 'smiley')
-					{
-						$sort_id[$packageInfo['type']]++;
-						$packages['smiley'][strtolower($packageInfo[$sort]) . '_' . $sort_id['smiley']] = md5($package->getFilename());
-						$context['available_smiley'][md5($package->getFilename())] = $packageInfo;
-					}
-					// Language package.
-					elseif ($packageInfo['type'] === 'language')
-					{
-						$sort_id[$packageInfo['type']]++;
-						$packages['language'][strtolower($packageInfo[$sort]) . '_' . $sort_id['language']] = md5($package->getFilename());
-						$context['available_language'][md5($package->getFilename())] = $packageInfo;
-					}
-					// Other stuff.
-					else
-					{
-						$sort_id['unknown']++;
-						$packages['unknown'][strtolower($packageInfo[$sort]) . '_' . $sort_id['unknown']] = md5($package->getFilename());
-						$context['available_unknown'][md5($package->getFilename())] = $packageInfo;
-					}
+				// Add-on / Modification
+				if ($packageInfo['type'] === 'addon' || $packageInfo['type'] === 'modification' || $packageInfo['type'] === 'mod')
+				{
+					$sort_id['addon']++;
+					$packages['addon'][strtolower($packageInfo[$sort]) . '_' . $sort_id['addon']] = md5($package->getFilename());
+					$context['available_addon'][md5($package->getFilename())] = $packageInfo;
+				}
+				// Avatar package.
+				elseif ($packageInfo['type'] === 'avatar')
+				{
+					$sort_id[$packageInfo['type']]++;
+					$packages['avatar'][strtolower($packageInfo[$sort]) . '_' . $sort_id['avatar']] = md5($package->getFilename());
+					$context['available_avatar'][md5($package->getFilename())] = $packageInfo;
+				}
+				// Smiley package.
+				elseif ($packageInfo['type'] === 'smiley')
+				{
+					$sort_id[$packageInfo['type']]++;
+					$packages['smiley'][strtolower($packageInfo[$sort]) . '_' . $sort_id['smiley']] = md5($package->getFilename());
+					$context['available_smiley'][md5($package->getFilename())] = $packageInfo;
+				}
+				// Language package.
+				elseif ($packageInfo['type'] === 'language')
+				{
+					$sort_id[$packageInfo['type']]++;
+					$packages['language'][strtolower($packageInfo[$sort]) . '_' . $sort_id['language']] = md5($package->getFilename());
+					$context['available_language'][md5($package->getFilename())] = $packageInfo;
+				}
+				// Other stuff.
+				else
+				{
+					$sort_id['unknown']++;
+					$packages['unknown'][strtolower($packageInfo[$sort]) . '_' . $sort_id['unknown']] = md5($package->getFilename());
+					$context['available_unknown'][md5($package->getFilename())] = $packageInfo;
 				}
 			}
 		}
-		catch (\UnexpectedValueException $e)
+		catch (UnexpectedValueException $e)
 		{
 			// @todo for now do nothing...
 		}
@@ -1663,6 +1632,74 @@ class Packages extends AbstractController
 		}
 
 		return $packages[$params];
+	}
+
+	/**
+	 * Removes database changes if specified conditions are met.
+	 *
+	 * @param array $package_installed The installed package that contains the database changes.
+	 * @param TableInstaller $table_installer The object responsible for modifying database tables.
+	 *
+	 * @return void
+	 */
+	public function removeDatabaseChanges($package_installed, $table_installer): void
+	{
+		// If there's database changes - and they want them removed - let's do it last!
+		if (!empty($package_installed['db_changes']) && !empty($this->_req->post->do_db_changes))
+		{
+			foreach ($package_installed['db_changes'] as $change)
+			{
+				if ($change[0] === 'remove_table' && isset($change[1]))
+				{
+					$table_installer->drop_table($change[1]);
+				}
+				elseif ($change[0] === 'remove_column' && isset($change[2]))
+				{
+					$table_installer->remove_column($change[1], $change[2]);
+				}
+				elseif ($change[0] === 'remove_index' && isset($change[2]))
+				{
+					$table_installer->remove_index($change[1], $change[2]);
+				}
+			}
+		}
+	}
+
+	/**
+	 * Determine database changes based on the given package information and installed package.
+	 *
+	 * @param array $packageInfo The package information that may contain uninstall database changes.
+	 * @param array $package_installed The installed package that contains database changes.
+	 *
+	 * @return void
+	 */
+	public function determineDatabaseChanges($packageInfo, $package_installed)
+	{
+		global $context, $txt;
+
+		$context['database_changes'] = [];
+		if (isset($packageInfo['uninstall']['database']))
+		{
+			$context['database_changes'][] = $txt['execute_database_changes'] . ' - ' . $packageInfo['uninstall']['database'];
+		}
+		elseif (!empty($package_installed['db_changes']))
+		{
+			foreach ($package_installed['db_changes'] as $change)
+			{
+				if (isset($change[2], $txt['package_db_' . $change[0]]))
+				{
+					$context['database_changes'][] = sprintf($txt['package_db_' . $change[0]], $change[1], $change[2]);
+				}
+				elseif (isset($txt['package_db_' . $change[0]]))
+				{
+					$context['database_changes'][] = sprintf($txt['package_db_' . $change[0]], $change[1]);
+				}
+				else
+				{
+					$context['database_changes'][] = $change[0] . '-' . $change[1] . (isset($change[2]) ? '-' . $change[2] : '');
+				}
+			}
+		}
 	}
 
 	/**

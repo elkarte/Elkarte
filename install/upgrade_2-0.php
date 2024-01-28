@@ -672,4 +672,30 @@ class UpgradeInstructions_upgrade_2_0
 			)
 		);
 	}
+
+
+	public function migrate_packageserver_settings_title()
+	{
+		return 'Removing package servers table...';
+	}
+
+	public function migrate_packageserver_settings()
+	{
+		return array(
+			array(
+				'debug_title' => 'Drop Table package_servers ...',
+				'function' => function () {
+					$this->table->drop_table('{db_prefix}package_servers');
+				}
+			),
+			array(
+				'debug_title' => 'Add of package servers settings ...',
+				'function' => function () {
+					updateSettings(array(
+						'elkarte_addon_server' => 'https://elkarte.github.io/addons/package.json',
+					));
+				}
+			)
+		);
+	}
 }

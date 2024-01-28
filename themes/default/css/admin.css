@@ -372,6 +372,10 @@ h3.category_header form {
 	margin-left: 5em;
 }
 
+ul.package_section {
+	border: 1px solid;
+}
+
 #package_list li {
 	font-weight: 600;
 	padding: 0.2em;
@@ -388,6 +392,20 @@ h3.category_header form {
 	display: inline-block;
 	width: 35%;
 	min-width: 20em;
+}
+
+.package_id.details_show > i::before, .package_id.details_hide > i::before {
+	vertical-align: middle;
+	width: 1.25em;
+	height: auto;
+	display: inline-block;
+	content: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='black' fill-opacity='.7' viewBox='0 0 32 32'%3E%3Cpolygon points='16 0, 16 32, 32 16'/%3E%3C/svg%3E");
+	padding: 0 2px;
+}
+
+.package_id.details_hide > i::before {
+	vertical-align: bottom;
+	content: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='black' fill-opacity='.7' viewBox='0 0 32 32'%3E%3Cpolygon points='0 16, 32 16, 16 32'/%3E%3C/svg%3E");
 }
 
 .description, .information {

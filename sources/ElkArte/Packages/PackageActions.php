@@ -102,10 +102,10 @@ class PackageActions extends AbstractController
 	public function test_init($actions, $uninstalling, $base_path, $theme_paths)
 	{
 		// This will hold data about anything that can be installed in other themes.
-		$this->themeFinds = array(
+		$this->themeFinds = [
 			'candidates' => [],
 			'other_themes' => [],
-		);
+		];
 
 		$this->fileFunc = FileFunctions::instance();
 
@@ -135,28 +135,28 @@ class PackageActions extends AbstractController
 		require_once(SUBSDIR . '/Package.subs.php');
 
 		// Oh my
-		$subActions = array(
-			'chmod' => array($this, 'action_chmod'),
-			'license' => array($this, 'action_readme'),
-			'readme' => array($this, 'action_readme'),
-			'redirect' => array($this, 'action_redirect'),
-			'error' => array($this, 'action_error'),
-			'modification' => array($this, 'action_modification'),
-			'code' => array($this, 'action_code'),
-			'database' => array($this, 'action_database'),
-			'create-dir' => array($this, 'action_create_dir_file'),
-			'create-file' => array($this, 'action_create_dir_file'),
-			'hook' => array($this, 'action_hook'),
-			'credits' => array($this, 'action_credits'),
-			'requires' => array($this, 'action_requires'),
-			'require-dir' => array($this, 'action_require_dir_file'),
-			'require-file' => array($this, 'action_require_dir_file'),
-			'move-dir' => array($this, 'action_move_dir_file'),
-			'move-file' => array($this, 'action_move_dir_file'),
-			'remove-dir' => array($this, 'action_remove_dir_file'),
-			'remove-file' => array($this, 'action_remove_dir_file'),
-			'skip' => array($this, 'action_skip'),
-		);
+		$subActions = [
+			'chmod' => [$this, 'action_chmod'],
+			'license' => [$this, 'action_readme'],
+			'readme' => [$this, 'action_readme'],
+			'redirect' => [$this, 'action_redirect'],
+			'error' => [$this, 'action_error'],
+			'modification' => [$this, 'action_modification'],
+			'code' => [$this, 'action_code'],
+			'database' => [$this, 'action_database'],
+			'create-dir' => [$this, 'action_create_dir_file'],
+			'create-file' => [$this, 'action_create_dir_file'],
+			'hook' => [$this, 'action_hook'],
+			'credits' => [$this, 'action_credits'],
+			'requires' => [$this, 'action_requires'],
+			'require-dir' => [$this, 'action_require_dir_file'],
+			'require-file' => [$this, 'action_require_dir_file'],
+			'move-dir' => [$this, 'action_move_dir_file'],
+			'move-file' => [$this, 'action_move_dir_file'],
+			'remove-dir' => [$this, 'action_remove_dir_file'],
+			'remove-file' => [$this, 'action_remove_dir_file'],
+			'skip' => [$this, 'action_skip'],
+		];
 
 		// Set up action/subaction stuff.
 		$action = new Action('package_actions_test');
@@ -199,28 +199,43 @@ class PackageActions extends AbstractController
 
 		if (isset($this->_action['filename']))
 		{
+			$hasFailure = false;
+
 			if ($this->_uninstalling)
 			{
-				$file = in_array($this->_action['type'], array('remove-dir', 'remove-file')) ? $this->_action['filename'] : BOARDDIR . '/packages/temp/' . $this->_base_path . $this->_action['filename'];
+				$file = in_array($this->_action['type'], ['remove-dir', 'remove-file']) ? $this->_action['filename'] : BOARDDIR . '/packages/temp/' . $this->_base_path . $this->_action['filename'];
 			}
 			else
 			{
 				$file = BOARDDIR . '/packages/temp/' . $this->_base_path . $this->_action['filename'];
 			}
 
-			if (!$this->fileFunc->fileExists($file)
-				&& ($this->thisAction['type'] !== 'Create Tree' && $this->thisAction['type'] !== 'Create File'))
+			// Creating, so there must not be an existing one in the package
+			if (in_array($this->thisAction['type'], ['Create Tree', 'Create File'])
+				&& $this->fileFunc->fileExists($file))
+			{
+				$hasFailure = true;
+			}
+
+			// Move/Extract there must be an existing directory in the package
+			if (in_array($this->thisAction['type'], ['Move Tree', 'Extract Tree'])
+				&& !$this->fileFunc->isDir($file))
+			{
+				$hasFailure = true;
+			}
+
+			if ($hasFailure === true)
 			{
 				$this->has_failure = true;
 
-				$this->thisAction += array(
+				$this->thisAction += [
 					'description' => $txt['package_action_error'],
 					'failed' => true,
-				);
+				];
 			}
 		}
 
-		// @todo None given?
+		// Over-write existing description if we have an error
 		if (empty($this->thisAction['description']))
 		{
 			$this->thisAction['description'] = $this->_action['description'] ?? '';
@@ -263,15 +278,15 @@ class PackageActions extends AbstractController
 		require_once(SUBSDIR . '/Package.subs.php');
 
 		// Here is what we need to do!
-		$subActions = array(
-			'redirect' => array($this, 'action_redirect2'),
-			'modification' => array($this, 'action_modification2'),
-			'code' => array($this, 'action_code2'),
-			'database' => array($this, 'action_database2'),
-			'hook' => array($this, 'action_hook2'),
-			'credits' => array($this, 'action_credits2'),
-			'skip' => array($this, 'action_skip'),
-		);
+		$subActions = [
+			'redirect' => [$this, 'action_redirect2'],
+			'modification' => [$this, 'action_modification2'],
+			'code' => [$this, 'action_code2'],
+			'database' => [$this, 'action_database2'],
+			'hook' => [$this, 'action_hook2'],
+			'credits' => [$this, 'action_credits2'],
+			'skip' => [$this, 'action_skip'],
+		];
 
 		// No failures yet
 		$this->_failed_count = 0;
@@ -347,7 +362,6 @@ class PackageActions extends AbstractController
 	 */
 	public function action_redirect()
 	{
-		return;
 	}
 
 	/**
@@ -355,7 +369,6 @@ class PackageActions extends AbstractController
 	 */
 	public function action_skip()
 	{
-		return;
 	}
 
 	/**
@@ -391,12 +404,12 @@ class PackageActions extends AbstractController
 		if (!$this->fileFunc->fileExists(BOARDDIR . '/packages/temp/' . $this->_base_path . $this->_action['filename']))
 		{
 			$this->has_failure = true;
-			$this->ourActions[] = array(
+			$this->ourActions[] = [
 				'type' => $txt['execute_modification'],
-				'action' => Util::htmlspecialchars(strtr($this->_action['filename'], array(BOARDDIR => '.'))),
+				'action' => Util::htmlspecialchars(strtr($this->_action['filename'], [BOARDDIR => '.'])),
 				'description' => $txt['package_action_error'],
 				'failed' => true,
-			);
+			];
 		}
 		else
 		{
@@ -419,18 +432,18 @@ class PackageActions extends AbstractController
 				$this->_get_filename($mod_action, $operation_key);
 
 				// We just need it for actual parse changes.
-				if (!in_array($mod_action['type'], array('error', 'result', 'opened', 'saved', 'end', 'missing', 'skipping', 'chmod')))
+				if (!in_array($mod_action['type'], ['error', 'result', 'opened', 'saved', 'end', 'missing', 'skipping', 'chmod']))
 				{
-					$summary = array(
+					$summary = [
 						'type' => $txt['execute_modification'],
-						'action' => Util::htmlspecialchars(strtr($mod_action['filename'], array(BOARDDIR => '.'))),
+						'action' => Util::htmlspecialchars(strtr($mod_action['filename'], [BOARDDIR => '.'])),
 						'description' => $mod_action['failed'] ? $txt['package_action_failure'] : $txt['package_action_success'],
 						'position' => $mod_action['position'],
 						'operation_key' => $operation_key,
 						'filename' => $this->_action['filename'],
 						'failed' => $mod_action['failed'],
 						'ignore_failure' => !empty($mod_action['ignore_failure'])
-					);
+					];
 
 					if (empty($mod_action['is_custom']))
 					{
@@ -438,7 +451,7 @@ class PackageActions extends AbstractController
 					}
 
 					// Themes are under the saved type.
-					if (isset($mod_action['is_custom']) && isset($context['theme_actions'][$mod_action['is_custom']]))
+					if (isset($mod_action['is_custom'], $context['theme_actions'][$mod_action['is_custom']]))
 					{
 						$context['theme_actions'][$mod_action['is_custom']]['actions'][$this->_actual_filename]['operations'][] = $summary;
 					}
@@ -500,32 +513,32 @@ class PackageActions extends AbstractController
 				{
 					if (!isset($context['theme_actions'][$mod_action['is_custom']]))
 					{
-						$context['theme_actions'][$mod_action['is_custom']] = array(
+						$context['theme_actions'][$mod_action['is_custom']] = [
 							'name' => $this->_theme_paths[$mod_action['is_custom']]['name'],
 							'actions' => [],
 							'has_failure' => $this->_failure,
-						);
+						];
 					}
 					else
 					{
 						$context['theme_actions'][$mod_action['is_custom']]['has_failure'] |= $this->_failure;
 					}
 
-					$context['theme_actions'][$mod_action['is_custom']]['actions'][$this->_actual_filename] = array(
+					$context['theme_actions'][$mod_action['is_custom']]['actions'][$this->_actual_filename] = [
 						'type' => $txt['execute_modification'],
-						'action' => Util::htmlspecialchars(strtr($mod_action['filename'], array(BOARDDIR => '.'))),
+						'action' => Util::htmlspecialchars(strtr($mod_action['filename'], [BOARDDIR => '.'])),
 						'description' => $this->_failure ? $txt['package_action_failure'] : $txt['package_action_success'],
 						'failed' => $this->_failure,
-					);
+					];
 				}
 				elseif (!isset($this->ourActions[$this->_actual_filename]))
 				{
-					$this->ourActions[$this->_actual_filename] = array(
+					$this->ourActions[$this->_actual_filename] = [
 						'type' => $txt['execute_modification'],
-						'action' => Util::htmlspecialchars(strtr($mod_action['filename'], array(BOARDDIR => '.'))),
+						'action' => Util::htmlspecialchars(strtr($mod_action['filename'], [BOARDDIR => '.'])),
 						'description' => $this->_failure ? $txt['package_action_failure'] : $txt['package_action_success'],
 						'failed' => $this->_failure,
-					);
+					];
 				}
 				else
 				{
@@ -534,31 +547,31 @@ class PackageActions extends AbstractController
 				}
 				break;
 			case 'skipping':
-				$this->ourActions[$this->_actual_filename] = array(
+				$this->ourActions[$this->_actual_filename] = [
 					'type' => $txt['execute_modification'],
-					'action' => Util::htmlspecialchars(strtr($mod_action['filename'], array(BOARDDIR => '.'))),
+					'action' => Util::htmlspecialchars(strtr($mod_action['filename'], [BOARDDIR => '.'])),
 					'description' => $txt['package_action_skipping']
-				);
+				];
 				break;
 			case 'missing':
 				if (empty($mod_action['is_custom']))
 				{
 					$this->has_failure = true;
-					$this->ourActions[$this->_actual_filename] = array(
+					$this->ourActions[$this->_actual_filename] = [
 						'type' => $txt['execute_modification'],
-						'action' => Util::htmlspecialchars(strtr($mod_action['filename'], array(BOARDDIR => '.'))),
+						'action' => Util::htmlspecialchars(strtr($mod_action['filename'], [BOARDDIR => '.'])),
 						'description' => $txt['package_action_missing'],
 						'failed' => true,
-					);
+					];
 				}
 				break;
 			case 'error':
-				$this->ourActions[$this->_actual_filename] = array(
+				$this->ourActions[$this->_actual_filename] = [
 					'type' => $txt['execute_modification'],
-					'action' => Util::htmlspecialchars(strtr($mod_action['filename'], array(BOARDDIR => '.'))),
+					'action' => Util::htmlspecialchars(strtr($mod_action['filename'], [BOARDDIR => '.'])),
 					'description' => $txt['package_action_error'],
 					'failed' => true,
-				);
+				];
 				break;
 		}
 	}
@@ -573,10 +586,10 @@ class PackageActions extends AbstractController
 	{
 		global $txt;
 
-		$this->thisAction = array(
+		$this->thisAction = [
 			'type' => $txt['execute_code'],
 			'action' => Util::htmlspecialchars($this->_action['filename']),
-		);
+		];
 	}
 
 	/**
@@ -589,10 +602,10 @@ class PackageActions extends AbstractController
 	{
 		global $txt;
 
-		$this->thisAction = array(
+		$this->thisAction = [
 			'type' => $txt['execute_database_changes'],
 			'action' => Util::htmlspecialchars($this->_action['filename']),
-		);
+		];
 	}
 
 	/**
@@ -603,10 +616,10 @@ class PackageActions extends AbstractController
 	{
 		global $txt;
 
-		$this->thisAction = array(
+		$this->thisAction = [
 			'type' => $txt['package_create'] . ' ' . ($this->_action['type'] === 'create-dir' ? $txt['package_tree'] : $txt['package_file']),
-			'action' => Util::htmlspecialchars(strtr($this->_action['destination'], array(BOARDDIR => '.')))
-		);
+			'action' => Util::htmlspecialchars(strtr($this->_action['destination'], [BOARDDIR => '.']))
+		];
 	}
 
 	/**
@@ -623,10 +636,10 @@ class PackageActions extends AbstractController
 			$this->has_failure = true;
 		}
 
-		$this->thisAction = array(
+		$this->thisAction = [
 			'type' => $this->_action['reverse'] ? $txt['execute_hook_remove'] : $txt['execute_hook_add'],
 			'action' => sprintf($txt['execute_hook_action'], Util::htmlspecialchars($this->_action['hook'])),
-		);
+		];
 	}
 
 	/**
@@ -636,10 +649,10 @@ class PackageActions extends AbstractController
 	{
 		global $txt;
 
-		$this->thisAction = array(
+		$this->thisAction = [
 			'type' => $txt['execute_credits_add'],
 			'action' => sprintf($txt['execute_credits_action'], Util::htmlspecialchars($this->_action['title'])),
-		);
+		];
 	}
 
 	/**
@@ -663,16 +676,16 @@ class PackageActions extends AbstractController
 			$installed_version = checkPackageDependency($this->_action['id']);
 
 			// Do a version level check (if requested) in the most basic way
-			$version_check = (!isset($this->_action['version']) || $installed_version == $this->_action['version']);
+			$version_check = (!isset($this->_action['version']) || $installed_version === $this->_action['version']);
 		}
 
 		// Set success or failure information
 		$this->_action['description'] = ($installed_version && $version_check) ? $txt['package_action_success'] : $txt['package_action_failure'];
 		$this->has_failure = !($installed_version && $version_check);
-		$this->thisAction = array(
+		$this->thisAction = [
 			'type' => $txt['package_requires'],
 			'action' => $txt['package_check_for'] . ' ' . $this->_action['id'] . (isset($this->_action['version']) ? (' / ' . ($version_check ? $this->_action['version'] : '<span class="error">' . $this->_action['version'] . '</span>')) : ''),
-		);
+		];
 	}
 
 	/**
@@ -685,10 +698,10 @@ class PackageActions extends AbstractController
 		global $txt;
 
 		// Do this one...
-		$this->thisAction = array(
+		$this->thisAction = [
 			'type' => $txt['package_extract'] . ' ' . ($this->_action['type'] === 'require-dir' ? $txt['package_tree'] : $txt['package_file']),
-			'action' => Util::htmlspecialchars(strtr($this->_action['destination'], array(BOARDDIR => '.')))
-		);
+			'action' => Util::htmlspecialchars(strtr($this->_action['destination'], [BOARDDIR => '.']))
+		];
 
 		// Could this be theme related?
 		if (!empty($this->_action['unparsed_destination']))
@@ -708,7 +721,7 @@ class PackageActions extends AbstractController
 		if (preg_match('~^\$(languagedir|languages_dir|imagesdir|themedir|themes_dir)~i', $destination, $matches))
 		{
 			// Is the action already stated?
-			$theme_action = !empty($this->_action['theme_action']) && in_array($this->_action['theme_action'], array('no', 'yes', 'auto')) ? $this->_action['theme_action'] : 'auto';
+			$theme_action = !empty($this->_action['theme_action']) && in_array($this->_action['theme_action'], ['no', 'yes', 'auto']) ? $this->_action['theme_action'] : 'auto';
 
 			// Need to set it?
 			if ($set_destination)
@@ -717,7 +730,7 @@ class PackageActions extends AbstractController
 			}
 
 			// If it's not auto do we think we have something we can act upon?
-			if ($theme_action !== 'auto' && !in_array($matches[1], array('languagedir', 'languages_dir', 'imagesdir', 'themedir')))
+			if ($theme_action !== 'auto' && !in_array($matches[1], ['languagedir', 'languages_dir', 'imagesdir', 'themedir']))
 			{
 				$theme_action = '';
 			}
@@ -728,14 +741,14 @@ class PackageActions extends AbstractController
 			}
 
 			// So, we still want to do something?
-			if ($theme_action != '')
+			if ($theme_action !== '')
 			{
 				$this->themeFinds['candidates'][] = $this->_action;
 			}
 			// Otherwise is this is going into another theme record it.
 			elseif ($matches[1] === 'themes_dir')
 			{
-				$this->themeFinds['other_themes'][] = strtolower(strtr(parse_path($destination), array('\\' => '/')) . '/' . basename($this->_action['filename']));
+				$this->themeFinds['other_themes'][] = strtolower(strtr(parse_path($destination), ['\\' => '/']) . '/' . basename($this->_action['filename']));
 			}
 		}
 	}
@@ -749,10 +762,10 @@ class PackageActions extends AbstractController
 	{
 		global $txt;
 
-		$this->thisAction = array(
+		$this->thisAction = [
 			'type' => $txt['package_move'] . ' ' . ($this->_action['type'] === 'move-dir' ? $txt['package_tree'] : $txt['package_file']),
-			'action' => Util::htmlspecialchars(strtr($this->_action['source'], array(BOARDDIR => '.'))) . ' => ' . Util::htmlspecialchars(strtr($this->_action['destination'], array(BOARDDIR => '.')))
-		);
+			'action' => Util::htmlspecialchars(strtr($this->_action['source'], [BOARDDIR => '.'])) . ' => ' . Util::htmlspecialchars(strtr($this->_action['destination'], [BOARDDIR => '.']))
+		];
 	}
 
 	/**
@@ -764,10 +777,10 @@ class PackageActions extends AbstractController
 	{
 		global $txt;
 
-		$this->thisAction = array(
+		$this->thisAction = [
 			'type' => $txt['package_delete'] . ' ' . ($this->_action['type'] === 'remove-dir' ? $txt['package_tree'] : $txt['package_file']),
-			'action' => Util::htmlspecialchars(strtr($this->_action['filename'], array(BOARDDIR => '.')))
-		);
+			'action' => Util::htmlspecialchars(strtr($this->_action['filename'], [BOARDDIR => '.']))
+		];
 
 		// Could this be theme related?
 		if (!empty($this->_action['unparsed_filename']))
@@ -791,12 +804,12 @@ class PackageActions extends AbstractController
 			{
 				if ($this->_action['type'] === 'failure')
 				{
-					$this->failed_steps[] = array(
+					$this->failed_steps[] = [
 						'file' => $action['filename'],
 						'large_step' => $this->_failed_count,
 						'sub_step' => $key,
 						'theme' => 1,
-					);
+					];
 				}
 
 				// Gather the themes we installed into.
@@ -818,8 +831,7 @@ class PackageActions extends AbstractController
 			// This is just here as reference for what is available.
 			global $context;
 
-			// Now include the file and be done with it ;).
-			if ($this->fileFunc->fileExists(BOARDDIR . '/packages/temp/' . $this->_base_path . $this->_action['filename']))
+			if (FileFunctions::instance()->fileExists( BOARDDIR . '/packages/temp/' . $this->_base_path . $this->_action['filename']))
 			{
 				require(BOARDDIR . '/packages/temp/' . $this->_base_path . $this->_action['filename']);
 			}
@@ -834,12 +846,12 @@ class PackageActions extends AbstractController
 		if ($this->_action['type'] === 'credits')
 		{
 			// Time to build the billboard
-			$this->credits_tag = array(
+			$this->credits_tag = [
 				'url' => $this->_action['url'],
 				'license' => $this->_action['license'],
 				'copyright' => $this->_action['copyright'],
 				'title' => $this->_action['title'],
-			);
+			];
 		}
 	}
 
@@ -873,7 +885,7 @@ class PackageActions extends AbstractController
 			global $context;
 
 			// Let the file work its magic ;)
-			if ($this->fileFunc->fileExists(BOARDDIR . '/packages/temp/' . $this->_base_path . $this->_action['filename']))
+			if (FileFunctions::instance()->fileExists(BOARDDIR . '/packages/temp/' . $this->_base_path . $this->_action['filename']))
 			{
 				require(BOARDDIR . '/packages/temp/' . $this->_base_path . $this->_action['filename']);
 			}
@@ -891,18 +903,23 @@ class PackageActions extends AbstractController
 		if ($this->_action['type'] === 'redirect' && !empty($this->_action['redirect_url']))
 		{
 			$context['redirect_url'] = $this->_action['redirect_url'];
-			$context['redirect_text'] = !empty($this->_action['filename']) && $this->fileFunc->fileExists(BOARDDIR . '/packages/temp/' . $this->_base_path . $this->_action['filename'])
-				? file_get_contents(BOARDDIR . '/packages/temp/' . $this->_base_path . $this->_action['filename'])
-				: ($this->_uninstalling ? $txt['package_uninstall_done'] : $txt['package_installed_done']);
+			if (!empty($this->_action['filename']) && FileFunctions::instance()->fileExists(BOARDDIR . '/packages/temp/' . $this->_base_path . $this->_action['filename']))
+			{
+				$context['redirect_text'] = file_get_contents(BOARDDIR . '/packages/temp/' . $this->_base_path . $this->_action['filename']);
+			}
+			else
+			{
+				$context['redirect_text'] = $this->_uninstalling ? $txt['package_uninstall_done'] : $txt['package_installed_done'];
+			}
 			$context['redirect_timeout'] = $this->_action['redirect_timeout'];
 
 			// Parse out a couple of common urls.
-			$urls = array(
+			$urls = [
 				'$boardurl' => $boardurl,
 				'$scripturl' => $scripturl,
 				'$session_var' => $context['session_var'],
 				'$session_id' => $context['session_id'],
-			);
+			];
 
 			$context['redirect_url'] = strtr($context['redirect_url'], $urls);
 		}

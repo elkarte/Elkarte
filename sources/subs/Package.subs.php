@@ -146,9 +146,9 @@ function loadInstalledPackages()
 			UPDATE {db_prefix}log_packages
 			SET 
 				install_state = {int:not_installed}',
-			array(
+			[
 				'not_installed' => 0,
-			)
+			]
 		);
 
 		// Don't have anything left, so send an empty array.
@@ -157,34 +157,35 @@ function loadInstalledPackages()
 
 	// Load the packages from the database - note this is ordered by installation time to ensure
 	// latest package uninstalled first.
-	$installed = array();
-	$found = array();
+	$installed = [];
+	$found = [];
 	$db->fetchQuery('
 		SELECT 
-			id_install, package_id, filename, name, version
+			id_install, package_id, filename, name, version, time_installed
 		FROM {db_prefix}log_packages
 		WHERE install_state != {int:not_installed}
 		ORDER BY time_installed DESC',
-		array(
+		[
 			'not_installed' => 0,
-		)
+		]
 	)->fetch_callback(
 		function ($row) use (&$found, &$installed) {
 			// Already found this? If so don't add it twice!
-			if (in_array($row['package_id'], $found))
+			if (in_array((int) $row['package_id'], $found, true))
 			{
 				return;
 			}
 
-			$found[] = $row['package_id'];
+			$found[] = (int) $row['package_id'];
 
-			$installed[] = array(
-				'id' => $row['id_install'],
+			$installed[] = [
+				'id' => (int) $row['id_install'],
 				'name' => $row['name'],
 				'filename' => $row['filename'],
 				'package_id' => $row['package_id'],
 				'version' => $row['version'],
-			);
+				'time_installed' => !empty($row['time_installed']) ? $row['time_installed'] : 0,
+			];
 		}
 	);
 
@@ -199,37 +200,37 @@ function loadInstalledPackages()
  * - Otherwise returns a basic array of id, version, filename, and similar information.
  * - An \ElkArte\XmlArray is available in 'xml'.
  *
- * @param string $gzfilename
+ * @param string $gzFilename
  *
  * @return array|string error string on error array on success
  * @package Packages
  */
-function getPackageInfo($gzfilename)
+function getPackageInfo($gzFilename)
 {
-	$gzfilename = trim($gzfilename);
+	$gzFilename = trim($gzFilename);
 	$fileFunc = FileFunctions::instance();
 
 	// Extract package-info.xml from downloaded file. (*/ is used because it could be in any directory.)
-	if (preg_match('~^https?://~i', $gzfilename) === 1)
+	if (preg_match('~^https?://~i', $gzFilename) === 1)
 	{
-		$packageInfo = read_tgz_data(fetch_web_data($gzfilename, '', true), '*/package-info.xml', true);
+		$packageInfo = read_tgz_data(fetch_web_data($gzFilename, '', true), '*/package-info.xml', true);
 	}
 	else
 	{
 		// It must be in the package directory then
-		if (!$fileFunc->fileExists(BOARDDIR . '/packages/' . $gzfilename))
+		if (!$fileFunc->fileExists(BOARDDIR . '/packages/' . $gzFilename))
 		{
 			return 'package_get_error_not_found';
 		}
 
 		// Make sure a package.xml file is available
-		if ($fileFunc->fileExists(BOARDDIR . '/packages/' . $gzfilename))
+		if ($fileFunc->fileExists(BOARDDIR . '/packages/' . $gzFilename))
 		{
-			$packageInfo = read_tgz_file(BOARDDIR . '/packages/' . $gzfilename, '*/package-info.xml', true);
+			$packageInfo = read_tgz_file(BOARDDIR . '/packages/' . $gzFilename, '*/package-info.xml', true);
 		}
-		elseif ($fileFunc->fileExists(BOARDDIR . '/packages/' . $gzfilename . '/package-info.xml'))
+		elseif ($fileFunc->fileExists(BOARDDIR . '/packages/' . $gzFilename . '/package-info.xml'))
 		{
-			$packageInfo = file_get_contents(BOARDDIR . '/packages/' . $gzfilename . '/package-info.xml');
+			$packageInfo = file_get_contents(BOARDDIR . '/packages/' . $gzFilename . '/package-info.xml');
 		}
 		else
 		{
@@ -241,7 +242,7 @@ function getPackageInfo($gzfilename)
 	if (empty($packageInfo))
 	{
 		// Perhaps they are trying to install a theme, lets tell them nicely this is the wrong function
-		$packageInfo = read_tgz_file(BOARDDIR . '/packages/' . $gzfilename, '*/theme_info.xml', true);
+		$packageInfo = read_tgz_file(BOARDDIR . '/packages/' . $gzFilename, '*/theme_info.xml', true);
 		if (!empty($packageInfo))
 		{
 			return 'package_get_error_is_theme';
@@ -263,12 +264,12 @@ function getPackageInfo($gzfilename)
 	// Convert packageInfo to an array for use
 	$package = Util::htmlspecialchars__recursive($packageInfo->to_array());
 	$package['xml'] = $packageInfo;
-	$package['filename'] = $gzfilename;
+	$package['filename'] = $gzFilename;
 
 	// Set a default type if none was supplied in the package
 	if (!isset($package['type']))
 	{
-		$package['type'] = 'modification';
+		$package['type'] = 'addon';
 	}
 
 	return $package;
@@ -284,7 +285,7 @@ function getPackageInfo($gzfilename)
  * @package Packages
  * @deprecated since 2.0, use PackageChmod class
  */
-function create_chmod_control($chmodFiles = array(), $chmodOptions = array(), $restore_write_status = false)
+function create_chmod_control($chmodFiles = [], $chmodOptions = [], $restore_write_status = false)
 {
 	$create_chmod_control = new PackageChmod();
 
@@ -344,7 +345,7 @@ function list_restoreFiles($dummy1, $dummy2, $dummy3, $do_change)
 		}
 
 		// Record the results!
-		$restore_files[] = array(
+		$restore_files[] = [
 			'path' => $file,
 			'old_perms_raw' => $perms,
 			'old_perms' => substr(sprintf('%o', $perms), -4),
@@ -352,7 +353,7 @@ function list_restoreFiles($dummy1, $dummy2, $dummy3, $do_change)
 			'new_perms' => isset($new_permissions) ? substr(sprintf('%o', $new_permissions), -4) : '',
 			'result' => $result ?? '',
 			'writable_message' => '<span class="' . (@is_writable($file) ? 'success' : 'alert') . '">' . ($fileFunc->isWritable($file) ? $txt['package_file_perms_writable'] : $txt['package_file_perms_not_writable']) . '</span>',
-		);
+		];
 	}
 
 	return $restore_files;
@@ -361,7 +362,7 @@ function list_restoreFiles($dummy1, $dummy2, $dummy3, $do_change)
 /**
  * Parses the actions in package-info.xml file from packages.
  *
- * @param \ElkArte\XmlArray $packageXML
+ * @param XmlArray $packageXML
  * @param bool $testing_only = true
  * @param string $method = 'install' ('install', 'upgrade', or 'uninstall')
  * @param string $previous_version = ''
@@ -502,15 +503,15 @@ function compareVersions($version1, $version2)
 {
 	static $categories;
 
-	$versions = array();
-	foreach (array(1 => $version1, $version2) as $id => $version)
+	$versions = [];
+	foreach ([1 => $version1, $version2] as $id => $version)
 	{
 		// Clean the version and extract the version parts.
 		$clean = str_replace(' ', '', strtolower($version));
 		preg_match('~(\d+)(?:\.(\d+|))?(?:\.)?(\d+|)(?:(alpha|beta|rc)(\d+|)(?:\.)?(\d+|))?(?:\s(dev))?(\d+|)~', $clean, $parts);
 
 		// Build an array of parts.
-		$versions[$id] = array(
+		$versions[$id] = [
 			'major' => !empty($parts[1]) ? (int) $parts[1] : 0,
 			'minor' => !empty($parts[2]) ? (int) $parts[2] : 0,
 			'patch' => !empty($parts[3]) ? (int) $parts[3] : 0,
@@ -518,7 +519,7 @@ function compareVersions($version1, $version2)
 			'type_major' => !empty($parts[6]) ? (int) $parts[5] : 0,
 			'type_minor' => !empty($parts[6]) ? (int) $parts[6] : 0,
 			'dev' => !empty($parts[7]),
-		);
+		];
 	}
 
 	// Are they the same, perhaps?
@@ -577,7 +578,7 @@ function parse_path($path)
 		return '';
 	}
 
-	$dirs = array(
+	$dirs = [
 		'\\' => '/',
 		'BOARDDIR' => BOARDDIR,
 		'SOURCEDIR' => SOURCEDIR,
@@ -591,7 +592,7 @@ function parse_path($path)
 		'IMAGESDIR' => $settings['default_theme_dir'] . '/' . basename($settings['default_images_url']),
 		'LANGUAGEDIR' => SOURCEDIR . '/ElkArte/Languages',
 		'SMILEYDIR' => $modSettings['smileys_dir'],
-	);
+	];
 
 	// Do we parse in a package directory?
 	if (!empty($temp_path))
@@ -633,10 +634,10 @@ function deltree($dir, $delete_dir = true)
 	}
 
 	// Read all the files and directories in the parent directory
-	$iterator = new \RecursiveDirectoryIterator($dir, \FilesystemIterator::SKIP_DOTS);
-	$entrynames = new \RecursiveIteratorIterator($iterator, \RecursiveIteratorIterator::CHILD_FIRST, \RecursiveIteratorIterator::CATCH_GET_CHILD);
+	$iterator = new RecursiveDirectoryIterator($dir, FilesystemIterator::SKIP_DOTS);
+	$entrynames = new RecursiveIteratorIterator($iterator, RecursiveIteratorIterator::CHILD_FIRST, RecursiveIteratorIterator::CATCH_GET_CHILD);
 
-	/** @var \SplFileInfo $entryname */
+	/** @var SplFileInfo $entryname */
 	foreach ($entrynames as $entryname)
 	{
 		if ($entryname->isDir() && $delete_dir)
@@ -777,7 +778,7 @@ function mktree($strPath, $mode = true)
 		{
 			return $fileFunc->createDirectory($strPath, false);
 		}
-		catch (\Exception $e)
+		catch (Exception $e)
 		{
 			return false;
 		}
@@ -833,7 +834,7 @@ function copytree($source, $destination)
 		{
 			$fileFunc->createDirectory($destination, false);
 		}
-		catch (\Exception $e)
+		catch (Exception $e)
 		{
 			return;
 		}
@@ -848,7 +849,7 @@ function copytree($source, $destination)
 	// Copy the files over by whatever means we have enabled
 	while (($entryname = readdir($current_dir)))
 	{
-		if (in_array($entryname, array('.', '..')))
+		if (in_array($entryname, ['.', '..']))
 		{
 			continue;
 		}
@@ -900,23 +901,23 @@ function copytree($source, $destination)
  * @return array an array of those changes made.
  * @package Packages
  */
-function parseModification($file, $testing = true, $undo = false, $theme_paths = array())
+function parseModification($file, $testing = true, $undo = false, $theme_paths = [])
 {
 	global $txt, $modSettings;
 
 	detectServer()->setTimeLimit(600);
 
-	$xml = new XmlArray(strtr($file, array("\r" => '')));
-	$actions = array();
+	$xml = new XmlArray(strtr($file, ["\r" => '']));
+	$actions = [];
 	$everything_found = true;
 
 	if (!$xml->exists('modification') || !$xml->exists('modification/file'))
 	{
-		$actions[] = array(
+		$actions[] = [
 			'type' => 'error',
 			'filename' => '-',
 			'debug' => $txt['package_modification_malformed']
-		);
+		];
 
 		return $actions;
 	}
@@ -925,10 +926,10 @@ function parseModification($file, $testing = true, $undo = false, $theme_paths =
 	$files = $xml->set('modification/file');
 
 	// Use this for holding all the template changes in this mod.
-	$template_changes = array();
+	$template_changes = [];
 
 	// This is needed to hold the long paths, as they can vary...
-	$long_changes = array();
+	$long_changes = [];
 
 	// First, we need to build the list of all the files likely to get changed.
 	foreach ($files as $file)
@@ -955,7 +956,7 @@ function parseModification($file, $testing = true, $undo = false, $theme_paths =
 	}
 
 	// Custom themes to add.
-	$custom_themes_add = array();
+	$custom_themes_add = [];
 
 	// If we have some template changes, we need to build a master link of what new ones are required for the custom themes.
 	if (!empty($template_changes[1]))
@@ -984,9 +985,9 @@ function parseModification($file, $testing = true, $undo = false, $theme_paths =
 	foreach ($files as $file)
 	{
 		// This is the actual file referred to in the XML document...
-		$files_to_change = array(
+		$files_to_change = [
 			1 => parse_path(trim($file->fetch('@name'))),
-		);
+		];
 
 		// Sometimes though, we have some additional files for other themes, if we have add them to the mix.
 		if (isset($custom_themes_add[$files_to_change[1]]))
@@ -1005,13 +1006,13 @@ function parseModification($file, $testing = true, $undo = false, $theme_paths =
 			}
 
 			// Doesn't exist - give an error or what?
-			if (!file_exists($working_file) && (!$file->exists('@error') || !in_array(trim($file->fetch('@error')), array('ignore', 'skip'))))
+			if (!file_exists($working_file) && (!$file->exists('@error') || !in_array(trim($file->fetch('@error')), ['ignore', 'skip'])))
 			{
-				$actions[] = array(
+				$actions[] = [
 					'type' => 'missing',
 					'filename' => $working_file,
 					'debug' => $txt['package_modification_missing']
-				);
+				];
 
 				$everything_found = false;
 				continue;
@@ -1019,10 +1020,10 @@ function parseModification($file, $testing = true, $undo = false, $theme_paths =
 			// Skip the file if it doesn't exist.
 			elseif (!file_exists($working_file) && $file->exists('@error') && trim($file->fetch('@error')) === 'skip')
 			{
-				$actions[] = array(
+				$actions[] = [
 					'type' => 'skipping',
 					'filename' => $working_file,
-				);
+				];
 				continue;
 			}
 			// Okay, we're creating this file then...?
@@ -1036,19 +1037,19 @@ function parseModification($file, $testing = true, $undo = false, $theme_paths =
 				$working_data = str_replace("\r", '', package_get_contents($working_file));
 			}
 
-			$actions[] = array(
+			$actions[] = [
 				'type' => 'opened',
 				'filename' => $working_file
-			);
+			];
 
-			$operations = $file->exists('operation') ? $file->set('operation') : array();
+			$operations = $file->exists('operation') ? $file->set('operation') : [];
 			foreach ($operations as $operation)
 			{
 				// Convert operation to an array.
-				$actual_operation = array(
-					'searches' => array(),
-					'error' => $operation->exists('@error') && in_array(trim($operation->fetch('@error')), array('ignore', 'fatal', 'required')) ? trim($operation->fetch('@error')) : 'fatal',
-				);
+				$actual_operation = [
+					'searches' => [],
+					'error' => $operation->exists('@error') && in_array(trim($operation->fetch('@error')), ['ignore', 'fatal', 'required']) ? trim($operation->fetch('@error')) : 'fatal',
+				];
 
 				// The 'add' parameter is used for all searches in this operation.
 				$add = $operation->exists('add') ? $operation->fetch('add') : '';
@@ -1057,26 +1058,26 @@ function parseModification($file, $testing = true, $undo = false, $theme_paths =
 				$searches = $operation->set('search');
 				foreach ($searches as $i => $search)
 				{
-					$actual_operation['searches'][] = array(
-						'position' => $search->exists('@position') && in_array(trim($search->fetch('@position')), array('before', 'after', 'replace', 'end')) ? trim($search->fetch('@position')) : 'replace',
+					$actual_operation['searches'][] = [
+						'position' => $search->exists('@position') && in_array(trim($search->fetch('@position')), ['before', 'after', 'replace', 'end']) ? trim($search->fetch('@position')) : 'replace',
 						'is_reg_exp' => $search->exists('@regexp') && trim($search->fetch('@regexp')) === 'true',
 						'loose_whitespace' => $search->exists('@whitespace') && trim($search->fetch('@whitespace')) === 'loose',
 						'search' => $search->fetch('.'),
 						'add' => $add,
 						'preg_search' => '',
 						'preg_replace' => '',
-					);
+					];
 				}
 
 				// At least one search should be defined.
 				if (empty($actual_operation['searches']))
 				{
-					$actions[] = array(
+					$actions[] = [
 						'type' => 'failure',
 						'filename' => $working_file,
 						'search' => $search['search'],
 						'is_custom' => $theme > 1 ? $theme : 0,
-					);
+					];
 
 					// Skip to the next operation.
 					continue;
@@ -1092,12 +1093,12 @@ function parseModification($file, $testing = true, $undo = false, $theme_paths =
 						{
 							if ($actual_operation['error'] === 'fatal')
 							{
-								$actions[] = array(
+								$actions[] = [
 									'type' => 'failure',
 									'filename' => $working_file,
 									'search' => $search['search'],
 									'is_custom' => $theme > 1 ? $theme : 0,
-								);
+								];
 							}
 
 							// Continue to the next operation.
@@ -1132,7 +1133,7 @@ function parseModification($file, $testing = true, $undo = false, $theme_paths =
 				// Sort the search list so the replaces come before the add before/after's.
 				if (count($actual_operation['searches']) !== 1)
 				{
-					$replacements = array();
+					$replacements = [];
 
 					foreach ($actual_operation['searches'] as $i => $search)
 					{
@@ -1166,7 +1167,7 @@ function parseModification($file, $testing = true, $undo = false, $theme_paths =
 					}
 
 					// Shuzzup.  This is done so we can safely use a regular expression. ($0 is bad!!)
-					$actual_operation['searches'][$i]['preg_replace'] = strtr($search['add'], array('$' => '[$PACKAGE1$]', '\\' => '[$PACKAGE2$]'));
+					$actual_operation['searches'][$i]['preg_replace'] = strtr($search['add'], ['$' => '[$PACKAGE1$]', '\\' => '[$PACKAGE2$]']);
 
 					// Before, so the replacement comes after the search subject :P
 					if ($search['position'] === 'before')
@@ -1203,7 +1204,7 @@ function parseModification($file, $testing = true, $undo = false, $theme_paths =
 					if (($failed && $actual_operation['error'] === 'fatal')
 						|| (!$failed && $actual_operation['error'] === 'required'))
 					{
-						$actions[] = array(
+						$actions[] = [
 							'type' => 'failure',
 							'filename' => $working_file,
 							'search' => $actual_operation['searches'][$i]['preg_search'],
@@ -1212,7 +1213,7 @@ function parseModification($file, $testing = true, $undo = false, $theme_paths =
 							'position' => $search['position'],
 							'is_custom' => $theme > 1 ? $theme : 0,
 							'failed' => $failed,
-						);
+						];
 
 						$everything_found = false;
 						continue;
@@ -1227,7 +1228,7 @@ function parseModification($file, $testing = true, $undo = false, $theme_paths =
 					// Finally, we're doing some replacements.
 					$working_data = preg_replace('~' . $actual_operation['searches'][$i]['preg_search'] . '~s', $actual_operation['searches'][$i]['preg_replace'], $working_data, 1);
 
-					$actions[] = array(
+					$actions[] = [
 						'type' => 'replace',
 						'filename' => $working_file,
 						'search' => $actual_operation['searches'][$i]['preg_search'],
@@ -1238,22 +1239,22 @@ function parseModification($file, $testing = true, $undo = false, $theme_paths =
 						'failed' => $failed,
 						'ignore_failure' => $failed && $actual_operation['error'] === 'ignore',
 						'is_custom' => $theme > 1 ? $theme : 0,
-					);
+					];
 				}
 			}
 
 			// Fix any little helper symbols ;).
-			$working_data = strtr($working_data, array('[$PACKAGE1$]' => '$', '[$PACKAGE2$]' => '\\'));
+			$working_data = strtr($working_data, ['[$PACKAGE1$]' => '$', '[$PACKAGE2$]' => '\\']);
 
 			$packageChmod = new PackageChmod();
 			$packageChmod->pkgChmod($working_file);
 
 			if ((file_exists($working_file) && !is_writable($working_file)) || (!file_exists($working_file) && !is_writable(dirname($working_file))))
 			{
-				$actions[] = array(
+				$actions[] = [
 					'type' => 'chmod',
 					'filename' => $working_file
-				);
+				];
 			}
 
 			if (basename($working_file) === 'Settings_bak.php')
@@ -1277,18 +1278,18 @@ function parseModification($file, $testing = true, $undo = false, $theme_paths =
 			// Always call this, even if in testing, because it won't really be written in testing mode.
 			package_put_contents($working_file, $working_data, $testing);
 
-			$actions[] = array(
+			$actions[] = [
 				'type' => 'saved',
 				'filename' => $working_file,
 				'is_custom' => $theme > 1 ? $theme : 0,
-			);
+			];
 		}
 	}
 
-	$actions[] = array(
+	$actions[] = [
 		'type' => 'result',
 		'status' => $everything_found
-	);
+	];
 
 	return $actions;
 }
@@ -1311,7 +1312,7 @@ function package_get_contents($filename)
 		// Windows doesn't seem to care about the memory_limit.
 		if (!empty($modSettings['package_disable_cache']) || $mem_check || strpos(PHP_OS_FAMILY, 'Win') !== false)
 		{
-			$package_cache = array();
+			$package_cache = [];
 		}
 		else
 		{
@@ -1344,9 +1345,9 @@ function package_get_contents($filename)
  */
 function package_put_contents($filename, $data, $testing = false)
 {
-	/** @var $package_ftp \ElkArte\Http\FtpConnection */
+	/** @var $package_ftp FtpConnection */
 	global $package_ftp, $package_cache, $modSettings;
-	static $text_filetypes = array('php', 'txt', 'js', 'css', 'vbs', 'html', 'htm', 'log', 'xml', 'csv');
+	static $text_filetypes = ['php', 'txt', 'js', 'css', 'vbs', 'html', 'htm', 'log', 'xml', 'csv'];
 
 	if (!isset($package_cache))
 	{
@@ -1355,7 +1356,7 @@ function package_put_contents($filename, $data, $testing = false)
 
 		if (!empty($modSettings['package_disable_cache']) || $mem_check || strpos(PHP_OS_FAMILY, 'Win') !== false)
 		{
-			$package_cache = array();
+			$package_cache = [];
 		}
 		else
 		{
@@ -1424,7 +1425,7 @@ function package_put_contents($filename, $data, $testing = false)
 function package_flush_cache($trash = false)
 {
 	global $package_ftp, $package_cache;
-	static $text_filetypes = array('php', 'txt', 'js', 'css', 'vbs', 'html', 'htm', 'log', 'xml', 'csv');
+	static $text_filetypes = ['php', 'txt', 'js', 'css', 'vbs', 'html', 'htm', 'log', 'xml', 'csv'];
 
 	if (empty($package_cache))
 	{
@@ -1476,7 +1477,7 @@ function package_flush_cache($trash = false)
 
 	if ($trash)
 	{
-		$package_cache = array();
+		$package_cache = [];
 
 		return;
 	}
@@ -1492,7 +1493,7 @@ function package_flush_cache($trash = false)
 		}
 	}
 
-	$package_cache = array();
+	$package_cache = [];
 }
 
 /**
@@ -1528,8 +1529,8 @@ function package_create_backup($id = 'backup')
 	$fileFunc = FileFunctions::instance();
 
 	// The files that reside outside of sources, in the base, we add manually
-	$base_files = array('index.php', 'SSI.php', 'subscriptions.php',
-						'email_imap_cron.php', 'emailpost.php', 'emailtopic.php');
+	$base_files = ['index.php', 'SSI.php', 'subscriptions.php',
+						'email_imap_cron.php', 'emailpost.php', 'emailtopic.php'];
 	foreach ($base_files as $file)
 	{
 		if ($fileFunc->fileExists(BOARDDIR . '/' . $file))
@@ -1539,9 +1540,9 @@ function package_create_backup($id = 'backup')
 	}
 
 	// Root directory where most of our files reside
-	$dirs = array(
+	$dirs = [
 		SOURCEDIR => $use_relative_paths ? 'sources/' : strtr(SOURCEDIR . '/', '\\', '/')
-	);
+	];
 
 	// Find all installed theme directories
 	$db->fetchQuery('
@@ -1550,10 +1551,10 @@ function package_create_backup($id = 'backup')
 		FROM {db_prefix}themes
 		WHERE id_member = {int:no_member}
 			AND variable = {string:theme_dir}',
-		array(
+		[
 			'no_member' => 0,
 			'theme_dir' => 'theme_dir',
-		)
+		]
 	)->fetch_callback(
 		function ($row) use (&$dirs, $use_relative_paths) {
 			$dirs[$row['value']] = $use_relative_paths ? 'themes/' . basename($row['value']) . '/' : strtr($row['value'] . '/', '\\', '/');
@@ -1746,13 +1747,13 @@ function isPackageInstalled($id, $install_id = null)
 {
 	$db = database();
 
-	$result = array(
+	$result = [
 		'package_id' => null,
 		'install_state' => null,
 		'old_themes' => null,
 		'old_version' => null,
-		'db_changes' => array()
-	);
+		'db_changes' => []
+	];
 
 	if (empty($id))
 	{
@@ -1769,20 +1770,20 @@ function isPackageInstalled($id, $install_id = null)
 			' . (!empty($install_id) ? ' AND id_install = {int:install_id} ' : '') . '
 		ORDER BY time_installed DESC
 		LIMIT 1',
-		array(
+		[
 			'not_installed' => 0,
 			'current_package' => $id,
 			'install_id' => $install_id,
-		)
+		]
 	)->fetch_callback(
 		function ($row) use (&$result) {
-			$result = array(
+			$result = [
 				'old_themes' => explode(',', $row['themes_installed']),
 				'old_version' => $row['version'],
-				'db_changes' => empty($row['db_changes']) ? array() : Util::unserialize($row['db_changes']),
+				'db_changes' => empty($row['db_changes']) ? [] : Util::unserialize($row['db_changes']),
 				'package_id' => $row['package_id'],
 				'install_state' => $row['install_state'],
-			);
+			];
 		}
 	);
 
@@ -1807,14 +1808,14 @@ function setPackageState($id, $install_id)
 			id_member_removed = {int:current_member}, time_removed = {int:current_time}
 		WHERE package_id = {string:package_id}
 			AND id_install = {int:install_id}',
-		array(
+		[
 			'current_member' => User::$info->id,
 			'not_installed' => 0,
 			'current_time' => time(),
 			'package_id' => $id,
 			'member_name' => User::$info->name,
 			'install_id' => $install_id,
-		)
+		]
 	);
 }
 
@@ -1840,10 +1841,10 @@ function checkPackageDependency($id)
 			AND install_state != {int:not_installed}
 		ORDER BY time_installed DESC
 		LIMIT 1',
-		array(
+		[
 			'not_installed' => 0,
 			'current_package' => $id,
-		)
+		]
 	)->fetch_callback(
 		function ($row) use (&$version) {
 			$version = $row['version'];
@@ -1869,19 +1870,19 @@ function addPackageLog($packageInfo, $failed_step_insert, $themes_installed, $db
 	$db = database();
 
 	$db->insert('', '{db_prefix}log_packages',
-		array(
+		[
 			'filename' => 'string', 'name' => 'string', 'package_id' => 'string', 'version' => 'string',
 			'id_member_installed' => 'int', 'member_installed' => 'string', 'time_installed' => 'int',
 			'install_state' => 'int', 'failed_steps' => 'string', 'themes_installed' => 'string',
 			'member_removed' => 'int', 'db_changes' => 'string', 'credits' => 'string',
-		),
-		array(
+		],
+		[
 			$packageInfo['filename'], $packageInfo['name'], $packageInfo['id'], $packageInfo['version'],
 			User::$info->id, User::$info->name, time(),
 			$is_upgrade ? 2 : 1, $failed_step_insert, $themes_installed,
 			0, $db_changes, $credits_tag,
-		),
-		array('id_install')
+		],
+		['id_install']
 	);
 }
 
@@ -1898,41 +1899,10 @@ function setPackagesAsUninstalled()
 	$db->query('', '
 		UPDATE {db_prefix}log_packages
 		SET install_state = {int:not_installed}',
-		array(
+		[
 			'not_installed' => 0,
-		)
+		]
 	);
-}
-
-/**
- * Validates that the remote url is one of our known package servers
- *
- * @param string $remote_url
- *
- * @return bool
- * @package Packages
- *
- */
-function isAuthorizedServer($remote_url)
-{
-	global $modSettings;
-
-	// Know addon servers
-	$servers = Util::unserialize($modSettings['authorized_package_servers']);
-	if (empty($servers))
-	{
-		return false;
-	}
-
-	foreach ($servers as $server)
-	{
-		if (preg_match('~^' . preg_quote($server) . '~', $remote_url) == 0)
-		{
-			return true;
-		}
-	}
-
-	return false;
 }
 
 /**
