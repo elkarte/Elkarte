@@ -2080,34 +2080,6 @@ class InstallInstructions_install_2_0
 		);
 	}
 
-	public function table_package_servers()
-	{
-		return $this->table->create_table('{db_prefix}package_servers',
-			array(
-				array('name' => 'id_server', 'type' => 'smallint', 'size' => 5, 'unsigned' => true, 'auto' => true),
-				array('name' => 'name',      'type' => 'varchar', 'size' => 255, 'default' => ''),
-				array('name' => 'url',       'type' => 'varchar', 'size' => 255, 'default' => ''),
-			),
-			array(
-				array('name' => 'id_server', 'columns' => array('id_server'), 'type' => 'primary'),
-			),
-			array(),
-			'ignore'
-		);
-	}
-
-	public function insert_package_servers()
-	{
-		return $this->db->insert('ignore',
-			'{db_prefix}package_servers',
-			array('name' => 'string', 'url' => 'string'),
-			array(
-				array('ElkArte Third-party Add-ons Site', 'https://elkarte.github.io/addons/package.json'),
-			),
-			array('id_server')
-		);
-	}
-
 	public function table_pending_notifications()
 	{
 		return $this->table->create_table('{db_prefix}pending_notifications',
@@ -2696,6 +2668,7 @@ class InstallInstructions_install_2_0
 				array('usernotif_favicon_type', 'circle'),
 				array('secureCookies', '1'),
 				array('httponlyCookies', '1'),
+				array('elkarte_addon_server', 'https://elkarte.github.io/addons/package.json'),
 			),
 			array('variable')
 		);
