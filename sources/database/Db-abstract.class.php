@@ -12,7 +12,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.1.9
+ * @version 1.1.10
  *
  */
 
@@ -71,7 +71,7 @@ abstract class Database_Abstract implements Database
 	 * Callback for preg_replace_callback on the query.
 	 * It allows to replace on the fly a few pre-defined strings, for
 	 * convenience ('query_see_board', 'query_wanna_see_board'), with
-	 * their current values from $user_info.
+	 * their current values from $user_info.  If not defined will deny with 0=1
 	 * In addition, it performs checks and sanitation on the values
 	 * sent to the database.
 	 *
@@ -90,10 +90,10 @@ abstract class Database_Abstract implements Database
 			return $db_prefix;
 
 		if ($matches[1] === 'query_see_board')
-			return $user_info['query_see_board'];
+			return $user_info['query_see_board'] ?? '0=1';
 
 		if ($matches[1] === 'query_wanna_see_board')
-			return $user_info['query_wanna_see_board'];
+			return $user_info['query_wanna_see_board'] ?? '0=1';
 
 		if (!isset($matches[2]))
 			$this->error_backtrace('Invalid value inserted or no type specified.', '', E_USER_ERROR, __FILE__, __LINE__);
