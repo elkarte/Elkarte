@@ -13,7 +13,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.1.9
+ * @version 1.1.10
  *
  */
 
@@ -470,7 +470,7 @@ class Register_Controller extends Action_Controller
 				if ($is_valid !== true)
 				{
 					$err_params = array($row['name']);
-					if ($is_valid === 'custom_field_not_number')
+					if ($is_valid === 'custom_field_too_long')
 						$err_params[] = $row['field_length'];
 
 					$reg_errors->addError(array($is_valid, $err_params));
