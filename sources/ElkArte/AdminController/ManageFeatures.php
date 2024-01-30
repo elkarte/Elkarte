@@ -571,7 +571,7 @@ class ManageFeatures extends AbstractController
 
 			require_once(SUBSDIR . '/Mentions.subs.php');
 			$enabled_mentions = array();
-			$current_settings = unserialize($modSettings['notification_methods']);
+			$current_settings = Util::unserialize($modSettings['notification_methods']);
 
 			// Fist hide what was visible
 			$modules_toggle = array('enable' => array(), 'disable' => array());
@@ -1373,7 +1373,7 @@ class ManageFeatures extends AbstractController
 			if (empty($context['fid']))
 			{
 				$colname = Util::substr(strtr($this->_req->post->field_name, array(' ' => '')), 0, 6);
-				preg_match('~([\w\d_-]+)~', $colname, $matches);
+				preg_match('~([\w_-]+)~', $colname, $matches);
 
 				// If there is nothing to the name, then let's start our own - for foreign languages etc.
 				if (isset($matches[1]))
