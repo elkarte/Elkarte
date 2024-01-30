@@ -14,6 +14,10 @@
 
 namespace ElkArte;
 
+use BBC\ParserWrapper;
+use ElkArte\Cache\Cache;
+use ElkArte\Database\QueryInterface;
+
 /**
  * This class loads all the data related to a certain member or
  * set of members taken from the db
@@ -26,14 +30,14 @@ class MemberLoader
 	public const SET_NORMAL = 'normal';
 	/** @var string What is required to see a profile page */
 	public const SET_PROFILE = 'profile';
-	/** @var \ElkArte\Database\QueryInterface */
-	protected $db = null;
-	/** @var \ElkArte\Cache\Cache */
-	protected $cache = null;
-	/** @var \BBC\ParserWrapper */
-	protected $bbc_parser = null;
-	/** @var \ElkArte\MembersList */
-	protected $users_list = null;
+	/** @var QueryInterface */
+	protected $db;
+	/** @var Cache */
+	protected $cache;
+	/** @var ParserWrapper */
+	protected $bbc_parser;
+	/** @var MembersList */
+	protected $users_list;
 	/** @var mixed[] */
 	protected $options = [
 		'titlesEnable' => false,
@@ -51,17 +55,17 @@ class MemberLoader
 	protected $base_select_tables = '';
 	/** @var int[] member ids that have been loaded */
 	protected $loaded_ids = [];
-	/** @var \ElkArte\Member[] */
+	/** @var Member[] */
 	protected $loaded_members = [];
 
 	/**
 	 * Initialize the class
 	 *
-	 * @param \ElkArte\Database\QueryInterface $db The object to query the database
-	 * @param \ElkArte\Cache\Cache $cache Cache object used to... well cache content of each member
-	 * @param \BBC\ParserWrapper $bbc_parser BBC parser to convert BBC to HTML
-	 * @param \ElkArte\MembersList $list the instance of the list of members
-	 * @param mixed[] $options Random options useful to the loader to decide what to actually load
+	 * @param QueryInterface $db The object to query the database
+	 * @param Cache $cache Cache object used to... well cache content of each member
+	 * @param ParserWrapper $bbc_parser BBC parser to convert BBC to HTML
+	 * @param MembersList $list the instance of the list of members
+	 * @param array $options Random options useful to the loader to decide what to actually load
 	 */
 	public function __construct($db, $cache, $bbc_parser, $list, $options = [])
 	{
@@ -213,6 +217,7 @@ class MemberLoader
 			)
 		)->fetch_callback(
 			function ($row) use (&$new_loaded_ids) {
+				$row['id_member'] = (int) $row['id_member'];
 				$new_loaded_ids[] = $row['id_member'];
 				$this->loaded_ids[] = $row['id_member'];
 				$row['options'] = array();
@@ -258,10 +263,11 @@ class MemberLoader
 		)->fetch_callback(
 			function ($row) use (&$data) {
 				$key = 0;
+				$row['id_member'] = (int) $row['id_member'];
 				if (!empty($row['field_options']))
 				{
 					$field_options = explode(',', $row['field_options']);
-					$key = (int) array_search($row['value'], $field_options);
+					$key = (int) array_search($row['value'], $field_options, true);
 				}
 
 				$data[$row['id_member']][$row['variable'] . '_key'] = $row['variable'] . '_' . $key;
@@ -318,7 +324,7 @@ class MemberLoader
 			foreach ($temp_mods as $id)
 			{
 				// By popular demand, don't show admins or global moderators as moderators.
-				if ($this->loaded_members[$id]['id_group'] != 1 && $this->loaded_members[$id]['id_group'] != 2)
+				if ($this->loaded_members[$id]['id_group'] !== 1 && $this->loaded_members[$id]['id_group'] !== 2)
 				{
 					$this->loaded_members[$id]['member_group'] = $group_info['group_name'];
 				}
