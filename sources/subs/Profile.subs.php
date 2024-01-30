@@ -84,7 +84,7 @@ function currentMemberID($fatal = true, $reload_id = false)
 /**
  * Set the context for a page load!
  *
- * @param mixed[] $fields
+ * @param array $fields
  * @param string $hook a string that represent the hook that can be used to operate on $fields
  */
 function setupProfileContext($fields, $hook = '')
@@ -102,7 +102,7 @@ function setupProfileContext($fields, $hook = '')
 	// First check for any linked sets.
 	foreach ($profile_fields as $key => $field)
 	{
-		if (isset($field['link_with']) && in_array($field['link_with'], $fields))
+		if (isset($field['link_with']) && in_array($field['link_with'], $fields, true))
 		{
 			$fields[] = $key;
 		}
@@ -184,7 +184,7 @@ function setupProfileContext($fields, $hook = '')
 			}
 		}
 		// Bodge in a line break - without doing two in a row ;)
-		elseif ($field === 'hr' && $last_type !== 'hr' && $last_type != '')
+		elseif ($field === 'hr' && $last_type !== 'hr' && $last_type !== '')
 		{
 			$last_type = 'hr';
 			$context['profile_fields'][$i++]['type'] = 'hr';
@@ -201,7 +201,7 @@ function setupProfileContext($fields, $hook = '')
  *
  * @param int $memID
  * @param string $area = 'summary'
- * @param mixed[] $custom_fields = array()
+ * @param array $custom_fields = array()
  */
 function loadCustomFields($memID, $area = 'summary', array $custom_fields = array())
 {
@@ -535,7 +535,7 @@ function loadProfileFields($force_reload = false)
 					return $txt['invalid_registration'] . ' ' . Util::strftime('%d %b %Y ' . (strpos(User::$info->time_format, '%H') !== false ? '%I:%M:%S %p' : '%H:%M:%S'), forum_time(false));
 				}
 				// As long as it doesn't equal "N/A"...
-				elseif ($value != $txt['not_applicable'] && $value != strtotime(Util::strftime('%Y-%m-%d', $cur_profile['date_registered'] + (User::$info->time_offset + $modSettings['time_offset']) * 3600)))
+				elseif ($value !== $txt['not_applicable'] && $value !== strtotime(Util::strftime('%Y-%m-%d', $cur_profile['date_registered'] + (User::$info->time_offset + $modSettings['time_offset']) * 3600)))
 				{
 					$value -= (User::$info->time_offset + $modSettings['time_offset']) * 3600;
 				}
@@ -583,7 +583,7 @@ function loadProfileFields($force_reload = false)
 			'label' => $txt['allow_user_email'],
 			'permission' => 'profile_identity',
 			'input_validate' => function (&$value) {
-				$value = $value == 0 ? 1 : 0;
+				$value = (int) $value === 0 ? 1 : 0;
 
 				return true;
 			},
@@ -644,8 +644,8 @@ function loadProfileFields($force_reload = false)
 				$value = (int) $value;
 				if (isset($_POST['karma_bad']))
 				{
-					$profile_vars['karma_bad'] = $_POST['karma_bad'] != '' ? (int) $_POST['karma_bad'] : 0;
-					$cur_profile['karma_bad'] = $_POST['karma_bad'] != '' ? (int) $_POST['karma_bad'] : 0;
+					$profile_vars['karma_bad'] = $_POST['karma_bad'] !== '' ? (int) $_POST['karma_bad'] : 0;
+					$cur_profile['karma_bad'] = $_POST['karma_bad'] !== '' ? (int) $_POST['karma_bad'] : 0;
 				}
 
 				return true;
@@ -685,12 +685,10 @@ function loadProfileFields($force_reload = false)
 
 					return true;
 				}
-				else
-				{
-					$value = $cur_profile['lngfile'];
 
-					return false;
-				}
+				$value = $cur_profile['lngfile'];
+
+				return false;
 			},
 		),
 		// The username is not always editable - so adjust it as such.
@@ -734,7 +732,7 @@ function loadProfileFields($force_reload = false)
 						}
 						else
 						{
-							// If there are "important" errors and you are not an admin: log the first error
+							// If there are "important" errors, and you are not an admin: log the first error
 							// Otherwise grab all of them and do not log anything
 							$error_severity = $errors->hasErrors(1) && User::$info->is_admin === false ? 1 : null;
 							foreach ($errors->prepareErrors($error_severity) as $error)
@@ -762,7 +760,7 @@ function loadProfileFields($force_reload = false)
 				global $cur_profile;
 
 				// If we didn't try it then ignore it!
-				if ($value == '')
+				if ($value === '')
 				{
 					return false;
 				}
@@ -899,11 +897,13 @@ function loadProfileFields($force_reload = false)
 				{
 					return 'no_name';
 				}
-				elseif (Util::strlen($value) > 60)
+
+				if (Util::strlen($value) > 60)
 				{
 					return 'name_too_long';
 				}
-				elseif ($cur_profile['real_name'] != $value)
+
+				if ($cur_profile['real_name'] != $value)
 				{
 					require_once(SUBSDIR . '/Members.subs.php');
 					if (isReservedName($value, $context['id_member']))
@@ -943,16 +943,14 @@ function loadProfileFields($force_reload = false)
 					{
 						return true;
 					}
-					// There is a previous secret answer to the secret question, so let\'s put it back in the db...
-					else
-					{
-						$value = $member['secret_answer'];
 
-						// We have to tell the code is an error otherwise an empty value will go into the db
-						return false;
-					}
+					// There is a previous secret answer to the secret question, so let\'s put it back in the db...
+					$value = $member['secret_answer'];
+
+					// We have to tell the code is an error otherwise an empty value will go into the db
+					return false;
 				}
-				$value = $value != '' ? md5($value) : '';
+				$value = $value !== '' ? md5($value) : '';
 
 				return true;
 			},
@@ -961,7 +959,7 @@ function loadProfileFields($force_reload = false)
 			'type' => 'callback',
 			'callback_func' => 'signature_modify',
 			'permission' => 'profile_extra',
-			'enabled' => substr($modSettings['signature_settings'], 0, 1) == 1,
+			'enabled' => strpos($modSettings['signature_settings'], 1) === 0,
 			'preload' => 'profileLoadSignatureData',
 			'input_validate' => 'profileValidateSignature',
 		),
@@ -1337,7 +1335,7 @@ function profileValidateEmail($email, $memID = 0)
 /**
  * Save the profile changes
  *
- * @param mixed[] $profile_vars
+ * @param array $profile_vars
  * @param int $memID id_member
  */
 function saveProfileChanges(&$profile_vars, $memID)
@@ -1865,7 +1863,7 @@ function makeCustomFieldChanges($memID, $area, $sanitize = true)
 /**
  * Validates the value of a custom field
  *
- * @param mixed[] $field - An array describing the field. It consists of the
+ * @param array $field - An array describing the field. It consists of the
  *                indexes:
  *                  - type; if different from 'text', only the length is checked
  *                  - mask; if empty or equal to 'none', only the length is
@@ -1885,18 +1883,17 @@ function isCustomFieldValid($field, $value)
 	// Any masks to apply?
 	if ($field['field_type'] === 'text' && !empty($field['mask']) && $field['mask'] !== 'none')
 	{
-		// @todo We never error on this - just ignore it at the moment...
 		if ($field['mask'] === 'email' && !isValidEmail($value))
 		{
 			return 'custom_field_invalid_email';
 		}
 
-		if ($field['mask'] === 'number' && preg_match('~[^\d]~', $value))
+		if ($field['mask'] === 'number' && preg_match('~\D~', $value))
 		{
 			return 'custom_field_not_number';
 		}
 
-		if (substr($field['mask'], 0, 5) === 'regex' && trim($value) !== '' && preg_match(substr($field['mask'], 5), $value) === 0)
+		if (strpos($field['mask'], 'regex') === 0 && trim($value) !== '' && preg_match(substr($field['mask'], 5), $value) === 0)
 		{
 			return 'custom_field_inproper_format';
 		}
@@ -1942,7 +1939,6 @@ function profileSendActivation()
 	}
 
 	User::load(true);
-
 	User::$info['is_logged'] = $context['user']['is_logged'] = false;
 	User::$info['is_guest'] = $context['user']['is_guest'] = true;
 
@@ -2142,20 +2138,22 @@ function profileLoadGroups()
 	require_once(SUBSDIR . '/Membergroups.subs.php');
 
 	$context['member_groups'] = getGroupsList();
-	$context['member_groups'][0]['is_primary'] = $cur_profile['id_group'] == 0;
+	$context['member_groups'][0]['is_primary'] = (int) $cur_profile['id_group'] === 0;
 
 	$curGroups = explode(',', $cur_profile['additional_groups']);
+	$curGroups = array_map('intval', $curGroups);
 
 	foreach ($context['member_groups'] as $id_group => $row)
 	{
+		$id_group = (int) $id_group;
 		// Registered member was already taken care before
-		if ($id_group == 0)
+		if ($id_group === 0)
 		{
 			continue;
 		}
 
 		$context['member_groups'][$id_group]['is_primary'] = $cur_profile['id_group'] == $id_group;
-		$context['member_groups'][$id_group]['is_additional'] = in_array($id_group, $curGroups);
+		$context['member_groups'][$id_group]['is_additional'] = in_array($id_group, $curGroups, true);
 		$context['member_groups'][$id_group]['can_be_additional'] = true;
 		$context['member_groups'][$id_group]['can_be_primary'] = $row['hidden'] != 2;
 	}
@@ -2197,7 +2195,7 @@ function profileReloadUser()
 	global $modSettings, $context, $cur_profile;
 
 	// Log them back in - using the verify password as they must have matched and this one doesn't get changed by anyone!
-	if (isset($_POST['passwrd2']) && $_POST['passwrd2'] != '')
+	if (isset($_POST['passwrd2']) && $_POST['passwrd2'] !== '')
 	{
 		require_once(SUBSDIR . '/Auth.subs.php');
 		$check = validateLoginPassword($_POST['passwrd2'], $_POST['passwrd1'], $cur_profile['member_name']);
@@ -2262,7 +2260,8 @@ function profileValidateSignature(&$value)
 		{
 			return 'signature_allow_smileys';
 		}
-		elseif (!empty($sig_limits[4]) && $sig_limits[4] > 0 && $smiley_count > $sig_limits[4])
+
+		if (!empty($sig_limits[4]) && $sig_limits[4] > 0 && $smiley_count > $sig_limits[4])
 		{
 			$txt['profile_error_signature_max_smileys'] = sprintf($txt['profile_error_signature_max_smileys'], $sig_limits[4]);
 
@@ -2524,7 +2523,7 @@ function profileSaveGroups(&$value)
 			)
 		)->fetch_callback(
 			function ($row) use (&$protected_groups) {
-				$protected_groups[] = $row['id_group'];
+				$protected_groups[] = (int) $row['id_group'];
 			}
 		);
 
@@ -2532,7 +2531,7 @@ function profileSaveGroups(&$value)
 	}
 
 	// The account page allows the change of your id_group - but not to a protected group!
-	if (empty($protected_groups) || count(array_intersect(array((int) $value, $old_profile['id_group']), $protected_groups)) == 0)
+	if (empty($protected_groups) || count(array_intersect(array((int) $value, $old_profile['id_group']), $protected_groups)) === 0)
 	{
 		$value = (int) $value;
 	}

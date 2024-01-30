@@ -264,7 +264,7 @@ function byte_format($number)
  *
  * - Returns a pretty formatted version of time based on the user's format in User::$info->time_format.
  * - Applies all necessary time offsets to the timestamp, unless offset_type is set.
- * - If todayMod is set and show_today was not not specified or true, an
+ * - If todayMod is set and show_today was not specified or true, an
  *   alternate format string is used to show the date with something to show it is "today" or "yesterday".
  * - Performs localization (more than just strftime would do alone.)
  *
@@ -329,13 +329,15 @@ function standardTime($log_time, $show_today = true, $offset_type = false)
 		}
 
 		// Same day of the year, same year.... Today!
-		if ($then['yday'] == $now['yday'] && $then['year'] == $now['year'])
+		if ($then['yday'] === $now['yday'] && $then['year'] === $now['year'])
 		{
 			return sprintf($txt['today'], standardTime($log_time, $today_fmt, $offset_type));
 		}
 
 		// Day-of-year is one less and same year, or it's the first of the year and that's the last of the year...
-		if ($modSettings['todayMod'] == '2' && (($then['yday'] == $now['yday'] - 1 && $then['year'] == $now['year']) || ($now['yday'] == 0 && $then['year'] == $now['year'] - 1) && $then['mon'] == 12 && $then['mday'] == 31))
+		if ((int)$modSettings['todayMod'] === 2
+			&& (($then['yday'] === $now['yday'] - 1 && $then['year'] === $now['year'])
+				|| (($now['yday'] === 0 && $then['year'] === $now['year'] - 1) && $then['mon'] === 12 && $then['mday'] === 31)))
 		{
 			return sprintf($txt['yesterday'], standardTime($log_time, $today_fmt, $offset_type));
 		}
@@ -347,7 +349,7 @@ function standardTime($log_time, $show_today = true, $offset_type = false)
 	// https://msdn.microsoft.com/en-us/library/cc233982.aspx
 	if ($is_win)
 	{
-		$txt['lang_locale'] = strtr($txt['lang_locale'], '_', '-');
+		$txt['lang_locale'] = str_replace('_', '-', $txt['lang_locale']);
 	}
 
 	if (setlocale(LC_TIME, $txt['lang_locale']))
@@ -361,7 +363,7 @@ function standardTime($log_time, $show_today = true, $offset_type = false)
 			$str = str_replace('%p', (Util::strftime('%H', $time) < 12 ? $txt['time_am'] : $txt['time_pm']), $str);
 		}
 
-		foreach (array('%a', '%A', '%b', '%B') as $token)
+		foreach (['%a', '%A', '%b', '%B'] as $token)
 		{
 			if (strpos($str, $token) !== false)
 			{
@@ -372,28 +374,28 @@ function standardTime($log_time, $show_today = true, $offset_type = false)
 	else
 	{
 		// Do-it-yourself time localization.  Fun.
-		foreach (array('%a' => 'days_short', '%A' => 'days', '%b' => 'months_short', '%B' => 'months') as $token => $text_label)
+		foreach (['%a' => 'days_short', '%A' => 'days', '%b' => 'months_short', '%B' => 'months'] as $token => $text_label)
 		{
 			if (strpos($str, $token) !== false)
 			{
-				$str = str_replace($token, $txt[$text_label][(int) Elkarte\Util::strftime($token === '%a' || $token === '%A' ? '%w' : '%m', $time)], $str);
+				$str = str_replace($token, $txt[$text_label][(int) Util::strftime($token === '%a' || $token === '%A' ? '%w' : '%m', $time)], $str);
 			}
 		}
 
 		if (strpos($str, '%p') !== false)
 		{
-			$str = str_replace('%p', (Elkarte\Util::strftime('%H', $time) < 12 ? $txt['time_am'] : $txt['time_pm']), $str);
+			$str = str_replace('%p', (Util::strftime('%H', $time) < 12 ? $txt['time_am'] : $txt['time_pm']), $str);
 		}
 	}
 
 	// Windows doesn't support %e; on some versions, strftime fails altogether if used, so let's prevent that.
 	if ($is_win && strpos($str, '%e') !== false)
 	{
-		$str = str_replace('%e', ltrim(Elkarte\Util::strftime('%d', $time), '0'), $str);
+		$str = str_replace('%e', ltrim(Util::strftime('%d', $time), '0'), $str);
 	}
 
 	// Format any other characters..
-	return Elkarte\Util::strftime($str, $time);
+	return Util::strftime($str, $time);
 }
 
 /**
@@ -1729,7 +1731,7 @@ function addProtocol($url, $protocols = array())
 	}
 
 	$found = false;
-	$url = preg_replace_callback($pattern, function ($match) use (&$found) {
+	$url = preg_replace_callback($pattern, static function ($match) use (&$found) {
 		$found = true;
 
 		return strtolower($match[0]);
@@ -1763,7 +1765,7 @@ function removeNestedQuotes($text)
 	$max_depth = (int) $modSettings['removeNestedQuotes'];
 
 	// Remove quotes over our limit, then we need to find them all
-	preg_match_all('~(\[\/?quote(?:(.*?))?\])~i', $text, $matches, PREG_OFFSET_CAPTURE);
+	preg_match_all('~(\[/?quote(.*?)?])~i', $text, $matches, PREG_OFFSET_CAPTURE);
 	$depth = 0;
 	$remove = [];
 	$start_pos = 0;
@@ -1834,12 +1836,12 @@ function removeBr($string)
  * Replace all vulgar words with respective proper words. (substring or whole words..)
  *
  * What it does:
- * - it censors the passed string.
- * - if the admin setting allow_no_censored is on it does not censor unless force is also set.
- * - if the admin setting allow_no_censored is off will censor words unless the user has set
+ *  - it censors the passed string.
+ *  - if the admin setting allow_no_censored is on it does not censor unless force is also set.
+ *  - if the admin setting allow_no_censored is off will censor words unless the user has set
  * it to not censor in their profile and force is off
- * - it caches the list of censored words to reduce parsing.
- * - Returns the censored text
+ *  - it caches the list of censored words to reduce parsing.
+ *  - Returns the censored text
  *
  * @param string $text
  * @param bool $force = false
@@ -1883,7 +1885,9 @@ function can_see_button_strip($button_strip)
 }
 
 /**
- * @return \ElkArte\Themes\DefaultTheme\Theme
+ * Get the current theme instance.
+ *
+ * @return Theme The current theme instance.
  */
 function theme()
 {
@@ -1891,9 +1895,11 @@ function theme()
 }
 
 /**
- * Stops the execution with a 1x1 gif file
+ * Send a 1x1 GIF response and terminate the script execution
  *
- * @param bool $expired Sends an expired header.
+ * @param bool $expired Flag to determine if header Expires should be sent
+ *
+ * @return void
  */
 function dieGif($expired = false)
 {
