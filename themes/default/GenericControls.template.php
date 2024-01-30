@@ -159,9 +159,21 @@ function template_control_richedit($editor_id, $smileyContainer = null, $bbcCont
 			// Other Editor startup options, css, smiley box, validate wizzy, move into view
 			$.sceditor.plugins.moveTo = function() {
 				var base = this;
+				const isEditorLoaded = async selector => {
+					while (document.querySelector(selector) === null) {
+						await new Promise(resolve =>requestAnimationFrame(resolve));
+					}
+					return true;
+				};
 
 				base.signalReady = function() {
 					let editor = this;
+					
+					// signalReady can be called before the extensionMethods are available
+					isEditorLoaded(".sceditor-toolbar").then((selector) => {
+						editor.createPermanentDropDown();
+						editor.css("code {white-space: pre;}");
+					});
 
 					if ($.sceditor.isWysiwygSupported === false)
 					{
@@ -173,16 +185,12 @@ function template_control_richedit($editor_id, $smileyContainer = null, $bbcCont
 					{
 						document.getElementById("skipnav").scrollIntoView();
 					}
-
-					editor.css("code {white-space: pre;}");
-					editor.createPermanentDropDown();
 				};
 			}
 	
 			$(function() {
 				elk_editor();
 			});
-
 		</script>';
 }
 
