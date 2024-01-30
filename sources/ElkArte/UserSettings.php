@@ -79,7 +79,7 @@ class UserSettings extends ValuesContainerReadOnly
 	 */
 	public function getActivationStatus($strip_ban = true)
 	{
-		return (int) $this->is_activated > UserSettingsLoader::BAN_OFFSET ? $this->is_activated - UserSettingsLoader::BAN_OFFSET : $this->is_activated;
+		return (int) ($this->is_activated > UserSettingsLoader::BAN_OFFSET ? $this->is_activated - UserSettingsLoader::BAN_OFFSET : $this->is_activated);
 	}
 
 	/**
