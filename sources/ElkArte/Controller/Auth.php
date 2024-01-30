@@ -47,7 +47,7 @@ class Auth extends AbstractController
 	 *
 	 * - (well no, not really. We route directly to the rest.)
 	 *
-	 * @see \ElkArte\AbstractController::action_index()
+	 * @see AbstractController::action_index
 	 */
 	public function action_index()
 	{
@@ -724,14 +724,15 @@ class Auth extends AbstractController
  * Check activation status of the current user.
  *
  * What it does:
+ *
  * is_activated value key is as follows:
- * - > 10 Banned with activation status as value - 10
- * - 5 = Awaiting COPPA consent
- * - 4 = Awaiting Deletion approval
- * - 3 = Awaiting Admin approval
- * - 2 = Awaiting reactivation from email change
- * - 1 = Approved and active
- * - 0 = Not active
+ *  - > 10 Banned with activation status as value - 10
+ *  - 5 = Awaiting COPPA consent
+ *  - 4 = Awaiting Deletion approval
+ *  - 3 = Awaiting Admin approval
+ *  - 2 = Awaiting reactivation from email change
+ *  - 1 = Approved and active
+ *  - 0 = Not active
  *
  * @package Authorization
  */
@@ -748,7 +749,7 @@ function checkActivation()
 	$activation_status = User::$settings->getActivationStatus();
 
 	// Check if the account is activated - COPPA first...
-	if ($activation_status == 5)
+	if ($activation_status === 5)
 	{
 		$context['login_errors'][] = $txt['coppa_no_concent'] . ' <a href="' . getUrl('action', ['action' => 'register', 'sa' => 'coppa', 'member' => User::$settings['id_member']]) . '">' . $txt['coppa_need_more_details'] . '</a>';
 
@@ -756,12 +757,12 @@ function checkActivation()
 	}
 
 	// Awaiting approval still?
-	if ($activation_status == 3)
+	if ($activation_status === 3)
 	{
 		throw new Exception('still_awaiting_approval', 'user');
 	}
-	// Awaiting deletion, changed their mind?
-	elseif ($activation_status == 4)
+
+	if ($activation_status === 4)
 	{
 		if (isset($_REQUEST['undelete']))
 		{
@@ -778,8 +779,9 @@ function checkActivation()
 			return false;
 		}
 	}
+	// Awaiting deletion, changed their mind?
 	// Standard activation?
-	elseif ($activation_status != 1)
+	elseif ($activation_status !== 1)
 	{
 		Errors::instance()->log_error($txt['activate_not_completed1'] . ' - <span class="remove">' . User::$settings['member_name'] . '</span>', false);
 

@@ -507,7 +507,7 @@ class UserSettingsLoader
 		$activation_status = $this->settings->getActivationStatus();
 
 		// Check if the account is activated - COPPA first...
-		if ($activation_status == 5)
+		if ($activation_status === 5)
 		{
 			$context['login_errors'][] = $txt['coppa_no_concent'] . ' <a href="' . getUrl('action', ['action' => 'register', 'sa' => 'coppa', 'member' => $this->settings['id_member']]) . '">' . $txt['coppa_need_more_details'] . '</a>';
 
@@ -515,13 +515,13 @@ class UserSettingsLoader
 		}
 
 		// Awaiting approval still?
-		if ($activation_status == 3)
+		if ($activation_status === 3)
 		{
 			throw new Exception('still_awaiting_approval', 'user');
 		}
 
 		// Awaiting deletion, changed their mind?
-		if ($activation_status == 4)
+		if ($activation_status === 4)
 		{
 			if ($undelete)
 			{
@@ -540,7 +540,7 @@ class UserSettingsLoader
 		}
 
 		// Standard activation?
-		if ($activation_status != 1)
+		if ($activation_status !== 1)
 		{
 			\ElkArte\Errors\Errors::instance()->log_error($txt['activate_not_completed1'] . ' - <span class="remove">' . $this->settings['member_name'] . '</span>', false);
 

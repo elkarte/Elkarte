@@ -5,14 +5,15 @@
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
- * This file contains code covered by:
- * copyright: 2011 Simple Machines (http://www.simplemachines.org)
- *
  * @version 2.0 dev
  *
  */
 
 namespace ElkArte;
+
+use BBC\ParserWrapper;
+use ElkArte\Cache\Cache;
+use ElkArte\Database\QueryInterface;
 
 /**
  * This class is used as interface to load/get the members from the database.
@@ -23,27 +24,12 @@ namespace ElkArte;
  */
 class MembersList
 {
-	/**
-	 * List of all the members already loaded
-	 *
-	 * @var \ElkArte\Member[]
-	 */
+	/** @var Member[] List of all the members already loaded */
 	protected static $members = [];
-
-	/**
-	 * Instance of \ElkArte\MemberLoader used to actually get the data out of
-	 * the database and ready in an \ElkArte\Member object
-	 *
-	 * @var \ElkArte\MemberLoader
-	 */
-	protected static $loader = null;
-
-	/**
-	 * Instance of this very class
-	 *
-	 * @var \ElkArte\MembersList
-	 */
-	protected static $instance = null;
+	/** @var MemberLoader Instance of MemberLoader used to actually get the data out of the database and ready in a Member object */
+	protected static $loader;
+	/** @var MembersListInstance of this very class */
+	protected static $instance;
 
 	/**
 	 * Protected construct to avoid external access
@@ -55,9 +41,9 @@ class MembersList
 	/**
 	 * Initialize the loader and the instance of this class
 	 *
-	 * @param \ElkArte\Database\QueryInterface $db The object to query the database
-	 * @param \ElkArte\Cache\Cache $cache Cache object used to... well cache content of each member
-	 * @param \BBC\ParserWrapper $bbc_parser BBC parser to convert BBC to HTML
+	 * @param QueryInterface $db The object to query the database
+	 * @param Cache $cache Cache object used to... well cache content of each member
+	 * @param ParserWrapper $bbc_parser BBC parser to convert BBC to HTML
 	 */
 	public static function init($db, $cache, $bbc_parser)
 	{
@@ -86,7 +72,9 @@ class MembersList
 	 */
 	public static function load($users, $is_name = false, $set = 'normal')
 	{
-		$result = $is_name ? self::$loader->loadByName($users, $set) : self::$loader->loadById($users, $set);
+		$result = $is_name
+			? self::$loader->loadByName($users, $set)
+			: self::$loader->loadById($users, $set);
 
 		return !empty($result) ? $result : false;
 	}
@@ -105,10 +93,10 @@ class MembersList
 	}
 
 	/**
-	 * Returns the \ElkArte\Member object of the requested (numeric) $id
+	 * Returns the Member object of the requested (numeric) $id
 	 *
 	 * @param int $id Member id to retrieve and return
-	 * @return \ElkArte\ValuesContainer
+	 * @return ValuesContainer
 	 */
 	public static function get($id)
 	{
@@ -127,7 +115,7 @@ class MembersList
 	 * Returns the \ElkArte\Member object of the requested (numeric) $id
 	 *
 	 * @param int $id id of the member
-	 * @return bool|\ElkArte\ValuesContainer
+	 * @return bool|ValuesContainer
 	 */
 	public function getById($id)
 	{
@@ -137,7 +125,7 @@ class MembersList
 	/**
 	 * Adds a \ElkArte\Member object to the list.
 	 *
-	 * @param \ElkArte\Member $member_data The object representing
+	 * @param Member $member_data The object representing
 	 * @param int $id id of the member
 	 */
 	public static function add($member_data, $id)

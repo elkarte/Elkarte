@@ -491,7 +491,7 @@ class Register extends AbstractController
 				if ($is_valid !== true)
 				{
 					$err_params = array($row['name']);
-					if ($is_valid === 'custom_field_not_number')
+					if ($is_valid === 'custom_field_too_long')
 					{
 						$err_params[] = $row['field_length'];
 					}
