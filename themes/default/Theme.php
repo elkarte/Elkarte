@@ -253,7 +253,7 @@ class Theme extends BaseTheme
 		// let's add the css in any case
 		if (!empty($modSettings['avatar_max_width']) || !empty($modSettings['avatar_max_height']))
 		{
-			$this->addCSSRules('
+			$this->css->addCSSRules('
 		.avatarresize {' . (!empty($modSettings['avatar_max_width']) ? '
 			max-width:' . $modSettings['avatar_max_width'] . 'px;' : '') . (!empty($modSettings['avatar_max_height']) ? '
 			max-height:' . $modSettings['avatar_max_height'] . 'px;' : '') . '
@@ -263,20 +263,20 @@ class Theme extends BaseTheme
 		// Save some database hits, if a width for multiple wrappers is set in admin.
 		if (!empty($settings['forum_width']))
 		{
-			$this->addCSSRules('
+			$this->css->addCSSRules('
 		.wrapper {width: ' . $settings['forum_width'] . ';}');
 		}
 
 		// Localization for the show more quote and its container height
 		$quote_height = !empty($modSettings['heightBeforeShowMore']) ? $modSettings['heightBeforeShowMore'] . 'px' : 'none';
-		$this->addCSSRules('
+		$this->css->addCSSRules('
 		input[type=checkbox].quote-show-more:after {content: "' . $txt['quote_expand'] . '";}
 		.quote-read-more > .bbc_quote {--quote_height: ' . $quote_height . ';}'
 		);
 
 		if (!empty($this->user->avatar['href']))
 		{
-			$this->addCSSRules('
+			$this->css->addCSSRules('
 		.i-menu-profile::before, .i-menu-profile.enabled::before {
 			content: "";
 			background-image: url("' . htmlspecialchars_decode($this->user->avatar['href']) . '");

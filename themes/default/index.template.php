@@ -108,7 +108,7 @@ function template_html_above()
 	}
 
 	// load in any css from addons or themes, so they can overwrite if wanted
-	template_css();
+	theme()->themeCss()->template_css();
 
 	// Present a canonical url for search engines to prevent duplicate content in their indices.
 	if (!empty($context['canonical_url']))
@@ -163,10 +163,10 @@ function template_html_above()
 	}
 
 	// load in any javascript files from addons and themes
-	theme()->template_javascript();
+	theme()->themeJs()->template_javascript();
 
-	// load in any javascript files from addons and themes
-	theme()->template_inlinecss();
+	// load in any css files from addons and themes
+	theme()->themeCss()->template_inlinecss();
 
 	// Output any remaining HTML headers. (from addons, maybe?)
 	echo $context['html_headers'];
@@ -441,10 +441,10 @@ function template_html_below()
 	</footer>';
 
 	// This is here to catch any late loading of JS files via templates
-	theme()->outputJavascriptFiles(theme()->getJSFiles());
+	theme()->themeJs()->outputJavascriptFiles(theme()->themeJs()->getJSFiles());
 
 	// load inline javascript that needed to be deferred to the end of the page
-	theme()->template_inline_javascript(true);
+	theme()->themeJs()->template_inline_javascript(true);
 
 	// Schema microdata about the organization?
 	if (!empty($context['smd_site']))
@@ -631,7 +631,7 @@ function template_menu()
 				</nav>';
 
 	// Define the upper_section toggle in javascript.
-	theme()->addInlineJavascript('
+	theme()->themeJs()->addInlineJavascript('
 		var oMainHeaderToggle = new elk_Toggle({
 			bToggleEnabled: true,
 			bCurrentlyCollapsed: ' . (empty($context['minmax_preferences']['upshrink']) ? 'false' : 'true') . ',
