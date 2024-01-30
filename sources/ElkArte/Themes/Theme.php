@@ -32,10 +32,6 @@ abstract class Theme
 {
 	/** @var string */
 	public const DEFAULT_EXPIRES = 'Mon, 26 Jul 1997 05:00:00 GMT';
-	/** @var string */
-	public const STANDARD = 'standard';
-	/** @var string */
-	public const DEFERRED = 'defer';
 	/** @var int */
 	public const ALL = -1;
 	/** @var array */
@@ -52,19 +48,6 @@ abstract class Theme
 	protected $id;
 	/** @var array */
 	protected $links = [];
-	/** @var array All of the JS files to include */
-	protected $js_files = [];
-	/** @var array Any inline JS to output */
-	protected $js_inline = [
-		'standard' => [],
-		'defer' => [],
-	];
-	/** @var array JS variables to output */
-	protected $js_vars = [];
-	/** @var array Inline CSS */
-	protected $css_rules = [];
-	/** @var array CSS files */
-	protected $css_files = [];
 	/** @var string[] Holds base actions that we do not want crawled / indexed */
 	public $no_index_actions = [];
 	/** @var bool Right to left language support */
@@ -73,6 +56,10 @@ abstract class Theme
 	private $templates;
 	/** @var TemplateLayers */
 	private $layers;
+	/** @var Javascript */
+	public $javascript;
+	/** @var Css  */
+	public $css;
 
 	/**
 	 * Theme constructor.
@@ -87,19 +74,6 @@ abstract class Theme
 		$this->user = $user;
 		$this->layers = new TemplateLayers();
 		$this->templates = new Templates($dirs);
-
-		$this->js_files = &$GLOBALS['context']['js_files'];
-		$this->js_vars = &$GLOBALS['context']['js_vars'];
-
-		$this->css_files = &$GLOBALS['context']['css_files'];
-		$this->css_rules = &$GLOBALS['context']['css_rules'];
-		if (empty($this->css_rules))
-		{
-			$this->css_rules = [
-				'all' => '',
-				'media' => [],
-			];
-		}
 
 		$this->no_index_actions = [
 			'profile',
@@ -116,12 +90,14 @@ abstract class Theme
 		];
 
 		$this->_req = HttpReq::instance();
+
+		// Theme posse
+		$this->javascript = new Javascript();
+		$this->css = new Css();
 	}
 
 	/**
-	 * Initialize the template... mainly little settings.
-	 *
-	 * @return array Theme settings
+	 * The following are expected in the custom Theme.php (or just use the default)
 	 */
 	abstract public function getSettings();
 
@@ -154,102 +130,6 @@ abstract class Theme
 	}
 
 	/**
-	 * Add a Javascript variable for output later (for feeding text strings and similar to JS)
-	 *
-	 * @param array $vars array of vars to include in the output done as 'varname' => 'var value'
-	 * @param bool $escape = false, whether or not to escape the value
-	 */
-	public function addJavascriptVar($vars, $escape = false)
-	{
-		if (empty($vars) || !is_array($vars))
-		{
-			return;
-		}
-
-		foreach ($vars as $key => $value)
-		{
-			$this->js_vars[$key] = !empty($escape) ? JavaScriptEscape($value) : $value;
-		}
-	}
-
-	/**
-	 * Add a CSS rule to a style tag in head.
-	 *
-	 * @param string $rules the CSS rule/s
-	 * @param null|string $media = null, the media query the rule belongs to
-	 */
-	public function addCSSRules($rules, $media = null)
-	{
-		if (empty($rules))
-		{
-			return;
-		}
-
-		if ($media === null)
-		{
-			$this->css_rules['all'] = $this->css_rules['all'] ?? '';
-			$this->css_rules['all'] .= $rules;
-		}
-		else
-		{
-			$this->css_rules['media'][$media] = $this->css_rules['media'][$media] ?? '';
-			$this->css_rules['media'][$media] .= $rules;
-		}
-	}
-
-	/**
-	 * Returns javascript vars loaded with addJavascriptVar function
-	 *
-	 * @return array
-	 */
-	public function getJavascriptVars()
-	{
-		return $this->js_vars;
-	}
-
-	/**
-	 * Returns inline javascript of a give type that was added with addInlineJavascript function
-	 *
-	 * @param int $type One of ALL, SELF, DEFERRED class constants
-	 *
-	 * @return array
-	 * @throws \Exception if the type is not known
-	 */
-	public function getInlineJavascript($type = self::ALL)
-	{
-		switch ($type)
-		{
-			case self::ALL:
-				return $this->js_inline;
-			case self::DEFERRED:
-				return $this->js_inline[self::DEFERRED];
-			case self::STANDARD:
-				return $this->js_inline[self::STANDARD];
-		}
-
-		throw new \Exception('Unknown inline Javascript type');
-	}
-
-	/**
-	 * Add a block of inline Javascript code to be executed later
-	 *
-	 * What it does:
-	 * - only use this if you have to, generally external JS files are better, but for very small scripts
-	 *   or for scripts that require help from PHP/whatever, this can be useful.
-	 * - all code added with this function is added to the same <script> tag so do make sure your JS is clean!
-	 *
-	 * @param string $javascript
-	 * @param bool $defer = false, define if the script should load in <head> or before the closing <html> tag
-	 */
-	public function addInlineJavascript($javascript, $defer = false)
-	{
-		if (!empty($javascript))
-		{
-			$this->js_inline[(!empty($defer) ? self::DEFERRED : self::STANDARD)][] = $javascript;
-		}
-	}
-
-	/**
 	 * Turn on/off RTL language support
 	 *
 	 * @param $toggle
@@ -261,16 +141,6 @@ abstract class Theme
 		$this->rtl = (bool)$toggle;
 
 		return $this;
-	}
-
-	/**
-	 * Provide a way to fetch the js_files array
-	 *
-	 * @return array
-	 */
-	public function getJSFiles()
-	{
-		return $this->js_files;
 	}
 
 	public function getRequestAPI(): string
@@ -397,6 +267,17 @@ abstract class Theme
 		echo $context['raw_data'];
 	}
 
+	/**
+	 * Setup the headers content type
+	 *
+	 * What it does:
+	 *  - Sets the content type of the headers based on the provided context and API.
+	 *
+	 * @param Headers $header The Headers instance used to set the content type.
+	 * @param array $context The context array containing the sub template.
+	 * @param string $api The API string used to determine the content type.
+	 * @return void
+	 */
 	public function setupHeadersContentType(Headers $header, array $context, string $api): void
 	{
 		if (isset($context['sub_template']))
@@ -409,6 +290,16 @@ abstract class Theme
 		$header->contentType($contentType, 'UTF-8');
 	}
 
+	/**
+	 * Load default theme settings
+	 *
+	 * Updates the theme settings by replacing the URL and directory values with the default ones if the 'use_default_images'
+	 * setting is set to 'defaults' and the 'default_template' setting is provided.
+	 *
+	 * @param array &$settings The reference to the theme settings array.
+	 *
+	 * @return void
+	 */
 	public function loadDefaultThemeSettings(array &$settings): void
 	{
 		if (isset($settings['use_default_images'], $settings['default_template'])
@@ -479,391 +370,25 @@ abstract class Theme
 	}
 
 	/**
-	 * Output the Javascript, including files, inline and vars
+	 * Add a block of inline Javascript code to be executed later
 	 *
-	 * What it does:
-	 *
-	 * - Outputs in <head> all js variables added with addJavascriptVar()
-	 * - Outputs jQuery/jQueryUI from the proper source (local/CDN)
-	 * - Outputs in <head> all JS files added with loadJavascriptFile, uses defer/async where requested
-	 * - Outputs in <head> all *inline* JS that is not deferred, deferred ones are placed after </body>
-	 * - If the admin option to combine files is set, will use Combiner.class
+	 * @param string $javascript
+	 * @param bool $defer = false, define if the script should load in <head> or before the closing <html> tag
 	 */
-	public function template_javascript()
+	public function addInlineJavascript($javascript, $defer = false)
 	{
-		global $modSettings;
-
-		// Output any declared Javascript variables first, they tend to be globals
-		$js_vars = [];
-		if (!empty($this->js_vars))
-		{
-			foreach ($this->js_vars as $var => $value)
-			{
-				$js_vars[] = $var . ' = ' . $value;
-			}
-
-			echo '
-	<script id="site_vars">
-		let ', implode(",\n\t\t\t", $js_vars), ';
-	</script>';
-		}
-
-		// Load jQuery and jQuery UI
-		if (isset($modSettings['jquery_source']))
-		{
-			$this->templateJquery();
-		}
-
-		// Use this hook to work with Javascript files and vars pre output
-		call_integration_hook('pre_javascript_output', []);
-
-		// Load all the Javascript files
-		$this->templateJavascriptFiles();
-
-		// Output any <head> level inline JS
-		$this->template_inline_javascript();
+		$this->javascript->addInlineJavascript($javascript, $defer);
 	}
 
 	/**
-	 * Loads the required jQuery files for the system
+	 * Add a Javascript variable for output later (for feeding text strings and similar to JS)
 	 *
-	 * - Determines the correct script tags to add based on CDN/Local/Auto
+	 * @param array $vars array of vars to include in the output done as 'varname' => 'var value'
+	 * @param bool $escape = false, whether or not to escape the value
 	 */
-	protected function templateJquery()
+	public function addJavascriptVar($vars, $escape = false)
 	{
-		global $modSettings, $settings;
-
-		// Use a specified version of jquery 3.7.1  / 1.13.2
-		$jquery_version = '3.7.1';
-		$jqueryui_version = '1.13.2';
-
-		$jquery_cdn = 'https://ajax.googleapis.com/ajax/libs/jquery/' . $jquery_version . '/jquery.min.js';
-		$jqueryui_cdn = 'https://ajax.googleapis.com/ajax/libs/jqueryui/' . $jqueryui_version . '/jquery-ui.min.js';
-
-		switch ($modSettings['jquery_source'])
-		{
-			// Only getting the files from the CDN?
-			case 'cdn':
-				echo '
-	<script src="' . $jquery_cdn . '" id="jquery"></script>',
-				(!empty($modSettings['jquery_include_ui']) ? '
-	<script src="' . $jqueryui_cdn . '" id="jqueryui"></script>' : '');
-				break;
-			// Just use the local file
-			case 'local':
-				echo '
-	<script src="', $settings['default_theme_url'], '/scripts/jquery-' . $jquery_version . '.min.js" id="jquery"></script>',
-				(!empty($modSettings['jquery_include_ui']) ? '
-	<script src="' . $settings['default_theme_url'] . '/scripts/jquery-ui-' . $jqueryui_version . '.min.js" id="jqueryui"></script>' : '');
-				break;
-			// CDN with local fallback
-			case 'auto':
-				echo '
-	<script src="' . $jquery_cdn . '" id="jquery"></script>',
-				(!empty($modSettings['jquery_include_ui']) ? '
-	<script src="' . $jqueryui_cdn . '" id="jqueryui"></script>' : '');
-				echo '
-	<script>
-		window.jQuery || document.write(\'<script src="', $settings['default_theme_url'], '/scripts/jquery-' . $jquery_version . '.min.js"><\/script>\');',
-				(!empty($modSettings['jquery_include_ui']) ? '
-		window.jQuery.ui || document.write(\'<script src="' . $settings['default_theme_url'] . '/scripts/jquery-ui-' . $jqueryui_version . '.min.js"><\/script>\')' : ''), '
-	</script>';
-				break;
-		}
-	}
-
-	/**
-	 * Loads the JS files that have been set in the controllers
-	 *
-	 * - Will combine / minify the files if the option is set.
-	 * - Handles files that are output in template_html_above <head> section
-	 * - Clears all files from $this->js_files so that it can be called multiple times.  Current
-	 * this is called from here and then again in index.template (for files added by templates)
-	 */
-	protected function templateJavascriptFiles()
-	{
-		global $modSettings, $settings;
-
-		if (empty($this->js_files))
-		{
-			return;
-		}
-
-		// Combine javascript
-		if (!empty($modSettings['combine_css_js']))
-		{
-			// Maybe minify as well
-			$minify = !empty($modSettings['minify_css_js']);
-			$combiner = new SiteCombiner($settings['default_theme_cache_dir'], $settings['default_theme_cache_url'], $minify);
-			$combine_standard_name = $combiner->site_js_combine($this->js_files, false);
-			$combine_deferred_name = $combiner->site_js_combine($this->js_files, true);
-
-			call_integration_hook('post_javascript_combine', [&$combine_standard_name, &$combine_deferred_name, $combiner]);
-
-			if (!empty($combine_standard_name))
-			{
-				echo '
-	<script src="', $combine_standard_name, '" id="jscombined_top"></script>';
-			}
-
-			if (!empty($combine_deferred_name))
-			{
-				echo '
-	<script src="', $combine_deferred_name, '" id="jscombined_deferred" defer="defer"></script>';
-			}
-
-			// While we have any remaining Javascript files, (not local etc)
-			$this->outputJavascriptFiles($combiner->getSpares());
-		}
-		// Just want to minify and not combine
-		elseif (!empty($modSettings['minify_css_js']))
-		{
-			$combiner = new SiteCombiner($settings['default_theme_cache_dir'], $settings['default_theme_cache_url']);
-			$this->js_files = $combiner->site_js_minify($this->js_files);
-
-			// Output all the files
-			$this->outputJavascriptFiles($this->js_files);
-		}
-		// Not combining or minifying, just give them the original files
-		else
-		{
-			$this->outputJavascriptFiles($this->js_files);
-		}
-
-		// Reset, templates can still add _files_, but they will be output in template_html_below.
-		$this->js_files = [];
-	}
-
-	/**
-	 * Outputs script tags to the template with appropriate defer, async or void attributes
-	 *
-	 * Called from template_html_above to output JS defined in the *CONTROLLERS*
-	 * Called from template_html_below to output JS defined in the *TEMPLATES*.
-	 *
-	 * @param array $files
-	 * @return void
-	 */
-	public function outputJavascriptFiles($files)
-	{
-		// While we have Javascript files to place in the template
-		foreach ($files as $id => $js_file)
-		{
-			$async = !empty($js_file['options']['async']) ? ' async="async"' : '';
-			$defer = !empty($js_file['options']['defer']) ? ' defer="defer"' : '';
-
-			echo '
-	<script src="', $js_file['filename'], '" id="', $id, '"', $async, $defer, '></script>';
-		}
-	}
-
-	/**
-	 * Inline JavaScript - Actually useful sometimes!
-	 *
-	 * @param bool $do_deferred if true outputs the inline JS that was marked as deferred.
-	 * @return void
-	 */
-	public function template_inline_javascript($do_deferred = false, $tabs = 3)
-	{
-		if (empty($this->js_inline))
-		{
-			return;
-		}
-
-		// Deferred output waits until we are deferring !
-		if (!empty($this->js_inline['defer']) && $do_deferred)
-		{
-			$output = $this->formatInlineJS($this->js_inline['defer'], $tabs);
-		}
-
-		// Standard header output
-		if (!empty($this->js_inline['standard']) && !$do_deferred)
-		{
-			$output = $this->formatInlineJS($this->js_inline['standard'], $tabs);
-		}
-
-		// Output the script
-		if (!empty($output))
-		{
-			echo '
-	<script id="site_inline', $do_deferred ? '_deferred"' : '"', '>
-		', implode("\n" . str_repeat("\t", $tabs), $output), '
-	</script>';
-		}
-	}
-
-	/**
-	 * Function to either compress or pretty indent inline JS
-	 *
-	 * @param array $files
-	 * @param int $tabs
-	 *
-	 * @return array
-	 */
-	private function formatInlineJS($files, $tabs = 3)
-	{
-		global $modSettings, $settings;
-
-		// Scrunch
-		if (!empty($modSettings['minify_css_js']))
-		{
-			// Inline can have user prefs etc. so caching is not a viable option
-			// Benchmarked: at 0.01627s wall clock, 16.26ms for computations, 42% size reduction
-			// for large load, 10.3ms (.0104s) for normal sized inline.
-			$combiner = new SiteCombiner($settings['default_theme_cache_dir'], $settings['default_theme_cache_url'], true);
-			foreach ($files as $i => $js_block)
-			{
-				$files[$i] = $combiner->jsMinify($js_block);
-			}
-
-			return $files;
-		}
-
-		// Or pretty
-		foreach ($files as $i => $js_block)
-		{
-			// Lines in this block
-			$lines = explode("\n", $js_block);
-
-			// One liner, just indent
-			if (count($lines) === 1)
-			{
-				$files[$i] = str_repeat("\t", $tabs) . ltrim($js_block);
-				continue;
-			}
-
-			// Current number of leading tabs due to source indenting
-			$num = strspn($lines[1], "\t");
-			$existing = str_repeat("\t", $num);
-			$new = str_repeat("\t", $tabs);
-
-			// Replace existing leading tabs with new count, allowing for excess of that
-			foreach ($lines as $j => $line)
-			{
-				$pos = strpos($line, $existing);
-				if ($pos === 0)
-				{
-					$lines[$j] = substr_replace($line, $new, 0, $num);
-				}
-				else
-				{
-					$lines[$j] = $new . ltrim($line);
-				}
-			}
-
-			// Done
-			$files[$i] = implode("\n", $lines);
-		}
-
-		return $files;
-	}
-
-	/**
-	 * Output the CSS files
-	 *
-	 * What it does:
-	 *  - If the admin option to combine files is set, will use Combiner.class
-	 */
-	public function template_css()
-	{
-		global $modSettings, $settings;
-
-		// Use this hook to work with CSS files pre output
-		call_integration_hook('pre_css_output');
-
-		if (empty($this->css_files))
-		{
-			return;
-		}
-
-		// Combine the CSS files?
-		if (!empty($modSettings['combine_css_js']))
-		{
-			// Minify?
-			$minify = !empty($modSettings['minify_css_js']);
-			$combiner = new SiteCombiner($settings['default_theme_cache_dir'], $settings['default_theme_cache_url'], $minify);
-			$combine_name = $combiner->site_css_combine($this->css_files);
-
-			call_integration_hook('post_css_combine', [&$combine_name, $combiner]);
-
-			if (!empty($combine_name))
-			{
-				echo '
-	<link rel="stylesheet" href="', $combine_name, '" id="csscombined" />';
-			}
-
-			foreach ($combiner->getSpares() as $id => $file)
-			{
-				echo '
-	<link rel="stylesheet" href="', $file['filename'], '" id="', $id, '" />';
-			}
-		}
-		// Minify and not combine
-		elseif (!empty($modSettings['minify_css_js']))
-		{
-			$combiner = new SiteCombiner($settings['default_theme_cache_dir'], $settings['default_theme_cache_url']);
-			$this->css_files = $combiner->site_css_minify($this->css_files);
-
-			// Output all the files
-			foreach ($this->css_files as $id => $file)
-			{
-				echo '
-	<link rel="stylesheet" href="', $file['filename'], '" id="', $id, '" />';
-			}
-		}
-		// Just the original files
-		else
-		{
-			foreach ($this->css_files as $id => $file)
-			{
-				echo '
-	<link rel="stylesheet" href="', $file['filename'], '" id="', $id, '" />';
-			}
-		}
-	}
-
-	/**
-	 * Output the inline-CSS in a style tag
-	 */
-	public function template_inlinecss()
-	{
-		global $modSettings, $settings;
-
-		$style_tag = '';
-
-		// Combine and minify the CSS files to save bandwidth and requests?
-		if (!empty($this->css_rules))
-		{
-			if (!empty($this->css_rules['all']))
-			{
-				$style_tag .= '
-	' . $this->css_rules['all'];
-			}
-
-			if (!empty($this->css_rules['media']))
-			{
-				foreach ($this->css_rules['media'] as $key => $val)
-				{
-					$style_tag .= '
-	@media ' . $key . '{
-		' . $val . '
-	}';
-				}
-			}
-		}
-
-		if ($style_tag !== '')
-		{
-			if (!empty($modSettings['minify_css_js']))
-			{
-				$combiner = new SiteCombiner($settings['default_theme_cache_dir'], $settings['default_theme_cache_url'], true);
-				$style_tag = $combiner->cssMinify($style_tag, true);
-			}
-
-			echo '
-	<style>
-	' . $style_tag . '
-	</style>';
-		}
+		$this->javascript->addJavascriptVar($vars, $escape);
 	}
 
 	/**
@@ -872,7 +397,7 @@ abstract class Theme
 	 * @param string $type (Optional) The type of hives to clean. Default is 'all'. Possible values are 'all', 'css', 'js'.
 	 * @return bool Returns true if the hives are successfully cleaned, otherwise false.
 	 */
-	private function cleanHives($type = 'all')
+	public function cleanHives($type = 'all')
 	{
 		global $settings;
 
@@ -1245,5 +770,21 @@ abstract class Theme
 				$template_layers->addBegin($layer);
 			}
 		}
+	}
+
+	/**
+	 * Return the instance of /ElkArte/Themes/Css
+	 */
+	public function themeCss()
+	{
+		return $this->css;
+	}
+
+	/**
+	 * Return the instance of /ElkArte/Themes/Javascript
+	 */
+	public function themeJs()
+	{
+		return $this->javascript;
 	}
 }
