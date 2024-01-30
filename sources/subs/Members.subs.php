@@ -543,9 +543,9 @@ function registerMember(&$regOptions, $ErrorContext = 'register')
 	}
 
 	// That's kind of easy to guess...
-	if ($regOptions['password'] == '')
+	if ($regOptions['password'] === '')
 	{
-		if ($regOptions['auth_method'] == 'password')
+		if ($regOptions['auth_method'] === 'password')
 		{
 			$reg_errors->addError('no_password');
 		}
