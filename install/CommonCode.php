@@ -223,25 +223,25 @@ function saveFileSettings($config_vars, $settingsArray)
 	}
 
 	// Step line by line and see whats changing
-	foreach ($settingsArray as $i => $iValue)
+	for ($i = 0, $n = count($settingsArray); $i < $n; $i++)
 	{
-		if (trim($iValue) === '?>')
+		if (trim($settingsArray[$i]) === '?>')
 		{
 			$settingsArray[$i] = '';
 		}
 
 		// Don't trim or bother with it if it's not a variable.
-		if (substr($iValue, 0, 1) !== '$')
+		if (substr($settingsArray[$i], 0, 1) !== '$')
 		{
 			continue;
 		}
 
-		$settingsArray[$i] = trim($iValue) . "\n";
+		$settingsArray[$i] = trim($settingsArray[$i]) . "\n";
 
 		// Update as requested
 		foreach ($config_vars as $var => $val)
 		{
-			if (strncasecmp($iValue, '$' . $var, 1 + strlen($var)) === 0)
+			if (strncasecmp($settingsArray[$i], '$' . $var, 1 + strlen($var)) === 0)
 			{
 				if ($val === '#remove#')
 				{
@@ -250,7 +250,7 @@ function saveFileSettings($config_vars, $settingsArray)
 				}
 
 				$comment = strstr(substr(un_htmlspecialchars($settingsArray[$i]), strpos(un_htmlspecialchars($settingsArray[$i]), ';')), '#');
-				$settingsArray[$i] = '$' . $var . ' = \'' . $val . '\';' . ($comment === '' ? '' : "\t\t" . rtrim($comment)) . "\n";
+				$settingsArray[$i] = '$' . $var . ' = \'' . $val . '\';' . ($comment == '' ? '' : "\t\t" . rtrim($comment)) . "\n";
 
 				unset($config_vars[$var]);
 			}
@@ -271,7 +271,7 @@ function saveFileSettings($config_vars, $settingsArray)
 	}
 
 	// Write out the new settings.php file
-	if (trim($settingsArray[0]) !== '<?php')
+	if (trim($settingsArray[0]) != '<?php')
 	{
 		array_unshift($settingsArray,'<?php' . "\n" );
 	}
@@ -1031,13 +1031,13 @@ class Ftp_Connection
 				$lookup_file = $_SERVER['PHP_SELF'];
 			}
 
+			// @todo does dirname return bools ??
 			$found_path = dirname($this->locate('*' . basename(dirname($lookup_file)) . '/' . basename($lookup_file), $data));
-			if (empty($found_path))
+			if ($found_path == false)
 			{
 				$found_path = dirname($this->locate(basename($lookup_file)));
 			}
-
-			if (!empty($found_path))
+			if ($found_path != false)
 			{
 				$path = $found_path;
 			}
