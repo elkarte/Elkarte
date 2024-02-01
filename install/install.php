@@ -20,11 +20,11 @@ require('Install_Controller.php');
 // ><html dir="ltr"><head><title>Error!</title></head><body>Sorry, this installer requires PHP!<div style="display: none;">
 
 // Database info.
-$databases = array();
+$databases = [];
 load_possible_databases();
 
 // Initialize everything and load the language files.
-$txt = array();
+$txt = [];
 initialize_inputs();
 loadLanguageFile();
 
@@ -55,7 +55,7 @@ function initialize_inputs()
 
 	if (!defined('TMP_BOARDDIR'))
 	{
-		define('TMP_BOARDDIR', realpath(__DIR__ . '/..'));
+		define('TMP_BOARDDIR', dirname(__DIR__));
 	}
 
 	// This is the test for support of compression
@@ -68,7 +68,7 @@ function initialize_inputs()
 	// This is really quite simple; if ?delete is on the URL, delete the installer...
 	if (isset($_GET['delete']))
 	{
-		return action_deleteInstaller();
+		action_deleteInstaller();
 	}
 
 	ob_start();
@@ -111,7 +111,7 @@ function setTimeZone() {
 	// Validate this is a valid zone
 	if (!in_array($timezone_id, timezone_identifiers_list(), true))
 	{
-		// Tray and make one up
+		// Try and make one up
 		$server_offset = @mktime(0, 0, 0, 1, 1, 1970) * -1;
 		$timezone_id = timezone_name_from_abbr('', $server_offset, 0);
 
@@ -132,7 +132,7 @@ function loadLanguageFile()
 {
 	global $incontext, $txt;
 
-	$incontext['detected_languages'] = array();
+	$incontext['detected_languages'] = [];
 
 	// Make sure the languages' directory actually exists.
 	if (file_exists(TMP_BOARDDIR . '/sources/ElkArte/Languages/Install'))
@@ -165,7 +165,7 @@ function loadLanguageFile()
 
 		<p>This installer was unable to find the installer\'s language file or files.  They should be found under:</p>
 
-		<div style="font-family: monospace; font-weight: bold;">', dirname($_SERVER['PHP_SELF']) != '/' ? dirname($_SERVER['PHP_SELF']) : '', '/themes/default/languages</div>
+		<div style="font-family: monospace; font-weight: bold;">', dirname($_SERVER['PHP_SELF']) !== '/' ? dirname($_SERVER['PHP_SELF']) : '', '/themes/default/languages</div>
 
 		<p>In some cases, FTP clients do not properly upload files with this many folders.  Please double-check to make sure you <span style="font-weight: 600;">have uploaded all the files in the distribution</span>.</p>
 		<p>If that doesn\'t help, please make sure this install.php file is in the same place as the themes folder.</p>
@@ -189,7 +189,7 @@ function loadLanguageFile()
 		list ($_SESSION['installer_temp_lang']) = array_keys($incontext['detected_languages']);
 
 		// If we have english and some other language, use the other language.  We Americans hate english :P.
-		if ($_SESSION['installer_temp_lang'] == 'English.php' && count($incontext['detected_languages']) > 1)
+		if ($_SESSION['installer_temp_lang'] === 'English.php' && count($incontext['detected_languages']) > 1)
 		{
 			list (, $_SESSION['installer_temp_lang']) = array_values($incontext['detected_languages']);
 		}
@@ -244,11 +244,11 @@ function installExit($fallThrough = false)
 function updateSettingsFile($config_vars)
 {
 	// Lets ensure its writable
-	if (!is_writeable(dirname(__FILE__, 2) . '/Settings.php'))
+	if (!is_writable(dirname(__FILE__, 2) . '/Settings.php'))
 	{
 		@chmod(dirname(__FILE__, 2) . '/Settings.php', 0777);
 
-		if (!is_writeable(dirname(__FILE__, 2) . '/Settings.php'))
+		if (!is_writable(dirname(__FILE__, 2) . '/Settings.php'))
 		{
 			return false;
 		}
@@ -278,7 +278,7 @@ function parseSqlLines($sql_file, $replaces)
 	$db_table_wrapper = new DbTableWrapper($db_table);
 
 	// The file with the commands we will run
-	$exists = array();
+	$exists = [];
 	require_once($sql_file);
 
 	// InstallInstructions_install_2_0 or InstallInstructions_install_2_0_postgresql
@@ -393,7 +393,7 @@ function fixModSecurity()
 	SecFilterScanPOST Off
 </IfModule>';
 
-	if (!function_exists('apache_get_modules') || !in_array('mod_security', apache_get_modules()))
+	if (!function_exists('apache_get_modules') || !in_array('mod_security', apache_get_modules(), true))
 	{
 		return true;
 	}
@@ -405,7 +405,7 @@ function fixModSecurity()
 		// Only change something if mod_security hasn't been addressed yet.
 		if (strpos($current_htaccess, '<IfModule mod_security.c>') === false)
 		{
-			if ($ht_handle = fopen(TMP_BOARDDIR . '/.htaccess', 'a'))
+			if ($ht_handle = fopen(TMP_BOARDDIR . '/.htaccess', 'ab'))
 			{
 				fwrite($ht_handle, $htaccess_addition);
 				fclose($ht_handle);
@@ -448,7 +448,7 @@ function fixModSecurity()
  */
 function JavaScriptEscape($string)
 {
-	return '\'' . strtr($string, array(
+	return '\'' . strtr($string, [
 			"\r" => '',
 			"\n" => '\\n',
 			"\t" => '\\t',
@@ -458,5 +458,5 @@ function JavaScriptEscape($string)
 			'<script' => '<scri\'+\'pt',
 			'<body>' => '<bo\'+\'dy>',
 			'<a href' => '<a hr\'+\'ef',
-		)) . '\'';
+		]) . '\'';
 }

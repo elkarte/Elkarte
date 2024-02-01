@@ -9,12 +9,12 @@
  *
  */
 
-$GLOBALS['databases']['postgresql'] = array(
+$GLOBALS['databases']['postgresql'] = [
 	'name' => 'PostgreSQL',
 	'extension' => 'PostgreSQL (PgSQL)',
 	'version' => '9.5',
 	'function_check' => 'pg_connect',
-	'version_check' => function($db_connection) {
+	'version_check' => static function($db_connection) {
 		$request = pg_query('SELECT version()');
 		list ($version) = pg_fetch_row($request);
 		list ($pgl, $version) = explode(" ", $version);
@@ -22,13 +22,13 @@ $GLOBALS['databases']['postgresql'] = array(
 	'supported' => function_exists('pg_connect'),
 	'additional_file' => 'install_' . DB_SCRIPT_VERSION . '_postgresql.php',
 	'test_collation' => false,
-	'validate_prefix' => function (&$value) {
+	'validate_prefix' => static function (&$value) {
 		global $txt;
 
-		$value = preg_replace('~[^A-Za-z0-9_\$]~', '', $value);
+		$value = preg_replace('~[^A-Za-z0-9_$]~', '', $value);
 
 		// Is it reserved?
-		if ($value == 'pg_')
+		if ($value === 'pg_')
 			return $txt['error_db_prefix_reserved'];
 
 		// Is the prefix numeric?
@@ -38,4 +38,4 @@ $GLOBALS['databases']['postgresql'] = array(
 		return true;
 	},
 	'require_db_confirm' => true,
-);
+];

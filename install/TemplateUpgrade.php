@@ -173,9 +173,9 @@ function template_upgrade_above()
 		<link rel="stylesheet" href="', $settings['default_theme_url'], '/css/index.css?20RC1" />
 		<link rel="stylesheet" href="', $settings['default_theme_url'], '/css/_light/index_light.css?20RC1" />
 		<link rel="stylesheet" href="', $settings['default_theme_url'], '/css/install.css?20RC1" />
-		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js" id="jquery"></script>
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js" id="jquery"></script>
 		<script>
-			window.jQuery || document.write(\'<script src="', $settings['default_theme_url'], '/scripts/jquery-3.6.0.min.js"><\/script>\');
+			window.jQuery || document.write(\'<script src="', $settings['default_theme_url'], '/scripts/jquery-3.7.1.min.js"><\/script>\');
 		</script>
 		<script src="', $settings['default_theme_url'], '/scripts/script.js"></script>
 		<script>

@@ -20,7 +20,6 @@
  * Some taken from http://www.xach.com/aolserver/mysql-functions.sql and http://pgfoundry.org/projects/mysqlcompat/.
  * IP Regex in inet_aton from http://www.mkyong.com/database/regular-expression-in-postgresql/.
  */
-
 class InstallInstructions_install_2_0_postgresql
 {
 	protected $db = null;
@@ -29,7 +28,7 @@ class InstallInstructions_install_2_0_postgresql
 	public function __construct($db, $table)
 	{
 		$this->db = $db;
-		return $this->table = $table;
+		$this->table = $table;
 	}
 
 	public function create_functions()

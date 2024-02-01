@@ -9,7 +9,7 @@
  *
  */
 
-$GLOBALS['databases']['mysqli'] = array(
+$GLOBALS['databases']['mysqli'] = [
 	'name' => 'MySQL',
 	'extension' => 'MySQL Improved (MySQLi)',
 	'version' => '5.7.0',
@@ -31,4 +31,4 @@ $GLOBALS['databases']['mysqli'] = array(
 		return true;
 	},
 	'require_db_confirm' => true,
-);
+];

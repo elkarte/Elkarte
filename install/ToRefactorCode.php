@@ -65,7 +65,7 @@ function protected_alter($change, $substep, $is_test = false)
 			FROM ' . $db_prefix . $change['table']);
 		if ($request->hasResults())
 		{
-			$cur_index = array();
+			$cur_index = [];
 
 			while ($row = $db->fetch_assoc($request))
 			{
@@ -76,24 +76,26 @@ function protected_alter($change, $substep, $is_test = false)
 			}
 
 			ksort($cur_index, SORT_NUMERIC);
-			$found = array_values($cur_index) === $change['target_columns'];
+			$found = array_values($cur_index) == $change['target_columns'];
 
 			$db->free_result($request);
 		}
 	}
 
 	// If we're trying to add and it's added, we're done.
-	if ($found && in_array($change['method'], array('add', 'change')))
+	if ($found && in_array($change['method'], ['add', 'change']))
 	{
 		return true;
 	}
+
 	// Otherwise if we're removing and it wasn't found we're also done.
-	elseif (!$found && in_array($change['method'], array('remove', 'change_remove')))
+	if (!$found && in_array($change['method'], ['remove', 'change_remove']))
 	{
 		return true;
 	}
+
 	// Otherwise is it just a test?
-	elseif ($is_test)
+	if ($is_test)
 	{
 		return false;
 	}
@@ -150,13 +152,13 @@ function protected_alter($change, $substep, $is_test = false)
 }
 
 /**
- * Performs the actual query against the db
+ * Executes an upgrade query on the database.
  * Checks for errors so it can inform of issues
  *
- * @param string  $string
- * @param boolean $unbuffered
- *
- * @return boolean|resource
+ * @param string $string The query string.
+ * @param bool $unbuffered Whether to use unbuffered query or not. Default is false.
+ * @return bool|\mysqli_result|null Returns the query result if successful,
+ * false if a duplicate or non-existent error occurred, and null for other errors.
  */
 function upgrade_query($string, $unbuffered = false)
 {
@@ -170,7 +172,7 @@ function upgrade_query($string, $unbuffered = false)
 	$modSettings['disableQueryCheck'] = true;
 	$db->setUnbuffered($unbuffered);
 	$db->skip_next_error();
-	$result = $db->query('', $string, array('security_override' => true));
+	$result = $db->query('', $string, ['security_override' => true]);
 	$db->setUnbuffered(false);
 
 	// Failure?!
@@ -183,10 +185,10 @@ function upgrade_query($string, $unbuffered = false)
 	$db_error_message = $db->last_error($db_connection);
 
 	// If MySQL we do something more clever.
-	if ($db_type == 'mysql')
+	if ($db_type === 'mysql')
 	{
 		$mysql_errno = mysqli_errno($db_connection);
-		$error_query = in_array(substr(trim($string), 0, 11), array('INSERT INTO', 'UPDATE IGNO', 'ALTER TABLE', 'DROP TABLE ', 'ALTER IGNOR'));
+		$error_query = in_array(substr(trim($string), 0, 11), ['INSERT INTO', 'UPDATE IGNO', 'ALTER TABLE', 'DROP TABLE ', 'ALTER IGNOR']);
 
 		// Error numbers:
 		//    1016: Can't open file '....MYI'
@@ -200,9 +202,9 @@ function upgrade_query($string, $unbuffered = false)
 		//    1091: Can't drop key, doesn't exist.
 		//    1146: Table doesn't exist.
 		//    2013: Lost connection to server during query.
-		if ($mysql_errno == 1016)
+		if ($mysql_errno === 1016)
 		{
-			if (preg_match('~\'([^\.\']+)~', $db_error_message, $match) != 0 && !empty($match[1]))
+			if (preg_match('~\'([^.\']+)~', $db_error_message, $match) ===1 && !empty($match[1]))
 			{
 				mysqli_query('
 					REPAIR TABLE `' . $match[1] . '`');
@@ -214,7 +216,7 @@ function upgrade_query($string, $unbuffered = false)
 				return $result;
 			}
 		}
-		elseif ($mysql_errno == 2013)
+		elseif ($mysql_errno === 2013)
 		{
 			$db_connection = mysqli_connect($db_server, $db_user, $db_passwd, $db_name);
 
@@ -229,21 +231,21 @@ function upgrade_query($string, $unbuffered = false)
 			}
 		}
 		// Duplicate column name... should be okay ;).
-		elseif (in_array($mysql_errno, array(1060, 1061, 1068, 1091)))
+		elseif (in_array($mysql_errno, [1060, 1061, 1068, 1091]))
 		{
 			return false;
 		}
 		// Duplicate insert... make sure it's the proper type of query ;).
-		elseif (in_array($mysql_errno, array(1054, 1062, 1146)) && $error_query)
+		elseif (in_array($mysql_errno, [1054, 1062, 1146]) && $error_query)
 		{
 			return false;
 		}
 		// Creating an index on a non-existent column.
-		elseif ($mysql_errno == 1072)
+		elseif ($mysql_errno === 1072)
 		{
 			return false;
 		}
-		elseif ($mysql_errno == 1050 && substr(trim($string), 0, 12) == 'RENAME TABLE')
+		elseif ($mysql_errno === 1050 && strpos(trim($string), 'RENAME TABLE') === 0)
 		{
 			return false;
 		}
@@ -251,12 +253,13 @@ function upgrade_query($string, $unbuffered = false)
 	// If a table already exists don't go potty.
 	else
 	{
-		if (in_array(substr(trim($string), 0, 8), array('CREATE T', 'CREATE S', 'DROP TABL', 'ALTER TA', 'CREATE I')))
+		if (in_array(substr(trim($string), 0, 8), ['CREATE T', 'CREATE S', 'DROP TABL', 'ALTER TA', 'CREATE I']))
 		{
 			if (strpos($db_error_message, 'exist') !== false)
 			{
 				return true;
 			}
+
 			// SQLite
 			if (strpos($db_error_message, 'missing') !== false)
 			{
@@ -279,7 +282,7 @@ function upgrade_query($string, $unbuffered = false)
 		$query_string .= ';' . $k . '=' . $v;
 	}
 
-	if (strlen($query_string) != 0)
+	if ($query_string !== '')
 	{
 		$query_string = '?' . substr($query_string, 1);
 	}

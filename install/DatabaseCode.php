@@ -13,7 +13,7 @@
  */
 
 /**
- *
+ * Wrapper for database methods
  */
 class DbWrapper
 {
@@ -22,11 +22,15 @@ class DbWrapper
 	/** @var bool */
 	protected $count_mode = false;
 	/** @var array */
-	protected $replaces = array();
+	protected $replaces = [];
 
 	/**
-	 * @param $db
-	 * @param $replaces
+	 * Constructs a new instance of the class.
+	 *
+	 * @param mixed $db The database object or connection that will be used.
+	 * @param array $replaces The array of replacement values to be used in the class.
+	 *
+	 * @return void
 	 */
 	public function __construct($db, $replaces)
 	{
@@ -35,17 +39,30 @@ class DbWrapper
 	}
 
 	/**
-	 * @param $name
-	 * @param $args
-	 * @return false|mixed
+	 * Magic method that allows calling inaccessible methods on an object.
+	 *
+	 * @param string $name The name of the method being called.
+	 * @param array $args An array of arguments to be passed to the method.
+	 *
+	 * @return mixed The result of the method call.
 	 */
 	public function __call($name, $args)
 	{
-		return call_user_func_array(array($this->db, $name), $args);
+		return call_user_func_array([$this->db, $name], $args);
 	}
 
 	/**
-	 * @return int
+	 * Inserts data into the database.
+	 *
+	 * This method can be used to insert data into the database using the specified database object or connection.
+	 * The method supports multiple ways of passing the data to be inserted by accepting variable number of arguments as an array:
+	 *   - The first argument must be the table name.
+	 *   - The second argument must be an array of column names.
+	 *   - The third argument must be an array of values to be inserted.
+	 *   - Additional arguments may be accepted depending on the implementation of the "insert" method of the database object.
+	 *
+	 * @return int|void If the count mode is enabled, returns the number of rows to be inserted as an integer.
+	 *                 Otherwise, returns the number of affected rows after the insertion as an integer.
 	 */
 	public function insert()
 	{
@@ -64,13 +81,16 @@ class DbWrapper
 			}
 		}
 
-		call_user_func_array(array($this->db, 'insert'), $args);
+		call_user_func_array([$this->db, 'insert'], $args);
 
 		return $this->db->affected_rows();
 	}
 
 	/**
-	 * @param $on
+	 * Sets the count mode for the class.
+	 *
+	 * @param bool $on Boolean value representing whether count mode is enabled or disabled. Default is true.
+	 *
 	 * @return void
 	 */
 	public function countMode($on = true)
@@ -98,19 +118,21 @@ class DbTableWrapper
 	}
 
 	/**
-	 * @param string $name
-	 * @param $args
-	 * @return false|mixed
+	 * Magic method to handle dynamic method calls
+	 *
+	 * @param mixed $name The name of the method being called
+	 * @param array $args The arguments passed to the method being called
+	 * @return mixed The result of the method being called
 	 */
 	public function __call($name, $args)
 	{
-		return call_user_func_array(array($this->db, $name), $args);
+		return call_user_func_array([$this->db, $name], $args);
 	}
 
 	/**
-	 * Create a table
+	 * Create a table using the given arguments
 	 *
-	 * @return bool
+	 * @return bool True on success, false on failure
 	 */
 	public function create_table()
 	{
@@ -121,7 +143,7 @@ class DbTableWrapper
 		}
 
 		// In this case errors are ignored, so the return is always true
-		call_user_func_array(array($this->db, 'create_table'), $args);
+		call_user_func_array([$this->db, 'create_table'], $args);
 
 		return true;
 	}
@@ -136,7 +158,7 @@ class DbTableWrapper
 		$args = func_get_args();
 
 		// In this case errors are ignored, so the return is always true
-		call_user_func_array(array($this->db, 'add_index'), $args);
+		call_user_func_array([$this->db, 'add_index'], $args);
 
 		return true;
 	}
@@ -144,6 +166,12 @@ class DbTableWrapper
 
 if (class_exists('\\ElkArte\\Database\\Mysqli\\Table'))
 {
+	/**
+	 * MySQL specific implementation of the database table installer.
+	 *
+	 * @package ElkArte
+	 * @subpackage Database
+	 */
 	class DbTable_MySQL_Install extends \ElkArte\Database\Mysqli\Table
 	{
 		public static $_tbl_inst = null;
@@ -156,10 +184,10 @@ if (class_exists('\\ElkArte\\Database\\Mysqli\\Table'))
 		public function __construct($db, $db_prefix)
 		{
 			// We are doing install, of course we want to do any remove on these
-			$this->_reservedTables = array();
+			$this->_reservedTables = [];
 
 			// let's be sure.
-			$this->_package_log = array();
+			$this->_package_log = [];
 
 			// This executes queries and things
 			$this->_db = $db;
@@ -205,51 +233,49 @@ if (class_exists('\\ElkArte\\Database\\Mysqli\\Table'))
 			return $this->_db->query('', '
 				ALTER TABLE ' . $table_name . '
 				' . $statement,
-				array(
+				[
 					'security_override' => true,
-				)
+				]
 			);
 		}
 
 		/**
-		 * Discovers what type of data we are altering.
+		 * Determines the type of ALTER statement based on the given statement.
 		 *
-		 * @param string $statement
+		 * @param string $statement The ALTER statement to analyze.
+		 * @return string|false The type of ALTER statement or false if no match is found.
 		 */
 		protected function _find_alter_type($statement)
 		{
 			/** MySQL cases */
-			// Adding a column is:
-			//    ADD `column_name`
-			// Removing a column is:
-			//    DROP COL UMN
-			// Changing a column is:
-			//    CHANGE C OLUMN
+			// Adding a column is:   ADD `column_name`
+			// Removing a column is: DROP COL UMN
+			// Changing a column is: CHANGE C OLUMN
 			// Adding indexes:
-			//    ADD PRIM ARY KEY
-			//    ADD UNIQ UE
-			//    ADD INDE X
+			//    - ADD PRIM ARY KEY
+			//    - ADD UNIQ UE
+			//    - ADD INDE X
 			// Dropping indexes:
-			//    DROP PRI MARY KEY
-			//    DROP IND EX
+			//    - DROP PRI MARY KEY
+			//    - DROP IND EX
 			$short = substr(trim($statement), 0, 8);
 
-			if (in_array($short, array('DROP COL', 'CHANGE C')))
+			if (in_array($short, ['DROP COL', 'CHANGE C']))
 			{
 				return 'drop_column';
 			}
 
-			if (substr($short, 0, 5) === 'ADD `')
+			if (strpos($short, 'ADD `') === 0)
 			{
 				return 'add_column';
 			}
 
-			if (in_array($short, array('ADD PRIM', 'ADD UNIQ', 'ADD INDE')))
+			if (in_array($short, ['ADD PRIM', 'ADD UNIQ', 'ADD INDE']))
 			{
 				return 'add_index';
 			}
 
-			if (in_array($short, array('DROP PRI', 'DROP IND')))
+			if (in_array($short, ['DROP PRI', 'DROP IND']))
 			{
 				return 'drop_index';
 			}
@@ -283,7 +309,7 @@ if (class_exists('\\ElkArte\\Database\\Postgresql\\Table'))
 {
 	class DbTable_PostgreSQL_Install extends \ElkArte\Database\Postgresql\Table
 	{
-		public static $_tbl_inst = null;
+		public static $_tbl_inst;
 
 		/**
 		 * DbTable_PostgreSQL::construct
@@ -293,10 +319,10 @@ if (class_exists('\\ElkArte\\Database\\Postgresql\\Table'))
 		public function __construct($db, $db_prefix)
 		{
 			// We are doing install, of course we want to do any remove on these
-			$this->_reservedTables = array();
+			$this->_reservedTables = [];
 
 			// let's be sure.
-			$this->_package_log = array();
+			$this->_package_log = [];
 
 			// This executes queries and things
 			$this->_db = $db;
@@ -342,9 +368,9 @@ if (class_exists('\\ElkArte\\Database\\Postgresql\\Table'))
 			return $this->_db->query('', '
 				ALTER TABLE ' . $table_name . '
 				' . $statement,
-				array(
+				[
 					'security_override' => true,
-				)
+				]
 			);
 		}
 
@@ -356,39 +382,35 @@ if (class_exists('\\ElkArte\\Database\\Postgresql\\Table'))
 		protected function _find_alter_type($statement)
 		{
 			/** PostgreSQL cases */
-			// Removing a column is:
-			//    DROP COL UMN
-			// Rename a column is:
-			//    RENAME C OLUMN
-			// Altering a column is:
-			//    ALTER CO LUMN
-			// Adding a column is:
-			//    ADD COLU MN
+			// Removing a column is: DROP COL UMN
+			// Rename a column is:   RENAME C OLUMN
+			// Altering a column is: ALTER CO LUMN
+			// Adding a column is:   ADD COLU MN
 			// Adding indexes:
-			//    ADD PRIM ARY KEY
-			//    CREATE
-			//    CREATE U NIQUE
-			//    CREATE I NDEX
+			//   - ADD PRIM ARY KEY
+			//   - CREATE
+			//   - CREATE U NIQUE
+			//   - CREATE I NDEX
 			// Dropping indexes:
-			//    DROP CON STRAINT
-			//    DROP IND EX
+			//    - DROP CON STRAINT
+			//    - DROP IND EX
 			$short = substr(trim($statement), 0, 8);
-			if (in_array($short, array('DROP COL', 'RENAME C')))
+			if (in_array($short, ['DROP COL', 'RENAME C']))
 			{
 				return 'drop_column';
 			}
 
-			if (in_array($short, array('ALTER CO', 'ADD COLU')))
+			if (in_array($short, ['ALTER CO', 'ADD COLU']))
 			{
 				return 'add_column';
 			}
 
-			if (in_array($short, array('ADD PRIM', 'CREATE U', 'CREATE I')) || substr($short, 0, 6) === 'CREATE ')
+			if (in_array($short, ['ADD PRIM', 'CREATE U', 'CREATE I']) || substr($short, 0, 6) === 'CREATE ')
 			{
 				return 'add_index';
 			}
 
-			if (in_array($short, array('DROP CON', 'DROP IND')))
+			if (in_array($short, ['DROP CON', 'DROP IND']))
 			{
 				return 'drop_index';
 			}

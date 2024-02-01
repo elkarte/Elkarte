@@ -158,14 +158,14 @@ function checkChange(&$change)
 			)
 		);
 		// Mayday!
-		if ($request->num_rows() == 0)
+		if ($request->num_rows() === 0)
 		{
 			return;
 		}
 		// Oh where, oh where has my little field gone. Oh where can it be...
 		while ($row = $request->fetch_assoc())
 		{
-			if ($row['Field'] == $temp[1] || $row['Field'] == $temp[2])
+			if ($row['Field'] === $temp[1] || $row['Field'] === $temp[2])
 			{
 				$current_type = $row['Type'];
 				break;

@@ -23,7 +23,7 @@ use ElkArte\Util;
 class Install_Controller
 {
 	/** @var array The installation steps*/
-	public $steps = array();
+	public $steps = [];
 	/** @var int Are we there yet? */
 	public $overall_percent = 0;
 
@@ -36,16 +36,16 @@ class Install_Controller
 
 		// All the steps in detail.
 		// Number,Name,Function,Progress Weight.
-		$this->steps = array(
-			0 => array(1, $txt['install_step_welcome'], 'action_welcome', 0),
-			1 => array(2, $txt['install_step_exist'], 'action_checkFilesExist', 5),
-			2 => array(3, $txt['install_step_writable'], 'action_checkFilesWritable', 5),
-			3 => array(4, $txt['install_step_databaseset'], 'action_databaseSettings', 15),
-			4 => array(5, $txt['install_step_forum'], 'action_forumSettings', 40),
-			5 => array(6, $txt['install_step_databasechange'], 'action_databasePopulation', 15),
-			6 => array(7, $txt['install_step_admin'], 'action_adminAccount', 20),
-			7 => array(8, $txt['install_step_delete'], 'action_deleteInstall', 0),
-		);
+		$this->steps = [
+			0 => [1, $txt['install_step_welcome'], 'action_welcome', 0],
+			1 => [2, $txt['install_step_exist'], 'action_checkFilesExist', 5],
+			2 => [3, $txt['install_step_writable'], 'action_checkFilesWritable', 5],
+			3 => [4, $txt['install_step_databaseset'], 'action_databaseSettings', 15],
+			4 => [5, $txt['install_step_forum'], 'action_forumSettings', 40],
+			5 => [6, $txt['install_step_databasechange'], 'action_databasePopulation', 15],
+			6 => [7, $txt['install_step_admin'], 'action_adminAccount', 20],
+			7 => [8, $txt['install_step_delete'], 'action_deleteInstall', 0],
+		];
 	}
 
 	/**
@@ -155,8 +155,8 @@ class Install_Controller
 		}
 
 		// Is some database support even compiled in?
-		$incontext['supported_databases'] = array();
-		$db_missing = array();
+		$incontext['supported_databases'] = [];
+		$db_missing = [];
 		foreach ($databases as $key => $db)
 		{
 			if ($db['supported'])
@@ -229,12 +229,12 @@ class Install_Controller
 		$incontext['page_title'] = $txt['install_welcome'];
 		$incontext['sub_template'] = 'welcome_message';
 
-		$exist_files = array(
+		$exist_files = [
 			'db_last_error.sample.txt' => 'db_last_error.txt',
 			'Settings.sample.php' => 'Settings.php',
 			'Settings_bak.sample.php' => 'Settings_bak.php'
-		);
-		$missing_files = array();
+		];
+		$missing_files = [];
 
 		foreach ($exist_files as $orig => $file)
 		{
@@ -258,7 +258,7 @@ class Install_Controller
 			return true;
 		}
 
-		$rename_array = array();
+		$rename_array = [];
 		foreach ($missing_files as $orig => $file)
 		{
 			$rename_array[] = '<li>' . $orig . ' => ' . $file . '</li>';
@@ -283,7 +283,7 @@ class Install_Controller
 
 		$extra_files= [];
 
-		$writable_files = array(
+		$writable_files = [
 			'attachments',
 			'avatars',
 			'cache',
@@ -294,7 +294,7 @@ class Install_Controller
 			'db_last_error.txt',
 			'Settings.php',
 			'Settings_bak.php'
-		);
+		];
 		foreach ($incontext['detected_languages'] as $lang => $temp)
 		{
 			$extra_files[] = 'sources/ElkArte/Languages/Install/' . $lang;
@@ -306,7 +306,7 @@ class Install_Controller
 			$writable_files[] = file_exists(TMP_BOARDDIR . '/.htaccess') ? '.htaccess' : '.';
 		}
 
-		$failed_files = array();
+		$failed_files = [];
 
 		// On linux, it's easy - just use is_writable!
 		if (substr(__FILE__, 1, 2) !== ':\\')
@@ -397,7 +397,7 @@ class Install_Controller
 				$_POST['ftp_path'] = $_SESSION['installer_temp_ftp']['path'];
 			}
 
-			$incontext['ftp_errors'] = array();
+			$incontext['ftp_errors'] = [];
 
 			if (isset($_POST['ftp_username']))
 			{
@@ -439,27 +439,27 @@ class Install_Controller
 				}
 
 				// Set the username etc, into context.
-				$incontext['ftp'] = array(
+				$incontext['ftp'] = [
 					'server' => $_POST['ftp_server'] ?? 'localhost',
 					'port' => $_POST['ftp_port'] ?? '21',
 					'username' => $_POST['ftp_username'] ?? '',
 					'path' => $_POST['ftp_path'] ?? '/',
 					'path_msg' => !empty($found_path) ? $txt['ftp_path_found_info'] : $txt['ftp_path_info'],
-				);
+				];
 
 				return false;
 			}
 			else
 			{
-				$_SESSION['installer_temp_ftp'] = array(
+				$_SESSION['installer_temp_ftp'] = [
 					'server' => $_POST['ftp_server'],
 					'port' => $_POST['ftp_port'],
 					'username' => $_POST['ftp_username'],
 					'password' => $_POST['ftp_password'],
 					'path' => $_POST['ftp_path']
-				);
+				];
 
-				$failed_files_updated = array();
+				$failed_files_updated = [];
 
 				foreach ($failed_files as $file)
 				{
@@ -487,9 +487,9 @@ class Install_Controller
 					$incontext['failed_files'] = $failed_files_updated;
 
 					// Set the username etc, into context.
-					$incontext['ftp'] = $_SESSION['installer_temp_ftp'] += array(
+					$incontext['ftp'] = $_SESSION['installer_temp_ftp'] += [
 						'path_msg' => $txt['ftp_path_info'],
-					);
+					];
 
 					return false;
 				}
@@ -517,7 +517,7 @@ class Install_Controller
 		$incontext['db']['name'] = '';
 		$incontext['db']['pass'] = '';
 		$incontext['db']['type'] = '';
-		$incontext['supported_databases'] = array();
+		$incontext['supported_databases'] = [];
 
 		$foundOne = false;
 		foreach ($databases as $key => $db)
@@ -604,7 +604,7 @@ class Install_Controller
 			}
 
 			// Take care of these variables...
-			$vars = array(
+			$vars = [
 				'db_type' => $db_type,
 				'db_name' => $_POST['db_name'],
 				'db_user' => $_POST['db_user'],
@@ -614,7 +614,7 @@ class Install_Controller
 				'db_prefix' => $db_prefix,
 				// The cookiename is special; we want it to be the same if it ever needs to be reinstalled with the same info.
 				'cookiename' => 'ElkArteCookie' . abs(crc32($_POST['db_name'] . preg_replace('~[^A-Za-z0-9_$]~', '', $_POST['db_prefix'])) % 1000),
-			);
+			];
 
 			// God I hope it saved!
 			if (!updateSettingsFile($vars))
@@ -669,7 +669,7 @@ class Install_Controller
 				if ($db !== null && $db !== false)
 				{
 					$db_user = $_POST['db_prefix'] . $db_user;
-					updateSettingsFile(array('db_user' => $db_user));
+					updateSettingsFile(['db_user' => $db_user]);
 				}
 			}
 
@@ -700,9 +700,9 @@ class Install_Controller
 				$db->skip_next_error();
 				$db->query('', "
 					CREATE DATABASE IF NOT EXISTS `$db_name`",
-					array(
+					[
 						'security_override' => true,
-					)
+					]
 				);
 
 				// Okay, let's try the prefix if it didn't work...
@@ -711,15 +711,15 @@ class Install_Controller
 					$db->skip_next_error();
 					$db->query('', "
 						CREATE DATABASE IF NOT EXISTS `$_POST[db_prefix]$db_name`",
-						array(
+						[
 							'security_override' => true,
-						)
+						]
 					);
 
 					if ($db->select_db($_POST['db_prefix'] . $db_name))
 					{
 						$db_name = $_POST['db_prefix'] . $db_name;
-						updateSettingsFile(array('db_name' => $db_name));
+						updateSettingsFile(['db_name' => $db_name]);
 					}
 				}
 
@@ -754,7 +754,6 @@ class Install_Controller
 		{
 			$db_type = $_POST['db_type'];
 		}
-
 		// Else we'd better be able to get the connection.
 		else
 		{
@@ -767,7 +766,7 @@ class Install_Controller
 		$host = empty($_SERVER['HTTP_HOST']) ? $_SERVER['SERVER_NAME'] . (empty($_SERVER['SERVER_PORT']) || $_SERVER['SERVER_PORT'] == '80' ? '' : ':' . $_SERVER['SERVER_PORT']) : $_SERVER['HTTP_HOST'];
 
 		// Now, to put what we've learned together... and add a path.
-		$incontext['detected_url'] = 'http' . (!empty($_SERVER['HTTPS']) && strtolower($_SERVER['HTTPS']) === 'on' ? 's' : '') . '://' . $host . strtr(substr($_SERVER['PHP_SELF'], 0, strrpos($_SERVER['PHP_SELF'], '/')), array('/install' => ''));
+		$incontext['detected_url'] = 'http' . (!empty($_SERVER['HTTPS']) && strtolower($_SERVER['HTTPS']) === 'on' ? 's' : '') . '://' . $host . strtr(substr($_SERVER['PHP_SELF'], 0, strrpos($_SERVER['PHP_SELF'], '/')), ['/install' => '']);
 
 		// Check if the database sessions will even work.
 		$incontext['test_dbsession'] = ini_get('session.auto_start') != 1;
@@ -791,15 +790,15 @@ class Install_Controller
 			}
 
 			// Save these variables.
-			$vars = array(
+			$vars = [
 				'boardurl' => $_POST['boardurl'],
 				'boarddir' => addslashes(TMP_BOARDDIR),
 				'sourcedir' => addslashes(TMP_BOARDDIR) . '/sources',
 				'cachedir' => addslashes(TMP_BOARDDIR) . '/cache',
-				'mbname' => strtr($_POST['mbname'], array('\"' => '"')),
+				'mbname' => strtr($_POST['mbname'], ['\"' => '"']),
 				'language' => substr($_SESSION['installer_temp_lang'], 8, -4),
 				'extdir' => addslashes(TMP_BOARDDIR) . '/sources/ext',
-			);
+			];
 
 			// Must save!
 			if (!updateSettingsFile($vars))
@@ -813,7 +812,7 @@ class Install_Controller
 			require(TMP_BOARDDIR . '/Settings.php');
 
 			// Set our db character_set to utf8
-			updateSettingsFile(array('db_character_set' => 'utf8'));
+			updateSettingsFile(['db_character_set' => 'utf8']);
 
 			// Good, skip on.
 			return true;
@@ -845,6 +844,10 @@ class Install_Controller
 		require(TMP_BOARDDIR . '/Settings.php');
 		definePaths();
 
+		// Server and allowed functions will be used
+		require_once(TMP_BOARDDIR . '/sources/Load.php');
+		require_once(TMP_BOARDDIR . '/sources/Security.php');
+
 		$db = load_database();
 		db_table_install();
 
@@ -854,10 +857,9 @@ class Install_Controller
 			SELECT 
 			    variable, value
 			FROM {db_prefix}settings',
-			array()
+			[]
 		);
-
-		$modSettings = array();
+		$modSettings = [];
 		if ($result->hasResults())
 		{
 			while ($row = $result->fetch_assoc())
@@ -882,12 +884,12 @@ class Install_Controller
 		$db->skip_next_error();
 		$db->query('', '
 			SET NAMES {' . ($db_type == 'postgresql' ? 'string' : 'raw') . ':utf8}',
-			array(
+			[
 				'utf8' => 'utf8',
-			)
+			]
 		);
 
-		$replaces = array(
+		$replaces = [
 			'{$db_prefix}' => $db_prefix,
 			'{BOARDDIR}' => TMP_BOARDDIR,
 			'{$boardurl}' => $boardurl,
@@ -896,7 +898,7 @@ class Install_Controller
 			'{$current_version}' => CURRENT_VERSION,
 			'{$current_time}' => time(),
 			'{$sched_task_offset}' => 82800 + mt_rand(0, 86399),
-		);
+		];
 
 		foreach ($txt as $key => $value)
 		{
@@ -905,17 +907,17 @@ class Install_Controller
 				$replaces['{$' . $key . '}'] = $value;
 			}
 		}
-		$replaces['{$default_reserved_names}'] = strtr($replaces['{$default_reserved_names}'], array('\\\\n' => '\\n'));
+		$replaces['{$default_reserved_names}'] = strtr($replaces['{$default_reserved_names}'], ['\\\\n' => '\\n']);
 
 		// Execute the SQL.
-		$exists = array();
-		$incontext['failures'] = array();
-		$incontext['sql_results'] = array(
+		$exists = [];
+		$incontext['failures'] = [];
+		$incontext['sql_results'] = [
 			'tables' => 0,
 			'inserts' => 0,
 			'table_dups' => 0,
 			'insert_dups' => 0,
-		);
+		];
 
 		if (!empty($databases[$db_type]['additional_file']))
 		{
@@ -928,26 +930,26 @@ class Install_Controller
 		// Make sure UTF will be used globally.
 		$db->insert('replace',
 			$db_prefix . 'settings',
-			array(
+			[
 				'variable' => 'string-255', 'value' => 'string-65534',
-			),
-			array(
+			],
+			[
 				'global_character_set', 'UTF-8',
-			),
-			array('variable')
+			],
+			['variable']
 		);
 
 		$agreement = new Agreement('english');
 		$success = $agreement->storeBackup();
 		$db->insert('replace',
 			$db_prefix . 'settings',
-			array(
+			[
 				'variable' => 'string-255', 'value' => 'string-65534',
-			),
-			array(
+			],
+			[
 				'agreementRevision', $success,
-			),
-			array('variable')
+			],
+			['variable']
 		);
 
 		// Maybe we can auto-detect better cookie settings?
@@ -959,7 +961,7 @@ class Install_Controller
 			$globalCookies = false;
 
 			// Okay... let's see.  Using a subdomain other than www.? (not a perfect check.)
-			if ($matches[2] !== '' && (strpos(substr($matches[2], 1), '.') === false || in_array($matches[1], array('forum', 'board', 'community', 'forums', 'support', 'chat', 'help', 'talk', 'boards', 'www'))))
+			if ($matches[2] !== '' && (strpos(substr($matches[2], 1), '.') === false || in_array($matches[1], ['forum', 'board', 'community', 'forums', 'support', 'chat', 'help', 'talk', 'boards', 'www'])))
 			{
 				$globalCookies = true;
 			}
@@ -972,21 +974,21 @@ class Install_Controller
 
 			if ($globalCookies)
 			{
-				$rows[] = array('globalCookies', '1');
+				$rows[] = ['globalCookies', '1'];
 			}
 
 			if ($localCookies)
 			{
-				$rows[] = array('localCookies', '1');
+				$rows[] = ['localCookies', '1'];
 			}
 
 			if (!empty($rows))
 			{
 				$db->insert('replace',
 					$db_prefix . 'settings',
-					array('variable' => 'string-255', 'value' => 'string-65534'),
+					['variable' => 'string-255', 'value' => 'string-65534'],
 					$rows,
-					array('variable')
+					['variable']
 				);
 			}
 		}
@@ -1000,13 +1002,13 @@ class Install_Controller
 			{
 				$db->insert('',
 					$db_prefix . 'settings',
-					array(
+					[
 						'variable' => 'string-255', 'value' => 'string-65534',
-					),
-					array(
+					],
+					[
 						'default_timezone', $timezone_id,
-					),
-					array('variable')
+					],
+					['variable']
 				);
 			}
 		}
@@ -1016,7 +1018,7 @@ class Install_Controller
 		$db_table = db_table($db);
 		foreach ($tables as $table)
 		{
-			if ($db_table->optimize($table) == -1)
+			if ($db_table->optimize($table) === -1)
 			{
 				$incontext['failures'][-1] = $db->last_error();
 				break;
@@ -1028,9 +1030,9 @@ class Install_Controller
 		$cannot_alter_table = $db->query('', "
 			ALTER TABLE {$db_prefix}log_digest
 			ORDER BY id_topic",
-				array(
+				[
 					'security_override' => true
-				)
+				]
 			)->getResultObject() === false;
 
 		if (!empty($databases[$db_type]['alter_support']) && $cannot_alter_table)
@@ -1098,9 +1100,9 @@ class Install_Controller
 			WHERE id_group = {int:admin_group} 
 				OR FIND_IN_SET({int:admin_group}, additional_groups) != 0
 			LIMIT 1',
-			array(
+			[
 				'admin_group' => 1,
-			)
+			]
 		);
 		// Skip the step if an admin already exists
 		if ($request->num_rows() != 0)
@@ -1113,7 +1115,7 @@ class Install_Controller
 		if (isset($_POST['password1']) && !empty($_POST['contbutt']))
 		{
 			// Wrong password?
-			if ($incontext['require_db_confirm'] && $_POST['password3'] != $db_passwd)
+			if ($incontext['require_db_confirm'] && $_POST['password3'] !== $db_passwd)
 			{
 				$incontext['error'] = $txt['error_db_connect'];
 
@@ -1121,7 +1123,7 @@ class Install_Controller
 			}
 
 			// Not matching passwords?
-			if ($_POST['password1'] != $_POST['password2'])
+			if ($_POST['password1'] !== $_POST['password2'])
 			{
 				$incontext['error'] = $txt['error_user_settings_again_match'];
 
@@ -1144,13 +1146,13 @@ class Install_Controller
 			}
 
 			// Update the main contact email?
-			if (!empty($_POST['email']) && (empty($webmaster_email) || $webmaster_email == 'noreply@myserver.com'))
+			if (!empty($_POST['email']) && (empty($webmaster_email) || $webmaster_email === 'noreply@myserver.com'))
 			{
-				updateSettingsFile(array('webmaster_email' => $_POST['email']));
+				updateSettingsFile(['webmaster_email' => $_POST['email']]);
 			}
 
 			// Work out whether we're going to have dodgy characters and remove them.
-			$invalid_characters = preg_match('~[<>&"\'=\\\]~', $_POST['username']) != 0;
+			$invalid_characters = preg_match('~[<>&"\'=\\\]~', $_POST['username']) === 1;
 			$_POST['username'] = preg_replace('~[<>&"\'=\\\]~', '', $_POST['username']);
 
 			$db->skip_next_error();
@@ -1161,12 +1163,12 @@ class Install_Controller
 				WHERE member_name = {string:username} 
 					OR email_address = {string:email}
 				LIMIT 1',
-				array(
+				[
 					'username' => stripslashes($_POST['username']),
 					'email' => stripslashes($_POST['email']),
-				)
+				]
 			);
-			if ($result->num_rows() != 0)
+			if ($result->num_rows() !== 0)
 			{
 				list ($incontext['member_id'], $incontext['member_salt']) = $result->fetch_row();
 				$result->free_result();
@@ -1179,12 +1181,12 @@ class Install_Controller
 			if (trim($_POST['username']) === '' || strlen($_POST['username']) > 25)
 			{
 				// Try the previous step again.
-				$incontext['error'] = $_POST['username'] == '' ? $txt['error_username_left_empty'] : $txt['error_username_too_long'];
+				$incontext['error'] = $_POST['username'] === '' ? $txt['error_username_left_empty'] : $txt['error_username_too_long'];
 
 				return false;
 			}
 
-			if ($invalid_characters || $_POST['username'] == '_' || $_POST['username'] == '|' || strpos($_POST['username'], '[code') !== false || strpos($_POST['username'], '[/code') !== false)
+			if ($invalid_characters || $_POST['username'] === '_' || $_POST['username'] === '|' || strpos($_POST['username'], '[code') !== false || strpos($_POST['username'], '[/code') !== false)
 			{
 				// Try the previous step again.
 				$incontext['error'] = $txt['error_invalid_characters_username'];
@@ -1215,7 +1217,7 @@ class Install_Controller
 
 			$request = $db->insert('',
 				$db_prefix . 'members',
-				array(
+				[
 					'member_name' => 'string-25', 'real_name' => 'string-25', 'passwd' => 'string', 'email_address' => 'string',
 					'id_group' => 'int', 'posts' => 'int', 'date_registered' => 'int', 'hide_email' => 'int',
 					'password_salt' => 'string', 'lngfile' => 'string', 'avatar' => 'string',
@@ -1223,8 +1225,8 @@ class Install_Controller
 					'message_labels' => 'string', 'website_title' => 'string', 'website_url' => 'string',
 					'signature' => 'string', 'usertitle' => 'string', 'secret_question' => 'string',
 					'additional_groups' => 'string', 'ignore_boards' => 'string',
-				),
-				array(
+				],
+				[
 					stripslashes($_POST['username']), stripslashes($_POST['username']), $incontext['passwd'], stripslashes($_POST['email']),
 					1, 0, time(), 0,
 					$incontext['member_salt'], '', '',
@@ -1232,20 +1234,20 @@ class Install_Controller
 					'', '', '',
 					'', '', '',
 					'', '',
-				),
-				array('id_member')
+				],
+				['id_member']
 			);
 
 			// Awww, crud!
 			if ($request->hasResults() === false)
 			{
 				$incontext['error'] = $txt['error_user_settings_query'] . '<br />
-				<div style="margin: 2ex;">' . nl2br(htmlspecialchars($db->last_error($db_connection), ENT_COMPAT, 'UTF-8')) . '</div>';
+				<div style="margin: 2ex;">' . nl2br(htmlspecialchars($db->last_error(), ENT_COMPAT, 'UTF-8')) . '</div>';
 
 				return false;
 			}
 
-			$incontext['member_id'] = $db->insert_id("{$db_prefix}members", 'id_member');
+			$incontext['member_id'] = $db->insert_id("{$db_prefix}members");
 
 			// If we're here we're good.
 			return true;
@@ -1308,20 +1310,20 @@ class Install_Controller
 		$db->skip_next_error();
 		$db->query('', '
 			SET NAMES UTF8',
-			array()
+			[]
 		);
 
 		// As track stats is by default enabled let's add some activity.
 		$db->insert('ignore',
 			'{db_prefix}log_activity',
-			array('date' => 'date', 'topics' => 'int', 'posts' => 'int', 'registers' => 'int'),
-			array(Util::strftime('%Y-%m-%d', time()), 1, 1, (!empty($incontext['member_id']) ? 1 : 0)),
-			array('date')
+			['date' => 'date', 'topics' => 'int', 'posts' => 'int', 'registers' => 'int'],
+			[Util::strftime('%Y-%m-%d', time()), 1, 1, (!empty($incontext['member_id']) ? 1 : 0)],
+			['date']
 		);
 
 		// Take notes of when the installation was finished not to send to the
 		// upgrade when pointing to index.php and the install directory is still there.
-		updateSettingsFile(array('install_time' => time()));
+		updateSettingsFile(['install_time' => time()]);
 
 		// We're going to want our lovely $modSettings now.
 		$db->skip_next_error();
@@ -1329,7 +1331,7 @@ class Install_Controller
 			SELECT 
 				variable, value
 			FROM {db_prefix}settings',
-			array()
+			[]
 		)->fetch_callback(
 			function ($row) use (&$modSettings) {
 				// Only proceed if we can load the data.
@@ -1349,11 +1351,11 @@ class Install_Controller
 				value
 			FROM {db_prefix}settings
 			WHERE variable = {string:db_sessions}',
-			array(
+			[
 				'db_sessions' => 'databaseSession_enable',
-			)
+			]
 		);
-		if ($result->num_rows() != 0)
+		if ($result->num_rows() !== 0)
 		{
 			list ($db_sessions) = $result->fetch_row();
 		}
@@ -1369,13 +1371,13 @@ class Install_Controller
 
 			$db->insert('replace',
 				'{db_prefix}sessions',
-				array(
+				[
 					'session_id' => 'string', 'last_update' => 'int', 'data' => 'string',
-				),
-				array(
+				],
+				[
 					session_id(), time(), 'USER_AGENT|s:' . strlen($_SERVER['HTTP_USER_AGENT']) . ':"' . $_SERVER['HTTP_USER_AGENT'] . '";admin_time|i:' . time() . ';',
-				),
-				array('session_id')
+				],
+				['session_id']
 			);
 		}
 
@@ -1396,7 +1398,7 @@ class Install_Controller
 			WHERE id_msg = 1
 				AND modified_time = 0
 			LIMIT 1',
-			array()
+			[]
 		);
 		if ($request->num_rows() > 0)
 		{
@@ -1415,11 +1417,11 @@ class Install_Controller
 			User::$info->ip = $_SERVER['REMOTE_ADDR'];
 			User::$info->id = $incontext['member_id'] ?? 0;
 
-			logAction('install', array('version' => $forum_version), 'admin');
+			logAction('install', ['version' => $forum_version], 'admin');
 		}
 
 		// Some final context for the template.
-		$incontext['dir_still_writable'] = is_writable(__DIR__) && substr(__FILE__, 1, 2) != ':\\';
+		$incontext['dir_still_writable'] = is_writable(__DIR__) && substr(__FILE__, 1, 2) !== ':\\';
 		$incontext['probably_delete_install'] = isset($_SESSION['installer_temp_ftp']) || is_writable(__DIR__) || is_writable(__FILE__);
 
 		return false;
