@@ -239,3 +239,6 @@ $txt['upgrade_error_script_js'] = 'The upgrade script cannot find script.js or i
 $txt['upgrade_warning_lots_data'] = 'This upgrade script has detected that your forum contains a lot of data which needs upgrading. This process may take quite some time depending on your server and forum size, and for very large forums (~300,000 messages) may take several hours to complete.';
 $txt['upgrade_warning_out_of_date'] = 'This upgrade script is out of date! The current version of ElkArte is <em id="elkVersion">??</em> but this upgrade script is for <em id="installedVersion">%1$s</em>.<br /><br />It is recommended that you visit the <a href="https://www.elkarte.net/" target="_blank" class="new_win">ElkArte Community</a> website to ensure you are upgrading to the latest version.';
 $txt['upgrade_warning_already_done'] = 'You are already running <em>ElkArte %1$s</em> no upgrade is available!  You must <strong>delete</strong> the install directory and then proceed to <a href="%2$s">your forum</a>';
+
+$txt['database_error'] = 'Database Error';
+$txt['theme_language_error'] = 'Unable to load the \'%1$s\' language file.';

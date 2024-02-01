@@ -33,14 +33,14 @@ $upcontext['current_debug_item_name'] = '';
 
 // All the steps in detail.
 // Number,Name,Function,Progress Weight.
-$upcontext['steps'] = array(
-	0 => array(1, 'Login', 'action_welcomeLogin', 0),
-	1 => array(2, 'Upgrade Options', 'action_upgradeOptions', 5),
-	2 => array(3, 'Backup', 'action_backupDatabase', 15),
-	3 => array(4, 'Database Changes', 'action_databaseChanges', 65),
-	4 => array(5, 'Database Changes', 'action_deleteOldFiles', 15),
-	5 => array(6, 'Delete Upgrade', 'action_deleteUpgrade', 0),
-);
+$upcontext['steps'] = [
+	0 => [1, 'Login', 'action_welcomeLogin', 0],
+	1 => [2, 'Upgrade Options', 'action_upgradeOptions', 5],
+	2 => [3, 'Backup', 'action_backupDatabase', 15],
+	3 => [4, 'Database Changes', 'action_databaseChanges', 65],
+	4 => [5, 'Database Changes', 'action_deleteOldFiles', 15],
+	5 => [6, 'Delete Upgrade', 'action_deleteUpgrade', 0],
+];
 
 // Just to remember which one has files in it.
 $upcontext['database_step'] = 3;
@@ -55,7 +55,7 @@ if (PHP_SAPI === 'cli' && !empty($_SERVER['argv']) && empty($_SERVER['REMOTE_ADD
 {
 	for ($i = 1; $i < $_SERVER['argc']; $i++)
 	{
-		if (preg_match('~^--path=(.+)$~', $_SERVER['argv'][$i], $match) != 0)
+		if (preg_match('~^--path=(.+)$~', $_SERVER['argv'][$i], $match) === 1)
 		{
 			$upgrade_path = substr($match[1], -1) === '/' ? substr($match[1], 0, -1) : $match[1];
 		}
@@ -161,13 +161,13 @@ if (empty($upcontext['updated']))
 {
 	$upcontext['started'] = time();
 	$upcontext['updated'] = 0;
-	$upcontext['user'] = array(
+	$upcontext['user'] = [
 		'id' => 0,
 		'name' => 'Guest',
 		'pass' => 0,
 		'started' => $upcontext['started'],
 		'updated' => $upcontext['updated'],
-	);
+	];
 }
 
 // Load up essential data such as modSettings, Classloader, db
@@ -199,12 +199,12 @@ if (isset($modSettings['elkVersion']))
 		FROM {db_prefix}themes
 		WHERE id_theme = {int:id_theme}
 			AND variable IN ({string:theme_url}, {string:theme_dir}, {string:images_url})',
-		array(
+		[
 			'id_theme' => 1,
 			'theme_url' => 'theme_url',
 			'theme_dir' => 'theme_dir',
 			'images_url' => 'images_url',
-		)
+		]
 	)->fetch_callback(
 		function ($row) use (&$modSettings) {
 			$modSettings[$row['variable']] = $row['value'];
@@ -237,7 +237,7 @@ $upcontext['right_to_left'] = $txt['lang_rtl'] ?? false;
 // Have we got log data - if so use it (It will be clean!)
 if (isset($_GET['data']))
 {
-	$upcontext['upgrade_status'] = unserialize(base64_decode($_GET['data']), array('allowed_classes' => false));
+	$upcontext['upgrade_status'] = unserialize(base64_decode($_GET['data']), ['allowed_classes' => false]);
 	$upcontext['current_step'] = $upcontext['upgrade_status']['curstep'];
 	$upcontext['language'] = ucfirst($upcontext['upgrade_status']['lang']);
 	$upcontext['rid'] = $upcontext['upgrade_status']['rid'];
@@ -255,20 +255,20 @@ else
 {
 	$upcontext['current_step'] = 0;
 	$upcontext['rid'] = mt_rand(0, 5000);
-	$upcontext['upgrade_status'] = array(
+	$upcontext['upgrade_status'] = [
 		'curstep' => 0,
 		// memo: .lng files were used by YaBB SE
-		'lang' => isset($_GET['lang']) ? $_GET['lang'] : basename($language, '.lng'),
+		'lang' => $_GET['lang'] ?? basename($language, '.lng'),
 		'rid' => $upcontext['rid'],
 		'pass' => 0,
 		'debug' => 0,
 		'js' => 0,
-	);
+	];
 	$upcontext['language'] = $upcontext['upgrade_status']['lang'];
 }
 
 // If this isn't the first stage see whether they are logging in and resuming.
-if ($upcontext['current_step'] != 0 || !empty($upcontext['user']['step']))
+if ($upcontext['current_step'] !== 0 || !empty($upcontext['user']['step']))
 {
 	checkLogin();
 }
@@ -297,7 +297,7 @@ foreach ($upcontext['steps'] as $num => $step)
 		$upcontext['skip'] = false;
 
 		// We cannot proceed if we're not logged in.
-		if ($num != 0 && !$disable_security && $upcontext['user']['pass'] != $upcontext['upgrade_status']['pass'])
+		if ($num !== 0 && !$disable_security && $upcontext['user']['pass'] !== $upcontext['upgrade_status']['pass'])
 		{
 			$upcontext['steps'][0][2]();
 			break;
@@ -337,7 +337,7 @@ function upgradeExit($fallThrough = false)
 		$upcontext['user']['updated'] = time();
 		$upgradeData = base64_encode(serialize($upcontext['user']));
 		copy(BOARDDIR . '/Settings.php', BOARDDIR . '/Settings_bak.php');
-		changeSettings(array('upgradeData' => '\'' . $upgradeData . '\''));
+		changeSettings(['upgradeData' => '\'' . $upgradeData . '\'']);
 		updateLastError();
 	}
 
@@ -361,7 +361,7 @@ function upgradeExit($fallThrough = false)
 				debug_print_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS);
 			}
 
-			echo "\n" . 'Error: Unexpected call to use the ' . (isset($upcontext['sub_template']) ? $upcontext['sub_template'] : '') . ' template. Please copy and paste all the text above and visit the ElkArte Community to tell the Developers that they\'ve made a doh!; they\'ll get you up and running again.';
+			echo "\n" . 'Error: Unexpected call to use the ' . ($upcontext['sub_template'] ?? '') . ' template. Please copy and paste all the text above and visit the ElkArte Community to tell the Developers that they\'ve made a doh!; they\'ll get you up and running again.';
 			flush();
 			die();
 		}
@@ -371,10 +371,10 @@ function upgradeExit($fallThrough = false)
 			header('Content-Type: text/xml; charset=UTF-8');
 
 			// Sadly we need to retain the $_GET data thanks to the old upgrade scripts.
-			$upcontext['get_data'] = array();
+			$upcontext['get_data'] = [];
 			foreach ($_GET as $k => $v)
 			{
-				if (strpos($k, 'amp') !== 0 && !in_array($k, array('xml', 'substep', 'lang', 'data', 'step', 'filecount')))
+				if (strpos($k, 'amp') !== 0 && !in_array($k, ['xml', 'substep', 'lang', 'data', 'step', 'filecount']))
 				{
 					$upcontext['get_data'][$k] = $v;
 				}
@@ -451,7 +451,7 @@ function redirectLocation($location, $addForm = true)
 		@ob_end_clean();
 	}
 
-	header('Location: ' . strtr($location, array('&amp;' => '&')));
+	header('Location: ' . strtr($location, ['&amp;' => '&']));
 
 	// Exit - saving status as we go.
 	upgradeExit(true);
@@ -479,7 +479,7 @@ function loadEssentialData()
 	}
 
 	// Start the session.
-	if (ini_get('session.save_handler') == 'user')
+	if (ini_get('session.save_handler') === 'user')
 	{
 		@ini_set('session.save_handler', 'files');
 	}
@@ -501,7 +501,7 @@ function loadEssentialData()
 		require_once(SOURCEDIR . '/Security.php');
 		require_once(SOURCEDIR . '/Autoloader.class.php');
 		$autoloder = Elk_Autoloader::instance();
-		$autoloder->setupAutoloader(array(SOURCEDIR, SUBSDIR, CONTROLLERDIR, ADMINDIR, ADDONSDIR));
+		$autoloder->setupAutoloader([SOURCEDIR, SUBSDIR, CONTROLLERDIR, ADMINDIR, ADDONSDIR]);
 		$autoloder->register(SOURCEDIR, '\\ElkArte');
 		load_possible_databases($db_type);
 
@@ -512,7 +512,7 @@ function loadEssentialData()
 		{
 			$db->query('', '
 				SET NAMES ' . $db_character_set,
-				array()
+				[]
 			);
 		}
 
@@ -522,14 +522,14 @@ function loadEssentialData()
 			SELECT 
 			    variable, value
 			FROM {db_prefix}settings',
-			array()
+			[]
 		);
-		$modSettings = array();
-		while ($row = $db->fetch_assoc($request))
+		$modSettings = [];
+		while ($row = $request->fetch_assoc())
 		{
 			$modSettings[$row['variable']] = $row['value'];
 		}
-		$db->free_result($request);
+		$request->free_result();
 	}
 	else
 	{
@@ -669,7 +669,7 @@ function action_welcomeLogin()
 	// Do they have ALTER privileges?
 	$db->skip_next_error();
 	if (!empty($databases[$db_type]['alter_support'])
-		&& $db->query('', '	ALTER TABLE {db_prefix}log_digest ORDER BY id_topic', array()) === false)
+		&& $db->query('', '	ALTER TABLE {db_prefix}log_digest ORDER BY id_topic', []) === false)
 	{
 		return throw_error('The ' . $databases[$db_type]['name'] . ' user you have set in Settings.php does not have proper privileges.<br /><br />Please ask your host to give this user the ALTER, CREATE, and DROP privileges.');
 	}
@@ -683,19 +683,17 @@ function action_welcomeLogin()
 	}
 
 	// What absolutely needs to be writable?
-	$writable_files = array(
+	$writable_files = [
 		BOARDDIR . '/Settings.php',
 		BOARDDIR . '/Settings_bak.php',
-	);
+	];
 
 	// Check the cache directory.
 	$CACHEDIR_temp = !defined('CACHEDIR') ? BOARDDIR . '/cache' : CACHEDIR;
-	if (!file_exists($CACHEDIR_temp))
+	if (!file_exists($CACHEDIR_temp)
+		&& !mkdir($CACHEDIR_temp) && !is_dir($CACHEDIR_temp))
 	{
-		if (!mkdir($CACHEDIR_temp) && !is_dir($CACHEDIR_temp))
-		{
-			return throw_error(sprintf('The cache directory "%s" could not be created.<br /><br />Please make sure you have a directory called &quot;cache&quot; in your forum directory before continuing.', $CACHEDIR_temp));
-		}
+		return throw_error(sprintf('The cache directory "%s" could not be created.<br /><br />Please make sure you have a directory called &quot;cache&quot; in your forum directory before continuing.', $CACHEDIR_temp));
 	}
 
 	if (!file_exists($CACHEDIR_temp))
@@ -740,7 +738,7 @@ function action_welcomeLogin()
 	// Upgrade the agreement.
 
 	// We're going to check that their board dir setting is right in case they've been moving stuff around.
-	if (strtr(BOARDDIR, array('/' => '', '\\' => '')) !== strtr(TMP_BOARDDIR, array('/' => '', '\\' => '')))
+	if (strtr(BOARDDIR, ['/' => '', '\\' => '']) !== strtr(TMP_BOARDDIR, ['/' => '', '\\' => '']))
 	{
 		$upcontext['warning'] = '
 			It looks as if your board directory settings <em>might</em> be incorrect. Your board directory is currently set to &quot;' . BOARDDIR . '&quot; but should probably be &quot;' . TMP_BOARDDIR . '&quot;. Settings.php currently lists your paths as:<br />
@@ -785,58 +783,57 @@ function checkLogin()
 
 		// Before SMF 2.0 these column names were different!
 		$oldDB = false;
-		if (empty($db_type) || $db_type == 'mysql')
+		if (empty($db_type) || $db_type === 'mysql')
 		{
 			$db->skip_next_error();
 			$request = $db->query('', '
 				SHOW COLUMNS
 				FROM {db_prefix}members
 				LIKE {string:member_name}',
-				array(
+				[
 					'member_name' => 'memberName',
-				)
+				]
 			);
-			if ($db->num_rows($request) != 0)
+			if ($request->num_rows() !== 0)
 			{
 				$oldDB = true;
 			}
-			$db->free_result($request);
+			$request->free_result();
 		}
 
 		// Get what we believe to be their details.
 		if (!$disable_security)
 		{
+			$db->skip_next_error();
 			if ($oldDB)
 			{
-				$db->skip_next_error();
 				$request = $db->query('', '
 					SELECT 
 						id_member, memberName AS member_name, passwd, id_group,
 						additionalGroups AS additional_groups, lngfile
 					FROM {db_prefix}members
 					WHERE memberName = {string:member_name}',
-					array(
+					[
 						'member_name' => $_POST['user'],
-					)
+					]
 				);
 			}
 			else
 			{
-				$db->skip_next_error();
 				$request = $db->query('', '
 					SELECT 
 						id_member, member_name, passwd, id_group, additional_groups, lngfile
 					FROM {db_prefix}members
 					WHERE member_name = {string:member_name}',
-					array(
+					[
 						'member_name' => $_POST['user'],
-					)
+					]
 				);
 			}
 
-			if ($db->num_rows($request) != 0)
+			if ($request->num_rows() !== 0)
 			{
-				list ($id_member, $name, $password, $id_group, $addGroups, $user_language) = $db->fetch_row($request);
+				list ($id_member, $name, $password, $id_group, $addGroups, $user_language) = $request->fetch_row($request);
 
 				// These will come in handy, if you want to login
 				require_once(SOURCEDIR . '/Security.php');
@@ -893,7 +890,7 @@ function checkLogin()
 
 						// Update the password hash and set up the salt.
 						require_once(SUBSDIR . '/Members.subs.php');
-						updateMemberData($id_member, array('passwd' => $password, 'password_salt' => $password_salt, 'passwd_flood' => ''));
+						updateMemberData($id_member, ['passwd' => $password, 'password_salt' => $password_salt, 'passwd_flood' => '']);
 					}
 				}
 			}
@@ -903,7 +900,7 @@ function checkLogin()
 				$upcontext['username_incorrect'] = true;
 			}
 
-			$db->free_result($request);
+			$request->free_result();
 		}
 
 		$upcontext['username'] = $_POST['user'];
@@ -959,16 +956,16 @@ function checkLogin()
 						FROM {db_prefix}permissions
 						WHERE id_group IN ({array_int:groups})
 							AND permission = {string:admin_forum}',
-						array(
+						[
 							'groups' => $groups,
 							'admin_forum' => 'admin_forum',
-						)
+						]
 					);
-					if ($db->num_rows($request) == 0)
+					if ($request->num_rows() === 0)
 					{
 						return throw_error('You need to be an admin to perform an upgrade!');
 					}
-					$db->free_result($request);
+					$request->free_result();
 				}
 
 				$upcontext['user']['id'] = $id_member;
@@ -1044,9 +1041,9 @@ function action_upgradeOptions()
 	$db->query('', '
 		DELETE FROM {db_prefix}settings
 		WHERE variable = {string:allow_sm_stats}',
-		array(
+		[
 			'allow_sm_stats' => 'allow_sm_stats',
-		)
+		]
 	);
 
 	// Cleanup all the hooks (we are upgrading, so better have everything cleaned up)
@@ -1054,9 +1051,9 @@ function action_upgradeOptions()
 	$db->query('', '
 		DELETE FROM {db_prefix}settings
 		WHERE variable = {string:integrate}',
-		array(
+		[
 			'integrate' => 'integrate_%',
-		)
+		]
 	);
 
 	// Optionally empty the error log?
@@ -1064,11 +1061,11 @@ function action_upgradeOptions()
 	{
 		$db->query('truncate_table', '
 			TRUNCATE {db_prefix}log_errors',
-			array()
+			[]
 		);
 	}
 
-	$changes = array();
+	$changes = [];
 
 	// If we're overriding the language follow it through.
 	if (isset($_GET['lang']) && file_exists($modSettings['theme_dir'] . '/languages/' . $_GET['lang'] . '/index.' . $_GET['lang'] . '.php'))
@@ -1173,10 +1170,10 @@ function action_backupDatabase()
 
 	// Get all the table names.
 	$filter = str_replace('_', '\_', preg_match('~^`(.+?)`\.(.+?)$~', $db_prefix, $match) != 0 ? $match[2] : $db_prefix) . '%';
-	$db_name = preg_match('~^`(.+?)`\.(.+?)$~', $db_prefix, $match) != 0 ? strtr($match[1], array('`' => '')) : false;
+	$db_name = preg_match('~^`(.+?)`\.(.+?)$~', $db_prefix, $match) != 0 ? strtr($match[1], ['`' => '']) : false;
 	$tables = $db->db_list_tables($db_name, $filter);
 
-	$table_names = array();
+	$table_names = [];
 	foreach ($tables as $table)
 	{
 		if (strpos($table, 'backup_') !== 0)
@@ -1187,7 +1184,7 @@ function action_backupDatabase()
 
 	$upcontext['table_count'] = count($table_names);
 	$upcontext['cur_table_num'] = $_GET['substep'];
-	$upcontext['cur_table_name'] = str_replace($db_prefix, '', isset($table_names[$_GET['substep']]) ? $table_names[$_GET['substep']] : $table_names[0]);
+	$upcontext['cur_table_name'] = str_replace($db_prefix, '', $table_names[$_GET['substep']] ?? $table_names[0]);
 	$upcontext['step_progress'] = (int) (($upcontext['cur_table_num'] / $upcontext['table_count']) * 100);
 
 	// For non-java auto submit...
@@ -1213,7 +1210,7 @@ function action_backupDatabase()
 		// Backup each table!
 		for ($substep = $_GET['substep'], $n = count($table_names); $substep < $n; $substep++)
 		{
-			$upcontext['cur_table_name'] = str_replace($db_prefix, '', (isset($table_names[$substep + 1]) ? $table_names[$substep + 1] : $table_names[$substep]));
+			$upcontext['cur_table_name'] = str_replace($db_prefix, '', ($table_names[$substep + 1] ?? $table_names[$substep]));
 			$upcontext['cur_table_num'] = $substep + 1;
 			$upcontext['step_progress'] = (int) (($upcontext['cur_table_num'] / $upcontext['table_count']) * 100);
 
@@ -1294,7 +1291,7 @@ function action_databaseChanges()
 	// All possible files.
 	// Name, less than version, insert_on_complete.
 	$files = getUpgradeFiles();
-	$files_todo = array();
+	$files_todo = [];
 
 	// How many files are there in total?
 	$filecount = 0;
@@ -1336,9 +1333,9 @@ function action_databaseChanges()
 				// Only update the version of this if complete.
 				$db->insert('replace',
 					'{db_prefix}settings',
-					array('variable' => 'string', 'value' => 'string'),
-					array('elkVersion', $file[2]),
-					array('variable')
+					['variable' => 'string', 'value' => 'string'],
+					['elkVersion', $file[2]],
+					['variable']
 				);
 
 				$modSettings['elkVersion'] = $file[2];
@@ -1410,11 +1407,11 @@ function action_deleteUpgrade()
 
 	$endl = $command_line ? "\n" : '<br />' . "\n";
 
-	$changes = array(
+	$changes = [
 		'language' => '\'' . (substr($language, -4) === '.lng' ? substr($language, 0, -4) : $language) . '\'',
 		'db_error_send' => '1',
 		'upgradeData' => '#remove#'
-	);
+	];
 
 	// Are we in maintenance mode?
 	if (isset($upcontext['user']['main']))
@@ -1433,7 +1430,7 @@ function action_deleteUpgrade()
 	}
 
 	// Wipe this out...
-	$upcontext['user'] = array();
+	$upcontext['user'] = [];
 
 	// Make a backup of Settings.php first as otherwise earlier changes are lost.
 	copy(BOARDDIR . '/Settings.php', BOARDDIR . '/Settings_bak.php');
@@ -1457,15 +1454,15 @@ function action_deleteUpgrade()
 	// Log the action manually, so CLI still works.
 	$db->insert('',
 		'{db_prefix}log_actions',
-		array(
+		[
 			'log_time' => 'int', 'id_log' => 'int', 'id_member' => 'int', 'ip' => 'string-16', 'action' => 'string',
 			'id_board' => 'int', 'id_topic' => 'int', 'id_msg' => 'int', 'extra' => 'string-65534',
-		),
-		array(
+		],
+		[
 			time(), 3, $user_info['id'], $command_line ? '127.0.0.1' : $user_info['ip'], 'upgrade',
-			0, 0, 0, serialize(array('version' => CURRENT_VERSION, 'member' => $user_info['id'])),
-		),
-		array('id_action')
+			0, 0, 0, serialize(['version' => CURRENT_VERSION, 'member' => $user_info['id']]),
+		],
+		['id_action']
 	);
 
 	$user_info['id'] = 0;
@@ -1476,7 +1473,7 @@ function action_deleteUpgrade()
 	// Set jquery to auto, if it's not already set
 	if (!isset($modSettings['jquery_source']))
 	{
-		updateSettings(array('jquery_source' => 'auto'));
+		updateSettings(['jquery_source' => 'auto']);
 	}
 
 	if ($command_line)
@@ -1516,7 +1513,7 @@ function changeSettings($config_vars)
 		$settingsArray = preg_split('~[\r\n]~', $settingsArray[0]);
 	}
 
-	$save_vars = array();
+	$save_vars = [];
 	foreach ($config_vars as $key => $var)
 	{
 		$save_vars[$key] = trim($var, '\'');
@@ -1530,7 +1527,7 @@ function changeSettings($config_vars)
  */
 function getMemberGroups()
 {
-	static $member_groups = array();
+	static $member_groups = [];
 
 	if (!empty($member_groups))
 	{
@@ -1545,10 +1542,10 @@ function getMemberGroups()
 			group_name, id_group
 		FROM {db_prefix}membergroups
 		WHERE id_group = {int:admin_group} OR id_group > {int:old_group}',
-		array(
+		[
 			'admin_group' => 1,
 			'old_group' => 7,
-		)
+		]
 	);
 
 	if ($request === false)
@@ -1559,18 +1556,18 @@ function getMemberGroups()
 				membergroup, id_group
 			FROM {db_prefix}membergroups
 			WHERE id_group = {int:admin_group} OR id_group > {int:old_group}',
-			array(
+			[
 				'admin_group' => 1,
 				'old_group' => 7,
-			)
+			]
 		);
 	}
 
-	while ($row = $db->fetch_row($request))
+	while ($row = $request->fetch_row())
 	{
 		$member_groups[trim($row[0])] = $row[1];
 	}
-	$db->free_result($request);
+	$request->free_result();
 
 	return $member_groups;
 }
@@ -1583,7 +1580,7 @@ function fixRelativePath($path)
 	global $install_path;
 
 	// Fix the . at the start, clear any duplicate slashes, and fix any trailing slash...
-	return addslashes(preg_replace(array('~^\.([/\\\]|$)~', '~[/]+~', '~[\\\]+~', '~[/\\\]$~'), array($install_path . '$1', '/', '\\', ''), $path));
+	return addslashes(preg_replace(['~^\.([/\\\]|$)~', '~[/]+~', '~[\\\]+~', '~[/\\\]$~'], [$install_path . '$1', '/', '\\', ''], $path));
 }
 
 /**
@@ -1594,12 +1591,12 @@ function parse_sql($filename)
 	global $db_prefix, $boardurl, $command_line, $file_steps, $step_progress;
 	global $upcontext, $support_js, $is_debug;
 
-	$replaces = array(
+	$replaces = [
 		'{$db_prefix}' => $db_prefix,
 		'{BOARDDIR}' => BOARDDIR,
 		'{$boardurl}' => $boardurl,
 		'{$db_collation}' => discoverCollation()
-	);
+	];
 	$db = load_database();
 	$db_table = db_table_install();
 	$db_wrapper = new DbWrapper($db, $replaces);
@@ -1632,7 +1629,7 @@ function parse_sql($filename)
 	$upcontext['current_debug_item_name'] = '';
 
 	// This array keeps a record of what we've done in case javascript is dead...
-	$upcontext['actioned_items'] = array();
+	$upcontext['actioned_items'] = [];
 
 	$done_something = false;
 
@@ -1720,7 +1717,7 @@ function parse_sql($filename)
 		}
 
 		// Clean up by cleaning any step info.
-		$step_progress = array();
+		$step_progress = [];
 	}
 
 	// Put back the error handler.
@@ -1778,7 +1775,7 @@ function nextSubstep($substep)
 	if (!empty($step_progress))
 	{
 		$upcontext['substep_progress'] = 0;
-		$upcontext['substep_progress_name'] = isset($step_progress['name']) ? $step_progress['name'] : '';
+		$upcontext['substep_progress_name'] = $step_progress['name'] ?? '';
 		if ($step_progress['current'] > $step_progress['total'])
 		{
 			$upcontext['substep_progress'] = 99.9;
@@ -1839,7 +1836,7 @@ function cmdStep0()
 
 	if (!isset($_SERVER['argv']))
 	{
-		$_SERVER['argv'] = array();
+		$_SERVER['argv'] = [];
 	}
 	$_GET['maint'] = 1;
 
@@ -1897,7 +1894,7 @@ Usage: /path/to/php -f ' . basename(__FILE__) . ' -- [OPTION]...
 
 	$db->skip_next_error();
 	if (!empty($databases[$db_type]['alter_support'])
-		&& $db->query('', '	ALTER TABLE {db_prefix}log_digest ORDER BY id_topic', array()) === false)
+		&& $db->query('', '	ALTER TABLE {db_prefix}log_digest ORDER BY id_topic', []) === false)
 	{
 		print_error('Error: The ' . $databases[$db_type]['name'] . ' account in Settings.php does not have sufficient privileges.', true);
 	}
@@ -1964,12 +1961,10 @@ Usage: /path/to/php -f ' . basename(__FILE__) . ' -- [OPTION]...
 
 	// Make sure cache directory exists and is writable!
 	$CACHEDIR_temp = !defined('CACHEDIR') ? BOARDDIR . '/cache' : CACHEDIR;
-	if (!file_exists($CACHEDIR_temp))
+	if (!file_exists($CACHEDIR_temp)
+		&& !mkdir($CACHEDIR_temp) && !is_dir($CACHEDIR_temp))
 	{
-		if (!mkdir($CACHEDIR_temp) && !is_dir($CACHEDIR_temp))
-		{
-			return throw_error(sprintf('The cache directory "%s" could not be created.<br /><br />Please make sure you have a directory called &quot;cache&quot; in your forum directory before continuing.', $CACHEDIR_temp));
-		}
+		return throw_error(sprintf('The cache directory "%s" could not be created.<br /><br />Please make sure you have a directory called &quot;cache&quot; in your forum directory before continuing.', $CACHEDIR_temp));
 	}
 
 	if (!is_writable($CACHEDIR_temp))
@@ -2084,7 +2079,7 @@ function loadEssentialFunctions()
 		function text2words($text, $max_chars = 20)
 		{
 			// Step 1: Remove entities/things we don't consider words:
-			$words = preg_replace('~(?:[\x0B\0\x{A0}\t\r\s\n(){}\\[\\]<>!@$%^*.,:+=`\~\?/\\\\]+|&(?:amp|lt|gt|quot);)+~u', ' ', strtr($text, array('<br />' => ' ')));
+			$words = preg_replace('~(?:[\x0B\0\x{A0}\t\r\s\n(){}\\[\\]<>!@$%^*.,:+=`\~\?/\\\\]+|&(?:amp|lt|gt|quot);)+~u', ' ', strtr($text, ['<br />' => ' ']));
 
 			// Step 2: Entities we left to letters, where applicable, lowercase.
 			$words = un_htmlspecialchars(Util::strtolower($words));
@@ -2093,7 +2088,7 @@ function loadEssentialFunctions()
 			$words = explode(' ', $words);
 
 			// Trim characters before and after and add slashes for database insertion.
-			$returned_words = array();
+			$returned_words = [];
 			foreach ($words as $word)
 			{
 				if (($word = trim($word, '-_\'')) !== '')
@@ -2163,17 +2158,17 @@ function discoverCollation()
 		$request = $db->query('', '
 			SHOW TABLE STATUS
 			LIKE {string:table_name}',
-			array(
+			[
 				'table_name' => "{$db_prefix}members",
-			)
+			]
 		);
-		if ($db->num_rows($request) == 0)
+		if ($request->num_rows() == 0)
 		{
 			die('Unable to find members table!');
 		}
 
-		$table_status = $db->fetch_assoc($request);
-		$db->free_result($request);
+		$table_status = $request->fetch_assoc();
+		$request->free_result();
 
 		if (!empty($table_status['Collation']))
 		{
@@ -2181,17 +2176,17 @@ function discoverCollation()
 			$request = $db->query('', '
 				SHOW COLLATION
 				LIKE {string:collation}',
-				array(
+				[
 					'collation' => $table_status['Collation'],
-				)
+				]
 			);
 
 			// Got something?
-			if ($db->num_rows($request) != 0)
+			if ($request->num_rows() !== 0)
 			{
 				$collation_info = $db->fetch_assoc($request);
 			}
-			$db->free_result($request);
+			$request->free_result();
 
 			// Excellent!
 			if (!empty($collation_info['Collation']) && !empty($collation_info['Charset']))

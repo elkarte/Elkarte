@@ -12,6 +12,11 @@
  *
  */
 
+/**
+ * Class InstallInstructions_install_2_0
+ *
+ * Provides DB installation instructions for version 2.0 of the software.
+ */
 class InstallInstructions_install_2_0
 {
 	protected $db;

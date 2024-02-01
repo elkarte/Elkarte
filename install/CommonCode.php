@@ -47,6 +47,7 @@ function load_possible_databases($type = null)
  */
 function load_database($force = false)
 {
+	// These globals are needed
 	global $db_prefix, $db_connection, $db_type, $db_name, $db_user, $db_persist, $db_server, $db_passwd, $db_port;
 
 	// Connect the database.
@@ -127,7 +128,7 @@ function db_table_install()
 
 	$db = load_database();
 
-	return call_user_func_array(array('DbTable_' . $db_type . '_Install', 'db_table'), [$db, $db_prefix]);
+	return call_user_func_array(['DbTable_' . $db_type . '_Install', 'db_table'], [$db, $db_prefix]);
 }
 
 /**
@@ -188,7 +189,7 @@ function action_deleteInstaller()
 	// Now just redirect to a blank.png...
 	$secure = false;
 
-	if (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] == 'on')
+	if (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on')
 	{
 		$secure = true;
 	}
@@ -357,14 +358,11 @@ function makeFilesWritable(&$files)
 	{
 		$ftp = new Ftp_Connection($upcontext['chmod']['server'], $upcontext['chmod']['port'], $upcontext['chmod']['username'], $upcontext['chmod']['password']);
 
-		if ($ftp->error === false)
+		// Try it without /home/abc just in case they messed up.
+		if (($ftp->error === false) && !$ftp->chdir($upcontext['chmod']['path']))
 		{
-			// Try it without /home/abc just in case they messed up.
-			if (!$ftp->chdir($upcontext['chmod']['path']))
-			{
-				$upcontext['chmod']['ftp_error'] = $ftp->last_message;
-				$ftp->chdir(preg_replace('~^/home[2]?/[^/]+?~', '', $upcontext['chmod']['path']));
-			}
+			$upcontext['chmod']['ftp_error'] = $ftp->last_message;
+			$ftp->chdir(preg_replace('~^/home[2]?/[^/]+?~', '', $upcontext['chmod']['path']));
 		}
 	}
 
@@ -394,78 +392,73 @@ function makeFilesWritable(&$files)
 
 		return false;
 	}
+
+	// We want to do a relative path for FTP.
+	if (!in_array($upcontext['chmod']['path'], ['', '/'], true))
+	{
+		$ftp_root = strtr(BOARDDIR, [$upcontext['chmod']['path'] => '']);
+		if (substr($ftp_root, -1) === '/' && ($upcontext['chmod']['path'] === '' || $upcontext['chmod']['path'][0] === '/'))
+		{
+			$ftp_root = substr($ftp_root, 0, -1);
+		}
+	}
 	else
 	{
-		// We want to do a relative path for FTP.
-		if (!in_array($upcontext['chmod']['path'], array('', '/')))
-		{
-			$ftp_root = strtr(BOARDDIR, array($upcontext['chmod']['path'] => ''));
-			if (substr($ftp_root, -1) === '/' && ($upcontext['chmod']['path'] === '' || $upcontext['chmod']['path'][0] === '/'))
-			{
-				$ftp_root = substr($ftp_root, 0, -1);
-			}
-		}
-		else
-		{
-			$ftp_root = BOARDDIR;
-		}
-
-		// Save the info for next time!
-		$_SESSION['installer_temp_ftp'] = array(
-			'server' => $upcontext['chmod']['server'],
-			'port' => $upcontext['chmod']['port'],
-			'username' => $upcontext['chmod']['username'],
-			'password' => $upcontext['chmod']['password'],
-			'path' => $upcontext['chmod']['path'],
-			'root' => $ftp_root,
-		);
-
-		foreach ($files as $k => $file)
-		{
-			if (!is_writable($file))
-			{
-				$ftp->chmod($file, 0755);
-			}
-
-			if (!is_writable($file))
-			{
-				$ftp->chmod($file, 0777);
-			}
-
-			// Assuming that didn't work calculate the path without the boarddir.
-			if (!is_writable($file))
-			{
-				if (strpos($file, BOARDDIR) === 0)
-				{
-					$ftp_file = strtr($file, array($_SESSION['installer_temp_ftp']['root'] => ''));
-					$ftp->chmod($ftp_file, 0755);
-					if (!is_writable($file))
-					{
-						$ftp->chmod($ftp_file, 0777);
-					}
-
-					// Sometimes an extra slash can help...
-					$ftp_file = '/' . $ftp_file;
-					if (!is_writable($file))
-					{
-						$ftp->chmod($ftp_file, 0755);
-					}
-
-					if (!is_writable($file))
-					{
-						$ftp->chmod($ftp_file, 0777);
-					}
-				}
-			}
-
-			if (is_writable($file))
-			{
-				unset($files[$k]);
-			}
-		}
-
-		$ftp->close();
+		$ftp_root = BOARDDIR;
 	}
+
+	// Save the info for next time!
+	$_SESSION['installer_temp_ftp'] = [
+		'server' => $upcontext['chmod']['server'],
+		'port' => $upcontext['chmod']['port'],
+		'username' => $upcontext['chmod']['username'],
+		'password' => $upcontext['chmod']['password'],
+		'path' => $upcontext['chmod']['path'],
+		'root' => $ftp_root,
+	];
+
+	foreach ($files as $k => $file)
+	{
+		if (!is_writable($file))
+		{
+			$ftp->chmod($file, 0755);
+		}
+
+		if (!is_writable($file))
+		{
+			$ftp->chmod($file, 0777);
+		}
+
+		// Assuming that didn't work calculate the path without the boarddir.
+		if (!is_writable($file) && strpos($file, BOARDDIR) === 0)
+		{
+			$ftp_file = strtr($file, [$_SESSION['installer_temp_ftp']['root'] => '']);
+			$ftp->chmod($ftp_file, 0755);
+			if (!is_writable($file))
+			{
+				$ftp->chmod($ftp_file, 0777);
+			}
+
+			// Sometimes an extra slash can help...
+			$ftp_file = '/' . $ftp_file;
+			if (!is_writable($file))
+			{
+				$ftp->chmod($ftp_file, 0755);
+			}
+
+			if (!is_writable($file))
+			{
+				$ftp->chmod($ftp_file, 0777);
+			}
+		}
+
+		if (is_writable($file))
+		{
+			unset($files[$k]);
+		}
+	}
+
+	$ftp->close();
 
 	// What remains?
 	$upcontext['chmod']['files'] = $files;
@@ -566,7 +559,7 @@ class Ftp_Connection
 	public $error;
 	/** @var string holds last message from the server */
 	public $last_message;
-	/** @var mixed[] Passive connection */
+	/** @var array Passive connection */
 	public $pasv;
 
 	/**
@@ -582,7 +575,7 @@ class Ftp_Connection
 		// Initialize variables.
 		$this->connection = 'no_connection';
 		$this->error = false;
-		$this->pasv = array();
+		$this->pasv = [];
 
 		if ($ftp_server !== null)
 		{
@@ -612,7 +605,7 @@ class Ftp_Connection
 		{
 			$ftp_server = substr($ftp_server, 7);
 		}
-		$ftp_server = strtr($ftp_server, array('/' => '', ':' => '', '@' => ''));
+		$ftp_server = strtr($ftp_server, ['/' => '', ':' => '', '@' => '']);
 
 		// Connect to the FTP server.
 		$this->connection = @fsockopen($ftp_server, $ftp_port, $err, $err, 5);
@@ -756,7 +749,7 @@ class Ftp_Connection
 		} while ((strlen($this->last_message) < 4 || strpos($this->last_message, ' ') === 0 || strpos($this->last_message, ' ', 3) !== 3) && time() - $time < 5);
 
 		// Was the desired response returned?
-		return is_array($desired) ? in_array(substr($this->last_message, 0, 3), $desired) : substr($this->last_message, 0, 3) == $desired;
+		return is_array($desired) ? in_array(substr($this->last_message, 0, 3), $desired) : strpos($this->last_message, $desired) === 0;
 	}
 
 	/**
@@ -797,7 +790,7 @@ class Ftp_Connection
 		}
 
 		// This is pretty simple - store it for later use ;).
-		$this->pasv = array('ip' => $match[1] . '.' . $match[2] . '.' . $match[3] . '.' . $match[4], 'port' => $match[5] * 256 + $match[6]);
+		$this->pasv = ['ip' => $match[1] . '.' . $match[2] . '.' . $match[3] . '.' . $match[4], 'port' => $match[5] * 256 + $match[6]];
 
 		return true;
 	}
@@ -873,7 +866,7 @@ class Ftp_Connection
 
 		// Connect, assuming we've got a connection.
 		$fp = @fsockopen($this->pasv['ip'], $this->pasv['port'], $err, $err, 5);
-		if (!$fp || !$this->check_response(array(150, 125)))
+		if (!$fp || !$this->check_response([150, 125]))
 		{
 			$this->error = 'bad_response';
 			@fclose($fp);
@@ -925,7 +918,7 @@ class Ftp_Connection
 		// Check for 257!
 		if (preg_match('~^257 "(.+?)" ~', $response, $match) != 0)
 		{
-			$current_dir = strtr($match[1], array('""' => '"'));
+			$current_dir = strtr($match[1], ['""' => '"']);
 		}
 		else
 		{
@@ -947,7 +940,7 @@ class Ftp_Connection
 			{
 				return $listing[$i];
 			}
-			if (substr($file, -1) === '*' && substr($listing[$i], 0, strlen($file) - 1) === substr($file, 0, -1))
+			if (substr($file, -1) === '*' && strpos($file, substr($listing[$i], 0, strlen($file) - 1)) === 0)
 			{
 				return $listing[$i];
 			}
@@ -1003,7 +996,7 @@ class Ftp_Connection
 			{
 				$username = $match[1];
 
-				$path = strtr($_SERVER['DOCUMENT_ROOT'], array('/home/' . $match[1] . '/' => '', '/home2/' . $match[1] . '/' => ''));
+				$path = strtr($_SERVER['DOCUMENT_ROOT'], ['/home/' . $match[1] . '/' => '', '/home2/' . $match[1] . '/' => '']);
 
 				if (substr($path, -1) === '/')
 				{
@@ -1021,7 +1014,7 @@ class Ftp_Connection
 			}
 			else
 			{
-				$path = strtr(strtr($filesystem_path, array('\\' => '/')), array($_SERVER['DOCUMENT_ROOT'] => ''));
+				$path = strtr(strtr($filesystem_path, ['\\' => '/']), [$_SERVER['DOCUMENT_ROOT'] => '']);
 			}
 		}
 		else
@@ -1054,7 +1047,7 @@ class Ftp_Connection
 			$found_path = true;
 		}
 
-		return array($username, $path, isset($found_path));
+		return [$username, $path, isset($found_path)];
 	}
 
 	/**
