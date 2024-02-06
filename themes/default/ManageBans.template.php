@@ -9,7 +9,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.1
+ * @version 1.1.10
  *
  */
 
@@ -185,7 +185,11 @@ function template_ban_edit()
 	if (!empty($context['use_autosuggest']))
 		echo '
 	<script>
-		var oAddMemberSuggest = new smc_AutoSuggest({
+		var oAddMemberSuggest;
+		isFunctionLoaded("smc_AutoSuggest", addMemberSuggest);
+		function addMemberSuggest(available) {
+			if (available === false) return;
+			oAddMemberSuggest = new smc_AutoSuggest({
 			sSelf: \'oAddMemberSuggest\',
 			sSessionId: elk_session_id,
 			sSessionVar: elk_session_var,
@@ -195,8 +199,8 @@ function template_ban_edit()
 			sTextDeleteItem: \'', $txt['autosuggest_delete_item'], '\',
 			bItemList: false
 		});
-
 		oAddMemberSuggest.registerCallback(\'onBeforeUpdate\', \'onUpdateName\');
+		};
 	</script>';
 }
 
@@ -266,7 +270,11 @@ function template_ban_edit_trigger()
 	</div>
 
 	<script>
-		var oAddMemberSuggest = new smc_AutoSuggest({
+		var oAddMemberSuggest;
+		isFunctionLoaded("smc_AutoSuggest", AddMemberSuggest);
+		function AddMemberSuggest(available) {
+			if (available === false) return;
+			oAddMemberSuggest = new smc_AutoSuggest({
 			sSelf: \'oAddMemberSuggest\',
 			sSessionId: elk_session_id,
 			sSessionVar: elk_session_var,
@@ -276,7 +284,7 @@ function template_ban_edit_trigger()
 			sTextDeleteItem: \'', $txt['autosuggest_delete_item'], '\',
 			bItemList: false
 		});
-
 		oAddMemberSuggest.registerCallback(\'onBeforeUpdate\', \'onUpdateName\');
+		};
 	</script>';
 }

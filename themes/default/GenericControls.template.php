@@ -28,7 +28,7 @@ function template_control_richedit($editor_id, $smileyContainer = null, $bbcCont
 
 	$editor_context = &$context['controls']['richedit'][$editor_id];
 
-	$plugins = array_filter(array('bbcode', 'undo', 'moveTo', 'splittag', (!empty($context['mentions_enabled']) ? 'mention' : '')));
+	$plugins = array_filter(array('bbcode', 'undo', 'initialLoad', 'splittag', (!empty($context['mentions_enabled']) ? 'mention' : '')));
 
 	// Allow addons to insert additional editor plugin scripts
 	if (!empty($editor_context['plugin_addons']) && is_array($editor_context['plugin_addons']))
@@ -156,38 +156,6 @@ function template_control_richedit($editor_id, $smileyContainer = null, $bbcCont
 				$editor_container["' . $editor_id . '"].find("textarea, iframe").addClass("border_error");' : '', '
 			}
 			
-			// Other Editor startup options, css, smiley box, validate wizzy, move into view
-			$.sceditor.plugins.moveTo = function() {
-				var base = this;
-				const isEditorLoaded = async selector => {
-					while (document.querySelector(selector) === null) {
-						await new Promise(resolve =>requestAnimationFrame(resolve));
-					}
-					return true;
-				};
-
-				base.signalReady = function() {
-					let editor = this;
-					
-					// signalReady can be called before the extensionMethods are available
-					isEditorLoaded(".sceditor-toolbar").then((selector) => {
-						editor.createPermanentDropDown();
-						editor.css("code {white-space: pre;}");
-					});
-
-					if ($.sceditor.isWysiwygSupported === false)
-					{
-						document.querySelectorAll(".sceditor-button-source").forEach((elem) => {elem.style.display = "none"});
-					}
-
-					// Move the editor into view
-					if (document.getElementById("dropdown_menu_1") !== null || document.getElementById("preview_section") !== null)
-					{
-						document.getElementById("skipnav").scrollIntoView();
-					}
-				};
-			}
-	
 			$(function() {
 				elk_editor();
 			});

@@ -9,7 +9,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.1.9
+ * @version 1.1.10
  *
  */
 
@@ -122,7 +122,11 @@ function template_editBuddies()
 
 	// Initialize the autosuggest object
 	addInlineJavascript('
-		var oAddBuddySuggest = new smc_AutoSuggest({
+		var oAddBuddySuggest;
+		isFunctionLoaded("smc_AutoSuggest", AddBuddySuggest);
+		function AddBuddySuggest(available) {
+			if (available === false) return;
+			oAddBuddySuggest = new smc_AutoSuggest({
 			sSelf: \'oAddBuddySuggest\',
 			sSessionId: elk_session_id,
 			sSessionVar: elk_session_var,
@@ -131,7 +135,8 @@ function template_editBuddies()
 			sSearchType: \'member\',
 			sTextDeleteItem: \'' . $txt['autosuggest_delete_item'] . '\',
 			bItemList: false
-		});', true);
+		});
+		};', true);
 }
 
 /**
@@ -221,7 +226,11 @@ function template_editIgnoreList()
 	</form>';
 
 	addInlineJavascript('
-		var oAddIgnoreSuggest = new smc_AutoSuggest({
+		var oAddIgnoreSuggest;
+		isFunctionLoaded("smc_AutoSuggest", AddIgnoreSuggest);
+		function AddIgnoreSuggest(available) {
+			if (available === false) return;
+			oAddIgnoreSuggest = new smc_AutoSuggest({
 			sSelf: \'oAddIgnoreSuggest\',
 			sSessionId: elk_session_id,
 			sSessionVar: elk_session_var,
@@ -230,7 +239,8 @@ function template_editIgnoreList()
 			sSearchType: \'member\',
 			sTextDeleteItem: \'' . $txt['autosuggest_delete_item'] . '\',
 			bItemList: false
-		});', true);
+		});
+		};', true);
 }
 
 /**

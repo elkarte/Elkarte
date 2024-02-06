@@ -9,7 +9,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.1
+ * @version 1.1.10
  */
 
 /**
@@ -258,7 +258,11 @@ function template_maintain_members()
 	</div>
 
 	<script>
-		var oAttributeMemberSuggest = new smc_AutoSuggest({
+		var oAttributeMemberSuggest;
+		isFunctionLoaded("smc_AutoSuggest", AttributeMemberSuggest);
+		function AttributeMemberSuggest(available) {
+			if (available === false) return;
+			oAttributeMemberSuggest = new smc_AutoSuggest({
 			sSelf: \'oAttributeMemberSuggest\',
 			sSessionId: elk_session_id,
 			sSessionVar: elk_session_var,
@@ -268,6 +272,7 @@ function template_maintain_members()
 			sTextDeleteItem: \'', $txt['autosuggest_delete_item'], '\',
 			bItemList: false
 		});
+		};
 	</script>';
 }
 

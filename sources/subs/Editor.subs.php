@@ -12,7 +12,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.1.7
+ * @version 1.1.10
  *
  */
 
@@ -71,7 +71,7 @@ function create_control_richedit($editorOptions)
 			loadCSSFile($context['theme_variant'] . '/jquery.sceditor.elk' . $context['theme_variant'] . '.css');
 
 		// JS makes the editor go round
-		loadJavascriptFile(array('jquery.sceditor.bbcode.min.js', 'jquery.sceditor.elkarte.js', 'post.js', 'splittag.plugin.js', 'undo.plugin.min.js', 'dropAttachments.js'));
+		loadJavascriptFile(array('jquery.sceditor.bbcode.min.js', 'jquery.sceditor.elkarte.js', 'post.js', 'initialLoad.plugin.js', 'splittag.plugin.js', 'undo.plugin.min.js', 'dropAttachments.js'));
 		addJavascriptVar(array(
 			'post_box_name' => $editorOptions['id'],
 			'elk_smileys_url' => $settings['smileys_url'],

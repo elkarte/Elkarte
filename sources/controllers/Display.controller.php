@@ -811,6 +811,9 @@ class Display_Controller extends Action_Controller
 			&& (empty($modSettings['likeMinPosts']) ? true : $modSettings['likeMinPosts'] <= $user_info['posts']);
 		$message['like_count'] = !empty($context['likes'][$message['id_msg']]['count']) ? $context['likes'][$message['id_msg']]['count'] : 0;
 
+		// Set before any bbc parsing so the parser has the id_msg id (loadMemberContext parses signatures)
+		$context['id_msg'] = $message['id_msg'];
+
 		// If it couldn't load, or the user was a guest.... someday may be done with a guest table.
 		if (!loadMemberContext($message['id_member'], true))
 		{
@@ -854,7 +857,6 @@ class Display_Controller extends Action_Controller
 		$message['subject'] = censor($message['subject']);
 
 		// Run BBC interpreter on the message.
-		$context['id_msg'] = $message['id_msg'];
 		$bbc_wrapper = \BBC\ParserWrapper::instance();
 		$message['body'] = $bbc_wrapper->parseMessage($message['body'], $message['smileys_enabled']);
 

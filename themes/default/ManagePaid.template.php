@@ -9,7 +9,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.1
+ * @version 1.1.10
  *
  */
 
@@ -336,7 +336,11 @@ function template_modify_user_subscription()
 		</form>';
 
 	addInlineJavascript('
-		var oAddMemberSuggest = new smc_AutoSuggest({
+		var oAddMemberSuggest;
+		isFunctionLoaded("smc_AutoSuggest", AddMemberSuggest);
+		function AddMemberSuggest(available) {
+			if (available === false) return;
+			oAddMemberSuggest = new smc_AutoSuggest({
 			sSelf: \'oAddMemberSuggest\',
 			sSessionId: elk_session_id,
 			sSessionVar: elk_session_var,
@@ -345,7 +349,8 @@ function template_modify_user_subscription()
 			sSearchType: \'member\',
 			sTextDeleteItem: \'' . $txt['autosuggest_delete_item'] . '\',
 			bItemList: false
-			});', true);
+		});
+		};', true);
 
 	// If we have pending payments for this user, show them
 	if (!empty($context['pending_payments']))

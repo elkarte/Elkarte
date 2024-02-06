@@ -9,7 +9,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.1.7
+ * @version 1.1.10
  *
  */
 
@@ -376,7 +376,11 @@ function template_edit_group()
 	if ($context['group']['id'] != 3 && $context['group']['id'] != 4)
 	{
 		$js = '
-		var oModeratorSuggest = new smc_AutoSuggest({
+		var oModeratorSuggest;
+		isFunctionLoaded("smc_AutoSuggest", ModeratorSuggest);
+		function ModeratorSuggest(available) {
+			if (available === false) return;
+			oModeratorSuggest = new smc_AutoSuggest({
 			sSelf: \'oModeratorSuggest\',
 			sSessionId: elk_session_id,
 			sSessionVar: elk_session_var,
@@ -399,7 +403,8 @@ function template_edit_group()
 
 		$js .= '
 			]
-		});';
+		});
+		};';
 
 		addInlineJavascript($js, true);
 	}
@@ -679,7 +684,11 @@ function template_group_members()
 
 	if (!empty($context['group']['assignable']))
 		addInlineJavascript('
-		var oAddMemberSuggest = new smc_AutoSuggest({
+		var oAddMemberSuggest;
+		isFunctionLoaded("smc_AutoSuggest", AddMemberSuggest);
+		function AddMemberSuggest(available) {
+			if (available === false) return;
+			oAddMemberSuggest = new smc_AutoSuggest({
 			sSelf: \'oAddMemberSuggest\',
 			sSessionId: elk_session_id,
 			sSessionVar: elk_session_var,
@@ -691,7 +700,8 @@ function template_group_members()
 			sTextDeleteItem: \'' . $txt['autosuggest_delete_item'] . '\',
 			bItemList: true,
 			sItemListContainerId: \'toAddItemContainer\'
-		});', true);
+		});
+		};', true);
 }
 
 /**

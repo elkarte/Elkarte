@@ -1513,7 +1513,7 @@ function disableAutoComplete()
 			if (typeof opt.delay === 'undefined')
 			{
 				start = false;
-				opt.delay = 15000;
+				opt.delay = 45000;
 			}
 
 			setTimeout(function() {
@@ -1539,6 +1539,7 @@ function disableAutoComplete()
 				cache: false,
 				dataType: 'json',
 				timeout: 1500,
+				beforeSend: function(xhr){xhr.overrideMimeType("application/json; charset=utf-8");},
 				url: elk_scripturl + "?action=mentions;sa=fetch;api=json;lastsent=" + lastTime
 			})
 			.done(function(request) {
@@ -1871,3 +1872,34 @@ var ElkNotifier = new ElkNotifications();
 		this.ElkInfoBar = ElkInfoBar;
 	}
 })();
+
+/**
+ * This function regularly checks for the existence of a specific function in the global scope,
+ * until either the function appears or a time limit passes. This could be helpful for scripts
+ * that rely on deferred or asynchronously loaded scripts.
+ *
+ * isFunctionLoaded(nameOfRequiredFunction, callbackFunction, limit);
+ * callbackFunction(result) { if (result === true) DoStuff })
+ *
+ * @param {string} selector - The name of the function to check.
+ * @param {number} [limit] - The maximum number of retries before considering the function as not loaded. Default is 120. Every 60 is ~ 1 second wait time.
+ * @param {Function} callback - A callback that is called with `true` if the function is loaded, or `false` if it is not loaded within the specified limit.
+ */
+function isFunctionLoaded(selector, callback, limit)
+{
+	var MAX_RETRIES = limit || 180;
+	var retries = 0;
+	var checkFunction = function () {
+		if (typeof window[selector] === "function" || retries >= MAX_RETRIES)
+		{
+			callback(typeof window[selector] === "function");
+		}
+		else
+		{
+			retries++;
+			requestAnimationFrame(checkFunction);
+		}
+	};
+
+	checkFunction();
+};
