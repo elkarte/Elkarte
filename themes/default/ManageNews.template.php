@@ -9,7 +9,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.1
+ * @version 1.1.10
  *
  */
 
@@ -152,7 +152,12 @@ function template_email_members()
 			}
 		});
 
-		var oMemberSuggest = new smc_AutoSuggest({
+		var oMemberSuggest;
+		var oExcludeMemberSuggest;
+		isFunctionLoaded("smc_AutoSuggest", ExcludeMemberSuggest);
+		function ExcludeMemberSuggest(available) {
+			if (available === false) return;
+			oMemberSuggest = new smc_AutoSuggest({
 			sSelf: \'oMemberSuggest\',
 			sSessionId: elk_session_id,
 			sSessionVar: elk_session_var,
@@ -165,9 +170,9 @@ function template_email_members()
 			sTextDeleteItem: \'' . $txt['autosuggest_delete_item'] . '\',
 			sItemListContainerId: \'members_container\',
 			aListItems: []
-		});
-
-		var oExcludeMemberSuggest = new smc_AutoSuggest({
+			});
+	
+			oExcludeMemberSuggest = new smc_AutoSuggest({
 			sSelf: \'oExcludeMemberSuggest\',
 			sSessionId: elk_session_id,
 			sSessionVar: elk_session_var,
@@ -180,7 +185,8 @@ function template_email_members()
 			sTextDeleteItem: \'' . $txt['autosuggest_delete_item'] . '\',
 			sItemListContainerId: \'exclude_members_container\',
 			aListItems: []
-		});', true);
+		});
+		};', true);
 }
 
 /**

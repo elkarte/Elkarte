@@ -9,7 +9,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.1
+ * @version 1.1.10
  *
  */
 
@@ -150,7 +150,11 @@ function template_searchform()
 		createEventListener(window);
 		window.addEventListener("load", initSearch, false);
 
-		var oAddMemberSuggest = new smc_AutoSuggest({
+		var oAddMemberSuggest;
+		isFunctionLoaded("smc_AutoSuggest", AddMemberSuggest);
+		function AddMemberSuggest(available) {
+			if (available === false) return;
+			oAddMemberSuggest = new smc_AutoSuggest({
 			sSelf: \'oAddMemberSuggest\',
 			sSessionId: elk_session_id,
 			sSessionVar: elk_session_var,
@@ -158,6 +162,7 @@ function template_searchform()
 			sSearchType: \'member\',
 			bItemList: false
 		});
+		};
 
 		// Set the search style
 		document.getElementById(\'advanced\').value = "' . (empty($context['minmax_preferences']['asearch']) ? '1' : '0') . '";

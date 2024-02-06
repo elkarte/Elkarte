@@ -9,7 +9,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.1.8
+ * @version 1.1.10
  *
  */
 
@@ -651,7 +651,11 @@ function template_modify_board()
 	</div>';
 
 	$js = '
-		var oModeratorSuggest = new smc_AutoSuggest({
+		var oModeratorSuggest;
+		isFunctionLoaded("smc_AutoSuggest", ModeratorSuggest);
+		function ModeratorSuggest(available) {
+			if (available === false) return;
+			oModeratorSuggest = new smc_AutoSuggest({
 			sSelf: \'oModeratorSuggest\',
 			sSessionId: elk_session_id,
 			sSessionVar: elk_session_var,
@@ -674,7 +678,8 @@ function template_modify_board()
 
 	$js .= '
 			]
-		});';
+		});
+		};';
 
 	addInlineJavascript($js, true);
 
