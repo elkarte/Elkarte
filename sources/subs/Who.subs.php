@@ -510,7 +510,7 @@ function prepareCreditsData()
 			'<a href="http://users.tpg.com.au/j_birch/plugins/superfish/">Superfish</a> | &copy; Joel Birch | Licensed under <a href="http://opensource.org/licenses/MIT">The MIT License (MIT)</a>',
 			'<a href="https://github.com/tubalmartin/YUI-CSS-compressor-PHP-port">YUI-CSS compressor (PHP port)</a> | &copy; Yahoo! Inc | Licensed under <a href="http://opensource.org/licenses/BSD-3-Clause">The BSD License</a>',
 			'<a href="http://lab.ejci.net/favico.js/">favico.js</a> | &copy; Miroslav Magda | Licensed under <a href="http://opensource.org/licenses/MIT">The MIT License (MIT)</a>',
-			'<a href="https://github.com/ttsvetko/HTML5-Desktop-Notifications">Push.js</a> | &copy; Tyler Nickerson | Licensed under <a href="http://opensource.org/licenses/MIT">The MIT License (MIT)</a>',
+			'<a href="https://github.com/Nickersoft/push.js">Push.js</a> | &copy; Tyler Nickerson | Licensed under <a href="http://opensource.org/licenses/MIT">The MIT License (MIT)</a>',
 		),
 	);
 
