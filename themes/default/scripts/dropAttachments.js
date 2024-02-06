@@ -3,7 +3,7 @@
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * @version 1.1.9
+ * @version 1.1.10
  */
 
 /**
@@ -139,6 +139,7 @@
 
 						return xhrobj;
 					},
+					beforeSend: function(xhr){xhr.overrideMimeType("application/json; charset=utf-8");},
 					url: elk_scripturl + '?action=attachment;sa=ulattach;api;' + elk_session_var + '=' + elk_session_id + ';board=' + board,
 					type: "POST",
 					dataType: "json",
@@ -286,6 +287,7 @@
 				type: "POST",
 				cache: false,
 				dataType: 'json',
+				beforeSend: function(xhr){xhr.overrideMimeType("application/json; charset=utf-8");},
 				data: {
 					'attachid': dataToSend.attachid
 				}

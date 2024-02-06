@@ -102,11 +102,8 @@ class Attachment_Controller extends Action_Controller
 		loadLanguage('Errors');
 		$context['attachments']['can']['post'] = !empty($modSettings['attachmentEnable']) && $modSettings['attachmentEnable'] == 1 && (allowedTo('post_attachment') || ($modSettings['postmod_active'] && allowedTo('post_unapproved_attachments')));
 
-		// Set up the template details
-		$template_layers = Template_Layers::instance();
-		$template_layers->removeAll();
-		loadTemplate('Json');
-		$context['sub_template'] = 'send_json';
+		// Prepare the json response template
+		$this->setUpTheTemplateDetails();
 
 		// Make sure the session is still valid
 		if (checkSession('request', '', false) != '')
@@ -182,10 +179,7 @@ class Attachment_Controller extends Action_Controller
 		global $context, $txt, $user_info;
 
 		// Prepare the template so we can respond with json
-		$template_layers = Template_Layers::instance();
-		$template_layers->removeAll();
-		loadTemplate('Json');
-		$context['sub_template'] = 'send_json';
+		$this->setUpTheTemplateDetails();
 
 		// Make sure the session is valid
 		if (checkSession('request', '', false) !== '')
@@ -695,5 +689,24 @@ class Attachment_Controller extends Action_Controller
 
 		// Try to buy some time...
 		detectServer()->setTimeLimit(600);
+	}
+
+	/**
+	 * Set up the template details for a JSON response.
+	 */
+	public function setUpTheTemplateDetails()
+	{
+		global $context;
+
+		// Set up the template for a json response
+		$template_layers = Template_Layers::instance();
+		$template_layers->removeAll();
+		loadTemplate('Json');
+		$context['sub_template'] = 'send_json';
+
+		if (!headers_sent())
+		{
+			header('Content-Type:json; charset=UTF-8');
+		}
 	}
 }
