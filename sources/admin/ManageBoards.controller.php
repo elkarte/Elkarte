@@ -677,7 +677,11 @@ class ManageBoards_Controller extends Action_Controller
 			$boardOptions['board_name'] = preg_replace('~[&]([^;]{8}|[^;]{0,8}$)~', '&amp;$1', $this->_req->post->board_name);
 
 			// Convert any html to bbc
-			if (!empty($boardOptions['board_description']))
+			if (empty($this->_req->post->desc))
+			{
+				$boardOptions['board_description'] = '';
+			}
+			else
 			{
 				$parser = new Html_2_BBC($this->_req->post->desc);
 				$boardOptions['board_description'] = Util::htmlspecialchars($parser->get_bbc());
