@@ -10,7 +10,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.1.9
+ * @version 1.1.10
  *
  */
 
@@ -137,6 +137,9 @@ class BBCParser
 		}
 
 		$this->resetParser();
+
+		if (!empty($GLOBALS['modSettings']['convertSmartQuotes']))
+			$this->convertSmartQuotes();
 
 		// @todo change this to <br> (it will break tests and previews and ...)
 		$this->message = str_replace("\n", '<br />', $this->message);
@@ -1702,6 +1705,46 @@ class BBCParser
 	public function canCache()
 	{
 		return $this->can_cache;
+	}
+
+	/**
+	 * Only necessary when you have old non-utf8 database that was imported.
+	 *
+	 * Microsoft uses their own character set Code Page 1252 (CP1252), which is a
+	 * superset of ISO 8859-1, defining several characters between DEC 128 and 159
+	 * that are not normally displayable.  This converts the popular ones that
+	 * appear from a cut and paste from windows.
+	 */
+	public function convertSmartQuotes()
+	{
+		if (empty($this->message))
+		{
+			return;
+		}
+
+		// UTF-8 occurrences of MS special characters
+		$findChars = array(
+			"\xe2\x80\x9a",	// single low-9 quotation mark
+			"\xe2\x80\x9e",	// double low-9 quotation mark
+			"\xe2\x80\xa6",	// horizontal ellipsis
+			"\xe2\x80\x98",	// left single curly quote
+			"\xe2\x80\x99",	// right single curly quote
+			"\xe2\x80\x9c",	// left double curly quote
+			"\xe2\x80\x9d",	// right double curly quote
+		);
+
+		// safe replacements
+		$replaceChars = array(
+			',',	// &sbquo;
+			',,',	// &bdquo;
+			'...',	// &hellip;
+			"'",	// &lsquo;
+			"'",	// &rsquo;
+			'"',	// &ldquo;
+			'"',	// &rdquo;
+		);
+
+		$this->message = str_replace($findChars, $replaceChars, $this->message);
 	}
 
 	/**
