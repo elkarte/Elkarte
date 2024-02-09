@@ -57,18 +57,18 @@ class ProfileHistory extends AbstractController
 	 * Profile history entry point.
 	 * Re-directs to sub-actions.
 	 *
-	 * @see \ElkArte\AbstractController::action_index()
+	 * @see AbstractController::action_index()
 	 */
 	public function action_index()
 	{
 		global $context, $txt;
 
-		$subActions = array(
-			'activity' => array('controller' => $this, 'function' => 'action_trackactivity', 'label' => $txt['trackActivity']),
-			'ip' => array('controller' => $this, 'function' => 'action_trackip', 'label' => $txt['trackIP']),
-			'edits' => array('controller' => $this, 'function' => 'action_trackedits', 'label' => $txt['trackEdits']),
-			'logins' => array('controller' => $this, 'function' => 'action_tracklogin', 'label' => $txt['trackLogins']),
-		);
+		$subActions = [
+			'activity' => ['controller' => $this, 'function' => 'action_trackactivity', 'label' => $txt['trackActivity']],
+			'ip' => ['controller' => $this, 'function' => 'action_trackip', 'label' => $txt['trackIP']],
+			'edits' => ['controller' => $this, 'function' => 'action_trackedits', 'label' => $txt['trackEdits']],
+			'logins' => ['controller' => $this, 'function' => 'action_tracklogin', 'label' => $txt['trackLogins']],
+		];
 
 		// Create the tabs for the template. (Mostly done by prepareTabData function of Menu)
 		$context[$context['profile_menu_name']]['object']->prepareTabData([
@@ -112,92 +112,92 @@ class ProfileHistory extends AbstractController
 		$context['member']['name'] = $this->_profile['real_name'];
 
 		// Set the options for the list component.
-		$listOptions = array(
+		$listOptions = [
 			'id' => 'track_name_user_list',
 			'title' => $txt['errors_by'] . ' ' . $context['member']['name'],
 			'items_per_page' => $modSettings['defaultMaxMessages'],
 			'no_items_label' => $txt['no_errors_from_user'],
 			'base_href' => $scripturl . '?action=profile;area=history;sa=user;u=' . $this->_memID,
 			'default_sort_col' => 'date',
-			'get_items' => array(
-				'function' => function ($start, $items_per_page, $sort, $where, $where_vars = array()) {
+			'get_items' => [
+				'function' => function ($start, $items_per_page, $sort, $where, $where_vars = []) {
 					return $this->list_getUserErrors($start, $items_per_page, $sort, $where, $where_vars);
 				},
-				'params' => array(
+				'params' => [
 					'le.id_member = {int:current_member}',
-					array('current_member' => $this->_memID),
-				),
-			),
-			'get_count' => array(
-				'function' => function ($where, $where_vars = array()) {
+					['current_member' => $this->_memID],
+				],
+			],
+			'get_count' => [
+				'function' => function ($where, $where_vars = []) {
 					return $this->list_getUserErrorCount($where, $where_vars);
 				},
-				'params' => array(
+				'params' => [
 					'id_member = {int:current_member}',
-					array('current_member' => $this->_memID),
-				),
-			),
-			'columns' => array(
-				'ip_address' => array(
-					'header' => array(
+					['current_member' => $this->_memID],
+				],
+			],
+			'columns' => [
+				'ip_address' => [
+					'header' => [
 						'value' => $txt['ip_address'],
-					),
-					'data' => array(
-						'sprintf' => array(
+					],
+					'data' => [
+						'sprintf' => [
 							'format' => '<a href="' . $scripturl . '?action=profile;area=history;sa=ip;searchip=%1$s;u=' . $this->_memID . '">%1$s</a>',
-							'params' => array(
+							'params' => [
 								'ip' => false,
-							),
-						),
-					),
-					'sort' => array(
+							],
+						],
+					],
+					'sort' => [
 						'default' => 'le.ip',
 						'reverse' => 'le.ip DESC',
-					),
-				),
-				'message' => array(
-					'header' => array(
+					],
+				],
+				'message' => [
+					'header' => [
 						'value' => $txt['message'],
-					),
-					'data' => array(
-						'sprintf' => array(
+					],
+					'data' => [
+						'sprintf' => [
 							'format' => '%1$s<br /><a href="%2$s">%2$s</a>',
-							'params' => array(
+							'params' => [
 								'message' => false,
 								'url' => false,
-							),
-						),
-					),
-				),
-				'date' => array(
-					'header' => array(
+							],
+						],
+					],
+				],
+				'date' => [
+					'header' => [
 						'value' => $txt['date'],
-					),
-					'data' => array(
+					],
+					'data' => [
 						'db' => 'time',
-					),
-					'sort' => array(
+					],
+					'sort' => [
 						'default' => 'le.id_error DESC',
 						'reverse' => 'le.id_error',
-					),
-				),
-			),
-			'additional_rows' => array(
-				array(
+					],
+				],
+			],
+			'additional_rows' => [
+				[
 					'position' => 'after_title',
 					'value' => $txt['errors_desc'],
 					'style' => 'padding: 1ex 2ex;',
-				),
-			),
-		);
+				],
+			],
+		];
 
 		// Create the list for viewing.
 		createList($listOptions);
 
 		// Get all IP addresses this user has used for his messages.
 		$ips = getMembersIPs($this->_memID);
-		$context['ips'] = array();
-		$context['error_ips'] = array();
+		$context['ips'] = [];
+		$context['error_ips'] = [];
 
 		foreach ($ips['message_ips'] as $ip)
 		{
@@ -210,7 +210,7 @@ class ProfileHistory extends AbstractController
 		}
 
 		// Find other users that might use the same IP.
-		$context['members_in_range'] = array();
+		$context['members_in_range'] = [];
 
 		$all_ips = array_unique(array_merge($ips['message_ips'], $ips['error_ips']));
 		if (!empty($all_ips))
@@ -235,10 +235,10 @@ class ProfileHistory extends AbstractController
 	 * @param int $items_per_page The number of items to show per page
 	 * @param string $sort A string indicating how to sort the results
 	 * @param string $where
-	 * @param mixed[] $where_vars array of values used in the where statement
-	 * @return mixed[] error messages array
+	 * @param array $where_vars array of values used in the where statement
+	 * @return array error messages array
 	 */
-	public function list_getUserErrors($start, $items_per_page, $sort, $where, $where_vars = array())
+	public function list_getUserErrors($start, $items_per_page, $sort, $where, $where_vars = [])
 	{
 		require_once(SUBSDIR . '/ProfileHistory.subs.php');
 
@@ -252,10 +252,10 @@ class ProfileHistory extends AbstractController
 	 * used in action_trackip() and action_trackactivity()
 	 *
 	 * @param string $where
-	 * @param mixed[] $where_vars = array() or values used in the where statement
+	 * @param array $where_vars = array() or values used in the where statement
 	 * @return string number of user errors
 	 */
-	public function list_getUserErrorCount($where, $where_vars = array())
+	public function list_getUserErrorCount($where, $where_vars = [])
 	{
 		require_once(SUBSDIR . '/ProfileHistory.subs.php');
 
@@ -315,7 +315,7 @@ class ProfileHistory extends AbstractController
 		$context['ips'] = loadMembersIPs($ip_string, $ip_var);
 
 		// Start with the user messages.
-		$listOptions = array(
+		$listOptions = [
 			'id' => 'track_message_list',
 			'title' => $txt['messages_from_ip'] . ' ' . $context['ip'],
 			'start_var_name' => 'messageStart',
@@ -323,92 +323,92 @@ class ProfileHistory extends AbstractController
 			'no_items_label' => $txt['no_messages_from_ip'],
 			'base_href' => $context['base_url'] . ';searchip=' . $context['ip'],
 			'default_sort_col' => 'date',
-			'get_items' => array(
-				'function' => function ($start, $items_per_page, $sort, $where, $where_vars = array()) {
+			'get_items' => [
+				'function' => function ($start, $items_per_page, $sort, $where, $where_vars = []) {
 					return $this->list_getIPMessages($start, $items_per_page, $sort, $where, $where_vars);
 				},
-				'params' => array(
+				'params' => [
 					'm.poster_ip ' . $ip_string,
-					array('ip_address' => $ip_var),
-				),
-			),
-			'get_count' => array(
-				'function' => function ($where, $where_vars = array()) {
+					['ip_address' => $ip_var],
+				],
+			],
+			'get_count' => [
+				'function' => function ($where, $where_vars = []) {
 					return $this->list_getIPMessageCount($where, $where_vars);
 				},
-				'params' => array(
+				'params' => [
 					'm.poster_ip ' . $ip_string,
-					array('ip_address' => $ip_var),
-				),
-			),
-			'columns' => array(
-				'ip_address' => array(
-					'header' => array(
+					['ip_address' => $ip_var],
+				],
+			],
+			'columns' => [
+				'ip_address' => [
+					'header' => [
 						'value' => $txt['ip_address'],
-					),
-					'data' => array(
-						'sprintf' => array(
+					],
+					'data' => [
+						'sprintf' => [
 							'format' => '<a href="' . $context['base_url'] . ';searchip=%1$s">%1$s</a>',
-							'params' => array(
+							'params' => [
 								'ip' => false,
-							),
-						),
-					),
-					'sort' => array(
+							],
+						],
+					],
+					'sort' => [
 						'default' => 'm.poster_ip',
 						'reverse' => 'm.poster_ip DESC',
-					),
-				),
-				'poster' => array(
-					'header' => array(
+					],
+				],
+				'poster' => [
+					'header' => [
 						'value' => $txt['poster'],
-					),
-					'data' => array(
+					],
+					'data' => [
 						'db' => 'member_link',
-					),
-				),
-				'subject' => array(
-					'header' => array(
+					],
+				],
+				'subject' => [
+					'header' => [
 						'value' => $txt['subject'],
-					),
-					'data' => array(
-						'sprintf' => array(
+					],
+					'data' => [
+						'sprintf' => [
 							'format' => '<a href="' . $scripturl . '?topic=%1$s.msg%2$s#msg%2$s" rel="nofollow">%3$s</a>',
-							'params' => array(
+							'params' => [
 								'topic' => false,
 								'id' => false,
 								'subject' => false,
-							),
-						),
-					),
-				),
-				'date' => array(
-					'header' => array(
+							],
+						],
+					],
+				],
+				'date' => [
+					'header' => [
 						'value' => $txt['date'],
-					),
-					'data' => array(
+					],
+					'data' => [
 						'db' => 'time',
-					),
-					'sort' => array(
+					],
+					'sort' => [
 						'default' => 'm.id_msg DESC',
 						'reverse' => 'm.id_msg',
-					),
-				),
-			),
-			'additional_rows' => array(
-				array(
+					],
+				],
+			],
+			'additional_rows' => [
+				[
 					'position' => 'after_title',
 					'value' => $txt['messages_from_ip_desc'],
 					'style' => 'padding: 1ex 2ex;',
-				),
-			),
-		);
+				],
+			],
+		];
 
 		// Create the messages list.
 		createList($listOptions);
 
 		// Set the options for the error lists.
-		$listOptions = array(
+		$listOptions = [
 			'id' => 'track_ip_user_list',
 			'title' => $txt['errors_from_ip'] . ' ' . $context['ip'],
 			'start_var_name' => 'errorStart',
@@ -416,85 +416,85 @@ class ProfileHistory extends AbstractController
 			'no_items_label' => $txt['no_errors_from_ip'],
 			'base_href' => $context['base_url'] . ';searchip=' . $context['ip'],
 			'default_sort_col' => 'date2',
-			'get_items' => array(
-				'function' => function ($start, $items_per_page, $sort, $where, $where_vars = array()) {
+			'get_items' => [
+				'function' => function ($start, $items_per_page, $sort, $where, $where_vars = []) {
 					return $this->list_getUserErrors($start, $items_per_page, $sort, $where, $where_vars);
 				},
-				'params' => array(
+				'params' => [
 					'le.ip ' . $ip_string,
-					array('ip_address' => $ip_var),
-				),
-			),
-			'get_count' => array(
-				'function' => function ($where, $where_vars = array()) {
+					['ip_address' => $ip_var],
+				],
+			],
+			'get_count' => [
+				'function' => function ($where, $where_vars = []) {
 					return $this->list_getUserErrorCount($where, $where_vars);
 				},
-				'params' => array(
+				'params' => [
 					'ip ' . $ip_string,
-					array('ip_address' => $ip_var),
-				),
-			),
-			'columns' => array(
-				'ip_address2' => array(
-					'header' => array(
+					['ip_address' => $ip_var],
+				],
+			],
+			'columns' => [
+				'ip_address2' => [
+					'header' => [
 						'value' => $txt['ip_address'],
-					),
-					'data' => array(
-						'sprintf' => array(
+					],
+					'data' => [
+						'sprintf' => [
 							'format' => '<a href="' . $context['base_url'] . ';searchip=%1$s">%1$s</a>',
-							'params' => array(
+							'params' => [
 								'ip' => false,
-							),
-						),
-					),
-					'sort' => array(
+							],
+						],
+					],
+					'sort' => [
 						'default' => 'le.ip',
 						'reverse' => 'le.ip DESC',
-					),
-				),
-				'display_name' => array(
-					'header' => array(
+					],
+				],
+				'display_name' => [
+					'header' => [
 						'value' => $txt['display_name'],
-					),
-					'data' => array(
+					],
+					'data' => [
 						'db' => 'member_link',
-					),
-				),
-				'message' => array(
-					'header' => array(
+					],
+				],
+				'message' => [
+					'header' => [
 						'value' => $txt['message'],
-					),
-					'data' => array(
-						'sprintf' => array(
+					],
+					'data' => [
+						'sprintf' => [
 							'format' => '%1$s<br /><a href="%2$s">%2$s</a>',
-							'params' => array(
+							'params' => [
 								'message' => false,
 								'url' => false,
-							),
-						),
-					),
-				),
-				'date2' => array(
-					'header' => array(
+							],
+						],
+					],
+				],
+				'date2' => [
+					'header' => [
 						'value' => $txt['date'],
-					),
-					'data' => array(
+					],
+					'data' => [
 						'db' => 'time',
-					),
-					'sort' => array(
+					],
+					'sort' => [
 						'default' => 'le.id_error DESC',
 						'reverse' => 'le.id_error',
-					),
-				),
-			),
-			'additional_rows' => array(
-				array(
+					],
+				],
+			],
+			'additional_rows' => [
+				[
 					'position' => 'after_title',
 					'value' => $txt['errors_from_ip_desc'],
 					'style' => 'padding: 1ex 2ex;',
-				),
-			),
-		);
+				],
+			],
+		];
 
 		// Create the error list.
 		createList($listOptions);
@@ -502,28 +502,28 @@ class ProfileHistory extends AbstractController
 		$context['single_ip'] = strpos($context['ip'], '*') === false;
 		if ($context['single_ip'])
 		{
-			$context['whois_servers'] = array(
-				'afrinic' => array(
+			$context['whois_servers'] = [
+				'afrinic' => [
 					'name' => $txt['whois_afrinic'],
 					'url' => 'http://www.afrinic.net/whois?searchtext=' . $context['ip'],
-				),
-				'apnic' => array(
+				],
+				'apnic' => [
 					'name' => $txt['whois_apnic'],
 					'url' => 'http://wq.apnic.net/apnic-bin/whois.pl?searchtext=' . $context['ip'],
-				),
-				'arin' => array(
+				],
+				'arin' => [
 					'name' => $txt['whois_arin'],
 					'url' => 'http://whois.arin.net/rest/ip/' . $context['ip'],
-				),
-				'lacnic' => array(
+				],
+				'lacnic' => [
 					'name' => $txt['whois_lacnic'],
 					'url' => 'http://lacnic.net/cgi-bin/lacnic/whois?query=' . $context['ip'],
-				),
-				'ripe' => array(
+				],
+				'ripe' => [
 					'name' => $txt['whois_ripe'],
 					'url' => 'https://apps.db.ripe.net/search/query.html?searchtext=' . $context['ip'],
-				),
-			);
+				],
+			];
 
 			// Let integration add whois servers easily
 			call_integration_hook('integrate_trackip');
@@ -540,10 +540,10 @@ class ProfileHistory extends AbstractController
 	 * @param int $items_per_page The number of items to show per page
 	 * @param string $sort A string indicating how to sort the results
 	 * @param string $where
-	 * @param mixed[] $where_vars array of values used in the where statement
-	 * @return mixed[] an array of basic messages / details
+	 * @param array $where_vars array of values used in the where statement
+	 * @return array an array of basic messages / details
 	 */
-	public function list_getIPMessages($start, $items_per_page, $sort, $where, $where_vars = array())
+	public function list_getIPMessages($start, $items_per_page, $sort, $where, $where_vars = [])
 	{
 		require_once(SUBSDIR . '/ProfileHistory.subs.php');
 
@@ -556,10 +556,10 @@ class ProfileHistory extends AbstractController
 	 * Pass though to getIPMessageCount for createList() in TrackIP()
 	 *
 	 * @param string $where
-	 * @param mixed[] $where_vars array of values used in the where statement
+	 * @param array $where_vars array of values used in the where statement
 	 * @return string count of messages matching the IP
 	 */
-	public function list_getIPMessageCount($where, $where_vars = array())
+	public function list_getIPMessageCount($where, $where_vars = [])
 	{
 		require_once(SUBSDIR . '/ProfileHistory.subs.php');
 
@@ -585,61 +585,61 @@ class ProfileHistory extends AbstractController
 		}
 
 		// Start with the user messages.
-		$listOptions = array(
+		$listOptions = [
 			'id' => 'track_logins_list',
 			'title' => $txt['trackLogins'],
 			'no_items_label' => $txt['trackLogins_none_found'],
 			'base_href' => $context['base_url'],
-			'get_items' => array(
-				'function' => function ($start, $items_per_page, $sort, $where, $where_vars = array()) {
+			'get_items' => [
+				'function' => function ($start, $items_per_page, $sort, $where, $where_vars = []) {
 					return $this->list_getLogins($start, $items_per_page, $sort, $where, $where_vars);
 				},
-				'params' => array(
+				'params' => [
 					'id_member = {int:current_member}',
-					array('current_member' => $this->_memID),
-				),
-			),
-			'get_count' => array(
-				'function' => function ($where, $where_vars = array()) {
+					['current_member' => $this->_memID],
+				],
+			],
+			'get_count' => [
+				'function' => function ($where, $where_vars = []) {
 					return $this->list_getLoginCount($where, $where_vars);
 				},
-				'params' => array(
+				'params' => [
 					'id_member = {int:current_member}',
-					array('current_member' => $this->_memID),
-				),
-			),
-			'columns' => array(
-				'time' => array(
-					'header' => array(
+					['current_member' => $this->_memID],
+				],
+			],
+			'columns' => [
+				'time' => [
+					'header' => [
 						'value' => $txt['date'],
-					),
-					'data' => array(
+					],
+					'data' => [
 						'db' => 'time',
-					),
-				),
-				'ip' => array(
-					'header' => array(
+					],
+				],
+				'ip' => [
+					'header' => [
 						'value' => $txt['ip_address'],
-					),
-					'data' => array(
-						'sprintf' => array(
+					],
+					'data' => [
+						'sprintf' => [
 							'format' => '<a href="' . $context['base_url'] . ';searchip=%1$s">%1$s</a> (<a href="' . $context['base_url'] . ';searchip=%2$s">%2$s</a>) ',
-							'params' => array(
+							'params' => [
 								'ip' => false,
 								'ip2' => false
-							),
-						),
-					),
-				),
-			),
-			'additional_rows' => array(
-				array(
+							],
+						],
+					],
+				],
+			],
+			'additional_rows' => [
+				[
 					'position' => 'after_title',
 					'value' => $txt['trackLogins_desc'],
 					'style' => 'padding: 1ex 2ex;',
-				),
-			),
-		);
+				],
+			],
+		];
 
 		// Create the messages list.
 		createList($listOptions);
@@ -657,11 +657,11 @@ class ProfileHistory extends AbstractController
 	 * @param int $items_per_page The number of items to show per page
 	 * @param string $sort A string indicating how to sort the results
 	 * @param string $where
-	 * @param mixed[] $where_vars array of values used in the where statement
+	 * @param array $where_vars array of values used in the where statement
 	 *
-	 * @return mixed[] an array of messages
+	 * @return array an array of messages
 	 */
-	public function list_getLogins($start, $items_per_page, $sort, $where, $where_vars = array())
+	public function list_getLogins($start, $items_per_page, $sort, $where, $where_vars = [])
 	{
 		require_once(SUBSDIR . '/ProfileHistory.subs.php');
 
@@ -675,10 +675,10 @@ class ProfileHistory extends AbstractController
 	 * (createList() in TrackLogins())
 	 *
 	 * @param string $where
-	 * @param mixed[] $where_vars array of values used in the where statement
+	 * @param array $where_vars array of values used in the where statement
 	 * @return string count of messages matching the IP
 	 */
-	public function list_getLoginCount($where, $where_vars = array())
+	public function list_getLoginCount($where, $where_vars = [])
 	{
 		require_once(SUBSDIR . '/ProfileHistory.subs.php');
 
@@ -697,70 +697,70 @@ class ProfileHistory extends AbstractController
 		$context['custom_field_titles'] = loadAllCustomFields();
 
 		// Set the options for the error lists.
-		$listOptions = array(
+		$listOptions = [
 			'id' => 'edit_list',
 			'title' => $txt['trackEdits'],
 			'items_per_page' => $modSettings['defaultMaxMessages'],
 			'no_items_label' => $txt['trackEdit_no_edits'],
 			'base_href' => $scripturl . '?action=profile;area=history;sa=edits;u=' . $this->_memID,
 			'default_sort_col' => 'time',
-			'get_items' => array(
+			'get_items' => [
 				'function' => function ($start, $items_per_page, $sort) {
 					return $this->list_getProfileEdits($start, $items_per_page, $sort);
 				},
-			),
-			'get_count' => array(
+			],
+			'get_count' => [
 				'function' => function () {
 					return $this->list_getProfileEditCount();
 				},
-			),
-			'columns' => array(
-				'action' => array(
-					'header' => array(
+			],
+			'columns' => [
+				'action' => [
+					'header' => [
 						'value' => $txt['trackEdit_action'],
-					),
-					'data' => array(
+					],
+					'data' => [
 						'db' => 'action_text',
-					),
-				),
-				'before' => array(
-					'header' => array(
+					],
+				],
+				'before' => [
+					'header' => [
 						'value' => $txt['trackEdit_before'],
-					),
-					'data' => array(
+					],
+					'data' => [
 						'db' => 'before',
-					),
-				),
-				'after' => array(
-					'header' => array(
+					],
+				],
+				'after' => [
+					'header' => [
 						'value' => $txt['trackEdit_after'],
-					),
-					'data' => array(
+					],
+					'data' => [
 						'db' => 'after',
-					),
-				),
-				'time' => array(
-					'header' => array(
+					],
+				],
+				'time' => [
+					'header' => [
 						'value' => $txt['date'],
-					),
-					'data' => array(
+					],
+					'data' => [
 						'db' => 'time',
-					),
-					'sort' => array(
+					],
+					'sort' => [
 						'default' => 'id_action DESC',
 						'reverse' => 'id_action',
-					),
-				),
-				'applicator' => array(
-					'header' => array(
+					],
+				],
+				'applicator' => [
+					'header' => [
 						'value' => $txt['trackEdit_applicator'],
-					),
-					'data' => array(
+					],
+					'data' => [
 						'db' => 'member_link',
-					),
-				),
-			),
-		);
+					],
+				],
+			],
+		];
 
 		// Create the error list.
 		createList($listOptions);
@@ -777,7 +777,7 @@ class ProfileHistory extends AbstractController
 	 * @param int $start The item to start with (for pagination purposes)
 	 * @param int $items_per_page The number of items to show per page
 	 * @param string $sort A string indicating how to sort the results
-	 * @return mixed[] array of profile edits
+	 * @return array array of profile edits
 	 */
 	public function list_getProfileEdits($start, $items_per_page, $sort)
 	{

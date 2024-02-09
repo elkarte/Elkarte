@@ -12,7 +12,11 @@
 
 namespace ElkArte\Profile;
 
+use BBC\ParserWrapper;
 use ElkArte\DataValidator;
+use ElkArte\Errors\ErrorContext;
+use ElkArte\Exceptions\Exception;
+use ElkArte\Languages\Txt;
 use ElkArte\MembersList;
 use ElkArte\User;
 use ElkArte\Util;
@@ -27,7 +31,7 @@ class ProfileFields
 	 * @param string $area = 'summary'
 	 * @param array $custom_fields = array()
 	 */
-	public function loadCustomFields($memID, $area = 'summary', array $custom_fields = array())
+	public function loadCustomFields($memID, $area = 'summary', array $custom_fields = [])
 	{
 		global $context, $txt, $settings, $scripturl;
 
@@ -67,13 +71,13 @@ class ProfileFields
 		FROM {db_prefix}custom_fields
 		WHERE ' . $where . '
 		ORDER BY vieworder ASC',
-			array(
+			[
 				'area' => $area,
-			)
+			]
 		);
-		$context['custom_fields'] = array();
+		$context['custom_fields'] = [];
 		$context['custom_fields_required'] = false;
-		$bbc_parser = \BBC\ParserWrapper::instance();
+		$bbc_parser = ParserWrapper::instance();
 		while (($row = $request->fetch_assoc()))
 		{
 			// Shortcut.
@@ -84,7 +88,7 @@ class ProfileFields
 			if (!empty($custom_fields) && isset($custom_fields[$row['col_name']]))
 			{
 				$value = Util::htmlspecialchars($custom_fields[$row['col_name']]);
-				if (in_array($row['field_type'], array('select', 'radio')))
+				if (in_array($row['field_type'], ['select', 'radio']))
 				{
 					$options = explode(',', $row['field_options']);
 					$value = $options[$value] ?? '';
@@ -140,7 +144,7 @@ class ProfileFields
 				$input_html .= '</fieldset>';
 			}
 			// A standard input field, including some html5 variants
-			elseif (in_array($row['field_type'], array('text', 'url', 'search', 'date', 'email', 'color')))
+			elseif (in_array($row['field_type'], ['text', 'url', 'search', 'date', 'email', 'color']))
 			{
 				$input_html = '<input id="' . $row['col_name'] . '" type="' . $row['field_type'] . '" name="customfield[' . $row['col_name'] . ']" ' . ($row['field_length'] != 0 ? 'maxlength="' . $row['field_length'] . '"' : '') . ' size="' . ($row['field_length'] == 0 || $row['field_length'] >= 50 ? 50 : ($row['field_length'] > 30 ? 30 : ($row['field_length'] > 10 ? 20 : 10))) . '" value="' . $value . '" placeholder="' . $row['field_name'] . '" class="input_text" />';
 			}
@@ -158,20 +162,20 @@ class ProfileFields
 			// Allow for newlines at least
 			elseif ($row['field_type'] === 'textarea')
 			{
-				$output_html = strtr($output_html, array("\n" => '<br />'));
+				$output_html = strtr($output_html, ["\n" => '<br />']);
 			}
 
 			// Enclosing the user input within some other text?
 			if (!empty($row['enclose']) && !empty($output_html))
 			{
-				$replacements = array(
+				$replacements = [
 					'{SCRIPTURL}' => $scripturl,
 					'{IMAGES_URL}' => $settings['images_url'],
 					'{DEFAULT_IMAGES_URL}' => $settings['default_images_url'],
 					'{INPUT}' => $output_html,
-				);
+				];
 
-				if (in_array($row['field_type'], array('radio', 'select')))
+				if (in_array($row['field_type'], ['radio', 'select']))
 				{
 					$replacements['{KEY}'] = $row['col_name'] . '_' . ($key ?? 0);
 				}
@@ -180,14 +184,14 @@ class ProfileFields
 			}
 
 			$context['custom_fields_required'] = $context['custom_fields_required'] || $row['show_reg'];
-			$valid_areas = array('register', 'account', 'forumprofile', 'theme');
+			$valid_areas = ['register', 'account', 'forumprofile', 'theme'];
 
 			if (!in_array($area, $valid_areas) && ($value === '' || $value === 'no_default'))
 			{
 				continue;
 			}
 
-			$context['custom_fields'][] = array(
+			$context['custom_fields'][] = [
 				'name' => $row['field_name'],
 				'desc' => $row['field_desc'],
 				'field_type' => $row['field_type'],
@@ -199,12 +203,12 @@ class ProfileFields
 				'show_reg' => $row['show_reg'],
 				'field_length' => $row['field_length'],
 				'mask' => $row['mask'],
-			);
+			];
 		}
 
 		$request->free_result();
 
-		call_integration_hook('integrate_load_custom_profile_fields', array($memID, $area));
+		call_integration_hook('integrate_load_custom_profile_fields', [$memID, $area]);
 	}
 
 	/**
@@ -268,16 +272,16 @@ class ProfileFields
 		 * the changes to be displayed correctly on submit of the form.
 		 */
 
-		$profile_fields = array(
-			'avatar_choice' => array(
+		$profile_fields = [
+			'avatar_choice' => [
 				'type' => 'callback',
 				'callback_func' => 'avatar_select',
 				// This handles the permissions too.
 				'preload' => 'profileLoadAvatarData',
 				'input_validate' => 'profileSaveAvatarData',
 				'save_key' => 'avatar',
-			),
-			'bday1' => array(
+			],
+			'bday1' => [
 				'type' => 'callback',
 				'callback_func' => 'birthdate',
 				'permission' => 'profile_extra',
@@ -286,11 +290,11 @@ class ProfileFields
 
 					// Split up the birth date....
 					list ($uyear, $umonth, $uday) = explode('-', empty($cur_profile['birthdate']) || $cur_profile['birthdate'] === '0001-01-01' ? '0000-00-00' : $cur_profile['birthdate']);
-					$context['member']['birth_date'] = array(
+					$context['member']['birth_date'] = [
 						'year' => $uyear === '0004' ? '0000' : $uyear,
 						'month' => $umonth,
 						'day' => $uday,
-					);
+					];
 
 					return true;
 				},
@@ -319,9 +323,9 @@ class ProfileFields
 
 					return false;
 				},
-			),
+			],
 			// Setting the birth date the old style way?
-			'birthdate' => array(
+			'birthdate' => [
 				'type' => 'hidden',
 				'permission' => 'profile_extra',
 				'input_validate' => function (&$value) {
@@ -341,8 +345,8 @@ class ProfileFields
 						return false;
 					}
 				},
-			),
-			'date_registered' => array(
+			],
+			'date_registered' => [
 				'type' => 'date',
 				'value' => empty($cur_profile['date_registered']) ? $txt['not_applicable'] : Util::strftime('%Y-%m-%d', $cur_profile['date_registered'] + (User::$info->time_offset + $modSettings['time_offset']) * 3600),
 				'label' => $txt['date_registered'],
@@ -370,8 +374,8 @@ class ProfileFields
 
 					return true;
 				},
-			),
-			'email_address' => array(
+			],
+			'email_address' => [
 				'type' => 'email',
 				'label' => $txt['user_email_address'],
 				'subtext' => $txt['valid_email'],
@@ -400,8 +404,8 @@ class ProfileFields
 
 					return $isValid;
 				},
-			),
-			'hide_email' => array(
+			],
+			'hide_email' => [
 				'type' => 'check',
 				'value' => empty($cur_profile['hide_email']),
 				'label' => $txt['allow_user_email'],
@@ -411,17 +415,17 @@ class ProfileFields
 
 					return true;
 				},
-			),
+			],
 			// Selecting group membership is a complicated one, so we treat it separate!
-			'id_group' => array(
+			'id_group' => [
 				'type' => 'callback',
 				'callback_func' => 'group_manage',
 				'permission' => 'manage_membergroups',
 				'preload' => 'profileLoadGroups',
 				'log_change' => true,
 				'input_validate' => 'profileSaveGroups',
-			),
-			'id_theme' => array(
+			],
+			'id_theme' => [
 				'type' => 'callback',
 				'callback_func' => 'theme_pick',
 				'permission' => 'profile_extra',
@@ -436,18 +440,18 @@ class ProfileFields
 					FROM {db_prefix}themes
 					WHERE id_theme = {int:id_theme}
 						AND variable = {string:variable}
-					LIMIT 1', array(
+					LIMIT 1', [
 							'id_theme' => $cur_profile['id_theme'],
 							'variable' => 'name',
-						)
+						]
 					);
 					list ($name) = $request->fetch_row();
 					$request->free_result();
 
-					$context['member']['theme'] = array(
+					$context['member']['theme'] = [
 						'id' => $cur_profile['id_theme'],
 						'name' => empty($cur_profile['id_theme']) ? $txt['theme_forum_default'] : $name
-					);
+					];
 
 					return true;
 				},
@@ -456,8 +460,8 @@ class ProfileFields
 
 					return true;
 				},
-			),
-			'karma_good' => array(
+			],
+			'karma_good' => [
 				'type' => 'callback',
 				'callback_func' => 'karma_modify',
 				'permission' => 'admin_forum',
@@ -477,16 +481,16 @@ class ProfileFields
 				'preload' => function () {
 					global $context, $cur_profile;
 
-					$context['member']['karma'] = array(
+					$context['member']['karma'] = [
 						'good' => (int)$cur_profile['karma_good'],
 						'bad' => (int)$cur_profile['karma_bad']
-					);
+					];
 
 					return true;
 				},
 				'enabled' => !empty($modSettings['karmaMode']),
-			),
-			'lngfile' => array(
+			],
+			'lngfile' => [
 				'type' => 'select',
 				'options' => 'return $context[\'profile_languages\'];',
 				'label' => $txt['preferred_language'],
@@ -514,9 +518,9 @@ class ProfileFields
 
 					return false;
 				},
-			),
+			],
 			// The username is not always editable - so adjust it as such.
-			'member_name' => array(
+			'member_name' => [
 				'type' => allowedTo('admin_forum') && isset($_GET['changeusername']) ? 'text' : 'label',
 				'label' => $txt['username'],
 				'subtext' => allowedTo('admin_forum') && !isset($_GET['changeusername']) ? '[<a href="' . $scripturl . '?action=profile;u=' . $context['id_member'] . ';area=account;changeusername" class="em">' . $txt['username_change'] . '</a>]' : '',
@@ -533,7 +537,7 @@ class ProfileFields
 
 						// Maybe they are trying to change their password as well?
 						$resetPassword = true;
-						if (isset($_POST['passwrd1']) && $_POST['passwrd1'] !== '' && isset($_POST['passwrd2']) && $_POST['passwrd1'] === $_POST['passwrd2'] && validatePassword($_POST['passwrd1'], $value, array($cur_profile['real_name'], User::$info->username, User::$info->name, User::$info->email)) === null)
+						if (isset($_POST['passwrd1']) && $_POST['passwrd1'] !== '' && isset($_POST['passwrd2']) && $_POST['passwrd1'] === $_POST['passwrd2'] && validatePassword($_POST['passwrd1'], $value, [$cur_profile['real_name'], User::$info->username, User::$info->name, User::$info->email]) === null)
 						{
 							$resetPassword = false;
 						}
@@ -545,14 +549,14 @@ class ProfileFields
 						}
 						elseif ($value !== null)
 						{
-							$errors = \ElkArte\Errors\ErrorContext::context('change_username', 0);
+							$errors = ErrorContext::context('change_username', 0);
 
 							validateUsername($context['id_member'], $value, 'change_username');
 
 							// No errors we can proceed normally
 							if (!$errors->hasErrors())
 							{
-								updateMemberData($context['id_member'], array('member_name' => $value));
+								updateMemberData($context['id_member'], ['member_name' => $value]);
 							}
 							else
 							{
@@ -561,7 +565,7 @@ class ProfileFields
 								$error_severity = $errors->hasErrors(1) && User::$info->is_admin === false ? 1 : null;
 								foreach ($errors->prepareErrors($error_severity) as $error)
 								{
-									throw new \ElkArte\Exceptions\Exception($error, $error_severity === null ? false : 'general');
+									throw new Exception($error, $error_severity === null ? false : 'general');
 								}
 							}
 						}
@@ -569,8 +573,8 @@ class ProfileFields
 
 					return false;
 				},
-			),
-			'passwrd1' => array(
+			],
+			'passwrd1' => [
 				'type' => 'password',
 				'label' => ucwords($txt['choose_pass']),
 				'subtext' => $txt['password_strength'],
@@ -597,7 +601,7 @@ class ProfileFields
 
 					// Let's get the validation function into play...
 					require_once(SUBSDIR . '/Auth.subs.php');
-					$passwordErrors = validatePassword($value, $cur_profile['member_name'], array($cur_profile['real_name'], User::$info->username, User::$info->name, User::$info->email));
+					$passwordErrors = validatePassword($value, $cur_profile['member_name'], [$cur_profile['real_name'], User::$info->username, User::$info->name, User::$info->email]);
 
 					// Were there errors?
 					if ($passwordErrors !== null)
@@ -611,8 +615,8 @@ class ProfileFields
 
 					return true;
 				},
-			),
-			'passwrd2' => array(
+			],
+			'passwrd2' => [
 				'type' => 'password',
 				'label' => ucwords($txt['verify_pass']),
 				'enabled' => true,
@@ -620,15 +624,15 @@ class ProfileFields
 				'value' => '',
 				'permission' => 'profile_identity',
 				'is_dummy' => true,
-			),
-			'enable_otp' => array(
+			],
+			'enable_otp' => [
 				'type' => 'check',
 				'value' => !empty($cur_profile['enable_otp']),
 				'subtext' => $txt['otp_enabled_help'],
 				'label' => $txt['otp_enabled'],
 				'permission' => 'profile_identity',
-			),
-			'otp_secret' => array(
+			],
+			'otp_secret' => [
 				'type' => 'text',
 				'label' => ucwords($txt['otp_token']),
 				'subtext' => $txt['otp_token_help'],
@@ -637,16 +641,16 @@ class ProfileFields
 				'value' => empty($cur_profile['otp_secret']) ? '' : $cur_profile['otp_secret'],
 				'postinput' => '<div style="display: inline-block;"><input type="button" value="' . $txt['otp_generate'] . '" onclick="generateSecret();"></div><div id="qrcode"></div>',
 				'permission' => 'profile_identity',
-			),
+			],
 			// This does contact-related settings
-			'receive_from' => array(
+			'receive_from' => [
 				'type' => 'select',
-				'options' => array(
+				'options' => [
 					$txt['receive_from_everyone'],
 					$txt['receive_from_ignore'],
 					$txt['receive_from_buddies'],
 					$txt['receive_from_admins'],
-				),
+				],
 				'subtext' => $txt['receive_from_description'],
 				'value' => empty($cur_profile['receive_from']) ? 0 : $cur_profile['receive_from'],
 				'input_validate' => function (&$value) {
@@ -659,9 +663,9 @@ class ProfileFields
 
 					return true;
 				},
-			),
+			],
 			// This does ALL the pm settings
-			'pm_settings' => array(
+			'pm_settings' => [
 				'type' => 'callback',
 				'callback_func' => 'pm_settings',
 				'permission' => 'pm_read',
@@ -684,8 +688,8 @@ class ProfileFields
 
 					return true;
 				},
-			),
-			'posts' => array(
+			],
+			'posts' => [
 				'type' => 'int',
 				'label' => $txt['profile_posts'],
 				'log_change' => true,
@@ -693,7 +697,7 @@ class ProfileFields
 				'permission' => 'moderate_forum',
 				'input_validate' => function (&$value) {
 					// Account for comma_format presentation up front
-					$check = strtr($value, array(',' => '', '.' => '', ' ' => ''));
+					$check = strtr($value, [',' => '', '.' => '', ' ' => '']);
 					if (!is_numeric($check))
 					{
 						return 'digits_only';
@@ -703,13 +707,13 @@ class ProfileFields
 
 					return true;
 				},
-			),
-			'real_name' => array(
+			],
+			'real_name' => [
 				'type' => !empty($modSettings['allow_editDisplayName']) || allowedTo('moderate_forum') ? 'text' : 'label',
 				'label' => $txt['name'],
 				'subtext' => $txt['display_name_desc'],
 				'log_change' => true,
-				'input_attr' => array('maxlength="60"'),
+				'input_attr' => ['maxlength="60"'],
 				'permission' => 'profile_identity',
 				'enabled' => !empty($modSettings['allow_editDisplayName']) || allowedTo('moderate_forum'),
 				'input_validate' => function (&$value) {
@@ -738,15 +742,15 @@ class ProfileFields
 
 					return true;
 				},
-			),
-			'secret_question' => array(
+			],
+			'secret_question' => [
 				'type' => 'text',
 				'label' => $txt['secret_question'],
 				'subtext' => $txt['secret_desc'],
 				'size' => 50,
 				'permission' => 'profile_identity',
-			),
-			'secret_answer' => array(
+			],
+			'secret_answer' => [
 				'type' => 'text',
 				'label' => $txt['secret_answer'],
 				'subtext' => $txt['secret_desc2'],
@@ -760,7 +764,7 @@ class ProfileFields
 					if (empty($value))
 					{
 						require_once(SUBSDIR . '/Members.subs.php');
-						$member = getBasicMemberData($cur_profile['id_member'], array('authentication' => true));
+						$member = getBasicMemberData($cur_profile['id_member'], ['authentication' => true]);
 
 						// No previous answer was saved, so that\'s all good
 						if (empty($member['secret_answer']))
@@ -778,23 +782,23 @@ class ProfileFields
 
 					return true;
 				},
-			),
-			'signature' => array(
+			],
+			'signature' => [
 				'type' => 'callback',
 				'callback_func' => 'signature_modify',
 				'permission' => 'profile_extra',
 				'enabled' => strpos($modSettings['signature_settings'], 1) === 0,
 				'preload' => 'profileLoadSignatureData',
 				'input_validate' => 'profileValidateSignature',
-			),
-			'show_online' => array(
+			],
+			'show_online' => [
 				'type' => 'check',
 				'label' => $txt['show_online'],
 				'permission' => 'profile_identity',
 				'enabled' => !empty($modSettings['allow_hideOnline']) || allowedTo('moderate_forum'),
-			),
+			],
 			// Pretty much a dummy entry - it populates all the theme settings.
-			'theme_settings' => array(
+			'theme_settings' => [
 				'type' => 'callback',
 				'callback_func' => 'theme_settings',
 				'permission' => 'profile_extra',
@@ -802,7 +806,7 @@ class ProfileFields
 				'preload' => function () {
 					global $context;
 
-					\ElkArte\Languages\Txt::load('Settings');
+					Txt::load('Settings');
 
 					// Can they disable censoring?
 					$context['allow_no_censored'] = false;
@@ -813,22 +817,22 @@ class ProfileFields
 
 					return true;
 				},
-			),
-			'time_format' => array(
+			],
+			'time_format' => [
 				'type' => 'callback',
 				'callback_func' => 'timeformat_modify',
 				'permission' => 'profile_extra',
 				'preload' => function () {
 					global $context, $txt, $cur_profile, $modSettings;
 
-					$context['easy_timeformats'] = array(
-						array('format' => '', 'title' => $txt['timeformat_default']),
-						array('format' => '%B %d, %Y, %I:%M:%S %p', 'title' => $txt['timeformat_easy1']),
-						array('format' => '%B %d, %Y, %H:%M:%S', 'title' => $txt['timeformat_easy2']),
-						array('format' => '%Y-%m-%d, %H:%M:%S', 'title' => $txt['timeformat_easy3']),
-						array('format' => '%d %B %Y, %H:%M:%S', 'title' => $txt['timeformat_easy4']),
-						array('format' => '%d-%m-%Y, %H:%M:%S', 'title' => $txt['timeformat_easy5'])
-					);
+					$context['easy_timeformats'] = [
+						['format' => '', 'title' => $txt['timeformat_default']],
+						['format' => '%B %d, %Y, %I:%M:%S %p', 'title' => $txt['timeformat_easy1']],
+						['format' => '%B %d, %Y, %H:%M:%S', 'title' => $txt['timeformat_easy2']],
+						['format' => '%Y-%m-%d, %H:%M:%S', 'title' => $txt['timeformat_easy3']],
+						['format' => '%d %B %Y, %H:%M:%S', 'title' => $txt['timeformat_easy4']],
+						['format' => '%d-%m-%Y, %H:%M:%S', 'title' => $txt['timeformat_easy5']]
+					];
 
 					$context['member']['time_format'] = $cur_profile['time_format'];
 					$context['current_forum_time'] = standardTime(time() - User::$info->time_offset * 3600, false);
@@ -837,8 +841,8 @@ class ProfileFields
 
 					return true;
 				},
-			),
-			'time_offset' => array(
+			],
+			'time_offset' => [
 				'type' => 'callback',
 				'callback_func' => 'timeoffset_modify',
 				'permission' => 'profile_extra',
@@ -860,12 +864,12 @@ class ProfileFields
 
 					return true;
 				},
-			),
-			'usertitle' => array(
+			],
+			'usertitle' => [
 				'type' => 'text',
 				'label' => $txt['custom_title'],
 				'log_change' => true,
-				'input_attr' => array('maxlength="50"'),
+				'input_attr' => ['maxlength="50"'],
 				'size' => 50,
 				'permission' => 'profile_title',
 				'enabled' => !empty($modSettings['titlesEnable']),
@@ -877,16 +881,16 @@ class ProfileFields
 
 					return true;
 				},
-			),
-			'website_title' => array(
+			],
+			'website_title' => [
 				'type' => 'text',
 				'label' => $txt['website_title'],
 				'subtext' => $txt['include_website_url'],
 				'size' => 50,
 				'permission' => 'profile_extra',
 				'link_with' => 'website',
-			),
-			'website_url' => array(
+			],
+			'website_url' => [
 				'type' => 'url',
 				'label' => $txt['website_url'],
 				'subtext' => $txt['complete_url'],
@@ -895,7 +899,7 @@ class ProfileFields
 				// Fix the URL...
 				'input_validate' => function (&$value) {
 
-					$value = addProtocol($value, array('http://', 'https://', 'ftp://', 'ftps://'));
+					$value = addProtocol($value, ['http://', 'https://', 'ftp://', 'ftps://']);
 					if (strlen($value) < 8)
 					{
 						$value = '';
@@ -904,12 +908,12 @@ class ProfileFields
 					return true;
 				},
 				'link_with' => 'website',
-			),
-		);
+			],
+		];
 
-		call_integration_hook('integrate_load_profile_fields', array(&$profile_fields));
+		call_integration_hook('integrate_load_profile_fields', [&$profile_fields]);
 
-		$disabled_fields = !empty($modSettings['disabled_profile_fields']) ? explode(',', $modSettings['disabled_profile_fields']) : array();
+		$disabled_fields = !empty($modSettings['disabled_profile_fields']) ? explode(',', $modSettings['disabled_profile_fields']) : [];
 
 		// Hard to imagine this won't be necessary
 		require_once(SUBSDIR . '/Members.subs.php');
@@ -918,7 +922,7 @@ class ProfileFields
 		foreach ($profile_fields as $key => $field)
 		{
 			// Do we have permission to do this?
-			if (isset($field['permission']) && !allowedTo(($context['user']['is_owner'] ? array($field['permission'] . '_own', $field['permission'] . '_any') : $field['permission'] . '_any')) && !allowedTo($field['permission']))
+			if (isset($field['permission']) && !allowedTo(($context['user']['is_owner'] ? [$field['permission'] . '_own', $field['permission'] . '_any'] : $field['permission'] . '_any')) && !allowedTo($field['permission']))
 			{
 				unset($profile_fields[$key]);
 			}
@@ -949,7 +953,7 @@ class ProfileFields
 
 		if (!empty($hook))
 		{
-			call_integration_hook('integrate_' . $hook . '_profile_fields', array(&$fields));
+			call_integration_hook('integrate_' . $hook . '_profile_fields', [&$fields]);
 		}
 
 		// Load them up.
@@ -960,14 +964,14 @@ class ProfileFields
 
 		// This allows variables to call activities when they save
 		// - by default just to reload their settings
-		$context['profile_execute_on_save'] = array();
+		$context['profile_execute_on_save'] = [];
 		if ($context['user']['is_owner'])
 		{
 			$context['profile_execute_on_save']['reload_user'] = 'profileReloadUser';
 		}
 
 		// Assume we log nothing.
-		$context['log_changes'] = array();
+		$context['log_changes'] = [];
 
 		// Cycle through the profile fields working out what to do!
 		foreach ($fields as $key)
@@ -1038,10 +1042,10 @@ class ProfileFields
 				// Are we logging it?
 				if (!empty($field['log_change']) && isset($old_profile[$key]))
 				{
-					$context['log_changes'][$key] = array(
+					$context['log_changes'][$key] = [
 						'previous' => $old_profile[$key],
 						'new' => $_POST[$key],
-					);
+					];
 				}
 			}
 
@@ -1053,17 +1057,17 @@ class ProfileFields
 				// Any changes to primary group?
 				if ((int) $_POST['id_group'] !== (int) $old_profile['id_group'])
 				{
-					$context['log_changes']['id_group'] = array(
+					$context['log_changes']['id_group'] = [
 						'previous' => !empty($old_profile[$key]) && isset($context['member_groups'][$old_profile[$key]]) ? $context['member_groups'][$old_profile[$key]]['name'] : '',
 						'new' => !empty($_POST[$key]) && isset($context['member_groups'][$_POST[$key]]) ? $context['member_groups'][$_POST[$key]]['name'] : '',
-					);
+					];
 				}
 
 				// Prepare additional groups for comparison.
-				$additional_groups = array(
-					'previous' => !empty($old_profile['additional_groups']) ? explode(',', $old_profile['additional_groups']) : array(),
-					'new' => !empty($_POST['additional_groups']) ? array_diff($_POST['additional_groups'], array(0)) : array(),
-				);
+				$additional_groups = [
+					'previous' => !empty($old_profile['additional_groups']) ? explode(',', $old_profile['additional_groups']) : [],
+					'new' => !empty($_POST['additional_groups']) ? array_diff($_POST['additional_groups'], [0]) : [],
+				];
 
 				sort($additional_groups['previous']);
 				sort($additional_groups['new']);
@@ -1095,7 +1099,7 @@ class ProfileFields
 		// @todo Temporary
 		if ($context['user']['is_owner'])
 		{
-			$changeOther = allowedTo(array('profile_extra_any', 'profile_extra_own'));
+			$changeOther = allowedTo(['profile_extra_any', 'profile_extra_own']);
 		}
 		else
 		{
@@ -1128,9 +1132,9 @@ class ProfileFields
 		$db = database();
 
 		// Check the name and email for validity.
-		$check = array();
-		$check['email'] = strtr($email, array('&#039;' => '\''));
-		if (DataValidator::is_valid($check, array('email' => 'valid_email|required'), array('email' => 'trim')))
+		$check = [];
+		$check['email'] = strtr($email, ['&#039;' => '\'']);
+		if (DataValidator::is_valid($check, ['email' => 'valid_email|required'], ['email' => 'trim']))
 		{
 			$email = $check['email'];
 		}
@@ -1147,10 +1151,10 @@ class ProfileFields
 		WHERE ' . ($memID != 0 ? 'id_member != {int:selected_member} AND ' : '') . '
 			email_address = {string:email_address}
 		LIMIT 1',
-			array(
+			[
 				'selected_member' => $memID,
 				'email_address' => $email,
-			)
+			]
 		)->num_rows();
 
 		return ($num > 0) ? 'email_taken' : true;

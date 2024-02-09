@@ -77,7 +77,7 @@ class ProfileOptions extends AbstractController
 	/**
 	 * Show all the users buddies, as well as a add/delete interface.
 	 *
-	 * @throws \ElkArte\Exceptions\Exception
+	 * @throws Exception
 	 */
 	public function action_editBuddyIgnoreLists()
 	{
@@ -95,10 +95,10 @@ class ProfileOptions extends AbstractController
 		$context['can_moderate_forum'] = allowedTo('moderate_forum');
 		$context['can_send_email'] = allowedTo('send_email_to_members');
 
-		$subActions = array(
-			'buddies' => array($this, 'action_editBuddies'),
-			'ignore' => array($this, 'action_editIgnoreList'),
-		);
+		$subActions = [
+			'buddies' => [$this, 'action_editBuddies'],
+			'ignore' => [$this, 'action_editIgnoreList'],
+		];
 
 		// Set a subaction
 		$action = new Action('buddy_actions');
@@ -147,7 +147,7 @@ class ProfileOptions extends AbstractController
 		{
 			checkSession('get');
 
-			call_integration_hook('integrate_remove_buddy', array($this->_memID));
+			call_integration_hook('integrate_remove_buddy', [$this->_memID]);
 
 			// Heh, I'm lazy, do it the easy way...
 			foreach ($buddiesArray as $key => $buddy)
@@ -161,7 +161,7 @@ class ProfileOptions extends AbstractController
 			// Make the changes.
 			$this->_profile['buddy_list'] = implode(',', $buddiesArray);
 			require_once(SUBSDIR . '/Members.subs.php');
-			updateMemberData($this->_memID, array('buddy_list' => $this->_profile['buddy_list']));
+			updateMemberData($this->_memID, ['buddy_list' => $this->_profile['buddy_list']]);
 
 			// Redirect off the page because we don't like all this ugly query stuff to stick in the history.
 			redirectexit('action=profile;area=lists;sa=buddies;u=' . $this->_memID);
@@ -172,7 +172,7 @@ class ProfileOptions extends AbstractController
 			checkSession();
 
 			// Prepare the string for extraction...
-			$new_buddy = strtr(Util::htmlspecialchars($this->_req->post->new_buddy, ENT_QUOTES), array('&quot;' => '"'));
+			$new_buddy = strtr(Util::htmlspecialchars($this->_req->post->new_buddy, ENT_QUOTES), ['&quot;' => '"']);
 			preg_match_all('~"([^"]+)"~', $new_buddy, $matches);
 			$new_buddies = array_unique(array_merge($matches[1], explode(',', preg_replace('~"[^"]+"~', '', $new_buddy))));
 
@@ -180,13 +180,13 @@ class ProfileOptions extends AbstractController
 			{
 				$new_buddies[$k] = strtr(trim($buddy), ['\'' => '&#039;']);
 
-				if ($new_buddies[$k] === '' || in_array($new_buddies[$k], array($this->_profile['member_name'], $this->_profile['real_name'])))
+				if ($new_buddies[$k] === '' || in_array($new_buddies[$k], [$this->_profile['member_name'], $this->_profile['real_name']]))
 				{
 					unset($new_buddies[$k]);
 				}
 			}
 
-			call_integration_hook('integrate_add_buddies', array($this->_memID, &$new_buddies));
+			call_integration_hook('integrate_add_buddies', [$this->_memID, &$new_buddies]);
 
 			if (!empty($new_buddies))
 			{
@@ -199,7 +199,7 @@ class ProfileOptions extends AbstractController
 				$this->_profile['buddy_list'] = implode(',', array_filter(array_unique(array_merge($new_buddiesArray, $old_buddiesArray))));
 
 				require_once(SUBSDIR . '/Members.subs.php');
-				updateMemberData($this->_memID, array('buddy_list' => $this->_profile['buddy_list']));
+				updateMemberData($this->_memID, ['buddy_list' => $this->_profile['buddy_list']]);
 			}
 
 			// Back to the buddy list!
@@ -207,12 +207,12 @@ class ProfileOptions extends AbstractController
 		}
 
 		// Get all the users "buddies"...
-		$buddies = array();
+		$buddies = [];
 
 		if (!empty($buddiesArray))
 		{
 			require_once(SUBSDIR . '/Members.subs.php');
-			$result = getBasicMemberData($buddiesArray, array('sort' => 'real_name', 'limit' => substr_count($this->_profile['buddy_list'], ',') + 1));
+			$result = getBasicMemberData($buddiesArray, ['sort' => 'real_name', 'limit' => substr_count($this->_profile['buddy_list'], ',') + 1]);
 			foreach ($result as $row)
 			{
 				$buddies[] = $row['id_member'];
@@ -225,14 +225,14 @@ class ProfileOptions extends AbstractController
 		MembersList::load($buddies, false, 'profile');
 
 		// Set the context for each buddy.
-		$context['buddies'] = array();
+		$context['buddies'] = [];
 		foreach ($buddies as $buddy)
 		{
 			$context['buddies'][$buddy] = MembersList::get($buddy);
 			$context['buddies'][$buddy]->loadContext();
 		}
 
-		call_integration_hook('integrate_view_buddies', array($this->_memID));
+		call_integration_hook('integrate_view_buddies', [$this->_memID]);
 	}
 
 	/**
@@ -277,7 +277,7 @@ class ProfileOptions extends AbstractController
 			// Make the changes.
 			$this->_profile['pm_ignore_list'] = implode(',', $ignoreArray);
 			require_once(SUBSDIR . '/Members.subs.php');
-			updateMemberData($this->_memID, array('pm_ignore_list' => $this->_profile['pm_ignore_list']));
+			updateMemberData($this->_memID, ['pm_ignore_list' => $this->_profile['pm_ignore_list']]);
 
 			// Redirect off the page because we don't like all this ugly query stuff
 			// to stick in the history.
@@ -288,15 +288,15 @@ class ProfileOptions extends AbstractController
 			checkSession();
 
 			// Prepare the string for extraction...
-			$new_ignore = strtr(Util::htmlspecialchars($this->_req->post->new_ignore, ENT_QUOTES), array('&quot;' => '"'));
+			$new_ignore = strtr(Util::htmlspecialchars($this->_req->post->new_ignore, ENT_QUOTES), ['&quot;' => '"']);
 			preg_match_all('~"([^"]+)"~', $new_ignore, $matches);
 			$new_entries = array_unique(array_merge($matches[1], explode(',', preg_replace('~"[^"]+"~', '', $new_ignore))));
 
 			foreach ($new_entries as $k => $entry)
 			{
-				$new_entries[$k] = strtr(trim($entry), array('\'' => '&#039;'));
+				$new_entries[$k] = strtr(trim($entry), ['\'' => '&#039;']);
 
-				if ($new_entries[$k] === '' || in_array($new_entries[$k], array($this->_profile['member_name'], $this->_profile['real_name'])))
+				if ($new_entries[$k] === '' || in_array($new_entries[$k], [$this->_profile['member_name'], $this->_profile['real_name']]))
 				{
 					unset($new_entries[$k]);
 				}
@@ -311,7 +311,7 @@ class ProfileOptions extends AbstractController
 				// Now update the current users buddy list.
 				$this->_profile['pm_ignore_list'] = implode(',', $ignoreArray);
 				require_once(SUBSDIR . '/Members.subs.php');
-				updateMemberData($this->_memID, array('pm_ignore_list' => $this->_profile['pm_ignore_list']));
+				updateMemberData($this->_memID, ['pm_ignore_list' => $this->_profile['pm_ignore_list']]);
 			}
 
 			// Back to the list of pitiful people!
@@ -319,12 +319,12 @@ class ProfileOptions extends AbstractController
 		}
 
 		// Initialise the list of members we're ignoring.
-		$ignored = array();
+		$ignored = [];
 
 		if (!empty($ignoreArray))
 		{
 			require_once(SUBSDIR . '/Members.subs.php');
-			$result = getBasicMemberData($ignoreArray, array('sort' => 'real_name', 'limit' => substr_count($this->_profile['pm_ignore_list'], ',') + 1));
+			$result = getBasicMemberData($ignoreArray, ['sort' => 'real_name', 'limit' => substr_count($this->_profile['pm_ignore_list'], ',') + 1]);
 			foreach ($result as $row)
 			{
 				$ignored[] = $row['id_member'];
@@ -337,7 +337,7 @@ class ProfileOptions extends AbstractController
 		MembersList::load($ignored, false, 'profile');
 
 		// Set the context for each buddy.
-		$context['ignore_list'] = array();
+		$context['ignore_list'] = [];
 		foreach ($ignored as $ignore_member)
 		{
 			$context['ignore_list'][$ignore_member] = MembersList::get($ignore_member);
@@ -355,7 +355,7 @@ class ProfileOptions extends AbstractController
 		theme()->getTemplates()->load('ProfileOptions');
 		$this->loadThemeOptions();
 
-		if (allowedTo(array('profile_identity_own', 'profile_identity_any')))
+		if (allowedTo(['profile_identity_own', 'profile_identity_any']))
 		{
 			$profileFields = new ProfileFields();
 			$profileFields->loadCustomFields($this->_memID, 'account');
@@ -409,8 +409,8 @@ class ProfileOptions extends AbstractController
 		{
 			require_once(SUBSDIR . '/Themes.subs.php');
 			$context['member']['options'] = loadThemeOptionsInto(
-				array(1, (int) $cur_profile['id_theme']),
-				array(-1, $this->_memID), $context['member']['options']
+				[1, (int) $cur_profile['id_theme']],
+				[-1, $this->_memID], $context['member']['options']
 			);
 
 			if (isset($post_options))
@@ -433,61 +433,61 @@ class ProfileOptions extends AbstractController
 	{
 		global $modSettings;
 
-		$fields = array(
-			'account' => array(
-				'fields' => array(
+		$fields = [
+			'account' => [
+				'fields' => [
 					'member_name', 'real_name', 'date_registered', 'posts', 'lngfile', 'hr',
 					'id_group', 'hr',
 					'email_address', 'hide_email', 'show_online', 'hr',
 					'passwrd1', 'passwrd2', 'hr',
 					'secret_question', 'secret_answer',
-				),
+				],
 				'hook' => 'account'
-			),
-			'account_otp' => array(
-				'fields' => array(
+			],
+			'account_otp' => [
+				'fields' => [
 					'member_name', 'real_name', 'date_registered', 'posts', 'lngfile', 'hr',
 					'id_group', 'hr',
 					'email_address', 'hide_email', 'show_online', 'hr',
 					'passwrd1', 'passwrd2', 'hr',
 					'secret_question', 'secret_answer', 'hr',
 					'enable_otp', 'otp_secret', 'hr'
-				),
+				],
 				'hook' => 'account'
-			),
-			'forumprofile' => array(
-				'fields' => array(
+			],
+			'forumprofile' => [
+				'fields' => [
 					'avatar_choice', 'hr',
 					'bday1', 'usertitle', 'hr',
 					'signature', 'hr',
 					'karma_good', 'hr',
 					'website_title', 'website_url',
-				),
+				],
 				'hook' => 'forum'
-			),
-			'theme' => array(
-				'fields' => array(
+			],
+			'theme' => [
+				'fields' => [
 					'id_theme', 'smiley_set', 'hr',
 					'time_format', 'time_offset', 'hr',
 					'theme_settings',
-				),
+				],
 				'hook' => 'themepick'
-			),
-			'contactprefs' => array(
-				'fields' => array(
+			],
+			'contactprefs' => [
+				'fields' => [
 					'receive_from',
 					'hr',
 					'pm_settings',
-				),
+				],
 				'hook' => 'pmprefs'
-			),
-			'registration' => array(
-				'fields' => !empty($modSettings['registration_fields']) ? explode(',', $modSettings['registration_fields']) : array(),
+			],
+			'registration' => [
+				'fields' => !empty($modSettings['registration_fields']) ? explode(',', $modSettings['registration_fields']) : [],
 				'hook' => 'registration'
-			)
-		);
+			]
+		];
 
-		return $fields[$area] ?? array();
+		return $fields[$area] ?? [];
 	}
 
 	/**
@@ -500,7 +500,7 @@ class ProfileOptions extends AbstractController
 		theme()->getTemplates()->load('ProfileOptions');
 		$this->loadThemeOptions();
 
-		if (allowedTo(array('profile_extra_own', 'profile_extra_any')))
+		if (allowedTo(['profile_extra_own', 'profile_extra_any']))
 		{
 			$profileFields = new ProfileFields();
 			$profileFields->loadCustomFields($this->_memID, 'forumprofile');
@@ -544,7 +544,7 @@ class ProfileOptions extends AbstractController
 
 		$this->loadThemeOptions();
 
-		if (allowedTo(array('profile_extra_own', 'profile_extra_any')))
+		if (allowedTo(['profile_extra_own', 'profile_extra_any']))
 		{
 			$profileFields = new ProfileFields();
 			$profileFields->loadCustomFields($this->_memID, 'theme');
@@ -589,10 +589,10 @@ class ProfileOptions extends AbstractController
 		$variant = $this->_req->getQuery('vrt', 'cleanhtml');
 
 		// Build the link tree
-		$context['linktree'][] = array(
+		$context['linktree'][] = [
 			'url' => $scripturl . '?action=profile;sa=pick;u=' . $this->_memID,
 			'name' => $txt['theme_pick'],
-		);
+		];
 		$context['default_theme_id'] = $modSettings['theme_default'];
 
 		// Saving a theme/variant cause JS doesn't work - pretend it did ;)
@@ -615,12 +615,12 @@ class ProfileOptions extends AbstractController
 		{
 			// Save the chosen theme.
 			require_once(SUBSDIR . '/Members.subs.php');
-			updateMemberData($this->_memID, array('id_theme' => $themePicked));
+			updateMemberData($this->_memID, ['id_theme' => $themePicked]);
 
 			// Did they pick a variant as well?
 			if (!empty($variant))
 			{
-				updateThemeOptions(array($themePicked, $this->_memID, 'theme_variant', $variant));
+				updateThemeOptions([$themePicked, $this->_memID, 'theme_variant', $variant]);
 				Cache::instance()->remove('theme_settings-' . $themePicked . ':' . $this->_memID);
 				$_SESSION['id_variant'] = 0;
 			}
@@ -662,11 +662,11 @@ class ProfileOptions extends AbstractController
 
 		require_once(SUBSDIR . '/Profile.subs.php');
 
-		$subActions = array(
-			'settings' => array($this, 'action_editNotificationSettings'),
-			'boards' => array($this, 'action_editNotificationBoards'),
-			'topics' => array($this, 'action_editNotificationTopics')
-		);
+		$subActions = [
+			'settings' => [$this, 'action_editNotificationSettings'],
+			'boards' => [$this, 'action_editNotificationBoards'],
+			'topics' => [$this, 'action_editNotificationTopics']
+		];
 
 		// Set a subaction
 		$action = new Action('notification_actions');
@@ -716,28 +716,28 @@ class ProfileOptions extends AbstractController
 		unset($context['sub_template']);
 
 		// Fine, start with the board list.
-		$listOptions = array(
+		$listOptions = [
 			'id' => 'board_notification_list',
 			'width' => '100%',
 			'no_items_label' => $txt['notifications_boards_none'] . '<br /><br />' . $txt['notifications_boards_howto'],
 			'no_items_align' => 'left',
 			'base_href' => $scripturl . '?action=profile;u=' . $this->_memID . ';area=notification',
 			'default_sort_col' => 'board_name',
-			'get_items' => array(
+			'get_items' => [
 				'function' => function ($start, $items_per_page, $sort, $memID) {
 					return $this->list_getBoardNotifications($start, $items_per_page, $sort, $memID);
 				},
-				'params' => array(
+				'params' => [
 					$this->_memID,
-				),
-			),
-			'columns' => array(
-				'board_name' => array(
-					'header' => array(
+				],
+			],
+			'columns' => [
+				'board_name' => [
+					'header' => [
 						'value' => $txt['notifications_boards'],
 						'class' => 'lefttext',
-					),
-					'data' => array(
+					],
+					'data' => [
 						'function' => function ($board) {
 							global $txt;
 
@@ -750,55 +750,55 @@ class ProfileOptions extends AbstractController
 
 							return $link;
 						},
-					),
-					'sort' => array(
+					],
+					'sort' => [
 						'default' => 'name',
 						'reverse' => 'name DESC',
-					),
-				),
-				'delete' => array(
-					'header' => array(
+					],
+				],
+				'delete' => [
+					'header' => [
 						'value' => '<input type="checkbox" onclick="invertAll(this, this.form);" />',
 						'class' => 'centertext',
 						'style' => 'width:4%;',
-					),
-					'data' => array(
-						'sprintf' => array(
+					],
+					'data' => [
+						'sprintf' => [
 							'format' => '<input type="checkbox" name="notify_boards[]" value="%1$d" %2$s />',
-							'params' => array(
+							'params' => [
 								'id' => false,
 								'checked' => false,
-							),
-						),
+							],
+						],
 						'class' => 'centertext',
-					),
-				),
-			),
-			'form' => array(
+					],
+				],
+			],
+			'form' => [
 				'href' => $scripturl . '?action=profile;area=notification;sa=boards',
 				'include_sort' => true,
 				'include_start' => true,
-				'hidden_fields' => array(
+				'hidden_fields' => [
 					'u' => $this->_memID,
 					'sa' => $context['menu_item_selected'],
 					$context['session_var'] => $context['session_id'],
-				),
+				],
 				'token' => $context['token_check'],
-			),
-			'additional_rows' => array(
-				array(
+			],
+			'additional_rows' => [
+				[
 					'class' => 'submitbutton',
 					'position' => 'bottom_of_list',
 					'value' => '
 						<input type="submit" name="edit_notify_boards" value="' . $txt['notifications_boards_update'] . '" />
 						<input type="hidden" name="save" value="save" />',
-				),
-				array(
+				],
+				[
 					'position' => 'after_title',
 					'value' => getBoardNotificationsCount($this->_memID) == 0 ? $txt['notifications_boards_none'] . '<br />' . $txt['notifications_boards_howto'] : $txt['notifications_boards_current'],
-				),
-			),
-		);
+				],
+			],
+		];
 
 		// Create the board notification list.
 		createList($listOptions);
@@ -818,7 +818,7 @@ class ProfileOptions extends AbstractController
 		unset($context['sub_template']);
 
 		// Now do the topic notifications.
-		$listOptions = array(
+		$listOptions = [
 			'id' => 'topic_notification_list',
 			'width' => '100%',
 			'items_per_page' => $modSettings['defaultMaxMessages'],
@@ -826,29 +826,29 @@ class ProfileOptions extends AbstractController
 			'no_items_align' => 'left',
 			'base_href' => $scripturl . '?action=profile;u=' . $this->_memID . ';area=notification',
 			'default_sort_col' => 'last_post',
-			'get_items' => array(
+			'get_items' => [
 				'function' => function ($start, $items_per_page, $sort, $memID) {
 					return $this->list_getTopicNotifications($start, $items_per_page, $sort, $memID);
 				},
-				'params' => array(
+				'params' => [
 					$this->_memID,
-				),
-			),
-			'get_count' => array(
+				],
+			],
+			'get_count' => [
 				'function' => function ($memID) {
 					return $this->list_getTopicNotificationCount($memID);
 				},
-				'params' => array(
+				'params' => [
 					$this->_memID,
-				),
-			),
-			'columns' => array(
-				'subject' => array(
-					'header' => array(
+				],
+			],
+			'columns' => [
+				'subject' => [
+					'header' => [
 						'value' => $txt['notifications_topics'],
 						'class' => 'lefttext',
-					),
-					'data' => array(
+					],
+					'data' => [
 						'function' => function ($topic) {
 							global $txt;
 
@@ -863,82 +863,82 @@ class ProfileOptions extends AbstractController
 
 							return $link;
 						},
-					),
-					'sort' => array(
+					],
+					'sort' => [
 						'default' => 'ms.subject',
 						'reverse' => 'ms.subject DESC',
-					),
-				),
-				'started_by' => array(
-					'header' => array(
+					],
+				],
+				'started_by' => [
+					'header' => [
 						'value' => $txt['started_by'],
 						'class' => 'lefttext',
-					),
-					'data' => array(
+					],
+					'data' => [
 						'db' => 'poster_link',
-					),
-					'sort' => array(
+					],
+					'sort' => [
 						'default' => 'real_name_col',
 						'reverse' => 'real_name_col DESC',
-					),
-				),
-				'last_post' => array(
-					'header' => array(
+					],
+				],
+				'last_post' => [
+					'header' => [
 						'value' => $txt['last_post'],
 						'class' => 'lefttext',
-					),
-					'data' => array(
-						'sprintf' => array(
+					],
+					'data' => [
+						'sprintf' => [
 							'format' => '<span class="smalltext">%1$s<br />' . $txt['by'] . ' %2$s</span>',
-							'params' => array(
+							'params' => [
 								'updated' => false,
 								'poster_updated_link' => false,
-							),
-						),
-					),
-					'sort' => array(
+							],
+						],
+					],
+					'sort' => [
 						'default' => 'ml.id_msg DESC',
 						'reverse' => 'ml.id_msg',
-					),
-				),
-				'delete' => array(
-					'header' => array(
+					],
+				],
+				'delete' => [
+					'header' => [
 						'value' => '<input type="checkbox" onclick="invertAll(this, this.form);" />',
 						'class' => 'centertext',
 						'style' => 'width:4%;',
-					),
-					'data' => array(
-						'sprintf' => array(
+					],
+					'data' => [
+						'sprintf' => [
 							'format' => '<input type="checkbox" name="notify_topics[]" value="%1$d" />',
-							'params' => array(
+							'params' => [
 								'id' => false,
-							),
-						),
+							],
+						],
 						'class' => 'centertext',
-					),
-				),
-			),
-			'form' => array(
+					],
+				],
+			],
+			'form' => [
 				'href' => $scripturl . '?action=profile;area=notification',
 				'include_sort' => true,
 				'include_start' => true,
-				'hidden_fields' => array(
+				'hidden_fields' => [
 					'u' => $this->_memID,
 					'sa' => $context['menu_item_selected'],
 					$context['session_var'] => $context['session_id'],
-				),
+				],
 				'token' => $context['token_check'],
-			),
-			'additional_rows' => array(
-				array(
+			],
+			'additional_rows' => [
+				[
 					'class' => 'submitbutton',
 					'position' => 'bottom_of_list',
 					'value' => '
 						<input type="submit" name="edit_notify_topics" value="' . $txt['notifications_update'] . '" />
 						<input type="hidden" name="save" value="save" />',
-				),
-			),
-		);
+				],
+			],
+		];
 
 		// Create the topic notification list.
 		createList($listOptions);
@@ -1009,7 +1009,7 @@ class ProfileOptions extends AbstractController
 
 		$context['sub_template'] = 'ignoreboards';
 		require_once(SUBSDIR . '/Boards.subs.php');
-		$context += getBoardList(array('not_redirection' => true, 'ignore' => !empty($cur_profile['ignore_boards']) ? explode(',', $cur_profile['ignore_boards']) : array()));
+		$context += getBoardList(['not_redirection' => true, 'ignore' => !empty($cur_profile['ignore_boards']) ? explode(',', $cur_profile['ignore_boards']) : []]);
 
 		// Include a list of boards per category for easy toggling.
 		foreach ($context['categories'] as $cat => &$category)
@@ -1038,7 +1038,7 @@ class ProfileOptions extends AbstractController
 		$context['can_manage_membergroups'] = allowedTo('manage_membergroups');
 		$context['can_manage_protected'] = allowedTo('admin_forum');
 		$context['can_edit_primary'] = $context['can_manage_protected'];
-		$context['update_message'] = isset($this->_req->query->msg) && isset($txt['group_membership_msg_' . $this->_req->query->msg]) ? $txt['group_membership_msg_' . $this->_req->query->msg] : '';
+		$context['update_message'] = isset($this->_req->query->msg, $txt['group_membership_msg_' . $this->_req->query->msg]) ? $txt['group_membership_msg_' . $this->_req->query->msg] : '';
 
 		// Get all the groups this user is a member of.
 		$groups = explode(',', $curMember['additional_groups']);
@@ -1047,7 +1047,7 @@ class ProfileOptions extends AbstractController
 		// Ensure the query doesn't croak!
 		if (empty($groups))
 		{
-			$groups = array(0);
+			$groups = [0];
 		}
 
 		// Just to be sure...
@@ -1058,7 +1058,7 @@ class ProfileOptions extends AbstractController
 		$context['groups'] = loadMembergroupsJoin($groups, $this->_memID);
 
 		// Add registered members on the end.
-		$context['groups']['member'][0] = array(
+		$context['groups']['member'][0] = [
 			'id' => 0,
 			'name' => $txt['regular_members'],
 			'desc' => $txt['regular_members_desc'],
@@ -1066,7 +1066,7 @@ class ProfileOptions extends AbstractController
 			'is_primary' => $context['primary_group'] == 0,
 			'can_be_primary' => true,
 			'can_leave' => 0,
-		);
+		];
 
 		// No changing primary one unless you have enough groups!
 		if (count($context['groups']['member']) < 2)
@@ -1075,9 +1075,8 @@ class ProfileOptions extends AbstractController
 		}
 
 		// In the special case that someone is requesting membership of a group, setup some special context vars.
-		if (isset($this->_req->query->request)
-			&& isset($context['groups']['available'][(int) $this->_req->query->request])
-			&& $context['groups']['available'][(int) $this->_req->query->request]['type'] == 2)
+		if (isset($this->_req->query->request, $context['groups']['available'][(int)$this->_req->query->request])
+			&& $context['groups']['available'][(int)$this->_req->query->request]['type'] == 2)
 		{
 			$context['group_request'] = $context['groups']['available'][(int) $this->_req->query->request];
 		}
@@ -1087,7 +1086,7 @@ class ProfileOptions extends AbstractController
 	 * This function actually makes all the group changes
 	 *
 	 * @return string
-	 * @throws \ElkArte\Exceptions\Exception no_access
+	 * @throws Exception no_access
 	 */
 	public function action_groupMembership2()
 	{
@@ -1131,7 +1130,7 @@ class ProfileOptions extends AbstractController
 		}
 
 		// What ever we are doing, we need to determine if changing primary is possible!
-		$groups_details = membergroupsById(array($group_id, $this->_profile['id_group']), 0, true);
+		$groups_details = membergroupsById([$group_id, $this->_profile['id_group']], 0, true);
 
 		// Protected groups require proper permissions!
 		if ($group_id != 1 && $groups_details[$group_id]['group_type'] == 1)
@@ -1152,12 +1151,14 @@ class ProfileOptions extends AbstractController
 				{
 					throw new Exception('no_access', false);
 				}
+
 				// What about leaving a requestable group we are not a member of?
-				elseif ($changeType === 'free' && $row['group_type'] == 2 && $this->_profile['id_group'] != $row['id_group'] && !isset($addGroups[$row['id_group']]))
+				if ($changeType === 'free' && $row['group_type'] == 2 && $this->_profile['id_group'] != $row['id_group'] && !isset($addGroups[$row['id_group']]))
 				{
 					throw new Exception('no_access', false);
 				}
-				elseif ($changeType === 'free' && $row['group_type'] != 3 && $row['group_type'] != 2)
+
+				if ($changeType === 'free' && $row['group_type'] != 3 && $row['group_type'] != 2)
 				{
 					throw new Exception('no_access', false);
 				}
@@ -1230,7 +1231,7 @@ class ProfileOptions extends AbstractController
 			if (!empty($moderators))
 			{
 				require_once(SUBSDIR . '/Members.subs.php');
-				$members = getBasicMemberData($moderators, array('preferences' => true, 'sort' => 'lngfile'));
+				$members = getBasicMemberData($moderators, ['preferences' => true, 'sort' => 'lngfile']);
 
 				foreach ($members as $member)
 				{
@@ -1249,13 +1250,13 @@ class ProfileOptions extends AbstractController
 						}
 					}
 
-					$replacements = array(
+					$replacements = [
 						'RECPNAME' => $member['member_name'],
 						'APPYNAME' => $this->_profile['member_name'],
 						'GROUPNAME' => $group_name,
 						'REASON' => $this->_req->post->reason,
 						'MODLINK' => $scripturl . '?action=moderate;area=groups;sa=requests',
-					);
+					];
 
 					$emaildata = loadEmailTemplate('request_membership', $replacements, empty($member['lngfile']) || empty($modSettings['userLanguage']) ? $language : $member['lngfile']);
 					sendmail($member['email_address'], $emaildata['subject'], $emaildata['body'], null, null, false, 2);
@@ -1264,8 +1265,9 @@ class ProfileOptions extends AbstractController
 
 			return $changeType;
 		}
+
 		// Otherwise, we are leaving/joining a group.
-		elseif ($changeType === 'free')
+		if ($changeType === 'free')
 		{
 			// Are we leaving?
 			if ($this->_profile['id_group'] == $group_id || isset($addGroups[$group_id]))
@@ -1326,11 +1328,11 @@ class ProfileOptions extends AbstractController
 		}
 		else
 		{
-			updateSettings(array('settings_updated' => time()));
+			updateSettings(['settings_updated' => time()]);
 		}
 
 		require_once(SUBSDIR . '/Members.subs.php');
-		updateMemberData($this->_memID, array('id_group' => $newPrimary, 'additional_groups' => $addGroups));
+		updateMemberData($this->_memID, ['id_group' => $newPrimary, 'additional_groups' => $addGroups]);
 
 		return $changeType;
 	}

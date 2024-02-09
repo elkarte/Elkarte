@@ -93,7 +93,7 @@ class Profile extends AbstractController
 		theme()->getTemplates()->load('Profile');
 
 		// Trigger profile pre-load event
-		$this->_events->trigger('pre_load', array('post_errors' => $post_errors));
+		$this->_events->trigger('pre_load', ['post_errors' => $post_errors]);
 
 		// A little bit about this member
 		$context['id_member'] = $this->_memID;
@@ -213,100 +213,100 @@ class Profile extends AbstractController
 	{
 		global $txt, $context, $modSettings;
 
-		$profile_areas = array(
-			'info' => array(
+		$profile_areas = [
+			'info' => [
 				'title' => $txt['profileInfo'],
-				'areas' => array(
-					'summary' => array(
+				'areas' => [
+					'summary' => [
 						'label' => $txt['summary'],
 						'controller' => '\\ElkArte\\Profile\\ProfileInfo',
 						'function' => 'action_summary',
 						// From the summary it's possible to activate an account, so we need the token
 						'token' => 'profile-aa%u',
 						'token_type' => 'get',
-						'permission' => array(
+						'permission' => [
 							'own' => 'profile_view_own',
 							'any' => 'profile_view_any',
-						),
-					),
-					'statistics' => array(
+						],
+					],
+					'statistics' => [
 						'label' => $txt['statPanel'],
 						'controller' => '\\ElkArte\\Profile\\ProfileInfo',
 						'function' => 'action_statPanel',
-						'permission' => array(
+						'permission' => [
 							'own' => 'profile_view_own',
 							'any' => 'profile_view_any',
-						),
-					),
-					'showposts' => array(
+						],
+					],
+					'showposts' => [
 						'label' => $txt['showPosts'],
 						'controller' => '\\ElkArte\\Profile\\ProfileInfo',
 						'function' => 'action_showPosts',
-						'subsections' => array(
-							'messages' => array($txt['showMessages'], array('profile_view_own', 'profile_view_any')),
-							'topics' => array($txt['showTopics'], array('profile_view_own', 'profile_view_any')),
-							'unwatchedtopics' => array($txt['showUnwatched'], array('profile_view_own', 'profile_view_any'), 'enabled' => $modSettings['enable_unwatch'] && $context['user']['is_owner']),
-							'attach' => array($txt['showAttachments'], array('profile_view_own', 'profile_view_any')),
-						),
-						'permission' => array(
+						'subsections' => [
+							'messages' => [$txt['showMessages'], ['profile_view_own', 'profile_view_any']],
+							'topics' => [$txt['showTopics'], ['profile_view_own', 'profile_view_any']],
+							'unwatchedtopics' => [$txt['showUnwatched'], ['profile_view_own', 'profile_view_any'], 'enabled' => $modSettings['enable_unwatch'] && $context['user']['is_owner']],
+							'attach' => [$txt['showAttachments'], ['profile_view_own', 'profile_view_any']],
+						],
+						'permission' => [
 							'own' => 'profile_view_own',
 							'any' => 'profile_view_any',
-						),
-					),
-					'showlikes' => array(
+						],
+					],
+					'showlikes' => [
 						'label' => $txt['likes_show'],
 						'controller' => '\\ElkArte\\Controller\\Likes',
 						'function' => 'action_showProfileLikes',
 						'enabled' => !empty($modSettings['likes_enabled']) && $context['user']['is_owner'],
-						'subsections' => array(
-							'given' => array($txt['likes_given'], array('profile_view_own')),
-							'received' => array($txt['likes_received'], array('profile_view_own')),
-						),
-						'permission' => array(
+						'subsections' => [
+							'given' => [$txt['likes_given'], ['profile_view_own']],
+							'received' => [$txt['likes_received'], ['profile_view_own']],
+						],
+						'permission' => [
 							'own' => 'profile_view_own',
-							'any' => array(),
-						),
-					),
-					'permissions' => array(
+							'any' => [],
+						],
+					],
+					'permissions' => [
 						'label' => $txt['showPermissions'],
 						'controller' => '\\ElkArte\\Profile\\ProfileInfo',
 						'function' => 'action_showPermissions',
-						'permission' => array(
+						'permission' => [
 							'own' => 'manage_permissions',
 							'any' => 'manage_permissions',
-						),
-					),
-					'history' => array(
+						],
+					],
+					'history' => [
 						'label' => $txt['history'],
 						'controller' => '\\ElkArte\\Profile\\ProfileHistory',
 						'function' => 'action_index',
-						'subsections' => array(
-							'activity' => array($txt['trackActivity'], 'moderate_forum'),
-							'ip' => array($txt['trackIP'], 'moderate_forum'),
-							'edits' => array($txt['trackEdits'], 'moderate_forum', 'enabled' => featureEnabled('ml') && !empty($modSettings['userlog_enabled'])),
-							'logins' => array($txt['trackLogins'], array('profile_view_own', 'moderate_forum')),
-						),
-						'permission' => array(
+						'subsections' => [
+							'activity' => [$txt['trackActivity'], 'moderate_forum'],
+							'ip' => [$txt['trackIP'], 'moderate_forum'],
+							'edits' => [$txt['trackEdits'], 'moderate_forum', 'enabled' => featureEnabled('ml') && !empty($modSettings['userlog_enabled'])],
+							'logins' => [$txt['trackLogins'], ['profile_view_own', 'moderate_forum']],
+						],
+						'permission' => [
 							'own' => 'moderate_forum',
 							'any' => 'moderate_forum',
-						),
-					),
-					'viewwarning' => array(
+						],
+					],
+					'viewwarning' => [
 						'label' => $txt['profile_view_warnings'],
 						'enabled' => featureEnabled('w') && !empty($modSettings['warning_enable']) && $this->_profile['warning'] && (!empty($modSettings['warning_show']) && ($context['user']['is_owner'] || $modSettings['warning_show'] == 2)),
 						'controller' => '\\ElkArte\\Profile\\ProfileInfo',
 						'function' => 'action_viewWarning',
-						'permission' => array(
+						'permission' => [
 							'own' => 'profile_view_own',
 							'any' => 'issue_warning',
-						),
-					),
-				),
-			),
-			'edit_profile' => array(
+						],
+					],
+				],
+			],
+			'edit_profile' => [
 				'title' => $txt['profileEdit'],
-				'areas' => array(
-					'account' => array(
+				'areas' => [
+					'account' => [
 						'label' => $txt['account'],
 						'controller' => '\\ElkArte\\Profile\\ProfileOptions',
 						'function' => 'action_account',
@@ -314,104 +314,104 @@ class Profile extends AbstractController
 						'sc' => 'post',
 						'token' => 'profile-ac%u',
 						'password' => true,
-						'permission' => array(
-							'own' => array('profile_identity_any', 'profile_identity_own', 'manage_membergroups'),
-							'any' => array('profile_identity_any', 'manage_membergroups'),
-						),
-					),
-					'forumprofile' => array(
+						'permission' => [
+							'own' => ['profile_identity_any', 'profile_identity_own', 'manage_membergroups'],
+							'any' => ['profile_identity_any', 'manage_membergroups'],
+						],
+					],
+					'forumprofile' => [
 						'label' => $txt['forumprofile'],
 						'controller' => '\\ElkArte\\Profile\\ProfileOptions',
 						'function' => 'action_forumProfile',
 						'sc' => 'post',
 						'token' => 'profile-fp%u',
-						'permission' => array(
-							'own' => array('profile_extra_any', 'profile_extra_own', 'profile_title_own', 'profile_title_any'),
-							'any' => array('profile_extra_any', 'profile_title_any'),
-						),
-					),
-					'theme' => array(
+						'permission' => [
+							'own' => ['profile_extra_any', 'profile_extra_own', 'profile_title_own', 'profile_title_any'],
+							'any' => ['profile_extra_any', 'profile_title_any'],
+						],
+					],
+					'theme' => [
 						'label' => $txt['theme'],
 						'controller' => '\\ElkArte\\Profile\\ProfileOptions',
 						'function' => 'action_themepick',
 						'sc' => 'post',
 						'token' => 'profile-th%u',
-						'permission' => array(
-							'own' => array('profile_extra_any', 'profile_extra_own'),
-							'any' => array('profile_extra_any'),
-						),
-					),
-					'pick' => array(
+						'permission' => [
+							'own' => ['profile_extra_any', 'profile_extra_own'],
+							'any' => ['profile_extra_any'],
+						],
+					],
+					'pick' => [
 						'label' => $txt['theme'],
 						'controller' => '\\ElkArte\\Profile\\ProfileOptions',
 						'function' => 'action_pick',
 						'hidden' => true,
 						'sc' => 'post',
 						'token' => 'profile-th%u',
-						'permission' => array(
-							'own' => array('profile_extra_any', 'profile_extra_own'),
-							'any' => array('profile_extra_any'),
-						),
-					),
-					'notification' => array(
+						'permission' => [
+							'own' => ['profile_extra_any', 'profile_extra_own'],
+							'any' => ['profile_extra_any'],
+						],
+					],
+					'notification' => [
 						'label' => $txt['notifications'],
 						'controller' => '\\ElkArte\\Profile\\ProfileOptions',
 						'function' => 'action_notification',
 						'sc' => 'post',
 						'token' => 'profile-nt%u',
-						'subsections' => array(
-							'settings' => array($txt['notify_settings']),
-							'boards' => array($txt['notify_boards']),
-							'topics' => array($txt['notify_topics']),
-						),
-						'permission' => array(
-							'own' => array('profile_extra_any', 'profile_extra_own'),
-							'any' => array('profile_extra_any'),
-						),
-					),
+						'subsections' => [
+							'settings' => [$txt['notify_settings']],
+							'boards' => [$txt['notify_boards']],
+							'topics' => [$txt['notify_topics']],
+						],
+						'permission' => [
+							'own' => ['profile_extra_any', 'profile_extra_own'],
+							'any' => ['profile_extra_any'],
+						],
+					],
 					// Without profile_extra_own, settings are accessible from the PM section.
 					// @todo at some point decouple it from PMs
-					'contactprefs' => array(
+					'contactprefs' => [
 						'label' => $txt['contactprefs'],
 						'controller' => '\\ElkArte\\Profile\\ProfileOptions',
 						'function' => 'action_pmprefs',
-						'enabled' => allowedTo(array('profile_extra_own', 'profile_extra_any')),
+						'enabled' => allowedTo(['profile_extra_own', 'profile_extra_any']),
 						'sc' => 'post',
 						'token' => 'profile-pm%u',
-						'permission' => array(
-							'own' => array('pm_read'),
-							'any' => array('profile_extra_any'),
-						),
-					),
-					'ignoreboards' => array(
+						'permission' => [
+							'own' => ['pm_read'],
+							'any' => ['profile_extra_any'],
+						],
+					],
+					'ignoreboards' => [
 						'label' => $txt['ignoreboards'],
 						'controller' => '\\ElkArte\\Profile\\ProfileOptions',
 						'function' => 'action_ignoreboards',
 						'enabled' => !empty($modSettings['allow_ignore_boards']),
 						'sc' => 'post',
 						'token' => 'profile-ib%u',
-						'permission' => array(
-							'own' => array('profile_extra_any', 'profile_extra_own'),
-							'any' => array('profile_extra_any'),
-						),
-					),
-					'lists' => array(
+						'permission' => [
+							'own' => ['profile_extra_any', 'profile_extra_own'],
+							'any' => ['profile_extra_any'],
+						],
+					],
+					'lists' => [
 						'label' => $txt['editBuddyIgnoreLists'],
 						'controller' => '\\ElkArte\\Profile\\ProfileOptions',
 						'function' => 'action_editBuddyIgnoreLists',
 						'enabled' => !empty($modSettings['enable_buddylist']) && $context['user']['is_owner'],
 						'sc' => 'post',
 						'token' => 'profile-bl%u',
-						'subsections' => array(
-							'buddies' => array($txt['editBuddies']),
-							'ignore' => array($txt['editIgnoreList']),
-						),
-						'permission' => array(
-							'own' => array('profile_extra_any', 'profile_extra_own'),
-							'any' => array(),
-						),
-					),
-					'groupmembership' => array(
+						'subsections' => [
+							'buddies' => [$txt['editBuddies']],
+							'ignore' => [$txt['editIgnoreList']],
+						],
+						'permission' => [
+							'own' => ['profile_extra_any', 'profile_extra_own'],
+							'any' => [],
+						],
+					],
+					'groupmembership' => [
 						'label' => $txt['groupmembership'],
 						'controller' => '\\ElkArte\\Profile\\ProfileOptions',
 						'function' => 'action_groupMembership',
@@ -419,80 +419,80 @@ class Profile extends AbstractController
 						'sc' => 'request',
 						'token' => 'profile-gm%u',
 						'token_type' => 'request',
-						'permission' => array(
-							'own' => array('profile_view_own'),
-							'any' => array('manage_membergroups'),
-						),
-					),
-				),
-			),
-			'profile_action' => array(
+						'permission' => [
+							'own' => ['profile_view_own'],
+							'any' => ['manage_membergroups'],
+						],
+					],
+				],
+			],
+			'profile_action' => [
 				'title' => $txt['profileAction'],
-				'areas' => array(
-					'sendpm' => array(
+				'areas' => [
+					'sendpm' => [
 						'label' => $txt['profileSendIm'],
 						'custom_url' => getUrl('action', ['action' => 'pm', 'sa' => 'send']),
-						'permission' => array(
-							'own' => array(),
-							'any' => array('pm_send'),
-						),
-					),
-					'issuewarning' => array(
+						'permission' => [
+							'own' => [],
+							'any' => ['pm_send'],
+						],
+					],
+					'issuewarning' => [
 						'label' => $txt['profile_issue_warning'],
 						'enabled' => featureEnabled('w') && !empty($modSettings['warning_enable']) && (!$context['user']['is_owner'] || $context['user']['is_admin']),
 						'controller' => '\\ElkArte\\Profile\\ProfileAccount',
 						'function' => 'action_issuewarning',
 						'token' => 'profile-iw%u',
-						'permission' => array(
-							'own' => array(),
-							'any' => array('issue_warning'),
-						),
-					),
-					'banuser' => array(
+						'permission' => [
+							'own' => [],
+							'any' => ['issue_warning'],
+						],
+					],
+					'banuser' => [
 						'label' => $txt['profileBanUser'],
 						'custom_url' => getUrl('admin', ['action' => 'admin', 'area' => 'ban', 'sa' => 'add']),
 						'enabled' => $this->_profile['id_group'] != 1 && !in_array(1, explode(',', $this->_profile['additional_groups'])),
-						'permission' => array(
-							'own' => array(),
-							'any' => array('manage_bans'),
-						),
-					),
-					'subscriptions' => array(
+						'permission' => [
+							'own' => [],
+							'any' => ['manage_bans'],
+						],
+					],
+					'subscriptions' => [
 						'label' => $txt['subscriptions'],
 						'controller' => '\\ElkArte\\Profile\\ProfileSubscriptions',
 						'function' => 'action_subscriptions',
 						'enabled' => !empty($modSettings['paid_enabled']),
-						'permission' => array(
-							'own' => array('profile_view_own'),
-							'any' => array('moderate_forum'),
-						),
-					),
-					'deleteaccount' => array(
+						'permission' => [
+							'own' => ['profile_view_own'],
+							'any' => ['moderate_forum'],
+						],
+					],
+					'deleteaccount' => [
 						'label' => $txt['deleteAccount'],
 						'controller' => '\\ElkArte\\Profile\\ProfileAccount',
 						'function' => 'action_deleteaccount',
 						'sc' => 'post',
 						'token' => 'profile-da%u',
 						'password' => true,
-						'permission' => array(
-							'own' => array('profile_remove_any', 'profile_remove_own'),
-							'any' => array('profile_remove_any'),
-						),
-					),
-					'activateaccount' => array(
+						'permission' => [
+							'own' => ['profile_remove_any', 'profile_remove_own'],
+							'any' => ['profile_remove_any'],
+						],
+					],
+					'activateaccount' => [
 						'controller' => '\\ElkArte\\Profile\\ProfileAccount',
 						'function' => 'action_activateaccount',
 						'sc' => 'get',
 						'token' => 'profile-aa%u',
 						'token_type' => 'get',
-						'permission' => array(
-							'own' => array(),
-							'any' => array('moderate_forum'),
-						),
-					),
-				),
-			),
-		);
+						'permission' => [
+							'own' => [],
+							'any' => ['moderate_forum'],
+						],
+					],
+				],
+			],
+		];
 
 		// Set a few options for the menu.
 		$menuOptions = [
@@ -568,27 +568,27 @@ class Profile extends AbstractController
 	{
 		global $context, $txt;
 
-		$context['linktree'][] = array(
+		$context['linktree'][] = [
 			'url' => getUrl('profile', ['action' => 'profile', 'u' => $this->_memID, 'name' => $this->_profile['real_name']]),
 			'name' => sprintf($txt['profile_of_username'], $context['member']['name']),
-		);
+		];
 
 		if (!empty($this->_profile_include_data['label']))
 		{
-			$context['linktree'][] = array(
+			$context['linktree'][] = [
 				'url' => getUrl('profile', ['action' => 'profile', 'area' => $this->_profile_include_data['current_area'], 'u' => $this->_memID, 'name' => $this->_profile['real_name']]),
 				'name' => $this->_profile_include_data['label'],
-			);
+			];
 		}
 
 		if (!empty($this->_current_subsection)
 			&& isset($this->_profile_include_data['subsections'][$this->_current_subsection])
 			&& $this->_profile_include_data['subsections'][$this->_current_subsection]['label'] !== $this->_profile_include_data['label'])
 		{
-			$context['linktree'][] = array(
+			$context['linktree'][] = [
 				'url' => getUrl('profile', ['action' => 'profile', 'area' => $this->_profile_include_data['current_area'], 'sa' => $this->_current_subsection, 'u' => $this->_memID, 'name' => $this->_profile['real_name']]),
 				'name' => $this->_profile_include_data['subsections'][$this->_current_subsection]['label'],
-			);
+			];
 		}
 	}
 
@@ -604,8 +604,8 @@ class Profile extends AbstractController
 		$context['require_password'] = $check_password;
 
 		// These will get populated soon!
-		$post_errors = array();
-		$profile_vars = array();
+		$post_errors = [];
+		$profile_vars = [];
 
 		if ($this->completedSave)
 		{
@@ -659,7 +659,7 @@ class Profile extends AbstractController
 				$controller->pre_dispatch();
 				$controller->action_authentication(true);
 			}
-			elseif (in_array($this->_current_area, array('account', 'forumprofile', 'theme', 'contactprefs')))
+			elseif (in_array($this->_current_area, ['account', 'forumprofile', 'theme', 'contactprefs']))
 			{
 				// @todo yes this is ugly, but saveProfileFields needs to be updated first
 				$_POST = (array) $this->_req->post;
@@ -685,7 +685,7 @@ class Profile extends AbstractController
 				saveProfileChanges($profile_vars, $this->_memID);
 			}
 
-			call_integration_hook('integrate_profile_save', array(&$profile_vars, &$post_errors, $this->_memID));
+			call_integration_hook('integrate_profile_save', [&$profile_vars, &$post_errors, $this->_memID]);
 
 			// There was a problem, let them try to re-enter.
 			if (!empty($post_errors))
@@ -699,7 +699,7 @@ class Profile extends AbstractController
 				// If we've changed the password, notify any integration that may be listening in.
 				if (isset($profile_vars['passwd']))
 				{
-					call_integration_hook('integrate_reset_pass', array($this->_profile['member_name'], $this->_profile['member_name'], $this->_req->post->passwrd2));
+					call_integration_hook('integrate_reset_pass', [$this->_profile['member_name'], $this->_profile['member_name'], $this->_req->post->passwrd2]);
 				}
 
 				require_once(SUBSDIR . '/Members.subs.php');
@@ -713,15 +713,15 @@ class Profile extends AbstractController
 				}
 				elseif (isset($profile_vars['real_name']))
 				{
-					updateSettings(array('memberlist_updated' => time()));
+					updateSettings(['memberlist_updated' => time()]);
 				}
 
 				// If the member changed his/her birth date, update calendar statistics.
 				if (isset($profile_vars['birthdate']) || isset($profile_vars['real_name']))
 				{
-					updateSettings(array(
+					updateSettings([
 						'calendar_updated' => time(),
-					));
+					]);
 				}
 
 				// Anything worth logging?
@@ -784,7 +784,7 @@ class Profile extends AbstractController
 			$this->_req->post->oldpasswrd = un_htmlspecialchars($this->_req->post->oldpasswrd);
 
 			// Does the integration want to check passwords?
-			$good_password = in_array(true, call_integration_hook('integrate_verify_password', array($this->_profile['member_name'], $this->_req->post->oldpasswrd, false)), true);
+			$good_password = in_array(true, call_integration_hook('integrate_verify_password', [$this->_profile['member_name'], $this->_req->post->oldpasswrd, false]), true);
 
 			// Start up the password checker, we have work to do
 			require_once(SUBSDIR . '/Auth.subs.php');
