@@ -6,7 +6,7 @@
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * @version 1.1.1
+ * @version 1.1.10
  *
  */
 
@@ -191,6 +191,7 @@ final class ParserWrapper
 				->parse($message);
 		}
 
+		$GLOBALS['context']['parserArea'] = $area;
 		$message = $parsers['bbc']->parse($message);
 
 		return $parsers['smiley']

@@ -8,26 +8,34 @@
 
 // Editor startup options and adjustments, css, smiley box, validate wizzy, move into view
 $.sceditor.plugins.initialLoad = function() {
-	var base = this;
-	const MAX_RETRIES = 120;
-	const isEditorLoaded = async selector => {
-		let retries = 0;
-		while (document.querySelector(selector) === null && retries < MAX_RETRIES)
-		{
-			await new Promise(resolve => requestAnimationFrame(resolve));
-			retries++;
+	var base = this,
+		editor,
+		MAX_RETRIES = 120;
+
+	var isEditorLoaded = function(selector, callback) {
+		var retries = 0;
+		function checkSelector() {
+			if(document.querySelector(selector) !== null || retries >= MAX_RETRIES) {
+				callback();
+			} else {
+				retries++;
+				requestAnimationFrame(checkSelector);
+			}
 		}
-		return true;
+		checkSelector();
 	};
 
+	base.editorLoaded = function()
+	{
+		editor.createPermanentDropDown();
+		editor.css("code {white-space: pre;}");
+	}
+
 	base.signalReady = function() {
-		let editor = this;
+		editor = this;
 
 		// signalReady can be called before the extensionMethods are available
-		isEditorLoaded(".sceditor-toolbar").then((selector) => {
-			editor.createPermanentDropDown();
-			editor.css("code {white-space: pre;}");
-		});
+		isEditorLoaded(".sceditor-toolbar", base.editorLoaded);
 
 		if ($.sceditor.isWysiwygSupported === false)
 		{
