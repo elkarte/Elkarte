@@ -16,15 +16,16 @@
  *
  */
 
-namespace ElkArte\Controller;
+namespace ElkArte\Profile;
 
 use ElkArte\AbstractController;
 use ElkArte\Action;
 use ElkArte\Cache\Cache;
 use ElkArte\EventManager;
 use ElkArte\Exceptions\Exception;
-use ElkArte\MembersList;
 use ElkArte\Languages\Txt;
+use ElkArte\Member;
+use ElkArte\MembersList;
 use ElkArte\Menu\Menu;
 use ElkArte\User;
 use ElkArte\Util;
@@ -38,7 +39,7 @@ class Profile extends AbstractController
 	private $completedSave = false;
 
 	/** @var null If this was a request to save an update */
-	private $isSaving = null;
+	private $isSaving;
 
 	/** @var null What it says, on completion */
 	private $_force_redirect;
@@ -55,7 +56,7 @@ class Profile extends AbstractController
 	/** @var int Member id for the history being viewed */
 	private $_memID = 0;
 
-	/** @var \ElkArte\Member The \ElkArte\Member object is stored here to avoid some global */
+	/** @var Member The \ElkArte\Member object is stored here to avoid some global */
 	private $_profile;
 
 	/**
@@ -77,7 +78,7 @@ class Profile extends AbstractController
 	 *
 	 * - Fires the pre_load event
 	 *
-	 * @see \ElkArte\AbstractController::action_index()
+	 * @see AbstractController::action_index
 	 */
 	public function action_index()
 	{
@@ -218,7 +219,7 @@ class Profile extends AbstractController
 				'areas' => array(
 					'summary' => array(
 						'label' => $txt['summary'],
-						'controller' => '\\ElkArte\\Controller\\ProfileInfo',
+						'controller' => '\\ElkArte\\Profile\\ProfileInfo',
 						'function' => 'action_summary',
 						// From the summary it's possible to activate an account, so we need the token
 						'token' => 'profile-aa%u',
@@ -230,7 +231,7 @@ class Profile extends AbstractController
 					),
 					'statistics' => array(
 						'label' => $txt['statPanel'],
-						'controller' => '\\ElkArte\\Controller\\ProfileInfo',
+						'controller' => '\\ElkArte\\Profile\\ProfileInfo',
 						'function' => 'action_statPanel',
 						'permission' => array(
 							'own' => 'profile_view_own',
@@ -239,7 +240,7 @@ class Profile extends AbstractController
 					),
 					'showposts' => array(
 						'label' => $txt['showPosts'],
-						'controller' => '\\ElkArte\\Controller\\ProfileInfo',
+						'controller' => '\\ElkArte\\Profile\\ProfileInfo',
 						'function' => 'action_showPosts',
 						'subsections' => array(
 							'messages' => array($txt['showMessages'], array('profile_view_own', 'profile_view_any')),
@@ -268,7 +269,7 @@ class Profile extends AbstractController
 					),
 					'permissions' => array(
 						'label' => $txt['showPermissions'],
-						'controller' => '\\ElkArte\\Controller\\ProfileInfo',
+						'controller' => '\\ElkArte\\Profile\\ProfileInfo',
 						'function' => 'action_showPermissions',
 						'permission' => array(
 							'own' => 'manage_permissions',
@@ -277,7 +278,7 @@ class Profile extends AbstractController
 					),
 					'history' => array(
 						'label' => $txt['history'],
-						'controller' => '\\ElkArte\\Controller\\ProfileHistory',
+						'controller' => '\\ElkArte\\Profile\\ProfileHistory',
 						'function' => 'action_index',
 						'subsections' => array(
 							'activity' => array($txt['trackActivity'], 'moderate_forum'),
@@ -293,7 +294,7 @@ class Profile extends AbstractController
 					'viewwarning' => array(
 						'label' => $txt['profile_view_warnings'],
 						'enabled' => featureEnabled('w') && !empty($modSettings['warning_enable']) && $this->_profile['warning'] && (!empty($modSettings['warning_show']) && ($context['user']['is_owner'] || $modSettings['warning_show'] == 2)),
-						'controller' => '\\ElkArte\\Controller\\ProfileInfo',
+						'controller' => '\\ElkArte\\Profile\\ProfileInfo',
 						'function' => 'action_viewWarning',
 						'permission' => array(
 							'own' => 'profile_view_own',
@@ -307,7 +308,7 @@ class Profile extends AbstractController
 				'areas' => array(
 					'account' => array(
 						'label' => $txt['account'],
-						'controller' => '\\ElkArte\\Controller\\ProfileOptions',
+						'controller' => '\\ElkArte\\Profile\\ProfileOptions',
 						'function' => 'action_account',
 						'enabled' => $context['user']['is_admin'] || ($this->_profile['id_group'] != 1 && !in_array(1, explode(',', $this->_profile['additional_groups']))),
 						'sc' => 'post',
@@ -320,7 +321,7 @@ class Profile extends AbstractController
 					),
 					'forumprofile' => array(
 						'label' => $txt['forumprofile'],
-						'controller' => '\\ElkArte\\Controller\\ProfileOptions',
+						'controller' => '\\ElkArte\\Profile\\ProfileOptions',
 						'function' => 'action_forumProfile',
 						'sc' => 'post',
 						'token' => 'profile-fp%u',
@@ -331,7 +332,7 @@ class Profile extends AbstractController
 					),
 					'theme' => array(
 						'label' => $txt['theme'],
-						'controller' => '\\ElkArte\\Controller\\ProfileOptions',
+						'controller' => '\\ElkArte\\Profile\\ProfileOptions',
 						'function' => 'action_themepick',
 						'sc' => 'post',
 						'token' => 'profile-th%u',
@@ -342,7 +343,7 @@ class Profile extends AbstractController
 					),
 					'pick' => array(
 						'label' => $txt['theme'],
-						'controller' => '\\ElkArte\\Controller\\ProfileOptions',
+						'controller' => '\\ElkArte\\Profile\\ProfileOptions',
 						'function' => 'action_pick',
 						'hidden' => true,
 						'sc' => 'post',
@@ -354,7 +355,7 @@ class Profile extends AbstractController
 					),
 					'notification' => array(
 						'label' => $txt['notifications'],
-						'controller' => '\\ElkArte\\Controller\\ProfileOptions',
+						'controller' => '\\ElkArte\\Profile\\ProfileOptions',
 						'function' => 'action_notification',
 						'sc' => 'post',
 						'token' => 'profile-nt%u',
@@ -372,7 +373,7 @@ class Profile extends AbstractController
 					// @todo at some point decouple it from PMs
 					'contactprefs' => array(
 						'label' => $txt['contactprefs'],
-						'controller' => '\\ElkArte\\Controller\\ProfileOptions',
+						'controller' => '\\ElkArte\\Profile\\ProfileOptions',
 						'function' => 'action_pmprefs',
 						'enabled' => allowedTo(array('profile_extra_own', 'profile_extra_any')),
 						'sc' => 'post',
@@ -384,7 +385,7 @@ class Profile extends AbstractController
 					),
 					'ignoreboards' => array(
 						'label' => $txt['ignoreboards'],
-						'controller' => '\\ElkArte\\Controller\\ProfileOptions',
+						'controller' => '\\ElkArte\\Profile\\ProfileOptions',
 						'function' => 'action_ignoreboards',
 						'enabled' => !empty($modSettings['allow_ignore_boards']),
 						'sc' => 'post',
@@ -396,7 +397,7 @@ class Profile extends AbstractController
 					),
 					'lists' => array(
 						'label' => $txt['editBuddyIgnoreLists'],
-						'controller' => '\\ElkArte\\Controller\\ProfileOptions',
+						'controller' => '\\ElkArte\\Profile\\ProfileOptions',
 						'function' => 'action_editBuddyIgnoreLists',
 						'enabled' => !empty($modSettings['enable_buddylist']) && $context['user']['is_owner'],
 						'sc' => 'post',
@@ -412,7 +413,7 @@ class Profile extends AbstractController
 					),
 					'groupmembership' => array(
 						'label' => $txt['groupmembership'],
-						'controller' => '\\ElkArte\\Controller\\ProfileOptions',
+						'controller' => '\\ElkArte\\Profile\\ProfileOptions',
 						'function' => 'action_groupMembership',
 						'enabled' => !empty($modSettings['show_group_membership']) && $context['user']['is_owner'],
 						'sc' => 'request',
@@ -439,7 +440,7 @@ class Profile extends AbstractController
 					'issuewarning' => array(
 						'label' => $txt['profile_issue_warning'],
 						'enabled' => featureEnabled('w') && !empty($modSettings['warning_enable']) && (!$context['user']['is_owner'] || $context['user']['is_admin']),
-						'controller' => '\\ElkArte\\Controller\\ProfileAccount',
+						'controller' => '\\ElkArte\\Profile\\ProfileAccount',
 						'function' => 'action_issuewarning',
 						'token' => 'profile-iw%u',
 						'permission' => array(
@@ -458,7 +459,7 @@ class Profile extends AbstractController
 					),
 					'subscriptions' => array(
 						'label' => $txt['subscriptions'],
-						'controller' => '\\ElkArte\\Controller\\ProfileSubscriptions',
+						'controller' => '\\ElkArte\\Profile\\ProfileSubscriptions',
 						'function' => 'action_subscriptions',
 						'enabled' => !empty($modSettings['paid_enabled']),
 						'permission' => array(
@@ -468,7 +469,7 @@ class Profile extends AbstractController
 					),
 					'deleteaccount' => array(
 						'label' => $txt['deleteAccount'],
-						'controller' => '\\ElkArte\\Controller\\ProfileAccount',
+						'controller' => '\\ElkArte\\Profile\\ProfileAccount',
 						'function' => 'action_deleteaccount',
 						'sc' => 'post',
 						'token' => 'profile-da%u',
@@ -479,7 +480,7 @@ class Profile extends AbstractController
 						),
 					),
 					'activateaccount' => array(
-						'controller' => '\\ElkArte\\Controller\\ProfileAccount',
+						'controller' => '\\ElkArte\\Profile\\ProfileAccount',
 						'function' => 'action_activateaccount',
 						'sc' => 'get',
 						'token' => 'profile-aa%u',
@@ -672,7 +673,8 @@ class Profile extends AbstractController
 					$fields = ProfileOptions::getFields($this->_current_area);
 				}
 
-				saveProfileFields($fields['fields'], $fields['hook']);
+				$profileFields = new ProfileFields();
+				$profileFields->saveProfileFields($fields['fields'], $fields['hook']);
 			}
 			elseif (empty($post_errors))
 			{
@@ -704,7 +706,7 @@ class Profile extends AbstractController
 				updateMemberData($this->_memID, $profile_vars);
 
 				// What if this is the newest member?
-				if ($modSettings['latestMember'] == $this->_memID)
+				if ((int) $modSettings['latestMember'] === $this->_memID)
 				{
 					require_once(SUBSDIR . '/Members.subs.php');
 					updateMemberStats();
@@ -764,7 +766,7 @@ class Profile extends AbstractController
 	 * If a password validation before a change is needed, this is the function to do it
 	 *
 	 * @param bool $check_password if this profile update requires a password verification
-	 * @throws \ElkArte\Exceptions\Exception
+	 * @throws Exception
 	 */
 	private function _check_password($check_password)
 	{
@@ -794,7 +796,7 @@ class Profile extends AbstractController
 			}
 
 			// Warn other elements not to jump the gun and do custom changes!
-			if (in_array('bad_password', $post_errors))
+			if (in_array('bad_password', $post_errors, true))
 			{
 				$context['password_auth_failed'] = true;
 			}

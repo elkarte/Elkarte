@@ -16,7 +16,7 @@
  *
  */
 
-namespace ElkArte\Controller;
+namespace ElkArte\Profile;
 
 use ElkArte\AbstractController;
 use ElkArte\Action;
@@ -65,7 +65,7 @@ class ProfileOptions extends AbstractController
 	/**
 	 * Default method, if another action is not called by the menu.
 	 *
-	 * @see \ElkArte\AbstractController::action_index()
+	 * @see AbstractController::action_index()
 	 */
 	public function action_index()
 	{
@@ -357,7 +357,8 @@ class ProfileOptions extends AbstractController
 
 		if (allowedTo(array('profile_identity_own', 'profile_identity_any')))
 		{
-			loadCustomFields($this->_memID, 'account');
+			$profileFields = new ProfileFields();
+			$profileFields->loadCustomFields($this->_memID, 'account');
 		}
 
 		$context['sub_template'] = 'edit_options';
@@ -501,7 +502,8 @@ class ProfileOptions extends AbstractController
 
 		if (allowedTo(array('profile_extra_own', 'profile_extra_any')))
 		{
-			loadCustomFields($this->_memID, 'forumprofile');
+			$profileFields = new ProfileFields();
+			$profileFields->loadCustomFields($this->_memID, 'forumprofile');
 		}
 
 		$context['sub_template'] = 'edit_options';
@@ -520,7 +522,8 @@ class ProfileOptions extends AbstractController
 		global $context, $txt;
 
 		$this->loadThemeOptions();
-		loadCustomFields($this->_memID, 'pmprefs');
+		$profileFields = new ProfileFields();
+		$profileFields->loadCustomFields($this->_memID, 'pmprefs');
 		theme()->getTemplates()->load('ProfileOptions');
 
 		$context['sub_template'] = 'edit_options';
@@ -543,7 +546,8 @@ class ProfileOptions extends AbstractController
 
 		if (allowedTo(array('profile_extra_own', 'profile_extra_any')))
 		{
-			loadCustomFields($this->_memID, 'theme');
+			$profileFields = new ProfileFields();
+			$profileFields->loadCustomFields($this->_memID, 'theme');
 		}
 
 		theme()->getTemplates()->load('ProfileOptions');

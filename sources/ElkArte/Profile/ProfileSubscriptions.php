@@ -14,7 +14,7 @@
  *
  */
 
-namespace ElkArte\Controller;
+namespace ElkArte\Profile;
 
 use ElkArte\AbstractController;
 use ElkArte\Exceptions\Exception;

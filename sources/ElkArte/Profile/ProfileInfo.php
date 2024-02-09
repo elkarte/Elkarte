@@ -15,16 +15,16 @@
  *
  */
 
-namespace ElkArte\Controller;
+namespace ElkArte\Profile;
 
 use BBC\ParserWrapper;
 use ElkArte\AbstractController;
 use ElkArte\Action;
 use ElkArte\Exceptions\Exception;
 use ElkArte\FileFunctions;
+use ElkArte\Languages\Txt;
 use ElkArte\MembersList;
 use ElkArte\MessagesDelete;
-use ElkArte\Languages\Txt;
 use ElkArte\Util;
 
 /**
@@ -87,7 +87,7 @@ class ProfileInfo extends AbstractController
 		$subActions = array(
 			'buddies' => array($this, 'action_profile_buddies'),
 			'recent' => array($this, 'action_profile_recent'),
-			'summary' => array('controller' => '\\ElkArte\\Controller\\Profile', 'function' => 'action_index'),
+			'summary' => array('controller' => '\\ElkArte\\Profile\\Profile', 'function' => 'action_index'),
 		);
 
 		// Action control
@@ -137,7 +137,8 @@ class ProfileInfo extends AbstractController
 		$this->_load_summary();
 
 		// To finish this off, custom profile fields.
-		loadCustomFields($this->_memID);
+		$profileFields = new ProfileFields();
+		$profileFields->loadCustomFields($this->_memID);
 	}
 
 	/**

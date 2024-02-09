@@ -14,14 +14,15 @@
  *
  */
 
-namespace ElkArte\Controller;
+namespace ElkArte\Profile;
 
 use BBC\ParserWrapper;
 use ElkArte\AbstractController;
+use ElkArte\Controller\Auth;
 use ElkArte\EventManager;
 use ElkArte\Exceptions\Exception;
-use ElkArte\MembersList;
 use ElkArte\Languages\Txt;
+use ElkArte\MembersList;
 use ElkArte\User;
 
 /**
