@@ -27,15 +27,18 @@ use ElkArte\EventManager;
 use ElkArte\Exceptions\ControllerRedirectException;
 use ElkArte\Exceptions\Exception;
 use ElkArte\Exceptions\PmErrorException;
+use ElkArte\Languages\Loader;
+use ElkArte\Languages\Txt;
 use ElkArte\MembersList;
 use ElkArte\MessagesCallback\BodyParser\Normal;
 use ElkArte\MessagesCallback\PmRenderer;
-use ElkArte\Languages\Txt;
+use ElkArte\Profile\Profile;
+use ElkArte\Profile\ProfileFields;
+use ElkArte\Profile\ProfileOptions;
 use ElkArte\User;
 use ElkArte\Util;
 use ElkArte\ValuesContainer;
 use ElkArte\VerificationControls\VerificationControlsIntegrate;
-use ElkArte\Languages\Loader;
 
 /**
  * Class PersonalMessage
@@ -1864,8 +1867,9 @@ class PersonalMessage extends AbstractController
 			$_POST = Util::htmlspecialchars__recursive($_POST);
 
 			// Save the fields.
+			$profileFields = new ProfileFields();
 			$fields = ProfileOptions::getFields('contactprefs');
-			saveProfileFields($fields['fields'], $fields['hook']);
+			$profileFields->saveProfileFields($fields['fields'], $fields['hook']);
 
 			if (!empty($profile_vars))
 			{

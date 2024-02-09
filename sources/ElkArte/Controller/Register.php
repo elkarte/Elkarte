@@ -26,9 +26,11 @@ use ElkArte\Errors\ErrorContext;
 use ElkArte\Errors\Errors;
 use ElkArte\Exceptions\Exception;
 use ElkArte\Http\Headers;
-use ElkArte\PrivacyPolicy;
 use ElkArte\Languages\Txt;
+use ElkArte\PrivacyPolicy;
+use ElkArte\Profile\ProfileOptions;
 use ElkArte\Util;
+use ProfileFields;
 
 /**
  * It registers new members, and it allows the administrator moderate member registration
@@ -470,8 +472,8 @@ class Register extends AbstractController
 		$regOptions['theme_vars'] = Util::htmlspecialchars__recursive($regOptions['theme_vars']);
 
 		// Check whether we have fields that simply MUST be displayed?
-		require_once(SUBSDIR . '/Profile.subs.php');
-		loadCustomFields(0, 'register', $this->_req->post->customfield ?? array());
+		$profileFields = new \ElkArte\Profile\ProfileFields();
+		$profileFields->loadCustomFields(0, 'register', $this->_req->post->customfield ?? array());
 
 		foreach ($context['custom_fields'] as $row)
 		{
@@ -781,7 +783,7 @@ class Register extends AbstractController
 	/**
 	 * Load standard and custom registration profile fields
 	 *
-	 * @uses loadCustomFields() Loads standard fields in to context
+	 * @uses ProfileFields->loadCustomFields() Loads standard fields in to context
 	 * @uses setupProfileContext() Loads supplied fields in to context
 	 */
 	private function _load_profile_fields()
@@ -789,8 +791,8 @@ class Register extends AbstractController
 		global $context, $modSettings, $cur_profile;
 
 		// Any custom fields to load?
-		require_once(SUBSDIR . '/Profile.subs.php');
-		loadCustomFields(0, 'register');
+		$profileFields = new \ElkArte\Profile\ProfileFields();
+		$profileFields->loadCustomFields(0, 'register');
 
 		// Or any standard ones?
 		if (!empty($modSettings['registration_fields']))
