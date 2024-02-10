@@ -35,10 +35,8 @@ class ProfileInfo extends AbstractController
 {
 	/** @var int Member id for the profile being worked with */
 	private $_memID = 0;
-
 	/** @var \ElkArte\Member The \ElkArte\Member object is stored here to avoid some global */
-	private $_profile = null;
-
+	private $_profile;
 	/** @var array Holds the current summary tabs to load */
 	private $_summary_areas;
 
@@ -60,7 +58,7 @@ class ProfileInfo extends AbstractController
 
 		if (!isset($context['user']['is_owner']))
 		{
-			$context['user']['is_owner'] = (int) $this->_memID === (int) $this->user->id;
+			$context['user']['is_owner'] = $this->_memID === (int) $this->user->id;
 		}
 
 		// Attempt to load the member's profile data.
@@ -87,7 +85,7 @@ class ProfileInfo extends AbstractController
 		$subActions = [
 			'buddies' => [$this, 'action_profile_buddies'],
 			'recent' => [$this, 'action_profile_recent'],
-			'summary' => ['controller' => '\\ElkArte\\Profile\\Profile', 'function' => 'action_index'],
+			'summary' => ['controller' => Profile::class, 'function' => 'action_index'],
 		];
 
 		// Action control
@@ -170,13 +168,13 @@ class ProfileInfo extends AbstractController
 				'name' => $txt['profile_recent_activity'],
 				'templates' => ['posts', 'topics', 'attachments'],
 				'active' => true,
-				'href' => getUrl('action', ['action' => 'profileInfo', 'sa' => 'recent', 'api' => 'html', 'u' => $this->_memID, '{session_data}']),
+				'href' => getUrl('action', ['action' => 'profileinfo', 'sa' => 'recent', 'api' => 'html', 'u' => $this->_memID, '{session_data}']),
 			],
 			'buddies' => [
 				'name' => $txt['buddies'],
 				'templates' => ['buddies'],
 				'active' => !empty($modSettings['enable_buddylist']) && $context['user']['is_owner'],
-				'href' => getUrl('action', ['action' => 'profileInfo', 'sa' => 'buddies', 'api' => 'html', 'u' => $this->_memID, '{session_data}']),
+				'href' => getUrl('action', ['action' => 'profileinfo', 'sa' => 'buddies', 'api' => 'html', 'u' => $this->_memID, '{session_data}']),
 			]
 		];
 
@@ -221,7 +219,7 @@ class ProfileInfo extends AbstractController
 			'can_send_email' => allowedTo('send_email_to_members'),
 			'can_have_buddy' => allowedTo('profile_identity_own') && !empty($modSettings['enable_buddylist']),
 			'can_issue_warning' => featureEnabled('w') && allowedTo('issue_warning') && !empty($modSettings['warning_enable']),
-			'can_view_warning' => featureEnabled('w') && (allowedTo('issue_warning') && !$context['user']['is_owner']) || (!empty($modSettings['warning_show']) && ($modSettings['warning_show'] > 1 || $context['user']['is_owner']))
+			'can_view_warning' => featureEnabled('w') && ((allowedTo('issue_warning') && !$context['user']['is_owner']) || (!empty($modSettings['warning_show']) && ($modSettings['warning_show'] > 1 || $context['user']['is_owner'])))
 		];
 
 		// @critical: potential problem here
@@ -230,7 +228,7 @@ class ProfileInfo extends AbstractController
 		$context['member']['id'] = $this->_memID;
 
 		// Is the signature even enabled on this forum?
-		$context['signature_enabled'] = substr($modSettings['signature_settings'], 0, 1) == 1;
+		$context['signature_enabled'] = strpos($modSettings['signature_settings'], 1) === 0;
 	}
 
 	/**
@@ -322,7 +320,7 @@ class ProfileInfo extends AbstractController
 		if (allowedTo('moderate_forum'))
 		{
 			// Make sure it's a valid ip address; otherwise, don't bother...
-			if (filter_var($this->_profile['ip'], FILTER_VALIDATE_IP, FILTER_FLAG_IPV4) === false && empty($modSettings['disableHostnameLookup']))
+			if (empty($modSettings['disableHostnameLookup']) && filter_var($this->_profile['ip'], FILTER_VALIDATE_IP, FILTER_FLAG_IPV4) === false)
 			{
 				$context['member']['hostname'] = host_from_ip($this->_profile['ip']);
 			}
@@ -374,7 +372,7 @@ class ProfileInfo extends AbstractController
 			$context['activate_type'] = $context['member']['is_activated'];
 
 			// What should the link text be?
-			$context['activate_link_text'] = in_array($context['member']['is_activated'], [3, 4, 5, 13, 14, 15])
+			$context['activate_link_text'] = in_array((int) $context['member']['is_activated'], [3, 4, 5, 13, 14, 15])
 				? $txt['account_approve']
 				: $txt['account_activate'];
 
@@ -437,7 +435,7 @@ class ProfileInfo extends AbstractController
 		$context['page_title'] = $txt['showPosts'] . ' - ' . $this->_profile['real_name'];
 
 		// Is the load average too high to allow searching just now?
-		if (!empty($modSettings['loadavg_show_posts']) && $modSettings['current_load'] >= $modSettings['loadavg_show_posts'])
+		if ($this->isOverLoadAverage())
 		{
 			throw new Exception('loadavg_show_posts_disabled', false);
 		}
@@ -445,13 +443,15 @@ class ProfileInfo extends AbstractController
 		// If we're specifically dealing with attachments use that function!
 		if ($action === 'attach')
 		{
-			return $this->action_showAttachments();
+			$this->action_showAttachments();
+			return;
 		}
 
 		// Instead, if we're dealing with unwatched topics (and the feature is enabled) use that other function.
 		if ($action === 'unwatchedtopics' && $modSettings['enable_unwatch'])
 		{
-			return $this->action_showUnwatched();
+			$this->action_showUnwatched();
+			return;
 		}
 
 		// Are we just viewing topics?
@@ -1065,9 +1065,9 @@ class ProfileInfo extends AbstractController
 		$context['board'] = $board;
 
 		$curGroups = empty($this->_profile['additional_groups']) ? [] : explode(',', $this->_profile['additional_groups']);
-
 		$curGroups[] = $this->_profile['id_group'];
 		$curGroups[] = $this->_profile['id_post_group'];
+		$curGroups = array_map('intval', $curGroups);
 
 		// Load a list of boards for the jump box - except the defaults.
 		require_once(SUBSDIR . '/Boards.subs.php');
@@ -1077,7 +1077,9 @@ class ProfileInfo extends AbstractController
 		$context['no_access_boards'] = [];
 		foreach ($board_list as $row)
 		{
-			if (count(array_intersect($curGroups, explode(',', $row['member_groups']))) === 0 && !$row['is_mod'])
+			$row['id_board'] = (int) $row['id_board'];
+			$row['id_profile'] = (int) $row['id_profile'] ;
+			if (!$row['is_mod'] && count(array_intersect($curGroups, explode(',', $row['member_groups']))) === 0)
 			{
 				$context['no_access_boards'][] = [
 					'id' => $row['id_board'],
@@ -1085,13 +1087,13 @@ class ProfileInfo extends AbstractController
 					'is_last' => false,
 				];
 			}
-			elseif ($row['id_profile'] != 1 || $row['is_mod'])
+			elseif ($row['id_profile'] !== 1 || $row['is_mod'])
 			{
 				$context['boards'][$row['id_board']] = [
 					'id' => $row['id_board'],
 					'name' => $row['board_name'],
 					'url' => getUrl('board', ['board' => $row['id_board'], 'start' => 0, 'name' => $row['board_name']]),
-					'selected' => $board == $row['id_board'],
+					'selected' => $board === $row['id_board'],
 					'profile' => $row['id_profile'],
 					'profile_name' => $context['profiles'][$row['id_profile']]['name'],
 				];
@@ -1109,7 +1111,7 @@ class ProfileInfo extends AbstractController
 		];
 
 		// If you're an admin we know you can do everything, we might as well leave.
-		$context['member']['has_all_permissions'] = in_array(1, $curGroups);
+		$context['member']['has_all_permissions'] = in_array(1, $curGroups, true);
 		if ($context['member']['has_all_permissions'])
 		{
 			return;
@@ -1130,7 +1132,7 @@ class ProfileInfo extends AbstractController
 		global $modSettings, $context, $txt;
 
 		// Firstly, can we actually even be here?
-		if (!allowedTo('issue_warning') && (empty($modSettings['warning_show']) || ($modSettings['warning_show'] == 1 && !$context['user']['is_owner'])))
+		if ((empty($modSettings['warning_show']) || ((int) $modSettings['warning_show'] === 1 && !$context['user']['is_owner'])) && !allowedTo('issue_warning'))
 		{
 			throw new Exception('no_access', false);
 		}
@@ -1255,7 +1257,7 @@ class ProfileInfo extends AbstractController
 		theme()->getLayers()->removeAll();
 
 		// Some buddies for you
-		if (in_array('buddies', $this->_summary_areas))
+		if (in_array('buddies', $this->_summary_areas, true))
 		{
 			$this->_load_buddies();
 			$context['sub_template'] = 'profile_block_buddies';
@@ -1274,7 +1276,7 @@ class ProfileInfo extends AbstractController
 		if (!empty($modSettings['enable_buddylist'])
 			&& $context['user']['is_owner']
 			&& !empty($this->user->buddies)
-			&& in_array('buddies', $this->_summary_areas)
+			&& in_array('buddies', $this->_summary_areas, true)
 			&& MembersList::load($this->user->buddies, false, 'profile'))
 		{
 			// Get the info for this buddy
@@ -1312,19 +1314,19 @@ class ProfileInfo extends AbstractController
 		theme()->getLayers()->removeAll();
 
 		// So, just what have you been up to?
-		if (in_array('posts', $this->_summary_areas))
+		if (in_array('posts', $this->_summary_areas, true))
 		{
 			$this->_load_recent_posts();
 			$context['profile_blocks'][] = 'template_profile_block_posts';
 		}
 
-		if (in_array('topics', $this->_summary_areas))
+		if (in_array('topics', $this->_summary_areas, true))
 		{
 			$this->_load_recent_topics();
 			$context['profile_blocks'][] = 'template_profile_block_topics';
 		}
 
-		if (in_array('attachments', $this->_summary_areas))
+		if (in_array('attachments', $this->_summary_areas, true))
 		{
 			$this->_load_recent_attachments();
 			$context['profile_blocks'][] = 'template_profile_block_attachments';
@@ -1339,14 +1341,11 @@ class ProfileInfo extends AbstractController
 		global $context, $modSettings;
 
 		// How about their most recent posts?
-		if (in_array('posts', $this->_summary_areas))
+		if (in_array('posts', $this->_summary_areas, true))
 		{
 			// Is the load average too high just now, then let them know
-			if (!empty($modSettings['loadavg_show_posts']) && $modSettings['current_load'] >= $modSettings['loadavg_show_posts'])
-			{
-				$context['loadaverage'] = true;
-			}
-			else
+			$context['loadaverage'] = $this->isOverLoadAverage();
+			if (!$context['loadaverage'])
 			{
 				// Set up to get the last 10 posts of this member
 				$msgCount = count_user_posts($this->_memID);
@@ -1405,14 +1404,11 @@ class ProfileInfo extends AbstractController
 		global $context, $modSettings;
 
 		// How about the most recent topics that they started?
-		if (in_array('topics', $this->_summary_areas))
+		if (in_array('topics', $this->_summary_areas, true))
 		{
 			// Is the load average still too high?
-			if (!empty($modSettings['loadavg_show_posts']) && $modSettings['current_load'] >= $modSettings['loadavg_show_posts'])
-			{
-				$context['loadaverage'] = true;
-			}
-			else
+			$context['loadaverage'] = $this->isOverLoadAverage();
+			if (!$context['loadaverage'])
 			{
 				// Set up to get the last 10 topics of this member
 				$topicCount = count_user_topics($this->_memID);
@@ -1535,5 +1531,18 @@ class ProfileInfo extends AbstractController
 				}
 			}
 		}
+	}
+
+	/**
+	 * Checks if the current load average exceeds a specified threshold.
+	 *
+	 * @return bool Returns true if the current load average is higher than the specified threshold, otherwise false.
+	 */
+	private function isOverLoadAverage()
+	{
+		global $modSettings;
+
+		// Is the load average too high just now, then let them know
+		return !empty($modSettings['loadavg_show_posts']) && $modSettings['current_load'] >= $modSettings['loadavg_show_posts'];
 	}
 }

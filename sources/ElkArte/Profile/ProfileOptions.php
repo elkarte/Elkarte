@@ -24,7 +24,6 @@ use ElkArte\Cache\Cache;
 use ElkArte\Exceptions\Exception;
 use ElkArte\Languages\Txt;
 use ElkArte\MembersList;
-use ElkArte\Util;
 
 /**
  * Options a user can set to customize their site experience
@@ -35,18 +34,9 @@ use ElkArte\Util;
  */
 class ProfileOptions extends AbstractController
 {
-	/**
-	 * Member id for the profile being viewed
-	 *
-	 * @var int
-	 */
+	/** @var int Member id for the profile being viewed  */
 	private $_memID = 0;
-
-	/**
-	 * The \ElkArte\Member object is stored here to avoid some global
-	 *
-	 * @var \ElkArte\Member
-	 */
+	/** @var Member The \ElkArte\Member object is stored here to avoid some global */
 	private $_profile;
 
 	/**
@@ -130,32 +120,26 @@ class ProfileOptions extends AbstractController
 		$context['sub_template'] = 'editBuddies';
 
 		// Use suggest finding the right buddies
-		loadJavascriptFile('suggest.js');
+		loadJavascriptFile('suggest.js', array('defer' => true));
 
 		// For making changes!
-		$buddiesArray = explode(',', $this->_profile['buddy_list']);
-		foreach ($buddiesArray as $k => $dummy)
-		{
-			if ($dummy === '')
-			{
-				unset($buddiesArray[$k]);
-			}
-		}
+		$buddiesArray = array_map('intval', explode(',', $this->_profile['buddy_list']));
+		$buddiesArray = array_filter($buddiesArray, static function($value) {
+			return $value !== '';
+		});
 
 		// Removing a buddy?
-		if (isset($this->_req->query->remove))
+		$notMyBuddy = $this->_req->getQuery('remove', 'intval');
+		if ($notMyBuddy !== null)
 		{
 			checkSession('get');
 
 			call_integration_hook('integrate_remove_buddy', [$this->_memID]);
 
-			// Heh, I'm lazy, do it the easy way...
-			foreach ($buddiesArray as $key => $buddy)
+			$key = array_search($notMyBuddy, $buddiesArray, true);
+			if ($key !== false)
 			{
-				if ($buddy == (int) $this->_req->query->remove)
-				{
-					unset($buddiesArray[$key]);
-				}
+				unset($buddiesArray[$key]);
 			}
 
 			// Make the changes.
@@ -172,27 +156,19 @@ class ProfileOptions extends AbstractController
 			checkSession();
 
 			// Prepare the string for extraction...
-			$new_buddy = strtr(Util::htmlspecialchars($this->_req->post->new_buddy, ENT_QUOTES), ['&quot;' => '"']);
-			preg_match_all('~"([^"]+)"~', $new_buddy, $matches);
-			$new_buddies = array_unique(array_merge($matches[1], explode(',', preg_replace('~"[^"]+"~', '', $new_buddy))));
-
-			foreach ($new_buddies as $k => $buddy)
+			$new_buddy = strtr($this->_req->getPost('new_buddy', 'trim|htmlspecialchars[ENT_QUOTES]'), ['&quot;' => '"']);
+			if ($new_buddy === '' || in_array($new_buddy, [$this->_profile['member_name'], $this->_profile['real_name']], true))
 			{
-				$new_buddies[$k] = strtr(trim($buddy), ['\'' => '&#039;']);
-
-				if ($new_buddies[$k] === '' || in_array($new_buddies[$k], [$this->_profile['member_name'], $this->_profile['real_name']]))
-				{
-					unset($new_buddies[$k]);
-				}
+				unset($new_buddy);
 			}
 
 			call_integration_hook('integrate_add_buddies', [$this->_memID, &$new_buddies]);
 
-			if (!empty($new_buddies))
+			if (!empty($new_buddy))
 			{
 				// Now find out the id_member of the buddy.
 				require_once(SUBSDIR . '/ProfileOptions.subs.php');
-				$new_buddiesArray = getBuddiesID($new_buddies);
+				$new_buddiesArray = getBuddiesID([$new_buddy]);
 				$old_buddiesArray = explode(',', $this->_profile['buddy_list']);
 
 				// Now update the current users buddy list.
@@ -215,7 +191,7 @@ class ProfileOptions extends AbstractController
 			$result = getBasicMemberData($buddiesArray, ['sort' => 'real_name', 'limit' => substr_count($this->_profile['buddy_list'], ',') + 1]);
 			foreach ($result as $row)
 			{
-				$buddies[] = $row['id_member'];
+				$buddies[] = (int) $row['id_member'];
 			}
 		}
 
@@ -248,30 +224,25 @@ class ProfileOptions extends AbstractController
 
 		// We want to view what we're doing :P
 		$context['sub_template'] = 'editIgnoreList';
-		loadJavascriptFile('suggest.js');
+		loadJavascriptFile('suggest.js', array('defer' => true));
 
 		// For making changes!
-		$ignoreArray = explode(',', $this->_profile['pm_ignore_list']);
-		foreach ($ignoreArray as $k => $dummy)
-		{
-			if ($dummy === '')
-			{
-				unset($ignoreArray[$k]);
-			}
-		}
+		$ignoreArray = array_map('intval', explode(',', $this->_profile['pm_ignore_list']));
+		$ignoreArray = array_filter($ignoreArray, static function($value) {
+			return $value !== '';
+		});
 
 		// Removing a member from the ignore list?
-		if (isset($this->_req->query->remove))
+		$id_remove = $this->_req->getQuery('remove', 'intval');
+		if (isset($id_remove))
 		{
 			checkSession('get');
 
 			// Heh, I'm lazy, do it the easy way...
-			foreach ($ignoreArray as $key => $id_remove)
+			$key = array_search($id_remove, $ignoreArray, true);
+			if ($key !== false)
 			{
-				if ($id_remove == (int) $this->_req->query->remove)
-				{
-					unset($ignoreArray[$key]);
-				}
+				unset($ignoreArray[$key]);
 			}
 
 			// Make the changes.
@@ -288,25 +259,17 @@ class ProfileOptions extends AbstractController
 			checkSession();
 
 			// Prepare the string for extraction...
-			$new_ignore = strtr(Util::htmlspecialchars($this->_req->post->new_ignore, ENT_QUOTES), ['&quot;' => '"']);
-			preg_match_all('~"([^"]+)"~', $new_ignore, $matches);
-			$new_entries = array_unique(array_merge($matches[1], explode(',', preg_replace('~"[^"]+"~', '', $new_ignore))));
-
-			foreach ($new_entries as $k => $entry)
+			$new_ignore = strtr($this->_req->getPost('new_ignore', 'trim|htmlspecialchars[ENT_QUOTES]'), ['&quot;' => '"']);
+			if ($new_ignore === '' || in_array($new_ignore, [$this->_profile['member_name'], $this->_profile['real_name']], true))
 			{
-				$new_entries[$k] = strtr(trim($entry), ['\'' => '&#039;']);
-
-				if ($new_entries[$k] === '' || in_array($new_entries[$k], [$this->_profile['member_name'], $this->_profile['real_name']]))
-				{
-					unset($new_entries[$k]);
-				}
+				unset($new_ignore);
 			}
 
-			if (!empty($new_entries))
+			if (!empty($new_ignore))
 			{
 				// Now find out the id_member for the members in question.
 				require_once(SUBSDIR . '/ProfileOptions.subs.php');
-				$ignoreArray = array_merge($ignoreArray, getBuddiesID($new_entries, false));
+				$ignoreArray = array_merge($ignoreArray, getBuddiesID([$new_ignore], false));
 
 				// Now update the current users buddy list.
 				$this->_profile['pm_ignore_list'] = implode(',', $ignoreArray);
@@ -327,7 +290,7 @@ class ProfileOptions extends AbstractController
 			$result = getBasicMemberData($ignoreArray, ['sort' => 'real_name', 'limit' => substr_count($this->_profile['pm_ignore_list'], ',') + 1]);
 			foreach ($result as $row)
 			{
-				$ignored[] = $row['id_member'];
+				$ignored[] = (int) $row['id_member'];
 			}
 		}
 
@@ -336,7 +299,7 @@ class ProfileOptions extends AbstractController
 		// Load all the members up.
 		MembersList::load($ignored, false, 'profile');
 
-		// Set the context for each buddy.
+		// Set the context for everyone we ignore.
 		$context['ignore_list'] = [];
 		foreach ($ignored as $ignore_member)
 		{
@@ -376,6 +339,7 @@ class ProfileOptions extends AbstractController
 		{
 			$fields = self::getFields('account');
 		}
+
 		setupProfileContext($fields['fields'], $fields['hook']);
 	}
 
@@ -1032,17 +996,18 @@ class ProfileOptions extends AbstractController
 		$context['sub_template'] = 'groupMembership';
 
 		$curMember = $this->_profile;
-		$context['primary_group'] = $curMember['id_group'];
+		$context['primary_group'] = (int) $curMember['id_group'];
+		$msgName = $this->_req->getQuery('msg', 'trim');
 
 		// Can they manage groups?
 		$context['can_manage_membergroups'] = allowedTo('manage_membergroups');
 		$context['can_manage_protected'] = allowedTo('admin_forum');
 		$context['can_edit_primary'] = $context['can_manage_protected'];
-		$context['update_message'] = isset($this->_req->query->msg, $txt['group_membership_msg_' . $this->_req->query->msg]) ? $txt['group_membership_msg_' . $this->_req->query->msg] : '';
+		$context['update_message'] = isset($msgName, $txt['group_membership_msg_' . $msgName]) ? $txt['group_membership_msg_' . $msgName] : '';
 
 		// Get all the groups this user is a member of.
-		$groups = explode(',', $curMember['additional_groups']);
-		$groups[] = $curMember['id_group'];
+		$groups = array_map('intval', explode(',', $curMember['additional_groups']));
+		$groups[] = (int) $curMember['id_group'];
 
 		// Ensure the query doesn't croak!
 		if (empty($groups))
@@ -1063,7 +1028,7 @@ class ProfileOptions extends AbstractController
 			'name' => $txt['regular_members'],
 			'desc' => $txt['regular_members_desc'],
 			'type' => 0,
-			'is_primary' => $context['primary_group'] == 0,
+			'is_primary' => $context['primary_group'] === 0,
 			'can_be_primary' => true,
 			'can_leave' => 0,
 		];
@@ -1075,10 +1040,11 @@ class ProfileOptions extends AbstractController
 		}
 
 		// In the special case that someone is requesting membership of a group, setup some special context vars.
-		if (isset($this->_req->query->request, $context['groups']['available'][(int)$this->_req->query->request])
-			&& $context['groups']['available'][(int)$this->_req->query->request]['type'] == 2)
+		$groupRequest = $this->_req->getQuery('request', 'intval');
+		if (isset($groupRequest, $context['groups']['available'][$groupRequest])
+			&& $context['groups']['available'][$groupRequest]['type'] === 2)
 		{
-			$context['group_request'] = $context['groups']['available'][(int) $this->_req->query->request];
+			$context['group_request'] = $context['groups']['available'][$groupRequest];
 		}
 	}
 
@@ -1114,17 +1080,17 @@ class ProfileOptions extends AbstractController
 		$context['can_manage_protected'] = allowedTo('admin_forum');
 
 		// By default, the new primary is the old one.
-		$newPrimary = $this->_profile['id_group'];
+		$newPrimary = (int) $this->_profile['id_group'];
 		$addGroups = array_flip(explode(',', $this->_profile['additional_groups']));
-		$canChangePrimary = $this->_profile['id_group'] == 0;
+		$canChangePrimary = (int) $this->_profile['id_group'] === 0;
 		$changeType = isset($this->_req->post->primary) ? 'primary' : (isset($this->_req->post->req) ? 'request' : 'free');
 
 		// One way or another, we have a target group in mind...
 		$group_id = $group_id ?? (int) $this->_req->post->primary;
-		$foundTarget = $changeType === 'primary' && $group_id == 0;
+		$foundTarget = $changeType === 'primary' && $group_id === 0;
 
 		// Sanity check!!
-		if ($group_id == 1)
+		if ($group_id === 1)
 		{
 			isAllowedTo('admin_forum');
 		}
@@ -1133,7 +1099,7 @@ class ProfileOptions extends AbstractController
 		$groups_details = membergroupsById([$group_id, $this->_profile['id_group']], 0, true);
 
 		// Protected groups require proper permissions!
-		if ($group_id != 1 && $groups_details[$group_id]['group_type'] == 1)
+		if ($group_id !== 1 && $groups_details[$group_id]['group_type'] === 1)
 		{
 			isAllowedTo('admin_forum');
 		}
@@ -1141,24 +1107,24 @@ class ProfileOptions extends AbstractController
 		foreach ($groups_details as $key => $row)
 		{
 			// Is this the new group?
-			if ($row['id_group'] == $group_id)
+			if ($row['id_group'] === $group_id)
 			{
 				$foundTarget = true;
 				$group_name = $row['group_name'];
 
 				// Does the group type match what we're doing - are we trying to request a non-requestable group?
-				if ($changeType === 'request' && $row['group_type'] != 2)
+				if ($changeType === 'request' && $row['group_type'] !== 2)
 				{
 					throw new Exception('no_access', false);
 				}
 
 				// What about leaving a requestable group we are not a member of?
-				if ($changeType === 'free' && $row['group_type'] == 2 && $this->_profile['id_group'] != $row['id_group'] && !isset($addGroups[$row['id_group']]))
+				if ($changeType === 'free' && $row['group_type'] === 2 && $this->_profile['id_group'] !== $row['id_group'] && !isset($addGroups[$row['id_group']]))
 				{
 					throw new Exception('no_access', false);
 				}
 
-				if ($changeType === 'free' && $row['group_type'] != 3 && $row['group_type'] != 2)
+				if ($changeType === 'free' && $row['group_type'] !== 3 && $row['group_type'] !== 2)
 				{
 					throw new Exception('no_access', false);
 				}
@@ -1171,19 +1137,19 @@ class ProfileOptions extends AbstractController
 			}
 
 			// If this is their old primary, can we change it?
-			if ($row['id_group'] == $this->_profile['id_group'] && ($row['group_type'] > 1 || $context['can_manage_membergroups']) && $canChangePrimary !== false)
+			if ($row['id_group'] === $this->_profile['id_group'] && ($row['group_type'] > 1 || $context['can_manage_membergroups']) && $canChangePrimary !== false)
 			{
 				$canChangePrimary = true;
 			}
 
 			// If we are not doing a force primary move, don't do it automatically if current primary is not 0.
-			if ($changeType != 'primary' && $this->_profile['id_group'] != 0)
+			if ($changeType !== 'primary' && $this->_profile['id_group'] !== 0)
 			{
 				$canChangePrimary = false;
 			}
 
 			// If this is the one we are acting on, can we even act?
-			if ((!$context['can_manage_protected'] && $row['group_type'] == 1) || (!$context['can_manage_membergroups'] && $row['group_type'] == 0))
+			if ((!$context['can_manage_protected'] && $row['group_type'] === 1) || (!$context['can_manage_membergroups'] && $row['group_type'] === 0))
 			{
 				$canChangePrimary = false;
 			}
@@ -1235,7 +1201,7 @@ class ProfileOptions extends AbstractController
 
 				foreach ($members as $member)
 				{
-					if ($member['notify_types'] != 4)
+					if ((int) $member['notify_types'] !== 4)
 					{
 						continue;
 					}
@@ -1270,9 +1236,9 @@ class ProfileOptions extends AbstractController
 		if ($changeType === 'free')
 		{
 			// Are we leaving?
-			if ($this->_profile['id_group'] == $group_id || isset($addGroups[$group_id]))
+			if ($this->_profile['id_group'] === $group_id || isset($addGroups[$group_id]))
 			{
-				if ($this->_profile['id_group'] == $group_id)
+				if ($this->_profile['id_group'] === $group_id)
 				{
 					$newPrimary = 0;
 				}
@@ -1285,7 +1251,7 @@ class ProfileOptions extends AbstractController
 			elseif ($canChangePrimary)
 			{
 				// Can we change the primary, and do we want to?
-				if ($this->_profile['id_group'] != 0)
+				if ($this->_profile['id_group'] !== 0)
 				{
 					$addGroups[$this->_profile['id_group']] = -1;
 				}
@@ -1300,7 +1266,7 @@ class ProfileOptions extends AbstractController
 		// Finally, we must be setting the primary.
 		elseif ($canChangePrimary)
 		{
-			if ($this->_profile['id_group'] != 0)
+			if ($this->_profile['id_group'] !== 0)
 			{
 				$addGroups[$this->_profile['id_group']] = -1;
 			}

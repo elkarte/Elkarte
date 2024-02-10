@@ -30,25 +30,11 @@ use ElkArte\User;
  */
 class ProfileAccount extends AbstractController
 {
-	/**
-	 * Member id for the account being worked on
-	 *
-	 * @var int
-	 */
+	/** @var int Member id for the account being worked on */
 	private $_memID = 0;
-
-	/**
-	 * The \ElkArte\Member object is stored here to avoid some global
-	 *
-	 * @var \ElkArte\Member
-	 */
-	private $_profile = null;
-
-	/**
-	 * Holds any errors that were generated when issuing a warning
-	 *
-	 * @var array
-	 */
+	/** @var \ElkArte\Member The \ElkArte\Member object is stored here to avoid some global */
+	private $_profile;
+	/** @var array Holds any errors that were generated when issuing a warning */
 	private $_issueErrors = [];
 
 	/**
@@ -263,7 +249,7 @@ class ProfileAccount extends AbstractController
 		if (isset($this->_req->post->save))
 		{
 			// Security is good here.
-			checkSession('post');
+			checkSession();
 
 			// There must be a reason, and use of flowery words is allowed.
 			$warn_reason = $this->_req->getPost('warn_reason', 'trim|\\ElkArte\\Util::htmlspecialchars', '');
@@ -584,7 +570,7 @@ class ProfileAccount extends AbstractController
 		checkSession();
 
 		// Check we got here as we should have!
-		if ($cur_profile->id_member != $this->_profile->id_member)
+		if ((int) $cur_profile->id_member !== (int) $this->_profile->id_member)
 		{
 			throw new Exception('no_access', false);
 		}
@@ -593,7 +579,7 @@ class ProfileAccount extends AbstractController
 		require_once(SUBSDIR . '/Members.subs.php');
 
 		// Too often, people remove/delete their own only administrative account.
-		if (in_array(1, explode(',', $cur_profile['additional_groups'])) || $cur_profile['id_group'] == 1)
+		if (in_array(1, array_map('intval', explode(',', $cur_profile['additional_groups'])), true) || (int) $cur_profile['id_group'] === 1)
 		{
 			// Are you allowed to administrate the forum, as they are?
 			isAllowedTo('admin_forum');
@@ -613,7 +599,7 @@ class ProfileAccount extends AbstractController
 
 			// Now, have you been naughty and need your posts deleting?
 			// @todo Should this check board permissions?
-			if ($this->_req->post->remove_type != 'none' && allowedTo('moderate_forum'))
+			if ($this->_req->post->remove_type !== 'none' && allowedTo('moderate_forum'))
 			{
 				// Include subs/Topic.subs.php - essential for this type of work!
 				require_once(SUBSDIR . '/Topic.subs.php');
@@ -674,13 +660,14 @@ class ProfileAccount extends AbstractController
 
 		isAllowedTo('moderate_forum');
 
+		$this->_profile['is_activated'] = (int) $this->_profile['is_activated'];
 		if (isset($this->_req->query->save, $this->_profile['is_activated'])
-			&& $this->_profile['is_activated'] != 1)
+			&& $this->_profile['is_activated'] !== 1)
 		{
 			require_once(SUBSDIR . '/Members.subs.php');
 
 			// If we are approving the deletion of an account, we do something special ;)
-			if ($this->_profile['is_activated'] == 4)
+			if ($this->_profile['is_activated'] === 4)
 			{
 				deleteMembers($context['id_member']);
 				redirectexit();

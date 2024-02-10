@@ -1,6 +1,7 @@
 <?php
 
 /**
+ * Handles the loading of custom and standard fields
  *
  * @package   ElkArte Forum
  * @copyright ElkArte Forum contributors
@@ -21,6 +22,9 @@ use ElkArte\MembersList;
 use ElkArte\User;
 use ElkArte\Util;
 
+/**
+ * The ProfileFields class is responsible for loading and rendering profile fields.
+ */
 class ProfileFields
 {
 	/**
@@ -35,14 +39,16 @@ class ProfileFields
 	{
 		global $context, $txt, $settings, $scripturl;
 
-		$db = database();
+		$context['custom_fields'] = [];
+		$context['custom_fields_required'] = false;
+		$bbc_parser = ParserWrapper::instance();
 
 		// Get the right restrictions in place...
 		$where = 'active = 1';
-		if (!allowedTo('admin_forum') && $area !== 'register')
+		if ($area !== 'register' && !allowedTo('admin_forum'))
 		{
 			// If it's the owner they can see two types of private fields, regardless.
-			if ($memID == User::$info->id)
+			if ($memID === User::$info->id)
 			{
 				$where .= $area === 'summary' ? ' AND private < 3' : ' AND (private = 0 OR private = 2)';
 			}
@@ -61,24 +67,8 @@ class ProfileFields
 			$where .= ' AND show_profile = {string:area}';
 		}
 
-		// Load all the relevant fields - and data.
-		// The fully-qualified name for rows is here because it's a reserved word in Mariadb
-		// 10.2.4+ and quoting would be different for MySQL/Mariadb and PSQL
-		$request = $db->query('', '
-		SELECT
-			col_name, field_name, field_desc, field_type, show_reg, field_length, field_options,
-			default_value, bbc, enclose, placement, mask, vieworder, {db_prefix}custom_fields.rows, cols
-		FROM {db_prefix}custom_fields
-		WHERE ' . $where . '
-		ORDER BY vieworder ASC',
-			[
-				'area' => $area,
-			]
-		);
-		$context['custom_fields'] = [];
-		$context['custom_fields_required'] = false;
-		$bbc_parser = ParserWrapper::instance();
-		while (($row = $request->fetch_assoc()))
+		$data = getCustomFieldData($where, $area);
+		foreach ($data as $row)
 		{
 			// Shortcut.
 			$options = MembersList::get($memID)->options;
@@ -146,12 +136,49 @@ class ProfileFields
 			// A standard input field, including some html5 variants
 			elseif (in_array($row['field_type'], ['text', 'url', 'search', 'date', 'email', 'color']))
 			{
-				$input_html = '<input id="' . $row['col_name'] . '" type="' . $row['field_type'] . '" name="customfield[' . $row['col_name'] . ']" ' . ($row['field_length'] != 0 ? 'maxlength="' . $row['field_length'] . '"' : '') . ' size="' . ($row['field_length'] == 0 || $row['field_length'] >= 50 ? 50 : ($row['field_length'] > 30 ? 30 : ($row['field_length'] > 10 ? 20 : 10))) . '" value="' . $value . '" placeholder="' . $row['field_name'] . '" class="input_text" />';
+				$row['field_length'] = (int)$row['field_length'];
+				$input_html = '<input id="' . $row['col_name'] . '" type="' . $row['field_type'] . '" name="customfield[' . $row['col_name'] . ']"';
+
+				if ($row['field_length'])
+				{
+					$input_html .= ' maxlength="' . $row['field_length'] . '"';
+				}
+
+				if ($row['field_length'] === 0 || $row['field_length'] >= 50)
+				{
+					$input_html .= ' size="50"';
+				}
+				elseif ($row['field_length'] > 30)
+				{
+					$input_html .= ' size="30"';
+				}
+				elseif ($row['field_length'] > 10)
+				{
+					$input_html .= ' size="20"';
+				}
+				else
+				{
+					$input_html .= ' size="10"';
+				}
+
+				$input_html .= ' value="' . $value . '" placeholder="' . $row['field_name'] . '" class="input_text" />';
 			}
 			// Only thing left, a textbox for you
 			else
 			{
-				$input_html = '<textarea id="' . $row['col_name'] . '" name="customfield[' . $row['col_name'] . ']" ' . (!empty($rows) ? 'rows="' . $row['rows'] . '"' : '') . ' ' . (!empty($cols) ? 'cols="' . $row['cols'] . '"' : '') . '>' . $value . '</textarea>';
+				$input_html = '<textarea id="' . $row['col_name'] . '" name="customfield[' . $row['col_name'] . ']"';
+
+				if (!empty($row['rows']))
+				{
+					$input_html .= ' rows="' . $row['rows'] . '"';
+				}
+
+				if (!empty($row['cols']))
+				{
+					$input_html .= ' cols="' . $row['cols'] . '"';
+				}
+
+				$input_html .= '>' . $value . '</textarea>';
 			}
 
 			// Parse BBCode
@@ -205,8 +232,6 @@ class ProfileFields
 				'mask' => $row['mask'],
 			];
 		}
-
-		$request->free_result();
 
 		call_integration_hook('integrate_load_custom_profile_fields', [$memID, $area]);
 	}
@@ -301,16 +326,21 @@ class ProfileFields
 				'input_validate' => function (&$value) {
 					global $profile_vars, $cur_profile;
 
-					if (isset($_POST['bday2'], $_POST['bday3']) && $value > 0 && $_POST['bday2'] > 0)
+					if (isset($_POST['bday1']))
 					{
+						$date_parts = explode('-', $_POST['bday1']);
+						$bday3 = (int) $date_parts[0]; // Year
+						$bday1 = (int) $date_parts[1]; // Month
+						$bday2 = (int) $date_parts[2]; // Day
+
 						// Set to blank?
-						if ((int)$_POST['bday3'] === 1 && (int)$_POST['bday2'] === 1 && (int)$value === 1)
+						if ($bday3 === 1 && $bday2 === 1 && $bday1 === 1)
 						{
 							$value = '0001-01-01';
 						}
 						else
 						{
-							$value = checkdate($value, $_POST['bday2'], max($_POST['bday3'], 4)) ? sprintf('%04d-%02d-%02d', max($_POST['bday3'], 4), $_POST['bday1'], $_POST['bday2']) : '0001-01-01';
+							$value = checkdate($bday1, $bday2, max($bday3, 4)) ? sprintf('%04d-%02d-%02d', max($bday3, 4), $bday1, $bday2) : '0001-01-01';
 						}
 					}
 					else
@@ -322,28 +352,6 @@ class ProfileFields
 					$cur_profile['birthdate'] = $value;
 
 					return false;
-				},
-			],
-			// Setting the birth date the old style way?
-			'birthdate' => [
-				'type' => 'hidden',
-				'permission' => 'profile_extra',
-				'input_validate' => function (&$value) {
-					global $cur_profile;
-
-					// @todo Should we check for this year and tell them they made a mistake :P? (based on coppa at least?)
-					if (preg_match('/(\d{4})[\-\., ](\d{2})[\-\., ](\d{2})/', $value, $dates) === 1)
-					{
-						$value = checkdate($dates[2], $dates[3], max($dates[1], 4)) ? sprintf('%04d-%02d-%02d', max($dates[1], 4), $dates[2], $dates[3]) : '0001-01-01';
-
-						return true;
-					}
-					else
-					{
-						$value = empty($cur_profile['birthdate']) ? '0001-01-01' : $cur_profile['birthdate'];
-
-						return false;
-					}
 				},
 			],
 			'date_registered' => [
@@ -362,8 +370,9 @@ class ProfileFields
 
 						return $txt['invalid_registration'] . ' ' . Util::strftime('%d %b %Y ' . (strpos(User::$info->time_format, '%H') !== false ? '%I:%M:%S %p' : '%H:%M:%S'), forum_time(false));
 					}
+
 					// As long as it doesn't equal "N/A"...
-					elseif ($value !== $txt['not_applicable'] && $value !== strtotime(Util::strftime('%Y-%m-%d', $cur_profile['date_registered'] + (User::$info->time_offset + $modSettings['time_offset']) * 3600)))
+					if ($value !== $txt['not_applicable'] && $value !== strtotime(Util::strftime('%Y-%m-%d', $cur_profile['date_registered'] + (User::$info->time_offset + $modSettings['time_offset']) * 3600)))
 					{
 						$value -= (User::$info->time_offset + $modSettings['time_offset']) * 3600;
 					}
@@ -381,7 +390,7 @@ class ProfileFields
 				'subtext' => $txt['valid_email'],
 				'log_change' => true,
 				'permission' => 'profile_identity',
-				'input_validate' => function (&$value) {
+				'input_validate' => function ($value) {
 					global $context, $old_profile, $profile_vars, $modSettings;
 
 					if (strtolower($value) === strtolower($old_profile['email_address']))
@@ -537,12 +546,12 @@ class ProfileFields
 
 						// Maybe they are trying to change their password as well?
 						$resetPassword = true;
-						if (isset($_POST['passwrd1']) && $_POST['passwrd1'] !== '' && isset($_POST['passwrd2']) && $_POST['passwrd1'] === $_POST['passwrd2'] && validatePassword($_POST['passwrd1'], $value, [$cur_profile['real_name'], User::$info->username, User::$info->name, User::$info->email]) === null)
+						if (isset($_POST['passwrd1'], $_POST['passwrd2']) && $_POST['passwrd1'] !== '' && $_POST['passwrd1'] === $_POST['passwrd2'] && validatePassword($_POST['passwrd1'], $value, [$cur_profile['real_name'], User::$info->username, User::$info->name, User::$info->email]) === null)
 						{
 							$resetPassword = false;
 						}
 
-						// Do the reset... this will send them an email too.
+						// Do the reset... this will email them too.
 						if ($resetPassword)
 						{
 							resetPassword($context['id_member'], $value);
@@ -703,7 +712,7 @@ class ProfileFields
 						return 'digits_only';
 					}
 
-					$value = $check != '' ? $check : 0;
+					$value = $check !== '' ? $check : 0;
 
 					return true;
 				},
@@ -719,7 +728,7 @@ class ProfileFields
 				'input_validate' => function (&$value) {
 					global $context, $cur_profile;
 
-					$value = trim(preg_replace('~[\s]~u', ' ', $value));
+					$value = trim(preg_replace('~\s~u', ' ', $value));
 
 					if (trim($value) === '')
 					{
@@ -731,7 +740,7 @@ class ProfileFields
 						return 'name_too_long';
 					}
 
-					if ($cur_profile['real_name'] != $value)
+					if ($cur_profile['real_name'] !== $value)
 					{
 						require_once(SUBSDIR . '/Members.subs.php');
 						if (isReservedName($value, $context['id_member']))
@@ -855,7 +864,7 @@ class ProfileFields
 				},
 				'input_validate' => function (&$value) {
 					// Validate the time_offset...
-					$value = (float)strtr($value, ',', '.');
+					$value = (float)str_replace(',', '.', $value);
 
 					if ($value < -23.5 || $value > 23.5)
 					{
@@ -873,7 +882,7 @@ class ProfileFields
 				'size' => 50,
 				'permission' => 'profile_title',
 				'enabled' => !empty($modSettings['titlesEnable']),
-				'input_validate' => function (&$value) {
+				'input_validate' => function ($value) {
 					if (Util::strlen($value) > 50)
 					{
 						return 'user_title_too_long';
@@ -934,7 +943,7 @@ class ProfileFields
 			}
 
 			// Is it specifically disabled?
-			if (in_array($key, $disabled_fields) || (isset($field['link_with']) && in_array($field['link_with'], $disabled_fields)))
+			if (in_array($key, $disabled_fields, true) || (isset($field['link_with']) && in_array($field['link_with'], $disabled_fields, true)))
 			{
 				unset($profile_fields[$key]);
 			}
@@ -1073,7 +1082,7 @@ class ProfileFields
 				sort($additional_groups['new']);
 
 				// What about additional groups?
-				if ($additional_groups['previous'] != $additional_groups['new'])
+				if ($additional_groups['previous'] !== $additional_groups['new'])
 				{
 					foreach ($additional_groups as $type => $groups)
 					{
@@ -1129,8 +1138,6 @@ class ProfileFields
 	 */
 	public function profileValidateEmail($email, $memID = 0)
 	{
-		$db = database();
-
 		// Check the name and email for validity.
 		$check = [];
 		$check['email'] = strtr($email, ['&#039;' => '\'']);
@@ -1144,18 +1151,7 @@ class ProfileFields
 		}
 
 		// Email addresses should be and stay unique.
-		$num = $db->fetchQuery('
-		SELECT 
-			id_member
-		FROM {db_prefix}members
-		WHERE ' . ($memID != 0 ? 'id_member != {int:selected_member} AND ' : '') . '
-			email_address = {string:email_address}
-		LIMIT 1',
-			[
-				'selected_member' => $memID,
-				'email_address' => $email,
-			]
-		)->num_rows();
+		$num = isUniqueEmail($memID, $email);
 
 		return ($num > 0) ? 'email_taken' : true;
 	}

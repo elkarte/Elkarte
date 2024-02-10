@@ -27,19 +27,10 @@ use ElkArte\MembersList;
  */
 class ProfileHistory extends AbstractController
 {
-	/**
-	 * Member id for the history being viewed
-	 *
-	 * @var int
-	 */
+	/** @var int Member id for the history being viewed */
 	private $_memID = 0;
-
-	/**
-	 * The \ElkArte\Member object is stored here to avoid some global
-	 *
-	 * @var \ElkArte\Member
-	 */
-	private $_profile = null;
+	/** @var \ElkArte\Member The \ElkArte\Member object is stored here to avoid some global */
+	private $_profile;
 
 	/**
 	 * Called before all other methods when coming from the dispatcher or
@@ -296,7 +287,7 @@ class ProfileHistory extends AbstractController
 			$context['ip'] = trim($this->_req->query->searchip);
 		}
 
-		if (preg_match('/^\d{1,3}\.(\d{1,3}|\*)\.(\d{1,3}|\*)\.(\d{1,3}|\*)$/', $context['ip']) == 0
+		if (preg_match('/^\d{1,3}\.(\d{1,3}|\*)\.(\d{1,3}|\*)\.(\d{1,3}|\*)$/', $context['ip']) !== 1
 			&& isValidIPv6($context['ip']) === false)
 		{
 			throw new Exception('invalid_tracking_ip', false);
