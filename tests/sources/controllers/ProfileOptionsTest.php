@@ -1,11 +1,11 @@
 <?php
 
-use ElkArte\Controller\ProfileOptions;
 use ElkArte\EventManager;
+use ElkArte\Languages\Loader;
 use ElkArte\MembersList;
 use ElkArte\Menu\Menu;
+use ElkArte\Profile\ProfileOptions;
 use ElkArte\User;
-use ElkArte\Languages\Loader;
 
 /**
  * TestCase class for the Profile Options Controller

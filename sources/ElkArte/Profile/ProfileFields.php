@@ -37,36 +37,12 @@ class ProfileFields
 	 */
 	public function loadCustomFields($memID, $area = 'summary', array $custom_fields = [])
 	{
-		global $context, $txt, $settings, $scripturl;
+		global $context;
 
 		$context['custom_fields'] = [];
 		$context['custom_fields_required'] = false;
-		$bbc_parser = ParserWrapper::instance();
 
-		// Get the right restrictions in place...
-		$where = 'active = 1';
-		if ($area !== 'register' && !allowedTo('admin_forum'))
-		{
-			// If it's the owner they can see two types of private fields, regardless.
-			if ($memID === User::$info->id)
-			{
-				$where .= $area === 'summary' ? ' AND private < 3' : ' AND (private = 0 OR private = 2)';
-			}
-			else
-			{
-				$where .= $area === 'summary' ? ' AND private < 2' : ' AND private = 0';
-			}
-		}
-
-		if ($area === 'register')
-		{
-			$where .= ' AND show_reg != 0';
-		}
-		elseif ($area !== 'summary')
-		{
-			$where .= ' AND show_profile = {string:area}';
-		}
-
+		$where = $this->getProfileFieldWhereClause($area, $memID);
 		$data = getCustomFieldData($where, $area);
 		foreach ($data as $row)
 		{
@@ -85,19 +61,62 @@ class ProfileFields
 				}
 			}
 
-			// HTML for the input form.
-			$output_html = $value;
+			// Generate HTML for the various form inputs.
+			list($input_html, $output_html, $key) = $this->generateFormFieldHtml($row, $value);
+			$output_html = $this->postProcessOutputHtml($row, $output_html, $key);
 
-			// Checkbox inputs
-			if ($row['field_type'] === 'check')
+			$context['custom_fields_required'] = $context['custom_fields_required'] || $row['show_reg'];
+			$valid_areas = ['register', 'account', 'forumprofile', 'theme'];
+
+			if (($value === '' || $value === 'no_default') && !in_array($area, $valid_areas))
 			{
-				$true = (bool)$value;
+				continue;
+			}
+
+			$context['custom_fields'][] = [
+				'name' => $row['field_name'],
+				'desc' => $row['field_desc'],
+				'field_type' => $row['field_type'],
+				'input_html' => $input_html,
+				'output_html' => $output_html,
+				'placement' => $row['placement'],
+				'colname' => $row['col_name'],
+				'value' => $value,
+				'show_reg' => $row['show_reg'],
+				'field_length' => $row['field_length'],
+				'mask' => $row['mask'],
+			];
+		}
+
+		call_integration_hook('integrate_load_custom_profile_fields', [$memID, $area]);
+	}
+
+	/**
+	 * Generate HTML for a form field based on the given row and value.
+	 *
+	 * @param array $row - The row containing information about the field.
+	 * @param mixed $value - The current value of the field.
+	 *
+	 * @return array - An array containing the generated input HTML and the corresponding output HTML.
+	 */
+	private function generateFormFieldHtml($row, $value)
+	{
+		global $txt;
+
+		$output_html = $value;
+		$key = null;
+
+		// Implement form field HTML generation based on field_type
+		switch ($row['field_type'])
+		{
+			case 'check':
+				// generate HTML for checkbox
+				$true = (bool) $value;
 				$input_html = '<input id="' . $row['col_name'] . '" type="checkbox" name="customfield[' . $row['col_name'] . ']" ' . ($true ? 'checked="checked"' : '') . ' class="input_check" />';
 				$output_html = $true ? $txt['yes'] : $txt['no'];
-			}
-			// A select list
-			elseif ($row['field_type'] === 'select')
-			{
+				break;
+			case 'select':
+				// generate HTML for select
 				$input_html = '<select id="' . $row['col_name'] . '" name="customfield[' . $row['col_name'] . ']"><option value=""' . ($row['default_value'] === 'no_default' ? ' selected="selected"' : '') . '></option>';
 				$options = explode(',', $row['field_options']);
 
@@ -113,10 +132,9 @@ class ProfileFields
 				}
 
 				$input_html .= '</select>';
-			}
-			// Radio buttons
-			elseif ($row['field_type'] === 'radio')
-			{
+				break;
+			case 'radio':
+				// generate HTML for radio
 				$input_html = '<fieldset><legend>' . $row['field_name'] . '</legend>';
 				$options = explode(',', $row['field_options']);
 
@@ -132,11 +150,15 @@ class ProfileFields
 				}
 
 				$input_html .= '</fieldset>';
-			}
-			// A standard input field, including some html5 variants
-			elseif (in_array($row['field_type'], ['text', 'url', 'search', 'date', 'email', 'color']))
-			{
-				$row['field_length'] = (int)$row['field_length'];
+				break;
+			case 'text':
+			case 'url':
+			case 'search':
+			case 'date':
+			case 'email':
+			case 'color':
+				// A standard input field, including some html5 variants
+				$row['field_length'] = (int) $row['field_length'];
 				$input_html = '<input id="' . $row['col_name'] . '" type="' . $row['field_type'] . '" name="customfield[' . $row['col_name'] . ']"';
 
 				if ($row['field_length'])
@@ -162,10 +184,9 @@ class ProfileFields
 				}
 
 				$input_html .= ' value="' . $value . '" placeholder="' . $row['field_name'] . '" class="input_text" />';
-			}
-			// Only thing left, a textbox for you
-			else
-			{
+				break;
+			default:
+				// generate HTML for textarea
 				$input_html = '<textarea id="' . $row['col_name'] . '" name="customfield[' . $row['col_name'] . ']"';
 
 				if (!empty($row['rows']))
@@ -179,61 +200,10 @@ class ProfileFields
 				}
 
 				$input_html .= '>' . $value . '</textarea>';
-			}
-
-			// Parse BBCode
-			if ($row['bbc'])
-			{
-				$output_html = $bbc_parser->parseCustomFields($output_html);
-			}
-			// Allow for newlines at least
-			elseif ($row['field_type'] === 'textarea')
-			{
-				$output_html = strtr($output_html, ["\n" => '<br />']);
-			}
-
-			// Enclosing the user input within some other text?
-			if (!empty($row['enclose']) && !empty($output_html))
-			{
-				$replacements = [
-					'{SCRIPTURL}' => $scripturl,
-					'{IMAGES_URL}' => $settings['images_url'],
-					'{DEFAULT_IMAGES_URL}' => $settings['default_images_url'],
-					'{INPUT}' => $output_html,
-				];
-
-				if (in_array($row['field_type'], ['radio', 'select']))
-				{
-					$replacements['{KEY}'] = $row['col_name'] . '_' . ($key ?? 0);
-				}
-
-				$output_html = strtr($row['enclose'], $replacements);
-			}
-
-			$context['custom_fields_required'] = $context['custom_fields_required'] || $row['show_reg'];
-			$valid_areas = ['register', 'account', 'forumprofile', 'theme'];
-
-			if (!in_array($area, $valid_areas) && ($value === '' || $value === 'no_default'))
-			{
-				continue;
-			}
-
-			$context['custom_fields'][] = [
-				'name' => $row['field_name'],
-				'desc' => $row['field_desc'],
-				'field_type' => $row['field_type'],
-				'input_html' => $input_html,
-				'output_html' => $output_html,
-				'placement' => $row['placement'],
-				'colname' => $row['col_name'],
-				'value' => $value,
-				'show_reg' => $row['show_reg'],
-				'field_length' => $row['field_length'],
-				'mask' => $row['mask'],
-			];
+				break;
 		}
 
-		call_integration_hook('integrate_load_custom_profile_fields', [$memID, $area]);
+		return [$input_html, $output_html, $key];
 	}
 
 	/**
@@ -329,9 +299,9 @@ class ProfileFields
 					if (isset($_POST['bday1']))
 					{
 						$date_parts = explode('-', $_POST['bday1']);
-						$bday3 = (int) $date_parts[0]; // Year
-						$bday1 = (int) $date_parts[1]; // Month
-						$bday2 = (int) $date_parts[2]; // Day
+						$bday3 = (int)$date_parts[0]; // Year
+						$bday1 = (int)$date_parts[1]; // Month
+						$bday2 = (int)$date_parts[2]; // Day
 
 						// Set to blank?
 						if ($bday3 === 1 && $bday2 === 1 && $bday1 === 1)
@@ -1064,7 +1034,7 @@ class ProfileFields
 				profileLoadGroups();
 
 				// Any changes to primary group?
-				if ((int) $_POST['id_group'] !== (int) $old_profile['id_group'])
+				if ((int)$_POST['id_group'] !== (int)$old_profile['id_group'])
 				{
 					$context['log_changes']['id_group'] = [
 						'previous' => !empty($old_profile[$key]) && isset($context['member_groups'][$old_profile[$key]]) ? $context['member_groups'][$old_profile[$key]]['name'] : '',
@@ -1154,5 +1124,89 @@ class ProfileFields
 		$num = isUniqueEmail($memID, $email);
 
 		return ($num > 0) ? 'email_taken' : true;
+	}
+
+	/**
+	 * Get the WHERE clause for retrieving profile fields.
+	 *
+	 * @param string $area
+	 * @param int $memID
+	 *
+	 * @return string
+	 */
+	public function getProfileFieldWhereClause(string $area, int $memID): string
+	{
+		// Get the right restrictions in place...
+		$where = 'active = 1';
+		if ($area !== 'register' && !allowedTo('admin_forum'))
+		{
+			// If it's the owner they can see two types of private fields, regardless.
+			if ($memID === User::$info->id)
+			{
+				$where .= $area === 'summary' ? ' AND private < 3' : ' AND (private = 0 OR private = 2)';
+			}
+			else
+			{
+				$where .= $area === 'summary' ? ' AND private < 2' : ' AND private = 0';
+			}
+		}
+
+		if ($area === 'register')
+		{
+			$where .= ' AND show_reg != 0';
+		}
+		elseif ($area !== 'summary')
+		{
+			$where .= ' AND show_profile = {string:area}';
+		}
+
+		return $where;
+	}
+
+	/**
+	 * Do any post-processing to the output HTML for custom fields.
+	 *
+	 * @param array $row
+	 * @param string $output_html
+	 * @param string $key
+	 *
+	 * @return array
+	 */
+	public function postProcessOutputHtml($row, $output_html, $key)
+	{
+		global $scripturl, $settings;
+
+		// Parse BBCode
+		if ($row['bbc'])
+		{
+			$bbc_parser = ParserWrapper::instance();
+
+			$output_html = $bbc_parser->parseCustomFields($output_html);
+		}
+		// Allow for newlines at least
+		elseif ($row['field_type'] === 'textarea')
+		{
+			$output_html = strtr($output_html, ["\n" => '<br />']);
+		}
+
+		// Enclosing the user input within some other text?
+		if (!empty($row['enclose']) && !empty($output_html))
+		{
+			$replacements = [
+				'{SCRIPTURL}' => $scripturl,
+				'{IMAGES_URL}' => $settings['images_url'],
+				'{DEFAULT_IMAGES_URL}' => $settings['default_images_url'],
+				'{INPUT}' => $output_html,
+			];
+
+			if (in_array($row['field_type'], ['radio', 'select']))
+			{
+				$replacements['{KEY}'] = $row['col_name'] . '_' . ($key ?? 0);
+			}
+
+			$output_html = strtr($row['enclose'], $replacements);
+		}
+
+		return $output_html;
 	}
 }

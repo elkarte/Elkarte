@@ -1,9 +1,9 @@
 <?php
 
-use ElkArte\Controller\ProfileInfo;
 use ElkArte\EventManager;
-use ElkArte\User;
 use ElkArte\Languages\Loader;
+use ElkArte\Profile\ProfileInfo;
+use ElkArte\User;
 
 /**
  * TestCase class for the Profile Info Controller
