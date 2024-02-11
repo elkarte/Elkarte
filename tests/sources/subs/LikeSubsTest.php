@@ -9,7 +9,7 @@ use ElkArte\Languages\Loader;
  * WARNING. These tests work directly with the local database. Don't run
  * them if you need to keep your data untouched!
  */
-class LikeTest extends TestCase
+class LikeSubsTest extends TestCase
 {
 	protected $backupGlobalsExcludeList = ['user_info'];
 	public $id_topic;
