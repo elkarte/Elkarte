@@ -1,17 +1,18 @@
 <?php
 
-use ElkArte\Controller\Emailpost;
-use ElkArte\EventManager;
-use ElkArte\Themes\ThemeLoader;
-use ElkArte\Languages\Loader;
-
 /**
  * TestCase class for the EmailPost Controller
  *
  * WARNING. These tests work directly with the local database. Don't run
  * them local if you need to keep your data untouched!
  */
-class TestEmailPostController extends ElkArteCommonSetupTest
+
+use ElkArte\Controller\Emailpost;
+use ElkArte\EventManager;
+use ElkArte\Languages\Loader;
+use tests\ElkArteCommonSetupTest;
+
+class EmailPostTest extends ElkArteCommonSetupTest
 {
 	protected $backupGlobalsExcludeList = ['user_info'];
 	protected $data = '';

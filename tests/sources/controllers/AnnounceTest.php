@@ -1,16 +1,18 @@
 <?php
 
-use ElkArte\Controller\Announce;
-use ElkArte\EventManager;
-use ElkArte\User;
-
 /**
  * TestCase class for the Announce Controller
  *
  * WARNING. These tests work directly with the local database. Don't run
  * them local if you need to keep your data untouched!
  */
-class TestAnnounce extends ElkArteCommonSetupTest
+
+use ElkArte\Controller\Announce;
+use ElkArte\EventManager;
+use ElkArte\User;
+use tests\ElkArteCommonSetupTest;
+
+class AnnounceTest extends ElkArteCommonSetupTest
 {
 	protected $backupGlobalsExcludeList = ['user_info'];
 

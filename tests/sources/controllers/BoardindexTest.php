@@ -1,15 +1,17 @@
 <?php
 
-use ElkArte\Controller\BoardIndex;
-use ElkArte\EventManager;
-
 /**
  * TestCase class for the BoardIndex Controller
  *
  * WARNING. These tests work directly with the local database. Don't run
  * them local if you need to keep your data untouched!
  */
-class TestBoardIndex extends ElkArteCommonSetupTest
+
+use ElkArte\Controller\BoardIndex;
+use ElkArte\EventManager;
+use tests\ElkArteCommonSetupTest;
+
+class BoardIndexTest extends ElkArteCommonSetupTest
 {
 	protected $backupGlobalsExcludeList = ['user_info'];
 

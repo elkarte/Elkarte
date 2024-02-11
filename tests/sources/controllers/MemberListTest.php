@@ -1,17 +1,19 @@
 <?php
 
-use ElkArte\Controller\Memberlist;
-use ElkArte\EventManager;
-use ElkArte\HttpReq;
-use ElkArte\User;
-
 /**
  * TestCase class for the MemberList Controller
  *
  * WARNING. These tests work directly with the local database. Don't run
  * them local if you need to keep your data untouched!
  */
-class TestMemberListController extends ElkArteCommonSetupTest
+
+use ElkArte\Controller\Memberlist;
+use ElkArte\EventManager;
+use ElkArte\HttpReq;
+use ElkArte\User;
+use tests\ElkArteCommonSetupTest;
+
+class MemberListTest extends ElkArteCommonSetupTest
 {
 	protected $backupGlobalsExcludeList = ['user_info'];
 

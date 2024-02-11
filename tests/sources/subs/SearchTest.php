@@ -1,0 +1,301 @@
+<?php
+
+use ElkArte\Cache\Cache;
+use ElkArte\HttpReq;
+use ElkArte\Search\Search;
+use ElkArte\Search\SearchApiWrapper;
+use ElkArte\Search\SearchParams;
+use ElkArte\Search\WeightFactors;
+use ElkArte\User;
+use ElkArte\UserSettingsLoader;
+use ElkArte\ValuesContainer;
+use PHPUnit\Framework\TestCase;
+
+/**
+ * Class TestSearchclass
+ */
+class SearchTest extends TestCase
+{
+	protected $backupGlobalsExcludeList = ['user_info'];
+	protected $member_full_access;
+	protected $member_limited_access;
+
+	/**
+	 * Prepare what is necessary to use in these tests.
+	 *
+	 * setUpBeforeClass() is run automatically by the testing framework just once before any test method.
+	 */
+	public static function setUpBeforeClass(): void
+	{
+		// This is here to cheat with allowedTo
+		User::$info = new ValuesContainer([
+			'id' => 1,
+			'ip' => long2ip(rand(0, 2147483647)),
+			'is_admin' => true,
+			'is_guest' => false,
+			'possibly_robot' => false,
+			'groups' => array(0 => 1),
+			'permissions' => array('admin_forum'),
+		]);
+
+		// Create 2 boards
+		require_once(SUBSDIR . '/Boards.subs.php');
+		$board_all_access = createBoard([
+			'board_name' => 'Search 1',
+			'redirect' => '',
+			'move_to' => 'bottom',
+			'target_category' => 1,
+			'access_groups' => [0,1],
+			'deny_groups' => [],
+			'profile' => '1',
+			'inherit_permissions' => false,
+		]);
+
+		$board_limited_access = createBoard([
+			'board_name' => 'Search 2',
+			'redirect' => '',
+			'move_to' => 'bottom',
+			'target_category' => 1,
+			'access_groups' => [1],
+			'deny_groups' => [],
+			'profile' => '1',
+			'inherit_permissions' => false,
+		]);
+
+		// Create 3 users (actually 2)
+		// One user must have access to all the boards
+		// One user must have access to one board
+		// One user must have access to no boards (guests)
+		require_once(SUBSDIR . '/Members.subs.php');
+
+		$regOptions1 = [
+			'interface' => 'admin',
+			'username' => 'Search User 1',
+			'email' => 'search@email1.tld',
+			'password' => 'password',
+			'password_check' => 'password',
+			'check_reserved_name' => false,
+			'check_password_strength' => false,
+			'check_email_ban' => false,
+			'send_welcome_email' => false,
+			'require' => 'nothing',
+			'memberGroup' => 1,
+			'ip' => long2ip(rand(0, 2147483647)),
+			'ip2' => long2ip(rand(0, 2147483647)),
+			'auth_method' => 'password',
+		];
+		$member_full_access = registerMember($regOptions1);
+
+		$regOptions2 = [
+			'interface' => 'admin',
+			'username' => 'Search User 2',
+			'email' => 'search@email2.tld',
+			'password' => 'password',
+			'password_check' => 'password',
+			'check_reserved_name' => false,
+			'check_password_strength' => false,
+			'check_email_ban' => false,
+			'send_welcome_email' => false,
+			'require' => 'nothing',
+			'memberGroup' => 0,
+			'ip' => long2ip(rand(0, 2147483647)),
+			'ip2' => long2ip(rand(0, 2147483647)),
+			'auth_method' => 'password',
+		];
+		registerMember($regOptions2);
+
+		// Create 2 topics, one for each board
+		require_once(SUBSDIR . '/Post.subs.php');
+		$msgOptions = [
+			'id' => 0,
+			'subject' => 'Visible search topic',
+			'body' => 'Visible search topic',
+			'icon' => '',
+			'smileys_enabled' => true,
+			'approved' => true,
+		];
+		$topicOptions = [
+			'id' => 0,
+			'board' => $board_all_access,
+			'lock_mode' => null,
+			'sticky_mode' => null,
+			'mark_as_read' => true,
+			'is_approved' => true,
+		];
+		$posterOptions = [
+			'id' => $member_full_access,
+			'ip' => long2ip(rand(0, 2147483647)),
+			'name' => 'guestname',
+			'email' => $regOptions1['email'],
+			'update_post_count' => false,
+		];
+		createPost($msgOptions, $topicOptions, $posterOptions);
+
+		$msgOptions = [
+			'id' => 0,
+			'subject' => 'Hidden search topic',
+			'body' => 'Hidden search topic',
+			'icon' => '',
+			'smileys_enabled' => true,
+			'approved' => true,
+		];
+		$topicOptions = [
+			'id' => 0,
+			'board' => $board_limited_access,
+			'lock_mode' => null,
+			'sticky_mode' => null,
+			'mark_as_read' => true,
+			'is_approved' => true,
+		];
+		$posterOptions = [
+			'id' => $member_full_access,
+			'ip' => long2ip(rand(0, 2147483647)),
+			'name' => 'guestname',
+			'email' => $regOptions1['email'],
+			'update_post_count' => false,
+		];
+		createPost($msgOptions, $topicOptions, $posterOptions);
+	}
+
+	/**
+	 * Initialize or add whatever necessary for these tests
+	 */
+	protected function setUp(): void
+	{
+		require_once(SUBSDIR . '/Auth.subs.php');
+
+		$this->member_full_access = userByEmail('search@email1.tld');
+		$this->member_limited_access = userByEmail('search@email2.tld');
+	}
+
+	/**
+	 * Admins are able to find both topics
+	 */
+	public function testBasicAdminSearch()
+	{
+		$this->assertIsInt($this->member_full_access, 'Admin member not found ' . $this->member_full_access);
+		$this->loadUser($this->member_full_access);
+
+		$topics = $this->_performSearch();
+		$this->assertCount(2, $topics, 'Admin search results not correct, found ' . count($topics) . ' instead of 2');
+	}
+
+	/**
+	 * Normal users with access to one of the two boards are able to find
+	 * only one topic
+	 */
+	public function testBasicMemberSearch()
+	{
+		$this->assertIsInt($this->member_limited_access, 'Limited member not found ' . $this->member_limited_access);
+		$this->loadUser($this->member_limited_access);
+
+		$topics = $this->_performSearch();
+		$this->assertCount(1, $topics, 'Normal member search results not correct, found ' . count($topics) . ' instead of 1');
+	}
+
+	/**
+	 * Guests do not have access to the boards, so they cannot find any result
+	 */
+	public function testBasicGuestSearch()
+	{
+		$this->loadUser(0);
+
+		$this->expectException('\Exception');
+		$this->expectExceptionMessage('query_not_specific_enough');
+		$topics = $this->_performSearch();
+
+		$this->assertCount(0, $topics, 'Guest search results not correct, found ' . count($topics) . ' instead of 0');
+	}
+
+	protected function loadUser($id)
+	{
+		$db = database();
+		$cache = Cache::instance();
+		$req = request();
+
+		$user = new UserSettingsLoader($db, $cache, $req);
+		$user->loadUserById($id, true, '');
+		User::reloadByUser($user);
+	}
+
+	/**
+	 * Sets up the search parameters, runs search, and returns the results
+	 *
+	 * @return array
+	 * @throws \ElkArte\Exceptions\Exception
+	 */
+	protected function _performSearch()
+	{
+		global $modSettings, $context;
+
+		$recentPercentage = 0.30;
+		$maxMembersToSearch = 500;
+		$humungousTopicPosts = 200;
+		$shortTopicPosts = 5;
+
+		$maxMessageResults = empty($modSettings['search_max_results']) ? 0 : $modSettings['search_max_results'];
+		$search_terms = [
+			'search' => 'search',
+			'search_selection' => 'all',
+			'advanced' => 0
+		];
+
+		$req = HttpReq::instance();
+		$req->query['search'] = $search_terms['search'];
+
+		$search = new Search();
+		$search->setWeights(new WeightFactors($modSettings, 1));
+		$search_params = new SearchParams('');
+		$search_params->merge($search_terms, $recentPercentage, $maxMembersToSearch);
+		$search->setParams($search_params, !empty($modSettings['search_simple_fulltext']));
+		$context['params'] = $search->compileURLparams();
+
+		$search_config = new ValuesContainer(array(
+			'humungousTopicPosts' => $humungousTopicPosts,
+			'shortTopicPosts' => $shortTopicPosts,
+			'maxMessageResults' => $maxMessageResults,
+			'search_index' => !empty($modSettings['search_index']) ? $modSettings['search_index'] : '',
+			'banned_words' => empty($modSettings['search_banned_words']) ? array() : explode(',', $modSettings['search_banned_words']),
+		));
+
+		return $search->searchQuery(
+			new SearchApiWrapper($search_config, $search->getSearchParams())
+		);
+	}
+
+	protected function _getSalt($member)
+	{
+		$db = database();
+
+		if (empty($member))
+		{
+			return '';
+		}
+
+		$res = $db->fetchQuery('
+			SELECT 
+				passwd, password_salt
+			FROM {db_prefix}members
+			where id_member = {int:id_member}',
+			array(
+				'id_member' => $member
+			)
+		)->fetch_all();
+
+		if (empty($res))
+		{
+			return '';
+		}
+
+		return hash('sha256', ($res[0]['passwd'] . $res[0]['password_salt']));
+	}
+
+	/**
+	 * cleanup data we no longer need at the end of the tests in this class.
+	 *
+	 * tearDown() is run automatically by the testing framework after each test method.
+	 */
+	protected function tearDown(): void
+	{
+	}
+}

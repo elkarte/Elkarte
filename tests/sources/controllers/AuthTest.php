@@ -1,16 +1,18 @@
 <?php
 
-use ElkArte\Controller\Auth;
-use ElkArte\EventManager;
-use ElkArte\User;
-
 /**
  * TestCase class for the Auth Controller
  *
  * WARNING. These tests work directly with the local database. Don't run
  * them local if you need to keep your data untouched!
  */
-class TestAuth extends ElkArteCommonSetupTest
+
+use ElkArte\Controller\Auth;
+use ElkArte\EventManager;
+use ElkArte\User;
+use tests\ElkArteCommonSetupTest;
+
+class AuthTest extends ElkArteCommonSetupTest
 {
 	protected $backupGlobalsExcludeList = ['user_info'];
 

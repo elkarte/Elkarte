@@ -1,18 +1,20 @@
 <?php
 
-use ElkArte\Controller\Draft;
-use ElkArte\EventManager;
-use ElkArte\Menu\Menu;
-use ElkArte\User;
-use ElkArte\Languages\Loader;
-
 /**
  * TestCase class for the Draft Controller
  *
  * WARNING. These tests work directly with the local database. Don't run
  * them local if you need to keep your data untouched!
  */
-class TestDraft extends ElkArteCommonSetupTest
+
+use ElkArte\Controller\Draft;
+use ElkArte\EventManager;
+use ElkArte\Languages\Loader;
+use ElkArte\Menu\Menu;
+use ElkArte\User;
+use tests\ElkArteCommonSetupTest;
+
+class DraftTest extends ElkArteCommonSetupTest
 {
 	protected $backupGlobalsExcludeList = ['user_info'];
 

@@ -1,16 +1,17 @@
 <?php
+/**
+ * TestCase class for the Likes Controller
+ */
 
 use ElkArte\Controller\Likes;
 use ElkArte\EventManager;
 use ElkArte\HttpReq;
+use ElkArte\Languages\Loader;
 use ElkArte\Menu\Menu;
 use ElkArte\User;
-use ElkArte\Languages\Loader;
+use tests\ElkArteCommonSetupTest;
 
-/**
- * TestCase class for the Likes Controller
- */
-class TestLike extends ElkArteCommonSetupTest
+class LikeTest extends ElkArteCommonSetupTest
 {
 	protected $backupGlobalsExcludeList = ['user_info'];
 

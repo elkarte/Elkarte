@@ -1,16 +1,16 @@
 <?php
 
+/**
+ * TestCase class for the admin search
+ */
+
 use ElkArte\HttpReq;
 use ElkArte\SiteDispatcher;
-use ElkArte\Themes\ThemeLoader;
 use ElkArte\User;
 use ElkArte\Languages\Loader;
 use PHPUnit\Framework\TestCase;
 
-/**
- * TestCase class for the admin search
- */
-class TestAdminSearch extends TestCase
+class AdminSearchTest extends TestCase
 {
 	protected $backupGlobalsExcludeList = ['user_info'];
 

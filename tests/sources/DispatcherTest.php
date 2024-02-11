@@ -1,5 +1,15 @@
 <?php
 
+/**
+ * TestCase class for dispatching.
+ *
+ * The few tests here test that for the actions known to us,
+ * things can be found, and all expected methods exist.
+ * Potentially useful during refactoring, as it will fail on us and
+ * force to check that all expected subactions are still routed, and
+ * update it.
+ */
+
 use ElkArte\AdminController\Admin;
 use ElkArte\Controller\Announce;
 use ElkArte\Controller\Attachment;
@@ -20,15 +30,6 @@ use ElkArte\SiteDispatcher;
 use ElkArte\User;
 use PHPUnit\Framework\TestCase;
 
-/**
- * TestCase class for dispatching.
- *
- * The few tests here test that for the actions known to us,
- * things can be found, and all expected methods exist.
- * Potentially useful during refactoring, as it will fail on us and
- * force to check that all expected subactions are still routed, and
- * update it.
- */
 class DispatcherTest extends TestCase
 {
 	protected $backupGlobalsExcludeList = ['user_info'];

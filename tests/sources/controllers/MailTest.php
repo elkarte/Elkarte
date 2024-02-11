@@ -1,16 +1,18 @@
 <?php
 
-use ElkArte\Mail\BuildMail;
-use ElkArte\Mail\PreparseMail;
-use ElkArte\Languages\Loader;
-
 /**
  * TestCase class for the PreparseMail and BuildMail Controllers
  *
  * WARNING. These tests work directly with the local database. Don't run
  * them local if you need to keep your data untouched!
  */
-class TestMail extends ElkArteCommonSetupTest
+
+use ElkArte\Languages\Loader;
+use ElkArte\Mail\BuildMail;
+use ElkArte\Mail\PreparseMail;
+use tests\ElkArteCommonSetupTest;
+
+class MailTest extends ElkArteCommonSetupTest
 {
 	protected $backupGlobalsExcludeList = ['user_info'];
 	protected $data = '';

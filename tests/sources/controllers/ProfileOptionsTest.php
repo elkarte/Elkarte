@@ -1,16 +1,18 @@
 <?php
 
+/**
+ * TestCase class for the Profile Options Controller
+ */
+
 use ElkArte\EventManager;
 use ElkArte\Languages\Loader;
 use ElkArte\MembersList;
 use ElkArte\Menu\Menu;
 use ElkArte\Profile\ProfileOptions;
 use ElkArte\User;
+use tests\ElkArteCommonSetupTest;
 
-/**
- * TestCase class for the Profile Options Controller
- */
-class TestProfileOptions extends ElkArteCommonSetupTest
+class ProfileOptionsTest extends ElkArteCommonSetupTest
 {
 	protected $backupGlobalsExcludeList = ['user_info'];
 
