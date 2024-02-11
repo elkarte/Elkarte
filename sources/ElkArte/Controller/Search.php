@@ -142,7 +142,7 @@ class Search extends AbstractController
 		{
 			theme()->getTemplates()->load('Search');
 			$context['sub_template'] = 'searchform';
-			loadJavascriptFile('suggest.js');
+			loadJavascriptFile('suggest.js', array('defer' => true));
 		}
 
 		// Check the user's permissions.

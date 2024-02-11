@@ -512,7 +512,7 @@ class ManageBans extends AbstractController
 				else
 				{
 					$context['use_autosuggest'] = true;
-					loadJavascriptFile('suggest.js');
+					loadJavascriptFile('suggest.js', array('defer' => true));
 				}
 			}
 		}
@@ -905,7 +905,7 @@ class ManageBans extends AbstractController
 		}
 
 		// The template uses the autosuggest functions
-		loadJavascriptFile('suggest.js');
+		loadJavascriptFile('suggest.js', array('defer' => true));;
 
 		// Template we will use
 		$context['sub_template'] = 'ban_edit_trigger';

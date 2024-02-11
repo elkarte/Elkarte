@@ -859,7 +859,7 @@ class ManageBoards extends AbstractController
 		{
 			$context['sub_template'] = 'modify_board';
 			$context['page_title'] = $txt['boardsEdit'];
-			loadJavascriptFile('suggest.js');
+			loadJavascriptFile('suggest.js', array('defer' => true));
 		}
 		else
 		{

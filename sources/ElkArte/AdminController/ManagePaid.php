@@ -612,7 +612,7 @@ class ManagePaid extends AbstractController
 		// Setup the template.
 		$context['sub_template'] = 'modify_user_subscription';
 		$context['page_title'] = $txt[$context['action_type'] . '_subscriber'];
-		loadJavascriptFile('suggest.js');
+		loadJavascriptFile('suggest.js', array('defer' => true));
 
 		// If we haven't been passed the subscription ID get it.
 		if ($context['log_id'] && !$context['sub_id'])
