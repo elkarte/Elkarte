@@ -157,13 +157,17 @@ function template_searchform()
 		createEventListener(window);
 		window.addEventListener("load", initSearch, false);
 
-		new smc_AutoSuggest({
-			sSessionId: elk_session_id,
-			sSessionVar: elk_session_var,
-			sControlId: \'userspec\',
-			sSearchType: \'member\',
-			bItemList: false
-		});
+		isFunctionLoaded("smc_AutoSuggest").then((available) => { 
+			if (available) {
+				new smc_AutoSuggest({
+					sSessionId: elk_session_id,
+					sSessionVar: elk_session_var,
+					sControlId: \'userspec\',
+					sSearchType: \'member\',
+					bItemList: false
+				});
+			}
+		});		
 
 		// Set the search style
 		document.getElementById(\'advanced\').value = "' . (empty($context['minmax_preferences']['asearch']) ? '1' : '0') . '";

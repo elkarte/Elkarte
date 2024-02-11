@@ -143,32 +143,36 @@ function template_email_members()
 			}
 		});
 
-		new smc_AutoSuggest({
-			sSessionId: elk_session_id,
-			sSessionVar: elk_session_var,
-			sSuggestId: \'members\',
-			sControlId: \'members\',
-			sSearchType: \'member\',
-			bItemList: true,
-			sPostName: \'member_list\',
-			sURLMask: \'action=profile;u=%item_id%\',
-			sTextDeleteItem: ' . JavaScriptEscape($txt['autosuggest_delete_item']) . ',
-			sItemListContainerId: \'members_container\',
-			aListItems: []
-		});
+		isFunctionLoaded("smc_AutoSuggest").then((available) => { 
+			if (available) {
+				new smc_AutoSuggest({
+					sSessionId: elk_session_id,
+					sSessionVar: elk_session_var,
+					sSuggestId: \'members\',
+					sControlId: \'members\',
+					sSearchType: \'member\',
+					bItemList: true,
+					sPostName: \'member_list\',
+					sURLMask: \'action=profile;u=%item_id%\',
+					sTextDeleteItem: ' . JavaScriptEscape($txt['autosuggest_delete_item']) . ',
+					sItemListContainerId: \'members_container\',
+					aListItems: []
+				});
 
-		new smc_AutoSuggest({
-			sSessionId: elk_session_id,
-			sSessionVar: elk_session_var,
-			sSuggestId: \'exclude_members\',
-			sControlId: \'exclude_members\',
-			sSearchType: \'member\',
-			bItemList: true,
-			sPostName: \'exclude_member_list\',
-			sURLMask: \'action=profile;u=%item_id%\',
-			sTextDeleteItem: ' . JavaScriptEscape($txt['autosuggest_delete_item']) . ',
-			sItemListContainerId: \'exclude_members_container\',
-			aListItems: []
+				new smc_AutoSuggest({
+					sSessionId: elk_session_id,
+					sSessionVar: elk_session_var,
+					sSuggestId: \'exclude_members\',
+					sControlId: \'exclude_members\',
+					sSearchType: \'member\',
+					bItemList: true,
+					sPostName: \'exclude_member_list\',
+					sURLMask: \'action=profile;u=%item_id%\',
+					sTextDeleteItem: ' . JavaScriptEscape($txt['autosuggest_delete_item']) . ',
+					sItemListContainerId: \'exclude_members_container\',
+					aListItems: []
+				});
+			}
 		});', true);
 }
 

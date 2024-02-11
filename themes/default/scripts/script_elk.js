@@ -2351,4 +2351,4 @@ async function isFunctionLoaded(selector, limit)
 	}
 
 	return false;
-};
+}

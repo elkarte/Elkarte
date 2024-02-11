@@ -730,18 +730,20 @@ function template_modify_board()
 	</div>';
 
 	$js = '
-		new smc_AutoSuggest({
-			sSessionId: elk_session_id,
-			sSessionVar: elk_session_var,
-			sSuggestId: \'moderators\',
-			sControlId: \'moderators\',
-			sSearchType: \'member\',
-			bItemList: true,
-			sPostName: \'moderator_list\',
-			sURLMask: \'action=profile;u=%item_id%\',
-			sTextDeleteItem: ' . JavaScriptEscape($txt['autosuggest_delete_item']) . ',
-			sItemListContainerId: \'moderator_container\',
-			aListItems: [';
+		isFunctionLoaded("smc_AutoSuggest").then((available) => { 
+		if (available) {
+			new smc_AutoSuggest({
+				sSessionId: elk_session_id,
+				sSessionVar: elk_session_var,
+				sSuggestId: \'moderators\',
+				sControlId: \'moderators\',
+				sSearchType: \'member\',
+				bItemList: true,
+				sPostName: \'moderator_list\',
+				sURLMask: \'action=profile;u=%item_id%\',
+				sTextDeleteItem: ' . JavaScriptEscape($txt['autosuggest_delete_item']) . ',
+				sItemListContainerId: \'moderator_container\',
+				aListItems: [';
 
 	foreach ($context['board']['moderators'] as $id_member => $member_name)
 	{
@@ -754,6 +756,8 @@ function template_modify_board()
 
 	$js .= '
 			]
+				});
+			}
 		});';
 
 	theme()->addInlineJavascript($js, true);

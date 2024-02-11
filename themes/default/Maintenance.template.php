@@ -274,15 +274,19 @@ function template_maintain_members()
 	</div>
 
 	<script>
-		new smc_AutoSuggest({
-			sSessionId: elk_session_id,
-			sSessionVar: elk_session_var,
-			sSuggestId: \'attributeMember\',
-			sControlId: \'to\',
-			sSearchType: \'member\',
-			sTextDeleteItem: ', JavaScriptEscape($txt['autosuggest_delete_item']), ',
-			bItemList: false
-		});
+		isFunctionLoaded("smc_AutoSuggest").then((available) => { 
+			if (available) {
+				new smc_AutoSuggest({
+					sSessionId: elk_session_id,
+					sSessionVar: elk_session_var,
+					sSuggestId: \'attributeMember\',
+					sControlId: \'to\',
+					sSearchType: \'member\',
+					sTextDeleteItem: ', JavaScriptEscape($txt['autosuggest_delete_item']), ',
+					bItemList: false
+				});
+			}
+		});	
 	</script>';
 }
 

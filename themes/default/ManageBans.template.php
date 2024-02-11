@@ -195,15 +195,19 @@ function template_ban_edit()
 	{
 		echo '
 	<script>
-		new smc_AutoSuggest({
-			sSessionId: elk_session_id,
-			sSessionVar: elk_session_var,
-			sSuggestId: \'user\',
-			sControlId: \'user\',
-			sSearchType: \'member\',
-			sTextDeleteItem: ', JavaScriptEscape($txt['autosuggest_delete_item']), ',
-			bItemList: false
-		});
+		isFunctionLoaded("smc_AutoSuggest").then((available) => { 
+			if (available) {
+				new smc_AutoSuggest({
+					sSessionId: elk_session_id,
+					sSessionVar: elk_session_var,
+					sSuggestId: \'user\',
+					sControlId: \'user\',
+					sSearchType: \'member\',
+					sTextDeleteItem: ', JavaScriptEscape($txt['autosuggest_delete_item']), ',
+					bItemList: false
+				});
+			}
+		});		
 
 		oAddMemberSuggest.registerCallback(\'onBeforeUpdate\', \'onUpdateName\');
 	</script>';
@@ -278,15 +282,19 @@ function template_ban_edit_trigger()
 	</div>
 
 	<script>
-		new smc_AutoSuggest({
-			sSessionId: elk_session_id,
-			sSessionVar: elk_session_var,
-			sSuggestId: \'username\',
-			sControlId: \'user\',
-			sSearchType: \'member\',
-			sTextDeleteItem: ', JavaScriptEscape($txt['autosuggest_delete_item']), ',
-			bItemList: false
-		});
+		isFunctionLoaded("smc_AutoSuggest").then((available) => { 
+			if (available) {
+				new smc_AutoSuggest({
+					sSessionId: elk_session_id,
+					sSessionVar: elk_session_var,
+					sSuggestId: \'username\',
+					sControlId: \'user\',
+					sSearchType: \'member\',
+					sTextDeleteItem: ', JavaScriptEscape($txt['autosuggest_delete_item']), ',
+					bItemList: false
+				});
+			}
+		});		
 
 		oAddMemberSuggest.registerCallback(\'onBeforeUpdate\', \'onUpdateName\');
 	</script>';

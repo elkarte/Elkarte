@@ -355,15 +355,19 @@ function template_modify_user_subscription()
 		</form>';
 
 	theme()->addInlineJavascript('
-		new smc_AutoSuggest({
-			sSessionId: elk_session_id,
-			sSessionVar: elk_session_var,
-			sSuggestId: \'name_subscriber\',
-			sControlId: \'name_control\',
-			sSearchType: \'member\',
-			sTextDeleteItem: ' . JavaScriptEscape($txt['autosuggest_delete_item']) . ',
-			bItemList: false
-			});', true);
+		isFunctionLoaded("smc_AutoSuggest").then((available) => { 
+		if (available) {
+			new smc_AutoSuggest({
+				sSessionId: elk_session_id,
+				sSessionVar: elk_session_var,
+				sSuggestId: \'name_subscriber\',
+				sControlId: \'name_control\',
+				sSearchType: \'member\',
+				sTextDeleteItem: ' . JavaScriptEscape($txt['autosuggest_delete_item']) . ',
+				bItemList: false
+				});
+			}
+		})', true);
 
 	// If we have pending payments for this user, show them
 	if (!empty($context['pending_payments']))
