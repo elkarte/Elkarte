@@ -3,7 +3,7 @@
 use BBC\HtmlParser;
 use PHPUnit\Framework\TestCase;
 
-class BBCHTMLSubsTest extends TestCase
+class BBCHTMLSubsTest extends \tests\ElkArteCommonSetupTest
 {
 	protected $bbcTestCases;
 	protected $backupGlobalsExcludeList = ['user_info'];
@@ -15,7 +15,9 @@ class BBCHTMLSubsTest extends TestCase
 	 */
 	protected function setUp(): void
 	{
-		$GLOBALS['modSettings']['user_access_mentions'] = array();
+		parent::setUp();
+
+		$GLOBALS['modSettings']['user_access_mentions'] = [];
 		$GLOBALS['modSettings']['enablePostHTML'] = 1;
 
 		new ElkArte\Themes\ThemeLoader();
@@ -46,11 +48,10 @@ class BBCHTMLSubsTest extends TestCase
 	}
 
 	/**
-	 * testBBHTMLcode, parse html bbcode and checks that the results are what we expect
+	 * testBBHTM code, parse html bbcode and checks that the results are what we expect
 	 */
 	public function testBBHTML()
 	{
-
 		$parser = new HtmlParser;
 
 		foreach ($this->bbcTestCases as $testcase)

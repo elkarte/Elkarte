@@ -49,7 +49,7 @@ class CalendarTest extends ElkArteCommonSetupTest
 		$this->assertStringContainsString('You cannot access the calendar right now because it is disabled', $check);
 
 		// Try again with it on
-		// Unfortunately the Calendar_Event.class.test has a section of mock functions which will cause
+		// Unfortunately the CalendarEventTest has a section of mock functions which will cause
 		// fatal errors here when Calendar.subs.php is properly loaded due to duplicate function names.
 
 		//$modSettings['cal_enabled'] = 1;

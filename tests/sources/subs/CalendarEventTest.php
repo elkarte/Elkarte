@@ -27,7 +27,7 @@ class CalendarEventTest extends ElkArteCommonSetupTest
 	{
 		unlink(SUBSDIR . '/Calendar.subs.php');
 		rename(SUBSDIR . '/Calendar_tmp.subs.php', SUBSDIR . '/Calendar.subs.php');
-		rename(BOARDDIR . '/tests/sources/subs/Calendar_Event.class.Test.php', BOARDDIR . '/tests/sources/subs/Calendar_Event.class.Test.tmp');
+		rename(BOARDDIR . '/tests/sources/subs/CalendarEventTest.php', BOARDDIR . '/tests/sources/subs/CalendarEventTest.tmp');
 	}
 
 	protected function setUp(): void
