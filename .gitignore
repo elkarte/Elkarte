@@ -35,3 +35,4 @@ testcases*/
 /sources/ElkArte/Languages/*
 !/sources/ElkArte/Languages/*/English.php
 test*.php
+.phpunit.result.cache
