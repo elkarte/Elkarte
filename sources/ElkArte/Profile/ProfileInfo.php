@@ -15,16 +15,16 @@
  *
  */
 
-namespace ElkArte\Controller;
+namespace ElkArte\Profile;
 
 use BBC\ParserWrapper;
 use ElkArte\AbstractController;
 use ElkArte\Action;
 use ElkArte\Exceptions\Exception;
 use ElkArte\FileFunctions;
+use ElkArte\Languages\Txt;
 use ElkArte\MembersList;
 use ElkArte\MessagesDelete;
-use ElkArte\Languages\Txt;
 use ElkArte\Util;
 
 /**
@@ -35,10 +35,8 @@ class ProfileInfo extends AbstractController
 {
 	/** @var int Member id for the profile being worked with */
 	private $_memID = 0;
-
 	/** @var \ElkArte\Member The \ElkArte\Member object is stored here to avoid some global */
-	private $_profile = null;
-
+	private $_profile;
 	/** @var array Holds the current summary tabs to load */
 	private $_summary_areas;
 
@@ -60,7 +58,7 @@ class ProfileInfo extends AbstractController
 
 		if (!isset($context['user']['is_owner']))
 		{
-			$context['user']['is_owner'] = (int) $this->_memID === (int) $this->user->id;
+			$context['user']['is_owner'] = $this->_memID === (int) $this->user->id;
 		}
 
 		// Attempt to load the member's profile data.
@@ -84,11 +82,11 @@ class ProfileInfo extends AbstractController
 		global $context;
 
 		// What do we do, do you even know what you do?
-		$subActions = array(
-			'buddies' => array($this, 'action_profile_buddies'),
-			'recent' => array($this, 'action_profile_recent'),
-			'summary' => array('controller' => '\\ElkArte\\Controller\\Profile', 'function' => 'action_index'),
-		);
+		$subActions = [
+			'buddies' => [$this, 'action_profile_buddies'],
+			'recent' => [$this, 'action_profile_recent'],
+			'summary' => ['controller' => Profile::class, 'function' => 'action_index'],
+		];
 
 		// Action control
 		$action = new Action('profile_info');
@@ -124,7 +122,7 @@ class ProfileInfo extends AbstractController
 		$context['canonical_url'] = getUrl('action', ['action' => 'profile', 'u' => $this->_memID]);
 
 		// Are there things we don't show?
-		$context['disabled_fields'] = isset($modSettings['disabled_profile_fields']) ? array_flip(explode(',', $modSettings['disabled_profile_fields'])) : array();
+		$context['disabled_fields'] = isset($modSettings['disabled_profile_fields']) ? array_flip(explode(',', $modSettings['disabled_profile_fields'])) : [];
 
 		// Disable Menu tab
 		$context[$context['profile_menu_name']]['tab_data'] = [];
@@ -137,7 +135,8 @@ class ProfileInfo extends AbstractController
 		$this->_load_summary();
 
 		// To finish this off, custom profile fields.
-		loadCustomFields($this->_memID);
+		$profileFields = new ProfileFields();
+		$profileFields->loadCustomFields($this->_memID);
 	}
 
 	/**
@@ -155,32 +154,32 @@ class ProfileInfo extends AbstractController
 	{
 		global $txt, $context, $modSettings;
 
-		$context['summarytabs'] = array(
-			'summary' => array(
+		$context['summarytabs'] = [
+			'summary' => [
 				'name' => $txt['summary'],
-				'templates' => array(
-					array('summary', 'user_info'),
-					array('contact', 'other_info'),
-					array('user_customprofileinfo', 'moderation'),
-				),
+				'templates' => [
+					['summary', 'user_info'],
+					['contact', 'other_info'],
+					['user_customprofileinfo', 'moderation'],
+				],
 				'active' => true,
-			),
-			'recent' => array(
+			],
+			'recent' => [
 				'name' => $txt['profile_recent_activity'],
-				'templates' => array('posts', 'topics', 'attachments'),
+				'templates' => ['posts', 'topics', 'attachments'],
 				'active' => true,
-				'href' => getUrl('action', ['action' => 'profileInfo', 'sa' => 'recent', 'api' => 'html', 'u' => $this->_memID, '{session_data}']),
-			),
-			'buddies' => array(
+				'href' => getUrl('action', ['action' => 'profileinfo', 'sa' => 'recent', 'api' => 'html', 'u' => $this->_memID, '{session_data}']),
+			],
+			'buddies' => [
 				'name' => $txt['buddies'],
-				'templates' => array('buddies'),
+				'templates' => ['buddies'],
 				'active' => !empty($modSettings['enable_buddylist']) && $context['user']['is_owner'],
-				'href' => getUrl('action', ['action' => 'profileInfo', 'sa' => 'buddies', 'api' => 'html', 'u' => $this->_memID, '{session_data}']),
-			)
-		);
+				'href' => getUrl('action', ['action' => 'profileinfo', 'sa' => 'buddies', 'api' => 'html', 'u' => $this->_memID, '{session_data}']),
+			]
+		];
 
 		// Let addons add or remove to the tabs array
-		call_integration_hook('integrate_profile_summary', array($this->_memID));
+		call_integration_hook('integrate_profile_summary', [$this->_memID]);
 
 		// Go forward with whats left after integration adds or removes
 		$summary_areas = '';
@@ -214,14 +213,14 @@ class ProfileInfo extends AbstractController
 		global $context, $modSettings, $txt;
 
 		// Set up the context stuff and load the user.
-		$context += array(
+		$context += [
 			'page_title' => sprintf($txt['profile_of_username'], $this->_profile['name']),
 			'can_send_pm' => allowedTo('pm_send'),
 			'can_send_email' => allowedTo('send_email_to_members'),
 			'can_have_buddy' => allowedTo('profile_identity_own') && !empty($modSettings['enable_buddylist']),
 			'can_issue_warning' => featureEnabled('w') && allowedTo('issue_warning') && !empty($modSettings['warning_enable']),
-			'can_view_warning' => featureEnabled('w') && (allowedTo('issue_warning') && !$context['user']['is_owner']) || (!empty($modSettings['warning_show']) && ($modSettings['warning_show'] > 1 || $context['user']['is_owner']))
-		);
+			'can_view_warning' => featureEnabled('w') && ((allowedTo('issue_warning') && !$context['user']['is_owner']) || (!empty($modSettings['warning_show']) && ($modSettings['warning_show'] > 1 || $context['user']['is_owner'])))
+		];
 
 		// @critical: potential problem here
 		$context['member'] = $this->_profile;
@@ -229,7 +228,7 @@ class ProfileInfo extends AbstractController
 		$context['member']['id'] = $this->_memID;
 
 		// Is the signature even enabled on this forum?
-		$context['signature_enabled'] = substr($modSettings['signature_settings'], 0, 1) == 1;
+		$context['signature_enabled'] = strpos($modSettings['signature_settings'], 1) === 0;
 	}
 
 	/**
@@ -321,7 +320,7 @@ class ProfileInfo extends AbstractController
 		if (allowedTo('moderate_forum'))
 		{
 			// Make sure it's a valid ip address; otherwise, don't bother...
-			if (filter_var($this->_profile['ip'], FILTER_VALIDATE_IP, FILTER_FLAG_IPV4) === false && empty($modSettings['disableHostnameLookup']))
+			if (empty($modSettings['disableHostnameLookup']) && filter_var($this->_profile['ip'], FILTER_VALIDATE_IP, FILTER_FLAG_IPV4) === false)
 			{
 				$context['member']['hostname'] = host_from_ip($this->_profile['ip']);
 			}
@@ -373,7 +372,7 @@ class ProfileInfo extends AbstractController
 			$context['activate_type'] = $context['member']['is_activated'];
 
 			// What should the link text be?
-			$context['activate_link_text'] = in_array($context['member']['is_activated'], array(3, 4, 5, 13, 14, 15))
+			$context['activate_link_text'] = in_array((int) $context['member']['is_activated'], [3, 4, 5, 13, 14, 15])
 				? $txt['account_approve']
 				: $txt['account_activate'];
 
@@ -420,7 +419,7 @@ class ProfileInfo extends AbstractController
 
 		// What are we viewing
 		$action = $this->_req->getQuery('sa', 'trim', '');
-		$action_title = array('messages' => 'Messages', 'attach' => 'Attachments', 'topics' => 'Topics', 'unwatchedtopics' => 'Unwatched');
+		$action_title = ['messages' => 'Messages', 'attach' => 'Attachments', 'topics' => 'Topics', 'unwatchedtopics' => 'Unwatched'];
 		$action_title = $action_title[$action] ?? 'Posts';
 
 		theme()->getTemplates()->load('ProfileInfo');
@@ -436,7 +435,7 @@ class ProfileInfo extends AbstractController
 		$context['page_title'] = $txt['showPosts'] . ' - ' . $this->_profile['real_name'];
 
 		// Is the load average too high to allow searching just now?
-		if (!empty($modSettings['loadavg_show_posts']) && $modSettings['current_load'] >= $modSettings['loadavg_show_posts'])
+		if ($this->isOverLoadAverage())
 		{
 			throw new Exception('loadavg_show_posts_disabled', false);
 		}
@@ -444,13 +443,15 @@ class ProfileInfo extends AbstractController
 		// If we're specifically dealing with attachments use that function!
 		if ($action === 'attach')
 		{
-			return $this->action_showAttachments();
+			$this->action_showAttachments();
+			return;
 		}
 
 		// Instead, if we're dealing with unwatched topics (and the feature is enabled) use that other function.
 		if ($action === 'unwatchedtopics' && $modSettings['enable_unwatch'])
 		{
-			return $this->action_showUnwatched();
+			$this->action_showUnwatched();
+			return;
 		}
 
 		// Are we just viewing topics?
@@ -517,8 +518,8 @@ class ProfileInfo extends AbstractController
 
 		// Start counting at the number of the first message displayed.
 		$counter = $reverse ? $context['start'] + $maxIndex + 1 : $context['start'];
-		$context['posts'] = array();
-		$board_ids = array('own' => array(), 'any' => array());
+		$context['posts'] = [];
+		$board_ids = ['own' => [], 'any' => []];
 		$bbc_parser = ParserWrapper::instance();
 		foreach ($rows as $row)
 		{
@@ -530,64 +531,64 @@ class ProfileInfo extends AbstractController
 			$row['body'] = $bbc_parser->parseMessage($row['body'], $row['smileys_enabled']);
 
 			// And the array...
-			$context['posts'][$counter += $reverse ? -1 : 1] = array(
+			$context['posts'][$counter += $reverse ? -1 : 1] = [
 				'body' => $row['body'],
 				'counter' => $counter,
-				'category' => array(
+				'category' => [
 					'name' => $row['cname'],
 					'id' => $row['id_cat']
-				),
-				'board' => array(
+				],
+				'board' => [
 					'name' => $row['bname'],
 					'id' => $row['id_board'],
 					'link' => '<a href="' . getUrl('board', ['board' => $row['id_board'], 'start' => 0, 'name' => $row['bname']]) . '">' . $row['bname'] . '</a>',
-				),
-				'topic' => array(
+				],
+				'topic' => [
 					'id' => $row['id_topic'],
 					'link' => '<a href="' . getUrl('topic', ['topic' => $row['id_topic'], 'msg' => $row['id_msg'], 'subject' => $row['subject'], 'start' => '0']) . '#msg' . $row['id_msg'] . '">' . $row['subject'] . '</a>',
-				),
+				],
 				'subject' => $row['subject'],
 				'start' => 'msg' . $row['id_msg'],
 				'time' => standardTime($row['poster_time']),
 				'html_time' => htmlTime($row['poster_time']),
 				'timestamp' => forum_time(true, $row['poster_time']),
 				'id' => $row['id_msg'],
-				'tests' => array(
+				'tests' => [
 					'can_reply' => false,
 					'can_mark_notify' => false,
 					'can_delete' => false,
-				),
+				],
 				'delete_possible' => ($row['id_first_msg'] != $row['id_msg'] || $row['id_last_msg'] == $row['id_msg']) && (empty($modSettings['edit_disable_time']) || $row['poster_time'] + $modSettings['edit_disable_time'] * 60 >= time()),
 				'approved' => $row['approved'],
 
-				'buttons' => array(
+				'buttons' => [
 					// How about... even... remove it entirely?!
-					'remove' => array(
+					'remove' => [
 						'href' => getUrl('action', ['action' => 'deletemsg', 'msg' => $row['id_msg'], 'topic' => $row['id_topic'], 'profile', 'u' => $context['member']['id'], 'start' => $context['start'], '{session_data}']),
 						'text' => $txt['remove'],
 						'test' => 'can_delete',
 						'custom' => 'onclick="return confirm(' . JavaScriptEscape($txt['remove_message'] . '?') . ');"',
-					),
+					],
 					// Can we request notification of topics?
-					'notify' => array(
+					'notify' => [
 						'href' => getUrl('action', ['action' => 'notify', 'topic' => $row['id_topic'], 'msg' => $row['id_msg']]),
 						'text' => $txt['notify'],
 						'test' => 'can_mark_notify',
-					),
+					],
 					// If they *can* reply?
-					'reply' => array(
+					'reply' => [
 						'href' => getUrl('action', ['action' => 'post', 'topic' => $row['id_topic'], 'msg' => $row['id_msg']]),
 						'text' => $txt['reply'],
 						'test' => 'can_reply',
-					),
+					],
 					// If they *can* quote?
-					'quote' => array(
+					'quote' => [
 						'href' => getUrl('action', ['action' => 'post', 'topic' => $row['id_topic'], 'msg' => $row['id_msg'], 'quote' => $row['id_msg']]),
 						'text' => $txt['quote'],
 						'test' => 'can_quote',
-					),
-				)
-			);
+					],
+				]
+			];
 
 			if ($this->user->id == $row['id_member_started'])
 			{
@@ -605,29 +606,29 @@ class ProfileInfo extends AbstractController
 		// These are all the permissions that are different from board to board..
 		if ($context['is_topics'])
 		{
-			$permissions = array(
-				'own' => array(
+			$permissions = [
+				'own' => [
 					'post_reply_own' => 'can_reply',
-				),
-				'any' => array(
+				],
+				'any' => [
 					'post_reply_any' => 'can_reply',
 					'mark_any_notify' => 'can_mark_notify',
-				)
-			);
+				]
+			];
 		}
 		else
 		{
-			$permissions = array(
-				'own' => array(
+			$permissions = [
+				'own' => [
 					'post_reply_own' => 'can_reply',
 					'delete_own' => 'can_delete',
-				),
-				'any' => array(
+				],
+				'any' => [
 					'post_reply_any' => 'can_reply',
 					'mark_any_notify' => 'can_mark_notify',
 					'delete_any' => 'can_delete',
-				)
-			);
+				]
+			];
 		}
 
 		// For every permission in the own/any lists...
@@ -684,57 +685,57 @@ class ProfileInfo extends AbstractController
 		// Make sure we can't actually see anything...
 		if (empty($boardsAllowed))
 		{
-			$boardsAllowed = array(-1);
+			$boardsAllowed = [-1];
 		}
 
 		// This is all the information required to list attachments.
-		$listOptions = array(
+		$listOptions = [
 			'id' => 'profile_attachments',
 			'title' => $txt['showAttachments'] . ($context['user']['is_owner'] ? '' : ' - ' . $context['member']['name']),
 			'items_per_page' => $modSettings['defaultMaxMessages'],
 			'no_items_label' => $txt['show_attachments_none'],
 			'base_href' => getUrl('action', ['action' => 'profile', 'area' => 'showposts', 'sa' => 'attach', 'u' => $this->_memID]),
 			'default_sort_col' => 'filename',
-			'get_items' => array(
+			'get_items' => [
 				'function' => function ($start, $items_per_page, $sort, $boardsAllowed) {
 					return $this->list_getAttachments($start, $items_per_page, $sort, $boardsAllowed);
 				},
-				'params' => array(
+				'params' => [
 					$boardsAllowed,
-				),
-			),
-			'get_count' => array(
+				],
+			],
+			'get_count' => [
 				'function' => function ($boardsAllowed) {
 					return $this->list_getNumAttachments($boardsAllowed);
 				},
-				'params' => array(
+				'params' => [
 					$boardsAllowed,
-				),
-			),
-			'data_check' => array(
+				],
+			],
+			'data_check' => [
 				'class' => function ($data) {
 					return $data['approved'] ? '' : 'approvebg';
 				},
-			),
-			'columns' => array(
-				'filename' => array(
-					'header' => array(
+			],
+			'columns' => [
+				'filename' => [
+					'header' => [
 						'value' => $txt['show_attach_filename'],
 						'class' => 'lefttext grid25',
-					),
-					'data' => array(
+					],
+					'data' => [
 						'db' => 'filename',
-					),
-					'sort' => array(
+					],
+					'sort' => [
 						'default' => 'a.filename',
 						'reverse' => 'a.filename DESC',
-					),
-				),
-				'thumb' => array(
-					'header' => array(
+					],
+				],
+				'thumb' => [
+					'header' => [
 						'value' => '',
-					),
-					'data' => array(
+					],
+					'data' => [
 						'function' => function ($rowData) {
 							if ($rowData['is_image'] && !empty($rowData['id_thumb']))
 							{
@@ -744,56 +745,56 @@ class ProfileInfo extends AbstractController
 							return '<img src="' . getUrl('action', ['action' => 'dlattach', 'attach' => $rowData['id'], 'thumb']) . '" loading="lazy" />';
 						},
 						'class' => 'centertext recent_attachments',
-					),
-					'sort' => array(
+					],
+					'sort' => [
 						'default' => 'a.filename',
 						'reverse' => 'a.filename DESC',
-					),
-				),
-				'downloads' => array(
-					'header' => array(
+					],
+				],
+				'downloads' => [
+					'header' => [
 						'value' => $txt['show_attach_downloads'],
 						'class' => 'centertext',
-					),
-					'data' => array(
+					],
+					'data' => [
 						'db' => 'downloads',
 						'comma_format' => true,
 						'class' => 'centertext',
-					),
-					'sort' => array(
+					],
+					'sort' => [
 						'default' => 'a.downloads',
 						'reverse' => 'a.downloads DESC',
-					),
-				),
-				'subject' => array(
-					'header' => array(
+					],
+				],
+				'subject' => [
+					'header' => [
 						'value' => $txt['message'],
 						'class' => 'lefttext grid30',
-					),
-					'data' => array(
+					],
+					'data' => [
 						'db' => 'subject',
-					),
-					'sort' => array(
+					],
+					'sort' => [
 						'default' => 'm.subject',
 						'reverse' => 'm.subject DESC',
-					),
-				),
-				'posted' => array(
-					'header' => array(
+					],
+				],
+				'posted' => [
+					'header' => [
 						'value' => $txt['show_attach_posted'],
 						'class' => 'lefttext',
-					),
-					'data' => array(
+					],
+					'data' => [
 						'db' => 'posted',
 						'timeformat' => true,
-					),
-					'sort' => array(
+					],
+					'sort' => [
 						'default' => 'm.poster_time',
 						'reverse' => 'm.poster_time DESC',
-					),
-				),
-			),
-		);
+					],
+				],
+			],
+		];
 
 		// Create the request list.
 		createList($listOptions);
@@ -848,102 +849,102 @@ class ProfileInfo extends AbstractController
 		}
 
 		// And here they are: the topics you don't like
-		$listOptions = array(
+		$listOptions = [
 			'id' => 'unwatched_topics',
 			'title' => $txt['showUnwatched'],
 			'items_per_page' => $modSettings['defaultMaxMessages'],
 			'no_items_label' => $txt['unwatched_topics_none'],
 			'base_href' => getUrl('action', ['action' => 'profile', 'area' => 'showposts', 'sa' => 'unwatchedtopics', 'u' => $this->_memID]),
 			'default_sort_col' => 'started_on',
-			'get_items' => array(
+			'get_items' => [
 				'function' => function ($start, $items_per_page, $sort) {
 					return $this->list_getUnwatched($start, $items_per_page, $sort);
 				},
-			),
-			'get_count' => array(
+			],
+			'get_count' => [
 				'function' => function () {
 					return $this->list_getNumUnwatched();
 				},
-			),
-			'columns' => array(
-				'subject' => array(
-					'header' => array(
+			],
+			'columns' => [
+				'subject' => [
+					'header' => [
 						'value' => $txt['subject'],
 						'class' => 'lefttext',
 						'style' => 'width: 30%;',
-					),
-					'data' => array(
-						'sprintf' => array(
+					],
+					'data' => [
+						'sprintf' => [
 							'format' => '<a href="' . getUrl('profile', ['topic' => '%1$d.0']) . '">%2$s</a>',
-							'params' => array(
+							'params' => [
 								'id_topic' => false,
 								'subject' => false,
-							),
-						),
-					),
-					'sort' => array(
+							],
+						],
+					],
+					'sort' => [
 						'default' => 'm.subject',
 						'reverse' => 'm.subject DESC',
-					),
-				),
-				'started_by' => array(
-					'header' => array(
+					],
+				],
+				'started_by' => [
+					'header' => [
 						'value' => $txt['started_by'],
 						'style' => 'width: 15%;',
-					),
-					'data' => array(
+					],
+					'data' => [
 						'db' => 'started_by',
-					),
-					'sort' => array(
+					],
+					'sort' => [
 						'default' => 'mem.real_name',
 						'reverse' => 'mem.real_name DESC',
-					),
-				),
-				'started_on' => array(
-					'header' => array(
+					],
+				],
+				'started_on' => [
+					'header' => [
 						'value' => $txt['on'],
 						'class' => 'lefttext',
 						'style' => 'width: 20%;',
-					),
-					'data' => array(
+					],
+					'data' => [
 						'db' => 'started_on',
 						'timeformat' => true,
-					),
-					'sort' => array(
+					],
+					'sort' => [
 						'default' => 'm.poster_time',
 						'reverse' => 'm.poster_time DESC',
-					),
-				),
-				'last_post_by' => array(
-					'header' => array(
+					],
+				],
+				'last_post_by' => [
+					'header' => [
 						'value' => $txt['last_post'],
 						'style' => 'width: 15%;',
-					),
-					'data' => array(
+					],
+					'data' => [
 						'db' => 'last_post_by',
-					),
-					'sort' => array(
+					],
+					'sort' => [
 						'default' => 'mem.real_name',
 						'reverse' => 'mem.real_name DESC',
-					),
-				),
-				'last_post_on' => array(
-					'header' => array(
+					],
+				],
+				'last_post_on' => [
+					'header' => [
 						'value' => $txt['on'],
 						'class' => 'lefttext',
 						'style' => 'width: 20%;',
-					),
-					'data' => array(
+					],
+					'data' => [
 						'db' => 'last_post_on',
 						'timeformat' => true,
-					),
-					'sort' => array(
+					],
+					'sort' => [
 						'default' => 'm.poster_time',
 						'reverse' => 'm.poster_time DESC',
-					),
-				),
-			),
-		);
+					],
+				],
+			],
+		];
 
 		// Create the request list.
 		createList($listOptions);
@@ -1034,7 +1035,7 @@ class ProfileInfo extends AbstractController
 		$context['posts_by_time'] = UserStatsPostingTime($this->_memID);
 
 		// Custom stats (just add a template_layer to add it to the template!)
-		call_integration_hook('integrate_profile_stats', array($this->_memID));
+		call_integration_hook('integrate_profile_stats', [$this->_memID]);
 	}
 
 	/**
@@ -1063,37 +1064,39 @@ class ProfileInfo extends AbstractController
 		$board = empty($board) ? 0 : (int) $board;
 		$context['board'] = $board;
 
-		$curGroups = empty($this->_profile['additional_groups']) ? array() : explode(',', $this->_profile['additional_groups']);
-
+		$curGroups = empty($this->_profile['additional_groups']) ? [] : explode(',', $this->_profile['additional_groups']);
 		$curGroups[] = $this->_profile['id_group'];
 		$curGroups[] = $this->_profile['id_post_group'];
+		$curGroups = array_map('intval', $curGroups);
 
 		// Load a list of boards for the jump box - except the defaults.
 		require_once(SUBSDIR . '/Boards.subs.php');
-		$board_list = getBoardList(array('moderator' => $this->_memID), true);
+		$board_list = getBoardList(['moderator' => $this->_memID], true);
 
-		$context['boards'] = array();
-		$context['no_access_boards'] = array();
+		$context['boards'] = [];
+		$context['no_access_boards'] = [];
 		foreach ($board_list as $row)
 		{
-			if (count(array_intersect($curGroups, explode(',', $row['member_groups']))) === 0 && !$row['is_mod'])
+			$row['id_board'] = (int) $row['id_board'];
+			$row['id_profile'] = (int) $row['id_profile'] ;
+			if (!$row['is_mod'] && count(array_intersect($curGroups, explode(',', $row['member_groups']))) === 0)
 			{
-				$context['no_access_boards'][] = array(
+				$context['no_access_boards'][] = [
 					'id' => $row['id_board'],
 					'name' => $row['board_name'],
 					'is_last' => false,
-				);
+				];
 			}
-			elseif ($row['id_profile'] != 1 || $row['is_mod'])
+			elseif ($row['id_profile'] !== 1 || $row['is_mod'])
 			{
-				$context['boards'][$row['id_board']] = array(
+				$context['boards'][$row['id_board']] = [
 					'id' => $row['id_board'],
 					'name' => $row['board_name'],
 					'url' => getUrl('board', ['board' => $row['id_board'], 'start' => 0, 'name' => $row['board_name']]),
-					'selected' => $board == $row['id_board'],
+					'selected' => $board === $row['id_board'],
 					'profile' => $row['id_profile'],
 					'profile_name' => $context['profiles'][$row['id_profile']]['name'],
-				);
+				];
 			}
 		}
 
@@ -1108,7 +1111,7 @@ class ProfileInfo extends AbstractController
 		];
 
 		// If you're an admin we know you can do everything, we might as well leave.
-		$context['member']['has_all_permissions'] = in_array(1, $curGroups);
+		$context['member']['has_all_permissions'] = in_array(1, $curGroups, true);
 		if ($context['member']['has_all_permissions'])
 		{
 			return;
@@ -1129,7 +1132,7 @@ class ProfileInfo extends AbstractController
 		global $modSettings, $context, $txt;
 
 		// Firstly, can we actually even be here?
-		if (!allowedTo('issue_warning') && (empty($modSettings['warning_show']) || ($modSettings['warning_show'] == 1 && !$context['user']['is_owner'])))
+		if ((empty($modSettings['warning_show']) || ((int) $modSettings['warning_show'] === 1 && !$context['user']['is_owner'])) && !allowedTo('issue_warning'))
 		{
 			throw new Exception('no_access', false);
 		}
@@ -1146,80 +1149,80 @@ class ProfileInfo extends AbstractController
 
 		// Let's use a generic list to get all the current warnings
 		// and use the issue warnings grab-a-granny thing.
-		$listOptions = array(
+		$listOptions = [
 			'id' => 'view_warnings',
 			'title' => $txt['profile_viewwarning_previous_warnings'],
 			'items_per_page' => $modSettings['defaultMaxMessages'],
 			'no_items_label' => $txt['profile_viewwarning_no_warnings'],
 			'base_href' => getUrl('action', ['action' => 'profile', 'area' => 'viewwarning', 'sa' => 'user', 'u' => $this->_memID]),
 			'default_sort_col' => 'log_time',
-			'get_items' => array(
+			'get_items' => [
 				'function' => 'list_getUserWarnings',
-				'params' => array(
+				'params' => [
 					$this->_memID,
-				),
-			),
-			'get_count' => array(
+				],
+			],
+			'get_count' => [
 				'function' => 'list_getUserWarningCount',
-				'params' => array(
+				'params' => [
 					$this->_memID,
-				),
-			),
-			'columns' => array(
-				'log_time' => array(
-					'header' => array(
+				],
+			],
+			'columns' => [
+				'log_time' => [
+					'header' => [
 						'value' => $txt['profile_warning_previous_time'],
-					),
-					'data' => array(
+					],
+					'data' => [
 						'db' => 'time',
-					),
-					'sort' => array(
+					],
+					'sort' => [
 						'default' => 'lc.log_time DESC',
 						'reverse' => 'lc.log_time',
-					),
-				),
-				'reason' => array(
-					'header' => array(
+					],
+				],
+				'reason' => [
+					'header' => [
 						'value' => $txt['profile_warning_previous_reason'],
 						'style' => 'width: 50%;',
-					),
-					'data' => array(
+					],
+					'data' => [
 						'db' => 'reason',
-					),
-				),
-				'level' => array(
-					'header' => array(
+					],
+				],
+				'level' => [
+					'header' => [
 						'value' => $txt['profile_warning_previous_level'],
-					),
-					'data' => array(
+					],
+					'data' => [
 						'db' => 'counter',
-					),
-					'sort' => array(
+					],
+					'sort' => [
 						'default' => 'lc.counter DESC',
 						'reverse' => 'lc.counter',
-					),
-				),
-			),
-			'additional_rows' => array(
-				array(
+					],
+				],
+			],
+			'additional_rows' => [
+				[
 					'position' => 'after_title',
 					'value' => $txt['profile_viewwarning_desc'],
 					'class' => 'smalltext',
 					'style' => 'padding: 2ex;',
-				),
-			),
-		);
+				],
+			],
+		];
 
 		// Create the list for viewing.
 		createList($listOptions);
 
 		// Create some common text bits for the template.
-		$context['level_effects'] = array(
+		$context['level_effects'] = [
 			0 => '',
 			$modSettings['warning_watch'] => $txt['profile_warning_effect_own_watched'],
 			$modSettings['warning_moderate'] => $txt['profile_warning_effect_own_moderated'],
 			$modSettings['warning_mute'] => $txt['profile_warning_effect_own_muted'],
-		);
+		];
 		$context['current_level'] = 0;
 		$context['sub_template'] = 'viewWarning';
 
@@ -1254,7 +1257,7 @@ class ProfileInfo extends AbstractController
 		theme()->getLayers()->removeAll();
 
 		// Some buddies for you
-		if (in_array('buddies', $this->_summary_areas))
+		if (in_array('buddies', $this->_summary_areas, true))
 		{
 			$this->_load_buddies();
 			$context['sub_template'] = 'profile_block_buddies';
@@ -1273,7 +1276,7 @@ class ProfileInfo extends AbstractController
 		if (!empty($modSettings['enable_buddylist'])
 			&& $context['user']['is_owner']
 			&& !empty($this->user->buddies)
-			&& in_array('buddies', $this->_summary_areas)
+			&& in_array('buddies', $this->_summary_areas, true)
 			&& MembersList::load($this->user->buddies, false, 'profile'))
 		{
 			// Get the info for this buddy
@@ -1305,25 +1308,25 @@ class ProfileInfo extends AbstractController
 		// The block templates are here
 		theme()->getTemplates()->load('ProfileInfo');
 		$context['sub_template'] = 'profile_blocks';
-		$context['profile_blocks'] = array();
+		$context['profile_blocks'] = [];
 
 		// Flush everything since we intend to return the information to an ajax handler
 		theme()->getLayers()->removeAll();
 
 		// So, just what have you been up to?
-		if (in_array('posts', $this->_summary_areas))
+		if (in_array('posts', $this->_summary_areas, true))
 		{
 			$this->_load_recent_posts();
 			$context['profile_blocks'][] = 'template_profile_block_posts';
 		}
 
-		if (in_array('topics', $this->_summary_areas))
+		if (in_array('topics', $this->_summary_areas, true))
 		{
 			$this->_load_recent_topics();
 			$context['profile_blocks'][] = 'template_profile_block_topics';
 		}
 
-		if (in_array('attachments', $this->_summary_areas))
+		if (in_array('attachments', $this->_summary_areas, true))
 		{
 			$this->_load_recent_attachments();
 			$context['profile_blocks'][] = 'template_profile_block_attachments';
@@ -1338,14 +1341,11 @@ class ProfileInfo extends AbstractController
 		global $context, $modSettings;
 
 		// How about their most recent posts?
-		if (in_array('posts', $this->_summary_areas))
+		if (in_array('posts', $this->_summary_areas, true))
 		{
 			// Is the load average too high just now, then let them know
-			if (!empty($modSettings['loadavg_show_posts']) && $modSettings['current_load'] >= $modSettings['loadavg_show_posts'])
-			{
-				$context['loadaverage'] = true;
-			}
-			else
+			$context['loadaverage'] = $this->isOverLoadAverage();
+			if (!$context['loadaverage'])
 			{
 				// Set up to get the last 10 posts of this member
 				$msgCount = count_user_posts($this->_memID);
@@ -1364,7 +1364,7 @@ class ProfileInfo extends AbstractController
 				// Find this user's most recent posts
 				$rows = load_user_posts($this->_memID, 0, $maxIndex, $range_limit);
 				$bbc_parser = ParserWrapper::instance();
-				$context['posts'] = array();
+				$context['posts'] = [];
 				foreach ($rows as $row)
 				{
 					// Censor....
@@ -1373,24 +1373,24 @@ class ProfileInfo extends AbstractController
 
 					// Do the code.
 					$row['body'] = $bbc_parser->parseMessage($row['body'], $row['smileys_enabled']);
-					$preview = strip_tags(strtr($row['body'], array('<br />' => '&#10;')));
+					$preview = strip_tags(strtr($row['body'], ['<br />' => '&#10;']));
 					$preview = Util::shorten_text($preview, !empty($modSettings['ssi_preview_length']) ? $modSettings['ssi_preview_length'] : 128);
 					$short_subject = Util::shorten_text($row['subject'], !empty($modSettings['ssi_subject_length']) ? $modSettings['ssi_subject_length'] : 24);
 
 					// And the array...
-					$context['posts'][] = array(
+					$context['posts'][] = [
 						'body' => $preview,
-						'board' => array(
+						'board' => [
 							'name' => $row['bname'],
 							'link' => '<a href="' . getUrl('board', ['board' => $row['id_board'], 'start' => 0, 'name' => $row['bname']]). '">' . $row['bname'] . '</a>'
-						),
+						],
 						'subject' => $row['subject'],
 						'short_subject' => $short_subject,
 						'time' => standardTime($row['poster_time']),
 						'html_time' => htmlTime($row['poster_time']),
 						'timestamp' => forum_time(true, $row['poster_time']),
 						'link' => '<a href="' . getUrl('topic', ['topic' => $row['id_topic'], 'start' => 0, 'msg' => $row['id_msg'], 'subject' => $row['subject'], 'hash' => '#msg' . $row['id_msg']]) . '" rel="nofollow">' . $short_subject . '</a>',
-					);
+					];
 				}
 			}
 		}
@@ -1404,14 +1404,11 @@ class ProfileInfo extends AbstractController
 		global $context, $modSettings;
 
 		// How about the most recent topics that they started?
-		if (in_array('topics', $this->_summary_areas))
+		if (in_array('topics', $this->_summary_areas, true))
 		{
 			// Is the load average still too high?
-			if (!empty($modSettings['loadavg_show_posts']) && $modSettings['current_load'] >= $modSettings['loadavg_show_posts'])
-			{
-				$context['loadaverage'] = true;
-			}
-			else
+			$context['loadaverage'] = $this->isOverLoadAverage();
+			if (!$context['loadaverage'])
 			{
 				// Set up to get the last 10 topics of this member
 				$topicCount = count_user_topics($this->_memID);
@@ -1430,7 +1427,7 @@ class ProfileInfo extends AbstractController
 
 				// Find this user's most recent topics
 				$rows = load_user_topics($this->_memID, 0, $maxIndex, $range_limit);
-				$context['topics'] = array();
+				$context['topics'] = [];
 				$bbc_parser = ParserWrapper::instance();
 
 				foreach ($rows as $row)
@@ -1441,16 +1438,16 @@ class ProfileInfo extends AbstractController
 
 					// Do the code.
 					$row['body'] = $bbc_parser->parseMessage($row['body'], $row['smileys_enabled']);
-					$preview = strip_tags(strtr($row['body'], array('<br />' => '&#10;')));
+					$preview = strip_tags(strtr($row['body'], ['<br />' => '&#10;']));
 					$preview = Util::shorten_text($preview, !empty($modSettings['ssi_preview_length']) ? $modSettings['ssi_preview_length'] : 128);
 					$short_subject = Util::shorten_text($row['subject'], !empty($modSettings['ssi_subject_length']) ? $modSettings['ssi_subject_length'] : 24);
 
 					// And the array...
-					$context['topics'][] = array(
-						'board' => array(
+					$context['topics'][] = [
+						'board' => [
 							'name' => $row['bname'],
 							'link' => '<a href="' . getUrl('board', ['board' => $row['id_board'], 'start' => 0, 'name' => $row['bname']]) . '">' . $row['bname'] . '</a>'
-						),
+						],
 						'subject' => $row['subject'],
 						'short_subject' => $short_subject,
 						'body' => $preview,
@@ -1458,7 +1455,7 @@ class ProfileInfo extends AbstractController
 						'html_time' => htmlTime($row['poster_time']),
 						'timestamp' => forum_time(true, $row['poster_time']),
 						'link' => '<a href="' . getUrl('topic', ['topic' => $row['id_topic'], 'start' => 0, 'msg' => $row['id_msg'], 'subject' => $row['subject'], 'hash' => '#msg' . $row['id_msg']]) . '" rel="nofollow">' . $short_subject . '</a>',
-					);
+					];
 				}
 			}
 		}
@@ -1471,7 +1468,7 @@ class ProfileInfo extends AbstractController
 	{
 		global $context, $modSettings, $settings;
 
-		$context['thumbs'] = array();
+		$context['thumbs'] = [];
 
 		// Load up the most recent attachments for this user for use in profile views etc.
 		if (!empty($modSettings['attachmentEnable'])
@@ -1482,7 +1479,7 @@ class ProfileInfo extends AbstractController
 
 			if (empty($boardsAllowed))
 			{
-				$boardsAllowed = array(-1);
+				$boardsAllowed = [-1];
 			}
 
 			$attachments = $this->list_getAttachments(0, $settings['attachments_on_summary'], 'm.poster_time DESC', $boardsAllowed);
@@ -1494,14 +1491,14 @@ class ProfileInfo extends AbstractController
 			// Load them in to $context for use in the template
 			foreach ($attachments as $i => $attachment)
 			{
-				$context['thumbs'][$i] = array(
+				$context['thumbs'][$i] = [
 					'url' => getUrl('action', ['action' => 'dlattach', 'topic' => $attachment['topic'] . '.0', 'attach' => $attachment['id']]),
 					'img' => '',
 					'filename' => $attachment['filename'],
 					'downloads' => $attachment['downloads'],
 					'subject' => $attachment['subject'],
 					'id' => $attachment['id'],
-				);
+				];
 
 				// Show a thumbnail image as well?
 				if ($attachment['is_image'] && !empty($modSettings['attachmentShowImages']) && !empty($modSettings['attachmentThumbnails']))
@@ -1534,5 +1531,18 @@ class ProfileInfo extends AbstractController
 				}
 			}
 		}
+	}
+
+	/**
+	 * Checks if the current load average exceeds a specified threshold.
+	 *
+	 * @return bool Returns true if the current load average is higher than the specified threshold, otherwise false.
+	 */
+	private function isOverLoadAverage()
+	{
+		global $modSettings;
+
+		// Is the load average too high just now, then let them know
+		return !empty($modSettings['loadavg_show_posts']) && $modSettings['current_load'] >= $modSettings['loadavg_show_posts'];
 	}
 }

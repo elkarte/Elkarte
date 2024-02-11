@@ -20,6 +20,7 @@ use ElkArte\AbstractController;
 use ElkArte\Errors\Errors;
 use ElkArte\Exceptions\Exception;
 use ElkArte\Languages\Txt;
+use ElkArte\Profile\Profile;
 use ElkArte\Util;
 
 /**

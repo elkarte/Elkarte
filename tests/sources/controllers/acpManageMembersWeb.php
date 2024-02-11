@@ -106,7 +106,7 @@ class SupportManageMembersController extends ElkArteWebSupport
 	 * Register and activate some meatheads, uh ... members
 	 *
 	 * This used to run in runInSeparateProcess, but after 5 years some update just made
-	 * that process fail, so additonal ACP detection logic has been added.
+	 * that process fail, so additional ACP detection logic has been added.
 	 */
 	public function testApproveMember()
 	{
@@ -142,10 +142,11 @@ class SupportManageMembersController extends ElkArteWebSupport
 		}, 15000);
 
 		// Unselect Not Activated and Banned so we only see activated members
-		$script = 'document.querySelector(\'#activated-1\').click();';
-		$this->execute(['script' => $script, 'args' => []]);
-		$script = 'document.querySelector(\'#activated-2\').click();';
-		$this->execute(['script' => $script, 'args' => []]);
+		// These might be hidden?  In any case they fail to select.
+	//	$script = 'document.getElementById(\'#activated-1\').click();';
+	//	$this->execute(['script' => $script, 'args' => []]);
+	//	$script = 'document.getElementById(\'#activated-2\').click();';
+	//	$this->execute(['script' => $script, 'args' => []]);
 
 		$this->clickit('input[value=Search]');
 		$this->assertStringContainsString('user1', $this->byId('member_list')->text());

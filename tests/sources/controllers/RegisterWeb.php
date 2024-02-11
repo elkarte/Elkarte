@@ -9,6 +9,8 @@
  */
 
 use ElkArte\Errors\ErrorContext;
+use ElkArte\Languages\Loader;
+use ElkArte\Languages\Txt;
 
 /**
  * Testcases for member registration
@@ -163,13 +165,14 @@ class SupportRegisterController extends ElkArteWebSupport
 	 */
 	public function testDeleteAccount()
 	{
-		global $txt;
+		global $modSettings;
 
-		$txt['guest_title'] = 'Guest';
+		Txt::load('Index');
 
 		// Register a member that we can delete
 		require_once(SUBSDIR . '/Members.subs.php');
 		$_SESSION['just_registered'] = 0;
+		$modSettings['totalMembers'] = 5;
 		$regOptions = [
 			'interface' => 'admin',
 			'username' => 'user49',

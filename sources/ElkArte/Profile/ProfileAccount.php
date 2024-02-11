@@ -14,14 +14,15 @@
  *
  */
 
-namespace ElkArte\Controller;
+namespace ElkArte\Profile;
 
 use BBC\ParserWrapper;
 use ElkArte\AbstractController;
+use ElkArte\Controller\Auth;
 use ElkArte\EventManager;
 use ElkArte\Exceptions\Exception;
-use ElkArte\MembersList;
 use ElkArte\Languages\Txt;
+use ElkArte\MembersList;
 use ElkArte\User;
 
 /**
@@ -29,26 +30,12 @@ use ElkArte\User;
  */
 class ProfileAccount extends AbstractController
 {
-	/**
-	 * Member id for the account being worked on
-	 *
-	 * @var int
-	 */
+	/** @var int Member id for the account being worked on */
 	private $_memID = 0;
-
-	/**
-	 * The \ElkArte\Member object is stored here to avoid some global
-	 *
-	 * @var \ElkArte\Member
-	 */
-	private $_profile = null;
-
-	/**
-	 * Holds any errors that were generated when issuing a warning
-	 *
-	 * @var array
-	 */
-	private $_issueErrors = array();
+	/** @var \ElkArte\Member The \ElkArte\Member object is stored here to avoid some global */
+	private $_profile;
+	/** @var array Holds any errors that were generated when issuing a warning */
+	private $_issueErrors = [];
 
 	/**
 	 * Called before all other methods when coming from the dispatcher or
@@ -63,7 +50,7 @@ class ProfileAccount extends AbstractController
 	/**
 	 * Entry point for this class.
 	 *
-	 * @see \ElkArte\AbstractController::action_index()
+	 * @see AbstractController::action_index()
 	 */
 	public function action_index()
 	{
@@ -76,7 +63,7 @@ class ProfileAccount extends AbstractController
 	 *
 	 * @uses template_issueWarning sub template in ProfileAccount
 	 * @uses Profile template
-	 * @throws \ElkArte\Exceptions\Exception
+	 * @throws Exception
 	 */
 	public function action_issuewarning()
 	{
@@ -132,12 +119,12 @@ class ProfileAccount extends AbstractController
 		}
 
 		// Defaults.
-		$context['warning_data'] = array(
+		$context['warning_data'] = [
 			'reason' => '',
 			'notify' => '',
 			'notify_subject' => '',
 			'notify_body' => '',
-		);
+		];
 
 		// Are we saving?
 		$this->_save_warning();
@@ -149,7 +136,7 @@ class ProfileAccount extends AbstractController
 		if (!empty($this->_issueErrors))
 		{
 			// Fill in the suite of errors.
-			$context['post_errors'] = array();
+			$context['post_errors'] = [];
 			foreach ($this->_issueErrors as $error)
 			{
 				$context['post_errors'][] = $txt[$error];
@@ -162,11 +149,11 @@ class ProfileAccount extends AbstractController
 		require_once(SUBSDIR . '/Profile.subs.php');
 
 		// Work our the various levels.
-		$context['level_effects'] = array(
+		$context['level_effects'] = [
 			0 => $txt['profile_warning_effect_none'],
-		);
+		];
 
-		foreach (array('watch', 'moderate', 'mute') as $status)
+		foreach (['watch', 'moderate', 'mute'] as $status)
 		{
 			if ($modSettings['warning_' . $status] != 110)
 			{
@@ -204,7 +191,7 @@ class ProfileAccount extends AbstractController
 		require_once(SUBSDIR . '/Maillist.subs.php');
 
 		// Any custom templates?
-		$context['notification_templates'] = array();
+		$context['notification_templates'] = [];
 		$notification_templates = maillist_templates('warntpl');
 
 		foreach ($notification_templates as $row)
@@ -215,32 +202,32 @@ class ProfileAccount extends AbstractController
 				continue;
 			}
 
-			$context['notification_templates'][] = array(
+			$context['notification_templates'][] = [
 				'title' => $row['title'],
 				'body' => $row['body'],
-			);
+			];
 		}
 
 		// Setup the "default" templates.
-		foreach (array('spamming', 'offence', 'insulting') as $type)
+		foreach (['spamming', 'offence', 'insulting'] as $type)
 		{
-			$context['notification_templates'][] = array(
+			$context['notification_templates'][] = [
 				'title' => $txt['profile_warning_notify_title_' . $type],
 				'body' => sprintf($txt['profile_warning_notify_template_outline' . (!empty($warning_for_message) ? '_post' : '')], $txt['profile_warning_notify_for_' . $type]),
-			);
+			];
 		}
 
 		// Replace all the common variables in the templates.
 		foreach ($context['notification_templates'] as $k => $name)
 		{
 			$context['notification_templates'][$k]['body'] = strtr($name['body'],
-				array(
+				[
 					'{MEMBER}' => un_htmlspecialchars($context['member']['name']),
 					'{MESSAGE}' => '[url=' . getUrl('action', ['msg' => $warning_for_message]) . ']' . un_htmlspecialchars($warned_message_subject) . '[/url]',
 					'{SCRIPTURL}' => $scripturl,
 					'{FORUMNAME}' => $mbname,
 					'{REGARDS}' => replaceBasicActionUrl($txt['regards_team'])
-				)
+				]
 			);
 		}
 	}
@@ -262,7 +249,7 @@ class ProfileAccount extends AbstractController
 		if (isset($this->_req->post->save))
 		{
 			// Security is good here.
-			checkSession('post');
+			checkSession();
 
 			// There must be a reason, and use of flowery words is allowed.
 			$warn_reason = $this->_req->getPost('warn_reason', 'trim|\\ElkArte\\Util::htmlspecialchars', '');
@@ -310,7 +297,7 @@ class ProfileAccount extends AbstractController
 
 				// Make the change.
 				require_once(SUBSDIR . '/Members.subs.php');
-				updateMemberData($this->_memID, array('warning' => $warning_level));
+				updateMemberData($this->_memID, ['warning' => $warning_level]);
 
 				// Leave a lovely message.
 				$context['profile_updated'] = $context['user']['is_owner'] ? $txt['profile_updated_own'] : $txt['profile_warning_success'];
@@ -318,12 +305,12 @@ class ProfileAccount extends AbstractController
 			else
 			{
 				// Try to remember some bits.
-				$context['warning_data'] = array(
+				$context['warning_data'] = [
 					'reason' => $warn_reason,
 					'notify' => !empty($this->_req->post->warn_notify),
 					'notify_subject' => $this->_req->getPost('warn_sub', 'trim', ''),
 					'notify_body' => $this->_req->getPost('warn_body', 'trim', ''),
-				);
+				];
 			}
 
 			// Show the new improved warning level.
@@ -335,7 +322,7 @@ class ProfileAccount extends AbstractController
 	 * Issue a pm to the member getting the warning
 	 *
 	 * @return int
-	 * @throws \ElkArte\Exceptions\Exception
+	 * @throws Exception
 	 */
 	private function _issue_warning_pm()
 	{
@@ -355,12 +342,12 @@ class ProfileAccount extends AbstractController
 			else
 			{
 				require_once(SUBSDIR . '/PersonalMessage.subs.php');
-				$from = array(
+				$from = [
 					'id' => 0,
 					'name' => $context['forum_name'],
 					'username' => $context['forum_name'],
-				);
-				sendpm(array('to' => array($this->_memID), 'bcc' => array()), $warn_sub, $warn_body, false, $from);
+				];
+				sendpm(['to' => [$this->_memID], 'bcc' => []], $warn_sub, $warn_body, false, $from);
 
 				// Log the notice.
 				$id_notice = logWarningNotice($warn_sub, $warn_body);
@@ -397,13 +384,13 @@ class ProfileAccount extends AbstractController
 
 			// Try to remember some bits.
 			$context['preview_subject'] = $this->_req->getPost('warn_sub', 'trim|\\ElkArte\\Util::htmlspecialchars', '');
-			$context['warning_data'] = array(
+			$context['warning_data'] = [
 				'reason' => $this->_req->post->warn_reason,
 				'notify' => !empty($this->_req->post->warn_notify),
 				'notify_subject' => $this->_req->getPost('warn_sub', 'trim', ''),
 				'notify_body' => $this->_req->getPost('warn_body', 'trim', ''),
 				'body_preview' => $warning_body,
-			);
+			];
 		}
 	}
 
@@ -414,57 +401,57 @@ class ProfileAccount extends AbstractController
 	{
 		global $txt, $modSettings;
 
-		$listOptions = array(
+		$listOptions = [
 			'id' => 'issued_warnings',
 			'title' => $txt['profile_viewwarning_previous_warnings'],
 			'items_per_page' => $modSettings['defaultMaxMessages'],
 			'no_items_label' => $txt['profile_viewwarning_no_warnings'],
 			'base_href' => getUrl('action', ['action' => 'profile', 'area' => 'issuewarning', 'sa' => 'user', 'u' => $this->_memID]),
 			'default_sort_col' => 'log_time',
-			'get_items' => array(
+			'get_items' => [
 				'function' => function ($start, $items_per_page, $sort) {
 					return $this->list_getUserWarnings($start, $items_per_page, $sort);
 				},
-			),
-			'get_count' => array(
+			],
+			'get_count' => [
 				'function' => function () {
 					return $this->list_getUserWarningCount();
 				},
-			),
-			'columns' => array(
-				'issued_by' => array(
-					'header' => array(
+			],
+			'columns' => [
+				'issued_by' => [
+					'header' => [
 						'value' => $txt['profile_warning_previous_issued'],
 						'class' => 'grid20',
-					),
-					'data' => array(
+					],
+					'data' => [
 						'function' => function ($warning) {
 							return $warning['issuer']['link'];
 						},
-					),
-					'sort' => array(
+					],
+					'sort' => [
 						'default' => 'lc.member_name DESC',
 						'reverse' => 'lc.member_name',
-					),
-				),
-				'log_time' => array(
-					'header' => array(
+					],
+				],
+				'log_time' => [
+					'header' => [
 						'value' => $txt['profile_warning_previous_time'],
 						'class' => 'grid30',
-					),
-					'data' => array(
+					],
+					'data' => [
 						'db' => 'time',
-					),
-					'sort' => array(
+					],
+					'sort' => [
 						'default' => 'lc.log_time DESC',
 						'reverse' => 'lc.log_time',
-					),
-				),
-				'reason' => array(
-					'header' => array(
+					],
+				],
+				'reason' => [
+					'header' => [
 						'value' => $txt['profile_warning_previous_reason'],
-					),
-					'data' => array(
+					],
+					'data' => [
 						'function' => function ($warning) {
 							global $txt;
 
@@ -485,23 +472,23 @@ class ProfileAccount extends AbstractController
 							return $ret;
 
 						},
-					),
-				),
-				'level' => array(
-					'header' => array(
+					],
+				],
+				'level' => [
+					'header' => [
 						'value' => $txt['profile_warning_previous_level'],
 						'class' => 'grid8',
-					),
-					'data' => array(
+					],
+					'data' => [
 						'db' => 'counter',
-					),
-					'sort' => array(
+					],
+					'sort' => [
 						'default' => 'lc.counter DESC',
 						'reverse' => 'lc.counter',
-					),
-				),
-			),
-		);
+					],
+				],
+			],
+		];
 
 		// Create the list for viewing.
 		createList($listOptions);
@@ -583,7 +570,7 @@ class ProfileAccount extends AbstractController
 		checkSession();
 
 		// Check we got here as we should have!
-		if ($cur_profile->id_member != $this->_profile->id_member)
+		if ((int) $cur_profile->id_member !== (int) $this->_profile->id_member)
 		{
 			throw new Exception('no_access', false);
 		}
@@ -592,7 +579,7 @@ class ProfileAccount extends AbstractController
 		require_once(SUBSDIR . '/Members.subs.php');
 
 		// Too often, people remove/delete their own only administrative account.
-		if (in_array(1, explode(',', $cur_profile['additional_groups'])) || $cur_profile['id_group'] == 1)
+		if (in_array(1, array_map('intval', explode(',', $cur_profile['additional_groups'])), true) || (int) $cur_profile['id_group'] === 1)
 		{
 			// Are you allowed to administrate the forum, as they are?
 			isAllowedTo('admin_forum');
@@ -612,7 +599,7 @@ class ProfileAccount extends AbstractController
 
 			// Now, have you been naughty and need your posts deleting?
 			// @todo Should this check board permissions?
-			if ($this->_req->post->remove_type != 'none' && allowedTo('moderate_forum'))
+			if ($this->_req->post->remove_type !== 'none' && allowedTo('moderate_forum'))
 			{
 				// Include subs/Topic.subs.php - essential for this type of work!
 				require_once(SUBSDIR . '/Topic.subs.php');
@@ -644,10 +631,10 @@ class ProfileAccount extends AbstractController
 		{
 			// Setup their account for deletion ;)
 			require_once(SUBSDIR . '/Members.subs.php');
-			updateMemberData($this->_memID, array('is_activated' => 4));
+			updateMemberData($this->_memID, ['is_activated' => 4]);
 
 			// Another account needs approval...
-			updateSettings(array('unapprovedMembers' => true), true);
+			updateSettings(['unapprovedMembers' => true], true);
 		}
 		// Also check if you typed your password correctly.
 		else
@@ -673,28 +660,29 @@ class ProfileAccount extends AbstractController
 
 		isAllowedTo('moderate_forum');
 
+		$this->_profile['is_activated'] = (int) $this->_profile['is_activated'];
 		if (isset($this->_req->query->save, $this->_profile['is_activated'])
-			&& $this->_profile['is_activated'] != 1)
+			&& $this->_profile['is_activated'] !== 1)
 		{
 			require_once(SUBSDIR . '/Members.subs.php');
 
 			// If we are approving the deletion of an account, we do something special ;)
-			if ($this->_profile['is_activated'] == 4)
+			if ($this->_profile['is_activated'] === 4)
 			{
 				deleteMembers($context['id_member']);
 				redirectexit();
 			}
 
 			// Actually update this member now, as it guarantees the unapproved count can't get corrupted.
-			approveMembers(array('members' => array($context['id_member']), 'activated_status' => $this->_profile['is_activated']));
+			approveMembers(['members' => [$context['id_member']], 'activated_status' => $this->_profile['is_activated']]);
 
 			// Log what we did?
-			logAction('approve_member', array('member' => $this->_memID), 'admin');
+			logAction('approve_member', ['member' => $this->_memID], 'admin');
 
 			// If we are doing approval, update the stats for the member just in case.
-			if (in_array($this->_profile['is_activated'], array(3, 4, 13, 14)))
+			if (in_array($this->_profile['is_activated'], [3, 4, 13, 14]))
 			{
-				updateSettings(array('unapprovedMembers' => ($modSettings['unapprovedMembers'] > 1 ? $modSettings['unapprovedMembers'] - 1 : 0)));
+				updateSettings(['unapprovedMembers' => ($modSettings['unapprovedMembers'] > 1 ? $modSettings['unapprovedMembers'] - 1 : 0)]);
 			}
 
 			// Make sure we update the stats too.

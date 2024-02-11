@@ -14,7 +14,7 @@
  *
  */
 
-namespace ElkArte\Controller;
+namespace ElkArte\Profile;
 
 use ElkArte\AbstractController;
 use ElkArte\Exceptions\Exception;
@@ -26,25 +26,11 @@ use ElkArte\Util;
  */
 class ProfileSubscriptions extends AbstractController
 {
-	/**
-	 * Holds the the details of the subscription order
-	 *
-	 * @var
-	 */
+	/** @var Holds the details of the subscription order */
 	private $_order;
-
-	/**
-	 * Holds all the available gateways so they can be initialized
-	 *
-	 * @var array
-	 */
+	/** @var array Holds all the available gateways so they can be initialized */
 	private $_gateways;
-
-	/**
-	 * The id of the subscription
-	 *
-	 * @var int
-	 */
+	/** @var int The id of the subscription */
 	private $_id_sub;
 
 	/**
@@ -53,7 +39,7 @@ class ProfileSubscriptions extends AbstractController
 	 * - This is just a stub as action_subscriptions is called from a menu pick
 	 * and not routed through this method.
 	 *
-	 * @see \ElkArte\AbstractController::action_index()
+	 * @see AbstractController::action_index()
 	 */
 	public function action_index()
 	{
@@ -74,7 +60,7 @@ class ProfileSubscriptions extends AbstractController
 		$memID = currentMemberID();
 		$context['member']['id'] = $memID;
 
-		// Load all of the subscriptions in the system (loads in to $context)
+		// Load all the subscriptions in the system (loads in to $context)
 		require_once(SUBSDIR . '/PaidSubscriptions.subs.php');
 		loadSubscriptions();
 
@@ -105,7 +91,7 @@ class ProfileSubscriptions extends AbstractController
 		// Find the active subscribed ones
 		foreach ($context['current'] as $id => $current)
 		{
-			if ($current['status'] == 1)
+			if ((int) $current['status'] === 1)
 			{
 				$context['subscriptions'][$id]['subscribed'] = true;
 			}
@@ -142,14 +128,14 @@ class ProfileSubscriptions extends AbstractController
 			// Work out the costs.
 			$costs = Util::unserialize($sub['real_cost']);
 
-			$cost_array = array();
+			$cost_array = [];
 
 			// Flexible cost to time?
 			if ($sub['real_length'] === 'F')
 			{
 				foreach ($costs as $duration => $cost)
 				{
-					if ($cost != 0)
+					if ((int) $cost !== 0)
 					{
 						$cost_array[$duration] = $cost;
 					}
@@ -226,7 +212,7 @@ class ProfileSubscriptions extends AbstractController
 	 *
 	 * @param int $memID The id of the member who is ordering
 	 *
-	 * @throws \ElkArte\Exceptions\Exception paid_sub_not_active
+	 * @throws Exception paid_sub_not_active
 	 */
 	private function _confirmOrder($memID)
 	{
@@ -277,14 +263,14 @@ class ProfileSubscriptions extends AbstractController
 		}
 
 		// Now we are going to assume they want to take this out ;)
-		$new_data = array($this->_order['id'], $context['value'], $period, 'prepay');
+		$new_data = [$this->_order['id'], $context['value'], $period, 'prepay'];
 
 		// They have one of these already?
 		if (isset($context['current'][$this->_order['id']]))
 		{
 			// What are the details like?
-			$current_pending = array();
-			if ($context['current'][$this->_order['id']]['pending_details'] != '')
+			$current_pending = [];
+			if ($context['current'][$this->_order['id']]['pending_details'] !== '')
 			{
 				$current_pending = Util::unserialize($context['current'][$this->_order['id']]['pending_details']);
 			}
@@ -292,7 +278,7 @@ class ProfileSubscriptions extends AbstractController
 			// Don't get silly.
 			if (count($current_pending) > 9)
 			{
-				$current_pending = array();
+				$current_pending = [];
 			}
 
 			// Only record real pending payments as will otherwise confuse the admin!
@@ -316,7 +302,7 @@ class ProfileSubscriptions extends AbstractController
 		// Never had this before, lovely.
 		else
 		{
-			$pending_details = serialize(array($new_data));
+			$pending_details = serialize([$new_data]);
 			logNewSubscription($this->_order['id'], $memID, $pending_details);
 		}
 
@@ -358,13 +344,13 @@ class ProfileSubscriptions extends AbstractController
 	 * Sets the required payment form fields for the various payment gateways
 	 *
 	 * @param int $memID The id of the member who is ordering
-	 * @param string period xx for none or a value of time
+	 * @param string $period xx for none or a value of time
 	 */
 	private function _set_payment_gatway_context($memID, $period)
 	{
 		global $context, $scripturl;
 
-		$context['gateways'] = array();
+		$context['gateways'] = [];
 		foreach ($this->_gateways as $id => $gateway)
 		{
 			$fields = $this->_gateways[$id]->fetchGatewayFields($this->_order['id'] . '+' . $memID, $this->_order, $context['value'], $period, $scripturl . '?action=profile&u=' . $memID . '&area=subscriptions&sub_id=' . $this->_order['id'] . '&done');

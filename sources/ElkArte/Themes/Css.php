@@ -83,7 +83,7 @@ class Css
 		elseif (!empty($modSettings['minify_css_js']))
 		{
 			$combiner = new SiteCombiner($settings['default_theme_cache_dir'], $settings['default_theme_cache_url']);
-			$this->css_files($combiner->site_css_minify($this->css_files));
+			$this->css_files = $combiner->site_css_minify($this->css_files);
 
 			// Output all the files
 			foreach ($this->css_files as $id => $file)

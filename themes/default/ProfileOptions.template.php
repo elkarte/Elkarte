@@ -94,7 +94,7 @@ function template_editBuddies()
 
 			foreach ($buddy['custom_fields'] as $key => $cpf)
 			{
-				if ($cpf['placement'] == 1)
+				if ((int) $cpf['placement'] === 1)
 				{
 					$im[] = $cpf['value'];
 				}
@@ -143,16 +143,18 @@ function template_editBuddies()
 		</div>
 	</form>';
 
-	// Initialize the autosuggest object
+	// Initialize the member suggest object
 	theme()->addInlineJavascript('
-		new smc_AutoSuggest({
-			sSessionId: elk_session_id,
-			sSessionVar: elk_session_var,
-			sSuggestId: \'new_buddy\',
-			sControlId: \'new_buddy\',
-			sSearchType: \'member\',
-			sTextDeleteItem: ' . JavaScriptEscape($txt['autosuggest_delete_item']) . ',
-			bItemList: false
+		isFunctionLoaded("smc_AutoSuggest").then((available) => { 
+			if (available) {
+				new smc_AutoSuggest({
+					sSessionId: elk_session_id,
+					sSessionVar: elk_session_var,
+					sSuggestId: "new_buddy",
+					sControlId: "new_buddy",
+					sSearchType: "member",
+				});
+			}
 		});', true);
 }
 
@@ -251,14 +253,18 @@ function template_editIgnoreList()
 	</form>';
 
 	theme()->addInlineJavascript('
-		new smc_AutoSuggest({
-			sSessionId: elk_session_id,
-			sSessionVar: elk_session_var,
-			sSuggestId: \'new_ignore\',
-			sControlId: \'new_ignore\',
-			sSearchType: \'member\',
-			sTextDeleteItem: ' . JavaScriptEscape($txt['autosuggest_delete_item']) . ',
-			bItemList: false
+		isFunctionLoaded("smc_AutoSuggest").then((available) => { 
+			if (available) {
+				new smc_AutoSuggest({
+					sSessionId: elk_session_id,
+					sSessionVar: elk_session_var,
+					sSuggestId: "new_ignore",
+					sControlId: "new_ignore",
+					sSearchType: "member",
+					sTextDeleteItem: ' . JavaScriptEscape($txt['autosuggest_delete_item']) . ',
+					bItemList: false
+				});
+			}
 		});', true);
 }
 
@@ -1226,13 +1232,11 @@ function template_profile_birthdate()
 	echo '
 							<dt>
 								<label>', $txt['dob'], '</label>
-								<p class="smalltext">', $txt['dob_year'], ' - ', $txt['dob_month'], ' - ', $txt['dob_day'], '</p>
+								<p class="smalltext">', $txt['dob_month'], ' - ', $txt['dob_day'], ' - ', $txt['dob_year'], '</p>
 							</dt>
-							<dd>
-								<input type="number" name="bday3" size="4" maxlength="4" value="', $context['member']['birth_date']['year'], '" class="input_text" /> -
-								<input type="number" min="0" max="12" name="bday1" size="2" maxlength="2" value="', $context['member']['birth_date']['month'], '" class="input_text" /> -
-								<input type="number" min="0" max="31" name="bday2" size="2" maxlength="2" value="', $context['member']['birth_date']['day'], '" class="input_text" />
-							</dd>';
+						    <dd>
+						        <input type="date" name="bday1" value="', sprintf('%04d-%02d-%02d', $context['member']['birth_date']['year'], $context['member']['birth_date']['month'], $context['member']['birth_date']['day']), '" />
+						    </dd>';
 }
 
 /**

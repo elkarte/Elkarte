@@ -863,30 +863,23 @@ function template_footer()
 /**
  * Output the Javascript files
  *
- * What it does:
- *
- * - tabbing in this function is to make the HTML source look proper
- * - outputs jQuery/jQueryUI from the proper source (local/CDN)
- * - if deferred is set function will output all JS (source & inline) set to load at page end
- * - if the admin option to combine files is set, will use Combiner.class
- *
+ * @depreciated since 2.0, only for old theme suppot
  * @return void
  */
 function template_javascript()
 {
-	theme()->template_javascript();
+	theme()->themeJs()->template_javascript();
 }
 
 /**
  * Output the CSS files
  *
- * What it does:
- *  - If the admin option to combine files is set, will use Combiner.class
+ * @depreciated since 2.0, only for old theme suppot
  * @return void
  */
 function template_css()
 {
-	theme()->template_css();
+	theme()->themecss->template_css();
 }
 
 /**
