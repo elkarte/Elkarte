@@ -69,6 +69,7 @@ require_once(EXTDIR . '/ClassLoader.php');
 $loader = new ClassLoader();
 $loader->setPsr4('ElkArte\\', SOURCEDIR . '/ElkArte');
 $loader->setPsr4('BBC\\', SOURCEDIR . '/ElkArte/BBC');
+$loader->setPsr4('tests\\', SOURCEDIR . 'var/www/tests');
 $loader->register();
 
 // Used by the test, add others as needed or ...

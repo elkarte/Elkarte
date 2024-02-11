@@ -1,16 +1,18 @@
 <?php
 
-use ElkArte\Controller\Calendar;
-use ElkArte\EventManager;
-use ElkArte\Languages\Loader;
-
 /**
  * TestCase class for the Calendar Controller
  *
  * WARNING. These tests work directly with the local database. Don't run
  * them local if you need to keep your data untouched!
  */
-class TestCalendar extends ElkArteCommonSetupTest
+
+use ElkArte\Controller\Calendar;
+use ElkArte\EventManager;
+use ElkArte\Languages\Loader;
+use tests\ElkArteCommonSetupTest;
+
+class CalendarTest extends ElkArteCommonSetupTest
 {
 	protected $backupGlobalsExcludeList = ['user_info'];
 

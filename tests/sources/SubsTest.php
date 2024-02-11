@@ -6,7 +6,7 @@ use PHPUnit\Framework\TestCase;
  * TestCase class for (ideally) all the functions in the Subs.php file
  * that do not fit in any other test
  */
-class TestSubs extends TestCase
+class SubsTest extends TestCase
 {
 	protected $backupGlobalsExcludeList = ['user_info'];
 	/**

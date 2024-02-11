@@ -1,19 +1,20 @@
 <?php
 
-use ElkArte\Controller\Help;
-use ElkArte\EventManager;
-use ElkArte\HttpReq;
-use ElkArte\Themes\ThemeLoader;
-use ElkArte\User;
-use ElkArte\Languages\Loader;
-
 /**
  * TestCase class for the Help Controller
  *
  * WARNING. These tests work directly with the local database. Don't run
  * them local if you need to keep your data untouched!
  */
-class TestHelpController extends ElkArteCommonSetupTest
+
+use ElkArte\Controller\Help;
+use ElkArte\EventManager;
+use ElkArte\HttpReq;
+use ElkArte\Languages\Loader;
+use ElkArte\User;
+use tests\ElkArteCommonSetupTest;
+
+class HelpTest extends ElkArteCommonSetupTest
 {
 	protected $backupGlobalsExcludeList = ['user_info'];
 

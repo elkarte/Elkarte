@@ -1,5 +1,7 @@
 <?php
 
+use tests\ElkArteCommonSetupTest;
+
 /**
  * TestCase class for menu subs.
  */

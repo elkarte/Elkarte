@@ -8,7 +8,7 @@ require_once(SUBSDIR . '/Logging.subs.php');
  * TestCase class for logging
  * @backupGlobals disabled
  */
-class TestLogging extends TestCase
+class LoggingTest extends TestCase
 {
 	protected $backupGlobalsExcludeList = ['user_info'];
 	/**

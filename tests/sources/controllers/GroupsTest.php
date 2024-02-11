@@ -1,18 +1,20 @@
 <?php
 
-use ElkArte\Controller\Groups;
-use ElkArte\EventManager;
-use ElkArte\HttpReq;
-use ElkArte\User;
-use ElkArte\Languages\Loader;
-
 /**
  * TestCase class for the Groups Controller
  *
  * WARNING. These tests work directly with the local database. Don't run
  * them local if you need to keep your data untouched!
  */
-class TestGroups extends ElkArteCommonSetupTest
+
+use ElkArte\Controller\Groups;
+use ElkArte\EventManager;
+use ElkArte\HttpReq;
+use ElkArte\Languages\Loader;
+use ElkArte\User;
+use tests\ElkArteCommonSetupTest;
+
+class GroupsTest extends ElkArteCommonSetupTest
 {
 	protected $controller;
 	protected $backupGlobalsExcludeList = ['user_info'];

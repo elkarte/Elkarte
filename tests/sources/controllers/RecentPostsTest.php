@@ -1,14 +1,16 @@
 <?php
 
-use ElkArte\Controller\Recent;
-use ElkArte\EventManager;
-use ElkArte\User;
-use ElkArte\Languages\Loader;
-
 /**
  * TestCase class for recent posts
  */
-class TestRecentPosts extends ElkArteCommonSetupTest
+
+use ElkArte\Controller\Recent;
+use ElkArte\EventManager;
+use ElkArte\Languages\Loader;
+use ElkArte\User;
+use tests\ElkArteCommonSetupTest;
+
+class RecentPostsTest extends ElkArteCommonSetupTest
 {
 	protected $backupGlobalsExcludeList = ['user_info'];
 

@@ -1,5 +1,12 @@
 <?php
 
+/**
+ * TestCase class for the Packages & PackageServer Controller
+ *
+ * WARNING. These tests work directly with the local database. Don't run
+ * them local if you need to keep your data untouched!
+ */
+
 use ElkArte\EventManager;
 use ElkArte\HttpReq;
 use ElkArte\Languages\Loader;
@@ -7,14 +14,9 @@ use ElkArte\Menu\Menu;
 use ElkArte\Packages\Packages;
 use ElkArte\Packages\PackageServers;
 use ElkArte\User;
+use tests\ElkArteCommonSetupTest;
 
-/**
- * TestCase class for the Packages & PackageServer Controller
- *
- * WARNING. These tests work directly with the local database. Don't run
- * them local if you need to keep your data untouched!
- */
-class TestPackagesController extends ElkArteCommonSetupTest
+class PackagesTest extends ElkArteCommonSetupTest
 {
 	protected $backupGlobalsExcludeList = ['user_info'];
 

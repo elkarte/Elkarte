@@ -1,14 +1,16 @@
 <?php
 
-use ElkArte\AdminController\ManageBoards;
-use ElkArte\EventManager;
-use ElkArte\User;
-use ElkArte\Languages\Loader;
-
 /**
  * TestCase class for manage boards settings
  */
-class TestManageBoardsSettings extends ElkArteCommonSetupTest
+
+use ElkArte\AdminController\ManageBoards;
+use ElkArte\EventManager;
+use ElkArte\Languages\Loader;
+use ElkArte\User;
+use tests\ElkArteCommonSetupTest;
+
+class ManageBoardsSettingsTest extends ElkArteCommonSetupTest
 {
 	protected $backupGlobalsExcludeList = ['user_info'];
 	/**

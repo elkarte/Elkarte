@@ -1,13 +1,15 @@
 <?php
 
-use ElkArte\AdminController\ManageEmojiModule;
-use ElkArte\Emoji;
-use ElkArte\HttpReq;
-
 /**
  * TestCase class for the Emoji Controller
  */
-class TestEmoji extends ElkArteCommonSetupTest
+
+use ElkArte\AdminController\ManageEmojiModule;
+use ElkArte\Emoji;
+use ElkArte\HttpReq;
+use tests\ElkArteCommonSetupTest;
+
+class EmojiTest extends ElkArteCommonSetupTest
 {
 	protected $backupGlobalsExcludeList = ['user_info'];
 

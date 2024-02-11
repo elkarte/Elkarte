@@ -1,15 +1,16 @@
 <?php
 
-use ElkArte\Controller\MessageIndex;
-use ElkArte\EventManager;
-use ElkArte\User;
-use ElkArte\Languages\Loader;
-
-
 /**
  * TestCase class for the Message Index Controller
  */
-class TestMessageIndex extends ElkArteCommonSetupTest
+
+use ElkArte\Controller\MessageIndex;
+use ElkArte\EventManager;
+use ElkArte\Languages\Loader;
+use ElkArte\User;
+use tests\ElkArteCommonSetupTest;
+
+class MessageIndexTest extends ElkArteCommonSetupTest
 {
 	protected $backupGlobalsExcludeList = ['user_info'];
 
