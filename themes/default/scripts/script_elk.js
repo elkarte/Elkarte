@@ -1601,7 +1601,7 @@ function disableAutoComplete()
 			if (typeof opt.delay === 'undefined')
 			{
 				start = false;
-				opt.delay = 30000;
+				opt.delay = 45000;
 			}
 
 			setTimeout(function ()
@@ -1634,6 +1634,7 @@ function disableAutoComplete()
 				cache: false,
 				dataType: 'json',
 				timeout: 1500,
+				beforeSend: function(xhr){xhr.overrideMimeType("application/json; charset=utf-8");},
 				url: elk_prepareScriptUrl(elk_scripturl) + "action=mentions;sa=fetch;api=json;lastsent=" + lastTime
 			})
 			.done(function (request)
@@ -2321,4 +2322,33 @@ elkMenu.prototype.keysCallback = function (keyboardEvent, el)
 				break;
 		}
 	}
+};
+
+/**
+ * This function regularly checks for the existence of a specific function in the global scope,
+ * until either the function appears or a time limit passes. This could be helpful for scripts
+ * that rely on deferred or asynchronously loaded scripts.
+ *
+ * isFunctionLoaded(NameOfFunction).then((available) => { if (available === true) DoStuff })
+ *
+ * @param {string} selector - The name of the function to check.
+ * @param {number} [limit] - The maximum number of retries before considering the function as not loaded. Default is 120. Every 60 is ~ 1 second wait time.
+ * @returns {Promise<boolean>} - A Promise that resolves to `true` if the function is loaded, or `false` if it is not loaded within the specified limit.
+ */
+async function isFunctionLoaded(selector, limit)
+{
+	let MAX_RETRIES = limit || 180;
+	let retries = 0;
+	while (typeof window[selector] !== "function" && retries < MAX_RETRIES)
+	{
+		await new Promise(resolve => requestAnimationFrame(resolve));
+		retries++;
+	}
+
+	if (retries < MAX_RETRIES)
+	{
+		return true;
+	}
+
+	return false;
 };
