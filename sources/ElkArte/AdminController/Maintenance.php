@@ -284,7 +284,7 @@ class Maintenance extends AbstractController
 			);
 		}
 
-		loadJavascriptFile('suggest.js');
+		loadJavascriptFile('suggest.js', array('defer' => true));
 
 		// Set up the sub-template
 		$context['sub_template'] = 'maintain_members';

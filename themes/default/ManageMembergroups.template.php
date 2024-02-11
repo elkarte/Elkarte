@@ -396,18 +396,20 @@ function template_edit_group()
 	if ($context['group']['id'] != 3 && $context['group']['id'] != 4)
 	{
 		$js = '
-		new smc_AutoSuggest({
-			sSessionId: elk_session_id,
-			sSessionVar: elk_session_var,
-			sSuggestId: \'group_moderators\',
-			sControlId: \'group_moderators\',
-			sSearchType: \'member\',
-			bItemList: true,
-			sPostName: \'moderator_list\',
-			sURLMask: \'action=profile;u=%item_id%\',
-			sTextDeleteItem: ' . JavaScriptEscape($txt['autosuggest_delete_item']) . ',
-			sItemListContainerId: \'moderator_container\',
-			aListItems: [';
+		isFunctionLoaded("smc_AutoSuggest").then((available) => { 
+			if (available) {
+				new smc_AutoSuggest({
+					sSessionId: elk_session_id,
+					sSessionVar: elk_session_var,
+					sSuggestId: \'group_moderators\',
+					sControlId: \'group_moderators\',
+					sSearchType: \'member\',
+					bItemList: true,
+					sPostName: \'moderator_list\',
+					sURLMask: \'action=profile;u=%item_id%\',
+					sTextDeleteItem: ' . JavaScriptEscape($txt['autosuggest_delete_item']) . ',
+					sItemListContainerId: \'moderator_container\',
+					aListItems: [';
 
 		foreach ($context['group']['moderators'] as $id_member => $member_name)
 		{
@@ -420,6 +422,8 @@ function template_edit_group()
 
 		$js .= '
 			]
+				});
+			}
 		});';
 
 		theme()->addInlineJavascript($js, true);
@@ -739,17 +743,21 @@ function template_group_members()
 	if (!empty($context['group']['assignable']))
 	{
 		theme()->addInlineJavascript('
-		new smc_AutoSuggest({
-			sSessionId: elk_session_id,
-			sSessionVar: elk_session_var,
-			sSuggestId: \'to_suggest\',
-			sControlId: \'toAdd\',
-			sSearchType: \'member\',
-			sPostName: \'member_add\',
-			sURLMask: \'action=profile;u=%item_id%\',
-			sTextDeleteItem: ' . JavaScriptEscape($txt['autosuggest_delete_item']) . ',
-			bItemList: true,
-			sItemListContainerId: \'toAddItemContainer\'
+		isFunctionLoaded("smc_AutoSuggest").then((available) => { 
+			if (available) {
+				new smc_AutoSuggest({
+					sSessionId: elk_session_id,
+					sSessionVar: elk_session_var,
+					sSuggestId: \'to_suggest\',
+					sControlId: \'toAdd\',
+					sSearchType: \'member\',
+					sPostName: \'member_add\',
+					sURLMask: \'action=profile;u=%item_id%\',
+					sTextDeleteItem: ' . JavaScriptEscape($txt['autosuggest_delete_item']) . ',
+					bItemList: true,
+					sItemListContainerId: \'toAddItemContainer\'
+				});
+			}
 		});', true);
 	}
 }

@@ -218,9 +218,11 @@ class MemberLoader
 		)->fetch_callback(
 			function ($row) use (&$new_loaded_ids) {
 				$row['id_member'] = (int) $row['id_member'];
+				$row['id_group'] = (int) $row['id_group'];
+
 				$new_loaded_ids[] = $row['id_member'];
 				$this->loaded_ids[] = $row['id_member'];
-				$row['options'] = array();
+				$row['options'] = [];
 				$this->loaded_members[$row['id_member']] = new Member($row, $this->set, $this->bbc_parser);
 				$this->users_list->add($this->loaded_members[$row['id_member']], $row['id_member']);
 			}

@@ -1074,6 +1074,10 @@ function membergroupsById($group_ids, $limit = 1, $detailed = false, $assignable
 		)
 	)->fetch_callback(
 		function ($row) use (&$groups) {
+			$row['id_group'] = (int) $row['id_group'];
+			$row['id_parent'] = (int) $row['id_parent'];
+			$row['group_type'] = (int) $row['group_type'];
+
 			$groups[$row['id_group']] = $row;
 		}
 	);

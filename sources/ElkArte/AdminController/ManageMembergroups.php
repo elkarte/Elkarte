@@ -830,7 +830,7 @@ class ManageMembergroups extends AbstractController
 		// Use the autosuggest script when needed
 		if ($context['group']['id'] != 3 && $context['group']['id'] != 4)
 		{
-			loadJavascriptFile('suggest.js');
+			loadJavascriptFile('suggest.js', array('defer' => true));
 		}
 
 		createToken('admin-mmg');

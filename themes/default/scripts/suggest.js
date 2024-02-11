@@ -10,11 +10,11 @@
  */
 
 /**
- * This file contains javascript associated with a autosuggest control.
+ * This file contains javascript associated with an auto suggest control.
  */
 
 /**
- * The autosuggest class, used to display a selection list of members
+ * The auto suggest class, used to display a selection list of members
  *
  * @param {object} oOptions
  */
@@ -32,22 +32,22 @@ function smc_AutoSuggest(oOptions)
 	this.oSelectedDiv = null;
 	this.aCache = [];
 	this.aDisplayData = [];
-	this.sRetrieveURL = 'sRetrieveURL' in this.opt ? this.opt.sRetrieveURL : '%scripturl%action=suggest;api=xml';
+	this.sRetrieveURL = this.opt.sRetrieveURL || '%scripturl%action=suggest;api=xml';
 
 	// How many objects can we show at once?
-	this.iMaxDisplayQuantity = 'iMaxDisplayQuantity' in this.opt ? this.opt.iMaxDisplayQuantity : 12;
+	this.iMaxDisplayQuantity = this.opt.iMaxDisplayQuantity || 12;
 
 	// How many characters shall we start searching on?
-	this.iMinimumSearchChars = 'iMinimumSearchChars' in this.opt ? this.opt.iMinimumSearchChars : 2;
+	this.iMinimumSearchChars = this.opt.iMinimumSearchChars || 2;
 
 	// Should selected items be added to a list?
-	this.bItemList = 'bItemList' in this.opt ? this.opt.bItemList : false;
+	this.bItemList = this.opt.bItemList || false;
 
 	// Are there any items that should be added in advance?
-	this.aListItems = 'aListItems' in this.opt ? this.opt.aListItems : [];
+	this.aListItems = this.opt.aListItems || [];
 
-	this.sItemTemplate = 'sItemTemplate' in this.opt ? this.opt.sItemTemplate : '<input type="hidden" name="%post_name%[]" value="%item_id%" /><a href="%item_href%" class="extern" onclick="window.open(this.href, \'_blank\'); return false;">%item_name%</a>&nbsp;<i class="icon icon-small i-remove" title="%delete_text%"><s>%delete_text%</s></i>';
-	this.sTextDeleteItem = 'sTextDeleteItem' in this.opt ? this.opt.sTextDeleteItem : '';
+	this.sItemTemplate = this.opt.sItemTemplate || '<input type="hidden" name="%post_name%[]" value="%item_id%" /><a href="%item_href%" class="extern" onclick="window.open(this.href, \'_blank\'); return false;">%item_name%</a>&nbsp;<i class="icon icon-small i-remove" title="%delete_text%"><s>%delete_text%</s></i>';
+	this.sTextDeleteItem = this.opt.sTextDeleteItem || '';
 	this.oCallback = {};
 	this.bDoAutoAdd = false;
 	this.iItemCount = 0;
@@ -60,7 +60,9 @@ function smc_AutoSuggest(oOptions)
 	window.addEventListener("load", this.init.bind(this));
 }
 
-// Initialize our autosuggest object, adds events and containers to the element we monitor
+/**
+ * Initialize our auto suggest object, adds events and containers to the element we monitor
+ */
 smc_AutoSuggest.prototype.init = function ()
 {
 	// Create a div that'll contain the results later on.
@@ -103,9 +105,9 @@ smc_AutoSuggest.prototype.init = function ()
 	// Items provided to add to the top of the selection list?
 	if (this.aListItems.length > 0)
 	{
-		for (var i = 0, n = this.aListItems.length; i < n; i++)
+		for (let i = 0, n = this.aListItems.length; i < n; i++)
 		{
-			this.addItemLink(this.aListItems[i].sItemId, this.aListItems[i].sItemName);
+			this.addItemLink(this.aListItems[i].sItemId, this.aListItems[i].sItemName, false);
 		}
 	}
 
@@ -114,129 +116,151 @@ smc_AutoSuggest.prototype.init = function ()
 
 /**
  * Handle keypress events for the suggest controller
- *
- * @param oEvent
  */
-smc_AutoSuggest.prototype.handleKey = function (oEvent)
-{
-	// Grab the event object, one way or the other
-	if (!oEvent)
-	{
-		oEvent = window.event;
-	}
+smc_AutoSuggest.prototype.handleKey = function (oEvent) {
+	let iKeyPress = this.getKeyPress(oEvent);
 
-	// Get the keycode of the key that was pressed.
-	var iKeyPress = 0;
-	if ('which' in oEvent)
-	{
-		iKeyPress = oEvent.which;
-	}
-	else if ('keyCode' in oEvent)
-	{
-		iKeyPress = oEvent.keyCode;
-	}
-
-	// Check what key they have pressed
 	switch (iKeyPress)
 	{
-		// Tab.
-		case 9:
-			if (this.aDisplayData.length > 0)
-			{
-				if (this.oSelectedDiv !== null)
-				{
-					this.itemClicked(this.oSelectedDiv);
-				}
-				else
-				{
-					this.handleSubmit();
-				}
-			}
-
-			// Continue to the next control.
-			return true;
-
-		// Was it an Enter key - if so assume they are trying to select something.
-		case 13:
-			if (this.aDisplayData.length > 0 && this.oSelectedDiv !== null)
-			{
-				this.itemClicked(this.oSelectedDiv);
-
-				// Do our best to stop it submitting the form!
-				return false;
-			}
-			else
-			{
-				return true;
-			}
-			break;
-
-		// Up/Down arrow?
-		case 38:
-		case 40:
-			if (this.aDisplayData.length && this.oSuggestDivHandle.style.visibility !== 'hidden')
-			{
-				// Loop through the display data trying to find our entry.
-				var bPrevHandle = false,
-					oToHighlight = null;
-
-				for (var i = 0; i < this.aDisplayData.length; i++)
-				{
-					// If we're going up and yet the top one was already selected don't go around.
-					if (this.oSelectedDiv !== null && this.oSelectedDiv === this.aDisplayData[i] && i === 0 && iKeyPress === 38)
-					{
-						oToHighlight = this.oSelectedDiv;
-						break;
-					}
-
-					// If nothing is selected and we are going down then we select the first one.
-					if (this.oSelectedDiv === null && iKeyPress === 40)
-					{
-						oToHighlight = this.aDisplayData[i];
-						break;
-					}
-
-					// If the previous handle was the actual previously selected one and we're hitting down then this is the one we want.
-					if (bPrevHandle !== false && bPrevHandle === this.oSelectedDiv && iKeyPress === 40)
-					{
-						oToHighlight = this.aDisplayData[i];
-						break;
-					}
-
-					// If we're going up and this is the previously selected one then we want the one before, if there was one.
-					if (bPrevHandle !== false && this.aDisplayData[i] === this.oSelectedDiv && iKeyPress === 38)
-					{
-						oToHighlight = bPrevHandle;
-						break;
-					}
-
-					// Make the previous handle this!
-					bPrevHandle = this.aDisplayData[i];
-				}
-
-				// If we don't have one to highlight by now then it must be the last one that we're after.
-				if (oToHighlight === null)
-				{
-					oToHighlight = bPrevHandle;
-				}
-
-				// Remove any old highlighting.
-				if (this.oSelectedDiv !== null)
-				{
-					this.itemMouseOut(this.oSelectedDiv);
-				}
-
-				// Mark what the selected div now is.
-				this.oSelectedDiv = oToHighlight;
-				this.itemMouseOver(this.oSelectedDiv);
-			}
-			break;
+		case 9: // Tab
+			return this.handleTabKey();
+		case 13: // Enter
+			return this.handleEnterKey();
+		case 38: // Up arrow
+		case 40: // Down arrow
+			return this.handleArrowKey(iKeyPress);
 	}
 
 	return true;
 };
 
-// Functions for integration.
+/**
+ * Gets the key pressed from the event handler.
+ */
+smc_AutoSuggest.prototype.getKeyPress = function (oEvent) {
+	return 'which' in oEvent ? oEvent.which : oEvent.keyCode;
+};
+
+/**
+ * Handles the tab key press event for the AutoSuggest component.
+ */
+smc_AutoSuggest.prototype.handleTabKey = function () {
+	if (this.aDisplayData.length > 0)
+	{
+		if (this.oSelectedDiv !== null)
+		{
+			this.itemClicked(this.oSelectedDiv);
+		}
+		else
+		{
+			this.handleSubmit();
+		}
+	}
+
+	return true;
+};
+
+/**
+ * Handles the enter key press event for the auto-suggest feature.
+ * Triggers the selectItem() method to select the highlighted item
+ * when the enter key is pressed.
+ */
+smc_AutoSuggest.prototype.handleEnterKey = function () {
+	if (this.aDisplayData.length > 0 && this.oSelectedDiv !== null)
+	{
+		this.itemClicked(this.oSelectedDiv);
+
+		// Do our best to stop it submitting the form!
+		return false;
+	}
+
+	return true;
+};
+
+/**
+ * Handles the up/down arrow key events for the AutoSuggest component.
+ */
+smc_AutoSuggest.prototype.handleArrowKey = function (iKeyPress) {
+	if (this.aDisplayData.length && this.oSuggestDivHandle.style.visibility !== 'hidden')
+	{
+		// Loop through the display data trying to find our entry.
+		let bPrevHandle = false,
+			oToHighlight = null;
+
+		for (let i = 0; i < this.aDisplayData.length; i++)
+		{
+			// If we're going up and yet the top one was already selected don't go around.
+			if (this.oSelectedDiv !== null && this.oSelectedDiv === this.aDisplayData[i] && i === 0 && iKeyPress === 38)
+			{
+				oToHighlight = this.oSelectedDiv;
+				break;
+			}
+
+			// If nothing is selected, and we are going down then we select the first one.
+			if (this.oSelectedDiv === null && iKeyPress === 40)
+			{
+				oToHighlight = this.aDisplayData[i];
+				break;
+			}
+
+			// If the previous handle was the actual previously selected one, and we're hitting down then this is the one we want.
+			if (bPrevHandle !== false && bPrevHandle === this.oSelectedDiv && iKeyPress === 40)
+			{
+				oToHighlight = this.aDisplayData[i];
+				break;
+			}
+
+			// If we're going up and this is the previously selected one then we want the one before, if there was one.
+			if (bPrevHandle !== false && this.aDisplayData[i] === this.oSelectedDiv && iKeyPress === 38)
+			{
+				oToHighlight = bPrevHandle;
+				break;
+			}
+
+			// Make the previous handle this!
+			bPrevHandle = this.aDisplayData[i];
+		}
+
+		// If we don't have one to highlight by now then it must be the last one that we're after.
+		if (oToHighlight === null)
+		{
+			oToHighlight = bPrevHandle;
+		}
+
+		// Remove any old highlighting.
+		if (this.oSelectedDiv !== null)
+		{
+			this.itemMouseOut(this.oSelectedDiv);
+		}
+
+		// Mark what the selected div now is.
+		this.oSelectedDiv = oToHighlight;
+		this.itemMouseOver(this.oSelectedDiv);
+	}
+
+	return true;
+};
+
+/**
+ * Handles the mouse over event for an item in the auto suggest menu.
+ */
+smc_AutoSuggest.prototype.itemMouseOver = function (oCurElement)
+{
+	this.oSelectedDiv = oCurElement;
+	oCurElement.className = 'auto_suggest_item_hover';
+};
+
+/**
+ * Handle the mouse out event on an item in the auto suggest dropdown.
+ */
+smc_AutoSuggest.prototype.itemMouseOut = function (oCurElement)
+{
+	oCurElement.className = 'auto_suggest_item';
+};
+
+/**
+ * Registers a callback function to be called when the auto-suggest results are available.
+  */
 smc_AutoSuggest.prototype.registerCallback = function (sCallbackType, sCallback)
 {
 	switch (sCallbackType)
@@ -259,16 +283,20 @@ smc_AutoSuggest.prototype.registerCallback = function (sCallbackType, sCallback)
 	}
 };
 
-// User hit submit?
+/**
+ * Handle form submission for the AutoSuggest component.
+ *
+ * @returns {boolean} - Returns false to prevent the default form submission behavior.
+ */
 smc_AutoSuggest.prototype.handleSubmit = function ()
 {
-	var bReturnValue = true,
+	let bReturnValue = true,
 		oFoundEntry = null;
 
 	// Do we have something that matches the current text?
-	for (var i = 0; i < this.aCache.length; i++)
+	for (let i = 0; i < this.aCache.length; i++)
 	{
-		if (this.sLastSearch.toLowerCase() === this.aCache[i].sItemName.toLowerCase().substr(0, this.sLastSearch.length))
+		if (this.sLastSearch.toLowerCase() === this.aCache[i].sItemName.toLowerCase().substring(0, this.sLastSearch.length))
 		{
 			// Exact match?
 			if (this.sLastSearch.length === this.aCache[i].sItemName.length)
@@ -309,7 +337,9 @@ smc_AutoSuggest.prototype.handleSubmit = function ()
 	return false;
 };
 
-// Positions the box correctly on the window.
+/**
+ * Positions the suggestion dropdown div based on the input element's position.
+ */
 smc_AutoSuggest.prototype.positionDiv = function ()
 {
 	// Only do it once.
@@ -321,7 +351,7 @@ smc_AutoSuggest.prototype.positionDiv = function ()
 	this.bPositionComplete = true;
 
 	// Put the div under the text box.
-	var aParentPos = elk_itemPos(this.oTextHandle);
+	let aParentPos = elk_itemPos(this.oTextHandle);
 
 	this.oSuggestDivHandle.style.left = aParentPos[0] + 'px';
 	this.oSuggestDivHandle.style.top = (aParentPos[1] + this.oTextHandle.offsetHeight) + 'px';
@@ -330,18 +360,22 @@ smc_AutoSuggest.prototype.positionDiv = function ()
 	return true;
 };
 
-// Do something after clicking an item.
+/**
+ * Called when an item in the auto suggest list is clicked.
+ */
 smc_AutoSuggest.prototype.itemClicked = function (oEvent)
 {
+	let target = 'target' in oEvent ? oEvent.target : oEvent;
+
 	// Is there a div that we are populating?
 	if (this.bItemList)
 	{
-		this.addItemLink(oEvent.target.sItemId, oEvent.target.innerHTML);
+		this.addItemLink(target.sItemId, target.innerHTML, false);
 	}
 	// Otherwise clear things down.
 	else
 	{
-		this.oTextHandle.value = oEvent.target.innerHTML.php_unhtmlspecialchars();
+		this.oTextHandle.value = target.innerHTML.php_unhtmlspecialchars();
 	}
 
 	this.oRealTextHandle.value = this.oTextHandle.value;
@@ -349,11 +383,13 @@ smc_AutoSuggest.prototype.itemClicked = function (oEvent)
 	this.oSelectedDiv = null;
 };
 
-// Remove the last searched for name from the search box.
+/**
+ * Removes the last entered search string from the auto-suggest component.
+ */
 smc_AutoSuggest.prototype.removeLastSearchString = function ()
 {
 	// Remove the text we searched for from the div.
-	var sTempText = this.oTextHandle.value.toLowerCase(),
+	let sTempText = this.oTextHandle.value.toLowerCase(),
 		iStartString = sTempText.indexOf(this.sLastSearch.toLowerCase());
 
 	// Just attempt to remove the bits we just searched for.
@@ -376,7 +412,7 @@ smc_AutoSuggest.prototype.removeLastSearchString = function ()
 		}
 
 		// Now remove anything from iStartString upwards.
-		this.oTextHandle.value = this.oTextHandle.value.substr(0, iStartString);
+		this.oTextHandle.value = this.oTextHandle.value.substring(0, iStartString);
 	}
 	// Just take it all.
 	else
@@ -385,7 +421,13 @@ smc_AutoSuggest.prototype.removeLastSearchString = function ()
 	}
 };
 
-// Add a result if not already done.
+/**
+ * Adds an item link to the item list.
+ *
+ * @param {string} sItemId - The ID of the item.
+ * @param {string} sItemName - The name of the item.
+ * @param {boolean} bFromSubmit - Specifies whether the call is from a submit action.
+ */
 smc_AutoSuggest.prototype.addItemLink = function (sItemId, sItemName, bFromSubmit)
 {
 	// Increase the internal item count.
@@ -401,7 +443,7 @@ smc_AutoSuggest.prototype.addItemLink = function (sItemId, sItemName, bFromSubmi
 		}
 	}
 
-	var oNewDiv = document.createElement('div');
+	let oNewDiv = document.createElement('div');
 	oNewDiv.id = 'suggest_' + this.opt.sSuggestId + '_' + sItemId;
 	oNewDiv.innerHTML = this.sItemTemplate
 		.replace(/%post_name%/g, this.opt.sPostName)
@@ -424,14 +466,16 @@ smc_AutoSuggest.prototype.addItemLink = function (sItemId, sItemName, bFromSubmi
 	// If we came from a submit, and there's still more to go, turn on auto add for all the other things.
 	this.bDoAutoAdd = this.oTextHandle.value !== '' && bFromSubmit;
 
-	// Update the fellow..
+	// Update the fellow.
 	this.autoSuggestUpdate();
 };
 
-// Delete an item that has been added, if at all?
+/**
+ * Deletes the added item from the auto-suggest component.
+  */
 smc_AutoSuggest.prototype.deleteAddedItem = function (oEvent)
 {
-	var oDiv;
+	let oDiv;
 
 	// A registerCallback, e.g. PM preventing duplicate entries
 	if (typeof oEvent === 'string')
@@ -463,14 +507,18 @@ smc_AutoSuggest.prototype.deleteAddedItem = function (oEvent)
 	return false;
 };
 
-// Hide the box.
+/**
+ * Hide the auto suggest suggestions.
+ */
 smc_AutoSuggest.prototype.autoSuggestHide = function ()
 {
 	// Delay to allow events to propagate through....
 	this.oHideTimer = setTimeout(this.autoSuggestActualHide.bind(this), 350);
 };
 
-// Do the actual hiding after a timeout.
+/**
+ * Hides the actual auto-suggest dropdown after a timeout
+ */
 smc_AutoSuggest.prototype.autoSuggestActualHide = function ()
 {
 	this.oSuggestDivHandle.style.display = 'none';
@@ -478,7 +526,9 @@ smc_AutoSuggest.prototype.autoSuggestActualHide = function ()
 	this.oSelectedDiv = null;
 };
 
-// Show the box.
+/**
+ * Shows the auto suggest dropdown when triggered by the user.
+ */
 smc_AutoSuggest.prototype.autoSuggestShow = function ()
 {
 	if (this.oHideTimer)
@@ -492,13 +542,15 @@ smc_AutoSuggest.prototype.autoSuggestShow = function ()
 	this.oSuggestDivHandle.style.display = '';
 };
 
-// Populate the actual div.
+/**
+ * Populates the auto-suggest dropdown div with suggestions based on the provided data.
+ */
 smc_AutoSuggest.prototype.populateDiv = function (aResults)
 {
 	// Cannot have any children yet.
 	while (this.oSuggestDivHandle.childNodes.length > 0)
 	{
-		// Tidy up the events etc too.
+		// Tidy up the events etc. too.
 		this.oSuggestDivHandle.childNodes[0].onmouseover = null;
 		this.oSuggestDivHandle.childNodes[0].onmouseout = null;
 		this.oSuggestDivHandle.childNodes[0].onclick = null;
@@ -513,11 +565,11 @@ smc_AutoSuggest.prototype.populateDiv = function (aResults)
 		return false;
 	}
 
-	var aNewDisplayData = [];
-	for (var i = 0; i < (aResults.length > this.iMaxDisplayQuantity ? this.iMaxDisplayQuantity : aResults.length); i++)
+	let aNewDisplayData = [];
+	for (let i = 0; i < (aResults.length > this.iMaxDisplayQuantity ? this.iMaxDisplayQuantity : aResults.length); i++)
 	{
 		// Create the sub element
-		var oNewDivHandle = document.createElement('div');
+		let oNewDivHandle = document.createElement('div');
 
 		oNewDivHandle.sItemId = aResults[i].sItemId;
 		oNewDivHandle.className = 'auto_suggest_item';
@@ -526,7 +578,7 @@ smc_AutoSuggest.prototype.populateDiv = function (aResults)
 
 		this.oSuggestDivHandle.appendChild(oNewDivHandle);
 
-		// Attach some events to it so we can do stuff.
+		// Attach some events to it, so we can do stuff.
 		oNewDivHandle.onmouseover = function ()
 		{
 			this.className = 'auto_suggest_item_hover';
@@ -545,7 +597,9 @@ smc_AutoSuggest.prototype.populateDiv = function (aResults)
 	return true;
 };
 
-// Callback function for the XML request, should contain the list of users that match
+/**
+ * Callback function for the XML request, should contain the list of users that match
+ */
 smc_AutoSuggest.prototype.onSuggestionReceived = function (oXMLDoc)
 {
 	if (oXMLDoc === false)
@@ -557,17 +611,17 @@ smc_AutoSuggest.prototype.onSuggestionReceived = function (oXMLDoc)
 
 	// Go through each item received
 	this.aCache = [];
-	for (var i = 0; i < aItems.length; i++)
+	for (let i = 0; i < aItems.length; i++)
 	{
 		this.aCache[i] = {
 			sItemId: aItems[i].getAttribute('id'),
 			sItemName: aItems[i].childNodes[0].nodeValue
 		};
 
-		// If we're doing auto add and we found the exact person, then add them!
+		// If we're doing auto add, and we found the exact person, then add them!
 		if (this.bDoAutoAdd && this.sLastSearch === this.aCache[i].sItemName)
 		{
-			var oReturnValue = {
+			let oReturnValue = {
 				sItemId: this.aCache[i].sItemId,
 				sItemName: this.aCache[i].sItemName
 			};
@@ -596,7 +650,9 @@ smc_AutoSuggest.prototype.onSuggestionReceived = function (oXMLDoc)
 	return true;
 };
 
-// Get a new suggestion.
+/**
+ * Update the suggestions in the auto suggest dropdown based on the user input
+ */
 smc_AutoSuggest.prototype.autoSuggestUpdate = function ()
 {
 	// If there's a callback then call it.
@@ -628,18 +684,18 @@ smc_AutoSuggest.prototype.autoSuggestUpdate = function ()
 	this.sLastDirtySearch = this.oTextHandle.value;
 
 	// We're only actually interested in the last string.
-	var sSearchString = this.oTextHandle.value.replace(/^("[^"]+",[ ]*)+/, '').replace(/^([^,]+,[ ]*)+/, '');
-	if (sSearchString.substr(0, 1) === '"')
+	let sSearchString = this.oTextHandle.value.replace(/^("[^"]+",[ ]*)+/, '').replace(/^([^,]+,[ ]*)+/, '');
+	if (sSearchString.substring(0, 1) === '"')
 	{
-		sSearchString = sSearchString.substr(1);
+		sSearchString = sSearchString.substring(1);
 	}
 
 	// Stop replication ASAP.
-	var sRealLastSearch = this.sLastSearch;
+	let sRealLastSearch = this.sLastSearch;
 	this.sLastSearch = sSearchString;
 
 	// Either nothing or we've completed a sentence.
-	if (sSearchString === '' || sSearchString.substr(sSearchString.length - 1) === '"')
+	if (sSearchString === '' || sSearchString.substring(sSearchString.length - 1) === '"')
 	{
 		this.populateDiv();
 		return true;
@@ -650,23 +706,25 @@ smc_AutoSuggest.prototype.autoSuggestUpdate = function ()
 	{
 		return true;
 	}
+
 	// Too small?
-	else if (sSearchString.length < this.iMinimumSearchChars)
+	if (sSearchString.length < this.iMinimumSearchChars)
 	{
 		this.aCache = [];
 		this.autoSuggestHide();
 		return true;
 	}
-	else if (sSearchString.substr(0, sRealLastSearch.length) === sRealLastSearch)
+
+	if (sSearchString.substring(0, sRealLastSearch.length) === sRealLastSearch)
 	{
 		// Instead of hitting the server again, just narrow down the results...
-		var aNewCache = [],
+		let aNewCache = [],
 			j = 0,
 			sLowercaseSearch = sSearchString.toLowerCase();
 
-		for (var k = 0; k < this.aCache.length; k++)
+		for (let k = 0; k < this.aCache.length; k++)
 		{
-			if (this.aCache[k].sItemName.substr(0, sSearchString.length).toLowerCase() === sLowercaseSearch)
+			if (this.aCache[k].sItemName.slice(0, sSearchString.length).toLowerCase() === sLowercaseSearch)
 			{
 				aNewCache[j++] = this.aCache[k];
 			}
@@ -697,7 +755,7 @@ smc_AutoSuggest.prototype.autoSuggestUpdate = function ()
 	sSearchString = sSearchString.php_urlencode();
 
 	// Get the document.
-	var obj = {
+	let obj = {
 			"suggest_type": this.opt.sSearchType,
 			"search": sSearchString,
 			"time": new Date().getTime()

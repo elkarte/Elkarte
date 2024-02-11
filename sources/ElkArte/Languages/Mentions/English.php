@@ -38,6 +38,7 @@ $txt['mentions_type_rlikemsg'] = 'Unlikes';
 $txt['mentions_type_buddy'] = 'Buddy';
 $txt['mentions_type_quotedmem'] = 'Quoted';
 $txt['mentions_type_mailfail'] = 'Delivery Failure';
+$txt['mentions_type_watchedtopic'] = 'Watching';
 
 $txt['mentions_mark_all_read'] = 'Mark these mentions as read';
 

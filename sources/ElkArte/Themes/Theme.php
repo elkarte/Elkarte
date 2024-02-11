@@ -38,7 +38,8 @@ abstract class Theme
 	private const CONTENT_TYPES = [
 		'fatal_error' => 'text/html',
 		'json' => 'application/json',
-		'xml' => 'text/xml'
+		'xml' => 'text/xml',
+		'generic_xml' => 'text/xml'
 	];
 	/** @var ValuesContainer */
 	public $user;

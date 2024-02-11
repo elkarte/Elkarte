@@ -466,7 +466,7 @@ class Groups extends AbstractController
 
 		if (!empty($context['group']['assignable']))
 		{
-			loadJavascriptFile('suggest.js');
+			loadJavascriptFile('suggest.js', array('defer' => true));
 		}
 
 		// Select the template.

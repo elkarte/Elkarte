@@ -22,7 +22,7 @@ use ElkArte\User;
 class Txt
 {
 	/** @var Loader[] */
-	protected static $loader = null;
+	protected static $loader;
 
 	/**
 	 * Loads the language lexicon file(s) in the proper language
@@ -37,7 +37,7 @@ class Txt
 
 		if (self::$loader === null)
 		{
-			$txt = [];
+			$txt = $txt ?? [];
 			$lang = User::$info->language ?? $language;
 			self::$loader = new Loader($lang, $txt, database());
 			self::$loader->setFallback(empty($modSettings['disable_language_fallback']));
