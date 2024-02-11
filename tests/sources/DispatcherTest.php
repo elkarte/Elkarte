@@ -1,5 +1,19 @@
 <?php
 
+use ElkArte\AdminController\Admin;
+use ElkArte\Controller\Announce;
+use ElkArte\Controller\Attachment;
+use ElkArte\Controller\Auth;
+use ElkArte\Controller\BoardIndex;
+use ElkArte\Controller\Display;
+use ElkArte\Controller\Help;
+use ElkArte\Controller\Members;
+use ElkArte\Controller\MessageIndex;
+use ElkArte\Controller\ModerateAttachments;
+use ElkArte\Controller\Notify;
+use ElkArte\Controller\Post;
+use ElkArte\Controller\Register;
+use ElkArte\Controller\RemoveTopic;
 use ElkArte\EventManager;
 use ElkArte\HttpReq;
 use ElkArte\SiteDispatcher;
@@ -32,7 +46,6 @@ class DispatcherTest extends TestCase
 			'groups' => array('index', 'members', 'requests'),
 			'help' => array('index'),
 			'topic' => array('lock', 'printpage', 'sticky'),
-			'profile' => array('index'),
 			'reminder' => array('picktype', 'secret2', 'setpassword', 'setpassword2'),
 		);
 
@@ -55,31 +68,30 @@ class DispatcherTest extends TestCase
 		// controller hardcoded, sa action
 		// these are ?action=name routed to SomeController->action_name()
 		$actions = array(
-			'activate' => '\\ElkArte\\Controller\\Register',
-			'attachapprove' => '\\ElkArte\\Controller\\ModerateAttachments',
-			'addbuddy' => '\\ElkArte\\Controller\\Members',
-			'collapse' => '\\ElkArte\\Controller\\BoardIndex',
-			'contact' => '\\ElkArte\\Controller\\Register',
-			'coppa' => '\\ElkArte\\Controller\\Register',
-			'deletemsg' => '\\ElkArte\\Controller\\RemoveTopic',
-			'dlattach' => '\\ElkArte\\Controller\\Attachment',
-			'unwatchtopic' => '\\ElkArte\\Controller\\Notify',
-			'quickhelp' => '\\ElkArte\\Controller\\Help',
-			'login' => '\\ElkArte\\Controller\\Auth',
-			'login2' => '\\ElkArte\\Controller\\Auth',
-			'logout' => '\\ElkArte\\Controller\\Auth',
-			'quotefast' => '\\ElkArte\\Controller\\Post',
-			'quickmod' => '\\ElkArte\\Controller\\MessageIndex',
-			'quickmod2' => '\\ElkArte\\Controller\\Display',
+			'activate' => Register::class,
+			'attachapprove' => ModerateAttachments::class,
+			'addbuddy' => Members::class,
+			'collapse' => BoardIndex::class,
+			'contact' => Register::class,
+			'coppa' => Register::class,
+			'deletemsg' => RemoveTopic::class,
+			'dlattach' => Attachment::class,
+			'unwatchtopic' => Notify::class,
+			'quickhelp' => Help::class,
+			'login' => Auth::class,
+			'login2' => Auth::class,
+			'logout' => Auth::class,
+			'quotefast' => Post::class,
+			'quickmod' => MessageIndex::class,
+			'quickmod2' => Display::class,
 		);
 
 		foreach (array_keys($actions) as $action)
 		{
 			$controller_name = ucfirst($actions[$action]);
 			$controller = new $controller_name(new EventManager());
-			$this->assertTrue(method_exists($controller, 'action_' . $action));
+			$this->assertTrue(method_exists($controller, 'action_' . $action, ), 'action_' . $action);
 		}
-
 	}
 
 	/**
@@ -95,7 +107,7 @@ class DispatcherTest extends TestCase
 				'test_name' => 'no action',
 				'result' => array(
 					'function_name' => 'action_boardindex',
-					'controller_name' => '\\ElkArte\\Controller\\BoardIndex',
+					'controller_name' => BoardIndex::class,
 				),
 			),
 			// A topic
@@ -105,7 +117,7 @@ class DispatcherTest extends TestCase
 				'topic' => 1,
 				'result' => array(
 					'function_name' => 'action_display',
-					'controller_name' => '\\ElkArte\\Controller\\Display',
+					'controller_name' => Display::class,
 				),
 			),
 			// A board
@@ -114,7 +126,7 @@ class DispatcherTest extends TestCase
 				'board' => 1,
 				'result' => array(
 					'function_name' => 'action_messageindex',
-					'controller_name' => '\\ElkArte\\Controller\\MessageIndex',
+					'controller_name' => MessageIndex::class,
 				),
 			),
 			// Non-existing action
@@ -123,7 +135,7 @@ class DispatcherTest extends TestCase
 				'action' => 'qwerty',
 				'result' => array(
 					'function_name' => 'action_boardindex',
-					'controller_name' => '\\ElkArte\\Controller\\BoardIndex',
+					'controller_name' => BoardIndex::class,
 				),
 			),
 			// An existing one, no sub-action, naming patterns
@@ -132,7 +144,7 @@ class DispatcherTest extends TestCase
 				'action' => 'announce',
 				'result' => array(
 					'function_name' => 'action_index',
-					'controller_name' => '\\ElkArte\\Controller\\Announce',
+					'controller_name' => Announce::class,
 				),
 			),
 			// An existing one, with sub-action, naming patterns
@@ -142,7 +154,7 @@ class DispatcherTest extends TestCase
 				'sa' => 'test',
 				'result' => array(
 					'function_name' => 'action_index',
-					'controller_name' => '\\ElkArte\\Controller\\Announce',
+					'controller_name' => Announce::class,
 				),
 			),
 			// An existing one, action array, naming patterns, ADMINDIR
@@ -151,7 +163,7 @@ class DispatcherTest extends TestCase
 				'action' => 'admin',
 				'result' => array(
 					'function_name' => 'action_index',
-					'controller_name' => '\\ElkArte\\AdminController\\Admin',
+					'controller_name' => Admin::class,
 				),
 			),
 			// An existing one, action array
@@ -160,7 +172,7 @@ class DispatcherTest extends TestCase
 				'action' => 'removetopic2',
 				'result' => array(
 					'function_name' => 'action_removetopic2',
-					'controller_name' => '\\ElkArte\\Controller\\RemoveTopic',
+					'controller_name' => RemoveTopic::class,
 				),
 			),
 		);
@@ -215,7 +227,7 @@ class SiteDispatcher_Tester extends SiteDispatcher
 	 */
 	public function compare($action)
 	{
-		return $this->_controller_name == $action['controller_name'] &&
-		       $this->_function_name == $action['function_name'];
+		return ltrim($this->_controller_name, '\\') === $action['controller_name'] &&
+		       $this->_function_name === $action['function_name'];
 	}
 }

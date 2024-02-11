@@ -42,6 +42,7 @@ class ProfileFields
 		$context['custom_fields'] = [];
 		$context['custom_fields_required'] = false;
 
+		require_once(SUBSDIR . '/Profile.subs.php');
 		$where = $this->getProfileFieldWhereClause($area, $memID);
 		$data = getCustomFieldData($where, $area);
 		foreach ($data as $row)

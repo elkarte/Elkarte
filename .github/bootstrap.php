@@ -19,6 +19,7 @@ use ElkArte\Debug;
 use ElkArte\ext\Composer\Autoload\ClassLoader;
 use ElkArte\Hooks;
 use ElkArte\MembersList;
+use ElkArte\Themes\ThemeLoader;
 
 // We're going to need, cough, a few globals
 global $mbname, $language;
@@ -104,6 +105,6 @@ updateSettings(array(
 removeSettings('mentions_member_check');
 
 // Basic language is good to have for functional tests
-\ElkArte\Themes\ThemeLoader::loadLanguageFile('Index+Errors');
+ThemeLoader::loadLanguageFile('Index+Errors');
 
 file_put_contents('bootstrapcompleted.lock', '1');
