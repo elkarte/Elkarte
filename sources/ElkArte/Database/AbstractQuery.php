@@ -965,7 +965,7 @@ abstract class AbstractQuery implements QueryInterface
 			return 0;
 		}
 
-		return $result->num_rows();
+		return (int) $result->num_rows();
 	}
 
 	/**

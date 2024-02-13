@@ -106,7 +106,7 @@ class Fulltext extends Standard
 				'fulltext_minimum_word_length' => 'ft_min_word_len',
 			)
 		);
-		if ($request !== false && $request->num_rows() == 1)
+		if ($request !== false && $request->num_rows() === 1)
 		{
 			list (, $min_word_length) = $request->fetch_row();
 			$request->free_result();

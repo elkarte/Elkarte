@@ -484,7 +484,7 @@ function getAttachmentFromTopic($id_attach, $id_topic)
 			'current_topic' => $id_topic,
 		)
 	);
-	if ($request->num_rows() != 0)
+	if ($request->num_rows() !== 0)
 	{
 		$attachmentData = $request->fetch_assoc();
 	}
@@ -535,7 +535,7 @@ function getAttachmentThumbFromTopic($id_attach, $id_topic)
 	$attachmentData = [
 		'id_folder' => '', 'filename' => '', 'file_hash' => '', 'fileext' => '', 'id_attach' => '',
 		'attachment_type' => '', 'mime_type' => '', 'approved' => '', 'id_member' => ''];
-	if ($request->num_rows() != 0)
+	if ($request->num_rows() !== 0)
 	{
 		$row = $request->fetch_assoc();
 

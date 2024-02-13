@@ -397,7 +397,7 @@ class SearchParams extends ValuesContainer
 			$this->_userQuery = '';
 		}
 		// Nothing? lets try the poster name instead since that is what they go by
-		elseif ($request->num_rows() == 0)
+		elseif ($request->num_rows() === 0)
 		{
 			$this->_userQuery = $this->_db->quote(
 				'm.id_member = {int:id_member_guest} AND ({raw:match_possible_guest_names})',
@@ -482,7 +482,7 @@ class SearchParams extends ValuesContainer
 					'is_approved_true' => 1,
 				)
 			);
-			if ($request->num_rows() == 0)
+			if ($request->num_rows() === 0)
 			{
 				throw new Exception('topic_gone', false);
 			}

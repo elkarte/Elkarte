@@ -344,7 +344,7 @@ function associatedTopic($msg_id, $topicID = null)
 				'msg' => $msg_id,
 			)
 		);
-		if ($request->num_rows() != 1)
+		if ($request->num_rows() !== 1)
 		{
 			$topic = false;
 		}
@@ -544,7 +544,7 @@ function recordReport($message, $poster_comment)
 			'ignored' => 1,
 		)
 	);
-	if ($request->num_rows() != 0)
+	if ($request->num_rows() !== 0)
 	{
 		list ($id_report, $ignore_all) = $request->fetch_row();
 	}

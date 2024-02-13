@@ -1836,7 +1836,7 @@ function ssi_boardNews($board = null, $limit = null, $start = null, $length = nu
 			'blank_redirect' => '',
 		)
 	);
-	if ($request->num_rows() == 0)
+	if ($request->num_rows() === 0)
 	{
 		if ($output_method === 'echo')
 		{

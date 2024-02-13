@@ -357,7 +357,7 @@ class MessagesDelete
 
 		// Remove the topic if it doesn't have any messages.
 		$topic_exists = true;
-		if ($request->num_rows() == 0)
+		if ($request->num_rows() === 0)
 		{
 			require_once(SUBSDIR . '/Topic.subs.php');
 			removeTopics($from_topic, false, true);
@@ -630,7 +630,7 @@ class MessagesDelete
 				'id_msg' => $message,
 			)
 		);
-		if ($request->num_rows() == 0)
+		if ($request->num_rows() === 0)
 		{
 			return false;
 		}
@@ -732,7 +732,7 @@ class MessagesDelete
 					'recycle_board' => $this->_recycle_board,
 				)
 			);
-			if ($request->num_rows() == 0)
+			if ($request->num_rows() === 0)
 			{
 				throw new Exceptions\Exception('recycle_no_valid_board');
 			}

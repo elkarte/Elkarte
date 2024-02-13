@@ -899,7 +899,7 @@ function hasBoardNotification($id_member, $id_board)
 			'current_member' => $id_member,
 		)
 	);
-	$hasNotification = $request->num_rows() != 0;
+	$hasNotification = $request->num_rows() !== 0;
 	$request->free_result();
 
 	return $hasNotification;
@@ -976,7 +976,7 @@ function resetSentBoardNotification($id_member, $id_board, $check = true)
 			)
 		);
 		// nothing to do
-		if ($request->num_rows() == 0)
+		if ($request->num_rows() === 0)
 		{
 			return false;
 		}
