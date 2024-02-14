@@ -33,14 +33,13 @@ use GlobIterator;
  * - updates the settings for enabled/disabled core features as requested.
  * - loads in module core features
  *
- * @package CoreFeatures
  */
 class CoreFeatures extends AbstractController
 {
 	/**
 	 * Default handler.
 	 *
-	 * @see \ElkArte\AbstractController::action_index()
+	 * @see AbstractController::action_index()
 	 */
 	public function action_index()
 	{
@@ -157,7 +156,7 @@ class CoreFeatures extends AbstractController
 			'cp' => array(
 				'url' => getUrl('admin', ['action' => 'admin', 'area' => 'featuresettings', 'sa' => 'profile', '{session_data}']),
 				'save_callback' => 'custom_profiles_toggle_callback',
-				'setting_callback' => function ($value) {
+				'setting_callback' => static function ($value) {
 					if (!$value)
 					{
 						return array(
@@ -166,10 +165,8 @@ class CoreFeatures extends AbstractController
 							'displayFields' => '',
 						);
 					}
-					else
-					{
-						return array();
-					}
+
+					return array();
 				},
 			),
 			// k = karma.
@@ -185,7 +182,7 @@ class CoreFeatures extends AbstractController
 				'settings' => array(
 					'likes_enabled' => 1,
 				),
-				'setting_callback' => function ($value) {
+				'setting_callback' => static function ($value) {
 					global $modSettings;
 
 					require_once(SUBSDIR . '/Mentions.subs.php');
@@ -193,17 +190,13 @@ class CoreFeatures extends AbstractController
 					// Makes all the like/rlike mentions invisible (or visible)
 					toggleMentionsVisibility('likemsg', !empty($value));
 					toggleMentionsVisibility('rlikemsg', !empty($value));
-
-					$current = !empty($modSettings['enabled_mentions']) ? explode(',', $modSettings['enabled_mentions']) : array();
-
+					$current = empty($modSettings['enabled_mentions']) ? array() : explode(',', $modSettings['enabled_mentions']);
 					if (!empty($value))
 					{
 						return array('enabled_mentions' => implode(',', array_unique(array_merge($current, array('likemsg', 'rlikemsg')))));
 					}
-					else
-					{
-						return array('enabled_mentions' => implode(',', array_unique(array_diff($current, array('likemsg', 'rlikemsg')))));
-					}
+
+					return array('enabled_mentions' => implode(',', array_unique(array_diff($current, array('likemsg', 'rlikemsg')))));
 				},
 			),
 			// ml = moderation log.
@@ -227,7 +220,7 @@ class CoreFeatures extends AbstractController
 			// pm = post moderation.
 			'pm' => array(
 				'url' => getUrl('admin', ['action' => 'admin', 'area' => 'permissions', 'sa' => 'postmod', '{session_data}']),
-				'setting_callback' => function ($value) {
+				'setting_callback' => static function ($value) {
 					// Cannot use warning post moderation if disabled!
 					if (!$value)
 					{
@@ -236,10 +229,8 @@ class CoreFeatures extends AbstractController
 
 						return array('warning_moderate' => 0);
 					}
-					else
-					{
-						return array();
-					}
+
+					return array();
 				},
 			),
 			// ps = Paid Subscriptions.
@@ -257,10 +248,10 @@ class CoreFeatures extends AbstractController
 			// w = warning.
 			'w' => array(
 				'url' => getUrl('admin', ['action' => 'admin', 'area' => 'securitysettings', 'sa' => 'moderation']),
-				'setting_callback' => function ($value) {
+				'setting_callback' => static function ($value) {
 					global $modSettings;
 
-					list ($modSettings['warning_enable'], $modSettings['user_limit'], $modSettings['warning_decrement']) = explode(',', $modSettings['warning_settings']);
+					[$modSettings['warning_enable'], $modSettings['user_limit'], $modSettings['warning_decrement']] = explode(',', $modSettings['warning_settings']);
 					$warning_settings = ($value ? 1 : 0) . ',' . $modSettings['user_limit'] . ',' . $modSettings['warning_decrement'];
 					if (!$value)
 					{
@@ -284,7 +275,6 @@ class CoreFeatures extends AbstractController
 					}
 
 					$returnSettings['warning_settings'] = $warning_settings;
-
 					return $returnSettings;
 				},
 			),
@@ -294,14 +284,14 @@ class CoreFeatures extends AbstractController
 				'settings' => array(
 					'spider_mode' => 1,
 				),
-				'setting_callback' => function ($value) {
+				'setting_callback' => static function ($value) {
 					// Turn off the spider group if disabling.
 					if (!$value)
 					{
 						return array('spider_group' => 0, 'show_spider_online' => 0, 'spider_no_guest' => 0);
 					}
 				},
-				'on_save' => function () {
+				'on_save' => static function () {
 					require_once(SUBSDIR . '/SearchEngines.subs.php');
 				},
 			),
@@ -319,7 +309,7 @@ class CoreFeatures extends AbstractController
 	 * Searches the ADMINDIR looking for module managers and load the "Core Feature"
 	 * if existing.
 	 *
-	 * @param mixed[] $core_features The core features array
+	 * @param array $core_features The core features array
 	 */
 	protected function _getModulesConfig(&$core_features)
 	{
@@ -347,14 +337,14 @@ class CoreFeatures extends AbstractController
 
 			if (method_exists($integration['class'], 'setting_callback'))
 			{
-				$core_features[$integration['id']]['setting_callback'] = function ($value) use ($integration) {
+				$core_features[$integration['id']]['setting_callback'] = static function ($value) use ($integration) {
 					$integration['class']::setting_callback($value);
 				};
 			}
 
 			if (method_exists($integration['class'], 'on_save'))
 			{
-				$core_features[$integration['id']]['on_save'] = function () use ($integration) {
+				$core_features[$integration['id']]['on_save'] = static function () use ($integration) {
 					$integration['class']::on_save();
 				};
 			}
@@ -365,7 +355,7 @@ class CoreFeatures extends AbstractController
 	 * This function makes sure the requested subaction does exists, if it
 	 * doesn't, it sets a default action.
 	 *
-	 * @param mixed[] $subActions = array() An array containing all possible subactions.
+	 * @param array $subActions = array() An array containing all possible subactions.
 	 * @param string $defaultAction = '' the default action to be called if no valid subaction was found.
 	 */
 	public function loadGeneralSettingParameters($subActions = array(), $defaultAction = '')
@@ -391,7 +381,7 @@ class CoreFeatures extends AbstractController
 	/**
 	 * Takes care os saving the core features status (enabled/disabled)
 	 *
-	 * @param mixed[] $core_features - The array of all the core features, as
+	 * @param array $core_features - The array of all the core features, as
 	 *                returned by $this->settings()
 	 */
 	private function _save_core_features($core_features)
@@ -418,7 +408,7 @@ class CoreFeatures extends AbstractController
 				{
 					if (empty($feature_id) || (!empty($feature_id) && ($value < 2 || empty($modSettings[$key]))))
 					{
-						$setting_changes[$key] = !empty($feature_id) ? $value : !$value;
+						$setting_changes[$key] = empty($feature_id) ? !$value : $value;
 					}
 				}
 			}
@@ -467,8 +457,7 @@ class CoreFeatures extends AbstractController
 	/**
 	 * Puts the core features data into a format usable by the template
 	 *
-	 * @param mixed[] $core_features - The array of all the core features, as
-	 *                returned by $this->settings()
+	 * @param array $core_features - The array of all the core features, as returned by $this->settings()
 	 *
 	 * @return array
 	 */
@@ -490,9 +479,7 @@ class CoreFeatures extends AbstractController
 		}
 
 		// Sort by title attribute
-		uasort($features, static function ($a, $b) {
-			return strcmp(strtolower($a['title']), strtolower($b['title']));
-		});
+		uasort($features, static fn($a, $b) => strcmp(strtolower($a['title']), strtolower($b['title'])));
 
 		return $features;
 	}
@@ -502,7 +489,7 @@ class CoreFeatures extends AbstractController
 	 *
 	 * - Callback for admin internal search.
 	 *
-	 * @return mixed[] array in a config_var format
+	 * @return array array in a config_var format
 	 */
 	public function config_vars()
 	{

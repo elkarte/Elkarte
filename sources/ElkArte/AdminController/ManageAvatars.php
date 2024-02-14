@@ -40,7 +40,7 @@ class ManageAvatars extends AbstractController
 	 * - requires manage_attachments permissions
 	 *
 	 * @event integrate_sa_manage_avatars
-	 * @see \ElkArte\AbstractController::action_index()
+	 * @see AbstractController::action_index()
 	 */
 	public function action_index()
 	{
@@ -105,7 +105,7 @@ class ManageAvatars extends AbstractController
 		}
 
 		// Attempt to figure out if the admin is trying to break things.
-		$context['settings_save_onclick'] = 'return (document.getElementById(\'custom_avatar_dir\').value == \'\' || document.getElementById(\'custom_avatar_url\').value == \'\') ? confirm(\'' . $txt['custom_avatar_check_empty'] . '\') : true;';
+		$context['settings_save_onclick'] = "return (document.getElementById('custom_avatar_dir').value == '' || document.getElementById('custom_avatar_url').value == '') ? confirm('" . $txt['custom_avatar_check_empty'] . "') : true;";
 
 		// Prepare the context.
 		$context['post_url'] = getUrl('admin', ['action' => 'admin', 'area' => 'manageattachments', 'sa' => 'avatars', 'save']);
@@ -147,7 +147,7 @@ class ManageAvatars extends AbstractController
 			array('permissions', 'profile_set_avatar', 0, $txt['profile_set_avatar']),
 			// Server stored avatars!
 			array('title', 'avatar_server_stored'),
-			array('warning', empty($testImg) ? 'avatar_img_enc_warning' : ''),
+			array('warning', $testImg === false ? 'avatar_img_enc_warning' : ''),
 			array('check', 'avatar_stored_enabled'),
 			array('text', 'avatar_directory', 40, 'invalid' => !$context['valid_avatar_dir']),
 			array('text', 'avatar_url', 40),

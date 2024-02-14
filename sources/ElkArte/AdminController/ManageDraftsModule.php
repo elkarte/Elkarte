@@ -13,11 +13,13 @@
 namespace ElkArte\AdminController;
 
 use ElkArte\AbstractController;
+use ElkArte\DraftsIntegrate;
 use ElkArte\EventManager;
 use ElkArte\Hooks;
-use ElkArte\SettingsForm\SettingsForm;
 use ElkArte\Languages\Txt;
+use ElkArte\SettingsForm\SettingsForm;
 use ElkArte\User;
+use Exception;
 
 /**
  * Drafts administration controller.
@@ -43,10 +45,9 @@ class ManageDraftsModule extends AbstractController
 				'drafts_autosave_enabled' => 2,
 				'drafts_show_saved_enabled' => 2,
 			),
-			'setting_callback' => function ($value) {
+			'setting_callback' => static function ($value) {
 				require_once(SUBSDIR . '/ScheduledTasks.subs.php');
 				toggleTaskStatusByName('remove_old_drafts', $value);
-
 				$modules = array('admin', 'post', 'display', 'profile', 'personalmessage');
 
 				// Enabling, let's register the modules and prepare the scheduled task
@@ -54,13 +55,13 @@ class ManageDraftsModule extends AbstractController
 				{
 					enableModules('drafts', $modules);
 					calculateNextTrigger('remove_old_drafts');
-					Hooks::instance()->enableIntegration('\\ElkArte\\DraftsIntegrate');
+					Hooks::instance()->enableIntegration(DraftsIntegrate::class);
 				}
 				// Disabling, just forget about the modules
 				else
 				{
 					disableModules('drafts', $modules);
-					Hooks::instance()->disableIntegration('\\ElkArte\\DraftsIntegrate');
+					Hooks::instance()->disableIntegration(DraftsIntegrate::class);
 				}
 			},
 		);
@@ -70,7 +71,7 @@ class ManageDraftsModule extends AbstractController
 	 * Integrate drafts in to the delete member chain
 	 *
 	 * @param int[] $users
-	 * @throws \Exception
+	 * @throws Exception
 	 */
 	public static function integrate_delete_members($users)
 	{
@@ -146,7 +147,7 @@ class ManageDraftsModule extends AbstractController
 	 */
 	public static function integrate_sa_manage_maintenance(&$subActions)
 	{
-		$subActions['topics']['activities']['olddrafts'] = function () {
+		$subActions['topics']['activities']['olddrafts'] = static function () {
 			$controller = new ManageDraftsModule(new EventManager());
 			$controller->setUser(User::$info);
 			$controller->pre_dispatch();

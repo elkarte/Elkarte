@@ -23,10 +23,8 @@ use ElkArte\Languages\Txt;
  *
  * What it does:
  *
- * - This class manages logs, and forwards to display, pruning,
- * and other actions on logs.
+ * - This class manages logs, and forwards to display, pruning, and other actions on logs.
  *
- * @package AdminLog
  */
 class AdminLog extends AbstractController
 {
@@ -45,24 +43,24 @@ class AdminLog extends AbstractController
 		$subActions = array(
 			'errorlog' => array(
 				'function' => 'action_index',
-				'controller' => '\\ElkArte\\AdminController\\ManageErrors'),
+				'controller' => ManageErrors::class),
 				'disabled' => empty($modSettings['enableErrorLogging']),
 			'adminlog' => array(
 				'function' => 'action_log',
-				'controller' => '\\ElkArte\\AdminController\\Modlog'),
+				'controller' => Modlog::class),
 			'modlog' => array(
 				'function' => 'action_log',
-				'controller' => '\\ElkArte\\AdminController\\Modlog',
+				'controller' => Modlog::class,
 				'disabled' => !featureEnabled('ml') || empty($modSettings['modlog_enabled'])),
 			'banlog' => array(
 				'function' => 'action_log',
-				'controller' => '\\ElkArte\\AdminController\\ManageBans'),
+				'controller' => ManageBans::class),
 			'spiderlog' => array(
 				'function' => 'action_logs',
-				'controller' => '\\ElkArte\\AdminController\\ManageSearchEngines'),
+				'controller' => ManageSearchEngines::class),
 			'tasklog' => array(
 				'function' => 'action_log',
-				'controller' => '\\ElkArte\\AdminController\\ManageScheduledTasks'),
+				'controller' => ManageScheduledTasks::class),
 			'pruning' => array(
 				'controller' => $this,
 				'function' => 'action_pruningSettings_display'),
@@ -178,7 +176,7 @@ class AdminLog extends AbstractController
 			}
 
 			$settingsForm->setConfigVars($savevar);
-			$settingsForm->setConfigValues((array) $_POST);
+			$settingsForm->setConfigValues($_POST);
 			$settingsForm->save();
 			redirectexit('action=admin;area=logs;sa=pruning');
 		}
@@ -190,7 +188,7 @@ class AdminLog extends AbstractController
 		// Get the actual values
 		if (!empty($modSettings['pruningOptions']))
 		{
-			list ($modSettings['pruneErrorLog'], $modSettings['pruneModLog'], $modSettings['pruneBanLog'], $modSettings['pruneReportLog'], $modSettings['pruneScheduledTaskLog'], $modSettings['pruneSpiderHitLog']) = array_pad(explode(',', $modSettings['pruningOptions']), 7, 0);
+			[$modSettings['pruneErrorLog'], $modSettings['pruneModLog'], $modSettings['pruneBanLog'], $modSettings['pruneReportLog'], $modSettings['pruneScheduledTaskLog'], $modSettings['pruneSpiderHitLog']] = array_pad(explode(',', $modSettings['pruningOptions']), 7, 0);
 		}
 		else
 		{
@@ -213,10 +211,8 @@ class AdminLog extends AbstractController
 			['check', 'enableErrorQueryLogging'],
 			// Moderation logging is a Core feature, it enables Admin, Moderation and Profile Edit logging.  This
 			// allows some fine-tuning of that features, e.g. only allow admin logging
-			featureEnabled('ml') ?
-			['check', 'modlog_enabled'] : '',
-			featureEnabled('ml') ?
-			['check', 'userlog_enabled'] : '',
+			featureEnabled('ml') ? ['check', 'modlog_enabled'] : '',
+			featureEnabled('ml') ? ['check', 'userlog_enabled'] : '',
 			// Even do the pruning?
 			['title', 'pruning_title', 'force_div_id' => 'pruning_title'],
 			// The array indexes are here so, we can remove/change them before saving.

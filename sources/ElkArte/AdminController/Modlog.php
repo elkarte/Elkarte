@@ -30,7 +30,7 @@ class Modlog extends AbstractController
 	/**
 	 * Default method for this controller.
 	 *
-	 * @see \ElkArte\AbstractController::action_index()
+	 * @see AbstractController::action_index()
 	 */
 	public function action_index()
 	{
@@ -63,7 +63,7 @@ class Modlog extends AbstractController
 		}
 
 		// These change dependant on whether we are viewing the moderation or admin log.
-		if ($context['log_type'] == 3 || $this->_req->query->action === 'admin')
+		if ($context['log_type'] === 3 || $this->_req->query->action === 'admin')
 		{
 			$context['url_start'] = getUrl('admin', ['action' => 'admin', 'area' => 'logs', 'sa' => ($context['log_type'] == 3 ? 'adminlog' : 'modlog'), 'type' => $context['log_type']]);
 		}
@@ -76,7 +76,7 @@ class Modlog extends AbstractController
 
 		Txt::load('Modlog');
 
-		$context['page_title'] = $context['log_type'] == 3 ? $txt['modlog_admin_log'] : $txt['modlog_view'];
+		$context['page_title'] = $context['log_type'] === 3 ? $txt['modlog_admin_log'] : $txt['modlog_view'];
 
 		// The number of entries to show per page of log file.
 		$context['displaypage'] = 30;
@@ -185,21 +185,17 @@ class Modlog extends AbstractController
 			'base_href' => $context['url_start'],
 			'default_sort_col' => 'time',
 			'get_items' => array(
-				'function' => function ($start, $items_per_page, $sort, $query_string, $query_params, $log_type) {
-					return $this->getModLogEntries($start, $items_per_page, $sort, $query_string, $query_params, $log_type);
-				},
+				'function' => fn($start, $items_per_page, $sort, $query_string, $query_params, $log_type) => $this->getModLogEntries($start, $items_per_page, $sort, $query_string, $query_params, $log_type),
 				'params' => array(
-					(!empty($search_params['string']) ? ' INSTR({raw:sql_type}, {string:search_string})' : ''),
+					(empty($search_params['string']) ? '' : ' INSTR({raw:sql_type}, {string:search_string})'),
 					array('sql_type' => $search_params_column, 'search_string' => $search_params['string']),
 					$context['log_type'],
 				),
 			),
 			'get_count' => array(
-				'function' => function ($query_string, $query_params, $log_type) {
-					return $this->getModLogEntryCount($query_string, $query_params, $log_type);
-				},
+				'function' => fn($query_string, $query_params, $log_type) => $this->getModLogEntryCount($query_string, $query_params, $log_type),
 				'params' => array(
-					(!empty($search_params['string']) ? ' INSTR({raw:sql_type}, {string:search_string})' : ''),
+					(empty($search_params['string']) ? '' : ' INSTR({raw:sql_type}, {string:search_string})'),
 					array('sql_type' => $search_params_column, 'search_string' => $search_params['string']),
 					$context['log_type'],
 				),
@@ -281,9 +277,7 @@ class Modlog extends AbstractController
 						'class' => 'centertext',
 					),
 					'data' => array(
-						'function' => function ($entry) {
-							return '<input type="checkbox" name="delete[]" value="' . $entry['id'] . '"' . ($entry['editable'] ? '' : ' disabled="disabled"') . ' />';
-						},
+						'function' => static fn($entry) => '<input type="checkbox" name="delete[]" value="' . $entry['id'] . '"' . ($entry['editable'] ? '' : ' disabled="disabled"') . ' />',
 						'class' => 'centertext',
 					),
 				),

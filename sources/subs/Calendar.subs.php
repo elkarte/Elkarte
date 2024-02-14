@@ -1340,9 +1340,9 @@ function getHoliday($id_holiday)
 		function ($row) use (&$holiday) {
 			$holiday = array(
 				'id' => $row['id_holiday'],
-				'day' => $row['day'],
-				'month' => $row['month'],
-				'year' => $row['year'] <= 4 ? 0 : $row['year'],
+				'day' => (int) $row['day'],
+				'month' => (int) $row['month'],
+				'year' => $row['year'] <= 4 ? 0 : (int) $row['year'],
 				'title' => $row['title']
 			);
 		}

@@ -26,6 +26,10 @@ use ElkArte\SettingsForm\SettingsForm;
 use ElkArte\Util;
 use ElkArte\AttachmentsDirectory;
 use ElkArte\Languages\Loader;
+use Exception;
+use FilesystemIterator;
+use UnexpectedValueException;
+use ElkArte\AdminController\ManageAvatars;
 
 /**
  * This is the attachments and avatars controller class.
@@ -37,7 +41,7 @@ class ManageAttachments extends AbstractController
 	/** @var int Loop counter for paused attachment maintenance actions */
 	public $step;
 
-	/** @var int substep counter for paused attachment maintenance actions*/
+	/** @var int substep counter for paused attachment maintenance actions */
 	public $substep;
 
 	/** @var int Substep at the beginning of a maintenance loop */
@@ -58,6 +62,9 @@ class ManageAttachments extends AbstractController
 	/** @var FileFunctions */
 	public $file_functions;
 
+	/**
+	 * Pre dispatch, load functions needed by all methods
+	 */
 	public function pre_dispatch()
 	{
 		// These get used often enough that it makes sense to include them for every action
@@ -80,7 +87,7 @@ class ManageAttachments extends AbstractController
 	 * @uses Admin language file.
 	 * @uses template layer 'manage_files' for showing the tab bar.
 	 *
-	 * @see  \ElkArte\AbstractController::action_index()
+	 * @see AbstractController::action_index()
 	 */
 	public function action_index()
 	{
@@ -96,7 +103,7 @@ class ManageAttachments extends AbstractController
 		$subActions = array(
 			'attachments' => array($this, 'action_attachSettings_display'),
 			'avatars' => array(
-				'controller' => '\\ElkArte\\AdminController\\ManageAvatars',
+				'controller' => ManageAvatars::class,
 				'function' => 'action_index'),
 			'attachpaths' => array($this, 'action_attachpaths'),
 			'browse' => array($this, 'action_browse'),
@@ -184,8 +191,8 @@ class ManageAttachments extends AbstractController
 			if (isset($this->_req->post->attachmentUploadDir))
 			{
 				if (!empty($this->_req->post->attachmentUploadDir)
-					&& $this->file_functions->fileExists($modSettings['attachmentUploadDir'])
-					&& $modSettings['attachmentUploadDir'] !== $this->_req->post->attachmentUploadDir)
+					&& $modSettings['attachmentUploadDir'] !== $this->_req->post->attachmentUploadDir
+					&& $this->file_functions->fileExists($modSettings['attachmentUploadDir']))
 				{
 					rename($modSettings['attachmentUploadDir'], $this->_req->post->attachmentUploadDir);
 				}
@@ -200,7 +207,7 @@ class ManageAttachments extends AbstractController
 				// Make sure we have a base directory defined
 				if (empty($this->_req->post->basedirectory_for_attachments))
 				{
-					$this->_req->post->basedirectory_for_attachments = (!empty($modSettings['basedirectory_for_attachments']) ? ($modSettings['basedirectory_for_attachments']) : BOARDDIR);
+					$this->_req->post->basedirectory_for_attachments = (empty($modSettings['basedirectory_for_attachments']) ? (BOARDDIR) : $modSettings['basedirectory_for_attachments']);
 				}
 
 				// The current base directories that we know
@@ -228,9 +235,8 @@ class ManageAttachments extends AbstractController
 						{
 							$attachmentsDir->createDirectory($this->_req->post->basedirectory_for_attachments);
 						}
-						catch (\Exception $e)
+						catch (Exception)
 						{
-
 							$this->_req->post->basedirectory_for_attachments = $modSettings['basedirectory_for_attachments'];
 						}
 					}
@@ -239,10 +245,7 @@ class ManageAttachments extends AbstractController
 					if (!in_array($this->_req->post->basedirectory_for_attachments, $modSettings['attachment_basedirectories']))
 					{
 						$modSettings['attachment_basedirectories'][$modSettings['currentAttachmentUploadDir']] = $this->_req->post->basedirectory_for_attachments;
-						updateSettings(array(
-							'attachment_basedirectories' => serialize($modSettings['attachment_basedirectories']),
-							'currentAttachmentUploadDir' => $currentAttachmentUploadDir,
-						));
+						updateSettings(array('attachment_basedirectories' => serialize($modSettings['attachment_basedirectories']), 'currentAttachmentUploadDir' => $currentAttachmentUploadDir,));
 
 						$this->_req->post->attachmentUploadDir = serialize($modSettings['attachmentUploadDir']);
 					}
@@ -250,12 +253,9 @@ class ManageAttachments extends AbstractController
 			}
 
 			// Allow or not webp extensions.
-			if (!empty($this->_req->post->attachment_webp_enable))
+			if (!empty($this->_req->post->attachment_webp_enable) && strpos($this->_req->post->attachmentExtensions, 'webp') === false)
 			{
-				if (strpos($this->_req->post->attachmentExtensions, 'webp') === false)
-				{
-					$this->_req->post->attachmentExtensions .= ',webp';
-				}
+				$this->_req->post->attachmentExtensions .= ',webp';
 			}
 
 			call_integration_hook('integrate_save_attachment_settings');
@@ -338,8 +338,8 @@ class ManageAttachments extends AbstractController
 		$testUM = empty($upload_max_filesize) || memoryReturnBytes($upload_max_filesize) >= (isset($modSettings['attachmentSizeLimit']) ? $modSettings['attachmentSizeLimit'] * 1024 : 0);
 
 		// Set some helpful information for the UI
-		$post_max_size_text = sprintf($txt['zero_for_system_limit'],empty($post_max_size) ? $txt['none'] : $post_max_size, 'post_max_size');
-		$upload_max_filesize_text = sprintf($txt['zero_for_system_limit'],empty($upload_max_filesize) ? $txt['none'] : $upload_max_filesize, 'upload_max_filesize');
+		$post_max_size_text = sprintf($txt['zero_for_system_limit'], $post_max_size === '' || $post_max_size === '0' || $post_max_size === false ? $txt['none'] : $post_max_size, 'post_max_size');
+		$upload_max_filesize_text = sprintf($txt['zero_for_system_limit'], $upload_max_filesize === '' || $upload_max_filesize === '0' || $upload_max_filesize === false ? $txt['none'] : $upload_max_filesize, 'upload_max_filesize');
 
 		$config_vars = array(
 			array('title', 'attachment_manager_settings'),
@@ -351,22 +351,22 @@ class ManageAttachments extends AbstractController
 			array('check', 'use_subdirectories_for_attachments', 'subtext' => $txt['use_subdirectories_for_attachments_note']),
 			(empty($modSettings['attachment_basedirectories'])
 				? array('text', 'basedirectory_for_attachments', 40,)
-				: array('var_message', 'basedirectory_for_attachments', 'message' => 'basedirectory_for_attachments_path', 'invalid' => empty($context['valid_basedirectory']), 'text_label' => (!empty($context['valid_basedirectory'])
-					? $txt['basedirectory_for_attachments_current']
-					: $txt['basedirectory_for_attachments_warning']))
+				: array('var_message', 'basedirectory_for_attachments', 'message' => 'basedirectory_for_attachments_path', 'invalid' => empty($context['valid_basedirectory']), 'text_label' => (empty($context['valid_basedirectory'])
+					? $txt['basedirectory_for_attachments_warning']
+					: $txt['basedirectory_for_attachments_current']))
 			),
 			Util::is_serialized($modSettings['attachmentUploadDir'])
 				? array('var_message', 'attach_current_directory', 'postinput' => $txt['attachmentUploadDir_multiple_configure'], 'message' => 'attachment_path', 'invalid' => empty($context['valid_upload_dir']),
-					'text_label' => (!empty($context['valid_upload_dir'])
-						? $txt['attach_current_dir']
-						: $txt['attach_current_dir_warning']))
+				'text_label' => (empty($context['valid_upload_dir'])
+					? $txt['attach_current_dir_warning']
+					: $txt['attach_current_dir']))
 				: array('text', 'attachmentUploadDir', 'postinput' => $txt['attachmentUploadDir_multiple_configure'], 40, 'invalid' => !$context['valid_upload_dir']),
 			array('int', 'attachmentDirFileLimit', 'subtext' => $txt['zero_for_no_limit'], 6),
 			array('int', 'attachmentDirSizeLimit', 'subtext' => $txt['zero_for_no_limit'], 6, 'postinput' => $txt['kilobyte']),
 			'',
 			// Posting limits
-			array('int', 'attachmentPostLimit', 'subtext' => $post_max_size_text, 6, 'postinput' => empty($testPM) ? $txt['attachment_postsize_warning'] : $txt['kilobyte'], 'invalid' => empty($testPM)),
-			array('int', 'attachmentSizeLimit', 'subtext' => $upload_max_filesize_text, 6, 'postinput' => empty($testUM) ? $txt['attachment_postsize_warning'] : $txt['kilobyte'], 'invalid' => empty($testUM)),
+			array('int', 'attachmentPostLimit', 'subtext' => $post_max_size_text, 6, 'postinput' => $testPM === false ? $txt['attachment_postsize_warning'] : $txt['kilobyte'], 'invalid' => $testPM === false),
+			array('int', 'attachmentSizeLimit', 'subtext' => $upload_max_filesize_text, 6, 'postinput' => $testUM === false ? $txt['attachment_postsize_warning'] : $txt['kilobyte'], 'invalid' => $testUM === false),
 			array('int', 'attachmentNumPerPostLimit', 'subtext' => $txt['zero_for_no_limit'], 6),
 			'',
 			array('check', 'attachment_webp_enable', 'disabled' => !$testWebP, 'postinput' => $testWebP ? "" : $txt['attachment_webp_enable_na']),
@@ -384,7 +384,7 @@ class ManageAttachments extends AbstractController
 			array('text', 'attachmentExtensions', 40),
 			'',
 			// Image checks.
-			array('warning', empty($testImg) ? 'attachment_img_enc_warning' : ''),
+			array('warning', $testImg === false ? 'attachment_img_enc_warning' : ''),
 			array('check', 'attachment_image_reencode'),
 			// Thumbnail settings.
 			array('title', 'attachment_thumbnail_settings'),
@@ -415,9 +415,9 @@ class ManageAttachments extends AbstractController
 	 * Show a list of attachment or avatar files.
 	 *
 	 * - Called by
-	 * 		?action=admin;area=manageattachments;sa=browse for attachments
-	 * 		?action=admin;area=manageattachments;sa=browse;avatars for avatars.
-	 * 		?action=admin;area=manageattachments;sa=browse;thumbs for thumbnails.
+	 *     ?action=admin;area=manageattachments;sa=browse for attachments
+	 *     ?action=admin;area=manageattachments;sa=browse;avatars for avatars.
+	 *     ?action=admin;area=manageattachments;sa=browse;thumbs for thumbnails.
 	 * - Allows sorting by name, date, size and member.
 	 * - Paginates results.
 	 *
@@ -458,13 +458,12 @@ class ManageAttachments extends AbstractController
 						'class' => 'grid50',
 					),
 					'data' => array(
-						'function' => function ($rowData) {
+						'function' => static function ($rowData) {
 							global $modSettings, $context;
 
 							$link = '<a href="';
-
 							// In case of a custom avatar URL attachments have a fixed directory.
-							if ($rowData['attachment_type'] == 1)
+							if ((int) $rowData['attachment_type'] === 1)
 							{
 								$link .= sprintf('%1$s/%2$s', $modSettings['custom_avatar_url'], $rowData['filename']);
 							}
@@ -478,13 +477,12 @@ class ManageAttachments extends AbstractController
 							{
 								$link .= getUrl('attach', ['action' => 'dlattach', 'topic' => ((int) $rowData['id_topic']) . '.0', 'attach' => (int) $rowData['id_attach'], 'name' => $rowData['filename']]);
 							}
-
 							$link .= '"';
 
 							// Show a popup on click if it's a picture and we know its dimensions (use rand message to prevent navigation)
 							if (!empty($rowData['width']) && !empty($rowData['height']))
 							{
-								$link .= 'id="link_' . $rowData['id_attach'] . '" data-lightboxmessage="' . rand(0, 100000) . '" data-lightboximage="' . $rowData['id_attach'] . '"';
+								$link .= 'id="link_' . $rowData['id_attach'] . '" data-lightboxmessage="' . random_int(0, 100000) . '" data-lightboximage="' . $rowData['id_attach'] . '"';
 							}
 
 							$link .= sprintf('>%1$s</a>', preg_replace('~&amp;#(\\\\d{1,7}|x[0-9a-fA-F]{1,6});~', '&#\\\\1;', htmlspecialchars($rowData['filename'], ENT_COMPAT, 'UTF-8')));
@@ -509,9 +507,7 @@ class ManageAttachments extends AbstractController
 						'class' => 'nowrap',
 					),
 					'data' => array(
-						'function' => function ($rowData) {
-							return byte_format($rowData['size']);
-						},
+						'function' => static fn($rowData) => byte_format($rowData['size']),
 					),
 					'sort' => array(
 						'default' => 'a.size',
@@ -520,21 +516,18 @@ class ManageAttachments extends AbstractController
 				),
 				'member' => array(
 					'header' => array(
-						'value' => $context['browse_type'] == 'avatars' ? $txt['attachment_manager_member'] : $txt['posted_by'],
+						'value' => $context['browse_type'] === 'avatars' ? $txt['attachment_manager_member'] : $txt['posted_by'],
 						'class' => 'nowrap',
 					),
 					'data' => array(
-						'function' => function ($rowData) {
+						'function' => static function ($rowData) {
 							// In case of an attachment, return the poster of the attachment.
 							if (empty($rowData['id_member']))
 							{
 								return htmlspecialchars($rowData['poster_name'], ENT_COMPAT, 'UTF-8');
 							}
-							// Otherwise it must be an avatar, return the link to the owner of it.
-							else
-							{
-								return '<a href="' . getUrl('profile', ['action' => 'profile', 'u' => (int) $rowData['id_member'], 'name' => $rowData['poster_name']]) . '">' . $rowData['poster_name'] . '</a>';
-							}
+
+							return '<a href="' . getUrl('profile', ['action' => 'profile', 'u' => (int) $rowData['id_member'], 'name' => $rowData['poster_name']]) . '">' . $rowData['poster_name'] . '</a>';
 						},
 					),
 					'sort' => array(
@@ -544,16 +537,15 @@ class ManageAttachments extends AbstractController
 				),
 				'date' => array(
 					'header' => array(
-						'value' => $context['browse_type'] == 'avatars' ? $txt['attachment_manager_last_active'] : $txt['date'],
+						'value' => $context['browse_type'] === 'avatars' ? $txt['attachment_manager_last_active'] : $txt['date'],
 						'class' => 'nowrap',
 					),
 					'data' => array(
-						'function' => function ($rowData) {
+						'function' => static function ($rowData) {
 							global $txt, $context;
 
 							// The date the message containing the attachment was posted or the owner of the avatar was active.
 							$date = empty($rowData['poster_time']) ? $txt['never'] : standardTime($rowData['poster_time']);
-
 							// Add a link to the topic in case of an attachment.
 							if ($context['browse_type'] !== 'avatars')
 							{
@@ -688,10 +680,10 @@ class ManageAttachments extends AbstractController
 		$context['attachment_current_files'] = comma_format($current_dir['files'], 0);
 		$context['attach_multiple_dirs'] = count($attach_dirs) > 1;
 		$context['attach_dirs'] = $attach_dirs;
-		$context['base_dirs'] = !empty($modSettings['attachment_basedirectories']) ? Util::unserialize($modSettings['attachment_basedirectories']) : array();
+		$context['base_dirs'] = empty($modSettings['attachment_basedirectories']) ? array() : Util::unserialize($modSettings['attachment_basedirectories']);
 		$context['checked'] = $this->_req->getSession('checked', true);
 
-		if (!empty($this->_req->session->results))
+		if (!empty($_SESSION['results']))
 		{
 			$context['results'] = implode('<br />', $this->_req->session->results);
 			unset($_SESSION['results']);
@@ -724,9 +716,9 @@ class ManageAttachments extends AbstractController
 				setRemovalNotice($messages, $this->_req->post->notice);
 			}
 		}
+		// Remove all the old avatars.
 		else
 		{
-			// Remove all the old avatars.
 			removeAttachments(array('not_id_member' => 0, 'last_login' => (time() - 24 * 60 * 60 * $this->_req->post->age)), 'members');
 		}
 
@@ -764,7 +756,7 @@ class ManageAttachments extends AbstractController
 	{
 		global $language;
 
-		checkSession('post');
+		checkSession();
 
 		if (!empty($this->_req->post->remove))
 		{
@@ -872,7 +864,7 @@ class ManageAttachments extends AbstractController
 					redirectexit('action=admin;area=manageattachments;sa=maintenance');
 				}
 
-				foreach ($this->_req->post->to_fix as $key => $value)
+				foreach ($this->_req->post->to_fix as $value)
 				{
 					$_SESSION['attachments_to_fix'][] = $value;
 				}
@@ -893,7 +885,7 @@ class ManageAttachments extends AbstractController
 			'files_without_attachment' => 0,
 		);
 
-		$to_fix = !empty($_SESSION['attachments_to_fix']) ? $_SESSION['attachments_to_fix'] : array();
+		$to_fix = empty($_SESSION['attachments_to_fix']) ? array() : $_SESSION['attachments_to_fix'];
 		$context['repair_errors'] = $_SESSION['attachments_to_fix2'] ?? $context['repair_errors'];
 		$fix_errors = isset($this->_req->query->fixErrors);
 
@@ -1012,7 +1004,7 @@ class ManageAttachments extends AbstractController
 			{
 				try
 				{
-					$files = new \FilesystemIterator($attach_dir, \FilesystemIterator::SKIP_DOTS);
+					$files = new FilesystemIterator($attach_dir, FilesystemIterator::SKIP_DOTS);
 					foreach ($files as $file)
 					{
 						if ($file->getFilename() === '.htaccess')
@@ -1035,18 +1027,15 @@ class ManageAttachments extends AbstractController
 							elseif (strpos($file->getFilename(), '_') !== false)
 							{
 								$attachID = (int) substr($file->getFilename(), 0, strpos($file->getFilename(), '_'));
-								if (!empty($attachID))
+								if ($attachID !== 0 && !validateAttachID($attachID))
 								{
-									if (!validateAttachID($attachID))
+									if ($fix_errors && in_array('files_without_attachment', $to_fix))
 									{
-										if ($fix_errors && in_array('files_without_attachment', $to_fix))
-										{
-											$this->file_functions->delete($file->getPathname());
-										}
-										else
-										{
-											$context['repair_errors']['files_without_attachment']++;
-										}
+										$this->file_functions->delete($file->getPathname());
+									}
+									else
+									{
+										$context['repair_errors']['files_without_attachment']++;
 									}
 								}
 							}
@@ -1062,8 +1051,9 @@ class ManageAttachments extends AbstractController
 								}
 							}
 						}
+
 						$current_check++;
-						$this->substep = (int) $current_check;
+						$this->substep = $current_check;
 
 						if ($current_check - $files_checked >= $max_checks)
 						{
@@ -1071,7 +1061,7 @@ class ManageAttachments extends AbstractController
 						}
 					}
 				}
-				catch (\UnexpectedValueException $e)
+				catch (UnexpectedValueException)
 				{
 					// @todo for now do nothing...
 				}
@@ -1108,11 +1098,11 @@ class ManageAttachments extends AbstractController
 	 * - Called by repairAttachments().
 	 * - If repairAttachments() has more steps added, this function needs to be updated!
 	 *
-	 * @param mixed[] $to_fix attachments to fix
+	 * @param array $to_fix attachments to fix
 	 * @param int $max_substep = 0
 	 * @throws \ElkArte\Exceptions\Exception
 	 * @todo Move to ManageAttachments.subs.php
-		 */
+	 */
 	private function _pauseAttachmentMaintenance($to_fix, $max_substep = 0)
 	{
 		global $context, $txt, $time_start;
@@ -1217,9 +1207,7 @@ class ManageAttachments extends AbstractController
 						'class' => 'centertext',
 					),
 					'data' => array(
-						'function' => function ($rowData) {
-							return '<input type="radio" name="current_dir" value="' . $rowData['id'] . '" ' . ($rowData['current'] ? ' checked="checked"' : '') . (!empty($rowData['disable_current']) ? ' disabled="disabled"' : '') . ' class="input_radio" />';
-						},
+						'function' => static fn($rowData) => '<input type="radio" name="current_dir" value="' . $rowData['id'] . '" ' . ($rowData['current'] ? ' checked="checked"' : '') . (empty($rowData['disable_current']) ? '' : ' disabled="disabled"') . ' class="input_radio" />',
 						'class' => 'grid8 centertext',
 					),
 				),
@@ -1228,11 +1216,9 @@ class ManageAttachments extends AbstractController
 						'value' => $txt['attach_path'],
 					),
 					'data' => array(
-						'function' => function ($rowData) {
-							return '
+						'function' => static fn($rowData) => '
 							<input type="hidden" name="dirs[' . $rowData['id'] . ']" value="' . $rowData['path'] . '" />
-							<input type="text" size="40" name="dirs[' . $rowData['id'] . ']" value="' . $rowData['path'] . '"' . (!empty($rowData['disable_base_dir']) ? ' disabled="disabled"' : '') . ' class="input_text"/>';
-						},
+							<input type="text" size="40" name="dirs[' . $rowData['id'] . ']" value="' . $rowData['path'] . '"' . (empty($rowData['disable_base_dir']) ? '' : ' disabled="disabled"') . ' class="input_text"/>',
 						'class' => 'grid50',
 					),
 				),
@@ -1305,9 +1291,7 @@ class ManageAttachments extends AbstractController
 							'class' => 'centertext',
 						),
 						'data' => array(
-							'function' => function ($rowData) {
-								return '<input type="radio" name="current_base_dir" value="' . $rowData['id'] . '" ' . ($rowData['current'] ? ' checked="checked"' : '') . ' class="input_radio" />';
-							},
+							'function' => static fn($rowData) => '<input type="radio" name="current_base_dir" value="' . $rowData['id'] . '" ' . ($rowData['current'] ? ' checked="checked"' : '') . ' class="input_radio" />',
 							'class' => 'grid8 centertext',
 						),
 					),
@@ -1433,7 +1417,7 @@ class ManageAttachments extends AbstractController
 				{
 					$attachmentsDir->createDirectory($path);
 				}
-				catch (\Exception $e)
+				catch (Exception $e)
 				{
 					$errors[] = $path . ': ' . $txt[$e->getMessage()];
 					continue;
@@ -1453,7 +1437,7 @@ class ManageAttachments extends AbstractController
 					continue;
 				}
 			}
-			catch (\Exception $e)
+			catch (Exception $e)
 			{
 				$errors[] = $real_path . ': ' . $txt[$e->getMessage()];
 			}
@@ -1490,25 +1474,16 @@ class ManageAttachments extends AbstractController
 					updateAttachmentIdFolder($id, 1);
 				}
 
-				$update = array(
-					'currentAttachmentUploadDir' => 1,
-					'attachmentUploadDir' => serialize(array(1 => $dir)),
-				);
+				$update = array('currentAttachmentUploadDir' => 1, 'attachmentUploadDir' => serialize(array(1 => $dir)),);
 			}
 		}
 		else
 		{
 			// Save it to the database.
-			$update = array(
-				'currentAttachmentUploadDir' => $current_dir,
-				'attachmentUploadDir' => serialize($new_dirs),
-			);
+			$update = array('currentAttachmentUploadDir' => $current_dir, 'attachmentUploadDir' => serialize($new_dirs),);
 		}
 
-		if (!empty($update))
-		{
-			updateSettings($update);
-		}
+		updateSettings($update);
 
 		if (!empty($errors))
 		{
@@ -1537,12 +1512,9 @@ class ManageAttachments extends AbstractController
 		$base_dirs = $this->_req->getPost('base_dir');
 
 		// Changing the current base directory?
-		if (empty($new_base_dir) && !empty($current_base_dir))
+		if (empty($new_base_dir) && !empty($current_base_dir) && $modSettings['basedirectory_for_attachments'] !== $attachmentUploadDir[$current_base_dir])
 		{
-			if ($modSettings['basedirectory_for_attachments'] !== $attachmentUploadDir[$current_base_dir])
-			{
-				$update = ['basedirectory_for_attachments' => $attachmentUploadDir[$current_base_dir]];
-			}
+			$update = ['basedirectory_for_attachments' => $attachmentUploadDir[$current_base_dir]];
 		}
 
 		// Modifying / Removing a basedir entry
@@ -1551,18 +1523,11 @@ class ManageAttachments extends AbstractController
 			// Renaming the base dir, we can try
 			foreach ($base_dirs as $id => $dir)
 			{
-				if (!empty($dir) && $dir !== $attachmentUploadDir[$id])
+				if (!empty($dir) && $dir !== $attachmentUploadDir[$id] && @rename($attachmentUploadDir[$id], $dir))
 				{
-					if (@rename($attachmentUploadDir[$id], $dir))
-					{
-						$attachmentUploadDir[$id] = $dir;
-						$attachmentBaseDirectories[$id] = $dir;
-						$update = (array(
-							'attachmentUploadDir' => serialize($attachmentUploadDir),
-							'attachment_basedirectories' => serialize($attachmentBaseDirectories),
-							'basedirectory_for_attachments' => $attachmentUploadDir[$current_base_dir],
-						));
-					}
+					$attachmentUploadDir[$id] = $dir;
+					$attachmentBaseDirectories[$id] = $dir;
+					$update = (array('attachmentUploadDir' => serialize($attachmentUploadDir), 'attachment_basedirectories' => serialize($attachmentBaseDirectories), 'basedirectory_for_attachments' => $attachmentUploadDir[$current_base_dir],));
 				}
 
 				// Or remove it (from selection only)
@@ -1577,10 +1542,7 @@ class ManageAttachments extends AbstractController
 
 					// Removed from selection (not disc)
 					unset($attachmentBaseDirectories[$id]);
-					$update = [
-						'attachment_basedirectories' => !empty($attachmentBaseDirectories) ? serialize($attachmentBaseDirectories) : '',
-						'basedirectory_for_attachments' => $attachmentUploadDir[$current_base_dir] ?? '',
-					];
+					$update = ['attachment_basedirectories' => empty($attachmentBaseDirectories) ? '' : serialize($attachmentBaseDirectories), 'basedirectory_for_attachments' => $attachmentUploadDir[$current_base_dir] ?? '',];
 				}
 			}
 		}
@@ -1597,30 +1559,24 @@ class ManageAttachments extends AbstractController
 				{
 					$attachmentsDir->createDirectory($new_base_dir);
 				}
-				catch (\Exception $e)
+				catch (Exception)
 				{
 					$errors[] = $new_base_dir . ': ' . $txt['attach_dir_base_no_create'];
 				}
 			}
 
 			// Find the new key
-			$modSettings['currentAttachmentUploadDir'] = array_search($new_base_dir, $attachmentsDir->getPaths());
+			$modSettings['currentAttachmentUploadDir'] = array_search($new_base_dir, $attachmentsDir->getPaths(), true);
 			if (!in_array($new_base_dir, $attachmentBaseDirectories))
 			{
 				$attachmentBaseDirectories[$modSettings['currentAttachmentUploadDir']] = $new_base_dir;
 			}
+
 			ksort($attachmentBaseDirectories);
-			$update = [
-				'attachment_basedirectories' => serialize($attachmentBaseDirectories),
-				'basedirectory_for_attachments' => $new_base_dir,
-				'currentAttachmentUploadDir' => $current_dir,
-			];
+			$update = ['attachment_basedirectories' => serialize($attachmentBaseDirectories), 'basedirectory_for_attachments' => $new_base_dir, 'currentAttachmentUploadDir' => $current_dir,];
 		}
 
-		if (!empty($errors))
-		{
-			$_SESSION['errors']['base'] = $errors;
-		}
+		$_SESSION['errors']['base'] = $errors;
 
 		if (!empty($update))
 		{
@@ -1645,7 +1601,7 @@ class ManageAttachments extends AbstractController
 		$this->from = $this->_req->getPost('from', 'intval');
 		$this->auto = $this->_req->getPost('auto', 'intval', 0);
 		$this->to = $this->_req->getPost('to', 'intval');
-		$start = !empty($this->_req->post->empty_it) ? 0 : $modSettings['attachmentDirFileLimit'];
+		$start = empty($this->_req->post->empty_it) ? $modSettings['attachmentDirFileLimit'] : 0;
 		$_SESSION['checked'] = !empty($this->_req->post->empty_it);
 
 		// Prepare for the moving
@@ -1721,15 +1677,16 @@ class ManageAttachments extends AbstractController
 				}
 
 				// Find some attachments to move
-				list ($tomove_count, $tomove) = findAttachmentsToMove($this->from, $start, $limit);
+				[$tomove_count, $tomove] = findAttachmentsToMove($this->from, $start, $limit);
 
 				// Nothing found to move
 				if ($tomove_count === 0)
 				{
-					if (empty($current_progress))
+					if ($current_progress === 0)
 					{
 						$results[] = $txt['attachment_transfer_no_find'];
 					}
+
 					break;
 				}
 
@@ -1753,7 +1710,7 @@ class ManageAttachments extends AbstractController
 					if ($limiting_by_size_num)
 					{
 						$dir_files++;
-						$dir_size += !empty($row['size']) ? $row['size'] : filesize($source);
+						$dir_size += empty($row['size']) ? filesize($source) : $row['size'];
 
 						// If we've reached a directory limit. Do something if we are in auto mode, otherwise set an error.
 						if ($attachmentsDir->remainingSpace($dir_size) === 0 || $attachmentsDir->remainingFiles($dir_files) === 0)
@@ -1763,7 +1720,7 @@ class ManageAttachments extends AbstractController
 							if ($create_result === true)
 							{
 								$results[] = sprintf($txt['attachments_transfered'], $total_moved, $attachmentsDir->getPathById($new_dir));
-								if (!empty($total_not_moved))
+								if ($total_not_moved !== 0)
 								{
 									$results[] = sprintf($txt['attachments_not_transfered'], $total_not_moved);
 								}
@@ -1811,21 +1768,21 @@ class ManageAttachments extends AbstractController
 				if (!$break)
 				{
 					$percent_done = min(round($current_progress / $total_progress * 100, 0), 100);
-					$prog_bar = '
+					$progressBar = '
 						<div class="progress_bar">
 							<div class="green_percent" style="width: ' . $percent_done . '%;">' . $percent_done . '%</div>
 						</div>';
 
 					// Write it to a file so it can be displayed
 					$fp = fopen(BOARDDIR . '/progress.php', 'wb');
-					fwrite($fp, $prog_bar);
+					fwrite($fp, $progressBar);
 					fclose($fp);
 					usleep(500000);
 				}
 			}
 
 			$results[] = sprintf($txt['attachments_transfered'], $total_moved, $attachmentsDir->getPathById($new_dir));
-			if (!empty($total_not_moved))
+			if ($total_not_moved !== 0)
 			{
 				$results[] = sprintf($txt['attachments_not_transfered'], $total_not_moved);
 			}

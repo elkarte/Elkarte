@@ -28,7 +28,7 @@ class RepairBoards extends AbstractController
 	/**
 	 * Default method.
 	 *
-	 * @see \ElkArte\AbstractController::action_index()
+	 * @see AbstractController::action_index()
 	 */
 	public function action_index()
 	{

@@ -208,9 +208,8 @@ class ManageBans extends AbstractController
 						'value' => $txt['ban_added'],
 					),
 					'data' => array(
-						'function' => function ($rowData) {
+						'function' => static function ($rowData) {
 							global $context;
-
 							return standardTime($rowData['ban_time'], empty($context['ban_time_format']) ? true : $context['ban_time_format']);
 						},
 					),
@@ -224,17 +223,15 @@ class ManageBans extends AbstractController
 						'value' => $txt['ban_expires'],
 					),
 					'data' => array(
-						'function' => function ($rowData) {
+						'function' => static function ($rowData) {
 							global $txt;
-
 							// This ban never expires...whahaha.
 							if ($rowData['expire_time'] === null)
 							{
 								return $txt['never'];
 							}
-
 							// This ban has already expired.
-							elseif ($rowData['expire_time'] < time())
+							if ($rowData['expire_time'] < time())
 							{
 								return sprintf('<span class="error">%1$s</span>', $txt['ban_expired']);
 							}
@@ -380,7 +377,7 @@ class ManageBans extends AbstractController
 								'style' => 'width: 60%;',
 							),
 							'data' => array(
-								'function' => function ($ban_item) {
+								'function' => static function ($ban_item) {
 									global $txt;
 
 									if (in_array($ban_item['type'], array('ip', 'hostname', 'email')))
@@ -413,9 +410,8 @@ class ManageBans extends AbstractController
 								'style' => 'width: 15%;',
 							),
 							'data' => array(
-								'function' => function ($ban_item) {
+								'function' => static function ($ban_item) {
 									global $txt, $context;
-
 									return '<a href="' . getUrl('admin', ['action' => 'admin', 'area' => 'ban', 'sa' => 'edittrigger', 'bg' => $context['ban']['id'], 'bi' => $ban_item['id']]) . '">' . $txt['ban_edit_trigger'] . '</a>';
 								},
 							),
@@ -556,6 +552,7 @@ class ManageBans extends AbstractController
 			{
 				$ban_info['id'] = $this->_req->getPost('bg', 'intval', 0);
 			}
+
 			$ban_info['is_new'] = empty($ban_info['id']);
 			$ban_info['expire_date'] = $this->_req->getPost('expire_date', 'intval', 0);
 			$ban_info['expiration'] = array(
@@ -594,7 +591,7 @@ class ManageBans extends AbstractController
 		// Something went wrong somewhere, ban info or triggers, ... Oh well, let's go back.
 		if ($ban_errors->hasErrors())
 		{
-			$context['ban_suggestions'] = !empty($saved_triggers) ? $saved_triggers : '';
+			$context['ban_suggestions'] = empty($saved_triggers) ? '' : $saved_triggers;
 			$context['ban']['from_user'] = true;
 
 			// They may have entered a name not using the member select box
@@ -677,7 +674,7 @@ class ManageBans extends AbstractController
 			'id' => 'ban_log',
 			'title' => $txt['ban_log'],
 			'items_per_page' => 30,
-			'base_href' => $context['admin_area'] == 'ban' ? getUrl('admin', ['action' => 'admin', 'area' => 'ban', 'sa' => 'log']) : getUrl('admin', ['action' => 'admin', 'area' => 'logs', 'sa' => 'banlog']),
+			'base_href' => $context['admin_area'] === 'ban' ? getUrl('admin', ['action' => 'admin', 'area' => 'ban', 'sa' => 'log']) : getUrl('admin', ['action' => 'admin', 'area' => 'logs', 'sa' => 'banlog']),
 			'default_sort_col' => 'date',
 			'get_items' => array(
 				'function' => 'list_getBanLogEntries',
@@ -712,8 +709,8 @@ class ManageBans extends AbstractController
 						'db_htmlsafe' => 'email',
 					),
 					'sort' => array(
-						'default' => 'lb.email = \'\', lb.email',
-						'reverse' => 'lb.email != \'\', lb.email DESC',
+						'default' => "lb.email = '', lb.email",
+						'reverse' => "lb.email != '', lb.email DESC",
 					),
 				),
 				'member' => array(
@@ -739,9 +736,7 @@ class ManageBans extends AbstractController
 						'value' => $txt['ban_log_date'],
 					),
 					'data' => array(
-						'function' => function ($rowData) {
-							return standardTime($rowData['log_time']);
-						},
+						'function' => static fn($rowData) => standardTime($rowData['log_time']),
 					),
 					'sort' => array(
 						'default' => 'lb.log_time DESC',
@@ -765,7 +760,7 @@ class ManageBans extends AbstractController
 				),
 			),
 			'form' => array(
-				'href' => $context['admin_area'] == 'ban' ? getUrl('admin', ['action' => 'admin', 'area' => 'ban', 'sa' => 'log']) : getUrl('admin', ['action' => 'admin', 'area' => 'logs', 'sa' => 'banlog']),
+				'href' => $context['admin_area'] === 'ban' ? getUrl('admin', ['action' => 'admin', 'area' => 'ban', 'sa' => 'log']) : getUrl('admin', ['action' => 'admin', 'area' => 'logs', 'sa' => 'banlog']),
 				'include_start' => true,
 				'include_sort' => true,
 				'token' => 'admin-bl',
@@ -821,7 +816,7 @@ class ManageBans extends AbstractController
 		if (isset($this->_req->post->add_new_trigger) && !empty($this->_req->post->ban_suggestions))
 		{
 			saveTriggers((array) $this->_req->post, $ban_group, 0, $ban_id);
-			redirectexit('action=admin;area=ban;sa=edit' . (!empty($ban_group) ? ';bg=' . $ban_group : ''));
+			redirectexit('action=admin;area=ban;sa=edit;bg=' . $ban_group);
 		}
 		// Edit an existing trigger with new / updated details
 		elseif (isset($this->_req->post->edit_trigger) && !empty($this->_req->post->ban_suggestions))
@@ -831,18 +826,18 @@ class ManageBans extends AbstractController
 			$dummy = (array) $this->_req->post;
 			$dummy['ban_suggestions'] = (array) array_shift($this->_req->post->ban_suggestions);
 			saveTriggers($dummy, $ban_group, 0, $ban_id);
-			if (!empty($this->_req->post->ban_suggestions))
+			if ($this->_req->post->ban_suggestions !== [])
 			{
 				saveTriggers((array) $this->_req->post, $ban_group);
 			}
 
-			redirectexit('action=admin;area=ban;sa=edit' . (!empty($ban_group) ? ';bg=' . $ban_group : ''));
+			redirectexit('action=admin;area=ban;sa=edit;bg=' . $ban_group);
 		}
 		// Removing a ban trigger by clearing the checkbox
 		elseif (isset($this->_req->post->edit_trigger))
 		{
 			removeBanTriggers($ban_id);
-			redirectexit('action=admin;area=ban;sa=edit' . (!empty($ban_group) ? ';bg=' . $ban_group : ''));
+			redirectexit('action=admin;area=ban;sa=edit;bg=' . $ban_group);
 		}
 
 		// No id supplied, this must be a new trigger being added
@@ -878,6 +873,7 @@ class ManageBans extends AbstractController
 			{
 				throw new Exception('ban_not_found', false);
 			}
+
 			$row = $ban_row[$ban_id];
 
 			// Load it up for the template
@@ -905,7 +901,7 @@ class ManageBans extends AbstractController
 		}
 
 		// The template uses the autosuggest functions
-		loadJavascriptFile('suggest.js', array('defer' => true));;
+		loadJavascriptFile('suggest.js', array('defer' => true));
 
 		// Template we will use
 		$context['sub_template'] = 'ban_edit_trigger';
@@ -940,7 +936,7 @@ class ManageBans extends AbstractController
 			removeBanTriggers($to_remove);
 
 			// Rehabilitate some members.
-			if ($this->_req->query->entity == 'member')
+			if ($this->_req->query->entity === 'member')
 			{
 				updateBanMembers();
 			}
@@ -1066,27 +1062,25 @@ class ManageBans extends AbstractController
 		if ($context['selected_entity'] === 'ip')
 		{
 			$listOptions['columns']['banned_entity']['data'] = array(
-				'function' => function ($rowData) {
-					return range2ip(array(
-						$rowData['ip_low1'],
-						$rowData['ip_low2'],
-						$rowData['ip_low3'],
-						$rowData['ip_low4'],
-						$rowData['ip_low5'],
-						$rowData['ip_low6'],
-						$rowData['ip_low7'],
-						$rowData['ip_low8']
-					), array(
-						$rowData['ip_high1'],
-						$rowData['ip_high2'],
-						$rowData['ip_high3'],
-						$rowData['ip_high4'],
-						$rowData['ip_high5'],
-						$rowData['ip_high6'],
-						$rowData['ip_high7'],
-						$rowData['ip_high8']
-					));
-				},
+				'function' => static fn($rowData) => range2ip(array(
+					$rowData['ip_low1'],
+					$rowData['ip_low2'],
+					$rowData['ip_low3'],
+					$rowData['ip_low4'],
+					$rowData['ip_low5'],
+					$rowData['ip_low6'],
+					$rowData['ip_low7'],
+					$rowData['ip_low8']
+				), array(
+					$rowData['ip_high1'],
+					$rowData['ip_high2'],
+					$rowData['ip_high3'],
+					$rowData['ip_high4'],
+					$rowData['ip_high5'],
+					$rowData['ip_high6'],
+					$rowData['ip_high7'],
+					$rowData['ip_high8']
+				)),
 			);
 			$listOptions['columns']['banned_entity']['sort'] = array(
 				'default' => 'bi.ip_low1, bi.ip_high1, bi.ip_low2, bi.ip_high2, bi.ip_low3, bi.ip_high3, bi.ip_low4, bi.ip_high4, bi.ip_low5, bi.ip_high5, bi.ip_low6, bi.ip_high6, bi.ip_low7, bi.ip_high7, bi.ip_low8, bi.ip_high8',
@@ -1096,9 +1090,7 @@ class ManageBans extends AbstractController
 		elseif ($context['selected_entity'] === 'hostname')
 		{
 			$listOptions['columns']['banned_entity']['data'] = array(
-				'function' => function ($rowData) {
-					return strtr(Util::htmlspecialchars($rowData['hostname']), array('%' => '*'));
-				},
+				'function' => static fn($rowData) => strtr(Util::htmlspecialchars($rowData['hostname']), array('%' => '*')),
 			);
 			$listOptions['columns']['banned_entity']['sort'] = array(
 				'default' => 'bi.hostname',
@@ -1108,9 +1100,7 @@ class ManageBans extends AbstractController
 		elseif ($context['selected_entity'] === 'email')
 		{
 			$listOptions['columns']['banned_entity']['data'] = array(
-				'function' => function ($rowData) {
-					return strtr(Util::htmlspecialchars($rowData['email_address']), array('%' => '*'));
-				},
+				'function' => static fn($rowData) => strtr(Util::htmlspecialchars($rowData['email_address']), array('%' => '*')),
 			);
 			$listOptions['columns']['banned_entity']['sort'] = array(
 				'default' => 'bi.email_address',

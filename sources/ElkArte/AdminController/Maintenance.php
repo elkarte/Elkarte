@@ -35,39 +35,19 @@ use ElkArte\User;
  */
 class Maintenance extends AbstractController
 {
-	/**
-	 * Maximum topic counter
-	 *
-	 * @var int
-	 */
+	/** @var int Maximum topic counter */
 	public $max_topics;
 
-	/**
-	 * How many actions to take for a maintenance actions
-	 *
-	 * @var int
-	 */
+	/** @var int How many actions to take for a maintenance actions */
 	public $increment;
 
-	/**
-	 * Total steps for a given maintenance action
-	 *
-	 * @var int
-	 */
+	/** @var int Total steps for a given maintenance action */
 	public $total_steps;
 
-	/**
-	 * reStart pointer for paused maintenance actions
-	 *
-	 * @var int
-	 */
+	/** @var int reStart pointer for paused maintenance actions */
 	public $start;
 
-	/**
-	 * Loop counter for paused maintenance actions
-	 *
-	 * @var int
-	 */
+	/** @var int Loop counter for paused maintenance actions */
 	public $step;
 
 	/**
@@ -78,7 +58,7 @@ class Maintenance extends AbstractController
 	 * - This, as usual, checks permissions, loads language files,
 	 * and forwards to the actual workers.
 	 *
-	 * @see \ElkArte\AbstractController::action_index()
+	 * @see AbstractController::action_index
 	 */
 	public function action_index()
 	{
@@ -143,7 +123,7 @@ class Maintenance extends AbstractController
 				'function' => 'action_hooks',
 			),
 			'attachments' => array(
-				'controller' => '\\ElkArte\\AdminController\\ManageAttachments',
+				'controller' => ManageAttachments::class,
 				'function' => 'action_maintenance',
 			),
 		);
@@ -463,8 +443,7 @@ class Maintenance extends AbstractController
 		}
 
 		$context['convert_to'] = $body_type === 'text' ? 'mediumtext' : 'text';
-
-		if ($body_type === 'text' || ($body_type !== 'text' && isset($this->_req->post->do_conversion)))
+		if ($body_type === 'text' || isset($this->_req->post->do_conversion))
 		{
 			checkSession();
 			validateToken('admin-maint');
@@ -495,10 +474,10 @@ class Maintenance extends AbstractController
 
 			return;
 		}
-		elseif ($body_type !== 'text' && (!isset($this->_req->post->do_conversion) || isset($this->_req->post->cont)))
+
+		if (!isset($this->_req->post->do_conversion) || isset($this->_req->post->cont))
 		{
 			checkSession();
-
 			if (empty($this->_req->query->start))
 			{
 				validateToken('admin-maint');
@@ -512,15 +491,14 @@ class Maintenance extends AbstractController
 			$context['continue_post_data'] = '';
 			$context['continue_countdown'] = 3;
 			$context['sub_template'] = 'not_done';
+
 			$increment = 500;
 			$id_msg_exceeding = isset($this->_req->post->id_msg_exceeding) ? explode(',', $this->_req->post->id_msg_exceeding) : array();
-
 			$max_msgs = countMessages();
 			$start = $this->_req->query->start;
 
 			// Try for as much time as possible.
 			detectServer()->setTimeLimit(600);
-
 			while ($start < $max_msgs)
 			{
 				$id_msg_exceeding = detectExceedingMessages($start, $increment);
@@ -920,12 +898,12 @@ class Maintenance extends AbstractController
 			$memID = array_shift($members);
 			$memID = $memID['id'];
 
-			$email = $our_post['type'] == 'email' ? $our_post['from_email'] : '';
-			$membername = $our_post['type'] == 'name' ? $our_post['from_name'] : '';
+			$email = $our_post['type'] === 'email' ? $our_post['from_email'] : '';
+			$memberName = $our_post['type'] === 'name' ? $our_post['from_name'] : '';
 
 			// Now call the reattribute function.
 			require_once(SUBSDIR . '/Members.subs.php');
-			reattributePosts($memID, $email, $membername, !$our_post['posts']);
+			reattributePosts($memID, $email, $memberName, !$our_post['posts']);
 
 			$context['maintenance_finished'] = array(
 				'errors' => array(sprintf($txt['maintain_done'], $txt['maintain_reattribute_posts'])),
@@ -973,21 +951,18 @@ class Maintenance extends AbstractController
 		{
 			return $this->action_database();
 		}
-		else
-		{
-			require_once(SUBSDIR . '/Admin.subs.php');
 
-			emailAdmins('admin_backup_database', array(
-				'BAK_REALNAME' => $this->user->name
-			));
-			logAction('database_backup', array('member' => $this->user->id), 'admin');
+		require_once(SUBSDIR . '/Admin.subs.php');
+		emailAdmins('admin_backup_database', array(
+			'BAK_REALNAME' => $this->user->name
+		));
 
-			require_once(SOURCEDIR . '/DumpDatabase.php');
-			DumpDatabase2();
+		logAction('database_backup', array('member' => $this->user->id), 'admin');
+		require_once(SOURCEDIR . '/DumpDatabase.php');
+		DumpDatabase2();
 
-			// Should not get here as DumpDatabase2 exits
-			return true;
-		}
+		// Should not get here as DumpDatabase2 exits
+		return true;
 	}
 
 	/**
@@ -1002,20 +977,17 @@ class Maintenance extends AbstractController
 		$ftp = new FtpConnection($this->_req->post->ftp_server, $this->_req->post->ftp_port, $this->_req->post->ftp_username, $this->_req->post->ftp_password);
 
 		// No errors on the connection, id/pass are good
-		if ($ftp->error === false)
+		// I know, I know... but a lot of people want to type /home/xyz/... which is wrong, but logical.
+		if ($ftp->error === false && !$ftp->chdir($this->_req->post->ftp_path))
 		{
-			// I know, I know... but a lot of people want to type /home/xyz/... which is wrong, but logical.
-			if (!$ftp->chdir($this->_req->post->ftp_path))
-			{
-				$ftp->chdir(preg_replace('~^/home[2]?/[^/]+~', '', $this->_req->post->ftp_path));
-			}
+			$ftp->chdir(preg_replace('~^/home[2]?/[^/]+~', '', $this->_req->post->ftp_path));
 		}
 
 		// If we had an error...
 		if ($ftp->error !== false)
 		{
 			Txt::load('Packages');
-			$ftp_error = $ftp->last_message === null ? ($txt['package_ftp_' . $ftp->error] ?? '') : $ftp->last_message;
+			$ftp_error = $ftp->last_message ?? $txt['package_ftp_' . $ftp->error] ?? '';
 
 			// Fill the boxes for a FTP connection with data from the previous attempt
 			$context['package_ftp'] = array(
@@ -1052,7 +1024,7 @@ class Maintenance extends AbstractController
 			$body_type = fetchBodyType();
 
 			$context['convert_to'] = $body_type === 'text' ? 'mediumtext' : 'text';
-			$context['convert_to_suggest'] = ($body_type != 'text' && !empty($modSettings['max_messageLength']) && $modSettings['max_messageLength'] < 65536);
+			$context['convert_to_suggest'] = ($body_type !== 'text' && !empty($modSettings['max_messageLength']) && $modSettings['max_messageLength'] < 65536);
 		}
 
 		// Check few things to give advices before make a backup
@@ -1340,14 +1312,10 @@ class Maintenance extends AbstractController
 			'base_href' => getUrl('admin', ['action' => 'admin', 'area' => 'maintain', 'sa' => 'hooks', $context['filter_url'], '{session_data}']),
 			'default_sort_col' => 'hook_name',
 			'get_items' => array(
-				'function' => function ($start, $items_per_page, $sort) {
-					return $this->list_getIntegrationHooks($start, $items_per_page, $sort);
-				},
+				'function' => fn($start, $items_per_page, $sort) => $this->list_getIntegrationHooks($start, $items_per_page, $sort),
 			),
 			'get_count' => array(
-				'function' => function () {
-					return $this->list_getIntegrationHooksCount();
-				},
+				'function' => fn() => $this->list_getIntegrationHooksCount(),
 			),
 			'no_items_label' => $txt['hooks_no_hooks'],
 			'columns' => array(
@@ -1368,17 +1336,15 @@ class Maintenance extends AbstractController
 						'value' => $txt['hooks_field_function_name'],
 					),
 					'data' => array(
-						'function' => function ($data) {
+						'function' => static function ($data) {
 							global $txt;
 
 							if (!empty($data['included_file']))
 							{
 								return $txt['hooks_field_function'] . ': ' . $data['real_function'] . '<br />' . $txt['hooks_field_included_file'] . ': ' . $data['included_file'];
 							}
-							else
-							{
-								return $data['real_function'];
-							}
+
+							return $data['real_function'];
 						},
 					),
 					'sort' => array(
@@ -1404,9 +1370,7 @@ class Maintenance extends AbstractController
 						'class' => 'nowrap',
 					),
 					'data' => array(
-						'function' => function ($data) {
-							return '<i class="icon i-post_moderation_' . $data['status'] . '" title="' . $data['img_text'] . '"></i>';
-						},
+						'function' => static fn($data) => '<i class="icon i-post_moderation_' . $data['status'] . '" title="' . $data['img_text'] . '"></i>',
 						'class' => 'centertext',
 					),
 					'sort' => array(
@@ -1508,7 +1472,7 @@ class Maintenance extends AbstractController
 		require_once(SUBSDIR . '/Maintenance.subs.php');
 
 		// Only run this query if we don't have the total number of members that have posted
-		if (!isset($this->_req->session->total_members) || $start === 0)
+		if (!isset($_SESSION['total_members']) || $start === 0)
 		{
 			validateToken('admin-maint');
 			$total_members = countContributors();
@@ -1525,7 +1489,7 @@ class Maintenance extends AbstractController
 		$total_rows = updateMembersPostCount($start, $increment);
 
 		// Continue?
-		if ($total_rows == $increment)
+		if ($total_rows === $increment)
 		{
 			createToken('admin-recountposts');
 

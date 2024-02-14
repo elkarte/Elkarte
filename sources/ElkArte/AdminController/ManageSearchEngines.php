@@ -19,8 +19,8 @@ namespace ElkArte\AdminController;
 use ElkArte\AbstractController;
 use ElkArte\Action;
 use ElkArte\Cache\Cache;
-use ElkArte\SettingsForm\SettingsForm;
 use ElkArte\Languages\Txt;
+use ElkArte\SettingsForm\SettingsForm;
 
 /**
  * ManageSearchEngines admin controller. This class handles all search engines
@@ -34,7 +34,7 @@ class ManageSearchEngines extends AbstractController
 	 * Entry point for this section.
 	 *
 	 * @event integrate_sa_manage_search_engines add additonal search engine actions
-	 * @see \ElkArte\AbstractController::action_index()
+	 * @see AbstractController::action_index()
 	 */
 	public function action_index()
 	{
@@ -136,7 +136,7 @@ class ManageSearchEngines extends AbstractController
 			{
 				$javascript_function .= '
 				if (document.getElementById(\'' . $variable[1] . '\'))
-					document.getElementById(\'' . $variable[1] . '\').disabled = disabledState;';
+					document.getElementById(\'' . $variable[1] . "').disabled = disabledState;";
 			}
 		}
 
@@ -222,8 +222,9 @@ class ManageSearchEngines extends AbstractController
 			$this->action_editspiders();
 			return;
 		}
+
 		// User pressed the 'remove selection button'.
-		elseif (!empty($this->_req->post->removeSpiders) && !empty($this->_req->post->remove) && is_array($this->_req->post->remove))
+		if (!empty($this->_req->post->removeSpiders) && !empty($this->_req->post->remove) && is_array($this->_req->post->remove))
 		{
 			checkSession();
 			validateToken('admin-ser');
@@ -233,7 +234,6 @@ class ManageSearchEngines extends AbstractController
 
 			// Delete them all!
 			removeSpiders($toRemove);
-
 			Cache::instance()->remove('spider_search');
 			recacheSpiderNames();
 		}
@@ -265,9 +265,7 @@ class ManageSearchEngines extends AbstractController
 						'value' => $txt['spider_name'],
 					),
 					'data' => array(
-						'function' => function ($rowData) {
-							return sprintf('<a href=' . getUrl('admin', ['action' => 'admin', 'area' => 'sengines', 'sa' => 'editspiders', 'sid' => $rowData['id_spider']]) . '">%1$s</a>', htmlspecialchars($rowData['spider_name'], ENT_COMPAT, 'UTF-8'));
-						},
+						'function' => static fn($rowData) => sprintf('<a href=' . getUrl('admin', ['action' => 'admin', 'area' => 'sengines', 'sa' => 'editspiders', 'sid' => $rowData['id_spider']]) . '">%1$s</a>', htmlspecialchars($rowData['spider_name'], ENT_COMPAT, 'UTF-8')),
 					),
 					'sort' => array(
 						'default' => 'spider_name',
@@ -279,7 +277,7 @@ class ManageSearchEngines extends AbstractController
 						'value' => $txt['spider_last_seen'],
 					),
 					'data' => array(
-						'function' => function ($rowData) {
+						'function' => static function ($rowData) {
 							global $context, $txt;
 
 							return isset($context['spider_last_seen'][$rowData['id_spider']]) ? standardTime($context['spider_last_seen'][$rowData['id_spider']]) : $txt['spider_last_never'];
@@ -379,6 +377,7 @@ class ManageSearchEngines extends AbstractController
 					$ips[] = $set;
 				}
 			}
+
 			$ips = implode(',', $ips);
 
 			// Goes in as it is...
@@ -440,7 +439,7 @@ class ManageSearchEngines extends AbstractController
 			'items_per_page' => 20,
 			'title' => $txt['spider_logs'],
 			'no_items_label' => $txt['spider_logs_empty'],
-			'base_href' => $context['admin_area'] == 'sengines' ? getUrl('admin', ['action' => 'admin', 'area' => 'sengines', 'sa' => 'logs']) : getUrl('admin', ['action' => 'admin', 'area' => 'logs', 'sa' => 'spiderlog']),
+			'base_href' => $context['admin_area'] === 'sengines' ? getUrl('admin', ['action' => 'admin', 'area' => 'sengines', 'sa' => 'logs']) : getUrl('admin', ['action' => 'admin', 'area' => 'logs', 'sa' => 'spiderlog']),
 			'default_sort_col' => 'log_time',
 			'get_items' => array(
 				'function' => 'getSpiderLogs',
@@ -467,9 +466,7 @@ class ManageSearchEngines extends AbstractController
 						'value' => $txt['spider_time'],
 					),
 					'data' => array(
-						'function' => function ($rowData) {
-							return standardTime($rowData['log_time']);
-						},
+						'function' => static fn($rowData) => standardTime($rowData['log_time']),
 					),
 					'sort' => array(
 						'default' => 'sl.id_hit DESC',
@@ -508,6 +505,7 @@ class ManageSearchEngines extends AbstractController
 		if (!empty($context['spider_logs']['rows']))
 		{
 			$urls = array();
+
 			// Grab the current /url.
 			foreach ($context['spider_logs']['rows'] as $k => $row)
 			{
@@ -568,8 +566,7 @@ class ManageSearchEngines extends AbstractController
 
 		// Prepare the dates for the drop down.
 		$date_choices = spidersStatsDates();
-		end($date_choices);
-		$max_date = key($date_choices);
+		$max_date = array_key_last($date_choices);
 
 		// What are we currently viewing?
 		$current_date = isset($this->_req->post->new_date, $date_choices[$this->_req->post->new_date]) ? $this->_req->post->new_date : $max_date;
@@ -660,7 +657,7 @@ class ManageSearchEngines extends AbstractController
 				),
 			),
 			'form' => array(
-				'href' =>getUrl('admin', ['action' => 'admin', 'area' => 'sengines', 'sa' => 'stats']),
+				'href' => getUrl('admin', ['action' => 'admin', 'area' => 'sengines', 'sa' => 'stats']),
 				'name' => 'spider_stat_list',
 			),
 			'additional_rows' => array(

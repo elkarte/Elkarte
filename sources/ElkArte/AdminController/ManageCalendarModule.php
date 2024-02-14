@@ -33,7 +33,7 @@ class ManageCalendarModule extends AbstractController
 	/**
 	 * Used to add the Calendar entry to the Core Features list.
 	 *
-	 * @param mixed[] $core_features The core features array
+	 * @param array $core_features The core features array
 	 */
 	public static function addCoreFeature(&$core_features)
 	{
@@ -42,7 +42,7 @@ class ManageCalendarModule extends AbstractController
 			'settings' => array(
 				'cal_enabled' => 1,
 			),
-			'setting_callback' => function ($value) {
+			'setting_callback' => static function ($value) {
 				if ($value)
 				{
 					enableModules('calendar', array('admin', 'post', 'boardindex', 'display'));
@@ -164,11 +164,11 @@ class ManageCalendarModule extends AbstractController
 						'value' => $txt['date'],
 					),
 					'data' => array(
-						'function' => function ($rowData) {
+						'function' => static function ($rowData) {
 							global $txt;
 
 							// Recurring every year or just a single year?
-							$year = $rowData['year'] == '0004' ? sprintf('(%1$s)', $txt['every_year']) : $rowData['year'];
+							$year = $rowData['year'] === '0004' ? sprintf('(%1$s)', $txt['every_year']) : $rowData['year'];
 
 							// Construct the date.
 							return sprintf('%1$d %2$s %3$s', $rowData['day'], $txt['months'][(int) $rowData['month']], $year);
@@ -232,7 +232,7 @@ class ManageCalendarModule extends AbstractController
 
 		$context['is_new'] = !isset($this->_req->query->holiday);
 		$context['cal_minyear'] = $modSettings['cal_minyear'];
-		$context['cal_maxyear'] = date('Y') + $modSettings['cal_limityear'];
+		$context['cal_maxyear'] = (int) date('Y') + (int) $modSettings['cal_limityear'];
 		$context['page_title'] = $context['is_new'] ? $txt['holidays_add'] : $txt['holidays_edit'];
 		$context['sub_template'] = 'edit_holiday';
 
@@ -288,9 +288,9 @@ class ManageCalendarModule extends AbstractController
 		// Last day for the drop down?
 		$context['holiday']['last_day'] = (int) Util::strftime('%d', mktime(0, 0, 0, $context['holiday']['month'] == 12
 			? 1
-			: $context['holiday']['month'] + 1, 0, $context['holiday']['month'] == 12
-				? $context['holiday']['year'] + 1
-				: $context['holiday']['year']));
+			: $context['holiday']['month'] + 1, 0, $context['holiday']['month'] === 12
+			? $context['holiday']['year'] + 1
+			: $context['holiday']['year']));
 	}
 
 	/**

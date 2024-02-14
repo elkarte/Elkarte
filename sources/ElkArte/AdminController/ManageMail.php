@@ -18,9 +18,10 @@ namespace ElkArte\AdminController;
 
 use ElkArte\AbstractController;
 use ElkArte\Action;
-use ElkArte\SettingsForm\SettingsForm;
-use ElkArte\Languages\Txt;
+use ElkArte\Exceptions\Exception;
 use ElkArte\Languages\Loader;
+use ElkArte\Languages\Txt;
+use ElkArte\SettingsForm\SettingsForm;
 use ElkArte\Util;
 
 /**
@@ -41,7 +42,7 @@ class ManageMail extends AbstractController
 	 * - This function checks permissions and passes control through to the relevant section.
 	 *
 	 * @event integrate_sa_manage_mail Used to add more sub actions
-	 * @see  \ElkArte\AbstractController::action_index()
+	 * @see AbstractController::action_index()
 	 * @uses Help and MangeMail language files
 	 */
 	public function action_index()
@@ -116,6 +117,7 @@ class ManageMail extends AbstractController
 				$this->_req->post->smtp_password[0] = base64_encode($this->_req->post->smtp_password[0]);
 				$this->_req->post->smtp_password[1] = base64_encode($this->_req->post->smtp_password[1]);
 			}
+
 			checkSession();
 
 			// We don't want to save the subject and body previews.
@@ -134,6 +136,7 @@ class ManageMail extends AbstractController
 			{
 				$this->_req->post->smtp_client = detectServer()->getFQDN();
 			}
+
 			$settingsForm->setConfigValues((array) $this->_req->post);
 			$settingsForm->save();
 			redirectexit('action=admin;area=mailqueue;sa=settings');
@@ -157,7 +160,7 @@ class ManageMail extends AbstractController
 				' . $index . ': {
 				subject: ' . JavaScriptEscape($email['subject']) . ',
 				body: ' . JavaScriptEscape(nl2br($email['body'])) . '
-			}' . (!$is_last ? ',' : '');
+			}' . ($is_last ? '' : ',');
 		}
 
 		theme()->addInlineJavascript($javascript . '
@@ -186,6 +189,7 @@ class ManageMail extends AbstractController
 		{
 			$txtBirthdayEmails = [];
 		}
+
 		$lang_loader = new Loader(null, $txtBirthdayEmails, database(), 'txtBirthdayEmails');
 		$lang_loader->load('EmailTemplates');
 
@@ -201,7 +205,7 @@ class ManageMail extends AbstractController
 			$processedBirthdayEmails[$index][$element] = $value;
 		}
 
-		foreach ($processedBirthdayEmails as $index => $dummy)
+		foreach (array_keys($processedBirthdayEmails) as $index)
 		{
 			$emails[$index] = $index;
 		}
@@ -215,7 +219,7 @@ class ManageMail extends AbstractController
 			// SMTP stuff.
 			array('select', 'mail_type', array($txt['mail_type_default'], 'SMTP')),
 			array('text', 'smtp_host'),
-				array('text', 'smtp_client'),
+			array('text', 'smtp_client'),
 			array('text', 'smtp_port'),
 			array('check', 'smtp_starttls'),
 			array('text', 'smtp_username'),
@@ -280,7 +284,6 @@ class ManageMail extends AbstractController
 	 *
 	 * @param int $all_emails total emails to be sent
 	 * @param int $sent_emails number of emails sent so far
-	 * @throws \ElkArte\Exceptions\Exception
 	 */
 	private function _pauseMailQueueClear($all_emails, $sent_emails)
 	{
@@ -358,9 +361,7 @@ class ManageMail extends AbstractController
 						'value' => $txt['mailqueue_subject'],
 					),
 					'data' => array(
-						'function' => function ($rowData) {
-							return Util::shorten_text(Util::htmlspecialchars($rowData['subject'], 50));
-						},
+						'function' => static fn($rowData) => Util::shorten_text(Util::htmlspecialchars($rowData['subject'], 50)),
 						'class' => 'smalltext',
 					),
 					'sort' => array(
@@ -391,7 +392,7 @@ class ManageMail extends AbstractController
 						'class' => 'centertext',
 					),
 					'data' => array(
-						'function' => function ($rowData) {
+						'function' => static function ($rowData) {
 							global $txt;
 
 							// We probably have a text label with your priority.
@@ -412,9 +413,7 @@ class ManageMail extends AbstractController
 						'value' => $txt['mailqueue_age'],
 					),
 					'data' => array(
-						'function' => function ($rowData) {
-							return time_since(time() - $rowData['time_sent']);
-						},
+						'function' => static fn($rowData) => time_since(time() - $rowData['time_sent']),
 						'class' => 'smalltext',
 					),
 					'sort' => array(
@@ -427,9 +426,7 @@ class ManageMail extends AbstractController
 						'value' => '<input type="checkbox" onclick="invertAll(this, this.form);" class="input_check" />',
 					),
 					'data' => array(
-						'function' => function ($rowData) {
-							return '<input type="checkbox" name="delete[]" value="' . $rowData['id_mail'] . '" class="input_check" />';
-						},
+						'function' => static fn($rowData) => '<input type="checkbox" name="delete[]" value="' . $rowData['id_mail'] . '" class="input_check" />',
 						'class' => 'centertext',
 					),
 				),

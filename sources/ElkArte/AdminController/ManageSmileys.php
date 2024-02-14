@@ -23,10 +23,10 @@ use ElkArte\Cache\Cache;
 use ElkArte\Errors\Errors;
 use ElkArte\Exceptions\Exception;
 use ElkArte\FileFunctions;
+use ElkArte\Languages\Txt;
 use ElkArte\Packages\PackageChmod;
 use ElkArte\Packages\PackageParser;
 use ElkArte\SettingsForm\SettingsForm;
-use ElkArte\Languages\Txt;
 use ElkArte\Util;
 
 /**
@@ -39,14 +39,14 @@ class ManageSmileys extends AbstractController
 	private $_smiley_context = [];
 
 	/** @var string[] allowed extensions for smiles */
-	private $_smiley_types =  ['jpg', 'gif', 'jpeg', 'png', 'webp', 'svg'];
+	private $_smiley_types = ['jpg', 'gif', 'jpeg', 'png', 'webp', 'svg'];
 
 	/**
 	 * This is the dispatcher of smileys administration.
 	 *
 	 * @uses ManageSmileys language
 	 * @uses ManageSmileys template
-	 * @see  \ElkArte\AbstractController::action_index()
+	 * @see  AbstractController::action_index()
 	 */
 	public function action_index()
 	{
@@ -247,7 +247,6 @@ class ManageSmileys extends AbstractController
  
  let custom = [
  ';
-
 		foreach ($custom as $emoji)
 		{
 			$header .= "\t" . '{name: \'' . $emoji['name'] . '\', key: \'' . $emoji['key'] . '\', type: \'' . $emoji['type'] . "'},\n";
@@ -315,9 +314,7 @@ class ManageSmileys extends AbstractController
 						'class' => 'centertext',
 					],
 					'data' => [
-						'function' => function ($rowData) {
-							return $rowData['selected'] ? '<i class="icon i-check"></i>' : '';
-						},
+						'function' => static fn($rowData) => $rowData['selected'] ? '<i class="icon i-check"></i>' : '',
 						'class' => 'centertext',
 					],
 					'sort' => [
@@ -385,15 +382,13 @@ class ManageSmileys extends AbstractController
 						'class' => 'centertext',
 					],
 					'data' => [
-						'function' => function ($rowData) {
-							return $rowData['id'] == 0 ? '' : sprintf('<input type="checkbox" name="smiley_set[%1$d]" class="input_check" />', $rowData['id']);
-						},
+						'function' => static fn($rowData) => $rowData['id'] == 0 ? '' : sprintf('<input type="checkbox" name="smiley_set[%1$d]" class="input_check" />', $rowData['id']),
 						'class' => 'centertext',
 					],
 				],
 			],
 			'form' => [
-				'href' =>getUrl('admin', ['action' => 'admin', 'area' => 'smileys', 'sa' => 'editsets']),
+				'href' => getUrl('admin', ['action' => 'admin', 'area' => 'smileys', 'sa' => 'editsets']),
 				'token' => 'admin-mss',
 			],
 			'additional_rows' => [
@@ -435,10 +430,15 @@ class ManageSmileys extends AbstractController
 				$set_extensions = explode(',', $modSettings['smiley_sets_extensions']);
 				foreach ($this->_req->post->smiley_set as $id => $val)
 				{
-					if (isset($set_paths[$id], $set_names[$id]) && !empty($id))
+					if (!isset($set_paths[$id], $set_names[$id]))
 					{
-						unset($set_paths[$id], $set_names[$id], $set_extensions[$id]);
+						continue;
 					}
+					if (empty($id))
+					{
+						continue;
+					}
+					unset($set_paths[$id], $set_names[$id], $set_extensions[$id]);
 				}
 
 				// Update the modSettings with the new values
@@ -698,6 +698,7 @@ class ManageSmileys extends AbstractController
 						];
 					}
 				}
+
 				$dir->close();
 			}
 		}
@@ -847,7 +848,7 @@ class ManageSmileys extends AbstractController
 					}
 				}
 
-				foreach ($context['smiley_sets'] as $i => $set)
+				foreach ($context['smiley_sets'] as $set)
 				{
 					$set['name'] = un_htmlspecialchars($set['name']);
 					$set['path'] = un_htmlspecialchars($set['path']);
@@ -859,7 +860,7 @@ class ManageSmileys extends AbstractController
 
 					// Got one...
 					if (!is_uploaded_file($_FILES['individual_' . $set['name']]['tmp_name']) || (ini_get('open_basedir') === ''
-						&& !$fileFunc->fileExists($_FILES['individual_' . $set['name']]['tmp_name'])))
+							&& !$fileFunc->fileExists($_FILES['individual_' . $set['name']]['tmp_name'])))
 					{
 						throw new Exception('smileys_upload_error');
 					}
@@ -884,7 +885,7 @@ class ManageSmileys extends AbstractController
 
 					// If the file exists - ignore it.
 					$smileyLocation = $context['smileys_dir'] . '/' . $set['path'] . '/' . $destName;
-					if ($fileFunc-fileExists($smileyLocation))
+					if ($fileFunc->fileExists($smileyLocation))
 					{
 						continue;
 					}
@@ -916,6 +917,7 @@ class ManageSmileys extends AbstractController
 					$smiley_order = '0';
 				}
 			}
+
 			$param = [
 				$this->_req->post->smiley_code,
 				$this->_req->post->smiley_filename,
@@ -1094,13 +1096,11 @@ class ManageSmileys extends AbstractController
 				'columns' => [
 					'picture' => [
 						'data' => [
-							'function' => static function ($rowData) use ($context) {
-								return '
+							'function' => static fn($rowData) => '
 								<a href="' . getUrl('admin', ['action' => 'admin', 'area' => 'smileys', 'sa' => 'modifysmiley', 'smiley' => '']) . $rowData['id_smiley'] . '">
 									<img class="smiley" src="' . $context['smiley_path'] . $rowData['filename'] . '.' . $context['smiley_extension'] . '" alt="' . $rowData['description'] . '" id="smiley' . $rowData['id_smiley'] . '" />
 									<input type="hidden" name="smileys[' . $rowData['id_smiley'] . '][filename]" value="' . $rowData['filename'] . '" />
-								</a>';
-								}
+								</a>'
 						],
 						'class' => 'imagecolumn',
 					],
@@ -1133,9 +1133,7 @@ class ManageSmileys extends AbstractController
 							'value' => $txt['smileys_location'],
 						],
 						'data' => [
-							'function' => function ($rowData) use ($smiley_locations) {
-								return $smiley_locations[$rowData['hidden']];
-							},
+							'function' => static fn($rowData) => $smiley_locations[$rowData['hidden']],
 						],
 						'sort' => [
 							'default' => 'hidden',
@@ -1164,7 +1162,7 @@ class ManageSmileys extends AbstractController
 									if (!$fileFunc->fileExists($modSettings['smileys_dir'] . '/' . $smiley_set['path'] . '/' . $filename))
 									{
 										$missing_sets[] = $smiley_set['path'];
-										if (possibleSmileEmoji($rowData, $modSettings['smileys_dir'] . '/' . $smiley_set['path'] , $smiley_set['ext']))
+										if (possibleSmileEmoji($rowData, $modSettings['smileys_dir'] . '/' . $smiley_set['path'], $smiley_set['ext']))
 										{
 											$found_replacement = $rowData['emoji'] . '.svg';
 										}
@@ -1180,7 +1178,7 @@ class ManageSmileys extends AbstractController
 										<p class="smalltext">
 											<strong>' . $txt['smileys_not_found_in_set'] . '</strong> ' . implode(', ', $missing_sets);
 
-									if (!empty($found_replacement))
+									if ($found_replacement !== '' && $found_replacement !== '0')
 									{
 										$description .= '<br />' . sprintf($txt['smileys_emoji_found'], '<img class="smiley emoji" src="' . $context['emoji_path'] . $found_replacement . '" /> ');
 									}
@@ -1335,12 +1333,14 @@ class ManageSmileys extends AbstractController
 				{
 					throw new Exception('icon_not_found', false);
 				}
+
 				// There is a 16-character limit on message icons...
-				elseif (strlen($this->_req->post->icon_filename) > 16)
+				if (strlen($this->_req->post->icon_filename) > 16)
 				{
 					throw new Exception('icon_name_too_long', false);
 				}
-				elseif ($this->_req->post->icon_location === $this->_req->query->icon && !empty($this->_req->query->icon))
+
+				if ($this->_req->post->icon_location === $this->_req->query->icon && $this->_req->query->icon !== 0)
 				{
 					throw new Exception('icon_after_itself', false);
 				}
@@ -1359,7 +1359,7 @@ class ManageSmileys extends AbstractController
 				}
 
 				// If there are no existing icons and this is a new one, set the id to 1 (mainly for non-mysql)
-				if (empty($this->_req->query->icon) && empty($context['icons']))
+				if ($this->_req->query->icon === 0 && empty($context['icons']))
 				{
 					$this->_req->query->icon = 1;
 				}
@@ -1426,9 +1426,7 @@ class ManageSmileys extends AbstractController
 			'sortable' => true,
 			'base_href' => getUrl('admin', ['action' => 'admin', 'area' => 'smileys', 'sa' => 'editicons']),
 			'get_items' => [
-				'function' => function () {
-					return $this->list_fetchMessageIconsDetails();
-				},
+				'function' => fn() => $this->list_fetchMessageIconsDetails(),
 			],
 			'no_items_label' => $txt['icons_no_entries'],
 			'columns' => [
@@ -1864,7 +1862,7 @@ class ManageSmileys extends AbstractController
 			{
 				updateSettings([
 					'smiley_sets_known' => $modSettings['smiley_sets_known'] . ',' . basename($action['action']),
-					'smiley_sets_names' => $modSettings['smiley_sets_names'] . "\n" . $smileyInfo['name'] . (count($context['actions']) > 1 ? ' ' . (!empty($action['description']) ? Util::htmlspecialchars($action['description']) : basename($action['action'])) : ''),
+					'smiley_sets_names' => $modSettings['smiley_sets_names'] . "\n" . $smileyInfo['name'] . (count($context['actions']) > 1 ? ' ' . (empty($action['description']) ? basename($action['action']) : Util::htmlspecialchars($action['description'])) : ''),
 				]);
 			}
 
@@ -1953,7 +1951,7 @@ class ManageSmileys extends AbstractController
 		foreach ($smiley_sets as $smiley_set)
 		{
 			$smiles = $fileFunc->listTree($context['smileys_dir'] . '/' . un_htmlspecialchars($smiley_set['path']));
-			foreach($smiles as $smile)
+			foreach ($smiles as $smile)
 			{
 				if (in_array($smile['filename'], ['.', '..', '.htaccess', 'index.php'], true))
 				{
@@ -1961,14 +1959,20 @@ class ManageSmileys extends AbstractController
 				}
 
 				$key = strtolower(pathinfo($smile['filename'], PATHINFO_FILENAME));
-				if (!in_array($key, $filenames, true)
-					&& in_array(strtolower(pathinfo($smile['filename'], PATHINFO_EXTENSION)), $this->_smiley_types, true))
+				if (in_array($key, $filenames, true))
 				{
-					$filenames[strtolower($key)] = [
-						'id' => Util::htmlspecialchars($key, ENT_COMPAT, 'UTF-8'),
-						'selected' => false,
-					];
+					continue;
 				}
+
+				if (!in_array(strtolower(pathinfo($smile['filename'], PATHINFO_EXTENSION)), $this->_smiley_types, true))
+				{
+					continue;
+				}
+
+				$filenames[strtolower($key)] = [
+					'id' => Util::htmlspecialchars($key, ENT_COMPAT, 'UTF-8'),
+					'selected' => false,
+				];
 			}
 		}
 

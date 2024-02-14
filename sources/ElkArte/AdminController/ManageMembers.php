@@ -31,18 +31,10 @@ use ElkArte\Util;
  */
 class ManageMembers extends AbstractController
 {
-	/**
-	 * Holds various setting conditions for the current action
-	 *
-	 * @var array
-	 */
+	/** @var array Holds various setting conditions for the current action */
 	protected $conditions;
 
-	/**
-	 * Holds the members that the action is being applied to
-	 *
-	 * @var int[]
-	 */
+	/** @var int[] Holds the members that the action is being applied to */
 	protected $member_info;
 
 	/**
@@ -50,14 +42,14 @@ class ManageMembers extends AbstractController
 	 *
 	 * What it does:
 	 *
-	 * - As everyone else, it calls a function based on the given sub-action.
+	 * - As everywhere else, it calls a function based on the given sub-action.
 	 * - Called by ?action=admin;area=viewmembers.
 	 * - Requires the moderate_forum permission.
 	 *
 	 * @event integrate_manage_members used to add subactions and tabs
 	 * @uses ManageMembers template
 	 * @uses ManageMembers language file.
-	 * @see  \ElkArte\AbstractController::action_index()
+	 * @see  AbstractCowntroller::action_index()
 	 */
 	public function action_index()
 	{
@@ -271,7 +263,7 @@ class ManageMembers extends AbstractController
 			elseif (!empty($this->_req->post))
 			{
 				$search_params['types'] = $this->_req->post->types;
-				foreach ($params as $param_name => $param_info)
+				foreach (array_keys($params) as $param_name)
 				{
 					if (isset($this->_req->post->{$param_name}))
 					{
@@ -358,7 +350,7 @@ class ManageMembers extends AbstractController
 				elseif ($param_info['type'] === 'checkbox')
 				{
 					// Each checkbox or no checkbox at all is checked -> ignore.
-					if (!is_array($search_params[$param_name]) || count($search_params[$param_name]) === 0 || count($search_params[$param_name]) === count($param_info['values']))
+					if (!is_array($search_params[$param_name]) || $search_params[$param_name] === [] || count($search_params[$param_name]) === count($param_info['values']))
 					{
 						continue;
 					}
@@ -380,7 +372,7 @@ class ManageMembers extends AbstractController
 			// Set up the membergroup query part.
 			$mg_query_parts = array();
 
-			// Primary membergroups, but only if at least was was not selected.
+			// Primary membergroups, but only if at least was not selected.
 			if (!empty($search_params['membergroups'][1]) && count($context['membergroups']) !== count($search_params['membergroups'][1]))
 			{
 				$mg_query_parts[] = 'mem.id_group IN ({array_int:group_check})';
@@ -398,7 +390,7 @@ class ManageMembers extends AbstractController
 			}
 
 			// Combine the one or two membergroup parts into one query part linked with an OR.
-			if (!empty($mg_query_parts))
+			if ($mg_query_parts !== [])
 			{
 				$query_parts[] = '(' . implode(' OR ', $mg_query_parts) . ')';
 			}
@@ -411,7 +403,7 @@ class ManageMembers extends AbstractController
 			}
 
 			// Construct the where part of the query.
-			$where = empty($query_parts) ? '1=1' : implode('
+			$where = $query_parts === [] ? '1=1' : implode('
 				AND ', $query_parts);
 		}
 		else
@@ -424,6 +416,7 @@ class ManageMembers extends AbstractController
 
 		// Get the title and sub template ready..
 		$context['page_title'] = $txt['admin_members'];
+		$where_params = $where_params ?? [];
 
 		$listOptions = array(
 			'id' => 'member_list',
@@ -436,7 +429,7 @@ class ManageMembers extends AbstractController
 				'function' => 'list_getMembers',
 				'params' => array(
 					$where ?? '1=1',
-					$where_params ?? array(),
+					$where_params,
 				),
 			),
 			'get_count' => array(
@@ -444,7 +437,7 @@ class ManageMembers extends AbstractController
 				'function' => 'list_getNumMembers',
 				'params' => array(
 					$where ?? '1=1',
-					$where_params ?? array(),
+					$where_params,
 				),
 			),
 			'columns' => array(
@@ -466,7 +459,7 @@ class ManageMembers extends AbstractController
 					),
 					'data' => array(
 						'sprintf' => array(
-							'format' => '<a href="' . getUrl('profile', ['action' => 'profile', 'u' => '%1$d', 'name' =>'%2$s']) . '">%2$s</a>',
+							'format' => '<a href="' . getUrl('profile', ['action' => 'profile', 'u' => '%1$d', 'name' => '%2$s']) . '">%2$s</a>',
 							'params' => array(
 								'id_member' => false,
 								'member_name' => false,
@@ -535,7 +528,7 @@ class ManageMembers extends AbstractController
 						'value' => $txt['viewmembers_online'],
 					),
 					'data' => array(
-						'function' => function ($rowData) {
+						'function' => static function ($rowData) {
 							global $txt;
 
 							require_once(SUBSDIR . '/Members.subs.php');
@@ -546,7 +539,7 @@ class ManageMembers extends AbstractController
 							// Show it in italics if they're not activated...
 							if ($rowData['is_activated'] % 10 !== 1)
 							{
-								$difference = sprintf('<em title="%1$s">%2$s</em>', $txt['not_activated'], $difference);
+								return sprintf('<em title="%1$s">%2$s</em>', $txt['not_activated'], $difference);
 							}
 
 							return $difference;
@@ -575,9 +568,7 @@ class ManageMembers extends AbstractController
 						'class' => 'centertext',
 					),
 					'data' => array(
-						'function' => function ($rowData) {
-							return '<input type="checkbox" name="members[]" value="' . $rowData['id_member'] . '" class="input_check" ' . ($rowData['id_member'] === User::$info->id || $rowData['id_group'] == 1 || in_array(1, explode(',', $rowData['additional_groups'])) ? 'disabled="disabled"' : '') . ' />';
-						},
+						'function' => static fn($rowData) => '<input type="checkbox" name="members[]" value="' . $rowData['id_member'] . '" class="input_check" ' . ($rowData['id_member'] === User::$info->id || $rowData['id_group'] == 1 || in_array(1, explode(',', $rowData['additional_groups'])) ? 'disabled="disabled"' : '') . ' />',
 						'class' => 'centertext',
 					),
 				),
@@ -634,6 +625,7 @@ class ManageMembers extends AbstractController
 
 			$members[] = (int) $value;
 		}
+
 		$members = array_filter($members);
 
 		// No members, nothing to do.
@@ -703,10 +695,12 @@ class ManageMembers extends AbstractController
 			{
 				$suggestions[] = 'email';
 			}
+
 			if ($ban_name)
 			{
 				$suggestions[] = 'user';
 			}
+
 			if ($ban_ips)
 			{
 				$suggestions[] = 'main_ip';
@@ -729,7 +723,7 @@ class ManageMembers extends AbstractController
 	/**
 	 * Prepares the list of groups to be used in the dropdown for "mass actions".
 	 *
-	 * @return mixed[]
+	 * @return array
 	 */
 	protected function _getGroups()
 	{
@@ -820,15 +814,22 @@ class ManageMembers extends AbstractController
 		foreach ($context['activation_numbers'] as $type => $amount)
 		{
 			// We have some of these...
-			if (in_array($type, $context['allowed_filters']) && $amount > 0)
+			if (!in_array($type, $context['allowed_filters']))
 			{
-				$context['available_filters'][] = array(
-					'type' => $type,
-					'amount' => $amount,
-					'desc' => $txt['admin_browse_filter_type_' . $type] ?? '?',
-					'selected' => $type === $context['current_filter']
-				);
+				continue;
 			}
+
+			if ($amount <= 0)
+			{
+				continue;
+			}
+
+			$context['available_filters'][] = array(
+				'type' => $type,
+				'amount' => $amount,
+				'desc' => $txt['admin_browse_filter_type_' . $type] ?? '?',
+				'selected' => $type === $context['current_filter']
+			);
 		}
 
 		// If the filter was not sent, set it to whatever has people in it!
@@ -855,6 +856,7 @@ class ManageMembers extends AbstractController
 		{
 			$_SESSION['showdupes'] = (int) $this->_req->query->showdupes;
 		}
+
 		$context['show_duplicates'] = !empty($_SESSION['showdupes']);
 
 		// Determine which actions we should allow on this page.
@@ -933,6 +935,7 @@ class ManageMembers extends AbstractController
 				else
 					message = "' . ($context['browse_type'] === 'approve' ? $txt['admin_browse_w_approve'] : $txt['admin_browse_w_activate']) . '";';
 		}
+
 		$javascript .= '
 				if (confirm(message + " ' . $txt['admin_browse_warn'] . '"))
 					document.forms.postForm.submit();
@@ -941,7 +944,7 @@ class ManageMembers extends AbstractController
 		$listOptions = array(
 			'id' => 'approve_list',
 			'items_per_page' => $modSettings['defaultMaxMembers'],
-			'base_href' => getUrl('admin', ['action' => 'admin', 'area' => 'viewmembers', 'sa' => 'browse', 'type' => $context['browse_type'] . (!empty($context['show_filter']) ? ', \'filter\' =>' . $context['current_filter'] : '')]),
+			'base_href' => getUrl('admin', ['action' => 'admin', 'area' => 'viewmembers', 'sa' => 'browse', 'type' => $context['browse_type'] . (empty($context['show_filter']) ? '' : ", 'filter' =>" . $context['current_filter'])]),
 			'default_sort_col' => 'date_registered',
 			'get_items' => array(
 				'file' => SUBSDIR . '/Members.subs.php',
@@ -1030,9 +1033,7 @@ class ManageMembers extends AbstractController
 						'value' => $txt['hostname'],
 					),
 					'data' => array(
-						'function' => function ($rowData) {
-							return host_from_ip($rowData['member_ip']);
-						},
+						'function' => static fn($rowData) => host_from_ip($rowData['member_ip']),
 						'class' => 'smalltext',
 					),
 				),
@@ -1041,9 +1042,8 @@ class ManageMembers extends AbstractController
 						'value' => $context['current_filter'] == 4 ? $txt['viewmembers_online'] : $txt['date_registered'],
 					),
 					'data' => array(
-						'function' => function ($rowData) {
+						'function' => static function ($rowData) {
 							global $context;
-
 							return standardTime($rowData[($context['current_filter'] == 4 ? 'last_login' : 'date_registered')]);
 						},
 					),
@@ -1059,7 +1059,7 @@ class ManageMembers extends AbstractController
 						'style' => 'width: 20%;',
 					),
 					'data' => array(
-						'function' => function ($rowData) {
+						'function' => static function ($rowData) {
 							global $txt;
 
 							$member_links = array();
@@ -1067,7 +1067,7 @@ class ManageMembers extends AbstractController
 							{
 								if ($member['id'])
 								{
-									$member_links[] = '<a href="' . getUrl('profile', ['action' => 'profile', 'u' => $member['id'], 'name' => $member['name']]) . '" ' . (!empty($member['is_banned']) ? 'class="alert"' : '') . '>' . $member['name'] . '</a>';
+									$member_links[] = '<a href="' . getUrl('profile', ['action' => 'profile', 'u' => $member['id'], 'name' => $member['name']]) . '" ' . (empty($member['is_banned']) ? '' : 'class="alert"') . '>' . $member['name'] . '</a>';
 								}
 								else
 								{
@@ -1112,7 +1112,7 @@ class ManageMembers extends AbstractController
 					'class' => 'flow_flex_additional_row',
 					'value' => '
 						<div class="submitbutton">
-							<a class="linkbutton" href="' . getUrl('action', ['action' => 'admin', 'area' => 'viewmembers', 'sa' => 'browse', 'showdupes' => $context['show_duplicates'] ? 0 : 1, 'type' => $context['browse_type'], '{session_data}'] + (!empty($context['show_filter']) ? ['filter' => $context['current_filter']] : [])) . '">' . ($context['show_duplicates'] ? $txt['dont_check_for_duplicate'] : $txt['check_for_duplicate']) . '</a>
+							<a class="linkbutton" href="' . getUrl('action', ['action' => 'admin', 'area' => 'viewmembers', 'sa' => 'browse', 'showdupes' => $context['show_duplicates'] ? 0 : 1, 'type' => $context['browse_type'], '{session_data}'] + (empty($context['show_filter']) ? [] : ['filter' => $context['current_filter']])) . '">' . ($context['show_duplicates'] ? $txt['dont_check_for_duplicate'] : $txt['check_for_duplicate']) . '</a>
 							<select name="todo" onchange="onSelectChange();">
 								' . $allowed_actions . '
 							</select>
@@ -1220,7 +1220,7 @@ class ManageMembers extends AbstractController
 		}
 
 		$data = retrieveMemberData($this->conditions);
-		if ($data['member_count'] == 0)
+		if ($data['member_count'] === 0)
 		{
 			redirectexit('action=admin;area=viewmembers;sa=browse;type=' . $this->_req->post->type . ';sort=' . $this->_req->sort . ';filter=' . $current_filter . ';start=' . $this->_req->start);
 		}
@@ -1337,7 +1337,7 @@ class ManageMembers extends AbstractController
 			$replacements = array(
 				'USERNAME' => $member['name'],
 				'ACTIVATIONLINK' => getUrl('action', ['action' => 'register', 'sa' => 'activate', 'u' => $member['id'], 'code' => $this->conditions['validation_code']]),
-				'ACTIVATIONLINKWITHOUTCODE' =>getUrl('action', ['action' => 'register', 'sa' => 'activate', 'u' => $member['id']]),
+				'ACTIVATIONLINKWITHOUTCODE' => getUrl('action', ['action' => 'register', 'sa' => 'activate', 'u' => $member['id']]),
 				'ACTIVATIONCODE' => $this->conditions['validation_code'],
 			);
 

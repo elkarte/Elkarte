@@ -1922,12 +1922,14 @@ function countInactiveMembers()
 }
 
 /**
- * Get the member's id and group
+ * Get member data by name
  *
- * @param string $name
- * @param bool $flexible if true searches for both real_name and member_name (default false)
- * @return int
- * @package Members
+ * Retrieves the details of a member by their real name or username. The search is case-insensitive by default,
+ * but can be made flexible by setting the $flexible parameter to true.
+ *
+ * @param string $name The name to search for
+ * @param bool $flexible Set to true to enable flexible search
+ * @return array|int Returns an array containing the id_member and id_group of the member, or 0 if no member is found
  */
 function getMemberByName($name, $flexible = false)
 {
@@ -2086,9 +2088,9 @@ function retrieveMemberData($conditions)
 		function ($row) use (&$data) {
 			global $modSettings, $language;
 
-			$data['members'][] = $row['id_member'];
+			$data['members'][] = (int) $row['id_member'];
 			$data['member_info'][] = array(
-				'id' => $row['id_member'],
+				'id' => (int) $row['id_member'],
 				'username' => $row['member_name'],
 				'name' => $row['real_name'],
 				'email' => $row['email_address'],

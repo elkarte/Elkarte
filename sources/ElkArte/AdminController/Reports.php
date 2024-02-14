@@ -51,7 +51,7 @@ class Reports extends AbstractController
 	 *
 	 * @event integrate_report_types
 	 * @event integrate_report_buttons
-	 * @see \ElkArte\AbstractController::action_index()
+	 * @see AbstractController::action_index()
 	 */
 	public function action_index()
 	{
@@ -96,7 +96,7 @@ class Reports extends AbstractController
 			);
 		}
 
-		$report_type = !empty($this->_req->post->rt) ? $this->_req->post->rt : (!empty($this->_req->query->rt) ? $this->_req->query->rt : null);
+		$report_type = empty($this->_req->post->rt) ? (!empty($this->_req->query->rt) ? $this->_req->query->rt : null) : ($this->_req->post->rt);
 
 		// If they haven't chosen a report type which is valid, send them off to the report type chooser!
 		if (empty($report_type) || !isset($context['report_types'][$report_type]))
@@ -426,7 +426,7 @@ class Reports extends AbstractController
 				$curData = array('col' => $perm_info['title']);
 
 				// Now cycle each membergroup in this set of permissions.
-				foreach ($member_groups as $id_group => $name)
+				foreach (array_keys($member_groups) as $id_group)
 				{
 					// Don't overwrite the key column!
 					if ($id_group === 'col')
@@ -528,7 +528,7 @@ class Reports extends AbstractController
 				'color' => empty($row['online_color']) ? '-' : '<span style="color: ' . $row['online_color'] . ';">' . $row['online_color'] . '</span>',
 				'min_posts' => $row['min_posts'] == -1 ? 'N/A' : $row['min_posts'],
 				'max_messages' => $row['max_messages'],
-				'icons' => !empty($row['icons'][0]) && !empty($row['icons'][1]) ? str_repeat('<img src="' . $settings['images_url'] . '/group_icons/' . $row['icons'][1] . '" alt="*" />', $row['icons'][0]) : '',
+				'icons' => isset($row['icons'][0]) && ($row['icons'][0] !== '' && $row['icons'][0] !== '0') && (isset($row['icons'][1]) && ($row['icons'][1] !== '' && $row['icons'][1] !== '0')) ? str_repeat('<img src="' . $settings['images_url'] . '/group_icons/' . $row['icons'][1] . '" alt="*" />', $row['icons'][0]) : '',
 			);
 
 			// Board permissions.
@@ -809,7 +809,7 @@ function newTable($title = '', $default_value = '', $shading = 'all', $width_nor
  * will add a separator across the table at this point.
  * once the incoming data has been sanitized, it is added to the table.
  *
- * @param mixed[] $inc_data
+ * @param array $inc_data
  * @param int|null $custom_table = null
  *
  * @return bool
@@ -905,14 +905,7 @@ function addSeparator($title = '', $custom_table = null)
 		return false;
 	}
 
-	if ($custom_table !== null)
-	{
-		$table = $custom_table;
-	}
-	else
-	{
-		$table = $context['current_table'];
-	}
+	$table = $custom_table ?? $context['current_table'];
 
 	// Plumb in the separator
 	$context['tables'][$table]['data'][] = array(
@@ -980,7 +973,7 @@ function finishTables()
  * are used as opposed to the keys(!
  *
  * @param string $method = 'rows' rows or cols
- * @param mixed[] $keys = array()
+ * @param array $keys = array()
  * @param bool $reverse = false
  */
 function setKeys($method = 'rows', $keys = array(), $reverse = false)
