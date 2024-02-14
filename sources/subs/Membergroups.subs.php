@@ -1073,11 +1073,16 @@ function membergroupsById($group_ids, $limit = 1, $detailed = false, $assignable
 			'limit' => $limit,
 		)
 	)->fetch_callback(
-		function ($row) use (&$groups) {
+		function ($row) use (&$groups, $detailed) {
 			$row['id_group'] = (int) $row['id_group'];
-			$row['id_parent'] = (int) $row['id_parent'];
 			$row['group_type'] = (int) $row['group_type'];
-			$row['min_posts'] = (int) $row['min_posts'];
+
+			if ($detailed)
+			{
+				$row['id_parent'] = (int) $row['id_parent'];
+				$row['min_posts'] = (int) $row['min_posts'];
+				$row['max_messages'] = (int) $row['max_messages'];
+			}
 
 			$groups[$row['id_group']] = $row;
 		}
