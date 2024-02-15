@@ -34,7 +34,7 @@ class ManageMembers extends AbstractController
 	/** @var array Holds various setting conditions for the current action */
 	protected $conditions;
 
-	/** @var int[] Holds the members that the action is being applied to */
+	/** @var array Holds the members that the action is being applied to */
 	protected $member_info;
 
 	/**
@@ -97,11 +97,11 @@ class ManageMembers extends AbstractController
 
 		foreach ($context['activation_numbers'] as $activation_type => $total_members)
 		{
-			if (in_array($activation_type, array(0, 2)))
+			if (in_array($activation_type, array(0, 2), true))
 			{
 				$context['awaiting_activation'] += $total_members;
 			}
-			elseif (in_array($activation_type, array(3, 4, 5)))
+			elseif (in_array($activation_type, array(3, 4, 5), true))
 			{
 				$context['awaiting_approval'] += $total_members;
 			}
@@ -1190,30 +1190,39 @@ class ManageMembers extends AbstractController
 		$this->conditions = array();
 
 		// Sort out where we are going...
-		$current_filter = $this->conditions['activated_status'] = (int) $this->_req->post->orig_filter;
+		$original_filter = $this->_req->getPost('orig_filter', 'intval', null);
+		$current_filter = $this->conditions['activated_status'] = $original_filter;
+
+		$type = $this->_req->getQuery('type', 'trim', '');
+		$filter = $this->_req->getPost('filter', 'trim', null);
+		$sort = $this->_req->getRequest('sort', 'trim', '');
+		$start = $this->_req->getRequest('start', 'intval', 0);
+		$todoAction = $this->_req->getPost('todoAction');
+		$time_passed = $this->_req->getPost('$time_passed', 'intval');
+		$todo = $this->_req->getPost('todo', 'trim');
 
 		// If we are applying a filter do just that - then redirect.
-		if (isset($this->_req->post->filter) && $this->_req->post->filter !== $this->_req->post->orig_filter)
+		if (isset($filter) && $filter !== $original_filter)
 		{
-			redirectexit('action=admin;area=viewmembers;sa=browse;type=' . $this->_req->query->type . ';sort=' . $this->_req->sort . ';filter=' . $this->_req->post->filter . ';start=' . $this->_req->start);
+			redirectexit('action=admin;area=viewmembers;sa=browse;type=' . $type . ';sort=' . $sort . ';filter=' . $filter . ';start=' . $start);
 		}
 
 		// Nothing to do?
-		if (!isset($this->_req->post->todoAction) && !isset($this->_req->post->time_passed))
+		if (!isset($todoAction) && !isset($time_passed))
 		{
-			redirectexit('action=admin;area=viewmembers;sa=browse;type=' . $this->_req->query->type . ';sort=' . $this->_req->sort . ';filter=' . $current_filter . ';start=' . $this->_req->start);
+			redirectexit('action=admin;area=viewmembers;sa=browse;type=' . $type . ';sort=' . $sort . ';filter=' . $current_filter . ';start=' . $start);
 		}
 
 		// Are we dealing with members who have been waiting for > set amount of time?
-		if (isset($this->_req->post->time_passed))
+		if (isset($time_passed))
 		{
-			$this->conditions['time_before'] = time() - 86400 * (int) $this->_req->post->time_passed;
+			$this->conditions['time_before'] = time() - 86400 * $time_passed;
 		}
 		// Coming from checkboxes - validate the members passed through to us.
 		else
 		{
 			$this->conditions['members'] = array();
-			foreach ($this->_req->post->todoAction as $id)
+			foreach ($todoAction as $id)
 			{
 				$this->conditions['members'][] = (int) $id;
 			}
@@ -1222,14 +1231,14 @@ class ManageMembers extends AbstractController
 		$data = retrieveMemberData($this->conditions);
 		if ($data['member_count'] === 0)
 		{
-			redirectexit('action=admin;area=viewmembers;sa=browse;type=' . $this->_req->post->type . ';sort=' . $this->_req->sort . ';filter=' . $current_filter . ';start=' . $this->_req->start);
+			redirectexit('action=admin;area=viewmembers;sa=browse;type=' . $type . ';sort=' . $sort . ';filter=' . $current_filter . ';start=' . $start);
 		}
 
 		$this->member_info = $data['member_info'];
 		$this->conditions['members'] = $data['members'];
 
 		// What do we want to do with this application?
-		switch ($this->_req->post->todo)
+		switch ($todo)
 		{
 			// Are we activating or approving the members?
 			case 'ok':
@@ -1257,9 +1266,9 @@ class ManageMembers extends AbstractController
 		}
 
 		// Log what we did? Core features Moderation Logging must be enabled
-		if (featureEnabled('ml') && in_array($this->_req->post->todo, ['ok', 'okemail', 'require_activation', 'remind']))
+		if (featureEnabled('ml') && in_array($todo, ['ok', 'okemail', 'require_activation', 'remind']))
 		{
-			$log_action = $this->_req->post->todo === 'remind' ? 'remind_member' : 'approve_member';
+			$log_action = $todo === 'remind' ? 'remind_member' : 'approve_member';
 
 			foreach ($this->member_info as $member)
 			{
@@ -1268,7 +1277,7 @@ class ManageMembers extends AbstractController
 		}
 
 		// Although updateMemberStats *may* catch this, best to do it manually just in case (Doesn't always sort out unapprovedMembers).
-		if (in_array($current_filter, array(3, 4)))
+		if (in_array($current_filter, array(3, 4, 5)))
 		{
 			updateSettings(array('unapprovedMembers' => ($modSettings['unapprovedMembers'] > $data['member_count'] ? $modSettings['unapprovedMembers'] - $data['member_count'] : 0)));
 		}
@@ -1278,13 +1287,13 @@ class ManageMembers extends AbstractController
 		updateMemberStats();
 
 		// If they haven't been deleted, update the post group statistics on them...
-		if (!in_array($this->_req->post->todo, array('delete', 'deleteemail', 'reject', 'rejectemail', 'remind')))
+		if (!in_array($todo, array('delete', 'deleteemail', 'reject', 'rejectemail', 'remind')))
 		{
 			require_once(SUBSDIR . '/Membergroups.subs.php');
 			updatePostGroupStats($this->conditions['members']);
 		}
 
-		redirectexit('action=admin;area=viewmembers;sa=browse;type=' . $this->_req->query->type . ';sort=' . $this->_req->sort . ';filter=' . $current_filter . ';start=' . $this->_req->start);
+		redirectexit('action=admin;area=viewmembers;sa=browse;type=' . $type . ';sort=' . $sort . ';filter=' . $current_filter . ';start=' . $start);
 	}
 
 	/**
@@ -1369,7 +1378,15 @@ class ManageMembers extends AbstractController
 	}
 
 	/**
-	 * Remove a set of member applications
+	 * Deletes the members specified in the conditions array.
+	 *
+	 * What it does:
+	 *
+	 * - Called by the action_approve method.
+	 * - Deletes the members specified in the conditions array.
+	 * - Optionally sends email to notify the deleted members.
+	 *
+	 * @return void
 	 */
 	private function _deleteMember()
 	{
