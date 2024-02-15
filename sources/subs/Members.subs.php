@@ -1914,7 +1914,7 @@ function countInactiveMembers()
 		)
 	)->fetch_callback(
 		function ($row) use (&$inactive_members) {
-			$inactive_members[$row['is_activated']] = $row['total_members'];
+			$inactive_members[(int) $row['is_activated']] = (int) $row['total_members'];
 		}
 	);
 
@@ -2569,6 +2569,32 @@ function updateMemberStats($id_member = null, $real_name = null)
 			);
 			list ($changes['unapprovedMembers']) = $request->fetch_row();
 			$request->free_result();
+		}
+
+		// What about unapproved COPPA registrations?
+		if (!empty($modSettings['coppaType']) && $modSettings['coppaType'] != 1)
+		{
+			$request = $db->query('', '
+				SELECT 
+					COUNT(*)
+				FROM {db_prefix}members
+				WHERE is_activated = {int:coppa_approval}',
+				array(
+					'coppa_approval' => 5,
+				)
+			);
+			list ($coppa_approvals) = $request->fetch_row();
+			$request->free_result();
+
+			// Add this to the number of unapproved members
+			if (!empty($changes['unapprovedMembers']))
+			{
+				$changes['unapprovedMembers'] += $coppa_approvals;
+			}
+			else
+			{
+				$changes['unapprovedMembers'] = $coppa_approvals;
+			}
 		}
 	}
 

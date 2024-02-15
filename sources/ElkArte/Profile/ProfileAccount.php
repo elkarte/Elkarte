@@ -680,7 +680,7 @@ class ProfileAccount extends AbstractController
 			logAction('approve_member', ['member' => $this->_memID], 'admin');
 
 			// If we are doing approval, update the stats for the member just in case.
-			if (in_array($this->_profile['is_activated'], [3, 4, 13, 14]))
+			if (in_array($this->_profile['is_activated'], [3, 4, 5, 13, 14, 15]))
 			{
 				updateSettings(['unapprovedMembers' => ($modSettings['unapprovedMembers'] > 1 ? $modSettings['unapprovedMembers'] - 1 : 0)]);
 			}
