@@ -29,54 +29,79 @@ class BBCParser
 
 	/** @var string */
 	protected $message;
+
 	/** @var Codes */
 	protected $bbc;
+
 	/** @var array */
 	protected $bbc_codes;
+
 	/** @var array */
 	protected $item_codes;
+
 	/** @var array */
 	protected $tags;
+
 	/** @var int parser position in message */
 	protected $pos;
+
 	/** @var int */
 	protected $pos1;
+
 	/** @var int */
 	protected $pos2;
+
 	/** @var int */
 	protected $pos3;
+
 	/** @var int */
 	protected $last_pos;
+
 	/** @var bool */
 	protected $do_smileys = true;
+
 	/** @var array */
 	protected $open_tags = [];
+
 	/** @var string|null This is the actual tag that's open */
 	protected $inside_tag;
+
 	/** @var Autolink|null */
 	protected $autolinker;
+
 	/** @var bool */
 	protected $possible_html;
+
 	/** @var bool */
 	protected $possible_markdown;
+
 	/** @var HtmlParser|null */
 	protected $html_parser;
+
 	/** @var MarkdownParser|null */
 	protected $markdown_parser;
+
 	/** @var bool if we can cache the message or not (some tags disallow caching) */
 	protected $can_cache = true;
+
 	/** @var int footnote tracker */
 	protected $num_footnotes = 0;
+
 	/** @var string used to mark smiles in a message */
 	protected $smiley_marker = "\r";
+
 	/** @var int */
 	protected $lastAutoPos = 0;
+
 	/** @var array content fo the footnotes */
 	protected $fn_content = [];
+
 	/** @var array */
 	protected $tag_possible = [];
+
 	/** @var int */
 	protected $fn_count = 0;
+
 	/** @var int */
 	protected $fn_num = 0;
 
@@ -219,7 +244,7 @@ class BBCParser
 	{
 		while ($this->pos !== false)
 		{
-			$this->last_pos = isset($this->last_pos) ? max($this->pos, $this->last_pos) : $this->pos;
+			$this->last_pos = $this->last_pos !== null ? max($this->pos, $this->last_pos) : $this->pos;
 			$this->pos = strpos($this->message, '[', $this->pos + 1);
 
 			// Failsafe.
@@ -260,7 +285,7 @@ class BBCParser
 				continue;
 			}
 
-			$this->inside_tag = !$this->hasOpenTags() ? null : $this->getLastOpenedTag();
+			$this->inside_tag = $this->hasOpenTags() ? $this->getLastOpenedTag() : null;
 
 			if (isset($this->message[$this->pos + 2]) && $this->isItemCode($next_char) && $this->message[$this->pos + 2] === ']' && !$this->bbc->isDisabled('list') && !$this->bbc->isDisabled('li'))
 			{
@@ -439,12 +464,16 @@ class BBCParser
 			{
 				$this->message = substr_replace($this->message, '', $this->pos, 6);
 			}
-
 			// Trim inside whitespace
-			if (!empty($tag[Codes::ATTR_TRIM]) && $tag[Codes::ATTR_TRIM] !== Codes::TRIM_INSIDE)
+			if (empty($tag[Codes::ATTR_TRIM]))
 			{
-				$this->trimWhiteSpace($this->pos);
+				continue;
 			}
+			if ($tag[Codes::ATTR_TRIM] === Codes::TRIM_INSIDE)
+			{
+				continue;
+			}
+			$this->trimWhiteSpace($this->pos);
 		}
 
 		if (!empty($to_close))
@@ -999,7 +1028,7 @@ class BBCParser
 			$quoted = false;
 		}
 
-		$this->pos2 = strpos($this->message, !$quoted ? ']' : '&quot;]', $this->pos1);
+		$this->pos2 = strpos($this->message, $quoted ? '&quot;]' : ']', $this->pos1);
 		if ($this->pos2 === false)
 		{
 			return true;
@@ -1012,7 +1041,7 @@ class BBCParser
 		}
 
 		$data = array(
-			substr($this->message, $this->pos2 + (!$quoted ? 1 : 7), $this->pos3 - ($this->pos2 + (!$quoted ? 1 : 7))),
+			substr($this->message, $this->pos2 + ($quoted ? 7 : 1), $this->pos3 - ($this->pos2 + ($quoted ? 7 : 1))),
 			substr($this->message, $this->pos1, $this->pos2 - $this->pos1)
 		);
 
@@ -1167,7 +1196,7 @@ class BBCParser
 			$quoted = false;
 		}
 
-		$this->pos2 = strpos($this->message, !$quoted ? ']' : '&quot;]', $this->pos1);
+		$this->pos2 = strpos($this->message, $quoted ? '&quot;]' : ']', $this->pos1);
 		if ($this->pos2 === false)
 		{
 			return true;
@@ -1193,7 +1222,7 @@ class BBCParser
 
 		$code = strtr($tag[Codes::ATTR_BEFORE], array('$1' => $data));
 		$tmp = $this->noSmileys($code);
-		$this->message = substr_replace($this->message, $tmp, $this->pos, $this->pos2 + (!$quoted ? 1 : 7) - $this->pos);
+		$this->message = substr_replace($this->message, $tmp, $this->pos, $this->pos2 + ($quoted ? 7 : 1) - $this->pos);
 		$this->pos += strlen($tmp) - 1;
 
 		return false;
@@ -1208,38 +1237,18 @@ class BBCParser
 	 */
 	protected function handleTag(array $tag)
 	{
-		switch ($tag[Codes::ATTR_TYPE])
+		return match ($tag[Codes::ATTR_TYPE])
 		{
-			case Codes::TYPE_PARSED_CONTENT:
-				return $this->handleTypeParsedContext($tag);
+			Codes::TYPE_PARSED_CONTENT => $this->handleTypeParsedContext($tag),
+			Codes::TYPE_UNPARSED_CONTENT => $this->handleTypeUnparsedContext($tag),
+			Codes::TYPE_UNPARSED_EQUALS_CONTENT => $this->handleUnparsedEqualsContext($tag),
+			Codes::TYPE_CLOSED => $this->handleTypeClosed($tag),
+			Codes::TYPE_UNPARSED_COMMAS_CONTENT => $this->handleUnparsedCommasContext($tag),
+			Codes::TYPE_UNPARSED_COMMAS => $this->handleUnparsedCommas($tag),
+			Codes::TYPE_PARSED_EQUALS, Codes::TYPE_UNPARSED_EQUALS => $this->handleEquals($tag),
+			default => false,
+		};
 
-			// Don't parse the content, just skip it.
-			case Codes::TYPE_UNPARSED_CONTENT:
-				return $this->handleTypeUnparsedContext($tag);
-
-			// Don't parse the content, just skip it.
-			case Codes::TYPE_UNPARSED_EQUALS_CONTENT:
-				return $this->handleUnparsedEqualsContext($tag);
-
-			// A closed tag, with no content or value.
-			case Codes::TYPE_CLOSED:
-				return $this->handleTypeClosed($tag);
-
-			// This one is sorta ugly... :/
-			case Codes::TYPE_UNPARSED_COMMAS_CONTENT:
-				return $this->handleUnparsedCommasContext($tag);
-
-			// This has parsed content, and a csv value which is unparsed.
-			case Codes::TYPE_UNPARSED_COMMAS:
-				return $this->handleUnparsedCommas($tag);
-
-			// A tag set to a value, parsed or not.
-			case Codes::TYPE_PARSED_EQUALS:
-			case Codes::TYPE_UNPARSED_EQUALS:
-				return $this->handleEquals($tag);
-		}
-
-		return false;
 	}
 
 	/**
@@ -1284,7 +1293,7 @@ class BBCParser
 		$data = str_replace("\t", '&nbsp;&nbsp;&nbsp;', $data);
 
 		// If it wasn't changed, no copying or other boring stuff has to happen!
-		if (substr_compare($this->message, $data, $this->last_pos, $this->pos - $this->last_pos))
+		if (substr_compare($this->message, $data, $this->last_pos, $this->pos - $this->last_pos) !== 0)
 		{
 			$this->message = substr_replace($this->message, $data, $this->last_pos, $this->pos - $this->last_pos);
 
@@ -1310,13 +1319,11 @@ class BBCParser
 		$this->fn_count = $fn_total;
 
 		// Replace our footnote text with a [1] link, save the text for use at the end of the message
-		$this->message = preg_replace_callback('~(%fn%(.*?)%fn%)~is', function (array $matches) {
-			return $this->footnoteCallback($matches);
-		}, $this->message);
+		$this->message = preg_replace_callback('~(%fn%(.*?)%fn%)~is', fn(array $matches) => $this->footnoteCallback($matches), $this->message);
 		$fn_total += $this->fn_num;
 
 		// If we have footnotes, add them in at the end of the message
-		if (!empty($this->fn_num))
+		if ($this->fn_num !== 0) // Set in callback
 		{
 			$this->message .= $this->smiley_marker . '<div class="bbc_footnotes">' . implode('', $this->fn_content) . '</div>' . $this->smiley_marker;
 		}
@@ -1346,14 +1353,14 @@ class BBCParser
 	{
 		if (!isset($tag[Codes::ATTR_DISABLED_BEFORE]) && !isset($tag[Codes::ATTR_DISABLED_AFTER]) && !isset($tag[Codes::ATTR_DISABLED_CONTENT]))
 		{
-			$tag[Codes::ATTR_BEFORE] = !empty($tag[Codes::ATTR_BLOCK_LEVEL]) ? '<div>' : '';
-			$tag[Codes::ATTR_AFTER] = !empty($tag[Codes::ATTR_BLOCK_LEVEL]) ? '</div>' : '';
-			$tag[Codes::ATTR_CONTENT] = $tag[Codes::ATTR_TYPE] === Codes::TYPE_CLOSED ? '' : (!empty($tag[Codes::ATTR_BLOCK_LEVEL]) ? '<div>$1</div>' : '$1');
+			$tag[Codes::ATTR_BEFORE] = empty($tag[Codes::ATTR_BLOCK_LEVEL]) ? '' : '<div>';
+			$tag[Codes::ATTR_AFTER] = empty($tag[Codes::ATTR_BLOCK_LEVEL]) ? '' : '</div>';
+			$tag[Codes::ATTR_CONTENT] = $tag[Codes::ATTR_TYPE] === Codes::TYPE_CLOSED ? '' : (empty($tag[Codes::ATTR_BLOCK_LEVEL]) ? '$1' : '<div>$1</div>');
 		}
 		elseif (isset($tag[Codes::ATTR_DISABLED_BEFORE]) || isset($tag[Codes::ATTR_DISABLED_AFTER]))
 		{
-			$tag[Codes::ATTR_BEFORE] = $tag[Codes::ATTR_DISABLED_BEFORE] ?? (!empty($tag[Codes::ATTR_BLOCK_LEVEL]) ? '<div>' : '');
-			$tag[Codes::ATTR_AFTER] = $tag[Codes::ATTR_DISABLED_AFTER] ?? (!empty($tag[Codes::ATTR_BLOCK_LEVEL]) ? '</div>' : '');
+			$tag[Codes::ATTR_BEFORE] = $tag[Codes::ATTR_DISABLED_BEFORE] ?? (empty($tag[Codes::ATTR_BLOCK_LEVEL]) ? '' : '<div>');
+			$tag[Codes::ATTR_AFTER] = $tag[Codes::ATTR_DISABLED_AFTER] ?? (empty($tag[Codes::ATTR_BLOCK_LEVEL]) ? '' : '</div>');
 		}
 		else
 		{
@@ -1412,6 +1419,7 @@ class BBCParser
 			{
 				$match_preg .= $this->tag_possible['regex_cache'][$key];
 			}
+
 			$match_preg .= '\]~i';
 
 			// Check if this combination of parameters matches the user input
@@ -1435,7 +1443,7 @@ class BBCParser
 		$this->tag_possible['regex_keys'] = range(0, $this->tag_possible['regex_size']);
 
 		// Push optional params to the end of the stack but maintain current order of required ones
-		foreach ($this->tag_possible['regex_keys'] as $index => $info)
+		foreach (array_keys($this->tag_possible['regex_keys']) as $index)
 		{
 			$control_order[$index] = $index;
 
@@ -1467,7 +1475,7 @@ class BBCParser
 		foreach ($this->tag_possible['optionals'] as $index => $optional)
 		{
 			// @todo more robust, and slower, check would be a preg_match on $possible['regex_cache'][$index]
-			$param_exists = stripos($message_stub, $this->tag_possible['param_check'][$index]) !== false;
+			$param_exists = stripos($message_stub, (string) $this->tag_possible['param_check'][$index]) !== false;
 
 			// Only make unused optional tags as optional
 			if ($optional)
@@ -1502,7 +1510,7 @@ class BBCParser
 		// Attempt to pull out just this tag
 		if (preg_match('~^(?:.+?)\](?>.|(?R))*?\[\/' . $this->tag_possible[Codes::ATTR_TAG] . '\](?:.|\s)~i', $message_stub, $matches) === 1)
 		{
-			$message_stub = $matches[0];
+			return $matches[0];
 		}
 
 		return $message_stub;
@@ -1642,10 +1650,20 @@ class BBCParser
 	 */
 	protected function trimWhiteSpace($offset = null)
 	{
-		if (preg_match('~(<br />|&nbsp;|\s)*~', $this->message, $matches, 0, $offset) !== 0 && isset($matches[0]) && $matches[0] !== '')
+		if (preg_match('~(<br />|&nbsp;|\s)*~', $this->message, $matches, 0, $offset) === 0)
 		{
-			$this->message = substr_replace($this->message, '', $offset, strlen($matches[0]));
+			return;
 		}
+		if (!isset($matches[0]))
+		{
+			return;
+		}
+		if ($matches[0] === '')
+		{
+			return;
+		}
+
+		$this->message = substr_replace($this->message, '', $offset, strlen($matches[0]));
 	}
 
 	/**

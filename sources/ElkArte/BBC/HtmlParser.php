@@ -24,10 +24,13 @@ class HtmlParser
 {
 	/** @var int width of the image */
 	public $image_width;
+
 	/** @var int height of the image */
 	public $image_height;
+
 	/** @var array tags that are stand alone */
 	protected $empty_tags = array('br', 'hr');
+
 	/** @var array tags we will allow */
 	protected $closable_tags = array('b', 'u', 'i', 's', 'em', 'ins', 'del', 'pre', 'blockquote');
 
@@ -170,7 +173,7 @@ class HtmlParser
 				if (!empty($modSettings['max_image_width']) && !empty($modSettings['max_image_height']))
 				{
 					// For images, we'll want this
-					list ($width, $height) = url_image_size($imgtag);
+					[$width, $height] = url_image_size($imgtag);
 
 					if ($width > $modSettings['max_image_width'])
 					{
