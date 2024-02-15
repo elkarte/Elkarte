@@ -17,7 +17,6 @@
 
 namespace ElkArte\AdminController;
 
-use Elk_Exception;
 use ElkArte\AbstractController;
 use ElkArte\Action;
 use ElkArte\FileFunctions;

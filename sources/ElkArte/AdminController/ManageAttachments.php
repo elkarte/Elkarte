@@ -1483,7 +1483,10 @@ class ManageAttachments extends AbstractController
 			$update = array('currentAttachmentUploadDir' => $current_dir, 'attachmentUploadDir' => serialize($new_dirs),);
 		}
 
-		updateSettings($update);
+		if (!empty($update))
+		{
+			updateSettings($update);
+		}
 
 		if (!empty($errors))
 		{
@@ -1576,7 +1579,7 @@ class ManageAttachments extends AbstractController
 			$update = ['attachment_basedirectories' => serialize($attachmentBaseDirectories), 'basedirectory_for_attachments' => $new_base_dir, 'currentAttachmentUploadDir' => $current_dir,];
 		}
 
-		$_SESSION['errors']['base'] = $errors;
+		$_SESSION['errors']['base'] = $errors ?? null;
 
 		if (!empty($update))
 		{
