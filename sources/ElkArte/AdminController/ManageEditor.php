@@ -35,7 +35,7 @@ class ManageEditor extends AbstractController
 	 * - requires admin_forum permissions
 	 *
 	 * @event integrate_sa_manage_editor Used to add more sub actions
-	 * @see \ElkArte\AbstractController::action_index()
+	 * @see AbstractController::action_index()
 	 */
 	public function action_index()
 	{
@@ -133,7 +133,7 @@ class ManageEditor extends AbstractController
 	{
 		$config_vars = array(
 			array('check', 'enableBBC'),
-			array('check', 'enableBBC', 0, 'onchange' => 'toggleBBCDisabled(\'disabledBBC\', !this.checked);'),
+			array('check', 'enableBBC', 0, 'onchange' => "toggleBBCDisabled('disabledBBC', !this.checked);"),
 			array('bbc', 'disabledBBC'),
 
 			array('title', 'editorSettings'),

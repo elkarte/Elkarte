@@ -23,9 +23,9 @@ use ElkArte\Agreement;
 use ElkArte\Errors\ErrorContext;
 use ElkArte\Exceptions\Exception;
 use ElkArte\FileFunctions;
+use ElkArte\Languages\Txt;
 use ElkArte\PrivacyPolicy;
 use ElkArte\SettingsForm\SettingsForm;
-use ElkArte\Languages\Txt;
 use ElkArte\TokenHash;
 use ElkArte\Util;
 
@@ -51,7 +51,7 @@ class ManageRegistration extends AbstractController
 	 * @event integrate_sa_manage_registrations add new registration sub actions
 	 * @uses Login language file
 	 * @uses Register template.
-	 * @see  \ElkArte\AbstractController::action_index()
+	 * @see  AbstractController::action_index()
 	 */
 	public function action_index()
 	{
@@ -515,7 +515,7 @@ class ManageRegistration extends AbstractController
 			checkCoppa();', true);
 
 		// Turn the postal address into something suitable for a textbox.
-		$modSettings['coppaPost'] = !empty($modSettings['coppaPost']) ? preg_replace('~<br ?/?' . '>~', "\n", $modSettings['coppaPost']) : '';
+		$modSettings['coppaPost'] = empty($modSettings['coppaPost']) ? '' : preg_replace('~<br ?/?>~', "\n", $modSettings['coppaPost']);
 
 		$settingsForm->prepare();
 	}

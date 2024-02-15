@@ -18,11 +18,12 @@ namespace ElkArte\AdminController;
 
 use ElkArte\AbstractController;
 use ElkArte\Action;
+use ElkArte\Controller\Groups;
 use ElkArte\DataValidator;
 use ElkArte\Exceptions\Exception;
+use ElkArte\Languages\Txt;
 use ElkArte\Permissions;
 use ElkArte\SettingsForm\SettingsForm;
-use ElkArte\Languages\Txt;
 
 /**
  * ManageMembergroups controller, administration page for membergroups.
@@ -44,7 +45,7 @@ class ManageMembergroups extends AbstractController
 	 * @event integrate_sa_manage_membergroups Used to add more sub actions
 	 * @uses ManageMembergroups template.
 	 * @uses ManageMembers language file.
-	 * @see  \ElkArte\AbstractController::action_index()
+	 * @see AbstractController::action_index()
 	 */
 	public function action_index()
 	{
@@ -72,7 +73,7 @@ class ManageMembergroups extends AbstractController
 				'function' => 'action_list',
 				'permission' => 'manage_membergroups'),
 			'members' => array(
-				'controller' => '\\ElkArte\\Controller\\Groups',
+				'controller' => Groups::class,
 				'function' => 'action_index',
 				'permission' => 'manage_membergroups'),
 			'settings' => array(
@@ -143,9 +144,9 @@ class ManageMembergroups extends AbstractController
 						'value' => $txt['membergroups_name'],
 					),
 					'data' => array(
-						'function' => function ($rowData) {
+						'function' => static function ($rowData) {
 							// Since the moderator group has no explicit members, no link is needed.
-							if ($rowData['id_group'] == 3)
+							if ($rowData['id_group'] === 3)
 							{
 								$group_name = $rowData['group_name'];
 							}
@@ -155,15 +156,14 @@ class ManageMembergroups extends AbstractController
 							}
 
 							// Add a help option for moderator and administrator.
-							if ($rowData['id_group'] == 1)
+							if ($rowData['id_group'] === 1)
 							{
 								$group_name .= ' <a href="' . getUrl('action', ['action' => 'quickhelp', 'help' => 'membergroup_administrator']) . '" onclick="return reqOverlayDiv(this.href);" class="helpicon i-help"></a>';
 							}
-							elseif ($rowData['id_group'] == 3)
+							elseif ($rowData['id_group'] === 3)
 							{
 								$group_name .= ' <a href="' . getUrl('action', ['action' => 'quickhelp', 'help' => 'membergroup_moderator']) . '" onclick="return reqOverlayDiv(this.href);" class="helpicon i-help"></a>';
 							}
-
 							return $group_name;
 						},
 					),
@@ -177,17 +177,20 @@ class ManageMembergroups extends AbstractController
 						'value' => $txt['membergroups_icons'],
 					),
 					'data' => array(
-						'function' => function ($rowData) {
+						'function' => static function ($rowData) {
 							global $settings;
 
-							if (!empty($rowData['icons'][0]) && !empty($rowData['icons'][1]))
-							{
-								return str_repeat('<img src="' . $settings['images_url'] . '/group_icons/' . $rowData['icons'][1] . '" alt="*" />', $rowData['icons'][0]);
-							}
-							else
+							if (empty($rowData['icons'][0]))
 							{
 								return '';
 							}
+
+							if (empty($rowData['icons'][1]))
+							{
+								return '';
+							}
+
+							return str_repeat('<img src="' . $settings['images_url'] . '/group_icons/' . $rowData['icons'][1] . '" alt="*" />', $rowData['icons'][0]);
 						},
 					),
 					'sort' => array(
@@ -200,11 +203,10 @@ class ManageMembergroups extends AbstractController
 						'value' => $txt['membergroups_members_top'],
 					),
 					'data' => array(
-						'function' => function ($rowData) {
+						'function' => static function ($rowData) {
 							global $txt;
-
 							// No explicit members for the moderator group.
-							return $rowData['id_group'] == 3 ? $txt['membergroups_guests_na'] : comma_format($rowData['num_members']);
+							return $rowData['id_group'] === 3 ? $txt['membergroups_guests_na'] : comma_format($rowData['num_members']);
 						},
 					),
 					'sort' => array(
@@ -263,9 +265,7 @@ class ManageMembergroups extends AbstractController
 						'value' => $txt['membergroups_name'],
 					),
 					'data' => array(
-						'function' => function ($rowData) {
-							return sprintf('<a href="' . getUrl('admin', ['action' => 'admin', 'area' => 'membergroups', 'sa' => 'members', 'group' => $rowData['id_group']]) . '">%1$s</a>', $rowData['group_name_color']);
-						},
+						'function' => static fn($rowData) => sprintf('<a href="' . getUrl('admin', ['action' => 'admin', 'area' => 'membergroups', 'sa' => 'members', 'group' => $rowData['id_group']]) . '">%1$s</a>', $rowData['group_name_color']),
 					),
 					'sort' => array(
 						'default' => 'mg.group_name',
@@ -277,17 +277,20 @@ class ManageMembergroups extends AbstractController
 						'value' => $txt['membergroups_icons'],
 					),
 					'data' => array(
-						'function' => function ($rowData) {
+						'function' => static function ($rowData) {
 							global $settings;
 
-							if (!empty($rowData['icons'][0]) && !empty($rowData['icons'][1]))
-							{
-								return str_repeat('<img src="' . $settings['images_url'] . '/group_icons/' . $rowData['icons'][1] . '" alt="*" />', $rowData['icons'][0]);
-							}
-							else
+							if (empty($rowData['icons'][0]))
 							{
 								return '';
 							}
+
+							if (empty($rowData['icons'][1]))
+							{
+								return '';
+							}
+
+							return str_repeat('<img src="' . $settings['images_url'] . '/group_icons/' . $rowData['icons'][1] . '" alt="*" />', $rowData['icons'][0]);
 						},
 					),
 					'sort' => array(
@@ -378,7 +381,7 @@ class ManageMembergroups extends AbstractController
 			// Don't allow copying of a real privileged person!
 			$permissionsObject = new Permissions();
 			$illegal_permissions = $permissionsObject->getIllegalPermissions();
-			$minposts = !empty($this->_req->post->min_posts) ? (int) $this->_req->post->min_posts : '-1';
+			$minposts = empty($this->_req->post->min_posts) ? '-1' : (int) $this->_req->post->min_posts;
 
 			$id_group = createMembergroup($this->_req->post->group_name, $minposts, $group_type);
 
@@ -406,7 +409,7 @@ class ManageMembergroups extends AbstractController
 			// Copy or inherit the permissions!
 			elseif ($this->_req->post->perm_type === 'copy' || $this->_req->post->perm_type === 'inherit')
 			{
-				$copy_id = $this->_req->post->perm_type == 'copy' ? (int) $this->_req->post->copyperm : (int) $this->_req->post->inheritperm;
+				$copy_id = $this->_req->post->perm_type === 'copy' ? (int) $this->_req->post->copyperm : (int) $this->_req->post->inheritperm;
 
 				// Are you a powerful admin?
 				if (!allowedTo('admin_forum'))
@@ -414,7 +417,7 @@ class ManageMembergroups extends AbstractController
 					$copy_type = membergroupById($copy_id);
 
 					// Keep protected groups ... well, protected!
-					if ($copy_type['group_type'] == 1)
+					if ($copy_type['group_type'] === 1)
 					{
 						throw new Exception('membergroup_does_not_exist');
 					}
@@ -450,10 +453,17 @@ class ManageMembergroups extends AbstractController
 			foreach (array('allow', 'deny') as $board_action)
 			{
 				// Only do this if they have special access requirements.
-				if (!empty($changed_boards[$board_action]))
+				if (!isset($changed_boards[$board_action]))
 				{
-					assignGroupToBoards($id_group, $changed_boards, $board_action);
+					continue;
 				}
+
+				if ($changed_boards[$board_action] === [])
+				{
+					continue;
+				}
+
+				assignGroupToBoards($id_group, $changed_boards, $board_action);
 			}
 
 			// If this is joinable then set it to show group membership in people's profiles.
@@ -593,8 +603,8 @@ class ManageMembergroups extends AbstractController
 
 			// Empty values will be replaced by validator values where they exist
 			$empty_post = array('max_messages' => null, 'min_posts' => null, 'group_type' => null, 'group_desc' => '',
-								'group_name' => '', 'group_hidden' => null, 'group_inherit' => null, 'icon_count' => null,
-								'icon_image' => '', 'online_color' => '', 'boardaccess' => null);
+				'group_name' => '', 'group_hidden' => null, 'group_inherit' => null, 'icon_count' => null,
+				'icon_image' => '', 'online_color' => '', 'boardaccess' => null);
 
 			$validator = new DataValidator();
 
@@ -674,10 +684,17 @@ class ManageMembergroups extends AbstractController
 					detachGroupFromBoards($current_group['id_group'], $changed_boards, $board_action);
 
 					// Add the membergroup to all boards that hadn't been set yet.
-					if (!empty($changed_boards[$board_action]))
+					if (!isset($changed_boards[$board_action]))
 					{
-						assignGroupToBoards($current_group['id_group'], $changed_boards, $board_action);
+						continue;
 					}
+
+					if (empty($changed_boards[$board_action]))
+					{
+						continue;
+					}
+
+					assignGroupToBoards($current_group['id_group'], $changed_boards, $board_action);
 				}
 			}
 
@@ -770,7 +787,7 @@ class ManageMembergroups extends AbstractController
 		// Fetch the current group information.
 		$row = membergroupById($current_group['id_group'], true);
 
-		if (empty($row) || (!allowedTo('admin_forum') && $row['group_type'] == 1))
+		if (empty($row) || (!allowedTo('admin_forum') && $row['group_type'] === 1))
 		{
 			throw new Exception('membergroup_does_not_exist', false);
 		}
@@ -787,12 +804,12 @@ class ManageMembergroups extends AbstractController
 			'max_messages' => $row['max_messages'],
 			'icon_count' => (int) $row['icons'][0],
 			'icon_image' => $row['icons'][1] ?? '',
-			'is_post_group' => $row['min_posts'] != -1,
-			'type' => $row['min_posts'] != -1 ? 0 : $row['group_type'],
-			'hidden' => $row['min_posts'] == -1 ? $row['hidden'] : 0,
+			'is_post_group' => $row['min_posts'] !== -1,
+			'type' => $row['min_posts'] !== -1 ? 0 : $row['group_type'],
+			'hidden' => $row['min_posts'] === -1 ? $row['hidden'] : 0,
 			'inherited_from' => $row['id_parent'],
-			'allow_post_group' => $row['id_group'] == 2 || $row['id_group'] > 4,
-			'allow_delete' => $row['id_group'] == 2 || $row['id_group'] > 4,
+			'allow_post_group' => $row['id_group'] === 2 || $row['id_group'] > 4,
+			'allow_delete' => $row['id_group'] === 2 || $row['id_group'] > 4,
 			'allow_protected' => allowedTo('admin_forum'),
 		);
 
@@ -802,12 +819,12 @@ class ManageMembergroups extends AbstractController
 
 		if (!empty($context['group']['moderators']))
 		{
-			list ($context['group']['last_moderator_id']) = array_slice(array_keys($context['group']['moderators']), -1);
+			[$context['group']['last_moderator_id']] = array_slice(array_keys($context['group']['moderators']), -1);
 		}
 
 		// Get a list of boards this membergroup is allowed to see.
 		$context['boards'] = array();
-		if ($row['id_group'] == 2 || $row['id_group'] > 3)
+		if ($row['id_group'] === 2 || $row['id_group'] > 3)
 		{
 			require_once(SUBSDIR . '/Boards.subs.php');
 			$context += getBoardList(array('override_permissions' => true, 'access' => $row['id_group'], 'not_redirection' => true));

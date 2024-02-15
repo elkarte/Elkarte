@@ -17,11 +17,13 @@
 namespace ElkArte\AdminController;
 
 use BBC\ParserWrapper;
+use DateTimeZone;
 use ElkArte\AbstractController;
 use ElkArte\Action;
 use ElkArte\Exceptions\Exception;
 use ElkArte\Hooks;
 use ElkArte\Languages\Txt;
+use ElkArte\MetadataIntegrate;
 use ElkArte\Notifications\Notifications;
 use ElkArte\SettingsForm\SettingsForm;
 use ElkArte\Util;
@@ -47,7 +49,7 @@ class ManageFeatures extends AbstractController
 	 * This function passes control through to the relevant tab.
 	 *
 	 * @event integrate_sa_modify_features Use to add new Configuration tabs
-	 * @see  \ElkArte\AbstractController::action_index()
+	 * @see AbstractController::action_index()
 	 * @uses Help, ManageSettings languages
 	 * @uses sub_template show_settings
 	 */
@@ -160,6 +162,7 @@ class ManageFeatures extends AbstractController
 
 		// Initialize it with our settings
 		$settingsForm->setConfigVars($this->_basicSettings());
+
 		theme()->addJavascriptVar(['txt_invalid_response' => $txt['ajax_bad_response']], true);
 
 		// Saving?
@@ -178,11 +181,11 @@ class ManageFeatures extends AbstractController
 			// Microdata needs to enable its integration
 			if ($this->_req->isSet('metadata_enabled'))
 			{
-				Hooks::instance()->enableIntegration('\\ElkArte\\MetadataIntegrate');
+				Hooks::instance()->enableIntegration(MetadataIntegrate::class);
 			}
 			else
 			{
-				Hooks::instance()->disableIntegration('\\ElkArte\\MetadataIntegrate');
+				Hooks::instance()->disableIntegration(MetadataIntegrate::class);
 			}
 
 			// If they have changed Hive settings, lets clear them to avoid issues
@@ -263,8 +266,8 @@ class ManageFeatures extends AbstractController
 		);
 
 		// Get all the time zones.
-		$all_zones = timezone_identifiers_list();
-		if ($all_zones === false)
+		$all_zones = DateTimeZone::listIdentifiers();
+		if (empty($all_zones))
 		{
 			unset($config_vars['default_timezone']);
 		}
@@ -550,22 +553,16 @@ class ManageFeatures extends AbstractController
 					if (!empty($notification['enable']))
 					{
 						$defaults = $notification['default'] ?? [];
-						unset($notification['enable']);
-						unset($notification['default']);
+						unset($notification['enable'], $notification['default']);
 						foreach ($notification as $k => $v)
 						{
-							if (in_array($k, $defaults))
-							{
-								$notification[$k] = Notifications::DEFAULT_LEVEL;
-							}
-							else
-							{
-								$notification[$k] = $v;
-							}
+							$notification[$k] = in_array($k, $defaults) ? Notifications::DEFAULT_LEVEL : $v;
 						}
+
 						$notification_methods[$type] = $notification;
 					}
 				}
+
 				$notification_methods = serialize($notification_methods);
 			}
 
@@ -675,7 +672,7 @@ class ManageFeatures extends AbstractController
 			$is_default = [];
 
 			// If its enabled, show all the available ways, like email, notify, weekly ...
-			foreach ($notification_methods as $method_name => $method)
+			foreach (array_keys($notification_methods) as $method_name)
 			{
 				$method_name = strtolower($method_name);
 
@@ -688,11 +685,17 @@ class ManageFeatures extends AbstractController
 				$config_vars[] = array('check', 'notifications[' . $title . '][' . $method_name . ']', 'text_label' => $txt['notify_' . $method_name]);
 				$modSettings['notifications[' . $title . '][' . $method_name . ']'] = !empty($current_settings[$title][$method_name]);
 				$default_values[] = [$method_name, $txt['notify_' . $method_name]];
-
-				if (!empty($current_settings[$title][$method_name]) && $current_settings[$title][$method_name] == Notifications::DEFAULT_LEVEL)
+				if (empty($current_settings[$title][$method_name]))
 				{
-					$is_default[] = $method_name;
+					continue;
 				}
+
+				if ($current_settings[$title][$method_name] != Notifications::DEFAULT_LEVEL)
+				{
+					continue;
+				}
+
+				$is_default[] = $method_name;
 			}
 
 			$config_vars[] = array('select', 'notifications[' . $title . '][default]', $default_values, 'text_label' => $txt['default_active'], 'multiple' => true, 'value' => $is_default);
@@ -730,9 +733,9 @@ class ManageFeatures extends AbstractController
 			document.getElementById(\'signature_max_smileys\').disabled = !document.getElementById(\'signature_allow_smileys\').checked;', true);
 
 		// Load all the signature settings.
-		list ($sig_limits, $sig_bbc) = explode(':', $modSettings['signature_settings']);
+		[$sig_limits, $sig_bbc] = explode(':', $modSettings['signature_settings']);
 		$sig_limits = explode(',', $sig_limits);
-		$disabledTags = !empty($sig_bbc) ? explode(',', $sig_bbc) : array();
+		$disabledTags = empty($sig_bbc) ? array() : explode(',', $sig_bbc);
 
 		// @todo temporary since it does not work, and seriously why would you do this?
 		$disabledTags[] = 'footnote';
@@ -787,23 +790,24 @@ class ManageFeatures extends AbstractController
 			{
 				$signature_bbc_enabledTags = array($signature_bbc_enabledTags);
 			}
+
 			$this->_req->post->signature_bbc_enabledTags = $signature_bbc_enabledTags;
 
 			$sig_limits = array();
-			foreach ($context['signature_settings'] as $key => $value)
+			foreach (array_keys($context['signature_settings']) as $key)
 			{
-				if ($key == 'allow_smileys')
+				if ($key === 'allow_smileys')
 				{
 					continue;
 				}
-				elseif ($key == 'max_smileys' && empty($this->_req->post->signature_allow_smileys))
+				if ($key === 'max_smileys' && empty($this->_req->post->signature_allow_smileys))
 				{
 					$sig_limits[] = -1;
 				}
 				else
 				{
 					$current_key = $this->_req->getPost('signature_' . $key, 'intval');
-					$sig_limits[] = !empty($current_key) ? max(1, $current_key) : 0;
+					$sig_limits[] = empty($current_key) ? 0 : max(1, $current_key);
 				}
 			}
 
@@ -823,7 +827,7 @@ class ManageFeatures extends AbstractController
 
 		$context['post_url'] = getUrl('admin', ['action' => 'admin', 'area' => 'featuresettings', 'sa' => 'sig', 'save']);
 		$context['settings_title'] = $txt['signature_settings'];
-		$context['settings_message'] = !empty($settings_applied) ? $txt['signature_settings_applied'] : sprintf($txt['signature_settings_warning'], getUrl('admin', ['action' => 'admin', 'area' => 'featuresettings', 'sa' => 'sig', 'apply', '{session_data}']));
+		$context['settings_message'] = empty($settings_applied) ? sprintf($txt['signature_settings_warning'], getUrl('admin', ['action' => 'admin', 'area' => 'featuresettings', 'sa' => 'sig', 'apply', '{session_data}'])) : $txt['signature_settings_applied'];
 
 		$settingsForm->prepare();
 	}
@@ -847,21 +851,21 @@ class ManageFeatures extends AbstractController
 			array('int', 'signature_max_length', 'subtext' => $txt['zero_for_no_limit']),
 			array('int', 'signature_max_lines', 'subtext' => $txt['zero_for_no_limit']),
 			array('int', 'signature_max_font_size', 'subtext' => $txt['zero_for_no_limit']),
-			array('check', 'signature_allow_smileys', 'onclick' => 'document.getElementById(\'signature_max_smileys\').disabled = !this.checked;'),
+			array('check', 'signature_allow_smileys', 'onclick' => "document.getElementById('signature_max_smileys').disabled = !this.checked;"),
 			array('int', 'signature_max_smileys', 'subtext' => $txt['zero_for_no_limit']),
 			array('select', 'signature_repetition_guests',
-				  array(
-					  $txt['signature_always'],
-					  $txt['signature_onlyfirst'],
-					  $txt['signature_never'],
-				  ),
+				array(
+					$txt['signature_always'],
+					$txt['signature_onlyfirst'],
+					$txt['signature_never'],
+				),
 			),
 			array('select', 'signature_repetition_members',
-				  array(
-					  $txt['signature_always'],
-					  $txt['signature_onlyfirst'],
-					  $txt['signature_never'],
-				  ),
+				array(
+					$txt['signature_always'],
+					$txt['signature_onlyfirst'],
+					$txt['signature_never'],
+				),
 			),
 			'',
 			// Image settings.
@@ -929,20 +933,24 @@ class ManageFeatures extends AbstractController
 			{
 				foreach ($this->_req->post->reg as $value)
 				{
-					if (in_array($value, $standard_fields) && !isset($disable_fields[$value]))
+					if (!in_array($value, $standard_fields))
 					{
-						$reg_fields[] = $value;
+						continue;
 					}
+
+					if (isset($disable_fields[$value]))
+					{
+						continue;
+					}
+
+					$reg_fields[] = $value;
 				}
 			}
 
 			// What we have left!
 			$changes['registration_fields'] = empty($reg_fields) ? '' : implode(',', $reg_fields);
 
-			if (!empty($changes))
-			{
-				updateSettings($changes);
-			}
+			updateSettings($changes);
 		}
 
 		createToken('admin-scp');
@@ -974,7 +982,7 @@ class ManageFeatures extends AbstractController
 						'class' => 'centertext',
 					),
 					'data' => array(
-						'function' => function ($rowData) {
+						'function' => static function ($rowData) {
 							$isChecked = $rowData['disabled'] ? '' : ' checked="checked"';
 							$onClickHandler = $rowData['can_show_register'] ? sprintf('onclick="document.getElementById(\'reg_%1$s\').disabled = !this.checked;"', $rowData['id']) : '';
 
@@ -990,7 +998,7 @@ class ManageFeatures extends AbstractController
 						'class' => 'centertext',
 					),
 					'data' => array(
-						'function' => function ($rowData) {
+						'function' => static function ($rowData) {
 							$isChecked = $rowData['on_register'] && !$rowData['disabled'] ? ' checked="checked"' : '';
 							$isDisabled = $rowData['can_show_register'] ? '' : ' disabled="disabled"';
 
@@ -1053,9 +1061,7 @@ class ManageFeatures extends AbstractController
 						'value' => $txt['custom_profile_fieldname'],
 					),
 					'data' => array(
-						'function' => function ($rowData) {
-							return sprintf('<a href="%1$s">%2$s</a><div class="smalltext">%3$s</div>', getUrl('admin', ['action' => 'admin', 'area' => 'featuresettings', 'sa' => 'profileedit', 'fid' => (int) $rowData['id_field']]), $rowData['field_name'], $rowData['field_desc']);
-						},
+						'function' => static fn($rowData) => sprintf('<a href="%1$s">%2$s</a><div class="smalltext">%3$s</div>', getUrl('admin', ['action' => 'admin', 'area' => 'featuresettings', 'sa' => 'profileedit', 'fid' => (int) $rowData['id_field']]), $rowData['field_name'], $rowData['field_desc']),
 						'style' => 'width: 65%;',
 					),
 					'sort' => array(
@@ -1068,7 +1074,7 @@ class ManageFeatures extends AbstractController
 						'value' => $txt['custom_profile_fieldtype'],
 					),
 					'data' => array(
-						'function' => function ($rowData) {
+						'function' => static function ($rowData) {
 							global $txt;
 
 							$textKey = sprintf('custom_profile_type_%1$s', $rowData['field_type']);
@@ -1088,7 +1094,7 @@ class ManageFeatures extends AbstractController
 						'class' => 'centertext',
 					),
 					'data' => array(
-						'function' => function ($rowData) {
+						'function' => static function ($rowData) {
 							$isChecked = $rowData['active'] === '1' ? ' checked="checked"' : '';
 
 							return sprintf('<input type="checkbox" name="cust[]" id="cust_%1$s" value="%1$s" class="input_check"%2$s />', $rowData['id_field'], $isChecked);
@@ -1106,10 +1112,10 @@ class ManageFeatures extends AbstractController
 						'value' => $txt['custom_profile_placement'],
 					),
 					'data' => array(
-						'function' => function ($rowData) {
+						'function' => static function ($rowData) {
 							global $txt;
-							$placement = 'custom_profile_placement_';
 
+							$placement = 'custom_profile_placement_';
 							switch ((int) $rowData['placement'])
 							{
 								case 0:
@@ -1307,7 +1313,7 @@ class ManageFeatures extends AbstractController
 
 			// Some masking stuff...
 			$mask = $this->_req->getPost('mask', 'strval', '');
-			if ($mask == 'regex' && isset($this->_req->post->regex))
+			if ($mask === 'regex' && isset($this->_req->post->regex))
 			{
 				$mask .= $this->_req->post->regex;
 			}
@@ -1351,19 +1357,27 @@ class ManageFeatures extends AbstractController
 							$newOptions[$k] = $v;
 
 							// Is it default?
-							if (isset($this->_req->post->default_select) && $this->_req->post->default_select == $k)
+							if (!isset($this->_req->post->default_select))
 							{
-								$default = $v;
+								continue;
 							}
+
+							if ($this->_req->post->default_select != $k)
+							{
+								continue;
+							}
+
+							$default = $v;
 						}
 
-						if (isset($_POST['default_select']) && $_POST['default_select'] == 'no_default')
+						if (isset($_POST['default_select']) && $_POST['default_select'] === 'no_default')
 						{
 							$default = 'no_default';
 						}
 
 						$field_options = substr($field_options, 0, -1);
 					}
+
 					break;
 				default:
 					$default = $this->_req->post->default_value ?? '';
@@ -1378,11 +1392,13 @@ class ManageFeatures extends AbstractController
 				// If there is nothing to the name, then let's start our own - for foreign languages etc.
 				if (isset($matches[1]))
 				{
-					$colname = $initial_colname = 'cust_' . strtolower($matches[1]);
+					$colname = 'cust_' . strtolower($matches[1]);
+					$initial_colname = 'cust_' . strtolower($matches[1]);
 				}
 				else
 				{
-					$colname = $initial_colname = 'cust_' . mt_rand(1, 999999);
+					$colname = 'cust_' . mt_rand(1, 999999);
+					$initial_colname = 'cust_' . mt_rand(1, 999999);
 				}
 
 				$unique = ensureUniqueProfileField($colname, $initial_colname);
@@ -1454,12 +1470,20 @@ class ManageFeatures extends AbstractController
 					foreach ($optionChanges as $k => $option)
 					{
 						// Just been renamed?
-						if (!in_array($k, $takenKeys) && !empty($newOptions[$k]))
+						if (in_array($k, $takenKeys))
 						{
-							updateRenamedProfileField($k, $newOptions, $context['field']['colname'], $option);
+							continue;
 						}
+
+						if (empty($newOptions[$k]))
+						{
+							continue;
+						}
+
+						updateRenamedProfileField($k, $newOptions, $context['field']['colname'], $option);
 					}
 				}
+
 				// @todo Maybe we should adjust based on new text length limits?
 
 				// And finally update an existing field
@@ -1549,10 +1573,17 @@ class ManageFeatures extends AbstractController
 			require_once(SUBSDIR . '/Membergroups.subs.php');
 			foreach ($context['pm_limits'] as $group_id => $group)
 			{
-				if (isset($this->_req->post->group[$group_id]) && $this->_req->post->group[$group_id] != $group['max_messages'])
+				if (!isset($this->_req->post->group[$group_id]))
 				{
-					updateMembergroupProperties(array('current_group' => $group_id, 'max_messages' => $this->_req->post->group[$group_id]));
+					continue;
 				}
+
+				if ($this->_req->post->group[$group_id] == $group['max_messages'])
+				{
+					continue;
+				}
+
+				updateMembergroupProperties(array('current_group' => $group_id, 'max_messages' => $this->_req->post->group[$group_id]));
 			}
 
 			call_integration_hook('integrate_save_pmsettings_settings');

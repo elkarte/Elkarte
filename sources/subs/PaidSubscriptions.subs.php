@@ -251,7 +251,7 @@ function addSubscription($id_subscribe, $id_member, $renewal = '', $forceStartTi
 			'is_active' => 1,
 		)
 	);
-	if ($request->num_rows() != 0)
+	if ($request->num_rows() !== 0)
 	{
 		list ($id_sublog, $endtime, $starttime) = $request->fetch_row();
 
@@ -339,7 +339,7 @@ function addSubscription($id_subscribe, $id_member, $renewal = '', $forceStartTi
 		)
 	);
 	// @todo Don't really need to do this twice...
-	if ($request->num_rows() != 0)
+	if ($request->num_rows() !== 0)
 	{
 		list ($id_sublog, $endtime, $starttime) = $request->fetch_row();
 
@@ -978,7 +978,7 @@ function alreadySubscribed($id_sub, $id_member)
 			'current_member' => $id_member,
 		)
 	);
-	$result = $request->num_rows() != 0;
+	$result = $request->num_rows() !== 0;
 	$request->free_result();
 
 	return $result;

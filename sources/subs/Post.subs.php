@@ -599,7 +599,7 @@ function modifyPost(&$msgOptions, &$topicOptions, &$posterOptions)
 				'id_first_msg' => $msgOptions['id'],
 			)
 		);
-		if ($request->num_rows() == 1)
+		if ($request->num_rows() === 1)
 		{
 			require_once(SUBSDIR . '/Messages.subs.php');
 			updateSubjectStats($topicOptions['id'], $msgOptions['subject']);
@@ -1096,7 +1096,7 @@ function lastPost()
 			'is_approved' => 1,
 		)
 	);
-	if ($request->num_rows() == 0)
+	if ($request->num_rows() === 0)
 	{
 		return array();
 	}
@@ -1193,7 +1193,7 @@ function getFormMsgSubject($editing, $topic, $first_subject = '', $msg_id = 0)
 					'is_approved' => 1,
 				)
 			);
-			if ($request->num_rows() == 0)
+			if ($request->num_rows() === 0)
 			{
 				throw new \ElkArte\Exceptions\Exception('quoted_post_deleted', false);
 			}

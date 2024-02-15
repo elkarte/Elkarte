@@ -26,7 +26,7 @@ class ManageTopics extends AbstractController
 	 * Check permissions and forward to the right method.
 	 *
 	 * @event integrate_sa_manage_topics
-	 * @see \ElkArte\AbstractController::action_index()
+	 * @see AbstractController::action_index()
 	 */
 	public function action_index()
 	{

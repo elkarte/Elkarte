@@ -781,7 +781,7 @@ function insertBanGroup($ban_info = array())
 	);
 
 	// @todo shouldn't be an error here?
-	if ($request->num_rows() == 1)
+	if ($request->num_rows() === 1)
 	{
 		list ($id_ban) = $request->fetch_row();
 		$request->free_result();
@@ -953,7 +953,7 @@ function validateIPBan($ip_array, $fullip = '')
 		LIMIT 1',
 		$values
 	);
-	if ($request->num_rows() != 0)
+	if ($request->num_rows() !== 0)
 	{
 		list ($error_id_ban, $error_ban_name) = $request->fetch_row();
 		$values = array('error' => array('ban_trigger_already_exists', array(

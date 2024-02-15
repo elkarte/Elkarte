@@ -89,7 +89,7 @@ class ManageThemes extends AbstractController
 	 * - Requires the user to not be a guest.
 	 * - Accessed via ?action=admin;area=theme.
 	 *
-	 * @see \ElkArte\AbstractController::action_index()
+	 * @see AbstractController::action_index()
 	 */
 	public function action_index()
 	{
@@ -182,7 +182,7 @@ class ManageThemes extends AbstractController
 		);
 
 		// Follow the sa or just go to administration.
-		if (isset($this->_req->query->sa) && !empty($subActions[$this->_req->query->sa]))
+		if (isset($this->_req->query->sa, $subActions[$this->_req->query->sa]) && $subActions[$this->_req->query->sa] !== '' && $subActions[$this->_req->query->sa] !== '0')
 		{
 			$this->{$subActions[$this->_req->query->sa]}();
 		}
@@ -245,10 +245,7 @@ class ManageThemes extends AbstractController
 				Cache::instance()->remove('theme_settings-' . $id);
 			}
 
-			if (!empty($setValues))
-			{
-				updateThemeOptions($setValues);
-			}
+			updateThemeOptions($setValues);
 
 			redirectexit('action=admin;area=theme;sa=list;' . $context['session_var'] . '=' . $context['session_id']);
 		}
@@ -388,11 +385,13 @@ class ManageThemes extends AbstractController
 					{
 						continue;
 					}
+
 					// Checkbox.
-					elseif (empty($item['type']))
+					if (empty($item['type']))
 					{
 						$options[$option][$item['id']] = $options[$option][$item['id']] ? 1 : 0;
 					}
+
 					// Number
 					elseif ($item['type'] === 'number')
 					{
@@ -483,6 +482,7 @@ class ManageThemes extends AbstractController
 					'thumbnail' => !$fileFunc->fileExists($settings['theme_dir'] . '/images/thumbnail.png') || $fileFunc->fileExists($settings['theme_dir'] . '/images/thumbnail_' . $variant . '.png') ? $settings['images_url'] . '/thumbnail_' . $variant . '.png' : ($settings['images_url'] . '/thumbnail.png'),
 				);
 			}
+
 			$context['default_variant'] = !empty($settings['default_variant']) && isset($context['theme_variants'][$settings['default_variant']]) ? $settings['default_variant'] : $settings['theme_variants'][0];
 		}
 
@@ -566,7 +566,7 @@ class ManageThemes extends AbstractController
 			$context['sub_template'] = 'manage_themes';
 
 			// Make our known themes a little easier to work with.
-			$knownThemes = !empty($modSettings['knownThemes']) ? explode(',', $modSettings['knownThemes']) : array();
+			$knownThemes = empty($modSettings['knownThemes']) ? array() : explode(',', $modSettings['knownThemes']);
 
 			// Load up all the themes.
 			require_once(SUBSDIR . '/Themes.subs.php');
@@ -583,6 +583,7 @@ class ManageThemes extends AbstractController
 			{
 				$i++;
 			}
+
 			$context['new_theme_name'] = 'theme' . $i;
 
 			createToken('admin-tm');
@@ -797,7 +798,7 @@ class ManageThemes extends AbstractController
 				unset($context['options'][$i]);
 				continue;
 			}
-			elseif (($setting['id'] === 'topics_per_page' || $setting['id'] === 'messages_per_page') && !empty($modSettings['disableCustomPerPage']))
+			if (($setting['id'] === 'topics_per_page' || $setting['id'] === 'messages_per_page') && !empty($modSettings['disableCustomPerPage']))
 			{
 				unset($context['options'][$i]);
 				continue;
@@ -822,7 +823,7 @@ class ManageThemes extends AbstractController
 				$context['options'][$i]['type'] = 'list';
 			}
 
-			$context['options'][$i]['value'] = !isset($context['theme_options'][$setting['id']]) ? '' : $context['theme_options'][$setting['id']];
+			$context['options'][$i]['value'] = $context['theme_options'][$setting['id']] ?? '';
 		}
 
 		// Restore the existing theme and its settings.
@@ -1099,7 +1100,7 @@ class ManageThemes extends AbstractController
 		}
 
 		// Get the theme name and descriptions.
-		list ($context['available_themes'], $guest_theme) = availableThemes($current_theme, $context['current_member']);
+		[$context['available_themes'], $guest_theme] = availableThemes($current_theme, $context['current_member']);
 
 		// As long as we're not doing the default theme...
 		if (!isset($u) || $u >= 0)
@@ -1266,7 +1267,7 @@ class ManageThemes extends AbstractController
 					{
 						$install_info = $temp + $install_info;
 
-						if (empty($explicit_images) && !empty($install_info['base_theme_url']))
+						if ($explicit_images === false && !empty($install_info['base_theme_url']))
 						{
 							$install_info['theme_url'] = $install_info['base_theme_url'];
 						}
@@ -1396,6 +1397,7 @@ class ManageThemes extends AbstractController
 		// Set the default settings...
 		$this->theme_name = strtok(basename(isset($_FILES['theme_gz']) ? $_FILES['theme_gz']['name'] : $this->_req->post->theme_gz), '.');
 		$this->theme_name = preg_replace(array('/\s/', '/\.[\.]+/', '/[^\w_\.\-]/'), array('_', '.', ''), $this->theme_name);
+
 		$this->theme_dir = BOARDDIR . '/themes/' . $this->theme_name;
 
 		if (isset($_FILES['theme_gz']) && is_uploaded_file($_FILES['theme_gz']['tmp_name']) && (ini_get('open_basedir') != '' || $fileFunc->fileExists($_FILES['theme_gz']['tmp_name'])))
@@ -1480,7 +1482,7 @@ class ManageThemes extends AbstractController
 		{
 			if (!empty($options['admin_preferences']))
 			{
-				$options['admin_preferences'] = serializeToJson($options['admin_preferences'], function ($array_form) {
+				$options['admin_preferences'] = serializeToJson($options['admin_preferences'], static function ($array_form) {
 					global $context;
 
 					$context['admin_preferences'] = $array_form;
@@ -1507,7 +1509,7 @@ class ManageThemes extends AbstractController
 		{
 			if (!empty($options['minmax_preferences']))
 			{
-				$minmax_preferences = serializeToJson($options['minmax_preferences'], function ($array_form) use ($settings) {
+				$minmax_preferences = serializeToJson($options['minmax_preferences'], static function ($array_form) use ($settings) {
 					// Update the option.
 					require_once(SUBSDIR . '/Themes.subs.php');
 					updateThemeOptions(array($settings['theme_id'], User::$info->id, 'minmax_preferences', json_encode($array_form)));

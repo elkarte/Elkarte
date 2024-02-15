@@ -556,7 +556,7 @@ function processNextTasks($ts = 0)
 			'current_time' => time(),
 		)
 	);
-	if ($request->num_rows() != 0)
+	if ($request->num_rows() !== 0)
 	{
 		// The two important things really...
 		$row = $request->fetch_assoc();

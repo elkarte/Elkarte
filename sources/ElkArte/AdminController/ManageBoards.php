@@ -34,18 +34,10 @@ use ElkArte\Util;
  */
 class ManageBoards extends AbstractController
 {
-	/**
-	 * Category being worked on
-	 *
-	 * @var int
-	 */
+	/** @var int Category being worked on */
 	public $cat;
 
-	/**
-	 * Current board id being modified
-	 *
-	 * @var int
-	 */
+	/** @var int Current board id being modified */
 	public $boardid;
 
 	/**
@@ -61,7 +53,7 @@ class ManageBoards extends AbstractController
 	 */
 	public function action_index()
 	{
-		global $context, $txt;
+		global $context;
 
 		// Everything's gonna need this.
 		Txt::load('ManageBoards');
@@ -228,7 +220,7 @@ class ManageBoards extends AbstractController
 					{
 						$context['categories'][$catid]['move_link'] = array(
 							'child_level' => 0,
-							'label' => $txt['mboards_order_before'] . ' \'' . htmlspecialchars($boards[$boardid]['name'], ENT_COMPAT, 'UTF-8') . '\'',
+							'label' => $txt['mboards_order_before'] . " '" . htmlspecialchars($boards[$boardid]['name'], ENT_COMPAT, 'UTF-8') . "'",
 							'href' => getUrl('admin', ['action' => 'admin', 'area' => 'manageboards', 'sa' => 'move', 'src_board' => $context['move_board'], 'target_board' => $boardid, 'move_to' => 'before', '{session_data}', $security_token]),
 						);
 					}
@@ -238,21 +230,21 @@ class ManageBoards extends AbstractController
 						$context['categories'][$catid]['boards'][$boardid]['move_links'] = array(
 							array(
 								'child_level' => $boards[$boardid]['level'],
-								'label' => $txt['mboards_order_after'] . '\'' . htmlspecialchars($boards[$boardid]['name'], ENT_COMPAT, 'UTF-8') . '\'',
+								'label' => $txt['mboards_order_after'] . "'" . htmlspecialchars($boards[$boardid]['name'], ENT_COMPAT, 'UTF-8') . "'",
 								'href' => getUrl('admin', ['action' => 'admin', 'area' => 'manageboards', 'sa' => 'move', 'src_board' => $context['move_board'], 'target_board' => $boardid, 'move_to' => 'after', '{session_data}', $security_token]),
 							),
 							array(
 								'child_level' => $boards[$boardid]['level'] + 1,
-								'label' => $txt['mboards_order_child_of'] . ' \'' . htmlspecialchars($boards[$boardid]['name'], ENT_COMPAT, 'UTF-8') . '\'',
+								'label' => $txt['mboards_order_child_of'] . " '" . htmlspecialchars($boards[$boardid]['name'], ENT_COMPAT, 'UTF-8') . "'",
 								'href' => getUrl('admin', ['action' => 'admin', 'area' => 'manageboards', 'sa' => 'move', 'src_board' => $context['move_board'], 'target_board' => $boardid, 'move_to' => 'child', '{session_data}', $security_token]),
 							),
 						);
 					}
 
 					$difference = $boards[$boardid]['level'] - $prev_child_level;
-					if ($difference == 1)
+					if ($difference === 1)
 					{
-						$stack[] = !empty($context['categories'][$catid]['boards'][$prev_board]['move_links']) ? array_shift($context['categories'][$catid]['boards'][$prev_board]['move_links']) : null;
+						$stack[] = empty($context['categories'][$catid]['boards'][$prev_board]['move_links']) ? null : array_shift($context['categories'][$catid]['boards'][$prev_board]['move_links']);
 					}
 					elseif ($difference < 0)
 					{
@@ -287,7 +279,7 @@ class ManageBoards extends AbstractController
 				{
 					$context['categories'][$catid]['move_link'] = array(
 						'child_level' => 0,
-						'label' => $txt['mboards_order_before'] . ' \'' . htmlspecialchars($tree['node']['name'], ENT_COMPAT, 'UTF-8') . '\'',
+						'label' => $txt['mboards_order_before'] . " '" . htmlspecialchars($tree['node']['name'], ENT_COMPAT, 'UTF-8') . "'",
 						'href' => getUrl('admin', ['action' => 'admin', 'area' => 'manageboards', 'sa' => 'move', 'src_board' => $context['move_board'], 'target_cat' => $catid, 'move_to' => 'top', '{session_data}', $security_token]),
 					);
 				}
@@ -333,7 +325,6 @@ class ManageBoards extends AbstractController
 
 			// Change "This & That" to "This &amp; That" but don't change "&cent" to "&amp;cent;"...
 			$catOptions['cat_name'] = preg_replace('~[&]([^;]{8}|[^;]{0,8}$)~', '&amp;$1', $this->_req->post->cat_name);
-
 			$catOptions['is_collapsible'] = isset($this->_req->post->collapse);
 
 			if (isset($this->_req->post->add))
@@ -582,11 +573,11 @@ class ManageBoards extends AbstractController
 			}
 
 			// Are they doing redirection?
-			$boardOptions['redirect'] = !$this->_req->comparePost('redirect_address', '', 'trim') ? $this->_req->get('redirect_address') : '';
+			$boardOptions['redirect'] = $this->_req->comparePost('redirect_address', '', 'trim') ? '' : $this->_req->get('redirect_address');
 
 			// Profiles...
 			$boardOptions['profile'] = $this->_req->post->profile;
-			$boardOptions['inherit_permissions'] = $this->_req->post->profile == -1;
+			$boardOptions['inherit_permissions'] = (int) $this->_req->post->profile === -1;
 
 			// We need to know what used to be case in terms of redirection.
 			if (!empty($board_id))
@@ -620,6 +611,7 @@ class ManageBoards extends AbstractController
 				{
 					$boardOptions['target_category'] = $this->_req->getPost('cur_cat', 'intval', 0);
 				}
+
 				if (!isset($boardOptions['move_to']))
 				{
 					$boardOptions['move_to'] = 'bottom';
@@ -639,30 +631,26 @@ class ManageBoards extends AbstractController
 			{
 				throw new Exception('mboards_delete_board_has_posts');
 			}
-			else
-			{
-				$this->action_board();
-			}
+			$this->action_board();
 
 			return;
 		}
 		elseif (isset($this->_req->post->delete))
 		{
 			$boardTree = new BoardsTree(database());
-
 			// First, check if our board still has posts or topics.
 			if ($posts)
 			{
 				throw new Exception('mboards_delete_board_has_posts');
 			}
-			elseif ($this->_req->comparePost('delete_action', 1, 'intval'))
+
+			if ($this->_req->comparePost('delete_action', 1, 'intval'))
 			{
 				// Check if we are moving all the current sub-boards first - before we start deleting!
 				if (empty($this->_req->post->board_to))
 				{
 					throw new Exception('mboards_delete_board_error');
 				}
-
 				$boardTree->deleteBoards(array($board_id), $this->_req->getPost('board_to', 'intval'));
 			}
 			else
@@ -797,7 +785,7 @@ class ManageBoards extends AbstractController
 		foreach ($catBoards as $boardid)
 		{
 			$thisBoard = $boardTree->getBoardById($boardid);
-			if ($boardid == $this->boardid)
+			if ($boardid === $this->boardid)
 			{
 				$context['board_order'][] = array(
 					'id' => $boardid,
@@ -813,7 +801,7 @@ class ManageBoards extends AbstractController
 				$context['board_order'][] = array(
 					'id' => $boardid,
 					'name' => str_repeat('-', $thisBoard['level']) . ' ' . $thisBoard['name'],
-					'is_child' => empty($this->boardid) ? false : $boardTree->isChildOf($boardid, $this->boardid),
+					'is_child' => !empty($this->boardid) && $boardTree->isChildOf($boardid, $this->boardid),
 					'selected' => false
 				);
 			}
@@ -826,10 +814,17 @@ class ManageBoards extends AbstractController
 			$context['children'] = $curBoard['tree']['children'];
 			foreach ($context['board_order'] as $board)
 			{
-				if ($board['is_child'] === false && $board['selected'] === false)
+				if ($board['is_child'] !== false)
 				{
-					$context['can_move_children'] = true;
+					continue;
 				}
+
+				if ($board['selected'] !== false)
+				{
+					continue;
+				}
+
+				$context['can_move_children'] = true;
 			}
 		}
 
@@ -850,7 +845,7 @@ class ManageBoards extends AbstractController
 
 		if (!empty($context['board']['moderators']))
 		{
-			list ($context['board']['last_moderator_id']) = array_slice(array_keys($context['board']['moderators']), -1);
+			[$context['board']['last_moderator_id']] = array_slice(array_keys($context['board']['moderators']), -1);
 		}
 
 		$context['themes'] = getAllThemes();
@@ -900,7 +895,7 @@ class ManageBoards extends AbstractController
 		$context['post_url'] = getUrl('admin', ['action' => 'admin', 'area' => 'manageboards', 'sa' => 'settings', 'save']);
 
 		// Warn the admin against selecting the recycle topic without selecting a board.
-		$context['force_form_onsubmit'] = 'if(document.getElementById(\'recycle_enable\').checked && document.getElementById(\'recycle_board\').value == 0) { return confirm(\'' . $txt['recycle_board_unselected_notice'] . '\');} return true;';
+		$context['force_form_onsubmit'] = "if(document.getElementById('recycle_enable').checked && document.getElementById('recycle_board').value == 0) { return confirm('" . $txt['recycle_board_unselected_notice'] . "');} return true;";
 
 		// Doing a save?
 		if (isset($this->_req->query->save))
@@ -947,7 +942,7 @@ class ManageBoards extends AbstractController
 			'',
 			// Other board settings.
 			array('check', 'countChildPosts'),
-			array('check', 'recycle_enable', 'onclick' => 'document.getElementById(\'recycle_board\').disabled = !this.checked;'),
+			array('check', 'recycle_enable', 'onclick' => "document.getElementById('recycle_board').disabled = !this.checked;"),
 			array('select', 'recycle_board', $recycle_boards),
 			array('check', 'allow_ignore_boards'),
 			array('check', 'deny_boards_access'),

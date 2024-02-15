@@ -309,7 +309,7 @@ class Payment implements PaymentInterface
 			)
 		);
 		// No joy?
-		if ($request->num_rows() == 0)
+		if ($request->num_rows() === 0)
 		{
 			// Can we identify them by email?
 			if (!empty($_POST['payer_email']))

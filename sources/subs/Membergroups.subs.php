@@ -782,13 +782,13 @@ function list_getMembergroups($start, $items_per_page, $sort, $membergroup_type,
 				return;
 			}
 
-			if ($row['id_parent'] != -2)
+			if ((int) $row['id_parent'] !== -2)
 			{
-				$parent_groups[] = $row['id_parent'];
+				$parent_groups[] = (int) $row['id_parent'];
 			}
 
 			// If it's inherited, just add it as a child.
-			if ($aggregate && $row['id_parent'] != -2)
+			if ($aggregate && (int) $row['id_parent'] !== -2)
 			{
 				if (isset($groups[$row['id_parent']]))
 				{
@@ -799,27 +799,27 @@ function list_getMembergroups($start, $items_per_page, $sort, $membergroup_type,
 			}
 
 			$row['icons'] = explode('#', $row['icons']);
-
+			$row['id_group'] = (int) $row['id_group'];
 			$groups[$row['id_group']] = array(
 				'id_group' => $row['id_group'],
 				'group_name' => $row['group_name'],
 				'group_name_color' => empty($row['online_color']) ? $row['group_name'] : '<span style="color: ' . $row['online_color'] . '">' . $row['group_name'] . '</span>',
-				'min_posts' => $row['min_posts'],
+				'min_posts' => (int) $row['min_posts'],
 				'desc' => $row['description'],
 				'online_color' => $row['online_color'],
-				'type' => $row['group_type'],
-				'num_members' => $row['num_members'],
+				'type' => (int) $row['group_type'],
+				'num_members' => (int) $row['num_members'],
 				'moderators' => array(),
 				'icons' => $row['icons'],
-				'can_search' => $row['id_group'] != 3,
-				'id_parent' => $row['id_parent'],
+				'can_search' => $row['id_group'] !== 3,
+				'id_parent' => (int) $row['id_parent'],
 			);
 
 			if ($count_permissions)
 			{
 				$groups[$row['id_group']]['num_permissions'] = array(
-					'allowed' => $row['id_group'] == 1 ? '(' . $txt['permissions_all'] . ')' : 0,
-					'denied' => $row['id_group'] == 1 ? '(' . $txt['permissions_none'] . ')' : 0,
+					'allowed' => $row['id_group'] === 1 ? '(' . $txt['permissions_all'] . ')' : 0,
+					'denied' => $row['id_group'] === 1 ? '(' . $txt['permissions_none'] . ')' : 0,
 				);
 			}
 
@@ -1073,10 +1073,16 @@ function membergroupsById($group_ids, $limit = 1, $detailed = false, $assignable
 			'limit' => $limit,
 		)
 	)->fetch_callback(
-		function ($row) use (&$groups) {
+		function ($row) use (&$groups, $detailed) {
 			$row['id_group'] = (int) $row['id_group'];
-			$row['id_parent'] = (int) $row['id_parent'];
 			$row['group_type'] = (int) $row['group_type'];
+
+			if ($detailed)
+			{
+				$row['id_parent'] = (int) $row['id_parent'];
+				$row['min_posts'] = (int) $row['min_posts'];
+				$row['max_messages'] = (int) $row['max_messages'];
+			}
 
 			$groups[$row['id_group']] = $row;
 		}

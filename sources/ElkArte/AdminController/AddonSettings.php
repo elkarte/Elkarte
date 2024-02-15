@@ -37,7 +37,7 @@ class AddonSettings extends AbstractController
 	/**
 	 * This, my friend, is for all the authors of addons out there.
 	 *
-	 * @see \ElkArte\AbstractController::action_index()
+	 * @see AbstractController::action_index()
 	 */
 	public function action_index()
 	{
@@ -50,11 +50,8 @@ class AddonSettings extends AbstractController
 			'general' => array($this, 'action_addonSettings_display', 'permission' => 'admin_forum'),
 		);
 
-		// @FIXME
-		// $this->loadGeneralSettingParameters($subActions, 'general');
 		$context['page_title'] = $txt['admin_modifications'];
 		$context['sub_template'] = 'show_settings';
-		// END $this->loadGeneralSettingParameters();
 
 		// Load up all the tabs...
 		$context[$context['admin_menu_name']]['object']->prepareTabData([
@@ -137,36 +134,5 @@ class AddonSettings extends AbstractController
 	public function settings_search()
 	{
 		return $this->_settings();
-	}
-
-	/**
-	 * This function makes sure the requested subaction does exist,
-	 * if it doesn't, it sets a default action or.
-	 *
-	 * @param array $subActions An array containing all possible subactions.
-	 * @param string $defaultAction the default action to be called if no valid subaction was found.
-	 *
-	 * @throws \ElkArte\Exceptions\Exception
-	 */
-	public function loadGeneralSettingParameters($subActions = [], $defaultAction = '')
-	{
-		global $context;
-
-		// You need to be an admin to edit settings!
-		isAllowedTo('admin_forum');
-
-		Txt::load('Help+ManageSettings');
-
-		$context['sub_template'] = 'show_settings';
-
-		// By default do the basic settings.
-		$subAction = $this->_req->getQuery('sa', 'trim|strval', $defaultAction);
-		if (empty($subAction) || empty($subActions[$subAction]))
-		{
-			$keys = array_keys($subActions);
-			$subAction = array_pop($keys);
-		}
-
-		$context['sub_action'] = $subAction;
 	}
 }

@@ -36,7 +36,7 @@ class AdminDebug extends AbstractController
 	/**
 	 * Main dispatcher.
 	 *
-	 * @see \ElkArte\AbstractController::action_index()
+	 * @see AbstractController::action_index()
 	 */
 	public function action_index()
 	{

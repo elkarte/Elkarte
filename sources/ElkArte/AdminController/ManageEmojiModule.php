@@ -17,6 +17,9 @@ use ElkArte\FileFunctions;
 use ElkArte\HttpReq;
 use ElkArte\Languages\Txt;
 use ElkArte\UnZip;
+use FilesystemIterator;
+use RecursiveDirectoryIterator;
+use RecursiveIteratorIterator;
 
 /**
  * Emoji administration controller.
@@ -66,13 +69,11 @@ abstract class ManageEmojiModule extends AbstractController
 		}
 
 		// An emoji group was selected, unzip them if required
-		if (!FileFunctions::instance()->fileExists(BOARDDIR . '/smileys/' . $req->post->emoji_selection . '\1f44d.svg'))
+		if (!FileFunctions::instance()->fileExists(BOARDDIR . '/smileys/' . $req->post->emoji_selection . '\1f44d.svg')
+			&& self::unZipEmoji($req))
 		{
-			if (self::unZipEmoji($req))
-			{
-				self::removeEmoji($req);
-				self::copyEmojiToSmiley($req);
-			}
+			self::removeEmoji($req);
+			self::copyEmojiToSmiley($req);
 		}
 	}
 
@@ -116,10 +117,10 @@ abstract class ManageEmojiModule extends AbstractController
 		$fileFunc = FileFunctions::instance();
 		if ($fileFunc->isDir($source))
 		{
-			$iterator = new \RecursiveDirectoryIterator($source, \FilesystemIterator::SKIP_DOTS);
-			$files = new \RecursiveIteratorIterator($iterator, \RecursiveIteratorIterator::CHILD_FIRST, \RecursiveIteratorIterator::CATCH_GET_CHILD);
+			$iterator = new RecursiveDirectoryIterator($source, FilesystemIterator::SKIP_DOTS);
+			$files = new RecursiveIteratorIterator($iterator, RecursiveIteratorIterator::CHILD_FIRST, RecursiveIteratorIterator::CATCH_GET_CHILD);
 
-			/** @var \FilesystemIterator $file */
+			/** @var FilesystemIterator $file */
 			foreach ($files as $file)
 			{
 				if ($file->getExtension() === 'svg')

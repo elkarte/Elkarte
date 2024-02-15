@@ -20,10 +20,15 @@ namespace ElkArte\AdminController;
 use ElkArte\AbstractController;
 use ElkArte\Action;
 use ElkArte\FileFunctions;
+use ElkArte\Languages\Txt;
 use ElkArte\Search\SearchApiWrapper;
 use ElkArte\SettingsForm\SettingsForm;
-use ElkArte\Languages\Txt;
 use ElkArte\Util;
+use Exception;
+use FilesystemIterator;
+use GlobIterator;
+use SphinxClient;
+use UnexpectedValueException;
 
 /**
  * ManageSearch controller admin class.
@@ -46,7 +51,7 @@ class ManageSearch extends AbstractController
 	 * @event integrate_sa_manage_search add new search actions
 	 * @uses ManageSearch template.
 	 * @uses Search language file.
-	 * @see  \ElkArte\AbstractController::action_index()
+	 * @see  AbstractController::action_index()
 	 */
 	public function action_index()
 	{
@@ -135,7 +140,7 @@ class ManageSearch extends AbstractController
 
 			if (empty($this->_req->post->search_results_per_page))
 			{
-				$this->_req->post->search_results_per_page = !empty($modSettings['search_results_per_page']) ? $modSettings['search_results_per_page'] : $modSettings['defaultMaxMessages'];
+				$this->_req->post->search_results_per_page = empty($modSettings['search_results_per_page']) ? $modSettings['defaultMaxMessages'] : $modSettings['search_results_per_page'];
 			}
 
 			$new_engines = array();
@@ -143,17 +148,30 @@ class ManageSearch extends AbstractController
 			{
 				$url = trim(str_replace(array('"', '<', '>'), array('&quot;', '&lt;', '&gt;'), $this->_req->post->engine_url[$id]));
 				// If no url, forget it
-				if (!empty($searchengine) && !empty($url) && filter_var($url, FILTER_VALIDATE_URL))
+				if (empty($searchengine))
 				{
-					$new_engines[] = array(
-						'name' => trim(Util::htmlspecialchars($searchengine, ENT_COMPAT)),
-						'url' => $url,
-						'separator' => trim(Util::htmlspecialchars(!empty($this->_req->post->engine_separator[$id]) ? $this->_req->post->engine_separator[$id] : '+', ENT_COMPAT)),
-					);
+					continue;
 				}
+
+				if (empty($url))
+				{
+					continue;
+				}
+
+				if (!filter_var($url, FILTER_VALIDATE_URL))
+				{
+					continue;
+				}
+
+				$new_engines[] = array(
+					'name' => trim(Util::htmlspecialchars($searchengine, ENT_COMPAT)),
+					'url' => $url,
+					'separator' => trim(Util::htmlspecialchars(empty($this->_req->post->engine_separator[$id]) ? '+' : $this->_req->post->engine_separator[$id], ENT_COMPAT)),
+				);
 			}
+
 			updateSettings(array(
-				'additional_search_engines' => !empty($new_engines) ? serialize($new_engines) : ''
+				'additional_search_engines' => $new_engines === [] ? '' : serialize($new_engines)
 			));
 
 			$settingsForm->setConfigValues((array) $this->_req->post);
@@ -192,7 +210,7 @@ class ManageSearch extends AbstractController
 		);
 
 		// Perhaps the search method wants to add some settings?
-		$searchAPI = new SearchApiWrapper(!empty($modSettings['search_index']) ? $modSettings['search_index'] : '');
+		$searchAPI = new SearchApiWrapper(empty($modSettings['search_index']) ? '' : $modSettings['search_index']);
 		$searchAPI->searchSettings($config_vars);
 
 		// Add new settings with a nice hook, makes them available for admin settings search as well
@@ -421,7 +439,7 @@ class ManageSearch extends AbstractController
 		$apis = array();
 		try
 		{
-			$files = new \GlobIterator(SOURCEDIR . '/ElkArte/Search/API/*.php', \FilesystemIterator::SKIP_DOTS);
+			$files = new GlobIterator(SOURCEDIR . '/ElkArte/Search/API/*.php', FilesystemIterator::SKIP_DOTS);
 			foreach ($files as $file)
 			{
 				if ($file->isFile())
@@ -444,7 +462,7 @@ class ManageSearch extends AbstractController
 				}
 			}
 		}
-		catch (\UnexpectedValueException $e)
+		catch (UnexpectedValueException)
 		{
 			// @todo for now just passthrough
 		}
@@ -508,13 +526,13 @@ class ManageSearch extends AbstractController
 		if ($context['step'] === 1)
 		{
 			$context['sub_template'] = 'create_index_progress';
-			list ($context['start'], $context['step'], $context['percentage']) = createSearchIndex($context['start'], $messages_per_batch);
+			[$context['start'], $context['step'], $context['percentage']] = createSearchIndex($context['start'], $messages_per_batch);
 		}
 
 		// Step 2: removing the words that occur too often and are of no use.
 		if ($context['step'] === 2)
 		{
-			list ($context['start'], $complete, $context['percentage']) = removeCommonWordsFromIndex($context['start']);
+			[$context['start'], $complete, $context['percentage']] = removeCommonWordsFromIndex($context['start']);
 			if ($complete)
 			{
 				$context['step'] = 3;
@@ -599,8 +617,6 @@ class ManageSearch extends AbstractController
 
 	/**
 	 * Save the form values in modsettings
-	 *
-	 * @throws \Elk_Exception
 	 */
 	private function _saveSphinxConfig()
 	{
@@ -628,14 +644,14 @@ class ManageSearch extends AbstractController
 		if (FileFunctions::instance()->fileExists(SOURCEDIR . '/sphinxapi.php'))
 		{
 			include_once(SOURCEDIR . '/sphinxapi.php');
-			$server = !empty($modSettings['sphinx_searchd_server']) ? $modSettings['sphinx_searchd_server'] : 'localhost';
-			$port = !empty($modSettings['sphinx_searchd_port']) ? $modSettings['sphinx_searchd_port'] : 9312;
+			$server = empty($modSettings['sphinx_searchd_server']) ? 'localhost' : $modSettings['sphinx_searchd_server'];
+			$port = empty($modSettings['sphinx_searchd_port']) ? 9312 : $modSettings['sphinx_searchd_port'];
 
-			$mySphinx = new \SphinxClient();
+			$mySphinx = new SphinxClient();
 			$mySphinx->SetServer($server, (int) $port);
 			$mySphinx->SetLimits(0, 25, 1);
 
-			$index = (!empty($modSettings['sphinx_index_prefix']) ? $modSettings['sphinx_index_prefix'] : 'elkarte') . '_index';
+			$index = (empty($modSettings['sphinx_index_prefix']) ? 'elkarte' : $modSettings['sphinx_index_prefix']) . '_index';
 			$request = $mySphinx->Query('ElkArte', $index);
 
 			if ($request === false)
@@ -663,16 +679,16 @@ class ManageSearch extends AbstractController
 	{
 		global $txt, $modSettings, $context;
 
-		$server = !empty($modSettings['sphinx_searchd_server']) ? $modSettings['sphinx_searchd_server'] : 'localhost';
+		$server = empty($modSettings['sphinx_searchd_server']) ? 'localhost' : $modSettings['sphinx_searchd_server'];
 		$server = $server === 'localhost' ? '127.0.0.1' : $server;
-		$port = !empty($modSettings['sphinxql_searchd_port']) ? $modSettings['sphinxql_searchd_port'] : '9306';
+		$port = empty($modSettings['sphinxql_searchd_port']) ? '9306' : $modSettings['sphinxql_searchd_port'];
 
 		set_error_handler(static function () { /* ignore errors */ });
 		try
 		{
 			$result = mysqli_connect($server, '', '', '', (int) $port);
 		}
-		catch (\Exception $e)
+		catch (Exception)
 		{
 			$result = false;
 		}

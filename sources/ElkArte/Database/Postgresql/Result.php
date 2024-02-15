@@ -94,7 +94,7 @@ class Result extends AbstractResult
 		// simply delegate to the native function
 		if (is_resource($this->result) || $this->result instanceof \PgSql\Result)
 		{
-			return pg_num_rows($this->result);
+			return (int) pg_num_rows($this->result);
 		}
 	}
 

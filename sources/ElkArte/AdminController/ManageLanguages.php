@@ -18,15 +18,13 @@ namespace ElkArte\AdminController;
 
 use ElkArte\AbstractController;
 use ElkArte\Action;
-use ElkArte\Cache\Cache;
 use ElkArte\Exceptions\Exception;
 use ElkArte\FileFunctions;
-use ElkArte\Packages\PackageChmod;
-use ElkArte\SettingsForm\SettingsForm;
-use ElkArte\Languages\Txt;
-use ElkArte\Util;
 use ElkArte\Languages\Editor as LangEditor;
 use ElkArte\Languages\Loader as LangLoader;
+use ElkArte\Languages\Txt;
+use ElkArte\SettingsForm\SettingsForm;
+use ElkArte\Util;
 
 /**
  * Manage languages controller class.
@@ -45,7 +43,7 @@ class ManageLanguages extends AbstractController
 	 *
 	 * @event integrate_sa_manage_languages Used to add more sub actions
 	 * @uses ManageSettings language file
-	 * @see  \ElkArte\AbstractController::action_index()
+	 * @see AbstractController::action_index()
 	 */
 	public function action_index()
 	{
@@ -202,7 +200,7 @@ class ManageLanguages extends AbstractController
 			'base_href' => getUrl('admin', ['action' => 'admin', 'area' => 'languages']),
 			'title' => $txt['edit_languages'],
 			'data_check' => array(
-				'class' => function ($rowData) {
+				'class' => static function ($rowData) {
 					if ($rowData['default'])
 					{
 						return 'highlight2';
@@ -224,9 +222,7 @@ class ManageLanguages extends AbstractController
 						'class' => 'centertext',
 					),
 					'data' => array(
-						'function' => function ($rowData) {
-							return '<input type="radio" name="def_language" value="' . $rowData['id'] . '" ' . ($rowData['default'] ? 'checked="checked"' : '') . ' class="input_radio" />';
-						},
+						'function' => static fn($rowData) => '<input type="radio" name="def_language" value="' . $rowData['id'] . '" ' . ($rowData['default'] ? 'checked="checked"' : '') . ' class="input_radio" />',
 						'style' => 'width: 8%;',
 						'class' => 'centertext',
 					),
@@ -236,9 +232,7 @@ class ManageLanguages extends AbstractController
 						'value' => $txt['languages_lang_name'],
 					),
 					'data' => array(
-						'function' => function ($rowData) {
-							return sprintf('<a href="%1$s">%2$s<i class="icon icon-small i-modify"></i></a>', getUrl('admin', ['action' => 'admin', 'area' => 'languages', 'sa' => 'editlang', 'lid' => $rowData['id']]), $rowData['name']);
-						},
+						'function' => static fn($rowData) => sprintf('<a href="%1$s">%2$s<i class="icon icon-small i-modify"></i></a>', getUrl('admin', ['action' => 'admin', 'area' => 'languages', 'sa' => 'editlang', 'lid' => $rowData['id']]), $rowData['name']),
 					),
 				),
 				'count' => array(
@@ -309,7 +303,7 @@ class ManageLanguages extends AbstractController
 		);
 		$settingsForm = new SettingsForm(SettingsForm::FILE_ADAPTER);
 		$settingsForm->setConfigVars($configVars);
-		$settingsForm->setConfigValues((array) $configValues);
+		$settingsForm->setConfigValues($configValues);
 		$settingsForm->save();
 	}
 
@@ -330,369 +324,6 @@ class ManageLanguages extends AbstractController
 	{
 		// @todo for the moment there is no facility to download packages, so better kill it here
 		throw new Exception('no_access', false);
-
-		Txt::load('ManageSettings');
-		require_once(SUBSDIR . '/Package.subs.php');
-		$fileFunc = FileFunctions::instance();
-
-		// Clearly we need to know what to request.
-		if (!isset($this->_req->query->did))
-		{
-			throw new Exception('no_access', false);
-		}
-
-		// Some lovely context.
-		$context['download_id'] = $this->_req->query->did;
-		$context['sub_template'] = 'download_language';
-		$context['menu_data_' . $context['admin_menu_id']]['current_subsection'] = 'add';
-
-		// Can we actually do the installation - and do they want to?
-		if (!empty($this->_req->post->do_install) && !empty($this->_req->post->copy_file))
-		{
-			checkSession('get');
-			validateToken('admin-dlang');
-
-			$chmod_files = array();
-			$install_files = array();
-
-			// Check writable status.
-			foreach ($this->_req->post->copy_file as $file)
-			{
-				// Check it's not very bad.
-				if (strpos($file, '..') !== false || (strpos($file, 'themes') !== 0 && !preg_match('~agreement\.[A-Za-z-_0-9]+\.txt$~', $file)))
-				{
-					throw new Exception($txt['languages_download_illegal_paths']);
-				}
-
-				$chmod_files[] = BOARDDIR . '/' . $file;
-				$install_files[] = $file;
-			}
-
-			// Call this in case we have work to do.
-			$create_chmod_control = new PackageChmod();
-			$file_status =  $create_chmod_control->createChmodControl($chmod_files);
-			$files_left = $file_status['files']['notwritable'];
-
-			// Something not writable?
-			if (!empty($files_left))
-			{
-				$context['error_message'] = $txt['languages_download_not_chmod'];
-			}
-			// Otherwise, go go go!
-			elseif (!empty($install_files))
-			{
-				// @todo retrieve the language pack per naming pattern from our sites
-				read_tgz_file('http://download.elkarte.net/fetch_language.php?version=' . urlencode(strtr(FORUM_VERSION, array('ElkArte ' => ''))) . ';fetch=' . urlencode($this->_req->query->did), BOARDDIR, false, true, $install_files);
-
-				// Make sure the files aren't stuck in the cache.
-				package_flush_cache();
-				$context['install_complete'] = sprintf($txt['languages_download_complete_desc'], getUrl('admin', ['action' => 'admin', 'area' => 'languages']));
-
-				return;
-			}
-		}
-
-		// @todo Open up the old china.
-		$archive_content = read_tgz_file('http://download.elkarte.net/fetch_language.php?version=' . urlencode(strtr(FORUM_VERSION, array('ElkArte ' => ''))) . ';fetch=' . urlencode($this->_req->query->did), null);
-
-		if (empty($archive_content))
-		{
-			throw new Exception($txt['add_language_error_no_response']);
-		}
-
-		// Now for each of the files, let's do some *stuff*
-		$context['files'] = array(
-			'lang' => array(),
-			'other' => array(),
-		);
-		$context['make_writable'] = array();
-		foreach ($archive_content as $file)
-		{
-			$dirname = dirname($file['filename']);
-			$filename = basename($file['filename']);
-			$extension = substr($filename, strrpos($filename, '.') + 1);
-
-			// Don't do anything with files we don't understand.
-			if (!in_array($extension, array('php', 'jpg', 'gif', 'jpeg', 'png', 'txt')))
-			{
-				continue;
-			}
-
-			// Basic data.
-			$context_data = array(
-				'name' => $filename,
-				'destination' => BOARDDIR . '/' . $file['filename'],
-				'generaldest' => $file['filename'],
-				'size' => $file['size'],
-				// Does chmod status allow the copy?
-				'writable' => false,
-				// Should we suggest they copy this file?
-				'default_copy' => true,
-				// Does the file already exist, if so is it same or different?
-				'exists' => false,
-			);
-
-			// Does the file exist, is it different and can we overwrite?
-			if ($fileFunc->fileExists(BOARDDIR . '/' . $file['filename']))
-			{
-				if ($fileFunc->isWritable(BOARDDIR . '/' . $file['filename']))
-				{
-					$context_data['writable'] = true;
-				}
-
-				// Finally, do we actually think the content has changed?
-				if ($file['size'] == filesize(BOARDDIR . '/' . $file['filename']) && $file['md5'] === md5_file(BOARDDIR . '/' . $file['filename']))
-				{
-					$context_data['exists'] = 'same';
-					$context_data['default_copy'] = false;
-				}
-				// Attempt to discover newline character differences.
-				elseif ($file['md5'] === md5(preg_replace("~[\r]?\n~", "\r\n", file_get_contents(BOARDDIR . '/' . $file['filename']))))
-				{
-					$context_data['exists'] = 'same';
-					$context_data['default_copy'] = false;
-				}
-				else
-				{
-					$context_data['exists'] = 'different';
-				}
-			}
-			// No overwrite?
-			elseif ($fileFunc->isWritable(BOARDDIR . '/' . $dirname))
-			{
-				// Can we at least stick it in the directory...
-				$context_data['writable'] = true;
-			}
-
-			// I love PHP files, that's why I'm a developer and not an artistic type spending my time drinking absinth and living a life of sin...
-			if ($extension === 'php' && preg_match('~\w+\.\w+(?:-utf8)?\.php~', $filename))
-			{
-				$context_data += array(
-					'version' => '??',
-					'cur_version' => false,
-					'version_compare' => 'newer',
-				);
-
-				list ($name,) = explode('.', $filename);
-
-				// Let's get the new version, I like versions, they tell me that I'm up to date.
-				if (preg_match('~\s*Version:\s+(.+?);\s*' . preg_quote($name, '~') . '~i', $file['preview'], $match) == 1)
-				{
-					$context_data['version'] = $match[1];
-				}
-
-				// Now does the old file exist - if so what is it's version?
-				if ($fileFunc->fileExists(BOARDDIR . '/' . $file['filename']))
-				{
-					// OK - what is the current version?
-					$fp = fopen(BOARDDIR . '/' . $file['filename'], 'rb');
-					$header = fread($fp, 768);
-					fclose($fp);
-
-					// Find the version.
-					if (preg_match('~(?://|/\*)\s*Version:\s+(.+?);\s*' . preg_quote($name, '~') . '(?:[\s]{2}|\*/)~i', $header, $match) == 1)
-					{
-						$context_data['cur_version'] = $match[1];
-
-						// How does this compare?
-						if ($context_data['cur_version'] === $context_data['version'])
-						{
-							$context_data['version_compare'] = 'same';
-						}
-						elseif ($context_data['cur_version'] > $context_data['version'])
-						{
-							$context_data['version_compare'] = 'older';
-						}
-
-						// Don't recommend copying if the version is the same.
-						if ($context_data['version_compare'] !== 'newer')
-						{
-							$context_data['default_copy'] = false;
-						}
-					}
-				}
-
-				// Add the context data to the main set.
-				$context['files']['lang'][] = $context_data;
-			}
-			else
-			{
-				// If we think it's a theme thing, work out what the theme is.
-				if (strpos($dirname, 'themes') === 0 && preg_match('~themes[\\/]([^\\/]+)[\\/]~', $dirname, $match))
-				{
-					$theme_name = $match[1];
-				}
-				else
-				{
-					$theme_name = 'misc';
-				}
-
-				// Assume it's an image, could be an acceptance note etc but rare.
-				$context['files']['images'][$theme_name][] = $context_data;
-			}
-
-			// Collect together all non-writable areas.
-			if (!$context_data['writable'])
-			{
-				$context['make_writable'][] = $context_data['destination'];
-			}
-		}
-
-		// So, I'm a perfectionist - let's get the theme names.
-		$indexes = array();
-		foreach ($context['files']['images'] as $k => $dummy)
-		{
-			$indexes[] = $k;
-		}
-
-		$context['theme_names'] = array();
-		if (!empty($indexes))
-		{
-			require_once(SUBSDIR . '/Themes.subs.php');
-			$value_data = array(
-				'query' => array(),
-				'params' => array(),
-			);
-
-			foreach ($indexes as $k => $index)
-			{
-				$value_data['query'][] = 'value LIKE {string:value_' . $k . '}';
-				$value_data['params']['value_' . $k] = '%' . $index;
-			}
-
-			$themes = validateThemeName($indexes, $value_data);
-
-			// Now we have the id_theme we can get the pretty description.
-			if (!empty($themes))
-			{
-				$context['theme_names'] = getBasicThemeInfos($themes);
-			}
-		}
-
-		// Before we go to far can we make anything writable, eh, eh?
-		if (!empty($context['make_writable']))
-		{
-			// What is left to be made writable?
-			$create_chmod_control = new PackageChmod();
-			$file_status =  $create_chmod_control->createChmodControl($context['make_writable']);
-			$context['still_not_writable'] = $file_status['files']['notwritable'];
-
-			// Mark those which are now writable as such.
-			foreach ($context['files'] as $type => $data)
-			{
-				if ($type === 'lang')
-				{
-					foreach ($data as $k => $file)
-					{
-						if (!$file['writable'] && !in_array($file['destination'], $context['still_not_writable']))
-						{
-							$context['files'][$type][$k]['writable'] = true;
-						}
-					}
-				}
-				else
-				{
-					foreach ($data as $theme => $files)
-					{
-						foreach ($files as $k => $file)
-						{
-							if (!$file['writable'] && !in_array($file['destination'], $context['still_not_writable']))
-							{
-								$context['files'][$type][$theme][$k]['writable'] = true;
-							}
-						}
-					}
-				}
-			}
-
-			// Are we going to need more language stuff?
-			if (!empty($context['still_not_writable']))
-			{
-				Txt::load('Packages');
-			}
-		}
-
-		// This is the list for the main files.
-		$listOptions = array(
-			'id' => 'lang_main_files_list',
-			'title' => $txt['languages_download_main_files'],
-			'get_items' => array(
-				'function' => function () {
-					global $context;
-
-					return $context['files']['lang'];
-				},
-			),
-			'columns' => array(
-				'name' => array(
-					'header' => array(
-						'value' => $txt['languages_download_filename'],
-					),
-					'data' => array(
-						'function' => function ($rowData) {
-							global $txt;
-
-							return '<strong>' . $rowData['name'] . '</strong><br /><span class="smalltext">' . $txt['languages_download_dest'] . ': ' . $rowData['destination'] . '</span>' . ($rowData['version_compare'] == 'older' ? '<br />' . $txt['languages_download_older'] : '');
-						},
-					),
-				),
-				'writable' => array(
-					'header' => array(
-						'value' => $txt['languages_download_writable'],
-					),
-					'data' => array(
-						'function' => function ($rowData) {
-							global $txt;
-
-							return '<span class="' . ($rowData['writable'] ? 'success' : 'error') . ';">' . ($rowData['writable'] ? $txt['yes'] : $txt['no']) . '</span>';
-						},
-					),
-				),
-				'version' => array(
-					'header' => array(
-						'value' => $txt['languages_download_version'],
-					),
-					'data' => array(
-						'function' => function ($rowData) {
-							return '<span class="' . ($rowData['version_compare'] == 'older' ? 'error' : ($rowData['version_compare'] == 'same' ? 'softalert' : 'success')) . ';">' . $rowData['version'] . '</span>';
-						},
-					),
-				),
-				'exists' => array(
-					'header' => array(
-						'value' => $txt['languages_download_exists'],
-					),
-					'data' => array(
-						'function' => function ($rowData) {
-							global $txt;
-
-							return $rowData['exists'] ? ($rowData['exists'] == 'same' ? $txt['languages_download_exists_same'] : $txt['languages_download_exists_different']) : $txt['no'];
-						},
-					),
-				),
-				'copy' => array(
-					'header' => array(
-						'value' => $txt['languages_download_copy'],
-						'class' => 'centertext',
-					),
-					'data' => array(
-						'function' => function ($rowData) {
-							return '<input type="checkbox" name="copy_file[]" value="' . $rowData['generaldest'] . '" ' . ($rowData['default_copy'] ? 'checked="checked"' : '') . ' class="input_check" />';
-						},
-						'style' => 'width: 4%;',
-						'class' => 'centertext',
-					),
-				),
-			),
-		);
-
-		// Kill the cache, as it is now invalid..
-		$cache = Cache::instance();
-		$cache->put('known_languages', null, $cache->maxLevel(1) ? 86400 : 3600);
-
-		createList($listOptions);
-
-		createToken('admin-dlang');
 	}
 
 	/**
@@ -712,7 +343,7 @@ class ManageLanguages extends AbstractController
 		$context['sub_template'] = 'modify_language_entries';
 
 		$context['lang_id'] = $this->_req->query->lid;
-		$file_id = !empty($this->_req->post->tfid) ? $this->_req->post->tfid : '';
+		$file_id = empty($this->_req->post->tfid) ? '' : $this->_req->post->tfid;
 
 		// Clean the ID - just in case.
 		preg_match('~([A-Za-z0-9_-]+)~', $context['lang_id'], $matches);
@@ -725,14 +356,12 @@ class ManageLanguages extends AbstractController
 		$lang_dirs = glob($base_lang_dir . '/*', GLOB_ONLYDIR);
 
 		// Now for every theme get all the files and stick them in context!
-		$context['possible_files'] = array_map(static function($file) use ($file_id, $txt) {
-			return [
-				'id' => basename($file, '.php'),
-				'name' => $txt['lang_file_desc_' . basename($file)] ?? basename($file),
-				'path' => $file,
-				'selected' => $file_id === basename($file),
-			];
-		}, $lang_dirs);
+		$context['possible_files'] = array_map(static fn($file) => [
+			'id' => basename($file, '.php'),
+			'name' => $txt['lang_file_desc_' . basename($file)] ?? basename($file),
+			'path' => $file,
+			'selected' => $file_id === basename($file),
+		], $lang_dirs);
 
 		if ($context['lang_id'] !== 'english')
 		{

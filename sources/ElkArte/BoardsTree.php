@@ -31,7 +31,7 @@ class BoardsTree
 	protected $cat_tree = [];
 	protected $boards = [];
 	protected $boardList = [];
-	protected $db = null;
+	protected $db;
 
 	public function __construct(QueryInterface $db)
 	{
@@ -50,7 +50,7 @@ class BoardsTree
 	 *
 	 * @param array $query
 	 *
-	 * @throws \ElkArte\Exceptions\Exception no_valid_parent
+	 * @throws Exception no_valid_parent
 	 */
 	protected function loadBoardTree($query = array())
 	{
@@ -109,8 +109,8 @@ class BoardsTree
 					'level' => $row['child_level'],
 					'order' => (int) $row['board_order'],
 					'name' => $row['board_name'],
-					'member_groups' => explode(',', $row['member_groups']),
-					'deny_groups' => explode(',', $row['deny_member_groups']),
+					'member_groups' => array_map('intval', explode(',', $row['member_groups'])),
+					'deny_groups' => array_map('intval', explode(',', $row['deny_member_groups'])),
 					'description' => $row['description'],
 					'count_posts' => empty($row['count_posts']),
 					'old_posts' => empty($row['old_posts']),
@@ -268,7 +268,7 @@ class BoardsTree
 	{
 		if (isset($this->boards[$id]))
 		{
-			return $this->boards[$id];
+			return (int) $this->boards[$id];
 		}
 
 		throw new \Exception('Board id doesn\'t exist: ' . $id);

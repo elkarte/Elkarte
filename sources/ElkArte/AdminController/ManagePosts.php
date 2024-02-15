@@ -40,7 +40,7 @@ class ManagePosts extends AbstractController
 	 * - Requires (and checks for) the admin_forum permission.
 	 *
 	 * @event integrate_sa_manage_posts used to add new subactions
-	 * @see \ElkArte\AbstractController::action_index()
+	 * @see AbstractController::action_index()
 	 */
 	public function action_index()
 	{
@@ -53,7 +53,7 @@ class ManagePosts extends AbstractController
 				$this, 'action_censor', 'permission' => 'admin_forum'),
 			'topics' => array(
 				'function' => 'action_index',
-				'controller' => '\\ElkArte\\AdminController\\ManageTopics',
+				'controller' => ManageTopics::class,
 				'permission' => 'admin_forum'),
 		);
 
@@ -121,7 +121,7 @@ class ManagePosts extends AbstractController
 
 				foreach ($this->_req->post->censortext as $c)
 				{
-					list ($censored_vulgar[], $censored_proper[]) = array_pad(explode('=', trim($c)), 2, '');
+					[$censored_vulgar[], $censored_proper[]] = array_pad(explode('=', trim($c)), 2, '');
 				}
 			}
 			elseif (isset($this->_req->post->censor_vulgar, $this->_req->post->censor_proper))
@@ -178,7 +178,7 @@ class ManagePosts extends AbstractController
 		$context['censored_words'] = array();
 		foreach ($censor_vulgar as $i => $censor_vulgar_i)
 		{
-			if (empty($censor_vulgar_i))
+			if ($censor_vulgar_i === '' || $censor_vulgar_i === '0')
 			{
 				continue;
 			}
@@ -279,7 +279,7 @@ class ManagePosts extends AbstractController
 			// Set a min quote length of 3 lines of text (@ default font size)
 			if (!empty($this->_req->post->heightBeforeShowMore))
 			{
-				$this->_req->post->heightBeforeShowMore = (int) max((int) $this->_req->post->heightBeforeShowMore, 155);
+				$this->_req->post->heightBeforeShowMore = max((int) $this->_req->post->heightBeforeShowMore, 155);
 			}
 
 			call_integration_hook('integrate_save_post_settings');

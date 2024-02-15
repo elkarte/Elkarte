@@ -40,7 +40,7 @@ class ManageScheduledTasks extends AbstractController
 	 * @uses ManageScheduledTasks template file
 	 * @uses ManageScheduledTasks language file
 	 *
-	 * @see  \ElkArte\AbstractController::action_index()
+	 * @see  AbstractController::action_index()
 	 */
 	public function action_index()
 	{
@@ -160,9 +160,7 @@ class ManageScheduledTasks extends AbstractController
 			'title' => $txt['maintain_tasks'],
 			'base_href' => getUrl('admin', ['action' => 'admin', 'area' => 'scheduledtasks']),
 			'get_items' => array(
-				'function' => function () {
-					return $this->list_getScheduledTasks();
-				},
+				'function' => fn() => $this->list_getScheduledTasks(),
 			),
 			'columns' => array(
 				'name' => array(
@@ -297,6 +295,7 @@ class ManageScheduledTasks extends AbstractController
 		{
 			throw new Exception('no_access', false);
 		}
+
 		$this->_req->query->tid = (int) $this->_req->query->tid;
 
 		// Saving?
@@ -313,6 +312,7 @@ class ManageScheduledTasks extends AbstractController
 			{
 				$matches[2] = 0;
 			}
+
 			if (!isset($matches[1]) || $matches[1] > 23)
 			{
 				$matches[1] = 0;
@@ -332,7 +332,7 @@ class ManageScheduledTasks extends AbstractController
 			}
 
 			// Is it disabled?
-			$disabled = !isset($this->_req->post->enabled) ? 1 : 0;
+			$disabled = isset($this->_req->post->enabled) ? 0 : 1;
 
 			// Do the update!
 			$this->_req->query->tid = (int) $this->_req->query->tid;
@@ -384,14 +384,10 @@ class ManageScheduledTasks extends AbstractController
 			'base_href' => $context['admin_area'] === 'scheduledtasks' ? getUrl('admin', ['action' => 'admin', 'area' => 'scheduledtasks', 'sa' => 'tasklog']) : getUrl('admin', ['action' => 'admin', 'area' => 'logs', 'sa' => 'tasklog']),
 			'default_sort_col' => 'date',
 			'get_items' => array(
-				'function' => function ($start, $items_per_page, $sort) {
-					return $this->list_getTaskLogEntries($start, $items_per_page, $sort);
-				},
+				'function' => fn($start, $items_per_page, $sort) => $this->list_getTaskLogEntries($start, $items_per_page, $sort),
 			),
 			'get_count' => array(
-				'function' => function () {
-					return $this->list_getNumTaskLogEntries();
-				},
+				'function' => fn() => $this->list_getNumTaskLogEntries(),
 			),
 			'columns' => array(
 				'name' => array(
@@ -407,9 +403,7 @@ class ManageScheduledTasks extends AbstractController
 						'value' => $txt['scheduled_log_time_run'],
 					),
 					'data' => array(
-						'function' => function ($rowData) {
-							return standardTime($rowData['time_run'], true);
-						},
+						'function' => static fn($rowData) => standardTime($rowData['time_run'], true),
 					),
 					'sort' => array(
 						'default' => 'lst.id_log DESC',
@@ -438,7 +432,7 @@ class ManageScheduledTasks extends AbstractController
 						'value' => $txt['scheduled_log_completed'],
 					),
 					'data' => array(
-						'function' => function ($rowData) {
+						'function' => static function ($rowData) {
 							global $txt;
 
 							return '<i class="icon ' . ($rowData['task_completed'] ? 'i-check' : 'i-fail') . '" title="' . sprintf($txt[$rowData['task_completed'] ? 'maintain_done' : 'maintain_fail'], $rowData['name']) . '" />';

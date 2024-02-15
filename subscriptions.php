@@ -143,7 +143,7 @@ $request = $db->query('', '
 		'current_member' => $member_id,
 	)
 );
-if ($request->num_rows() == 0)
+if ($request->num_rows() === 0)
 {
 	generateSubscriptionError(sprintf($txt['paid_count_not_find_subscription_log'], $member_id, $subscription_id), $notify_users);
 }

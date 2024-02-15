@@ -24,6 +24,8 @@ use ElkArte\Exceptions\Exception;
 use ElkArte\Hooks;
 use ElkArte\Languages\Txt;
 use ElkArte\Menu\Menu;
+use ElkArte\Packages\Packages;
+use ElkArte\Packages\PackageServers;
 use ElkArte\User;
 use ElkArte\XmlArray;
 
@@ -43,7 +45,7 @@ class Admin extends AbstractController
 	 * @var string[] areas to find current installed status and installed version
 	 */
 	private $_checkFor = array('gd', 'imagick', 'db_server', 'php', 'server',
-							   'zend', 'apc', 'memcache', 'memcached', 'opcache');
+		'zend', 'apc', 'memcache', 'memcached', 'opcache');
 
 	/**
 	 * Pre Dispatch, called before other methods.
@@ -127,19 +129,19 @@ class Admin extends AbstractController
 				'areas' => array(
 					'index' => array(
 						'label' => $txt['admin_center'],
-						'controller' => '\\ElkArte\\AdminController\\Admin',
+						'controller' => Admin::class,
 						'function' => 'action_home',
 						'class' => 'i-home i-admin',
 					),
 					'credits' => array(
 						'label' => $txt['support_credits_title'],
-						'controller' => '\\ElkArte\\AdminController\\Admin',
+						'controller' => Admin::class,
 						'function' => 'action_credits',
 						'class' => 'i-support i-admin',
 					),
 					'maillist' => array(
 						'label' => $txt['mail_center'],
-						'controller' => '\\ElkArte\\AdminController\\ManageMaillist',
+						'controller' => ManageMaillist::class,
 						'function' => 'action_index',
 						'class' => 'i-envelope-blank i-admin',
 						'permission' => array('approve_emails', 'admin_forum'),
@@ -154,7 +156,7 @@ class Admin extends AbstractController
 					),
 					'news' => array(
 						'label' => $txt['news_title'],
-						'controller' => '\\ElkArte\\AdminController\\ManageNews',
+						'controller' => ManageNews::class,
 						'function' => 'action_index',
 						'class' => 'i-post-text i-admin',
 						'permission' => array('edit_news', 'send_mail', 'admin_forum'),
@@ -166,7 +168,7 @@ class Admin extends AbstractController
 					),
 					'packages' => array(
 						'label' => $txt['package'],
-						'controller' => '\\ElkArte\\Packages\\Packages',
+						'controller' => Packages::class,
 						'function' => 'action_index',
 						'permission' => array('admin_forum'),
 						'class' => 'i-package i-admin',
@@ -178,14 +180,14 @@ class Admin extends AbstractController
 					),
 					'packageservers' => array(
 						'label' => $txt['package_servers'],
-						'controller' => '\\ElkArte\\Packages\\PackageServers',
+						'controller' => PackageServers::class,
 						'function' => 'action_index',
 						'permission' => array('admin_forum'),
 						'class' => 'i-package i-admin',
 						'hidden' => true,
 					),
 					'search' => array(
-						'controller' => '\\ElkArte\\AdminController\\Admin',
+						'controller' => Admin::class,
 						'function' => 'action_search',
 						'permission' => array('admin_forum'),
 						'class' => 'i-search i-admin',
@@ -193,7 +195,7 @@ class Admin extends AbstractController
 						'hidden' => true,
 					),
 					'adminlogoff' => array(
-						'controller' => '\\ElkArte\\AdminController\\Admin',
+						'controller' => Admin::class,
 						'function' => 'action_endsession',
 						'label' => $txt['admin_logoff'],
 						'enabled' => empty($modSettings['securityDisable']),
@@ -207,13 +209,13 @@ class Admin extends AbstractController
 				'areas' => array(
 					'corefeatures' => array(
 						'label' => $txt['core_settings_title'],
-						'controller' => '\\ElkArte\\AdminController\\CoreFeatures',
+						'controller' => CoreFeatures::class,
 						'function' => 'action_index',
 						'class' => 'i-cog i-admin',
 					),
 					'featuresettings' => array(
 						'label' => $txt['modSettings_title'],
-						'controller' => '\\ElkArte\\AdminController\\ManageFeatures',
+						'controller' => ManageFeatures::class,
 						'function' => 'action_index',
 						'class' => 'i-switch-on i-admin',
 						'subsections' => array(
@@ -229,7 +231,7 @@ class Admin extends AbstractController
 					),
 					'serversettings' => array(
 						'label' => $txt['admin_server_settings'],
-						'controller' => '\\ElkArte\\AdminController\\ManageServer',
+						'controller' => ManageServer::class,
 						'function' => 'action_index',
 						'class' => 'i-menu i-admin',
 						'subsections' => array(
@@ -243,7 +245,7 @@ class Admin extends AbstractController
 					),
 					'securitysettings' => array(
 						'label' => $txt['admin_security_moderation'],
-						'controller' => '\\ElkArte\\AdminController\\ManageSecurity',
+						'controller' => ManageSecurity::class,
 						'function' => 'action_index',
 						'class' => 'i-key i-admin',
 						'subsections' => array(
@@ -254,7 +256,7 @@ class Admin extends AbstractController
 					),
 					'theme' => array(
 						'label' => $txt['theme_admin'],
-						'controller' => '\\ElkArte\\AdminController\\ManageThemes',
+						'controller' => ManageThemes::class,
 						'function' => 'action_index',
 						'custom_url' => getUrl('admin', ['action' => 'admin', 'area' => 'theme']),
 						'class' => 'i-modify i-admin',
@@ -266,14 +268,14 @@ class Admin extends AbstractController
 					),
 					'current_theme' => array(
 						'label' => $txt['theme_current_settings'],
-						'controller' => '\\ElkArte\\AdminController\\ManageThemes',
+						'controller' => ManageThemes::class,
 						'function' => 'action_index',
 						'custom_url' => getUrl('admin', ['action' => 'admin', 'area' => 'theme', 'sa' => 'list', 'th' => $settings['theme_id']]),
 						'class' => 'i-paint i-admin',
 					),
 					'languages' => array(
 						'label' => $txt['language_configuration'],
-						'controller' => '\\ElkArte\\AdminController\\ManageLanguages',
+						'controller' => ManageLanguages::class,
 						'function' => 'action_index',
 						'class' => 'i-language i-admin',
 						'subsections' => array(
@@ -284,7 +286,7 @@ class Admin extends AbstractController
 					),
 					'addonsettings' => array(
 						'label' => $txt['admin_modifications'],
-						'controller' => '\\ElkArte\\AdminController\\AddonSettings',
+						'controller' => AddonSettings::class,
 						'function' => 'action_index',
 						'class' => 'i-puzzle i-admin',
 						'subsections' => array(
@@ -299,7 +301,7 @@ class Admin extends AbstractController
 				'areas' => array(
 					'manageboards' => array(
 						'label' => $txt['admin_boards'],
-						'controller' => '\\ElkArte\\AdminController\\ManageBoards',
+						'controller' => ManageBoards::class,
 						'function' => 'action_index',
 						'class' => 'i-directory i-admin',
 						'permission' => array('manage_boards'),
@@ -311,7 +313,7 @@ class Admin extends AbstractController
 					),
 					'postsettings' => array(
 						'label' => $txt['manageposts'],
-						'controller' => '\\ElkArte\\AdminController\\ManagePosts',
+						'controller' => ManagePosts::class,
 						'function' => 'action_index',
 						'permission' => array('admin_forum'),
 						'class' => 'i-post-text i-admin',
@@ -323,14 +325,14 @@ class Admin extends AbstractController
 					),
 					'editor' => array(
 						'label' => $txt['editor_manage'],
-						'controller' => '\\ElkArte\\AdminController\\ManageEditor',
+						'controller' => ManageEditor::class,
 						'function' => 'action_index',
 						'class' => 'i-modify i-admin',
 						'permission' => array('manage_bbc'),
 					),
 					'smileys' => array(
 						'label' => $txt['smileys_manage'],
-						'controller' => '\\ElkArte\\AdminController\\ManageSmileys',
+						'controller' => ManageSmileys::class,
 						'function' => 'action_index',
 						'class' => 'i-smiley-blank i-admin',
 						'permission' => array('manage_smileys'),
@@ -345,7 +347,7 @@ class Admin extends AbstractController
 					),
 					'manageattachments' => array(
 						'label' => $txt['attachments_avatars'],
-						'controller' => '\\ElkArte\\AdminController\\ManageAttachments',
+						'controller' => ManageAttachments::class,
 						'function' => 'action_index',
 						'class' => 'i-paperclip i-admin',
 						'permission' => array('manage_attachments'),
@@ -359,7 +361,7 @@ class Admin extends AbstractController
 					),
 					'managesearch' => array(
 						'label' => $txt['manage_search'],
-						'controller' => '\\ElkArte\\AdminController\\ManageSearch',
+						'controller' => ManageSearch::class,
 						'function' => 'action_index',
 						'class' => 'i-search i-admin',
 						'permission' => array('admin_forum'),
@@ -378,14 +380,14 @@ class Admin extends AbstractController
 				'areas' => array(
 					'viewmembers' => array(
 						'label' => $txt['admin_users'],
-						'controller' => '\\ElkArte\\AdminController\\ManageMembers',
+						'controller' => ManageMembers::class,
 						'function' => 'action_index',
 						'class' => 'i-user i-admin',
 						'permission' => array('moderate_forum'),
 					),
 					'membergroups' => array(
 						'label' => $txt['admin_groups'],
-						'controller' => '\\ElkArte\\AdminController\\ManageMembergroups',
+						'controller' => ManageMembergroups::class,
 						'function' => 'action_index',
 						'class' => 'i-users',
 						'permission' => array('manage_membergroups'),
@@ -397,7 +399,7 @@ class Admin extends AbstractController
 					),
 					'permissions' => array(
 						'label' => $txt['edit_permissions'],
-						'controller' => '\\ElkArte\\AdminController\\ManagePermissions',
+						'controller' => ManagePermissions::class,
 						'function' => 'action_index',
 						'class' => 'i-key i-admin',
 						'permission' => array('manage_permissions'),
@@ -411,7 +413,7 @@ class Admin extends AbstractController
 					),
 					'ban' => array(
 						'label' => $txt['ban_title'],
-						'controller' => '\\ElkArte\\AdminController\\ManageBans',
+						'controller' => ManageBans::class,
 						'function' => 'action_index',
 						'class' => 'i-thumbdown i-admin',
 						'permission' => 'manage_bans',
@@ -424,7 +426,7 @@ class Admin extends AbstractController
 					),
 					'regcenter' => array(
 						'label' => $txt['registration_center'],
-						'controller' => '\\ElkArte\\AdminController\\ManageRegistration',
+						'controller' => ManageRegistration::class,
 						'function' => 'action_index',
 						'class' => 'i-user-plus i-admin',
 						'permission' => array('admin_forum', 'moderate_forum'),
@@ -439,7 +441,7 @@ class Admin extends AbstractController
 					'sengines' => array(
 						'label' => $txt['search_engines'],
 						'enabled' => featureEnabled('sp'),
-						'controller' => '\\ElkArte\\AdminController\\ManageSearchEngines',
+						'controller' => ManageSearchEngines::class,
 						'function' => 'action_index',
 						'class' => 'i-website i-admin',
 						'permission' => 'admin_forum',
@@ -453,7 +455,7 @@ class Admin extends AbstractController
 					'paidsubscribe' => array(
 						'label' => $txt['paid_subscriptions'],
 						'enabled' => featureEnabled('ps'),
-						'controller' => '\\ElkArte\\AdminController\\ManagePaid',
+						'controller' => ManagePaid::class,
 						'class' => 'i-credit i-admin',
 						'function' => 'action_index',
 						'permission' => 'admin_forum',
@@ -470,7 +472,7 @@ class Admin extends AbstractController
 				'areas' => array(
 					'maintain' => array(
 						'label' => $txt['maintain_title'],
-						'controller' => '\\ElkArte\\AdminController\\Maintenance',
+						'controller' => Maintenance::class,
 						'function' => 'action_index',
 						'class' => 'i-cog i-admin',
 						'subsections' => array(
@@ -484,7 +486,7 @@ class Admin extends AbstractController
 					),
 					'logs' => array(
 						'label' => $txt['logs'],
-						'controller' => '\\ElkArte\\AdminController\\AdminLog',
+						'controller' => AdminLog::class,
 						'function' => 'action_index',
 						'class' => 'i-comments i-admin',
 						'subsections' => array(
@@ -499,7 +501,7 @@ class Admin extends AbstractController
 					),
 					'scheduledtasks' => array(
 						'label' => $txt['maintain_tasks'],
-						'controller' => '\\ElkArte\\AdminController\\ManageScheduledTasks',
+						'controller' => ManageScheduledTasks::class,
 						'function' => 'action_index',
 						'class' => 'i-calendar i-admin',
 						'subsections' => array(
@@ -509,7 +511,7 @@ class Admin extends AbstractController
 					),
 					'mailqueue' => array(
 						'label' => $txt['mailqueue_title'],
-						'controller' => '\\ElkArte\\AdminController\\ManageMail',
+						'controller' => ManageMail::class,
 						'function' => 'action_index',
 						'class' => 'i-envelope-blank i-admin',
 						'subsections' => array(
@@ -520,13 +522,13 @@ class Admin extends AbstractController
 					'reports' => array(
 						'enabled' => featureEnabled('rg'),
 						'label' => $txt['generate_reports'],
-						'controller' => '\\ElkArte\\AdminController\\Reports',
+						'controller' => Reports::class,
 						'function' => 'action_index',
 						'class' => 'i-pie-chart i-admin',
 					),
 					'repairboards' => array(
 						'label' => $txt['admin_repair'],
-						'controller' => '\\ElkArte\\AdminController\\RepairBoards',
+						'controller' => RepairBoards::class,
 						'function' => 'action_repairboards',
 						'select' => 'maintain',
 						'hidden' => true,
@@ -579,7 +581,7 @@ class Admin extends AbstractController
 			'name' => $txt['admin_center'],
 		);
 
-		if (isset($admin_include_data['current_area']) && $admin_include_data['current_area'] != 'index')
+		if (isset($admin_include_data['current_area']) && $admin_include_data['current_area'] !== 'index')
 		{
 			$context['linktree'][] = array(
 				'url' => getUrl('admin', ['action' => 'admin', 'area' => $admin_include_data['current_area'], '{session_data}']),
@@ -587,14 +589,20 @@ class Admin extends AbstractController
 			);
 		}
 
-		if (isset($admin_include_data['current_subsection'], $admin_include_data['subsections'][$admin_include_data['current_subsection']])
-			&& $admin_include_data['subsections'][$admin_include_data['current_subsection']]['label'] != $admin_include_data['label'])
+		if (!isset($admin_include_data['current_subsection'], $admin_include_data['subsections'][$admin_include_data['current_subsection']]))
 		{
-			$context['linktree'][] = array(
-				'url' => getUrl('admin', ['action' => 'admin', 'area' => $admin_include_data['current_area'], 'sa' => $admin_include_data['current_subsection'], '{session_data}']),
-				'name' => $admin_include_data['subsections'][$admin_include_data['current_subsection']]['label'],
-			);
+			return;
 		}
+
+		if ($admin_include_data['subsections'][$admin_include_data['current_subsection']]['label'] === $admin_include_data['label'])
+		{
+			return;
+		}
+
+		$context['linktree'][] = array(
+			'url' => getUrl('admin', ['action' => 'admin', 'area' => $admin_include_data['current_area'], 'sa' => $admin_include_data['current_subsection'], '{session_data}']),
+			'name' => $admin_include_data['subsections'][$admin_include_data['current_subsection']]['label'],
+		);
 	}
 
 	/**
@@ -793,40 +801,40 @@ class Admin extends AbstractController
 		// This is a special array of functions that contain setting data
 		// - we query all these to simply pull all setting bits!
 		$settings_search = array(
-			array('settings_search', 'area=logs;sa=pruning', '\\ElkArte\\AdminController\\AdminLog'),
-			array('config_vars', 'area=corefeatures', '\\ElkArte\\AdminController\\CoreFeatures'),
-			array('basicSettings_search', 'area=featuresettings;sa=basic', '\\ElkArte\\AdminController\\ManageFeatures'),
-			array('layoutSettings_search', 'area=featuresettings;sa=layout', '\\ElkArte\\AdminController\\ManageFeatures'),
-			array('karmaSettings_search', 'area=featuresettings;sa=karma', '\\ElkArte\\AdminController\\ManageFeatures'),
-			array('likesSettings_search', 'area=featuresettings;sa=likes', '\\ElkArte\\AdminController\\ManageFeatures'),
-			array('mentionSettings_search', 'area=featuresettings;sa=mention', '\\ElkArte\\AdminController\\ManageFeatures'),
-			array('signatureSettings_search', 'area=featuresettings;sa=sig', '\\ElkArte\\AdminController\\ManageFeatures'),
-			array('settings_search', 'area=addonsettings;sa=general', '\\ElkArte\\AdminController\\AddonSettings'),
-			array('settings_search', 'area=manageattachments;sa=attachments', '\\ElkArte\\AdminController\\ManageAttachments'),
-			array('settings_search', 'area=manageattachments;sa=avatars', '\\ElkArte\\AdminController\\ManageAvatars'),
-			array('settings_search', 'area=postsettings;sa=bbc', '\\ElkArte\\AdminController\\ManageEditor'),
-			array('settings_search', 'area=manageboards;sa=settings', '\\ElkArte\\AdminController\\ManageBoards'),
-			array('settings_search', 'area=languages;sa=settings', '\\ElkArte\\AdminController\\ManageLanguages'),
-			array('settings_search', 'area=mailqueue;sa=settings', '\\ElkArte\\AdminController\\ManageMail'),
-			array('settings_search', 'area=maillist;sa=emailsettings', '\\ElkArte\\AdminController\\ManageMaillist'),
-			array('settings_search', 'area=membergroups;sa=settings', '\\ElkArte\\AdminController\\ManageMembergroups'),
-			array('settings_search', 'area=news;sa=settings', '\\ElkArte\\AdminController\\ManageNews'),
-			array('settings_search', 'area=paidsubscribe;sa=settings', '\\ElkArte\\AdminController\\ManagePaid'),
-			array('settings_search', 'area=permissions;sa=settings', '\\ElkArte\\AdminController\\ManagePermissions'),
-			array('settings_search', 'area=postsettings;sa=posts', '\\ElkArte\\AdminController\\ManagePosts'),
-			array('settings_search', 'area=regcenter;sa=settings', '\\ElkArte\\AdminController\\ManageRegistration'),
-			array('settings_search', 'area=managesearch;sa=settings', '\\ElkArte\\AdminController\\ManageSearch'),
-			array('settings_search', 'area=sengines;sa=settings', '\\ElkArte\\AdminController\\ManageSearchEngines'),
-			array('securitySettings_search', 'area=securitysettings;sa=general', '\\ElkArte\\AdminController\\ManageSecurity'),
-			array('spamSettings_search', 'area=securitysettings;sa=spam', '\\ElkArte\\AdminController\\ManageSecurity'),
-			array('moderationSettings_search', 'area=securitysettings;sa=moderation', '\\ElkArte\\AdminController\\ManageSecurity'),
-			array('generalSettings_search', 'area=serversettings;sa=general', '\\ElkArte\\AdminController\\ManageServer'),
-			array('databaseSettings_search', 'area=serversettings;sa=database', '\\ElkArte\\AdminController\\ManageServer'),
-			array('cookieSettings_search', 'area=serversettings;sa=cookie', '\\ElkArte\\AdminController\\ManageServer'),
-			array('cacheSettings_search', 'area=serversettings;sa=cache', '\\ElkArte\\AdminController\\ManageServer'),
-			array('balancingSettings_search', 'area=serversettings;sa=loads', '\\ElkArte\\AdminController\\ManageServer'),
-			array('settings_search', 'area=smileys;sa=settings', '\\ElkArte\\AdminController\\ManageSmileys'),
-			array('settings_search', 'area=postsettings;sa=topics', '\\ElkArte\\AdminController\\ManageTopics'),
+			array('settings_search', 'area=logs;sa=pruning', AdminLog::class),
+			array('config_vars', 'area=corefeatures', CoreFeatures::class),
+			array('basicSettings_search', 'area=featuresettings;sa=basic', ManageFeatures::class),
+			array('layoutSettings_search', 'area=featuresettings;sa=layout', ManageFeatures::class),
+			array('karmaSettings_search', 'area=featuresettings;sa=karma', ManageFeatures::class),
+			array('likesSettings_search', 'area=featuresettings;sa=likes', ManageFeatures::class),
+			array('mentionSettings_search', 'area=featuresettings;sa=mention', ManageFeatures::class),
+			array('signatureSettings_search', 'area=featuresettings;sa=sig', ManageFeatures::class),
+			array('settings_search', 'area=addonsettings;sa=general', AddonSettings::class),
+			array('settings_search', 'area=manageattachments;sa=attachments', ManageAttachments::class),
+			array('settings_search', 'area=manageattachments;sa=avatars', ManageAvatars::class),
+			array('settings_search', 'area=postsettings;sa=bbc', ManageEditor::class),
+			array('settings_search', 'area=manageboards;sa=settings', ManageBoards::class),
+			array('settings_search', 'area=languages;sa=settings', ManageLanguages::class),
+			array('settings_search', 'area=mailqueue;sa=settings', ManageMail::class),
+			array('settings_search', 'area=maillist;sa=emailsettings', ManageMaillist::class),
+			array('settings_search', 'area=membergroups;sa=settings', ManageMembergroups::class),
+			array('settings_search', 'area=news;sa=settings', ManageNews::class),
+			array('settings_search', 'area=paidsubscribe;sa=settings', ManagePaid::class),
+			array('settings_search', 'area=permissions;sa=settings', ManagePermissions::class),
+			array('settings_search', 'area=postsettings;sa=posts', ManagePosts::class),
+			array('settings_search', 'area=regcenter;sa=settings', ManageRegistration::class),
+			array('settings_search', 'area=managesearch;sa=settings', ManageSearch::class),
+			array('settings_search', 'area=sengines;sa=settings', ManageSearchEngines::class),
+			array('securitySettings_search', 'area=securitysettings;sa=general', ManageSecurity::class),
+			array('spamSettings_search', 'area=securitysettings;sa=spam', ManageSecurity::class),
+			array('moderationSettings_search', 'area=securitysettings;sa=moderation', ManageSecurity::class),
+			array('generalSettings_search', 'area=serversettings;sa=general', ManageServer::class),
+			array('databaseSettings_search', 'area=serversettings;sa=database', ManageServer::class),
+			array('cookieSettings_search', 'area=serversettings;sa=cookie', ManageServer::class),
+			array('cacheSettings_search', 'area=serversettings;sa=cache', ManageServer::class),
+			array('balancingSettings_search', 'area=serversettings;sa=loads', ManageServer::class),
+			array('settings_search', 'area=smileys;sa=settings', ManageSmileys::class),
+			array('settings_search', 'area=postsettings;sa=topics', ManageTopics::class),
 		);
 
 		// Allow integration to add settings to search
@@ -866,10 +874,10 @@ class Admin extends AbstractController
 		$this->_req->post->membername = un_htmlspecialchars($context['search_term']);
 		$this->_req->post->types = '';
 
-		$managemembers = new ManageMembers(new EventManager());
-		$managemembers->setUser(User::$info);
-		$managemembers->pre_dispatch();
-		$managemembers->action_index();
+		$manageMembers = new ManageMembers(new EventManager());
+		$manageMembers->setUser(User::$info);
+		$manageMembers->pre_dispatch();
+		$manageMembers->action_index();
 	}
 
 	/**
@@ -907,12 +915,12 @@ class Admin extends AbstractController
 		$search_results = fetch_web_data($context['doc_apiurl'] . '?action=query&list=search&srprop=timestamp|snippet&format=xml&srwhat=text&srsearch=' . $postVars);
 
 		// If we didn't get any xml back we are in trouble - perhaps the doc site is overloaded?
-		if (!$search_results || preg_match('~<' . '\?xml\sversion="\d+\.\d+"\?' . '>\s*(<api>.+?</api>)~is', $search_results, $matches) !== 1)
+		if (!$search_results || preg_match('~<\?xml\sversion="\d+\.\d+"\?>\s*(<api>.+?</api>)~is', $search_results, $matches) !== 1)
 		{
 			throw new Exception('cannot_connect_doc_site');
 		}
 
-		$search_results = !empty($matches[1]) ? $matches[1] : '';
+		$search_results = empty($matches[1]) ? '' : $matches[1];
 
 		// Otherwise we simply walk through the XML and stick it in context for display.
 		$context['search_results'] = array();
@@ -936,7 +944,7 @@ class Admin extends AbstractController
 				$context['search_results'][$title] = array(
 					'title' => $title,
 					'relevance' => $relevance++,
-					'snippet' => str_replace('class=\'searchmatch\'', 'class="highlight"', un_htmlspecialchars($result->fetch('@snippet'))),
+					'snippet' => str_replace("class='searchmatch'", 'class="highlight"', un_htmlspecialchars($result->fetch('@snippet'))),
 				);
 			}
 		}

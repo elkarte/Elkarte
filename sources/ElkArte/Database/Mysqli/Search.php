@@ -70,7 +70,7 @@ class Search extends AbstractSearch
 			);
 		}
 
-		if ($request !== false && $request->num_rows() == 1)
+		if ($request !== false && $request->num_rows() === 1)
 		{
 			// Only do this if the user has permission to execute this query.
 			$row = $request->fetch_assoc();
@@ -104,7 +104,7 @@ class Search extends AbstractSearch
 			);
 		}
 
-		if ($request !== false && $request->num_rows() == 1)
+		if ($request !== false && $request->num_rows() === 1)
 		{
 			// Only do this if the user has permission to execute this query.
 			$row = $request->fetch_assoc();

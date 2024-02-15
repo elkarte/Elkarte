@@ -1,9 +1,9 @@
 <?php
 
 use BBC\HtmlParser;
-use PHPUnit\Framework\TestCase;
+use tests\ElkArteCommonSetupTest;
 
-class BBCHTMLSubsTest extends \tests\ElkArteCommonSetupTest
+class BBCHTMLSubsTest extends ElkArteCommonSetupTest
 {
 	protected $bbcTestCases;
 	protected $backupGlobalsExcludeList = ['user_info'];

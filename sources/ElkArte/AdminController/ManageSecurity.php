@@ -20,8 +20,8 @@ namespace ElkArte\AdminController;
 use ElkArte\AbstractController;
 use ElkArte\Action;
 use ElkArte\Cache\Cache;
-use ElkArte\SettingsForm\SettingsForm;
 use ElkArte\Languages\Txt;
+use ElkArte\SettingsForm\SettingsForm;
 
 /**
  * ManageSecurity controller handles the Security and Moderation
@@ -35,7 +35,7 @@ class ManageSecurity extends AbstractController
 	 * This function passes control through to the relevant security tab.
 	 *
 	 * @event integrate_sa_modify_security
-	 * @see \ElkArte\AbstractController::action_index()
+	 * @see AbstractController::action_index()
 	 */
 	public function action_index()
 	{
@@ -205,7 +205,7 @@ class ManageSecurity extends AbstractController
 		}
 
 		// We actually store lots of these together - for efficiency.
-		list ($modSettings['warning_enable'], $modSettings['user_limit'], $modSettings['warning_decrement']) = explode(',', $modSettings['warning_settings']);
+		[$modSettings['warning_enable'], $modSettings['user_limit'], $modSettings['warning_decrement']] = explode(',', $modSettings['warning_settings']);
 
 		$context['post_url'] = getUrl('admin', ['action' => 'admin', 'area' => 'securitysettings', 'save', 'sa' => 'moderation']);
 		$context['settings_title'] = $txt['moderation_settings'];
@@ -284,7 +284,7 @@ class ManageSecurity extends AbstractController
 		}
 
 		// Add in PM spam settings on the fly
-		list ($modSettings['max_pm_recipients'], $modSettings['pm_posts_verification'], $modSettings['pm_posts_per_hour']) = explode(',', $modSettings['pm_spam_settings']);
+		[$modSettings['max_pm_recipients'], $modSettings['pm_posts_verification'], $modSettings['pm_posts_per_hour']] = explode(',', $modSettings['pm_spam_settings']);
 
 		// And the same for guests requiring verification.
 		$modSettings['guests_require_captcha'] = !empty($modSettings['posts_require_captcha']);
@@ -293,7 +293,7 @@ class ManageSecurity extends AbstractController
 		// Some minor javascript for the guest post setting.
 		if ($modSettings['posts_require_captcha'])
 		{
-			theme()->addInlineJavascript('document.getElementById(\'guests_require_captcha\').disabled = true;', true);
+			theme()->addInlineJavascript("document.getElementById('guests_require_captcha').disabled = true;", true);
 		}
 
 		$context['post_url'] = getUrl('admin', ['action' => 'admin', 'area' => 'securitysettings', 'save', 'sa' => 'spam']);
@@ -316,7 +316,7 @@ class ManageSecurity extends AbstractController
 			array('check', 'search_enable_captcha'),
 			// This, my friend, is a cheat :p
 			'guest_verify' => array('check', 'guests_require_captcha', 'postinput' => $txt['setting_guests_require_captcha_desc']),
-			array('int', 'posts_require_captcha', 'postinput' => $txt['posts_require_captcha_desc'], 'onchange' => 'if (this.value > 0){ document.getElementById(\'guests_require_captcha\').checked = true; document.getElementById(\'guests_require_captcha\').disabled = true;} else {document.getElementById(\'guests_require_captcha\').disabled = false;}'),
+			array('int', 'posts_require_captcha', 'postinput' => $txt['posts_require_captcha_desc'], 'onchange' => "if (this.value > 0){ document.getElementById('guests_require_captcha').checked = true; document.getElementById('guests_require_captcha').disabled = true;} else {document.getElementById('guests_require_captcha').disabled = false;}"),
 			array('check', 'guests_report_require_captcha'),
 			// PM Settings
 			array('title', 'antispam_PM'),

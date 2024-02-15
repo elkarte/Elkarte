@@ -45,7 +45,7 @@ class ManageServer extends AbstractController
 	 *
 	 * @event integrate_sa_server_settings
 	 * @uses edit_settings adminIndex.
-	 * @see  \ElkArte\AbstractController::action_index()
+	 * @see AbstractController::action_index()
 	 */
 	public function action_index()
 	{
@@ -150,7 +150,7 @@ class ManageServer extends AbstractController
 
 			$settingsForm->setConfigValues((array) $this->_req->post);
 			$settingsForm->save();
-			redirectexit('action=admin;area=serversettings;sa=general;' . $context['session_var'] . '=' . $context['session_id'] . ';msg=' . (!empty($context['settings_message']) ? $context['settings_message'] : 'core_settings_saved'));
+			redirectexit('action=admin;area=serversettings;sa=general;' . $context['session_var'] . '=' . $context['session_id'] . ';msg=' . (empty($context['settings_message']) ? 'core_settings_saved' : $context['settings_message']));
 		}
 
 		// Fill the config array for the template and all that.
@@ -225,7 +225,7 @@ class ManageServer extends AbstractController
 
 			$settingsForm->setConfigValues((array) $this->_req->post);
 			$settingsForm->save();
-			redirectexit('action=admin;area=serversettings;sa=database;' . $context['session_var'] . '=' . $context['session_id'] . ';msg=' . (!empty($context['settings_message']) ? $context['settings_message'] : 'core_settings_saved'));
+			redirectexit('action=admin;area=serversettings;sa=database;' . $context['session_var'] . '=' . $context['session_id'] . ';msg=' . (empty($context['settings_message']) ? 'core_settings_saved' : $context['settings_message']));
 		}
 
 		// Fill the config array for the template.
@@ -300,7 +300,7 @@ class ManageServer extends AbstractController
 				unset($this->_req->post->globalCookies);
 			}
 
-			if (!empty($this->_req->post->globalCookiesDomain) && strpos($boardurl, $this->_req->post->globalCookiesDomain) === false)
+			if (!empty($this->_req->post->globalCookiesDomain) && strpos($boardurl, (string) $this->_req->post->globalCookiesDomain) === false)
 			{
 				throw new Exception('invalid_cookie_domain', false);
 			}
@@ -330,7 +330,7 @@ class ManageServer extends AbstractController
 				redirectexit('action=admin;area=serversettings;sa=cookie;' . $context['session_var'] . '=' . $original_session_id);
 			}
 
-			redirectexit('action=admin;area=serversettings;sa=cookie;' . $context['session_var'] . '=' . $context['session_id'] . ';msg=' . (!empty($context['settings_message']) ? $context['settings_message'] : 'core_settings_saved'));
+			redirectexit('action=admin;area=serversettings;sa=cookie;' . $context['session_var'] . '=' . $context['session_id'] . ';msg=' . (empty($context['settings_message']) ? 'core_settings_saved' : $context['settings_message']));
 		}
 
 		theme()->addInlineJavascript('
@@ -363,7 +363,7 @@ class ManageServer extends AbstractController
 			array('localCookies', $txt['localCookies'], 'subtext' => $txt['localCookies_note'], 'db', 'check', false, 'localCookies'),
 			array('globalCookies', $txt['globalCookies'], 'subtext' => $txt['globalCookies_note'], 'db', 'check', false, 'globalCookies'),
 			array('globalCookiesDomain', $txt['globalCookiesDomain'], 'subtext' => $txt['globalCookiesDomain_note'], 'db', 'text', false, 'globalCookiesDomain'),
-			array('secureCookies', $txt['secureCookies'], 'subtext' => $txt['secureCookies_note'], 'db', 'check', false, 'secureCookies', 'disabled' => !isset($_SERVER['HTTPS']) || !(strtolower($_SERVER['HTTPS']) === 'on' || strtolower($_SERVER['HTTPS']) == '1')),
+			array('secureCookies', $txt['secureCookies'], 'subtext' => $txt['secureCookies_note'], 'db', 'check', false, 'secureCookies', 'disabled' => !isset($_SERVER['HTTPS']) || strtolower($_SERVER['HTTPS']) !== 'on' && strtolower($_SERVER['HTTPS']) != '1'),
 			array('httponlyCookies', $txt['httponlyCookies'], 'subtext' => $txt['httponlyCookies_note'], 'db', 'check', false, 'httponlyCookies'),
 			'',
 			// Sessions
@@ -475,7 +475,7 @@ class ManageServer extends AbstractController
 		);
 
 		// If the cache engine has specific settings, add them in
-		foreach ($detected as $key => $value)
+		foreach ($detected as $value)
 		{
 			if ($value->isAvailable())
 			{

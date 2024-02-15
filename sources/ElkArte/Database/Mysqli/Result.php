@@ -64,7 +64,7 @@ class Result extends AbstractResult
 	public function num_rows()
 	{
 		// Simply delegate to the native function
-		return mysqli_num_rows($this->result);
+		return (int) mysqli_num_rows($this->result);
 	}
 
 	/**

@@ -618,7 +618,7 @@ function moveTopics($topics, $toBoard, $log = false)
 		)
 	);
 	// Num of rows = 0 -> no topics found. Num of rows > 1 -> topics are on multiple boards.
-	if ($request->num_rows() == 0)
+	if ($request->num_rows() === 0)
 	{
 		return;
 	}
@@ -2547,7 +2547,7 @@ function splitTopic($split1_ID_TOPIC, $splitMessages, $new_subject)
 		)
 	);
 	// You can't select ALL the messages!
-	if ($request->num_rows() == 0)
+	if ($request->num_rows() === 0)
 	{
 		throw new \ElkArte\Exceptions\Exception('selected_all_posts', false);
 	}
@@ -3398,7 +3398,7 @@ function getSubject($id_topic)
 			'search_topic_id' => $id_topic,
 		)
 	);
-	if ($request->num_rows() == 0)
+	if ($request->num_rows() === 0)
 	{
 		throw new \ElkArte\Exceptions\Exception('topic_gone', false);
 	}

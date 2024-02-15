@@ -19,8 +19,8 @@ namespace ElkArte\AdminController;
 
 use ElkArte\AbstractController;
 use ElkArte\Errors\Log;
-use ElkArte\MembersList;
 use ElkArte\Languages\Txt;
+use ElkArte\MembersList;
 
 /**
  * ManageErrors controller, administration of error log.
@@ -34,7 +34,7 @@ class ManageErrors extends AbstractController
 	 * Calls the right handler.
 	 * Requires admin_forum permission.
 	 *
-	 * @see \ElkArte\AbstractController::action_index()
+	 * @see AbstractController::action_index()
 	 */
 	public function action_index()
 	{
@@ -144,7 +144,7 @@ class ManageErrors extends AbstractController
 			// Go back to where we were.
 			if ($type === 'delete')
 			{
-				redirectexit('action=admin;area=logs;sa=errorlog' . (isset($this->_req->query->desc) ? ';desc' : '') . ';start=' . $this->_req->query->start . (!empty($filter) ? ';filter=' . $this->_req->query->filter . ';value=' . $this->_req->query->value : ''));
+				redirectexit('action=admin;area=logs;sa=errorlog' . (isset($this->_req->query->desc) ? ';desc' : '') . ';start=' . $this->_req->query->start . (empty($filter) ? '' : ';filter=' . $this->_req->query->filter . ';value=' . $this->_req->query->value));
 			}
 
 			redirectexit('action=admin;area=logs;sa=errorlog' . (isset($this->_req->query->desc) ? ';desc' : ''));
@@ -196,7 +196,7 @@ class ManageErrors extends AbstractController
 		$context['error_types']['all'] = array(
 			'label' => $txt['errortype_all'],
 			'description' => $txt['errortype_all_desc'] ?? '',
-			'url' => getUrl('admin', ['action' => 'admin', 'area' => 'logs', 'sa' => 'errorlog', $context['sort_direction'] == 'down' ? 'desc' : '']),
+			'url' => getUrl('admin', ['action' => 'admin', 'area' => 'logs', 'sa' => 'errorlog', $context['sort_direction'] === 'down' ? 'desc' : '']),
 			'is_selected' => empty($filter),
 		);
 
@@ -245,11 +245,10 @@ class ManageErrors extends AbstractController
 
 		$filter = $this->_req->getQuery('filter', 'trim', null);
 		$value = $this->_req->getQuery('value', 'trim', null);
-
 		// Set up the filtering...
 		if (isset($value, $filters[$filter]))
 		{
-			$filter = array(
+			return array(
 				'variable' => $filter,
 				'value' => array(
 					'sql' => in_array($filter, array('message', 'url', 'file'))
@@ -260,17 +259,13 @@ class ManageErrors extends AbstractController
 				'entity' => $filters[$filter]
 			);
 		}
-		else
-		{
-			if (isset($filter, $value))
-			{
-				unset($this->_req->query->filter, $this->_req->query->value);
-			}
 
-			$filter = [];
+		if (isset($filter, $value))
+		{
+			unset($this->_req->query->filter, $this->_req->query->value);
 		}
 
-		return $filter;
+		return [];
 	}
 
 	/**
@@ -323,14 +318,14 @@ class ManageErrors extends AbstractController
 					$context['filter']['value']['html'] = '<a href="' . getUrl('profile', ['action' => 'profile', 'u' => $id, 'name' => $name]) . '">' . $name . '</a>';
 					break;
 				case 'url':
-					$context['filter']['value']['html'] = '\'' . strtr(htmlspecialchars((substr($filter['value']['sql'], 0, 1) === '?' ? $scripturl : '') . $filter['value']['sql'], ENT_COMPAT, 'UTF-8'), array('\_' => '_')) . '\'';
+					$context['filter']['value']['html'] = "'" . strtr(htmlspecialchars((substr($filter['value']['sql'], 0, 1) === '?' ? $scripturl : '') . $filter['value']['sql'], ENT_COMPAT, 'UTF-8'), array('\_' => '_')) . "'";
 					break;
 				case 'message':
-					$context['filter']['value']['html'] = '\'' . strtr(htmlspecialchars($filter['value']['sql'], ENT_COMPAT, 'UTF-8'), array("\n" => '<br />', '&lt;br /&gt;' => '<br />', "\t" => '&nbsp;&nbsp;&nbsp;', '\_' => '_', '\\%' => '%', '\\\\' => '\\')) . '\'';
+					$context['filter']['value']['html'] = "'" . strtr(htmlspecialchars($filter['value']['sql'], ENT_COMPAT, 'UTF-8'), array("\n" => '<br />', '&lt;br /&gt;' => '<br />', "\t" => '&nbsp;&nbsp;&nbsp;', '\_' => '_', '\\%' => '%', '\\\\' => '\\')) . "'";
 					$context['filter']['value']['html'] = preg_replace('~&amp;lt;span class=&amp;quot;remove&amp;quot;&amp;gt;(.+?)&amp;lt;/span&amp;gt;~', '$1', $context['filter']['value']['html']);
 					break;
 				case 'error_type':
-					$context['filter']['value']['html'] = '\'' . strtr(htmlspecialchars($filter['value']['sql'], ENT_COMPAT, 'UTF-8'), array("\n" => '<br />', '&lt;br /&gt;' => '<br />', "\t" => '&nbsp;&nbsp;&nbsp;', '\_' => '_', '\\%' => '%', '\\\\' => '\\')) . '\'';
+					$context['filter']['value']['html'] = "'" . strtr(htmlspecialchars($filter['value']['sql'], ENT_COMPAT, 'UTF-8'), array("\n" => '<br />', '&lt;br /&gt;' => '<br />', "\t" => '&nbsp;&nbsp;&nbsp;', '\_' => '_', '\\%' => '%', '\\\\' => '\\')) . "'";
 					break;
 				default:
 					$context['filter']['value']['html'] = &$filter['value']['sql'];

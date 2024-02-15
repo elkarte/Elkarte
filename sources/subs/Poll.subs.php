@@ -228,7 +228,7 @@ function pollInfoForTopic($topicID)
 	);
 
 	// The topic must exist
-	if ($request->num_rows() == 0)
+	if ($request->num_rows() === 0)
 	{
 		return false;
 	}
@@ -265,7 +265,7 @@ function topicFromPoll($pollID)
 	);
 
 	// The topic must exist
-	if ($request->num_rows() == 0)
+	if ($request->num_rows() === 0)
 	{
 		$topicID = false;
 	}
@@ -560,7 +560,7 @@ function pollStarters($id_topic)
 		)
 	);
 
-	if ($request->num_rows() != 0)
+	if ($request->num_rows() !== 0)
 	{
 		$pollStarters = $request->fetch_row();
 	}
