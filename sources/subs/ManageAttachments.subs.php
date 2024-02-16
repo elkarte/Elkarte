@@ -319,34 +319,7 @@ function removeAttachments($condition, $query_type = '', $return_affected_messag
 }
 
 /**
- * How many attachments we have overall.
- *
- * @return int
- */
-function getAttachmentCount()
-{
-	$db = database();
-
-	// Get the number of attachments....
-	$request = $db->query('', '
-		SELECT 
-			COUNT(*)
-		FROM {db_prefix}attachments
-		WHERE attachment_type = {int:attachment_type}
-			AND id_member = {int:guest_id_member}',
-		[
-			'attachment_type' => 0,
-			'guest_id_member' => 0,
-		]
-	);
-	list ($num_attachments) = $request->fetch_row();
-	$request->free_result();
-
-	return (int) $num_attachments;
-}
-
-/**
- * How many attachments we have in a certain folder.
+ * How many attachments the DB says we have in a certain folder.
  *
  * @param string $folder
  *
@@ -375,28 +348,35 @@ function getFolderAttachmentCount($folder)
 }
 
 /**
- * How many avatars do we have. Need to know. :P
+ * How many attachments of a given type we have in the DB
  *
  * @return int
  */
-function getAvatarCount()
+function getAttachmentCountByType($type = 'attachment')
 {
 	$db = database();
 
-	// Get the avatar amount....
+	$types = ['attachment' => 0, 'attachments' => 0, 'avatar' => 1, 'avatars' => 1, 'thumbnail' => 3, 'thumbnails' => 3];
+	$attachmentType = $types[$type] ?? 0;
+
+	// Guests can't have avatars
+	$where = $attachmentType === 1 ? ' AND id_member != {int:guest_id_member}' : ' AND id_member = {int:guest_id_member}';
+
+	// Get the number of attachments....
 	$request = $db->query('', '
 		SELECT 
 			COUNT(*)
 		FROM {db_prefix}attachments
-		WHERE id_member != {int:guest_id_member}',
-		[
+		WHERE attachment_type = {int:attachment_type}' .
+			$where,	[
+			'attachment_type' => $attachmentType,
 			'guest_id_member' => 0,
 		]
 	);
-	list ($num_avatars) = $request->fetch_row();
+	list ($num_attachments) = $request->fetch_row();
 	$request->free_result();
 
-	return (int) $num_avatars;
+	return (int) $num_attachments;
 }
 
 /**
@@ -820,15 +800,19 @@ function repairAttachmentData($start, $fix_errors, $to_fix)
 }
 
 /**
- * Finds avatar files that are not assigned to any members
+ * Function used to find orphan avatars and optionally fix them.
  *
- * - If $fix_errors is set, it will
+ * What it does:
  *
- * @param int $start
- * @param bool $fix_errors
- * @param string[] $to_fix
+ * - Retrieves the attachments that are avatar types and do not belong to any member.
+ * - If $fix_errors is set to true and 'avatar_no_member' is in the $to_fix array, it deletes
+ *   the file from disk and from the DB and returns the id_attachment of the deleted files.
  *
- * @return array
+ * @param int $start The starting point for retrieving attachments.
+ * @param bool $fix_errors Whether to fix errors or not.
+ * @param array $to_fix The list of errors to fix.
+ *
+ * @return array The id_attachments of the deleted files (if $fix_errors is true).
  */
 function findOrphanAvatars($start, $fix_errors, $to_fix)
 {
@@ -874,7 +858,7 @@ function findOrphanAvatars($start, $fix_errors, $to_fix)
 	);
 
 	// Do we need to delete what we have?
-	if ($fix_errors && !empty($to_remove) && in_array('avatar_no_member', $to_fix))
+	if ($fix_errors && !empty($to_remove) && in_array('avatar_no_member', $to_fix, true))
 	{
 		$db->query('', '
 			DELETE FROM {db_prefix}attachments
@@ -955,7 +939,6 @@ function findOrphanAttachments($start, $fix_errors, $to_fix)
 
 /**
  * Get the max attachment ID which is a thumbnail.
- *
  */
 function getMaxThumbnail()
 {
@@ -978,7 +961,6 @@ function getMaxThumbnail()
 
 /**
  * Get the max attachment ID.
- *
  */
 function maxAttachment()
 {
@@ -1511,8 +1493,13 @@ function list_getFiles($start, $items_per_page, $sort, $browse_type)
 }
 
 /**
- * Return the overall attachments size
+ * Calculates the overall size of all attachments, excluding avatars & thumbnails
  *
+ * What it does:
+ * - Retrieves the size of all attachments in the database.
+ * - Excludes avatars from the calculation.
+ *
+ * @return string The overall size of all attachments in a human-readable format.
  */
 function overallAttachmentsSize()
 {
@@ -1535,8 +1522,15 @@ function overallAttachmentsSize()
 }
 
 /**
- * Get files and size from the current attachments dir
+ * Retrieves the properties of the current attachments directory.
  *
+ *  What it does:
+ *
+ *  - Calls the AttachmentsDirectory constructor to create an instance of the attachments directory class
+ *  - Retrieves the current directory ID from the attachments directory object
+ *  - Calls the attachDirProperties function to retrieve the properties of the current directory
+ *
+ * @return array The properties of the current attachments directory.
  */
 function currentAttachDirProperties()
 {
@@ -1548,11 +1542,16 @@ function currentAttachDirProperties()
 }
 
 /**
- * Get files and size from the current attachments dir
+ * Retrieves the properties of attachments in a specific directory.
  *
- * @param string $dir
+ * What it does:
  *
- * @return array
+ * - Retrieves the number of files and the total size of the attachments.
+ * - Excludes attachments of type 1 (avatars).
+ *
+ * @param int $dir The directory ID.
+ *
+ * @return array An array containing the number of files and the total size of attachments in the directory.
  */
 function attachDirProperties($dir)
 {
@@ -1658,12 +1657,16 @@ function setRemovalNotice($messages, $notice)
 }
 
 /**
- * Finds all the attachments of a single message.
+ * Retrieves the attachment IDs associated with a specific message.
  *
- * @param int $id_msg
- * @param bool $unapproved if true returns also the unapproved attachments (default false)
- * @return array
- * @todo $unapproved may be superfluous
+ *  What it does:
+ *
+ *  - Returns an array of attachment IDs.
+ *
+ * @param int $id_msg The ID of the message.
+ * @param bool $unapproved Whether to include unapproved attachments or not. Default is false.
+ *
+ * @return int[] An array of attachment IDs.
  */
 function attachmentsOfMessage($id_msg, $unapproved = false)
 {
@@ -1689,11 +1692,15 @@ function attachmentsOfMessage($id_msg, $unapproved = false)
 }
 
 /**
- * Counts attachments for the given folder.
+ * Counts the number of attachments in a given folder.
  *
- * @param int $id_folder
+ * What it does:
  *
- * @return int
+ * - Retrieves the total number of attachments in the specified folder.
+ *
+ * @param int $id_folder The ID of the folder to count attachments in.
+ *
+ * @return int The number of attachments in the folder.
  */
 function countAttachmentsInFolders($id_folder)
 {
@@ -1739,6 +1746,8 @@ function updateAttachmentIdFolder($from, $to)
 /**
  * Validates the current user can remove a specified attachment
  *
+ *  What it does:
+ *
  * - Has moderator / admin manage_attachments permission
  * - Message is not locked, they have attach permissions and meets one of the following:
  *    - Has modify any permission
@@ -1752,8 +1761,6 @@ function updateAttachmentIdFolder($from, $to)
  */
 function canRemoveAttachment($id_attach, $id_member_requesting)
 {
-	global $modSettings;
-
 	if (allowedTo('manage_attachments'))
 	{
 		return true;
@@ -1778,8 +1785,8 @@ function canRemoveAttachment($id_attach, $id_member_requesting)
 
 		if (!empty($row))
 		{
-			$is_owner = (int) $id_member_requesting === (int) $row['id_member'];
-			$is_starter = (int) $id_member_requesting === (int) $row['id_member_started'];
+			$is_owner = $id_member_requesting === (int) $row['id_member'];
+			$is_starter = $id_member_requesting === (int) $row['id_member_started'];
 			$can_attach = allowedTo('post_attachment', $row['id_board']) || ($modSettings['postmod_active'] && allowedTo('post_unapproved_attachments', $row['id_board']));
 			$can_modify = (!$row['locked'] || allowedTo('moderate_board', $row['id_board']))
 				&& (
@@ -1793,4 +1800,101 @@ function canRemoveAttachment($id_attach, $id_member_requesting)
 	});
 
 	return $canRemove;
+}
+
+/**
+ * Retrieves the total number of attachments on disk.
+ *
+ *  What it does:
+ *
+ *  - Iterates through each attachment directory specified in $modSettings['attachmentUploadDir'].
+ *  - Counts the number of files in each directory, excluding dotfiles.
+ *  - Returns the sum total of all files found.
+ *
+ * @return int The total number of attachments found on disk.
+ */
+function getAttachmentCountFromDisk()
+{
+	global $modSettings;
+
+	$attach_dirs = $modSettings['attachmentUploadDir'];
+
+	$fileCount = 0;
+	foreach ($attach_dirs as $attach_dir)
+	{
+		try
+		{
+			$dir_iterator = new FilesystemIterator($attach_dir, FilesystemIterator::SKIP_DOTS);
+			$filter_iterator = new CallbackFilterIterator($dir_iterator, function ($file, $key, $iterator) {
+				return $file->getFilename()[0] !== '.';
+			});
+			$fileCount += iterator_count($filter_iterator);
+		}
+		catch (\Exception)
+		{
+			$fileCount += 0;
+		}
+	}
+
+	return $fileCount;
+}
+
+/**
+ * Function called in-between each round of attachments and avatar repairs to pause the
+ * attachment maintenance process.
+ *
+ *  What it does:
+ *
+ *  - Called by repairAttachments().
+ *  - If repairAttachments() has more steps added, this function needs to be updated!
+ *
+ * @param array $to_fix The attachments to fix.
+ * @param int $max_substep The maximum number of items in teh substep
+ * @param int $starting_substep The starting substep.
+ * @param int $substep The current substep value (current completed of $max_substep)
+ * @param int $step The current step.
+ * @param bool $fixErrors Whether to fix errors or not.
+ *
+ * @return void
+ */
+function pauseAttachmentMaintenance($to_fix, $max_substep = 0, $starting_substep = 0, $substep = 0, $step = 0, $fixErrors = false)
+{
+	global $context, $txt, $time_start;
+
+	// Try get more time...
+	detectServer()->setTimeLimit(600);
+
+	// Have we already used our maximum time?
+	if ($starting_substep === $substep || microtime(true) - $time_start < 3)
+	{
+		return;
+	}
+
+	$context['continue_get_data'] = '?action=admin;area=manageattachments;sa=repair' . ($fixErrors ? ';fixErrors' : '') . ';step=' . $step . ';substep=' . $substep . ';' . $context['session_var'] . '=' . $context['session_id'];
+	$context['page_title'] = $txt['not_done_title'];
+	$context['continue_post_data'] = '';
+	$context['continue_countdown'] = '3';
+	$context['sub_template'] = 'not_done';
+
+	// Specific stuff to not break this template!
+	$context[$context['admin_menu_name']]['current_subsection'] = 'maintenance';
+
+	// Change these two if more steps are added!
+	if ($max_substep === 0)
+	{
+		$context['continue_percent'] = round($step * 20);
+	}
+	else
+	{
+		$context['continue_percent'] = round($step * 20 + (($substep / $max_substep) * 20));
+	}
+
+	// Never more than 100%!
+	$context['continue_percent'] = min($context['continue_percent'], 100);
+
+	// Save the needed information for the next loop
+	$_SESSION['attachments_to_fix'] = $to_fix;
+	$_SESSION['attachments_to_fix2'] = $context['repair_errors'];
+
+	obExit();
 }
