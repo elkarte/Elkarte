@@ -22,8 +22,7 @@ use UnexpectedValueException;
  *
  * The performance gain may or may not exist depending on many factors.
  *
- * It requires the CACHEDIR constant to be defined and pointing to a
- * writable directory.
+ * It requires the CACHEDIR constant to be defined and pointing to a writable directory.
  */
 class Filebased extends AbstractCacheMethod
 {
@@ -72,7 +71,7 @@ class Filebased extends AbstractCacheMethod
 		// Or stashing it away
 		else
 		{
-			$cache_data = "<?php '" . json_encode(array('expiration' => time() + $ttl, 'data' => $value)) . "';";
+			$cache_data = "<?php '" . json_encode(['expiration' => time() + $ttl, 'data' => $value]) . "';";
 
 			// Write out the cache file, check that the cache write was successful; all the data must be written
 			// If it fails due to low diskspace, or other, remove the cache file
@@ -127,15 +126,25 @@ class Filebased extends AbstractCacheMethod
 
 			foreach ($files as $file)
 			{
-				if ($file->getFilename() !== 'index.php'
-					&& $file->getFilename() !== '.htaccess'
-					&& $file->getExtension() === $this->ext)
+				if ($file->getFilename() === 'index.php')
 				{
-					$this->fileFunc->delete($file->getPathname());
+					continue;
 				}
+
+				if ($file->getFilename() === '.htaccess')
+				{
+					continue;
+				}
+
+				if ($file->getExtension() !== $this->ext)
+				{
+					continue;
+				}
+
+				$this->fileFunc->delete($file->getPathname());
 			}
 		}
-		catch (UnexpectedValueException $e)
+		catch (UnexpectedValueException)
 		{
 			// @todo
 		}
@@ -162,7 +171,7 @@ class Filebased extends AbstractCacheMethod
 	 */
 	public function details()
 	{
-		return array('title' => $this->title, 'version' => 'N/A');
+		return ['title' => $this->title, 'version' => 'N/A'];
 	}
 
 	/**
@@ -176,6 +185,6 @@ class Filebased extends AbstractCacheMethod
 	{
 		global $txt;
 
-		$config_vars[] = array('cachedir', $txt['cachedir'], 'file', 'text', 36, 'cache_cachedir', 'force_div_id' => 'filebased_cachedir');
+		$config_vars[] = ['cachedir', $txt['cachedir'], 'file', 'text', 36, 'cache_cachedir', 'force_div_id' => 'filebased_cachedir'];
 	}
 }

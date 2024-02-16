@@ -58,32 +58,21 @@ class Cache
 	 */
 	public function __construct($level, $accelerator, $options)
 	{
+		$this->_options = $options;
+
 		// Default to file based, so we can slow everything down :P
 		if (empty($accelerator))
 		{
 			$accelerator = 'filebased';
 		}
-
 		$this->_accelerator = $accelerator;
 
 		$this->setLevel($level);
-
 		if ($level > 0)
 		{
 			$this->enable(true);
 			$this->level = $level;
 		}
-
-		// If the cache is disabled just go out
-		if (!$this->isEnabled())
-		{
-			return;
-		}
-
-		// Set the cache options
-		$this->_options = $options;
-
-		$this->_init();
 	}
 
 	/**
@@ -163,12 +152,12 @@ class Cache
 		{
 			global $cache_accelerator, $cache_enable, $cache_memcached;
 
-			$options = array();
+			$options = [];
 			if (strpos($cache_accelerator ?? '', 'memcache') === 0)
 			{
-				$options = array(
+				$options = [
 					'servers' => explode(',', $cache_memcached),
-				);
+				];
 			}
 
 			self::$_instance = new Cache($cache_enable, $cache_accelerator, $options);
@@ -185,7 +174,7 @@ class Cache
 		$cached = $this->get('_cached_keys');
 		if (!is_array($cached))
 		{
-			$cached = array();
+			$cached = [];
 		}
 
 		$_cached_keys = array_unique(array_merge($this->_cached_keys, $cached));
@@ -214,10 +203,10 @@ class Cache
 
 		if ($db_show_debug === true)
 		{
-			$cache_hit = array(
+			$cache_hit = [
 				'k' => $key,
 				'd' => 'get'
-			);
+			];
 			$st = microtime(true);
 		}
 
@@ -231,7 +220,7 @@ class Cache
 			Debug::instance()->cache($cache_hit);
 		}
 
-		call_integration_hook('cache_get_data', array($key, $ttl, $value));
+		call_integration_hook('cache_get_data', [$key, $ttl, $value]);
 
 		return empty($value) ? null : Util::unserialize($value);
 	}
@@ -277,11 +266,11 @@ class Cache
 		// If we are showing debug information we have some data to collect
 		if ($db_show_debug === true)
 		{
-			$cache_hit = array(
+			$cache_hit = [
 				'k' => $key,
 				'd' => 'put',
 				's' => $value === null ? 0 : strlen(serialize($value))
-			);
+			];
 			$st = microtime(true);
 		}
 
@@ -291,7 +280,7 @@ class Cache
 
 		$this->_cache_obj->put($key, $value, $ttl);
 
-		call_integration_hook('cache_put_data', array($key, $value, $ttl));
+		call_integration_hook('cache_put_data', [$key, $value, $ttl]);
 
 		// Show the debug cache hit information
 		if ($db_show_debug === true)
@@ -316,7 +305,7 @@ class Cache
 	 */
 	public function quick_get($key, $file, $function, $params, $level = 1)
 	{
-		call_integration_hook('pre_cache_quick_get', array(&$key, &$file, &$function, &$params, &$level));
+		call_integration_hook('pre_cache_quick_get', [&$key, &$file, &$function, &$params, &$level]);
 
 		/* Refresh the cache if either:
 			1. Caching is disabled.
@@ -326,7 +315,11 @@ class Cache
 			5. The expire time set in the cache item has passed (needed for Zend).
 		*/
 		$cache_block = $this->get($key, 3600);
-		if ($this->level < $level  || !is_array($cache_block) || !$this->isEnabled() || (!empty($cache_block['refresh_eval']) && eval($cache_block['refresh_eval'])) || (!empty($cache_block['expires']) && $cache_block['expires'] < time()))
+		if ($this->level < $level
+			|| !is_array($cache_block)
+			|| !$this->isEnabled()
+			|| (!empty($cache_block['refresh_eval']) && eval($cache_block['refresh_eval']))
+			|| (!empty($cache_block['expires']) && $cache_block['expires'] < time()))
 		{
 			require_once(SOURCEDIR . '/' . $file);
 			$cache_block = call_user_func_array($function, $params);
@@ -343,7 +336,7 @@ class Cache
 			eval($cache_block['post_retri_eval']);
 		}
 
-		call_integration_hook('post_cache_quick_get', array($cache_block));
+		call_integration_hook('post_cache_quick_get', [$cache_block]);
 
 		return $cache_block['data'];
 	}
@@ -404,7 +397,9 @@ class Cache
 	}
 
 	/**
-	 * @return int
+	 * Retrieves the current level.
+	 *
+	 * @return int The current level.
 	 */
 	public function getLevel()
 	{
@@ -454,7 +449,12 @@ class Cache
 	 */
 	public function levelLowerThan($level)
 	{
-		return !$this->isEnabled() || $this->level < $level;
+		if (!$this->isEnabled())
+		{
+			return true;
+		}
+
+		return $this->level < $level;
 	}
 
 	/**
@@ -488,11 +488,7 @@ class Cache
 			return;
 		}
 
-		$to_remove = array();
-		foreach ((array) $keys_match as $k)
-		{
-			$to_remove[] = $k;
-		}
+		$to_remove = (array) $keys_match;
 		$pattern = $delimiter . implode('|', $to_remove) . $delimiter . $modifiers;
 
 		foreach ($this->_cached_keys as $cached_key)

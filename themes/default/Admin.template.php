@@ -1118,6 +1118,28 @@ function template_clean_cache_button_below()
 			</form>
 		</div>
 	</div>';
+
+	// Have some cache status to show?
+	if (!empty($context['cache_accelerator_stats']))
+	{
+		echo '
+	<div class="generic_list_wrapper">
+		<h2 class="category_header">', $txt['maintain_cache_status'], '</h2>
+		<div class="content">
+			<dl class="settings">';
+
+		foreach($context['cache_accelerator_stats'] as $area => $value)
+		{
+			echo '
+				<dt>', $txt['maintain_cache_' . $area], '</dt>
+ 				<dd>', $value, '</dd>';
+		}
+
+		echo '
+			</dt>
+		</div>
+	</div>';
+	}
 }
 
 /**

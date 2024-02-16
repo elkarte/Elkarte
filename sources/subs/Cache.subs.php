@@ -25,7 +25,7 @@ use ElkArte\Cache\CacheMethod\AbstractCacheMethod;
  * @param string $key cache entry key
  * @param string $file file to include
  * @param string $function function to call
- * @param mixed[] $params parameters sent to the function
+ * @param array $params parameters sent to the function
  * @param int $level = 1
  *
  * @return mixed
@@ -50,7 +50,7 @@ function cache_quick_get($key, $file, $function, $params, $level = 1)
  *     Zend: http://files.zend.com/help/Zend-Platform/zend_cache_functions.htm
  *
  * @param string $key
- * @param string|int|mixed[]|null $value
+ * @param string|int|array|null $value
  * @param int $ttl = 120
  * @deprecated since 2.0
  *
@@ -113,11 +113,13 @@ function clean_cache($type = '')
  *             If false, for each engine available an array with 'title' (string)
  *             and 'supported' (bool) is returned.
  *
- * @return mixed[]
+ * @return array
  */
 function loadCacheEngines($supported_only = true)
 {
-	$engines = array();
+	global $cache_memcached;
+
+	$engines = [];
 
 	$classes = new GlobIterator(SOURCEDIR . '/ElkArte/Cache/CacheMethod/*.php', FilesystemIterator::SKIP_DOTS);
 
@@ -130,12 +132,20 @@ function loadCacheEngines($supported_only = true)
 		{
 		   	continue;
 		}
-		$class = '\\ElkArte\\Cache\\CacheMethod\\' . $parts[0];
+		$class = '\\ElkArte\\Cache\\CacheMethod\\' . $engine_name;
 
 		// Validate the class name exists
 		if (class_exists($class))
 		{
-			$obj = new $class(array());
+			$options = [];
+			if (strpos($engine_name, 'Memcache') === 0)
+			{
+				$options = [
+					'servers' => explode(',', $cache_memcached),
+				];
+			}
+
+			$obj = new $class($options);
 			if ($obj instanceof AbstractCacheMethod)
 			{
 				if ($supported_only && $obj->isAvailable())

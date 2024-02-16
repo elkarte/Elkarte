@@ -406,7 +406,6 @@ class ManageServer extends AbstractController
 			$settingsForm->save();
 
 			// we need to save the $cache_enable to $modSettings as well
-			// @TODO Still?
 			updateSettings(array('cache_enable' => (int) $this->_req->post->cache_enable));
 
 			// exit so we reload our new settings on the page
@@ -443,13 +442,13 @@ class ManageServer extends AbstractController
 	 */
 	private function _cacheSettings()
 	{
-		global $txt;
+		global $txt, $cache_accelerator, $context;
 
 		// Detect all available optimizers
 		require_once(SUBSDIR . '/Cache.subs.php');
 		$detected = loadCacheEngines(false);
-		$detected_names = array();
-		$detected_supported = array();
+		$detected_names = [];
+		$detected_supported = [];
 
 		foreach ($detected as $key => $value)
 		{
@@ -458,6 +457,10 @@ class ManageServer extends AbstractController
 			if (!empty($value->isAvailable()))
 			{
 				$detected_supported[$key] = $value->title();
+				if ($key === $cache_accelerator)
+				{
+					$context['cache_accelerator_stats'] = $value->getStats();
+				}
 			}
 		}
 
@@ -465,14 +468,14 @@ class ManageServer extends AbstractController
 
 		// Set our values to show what, if anything, we found
 		$txt['cache_settings_message'] = sprintf($txt['detected_accelerators'], implode(', ', $detected_supported));
-		$cache_level = array($txt['cache_off'], $txt['cache_level1'], $txt['cache_level2'], $txt['cache_level3']);
+		$cache_level = [$txt['cache_off'], $txt['cache_level1'], $txt['cache_level2'], $txt['cache_level3']];
 
 		// Define the variables we want to edit.
-		$config_vars = array(
+		$config_vars = [
 			// Only a few settings, but they are important
-			array('cache_enable', $txt['cache_enable'], 'file', 'select', $cache_level, 'cache_enable'),
-			array('cache_accelerator', $txt['cache_accelerator'], 'file', 'select', $detected_supported),
-		);
+			['cache_enable', $txt['cache_enable'], 'file', 'select', $cache_level, 'cache_enable'],
+			['cache_accelerator', $txt['cache_accelerator'], 'file', 'select', $detected_supported],
+		];
 
 		// If the cache engine has specific settings, add them in
 		foreach ($detected as $value)
@@ -484,7 +487,7 @@ class ManageServer extends AbstractController
 		}
 
 		// Notify the integration that we're preparing to mess with cache settings...
-		call_integration_hook('integrate_modify_cache_settings', array(&$config_vars));
+		call_integration_hook('integrate_modify_cache_settings', [&$config_vars]);
 
 		return $config_vars;
 	}

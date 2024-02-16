@@ -30,15 +30,20 @@ abstract class AbstractCacheMethod implements CacheMethodInterface
 	/** @var string the (human-readable) name of the caching engine. */
 	protected $title = '';
 
-	/** @var string This is prefixed to all cache entries so that different
-	    applications won't interfere with each other. */
+	/** @var string This is prefixed to all cache entries so that different applications won't interfere with each other. */
 	protected $prefix = 'elkarte';
 
-	/** @var \ElkArte\FileFunctions instance of file functions for use in cache methods */
+	/** @var FileFunctions instance of file functions for use in cache methods */
 	protected $fileFunc;
 
 	/**
-	 * {@inheritdoc}
+	 * Class constructor.
+	 *
+	 * Initializes the object with the given options.
+	 *
+	 * @param mixed $options The options for the object.
+	 *
+	 * @return void
 	 */
 	public function __construct($options)
 	{
@@ -94,5 +99,13 @@ abstract class AbstractCacheMethod implements CacheMethodInterface
 	public function title()
 	{
 		return $this->title;
+	}
+
+	/**
+	 * {@inheritdoc}
+	 */
+	public function getStats()
+	{
+		return [];
 	}
 }

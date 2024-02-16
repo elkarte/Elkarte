@@ -120,4 +120,11 @@ interface CacheMethodInterface
 	 * @return void
 	 */
 	public function remove($key);
+
+	/**
+	 * Retrieves statistics related to the cache in use.
+	 *
+	 * @return array An associative array containing the cache statistics.
+	 */
+	public function getStats();
 }
