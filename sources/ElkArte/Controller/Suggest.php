@@ -18,6 +18,7 @@ namespace ElkArte\Controller;
 
 use ElkArte\AbstractController;
 use ElkArte\FileFunctions;
+use ElkArte\SuggestMember;
 
 /**
  * Suggest Controller
@@ -35,7 +36,7 @@ class Suggest extends AbstractController
 	/**
 	 * Intended entry point for this class.
 	 *
-	 * @see \ElkArte\AbstractController::action_index()
+	 * @see AbstractController::action_index
 	 */
 	public function action_index()
 	{
@@ -61,14 +62,11 @@ class Suggest extends AbstractController
 
 		// These are all registered types.
 		$searchTypes = array(
-			'member' => array(
-				'class' => '\\ElkArte\\Suggest',
-				'function' => 'member'
-			),
+			'member' => array('class' => SuggestMember::class, 'function' => 'member'),
 		);
 
 		// Allow integration a way to register their own type
-		call_integration_hook('integrate_autosuggest', array(&$searchTypes));
+		call_integration_hook('integrate_autosuggest', [&$searchTypes]);
 
 		// Good old session check
 		checkSession('post');
@@ -78,9 +76,9 @@ class Suggest extends AbstractController
 		theme()->getLayers()->removeAll();
 
 		// Any parameters?
-		$search_param = isset($this->_req->post->search_param) ? json_decode(base64_decode($this->_req->post->search_param), true) : array();
-		$suggest_type = $this->_req->getPost('suggest_type', 'trim', null);
-		$search = $this->_req->getPost('search', 'trim', null);
+		$search_param = isset($this->_req->post->search_param) ? json_decode(base64_decode($this->_req->post->search_param), true) : [];
+		$suggest_type = $this->_req->getPost('suggest_type', 'trim');
+		$search = $this->_req->getPost('search', 'trim');
 
 		if (isset($suggest_type, $search, $searchTypes[$suggest_type]))
 		{
@@ -93,7 +91,7 @@ class Suggest extends AbstractController
 				require_once($currentSearch['file']);
 			}
 
-			// If it is a class, let's instantiate it
+			// If a class, let's instantiate it
 			if (!empty($currentSearch['class']) && class_exists($currentSearch['class']))
 			{
 				$suggest = new $currentSearch['class']($search, $search_param);

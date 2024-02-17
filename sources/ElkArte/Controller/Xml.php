@@ -238,8 +238,8 @@ class Xml extends AbstractController
 			'messages' => array(
 				'identifier' => 'message',
 				'children' => array(array(
-										'value' => $message
-									)),
+					'value' => $message
+				)),
 			),
 			'tokens' => array(
 				'identifier' => 'token',
@@ -382,13 +382,13 @@ class Xml extends AbstractController
 				$moved_key = 0;
 
 				// What board was drag and dropped?
-				list (, $board_moved,) = explode(',', $this->_req->post->moved);
+				[, $board_moved,] = explode(',', $this->_req->post->moved);
 				$board_moved = (int) $board_moved;
 
 				// The board ids arrive in 1-n view order ...
 				foreach ($this->_req->post->cbp as $id)
 				{
-					list ($category, $board, $childof) = explode(',', $id);
+					[$category, $board, $childof] = explode(',', $id);
 
 					if ($board == -1)
 					{
@@ -412,14 +412,14 @@ class Xml extends AbstractController
 				}
 
 				// Look behind for the previous board and previous sibling
-				$board_previous = (isset($board_tree[$moved_key - 1]) && $board_tree[$moved_key]['category'] == $board_tree[$moved_key - 1]['category']) ? $board_tree[$moved_key - 1] : null;
+				$board_previous = (isset($board_tree[$moved_key - 1]) && $board_tree[$moved_key]['category'] === $board_tree[$moved_key - 1]['category']) ? $board_tree[$moved_key - 1] : null;
 				$board_previous_sibling = null;
 				for ($i = $moved_key - 1; $i >= 0; $i--)
 				{
 					// Sibling must have the same category and same parent tree
-					if ($board_tree[$moved_key]['category'] == $board_tree[$i]['category'])
+					if ($board_tree[$moved_key]['category'] === $board_tree[$i]['category'])
 					{
-						if ($board_tree[$moved_key]['parent'] == $board_tree[$i]['parent'])
+						if ($board_tree[$moved_key]['parent'] === $board_tree[$i]['parent'])
 						{
 							$board_previous_sibling = $board_tree[$i];
 							break;
@@ -559,7 +559,7 @@ class Xml extends AbstractController
 			if ($this->_req->getPost('order', 'trim', '') === 'reorder')
 			{
 				// Get the details on the moved smile
-				list (, $smile_moved) = explode('_', $this->_req->post->moved);
+				[, $smile_moved] = explode('_', $this->_req->post->moved);
 				$smile_moved = (int) $smile_moved;
 				$smile_moved_details = getSmiley($smile_moved);
 
@@ -572,7 +572,7 @@ class Xml extends AbstractController
 						'postform' => 0,
 						'popup' => 2
 					);
-					list ($smile_received_location, $smile_received_row) = explode('|', $this->_req->post->received);
+					[$smile_received_location, $smile_received_row] = explode('|', $this->_req->post->received);
 					$smile_received_location = $displayTypes[substr($smile_received_location, 7)];
 				}
 

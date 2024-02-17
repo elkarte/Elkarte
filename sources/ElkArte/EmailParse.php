@@ -1097,7 +1097,7 @@ class EmailParse
 	public function load_key($key = '')
 	{
 		$regex_key = '~(([a-z0-9]{32})\-(p|t|m)(\d+))~i';
-		$match = array();
+		$match = [];
 
 		// Supplied a key, lets check it
 		if (!empty($key))

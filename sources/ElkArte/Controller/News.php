@@ -21,8 +21,8 @@ use ElkArte\AbstractController;
 use ElkArte\Cache\Cache;
 use ElkArte\Exceptions\Exception;
 use ElkArte\Http\Headers;
-use ElkArte\MembersList;
 use ElkArte\Languages\Txt;
+use ElkArte\MembersList;
 use ElkArte\Util;
 
 /**
@@ -30,18 +30,10 @@ use ElkArte\Util;
  */
 class News extends AbstractController
 {
-	/**
-	 * Holds news specific version board query for news feeds
-	 *
-	 * @var string
-	 */
-	private $_query_this_board = null;
+	/** @var string Holds news specific version board query for news feeds */
+	private $_query_this_board;
 
-	/**
-	 * Holds the limit for the number of items to get
-	 *
-	 * @var int
-	 */
+	/** @var int Holds the limit for the number of items to get */
 	private $_limit;
 
 	/**
@@ -60,7 +52,7 @@ class News extends AbstractController
 	/**
 	 * Dispatcher. Forwards to the action to execute.
 	 *
-	 * @see \ElkArte\AbstractController::action_index()
+	 * @see AbstractController::action_index
 	 */
 	public function action_index()
 	{
@@ -238,7 +230,7 @@ class News extends AbstractController
 			}
 		}
 
-		$cachekey = md5(serialize($cachekey) . (!empty($this->_query_this_board) ? $this->_query_this_board : ''));
+		$cachekey = md5(serialize($cachekey) . (empty($this->_query_this_board) ? '' : $this->_query_this_board));
 		$cache_t = microtime(true);
 		$cache = Cache::instance();
 
@@ -310,7 +302,7 @@ class News extends AbstractController
 				}
 			}
 
-			$context['url_parts'] = !empty($url_parts) ? implode(';', $url_parts) : '';
+			$context['url_parts'] = empty($url_parts) ? '' : implode(';', $url_parts);
 			$context['sub_template'] = 'feedatom';
 		}
 		// rdf by default
@@ -464,7 +456,7 @@ class News extends AbstractController
 					'author' => array(
 						'name' => $row['poster_name'],
 						'email' => in_array(showEmailAddress(!empty($row['hide_email']), $row['id_member']), array('yes', 'yes_permission_override')) ? $row['poster_email'] : null,
-						'uri' => !empty($row['id_member']) ? $scripturl . '?action=profile;u=' . $row['id_member'] : '',
+						'uri' => empty($row['id_member']) ? '' : $scripturl . '?action=profile;u=' . $row['id_member'],
 					),
 					'published' => Util::gmstrftime('%Y-%m-%dT%H:%M:%SZ', $row['poster_time']),
 					'modified' => Util::gmstrftime('%Y-%m-%dT%H:%M:%SZ', empty($row['modified_time']) ? $row['poster_time'] : $row['modified_time']),
@@ -482,7 +474,7 @@ class News extends AbstractController
 					'poster' => array(
 						'name' => cdata_parse($row['poster_name']),
 						'id' => $row['id_member'],
-						'link' => !empty($row['id_member']) ? $scripturl . '?action=profile;u=' . $row['id_member'] : '',
+						'link' => empty($row['id_member']) ? '' : $scripturl . '?action=profile;u=' . $row['id_member'],
 					),
 					'topic' => $row['id_topic'],
 					'board' => array(
@@ -570,7 +562,7 @@ class News extends AbstractController
 					'author' => array(
 						'name' => $row['poster_name'],
 						'email' => in_array(showEmailAddress(!empty($row['hide_email']), $row['id_member']), array('yes', 'yes_permission_override')) ? $row['poster_email'] : null,
-						'uri' => !empty($row['id_member']) ? $scripturl . '?action=profile;u=' . $row['id_member'] : ''
+						'uri' => empty($row['id_member']) ? '' : $scripturl . '?action=profile;u=' . $row['id_member']
 					),
 					'published' => Util::gmstrftime('%Y-%m-%dT%H:%M:%SZ', $row['poster_time']),
 					'updated' => Util::gmstrftime('%Y-%m-%dT%H:%M:%SZ', empty($row['modified_time']) ? $row['poster_time'] : $row['modified_time']),
@@ -588,12 +580,12 @@ class News extends AbstractController
 					'starter' => array(
 						'name' => cdata_parse($row['first_poster_name']),
 						'id' => $row['id_first_member'],
-						'link' => !empty($row['id_first_member']) ? $scripturl . '?action=profile;u=' . $row['id_first_member'] : ''
+						'link' => empty($row['id_first_member']) ? '' : $scripturl . '?action=profile;u=' . $row['id_first_member']
 					),
 					'poster' => array(
 						'name' => cdata_parse($row['poster_name']),
 						'id' => $row['id_member'],
-						'link' => !empty($row['id_member']) ? $scripturl . '?action=profile;u=' . $row['id_member'] : ''
+						'link' => empty($row['id_member']) ? '' : $scripturl . '?action=profile;u=' . $row['id_member']
 					),
 					'topic' => array(
 						'subject' => cdata_parse($row['first_subject']),
@@ -655,21 +647,21 @@ class News extends AbstractController
 		if ($xml_format === 'rss' || $xml_format === 'rss2')
 		{
 			$data = array(array(
-							  'title' => cdata_parse($member['name']),
-							  'link' => $scripturl . '?action=profile;u=' . $member['id'],
-							  'description' => cdata_parse($member['group'] ?? $member['post_group']),
-							  'comments' => $scripturl . '?action=pm;sa=send;u=' . $member['id'],
-							  'pubDate' => gmdate('D, d M Y H:i:s \G\M\T', $member->date_registered),
-							  'guid' => $scripturl . '?action=profile;u=' . $member['id'],
-						  ));
+				'title' => cdata_parse($member['name']),
+				'link' => $scripturl . '?action=profile;u=' . $member['id'],
+				'description' => cdata_parse($member['group'] ?? $member['post_group']),
+				'comments' => $scripturl . '?action=pm;sa=send;u=' . $member['id'],
+				'pubDate' => gmdate('D, d M Y H:i:s \G\M\T', $member->date_registered),
+				'guid' => $scripturl . '?action=profile;u=' . $member['id'],
+			));
 		}
 		elseif ($xml_format === 'rdf')
 		{
 			$data = array(array(
-							  'title' => cdata_parse($member['name']),
-							  'link' => $scripturl . '?action=profile;u=' . $member['id'],
-							  'description' => cdata_parse($member['group'] ?? $member['post_group']),
-						  ));
+				'title' => cdata_parse($member['name']),
+				'link' => $scripturl . '?action=profile;u=' . $member['id'],
+				'description' => cdata_parse($member['group'] ?? $member['post_group']),
+			));
 		}
 		elseif ($xml_format === 'atom')
 		{
@@ -680,12 +672,12 @@ class News extends AbstractController
 				'author' => array(
 					'name' => $member['real_name'],
 					'email' => in_array(showEmailAddress(!empty($member['hide_email']), $member['id']), array('yes', 'yes_permission_override')) ? $member['email'] : null,
-					'uri' => !empty($member['website']) ? $member['website']['url'] : ''
+					'uri' => empty($member['website']) ? '' : $member['website']['url']
 				),
 				'published' => Util::gmstrftime('%Y-%m-%dT%H:%M:%SZ', $member->date_registered),
 				'updated' => Util::gmstrftime('%Y-%m-%dT%H:%M:%SZ', $member->last_login),
 				'id' => $scripturl . '?action=profile;u=' . $member['id'],
-				'logo' => !empty($member['avatar']) ? $member['avatar']['url'] : '',
+				'logo' => empty($member['avatar']) ? '' : $member['avatar']['url'],
 			);
 		}
 		else
@@ -696,13 +688,13 @@ class News extends AbstractController
 				'link' => $scripturl . '?action=profile;u=' . $member['id'],
 				'posts' => $member['posts'],
 				'post-group' => cdata_parse($member['post_group']),
-				'language' => cdata_parse(!empty($member['language']) ? $member['language'] : Util::ucwords(strtr($language, array('_' => ' ', '-utf8' => '')))),
+				'language' => cdata_parse(empty($member['language']) ? Util::ucwords(strtr($language, array('_' => ' ', '-utf8' => ''))) : $member['language']),
 				'last-login' => gmdate('D, d M Y H:i:s \G\M\T', $member->last_login),
 				'registered' => gmdate('D, d M Y H:i:s \G\M\T', $member->date_registered)
 			);
 
 			// Everything below here might not be set, and thus maybe shouldn't be displayed.
-			if ($member['avatar']['name'] != '')
+			if ($member['avatar']['name'] !== '')
 			{
 				$data['avatar'] = $member['avatar']['url'];
 			}
@@ -713,17 +705,17 @@ class News extends AbstractController
 				$data['online'] = '';
 			}
 
-			if ($member['signature'] != '')
+			if ($member['signature'] !== '')
 			{
 				$data['signature'] = cdata_parse($member['signature']);
 			}
 
-			if ($member['title'] != '')
+			if ($member['title'] !== '')
 			{
 				$data['title'] = cdata_parse($member['title']);
 			}
 
-			if ($member['website']['title'] != '')
+			if ($member['website']['title'] !== '')
 			{
 				$data['website'] = array(
 					'title' => cdata_parse($member['website']['title']),
@@ -731,7 +723,7 @@ class News extends AbstractController
 				);
 			}
 
-			if ($member['group'] != '')
+			if ($member['group'] !== '')
 			{
 				$data['position'] = cdata_parse($member['group']);
 			}
@@ -749,9 +741,9 @@ class News extends AbstractController
 				$data['email'] = $member['email'];
 			}
 
-			if (!empty($member['birth_date']) && substr($member['birth_date'], 0, 4) !== '0000')
+			if (!empty($member['birth_date']) && strpos($member['birth_date'], '0000') !== 0)
 			{
-				list ($birth_year, $birth_month, $birth_day) = sscanf($member['birth_date'], '%d-%d-%d');
+				[$birth_year, $birth_month, $birth_day] = sscanf($member['birth_date'], '%d-%d-%d');
 				$datearray = getdate(forum_time());
 				$data['age'] = $datearray['year'] - $birth_year - (($datearray['mon'] > $birth_month || ($datearray['mon'] === $birth_month && $datearray['mday'] >= $birth_day)) ? 0 : 1);
 			}

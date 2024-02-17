@@ -18,40 +18,24 @@ namespace ElkArte\Controller;
 
 use ElkArte\AbstractController;
 use ElkArte\Exceptions\Exception;
-use ElkArte\Util;
 use ElkArte\Languages\Loader;
+use ElkArte\Util;
 
 /**
  * Move Topic Controller
  */
 class MoveTopic extends AbstractController
 {
-	/**
-	 * The id of the topic being manipulated
-	 *
-	 * @var int
-	 */
+	/** @var int The id of the topic being manipulated */
 	private $_topic;
 
-	/**
-	 * Information about the topic being moved
-	 *
-	 * @var array
-	 */
+	/** @var array Information about the topic being moved  */
 	private $_topic_info;
 
-	/**
-	 * Information about the board where the topic resides
-	 *
-	 * @var array
-	 */
+	/** @var array Information about the board where the topic resides */
 	private $_board_info;
 
-	/**
-	 * Board that will receive the topic
-	 *
-	 * @var int
-	 */
+	/** @var int Board that will receive the topic */
 	private $_toboard;
 
 	/**
@@ -68,7 +52,7 @@ class MoveTopic extends AbstractController
 	/**
 	 * Forwards to the action method to handle the action.
 	 *
-	 * @see \ElkArte\AbstractController::action_index()
+	 * @see AbstractController::action_index
 	 */
 	public function action_index()
 	{
@@ -159,10 +143,17 @@ class MoveTopic extends AbstractController
 		}
 
 		// Are they allowed to actually move any topics or even their own?
-		if (!allowedTo('move_any') && ($this->_topic_info['id_member_started'] == $this->user->id && !allowedTo('move_own')))
+		if (allowedTo('move_any'))
 		{
-			throw new Exception('cannot_move_any', false);
+			return;
 		}
+
+		if (!($this->_topic_info['id_member_started'] == $this->user->id && !allowedTo('move_own')))
+		{
+			return;
+		}
+
+		throw new Exception('cannot_move_any', false);
 	}
 
 	/**
@@ -429,7 +420,7 @@ class MoveTopic extends AbstractController
 			));
 
 			// Auto remove this MOVED redirection topic in the future?
-			$redirect_expires = !empty($this->_req->post->redirect_expires) ? (int) $this->_req->post->redirect_expires : 0;
+			$redirect_expires = empty($this->_req->post->redirect_expires) ? 0 : (int) $this->_req->post->redirect_expires;
 
 			// Redirect to the MOVED topic from topic list?
 			$redirect_topic = isset($this->_req->post->redirect_topic) ? $this->_topic : 0;

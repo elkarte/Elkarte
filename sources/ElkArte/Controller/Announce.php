@@ -60,7 +60,7 @@ class Announce extends AbstractController
 	/**
 	 * Default (sub)action for ?action=announce
 	 *
-	 * @see \ElkArte\AbstractController::action_index()
+	 * @see AbstractController::action_index()
 	 */
 	public function action_index()
 	{

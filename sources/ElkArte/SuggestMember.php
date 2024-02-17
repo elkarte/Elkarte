@@ -20,25 +20,17 @@ namespace ElkArte;
 /**
  * Suggesting names (basically a wrapper for getMember)
  */
-class Suggest
+class SuggestMember
 {
-	/**
-	 * What we are going to search for
-	 *
-	 * @var string
-	 */
+	/** @var string What we are going to search for */
 	private $_search;
 
-	/**
-	 * Any special parameters for the search
-	 *
-	 * @var
-	 */
+	/** @var Any special parameters for the search */
 	private $_params;
 
 	/**
-	 * @param $search
-	 * @param array
+	 * @param string $search
+	 * @param array $params
 	 */
 	public function __construct($search, $params)
 	{
@@ -54,7 +46,7 @@ class Suggest
 	public function member()
 	{
 		// Escape the search string
-		$this->_search = strtr($this->_search, array('%' => '\%', '_' => '\_', '*' => '%', '?' => '_', '&#038;' => '&amp;'));
+		$this->_search = strtr($this->_search, ['%' => '\%', '_' => '\_', '*' => '%', '?' => '_', '&#038;' => '&amp;']);
 
 		require_once(SUBSDIR . '/Members.subs.php');
 

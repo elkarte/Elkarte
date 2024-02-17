@@ -116,10 +116,8 @@ class Reminder extends AbstractController
 			{
 				throw new Exception($txt['registration_not_approved'] . ' <a class="linkbutton" href="' . getUrl('action', ['action' => 'register', 'sa' => 'activate', 'user' => $this->_req->post->user]) . '">' . $txt['here'] . '</a>.', false);
 			}
-			else
-			{
-				throw new Exception($txt['registration_not_activated'] . ' <a class="linkbutton" href="' . getUrl('action', ['action' => 'register', 'sa' => 'activate', 'user' => $this->_req->post->user]) . '">' . $txt['here'] . '</a>.', false);
-			}
+
+			throw new Exception($txt['registration_not_activated'] . ' <a class="linkbutton" href="' . getUrl('action', ['action' => 'register', 'sa' => 'activate', 'user' => $this->_req->post->user]) . '">' . $txt['here'] . '</a>.', false);
 		}
 
 		// You can't get emailed if you have no email address.
@@ -134,7 +132,6 @@ class Reminder extends AbstractController
 		{
 			// Randomly generate a new password, with only alpha numeric characters that is a max length of 14 chars.
 			$password = generateValidationCode(14);
-
 			require_once(SUBSDIR . '/Mail.subs.php');
 			$replacements = array(
 				'REALNAME' => $member['real_name'],
@@ -154,8 +151,9 @@ class Reminder extends AbstractController
 			// Don't really.
 			return null;
 		}
+
 		// Otherwise are ready to answer the question?
-		elseif (isset($this->_req->post->reminder_type) && $this->_req->post->reminder_type === 'secret')
+		if (isset($this->_req->post->reminder_type) && $this->_req->post->reminder_type === 'secret')
 		{
 			return secretAnswerInput();
 		}

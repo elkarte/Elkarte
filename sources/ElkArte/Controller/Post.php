@@ -29,6 +29,7 @@ use ElkArte\Exceptions\Exception;
 use ElkArte\Languages\Txt;
 use ElkArte\Notifications\Notifications;
 use ElkArte\Notifications\NotificationsTask;
+use ElkArte\Themes\TemplateLayers;
 use ElkArte\User;
 use ElkArte\Util;
 
@@ -38,10 +39,10 @@ use ElkArte\Util;
 class Post extends AbstractController
 {
 	/** @var null|ErrorContext The post (messages) errors object */
-	protected $_post_errors = null;
+	protected $_post_errors;
 
-	/** @var null|\ElkArte\Themes\TemplateLayers The template layers object */
-	protected $_template_layers = null;
+	/** @var null|TemplateLayers The template layers object */
+	protected $_template_layers;
 
 	/** @var array An array of attributes of the topic (if not new) */
 	protected $_topic_attributes = array();
@@ -52,7 +53,7 @@ class Post extends AbstractController
 	/** @var string The message */
 	protected $_form_message = '';
 
-	/** @var \BBC\PreparseCode */
+	/** @var PreparseCode */
 	protected $preparse;
 
 	/**
@@ -73,7 +74,7 @@ class Post extends AbstractController
 	/**
 	 * Dispatch to the right action method for the request.
 	 *
-	 * @see \ElkArte\AbstractController::action_index()
+	 * @see AbstractController::action_index
 	 */
 	public function action_index()
 	{
@@ -120,9 +121,9 @@ class Post extends AbstractController
 		{
 			$this->_events->trigger('prepare_context', array('id_member_poster' => $this->_topic_attributes['id_member']));
 		}
-		catch (ControllerRedirectException $e)
+		catch (ControllerRedirectException $controllerRedirectException)
 		{
-			return $e->doRedirect($this);
+			return $controllerRedirectException->doRedirect($this);
 		}
 
 		// Load up the message details if this is an existing msg
@@ -194,7 +195,7 @@ class Post extends AbstractController
 	 * - Checks if a topic is locked
 	 * - Determines if this msg will be pre approved or member requires approval
 	 *
-	 * @throws \ElkArte\Exceptions\Exception
+	 * @throws Exception
 	 */
 	protected function _beforePrepareContext()
 	{
@@ -334,10 +335,17 @@ class Post extends AbstractController
 		$context['show_approval'] = allowedTo('approve_posts') && $context['becomes_approved'] ? 2 : (allowedTo('approve_posts') ? 1 : 0);
 
 		// Don't allow a post if it's locked and you aren't all powerful.
-		if ($this->_topic_attributes['locked'] && !allowedTo('moderate_board'))
+		if (!$this->_topic_attributes['locked'])
 		{
-			throw new Exception('topic_locked', false);
+			return;
 		}
+
+		if (allowedTo('moderate_board'))
+		{
+			return;
+		}
+
+		throw new Exception('topic_locked', false);
 	}
 
 	/**
@@ -533,7 +541,7 @@ class Post extends AbstractController
 			if ((!empty($topic) && !empty($quote))
 				|| (!empty($modSettings['enableFollowup']) && !empty($followup)))
 			{
-				$msg_id = !empty($quote) ? $quote : $followup;
+				$msg_id = empty($quote) ? $followup : $quote;
 				$case = 2;
 			}
 			// Posting a reply without a quote?
@@ -547,7 +555,7 @@ class Post extends AbstractController
 				$case = 4;
 			}
 
-			list ($this->_form_subject,) = getFormMsgSubject($case, $topic, $this->_topic_attributes['subject'], $msg_id);
+			[$this->_form_subject,] = getFormMsgSubject($case, $topic, $this->_topic_attributes['subject'], $msg_id);
 		}
 
 		// No check is needed, since nothing is really posted.
@@ -632,7 +640,7 @@ class Post extends AbstractController
 			|| (!empty($modSettings['enableFollowup']) && $followup !== 0))
 		{
 			$case = 2;
-			$msg_id = !empty($quote) ? $quote : $followup;
+			$msg_id = empty($quote) ? $followup : $quote;
 		}
 		// Posting a reply without a quote?
 		elseif (!empty($topic) && $quote === 0)
@@ -645,7 +653,7 @@ class Post extends AbstractController
 			$case = 4;
 		}
 
-		list ($this->_form_subject, $this->_form_message) = getFormMsgSubject($case, $topic, $this->_topic_attributes['subject'], $msg_id);
+		[$this->_form_subject, $this->_form_message] = getFormMsgSubject($case, $topic, $this->_topic_attributes['subject'], $msg_id);
 	}
 
 	/**
@@ -793,6 +801,7 @@ class Post extends AbstractController
 			{
 				$context['icon'] = $context['icons'][0]['value'];
 			}
+
 			$found = false;
 			foreach ($context['icons'] as $icon)
 			{
@@ -1077,7 +1086,7 @@ class Post extends AbstractController
 				{
 					throw new Exception('modify_post_time_passed', false);
 				}
-				elseif ($topic_info['id_member_started'] == $this->user->id && !allowedTo('modify_own'))
+				if ($topic_info['id_member_started'] == $this->user->id && !allowedTo('modify_own'))
 				{
 					isAllowedTo('modify_replies');
 				}
@@ -1108,7 +1117,7 @@ class Post extends AbstractController
 
 			// Can they approve it?
 			$can_approve = allowedTo('approve_posts');
-			$becomesApproved = $modSettings['postmod_active'] ? ($can_approve && !$msgInfo['approved'] ? (!empty($_REQUEST['approve']) ? 1 : 0) : $msgInfo['approved']) : 1;
+			$becomesApproved = $modSettings['postmod_active'] ? ($can_approve && !$msgInfo['approved'] ? (empty($_REQUEST['approve']) ? 0 : 1) : $msgInfo['approved']) : 1;
 			$approve_has_changed = $msgInfo['approved'] != $becomesApproved;
 
 			if (!allowedTo('moderate_forum') || !$posterIsGuest)
@@ -1128,8 +1137,8 @@ class Post extends AbstractController
 		// If the poster is a guest evaluate the legality of name and email.
 		if ($posterIsGuest)
 		{
-			$_POST['guestname'] = !isset($_POST['guestname']) ? '' : Util::htmlspecialchars(trim($_POST['guestname']));
-			$_POST['email'] = !isset($_POST['email']) ? '' : Util::htmlspecialchars(trim($_POST['email']));
+			$_POST['guestname'] = isset($_POST['guestname']) ? Util::htmlspecialchars(trim($_POST['guestname'])) : '';
+			$_POST['email'] = isset($_POST['email']) ? Util::htmlspecialchars(trim($_POST['email'])) : '';
 
 			if ($_POST['guestname'] === '' || $_POST['guestname'] === '_')
 			{
@@ -1144,12 +1153,9 @@ class Post extends AbstractController
 			if (empty($modSettings['guest_post_no_email']))
 			{
 				// Only check if they changed it!
-				if (!isset($msgInfo) || $msgInfo['poster_email'] !== $_POST['email'])
+				if ((!isset($msgInfo) || $msgInfo['poster_email'] !== $_POST['email']) && (!allowedTo('moderate_forum') && !DataValidator::is_valid($_POST, array('email' => 'valid_email|required'), array('email' => 'trim'))))
 				{
-					if (!allowedTo('moderate_forum') && !DataValidator::is_valid($_POST, array('email' => 'valid_email|required'), array('email' => 'trim')))
-					{
-						empty($_POST['email']) ? $this->_post_errors->addError('no_email') : $this->_post_errors->addError('bad_email');
-					}
+					empty($_POST['email']) ? $this->_post_errors->addError('no_email') : $this->_post_errors->addError('bad_email');
 				}
 
 				// Now make sure this email address is not banned from posting.
@@ -1169,9 +1175,9 @@ class Post extends AbstractController
 		{
 			$this->_events->trigger('before_save_post', array('post_errors' => $this->_post_errors, 'topic_info' => $topic_info));
 		}
-		catch (ControllerRedirectException $e)
+		catch (ControllerRedirectException $controllerRedirectException)
 		{
-			return $e->doRedirect($this);
+			return $controllerRedirectException->doRedirect($this);
 		}
 
 		// Check the subject and message.
@@ -1346,10 +1352,7 @@ class Post extends AbstractController
 
 			createPost($msgOptions, $topicOptions, $posterOptions);
 
-			if (isset($topicOptions['id']))
-			{
-				$topic = $topicOptions['id'];
-			}
+			$topic = $topicOptions['id'];
 		}
 
 		// Trigger the after_save_post event
@@ -1359,7 +1362,7 @@ class Post extends AbstractController
 		// (You just posted and they will be unread.)
 		if ($this->user->is_guest === false)
 		{
-			$board_list = !empty($board_info['parent_boards']) ? array_keys($board_info['parent_boards']) : array();
+			$board_list = empty($board_info['parent_boards']) ? array() : array_keys($board_info['parent_boards']);
 
 			// Returning to the topic?
 			if (!empty($_REQUEST['goback']))
@@ -1481,7 +1484,7 @@ class Post extends AbstractController
 				return null;
 			}
 			// Besides, you need permission.
-			elseif (!allowedTo(array('lock_any', 'lock_own')))
+			if (!allowedTo(array('lock_any', 'lock_own')))
 			{
 				return null;
 			}
@@ -1491,30 +1494,25 @@ class Post extends AbstractController
 				return allowedTo('lock_any') ? 1 : 2;
 			}
 		}
-
 		// Nothing changes to the lock status.
 		if ((empty($lock) && empty($topic_info['locked'])) || (!empty($lock) && !empty($topic_info['locked'])))
 		{
 			return null;
 		}
 		// You're simply not allowed to (un)lock this.
-		elseif (!allowedTo(array('lock_any', 'lock_own')) || (!allowedTo('lock_any') && $this->user->id != $topic_info['id_member_started']))
+		if (!allowedTo(array('lock_any', 'lock_own')) || (!allowedTo('lock_any') && $this->user->id != $topic_info['id_member_started']))
 		{
 			return null;
 		}
 		// You're only allowed to lock your own topics.
-		elseif (!allowedTo('lock_any'))
+		if (!allowedTo('lock_any'))
 		{
 			// You're not allowed to break a moderator's lock.
 			if ($topic_info['locked'] == 1)
 			{
 				return null;
 			}
-			// Lock it with a soft lock or unlock it.
-			else
-			{
-				$lock = empty($lock) ? 0 : 2;
-			}
+			$lock = empty($lock) ? 0 : 2;
 		}
 		// You must be the moderator.
 		else
@@ -1559,7 +1557,7 @@ class Post extends AbstractController
 			// Censor the message!
 			$row['body'] = censor($row['body']);
 
-			$row['body'] = preg_replace('~<br ?/?' . '>~i', "\n", $row['body']);
+			$row['body'] = preg_replace('~<br ?/?>~i', "\n", $row['body']);
 
 			// Want to modify a single message by double clicking it?
 			if (isset($_REQUEST['modify']))
@@ -1581,7 +1579,7 @@ class Post extends AbstractController
 
 			// Add a quote string on the front and end.
 			$context['quote']['xml'] = '[quote author=' . $row['poster_name'] . ' link=msg=' . (int) $_REQUEST['quote'] . ' date=' . $row['poster_time'] . "]\n" . $row['body'] . "\n[/quote]";
-			$context['quote']['text'] = strtr(un_htmlspecialchars($context['quote']['xml']), array('\'' => '\\\'', '\\' => '\\\\', "\n" => '\\n', '</script>' => '</\' + \'script>'));
+			$context['quote']['text'] = strtr(un_htmlspecialchars($context['quote']['xml']), array("'" => '\\\'', '\\' => '\\\\', "\n" => '\\n', '</script>' => "</' + 'script>"));
 			$context['quote']['xml'] = strtr($context['quote']['xml'], ['&nbsp;' => '&#160;', '<' => '&lt;', '>' => '&gt;']);
 		}
 		//@todo Needs a nicer interface.
@@ -1641,7 +1639,7 @@ class Post extends AbstractController
 				{
 					throw new Exception('modify_post_time_passed', false);
 				}
-				elseif ($row['id_member_started'] == $this->user->id && !allowedTo('modify_own'))
+				if ($row['id_member_started'] == $this->user->id && !allowedTo('modify_own'))
 				{
 					isAllowedTo('modify_replies');
 				}
@@ -1650,7 +1648,6 @@ class Post extends AbstractController
 					isAllowedTo('modify_own');
 				}
 			}
-			// Otherwise, they're locked out; someone who can modify the replies is needed.
 			elseif ($row['id_member_started'] == $this->user->id && !allowedTo('modify_any'))
 			{
 				isAllowedTo('modify_replies');

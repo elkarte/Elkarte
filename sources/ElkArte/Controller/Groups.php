@@ -70,7 +70,7 @@ class Groups extends AbstractController
 	 * Entry point to groups.
 	 * It allows moderators and users to access the group showing functions.
 	 *
-	 * @see \ElkArte\AbstractController::action_index()
+	 * @see AbstractController::action_index
 	 */
 	public function action_index()
 	{
@@ -143,30 +143,28 @@ class Groups extends AbstractController
 						'value' => $txt['name'],
 					),
 					'data' => array(
-						'function' => function ($rowData) use ($base_type, $base_params) {
-							// Since the moderator group has no explicit members, no link is needed.
-							if ($rowData['id_group'] == 3)
-							{
-								$group_name = $rowData['group_name'];
-							}
-							else
-							{
-								$url = getUrl($base_type, array_merge($base_params, ['group' => $rowData['id_group']]));
-								$group_name = sprintf('<a href="%1$s">%2$s</a>', $url, $rowData['group_name_color']);
-							}
-
-							// Add a help option for moderator and administrator.
-							if ($rowData['id_group'] == 1)
-							{
-								$group_name .= ' (<a href="' . getUrl('action', ['action' => 'quickhelp', 'help' => 'membergroup_administrator']) . '" onclick="return reqOverlayDiv(this.href);" class="helpicon i-help"></a>)';
-							}
-							elseif ($rowData['id_group'] == 3)
-							{
-								$group_name .= ' (<a href="' . getUrl('action', ['action' => 'quickhelp', 'help' => 'membergroup_moderator']) . '" onclick="return reqOverlayDiv(this.href);" class="helpicon i-help"></a>)';
-							}
-
-							return $group_name;
-						},
+						'function' => static function ($rowData) use ($base_type, $base_params) {
+          // Since the moderator group has no explicit members, no link is needed.
+          if ($rowData['id_group'] == 3)
+   							{
+   								$group_name = $rowData['group_name'];
+   							}
+   							else
+   							{
+   								$url = getUrl($base_type, array_merge($base_params, ['group' => $rowData['id_group']]));
+   								$group_name = sprintf('<a href="%1$s">%2$s</a>', $url, $rowData['group_name_color']);
+   							}
+          // Add a help option for moderator and administrator.
+          if ($rowData['id_group'] == 1)
+   							{
+   								$group_name .= ' (<a href="' . getUrl('action', ['action' => 'quickhelp', 'help' => 'membergroup_administrator']) . '" onclick="return reqOverlayDiv(this.href);" class="helpicon i-help"></a>)';
+   							}
+   							elseif ($rowData['id_group'] == 3)
+   							{
+   								$group_name .= ' (<a href="' . getUrl('action', ['action' => 'quickhelp', 'help' => 'membergroup_moderator']) . '" onclick="return reqOverlayDiv(this.href);" class="helpicon i-help"></a>)';
+   							}
+          return $group_name;
+      },
 					),
 					'sort' => array(
 						'default' => 'CASE WHEN mg.id_group < 4 THEN mg.id_group ELSE 4 END, mg.group_name',
@@ -178,18 +176,16 @@ class Groups extends AbstractController
 						'value' => $txt['membergroups_icons'],
 					),
 					'data' => array(
-						'function' => function ($rowData) {
-							global $settings;
-
-							if (!empty($rowData['icons'][0]) && !empty($rowData['icons'][1]))
-							{
-								return str_repeat('<img src="' . $settings['images_url'] . '/group_icons/' . $rowData['icons'][1] . '" alt="*" />', $rowData['icons'][0]);
-							}
-							else
-							{
-								return '';
-							}
-						},
+						'function' => static function ($rowData) {
+          global $settings;
+          if (empty($rowData['icons'][0])) {
+              return '';
+          }
+          if (empty($rowData['icons'][1])) {
+              return '';
+          }
+          return str_repeat('<img src="' . $settings['images_url'] . '/group_icons/' . $rowData['icons'][1] . '" alt="*" />', $rowData['icons'][0]);
+      },
 					),
 					'sort' => array(
 						'default' => 'mg.icons',
@@ -201,11 +197,10 @@ class Groups extends AbstractController
 						'value' => $txt['moderators'],
 					),
 					'data' => array(
-						'function' => function ($group) {
-							global $txt;
-
-							return empty($group['moderators']) ? '<em>' . $txt['membergroups_new_copy_none'] . '</em>' : implode(', ', $group['moderators']);
-						},
+						'function' => static function ($group) {
+          global $txt;
+          return empty($group['moderators']) ? '<em>' . $txt['membergroups_new_copy_none'] . '</em>' : implode(', ', $group['moderators']);
+      },
 					),
 				),
 				'members' => array(
@@ -213,12 +208,11 @@ class Groups extends AbstractController
 						'value' => $txt['membergroups_members_top'],
 					),
 					'data' => array(
-						'function' => function ($rowData) {
-							global $txt;
-
-							// No explicit members for the moderator group.
-							return $rowData['id_group'] == 3 ? $txt['membergroups_guests_na'] : comma_format($rowData['num_members']);
-						},
+						'function' => static function ($rowData) {
+          global $txt;
+          // No explicit members for the moderator group.
+          return $rowData['id_group'] == 3 ? $txt['membergroups_guests_na'] : comma_format($rowData['num_members']);
+      },
 						'class' => 'centertext',
 					),
 					'sort' => array(
@@ -299,11 +293,13 @@ class Groups extends AbstractController
 				'id' => $id_member,
 				'name' => $name
 			);
-
-			if ($this->user->id == $id_member && $context['group']['group_type'] != 1)
-			{
-				$context['group']['can_moderate'] = true;
-			}
+   if ($this->user->id != $id_member) {
+       continue;
+   }
+   if ($context['group']['group_type'] == 1) {
+       continue;
+   }
+   $context['group']['can_moderate'] = true;
 		}
 
 		// If this group is hidden then it can only "exist" if the user can moderate it!
@@ -353,7 +349,7 @@ class Groups extends AbstractController
 			preg_match_all('~"([^"]+)"~', $toAdd, $matches);
 			$member_names = array_unique(array_merge($matches[1], explode(',', preg_replace('~"[^"]+"~', '', $toAdd))));
 
-			foreach ($member_names as $index => $member_name)
+			foreach (array_keys($member_names) as $index)
 			{
 				$member_names[$index] = trim(Util::strtolower($member_names[$index]));
 				if ($member_names[$index] === '')

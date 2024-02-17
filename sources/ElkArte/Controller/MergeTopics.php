@@ -38,7 +38,7 @@ class MergeTopics extends AbstractController
 	 * - requires the merge_any permission.
 	 * - is accessed with ?action=mergetopics.
 	 *
-	 * @see \ElkArte\AbstractController::action_index()
+	 * @see AbstractController::action_index
 	 */
 	public function action_index()
 	{
@@ -88,7 +88,7 @@ class MergeTopics extends AbstractController
 		// Prepare a handy query bit for approval...
 		if ($modSettings['postmod_active'])
 		{
-			$can_approve_boards = !empty($this->user->mod_cache['ap']) ? $this->user->mod_cache['ap'] : boardsAllowedTo('approve_posts');
+			$can_approve_boards = empty($this->user->mod_cache['ap']) ? boardsAllowedTo('approve_posts') : $this->user->mod_cache['ap'];
 			$onlyApproved = $can_approve_boards !== array(0) && !in_array($target_board, $can_approve_boards);
 		}
 		else
@@ -136,6 +136,7 @@ class MergeTopics extends AbstractController
 		{
 			$boardListOptions['included_boards'] = $merge_boards;
 		}
+
 		$boards_list = getBoardList($boardListOptions, true);
 		$context['boards'] = array();
 
@@ -177,7 +178,7 @@ class MergeTopics extends AbstractController
 	 * @param int[] $topics = array() of topic ids
 	 *
 	 * @return bool
-	 * @throws \ElkArte\Exceptions\Exception merge_need_more_topics
+	 * @throws Exception merge_need_more_topics
 	 */
 	public function action_mergeExecute($topics = array())
 	{

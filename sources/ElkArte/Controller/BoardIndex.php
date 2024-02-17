@@ -33,7 +33,7 @@ class BoardIndex extends AbstractController implements FrontpageInterface
 	public static function frontPageHook(&$default_action)
 	{
 		$default_action = array(
-			'controller' => '\\ElkArte\\Controller\\BoardIndex',
+			'controller' => BoardIndex::class,
 			'function' => 'action_boardindex'
 		);
 	}
@@ -41,7 +41,7 @@ class BoardIndex extends AbstractController implements FrontpageInterface
 	/**
 	 * Forwards to the action to execute here by default.
 	 *
-	 * @see \ElkArte\AbstractController::action_index()
+	 * @see AbstractController::action_index
 	 */
 	public function action_index()
 	{
@@ -170,10 +170,7 @@ class BoardIndex extends AbstractController implements FrontpageInterface
 
 		// Allow mods to add additional buttons here
 		call_integration_hook('integrate_mark_read_button');
-		if (!empty($context['info_center_callbacks']))
-		{
-			theme()->getLayers()->add('info_center');
-		}
+		theme()->getLayers()->add('info_center');
 	}
 
 	/**
@@ -196,7 +193,7 @@ class BoardIndex extends AbstractController implements FrontpageInterface
 		}
 
 		// Check if the input values are correct.
-		if (isset($this->_req->query->c) && in_array($this->_req->query->sa, array('expand', 'collapse', 'toggle')) )
+		if (isset($this->_req->query->c) && in_array($this->_req->query->sa, array('expand', 'collapse', 'toggle')))
 		{
 			// And collapse/expand/toggle the category.
 			require_once(SUBSDIR . '/Categories.subs.php');

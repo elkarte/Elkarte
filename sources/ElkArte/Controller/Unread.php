@@ -24,40 +24,22 @@ use ElkArte\Exceptions\Exception;
  */
 class Unread extends AbstractController
 {
-	/**
-	 * The board ids we are marking
-	 *
-	 * @var array
-	 */
-	private $_boards = array();
+	/** @var array The board ids we are marking */
+	private $_boards = [];
 
-	/**
-	 * @var bool
-	 */
+	/** @var bool */
 	private $_is_topics = false;
 
-	/**
-	 * Number of topics
-	 *
-	 * @var int
-	 */
+	/** @var int Number of topics */
 	private $_num_topics = 0;
 
-	/**
-	 * The action being performed
-	 *
-	 * @var string
-	 */
+	/** @var string The action being performed */
 	private $_action = 'unread';
 
-	/**
-	 * @var bool
-	 */
+	/** @var bool */
 	private $_action_unread = false;
 
-	/**
-	 * @var bool
-	 */
+	/** @var bool */
 	private $_action_unreadreplies = false;
 
 	/**
@@ -65,7 +47,7 @@ class Unread extends AbstractController
 	 *
 	 * @var Unread
 	 */
-	private $_grabber = null;
+	private $_grabber;
 
 	/**
 	 * Called before any other action method in this class.
@@ -166,17 +148,22 @@ class Unread extends AbstractController
 	private function _checkServerLoad()
 	{
 		global $context, $modSettings;
-
 		// Check for any server load issues
-		if ($context['showing_all_topics'] && !empty($modSettings['loadavg_allunread']) && $modSettings['current_load'] >= $modSettings['loadavg_allunread'])
+		if ($context['showing_all_topics']
+			&& !empty($modSettings['loadavg_allunread'])
+			&& $modSettings['current_load'] >= $modSettings['loadavg_allunread'])
 		{
 			throw new Exception('loadavg_allunread_disabled', false);
 		}
-		elseif ($this->_action_unreadreplies && !empty($modSettings['loadavg_unreadreplies']) && $modSettings['current_load'] >= $modSettings['loadavg_unreadreplies'])
+		elseif ($this->_action_unreadreplies
+			&& !empty($modSettings['loadavg_unreadreplies'])
+			&& $modSettings['current_load'] >= $modSettings['loadavg_unreadreplies'])
 		{
 			throw new Exception('loadavg_unreadreplies_disabled', false);
 		}
-		elseif (!$context['showing_all_topics'] && $this->_action_unread && !empty($modSettings['loadavg_unread']) && $modSettings['current_load'] >= $modSettings['loadavg_unread'])
+		elseif (!$context['showing_all_topics']
+			&& $this->_action_unread && !empty($modSettings['loadavg_unread'])
+			&& $modSettings['current_load'] >= $modSettings['loadavg_unread'])
 		{
 			throw new Exception('loadavg_unread_disabled', false);
 		}
@@ -247,10 +234,8 @@ class Unread extends AbstractController
 		{
 			throw new Exception('error_no_boards_selected');
 		}
-		else
-		{
-			$this->_grabber->setBoards($this->_boards);
-		}
+
+		$this->_grabber->setBoards($this->_boards);
 	}
 
 	/**
@@ -294,7 +279,7 @@ class Unread extends AbstractController
 		// Trick
 		$txt['starter'] = $txt['started_by'];
 
-		foreach ($sort_methods as $key => $val)
+		foreach (array_keys($sort_methods) as $key)
 		{
 			switch ($key)
 			{
@@ -313,7 +298,7 @@ class Unread extends AbstractController
 	/**
 	 * Intended entry point for unread controller class.
 	 *
-	 * @see \ElkArte\AbstractController::action_index()
+	 * @see AbstractController::action_index
 	 */
 	public function action_index()
 	{
@@ -371,6 +356,7 @@ class Unread extends AbstractController
 		{
 			$context['topics'] = $this->_grabber->getUnreads($type, $this->_req->query->start, $context['topics_per_page'], $settings['avatars_on_indexes']);
 		}
+
 		$this->_exiting_unread();
 
 		return true;
@@ -514,10 +500,10 @@ class Unread extends AbstractController
 
 			$recent_buttons = array(
 				'markread' => array(
-					'text' => !empty($context['no_board_limits']) ? 'mark_as_read' : 'mark_read_short',
+					'text' => empty($context['no_board_limits']) ? 'mark_read_short' : 'mark_as_read',
 					'lang' => true,
 					'custom' => 'onclick="return markunreadButton(this);"',
-					'url' => $scripturl . '?action=markasread;sa=' . (!empty($context['no_board_limits']) ? 'all' : 'board' . $context['querystring_board_limits']) . ';' . $context['session_var'] . '=' . $context['session_id'],
+					'url' => $scripturl . '?action=markasread;sa=' . (empty($context['no_board_limits']) ? 'board' . $context['querystring_board_limits'] : 'all') . ';' . $context['session_var'] . '=' . $context['session_id'],
 				),
 			);
 
@@ -533,9 +519,9 @@ class Unread extends AbstractController
 			if (!empty($context['topics']) && !$context['showing_all_topics'])
 			{
 				$recent_buttons['readall'] = array('text' => 'unread_topics_all',
-												   'lang' => true,
-												   'url' => $scripturl . '?action=unread;all' . $context['querystring_board_limits'],
-												   'active' => true);
+					'lang' => true,
+					'url' => $scripturl . '?action=unread;all' . $context['querystring_board_limits'],
+					'active' => true);
 			}
 		}
 		elseif (!$this->_is_topics && isset($topics_to_mark))

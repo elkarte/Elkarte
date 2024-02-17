@@ -31,7 +31,7 @@ class Jslocale extends AbstractController
 	 *
 	 * @var string
 	 */
-	private $_file_data = null;
+	private $_file_data;
 
 	/**
 	 * {@inheritdoc }
@@ -141,6 +141,7 @@ class Jslocale extends AbstractController
 			{
 				$privacypol = new PrivacyPolicy($lang);
 			}
+
 			$context['json_data'] = array('agreement' => '', 'privacypol' => '');
 			try
 			{

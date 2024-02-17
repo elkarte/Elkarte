@@ -40,7 +40,7 @@ class MessageIndex extends AbstractController implements FrontpageInterface
 		add_integration_function('integrate_current_action', '\\ElkArte\\Controller\\MessageIndex::fixCurrentAction', '', false);
 
 		$default_action = [
-			'controller' => '\\ElkArte\\Controller\\MessageIndex',
+			'controller' => MessageIndex::class,
 			'function' => 'action_messageindex_fp'
 		];
 	}
@@ -112,7 +112,7 @@ class MessageIndex extends AbstractController implements FrontpageInterface
 	/**
 	 * Dispatches forward to message index handler.
 	 *
-	 * @see \ElkArte\AbstractController::action_index()
+	 * @see AbstractController::action_index
 	 */
 	public function action_index()
 	{
@@ -302,16 +302,11 @@ class MessageIndex extends AbstractController implements FrontpageInterface
 		// todo: Need to move this to theme.
 		foreach ($sort_methods as $key => $val)
 		{
-			switch ($key)
+			$sorticon = match ($key)
 			{
-				case 'subject':
-				case 'starter':
-				case 'last_poster':
-					$sorticon = 'alpha';
-					break;
-				default:
-					$sorticon = 'numeric';
-			}
+				'subject', 'starter', 'last_poster' => 'alpha',
+				default => 'numeric',
+			};
 
 			$context['topics_headers'][$key] = [
 				'url' => getUrl('board', ['board' => $context['current_board'], 'start' => $context['start'], 'sort' => $key, 'name' => $board_info['name'], $context['sort_by'] == $key && $context['sort_direction'] === 'up' ? 'desc' : 'asc']),
@@ -335,7 +330,7 @@ class MessageIndex extends AbstractController implements FrontpageInterface
 		// Set up the query options
 		$indexOptions = [
 			'only_approved' => $modSettings['postmod_active'] && !allowedTo('approve_posts'),
-			'previews' => !empty($modSettings['message_index_preview']) ? (empty($modSettings['preview_characters']) ? -1 : $modSettings['preview_characters']) : 0,
+			'previews' => empty($modSettings['message_index_preview']) ? 0 : (empty($modSettings['preview_characters']) ? -1 : $modSettings['preview_characters']),
 			'include_avatars' => $settings['avatars_on_indexes'],
 			'ascending' => $ascending,
 			'fake_ascending' => $fake_ascending
@@ -346,7 +341,7 @@ class MessageIndex extends AbstractController implements FrontpageInterface
 
 		$topics_info = messageIndexTopics($board, $this->user->id, $start, $maxindex, $context['sort_by'], $sort_column, $indexOptions);
 
-		$context['topics'] = TopicUtil::prepareContext($topics_info, false, !empty($modSettings['preview_characters']) ? $modSettings['preview_characters'] : 128);
+		$context['topics'] = TopicUtil::prepareContext($topics_info, false, empty($modSettings['preview_characters']) ? 128 : $modSettings['preview_characters']);
 
 		// Allow addons to add to the $context['topics']
 		call_integration_hook('integrate_messageindex_listing', [$topics_info]);
@@ -529,6 +524,7 @@ class MessageIndex extends AbstractController implements FrontpageInterface
 		]);
 		$validator->input_processing(['topics' => 'array']);
 		$validator->validate($this->_req->post);
+
 		$selected_topics = $validator->topics;
 		$selected_qaction = $validator->qaction;
 
@@ -658,12 +654,9 @@ class MessageIndex extends AbstractController implements FrontpageInterface
 
 			foreach ($topics_info as $row)
 			{
-				if (!empty($board))
+				if (!empty($board) && ($row['id_board'] != $board || ($modSettings['postmod_active'] && !$row['approved'] && !allowedTo('approve_posts'))))
 				{
-					if ($row['id_board'] != $board || ($modSettings['postmod_active'] && !$row['approved'] && !allowedTo('approve_posts')))
-					{
-						continue;
-					}
+					continue;
 				}
 
 				// Don't allow them to act on unapproved posts they can't see...
@@ -715,6 +708,7 @@ class MessageIndex extends AbstractController implements FrontpageInterface
 						{
 							$moveCache[0][] = $row['id_topic'];
 						}
+
 						break;
 					case 'remove':
 						$removeCache[] = $row['id_topic'];

@@ -27,19 +27,15 @@ use ElkArte\Util;
  */
 class PostModeration extends AbstractController
 {
-	/**
-	 * Holds any passed brd values, used for filtering and the like
-	 *
-	 * @var array|null
-	 */
-	private $_brd = null;
+	/** @var array|null Holds any passed brd values, used for filtering and the like */
+	private $_brd;
 
 	/**
 	 * This is the entry point for all things post moderation.
 	 *
 	 * @uses ModerationCenter.template
 	 * @uses ModerationCenter language file
-	 * @see  \ElkArte\AbstractController::action_index()
+	 * @see AbstractController::action_index
 	 */
 	public function action_index()
 	{
@@ -74,13 +70,13 @@ class PostModeration extends AbstractController
 		$context['header_title'] = $txt['mc_' . ($context['current_view'] === 'topics' ? 'topics' : 'posts')];
 
 		// Work out what boards we can work in!
-		$approve_boards = !empty($this->user->mod_cache['ap']) ? $this->user->mod_cache['ap'] : boardsAllowedTo('approve_posts');
+		$approve_boards = empty($this->user->mod_cache['ap']) ? boardsAllowedTo('approve_posts') : $this->user->mod_cache['ap'];
 
 		$this->_brd = $this->_req->getPost('brd', 'intval', $this->_req->getQuery('brd', 'intval', null));
 
 		// If we filtered by board remove ones outside of this board.
 		// @todo Put a message saying we're filtered?
-		if (isset($this->_brd))
+		if ($this->_brd !== null)
 		{
 			$filter_board = array($this->_brd);
 			$approve_boards = $approve_boards == array(0) ? $filter_board : array_intersect($approve_boards, $filter_board);
@@ -244,7 +240,7 @@ class PostModeration extends AbstractController
 
 		$context['total_unapproved_topics'] = $mod_count['topics'];
 		$context['total_unapproved_posts'] = $mod_count['posts'];
-		$context['page_index'] = constructPageIndex('{scripturl}?action=moderate;area=postmod;sa=' . $context['current_view'] . (isset($this->_brd) ? ';brd=' . $this->_brd : ''), $this->_req->query->start, $context['current_view'] === 'topics' ? $context['total_unapproved_topics'] : $context['total_unapproved_posts'], 10);
+		$context['page_index'] = constructPageIndex('{scripturl}?action=moderate;area=postmod;sa=' . $context['current_view'] . ($this->_brd !== null ? ';brd=' . $this->_brd : ''), $this->_req->query->start, $context['current_view'] === 'topics' ? $context['total_unapproved_topics'] : $context['total_unapproved_posts'], 10);
 		$context['start'] = $this->_req->query->start;
 
 		// We have enough to make some pretty tabs!
@@ -259,7 +255,7 @@ class PostModeration extends AbstractController
 		$context['menu_data_' . $context['moderation_menu_id']]['sections']['posts']['areas']['postmod']['subsections']['topics']['label'] = $context['menu_data_' . $context['moderation_menu_id']]['sections']['posts']['areas']['postmod']['subsections']['topics']['label'] . ' [' . $context['total_unapproved_topics'] . ']';
 
 		// If we are filtering some boards out then make sure to send that along with the links.
-		if (isset($this->_brd))
+		if ($this->_brd !== null)
 		{
 			$context['menu_data_' . $context['moderation_menu_id']]['sections']['posts']['areas']['postmod']['subsections']['posts']['add_params'] = ';brd=' . $this->_brd;
 			$context['menu_data_' . $context['moderation_menu_id']]['sections']['posts']['areas']['postmod']['subsections']['topics']['add_params'] = ';brd=' . $this->_brd;
@@ -306,7 +302,7 @@ class PostModeration extends AbstractController
 		$context['page_title'] = $txt['mc_unapproved_attachments'];
 
 		// Once again, permissions are king!
-		$approve_boards = !empty($this->user->mod_cache['ap']) ? $this->user->mod_cache['ap'] : boardsAllowedTo('approve_posts');
+		$approve_boards = empty($this->user->mod_cache['ap']) ? boardsAllowedTo('approve_posts') : $this->user->mod_cache['ap'];
 
 		if ($approve_boards == array(0))
 		{
@@ -427,9 +423,7 @@ class PostModeration extends AbstractController
 						'value' => $txt['mc_unapproved_attach_poster'],
 					),
 					'data' => array(
-						'function' => function ($data) {
-							return $data['poster']['link'];
-						},
+						'function' => static fn($data) => $data['poster']['link'],
 					),
 					'sort' => array(
 						'default' => 'm.id_member',
@@ -456,10 +450,9 @@ class PostModeration extends AbstractController
 						'value' => $txt['post'],
 					),
 					'data' => array(
-						'function' => function ($data) {
+						'function' => static function ($data) {
 							global $modSettings;
-
-							return '<a href="' . $data['message']['href'] . '">' . Util::shorten_text($data['message']['subject'], !empty($modSettings['subject_length']) ? $modSettings['subject_length'] : 32) . '</a>';
+							return '<a href="' . $data['message']['href'] . '">' . Util::shorten_text($data['message']['subject'], empty($modSettings['subject_length']) ? 32 : $modSettings['subject_length']) . '</a>';
 						},
 						'class' => 'smalltext',
 						'style' => 'width:15em;',

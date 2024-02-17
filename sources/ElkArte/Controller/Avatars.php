@@ -34,10 +34,10 @@ use ElkArte\TokenHash;
  */
 class Avatars
 {
-	/** @var \ElkArte\HttpReq */
+	/** @var HttpReq */
 	private $req;
 
-	/** @var \ElkArte\FileFunctions */
+	/** @var FileFunctions */
 	private $file_functions;
 
 	/** @var boolean */
@@ -78,12 +78,12 @@ class Avatars
 	{
 		global $modSettings;
 
-		// See if we need to process and external url that we save as a file
+		// See if we need to process an external url that we save as a file
 		$check = false;
 		if ($value === 'external'
 			&& !empty($modSettings['avatar_external_enabled'])
-			&& ($this->_isValidHttp() || $this->_isValidHttps())
-			&& !empty($modSettings['avatar_download_external']))
+			&& !empty($modSettings['avatar_download_external'])
+			&& ($this->_isValidHttp() || $this->_isValidHttps()))
 		{
 			$check = $this->processExternalStored();
 		}
@@ -126,7 +126,7 @@ class Avatars
 	/**
 	 * Supplying an external url for your avatar that we download
 	 *
-	 * @throws \ElkArte\Exceptions\Exception attachments_no_write
+	 * @throws Exception attachments_no_write
 	 */
 	public function processExternalStored()
 	{
@@ -292,15 +292,11 @@ class Avatars
 
 		// Do any security checks now, although a re-encode could occur in subsequent steps
 		// it is simpler and cleaner to do it now.
-		if (!$image->checkImageContents())
+		// It's bad. Last chance, maybe we can re-encode it?
+		if (!$image->checkImageContents() && (empty($modSettings['avatar_reencode']) || (!$image->reEncodeImage())))
 		{
-			// It's bad. Last chance, maybe we can re-encode it?
-			if (empty($modSettings['avatar_reencode']) || (!$image->reEncodeImage()))
-			{
-				unset($image);
-
-				return false;
-			}
+			unset($image);
+			return false;
 		}
 
 		// Do any size manipulations as required
@@ -325,7 +321,7 @@ class Avatars
 	 * - To big, and we want to resize it, resize/save it
 	 *
 	 * @param array $sizes
-	 * @param \ElkArte\Graphics\Image $image
+	 * @param Image $image
 	 * @return boolean
 	 */
 	public function prepareAvatarImage($sizes, $image)
@@ -374,7 +370,7 @@ class Avatars
 	 *
 	 * Image has been loaded, validated as an image, and gone through security checks.
 	 *
-	 * @param \ElkArte\Graphics\Image $image
+	 * @param Image $image
 	 * @return boolean
 	 */
 	private function _saveUploadedAvatar($image)
@@ -400,7 +396,8 @@ class Avatars
 			$extension = 'png';
 			$sizes[2] = IMAGETYPE_PNG;
 		}
-		$preferred_format = (int) array_search($extension, $valid_avatar_extensions);
+
+		$preferred_format = (int) array_search($extension, $valid_avatar_extensions, true);
 		$mime_type = getValidMimeImageType($sizes[2]);
 
 		// Generate the final name
@@ -450,11 +447,11 @@ class Avatars
 			);
 
 			// Retain this globally in case the script wants it.
-			$modSettings['new_avatar_data'] = array(
+			$modSettings['new_avatar_data'] = [
 				'id' => $db->insert_id('{db_prefix}attachments'),
 				'filename' => $destName,
 				'type' => 1,
-			);
+			];
 
 			return true;
 		}
@@ -489,7 +486,7 @@ class Avatars
 	 * Move an uploaded avatar with a secure temp name to the custom avatar directory
 	 * or die trying
 	 *
-	 * @throws \ElkArte\Exceptions\Exception attachments_no_write, attach_timeout
+	 * @throws Exception attachments_no_write, attach_timeout
 	 */
 	private function _moveTempAvatar()
 	{

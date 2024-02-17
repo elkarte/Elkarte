@@ -19,11 +19,13 @@ namespace ElkArte\Controller;
 use BBC\ParserWrapper;
 use ElkArte\AbstractController;
 use ElkArte\Action;
+use ElkArte\AdminController\ManageMembers;
+use ElkArte\AdminController\Modlog;
 use ElkArte\Cache\Cache;
 use ElkArte\Exceptions\Exception;
+use ElkArte\Languages\Txt;
 use ElkArte\Menu\Menu;
 use ElkArte\MessagesDelete;
-use ElkArte\Languages\Txt;
 use ElkArte\User;
 use ElkArte\Util;
 
@@ -32,17 +34,13 @@ use ElkArte\Util;
  */
 class ModerationCenter extends AbstractController
 {
-	/**
-	 * Holds function array to pass to callMenu to call the right moderation area
-	 *
-	 * @var array
-	 */
+	/** @var array Holds function array to pass to callMenu to call the right moderation area */
 	private $_mod_include_data;
 
 	/**
 	 * Entry point for the moderation center.
 	 *
-	 * @see \ElkArte\AbstractController::action_index()
+	 * @see AbstractController::action_index
 	 */
 	public function action_index()
 	{
@@ -58,8 +56,7 @@ class ModerationCenter extends AbstractController
 	/**
 	 * Prepare menu, make checks, load files, and create moderation menu.
 	 *
-	 * This can be called from the class, or from outside, to
-	 * set up moderation menu.
+	 * This can be called from the class, or from outside, to set up moderation menu.
 	 */
 	public function prepareModcenter()
 	{
@@ -90,7 +87,7 @@ class ModerationCenter extends AbstractController
 
 		if (!empty($options['admin_preferences']))
 		{
-			$context['admin_preferences'] = serializeToJson($options['admin_preferences'], function ($array_form) {
+			$context['admin_preferences'] = serializeToJson($options['admin_preferences'], static function ($array_form) {
 				global $context;
 
 				$context['admin_preferences'] = $array_form;
@@ -116,25 +113,25 @@ class ModerationCenter extends AbstractController
 				'areas' => array(
 					'index' => array(
 						'label' => $txt['moderation_center'],
-						'controller' => '\\ElkArte\\Controller\\ModerationCenter',
+						'controller' => ModerationCenter::class,
 						'function' => 'action_moderationHome',
 						'class' => 'i-home i-admin',
 					),
 					'settings' => array(
 						'label' => $txt['mc_settings'],
-						'controller' => '\\ElkArte\\Controller\\ModerationCenter',
+						'controller' => ModerationCenter::class,
 						'function' => 'action_moderationSettings',
 						'class' => 'i-switch-on i-admin',
 					),
 					'modlogoff' => array(
 						'label' => $txt['mc_logoff'],
-						'controller' => '\\ElkArte\\Controller\\ModerationCenter',
+						'controller' => ModerationCenter::class,
 						'function' => 'action_modEndSession',
 						'enabled' => empty($modSettings['securityDisable_moderate']),
 						'class' => 'i-sign-out i-admin',
 					),
 					'notice' => array(
-						'controller' => '\\ElkArte\\Controller\\ModerationCenter',
+						'controller' => ModerationCenter::class,
 						'function' => 'action_showNotice',
 						'select' => 'index',
 						'class' => 'i-post-text i-admin',
@@ -147,14 +144,14 @@ class ModerationCenter extends AbstractController
 					'modlog' => array(
 						'label' => $txt['modlog_view'],
 						'enabled' => featureEnabled('ml') && $context['can_moderate_boards'],
-						'controller' => '\\ElkArte\\AdminController\\Modlog',
+						'controller' => Modlog::class,
 						'function' => 'action_log',
 						'class' => 'i-comments i-admin',
 					),
 					'warnings' => array(
 						'label' => $txt['mc_warnings'],
 						'enabled' => featureEnabled('w') && !empty($modSettings['warning_enable']) && $context['can_moderate_boards'],
-						'controller' => '\\ElkArte\\Controller\\ModerationCenter',
+						'controller' => ModerationCenter::class,
 						'function' => 'action_viewWarnings',
 						'class' => 'i-warn i-admin',
 						'subsections' => array(
@@ -165,13 +162,13 @@ class ModerationCenter extends AbstractController
 				),
 			),
 			'posts' => array(
-				'title' => $txt['mc_posts'] . (!empty($mod_counts['pt_total']) ? ' [' . $mod_counts['pt_total'] . ']' : ''),
+				'title' => $txt['mc_posts'] . (empty($mod_counts['pt_total']) ? '' : ' [' . $mod_counts['pt_total'] . ']'),
 				'enabled' => $context['can_moderate_boards'] || $context['can_moderate_approvals'],
 				'areas' => array(
 					'postmod' => array(
-						'label' => $txt['mc_unapproved_posts'] . (!empty($mod_counts['postmod']) ? ' [' . $mod_counts['postmod'] . ']' : ''),
+						'label' => $txt['mc_unapproved_posts'] . (empty($mod_counts['postmod']) ? '' : ' [' . $mod_counts['postmod'] . ']'),
 						'enabled' => $context['can_moderate_approvals'],
-						'controller' => '\\ElkArte\\Controller\\PostModeration',
+						'controller' => PostModeration::class,
 						'function' => 'action_index',
 						'class' => 'i-post-text i-admin',
 						'custom_url' => getUrl('action', ['action' => 'moderate', 'area' => 'postmod']),
@@ -181,35 +178,35 @@ class ModerationCenter extends AbstractController
 						),
 					),
 					'emailmod' => array(
-						'label' => $txt['mc_emailerror'] . (!empty($mod_counts['emailmod']) ? ' [' . $mod_counts['emailmod'] . ']' : ''),
+						'label' => $txt['mc_emailerror'] . (empty($mod_counts['emailmod']) ? '' : ' [' . $mod_counts['emailmod'] . ']'),
 						'enabled' => !empty($modSettings['maillist_enabled']) && allowedTo('approve_emails'),
 						'function' => 'UnapprovedEmails',
 						'class' => 'i-envelope-blank i-admin',
 						'custom_url' => getUrl('action', ['action' => 'moderate', 'area' => 'maillist', 'sa' => 'emaillist']),
 					),
 					'attachmod' => array(
-						'label' => $txt['mc_unapproved_attachments'] . (!empty($mod_counts['attachments']) ? ' [' . $mod_counts['attachments'] . ']' : ''),
+						'label' => $txt['mc_unapproved_attachments'] . (empty($mod_counts['attachments']) ? '' : ' [' . $mod_counts['attachments'] . ']'),
 						'enabled' => $context['can_moderate_approvals'],
-						'controller' => '\\ElkArte\\Controller\\PostModeration',
+						'controller' => PostModeration::class,
 						'function' => 'action_index',
 						'class' => 'i-paperclip i-admin',
 						'custom_url' => getUrl('action', ['action' => 'moderate', 'area' => 'attachmod', 'sa' => 'attachments']),
 					),
 					'reports' => array(
-						'label' => $txt['mc_reported_posts'] . (!empty($mod_counts['reports']) ? ' [' . $mod_counts['reports'] . ']' : ''),
+						'label' => $txt['mc_reported_posts'] . (empty($mod_counts['reports']) ? '' : ' [' . $mod_counts['reports'] . ']'),
 						'enabled' => $context['can_moderate_boards'],
-						'controller' => '\\ElkArte\\Controller\\ModerationCenter',
+						'controller' => ModerationCenter::class,
 						'function' => 'action_reportedPosts',
 						'class' => 'i-modify i-admin',
 						'subsections' => array(
-							'open' => array($txt['mc_reportedp_active'] . (!empty($mod_counts['reports']) ? ' [' . $mod_counts['reports'] . ']' : '')),
+							'open' => array($txt['mc_reportedp_active'] . (empty($mod_counts['reports']) ? '' : ' [' . $mod_counts['reports'] . ']')),
 							'closed' => array($txt['mc_reportedp_closed']),
 						),
 					),
 					'pm_reports' => array(
-						'label' => $txt['mc_reported_pms'] . (!empty($mod_counts['pm_reports']) ? ' [' . $mod_counts['pm_reports'] . ']' : ''),
+						'label' => $txt['mc_reported_pms'] . (empty($mod_counts['pm_reports']) ? '' : ' [' . $mod_counts['pm_reports'] . ']'),
 						'enabled' => $this->user->is_admin,
-						'controller' => '\\ElkArte\\Controller\\ModerationCenter',
+						'controller' => ModerationCenter::class,
 						'function' => 'action_reportedPosts',
 						'class' => 'i-alert i-admin',
 						'subsections' => array(
@@ -220,13 +217,13 @@ class ModerationCenter extends AbstractController
 				),
 			),
 			'groups' => array(
-				'title' => $txt['mc_groups'] . (!empty($mod_counts['mg_total']) ? ' [' . $mod_counts['mg_total'] . ']' : ''),
+				'title' => $txt['mc_groups'] . (empty($mod_counts['mg_total']) ? '' : ' [' . $mod_counts['mg_total'] . ']'),
 				'enabled' => $context['can_moderate_groups'],
 				'areas' => array(
 					'userwatch' => array(
 						'label' => $txt['mc_watched_users_title'],
 						'enabled' => featureEnabled('w') && !empty($modSettings['warning_enable']) && $context['can_moderate_boards'],
-						'controller' => '\\ElkArte\\Controller\\ModerationCenter',
+						'controller' => ModerationCenter::class,
 						'function' => 'action_viewWatchedUsers',
 						'class' => 'i-user i-admin',
 						'subsections' => array(
@@ -235,23 +232,23 @@ class ModerationCenter extends AbstractController
 						),
 					),
 					'groups' => array(
-						'label' => $txt['mc_group_requests'] . (!empty($mod_counts['groupreq']) ? ' [' . $mod_counts['groupreq'] . ']' : ''),
-						'controller' => '\\ElkArte\\Controller\\Groups',
+						'label' => $txt['mc_group_requests'] . (empty($mod_counts['groupreq']) ? '' : ' [' . $mod_counts['groupreq'] . ']'),
+						'controller' => Groups::class,
 						'function' => 'action_index',
 						'class' => 'i-users i-admin',
 						'custom_url' => getUrl('action', ['action' => 'moderate', 'area' => 'groups', 'sa' => 'requests']),
 					),
 					'members' => array(
 						'enabled' => allowedTo('moderate_forum'),
-						'label' => $txt['mc_member_requests'] . (!empty($mod_counts['memberreq']) ? ' [' . $mod_counts['memberreq'] . ']' : ''),
-						'controller' => '\\ElkArte\\AdminController\\ManageMembers',
+						'label' => $txt['mc_member_requests'] . (empty($mod_counts['memberreq']) ? '' : ' [' . $mod_counts['memberreq'] . ']'),
+						'controller' => ManageMembers::class,
 						'function' => 'action_approve',
 						'class' => 'i-user-plus i-admin',
 						'custom_url' => getUrl('admin', ['action' => 'admin', 'area' => 'viewmembers', 'sa' => 'browse', 'type' => 'approve']),
 					),
 					'viewgroups' => array(
 						'label' => $txt['mc_view_groups'],
-						'controller' => '\\ElkArte\\Controller\\Groups',
+						'controller' => Groups::class,
 						'function' => 'action_index',
 						'class' => 'i-view i-admin',
 					),
@@ -332,7 +329,7 @@ class ModerationCenter extends AbstractController
 		$context['sub_template'] = 'moderation_center';
 
 		// Start off with no blocks
-		$valid_blocks = array();
+		$valid_blocks = [];
 
 		// Load what blocks the user actually can see...
 		$valid_blocks['p'] = 'notes';
@@ -356,7 +353,7 @@ class ModerationCenter extends AbstractController
 		}
 		else
 		{
-			list (, $user_blocks) = explode('|', User::$settings['mod_prefs']);
+			[, $user_blocks] = explode('|', User::$settings['mod_prefs']);
 		}
 
 		$user_blocks = str_split($user_blocks);
@@ -407,7 +404,7 @@ class ModerationCenter extends AbstractController
 			throw new Exception('no_access', false);
 		}
 
-		list ($context['notice_body'], $context['notice_subject']) = $notice;
+		[$context['notice_body'], $context['notice_subject']] = $notice;
 
 		$parser = ParserWrapper::instance();
 
@@ -524,7 +521,7 @@ class ModerationCenter extends AbstractController
 			$context['reports'][$row['id_report']] = array(
 				'board' => $row['id_board'],
 				'id' => $row['id_report'],
-				'topic_href' => getUrl('topic', ['topic' => $row['id_topic'], 'msg' =>  $row['id_msg'], 'start' => $row['id_msg'], 'hash' => '#msg' . $row['id_msg']]),
+				'topic_href' => getUrl('topic', ['topic' => $row['id_topic'], 'msg' => $row['id_msg'], 'start' => $row['id_msg'], 'hash' => '#msg' . $row['id_msg']]),
 				'report_href' => getUrl('action', ['action' => 'moderate', 'area' => $context['admin_area'], 'report' => $row['id_report']]),
 				'author' => array(
 					'id' => $row['id_author'],
@@ -561,7 +558,7 @@ class ModerationCenter extends AbstractController
 					'close' => array(
 						'url' => getUrl('action', ['action' => 'moderate', 'area' => $context['admin_area'], 'sa' => ($context['view_closed'] ? 'closed' : ''), 'close' => (int) !$row['closed'], 'rid' => $row['id_report'], 'start' => $context['start'], '{session_data}']),
 						'text' => $context['view_closed'] ? 'mc_reportedp_open' : 'mc_reportedp_close',
-						'icon' =>  $context['view_closed'] ?  'sign-in' : 'close',
+						'icon' => $context['view_closed'] ? 'sign-in' : 'close',
 					),
 				),
 			);
@@ -738,7 +735,7 @@ class ModerationCenter extends AbstractController
 			'title' => $txt['mc_modreport_modactions'],
 			'items_per_page' => 15,
 			'no_items_label' => $txt['modlog_no_entries_found'],
-			'base_href' =>getUrl('action', ['action' => 'moderate', 'area' => $context['admin_area'], 'report' => $context['report']['id']]),
+			'base_href' => getUrl('action', ['action' => 'moderate', 'area' => $context['admin_area'], 'report' => $context['report']['id']]),
 			'default_sort_col' => 'time',
 			'get_items' => array(
 				'function' => 'list_getModLogEntries',
@@ -860,7 +857,7 @@ class ModerationCenter extends AbstractController
 			'close' => [
 				'url' => getUrl('action', ['action' => 'moderate', 'area' => $context['admin_area'], 'close' => (int) !$context['report'] ['closed'], 'rid' => $context['report'] ['id'], '{session_data}']),
 				'text' => $context['report'] ['closed'] ? 'mc_reportedp_open' : 'mc_reportedp_close',
-				'icon' =>  $context['report'] ['closed'] ?  'sign-in' : 'close',
+				'icon' => $context['report'] ['closed'] ? 'sign-in' : 'close',
 			],
 		];
 
@@ -910,7 +907,7 @@ class ModerationCenter extends AbstractController
 		}
 		else
 		{
-			list ($show_reports, $mod_blocks, $pref_binary) = explode('|', User::$settings['mod_prefs']);
+			[$show_reports, $mod_blocks, $pref_binary] = explode('|', User::$settings['mod_prefs']);
 		}
 
 		// Are we saving?
@@ -960,7 +957,7 @@ class ModerationCenter extends AbstractController
 					$pref_binary |= ($this->_req->post->mod_notify_report == 2 ? 1 : 2);
 				}
 
-				$show_reports = !empty($this->_req->post->mod_show_reports) ? 1 : 0;
+				$show_reports = empty($this->_req->post->mod_show_reports) ? 0 : 1;
 			}
 
 			// Put it all together.
@@ -1040,7 +1037,7 @@ class ModerationCenter extends AbstractController
 		else
 		{
 			// Still obey permissions!
-			$approve_boards = !empty($this->user->mod_cache['ap']) ? $this->user->mod_cache['ap'] : boardsAllowedTo('approve_posts');
+			$approve_boards = empty($this->user->mod_cache['ap']) ? boardsAllowedTo('approve_posts') : $this->user->mod_cache['ap'];
 			$delete_boards = boardsAllowedTo('delete_any');
 
 			if ($approve_boards == array(0))
@@ -1069,12 +1066,8 @@ class ModerationCenter extends AbstractController
 			'default_sort_col' => $context['view_posts'] ? '' : 'member',
 			'get_items' => array(
 				'function' => $context['view_posts']
-					? function ($start, $items_per_page, $sort, $approve_query, $delete_boards) {
-						return $this->list_getWatchedUserPosts($start, $items_per_page, $sort, $approve_query, $delete_boards);
-					}
-					: function ($start, $items_per_page, $sort) {
-						return $this->list_getWatchedUsers($start, $items_per_page, $sort);
-					},
+					? fn($start, $items_per_page, $sort, $approve_query, $delete_boards) => $this->list_getWatchedUserPosts($start, $items_per_page, $sort, $approve_query, $delete_boards)
+					: fn($start, $items_per_page, $sort) => $this->list_getWatchedUsers($start, $items_per_page, $sort),
 				'params' => array(
 					$approve_query,
 					$delete_boards,
@@ -1082,12 +1075,8 @@ class ModerationCenter extends AbstractController
 			),
 			'get_count' => array(
 				'function' => $context['view_posts']
-					? function ($approve_query) {
-						return $this->list_getWatchedUserPostsCount($approve_query);
-					}
-					: function () {
-						return $this->list_getWatchedUserCount();
-					},
+					? fn($approve_query) => $this->list_getWatchedUserPostsCount($approve_query)
+					: fn() => $this->list_getWatchedUserCount(),
 				'params' => array(
 					$approve_query,
 				),
@@ -1117,9 +1106,7 @@ class ModerationCenter extends AbstractController
 						'value' => $txt['mc_watched_users_warning'],
 					),
 					'data' => array(
-						'function' => function ($member) {
-							return allowedTo('issue_warning') ? '<a href="' . getUrl('action', ['action' => 'profile', 'area' => 'issuewarning', 'u' => $member['id']]) . '">' . $member['warning'] . '%</a>' : $member['warning'] . '%';
-						},
+						'function' => static fn($member) => allowedTo('issue_warning') ? '<a href="' . getUrl('action', ['action' => 'profile', 'area' => 'issuewarning', 'u' => $member['id']]) . '">' . $member['warning'] . '%</a>' : $member['warning'] . '%',
 					),
 					'sort' => array(
 						'default' => 'warning',
@@ -1161,7 +1148,7 @@ class ModerationCenter extends AbstractController
 						'value' => $txt['mc_watched_users_last_post'],
 					),
 					'data' => array(
-						'function' => function ($member) {
+						'function' => static function ($member) {
 							if ($member['last_post_id'])
 							{
 								return '<a href="' . getUrl('action', ['msg' => $member['last_post_id']]) . '">' . $member['last_post'] . '</a>';
@@ -1196,9 +1183,7 @@ class ModerationCenter extends AbstractController
 			$listOptions['columns'] = array(
 				'posts' => array(
 					'data' => array(
-						'function' => function ($post) {
-							return template_user_watch_post_callback($post);
-						},
+						'function' => static fn($post) => template_user_watch_post_callback($post),
 					),
 				),
 			);
@@ -1347,20 +1332,16 @@ class ModerationCenter extends AbstractController
 			'base_href' => getUrl('action', ['action' => 'moderate', 'area' => 'warnings', 'sa' => 'log', '{session_data}']),
 			'default_sort_col' => 'time',
 			'get_items' => array(
-				'function' => function ($start, $items_per_page, $sort, $query_string, $query_params) {
-					return $this->list_getWarnings($start, $items_per_page, $sort, $query_string, $query_params);
-				},
+				'function' => fn($start, $items_per_page, $sort, $query_string, $query_params) => $this->list_getWarnings($start, $items_per_page, $sort, $query_string, $query_params),
 				'params' => array(
-					(!empty($search_params['string']) ? ' INSTR({raw:sql_type}, {string:search_string})' : ''),
+					(empty($search_params['string']) ? '' : ' INSTR({raw:sql_type}, {string:search_string})'),
 					array('sql_type' => $search_params_column, 'search_string' => $search_params['string']),
 				),
 			),
 			'get_count' => array(
-				'function' => function ($query_string, $query_params) {
-					return $this->list_getWarningCount($query_string, $query_params);
-				},
+				'function' => fn($query_string, $query_params) => $this->list_getWarningCount($query_string, $query_params),
 				'params' => array(
-					(!empty($search_params['string']) ? ' INSTR({raw:sql_type}, {string:search_string})' : ''),
+					(empty($search_params['string']) ? '' : ' INSTR({raw:sql_type}, {string:search_string})'),
 					array('sql_type' => $search_params_column, 'search_string' => $search_params['string']),
 				),
 			),
@@ -1407,7 +1388,7 @@ class ModerationCenter extends AbstractController
 						'value' => $txt['profile_warning_previous_reason'],
 					),
 					'data' => array(
-						'function' => function ($warning) {
+						'function' => static function ($warning) {
 							global $txt;
 
 							$output = '
@@ -1511,20 +1492,18 @@ class ModerationCenter extends AbstractController
 		global $modSettings, $context, $txt;
 
 		require_once(SUBSDIR . '/Moderation.subs.php');
-
 		// Submitting a new one?
 		if (isset($this->_req->post->add))
 		{
 			$this->action_modifyWarningTemplate();
-
 			return true;
 		}
+
 		// Deleting and existing one
-		elseif (isset($this->_req->post->delete) && !empty($this->_req->post->deltpl))
+		if (isset($this->_req->post->delete) && !empty($this->_req->post->deltpl))
 		{
 			checkSession('post');
 			validateToken('mod-wt');
-
 			removeWarningTemplate($this->_req->post->deltpl);
 		}
 
@@ -1540,14 +1519,10 @@ class ModerationCenter extends AbstractController
 			'base_href' => getUrl('action', ['action' => 'moderate', 'area' => 'warnings', 'sa' => 'templates', '{session_data}']),
 			'default_sort_col' => 'title',
 			'get_items' => array(
-				'function' => function ($start, $items_per_page, $sort, $template_type = 'warntpl') {
-					return $this->list_getWarningTemplates($start, $items_per_page, $sort, $template_type);
-				},
+				'function' => fn($start, $items_per_page, $sort, $template_type = 'warntpl') => $this->list_getWarningTemplates($start, $items_per_page, $sort, $template_type),
 			),
 			'get_count' => array(
-				'function' => function ($template_type = 'warntpl') {
-					return $this->list_getWarningTemplateCount($template_type);
-				},
+				'function' => fn($template_type = 'warntpl') => $this->list_getWarningTemplateCount($template_type),
 			),
 			'columns' => array(
 				'title' => array(
@@ -1599,9 +1574,7 @@ class ModerationCenter extends AbstractController
 						'style' => 'width: 4%;text-align: center;',
 					),
 					'data' => array(
-						'function' => function ($rowData) {
-							return '<input type="checkbox" name="deltpl[]" value="' . $rowData['id_comment'] . '" class="input_check" />';
-						},
+						'function' => static fn($rowData) => '<input type="checkbox" name="deltpl[]" value="' . $rowData['id_comment'] . '" class="input_check" />',
 						'class' => 'centertext',
 					),
 				),
@@ -1688,7 +1661,7 @@ class ModerationCenter extends AbstractController
 				$template_body = strtr($template_body, array('<br />' => "\n"));
 
 				// Is this personal?
-				$recipient_id = !empty($this->_req->post->make_personal) ? $this->user->id : 0;
+				$recipient_id = empty($this->_req->post->make_personal) ? 0 : $this->user->id;
 
 				// If we are this far it's save time.
 				if ($context['is_edit'])
@@ -1724,8 +1697,8 @@ class ModerationCenter extends AbstractController
 			else
 			{
 				$context['warning_errors'] = array();
-				$context['template_data']['title'] = !empty($template_title) ? $template_title : '';
-				$context['template_data']['body'] = !empty($template_body) ? $template_body : $txt['mc_warning_template_body_default'];
+				$context['template_data']['title'] = empty($template_title) ? '' : $template_title;
+				$context['template_data']['body'] = empty($template_body) ? $txt['mc_warning_template_body_default'] : $template_body;
 				$context['template_data']['personal'] = !empty($this->_req->post->make_personal);
 
 				if (empty($template_title))
@@ -1855,7 +1828,7 @@ class ModerationCenter extends AbstractController
 					'name' => $user['real_name'],
 					'link' => '<a href="' . getUrl('profile', ['action' => 'profile', 'u' => $user['id_member']]) . '">' . $user['real_name'] . '</a>',
 					'href' => getUrl('profile', ['action' => 'profile', 'u' => $user['id_member']]),
-					'last_login' => !empty($user['last_login']) ? standardTime($user['last_login']) : '',
+					'last_login' => empty($user['last_login']) ? '' : standardTime($user['last_login']),
 				);
 			}
 		}
@@ -1988,12 +1961,12 @@ class ModerationCenter extends AbstractController
 		$context['reported_posts'] = array();
 
 		$reported_posts = reportedPosts(false);
-		foreach ($reported_posts as $i => $row)
+		foreach ($reported_posts as $row)
 		{
 			$context['reported_posts'][] = array(
 				'id' => $row['id_report'],
 				'topic_href' => getUrl('topic', ['topic' => $row['id_topic'], 'msg' => $row['id_msg'], 'start' => $row['id_msg'], 'hash' => '#msg' . $row['id_msg']]),
-				'report_href' => getUrl('action', ['action' => 'moderate', 'area' =>  $context['admin_area'], 'report' => $row['id_report']]),
+				'report_href' => getUrl('action', ['action' => 'moderate', 'area' => $context['admin_area'], 'report' => $row['id_report']]),
 				'author' => array(
 					'id' => $row['id_author'],
 					'name' => $row['author_name'],

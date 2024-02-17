@@ -49,19 +49,13 @@ use ElkArte\VerificationControls\VerificationControlsIntegrate;
 class PersonalMessage extends AbstractController
 {
 	/**
-	 * $_search_params will carry all settings that differ from the default
+	 * @var array $_search_params will carry all settings that differ from the default
 	 * search parameters. That way, the URLs involved in a search page will
 	 * be kept as short as possible.
-	 *
-	 * @var array
 	 */
 	private $_search_params = [];
 
-	/**
-	 * $_searchq_parameters will carry all the values needed by S_search_params
-	 *
-	 * @var array
-	 */
+	/** @var array $_searchq_parameters will carry all the values needed by S_search_params */
 	private $_searchq_parameters = [];
 
 	/** @var int display_mode key is as follows */
@@ -145,7 +139,7 @@ class PersonalMessage extends AbstractController
 		$context['folder'] = $folder !== 'sent' ? 'inbox' : 'sent';
 
 		// This is convenient.  Do you know how annoying it is to do this every time?!
-		$context['current_label_redirect'] = 'action=pm;f=' . $context['folder'] . (isset($start) ? ';start=' . $start : '') . (!empty($label) ? ';l=' . $label : '');
+		$context['current_label_redirect'] = 'action=pm;f=' . $context['folder'] . (isset($start) ? ';start=' . $start : '') . (empty($label) ? '' : ';l=' . $label);
 		$context['can_issue_warning'] = featureEnabled('w') && allowedTo('issue_warning') && !empty($modSettings['warning_enable']);
 
 		// Build the linktree for all the actions...
@@ -198,7 +192,7 @@ class PersonalMessage extends AbstractController
 				continue;
 			}
 
-			$context['labels'][(int) $id_label] = [
+			$context['labels'][$id_label] = [
 				'id' => $id_label,
 				'name' => trim($label_name),
 				'messages' => 0,
@@ -224,7 +218,7 @@ class PersonalMessage extends AbstractController
 	 * - It sets up the menu.
 	 * - Calls from the menu the appropriate method/function for the current area.
 	 *
-	 * @see \ElkArte\AbstractController::action_index()
+	 * @see AbstractController::action_index
 	 */
 	public function action_index()
 	{
@@ -388,7 +382,7 @@ class PersonalMessage extends AbstractController
 			'current_area' => $area,
 			'hook' => 'pm',
 			'disable_url_session_check' => true,
-			'counters' => !empty($label_counters) ? $label_counters : 0,
+			'counters' => empty($label_counters) ? 0 : $label_counters,
 		);
 
 		// Actually create the menu!
@@ -415,7 +409,7 @@ class PersonalMessage extends AbstractController
 	 *
 	 * Display mode: 0 = all at once, 1 = one at a time, 2 = as a conversation
 	 *
-	 * @throws \ElkArte\Exceptions\Exception
+	 * @throws Exception
 	 * @uses subject_list, pm template layers
 	 * @uses folder sub template
 	 */
@@ -471,9 +465,10 @@ class PersonalMessage extends AbstractController
 				{
 					$descending = true;
 				}
+
 				break;
 			case 'name':
-				$sort_by_query = 'COALESCE(mem.real_name, \'\')';
+				$sort_by_query = "COALESCE(mem.real_name, '')";
 				break;
 			case 'subject':
 				$sort_by_query = 'pm.subject';
@@ -567,7 +562,7 @@ class PersonalMessage extends AbstractController
 		];
 
 		// We now know what they want, so lets fetch those PM's
-		list ($pms, $posters, $recipients, $lastData) = loadPMs([
+		[$pms, $posters, $recipients, $lastData] = loadPMs([
 			'sort_by_query' => $sort_by_query,
 			'display_mode' => $context['display_mode'],
 			'sort_by' => $sort_by,
@@ -601,7 +596,7 @@ class PersonalMessage extends AbstractController
 			// the PMs that make up the conversation
 			if ($context['display_mode'] === self::DISPLAY_AS_CONVERSATION)
 			{
-				list($display_pms, $posters) = loadConversationList($lastData['head'], $recipients, $context['folder']);
+				[$display_pms, $posters] = loadConversationList($lastData['head'], $recipients, $context['folder']);
 
 				// Conversation list may expose additional PM's being displayed
 				$all_pms = array_unique(array_merge($pms, $display_pms));
@@ -616,7 +611,7 @@ class PersonalMessage extends AbstractController
 			}
 
 			// Get recipients (don't include bcc-recipients for your inbox, you're not supposed to know :P).
-			list($context['message_labels'], $context['message_replied'], $context['message_unread']) = loadPMRecipientInfo($all_pms, $recipients, $context['folder']);
+			[$context['message_labels'], $context['message_replied'], $context['message_unread']] = loadPMRecipientInfo($all_pms, $recipients, $context['folder']);
 
 			// Make sure we don't load any unnecessary data for one at a time mode
 			if ($context['display_mode'] === self::DISPLAY_ONE_AT_TIME)
@@ -674,8 +669,8 @@ class PersonalMessage extends AbstractController
 		$subject_renderer = new PmRenderer($subjects_request ?? $messages_request, $this->user, $bodyParser, $opt);
 
 		// Subject and Message
-		$context['get_pmessage'] = [$renderer, 'getContext'];
-		$context['get_psubject'] = [$subject_renderer, 'getContext'];
+		$context['get_pmessage'] = static fn(bool $reset = false): bool|array => $renderer->getContext($reset);
+		$context['get_psubject'] = static fn(bool $reset = false): array|bool => $subject_renderer->getContext($reset);
 
 		// Prepare some items for the template
 		$context['topic_starter_id'] = 0;
@@ -732,7 +727,7 @@ class PersonalMessage extends AbstractController
 	/**
 	 * Send a new personal message?
 	 *
-	 * @throws \ElkArte\Exceptions\Exception pm_not_yours
+	 * @throws Exception pm_not_yours
 	 */
 	public function action_send()
 	{
@@ -746,7 +741,7 @@ class PersonalMessage extends AbstractController
 		$context['sub_template'] = 'send';
 
 		// Extract out the spam settings - cause it's neat.
-		list ($modSettings['max_pm_recipients'], $modSettings['pm_posts_verification'], $modSettings['pm_posts_per_hour']) = explode(',', $modSettings['pm_spam_settings']);
+		[$modSettings['max_pm_recipients'], $modSettings['pm_posts_verification'], $modSettings['pm_posts_per_hour']] = explode(',', $modSettings['pm_spam_settings']);
 
 		// Set up some items for the template
 		$context['page_title'] = $txt['send_message'];
@@ -771,9 +766,9 @@ class PersonalMessage extends AbstractController
 		{
 			$this->_events->trigger('before_set_context', array('pmsg' => $this->_req->query->pmsg ?? ($this->_req->query->quote ?? 0)));
 		}
-		catch (PmErrorException $e)
+		catch (PmErrorException $pmErrorException)
 		{
-			$this->messagePostError($e->namedRecipientList, $e->recipientList, $e->msgOptions);
+			$this->messagePostError($pmErrorException->namedRecipientList, $pmErrorException->recipientList, $pmErrorException->msgOptions);
 			return;
 		}
 
@@ -820,7 +815,7 @@ class PersonalMessage extends AbstractController
 			if (isset($this->_req->query->quote))
 			{
 				// Remove any nested quotes and <br />...
-				$form_message = preg_replace('~<br ?/?' . '>~i', "\n", $row_quoted['body']);
+				$form_message = preg_replace('~<br ?/?>~i', "\n", $row_quoted['body']);
 				$form_message = removeNestedQuotes($form_message);
 
 				if (empty($row_quoted['id_member']))
@@ -855,8 +850,8 @@ class PersonalMessage extends AbstractController
 					'name' => $row_quoted['real_name'],
 					'username' => $row_quoted['member_name'],
 					'id' => $row_quoted['id_member'],
-					'href' => !empty($row_quoted['id_member']) ? getUrl('profile', ['action' => 'profile', 'u' => $row_quoted['id_member']]) : '',
-					'link' => !empty($row_quoted['id_member']) ? '<a href="' . getUrl('profile', ['action' => 'profile', 'u' => $row_quoted['id_member']]) . '">' . $row_quoted['real_name'] . '</a>' : $row_quoted['real_name'],
+					'href' => empty($row_quoted['id_member']) ? '' : getUrl('profile', ['action' => 'profile', 'u' => $row_quoted['id_member']]),
+					'link' => empty($row_quoted['id_member']) ? $row_quoted['real_name'] : '<a href="' . getUrl('profile', ['action' => 'profile', 'u' => $row_quoted['id_member']]) . '">' . $row_quoted['real_name'] . '</a>',
 				),
 				'subject' => $row_quoted['subject'],
 				'time' => standardTime($row_quoted['msgtime']),
@@ -921,6 +916,7 @@ class PersonalMessage extends AbstractController
 			{
 				$names[] = $to['name'];
 			}
+
 			$context['to_value'] = empty($names) ? '' : '&quot;' . implode('&quot;, &quot;', $names) . '&quot;';
 		}
 		else
@@ -974,7 +970,7 @@ class PersonalMessage extends AbstractController
 	 * @param array $recipient_ids array keys of [bbc] => int[] and [to] => int[]
 	 * @param array $msg_options body, subject and reply values
 	 *
-	 * @throws \ElkArte\Exceptions\Exception pm_not_yours
+	 * @throws Exception pm_not_yours
 	 */
 	public function messagePostError($named_recipients, $recipient_ids = array(), $msg_options = null)
 	{
@@ -1059,8 +1055,8 @@ class PersonalMessage extends AbstractController
 						'name' => $row_quoted['real_name'],
 						'username' => $row_quoted['member_name'],
 						'id' => $row_quoted['id_member'],
-						'href' => !empty($row_quoted['id_member']) ? getUrl('profile', ['action' => 'profile', 'u' => $row_quoted['id_member']]) : '',
-						'link' => !empty($row_quoted['id_member']) ? '<a href="' . getUrl('profile', ['action' => 'profile', 'u' => $row_quoted['id_member']]) . '">' . $row_quoted['real_name'] . '</a>' : $row_quoted['real_name'],
+						'href' => empty($row_quoted['id_member']) ? '' : getUrl('profile', ['action' => 'profile', 'u' => $row_quoted['id_member']]),
+						'link' => empty($row_quoted['id_member']) ? $row_quoted['real_name'] : '<a href="' . getUrl('profile', ['action' => 'profile', 'u' => $row_quoted['id_member']]) . '">' . $row_quoted['real_name'] . '</a>',
 					),
 					'subject' => $row_quoted['subject'],
 					'time' => standardTime($row_quoted['msgtime']),
@@ -1141,7 +1137,7 @@ class PersonalMessage extends AbstractController
 		Txt::load('PersonalMessage', false);
 
 		// Extract out the spam settings - it saves database space!
-		list ($modSettings['max_pm_recipients'], $modSettings['pm_posts_verification'], $modSettings['pm_posts_per_hour']) = explode(',', $modSettings['pm_spam_settings']);
+		[$modSettings['max_pm_recipients'], $modSettings['pm_posts_verification'], $modSettings['pm_posts_per_hour']] = explode(',', $modSettings['pm_spam_settings']);
 
 		// Initialize the errors we're about to make.
 		$post_errors = ErrorContext::context('pm', 1);
@@ -1237,7 +1233,7 @@ class PersonalMessage extends AbstractController
 							Util::strtolower($member['email']),
 						);
 
-						if (count(array_intersect($testNames, $namedRecipientList[$recipientType])) !== 0)
+						if (array_intersect($testNames, $namedRecipientList[$recipientType]) !== [])
 						{
 							$recipientList[$recipientType][] = $member['id'];
 
@@ -1366,13 +1362,13 @@ class PersonalMessage extends AbstractController
 
 			return true;
 		}
-		// Adding a recipient cause javascript ain't working?
 
+		// Adding a recipient cause javascript ain't working?
 		try
 		{
 			$this->_events->trigger('before_sending', array('namedRecipientList' => $namedRecipientList, 'recipientList' => $recipientList, 'namesNotFound' => $namesNotFound, 'post_errors' => $post_errors));
 		}
-		catch (ControllerRedirectException $e)
+		catch (ControllerRedirectException)
 		{
 			$this->messagePostError($namedRecipientList, $recipientList);
 
@@ -1409,7 +1405,7 @@ class PersonalMessage extends AbstractController
 		// Finally do the actual sending of the PM.
 		if (!empty($recipientList['to']) || !empty($recipientList['bcc']))
 		{
-			$context['send_log'] = sendpm($recipientList, $this->_req->post->subject, $this->_req->post->message, true, null, !empty($this->_req->post->pm_head) ? (int) $this->_req->post->pm_head : 0);
+			$context['send_log'] = sendpm($recipientList, $this->_req->post->subject, $this->_req->post->message, true, null, empty($this->_req->post->pm_head) ? 0 : (int) $this->_req->post->pm_head);
 		}
 		else
 		{
@@ -1441,8 +1437,8 @@ class PersonalMessage extends AbstractController
 
 			return false;
 		}
-		// Message sent successfully?
 
+		// Message sent successfully
 		$context['current_label_redirect'] .= ';done=sent';
 
 		// Go back to the where they sent from, if possible...
@@ -1469,7 +1465,7 @@ class PersonalMessage extends AbstractController
 		$pm_action = empty($pm_action) && isset($this->_req->post->del_selected) ? 'delete' : $pm_action;
 
 		// Create a list of PMs that we need to work on
-		if ($pm_action != ''
+		if ($pm_action !== ''
 			&& !empty($this->_req->post->pms)
 			&& is_array($this->_req->post->pms))
 		{
@@ -1682,6 +1678,7 @@ class PersonalMessage extends AbstractController
 				{
 					$this->_req->post->label = Util::substr($this->_req->post->label, 0, 30);
 				}
+
 				if ($this->_req->post->label !== '')
 				{
 					$the_labels[] = $this->_req->post->label;
@@ -1691,7 +1688,7 @@ class PersonalMessage extends AbstractController
 			elseif (isset($this->_req->post->delete, $this->_req->post->delete_label))
 			{
 				$i = 0;
-				foreach ($the_labels as $id => $name)
+				foreach (array_keys($the_labels) as $id)
 				{
 					if (isset($this->_req->post->delete_label[$id]))
 					{
@@ -1708,7 +1705,7 @@ class PersonalMessage extends AbstractController
 			elseif (isset($this->_req->post->save) && !empty($this->_req->post->label_name))
 			{
 				$i = 0;
-				foreach ($the_labels as $id => $name)
+				foreach (array_keys($the_labels) as $id)
 				{
 					if ($id == -1)
 					{
@@ -1939,7 +1936,7 @@ class PersonalMessage extends AbstractController
 			checkSession();
 
 			// First, load up the message they want to file a complaint against, and verify it actually went to them!
-			list ($subject, $body, $time, $memberFromID, $memberFromName, $poster_name, $time_message) = loadPersonalMessage($pmsg);
+			[$subject, $body, $time, $memberFromID, $memberFromName, $poster_name, $time_message] = loadPersonalMessage($pmsg);
 
 			require_once(SUBSDIR . '/Messages.subs.php');
 
@@ -1957,7 +1954,7 @@ class PersonalMessage extends AbstractController
 			), $poster_comment);
 
 			// Remove the line breaks...
-			$body = preg_replace('~<br ?/?' . '>~i', "\n", $body);
+			$body = preg_replace('~<br ?/?>~i', "\n", $body);
 
 			$recipients = array();
 			$temp = loadPMRecipientsAll($context['pm_id'], true);
@@ -1999,6 +1996,7 @@ class PersonalMessage extends AbstractController
 					{
 						$report_body .= $mtxt['pm_report_pm_other_recipients'] . ' ' . implode(', ', $recipients) . "\n\n";
 					}
+
 					$report_body .= $mtxt['pm_report_pm_unedited_below'] . "\n" . '[quote author=' . (empty($memberFromID) ? '&quot;' . $memberFromName . '&quot;' : $memberFromName . ' link=action=profile;u=' . $memberFromID . ' date=' . $time) . ']' . "\n" . un_htmlspecialchars($body) . '[/quote]';
 
 					// Plonk it in the array ;)
@@ -2017,7 +2015,7 @@ class PersonalMessage extends AbstractController
 			}
 
 			// Send a different email for each language.
-			foreach ($messagesToSend as $lang => $message)
+			foreach ($messagesToSend as $message)
 			{
 				sendpm($message['recipients'], $message['subject'], $message['body']);
 			}
@@ -2082,6 +2080,7 @@ class PersonalMessage extends AbstractController
 			{
 				$js_rules[$rule] = $txt['pm_rule_' . $rule];
 			}
+
 			$js_rules = json_encode($js_rules);
 
 			// Any known label
@@ -2093,6 +2092,7 @@ class PersonalMessage extends AbstractController
 					$js_labels[$label['id'] + 1] = $label['name'];
 				}
 			}
+
 			$js_labels = json_encode($js_labels);
 
 			// And all the groups as well
@@ -2135,10 +2135,15 @@ class PersonalMessage extends AbstractController
 				// Need to get member names!
 				foreach ($context['rule']['criteria'] as $k => $criteria)
 				{
-					if ($criteria['t'] === 'mid' && !empty($criteria['v']))
+					if ($criteria['t'] !== 'mid')
 					{
-						$members[(int) $criteria['v']] = $k;
+						continue;
 					}
+					if (empty($criteria['v']))
+					{
+						continue;
+					}
+					$members[(int) $criteria['v']] = $k;
 				}
 
 				if (!empty($members))
@@ -2337,7 +2342,7 @@ class PersonalMessage extends AbstractController
 		$blocklist_words = array('quote', 'the', 'is', 'it', 'are', 'if', 'in');
 
 		// What are we actually searching for?
-		$this->_search_params['search'] = !empty($this->_search_params['search']) ? $this->_search_params['search'] : ($this->_req->post->search ?? '');
+		$this->_search_params['search'] = empty($this->_search_params['search']) ? $this->_req->post->search ?? '' : ($this->_search_params['search']);
 
 		// If nothing is left to search on - we set an error!
 		if (!isset($this->_search_params['search']) || $this->_search_params['search'] === '')
@@ -2367,10 +2372,11 @@ class PersonalMessage extends AbstractController
 		{
 			if ($word === '-')
 			{
-				if (($word = trim($phraseArray[$index], '-_\' ')) !== '' && !in_array($word, $blocklist_words))
+				if (($word = trim($phraseArray[$index], "-_' ")) !== '' && !in_array($word, $blocklist_words))
 				{
 					$excludedWords[] = $word;
 				}
+
 				unset($phraseArray[$index]);
 			}
 		}
@@ -2380,10 +2386,11 @@ class PersonalMessage extends AbstractController
 		{
 			if (strpos(trim($word), '-') === 0)
 			{
-				if (($word = trim($word, '-_\' ')) !== '' && !in_array($word, $blocklist_words))
+				if (($word = trim($word, "-_' ")) !== '' && !in_array($word, $blocklist_words))
 				{
 					$excludedWords[] = $word;
 				}
+
 				unset($wordArray[$index]);
 			}
 		}
@@ -2395,7 +2402,7 @@ class PersonalMessage extends AbstractController
 		foreach ($searchArray as $index => $value)
 		{
 			// Skip anything that's close to empty.
-			if (($searchArray[$index] = trim($value, '-_\' ')) === '')
+			if (($searchArray[$index] = trim($value, "-_' ")) === '')
 			{
 				unset($searchArray[$index]);
 			}
@@ -2431,7 +2438,7 @@ class PersonalMessage extends AbstractController
 		// Make sure at least one word is being searched for.
 		if (empty($searchArray))
 		{
-			$context['search_errors']['invalid_search_string' . (!empty($foundBlockListedWords) ? '_blocklist' : '')] = true;
+			$context['search_errors']['invalid_search_string' . (empty($foundBlockListedWords) ? '' : '_blocklist')] = true;
 		}
 
 		// Sort out the search query so the user can edit it - if they want.
@@ -2502,7 +2509,7 @@ class PersonalMessage extends AbstractController
 		$numResults = numPMSeachResults($userQuery, $labelQuery, $timeQuery, $searchQuery, $this->_searchq_parameters);
 
 		// Get all the matching message ids, senders and head pm nodes
-		list($foundMessages, $posters, $head_pms) = loadPMSearchMessages($userQuery, $labelQuery, $timeQuery, $searchQuery, $this->_searchq_parameters, $this->_search_params);
+		[$foundMessages, $posters, $head_pms] = loadPMSearchMessages($userQuery, $labelQuery, $timeQuery, $searchQuery, $this->_searchq_parameters, $this->_search_params);
 
 		// Find the real head pm when in conversation view
 		if ($context['display_mode'] === self::DISPLAY_AS_CONVERSATION && !empty($head_pms))
@@ -2529,7 +2536,7 @@ class PersonalMessage extends AbstractController
 		if (!empty($foundMessages))
 		{
 			$recipients = array();
-			list($context['message_labels'], $context['message_replied'], $context['message_unread'], $context['first_label']) = loadPMRecipientInfo($foundMessages, $recipients, $context['folder'], true);
+			[$context['message_labels'], $context['message_replied'], $context['message_unread'], $context['first_label']] = loadPMRecipientInfo($foundMessages, $recipients, $context['folder'], true);
 
 			// Prepare for the callback!
 			$search_results = loadPMSearchResults($foundMessages, $this->_search_params);
@@ -2569,12 +2576,10 @@ class PersonalMessage extends AbstractController
 					// Fix the international characters in the keyword too.
 					$query = un_htmlspecialchars($query);
 					$query = trim($query, '\*+');
-					$query = strtr(Util::htmlspecialchars($query), array('\\\'' => '\''));
+					$query = strtr(Util::htmlspecialchars($query), array('\\\'' => "'"));
 
-					$body_highlighted = preg_replace_callback('/((<[^>]*)|' . preg_quote(strtr($query, array('\'' => '&#039;')), '/') . ')/iu',
-						function ($matches) {
-							return $this->_highlighted_callback($matches);
-						}, $row['body']);
+					$body_highlighted = preg_replace_callback('/((<[^>]*)|' . preg_quote(strtr($query, array("'" => '&#039;')), '/') . ')/iu',
+						fn($matches) => $this->_highlighted_callback($matches), $row['body']);
 					$subject_highlighted = preg_replace('/(' . preg_quote($query, '/') . ')/iu', '<strong class="highlight">$1</strong>', $row['subject']);
 				}
 
@@ -2591,7 +2596,7 @@ class PersonalMessage extends AbstractController
 					'timestamp' => forum_time(true, $row['msgtime']),
 					'recipients' => &$recipients[$row['id_pm']],
 					'labels' => &$context['message_labels'][$row['id_pm']],
-					'fully_labeled' => (!empty($context['message_labels'][$row['id_pm']]) ? count($context['message_labels'][$row['id_pm']]) : 0) == count($context['labels']),
+					'fully_labeled' => (empty($context['message_labels'][$row['id_pm']]) ? 0 : count($context['message_labels'][$row['id_pm']])) === count($context['labels']),
 					'is_replied_to' => &$context['message_replied'][$row['id_pm']],
 					'href' => $href,
 					'link' => '<a href="' . $href . '">' . $subject_highlighted . '</a>',
@@ -2649,9 +2654,7 @@ class PersonalMessage extends AbstractController
 		];
 
 		// Drop any non-enabled ones
-		return array_filter($pmButtons, static function ($button) {
-			return !isset($button['enabled']) || (bool) $button['enabled'] !== false;
-		});
+		return array_filter($pmButtons, static fn($button) => !isset($button['enabled']) || (bool) $button['enabled']);
 	}
 
 	/**
@@ -2675,9 +2678,9 @@ class PersonalMessage extends AbstractController
 			$temp_params = base64_decode(str_replace(array('-', '_', '.'), array('+', '/', '='), $temp_params));
 
 			$temp_params = explode('|"|', $temp_params);
-			foreach ($temp_params as $i => $data)
+			foreach ($temp_params as $data)
 			{
-				list ($k, $v) = array_pad(explode('|\'|', $data), 2, '');
+				[$k, $v] = array_pad(explode("|'|", $data), 2, '');
 				$this->_search_params[$k] = $v;
 			}
 		}
@@ -2710,19 +2713,19 @@ class PersonalMessage extends AbstractController
 		// Minimum age of messages. Default to zero (don't set param in that case).
 		if (!empty($this->_search_params['minage']) || (!empty($this->_req->post->minage) && $this->_req->post->minage > 0))
 		{
-			$this->_search_params['minage'] = !empty($this->_search_params['minage']) ? (int) $this->_search_params['minage'] : (int) $this->_req->post->minage;
+			$this->_search_params['minage'] = empty($this->_search_params['minage']) ? (int) $this->_req->post->minage : (int) $this->_search_params['minage'];
 		}
 
 		// Maximum age of messages. Default to infinite (9999 days: param not set).
 		if (!empty($this->_search_params['maxage']) || (!empty($this->_req->post->maxage) && $this->_req->post->maxage < 9999))
 		{
-			$this->_search_params['maxage'] = !empty($this->_search_params['maxage']) ? (int) $this->_search_params['maxage'] : (int) $this->_req->post->maxage;
+			$this->_search_params['maxage'] = empty($this->_search_params['maxage']) ? (int) $this->_req->post->maxage : (int) $this->_search_params['maxage'];
 		}
 
 		// Default the username to a wildcard matching every user (*).
 		if (!empty($this->_search_params['userspec']) || (!empty($this->_req->post->userspec) && $this->_req->post->userspec != '*'))
 		{
-			$this->_search_params['userspec'] = $this->_search_params['userspec'] ?? $this->_req->post->userspec;
+			$this->_search_params['userspec'] ??= $this->_req->post->userspec;
 		}
 
 		// Search modifiers
@@ -2785,6 +2788,7 @@ class PersonalMessage extends AbstractController
 					{
 						$uq[] = 'AND pm.id_member_from = 0 AND (' . $name . ' LIKE {string:guest_user_name_implode_' . $key . '})';
 					}
+
 					$userQuery = implode(' ', $uq);
 					$this->_searchq_parameters['pm_from_name'] = $name;
 				}
@@ -2838,7 +2842,7 @@ class PersonalMessage extends AbstractController
 
 		if (empty($this->_search_params['sort']) && !empty($this->_req->post->sort))
 		{
-			list ($this->_search_params['sort'], $this->_search_params['sort_dir']) = array_pad(explode('|', $this->_req->post->sort), 2, '');
+			[$this->_search_params['sort'], $this->_search_params['sort_dir']] = array_pad(explode('|', $this->_req->post->sort), 2, '');
 		}
 
 		$this->_search_params['sort'] = !empty($this->_search_params['sort']) && in_array($this->_search_params['sort'], $sort_columns) ? $this->_search_params['sort'] : 'pm.id_pm';
@@ -2921,7 +2925,7 @@ class PersonalMessage extends AbstractController
 		// Now we have all the parameters, combine them together for pagination and the like...
 		foreach ($this->_search_params as $k => $v)
 		{
-			$encoded[] = $k . '|\'|' . $v;
+			$encoded[] = $k . "|'|" . $v;
 		}
 
 		// Base64 encode, then replace +/= with uri safe ones that can be reverted
@@ -2974,6 +2978,7 @@ class PersonalMessage extends AbstractController
 		{
 			$context['search_params']['minage'] = (int) $context['search_params']['minage'];
 		}
+
 		if (!empty($context['search_params']['maxage']))
 		{
 			$context['search_params']['maxage'] = (int) $context['search_params']['maxage'];
@@ -3032,7 +3037,7 @@ class PersonalMessage extends AbstractController
 	 */
 	private function _highlighted_callback($matches)
 	{
-		return isset($matches[2]) && $matches[2] == $matches[1] ? stripslashes($matches[1]) : '<strong class="highlight">' . $matches[1] . '</strong>';
+		return isset($matches[2]) && $matches[2] === $matches[1] ? stripslashes($matches[1]) : '<strong class="highlight">' . $matches[1] . '</strong>';
 	}
 
 	/**

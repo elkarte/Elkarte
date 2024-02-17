@@ -757,13 +757,13 @@ function modAddUpdateTemplate($recipient_id, $template_title, $template_body, $i
 }
 
 /**
- * Get the report details, need this so we can limit access to a particular board
- *  - returns false if they are requesting a report they can not see or does not exist
+ * Retrieves detailed information about a specific report.
  *
- * @param int $id_report
- * @param bool $show_pms
+ * @param int $id_report The ID of the report to retrieve details for.
+ * @param bool $show_pms (optional) Whether to include PM reports. Defaults to false.
  *
- * @return bool
+ * @return array|false An associative array containing the details of the report,
+ * or false if the report was not found.
  */
 function modReportDetails($id_report, $show_pms = false)
 {
@@ -778,7 +778,7 @@ function modReportDetails($id_report, $show_pms = false)
 			LEFT JOIN {db_prefix}members AS mem ON (mem.id_member = lr.id_member)
 		WHERE lr.id_report = {int:id_report}
 			AND lr.type IN ({array_string:rep_type})
-			AND ' . (User::$info->mod_cache['bq'] == '1=1' || User::$info->mod_cache['bq'] == '0=1' ? User::$info->mod_cache['bq'] : 'lr.' . User::$info->mod_cache['bq']) . '
+			AND ' . (User::$info->mod_cache['bq'] === '1=1' || User::$info->mod_cache['bq'] === '0=1' ? User::$info->mod_cache['bq'] : 'lr.' . User::$info->mod_cache['bq']) . '
 		LIMIT 1',
 		array(
 			'id_report' => $id_report,

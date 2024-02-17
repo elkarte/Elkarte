@@ -1603,7 +1603,7 @@ function changePMLabels($to_label, $label_type, $user_id)
 			}
 
 			if (!empty($options['pm_remove_inbox_label'])
-				&& $to_label[$row['id_pm']] != '-1'
+				&& $to_label[$row['id_pm']] !== '-1'
 				&& ($key = array_search('-1', $labels)) !== false)
 			{
 				unset($labels[$key]);

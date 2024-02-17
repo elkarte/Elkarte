@@ -18,8 +18,8 @@
 namespace ElkArte\Controller;
 
 use ElkArte\AbstractController;
-use ElkArte\Exceptions\Exception;
 use ElkArte\Action;
+use ElkArte\Exceptions\Exception;
 use ElkArte\Languages\Txt;
 
 /**
@@ -40,7 +40,7 @@ class Notify extends AbstractController
 	/**
 	 * Dispatch to the right action.
 	 *
-	 * @see \ElkArte\AbstractController::action_index()
+	 * @see AbstractController::action_index
 	 */
 	public function action_index()
 	{
@@ -111,12 +111,9 @@ class Notify extends AbstractController
 
 			return true;
 		}
-		else
-		{
-			checkSession('get');
 
-			$this->_toggle_topic_notification();
-		}
+		checkSession('get');
+		$this->_toggle_topic_notification();
 
 		// Send them back to the topic.
 		redirectexit('topic=' . $topic . '.' . $this->_req->query->start);
@@ -246,14 +243,11 @@ class Notify extends AbstractController
 
 			return;
 		}
-		// Turn the board level notification on/off?
-		else
-		{
-			checkSession('get');
 
-			// Turn notification on/off for this board.
-			$this->_toggle_board_notification();
-		}
+		checkSession('get');
+
+		// Turn notification on/off for this board.
+		$this->_toggle_board_notification();
 
 		// Back to the board!
 		redirectexit('board=' . $board . '.' . $this->_req->query->start);
@@ -423,7 +417,7 @@ class Notify extends AbstractController
 			$context['xml_data'] = array(
 				'error' => 1,
 				'url' => getUrl('action', ['action' => 'unwatchtopic', 'sa' => ($this->_req->query->sa === 'on' ? 'on' : 'off'), 'topic' => $topic . '.' . $this->_req->query->start, '{session_data}'])
-				);
+			);
 
 			return;
 		}
@@ -500,7 +494,7 @@ class Notify extends AbstractController
 			case 'mentionmem':
 			case 'quotedmem':
 			case 'rlikemsg':
- 				$this->_setUserEmailNotificationOff($member['id_member'], $area);
+				$this->_setUserEmailNotificationOff($member['id_member'], $area);
 				break;
 		}
 
@@ -566,10 +560,11 @@ class Notify extends AbstractController
 
 			$potentialAreas[] = strtolower($class::getType());
 		}
+
 		$potentialAreas = array_merge($potentialAreas, ['topic', 'board']);
 
 		// Expand the token
-		list ($id_member, $hash, $area, $extra, $time) = explode('_', $match[1]);
+		[$id_member, $hash, $area, $extra, $time] = explode('_', $match[1]);
 
 		// The area is a known one
 		if (!in_array($area, $potentialAreas, true))
@@ -613,6 +608,7 @@ class Notify extends AbstractController
 		Txt::load('Profile');
 
 		$_POST['notify_submit'] = true;
+
 		foreach (getMemberNotificationsProfile($memID) as $mention => $data)
 		{
 			foreach ($data['data'] as $type => $method)
@@ -651,13 +647,14 @@ class Notify extends AbstractController
 				try
 				{
 					$subject = getSubject((int) $extra);
-					$subject = $subject ?? $txt['notify_unsubscribed_generic'];
+					$subject ??= $txt['notify_unsubscribed_generic'];
 					$context['unsubscribe_message'] = sprintf($txt['notify_topic_unsubscribed'], $subject, $email);
 				}
-				catch (Exception $e)
+				catch (Exception)
 				{
 					$context['unsubscribe_message'] = $txt['notify_default_unsubscribed'];
 				}
+
 				break;
 			case 'board':
 				require_once(SUBSDIR . '/Boards.subs.php');

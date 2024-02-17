@@ -18,6 +18,7 @@ use ElkArte\Cache\Cache;
 use ElkArte\Converters\Html2BBC;
 use ElkArte\Converters\Html2Md;
 use ElkArte\EmailFormat;
+use ElkArte\EmailParse;
 use ElkArte\Languages\Txt;
 use ElkArte\Mail\PreparseMail;
 use ElkArte\MembersList;
@@ -672,7 +673,7 @@ function pbe_check_moderation(&$pbe)
  * - can choose to approve the email with the corrections
  *
  * @param string $error
- * @param \ElkArte\EmailParse $email_message
+ * @param EmailParse $email_message
  *
  * @return bool
  * @package Maillist
@@ -816,7 +817,7 @@ function pbe_emailError($error, $email_message)
  * - calls createAttachment to store them
  *
  * @param array $pbe
- * @param \ElkArte\EmailParse $email_message
+ * @param EmailParse $email_message
  *
  * @return array
  * @package Maillist
@@ -945,7 +946,7 @@ function pbe_email_attachments($pbe, $email_message)
  * - Load the board id that a given email address is assigned to in the ACP
  * - Returns the board number in which the new topic must go
  *
- * @param \ElkArte\EmailParse $email_address
+ * @param EmailParse $email_address
  *
  * @return int
  * @package Maillist
@@ -1012,7 +1013,7 @@ function pbe_prepare_text(&$message, &$subject = '', &$signature = '')
  *
  * When finished, fire off a site notification informing the user of the action and reason
  *
- * @param \ElkArte\EmailParse $email_message
+ * @param EmailParse $email_message
  * @package Maillist
  */
 function pbe_disable_user_notify($email_message)
@@ -1298,7 +1299,7 @@ function query_user_keys($email)
 /**
  * Return the email that a given key was sent to
  *
- * @param \ElkArte\EmailParse $email_message
+ * @param EmailParse $email_message
  * @return string email address the key was sent to
  * @package Maillist
  */
@@ -1699,7 +1700,7 @@ function query_notifications($id_member, $id_board, $id_topic, $auto_notify, $pe
  * - Marks the PM replied to as replied to
  * - Updates the number of unread to reflect this
  *
- * @param \ElkArte\EmailParse $email_message
+ * @param EmailParse $email_message
  * @param array $pbe
  * @package Maillist
  */
@@ -1766,7 +1767,7 @@ function query_mark_pms($email_message, $pbe)
  *
  * - Also removes any old keys to minimize security issues
  *
- * @param \ElkArte\EmailParse $email_message
+ * @param EmailParse $email_message
  * @package Maillist
  */
 function query_key_maintenance($email_message)
@@ -1816,7 +1817,7 @@ function query_key_maintenance($email_message)
  * - Updates the who's online list with the member and action
  *
  * @param array $pbe
- * @param \ElkArte\EmailParse $email_message
+ * @param EmailParse $email_message
  * @param array $topic_info
  * @package Maillist
  */
@@ -1887,14 +1888,16 @@ function query_update_member_stats($pbe, $email_message, $topic_info = array())
  * - Formats the email response such that it looks structured and not chopped up (via pbe_fix_email_body)
  *
  * @param bool $html
- * @param \ElkArte\EmailParse $email_message
+ * @param EmailParse $email_message
  * @param array $pbe
  *
  * @return string
  * @package Maillist
  */
-function pbe_load_text(&$html, $email_message, $pbe)
+function pbe_load_text($email_message, $pbe)
 {
+	$html = $email_message->html_found;
+
 	if ($html)
 	{
 		$text = pbe_load_html($email_message, $html);
@@ -1933,7 +1936,7 @@ function pbe_load_text(&$html, $email_message, $pbe)
  * Checks and removes role=presentation tables.  If to many tables remain, returns the plain text
  * version of the email as converting too many html tables to bbc simply will not look good
  *
- * @param \ElkArte\EmailParse $email_message
+ * @param EmailParse $email_message
  * @param bool $html
  * @return string
  */
@@ -1978,7 +1981,7 @@ function pbe_load_html($email_message, &$html)
  * - returns true if successful or false for any number of failures
  *
  * @param array $pbe array of all pbe user_info values
- * @param \ElkArte\EmailParse $email_message
+ * @param EmailParse $email_message
  * @param array $topic_info
  *
  * @return bool
@@ -2025,8 +2028,7 @@ function pbe_create_post($pbe, $email_message, $topic_info)
 	}
 
 	// Convert to BBC and Format the message
-	$html = $email_message->html_found;
-	$text = pbe_load_text($html, $email_message, $pbe);
+	$text = pbe_load_text($email_message, $pbe);
 	if (empty($text))
 	{
 		return pbe_emailError('error_no_message', $email_message);
@@ -2107,7 +2109,7 @@ function pbe_create_post($pbe, $email_message, $topic_info)
  * - Returns true if successful or false for any number of failures
  *
  * @param array $pbe array of pbe 'user_info' values
- * @param \ElkArte\EmailParse $email_message
+ * @param EmailParse $email_message
  * @param array $pm_info
  *
  * @return bool
@@ -2126,8 +2128,7 @@ function pbe_create_pm($pbe, $email_message, $pm_info)
 	}
 
 	// Convert the PM to BBC and Format the message
-	$html = $email_message->html_found;
-	$text = pbe_load_text($html, $email_message, $pbe);
+	$text = pbe_load_text($email_message, $pbe);
 	if (empty($text))
 	{
 		return pbe_emailError('error_no_message', $email_message);
@@ -2174,7 +2175,7 @@ function pbe_create_pm($pbe, $email_message, $pm_info)
  * - Requires the pbe, email_message and board_info arrays to be populated.
  *
  * @param array $pbe array of pbe 'user_info' values
- * @param \ElkArte\EmailParse $email_message
+ * @param EmailParse $email_message
  * @param array $board_info
  *
  * @return bool
@@ -2233,8 +2234,7 @@ function pbe_create_topic($pbe, $email_message, $board_info)
 	}
 
 	// The message itself will need a bit of work
-	$html = $email_message->html_found;
-	$text = pbe_load_text($html, $email_message, $pbe);
+	$text = pbe_load_text($email_message, $pbe);
 	if (empty($text))
 	{
 		return pbe_emailError('error_no_message', $email_message);

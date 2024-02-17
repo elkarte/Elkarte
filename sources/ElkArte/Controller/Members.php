@@ -31,7 +31,7 @@ class Members extends AbstractController
 	/**
 	 * Forwards to an action method.
 	 *
-	 * @see \ElkArte\AbstractController::action_index()
+	 * @see AbstractController::action_index
 	 */
 	public function action_index()
 	{

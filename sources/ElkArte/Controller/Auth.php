@@ -242,6 +242,7 @@ class Auth extends AbstractController
 
 		$user = new UserSettingsLoader($db, $cache, $req);
 		$user->loadUserById($member_found === false ? 0 : $member_found['id_member'], true, '');
+
 		$user_setting = $user->getSettings();
 
 		// User using 2FA for login? Let's validate the token...
@@ -255,7 +256,7 @@ class Auth extends AbstractController
 		if (!empty($_POST['otp_token']))
 		{
 			require_once(EXTDIR . '/GoogleAuthenticator.php');
-			$ga = New \GoogleAuthenticator();
+			$ga = new \GoogleAuthenticator();
 
 			$ga->getCode($user_setting['otp_secret']);
 			$checkResult = $ga->verifyCode($user_setting['otp_secret'], $_POST['otp_token'], 2);
@@ -265,6 +266,7 @@ class Auth extends AbstractController
 
 				return false;
 			}
+
 			// OTP already used? Sorry, but this is a ONE TIME password..
 			if ($user_setting['otp_used'] === $_POST['otp_token'])
 			{
@@ -353,7 +355,7 @@ class Auth extends AbstractController
 			$other_passwords = $this->_other_passwords($_POST['passwrd'], $user_setting['password_salt'], $user_setting['passwd'], $user_setting['member_name']);
 
 			// Whichever encryption it was using, let's make it use ElkArte's now ;).
-			if (in_array($user_setting['passwd'], $other_passwords))
+			if (in_array($user_setting['passwd'], $other_passwords, true))
 			{
 				$user->rehashPassword($sha_passwd);
 
@@ -501,7 +503,7 @@ class Auth extends AbstractController
 			}
 
 			// Perhaps we converted from a non UTF-8 db and have a valid password being hashed differently.
-			if (!empty($modSettings['previousCharacterSet']) && $modSettings['previousCharacterSet'] != 'utf8')
+			if (!empty($modSettings['previousCharacterSet']) && $modSettings['previousCharacterSet'] !== 'utf8')
 			{
 				// Try iconv first, for no particular reason.
 				if (function_exists('iconv'))
@@ -613,7 +615,7 @@ class Auth extends AbstractController
 			{
 				redirectexit();
 			}
-			elseif (!empty($_SESSION['logout_url']) && (substr($_SESSION['logout_url'], 0, 7) !== 'http://' && substr($_SESSION['logout_url'], 0, 8) !== 'https://'))
+			elseif ((strpos($_SESSION['logout_url'], 'http://') !== 0 && strpos($_SESSION['logout_url'], 'https://') !== 0))
 			{
 				unset($_SESSION['logout_url']);
 				redirectexit();
@@ -799,9 +801,9 @@ function checkActivation()
  * What it does:
  *  - It sets the cookie, it call hooks, updates runtime settings for the user.
  *
- * @param \ElkArte\UserSettingsLoader $user
+ * @param UserSettingsLoader $user
  *
- * @throws \ElkArte\Exceptions\Exception
+ * @throws Exception
  * @package Authorization
  */
 function doLogin(UserSettingsLoader $user)

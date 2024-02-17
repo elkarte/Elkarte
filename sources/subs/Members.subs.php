@@ -1872,6 +1872,19 @@ function getBasicMemberData($member_ids, $options = array())
 		)
 	)->fetch_callback(
 		function ($row) use (&$members, $language, $single) {
+			$row['id_member'] = (int) $row['id_member'];
+			$row['posts'] = (int) $row['posts'];
+			$row['id_theme'] = (int) $row['id_theme'];
+			if (!empty($options['moderation']))
+			{
+				$row['id_group'] = (int) $row['id_group'];
+				$row['id_post_group'] = (int) $row['id_post_group'];
+			}
+			if (!empty($options['preferences']))
+			{
+				$row['notify_types'] = (int) $row['notify_types'];
+			}
+
 			if (empty($row['lngfile']))
 			{
 				$row['lngfile'] = $language;

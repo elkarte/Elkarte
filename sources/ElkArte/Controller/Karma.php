@@ -75,7 +75,7 @@ class Karma extends AbstractController
 	 * @param int $id_target
 	 *
 	 * @return int
-	 * @throws \ElkArte\Exceptions\Exception feature_disabled
+	 * @throws Exception feature_disabled
 	 */
 	private function _prepare_karma($id_target)
 	{
@@ -112,16 +112,11 @@ class Karma extends AbstractController
 
 		// Delete any older items from the log so we can get the go ahead or not
 		clearKarma($modSettings['karmaWaitTime']);
+  if (!empty($modSettings['karmaTimeRestrictAdmins']) || !allowedTo('moderate_forum')) {
+      return lastActionOn($this->user->id, $id_target);
+  }
 
-		// Not an administrator... or one who is restricted as well.
-		$action = 0;
-		if (!empty($modSettings['karmaTimeRestrictAdmins']) || !allowedTo('moderate_forum'))
-		{
-			// Find out if this user has done this recently...
-			$action = lastActionOn($this->user->id, $id_target);
-		}
-
-		return $action;
+		return 0;
 	}
 
 	/**
@@ -132,7 +127,7 @@ class Karma extends AbstractController
 	 * @param int $action applaud or smite
 	 * @param int $dir
 	 *
-	 * @throws \ElkArte\Exceptions\Exception karma_wait_time
+	 * @throws Exception karma_wait_time
 	 */
 	private function _give_karma($id_executor, $id_target, $action, $dir)
 	{

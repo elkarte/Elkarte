@@ -30,17 +30,13 @@ use ElkArte\Util;
  */
 class SplitTopics extends AbstractController
 {
-	/**
-	 * Holds the new subject for the split topic
-	 *
-	 * @var string
-	 */
-	private $_new_topic_subject = null;
+	/** @var string Holds the new subject for the split topic */
+	private $_new_topic_subject;
 
 	/**
 	 * Intended entry point for this class.
 	 *
-	 * @see \ElkArte\AbstractController::action_index()
+	 * @see AbstractController::action_index
 	 */
 	public function action_index()
 	{
@@ -194,7 +190,7 @@ class SplitTopics extends AbstractController
 		if (empty($_SESSION['move_to_board']))
 		{
 			$_SESSION['move_to_board'] = (!empty($this->_req->post->move_new_topic) && !empty($this->_req->post->move_to_board)) ? (int) $this->_req->post->move_to_board : 0;
-			$_SESSION['reason'] = !empty($this->_req->post->reason) ? trim(Util::htmlspecialchars($this->_req->post->reason, ENT_QUOTES)) : '';
+			$_SESSION['reason'] = empty($this->_req->post->reason) ? '' : trim(Util::htmlspecialchars($this->_req->post->reason, ENT_QUOTES));
 			$_SESSION['messageRedirect'] = !empty($this->_req->post->messageRedirect);
 			$_SESSION['new_topic_subject'] = $this->_new_topic_subject;
 		}
@@ -221,7 +217,7 @@ class SplitTopics extends AbstractController
 		global $txt, $topic, $context, $modSettings, $options;
 
 		$context['page_title'] = $txt['split_topic'] . ' - ' . $txt['select_split_posts'];
-		$context['destination_board'] = !empty($this->_req->post->move_to_board) ? (int) $this->_req->post->move_to_board : 0;
+		$context['destination_board'] = empty($this->_req->post->move_to_board) ? 0 : (int) $this->_req->post->move_to_board;
 
 		// Haven't selected anything have we?
 		$_SESSION['split_selection'][$topic] = empty($_SESSION['split_selection'][$topic]) ? array() : $_SESSION['split_selection'][$topic];

@@ -15,8 +15,9 @@ namespace ElkArte\Controller;
 
 use ElkArte\AbstractController;
 use ElkArte\EmailParse;
-use ElkArte\Languages\Txt;
+use ElkArte\Exceptions\Exception;
 use ElkArte\Languages\Loader;
+use ElkArte\Languages\Txt;
 
 /**
  * Handles items pertaining to posting or PM an item that was received by email
@@ -29,7 +30,7 @@ class Emailpost extends AbstractController
 	 * Default entry point, it forwards to a worker method,
 	 * if we ever get here.
 	 *
-	 * @see \ElkArte\AbstractController::action_index()
+	 * @see AbstractController::action_index
 	 */
 	public function action_index()
 	{
@@ -48,7 +49,7 @@ class Emailpost extends AbstractController
 	 *
 	 * @param string $data raw email string, including headers
 	 * @return string[]|bool
-	 * @throws \ElkArte\Exceptions\Exception
+	 * @throws Exception
 	 */
 	public function action_pbe_preview($data = '')
 	{
@@ -98,7 +99,10 @@ class Emailpost extends AbstractController
 		}
 
 		// Return the parsed and formatted body and who it was sent to for the template
-		return array('body' => $text, 'to' => implode(' & ', $email_message->email['to']) . (!empty($email_message->email['cc']) ? ', ' . implode(' & ', $email_message->email['cc']) : ''));
+		return array(
+			'body' => $text,
+			'to' => implode(' & ', $email_message->email['to']) . (empty($email_message->email['cc']) ? '' : ', ' . implode(' & ', $email_message->email['cc']))
+		);
 	}
 
 	/**
@@ -119,7 +123,7 @@ class Emailpost extends AbstractController
 	 * @param string|null $key used to supply a lost key
 	 *
 	 * @return bool
-	 * @throws \ElkArte\Exceptions\Exception
+	 * @throws Exception
 	 */
 	public function action_pbe_post($data = null, $force = false, $key = null)
 	{
@@ -168,12 +172,10 @@ class Emailpost extends AbstractController
 				// If they don't wish, then return false like recording the failure would do
 				return false;
 			}
-			else
-			{
-				// When the auto-disable function is not turned on, record the DSN
-				// In the failed email table for the admins to handle however
-				return pbe_emailError('error_bounced', $email_message);
-			}
+
+			// When the auto-disable function is not turned on, record the DSN
+			// In the failed email table for the admins to handle however
+			return pbe_emailError('error_bounced', $email_message);
 		}
 
 		// If the feature is on but the post/pm function is not enabled, just log the message.
@@ -189,7 +191,7 @@ class Emailpost extends AbstractController
 		}
 
 		// Load the user from the database based on the sending email address
-		$email_message->email['from'] = !empty($email_message->email['from']) ? strtolower($email_message->email['from']) : '';
+		$email_message->email['from'] = empty($email_message->email['from']) ? '' : strtolower($email_message->email['from']);
 		$pbe = query_load_user_info($email_message->email['from']);
 
 		// Can't find this email in our database, a non-user, a spammer, a looser, a poser or even worse?
@@ -325,7 +327,7 @@ class Emailpost extends AbstractController
 	 * @param string|null $data used to supply a full body+headers email
 	 *
 	 * @return bool
-	 * @throws \ElkArte\Exceptions\Exception
+	 * @throws Exception
 	 */
 	public function action_pbe_topic($data = null)
 	{
@@ -381,12 +383,9 @@ class Emailpost extends AbstractController
 				// If they don't wish, then return false like recording the failure
 				return false;
 			}
-			else
-			{
-				// When the auto-disable function is not turned on, record the DSN
-				// In the failed email table for the admins to handle however
-				return pbe_emailError('error_bounced', $email_message);
-			}
+			// When the auto-disable function is not turned on, record the DSN
+			// In the failed email table for the admins to handle however
+			return pbe_emailError('error_bounced', $email_message);
 		}
 
 		// If the feature is on but the post/pm function is not enabled, just log the message.
@@ -396,7 +395,7 @@ class Emailpost extends AbstractController
 		}
 
 		// Load the user from the database based on the sending email address
-		$email_message->email['from'] = !empty($email_message->email['from']) ? strtolower($email_message->email['from']) : '';
+		$email_message->email['from'] = empty($email_message->email['from']) ? '' : strtolower($email_message->email['from']);
 		$pbe = query_load_user_info($email_message->email['from']);
 
 		// Can't find this email as one of our users?
