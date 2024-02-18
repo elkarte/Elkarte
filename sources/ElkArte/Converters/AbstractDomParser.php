@@ -216,6 +216,7 @@ abstract class AbstractDomParser
 			{
 				$lines[] = '';
 			}
+
 			while (!empty($string))
 			{
 				// Get the next #width characters before a break (space, punctuation tab etc)

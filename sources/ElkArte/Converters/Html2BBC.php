@@ -38,9 +38,6 @@ class Html2BBC extends AbstractDomParser
 	/** @var string[] Font numbers to pt size */
 	public $sizes_equivalence = [1 => '8px', '10px', '12px', '14px', '18px', '20px', '22px'];
 
-	/** @var bool|null Used to strip newlines inside 'p' and 'div' elements */
-	public $strip_newlines;
-
 	/** @var string[] Html tags to skip that would normally be converted */
 	protected $_skip_tags = [];
 
@@ -51,9 +48,9 @@ class Html2BBC extends AbstractDomParser
 	 * Gets everything started using the built-in or external parser
 	 *
 	 * @param string $html string of html to convert
-	 * @param bool $strip flag to strip newlines, true by default
+	 * @param bool $strip_newlines flag to strip newlines, true by default
 	 */
-	public function __construct($html, $strip = true)
+	public function __construct($html, public $strip_newlines = true)
 	{
 		// Up front, remove whitespace between html tags
 		$html = preg_replace('/(?:(?<=>)|(?<=\/>))(\s+)(?=<\/?)/', '', $html);
@@ -67,9 +64,6 @@ class Html2BBC extends AbstractDomParser
 
 		// Escape items that are BBC tags
 		$html = strtr($html, ['[' => '&amp#91;', ']' => '&amp#93;']);
-
-		// Set a Parser then load the HTML
-		$this->strip_newlines = $strip;
 		$this->setParser();
 		$this->loadHTML($html);
 	}
@@ -238,11 +232,11 @@ class Html2BBC extends AbstractDomParser
 				$bbc = $this->_convertImage($node);
 				break;
 			case 'ol':
-				$bbc = $this->hasParentList($node) ? trim($this->getValue($node)) : rtrim($this->getValue($node));
+				$bbc = $this->hasParentList($node) !== 0 ? trim($this->getValue($node)) : rtrim($this->getValue($node));
 				$bbc = $this->line_end . '[list type=decimal]' . $this->line_end . $bbc . $this->line_end . '[/list]' . $this->line_end;
 				break;
 			case 'ul':
-				$bbc = $this->hasParentList($node) ? trim($this->getValue($node)) : rtrim($this->getValue($node));
+				$bbc = $this->hasParentList($node) !== 0 ? trim($this->getValue($node)) : rtrim($this->getValue($node));
 				$bbc = $this->line_end . '[list]' . $this->line_end . $bbc . $this->line_end . '[/list]' . $this->line_end;
 				break;
 			case 'li':
@@ -351,22 +345,15 @@ class Html2BBC extends AbstractDomParser
 		// Maybe an email link
 		if (substr($href, 0, 7) === 'mailto:')
 		{
-			if ($href !== 'mailto:' . ($modSettings['maillist_sitename_address'] ?? ''))
-			{
-				$href = substr($href, 7);
-			}
-			else
-			{
-				$href = '';
-			}
+			$href = $href !== 'mailto:' . ($modSettings['maillist_sitename_address'] ?? '') ? substr($href, 7) : '';
 
-			return !empty($value) ? '[email=' . $href . ']' . $value . '[/email]' : '[email]' . $href . '[/email]';
+			return empty($value) ? '[email]' . $href . '[/email]' : '[email=' . $href . ']' . $value . '[/email]';
 		}
 
 		// FTP
-		if (substr($href, 0, 6) === 'ftp://')
+		if (strpos($href, 'ftp://') === 0)
 		{
-			return !empty($value) ? '[ftp=' . $href . ']' . $value . '[/ftp]' : '[ftp]' . $href . '[/ftp]';
+			return empty($value) ? '[ftp]' . $href . '[/ftp]' : '[ftp=' . $href . ']' . $value . '[/ftp]';
 		}
 
 		// Oh a link then
@@ -384,7 +371,7 @@ class Html2BBC extends AbstractDomParser
 			}
 		}
 
-		return !empty($value) ? '[url=' . $href . ']' . $value . '[/url]' : '[url]' . $href . '[/url]';
+		return empty($value) ? '[url]' . $href . '[/url]' : '[url=' . $href . ']' . $value . '[/url]';
 	}
 
 	/**
@@ -402,7 +389,7 @@ class Html2BBC extends AbstractDomParser
 		$title = $node->getAttribute('title');
 		$value = $this->getValue($node);
 
-		return !empty($title) ? '[abbr=' . $title . ']' . $value . '[/abbr]' : '';
+		return empty($title) ? '' : '[abbr=' . $title . ']' . $value . '[/abbr]';
 	}
 
 	/**
@@ -424,7 +411,7 @@ class Html2BBC extends AbstractDomParser
 
 		if ($dir === 'rtl' || $dir === 'ltr')
 		{
-			$bbc = '[bdo=' . $dir . ']' . $value . '[/bdo]';
+			return '[bdo=' . $dir . ']' . $value . '[/bdo]';
 		}
 
 		return $bbc;
@@ -456,6 +443,7 @@ class Html2BBC extends AbstractDomParser
 			{
 				array_shift($lines);
 			}
+
 			while (trim($lines[count($lines) - 1]) === '')
 			{
 				array_pop($lines);
@@ -519,6 +507,7 @@ class Html2BBC extends AbstractDomParser
 					{
 						$styleValue = substr($styleValue, 0, strpos($styleValue, ','));
 					}
+
 					$bbc = '[font=' . strtr($styleValue, array("'" => '')) . ']' . $bbc . '[/font]';
 					break;
 				case 'font-weight':
@@ -526,12 +515,14 @@ class Html2BBC extends AbstractDomParser
 					{
 						$bbc = '[b]' . $bbc . '[/b]';
 					}
+
 					break;
 				case 'font-style':
 					if ($styleValue === 'italic')
 					{
 						$bbc = '[i]' . $bbc . '[/i]';
 					}
+
 					break;
 				case 'text-decoration':
 					if ($styleValue === 'underline')
@@ -542,6 +533,7 @@ class Html2BBC extends AbstractDomParser
 					{
 						$bbc = '[s]' . $bbc . '[/s]';
 					}
+
 					break;
 				case 'font-size':
 					// Account for formatting issues, decimal in the wrong spot
@@ -549,6 +541,7 @@ class Html2BBC extends AbstractDomParser
 					{
 						$styleValue = $dec_matches[1] . $dec_matches[2];
 					}
+
 					$bbc = '[size=' . $styleValue . ']' . $bbc . '[/size]';
 					break;
 				case 'color':
@@ -570,6 +563,7 @@ class Html2BBC extends AbstractDomParser
 					{
 						$bbc = '[center]' . $bbc . '[/center]';
 					}
+
 					break;
 			}
 		}
@@ -595,7 +589,7 @@ class Html2BBC extends AbstractDomParser
 			{
 				if (strpos($match[0], ':'))
 				{
-					list ($key, $value) = explode(':', trim($match[0], ';'));
+					[$key, $value] = explode(':', trim($match[0], ';'));
 					$key = trim($key);
 					$styles[$key] = trim($value);
 				}
@@ -741,7 +735,7 @@ class Html2BBC extends AbstractDomParser
 
 		if (!empty($size))
 		{
-			$bbc = str_replace('[img', '[img ' . trim($size), $bbc);
+			return str_replace('[img', '[img ' . trim($size), $bbc);
 		}
 
 		return $bbc;
@@ -838,14 +832,7 @@ class Html2BBC extends AbstractDomParser
 					$working = strip_tags($working);
 
 					// Strip can return nothing due to an error
-					if (empty($working))
-					{
-						$parts[$i] = $part;
-					}
-					else
-					{
-						$parts[$i] = htmlspecialchars_decode($working);
-					}
+					$parts[$i] = empty($working) ? $part : htmlspecialchars_decode($working);
 				}
 			}
 		}
