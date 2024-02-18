@@ -218,7 +218,7 @@ class Query extends AbstractQuery
 		}
 
 		// Log the error.
-		$query_error = $this->handleSpaceError($query_errno,$query_error);
+		$query_error = $this->handleSpaceError($query_errno, $query_error);
 		if ($query_errno !== self::ERR_DEADLOCK_FOUND && $query_errno !== self::ERR_LOCK_WAIT_TIMEOUT_EXCEEDED)
 		{
 			Errors::instance()->log_error($txt['database_error'] . ': ' . $query_error . (empty($modSettings['enableErrorQueryLogging']) ? '' : "\n\n$db_string"), 'database', $file, $line);

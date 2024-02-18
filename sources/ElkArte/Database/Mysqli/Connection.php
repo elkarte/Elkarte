@@ -54,14 +54,14 @@ class Connection implements ConnectionInterface
 			mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_INDEX & ~MYSQLI_REPORT_STRICT);
 		}
 		catch (\mysqli_sql_exception $e)
-        {
-	        // Something's wrong, show an error if its fatal (which we assume it is)
-	        // If the connection fails more than once (e.g. wrong password) the exception
-	        // should be thrown only once.
-	        self::$failed_once = true;
+		{
+			// Something's wrong, show an error if its fatal (which we assume it is)
+			// If the connection fails more than once (e.g. wrong password) the exception
+			// should be thrown only once.
+			self::$failed_once = true;
 
-	        throw new \RuntimeException('Db initialization failed ' . $e->getMessage());
-        }
+			throw new \RuntimeException('Db initialization failed ' . $e->getMessage());
+		}
 
 		return $query;
 	}
