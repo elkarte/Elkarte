@@ -40,7 +40,7 @@ class Log extends AbstractModel
 		// Deleting all with a filter?
 		elseif ($type === 'delall' && !empty($filter))
 		{
-			$this->_db->query('','
+			$this->_db->query('', '
 				DELETE FROM {db_prefix}log_errors
 				WHERE ' . $filter['variable'] . ' LIKE {string:filter}',
 				array(
@@ -51,7 +51,7 @@ class Log extends AbstractModel
 		// Just specific errors?
 		elseif ($type === 'delete')
 		{
-			$this->_db->query('','
+			$this->_db->query('', '
 				DELETE FROM {db_prefix}log_errors
 				WHERE id_error IN ({array_int:error_list})',
 				array(
@@ -74,13 +74,13 @@ class Log extends AbstractModel
 		$result = $this->_db->query('', '
 			SELECT
 			 	COUNT(*)
-			FROM {db_prefix}log_errors' . (!empty($filter) ? '
-			WHERE ' . $filter['variable'] . ' LIKE {string:filter}' : ''),
+			FROM {db_prefix}log_errors' . (empty($filter) ? '' : '
+			WHERE ' . $filter['variable'] . ' LIKE {string:filter}'),
 			array(
-				'filter' => !empty($filter) ? $filter['value']['sql'] : '',
+				'filter' => empty($filter) ? '' : $filter['value']['sql'],
 			)
 		);
-		list ($num_errors) = $result->fetch_row();
+		[$num_errors] = $result->fetch_row();
 
 		$result->free_result();
 
@@ -105,12 +105,12 @@ class Log extends AbstractModel
 		$this->_db->fetchQuery('
 			SELECT 
 				id_error, id_member, ip, url, log_time, message, session, error_type, file, line
-			FROM {db_prefix}log_errors' . (!empty($filter) ? '
-			WHERE ' . $filter['variable'] . ' LIKE {string:filter}' : '') . '
+			FROM {db_prefix}log_errors' . (empty($filter) ? '' : '
+			WHERE ' . $filter['variable'] . ' LIKE {string:filter}') . '
 			ORDER BY id_error ' . ($sort_direction === 'down' ? 'DESC' : '') . '
 			LIMIT ' . $this->_modSettings['defaultMaxMessages'] . ' OFFSET ' . $start,
 			array(
-				'filter' => !empty($filter) ? $filter['value']['sql'] : '',
+				'filter' => empty($filter) ? '' : $filter['value']['sql'],
 			)
 		)->fetch_callback(
 			function ($row) use (&$log, $filter, $scripturl, $txt) {
@@ -119,6 +119,7 @@ class Log extends AbstractModel
 				{
 					$search_message = $this->_db->escape_wildcard_string($row['message']);
 				}
+
 				$show_message = strtr(strtr(preg_replace('~&lt;span class=&quot;remove&quot;&gt;(.+?)&lt;/span&gt;~', '$1', $row['message']), array("\r" => '', '<br />' => "\n", '<' => '&lt;', '>' => '&gt;', '"' => '&quot;')), array("\n" => '<br />'));
 
 				$log['errors'][$row['id_error']] = array(
@@ -195,12 +196,12 @@ class Log extends AbstractModel
 				// Total errors so far?
 				$sum += $row['num_errors'];
 
-				$types[$sum] = array(
+				$types[$sum] = [
 					'label' => ($txt['errortype_' . $row['error_type']] ?? $row['error_type']) . ' (' . $row['num_errors'] . ')',
 					'description' => $txt['errortype_' . $row['error_type'] . '_desc'] ?? '',
 					'url' => getUrl('admin', ['action' => 'admin', 'area' => 'logs', 'sa' => 'errorlog'] + ($sort === null || $sort === 'down' ? ['desc'] : []) + ['filter' => 'error_type', 'value' => $row['error_type']]),
 					'is_selected' => !empty($filter) && $filter['value']['sql'] == $this->_db->escape_wildcard_string($row['error_type']),
-				);
+				];
 			}
 		);
 
