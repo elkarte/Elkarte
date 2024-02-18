@@ -98,6 +98,8 @@ updateSettings(array(
 	'currentAttachmentUploadDir' => 1,
 ));
 
+detectServer()->setMemoryLimit('256M');
+
 /**
  * This next line is pointless, but without it DatabaseTestExt tests fail in postgre.
  * This 'mentions_member_check' setting looks to be added as part of a scheduled task
