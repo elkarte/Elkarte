@@ -14,7 +14,7 @@ class EmailpostBasic extends TestCase
 	 */
 	protected function setUp(): void
 	{
-		require_once(SUBSDIR . '/Emailpost.subs.php');
+		require_once(SUBSDIR . '/Maillist.subs.php');
 
 		$this->bbcTestCases = [
 			[

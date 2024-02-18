@@ -12,70 +12,55 @@
  *
  */
 
-namespace ElkArte;
+namespace ElkArte\Maillist;
+
+use ElkArte\AbstractModel;
+use ElkArte\Errors;
+use ElkArte\EventManager;
 
 /**
  * Grabs unread messages from an imap account
- * Passes any new messages found to the postby email function for processing
+ * Passes any new messages found to the "postby" email function for processing
  */
-class PbeImap extends AbstractModel
+class MaillistImap extends AbstractModel
 {
-	/**
-	 * The name of the imap host
-	 */
+	/** @var string The name of the imap host */
 	protected $_hostname = '';
 
-	/**
-	 * The username to access the imap account
-	 */
+	/** @var string The username to access the imap account */
 	protected $_username = '';
 
-	/**
-	 * The password of the imap account
-	 */
+	/** @var string The password of the imap account */
 	protected $_password = '';
 
-	/**
-	 * The name of the folder where messages are stored
-	 */
+	/** @var string The name of the folder where messages are stored */
 	protected $_mailbox = 'INBOX';
 
-	/**
-	 * Type of connection: pop3, pop3tls, pop3ssl, imap, imaptls, imapssl
-	 */
+	/** @var string Type of connection: pop3, pop3tls, pop3ssl, imap, imaptls, imapssl */
 	protected $_type = '';
 
-	/**
-	 * If the host is gmail.
-	 * Gmail requires some more processing when deleting emails
-	 */
+	/** @var bool If the host is gmail. Gmail requires more processing when deleting emails */
 	protected $_is_gmail = false;
 
-	/**
-	 * Are we going to delete the emails once read?
-	 */
+	/** @var bool Are we going to delete the emails once read? */
 	protected $_delete = false;
 
-	/**
-	 * The inbox object
-	 */
-	protected $_inbox = null;
+	/** @var null The inbox object */
+	protected $_inbox;
 
-	/**
-	 * imap_open $mailbox string
-	 */
+	/** @var string imap_open $mailbox string */
 	protected $_imap_server = '';
 
 	/**
 	 * The constructor, prepares few variables.
 	 *
 	 * $modSettings - May contain a few needed settings:
-	 *                 - maillist_imap_host
-	 *                 - maillist_imap_uid
-	 *                 - maillist_imap_pass
-	 *                 - maillist_imap_mailbox
-	 *                 - maillist_imap_connection
-	 *                 - maillist_imap_delete
+	 *    - maillist_imap_host
+	 *    - maillist_imap_uid
+	 *    - maillist_imap_pass
+	 *    - maillist_imap_mailbox
+	 *    - maillist_imap_connection
+	 *    - maillist_imap_delete
 	 */
 	public function __construct()
 	{
@@ -111,8 +96,8 @@ class PbeImap extends AbstractModel
 		// You've got mail,
 		if (!empty($emails))
 		{
-			// Initialize Emailpost controller
-			$controller = new Controller\Emailpost(new EventManager());
+			// Initialize Maillist controller
+			$controller = new MaillistPost(new EventManager());
 			$controller->setUser($this->user);
 
 			// Make sure we work from the oldest to the newest message
@@ -167,7 +152,7 @@ class PbeImap extends AbstractModel
 				$imap_error = imap_last_error();
 				if (!empty($imap_error))
 				{
-					Errors\Errors::instance()->log_error($imap_error, 'debug', 'IMAP');
+					Errors::instance()->log_error($imap_error, 'debug', 'IMAP');
 				}
 			}
 		}
@@ -181,7 +166,7 @@ class PbeImap extends AbstractModel
 	private function _checkValues()
 	{
 		// I suppose that without this information we can't do anything.
-		return (empty($this->_hostname) || empty($this->_username) || empty($this->_password)) ? false : true;
+		return !((empty($this->_hostname) || empty($this->_username) || empty($this->_password)));
 	}
 
 	/**
@@ -235,7 +220,7 @@ class PbeImap extends AbstractModel
 				break;
 		}
 
-		return array('protocol' => $protocol, 'port' => $port, 'flags' => $flags);
+		return ['protocol' => $protocol, 'port' => $port, 'flags' => $flags];
 	}
 
 	/**
@@ -281,18 +266,18 @@ class PbeImap extends AbstractModel
 	protected function _get_trash_folder()
 	{
 		// Known names for the trash bin, I'm sure there are more
-		$trashbox = array('[Google Mail]/Bin', '[Google Mail]/Trash', '[Gmail]/Bin', '[Gmail]/Trash');
+		$trashBox = ['[Google Mail]/Bin', '[Google Mail]/Trash', '[Gmail]/Bin', '[Gmail]/Trash'];
 
-		call_integration_hook('integrate_imap_trash_folders', array(&$trashbox));
+		call_integration_hook('integrate_imap_trash_folders', [&$trashBox]);
 
 		// Get all the folders / labels
-		$mailboxes = imap_list($this->_inbox, $this->_imap_server, '*');
+		$mailBoxes = imap_list($this->_inbox, $this->_imap_server, '*');
 
 		// Check the names to see if one is known as a trashbin
-		foreach ($mailboxes as $mailbox)
+		foreach ($mailBoxes as $mailbox)
 		{
 			$name = str_replace($this->_imap_server, '', $mailbox);
-			if (in_array($name, $trashbox))
+			if (in_array($name, $trashBox, true))
 			{
 				return $name;
 			}

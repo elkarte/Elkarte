@@ -2,7 +2,7 @@
 
 /**
  * Should be run from a cron job to fetch messages from an imap mailbox
- * Can be called from scheduled tasks (fake-cron) if needed
+ * Can also be called from scheduled tasks (fake-cron) if needed
  *
  * @package   ElkArte Forum
  * @copyright ElkArte Forum contributors
@@ -12,9 +12,9 @@
  *
  */
 
-// Any output here is not good
-use ElkArte\PbeImap;
+use ElkArte\Maillist\MaillistImap;
 
+// Any output here is not good
 error_reporting(0);
 
 // Being run as a cron job
@@ -25,6 +25,7 @@ if (!defined('ELK'))
 	require_once(__DIR__ . '/bootstrap.php');
 	$ssi_guest_access = true;
 	new Bootstrap(true);
+
 	postbyemail_imap();
 
 	// Need to keep the cli clean on return
@@ -52,14 +53,6 @@ function postbyemail_imap()
 		return false;
 	}
 
-	$pbe = new PbeImap();
-
-	if ($pbe !== false)
-	{
-		return $pbe->process();
-	}
-	else
-	{
-		return false;
-	}
+	$pbe = new MaillistImap();
+	return $pbe->process();
 }

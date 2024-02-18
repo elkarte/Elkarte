@@ -18,13 +18,14 @@ use BBC\ParserWrapper;
 use ElkArte\AbstractController;
 use ElkArte\Action;
 use ElkArte\Cache\Cache;
-use ElkArte\Controller\Emailpost;
 use ElkArte\Converters\Html2Md;
 use ElkArte\DataValidator;
 use ElkArte\EmailSettings;
 use ElkArte\EventManager;
 use ElkArte\Exceptions\Exception;
 use ElkArte\Languages\Txt;
+use ElkArte\Maillist\MaillistPost;
+use ElkArte\Maillist\MaillistPreview;
 use ElkArte\SettingsForm\SettingsForm;
 use ElkArte\User;
 use ElkArte\Util;
@@ -362,7 +363,7 @@ class ManageMaillist extends AbstractController
 					$data = $temp_email[0]['body'];
 
 					// Read/parse this message for viewing
-					$controller = new Emailpost(new EventManager());
+					$controller = new MaillistPreview(new EventManager());
 					$controller->setUser(User::$info);
 					$result = $controller->action_pbe_preview($data);
 					$text = $result['body'] ?? '';
@@ -473,7 +474,7 @@ class ManageMaillist extends AbstractController
 					}
 
 					// Let's TRY AGAIN to make a post!
-					$controller = new Emailpost(new EventManager());
+					$controller = new MaillistPost(new EventManager());
 					$controller->setUser(User::$info);
 					$text = $controller->action_pbe_post($data, true, $key);
 

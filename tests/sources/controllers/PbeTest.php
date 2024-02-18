@@ -22,7 +22,7 @@ class TestPBE extends TestCase
 	protected function setUp(): void
 	{
 		global $txt;
-		require_once(SUBSDIR . '/Emailpost.subs.php');
+		require_once(SUBSDIR . '/Maillist.subs.php');
 
 		$lang = new Loader('english', $txt, database());
 		$lang->load('Maillist');

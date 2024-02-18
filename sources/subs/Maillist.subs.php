@@ -33,17 +33,17 @@ function list_maillist_unapproved($id = 0, $start = 0, $items_per_page = 0, $sor
 {
 	$db = database();
 
-	// Init
+	// Setup
 	$i = 0;
 	$sort = empty($sort) ? 'id_email DESC' : $sort;
-	$postemail = array();
-	require_once(SUBSDIR . '/Emailpost.subs.php');
+	$postemail = [];
+	require_once(SUBSDIR . '/MaillistPost.subs.php');
 
 	// Where can they approve items?
-	$approve_boards = !empty(User::$info->mod_cache['ap']) ? User::$info->mod_cache['ap'] : boardsAllowedTo('approve_posts');
+	$approve_boards = empty(User::$info->mod_cache['ap']) ? boardsAllowedTo('approve_posts') : User::$info->mod_cache['ap'];
 
 	// Work out the query
-	if ($approve_boards == array(0))
+	if ($approve_boards == [0])
 	{
 		$approve_query = '';
 	}
@@ -73,18 +73,17 @@ function list_maillist_unapproved($id = 0, $start = 0, $items_per_page = 0, $sor
 			LEFT JOIN {db_prefix}boards AS b ON (b.id_board = e.id_board)
 		WHERE ' . $where_query . '
 		ORDER BY {raw:sort}
-		' . ((!empty($items_per_page)) ? 'LIMIT {int:limit} OFFSET {int:offset}  ' : 'LIMIT 1'),
-		array(
+		' . ((empty($items_per_page)) ? 'LIMIT 1' : 'LIMIT {int:limit} OFFSET {int:offset}  '),
+		[
 			'offset' => $start,
 			'limit' => $items_per_page,
 			'sort' => $sort,
 			'id' => $id,
-		)
+		]
 	)->fetch_callback(
-		function ($row) use (&$postemail, &$i) {
+		static function ($row) use (&$postemail, &$i) {
 			global $txt, $boardurl;
-
-			$postemail[$i] = array(
+			$postemail[$i] = [
 				'id_email' => $row['id_email'],
 				'error' => $txt[$row['error'] . '_short'],
 				'error_code' => $row['error'],
@@ -95,12 +94,12 @@ function list_maillist_unapproved($id = 0, $start = 0, $items_per_page = 0, $sor
 				'type' => $row['message_type'],
 				'body' => $row['message'],
 				'link' => '#',
-			);
+			];
 
 			// Sender details we can use
 			$temp = query_load_user_info($row['email_from']);
-			$postemail[$i]['name'] = !empty($temp['user_info']['name']) ? $temp['user_info']['name'] : '';
-			$postemail[$i]['language'] = !empty($temp['user_info']['language']) ? $temp['user_info']['language'] : '';
+			$postemail[$i]['name'] = empty($temp['user_info']['name']) ? '' : $temp['user_info']['name'];
+			$postemail[$i]['language'] = empty($temp['user_info']['language']) ? '' : $temp['user_info']['language'];
 
 			// Build a link to the topic or message in case someone wants to take a look at that thread
 			switch ($row['message_type'])
@@ -115,7 +114,6 @@ function list_maillist_unapproved($id = 0, $start = 0, $items_per_page = 0, $sor
 					$postemail[$i]['subject'] = $txt['private'];
 					break;
 			}
-
 			$i++;
 		}
 	);
@@ -133,10 +131,10 @@ function list_maillist_count_unapproved()
 	$db = database();
 
 	// Where can they approve items?
-	$approve_boards = !empty(User::$info->mod_cache['ap']) ? User::$info->mod_cache['ap'] : boardsAllowedTo('approve_posts');
+	$approve_boards = empty(User::$info->mod_cache['ap']) ? boardsAllowedTo('approve_posts') : User::$info->mod_cache['ap'];
 
 	// Work out the query
-	if ($approve_boards == array(0))
+	if ($approve_boards == [0])
 	{
 		$approve_query = '';
 	}
@@ -157,9 +155,9 @@ function list_maillist_count_unapproved()
 			LEFT JOIN {db_prefix}boards AS b ON (b.id_board = e.id_board)
 		WHERE {query_see_board}
 			' . $approve_query,
-		array()
+		[]
 	);
-	list ($total) = $request->fetch_row();
+	[$total] = $request->fetch_row();
 	$request->free_result();
 
 	return $total;
@@ -179,9 +177,9 @@ function maillist_delete_error_entry($id)
 	$db->query('', '
 		DELETE FROM {db_prefix}postby_emails_error
 		WHERE id_email = {int:id}',
-		array(
+		[
 			'id' => $id,
-		)
+		]
 	);
 }
 
@@ -212,34 +210,34 @@ function list_get_filter_parser($start, $items_per_page, $sort = '', $id = 0, $s
 	}
 
 	// Define $email_filters
-	$email_filters = array();
+	$email_filters = [];
 
 	// Load all the email_filters, we need lots of these :0
 	$db->fetchQuery('
 		SELECT 
 			id_filter, filter_style, filter_type, filter_to, filter_from, filter_name, filter_order
 		FROM {db_prefix}postby_emails_filters
-		WHERE id_filter' . (($id == 0) ? ' > {int:id}' : ' = {int:id}') . '
+		WHERE id_filter' . (($id === 0) ? ' > {int:id}' : ' = {int:id}') . '
 			AND filter_style = {string:style}
 		ORDER BY {raw:sort}, filter_type ASC, filter_order ASC
-		' . ((!empty($items_per_page)) ? 'LIMIT {int:limit} OFFSET {int:offset}  ' : ''),
-		array(
+		' . ((empty($items_per_page)) ? '' : 'LIMIT {int:limit} OFFSET {int:offset}  '),
+		[
 			'offset' => $start,
 			'limit' => $items_per_page,
 			'sort' => $sort,
 			'id' => $id,
 			'style' => $style
-		)
+		]
 	)->fetch_callback(
-		function ($row) use (&$email_filters) {
-			$email_filters[$row['id_filter']] = array(
+		static function ($row) use (&$email_filters) {
+			$email_filters[$row['id_filter']] = [
 				'id_filter' => $row['id_filter'],
 				'filter_type' => $row['filter_type'],
 				'filter_to' => '<strong>"</strong>' . Util::htmlspecialchars($row['filter_to']) . '<strong>"</strong>',
 				'filter_from' => '<strong>"</strong>' . Util::htmlspecialchars($row['filter_from']) . '<strong>"</strong>',
 				'filter_name' => Util::htmlspecialchars($row['filter_name']),
 				'filter_order' => $row['filter_order'],
-			);
+			];
 		}
 	);
 
@@ -270,12 +268,12 @@ function list_count_filter_parser($id, $style)
 		FROM {db_prefix}postby_emails_filters
 		WHERE id_filter' . (($id === 0) ? ' > {int:id}' : ' = {int:id}') . '
 			AND filter_style = {string:style}',
-		array(
+		[
 			'id' => $id,
 			'style' => $style
-		)
+		]
 	);
-	list ($total) = $request->fetch_row();
+	[$total] = $request->fetch_row();
 	$request->free_result();
 
 	return (int) $total;
@@ -305,10 +303,10 @@ function maillist_load_filter_parser($id, $style)
 		WHERE id_filter = {int:id}
 			AND filter_style = {string:style}
 		LIMIT 1',
-		array(
+		[
 			'id' => $id,
 			'style' => $style
-		)
+		]
 	);
 	$row = $request->fetch_assoc();
 	$request->free_result();
@@ -336,9 +334,9 @@ function maillist_delete_filter_parser($id)
 	$db->query('', '
 		DELETE FROM {db_prefix}postby_emails_filters
 		WHERE id_filter = {int:id}',
-		array(
+		[
 			'id' => $id
-		)
+		]
 	);
 }
 
@@ -354,18 +352,18 @@ function maillist_board_list()
 	$db = database();
 
 	// Get the board and the id's, we need these for the templates
-	$result = array();
+	$result = [];
 	$result[0] = '';
 	$db->fetchQuery('
 		SELECT 
 			id_board, name
 		FROM {db_prefix}boards
 		WHERE id_board > {int:zero}',
-		array(
+		[
 			'zero' => 0,
-		)
+		]
 	)->fetch_callback(
-		function ($row) use (&$result) {
+		static function ($row) use (&$result) {
 			$result[$row['id_board']] = $row['name'];
 		}
 	);
@@ -388,11 +386,11 @@ function enable_maillist_imap_cron($switch)
 		UPDATE {db_prefix}scheduled_tasks
 		SET disabled = {int:onoff}, next_time = {int:time}
 		WHERE task = {string:name}',
-		array(
+		[
 			'name' => 'pbeIMAP',
 			'onoff' => empty($switch) ? 1 : 0,
 			'time' => time() + (5 * 60),
-		)
+		]
 	);
 }
 
@@ -416,23 +414,21 @@ function maillist_templates($template_type, $subject = null)
 		FROM {db_prefix}log_comments
 		WHERE comment_type = {string:tpltype}
 			AND (id_recipient = {int:generic} OR id_recipient = {int:current_member})',
-		array(
+		[
 			'tpltype' => $template_type,
 			'generic' => 0,
 			'current_member' => User::$info->id,
-		)
+		]
 	)->fetch_callback(
-		function ($row) use ($subject) {
-			$template = array(
+		static function ($row) use ($subject) {
+			$template = [
 				'title' => $row['template_title'],
 				'body' => $row['body'],
-			);
-
+			];
 			if ($subject !== null)
 			{
 				$template['subject'] = $subject;
 			}
-
 			return $template;
 		}
 	);
@@ -441,7 +437,7 @@ function maillist_templates($template_type, $subject = null)
 /**
  * Log in post-by emails an email being sent
  *
- * @param mixed[] $sent associative array of id_email, time_sent, email_to
+ * @param array $sent associative array of id_email, time_sent, email_to
  * @package Maillist
  */
 function log_email($sent)
@@ -450,12 +446,12 @@ function log_email($sent)
 
 	$db->insert('ignore',
 		'{db_prefix}postby_emails',
-		array(
+		[
 			'message_key' => 'string', 'message_type' => 'string',
 			'message_id' => 'string', 'time_sent' => 'int', 'email_to' => 'string'
-		),
+		],
 		$sent,
-		array('id_email')
+		['id_email']
 	);
 }
 
@@ -477,8 +473,8 @@ function updateParserFilterOrder($replace, $filters)
 		UPDATE {db_prefix}postby_emails_filters
 		SET filter_order = CASE ' . $replace . ' ELSE filter_order END
 		WHERE id_filter IN ({array_int:filters})',
-		array(
+		[
 			'filters' => $filters,
-		)
+		]
 	);
 }

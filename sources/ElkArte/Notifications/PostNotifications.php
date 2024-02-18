@@ -62,7 +62,7 @@ class PostNotifications extends AbstractModel
 		parent::__construct();
 
 		// Load in dependencies
-		require_once(SUBSDIR . '/Emailpost.subs.php');
+		require_once(SUBSDIR . '/Maillist.subs.php');
 		require_once(SUBSDIR . '/Notification.subs.php');
 		require_once(SUBSDIR . '/Mail.subs.php');
 	}
