@@ -25,7 +25,7 @@ interface SearchInterface
 	 * @param string $db_string
 	 * @param array $db_values
 	 *
-	 * @return \ElkArte\Database\AbstractResult|boolean
+	 * @return AbstractResult|boolean
 	 */
 	public function search_query($identifier, $db_string, $db_values = array());
 

@@ -52,7 +52,7 @@ class Result extends AbstractResult
 	public function free_result()
 	{
 		// Just delegate to MySQL's function
-		if ($this->result instanceof mysqli_result)
+		if ($this->result instanceof \mysqli_result && isset($this->result->num_rows))
 		{
 			mysqli_free_result($this->result);
 		}

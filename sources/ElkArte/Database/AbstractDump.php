@@ -17,45 +17,23 @@
 
 namespace ElkArte\Database;
 
+use ElkArte\Exceptions\Exception;
+
 /**
  * Abstract database class, implements database to control functions
  */
 abstract class AbstractDump
 {
 	/**
-	 * Holds current instance of the db class
-	 *
-	 * @var \ElkArte\Database\QueryInterface
-	 */
-	protected $_db = null;
-
-	/**
-	 * Holds current instance of the tables-related class
-	 *
-	 * @var \ElkArte\Database\AbstractTable
-	 */
-	protected $_db_table = null;
-
-	/**
-	 * The db prefix
-	 *
-	 * @var string
-	 */
-	protected $_db_prefix = '';
-
-	/**
 	 * Initializes a database connection.
 	 * It returns the connection, if successful.
 	 *
-	 * @param \ElkArte\Database\QueryInterface $db
-	 * @param \ElkArte\Database\AbstractTable|null $db_table
-	 * @param string|null $db_prefix
+	 * @param QueryInterface $_db Holds current instance of the db class
+	 * @param AbstractTable|null $_db_table Holds current instance of the tables-related class
+	 * @param string|null $_db_prefix The db prefix
 	 */
-	public function __construct($db, $db_table = null, $db_prefix = null)
+	public function __construct(protected $_db, protected $_db_table = null, protected $_db_prefix = null)
 	{
-		$this->_db = $db;
-		$this->_db_table = $db_table;
-		$this->_db_prefix = $db_prefix;
 	}
 
 	/**
@@ -64,7 +42,7 @@ abstract class AbstractDump
 	 * @param string $tableName - the table
 	 *
 	 * @return string - the CREATE statement as string
-	 * @throws \ElkArte\Exceptions\Exception
+	 * @throws Exception
 	 */
 	abstract public function table_sql($tableName);
 
@@ -85,8 +63,8 @@ abstract class AbstractDump
 	 * @param string $table_name
 	 * @param string $backup_table
 	 *
-	 * @return bool|\ElkArte\Database\AbstractResult - the request handle to the table creation query
-	 * @throws \ElkArte\Exceptions\Exception
+	 * @return bool|AbstractResult - the request handle to the table creation query
+	 * @throws Exception
 	 */
 	abstract public function backup_table($table_name, $backup_table);
 
@@ -98,7 +76,7 @@ abstract class AbstractDump
 	 * @param bool $new_table
 	 *
 	 * @return string the query to insert the data back in, or an empty string if the table was empty.
-	 * @throws \ElkArte\Exceptions\Exception
+	 * @throws Exception
 	 */
 	abstract public function insert_sql($tableName, $new_table = false);
 }

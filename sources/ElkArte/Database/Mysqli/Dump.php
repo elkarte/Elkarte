@@ -50,13 +50,13 @@ class Dump extends AbstractDump
 		while (($row = $result->fetch_assoc()))
 		{
 			// Make the CREATE for this column.
-			$schema_create .= ' `' . $row['Field'] . '` ' . $row['Type'] . ($row['Null'] != 'YES' ? ' NOT NULL' : '');
+			$schema_create .= ' `' . $row['Field'] . '` ' . $row['Type'] . ($row['Null'] !== 'YES' ? ' NOT NULL' : '');
 
 			// Add a default...?
 			if (!empty($row['Default']) || $row['Null'] !== 'YES')
 			{
 				// Make a special case of auto-timestamp.
-				if ($row['Default'] == 'CURRENT_TIMESTAMP')
+				if ($row['Default'] === 'CURRENT_TIMESTAMP')
 				{
 					$schema_create .= ' /*!40102 NOT NULL default CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP */';
 				}
@@ -67,13 +67,14 @@ class Dump extends AbstractDump
 					$type = strtolower($row['Type']);
 					$isNumericColumn = strpos($type, 'int') !== false || strpos($type, 'bool') !== false || strpos($type, 'bit') !== false || strpos($type, 'float') !== false || strpos($type, 'double') !== false || strpos($type, 'decimal') !== false;
 
-					$schema_create .= ' default ' . ($isNumericColumn ? $row['Default'] : '\'' . $this->_db->escape_string($row['Default']) . '\'');
+					$schema_create .= ' default ' . ($isNumericColumn ? $row['Default'] : "'" . $this->_db->escape_string($row['Default']) . "'");
 				}
 			}
 
 			// And now any extra information. (such as auto_increment.)
-			$schema_create .= ($row['Extra'] != '' ? ' ' . $row['Extra'] : '') . ',' . $crlf;
+			$schema_create .= ($row['Extra'] !== '' ? ' ' . $row['Extra'] : '') . ',' . $crlf;
 		}
+
 		$result->free_result();
 
 		// Take off the last comma.
@@ -87,11 +88,11 @@ class Dump extends AbstractDump
 				'table' => $tableName,
 			)
 		);
-		$indexes = array();
+		$indexes = [];
 		while (($row = $result->fetch_assoc()))
 		{
 			// Is this a primary key, unique index, or regular index?
-			$row['Key_name'] = $row['Key_name'] == 'PRIMARY' ? 'PRIMARY KEY' : (empty($row['Non_unique']) ? 'UNIQUE ' : ($row['Comment'] == 'FULLTEXT' || (isset($row['Index_type']) && $row['Index_type'] == 'FULLTEXT') ? 'FULLTEXT ' : 'KEY ')) . '`' . $row['Key_name'] . '`';
+			$row['Key_name'] = $row['Key_name'] === 'PRIMARY' ? 'PRIMARY KEY' : (empty($row['Non_unique']) ? 'UNIQUE ' : ($row['Comment'] == 'FULLTEXT' || (isset($row['Index_type']) && $row['Index_type'] == 'FULLTEXT') ? 'FULLTEXT ' : 'KEY ')) . '`' . $row['Key_name'] . '`';
 
 			// Is this the first column in the index?
 			if (empty($indexes[$row['Key_name']]))
@@ -109,6 +110,7 @@ class Dump extends AbstractDump
 				$indexes[$row['Key_name']][$row['Seq_in_index']] = '`' . $row['Column_name'] . '`';
 			}
 		}
+
 		$result->free_result();
 
 		// Build the CREATEs for the keys.
@@ -146,7 +148,8 @@ class Dump extends AbstractDump
 
 		$db_name_str = $db_name_str === false ? $db_name : $db_name_str;
 		$db_name_str = trim($db_name_str);
-		$filter = $filter === false ? '' : ' LIKE \'' . $filter . '\'';
+
+		$filter = $filter === false ? '' : " LIKE '" . $filter . "'";
 
 		$request = $this->_db->query('', '
 			SHOW TABLES
@@ -162,6 +165,7 @@ class Dump extends AbstractDump
 		{
 			$tables[] = $row[0];
 		}
+
 		$request->free_result();
 
 		return $tables;
@@ -210,7 +214,7 @@ class Dump extends AbstractDump
 				'table' => $table,
 			)
 		);
-		list (, $create) = $result->fetch_row();
+		[, $create] = $result->fetch_row();
 		$result->free_result();
 
 		$create = preg_split('/[\n\r]/', $create);
@@ -264,9 +268,9 @@ class Dump extends AbstractDump
 			}
 		}
 
-		$create = !empty($create) ? '(
+		$create = empty($create) ? '' : '(
 				' . implode('
-				', $create) . ')' : '';
+				', $create) . ')';
 
 		$request = $this->_db->query('', '
 			CREATE TABLE {raw:backup_table} {raw:create}
@@ -285,7 +289,7 @@ class Dump extends AbstractDump
 
 		if ($auto_inc !== '')
 		{
-			if (preg_match('~\`(.+?)\`\s~', $auto_inc, $match) != 0 && substr($auto_inc, -1, 1) === ',')
+			if (preg_match('~\`(.+?)\`\s~', $auto_inc, $match) === 1 && substr($auto_inc, -1, 1) === ',')
 			{
 				$auto_inc = substr($auto_inc, 0, -1);
 			}
@@ -313,7 +317,7 @@ class Dump extends AbstractDump
 
 		if ($new_table)
 		{
-			$limit = strstr($tableName, 'log_') !== false ? 500 : 250;
+			$limit = strpos($tableName, 'log_') !== false ? 500 : 250;
 			$start = 0;
 		}
 
@@ -334,7 +338,7 @@ class Dump extends AbstractDump
 		// The number of rows, just for record keeping and breaking INSERTs up.
 		$num_rows = $result->num_rows();
 
-		if ($num_rows == 0)
+		if ($num_rows === 0)
 		{
 			return '';
 		}
@@ -354,7 +358,7 @@ class Dump extends AbstractDump
 			// Get the fields in this row...
 			$field_list = array();
 
-			foreach ($row as $key => $item)
+			foreach ($row as $item)
 			{
 				// Try to figure out the type of each field. (NULL, number, or 'string'.)
 				if (!isset($item))
@@ -367,7 +371,7 @@ class Dump extends AbstractDump
 				}
 				else
 				{
-					$field_list[] = '\'' . $this->_db->escape_string($item) . '\'';
+					$field_list[] = "'" . $this->_db->escape_string($item) . "'";
 				}
 			}
 

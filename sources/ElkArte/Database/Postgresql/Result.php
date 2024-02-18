@@ -79,9 +79,8 @@ class Result extends AbstractResult
 			{
 				@pg_free_result($this->result);
 			}
-			catch ( \Throwable $e )
+			catch (\Throwable)
 			{
-				null;
 			}
 		}
 	}
@@ -94,7 +93,7 @@ class Result extends AbstractResult
 		// simply delegate to the native function
 		if (is_resource($this->result) || $this->result instanceof \PgSql\Result)
 		{
-			return (int) pg_num_rows($this->result);
+			return pg_num_rows($this->result);
 		}
 	}
 
@@ -104,7 +103,9 @@ class Result extends AbstractResult
 	public function num_fields()
 	{
 		if (is_resource($this->result) || $this->result instanceof \PgSql\Result)
+		{
 			return pg_num_fields($this->result);
+		}
 	}
 
 	/**
@@ -124,7 +125,9 @@ class Result extends AbstractResult
 	public function fetch_assoc()
 	{
 		if (is_resource($this->result) || $this->result instanceof \PgSql\Result)
+		{
 			return pg_fetch_assoc($this->result);
+		}
 	}
 
 	/**

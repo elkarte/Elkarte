@@ -16,7 +16,7 @@ namespace ElkArte\Database\Mysqli;
 use ElkArte\Database\AbstractSearch;
 
 /**
- * MySQL implementation of DbSearch
+ * MySQLs implementation of DbSearch
  */
 class Search extends AbstractSearch
 {

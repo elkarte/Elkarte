@@ -18,6 +18,7 @@
 namespace ElkArte\Database\Postgresql;
 
 use ElkArte\Database\AbstractTable;
+use ElkArte\Exceptions\Exception;
 
 /**
  * Adds PostgreSQL table level functionality,
@@ -26,19 +27,11 @@ use ElkArte\Database\AbstractTable;
  */
 class Table extends AbstractTable
 {
-	/**
-	 * Holds this instance of the table interface
-	 *
-	 * @var \ElkArte\Database\Postgresql\Table
-	 */
-	protected static $_tbl = null;
+	/** @var Table Holds this instance of the table interface */
+	protected static $_tbl;
 
-	/**
-	 * Any index to create when a table is created
-	 *
-	 * @var string[]
-	 */
-	protected $_indexes = array();
+	/** @var string[] Any index to create when a table is created */
+	protected $_indexes = [];
 
 	/**
 	 * {@inheritdoc }
@@ -50,7 +43,7 @@ class Table extends AbstractTable
 		$table_name = str_replace('{db_prefix}', $this->_db_prefix, $table_name);
 
 		// God no - dropping one of these = bad.
-		if (in_array(strtolower($table_name), $this->_reservedTables))
+		if (in_array(strtolower($table_name), $this->_reservedTables, true))
 		{
 			return false;
 		}
@@ -65,6 +58,7 @@ class Table extends AbstractTable
 			{
 				$this->_db->skip_next_error();
 			}
+
 			$table_query = 'DROP TABLE ' . $table_name;
 
 			$this->_db->query('',
@@ -123,18 +117,16 @@ class Table extends AbstractTable
 			{
 				return $this->change_column($table_name, $column_info['name'], $column_info);
 			}
-			else
-			{
-				return false;
-			}
+
+			return false;
 		}
 
 		// Get the specifics...
 		$column_info['size'] = isset($column_info['size']) && is_numeric($column_info['size']) ? $column_info['size'] : null;
-		list ($type, $size) = $this->calculate_type($column_info['type'], $column_info['size']);
+		[$type, $size] = $this->calculate_type($column_info['type'], $column_info['size']);
 		if ($size !== null)
 		{
-			$type = $type . '(' . $size . ')';
+			$type .= '(' . $size . ')';
 		}
 
 		// Now add the thing!
@@ -148,10 +140,8 @@ class Table extends AbstractTable
 		{
 			return $this->change_column($table_name, $column_info['name'], $column_info);
 		}
-		else
-		{
-			return true;
-		}
+
+		return true;
 	}
 
 	/**
@@ -180,7 +170,7 @@ class Table extends AbstractTable
 		// Different default?
 		if (isset($column_info['default']) && $column_info['default'] !== $old_info['default'])
 		{
-			$action = $column_info['default'] !== null ? 'SET DEFAULT \'' . $this->_db->escape_string($column_info['default']) . '\'' : 'DROP DEFAULT';
+			$action = $column_info['default'] !== null ? "SET DEFAULT '" . $this->_db->escape_string($column_info['default']) . "'" : 'DROP DEFAULT';
 			$this->_alter_table($table_name, '
 				ALTER COLUMN ' . $column_info['name'] . ' ' . $action);
 		}
@@ -196,13 +186,14 @@ class Table extends AbstractTable
 				$setTo = $column_info['default'] ?? (strpos($old_info['type'], 'int') !== false ? 0 : '');
 				$this->_db->query('', '
 					UPDATE ' . $table_name . '
-					SET ' . $column_info['name'] . ' = \'' . $setTo . '\'
+					SET ' . $column_info['name'] . " = '" . $setTo . '\'
 					WHERE ' . $column_info['name'] . ' IS NULL',
 					array(
 						'security_override' => true,
 					)
 				);
 			}
+
 			$this->_alter_table($table_name, '
 				ALTER COLUMN ' . $column_info['name'] . ' ' . $action . ' NOT NULL');
 			$this->_db->transaction('commit');
@@ -212,10 +203,10 @@ class Table extends AbstractTable
 		if (isset($column_info['type']) && ($column_info['type'] !== $old_info['type'] || (isset($column_info['size']) && $column_info['size'] !== $old_info['size'])))
 		{
 			$column_info['size'] = isset($column_info['size']) && is_numeric($column_info['size']) ? $column_info['size'] : null;
-			list ($type, $size) = $this->calculate_type($column_info['type'], $column_info['size']);
+			[$type, $size] = $this->calculate_type($column_info['type'], $column_info['size']);
 			if ($size !== null)
 			{
-				$type = $type . '(' . $size . ')';
+				$type .= '(' . $size . ')';
 			}
 
 			// The alter is a pain.
@@ -244,7 +235,7 @@ class Table extends AbstractTable
 			{
 				// Alter the table first - then drop the sequence.
 				$this->_alter_table($table_name, '
-					ALTER COLUMN ' . $column_info['name'] . ' SET DEFAULT \'0\'');
+					ALTER COLUMN ' . $column_info['name'] . " SET DEFAULT '0'");
 				$this->_db->query('', '
 					DROP SEQUENCE ' . $table_name . '_seq',
 					array(
@@ -262,9 +253,10 @@ class Table extends AbstractTable
 					)
 				);
 				$this->_alter_table($table_name, '
-					ALTER COLUMN ' . $column_info['name'] . ' SET DEFAULT nextval(\'' . $table_name . '_seq\')');
+					ALTER COLUMN ' . $column_info['name'] . " SET DEFAULT nextval('" . $table_name . "_seq')");
 			}
 		}
+
 		return true;
 	}
 
@@ -305,6 +297,7 @@ class Table extends AbstractTable
 			{
 				$type_size = 255;
 			}
+
 			$type_name = $types[$type_name];
 		}
 
@@ -314,7 +307,7 @@ class Table extends AbstractTable
 			$type_size = null;
 		}
 
-		return array($type_name, $type_size);
+		return [$type_name, $type_size];
 	}
 
 	/**
@@ -377,7 +370,7 @@ class Table extends AbstractTable
 		if (empty($index_info['name']))
 		{
 			// No need for primary.
-			if (isset($index_info['type']) && $index_info['type'] == 'primary')
+			if (isset($index_info['type']) && $index_info['type'] === 'primary')
 			{
 				$index_info['name'] = '';
 			}
@@ -407,10 +400,7 @@ class Table extends AbstractTable
 				{
 					return false;
 				}
-				else
-				{
-					$this->remove_index($table_name, $index_info['name']);
-				}
+				$this->remove_index($table_name, $index_info['name']);
 			}
 		}
 
@@ -423,12 +413,13 @@ class Table extends AbstractTable
 		else
 		{
 			$this->_db->query('', '
-				CREATE ' . (isset($index_info['type']) && $index_info['type'] == 'unique' ? 'UNIQUE' : '') . ' INDEX ' . $index_info['name'] . ' ON ' . $table_name . ' (' . $columns . ')',
+				CREATE ' . (isset($index_info['type']) && $index_info['type'] === 'unique' ? 'UNIQUE' : '') . ' INDEX ' . $index_info['name'] . ' ON ' . $table_name . ' (' . $columns . ')',
 				array(
 					'security_override' => true,
 				)
 			);
 		}
+
 		return true;
 	}
 
@@ -457,7 +448,7 @@ class Table extends AbstractTable
 		while (($row = $result->fetch_assoc()))
 		{
 			// Try get the columns that make it up.
-			if (preg_match('~\(([^\)]+?)\)~i', $row['inddef'], $matches) == 0)
+			if (preg_match('~\(([^)]+?)\)~i', $row['inddef'], $matches) !== 1)
 			{
 				continue;
 			}
@@ -475,7 +466,7 @@ class Table extends AbstractTable
 			}
 
 			// Fix up the name to be consistent cross databases
-			if (substr($row['name'], -5) === '_pkey' && $row['is_primary'] == 1)
+			if (substr($row['name'], -5) === '_pkey' && (int) $row['is_primary'] === 1)
 			{
 				$row['name'] = 'PRIMARY';
 			}
@@ -497,6 +488,7 @@ class Table extends AbstractTable
 				);
 			}
 		}
+
 		$result->free_result();
 
 		return $indexes;
@@ -604,7 +596,7 @@ class Table extends AbstractTable
 				}
 
 				// Make the type generic.
-				list ($type, $size) = $this->calculate_type($row['data_type'], $row['character_maximum_length'], true);
+				[$type, $size] = $this->calculate_type($row['data_type'], $row['character_maximum_length'], true);
 
 				$columns[$row['column_name']] = array(
 					'name' => $row['column_name'],
@@ -616,6 +608,7 @@ class Table extends AbstractTable
 				);
 			}
 		}
+
 		$result->free_result();
 
 		return $columns;
@@ -646,10 +639,8 @@ class Table extends AbstractTable
 		{
 			return $row['Data_free'] / 1024;
 		}
-		else
-		{
-			return 0;
-		}
+
+		return 0;
 	}
 
 	/**
@@ -708,7 +699,8 @@ class Table extends AbstractTable
 				{
 					$index['name'] = implode('_', $index['columns']);
 				}
-				$this->_indexes[] = 'CREATE ' . (isset($index['type']) && $index['type'] == 'unique' ? 'UNIQUE' : '') . ' INDEX ' . $table_name . '_' . $index['name'] . ' ON ' . $table_name . ' (' . $columns . ')';
+
+				$this->_indexes[] = 'CREATE ' . (isset($index['type']) && $index['type'] === 'unique' ? 'UNIQUE' : '') . ' INDEX ' . $table_name . '_' . $index['name'] . ' ON ' . $table_name . ' (' . $columns . ')';
 			}
 		}
 
@@ -739,7 +731,7 @@ class Table extends AbstractTable
 	 * @param string $table_name
 	 *
 	 * @return string
-	 * @throws \ElkArte\Exceptions\Exception
+	 * @throws Exception
 	 */
 	protected function _db_create_query_column($column, $table_name)
 	{
@@ -752,11 +744,11 @@ class Table extends AbstractTable
 					'security_override' => true,
 				)
 			);
-			$default = 'default nextval(\'' . $table_name . '_seq\')';
+			$default = "default nextval('" . $table_name . "_seq')";
 		}
 		elseif (isset($column['default']) && $column['default'] !== null)
 		{
-			$default = 'default \'' . $this->_db->escape_string($column['default']) . '\'';
+			$default = "default '" . $this->_db->escape_string($column['default']) . "'";
 		}
 		else
 		{
@@ -765,13 +757,13 @@ class Table extends AbstractTable
 
 		// Sort out the size...
 		$column['size'] = isset($column['size']) && is_numeric($column['size']) ? $column['size'] : null;
-		list ($type, $size) = $this->calculate_type($column['type'], $column['size']);
+		[$type, $size] = $this->calculate_type($column['type'], $column['size']);
 		if ($size !== null)
 		{
-			$type = $type . '(' . $size . ')';
+			$type .= '(' . $size . ')';
 		}
 
 		// Now just put it together!
-		return '"' . $column['name'] . '" ' . $type . ' ' . (!empty($column['null']) ? '' : 'NOT NULL') . ' ' . $default;
+		return '"' . $column['name'] . '" ' . $type . ' ' . (empty($column['null']) ? 'NOT NULL' : '') . ' ' . $default;
 	}
 }

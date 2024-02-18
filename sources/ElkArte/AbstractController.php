@@ -21,36 +21,20 @@ namespace ElkArte;
  */
 abstract class AbstractController
 {
-	/**
-	 * The event manager.
-	 *
-	 * @var object
-	 */
+	/** @var object The event manager. */
 	protected $_events;
 
-	/**
-	 * The current hook.
-	 *
-	 * @var string
-	 */
+	/** @var string The current hook. */
 	protected $_hook = '';
 
-	/**
-	 * Holds instance of \ElkArte\HttpReq object
-	 *
-	 * @var \ElkArte\HttpReq
-	 */
+	/** @var HttpReq Holds instance of \ElkArte\HttpReq object */
 	protected $_req;
 
-	/**
-	 * Holds instance of \ElkArte\User::$info object
-	 *
-	 * @var \ElkArte\ValuesContainer
-	 */
+	/** @var ValuesContainer Holds instance of \ElkArte\User::$info object */
 	protected $user;
 
 	/**
-	 * @param \ElkArte\EventManager $eventManager
+	 * @param EventManager $eventManager
 	 */
 	public function __construct($eventManager)
 	{
@@ -61,8 +45,7 @@ abstract class AbstractController
 	}
 
 	/**
-	 * Standard method to add an "home" button when using a custom action
-	 * as forum index.
+	 * Standard method to add an "home" button when using a custom action as forum index.
 	 *
 	 * @param array $buttons
 	 */
@@ -84,8 +67,7 @@ abstract class AbstractController
 	}
 
 	/**
-	 * Standard method to tweak the current action when using a custom
-	 * action as forum index.
+	 * Standard method to tweak the current action when using a custom action as forum index.
 	 *
 	 * @param string $current_action
 	 */
@@ -95,6 +77,7 @@ abstract class AbstractController
 		{
 			$current_action = 'base';
 		}
+
 		if (!empty($_REQUEST['action']) && $_REQUEST['action'] === 'forum')
 		{
 			$current_action = 'home';
@@ -108,7 +91,7 @@ abstract class AbstractController
 	 */
 	public static function canFrontPage()
 	{
-		return in_array('ElkArte\\FrontpageInterface', class_implements(get_called_class()));
+		return in_array('ElkArte\\FrontpageInterface', class_implements(get_called_class()), true);
 	}
 
 	/**
@@ -116,7 +99,7 @@ abstract class AbstractController
 	 */
 	public static function frontPageOptions()
 	{
-		return array();
+		return [];
 	}
 
 	/**
@@ -130,7 +113,7 @@ abstract class AbstractController
 	/**
 	 * Sets the $this->user property to the current user
 	 *
-	 * @param \ElkArte\ValuesContainer $user
+	 * @param ValuesContainer $user
 	 */
 	public function setUser($user)
 	{
@@ -295,8 +278,7 @@ abstract class AbstractController
 	 * If the property does not exist in the class, will also look in globals.
 	 *
 	 * @param string $dep - The name of the property the even wants
-	 * @param mixed[] $dependencies - the array that will be filled with the
-	 *                                references to the dependencies
+	 * @param array $dependencies - the array that will be filled with the references to the dependencies
 	 */
 	public function provideDependencies($dep, &$dependencies)
 	{
@@ -312,6 +294,14 @@ abstract class AbstractController
 		{
 			$dependencies[$dep] = &$GLOBALS[$dep];
 		}
+	}
+
+	/**
+	 * @return ValuesContainer
+	 */
+	public function getUser(): ValuesContainer
+	{
+		return $this->user;
 	}
 
 	/**

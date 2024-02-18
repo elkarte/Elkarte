@@ -18,43 +18,26 @@ namespace ElkArte\Database\Postgresql;
 
 use ElkArte\Database\AbstractQuery;
 use ElkArte\Errors\Errors;
+use ElkArte\Exceptions\Exception;
 
 /**
  * PostgreSQL database class, implements database class to control mysql functions
  */
 class Query extends AbstractQuery
 {
-	/**
-	 * {@inheritDoc}
-	 */
-	const ESCAPE_CHAR = '\'\'';
+	/** {@inheritDoc} */
+	public const ESCAPE_CHAR = "''";
 
-	/**
-	 * Since PostgreSQL doesn't support INSERT REPLACE we are using this to remember
-	 * the rows affected by the delete
-	 *
-	 * @var int
-	 */
-	private $_in_transaction = false;
-
-	/**
-	 * {@inheritDoc}
-	 */
+	/** {@inheritDoc} */
 	protected $ilike = ' ILIKE ';
 
-	/**
-	 * {@inheritDoc}
-	 */
+	/** {@inheritDoc} */
 	protected $not_ilike = ' NOT ILIKE ';
 
-	/**
-	 * {@inheritDoc}
-	 */
+	/** {@inheritDoc} */
 	protected $rlike = ' ~* ';
 
-	/**
-	 * {@inheritDoc}
-	 */
+	/** {@inheritDoc} */
 	protected $not_rlike = ' !~* ';
 
 	/**
@@ -99,7 +82,7 @@ class Query extends AbstractQuery
 			$this->on_conflict = ' ON CONFLICT (' . implode(', ', $keys) . ') DO NOTHING';
 		}
 
-		list($table, $indexed_columns, $insertRows) = $this->prepareInsert($table, $columns, $data);
+		[$table, $indexed_columns, $insertRows] = $this->prepareInsert($table, $columns, $data);
 
 		// Do the insert.
 		$this->result = $this->query('', '
@@ -116,7 +99,7 @@ class Query extends AbstractQuery
 			$this->on_conflict = '';
 		}
 
-		if(is_resource($this->_db_last_result) || $this->_db_last_result instanceof \PgSQL\Result)
+		if (is_resource($this->_db_last_result) || $this->_db_last_result instanceof \PgSQL\Result)
 		{
 			$inserted_results = pg_affected_rows($this->_db_last_result);
 		}
@@ -124,6 +107,7 @@ class Query extends AbstractQuery
 		{
 			$inserted_results = 0;
 		}
+
 		$last_inserted_id = $this->insert_id($table);
 
 		$this->result->updateDetails([
@@ -141,10 +125,11 @@ class Query extends AbstractQuery
 	public function replace($table, $columns, $data, $keys, $disable_trans = false)
 	{
 		$sets = [];
-		foreach ($columns as $columnName => $type)
+		foreach (array_keys($columns) as $columnName)
 		{
 			$sets[] = $columnName . ' = EXCLUDED.' . $columnName;
 		}
+
 		$this->on_conflict = '
 			ON CONFLICT (' . implode(', ', $keys) . ') DO
 			UPDATE SET ' . implode(',
@@ -167,8 +152,6 @@ class Query extends AbstractQuery
 	{
 		if ($type === 'begin')
 		{
-			$this->_in_transaction = true;
-
 			return @pg_query($this->connection, 'BEGIN');
 		}
 
@@ -179,8 +162,6 @@ class Query extends AbstractQuery
 
 		if ($type === 'commit')
 		{
-			$this->_in_transaction = false;
-
 			return @pg_query($this->connection, 'COMMIT');
 		}
 
@@ -226,18 +207,18 @@ class Query extends AbstractQuery
 		global $txt, $modSettings;
 
 		// We'll try recovering the file and line number the original db query was called from.
-		list ($file, $line) = $this->backtrace_message();
+		[$file, $line] = $this->backtrace_message();
 
 		// Just in case nothing can be found from debug_backtrace
-		$file = $file ?? __FILE__;
-		$line = $line ?? __LINE__;
+		$file ??= __FILE__;
+		$line ??= __LINE__;
 
 		// Decide which connection to use
 		// This is the error message...
 		$query_error = @pg_last_error($this->connection);
 
 		// Log the error.
-		Errors::instance()->log_error($txt['database_error'] . ': ' . $query_error . (!empty($modSettings['enableErrorQueryLogging']) ? "\n\n" . $db_string : ''), 'database', $file, $line);
+		Errors::instance()->log_error($txt['database_error'] . ': ' . $query_error . (empty($modSettings['enableErrorQueryLogging']) ? '' : "\n\n" . $db_string), 'database', $file, $line);
 
 		$this->throwError($db_string, $query_error, $file, $line);
 	}
@@ -248,7 +229,7 @@ class Query extends AbstractQuery
 	 * @param string $table
 	 *
 	 * @return bool|int
-	 * @throws \ElkArte\Exceptions\Exception
+	 * @throws Exception
 	 */
 	public function insert_id($table)
 	{
@@ -258,7 +239,7 @@ class Query extends AbstractQuery
 
 		// Try get the last ID for the auto increment field.
 		$request = $this->query('', '
-			SELECT CURRVAL(\'' . $table . '_seq\') AS insertID',
+			SELECT CURRVAL(\'' . $table . "_seq') AS insertID",
 			array('security_override' => true)
 		);
 
@@ -267,7 +248,7 @@ class Query extends AbstractQuery
 			return false;
 		}
 
-		list ($lastID) = $request->fetch_row();
+		[$lastID] = $request->fetch_row();
 		$request->free_result();
 
 		return $lastID;
@@ -282,7 +263,7 @@ class Query extends AbstractQuery
 	 */
 	public function unescape_string($string)
 	{
-		return strtr($string, array('\'\'' => '\''));
+		return strtr($string, array("''" => "'"));
 	}
 
 	/**

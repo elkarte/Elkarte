@@ -27,27 +27,24 @@ class Connection implements ConnectionInterface
 	 */
 	public static function initiate($db_server, $db_name, $db_user, $db_passwd, $db_prefix, $db_options = array())
 	{
-		$db_port = !empty($db_options['port']) ? ' port=' . (int) $db_options['port'] : '';
+		$db_port = empty($db_options['port']) ? '' : ' port=' . (int) $db_options['port'];
 
 		if (!empty($db_options['persist']))
 		{
-			$connection = @pg_pconnect('host=' . $db_server . $db_port . ' dbname=' . $db_name . ' user=\'' . $db_user . '\' password=\'' . $db_passwd . '\'');
+			$connection = @pg_pconnect('host=' . $db_server . $db_port . ' dbname=' . $db_name . " user='" . $db_user . "' password='" . $db_passwd . "'");
 		}
 		else
 		{
-			$connection = @pg_connect('host=' . $db_server . $db_port . ' dbname=' . $db_name . ' user=\'' . $db_user . '\' password=\'' . $db_passwd . '\'');
+			$connection = @pg_connect('host=' . $db_server . $db_port . ' dbname=' . $db_name . " user='" . $db_user . "' password='" . $db_passwd . "'");
 		}
 
 		// Something's wrong, show an error if its fatal (which we assume it is)
-		if (!$connection)
+		// If the connection fails more than once (e.g. wrong password) the exception
+		// should be thrown only once.
+		if (!$connection && !self::$failed_once)
 		{
-			// If the connection fails more than once (e.g. wrong password) the exception
-			// should be thrown only once.
-			if (self::$failed_once == false)
-			{
-				self::$failed_once = true;
-				throw new \Exception('\\ElkArte\\Database\\Postgresql\\Connection::initiate');
-			}
+			self::$failed_once = true;
+			throw new \RuntimeException('\\ElkArte\\Database\\Postgresql\\Connection::initiate');
 		}
 
 		return new Query($db_prefix, $connection);
