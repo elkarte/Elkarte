@@ -78,7 +78,7 @@ class MaillistPost extends AbstractController
 		}
 
 		// Prepare
-		require_once(SUBSDIR . '/Maillist.subs.php');
+		require_once(SUBSDIR . '/MaillistPost.subs.php');
 		Txt::load('Maillist');
 		detectServer()->setMemoryLimit('128M');
 

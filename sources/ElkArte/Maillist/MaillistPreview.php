@@ -49,7 +49,7 @@ class MaillistPreview extends AbstractController
 	public function action_pbe_preview($data = '')
 	{
 		// Our mail parser and our main subs
-		require_once(SUBSDIR . '/Maillist.subs.php');
+		require_once(SUBSDIR . '/MaillistPost.subs.php');
 
 		// Init
 		Txt::load('Maillist');
