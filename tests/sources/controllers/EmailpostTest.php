@@ -7,9 +7,11 @@
  * them local if you need to keep your data untouched!
  */
 
-use ElkArte\Controller\Emailpost;
 use ElkArte\EventManager;
 use ElkArte\Languages\Loader;
+use ElkArte\Maillist\MaillistPreview;
+use ElkArte\Maillist\MaillistPost;
+use ElkArte\Maillist\MaillistTopic;
 use tests\ElkArteCommonSetupTest;
 
 class EmailPostTest extends ElkArteCommonSetupTest
@@ -124,7 +126,7 @@ Regards, The ElkArte Community
 	public function testActionPbePreview()
 	{
 		// Get the controller, call preview
-		$controller = new Emailpost(new EventManager());
+		$controller = new MaillistPreview(new EventManager());
 		$result = $controller->action_pbe_preview($this->data);
 
 		// Check that the preview was set
@@ -138,7 +140,7 @@ Regards, The ElkArte Community
 	public function testActionPbePost()
 	{
 		// Get the controller, call preview
-		$controller = new Emailpost(new EventManager());
+		$controller = new MaillistPost(new EventManager());
 		$controller->action_pbe_post($this->data, false);
 
 		// We will fail since the key does not exist
@@ -146,12 +148,12 @@ Regards, The ElkArte Community
 	}
 
 	/**
-	 * Test trying to start a pbe topic, its not setup so this will fail as well ;)
+	 * Test trying to start a pbe topic, it's not setup so this will fail as well ;)
 	 */
 	public function testActionPbeTopic()
 	{
 		// Get the controller, call preview
-		$controller = new Emailpost(new EventManager());
+		$controller = new MaillistTopic(new EventManager());
 		$controller->action_pbe_topic($this->data);
 
 		// We will fail since the key does not exist

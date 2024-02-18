@@ -44,9 +44,8 @@ class MarkdownParser
 		$data = $this->italicTags($data);
 		$data = $this->strikeTags($data);
 		$data = $this->ruleTags($data);
-		$data = $this->quoteTags($data);
 
-		return $data;
+		return $this->quoteTags($data);
 	}
 
 	/**
@@ -64,7 +63,7 @@ class MarkdownParser
 			$data = str_replace('<br />', "\n", $data);
 
 			$data = preg_replace('~(?:\n)(&gt;|>)(.*)~u', '&#8203;[quote]$2[/quote]', $data);
-			$data = preg_replace('~' . preg_quote('[/quote]&#8203;[quote]') . '~', "\n", $data);
+			$data = preg_replace('~' . preg_quote('[/quote]&#8203;[quote]', '~') . '~', "\n", $data);
 
 			return str_replace(["\n", '&#8203;'], ['<br />', ''], $data);
 		}
@@ -88,7 +87,7 @@ class MarkdownParser
 
 		if (strpos($data, '__') !== false)
 		{
-			$data = $this->doubleTagConvert('_', 'b', $data);
+			return $this->doubleTagConvert('_', 'b', $data);
 		}
 
 		return $data;
@@ -110,7 +109,7 @@ class MarkdownParser
 
 		if (strpos($data, '_') !== false)
 		{
-			$data = $this->tagConvert('_', 'i', $data);
+			return $this->tagConvert('_', 'i', $data);
 		}
 
 		return $data;
@@ -127,7 +126,7 @@ class MarkdownParser
 	{
 		if (strpos($data, '~~') !== false)
 		{
-			$data = $this->doubleTagConvert('~', 's', $data);
+			return $this->doubleTagConvert('~', 's', $data);
 		}
 
 		return $data;
@@ -208,21 +207,20 @@ class MarkdownParser
 		// code block
 		if (strpos($data, '```') !== false)
 		{
-			$data = preg_replace_callback('~(?<=\s|^|<br />)```\s*(?:\n|<br />)([\s\S]+?(?=(<br />|\n)```))(?:<br />|\n)```~u', static function ($match) {
-				return '[code]' . strtr($match[1], ['[' => '&#91;', ']' => '&#93;']) . '[/code]';
-			}, $data);
+			$data = preg_replace_callback('~(?<=\s|^|<br />)```\s*(?:\n|<br />)([\s\S]+?(?=(<br />|\n)```))(?:<br />|\n)```~u',
+				static fn($match) => '[code]' . strtr($match[1], ['[' => '&#91;', ']' => '&#93;']) . '[/code]', $data);
 		}
 
 		// icode line
 		if (strpos($data, '`') !== false)
 		{
-			$data = preg_replace_callback('~(?<=\W|^)`([^`]+)`(?=\W|$)~u', static function ($match) {
+			return preg_replace_callback('~(?<=\W|^)`([^`]+)`(?=\W|$)~u', static function ($match) {
 				if (strpos($match[1], '<br />'))
 				{
 					return $match[0];
 				}
 
-				return '[icode]'. strtr($match[1], ['[' => '&#91;', ']' => '&#93;']) . '[/icode]';
+				return '[icode]' . strtr($match[1], ['[' => '&#91;', ']' => '&#93;']) . '[/icode]';
 			}, $data);
 		}
 

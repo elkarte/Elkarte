@@ -139,6 +139,14 @@ $txt['maintain_version'] = 'Check all files against current versions';
 $txt['maintain_version_info'] = 'This maintenance task allows you to do a detailed version check of all forum files against the official list of latest versions.';
 $txt['maintain_run_now'] = 'Run task now';
 $txt['maintain_return'] = 'Back to Forum Maintenance';
+$txt['maintain_cache_status'] = 'Cache Status';
+$txt['maintain_cache_curr_items'] = 'The number of items currently stored in the cache.';
+$txt['maintain_cache_get_hits'] = 'The number of successful cache item retrievals.';
+$txt['maintain_cache_get_misses'] = 'The number of cache item retrievals that did not find a matching item.';
+$txt['maintain_cache_curr_connections'] = 'The number of currently open connections to the caching daemon.';
+$txt['maintain_cache_version'] = 'The version number of the caching server.';
+$txt['maintain_cache_hit_rate'] = 'Hit Rate in requests/second';
+$txt['maintain_cache_miss_rate'] = 'Miss Rate in requests/second';
 
 $txt['maintain_backup'] = 'Backup Database';
 $txt['maintain_backup_info'] = 'Download a backup copy of your forums database in case of emergency.';

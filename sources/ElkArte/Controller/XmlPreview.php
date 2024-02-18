@@ -34,7 +34,7 @@ class XmlPreview extends AbstractController
 	/**
 	 * Calls the correct function for the action.
 	 *
-	 * @see \ElkArte\AbstractController::action_index()
+	 * @see AbstractController::action_index
 	 */
 	public function action_index()
 	{
@@ -79,7 +79,7 @@ class XmlPreview extends AbstractController
 		require_once(SUBSDIR . '/Post.subs.php');
 
 		$errors = array();
-		$news = !isset($this->_req->post->news) ? '' : Util::htmlspecialchars($this->_req->post->news, ENT_QUOTES);
+		$news = isset($this->_req->post->news) ? Util::htmlspecialchars($this->_req->post->news, ENT_QUOTES) : '';
 		if (empty($news))
 		{
 			$errors[] = array('value' => 'no_news');
@@ -122,8 +122,8 @@ class XmlPreview extends AbstractController
 		Txt::load('Errors');
 
 		$context['post_error']['errors'] = array();
-		$context['send_pm'] = !empty($this->_req->post->send_pm) ? 1 : 0;
-		$context['send_html'] = !empty($this->_req->post->send_html) ? 1 : 0;
+		$context['send_pm'] = empty($this->_req->post->send_pm) ? 0 : 1;
+		$context['send_html'] = empty($this->_req->post->send_html) ? 0 : 1;
 
 		// Let them know about any mistakes
 		if (empty($this->_req->post->subject))
@@ -171,7 +171,7 @@ class XmlPreview extends AbstractController
 			$member['signature'] = $bbc_parser->parseSignature($member['signature'], true);
 
 			// And now what they want it to be
-			$preview_signature = !empty($this->_req->post->signature) ? Util::htmlspecialchars($this->_req->post->signature) : '';
+			$preview_signature = empty($this->_req->post->signature) ? '' : Util::htmlspecialchars($this->_req->post->signature);
 			$validation = profileValidateSignature($preview_signature);
 
 			// An odd check for errors to be sure
@@ -254,8 +254,8 @@ class XmlPreview extends AbstractController
 		// If you can't issue the warning, what are you doing here?
 		if (allowedTo('issue_warning'))
 		{
-			$warning_body = !empty($this->_req->post->body) ? trim(censor($this->_req->post->body)) : '';
-			$context['preview_subject'] = !empty($this->_req->post->title) ? trim(Util::htmlspecialchars($this->_req->post->title)) : '';
+			$warning_body = empty($this->_req->post->body) ? '' : trim(censor($this->_req->post->body));
+			$context['preview_subject'] = empty($this->_req->post->title) ? '' : trim(Util::htmlspecialchars($this->_req->post->title));
 			if (isset($this->_req->post->issuing))
 			{
 				if (empty($this->_req->post->title) || empty($this->_req->post->body))
@@ -269,6 +269,7 @@ class XmlPreview extends AbstractController
 				{
 					$context['post_error']['errors'][] = $txt['mc_warning_template_error_no_title'];
 				}
+
 				if (empty($this->_req->post->body))
 				{
 					$context['post_error']['errors'][] = $txt['mc_warning_template_error_no_body'];
@@ -305,6 +306,7 @@ class XmlPreview extends AbstractController
 				$bbc_parser = ParserWrapper::instance();
 				$warning_body = $bbc_parser->parseNotice($warning_body);
 			}
+
 			$context['preview_message'] = $warning_body;
 		}
 		else
@@ -330,8 +332,8 @@ class XmlPreview extends AbstractController
 		// If you can't approve emails, what are you doing here?
 		if (allowedTo('approve_emails'))
 		{
-			$body = !empty($this->_req->post->body) ? trim(censor($this->_req->post->body)) : '';
-			$context['preview_subject'] = !empty($this->_req->post->title) ? trim(Util::htmlspecialchars($this->_req->post->title)) : '';
+			$body = empty($this->_req->post->body) ? '' : trim(censor($this->_req->post->body));
+			$context['preview_subject'] = empty($this->_req->post->title) ? '' : trim(Util::htmlspecialchars($this->_req->post->title));
 
 			if (isset($this->_req->post->issuing))
 			{
@@ -372,10 +374,10 @@ class XmlPreview extends AbstractController
 				);
 				$replace = array(
 					$mbname,
-					(!empty($modSettings['maillist_sitename']) ? $modSettings['maillist_sitename'] : $mbname),
+					(empty($modSettings['maillist_sitename']) ? $mbname : $modSettings['maillist_sitename']),
 					$scripturl,
 					replaceBasicActionUrl($txt['regards_team']),
-					(!empty($modSettings['maillist_sitename_regards']) ? $modSettings['maillist_sitename_regards'] : '')
+					(empty($modSettings['maillist_sitename_regards']) ? '' : $modSettings['maillist_sitename_regards'])
 				);
 				$body = str_replace($find, $replace, $body);
 			}

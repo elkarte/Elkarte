@@ -14,21 +14,56 @@
 namespace ElkArte\Cache\CacheMethod;
 
 /**
- * Alternative PHP Cache or APC / APCu
+ * Alternative PHP Cache APCu
  */
 class Apc extends AbstractCacheMethod
 {
 	/** {@inheritdoc} */
 	protected $title = 'Alternative PHP Cache';
 
-	/** @var bool Whether to use the APCu functions or the original APC ones. */
-	protected $apcu = false;
-
 	/** {@inheritdoc} */
 	public function __construct($options)
 	{
 		parent::__construct($options);
-		$this->apcu = function_exists('apcu_store');
+	}
+
+	/**
+	 * Retrieves statistics about APCu cache.
+	 *
+	 * @return array An associative array containing the following cache statistics:
+	 *     - 'curr_items' : The number of items currently in the cache (default value is 0 if cache is not available).
+	 *     - 'get_hits' : The number of successful cache item fetches.
+	 *     - 'get_misses' : The number of cache item fetches that did not find a matching item.
+	 *     - 'curr_connections' : The current number of connections to APCu cache (always 1).
+	 *     - 'version' : The version of APCu extension installed.
+	 *     - 'hit_rate_user' : The user-defined hit rate, expressed as a percentage (rounded to two decimal places).
+	 *     - 'miss_rate_user' : The user-defined miss rate, expressed as a percentage (rounded to two decimal places).
+	 *
+	 *  If the statistics cannot be obtained, an empty array is returned.
+     */
+	public function getStats()
+	{
+		$results = [];
+
+		$cache = function_exists('apcu_cache_info') ? apcu_cache_info() : false;
+		if ($cache === false)
+		{
+			return $results;
+		}
+
+		// Just a few basics
+		$results['curr_items'] = comma_format($cache['num_entries'] ?? 0, 0);
+		$results['get_hits'] = comma_format($cache['num_hits'] ?? 0, 0);
+		$results['get_misses'] = comma_format($cache['num_misses'] ?? 0, 0);
+		$results['curr_connections'] = 1;
+		$results['version'] = phpversion('apcu');
+
+		// Seems start_time is really up_time, at least going by its value ?
+		$elapsed = max($cache['start_time'], 1);
+		$results['hit_rate'] = sprintf("%.2f", $cache['num_hits'] / $elapsed);
+		$results['miss_rate'] = sprintf("%.2f", $cache['num_misses'] / $elapsed);
+
+		return $results;
 	}
 
 	/**
@@ -48,13 +83,12 @@ class Apc extends AbstractCacheMethod
 	{
 		$prefixedKey = $this->getprefixedKey($key);
 		$success = false;
-		$result = $this->apcu ? apcu_fetch($prefixedKey, $success) : apc_fetch($prefixedKey, $success);
+		$result = apcu_fetch($prefixedKey, $success);
 		$this->is_miss = !$success;
 
 		/*
-		 * Let's be consistent, yes? All other cache methods
-		 * supported by ElkArte return null on failure to grab
-		 * the specified cache entry.
+		 * Let's be consistent, yes?
+		 * All other cache methods supported by ElkArte return null on failure to grab the specified cache entry.
 		 */
 		if ($this->is_miss)
 		{
@@ -71,28 +105,13 @@ class Apc extends AbstractCacheMethod
 	{
 		$prefixedKey = $this->getprefixedKey($key);
 
-		// An extended key is needed to counteract a bug in APC.
-		if ($this->apcu)
+		if ($value === null)
 		{
-			if ($value === null)
-			{
-				apcu_delete($prefixedKey);
-			}
-			else
-			{
-				apcu_store($prefixedKey, $value, $ttl);
-			}
+			apcu_delete($prefixedKey);
 		}
 		else
 		{
-			if ($value === null)
-			{
-				apc_delete($prefixedKey);
-			}
-			else
-			{
-				apc_store($prefixedKey, $value, $ttl);
-			}
+			apcu_store($prefixedKey, $value, $ttl);
 		}
 	}
 
@@ -101,20 +120,7 @@ class Apc extends AbstractCacheMethod
 	 */
 	public function clean($type = '')
 	{
-		if ($this->apcu)
-		{
-			apcu_clear_cache();
-		}
-		// If passed a type, clear that type out
-		elseif ($type === '' || $type === 'data')
-		{
-			apc_clear_cache('user');
-			apc_clear_cache('system');
-		}
-		elseif ($type === 'user')
-		{
-			apc_clear_cache('user');
-		}
+		apcu_clear_cache();
 	}
 
 	/**
@@ -122,7 +128,7 @@ class Apc extends AbstractCacheMethod
 	 */
 	public function isAvailable()
 	{
-		return function_exists('apc_store') || function_exists('apcu_store');
+		return function_exists('apcu_store');
 	}
 
 	/**
@@ -130,6 +136,6 @@ class Apc extends AbstractCacheMethod
 	 */
 	public function details()
 	{
-		return array('title' => $this->title, 'version' => phpversion($this->apcu ? 'apcu' : 'apc'));
+		return ['title' => $this->title, 'version' => phpversion('apcu')];
 	}
 }

@@ -191,7 +191,7 @@ function ml_alphaStart($start)
 	list ($start) = $request->fetch_row();
 	$request->free_result();
 
-	return $start;
+	return (int) $start;
 }
 
 /**

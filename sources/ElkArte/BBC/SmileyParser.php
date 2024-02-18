@@ -127,9 +127,7 @@ class SmileyParser
 
 		// Replace away!
 		return preg_replace_callback($this->search,
-			function (array $matches) {
-				return $this->parser_callback($matches);
-			}, $message);
+			fn(array $matches) => $this->parser_callback($matches), $message);
 	}
 
 	/**
@@ -204,31 +202,31 @@ class SmileyParser
 	 *   - Creates the search regex to find the enabled smiles in a message
 	 *   - Builds the replacement array for text smiley to image smiley
 	 *
-	 * @param array $smileysfrom
-	 * @param array $smileysto
-	 * @param array $smileysdescs
+	 * @param array $smileysFrom
+	 * @param array $smileysTo
+	 * @param array $smileysDescriptions
 	 */
-	protected function setSearchReplace($smileysfrom, $smileysto, $smileysdescs)
+	protected function setSearchReplace($smileysFrom, $smileysTo, $smileysDescriptions)
 	{
 		$searchParts = [];
 		$fileFunc = FileFunctions::instance();
 		$replace = [':' => '&#58;', '(' => '&#40;', ')' => '&#41;', '$' => '&#36;', '[' => '&#091;'];
 
-		foreach ($smileysfrom as $i => $smileysfrom_i)
+		foreach ($smileysFrom as $i => $smileysFrom_i)
 		{
-			$specialChars = htmlspecialchars($smileysfrom_i, ENT_QUOTES);
+			$specialChars = htmlspecialchars($smileysFrom_i, ENT_QUOTES);
 
 			// If an :emoji: tag, from smiles ACP, does not have an img file, leave it for emoji parsing
-			$possibleEmoji = isset($smileysfrom_i[3]) && $smileysfrom_i[0] === ':' && substr($smileysfrom_i, -1, 1) === ':';
-			$filename = $this->dir . $smileysto[$i] . '.' . $GLOBALS['context']['smiley_extension'];
+			$possibleEmoji = isset($smileysFrom_i[3]) && $smileysFrom_i[0] === ':' && substr($smileysFrom_i, -1, 1) === ':';
+			$filename = $this->dir . $smileysTo[$i] . '.' . $GLOBALS['context']['smiley_extension'];
 			if (!$possibleEmoji || $fileFunc->fileExists($filename))
 			{
 				// Either a smiley :) or emoji :smile: with a defined image
-				$smileyCode = '<img src="' . $this->path . $smileysto[$i] . '.' . $GLOBALS['context']['smiley_extension'] . '" alt="' . strtr($specialChars, $replace) . '" title="' . strtr(htmlspecialchars($smileysdescs[$i]), $replace) . '" class="smiley" />';
-				$this->replace[$smileysfrom_i] = $smileyCode;
+				$smileyCode = '<img src="' . $this->path . $smileysTo[$i] . '.' . $GLOBALS['context']['smiley_extension'] . '" alt="' . strtr($specialChars, $replace) . '" title="' . strtr(htmlspecialchars($smileysDescriptions[$i]), $replace) . '" class="smiley" />';
+				$this->replace[$smileysFrom_i] = $smileyCode;
 
-				$searchParts[] = preg_quote($smileysfrom_i, '~');
-				if ($smileysfrom_i !== $specialChars)
+				$searchParts[] = preg_quote($smileysFrom_i, '~');
+				if ($smileysFrom_i !== $specialChars)
 				{
 					$this->replace[$specialChars] = $smileyCode;
 					$searchParts[] = preg_quote($specialChars, '~');
@@ -246,10 +244,10 @@ class SmileyParser
 	 */
 	protected function load()
 	{
-		list ($smileysfrom, $smileysto, $smileysdescs) = $this->getFromDB();
+		[$smileysFrom, $smileysTo, $smileysDescriptions] = $this->getFromDB();
 
 		// Build the search/replace regex
-		$this->setSearchReplace($smileysfrom, $smileysto, $smileysdescs);
+		$this->setSearchReplace($smileysFrom, $smileysTo, $smileysDescriptions);
 	}
 
 	/**
@@ -262,9 +260,9 @@ class SmileyParser
 		// Load the smileys in reverse order by length, so they don't get parsed wrong.
 		if (!Cache::instance()->getVar($temp, 'parsing_smileys', 600))
 		{
-			$smileysfrom = [];
-			$smileysto = [];
-			$smileysdescs = [];
+			$smileysFrom = [];
+			$smileysTo = [];
+			$smileysDescriptions = [];
 
 			$db = database();
 
@@ -275,15 +273,15 @@ class SmileyParser
 				ORDER BY LENGTH(code) DESC',
 				[]
 			)->fetch_callback(
-				function ($row) use (&$smileysfrom, &$smileysto, &$smileysdescs) {
-					$smileysfrom[] = $row['code'];
-					$smileysto[] = htmlspecialchars($row['filename']);
-					$smileysdescs[] = $row['description'];
+				static function ($row) use (&$smileysFrom, &$smileysTo, &$smileysDescriptions) {
+					$smileysFrom[] = $row['code'];
+					$smileysTo[] = htmlspecialchars($row['filename']);
+					$smileysDescriptions[] = $row['description'];
 				}
 			);
 
 			// Cache this for a bit
-			$temp = [$smileysfrom, $smileysto, $smileysdescs];
+			$temp = [$smileysFrom, $smileysTo, $smileysDescriptions];
 			Cache::instance()->put('parsing_smileys', $temp, 600);
 		}
 

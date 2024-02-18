@@ -26,11 +26,7 @@ use ElkArte\Util;
  */
 class Memberlist extends AbstractController
 {
-	/**
-	 * The fields that we can search
-	 *
-	 * @var array
-	 */
+	/** @var array The fields that we can search */
 	public $_search_fields;
 
 	/**
@@ -70,7 +66,7 @@ class Memberlist extends AbstractController
 	 *
 	 * @uses Memberlist template, main sub-template.
 	 *
-	 * @see  \ElkArte\AbstractController::action_index()
+	 * @see AbstractController::action_index
 	 */
 	public function action_index()
 	{
@@ -88,8 +84,8 @@ class Memberlist extends AbstractController
 		// $subActions array format:
 		// 'subaction' => array('label', 'function', 'is_selected')
 		$subActions = array(
-			'all' => array($txt['view_all_members'], 'action_mlall', $context['listing_by'] == 'all'),
-			'search' => array($txt['mlist_search'], 'action_mlsearch', $context['listing_by'] == 'search'),
+			'all' => array($txt['view_all_members'], 'action_mlall', $context['listing_by'] === 'all'),
+			'search' => array($txt['mlist_search'], 'action_mlsearch', $context['listing_by'] === 'search'),
 		);
 
 		// Set up the sort links.
@@ -228,10 +224,12 @@ class Memberlist extends AbstractController
 		{
 			unset($context['columns']['email_address']);
 		}
+
 		if (isset($context['disabled_fields']['website']))
 		{
 			unset($context['columns']['website']);
 		}
+
 		if (isset($context['disabled_fields']['posts']))
 		{
 			unset($context['columns']['posts']);
@@ -266,9 +264,9 @@ class Memberlist extends AbstractController
 		require_once(SUBSDIR . '/Memberlist.subs.php');
 
 		// Some handy short cuts
-		$start = $this->_req->getQuery('start', '', null);
-		$desc = $this->_req->getQuery('desc', '', null);
-		$sort = $this->_req->getQuery('sort', '', null);
+		$start = $this->_req->getQuery('start', 'intval');
+		$desc = $this->_req->getQuery('desc', 'trim');
+		$sort = $this->_req->getQuery('sort', 'trim');
 
 		// Only use caching if:
 		// 1. there are at least 2k members,
@@ -349,7 +347,7 @@ class Memberlist extends AbstractController
 
 		// Are we sorting the results
 		$context['sort_by'] = $sort;
-		$context['sort_direction'] = !isset($desc) ? 'up' : 'down';
+		$context['sort_direction'] = isset($desc) ? 'down' : 'up';
 
 		// Construct the page index.
 		$context['page_index'] = constructPageIndex('{scripturl}?action=memberlist;sort=' . $sort . (isset($desc) ? ';desc' : ''), $start, $context['num_members'], $modSettings['defaultMaxMembers']);
@@ -393,6 +391,7 @@ class Memberlist extends AbstractController
 			{
 				$first_offset = 0;
 			}
+
 			$second_offset = ceil(($memberlist_cache['num_members'] - $start) / $cache_step_size) * $cache_step_size;
 
 			$where = 'mem.real_name BETWEEN {string:real_name_low} AND {string:real_name_high}';
@@ -446,9 +445,9 @@ class Memberlist extends AbstractController
 			|| isset($this->_req->post->search, $this->_req->post->fields))
 		{
 			// Some handy short cuts
-			$start = $this->_req->getQuery('start', '', null);
-			$desc = $this->_req->getQuery('desc', '', null);
-			$sort = $this->_req->getQuery('sort', '', null);
+			$start = $this->_req->getQuery('start', 'intval');
+			$desc = $this->_req->getQuery('desc', 'trim');
+			$sort = $this->_req->getQuery('sort', 'trim');
 			$search = Util::htmlspecialchars(trim($this->_req->query->search ?? $this->_req->post->search), ENT_QUOTES);
 			$input_fields = isset($this->_req->query->fields) ? explode(',', $this->_req->query->fields) : $this->_req->post->fields;
 
@@ -461,6 +460,7 @@ class Memberlist extends AbstractController
 					$context['search_defaults'] = $input_fields;
 				}
 			}
+
 			$context['old_search_value'] = $search;
 
 			// No fields?  Use default...
@@ -491,13 +491,13 @@ class Memberlist extends AbstractController
 			}
 
 			// set up some things for use in the template
-			$context['sort_direction'] = !isset($desc) ? 'up' : 'down';
+			$context['sort_direction'] = isset($desc) ? 'down' : 'up';
 			$context['sort_by'] = $sort;
 			$context['memberlist_buttons'] = array(
 				'view_all_members' => array('text' => 'view_all_members',
-											'lang' => true,
-											'url' => $scripturl . '?action=memberlist;sa=all',
-											'active' => true),
+					'lang' => true,
+					'url' => $scripturl . '?action=memberlist;sa=all',
+					'active' => true),
 			);
 
 			$query_parameters = array(
@@ -543,7 +543,7 @@ class Memberlist extends AbstractController
 
 			foreach ($fields as $key => $field)
 			{
-				if ($key === 2 && strpos($field, '(hide_email' ) === 0)
+				if ($key === 2 && strpos($field, '(hide_email') === 0)
 				{
 					$fields[$key] = '(hide_email = 0 AND {column_case_insensitive:email_address}';
 					continue;
@@ -560,7 +560,7 @@ class Memberlist extends AbstractController
 			foreach ($input_fields as $field)
 			{
 				$curField = substr($field, 5);
-				if (substr($field, 0, 5) === 'cust_' && isset($context['custom_search_fields'][$curField]))
+				if (isset($context['custom_search_fields'][$curField]) && strpos($field, 'cust_') === 0)
 				{
 					$customJoin[] = 'LEFT JOIN {db_prefix}custom_fields_data AS cfd' . $field . ' ON (cfd' . $field . '.variable = {string:cfd' . $field . '} AND cfd' . $field . '.id_member = mem.id_member)';
 					$query_parameters['cfd' . $field] = $curField;
@@ -568,9 +568,10 @@ class Memberlist extends AbstractController
 					$validFields[] = $field;
 				}
 			}
+
 			$field = $sort;
 			$curField = substr($field, 5);
-			if (substr($field, 0, 5) === 'cust_' && isset($context['custom_search_fields'][$curField]))
+			if (isset($context['custom_search_fields'][$curField]) && strpos($field, 'cust_') === 0)
 			{
 				$customJoin[] = 'LEFT JOIN {db_prefix}custom_fields_data AS cfd' . $field . ' ON (cfd' . $field . '.variable = {string:cfd' . $field . '} AND cfd' . $field . '.id_member = mem.id_member)';
 				$query_parameters['cfd' . $field] = $curField;

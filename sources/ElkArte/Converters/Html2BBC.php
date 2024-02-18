@@ -502,7 +502,7 @@ class Html2BBC extends AbstractDomParser
 
 		$bbc = $value;
 		$styles = $this->_getStyleValues($style);
-		foreach ($styles as $tag => $value)
+		foreach ($styles as $tag => $styleValue)
 		{
 			// Skip any inline styles as needed
 			if (in_array($tag, $this->_skip_style))
@@ -515,60 +515,60 @@ class Html2BBC extends AbstractDomParser
 			{
 				case 'font-family':
 					// Only get the first font if there's a list
-					if (strpos($value, ',') !== false)
+					if (strpos($styleValue, ',') !== false)
 					{
-						$value = substr($value, 0, strpos($value, ','));
+						$styleValue = substr($styleValue, 0, strpos($styleValue, ','));
 					}
-					$bbc = '[font=' . strtr($value, array("'" => '')) . ']' . $bbc . '[/font]';
+					$bbc = '[font=' . strtr($styleValue, array("'" => '')) . ']' . $bbc . '[/font]';
 					break;
 				case 'font-weight':
-					if ($value === 'bold' || $value === 'bolder' || $value == '700' || $value == '600')
+					if ($styleValue === 'bold' || $styleValue === 'bolder' || $styleValue === '700' || $styleValue === '600')
 					{
 						$bbc = '[b]' . $bbc . '[/b]';
 					}
 					break;
 				case 'font-style':
-					if ($value == 'italic')
+					if ($styleValue === 'italic')
 					{
 						$bbc = '[i]' . $bbc . '[/i]';
 					}
 					break;
 				case 'text-decoration':
-					if ($value == 'underline')
+					if ($styleValue === 'underline')
 					{
 						$bbc = '[u]' . $bbc . '[/u]';
 					}
-					elseif ($value == 'line-through')
+					elseif ($styleValue === 'line-through')
 					{
 						$bbc = '[s]' . $bbc . '[/s]';
 					}
 					break;
 				case 'font-size':
 					// Account for formatting issues, decimal in the wrong spot
-					if (preg_match('~(\d+)\.\d+(p[xt])~i', $value, $dec_matches) === 1)
+					if (preg_match('~(\d+)\.\d+(p[xt])~i', $styleValue, $dec_matches) === 1)
 					{
-						$value = $dec_matches[1] . $dec_matches[2];
+						$styleValue = $dec_matches[1] . $dec_matches[2];
 					}
-					$bbc = '[size=' . $value . ']' . $bbc . '[/size]';
+					$bbc = '[size=' . $styleValue . ']' . $bbc . '[/size]';
 					break;
 				case 'color':
-					$bbc = '[color=' . $value . ']' . $bbc . '[/color]';
+					$bbc = '[color=' . $styleValue . ']' . $bbc . '[/color]';
 					break;
 				// These tags all mean the same thing as far as BBC is concerned
 				case 'float':
 				case 'text-align':
 				case 'align':
-					if ($value === 'right')
+					if ($styleValue === 'right')
 					{
-						$bbc = '[right]' . $value . '[/right]';
+						$bbc = '[right]' . $bbc . '[/right]';
 					}
-					elseif ($value === 'left')
+					elseif ($styleValue === 'left')
 					{
-						$bbc = '[left]' . $value . '[/left]';
+						$bbc = '[left]' . $bbc . '[/left]';
 					}
-					elseif ($value === 'center')
+					elseif ($styleValue === 'center')
 					{
-						$bbc = '[center]' . $value . '[/center]';
+						$bbc = '[center]' . $bbc . '[/center]';
 					}
 					break;
 			}
@@ -622,7 +622,7 @@ class Html2BBC extends AbstractDomParser
 		$bbc = $this->getInnerHTML($node);
 
 		// Font / size can't span across certain tags with our bbc parser, so fix them now
-		$blocks = preg_split('~(\[hr\]|\[quote\])~', $bbc, 2, PREG_SPLIT_DELIM_CAPTURE);
+		$blocks = preg_split('~(\[hr]|\[quote])~', $bbc, 2, PREG_SPLIT_DELIM_CAPTURE);
 
 		if (!empty($size))
 		{
@@ -687,7 +687,7 @@ class Html2BBC extends AbstractDomParser
 		$size = '';
 
 		// First if this is an inline image, we don't support those, but will use any ALT found
-		if (substr($src, 0, 4) === 'cid:')
+		if (strpos($src, 'cid:') === 0)
 		{
 			return $alt;
 		}

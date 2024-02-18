@@ -153,7 +153,14 @@ abstract class AbstractDomParser
 		// The body of the HTML is where it's at.
 		if ($this->internalParser)
 		{
-			return $this->document->getElementsByTagName('body')->item(0);
+			// Remove comments
+			$xpath = new \DOMXPath($this->document);
+			foreach ($xpath->query('//comment()') as $comment)
+			{
+				$comment->parentNode->removeChild($comment);
+			}
+
+			return $xpath->query('//body')->item(0);
 		}
 
 		return $this->document->find('body', 0) ?? $this->document->find('html', 0) ?? $this->document->root;

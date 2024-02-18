@@ -758,25 +758,25 @@ function getBoardList($boardListOptions = array(), $simple = false)
 		while (($row = $request->fetch_assoc()))
 		{
 			$return_value[$row['id_board']] = array(
-				'id_cat' => $row['id_cat'],
+				'id_cat' => (int) $row['id_cat'],
 				'cat_name' => $row['cat_name'],
-				'id_board' => $row['id_board'],
+				'id_board' => (int) $row['id_board'],
 				'board_name' => $row['board_name'],
-				'child_level' => $row['child_level'],
+				'child_level' => (int) $row['child_level'],
 			);
 
 			// Do we want access information?
 			if (isset($boardListOptions['access']) && $boardListOptions['access'] !== false)
 			{
-				$return_value[$row['id_board']]['allow'] = !(empty($row['can_access']) || $row['can_access'] == 'f');
-				$return_value[$row['id_board']]['deny'] = !(empty($row['cannot_access']) || $row['cannot_access'] == 'f');
+				$return_value[$row['id_board']]['allow'] = !(empty($row['can_access']) || $row['can_access'] === 'f');
+				$return_value[$row['id_board']]['deny'] = !(empty($row['cannot_access']) || $row['cannot_access'] === 'f');
 			}
 
 			// Do we want moderation information?
 			if (!empty($boardListOptions['moderator']))
 			{
 				$return_value[$row['id_board']] += array(
-					'id_profile' => $row['id_profile'],
+					'id_profile' => (int) $row['id_profile'],
 					'member_groups' => $row['member_groups'],
 					'is_mod' => $row['is_mod'],
 				);
@@ -797,7 +797,7 @@ function getBoardList($boardListOptions = array(), $simple = false)
 			if (!isset($return_value['categories'][$row['id_cat']]))
 			{
 				$return_value['categories'][$row['id_cat']] = array(
-					'id' => $row['id_cat'],
+					'id' => (int) $row['id_cat'],
 					'name' => $row['cat_name'],
 					'boards' => array(),
 				);
@@ -806,10 +806,10 @@ function getBoardList($boardListOptions = array(), $simple = false)
 			// Shortcuts are useful to keep things simple
 			$this_cat = &$return_value['categories'][$row['id_cat']];
 
-			$this_cat['boards'][$row['id_board']] = array(
-				'id' => $row['id_board'],
+			$this_cat['boards'][(int) $row['id_board']] = array(
+				'id' => (int) $row['id_board'],
 				'name' => $row['board_name'],
-				'child_level' => $row['child_level'],
+				'child_level' => (int) $row['child_level'],
 				'allow' => false,
 				'deny' => false,
 				'selected' => isset($boardListOptions['selected_board']) && $boardListOptions['selected_board'] == $row['id_board'],
@@ -818,8 +818,8 @@ function getBoardList($boardListOptions = array(), $simple = false)
 
 			if (!empty($boardListOptions['access']))
 			{
-				$this_cat['boards'][$row['id_board']]['allow'] = !(empty($row['can_access']) || $row['can_access'] == 'f');
-				$this_cat['boards'][$row['id_board']]['deny'] = !(empty($row['cannot_access']) || $row['cannot_access'] == 'f');
+				$this_cat['boards'][$row['id_board']]['allow'] = !(empty($row['can_access']) || $row['can_access'] === 'f');
+				$this_cat['boards'][$row['id_board']]['deny'] = !(empty($row['cannot_access']) || $row['cannot_access'] === 'f');
 			}
 
 			// If is_ignored is set, it means we could have to deselect a board
@@ -837,8 +837,8 @@ function getBoardList($boardListOptions = array(), $simple = false)
 			// Do we want moderation information?
 			if (!empty($boardListOptions['moderator']))
 			{
-				$this_cat['boards'][$row['id_board']] += array(
-					'id_profile' => $row['id_profile'],
+				$this_cat['boards'][(int) $row['id_board']] += array(
+					'id_profile' => (int) $row['id_profile'],
 					'member_groups' => $row['member_groups'],
 					'is_mod' => $row['is_mod'],
 				);

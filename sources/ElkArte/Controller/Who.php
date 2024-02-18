@@ -19,8 +19,8 @@ namespace ElkArte\Controller;
 
 use ElkArte\AbstractController;
 use ElkArte\Exceptions\Exception;
-use ElkArte\MembersList;
 use ElkArte\Languages\Txt;
+use ElkArte\MembersList;
 use ElkArte\Util;
 
 /**

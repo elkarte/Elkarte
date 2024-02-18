@@ -487,6 +487,10 @@ function getAttachmentFromTopic($id_attach, $id_topic)
 	if ($request->num_rows() !== 0)
 	{
 		$attachmentData = $request->fetch_assoc();
+		$attachmentData['id_folder'] = (int) $attachmentData['id_folder'];
+		$attachmentData['id_attach'] = (int) $attachmentData['id_attach'];
+		$attachmentData['id_member'] = (int) $attachmentData['id_member'];
+		$attachmentData['attachment_type'] = (int) $attachmentData['attachment_type'];
 	}
 	$request->free_result();
 

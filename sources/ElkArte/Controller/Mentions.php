@@ -15,9 +15,10 @@ namespace ElkArte\Controller;
 
 use ElkArte\AbstractController;
 use ElkArte\DataValidator;
+use ElkArte\EventManager;
 use ElkArte\Exceptions\Exception;
-use ElkArte\Mentions\Mentioning;
 use ElkArte\Languages\Txt;
+use ElkArte\Mentions\Mentioning;
 
 /**
  * as liking a post, adding a buddy, @ calling a member in a post
@@ -56,7 +57,7 @@ class Mentions extends AbstractController
 	/**
 	 * Good old constructor
 	 *
-	 * @param \ElkArte\EventManager $eventManager
+	 * @param EventManager $eventManager
 	 */
 	public function __construct($eventManager)
 	{
@@ -195,14 +196,14 @@ class Mentions extends AbstractController
 			'default_sort_dir' => 'default',
 			'no_items_label' => $this->_all ? $txt['no_mentions_yet'] : $txt['no_new_mentions'],
 			'get_items' => [
-				'function' => [$this, 'list_loadMentions'],
+				'function' => fn(int $start, int $limit, string $sort, bool $all, string $type): array => $this->list_loadMentions($start, $limit, $sort, $all, $type),
 				'params' => [
 					$this->_all,
 					$this->_type,
 				],
 			],
 			'get_count' => [
-				'function' => [$this, 'list_getMentionCount'],
+				'function' => fn(bool $all, string $type) => $this->list_getMentionCount($all, $type),
 				'params' => [
 					$this->_all,
 					$this->_type,
@@ -214,7 +215,7 @@ class Mentions extends AbstractController
 						'value' => $txt['mentions_from'],
 					],
 					'data' => [
-						'function' => function ($row) {
+						'function' => static function ($row) {
 							global $settings;
 
 							if (isset($settings['mentions']['mentioner_template']))
@@ -227,7 +228,7 @@ class Mentions extends AbstractController
 									],
 									[
 										$row['avatar']['image'],
-										!empty($row['id_member_from']) ? getUrl('action', ['action' => 'profile', 'u' => $row['id_member_from']]) : '#',
+										empty($row['id_member_from']) ? '#' : getUrl('action', ['action' => 'profile', 'u' => $row['id_member_from']]),
 										$row['mentioner'],
 									],
 									$settings['mentions']['mentioner_template']);
@@ -274,8 +275,8 @@ class Mentions extends AbstractController
 						'class' => 'listaction grid8',
 					],
 					'data' => [
-						'function' => function ($row) {
-							global $txt, $settings;
+						'function' => static function ($row) {
+							global $txt;
 
 							$mark = empty($row['status']) ? 'read' : 'unread';
 							$opts = '<a href="' . getUrl('action', ['action' => 'mentions', 'sa' => 'updatestatus', 'mark' => $mark, 'item' => $row['id_mention'], '{session_data}']) . '"><i class="icon i-mark_' . $mark . '" title="' . $txt['mentions_mark' . $mark] . '" /><s>' . $txt['mentions_mark' . $mark] . '</s></i></a>&nbsp;';
@@ -290,7 +291,7 @@ class Mentions extends AbstractController
 				'show_on' => 'top',
 				'links' => [
 					[
-						'href' => getUrl('action', ['action' => 'mentions'] + (!empty($this->_all) ? ['all'] : [])),
+						'href' => getUrl('action', ['action' => 'mentions'] + (empty($this->_all) ? [] : ['all'])),
 						'is_selected' => empty($this->_type),
 						'label' => $txt['mentions_type_all']
 					],
@@ -300,7 +301,7 @@ class Mentions extends AbstractController
 				[
 					'position' => 'above_column_headers',
 					'class' => 'flow_flex_right',
-					'value' => '<a class="linkbutton" href="' . $scripturl . '?action=mentions' . (!empty($this->_all) ? '' : ';all') . str_replace(';all', '', $this->_url_param) . '">' . (!empty($this->_all) ? $txt['mentions_unread'] : $txt['mentions_all']) . '</a>',
+					'value' => '<a class="linkbutton" href="' . $scripturl . '?action=mentions' . (empty($this->_all) ? ';all' : '') . str_replace(';all', '', $this->_url_param) . '">' . (empty($this->_all) ? $txt['mentions_all'] : $txt['mentions_unread']) . '</a>',
 				],
 				[
 					'class' => 'submitbutton',
@@ -313,7 +314,7 @@ class Mentions extends AbstractController
 		foreach ($this->_known_mentions as $mention)
 		{
 			$list_options['list_menu']['links'][] = [
-				'href' => getUrl('action', ['action' => 'mentions', 'type' => $mention] + (!empty($this->_all) ? ['all'] : [])),
+				'href' => getUrl('action', ['action' => 'mentions', 'type' => $mention] + (empty($this->_all) ? [] : ['all'])),
 				'is_selected' => $this->_type === $mention,
 				'label' => $txt['mentions_type_' . $mention]
 			];
@@ -321,7 +322,7 @@ class Mentions extends AbstractController
 
 		createList($list_options);
 
-		$context['page_title'] = $txt['my_mentions'] . (!empty($this->_page) ? ' - ' . sprintf($txt['my_mentions_pages'], $this->_page) : '');
+		$context['page_title'] = $txt['my_mentions'] . (empty($this->_page) ? '' : ' - ' . sprintf($txt['my_mentions_pages'], $this->_page));
 		$context['linktree'][] = [
 			'url' => getUrl('action', ['action' => 'mentions']),
 			'name' => $txt['my_mentions'],
@@ -346,7 +347,7 @@ class Mentions extends AbstractController
 		$this->_type = in_array($this->_req->getQuery('type', 'trim'), $this->_known_mentions, true) ? $this->_req->getQuery('type', 'trim') : '';
 		$this->_page = $this->_req->getQuery('start', 'trim', '');
 
-		$this->_url_param = ($this->_all ? ';all' : '') . (!empty($this->_type) ? ';type=' . $this->_type : '') . ($this->_req->getQuery('start') !== null ? ';start=' . $this->_req->getQuery('start') : '');
+		$this->_url_param = ($this->_all ? ';all' : '') . (empty($this->_type) ? '' : ';type=' . $this->_type) . ($this->_req->getQuery('start') !== null ? ';start=' . $this->_req->getQuery('start') : '');
 	}
 
 	/**
@@ -452,6 +453,7 @@ class Mentions extends AbstractController
 					break;
 				}
 			}
+
 			$round++;
 
 			// If nothing has been removed OR there are not enough
@@ -464,10 +466,7 @@ class Mentions extends AbstractController
 			$start += $limit;
 		}
 
-		if ($round !== 0)
-		{
-			countUserMentions();
-		}
+		countUserMentions();
 
 		return $mentions;
 	}
@@ -485,9 +484,7 @@ class Mentions extends AbstractController
 		}
 		else
 		{
-			$to_register = array_map(static function ($name) {
-				return '\\ElkArte\\Mentions\\MentionType\\Event\\' . ucfirst($name);
-			}, $this->_known_mentions);
+			$to_register = array_map(static fn($name) => '\\ElkArte\\Mentions\\MentionType\\Event\\' . ucfirst($name), $this->_known_mentions);
 		}
 
 		$this->_registerEvent('view_mentions', 'view', $to_register);

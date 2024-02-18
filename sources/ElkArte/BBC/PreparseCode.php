@@ -27,14 +27,16 @@ class PreparseCode
 {
 	/** The regular expression non breaking space */
 	public const NBS = '\x{A0}';
+
 	/** @var string the message to preparse */
 	public $message = '';
-	/** @var string the username of the current user */
-	public $user_name = '';
+
 	/** @var bool if this is just a preview */
 	protected $previewing = false;
+
 	/** @var array the code blocks that we want to protect */
 	public $code_blocks = array();
+
 	/** @var PreparseCode */
 	public static $instance;
 
@@ -43,9 +45,8 @@ class PreparseCode
 	 *
 	 * @param string $user_name
 	 */
-	protected function __construct($user_name)
+	protected function __construct(public $user_name)
 	{
-		$this->user_name = $user_name;
 	}
 
 	/**
@@ -84,9 +85,7 @@ class PreparseCode
 		$this->message = preg_replace('~&amp;#(\d{4,5}|[2-9]\d{2,4}|1[2-9]\d);~', '&#$1;', $this->message);
 
 		// Clean up after nobbc ;).
-		$this->message = preg_replace_callback('~\[nobbc\](.+?)\[/nobbc\]~i', function ($matches) {
-			return $this->_preparsecode_nobbc_callback($matches);
-		}, $this->message);
+		$this->message = preg_replace_callback('~\[nobbc\](.+?)\[/nobbc\]~i', fn($matches) => $this->_preparsecode_nobbc_callback($matches), $this->message);
 
 		// Remove \r's... they're evil!
 		$this->message = strtr($this->message, array("\r" => ''));
@@ -112,9 +111,7 @@ class PreparseCode
 
 		// Make sure list and table tags are lowercase.
 		$this->message = preg_replace_callback('~\[([/]?)(list|li|table|tr|td|th)((\s[^\]]+)*)\]~i',
-			function ($matches) {
-				return $this->_preparsecode_lowertags_callback($matches);
-			}, $this->message);
+			fn($matches) => $this->_preparsecode_lowertags_callback($matches), $this->message);
 
 		// Don't leave any lists that were never opened or closed
 		$this->_validateLists();
@@ -123,17 +120,15 @@ class PreparseCode
 		$this->_fixMistakes();
 
 		// Remove empty bbc tags
-		$this->message = preg_replace('~\[[bisu]\]\s*\[/[bisu]\]~i', '', $this->message);
-		$this->message = preg_replace('~\[quote\]\s*\[/quote\]~i', '', $this->message);
+		$this->message = preg_replace('~\[[bisu]]\s*\[/[bisu]]~i', '', $this->message);
+		$this->message = preg_replace('~\[quote]\s*\[/quote]~i', '', $this->message);
 
 		// Fix color tags of many forms so they parse properly
 		$this->message = preg_replace('~\[color=(?:#[\da-fA-F]{3}|#[\da-fA-F]{6}|[A-Za-z]{1,20}|rgb\(\d{1,3}, ?\d{1,3}, ?\d{1,3}\))\]\s*\[/color\]~', '', $this->message);
 
 		// Font tags with multiple fonts (copy&paste in the WYSIWYG by some browsers).
-		$this->message = preg_replace_callback('~\[font=([^\]]*)\](.*?(?:\[/font\]))~s',
-			function ($matches) {
-				return $this->_preparsecode_font_callback($matches);
-			}, $this->message);
+		$this->message = preg_replace_callback('~\[font=([^]]*)](.*?(?:\[/font\]))~s',
+			fn($matches) => $this->_preparsecode_font_callback($matches), $this->message);
 
 		// Allow integration to do further processing on protected code block message
 		call_integration_hook('integrate_preparse_tokenized_code', array(&$this->message, $previewing, $this->code_blocks));
@@ -189,7 +184,7 @@ class PreparseCode
 		$had_tag = false;
 		$code_open = false;
 
-		if (preg_match_all('~(\[\/?code(?:=[^\]]+)?\])~i', $this->message, $matches))
+		if (preg_match_all('~(\[/?code(?:=[^]]+)?])~i', $this->message, $matches))
 		{
 			foreach ($matches[0] as $match)
 			{
@@ -224,12 +219,16 @@ class PreparseCode
 		{
 			$this->message .= '[/code]';
 		}
-
 		// Open any ones that need to be open, only if we've never had a tag.
-		if ($code_open && !$had_tag)
+		if (!$code_open)
 		{
-			$this->message = '[code]' . $this->message;
+			return;
 		}
+		if ($had_tag)
+		{
+			return;
+		}
+		$this->message = '[code]' . $this->message;
 	}
 
 	/**
@@ -375,9 +374,7 @@ class PreparseCode
 
 		// Now fix possible security problems with images loading links automatically...
 		$this->message = preg_replace_callback('~(\[img.*?\])(.+?)\[/img\]~is',
-			function ($matches) {
-				return $this->_fixTags_img_callback($matches);
-			}, $this->message);
+			fn($matches) => $this->_fixTags_img_callback($matches), $this->message);
 
 		// Limit the size of images posted?
 		if (!empty($modSettings['max_image_width']) || !empty($modSettings['max_image_height']))
@@ -448,7 +445,7 @@ class PreparseCode
 					$this_tag = 'iurl';
 					$this_close = 'iurl';
 				}
-				elseif (substr($replace, 0, 2) === '//')
+				elseif (strpos($replace, '//') === 0)
 				{
 					$replace = $protocols[0] . ':' . $replace;
 				}
@@ -514,22 +511,22 @@ class PreparseCode
 		require_once(SUBSDIR . '/Attachments.subs.php');
 
 		// Find all the img tags - with or without width and height.
-		preg_match_all('~\[img(\s+width=\d+)?(\s+height=\d+)?(\s+width=\d+)?\](.+?)\[/img\]~is', $this->message, $matches, PREG_PATTERN_ORDER);
+		preg_match_all('~\[img(\s+width=\d+)?(\s+height=\d+)?(\s+width=\d+)?](.+?)\[/img]~is', $this->message, $matches, PREG_PATTERN_ORDER);
 
 		$replaces = array();
-		foreach ($matches[0] as $match => $dummy)
+		foreach (array_keys($matches[0]) as $match)
 		{
 			// If the width was after the height, handle it.
-			$matches[1][$match] = !empty($matches[3][$match]) ? $matches[3][$match] : $matches[1][$match];
+			$matches[1][$match] = empty($matches[3][$match]) ? $matches[1][$match] : $matches[3][$match];
 
 			// Now figure out if they had a desired height or width...
-			$desired_width = !empty($matches[1][$match]) ? (int) substr(trim($matches[1][$match]), 6) : 0;
-			$desired_height = !empty($matches[2][$match]) ? (int) substr(trim($matches[2][$match]), 7) : 0;
+			$desired_width = empty($matches[1][$match]) ? 0 : (int) substr(trim($matches[1][$match]), 6);
+			$desired_height = empty($matches[2][$match]) ? 0 : (int) substr(trim($matches[2][$match]), 7);
 
 			// One was omitted, or both.  We'll have to find its real size...
 			if (empty($desired_width) || empty($desired_height))
 			{
-				list ($width, $height) = url_image_size(un_htmlspecialchars($matches[4][$match]));
+				[$width, $height] = url_image_size(un_htmlspecialchars($matches[4][$match]));
 
 				// They don't have any desired width or height!
 				if (empty($desired_width) && empty($desired_height))
@@ -569,7 +566,7 @@ class PreparseCode
 				$desired_height = $modSettings['max_image_height'];
 			}
 
-			$replaces[$matches[0][$match]] = '[img' . (!empty($desired_width) ? ' width=' . $desired_width : '') . (!empty($desired_height) ? ' height=' . $desired_height : '') . ']' . $matches[4][$match] . '[/img]';
+			$replaces[$matches[0][$match]] = '[img' . (empty($desired_width) ? '' : ' width=' . $desired_width) . (empty($desired_height) ? '' : ' height=' . $desired_height) . ']' . $matches[4][$match] . '[/img]';
 		}
 
 		// If any img tags were actually changed...
@@ -686,7 +683,7 @@ class PreparseCode
 	{
 		if (!empty($this->code_blocks))
 		{
-			$message = str_replace(array_keys($this->code_blocks), array_values($this->code_blocks), $message);
+			return str_replace(array_keys($this->code_blocks), array_values($this->code_blocks), $message);
 		}
 
 		return $message;
@@ -724,7 +721,7 @@ class PreparseCode
 			$remove_tag = false;
 
 			// Is it opening?
-			if ($matches[1] != '/')
+			if ($matches[1] !== '/')
 			{
 				// If the previous table tag isn't correct simply remove it.
 				if ((!empty($table_array) && !in_array($matches[2], $table_order[$table_array[0]])) || (empty($table_array) && $matches[2] !== 'table'))
@@ -788,7 +785,7 @@ class PreparseCode
 		$message = $this->restoreCodeBlocks($message);
 
 		// Change breaks back to \n's and &nsbp; back to spaces.
-		return preg_replace('~<br( /)?' . '>~', "\n", str_replace('&nbsp;', ' ', $message));
+		return preg_replace('~<br( /)?>~', "\n", str_replace('&nbsp;', ' ', $message));
 	}
 
 	/**

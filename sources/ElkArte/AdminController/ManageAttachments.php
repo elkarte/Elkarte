@@ -654,10 +654,10 @@ class ManageAttachments extends AbstractController
 		$attach_dirs = $attachmentDirectory->getPaths();
 
 		// Get the number of attachments...
-		$context['num_attachments'] = comma_format(getAttachmentCount(), 0);
+		$context['num_attachments'] = comma_format(getAttachmentCountByType('attachments'), 0);
 
 		// Also get the avatar amount...
-		$context['num_avatars'] = comma_format(getAvatarCount(), 0);
+		$context['num_avatars'] = comma_format(getAttachmentCountByType('avatars'), 0);
 
 		// Total size of attachments
 		$context['attachment_total_size'] = overallAttachmentsSize();
@@ -872,7 +872,7 @@ class ManageAttachments extends AbstractController
 		}
 
 		// All the valid problems are here:
-		$context['repair_errors'] = array(
+		$context['repair_errors'] = [
 			'missing_thumbnail_parent' => 0,
 			'parent_missing_thumbnail' => 0,
 			'file_missing_on_disk' => 0,
@@ -883,7 +883,7 @@ class ManageAttachments extends AbstractController
 			'wrong_folder' => 0,
 			'missing_extension' => 0,
 			'files_without_attachment' => 0,
-		);
+		];
 
 		$to_fix = empty($_SESSION['attachments_to_fix']) ? array() : $_SESSION['attachments_to_fix'];
 		$context['repair_errors'] = $_SESSION['attachments_to_fix2'] ?? $context['repair_errors'];
@@ -899,13 +899,13 @@ class ManageAttachments extends AbstractController
 				$removed = findOrphanThumbnails($this->substep, $fix_errors, $to_fix);
 				$context['repair_errors']['missing_thumbnail_parent'] += count($removed);
 
-				$this->_pauseAttachmentMaintenance($to_fix, $thumbnails);
+				pauseAttachmentMaintenance($to_fix, $thumbnails, $this->starting_substep, $this->substep, $this->step, $fix_errors);
 			}
 
 			// Done here, on to the next
 			$this->step = 1;
 			$this->substep = 0;
-			$this->_pauseAttachmentMaintenance($to_fix);
+			pauseAttachmentMaintenance($to_fix, 0, $this->starting_substep, $this->substep, $this->step, $fix_errors);
 		}
 
 		// Find parents which think they have thumbnails, but actually, don't.
@@ -918,13 +918,13 @@ class ManageAttachments extends AbstractController
 				$to_update = findParentsOrphanThumbnails($this->substep, $fix_errors, $to_fix);
 				$context['repair_errors']['parent_missing_thumbnail'] += count($to_update);
 
-				$this->_pauseAttachmentMaintenance($to_fix, $thumbnails);
+				pauseAttachmentMaintenance($to_fix, $thumbnails, $this->starting_substep, $this->substep, $this->step, $fix_errors);
 			}
 
 			// Another step done, but many to go
 			$this->step = 2;
 			$this->substep = 0;
-			$this->_pauseAttachmentMaintenance($to_fix);
+			pauseAttachmentMaintenance($to_fix, 0, $this->starting_substep, $this->substep, $this->step, $fix_errors);
 		}
 
 		// This may take forever I'm afraid, but life sucks... recount EVERY attachments!
@@ -941,13 +941,13 @@ class ManageAttachments extends AbstractController
 					$context['repair_errors'][$key] += $value;
 				}
 
-				$this->_pauseAttachmentMaintenance($to_fix, $thumbnails);
+				pauseAttachmentMaintenance($to_fix, $thumbnails, $this->starting_substep, $this->substep, $this->step, $fix_errors);
 			}
 
 			// And onward we go
 			$this->step = 3;
 			$this->substep = 0;
-			$this->_pauseAttachmentMaintenance($to_fix);
+			pauseAttachmentMaintenance($to_fix, 0, $this->starting_substep, $this->substep, $this->step, $fix_errors);
 		}
 
 		// Get avatars with no members associated with them.
@@ -960,12 +960,12 @@ class ManageAttachments extends AbstractController
 				$to_remove = findOrphanAvatars($this->substep, $fix_errors, $to_fix);
 				$context['repair_errors']['avatar_no_member'] += count($to_remove);
 
-				$this->_pauseAttachmentMaintenance($to_fix, $thumbnails);
+				pauseAttachmentMaintenance($to_fix, $thumbnails, $this->starting_substep, $this->substep, $this->step, $fix_errors);
 			}
 
 			$this->step = 4;
 			$this->substep = 0;
-			$this->_pauseAttachmentMaintenance($to_fix);
+			pauseAttachmentMaintenance($to_fix, 0, $this->starting_substep, $this->substep, $this->step, $fix_errors);
 		}
 
 		// What about attachments, who are missing a message :'(
@@ -978,12 +978,12 @@ class ManageAttachments extends AbstractController
 				$to_remove = findOrphanAttachments($this->substep, $fix_errors, $to_fix);
 				$context['repair_errors']['attachment_no_msg'] += count($to_remove);
 
-				$this->_pauseAttachmentMaintenance($to_fix, $thumbnails);
+				pauseAttachmentMaintenance($to_fix, $thumbnails, $this->starting_substep, $this->substep, $this->step, $fix_errors);
 			}
 
 			$this->step = 5;
 			$this->substep = 0;
-			$this->_pauseAttachmentMaintenance($to_fix);
+			pauseAttachmentMaintenance($to_fix, 0, $this->starting_substep, $this->substep, $this->step, $fix_errors);
 		}
 
 		// What about files who are not recorded in the database?
@@ -998,6 +998,7 @@ class ManageAttachments extends AbstractController
 			$attach_dirs = $modSettings['attachmentUploadDir'];
 			$current_check = 0;
 			$max_checks = 500;
+			$attachment_count = getAttachmentCountFromDisk();
 
 			$files_checked = empty($this->substep) ? 0 : $this->substep;
 			foreach ($attach_dirs as $attach_dir)
@@ -1041,7 +1042,7 @@ class ManageAttachments extends AbstractController
 							}
 							elseif ($file->getFilename() !== 'index.php' && !$file->isDir())
 							{
-								if ($fix_errors && in_array('files_without_attachment', $to_fix))
+								if ($fix_errors && in_array('files_without_attachment', $to_fix, true))
 								{
 									$this->file_functions->delete($file->getPathname());
 								}
@@ -1057,7 +1058,7 @@ class ManageAttachments extends AbstractController
 
 						if ($current_check - $files_checked >= $max_checks)
 						{
-							$this->_pauseAttachmentMaintenance($to_fix);
+							pauseAttachmentMaintenance($to_fix, $attachment_count, $this->starting_substep, $this->substep, $this->step, $fix_errors);
 						}
 					}
 				}
@@ -1069,7 +1070,7 @@ class ManageAttachments extends AbstractController
 
 			$this->step = 5;
 			$this->substep = 0;
-			$this->_pauseAttachmentMaintenance($to_fix);
+			pauseAttachmentMaintenance($to_fix, 0, $this->starting_substep, $this->substep, $this->step, $fix_errors);
 		}
 
 		// Got here we must be doing well - just the template! :D

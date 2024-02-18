@@ -103,7 +103,7 @@ class Draft extends Post
 		$context['page_index'] = constructPageIndex('{scripturl}?action=pm;sa=showpmdrafts', $context['start'], $msgCount, $maxIndex);
 		$context['current_page'] = $context['start'] / $maxIndex;
 
-		list ($maxIndex, $reverse, $limit, $order) = $this->_query_limits($msgCount, $maxIndex);
+		[$maxIndex, $reverse, $limit, $order] = $this->_query_limits($msgCount, $maxIndex);
 		$user_drafts = load_user_drafts($this->_memID, 0, false, $order, $limit);
 
 		// Start counting at the number of the first message displayed.
@@ -135,7 +135,7 @@ class Draft extends Post
 				'locked' => $row['locked'],
 				'sticky' => $row['is_sticky'],
 				'age' => floor((time() - $row['poster_time']) / 86400),
-				'remaining' => (!empty($modSettings['drafts_keep_days']) ? round($modSettings['drafts_keep_days'] - ((time() - $row['poster_time']) / 86400)) : 0),
+				'remaining' => (empty($modSettings['drafts_keep_days']) ? 0 : round($modSettings['drafts_keep_days'] - ((time() - $row['poster_time']) / 86400))),
 				'buttons' => [
 					'inline_mod_check' => [
 						'class' => 'inline_mod_check',
@@ -188,7 +188,7 @@ class Draft extends Post
 		checkSession(empty($this->_req->post) ? 'get' : '');
 
 		// Lets see what we have been sent, one or many to delete
-		$toDelete = array();
+		$toDelete = [];
 		if (!empty($this->_req->query->delete))
 		{
 			$toDelete[] = (int) $this->_req->query->delete;
@@ -232,7 +232,7 @@ class Draft extends Post
 		$limit = $start . ', ' . $maxIndex;
 		$order = 'ud.poster_time ' . ($reverse ? 'ASC' : 'DESC');
 
-		return array($maxIndex, $reverse, $limit, $order);
+		return [$maxIndex, $reverse, $limit, $order];
 	}
 
 	/**
@@ -327,7 +327,7 @@ class Draft extends Post
 		$context['page_index'] = constructPageIndex('{scripturl}?action=pm;sa=showpmdrafts', $context['start'], $msgCount, $maxIndex);
 		$context['current_page'] = $context['start'] / $maxIndex;
 
-		list ($maxIndex, $reverse, $limit, $order) = $this->_query_limits($msgCount, $maxIndex);
+		[$maxIndex, $reverse, $limit, $order] = $this->_query_limits($msgCount, $maxIndex);
 		$user_drafts = load_user_drafts($this->_memID, 1, false, $order, $limit);
 
 		// Start counting at the number of the first message displayed.
@@ -342,7 +342,7 @@ class Draft extends Post
 				'to' => array(),
 				'bcc' => array(),
 			);
-			$recipient_ids = (!empty($row['to_list'])) ? Util::unserialize($row['to_list']) : array();
+			$recipient_ids = (empty($row['to_list'])) ? [] : Util::unserialize($row['to_list']);
 
 			// Get nice names to show the user, the id's are not that great to see!
 			if (!empty($recipient_ids['to']) || !empty($recipient_ids['bcc']))
@@ -364,7 +364,7 @@ class Draft extends Post
 				'id_draft' => $row['id_draft'],
 				'recipients' => $recipients,
 				'age' => floor((time() - $row['poster_time']) / 86400),
-				'remaining' => (!empty($modSettings['drafts_keep_days']) ? floor($modSettings['drafts_keep_days'] - ((time() - $row['poster_time']) / 86400)) : 0),
+				'remaining' => (empty($modSettings['drafts_keep_days']) ? 0 : floor($modSettings['drafts_keep_days'] - ((time() - $row['poster_time']) / 86400))),
 				'buttons' => [
 					'reply_button' => [
 						'url' => getUrl('action', ['action' => 'pm', 'sa' => 'showpmdrafts', 'id_draft' => $row['id_draft'], '{session_data}']),

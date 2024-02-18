@@ -18,6 +18,7 @@ use ElkArte\Cache\Cache;
 use ElkArte\Converters\Html2BBC;
 use ElkArte\Converters\Html2Md;
 use ElkArte\EmailFormat;
+use ElkArte\EmailParse;
 use ElkArte\Languages\Txt;
 use ElkArte\Mail\PreparseMail;
 use ElkArte\MembersList;
@@ -49,12 +50,12 @@ use ElkArte\Util;
 function pbe_email_to_bbc($text, $html)
 {
 	// Define some things that need to be converted/modified, outside normal html or markup
-	$tags = array(
+	$tags = [
 		'~\*\*\s?(.*?)\*\*~is' => '**$1**', // set as markup bold
 		'~<\*>~' => '&lt;*&gt;', // <*> as set in default Mailist Templates
 		'~^-{3,}~' => '<hr>', // 3+ --- to hr
 		'~#([0-9a-fA-F]{4,6}\b)~' => '&#35;$1', // HTML entities
-	);
+	];
 
 	// We are starting with HTML, our goal is to convert the best parts of it to BBC,
 	$text = pbe_run_parsers($text);
@@ -75,25 +76,27 @@ function pbe_email_to_bbc($text, $html)
 		$text = str_replace(['[quote]', '[/quote]'], ['&gt;blockquote>', '&gt;/blockquote>'], $text);
 
 		// Convert this (markup) text to html
-		$text = preg_replace(array_keys($tags), array_values($tags), $text);
 		require_once(EXTDIR . '/markdown/markdown.php');
+
+		$text = preg_replace(array_keys($tags), array_values($tags), $text);
 		$text = Markdown($text);
-		$text = str_replace(array('&gt;blockquote>', '&gt;/blockquote>'), array('<blockquote>', '</blockquote>'), $text);
+		$text = str_replace(['&gt;blockquote>', '&gt;/blockquote>'], ['<blockquote>', '</blockquote>'], $text);
 	}
 
 	// Convert the resulting HTML to BBC
 	$bbc_converter = new Html2BBC($text, $html);
 	$bbc_converter->skip_tags(['font', 'span']);
 	$bbc_converter->skip_styles(['font-family', 'font-size', 'color']);
+
 	$text = $bbc_converter->get_bbc();
 
 	// Some tags often end up as just empty tags - remove those.
-	$emptytags = array(
+	$emptytags = [
 		'~\[[bisu]\]\s*\[/[bisu]\]~' => '',
 		'~\[quote\]\s*\[/quote\]~' => '',
 		'~\[center\]\s*\[/center\]~' => '',
 		'~(\n){3,}~si' => "\n\n",
-	);
+	];
 
 	return preg_replace(array_keys($emptytags), array_values($emptytags), $text);
 }
@@ -121,7 +124,7 @@ function pbe_run_parsers($text)
 	// to use the net, or be forced to read their own messed up emails
 	if (empty($result) || (trim(strip_tags(pbe_filter_email_message($text))) === ''))
 	{
-		$text = $text_save;
+		return $text_save;
 	}
 
 	return $text;
@@ -159,7 +162,7 @@ function pbe_fix_email_body($body, $real_name = '', $charset = 'UTF-8')
 	// Remove the riff-raff as defined by the ACP filters
 	$body = pbe_filter_email_message($body);
 
-	// Any old school email john smith wrote: etc style quotes that we need to update
+	// Any old school email john smith wrote: etc. style quotes that we need to update
 	$body = pbe_fix_client_quotes($body);
 
 	// Attempt to remove any exposed email addresses that are in the reply
@@ -197,7 +200,7 @@ function pbe_fix_email_quotes($body, $html)
 	// Coming from HTML then remove lines that start with > and are inside [quote] ... [/quote] blocks
 	if ($html)
 	{
-		$quotes = array();
+		$quotes = [];
 		if (preg_match_all('~\[quote](.*)\[/quote]~sU', $body, $quotes, PREG_SET_ORDER))
 		{
 			foreach ($quotes as $quote)
@@ -256,6 +259,7 @@ function pbe_fix_email_quotes($body, $html)
 				$qin_temp .= '[quote]' . "\n";
 				$current_quote++;
 			}
+
 			$body_array[$i] = $qin_temp . $body_array[$i];
 		}
 
@@ -268,6 +272,7 @@ function pbe_fix_email_quotes($body, $html)
 				$qout_temp .= '[/quote]' . "\n";
 				$current_quote--;
 			}
+
 			$body_array[$i] = $qout_temp . $body_array[$i];
 		}
 
@@ -280,6 +285,7 @@ function pbe_fix_email_quotes($body, $html)
 				$quote_done .= '[/quote]' . "\n";
 				$current_quote--;
 			}
+
 			$body_array[$i] = $quote_done . $body_array[$i];
 		}
 	}
@@ -290,6 +296,7 @@ function pbe_fix_email_quotes($body, $html)
 		$quote_done .= '[/quote]' . "\n";
 		$current_quote--;
 	}
+
 	$body_array[$i] = $quote_done;
 
 	// Join the array back together while dropping null index's
@@ -319,13 +326,13 @@ function pbe_email_quote_depth(&$string, $update = true)
 	while ($check)
 	{
 		// We have a quote marker, increase our depth and strip the line of that quote marker
-		if ($string === '>' || substr($string, 0, 2) === '> ')
+		if ($string === '>' || strpos($string, '> ') === 0)
 		{
 			$level++;
 			$string = substr($string, 2);
 		}
 		// Maybe a poorly nested quote, with no spaces between the >'s or the > and the data with no space
-		elseif ((substr($string, 0, 2) === '>>') || (preg_match('~^>[a-z0-9<-]+~Ui', $string) === 1))
+		elseif ((strpos($string, '>>') === 0) || (preg_match('~^>[a-z0-9<-]+~Ui', $string) === 1))
 		{
 			$level++;
 			$string = substr($string, 1);
@@ -362,22 +369,22 @@ function pbe_parse_email_message(&$body)
 	$db = database();
 
 	// Load up the parsers from the database
-	$expressions = array();
+	$expressions = [];
 	$db->fetchQuery('
 		SELECT
 			filter_from, filter_type
 		FROM {db_prefix}postby_emails_filters
 		WHERE filter_style = {string:filter_style}
 		ORDER BY filter_order ASC',
-		array(
+		[
 			'filter_style' => 'parser'
-		)
+		]
 	)->fetch_callback(
-		function ($row) use (&$expressions) {
+		static function ($row) use (&$expressions) {
 			// Build an array of valid expressions
-			$expressions[] = array(
+			$expressions[] = [
 				'type' => $row['filter_type'] === 'regex' ? 'regex' : 'string',
-				'parser' => $row['filter_from']);
+				'parser' => $row['filter_from']];
 		}
 	);
 
@@ -429,11 +436,11 @@ function pbe_filter_email_message($text)
 		FROM {db_prefix}postby_emails_filters
 		WHERE filter_style = {string:filter_style}
 		ORDER BY filter_type ASC, filter_order ASC',
-		array(
+		[
 			'filter_style' => 'filter'
-		)
+		]
 	)->fetch_callback(
-		function ($row) use (&$text) {
+		static function ($row) use (&$text) {
 			if ($row['filter_type'] === 'regex')
 			{
 				// Newline madness
@@ -475,22 +482,22 @@ function pbe_clean_email_subject($text, $check = false)
 {
 	global $txt, $modSettings, $mbname;
 
-	$sitename = !empty($modSettings['maillist_sitename']) ? $modSettings['maillist_sitename'] : $mbname;
+	$sitename = empty($modSettings['maillist_sitename']) ? $mbname : $modSettings['maillist_sitename'];
 
 	// Find Re: Subject: FW: FWD or [$sitename] in the subject and strip it
-	$re = strpos(strtoupper($text), $txt['RE:']);
+	$re = stripos($text, $txt['RE:']);
 	if ($re !== false)
 	{
 		$text = substr($text, 0, $re) . substr($text, $re + strlen($txt['RE:']), strlen($text));
 	}
 
-	$su = strpos(strtoupper($text), $txt['SUBJECT:']);
+	$su = stripos($text, $txt['SUBJECT:']);
 	if ($su !== false)
 	{
 		$text = substr($text, 0, $su) . substr($text, $su + strlen($txt['SUBJECT:']), strlen($text));
 	}
 
-	$fw = strpos(strtoupper($text), $txt['FW:']);
+	$fw = stripos($text, $txt['FW:']);
 	if ($fw !== false)
 	{
 		$text = substr($text, 0, $fw) . substr($text, $fw + strlen($txt['FW:']), strlen($text));
@@ -502,14 +509,14 @@ function pbe_clean_email_subject($text, $check = false)
 		$text = substr($text, 0, $gr) . substr($text, $gr + strlen($sitename) + 2, strlen($text));
 	}
 
-	$fwd = strpos(strtoupper($text), $txt['FWD:']);
+	$fwd = stripos($text, $txt['FWD:']);
 	if ($fwd !== false)
 	{
 		$text = substr($text, 0, $fwd) . substr($text, $fwd + strlen($txt['FWD:']), strlen($text));
 	}
 
 	// if not done then call ourselves again, we like the sound of our name
-	if (stripos($text, $txt['RE:']) || stripos($text, $txt['FW:']) || stripos($text, $txt['FWD:']) || strpos($text, '[' . $sitename . ']'))
+	if (stripos($text, (string) $txt['RE:']) || stripos($text, $txt['FW:']) || stripos($text, $txt['FWD:']) || strpos($text, '[' . $sitename . ']'))
 	{
 		$text = pbe_clean_email_subject($text);
 	}
@@ -531,7 +538,7 @@ function pbe_clean_email_subject($text, $check = false)
  *
  * @param string $body
  *
- * @return null|string|string[]
+ * @return null|string
  * @package Maillist
  *
  */
@@ -541,7 +548,7 @@ function pbe_fix_client_quotes($body)
 
 	// Define some common quote markers (from the original messages)
 	// @todo ACP for this? ... not sure
-	$regex = array();
+	$regex = [];
 
 	// On mon, jan 12, 2020 at 10:10 AM, John Smith wrote: [quote]
 	$regex[] = '~(?:' . $txt['email_on'] . ')?\w{3}, \w{3} \d{1,2},\s?\d{4} ' . $txt['email_at'] . ' \d{1,2}:\d{1,2} [AP]M,(.*)?' . $txt['email_wrote'] . ':\s?\s{1,4}\[quote\]~i';
@@ -630,24 +637,24 @@ function pbe_check_moderation(&$pbe)
 	if (!empty($modSettings['warning_mute']) && $modSettings['warning_mute'] <= $pbe['user_info']['warning'])
 	{
 		// Remove anything that would allow them to do anything via PBE
-		$denied_permissions = array(
+		$denied_permissions = [
 			'pm_send', 'postby_email',
 			'admin_forum', 'moderate_forum',
 			'post_new', 'post_reply_own', 'post_reply_any',
 			'post_attachment', 'post_unapproved_attachments',
 			'post_unapproved_topics', 'post_unapproved_replies_own', 'post_unapproved_replies_any',
-		);
+		];
 		$pbe['user_info']['permissions'] = array_diff($pbe['user_info']['permissions'], $denied_permissions);
 	}
 	elseif (!empty($modSettings['warning_moderate']) && $modSettings['warning_moderate'] <= $pbe['user_info']['warning'])
 	{
 		// Work out what permissions should change if they are just being moderated
-		$permission_change = array(
+		$permission_change = [
 			'post_new' => 'post_unapproved_topics',
 			'post_reply_own' => 'post_unapproved_replies_own',
 			'post_reply_any' => 'post_unapproved_replies_any',
 			'post_attachment' => 'post_unapproved_attachments',
-		);
+		];
 
 		foreach ($permission_change as $old => $new)
 		{
@@ -672,7 +679,7 @@ function pbe_check_moderation(&$pbe)
  * - can choose to approve the email with the corrections
  *
  * @param string $error
- * @param \ElkArte\EmailParse $email_message
+ * @param EmailParse $email_message
  *
  * @return bool
  * @package Maillist
@@ -694,10 +701,10 @@ function pbe_emailError($error, $email_message)
 	$subject = pbe_clean_email_subject($subject);
 	$subject = ($subject === '' ? $txt['no_subject'] : $subject);
 
-	// Start off with what we know about the security key, even if its nothing
-	$message_key = (string) $email_message->message_key;
-	$message_type = (string) $email_message->message_type;
-	$message_id = (int) $email_message->message_id;
+	// Start off with what we know about the security key, even if it's nothing
+	$message_key = $email_message->message_key;
+	$message_type = $email_message->message_type;
+	$message_id = $email_message->message_id;
 	$board_id = -1;
 
 	// First up is the old, wrong email address, lets see who this should have come from if
@@ -709,11 +716,6 @@ function pbe_emailError($error, $email_message)
 		{
 			// Valid key so show who should have sent this key in? email aggravaters :P often mess this up
 			$email_message->email['from'] .= ' => ' . $key_owner;
-
-			// Since we have a valid key set those details as well
-			$message_key = $email_message->message_key;
-			$message_type = $email_message->message_type;
-			$message_id = $email_message->message_id;
 		}
 	}
 
@@ -725,11 +727,6 @@ function pbe_emailError($error, $email_message)
 		{
 			// Valid key so show who should have sent this key in
 			$email_message->email['from'] = $key_owner . ' => ' . $email_message->email['from'];
-
-			// Since we have a valid key set those details as well
-			$message_key = $email_message->message_key;
-			$message_type = $email_message->message_type;
-			$message_id = $email_message->message_id;
 		}
 	}
 
@@ -738,7 +735,7 @@ function pbe_emailError($error, $email_message)
 	{
 		// We don't have the message type (since we don't have a key)
 		// Attempt to see if it might be a PM so we handle it correctly
-		if (empty($message_type) && (strpos($email_message->subject, $pm_subject_leader) !== false))
+		if (empty($message_type) && (strpos($email_message->subject, (string) $pm_subject_leader) !== false))
 		{
 			$message_type = 'p';
 		}
@@ -754,17 +751,15 @@ function pbe_emailError($error, $email_message)
 			$message = $user_key['message_id'];
 
 			// If we know/suspect its a "m,t or p" then use that to avoid a match on a wrong type, that would be bad ;)
-			if ((!empty($message_type) && $message_type === $type) || (empty($message_type) && $type !== 'p'))
+			// Look up this message/topic/pm and see if the subjects match ... if they do then tada!
+			if (((!empty($message_type) && $message_type === $type) || empty($message_type) && $type !== 'p')
+				&& query_load_subject($message, $type, $email_message->email['from']) === $subject)
 			{
-				// Look up this message/topic/pm and see if the subjects match ... if they do then tada!
-				if (query_load_subject($message, $type, $email_message->email['from']) === $subject)
-				{
-					// This email has a subject that matches the subject of a message that was sent to them
-					$message_key = $key;
-					$message_id = $message;
-					$message_type = $type;
-					break;
-				}
+				// This email has a subject that matches the subject of a message that was sent to them
+				$message_key = $key;
+				$message_id = $message;
+				$message_type = $type;
+				break;
 			}
 		}
 	}
@@ -777,17 +772,17 @@ function pbe_emailError($error, $email_message)
 
 	// Log the error so the moderators can take a look, helps keep them sharp
 	$id = isset($_REQUEST['item']) ? (int) $_REQUEST['item'] : 0;
-	$db->insert(!empty($id) ? 'replace' : 'ignore',
+	$db->insert(empty($id) ? 'ignore' : 'replace',
 		'{db_prefix}postby_emails_error',
-		array(
+		[
 			'id_email' => 'int', 'error' => 'string', 'message_key' => 'string',
 			'subject' => 'string', 'message_id' => 'int', 'id_board' => 'int',
-			'email_from' => 'string', 'message_type' => 'string', 'message' => 'string'),
-		array(
+			'email_from' => 'string', 'message_type' => 'string', 'message' => 'string'],
+		[
 			$id, $error, $message_key,
 			$subject, $message_id, $board_id,
-			$email_message->email['from'], $message_type, $email_message->raw_message),
-		array('id_email')
+			$email_message->email['from'], $message_type, $email_message->raw_message],
+		['id_email']
 	);
 
 	// Flush the moderator error number cache, if we are here it likely just changed.
@@ -816,7 +811,7 @@ function pbe_emailError($error, $email_message)
  * - calls createAttachment to store them
  *
  * @param array $pbe
- * @param \ElkArte\EmailParse $email_message
+ * @param EmailParse $email_message
  *
  * @return array
  * @package Maillist
@@ -828,7 +823,7 @@ function pbe_email_attachments($pbe, $email_message)
 	global $modSettings, $context, $txt;
 
 	// Init
-	$attachIDs = array();
+	$attachIDs = [];
 	$tmp_attachments = new TemporaryAttachmentsList();
 
 	// Make sure we know where to upload
@@ -845,15 +840,15 @@ function pbe_email_attachments($pbe, $email_message)
 			\ElkArte\Errors\Errors::instance()->log_error(sprintf($txt['attach_folder_admin_warning'], $attach_current_dir), 'critical');
 		}
 	}
-	catch (\Exception $e)
+	catch (\Exception $exception)
 	{
 		// If the attachment folder is not there: error.
-		$tmp_attachments->setSystemError($e->getMessage());
+		$tmp_attachments->setSystemError($exception->getMessage());
 	}
 
 	// For attachmentChecks function
 	require_once(SUBSDIR . '/Attachments.subs.php');
-	$context['attachments'] = array('quantity' => 0, 'total_size' => 0);
+	$context['attachments'] = ['quantity' => 0, 'total_size' => 0];
 
 	// Create the file(s) with a temp name, so we can validate its contents/type
 	foreach ($email_message->attachments as $name => $attachment)
@@ -887,7 +882,8 @@ function pbe_email_attachments($pbe, $email_message)
 		}
 	}
 
-	$prefix = $tmp_attachments->getTplName($pbe['profile']['id_member'], '');
+	$prefix = $tmp_attachments->getTplName($pbe['profile']['id_member']);
+
 	// Space for improvement: move the removeAll to the end before ->unset
 	if ($tmp_attachments->hasSystemError())
 	{
@@ -899,14 +895,14 @@ function pbe_email_attachments($pbe, $email_message)
 		foreach ($tmp_attachments as $attachID => $attachment)
 		{
 			// If there were any errors we just skip that file
-			if (strpos($attachID, $prefix) === false || $attachment->hasErrors())
+			if (strpos($attachID, (string) $prefix) === false || $attachment->hasErrors())
 			{
 				$attachment->remove(false);
 				continue;
 			}
 
 			// Load the attachmentOptions array with the data needed to create an attachment
-			$attachmentOptions = array(
+			$attachmentOptions = [
 				'post' => 0,
 				'poster' => $pbe['profile']['id_member'],
 				'name' => $attachment['name'],
@@ -915,8 +911,8 @@ function pbe_email_attachments($pbe, $email_message)
 				'mime_type' => (string) $attachment['type'],
 				'id_folder' => (int) $attachment['id_folder'],
 				'approved' => !$modSettings['postmod_active'] || in_array('post_unapproved_attachments', $pbe['user_info']['permissions']),
-				'errors' => array(),
-			);
+				'errors' => [],
+			];
 
 			// Make it available to the forum/post
 			if (createAttachment($attachmentOptions))
@@ -934,6 +930,7 @@ function pbe_email_attachments($pbe, $email_message)
 			}
 		}
 	}
+
 	$tmp_attachments->unset();
 
 	return $attachIDs;
@@ -945,7 +942,7 @@ function pbe_email_attachments($pbe, $email_message)
  * - Load the board id that a given email address is assigned to in the ACP
  * - Returns the board number in which the new topic must go
  *
- * @param \ElkArte\EmailParse $email_address
+ * @param EmailParse $email_address
  *
  * @return int
  * @package Maillist
@@ -955,12 +952,12 @@ function pbe_find_board_number($email_address)
 {
 	global $modSettings;
 
-	$valid_address = array();
+	$valid_address = [];
 	$board_number = 0;
 
 	// Load our valid email ids and the corresponding board ids
-	$data = (!empty($modSettings['maillist_receiving_address'])) ? Util::unserialize($modSettings['maillist_receiving_address']) : array();
-	foreach ($data as $key => $addr)
+	$data = (empty($modSettings['maillist_receiving_address'])) ? [] : Util::unserialize($modSettings['maillist_receiving_address']);
+	foreach ($data as $addr)
 	{
 		$valid_address[$addr[0]] = $addr[1];
 	}
@@ -1012,7 +1009,7 @@ function pbe_prepare_text(&$message, &$subject = '', &$signature = '')
  *
  * When finished, fire off a site notification informing the user of the action and reason
  *
- * @param \ElkArte\EmailParse $email_message
+ * @param EmailParse $email_message
  * @package Maillist
  */
 function pbe_disable_user_notify($email_message)
@@ -1028,14 +1025,14 @@ function pbe_disable_user_notify($email_message)
 		FROM {db_prefix}members
 		WHERE email_address = {string:email}
 		LIMIT 1',
-		array(
+		[
 			'email' => $email
-		)
+		]
 	);
 
 	if ($request->num_rows() !== 0)
 	{
-		list ($id_member) = $request->fetch_row();
+		[$id_member] = $request->fetch_row();
 		$request->free_result();
 
 		// Once we have the member's ID, we can turn off board/topic notifications
@@ -1045,9 +1042,9 @@ function pbe_disable_user_notify($email_message)
 			SET
 				notify_regularity = 99
 			WHERE id_member = {int:id_member}',
-			array(
+			[
 				'id_member' => $id_member
-			)
+			]
 		);
 
 		// Now that other notifications have been added, we need to turn off email for those, too.
@@ -1055,10 +1052,10 @@ function pbe_disable_user_notify($email_message)
 			DELETE FROM {db_prefix}notifications_pref
 			WHERE id_member = {int:id_member}
 				AND notification_type = {string:email}',
-			array(
+			[
 				'id_member' => $id_member,
 				'email' => 'email'
-			)
+			]
 		);
 
 		// Add a "mention" of email notification being disabled
@@ -1069,7 +1066,7 @@ function pbe_disable_user_notify($email_message)
 				'mailfail',
 				0,
 				$id_member,
-				array('id_members' => array($id_member))
+				['id_members' => [$id_member]]
 			));
 			$notifier->send();
 		}
@@ -1097,12 +1094,12 @@ function quote_callback($matches)
 
 	if (preg_match('~date=(\d{8,10})~ui', $matches[0], $match) === 1)
 	{
-		$date =  $txt['email_on'] . ': ' . date('D M j, Y', $match[1]);
+		$date = $txt['email_on'] . ': ' . date('D M j, Y', $match[1]);
 	}
 
-	if (preg_match('~author=([^<>\n]+?)(?=(?:link=|date=|\]))~ui', $matches[0], $match) === 1)
+	if (preg_match('~author=([^<>\n]+?)(?=(?:link=|date=|]))~ui', $matches[0], $match) === 1)
 	{
-		$author = $match[1] .  $txt['email_wrote'] . ': ';
+		$author = $match[1] . $txt['email_wrote'] . ': ';
 	}
 
 	return "\n" . '<blockquote>' . $date . ' ' . $author;
@@ -1148,12 +1145,12 @@ function query_load_user_info($email)
 		WHERE email_address = {string:email}
 		AND is_activated = {int:act}
 		LIMIT 1',
-		array(
+		[
 			'email' => $email,
 			'act' => 1,
-		)
+		]
 	);
-	list ($id_member) = $request->fetch_row();
+	[$id_member] = $request->fetch_row();
 	$request->free_result();
 
 	// No user found ... back we go
@@ -1163,7 +1160,7 @@ function query_load_user_info($email)
 	}
 
 	// Load the users profile information
-	$pbe = array();
+	$pbe = [];
 	if (MembersList::load($id_member, false, 'profile'))
 	{
 		$pbe['profile'] = MembersList::get($id_member);
@@ -1171,22 +1168,22 @@ function query_load_user_info($email)
 		// Load in *some* user_info data just like loadUserSettings would do
 		if (empty($pbe['profile']['additional_groups']))
 		{
-			$pbe['user_info']['groups'] = array(
-				$pbe['profile']['id_group'], $pbe['profile']['id_post_group']);
+			$pbe['user_info']['groups'] = [
+				$pbe['profile']['id_group'], $pbe['profile']['id_post_group']];
 		}
 		else
 		{
 			$pbe['user_info']['groups'] = array_merge(
-				array($pbe['profile']['id_group'], $pbe['profile']['id_post_group']),
+				[$pbe['profile']['id_group'], $pbe['profile']['id_post_group']],
 				explode(',', $pbe['profile']['additional_groups'])
 			);
 		}
 
 		// Clean up the groups
-		foreach ($pbe['user_info']['groups'] as $k => $v)
-		{
-			$pbe['user_info']['groups'][$k] = (int) $v;
-		}
+		$pbe['user_info']['groups'] = array_map(static function ($v) {
+			return (int) $v;
+		}, $pbe['user_info']['groups']);
+
 		$pbe['user_info']['groups'] = array_unique($pbe['user_info']['groups']);
 
 		// Load the user's general permissions....
@@ -1196,17 +1193,17 @@ function query_load_user_info($email)
 		$pbe['user_info']['warning'] = $pbe['profile']['warning'] ?? 0;
 
 		// Work out our query_see_board string for security
-		if (in_array(1, $pbe['user_info']['groups']))
+		if (in_array(1, $pbe['user_info']['groups'], true))
 		{
 			$pbe['user_info']['query_see_board'] = '1=1';
 		}
 		else
 		{
-			$pbe['user_info']['query_see_board'] = '((FIND_IN_SET(' . implode(', b.member_groups) != 0 OR FIND_IN_SET(', $pbe['user_info']['groups']) . ', b.member_groups) != 0)' . (!empty($modSettings['deny_boards_access']) ? ' AND (FIND_IN_SET(' . implode(', b.deny_member_groups) = 0 AND FIND_IN_SET(', $pbe['user_info']['groups']) . ', b.deny_member_groups) = 0)' : '') . ')';
+			$pbe['user_info']['query_see_board'] = '((FIND_IN_SET(' . implode(', b.member_groups) != 0 OR FIND_IN_SET(', $pbe['user_info']['groups']) . ', b.member_groups) != 0)' . (empty($modSettings['deny_boards_access']) ? '' : ' AND (FIND_IN_SET(' . implode(', b.deny_member_groups) = 0 AND FIND_IN_SET(', $pbe['user_info']['groups']) . ', b.deny_member_groups) = 0)') . ')';
 		}
 
 		// Set some convenience items
-		$pbe['user_info']['is_admin'] = in_array(1, $pbe['user_info']['groups']) ? 1 : 0;
+		$pbe['user_info']['is_admin'] = in_array(1, $pbe['user_info']['groups'], true) ? 1 : 0;
 		$pbe['user_info']['id'] = $id_member;
 		$pbe['user_info']['username'] = $pbe['profile']['member_name'] ?? '';
 		$pbe['user_info']['name'] = $pbe['profile']['real_name'] ?? '';
@@ -1214,7 +1211,7 @@ function query_load_user_info($email)
 		$pbe['user_info']['language'] = empty($pbe['profile']['lngfile']) || empty($modSettings['userLanguage']) ? $language : $pbe['profile']['lngfile'];
 	}
 
-	return !empty($pbe) ? $pbe : false;
+	return empty($pbe) ? false : $pbe;
 }
 
 /**
@@ -1227,7 +1224,7 @@ function query_load_user_info($email)
  * @param array $topic_info
  * @package Maillist
  */
-function query_load_permissions($type, &$pbe, $topic_info = array())
+function query_load_permissions($type, &$pbe, $topic_info = [])
 {
 	global $modSettings;
 
@@ -1236,19 +1233,19 @@ function query_load_permissions($type, &$pbe, $topic_info = array())
 	$where_query = ($type === 'board' ? '({array_int:member_groups}) AND id_profile = {int:id_profile}' : '({array_int:member_groups})');
 
 	// Load up the users board or general site permissions.
-	$removals = array();
-	$pbe['user_info']['permissions'] = array();
+	$removals = [];
+	$pbe['user_info']['permissions'] = [];
 	$db->fetchQuery('
 		SELECT
 			permission, add_deny
 		FROM {db_prefix}' . ($type === 'board' ? 'board_permissions' : 'permissions') . '
 		WHERE id_group IN ' . $where_query,
-		array(
+		[
 			'member_groups' => $pbe['user_info']['groups'],
 			'id_profile' => ($type === 'board') ? $topic_info['id_profile'] : '',
-		)
+		]
 	)->fetch_callback(
-		function ($row) use (&$removals, &$pbe) {
+		static function ($row) use (&$removals, &$pbe) {
 			if (empty($row['add_deny']))
 			{
 				$removals[] = $row['permission'];
@@ -1289,16 +1286,16 @@ function query_user_keys($email)
 		FROM {db_prefix}postby_emails
 		WHERE email_to = {string:email}
 		ORDER BY time_sent DESC',
-		array(
+		[
 			'email' => $email,
-		)
+		]
 	)->fetch_all();
 }
 
 /**
  * Return the email that a given key was sent to
  *
- * @param \ElkArte\EmailParse $email_message
+ * @param EmailParse $email_message
  * @return string email address the key was sent to
  * @package Maillist
  */
@@ -1306,7 +1303,7 @@ function query_key_owner($email_message)
 {
 	$db = database();
 
-	if (!isset($email_message->message_key, $email_message->message_type, $email_message->message_id))
+	if ($email_message->message_key === null && $email_message->message_type === null && $email_message->message_id === null)
 	{
 		return false;
 	}
@@ -1320,13 +1317,13 @@ function query_key_owner($email_message)
 			AND message_type = {string:type}
 			AND message_id = {string:message}
 		LIMIT 1',
-		array(
+		[
 			'key' => $email_message->message_key,
 			'type' => $email_message->message_type,
 			'message' => $email_message->message_id,
-		)
+		]
 	);
-	list ($email_to) = $request->fetch_row();
+	[$email_to] = $request->fetch_row();
 	$request->free_result();
 
 	return $email_to;
@@ -1360,9 +1357,9 @@ function query_load_subject($message_id, $message_type, $email)
 			FROM {db_prefix}topics AS t
 				INNER JOIN {db_prefix}messages AS m ON (m.id_msg = t.id_first_msg)
 			WHERE t.id_topic = {int:id_topic}',
-			array(
+			[
 				'id_topic' => $message_id
-			)
+			]
 		);
 	}
 	elseif ($message_type === 'm')
@@ -1373,9 +1370,9 @@ function query_load_subject($message_id, $message_type, $email)
 			FROM {db_prefix}messages AS m
 				INNER JOIN {db_prefix}topics AS t ON (t.id_topic = m.id_topic)
 			WHERE m.id_msg = {int:message_id}',
-			array(
+			[
 				'message_id' => $message_id
-			)
+			]
 		);
 	}
 	elseif ($message_type === 'p')
@@ -1388,16 +1385,16 @@ function query_load_subject($message_id, $message_type, $email)
 			WHERE email_address = {string:email}
 				AND is_activated = {int:act}
 			LIMIT 1',
-			array(
+			[
 				'email' => $email,
 				'act' => 1,
-			)
+			]
 		);
 
 		// Found them, now we find the PM to them with this ID
 		if ($request->num_rows() !== 0)
 		{
-			list ($id_member) = $request->fetch_row();
+			[$id_member] = $request->fetch_row();
 			$request->free_result();
 
 			// Now find this PM ID and make sure it was sent to this member
@@ -1408,10 +1405,10 @@ function query_load_subject($message_id, $message_type, $email)
 				WHERE pmr.id_pm = {int:id_pm}
 					AND pmr.id_member = {int:id_member}
 					AND p.id_pm = pmr.id_pm',
-				array(
+				[
 					'id_member' => $id_member,
 					'id_pm' => $message_id,
-				)
+				]
 			);
 		}
 	}
@@ -1423,9 +1420,10 @@ function query_load_subject($message_id, $message_type, $email)
 	// If we found the message, topic or PM, return the subject
 	if ($request->num_rows() !== 0)
 	{
-		list ($subject) = $request->fetch_row();
+		[$subject] = $request->fetch_row();
 		$subject = pbe_clean_email_subject($subject);
 	}
+
 	$request->free_result();
 
 	return $subject;
@@ -1461,10 +1459,10 @@ function query_load_message($message_type, $message_id, $pbe)
 				INNER JOIN {db_prefix}messages AS m ON (m.id_msg = t.id_first_msg)
 			WHERE {raw:query_see_board}
 				AND t.id_topic = {int:message_id}',
-			array(
+			[
 				'message_id' => $message_id,
 				'query_see_board' => $pbe['user_info']['query_see_board'],
-			)
+			]
 		);
 	}
 	elseif ($message_type === 'm')
@@ -1479,10 +1477,10 @@ function query_load_message($message_type, $message_id, $pbe)
 				INNER JOIN {db_prefix}topics AS t ON (t.id_topic = m.id_topic)
 			WHERE  {raw:query_see_board}
 				AND m.id_msg = {int:message_id}',
-			array(
+			[
 				'message_id' => $message_id,
 				'query_see_board' => $pbe['user_info']['query_see_board'],
-			)
+			]
 		);
 	}
 	elseif ($message_type === 'p')
@@ -1496,13 +1494,14 @@ function query_load_message($message_type, $message_id, $pbe)
 				AND pm.id_member = {int:id_mem}
 				AND p.id_pm = pm.id_pm
 				AND mem.id_member = p.id_member_from',
-			array(
+			[
 				'id_mem' => $pbe['profile']['id_member'],
 				'mess_id' => $message_id
-			)
+			]
 		);
 	}
-	$topic_info = array();
+
+	$topic_info = [];
 	if (isset($request))
 	{
 		// Found the information, load the topic_info array with the data for this topic and board
@@ -1510,11 +1509,12 @@ function query_load_message($message_type, $message_id, $pbe)
 		{
 			$topic_info = $request->fetch_assoc();
 		}
+
 		$request->free_result();
 	}
 
 	// Return the results or false
-	return !empty($topic_info) ? $topic_info : false;
+	return empty($topic_info) ? false : $topic_info;
 }
 
 /**
@@ -1535,11 +1535,11 @@ function query_load_board($message_id)
 			id_board
 		FROM {db_prefix}messages
 		WHERE id_msg = {int:message_id}',
-		array(
+		[
 			'message_id' => $message_id,
-		)
+		]
 	);
-	list ($board_id) = $request->fetch_row();
+	[$board_id] = $request->fetch_row();
 	$request->free_result();
 
 	return empty($board_id) ? 0 : $board_id;
@@ -1563,10 +1563,10 @@ function query_load_board_details($board_id, $pbe)
 			b.count_posts, b.id_profile, b.member_groups, b.id_theme, b.id_board
 		FROM {db_prefix}boards AS b
 		WHERE {raw:query_see_board} AND id_board = {int:id_board}',
-		array(
+		[
 			'id_board' => $board_id,
 			'query_see_board' => $pbe['user_info']['query_see_board'],
-		)
+		]
 	);
 	$board_info = $request->fetch_assoc();
 	$request->free_result();
@@ -1593,6 +1593,8 @@ function query_get_theme($id_member, $id_theme, $board_info)
 
 	$db = database();
 
+	$id_theme = (int) $id_theme;
+
 	// Verify the id_theme...
 	// Allow the board specific theme, if they are overriding.
 	if (!empty($board_info['id_theme']) && $board_info['override_theme'])
@@ -1601,29 +1603,25 @@ function query_get_theme($id_member, $id_theme, $board_info)
 	}
 	elseif (!empty($modSettings['knownThemes']))
 	{
-		$themes = explode(',', $modSettings['knownThemes']);
+		$themes = array_map('intval', explode(',', $modSettings['knownThemes']));
 
-		$id_theme = !in_array($id_theme, $themes) ? $modSettings['theme_guests'] : (int) $id_theme;
-	}
-	else
-	{
-		$id_theme = (int) $id_theme;
+		$id_theme = in_array($id_theme, $themes, true) ? $id_theme : (int) $modSettings['theme_guests'];
 	}
 
 	// With the theme and member, load the auto_notify variables
-	$theme_settings = array();
+	$theme_settings = [];
 	$db->fetchQuery('
 		SELECT
 			variable, value
 		FROM {db_prefix}themes
 		WHERE id_member = {int:id_member}
 			AND id_theme = {int:id_theme}',
-		array(
+		[
 			'id_theme' => $id_theme,
 			'id_member' => $id_member,
-		)
+		]
 	)->fetch_callback(
-		function ($row) use (&$theme_settings) {
+		static function ($row) use (&$theme_settings) {
 			// Put everything about this member/theme into a theme setting array
 			$theme_settings[$row['variable']] = $row['value'];
 		}
@@ -1655,15 +1653,16 @@ function query_notifications($id_member, $id_board, $id_topic, $auto_notify, $pe
 		FROM {db_prefix}log_notify
 		WHERE id_board = {int:board_list}
 			AND id_member = {int:current_member}',
-		array(
+		[
 			'current_member' => $id_member,
 			'board_list' => $id_board,
-		)
+		]
 	);
 	if ($request->fetch_row())
 	{
 		$board_notify = true;
 	}
+
 	$request->free_result();
 
 	// If they have topic notification on and not board notification then
@@ -1672,9 +1671,9 @@ function query_notifications($id_member, $id_board, $id_topic, $auto_notify, $pe
 	{
 		$db->insert('ignore',
 			'{db_prefix}log_notify',
-			array('id_member' => 'int', 'id_topic' => 'int', 'id_board' => 'int'),
-			array($id_member, $id_topic, 0),
-			array('id_member', 'id_topic', 'id_board')
+			['id_member' => 'int', 'id_topic' => 'int', 'id_board' => 'int'],
+			[$id_member, $id_topic, 0],
+			['id_member', 'id_topic', 'id_board']
 		);
 	}
 	else
@@ -1684,10 +1683,10 @@ function query_notifications($id_member, $id_board, $id_topic, $auto_notify, $pe
 			DELETE FROM {db_prefix}log_notify
 			WHERE id_member = {int:current_member}
 				AND id_topic = {int:current_topic}',
-			array(
+			[
 				'current_member' => $id_member,
 				'current_topic' => $id_topic,
-			)
+			]
 		);
 	}
 }
@@ -1699,7 +1698,7 @@ function query_notifications($id_member, $id_board, $id_topic, $auto_notify, $pe
  * - Marks the PM replied to as replied to
  * - Updates the number of unread to reflect this
  *
- * @param \ElkArte\EmailParse $email_message
+ * @param EmailParse $email_message
  * @param array $pbe
  * @package Maillist
  */
@@ -1714,10 +1713,10 @@ function query_mark_pms($email_message, $pbe)
 		WHERE id_member = {int:id_member}
 			AND NOT ((is_read & 1) >= 1)
 			AND id_pm = {int:personal_messages}',
-		array(
+		[
 			'personal_messages' => $email_message->message_id,
 			'id_member' => $pbe['profile']['id_member'],
-		)
+		]
 	);
 
 	// If something was marked as read, get the number of unread messages remaining.
@@ -1732,19 +1731,19 @@ function query_mark_pms($email_message, $pbe)
 				AND NOT ((is_read & 1) >= 1)
 				AND deleted = {int:is_not_deleted}
 			GROUP BY labels',
-			array(
+			[
 				'id_member' => $pbe['profile']['id_member'],
 				'is_not_deleted' => 0,
-			)
+			]
 		)->fetch_callback(
-			function ($row) use (&$total_unread) {
+			static function ($row) use (&$total_unread) {
 				$total_unread += $row['num'];
 			}
 		);
 
 		// Update things for when they do come to the site
 		require_once(SUBSDIR . '/Members.subs.php');
-		updateMemberData($pbe['profile']['id_member'], array('unread_messages' => $total_unread));
+		updateMemberData($pbe['profile']['id_member'], ['unread_messages' => $total_unread]);
 	}
 
 	// Now mark the message as "replied to" since they just did
@@ -1754,10 +1753,10 @@ function query_mark_pms($email_message, $pbe)
 			is_read = is_read | 2
 		WHERE id_pm = {int:replied_to}
 			AND id_member = {int:current_member}',
-		array(
+		[
 			'current_member' => $pbe['profile']['id_member'],
 			'replied_to' => $email_message->message_id,
-		)
+		]
 	);
 }
 
@@ -1766,7 +1765,7 @@ function query_mark_pms($email_message, $pbe)
  *
  * - Also removes any old keys to minimize security issues
  *
- * @param \ElkArte\EmailParse $email_message
+ * @param EmailParse $email_message
  * @package Maillist
  */
 function query_key_maintenance($email_message)
@@ -1776,7 +1775,7 @@ function query_key_maintenance($email_message)
 	$db = database();
 
 	// Old keys simply expire
-	$days = (!empty($modSettings['maillist_key_active'])) ? $modSettings['maillist_key_active'] : 21;
+	$days = (empty($modSettings['maillist_key_active'])) ? 21 : $modSettings['maillist_key_active'];
 	$delete_old = time() - ($days * 24 * 60 * 60);
 
 	// Consume the database key that was just used .. one reply per key,
@@ -1788,11 +1787,11 @@ function query_key_maintenance($email_message)
 			WHERE message_key = {string:key}
 				AND message_type = {string:type}
 				AND message_id = {string:message_id}',
-			array(
+			[
 				'key' => $email_message->message_key,
 				'type' => $email_message->message_type,
 				'message_id' => $email_message->message_id,
-			)
+			]
 		);
 	}
 
@@ -1801,9 +1800,9 @@ function query_key_maintenance($email_message)
 	$db->query('', '
 		DELETE FROM {db_prefix}postby_emails
 		WHERE time_sent < {int:delete_old}',
-		array(
+		[
 			'delete_old' => $delete_old
-		)
+		]
 	);
 }
 
@@ -1816,11 +1815,11 @@ function query_key_maintenance($email_message)
  * - Updates the who's online list with the member and action
  *
  * @param array $pbe
- * @param \ElkArte\EmailParse $email_message
+ * @param EmailParse $email_message
  * @param array $topic_info
  * @package Maillist
  */
-function query_update_member_stats($pbe, $email_message, $topic_info = array())
+function query_update_member_stats($pbe, $email_message, $topic_info = [])
 {
 	$db = database();
 
@@ -1838,32 +1837,32 @@ function query_update_member_stats($pbe, $email_message, $topic_info = array())
 
 	// Update the members total time logged in data
 	require_once(SUBSDIR . '/Members.subs.php');
-	updateMemberData($pbe['profile']['id_member'], array('total_time_logged_in' => $total_time_logged_in, 'last_login' => $last_login));
+	updateMemberData($pbe['profile']['id_member'], ['total_time_logged_in' => $total_time_logged_in, 'last_login' => $last_login]);
 
 	// Show they are active in the who's online list and what they have done
 	if ($email_message->message_type === 'm' || $email_message->message_type === 't')
 	{
-		$get_temp = array(
+		$get_temp = [
 			'action' => 'postbyemail',
 			'topic' => $topic_info['id_topic'],
 			'last_msg' => $topic_info['id_last_msg'],
 			'board' => $topic_info['id_board']
-		);
+		];
 	}
 	elseif ($email_message->message_type === 'x')
 	{
-		$get_temp = array(
+		$get_temp = [
 			'action' => 'topicbyemail',
 			'topic' => $topic_info['id'],
 			'board' => $topic_info['board'],
-		);
+		];
 	}
 	else
 	{
-		$get_temp = array(
+		$get_temp = [
 			'action' => 'pm',
 			'sa' => 'byemail'
-		);
+		];
 	}
 
 	// Place the entry in to the online log so the who's online can use it
@@ -1872,9 +1871,9 @@ function query_update_member_stats($pbe, $email_message, $topic_info = array())
 	$member_ip = empty($pbe['profile']['member_ip']) ? 0 : $pbe['profile']['member_ip'];
 	$db->insert($do_delete ? 'ignore' : 'replace',
 		'{db_prefix}log_online',
-		array('session' => 'string', 'id_member' => 'int', 'id_spider' => 'int', 'log_time' => 'int', 'ip' => 'string', 'url' => 'string'),
-		array($session_id, $pbe['profile']['id_member'], 0, $last_login, $member_ip, $serialized),
-		array('session')
+		['session' => 'string', 'id_member' => 'int', 'id_spider' => 'int', 'log_time' => 'int', 'ip' => 'string', 'url' => 'string'],
+		[$session_id, $pbe['profile']['id_member'], 0, $last_login, $member_ip, $serialized],
+		['session']
 	);
 }
 
@@ -1886,29 +1885,23 @@ function query_update_member_stats($pbe, $email_message, $topic_info = array())
  * - Converts an email response (text or html) to a BBC equivalent via pbe_Email_to_bbc
  * - Formats the email response such that it looks structured and not chopped up (via pbe_fix_email_body)
  *
- * @param bool $html
- * @param \ElkArte\EmailParse $email_message
+ * @param EmailParse $email_message
  * @param array $pbe
  *
  * @return string
  * @package Maillist
  */
-function pbe_load_text(&$html, $email_message, $pbe)
+function pbe_load_text($email_message, $pbe)
 {
-	if ($html)
-	{
-		$text = pbe_load_html($email_message, $html);
-	}
-	else
-	{
-		$text = $email_message->getPlainBody();
-	}
+	$html = $email_message->html_found;
+
+	$text = $html ? pbe_load_html($email_message, $html) : $email_message->getPlainBody();
 
 	// Convert to BBC and format it, so it looks like a post
 	$text = pbe_email_to_bbc($text, $html);
 
-	$pbe['profile']['real_name'] = $pbe['profile']['real_name'] ?? '';
-	$text = pbe_fix_email_body($text, $pbe['profile']['real_name'], (empty($email_message->_converted_utf8) ? $email_message->headers['x-parameters']['content-type']['charset'] : 'UTF-8'));
+	$pbe_real_name = $pbe['profile']['real_name'] ?? '';
+	$text = pbe_fix_email_body($text, $pbe_real_name, (empty($email_message->_converted_utf8) ? $email_message->headers['x-parameters']['content-type']['charset'] : 'UTF-8'));
 
 	// Do we even have a message left to post?
 	$text = Util::htmltrim($text);
@@ -1933,7 +1926,7 @@ function pbe_load_text(&$html, $email_message, $pbe)
  * Checks and removes role=presentation tables.  If to many tables remain, returns the plain text
  * version of the email as converting too many html tables to bbc simply will not look good
  *
- * @param \ElkArte\EmailParse $email_message
+ * @param EmailParse $email_message
  * @param bool $html
  * @return string
  */
@@ -1978,7 +1971,7 @@ function pbe_load_html($email_message, &$html)
  * - returns true if successful or false for any number of failures
  *
  * @param array $pbe array of all pbe user_info values
- * @param \ElkArte\EmailParse $email_message
+ * @param EmailParse $email_message
  * @param array $topic_info
  *
  * @return bool
@@ -1991,42 +1984,41 @@ function pbe_create_post($pbe, $email_message, $topic_info)
 
 	// Validate they have permission to reply
 	$becomesApproved = true;
-	if (!in_array('postby_email', $pbe['user_info']['permissions']) && !$pbe['user_info']['is_admin'])
+	if (!$pbe['user_info']['is_admin'] && !in_array('postby_email', $pbe['user_info']['permissions'], true))
 	{
 		return pbe_emailError('error_permission', $email_message);
 	}
 
-	if ($topic_info['locked'] && !$pbe['user_info']['is_admin'] && !in_array('moderate_forum', $pbe['user_info']['permissions']))
+	if ($topic_info['locked'] && !$pbe['user_info']['is_admin'] && !in_array('moderate_forum', $pbe['user_info']['permissions'], true))
 	{
 		return pbe_emailError('error_locked', $email_message);
 	}
 
 	if ($topic_info['id_member_started'] === $pbe['profile']['id_member'] && !$pbe['user_info']['is_admin'])
 	{
-		if ($modSettings['postmod_active'] && in_array('post_unapproved_replies_any', $pbe['user_info']['permissions']) && (!in_array('post_reply_any', $pbe['user_info']['permissions'])))
+		if ($modSettings['postmod_active'] && in_array('post_unapproved_replies_any', $pbe['user_info']['permissions'], true) && (!in_array('post_reply_any', $pbe['user_info']['permissions'])))
 		{
 			$becomesApproved = false;
 		}
-		elseif (!in_array('post_reply_own', $pbe['user_info']['permissions']))
+		elseif (!in_array('post_reply_own', $pbe['user_info']['permissions'], true))
 		{
 			return pbe_emailError('error_cant_reply', $email_message);
 		}
 	}
 	elseif (!$pbe['user_info']['is_admin'])
 	{
-		if ($modSettings['postmod_active'] && in_array('post_unapproved_replies_any', $pbe['user_info']['permissions']) && (!in_array('post_reply_any', $pbe['user_info']['permissions'])))
+		if ($modSettings['postmod_active'] && in_array('post_unapproved_replies_any', $pbe['user_info']['permissions'], true) && (!in_array('post_reply_any', $pbe['user_info']['permissions'])))
 		{
 			$becomesApproved = false;
 		}
-		elseif (!in_array('post_reply_any', $pbe['user_info']['permissions']))
+		elseif (!in_array('post_reply_any', $pbe['user_info']['permissions'], true))
 		{
 			return pbe_emailError('error_cant_reply', $email_message);
 		}
 	}
 
 	// Convert to BBC and Format the message
-	$html = $email_message->html_found;
-	$text = pbe_load_text($html, $email_message, $pbe);
+	$text = pbe_load_text($email_message, $pbe);
 	if (empty($text))
 	{
 		return pbe_emailError('error_no_message', $email_message);
@@ -2046,29 +2038,29 @@ function pbe_create_post($pbe, $email_message, $topic_info)
 	}
 
 	// Setup the post variables.
-	$msgOptions = array(
+	$msgOptions = [
 		'id' => 0,
 		'subject' => strpos($topic_info['subject'], trim($pbe['response_prefix'])) === 0 ? $topic_info['subject'] : $pbe['response_prefix'] . $topic_info['subject'],
 		'smileys_enabled' => true,
 		'body' => $text,
-		'attachments' => empty($attachIDs) ? array() : $attachIDs,
+		'attachments' => empty($attachIDs) ? [] : $attachIDs,
 		'approved' => $becomesApproved
-	);
+	];
 
-	$topicOptions = array(
+	$topicOptions = [
 		'id' => $topic_info['id_topic'],
 		'board' => $topic_info['id_board'],
 		'mark_as_read' => true,
 		'is_approved' => !$modSettings['postmod_active'] || empty($topic_info['id_topic']) || !empty($topic_info['approved'])
-	);
+	];
 
-	$posterOptions = array(
+	$posterOptions = [
 		'id' => $pbe['profile']['id_member'],
 		'name' => $pbe['profile']['real_name'],
 		'email' => $pbe['profile']['email_address'],
 		'update_post_count' => empty($topic_info['count_posts']),
 		'ip' => $email_message->load_ip() ? $email_message->ip : $pbe['profile']['member_ip']
-	);
+	];
 
 	// Make the post.
 	createPost($msgOptions, $topicOptions, $posterOptions);
@@ -2091,7 +2083,7 @@ function pbe_create_post($pbe, $email_message, $topic_info)
 	if ($becomesApproved)
 	{
 		require_once(SUBSDIR . '/Notification.subs.php');
-		sendNotifications($topic_info['id_topic'], 'reply', array(), array(), $pbe);
+		sendNotifications($topic_info['id_topic'], 'reply', [], [], $pbe);
 	}
 
 	return true;
@@ -2107,7 +2099,7 @@ function pbe_create_post($pbe, $email_message, $topic_info)
  * - Returns true if successful or false for any number of failures
  *
  * @param array $pbe array of pbe 'user_info' values
- * @param \ElkArte\EmailParse $email_message
+ * @param EmailParse $email_message
  * @param array $pm_info
  *
  * @return bool
@@ -2120,14 +2112,13 @@ function pbe_create_pm($pbe, $email_message, $pm_info)
 	global $modSettings, $txt;
 
 	// Can they send?
-	if (!$pbe['user_info']['is_admin'] && !in_array('pm_send', $pbe['user_info']['permissions']))
+	if (!$pbe['user_info']['is_admin'] && !in_array('pm_send', $pbe['user_info']['permissions'], true))
 	{
 		return pbe_emailError('error_pm_not_allowed', $email_message);
 	}
 
 	// Convert the PM to BBC and Format the message
-	$html = $email_message->html_found;
-	$text = pbe_load_text($html, $email_message, $pbe);
+	$text = pbe_load_text($email_message, $pbe);
 	if (empty($text))
 	{
 		return pbe_emailError('error_no_message', $email_message);
@@ -2140,17 +2131,17 @@ function pbe_create_pm($pbe, $email_message, $pm_info)
 	}
 
 	// For sending the message...
-	$from = array(
+	$from = [
 		'id' => $pbe['profile']['id_member'],
 		'name' => $pbe['profile']['real_name'],
 		'username' => $pbe['profile']['member_name']
-	);
+	];
 
 	$pm_info['subject'] = strpos($pm_info['subject'], trim($pbe['response_prefix'])) === 0 ? $pm_info['subject'] : $pbe['response_prefix'] . $pm_info['subject'];
 
 	// send/save the actual PM.
 	require_once(SUBSDIR . '/PersonalMessage.subs.php');
-	$pm_result = sendpm(array('to' => array($pm_info['id_member_from']), 'bcc' => array()), $pm_info['subject'], $text, true, $from, $pm_info['id_pm_head']);
+	$pm_result = sendpm(['to' => [$pm_info['id_member_from']], 'bcc' => []], $pm_info['subject'], $text, true, $from, $pm_info['id_pm_head']);
 
 	// Assuming all went well, mark this as read, replied to and update the unread counter
 	if (!empty($pm_result))
@@ -2174,7 +2165,7 @@ function pbe_create_pm($pbe, $email_message, $pm_info)
  * - Requires the pbe, email_message and board_info arrays to be populated.
  *
  * @param array $pbe array of pbe 'user_info' values
- * @param \ElkArte\EmailParse $email_message
+ * @param EmailParse $email_message
  * @param array $board_info
  *
  * @return bool
@@ -2196,7 +2187,7 @@ function pbe_create_topic($pbe, $email_message, $board_info)
 	$becomesApproved = true;
 	if (!$pbe['user_info']['is_admin'])
 	{
-		if (!in_array('postby_email', $pbe['user_info']['permissions']))
+		if (!in_array('postby_email', $pbe['user_info']['permissions'], true))
 		{
 			return pbe_emailError('error_permission', $email_message);
 		}
@@ -2205,7 +2196,7 @@ function pbe_create_topic($pbe, $email_message, $board_info)
 		{
 			$becomesApproved = false;
 		}
-		elseif (!in_array('post_new', $pbe['user_info']['permissions']))
+		elseif (!in_array('post_new', $pbe['user_info']['permissions'], true))
 		{
 			return pbe_emailError('error_cant_start', $email_message);
 		}
@@ -2219,7 +2210,7 @@ function pbe_create_topic($pbe, $email_message, $board_info)
 
 	// First on the agenda the subject
 	$subject = pbe_clean_email_subject($email_message->subject);
-	$subject = strtr(Util::htmlspecialchars($subject), array("\r" => '', "\n" => '', "\t" => ''));
+	$subject = strtr(Util::htmlspecialchars($subject), ["\r" => '', "\n" => '', "\t" => '']);
 
 	// Not to long not to short
 	if (Util::strlen($subject) > 100)
@@ -2233,8 +2224,7 @@ function pbe_create_topic($pbe, $email_message, $board_info)
 	}
 
 	// The message itself will need a bit of work
-	$html = $email_message->html_found;
-	$text = pbe_load_text($html, $email_message, $pbe);
+	$text = pbe_load_text($email_message, $pbe);
 	if (empty($text))
 	{
 		return pbe_emailError('error_no_message', $email_message);
@@ -2257,28 +2247,28 @@ function pbe_create_topic($pbe, $email_message, $board_info)
 	require_once(SUBSDIR . '/Post.subs.php');
 
 	// Setup the topic variables.
-	$msgOptions = array(
+	$msgOptions = [
 		'id' => 0,
 		'subject' => $subject,
 		'smileys_enabled' => true,
 		'body' => $text,
-		'attachments' => empty($attachIDs) ? array() : $attachIDs,
+		'attachments' => empty($attachIDs) ? [] : $attachIDs,
 		'approved' => $becomesApproved
-	);
+	];
 
-	$topicOptions = array(
+	$topicOptions = [
 		'id' => 0,
 		'board' => $board_info['id_board'],
 		'mark_as_read' => false
-	);
+	];
 
-	$posterOptions = array(
+	$posterOptions = [
 		'id' => $pbe['profile']['id_member'],
 		'name' => $pbe['profile']['real_name'],
 		'email' => $pbe['profile']['email_address'],
 		'update_post_count' => empty($board_info['count_posts']),
 		'ip' => $email_message->ip ?? $pbe['profile']['member_ip']
-	);
+	];
 
 	// Attempt to make the new topic.
 	createPost($msgOptions, $topicOptions, $posterOptions);
@@ -2300,7 +2290,7 @@ function pbe_create_topic($pbe, $email_message, $board_info)
 	if ($becomesApproved)
 	{
 		require_once(SUBSDIR . '/Notification.subs.php');
-		sendNotifications($topicOptions['id'], 'reply', array(), array(), $pbe);
+		sendNotifications($topicOptions['id'], 'reply', [], [], $pbe);
 	}
 
 	// Update this users info so the log shows them as active

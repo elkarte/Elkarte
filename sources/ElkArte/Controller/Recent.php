@@ -25,60 +25,28 @@ use ElkArte\FrontpageInterface;
  */
 class Recent extends AbstractController implements FrontpageInterface
 {
-	/**
-	 * The object that will retrieve the data
-	 *
-	 * @var \ElkArte\Recent
-	 */
+	/** @var \ElkArte\Recent The object that will retrieve the data */
 	private $_grabber;
 
-	/**
-	 * Sets range to query
-	 *
-	 * @var int[]
-	 */
+	/** @var int[] Sets range to query */
 	private $_maxMsgID;
 
-	/**
-	 * The url for the recent action
-	 *
-	 * @var string
-	 */
+	/** @var string The url for the recent action */
 	private $_base_url;
 
-	/**
-	 * The number of posts found
-	 *
-	 * @var int
-	 */
+	/** @var int The number of posts found */
 	private $_total_posts;
 
-	/**
-	 * The starting place for pagination
-	 *
-	 * @var
-	 */
+	/** @var int The starting place for pagination */
 	private $_start;
 
-	/**
-	 * The permissions own/any for use in the query
-	 *
-	 * @var array
-	 */
-	private $_permissions = array();
+	/** @var array The permissions own/any for use in the query */
+	private $_permissions = [];
 
-	/**
-	 * Pass to pageindex, to use "url.page" instead of "url;start=page"
-	 *
-	 * @var bool
-	 */
+	/** @var bool Pass to pageindex, to use "url.page" instead of "url;start=page" */
 	private $_flex_start = false;
 
-	/**
-	 * Number of posts per page
-	 *
-	 * @var int
-	 */
+	/** @var int Number of posts per page */
 	private $_num_per_page = 10;
 
 	/**
@@ -153,7 +121,7 @@ class Recent extends AbstractController implements FrontpageInterface
 	/**
 	 * Intended entry point for recent controller class.
 	 *
-	 * @see \ElkArte\AbstractController::action_index()
+	 * @see AbstractController::action_index
 	 */
 	public function action_index()
 	{
@@ -244,7 +212,7 @@ class Recent extends AbstractController implements FrontpageInterface
 			$post['use_likes'] = !empty($post['tests']['can_like']) && allowedTo('like_posts') && empty($context['is_locked'])
 				&& ($post['poster']['id'] != $this->user->id || !empty($modSettings['likeAllowSelf']))
 				&& (empty($modSettings['likeMinPosts']) || $modSettings['likeMinPosts'] <= $this->user->posts);
-			$post['like_counter'] = !empty($context['likes'][$counter]['count']) ? $context['likes'][$counter]['count'] : 0;
+			$post['like_counter'] = empty($context['likes'][$counter]['count']) ? 0 : $context['likes'][$counter]['count'];
 			$post['can_like'] = $post['use_likes'] && !$post['you_liked'];
 			$post['can_unlike'] = $post['use_likes'] && $post['you_liked'];
 			$post['likes_enabled'] = !empty($modSettings['likes_enabled']) && ($post['use_likes'] || ($post['like_counter'] != 0));
@@ -474,9 +442,7 @@ class Recent extends AbstractController implements FrontpageInterface
 		];
 
 		// Drop all non-enabled ones
-		return array_filter($postButtons, function ($button) {
-			return !isset($button['enabled']) ||$button['enabled'] !== false;
-		});
+		return array_filter($postButtons, static fn($button) => !isset($button['enabled']) || $button['enabled'] !== false);
 	}
 
 	/**

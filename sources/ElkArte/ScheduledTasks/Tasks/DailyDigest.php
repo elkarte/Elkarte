@@ -64,7 +64,7 @@ class DailyDigest implements ScheduledTaskInterface
 		$maillist = !empty($modSettings['maillist_enabled']) && !empty($modSettings['maillist_digest_enabled']);
 		if ($maillist)
 		{
-			require_once(SUBSDIR . '/Emailpost.subs.php');
+			require_once(SUBSDIR . '/Maillist.subs.php');
 		}
 
 		$is_weekly = !empty($is_weekly) ? 1 : 0;

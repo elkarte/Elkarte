@@ -29,7 +29,7 @@ class Stats extends AbstractController
 	/**
 	 * Entry point for this class.
 	 *
-	 * @see \ElkArte\AbstractController::action_index()
+	 * @see AbstractController::action_index
 	 */
 	public function action_index()
 	{
@@ -65,7 +65,7 @@ class Stats extends AbstractController
 		}
 
 		// Expanding out the history summary
-		list($year, $month) = $this->_expandedStats();
+		[$year, $month] = $this->_expandedStats();
 
 		// Just a lil' help from our friend :P
 		require_once(SUBSDIR . '/Stats.subs.php');

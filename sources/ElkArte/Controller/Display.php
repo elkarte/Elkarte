@@ -45,7 +45,7 @@ class Display extends AbstractController
 	/** @var int|string Start viewing the topics from ... (page, all, other) */
 	protected $_start;
 
-	/** @var bool if to include unapproved posts in the count  */
+	/** @var bool if to include unapproved posts in the count */
 	protected $includeUnapproved;
 
 	/** @var array data returned from getTopicInfo() */
@@ -194,10 +194,7 @@ class Display extends AbstractController
 			MembersList::loadGuest();
 
 			// What?  It's not like it *couldn't* be only guests in this topic...
-			if (!empty($posters))
-			{
-				MembersList::load($posters);
-			}
+			MembersList::load($posters);
 
 			// If using quick reply, load the user into context for the poster area
 			$this->prepareQuickReply();
@@ -543,32 +540,15 @@ class Display extends AbstractController
 			if ($start === 'new')
 			{
 				// Guests automatically go to the last post.
-				if ($this->user->is_guest)
-				{
-					$start = $total_visible_posts - 1;
-				}
-				else
-				{
-					// Fall through to the next if statement.
-					$start = 'msg' . $this->topicinfo['new_from'];
-				}
+				$start = $this->user->is_guest ? $total_visible_posts - 1 : 'msg' . $this->topicinfo['new_from'];
 			}
 
 			// Start from a certain time index, not a message.
 			if (strpos($start, 'from') === 0)
 			{
 				$timestamp = (int) substr($start, 4);
-				if ($timestamp === 0)
-				{
-					$start = 0;
-				}
-				else
-				{
-					// Find the number of messages posted before said time...
-					$start = countNewPosts($this->topicinfo['id_topic'], $this->topicinfo, $timestamp);
-				}
+				$start = $timestamp === 0 ? 0 : countNewPosts($this->topicinfo['id_topic'], $this->topicinfo, $timestamp);
 			}
-			// Link to a message...
 			elseif (strpos($start, 'msg') === 0)
 			{
 				$this->_virtual_msg = (int) substr($start, 3);
@@ -667,7 +647,7 @@ class Display extends AbstractController
 		$context['subject'] = $this->topicinfo['subject'];
 		$context['num_views'] = $this->topicinfo['num_views'];
 		$context['num_views_text'] = (int) $this->topicinfo['num_views'] === 1 ? $txt['read_one_time'] : sprintf($txt['read_many_times'], $this->topicinfo['num_views']);
-		$context['mark_unread_time'] = !empty($this->_virtual_msg) ? $this->_virtual_msg : $this->topicinfo['new_from'];
+		$context['mark_unread_time'] = empty($this->_virtual_msg) ? $this->topicinfo['new_from'] : $this->_virtual_msg;
 
 		// Set a canonical URL for this page.
 		$context['canonical_url'] = getUrl('topic', ['topic' => $this->topicinfo['id_topic'], 'start' => $context['start'], 'subject' => $this->topicinfo['subject']]);
@@ -812,15 +792,15 @@ class Display extends AbstractController
 	{
 		global $modSettings;
 
-		list ($sig_limits) = explode(':', $modSettings['signature_settings']);
+		[$sig_limits] = explode(':', $modSettings['signature_settings']);
 		$signature_settings = explode(',', $sig_limits);
 		if ($this->user->is_guest)
 		{
-			$this->_show_signatures = !empty($signature_settings[8]) ? (int) $signature_settings[8] : 0;
+			$this->_show_signatures = empty($signature_settings[8]) ? 0 : (int) $signature_settings[8];
 		}
 		else
 		{
-			$this->_show_signatures = !empty($signature_settings[9]) ? (int) $signature_settings[9] : 0;
+			$this->_show_signatures = empty($signature_settings[9]) ? 0 : (int) $signature_settings[9];
 		}
 	}
 
@@ -871,7 +851,7 @@ class Display extends AbstractController
 		$context['can_mark_notify'] = $context['can_mark_notify'] && !$context['user']['is_guest'];
 		$context['can_reply'] = $context['can_reply'] && (empty($this->topicinfo['locked']) || allowedTo('moderate_board'));
 		$context['can_reply_unapproved'] = $context['can_reply_unapproved'] && $modSettings['postmod_active'] && (empty($this->topicinfo['locked']) || allowedTo('moderate_board'));
-		$context['can_issue_warning'] = $context['can_issue_warning']  && featureEnabled('w') && !empty($modSettings['warning_enable']);
+		$context['can_issue_warning'] = $context['can_issue_warning'] && featureEnabled('w') && !empty($modSettings['warning_enable']);
 
 		// Handle approval flags...
 		$context['can_reply_approved'] = $context['can_reply'];
@@ -1114,7 +1094,7 @@ class Display extends AbstractController
 			$remover->removeMessage($message);
 		}
 
-		redirectexit(!empty($topicGone) ? 'board=' . $board : 'topic=' . $topic . '.' . (int) $this->_req->query->start);
+		redirectexit(empty($topicGone) ? 'topic=' . $topic . '.' . (int) $this->_req->query->start : 'board=' . $board);
 	}
 
 	/**

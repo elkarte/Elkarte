@@ -41,7 +41,7 @@ class Likes extends AbstractController
 	 *
 	 * @var int
 	 */
-	protected $_id_liked = null;
+	protected $_id_liked;
 
 	/**
 	 * Entry point function for likes, permission checks, just makes sure its on
@@ -61,7 +61,7 @@ class Likes extends AbstractController
 	 * Default action method, if a specific methods was not
 	 * directly called already. Simply forwards to likepost.
 	 *
-	 * @see \ElkArte\AbstractController::action_index()
+	 * @see AbstractController::action_index
 	 */
 	public function action_index()
 	{
@@ -211,14 +211,10 @@ class Likes extends AbstractController
 		global $txt;
 
 		// An error if not possible to like.
-		if (!$this->_doLikePost('+', 'likemsg'))
-		{
-			if (empty($this->_likes_response))
-			{
-				Txt::load('Errors');
-				$this->_likes_response = array('result' => false, 'data' => $txt['like_unlike_error']);
-			}
-		}
+		if (!$this->_doLikePost('+', 'likemsg') && empty($this->_likes_response)) {
+      Txt::load('Errors');
+      $this->_likes_response = array('result' => false, 'data' => $txt['like_unlike_error']);
+  }
 
 		$this->likeResponse();
 	}
@@ -266,14 +262,10 @@ class Likes extends AbstractController
 		global $txt;
 
 		// An error if not possible to like.
-		if (!$this->_doLikePost('-', 'rlikemsg'))
-		{
-			if (empty($this->_likes_response))
-			{
-				Txt::load('Errors');
-				$this->_likes_response = array('result' => false, 'data' => $txt['like_unlike_error']);
-			}
-		}
+		if (!$this->_doLikePost('-', 'rlikemsg') && empty($this->_likes_response)) {
+      Txt::load('Errors');
+      $this->_likes_response = array('result' => false, 'data' => $txt['like_unlike_error']);
+  }
 
 		$this->likeResponse();
 	}
@@ -344,17 +336,13 @@ class Likes extends AbstractController
 			'base_href' => getUrl('profile', ['action' => 'profile', 'area' => 'showlikes', 'sa' => 'received', 'u' => $memID, 'name' => $name]),
 			'default_sort_col' => 'subject',
 			'get_items' => array(
-				'function' => function ($start, $items_per_page, $sort, $memberID) {
-					return $this->list_loadLikesReceived($start, $items_per_page, $sort, $memberID);
-				},
+				'function' => fn($start, $items_per_page, $sort, $memberID) => $this->list_loadLikesReceived($start, $items_per_page, $sort, $memberID),
 				'params' => array(
 					$memID,
 				),
 			),
 			'get_count' => array(
-				'function' => function ($memberID, $given) {
-					return $this->list_getLikesCount($memberID, $given);
-				},
+				'function' => fn($memberID, $given) => $this->list_getLikesCount($memberID, $given),
 				'params' => array(
 					$memID,
 					false,
@@ -403,11 +391,10 @@ class Likes extends AbstractController
 						'class' => 'centertext',
 					),
 					'data' => array(
-						'function' => function ($row) {
-							global $txt;
-
-							return '<a href="' . $row['who'] . '" title="' . $txt['likes_show_who'] . '"><i class="icon i-users"></i></a>';
-						},
+						'function' => static function ($row) {
+          global $txt;
+          return '<a href="' . $row['who'] . '" title="' . $txt['likes_show_who'] . '"><i class="icon i-users"></i></a>';
+      },
 						'class' => 'centertext',
 						'style' => 'width: 10%',
 					),
@@ -482,17 +469,13 @@ class Likes extends AbstractController
 			'base_href' => getUrl('profile', ['action' => 'profile', 'area' => 'showlikes', 'sa' => 'given', 'u' => $memID, 'name' => $name]),
 			'default_sort_col' => 'subject',
 			'get_items' => array(
-				'function' => function ($start, $items_per_page, $sort, $memberID) {
-					return $this->list_loadLikesPosts($start, $items_per_page, $sort, $memberID);
-				},
+				'function' => fn($start, $items_per_page, $sort, $memberID) => $this->list_loadLikesPosts($start, $items_per_page, $sort, $memberID),
 				'params' => array(
 					$memID,
 				),
 			),
 			'get_count' => array(
-				'function' => function ($memberID, $given) {
-					return $this->list_getLikesCount($memberID, $given);
-				},
+				'function' => fn($memberID, $given) => $this->list_getLikesCount($memberID, $given),
 				'params' => array(
 					$memID,
 					true
@@ -541,11 +524,10 @@ class Likes extends AbstractController
 						'class' => 'centertext',
 					),
 					'data' => array(
-						'function' => function ($row) {
-							global $txt;
-
-							return '<a href="' . $row['delete'] . '" onclick="return confirm(\'' . $txt['likes_confirm_delete'] . '\');" title="' . $txt['likes_delete'] . '"><i class="icon i-delete"></i></a>';
-						},
+						'function' => static function ($row) {
+          global $txt;
+          return '<a href="' . $row['delete'] . '" onclick="return confirm(\'' . $txt['likes_confirm_delete'] . '\');" title="' . $txt['likes_delete'] . '"><i class="icon i-delete"></i></a>';
+      },
 						'class' => 'centertext',
 						'style' => 'width: 10%',
 					),
@@ -612,17 +594,13 @@ class Likes extends AbstractController
 			'base_href' => getUrl('action', ['action' => 'likes', 'sa' => 'showWhoLiked', 'msg' => $message]),
 			'default_sort_col' => 'member',
 			'get_items' => array(
-				'function' => function ($start, $items_per_page, $sort, $messageID) {
-					return $this->list_loadPostLikers($start, $items_per_page, $sort, $messageID);
-				},
+				'function' => fn($start, $items_per_page, $sort, $messageID) => $this->list_loadPostLikers($start, $items_per_page, $sort, $messageID),
 				'params' => array(
 					$message,
 				),
 			),
 			'get_count' => array(
-				'function' => function ($messageID) {
-					return $this->list_getMessageLikeCount($messageID);
-				},
+				'function' => fn($messageID) => $this->list_getMessageLikeCount($messageID),
 				'params' => array(
 					$message,
 				),
@@ -906,6 +884,7 @@ class Likes extends AbstractController
 		{
 			$this->_likes_response = array('result' => false, 'error' => $txt['like_post_error_something_wrong']);
 		}
+
 		$this->likeResponse();
 	}
 }

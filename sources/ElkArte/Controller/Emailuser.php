@@ -47,7 +47,7 @@ class Emailuser extends AbstractController
 	/**
 	 * Default action handler
 	 *
-	 * @see \ElkArte\AbstractController::action_index()
+	 * @see AbstractController::action_index
 	 */
 	public function action_index()
 	{
@@ -368,12 +368,12 @@ class Emailuser extends AbstractController
 			'id' => $row['id_member'],
 			'name' => $row['real_name'],
 			'email' => $row['email_address'],
-			'email_link' => ($context['show_email_address'] == 'yes_permission_override' ? '<em>' : '') . '<a href="mailto:' . $row['email_address'] . '">' . $row['email_address'] . '</a>' . ($context['show_email_address'] == 'yes_permission_override' ? '</em>' : ''),
+			'email_link' => ($context['show_email_address'] === 'yes_permission_override' ? '<em>' : '') . '<a href="mailto:' . $row['email_address'] . '">' . $row['email_address'] . '</a>' . ($context['show_email_address'] === 'yes_permission_override' ? '</em>' : ''),
 			'link' => $row['id_member'] ? '<a href="' . getUrl('profile', ['action' => 'profile', 'u' => $row['id_member'], 'name' => $row['real_name']]) . '">' . $row['real_name'] . '</a>' : $row['real_name'],
 		);
 
 		// Can we see this person's email address?
-		$context['can_view_recipient_email'] = $context['show_email_address'] == 'yes' || $context['show_email_address'] == 'yes_permission_override';
+		$context['can_view_recipient_email'] = $context['show_email_address'] === 'yes' || $context['show_email_address'] === 'yes_permission_override';
 
 		// Template
 		$context['sub_template'] = 'custom_email';
@@ -583,6 +583,7 @@ class Emailuser extends AbstractController
 		{
 			$report_errors->addError('no_comment');
 		}
+
 		$poster_comment = strtr(Util::htmlspecialchars($this->_req->post->comment), array("\r" => '', "\t" => ''));
 
 		if (Util::strlen($poster_comment) > 254)
@@ -648,7 +649,7 @@ class Emailuser extends AbstractController
 		$mod_to_notify = array();
 		foreach ($result as $row)
 		{
-			if ($row['notify_types'] != 4)
+			if ($row['notify_types'] !== 4)
 			{
 				$mod_to_notify[] = $row;
 			}
@@ -684,7 +685,7 @@ class Emailuser extends AbstractController
 			// Maybe they don't want to know?!
 			if (!empty($row['mod_prefs']))
 			{
-				list (, , $pref_binary) = explode('|', $row['mod_prefs']);
+				[, , $pref_binary] = explode('|', $row['mod_prefs']);
 				if (!($pref_binary & 1) && (!($pref_binary & 2) || !in_array($row['id_member'], $real_mods)))
 				{
 					continue;
@@ -696,7 +697,7 @@ class Emailuser extends AbstractController
 				'POSTERNAME' => $poster_name,
 				'REPORTERNAME' => $reporterName,
 				'TOPICLINK' => getUrl('topic', ['topic' => $topic, 'start' => 'msg' . $msg_id, 'subject' => $subject]) . '#msg' . $msg_id,
-				'REPORTLINK' => !empty($id_report) ? getUrl('action', ['action' => 'moderate', 'area' => 'reports', 'report' => $id_report]) : '',
+				'REPORTLINK' => empty($id_report) ? '' : getUrl('action', ['action' => 'moderate', 'area' => 'reports', 'report' => $id_report]),
 				'COMMENT' => $this->_req->post->comment,
 			);
 

@@ -33,7 +33,7 @@ class Calendar extends AbstractController
 	/**
 	 * Default action handler for requests on the calendar
 	 *
-	 * @see \ElkArte\AbstractController::action_index()
+	 * @see AbstractController::action_index
 	 */
 	public function action_index()
 	{
@@ -112,17 +112,14 @@ class Calendar extends AbstractController
 		}
 
 		// If we have a day clean that too.
-		if ($context['view_week'])
+		if ($context['view_week'] && ($curPage['day'] > 31 || !mktime(0, 0, 0, $curPage['month'], $curPage['day'], $curPage['year'])))
 		{
-			if ($curPage['day'] > 31 || !mktime(0, 0, 0, $curPage['month'], $curPage['day'], $curPage['year']))
-			{
-				throw new Exception('invalid_day', false);
-			}
+			throw new Exception('invalid_day', false);
 		}
 
 		// Load all the context information needed to show the calendar grid.
 		$calendarOptions = array(
-			'start_day' => !empty($options['calendar_start_day']) ? $options['calendar_start_day'] : 0,
+			'start_day' => empty($options['calendar_start_day']) ? 0 : $options['calendar_start_day'],
 			'show_birthdays' => in_array($modSettings['cal_showbdays'], array(1, 2)),
 			'show_events' => in_array($modSettings['cal_showevents'], array(1, 2)),
 			'show_holidays' => in_array($modSettings['cal_showholidays'], array(1, 2)),
@@ -354,6 +351,7 @@ class Calendar extends AbstractController
 	{
 		$controller = new Post(new EventManager());
 		$controller->setUser(User::$info);
+
 		$hook = $controller->getHook();
 		$controller->pre_dispatch();
 		$function_name = 'action_post';
@@ -370,13 +368,11 @@ class Calendar extends AbstractController
 	 *
 	 * What it does:
 	 *
-	 * - Follows the conventions in RFC5546 http://tools.ietf.org/html/rfc5546
+	 * - Follows the conventions in RFC5546 https://tools.ietf.org/html/rfc5546
 	 * - Sets events as all day events since we don't have hourly events
 	 * - Will honor and set multi day events
 	 * - Sets a sequence number if the event has been modified.
 	 * - Accessed by action=calendar;sa=ical
-	 *
-	 * @todo .... allow for week or month export files as well?
 	 */
 	public function action_ical()
 	{

@@ -278,7 +278,7 @@ class Markasread extends AbstractController
 		}
 		else
 		{
-			list ($earlyMsg) = messageAt((int) $this->_req->query->start, $topic);
+			[$earlyMsg] = messageAt((int) $this->_req->query->start, $topic);
 			$earlyMsg--;
 		}
 

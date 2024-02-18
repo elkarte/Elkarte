@@ -31,7 +31,7 @@ class Topic extends AbstractController
 	/**
 	 * Entry point for this class (by default).
 	 *
-	 * @see \ElkArte\AbstractController::action_index()
+	 * @see AbstractController::action_index
 	 */
 	public function action_index()
 	{
@@ -83,7 +83,7 @@ class Topic extends AbstractController
 		require_once(SUBSDIR . '/Topic.subs.php');
 
 		// Find out who started the topic and its current lock status
-		list ($starter, $locked) = topicStatus($topic);
+		[$starter, $locked] = topicStatus($topic);
 
 		// Can you lock topics here, mister?
 		$user_lock = !allowedTo('lock_any');
@@ -281,7 +281,7 @@ class Topic extends AbstractController
 		$context['canonical_url'] = getUrl('action', ['topic' => $topic . '.0']);
 		$context['view_attach_mode'] = array(
 			'text' => getUrl('action', ['action' => 'topic', 'sa' => 'printpage', 'topic' => $topic . '.0']),
-			'images' =>getUrl('action', ['action' => 'topic', 'sa' => 'printpage', 'topic' => $topic . '.0', 'images']),
+			'images' => getUrl('action', ['action' => 'topic', 'sa' => 'printpage', 'topic' => $topic . '.0', 'images']),
 		);
 	}
 }

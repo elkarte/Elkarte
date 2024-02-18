@@ -22,20 +22,28 @@ final class ParserWrapper
 {
 	/** @var array Disabled tags */
 	protected $disabled = array();
+
 	/** @var \BBC\Codes */
 	protected $codes;
+
 	/** @var  \BBC\BBCParser */
 	protected $bbc_parser;
+
 	/** @var  \BBC\SmileyParser */
 	protected $smiley_parser;
+
 	/** @var  \BBC\HtmlParser */
 	protected $html_parser;
+
 	/** @var  \BBC\Autolink */
 	protected $autolink_parser;
+
 	/** @var \BBC\MarkdownParser */
 	protected $markdown_parser;
+
 	/** @var bool If smileys are enabled */
 	protected $smileys_enabled = true;
+
 	/** @var ParserWrapper */
 	public static $instance;
 
@@ -140,10 +148,7 @@ final class ParserWrapper
 			call_integration_hook('integrate_' . $area . '_' . $parser_type . '_parser', array(&$parser, $this));
 
 			// If not, use the default one
-			if (!$parser)
-			{
-				$parser = call_user_func(array($this, 'get' . ucfirst($parser_type) . 'Parser'), $area);
-			}
+			$parser = $this->{'get' . ucfirst($parser_type) . 'Parser'}($area);
 		}
 
 		return $parsers;

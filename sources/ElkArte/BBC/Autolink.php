@@ -26,27 +26,33 @@ class Autolink
 {
 	/** @var Codes */
 	protected $bbc;
+
 	/** @var bool */
 	protected $url_enabled;
+
 	/** @var bool */
 	protected $email_enabled;
+
 	/** @var bool */
 	protected $possible_link;
+
 	/** @var bool */
 	protected $possible_email;
+
 	/** @var array of search regex for urls */
 	protected $search;
+
 	/** @var array of bbc url coded links */
 	protected $replace;
+
 	/** @var array of search regex for email */
 	protected $email_search;
+
 	/** @var array of bbc email coded links */
 	protected $email_replace;
 
 	/**
 	 * Autolink constructor.
-	 *
-	 * @param Codes $bbc
 	 */
 	public function __construct(Codes $bbc)
 	{
@@ -164,7 +170,7 @@ class Autolink
 	public function parseLinks($data)
 	{
 		// Switch out quotes really quick because they can cause problems.
-		$data = strtr($data, array('&#039;' => '\'', '&nbsp;' => "\xC2\xA0", '&quot;' => '>">', '"' => '<"<', '&lt;' => '<lt<'));
+		$data = strtr($data, array('&#039;' => "'", '&nbsp;' => "\xC2\xA0", '&quot;' => '>">', '"' => '<"<', '&lt;' => '<lt<'));
 
 		$result = preg_replace($this->search, $this->replace, $data);
 
@@ -175,7 +181,7 @@ class Autolink
 		}
 
 		// Switch those quotes back
-		return strtr($data, array('\'' => '&#039;', "\xC2\xA0" => '&nbsp;', '>">' => '&quot;', '<"<' => '"', '<lt<' => '&lt;'));
+		return strtr($data, array("'" => '&#039;', "\xC2\xA0" => '&nbsp;', '>">' => '&quot;', '<"<' => '"', '<lt<' => '&lt;'));
 	}
 
 	/**
@@ -237,6 +243,11 @@ class Autolink
 	 */
 	public function hasPossible()
 	{
-		return $this->hasPossibleLink() || $this->hasPossibleEmail();
+		if ($this->hasPossibleLink())
+		{
+			return true;
+		}
+
+		return $this->hasPossibleEmail();
 	}
 }

@@ -218,16 +218,21 @@ class Codes
 
 	/**  */
 	public const TRIM_NONE = 0;
+
 	/**  */
 	public const TRIM_INSIDE = 1;
+
 	/**  */
 	public const TRIM_OUTSIDE = 2;
+
 	/**  */
 	public const TRIM_BOTH = 3;
 
 	// These are mainly for *ATTR_QUOTED since there are 3 options
 	public const OPTIONAL = -1;
+
 	public const NONE = 0;
+
 	public const REQUIRED = 1;
 
 	/**
@@ -236,8 +241,11 @@ class Codes
 	 * The rest of the attributes depend on the type and other options.
 	 */
 	protected $bbc = array();
+
 	protected $itemcodes = array();
+
 	protected $disabled = array();
+
 	protected $parsing_codes = array();
 
 	/**
@@ -459,7 +467,7 @@ class Codes
 				self::ATTR_TAG => 'icode',
 				self::ATTR_TYPE => self::TYPE_UNPARSED_CONTENT,
 				self::ATTR_CONTENT => '<span class="bbc_code_inline">$1</span>',
-				self::ATTR_VALIDATE => $this->isDisabled('icode') ? null : function (&$data) {
+				self::ATTR_VALIDATE => $this->isDisabled('icode') ? null : static function (&$data) {
 					$data = strtr($data, array('[' => '&#91;', ']' => '&#93;'));
 				},
 				self::ATTR_BLOCK_LEVEL => false,
@@ -490,7 +498,7 @@ class Codes
 					),
 				),
 				self::ATTR_CONTENT => '<img src="$1" title="{title}" alt="{alt}" style="{width}{height}" class="bbc_img resized" />',
-				self::ATTR_VALIDATE => function (&$data) {
+				self::ATTR_VALIDATE => static function (&$data) {
 					$data = addProtocol($data);
 				},
 				self::ATTR_DISABLED_CONTENT => '($1)',
@@ -502,7 +510,7 @@ class Codes
 				self::ATTR_TAG => 'img',
 				self::ATTR_TYPE => self::TYPE_UNPARSED_CONTENT,
 				self::ATTR_CONTENT => '<img src="$1" alt="" class="bbc_img" />',
-				self::ATTR_VALIDATE => function (&$data) {
+				self::ATTR_VALIDATE => static function (&$data) {
 					$data = addProtocol($data);
 				},
 				self::ATTR_DISABLED_CONTENT => '($1)',
@@ -514,7 +522,7 @@ class Codes
 				self::ATTR_TAG => 'iurl',
 				self::ATTR_TYPE => self::TYPE_UNPARSED_CONTENT,
 				self::ATTR_CONTENT => '<a href="$1" class="bbc_link">$1</a>',
-				self::ATTR_VALIDATE => function (&$data) {
+				self::ATTR_VALIDATE => static function (&$data) {
 					//$data = removeBr($data);
 					$data = addProtocol($data);
 				},
@@ -527,7 +535,7 @@ class Codes
 				self::ATTR_TYPE => self::TYPE_UNPARSED_EQUALS,
 				self::ATTR_BEFORE => '<a href="$1" class="bbc_link">',
 				self::ATTR_AFTER => '</a>',
-				self::ATTR_VALIDATE => function (&$data) {
+				self::ATTR_VALIDATE => static function (&$data) {
 					$data = $data[0] === '#' ? '#post_' . substr($data, 1) : addProtocol($data);
 				},
 				self::ATTR_DISALLOW_CHILDREN => array(
@@ -734,7 +742,7 @@ class Codes
 				self::ATTR_TEST => '[1-7]{1}',
 				self::ATTR_BEFORE => '<span style="font-size: $1;" class="bbc_size">',
 				self::ATTR_AFTER => '</span>',
-				self::ATTR_VALIDATE => function (&$data) {
+				self::ATTR_VALIDATE => static function (&$data) {
 					$sizes = array(1 => 0.7, 2 => 1.0, 3 => 1.35, 4 => 1.45, 5 => 2.0, 6 => 2.65, 7 => 3.95);
 					$data = $sizes[(int) $data] . 'em';
 				},
@@ -871,7 +879,7 @@ class Codes
 				self::ATTR_TAG => 'url',
 				self::ATTR_TYPE => self::TYPE_UNPARSED_CONTENT,
 				self::ATTR_CONTENT => '<a href="$1" class="bbc_link" target="_blank" rel="noopener noreferrer">$1</a>',
-				self::ATTR_VALIDATE => function (&$data) {
+				self::ATTR_VALIDATE => static function (&$data) {
 					$data = addProtocol($data);
 				},
 				self::ATTR_BLOCK_LEVEL => false,
@@ -883,7 +891,7 @@ class Codes
 				self::ATTR_TYPE => self::TYPE_UNPARSED_EQUALS,
 				self::ATTR_BEFORE => '<a href="$1" class="bbc_link" target="_blank" rel="noopener noreferrer">',
 				self::ATTR_AFTER => '</a>',
-				self::ATTR_VALIDATE => function (&$data) {
+				self::ATTR_VALIDATE => static function (&$data) {
 					$data = addProtocol($data);
 				},
 				self::ATTR_DISALLOW_CHILDREN => array(
@@ -984,7 +992,7 @@ class Codes
 
 		if (!$this->isDisabled('li') && !$this->isDisabled('list'))
 		{
-			foreach ($item_codes as $c => $dummy)
+			foreach (array_keys($item_codes) as $c)
 			{
 				// Skip anything "bad"
 				if (!is_string($c) || trim($c) === '')

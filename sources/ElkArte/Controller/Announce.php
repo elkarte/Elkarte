@@ -60,7 +60,7 @@ class Announce extends AbstractController
 	/**
 	 * Default (sub)action for ?action=announce
 	 *
-	 * @see \ElkArte\AbstractController::action_index()
+	 * @see AbstractController::action_index()
 	 */
 	public function action_index()
 	{
@@ -150,7 +150,7 @@ class Announce extends AbstractController
 		$topic_info = getTopicInfo($topic, 'message');
 
 		// Prepare a plain text (markdown) body for email use, does the censoring as well
-		require_once(SUBSDIR . '/Emailpost.subs.php');
+		require_once(SUBSDIR . '/Maillist.subs.php');
 		pbe_prepare_text($topic_info['body'], $topic_info['subject']);
 
 		// We need this in order to be able send emails.

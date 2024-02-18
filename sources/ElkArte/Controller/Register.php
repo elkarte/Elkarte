@@ -30,7 +30,6 @@ use ElkArte\Languages\Txt;
 use ElkArte\PrivacyPolicy;
 use ElkArte\Profile\ProfileOptions;
 use ElkArte\Util;
-use ProfileFields;
 
 /**
  * It registers new members, and it allows the administrator moderate member registration
@@ -41,10 +40,7 @@ class Register extends AbstractController
 	private const STATUS_NOT_ACTIVE = 0;
 	private const STATUS_APPROVED_AND_ACTIVE = 1;
 	private const STATUS_AWAITING_REACTIVATION = 2;
-	private const STATUS_AWAITING_ADMIN = 3;
-	private const STATUS_AWAITING_DELETION = 4;
-	private const STATUS_AWAITING_COPPA  = 5;
-	private const STATUS_BANNED = 10;
+	private const STATUS_AWAITING_COPPA = 5;
 
 	/** @var array Holds the results of a findUser() request */
 	private $_row;
@@ -65,10 +61,17 @@ class Register extends AbstractController
 		global $modSettings;
 
 		// Check if the administrator has it disabled.
-		if (!empty($modSettings['registration_method']) && (int) $modSettings['registration_method'] === 3)
+		if (empty($modSettings['registration_method']))
 		{
-			throw new Exception('registration_disabled', false);
+			return;
 		}
+
+		if ((int) $modSettings['registration_method'] !== 3)
+		{
+			return;
+		}
+
+		throw new Exception('registration_disabled', false);
 	}
 
 	/**
@@ -76,7 +79,7 @@ class Register extends AbstractController
 	 *
 	 * By default, this is called for action=register
 	 *
-	 * @see \ElkArte\AbstractController::action_index()
+	 * @see AbstractController::action_index
 	 */
 	public function action_index()
 	{
@@ -420,7 +423,7 @@ class Register extends AbstractController
 		}
 
 		// By default, assume email is hidden, only show it if we tell it to.
-		$this->_req->post->hide_email = !empty($this->_req->post->allow_email) ? 0 : 1;
+		$this->_req->post->hide_email = empty($this->_req->post->allow_email) ? 1 : 0;
 
 		// Validate the passed language file.
 		if (isset($this->_req->post->lngfile) && !empty($modSettings['userLanguage']))
@@ -446,11 +449,11 @@ class Register extends AbstractController
 		// Set the options needed for registration.
 		$regOptions = array(
 			'interface' => 'guest',
-			'username' => !empty($this->_req->post->user) ? $this->_req->post->user : '',
-			'email' => !empty($this->_req->post->email) ? $this->_req->post->email : '',
-			'password' => !empty($this->_req->post->passwrd1) ? $this->_req->post->passwrd1 : '',
-			'password_check' => !empty($this->_req->post->passwrd2) ? $this->_req->post->passwrd2 : '',
-			'auth_method' => !empty($this->_req->post->authenticate) ? $this->_req->post->authenticate : '',
+			'username' => empty($this->_req->post->user) ? '' : $this->_req->post->user,
+			'email' => empty($this->_req->post->email) ? '' : $this->_req->post->email,
+			'password' => empty($this->_req->post->passwrd1) ? '' : $this->_req->post->passwrd1,
+			'password_check' => empty($this->_req->post->passwrd2) ? '' : $this->_req->post->passwrd2,
+			'auth_method' => empty($this->_req->post->authenticate) ? '' : $this->_req->post->authenticate,
 			'check_reserved_name' => true,
 			'check_password_strength' => true,
 			'check_email_ban' => true,
@@ -503,7 +506,7 @@ class Register extends AbstractController
 			}
 
 			// Is this required but not there?
-			if (trim($value) === '' && $row['show_reg'] > 1)
+			if ($row['show_reg'] > 1 && trim($value) === '')
 			{
 				$reg_errors->addError(array('custom_field_empty', array($row['name'])));
 			}
@@ -548,7 +551,7 @@ class Register extends AbstractController
 			return false;
 		}
 
-		$lang = !empty($modSettings['userLanguage']) ? $modSettings['userLanguage'] : 'english';
+		$lang = empty($modSettings['userLanguage']) ? 'english' : $modSettings['userLanguage'];
 		$agreement = new Agreement($lang);
 		$agreement->accept($memberID, $this->user->ip, empty($modSettings['agreementRevision']) ? Util::strftime('%Y-%m-%d', forum_time(false)) : $modSettings['agreementRevision']);
 
@@ -1020,7 +1023,7 @@ class Register extends AbstractController
 
 			// This will ensure we don't actually get an error message if it works!
 			$context['error_title'] = $txt['invalid_activation_resend'];
-			throw new Exception(!empty($email_change) ? 'change_email_success' : 'resend_email_success', false);
+			throw new Exception(empty($email_change) ? 'resend_email_success' : 'change_email_success', false);
 		}
 	}
 
@@ -1041,16 +1044,14 @@ class Register extends AbstractController
 			{
 				throw new Exception('already_activated', false);
 			}
-			elseif ($this->_row['validation_code'] === '')
+			if ($this->_row['validation_code'] === '')
 			{
 				Txt::load('Profile');
 				throw new Exception($txt['registration_not_approved'] . ' <a href="' . $scripturl . '?action=register;sa=activate;user=' . $this->_row['member_name'] . '">' . $txt['here'] . '</a>.', false);
 			}
-
 			$context['sub_template'] = 'retry_activate';
 			$context['page_title'] = $txt['invalid_activation_code'];
 			$context['member_id'] = $this->_row['id_member'];
-
 			return false;
 		}
 
@@ -1088,8 +1089,8 @@ class Register extends AbstractController
 		if (isset($this->_req->query->form))
 		{
 			// Some simple contact stuff for the forum.
-			$context['forum_contacts'] = (!empty($modSettings['coppaPost']) ? $modSettings['coppaPost'] . '<br /><br />' : '') . (!empty($modSettings['coppaFax']) ? $modSettings['coppaFax'] . '<br />' : '');
-			$context['forum_contacts'] = !empty($context['forum_contacts']) ? $context['forum_name_html_safe'] . '<br />' . $context['forum_contacts'] : '';
+			$context['forum_contacts'] = (empty($modSettings['coppaPost']) ? '' : $modSettings['coppaPost'] . '<br /><br />') . (empty($modSettings['coppaFax']) ? '' : $modSettings['coppaFax'] . '<br />');
+			$context['forum_contacts'] = empty($context['forum_contacts']) ? '' : $context['forum_name_html_safe'] . '<br />' . $context['forum_contacts'];
 
 			// Showing template?
 			if (!isset($this->_req->query->dl))
@@ -1115,7 +1116,7 @@ class Register extends AbstractController
 					->removeHeader('all')
 					->header('Connection', 'close')
 					->header('Content-Disposition', 'attachment; filename="approval.txt"')
-					->contentType( 'application/octet-stream')
+					->contentType('application/octet-stream')
 					->header('Content-Length', count($data))
 					->sendHeaders();
 
@@ -1316,6 +1317,7 @@ class Register extends AbstractController
 			$context['coppa_agree_above'] = sprintf($txt[($context['require_agreement'] ? 'agreement_' : '') . 'agree_coppa_above'], $modSettings['coppaAge']);
 			$context['coppa_agree_below'] = sprintf($txt[($context['require_agreement'] ? 'agreement_' : '') . 'agree_coppa_below'], $modSettings['coppaAge']);
 		}
+
 		createToken('register');
 	}
 

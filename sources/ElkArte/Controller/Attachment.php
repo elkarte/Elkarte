@@ -18,16 +18,16 @@ namespace ElkArte\Controller;
 
 use ElkArte\AbstractController;
 use ElkArte\Action;
+use ElkArte\AttachmentsDirectory;
 use ElkArte\Errors\AttachmentErrorContext;
 use ElkArte\Exceptions\Exception;
 use ElkArte\FileFunctions;
-use ElkArte\Graphics\TextImage;
 use ElkArte\Graphics\Image;
-use ElkArte\AttachmentsDirectory;
+use ElkArte\Graphics\TextImage;
 use ElkArte\Http\Headers;
+use ElkArte\Languages\Txt;
 use ElkArte\TemporaryAttachmentsList;
 use ElkArte\Themes\ThemeLoader;
-use ElkArte\Languages\Txt;
 use ElkArte\User;
 
 /**
@@ -255,13 +255,13 @@ class Attachment extends AbstractController
 			if ($result !== true)
 			{
 				Txt::load('Errors');
-				$context['json_data'] = array('result' => false, 'data' => $txt[!empty($result) ? $result : 'attachment_not_found']);
+				$context['json_data'] = ['result' => false, 'data' => $txt[empty($result) ? 'attachment_not_found' : $result]];
 			}
 		}
 		else
 		{
 			Txt::load('Errors');
-			$context['json_data'] = array('result' => false, 'data' => $txt['attachment_not_found']);
+			$context['json_data'] = ['result' => false, 'data' => $txt['attachment_not_found']];
 		}
 	}
 
@@ -276,7 +276,7 @@ class Attachment extends AbstractController
 	 * - Views to attachments and avatars do not increase hits and are not logged
 	 *   in the "Who's Online" log.
 	 *
-	 * @throws \ElkArte\Exceptions\Exception
+	 * @throws Exception
 	 */
 	public function action_dlattach()
 	{
@@ -322,7 +322,7 @@ class Attachment extends AbstractController
 			$attachPos = getAttachmentPosition($id_attach);
 			if ($attachPos !== false)
 			{
-				list($id_board, $id_topic) = array_values($attachPos);
+				[$id_board, $id_topic] = array_values($attachPos);
 			}
 		}
 		else
@@ -346,14 +346,14 @@ class Attachment extends AbstractController
 			if (empty($attachment['filename']))
 			{
 				$full_attach = getAttachmentFromTopic($id_attach, $id_topic);
-				$attachment['filename'] = !empty($full_attach['filename']) ? $full_attach['filename'] : '';
+				$attachment['filename'] = empty($full_attach['filename']) ? '' : $full_attach['filename'];
 				$attachment['id_attach'] = 0;
 				$attachment['attachment_type'] = 0;
 				$attachment['approved'] = $full_attach['approved'];
 				$attachment['id_member'] = $full_attach['id_member'];
 
 				// If it is a known extension, show a mimetype extension image
-				$check = returnMimeThumb(!empty($full_attach['fileext']) ? $full_attach['fileext'] : 'default');
+				$check = returnMimeThumb(empty($full_attach['fileext']) ? 'default' : $full_attach['fileext']);
 				if ($check !== false)
 				{
 					$attachment['fileext'] = 'png';
@@ -366,7 +366,7 @@ class Attachment extends AbstractController
 					$filename = $attachmentsDir->getCurrent() . '/' . $attachment['filename'];
 				}
 
-				if (substr(getMimeType($filename), 0, 5) !== 'image')
+				if (strpos(getMimeType($filename), 'image') !== 0)
 				{
 					$attachment['fileext'] = 'png';
 					$attachment['mime_type'] = 'image/png';
@@ -385,14 +385,14 @@ class Attachment extends AbstractController
 		$real_filename = $attachment['filename'] ?? '';
 		$file_hash = $attachment['file_hash'] ?? '';
 		$file_ext = $attachment['fileext'] ?? '';
-		$id_attach = $attachment['id_attach'] ?? '';
-		$attachment_type = $attachment['attachment_type'] ?? '';
+		$id_attach = $attachment['id_attach'] ?? -1;
+		$attachment_type = $attachment['attachment_type'] ?? -1;
 		$mime_type = $attachment['mime_type'] ?? '';
 		$is_approved = $attachment['approved'] ?? '';
 		$id_member = $attachment['id_member'] ?? '';
 
 		// If it isn't yet approved, do they have permission to view it?
-		if (!$is_approved && ($id_member == 0 || $this->user->id !== $id_member) && ($attachment_type == 0 || $attachment_type == 3))
+		if (!$is_approved && ($id_member === 0 || $this->user->id !== $id_member) && ($attachment_type === 0 || $attachment_type === 3))
 		{
 			isAllowedTo('approve_posts', $id_board ?? $board);
 		}
@@ -409,7 +409,7 @@ class Attachment extends AbstractController
 		}
 
 		$eTag = '"' . substr($id_attach . $real_filename . @filemtime($filename), 0, 64) . '"';
-		$disposition = !isset($this->_req->query->image) ? 'attachment' : 'inline';
+		$disposition = isset($this->_req->query->image) ? 'inline' : 'attachment';
 		$do_cache = !(!isset($this->_req->query->image) && getValidMimeImageType($file_ext) !== '');
 
 		// Make sure the mime type warrants an inline display.
@@ -441,7 +441,7 @@ class Attachment extends AbstractController
 	 * @param int $width If set, defines the width of the image, text font size will be scaled to fit
 	 * @param int $height If set, defines the height of the image
 	 * @param bool $split If true will break text strings so all words are separated by newlines
-	 * @throws \ElkArte\Exceptions\Exception
+	 * @throws Exception
 	 */
 	public function action_text_to_image($text = null, $width = 200, $height = 75, $split = false)
 	{
@@ -457,7 +457,7 @@ class Attachment extends AbstractController
 			$img = new TextImage($text);
 			$img = $img->generate($width, $height);
 		}
-		catch (\Exception $e)
+		catch (\Exception)
 		{
 			throw new Exception('no_access', false);
 		}
@@ -487,13 +487,8 @@ class Attachment extends AbstractController
 			return false;
 		}
 
-		// Support is available on the server
-		if (!function_exists('gzencode') && !empty($modSettings['enableCompressedOutput']))
-		{
-			return false;
-		}
-
-		return true;
+		// Support is available on the serve
+		return !(!function_exists('gzencode') && !empty($modSettings['enableCompressedOutput']));
 	}
 
 	/**
@@ -529,9 +524,9 @@ class Attachment extends AbstractController
 		}
 
 		// If it hasn't been modified since the last time this attachment was retrieved, there's no need to display it again.
-		if (!empty($this->_req->server->HTTP_IF_MODIFIED_SINCE))
+		if (!empty($_SERVER['HTTP_IF_MODIFIED_SINCE']))
 		{
-			list ($modified_since) = explode(';', $this->_req->server->HTTP_IF_MODIFIED_SINCE);
+			[$modified_since] = explode(';', $this->_req->server->HTTP_IF_MODIFIED_SINCE);
 			if (!$check_filename || strtotime($modified_since) >= filemtime($filename))
 			{
 				@ob_end_clean();
@@ -688,15 +683,15 @@ class Attachment extends AbstractController
 				$filename = getAttachmentFilename($real_filename, $id_attach, $id_folder, false, $file_hash);
 			}
 		}
-		catch (\Exception $e)
+		catch (\Exception $exception)
 		{
-			throw new Exception($e->getMessage(), false);
+			throw new Exception($exception->getMessage(), false);
 		}
 
 		$resize = true;
 
 		// Return mime type ala mimetype extension
-		if (substr(getMimeType($filename), 0, 5) !== 'image')
+		if (strpos(getMimeType($filename), 'image') !== 0)
 		{
 			$checkMime = returnMimeThumb($file_ext);
 			$mime_type = 'image/png';
@@ -718,7 +713,7 @@ class Attachment extends AbstractController
 			$max_width = $this->_req->isSet('thumb') && !empty($modSettings['attachmentThumbWidth']) ? $modSettings['attachmentThumbWidth'] : 250;
 			$max_height = $this->_req->isSet('thumb') && !empty($modSettings['attachmentThumbHeight']) ? $modSettings['attachmentThumbHeight'] : 250;
 
-			$image->createThumbnail($max_width, $max_height, $filename, null,false);
+			$image->createThumbnail($max_width, $max_height, $filename, null, false);
 		}
 
 		// With the headers complete, send the file data

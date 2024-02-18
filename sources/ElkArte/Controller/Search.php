@@ -39,24 +39,13 @@ use ElkArte\VerificationControls\VerificationControlsIntegrate;
  */
 class Search extends AbstractController
 {
-	/**
-	 * Holds the search object
-	 *
-	 * @var \ElkArte\Search\Search
-	 */
-	protected $_search = null;
+	/** @var \ElkArte\Search\Search Holds the search object */
+	protected $_search;
 
-	/**
-	 * The class that takes care of rendering the message icons (\ElkArte\MessageTopicIcons)
-	 *
-	 * @var null|\ElkArte\MessageTopicIcons
-	 */
-	protected $_icon_sources = null;
+	/** @var null|\ElkArte\MessageTopicIcons The class that takes care of rendering the message icons */
+	protected $_icon_sources;
 
-	/**
-	 *
-	 * @var array
-	 */
+	/** @var array */
 	protected $_participants = [];
 
 	/**
@@ -87,7 +76,6 @@ class Search extends AbstractController
 		{
 			redirectexit('action=memberlist;sa=search;fields=name,email;search=' . urlencode($search));
 		}
-
 		// If load management is on and the load is high, no need to even show the form.
 		if (!empty($modSettings['loadavg_search']) && $modSettings['current_load'] >= $modSettings['loadavg_search'])
 		{
@@ -100,7 +88,7 @@ class Search extends AbstractController
 	 *
 	 * - The default action for no sub-action is... present the search screen
 	 *
-	 * @see \ElkArte\AbstractController::action_index()
+	 * @see AbstractController::action_index
 	 */
 	public function action_index()
 	{
@@ -120,10 +108,10 @@ class Search extends AbstractController
 	 * - Decodes and loads search parameters given in the URL (if any).
 	 * - The form redirects to index.php?action=search;sa=results.
 	 *
-	 * @uses Search language file and Errors language when needed
+	 * @throws \ElkArte\Exceptions\Exception loadavg_search_disabled
 	 * @uses Search template, searchform sub template
 	 *
-	 * @throws \ElkArte\Exceptions\Exception loadavg_search_disabled
+	 * @uses Search language file and Errors language when needed
 	 */
 	public function action_search()
 	{
@@ -312,6 +300,7 @@ class Search extends AbstractController
 		{
 			$array['userspec'] = '*';
 		}
+
 		$array['show_complete'] = (int) $array['show_complete'];
 		$array['subject_only'] = (int) $array['subject_only'];
 
@@ -377,6 +366,7 @@ class Search extends AbstractController
 		$params = $this->_req->getRequest('params', '', '');
 		$search_params = new SearchParams($params);
 		$search_params->merge((array) $this->_req->post, $recentPercentage, $maxMembersToSearch);
+
 		$this->_search->setParams($search_params, !empty($modSettings['search_simple_fulltext']));
 
 		$context['compact'] = $this->_search->isCompact();
@@ -488,16 +478,16 @@ class Search extends AbstractController
 				'humungousTopicPosts' => $humungousTopicPosts,
 				'shortTopicPosts' => $shortTopicPosts,
 				'maxMessageResults' => $maxMessageResults,
-				'search_index' => !empty($modSettings['search_index']) ? $modSettings['search_index'] : '',
+				'search_index' => empty($modSettings['search_index']) ? '' : $modSettings['search_index'],
 				'banned_words' => empty($modSettings['search_banned_words']) ? array() : explode(',', $modSettings['search_banned_words']),
 			));
 			$context['topics'] = $this->_search->searchQuery(
 				new SearchApiWrapper($search_config, $this->_search->getSearchParams())
 			);
 		}
-		catch (\Exception $e)
+		catch (\Exception $exception)
 		{
-			$context['search_errors'][$e->getMessage()] = true;
+			$context['search_errors'][$exception->getMessage()] = true;
 
 			return $this->action_search();
 		}
@@ -575,7 +565,7 @@ class Search extends AbstractController
 		$renderer->setParticipants($this->_participants);
 
 		$context['topic_starter_id'] = 0;
-		$context['get_topics'] = [$renderer, 'getContext'];
+		$context['get_topics'] = static fn(bool $reset = false): bool|array => $renderer->getContext($reset);
 
 		$context['jump_to'] = array(
 			'label' => addslashes(un_htmlspecialchars($txt['jump_to'])),
@@ -587,7 +577,7 @@ class Search extends AbstractController
 	}
 
 	/**
-	 * Show an anti spam verification control
+	 * Show an anti-spam verification control
 	 */
 	protected function _controlVerifications()
 	{
@@ -616,6 +606,14 @@ class Search extends AbstractController
 		}
 	}
 
+	/**
+	 * Prepares the participants data
+	 *
+	 * @param bool $participationEnabled Indicates if participation is enabled
+	 * @param int $user_id The ID of the user
+	 *
+	 * @return void
+	 */
 	protected function _prepareParticipants($participationEnabled, $user_id)
 	{
 		// If we want to know who participated in what then load this now.

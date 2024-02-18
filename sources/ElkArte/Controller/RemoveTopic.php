@@ -26,11 +26,7 @@ use ElkArte\MessagesDelete;
  */
 class RemoveTopic extends AbstractController
 {
-	/**
-	 * Hold topic information for supplied message
-	 *
-	 * @var array
-	 */
+	/** @var array Hold topic information for supplied message */
 	private $_topic_info;
 
 	/**
@@ -48,7 +44,7 @@ class RemoveTopic extends AbstractController
 	 * All actions are directly called from other points, so there
 	 * is currently nothing to action in this method.
 	 *
-	 * @see \ElkArte\AbstractController::action_index()
+	 * @see AbstractController::action_index
 	 */
 	public function action_index()
 	{
@@ -313,8 +309,7 @@ class RemoveTopic extends AbstractController
 		// Lets send them back somewhere that may make sense
 		if (isset($actioned_messages) && count($actioned_messages) === 1 && empty($topics_to_restore))
 		{
-			reset($actioned_messages);
-			redirectexit('topic=' . key($actioned_messages));
+			redirectexit('topic=' . array_key_first($actioned_messages));
 		}
 		elseif (count($topics_to_restore) === 1)
 		{

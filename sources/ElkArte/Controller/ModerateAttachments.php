@@ -1,7 +1,7 @@
 <?php
 
 /**
- * All of the moderation actions for attachments, basically approve them
+ * All the moderation actions for attachments, basically approve them
  *
  * @package   ElkArte Forum
  * @copyright ElkArte Forum contributors
@@ -21,6 +21,9 @@ use ElkArte\Cache\Cache;
 use ElkArte\Exceptions\Exception;
 
 /**
+ * Class ModerateAttachments
+ *
+ * This class is responsible for moderating attachments.
  */
 class ModerateAttachments extends AbstractController
 {
@@ -28,7 +31,7 @@ class ModerateAttachments extends AbstractController
 	 * Forward to attachments approval method is the only responsibility
 	 * of this controller.
 	 *
-	 * @see \ElkArte\AbstractController::action_index()
+	 * @see AbstractController::action_index
 	 */
 	public function action_index()
 	{
@@ -72,7 +75,7 @@ class ModerateAttachments extends AbstractController
 
 		// @todo nb: this requires permission to approve posts, not manage attachments
 		// Now we have some ID's cleaned and ready to approve, but first - let's check we have permission!
-		$allowed_boards = !empty($this->user->mod_cache['ap']) ? $this->user->mod_cache['ap'] : boardsAllowedTo('approve_posts');
+		$allowed_boards = empty($this->user->mod_cache['ap']) ? boardsAllowedTo('approve_posts') : $this->user->mod_cache['ap'];
 
 		if ($allowed_boards == [0])
 		{
