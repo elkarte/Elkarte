@@ -17,10 +17,10 @@
 
 namespace ElkArte\Graphics;
 
-use ElkArte\FileFunctions;
-use ElkArte\Graphics\Manipulators\Imagick;
-use ElkArte\Graphics\Manipulators\Gd2;
 use ElkArte\Exceptions\Exception;
+use ElkArte\FileFunctions;
+use ElkArte\Graphics\Manipulators\Gd2;
+use ElkArte\Graphics\Manipulators\ImageMagick;
 
 /**
  * Class Image
@@ -41,31 +41,27 @@ class Image
 		IMAGETYPE_WEBP => 'webp'
 	];
 
-	/** @var \ElkArte\Graphics\Manipulators\Imagick|\ElkArte\Graphics\Manipulators\Gd2 */
+	/** @var ImageMagick|Gd2 */
 	protected $_manipulator;
 
 	/** @var string filename we are working with */
 	protected $_fileName = '';
 
-	/** @var bool if to force only using GD even if Imagick is present */
-	protected $_force_gd = false;
-
 	/** @var bool if the image has been loaded into the manipulator */
 	protected $_image_loaded = false;
 
-	/** @var string what manipulator (GD, Imagick, etc) is in use */
+	/** @var string what manipulator (GD, ImageMagick, etc) is in use */
 	protected $_current_manipulator = '';
 
 	/**
 	 * Image constructor.
 	 *
 	 * @param string $fileName
-	 * @param bool $force_gd
+	 * @param bool $_force_gd
 	 */
-	public function __construct($fileName, $force_gd = false)
+	public function __construct($fileName, protected $_force_gd = false)
 	{
 		$this->setFileName($fileName);
-		$this->_force_gd = $force_gd;
 
 		$this->loadImage();
 	}
@@ -85,10 +81,10 @@ class Image
 	 */
 	public function hasWebpSupport()
 	{
-		if (!$this->_force_gd && Imagick::canUse())
+		if (!$this->_force_gd && ImageMagick::canUse())
 		{
 			$check = \Imagick::queryformats();
-			if (!array_search('WEBP', $check))
+			if (!in_array('WEBP', $check, true))
 			{
 				return false;
 			}
@@ -121,12 +117,7 @@ class Image
 			return false;
 		}
 
-		if (!empty($modSettings['attachmentCheckExtensions']) && stripos($modSettings['attachmentExtensions'], ',webp') === false)
-		{
-			return false;
-		}
-
-		return true;
+		return !(!empty($modSettings['attachmentCheckExtensions']) && stripos($modSettings['attachmentExtensions'], ',webp') === false);
 	}
 
 	/**
@@ -139,7 +130,7 @@ class Image
 		{
 			$this->setManipulator();
 		}
-		catch (\Exception $e)
+		catch (\Exception)
 		{
 			// Nothing to do
 		}
@@ -177,10 +168,10 @@ class Image
 	protected function setManipulator()
 	{
 		// Later this could become an array of "manipulators" (or not) and remove the hard-coded IM/GD requirements
-		if (!$this->_force_gd && Imagick::canUse())
+		if (!$this->_force_gd && ImageMagick::canUse())
 		{
-			$this->_manipulator = new Imagick($this->_fileName);
-			$this->_current_manipulator = 'Imagick';
+			$this->_manipulator = new ImageMagick($this->_fileName);
+			$this->_current_manipulator = 'ImageMagick';
 		}
 		elseif (Gd2::canUse())
 		{
@@ -214,7 +205,7 @@ class Image
 	}
 
 	/**
-	 * Its how big ?
+	 * It's how big ?
 	 *
 	 * @return int
 	 */
@@ -263,7 +254,7 @@ class Image
 	 * @param string $dstName name to save
 	 * @param null|int $format image format image constant value to save the thumbnail
 	 * @param null|bool $force if forcing the image resize to scale up, the default action
-	 * @return bool|\ElkArte\Graphics\Image On success returns an image class loaded with new image
+	 * @return bool|Image On success returns an image class loaded with new image
 	 */
 	public function createThumbnail($max_width, $max_height, $dstName = '', $format = null, $force = null)
 	{
@@ -322,13 +313,19 @@ class Image
 		}
 
 		// If you have alpha channels, best keep them with PNG
-		if ($this->getMimeType() === 'image/png' && $this->getTransparency())
+		if ($this->getMimeType() !== 'image/png')
 		{
-			return IMAGETYPE_PNG;
+			// The default, JPG
+			return IMAGETYPE_JPEG;
 		}
 
-		// The default, JPG
-		return IMAGETYPE_JPEG;
+		if (!$this->getTransparency())
+		{
+			// The default, JPG
+			return IMAGETYPE_JPEG;
+		}
+
+		return IMAGETYPE_PNG;
 	}
 
 	/**
@@ -356,7 +353,7 @@ class Image
 		{
 			$this->_manipulator->autoRotate();
 		}
-		catch (\Exception $e)
+		catch (\Exception)
 		{
 			return false;
 		}
@@ -404,7 +401,7 @@ class Image
 		{
 			return $this->_manipulator->resizeImage($max_width, $max_height, $strip, $force_resize, $thumbnail);
 		}
-		catch (\Exception $e)
+		catch (\Exception)
 		{
 			return false;
 		}

@@ -14,7 +14,9 @@
 
 namespace ElkArte\Graphics\Manipulators;
 
-use \ElkArte\Graphics\Image;
+use ElkArte\Graphics\Image;
+use Exception;
+use GdImage;
 
 /**
  * Class Gd2
@@ -23,7 +25,7 @@ use \ElkArte\Graphics\Image;
  */
 class Gd2 extends AbstractManipulator
 {
-	/** @var \GdImage */
+	/** @var GdImage */
 	protected $_image;
 
 	/**
@@ -39,7 +41,7 @@ class Gd2 extends AbstractManipulator
 		{
 			$this->memoryCheck();
 		}
-		catch (\Exception $e)
+		catch (Exception)
 		{
 			// Just pass through since the check is not fatal
 		}
@@ -75,10 +77,10 @@ class Gd2 extends AbstractManipulator
 			try
 			{
 				$imagecreatefrom = 'imagecreatefrom' . Image::DEFAULT_FORMATS[$this->imageDimensions[2]];
-				/** @var $image \GdImage */
+				/** @var $image GdImage */
 				$image = $imagecreatefrom($this->_fileName);
 			}
-			catch (\Exception $e)
+			catch (Exception)
 			{
 				return false;
 			}
@@ -96,7 +98,7 @@ class Gd2 extends AbstractManipulator
 	/**
 	 * Sets the internal GD image resource.
 	 *
-	 * @param \GdImage $image
+	 * @param GdImage $image
 	 */
 	protected function _setImage($image)
 	{
@@ -129,7 +131,7 @@ class Gd2 extends AbstractManipulator
 				$image = imagecreatefromstring($image_data);
 				unset($image_data);
 			}
-			catch (\Exception $e)
+			catch (Exception)
 			{
 				return false;
 			}
@@ -173,13 +175,13 @@ class Gd2 extends AbstractManipulator
 		$src_height = $this->_height;
 
 		// Allow for a re-encode to the same size
-		$max_width = $max_width ?? $src_width;
-		$max_height = $max_height ?? $src_height;
+		$max_width ??= $src_width;
+		$max_height ??= $src_height;
 
 		// Determine whether to resize to max width or to max height (depending on the limits.)
 		if (!empty($max_width) && !empty($max_height))
 		{
-			list($dst_width, $dst_height) = $this->imageRatio($max_width, $max_height);
+			[$dst_width, $dst_height] = $this->imageRatio($max_width, $max_height);
 
 			// Don't bother resizing if it's already smaller...
 			if (!empty($dst_width) && !empty($dst_height) && ($dst_width < $src_width || $dst_height < $src_height || $force_resize))
@@ -236,7 +238,7 @@ class Gd2 extends AbstractManipulator
 		// No bogus formats
 		if (!isset(Image::DEFAULT_FORMATS[$preferred_format]))
 		{
-			return $success;
+			return false;
 		}
 
 		// Save the image as ..
@@ -251,30 +253,35 @@ class Gd2 extends AbstractManipulator
 					imagesavealpha($this->_image, true);
 					$success = imagepng($this->_image, $output_name, 9, PNG_ALL_FILTERS);
 				}
+
 				break;
 			case IMAGETYPE_GIF:
 				if (function_exists('imagegif'))
 				{
 					$success = imagegif($this->_image, $output_name);
 				}
+
 				break;
 			case IMAGETYPE_WBMP:
 				if (function_exists('imagewbmp'))
 				{
 					$success = imagewbmp($this->_image, $output_name);
 				}
+
 				break;
 			case IMAGETYPE_BMP:
 				if (function_exists('imagebmp'))
 				{
 					$success = imagebmp($this->_image, $output_name);
 				}
+
 				break;
 			case IMAGETYPE_WEBP:
 				if (function_exists('imagewebp'))
 				{
 					$success = imagewebp($this->_image, $output_name, $quality);
 				}
+
 				break;
 			default:
 				if (function_exists('imagejpeg'))
@@ -304,7 +311,7 @@ class Gd2 extends AbstractManipulator
 	 * - Only works with jpeg images, could add TIFF as well
 	 *
 	 * @return bool
-	 * @throws \Exception
+	 * @throws Exception
 	 */
 	public function autoRotate()
 	{
@@ -425,7 +432,7 @@ class Gd2 extends AbstractManipulator
 		if ($width > 1024 || $height > 1024)
 		{
 			// Single pass scale down, not looking for quality here
-			list($width, $height) = $this->imageScaleFactor(800);
+			[$width, $height] = $this->imageScaleFactor(800);
 			$image = imagescale($this->_image, $width, $height, IMG_NEAREST_NEIGHBOUR);
 		}
 
@@ -435,7 +442,7 @@ class Gd2 extends AbstractManipulator
 		{
 			for ($j = 0; $j < $height; $j++)
 			{
-				if (imagecolorat($image, $i, $j) & 0x7F000000)
+				if ((imagecolorat($image, $i, $j) & 0x7F000000) !== 0)
 				{
 					$transparency = true;
 					break 2;
@@ -472,7 +479,7 @@ class Gd2 extends AbstractManipulator
 			$background = imagecolorallocate($image, 255, 255, 255);
 			imagefill($image, 0, 0, $background);
 		}
-		catch (\Exception $e)
+		catch (Exception)
 		{
 			return false;
 		}
@@ -483,7 +490,6 @@ class Gd2 extends AbstractManipulator
 
 		if (!$true_type)
 		{
-			// @todo If using imagestring, (no freetype) we would need to output each line then advance the position
 			$text = str_replace("\n", ' ', $text);
 			$text_length = strlen($text);
 		}
@@ -546,7 +552,7 @@ class Gd2 extends AbstractManipulator
 	 */
 	public function __destruct()
 	{
-		if (gettype($this->_image) === 'object' && get_class($this->_image) === 'GdImage')
+		if ($this->_image instanceof GdImage)
 		{
 			imagedestroy($this->_image);
 			unset($this->_image);
