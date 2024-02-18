@@ -30,7 +30,7 @@ abstract class AbstractResult
 	/**
 	 * Constructor.
 	 *
-	 * @param $result Result Object
+	 * @param $result Object
 	 * @param null $details
 	 * @param resource $result
 	 */

@@ -30,7 +30,7 @@ class Connection implements ConnectionInterface
 	 */
 	public static function initiate($db_server, $db_name, $db_user, $db_passwd, $db_prefix, $db_options = [])
 	{
-		$db_port = (int) ($db_options['port'] ?? 0);
+		$db_port = (int) ($db_options['port'] ?? null);
 		$db_name = empty($db_options['select_db']) ? '' : $db_name;
 		$db_server = (empty($db_options['persist']) ? '' : 'p:') . $db_server;
 

@@ -181,6 +181,8 @@ class Query extends AbstractQuery
 	 */
 	public function error($db_string)
 	{
+		global $txt, $modSettings;
+
 		[$file, $line] = $this->backtrace_message();
 		$file = $file ?? __FILE__;
 		$line = $line ?? __LINE__;
@@ -313,7 +315,7 @@ class Query extends AbstractQuery
 	 */
 	private function handleConnectionError($db_string)
 	{
-		global $db_persist, $db_server, $db_user, $db_passwd, $db_name, $ssi_db_user, $ssi_db_passwd;
+		global $db_persist, $db_server, $db_user, $db_passwd, $db_name, $ssi_db_user, $ssi_db_passwd, $db_port;
 
 		// Check for the "lost connection" or "deadlock found" errors - and try it just one more time.
 		$new_connection = false;
@@ -321,13 +323,13 @@ class Query extends AbstractQuery
 		// Are we in SSI mode?  If so try that username and password first
 		if (ELK === 'SSI' && !empty($ssi_db_user) && !empty($ssi_db_passwd))
 		{
-			$new_connection = @mysqli_connect((empty($db_persist) ? '' : 'p:') . $db_server, $ssi_db_user, $ssi_db_passwd, $db_name);
+			$new_connection = @mysqli_connect((empty($db_persist) ? '' : 'p:') . $db_server, $ssi_db_user, $ssi_db_passwd, $db_name, $db_port ?? null);
 		}
 
 		// Fall back to the regular username and password if need be
 		if (!$new_connection)
 		{
-			$new_connection = @mysqli_connect((empty($db_persist) ? '' : 'p:') . $db_server, $db_user, $db_passwd, $db_name);
+			$new_connection = @mysqli_connect((empty($db_persist) ? '' : 'p:') . $db_server, $db_user, $db_passwd, $db_name, $db_port ?? null);
 		}
 
 		if ($new_connection)
@@ -481,221 +483,6 @@ class Query extends AbstractQuery
 		}
 
 		return null;
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	public function olderror($db_string)
-	{
-		global $txt, $webmaster_email, $modSettings, $db_persist;
-		global $db_server, $db_user, $db_passwd, $db_name, $ssi_db_user, $ssi_db_passwd;
-
-		// We'll try recovering the file and line number the original db query was called from.
-		[$file, $line] = $this->backtrace_message();
-
-		// Just in case nothing can be found from debug_backtrace
-		$file ??= __FILE__;
-		$line ??= __LINE__;
-
-		// This is the error message...
-		$query_error = mysqli_error($this->connection);
-		$query_errno = mysqli_errno($this->connection);
-
-		// Error numbers:
-		//    1016: Can't open file '....MYI'
-		//    1030: Got error ??? from table handler.
-		//    1034: Incorrect key file for table.
-		//    1035: Old key file for table.
-		//    1142: Command denied
-		//    1205: Lock wait timeout exceeded.
-		//    1213: Deadlock found.
-		//    2006: Server has gone away.
-		//    2013: Lost connection to server during query.
-
-		// We cannot do something, try to find out what and act accordingly
-		if ($query_errno === self::ERR_COMMAND_DENIED)
-		{
-			$command = substr(trim($db_string), 0, 6);
-			if ($command === 'DELETE' || $command === 'UPDATE' || $command === 'INSERT')
-			{
-				// We can try to ignore it (warning the admin though it's a thing to do)
-				// and serve the page just SELECTing
-				$_SESSION['query_command_denied'][$command] = $query_error;
-
-				// Let the admin know there is a command denied issue
-				Errors::instance()->log_error($txt['database_error'] . ': ' . $query_error . (empty($modSettings['enableErrorQueryLogging']) ? '' : "\n\n$db_string"), 'database', $file, $line);
-
-				return false;
-			}
-		}
-
-		// Database error auto fixing ;).
-		if (function_exists('\\ElkArte\\Cache\\Cache::instance()->get') && (!isset($modSettings['autoFixDatabase']) || $modSettings['autoFixDatabase'] === '1'))
-		{
-			$db_last_error = db_last_error();
-			$cache = Cache::instance();
-
-			// Force caching on, just for the error checking.
-			$old_cache = $cache->getLevel();
-			if ($cache->isEnabled() === false)
-			{
-				$cache->setLevel(1);
-			}
-
-			$temp = null;
-
-			if ($cache->getVar($temp, 'db_last_error', 600))
-			{
-				$db_last_error = max($db_last_error, $temp);
-			}
-
-			if ($db_last_error < time() - 3600 * 24 * 3)
-			{
-				// We know there's a problem... but what?  Try to auto detect.
-				if ($query_errno === 1030 && strpos($query_error, ' 127 ') !== false)
-				{
-					preg_match_all('~(?:[\n\r]|^)[^\']+?(?:FROM|JOIN|UPDATE|TABLE) ((?:[^\n\r(]+?(?:, )?)*)~', $db_string, $matches);
-
-					$fix_tables = [];
-					foreach ($matches[1] as $tables)
-					{
-						$tables = array_unique(explode(',', $tables));
-						foreach ($tables as $table)
-						{
-							// Now, it's still theoretically possible this could be an injection.  So backtick it!
-							if (trim($table) !== '')
-							{
-								$fix_tables[] = '`' . strtr(trim($table), array('`' => '')) . '`';
-							}
-						}
-					}
-
-					$fix_tables = array_unique($fix_tables);
-				}
-				// Table crashed.  Let's try to fix it.
-				elseif ($query_errno === 1016)
-				{
-					if (preg_match('~\'([^.\']+)~', $query_error, $match) != 0)
-					{
-						$fix_tables = ['`' . $match[1] . '`'];
-					}
-				}
-				// Indexes crashed.  Should be easy to fix!
-				elseif ($query_errno === 1034 || $query_errno === 1035)
-				{
-					preg_match("~'([^']+?)'~", $query_error, $match);
-					$fix_tables = ['`' . $match[1] . '`'];
-				}
-			}
-
-			// Check for errors like 145... only fix it once every three days, and send an email. (can't use empty because it might not be set yet...)
-			if (!empty($fix_tables))
-			{
-				// sources/Logging.php for logLastDatabaseError(), subs/Mail.subs.php for sendmail().
-				// @todo this should go somewhere else, not into the db-mysql layer I think
-				require_once(SOURCEDIR . '/Logging.php');
-				require_once(SUBSDIR . '/Mail.subs.php');
-
-				// Make a note of the REPAIR...
-				$cache->put('db_last_error', time(), 600);
-				if (!$cache->getVar($temp, 'db_last_error', 600))
-				{
-					logLastDatabaseError();
-				}
-
-				// Attempt to find and repair the broken table.
-				foreach ($fix_tables as $table)
-				{
-					$this->query('', '
-						REPAIR TABLE ' . $table, false);
-				}
-
-				// And send off an email!
-				sendmail($webmaster_email, $txt['database_error'], $txt['tried_to_repair']);
-
-				$modSettings['cache_enable'] = $old_cache;
-
-				// Try the query again...?
-				$ret = $this->query('', $db_string, false);
-				if ($ret->hasResults())
-				{
-					return $ret;
-				}
-			}
-			else
-			{
-				$modSettings['cache_enable'] = $old_cache;
-			}
-
-			// Check for the "lost connection" or "deadlock found" errors - and try it just one more time.
-			if (in_array($query_errno, [1205, 1213, 2006, 2013], true))
-			{
-				$new_connection = false;
-				if (in_array($query_errno, [2006, 2013], true))
-				{
-					// Are we in SSI mode?  If so try that username and password first
-					if (ELK === 'SSI' && !empty($ssi_db_user) && !empty($ssi_db_passwd))
-					{
-						$new_connection = @mysqli_connect((empty($db_persist) ? '' : 'p:') . $db_server, $ssi_db_user, $ssi_db_passwd, $db_name);
-					}
-
-					// Fall back to the regular username and password if need be
-					if (!$new_connection)
-					{
-						$new_connection = @mysqli_connect((empty($db_persist) ? '' : 'p:') . $db_server, $db_user, $db_passwd, $db_name);
-					}
-				}
-
-				if ($new_connection)
-				{
-					$this->connection = $new_connection;
-
-					// Try a deadlock more than once more.
-					for ($n = 0; $n < 4; $n++)
-					{
-						$ret = $this->query('', $db_string, false);
-
-						$new_errno = mysqli_errno($new_connection);
-						if ($ret->hasResults() || in_array($new_errno, array(1205, 1213)))
-						{
-							break;
-						}
-					}
-
-					// If it failed again, shucks to be you... we're not trying it over and over.
-					if ($ret->hasResults())
-					{
-						return $ret;
-					}
-				}
-			}
-			// Are they out of space, perhaps?
-			elseif ($query_errno === 1030 && (strpos($query_error, ' -1 ') !== false || strpos($query_error, ' 28 ') !== false || strpos($query_error, ' 12 ') !== false))
-			{
-				if (!isset($txt))
-				{
-					$query_error .= ' - check database storage space.';
-				}
-				else
-				{
-					if (!isset($txt['mysql_error_space']))
-					{
-						Txt::load('Errors');
-					}
-
-					$query_error .= $txt['mysql_error_space'] ?? ' - check database storage space.';
-				}
-			}
-		}
-
-		// Log the error.
-		if ($query_errno !== 1213 && $query_errno !== 1205)
-		{
-			Errors::instance()->log_error($txt['database_error'] . ': ' . $query_error . (empty($modSettings['enableErrorQueryLogging']) ? '' : "\n\n$db_string"), 'database', $file, $line);
-		}
-
-		$this->throwError($db_string, $query_error, $file, $line);
 	}
 
 	/**

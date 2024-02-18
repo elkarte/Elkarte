@@ -70,7 +70,6 @@ class Result extends AbstractResult
 	 */
 	public function free_result()
 	{
-
 		// Just delegate to the native function
 		if (is_resource($this->result) || $this->result instanceof \PgSql\Result)
 		{
@@ -81,6 +80,7 @@ class Result extends AbstractResult
 			}
 			catch (\Throwable)
 			{
+				// It may already have been closed, no action is needed.
 			}
 		}
 	}
