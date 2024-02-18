@@ -1180,10 +1180,9 @@ function query_load_user_info($email)
 		}
 
 		// Clean up the groups
-		foreach ($pbe['user_info']['groups'] as $k => $v)
-		{
-			$pbe['user_info']['groups'][$k] = (int) $v;
-		}
+		$pbe['user_info']['groups'] = array_map(static function ($v) {
+			return (int) $v;
+		}, $pbe['user_info']['groups']);
 
 		$pbe['user_info']['groups'] = array_unique($pbe['user_info']['groups']);
 
@@ -1194,7 +1193,7 @@ function query_load_user_info($email)
 		$pbe['user_info']['warning'] = $pbe['profile']['warning'] ?? 0;
 
 		// Work out our query_see_board string for security
-		if (in_array(1, (int) $pbe['user_info']['groups'], true))
+		if (in_array(1, $pbe['user_info']['groups'], true))
 		{
 			$pbe['user_info']['query_see_board'] = '1=1';
 		}
@@ -1204,7 +1203,7 @@ function query_load_user_info($email)
 		}
 
 		// Set some convenience items
-		$pbe['user_info']['is_admin'] = in_array(1, (int) $pbe['user_info']['groups'], true) ? 1 : 0;
+		$pbe['user_info']['is_admin'] = in_array(1, $pbe['user_info']['groups'], true) ? 1 : 0;
 		$pbe['user_info']['id'] = $id_member;
 		$pbe['user_info']['username'] = $pbe['profile']['member_name'] ?? '';
 		$pbe['user_info']['name'] = $pbe['profile']['real_name'] ?? '';

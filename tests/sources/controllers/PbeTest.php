@@ -155,7 +155,7 @@ Regards, The ElkArte Community
 		$this->assertEquals('85.214.104.5', $email_message->load_ip());
 
 		// And some MD as well
-		$markdown = pbe_load_text($email_message->html_found, $email_message, array());
+		$markdown = pbe_load_text($email_message, array());
 		$this->assertStringContainsString('[b]Testing[/b]', $markdown);
 	}
 }
