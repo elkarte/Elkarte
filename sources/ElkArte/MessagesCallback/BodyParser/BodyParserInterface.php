@@ -26,8 +26,7 @@ interface BodyParserInterface
 {
 	/**
 	 * @param string[] $highlight An array of terms to highlight
-	 * @param bool $use_partial_words If highlighting match partial words or only
-	 *              whole words.
+	 * @param bool $use_partial_words If highlighting match partial words or only whole words.
 	 */
 	public function __construct($highlight, $use_partial_words);
 
@@ -35,7 +34,7 @@ interface BodyParserInterface
 	 * Parses a body (i.e. a text) and returns the HTML.
 	 *
 	 * @param string $body Text to parse.
-	 * @param bool $smileys_enabled If convert smiley to images.
+	 * @param bool $smileys_enabled If to convert smileys to images.
 	 *
 	 * @return string
 	 */

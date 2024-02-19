@@ -565,12 +565,12 @@ class Search extends AbstractController
 		$renderer->setParticipants($this->_participants);
 
 		$context['topic_starter_id'] = 0;
-		$context['get_topics'] = static fn(bool $reset = false): bool|array => $renderer->getContext($reset);
+		$context['get_topics'] = [$renderer, 'getContext'];
 
-		$context['jump_to'] = array(
+		$context['jump_to'] = [
 			'label' => addslashes(un_htmlspecialchars($txt['jump_to'])),
 			'board_name' => addslashes(un_htmlspecialchars($txt['select_destination'])),
-		);
+		];
 
 		loadJavascriptFile('topic.js');
 		$this->buildQuickModerationButtons();
