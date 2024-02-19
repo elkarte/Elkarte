@@ -63,7 +63,7 @@ class QueueMail
 		$batch_size = $this->adjustBatchSize($override_limit, $batch_size, $delay);
 
 		// Now we know how many we're sending, let's send them.
-		list ($ids, $emails) = emailsInfo($batch_size);
+		[$ids, $emails] = emailsInfo($batch_size);
 
 		// Remove these from the queue .... Delete, delete, delete!!!
 		if (!empty($ids))
@@ -162,9 +162,9 @@ class QueueMail
 			// A per period limit but no defined batch size?  Determine a batch size
 			// based on the number of times we will potentially be called each minute
 			// as set in updateNextSendTime()
-			$delay = !empty($modSettings['mail_queue_delay'])
-				? $modSettings['mail_queue_delay']
-				: ($modSettings['mail_period_limit'] <= 5 ? 10 : 5);
+			$delay = empty($modSettings['mail_queue_delay'])
+				? ($modSettings['mail_period_limit'] <= 5 ? 10 : 5)
+				: ($modSettings['mail_queue_delay']);
 
 			// Size is number per minute / number of times we will be called per minute
 			$batch_size = (int) ceil($modSettings['mail_period_limit'] / ceil(60 / $delay));
@@ -219,7 +219,7 @@ class QueueMail
 		if (!$override_limit && !empty($modSettings['mail_period_limit']))
 		{
 			// See if we have quota left to send another batch_size this minute or if we have to wait
-			list ($mail_time, $mail_number) = isset($modSettings['mail_recent']) ? explode('|', $modSettings['mail_recent']) : [0, 0];
+			[$mail_time, $mail_number] = isset($modSettings['mail_recent']) ? explode('|', $modSettings['mail_recent']) : [0, 0];
 
 			// Nothing worth noting...
 			if (empty($mail_number) || $mail_time < time() - 60)
