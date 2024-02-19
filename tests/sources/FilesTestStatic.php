@@ -135,7 +135,7 @@ class FilesTestStatic extends TestCase
 \/\*\*
 (?: \*.{0,200}\n)* \* @package\s{1,5}ElkArte Forum
  \* @copyright ElkArte Forum contributors
- \* @license\s{1,5}?BSD http:\/\/opensource\.org\/licenses\/BSD-3-Clause \(see accompanying LICENSE\.txt file\)
+ \* @license\s{1,5}?BSD https?:\/\/opensource\.org\/licenses\/BSD-3-Clause \(see accompanying LICENSE\.txt file\)
  \*
  \* @version \d+\.\d+(?:\.\d+|\sdev|\s(beta|RC|Release Candidate)\s\d+)?
 (?:(?: \*\n)?|(?: \*(?:\s.{0,200})?\n))+ \*\/',
@@ -145,7 +145,7 @@ class FilesTestStatic extends TestCase
 \/\*\*
 (?: \*.{0,200}\n)* \* @package\s{1,5}ElkArte Forum
  \* @copyright ElkArte Forum contributors
- \* @license\s{1,5}?BSD http:\/\/opensource\.org\/licenses\/BSD-3-Clause \(see accompanying LICENSE\.txt file\)
+ \* @license\s{1,5}?BSD https?:\/\/opensource\.org\/licenses\/BSD-3-Clause \(see accompanying LICENSE\.txt file\)
  \*
  \* This file contains code covered by:
  \* copyright:\s+20\d\d Simple Machines (?:Forum )?\(http:\/\/www\.simplemachines\.org\)(
@@ -160,7 +160,7 @@ class FilesTestStatic extends TestCase
 \/\*\*
 (?: \*.{0,200}\n)* \* @package\s{1,5}ElkArte Forum
  \* @copyright ElkArte Forum contributors
- \* @license\s{1,5}?BSD http:\/\/opensource\.org\/licenses\/BSD-3-Clause \(see accompanying LICENSE\.txt file\)
+ \* @license\s{1,5}?BSD https?:\/\/opensource\.org\/licenses\/BSD-3-Clause \(see accompanying LICENSE\.txt file\)
  \*
  \* @version \d+\.\d+(?:\.\d+|\sdev|\s(beta|RC|Release Candidate)\s\d+)?
 (?:(?: \*\n)?|(?: \*(?:\s.{0,200})?\n))+ \*\/',
@@ -170,7 +170,7 @@ class FilesTestStatic extends TestCase
 \/\*\*
 (?: \*.{0,200}\n)* \* @name\s{1,10}ElkArte Forum
  \* @copyright ElkArte Forum contributors
- \* @license\s+?BSD http:\/\/opensource\.org\/licenses\/BSD-3-Clause
+ \* @license\s+?BSD https?:\/\/opensource\.org\/licenses\/BSD-3-Clause
  \*
  \* @version\s+?\d+\.\d+(?:\.\d+|\sdev|\s(beta|RC|Release Candidate)\s\d+)?
 (?:(?: \*\n)?|(?: \*(?:\s.{0,200})?\n))+ \*\/',
@@ -181,7 +181,7 @@ class FilesTestStatic extends TestCase
 \/\*\*
 (?: \*.{0,200}\n)* \* @name\s{1,10}ElkArte Forum
  \* @copyright ElkArte Forum contributors
- \* @license\s+?BSD http:\/\/opensource\.org\/licenses\/BSD-3-Clause
+ \* @license\s+?BSD https?:\/\/opensource\.org\/licenses\/BSD-3-Clause
  \*
  \* @version\s+?\d+\.\d+(?:\.\d+|\sdev|\s(beta|RC|Release Candidate)\s\d+)?
 (?:(?: \*\n)?|(?: \*(?:\s.{0,200})?\n))+ \*\/',
@@ -191,7 +191,7 @@ class FilesTestStatic extends TestCase
 \/\*\*
 (?: \*.{0,200}\n)* \* @name\s{1,10}ElkArte Forum
  \* @copyright ElkArte Forum contributors
- \* @license\s+?BSD http:\/\/opensource\.org\/licenses\/BSD-3-Clause
+ \* @license\s+?BSD https?:\/\/opensource\.org\/licenses\/BSD-3-Clause
  \*
  \* This file contains code covered by:
  \* copyright:\s+?20\d\d Simple Machines (?:Forum )?\(http:\/\/www\.simplemachines\.org\)
