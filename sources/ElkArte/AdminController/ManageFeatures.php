@@ -677,7 +677,7 @@ class ManageFeatures extends AbstractController
 				$method_name = strtolower($method_name);
 
 				// Are they excluding any, like don't let mailfail be allowed to send email !
-				if ($class::isBlocklisted($method_name))
+				if ($class::isNotAllowed($method_name))
 				{
 					continue;
 				}

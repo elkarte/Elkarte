@@ -13,25 +13,20 @@
 
 namespace ElkArte\Mentions\MentionType\Notification;
 
-use ElkArte\Mentions\MentionType\AbstractNotificationBoardAccess;
-use ElkArte\Mentions\MentionType\CommonConfigTrait;
+use ElkArte\Mentions\MentionType\AbstractNotificationMessage;
 
 /**
  * Class Rlikemsg
  *
  * Handles the notification (or non-notification) of removed likes.
  */
-class Rlikemsg extends AbstractNotificationBoardAccess
+class Rlikemsg extends AbstractNotificationMessage
 {
-	use CommonConfigTrait;
-
-	/**
-	 * {@inheritdoc }
-	 */
+	/** {@inheritDoc} */
 	protected static $_type = 'rlikemsg';
 
 	/**
-	 * {@inheritdoc }
+	 * {@inheritDoc}
 	 */
 	public function setUsersToNotify()
 	{
@@ -39,7 +34,7 @@ class Rlikemsg extends AbstractNotificationBoardAccess
 		{
 			parent::setUsersToNotify();
 		}
-		elseif (isset($this->_task))
+		elseif ($this->_task !== null)
 		{
 			// I'm not entirely sure if this is necessary, but better safe than sorry at this point.
 			$this->_task->setMembers([]);
@@ -51,24 +46,24 @@ class Rlikemsg extends AbstractNotificationBoardAccess
 	 */
 	public function getNotificationBody($lang_data, $members)
 	{
-		return $this->_getNotificationStrings('', array('subject' => static::$_type, 'body' => static::$_type), $members, $this->_task);
+		return $this->_getNotificationStrings('', [
+			'subject' => static::$_type,
+			'body' => static::$_type],
+			$members, $this->_task);
 	}
 
 	/**
 	 * Depending on the value of $this->_task['source_data']['rlike_notif']
-	 * May notify the user about a like removed, or softly and gently remove
-	 * a 'likemsg' mention when the post is unliked.
+	 * May notify the user about a like removed, or softly and gently remove a 'likemsg' mention when the post is unliked.
 	 *
 	 * @param int $member_from the id of the member mentioning
 	 * @param int[] $members_to an array of ids of the members mentioned
 	 * @param int $target the id of the target involved in the mention
 	 * @param string|null $time optional value to set the time of the mention, defaults to now
-	 * @param int|null $status status to change the mention to, if no notification,
-	 *             - default is to set it as read (status = 1)
+	 * @param int|null $status status to change the mention to, if no notification, default is to set it as read (status = 1)
 	 * @param bool|null $is_accessible optional if the mention is accessible to the user
 	 * @return array|int[]
 	 * @package Mentions
-	 * @throws \ElkArte\Exceptions\Exception
 	 */
 	public function insert($member_from, $members_to, $target, $time = null, $status = null, $is_accessible = null)
 	{
@@ -86,16 +81,16 @@ class Rlikemsg extends AbstractNotificationBoardAccess
 				AND id_member_from = {int:member_from}
 				AND id_target = {int:target}
 				AND status = {int:unread}',
-			array(
+			[
 				'members_to' => $members_to,
 				'type' => 'likemsg',
 				'member_from' => $member_from,
 				'target' => $target,
 				'status' => $status ?? 1,
 				'unread' => 0,
-			)
+			]
 		);
 
-		return array();
+		return [];
 	}
 }

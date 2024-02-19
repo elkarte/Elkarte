@@ -2,7 +2,6 @@
 
 /**
  * Handles all the mentions actions so members are notified of mentionable actions
- * @todo this class should be integrated into \ElkArte\Notifiers\Methods\Notifier.php
  *
  * @package   ElkArte Forum
  * @copyright ElkArte Forum contributors
@@ -15,7 +14,10 @@
 namespace ElkArte\Mentions;
 
 use ElkArte\AbstractModel;
+use ElkArte\Database\QueryInterface;
+use ElkArte\DataValidator;
 use ElkArte\Languages\Txt;
+use ElkArte\Mentions\MentionType\NotificationInterface;
 
 /**
  * Takes care of validating and inserting mention notifications in the database
@@ -37,26 +39,23 @@ class Mentioning extends AbstractModel
 	public const UNAPPROVED = 3;
 
 	/** @var array Will hold all available mention types */
-	protected $_known_mentions = array();
+	protected $_known_mentions = [];
 
 	/** @var array Will hold all available mention status
-	   'new' => 0, 'read' => 1, 'deleted' => 2, 'unapproved' => 3 */
-	protected $_known_status = array();
-
-	/** @var \ElkArte\DataValidator Holds the instance of the data validation class */
-	protected $_validator = null;
+	 * 'new' => 0, 'read' => 1, 'deleted' => 2, 'unapproved' => 3 */
+	protected $_known_status = [];
 
 	/** @var array Holds the passed data for this instance, is passed through the validator */
-	protected $_data = null;
+	protected $_data;
 
 	/**
 	 * Mentioning constructor.
 	 *
-	 * @param \ElkArte\Database\QueryInterface $db
-	 * @param \ElkArte\DataValidator $validator
+	 * @param QueryInterface $db
+	 * @param DataValidator $_validator
 	 * @param string $enabled_mentions
 	 */
-	public function __construct($db, $user, $validator, $enabled_mentions = '')
+	public function __construct($db, $user, protected $_validator, $enabled_mentions = '')
 	{
 		$this->_known_status = array(
 			'new' => self::MNEW,
@@ -64,8 +63,6 @@ class Mentioning extends AbstractModel
 			'deleted' => self::DELETED,
 			'unapproved' => self::UNAPPROVED,
 		);
-
-		$this->_validator = $validator;
 
 		$this->_known_mentions = array_filter(array_unique(explode(',', $enabled_mentions)));
 
@@ -75,8 +72,7 @@ class Mentioning extends AbstractModel
 	/**
 	 * Inserts a new mention.
 	 *
-	 * @param \ElkArte\Mentions\MentionType\NotificationInterface $mention_obj The object that knows
-	 * how to store the mention in the database
+	 * @param NotificationInterface $mention_obj The object that knows how to store the mention in the database
 	 * @param array $data must contain uid, type and msg at a minimum
 	 *
 	 * @return int[]
@@ -88,7 +84,7 @@ class Mentioning extends AbstractModel
 		// Common checks to determine if we can go on
 		if (!$this->_isValid())
 		{
-			return array();
+			return [];
 		}
 
 		// Cleanup, validate and remove the invalid values (0 and $this->_data['id_member_from'])
@@ -96,7 +92,7 @@ class Mentioning extends AbstractModel
 
 		if (empty($id_targets))
 		{
-			return array();
+			return [];
 		}
 
 		$actually_mentioned = $mention_obj->insert($this->_data['id_member_from'], $id_targets, $this->_validator->msg, $this->_validator->log_time, $this->_data['status']);
@@ -116,18 +112,18 @@ class Mentioning extends AbstractModel
 	 *
 	 * @param array $data must contain uid, type and msg at a minimum
 	 *
-	 * @return array|array
+	 * @return array
 	 */
 	protected function _prepareData($data)
 	{
 		if (isset($data['id_member']))
 		{
-			$_data = array(
-				'uid' => is_array($data['id_member']) ? $data['id_member'] : array($data['id_member']),
+			$_data = [
+				'uid' => is_array($data['id_member']) ? $data['id_member'] : [$data['id_member']],
 				'type' => $data['type'],
 				'msg' => $data['id_msg'],
 				'status' => isset($data['status'], $this->_known_status[$data['status']]) ? $this->_known_status[$data['status']] : 0,
-			);
+			];
 
 			if (isset($data['id_member_from']))
 			{
@@ -154,15 +150,15 @@ class Mentioning extends AbstractModel
 	 */
 	protected function _isValid()
 	{
-		$sanitization = array(
+		$sanitization = [
 			'type' => 'trim',
 			'msg' => 'intval',
-		);
+		];
 
-		$validation = array(
+		$validation = [
 			'type' => 'required|contains[' . implode(',', $this->_known_mentions) . ']',
 			'uid' => 'isarray',
-		);
+		];
 
 		// Any optional fields we need to check?
 		if (isset($this->_data['id_member_from']))
@@ -205,12 +201,12 @@ class Mentioning extends AbstractModel
 		// If its new add to our menu count
 		if ($status === 0)
 		{
-			updateMemberData($member_id, array('mentions' => '+'));
+			updateMemberData($member_id, ['mentions' => '+']);
 		}
 		// Mark as read we decrease the count
 		elseif ($status === 1)
 		{
-			updateMemberData($member_id, array('mentions' => '-'));
+			updateMemberData($member_id, ['mentions' => '-']);
 		}
 		// Deleting or un-approving may have been read or not, so a count is required
 		else
@@ -271,22 +267,22 @@ class Mentioning extends AbstractModel
 	protected function _getAccessible($mention_ids, $action)
 	{
 		require_once(SUBSDIR . '/Mentions.subs.php');
-		$sanitization = array(
+		$sanitization = [
 			'id_mention' => 'intval',
 			'mark' => 'trim',
-		);
-		$validation = array(
+		];
+		$validation = [
 			'id_mention' => 'validate_ownmention',
 			'mark' => 'contains[read,unread,delete,readall]',
-		);
+		];
 
 		$this->_validator->sanitation_rules($sanitization);
 		$this->_validator->validation_rules($validation);
 
-		$own = array();
+		$own = [];
 		foreach ($mention_ids as $id)
 		{
-			if ($this->_validator->validate(array('id_mention' => $id, 'mark' => $action)))
+			if ($this->_validator->validate(['id_mention' => $id, 'mark' => $action]))
 			{
 				$own[] = $id;
 			}
@@ -313,11 +309,11 @@ class Mentioning extends AbstractModel
 			UPDATE {db_prefix}log_mentions
 			SET status = {int:status}
 			WHERE id_mention IN ({array_int:id_mentions})',
-			array(
-				'id_mentions' => (array) $id_mentions,
-				'status' => $this->_known_status[$status],
-			)
-		)->affected_rows() != 0;
+				[
+					'id_mentions' => (array) $id_mentions,
+					'status' => $this->_known_status[$status],
+				]
+			)->affected_rows() !== 0;
 
 		// Update the top level mentions count
 		if ($success)

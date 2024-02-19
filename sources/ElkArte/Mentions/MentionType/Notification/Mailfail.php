@@ -13,30 +13,38 @@
 
 namespace ElkArte\Mentions\MentionType\Notification;
 
-use ElkArte\Mentions\MentionType\AbstractNotificationBoardAccess;
-use ElkArte\Mentions\MentionType\MailfailConfigTrait;
+use ElkArte\Mentions\MentionType\AbstractNotificationMessage;
 
 /**
  * Class Mailfail
  *
  * Handles notifying users who have had email notifications disabled for failure to deliver
  */
-class Mailfail extends AbstractNotificationBoardAccess
+class Mailfail extends AbstractNotificationMessage
 {
-	use MailfailConfigTrait;
-
-	/**
-	 * {@inheritdoc }
-	 */
+	/** {@inheritDoc} */
 	protected static $_type = 'mailfail';
 
 	/**
-	 * {@inheritdoc }
-	 * No need to send emails, because we have just disabled email notifications
-	 * for this user.
+	 * {@inheritDoc}
+	 * No need to send emails, because we have just disabled email notifications for this user.
 	 */
 	public function getNotificationBody($lang_data, $members)
 	{
-		return $this->_getNotificationStrings('', array('subject' => static::$_type, 'body' => static::$_type), $members, $this->_task);
+		return $this->_getNotificationStrings('', [
+			'subject' => static::$_type,
+			'body' => static::$_type],
+			$members, $this->_task);
+	}
+
+	public static function isNotAllowed($method)
+	{
+		// Don't let mailfail be allowed to send email.
+		if ($method === 'email' || $method === 'emaildaily' || $method === 'emailweekly')
+		{
+			return true;
+		}
+
+		return false;
 	}
 }

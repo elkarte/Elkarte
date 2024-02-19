@@ -14,7 +14,6 @@
 namespace ElkArte\Mentions\MentionType\Notification;
 
 use ElkArte\Mentions\MentionType\AbstractNotificationMessage;
-use ElkArte\Mentions\MentionType\CommonConfigTrait;
 
 /**
  * Class Buddy
@@ -23,31 +22,34 @@ use ElkArte\Mentions\MentionType\CommonConfigTrait;
  */
 class Buddy extends AbstractNotificationMessage
 {
-	use CommonConfigTrait;
-
-	/**
-	 * {@inheritdoc }
-	 */
+	/** {@inheritDoc} */
 	protected static $_type = 'buddy';
 
 	/**
-	 * {@inheritdoc }
+	 * {@inheritDoc}
 	 */
 	public function getNotificationBody($lang_data, $members)
 	{
 		if (empty($lang_data['subject']))
 		{
-			return $this->_getNotificationStrings('', array('subject' => static::$_type, 'body' => static::$_type), $members, $this->_task);
+			return $this->_getNotificationStrings('',
+				[
+					'subject' => static::$_type,
+					'body' => static::$_type
+				], $members, $this->_task);
 		}
 
-		$keys = array('subject' => 'notify_new_buddy_' . $lang_data['subject'], 'body' => 'notify_new_buddy_' . $lang_data['body']);
+		$keys = [
+			'subject' => 'notify_new_buddy_' . $lang_data['subject'],
+			'body' => 'notify_new_buddy_' . $lang_data['body']
+		];
 
 		$notifier = $this->_task->getNotifierData();
 
-		$replacements = array(
+		$replacements = [
 			'ACTIONNAME' => $notifier['real_name'],
-		);
+		];
 
-		return $this->_getNotificationStrings('notify_new_buddy', $keys, $members, $this->_task, array(), $replacements);
+		return $this->_getNotificationStrings('notify_new_buddy', $keys, $members, $this->_task, [], $replacements);
 	}
 }

@@ -15,11 +15,14 @@
 namespace ElkArte\Notifications;
 
 use ElkArte\AbstractModel;
+use ElkArte\Database\QueryInterface;
 use ElkArte\DataValidator;
-use ElkArte\Exceptions;
+use ElkArte\Exceptions\Exception;
 use ElkArte\Mentions;
+use ElkArte\Mentions\MentionType\AbstractNotificationMessage;
 use ElkArte\Mentions\MentionType\NotificationInterface;
 use ElkArte\User;
+use ElkArte\UserInfo;
 
 /**
  * Class Notifications
@@ -28,85 +31,55 @@ use ElkArte\User;
  */
 class Notifications extends AbstractModel
 {
-	/**
-	 * Where the notifiers are stored
-	 */
-	const NOTIFIERS_PATH = SOURCEDIR . '/ElkArte/Notifiers/Methods';
+	/** @var string Where the notifiers are stored */
+	public const NOTIFIERS_PATH = SOURCEDIR . '/ElkArte/Notifiers/Methods';
 
-	/**
-	 * Since we have to call them dynamically we need to know both path and namespace...
-	 */
-	const NOTIFIERS_NAMESPACE = '\\ElkArte\\Notifiers\\Methods';
+	/** @var string Since we have to call them dynamically we need to know both path and namespace... */
+	public const NOTIFIERS_NAMESPACE = '\\ElkArte\\Notifiers\\Methods';
 
-	/**
-	 * When in settings is stored with this value, it means it's the default for users that
-	 * have no specific setting
-	 */
-	const DEFAULT_LEVEL = 2;
+	/** @var int When in settings is stored with this value, it means it's the default for users that have no specific setting */
+	public const DEFAULT_LEVEL = 2;
 
-	/**
-	 * When notifications_pref has this value, no notifications are sent
-	 */
-	const DEFAULT_NONE = 'none';
+	/** @var string When notifications_pref has this value, no notifications are sent */
+	public const DEFAULT_NONE = 'none';
 
-	/**
-	 * Instance manager
-	 *
-	 * @var Notifications
-	 */
+	/** @var Notifications Instance manager */
 	protected static $_instance;
 
-	/**
-	 * List of notifications to send
-	 *
-	 * @var \ElkArte\Notifications\NotificationsTask[]
-	 */
+	/** @var NotificationsTask[] List of notifications to send */
 	protected $_to_send;
 
-	/**
-	 * Available notification frequencies
-	 *
-	 * @var string[]
-	 */
+	/** @var string[] Available notification frequencies */
 	protected $_notification_frequencies;
 
-	/**
-	 * Available notification frequencies
-	 *
-	 * @var array
-	 */
+	/** @var array Available notification frequencies */
 	protected $_notifiers;
 
-	/**
-	 * Only the members that should be notified.
-	 * For example, in case of editing a message, quoted members
-	 * should not be mentioned twice.
-	 *
-	 * @var array
-	 */
-	protected $_to_actually_mention = array();
+	/** @var array Only the members that should be notified.
+	 * For example, in case of editing a message, quoted members should not be mentioned twice. */
+	protected $_to_actually_mention = [];
 
 	/**
 	 * Notifications constructor.
 	 *
 	 * Registers the known notifications to the system, allows for integration to add more
 	 *
-	 * @param \ElkArte\Database\QueryInterface $db
-	 * @param \ElkArte\UserInfo|null $user
-	 * @throws \ElkArte\Exceptions\Exception
+	 * @param QueryInterface $db
+	 * @param UserInfo|null $user
+	 * @throws Exception
 	 */
 	public function __construct($db, $user)
 	{
 		parent::__construct($db, $user);
 
 		// Let's register all the notifications we know by default
-		$glob = new \GlobIterator(Notifications::NOTIFIERS_PATH . '/*.php', \FilesystemIterator::SKIP_DOTS);
+		$glob = new \GlobIterator(self::NOTIFIERS_PATH . '/*.php', \FilesystemIterator::SKIP_DOTS);
 		foreach ($glob as $file)
 		{
 			$this->register($file->getBasename('.php'));
 		}
 
-		call_integration_hook('integrate_notifications_methods', array($this));
+		call_integration_hook('integrate_notifications_methods', [$this]);
 	}
 
 	/**
@@ -116,13 +89,13 @@ class Notifications extends AbstractModel
 	 * @param string $namespace the namespace of the class.
 	 *
 	 * Used to identify the strings for the subject and body respectively of the notification.
-	 * @throws \ElkArte\Exceptions\Exception
+	 * @throws Exception
 	 */
 	public function register($class_name, $namespace = null)
 	{
 		if ($namespace === null)
 		{
-			$namespace = Notifications::NOTIFIERS_NAMESPACE;
+			$namespace = self::NOTIFIERS_NAMESPACE;
 		}
 
 		$class = $namespace . '\\' . $class_name;
@@ -130,7 +103,7 @@ class Notifications extends AbstractModel
 
 		if (isset($this->_notifiers[$index]))
 		{
-			throw new Exceptions\Exception('error_notifier_already_instantiated');
+			throw new Exception('error_notifier_already_instantiated');
 		}
 
 		$this->_notifiers[$index] = new $class($this->_db, $this->user);
@@ -156,7 +129,7 @@ class Notifications extends AbstractModel
 	 * Let's add it to the queue, later on (just before shutting down)
 	 * we will take care of sending it (see send)
 	 *
-	 * @param \ElkArte\Notifications\NotificationsTask $task
+	 * @param NotificationsTask $task
 	 */
 	public function add(NotificationsTask $task)
 	{
@@ -185,14 +158,14 @@ class Notifications extends AbstractModel
 	/**
 	 * Process a certain task in order to send out the notifications.
 	 *
-	 * @param \ElkArte\Notifications\NotificationsTask $task
+	 * @param NotificationsTask $task
 	 */
 	protected function _send_task(NotificationsTask $task)
 	{
-		/** @var \ElkArte\Mentions\MentionType\NotificationInterface $class */
+		/** @var NotificationInterface $class */
 		$class = $task->getClass();
 
-		/** @var \ElkArte\Mentions\MentionType\AbstractNotificationBoardAccess $obj */
+		/** @var AbstractNotificationMessage $obj */
 		$obj = new $class($this->_db, $this->user);
 		$obj->setTask($task);
 
@@ -287,8 +260,8 @@ class Notifications extends AbstractModel
 	/**
 	 * Inserts a new mention in the database (those that appear in the mentions area).
 	 *
-	 * @param \ElkArte\Mentions\MentionType\NotificationInterface $obj
-	 * @param \ElkArte\Notifications\NotificationsTask $task
+	 * @param NotificationInterface $obj
+	 * @param NotificationsTask $task
 	 * @param array $bodies
 	 */
 	protected function _send_notification(NotificationInterface $obj, NotificationsTask $task, $bodies)
@@ -310,8 +283,8 @@ class Notifications extends AbstractModel
 	/**
 	 * Sends an immediate email notification.
 	 *
-	 * @param \ElkArte\Mentions\MentionType\NotificationInterface $obj
-	 * @param \ElkArte\Notifications\NotificationsTask $task
+	 * @param NotificationInterface $obj
+	 * @param NotificationsTask $task
 	 * @param array $bodies
 	 */
 	protected function _send_email(NotificationInterface $obj, NotificationsTask $task, $bodies)
@@ -329,8 +302,8 @@ class Notifications extends AbstractModel
 	/**
 	 * Stores data in the database to send a daily digest.
 	 *
-	 * @param \ElkArte\Mentions\MentionType\NotificationInterface $obj
-	 * @param \ElkArte\Notifications\NotificationsTask $task
+	 * @param NotificationInterface $obj
+	 * @param NotificationsTask $task
 	 * @param array $bodies
 	 */
 	protected function _send_daily_email(NotificationInterface $obj, NotificationsTask $task, $bodies)
@@ -374,8 +347,8 @@ class Notifications extends AbstractModel
 	/**
 	 * Stores data in the database to send a weekly digest.
 	 *
-	 * @param \ElkArte\Mentions\MentionType\NotificationInterface $obj
-	 * @param \ElkArte\Notifications\NotificationsTask $task
+	 * @param NotificationInterface $obj
+	 * @param NotificationsTask $task
 	 * @param array $bodies
 	 */
 	protected function _send_weekly_email(NotificationInterface $obj, NotificationsTask $task, $bodies)

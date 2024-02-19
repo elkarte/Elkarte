@@ -1098,8 +1098,9 @@ function accessibleBoards($id_boards = null, $id_parents = null)
 	}
 	while (($row = $request->fetch_assoc()))
 	{
-		$boards[] = $row['id_board'];
+		$boards[] = (int) $row['id_board'];
 	}
+
 	$request->free_result();
 
 	return $boards;

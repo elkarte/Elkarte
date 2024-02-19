@@ -16,7 +16,6 @@ namespace ElkArte\Mentions\MentionType\Event;
 use ElkArte\DataValidator;
 use ElkArte\Mentions\Mentioning;
 use ElkArte\Mentions\MentionType\AbstractEventBoardAccess;
-use ElkArte\Mentions\MentionType\CommonConfigTrait;
 use ElkArte\Notifications\Notifications;
 use ElkArte\Notifications\NotificationsTask;
 
@@ -27,34 +26,30 @@ use ElkArte\Notifications\NotificationsTask;
  */
 class Watchedtopic extends AbstractEventBoardAccess
 {
-	use CommonConfigTrait;
-
-	/**
-	 * {@inheritdoc}
-	 */
+	/** {@inheritDoc} */
 	protected static $_type = 'watchedtopic';
 
 	/**
-	 * {@inheritdoc}
+	 * {@inheritDoc}
 	 */
 	public static function getEvents($controller)
 	{
-		$methods = array(
-			'post' => array(
-				'after_save_post' => array('msgOptions', 'becomesApproved', 'posterOptions')
-			),
-			'display' => array('prepare_context' => array('virtual_msg')),
-		);
+		$methods = [
+			'post' => [
+				'after_save_post' => ['msgOptions', 'becomesApproved', 'posterOptions']
+			],
+			'display' => ['prepare_context' => ['virtual_msg']],
+		];
 
 		return $methods[$controller] ?? [];
 	}
 
 	/**
-	 * {@inheritdoc }
+	 * {@inheritDoc}
 	 */
 	public static function getModules($modules)
 	{
-		$modules['mentions'] = array('post', 'display');
+		$modules['mentions'] = ['post', 'display'];
 
 		return $modules;
 	}
@@ -119,7 +114,7 @@ class Watchedtopic extends AbstractEventBoardAccess
 				'watchedtopic',
 				$msgOptions['id'],
 				$modified ? $posterOptions['id_starter'] : $posterOptions['id'],
-				array('id_members' => $members_id, 'notifier_data' => $posterOptions, 'status' => $status, 'subject' =>  $msgOptions['subject'])
+				['id_members' => $members_id, 'notifier_data' => $posterOptions, 'status' => $status, 'subject' =>  $msgOptions['subject']]
 			));
 		}
 	}
@@ -133,8 +128,8 @@ class Watchedtopic extends AbstractEventBoardAccess
 	{
 		if (strpos($text, '[quote ') !== false)
 		{
-			$quoted = array();
-			$blocks = preg_split('~\[quote~', $text);
+			$quoted = [];
+			$blocks = explode("\[quote", $text);
 
 			$skip_next = false;
 			foreach ($blocks as $block)
@@ -146,7 +141,7 @@ class Watchedtopic extends AbstractEventBoardAccess
 
 				if (!$skip_next)
 				{
-					preg_match('~author=(.*?)(\]|date=|link=)~', $block, $match);
+					preg_match('~author=(.*?)(]|date=|link=)~', $block, $match);
 
 					if (!empty($match[1]))
 					{

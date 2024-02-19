@@ -13,8 +13,7 @@
 
 namespace ElkArte\Mentions\MentionType\Notification;
 
-use ElkArte\Mentions\MentionType\AbstractNotificationBoardAccess;
-use ElkArte\Mentions\MentionType\CommonConfigTrait;
+use ElkArte\Mentions\MentionType\AbstractNotificationMessage;
 
 /**
  * Class watchedtopic
@@ -22,40 +21,35 @@ use ElkArte\Mentions\MentionType\CommonConfigTrait;
  * Handles notifying of members whose watched topics have received new posts
  *
  */
-class Watchedtopic extends AbstractNotificationBoardAccess
+class Watchedtopic extends AbstractNotificationMessage
 {
-	use CommonConfigTrait;
-
-	/**
-	 * {@inheritdoc }
-	 */
+	/** {@inheritDoc} */
 	protected static $_type = 'watchedtopic';
 
 	/**
-	 * {@inheritdoc }
+	 * {@inheritDoc}
 	 */
 	public function getNotificationBody($lang_data, $members)
 	{
 		if (empty($lang_data['suffix']))
 		{
-			return $this->_getNotificationStrings('', array(
+			return $this->_getNotificationStrings('', [
 				'subject' => static::$_type,
-				'body' => static::$_type),
-				$members,
-				$this->_task);
+				'body' => static::$_type],
+				$members,	$this->_task);
 		}
 
-		$keys = array(
+		$keys = [
 			'subject' => 'notify_watchedtopic_' . $lang_data['subject'],
 			'body' => 'notify_watchedtopic_' . $lang_data['body']
-		);
+		];
 
-		$replacements = array(
+		$replacements = [
 			'ACTIONNAME' => $this->_task['source_data']['notifier_data']['name'],
 			'SUBJECT' => $this->_task['source_data']['subject'],
 			'MSGLINK' => replaceBasicActionUrl('{script_url}?msg=' . $this->_task->id_target),
-		);
+		];
 
-		return $this->_getNotificationStrings('notify_watchedtopic', $keys, $members, $this->_task, array(), $replacements);
+		return $this->_getNotificationStrings('notify_watchedtopic', $keys, $members, $this->_task, [], $replacements);
 	}
 }

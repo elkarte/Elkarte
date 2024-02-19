@@ -14,7 +14,6 @@
 namespace ElkArte\Mentions\MentionType\Event;
 
 use ElkArte\Mentions\MentionType\AbstractEventBoardAccess;
-use ElkArte\Mentions\MentionType\CommonConfigTrait;
 
 /**
  * Class Buddy
@@ -23,15 +22,11 @@ use ElkArte\Mentions\MentionType\CommonConfigTrait;
  */
 class Buddy extends AbstractEventBoardAccess
 {
-	use CommonConfigTrait;
-
-	/**
-	 * {@inheritdoc }
-	 */
+	/** {@inheritDoc} */
 	protected static $_type = 'buddy';
 
 	/**
-	 * {@inheritdoc }
+	 * {@inheritDoc}
 	 */
 	public function view($type, &$mentions)
 	{

@@ -25,7 +25,7 @@ class Result extends AbstractResult
 	 */
 	public function affected_rows()
 	{
-		return mysqli_affected_rows($this->details->connection);
+		return (int) mysqli_affected_rows($this->details->connection);
 	}
 
 	/**

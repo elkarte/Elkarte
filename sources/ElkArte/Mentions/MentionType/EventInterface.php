@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Interface for mentions objects
+ * Interface for event objects. Enforces what each event class must provide
  *
  * @package   ElkArte Forum
  * @copyright ElkArte Forum contributors
@@ -28,10 +28,10 @@ interface EventInterface
 	/**
 	 * Returns the modules to enable when turning on the mention.
 	 *
-	 * @param string[] $modules An empty array, or array of active modules
-	 *                 in the form array('module' => array('controller'))
+	 * @param string[] $modules An empty array, or array of active modules in the form:
+	 * array('module' => array('controller'))
 	 * @return string[] Array of modules to activate on controllers in the form:
-	 *                  array('module' => array('controller'))
+	 * array('module' => array('controller'))
 	 */
 	public static function getModules($modules);
 
@@ -41,7 +41,7 @@ interface EventInterface
 	 * @param string $type
 	 * @param array $mentions
 	 */
-// 	public function view($type, &$mentions);
+ 	public function view($type, &$mentions);
 
 	/**
 	 * Provides a list of methods that should not be used by this mention type.
@@ -50,7 +50,7 @@ interface EventInterface
 	 *
 	 * @return bool
 	 */
-	public static function isBlocklisted($method);
+	public static function isNotAllowed($method);
 
 	/**
 	 * If needed checks for permissions to use this specific notification

@@ -14,46 +14,35 @@
 namespace ElkArte\Mentions\MentionType;
 
 use ElkArte\Database\QueryInterface;
+use ElkArte\Exceptions\Exception;
 use ElkArte\Languages\Txt;
 use ElkArte\Notifications\NotificationsTask;
 use ElkArte\UserInfo;
+use ElkArte\ValuesContainer;
 
 /**
  * Class AbstractNotificationMessage
  */
 abstract class AbstractNotificationMessage implements NotificationInterface
 {
-	/**
-	 * The identifier of the mention (the name that is stored in the db)
-	 *
-	 * @var string
-	 */
+	/** @var string The identifier of the mention (the name that is stored in the db) */
 	protected static $_type = '';
 
-	/**
-	 * The database object
-	 *
-	 * @var \ElkArte\Database\QueryInterface
-	 */
+	/** @var QueryInterface The database object */
 	protected $_db;
 
-	/**
-	 * The current user object
-	 *
-	 * @var \ElkArte\ValuesContainer
-	 */
+	/** @var ValuesContainer The current user object */
 	protected $user;
 
-	/**
-	 * The \ElkArte\NotificationsTask in use
-	 *
-	 * @var \ElkArte\Notifications\NotificationsTask
-	 */
+	/** @var NotificationsTask The \ElkArte\NotificationsTask in use */
 	protected $_task;
 
 	/**
-	 * @param \ElkArte\Database\QueryInterface $db
-	 * @param \ElkArte\UserInfo $user
+	 * Constructs a new instance of the class.
+	 *
+	 * @param QueryInterface $db The database query interface to use.
+	 * @param UserInfo $user The user info object to use.
+	 * @return void
 	 */
 	public function __construct(QueryInterface $db, UserInfo $user)
 	{
@@ -62,7 +51,7 @@ abstract class AbstractNotificationMessage implements NotificationInterface
 	}
 
 	/**
-	 * {@inheritdoc }
+	 * {@inheritDoc}
 	 */
 	public static function getType()
 	{
@@ -70,23 +59,23 @@ abstract class AbstractNotificationMessage implements NotificationInterface
 	}
 
 	/**
-	 * {@inheritdoc }
+	 * {@inheritDoc}
 	 */
 	public function setUsersToNotify()
 	{
-		if (isset($this->_task))
+		if ($this->_task !== null)
 		{
 			$this->_task->setMembers((array) $this->_task['source_data']['id_members']);
 		}
 	}
 
 	/**
-	 * {@inheritdoc }
+	 * {@inheritDoc}
 	 */
 	abstract public function getNotificationBody($lang_data, $members);
 
 	/**
-	 * {@inheritdoc }
+	 * {@inheritDoc}
 	 */
 	public function setTask(NotificationsTask $task)
 	{
@@ -94,7 +83,7 @@ abstract class AbstractNotificationMessage implements NotificationInterface
 	}
 
 	/**
-	 * {@inheritdoc }
+	 * {@inheritDoc}
 	 * By default returns null.
 	 */
 	public function getLastId()
@@ -103,14 +92,30 @@ abstract class AbstractNotificationMessage implements NotificationInterface
 	}
 
 	/**
-	 * {@inheritdoc }
+	 * {@inheritDoc}
+	 */
+	public static function isNotAllowed($method)
+	{
+		return false;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public static function canUse()
+	{
+		return true;
+	}
+
+	/**
+	 * {@inheritDoc}
 	 */
 	public function insert($member_from, $members_to, $target, $time = null, $status = null, $is_accessible = null)
 	{
-		$inserts = array();
+		$inserts = [];
 
 		// $time is not checked because it's useless
-		$existing = array();
+		$existing = [];
 		$this->_db->fetchQuery('
 			SELECT 
 				id_member
@@ -119,23 +124,23 @@ abstract class AbstractNotificationMessage implements NotificationInterface
 				AND mention_type = {string:type}
 				AND id_member_from = {int:member_from}
 				AND id_target = {int:target}',
-			array(
+			[
 				'members_to' => $members_to,
 				'type' => static::$_type,
 				'member_from' => $member_from,
 				'target' => $target,
-			)
+			]
 		)->fetch_callback(
-			function ($row) use (&$existing) {
-				$existing[] = $row['id_member'];
+			static function ($row) use (&$existing) {
+				$existing[] = (int) $row['id_member'];
 			}
 		);
 
-		$actually_mentioned = array();
 		// If the member has already been mentioned, it's not necessary to do it again
+		$actually_mentioned = [];
 		foreach ($members_to as $id_member)
 		{
-			if (!in_array($id_member, $existing))
+			if (!in_array((int) $id_member, $existing, true))
 			{
 				$inserts[] = array(
 					$id_member,
@@ -155,7 +160,7 @@ abstract class AbstractNotificationMessage implements NotificationInterface
 			// Insert the new mentions
 			$this->_db->insert('',
 				'{db_prefix}log_mentions',
-				array(
+				[
 					'id_member' => 'int',
 					'id_target' => 'int',
 					'status' => 'int',
@@ -163,9 +168,9 @@ abstract class AbstractNotificationMessage implements NotificationInterface
 					'id_member_from' => 'int',
 					'log_time' => 'int',
 					'mention_type' => 'string-12',
-				),
+				],
 				$inserts,
-				array('id_mention')
+				['id_mention']
 			);
 		}
 
@@ -173,23 +178,21 @@ abstract class AbstractNotificationMessage implements NotificationInterface
 	}
 
 	/**
-	 * Does the replacement of some placeholders with the corresponding
-	 * text/link/url.
+	 * Returns an array of notification strings based on template and replacements.
 	 *
-	 * @param string $template An email template to load
-	 * @param string[] $keys Pair values to match the $txt indexes to subject and body
-	 * @param int[] $members
-	 * @param \ElkArte\Notifications\NotificationsTask $task
-	 * @param string[] $lang_files Language files to load (optional)
-	 * @param string[] $replacements Additional replacements for the loadEmailTemplate function (optional)
-	 * @return array
-	 * @throws \ElkArte\Exceptions\Exception
+	 * @param string $template The email notification template to use.
+	 * @param array $keys Pair values to match the $txt indexes to subject and body
+	 * @param array $members The array of member IDs to generate notification strings for.
+	 * @param NotificationsTask $task The NotificationsTask object to retrieve member data from.
+	 * @param array $lang_files An optional array of language files to load strings from.
+	 * @param array $replacements Additional replacements for the loadEmailTemplate function (optional)
+	 * @return array The array of generated notification strings.
 	 */
 	protected function _getNotificationStrings($template, $keys, $members, NotificationsTask $task, $lang_files = array(), $replacements = array())
 	{
 		$members_data = $task->getMembersData();
 
-		$return = array();
+		$return = [];
 		if (!empty($template))
 		{
 			require_once(SUBSDIR . '/Notification.subs.php');
@@ -199,28 +202,28 @@ abstract class AbstractNotificationMessage implements NotificationInterface
 				$replacements['REALNAME'] = $members_data[$member]['real_name'];
 				$replacements['UNSUBSCRIBELINK'] = replaceBasicActionUrl('{script_url}?action=notify;sa=unsubscribe;token=' .
 					getNotifierToken($member, $members_data[$member]['email_address'], $members_data[$member]['password_salt'], $task->notification_type, $task->id_target));
-				$langstrings = $this->_loadStringsByTemplate($template, $members, $members_data, $lang_files, $replacements);
+				$langStrings = $this->_loadStringsByTemplate($template, $members, $members_data, $lang_files, $replacements);
 
-				$return[] = array(
+				$return[] = [
 					'id_member_to' => $member,
 					'email_address' => $members_data[$member]['email_address'],
-					'subject' => $langstrings[$members_data[$member]['lngfile']]['subject'],
-					'body' => $langstrings[$members_data[$member]['lngfile']]['body'],
+					'subject' => $langStrings[$members_data[$member]['lngfile']]['subject'],
+					'body' => $langStrings[$members_data[$member]['lngfile']]['body'],
 					'last_id' => 0
-				);
+				];
 			}
 		}
 		else
 		{
 			foreach ($members as $member)
 			{
-				$return[] = array(
+				$return[] = [
 					'id_member_to' => $member,
 					'email_address' => $members_data[$member]['email_address'],
 					'subject' => $keys['subject'],
 					'body' => $keys['body'] ?? '',
 					'last_id' => 0
-				);
+				];
 			}
 		}
 
@@ -228,30 +231,28 @@ abstract class AbstractNotificationMessage implements NotificationInterface
 	}
 
 	/**
-	 * Retrieves the strings from the $txt variable.
+	 * Loads template strings for multiple languages based on a template, using $txt values
 	 *
-	 * @param string $template An email template to load
-	 * @param int[] $users
-	 * @param array $users_data Should at least contain the lngfile index
-	 * @param string[] $lang_files Language files to load (optional)
-	 * @param string[] $replacements Additional replacements for the loadEmailTemplate function (optional)
-	 *
-	 * @return array
-	 * @throws \ElkArte\Exceptions\Exception
+	 * @param string $template The email template name to load strings for.
+	 * @param array $users An array of user IDs.
+	 * @param array $users_data An array containing user data, must contain lngfile index
+	 * @param array $lang_files Optional. An array of language files to load.
+	 * @param array $replacements Optional. An array of replacements for the template.
+	 * @return array An associative array where the keys are language codes and the values are the loaded template strings.
 	 */
 	protected function _loadStringsByTemplate($template, $users, $users_data, $lang_files = array(), $replacements = array())
 	{
 		require_once(SUBSDIR . '/Mail.subs.php');
 
 		$lang = $this->user->language;
-		$langs = array();
+		$langs = [];
 		foreach ($users as $user)
 		{
 			$langs[$users_data[$user]['lngfile']] = $users_data[$user]['lngfile'];
 		}
 
 		// Let's load all the languages into a cache thingy.
-		$langtxt = array();
+		$langtxt = [];
 		foreach ($langs as $lang)
 		{
 			$langtxt[$lang] = loadEmailTemplate($template, $replacements, $lang, false, true, array('digest', 'snippet'), $lang_files);

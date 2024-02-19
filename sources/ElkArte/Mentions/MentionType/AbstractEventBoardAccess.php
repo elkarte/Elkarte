@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Abstract class that handles checks for board access level
+ * Abstract class that handles checks for board access level, extends AbstractEventMessage
  *
  * @package   ElkArte Forum
  * @copyright ElkArte Forum contributors
@@ -22,12 +22,12 @@ use ElkArte\Util;
 abstract class AbstractEventBoardAccess extends AbstractEventMessage
 {
 	/**
-	 * {@inheritdoc}
+	 * {@inheritDoc}
 	 */
 	public function view($type, &$mentions)
 	{
-		$boards = array();
-		$unset_keys = array();
+		$boards = [];
+		$unset_keys = [];
 
 		foreach ($mentions as $key => $row)
 		{
@@ -44,7 +44,7 @@ abstract class AbstractEventBoardAccess extends AbstractEventMessage
 			}
 			else
 			{
-				$boards[$key] = $row['id_board'];
+				$boards[$key] = (int) $row['id_board'];
 			}
 
 			$mentions[$key]['message'] = $this->_replaceMsg($row);
@@ -59,8 +59,7 @@ abstract class AbstractEventBoardAccess extends AbstractEventMessage
 	}
 
 	/**
-	 * Verifies that the current user can access the boards where the messages
-	 * are in.
+	 * Verifies that the current user can access the boards where the messages are located.
 	 *
 	 * @param int[] $boards Array of board ids
 	 * @param array $mentions
@@ -74,7 +73,7 @@ abstract class AbstractEventBoardAccess extends AbstractEventMessage
 
 		// Do the permissions checks and replace inappropriate messages
 		require_once(SUBSDIR . '/Boards.subs.php');
-		// @todo find a better place?
+
 		Txt::load('Mentions');
 
 		$removed = false;
@@ -83,7 +82,7 @@ abstract class AbstractEventBoardAccess extends AbstractEventMessage
 		foreach ($boards as $key => $board)
 		{
 			// You can't see the board where this mention is, so we drop it from the results
-			if (!in_array($board, $accessibleBoards))
+			if (!in_array($board, $accessibleBoards, true))
 			{
 				$unset_keys[] = $key;
 			}
@@ -104,11 +103,11 @@ abstract class AbstractEventBoardAccess extends AbstractEventMessage
 			}
 			else
 			{
-				$modSettings['user_access_mentions'] = array();
+				$modSettings['user_access_mentions'] = [];
 			}
 
 			$modSettings['user_access_mentions'][$this->user->id] = 0;
-			updateSettings(array('user_access_mentions' => serialize($modSettings['user_access_mentions'])));
+			updateSettings(['user_access_mentions' => serialize($modSettings['user_access_mentions'])]);
 			scheduleTaskImmediate('user_access_mentions');
 		}
 
