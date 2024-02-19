@@ -26,7 +26,7 @@ class MenuTabs
 	/** @var string The tab box title id to look for in $txt */
 	public $title;
 
-	/** @var string the index of helptxt to use  */
+	/** @var string the index of helptxt to use */
 	public $help;
 
 	/** @var string The tab box description to look for in $txt */
@@ -38,24 +38,15 @@ class MenuTabs
 	/** @var string The action prefix to use for naming convention $txt lookups' */
 	public $prefix;
 
-	/** @var string the current area, such as 'managesearch' */
-	public $current_area;
-
-	/** @var string the current action for the area, such as settings */
-	public $currentSubaction;
-
 	/**
 	 * Basic constructor
 	 *
-	 * @param string $currentArea
+	 * @param string $current_area
 	 * @param string $currentSubaction
 	 */
-	public function __construct($currentArea, $currentSubaction)
+	public function __construct(public $current_area, public $currentSubaction)
 	{
 		global $context;
-
-		$this->current_area = $currentArea;
-		$this->currentSubaction = $currentSubaction;
 
 		// Do we have an active action, we might as this is often called
 		// from the controller just before dispatch
@@ -133,7 +124,7 @@ class MenuTabs
 	 */
 	public function getTitle()
 	{
-		if (!isset($this->title))
+		if ($this->title === null)
 		{
 			$this->setTitle();
 		}
@@ -168,7 +159,7 @@ class MenuTabs
 	 */
 	public function getHelp()
 	{
-		if (!isset($this->help))
+		if ($this->help === null)
 		{
 			$this->setHelp();
 		}
@@ -196,7 +187,7 @@ class MenuTabs
 	 */
 	public function getDescription()
 	{
-		if (!isset($this->description))
+		if ($this->description === null)
 		{
 			$this->setDescription();
 		}
@@ -232,7 +223,7 @@ class MenuTabs
 	 */
 	public function getClass()
 	{
-		if (!isset($this->class))
+		if ($this->class === null)
 		{
 			$this->setClass();
 		}
@@ -260,7 +251,7 @@ class MenuTabs
 	 */
 	public function getPrefix()
 	{
-		if (!isset($this->prefix))
+		if ($this->prefix === null)
 		{
 			$this->setPrefix();
 		}

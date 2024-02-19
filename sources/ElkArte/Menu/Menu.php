@@ -51,7 +51,7 @@ class Menu
 	private $includeData = [];
 
 	/** @var int Unique menu number */
-	private $maxMenuId = 0;
+	private $maxMenuId;
 
 	/** @var MenuOptions  Holds menu options */
 	private $menuOptions;
@@ -81,7 +81,7 @@ class Menu
 		$this->menuContext = [];
 
 		// This is necessary only in profile (at least for the core), but we do it always because it's easier
-		$this->permissionSet = !empty($context['user']['is_owner']) ? 'own' : 'any';
+		$this->permissionSet = empty($context['user']['is_owner']) ? 'any' : 'own';
 
 		// We may have a current subaction
 		$this->currentSubaction = $context['current_subaction'] ?? null;
@@ -143,7 +143,7 @@ class Menu
 	 * Adds the built out menu sections/subsections to the menu
 	 *
 	 * @param string $id
-	 * @param MenuSection $section
+	 * @param MenuItem $section
 	 *
 	 * @return $this
 	 */
@@ -177,7 +177,7 @@ class Menu
 					}
 				}
 
-				/** @var \ElkArte\Menu\MenuSection $section */
+				/** @var MenuSection $section */
 				$section = $this->menuData[$section_id];
 				$section->insertArea($area_id, $location, MenuArea::buildFromArray($area + $newSubsections));
 			}
@@ -189,7 +189,7 @@ class Menu
 	/**
 	 * Create a menu.  Expects that addOptions and addMenuData (or equivalent) have been called
 	 *
-	 * @throws \ElkArte\Exceptions\Exception
+	 * @throws Exception
 	 */
 	public function prepareMenu()
 	{
@@ -199,7 +199,7 @@ class Menu
 		// Build URLs first.
 		$this->menuContext['base_url'] = $this->menuOptions->getBaseUrl();
 		$this->menuContext['current_action'] = $this->menuOptions->getAction();
-		$this->currentArea = !empty($this->menuOptions->getCurrentArea()) ? $this->menuOptions->getCurrentArea() : $this->req->getQuery('area', 'trim|strval', '');
+		$this->currentArea = empty($this->menuOptions->getCurrentArea()) ? $this->req->getQuery('area', 'trim|strval', '') : $this->menuOptions->getCurrentArea();
 		$this->menuContext['extra_parameters'] = $this->menuOptions->buildAdditionalParams();
 
 		// Process the loopy menu data.
@@ -222,15 +222,13 @@ class Menu
 		}
 
 		// For consistency with the past, clean up the returned array
-		$this->includeData = array_filter($this->includeData, static function ($value) {
-			return !is_null($value) && $value !== '';
-		});
+		$this->includeData = array_filter($this->includeData, static fn($value) => !is_null($value) && $value !== '');
 
 		// Set information on the selected item.
 		$this->includeData += [
 			'current_action' => $this->menuContext['current_action'],
 			'current_area' => $this->currentArea,
-			'current_section' => !empty($this->menuContext['current_section']) ? $this->menuContext['current_section'] : '',
+			'current_section' => empty($this->menuContext['current_section']) ? '' : $this->menuContext['current_section'],
 			'current_subsection' => $this->currentSubaction,
 		];
 
@@ -259,7 +257,7 @@ class Menu
 		// Allow to extend *any* menu with a single hook
 		if ($this->menuOptions->getHook())
 		{
-			call_integration_hook($this->menuOptions->getHook(), array($this));
+			call_integration_hook($this->menuOptions->getHook(), [$this]);
 		}
 	}
 
@@ -286,11 +284,18 @@ class Menu
 			}
 		}
 
-		// If we did not find a current area the use the first valid one found, if any
-		if (!$this->foundSection && !empty($this->firstAreaCurrent))
+		// If we did not find a current area, then use the first valid one found.
+		if ($this->foundSection)
 		{
-			$this->setAreaCurrent($this->firstAreaCurrent[0], $this->firstAreaCurrent[1], $this->firstAreaCurrent[2]);
+			return;
 		}
+
+		if (empty($this->firstAreaCurrent))
+		{
+			return;
+		}
+
+		$this->setAreaCurrent($this->firstAreaCurrent[0], $this->firstAreaCurrent[1], $this->firstAreaCurrent[2]);
 	}
 
 	/**
@@ -301,11 +306,17 @@ class Menu
 	 */
 	private function validateSection($sectionId)
 	{
-		if (empty($this->menuContext['sections'][$sectionId]['areas'])
-			&& empty($this->menuContext['sections'][$sectionId]['url']))
+		if (!empty($this->menuContext['sections'][$sectionId]['areas']))
 		{
-			unset($this->menuContext['sections'][$sectionId]);
+			return;
 		}
+
+		if (!empty($this->menuContext['sections'][$sectionId]['url']))
+		{
+			return;
+		}
+
+		unset($this->menuContext['sections'][$sectionId]);
 	}
 
 	/**
@@ -369,17 +380,15 @@ class Menu
 	private function parseCounter($obj, $idx)
 	{
 		global $settings;
-
-		$counter = '';
 		if (!empty($this->menuOptions->getCounters()[$obj->getCounter()]))
 		{
-			$counter = sprintf(
+			return sprintf(
 				$settings['menu_numeric_notice'][$idx],
 				$this->menuOptions->getCounters()[$obj->getCounter()]
 			);
 		}
 
-		return $counter;
+		return '';
 	}
 
 	/**
@@ -533,12 +542,12 @@ class Menu
 		if (!empty($area->getIcon()))
 		{
 			$this->menuContext['sections'][$sectionId]['areas'][$areaId]['icon'] =
-				'<img ' . (!empty($area->getClass()) ? 'class="' . $area->getClass() . '"' : 'style="background: none"') . ' src="' . $imagePath . '/' . $area->getIcon() . '" alt="" />';
+				'<img ' . (empty($area->getClass()) ? 'style="background: none"' : 'class="' . $area->getClass() . '"') . ' src="' . $imagePath . '/' . $area->getIcon() . '" alt="" />';
 			return;
 		}
 
 		$this->menuContext['sections'][$sectionId]['areas'][$areaId]['icon'] =
-			'<i class="' . (!empty($area->getClass()) ? 'icon ' . $area->getClass() . '"' : '') . '></i>';
+			'<i class="' . (empty($area->getClass()) ? '' : 'icon ' . $area->getClass() . '"') . '></i>';
 	}
 
 	/**
@@ -555,9 +564,7 @@ class Menu
 		// Clear out ones not enabled or accessible
 		$subSections = array_filter(
 			$area->getSubsections(),
-			function ($sub) {
-				return $sub->isEnabled() && $this->checkPermissions($sub);
-			}
+			fn($sub) => $sub->isEnabled() && $this->checkPermissions($sub)
 		);
 
 		// For each subsection process the options
@@ -621,10 +628,17 @@ class Menu
 	 */
 	private function setDefaultSubSection($areaId, $subSections)
 	{
-		if ($this->currentArea === $areaId && empty($this->currentSubaction))
+		if ($this->currentArea !== $areaId)
 		{
-			$this->currentSubaction = key($subSections) ?? '';
+			return;
 		}
+
+		if (!empty($this->currentSubaction))
+		{
+			return;
+		}
+
+		$this->currentSubaction = key($subSections) ?? '';
 	}
 
 	/**
@@ -767,9 +781,7 @@ class Menu
 		}
 
 		// Drop any non-enabled ones
-		$tabContext['tabs'] = array_filter($tabContext['tabs'], static function ($tab) {
-			return !isset($tab['disabled']) || $tab['disabled'] === false;
-		});
+		$tabContext['tabs'] = array_filter($tabContext['tabs'], static fn($tab) => !isset($tab['disabled']) || $tab['disabled'] === false);
 
 		// Has it been deemed selected?
 		if (isset($tabContext['tabs'][$this->currentSubaction]))

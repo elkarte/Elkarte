@@ -32,7 +32,9 @@ class MenuSection extends MenuItem
 	private $areas = [];
 
 	/**
-	 * @return array
+	 * Get the areas for the given object
+	 *
+	 * @return array Returns an array of areas for the given object
 	 */
 	public function getAreas()
 	{
@@ -40,9 +42,10 @@ class MenuSection extends MenuItem
 	}
 
 	/**
-	 * @param array $arr
+	 * Build additional menu items from an array
 	 *
-	 * @return MenuSection
+	 * @param array $arr the array containing the menu item data
+	 * @return $this
 	 */
 	public function buildMoreFromArray($arr)
 	{
@@ -63,8 +66,10 @@ class MenuSection extends MenuItem
 	}
 
 	/**
-	 * @param string $id
-	 * @param MenuArea $area
+	 * Add a new area to the existing areas
+	 *
+	 * @param string $id the name of the new area
+	 * @param MenuItem $area the area as processed by MenuArea::buildFromArray
 	 *
 	 * @return $this
 	 */
@@ -80,7 +85,7 @@ class MenuSection extends MenuItem
 	 *
 	 * @param string $id the name of the new section
 	 * @param string $location the name of the section after which to insert $id
-	 * @param MenuArea $area the area as processed by MenuArea::buildFromArray
+	 * @param MenuItem $area the area as processed by MenuArea::buildFromArray
 	 *
 	 * @return $this
 	 */

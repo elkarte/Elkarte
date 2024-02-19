@@ -16,6 +16,7 @@ namespace ElkArte\Menu;
 use ElkArte\Cache\Cache;
 use ElkArte\HttpReq;
 use ElkArte\User;
+use ElkArte\ValuesContainer;
 
 /**
  * Class MenuContext
@@ -24,9 +25,16 @@ use ElkArte\User;
  */
 class MenuContext
 {
+	/** @var ValuesContainer details of the user to which we are building the menu */
 	private $user;
+
+	/** @var Cache|object The cache variable. */
 	private $cache;
+
+	/** @var int cache age */
 	private $cacheTime;
+
+	/** @var bool if the action needs to call a hook to determine the real action */
 	private $needs_action_hook;
 
 	public function __construct()
@@ -89,7 +97,7 @@ class MenuContext
 	{
 		global $context, $modSettings;
 
-		$context['allow_search'] = !empty($modSettings['allow_guestAccess']) ? allowedTo('search_posts') : ($this->user->is_guest === false && allowedTo('search_posts'));
+		$context['allow_search'] = empty($modSettings['allow_guestAccess']) ? $this->user->is_guest === false && allowedTo('search_posts') : (allowedTo('search_posts'));
 		$context['allow_admin'] = allowedTo(['admin_forum', 'manage_boards', 'manage_permissions', 'moderate_forum', 'manage_membergroups', 'manage_bans', 'send_mail', 'edit_news', 'manage_attachments', 'manage_smileys']);
 		$context['allow_edit_profile'] = $this->user->is_guest === false && allowedTo(['profile_view_own', 'profile_view_any', 'profile_identity_own', 'profile_identity_any', 'profile_extra_own', 'profile_extra_any', 'profile_remove_own', 'profile_remove_any', 'moderate_forum', 'manage_membergroups', 'profile_title_own', 'profile_title_any']);
 		$context['allow_memberlist'] = allowedTo('view_mlist');
@@ -191,7 +199,8 @@ class MenuContext
 
 		$button = $this->setButtonActionHook($button);
 		$button = $this->setButtonCounter($button, $menu_count);
-		return  $this->setSubButtonCounter($button, $menu_count);
+
+		return $this->setSubButtonCounter($button, $menu_count);
 	}
 
 	/**

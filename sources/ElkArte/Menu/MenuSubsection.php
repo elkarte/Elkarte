@@ -38,7 +38,11 @@ class MenuSubsection extends MenuItem
 	protected $active = [];
 
 	/**
-	 * @return bool
+	 * Check if the object is a default value.
+	 *
+	 * This method returns the value of the "default" property of the object.
+	 *
+	 * @return bool Returns true if the object is a default value, false otherwise.
 	 */
 	public function isDefault()
 	{
@@ -46,9 +50,12 @@ class MenuSubsection extends MenuItem
 	}
 
 	/**
-	 * @param bool $default
+	 * Set the default value of the object.
 	 *
-	 * @return MenuSubsection
+	 * This method sets the value of the "default" property of the object.
+	 *
+	 * @param mixed $default The new default value to be set.
+	 * @return $this This method returns the current instance of the object, allowing for method chaining.
 	 */
 	public function setDefault($default)
 	{
@@ -58,7 +65,11 @@ class MenuSubsection extends MenuItem
 	}
 
 	/**
-	 * @return string[]
+	 * Get the value of the "active" property of the object.
+	 *
+	 * This method returns the value of the "active" property of the object.
+	 *
+	 * @return bool Returns true if the object is active, false otherwise.
 	 */
 	public function getActive()
 	{
@@ -66,9 +77,13 @@ class MenuSubsection extends MenuItem
 	}
 
 	/**
-	 * @param string[] $active
+	 * Set the active state of the object.
 	 *
-	 * @return MenuSubsection
+	 * This method sets the value of the "active" property of the object.
+	 *
+	 * @param bool $active The new active state of the object.
+	 *
+	 * @return $this The modified object instance.
 	 */
 	public function setActive($active)
 	{
@@ -91,7 +106,7 @@ class MenuSubsection extends MenuItem
 		// These are special due to the non named index so there is no generic setter
 		$this->label = $arr[0];
 		$this->permission = isset($arr[1]) ? (array) $arr[1] : [];
-		$this->default = isset($arr[2]) ? (bool) $arr[2] : false;
+		$this->default = isset($arr[2]) && (bool) $arr[2];
 
 		// Support for boolean here, wrong but has been used
 		if ($this->getActive() === true)
