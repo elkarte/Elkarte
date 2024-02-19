@@ -25,10 +25,9 @@ interface ConnectionInterface
 	 * @param string $db_user
 	 * @param string $db_passwd
 	 * @param string $db_prefix
-	 * @param mixed[] $db_options
+	 * @param array $db_options
 	 *
-	 * @return \ElkArte\Database\QueryInterface|null
-	 * @throws \Exception
+	 * @return QueryInterface|null
 	 */
 	public static function initiate($db_server, $db_name, $db_user, $db_passwd, $db_prefix, $db_options = array());
 }

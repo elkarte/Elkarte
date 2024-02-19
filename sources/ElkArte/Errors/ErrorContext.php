@@ -21,44 +21,27 @@ use ElkArte\Languages\Txt;
 final class ErrorContext
 {
 	public const MINOR = 0;
+
 	public const SERIOUS = 1;
-	/**
-	 * Multiton. This is an array of instances of ErrorContext.
-	 * All callers use an error context ('post', 'attach', or 'default' if none chosen).
-	 *
-	 * @var array of ErrorContext
-	 */
-	private static $_contexts = null;
-	/**
-	 * Holds the unique identifier of the error (a name).
-	 *
-	 * @var string
-	 */
-	private $_name = null;
-	/**
-	 * An array that holds all the errors occurred separated by severity.
-	 *
-	 * @var array
-	 */
-	private $_errors = null;
-	/**
-	 * The default severity code.
-	 *
-	 * @var mixed
-	 */
-	private $_default_severity = 0;
-	/**
-	 * A list of all severity code from the less important to the most serious.
-	 *
-	 * @var array|mixed
-	 */
-	private $_severity_levels = array(0);
-	/**
-	 * Certain errors may need some specific language file...
-	 *
-	 * @var array
-	 */
-	private $_language_files = array();
+
+	/** @var array of ErrorContext Multiton. This is an array of instances of ErrorContext.
+	 * All callers use an error context ('post', 'attach', or 'default' if none chosen). */
+	private static $_contexts;
+
+	/** @var string Holds the unique identifier of the error (a name). */
+	private $_name;
+
+	/** @var array An array that holds all the errors occurred separated by severity. */
+	private $_errors;
+
+	/** @var mixed The default severity code. */
+	private $_default_severity;
+
+	/** @var array|mixed A list of all severity code from the less important to the most serious. */
+	private $_severity_levels;
+
+	/** @var array Certain errors may need some specific language file... */
+	private $_language_files = [];
 
 	/**
 	 * Create and initialize an instance of the class
@@ -86,7 +69,7 @@ final class ErrorContext
 			$this->_default_severity = $default_severity;
 		}
 
-		$this->_errors = array();
+		$this->_errors = [];
 	}
 
 	/**
@@ -102,7 +85,7 @@ final class ErrorContext
 	{
 		if (self::$_contexts === null)
 		{
-			self::$_contexts = array();
+			self::$_contexts = [];
 		}
 
 		if (!array_key_exists($id, self::$_contexts))
@@ -130,10 +113,17 @@ final class ErrorContext
 			$this->_errors[$severity][$name] = $error;
 		}
 
-		if (!empty($lang_file) && !isset($this->_language_files[$lang_file]))
+		if (empty($lang_file))
 		{
-			$this->_language_files[$lang_file] = false;
+			return;
 		}
+
+		if (isset($this->_language_files[$lang_file]))
+		{
+			return;
+		}
+
+		$this->_language_files[$lang_file] = false;
 	}
 
 	/**
@@ -153,19 +143,16 @@ final class ErrorContext
 			{
 				return $this->getErrorName($first_error[0]);
 			}
-			else
-			{
-				return $first_error[0];
-			}
+
+			return $first_error[0];
 		}
-		elseif (is_object($error))
+
+		if (is_object($error))
 		{
 			return $error->getName();
 		}
-		else
-		{
-			return $error;
-		}
+
+		return $error;
 	}
 
 	/**
@@ -185,6 +172,7 @@ final class ErrorContext
 				{
 					unset($this->_errors[$severity][$name]);
 				}
+
 				if (empty($this->_errors[$severity]))
 				{
 					unset($this->_errors[$severity]);
@@ -208,14 +196,13 @@ final class ErrorContext
 		{
 			return $this->_errors[$severity];
 		}
-		elseif ($severity === null && !empty($this->_errors))
+
+		if ($severity === null && !empty($this->_errors))
 		{
 			return $this->_errors;
 		}
-		else
-		{
-			return false;
-		}
+
+		return false;
 	}
 
 	/**
@@ -245,14 +232,13 @@ final class ErrorContext
 		{
 			return !empty($this->_errors[$severity]);
 		}
-		elseif ($severity === null)
+
+		if ($severity === null)
 		{
 			return !empty($this->_errors);
 		}
-		else
-		{
-			return false;
-		}
+
+		return false;
 	}
 
 	/**
@@ -324,8 +310,8 @@ final class ErrorContext
 
 		call_integration_hook('integrate_' . $this->_name . '_errors', array(&$this->_errors, &$this->_severity_levels));
 
-		$errors = array();
-		$returns = array();
+		$errors = [];
+		$returns = [];
 		if ($severity === null)
 		{
 			foreach ($this->_errors as $err)
@@ -348,6 +334,7 @@ final class ErrorContext
 				{
 					continue;
 				}
+
 				$returns[$name] = vsprintf($txt['error_' . $name] ?? ($txt[$name] ?? $name), $value);
 			}
 			elseif (is_object($error_val))
@@ -372,17 +359,14 @@ final class ErrorContext
 		Txt::load('Errors');
 
 		// Any custom one?
-		if (!empty($this->_language_files))
+		foreach ($this->_language_files as $language => $loaded)
 		{
-			foreach ($this->_language_files as $language => $loaded)
+			if (!$loaded)
 			{
-				if (!$loaded)
-				{
-					Txt::load($language);
+				Txt::load($language);
 
-					// Remember this file has been loaded already
-					$this->_language_files[$language] = true;
-				}
+				// Remember this file has been loaded already
+				$this->_language_files[$language] = true;
 			}
 		}
 	}
@@ -404,14 +388,10 @@ final class ErrorContext
 			{
 				return null;
 			}
-			else
-			{
-				return $first_error[1];
-			}
+
+			return $first_error[1];
 		}
-		else
-		{
-			return null;
-		}
+
+		return null;
 	}
 }

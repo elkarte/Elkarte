@@ -24,27 +24,18 @@ use ElkArte\ValuesContainer;
  */
 abstract class AbstractResult
 {
-	/**
-	 * Result object
-	 *
-	 * @var resource
-	 */
-	protected $result = null;
-
-	/**
-	 * @var \ElkArte\ValuesContainer
-	 */
-	protected $details = null;
+	/** @var ValuesContainer */
+	protected $details;
 
 	/**
 	 * Constructor.
 	 *
-	 * @param $result
+	 * @param $result Object
 	 * @param null $details
+	 * @param resource $result
 	 */
-	public function __construct($result, $details = null)
+	public function __construct(protected $result, $details = null)
 	{
-		$this->result = $result;
 		$this->details = $details ?? new ValuesContainer();
 	}
 

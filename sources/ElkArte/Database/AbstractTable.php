@@ -16,62 +16,40 @@
 
 namespace ElkArte\Database;
 
+use ElkArte\Exceptions\Exception;
+
 /**
  * This is used to create a table without worrying about schema compatibilities
  * across supported database systems.
  */
 abstract class AbstractTable
 {
-	/**
-	 * We need a way to interact with the database
-	 *
-	 * @var \ElkArte\Database\QueryInterface
-	 */
-	protected $_db = null;
+	/** @var array Array of table names we don't allow to be removed by addons. */
+	protected $_reservedTables;
 
-	/**
-	 * The forum tables prefix
-	 *
-	 * @var string
-	 */
-	protected $_db_prefix = null;
-
-	/**
-	 * Array of table names we don't allow to be removed by addons.
-	 *
-	 * @var array
-	 */
-	protected $_reservedTables = null;
-
-	/**
-	 * Keeps a (reverse) log of changes to the table structure, to be undone.
-	 * This is used by Packages admin installation/uninstalling/upgrade.
-	 *
-	 * @var array
-	 */
-	protected $_package_log = null;
+	/** @var array Keeps a (reverse) log of changes to the table structure, to be undone.
+	 * This is used by Packages admin installation/uninstalling/upgrade. */
+	protected $_package_log;
 
 	/**
 	 * DbTable::construct
 	 *
-	 * @param object $db - An implementation of the abstract DbTable
-	 * @param string $db_prefix - Database tables prefix
+	 * @param object $_db - An implementation of the abstract DbTable
+	 * @param string $_db_prefix - Database tables prefix
 	 */
-	public function __construct($db, $db_prefix)
+	public function __construct(protected $_db, protected $_db_prefix)
 	{
-		$this->_db_prefix = $db_prefix;
-
 		// We won't do any remove on these
 		$this->_reservedTables = array('admin_info_files', 'approval_queue', 'attachments', 'ban_groups', 'ban_items',
-									   'board_permissions', 'boards', 'calendar', 'calendar_holidays', 'categories', 'collapsed_categories',
-									   'custom_fields', 'group_moderators', 'log_actions', 'log_activity', 'log_banned', 'log_boards',
-									   'log_digest', 'log_errors', 'log_floodcontrol', 'log_group_requests', 'log_karma', 'log_mark_read',
-									   'log_notify', 'log_online', 'log_packages', 'log_polls', 'log_reported', 'log_reported_comments',
-									   'log_scheduled_tasks', 'log_search_messages', 'log_search_results', 'log_search_subjects',
-									   'log_search_topics', 'log_topics', 'mail_queue', 'membergroups', 'members', 'message_icons',
-									   'messages', 'moderators', 'package_servers', 'permission_profiles', 'permissions', 'personal_messages',
-									   'pm_recipients', 'poll_choices', 'polls', 'scheduled_tasks', 'sessions', 'settings', 'smileys',
-									   'themes', 'topics');
+			'board_permissions', 'boards', 'calendar', 'calendar_holidays', 'categories', 'collapsed_categories',
+			'custom_fields', 'group_moderators', 'log_actions', 'log_activity', 'log_banned', 'log_boards',
+			'log_digest', 'log_errors', 'log_floodcontrol', 'log_group_requests', 'log_karma', 'log_mark_read',
+			'log_notify', 'log_online', 'log_packages', 'log_polls', 'log_reported', 'log_reported_comments',
+			'log_scheduled_tasks', 'log_search_messages', 'log_search_results', 'log_search_subjects',
+			'log_search_topics', 'log_topics', 'mail_queue', 'membergroups', 'members', 'message_icons',
+			'messages', 'moderators', 'package_servers', 'permission_profiles', 'permissions', 'personal_messages',
+			'pm_recipients', 'poll_choices', 'polls', 'scheduled_tasks', 'sessions', 'settings', 'smileys',
+			'themes', 'topics');
 
 		foreach ($this->_reservedTables as $k => $table_name)
 		{
@@ -79,10 +57,7 @@ abstract class AbstractTable
 		}
 
 		// let's be sure.
-		$this->_package_log = array();
-
-		// This executes queries and things
-		$this->_db = $db;
+		$this->_package_log = [];
 	}
 
 	/**
@@ -110,14 +85,13 @@ abstract class AbstractTable
 	 *    - 'error' will return false if the table already exists.
 	 *
 	 * @param string $table_name
-	 * @param mixed[] $columns in the format specified.
-	 * @param mixed[] $indexes default array(), in the format specified.
-	 * @param mixed[] $parameters default array(
+	 * @param array $columns in the format specified.
+	 * @param array $indexes default array(), in the format specified.
+	 * @param array $parameters default array(
 	 *                  'if_exists' => 'ignore',
 	 *                  'temporary' => false,
 	 *                )
 	 * @return bool
-	 * @throws \ElkArte\Exceptions\Exception
 	 */
 	public function create_table($table_name, $columns, $indexes = array(), $parameters = array())
 	{
@@ -131,7 +105,7 @@ abstract class AbstractTable
 		$table_name = str_replace('{db_prefix}', $this->_db_prefix, $table_name);
 
 		// First - no way do we touch our tables.
-		if (in_array(strtolower($table_name), $this->_reservedTables))
+		if (in_array(strtolower($table_name), $this->_reservedTables, true))
 		{
 			return false;
 		}
@@ -168,6 +142,7 @@ abstract class AbstractTable
 		{
 			$table_query = 'CREATE TEMPORARY TABLE ' . $table_name . "\n" . '(';
 		}
+
 		foreach ($columns as $column)
 		{
 			$table_query .= "\n\t" . $this->_db_create_query_column($column, $table_name) . ',';
@@ -252,15 +227,14 @@ abstract class AbstractTable
 	 */
 	protected function _build_indexes()
 	{
-		return;
 	}
 
 	/**
 	 * This function adds a column.
 	 *
 	 * @param string $table_name the name of the table
-	 * @param mixed[] $column_info with column information
-	 * @param mixed[] $parameters default array()
+	 * @param array $column_info with column information
+	 * @param array $parameters default array()
 	 * @param string $if_exists default 'update'
 	 */
 	abstract public function add_column($table_name, $column_info, $parameters = array(), $if_exists = 'update');
@@ -270,7 +244,7 @@ abstract class AbstractTable
 	 *
 	 * @param string $table_name
 	 * @param string $column_name
-	 * @param mixed[] $parameters default array()
+	 * @param array $parameters default array()
 	 */
 	abstract public function remove_column($table_name, $column_name, $parameters = array());
 
@@ -279,8 +253,8 @@ abstract class AbstractTable
 	 *
 	 * @param string $table_name
 	 * @param string $old_column
-	 * @param mixed[] $column_info
-	 * @param mixed[] $parameters default array()
+	 * @param array $column_info
+	 * @param array $parameters default array()
 	 */
 	abstract public function change_column($table_name, $old_column, $column_info, $parameters = array());
 
@@ -288,8 +262,8 @@ abstract class AbstractTable
 	 * Add an index.
 	 *
 	 * @param string $table_name
-	 * @param mixed[] $index_info
-	 * @param mixed[] $parameters default array()
+	 * @param array $index_info
+	 * @param array $parameters default array()
 	 * @param string $if_exists default 'update'
 	 */
 	abstract public function add_index($table_name, $index_info, $parameters = array(), $if_exists = 'update');
@@ -299,7 +273,7 @@ abstract class AbstractTable
 	 *
 	 * @param string $table_name
 	 * @param string $index_name
-	 * @param mixed[] $parameters default array()
+	 * @param array $parameters default array()
 	 */
 	abstract public function remove_index($table_name, $index_name, $parameters = array());
 
@@ -345,7 +319,7 @@ abstract class AbstractTable
 	 *
 	 * @param string $table_name
 	 * @param string $column_name
-	 * @return mixed[]|false
+	 * @return array|false
 	 */
 	protected function _get_column_info($table_name, $column_name)
 	{
@@ -353,7 +327,7 @@ abstract class AbstractTable
 
 		foreach ($columns as $column)
 		{
-			if ($column_name == $column['name'])
+			if ($column_name === $column['name'])
 			{
 				return $column;
 			}
@@ -367,7 +341,7 @@ abstract class AbstractTable
 	 *
 	 * @param string $table_name
 	 * @param bool $detail
-	 * @param mixed[] $parameters default array()
+	 * @param array $parameters default array()
 	 * @return mixed
 	 */
 	abstract public function list_columns($table_name, $detail = false, $parameters = array());
@@ -376,17 +350,17 @@ abstract class AbstractTable
 	 * Returns name, columns and indexes of a table
 	 *
 	 * @param string $table_name
-	 * @return mixed[]
+	 * @return array
 	 */
 	public function table_structure($table_name)
 	{
 		$table_name = str_replace('{db_prefix}', $this->_db_prefix, $table_name);
 
-		return array(
+		return [
 			'name' => $table_name,
 			'columns' => $this->list_columns($table_name, true),
 			'indexes' => $this->list_indexes($table_name, true),
-		);
+		];
 	}
 
 	/**
@@ -394,7 +368,7 @@ abstract class AbstractTable
 	 *
 	 * @param string $table_name
 	 * @param bool $detail
-	 * @param mixed[] $parameters
+	 * @param array $parameters
 	 * @return mixed
 	 */
 	abstract public function list_indexes($table_name, $detail = false, $parameters = array());
@@ -415,8 +389,8 @@ abstract class AbstractTable
 	 *
 	 * @param string $table_name
 	 * @param string $statement
-	 * @return bool|\ElkArte\Database\AbstractResult
-	 * @throws \ElkArte\Exceptions\Exception
+	 * @return bool|AbstractResult
+	 * @throws Exception
 	 */
 	protected function _alter_table($table_name, $statement)
 	{

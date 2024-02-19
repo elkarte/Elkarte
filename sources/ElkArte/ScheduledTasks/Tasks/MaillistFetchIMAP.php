@@ -23,7 +23,7 @@ namespace ElkArte\ScheduledTasks\Tasks;
 class MaillistFetchIMAP implements ScheduledTaskInterface
 {
 	/**
-	 * Run the the pseudo cron for IMAP email collection
+	 * Run the pseudo cron for IMAP email collection
 	 *
 	 * @return bool
 	 */

@@ -55,8 +55,7 @@ interface QueryInterface
 	 * @param string $db_string
 	 * @param array|false $db_values = array()
 	 *
-	 * @return bool|\ElkArte\Database\AbstractResult
-	 * @throws \ElkArte\Exceptions\Exception
+	 * @return bool|AbstractResult
 	 */
 	public function query($identifier, $db_string, $db_values = array());
 
@@ -65,8 +64,7 @@ interface QueryInterface
 	 *
 	 * @param string $db_string
 	 * @param array $db_values = array()
-	 * @param array|null
-	 * @return bool|\ElkArte\Database\AbstractResult
+	 * @return bool|AbstractResult
 	 */
 	public function fetchQuery($db_string, $db_values = array());
 

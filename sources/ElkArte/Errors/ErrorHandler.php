@@ -29,12 +29,16 @@ final class ErrorHandler extends Errors
 {
 	/** @var bool Set this to TRUE to let PHP handle errors/warnings/notices. */
 	public const USE_DEFAULT = false;
+
 	/** @var int Mask for errors that are fatal and will halt */
 	protected $fatalErrors = E_ERROR | E_USER_ERROR | E_COMPILE_ERROR | E_CORE_ERROR | E_PARSE;
+
 	/** @var string The error string from $e->getMessage() */
 	private $error_string;
+
 	/** @var int The level of error from $e->getCode */
 	private $error_level;
+
 	/** @var string Common name for the error: Error, Waning, Notice */
 	private $error_name;
 
@@ -46,13 +50,9 @@ final class ErrorHandler extends Errors
 		parent::__construct();
 
 		// Register the class handlers to the PHP handler functions
-		set_error_handler(function ($error_level, $error_string, $file, $line) {
-			return $this->error_handler($error_level, $error_string, $file, $line);
-		});
+		set_error_handler(fn($error_level, $error_string, $file, $line) => $this->error_handler($error_level, $error_string, $file, $line));
 		set_exception_handler(function (Throwable $e) {
 			$this->exception_handler($e);
-
-			return;
 		});
 	}
 
@@ -71,7 +71,7 @@ final class ErrorHandler extends Errors
 	 * @param int $line
 	 *
 	 * @return bool
-	 * @throws \ElkArte\Exceptions\Exception
+	 * @throws Exception
 	 */
 	public function error_handler($error_level, $error_string, $file, $line)
 	{
@@ -102,8 +102,6 @@ final class ErrorHandler extends Errors
 	 * - Only does so if the error_level matches with error_reporting.
 	 *
 	 * @param Throwable $e
-	 *
-	 * @throws \ElkArte\Exceptions\Exception
 	 */
 	public function exception_handler(Throwable $e)
 	{
@@ -124,10 +122,7 @@ final class ErrorHandler extends Errors
 		{
 			\ElkArte\Errors::instance()->log_error(
 				$this->error_name . ': ' . $this->error_string,
-				stripos(
-					$this->error_string,
-					'undefined'
-				) !== false ? 'undefined_vars' : 'general',
+				stripos($this->error_string, 'undefined') !== false ? 'undefined_vars' : 'general',
 				$e->getFile(),
 				$e->getLine()
 			);
@@ -154,40 +149,26 @@ final class ErrorHandler extends Errors
 	}
 
 	/**
-	 * Determine the error name (or type) for display.
+	 * Sets the error name based on the error level and whether it is an exception or not.
 	 *
-	 * @param int $error_level
-	 * @param bool $isException
-	 *
-	 * @return string
+	 * @param int $error_level The error level
+	 * @param bool $isException Whether it is an exception or not
+	 * @return string The error name
 	 */
 	private function set_error_name(int $error_level, bool $isException): string
 	{
-		switch ($error_level)
+		$type = match ($error_level)
 		{
-			case E_USER_ERROR:
-				$type = 'Fatal Error';
-				break;
-			case E_USER_WARNING:
-			case E_WARNING:
-				$type = 'Warning';
-				break;
-			case E_USER_NOTICE:
-			case E_NOTICE:
-			case E_STRICT:
-				$type = 'Notice';
-				break;
-			case E_RECOVERABLE_ERROR:
-				$type = 'Catchable';
-				break;
-			default:
-				$type = 'Unknown Error';
-				break;
-		}
+			E_USER_ERROR => 'Fatal Error',
+			E_USER_WARNING, E_WARNING => 'Warning',
+			E_USER_NOTICE, E_NOTICE, E_STRICT => 'Notice',
+			E_RECOVERABLE_ERROR => 'Catchable',
+			default => 'Unknown Error',
+		};
 
 		if ($isException)
 		{
-			$type = 'Exception';
+			return 'Exception';
 		}
 
 		return $type;
@@ -218,7 +199,7 @@ MSG;
 			// write trace lines into main template
 			return sprintf(
 				$msg,
-				get_class($exception),
+				$exception::class,
 				$exception->getMessage(),
 				$exception->getFile(),
 				$exception->getLine(),
@@ -227,10 +208,8 @@ MSG;
 				$exception->getLine()
 			);
 		}
-		else
-		{
-			return $this->error_string;
-		}
+
+		return $this->error_string;
 	}
 
 	/**
@@ -258,6 +237,7 @@ MSG;
 				['(): ' => '']
 			);
 		}
+
 		// trace always ends with {main}
 		$result[] = '#' . (++$key) . ' {main}';
 
@@ -265,15 +245,16 @@ MSG;
 	}
 
 	/**
-	 * Advanced gettype().
+	 * Get the arguments from a stack point
 	 *
-	 * - Shows the full class name if argument is an object.
-	 * - Shows the resource type if argument is a resource.
-	 * - Uses gettype() for all other types.
+	 *  Advanced gettype().
 	 *
-	 * @param array $stackPoint
+	 *  - Shows the full class name if argument is an object.
+	 *  - Shows the resource type if argument is a resource.
+	 *  - Uses gettype() for all other types.
 	 *
-	 * @return array
+	 * @param array $stackPoint The stack point containing the arguments
+	 * @return array The array of argument types
 	 */
 	private function getTraceArgs(array $stackPoint): array
 	{
@@ -284,7 +265,7 @@ MSG;
 			{
 				if (is_object($arg))
 				{
-					$args[] = get_class($arg);
+					$args[] = $arg::class;
 				}
 				elseif (is_resource($arg))
 				{

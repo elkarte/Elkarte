@@ -24,21 +24,16 @@ use ElkArte\User;
  */
 class ControllerRedirectException extends \Exception
 {
-	protected $_controller;
-	protected $_method;
-
 	/**
 	 * Redefine the initialization.
 	 * Do note that parent::__construct() is not called.
 	 *
-	 * @param string $controller Is the name of controller (lowercase and with namespace,
+	 * @param string $_controller Is the name of controller (lowercase and with namespace,
 	 *                 for example 'post', or 'calendar') that should be instantiated
-	 * @param string $method The method to call.
+	 * @param string $_method The method to call.
 	 */
-	public function __construct($controller, $method)
+	public function __construct(protected $_controller, protected $_method)
 	{
-		$this->_controller = $controller;
-		$this->_method = $method;
 	}
 
 	/**
@@ -50,7 +45,7 @@ class ControllerRedirectException extends \Exception
 	 */
 	public function doRedirect($source)
 	{
-		if (ltrim(get_class($source), '\\') === ltrim($this->_controller, '\\'))
+		if (ltrim($source::class, '\\') === ltrim($this->_controller, '\\'))
 		{
 			return $source->{$this->_method}();
 		}

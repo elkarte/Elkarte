@@ -22,13 +22,13 @@ namespace ElkArte;
 abstract class AbstractModel
 {
 	/** @var \ElkArte\Database\QueryInterface The database object */
-	protected $_db = null;
+	protected $_db;
 
 	/** @var \ElkArte\UserInfo The current user data */
-	protected $user = null;
+	protected $user;
 
 	/** @var object The modSettings */
-	protected $_modSettings = array();
+	protected $_modSettings = [];
 
 	/** @var \ElkArte\HttpReq The request values */
 	protected $_req;

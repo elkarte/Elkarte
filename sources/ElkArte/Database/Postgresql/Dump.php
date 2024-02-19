@@ -51,11 +51,11 @@ class Dump extends AbstractDump
 		);
 		while (($row = $result->fetch_assoc()))
 		{
-			if ($row['data_type'] == 'character varying')
+			if ($row['data_type'] === 'character varying')
 			{
 				$row['data_type'] = 'varchar';
 			}
-			elseif ($row['data_type'] == 'character')
+			elseif ($row['data_type'] === 'character')
 			{
 				$row['data_type'] = 'char';
 			}
@@ -66,7 +66,7 @@ class Dump extends AbstractDump
 			}
 
 			// Make the CREATE for this column.
-			$schema_create .= ' "' . $row['column_name'] . '" ' . $row['data_type'] . ($row['is_nullable'] != 'YES' ? ' NOT NULL' : '');
+			$schema_create .= ' "' . $row['column_name'] . '" ' . $row['data_type'] . ($row['is_nullable'] !== 'YES' ? ' NOT NULL' : '');
 
 			// Add a default...?
 			if (trim($row['column_default']) !== '')
@@ -85,7 +85,7 @@ class Dump extends AbstractDump
 							'table' => $tableName,
 						)
 					);
-					list ($max_ind) = $count_req->fetch_row();
+					[$max_ind] = $count_req->fetch_row();
 					$count_req->free_result();
 
 					// Get the right bloody start!
@@ -95,6 +95,7 @@ class Dump extends AbstractDump
 
 			$schema_create .= ',' . $crlf;
 		}
+
 		$result->free_result();
 
 		// Take off the last comma.
@@ -116,7 +117,7 @@ class Dump extends AbstractDump
 		{
 			if ($row['is_primary'])
 			{
-				if (preg_match('~\(([^\)]+?)\)~i', $row['inddef'], $matches) == 0)
+				if (preg_match('~\(([^)]+?)\)~i', $row['inddef'], $matches) !== 1)
 				{
 					continue;
 				}
@@ -128,6 +129,7 @@ class Dump extends AbstractDump
 				$index_create .= $crlf . $row['inddef'] . ';';
 			}
 		}
+
 		$result->free_result();
 
 		// Finish it off!
@@ -157,6 +159,7 @@ class Dump extends AbstractDump
 		{
 			$tables[] = $row[0];
 		}
+
 		$request->free_result();
 
 		return $tables;
@@ -204,7 +207,7 @@ class Dump extends AbstractDump
 
 		if ($new_table)
 		{
-			$limit = strstr($tableName, 'log_') !== false ? 500 : 250;
+			$limit = strpos($tableName, 'log_') !== false ? 500 : 250;
 			$start = 0;
 		}
 
@@ -246,7 +249,7 @@ class Dump extends AbstractDump
 			// Get the fields in this row...
 			$field_list = array();
 
-			foreach ($row as $key => $item)
+			foreach ($row as $item)
 			{
 				// Try to figure out the type of each field. (NULL, number, or 'string'.)
 				if (!isset($item))
@@ -259,13 +262,14 @@ class Dump extends AbstractDump
 				}
 				else
 				{
-					$field_list[] = '\'' . $this->_db->escape_string($item) . '\'';
+					$field_list[] = "'" . $this->_db->escape_string($item) . "'";
 				}
 			}
 
 			// 'Insert' the data.
 			$data .= $insert_msg . '(' . implode(', ', $field_list) . ');' . $crlf;
 		}
+
 		$result->free_result();
 
 		$data .= $crlf;

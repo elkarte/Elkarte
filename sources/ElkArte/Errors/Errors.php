@@ -20,11 +20,13 @@ namespace ElkArte\Errors;
 
 use ElkArte\AbstractModel;
 use ElkArte\Cache\Cache;
+use ElkArte\Database\QueryInterface;
 use ElkArte\Exceptions\Exception;
 use ElkArte\Http\Headers;
+use ElkArte\Languages\Loader;
 use ElkArte\Themes\ThemeLoader;
 use ElkArte\User;
-use ElkArte\Languages\Loader;
+use ElkArte\UserInfo;
 
 /**
  * Class to handle all forum errors and exceptions
@@ -32,10 +34,10 @@ use ElkArte\Languages\Loader;
 class Errors extends AbstractModel
 {
 	/** @var Errors Sole private Errors instance */
-	private static $_errors = null;
+	private static $_errors;
 
 	/** @var string[] The types of categories we have */
-	private $errorTypes = array(
+	private $errorTypes = [
 		'general',
 		'critical',
 		'database',
@@ -45,15 +47,15 @@ class Errors extends AbstractModel
 		'template',
 		'debug',
 		'deprecated',
-	);
+	];
 
 	/**
 	 * In case of maintenance of very early errors, the database may not be available,
 	 * this __construct will feed AbstractModel with a value just to stop it
 	 * from trying to initialize the database connection.
 	 *
-	 * @param \ElkArte\Database\QueryInterface|null $db
-	 * @param \ElkArte\UserInfo|null $user
+	 * @param QueryInterface|null $db
+	 * @param UserInfo|null $user
 	 */
 	public function __construct($db = null, $user = null)
 	{
@@ -63,7 +65,7 @@ class Errors extends AbstractModel
 	/**
 	 * Retrieve the sole instance of this class.
 	 *
-	 * @return \ElkArte\Errors\Errors
+	 * @return Errors
 	 */
 	public static function instance()
 	{
@@ -76,7 +78,10 @@ class Errors extends AbstractModel
 	}
 
 	/**
-	 * @param string $errorType
+	 * Add error types to the errorTypes array
+	 *
+	 * @param string|int $errorType The error type to be added
+	 * @return void
 	 */
 	public function addErrorTypes($errorType)
 	{
@@ -93,13 +98,13 @@ class Errors extends AbstractModel
 	 *
 	 * @param string $error
 	 * @param string $error_type = 'general'
-	 * @param string|mixed[] $sprintf = array()
+	 * @param string|array $sprintf = array()
 	 * @param string $file = ''
 	 * @param int $line = 0
 	 *
 	 * @return string
 	 */
-	public function log_lang_error($error, $error_type = 'general', $sprintf = array(), $file = '', $line = 0)
+	public function log_lang_error($error, $error_type = 'general', $sprintf = [], $file = '', $line = 0)
 	{
 		global $language;
 
@@ -107,7 +112,22 @@ class Errors extends AbstractModel
 		$lang = new Loader($language, $mtxt, database());
 		$lang->load('Errors');
 
-		$error_message = !isset($mtxt[$error]) ? $error : (empty($sprintf) ? $mtxt[$error] : vsprintf($mtxt[$error], $sprintf));
+		if (isset($mtxt[$error]))
+		{
+			if (empty($sprintf))
+			{
+				$error_message = $mtxt[$error];
+			}
+			else
+			{
+				$error_message = vsprintf($mtxt[$error], $sprintf);
+			}
+		}
+		else
+		{
+			$error_message = $error;
+		}
+
 		$this->log_error($error_message, $error_type, $file, $line);
 
 		// Return the message to make things simpler.
@@ -118,15 +138,15 @@ class Errors extends AbstractModel
 	 * Log an error to the error log if the error logging is enabled.
 	 *
 	 * Available error types:
-	 * - general
-	 * - critical
-	 * - database
-	 * - undefined_vars
-	 * - template
-	 * - user
-	 * - deprecated
+	 *   - general
+	 *   - critical
+	 *   - database
+	 *   - undefined_vars
+	 *   - template
+	 *   - user
+	 *   - deprecated
 	 *
-	 * - filename and line should be __FILE__ and __LINE__, respectively.
+	 * filename and line should be __FILE__ and __LINE__, respectively.
 	 *
 	 * Example use:
 	 *   - die(Errors::instance()->log_error($msg));
@@ -147,8 +167,8 @@ class Errors extends AbstractModel
 		}
 
 		// Basically, htmlspecialchars it minus &. (for entities!)
-		$error_message = strtr($error_message, array('<' => '&lt;', '>' => '&gt;', '"' => '&quot;'));
-		$error_message = strtr($error_message, array('&lt;br /&gt;' => '<br />', '&lt;b&gt;' => '<strong>', '&lt;/b&gt;' => '</strong>', "\n" => '<br />'));
+		$error_message = strtr($error_message, ['<' => '&lt;', '>' => '&gt;', '"' => '&quot;']);
+		$error_message = strtr($error_message, ['&lt;br /&gt;' => '<br />', '&lt;b&gt;' => '<strong>', '&lt;/b&gt;' => '</strong>', "\n" => '<br />']);
 
 		// Add a file and line to the error message?
 		// Don't use the actual txt entries for file and line but instead use %1$s for file and %2$s for line
@@ -170,13 +190,29 @@ class Errors extends AbstractModel
 	}
 
 	/**
-	 * @return string
+	 * Parses the query string and returns it after processing
+	 *
+	 * @return string The parsed query string
 	 */
 	private function parseQueryString()
 	{
 		global $scripturl;
 
-		$query_string = empty($_SERVER['QUERY_STRING']) ? (empty($_SERVER['REQUEST_URL']) ? '' : str_replace($scripturl, '', $_SERVER['REQUEST_URL'])) : $_SERVER['QUERY_STRING'];
+		if (empty($_SERVER['QUERY_STRING']))
+		{
+			if (empty($_SERVER['REQUEST_URL']))
+			{
+				$query_string = '';
+			}
+			else
+			{
+				$query_string = str_replace($scripturl, '', $_SERVER['REQUEST_URL']);
+			}
+		}
+		else
+		{
+			$query_string = $_SERVER['QUERY_STRING'];
+		}
 
 		// Don't log the session hash in the url twice, it's a waste.
 		$query_string = htmlspecialchars((ELK === 'SSI' ? '' : '?') . preg_replace(array('~;sesc=[^&;]+~', '~' . session_name() . '=' . session_id() . '[&;]~'), array(';sesc', ''), $query_string), ENT_COMPAT, 'UTF-8');
@@ -198,7 +234,7 @@ class Errors extends AbstractModel
 		static $tried_hook = false;
 
 		// Perhaps integration wants to add specific error types for the log
-		$errorTypes = array();
+		$errorTypes = [];
 		if (empty($tried_hook))
 		{
 			// This prevents us from infinite looping if the hook or call produces an error.
@@ -257,7 +293,7 @@ class Errors extends AbstractModel
 	 * @param string $error
 	 * @param string|bool $log defaults to 'general' false will skip logging, true will use general
 	 *
-	 * @throws \ElkArte\Exceptions\Exception
+	 * @throws Exception
 	 */
 	public function fatal_error($error = '', $log = 'general')
 	{
@@ -271,8 +307,7 @@ class Errors extends AbstractModel
 	 *
 	 * - This function stops execution and displays an error message by key.
 	 * - uses the string with the error_message_key key.
-	 * - logs the error in the forum's default language while displaying the error
-	 * message in the user's language.
+	 * - logs the error in the forum's default language while displaying the error message in the user's language.
 	 * - uses Errors language file and applies the $sprintf information if specified.
 	 * - the information is logged if log is specified.
 	 *
@@ -280,7 +315,7 @@ class Errors extends AbstractModel
 	 * @param string|bool $log defaults to 'general' false will skip logging, true will use general
 	 * @param string[] $sprintf defaults to empty array()
 	 *
-	 * @throws \ElkArte\Exceptions\Exception
+	 * @throws Exception
 	 */
 	public function fatal_lang_error($error, $log = 'general', $sprintf = array())
 	{
@@ -323,8 +358,7 @@ class Errors extends AbstractModel
 	/**
 	 * Small utility function for fatal error pages, sets the headers.
 	 *
-	 * - Used by display_db_error(), display_loadavg_error(),
-	 * display_maintenance_message()
+	 * - Used by display_db_error(), display_loadavg_error(), display_maintenance_message()
 	 */
 	private function _set_fatal_error_headers()
 	{
@@ -536,6 +570,7 @@ class Errors extends AbstractModel
 		{
 			$debug .= $var . ': ' . $val . '<br>';
 		}
+
 		$this->log_error(
 			sprintf(
 				'%s is deprecated, use %s instead.%s',
@@ -554,7 +589,6 @@ class Errors extends AbstractModel
 	 * @param string $error_code string or int code
 	 *
 	 * @return bool
-	 * @throws \ElkArte\Exceptions\Exception
 	 * @uses Errors template, fatal_error sub template
 	 *
 	 */

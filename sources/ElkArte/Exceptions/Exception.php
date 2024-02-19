@@ -15,7 +15,7 @@
 
 namespace ElkArte\Exceptions;
 
-use ElkArte\Errors\Errors as E;
+use ElkArte\Errors\Errors;
 use ElkArte\Languages\Txt;
 use ElkArte\User;
 
@@ -25,18 +25,11 @@ use ElkArte\User;
 class Exception extends \Exception
 {
 	/**
-	 * The log under which the error should be displayed.
-	 *
-	 * @var bool|string
-	 */
-	protected $log = '';
-
-	/**
 	 * Values to use in vsprintf.
 	 *
 	 * @var string[]
 	 */
-	protected $sprintf = array();
+	protected $sprintf = [];
 
 	/**
 	 * \ElkArte\Exceptions\Exception constructor.
@@ -50,9 +43,8 @@ class Exception extends \Exception
 	 * @param int $code
 	 * @param Exception|null $previous
 	 */
-	public function __construct($message, $log = false, $sprintf = array(), $code = 0, Exception $previous = null)
+	public function __construct($message, protected $log = false, $sprintf = [], $code = 0, Exception $previous = null)
 	{
-		$this->log = $log;
 		$this->sprintf = is_array($sprintf) ? $sprintf : (array) $sprintf;
 
 		// Make sure everything is assigned properly
@@ -75,20 +67,20 @@ class Exception extends \Exception
 		$lang = false;
 		try
 		{
-			list ($msg, $lang) = $this->parseMessage($message);
+			[$msg, $lang] = $this->parseMessage($message);
 			if ($lang !== false)
 			{
 				Txt::load($lang);
 			}
 		}
-		catch (\Exception $e)
+		catch (\Exception)
 		{
-			E::instance()->display_minimal_error($message);
+			Errors::instance()->display_minimal_error($message);
 		}
 
 		$this->logMessage($message, $lang);
 
-		return !isset($txt[$msg]) ? $msg : (empty($this->sprintf) ? $txt[$msg] : vsprintf($txt[$msg], $this->sprintf));
+		return isset($txt[$msg]) ? (empty($this->sprintf) ? $txt[$msg] : vsprintf($txt[$msg], $this->sprintf)) : ($msg);
 	}
 
 	/**
@@ -149,8 +141,8 @@ class Exception extends \Exception
 
 		if ($this->log !== false)
 		{
-			$msg = !isset($txt[$msg]) ? $msg : (empty($this->sprintf) ? $txt[$msg] : vsprintf($txt[$msg], $this->sprintf));
-			E::instance()->log_error($msg, $this->log, $this->getFile(), $this->getLine());
+			$msg = isset($txt[$msg]) ? (empty($this->sprintf) ? $txt[$msg] : vsprintf($txt[$msg], $this->sprintf)) : ($msg);
+			Errors::instance()->log_error($msg, $this->log, $this->getFile(), $this->getLine());
 		}
 	}
 
@@ -161,6 +153,6 @@ class Exception extends \Exception
 	 */
 	public function fatalLangError()
 	{
-		E::instance()->fatal_lang_error($this->message, $this->log, $this->sprintf);
+		Errors::instance()->fatal_lang_error($this->message, $this->log, $this->sprintf);
 	}
 }

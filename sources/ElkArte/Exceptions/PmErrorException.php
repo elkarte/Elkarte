@@ -13,6 +13,8 @@
 
 namespace ElkArte\Exceptions;
 
+use ElkArte\ValuesContainer;
+
 /**
  * Class PmErrorException
  *
@@ -21,33 +23,15 @@ namespace ElkArte\Exceptions;
 class PmErrorException extends \Exception
 {
 	/**
-	 * @var int[]
-	 */
-	public $recipientList;
-
-	/**
-	 * @var array|string[]
-	 */
-	public $namedRecipientList;
-
-	/**
-	 * @var \ElkArte\ValuesContainer
-	 */
-	public $msgOptions;
-
-	/**
 	 * Redefine the initialization.
-	 * Do note that parent::__construct() is not called.
+	 * Do note that parent::__construct() is NOT called.
 	 *
 	 * @param array $recipientList Array of members ID separated into 'to' and 'bcc'
-	 * @param \ElkArte\ValuesContainer $msgOptions Some values for common
+	 * @param ValuesContainer $msgOptions Some values for common
 	 * @param string[] $namedRecipientList Array of member names separated into 'to' and 'bcc'
 	 *  this argument is deprecated
 	 */
-	public function __construct($recipientList, $msgOptions, $namedRecipientList = array())
+	public function __construct(public $recipientList, public $msgOptions, public $namedRecipientList = [])
 	{
-		$this->recipientList = $recipientList;
-		$this->msgOptions = $msgOptions;
-		$this->namedRecipientList = $namedRecipientList;
 	}
 }

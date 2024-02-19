@@ -206,7 +206,7 @@ class Html2Md extends AbstractDomParser
 				break;
 			case 'ol':
 			case 'ul':
-				if ($this->hasParentList($node))
+				if ($this->hasParentList($node) !== 0)
 				{
 					$markdown = trim($this->getValue($node));
 				}
@@ -214,6 +214,7 @@ class Html2Md extends AbstractDomParser
 				{
 					$markdown = $this->line_end . $this->getValue($node) . $this->line_end;
 				}
+
 				break;
 			case 'li':
 				$markdown = $this->_convertList($node);
@@ -283,7 +284,7 @@ class Html2Md extends AbstractDomParser
 		$title = $node->getAttribute('title');
 		$value = $this->getValue($node);
 
-		return !empty($title) ? '*[' . $value . ']: ' . $title : '';
+		return empty($title) ? '' : '*[' . $value . ']: ' . $title;
 	}
 
 	/**
@@ -328,7 +329,7 @@ class Html2Md extends AbstractDomParser
 		}
 		else
 		{
-			$markdown = '[' . ($value === $txt['link'] ? 'X' : $value) . ']('  . $href . ' "' . $txt['link'] . '")';
+			$markdown = '[' . ($value === $txt['link'] ? 'X' : $value) . '](' . $href . ' "' . $txt['link'] . '")';
 		}
 
 		$this->_setBodyWidth($markdown, $this->getBuffer($node));
@@ -414,7 +415,7 @@ class Html2Md extends AbstractDomParser
 		$this->body_width = 0;
 
 		// If we have a multi line code block, we are working outside to in, and need to convert the br's ourselves
-		$value = preg_replace('~<br( /)?' . '>~', $this->line_end, str_replace('&nbsp;', ' ', $value));
+		$value = preg_replace('~<br( /)?>~', $this->line_end, str_replace('&nbsp;', ' ', $value));
 
 		// Get the number of lines of code that we have
 		$lines = preg_split('~\r\n|\r|\n~', $value);
@@ -424,6 +425,7 @@ class Html2Md extends AbstractDomParser
 		{
 			array_shift($lines);
 		}
+
 		while (trim($lines[count($lines) - 1]) === '')
 		{
 			array_pop($lines);
@@ -513,14 +515,14 @@ class Html2Md extends AbstractDomParser
 		}
 
 		// A plain linked image, just return the alt text for use in the link
-		if ($this->getName($parent) === 'a' && !($parent->getAttribute('data-lightboximage') || $parent->getAttribute('data-lightboxmessage')))
+		if ($this->getName($parent) === 'a' && (!$parent->getAttribute('data-lightboximage') && !$parent->getAttribute('data-lightboxmessage')))
 		{
-			return !empty($alt) ? $alt : (!empty($title) ? $title : 'xXx');
+			return empty($alt) ? (!empty($title) ? $title : 'xXx') : ($alt);
 		}
 
-		$markdown = !empty($title)
-			? '![' . $alt . '](' . $src . ' "' . $title . '")'
-			: '![' . $alt . '](' . $src . ')';
+		$markdown = empty($title)
+			? '![' . $alt . '](' . $src . ')'
+			: '![' . $alt . '](' . $src . ' "' . $title . '")';
 
 		$this->_setBodyWidth($markdown, $this->getBuffer($node));
 
@@ -558,6 +560,7 @@ class Html2Md extends AbstractDomParser
 		// Ordered lists will need an item number
 		$start = (int) $this->getParent($node)->getAttribute('start');
 		$start = $start > 0 ? $start - 1 : 0;
+
 		$number = $start + $this->_getListPosition($node);
 
 		return $loose . $number . '. ' . $value . $this->line_end;
@@ -823,6 +826,7 @@ class Html2Md extends AbstractDomParser
 				{
 					break;
 				}
+
 				$ticks .= '`';
 			}
 		}
@@ -848,7 +852,7 @@ class Html2Md extends AbstractDomParser
 		$lines = explode($this->line_end, $markdown);
 		foreach ($lines as $line)
 		{
-			$line_strlen = Util::strlen($line) + (!empty($buffer) ? (int) $buffer : 0);
+			$line_strlen = Util::strlen($line) + (empty($buffer) ? 0 : (int) $buffer);
 			if ($line_strlen > $this->body_width)
 			{
 				$this->body_width = $line_strlen;
@@ -878,9 +882,7 @@ class Html2Md extends AbstractDomParser
 		$re = '/((?<!\\\\\( |]\()https?:\/\/|(?<!\\\\\( |]\(|:\/\/)www)[-\p{L}0-9+&@#\/%?=~_|!:,.;]*[\p{L}0-9+&@#\/%=~_|]/ui';
 		$count = 0;
 		$text = preg_replace_callback($re,
-			function ($matches) {
-				return $this->_plaintxtCallback($matches);
-			}, $text, -1, $count);
+			fn($matches) => $this->_plaintxtCallback($matches), $text, -1, $count);
 
 		// If we made changes, lets protect that link from wrapping
 		if ($count > 0)

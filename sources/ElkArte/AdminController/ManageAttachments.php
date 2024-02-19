@@ -21,7 +21,7 @@ use ElkArte\Action;
 use ElkArte\FileFunctions;
 use ElkArte\Graphics\Image;
 use ElkArte\Graphics\Manipulators\Gd2;
-use ElkArte\Graphics\Manipulators\Imagick;
+use ElkArte\Graphics\Manipulators\ImageMagick;
 use ElkArte\SettingsForm\SettingsForm;
 use ElkArte\Util;
 use ElkArte\AttachmentsDirectory;
@@ -321,8 +321,8 @@ class ManageAttachments extends AbstractController
 
 		// Perform several checks to determine imaging capabilities.
 		$image = new Image($settings['default_theme_dir'] . '/images/blank.png');
-		$testImg = Gd2::canUse() || Imagick::canUse();
-		$testImgRotate = Imagick::canUse() || (Gd2::canUse() && function_exists('exif_read_data'));
+		$testImg = Gd2::canUse() || ImageMagick::canUse();
+		$testImgRotate = ImageMagick::canUse() || (Gd2::canUse() && function_exists('exif_read_data'));
 
 		// Check on webp support, and correct if wrong
 		$testWebP = $image->hasWebpSupport();

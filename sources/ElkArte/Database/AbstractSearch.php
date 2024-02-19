@@ -18,33 +18,18 @@ namespace ElkArte\Database;
  */
 abstract class AbstractSearch implements SearchInterface
 {
-	/**
-	 * The database object
-	 *
-	 * @var \ElkArte\Database\QueryInterface
-	 */
-	protected $_db = null;
-
-	/**
-	 * The supported search methods
-	 *
-	 * @var string[]
-	 */
+	/** @var string[] The supported search methods */
 	protected $_supported_types = array();
 
-	/**
-	 * The way to skip a database error
-	 *
-	 * @var bool
-	 */
+	/** @var bool The way to skip a database error */
 	protected $_skip_error = false;
 
 	/**
 	 * Usual constructor
+	 * @param QueryInterface $_db The database object
 	 */
-	public function __construct($db)
+	public function __construct(protected $_db)
 	{
-		$this->_db = $db;
 	}
 
 	/**
@@ -90,22 +75,22 @@ abstract class AbstractSearch implements SearchInterface
 	{
 		$db_table = db_table();
 		$db_table->create_table('{db_prefix}log_search_words',
-			array(
-				array(
+			[
+				[
 					'name' => 'id_word',
 					'type' => 'int',
 					'size' => 10,
 					'unsigned' => true,
 					'default' => 0
-				),
-				array(
+				],
+				[
 					'name' => 'id_msg',
 					'type' => 'int',
 					'size' => 10,
 					'unsigned' => true,
 					'default' => 0
-				),
-			),
+				],
+			],
 			array(
 				array('name' => 'id_word', 'columns' => array('id_word', 'id_msg'), 'type' => 'primary')
 			)

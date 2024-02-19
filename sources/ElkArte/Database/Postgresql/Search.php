@@ -16,7 +16,7 @@ namespace ElkArte\Database\Postgresql;
 use ElkArte\Database\AbstractSearch;
 
 /**
- * PostgreSQL implementation of DbSearch
+ * PostgreSQLs implementation of DbSearch
  */
 class Search extends AbstractSearch
 {
@@ -77,8 +77,10 @@ class Search extends AbstractSearch
 
 		// PostGreSql has some hidden sizes.
 		$request = $this->_db->query('', '
-			SELECT relname, relpages * 8 *1024 AS "KB" FROM pg_class
-			WHERE relname = {string:messages} OR relname = {string:log_search_words}
+			SELECT 
+				relname, relpages * 8 *1024 AS "KB" FROM pg_class
+			WHERE relname = {string:messages} 
+				OR relname = {string:log_search_words}
 			ORDER BY relpages DESC',
 			array(
 				'messages' => $db_prefix . 'messages',
@@ -90,7 +92,7 @@ class Search extends AbstractSearch
 		{
 			while (($row = $request->fetch_assoc()))
 			{
-				if ($row['relname'] == $db_prefix . 'messages')
+				if ($row['relname'] === $db_prefix . 'messages')
 				{
 					$table_info['data_length'] = (int) $row['KB'];
 					$table_info['index_length'] = (int) $row['KB'];
@@ -98,12 +100,13 @@ class Search extends AbstractSearch
 					// Doesn't support fulltext
 					$table_info['fulltext_length'] = $txt['not_applicable'];
 				}
-				elseif ($row['relname'] == $db_prefix . 'log_search_words')
+				elseif ($row['relname'] === $db_prefix . 'log_search_words')
 				{
 					$table_info['index_length'] = (int) $row['KB'];
 					$table_info['custom_index_length'] = (int) $row['KB'];
 				}
 			}
+
 			$request->free_result();
 		}
 		else

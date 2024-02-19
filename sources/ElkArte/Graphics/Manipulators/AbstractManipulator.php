@@ -37,7 +37,7 @@ abstract class AbstractManipulator
 	/** @var int the height of the image, updated after any manipulation */
 	protected $_height = 0;
 
-	/** @var \Imagick|resource */
+	/** @var ImageMagick|resource */
 	protected $_image;
 
 	/**
@@ -121,7 +121,7 @@ abstract class AbstractManipulator
 		{
 			$this->imageDimensions = $type === 'string' ? getimagesizefromstring($data) : getimagesize($this->_fileName);
 		}
-		catch (\Exception $e)
+		catch (\Exception)
 		{
 			$this->imageDimensions = [];
 		}
@@ -167,7 +167,7 @@ abstract class AbstractManipulator
 	 *
 	 * @param bool $fatal if to throw an exception on lack of memory
 	 *
-	 * @return bool Whether or not the memory is available.
+	 * @return bool Whether the memory is available.
 	 * @throws \Exception
 	 */
 	public function memoryCheck($fatal = false)
@@ -236,7 +236,7 @@ abstract class AbstractManipulator
 
 		if ($this->_width > $this->_height)
 		{
-			$thumb_h = max (1, $this->_height * ($limit / $this->_width));
+			$thumb_h = max(1, $this->_height * ($limit / $this->_width));
 		}
 		// Portrait
 		elseif ($this->_width < $this->_height)

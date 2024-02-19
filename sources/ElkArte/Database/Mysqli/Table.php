@@ -29,9 +29,9 @@ class Table extends AbstractTable
 	/**
 	 * Holds this instance of the table interface
 	 *
-	 * @var \ElkArte\Database\AbstractTable
+	 * @var AbstractTable
 	 */
-	protected static $_tbl = null;
+	protected static $_tbl;
 
 	/**
 	 * {@inheritdoc }
@@ -43,7 +43,7 @@ class Table extends AbstractTable
 		$table_name = str_replace('{db_prefix}', $this->_db_prefix, $table_name);
 
 		// God no - dropping one of these = bad.
-		if (in_array(strtolower($table_name), $this->_reservedTables))
+		if (in_array(strtolower($table_name), $this->_reservedTables, true))
 		{
 			return false;
 		}
@@ -59,9 +59,9 @@ class Table extends AbstractTable
 			$query = 'DROP TABLE ' . $table_name;
 			$this->_db->query('',
 				$query,
-				array(
+				[
 					'security_override' => true,
-				)
+				]
 			);
 
 			return true;
@@ -97,10 +97,8 @@ class Table extends AbstractTable
 			{
 				return $this->change_column($table_name, $column_info['name'], $column_info);
 			}
-			else
-			{
-				return false;
-			}
+
+			return false;
 		}
 
 		// Now add the thing!
@@ -131,26 +129,32 @@ class Table extends AbstractTable
 		{
 			$column_info['name'] = $old_column;
 		}
+
 		if (!isset($column_info['default']))
 		{
 			$column_info['default'] = $old_info['default'];
 		}
+
 		if (!isset($column_info['null']))
 		{
 			$column_info['null'] = $old_info['null'];
 		}
+
 		if (!isset($column_info['auto']))
 		{
 			$column_info['auto'] = $old_info['auto'];
 		}
+
 		if (!isset($column_info['type']))
 		{
 			$column_info['type'] = $old_info['type'];
 		}
+
 		if (!isset($column_info['size']) || !is_numeric($column_info['size']))
 		{
 			$column_info['size'] = $old_info['size'];
 		}
+
 		if (!isset($column_info['unsigned']) || !in_array($column_info['type'], array('int', 'tinyint', 'smallint', 'mediumint', 'bigint')))
 		{
 			$column_info['unsigned'] = '';
@@ -179,7 +183,7 @@ class Table extends AbstractTable
 		}
 		elseif (isset($column['default']) && $column['default'] !== null)
 		{
-			$default = 'default \'' . $this->_db->escape_string($column['default']) . '\'';
+			$default = "default '" . $this->_db->escape_string($column['default']) . "'";
 		}
 		else
 		{
@@ -188,18 +192,18 @@ class Table extends AbstractTable
 
 		// Sort out the size... and stuff...
 		$column['size'] = isset($column['size']) && is_numeric($column['size']) ? $column['size'] : null;
-		list ($type, $size) = $this->calculate_type($column['type'], $column['size']);
+		[$type, $size] = $this->calculate_type($column['type'], $column['size']);
 
 		// Allow unsigned integers (mysql only)
 		$unsigned = in_array($type, array('int', 'tinyint', 'smallint', 'mediumint', 'bigint', 'float')) && !empty($column['unsigned']) ? 'unsigned ' : '';
 
 		if ($size !== null)
 		{
-			$type = $type . '(' . $size . ')';
+			$type .= '(' . $size . ')';
 		}
 
 		// Now just put it together!
-		return '`' . $column['name'] . '` ' . $type . ' ' . (!empty($unsigned) ? $unsigned : '') . (!empty($column['null']) ? '' : 'NOT NULL') . ' ' . $default;
+		return '`' . $column['name'] . '` ' . $type . ' ' . (empty($unsigned) ? '' : $unsigned) . (empty($column['null']) ? 'NOT NULL' : '') . ' ' . $default;
 	}
 
 	/**
@@ -208,7 +212,7 @@ class Table extends AbstractTable
 	public function calculate_type($type_name, $type_size = null, $reverse = false)
 	{
 		// MySQL is actually the generic baseline.
-		return array($type_name, $type_size);
+		return [$type_name, $type_size];
 	}
 
 	/**
@@ -244,13 +248,14 @@ class Table extends AbstractTable
 		{
 			return false;
 		}
+
 		$columns = implode(',', $index_info['columns']);
 
 		// No name - make it up!
 		if (empty($index_info['name']))
 		{
 			// No need for primary.
-			if (isset($index_info['type']) && $index_info['type'] == 'primary')
+			if (isset($index_info['type']) && $index_info['type'] === 'primary')
 			{
 				$index_info['name'] = '';
 			}
@@ -276,10 +281,8 @@ class Table extends AbstractTable
 				{
 					return false;
 				}
-				else
-				{
-					$this->remove_index($table_name, $index_info['name']);
-				}
+
+				$this->remove_index($table_name, $index_info['name']);
 			}
 		}
 
@@ -294,6 +297,7 @@ class Table extends AbstractTable
 			$this->_alter_table($table_name, '
 				ADD ' . (isset($index_info['type']) && $index_info['type'] === 'unique' ? 'UNIQUE' : 'INDEX') . ' ' . $index_info['name'] . ' (' . $columns . ')');
 		}
+
 		return true;
 	}
 
@@ -321,7 +325,7 @@ class Table extends AbstractTable
 			else
 			{
 				// What is the type?
-				if ($row['Key_name'] == 'PRIMARY')
+				if ($row['Key_name'] === 'PRIMARY')
 				{
 					$type = 'primary';
 				}
@@ -329,7 +333,7 @@ class Table extends AbstractTable
 				{
 					$type = 'unique';
 				}
-				elseif (isset($row['Index_type']) && $row['Index_type'] == 'FULLTEXT')
+				elseif (isset($row['Index_type']) && $row['Index_type'] === 'FULLTEXT')
 				{
 					$type = 'fulltext';
 				}
@@ -359,6 +363,7 @@ class Table extends AbstractTable
 				}
 			}
 		}
+
 		$result->free_result();
 
 		return $indexes;
@@ -386,7 +391,7 @@ class Table extends AbstractTable
 				return true;
 			}
 
-			if ($index['name'] == $index_name)
+			if ($index['name'] === $index_name)
 			{
 				// Drop the bugger...
 				$this->_alter_table($table_name, '
@@ -445,7 +450,7 @@ class Table extends AbstractTable
 				{
 					$type = $matches[1];
 					$size = $matches[2];
-					if (!empty($matches[3]) && $matches[3] == 'unsigned')
+					if (!empty($matches[3]) && $matches[3] === 'unsigned')
 					{
 						$unsigned = true;
 					}
@@ -472,6 +477,7 @@ class Table extends AbstractTable
 				}
 			}
 		}
+
 		$result->free_result();
 
 		return $columns;
@@ -508,7 +514,6 @@ class Table extends AbstractTable
 			{
 				return -1;
 			}
-
 			// How much left?
 			$request = $this->_db->fetchQuery('
 			SHOW TABLE STATUS LIKE {string:table}',
@@ -518,15 +523,10 @@ class Table extends AbstractTable
 			);
 			$row = $request->fetch_assoc();
 			$request->free_result();
-
-			$total_change = isset($row['Data_free']) && $data_before > $row['Data_free'] ? $data_before / 1024 : 0;
-		}
-		else
-		{
-			$total_change = 0;
+			return isset($row['Data_free']) && $data_before > $row['Data_free'] ? $data_before / 1024 : 0;
 		}
 
-		return $total_change;
+		return 0;
 	}
 
 	/**
@@ -582,7 +582,8 @@ class Table extends AbstractTable
 				{
 					$index['name'] = implode('_', $index['columns']);
 				}
-				$index_query .= "\n\t" . (isset($index['type']) && $index['type'] == 'unique' ? 'UNIQUE' : 'KEY') . ' ' . $index['name'] . ' (' . $columns . '),';
+
+				$index_query .= "\n\t" . (isset($index['type']) && $index['type'] === 'unique' ? 'UNIQUE' : 'KEY') . ' ' . $index['name'] . ' (' . $columns . '),';
 			}
 		}
 

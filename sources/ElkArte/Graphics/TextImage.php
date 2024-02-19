@@ -25,18 +25,14 @@ namespace ElkArte\Graphics;
  */
 class TextImage extends Image
 {
-	/** @var string text to be shown in the image */
-	protected $_text = '';
-
 	/**
 	 * Image constructor.
 	 *
-	 * @param string $text
+	 * @param string $_text
 	 * @param bool $force_gd
 	 */
-	public function __construct($text, $force_gd = false)
+	public function __construct(protected $_text, $force_gd = false)
 	{
-		$this->_text = $text;
 		$this->_force_gd = $force_gd;
 
 		// Determine and set what image library we will use
@@ -44,7 +40,7 @@ class TextImage extends Image
 		{
 			$this->setManipulator();
 		}
-		catch (\Exception $e)
+		catch (\Exception)
 		{
 			// Nothing to do
 		}
@@ -78,18 +74,18 @@ class TextImage extends Image
 
 	/**
 	 * Simple function to generate an image containing some text.
-	 * It uses preferentially Imagick if present, otherwise GD.
+	 * It uses preferentially ImageMagick if present, otherwise GD.
 	 * Font and size are fixed.
 	 *
 	 * @param int $width Width of the final image
 	 * @param int $height Height of the image
 	 * @param string $format Type of the image (valid types are png, jpeg, gif)
 	 *
-	 * @return bool|string The image or false if neither Imagick nor GD are found
+	 * @return bool|string The image or false if neither ImageMagick nor GD are found
 	 */
 	public function generate($width = 100, $height = 75, $format = 'png')
 	{
-		$valid_formats = array('jpeg', 'png', 'gif');
+		$valid_formats = ['jpeg', 'png', 'gif'];
 		if (!in_array($format, $valid_formats))
 		{
 			$format = 'png';

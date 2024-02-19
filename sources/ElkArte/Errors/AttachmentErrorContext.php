@@ -20,17 +20,17 @@ namespace ElkArte\Errors;
  */
 class AttachmentErrorContext
 {
-	/** @var null|object Holds our static instance of the class  */
-	private static $_context = null;
+	/** @var null|object Holds our static instance of the class */
+	private static $_context;
 
-	/** @var null|array Holds all attachment ids  */
-	private $_attachs = null;
+	/** @var null|array Holds all attachment ids */
+	private $_attachs;
 
 	/** @var null|ErrorContext Holds any errors found */
-	private $_generic_error = null;
+	private $_generic_error;
 
 	/** @var null|string Holds if the error is generic of specific to an attachment */
-	private $_active_attach = null;
+	private $_active_attach;
 
 	/**
 	 * Find and return Attachment_ErrorContext instance if it exists,
@@ -185,12 +185,9 @@ class AttachmentErrorContext
 	 */
 	public function hasError($error_code, $attachID = null)
 	{
-		if ($this->_generic_error !== null)
+		if ($this->_generic_error !== null && $this->_generic_error->hasError($error_code))
 		{
-			if ($this->_generic_error->hasError($error_code))
-			{
-				return true;
-			}
+			return true;
 		}
 
 		if (!empty($this->_attachs))
@@ -199,14 +196,12 @@ class AttachmentErrorContext
 			{
 				return isset($this->_attachs[$attachID]) && $this->_attachs[$attachID]['error']->hasError($error_code);
 			}
-			else
+
+			foreach ($this->_attachs as $attach)
 			{
-				foreach ($this->_attachs as $attach)
+				if ($attach['error']->hasError($error_code))
 				{
-					if ($attach['error']->hasError($error_code))
-					{
-						return true;
-					}
+					return true;
 				}
 			}
 		}

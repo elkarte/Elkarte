@@ -21,7 +21,7 @@ class ImageUploadResize
 	/** @var int[] Holds the WxH bounds an image must be within */
 	protected $_bounds;
 
-	/** @var \ElkArte\Graphics\Image The image we are working with */
+	/** @var Image The image we are working with */
 	protected $image;
 
 	/** @var string the full path name to the image */
@@ -171,7 +171,7 @@ class ImageUploadResize
 		}
 
 		// A WebP image will generally be smaller than Jpeg or Png
-		if ($this->getWebP() && ($this->_sizeCurrent[2] === IMAGETYPE_JPEG || $this->_sizeCurrent[2] === IMAGETYPE_PNG))
+		if (($this->_sizeCurrent[2] === IMAGETYPE_JPEG || $this->_sizeCurrent[2] === IMAGETYPE_PNG) && $this->getWebP())
 		{
 			return true;
 		}
@@ -183,13 +183,8 @@ class ImageUploadResize
 		}
 
 		// A transparent PNG, no WebP, If converted would be destructive, so just no
-		if ($this->_sizeCurrent[2] === IMAGETYPE_PNG && $this->image->getTransparency())
-		{
-			return false;
-		}
-
 		// Others like bmp or gif maybe even tiff
-		return true;
+		return !($this->_sizeCurrent[2] === IMAGETYPE_PNG && $this->image->getTransparency());
 	}
 
 	/**
