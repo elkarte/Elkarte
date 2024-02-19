@@ -31,7 +31,7 @@ class Display extends AbstractModule
 	protected $_id_poll = 0;
 
 	/**
-	 * {@inheritdoc}
+	 * {@inheritDoc}
 	 */
 	public static function hooks(EventManager $eventsManager)
 	{

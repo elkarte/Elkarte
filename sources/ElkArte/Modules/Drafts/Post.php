@@ -50,7 +50,7 @@ class Post extends AbstractModule
 	protected $_loading_draft = false;
 
 	/**
-	 * {@inheritdoc}
+	 * {@inheritDoc}
 	 */
 	public static function hooks(EventManager $eventsManager)
 	{

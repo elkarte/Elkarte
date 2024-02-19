@@ -31,7 +31,7 @@ class Post extends AbstractModule
 	protected static $_make_poll = false;
 
 	/**
-	 * {@inheritdoc}
+	 * {@inheritDoc}
 	 */
 	public static function hooks(EventManager $eventsManager)
 	{

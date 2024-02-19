@@ -53,7 +53,7 @@ class keyCaptcha implements ControlInterface
 	}
 
 	/**
-	 * {@inheritdoc}
+	 * {@inheritDoc}
 	 */
 	public function showVerification($sessionVal, $isNew, $force_refresh = true)
 	{
@@ -86,7 +86,7 @@ class keyCaptcha implements ControlInterface
 	}
 
 	/**
-	 * {@inheritdoc}
+	 * {@inheritDoc}
 	 */
 	public function createTest($sessionVal, $refresh = true)
 	{
@@ -94,7 +94,7 @@ class keyCaptcha implements ControlInterface
 	}
 
 	/**
-	 * {@inheritdoc}
+	 * {@inheritDoc}
 	 */
 	public function prepareContext($sessionVal)
 	{
@@ -107,7 +107,7 @@ class keyCaptcha implements ControlInterface
 	}
 
 	/**
-	 * {@inheritdoc}
+	 * {@inheritDoc}
 	 */
 	public function doTest($sessionVal)
 	{
@@ -126,7 +126,7 @@ class keyCaptcha implements ControlInterface
 	}
 
 	/**
-	 * {@inheritdoc}
+	 * {@inheritDoc}
 	 */
 	public function hasVisibleTemplate()
 	{
@@ -134,7 +134,7 @@ class keyCaptcha implements ControlInterface
 	}
 
 	/**
-	 * {@inheritdoc}
+	 * {@inheritDoc}
 	 */
 	public function settings()
 	{

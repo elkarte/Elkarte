@@ -32,7 +32,7 @@ use ElkArte\User;
 class MessageIndex extends AbstractController implements FrontpageInterface
 {
 	/**
-	 * {@inheritdoc}
+	 * {@inheritDoc}
 	 */
 	public static function frontPageHook(&$default_action)
 	{
@@ -46,7 +46,7 @@ class MessageIndex extends AbstractController implements FrontpageInterface
 	}
 
 	/**
-	 * {@inheritdoc}
+	 * {@inheritDoc}
 	 */
 	public static function frontPageOptions()
 	{
@@ -92,7 +92,7 @@ class MessageIndex extends AbstractController implements FrontpageInterface
 	}
 
 	/**
-	 * {@inheritdoc}
+	 * {@inheritDoc}
 	 */
 	public static function validateFrontPageOptions($post)
 	{

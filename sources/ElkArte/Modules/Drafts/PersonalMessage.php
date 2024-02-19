@@ -49,7 +49,7 @@ class PersonalMessage extends AbstractModule
 	/**
 	 * Add PM draft hooks and events to the system
 	 *
-	 * {@inheritdoc}
+	 * {@inheritDoc}
 	 */
 	public static function hooks(EventManager $eventsManager)
 	{

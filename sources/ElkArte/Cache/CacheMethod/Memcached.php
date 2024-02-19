@@ -18,14 +18,14 @@ namespace ElkArte\Cache\CacheMethod;
  */
 class Memcached extends AbstractCacheMethod
 {
-	/** {@inheritdoc} */
+	/** {@inheritDoc} */
 	protected $title = 'Memcached';
 
 	/** @var \Memcached Memcached instance representing the connection to the memcache servers. */
 	protected $obj;
 
 	/**
-	 * {@inheritdoc}
+	 * {@inheritDoc}
 	 */
 	public function __construct($options)
 	{
@@ -45,7 +45,7 @@ class Memcached extends AbstractCacheMethod
 	}
 
 	/**
-	 * {@inheritdoc}
+	 * {@inheritDoc}
 	 */
 	public function isAvailable()
 	{
@@ -65,7 +65,7 @@ class Memcached extends AbstractCacheMethod
 	}
 
 	/**
-	 * {@inheritdoc}
+	 * {@inheritDoc}
 	 */
 	protected function setOptions()
 	{
@@ -179,7 +179,7 @@ class Memcached extends AbstractCacheMethod
 	}
 
 	/**
-	 * {@inheritdoc}
+	 * {@inheritDoc}
 	 */
 	public function exists($key)
 	{
@@ -189,7 +189,7 @@ class Memcached extends AbstractCacheMethod
 	}
 
 	/**
-	 * {@inheritdoc}
+	 * {@inheritDoc}
 	 */
 	public function get($key, $ttl = 120)
 	{
@@ -200,7 +200,7 @@ class Memcached extends AbstractCacheMethod
 	}
 
 	/**
-	 * {@inheritdoc}
+	 * {@inheritDoc}
 	 */
 	public function put($key, $value, $ttl = 120)
 	{
@@ -213,7 +213,7 @@ class Memcached extends AbstractCacheMethod
 	}
 
 	/**
-	 * {@inheritdoc}
+	 * {@inheritDoc}
 	 */
 	public function clean($type = '')
 	{
@@ -222,7 +222,7 @@ class Memcached extends AbstractCacheMethod
 	}
 
 	/**
-	 * {@inheritdoc}
+	 * {@inheritDoc}
 	 */
 	public function details()
 	{

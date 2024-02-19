@@ -26,10 +26,10 @@ use UnexpectedValueException;
  */
 class Filebased extends AbstractCacheMethod
 {
-	/** {@inheritdoc} */
+	/** {@inheritDoc} */
 	protected $title = 'File-based caching';
 
-	/** {@inheritdoc} */
+	/** {@inheritDoc} */
 	protected $prefix = 'data_';
 
 	/** @var string File extension. */
@@ -49,7 +49,7 @@ class Filebased extends AbstractCacheMethod
 	}
 
 	/**
-	 * {@inheritdoc}
+	 * {@inheritDoc}
 	 */
 	public function exists($key)
 	{
@@ -57,7 +57,7 @@ class Filebased extends AbstractCacheMethod
 	}
 
 	/**
-	 * {@inheritdoc}
+	 * {@inheritDoc}
 	 */
 	public function put($key, $value, $ttl = 120)
 	{
@@ -83,7 +83,7 @@ class Filebased extends AbstractCacheMethod
 	}
 
 	/**
-	 * {@inheritdoc}
+	 * {@inheritDoc}
 	 */
 	public function get($key, $ttl = 120)
 	{
@@ -116,7 +116,7 @@ class Filebased extends AbstractCacheMethod
 	}
 
 	/**
-	 * {@inheritdoc}
+	 * {@inheritDoc}
 	 */
 	public function clean($type = '')
 	{
@@ -151,7 +151,7 @@ class Filebased extends AbstractCacheMethod
 	}
 
 	/**
-	 * {@inheritdoc}
+	 * {@inheritDoc}
 	 */
 	public function fixkey($key)
 	{
@@ -159,7 +159,7 @@ class Filebased extends AbstractCacheMethod
 	}
 
 	/**
-	 * {@inheritdoc}
+	 * {@inheritDoc}
 	 */
 	public function isAvailable()
 	{
@@ -167,7 +167,7 @@ class Filebased extends AbstractCacheMethod
 	}
 
 	/**
-	 * {@inheritdoc}
+	 * {@inheritDoc}
 	 */
 	public function details()
 	{

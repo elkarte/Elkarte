@@ -50,7 +50,7 @@ class Recent extends AbstractController implements FrontpageInterface
 	private $_num_per_page = 10;
 
 	/**
-	 * {@inheritdoc}
+	 * {@inheritDoc}
 	 */
 	public static function frontPageHook(&$default_action)
 	{
@@ -64,7 +64,7 @@ class Recent extends AbstractController implements FrontpageInterface
 	}
 
 	/**
-	 * {@inheritdoc}
+	 * {@inheritDoc}
 	 */
 	public static function frontPageOptions()
 	{

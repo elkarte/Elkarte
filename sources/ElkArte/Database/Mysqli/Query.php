@@ -570,7 +570,7 @@ class Query extends AbstractQuery
 	}
 
 	/**
-	 * {@inheritdoc}
+	 * {@inheritDoc}
 	 */
 	public function select_db($dbName = null)
 	{
@@ -578,7 +578,7 @@ class Query extends AbstractQuery
 	}
 
 	/**
-	 * {@inheritdoc}
+	 * {@inheritDoc}
 	 */
 	public function validConnection()
 	{
@@ -602,7 +602,7 @@ class Query extends AbstractQuery
 	}
 
 	/**
-	 * {@inheritdoc}
+	 * {@inheritDoc}
 	 */
 	protected function _replaceStringCaseSensitive($replacement)
 	{
@@ -610,7 +610,7 @@ class Query extends AbstractQuery
 	}
 
 	/**
-	 * {@inheritdoc}
+	 * {@inheritDoc}
 	 */
 	protected function _replaceStringCaseInsensitive($replacement)
 	{

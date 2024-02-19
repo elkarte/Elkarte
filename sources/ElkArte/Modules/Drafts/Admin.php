@@ -27,7 +27,7 @@ use ElkArte\Modules\AbstractModule;
 class Admin extends AbstractModule
 {
 	/**
-	 * {@inheritdoc}
+	 * {@inheritDoc}
 	 */
 	public static function hooks(EventManager $eventsManager)
 	{

@@ -54,7 +54,7 @@ class DatabaseHandler extends \SessionHandler
 	}
 
 	/**
-	 * {@inheritdoc}
+	 * {@inheritDoc}
 	 */
 	public function destroy($sessionId) : bool
 	{
@@ -77,7 +77,7 @@ class DatabaseHandler extends \SessionHandler
 	}
 
 	/**
-	 * {@inheritdoc}
+	 * {@inheritDoc}
 	 */
 	#[\ReturnTypeWillChange]
 	public function gc($maxLifetime)
@@ -101,7 +101,7 @@ class DatabaseHandler extends \SessionHandler
 	}
 
 	/**
-	 * {@inheritdoc}
+	 * {@inheritDoc}
 	 */
 	public function read($sessionId) : string
 	{
@@ -127,7 +127,7 @@ class DatabaseHandler extends \SessionHandler
 	}
 
 	/**
-	 * {@inheritdoc}
+	 * {@inheritDoc}
 	 */
 	public function write($sessionId, $data) : bool
 	{

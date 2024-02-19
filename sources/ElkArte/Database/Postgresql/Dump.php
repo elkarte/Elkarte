@@ -139,7 +139,7 @@ class Dump extends AbstractDump
 	}
 
 	/**
-	 * {@inheritdoc}
+	 * {@inheritDoc}
 	 */
 	public function list_tables($db_name_str = false, $filter = false)
 	{
