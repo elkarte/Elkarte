@@ -13,9 +13,9 @@
 
 namespace ElkArte\Languages;
 
+use ElkArte\Database\QueryInterface;
 use ElkArte\Debug;
 use ElkArte\Errors;
-use ElkArte\Database\QueryInterface;
 
 /**
  * This class takes care of loading language files
@@ -31,11 +31,11 @@ class Loader
 	/** @var string the language in use */
 	protected $language = 'English';
 
-	/** @var string */
-	protected $variable_name = '';
+	/** @var string The string representation of the variable for the loaded results */
+	protected $variableName = '';
 
 	/** @var bool if to fallback when we can find a request language area file */
-	protected $load_fallback = true;
+	protected $loadFallback = true;
 
 	/** @var array */
 	protected $variable = true;
@@ -48,7 +48,7 @@ class Loader
 	 *
 	 * @param string|null $lang area lexicon file to load
 	 * @param array $variable to return string in
-	 * @param \ElkArte\Database\QueryInterface $db
+	 * @param QueryInterface $db
 	 * @param string $variable_name
 	 */
 	public function __construct($lang, &$variable, QueryInterface $db, string $variable_name = 'txt')
@@ -61,7 +61,7 @@ class Loader
 		$this->path = LANGUAGEDIR . '/';
 		$this->db = $db;
 		$this->variable = &$variable;
-		$this->variable_name = $variable_name;
+		$this->variableName = $variable_name;
 
 		if (empty($this->variable))
 		{
@@ -72,11 +72,11 @@ class Loader
 	/**
 	 * If we should use a fallback language when the requested one is not found
 	 *
-	 * @param bool $new_Status
+	 * @param bool $newStatus
 	 */
-	public function setFallback(bool $new_Status)
+	public function setFallback(bool $newStatus)
 	{
-		$this->load_fallback = $new_Status;
+		$this->loadFallback = $newStatus;
 	}
 
 	/**
@@ -93,70 +93,107 @@ class Loader
 	 * Does the real work of looking for, then the loading the area files.  Will
 	 * implement a language fallback if enabled.
 	 *
-	 * @param string $file_name area language file to load
+	 * @param string $file_name area language file to load, separate multiple with a +
 	 * @param boolean $fatal what to do if we can not load the requested area
 	 * @param boolean $fix_calendar_arrays if to update the calendar [] as well
 	 */
 	public function load($file_name, $fatal = true, $fix_calendar_arrays = false)
 	{
-		global $db_show_debug, $txt;
-
 		$file_names = explode('+', $file_name);
 
 		// For each file open it up and write it out!
 		foreach ($file_names as $file)
 		{
-			$file = ucfirst($file);
-			if (isset($this->loaded[$file]) || in_array($file, Editor::IGNORE_FILES))
-			{
-				continue;
-			}
-
-			$found_fallback = false;
-			if ($this->load_fallback)
-			{
-				$found_fallback = $this->loadFile($file, 'English');
-			}
-			$found = $this->loadFile($file, $this->language);
-
-			$this->loaded[$file] = true;
-
-			// Keep track of what we're up to, soldier.
-			if ($found && $db_show_debug === true)
-			{
-				Debug::instance()->add(
-					'language_files',
-					$file . '.' . $this->language .
-					' (' . str_replace(BOARDDIR, '', $this->path) . ')'
-				);
-			}
-
-			// That couldn't be found!  Log the error, but *try* to continue normally.
-			if (!$found && $fatal)
-			{
-				if ($file !== 'Addons')
-				{
-					Errors::instance()->log_error(
-						sprintf(
-							$txt['theme_language_error'],
-							$file . '.' . $this->language,
-							'template'
-						)
-					);
-				}
-
-				// If we do have a fallback it may not be necessary to break out.
-				if ($found_fallback === false)
-				{
-					break;
-				}
-			}
+			$this->handleFile(ucfirst($file), $fatal);
 		}
+
 		$this->loadFromDb($file_names);
 
 		if ($fix_calendar_arrays)
 		{
 			$this->fix_calendar_text();
+		}
+	}
+
+	/**
+	 * Handle the loading of a language file.
+	 *
+	 * @param string $file The name of the language file to load.
+	 * @param bool $fatal Whether the absence of the file is fatal (true) or not (false).
+	 *
+	 * @return void
+	 */
+	private function handleFile($file, $fatal)
+	{
+		global $db_show_debug;
+
+		if (isset($this->loaded[$file]) || in_array($file, Editor::IGNORE_FILES, true))
+		{
+			return;
+		}
+
+		// A fallback is used to provide core language strings that are missing from another language
+		$found_fallback = false;
+		if ($this->loadFallback)
+		{
+			$found_fallback = $this->loadFile($file, 'English');
+		}
+
+		$found = $this->loadFile($file, $this->language);
+		$this->loaded[$file] = true;
+
+		// Keep track of what we're up to, soldier.
+		if (!$found && $db_show_debug === true)
+		{
+			$this->logDebug($file);
+		}
+
+		// That couldn't be found!  Log the error, but *try* to continue normally.
+		if (!$found && $fatal)
+		{
+			$this->logError($file, $found_fallback);
+		}
+	}
+
+	/**
+	 * Logs a debug message when a language file is not found.
+	 *
+	 * @param string $file The name of the file
+	 * @return void
+	 */
+	private function logDebug($file)
+	{
+		Debug::instance()->add(
+			'language_files',
+			$file . '.' . $this->language . ' (' . str_replace(BOARDDIR, '', $this->path) . ')'
+		);
+	}
+
+	/**
+	 * Logs an language loading error and throws an exception if necessary.
+	 *
+	 * @param string $file The file name.
+	 * @param bool $found_fallback Whether a fallback was found or not.
+	 * @return void
+	 */
+	private function logError($file, $found_fallback)
+	{
+		global $txt;
+
+		if ($file !== 'Addons')
+		{
+			Errors::instance()->log_error(
+				sprintf(
+					$txt['theme_language_error'],
+					$file . '.' . $this->language,
+					'template'
+				)
+			);
+		}
+
+		if ($found_fallback === false)
+		{
+			throw new \RuntimeException("No fallback found for file: {$file}");
 		}
 	}
 
@@ -182,6 +219,7 @@ class Loader
 		{
 			$this->variable[$row['language_key']] = $row['value'];
 		}
+
 		$result->free_result();
 	}
 
@@ -198,9 +236,9 @@ class Loader
 		if (file_exists($filepath))
 		{
 			require($filepath);
-			if (!empty(${$this->variable_name}))
+			if (!empty(${$this->variableName}))
 			{
-				$this->variable = array_merge($this->variable, ${$this->variable_name});
+				$this->variable = array_merge($this->variable, ${$this->variableName});
 			}
 
 			return true;
@@ -212,17 +250,15 @@ class Loader
 	/**
 	 * Loads / Sets arrays for use in date display
 	 * This is here and not in a language file for two reasons:
-	 *  1. the structure is required by the code, so better be sure
-	 *     to have it the way we are supposed to have it
-	 *  2. Transifex (that we use for translating the strings) doesn't
-	 *     support array of arrays, so if we move this to a language file
-	 *     we'd need to move away from Tx.
+	 *  1. the structure is required by the code, so better be sure to have it the way we are supposed to have it
+	 *  2. Transifex (that we use for translating the strings) doesn't support array of arrays, so if we
+	 * move this to a language file we'd need to move away from Tx.
 	 */
 	protected function fix_calendar_text()
 	{
 		global $txt;
 
-		$txt['days'] = array(
+		$txt['days'] = [
 			$txt['sunday'],
 			$txt['monday'],
 			$txt['tuesday'],
@@ -230,8 +266,8 @@ class Loader
 			$txt['thursday'],
 			$txt['friday'],
 			$txt['saturday'],
-		);
-		$txt['days_short'] = array(
+		];
+		$txt['days_short'] = [
 			$txt['sunday_short'],
 			$txt['monday_short'],
 			$txt['tuesday_short'],
@@ -239,8 +275,8 @@ class Loader
 			$txt['thursday_short'],
 			$txt['friday_short'],
 			$txt['saturday_short'],
-		);
-		$txt['months'] = array(
+		];
+		$txt['months'] = [
 			1 => $txt['january'],
 			$txt['february'],
 			$txt['march'],
@@ -253,8 +289,8 @@ class Loader
 			$txt['october'],
 			$txt['november'],
 			$txt['december'],
-		);
-		$txt['months_titles'] = array(
+		];
+		$txt['months_titles'] = [
 			1 => $txt['january_titles'],
 			$txt['february_titles'],
 			$txt['march_titles'],
@@ -267,8 +303,8 @@ class Loader
 			$txt['october_titles'],
 			$txt['november_titles'],
 			$txt['december_titles'],
-		);
-		$txt['months_short'] = array(
+		];
+		$txt['months_short'] = [
 			1 => $txt['january_short'],
 			$txt['february_short'],
 			$txt['march_short'],
@@ -281,6 +317,6 @@ class Loader
 			$txt['october_short'],
 			$txt['november_short'],
 			$txt['december_short'],
-		);
+		];
 	}
 }

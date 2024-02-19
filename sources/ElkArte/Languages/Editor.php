@@ -13,8 +13,8 @@
 
 namespace ElkArte\Languages;
 
-use ElkArte\Util;
 use ElkArte\Database\QueryInterface;
+use ElkArte\Util;
 
 /**
  * This class takes care of handing language edits
@@ -33,7 +33,7 @@ class Editor
 	protected $language = 'English';
 
 	/** @var string */
-	protected $variable_name = '';
+	protected $variableName = '';
 
 	/** @var Loader */
 	protected $loaders = [];
@@ -41,22 +41,24 @@ class Editor
 	/** @var array */
 	protected $txt = '';
 
-	/** @var array|string  */
-	protected $editortxt = '';
+	/** @var array|string */
+	protected $editorTxt = '';
 
-	/** @var array|string  */
+	/** @var array|string */
 	protected $txtBirthdayEmails = '';
 
-	/** @var array  */
-	protected $editing_strings = [];
+	/** @var array */
+	protected $editingStrings = [];
 
-	/** @var array|string[]  */
-	protected $ignore_keys = [];
+	/** @var array|string[] */
+	protected $ignoreKeys = [];
 
 	/**
-	 * @param string $lang
-	 * @param \ElkArte\Database\QueryInterface $db
-	 * @param string $variable_name
+	 * Constructs a new instance of the class.
+	 *
+	 * @param string $lang The language code to be used.
+	 * @param QueryInterface $db An instance of QueryInterface to interact with the database.
+	 * @param string $variable_name The name of the variable. Default is 'txt'.
 	 */
 	public function __construct($lang, QueryInterface $db, string $variable_name = 'txt')
 	{
@@ -67,23 +69,35 @@ class Editor
 
 		$this->path = SOURCEDIR . '/ElkArte/Languages/';
 		$this->db = $db;
-
 		$this->txt = [];
-		$this->editortxt = [];
+		$this->editorTxt = [];
 		$this->txtBirthdayEmails = [];
-		$this->variable_name = $variable_name;
+		$this->variableName = $variable_name;
+
 		$this->loaders = [
 			'txt' => new Loader($lang, $this->txt, $this->db, 'txt'),
-			'editortxt' => new Loader($lang, $this->editortxt, $this->db, 'editortxt'),
+			'editortxt' => new Loader($lang, $this->editorTxt, $this->db, 'editortxt'),
 			'txtBirthdayEmails' => new Loader($lang, $this->txtBirthdayEmails, $this->db, 'txtBirthdayEmails'),
 		];
 
-		// Ignore some things that are specific of the language pack (or just require some casting I don't want be bother of considering, like lang_capitalize_dates).
-		$this->ignore_keys = ['lang_character_set', 'lang_locale', 'lang_dictionary', 'lang_spelling', 'lang_rtl', 'lang_capitalize_dates'];
+		// Ignore some things that are specific of the language pack
+		// (or just require some casting I don't want to be bothered of considering, like lang_capitalize_dates).
+		$this->ignoreKeys = [
+			'lang_character_set',
+			'lang_locale',
+			'lang_dictionary',
+			'lang_spelling',
+			'lang_rtl',
+			'lang_capitalize_dates'
+		];
 	}
 
 	/**
-	 * @param string $path
+	 * Change the path.
+	 *
+	 * @param string $path The new path.
+	 *
+	 * @return void
 	 */
 	public function changePath($path)
 	{
@@ -91,7 +105,11 @@ class Editor
 	}
 
 	/**
-	 * @param string $file_name
+	 * Load method loads a file using a specified file name.
+	 *
+	 * @param string $file_name The name of the file to be loaded.
+	 *
+	 * @return void
 	 */
 	public function load($file_name)
 	{
@@ -102,8 +120,11 @@ class Editor
 	}
 
 	/**
-	 * @param $idx
-	 * @return string|null
+	 * Get method retrieves an element from the loaders array using the specified index.
+	 *
+	 * @param int $idx The index of the element to be retrieved.
+	 *
+	 * @return mixed|null The retrieved element if found, otherwise null.
 	 */
 	public function get($idx)
 	{
@@ -119,23 +140,33 @@ class Editor
 	}
 
 	/**
-	 * @return array
+	 * Retrieves an array of strings for editing.
+	 *
+	 * This method retrieves strings from loaders and prepares them for editing. It applies certain modifications to each string, such as HTML encoding and calculating the number of rows
+	 * needed for the editing textarea.
+	 *
+	 * @return array An array of strings for editing. Each array entry has the following keys:
+	 *               - 'key': A MD5 hash of the original string key.
+	 *               - 'display_key': The original string key.
+	 *               - 'value': The modified string value, HTML encoded.
+	 *               - 'rows': The number of rows needed for the editing textarea.
 	 */
 	public function getForEditing()
 	{
-		$this->editing_strings = [];
+		$this->editingStrings = [];
 		foreach (array_keys($this->loaders) as $k)
 		{
 			foreach ($this->{$k} as $key => $value)
 			{
-				if (in_array($key, $this->ignore_keys))
+				if (in_array($key, $this->ignoreKeys, true))
 				{
 					continue;
 				}
+
 				$md5EntryKey = md5($key);
 				$editing_string = Util::htmlspecialchars(htmlentities($value));
 
-				$this->editing_strings[$md5EntryKey] = [
+				$this->editingStrings[$md5EntryKey] = [
 					'key' => $md5EntryKey,
 					'display_key' => $key,
 					'value' => $editing_string,
@@ -144,12 +175,16 @@ class Editor
 			}
 		}
 
-		return $this->editing_strings;
+		return $this->editingStrings;
 	}
 
 	/**
-	 * @param string $file_name
-	 * @param array $txt
+	 * Save method saves content to a file with the specified file name.
+	 *
+	 * @param string $file_name The name of the file to save the content to.
+	 * @param array $txt The array of content to save.
+	 *
+	 * @return void
 	 */
 	public function save($file_name, $txt)
 	{
@@ -164,19 +199,21 @@ class Editor
 			'language_key' => 'string-40',
 			'value' => 'text'
 		];
+
 		foreach ($txt as $key => $val)
 		{
 			foreach (['txt', 'editortxt', 'txtBirthdayEmails'] as $var)
 			{
-				$display_key = $this->editing_strings[$key]['display_key'] ?? null;
+				$display_key = $this->editingStrings[$key]['display_key'] ?? null;
 				if (!isset($this->{$var}[$display_key]))
 				{
 					continue;
 				}
 
-				// For some reason, apparently sometimes a carriage return char (ASCII 13) appears in content from textareas, but we only use line feed (ASCII 10), so... just remove them all.
+				// For some reason, apparently sometimes a carriage return char (ASCII 13) appears in
+				// content from textareas, but we only use line feed (ASCII 10), so... just remove them all.
 				$val = str_replace("\r", "", $val);
-				if (trim($val) != trim($this->{$var}[$display_key]))
+				if (trim($val) !== trim($this->{$var}[$display_key]))
 				{
 					$this->db->replace('{db_prefix}languages',
 						$columns,
