@@ -210,8 +210,8 @@ class Query extends AbstractQuery
 		[$file, $line] = $this->backtrace_message();
 
 		// Just in case nothing can be found from debug_backtrace
-		$file ??= __FILE__;
-		$line ??= __LINE__;
+		$file = $file ?? __FILE__;
+		$line = $line ?? __LINE__;
 
 		// Decide which connection to use
 		// This is the error message...

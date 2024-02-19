@@ -299,8 +299,8 @@ abstract class AbstractQuery implements QueryInterface
 		[$file, $line, $backtrace_message] = $this->backtrace_message();
 
 		// Just in case nothing can be found from debug_backtrace
-		$file ??= $file_fallback;
-		$line ??= $line_fallback;
+		$file = $file ?? $file_fallback;
+		$line = $line ?? $line_fallback;
 		$log_message .= $backtrace_message;
 
 		// Is always a critical error.
@@ -1009,8 +1009,8 @@ abstract class AbstractQuery implements QueryInterface
 			[$file, $line] = $this->backtrace_message();
 
 			// Just in case nothing can be found from debug_backtrace
-			$file ??= __FILE__;
-			$line ??= __LINE__;
+			$file = $file ?? __FILE__;
+			$line = $line ?? __LINE__;
 
 			if (!empty($_SESSION['debug_redirect']))
 			{

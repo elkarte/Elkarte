@@ -647,7 +647,7 @@ class Notify extends AbstractController
 				try
 				{
 					$subject = getSubject((int) $extra);
-					$subject ??= $txt['notify_unsubscribed_generic'];
+					$subject = $subject ?? $txt['notify_unsubscribed_generic'];
 					$context['unsubscribe_message'] = sprintf($txt['notify_topic_unsubscribed'], $subject, $email);
 				}
 				catch (Exception)

@@ -2723,9 +2723,9 @@ class PersonalMessage extends AbstractController
 		}
 
 		// Default the username to a wildcard matching every user (*).
-		if (!empty($this->_search_params['userspec']) || (!empty($this->_req->post->userspec) && $this->_req->post->userspec != '*'))
+		if (!empty($this->_search_params['userspec']) || (!empty($this->_req->post->userspec) && $this->_req->post->userspec !== '*'))
 		{
-			$this->_search_params['userspec'] ??= $this->_req->post->userspec;
+			$this->_search_params['userspec'] = $this->_search_params['userspec'] ?? $this->_req->post->userspec;
 		}
 
 		// Search modifiers

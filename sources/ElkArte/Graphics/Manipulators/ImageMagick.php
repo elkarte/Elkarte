@@ -112,8 +112,8 @@ class ImageMagick extends AbstractManipulator
 		}
 		catch (ImagickException)
 		{
-			$this->_width = $this->imageDimensions[0] ??= 0;
-			$this->_height = $this->imageDimensions[1] ??= 0;
+			$this->_width = $this->imageDimensions[0] ?? 0;
+			$this->_height = $this->imageDimensions[1] ?? 0;
 		}
 	}
 
@@ -184,8 +184,8 @@ class ImageMagick extends AbstractManipulator
 		$src_height = $this->_height;
 
 		// Allow for a re-encode to the same size
-		$max_width ??= $src_width;
-		$max_height ??= $src_height;
+		$max_width = $max_width ?? $src_width;
+		$max_height = $max_height ?? $src_height;
 
 		// Determine whether to resize to max width or to max height (depending on the limits.)
 		[$dst_width, $dst_height] = $this->imageRatio($max_width, $max_height);
