@@ -101,7 +101,7 @@ class Sphinxql extends AbstractAPI
 	}
 
 	/**
-	 * {@inheritdoc }
+	 * {@inheritDoc}
 	 */
 	public function indexedWordQuery($words, $search_data)
 	{
@@ -109,7 +109,7 @@ class Sphinxql extends AbstractAPI
 	}
 
 	/**
-	 *  {@inheritdoc }
+	 *  {@inheritDoc}
 	 */
 	public function supportsExtended()
 	{
@@ -117,7 +117,7 @@ class Sphinxql extends AbstractAPI
 	}
 
 	/**
-	 * {@inheritdoc }
+	 * {@inheritDoc}
 	 */
 	public function prepareIndexes($word, &$wordsSearch, &$wordsExclude, $isExcluded, $excludedSubjectWords)
 	{
@@ -132,7 +132,7 @@ class Sphinxql extends AbstractAPI
 	}
 
 	/**
-	 * {@inheritdoc }
+	 * {@inheritDoc}
 	 */
 	public function searchQuery($search_words, $excluded_words, &$participants)
 	{
@@ -299,7 +299,7 @@ class Sphinxql extends AbstractAPI
 	}
 
 	/**
-	 * {@inheritdoc }
+	 * {@inheritDoc}
 	 */
 	public function useWordIndex()
 	{

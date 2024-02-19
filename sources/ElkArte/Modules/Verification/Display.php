@@ -29,7 +29,7 @@ use ElkArte\VerificationControls\VerificationControlsIntegrate;
 class Display extends AbstractModule
 {
 	/**
-	 * {@inheritdoc }
+	 * {@inheritDoc}
 	 */
 	public static function hooks(EventManager $eventsManager)
 	{

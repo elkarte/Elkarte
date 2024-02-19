@@ -37,7 +37,7 @@ class News extends AbstractController
 	private $_limit;
 
 	/**
-	 * {@inheritdoc }
+	 * {@inheritDoc}
 	 */
 	public function trackStats($action = '')
 	{

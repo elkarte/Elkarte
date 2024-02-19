@@ -34,7 +34,7 @@ class Jslocale extends AbstractController
 	private $_file_data;
 
 	/**
-	 * {@inheritdoc }
+	 * {@inheritDoc}
 	 */
 	public function trackStats($action = '')
 	{

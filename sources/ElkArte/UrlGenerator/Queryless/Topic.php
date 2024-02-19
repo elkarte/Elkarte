@@ -16,12 +16,12 @@ namespace ElkArte\UrlGenerator\Queryless;
 class Topic extends Standard
 {
 	/**
-	 * {@inheritdoc }
+	 * {@inheritDoc}
 	 */
 	protected $_types = ['topic'];
 
 	/**
-	 * {@inheritdoc }
+	 * {@inheritDoc}
 	 */
 	public function generate($params)
 	{

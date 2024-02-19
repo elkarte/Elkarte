@@ -23,12 +23,12 @@ use ElkArte\UrlGenerator\AbstractUrlGenerator;
 class Standard extends AbstractUrlGenerator
 {
 	/**
-	 * {@inheritdoc }
+	 * {@inheritDoc}
 	 */
 	protected $_types = ['standard'];
 
 	/**
-	 * {@inheritdoc }
+	 * {@inheritDoc}
 	 */
 	public function generate($params)
 	{
@@ -36,7 +36,7 @@ class Standard extends AbstractUrlGenerator
 	}
 
 	/**
-	 * {@inheritdoc }
+	 * {@inheritDoc}
 	 */
 	protected function generateQuery($params)
 	{

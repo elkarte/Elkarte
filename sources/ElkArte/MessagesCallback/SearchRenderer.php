@@ -37,7 +37,7 @@ class SearchRenderer extends Renderer
 	protected $_participants = [];
 
 	/**
-	 * {@inheritdoc }
+	 * {@inheritDoc}
 	 */
 	public function __construct($request, $user, BodyParserInterface $bodyParser, ValuesContainer $opt = null)
 	{
@@ -55,7 +55,7 @@ class SearchRenderer extends Renderer
 	}
 
 	/**
-	 * {@inheritdoc }
+	 * {@inheritDoc}
 	 */
 	protected function _setupPermissions()
 	{
@@ -66,14 +66,14 @@ class SearchRenderer extends Renderer
 	}
 
 	/**
-	 * {@inheritdoc }
+	 * {@inheritDoc}
 	 */
 	protected function _adjustMemberContext($member_context)
 	{
 	}
 
 	/**
-	 * {@inheritdoc }
+	 * {@inheritDoc}
 	 */
 	protected function _adjustAllMembers($member_context)
 	{
@@ -85,7 +85,7 @@ class SearchRenderer extends Renderer
 	}
 
 	/**
-	 * {@inheritdoc }
+	 * {@inheritDoc}
 	 */
 	protected function _buildOutputArray()
 	{

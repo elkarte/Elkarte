@@ -29,7 +29,7 @@ use ElkArte\Languages\Txt;
 class Profile extends AbstractModule
 {
 	/**
-	 * {@inheritdoc }
+	 * {@inheritDoc}
 	 */
 	public static function hooks(EventManager $eventsManager)
 	{

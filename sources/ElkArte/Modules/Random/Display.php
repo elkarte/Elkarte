@@ -27,7 +27,7 @@ class Display extends AbstractModule
 	protected static $includeUnapproved = false;
 
 	/**
-	 * {@inheritdoc }
+	 * {@inheritDoc}
 	 */
 	public static function hooks(EventManager $eventsManager)
 	{

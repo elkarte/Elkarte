@@ -874,7 +874,7 @@ class Standard extends AbstractAPI
 	}
 
 	/**
-	 * {@inheritdoc }
+	 * {@inheritDoc}
 	 */
 	public function indexedWordQuery($words, $search_data)
 	{

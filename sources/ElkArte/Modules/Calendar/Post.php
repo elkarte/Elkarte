@@ -40,7 +40,7 @@ class Post extends AbstractModule
 	protected static $_make_event = false;
 
 	/**
-	 * {@inheritdoc }
+	 * {@inheritDoc}
 	 */
 	public static function hooks(EventManager $eventsManager)
 	{

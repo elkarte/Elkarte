@@ -44,7 +44,7 @@ class Post extends AbstractModule
 	protected $ignore_temp = false;
 
 	/**
-	 * {@inheritdoc }
+	 * {@inheritDoc}
 	 */
 	public static function hooks(EventManager $eventsManager)
 	{

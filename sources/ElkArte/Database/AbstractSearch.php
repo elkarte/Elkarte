@@ -33,7 +33,7 @@ abstract class AbstractSearch implements SearchInterface
 	}
 
 	/**
-	 * {@inheritdoc }
+	 * {@inheritDoc}
 	 */
 	public function search_support($search_type)
 	{
@@ -41,7 +41,7 @@ abstract class AbstractSearch implements SearchInterface
 	}
 
 	/**
-	 * {@inheritdoc }
+	 * {@inheritDoc}
 	 */
 	public function search_query($identifier, $db_string, $db_values = array())
 	{

@@ -26,7 +26,7 @@ use ElkArte\Modules\AbstractModule;
 class BoardIndex extends AbstractModule
 {
 	/**
-	 * {@inheritdoc }
+	 * {@inheritDoc}
 	 */
 	public static function hooks(EventManager $eventsManager)
 	{

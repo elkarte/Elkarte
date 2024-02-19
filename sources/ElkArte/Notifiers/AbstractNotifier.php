@@ -54,7 +54,7 @@ abstract class AbstractNotifier implements NotifierInterface
 		$this->user = $user;
 	}
 	/**
-	 * {@inheritdoc }
+	 * {@inheritDoc}
 	 */
 	abstract public function send(NotificationInterface $obj, NotificationsTask $task, $bodies);
 }

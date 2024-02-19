@@ -23,7 +23,7 @@ use ElkArte\EventManager;
 class Post extends AbstractMentions
 {
 	/**
-	 * {@inheritdoc }
+	 * {@inheritDoc}
 	 */
 	public static function hooks(EventManager $eventsManager)
 	{

@@ -95,7 +95,7 @@ abstract class AbstractController
 	}
 
 	/**
-	 * {@inheritdoc }
+	 * {@inheritDoc}
 	 */
 	public static function frontPageOptions()
 	{
@@ -103,7 +103,7 @@ abstract class AbstractController
 	}
 
 	/**
-	 * {@inheritdoc }
+	 * {@inheritDoc}
 	 */
 	public static function validateFrontPageOptions($post)
 	{

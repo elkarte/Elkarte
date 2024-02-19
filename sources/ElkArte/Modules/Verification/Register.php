@@ -28,7 +28,7 @@ use ElkArte\VerificationControls\VerificationControlsIntegrate;
 class Register extends AbstractModule
 {
 	/**
-	 * {@inheritdoc }
+	 * {@inheritDoc}
 	 */
 	public static function hooks(EventManager $eventsManager)
 	{

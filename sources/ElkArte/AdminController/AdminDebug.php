@@ -26,7 +26,7 @@ use ElkArte\Exceptions\Exception;
 class AdminDebug extends AbstractController
 {
 	/**
-	 * {@inheritdoc }
+	 * {@inheritDoc}
 	 */
 	public function trackStats($action = '')
 	{

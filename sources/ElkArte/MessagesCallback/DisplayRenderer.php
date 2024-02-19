@@ -30,7 +30,7 @@ class DisplayRenderer extends Renderer
 	public const CONTEXT_HOOK = 'integrate_prepare_display_context';
 
 	/**
-	 * {@inheritdoc }
+	 * {@inheritDoc}
 	 */
 	protected function _setupPermissions()
 	{
@@ -49,7 +49,7 @@ class DisplayRenderer extends Renderer
 	}
 
 	/**
-	 * {@inheritdoc }
+	 * {@inheritDoc}
 	 */
 	protected function _adjustAllMembers($member_context)
 	{
@@ -66,7 +66,7 @@ class DisplayRenderer extends Renderer
 	}
 
 	/**
-	 * {@inheritdoc }
+	 * {@inheritDoc}
 	 */
 	protected function _buildOutputArray()
 	{

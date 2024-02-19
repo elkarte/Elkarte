@@ -24,7 +24,7 @@ use ElkArte\Util;
 class XmlPreview extends AbstractController
 {
 	/**
-	 * {@inheritdoc }
+	 * {@inheritDoc}
 	 */
 	public function trackStats($action = '')
 	{

@@ -56,7 +56,7 @@ class Compact implements BodyParserInterface
 	protected $_use_partial_words = false;
 
 	/**
-	 * {@inheritdoc }
+	 * {@inheritDoc}
 	 */
 	public function __construct($highlight, $use_partial_words)
 	{
@@ -67,7 +67,7 @@ class Compact implements BodyParserInterface
 	}
 
 	/**
-	 * {@inheritdoc }
+	 * {@inheritDoc}
 	 */
 	public function getSearchArray()
 	{
@@ -75,7 +75,7 @@ class Compact implements BodyParserInterface
 	}
 
 	/**
-	 * {@inheritdoc }
+	 * {@inheritDoc}
 	 */
 	public function prepare($body, $smileys_enabled)
 	{

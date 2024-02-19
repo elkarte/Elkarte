@@ -41,7 +41,7 @@ class PmRenderer extends Renderer
 	protected $_temp_pm_selected;
 
 	/**
-	 * {@inheritdoc }
+	 * {@inheritDoc}
 	 */
 	public function __construct($request, $user, BodyParserInterface $bodyParser, ValuesContainer $opt = null)
 	{
@@ -58,14 +58,14 @@ class PmRenderer extends Renderer
 	}
 
 	/**
-	 * {@inheritdoc }
+	 * {@inheritDoc}
 	 */
 	protected function _setupPermissions()
 	{
 	}
 
 	/**
-	 * {@inheritdoc }
+	 * {@inheritDoc}
 	 */
 	protected function _adjustGuestContext($member_context)
 	{
@@ -84,7 +84,7 @@ class PmRenderer extends Renderer
 	}
 
 	/**
-	 * {@inheritdoc }
+	 * {@inheritDoc}
 	 */
 	protected function _adjustAllMembers($member_context)
 	{
@@ -97,7 +97,7 @@ class PmRenderer extends Renderer
 	}
 
 	/**
-	 * {@inheritdoc }
+	 * {@inheritDoc}
 	 */
 	protected function _buildOutputArray()
 	{

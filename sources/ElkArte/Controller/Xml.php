@@ -30,7 +30,7 @@ use ElkArte\User;
 class Xml extends AbstractController
 {
 	/**
-	 * {@inheritdoc }
+	 * {@inheritDoc}
 	 */
 	public function trackStats($action = '')
 	{

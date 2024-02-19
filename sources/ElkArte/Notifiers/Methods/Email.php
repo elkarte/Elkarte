@@ -42,7 +42,7 @@ class Email extends AbstractNotifier
 	}
 
 	/**
-	 * {@inheritdoc }
+	 * {@inheritDoc}
 	 */
 	public function send(NotificationInterface $obj, NotificationsTask $task, $bodies)
 	{

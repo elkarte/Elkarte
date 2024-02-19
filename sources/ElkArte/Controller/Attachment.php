@@ -43,7 +43,7 @@ use ElkArte\User;
 class Attachment extends AbstractController
 {
 	/**
-	 * {@inheritdoc }
+	 * {@inheritDoc}
 	 */
 	public function needTheme($action = '')
 	{
@@ -68,7 +68,7 @@ class Attachment extends AbstractController
 	}
 
 	/**
-	 * {@inheritdoc }
+	 * {@inheritDoc}
 	 */
 	public function trackStats($action = '')
 	{

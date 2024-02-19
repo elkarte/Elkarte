@@ -42,7 +42,7 @@ class Display extends AbstractModule
 	protected static $_autosave_frequency = 30000;
 
 	/**
-	 * {@inheritdoc }
+	 * {@inheritDoc}
 	 */
 	public static function hooks(EventManager $eventsManager)
 	{

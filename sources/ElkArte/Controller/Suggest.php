@@ -26,7 +26,7 @@ use ElkArte\SuggestMember;
 class Suggest extends AbstractController
 {
 	/**
-	 * {@inheritdoc }
+	 * {@inheritDoc}
 	 */
 	public function trackStats($action = '')
 	{

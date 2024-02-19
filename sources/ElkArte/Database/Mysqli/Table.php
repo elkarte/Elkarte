@@ -34,7 +34,7 @@ class Table extends AbstractTable
 	protected static $_tbl;
 
 	/**
-	 * {@inheritdoc }
+	 * {@inheritDoc}
 	 */
 	public function drop_table($table_name, $force = false)
 	{
@@ -72,7 +72,7 @@ class Table extends AbstractTable
 	}
 
 	/**
-	 * {@inheritdoc }
+	 * {@inheritDoc}
 	 */
 	protected function _real_prefix()
 	{
@@ -80,7 +80,7 @@ class Table extends AbstractTable
 	}
 
 	/**
-	 * {@inheritdoc }
+	 * {@inheritDoc}
 	 */
 	public function add_column($table_name, $column_info, $parameters = array(), $if_exists = 'update')
 	{
@@ -109,7 +109,7 @@ class Table extends AbstractTable
 	}
 
 	/**
-	 * {@inheritdoc }
+	 * {@inheritDoc}
 	 */
 	public function change_column($table_name, $old_column, $column_info, $parameters = array())
 	{
@@ -207,7 +207,7 @@ class Table extends AbstractTable
 	}
 
 	/**
-	 * {@inheritdoc }
+	 * {@inheritDoc}
 	 */
 	public function calculate_type($type_name, $type_size = null, $reverse = false)
 	{
@@ -216,7 +216,7 @@ class Table extends AbstractTable
 	}
 
 	/**
-	 * {@inheritdoc }
+	 * {@inheritDoc}
 	 */
 	public function remove_column($table_name, $column_name, $parameters = array())
 	{
@@ -237,7 +237,7 @@ class Table extends AbstractTable
 	}
 
 	/**
-	 * {@inheritdoc }
+	 * {@inheritDoc}
 	 */
 	public function add_index($table_name, $index_info, $parameters = array(), $if_exists = 'update')
 	{
@@ -302,7 +302,7 @@ class Table extends AbstractTable
 	}
 
 	/**
-	 * {@inheritdoc }
+	 * {@inheritDoc}
 	 */
 	public function list_indexes($table_name, $detail = false, $parameters = array())
 	{
@@ -370,7 +370,7 @@ class Table extends AbstractTable
 	}
 
 	/**
-	 * {@inheritdoc }
+	 * {@inheritDoc}
 	 */
 	public function remove_index($table_name, $index_name, $parameters = array())
 	{
@@ -406,7 +406,7 @@ class Table extends AbstractTable
 	}
 
 	/**
-	 * {@inheritdoc }
+	 * {@inheritDoc}
 	 */
 	public function table_structure($table_name)
 	{
@@ -420,7 +420,7 @@ class Table extends AbstractTable
 	}
 
 	/**
-	 * {@inheritdoc }
+	 * {@inheritDoc}
 	 */
 	public function list_columns($table_name, $detail = false, $parameters = array())
 	{
@@ -484,7 +484,7 @@ class Table extends AbstractTable
 	}
 
 	/**
-	 * {@inheritdoc }
+	 * {@inheritDoc}
 	 */
 	public function optimize($table)
 	{
@@ -530,7 +530,7 @@ class Table extends AbstractTable
 	}
 
 	/**
-	 * {@inheritdoc }
+	 * {@inheritDoc}
 	 */
 	public function package_log()
 	{
@@ -538,7 +538,7 @@ class Table extends AbstractTable
 	}
 
 	/**
-	 * {@inheritdoc }
+	 * {@inheritDoc}
 	 */
 	protected function _close_table_query($temporary)
 	{
@@ -554,7 +554,7 @@ class Table extends AbstractTable
 	}
 
 	/**
-	 * {@inheritdoc }
+	 * {@inheritDoc}
 	 */
 	protected function _create_query_indexes($indexes, $table_name)
 	{

@@ -23,7 +23,7 @@ use ElkArte\EventManager;
 class Display extends AbstractMentions
 {
 	/**
-	 * {@inheritdoc }
+	 * {@inheritDoc}
 	 */
 	public static function hooks(EventManager $eventsManager)
 	{
