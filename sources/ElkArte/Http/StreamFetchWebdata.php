@@ -2,17 +2,19 @@
 
 /**
  * This will fetch a web resource http/https and return the headers and page data.  It is capable of following
- * redirects and interpreting chunked data, etc.  It will NOT work with allow_url_fopen off.
+ * redirects and interpreting chunked data, etc.  It will NOT work with ini allow_url_fopen off.
  *
  * @package   ElkArte Forum
  * @copyright ElkArte Forum contributors
- * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
+ * @license   BSD https://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
  * @version 2.0 dev
  *
  */
 
 namespace ElkArte\Http;
+
+use Exception;
 
 /**
  * Class StreamFetchWebdata
@@ -21,46 +23,38 @@ namespace ElkArte\Http;
  */
 class StreamFetchWebdata
 {
-	/** @var bool Use the same connection on redirects */
-	private $_keep_alive = false;
-
 	/** @var int Holds the passed or default value for redirects */
-	private $_max_redirect = 3;
+	private $_max_redirect;
 
 	/** @var int how much we will read */
 	private $_content_length = 0;
 
 	/** @var array the parsed url with host, port, path, etc */
-	private $_url = array();
+	private $_url = [];
 
 	/** @var null|resource the fopen resource */
-	private $_fp = null;
-
-	/** @var mixed[] Holds the passed user options array (only option is max_length) */
-	private $_user_options = array();
+	private $_fp;
 
 	/** @var string|string[] Holds any data that will be posted to a form */
 	private $_post_data = '';
 
 	/** @var string[] Holds the response to the request, headers, data, code */
-	private $_response = array('url' => '', 'code' => 404, 'error' => '', 'redirects' => 0, 'size' => 0, 'headers' => array(), 'body' => '');
+	private $_response = ['url' => '', 'code' => 404, 'error' => '', 'redirects' => 0, 'size' => 0, 'headers' => [], 'body' => ''];
 
 	/** @var array the context options for the stream */
-	private $_options = array();
+	private $_options = [];
 
 	/**
 	 * StreamFetchWebdata constructor.
 	 *
-	 * @param array $options
+	 * @param array $_user_options
 	 * @param int $max_redirect
-	 * @param bool $keep_alive
+	 * @param bool $_keep_alive
 	 */
-	public function __construct($options = array(), $max_redirect = 3, $keep_alive = false)
+	public function __construct(private $_user_options = [], $max_redirect = 3, private $_keep_alive = false)
 	{
 		// Initialize class variables
-		$this->_max_redirect = intval($max_redirect);
-		$this->_user_options = $options;
-		$this->_keep_alive = $keep_alive;
+		$this->_max_redirect = (int) $max_redirect;
 	}
 
 	/**
@@ -80,7 +74,7 @@ class StreamFetchWebdata
 			}
 			else
 			{
-				$this->_post_data = http_build_query(array(trim($post_data)), '', '&');
+				$this->_post_data = http_build_query([trim($post_data)], '', '&');
 			}
 		}
 
@@ -123,13 +117,13 @@ class StreamFetchWebdata
 	}
 
 	/**
-	 * Prepares all of the options needed from this request
+	 * Prepares the options needed from this request
 	 *
 	 * @param string $url
 	 */
 	private function _setOptions($url)
 	{
-		$this->_url = array();
+		$this->_url = [];
 
 		// Ensure the url is valid
 		if (filter_var($url, FILTER_VALIDATE_URL))
@@ -142,31 +136,31 @@ class StreamFetchWebdata
 		}
 
 		// Build out the options for our context stream
-		$this->_options = array(
-			'ssl' => array(
+		$this->_options = [
+			'ssl' => [
 				'verify_peer' => false,
 				'verify_peername' => false
-			),
+			],
 			'http' =>
-				array(
+				[
 					'method' => 'GET',
 					'max_redirects' => $this->_max_redirect,
 					'ignore_errors' => true,
 					'protocol_version' => 1.1,
 					'follow_location' => 1,
 					'timeout' => 10,
-					'header' => array(
+					'header' => [
 						'Connection: ' . ($this->_keep_alive ? 'Keep-Alive' : 'close'),
 						'User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML like Gecko) Chrome/51.0.2704.79 Safari/537.36 Edge/14.14931',
 						'Content-Type: application/x-www-form-urlencoded',
-					),
-				)
-		);
+					],
+				]
+		];
 
 		// Try to limit the body of the response?
 		if (!empty($this->_user_options['max_length']))
 		{
-			$this->_content_length = intval($this->_user_options['max_length']);
+			$this->_content_length = (int) $this->_user_options['max_length'];
 			$this->_options['http']['header'][] = 'Range: bytes=0-' . ($this->_content_length - 1);
 		}
 
@@ -190,9 +184,9 @@ class StreamFetchWebdata
 			$context = stream_context_create($this->_options);
 			$this->_fp = fopen($this->_response['url'], 'rb', false, $context);
 		}
-		catch (\Exception $e)
+		catch (Exception $exception)
 		{
-			$this->_response['error'] = $e->getMessage();
+			$this->_response['error'] = $exception->getMessage();
 
 			return false;
 		}
@@ -317,9 +311,7 @@ class StreamFetchWebdata
 		{
 			return $this->_response;
 		}
-		else
-		{
-			return $this->_response[$area] ?? $this->_response;
-		}
+
+		return $this->_response[$area] ?? $this->_response;
 	}
 }

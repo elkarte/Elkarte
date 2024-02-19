@@ -14,6 +14,11 @@ namespace ElkArte\Http;
 
 use ElkArte\HttpReq;
 
+/**
+ * Class Headers
+ *
+ * Handles HTTP headers for the application.
+ */
 class Headers
 {
 	/** @var string Default content type */
@@ -31,11 +36,11 @@ class Headers
 	/** @var array Holds any special (raw) headers collected */
 	protected $specialHeaders = [];
 
-	/** @var \ElkArte\HttpReq|null */
+	/** @var HttpReq|null */
 	protected $req;
 
-	/** @var \ElkArte\Http\Headers Sole private \ElkArte\Headers instance */
-	private static $instance = null;
+	/** @var Headers Sole private \ElkArte\Headers instance */
+	private static $instance;
 
 	/**
 	 * Headers constructor.
@@ -79,7 +84,7 @@ class Headers
 		}
 
 		// Maybe integrations want to change where we are heading?
-		call_integration_hook('integrate_redirect', array(&$setLocation));
+		call_integration_hook('integrate_redirect', [&$setLocation]);
 
 		// Set the location header and code
 		$this
@@ -90,7 +95,7 @@ class Headers
 	}
 
 	/**
-	 * Run maintance function and then send the all collected headers
+	 * Run maintenance function and then send the all collected headers
 	 */
 	public function send()
 	{
@@ -132,8 +137,7 @@ class Headers
 	}
 
 	/**
-	 * Converts / Fixes header names in to a standard format to enable consistent
-	 * search replace etc.
+	 * Converts / Fixes header names to a standard format, so we have consistent search replace etc.
 	 *
 	 * @param string $name
 	 * @return string
@@ -148,7 +152,7 @@ class Headers
 	}
 
 	/**
-	 * Set the http header code, like 404, 200, 301, etc
+	 * Set the http header code, like 404, 200, 301, etc.
 	 * Only output if content type is not empty
 	 *
 	 * @param int $httpCode
@@ -208,7 +212,7 @@ class Headers
 			$altName = "; filename*=UTF-8''" . rawurlencode($fileName);
 		}
 
-		$this->header('Content-Disposition',$type . '; filename="' . $fileName . '"' . $altName);
+		$this->header('Content-Disposition', $type . '; filename="' . $fileName . '"' . $altName);
 
 		return $this;
 	}
@@ -294,15 +298,14 @@ class Headers
 
 		if ($this->contentType)
 		{
-			header('Content-Type: ' . $this->contentType
-				. ($this->charset ? '; charset=' . $this->charset : ''), true, $this->httpCode);
+			header('Content-Type: ' . $this->contentType . ($this->charset ? '; charset=' . $this->charset : ''), true, $this->httpCode);
 		}
 	}
 
 	/**
 	 * Retrieve the sole instance of this class.
 	 *
-	 * @return \ElkArte\Http\Headers
+	 * @return Headers
 	 */
 	public static function instance()
 	{

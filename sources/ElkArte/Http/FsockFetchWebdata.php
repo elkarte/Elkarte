@@ -14,6 +14,8 @@
 
 namespace ElkArte\Http;
 
+use Exception;
+
 /**
  * Class FsockFetchWebdata
  *
@@ -21,9 +23,6 @@ namespace ElkArte\Http;
  */
 class FsockFetchWebdata
 {
-	/** @var bool Use the same connection on redirects */
-	private $_keep_alive;
-
 	/** @var int Holds the passed or default value for redirects */
 	private $_max_redirect;
 
@@ -45,9 +44,6 @@ class FsockFetchWebdata
 	/** @var null|resource the fsockopen resource */
 	private $_fp;
 
-	/** @var mixed[] Holds the passed user options array (only option is max_length) */
-	private $_user_options;
-
 	/** @var string|string[] Holds any data that will be posted to a form */
 	private $_post_data = '';
 
@@ -66,16 +62,14 @@ class FsockFetchWebdata
 	/**
 	 * FsockFetchWebdata constructor.
 	 *
-	 * @param array $options
+	 * @param array $_user_options
 	 * @param int $max_redirect
-	 * @param bool $keep_alive
+	 * @param bool $_keep_alive
 	 */
-	public function __construct($options = [], $max_redirect = 3, $keep_alive = false)
+	public function __construct(private $_user_options = [], $max_redirect = 3, private $_keep_alive = false)
 	{
 		// Initialize class variables
 		$this->_max_redirect = (int) $max_redirect;
-		$this->_user_options = $options;
-		$this->_keep_alive = $keep_alive;
 	}
 
 	/**
@@ -145,7 +139,7 @@ class FsockFetchWebdata
 			$this->_response['code'] = isset($code[1]) ? (int) $code[1] : '???';
 
 			// Make sure we ended up with a 200 OK.
-			if (in_array($this->_response['code'], array(200, 201, 206)))
+			if (in_array($this->_response['code'], [200, 201, 206], true))
 			{
 				// Provide a common valid 200 return code to the caller
 				$this->_response['code'] = 200;
@@ -156,11 +150,9 @@ class FsockFetchWebdata
 
 			return true;
 		}
-		else
-		{
-			// To the new location we go
-			$this->_fopenRequest($location);
-		}
+
+		// To the new location we go
+		$this->_fopenRequest($location);
 
 		return false;
 	}
@@ -174,7 +166,7 @@ class FsockFetchWebdata
 	{
 		$this->_url = [];
 		$this->_response['url'] = $url;
-		$this->_content_length = !empty($this->_user_options['max_length']) ? (int) $this->_user_options['max_length'] : 0;
+		$this->_content_length = empty($this->_user_options['max_length']) ? 0 : (int) $this->_user_options['max_length'];
 
 		// Make sure its valid before we parse it out
 		if (filter_var($url, FILTER_VALIDATE_URL))
@@ -187,12 +179,12 @@ class FsockFetchWebdata
 			if ($url_parse['scheme'] === 'https')
 			{
 				$this->_url['host'] = 'ssl://' . $url_parse['host'];
-				$this->_url['port'] = !empty($this->_url['port']) ? $this->_url['port'] : 443;
+				$this->_url['port'] = empty($this->_url['port']) ? 443 : $this->_url['port'];
 			}
 			else
 			{
 				$this->_url['host'] = $url_parse['host'];
-				$this->_url['port'] = !empty($this->_url['port']) ? $this->_url['port'] : 80;
+				$this->_url['port'] = empty($this->_url['port']) ? 80 : $this->_url['port'];
 			}
 
 			// Fix/Finalize the data path
@@ -216,7 +208,7 @@ class FsockFetchWebdata
 				$this->_fp = fsockopen($this->_url['host'], $this->_url['port'], $errno, $errstr, 5);
 				$this->_response['error'] = empty($errstr) ? false : $errno . ' :: ' . $errstr;
 			}
-			catch (\Exception $e)
+			catch (Exception)
 			{
 				return false;
 			}
@@ -299,7 +291,7 @@ class FsockFetchWebdata
 		foreach ($headers as $header)
 		{
 			// Get name and value
-			list($name, $value) = explode(':', $header, 2);
+			[$name, $value] = explode(':', $header, 2);
 
 			// Normalize / clean
 			$name = strtolower($name);
@@ -342,16 +334,14 @@ class FsockFetchWebdata
 			{
 				return '';
 			}
-			else
-			{
-				// Use the same connection or new?
-				if (!$this->_keep_alive)
-				{
-					fclose($this->_fp);
-				}
 
-				return $this->_headers['location'];
+			// Use the same connection or new?
+			if (!$this->_keep_alive)
+			{
+				fclose($this->_fp);
 			}
+
+			return $this->_headers['location'];
 		}
 
 		return '';
@@ -419,7 +409,7 @@ class FsockFetchWebdata
 		while (trim($body))
 		{
 			// It only claimed to be chunked, but its not.
-			if (!preg_match('~^([\da-fA-F]+)[^\r\n]*\r\n~sm', $body, $match))
+			if (!preg_match('~^([\da-fA-F]+)[^\r\n]*\r\n~m', $body, $match))
 			{
 				$decoded_body = $body;
 				break;
@@ -459,9 +449,7 @@ class FsockFetchWebdata
 		{
 			return $this->_response;
 		}
-		else
-		{
-			return $this->_response[$area] ?? $this->_response;
-		}
+
+		return $this->_response[$area] ?? $this->_response;
 	}
 }
