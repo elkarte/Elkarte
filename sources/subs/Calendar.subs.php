@@ -1132,25 +1132,25 @@ function getEventProperties($event_id, $calendar_only = false)
 	}
 	else
 	{
-		$return_value = array(
-			'boards' => array(),
-			'board' => $row['id_board'],
+		$return_value = [
+			'boards' => [],
+			'board' => (int) $row['id_board'],
 			'new' => 0,
-			'eventid' => $event_id,
-			'year' => $row['year'],
-			'month' => $row['month'],
-			'day' => $row['day'],
+			'eventid' => (int) $event_id,
+			'year' => (int) $row['year'],
+			'month' => (int) $row['month'],
+			'day' => (int) $row['day'],
 			'title' => $row['title'],
 			'span' => 1 + $row['span'],
-			'member' => $row['id_member'],
+			'member' => (int) $row['id_member'],
 			'realname' => $row['real_name'],
 			'sequence' => $row['modified_time'],
-			'topic' => array(
-				'id' => $row['id_topic'],
-				'member_started' => $row['id_member_started'],
-				'first_msg' => $row['id_first_msg'],
-			),
-		);
+			'topic' => [
+				'id' => (int) $row['id_topic'],
+				'member_started' => (int) $row['id_member_started'],
+				'first_msg' => (int) $row['id_first_msg'],
+			],
+		];
 
 		$return_value['last_day'] = (int) Util::strftime('%d', mktime(0, 0, 0, $return_value['month'] == 12 ? 1 : $return_value['month'] + 1, 0, $return_value['month'] == 12 ? $return_value['year'] + 1 : $return_value['year']));
 	}

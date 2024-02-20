@@ -16,6 +16,8 @@
 
 namespace ElkArte;
 
+use ElkArte\Exceptions\Exception;
+
 /**
  * A class to handle the basics of calendar events.
  * Namely a certain kind of validation, inserting a new one, updating existing,
@@ -61,7 +63,7 @@ class CalendarEvent
 	 * @param array $event The options may come from a form
 	 *
 	 * @return array
-	 * @throws \ElkArte\Exceptions\Exception
+	 * @throws Exception
 	 */
 	public function validate($event)
 	{
@@ -80,7 +82,6 @@ class CalendarEvent
 				throw new Exceptions\Exception('invalid_days_numb', false);
 			}
 		}
-
 
 		// There is no need to validate the following values if we are just deleting the event.
 		if (!isset($event['deleteevent']))
@@ -179,7 +180,7 @@ class CalendarEvent
 	public function update($options)
 	{
 		// There could be already a topic you are not allowed to modify
-		if (!allowedTo('post_new') && empty($this->_settings['disableNoPostingCalendarEdits']))
+		if (empty($this->_settings['disableNoPostingCalendarEdits']) && !allowedTo('post_new'))
 		{
 			$eventProperties = getEventProperties($this->_event_id, true);
 		}
@@ -224,7 +225,7 @@ class CalendarEvent
 	 * @param int $member_id - the id of the member saving the event
 	 *
 	 * @return array The event structure.
-	 * @throws \ElkArte\Exceptions\Exception no_access
+	 * @throws Exception no_access
 	 */
 	public function load($options, $member_id)
 	{
