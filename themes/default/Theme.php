@@ -107,8 +107,7 @@ class Theme extends BaseTheme
 				2 => ' <span>[<strong>%1$s</strong>]</span>',
 			],
 
-			// This slightly more complex array, instead, will deal with page indexes as frequently requested by Ant :P
-			// Oh no you don't. :D This slightly less complex array now has cleaner markup. :P
+			// This array deals with page indexes.
 			'page_index_template' => [
 				'base_link' => '<li class="linavPages"><a class="navPages" href="{base_link}">%2$s</a></li>',
 				'previous_page' => '<span class="previous_page">{prev_txt}</span>',
@@ -131,22 +130,20 @@ class Theme extends BaseTheme
 	 */
 	public function template_header(): void
 	{
-		global $context, $settings;
-
 		doSecurityChecks();
 
 		$this->setupThemeContext();
 
 		$header = Headers::instance();
-		$this->setupHeadersExpiration($header, $context);
-		$this->setupHeadersContentType($header, $context, $this->getRequestAPI());
+		$this->setupHeadersExpiration($header);
+		$this->setupHeadersContentType($header, $this->getRequestAPI());
 
 		foreach ($this->getLayers()->prepareContext() as $layer)
 		{
 			$this->getTemplates()->loadSubTemplate($layer . '_above', 'ignore');
 		}
 
-		$this->loadDefaultThemeSettings($settings);
+		$this->loadDefaultThemeSettings();
 
 		$header->sendHeaders();
 	}

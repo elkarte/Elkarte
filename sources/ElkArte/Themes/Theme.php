@@ -32,8 +32,10 @@ abstract class Theme
 {
 	/** @var string */
 	public const DEFAULT_EXPIRES = 'Mon, 26 Jul 1997 05:00:00 GMT';
+
 	/** @var int */
 	public const ALL = -1;
+
 	/** @var array */
 	private const CONTENT_TYPES = [
 		'fatal_error' => 'text/html',
@@ -41,24 +43,34 @@ abstract class Theme
 		'xml' => 'text/xml',
 		'generic_xml' => 'text/xml'
 	];
+
 	/** @var ValuesContainer */
 	public $user;
+
 	/** @var HttpReq user input variables */
 	public $_req;
+
 	/** @var int The id of the theme being used */
 	protected $id;
+
 	/** @var array */
 	protected $links = [];
+
 	/** @var string[] Holds base actions that we do not want crawled / indexed */
 	public $no_index_actions = [];
+
 	/** @var bool Right to left language support */
 	protected $rtl;
+
 	/** @var Templates */
 	private $templates;
+
 	/** @var TemplateLayers */
 	private $layers;
+
 	/** @var Javascript */
 	public $javascript;
+
 	/** @var Css  */
 	public $css;
 
@@ -144,13 +156,33 @@ abstract class Theme
 		return $this;
 	}
 
+	/**
+	 * Get the value of 'api' from the request
+	 *
+	 * What it does:
+	 *  - Retrieves the value of the 'api' parameter from the request.
+	 *
+	 * @return string The value of the 'api' parameter from the request, trimmed.
+	 */
 	public function getRequestAPI(): string
 	{
 		return $this->_req->getRequest('api', 'trim', '');
 	}
 
-	public function setupHeadersExpiration(Headers $header, array $context): void
+	/**
+	 * Set the headers expiration
+	 *
+	 * What it does:
+	 *  - Sets the Expires and Last-Modified headers in the Headers object.
+	 *
+	 * @param Headers $header The Headers object to set the headers in.
+	 *
+	 * @return void
+	 */
+	public function setupHeadersExpiration(Headers $header): void
 	{
+		global $context;
+
 		if (empty($context['no_last_modified']))
 		{
 			$header
@@ -269,23 +301,17 @@ abstract class Theme
 	}
 
 	/**
-	 * Setup the headers content type
+	 * Set the headers content type
 	 *
 	 * What it does:
 	 *  - Sets the content type of the headers based on the provided context and API.
 	 *
 	 * @param Headers $header The Headers instance used to set the content type.
-	 * @param array $context The context array containing the sub template.
 	 * @param string $api The API string used to determine the content type.
 	 * @return void
 	 */
-	public function setupHeadersContentType(Headers $header, array $context, string $api): void
+	public function setupHeadersContentType(Headers $header, string $api): void
 	{
-		if (isset($context['sub_template']))
-		{
-			$api = $context['sub_template'];
-		}
-
 		$contentType = self::CONTENT_TYPES[$api] ?? 'text/html';
 
 		$header->contentType($contentType, 'UTF-8');
@@ -297,12 +323,12 @@ abstract class Theme
 	 * Updates the theme settings by replacing the URL and directory values with the default ones if the 'use_default_images'
 	 * setting is set to 'defaults' and the 'default_template' setting is provided.
 	 *
-	 * @param array &$settings The reference to the theme settings array.
-	 *
 	 * @return void
 	 */
-	public function loadDefaultThemeSettings(array &$settings): void
+	public function loadDefaultThemeSettings(): void
 	{
+		global $settings;
+
 		if (isset($settings['use_default_images'], $settings['default_template'])
 			&& $settings['use_default_images'] === 'defaults')
 		{
@@ -335,6 +361,7 @@ abstract class Theme
 			{
 				continue;
 			}
+
 			$context['news_lines'][$i] = $bbc_parser->parseNews(stripslashes(trim($iValue)));
 		}
 
