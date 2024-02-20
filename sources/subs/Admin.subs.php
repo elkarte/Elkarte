@@ -439,7 +439,7 @@ function enableModules($module, $controllers)
 
 		$existing[] = $module;
 		$existing = array_filter(array_unique($existing));
-		updateSettings(array('modules_' . $controller => implode(',', $existing)));
+		updateSettings(['modules_' . $controller => implode(',', $existing)]);
 	}
 }
 

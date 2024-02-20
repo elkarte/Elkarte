@@ -39,15 +39,14 @@ class EventManager
 	/** @var object[] Instances of addons already loaded. */
 	protected $_instances = array();
 
-	/** @var object Instances of the controller. */
-	protected $_source = null;
+	/** @var AbstractController Instances of the controller, needs to have extended AbstractController. */
+	protected $_source;
 
 	/** @var string[] List of classes already registered. */
-	protected $_classes = array();
+	protected $_classes = [];
 
-	/** @var null|string[] List of classes declared, kept here just to
-	    avoid call get_declared_classes at each trigger */
-	protected $_declared_classes = null;
+	/** @var null|string[] List of classes declared, kept here just to avoid call get_declared_classes at each trigger */
+	protected $_declared_classes;
 
 	/**
 	 * Just a dummy for the time being.
@@ -72,15 +71,14 @@ class EventManager
 	/**
 	 * This is the function use to... trigger an event.
 	 *
-	 * - Called from many areas in the code where events can be raised
-	 * $this->_events->trigger('area', args)
+	 * - Called from many areas in the code where events can be raised $this->_events->trigger('area', args)
 	 *
 	 * @param string $position The "identifier" of the event, such as prepare_post
 	 * @param array $args The arguments passed to the methods registered
 	 *
 	 * @return bool
 	 */
-	public function trigger($position, $args = array())
+	public function trigger($position, $args = [])
 	{
 		// Nothing registered against this event, just return
 		if (!array_key_exists($position, $this->_registered_events) || !$this->_registered_events[$position]->hasEvents())
@@ -94,7 +92,7 @@ class EventManager
 			$class = $event[1];
 			$class_name = $class[0];
 			$method_name = $class[1];
-			$deps = $event[2] ?? array();
+			$deps = $event[2] ?? [];
 			$dependencies = null;
 
 			if (!class_exists($class_name))
@@ -129,17 +127,17 @@ class EventManager
 			$instance = $this->_getInstance($class_name);
 
 			// Do what we know we should do... if we find it.
-			if (is_callable(array($instance, $method_name)))
+			if (is_callable([$instance, $method_name]))
 			{
 				// Don't send $dependencies if there are none / the method can't use them
 				if (empty($dependencies))
 				{
-					call_user_func(array($instance, $method_name));
+					$instance->$method_name();
 				}
 				else
 				{
 					$this->_checkParameters($class_name, $method_name, $dependencies);
-					call_user_func_array(array($instance, $method_name), $dependencies);
+					call_user_func_array([$instance, $method_name], $dependencies);
 				}
 			}
 		}
@@ -163,13 +161,11 @@ class EventManager
 		{
 			return $this->_instances[$class_name];
 		}
-		else
-		{
-			$instance = new $class_name(HttpReq::instance(), User::$info);
-			$this->_setInstance($class_name, $instance);
 
-			return $instance;
-		}
+		$instance = new $class_name(HttpReq::instance(), User::$info);
+		$this->_setInstance($class_name, $instance);
+
+		return $instance;
 	}
 
 	/**
@@ -200,8 +196,7 @@ class EventManager
 	}
 
 	/**
-	 * Takes care of registering the classes/methods to the different positions
-	 * of the \ElkArte\EventManager.
+	 * Takes care of registering the classes/methods to the different positions of the \ElkArte\EventManager.
 	 *
 	 * What it does:
 	 *
@@ -299,15 +294,15 @@ class EventManager
 			$number_params = $r->getNumberOfParameters();
 			unset($r);
 		}
-		catch (\Exception $e)
+		catch (\Exception)
 		{
 			$number_params = 0;
 		}
 
 		// Php8 will not like passing parameters to a method that takes none
-		if ($number_params == 0 && !empty($dependencies))
+		if ($number_params === 0 && !empty($dependencies))
 		{
-			$dependencies = array();
+			$dependencies = [];
 		}
 	}
 }

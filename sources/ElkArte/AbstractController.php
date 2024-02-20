@@ -219,7 +219,7 @@ abstract class AbstractController
 	{
 		global $modSettings;
 
-		$classes = array();
+		$classes = [];
 		$setting_key = 'modules_' . $this->getHook();
 		$namespace = '\\ElkArte\\Modules\\';
 

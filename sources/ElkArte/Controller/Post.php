@@ -111,7 +111,7 @@ class Post extends AbstractController
 		$this->_beforePreparePost();
 
 		// Trigger the prepare_post event
-		$this->_events->trigger('prepare_post', array('topic_attributes' => &$this->_topic_attributes));
+		$this->_events->trigger('prepare_post', ['topic_attributes' => &$this->_topic_attributes]);
 
 		// Sets post form options / checkbox / etc
 		$this->_beforePrepareContext();
@@ -119,7 +119,7 @@ class Post extends AbstractController
 		// Trigger the prepare_context event
 		try
 		{
-			$this->_events->trigger('prepare_context', array('id_member_poster' => $this->_topic_attributes['id_member']));
+			$this->_events->trigger('prepare_context', ['id_member_poster' => (int) $this->_topic_attributes['id_member']]);
 		}
 		catch (ControllerRedirectException $controllerRedirectException)
 		{
@@ -702,7 +702,7 @@ class Post extends AbstractController
 	}
 
 	/**
-	 *
+	 * Preparing the page for post preview or error handling.
 	 */
 	protected function _preparingPage()
 	{
@@ -711,8 +711,8 @@ class Post extends AbstractController
 		// Any errors occurred?
 		$context['post_error'] = array(
 			'errors' => $this->_post_errors->prepareErrors(),
-			'type' => $this->_post_errors->getErrorType() == 0 ? 'minor' : 'serious',
-			'title' => $this->_post_errors->getErrorType() == 0 ? $txt['warning_while_submitting'] : $txt['error_while_submitting'],
+			'type' => $this->_post_errors->getErrorType() === 0 ? 'minor' : 'serious',
+			'title' => $this->_post_errors->getErrorType() === 0 ? $txt['warning_while_submitting'] : $txt['error_while_submitting'],
 		);
 
 		// What are you doing? Posting, modifying, previewing, new post, or reply...
@@ -753,7 +753,7 @@ class Post extends AbstractController
 			$before = isset($_REQUEST['msg']) ? array('before' => (int) $_REQUEST['msg']) : array();
 
 			$counter = 0;
-			$context['previous_posts'] = empty($limit) ? array() : selectMessages($topic, 0, $limit, $before, $only_approved);
+			$context['previous_posts'] = empty($limit) ? [] : selectMessages($topic, 0, $limit, $before, $only_approved);
 			foreach ($context['previous_posts'] as &$post)
 			{
 				$post['is_new'] = !empty($context['new_replies']);
@@ -906,7 +906,7 @@ class Post extends AbstractController
 		$context['current_action'] = 'post2';
 
 		// If the session has timed out, let the user re-submit their form.
-		if (checkSession('post', '', false) != '')
+		if (checkSession('post', '', false) !== '')
 		{
 			$this->_post_errors->addError('session_timeout');
 
@@ -916,7 +916,7 @@ class Post extends AbstractController
 			return $this->action_post();
 		}
 
-		$topic_info = array();
+		$topic_info = [];
 
 		// Previewing? Go back to start.
 		if (isset($_REQUEST['preview']))
@@ -928,7 +928,7 @@ class Post extends AbstractController
 		Txt::load('Post');
 
 		// Trigger the prepare_save_post event
-		$this->_events->trigger('prepare_save_post', array('topic_info' => &$topic_info));
+		$this->_events->trigger('prepare_save_post', ['topic_info' => &$topic_info]);
 
 		// Prevent double submission of this form.
 		checkSubmitOnce('check');
