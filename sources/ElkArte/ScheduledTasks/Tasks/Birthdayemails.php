@@ -16,8 +16,8 @@
 
 namespace ElkArte\ScheduledTasks\Tasks;
 
-use ElkArte\Themes\ThemeLoader;
 use ElkArte\Languages\Loader;
+use ElkArte\Themes\ThemeLoader;
 
 /**
  * Schedule birthday emails.
@@ -31,7 +31,6 @@ class Birthdayemails implements ScheduledTaskInterface
 	 * Happy birthday to me ! Sends out birthday greeting emails.
 	 *
 	 * @return bool
-	 * @throws \ElkArte\Exceptions\Exception
 	 */
 	public function run()
 	{
@@ -69,13 +68,12 @@ class Birthdayemails implements ScheduledTaskInterface
 				'day' => $day,
 			)
 		)->fetch_callback(
-			function ($row) use (&$birthdays) {
+			static function ($row) use (&$birthdays) {
 				// Group them by languages.
 				if (!isset($birthdays[$row['lngfile']]))
 				{
 					$birthdays[$row['lngfile']] = array();
 				}
-
 				$birthdays[$row['lngfile']][$row['id_member']] = array(
 					'name' => $row['real_name'],
 					'email' => $row['email_address']

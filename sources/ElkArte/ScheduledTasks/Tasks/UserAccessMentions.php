@@ -37,7 +37,7 @@ class UserAccessMentions implements ScheduledTaskInterface
 
 		$db = database();
 
-		$mentionTypes = array('mentionmem', 'likemsg', 'rlikemsg', 'quotedmem');
+		$mentionTypes = ['mentionmem', 'likemsg', 'rlikemsg', 'quotedmem'];
 
 		if (!empty($modSettings['user_access_mentions']))
 		{
@@ -45,7 +45,7 @@ class UserAccessMentions implements ScheduledTaskInterface
 		}
 		else
 		{
-			$user_access_mentions = array();
+			$user_access_mentions = [];
 		}
 
 		// This should be set only because of an immediate scheduled task, so higher priority
@@ -92,12 +92,12 @@ class UserAccessMentions implements ScheduledTaskInterface
 							array(
 								'current_member' => $member,
 								'mention_types' => $mentionTypes,
-								'user_see_board' => ($can == 'can' ? '' : 'NOT ') . '(' . $user_see_board . (!empty($modSettings['recycle_enable']) && $modSettings['recycle_board'] > 0 ? ' AND b.id_board != ' . $modSettings['recycle_board'] : '') . ')',
+								'user_see_board' => ($can === 'can' ? '' : 'NOT ') . '(' . $user_see_board . (!empty($modSettings['recycle_enable']) && $modSettings['recycle_board'] > 0 ? ' AND b.id_board != ' . $modSettings['recycle_board'] : '') . ')',
 								'start' => $start,
 								'limit' => $limit,
 							)
 						)->fetch_callback(
-							function ($row) use (&$remove, &$mentions) {
+							static function ($row) use (&$remove, &$mentions) {
 								if (empty($row['id_board']))
 								{
 									$remove[] = $row['id_mention'];
@@ -117,7 +117,7 @@ class UserAccessMentions implements ScheduledTaskInterface
 						// If we found something toggle them and increment the start for the next round
 						if (!empty($mentions))
 						{
-							toggleMentionsAccessibility($mentions, $can == 'can');
+							toggleMentionsAccessibility($mentions, $can === 'can');
 						}
 						// Otherwise it means we have finished with this access level for this member
 						else
@@ -151,60 +151,52 @@ class UserAccessMentions implements ScheduledTaskInterface
 
 			return true;
 		}
-		else
-		{
-			// Checks 10 users at a time, the scheduled task is set to run once per hour, so 240 users a day
-			// @todo <= I know you like it Spuds! :P It may be necessary to set it to something higher.
-			$limit = 10;
-			$current_check = !empty($modSettings['mentions_member_check']) ? $modSettings['mentions_member_check'] : 0;
-
-			require_once(SUBSDIR . '/Members.subs.php');
-			require_once(SUBSDIR . '/Mentions.subs.php');
-
-			// Grab users with mentions
-			$request = $db->query('', '
+		// Checks 10 users at a time, the scheduled task is set to run once per hour, so 240 users a day
+		// @todo <= I know you like it Spuds! :P It may be necessary to set it to something higher.
+		$limit = 10;
+		$current_check = empty($modSettings['mentions_member_check']) ? 0 : $modSettings['mentions_member_check'];
+		require_once(SUBSDIR . '/Members.subs.php');
+		require_once(SUBSDIR . '/Mentions.subs.php');
+		// Grab users with mentions
+		$request = $db->query('', '
 				SELECT COUNT(DISTINCT(id_member))
 				FROM {db_prefix}log_mentions
 				WHERE id_member > {int:last_id_member}
 					AND mention_type IN ({array_string:mention_types})',
-				array(
-					'last_id_member' => $current_check,
-					'mention_types' => $mentionTypes,
-				)
-			);
-			list ($remaining) = $request->fetch_row();
-			$request->free_result();
-
-			if ($remaining == 0)
-			{
-				$current_check = 0;
-			}
-
-			// Grab users with mentions
-			$request = $db->query('', '
+			array(
+				'last_id_member' => $current_check,
+				'mention_types' => $mentionTypes,
+			)
+		);
+		[$remaining] = $request->fetch_row();
+		$request->free_result();
+		if ($remaining == 0)
+		{
+			$current_check = 0;
+		}
+		// Grab users with mentions
+		$request = $db->query('', '
 				SELECT 
 					DISTINCT(id_member) as id_member
 				FROM {db_prefix}log_mentions
 				WHERE id_member > {int:last_id_member}
 					AND mention_type IN ({array_string:mention_types})
 				LIMIT {int:limit}',
-				array(
-					'last_id_member' => $current_check,
-					'mention_types' => $mentionTypes,
-					'limit' => $limit,
-				)
-			);
+			array(
+				'last_id_member' => $current_check,
+				'mention_types' => $mentionTypes,
+				'limit' => $limit,
+			)
+		);
+		// Remember where we are
+		updateSettings(array('mentions_member_check' => $current_check + $limit));
+		while (($row = $request->fetch_assoc()))
+		{
+			// Rebuild 'query_see_board', a lot of code duplication... :(
+			$user_see_board = memberQuerySeeBoard($row['id_member']);
 
-			// Remember where we are
-			updateSettings(array('mentions_member_check' => $current_check + $limit));
-
-			while (($row = $request->fetch_assoc()))
-			{
-				// Rebuild 'query_see_board', a lot of code duplication... :(
-				$user_see_board = memberQuerySeeBoard($row['id_member']);
-
-				// Find out if this user cannot see something that was supposed to be able to see
-				$request2 = $db->query('', '
+			// Find out if this user cannot see something that was supposed to be able to see
+			$request2 = $db->query('', '
 					SELECT 
 						mnt.id_mention
 					FROM {db_prefix}log_mentions as mnt
@@ -215,38 +207,38 @@ class UserAccessMentions implements ScheduledTaskInterface
 						AND {raw:user_see_board}
 						AND mnt.is_accessible = 1
 					LIMIT 1',
-					array(
-						'current_member' => $row['id_member'],
-						'mention_types' => $mentionTypes,
-						'user_see_board' => 'NOT (' . $user_see_board . (!empty($modSettings['recycle_enable']) && $modSettings['recycle_board'] > 0 ? ' AND b.id_board != ' . $modSettings['recycle_board'] : '') . ')',
-					)
-				);
+				array(
+					'current_member' => $row['id_member'],
+					'mention_types' => $mentionTypes,
+					'user_see_board' => 'NOT (' . $user_see_board . (!empty($modSettings['recycle_enable']) && $modSettings['recycle_board'] > 0 ? ' AND b.id_board != ' . $modSettings['recycle_board'] : '') . ')',
+				)
+			);
 
-				// One row of results is enough: scheduleTaskImmediate!
-				if ($request2->num_rows() == 1)
+			// One row of results is enough: scheduleTaskImmediate!
+			if ($request2->num_rows() === 1)
+			{
+				if (!empty($modSettings['user_access_mentions']))
 				{
-					if (!empty($modSettings['user_access_mentions']))
-					{
-						$modSettings['user_access_mentions'] = Util::unserialize($modSettings['user_access_mentions']);
-					}
-					else
-					{
-						$modSettings['user_access_mentions'] = array();
-					}
-
-					// But if the member is already on the list, let's skip it
-					if (!isset($modSettings['user_access_mentions'][$row['id_member']]))
-					{
-						$modSettings['user_access_mentions'][$row['id_member']] = 0;
-						updateSettings(array('user_access_mentions' => serialize(array_unique($modSettings['user_access_mentions']))));
-						scheduleTaskImmediate('user_access_mentions');
-					}
+					$modSettings['user_access_mentions'] = Util::unserialize($modSettings['user_access_mentions']);
 				}
-				$request2->free_result();
-			}
-			$request->free_result();
+				else
+				{
+					$modSettings['user_access_mentions'] = array();
+				}
 
-			return true;
+				// But if the member is already on the list, let's skip it
+				if (!isset($modSettings['user_access_mentions'][$row['id_member']]))
+				{
+					$modSettings['user_access_mentions'][$row['id_member']] = 0;
+					updateSettings(array('user_access_mentions' => serialize(array_unique($modSettings['user_access_mentions']))));
+					scheduleTaskImmediate('user_access_mentions');
+				}
+			}
+
+			$request2->free_result();
 		}
+
+		$request->free_result();
+		return true;
 	}
 }

@@ -32,7 +32,6 @@ class RemoveTopicRedirect implements ScheduledTaskInterface
 	 * Removes all of the expired Move Redirect topic notices that people hate
 	 *
 	 * @return bool
-	 * @throws \ElkArte\Exceptions\Exception
 	 */
 	public function run()
 	{
@@ -55,13 +54,13 @@ class RemoveTopicRedirect implements ScheduledTaskInterface
 				'redirect_expires' => time(),
 			)
 		)->fetch_callback(
-			function ($row) use (&$topics) {
+			static function ($row) use (&$topics) {
 				$topics[] = $row[0];
 			}
 		);
 
 		// Zap, you're gone
-		if (count($topics) > 0)
+		if ($topics !== [])
 		{
 			require_once(SUBSDIR . '/Topic.subs.php');
 			removeTopics($topics, false, true);

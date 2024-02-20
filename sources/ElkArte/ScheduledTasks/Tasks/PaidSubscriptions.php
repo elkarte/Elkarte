@@ -30,7 +30,6 @@ class PaidSubscriptions implements ScheduledTaskInterface
 	 * Removes expired and reminds members who have ones close to expiration
 	 *
 	 * @return bool
-	 * @throws \ElkArte\Exceptions\Exception
 	 */
 	public function run()
 	{
@@ -51,7 +50,7 @@ class PaidSubscriptions implements ScheduledTaskInterface
 				'time_now' => time(),
 			)
 		)->fetch_callback(
-			function ($row) {
+			static function ($row) {
 				removeSubscription($row['id_subscribe'], $row['id_member']);
 			}
 		);
@@ -77,16 +76,14 @@ class PaidSubscriptions implements ScheduledTaskInterface
 				'time_now' => time(),
 			)
 		)->fetch_callback(
-			function ($row) use (&$subs_reminded, $modSettings, $language) {
+			static function ($row) use (&$subs_reminded, $modSettings, $language) {
 				$subs_reminded[] = $row['id_sublog'];
-
 				$replacements = array(
 					'PROFILE_LINK' => getUrl('profile', ['action' => 'profile', 'area' => 'subscriptions', 'name' => $row['member_name'], 'u' => $row['id_member']]),
 					'REALNAME' => $row['member_name'],
 					'SUBSCRIPTION' => $row['name'],
 					'END_DATE' => strip_tags(standardTime($row['end_time'])),
 				);
-
 				$emaildata = loadEmailTemplate('paid_subscription_reminder', $replacements, empty($row['lngfile']) || empty($modSettings['userLanguage']) ? $language : $row['lngfile']);
 
 				// Send the actual email.

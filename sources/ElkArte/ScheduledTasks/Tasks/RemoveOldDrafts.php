@@ -29,7 +29,6 @@ class RemoveOldDrafts implements ScheduledTaskInterface
 	 * Scheduled task for removing those old and abandoned drafts
 	 *
 	 * @return bool
-	 * @throws \ElkArte\Exceptions\Exception
 	 */
 	public function run()
 	{
@@ -62,10 +61,11 @@ class RemoveOldDrafts implements ScheduledTaskInterface
 		{
 			$drafts[] = (int) $row[0];
 		}
+
 		$request->free_result();
 
 		// If we have old one, remove them
-		if (count($drafts) > 0)
+		if ($drafts !== [])
 		{
 			require_once(SUBSDIR . '/Drafts.subs.php');
 			deleteDrafts($drafts, -1, false);

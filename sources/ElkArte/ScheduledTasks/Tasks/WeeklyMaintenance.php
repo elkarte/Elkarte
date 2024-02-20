@@ -71,7 +71,7 @@ class WeeklyMaintenance implements ScheduledTaskInterface
 		{
 			if (!empty($modSettings['pruningOptions']) && strpos($modSettings['pruningOptions'], ',') !== false)
 			{
-				list ($modSettings['pruneErrorLog'], $modSettings['pruneModLog'], $modSettings['pruneBanLog'], $modSettings['pruneReportLog'], $modSettings['pruneScheduledTaskLog'], $modSettings['pruneSpiderHitLog']) = explode(',', $modSettings['pruningOptions']);
+				[$modSettings['pruneErrorLog'], $modSettings['pruneModLog'], $modSettings['pruneBanLog'], $modSettings['pruneReportLog'], $modSettings['pruneScheduledTaskLog'], $modSettings['pruneSpiderHitLog']] = explode(',', $modSettings['pruningOptions']);
 			}
 
 			if (!empty($modSettings['pruneErrorLog']))
@@ -136,7 +136,7 @@ class WeeklyMaintenance implements ScheduledTaskInterface
 						'closed' => 1,
 					)
 				)->fetch_callback(
-					function ($row) use (&$reports) {
+					static function ($row) use (&$reports) {
 						if (isset($row[0]))
 						{
 							$reports[] = $row[0];

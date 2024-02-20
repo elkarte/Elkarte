@@ -36,7 +36,6 @@ class DailyMaintenance implements ScheduledTaskInterface
 	 * Our only method, runs the show
 	 *
 	 * @return bool
-	 * @throws \ElkArte\Exceptions\Exception
 	 */
 	public function run()
 	{
@@ -48,8 +47,8 @@ class DailyMaintenance implements ScheduledTaskInterface
 		Cache::instance()->clean('data');
 
 		// If warning decrement is enabled and we have people who have not had a new warning in 24 hours, lower their warning level.
-		list (, , $modSettings['warning_decrement']) = explode(',', $modSettings['warning_settings']);
-		if ($modSettings['warning_decrement'])
+		[, , $modSettings['warning_decrement']] = explode(',', $modSettings['warning_settings']);
+		if ($modSettings['warning_decrement'] !== '' && $modSettings['warning_decrement'] !== '0')
 		{
 			// Find every member who has a warning level...
 			$members = array();
@@ -62,7 +61,7 @@ class DailyMaintenance implements ScheduledTaskInterface
 					'no_warning' => 0,
 				)
 			)->fetch_callback(
-				function ($row) use (&$members) {
+				static function ($row) use (&$members) {
 					$members[$row['id_member']] = $row['warning'];
 				}
 			);
@@ -84,7 +83,7 @@ class DailyMaintenance implements ScheduledTaskInterface
 						'warning' => 'warning',
 					)
 				)->fetch_callback(
-					function ($row) use (&$member_changes, $modSettings, $members) {
+					static function ($row) use (&$member_changes, $modSettings, $members) {
 						// More than 24 hours ago?
 						if ($row['last_warning'] <= time() - 86400)
 						{
@@ -121,7 +120,7 @@ class DailyMaintenance implements ScheduledTaskInterface
 			DELETE FROM {db_prefix}member_logins
 			WHERE time > {int:oldLogins}',
 			array(
-				'oldLogins' => !empty($modSettings['loginHistoryDays']) ? 60 * 60 * $modSettings['loginHistoryDays'] : 108000,
+				'oldLogins' => empty($modSettings['loginHistoryDays']) ? 108000 : 60 * 60 * $modSettings['loginHistoryDays'],
 			));
 
 		// Log we've done it...
