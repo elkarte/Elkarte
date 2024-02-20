@@ -23,6 +23,8 @@ use ElkArte\Mentions\MentionType\AbstractNotificationMessage;
 use ElkArte\Mentions\MentionType\NotificationInterface;
 use ElkArte\User;
 use ElkArte\UserInfo;
+use FilesystemIterator;
+use GlobIterator;
 
 /**
  * Class Notifications
@@ -73,7 +75,7 @@ class Notifications extends AbstractModel
 		parent::__construct($db, $user);
 
 		// Let's register all the notifications we know by default
-		$glob = new \GlobIterator(self::NOTIFIERS_PATH . '/*.php', \FilesystemIterator::SKIP_DOTS);
+		$glob = new GlobIterator(self::NOTIFIERS_PATH . '/*.php', FilesystemIterator::SKIP_DOTS);
 		foreach ($glob as $file)
 		{
 			$this->register($file->getBasename('.php'));
@@ -144,15 +146,12 @@ class Notifications extends AbstractModel
 	 */
 	public function send()
 	{
-		if (!empty($this->_to_send))
+		foreach ($this->_to_send as $task)
 		{
-			foreach ($this->_to_send as $task)
-			{
-				$this->_send_task($task);
-			}
+			$this->_send_task($task);
 		}
 
-		$this->_to_send = array();
+		$this->_to_send = [];
 	}
 
 	/**
@@ -269,14 +268,14 @@ class Notifications extends AbstractModel
 		$mentioning = new Mentions\Mentioning($this->_db, $this->user, new DataValidator(), $this->_modSettings->enabled_mentions);
 		foreach ($bodies as $body)
 		{
-			$this->_to_actually_mention[$task['notification_type']] = $mentioning->create($obj, array(
+			$this->_to_actually_mention[$task['notification_type']] = $mentioning->create($obj, [
 				'id_member_from' => $task['id_member_from'],
 				'id_member' => $body['id_member_to'],
 				'id_msg' => $task['id_target'],
 				'type' => $task['notification_type'],
 				'log_time' => $task['log_time'],
 				'status' => $task['source_data']['status'],
-			));
+			]);
 		}
 	}
 
@@ -312,13 +311,13 @@ class Notifications extends AbstractModel
 		{
 			if (in_array($body['id_member_to'], $this->_to_actually_mention[$task['notification_type']]))
 			{
-				$this->_insert_delayed(array(
+				$this->_insert_delayed([
 					$task['notification_type'],
 					$body['id_member_to'],
 					$task['log_time'],
 					'd',
 					$body['body']
-				));
+				]);
 			}
 		}
 	}
@@ -332,15 +331,15 @@ class Notifications extends AbstractModel
 	{
 		$this->_db->insert('ignore',
 			'{db_prefix}pending_notifications',
-			array(
+			[
 				'notification_type' => 'string-20',
 				'id_member' => 'int',
 				'log_time' => 'int',
 				'frequency' => 'string-1',
 				'snippet' => 'string',
-			),
+			],
 			$insert_array,
-			array()
+			[]
 		);
 	}
 
@@ -357,13 +356,13 @@ class Notifications extends AbstractModel
 		{
 			if (in_array($body['id_member_to'], $this->_to_actually_mention[$task['notification_type']]))
 			{
-				$this->_insert_delayed(array(
+				$this->_insert_delayed([
 					$task['notification_type'],
 					$body['id_member_to'],
 					$task['log_time'],
 					'w',
 					$body['body']
-				));
+				]);
 			}
 		}
 	}

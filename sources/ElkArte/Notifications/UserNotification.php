@@ -16,8 +16,11 @@
 namespace ElkArte\Notifications;
 
 use ElkArte\AbstractModel;
+use ElkArte\Database\QueryInterface;
 use ElkArte\DataValidator;
 use ElkArte\Languages\Txt;
+use ElkArte\UserInfo;
+use ElkArte\ValuesContainer;
 
 /**
  * Class UserNotification
@@ -26,33 +29,25 @@ use ElkArte\Languages\Txt;
  */
 class UserNotification extends AbstractModel
 {
-	/**
-	 * All the shapes the icon can be.
-	 *
-	 * @var string[]
-	 */
-	protected $_valid_types = array(
+	/** @var string[] All the shapes the icon can be. */
+	protected $_valid_types = [
 		'circle',
 		'rectangle',
-	);
+	];
 
-	/**
-	 * The positions the icon can be placed at.
-	 *
-	 * @var string[]
-	 */
-	protected $_valid_positions = array(
+	/** @var string[] The positions the icon can be placed at. */
+	protected $_valid_positions = [
 		'up',
 		'down',
 		'left',
 		'upleft',
-	);
+	];
 
 	/**
 	 * Construct, Load the language file and make db/user info available to the class
 	 *
-	 * @param \ElkArte\Database\QueryInterface $db
-	 * @param \ElkArte\UserInfo|\ElkArte\ValuesContainer $user
+	 * @param QueryInterface $db
+	 * @param UserInfo|ValuesContainer $user
 	 */
 	public function __construct($db, $user)
 	{
@@ -83,17 +78,17 @@ class UserNotification extends AbstractModel
 	 */
 	protected function _addFaviconNumbers($number)
 	{
-		call_integration_hook('integrate_adjust_favicon_number', array(&$number));
+		call_integration_hook('integrate_adjust_favicon_number', [&$number]);
 
 		loadJavascriptFile('favico.js', ['defer' => true]);
 
-		$notif_opt = array();
-		$rules = array(
+		$notif_opt = [];
+		$rules = [
 			'usernotif_favicon_bgColor',
 			'usernotif_favicon_textColor',
 			'usernotif_favicon_type',
 			'usernotif_favicon_position',
-		);
+		];
 		foreach ($rules as $key)
 		{
 			if ($this->settingExists($key))
@@ -108,7 +103,7 @@ class UserNotification extends AbstractModel
 				ElkNotifier.add(new ElkFavicon({
 					number: ' . $number . ',
 					fontStyle: \'bolder\',
-					animation: \'none\'' . (!empty($notif_opt) ? ',' . implode(',', $notif_opt) : '') . '
+					animation: \'none\'' . (empty($notif_opt) ? '' : ',' . implode(',', $notif_opt)) . '
 				}));
 			});', true);
 	}
@@ -119,8 +114,6 @@ class UserNotification extends AbstractModel
 	 * @param string $key modSettings key
 	 *
 	 * @return bool
-	 * @todo Really needed?
-	 *
 	 */
 	protected function settingExists($key)
 	{
@@ -153,27 +146,27 @@ class UserNotification extends AbstractModel
 	{
 		global $txt;
 
-		$types = array();
+		$types = [];
 		foreach ($this->_valid_types as $val)
 		{
 			$types[$val] = $txt['usernotif_favicon_shape_' . $val];
 		}
 
-		$positions = array();
+		$positions = [];
 		foreach ($this->_valid_positions as $val)
 		{
 			$positions[$val] = $txt['usernotif_favicon_' . $val];
 		}
 
-		return array(
-			array('title', 'usernotif_title'),
-			array('check', 'usernotif_desktop_enable'),
-			array('check', 'usernotif_favicon_enable'),
-			array('select', 'usernotif_favicon_type', $types),
-			array('select', 'usernotif_favicon_position', $positions),
-			array('color', 'usernotif_favicon_bgColor'),
-			array('color', 'usernotif_favicon_textColor'),
-		);
+		return [
+			['title', 'usernotif_title'],
+			['check', 'usernotif_desktop_enable'],
+			['check', 'usernotif_favicon_enable'],
+			['select', 'usernotif_favicon_type', $types],
+			['select', 'usernotif_favicon_position', $positions],
+			['color', 'usernotif_favicon_bgColor'],
+			['color', 'usernotif_favicon_textColor'],
+		];
 	}
 
 	/**
@@ -186,17 +179,17 @@ class UserNotification extends AbstractModel
 	public function validate($post)
 	{
 		$validator = new DataValidator();
-		$validation_rules = array(
+		$validation_rules = [
 			'usernotif_favicon_bgColor' => 'valid_color',
 			'usernotif_favicon_textColor' => 'valid_color',
 			'usernotif_favicon_type' => 'contains[' . implode(',', $this->_valid_types) . ']',
 			'usernotif_favicon_position' => 'contains[' . implode(',', $this->_valid_positions) . ']',
-		);
+		];
 
 		// Cleanup the inputs! :D
 		$validator->validation_rules($validation_rules);
 		$validator->validate($post);
-		foreach ($validation_rules as $key => $val)
+		foreach (array_keys($validation_rules) as $key)
 		{
 			$validation_errors = $validator->validation_errors($key);
 			if (empty($validation_errors))
