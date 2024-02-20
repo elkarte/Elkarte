@@ -97,6 +97,8 @@ class CalendarEvent
 			}
 
 			// Check the month and year...
+			$this->_settings['cal_limityear'] = empty($this->_settings['cal_limityear']) ? 20 : (int) $this->_settings['cal_limityear'];
+
 			if ($event['month'] < 1 || $event['month'] > 12)
 			{
 				throw new Exceptions\Exception('invalid_month', false);

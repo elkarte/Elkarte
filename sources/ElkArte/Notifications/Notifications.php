@@ -146,9 +146,12 @@ class Notifications extends AbstractModel
 	 */
 	public function send()
 	{
-		foreach ($this->_to_send as $task)
+		if (!empty($this->_to_send))
 		{
-			$this->_send_task($task);
+			foreach ($this->_to_send as $task)
+			{
+				$this->_send_task($task);
+			}
 		}
 
 		$this->_to_send = [];
