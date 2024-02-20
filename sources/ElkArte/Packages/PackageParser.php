@@ -16,10 +16,11 @@ namespace ElkArte\Packages;
 
 use ElkArte\AbstractModel;
 use ElkArte\FileFunctions;
+use ElkArte\XmlArray;
 
 class PackageParser extends AbstractModel
 {
-	/** @var \ElkArte\FileFunctions */
+	/** @var FileFunctions */
 	public $fileFunc;
 
 	/** @var array the results of our efforts */
@@ -60,7 +61,7 @@ class PackageParser extends AbstractModel
 	 * - Previous_version should be set to the previous installed version of this package, if any.
 	 * - Does not handle failure terribly well; testing first is always better.
 	 *
-	 * @param \ElkArte\XmlArray $packageXML
+	 * @param XmlArray $packageXML
 	 * @param bool $testing_only = true
 	 * @param string $method = 'install' ('install', 'upgrade', or 'uninstall')
 	 * @param string $previous_version = ''
@@ -78,7 +79,7 @@ class PackageParser extends AbstractModel
 		}
 
 		// Check on if emulation is enabled or needed
-		$the_version = strtr(FORUM_VERSION, array('ElkArte ' => ''));
+		$the_version = strtr(FORUM_VERSION, ['ElkArte ' => '']);
 		$the_version = $this->setEmulation($the_version);
 
 		// Get all the versions of this method (install, uninstall, upgrade) and find the right one.
@@ -124,7 +125,7 @@ class PackageParser extends AbstractModel
 	/**
 	 * Tests all actions to ensure there are no identifiable problems
 	 *
-	 * @param \ElkArte\XmlArray $actions
+	 * @param XmlArray $actions
 	 * @return void
 	 */
 	public function testingPhase($actions)
@@ -147,7 +148,7 @@ class PackageParser extends AbstractModel
 				$this->_return[] = call_user_func(array($this, 'test' . ucfirst($actionType)), $actionType, $action);
 			}
 			elseif (in_array($actionType, ['require-file', 'remove-file', 'move-file', 'create-file',
-										   'require-dir', 'remove-dir', 'move-dir', 'create-dir']))
+				'require-dir', 'remove-dir', 'move-dir', 'create-dir']))
 			{
 				$this_action = $this->_testFileDir($actionType, $action);
 
@@ -175,7 +176,7 @@ class PackageParser extends AbstractModel
 				$this->not_done[] = $action;
 			}
 			elseif (in_array($action['type'], ['require-file', 'remove-file', 'move-file', 'create-file',
-											   'require-dir', 'remove-dir', 'move-dir', 'create-dir']))
+				'require-dir', 'remove-dir', 'move-dir', 'create-dir']))
 			{
 				$method = str_replace('-', '', ucfirst($action['type']));
 				$this->_return[] = call_user_func(array($this, 'process' . $method), $action);
@@ -204,21 +205,27 @@ class PackageParser extends AbstractModel
 		$this->failure |= !copy($action['source'], $action['destination']);
 
 		// Any other theme files?
-		if (!empty($context['theme_copies'])
-			&& !empty($context['theme_copies'][$action['type']][$action['destination']]))
+		if (empty($context['theme_copies']))
 		{
-			foreach ($context['theme_copies'][$action['type']][$action['destination']] as $theme_destination)
+			return;
+		}
+
+		if (empty($context['theme_copies'][$action['type']][$action['destination']]))
+		{
+			return;
+		}
+
+		foreach ($context['theme_copies'][$action['type']][$action['destination']] as $theme_destination)
+		{
+			if (!mktree(dirname($theme_destination))
+				|| !$this->fileFunc->isWritable(dirname($theme_destination)))
 			{
-				if (!mktree(dirname($theme_destination))
-					|| !$this->fileFunc->isWritable(dirname($theme_destination)))
-				{
-					$this->failure |= true;
-				}
-
-				package_put_contents($theme_destination, package_get_contents($action['source']));
-
-				$this->failure |= !copy($action['source'], $theme_destination);
+				$this->failure |= true;
 			}
+
+			package_put_contents($theme_destination, package_get_contents($action['source']));
+
+			$this->failure |= !copy($action['source'], $theme_destination);
 		}
 	}
 
@@ -246,12 +253,19 @@ class PackageParser extends AbstractModel
 		}
 
 		// Any other theme folders?
-		if (!empty($context['theme_copies']) && !empty($context['theme_copies'][$action['type']][$action['filename']]))
+		if (empty($context['theme_copies']))
 		{
-			foreach ($context['theme_copies'][$action['type']][$action['filename']] as $theme_destination)
-			{
-				$this->failure |= !$this->fileFunc->delete($theme_destination);
-			}
+			return;
+		}
+
+		if (empty($context['theme_copies'][$action['type']][$action['filename']]))
+		{
+			return;
+		}
+
+		foreach ($context['theme_copies'][$action['type']][$action['filename']] as $theme_destination)
+		{
+			$this->failure |= !$this->fileFunc->delete($theme_destination);
 		}
 	}
 
@@ -298,15 +312,20 @@ class PackageParser extends AbstractModel
 		global $context;
 
 		copytree($action['source'], $action['destination']);
-
 		// Any other theme folders?
-		if (!empty($context['theme_copies'])
-			&& !empty($context['theme_copies'][$action['type']][$action['destination']]))
+		if (empty($context['theme_copies']))
 		{
-			foreach ($context['theme_copies'][$action['type']][$action['destination']] as $theme_destination)
-			{
-				copytree($action['source'], $theme_destination);
-			}
+			return;
+		}
+
+		if (empty($context['theme_copies'][$action['type']][$action['destination']]))
+		{
+			return;
+		}
+
+		foreach ($context['theme_copies'][$action['type']][$action['destination']] as $theme_destination)
+		{
+			copytree($action['source'], $theme_destination);
 		}
 	}
 
@@ -323,13 +342,19 @@ class PackageParser extends AbstractModel
 		deltree($action['filename']);
 
 		// Any other theme folders?
-		if (!empty($context['theme_copies'])
-			&& !empty($context['theme_copies'][$action['type']][$action['filename']]))
+		if (empty($context['theme_copies']))
 		{
-			foreach ($context['theme_copies'][$action['type']][$action['filename']] as $theme_destination)
-			{
-				deltree($theme_destination);
-			}
+			return;
+		}
+
+		if (empty($context['theme_copies'][$action['type']][$action['filename']]))
+		{
+			return;
+		}
+
+		foreach ($context['theme_copies'][$action['type']][$action['filename']] as $theme_destination)
+		{
+			deltree($theme_destination);
 		}
 	}
 
@@ -413,7 +438,7 @@ class PackageParser extends AbstractModel
 			'function' => $action->exists('@function') ? $action->fetch('@function') : '',
 			'hook' => $action->exists('@hook') ? $action->fetch('@hook') : $action->fetch('.'),
 			'include_file' => $action->exists('@file') ? $action->fetch('@file') : '',
-			'reverse' => $action->exists('@reverse') && $action->fetch('@reverse') == 'true',
+			'reverse' => $action->exists('@reverse') && $action->fetch('@reverse') === 'true',
 			'description' => '',
 		];
 	}
@@ -685,7 +710,7 @@ class PackageParser extends AbstractModel
 
 			return [
 				'type' => 'chmod',
-				'filename' =>$this->_getRoot($temp)
+				'filename' => $this->_getRoot($temp)
 			];
 		}
 
@@ -705,7 +730,7 @@ class PackageParser extends AbstractModel
 	 * Setup for all file/dir actions
 	 *
 	 * @param string $actionType
-	 * @param \ElkArte\XmlArray $action
+	 * @param XmlArray $action
 	 * @return array
 	 */
 	private function _testFileDir($actionType, $action)
@@ -714,11 +739,11 @@ class PackageParser extends AbstractModel
 
 		// Save the pointer to this entry for use in test Create.../Require.../Move...
 		$this_action = &$this->_return[];
-		$this_action = array(
+		$this_action = [
 			'type' => $actionType,
 			'filename' => $action->fetch('@name'),
 			'description' => $action->fetch('.')
-		);
+		];
 
 		// If there is a destination, make sure it makes sense.
 		if (substr($actionType, 0, 6) !== 'remove')
@@ -858,7 +883,7 @@ class PackageParser extends AbstractModel
 
 		if (!empty($_REQUEST['package']) && (!empty($_SESSION['single_version_emulate'][$_REQUEST['package']])))
 		{
-			$the_version = $_SESSION['single_version_emulate'][$_REQUEST['package']];
+			return $_SESSION['single_version_emulate'][$_REQUEST['package']];
 		}
 
 		return $the_version;
@@ -867,7 +892,7 @@ class PackageParser extends AbstractModel
 	/**
 	 * Get the right method (install, upgrade, uninstall) for this version of software
 	 *
-	 * @param \ElkArte\XmlArray $packageXML
+	 * @param XmlArray $packageXML
 	 * @param string $the_version
 	 * @param string $method
 	 * @param string $previous_version
@@ -884,23 +909,17 @@ class PackageParser extends AbstractModel
 		foreach ($these_methods as $this_method)
 		{
 			// They specified certain versions this part is for.
-			if ($this_method->exists('@for'))
+			// Don't keep going if this won't work for this version.
+			if ($this_method->exists('@for') && !matchPackageVersion($the_version, $this_method->fetch('@for')))
 			{
-				// Don't keep going if this won't work for this version.
-				if (!matchPackageVersion($the_version, $this_method->fetch('@for')))
-				{
-					continue;
-				}
+				continue;
 			}
 
 			// Upgrades may go from a certain old version of the addon.
-			if ($method === 'upgrade' && $this_method->exists('@from'))
+			// Well, this is for the wrong old version...
+			if ($method === 'upgrade' && $this_method->exists('@from') && !matchPackageVersion($previous_version, $this_method->fetch('@from')))
 			{
-				// Well, this is for the wrong old version...
-				if (!matchPackageVersion($previous_version, $this_method->fetch('@from')))
-				{
-					continue;
-				}
+				continue;
 			}
 
 			// We've found it!

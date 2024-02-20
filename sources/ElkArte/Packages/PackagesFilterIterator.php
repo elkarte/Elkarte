@@ -22,10 +22,8 @@ class PackagesFilterIterator extends \FilterIterator
 {
 	/**
 	 * Identify if a file is a valid package type.
-	 *
-	 * @return bool
 	 */
-	public function accept() : bool
+	public function accept(): bool
 	{
 		$current = $this->current();
 		$filename = $current->getFilename();
@@ -37,7 +35,7 @@ class PackagesFilterIterator extends \FilterIterator
 		}
 
 		// The temp directory that may or may not be present.
-		if ($current->isDir() && ($filename === 'temp' || $filename === 'backup'))
+		if (($filename === 'temp' || $filename === 'backup') && $current->isDir())
 		{
 			return false;
 		}

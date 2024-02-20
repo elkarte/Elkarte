@@ -212,7 +212,7 @@ class PackageServers extends AbstractController
 			}
 
 			// Grab a few, often wrong, items to fill in the form.
-			list ($username, $detect_path, $found_path) = $ftp->detect_path(BOARDDIR);
+			[$username, $detect_path, $found_path] = $ftp->detect_path(BOARDDIR);
 
 			if ($found_path || !isset($ftp_path))
 			{
@@ -261,7 +261,7 @@ class PackageServers extends AbstractController
 		// Want to browsing the packages from the addon server
 		if (isset($this->_req->query->server))
 		{
-			list($name, $url) = $this->_package_server();
+			[$name, $url] = $this->_package_server();
 		}
 
 		// Minimum required parameter did not exist so dump out.
@@ -324,12 +324,12 @@ class PackageServers extends AbstractController
 	{
 		// Populate the package info from the fetched data
 		return [
-			'id' => !empty($thisPackage->pkid) ? [$thisPackage->pkid] : $this->_assume_id($thisPackage),
+			'id' => empty($thisPackage->pkid) ? $this->_assume_id($thisPackage) : [$thisPackage->pkid],
 			'type' => $packageSection,
 			'name' => Util::htmlspecialchars($thisPackage->title),
 			'date' => htmlTime(strtotime($thisPackage->date)),
 			'author' => Util::htmlspecialchars($thisPackage->author),
-			'description' => !empty($thisPackage->short) ? Util::htmlspecialchars($thisPackage->short) : '',
+			'description' => empty($thisPackage->short) ? '' : Util::htmlspecialchars($thisPackage->short),
 			'version' => $thisPackage->version,
 			'elkversion' => $thisPackage->elkversion,
 			'license' => $thisPackage->license,
@@ -392,7 +392,7 @@ class PackageServers extends AbstractController
 		{
 			// Name this master.zip based on repo name in the link
 			$path_parts = pathinfo($matches[4]);
-			list (, $newname,) = explode('/', $path_parts['dirname']);
+			[, $newname,] = explode('/', $path_parts['dirname']);
 
 			// Just to be safe, no invalid file characters
 			$invalid = array_merge(array_map('chr', range(0, 31)), ['<', '>', ':', '"', '/', '\\', '|', '?', '*']);
@@ -461,7 +461,7 @@ class PackageServers extends AbstractController
 		// Download from a package server?
 		if (isset($this->_req->query->server))
 		{
-			list($name, $url) = $this->_package_server();
+			[$name, $url] = $this->_package_server();
 
 			// Fetch the package listing from the package server
 			$listing = json_decode(fetch_web_data($url));
@@ -574,7 +574,7 @@ class PackageServers extends AbstractController
 		}
 		elseif ($context['package']['type'] === 'language')
 		{
-			$context['package']['install']['link'] = $this->getInstallLink('add_languages',$context['package']['filename']);
+			$context['package']['install']['link'] = $this->getInstallLink('add_languages', $context['package']['filename']);
 		}
 
 		$context['package']['list_files']['link'] = $this->getInstallLink('list_files', $context['package']['filename'], 'list');
@@ -645,43 +645,39 @@ class PackageServers extends AbstractController
 			$txt[$context['package']] = str_replace('{MANAGETHEMEURL}', getUrl('admin', ['action' => 'admin', 'area' => 'theme', 'sa' => 'admin', '{session_data}', 'hash' => '#theme_install']), $txt[$context['package']]);
 			throw new Exception('package_upload_error_broken', false, $txt[$context['package']]);
 		}
-		// Is it already uploaded, maybe?
-		else
+		try
 		{
-			try
+			$dir = new FilesystemIterator(BOARDDIR . '/packages', FilesystemIterator::SKIP_DOTS);
+
+			$filter = new PackagesFilterIterator($dir);
+			$packages = new IteratorIterator($filter);
+
+			foreach ($packages as $package)
 			{
-				$dir = new FilesystemIterator(BOARDDIR . '/packages', FilesystemIterator::SKIP_DOTS);
-
-				$filter = new PackagesFilterIterator($dir);
-				$packages = new IteratorIterator($filter);
-
-				foreach ($packages as $package)
+				// No need to check these
+				if ($package->getFilename() === $packageName)
 				{
-					// No need to check these
-					if ($package->getFilename() === $packageName)
-					{
-						continue;
-					}
+					continue;
+				}
 
-					// Read package info for the archive we found
-					$packageInfo = getPackageInfo($package->getFilename());
-					if (!is_array($packageInfo))
-					{
-						continue;
-					}
+				// Read package info for the archive we found
+				$packageInfo = getPackageInfo($package->getFilename());
+				if (!is_array($packageInfo))
+				{
+					continue;
+				}
 
-					// If it was already uploaded under another name don't upload it again.
-					if ($packageInfo['id'] === $context['package']['id'] && compareVersions($packageInfo['version'], $context['package']['version']) == 0)
-					{
-						$this->fileFunc->delete($destination);
-						throw new Exception('Errors.package_upload_already_exists', 'general', $package->getFilename());
-					}
+				// If it was already uploaded under another name don't upload it again.
+				if ($packageInfo['id'] === $context['package']['id'] && compareVersions($packageInfo['version'], $context['package']['version']) == 0)
+				{
+					$this->fileFunc->delete($destination);
+					throw new Exception('Errors.package_upload_already_exists', 'general', $package->getFilename());
 				}
 			}
-			catch (UnexpectedValueException $e)
-			{
-				// @todo for now do nothing...
-			}
+		}
+		catch (UnexpectedValueException)
+		{
+			// @todo for now do nothing...
 		}
 
 		$context['package']['install']['link'] = '';
@@ -714,7 +710,8 @@ class PackageServers extends AbstractController
 	 *
 	 * @return string Returns an HTML link for the package action.
 	 */
-	public function getInstallLink($type, $filename, $action = 'install') {
+	public function getInstallLink($type, $filename, $action = 'install')
+	{
 		global $txt;
 
 		return '<a class="linkbutton" href="' . getUrl('admin', ['action' => 'admin', 'area' => 'packages', 'sa' => $action, 'package' => $filename]) . '">' . $txt[$type] . '</a>';
@@ -822,9 +819,7 @@ class PackageServers extends AbstractController
 				}
 
 				// Sort them naturally
-				usort($context['package_list'][$packageSection]['items'], function ($a, $b) {
-					return $this->package_sort($a, $b);
-				});
+				usort($context['package_list'][$packageSection]['items'], fn($a, $b) => $this->package_sort($a, $b));
 
 				$context['package_list'][$packageSection]['text'] = sprintf($mod_section_count, $section_count);
 			}

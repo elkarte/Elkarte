@@ -20,6 +20,7 @@ use BBC\ParserWrapper;
 use ElkArte\AbstractController;
 use ElkArte\Action;
 use ElkArte\Cache\Cache;
+use ElkArte\Database\AbstractTable;
 use ElkArte\EventManager;
 use ElkArte\Exceptions\Exception;
 use ElkArte\FileFunctions;
@@ -113,10 +114,10 @@ class Packages extends AbstractController
 			// The following two belong to PackageServers,
 			// for UI's sake moved here at least temporarily
 			'servers' => [
-				'controller' => '\\ElkArte\\Packages\\PackageServers',
+				'controller' => PackageServers::class,
 				'function' => 'action_list'],
 			'upload' => [
-				'controller' => '\\ElkArte\\Packages\\PackageServers',
+				'controller' => PackageServers::class,
 				'function' => 'action_upload'],
 		];
 
@@ -229,7 +230,7 @@ class Packages extends AbstractController
 
 		// Change our last link tree item for more information on this Packages area.
 		$context['linktree'][count($context['linktree']) - 1] = [
-			'url' =>getUrl('admin', ['action' => 'admin', 'area' => 'packages', 'sa' => 'browse']),
+			'url' => getUrl('admin', ['action' => 'admin', 'area' => 'packages', 'sa' => 'browse']),
 			'name' => $this->_uninstalling ? $txt['package_uninstall_actions'] : $txt['install_actions']
 		];
 
@@ -255,7 +256,7 @@ class Packages extends AbstractController
 		}
 
 		// Will we require chmod permissions to pull this off
-		$this->chmod_files = !empty($pka->chmod_files) ? $pka->chmod_files : [];
+		$this->chmod_files = empty($pka->chmod_files) ? [] : $pka->chmod_files;
 		if (!empty($this->chmod_files))
 		{
 			$chmod_control = new PackageChmod();
@@ -327,7 +328,7 @@ class Packages extends AbstractController
 				}
 			}
 
-			if (!isset($this->_base_path))
+			if ($this->_base_path === null)
 			{
 				$this->_base_path = '';
 			}
@@ -391,12 +392,19 @@ class Packages extends AbstractController
 			$context['themes_locked'] = true;
 
 			// Only let them uninstall themes it was installed into.
-			foreach ($this->theme_paths as $id => $data)
+			foreach (array_keys($this->theme_paths) as $id)
 			{
-				if ($id != 1 && !in_array($id, $package_installed['old_themes']))
+				if ($id === 1)
 				{
-					unset($this->theme_paths[$id]);
+					continue;
 				}
+
+				if (in_array($id, $package_installed['old_themes']))
+				{
+					continue;
+				}
+
+				unset($this->theme_paths[$id]);
 			}
 		}
 		// Or is it already installed and you want to upgrade
@@ -414,12 +422,19 @@ class Packages extends AbstractController
 			else
 			{
 				// Otherwise they can only upgrade themes from the first time around.
-				foreach ($this->theme_paths as $id => $data)
+				foreach (array_keys($this->theme_paths) as $id)
 				{
-					if ($id != 1 && !in_array($id, $package_installed['old_themes']))
+					if ($id === 1)
 					{
-						unset($this->theme_paths[$id]);
+						continue;
 					}
+
+					if (in_array($id, $package_installed['old_themes']))
+					{
+						continue;
+					}
+
+					unset($this->theme_paths[$id]);
 				}
 			}
 		}
@@ -575,7 +590,7 @@ class Packages extends AbstractController
 		$chmod_control->createChmodControl(
 			[],
 			[
-				'destination_url' => getUrl('admin', ['action' => 'admin', 'area' => 'packages', 'sa' =>  $this->_req->query->sa, 'package' => $this->_req->query->package])
+				'destination_url' => getUrl('admin', ['action' => 'admin', 'area' => 'packages', 'sa' => $this->_req->query->sa, 'package' => $this->_req->query->package])
 			]
 		);
 
@@ -700,7 +715,7 @@ class Packages extends AbstractController
 				{
 					// We're really just checking for entries which are create table AND add columns (etc).
 					$tables = [];
-					usort($db_package_log, [$this, '_sort_table_first']);
+					usort($db_package_log, fn(array $a, array $b): int => $this->_sort_table_first($a, $b));
 					foreach ($db_package_log as $k => $log)
 					{
 						if ($log[0] === 'remove_table')
@@ -747,7 +762,7 @@ class Packages extends AbstractController
 		}
 
 		// Log what we just did.
-		logAction($this->_uninstalling ? 'uninstall_package' : (!empty($is_upgrade) ? 'upgrade_package' : 'install_package'), ['package' => Util::htmlspecialchars($packageInfo['name']), 'version' => Util::htmlspecialchars($packageInfo['version'])], 'admin');
+		logAction($this->_uninstalling ? 'uninstall_package' : (empty($is_upgrade) ? 'install_package' : 'upgrade_package'), ['package' => Util::htmlspecialchars($packageInfo['name']), 'version' => Util::htmlspecialchars($packageInfo['version'])], 'admin');
 
 		// Just in case, let's clear the whole cache to avoid anything going up the swanny.
 		Cache::instance()->clean();
@@ -957,6 +972,7 @@ class Packages extends AbstractController
 		{
 			redirectexit('action=admin;area=packages;sa=browse');
 		}
+
 		$this->_req->query->package = preg_replace('~[\.]+~', '.', strtr($this->_req->query->package, ['/' => '_', '\\' => '_']));
 
 		// Can't delete what's not there.
@@ -1018,7 +1034,7 @@ class Packages extends AbstractController
 				'title' => $txt[($type === 'addon' ? 'modification' : $type) . '_package'],
 				'no_items_label' => $txt['no_packages'],
 				'get_items' => [
-					'function' => [$this, 'list_packages'],
+					'function' => fn(int $start, int $items_per_page, string $sort, string $params) => $this->list_packages($start, $items_per_page, $sort, $params),
 					'params' => ['params' => $type],
 				],
 				'base_href' => getUrl('admin', ['action' => 'admin', 'area' => 'packages', 'sa' => $context['sub_action'], 'type' => $type]),
@@ -1030,7 +1046,7 @@ class Packages extends AbstractController
 							'style' => 'width: 25%;',
 						],
 						'data' => [
-							'function' => function ($package_md5) use ($type) {
+							'function' => static function ($package_md5) use ($type) {
 								global $context;
 
 								if (isset($context['available_' . $type][$package_md5]))
@@ -1052,7 +1068,7 @@ class Packages extends AbstractController
 							'style' => 'width: 25%;',
 						],
 						'data' => [
-							'function' => function ($package_md5) use ($type) {
+							'function' => static function ($package_md5) use ($type) {
 								global $context;
 
 								if (isset($context['available_' . $type][$package_md5]))
@@ -1073,7 +1089,7 @@ class Packages extends AbstractController
 							'value' => $txt['package_installed_on'],
 						],
 						'data' => [
-							'function' => function($package_md5) use ($type, $txt) {
+							'function' => static function ($package_md5) use ($type, $txt) {
 								global $context;
 
 								if (!empty($context['available_' . $type][$package_md5]['time_installed']))
@@ -1094,7 +1110,7 @@ class Packages extends AbstractController
 							'value' => '',
 						],
 						'data' => [
-							'function' => function ($package_md5) use ($type) {
+							'function' => static function ($package_md5) use ($type) {
 								global $context, $txt;
 
 								if (!isset($context['available_' . $type][$package_md5]))
@@ -1105,7 +1121,6 @@ class Packages extends AbstractController
 								// Rewrite shortcut
 								$package = $context['available_' . $type][$package_md5];
 								$return = '';
-
 								if ($package['can_uninstall'])
 								{
 									$return = '
@@ -1131,7 +1146,6 @@ class Packages extends AbstractController
 									$return = '
 										<a class="linkbutton" href="' . getUrl('admin', ['action' => 'admin', 'area' => 'packages', 'sa' => 'install', 've' => $package['can_emulate_install'], 'package' => $package['filename']]) . '">' . $txt['package_emulate_install'] . ' ' . $package['can_emulate_install'] . '</a>';
 								}
-
 								return $return . '
 										<a class="linkbutton" href="' . getUrl('admin', ['action' => 'admin', 'area' => 'packages', 'sa' => 'list', 'package' => $package['filename']]) . '">' . $txt['list_files'] . '</a>
 										<a class="linkbutton" href="' . getUrl('admin', ['action' => 'admin', 'area' => 'packages', 'sa' => 'remove', 'package' => $package['filename'], '{session_data}']) . '"' . ($package['is_installed'] && $package['is_current']
@@ -1187,11 +1201,11 @@ class Packages extends AbstractController
 				'children' => [
 					[
 						'attributes' => [
-							'success' => !empty($package_ftp) ? 1 : 0,
+							'success' => empty($package_ftp) ? 0 : 1,
 						],
-						'value' => !empty($package_ftp) ?
-							$txt['package_ftp_test_success']
-							: ($context['package_ftp']['error'] ?? $txt['package_ftp_test_failed']),
+						'value' => empty($package_ftp)
+							? $context['package_ftp']['error'] ?? $txt['package_ftp_test_failed']
+							: ($txt['package_ftp_test_success']),
 					],
 				],
 			],
@@ -1285,7 +1299,7 @@ class Packages extends AbstractController
 				}
 			}
 
-			if (!isset($this->_base_path))
+			if ($this->_base_path === null)
 			{
 				$this->_base_path = '';
 			}
@@ -1309,10 +1323,17 @@ class Packages extends AbstractController
 			$old_themes = loadThemesAffected($install_id);
 			foreach ($theme_paths as $id => $data)
 			{
-				if ((int) $id !== 1 && !in_array($id, $old_themes))
+				if ((int) $id === 1)
 				{
-					unset($theme_paths[$id]);
+					continue;
 				}
+
+				if (in_array($id, $old_themes))
+				{
+					continue;
+				}
+
+				unset($theme_paths[$id]);
 			}
 		}
 
@@ -1368,16 +1389,16 @@ class Packages extends AbstractController
 			$create_chmod_control->createChmodControl(
 				[BOARDDIR . '/packages'],
 				[
-					'destination_url' =>getUrl('admin', ['action' => 'admin', 'area' => 'packages']),
+					'destination_url' => getUrl('admin', ['action' => 'admin', 'area' => 'packages']),
 					'crash_on_error' => true
 				]
 			);
 		}
 
-		list ($the_brand, $the_version) = explode(' ', FORUM_VERSION, 2);
+		[$the_brand, $the_version] = explode(' ', FORUM_VERSION, 2);
 
 		// Here we have a little code to help those who class themselves as something of gods, version emulation ;)
-		if (isset($this->_req->query->version_emulate) && strtr($this->_req->query->version_emulate, [$the_brand => '']) == $the_version)
+		if (isset($this->_req->query->version_emulate) && strtr($this->_req->query->version_emulate, [$the_brand => '']) === $the_version)
 		{
 			unset($_SESSION['version_emulate']);
 		}
@@ -1462,6 +1483,7 @@ class Packages extends AbstractController
 					{
 						continue;
 					}
+
 					$dirs[] = $package;
 				}
 				elseif (strtolower(substr($package->getFilename(), -7)) === '.tar.gz')
@@ -1470,6 +1492,7 @@ class Packages extends AbstractController
 					{
 						continue;
 					}
+
 					$dirs[] = substr($package, 0, -7);
 				}
 				elseif (strtolower($package->getExtension()) === 'zip' || strtolower($package->getExtension()) === 'tgz')
@@ -1478,6 +1501,7 @@ class Packages extends AbstractController
 					{
 						continue;
 					}
+
 					$dirs[] = substr($package->getBasename(), 0, -4);
 				}
 
@@ -1537,14 +1561,18 @@ class Packages extends AbstractController
 					foreach ($upgrades as $upgrade)
 					{
 						// Even if it is for this ElkArte, is it for the installed version of the mod?
-						if (!$upgrade->exists('@for') || matchPackageVersion($the_version, $upgrade->fetch('@for')))
+						if ($upgrade->exists('@for') && !matchPackageVersion($the_version, $upgrade->fetch('@for')))
 						{
-							if (!$upgrade->exists('@from') || matchPackageVersion($installed_adds[$packageInfo['id']]['version'], $upgrade->fetch('@from')))
-							{
-								$packageInfo['can_upgrade'] = true;
-								break;
-							}
+							continue;
 						}
+
+						if ($upgrade->exists('@from') && !matchPackageVersion($installed_adds[$packageInfo['id']]['version'], $upgrade->fetch('@from')))
+						{
+							continue;
+						}
+
+						$packageInfo['can_upgrade'] = true;
+						break;
 					}
 				}
 				// Note that it has to be the current version to be uninstallable.  Shucks.
@@ -1615,7 +1643,7 @@ class Packages extends AbstractController
 				}
 			}
 		}
-		catch (UnexpectedValueException $e)
+		catch (UnexpectedValueException)
 		{
 			// @todo for now do nothing...
 		}
@@ -1636,29 +1664,32 @@ class Packages extends AbstractController
 	 * Removes database changes if specified conditions are met.
 	 *
 	 * @param array $package_installed The installed package that contains the database changes.
-	 * @param TableInstaller $table_installer The object responsible for modifying database tables.
-	 *
-	 * @return void
+	 * @param AbstractTable $table_installer The object responsible for modifying database tables.
 	 */
 	public function removeDatabaseChanges($package_installed, $table_installer): void
 	{
 		// If there's database changes - and they want them removed - let's do it last!
-		if (!empty($package_installed['db_changes']) && !empty($this->_req->post->do_db_changes))
+		if (empty($package_installed['db_changes']))
 		{
-			foreach ($package_installed['db_changes'] as $change)
+			return;
+		}
+		if (empty($this->_req->post->do_db_changes))
+		{
+			return;
+		}
+		foreach ($package_installed['db_changes'] as $change)
+		{
+			if ($change[0] === 'remove_table' && isset($change[1]))
 			{
-				if ($change[0] === 'remove_table' && isset($change[1]))
-				{
-					$table_installer->drop_table($change[1]);
-				}
-				elseif ($change[0] === 'remove_column' && isset($change[2]))
-				{
-					$table_installer->remove_column($change[1], $change[2]);
-				}
-				elseif ($change[0] === 'remove_index' && isset($change[2]))
-				{
-					$table_installer->remove_index($change[1], $change[2]);
-				}
+				$table_installer->drop_table($change[1]);
+			}
+			elseif ($change[0] === 'remove_column' && isset($change[2]))
+			{
+				$table_installer->remove_column($change[1], $change[2]);
+			}
+			elseif ($change[0] === 'remove_index' && isset($change[2]))
+			{
+				$table_installer->remove_index($change[1], $change[2]);
 			}
 		}
 	}
