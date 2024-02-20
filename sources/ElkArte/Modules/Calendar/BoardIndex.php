@@ -33,10 +33,10 @@ class BoardIndex extends AbstractModule
 		// Load the calendar?
 		if (allowedTo('calendar_view'))
 		{
-			return array(
-				array('pre_load', array('\\ElkArte\\Modules\\Calendar\\BoardIndex', 'pre_load'), array()),
-				array('post_load', array('\\ElkArte\\Modules\\Calendar\\BoardIndex', 'post_load'), array()),
-			);
+			return [
+				['pre_load', [BoardIndex::class, 'pre_load'], []],
+				['post_load', [BoardIndex::class, 'post_load'], []],
+			];
 		}
 
 		return false;
@@ -57,10 +57,10 @@ class BoardIndex extends AbstractModule
 			'num_days_shown' => empty($modSettings['cal_days_for_index']) || $modSettings['cal_days_for_index'] < 1 ? 1 : $modSettings['cal_days_for_index'],
 		);
 
-		$context += Cache::instance()->quick_get('calendar_index_offset_' . ($this->user->time_offset + $modSettings['time_offset']), 'subs/Calendar.subs.php', 'cache_getRecentEvents', array($eventOptions));
+		$context += Cache::instance()->quick_get('calendar_index_offset_' . ($this->user->time_offset + $modSettings['time_offset']), 'subs/Calendar.subs.php', 'cache_getRecentEvents', [$eventOptions]);
 
 		// Whether one or multiple days are shown on the board index.
-		$context['calendar_only_today'] = $modSettings['cal_days_for_index'] == 1;
+		$context['calendar_only_today'] = (int) $modSettings['cal_days_for_index'] === 1;
 
 		// This is used to show the "how-do-I-edit" help.
 		$context['calendar_can_edit'] = allowedTo('calendar_edit_any');
@@ -80,6 +80,6 @@ class BoardIndex extends AbstractModule
 			return;
 		}
 
-		$callbacks = elk_array_insert($callbacks, 'recent_posts', array('show_events'), 'after', false);
+		$callbacks = elk_array_insert($callbacks, 'recent_posts', ['show_events'], 'after', false);
 	}
 }

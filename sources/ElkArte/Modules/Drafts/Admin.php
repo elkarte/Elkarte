@@ -16,6 +16,7 @@
 
 namespace ElkArte\Modules\Drafts;
 
+use ElkArte\AdminController\ManageDraftsModule;
 use ElkArte\EventManager;
 use ElkArte\Modules\AbstractModule;
 
@@ -31,10 +32,10 @@ class Admin extends AbstractModule
 	 */
 	public static function hooks(EventManager $eventsManager)
 	{
-		return array(
-			array('addMenu', array('\\ElkArte\\Modules\\Drafts\\Admin', 'addMenu'), array()),
-			array('addSearch', array('\\ElkArte\\Modules\\Drafts\\Admin', 'addSearch'), array()),
-		);
+		return [
+			['addMenu', [Admin::class, 'addMenu'], []],
+			['addSearch', [Admin::class, 'addSearch'], []],
+		];
 	}
 
 	/**
@@ -46,14 +47,14 @@ class Admin extends AbstractModule
 	{
 		global $txt;
 
-		$admin_areas['layout']['areas']['managedrafts'] = array(
+		$admin_areas['layout']['areas']['managedrafts'] = [
 			'label' => $txt['manage_drafts'],
-			'controller' => '\\ElkArte\\AdminController\\ManageDraftsModule',
+			'controller' => ManageDraftsModule::class,
 			'function' => 'action_index',
 			'class' => 'i-bookmark i-admin',
-			'permission' => array('admin_forum'),
+			'permission' => ['admin_forum'],
 			'enabled' => featureEnabled('dr'),
-		);
+		];
 	}
 
 	/**
@@ -67,6 +68,6 @@ class Admin extends AbstractModule
 	{
 		$language_files[] = 'Drafts';
 		$include_files[] = 'ManageDraftsModule.controller';
-		$settings_search[] = array('settings_search', 'area=managedrafts', '\\ElkArte\\AdminController\\ManageDraftsModule');
+		$settings_search[] = ['settings_search', 'area=managedrafts', ManageDraftsModule::class];
 	}
 }

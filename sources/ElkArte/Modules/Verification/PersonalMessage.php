@@ -1,7 +1,7 @@
 <?php
 
 /**
- *
+ * Adds Visual Verification controls to the PM page for those that need it.
  *
  * @package   ElkArte Forum
  * @copyright ElkArte Forum contributors
@@ -16,6 +16,7 @@
 
 namespace ElkArte\Modules\Verification;
 
+use ElkArte\Errors\ErrorContext;
 use ElkArte\EventManager;
 use ElkArte\Modules\AbstractModule;
 use ElkArte\User;
@@ -39,15 +40,13 @@ class PersonalMessage extends AbstractModule
 		if (User::$info->is_admin === false && !empty($modSettings['pm_posts_verification']) && User::$info->posts < $modSettings['pm_posts_verification'])
 		{
 			// Add the events to call for the verification
-			return array(
-				array('prepare_send_context', array('\\ElkArte\\Modules\\Verification\\PersonalMessage', 'prepare_send_context'), array()),
-				array('before_sending', array('\\ElkArte\\Modules\\Verification\\PersonalMessage', 'before_sending'), array('post_errors')),
-			);
+			return [
+				['prepare_send_context', [PersonalMessage::class, 'prepare_send_context'], []],
+				['before_sending', [PersonalMessage::class, 'before_sending'], ['post_errors']],
+			];
 		}
-		else
-		{
-			return array();
-		}
+
+		return [];
 	}
 
 	/**
@@ -60,9 +59,9 @@ class PersonalMessage extends AbstractModule
 		// Verification control needed for this PM?
 		$context['require_verification'] = true;
 
-		$verificationOptions = array(
+		$verificationOptions = [
 			'id' => 'pm',
-		);
+		];
 		$context['require_verification'] = VerificationControlsIntegrate::create($verificationOptions);
 		$context['visual_verification_id'] = $verificationOptions['id'];
 	}
@@ -70,8 +69,7 @@ class PersonalMessage extends AbstractModule
 	/**
 	 * Checks the user passed the verifications on the PM page.
 	 *
-	 * @param \ElkArte\Errors\ErrorContext $post_errors
-	 * @throws \ElkArte\Exceptions\Exception
+	 * @param ErrorContext $post_errors
 	 */
 	public function before_sending($post_errors)
 	{
@@ -83,9 +81,9 @@ class PersonalMessage extends AbstractModule
 		}
 
 		// Wrong verification code?
-		$verificationOptions = array(
+		$verificationOptions = [
 			'id' => 'pm',
-		);
+		];
 		$context['require_verification'] = VerificationControlsIntegrate::create($verificationOptions, true);
 
 		if (is_array($context['require_verification']))

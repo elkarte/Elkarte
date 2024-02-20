@@ -16,10 +16,10 @@
 
 namespace ElkArte\Modules\Drafts;
 
+use ElkArte\Controller\Draft;
 use ElkArte\EventManager;
-use ElkArte\Menu\MenuArea;
-use ElkArte\Modules\AbstractModule;
 use ElkArte\Languages\Txt;
+use ElkArte\Modules\AbstractModule;
 
 /**
  * Class \ElkArte\Modules\Drafts\Profile
@@ -39,14 +39,12 @@ class Profile extends AbstractModule
 		{
 			add_integration_function('integrate_profile_areas', '\\ElkArte\\Modules\\Drafts\\Profile::integrate_profile_areas', '', false);
 
-			return array(
-				array('pre_load', array('\\ElkArte\\Modules\\Drafts\\Profile', 'pre_load'), array('post_errors')),
-			);
+			return [
+				['pre_load', [Profile::class, 'pre_load'], ['post_errors']],
+			];
 		}
-		else
-		{
-			return array();
-		}
+
+		return [];
 	}
 
 	/**
@@ -58,18 +56,18 @@ class Profile extends AbstractModule
 	{
 		global $txt, $context;
 
-		$new_areas['info'] = array(
-			'showdrafts' => array(
+		$new_areas['info'] = [
+			'showdrafts' => [
 				'label' => $txt['drafts_show'],
-				'controller' => '\\ElkArte\\Controller\\Draft',
+				'controller' => Draft::class,
 				'function' => 'action_showProfileDrafts',
 				'enabled' => $context['user']['is_owner'],
-				'permission' => array(
+				'permission' => [
 					'own' => 'profile_view_own',
-					'any' => array(),
-				),
-			)
-		);
+					'any' => [],
+				],
+			]
+		];
 
 		return $profile_areas->insertSection($new_areas, 'showposts');
 	}

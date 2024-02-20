@@ -28,7 +28,7 @@ abstract class AbstractMentions extends AbstractModule
 	 * event manager.
 	 *
 	 * @param string $action
-	 * @param \ElkArte\EventManager $eventsManager
+	 * @param EventManager $eventsManager
 	 * @global $modSettings
 	 */
 	protected static function registerHooks($action, EventManager $eventsManager)
@@ -46,11 +46,12 @@ abstract class AbstractMentions extends AbstractModule
 				{
 					continue;
 				}
+
 				$hooks = $class::getEvents($action);
 
 				foreach ($hooks as $method => $dependencies)
 				{
-					$eventsManager->register($method, array($method, array($class, $action . '_' . $method), $dependencies));
+					$eventsManager->register($method, [$method, [$class, $action . '_' . $method], $dependencies]);
 				}
 			}
 		}

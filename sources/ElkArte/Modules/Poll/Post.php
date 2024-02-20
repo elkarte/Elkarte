@@ -16,9 +16,11 @@
 
 namespace ElkArte\Modules\Poll;
 
+use ElkArte\Errors\ErrorContext;
 use ElkArte\EventManager;
 use ElkArte\Exceptions\Exception;
 use ElkArte\Modules\AbstractModule;
+use ElkArte\Themes\TemplateLayers;
 use ElkArte\Util;
 
 /**
@@ -40,25 +42,25 @@ class Post extends AbstractModule
 		$context['can_add_poll'] = false;
 		$context['make_poll'] = false;
 
-		$return = array();
+		$return = [];
 		if (!empty($modSettings['pollMode']))
 		{
-			$return = array(
-				array('prepare_post', array('\\ElkArte\\Modules\\Poll\\Post', 'prepare_post'), array('topic', 'topic_attributes')),
-				array('prepare_context', array('\\ElkArte\\Modules\\Poll\\Post', 'prepare_context'), array('topic_attributes', 'topic', 'board')),
-				array('finalize_post_form', array('\\ElkArte\\Modules\\Poll\\Post', 'finalize_post_form'), array('destination', 'page_title', 'template_layers')),
-			);
+			$return = [
+				['prepare_post', [Post::class, 'prepare_post'], ['topic', 'topic_attributes']],
+				['prepare_context', [Post::class, 'prepare_context'], ['topic_attributes', 'topic', 'board']],
+				['finalize_post_form', [Post::class, 'finalize_post_form'], ['destination', 'page_title', 'template_layers']],
+			];
 		}
 
 		// Posting a poll?
 		self::$_make_poll = isset($_REQUEST['poll']);
 		if (self::$_make_poll)
 		{
-			return array_merge($return, array(
-				array('before_save_post', array('\\ElkArte\\Modules\\Poll\\Post', 'before_save_post'), array()),
-				array('save_replying', array('\\ElkArte\\Modules\\Poll\\Post', 'save_replying'), array()),
-				array('pre_save_post', array('\\ElkArte\\Modules\\Poll\\Post', 'pre_save_post'), array('topicOptions')),
-			));
+			return array_merge($return, [
+				['before_save_post', [Post::class, 'before_save_post'], []],
+				['save_replying', [Post::class, 'save_replying'], []],
+				['pre_save_post', [Post::class, 'pre_save_post'], ['topicOptions']],
+			]);
 		}
 
 		return $return;
@@ -75,10 +77,22 @@ class Post extends AbstractModule
 		$topic_attributes['id_poll'] = 0;
 
 		// You can't reply with a poll... hacker.
-		if (isset($_REQUEST['poll']) && !empty($topic) && !isset($_REQUEST['msg']))
+		if (!isset($_REQUEST['poll']))
 		{
-			$this->_unset_poll();
+			return;
 		}
+
+		if (empty($topic))
+		{
+			return;
+		}
+
+		if (isset($_REQUEST['msg']))
+		{
+			return;
+		}
+
+		$this->_unset_poll();
 	}
 
 	/**
@@ -108,7 +122,7 @@ class Post extends AbstractModule
 	 * @param int $board
 	 *
 	 * @return bool
-	 * @throws \ElkArte\Exceptions\Exception
+	 * @throws Exception
 	 */
 	public function prepare_context($topic_attributes, $topic, $board)
 	{
@@ -116,8 +130,10 @@ class Post extends AbstractModule
 
 		if (!empty($topic))
 		{
+			$msg = $this->_req->getRequest('msg', 'intval');
+
 			// If this topic already has a poll, they sure can't add another.
-			if (isset($_REQUEST['poll']) && $topic_attributes['id_poll'] > 0)
+			if ($msg !== null && $topic_attributes['id_poll'] > 0)
 			{
 				return $this->_unset_poll();
 			}
@@ -129,7 +145,7 @@ class Post extends AbstractModule
 			}
 			else
 			{
-				$context['can_add_poll'] = (allowedTo('poll_add_any') || ($topic_attributes['id_first_msg'] == $_REQUEST['msg'] && allowedTo('poll_add_own'))) && $topic_attributes['id_poll'] <= 0;
+				$context['can_add_poll'] = (allowedTo('poll_add_any') || ($topic_attributes['id_first_msg'] === $msg && allowedTo('poll_add_own'))) && $topic_attributes['id_poll'] <= 0;
 			}
 		}
 		else
@@ -139,9 +155,9 @@ class Post extends AbstractModule
 
 		if ($context['can_add_poll'])
 		{
-			theme()->addJavascriptVar(array(
+			theme()->addJavascriptVar([
 				'poll_remove' => $txt['poll_remove'],
-				'poll_add' => $txt['add_poll']), true);
+				'poll_add' => $txt['add_poll']], true);
 		}
 
 		// Check the users permissions - is the user allowed to add or post a poll?
@@ -153,7 +169,7 @@ class Post extends AbstractModule
 				isAllowedTo('poll_post');
 			}
 			// This is an old topic - but it is yours!  Can you add to it?
-			elseif ($this->user->id == $topic_attributes['id_member'] && !allowedTo('poll_add_any'))
+			elseif ($this->user->id === $topic_attributes['id_member'] && !allowedTo('poll_add_any'))
 			{
 				isAllowedTo('poll_add_own');
 			}
@@ -162,20 +178,26 @@ class Post extends AbstractModule
 			{
 				isAllowedTo('poll_add_any');
 			}
+
 			$context['can_moderate_poll'] = true;
 
 			require_once(SUBSDIR . '/Members.subs.php');
 			$allowedVoteGroups = groupsAllowedTo('poll_vote', $board);
 
+			// Clean / Set options
+			$poll_max_votes = $this->_req->getPost('poll_max_votes', 'intval', 1);
+			$poll_change_vote = $this->_req->getPost('poll_change_vote');
+			$poll_guest_vote = $this->_req->getPost('poll_guest_vote');
+
 			// Set up the poll options.
-			$context['poll'] = array(
-				'max_votes' => empty($_POST['poll_max_votes']) ? '1' : max(1, $_POST['poll_max_votes']),
-				'hide_results' => empty($_POST['poll_hide']) ? 0 : (int) $_POST['poll_hide'],
-				'expiration' => !isset($_POST['poll_expire']) ? '' : (int) $_POST['poll_expire'],
-				'change_vote' => isset($_POST['poll_change_vote']),
-				'guest_vote' => isset($_POST['poll_guest_vote']),
-				'guest_vote_allowed' => in_array(-1, $allowedVoteGroups['allowed']),
-			);
+			$context['poll'] = [
+				'max_votes' => max(1, $poll_max_votes),
+				'hide_results' => $this->_req->getPost('poll_hide', 'intval', 0),
+				'expiration' => $this->_req->getPost('poll_expire', 'intval', ''),
+				'change_vote' => isset($poll_change_vote),
+				'guest_vote' => isset($poll_guest_vote),
+				'guest_vote_allowed' => in_array(-1, $allowedVoteGroups['allowed'], true),
+			];
 
 			$this->_preparePollContext();
 		}
@@ -192,10 +214,10 @@ class Post extends AbstractModule
 
 		$context['poll']['question'] = isset($_REQUEST['question']) ? Util::htmlspecialchars(trim($_REQUEST['question'])) : '';
 
-		$context['poll']['choices'] = array();
+		$context['poll']['choices'] = [];
 		$choice_id = 0;
 
-		$_POST['options'] = empty($_POST['options']) ? array() : Util::htmlspecialchars__recursive($_POST['options']);
+		$_POST['options'] = empty($_POST['options']) ? [] : Util::htmlspecialchars__recursive($_POST['options']);
 		foreach ($_POST['options'] as $option)
 		{
 			if (trim($option) === '')
@@ -203,30 +225,30 @@ class Post extends AbstractModule
 				continue;
 			}
 
-			$context['poll']['choices'][] = array(
+			$context['poll']['choices'][] = [
 				'id' => $choice_id++,
 				'number' => $choice_id,
 				'label' => $option,
 				'is_last' => false
-			);
+			];
 		}
 
 		// One empty option for those with js disabled...I know are few... :P
-		$context['poll']['choices'][] = array(
+		$context['poll']['choices'][] = [
 			'id' => $choice_id++,
 			'number' => $choice_id,
 			'label' => '',
 			'is_last' => false
-		);
+		];
 
 		if (count($context['poll']['choices']) < 2)
 		{
-			$context['poll']['choices'][] = array(
+			$context['poll']['choices'][] = [
 				'id' => $choice_id++,
 				'number' => $choice_id,
 				'label' => '',
 				'is_last' => false
-			);
+			];
 		}
 
 		$context['last_choice_id'] = $choice_id;
@@ -238,7 +260,7 @@ class Post extends AbstractModule
 	 *
 	 * @param string $destination
 	 * @param string $page_title
-	 * @param \ElkArte\Themes\TemplateLayers $template_layers
+	 * @param TemplateLayers $template_layers
 	 */
 	public function finalize_post_form(&$destination, &$page_title, $template_layers)
 	{
@@ -274,22 +296,29 @@ class Post extends AbstractModule
 	 *
 	 * @param int $topic_info
 	 */
-	public function save_replying(&$topic_info)
+	public function save_replying($topic_info)
 	{
 		// Sorry, multiple polls aren't allowed... yet.  You should stop giving me ideas :P.
-		if (isset($_REQUEST['poll']) && $topic_info['id_poll'] > 0)
+		if (!isset($_REQUEST['poll']))
 		{
-			$this->_unset_poll();
+			return;
 		}
+
+		if ($topic_info['id_poll'] <= 0)
+		{
+			return;
+		}
+
+		$this->_unset_poll();
 	}
 
 	/**
 	 * Checks the poll conditions before we go to save
 	 *
-	 * @param \ElkArte\Errors\ErrorContext $post_errors
+	 * @param ErrorContext $post_errors
 	 * @param array $topic_info
 	 *
-	 * @throws \ElkArte\Exceptions\Exception no_access
+	 * @throws Exception no_access
 	 */
 	public function before_save_post($post_errors, $topic_info)
 	{
@@ -320,7 +349,7 @@ class Post extends AbstractModule
 			$post_errors->addError('no_question');
 		}
 
-		$_POST['options'] = empty($_POST['options']) ? array() : Util::htmltrim__recursive($_POST['options']);
+		$_POST['options'] = empty($_POST['options']) ? [] : Util::htmltrim__recursive($_POST['options']);
 
 		// Get rid of empty ones.
 		foreach ($_POST['options'] as $k => $option)
@@ -346,7 +375,7 @@ class Post extends AbstractModule
 	 * Create the poll!
 	 *
 	 * @param array $topicOptions
-	 * @throws \ElkArte\Exceptions\Exception
+	 * @throws Exception
 	 */
 	public function pre_save_post(&$topicOptions)
 	{
@@ -362,7 +391,7 @@ class Post extends AbstractModule
 	 * @param string $user_name The username of the member that creates the poll
 	 *
 	 * @return int - the id of the newly created poll
-	 * @throws \ElkArte\Exceptions\Exception poll_range_error
+	 * @throws Exception poll_range_error
 	 */
 	protected function _createPoll($options, $user_name)
 	{
@@ -391,7 +420,7 @@ class Post extends AbstractModule
 		$poll_guest_vote = isset($options['poll_guest_vote']) ? 1 : 0;
 
 		// Make sure guests are actually allowed to vote generally.
-		if ($poll_guest_vote)
+		if ($poll_guest_vote !== 0)
 		{
 			require_once(SUBSDIR . '/Members.subs.php');
 			$allowedVoteGroups = groupsAllowedTo('poll_vote', $board);
@@ -419,6 +448,7 @@ class Post extends AbstractModule
 		$question = htmlspecialchars($options['question'], ENT_COMPAT, 'UTF-8');
 		$question = Util::substr($question, 0, 255);
 		$question = preg_replace('~&amp;#(\d{4,5}|[2-9]\d{2,4}|1[2-9]\d);~', '&#$1;', $question);
+
 		$poll_options = Util::htmlspecialchars__recursive($options['options']);
 
 		// Finally, make the poll.

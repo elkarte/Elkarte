@@ -27,7 +27,7 @@ interface ModuleInterface
 	 * The method called by the EventManager to find out which trigger the
 	 * module is attached to and which parameters the listener wants to receive.
 	 *
-	 * @param \ElkArte\EventManager $eventsManager an instance of the event manager
+	 * @param EventManager $eventsManager an instance of the event manager
 	 *
 	 * @return array
 	 */

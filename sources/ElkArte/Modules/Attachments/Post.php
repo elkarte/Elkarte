@@ -21,6 +21,7 @@ use ElkArte\Errors\ErrorContext;
 use ElkArte\EventManager;
 use ElkArte\FileFunctions;
 use ElkArte\Modules\AbstractModule;
+use ElkArte\TemporaryAttachment;
 use ElkArte\TemporaryAttachmentsList;
 
 /**
@@ -32,10 +33,10 @@ class Post extends AbstractModule
 	protected static $_attach_level = 0;
 
 	/** @var AttachmentErrorContext The objects that keeps track of errors. */
-	protected $_attach_errors = null;
+	protected $_attach_errors;
 
 	/** @var int[] List of attachments ID already saved. */
-	protected $_saved_attach_id = array();
+	protected $_saved_attach_id = [];
 
 	/** @var bool If it is a new message or if it is an existing one edited. */
 	protected $_is_new_message = false;
@@ -54,17 +55,17 @@ class Post extends AbstractModule
 		{
 			self::$_attach_level = (int) $modSettings['attachmentEnable'];
 
-			return array(
-				array('prepare_post', array('\\ElkArte\\Modules\\Attachments\\Post', 'prepare_post'), array()),
-				array('prepare_context', array('\\ElkArte\\Modules\\Attachments\\Post', 'prepare_context'), array('post_errors')),
-				array('finalize_post_form', array('\\ElkArte\\Modules\\Attachments\\Post', 'finalize_post_form'), array('show_additional_options', 'board', 'topic')),
-				array('prepare_save_post', array('\\ElkArte\\Modules\\Attachments\\Post', 'prepare_save_post'), array('post_errors')),
-				array('pre_save_post', array('\\ElkArte\\Modules\\Attachments\\Post', 'pre_save_post'), array('msgOptions')),
-				array('after_save_post', array('\\ElkArte\\Modules\\Attachments\\Post', 'after_save_post'), array('msgOptions')),
-			);
+			return [
+				['prepare_post', [Post::class, 'prepare_post'], []],
+				['prepare_context', [Post::class, 'prepare_context'], ['post_errors']],
+				['finalize_post_form', [Post::class, 'finalize_post_form'], ['show_additional_options', 'board', 'topic']],
+				['prepare_save_post', [Post::class, 'prepare_save_post'], ['post_errors']],
+				['pre_save_post', [Post::class, 'pre_save_post'], ['msgOptions']],
+				['after_save_post', [Post::class, 'after_save_post'], ['msgOptions']],
+			];
 		}
 
-		return array();
+		return [];
 	}
 
 	/**
@@ -98,11 +99,11 @@ class Post extends AbstractModule
 		global $context;
 
 		// An array to hold all the attachments for this topic.
-		$context['attachments']['current'] = array();
+		$context['attachments']['current'] = [];
 
 		if ($this->_attach_errors->hasErrors())
 		{
-			$post_errors->addError(array('attachments_errors' => $this->_attach_errors));
+			$post_errors->addError(['attachments_errors' => $this->_attach_errors]);
 		}
 	}
 
@@ -119,7 +120,6 @@ class Post extends AbstractModule
 	 * @param bool $show_additional_options
 	 * @param int $board
 	 * @param int $topic
-	 * @throws \ElkArte\Exceptions\Exception
 	 */
 	public function finalize_post_form(&$show_additional_options, $board, $topic)
 	{
@@ -176,11 +176,11 @@ class Post extends AbstractModule
 
 				$prefix = $tmp_attachments->getTplName($this->user->id, '');
 
-				/** @var \ElkArte\TemporaryAttachment $attachment */
+				/** @var TemporaryAttachment $attachment */
 				foreach ($tmp_attachments as $attachID => $attachment)
 				{
 					// Initial errors (such as missing directory), we can recover
-					if ($attachID !== 'initial_error' && strpos($attachID, $prefix) === false)
+					if ($attachID !== 'initial_error' && strpos($attachID, (string) $prefix) === false)
 					{
 						continue;
 					}
@@ -196,6 +196,7 @@ class Post extends AbstractModule
 							{
 								$txt['error_attach_errors'] .= (is_array($error) ? vsprintf($txt[$error[0]], $error[1]) : $txt[$error]) . '<br  />';
 							}
+
 							$txt['error_attach_errors'] .= '</div>';
 							$this->_attach_errors->addError('attach_errors');
 						}
@@ -221,13 +222,13 @@ class Post extends AbstractModule
 						$context['files_in_session_warning'] = $txt['attached_files_in_session'];
 					}
 
-					$context['attachments']['current'][] = array(
+					$context['attachments']['current'][] = [
 						'name' => '<span class="underline">' . htmlspecialchars($attachment['name'], ENT_COMPAT, 'UTF-8') . '</span>',
 						'size' => $attachment['size'],
 						'id' => $attachment['public_attachid'],
 						'unchecked' => false,
 						'approved' => 1,
-					);
+					];
 				}
 			}
 		}
@@ -252,18 +253,19 @@ class Post extends AbstractModule
 		$context['attachments']['can']['post_unapproved'] = allowedTo('post_attachment');
 		$context['attachments']['total_size'] = $attachments['total_size'] ?? 0;
 		$context['attachments']['quantity'] = $attachments['quantity'] ?? 0;
-		$context['attachments']['restrictions'] = array();
+		$context['attachments']['restrictions'] = [];
 		if (!empty($modSettings['attachmentCheckExtensions']))
 		{
-			$context['attachments']['allowed_extensions'] = strtr(strtolower($modSettings['attachmentExtensions']), array(',' => ', '));
+			$context['attachments']['allowed_extensions'] = strtr(strtolower($modSettings['attachmentExtensions']), [',' => ', ']);
 		}
 		else
 		{
 			$context['attachments']['allowed_extensions'] = '';
 		}
+
 		$context['attachments']['template'] = 'template_add_new_attachments';
 
-		$attachmentRestrictionTypes = array('attachmentNumPerPostLimit', 'attachmentPostLimit', 'attachmentSizeLimit');
+		$attachmentRestrictionTypes = ['attachmentNumPerPostLimit', 'attachmentPostLimit', 'attachmentSizeLimit'];
 		foreach ($attachmentRestrictionTypes as $type)
 		{
 			if (!empty($modSettings[$type]))
@@ -346,7 +348,7 @@ class Post extends AbstractModule
 			// Since, they don't belong here. Let's inform the user that they exist..
 			if (!empty($topic))
 			{
-				$delete_url = $scripturl . '?action=post' . (!empty($msg) ? (';msg=' . $msg) : '') . (!empty($last_msg) ? (';last_msg=' . $last_msg) : '') . ';topic=' . $topic . ';delete_temp';
+				$delete_url = $scripturl . '?action=post' . (empty($msg) ? ('') : ';msg=' . $msg) . (empty($last_msg) ? ('') : ';last_msg=' . $last_msg) . ';topic=' . $topic . ';delete_temp';
 			}
 			else
 			{
@@ -360,13 +362,13 @@ class Post extends AbstractModule
 			$context['ignore_temp_attachments'] = true;
 			if ($tmp_attachments->areLostAttachments())
 			{
-				$this->_attach_errors->addError(array('temp_attachments_lost', array($delete_url, $file_list)));
+				$this->_attach_errors->addError(['temp_attachments_lost', [$delete_url, $file_list]]);
 			}
 			else
 			{
 				// We have a message id, so we can link back to the old topic they were trying to edit..
 				$goback_url = $scripturl . '?action=post;msg=' . $tmp_attachments->getPostParam('msg') . ($tmp_attachments->getPostParam('last_msg') === null ? '' : ';last_msg=' . $tmp_attachments->getPostParam('last_msg')) . ';topic=' . $tmp_attachments->getPostParam('topic') . ';additionalOptions';
-				$this->_attach_errors->addError(array('temp_attachments_found', array($delete_url, $goback_url, $file_list)));
+				$this->_attach_errors->addError(['temp_attachments_found', [$delete_url, $goback_url, $file_list]]);
 			}
 		}
 	}
@@ -375,7 +377,6 @@ class Post extends AbstractModule
 	 * Save attachments when the post is saved
 	 *
 	 * @param ErrorContext $post_errors
-	 * @throws \ElkArte\Exceptions\Exception
 	 */
 	public function prepare_save_post($post_errors)
 	{
@@ -386,7 +387,7 @@ class Post extends AbstractModule
 
 		if ($this->_attach_errors->hasErrors())
 		{
-			$post_errors->addError(array('attachments_errors' => $this->_attach_errors));
+			$post_errors->addError(['attachments_errors' => $this->_attach_errors]);
 		}
 	}
 
@@ -394,7 +395,6 @@ class Post extends AbstractModule
 	 * Handles both the saving and removing of attachments on post save
 	 *
 	 * @param int $msg
-	 * @throws \ElkArte\Exceptions\Exception
 	 */
 	protected function saveAttachments($msg)
 	{
@@ -404,8 +404,8 @@ class Post extends AbstractModule
 		if (isset($_POST['attach_del']))
 		{
 			require_once(SUBSDIR . '/Attachments.subs.php');
-			$keep_temp = array();
-			$keep_ids = array();
+			$keep_temp = [];
+			$keep_ids = [];
 			$tmp_attachments = new TemporaryAttachmentsList();
 			$prefix = $tmp_attachments->getTplName($this->user->id, '');
 
@@ -413,7 +413,7 @@ class Post extends AbstractModule
 			{
 				$attachID = $tmp_attachments->getIdFromPublic($public_id);
 
-				if (strpos($attachID, $prefix) !== false)
+				if (strpos($attachID, (string) $prefix) !== false)
 				{
 					$keep_temp[] = $attachID;
 				}
@@ -429,18 +429,18 @@ class Post extends AbstractModule
 			if (!empty($msg))
 			{
 				require_once(SUBSDIR . '/ManageAttachments.subs.php');
-				$attachmentQuery = array(
+				$attachmentQuery = [
 					'attachment_type' => 0,
 					'id_msg' => (int) $msg,
 					'not_id_attach' => $keep_ids,
-				);
+				];
 				removeAttachments($attachmentQuery);
 			}
 		}
 
 		// Then try to upload any attachments.
 		$context['attachments']['can']['post'] = self::$_attach_level === 1 && (allowedTo('post_attachment') || ($modSettings['postmod_active'] && allowedTo('post_unapproved_attachments')));
-		if ($context['attachments']['can']['post'] && empty($_POST['from_qr']))
+		if ($context['attachments']['can']['post'] && empty($this->_req->getPost('from_qr')))
 		{
 			require_once(SUBSDIR . '/Attachments.subs.php');
 			$this->ignore_temp = processAttachments((int) $msg);
@@ -464,13 +464,13 @@ class Post extends AbstractModule
 		if (empty($this->ignore_temp)
 			&& $context['attachments']['can']['post']
 			&& $tmp_attachments->hasAttachments()
-			&& empty($_POST['from_qr']))
+			&& empty($this->_req->getPost('from_qr')))
 		{
-			$this->_saved_attach_id = array();
+			$this->_saved_attach_id = [];
 
 			foreach ($tmp_attachments->toArray() as $attachID => $attachment)
 			{
-				if ($attachID !== 'initial_error' && strpos($attachID, $prefix) === false)
+				if ($attachID !== 'initial_error' && strpos($attachID, (string) $prefix) === false)
 				{
 					continue;
 				}
@@ -486,8 +486,8 @@ class Post extends AbstractModule
 				if (empty($attachment['errors']))
 				{
 					// Load the attachmentOptions array with the data needed to create an attachment
-					$attachmentOptions = array(
-						'post' => $_REQUEST['msg'] ?? 0,
+					$attachmentOptions = [
+						'post' => $this->_req->getRequest('msg', 'intval', 0),
 						'poster' => $this->user->id,
 						'name' => $attachment['name'],
 						'tmp_name' => $attachment['tmp_name'],
@@ -495,8 +495,8 @@ class Post extends AbstractModule
 						'mime_type' => $attachment['type'] ?? '',
 						'id_folder' => $attachment['id_folder'] ?? 0,
 						'approved' => !$modSettings['postmod_active'] || allowedTo('post_attachment'),
-						'errors' => array(),
-					);
+						'errors' => [],
+					];
 
 					if (createAttachment($attachmentOptions))
 					{
@@ -506,8 +506,8 @@ class Post extends AbstractModule
 							$this->_saved_attach_id[] = $attachmentOptions['thumb'];
 						}
 
-						$msgOptions['body'] = preg_replace('~\[attachurl(?:.*?)\]' . $attachment['public_attachid'] . '\[\/attachurl\]~', '[attachurl]' . $attachmentOptions['id'] . '[/attachurl]', $msgOptions['body']);
-						$msgOptions['body'] = preg_replace('~\[attach(.*?)\]' . $attachment['public_attachid'] . '\[\/attach\]~', '[attach$1]' . $attachmentOptions['id'] . '[/attach]', $msgOptions['body']);
+						$msgOptions['body'] = preg_replace('~\[attachurl(?:.*?)]' . $attachment['public_attachid'] . '\[/attachurl]~', '[attachurl]' . $attachmentOptions['id'] . '[/attachurl]', $msgOptions['body']);
+						$msgOptions['body'] = preg_replace('~\[attach(.*?)]' . $attachment['public_attachid'] . '\[/attach]~', '[attach$1]' . $attachmentOptions['id'] . '[/attach]', $msgOptions['body']);
 					}
 				}
 				// We have errors on this file, build out the issues for display to the user
@@ -522,10 +522,17 @@ class Post extends AbstractModule
 			$tmp_attachments->unset();
 		}
 
-		if (!empty($this->_saved_attach_id) && $msgOptions['icon'] === 'xx')
+		if (empty($this->_saved_attach_id))
 		{
-			$msgOptions['icon'] = 'clip';
+			return;
 		}
+
+		if ($msgOptions['icon'] !== 'xx')
+		{
+			return;
+		}
+
+		$msgOptions['icon'] = 'clip';
 	}
 
 	/**
@@ -535,9 +542,16 @@ class Post extends AbstractModule
 	 */
 	public function after_save_post($msgOptions)
 	{
-		if ($this->_is_new_message && !empty($this->_saved_attach_id))
+		if (!$this->_is_new_message)
 		{
-			bindMessageAttachments($msgOptions['id'], $this->_saved_attach_id);
+			return;
 		}
+
+		if (empty($this->_saved_attach_id))
+		{
+			return;
+		}
+
+		bindMessageAttachments($msgOptions['id'], $this->_saved_attach_id);
 	}
 }

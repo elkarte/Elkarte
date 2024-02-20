@@ -40,7 +40,7 @@ class Display extends AbstractModule
 		if (!empty($modSettings['cal_showInTopic']))
 		{
 			return array(
-				array('topicinfo', array('\\ElkArte\\Modules\\Calendar\\Display', 'topicinfo'), array('topicinfo', 'topic')),
+				array('topicinfo', array(Display::class, 'topicinfo'), array('topicinfo', 'topic')),
 			);
 		}
 
@@ -81,7 +81,7 @@ class Display extends AbstractModule
 			require_once(SUBSDIR . '/Calendar.subs.php');
 
 			// First, try create a better time format, ignoring the "time" elements.
-			if (preg_match('~%[AaBbCcDdeGghjmuYy](?:[^%]*%[AaBbCcDdeGghjmuYy])*~', $this->user->time_format, $matches) == 0 || empty($matches[0]))
+			if (preg_match('~%[AaBbCcDdeGghjmuYy](?:[^%]*%[AaBbCcDdeGghjmuYy])*~', $this->user->time_format, $matches) !== 1 || empty($matches[0]))
 			{
 				$date_string = $this->user->time_format;
 			}
@@ -93,7 +93,7 @@ class Display extends AbstractModule
 			// Get event information for this topic.
 			$events = eventInfoForTopic($topic);
 
-			$context['linked_calendar_events'] = array();
+			$context['linked_calendar_events'] = [];
 			foreach ($events as $event)
 			{
 				// Prepare the dates for being formatted.

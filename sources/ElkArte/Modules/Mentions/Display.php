@@ -29,6 +29,6 @@ class Display extends AbstractMentions
 	{
 		self::registerHooks('display', $eventsManager);
 
-		return array();
+		return [];
 	}
 }

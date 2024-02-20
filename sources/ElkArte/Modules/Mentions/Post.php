@@ -29,6 +29,6 @@ class Post extends AbstractMentions
 	{
 		self::registerHooks('post', $eventsManager);
 
-		return array();
+		return [];
 	}
 }
