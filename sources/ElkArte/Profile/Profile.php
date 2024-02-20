@@ -38,18 +38,25 @@ class Profile extends AbstractController
 {
 	/** @var bool If the save was successful or not */
 	private $completedSave = false;
+
 	/** @var null If this was a request to save an update */
 	private $isSaving;
+
 	/** @var null What it says, on completion */
 	private $_force_redirect;
+
 	/** @var array|bool Holds the output of createMenu for the profile areas */
 	private $_profile_include_data;
+
 	/** @var string The current area chosen from the menu */
 	private $_current_area;
+
 	/** @var string The current subsection, if any, of the area chosen */
 	private $_current_subsection;
+
 	/** @var int Member id for the history being viewed */
 	private $_memID = 0;
+
 	/** @var Member The \ElkArte\Member object is stored here to avoid some global */
 	private $_profile;
 
@@ -304,7 +311,7 @@ class Profile extends AbstractController
 						'label' => $txt['account'],
 						'controller' => ProfileOptions::class,
 						'function' => 'action_account',
-						'enabled' => $context['user']['is_admin'] || ((int) $this->_profile['id_group'] !== 1 && !in_array(1, array_map('intval', explode(',', $this->_profile['additional_groups'])), true)),					'sc' => 'post',
+						'enabled' => $context['user']['is_admin'] || ((int) $this->_profile['id_group'] !== 1 && !in_array(1, array_map('intval', explode(',', $this->_profile['additional_groups'])), true)), 'sc' => 'post',
 						'token' => 'profile-ac%u',
 						'password' => true,
 						'permission' => [
@@ -520,14 +527,14 @@ class Profile extends AbstractController
 
 		// Check the session, if required, and they are trying to save
 		$this->completedSave = false;
-		if (isset($this->_profile_include_data['sc']) && (isset($this->isSaving) || $context['do_preview']))
+		if (isset($this->_profile_include_data['sc']) && ($this->isSaving !== null || $context['do_preview']))
 		{
 			checkSession($this->_profile_include_data['sc']);
 			$this->completedSave = true;
 		}
 
 		// Does this require admin/moderator session validating?
-		if (isset($this->isSaving) && !$context['user']['is_owner'])
+		if ($this->isSaving !== null && !$context['user']['is_owner'])
 		{
 			validateSession();
 		}
@@ -543,7 +550,7 @@ class Profile extends AbstractController
 				$token_type = 'post';
 			}
 
-			if (isset($this->isSaving))
+			if ($this->isSaving !== null)
 			{
 				validateToken($token_name, $token_type);
 			}
@@ -574,15 +581,25 @@ class Profile extends AbstractController
 			];
 		}
 
-		if (!empty($this->_current_subsection)
-			&& isset($this->_profile_include_data['subsections'][$this->_current_subsection])
-			&& $this->_profile_include_data['subsections'][$this->_current_subsection]['label'] !== $this->_profile_include_data['label'])
+		if (empty($this->_current_subsection))
 		{
-			$context['linktree'][] = [
-				'url' => getUrl('profile', ['action' => 'profile', 'area' => $this->_profile_include_data['current_area'], 'sa' => $this->_current_subsection, 'u' => $this->_memID, 'name' => $this->_profile['real_name']]),
-				'name' => $this->_profile_include_data['subsections'][$this->_current_subsection]['label'],
-			];
+			return;
 		}
+
+		if (!isset($this->_profile_include_data['subsections'][$this->_current_subsection]))
+		{
+			return;
+		}
+
+		if ($this->_profile_include_data['subsections'][$this->_current_subsection]['label'] === $this->_profile_include_data['label'])
+		{
+			return;
+		}
+
+		$context['linktree'][] = [
+			'url' => getUrl('profile', ['action' => 'profile', 'area' => $this->_profile_include_data['current_area'], 'sa' => $this->_current_subsection, 'u' => $this->_memID, 'name' => $this->_profile['real_name']]),
+			'name' => $this->_profile_include_data['subsections'][$this->_current_subsection]['label'],
+		];
 	}
 
 	/**
@@ -642,7 +659,7 @@ class Profile extends AbstractController
 				$msg = $controller->action_groupMembership2();
 
 				// Whatever we've done, we have nothing else to do here...
-				redirectexit('action=profile' . ($context['user']['is_owner'] ? '' : ';u=' . $this->_memID) . ';area=groupmembership' . (!empty($msg) ? ';msg=' . $msg : ''));
+				redirectexit('action=profile' . ($context['user']['is_owner'] ? '' : ';u=' . $this->_memID) . ';area=groupmembership' . (empty($msg) ? '' : ';msg=' . $msg));
 			}
 			// Authentication changes?
 			elseif ($this->_current_area === 'authentication')

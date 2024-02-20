@@ -34,9 +34,10 @@ use ElkArte\MembersList;
  */
 class ProfileOptions extends AbstractController
 {
-	/** @var int Member id for the profile being viewed  */
+	/** @var int Member id for the profile being viewed */
 	private $_memID = 0;
-	/** @var Member The \ElkArte\Member object is stored here to avoid some global */
+
+	/** @var MembersList The \ElkArte\Member object is stored here to avoid some global */
 	private $_profile;
 
 	/**
@@ -124,9 +125,7 @@ class ProfileOptions extends AbstractController
 
 		// For making changes!
 		$buddiesArray = array_map('intval', explode(',', $this->_profile['buddy_list']));
-		$buddiesArray = array_filter($buddiesArray, static function($value) {
-			return $value !== '';
-		});
+		$buddiesArray = array_filter($buddiesArray, static fn($value) => $value !== '');
 
 		// Removing a buddy?
 		$notMyBuddy = $this->_req->getQuery('remove', 'intval');
@@ -228,9 +227,7 @@ class ProfileOptions extends AbstractController
 
 		// For making changes!
 		$ignoreArray = array_map('intval', explode(',', $this->_profile['pm_ignore_list']));
-		$ignoreArray = array_filter($ignoreArray, static function($value) {
-			return $value !== '';
-		});
+		$ignoreArray = array_filter($ignoreArray, static fn($value) => $value !== '');
 
 		// Removing a member from the ignore list?
 		$id_remove = $this->_req->getQuery('remove', 'intval');
@@ -446,7 +443,7 @@ class ProfileOptions extends AbstractController
 				'hook' => 'pmprefs'
 			],
 			'registration' => [
-				'fields' => !empty($modSettings['registration_fields']) ? explode(',', $modSettings['registration_fields']) : [],
+				'fields' => empty($modSettings['registration_fields']) ? [] : explode(',', $modSettings['registration_fields']),
 				'hook' => 'registration'
 			]
 		];
@@ -596,7 +593,7 @@ class ProfileOptions extends AbstractController
 		$current_theme = (int) $this->_profile['theme'];
 
 		// Get all theme name and descriptions.
-		list ($context['available_themes'], $guest_theme) = availableThemes($current_theme, $context['current_member']);
+		[$context['available_themes'], $guest_theme] = availableThemes($current_theme, $context['current_member']);
 
 		// As long as we're not doing the default theme...
 		if ($guest_theme !== 0)
@@ -688,9 +685,7 @@ class ProfileOptions extends AbstractController
 			'base_href' => $scripturl . '?action=profile;u=' . $this->_memID . ';area=notification',
 			'default_sort_col' => 'board_name',
 			'get_items' => [
-				'function' => function ($start, $items_per_page, $sort, $memID) {
-					return $this->list_getBoardNotifications($start, $items_per_page, $sort, $memID);
-				},
+				'function' => fn($start, $items_per_page, $sort, $memID) => $this->list_getBoardNotifications($start, $items_per_page, $sort, $memID),
 				'params' => [
 					$this->_memID,
 				],
@@ -702,11 +697,10 @@ class ProfileOptions extends AbstractController
 						'class' => 'lefttext',
 					],
 					'data' => [
-						'function' => function ($board) {
+						'function' => static function ($board) {
 							global $txt;
 
 							$link = $board['link'];
-
 							if ($board['new'])
 							{
 								$link .= ' <a href="' . $board['href'] . '" class="new_posts">' . $txt['new'] . '</a>';
@@ -791,17 +785,13 @@ class ProfileOptions extends AbstractController
 			'base_href' => $scripturl . '?action=profile;u=' . $this->_memID . ';area=notification',
 			'default_sort_col' => 'last_post',
 			'get_items' => [
-				'function' => function ($start, $items_per_page, $sort, $memID) {
-					return $this->list_getTopicNotifications($start, $items_per_page, $sort, $memID);
-				},
+				'function' => fn($start, $items_per_page, $sort, $memID) => $this->list_getTopicNotifications($start, $items_per_page, $sort, $memID),
 				'params' => [
 					$this->_memID,
 				],
 			],
 			'get_count' => [
-				'function' => function ($memID) {
-					return $this->list_getTopicNotificationCount($memID);
-				},
+				'function' => fn($memID) => $this->list_getTopicNotificationCount($memID),
 				'params' => [
 					$this->_memID,
 				],
@@ -813,19 +803,16 @@ class ProfileOptions extends AbstractController
 						'class' => 'lefttext',
 					],
 					'data' => [
-						'function' => function ($topic) {
+						'function' => static function ($topic) {
 							global $txt;
 
 							$link = $topic['link'];
-
 							if ($topic['new'])
 							{
 								$link .= ' <a href="' . $topic['new_href'] . '" class="new_posts">' . $txt['new'] . '</a>';
 							}
 
-							$link .= '<br /><span class="smalltext"><em>' . $txt['in'] . ' ' . $topic['board_link'] . '</em></span>';
-
-							return $link;
+							return $link . ('<br /><span class="smalltext"><em>' . $txt['in'] . ' ' . $topic['board_link'] . '</em></span>');
 						},
 					],
 					'sort' => [
@@ -973,7 +960,7 @@ class ProfileOptions extends AbstractController
 
 		$context['sub_template'] = 'ignoreboards';
 		require_once(SUBSDIR . '/Boards.subs.php');
-		$context += getBoardList(['not_redirection' => true, 'ignore' => !empty($cur_profile['ignore_boards']) ? explode(',', $cur_profile['ignore_boards']) : []]);
+		$context += getBoardList(['not_redirection' => true, 'ignore' => empty($cur_profile['ignore_boards']) ? [] : explode(',', $cur_profile['ignore_boards'])]);
 
 		// Include a list of boards per category for easy toggling.
 		foreach ($context['categories'] as $cat => &$category)
@@ -1041,11 +1028,17 @@ class ProfileOptions extends AbstractController
 
 		// In the special case that someone is requesting membership of a group, setup some special context vars.
 		$groupRequest = $this->_req->getQuery('request', 'intval');
-		if (isset($groupRequest, $context['groups']['available'][$groupRequest])
-			&& $context['groups']['available'][$groupRequest]['type'] === 2)
+		if (!isset($groupRequest, $context['groups']['available'][$groupRequest]))
 		{
-			$context['group_request'] = $context['groups']['available'][$groupRequest];
+			return;
 		}
+
+		if ($context['groups']['available'][$groupRequest]['type'] !== 2)
+		{
+			return;
+		}
+
+		$context['group_request'] = $context['groups']['available'][$groupRequest];
 	}
 
 	/**
@@ -1104,7 +1097,7 @@ class ProfileOptions extends AbstractController
 			isAllowedTo('admin_forum');
 		}
 
-		foreach ($groups_details as $key => $row)
+		foreach ($groups_details as $row)
 		{
 			// Is this the new group?
 			if ($row['id_group'] === $group_id)
@@ -1130,14 +1123,14 @@ class ProfileOptions extends AbstractController
 				}
 
 				// We can't change the primary group if this is hidden!
-				if ($row['hidden'] == 2)
+				if ((int) $row['hidden'] === 2)
 				{
 					$canChangePrimary = false;
 				}
 			}
 
 			// If this is their old primary, can we change it?
-			if ($row['id_group'] === $this->_profile['id_group'] && ($row['group_type'] > 1 || $context['can_manage_membergroups']) && $canChangePrimary !== false)
+			if ($row['id_group'] === $this->_profile['id_group'] && ($row['group_type'] > 1 || $context['can_manage_membergroups']) && $canChangePrimary)
 			{
 				$canChangePrimary = true;
 			}
@@ -1209,7 +1202,7 @@ class ProfileOptions extends AbstractController
 					// Check whether they are interested.
 					if (!empty($member['mod_prefs']))
 					{
-						list (, , $pref_binary) = explode('|', $member['mod_prefs']);
+						[, , $pref_binary] = explode('|', $member['mod_prefs']);
 						if (!($pref_binary & 4))
 						{
 							continue;
@@ -1255,6 +1248,7 @@ class ProfileOptions extends AbstractController
 				{
 					$addGroups[$this->_profile['id_group']] = -1;
 				}
+
 				$newPrimary = $group_id;
 			}
 			// Otherwise it's an additional group...
@@ -1270,21 +1264,24 @@ class ProfileOptions extends AbstractController
 			{
 				$addGroups[$this->_profile['id_group']] = -1;
 			}
+
 			if (isset($addGroups[$group_id]))
 			{
 				unset($addGroups[$group_id]);
 			}
+
 			$newPrimary = $group_id;
 		}
 
 		// Finally, we can make the changes!
-		foreach ($addGroups as $id => $dummy)
+		foreach (array_keys($addGroups) as $id)
 		{
 			if (empty($id))
 			{
 				unset($addGroups[$id]);
 			}
 		}
+
 		$addGroups = implode(',', array_flip($addGroups));
 
 		// Ensure that we don't cache permissions if the group is changing.

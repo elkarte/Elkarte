@@ -28,8 +28,10 @@ class ProfileSubscriptions extends AbstractController
 {
 	/** @var Holds the details of the subscription order */
 	private $_order;
+
 	/** @var array Holds all the available gateways so they can be initialized */
 	private $_gateways;
+
 	/** @var int The id of the subscription */
 	private $_id_sub;
 
@@ -225,7 +227,7 @@ class ProfileSubscriptions extends AbstractController
 		}
 
 		// Selecting a subscription that does not exist or is not active?
-		if (!isset($this->_id_sub, $context['subscriptions'][$this->_id_sub]) || $context['subscriptions'][$this->_id_sub]['active'] == 0)
+		if ($this->_id_sub === null || $context['subscriptions'][$this->_id_sub]['active'] == 0)
 		{
 			throw new Exception('paid_sub_not_active');
 		}
@@ -351,7 +353,7 @@ class ProfileSubscriptions extends AbstractController
 		global $context, $scripturl;
 
 		$context['gateways'] = [];
-		foreach ($this->_gateways as $id => $gateway)
+		foreach (array_keys($this->_gateways) as $id)
 		{
 			$fields = $this->_gateways[$id]->fetchGatewayFields($this->_order['id'] . '+' . $memID, $this->_order, $context['value'], $period, $scripturl . '?action=profile&u=' . $memID . '&area=subscriptions&sub_id=' . $this->_order['id'] . '&done');
 
