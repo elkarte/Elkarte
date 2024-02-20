@@ -16,6 +16,7 @@
 
 namespace ElkArte\Search\API;
 
+use ElkArte\Database\AbstractResult;
 use ElkArte\Util;
 
 /**
@@ -25,46 +26,22 @@ use ElkArte\Util;
  */
 class Fulltext extends Standard
 {
-	/**
-	 * This is the last version of ElkArte that this was tested on, to protect against API changes.
-	 *
-	 * @var string
-	 */
+	/** @var string This is the last version of ElkArte that this was tested on, to protect against API changes. */
 	public $version_compatible = 'ElkArte 2.0 dev';
 
-	/**
-	 * This won't work with versions of ElkArte less than this.
-	 *
-	 * @var string
-	 */
+	/** @var string This won't work with versions of ElkArte less than this. */
 	public $min_elk_version = 'ElkArte 1.0';
 
-	/**
-	 * Is it supported?
-	 *
-	 * @var bool
-	 */
+	/** @var bool Is it supported? */
 	public $is_supported = true;
 
-	/**
-	 * What words are banned?
-	 *
-	 * @var array
-	 */
-	protected $bannedWords = array();
+	/** @var array What words are banned? */
+	protected $bannedWords = [];
 
-	/**
-	 * What is the minimum word length?
-	 *
-	 * @var int
-	 */
+	/** @var int What is the minimum word length? */
 	protected $min_word_length = 4;
 
-	/**
-	 * What databases support the fulltext index?
-	 *
-	 * @var array
-	 */
+	/** @var array What databases support the fulltext index? */
 	protected $supported_databases = array('MySQL');
 
 	/**
@@ -77,14 +54,14 @@ class Fulltext extends Standard
 		parent::__construct($config, $searchParams);
 
 		// Is this database supported?
-		if (!in_array($this->_db->title(), $this->supported_databases))
+		if (!in_array($this->_db->title(), $this->supported_databases, true))
 		{
 			$this->is_supported = false;
 
 			return;
 		}
 
-		$this->bannedWords = empty($modSettings['search_banned_words']) ? array() : explode(',', $modSettings['search_banned_words']);
+		$this->bannedWords = empty($modSettings['search_banned_words']) ? [] : explode(',', $modSettings['search_banned_words']);
 		$this->min_word_length = $this->_getMinWordLength();
 	}
 
@@ -108,7 +85,7 @@ class Fulltext extends Standard
 		);
 		if ($request !== false && $request->num_rows() === 1)
 		{
-			list (, $min_word_length) = $request->fetch_row();
+			[, $min_word_length] = $request->fetch_row();
 			$request->free_result();
 		}
 		// 4 is the MySQL default...
@@ -159,6 +136,13 @@ class Fulltext extends Standard
 		}
 	}
 
+	/**
+	 * Fulltext::useWordIndex()
+	 *
+	 * Returns a boolean value indicating whether the word index should be used for searching.
+	 *
+	 * @return boolean Returns true if the word index should be used, otherwise false.
+	 */
 	public function useWordIndex()
 	{
 		return true;
@@ -172,7 +156,7 @@ class Fulltext extends Standard
 	 * @param array $words Words to index
 	 * @param array $search_data
 	 *
-	 * @return \ElkArte\Database\AbstractResult|boolean
+	 * @return AbstractResult|boolean
 	 */
 	public function indexedWordQuery($words, $search_data)
 	{
@@ -182,11 +166,11 @@ class Fulltext extends Standard
 
 		$db_search = db_search();
 
-		$query_select = array(
+		$query_select = [
 			'id_msg' => 'm.id_msg',
-		);
+		];
 
-		$query_where = array();
+		$query_where = [];
 		$query_params = $search_data['params'];
 
 		if ($query_params['id_search'])
@@ -224,13 +208,13 @@ class Fulltext extends Standard
 
 			foreach ($words['indexed_words'] as $fulltextWord)
 			{
-				$query_params['boolean_match'] .= (in_array($fulltextWord, $query_params['excluded_index_words']) ? '-' : '+') . $fulltextWord . ' ';
+				$query_params['boolean_match'] .= (in_array($fulltextWord, $query_params['excluded_index_words'], true) ? '-' : '+') . $fulltextWord . ' ';
 			}
 
 			$query_params['boolean_match'] = substr($query_params['boolean_match'], 0, -1);
 
 			// If we have bool terms to search, add them in
-			if ($query_params['boolean_match'])
+			if ($query_params['boolean_match'] !== '' && $query_params['boolean_match'] !== '0')
 			{
 				$query_where[] = 'MATCH (body, subject) AGAINST ({string:boolean_match} IN BOOLEAN MODE)';
 			}

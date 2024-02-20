@@ -34,8 +34,8 @@ class SearchApiWrapper
 	/**
 	 * Constructor
 	 *
-	 * @param \ElkArte\ValuesContainer|string $config The searchAPI
-	 * @param \ElkArte\Search\SearchParams $searchParams
+	 * @param ValuesContainer|string $config The searchAPI
+	 * @param SearchParams $searchParams
 	 * @package Search
 	 */
 	public function __construct($config, $searchParams = null)
@@ -51,8 +51,8 @@ class SearchApiWrapper
 	/**
 	 * Creates a search API and returns the object.
 	 *
-	 * @param \ElkArte\ValuesContainer $config
-	 * @param \ElkArte\Search\SearchParams $searchParams
+	 * @param ValuesContainer $config
+	 * @param SearchParams $searchParams
 	 */
 	protected function load($config, $searchParams)
 	{

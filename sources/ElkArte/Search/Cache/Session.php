@@ -22,11 +22,25 @@ use ElkArte\Sessions\SessionIndex;
  */
 class Session
 {
+
+	/** @var int $_id_search The ID used for searching. */
 	protected $_id_search = 0;
+
+	/** @var int Number of results variable. Stores the total number of results. */
 	protected $_num_results = -1;
+
+	/** @var array */
 	protected $_params = [];
+
+	/** @var string $_session_index Variable to hold the index for storing the search cache in the session. */
 	protected $_session_index = 'search_cache';
 
+	/**
+	 * Class constructor method.
+	 *
+	 * @param string $index (optional) The index value to be used in the session index.
+	 * @return void
+	 */
 	public function __construct($index = '')
 	{
 		if (!empty($index))
@@ -35,6 +49,12 @@ class Session
 		}
 	}
 
+	/**
+	 * The __destruct method is called when the object is destroyed.
+	 * It creates a new SessionIndex object with the session index, id search, number of results, and params as parameters.
+	 *
+	 * @return void
+	 */
 	public function __destruct()
 	{
 		new SessionIndex($this->_session_index, array(
@@ -44,6 +64,12 @@ class Session
 		));
 	}
 
+	/**
+	 * Increases the search ID value by one and returns the updated ID.
+	 *
+	 * @param int $pointer (optional) The starting search ID pointer. Default is 0.
+	 * @return int The updated ID value.
+	 */
 	public function increaseId($pointer = 0)
 	{
 		$this->_id_search = (int) $pointer;
@@ -57,11 +83,24 @@ class Session
 		return $this->getId();
 	}
 
+	/**
+	 * Returns the ID of the search.
+	 *
+	 * @return int The ID of the search.
+	 */
 	public function getId()
 	{
 		return $this->_id_search;
 	}
 
+	/**
+	 * Checks if the given parameters match the internal params.
+	 *
+	 * @param mixed $params The parameters to check against the internal params.
+	 *
+	 * @return bool Returns true if the given parameters match the internal params,
+	 *              false otherwise.
+	 */
 	public function existsWithParams($params)
 	{
 		return $this->_params === $params;

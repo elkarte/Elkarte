@@ -16,8 +16,8 @@
 
 namespace ElkArte\Search;
 
-use ElkArte\Util;
 use ElkArte\AbstractModel;
+use ElkArte\Util;
 use ElkArte\ValuesContainer;
 
 /**
@@ -25,27 +25,14 @@ use ElkArte\ValuesContainer;
  */
 class SearchArray extends AbstractModel
 {
-	/**
-	 * @var string The provided search orwell "striking thirteen" -movie
-	 *
-	 * That way, the URLs involved in a search page will be kept as short as possible.
-	 */
-	protected $_search_string = '';
-
 	/** @var array Words not to be found in the search results (-word) */
 	private $_excludedWords = [];
-
-	/** @var bool Simplify the fulltext search */
-	private $_search_simple_fulltext;
 
 	/** @var bool If we are performing a boolean or simple search */
 	private $_no_regexp = false;
 
 	/** @var array Holds the words and phrases to be searched on */
 	private $_searchArray = [];
-
-	/** @var array Words we do not search due to length or common terms */
-	private $_blocklist_words;
 
 	/** @var bool If search words were found on the blocklist */
 	private $_foundBlockListedWords = false;
@@ -56,17 +43,13 @@ class SearchArray extends AbstractModel
 	/**
 	 * Usual constructor that does what any constructor does.
 	 *
-	 * @param string $search_string
-	 * @param string[] $blocklist_words
-	 * @param bool $search_simple_fulltext
+	 * @param string $_search_string
+	 * @param string[] $_blocklist_words
+	 * @param bool $_search_simple_fulltext
 	 */
-	public function __construct($search_string, $blocklist_words, $search_simple_fulltext = false)
+	public function __construct(protected $_search_string, private $_blocklist_words, private $_search_simple_fulltext = false)
 	{
 		parent::__construct();
-
-		$this->_search_string = $search_string;
-		$this->_search_simple_fulltext = $search_simple_fulltext;
-		$this->_blocklist_words = $blocklist_words;
 
 		// Build the search query appropriate for the API in use
 		$search_config = new ValuesContainer(array(
@@ -117,7 +100,7 @@ class SearchArray extends AbstractModel
 		foreach ($this->_searchArray as $index => $value)
 		{
 			// Skip anything practically empty.
-			if (($this->_searchArray[$index] = trim($value, '-_\' ')) === '')
+			if (($this->_searchArray[$index] = trim($value, "-_' ")) === '')
 			{
 				unset($this->_searchArray[$index]);
 			}
@@ -157,7 +140,7 @@ class SearchArray extends AbstractModel
 		{
 			if ($word === '-')
 			{
-				if (($word = trim($phraseArray[$index], '-_\' ')) !== '' && !in_array($word, $this->_blocklist_words))
+				if (($word = trim($phraseArray[$index], "-_' ")) !== '' && !in_array($word, $this->_blocklist_words))
 				{
 					$this->_excludedWords[] = $word;
 				}
@@ -185,7 +168,7 @@ class SearchArray extends AbstractModel
 		{
 			if (strpos(trim($word), '-') === 0)
 			{
-				if (($word = trim($word, '-_\' ')) !== '' && !in_array($word, $this->_blocklist_words))
+				if (($word = trim($word, "-_' ")) !== '' && !in_array($word, $this->_blocklist_words))
 				{
 					$this->_excludedWords[] = $word;
 				}
@@ -268,7 +251,7 @@ class SearchArray extends AbstractModel
 
 		// Let's make sure they're not canceling each other out
 		$results = array_diff(array_map('serialize', $keywords['include']), array_map('serialize', $keywords['exclude']));
-		if (count(array_map('unserialize', $results)) === 0)
+		if (array_map('unserialize', $results) === [])
 		{
 			return $this->_searchArray[] = '';
 		}
@@ -310,26 +293,51 @@ class SearchArray extends AbstractModel
 		return preg_replace('~[^\pL\pN_"-]+~u', ' ', $string);
 	}
 
+	/**
+	 * Retrieves the search array
+	 *
+	 * @return array The search array
+	 */
 	public function getSearchArray()
 	{
 		return $this->_searchArray;
 	}
 
+	/**
+	 * Retrieves the array of excluded words
+	 *
+	 * @return array The array of excluded words
+	 */
 	public function getExcludedWords()
 	{
 		return $this->_excludedWords;
 	}
 
+	/**
+	 * Get the value of the _no_regexp property
+	 *
+	 * @return bool
+	 */
 	public function getNoRegexp()
 	{
 		return $this->_no_regexp;
 	}
 
+	/**
+	 * Returns if block listed words are found
+	 *
+	 * @return bool
+	 */
 	public function foundBlockListedWords()
 	{
 		return $this->_foundBlockListedWords;
 	}
 
+	/**
+	 * Returns the array of ignored items
+	 *
+	 * @return array The array of ignored items
+	 */
 	public function getIgnored()
 	{
 		return $this->_ignored;

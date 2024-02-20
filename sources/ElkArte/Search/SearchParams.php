@@ -16,6 +16,7 @@
 
 namespace ElkArte\Search;
 
+use ElkArte\Database\QueryInterface;
 use ElkArte\DataValidator;
 use ElkArte\Exceptions\Exception;
 use ElkArte\HttpReq;
@@ -49,10 +50,7 @@ class SearchParams extends ValuesContainer
 	/** @var int[] */
 	public $_memberlist = [];
 
-	/** @var string The string containing encoded search params */
-	protected $_search_string = '';
-
-	/** @var \ElkArte\Database\QueryInterface|null */
+	/** @var QueryInterface|null */
 	protected $_db;
 
 	/** @var \Elkarte\HttpReq HttpReq instance */
@@ -69,12 +67,12 @@ class SearchParams extends ValuesContainer
 	/**
 	 * Constructor
 	 *
+	 * @param string $_search_string The string containing encoded search params
 	 * @package Search
 	 */
-	public function __construct($string)
+	public function __construct(protected $_search_string)
 	{
 		$this->_db = database();
-		$this->_search_string = $string;
 		$this->prepare();
 		$this->data = &$this->_search_params;
 		$this->_req = HttpReq::instance();
@@ -95,7 +93,7 @@ class SearchParams extends ValuesContainer
 		{
 			$check = gzuncompress($temp_params);
 		}
-		catch (\Exception $e)
+		catch (\Exception)
 		{
 			$check = $temp_params;
 		}
@@ -134,7 +132,7 @@ class SearchParams extends ValuesContainer
 		{
 			$compressed = gzcompress($encoded);
 		}
-		catch (\Exception $e)
+		catch (\Exception)
 		{
 			$compressed = $encoded;
 		}
@@ -143,7 +141,7 @@ class SearchParams extends ValuesContainer
 			restore_error_handler();
 		}
 
-		return str_replace(array('+', '/', '='), array('-', '_', '.'), base64_encode($compressed));
+		return str_replace(['+', '/', '='], ['-', '_', '.'], base64_encode($compressed));
 	}
 
 	/**
@@ -151,12 +149,8 @@ class SearchParams extends ValuesContainer
 	 * with those present in the $param array (usually $_REQUEST['params'])
 	 *
 	 * @param array $params - An array of search parameters
-	 * @param int $recentPercentage - A coefficient to calculate the lowest
-	 *                message id to start search from
-	 * @param int $maxMembersToSearch - The maximum number of members to consider
-	 *                when multiple are found
-	 *
-	 * @throws \ElkArte\Exceptions\Exception topic_gone
+	 * @param int $recentPercentage - A coefficient to calculate the lowest message id to start search from
+	 * @param int $maxMembersToSearch - The maximum number of members to consider when multiple are found
 	 */
 	public function merge($params, $recentPercentage, $maxMembersToSearch)
 	{
@@ -278,13 +272,13 @@ class SearchParams extends ValuesContainer
 		// Minimum age of messages. Default to zero (don't set param in that case).
 		if (!empty($this->_search_params['minage']) || (!empty($params['minage']) && $params['minage'] > 0))
 		{
-			$this->_search_params['minage'] = !empty($this->_search_params['minage']) ? $this->_search_params['minage'] : $params['minage'];
+			$this->_search_params['minage'] = empty($this->_search_params['minage']) ? $params['minage'] : $this->_search_params['minage'];
 		}
 
 		// Maximum age of messages. Default to infinite (9999 days: param not set).
 		if (!empty($this->_search_params['maxage']) || (!empty($params['maxage']) && $params['maxage'] < 9999))
 		{
-			$this->_search_params['maxage'] = !empty($this->_search_params['maxage']) ? $this->_search_params['maxage'] : $params['maxage'];
+			$this->_search_params['maxage'] = empty($this->_search_params['maxage']) ? $params['maxage'] : $this->_search_params['maxage'];
 		}
 
 		if (!empty($this->_search_params['minage']) || !empty($this->_search_params['maxage']))
@@ -314,7 +308,7 @@ class SearchParams extends ValuesContainer
 				'is_approved_true' => 1,
 			)
 		);
-		list($this->_minMsgID, $this->_maxMsgID) = $request->fetch_row();
+		[$this->_minMsgID, $this->_maxMsgID] = $request->fetch_row();
 		if ($this->_minMsgID < 0 || $this->_maxMsgID < 0)
 		{
 			$context['search_errors']['no_messages_in_time_frame'] = true;
@@ -356,12 +350,11 @@ class SearchParams extends ValuesContainer
 	 * Will use real_name first and if nothing found, backup to member_name
 	 *
 	 * @param int $maxMembersToSearch
-	 * @throws \ElkArte\Exceptions\Exception
 	 */
 	public function buildUserQuery($maxMembersToSearch)
 	{
 		$userString = strtr(Util::htmlspecialchars($this->_search_params['userspec'], ENT_QUOTES), array('&quot;' => '"'));
-		$userString = strtr($userString, array('%' => '\%', '_' => '\_', '*' => '%', '?' => '_'));
+		$userString = strtr($userString, ['%' => '\%', '_' => '\_', '*' => '%', '?' => '_']);
 
 		preg_match_all('~"([^"]+)"~', $userString, $matches);
 		$possible_users = array_merge($matches[1], explode(',', preg_replace('~"[^"]+"~', '', $userString)));
@@ -424,6 +417,7 @@ class SearchParams extends ValuesContainer
 				)
 			);
 		}
+
 		$request->free_result();
 	}
 
@@ -459,7 +453,7 @@ class SearchParams extends ValuesContainer
 	 *
 	 * @param $query_boards
 	 * @return int[] array of boards to search in
-	 * @throws \ElkArte\Exceptions\Exception topic_gone
+	 * @throws Exception topic_gone
 	 */
 	public function setTopicBoardLimit($query_boards)
 	{
@@ -486,6 +480,7 @@ class SearchParams extends ValuesContainer
 			{
 				throw new Exception('topic_gone', false);
 			}
+
 			$this->_search_params['brd'] = [];
 			$brd = (int) $request->fetch_row()[0];
 
@@ -534,12 +529,12 @@ class SearchParams extends ValuesContainer
 			require_once(SUBSDIR . '/Boards.subs.php');
 			$num_boards = countBoards();
 
-			if (count($this->_search_params['brd']) == $num_boards)
+			if (count($this->_search_params['brd']) === $num_boards)
 			{
 				return $this->_boardQuery = '';
 			}
 
-			if (count($this->_search_params['brd']) == $num_boards - 1 && !empty($modSettings['recycle_board']) && !in_array($modSettings['recycle_board'], $this->_search_params['brd']))
+			if (count($this->_search_params['brd']) === $num_boards - 1 && !empty($modSettings['recycle_board']) && !in_array($modSettings['recycle_board'], $this->_search_params['brd']))
 			{
 				return $this->_boardQuery = '!= ' . $modSettings['recycle_board'];
 			}
@@ -565,7 +560,7 @@ class SearchParams extends ValuesContainer
 
 		if (empty($this->_search_params['sort']) && !empty($params['sort']))
 		{
-			list($this->_search_params['sort'], $this->_search_params['sort_dir']) = array_pad(explode('|', $params['sort']), 2, '');
+			[$this->_search_params['sort'], $this->_search_params['sort_dir']] = array_pad(explode('|', $params['sort']), 2, '');
 		}
 
 		$this->_search_params['sort'] = !empty($this->_search_params['sort']) && in_array($this->_search_params['sort'], $sort_columns) ? $this->_search_params['sort'] : 'relevance';
@@ -635,6 +630,6 @@ class SearchParams extends ValuesContainer
 			$timeDiff = 0;
 		}
 
-		return (int) $timeDiff / 86400;
+		return $timeDiff / 86400;
 	}
 }

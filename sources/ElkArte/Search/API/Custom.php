@@ -17,6 +17,7 @@
 
 namespace ElkArte\Search\API;
 
+use ElkArte\Database\AbstractResult;
 use ElkArte\Util;
 
 /**
@@ -26,33 +27,17 @@ use ElkArte\Util;
  */
 class Custom extends Standard
 {
-	/**
-	 *This is the last version of ElkArte that this was tested on, to protect against API changes.
-	 *
-	 * @var string
-	 */
+	/** @var string This is the last version of ElkArte that this was tested on, to protect against API changes. */
 	public $version_compatible = 'ElkArte 2.0 dev';
 
-	/**
-	 *This won't work with versions of ElkArte less than this.
-	 *
-	 * @var string
-	 */
+	/** @var string This won't work with versions of ElkArte less than this. */
 	public $min_elk_version = 'ElkArte 1.0 Beta';
 
-	/**
-	 * Is it supported?
-	 *
-	 * @var bool
-	 */
+	/** @var bool Is it supported? */
 	public $is_supported = true;
 
-	/**
-	 * Index Settings
-	 *
-	 * @var array
-	 */
-	protected $indexSettings = array();
+	/** @var array Index Settings */
+	protected $indexSettings = [];
 
 	/**
 	 * Custom::__construct()
@@ -64,7 +49,7 @@ class Custom extends Standard
 		parent::__construct($config, $searchParams);
 
 		// Is this database supported?
-		if (!in_array($this->_db->title(), $this->supported_databases))
+		if (!in_array($this->_db->title(), $this->supported_databases, true))
 		{
 			$this->is_supported = false;
 
@@ -110,22 +95,24 @@ class Custom extends Standard
 		{
 			return;
 		}
-		else
+		foreach ($subwords as $subword)
 		{
-			foreach ($subwords as $subword)
+			if (Util::strlen($subword) >= $this->min_word_length && !in_array($subword, $this->bannedWords))
 			{
-				if (Util::strlen($subword) >= $this->min_word_length && !in_array($subword, $this->bannedWords))
+				$wordsSearch['indexed_words'][] = $subword;
+				if ($isExcluded !== false)
 				{
-					$wordsSearch['indexed_words'][] = $subword;
-					if ($isExcluded !== false)
-					{
-						$wordsExclude[] = $subword;
-					}
+					$wordsExclude[] = $subword;
 				}
 			}
 		}
 	}
 
+	/**
+	 * Determines if the word index is being used.
+	 *
+	 * @return bool Returns true if the word index is being used, otherwise returns false.
+	 */
 	public function useWordIndex()
 	{
 		return true;
@@ -137,7 +124,7 @@ class Custom extends Standard
 	 * @param array $words An array of words
 	 * @param array $search_data An array of search data
 	 *
-	 * @return \ElkArte\Database\AbstractResult|boolean
+	 * @return AbstractResult|boolean
 	 */
 	public function indexedWordQuery($words, $search_data)
 	{
@@ -151,9 +138,9 @@ class Custom extends Standard
 		$query_select = array(
 			'id_msg' => 'm.id_msg',
 		);
-		$query_inner_join = array();
-		$query_left_join = array();
-		$query_where = array();
+		$query_inner_join = [];
+		$query_left_join = [];
+		$query_where = [];
 		$query_params = $search_data['params'];
 
 		if ($query_params['id_search'])
@@ -179,7 +166,7 @@ class Custom extends Standard
 		foreach ($words['indexed_words'] as $indexedWord)
 		{
 			$numTables++;
-			if (in_array($indexedWord, $query_params['excluded_index_words']))
+			if (in_array($indexedWord, $query_params['excluded_index_words'], true))
 			{
 				$query_left_join[] = '{db_prefix}log_search_words AS lsw' . $numTables . ' ON (lsw' . $numTables . '.id_word = ' . $indexedWord . ' AND lsw' . $numTables . '.id_msg = m.id_msg)';
 				$query_where[] = '(lsw' . $numTables . '.id_word IS NULL)';
@@ -219,10 +206,10 @@ class Custom extends Standard
 	{
 		$db = database();
 
-		$inserts = array();
+		$inserts = [];
 		foreach (text2words($msgOptions['body'], true) as $word)
 		{
-			$inserts[] = array($word, $msgOptions['id']);
+			$inserts[] = [$word, $msgOptions['id']];
 		}
 
 		if (!empty($inserts))
@@ -231,7 +218,7 @@ class Custom extends Standard
 				'{db_prefix}log_search_words',
 				array('id_word' => 'int', 'id_msg' => 'int'),
 				$inserts,
-				array('id_word', 'id_msg')
+				['id_word', 'id_msg']
 			);
 		}
 	}
@@ -251,7 +238,7 @@ class Custom extends Standard
 
 		if (isset($msgOptions['body']))
 		{
-			$stopwords = empty($modSettings['search_stopwords']) ? array() : explode(',', $modSettings['search_stopwords']);
+			$stopwords = empty($modSettings['search_stopwords']) ? [] : explode(',', $modSettings['search_stopwords']);
 			$old_body = $msgOptions['old_body'] ?? '';
 
 			// Create the new and old index
@@ -270,26 +257,27 @@ class Custom extends Standard
 					DELETE FROM {db_prefix}log_search_words
 					WHERE id_msg = {int:id_msg}
 						AND id_word IN ({array_int:removed_words})',
-					array(
+					[
 						'removed_words' => $removed_words,
 						'id_msg' => $msgOptions['id'],
-					)
+					]
 				);
 			}
 
 			// Add the new words to be indexed.
 			if (!empty($inserted_words))
 			{
-				$inserts = array();
+				$inserts = [];
 				foreach ($inserted_words as $word)
 				{
-					$inserts[] = array($word, $msgOptions['id']);
+					$inserts[] = [$word, $msgOptions['id']];
 				}
+
 				$db->insert('insert',
 					'{db_prefix}log_search_words',
-					array('id_word' => 'string', 'id_msg' => 'int'),
+					['id_word' => 'string', 'id_msg' => 'int'],
 					$inserts,
-					array('id_word', 'id_msg')
+					['id_word', 'id_msg']
 				);
 			}
 		}
