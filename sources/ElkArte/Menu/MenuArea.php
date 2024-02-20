@@ -273,7 +273,7 @@ class MenuArea extends MenuItem
 	 *
 	 * @param string $token The authentication token.
 	 *
-	 * @return void
+	 * @return MenuArea
 	 */
 	public function setToken($token)
 	{
@@ -297,7 +297,7 @@ class MenuArea extends MenuItem
 	 *
 	 * @param string $tokenType The token type to be set.
 	 *
-	 * @return void
+	 * @return MenuArea
 	 */
 	public function setTokenType($tokenType)
 	{
@@ -309,7 +309,7 @@ class MenuArea extends MenuItem
 	/**
 	 * Get the value of sc
 	 *
-	 * @return mixed The value of sc
+	 * @return string The value of sc
 	 */
 	public function getSc()
 	{
@@ -321,7 +321,7 @@ class MenuArea extends MenuItem
 	 *
 	 * @param mixed $sc The value to set for sc property
 	 *
-	 * @return void
+	 * @return MenuArea
 	 */
 	public function setSc($sc)
 	{

@@ -69,7 +69,7 @@ class MenuSubsection extends MenuItem
 	 *
 	 * This method returns the value of the "active" property of the object.
 	 *
-	 * @return bool Returns true if the object is active, false otherwise.
+	 * @return string[]
 	 */
 	public function getActive()
 	{
@@ -81,7 +81,7 @@ class MenuSubsection extends MenuItem
 	 *
 	 * This method sets the value of the "active" property of the object.
 	 *
-	 * @param bool $active The new active state of the object.
+	 * @param string[] $active The new active state of the object.
 	 *
 	 * @return $this The modified object instance.
 	 */

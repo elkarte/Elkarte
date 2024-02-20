@@ -18,18 +18,19 @@ namespace ElkArte;
  * High level overview:
  *
  * - Register your modules against a class in which it will be triggered with
- *  enableModules($moduleName, $class) such as enableModules('Mymodule', ['display','post'])
- * - You can also create a full core feature with ADMINDIR/ManageMymoduleModule.php file containing a
- * a static class of addCoreFeature.  The file and class will be auto discovered and called.
- * - Place your file in ElkArte/Modules/Mymodule/Display.php ElkArte/Modules/Mymodule/Post.php
- * - In Mymodules Display.php and Post.php create a `public static function hooks` which returns
- * what to do when triggered, example
+ *      - enableModules($moduleName, $class) e.g. enableModules('Mymodule', ['display','post'])
+ * - You can create a core feature
+ *     - Add a file ADMINDIR/ManageMymoduleModule.php containing a static class of addCoreFeature.
+ *     - The file and class will be auto discovered and called.
+ * - Place your module files in ElkArte/Modules as a directory like
+ *     - /Mymodule/Display.php and /Mymodule/Post.php
+ * - In Mymodules Display.php and Post.php create `public static function hooks` which returns an array of actions
+ * to call when triggered
  *     - ['prepare_context', ['\\ElkArte\\Modules\\Mymodule\\Display', 'do_something'], ['attachments', 'start']
- * - This will call the do_something() method in Display.php of the Mymodule directory and pass params
- * $attachments $start values from Display.php class (where the event was triggered).
- * - Some events have defined values passed, but you can always request other values as long as they
- * are class properties
- *
+ *     - Will call the do_something() method in Display.php of the Mymodule directory and pass params
+ *     - $attachments and $start values from Display.php class will be available (where the event was triggered).
+ *     - Some events have pre-defined values passed, but you can use any other value as long as it is a property
+ *       or globals in the calling class (the class in which the event was triggered)
  */
 class EventManager
 {
