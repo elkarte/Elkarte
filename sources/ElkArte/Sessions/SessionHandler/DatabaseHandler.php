@@ -16,6 +16,7 @@
 
 namespace ElkArte\Sessions\SessionHandler;
 
+use ElkArte\Database\QueryInterface;
 use ElkArte\ValuesContainer;
 
 /**
@@ -25,25 +26,16 @@ use ElkArte\ValuesContainer;
  */
 class DatabaseHandler extends \SessionHandler
 {
-	/**
-	 * The database object
-	 *
-	 * @var \ElkArte\Database\QueryInterface
-	 */
+	/** @var QueryInterface The database object */
 	protected $_db;
 
-	/**
-	 * The modSettings
-	 *
-	 * @var object
-	 */
+	/** @var object The modSettings */
 	protected $_modSettings = [];
 
 	/**
 	 * Make "global" items available to the class
 	 *
 	 * @param object|null $db
-	 * @throws \Exception
 	 */
 	public function __construct($db = null)
 	{
@@ -56,7 +48,7 @@ class DatabaseHandler extends \SessionHandler
 	/**
 	 * {@inheritDoc}
 	 */
-	public function destroy($sessionId) : bool
+	public function destroy($sessionId): bool
 	{
 		// Better safe than sorry
 		if (preg_match('~^[A-Za-z0-9,-]{16,64}$~', $sessionId) == 0)
@@ -97,15 +89,15 @@ class DatabaseHandler extends \SessionHandler
 			)
 		);
 
-		return $result->affected_rows() != 0;
+		return $result->affected_rows() !== 0;
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
-	public function read($sessionId) : string
+	public function read($sessionId): string
 	{
-		if (preg_match('~^[A-Za-z0-9,-]{16,64}$~', $sessionId) == 0)
+		if (preg_match('~^[A-Za-z0-9,-]{16,64}$~', $sessionId) !== 1)
 		{
 			return '';
 		}
@@ -120,7 +112,7 @@ class DatabaseHandler extends \SessionHandler
 				'session_id' => $sessionId,
 			)
 		);
-		list ($sessionData) = $result->fetch_row();
+		[$sessionData] = $result->fetch_row();
 		$result->free_result();
 
 		return empty($sessionData) ? '' : $sessionData;
@@ -129,9 +121,9 @@ class DatabaseHandler extends \SessionHandler
 	/**
 	 * {@inheritDoc}
 	 */
-	public function write($sessionId, $data) : bool
+	public function write($sessionId, $data): bool
 	{
-		if (preg_match('~^[A-Za-z0-9,-]{16,64}$~', $sessionId) == 0)
+		if (preg_match('~^[A-Za-z0-9,-]{16,64}$~', $sessionId) !== 1)
 		{
 			return false;
 		}
