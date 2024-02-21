@@ -25,25 +25,13 @@ use ElkArte\Subscriptions\PaymentGateway\PaymentInterface;
  */
 class Payment implements PaymentInterface
 {
-	/**
-	 * Holds the IPN response data
-	 *
-	 * @var string|array
-	 */
+	/** @var string|array Holds the IPN response data */
 	private $return_data;
 
-	/**
-	 * Data to send to paypal IPN
-	 *
-	 * @var string
-	 */
+	/** @var string Data to send to paypal IPN */
 	private $requestString;
 
-	/**
-	 * If this is a test sandbox run or not
-	 *
-	 * @var bool
-	 */
+	/** @var bool If this is a test sandbox run or not */
 	private $paidsubsTest;
 
 	/**
@@ -88,8 +76,6 @@ class Payment implements PaymentInterface
 	 * - If valid returns the subscription and member IDs we are going to process if it passes
 	 *
 	 * @return array
-	 * @throws \ElkArte\Exceptions\Exception
-	 * @throws \ElkArte\Exceptions\Exception
 	 */
 	public function precheck()
 	{
@@ -152,7 +138,7 @@ class Payment implements PaymentInterface
 		}
 
 		// Verify the currency!
-		if (trim(strtolower($_POST['mc_currency'])) !== strtolower($modSettings['paid_currency_code']))
+		if (strtolower(trim($_POST['mc_currency'])) !== strtolower($modSettings['paid_currency_code']))
 		{
 			generateSubscriptionError(sprintf($txt['paypal_currency_unkown'], $_POST['mc_currency'], $modSettings['paid_currency_code']));
 		}
@@ -278,14 +264,13 @@ class Payment implements PaymentInterface
 	 */
 	public function isSubscription()
 	{
-		return (substr($_POST['txn_type'], 0, 14) === 'subscr_payment' && $_POST['payment_status'] === 'Completed');
+		return (strpos($_POST['txn_type'], 'subscr_payment') === 0 && $_POST['payment_status'] === 'Completed');
 	}
 
 	/**
 	 * A private function to find out the subscription details.
 	 *
 	 * @return false|null
-	 * @throws \ElkArte\Exceptions\Exception
 	 */
 	private function _findSubscription()
 	{
@@ -337,7 +322,7 @@ class Payment implements PaymentInterface
 			}
 		}
 
-		list ($member_id, $subscription_id) = $request->fetch_row();
+		[$member_id, $subscription_id] = $request->fetch_row();
 		$_POST['item_number'] = $member_id . '+' . $subscription_id;
 		$request->free_result();
 	}
@@ -397,14 +382,13 @@ class Payment implements PaymentInterface
 	 * Record the transaction reference and exit
 	 *
 	 * @param int $subscription_id
-	 * @throws \ElkArte\Exceptions\Exception
 	 */
 	public function close($subscription_id)
 	{
 		$db = database();
 
 		// If it's a subscription record the reference.
-		if ($_POST['txn_type'] == 'subscr_payment' && !empty($_POST['subscr_id']))
+		if ($_POST['txn_type'] === 'subscr_payment' && !empty($_POST['subscr_id']))
 		{
 			$db->query('', '
 				UPDATE {db_prefix}log_subscribed

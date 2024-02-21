@@ -25,11 +25,7 @@ use ElkArte\Subscriptions\PaymentGateway\DisplayInterface;
  */
 class Display implements DisplayInterface
 {
-	/**
-	 * Name of this payment gateway
-	 *
-	 * @var string
-	 */
+	/** @var string Name of this payment gateway */
 	public $title = 'PayPal';
 
 	/**
@@ -41,12 +37,12 @@ class Display implements DisplayInterface
 	{
 		global $txt;
 
-		return array(
-			array(
+		return [
+			[
 				'text', 'paypal_email',
 				'subtext' => $txt['paypal_email_desc']
-			),
-		);
+			],
+		];
 	}
 
 	/**
@@ -78,7 +74,7 @@ class Display implements DisplayInterface
 		global $modSettings, $txt, $boardurl;
 
 		$return_data = array(
-			'form' => 'https://www.' . (!empty($modSettings['paidsubs_test']) ? 'sandbox.' : '') . 'paypal.com/cgi-bin/webscr',
+			'form' => 'https://www.' . (empty($modSettings['paidsubs_test']) ? '' : 'sandbox.') . 'paypal.com/cgi-bin/webscr',
 			'id' => 'paypal',
 			'hidden' => array(),
 			'title' => $txt['paypal'],
@@ -95,7 +91,7 @@ class Display implements DisplayInterface
 		$return_data['hidden']['no_shipping'] = 1;
 		$return_data['hidden']['no_note'] = 1;
 		$return_data['hidden']['amount'] = $value;
-		$return_data['hidden']['cmd'] = !$sub_data['repeatable'] ? '_xclick' : '_xclick-subscriptions';
+		$return_data['hidden']['cmd'] = $sub_data['repeatable'] ? '_xclick-subscriptions' : '_xclick';
 		$return_data['hidden']['return'] = $return_url;
 		$return_data['hidden']['a3'] = $value;
 		$return_data['hidden']['src'] = 1;

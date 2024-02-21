@@ -23,6 +23,7 @@ use ElkArte\Action;
 use ElkArte\Cache\Cache;
 use ElkArte\Exceptions\Exception;
 use ElkArte\Languages\Txt;
+use ElkArte\Member;
 use ElkArte\MembersList;
 
 /**
@@ -37,7 +38,7 @@ class ProfileOptions extends AbstractController
 	/** @var int Member id for the profile being viewed */
 	private $_memID = 0;
 
-	/** @var MembersList The \ElkArte\Member object is stored here to avoid some global */
+	/** @var Member The \ElkArte\Member object is stored here to avoid some global */
 	private $_profile;
 
 	/**
