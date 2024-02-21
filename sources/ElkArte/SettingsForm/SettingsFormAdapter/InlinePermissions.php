@@ -12,8 +12,8 @@
 
 namespace ElkArte\SettingsForm\SettingsFormAdapter;
 
-use ElkArte\Permissions;
 use ElkArte\Languages\Txt;
+use ElkArte\Permissions;
 
 /**
  * Class to initialize inline permissions sub-form and save its settings
@@ -71,9 +71,7 @@ class InlinePermissions extends Adapter
 
 		// Load the permission list
 		$this->permissionList = array_map(
-			static function ($permission) {
-				return $permission[1];
-			}, $this->permissions
+			static fn($permission) => $permission[1], $this->permissions
 		);
 
 		// Load the permission settings that guests cannot have
@@ -109,6 +107,7 @@ class InlinePermissions extends Adapter
 		{
 			return;
 		}
+
 		$insertRows = [];
 		foreach ($this->permissionList as $permission)
 		{
@@ -119,10 +118,17 @@ class InlinePermissions extends Adapter
 
 			foreach ($_POST[$permission] as $id_group => $value)
 			{
-				if (in_array($value, ['on', 'deny']) && !in_array($permission, $this->illegal_permissions))
+				if (!in_array($value, ['on', 'deny']))
 				{
-					$insertRows[] = [$permission, (int) $id_group, $value === 'on' ? 1 : 0];
+					continue;
 				}
+
+				if (in_array($permission, $this->illegal_permissions))
+				{
+					continue;
+				}
+
+				$insertRows[] = [$permission, (int) $id_group, $value === 'on' ? 1 : 0];
 			}
 		}
 
