@@ -1,7 +1,7 @@
 <?php
 
 use ElkArte\User;
-use ElkArte\ValuesContainer;
+use ElkArte\UserInfo;
 use PHPUnit\Framework\TestCase;
 
 class PreparseSubsTest extends TestCase
@@ -18,9 +18,12 @@ class PreparseSubsTest extends TestCase
 	{
 		require_once(SUBSDIR . '/Post.subs.php');
 
-		User::$info = new ValuesContainer([
-			'name' => 'istme',
+		User::$info = new UserInfo([
+			'name' => 'itsme',
+			'is_guest' => false,
+			'smiley_set' => 'default'
 		]);
+		User::load();
 
 		$this->bbPreparse_tests = [
 			[

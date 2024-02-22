@@ -11,7 +11,7 @@ class BBCSubsTest extends TestCase
 	protected $bbcTestCases;
 	protected $bbcInvalidTestCases;
 	protected $bbcPreparseTestCases;
-	protected $backupGlobalsExcludeList = ['user_info'];
+	//protected $backupGlobalsExcludeList = ['user_info'];
 
 	/**
 	 * Prepare what is necessary to use in these tests.
@@ -654,7 +654,7 @@ Should be an empty line in between.',
 	 */
 	public function testPreparseBBcode()
 	{
-		$preparse = PreparseCode::instance('');
+		$preparse = PreparseCode::instance(User::$info->name);
 		$parse = ParserWrapper::instance();
 
 		foreach ($this->bbcPreparseTestCases as $testcase)
@@ -664,6 +664,7 @@ Should be an empty line in between.',
 			$expected = $testcase[2];
 
 			$preparse->preparsecode($test, false);
+
 			$result = $parse->parseMessage($test, true);
 
 			$this->assertEquals($expected, $result, $name);

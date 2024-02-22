@@ -26,7 +26,7 @@ class TestPBE extends TestCase
 
 		$lang = new Loader('english', $txt, database());
 		$lang->load('Maillist');
-		User::$info = new UserInfo(['name' => 'name']);
+		User::$info = new UserInfo(['name' => 'itsme']);
 
 		$this->_email = 'Return-Path: <noreply@elkarte.net>
 Delivered-To: <drwho@tardis.com>

@@ -31,11 +31,14 @@ class PreparseCode
 	/** @var string the message to preparse */
 	public $message = '';
 
+	/** @var string the username of the current user */
+	public $user_name = '';
+
 	/** @var bool if this is just a preview */
 	protected $previewing = false;
 
 	/** @var array the code blocks that we want to protect */
-	public $code_blocks = array();
+	public $code_blocks = [];
 
 	/** @var PreparseCode */
 	public static $instance;
@@ -45,8 +48,9 @@ class PreparseCode
 	 *
 	 * @param string $user_name
 	 */
-	protected function __construct(public $user_name)
+	protected function __construct($user_name)
 	{
+		$this->user_name = $user_name;
 	}
 
 	/**
@@ -850,6 +854,10 @@ class PreparseCode
 	public static function instance($user)
 	{
 		if (self::$instance === null)
+		{
+			self::$instance = new PreparseCode($user);
+		}
+		elseif ($user !== self::$instance->user_name)
 		{
 			self::$instance = new PreparseCode($user);
 		}
