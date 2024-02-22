@@ -29,7 +29,6 @@ use ElkArte\Languages\Loader;
 use Exception;
 use FilesystemIterator;
 use UnexpectedValueException;
-use ElkArte\AdminController\ManageAvatars;
 
 /**
  * This is the attachments and avatars controller class.

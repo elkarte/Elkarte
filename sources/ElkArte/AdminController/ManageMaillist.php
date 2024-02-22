@@ -20,7 +20,6 @@ use ElkArte\Action;
 use ElkArte\Cache\Cache;
 use ElkArte\Converters\Html2Md;
 use ElkArte\DataValidator;
-use ElkArte\EmailSettings;
 use ElkArte\EventManager;
 use ElkArte\Exceptions\Exception;
 use ElkArte\Languages\Txt;

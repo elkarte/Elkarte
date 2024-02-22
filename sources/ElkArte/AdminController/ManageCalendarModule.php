@@ -286,7 +286,7 @@ class ManageCalendarModule extends AbstractController
 			$context['holiday'] = getHoliday($this->_req->query->holiday);
 		}
 
-		// Last day for the drop down?
+		// Last day for the drop-down?
 		$context['holiday']['last_day'] = (int) Util::strftime('%d', mktime(0, 0, 0, $context['holiday']['month'] == 12
 			? 1
 			: $context['holiday']['month'] + 1, 0, $context['holiday']['month'] === 12
@@ -402,6 +402,6 @@ class ManageCalendarModule extends AbstractController
 	 */
 	public function settings_search()
 	{
-		return $this->_settings();
+			return $this->_settings();
 	}
 }

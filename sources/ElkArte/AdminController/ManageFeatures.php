@@ -1677,4 +1677,12 @@ class ManageFeatures extends AbstractController
 	{
 		return $this->_signatureSettings();
 	}
+
+	/**
+	 * Public method to return the PM settings, used for admin search
+	 */
+	public function pmSettings_search()
+	{
+		return $this->_pmSettings();
+	}
 }
