@@ -13,27 +13,21 @@
 
 namespace ElkArte;
 
+/**
+ * Class AttachmentsDisplay
+ */
 class AttachmentsDisplay
 {
 	/** @var array The good old attachments array */
-	protected $messages = [];
-
-	/** @var array The good old attachments array */
 	protected $attachments = [];
-
-	/** @var bool If unapproved posts/attachments should be shown */
-	protected $includeUnapproved = false;
 
 	/**
 	 * @param int[] $messages
 	 * @param int[] $posters
 	 * @param bool $includeUnapproved
 	 */
-	public function __construct($messages, $posters, $includeUnapproved)
+	public function __construct(protected $messages, $posters, protected $includeUnapproved)
 	{
-		$this->messages = $messages;
-		$this->includeUnapproved = $includeUnapproved;
-
 		// Fetch attachments.
 		if (allowedTo('view_attachments'))
 		{
@@ -49,9 +43,7 @@ class AttachmentsDisplay
 			$this->getAttachments(
 				$this->messages,
 				$this->includeUnapproved,
-				static function ($attachment_info, $all_posters) {
-					return !(!$attachment_info['approved'] && (!isset($all_posters[$attachment_info['id_msg']]) || $all_posters[$attachment_info['id_msg']] != User::$info->id));
-				},
+				static fn($attachment_info, $all_posters) => !(!$attachment_info['approved'] && (!isset($all_posters[$attachment_info['id_msg']]) || $all_posters[$attachment_info['id_msg']] != User::$info->id)),
 				$posters
 			);
 		}
@@ -68,7 +60,7 @@ class AttachmentsDisplay
 	 * @param string|null $filter name of a callback function
 	 * @param array $all_posters
 	 *
-		 */
+	 */
 	protected function getAttachments($messages, $includeUnapproved = false, $filter = null, $all_posters = array())
 	{
 		global $modSettings;
@@ -91,15 +83,13 @@ class AttachmentsDisplay
 				'attachment_type' => 0,
 			)
 		)->fetch_callback(
-			function ($row) use ($includeUnapproved, $filter, $all_posters, &$attachments, &$temp) {
+			static function ($row) use ($includeUnapproved, $filter, $all_posters, &$attachments, &$temp) {
 				if (!$row['approved'] && !$includeUnapproved
 					&& (empty($filter) || !call_user_func($filter, $row, $all_posters)))
 				{
 					return;
 				}
-
 				$temp[$row['id_attach']] = $row;
-
 				if (!isset($attachments[$row['id_msg']]))
 				{
 					$attachments[$row['id_msg']] = array();
@@ -132,7 +122,7 @@ class AttachmentsDisplay
 	 * @return array of attachments
 	 * @todo change this pre-condition, too fragile and error-prone.
 	 *
-		 */
+	 */
 	public function loadAttachmentContext($id_msg)
 	{
 		global $context, $modSettings, $scripturl, $topic;
@@ -185,14 +175,7 @@ class AttachmentsDisplay
 		if ($have_unapproved)
 		{
 			// Unapproved attachments go first.
-			usort($attachmentData, static function ($a, $b) {
-				if ($a['is_approved'] === $b['is_approved'])
-				{
-					return 0;
-				}
-
-				return $a['is_approved'] > $b['is_approved'] ? -1 : 1;
-			});
+			usort($attachmentData, static fn($a, $b) => $b['is_approved'] <=> $a['is_approved']);
 		}
 
 		return [$attachmentData, $ilaData];
@@ -250,6 +233,7 @@ class AttachmentsDisplay
 				'href' => getUrl('action', ['action' => 'dlattach', 'topic' => $topic . '.0', 'attach' => $attachment['id_thumb'], 'image']),
 			);
 		}
+
 		$attachmentData['thumbnail']['has_thumb'] = !empty($attachment['id_thumb']);
 
 		// If thumbnails are disabled, check the maximum size of the image
