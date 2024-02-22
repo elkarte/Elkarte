@@ -44,8 +44,8 @@ class hCaptcha implements ControlInterface
 	{
 		global $modSettings;
 
-		$this->_site_key = !empty($modSettings['hcaptcha_site_key']) ? $modSettings['hcaptcha_site_key'] : '';
-		$this->_secret_key = !empty($modSettings['hcaptcha_secret_key']) ? $modSettings['hcaptcha_secret_key'] : '';
+		$this->_site_key = empty($modSettings['hcaptcha_site_key']) ? '' : $modSettings['hcaptcha_site_key'];
+		$this->_secret_key = empty($modSettings['hcaptcha_secret_key']) ? '' : $modSettings['hcaptcha_secret_key'];
 		$this->_userIP = User::$info->ip;
 
 		if (!empty($verificationOptions))

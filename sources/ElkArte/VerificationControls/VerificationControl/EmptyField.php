@@ -100,7 +100,7 @@ class EmptyField implements ControlInterface
 		else
 		{
 			$this->_field_name = $sessionVal['empty_field'];
-			$this->_user_value = !empty($_REQUEST[$sessionVal['empty_field']]) ? $_REQUEST[$sessionVal['empty_field']] : '';
+			$this->_user_value = empty($_REQUEST[$sessionVal['empty_field']]) ? '' : $_REQUEST[$sessionVal['empty_field']];
 		}
 	}
 
