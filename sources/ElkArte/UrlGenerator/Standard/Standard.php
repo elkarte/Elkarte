@@ -22,9 +22,7 @@ use ElkArte\UrlGenerator\AbstractUrlGenerator;
  */
 class Standard extends AbstractUrlGenerator
 {
-	/**
-	 * {@inheritDoc}
-	 */
+	/** {@inheritDoc} */
 	protected $_types = ['standard'];
 
 	/**
@@ -40,7 +38,7 @@ class Standard extends AbstractUrlGenerator
 	 */
 	protected function generateQuery($params)
 	{
-		$args = array();
+		$args = [];
 		foreach ($params as $k => $v)
 		{
 			if (is_int($k))
