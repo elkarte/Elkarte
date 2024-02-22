@@ -16,37 +16,52 @@
 
 namespace ElkArte;
 
+use ElkArte\Database\QueryInterface;
+
 /**
  * Unread posts and replies Controller
  */
 class Unread
 {
-	/** @var int  */
+	/** @var int */
 	public const UNREAD = 0;
-	/** @var int  */
+
+	/** @var int */
 	public const UNREADREPLIES = 1;
+
 	/** @var bool */
 	private $_ascending = false;
+
 	/** @var string */
 	private $_sort_query = '';
+
 	/** @var int */
 	private $_num_topics = 0;
+
 	/** @var int */
 	private $_min_message = 0;
+
 	/** @var int */
 	private $_action = self::UNREAD;
+
 	/** @var int */
 	private $_earliest_msg = 0;
+
 	/** @var bool */
 	private $_showing_all_topics;
+
 	/** @var int */
 	private $_user_id = 0;
+
 	/** @var bool */
-	private $_post_mod ;
+	private $_post_mod;
+
 	/** @var bool */
-	private $_unwatch ;
-	/** @var \ElkArte\Database\QueryInterface */
+	private $_unwatch;
+
+	/** @var QueryInterface */
 	private $_db;
+
 	/** @var int|string */
 	private $_preview_bodies = 0;
 
@@ -61,8 +76,7 @@ class Unread
 	 * @param int $user - ID of the user
 	 * @param bool|int $post_mod - if post moderation is active or not
 	 * @param bool|int $unwatch - if unwatch topics is active or not
-	 * @param bool|int $showing_all_topics - Is the user looking at all the unread
-	 *             replies, or the recent topics?
+	 * @param bool|int $showing_all_topics - Is the user looking at all the unread replies, or the recent topics?
 	 */
 	public function __construct($user, $post_mod, $unwatch, $showing_all_topics = false)
 	{
@@ -193,7 +207,7 @@ class Unread
 				'is_approved' => 1,
 			])
 		);
-		list ($this->_num_topics, $this->_min_message) = $request->fetch_row();
+		[$this->_num_topics, $this->_min_message] = $request->fetch_row();
 		$request->free_result();
 	}
 
@@ -219,7 +233,7 @@ class Unread
 				'is_approved' => 1,
 			])
 		);
-		list ($this->_num_topics, $this->_min_message) = $request->fetch_row();
+		[$this->_num_topics, $this->_min_message] = $request->fetch_row();
 		$request->free_result();
 	}
 
@@ -289,7 +303,7 @@ class Unread
 				ml.icon AS last_icon, ms.icon AS first_icon, t.id_poll, t.is_sticky, t.locked, ml.modified_time AS last_modified_time,
 				COALESCE(lt.id_msg, lmr.id_msg, -1) + 1 AS new_from,
 				' . $body_query . '
-				' . (!empty($custom_selects) ? implode(',', $custom_selects) . ', ' : '') . '
+				' . (empty($custom_selects) ? '' : implode(',', $custom_selects) . ', ') . '
 				ml.smileys_enabled AS last_smileys, ms.smileys_enabled AS first_smileys, t.id_first_msg, t.id_last_msg
 			FROM {db_prefix}messages AS ms
 				INNER JOIN {db_prefix}topics AS t ON (t.id_topic = ms.id_topic AND t.id_first_msg = ms.id_msg)
@@ -298,7 +312,7 @@ class Unread
 				LEFT JOIN {db_prefix}boards AS b ON (b.id_board = ms.id_board)') . '
 				LEFT JOIN {db_prefix}members AS mems ON (mems.id_member = ms.id_member)
 				LEFT JOIN {db_prefix}members AS meml ON (meml.id_member = ml.id_member)
-				LEFT JOIN {db_prefix}log_topics AS lt ON (lt.id_topic = t.id_topic AND lt.id_member = {int:current_member})' . (!empty($custom_joins) ? implode("\n\t\t\t\t", $custom_joins) : '') . '
+				LEFT JOIN {db_prefix}log_topics AS lt ON (lt.id_topic = t.id_topic AND lt.id_member = {int:current_member})' . (empty($custom_joins) ? '' : implode("\n\t\t\t\t", $custom_joins)) . '
 				LEFT JOIN {db_prefix}log_mark_read AS lmr ON (lmr.id_board = t.id_board AND lmr.id_member = {int:current_member})
 			WHERE t.id_board IN ({array_int:boards})
 				AND t.id_last_msg >= {int:min_message}
@@ -362,6 +376,7 @@ class Unread
 		{
 			$topics[] = $row['id_topic'];
 		}
+
 		$request->free_result();
 
 		// Sanity... where have you gone?
@@ -402,7 +417,7 @@ class Unread
 				ml.icon AS last_icon, ms.icon AS first_icon, t.id_poll, t.is_sticky, t.locked, ml.modified_time AS last_modified_time,
 				COALESCE(lt.id_msg, lmr.id_msg, -1) + 1 AS new_from,
 				' . $body_query . '
-				' . (!empty($custom_selects) ? implode(',', $custom_selects) . ', ' : '') . '
+				' . (empty($custom_selects) ? '' : implode(',', $custom_selects) . ', ') . '
 				ml.smileys_enabled AS last_smileys, ms.smileys_enabled AS first_smileys, t.id_first_msg, t.id_last_msg
 			FROM {db_prefix}topics AS t
 				INNER JOIN {db_prefix}messages AS ms ON (ms.id_topic = t.id_topic AND ms.id_msg = t.id_first_msg)
@@ -411,7 +426,7 @@ class Unread
 				LEFT JOIN {db_prefix}members AS mems ON (mems.id_member = ms.id_member)
 				LEFT JOIN {db_prefix}members AS meml ON (meml.id_member = ml.id_member)
 				LEFT JOIN {db_prefix}log_topics AS lt ON (lt.id_topic = t.id_topic AND lt.id_member = {int:current_member})
-				LEFT JOIN {db_prefix}log_mark_read AS lmr ON (lmr.id_board = t.id_board AND lmr.id_member = {int:current_member})' . (!empty($custom_joins) ? implode("\n\t\t\t\t", $custom_joins) : '') . '
+				LEFT JOIN {db_prefix}log_mark_read AS lmr ON (lmr.id_board = t.id_board AND lmr.id_member = {int:current_member})' . (empty($custom_joins) ? '' : implode("\n\t\t\t\t", $custom_joins)) . '
 			WHERE t.id_topic IN ({array_int:topic_list})
 			ORDER BY {raw:order}
 			LIMIT {int:limit}',

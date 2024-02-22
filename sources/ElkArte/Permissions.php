@@ -19,18 +19,15 @@ namespace ElkArte;
  */
 class Permissions
 {
-	/**
-	 * @var array
-	 */
-	protected $reserved_permissions = array(
+	/** @var array  */
+	protected $reserved_permissions = [
 		'admin_forum',
 		'manage_membergroups',
 		'manage_permissions',
-	);
-	/**
-	 * @var array
-	 */
-	protected $illegal_guest_permissions = array(
+	];
+
+	/** @var array */
+	protected $illegal_guest_permissions = [
 		'delete_replies',
 		'karma_edit',
 		'poll_add_own',
@@ -62,12 +59,12 @@ class Permissions
 		'postby_email',
 		'approve_emails',
 		'like_posts',
-	);
+	];
+
 	private $db;
-	/**
-	 * @var string[]
-	 */
-	private $illegal_permissions = array();
+
+	/** @var string[] */
+	private $illegal_permissions = [];
 
 	/**
 	 * Load a few illegal permissions into the class and context.
@@ -138,7 +135,6 @@ class Permissions
 	 * @param string[] $permissions
 	 * @param string[] $where
 	 * @param array $where_parameters = array() or values used in the where statement
-	 * @throws \ElkArte\Exceptions\Exception
 	 */
 	public function deletePermissions($permissions, $where = array(), $where_parameters = array())
 	{
@@ -147,6 +143,7 @@ class Permissions
 			$where[] = 'permission NOT IN ({array_string:illegal_permissions})';
 			$where_parameters['illegal_permissions'] = $this->illegal_permissions;
 		}
+
 		$where[] = 'permission IN ({array_string:permissions})';
 		$where_parameters['permissions'] = $permissions;
 
@@ -164,7 +161,6 @@ class Permissions
 	 * @param int|null $profile = null an int or null for the customized profile, if any
 	 *
 	 * @return bool
-	 * @throws \ElkArte\Exceptions\Exception
 	 */
 	public function updateChild($parents, $profile = null)
 	{
@@ -175,8 +171,8 @@ class Permissions
 		}
 
 		// Find all the children of this group.
-		$children = array();
-		$child_groups = array();
+		$children = [];
+		$child_groups = [];
 		$this->db->fetchQuery('
 			SELECT 
 				id_parent, id_group
@@ -188,7 +184,7 @@ class Permissions
 				'not_inherited' => -2,
 			)
 		)->fetch_callback(
-			function ($row) use (&$children, &$child_groups, &$parents) {
+			static function ($row) use (&$children, &$child_groups, &$parents) {
 				$children[$row['id_parent']][] = $row['id_group'];
 				$child_groups[] = $row['id_group'];
 				$parents[] = $row['id_parent'];
@@ -210,7 +206,7 @@ class Permissions
 		if ($profile < 1 || $profile === null)
 		{
 			// Fetch all the parent permissions.
-			$permissions = array();
+			$permissions = [];
 			$this->db->fetchQuery('
 				SELECT id_group, permission, add_deny
 				FROM {db_prefix}permissions
@@ -219,7 +215,7 @@ class Permissions
 					'parent_list' => $parents,
 				)
 			)->fetch_callback(
-				function ($row) use ($children, &$permissions) {
+				static function ($row) use ($children, &$permissions) {
 					foreach ($children[$row['id_group']] as $child)
 					{
 						$permissions[] = array(
@@ -264,7 +260,7 @@ class Permissions
 					'current_profile' => $profile !== null && $profile ? $profile : 1,
 				)
 			)->fetch_callback(
-				function ($row) use (&$permissions, $children) {
+				static function ($row) use (&$permissions, $children) {
 					foreach ($children[$row['id_group']] as $child)
 					{
 						$permissions[] = array($row['permission'], $child, $row['add_deny'], $row['id_profile']);

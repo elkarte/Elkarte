@@ -35,10 +35,10 @@ namespace ElkArte;
 class EventManager
 {
 	/** @var object[] Event An array of events, each entry is a different position. */
-	protected $_registered_events = array();
+	protected $_registered_events = [];
 
 	/** @var object[] Instances of addons already loaded. */
-	protected $_instances = array();
+	protected $_instances = [];
 
 	/** @var AbstractController Instances of the controller, needs to have extended AbstractController. */
 	protected $_source;
@@ -87,7 +87,7 @@ class EventManager
 			return false;
 		}
 
-		// For all areas that that registered against this event, let them know its been triggered
+		// For all areas that that registered against this event, let them know it's been triggered
 		foreach ($this->_registered_events[$position]->getEvents() as $event)
 		{
 			$class = $event[1];
@@ -119,7 +119,7 @@ class EventManager
 			}
 			else
 			{
-				foreach ($args as $key => $val)
+				foreach (array_keys($args) as $key)
 				{
 					$dependencies[$key] = &$args[$key];
 				}
@@ -149,8 +149,7 @@ class EventManager
 	 *
 	 * What it does:
 	 *
-	 * - Objects are stored in order to be shared between different triggers
-	 * in the same \ElkArte\EventManager.
+	 * - Objects are stored in order to be shared between different triggers in the same \ElkArte\EventManager.
 	 * - If the object doesn't exist yet, it is created
 	 *
 	 * @param string $class_name The name of the class.

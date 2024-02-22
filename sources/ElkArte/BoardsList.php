@@ -19,6 +19,7 @@ namespace ElkArte;
 
 use BBC\ParserWrapper;
 use ElkArte\Cache\Cache;
+use ElkArte\Database\QueryInterface;
 
 /**
  * This class fetches all the stuff needed to build a list of boards
@@ -52,7 +53,7 @@ class BoardsList
 	/** @var int The id of the recycle board (0 for none or not enabled) */
 	private $_recycle_board = 0;
 
-	/** @var \ElkArte\Database\QueryInterface The database! */
+	/** @var QueryInterface The database! */
 	private $_db;
 
 	/**
@@ -88,7 +89,7 @@ class BoardsList
 		}
 
 		$this->_user = User::$info;
-		$this->_user['mod_cache_ap'] = !empty($this->_user->mod_cache['ap']) ? $this->_user->mod_cache['ap'] : array();
+		$this->_user['mod_cache_ap'] = empty($this->_user->mod_cache['ap']) ? array() : $this->_user->mod_cache['ap'];
 
 		$this->_db = database();
 
@@ -115,13 +116,10 @@ class BoardsList
 	}
 
 	/**
-	 * Fetches a list of boards and (optional) categories including
-	 * statistical information, sub-boards and moderators.
-	 *  - Used by both the board index (main data) and the message index (child
-	 * boards).
-	 *  - Depending on the include_categories setting returns an associative
-	 * array with categories->boards->child_boards or an associative array
-	 * with boards->child_boards.
+	 * Fetches a list of boards and (optional) categories including statistical information, sub-boards and moderators.
+	 *  - Used by both the board index (main data) and the message index (child boards).
+	 *  - Depending on the include_categories setting returns an associative array with
+	 * categories->boards->child_boards or an associative array with boards->child_boards.
 	 *
 	 * @return array
 	 */
@@ -163,9 +161,7 @@ class BoardsList
 
 		$result_boards = $request->fetch_all();
 
-		usort($result_boards, static function ($a, $b) {
-			return $a['board_order'] <=> $b['board_order'];
-		});
+		usort($result_boards, static fn($a, $b) => $a['board_order'] <=> $b['board_order']);
 
 		$bbc_parser = ParserWrapper::instance();
 
@@ -196,9 +192,9 @@ class BoardsList
 						'boards' => array(),
 						'new' => false
 					);
-					$this->_categories[$row_board['id_cat']]['link'] = '<a id="c' . $row_board['id_cat'] . '"></a>' . (!$this->_user['is_guest']
-							? '<a href="' . getUrl('action', ['action' => 'unread', 'c' => $row_board['id_cat']]) . '" title="' . sprintf($txt['new_posts_in_category'], strip_tags($row_board['cat_name'])) . '">' . $cat_name . '</a>'
-							: $cat_name);
+					$this->_categories[$row_board['id_cat']]['link'] = '<a id="c' . $row_board['id_cat'] . '"></a>' . ($this->_user['is_guest']
+							? $cat_name
+							: '<a href="' . getUrl('action', ['action' => 'unread', 'c' => $row_board['id_cat']]) . '" title="' . sprintf($txt['new_posts_in_category'], strip_tags($row_board['cat_name'])) . '">' . $cat_name . '</a>');
 				}
 
 				// If this board has new posts in it (and isn't the recycle bin!) then the category is new.
@@ -208,7 +204,7 @@ class BoardsList
 				}
 
 				// Avoid showing category unread link where it only has redirection boards.
-				$this->_categories[$row_board['id_cat']]['show_unread'] = !empty($this->_categories[$row_board['id_cat']]['show_unread']) ? 1 : !$row_board['is_redirect'];
+				$this->_categories[$row_board['id_cat']]['show_unread'] = empty($this->_categories[$row_board['id_cat']]['show_unread']) ? !$row_board['is_redirect'] : 1;
 
 				// Collapsed category - don't do any of this.
 				if ($this->_categories[$row_board['id_cat']]['is_collapsed'])
@@ -227,27 +223,28 @@ class BoardsList
 				if (!isset($this->_current_boards[$row_board['id_board']]))
 				{
 					$href = getUrl('board', ['board' => $row_board['id_board'], 'start' => '0', 'name' => $row_board['board_name']]);
-					$this->_current_boards[$row_board['id_board']] = array(
+					$this->_current_boards[$row_board['id_board']] = [
 						'new' => empty($row_board['is_read']),
-						'id' => $row_board['id_board'],
+						'id' => (int) $row_board['id_board'],
 						'name' => $row_board['board_name'],
 						'description' => $bbc_parser->parseBoard($row_board['description']),
 						'raw_description' => $row_board['description'],
-						'moderators' => array(),
-						'link_moderators' => array(),
-						'children' => array(),
-						'link_children' => array(),
+						'moderators' => [],
+						'link_moderators' => [],
+						'children' => [],
+						'link_children' => [],
 						'children_new' => false,
-						'topics' => $row_board['num_topics'],
-						'posts' => $row_board['num_posts'],
+						'topics' => (int) $row_board['num_topics'],
+						'posts' => (int) $row_board['num_posts'],
 						'is_redirect' => $row_board['is_redirect'],
 						'unapproved_topics' => $row_board['unapproved_topics'],
 						'unapproved_posts' => $row_board['unapproved_posts'] - $row_board['unapproved_topics'],
-						'can_approve_posts' => $this->_user['mod_cache_ap'] == array(0) || in_array($row_board['id_board'], $this->_user['mod_cache_ap']),
+						'can_approve_posts' => $this->_user['mod_cache_ap'] == [0] || in_array($row_board['id_board'], $this->_user['mod_cache_ap']),
 						'href' => $href,
 						'link' => '<a href="' . $href . '">' . $row_board['board_name'] . '</a>'
-					);
+					];
 				}
+
 				$this->_boards[$row_board['id_board']] = $this->_options['include_categories'] ? $row_board['id_cat'] : 0;
 			}
 			// Found a sub-board.... make sure we've found its parent and the child hasn't been set already.
@@ -257,21 +254,21 @@ class BoardsList
 				$isChild = true;
 
 				$href = getUrl('board', ['board' => $row_board['id_board'], 'start' => '0', 'name' => $row_board['board_name']]);
-				$this->_current_boards[$row_board['id_parent']]['children'][$row_board['id_board']] = array(
-					'id' => $row_board['id_board'],
+				$this->_current_boards[$row_board['id_parent']]['children'][$row_board['id_board']] = [
+					'id' => (int) $row_board['id_board'],
 					'name' => $row_board['board_name'],
 					'description' => $bbc_parser->parseBoard($row_board['description']),
 					'raw_description' => $row_board['description'],
-					'new' => empty($row_board['is_read']) && $row_board['poster_name'] != '',
-					'topics' => $row_board['num_topics'],
-					'posts' => $row_board['num_posts'],
+					'new' => empty($row_board['is_read']) && $row_board['poster_name'] !== '',
+					'topics' => (int) $row_board['num_topics'],
+					'posts' => (int) $row_board['num_posts'],
 					'is_redirect' => $row_board['is_redirect'],
 					'unapproved_topics' => $row_board['unapproved_topics'],
 					'unapproved_posts' => $row_board['unapproved_posts'] - $row_board['unapproved_topics'],
-					'can_approve_posts' => $this->_user['mod_cache_ap'] == array(0) || in_array($row_board['id_board'], $this->_user['mod_cache_ap']),
+					'can_approve_posts' => $this->_user['mod_cache_ap'] == [0] || in_array($row_board['id_board'], $this->_user['mod_cache_ap']),
 					'href' => $href,
 					'link' => '<a href="' . $href . '">' . $row_board['board_name'] . '</a>'
-				);
+				];
 
 				// Counting sub-board posts is... slow :/.
 				if (!empty($this->_options['countChildPosts']) && !$row_board['is_redirect'])
@@ -305,8 +302,8 @@ class BoardsList
 							continue;
 						}
 
-						$parent_map[$row_board['id_parent']] = array(&$this->_current_boards[$id], &$this->_current_boards[$id]['children'][$row_board['id_parent']]);
-						$parent_map[$row_board['id_board']] = array(&$this->_current_boards[$id], &$this->_current_boards[$id]['children'][$row_board['id_parent']]);
+						$parent_map[$row_board['id_parent']] = [&$this->_current_boards[$id], &$this->_current_boards[$id]['children'][$row_board['id_parent']]];
+						$parent_map[$row_board['id_board']] = [&$this->_current_boards[$id], &$this->_current_boards[$id]['children'][$row_board['id_parent']]];
 
 						break;
 					}
@@ -335,20 +332,20 @@ class BoardsList
 			$row_board['short_subject'] = Util::shorten_text($row_board['subject'], $this->_subject_length);
 			$poster_href = getUrl('profile', ['action' => 'profile', 'u' => $row_board['id_member'], 'name' => $row_board['real_name']]);
 			$this_last_post = array(
-				'id' => $row_board['id_msg'],
+				'id' => (int) $row_board['id_msg'],
 				'time' => $row_board['poster_time'] > 0 ? standardTime($row_board['poster_time']) : $txt['not_applicable'],
 				'html_time' => $row_board['poster_time'] > 0 ? htmlTime($row_board['poster_time']) : $txt['not_applicable'],
 				'timestamp' => forum_time(true, $row_board['poster_time']),
 				'subject' => $row_board['short_subject'],
 				'member' => array(
-					'id' => $row_board['id_member'],
-					'username' => $row_board['poster_name'] != '' ? $row_board['poster_name'] : $txt['not_applicable'],
+					'id' => (int) $row_board['id_member'],
+					'username' => $row_board['poster_name'] !== '' ? $row_board['poster_name'] : $txt['not_applicable'],
 					'name' => $row_board['real_name'],
-					'href' => $row_board['poster_name'] != '' && !empty($row_board['id_member']) ? $poster_href : '',
-					'link' => $row_board['poster_name'] != '' ? (!empty($row_board['id_member']) ? '<a href="' . $poster_href . '">' . $row_board['real_name'] . '</a>' : $row_board['real_name']) : $txt['not_applicable'],
+					'href' => $row_board['poster_name'] !== '' && !empty($row_board['id_member']) ? $poster_href : '',
+					'link' => $row_board['poster_name'] !== '' ? (empty($row_board['id_member']) ? $row_board['real_name'] : '<a href="' . $poster_href . '">' . $row_board['real_name'] . '</a>') : $txt['not_applicable'],
 				),
 				'start' => 'msg' . $row_board['new_from'],
-				'topic' => $row_board['id_topic']
+				'topic' => (int) $row_board['id_topic']
 			);
 
 			if ($this->_options['avatars_on_indexes'])
@@ -357,14 +354,14 @@ class BoardsList
 			}
 
 			// Provide the href and link.
-			if ($row_board['subject'] != '')
+			if ($row_board['subject'] !== '')
 			{
 				$this_last_post['href'] = getUrl('topic', ['topic' => $row_board['id_topic'], 'start' => 'msg' . ($this->_user['is_guest'] ? $row_board['id_msg'] : $row_board['new_from']), 'subject' => $row_board['subject'], 0 => empty($row_board['is_read']) ? 'boardseen' : '']) . '#new';
 				$this_last_post['link'] = '<a href="' . $this_last_post['href'] . '" title="' . Util::htmlspecialchars($row_board['subject']) . '">' . $row_board['short_subject'] . '</a>';
-				/* The board's and children's 'last_post's have:
-				time, timestamp (a number that represents the time.), id (of the post), topic (topic id.),
-				link, href, subject, start (where they should go for the first unread post.),
-				and member. (which has id, name, link, href, username in it.) */
+				// The board's and children's 'last_post's have:
+				// time, timestamp (a number that represents the time.), id (of the post), topic (topic id.),
+				// link, href, subject, start (where they should go for the first unread post.),
+				// and member. (which has id, name, link, href, username in it.)
 				$this_last_post['last_post_message'] = sprintf($txt['last_post_message'], $this_last_post['member']['link'], $this_last_post['link'], $this_last_post['html_time']);
 			}
 			else
@@ -379,6 +376,7 @@ class BoardsList
 			{
 				$this->_current_boards[$isChild ? $row_board['id_parent'] : $row_board['id_board']]['last_post'] = $this_last_post;
 			}
+
 			// Just in the child...?
 			if ($isChild)
 			{
@@ -392,12 +390,24 @@ class BoardsList
 			{
 				$this->_current_boards[$row_board['id_board']]['new'] = false;
 			}
-
 			// Determine a global most recent topic.
-			if ($this->_options['set_latest_post'] && !empty($row_board['poster_time']) && $row_board['poster_time'] > $this->_latest_post['timestamp'] && !$ignoreThisBoard)
+			if (!$this->_options['set_latest_post'])
 			{
-				$this->_latest_post = &$this->_current_boards[$isChild ? $row_board['id_parent'] : $row_board['id_board']]['last_post'];
+				continue;
 			}
+			if (empty($row_board['poster_time']))
+			{
+				continue;
+			}
+			if ($row_board['poster_time'] <= $this->_latest_post['timestamp'])
+			{
+				continue;
+			}
+			if ($ignoreThisBoard)
+			{
+				continue;
+			}
+			$this->_latest_post = &$this->_current_boards[$isChild ? $row_board['id_parent'] : $row_board['id_board']]['last_post'];
 		}
 
 		if ($this->_options['get_moderators'] && !empty($this->_boards))
@@ -405,9 +415,7 @@ class BoardsList
 			$this->_getBoardModerators();
 		}
 
-		usort($this->_categories, static function ($a, $b) {
-			return $a['order'] <=> $b['order'];
-		});
+		usort($this->_categories, static fn($a, $b) => $a['order'] <=> $b['order']);
 
 		return $this->_options['include_categories'] ? $this->_categories : $this->_current_boards;
 	}
@@ -420,7 +428,7 @@ class BoardsList
 		global $txt;
 
 		$boards = array_keys($this->_boards);
-		$mod_cached = array();
+		$mod_cached = [];
 
 		if (!Cache::instance()->getVar($mod_cached, 'localmods_' . md5(implode(',', $boards)), 3600))
 		{

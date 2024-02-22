@@ -19,7 +19,7 @@ namespace ElkArte;
  */
 class Util
 {
-	protected static  $_entity_check_reg = '~(&#(\d{1,7}|x[0-9a-fA-F]{1,6});)~';
+	protected static $_entity_check_reg = '~(&#(\d{1,7}|x[0-9a-fA-F]{1,6});)~';
 
 	/**
 	 * Converts invalid / disallowed / out of range entities to nulls
@@ -33,14 +33,12 @@ class Util
 		$num = $string[0] === 'x' ? hexdec(substr($string, 1)) : (int) $string;
 
 		// We don't allow control characters, characters out of range, byte markers, etc
-		if ($num < 0x20 || $num > 0x10FFFF || ($num >= 0xD800 && $num <= 0xDFFF) || $num == 0x202D || $num == 0x202E)
+		if ($num < 0x20 || $num > 0x10FFFF || ($num >= 0xD800 && $num <= 0xDFFF) || $num === 0x202D || $num === 0x202E)
 		{
 			return '';
 		}
-		else
-		{
-			return '&#' . $num . ';';
-		}
+
+		return '&#' . $num . ';';
 	}
 
 	/**
@@ -65,14 +63,10 @@ class Util
 
 		if (empty($modSettings['disableEntityCheck']))
 		{
-			$check = preg_replace_callback('~(&amp;#(\d{1,7}|x[0-9a-fA-F]{1,6});)~', 'entity_fix__callback', htmlspecialchars($string, $quote_style, $charset, $double));
-		}
-		else
-		{
-			$check = htmlspecialchars($string, $quote_style, $charset, $double);
+			return preg_replace_callback('~(&amp;#(\d{1,7}|x[0-9a-fA-F]{1,6});)~', 'entity_fix__callback', htmlspecialchars($string, $quote_style, $charset, $double));
 		}
 
-		return $check;
+		return htmlspecialchars($string, $quote_style, $charset, $double);
 	}
 
 	/**
@@ -97,7 +91,7 @@ class Util
 			return Util::htmlspecialchars($var, ENT_QUOTES);
 		}
 
-		// Add the htmlspecialchars to every element.
+		// Apply htmlspecialchars to every element.
 		foreach ($var as $k => $v)
 		{
 			$var[$k] = $level > 25 ? null : Util::htmlspecialchars__recursive($v, $level + 1);
@@ -126,14 +120,10 @@ class Util
 
 		if (empty($modSettings['disableEntityCheck']))
 		{
-			$check = preg_replace('~^(?:[' . $space_chars . ']|&nbsp;)+|(?:[' . $space_chars . ']|&nbsp;)+$~u', '', preg_replace_callback(self::$_entity_check_reg, 'entity_fix__callback', $string));
-		}
-		else
-		{
-			$check = preg_replace('~^(?:[' . $space_chars . ']|&nbsp;)+|(?:[' . $space_chars . ']|&nbsp;)+$~u', '', $string);
+			return preg_replace('~^(?:[' . $space_chars . ']|&nbsp;)+|(?:[' . $space_chars . ']|&nbsp;)+$~u', '', preg_replace_callback(self::$_entity_check_reg, 'entity_fix__callback', $string));
 		}
 
-		return $check;
+		return preg_replace('~^(?:[' . $space_chars . ']|&nbsp;)+|(?:[' . $space_chars . ']|&nbsp;)+$~u', '', $string);
 	}
 
 	/**
@@ -199,31 +189,29 @@ class Util
 		// Single character search, lets go
 		if (strlen($needle) === 1)
 		{
-			$result = array_search($needle, array_slice($haystack_arr, $offset));
+			$result = array_search($needle, array_slice($haystack_arr, $offset), true);
 
 			return is_int($result) ? ($right ? $count - ($result + $offset) : $result + $offset) : false;
 		}
-		else
+
+		$needle_check = empty($modSettings['disableEntityCheck']) ? preg_replace_callback(self::$_entity_check_reg, 'entity_fix__callback', $needle) : $needle;
+		$needle_arr = preg_split('~(&#' . (empty($modSettings['disableEntityCheck']) ? '\d{1,7}' : '021') . ';|&quot;|&amp;|&lt;|&gt;|&nbsp;|.)~u', $needle_check, -1, PREG_SPLIT_DELIM_CAPTURE | PREG_SPLIT_NO_EMPTY);
+		$needle_arr = $right ? array_reverse($needle_arr) : $needle_arr;
+
+		$needle_size = count($needle_arr);
+		$result = array_search($needle_arr[0], array_slice($haystack_arr, $offset), true);
+		while ((int) $result === $result)
 		{
-			$needle_check = empty($modSettings['disableEntityCheck']) ? preg_replace_callback(self::$_entity_check_reg, 'entity_fix__callback', $needle) : $needle;
-			$needle_arr = preg_split('~(&#' . (empty($modSettings['disableEntityCheck']) ? '\d{1,7}' : '021') . ';|&quot;|&amp;|&lt;|&gt;|&nbsp;|.)~u', $needle_check, -1, PREG_SPLIT_DELIM_CAPTURE | PREG_SPLIT_NO_EMPTY);
-			$needle_arr = $right ? array_reverse($needle_arr) : $needle_arr;
-			$needle_size = count($needle_arr);
-
-			$result = array_search($needle_arr[0], array_slice($haystack_arr, $offset));
-			while ((int) $result === $result)
+			$offset += $result;
+			if (array_slice($haystack_arr, $offset, $needle_size) === $needle_arr)
 			{
-				$offset += $result;
-				if (array_slice($haystack_arr, $offset, $needle_size) === $needle_arr)
-				{
-					return $right ? ($count - $offset - $needle_size + 1) : $offset;
-				}
-
-				$result = array_search($needle_arr[0], array_slice($haystack_arr, ++$offset));
+				return $right ? ($count - $offset - $needle_size + 1) : $offset;
 			}
 
-			return false;
+			$result = array_search($needle_arr[0], array_slice($haystack_arr, ++$offset), true);
 		}
+
+		return false;
 	}
 
 	/**
@@ -241,12 +229,10 @@ class Util
 		{
 			return mb_strtolower($string, 'UTF-8');
 		}
-		else
-		{
-			require_once(SUBSDIR . '/Charset.subs.php');
 
-			return utf8_strtolower($string);
-		}
+		require_once(SUBSDIR . '/Charset.subs.php');
+
+		return utf8_strtolower($string);
 	}
 
 	/**
@@ -308,19 +294,15 @@ class Util
 				$check = preg_replace('~' . $ent_list . '|.~u', '_', $string);
 				return $check === null ? 0 : mb_strlen($check, 'UTF-8');
 			}
-			else
-			{
-				$check = preg_replace('~' . $ent_list . '|.~u', '_', preg_replace_callback(self::$_entity_check_reg, 'entity_fix__callback', $string));
-				return $check === null ? 0 : strlen($check);
-			}
-		}
-		else
-		{
-			$ent_list = '&(#021|quot|amp|lt|gt|nbsp);';
 
-			$check = preg_replace('~' . $ent_list . '|.~u', '_', $string);
+			$check = preg_replace('~' . $ent_list . '|.~u', '_', preg_replace_callback(self::$_entity_check_reg, 'entity_fix__callback', $string));
 			return $check === null ? 0 : strlen($check);
 		}
+
+		$ent_list = '&(#021|quot|amp|lt|gt|nbsp);';
+		$check = preg_replace('~' . $ent_list . '|.~u', '_', $string);
+
+		return $check === null ? 0 : strlen($check);
 	}
 
 	/**
@@ -448,7 +430,7 @@ class Util
 				elseif (preg_match('~<\/([\w]+)[^>]*>~', $tag[0], $close_tag))
 				{
 					// Remove its starting tag
-					$pos = array_search($close_tag[1], $open_tags);
+					$pos = array_search($close_tag[1], $open_tags, true);
 					if ($pos !== false)
 					{
 						array_splice($open_tags, $pos, 1);
@@ -487,6 +469,7 @@ class Util
 		// Our truncated string up to the last space
 		$space_pos = self::strpos($truncate, ' ', 0, true);
 		$space_pos = empty($space_pos) ? $length : $space_pos;
+
 		$truncate_check = self::substr($truncate, 0, $space_pos);
 
 		// Make sure this would not cause a cut in the middle of a tag
@@ -589,16 +572,15 @@ class Util
 		{
 			return mb_strtoupper($string, 'UTF-8');
 		}
-		else
-		{
-			require_once(SUBSDIR . '/Charset.subs.php');
 
-			return utf8_strtoupper($string);
-		}
+		require_once(SUBSDIR . '/Charset.subs.php');
+
+		return utf8_strtoupper($string);
 	}
 
 	/**
 	 * Wrappers for unserialize
+	 *
 	 * What it does:
 	 *
 	 * @param string $string The string to unserialize
@@ -644,7 +626,7 @@ class Util
 				$check = true;
 			}
 		}
-		catch (\Throwable $e)
+		catch (\Throwable)
 		{
 			/* do nothing */
 		}
@@ -675,7 +657,7 @@ class Util
 			$timestamp = time();
 		}
 
-		$date_equivalents = array (
+		$date_equivalents = array(
 			'%a' => 'D',
 			'%A' => 'l',
 			'%d' => 'd',
@@ -727,8 +709,7 @@ class Util
 
 		return preg_replace_callback(
 			'/%[A-Za-z]{1}/',
-			function($matches) use ($timestamp, $date_equivalents)
-			{
+			static function ($matches) use ($timestamp, $date_equivalents) {
 				$new_format = str_replace(array_keys($date_equivalents), array_values($date_equivalents), $matches[0]);
 				return date($new_format, $timestamp);
 			},

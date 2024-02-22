@@ -14,70 +14,40 @@
 namespace ElkArte;
 
 /**
- * Priority Class An abstract class to deal with priority
- * of template layers
+ * Priority Class An abstract class to deal with priority of template layers
  */
 class Priority
 {
-	/**
-	 * Default priority
-	 */
+	/** @var int Default priority */
 	public const STDPRIORITY = 0;
-	/**
-	 * An array containing all the entities added
-	 *
-	 * @var array
-	 */
-	protected $_all_general = array();
-	/**
-	 * An array containing all the entities that should go *after* another one
-	 *
-	 * @var array
-	 */
-	protected $_all_after = array();
-	/**
-	 * An array containing all the entities that should go *before* another one
-	 *
-	 * @var array
-	 */
-	protected $_all_before = array();
-	/**
-	 * An array containing all the entities that should go at the end of the list
-	 *
-	 * @var array
-	 */
-	protected $_all_end = array();
-	/**
-	 * An array containing all the entities that should go at the beginning
-	 *
-	 * @var array
-	 */
-	protected $_all_begin = array();
-	/**
-	 * The highest priority assigned at a certain moment for $_all_general
-	 *
-	 * @var int
-	 */
+
+	/** @var array An array containing all the entities added */
+	protected $_all_general = [];
+
+	/** @var array An array containing all the entities that should go *after* another one */
+	protected $_all_after = [];
+
+	/** @var array An array containing all the entities that should go *before* another one */
+	protected $_all_before = [];
+
+	/** @var array An array containing all the entities that should go at the end of the list */
+	protected $_all_end = [];
+
+	/** @var array An array containing all the entities that should go at the beginning */
+	protected $_all_begin = [];
+
+	/** @var int The highest priority assigned at a certain moment for $_all_general */
 	protected $_general_highest_priority = 0;
-	/**
-	 * The highest priority assigned at a certain moment for $_all_end
-	 *
-	 * @var int
-	 */
+
+	/** @var int The highest priority assigned at a certain moment for $_all_end */
 	protected $_end_highest_priority = 10000;
-	/**
-	 * The highest priority assigned at a certain moment for $_all_begin
-	 * Highest priority at "begin" is sort of tricky, because the value is negative
-	 *
-	 * @var int
-	 */
+
+	/** @var int The highest priority assigned at a certain moment for $_all_begin
+	 * Highest priority at "begin" is sort of tricky, because the value is negative */
 	protected $_begin_highest_priority = -10000;
-	/**
-	 * Array of sorted entities
-	 *
-	 * @var array
-	 */
-	protected $_sorted_entities = null;
+
+	/** @var array Array of sorted entities */
+	protected $_sorted_entities;
 
 	/**
 	 * Add a new entity to the pile
@@ -139,7 +109,7 @@ class Priority
 	{
 		$this->_all_begin[$entity] = $priority === null
 			? $this->_begin_highest_priority
-			: (int) -$priority;
+			: -$priority;
 		$this->_begin_highest_priority = max($this->_all_begin) + 100;
 	}
 
@@ -210,14 +180,11 @@ class Priority
 		// Now the funny part, let's start with some cleanup: collecting all the entities we know and pruning those that cannot be placed somewhere
 		$all_known = array_merge(array_keys($all_entities), array_keys($this->_all_after), array_keys($this->_all_before));
 
-		$all = array(
-			'before' => array(),
-			'after' => array()
-		);
+		$all = ['before' => [], 'after' => []];
 
 		foreach ($this->_all_before as $key => $value)
 		{
-			if (in_array($value, $all_known))
+			if (in_array($value, $all_known, true))
 			{
 				$all['before'][$key] = $value;
 			}
@@ -225,48 +192,43 @@ class Priority
 
 		foreach ($this->_all_after as $key => $value)
 		{
-			if (in_array($value, $all_known))
+			if (in_array($value, $all_known, true))
 			{
 				$all['after'][$key] = $value;
 			}
 		}
 
-		// This is terribly optimized, though it shouldn't loop over too many things (hopefully)
+		// This is not terribly optimized, though it shouldn't loop over too many things (hopefully)
+		// 2.0 I've tried to make things a bit more efficient, although maybe harder to read !
 		// It "iteratively" adds all the after/before entities shifting priority
 		// of all the other entities to ensure each one has a different value
 		while (!empty($all['after']) || !empty($all['before']))
 		{
-			foreach (array('after' => 1, 'before' => -1) as $where => $inc)
+			foreach (['after' => 1, 'before' => -1] as $where => $inc)
 			{
 				if (empty($all[$where]))
 				{
 					continue;
 				}
 
-				foreach ($all[$where] as $entity => $reference)
+				// Use a reference to avoid redundant array access
+				$references = &$all[$where];
+				foreach ($references as $entity => $reference)
 				{
 					if (isset($all_entities[$reference]))
 					{
 						$priority_threshold = $all_entities[$reference];
-						foreach ($all_entities as $key => $val)
+						foreach ($all_entities as &$val)
 						{
-							switch ($where)
+							// Use reference to update values directly
+							if (($where === 'after' && $val <= $priority_threshold)
+								|| ($where === 'before' && $val >= $priority_threshold))
 							{
-								case 'after':
-									if ($val <= $priority_threshold)
-									{
-										$all_entities[$key] -= $inc;
-									}
-									break;
-								case 'before':
-									if ($val >= $priority_threshold)
-									{
-										$all_entities[$key] -= $inc;
-									}
-									break;
+								$val -= $inc;
 							}
 						}
-						unset($all[$where][$entity]);
+
+						unset($references[$entity], $val);
 						$all_entities[$entity] = $priority_threshold;
 					}
 				}
@@ -291,10 +253,8 @@ class Priority
 		{
 			return (!empty($this->_all_general) || !empty($this->_all_begin) || !empty($this->_all_end));
 		}
-		else
-		{
-			return !empty($this->_sorted_entities);
-		}
+
+		return !empty($this->_sorted_entities);
 	}
 
 	/**

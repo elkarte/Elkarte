@@ -13,6 +13,7 @@
 
 namespace ElkArte;
 
+use ElkArte\Exceptions\Exception;
 use ElkArte\Languages\Txt;
 
 /**
@@ -33,10 +34,10 @@ use ElkArte\Languages\Txt;
 class UnTgz
 {
 	/** @var array Holds the return array of files processed */
-	protected $return = array();
+	protected $return = [];
 
 	/** @var array Holds the data found in each tar file header block */
-	protected $_current = array();
+	protected $_current = [];
 
 	/** @var int Holds the file pointer, generally to the 512 block we are working on */
 	protected $_offset = 0;
@@ -60,25 +61,10 @@ class UnTgz
 	protected $_found = false;
 
 	/** @var array|string Current file header we are working on */
-	protected $_header = array();
+	protected $_header = [];
 
-	/** @var null|string[] Array of file names we want to extract from the archive */
-	protected $files_to_extract;
-
-	/** @var \ElkArte\FileFunctions The file functions class */
+	/** @var FileFunctions The file functions class */
 	protected $fileFunc;
-
-	/** @var string Holds the data string passed to the function */
-	protected $data;
-
-	/** @var string Location to write the files. */
-	protected $destination;
-
-	/** @var bool|string If we are looking for a single specific file */
-	protected $single_file;
-
-	/** @var bool If we can overwrite a file with the same name in the destination */
-	protected $overwrite;
 
 	/**
 	 * Class initialization, passes variables, loads dependencies
@@ -89,17 +75,10 @@ class UnTgz
 	 * @param bool $overwrite
 	 * @param null|string[] $files_to_extract
 	 *
-	 * @throws \ElkArte\Exceptions\Exception package_no_zlib
+	 * @throws Exception package_no_zlib
 	 */
-	public function __construct($data, $destination, $single_file = false, $overwrite = false, $files_to_extract = null)
+	public function __construct(protected $data, protected $destination, protected $single_file = false, protected $overwrite = false, protected $files_to_extract = null)
 	{
-		// Load the passed commands in to the class
-		$this->data = $data;
-		$this->destination = $destination;
-		$this->single_file = $single_file;
-		$this->overwrite = $overwrite;
-		$this->files_to_extract = $files_to_extract;
-
 		// This class sorta needs gzinflate!
 		if (!function_exists('gzinflate'))
 		{
@@ -115,11 +94,22 @@ class UnTgz
 
 		// The destination needs exist, and be writable, or we are doomed
 		umask(0);
-		if ($this->destination !== null && !$this->single_file
-			&& !$this->fileFunc->fileExists($this->destination))
+		if ($this->destination === null)
 		{
-			mktree($this->destination);
+			return;
 		}
+
+		if ($this->single_file)
+		{
+			return;
+		}
+
+		if ($this->fileFunc->fileExists($this->destination))
+		{
+			return;
+		}
+
+		mktree($this->destination);
 	}
 
 	/**
@@ -240,6 +230,7 @@ class UnTgz
 			{
 				$this->_header['filename'] .= $this->data[$this->_offset++];
 			}
+
 			$this->_offset++;
 		}
 
@@ -251,6 +242,7 @@ class UnTgz
 			{
 				$this->_header['comment'] .= $this->data[$this->_offset++];
 			}
+
 			$this->_offset++;
 		}
 
@@ -350,7 +342,7 @@ class UnTgz
 
 			if (substr($this->_current['filename'], -1) !== '/')
 			{
-				$this->return[] = array(
+				$this->return[] = [
 					'filename' => $this->_current['filename'],
 					'md5' => md5($this->_current['data']),
 					'preview' => substr($this->_current['data'], 0, 100),
@@ -358,7 +350,7 @@ class UnTgz
 					'formatted_size' => byte_format($this->_current['size']),
 					'skipped' => false,
 					'crc' => $this->_crc_check,
-				);
+				];
 			}
 		}
 	}
@@ -386,7 +378,7 @@ class UnTgz
 	 */
 	private function _read_current_header()
 	{
-		$octdec = array('mode', 'uid', 'gid', 'size', 'mtime', 'checksum', 'type');
+		$octdec = ['mode', 'uid', 'gid', 'size', 'mtime', 'checksum', 'type'];
 
 		// Each file object is preceded by a 512-byte header record on 512 boundaries
 		$this->_header = substr($this->data, $this->_offset << 9, 512);
@@ -406,8 +398,10 @@ class UnTgz
 					{
 						$value = decoct($value);
 					}
+
 					$value = octdec($value);
 				}
+
 				$this->_current[$key] = $value;
 			}
 			else
@@ -436,12 +430,13 @@ class UnTgz
 		elseif ($this->destination !== null && !$this->single_file)
 		{
 			// Protect from accidental parent directory writing...
-			$this->_current['filename'] = strtr($this->_current['filename'], array('../' => '', '/..' => ''));
+			$this->_current['filename'] = strtr($this->_current['filename'], ['../' => '', '/..' => '']);
 
 			if (!$this->fileFunc->fileExists($this->destination . '/' . $this->_current['filename']))
 			{
 				mktree($this->destination . '/' . $this->_current['filename']);
 			}
+
 			$this->_write_this = false;
 		}
 		else
@@ -483,12 +478,23 @@ class UnTgz
 		{
 			$this->_skip = true;
 		}
-
 		// Write it out then
-		if (!$this->_skip && $this->_found === false && $this->_check_header_crc())
+		if ($this->_skip)
 		{
-			package_put_contents($this->destination . '/' . $this->_current['filename'], $this->_current['data']);
+			return;
 		}
+
+		if ($this->_found !== false)
+		{
+			return;
+		}
+
+		if (!$this->_check_header_crc())
+		{
+			return;
+		}
+
+		package_put_contents($this->destination . '/' . $this->_current['filename'], $this->_current['data']);
 	}
 
 	/**

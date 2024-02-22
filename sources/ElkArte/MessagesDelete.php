@@ -24,16 +24,17 @@ namespace ElkArte;
  */
 class MessagesDelete
 {
-	/** @var \ElkArte\ValuesContainer The current user deleting something */
-	protected $user = null;
+	/** @var ValuesContainer The current user deleting something */
+	protected $user;
+
 	/** @var int[] Id of the messages not found. */
-	private $_unfound_messages = array();
+	private $_unfound_messages = [];
+
 	/** @var int[] Id of the topics that should be restored */
-	private $_topics_to_restore = array();
+	private $_topics_to_restore = [];
+
 	/** @var int The board id of the recycle board */
-	private $_recycle_board = null;
-	/** @var string[] List of errors occurred */
-	private $_errors = array();
+	private $_recycle_board;
 
 	/**
 	 * Initialize the class! :P
@@ -57,7 +58,6 @@ class MessagesDelete
 	 * @param int[] $msgs_id Messages to restore
 	 *
 	 * @return array|void
-	 * @throws \ElkArte\Exceptions\Exception
 	 */
 	public function restoreMessages($msgs_id)
 	{
@@ -79,8 +79,8 @@ class MessagesDelete
 		$db = database();
 
 		// Get the id_previous_board and id_previous_topic.
-		$actioned_messages = array();
-		$previous_topics = array();
+		$actioned_messages = [];
+		$previous_topics = [];
 		$db->fetchQuery('
 			SELECT 
 				m.id_topic, m.id_msg, m.id_board, m.subject, m.id_member, t.id_previous_board, t.id_previous_topic,
@@ -96,7 +96,7 @@ class MessagesDelete
 		)->fetch_callback(
 			function ($row) use (&$actioned_messages, &$previous_topics) {
 				// Restoring the first post means topic.
-				if ($row['id_msg'] == $row['id_first_msg'] && $row['id_previous_topic'] == $row['id_topic'])
+				if ((int) $row['id_msg'] === (int) $row['id_first_msg'] && (int) $row['id_previous_topic'] === (int) $row['id_topic'])
 				{
 					$this->_topics_to_restore[] = $row['id_topic'];
 					return;
@@ -114,12 +114,12 @@ class MessagesDelete
 				{
 					$actioned_messages[$row['id_previous_topic']] = array(
 						'msgs' => array(),
-						'count_posts' => $row['count_posts'],
+						'count_posts' => (int) $row['count_posts'],
 						'subject' => $row['subject'],
 						'previous_board' => $row['id_previous_board'],
 						'possible_prev_board' => $row['possible_prev_board'],
-						'current_topic' => $row['id_topic'],
-						'current_board' => $row['id_board'],
+						'current_topic' => (int) $row['id_topic'],
+						'current_board' => (int) $row['id_board'],
 						'members' => array(),
 					);
 				}
@@ -127,13 +127,13 @@ class MessagesDelete
 				$actioned_messages[$row['id_previous_topic']]['msgs'][$row['id_msg']] = $row['subject'];
 				if ($row['id_member'])
 				{
-					$actioned_messages[$row['id_previous_topic']]['members'][] = $row['id_member'];
+					$actioned_messages[$row['id_previous_topic']]['members'][] = (int) $row['id_member'];
 				}
 			}
 		);
 
 		// Check for topics we are going to fully restore.
-		foreach ($actioned_messages as $topic => $data)
+		foreach (array_keys($actioned_messages) as $topic)
 		{
 			if (in_array($topic, $this->_topics_to_restore))
 			{
@@ -155,7 +155,7 @@ class MessagesDelete
 					'previous_topics' => $previous_topics,
 				)
 			)->fetch_callback(
-				function ($row) use (&$previous_topics) {
+				static function ($row) use (&$previous_topics) {
 					$previous_topics[$row['id_topic']] = array(
 						'board' => $row['id_board'],
 						'subject' => $row['subject'],
@@ -216,7 +216,6 @@ class MessagesDelete
 	 * @param int[] $msgs
 	 * @param int $from_topic
 	 * @param int $target_topic
-	 * @throws \ElkArte\Exceptions\Exception
 	 */
 	private function _mergePosts($msgs, $from_topic, $target_topic)
 	{
@@ -231,9 +230,7 @@ class MessagesDelete
 		}
 
 		// Lets make sure they are int.
-		$msgs = array_map(function ($value) {
-			return (int) $value;
-		}, $msgs);
+		$msgs = array_map(static fn($value) => (int) $value, $msgs);
 
 		// Get the source information.
 		$request = $db->query('', '
@@ -246,7 +243,7 @@ class MessagesDelete
 				'from_topic' => $from_topic,
 			)
 		);
-		list ($from_board, $from_first_msg, $from_replies, $from_unapproved_posts) = $request->fetch_row();
+		[$from_board, $from_first_msg, $from_replies, $from_unapproved_posts] = $request->fetch_row();
 		$request->free_result();
 
 		// Get some target topic and board stats.
@@ -260,7 +257,7 @@ class MessagesDelete
 				'target_topic' => $target_topic,
 			)
 		);
-		list ($target_board, $target_first_msg, $target_replies, $target_unapproved_posts, $count_posts) = $request->fetch_row();
+		[$target_board, $target_first_msg, $target_replies, $target_unapproved_posts, $count_posts] = $request->fetch_row();
 		$request->free_result();
 
 		// Lets see if the board that we are returning to has post count enabled.
@@ -278,7 +275,7 @@ class MessagesDelete
 					'is_approved' => 1,
 				)
 			)->fetch_callback(
-				function ($row) {
+				static function ($row) {
 					updateMemberData($row['id_member'], array('posts' => '+'));
 				}
 			);
@@ -318,14 +315,13 @@ class MessagesDelete
 				'target_topic' => $target_topic,
 			)
 		)->fetch_callback(
-			function ($row) use (&$target_topic_data) {
+			static function ($row) use (&$target_topic_data) {
 				if ($row['id_first_msg'] < $target_topic_data['id_first_msg'])
 				{
 					$target_topic_data['id_first_msg'] = $row['id_first_msg'];
 				}
 
 				$target_topic_data['id_last_msg'] = $row['id_last_msg'];
-
 				if (!$row['approved'])
 				{
 					$target_topic_data['unapproved_posts'] = $row['message_count'];
@@ -363,6 +359,7 @@ class MessagesDelete
 			removeTopics($from_topic, false, true);
 			$topic_exists = false;
 		}
+
 		$request->free_result();
 
 		// Recycled topic.
@@ -387,14 +384,13 @@ class MessagesDelete
 					'from_topic' => $from_topic,
 				)
 			)->fetch_callback(
-				function ($row) use (&$source_topic_data) {
+				static function ($row) use (&$source_topic_data) {
 					if ($row['id_first_msg'] < $source_topic_data['id_first_msg'])
 					{
 						$source_topic_data['id_first_msg'] = $row['id_first_msg'];
 					}
 
 					$source_topic_data['id_last_msg'] = $row['id_last_msg'];
-
 					if (!$row['approved'])
 					{
 						$source_topic_data['unapproved_posts'] = $row['message_count'];
@@ -462,7 +458,7 @@ class MessagesDelete
 					'first_messages' => $cache_updates,
 				)
 			)->fetch_callback(
-				function ($row) {
+				static function ($row) {
 					updateSubjectStats($row['id_topic'], $row['subject']);
 				}
 			);
@@ -546,7 +542,7 @@ class MessagesDelete
 				// Lets get the members that need their post count restored.
 				$db->fetchQuery('
 					SELECT
-					 	id_member, COUNT(id_msg) AS post_count
+						id_member, COUNT(id_msg) AS post_count
 					FROM {db_prefix}messages
 					WHERE id_topic = {int:topic}
 						AND approved = {int:is_approved}
@@ -556,7 +552,7 @@ class MessagesDelete
 						'is_approved' => 1,
 					)
 				)->fetch_callback(
-					function ($member) {
+					static function ($member) {
 						updateMemberData($member['id_member'], array('posts' => 'posts + ' . $member['post_count']));
 					}
 				);
@@ -565,13 +561,14 @@ class MessagesDelete
 			// Log it.
 			logAction('restore_topic', array('topic' => $row['id_topic'], 'board' => $row['id_board'], 'board_to' => $row['id_previous_board']));
 		}
+
 		$request->free_result();
 	}
 
 	/**
-	 * Returns the either the list of messages not found, or the number
+	 * Returns either the list of messages not found, or the number
 	 *
-	 * @param bool $return_msg If true returns the array of unfound messages,
+	 * @param bool $return_msg If true returns the array of not found messages,
 	 *                         if false their number
 	 * @return bool|int[]
 	 */
@@ -606,7 +603,6 @@ class MessagesDelete
 		global $board, $modSettings;
 
 		$db = database();
-		$this->_errors = array();
 
 		$message = (int) $message;
 
@@ -634,6 +630,7 @@ class MessagesDelete
 		{
 			return false;
 		}
+
 		$row = $request->fetch_assoc();
 		$request->free_result();
 
@@ -644,19 +641,17 @@ class MessagesDelete
 			{
 				// This needs to be included for topic functions
 				require_once(SUBSDIR . '/Topic.subs.php');
-
 				removeTopics($row['id_topic']);
-
 				return true;
 			}
-			elseif ($check == 'exit')
+			if ($check === 'exit')
 			{
 				return false;
 			}
 		}
 
 		// Deleting a recycled message can not lower anyone's post count.
-		if ($row['icon'] == 'recycled')
+		if ($row['icon'] === 'recycled')
 		{
 			$decreasePostCount = false;
 		}
@@ -736,7 +731,8 @@ class MessagesDelete
 			{
 				throw new Exceptions\Exception('recycle_no_valid_board');
 			}
-			list ($isRead, $last_board_msg) = $request->fetch_row();
+
+			[$isRead, $last_board_msg] = $request->fetch_row();
 			$request->free_result();
 
 			// Is there an existing topic in the recycle board to group this post with?
@@ -751,7 +747,7 @@ class MessagesDelete
 					'recycle_board' => $this->_recycle_board,
 				)
 			);
-			list ($id_recycle_topic, $first_topic_msg, $last_topic_msg) = $request->fetch_row();
+			[$id_recycle_topic, $first_topic_msg, $last_topic_msg] = $request->fetch_row();
 			$request->free_result();
 
 			// Insert a new topic in the recycle board if $id_recycle_topic is empty.
@@ -959,7 +955,7 @@ class MessagesDelete
 			require_once(SUBSDIR . '/FollowUps.subs.php');
 
 			// If it is an entire topic
-			if ($row['id_first_msg'] == $message)
+			if ((int) $row['id_first_msg'] === (int) $message)
 			{
 				$db->query('', '
 					DELETE FROM {db_prefix}follow_ups
@@ -978,15 +974,13 @@ class MessagesDelete
 		updateMessageStats();
 		require_once(SUBSDIR . '/Topic.subs.php');
 		updateTopicStats();
-		updateSettings(array(
-			'calendar_updated' => time(),
-		));
+		updateSettings(['calendar_updated' => time(),]);
 
 		// And now to update the last message of each board we messed with.
 		require_once(SUBSDIR . '/Post.subs.php');
 		if ($recycle)
 		{
-			updateLastMessages(array($row['id_board'], $this->_recycle_board));
+			updateLastMessages([$row['id_board'], $this->_recycle_board]);
 		}
 		else
 		{
@@ -1003,11 +997,17 @@ class MessagesDelete
 		}
 
 		// Add it to the mod log.
-		if (allowedTo('delete_any') && (!allowedTo('delete_own') || $row['id_member'] != $this->user->id))
+		if (!allowedTo('delete_any'))
 		{
-			logAction('delete', array('topic' => $row['id_topic'], 'subject' => $row['subject'], 'member' => $row['id_member'], 'board' => $row['id_board']));
+			return false;
 		}
 
+		if (allowedTo('delete_own') && $row['id_member'] == $this->user->id)
+		{
+			return false;
+		}
+
+		logAction('delete', array('topic' => $row['id_topic'], 'subject' => $row['subject'], 'member' => $row['id_member'], 'board' => $row['id_board']));
 		return false;
 	}
 
@@ -1041,6 +1041,7 @@ class MessagesDelete
 		{
 			$changeMe[] = $row['id_member'];
 		}
+
 		$request->free_result();
 
 		// Remove the mentions!
@@ -1122,9 +1123,9 @@ class MessagesDelete
 			}
 
 			// Can't delete an unapproved message, if you can't see it!
-			if ($modSettings['postmod_active'] && !$row['approved'] && $row['id_member'] != $this->user->id && !(in_array(0, $delete_any) || in_array($row['id_board'], $delete_any)))
+			if ($modSettings['postmod_active'] && !$row['approved'] && $row['id_member'] != $this->user->id && (!in_array(0, $delete_any) && !in_array($row['id_board'], $delete_any)))
 			{
-				$approve_posts = !empty($this->user->mod_cache['ap']) ? $this->user->mod_cache['ap'] : boardsAllowedTo('approve_posts');
+				$approve_posts = empty($this->user->mod_cache['ap']) ? boardsAllowedTo('approve_posts') : $this->user->mod_cache['ap'];
 				if (!in_array(0, $approve_posts) && !in_array($row['id_board'], $approve_posts))
 				{
 					return 'exit';
@@ -1181,12 +1182,12 @@ class MessagesDelete
 					$remove_own = boardsAllowedTo('remove_own');
 					$remove_own = in_array(0, $remove_own) || in_array($row['id_board'], $remove_own);
 				}
-
 				if ($row['id_member'] != $this->user->id && !$remove_any)
 				{
 					throw new Exceptions\Exception('cannot_remove_any', 'permission');
 				}
-				elseif (!$remove_any && !$remove_own)
+
+				if (!$remove_any && !$remove_own)
 				{
 					throw new Exceptions\Exception('cannot_remove_own', 'permission');
 				}

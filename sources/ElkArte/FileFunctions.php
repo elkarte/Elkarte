@@ -13,11 +13,11 @@
 
 namespace ElkArte;
 
-use \Exception;
+use Exception;
 
 class FileFunctions
 {
-	/** @var \ElkArte\FileFunctions The instance of the class */
+	/** @var FileFunctions The instance of the class */
 	private static $_instance;
 
 	/**
@@ -97,7 +97,7 @@ class FileFunctions
 
 		if ($mode == decoct(octdec($mode)))
 		{
-			$result = @chmod($item, intval($mode, 8));
+			return @chmod($item, intval($mode, 8));
 		}
 
 		return $result;
@@ -114,13 +114,13 @@ class FileFunctions
 	{
 		try
 		{
-			$dir = new \SplFileInfo($dir);
-			if ($dir->isDir() && $dir->getType() === 'dir' && !$dir->isLink())
+			$splDir = new \SplFileInfo($dir);
+			if ($splDir->isDir() && $splDir->getType() === 'dir' && !$splDir->isLink())
 			{
 				return true;
 			}
 		}
-		catch (\RuntimeException $e)
+		catch (\RuntimeException)
 		{
 			return false;
 		}
@@ -145,7 +145,7 @@ class FileFunctions
 				return true;
 			}
 		}
-		catch (\RuntimeException $e)
+		catch (\RuntimeException)
 		{
 			return false;
 		}
@@ -169,7 +169,7 @@ class FileFunctions
 				return $perms;
 			}
 		}
-		catch (\RuntimeException $e)
+		catch (\RuntimeException)
 		{
 			return false;
 		}
@@ -191,7 +191,7 @@ class FileFunctions
 			$fileInfo = new \SplFileInfo($item);
 			$size = $fileInfo->getSize();
 		}
-		catch (\RuntimeException $e)
+		catch (\RuntimeException)
 		{
 			$size = false;
 		}
@@ -216,7 +216,7 @@ class FileFunctions
 				return true;
 			}
 		}
-		catch (\RuntimeException $e)
+		catch (\RuntimeException)
 		{
 			return false;
 		}
@@ -255,19 +255,20 @@ class FileFunctions
 		// Normalize windows and linux path's
 		$path = str_replace('\\', DIRECTORY_SEPARATOR, $path);
 		$path = rtrim($path, DIRECTORY_SEPARATOR);
+
 		$tree = explode(DIRECTORY_SEPARATOR, $path);
 		$count = empty($tree) ? 0 : count($tree);
 		$partialTree = '';
 
 		// Make sure we have a valid path format
-		$directory = !empty($tree) ? $this->_initDir($tree, $count) : false;
+		$directory = empty($tree) ? false : $this->_initDir($tree, $count);
 		if ($directory === false)
 		{
 			// Maybe it's just the folder name
-			$tree = explode(DIRECTORY_SEPARATOR,BOARDDIR . DIRECTORY_SEPARATOR . $path);
+			$tree = explode(DIRECTORY_SEPARATOR, BOARDDIR . DIRECTORY_SEPARATOR . $path);
 			$count = empty($tree) ? 0 : count($tree);
 
-			$directory = !empty($tree) ? $this->_initDir($tree, $count) : false;
+			$directory = empty($tree) ? false : $this->_initDir($tree, $count);
 			if ($directory === false)
 			{
 				throw new Exception('attachments_no_create');
@@ -285,10 +286,8 @@ class FileFunctions
 				{
 					throw new Exception('attach_dir_duplicate_file');
 				}
-				else
-				{
-					break;
-				}
+
+				break;
 			}
 		}
 
@@ -338,13 +337,7 @@ class FileFunctions
 		}
 
 		error_clear_last();
-
-		if (!@unlink($path))
-		{
-			return false;
-		}
-
-		return true;
+		return @unlink($path);
 	}
 
 	/**
@@ -451,7 +444,7 @@ class FileFunctions
 				continue;
 			}
 
-			$sub_path = str_replace($path,'', $file->getPath());
+			$sub_path = str_replace($path, '', $file->getPath());
 
 			$tree[] = [
 				'filename' => $sub_path === '' ? $file->getFilename() : $sub_path . '/' . $file->getFilename(),
@@ -466,7 +459,7 @@ class FileFunctions
 	/**
 	 * Being a singleton, use this static method to retrieve the instance of the class
 	 *
-	 * @return \ElkArte\FileFunctions An instance of the class.
+	 * @return FileFunctions An instance of the class.
 	 */
 	public static function instance()
 	{

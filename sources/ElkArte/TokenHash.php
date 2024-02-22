@@ -23,18 +23,10 @@ namespace ElkArte;
  */
 class TokenHash
 {
-	/**
-	 * Available characters for private salt
-	 *
-	 * @var string
-	 */
+	/** @var string Available characters for private salt */
 	private $itoa64;
 
-	/**
-	 * Random salt to feed crypt
-	 *
-	 * @var string
-	 */
+	/** @var string Random salt to feed crypt */
 	private $_salt = '';
 
 	/**
@@ -98,8 +90,8 @@ class TokenHash
 	private function _prepareToken($hash, $length)
 	{
 		// Strip off the salt and just use the crypt value
-		$hash = explode('$', $hash);
-		$token = array_pop($hash);
+		$ourHash = explode('$', $hash);
+		$token = array_pop($ourHash);
 
 		// For our purposes lets stay with alphanumeric values only
 		$token = preg_replace('~\W~', '', $token);
@@ -108,7 +100,7 @@ class TokenHash
 		$short = $length + 10 - strlen($token);
 		if ($short > 0)
 		{
-			$token = str_pad($token, $short, $this->_private_salt($this->get_random_bytes($short)), STR_PAD_RIGHT);
+			return str_pad($token, $short, $this->_private_salt($this->get_random_bytes($short)), STR_PAD_RIGHT);
 		}
 
 		return $token;

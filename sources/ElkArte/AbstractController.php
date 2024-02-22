@@ -14,10 +14,14 @@
 namespace ElkArte;
 
 /**
- * Abstract base class for controllers.
+ * AbstractController class
  *
- * - Requires a default action handler, action_index().
- * - Defines an empty implementation for pre_dispatch() method.
+ * This class serves as a base class for all controllers in the application.
+ * It provides common functionality and methods that can be used by its subclasses.
+ *
+ *  - Requires a default action handler, action_index().
+ *  - Provides a constructor that loads in HttpReq.  Controllers should use a pre_dispatch class which is called
+ *    by the dispatcher before any other action method.
  */
 abstract class AbstractController
 {
@@ -34,7 +38,9 @@ abstract class AbstractController
 	protected $user;
 
 	/**
-	 * @param EventManager $eventManager
+	 * Constructor for the class.
+	 *
+	 * @param object $eventManager The event manager object.
 	 */
 	public function __construct($eventManager)
 	{
@@ -42,6 +48,31 @@ abstract class AbstractController
 		$this->_req = HttpReq::instance();
 
 		$this->_events = $eventManager;
+	}
+
+	/**
+	 * Default action handler.
+	 *
+	 * What it does:
+	 *
+	 * - This will be called by the dispatcher in many cases.
+	 * - It may set up a menu, sub-dispatch at its turn to the method matching ?sa= parameter
+	 * or simply forward the request to a known default method.
+	 */
+	abstract public function action_index();
+
+	/**
+	 * Called before any other action method in this class.
+	 *
+	 * What it does:
+	 *
+	 * - Allows for initializations, such as default values or loading templates or language files.
+	 */
+	public function pre_dispatch()
+	{
+		// By default, do nothing.
+		// Sub-classes may implement their prerequisite loading,
+		// such as load the template, load the language(s) file(s)
 	}
 
 	/**
@@ -53,14 +84,14 @@ abstract class AbstractController
 	{
 		global $scripturl, $txt, $modSettings;
 
-		$buttons = array_merge(array(
-			'base' => array(
+		$buttons = array_merge([
+			'base' => [
 				'title' => $txt['home'],
 				'href' => $scripturl,
 				'data-icon' => 'i-home',
 				'show' => true,
 				'action_hook' => true,
-			)), $buttons);
+			]], $buttons);
 
 		$buttons['home']['href'] = getUrl('action', $modSettings['default_forum_action']);
 		$buttons['home']['data-icon'] = 'i-comment-blank';
@@ -78,10 +109,17 @@ abstract class AbstractController
 			$current_action = 'base';
 		}
 
-		if (!empty($_REQUEST['action']) && $_REQUEST['action'] === 'forum')
+		if (empty($_REQUEST['action']))
 		{
-			$current_action = 'home';
+			return;
 		}
+
+		if ($_REQUEST['action'] !== 'forum')
+		{
+			return;
+		}
+
+		$current_action = 'home';
 	}
 
 	/**
@@ -91,11 +129,14 @@ abstract class AbstractController
 	 */
 	public static function canFrontPage()
 	{
-		return in_array('ElkArte\\FrontpageInterface', class_implements(get_called_class()), true);
+		return in_array(FrontpageInterface::class, class_implements(static::class), true);
 	}
 
 	/**
-	 * {@inheritDoc}
+	 * Used to define the parameters the controller may need for the front page
+	 * action to work
+	 *
+	 * - e.g. specify a topic ID or a board listing
 	 */
 	public static function frontPageOptions()
 	{
@@ -103,7 +144,11 @@ abstract class AbstractController
 	}
 
 	/**
-	 * {@inheritDoc}
+	 * Used to validate any parameters the controller may need for the front page
+	 * action to work
+	 *
+	 * - e.g. specify a topic ID
+	 * - should return true or false based on if its able to show the front page
 	 */
 	public static function validateFrontPageOptions($post)
 	{
@@ -111,17 +156,8 @@ abstract class AbstractController
 	}
 
 	/**
-	 * Sets the $this->user property to the current user
-	 *
-	 * @param ValuesContainer $user
-	 */
-	public function setUser($user)
-	{
-		$this->user = $user;
-	}
-
-	/**
-	 * Tells if the controller requires the security framework to be loaded.
+	 * Tells if the controller requires the security framework to be loaded. This is called
+	 * immediately after the controller is initialized.
 	 *
 	 * @param string $action the function name of the current action
 	 *
@@ -179,7 +215,7 @@ abstract class AbstractController
 	public function getModuleClass()
 	{
 		// Use the base controller name for the hook, ie post
-		$module_class = explode('\\', trim(get_class($this), '\\'));
+		$module_class = explode('\\', trim(static::class, '\\'));
 		$module_class = end($module_class);
 
 		return ucfirst($module_class);
@@ -245,32 +281,6 @@ abstract class AbstractController
 	}
 
 	/**
-	 * Default action handler.
-	 *
-	 * What it does:
-	 *
-	 * - This will be called by the dispatcher in many cases.
-	 * - It may set up a menu, sub-dispatch at its turn to the method matching ?sa= parameter
-	 * or simply forward the request to a known default method.
-	 */
-	abstract public function action_index();
-
-	/**
-	 * Called before any other action method in this class.
-	 *
-	 * What it does:
-	 *
-	 * - Allows for initializations, such as default values or
-	 * loading templates or language files.
-	 */
-	public function pre_dispatch()
-	{
-		// By default, do nothing.
-		// Sub-classes may implement their prerequisite loading,
-		// such as load the template, load the language(s) file(s)
-	}
-
-	/**
 	 * An odd function that allows events to request dependencies from properties
 	 * of the class.  Used by the EventManager to allow registered events to access
 	 * values of the class that triggered the event.
@@ -297,7 +307,9 @@ abstract class AbstractController
 	}
 
 	/**
-	 * @return ValuesContainer
+	 * Returns the user object.
+	 *
+	 * @return ValuesContainer the user object.
 	 */
 	public function getUser(): ValuesContainer
 	{
@@ -305,19 +317,13 @@ abstract class AbstractController
 	}
 
 	/**
-	 * Shortcut to register an array of names as events triggered at a certain
-	 * position in the code.
+	 * Sets the $this->user property to the current user
 	 *
-	 * @param string $name - Name of the trigger where the events will be executed.
-	 * @param string $method - The method that will be executed.
-	 * @param string[] $to_register - An array of classes to register.
+	 * @param ValuesContainer $user
 	 */
-	protected function _registerEvent($name, $method, $to_register)
+	public function setUser($user)
 	{
-		foreach ($to_register as $class)
-		{
-			$this->_events->register($name, array($name, array($class, $method, 0)));
-		}
+		$this->user = $user;
 	}
 
 	/**
@@ -340,5 +346,20 @@ abstract class AbstractController
 		}
 
 		return $api;
+	}
+
+	/**
+	 * Shortcut to register an array of names as events triggered at a certain position in the code.
+	 *
+	 * @param string $name - Name of the trigger where the events will be executed.
+	 * @param string $method - The method that will be executed.
+	 * @param string[] $to_register - An array of classes to register.
+	 */
+	protected function _registerEvent($name, $method, $to_register)
+	{
+		foreach ($to_register as $class)
+		{
+			$this->_events->register($name, array($name, array($class, $method, 0)));
+		}
 	}
 }

@@ -16,6 +16,8 @@
 
 namespace ElkArte;
 
+use ElkArte\Cache\Cache;
+use ElkArte\Database\QueryInterface;
 use ElkArte\Exceptions\Exception;
 
 /**
@@ -38,39 +40,27 @@ class UserSettingsLoader
 	/** @var string The member_name field from the db */
 	protected $username = '';
 
-	/** @var \ElkArte\Database\QueryInterface The database object */
-	protected $db;
-
-	/** @var \ElkArte\Cache\Cache The cache object */
-	protected $cache;
-
-	/** @var \ElkArte\Request The request object */
-	protected $req;
-
-	/** @var \ElkArte\ValuesContainerReadOnly The settings data */
+	/** @var ValuesContainerReadOnly The settings data */
 	protected $settings;
 
-	/** @var \ElkArte\ValuesContainer The into data */
+	/** @var ValuesContainer The into data */
 	protected $info;
 
 	/**
 	 * Constructor
 	 *
-	 * @param \ElkArte\Database\QueryInterface $db
-	 * @param \ElkArte\Cache\Cache $cache
-	 * @param \ElkArte\Request $req
+	 * @param QueryInterface $db
+	 * @param Cache $cache
+	 * @param Request $req
 	 */
-	public function __construct($db, $cache, $req)
+	public function __construct(protected $db, protected $cache, protected $req)
 	{
-		$this->db = $db;
-		$this->cache = $cache;
-		$this->req = $req;
 	}
 
 	/**
 	 * Returns the user settings
 	 *
-	 * @return \ElkArte\ValuesContainerReadOnly
+	 * @return ValuesContainerReadOnly
 	 */
 	public function getSettings()
 	{
@@ -80,7 +70,7 @@ class UserSettingsLoader
 	/**
 	 * Returns the user into
 	 *
-	 * @return \ElkArte\ValuesContainer
+	 * @return ValuesContainer
 	 */
 	public function getInfo()
 	{
@@ -214,9 +204,9 @@ class UserSettingsLoader
 		// 4. New session, yet updated < five hours ago? Maybe cache can help.
 		if (
 			ELK !== 'SSI'
-				&& !isset($_REQUEST['api']) && (!isset($_REQUEST['action']) || $_REQUEST['action'] !== '.xml')
-				&& empty($_SESSION['id_msg_last_visit'])
-				&& (!$this->cache->isEnabled() || !$this->cache->getVar($_SESSION['id_msg_last_visit'], 'user_last_visit-' . $this->id, 5 * 3600))
+			&& !isset($_REQUEST['api']) && (!isset($_REQUEST['action']) || $_REQUEST['action'] !== '.xml')
+			&& empty($_SESSION['id_msg_last_visit'])
+			&& (!$this->cache->isEnabled() || !$this->cache->getVar($_SESSION['id_msg_last_visit'], 'user_last_visit-' . $this->id, 5 * 3600))
 		)
 		{
 			// @todo can this be cached?
@@ -312,7 +302,7 @@ class UserSettingsLoader
 		}
 		else
 		{
-			list ($context['login_token_var'], , , $context['login_token']) = $_SESSION['token']['post-login'];
+			[$context['login_token_var'], , , $context['login_token']] = $_SESSION['token']['post-login'];
 		}
 
 		// Do we perhaps think this is a search robot?
@@ -360,7 +350,7 @@ class UserSettingsLoader
 			'mentions' => max(0, (int) $this->settings->mentions),
 			'unread_messages' => (int) $this->settings->unread_messages,
 			'total_time_logged_in' => (int) $this->settings->total_time_logged_in,
-			'buddies' => !empty($modSettings['enable_buddylist']) ? (!empty($this->settings->buddy_list) ? explode(',', (string) $this->settings->buddy_list) : []) : [],
+			'buddies' => empty($modSettings['enable_buddylist']) ? [] : (empty($this->settings->buddy_list) ? [] : explode(',', (string) $this->settings->buddy_list)),
 			'ignoreboards' => explode(',', (string) $this->settings->ignore_boards),
 			'ignoreusers' => explode(',', (string) $this->settings->pm_ignore_list),
 			'warning' => (int) $this->settings->warning,
@@ -383,7 +373,7 @@ class UserSettingsLoader
 		// Otherwise, just the groups in $user_info['groups'].
 		else
 		{
-			$user_info['query_see_board'] = '((FIND_IN_SET(' . implode(', b.member_groups) != 0 OR FIND_IN_SET(', $user_info['groups']) . ', b.member_groups) != 0)' . (!empty($modSettings['deny_boards_access']) ? ' AND (FIND_IN_SET(' . implode(', b.deny_member_groups) = 0 AND FIND_IN_SET(', $user_info['groups']) . ', b.deny_member_groups) = 0)' : '') . (isset($user_info['mod_cache']) ? ' OR ' . $user_info['mod_cache']['mq'] : '') . ')';
+			$user_info['query_see_board'] = '((FIND_IN_SET(' . implode(', b.member_groups) != 0 OR FIND_IN_SET(', $user_info['groups']) . ', b.member_groups) != 0)' . (empty($modSettings['deny_boards_access']) ? '' : ' AND (FIND_IN_SET(' . implode(', b.deny_member_groups) = 0 AND FIND_IN_SET(', $user_info['groups']) . ', b.deny_member_groups) = 0)') . (isset($user_info['mod_cache']) ? ' OR ' . $user_info['mod_cache']['mq'] : '') . ')';
 		}
 
 		$this->db->setSeeBoard($user_info['query_see_board']);
@@ -401,6 +391,7 @@ class UserSettingsLoader
 		{
 			$user_info['query_wanna_see_board'] = '(' . $user_info['query_see_board'] . ' AND b.id_board NOT IN (' . implode(',', $user_info['ignoreboards']) . '))';
 		}
+
 		$this->db->setWannaSeeBoard($user_info['query_wanna_see_board']);
 
 		$this->info = new UserInfo($user_info);
@@ -492,7 +483,7 @@ class UserSettingsLoader
 	 *                         request to delete the account or not
 	 *
 	 * @return bool
-	 * @throws \ElkArte\Exceptions\Exception
+	 * @throws Exception
 	 */
 	public function checkActivation($undelete)
 	{

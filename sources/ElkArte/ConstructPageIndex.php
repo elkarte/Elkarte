@@ -53,14 +53,8 @@ class ConstructPageIndex extends AbstractModel
 	/** @var int max page # to show */
 	private $max_value;
 
-	/** @var int  */
+	/** @var int */
 	private $num_per_page;
-
-	/** @var bool  */
-	private $flexible_start;
-
-	/** @var string  */
-	private $base_url;
 
 	/** @var string */
 	private $base_link;
@@ -87,14 +81,12 @@ class ConstructPageIndex extends AbstractModel
 	 * @param bool $flexible_start
 	 * @param array $show
 	 */
-	public function __construct($base_url, &$start, $max_value, $num_per_page, $flexible_start = false, $show = [])
+	public function __construct(private $base_url, &$start, $max_value, $num_per_page, private $flexible_start = false, $show = [])
 	{
 		$this->start = (int) $start;
 		$this->show = array_merge(['prev_next' => true, 'all' => false], $show);
 		$this->max_value = (int) $max_value;
 		$this->num_per_page = (int) $num_per_page;
-		$this->flexible_start = $flexible_start;
-		$this->base_url = $base_url;
 
 		// Need to pull in modsettings, db and user
 		parent::__construct();
@@ -210,9 +202,8 @@ class ConstructPageIndex extends AbstractModel
 	{
 		$pageindex = $this->setLeftNavigation();
 		$pageindex .= $this->setAll();
-		$pageindex .= $this->setRightNavigation();
 
-		return $pageindex;
+		return $pageindex . $this->setRightNavigation();
 	}
 
 	/**

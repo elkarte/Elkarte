@@ -40,7 +40,7 @@ class Agreement
 	/** @var Object The database object */
 	protected $_db;
 
-	/** @var \ElkArte\FileFunctions  */
+	/** @var FileFunctions */
 	protected $fileFunc;
 
 	/**
@@ -58,6 +58,7 @@ class Agreement
 		{
 			$backup_dir = BOARDDIR . '/packages/backups/' . $this->_backupdir_name;
 		}
+
 		$this->_backup_dir = $backup_dir;
 		$this->_db = database();
 	}
@@ -97,7 +98,7 @@ class Agreement
 		$backup_id = $this->_backupId();
 		if (!$this->_createBackup($backup_id))
 		{
-			$backup_id = false;
+			return false;
 		}
 
 		return $backup_id;
@@ -220,6 +221,15 @@ class Agreement
 		);
 	}
 
+	/**
+	 * Generates a backup ID
+	 *
+	 * This method generates a unique backup ID using the current timestamp.
+	 * If a backup folder with the same ID already exists, a counter is appended to the ID
+	 * until a unique backup ID is generated.
+	 *
+	 * @return string The generated backup ID
+	 */
 	protected function _backupId()
 	{
 		$backup_id = Util::strftime('%Y-%m-%d', forum_time(false));
@@ -271,6 +281,6 @@ class Agreement
 	 */
 	protected function buildName($language)
 	{
- 		return SOURCEDIR . '/ElkArte/Languages/' . $this->_file_name . '/' . $language . '.txt';
+		return SOURCEDIR . '/ElkArte/Languages/' . $this->_file_name . '/' . $language . '.txt';
 	}
 }

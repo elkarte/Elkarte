@@ -29,8 +29,11 @@ use ElkArte\Exceptions\Exception;
 class BoardsTree
 {
 	protected $cat_tree = [];
+
 	protected $boards = [];
+
 	protected $boardList = [];
+
 	protected $db;
 
 	public function __construct(QueryInterface $db)
@@ -62,11 +65,11 @@ class BoardsTree
 			SELECT
 				COALESCE(b.id_board, 0) AS id_board, b.id_parent, b.name AS board_name, b.description, b.child_level,
 				b.board_order, b.count_posts, b.old_posts, b.member_groups, b.id_theme, b.override_theme, b.id_profile, b.redirect,
-				b.num_posts, b.num_topics, b.deny_member_groups, c.id_cat, c.name AS cat_name, c.cat_order, c.can_collapse' . (!empty($query['select']) ?
-				$query['select'] : '') . '
+				b.num_posts, b.num_topics, b.deny_member_groups, c.id_cat, c.name AS cat_name, c.cat_order, c.can_collapse' . (empty($query['select']) ?
+				'' : $query['select']) . '
 			FROM {db_prefix}categories AS c
-				LEFT JOIN {db_prefix}boards AS b ON (b.id_cat = c.id_cat)' . (!empty($query['join']) ?
-				$query['join'] : '') . '
+				LEFT JOIN {db_prefix}boards AS b ON (b.id_cat = c.id_cat)' . (empty($query['join']) ?
+				'' : $query['join']) . '
 			ORDER BY c.cat_order, b.child_level, b.board_order',
 			array()
 		);
@@ -78,17 +81,17 @@ class BoardsTree
 			$row['id_cat'] = (int) $row['id_cat'];
 			if (!isset($this->cat_tree[$row['id_cat']]))
 			{
-				$this->cat_tree[$row['id_cat']] = array(
-					'node' => array(
+				$this->cat_tree[$row['id_cat']] = [
+					'node' => [
 						'id' => $row['id_cat'],
 						'name' => $row['cat_name'],
 						'order' => (int) $row['cat_order'],
 						'can_collapse' => $row['can_collapse']
-					),
+					],
 					'is_first' => empty($this->cat_tree),
 					'last_board_order' => $last_board_order,
 					'children' => []
-				);
+				];
 				$prevBoard = 0;
 				$curLevel = 0;
 			}
@@ -169,11 +172,12 @@ class BoardsTree
 			// Let integration easily add data to $this->boards and $this->cat_tree
 			call_integration_hook('integrate_board_tree', array($row));
 		}
+
 		$request->free_result();
 
 		// Get a list of all the boards in each category (using recursion).
-		$this->boardList = array();
-		foreach ($this->cat_tree as $catID => $node)
+		$this->boardList = [];
+		foreach (array_keys($this->cat_tree) as $catID)
 		{
 			$this->boardsInCategory($catID);
 		}
@@ -202,6 +206,12 @@ class BoardsTree
 		}
 	}
 
+	/**
+	 * Retrieves all the child boards of a given board.
+	 *
+	 * @param int $board_id The ID of the parent board.
+	 * @return array An array of all the child board IDs.
+	 */
 	public function allChildsOf($board_id)
 	{
 		if (empty($this->boards[$board_id]['tree']['children']))
@@ -241,7 +251,7 @@ class BoardsTree
 			return $this->cat_tree[$id];
 		}
 
-		throw new \Exception('Category id doesn\'t exist: ' . $id);
+		throw new \Exception("Category id doesn't exist: " . $id);
 	}
 
 	public function getBoardsInCat($id)
@@ -251,7 +261,7 @@ class BoardsTree
 			return $this->boardList[$id];
 		}
 
-		throw new \Exception('Category id doesn\'t exist: ' . $id);
+		throw new \Exception("Category id doesn't exist: " . $id);
 	}
 
 	public function categoryExists($id)
@@ -271,7 +281,7 @@ class BoardsTree
 			return (int) $this->boards[$id];
 		}
 
-		throw new \Exception('Board id doesn\'t exist: ' . $id);
+		throw new \Exception("Board id doesn't exist: " . $id);
 	}
 
 	/**
@@ -471,9 +481,7 @@ class BoardsTree
 				'parent_board' => $parent,
 			)
 		)->fetch_callback(
-			function ($row) {
-				return $row['id_board'];
-			}
+			static fn($row) => (int) $row['id_board']
 		);
 
 		// ...and set it to a new parent and child_level.

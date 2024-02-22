@@ -15,7 +15,8 @@ namespace ElkArte;
 
 /**
  * Action class defines an action with its associated sub-actions.
- * Object-oriented controllers (with sub-actions) uses it to set their action-subaction arrays, and have it call the
+ *
+ * Object-oriented controllers (with sub-actions) use it to set their action-subaction arrays, and have it call the
  * right function or method handlers.
  *
  * Replaces the sub-actions arrays in every dispatching function.
@@ -33,54 +34,56 @@ class Action
 	/** @var string A (unique !!) id that triggers a hook */
 	protected $_name;
 
-	/** @var \ElkArte\HttpReq Access to post/get data */
+	/** @var HttpReq Access to post/get data */
 	protected $req;
 
 	/**
 	 * Constructor!
 	 *
-	 * @param string $name Hook name
-	 * @param \ElkArte\HttpReq $req Access to post/get data
+	 * @param string|null $name Hook name
+	 * @param HttpReq $req Access to post/get data
 	 */
-	public function __construct(string $name = '', $req = null)
+	public function __construct(string $name = null, $req = null)
 	{
 		$this->_name = $name;
 		$this->req = $req ?: HttpReq::instance();
 	}
 
 	/**
-	 * Initialize the instance with an array of sub-actions. Sets a valid default action is none
-	 * is supplied.  Returns the cleaned subaction or the default action if the subaction is not
-	 * valid / available
+	 * Initialize the instance with an array of sub-actions.
+	 *
+	 * - Sets a valid default action if none is supplied.
+	 * - Returns the cleaned subaction or the default action if the subaction is not valid / available
+	 * - Calls generic integration hook integrate_sa_XYZ where XYZ is the optional named passed via new Action('XYZ')
 	 *
 	 * @param array $subActions array of known subactions
 	 * The accepted array format is:
-	 *   'sub_action name' => 'function name',
+	 *   'sub_action name' => 'function name'
 	 *  or
-	 *   'sub_action name' => array('function' => 'function name'),
-	 *  or
-	 *   'sub_action name' => array(
-	 *   	'controller' => 'controller name',
-	 *   	'function' => 'method name',
-	 *   	'enabled' => true/false,
-	 *   	'permission' => area),
+	 *   'sub_action name' => array('function' => 'function name')
 	 *  or
 	 *   'sub_action name' => array(
-	 *   	'controller object, i.e. $this',
-	 *   	'method name',
-	 *   	'enabled' => true/false
-	 *   	'permission' => area),
+	 *      'controller' => 'controller name',
+	 *      'function' => 'method name',
+	 *      'enabled' => true/false,
+	 *      'permission' => area),
 	 *  or
 	 *   'sub_action name' => array(
-	 *   	'controller' => 'controller name',
-	 *   	'function' => 'method name',
-	 *   	'enabled' => true/false,
-	 *   	'permission' => area)
+	 *      'controller object, i.e. $this',
+	 *      'method name',
+	 *      'enabled' => true/false
+	 *      'permission' => area),
+	 *  or
+	 *   'sub_action name' => array(
+	 *      'controller' => 'controller name',
+	 *      'function' => 'method name',
+	 *      'enabled' => true/false,
+	 *      'permission' => area)
 	 *
 	 *  If `enabled` is not present, it is assumed to be true.
 	 *
-	 * @param string $default default action if unknown sa is requested
-	 * @param string $requestParam key to check HTTP GET value, defaults to `sa`
+	 * @param string $default default action if an unknown sa is requested
+	 * @param string $requestParam key to check for the HTTP GET value, defaults to `sa`
 	 *
 	 * @event  integrate_sa_ the name specified in the constructor is appended to this
 	 *
@@ -89,7 +92,7 @@ class Action
 	public function initialize(array $subActions, string $default = '', string $requestParam = 'sa'): string
 	{
 		// Controller action initialized as new Action('xyz'), then call xyz integration hook
-		if ($this->_name !== '')
+		if ($this->_name !== null)
 		{
 			call_integration_hook('integrate_sa_' . $this->_name, [&$subActions]);
 		}
@@ -97,17 +100,12 @@ class Action
 		$this->_subActions = array_filter(
 			$subActions,
 			static function ($subAction) {
-				if (isset($subAction['disabled']) && $subAction['disabled'] == true)
+				if (isset($subAction['disabled']) && ($subAction['disabled'] === true || $subAction['disabled'] === 'true'))
 				{
 					return false;
 				}
 
-				if (isset($subAction['enabled']) && $subAction['enabled'] == false)
-				{
-					return false;
-				}
-
-				return true;
+				return !(isset($subAction['enabled']) && ($subAction['enabled'] === false || $subAction['enabled'] === 'false'));
 			}
 		);
 
@@ -121,8 +119,9 @@ class Action
 	/**
 	 * Call the function or method for the selected subaction.
 	 *
-	 * Both the controller and the method are set up in the subactions array. If a
-	 * controller is not specified, the function is assumed to be a regular callable.
+	 * - Both the controller and the method are set up in the subactions array.
+	 * - If a controller is not specified, the function is assumed to be a regular callable.
+	 * - Checks on permission of the $sub_id IF a permission area/check was passed.
 	 *
 	 * @param string $sub_id a valid index in the subactions array
 	 */
@@ -146,9 +145,10 @@ class Action
 			{
 				// Pointer to a controller to load
 				$controller = new $subAction['controller'](new EventManager());
-				$controller->setUser(User::$info);
 
 				// always set up the environment
+				$controller->getHook();
+				$controller->setUser(User::$info);
 				$controller->pre_dispatch();
 			}
 
@@ -161,7 +161,7 @@ class Action
 			$call = [$subAction[0], $subAction[1]];
 		}
 
-		call_user_func($call);
+		$call();
 	}
 
 	/**
@@ -169,13 +169,10 @@ class Action
 	 * given action, and throw an error otherwise.
 	 *
 	 * @param string $sub_id The sub action
-	 *
-	 * @return bool
-	 * @throws \ElkArte\Exceptions\Exception
 	 */
 	protected function isAllowedTo(string $sub_id): bool
 	{
-		if (isset($this->_subActions[$sub_id], $this->_subActions[$sub_id]['permission']))
+		if (isset($this->_subActions[$sub_id]['permission']))
 		{
 			isAllowedTo($this->_subActions[$sub_id]['permission']);
 		}

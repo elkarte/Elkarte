@@ -22,11 +22,7 @@ namespace ElkArte;
  */
 class ValuesContainer implements \ArrayAccess
 {
-	/**
-	 * The array that holds all the data collected by the object.
-	 *
-	 * @var array
-	 */
+	/** @var array The array that holds all the data collected by the object. */
 	protected $data = [];
 
 	/**
@@ -43,10 +39,11 @@ class ValuesContainer implements \ArrayAccess
 	}
 
 	/**
-	 * Setter
+	 * Sets the value of the specified key in the data array.
 	 *
-	 * @param string|int $key
-	 * @param mixed $val
+	 * @param string $key The key to be set.
+	 * @param mixed $val The value to be set for the specified key.
+	 * @return void
 	 */
 	public function __set($key, $val)
 	{
@@ -54,10 +51,11 @@ class ValuesContainer implements \ArrayAccess
 	}
 
 	/**
-	 * Getter, return the value or null if its not set
+	 * Retrieves the value of the specified key from the data array.
+	 * If the key does not exist, null is returned.
 	 *
-	 * @param string|int $key
-	 * @return mixed
+	 * @param string $key The key of the value to retrieve from the data array.
+	 * @return mixed|null The value associated with the specified key, or null if the key does not exist.
 	 */
 	public function __get($key)
 	{
@@ -82,11 +80,13 @@ class ValuesContainer implements \ArrayAccess
 	}
 
 	/**
-	 * Calling as method.  Return the key if found, if not return the argument value.
+	 * Dynamically handles method calls on the object.
+	 * Returns the value of the specified key in the internal data array if it exists,
+	 * otherwise, returns the first argument passed to the method, or null if no arguments were provided.
 	 *
-	 * @param string|int $key
-	 * @param array $args
-	 * @return mixed
+	 * @param string $key The name of the key to retrieve from the internal data array.
+	 * @param array $args Optional arguments that can be passed to the method.
+	 * @return mixed|null The value of the specified key in the internal data array, the first argument passed to the method, or null if no arguments were provided.
 	 */
 	public function __call($key, $args)
 	{
@@ -94,10 +94,11 @@ class ValuesContainer implements \ArrayAccess
 	}
 
 	/**
-	 * Tests if the key is set.
+	 * Checks if a specific key exists in the data array.
+	 * Same as calling `isset()` on the data array with the given key.
 	 *
-	 * @param string|int $key
-	 * @return bool
+	 * @param mixed $key The key to check for existence in the data array.
+	 * @return bool Returns true if the key exists in the data array, false otherwise.
 	 */
 	public function __isset($key)
 	{
@@ -110,7 +111,7 @@ class ValuesContainer implements \ArrayAccess
 	 * @param mixed|array $offset
 	 * @param string $value
 	 */
-	public function offsetSet($offset, $value) : void
+	public function offsetSet($offset, $value): void
 	{
 		if (is_null($offset))
 		{
@@ -123,12 +124,12 @@ class ValuesContainer implements \ArrayAccess
 	}
 
 	/**
-	 * Tests if an offset key is set.
+	 * Checks if the specified offset exists in the data array.
 	 *
-	 * @param string|int $offset
-	 * @return bool
+	 * @param mixed $offset The offset to check.
+	 * @return bool Returns true if the offset exists, otherwise false.
 	 */
-	public function offsetExists($offset) : bool
+	public function offsetExists($offset): bool
 	{
 		return isset($this->data[$offset]);
 	}
@@ -138,7 +139,7 @@ class ValuesContainer implements \ArrayAccess
 	 *
 	 * @param string|int $offset
 	 */
-	public function offsetUnset($offset) : void
+	public function offsetUnset($offset): void
 	{
 		unset($this->data[$offset]);
 	}

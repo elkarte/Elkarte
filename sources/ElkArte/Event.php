@@ -26,19 +26,15 @@ class Event
 	protected $_sorted = false;
 
 	/** @var string[] List of classes. */
-	protected $_events = array();
-
-	/** @var object The priority object. */
-	protected $_priority = array();
+	protected $_events = [];
 
 	/**
 	 * Initialize the class.
 	 *
-	 * @param Priority $priority the object that handles priorities
+	 * @param Priority $_priority the object that handles priorities
 	 */
-	public function __construct($priority)
+	public function __construct(protected $_priority)
 	{
-		$this->_priority = $priority;
 	}
 
 	/**
@@ -99,7 +95,7 @@ class Event
 	 */
 	public function getEvents()
 	{
-		$return = array();
+		$return = [];
 
 		if (!$this->_sorted)
 		{

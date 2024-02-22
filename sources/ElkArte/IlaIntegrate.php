@@ -41,14 +41,14 @@ class IlaIntegrate
 
 		if (empty($modSettings['attachment_inline_enabled']))
 		{
-			return array();
+			return [];
 		}
 
 		// $hook, $function, $file
-		return array(
-			array('integrate_additional_bbc', '\\ElkArte\\IlaIntegrate::integrate_additional_bbc'),
-			array('integrate_post_bbc_parser', '\\ElkArte\\IlaIntegrate::integrate_post_parser')
-		);
+		return [
+			['integrate_additional_bbc', '\\ElkArte\\IlaIntegrate::integrate_additional_bbc'],
+			['integrate_post_bbc_parser', '\\ElkArte\\IlaIntegrate::integrate_post_parser']
+		];
 	}
 
 	/**
@@ -59,9 +59,9 @@ class IlaIntegrate
 	public static function settingsRegister()
 	{
 		// $hook, $function, $file
-		return array(
-			array('integrate_modify_attachment_settings', '\\ElkArte\\IlaIntegrate::integrate_modify_attachment_settings'),
-		);
+		return [
+			['integrate_modify_attachment_settings', '\\ElkArte\\IlaIntegrate::integrate_modify_attachment_settings'],
+		];
 	}
 
 	/**
@@ -73,7 +73,7 @@ class IlaIntegrate
 	{
 		global $context;
 
-		$lighbox_message = 'data-lightboxmessage="' . (!empty($context['id_msg']) ? $context['id_msg'] : '0') . '"';
+		$lighbox_message = 'data-lightboxmessage="' . (empty($context['id_msg']) ? '0' : $context['id_msg']) . '"';
 		$message = str_replace('data-lightboxmessage="0"', $lighbox_message, $message);
 	}
 
@@ -87,13 +87,13 @@ class IlaIntegrate
 		global $modSettings, $txt;
 
 		// Generally we don't want to render in these tags ...
-		$disallow = array(
+		$disallow = [
 			'quote' => 1,
 			'code' => 1,
 			'nobbc' => 1,
 			'html' => 1,
 			'php' => 1,
-		);
+		];
 
 		// Why enable it to disable the tags, oh well
 		$disabledBBC = empty($modSettings['disabledBBC']) ? array() : explode(',', $modSettings['disabledBBC']);
@@ -283,6 +283,7 @@ class IlaIntegrate
 			// Grab the tags content value, at this point it will have completed parameter exchange
 			$parameters = $tag[Codes::ATTR_CONTENT] ?? '~~~';
 			$parameters = explode('~', $parameters);
+
 			$style = $parameters[0] ?? '';
 			$class = $parameters[1] ?? '';
 			$type = $parameters[2] ?? (empty($style) ? ';thumb' : '');
@@ -296,11 +297,11 @@ class IlaIntegrate
 			// An image will get the light box treatment
 			elseif (!empty($attachment['is_image']) || $preview)
 			{
-				$type = !empty($modSettings['attachmentThumbnails']) ? $type : '';
+				$type = empty($modSettings['attachmentThumbnails']) ? '' : $type;
 				$alt = Util::htmlspecialchars($attachment['filename'] ?? 'X');
 				self::$typeTag = '
 					<a id="link_$1" data-lightboximage="$1" data-lightboxmessage="0" href="' . getUrl('action', ['action' => 'dlattach', 'attach' => '$1', 'image']) . '">
-						<img src="' . getUrl('action', ['action' => 'dlattach', 'attach' => '$1']) . $type .'" style="' . $style . '" alt="' . $alt . '" class="bbc_img ' . $class . '" loading="lazy" />
+						<img src="' . getUrl('action', ['action' => 'dlattach', 'attach' => '$1']) . $type . '" style="' . $style . '" alt="' . $alt . '" class="bbc_img ' . $class . '" loading="lazy" />
 					</a>';
 			}
 			// Not an image, determine a mime thumbnail or use a default thumbnail

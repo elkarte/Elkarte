@@ -25,76 +25,41 @@ namespace ElkArte;
  * - Fetch cleaned values with $instance->getPost('keyname', 'sanitation needs', 'default value')
  *     - $this->-req->getPost('filename', 'trim|strval', '');
  *     - $this->-req->getQuery('filename', 'intval', 0);
+ *     - Can use rules as 'htmlspecialchars[ENT_COMPAT]', '\\ElkArte\\Util::htmlspecialchars[ENT_QUOTES]'
  */
 class HttpReq
 {
-	/**
-	 * The returned POST values
-	 *
-	 * @var object
-	 */
+	/** @var object The returned POST values */
 	public $post;
 
-	/**
-	 * The compiled post values (json and cleaned from request)
-	 *
-	 * @var array
-	 */
+	/** @var array The compiled post values (json and cleaned from request) */
 	private $_derived_post;
 
-	/**
-	 * The returned GET values
-	 *
-	 * @var object
-	 */
+	/** @var object The returned GET values */
 	public $query;
 
-	/**
-	 * The returned COOKIE values
-	 *
-	 * @var object
-	 */
+	/** @var object The returned COOKIE values */
 	public $cookie;
 
-	/**
-	 * The returned SESSION values
-	 *
-	 * @var object
-	 */
+	/** @var object The returned SESSION values */
 	public $session;
 
-	/**
-	 * The returned SERVER values
-	 *
-	 * @var object
-	 */
+	/** @var object The returned SERVER values */
 	public $server;
 
-	/**
-	 * Sole private \ElkArte\HttpReq instance
-	 *
-	 * @var \ElkArte\HttpReq
-	 */
-	private static $instance = null;
+	/** @var HttpReq Sole private \ElkArte\HttpReq instance */
+	private static $instance;
 
-	/**
-	 * Used to hold processed (sanitised) values
-	 *
-	 * @var array
-	 */
+	/** @var array Used to hold processed (sanitised) values */
 	private $_param;
 
-	/**
-	 * holds instance of the validator
-	 *
-	 * @var \ElkArte\DataValidator
-	 */
+	/** @var DataValidator holds instance of the validator */
 	protected $_dataValidator;
 
 	/**
 	 * Class constructor, sets PHP globals to class members
 	 *
-	 * @param $dataValidator \ElkArte\DataValidator|null Instance of the data validator
+	 * @param $dataValidator DataValidator|null Instance of the data validator
 	 */
 	private function __construct($dataValidator = null)
 	{
@@ -197,17 +162,17 @@ class HttpReq
 	 */
 	public function __get($key)
 	{
-		switch (true)
+		if (isset($this->_param[$key]))
 		{
-			case isset($this->_param[$key]):
-				return $this->_param[$key];
-			case isset($this->query->{$key}):
-				return $this->query->{$key};
-			case isset($this->post->{$key}):
-				return $this->post->{$key};
-			default:
-				return null;
+			return $this->_param[$key];
 		}
+
+		if (isset($this->query->{$key}))
+		{
+			return $this->query->{$key};
+		}
+
+		return $this->post->{$key} ?? null;
 	}
 
 	/**
@@ -248,15 +213,11 @@ class HttpReq
 	 */
 	public function __isset($key)
 	{
-		switch (true)
+		return match (true)
 		{
-			case isset($this->post->{$key}):
-			case isset($this->query->{$key}):
-			case isset($this->_param[$key]):
-				return true;
-			default:
-				return false;
-		}
+			isset($this->post->{$key}), isset($this->query->{$key}), isset($this->_param[$key]) => true,
+			default => false,
+		};
 	}
 
 	/**
@@ -407,14 +368,8 @@ class HttpReq
 		{
 			return $this->cookie->{$name};
 		}
-		elseif ($default !== null)
-		{
-			return $default;
-		}
-		else
-		{
-			return null;
-		}
+
+		return $default ?? null;
 	}
 
 	/**
@@ -433,14 +388,8 @@ class HttpReq
 		{
 			return $this->session->{$name};
 		}
-		elseif ($default !== null)
-		{
-			return $default;
-		}
-		else
-		{
-			return null;
-		}
+
+		return $default ?? null;
 	}
 
 	/**
@@ -460,12 +409,12 @@ class HttpReq
 		}
 
 		// To the validator
-		$this->_dataValidator->validation_rules(array());
-		$this->_dataValidator->sanitation_rules(array($name => $sanitize));
+		$this->_dataValidator->validation_rules();
+		$this->_dataValidator->sanitation_rules([$name => $sanitize]);
 
 		if (is_array($this->_param[$name]))
 		{
-			$this->_dataValidator->input_processing(array($name => 'array'));
+			$this->_dataValidator->input_processing([$name => 'array']);
 		}
 
 		$this->_dataValidator->validate($this->_param);
@@ -498,7 +447,7 @@ class HttpReq
 	/**
 	 * Retrieve the sole instance of this class.
 	 *
-	 * @return \ElkArte\HttpReq
+	 * @return HttpReq
 	 */
 	public static function instance()
 	{

@@ -46,12 +46,6 @@ class SiteCombiner
 	/** @var string Holds the minified data of the combined files */
 	private $_minified_cache;
 
-	/** @var string The directory where we will save the combined and packed files */
-	private $_archive_dir;
-
-	/** @var string The url where we will save the combined and packed files */
-	private $_archive_url;
-
 	/** @var string The stale parameter added to the url */
 	private $_archive_stale = CACHE_STALE;
 
@@ -67,14 +61,12 @@ class SiteCombiner
 	/**
 	 * Nothing much to do but start
 	 *
-	 * @param string $cachedir
-	 * @param string $cacheurl
+	 * @param string $_archive_dir
+	 * @param string $_archive_url
 	 * @param bool $minimize
 	 */
-	public function __construct($cachedir, $cacheurl, $minimize = true)
+	public function __construct(private $_archive_dir, private $_archive_url, $minimize = true)
 	{
-		$this->_archive_dir = $cachedir;
-		$this->_archive_url = $cacheurl;
 		$this->_minify = $minimize ?? true;
 		$this->fileFunc = FileFunctions::instance();
 	}
@@ -103,10 +95,17 @@ class SiteCombiner
 			$load = (!$do_deferred && empty($file['options']['defer'])) || ($do_deferred && !empty($file['options']['defer']));
 
 			// Get the ones that we would load locally, so we can merge them
-			if ($load && (empty($file['options']['local']) || !$this->_addFile($file['options'])))
+			if (!$load)
 			{
-				$this->_addSpare(array($id => $file));
+				continue;
 			}
+
+			if (!empty($file['options']['local']) && $this->_addFile($file['options']))
+			{
+				continue;
+			}
+
+			$this->_addSpare(array($id => $file));
 		}
 
 		// Nothing to combine
@@ -156,12 +155,7 @@ class SiteCombiner
 		}
 
 		// Directory not writable then we are done
-		if (!$this->_validDestination())
-		{
-			return false;
-		}
-
-		return true;
+		return $this->_validDestination();
 	}
 
 	/**
@@ -402,14 +396,7 @@ class SiteCombiner
 			{
 				$this->_combineFiles('js');
 
-				if (!empty($this->_min_cache))
-				{
-					$this->_minified_cache = $this->_min_cache;
-				}
-				else
-				{
-					$this->_minified_cache = trim($this->jsMinify($this->_cache));
-				}
+				$this->_minified_cache = empty($this->_min_cache) ? trim($this->jsMinify($this->_cache)) : $this->_min_cache;
 
 				$this->_saveFiles();
 			}
@@ -548,14 +535,7 @@ class SiteCombiner
 			if ($this->_isStale())
 			{
 				$this->_combineFiles('css');
-				if (!empty($this->_min_cache))
-				{
-					$this->_minified_cache = $this->_min_cache;
-				}
-				else
-				{
-					$this->_minified_cache = trim($this->cssMinify($this->_cache));
-				}
+				$this->_minified_cache = empty($this->_min_cache) ? trim($this->cssMinify($this->_cache)) : $this->_min_cache;
 
 				$this->_saveFiles();
 			}

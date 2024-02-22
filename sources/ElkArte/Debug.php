@@ -22,69 +22,41 @@ namespace ElkArte;
  */
 class Debug
 {
-	/**
-	 * The instance of the class
-	 *
-	 * @var object
-	 */
-	private static $_instance = null;
-	/**
-	 * This is used to remember if the debug is on or off
-	 *
-	 * @var bool
-	 */
+	/** @var object The instance of the class */
+	private static $_instance;
+
+	/** @var bool This is used to remember if the debug is on or off */
 	private $_track = true;
-	/**
-	 * A list of known debug entities (here to preserve a kind of order)
-	 *
-	 * @var array
-	 */
-	private $_debugs = array(
-		'templates' => array(),
-		'sub_templates' => array(),
-		'language_files' => array(),
-		'sheets' => array(),
-		'javascript' => array(),
-		'hooks' => array(),
-		'files_included' => array(),
-		'tokens' => array(),
-	);
-	/**
-	 * Holds the output ot the getrusage php function
-	 *
-	 * @var array
-	 */
-	private $_rusage = array();
-	/**
-	 * Holds All the cache hits for a page load
-	 *
-	 * @var string[]
-	 */
-	private $_cache_hits = array();
-	/**
-	 * Number of times the cache has been used
-	 *
-	 * @var int
-	 */
+
+	/** @var array A list of known debug entities (here to preserve a kind of order) */
+	private $_debugs = [
+		'templates' => [],
+		'sub_templates' => [],
+		'language_files' => [],
+		'sheets' => [],
+		'javascript' => [],
+		'hooks' => [],
+		'files_included' => [],
+		'tokens' => [],
+	];
+
+	/** @var array Holds the output ot the getrusage php function */
+	private $_rusage = [];
+
+	/** @var string[] Holds All the cache hits for a page load */
+	private $_cache_hits = [];
+
+	/** @var int Number of times the cache has been used */
 	private $_cache_count = 0;
-	/**
-	 * All the queries executed
-	 *
-	 * @var array
-	 */
-	private $_db_cache = array();
-	/**
-	 * Number of queries
-	 *
-	 * @var int
-	 */
+
+	/** @var array All the queries executed */
+	private $_db_cache = [];
+
+	/** @var int Number of queries */
 	private $_db_count = 0;
-	/**
-	 * Some generic "system" debug info
-	 *
-	 * @var string[]
-	 */
-	private $_system = array();
+
+	/** @var string[] Some generic "system" debug info */
+	private $_system = [];
 
 	/**
 	 * Return the single instance of this class
@@ -105,10 +77,10 @@ class Debug
 	 * Adds a new cache hits
 	 *
 	 * @param array $value contains the relevant cache info, in the form:
-	 *         d => method: put or get
-	 *         k => cache key
-	 *         t => time taken to get/put the entry
-	 *         s => length of the serialized value
+	 *    d => method: put or get
+	 *    k => cache key
+	 *    t => time taken to get/put the entry
+	 *    s => length of the serialized value
 	 */
 	public function cache($value)
 	{
@@ -125,11 +97,11 @@ class Debug
 	 * Adds a new database query
 	 *
 	 * @param array $value contains the relevant queries info, in the form:
-	 *         q => the query string (only for the first 50 queries, after that only a "...")
-	 *         f => the file in which the query has been executed
-	 *         l => the line at which the query has been executed
-	 *         s => seconds at which the query has been executed into the request
-	 *         t => time taken by the query
+	 *     q => the query string (only for the first 50 queries, after that only a "...")
+	 *     f => the file in which the query has been executed
+	 *     l => the line at which the query has been executed
+	 *     s => seconds at which the query has been executed into the request
+	 *     t => time taken by the query
 	 */
 	public function db_query($value)
 	{
@@ -167,7 +139,7 @@ class Debug
 	{
 		if (!$this->_track)
 		{
-			return array();
+			return [];
 		}
 
 		return $this->_db_cache;
@@ -194,7 +166,7 @@ class Debug
 	 */
 	public function toggleViewQueries()
 	{
-		$_SESSION['view_queries'] = $_SESSION['view_queries'] == 1 ? 0 : 1;
+		$_SESSION['view_queries'] = (int) $_SESSION['view_queries'] === 1 ? 0 : 1;
 	}
 
 	/**
@@ -205,7 +177,7 @@ class Debug
 		global $txt;
 
 		$this->_prepare_last_bits();
-		$expand_id = array();
+		$expand_id = [];
 
 		// Gotta have valid HTML ;).
 		$temp = ob_get_contents();
@@ -258,6 +230,7 @@ class Debug
 				$total_t += $cache_hit['t'];
 				$total_s += $cache_hit['s'];
 			}
+
 			$expand_id[] = 'debug_cache_info';
 
 			echo '
@@ -312,14 +285,14 @@ class Debug
 
 		$files = get_included_files();
 		$total_size = 0;
-		foreach ($files as $i => $file)
+		foreach ($files as $file)
 		{
 			if (file_exists($file))
 			{
 				$total_size += filesize($file);
 			}
 
-			$this->add('files_included', strtr($file, array(BOARDDIR => '.')));
+			$this->add('files_included', strtr($file, [BOARDDIR => '.']));
 		}
 
 		if (!empty($this->_db_cache))
@@ -452,6 +425,7 @@ class Debug
 			{
 				echo sprintf($txt['debug_query_which_took'], round($qq['t'], 8)) . '<br />';
 			}
+
 			echo '
 		<br />';
 		}

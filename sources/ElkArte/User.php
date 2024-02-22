@@ -21,41 +21,19 @@ use ElkArte\Cache\Cache;
  */
 class User
 {
-	/**
-	 * Contains data regarding the user in a form that may be useful in the code
-	 * Basically the former $user_info
-	 *
-	 * @var \ElkArte\ValuesContainer
-	 */
+	/** @var ValuesContainer Contains data regarding the user in a form that may be useful in the code Basically the former $user_info */
 	public static $info;
 
-	/**
-	 * Contains the data read from the db.
-	 * Read-only by means of ValuesContainerReadOnly
-	 *
-	 * @var \ElkArte\ValuesContainerReadOnly
-	 */
+	/** @var ValuesContainerReadOnly Contains the data read from the db. Read-only by means of ValuesContainerReadOnly */
 	public static $settings;
 
-	/**
-	 * The user object
-	 *
-	 * @var \ElkArte\UserSettings
-	 */
+	/** @var UserSettings The user object */
 	protected static $instance;
 
-	/**
-	 * The user id
-	 *
-	 * @var int
-	 */
+	/** @var int The user id */
 	protected static $id = 0;
 
-	/**
-	 * The hashed password read from the cookies
-	 *
-	 * @var string
-	 */
+	/** @var string The hashed password read from the cookies */
 	protected static $session_password = '';
 
 	/**
@@ -124,9 +102,8 @@ class User
 
 		if (empty(self::$id) && isset($_COOKIE[$cookiename]))
 		{
-			list ($id, self::$session_password) = serializeToJson($_COOKIE[$cookiename], function ($array_from) use ($cookiename) {
+			[$id, self::$session_password] = serializeToJson($_COOKIE[$cookiename], static function ($array_from) use ($cookiename) {
 				global $modSettings;
-
 				require_once(SUBSDIR . '/Auth.subs.php');
 				$_COOKIE[$cookiename] = json_encode($array_from);
 				setLoginCookie(60 * $modSettings['cookieTime'], $array_from[0], $array_from[1]);
@@ -137,7 +114,7 @@ class User
 		elseif (empty(self::$id) && isset($_SESSION['login_' . $cookiename]) && (!empty($modSettings['disableCheckUA']) || (!empty($_SESSION['USER_AGENT']) && $_SESSION['USER_AGENT'] == $user_agent)))
 		{
 			// @todo Perhaps we can do some more checking on this, such as on the first octet of the IP?
-			list ($id, self::$session_password, $login_span) = serializeToJson($_SESSION['login_' . $cookiename], function ($array_from) use ($cookiename) {
+			[$id, self::$session_password, $login_span] = serializeToJson($_SESSION['login_' . $cookiename], static function ($array_from) use ($cookiename) {
 				$_SESSION['login_' . $cookiename] = json_encode($array_from);
 			});
 

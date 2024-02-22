@@ -25,7 +25,7 @@ class SuggestMember
 	/** @var string What we are going to search for */
 	private $_search;
 
-	/** @var Any special parameters for the search */
+	/** @var array Any special parameters for the search */
 	private $_params;
 
 	/**
@@ -51,6 +51,6 @@ class SuggestMember
 		require_once(SUBSDIR . '/Members.subs.php');
 
 		// Find the member.
-		return getMember($this->_search, !empty($this->_params['buddies']) ? User::$info->buddies : array());
+		return getMember($this->_search, empty($this->_params['buddies']) ? array() : User::$info->buddies);
 	}
 }
