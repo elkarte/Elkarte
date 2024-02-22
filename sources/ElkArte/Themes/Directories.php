@@ -140,9 +140,9 @@ class Directories
 				throw new Error();
 			}
 		}
-		catch (Error $e)
+		catch (Error $error)
 		{
-			throw new Error('', 0, $e);
+			throw new Error('', 0, $error);
 		}
 	}
 }

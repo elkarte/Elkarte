@@ -16,15 +16,16 @@
 
 namespace ElkArte\Themes;
 
-use ElkArte\FileFunctions;
-use ElkArte\Http\Headers;
 use BadFunctionCallException;
 use ElkArte\Debug;
-use ElkArte\Languages\Txt;
 use ElkArte\Errors\Errors;
 use ElkArte\Exceptions\Exception;
+use ElkArte\FileFunctions;
+use ElkArte\Http\Headers;
+use ElkArte\Languages\Txt;
 use Error;
 use Generator;
+use JetBrains\PhpStorm\NoReturn;
 
 
 /**
@@ -34,31 +35,19 @@ use Generator;
  */
 class Templates
 {
-	/**
-	 * Template directory's that we will be searching for the sheets
-	 *
-	 * @var \ElkArte\Themes\Directories
-	 */
-	public $dirs = null;
+	/** @var Directories Template directory's that we will be searching for the sheets */
+	public $dirs;
 
-	/**
-	 * Template sheets that have not loaded
-	 *
-	 * @var array
-	 */
+	/** @var array Template sheets that have not loaded */
 	protected $delayed = [];
 
-	/**
-	 * Tracks if the default index.css has been loaded
-	 *
-	 * @var bool
-	 */
+	/** @var bool Tracks if the default index.css has been loaded */
 	protected $default_loaded = false;
 
 	/**
 	 * Templates constructor.
 	 */
-	public function __construct(\ElkArte\Themes\Directories $dirs)
+	public function __construct(Directories $dirs)
 	{
 		$this->dirs = $dirs;
 
@@ -70,12 +59,10 @@ class Templates
 	 * Load a template - if the theme doesn't include it, use the default.
 	 *
 	 * What it does:
-	 * - Loads a template file with the name template_name from the current, default, or
-	 * base theme.
+	 * - Loads a template file with the name template_name from the current, default, or base theme.
 	 * - Detects a wrong default theme directory and tries to work around it.
 	 * - Can be used to only load style sheets by using false as the template name
-	 *   loading of style sheets with this function is deprecated, use loadCSSFile
-	 * instead
+	 *   loading of style sheets with this function is deprecated, use loadCSSFile instead
 	 * - If $this->dirs is empty, it delays the loading of the template
 	 *
 	 * @param string|false $template_name
@@ -83,7 +70,6 @@ class Templates
 	 * @param bool $fatal = true if fatal is true, dies with an error message if the
 	 *     template cannot be found
 	 *
-	 * @return bool|null
 	 * @uses $this->requireTemplate() to actually load the file.
 	 *
 	 */
@@ -131,8 +117,6 @@ class Templates
 	 * @param bool $fatal = true if fatal is true, dies with an error message if the
 	 *     template cannot be found
 	 *
-	 * @return bool
-	 * @throws \ElkArte\Exceptions\Exception theme_template_error
 	 * @uses $this->dirs->fileInclude() to include the file.
 	 *
 	 */
@@ -162,11 +146,17 @@ class Templates
 			foreach ($style_sheets as $sheet)
 			{
 				$sheets[] = stripos('.css', $sheet) !== false ? $sheet : $sheet . '.css';
-				if ($sheet === 'admin' && !empty($context['theme_variant']))
+				if ($sheet !== 'admin')
 				{
-					$sheets[] =
-						$context['theme_variant'] . '/admin' . $context['theme_variant'] . '.css';
+					continue;
 				}
+
+				if (empty($context['theme_variant']))
+				{
+					continue;
+				}
+
+				$sheets[] = $context['theme_variant'] . '/admin' . $context['theme_variant'] . '.css';
 			}
 
 			loadCSSFile($sheets);
@@ -197,6 +187,7 @@ class Templates
 				{
 					$this->templateNotFound($e);
 				}
+
 				break;
 			}
 		}
@@ -271,7 +262,7 @@ class Templates
 	 *
 	 * @param Error $e
 	 */
-	protected function templateNotFound(Error $e)
+	#[NoReturn] protected function templateNotFound(Error $e)
 	{
 		global $context, $txt, $scripturl, $boardurl;
 
@@ -299,7 +290,7 @@ class Templates
 
 		// First, let's get the doctype and language information out of the way.
 		echo '<!DOCTYPE html>
-<html ', !empty($context['right_to_left']) ? 'dir="rtl"' : '', '>
+<html ', empty($context['right_to_left']) ? '' : 'dir="rtl"', '>
 	<head>
 		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 		<style>
@@ -350,17 +341,13 @@ class Templates
 			echo '
 		<hr />
 
-		<div style="margin: 0 20px;"><span style="font-family: monospace;">', strtr(
-				strtr(
-					$error,
-					[
-						'<strong>' . BOARDDIR => '<strong>...',
-						'<strong>' . strtr(BOARDDIR, '\\', '/') => '<strong>...',
-					]
-				),
-				'\\',
-				'/'
-			), '</span></div>';
+		<div style="margin: 0 20px;"><span style="font-family: monospace;">', str_replace('\\', '/', strtr(
+				$error,
+				[
+					'<strong>' . BOARDDIR => '<strong>...',
+					'<strong>' . strtr(BOARDDIR, '\\', '/') => '<strong>...',
+				]
+			)), '</span></div>';
 
 			$this->printLines($e);
 
@@ -427,20 +414,21 @@ class Templates
 	 * @uses    highlight_file() Highlights syntax.
 	 *
 	 */
-	public function getHighlightedLinesFromFile(
-		string $file,
-		int $min,
-		int $max
-	): Generator {
-		foreach (preg_split(
-					 '~\<br( /)?\>~',
-					 highlight_file($file, true)
-				 ) as $line => $content)
+	public function getHighlightedLinesFromFile(string $file, int $min, int $max): Generator
+	{
+		foreach (preg_split('~<br( /)?>~', highlight_file($file, true)) as $line => $content)
 		{
-			if ($line >= $min && $line <= $max)
+			if ($line < $min)
 			{
-				yield $line + 1 => $content;
+				continue;
 			}
+
+			if ($line > $max)
+			{
+				continue;
+			}
+
+			yield $line + 1 => $content;
 		}
 	}
 
@@ -457,8 +445,7 @@ class Templates
 	 * @param bool|string $fatal = false, $fatal = true is for templates that
 	 *                           shouldn't get a 'pretty' error screen 'ignore' to skip
 	 *
-	 * @throws \ElkArte\Exceptions\Exception theme_template_error
-	 * @todo get rid of reading $_REQUEST directly
+	 * @throws Exception theme_template_error
 	 *
 	 */
 	public function loadSubTemplate($sub_template_name, $fatal = false)

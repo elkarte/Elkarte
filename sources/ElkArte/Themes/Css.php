@@ -19,6 +19,7 @@ class Css
 {
 	/** @var array Inline CSS */
 	protected $css_rules = [];
+
 	/** @var array CSS files */
 	protected $css_files = [];
 
