@@ -669,8 +669,8 @@ class PersonalMessage extends AbstractController
 		$subject_renderer = new PmRenderer($subjects_request ?? $messages_request, $this->user, $bodyParser, $opt);
 
 		// Subject and Message
-		$context['get_pmessage'] = static fn(bool $reset = false): bool|array => $renderer->getContext($reset);
-		$context['get_psubject'] = static fn(bool $reset = false): array|bool => $subject_renderer->getContext($reset);
+		$context['get_pmessage'] = [$renderer, 'getContext'];
+		$context['get_psubject'] = [$subject_renderer, 'getContext'];
 
 		// Prepare some items for the template
 		$context['topic_starter_id'] = 0;

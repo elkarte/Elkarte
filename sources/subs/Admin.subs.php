@@ -434,7 +434,7 @@ function enableModules($module, $controllers)
 		}
 		else
 		{
-			$existing = array();
+			$existing = [];
 		}
 
 		$existing[] = $module;

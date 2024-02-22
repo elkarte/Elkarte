@@ -29,18 +29,10 @@ use ElkArte\User;
  */
 class Likes extends AbstractController
 {
-	/**
-	 * Holds the ajax response
-	 *
-	 * @var array
-	 */
-	protected $_likes_response = array();
+	/** @var array Holds the ajax response  */
+	protected $_likes_response = [];
 
-	/**
-	 * The id of the message being liked
-	 *
-	 * @var int
-	 */
+	/** @var int The id of the message being liked  */
 	protected $_id_liked;
 
 	/**

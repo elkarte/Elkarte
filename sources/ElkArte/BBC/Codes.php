@@ -31,147 +31,97 @@ class Codes
 	/** One of self::TYPE_* */
 	public const ATTR_TYPE = 2;
 
-	/**
-	 * An optional array of parameters, for the form
-	 * [tag abc=123]content[/tag].  The array is an associative array
-	 * where the keys are the parameter names, and the values are an
-	 * array which *may* contain any of self::PARAM_ATTR_*
-	 */
+	/** An optional array of parameters, for the form
+	    [tag abc=123]content[/tag].  The array is an associative array
+	    where the keys are the parameter names, and the values are an
+	    array which *may* contain any of self::PARAM_ATTR_*  */
 	public const ATTR_PARAM = 3;
 
-	/**
-	 * A regular expression to test immediately after the tag's
-	 * '=', ' ' or ']'.  Typically, should have a \] at the end.
-	 * Optional.
-	 */
+	/** A regular expression to test immediately after the tag's
+	    '=', ' ' or ']'.  Typically, should have a \] at the end.
+	    Optional. */
 	public const ATTR_TEST = 4;
 
-	/**
-	 * Only available for unparsed_content, closed, unparsed_commas_content, and unparsed_equals_content.
-	 * $1 is replaced with the content of the tag.
-	 * Parameters are replaced in the form {param}.
-	 * For unparsed_commas_content, $2, $3, ..., $n are replaced.
-	 */
+	/** Only available for unparsed_content, closed, unparsed_commas_content, and unparsed_equals_content.
+	    $1 is replaced with the content of the tag.
+	    Parameters are replaced in the form {param}.
+	    For unparsed_commas_content, $2, $3, ..., $n are replaced. */
 	public const ATTR_CONTENT = 5;
 
-	/**
-	 * Only when content is not used, to go before any content.
-	 * For unparsed_equals, $1 is replaced with the value.
-	 * For unparsed_commas, $1, $2, ..., $n are replaced.
-	 */
+	/** Only when content is not used, to go before any content.
+	    For unparsed_equals, $1 is replaced with the value.
+	    For unparsed_commas, $1, $2, ..., $n are replaced. */
 	public const ATTR_BEFORE = 6;
 
-	/**
-	 * Similar to before in every way, except that it is used when the tag is closed.
-	 */
+	/** Similar to before in every way, except that it is used when the tag is closed. */
 	public const ATTR_AFTER = 7;
 
-	/**
-	 * Used in place of content when the tag is disabled.
-	 * For closed, default is '', otherwise it is '$1' if block_level is false, '<div>$1</div>' elsewise.
-	 */
+	/** Used in place of content when the tag is disabled.
+	    For closed, default is '', otherwise it is '$1' if block_level is false, '<div>$1</div>' elsewise. */
 	public const ATTR_DISABLED_CONTENT = 8;
 
-	/**
-	 * Used in place of before when disabled.
-	 * Defaults to '<div>' if block_level, '' if not.
-	 */
+	/** Used in place of before when disabled. Defaults to '<div>' if block_level, '' if not. */
 	public const ATTR_DISABLED_BEFORE = 9;
 
-	/**
-	 * Used in place of after when disabled.
-	 * Defaults to '</div>' if block_level, '' if not.
-	 */
+	/** Used in place of after when disabled. Defaults to '</div>' if block_level, '' if not. */
 	public const ATTR_DISABLED_AFTER = 10;
 
-	/**
-	 * Set to true the tag is a "block level" tag, similar to HTML.
-	 * Block level tags cannot be nested inside tags that are not block level, and will not be implicitly closed as easily.
-	 * One break following a block level tag may also be removed.
-	 */
+	/** Set to true the tag is a "block level" tag, similar to HTML.
+	    Block level tags cannot be nested inside tags that are not block level, and will not be implicitly closed as easily.
+	    One break following a block level tag may also be removed. */
 	public const ATTR_BLOCK_LEVEL = 11;
 
-	/**
-	 * Trim the whitespace after the opening tag or the closing tag or both.
-	 * One of self::TRIM_*
-	 * Optional
-	 */
+	/** Trim the whitespace after the opening tag or the closing tag or both.
+	    One of self::TRIM_*
+	    Optional */
 	public const ATTR_TRIM = 12;
 
-	/**
-	 * Except when type is missing or 'closed', a callback to validate the data as $data.
-	 * Depending on the tag's type, $data may be a string or an array of strings (corresponding to the replacement.)
-	 */
+	/** Except when type is missing or 'closed', a callback to validate the data as $data.
+	    Depending on the tag's type, $data may be a string or an array of strings (corresponding to the replacement.) */
 	public const ATTR_VALIDATE = 13;
 
-	/**
-	 * When type is unparsed_equals or parsed_equals only, may be not set,
-	 * 'optional', or 'required' corresponding to if the content may be quoted.
-	 * This allows the parser to read [tag="abc]def[esdf]"] properly.
-	 */
+	/** When type is unparsed_equals or parsed_equals only, may be not set,
+	    'optional', or 'required' corresponding to if the content may be quoted.
+	    This allows the parser to read [tag="abc]def[esdf]"] properly. */
 	public const ATTR_QUOTED = 14;
 
-	/**
-	 * An array of tag names, or not set.
-	 * If set, the enclosing tag *must* be one of the listed tags, or parsing won't    occur.
-	 */
+	/** An array of tag names, or not set.
+	    If set, the enclosing tag *must* be one of the listed tags, or parsing won't occur. */
 	public const ATTR_REQUIRE_PARENTS = 15;
 
-	/**
-	 * similar to require_parents, if set children won't be parsed if they are not in the list.
-	 */
+	/** similar to require_parents, if set children won't be parsed if they are not in the list. */
 	public const ATTR_REQUIRE_CHILDREN = 16;
 
-	/**
-	 * Similar to, but very different from, require_parents.
-	 * If it is set the listed tags will not be parsed inside the tag.
-	 */
+	/** Similar to, but very different from, require_parents.
+	    If it is set the listed tags will not be parsed inside the tag. */
 	public const ATTR_DISALLOW_PARENTS = 17;
 
-	/**
-	 * Similar to, but very different from, require_children.
-	 * If it is set the listed tags will not be parsed inside the tag.
-	 */
+	/** Similar to, but very different from, require_children.
+	   If it is set the listed tags will not be parsed inside the tag. */
 	public const ATTR_DISALLOW_CHILDREN = 18;
 
-	/**
-	 * When ATTR_DISALLOW_PARENTS is used, this gets put before the tag.
-	 */
+	/** When ATTR_DISALLOW_PARENTS is used, this gets put before the tag. */
 	public const ATTR_DISALLOW_BEFORE = 19;
 
-	/**
-	 * * When ATTR_DISALLOW_PARENTS is used, this gets put after the tag.
-	 */
+	/** When ATTR_DISALLOW_PARENTS is used, this gets put after the tag. */
 	public const ATTR_DISALLOW_AFTER = 20;
 
-	/**
-	 * an array restricting what BBC can be in the parsed_equals parameter, if desired.
-	 */
+	/** an array restricting what BBC can be in the parsed_equals parameter, if desired. */
 	public const ATTR_PARSED_TAGS_ALLOWED = 21;
 
-	/**
-	 * (bool) Turn uris like http://www.google.com in to links
-	 */
+	/** (bool) Turn uris like https://www.google.com in to links */
 	public const ATTR_AUTOLINK = 22;
 
-	/**
-	 * The length of the tag
-	 */
+	/** The length of the tag */
 	public const ATTR_LENGTH = 23;
 
-	/**
-	 * Whether the tag is disabled
-	 */
+	/** Whether the tag is disabled */
 	public const ATTR_DISABLED = 24;
 
-	/**
-	 * If the message contains a code with this, the message should not be cached
-	 */
+	/** If the message contains a code with this, the message should not be cached */
 	public const ATTR_NO_CACHE = 25;
 
-	/**
-	 * If to reset ATTR_CONTENT to a new value, useful when build content tag in addons
-	 */
+	/** If to reset ATTR_CONTENT to a new value, useful when build content tag in addons */
 	public const ATTR_RESET = 26;
 
 	/** [tag]parsed content[/tag] */
@@ -235,18 +185,16 @@ class Codes
 
 	public const REQUIRED = 1;
 
-	/**
-	 * An array of self::ATTR_*
-	 * ATTR_TAG and ATTR_TYPE are required for every tag.
-	 * The rest of the attributes depend on the type and other options.
-	 */
-	protected $bbc = array();
+	/** An array of self::ATTR_*
+	    ATTR_TAG and ATTR_TYPE are required for every tag.
+	    The rest of the attributes depend on the type and other options. */
+	protected $bbc = [];
 
-	protected $itemcodes = array();
+	protected $itemcodes = [];
 
-	protected $disabled = array();
+	protected $disabled = [];
 
-	protected $parsing_codes = array();
+	protected $parsing_codes = [];
 
 	/**
 	 * Codes constructor.

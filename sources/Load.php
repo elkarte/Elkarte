@@ -1291,7 +1291,6 @@ function loadDatabase()
  * @param array $profile array containing the users profile data
  *
  * @return array $avatar
- * @todo this function seems more useful than expected, it should be improved. :P
  *
  * @event integrate_avatar allows access to $avatar array before it is returned
  */
