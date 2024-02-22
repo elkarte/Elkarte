@@ -11,7 +11,9 @@
  *
  */
 
-namespace ElkArte;
+namespace ElkArte\Maillist;
+
+use ElkArte\Util;
 
 /**
  * Attempts, though an outrageous set of assumptions, to reflow/format an email message
@@ -37,105 +39,47 @@ namespace ElkArte;
  */
 class EmailFormat
 {
-	/**
-	 * The full message section we will return
-	 *
-	 * @var string
-	 */
-	private $_body = null;
+	/** @var string The full message section we will return */
+	private $_body;
 
-	/**
-	 * The full message section broken in to parts
-	 *
-	 * @var array
-	 */
-	private $_body_array = array();
+	/** @var array The full message section broken in to parts */
+	private $_body_array = [];
 
-	/**
-	 * Holds the current quote level we are in
-	 *
-	 * @var int
-	 */
+	/** @var int Holds the current quote level we are in */
 	private $_in_quote = 0;
 
-	/**
-	 * Holds the current code block level we are in
-	 *
-	 * @var int
-	 */
+	/** @var int Holds the current code block level we are in */
 	private $_in_code = 0;
 
-	/**
-	 * Holds the level of bbc list we are in
-	 *
-	 * @var int
-	 */
+	/** @var int Holds the level of bbc list we are in */
 	private $_in_bbclist = 0;
 
-	/**
-	 * Holds the level of plain list we are in
-	 *
-	 * @var int
-	 */
+	/** @var int Holds the level of plain list we are in */
 	private $_in_plainlist = 0;
 
-	/**
-	 * Holds if we are in a plain text list
-	 *
-	 * @var int
-	 */
+	/** @var int Holds if we are in a plain text list */
 	private $_in_list = 0;
 
-	/**
-	 * Set if we have entered an area of the message that is a signature block
-	 *
-	 * @var bool
-	 */
+	/** @var bool Set if we have entered an area of the message that is a signature block */
 	private $_found_sig = false;
 
-	/**
-	 * Holds the members display name, used for signature check etc.
-	 *
-	 * @var string
-	 */
-	private $_real_name = null;
+	/** @var string Holds the members display name, used for signature check etc. */
+	private $_real_name;
 
-	/**
-	 * Tuning value (fudge) used to decide if a line is short
-	 * change with care, used to help figure out wrapping decisions
-	 *
-	 * @var int
-	 */
-	private $_maillist_short_line = null;
+	/** @var int Tuning value (fudge) used to decide if a line is short
+	 * change with care, used to help figure out wrapping decisions */
+	private $_maillist_short_line;
 
-	/**
-	 * Extra items to removed, defined in the acp
-	 *
-	 * @var string
-	 */
-	private $_maillist_leftover_remove = null;
+	/** @var string Extra items to removed, defined in the acp */
+	private $_maillist_leftover_remove;
 
-	/**
-	 * Items that may indicate the start of a signature line, defined in the acp
-	 *
-	 * @var string
-	 */
-	private $_maillist_sig_keys = null;
+	/** @var string Items that may indicate the start of a signature line, defined in the acp */
+	private $_maillist_sig_keys;
 
-	/**
-	 * Tuning delta value (fudge) to help indicate the last line in a paragraph
-	 * change with care
-	 *
-	 * @var int
-	 */
+	/** @var int Tuning delta value (fudge) to help indicate the last line in a paragraph change with care */
 	private $_para_check = 25;
 
-	/**
-	 * tuning value used to define a long line in a signature line
-	 * change with care
-	 *
-	 * @var int
-	 */
+	/** @var int tuning value used to define a long line in a signature line change with care */
 	private $_sig_longline = 67;
 
 	/**
@@ -183,6 +127,7 @@ class EmailFormat
 		{
 			$data = str_replace('[br]', "\n", $data);
 		}
+
 		$temps = explode("\n", $data);
 
 		// Remove any 'stuck' whitespace using the trim value function on all lines
@@ -248,8 +193,8 @@ class EmailFormat
 		// Starting a list like a) 1. 1) etc ...
 		$temp = $this->_in_plainlist;
 
-		if (preg_match('~^[a-j](\.|\)|-)\s~im', $var)
-			|| preg_match('~^[1-9]\s?(\.|\)|-)\s?~m', $var)
+		if (preg_match('~^[a-j]([.)\-])\s~im', $var)
+			|| preg_match('~^[1-9]\s?([.)\-])\s?~m', $var)
 			|| preg_match('~' . chr(187) . '~', $var)
 			|| preg_match('~^[ \t]?\* ?~m', $var)
 		)
@@ -270,15 +215,15 @@ class EmailFormat
 	private function _in_quote($var)
 	{
 		// In a quote?
-		if (preg_match('~\[quote( author=.*)?\]?~', $var))
+		if (preg_match('~\[quote( author=.*)?]?~', $var))
 		{
 			// Make sure it is not a single line quote
-			if (!preg_match('~\[/quote\]?~', $var))
+			if (!preg_match('~\[/quote]?~', $var))
 			{
 				$this->_in_quote++;
 			}
 		}
-		elseif (preg_match('~\[/quote\]?~', $var))
+		elseif (preg_match('~\[/quote]?~', $var))
 		{
 			$this->_in_quote--;
 		}
@@ -294,15 +239,15 @@ class EmailFormat
 	private function _in_code($var)
 	{
 		// In a code block?
-		if (preg_match('~\[code\]?~', $var))
+		if (preg_match('~\[code]?~', $var))
 		{
 			// Make sure it is not a single line code
-			if (!preg_match('~\[/code\]?~', $var))
+			if (!preg_match('~\[/code]?~', $var))
 			{
 				$this->_in_code++;
 			}
 		}
-		elseif (preg_match('~\[/code\]?~', $var))
+		elseif (preg_match('~\[/code]?~', $var))
 		{
 			$this->_in_code--;
 		}
@@ -318,12 +263,12 @@ class EmailFormat
 	private function _in_bbclist($var)
 	{
 		// Starting a bbc list
-		if (preg_match('~\[list\]?~', $var))
+		if (preg_match('~\[list]?~', $var))
 		{
 			$this->_in_bbclist++;
 		}
 		// Ending a bbc list
-		elseif (preg_match('~\[\/list\]?~', $var))
+		elseif (preg_match('~\[/list]?~', $var))
 		{
 			$this->_in_bbclist--;
 		}
@@ -348,7 +293,7 @@ class EmailFormat
 				// Are we at the last known list item?, if so we can turn wrapping off
 				if (isset($this->_body_array[$i + 1]) && $this->_in_list === $this->_in_plainlist)
 				{
-					$this->_body_array[$i - 1]['content'] = $this->_body_array[$i - 1]['content'] . "\n";
+					$this->_body_array[$i - 1]['content'] .= "\n";
 					$this->_in_list = 0;
 				}
 				else
@@ -364,7 +309,7 @@ class EmailFormat
 			}
 
 			// Blank line, if its not two in a row and not the start of a bbc code then insert a newline
-			if ($this->_body_array[$i]['content'] == '')
+			if ($this->_body_array[$i]['content'] === '')
 			{
 				if ((isset($this->_body_array[$i - 1])) && ($this->_body_array[$i - 1]['content'] !== "\n") && (substr($this->_body_array[$i - 1]['content'], 0, 1) !== '[') && ($this->_body_array[$i - 1]['length'] > $this->_maillist_short_line))
 				{
@@ -384,16 +329,9 @@ class EmailFormat
 				$this->_found_sig = true;
 			}
 			// Message stuff which should not be here any longer (as defined in the ACP) i.e. To: From: Subject:
-			elseif (!empty($this->_maillist_leftover_remove) && preg_match('~^((\[b\]){0,2}(' . $this->_maillist_leftover_remove . ')(\[\/b\]){0,2})~', $this->_body_array[$i]['content']))
+			elseif (!empty($this->_maillist_leftover_remove) && preg_match('~^((\[b]){0,2}(' . $this->_maillist_leftover_remove . ')(\[/b]){0,2})~', $this->_body_array[$i]['content']))
 			{
-				if ($this->_in_quote)
-				{
-					$this->_body_array[$i]['content'] = "\n";
-				}
-				else
-				{
-					$this->_body_array[$i]['content'] = $this->_body_array[$i]['content'] . "\n";
-				}
+				$this->_body_array[$i]['content'] = $this->_in_quote !== 0 ? "\n" : $this->_body_array[$i]['content'] . "\n";
 			}
 			// Line starts with a link .....
 			elseif (in_array(substr($this->_body_array[$i]['content'], 0, 4), array('www.', 'WWW.', 'http', 'HTTP')))
@@ -401,7 +339,7 @@ class EmailFormat
 				$this->_body_array[$i]['content'] = "\n" . $this->_body_array[$i]['content'];
 			}
 			// Previous line ended in a break already
-			elseif (isset($this->_body_array[$i - 1]['content']) && substr(trim($this->_body_array[$i - 1]['content']), -4) == '[br]')
+			elseif (isset($this->_body_array[$i - 1]['content']) && substr(trim($this->_body_array[$i - 1]['content']), -4) === '[br]')
 			{
 				// Nothing to do then
 				$this->_body_array[$i]['content'] .= '';
@@ -411,14 +349,7 @@ class EmailFormat
 			else
 			{
 				// Its a wrap ... maybe
-				if ($i > 0)
-				{
-					$para_check = $this->_body_array[$i]['length'] - $this->_body_array[$i - 1]['length'];
-				}
-				else
-				{
-					$para_check = 1;
-				}
+				$para_check = $i > 0 ? $this->_body_array[$i]['length'] - $this->_body_array[$i - 1]['length'] : 1;
 
 				// If this line is longer than the line above it we need to do some extra checks
 				if (($i > 0) && ($this->_body_array[$i - 1]['length'] > $this->_maillist_short_line) && !$this->_found_sig && !$this->_in_code && !$this->_in_bbclist)
@@ -457,11 +388,12 @@ class EmailFormat
 		}
 
 		// Join the message back together while dropping null index's
-		$temp = array();
-		foreach ($this->_body_array as $key => $values)
+		$temp = [];
+		foreach ($this->_body_array as $values)
 		{
 			$temp[] = $values['content'];
 		}
+
 		$this->_body = trim(implode(' ', array_values($temp)));
 	}
 
@@ -485,14 +417,8 @@ class EmailFormat
 		{
 			return true;
 		}
-
 		// check for universal sig dashes
-		if (!$this->_found_sig && preg_match('~^-- \n~m', $this->_body_array[$i]['content']))
-		{
-			return true;
-		}
-
-		return false;
+		return !$this->_found_sig && preg_match('~^-- \n~m', $this->_body_array[$i]['content']);
 	}
 
 	/**
@@ -508,13 +434,13 @@ class EmailFormat
 		$this->_body = preg_replace("~\n" . $tag . '~', "\n", $this->_body);
 
 		// Clean up double breaks found between bbc formatting tags, msoffice loves to do this
-		$this->_body = preg_replace('~\]\s*\[br\]\s*\[br\]\s*\[~', '][br][', $this->_body);
+		$this->_body = preg_replace('~]\s*\[br]\s*\[br]\s*\[~', '][br][', $this->_body);
 
 		// Repair the &nbsp; in its various states and any other chaff
-		$this->_body = strtr($this->_body, array(' &nbsp;' => ' ', '&nbsp; ' => ' ', "\xc2\xa0" => ' ', "\xe2\x80\xa8" => "\n"));
+		$this->_body = strtr($this->_body, [' &nbsp;' => ' ', '&nbsp; ' => ' ', "\xc2\xa0" => ' ', "\xe2\x80\xa8" => "\n"]);
 
 		// Trailing space before an end quote
-		$this->_body = preg_replace('~\s*\n\s*\[/quote\]~', '[/quote]', $this->_body);
+		$this->_body = preg_replace('~\s*\n\s*\[/quote]~', '[/quote]', $this->_body);
 
 		// Any number of spaces (including none), followed by newlines, followed by any number of spaces (including none),
 		$this->_body = preg_replace("~(\s*[\n]\s*){2,}~", "\n\n", $this->_body);
@@ -530,17 +456,17 @@ class EmailFormat
 		// Look for a word boundary, any number of word characters, a single lower case, a period a single uppercase
 		// any number of word characters and a boundary
 		$this->_body = preg_replace('~(\b\w+[a-z])\.([A-Z]\w+)\b~', '$1. $2', $this->_body);
-		$this->_body = preg_replace('~(\b\w+[A-z])\,([A-z]\w+)\b~', '$1, $2', $this->_body);
-		$this->_body = preg_replace('~(\b\w+[A-z])\,([A-Z]\w+)\b~', '$1, $2', $this->_body);
-		$this->_body = preg_replace('~(\b\w+[a-z])\,([a-z]\w+)\b~', '$1, $2', $this->_body);
+		$this->_body = preg_replace('~(\b\w+[A-z]),([A-z]\w+)\b~', '$1, $2', $this->_body);
+		$this->_body = preg_replace('~(\b\w+[A-z]),([A-Z]\w+)\b~', '$1, $2', $this->_body);
+		$this->_body = preg_replace('~(\b\w+[a-z]),([a-z]\w+)\b~', '$1, $2', $this->_body);
 		$this->_body = preg_replace('~(\b\w+[a-z])\s\.([A-Z]\w+)\b~', '$1. $2', $this->_body);
 
 		// Some tags often end up as just dummy tags, bla bla bla you have read this before yes?
-		$this->_body = preg_replace('~\[[bisu]\]\s*\[/[bisu]\]~', '', $this->_body);
-		$this->_body = preg_replace('~\[quote\]\s*\[/quote\]~', '', $this->_body);
+		$this->_body = preg_replace('~\[[bisu]]\s*\[/[bisu]]~', '', $this->_body);
+		$this->_body = preg_replace('~\[quote]\s*\[/quote]~', '', $this->_body);
 
 		// Make sure an email did not end up as the authors name .... [quote author=Joe Blow [email]joeblow@gmail.com[/email]]
-		$this->_body = preg_replace('~\[quote (author=.*)\[email].*\[/email\]\]~', '[quote $1]', $this->_body);
+		$this->_body = preg_replace('~\[quote (author=.*)\[email].*\[/email]]~', '[quote $1]', $this->_body);
 
 		// Any htmlenties that we want to remove, like ms smart ones?
 		if (preg_match('~&#8220;|&#8221;|&#8211;|&#8212;|&#8216|&#8217;~', $this->_body))
