@@ -72,7 +72,6 @@ class Admin extends AbstractModule
 	public function addSearch(&$language_files, &$include_files, &$settings_search)
 	{
 		$language_files[] = 'ManageCalendar';
-		$include_files[] = 'ManageCalendarModule.controller';
 		$settings_search[] = ['settings_search', 'area=managecalendar;sa=settings', ManageCalendarModule::class];
 	}
 }

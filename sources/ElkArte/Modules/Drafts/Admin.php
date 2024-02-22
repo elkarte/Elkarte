@@ -67,7 +67,6 @@ class Admin extends AbstractModule
 	public function addSearch(&$language_files, &$include_files, &$settings_search)
 	{
 		$language_files[] = 'Drafts';
-		$include_files[] = 'ManageDraftsModule.controller';
 		$settings_search[] = ['settings_search', 'area=managedrafts', ManageDraftsModule::class];
 	}
 }
