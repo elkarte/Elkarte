@@ -51,6 +51,7 @@ class XmlArray
 
 		// Set the debug level.
 		$this->debug_level = $level ?? error_reporting();
+		$this->trim = $auto_trim;
 
 		// Is the data already parsed?
 		if ($is_clone)
@@ -434,11 +435,10 @@ class XmlArray
 
 				$trace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS);
 				$i = 0;
-				while ($i < count($trace) && isset($trace[$i]['class']) && $trace[$i]['class'] == $this::class)
+				while ($i < count($trace) && isset($trace[$i]['class']) && $trace[$i]['class'] === get_class($this))
 				{
 					$i++;
 				}
-
 				$debug = ' from ' . $trace[$i - 1]['file'] . ' on line ' . $trace[$i - 1]['line'];
 
 				// Cause an error.
@@ -446,6 +446,7 @@ class XmlArray
 				{
 					trigger_error('Undefined XML attribute: ' . substr($el, 1) . $debug, E_USER_NOTICE);
 				}
+
 				return false;
 			}
 			else
@@ -460,11 +461,11 @@ class XmlArray
 		// Clean up after $lvl, for $return_full.
 		if ($return_full && (!isset($array['name']) || substr($array['name'], -1) !== ']'))
 		{
-			$array = array('name' => $el . '[]', $array);
+			$array = ['name' => $el . '[]', $array];
 		}
 
 		// Create the right type of class...
-		$newClass = static::class;
+		$newClass = get_class($this);
 
 		// Return a new \ElkArte\XmlArray for the result.
 		return $array === false ? false : new $newClass($array, $this->trim, $this->debug_level, true);
@@ -493,13 +494,12 @@ class XmlArray
 		{
 			return $array;
 		}
-
 		$paths = explode('|', $path);
 
 		// A * means all elements of any name.
 		$show_all = in_array('*', $paths);
 
-		$results = array();
+		$results = [];
 
 		// Check each element.
 		foreach ($array as $value)
@@ -509,7 +509,7 @@ class XmlArray
 				continue;
 			}
 
-			if ($show_all || in_array($value['name'], $paths))
+			if ($show_all || in_array($value['name'], $paths, true))
 			{
 				// Skip elements before "the one".
 				if ($level !== null && $level > 0)
@@ -522,15 +522,17 @@ class XmlArray
 				}
 			}
 		}
+
 		// No results found...
 		if (empty($results))
 		{
 			$trace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS);
 			$i = 0;
-			while ($i < count($trace) && isset($trace[$i]['class']) && $trace[$i]['class'] == $this::class)
+			while ($i < count($trace) && isset($trace[$i]['class']) && $trace[$i]['class'] === get_class($this))
 			{
 				$i++;
 			}
+
 			$debug = ' from ' . $trace[$i - 1]['file'] . ' on line ' . $trace[$i - 1]['line'];
 
 			// Cause an error.
@@ -543,15 +545,13 @@ class XmlArray
 		}
 
 		// Only one result.
-		if (count($results) === 1 || $level !== null)
+		if ($level !== null || count($results) === 1)
 		{
 			return $results[0];
 		}
+
 		// Return the result set.
-		else
-		{
-			return $results + array('name' => $path . '[]');
-		}
+		return $results + ['name' => $path . '[]'];
 	}
 
 	/**
@@ -762,7 +762,7 @@ class XmlArray
 			}
 
 			// Create the right type of class...
-			$newClass = static::class;
+			$newClass = get_class($this);
 
 			// Create a new \ElkArte\XmlArray and stick it in the array.
 			$array[] = new $newClass($val, $this->trim, $this->debug_level, true);

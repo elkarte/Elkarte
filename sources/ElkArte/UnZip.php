@@ -13,7 +13,6 @@
 
 namespace ElkArte;
 
-use ElkArte\Exceptions\Exception;
 use ElkArte\Languages\Txt;
 
 /**
@@ -66,6 +65,21 @@ class UnZip
 	/** @var bool If we found a file that was requested ($files_to_extract) */
 	protected $_found = false;
 
+	/** @var null|string[] Array of file names we want to extract from the archive */
+	protected $files_to_extract;
+
+	/** @var string Holds the data string passed to the function */
+	protected $data;
+
+	/** @var string Location to write the files. */
+	protected $destination;
+
+	/** @var bool|string If we are looking for a single specific file */
+	protected $single_file;
+
+	/** @var bool If we can overwrite a file with the same name in the destination */
+	protected $overwrite;
+
 	/**
 	 * Class initialization, passes variables, loads dependencies
 	 *
@@ -77,8 +91,15 @@ class UnZip
 	 *
 	 * @throws Exception package_no_zlib
 	 */
-	public function __construct(protected $data, protected $destination, protected $single_file = false, protected $overwrite = false, protected $files_to_extract = null)
+	public function __construct($data, $destination, $single_file = false, $overwrite = false, $files_to_extract = null)
 	{
+		// Load the passed commands in to the class
+		$this->data = $data;
+		$this->destination = $destination;
+		$this->single_file = $single_file;
+		$this->overwrite = $overwrite;
+		$this->files_to_extract = $files_to_extract;
+
 		// This function sorta needs gzinflate!
 		if (!function_exists('gzinflate'))
 		{
@@ -143,7 +164,7 @@ class UnZip
 		// Looking for a single file and this is it
 		if ($this->_found && $this->single_file)
 		{
-			return $this->_crc_check && $this->_found;
+			return $this->_crc_check ? $this->_found : false;
 		}
 
 		// Wanted many files then we need to clean up
@@ -168,7 +189,7 @@ class UnZip
 	public function check_valid_zip()
 	{
 		// No signature?
-		if (strlen($this->data) < 10)
+		if ($this->data === null || strlen($this->data) < 10)
 		{
 			return false;
 		}

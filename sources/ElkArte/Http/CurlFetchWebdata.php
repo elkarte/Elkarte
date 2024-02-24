@@ -64,6 +64,9 @@ class CurlFetchWebdata
 	/** @var int Holds the current redirect count for the request */
 	private $_current_redirect = 0;
 
+	/** @var array Holds the passed user options array */
+	private $_user_options;
+
 	/** @var string Holds any data that will be posted to a form */
 	private $_post_data = '';
 
@@ -81,13 +84,14 @@ class CurlFetchWebdata
 	 *
 	 * - Allow for user override values
 	 *
-	 * @param array $_user_options cURL options as an array
+	 * @param array $options cURL options as an array
 	 * @param int $max_redirect Maximum number of redirects
 	 */
-	public function __construct(private $_user_options = [], $max_redirect = 3)
+	public function __construct($options = [], $max_redirect = 3)
 	{
 		// Initialize class variables
 		$this->_max_redirect = (int) $max_redirect;
+		$this->_user_options = $options;
 	}
 
 	/**
@@ -168,7 +172,7 @@ class CurlFetchWebdata
 	private function _setOptions()
 	{
 		// Callback to parse the returned headers, if any
-		$this->default_options[CURLOPT_HEADERFUNCTION] = fn($cr, $header) => $this->_headerCallback($header);
+		$this->default_options[CURLOPT_HEADERFUNCTION] = fn($cr, $header) => $this->_headerCallback($cr, $header);
 
 		// Any user options to account for
 		if (is_array($this->_user_options))
@@ -197,10 +201,12 @@ class CurlFetchWebdata
 	 *
 	 * - lowercase everything to make it consistent
 	 *
+	 * @param object $cr Not used but passed by the cURL agent
 	 * @param string $header The headers received
+	 *
 	 * @return int
 	 */
-	private function _headerCallback($header)
+	private function _headerCallback($cr, $header)
 	{
 		$_header = trim($header);
 		$temp = explode(': ', $_header, 2);

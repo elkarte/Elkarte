@@ -1277,7 +1277,7 @@ class ManageMembers extends AbstractController
 		}
 
 		// Although updateMemberStats *may* catch this, best to do it manually just in case (Doesn't always sort out unapprovedMembers).
-		if (in_array($current_filter, array(3, 4, 5)))
+		if (in_array($current_filter, [3, 4, 5]))
 		{
 			updateSettings(array('unapprovedMembers' => ($modSettings['unapprovedMembers'] > $data['member_count'] ? $modSettings['unapprovedMembers'] - $data['member_count'] : 0)));
 		}
@@ -1287,7 +1287,7 @@ class ManageMembers extends AbstractController
 		updateMemberStats();
 
 		// If they haven't been deleted, update the post group statistics on them...
-		if (!in_array($todo, array('delete', 'deleteemail', 'reject', 'rejectemail', 'remind')))
+		if (!in_array($todo, ['delete', 'deleteemail', 'reject', 'rejectemail', 'remind']))
 		{
 			require_once(SUBSDIR . '/Membergroups.subs.php');
 			updatePostGroupStats($this->conditions['members']);
