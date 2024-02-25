@@ -116,7 +116,7 @@ class MembersList
 	 * Returns the \ElkArte\Member object of the requested (numeric) $id
 	 *
 	 * @param int $id id of the member
-	 * @return bool|ValuesContainer
+	 * @return false|Member
 	 */
 	public function getById($id)
 	{

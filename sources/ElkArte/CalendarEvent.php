@@ -25,15 +25,24 @@ use ElkArte\Exceptions\Exception;
  */
 class CalendarEvent
 {
+	/** @var null|int The id of the event. */
+	protected $_event_id;
+
+	/** @var array The general settings (in fact a copy of $modSettings). */
+	protected $_settings = [];
+
 	/**
 	 * Construct the object requires the id of the event and the settings
 	 *
-	 * @param null|int $_event_id Obviously the id of the event. If null or -1 the event is considered new
-	 * @param array $_settings An array of settings ($modSettings is the current one)
+	 * @param null|int $event_id Obviously the id of the event. If null or -1 the event is considered new
+	 * @param array $settings An array of settings ($modSettings is the current one)
 	 * @see CalendarEvent::isNew
 	 */
-	public function __construct(protected $_event_id, protected $_settings = array())
+	public function __construct($event_id, $settings = [])
 	{
+		$this->_settings = $settings;
+		$this->_event_id = $event_id;
+
 		// We need this for all kinds of useful functions.
 		require_once(SUBSDIR . '/Calendar.subs.php');
 	}

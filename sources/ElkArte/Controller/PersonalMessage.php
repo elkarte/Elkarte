@@ -2620,7 +2620,7 @@ class PersonalMessage extends AbstractController
 	 * Return buttons for search results, used when viewing full message as result
 	 *
 	 * @param int $id of the PM
-	 * @param array $member member information
+	 * @param ValuesContainer $member member information
 	 * @return array[]
 	 */
 	private function _setSearchPmButtons($id, $member)

@@ -23,6 +23,9 @@ use Exception;
  */
 class FsockFetchWebdata
 {
+	/** @var bool Use the same connection on redirects */
+	private $_keep_alive;
+
 	/** @var int Holds the passed or default value for redirects */
 	private $_max_redirect;
 
@@ -44,6 +47,9 @@ class FsockFetchWebdata
 	/** @var null|resource the fsockopen resource */
 	private $_fp;
 
+	/** @var mixed[] Holds the passed user options array (only option is max_length) */
+	private $_user_options;
+
 	/** @var string|string[] Holds any data that will be posted to a form */
 	private $_post_data = '';
 
@@ -62,14 +68,16 @@ class FsockFetchWebdata
 	/**
 	 * FsockFetchWebdata constructor.
 	 *
-	 * @param array $_user_options
+	 * @param array $options
 	 * @param int $max_redirect
-	 * @param bool $_keep_alive
+	 * @param bool $keep_alive
 	 */
-	public function __construct(private $_user_options = [], $max_redirect = 3, private $_keep_alive = false)
+	public function __construct($options = [], $max_redirect = 3, $keep_alive = false)
 	{
 		// Initialize class variables
 		$this->_max_redirect = (int) $max_redirect;
+		$this->_user_options = $options;
+		$this->_keep_alive = $keep_alive;
 	}
 
 	/**

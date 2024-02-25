@@ -14,7 +14,6 @@
 namespace ElkArte\Maillist;
 
 use ValueError;
-use function ElkArte\recode_string;
 
 /**
  * Class to parse and email in to its header and body parts for use in posting
