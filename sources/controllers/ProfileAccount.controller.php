@@ -11,7 +11,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.1.1
+ * @version 1.1.10
  *
  */
 
@@ -468,7 +468,7 @@ class ProfileAccount_Controller extends Action_Controller
 	 */
 	private function _issue_warning_pm()
 	{
-		global $context;
+		global $context, $modSettings;
 
 		$id_notice = 0;
 		if (!empty($this->_req->post->warn_notify) && empty($this->_issueErrors))
@@ -489,6 +489,9 @@ class ProfileAccount_Controller extends Action_Controller
 					'name' => $context['forum_name'],
 					'username' => $context['forum_name'],
 				);
+
+				// No sense in sending a PbE
+				$modSettings['maillist_enabled'] = 0;
 				sendpm(array('to' => array($this->_memID), 'bcc' => array()), $warn_sub, $warn_body, false, $from);
 
 				// Log the notice.

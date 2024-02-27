@@ -15,7 +15,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.1.4
+ * @version 1.1.10
  *
  */
 
@@ -876,7 +876,7 @@ function sendpm($recipients, $subject, $message, $store_outbox = true, $from = n
 			$from_wrapper = !empty($modSettings['maillist_mail_from']) ? $modSettings['maillist_mail_from'] : (empty($modSettings['maillist_sitename_address']) ? $webmaster_email : $modSettings['maillist_sitename_address']);
 
 			// Add in the signature
-			$replacements['SIGNATURE'] = $sender_details['signature'];
+			$replacements['SIGNATURE'] = empty($sender_details['signature']) ? '' : $sender_details['signature'];
 
 			// And off it goes, looking a bit more personal
 			$mail = loadEmailTemplate($email_template, $replacements, $lang);
