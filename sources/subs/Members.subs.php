@@ -1040,10 +1040,10 @@ function groupsAllowedTo($permission, $board_id = null)
 	$db = database();
 
 	// Admins are allowed to do anything.
-	$member_groups = array(
-		'allowed' => array(1),
-		'denied' => array(),
-	);
+	$member_groups = [
+		'allowed' => [1],
+		'denied' => [],
+	];
 
 	// Assume we're dealing with regular permissions (like profile_view_own).
 	if ($board_id === null)
@@ -1053,12 +1053,12 @@ function groupsAllowedTo($permission, $board_id = null)
 				id_group, add_deny
 			FROM {db_prefix}permissions
 			WHERE permission = {string:permission}',
-			array(
+			[
 				'permission' => $permission,
-			)
+			]
 		)->fetch_callback(
 			function ($row) use (&$member_groups) {
-				$member_groups[$row['add_deny'] === '1' ? 'allowed' : 'denied'][] = $row['id_group'];
+				$member_groups[$row['add_deny'] === '1' ? 'allowed' : 'denied'][] = (int) $row['id_group'];
 			}
 		);
 	}
@@ -1066,20 +1066,20 @@ function groupsAllowedTo($permission, $board_id = null)
 	else
 	{
 		// First get the profile of the given board.
-		if (isset($board_info['id']) && $board_info['id'] == $board_id)
+		if (isset($board_info['id']) && (int) $board_info['id'] === (int) $board_id)
 		{
-			$profile_id = $board_info['profile'];
+			$profile_id = (int) $board_info['profile'];
 		}
 		elseif ($board_id !== 0)
 		{
 			require_once(SUBSDIR . '/Boards.subs.php');
-			$board_data = fetchBoardsInfo(array('boards' => $board_id), array('selects' => 'permissions'));
+			$board_data = fetchBoardsInfo(['boards' => $board_id], ['selects' => 'permissions']);
 
 			if (empty($board_data))
 			{
 				throw new \ElkArte\Exceptions\Exception('no_board');
 			}
-			$profile_id = $board_data[$board_id]['id_profile'];
+			$profile_id = (int) $board_data[$board_id]['id_profile'];
 		}
 		else
 		{
@@ -1098,7 +1098,7 @@ function groupsAllowedTo($permission, $board_id = null)
 			)
 		)->fetch_callback(
 			function ($row) use (&$member_groups) {
-				$member_groups[$row['add_deny'] === '1' ? 'allowed' : 'denied'][] = $row['id_group'];
+				$member_groups[$row['add_deny'] === '1' ? 'allowed' : 'denied'][] = (int) $row['id_group'];
 			}
 		);
 	}

@@ -29,6 +29,7 @@ class ProfileHistory extends AbstractController
 {
 	/** @var int Member id for the history being viewed */
 	private $_memID = 0;
+
 	/** @var \ElkArte\Member The \ElkArte\Member object is stored here to avoid some global */
 	private $_profile;
 
@@ -111,18 +112,14 @@ class ProfileHistory extends AbstractController
 			'base_href' => $scripturl . '?action=profile;area=history;sa=user;u=' . $this->_memID,
 			'default_sort_col' => 'date',
 			'get_items' => [
-				'function' => function ($start, $items_per_page, $sort, $where, $where_vars = []) {
-					return $this->list_getUserErrors($start, $items_per_page, $sort, $where, $where_vars);
-				},
+				'function' => fn($start, $items_per_page, $sort, $where, $where_vars = []) => $this->list_getUserErrors($start, $items_per_page, $sort, $where, $where_vars),
 				'params' => [
 					'le.id_member = {int:current_member}',
 					['current_member' => $this->_memID],
 				],
 			],
 			'get_count' => [
-				'function' => function ($where, $where_vars = []) {
-					return $this->list_getUserErrorCount($where, $where_vars);
-				},
+				'function' => fn($where, $where_vars = []) => $this->list_getUserErrorCount($where, $where_vars),
 				'params' => [
 					'id_member = {int:current_member}',
 					['current_member' => $this->_memID],
@@ -315,18 +312,14 @@ class ProfileHistory extends AbstractController
 			'base_href' => $context['base_url'] . ';searchip=' . $context['ip'],
 			'default_sort_col' => 'date',
 			'get_items' => [
-				'function' => function ($start, $items_per_page, $sort, $where, $where_vars = []) {
-					return $this->list_getIPMessages($start, $items_per_page, $sort, $where, $where_vars);
-				},
+				'function' => fn($start, $items_per_page, $sort, $where, $where_vars = []) => $this->list_getIPMessages($start, $items_per_page, $sort, $where, $where_vars),
 				'params' => [
 					'm.poster_ip ' . $ip_string,
 					['ip_address' => $ip_var],
 				],
 			],
 			'get_count' => [
-				'function' => function ($where, $where_vars = []) {
-					return $this->list_getIPMessageCount($where, $where_vars);
-				},
+				'function' => fn($where, $where_vars = []) => $this->list_getIPMessageCount($where, $where_vars),
 				'params' => [
 					'm.poster_ip ' . $ip_string,
 					['ip_address' => $ip_var],
@@ -408,18 +401,14 @@ class ProfileHistory extends AbstractController
 			'base_href' => $context['base_url'] . ';searchip=' . $context['ip'],
 			'default_sort_col' => 'date2',
 			'get_items' => [
-				'function' => function ($start, $items_per_page, $sort, $where, $where_vars = []) {
-					return $this->list_getUserErrors($start, $items_per_page, $sort, $where, $where_vars);
-				},
+				'function' => fn($start, $items_per_page, $sort, $where, $where_vars = []) => $this->list_getUserErrors($start, $items_per_page, $sort, $where, $where_vars),
 				'params' => [
 					'le.ip ' . $ip_string,
 					['ip_address' => $ip_var],
 				],
 			],
 			'get_count' => [
-				'function' => function ($where, $where_vars = []) {
-					return $this->list_getUserErrorCount($where, $where_vars);
-				},
+				'function' => fn($where, $where_vars = []) => $this->list_getUserErrorCount($where, $where_vars),
 				'params' => [
 					'ip ' . $ip_string,
 					['ip_address' => $ip_var],
@@ -519,6 +508,7 @@ class ProfileHistory extends AbstractController
 			// Let integration add whois servers easily
 			call_integration_hook('integrate_trackip');
 		}
+
 		$context['sub_template'] = 'trackIP';
 	}
 
@@ -582,18 +572,14 @@ class ProfileHistory extends AbstractController
 			'no_items_label' => $txt['trackLogins_none_found'],
 			'base_href' => $context['base_url'],
 			'get_items' => [
-				'function' => function ($start, $items_per_page, $sort, $where, $where_vars = []) {
-					return $this->list_getLogins($start, $items_per_page, $sort, $where, $where_vars);
-				},
+				'function' => fn($start, $items_per_page, $sort, $where, $where_vars = []) => $this->list_getLogins($start, $items_per_page, $sort, $where, $where_vars),
 				'params' => [
 					'id_member = {int:current_member}',
 					['current_member' => $this->_memID],
 				],
 			],
 			'get_count' => [
-				'function' => function ($where, $where_vars = []) {
-					return $this->list_getLoginCount($where, $where_vars);
-				},
+				'function' => fn($where, $where_vars = []) => $this->list_getLoginCount($where, $where_vars),
 				'params' => [
 					'id_member = {int:current_member}',
 					['current_member' => $this->_memID],
@@ -696,14 +682,10 @@ class ProfileHistory extends AbstractController
 			'base_href' => $scripturl . '?action=profile;area=history;sa=edits;u=' . $this->_memID,
 			'default_sort_col' => 'time',
 			'get_items' => [
-				'function' => function ($start, $items_per_page, $sort) {
-					return $this->list_getProfileEdits($start, $items_per_page, $sort);
-				},
+				'function' => fn($start, $items_per_page, $sort) => $this->list_getProfileEdits($start, $items_per_page, $sort),
 			],
 			'get_count' => [
-				'function' => function () {
-					return $this->list_getProfileEditCount();
-				},
+				'function' => fn() => $this->list_getProfileEditCount(),
 			],
 			'columns' => [
 				'action' => [

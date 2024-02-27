@@ -94,11 +94,11 @@ class Calendar extends AbstractController
 		$today = getTodayInfo();
 
 		// If the month and year are not passed in, use today's date as a starting point.
-		$curPage = array(
+		$curPage = [
 			'day' => isset($_REQUEST['day']) ? (int) $_REQUEST['day'] : $today['day'],
 			'month' => isset($_REQUEST['month']) ? (int) $_REQUEST['month'] : $today['month'],
 			'year' => isset($_REQUEST['year']) ? (int) $_REQUEST['year'] : $today['year']
-		);
+		];
 
 		// Make sure the year and month are in valid ranges.
 		if ($curPage['month'] < 1 || $curPage['month'] > 12)
@@ -120,9 +120,9 @@ class Calendar extends AbstractController
 		// Load all the context information needed to show the calendar grid.
 		$calendarOptions = array(
 			'start_day' => empty($options['calendar_start_day']) ? 0 : $options['calendar_start_day'],
-			'show_birthdays' => in_array($modSettings['cal_showbdays'], array(1, 2)),
-			'show_events' => in_array($modSettings['cal_showevents'], array(1, 2)),
-			'show_holidays' => in_array($modSettings['cal_showholidays'], array(1, 2)),
+			'show_birthdays' => in_array((int) $modSettings['cal_showbdays'], array(1, 2)),
+			'show_events' => in_array((int) $modSettings['cal_showevents'], array(1, 2)),
+			'show_holidays' => in_array((int) $modSettings['cal_showholidays'], array(1, 2)),
 			'show_week_num' => true,
 			'short_day_titles' => false,
 			'show_next_prev' => true,
@@ -257,11 +257,11 @@ class Calendar extends AbstractController
 
 			// Load the list of boards and categories in the context.
 			require_once(SUBSDIR . '/Boards.subs.php');
-			$boardListOptions = array(
+			$boardListOptions = [
 				'included_boards' => in_array(0, $boards) ? null : $boards,
 				'not_redirection' => true,
 				'selected_board' => $modSettings['cal_defaultboard'],
-			);
+			];
 			$context += getBoardList($boardListOptions);
 		}
 
@@ -269,12 +269,14 @@ class Calendar extends AbstractController
 		theme()->getTemplates()->load('Calendar');
 		$context['sub_template'] = 'unlinked_event_post';
 
+		$modSettings['cal_limityear'] = empty($modSettings['cal_limityear']) ? 20 : (int) $modSettings['cal_limityear'];
+
 		$context['cal_minyear'] = $modSettings['cal_minyear'];
-		$context['cal_maxyear'] = (int) date('Y') + (int) $modSettings['cal_limityear'];
+		$context['cal_maxyear'] = (int) date('Y') + $modSettings['cal_limityear'];
 		$context['page_title'] = $event->isNew() ? $txt['calendar_edit'] : $txt['calendar_post_event'];
-		$context['linktree'][] = array(
+		$context['linktree'][] = [
 			'name' => $context['page_title'],
-		);
+		];
 	}
 
 	/**
@@ -292,7 +294,7 @@ class Calendar extends AbstractController
 		$event = new CalendarEvent($event_id, $modSettings);
 
 		// Validate the post...
-		$save_data = array();
+		$save_data = [];
 		if (!isset($_POST['link_to_board']))
 		{
 			try
@@ -341,8 +343,7 @@ class Calendar extends AbstractController
 	/**
 	 *
 	 * What it does:
-	 *  - require_once modules of the controller (not addons because these are
-	 *    always all require'd by the dispatcher),
+	 *  - require_once modules of the controller (not addons because these are always all require'd by the dispatcher),
 	 *  - Creates the event manager and registers addons and modules,
 	 *  - Instantiate the controller
 	 *  - Runs pre_dispatch
@@ -356,11 +357,13 @@ class Calendar extends AbstractController
 		$controller->pre_dispatch();
 		$function_name = 'action_post';
 
-		call_integration_hook('integrate_action_' . $hook . '_before', array($function_name));
+		call_integration_hook('integrate_action_' . $hook . '_before', [$function_name]);
 
 		$controller->{$function_name}();
 
-		call_integration_hook('integrate_action_' . $hook . '_after', array($function_name));
+		call_integration_hook('integrate_action_' . $hook . '_after', [$function_name]);
+
+		return true;
 	}
 
 	/**

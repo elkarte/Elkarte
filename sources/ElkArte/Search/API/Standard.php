@@ -219,14 +219,20 @@ class Standard extends AbstractAPI
 				'limit' => empty($modSettings['search_max_results']) ? 0 : $modSettings['search_max_results'] - $numSubjectResults,
 			));
 
-			call_integration_hook('integrate_subject_only_search_query', array(&$subject_query, &$subject_query_params));
+			call_integration_hook('integrate_subject_only_search_query', [&$subject_query, &$subject_query_params]);
 
 			$numSubjectResults += $this->_build_search_results_log($subject_query);
-
-			if (!empty($modSettings['search_max_results']) && $numSubjectResults >= $modSettings['search_max_results'])
+			if (empty($modSettings['search_max_results']))
 			{
-				break;
+				continue;
 			}
+
+			if ($numSubjectResults < $modSettings['search_max_results'])
+			{
+				continue;
+			}
+
+			break;
 		}
 
 		return $numSubjectResults;
@@ -255,7 +261,7 @@ class Standard extends AbstractAPI
 	{
 		$relevance = '1000 * (';
 
-		if ($factors !== null && is_array($factors))
+		if (is_array($factors))
 		{
 			$weight_total = 0;
 			foreach ($factors as $type => $value)
@@ -318,23 +324,22 @@ class Standard extends AbstractAPI
 				(' . implode(', ', array_keys($main_query['select'])) . ')') : '') . '
 			SELECT
 				' . implode(', ', $main_query['select']) . '
-			FROM ' . $main_query['from'] . (!empty($main_query['inner_join']) ? '
+			FROM ' . $main_query['from'] . (empty($main_query['inner_join']) ? '' : '
 				INNER JOIN ' . implode('
-				INNER JOIN ', array_unique($main_query['inner_join'])) : '') . (!empty($main_query['left_join']) ? '
+				INNER JOIN ', array_unique($main_query['inner_join']))) . (empty($main_query['left_join']) ? '' : '
 				LEFT JOIN ' . implode('
-				LEFT JOIN ', array_unique($main_query['left_join'])) : '') . (!empty($main_query['where']) ? '
-			WHERE ' : '') . implode('
-				AND ', array_unique($main_query['where'])) . (!empty($main_query['group_by']) ? '
-			GROUP BY ' . implode(', ', array_unique($main_query['group_by'])) : '') . (!empty($main_query['parameters']['limit']) ? '
-			LIMIT {int:limit}' : ''),
+				LEFT JOIN ', array_unique($main_query['left_join']))) . (empty($main_query['where']) ? '' : '
+			WHERE ') . implode('
+				AND ', array_unique($main_query['where'])) . (empty($main_query['group_by']) ? '' : '
+			GROUP BY ' . implode(', ', array_unique($main_query['group_by']))) . (empty($main_query['parameters']['limit']) ? '' : '
+			LIMIT {int:limit}'),
 			$main_query['parameters']
 		);
 
 		// If the database doesn't support IGNORE to make this fast we need to do some tracking.
 		if (!$this->_db->support_ignore())
 		{
-			$inserts = array();
-
+			$inserts = [];
 			while (($row = $ignoreRequest->fetch_assoc()))
 			{
 				// No duplicates!
@@ -361,7 +366,7 @@ class Standard extends AbstractAPI
 			// Now put them in!
 			if (!empty($inserts))
 			{
-				$query_columns = array();
+				$query_columns = [];
 				foreach ($main_query['select'] as $k => $v)
 				{
 					$query_columns[$k] = 'int';
@@ -371,17 +376,14 @@ class Standard extends AbstractAPI
 					'{db_prefix}log_search_results',
 					$query_columns,
 					$inserts,
-					array('id_search', 'id_topic')
+					['id_search', 'id_topic']
 				);
 			}
-			$num_results = count($inserts);
-		}
-		else
-		{
-			$num_results = $ignoreRequest->affected_rows();
+
+			return count($inserts);
 		}
 
-		return $num_results;
+		return $ignoreRequest->affected_rows();
 	}
 
 	/**
@@ -509,6 +511,7 @@ class Standard extends AbstractAPI
 					{
 						$where[] = 'm.subject ' . (empty($modSettings['search_match_words']) || $this->noRegexp() ? ' {not_ilike} ' : ' {not_rlike} ') . '{string:all_word_body_' . $count . '}';
 					}
+
 					$main_query['parameters']['all_word_body_' . ($count++)] = $this->prepareWord($regularWord, $this->noRegexp());
 				}
 
@@ -553,6 +556,7 @@ class Standard extends AbstractAPI
 				$main_query['parameters']['board_query'] = $this->_searchParams->_boardQuery;
 			}
 		}
+
 		call_integration_hook('integrate_main_search_query', array(&$main_query));
 
 		// Did we either get some indexed results, or otherwise did not do an indexed query?
@@ -747,6 +751,7 @@ class Standard extends AbstractAPI
 
 					$inserts[$row[$ind]] = $row;
 				}
+
 				$ignoreRequest->free_result();
 				$numSubjectResults = count($inserts);
 			}
@@ -755,10 +760,17 @@ class Standard extends AbstractAPI
 				$numSubjectResults += $ignoreRequest->affected_rows();
 			}
 
-			if (!empty($modSettings['search_max_results']) && $numSubjectResults >= $modSettings['search_max_results'])
+			if (empty($modSettings['search_max_results']))
 			{
-				break;
+				continue;
 			}
+
+			if ($numSubjectResults < $modSettings['search_max_results'])
+			{
+				continue;
+			}
+
+			break;
 		}
 
 		// Got some non-MySQL data to plonk in?
@@ -775,6 +787,11 @@ class Standard extends AbstractAPI
 		return $numSubjectResults;
 	}
 
+	/**
+	 * Determine whether or not to use the word index for search query
+	 *
+	 * @return bool Return true if word index should be used, otherwise false
+	 */
 	public function useWordIndex()
 	{
 		return false;
@@ -790,7 +807,7 @@ class Standard extends AbstractAPI
 	private function _prepare_word_index($id_search)
 	{
 		$indexedResults = 0;
-		$inserts = array();
+		$inserts = [];
 
 		// Clear, all clear!
 		if (!$this->_createTemporary)
@@ -803,6 +820,7 @@ class Standard extends AbstractAPI
 				)
 			);
 		}
+
 		$excludedWords = $this->_searchArray->getExcludedWords();
 
 		foreach ($this->_searchWords as $words)
@@ -817,10 +835,10 @@ class Standard extends AbstractAPI
 					'max_results' => $this->config->maxMessageResults,
 					'indexed_results' => $indexedResults,
 					'params' => array(
-						'id_search' => !$this->_createTemporary ? $id_search : 0,
+						'id_search' => $this->_createTemporary ? 0 : $id_search,
 						'excluded_words' => $excludedWords,
-						'user_query' => !empty($this->_searchParams->_userQuery) ? $this->_searchParams->_userQuery : '',
-						'board_query' => !empty($this->_searchParams->_boardQuery) ? $this->_searchParams->_boardQuery : '',
+						'user_query' => empty($this->_searchParams->_userQuery) ? '' : $this->_searchParams->_userQuery,
+						'board_query' => empty($this->_searchParams->_boardQuery) ? '' : $this->_searchParams->_boardQuery,
 						'topic' => (int) $this->_searchParams->topic,
 						'min_msg_id' => (int) $this->_searchParams->_minMsgID,
 						'max_msg_id' => (int) $this->_searchParams->_maxMsgID,
@@ -844,6 +862,7 @@ class Standard extends AbstractAPI
 
 						$inserts[$row[0]] = $row;
 					}
+
 					$ignoreRequest->free_result();
 					$indexedResults = count($inserts);
 				}
@@ -874,7 +893,7 @@ class Standard extends AbstractAPI
 	}
 
 	/**
-	 * {@inheritdoc }
+	 * {@inheritDoc}
 	 */
 	public function indexedWordQuery($words, $search_data)
 	{
@@ -896,8 +915,8 @@ class Standard extends AbstractAPI
 		$participants = array();
 		$request = $this->_db_search->search_query('', '
 			SELECT ' .
-				(empty($this->_searchParams['topic']) ? 'lsr.id_topic' : $this->_searchParams->topic . ' AS id_topic') . ',
-			 	lsr.id_msg, lsr.relevance, lsr.num_matches
+			(empty($this->_searchParams['topic']) ? 'lsr.id_topic' : $this->_searchParams->topic . ' AS id_topic') . ',
+				lsr.id_msg, lsr.relevance, lsr.num_matches
 			FROM {db_prefix}log_search_results AS lsr' . ($this->_searchParams->sort === 'num_replies' ? '
 				INNER JOIN {db_prefix}topics AS t ON (t.id_topic = lsr.id_topic)' : '') . '
 			WHERE lsr.id_search = {int:id_search}
@@ -921,6 +940,7 @@ class Standard extends AbstractAPI
 			// By default they didn't participate in the topic!
 			$participants[$row['id_topic']] = false;
 		}
+
 		$request->free_result();
 
 		return $participants;

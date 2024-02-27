@@ -1,7 +1,7 @@
 <?php
 
 /**
- *
+ * Adds Visual Verification controls to the Registration page
  *
  * @package   ElkArte Forum
  * @copyright ElkArte Forum contributors
@@ -16,6 +16,7 @@
 
 namespace ElkArte\Modules\Verification;
 
+use ElkArte\Errors\ErrorContext;
 use ElkArte\EventManager;
 use ElkArte\Modules\AbstractModule;
 use ElkArte\VerificationControls\VerificationControlsIntegrate;
@@ -28,7 +29,7 @@ use ElkArte\VerificationControls\VerificationControlsIntegrate;
 class Register extends AbstractModule
 {
 	/**
-	 * {@inheritdoc }
+	 * {@inheritDoc}
 	 */
 	public static function hooks(EventManager $eventsManager)
 	{
@@ -36,24 +37,21 @@ class Register extends AbstractModule
 
 		if (!empty($modSettings['reg_verification']))
 		{
-			return array(
-				array('prepare_context', array('\\ElkArte\\Modules\\Verification\\Register', 'prepare_context'), array('current_step')),
-				array('before_complete_register', array('\\ElkArte\\Modules\\Verification\\Register', 'before_complete_register'), array('reg_errors')),
-				array('verify_contact', array('\\ElkArte\\Modules\\Verification\\Register', 'verify_contact'), array()),
-				array('setup_contact', array('\\ElkArte\\Modules\\Verification\\Register', 'setup_contact'), array()),
-			);
+			return [
+				['prepare_context', [Register::class, 'prepare_context'], ['current_step']],
+				['before_complete_register', [Register::class, 'before_complete_register'], ['reg_errors']],
+				['verify_contact', [Register::class, 'verify_contact'], []],
+				['setup_contact', [Register::class, 'setup_contact'], []],
+			];
 		}
-		else
-		{
-			return array();
-		}
+
+		return [];
 	}
 
 	/**
 	 * Prepare $context for the registration form.
 	 *
 	 * @param int $current_step current step of the registration process
-	 * @throws \ElkArte\Exceptions\Exception
 	 */
 	public function prepare_context($current_step)
 	{
@@ -62,9 +60,9 @@ class Register extends AbstractModule
 		// Generate a visual verification code to make sure the user is no bot.
 		if ($current_step > 1)
 		{
-			$verificationOptions = array(
+			$verificationOptions = [
 				'id' => 'register',
-			);
+			];
 			$context['visual_verification'] = VerificationControlsIntegrate::create($verificationOptions);
 			$context['visual_verification_id'] = $verificationOptions['id'];
 		}
@@ -78,17 +76,16 @@ class Register extends AbstractModule
 	/**
 	 * Checks the user passed the verifications on the registration form.
 	 *
-	 * @param \ElkArte\Errors\ErrorContext $reg_errors Errors object from the registration controller
-	 * @throws \ElkArte\Exceptions\Exception
+	 * @param ErrorContext $reg_errors Errors object from the registration controller
 	 */
 	public function before_complete_register($reg_errors)
 	{
 		global $context;
 
 		// Check whether the visual verification code was entered correctly.
-		$verificationOptions = array(
+		$verificationOptions = [
 			'id' => 'register',
-		);
+		];
 		$context['visual_verification'] = VerificationControlsIntegrate::create($verificationOptions, true);
 
 		if (is_array($context['visual_verification']))
@@ -108,9 +105,9 @@ class Register extends AbstractModule
 		global $context, $txt;
 
 		// How about any verification errors
-		$verificationOptions = array(
+		$verificationOptions = [
 			'id' => 'contactform',
-		);
+		];
 		$context['require_verification'] = VerificationControlsIntegrate::create($verificationOptions, true);
 
 		if (is_array($context['require_verification']))
@@ -129,9 +126,9 @@ class Register extends AbstractModule
 	{
 		global $context;
 
-		$verificationOptions = array(
+		$verificationOptions = [
 			'id' => 'contactform',
-		);
+		];
 		$context['require_verification'] = VerificationControlsIntegrate::create($verificationOptions);
 		$context['visual_verification_id'] = $verificationOptions['id'];
 	}

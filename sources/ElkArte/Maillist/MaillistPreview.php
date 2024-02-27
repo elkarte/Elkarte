@@ -13,7 +13,6 @@
 namespace ElkArte\Maillist;
 
 use ElkArte\AbstractController;
-use ElkArte\EmailParse;
 use ElkArte\Languages\Txt;
 
 /**

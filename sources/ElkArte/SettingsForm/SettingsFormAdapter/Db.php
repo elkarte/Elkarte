@@ -118,17 +118,7 @@ class Db extends Adapter
 			return $txt[$configVar[1]];
 		}
 
-		if (isset($txt['setting_' . $configVar[1]]))
-		{
-			return $txt['setting_' . $configVar[1]];
-		}
-
-		if (isset($txt['groups_' . $configVar[1]]))
-		{
-			return $txt['groups_' . $configVar[1]];
-		}
-
-		return $configVar[1];
+		return $txt['setting_' . $configVar[1]] ?? $txt['groups_' . $configVar[1]] ?? $configVar[1];
 	}
 
 	/**
@@ -142,7 +132,7 @@ class Db extends Adapter
 			if ($configVar[0] === 'select' && !empty($configVar['multiple']))
 			{
 				$this->context[$configVar[1]]['name'] .= '[]';
-				$this->context[$configVar[1]]['value'] = !empty($this->context[$configVar[1]]['value']) ? Util::unserialize($this->context[$configVar[1]]['value']) : [];
+				$this->context[$configVar[1]]['value'] = empty($this->context[$configVar[1]]['value']) ? [] : Util::unserialize($this->context[$configVar[1]]['value']);
 			}
 
 			// If it's associative
@@ -192,7 +182,7 @@ class Db extends Adapter
 				$configVar['mask'] = [$configVar['mask']];
 			}
 
-			foreach ($configVar['mask'] as $key => $mask)
+			foreach ($configVar['mask'] as $mask)
 			{
 				$rules[$configVar[1]][] = $known_rules[$mask] ?? $mask;
 			}
@@ -240,10 +230,17 @@ class Db extends Adapter
 		}
 
 		// Is help available for this field based on its name
-		if (isset($helptxt[$configVar[1]]) && !isset($configVar['helptext']))
+		if (!isset($helptxt[$configVar[1]]))
 		{
-			$this->context[$configVar[1]]['helptext'] = $configVar[1];
+			return;
 		}
+
+		if (isset($configVar['helptext']))
+		{
+			return;
+		}
+
+		$this->context[$configVar[1]]['helptext'] = $configVar[1];
 	}
 
 	/**
@@ -254,9 +251,7 @@ class Db extends Adapter
 		global $context;
 
 		$inlinePermissions = array_filter($this->configVars,
-			static function ($configVar) {
-				return isset($configVar[0]) && $configVar[0] === 'permissions';
-			}
+			static fn($configVar) => isset($configVar[0]) && $configVar[0] === 'permissions'
 		);
 
 		if (empty($inlinePermissions))
@@ -278,9 +273,7 @@ class Db extends Adapter
 		global $helptxt, $modSettings;
 
 		$bbcChoice = array_filter($this->configVars,
-			static function ($configVar) {
-				return isset($configVar[0]) && $configVar[0] === 'bbc';
-			}
+			static fn($configVar) => isset($configVar[0]) && $configVar[0] === 'bbc'
 		);
 		if (empty($bbcChoice))
 		{
@@ -291,6 +284,7 @@ class Db extends Adapter
 		$codes = ParserWrapper::instance()->getCodes();
 		$bbcTags = $codes->getTags();
 		$bbcTags = array_unique($bbcTags);
+
 		$bbc_sections = [];
 		foreach ($bbcTags as $tag)
 		{
@@ -318,7 +312,7 @@ class Db extends Adapter
 	 */
 	public function save()
 	{
-		list ($setArray) = $this->sanitizeVars();
+		[$setArray] = $this->sanitizeVars();
 		$inlinePermissions = [];
 
 		foreach ($this->configVars as $var)
@@ -327,6 +321,7 @@ class Db extends Adapter
 			{
 				continue;
 			}
+
 			// Permissions?
 			if ($var[0] === 'permissions')
 			{
@@ -366,6 +361,7 @@ class Db extends Adapter
 			{
 				continue;
 			}
+
 			$setTypes[$var[1]] = $var[1];
 			switch ($var[0])
 			{
@@ -386,6 +382,7 @@ class Db extends Adapter
 						// For security purposes we validate this line by line.
 						$setArray[$var[1]] = serialize(array_intersect($this->configValues[$var[1]], array_keys($var[2])));
 					}
+
 					break;
 				case 'int':
 					// Integers!
@@ -409,6 +406,7 @@ class Db extends Adapter
 					{
 						$setArray[$var[1]] = $this->configValues[$var[1]][0];
 					}
+
 					break;
 				case 'bbc':
 					// BBC.
@@ -439,7 +437,7 @@ class Db extends Adapter
 	}
 
 	/**
-	 * @param string[] $var
+	 * @param mixed $var
 	 *
 	 * @return string
 	 */

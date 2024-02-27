@@ -20,21 +20,17 @@ use ElkArte\ValuesContainer;
  */
 class SessionIndex extends ValuesContainer
 {
-	protected $_idx = '';
-
 	/**
 	 * Constructor
 	 *
-	 * @param string $idx The index of to be used in $_SESSION
+	 * @param string $_idx The index of to be used in $_SESSION
 	 * @param array|null $data Any array of data used to initialize the object (optional)
 	 */
-	public function __construct($idx, $data = null)
+	public function __construct(protected $_idx, $data = null)
 	{
-		$this->_idx = $idx;
-
 		if (!isset($_SESSION[$this->_idx]))
 		{
-			$_SESSION[$this->_idx] = $data === null ? array() : (array) $data;
+			$_SESSION[$this->_idx] = $data === null ? [] : (array) $data;
 		}
 
 		$this->data = &$_SESSION[$this->_idx];

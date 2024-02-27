@@ -21,26 +21,24 @@ use ElkArte\Modules\AbstractModule;
  */
 class Display extends AbstractModule
 {
-	/**
-	 * @var bool
-	 */
+	/** @var bool */
 	protected static $includeUnapproved = false;
 
 	/**
-	 * {@inheritdoc }
+	 * {@inheritDoc}
 	 */
 	public static function hooks(EventManager $eventsManager)
 	{
 		global $modSettings;
 
-		$return = array();
+		$return = [];
 
 		if (!empty($modSettings['enableFollowup']))
 		{
-			$return = array(
-				array('topicinfo', array('\\ElkArte\\Modules\\Random\\Display', 'topicinfo'), array('topicinfo', 'topic', 'includeUnapproved')),
-				array('prepare_context', array('\\ElkArte\\Modules\\Random\\Display', 'prepare_context'), array())
-			);
+			$return = [
+				['topicinfo', [Display::class, 'topicinfo'], ['topicinfo', 'topic', 'includeUnapproved']],
+				['prepare_context', [Display::class, 'prepare_context'], []]
+			];
 
 			add_integration_function('integrate_topic_query', '\\ElkArte\\Modules\\Random\\Display::followup_topic_query', '', false);
 			add_integration_function('integrate_display_message_list', '\\ElkArte\\Modules\\Random\\Display::followup_message_list', '', false);
@@ -130,6 +128,6 @@ class Display extends AbstractModule
 	{
 		global $context;
 
-		$context['can_follow_up'] = boardsAllowedTo('post_new') !== array();
+		$context['can_follow_up'] = boardsAllowedTo('post_new') !== [];
 	}
 }

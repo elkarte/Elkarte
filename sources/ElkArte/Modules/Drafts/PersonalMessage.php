@@ -16,11 +16,12 @@
 
 namespace ElkArte\Modules\Drafts;
 
+use ElkArte\Controller\Draft;
 use ElkArte\EventManager;
 use ElkArte\Exceptions\ControllerRedirectException;
 use ElkArte\Exceptions\PmErrorException;
-use ElkArte\Modules\AbstractModule;
 use ElkArte\Languages\Txt;
+use ElkArte\Modules\AbstractModule;
 use ElkArte\Util;
 use ElkArte\ValuesContainer;
 
@@ -40,16 +41,16 @@ class PersonalMessage extends AbstractModule
 	/** @var int Subject length */
 	protected static $_subject_length = 32;
 
-	/** @var \ElkArte\EventManager */
-	protected static $_eventsManager = null;
+	/** @var EventManager */
+	protected static $_eventsManager;
 
-	/** @var \ElkArte\ValuesContainer */
+	/** @var ValuesContainer */
 	protected $_loaded_draft;
 
 	/**
 	 * Add PM draft hooks and events to the system
 	 *
-	 * {@inheritdoc}
+	 * {@inheritDoc}
 	 */
 	public static function hooks(EventManager $eventsManager)
 	{
@@ -82,16 +83,13 @@ class PersonalMessage extends AbstractModule
 
 			// Events
 			return [
-				['before_set_context', ['\\ElkArte\\Modules\\Drafts\\PersonalMessage', 'before_set_context'], ['pmsg']],
-				['prepare_send_context', ['\\ElkArte\\Modules\\Drafts\\PersonalMessage', 'prepare_send_context'], ['editorOptions']],
-				['before_sending', ['\\ElkArte\\Modules\\Drafts\\PersonalMessage', 'before_sending'], ['recipientList']],
-				['message_sent', ['\\ElkArte\\Modules\\Drafts\\PersonalMessage', 'message_sent'], ['failed']],
+				['before_set_context', [PersonalMessage::class, 'before_set_context'], ['pmsg']],
+				['prepare_send_context', [PersonalMessage::class, 'prepare_send_context'], ['editorOptions']],
+				['before_sending', [PersonalMessage::class, 'before_sending'], ['recipientList']],
+				['message_sent', [PersonalMessage::class, 'message_sent'], ['failed']],
 			];
 		}
-		else
-		{
-			return [];
-		}
+		return [];
 	}
 
 	/**
@@ -103,13 +101,13 @@ class PersonalMessage extends AbstractModule
 	{
 		global $scripturl, $txt;
 
-		$pm_areas['folders']['areas'] = elk_array_insert($pm_areas['folders']['areas'], 'sent', array(
-			'showpmdrafts' => array(
+		$pm_areas['folders']['areas'] = elk_array_insert($pm_areas['folders']['areas'], 'sent', [
+			'showpmdrafts' => [
 				'label' => $txt['drafts_show'],
 				'custom_url' => $scripturl . '?action=pm;sa=showpmdrafts',
 				'permission' => 'pm_draft',
 				'enabled' => true,
-			)), 'after');
+			]], 'after');
 	}
 
 	/**
@@ -119,11 +117,11 @@ class PersonalMessage extends AbstractModule
 	 */
 	public static function integrate_sa_pm_index(&$subActions)
 	{
-		$subActions['showpmdrafts'] = array(
-			'controller' => '\\ElkArte\\Controller\\Draft',
+		$subActions['showpmdrafts'] = [
+			'controller' => Draft::class,
 			'function' => 'action_showPMDrafts',
 			'permission' => 'pm_read'
-		);
+		];
 	}
 
 	/**
@@ -131,7 +129,7 @@ class PersonalMessage extends AbstractModule
 	 *
 	 * @param int $pmsg
 	 *
-	 * @throws \ElkArte\Exceptions\PmErrorException
+	 * @throws PmErrorException
 	 */
 	public function before_set_context($pmsg)
 	{
@@ -146,10 +144,8 @@ class PersonalMessage extends AbstractModule
 				$this->_loadDraft($this->user->id, (int) $_REQUEST['id_draft']);
 				throw new PmErrorException($this->_loaded_draft->to_list, $this->_loaded_draft);
 			}
-			else
-			{
-				$this->_prepareDraftsContext($this->user->id, $pmsg);
-			}
+
+			$this->_prepareDraftsContext($this->user->id, $pmsg);
 		}
 	}
 
@@ -223,13 +219,13 @@ class PersonalMessage extends AbstractModule
 			$short_subject = empty($draft['subject'])
 				? $txt['drafts_none']
 				: Util::shorten_text(stripslashes($draft['subject']), self::$_subject_length);
-			$context['drafts'][] = array(
+			$context['drafts'][] = [
 				'subject' => censor($short_subject),
 				'poster_time' => standardTime($draft['poster_time']),
-				'link' => '<a href="' . $scripturl . '?action=pm;sa=send;id_draft=' . $draft['id_draft'] . '">' . (!empty($draft['subject'])
-						? $draft['subject']
-						: $txt['drafts_none']) . '</a>',
-			);
+				'link' => '<a href="' . $scripturl . '?action=pm;sa=send;id_draft=' . $draft['id_draft'] . '">' . (empty($draft['subject'])
+					? $txt['drafts_none']
+					: $draft['subject']) . '</a>',
+			];
 		}
 
 		return true;
@@ -266,7 +262,7 @@ class PersonalMessage extends AbstractModule
 					bPM: true
 				}';
 
-			loadJavascriptFile('drafts.plugin.js', array('defer' => true));
+			loadJavascriptFile('drafts.plugin.js', ['defer' => true]);
 			Txt::load('Post');
 
 			// Our not so concise shortcut line
@@ -275,16 +271,16 @@ class PersonalMessage extends AbstractModule
 			$editorOptions['buttons'] = $editorOptions['buttons'] ?? [];
 			$editorOptions['hidden_fields'] = $editorOptions['hidden_fields'] ?? [];
 
-			$editorOptions['buttons'][] = array(
+			$editorOptions['buttons'][] = [
 				'name' => 'save_draft',
 				'value' => $txt['draft_save'],
 				'options' => 'onclick="submitThisOnce(this);" accesskey="d"',
-			);
+			];
 
-			$editorOptions['hidden_fields'][] = array(
+			$editorOptions['hidden_fields'][] = [
 				'name' => 'id_pm_draft',
 				'value' => empty($context['id_pm_draft']) ? 0 : $context['id_pm_draft'],
-			);
+			];
 		}
 	}
 
@@ -306,8 +302,7 @@ class PersonalMessage extends AbstractModule
 		}
 
 		// Want to save this as a draft and think about it some more?
-		if (isset($_POST['save_draft'])
-			&& !empty($context['drafts_pm_save']) && isset($_POST['id_pm_draft']))
+		if (isset($_POST['save_draft'], $_POST['id_pm_draft']) && !empty($context['drafts_pm_save']))
 		{
 			// Prepare the data
 			$draft = [
@@ -321,12 +316,12 @@ class PersonalMessage extends AbstractModule
 
 			if ($this->getApi() !== false)
 			{
-				$recipientList['to'] = isset($_POST['recipient_to']) ? explode(',', $_POST['recipient_to']) : array();
-				$recipientList['bcc'] = isset($_POST['recipient_bcc']) ? explode(',', $_POST['recipient_bcc']) : array();
+				$recipientList['to'] = isset($_POST['recipient_to']) ? explode(',', $_POST['recipient_to']) : [];
+				$recipientList['bcc'] = isset($_POST['recipient_bcc']) ? explode(',', $_POST['recipient_bcc']) : [];
 			}
 
 			// Trigger any before_savepm_draft events
-			self::$_eventsManager->trigger('before_savepm_draft', array('draft' => &$draft, 'recipientList' => &$recipientList));
+			self::$_eventsManager->trigger('before_savepm_draft', ['draft' => &$draft, 'recipientList' => &$recipientList]);
 
 			// Now save the draft
 			savePMDraft($recipientList, $draft, !empty($this->getApi()));
@@ -342,11 +337,22 @@ class PersonalMessage extends AbstractModule
 	public function message_sent($failed)
 	{
 		global $context;
-
 		// If we had a PM draft for this one, then its time to remove it since it was just sent
-		if (!$failed && $context['drafts_pm_save'] && !empty($_POST['id_pm_draft']))
+		if ($failed)
 		{
-			deleteDrafts((int) $_POST['id_pm_draft'], $this->user->id);
+			return;
 		}
+
+		if (!$context['drafts_pm_save'])
+		{
+			return;
+		}
+
+		if (empty($_POST['id_pm_draft']))
+		{
+			return;
+		}
+
+		deleteDrafts((int) $_POST['id_pm_draft'], $this->user->id);
 	}
 }

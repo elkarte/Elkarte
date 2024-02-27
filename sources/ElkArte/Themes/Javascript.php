@@ -22,12 +22,16 @@ class Javascript
 {
 	/** @var string */
 	public const STANDARD = 'standard';
+
 	/** @var string */
 	public const DEFERRED = 'defer';
+
 	/** @var array Any inline JS to output */
 	protected $js_inline = ['standard' => [], 'defer' => []];
+
 	/** @var array All the JS files to include */
 	public $js_files = [];
+
 	/** @var array JS variables to output */
 	public $js_vars = [];
 
@@ -114,27 +118,27 @@ class Javascript
 			case 'cdn':
 				echo '
 	<script src="' . $jquery_cdn . '" id="jquery"></script>',
-				(!empty($modSettings['jquery_include_ui']) ? '
-	<script src="' . $jqueryui_cdn . '" id="jqueryui"></script>' : '');
+				(empty($modSettings['jquery_include_ui']) ? '' : '
+	<script src="' . $jqueryui_cdn . '" id="jqueryui"></script>');
 				break;
 			// Just use the local file
 			case 'local':
 				echo '
 	<script src="', $settings['default_theme_url'], '/scripts/jquery-' . $jquery_version . '.min.js" id="jquery"></script>',
-				(!empty($modSettings['jquery_include_ui']) ? '
-	<script src="' . $settings['default_theme_url'] . '/scripts/jquery-ui-' . $jqueryui_version . '.min.js" id="jqueryui"></script>' : '');
+				(empty($modSettings['jquery_include_ui']) ? '' : '
+	<script src="' . $settings['default_theme_url'] . '/scripts/jquery-ui-' . $jqueryui_version . '.min.js" id="jqueryui"></script>');
 				break;
 			// CDN with local fallback
 			case 'auto':
 				echo '
 	<script src="' . $jquery_cdn . '" id="jquery"></script>',
-				(!empty($modSettings['jquery_include_ui']) ? '
-	<script src="' . $jqueryui_cdn . '" id="jqueryui"></script>' : '');
+				(empty($modSettings['jquery_include_ui']) ? '' : '
+	<script src="' . $jqueryui_cdn . '" id="jqueryui"></script>');
 				echo '
 	<script>
 		window.jQuery || document.write(\'<script src="', $settings['default_theme_url'], '/scripts/jquery-' . $jquery_version . '.min.js"><\/script>\');',
-				(!empty($modSettings['jquery_include_ui']) ? '
-		window.jQuery.ui || document.write(\'<script src="' . $settings['default_theme_url'] . '/scripts/jquery-ui-' . $jqueryui_version . '.min.js"><\/script>\')' : ''), '
+				(empty($modSettings['jquery_include_ui']) ? '' : '
+		window.jQuery.ui || document.write(\'<script src="' . $settings['default_theme_url'] . '/scripts/jquery-ui-' . $jqueryui_version . '.min.js"><\/script>\')'), '
 	</script>';
 				break;
 		}
@@ -216,8 +220,8 @@ class Javascript
 		// While we have Javascript files to place in the template
 		foreach ($files as $id => $js_file)
 		{
-			$async = !empty($js_file['options']['async']) ? ' async="async"' : '';
-			$defer = !empty($js_file['options']['defer']) ? ' defer="defer"' : '';
+			$async = empty($js_file['options']['async']) ? '' : ' async="async"';
+			$defer = empty($js_file['options']['defer']) ? '' : ' defer="defer"';
 
 			echo '
 	<script src="', $js_file['filename'], '" id="', $id, '"', $async, $defer, '></script>';
@@ -308,14 +312,7 @@ class Javascript
 			foreach ($lines as $j => $line)
 			{
 				$pos = strpos($line, $existing);
-				if ($pos === 0)
-				{
-					$lines[$j] = substr_replace($line, $new, 0, $num);
-				}
-				else
-				{
-					$lines[$j] = $new . ltrim($line);
-				}
+				$lines[$j] = $pos === 0 ? substr_replace($line, $new, 0, $num) : $new . ltrim($line);
 			}
 
 			// Done
@@ -340,7 +337,7 @@ class Javascript
 	{
 		if (!empty($javascript))
 		{
-			$this->js_inline[(!empty($defer) ? self::DEFERRED : self::STANDARD)][] = $javascript;
+			$this->js_inline[(empty($defer) ? self::STANDARD : self::DEFERRED)][] = $javascript;
 		}
 	}
 
@@ -359,7 +356,7 @@ class Javascript
 
 		foreach ($vars as $key => $value)
 		{
-			$this->js_vars[$key] = !empty($escape) ? JavaScriptEscape($value) : $value;
+			$this->js_vars[$key] = empty($escape) ? $value : JavaScriptEscape($value);
 		}
 	}
 

@@ -18,36 +18,36 @@ namespace ElkArte;
  * High level overview:
  *
  * - Register your modules against a class in which it will be triggered with
- *  enableModules($moduleName, $class) such as enableModules('Mymodule', ['display','post'])
- * - You can also create a full core feature with ADMINDIR/ManageMymoduleModule.php file containing a
- * a static class of addCoreFeature.  The file and class will be auto discovered and called.
- * - Place your file in ElkArte/Modules/Mymodule/Display.php ElkArte/Modules/Mymodule/Post.php
- * - In Mymodules Display.php and Post.php create a `public static function hooks` which returns
- * what to do when triggered, example
+ *      - enableModules($moduleName, $class) e.g. enableModules('Mymodule', ['display','post'])
+ * - You can create a core feature
+ *     - Add a file ADMINDIR/ManageMymoduleModule.php containing a static class of addCoreFeature.
+ *     - The file and class will be auto discovered and called.
+ * - Place your module files in ElkArte/Modules as a directory like
+ *     - /Mymodule/Display.php and /Mymodule/Post.php
+ * - In Mymodules Display.php and Post.php create `public static function hooks` which returns an array of actions
+ * to call when triggered
  *     - ['prepare_context', ['\\ElkArte\\Modules\\Mymodule\\Display', 'do_something'], ['attachments', 'start']
- * - This will call the do_something() method in Display.php of the Mymodule directory and pass params
- * $attachments $start values from Display.php class (where the event was triggered).
- * - Some events have defined values passed, but you can always request other values as long as they
- * are class properties
- *
+ *     - Will call the do_something() method in Display.php of the Mymodule directory and pass params
+ *     - $attachments and $start values from Display.php class will be available (where the event was triggered).
+ *     - Some events have pre-defined values passed, but you can use any other value as long as it is a property
+ *       or globals in the calling class (the class in which the event was triggered)
  */
 class EventManager
 {
 	/** @var object[] Event An array of events, each entry is a different position. */
-	protected $_registered_events = array();
+	protected $_registered_events = [];
 
 	/** @var object[] Instances of addons already loaded. */
-	protected $_instances = array();
+	protected $_instances = [];
 
-	/** @var object Instances of the controller. */
-	protected $_source = null;
+	/** @var AbstractController Instances of the controller, needs to have extended AbstractController. */
+	protected $_source;
 
 	/** @var string[] List of classes already registered. */
-	protected $_classes = array();
+	protected $_classes = [];
 
-	/** @var null|string[] List of classes declared, kept here just to
-	    avoid call get_declared_classes at each trigger */
-	protected $_declared_classes = null;
+	/** @var null|string[] List of classes declared, kept here just to avoid call get_declared_classes at each trigger */
+	protected $_declared_classes;
 
 	/**
 	 * Just a dummy for the time being.
@@ -72,15 +72,14 @@ class EventManager
 	/**
 	 * This is the function use to... trigger an event.
 	 *
-	 * - Called from many areas in the code where events can be raised
-	 * $this->_events->trigger('area', args)
+	 * - Called from many areas in the code where events can be raised $this->_events->trigger('area', args)
 	 *
 	 * @param string $position The "identifier" of the event, such as prepare_post
 	 * @param array $args The arguments passed to the methods registered
 	 *
 	 * @return bool
 	 */
-	public function trigger($position, $args = array())
+	public function trigger($position, $args = [])
 	{
 		// Nothing registered against this event, just return
 		if (!array_key_exists($position, $this->_registered_events) || !$this->_registered_events[$position]->hasEvents())
@@ -88,13 +87,13 @@ class EventManager
 			return false;
 		}
 
-		// For all areas that that registered against this event, let them know its been triggered
+		// For all areas that that registered against this event, let them know it's been triggered
 		foreach ($this->_registered_events[$position]->getEvents() as $event)
 		{
 			$class = $event[1];
 			$class_name = $class[0];
 			$method_name = $class[1];
-			$deps = $event[2] ?? array();
+			$deps = $event[2] ?? [];
 			$dependencies = null;
 
 			if (!class_exists($class_name))
@@ -120,7 +119,7 @@ class EventManager
 			}
 			else
 			{
-				foreach ($args as $key => $val)
+				foreach (array_keys($args) as $key)
 				{
 					$dependencies[$key] = &$args[$key];
 				}
@@ -129,17 +128,17 @@ class EventManager
 			$instance = $this->_getInstance($class_name);
 
 			// Do what we know we should do... if we find it.
-			if (is_callable(array($instance, $method_name)))
+			if (is_callable([$instance, $method_name]))
 			{
 				// Don't send $dependencies if there are none / the method can't use them
 				if (empty($dependencies))
 				{
-					call_user_func(array($instance, $method_name));
+					$instance->$method_name();
 				}
 				else
 				{
 					$this->_checkParameters($class_name, $method_name, $dependencies);
-					call_user_func_array(array($instance, $method_name), $dependencies);
+					call_user_func_array([$instance, $method_name], $dependencies);
 				}
 			}
 		}
@@ -150,8 +149,7 @@ class EventManager
 	 *
 	 * What it does:
 	 *
-	 * - Objects are stored in order to be shared between different triggers
-	 * in the same \ElkArte\EventManager.
+	 * - Objects are stored in order to be shared between different triggers in the same \ElkArte\EventManager.
 	 * - If the object doesn't exist yet, it is created
 	 *
 	 * @param string $class_name The name of the class.
@@ -163,13 +161,11 @@ class EventManager
 		{
 			return $this->_instances[$class_name];
 		}
-		else
-		{
-			$instance = new $class_name(HttpReq::instance(), User::$info);
-			$this->_setInstance($class_name, $instance);
 
-			return $instance;
-		}
+		$instance = new $class_name(HttpReq::instance(), User::$info);
+		$this->_setInstance($class_name, $instance);
+
+		return $instance;
 	}
 
 	/**
@@ -200,8 +196,7 @@ class EventManager
 	}
 
 	/**
-	 * Takes care of registering the classes/methods to the different positions
-	 * of the \ElkArte\EventManager.
+	 * Takes care of registering the classes/methods to the different positions of the \ElkArte\EventManager.
 	 *
 	 * What it does:
 	 *
@@ -299,15 +294,15 @@ class EventManager
 			$number_params = $r->getNumberOfParameters();
 			unset($r);
 		}
-		catch (\Exception $e)
+		catch (\Exception)
 		{
 			$number_params = 0;
 		}
 
 		// Php8 will not like passing parameters to a method that takes none
-		if ($number_params == 0 && !empty($dependencies))
+		if ($number_params === 0 && !empty($dependencies))
 		{
-			$dependencies = array();
+			$dependencies = [];
 		}
 	}
 }

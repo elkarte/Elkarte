@@ -18,11 +18,11 @@ namespace ElkArte\Cache\CacheMethod;
  */
 class Zend extends AbstractCacheMethod
 {
-	/** {@inheritdoc} */
+	/** {@inheritDoc} */
 	protected $title = 'Zend Platform/Performance Suite';
 
 	/**
-	 * {@inheritdoc}
+	 * {@inheritDoc}
 	 */
 	public function exists($key)
 	{
@@ -32,7 +32,7 @@ class Zend extends AbstractCacheMethod
 	}
 
 	/**
-	 * {@inheritdoc}
+	 * {@inheritDoc}
 	 */
 	public function get($key, $ttl = 120)
 	{
@@ -43,7 +43,7 @@ class Zend extends AbstractCacheMethod
 	}
 
 	/**
-	 * {@inheritdoc}
+	 * {@inheritDoc}
 	 */
 	public function put($key, $value, $ttl = 120)
 	{
@@ -51,7 +51,7 @@ class Zend extends AbstractCacheMethod
 	}
 
 	/**
-	 * {@inheritdoc}
+	 * {@inheritDoc}
 	 */
 	public function clean($type = '')
 	{
@@ -59,7 +59,7 @@ class Zend extends AbstractCacheMethod
 	}
 
 	/**
-	 * {@inheritdoc}
+	 * {@inheritDoc}
 	 */
 	public function isAvailable()
 	{
@@ -67,7 +67,7 @@ class Zend extends AbstractCacheMethod
 	}
 
 	/**
-	 * {@inheritdoc}
+	 * {@inheritDoc}
 	 */
 	public function details()
 	{

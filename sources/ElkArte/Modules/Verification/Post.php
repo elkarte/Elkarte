@@ -1,7 +1,7 @@
 <?php
 
 /**
- *
+ * Adds Visual Verification controls to the Post page
  *
  * @package   ElkArte Forum
  * @copyright ElkArte Forum contributors
@@ -16,6 +16,7 @@
 
 namespace ElkArte\Modules\Verification;
 
+use ElkArte\Errors\ErrorContext;
 use ElkArte\EventManager;
 use ElkArte\Modules\AbstractModule;
 use ElkArte\User;
@@ -38,53 +39,58 @@ class Post extends AbstractModule
 		// Using controls and this users is the lucky recipient of them?
 		if (User::$info->is_admin === false && User::$info->is_moderator === false && !empty($modSettings['posts_require_captcha']) && (User::$info->posts < $modSettings['posts_require_captcha'] || (User::$info->is_guest && $modSettings['posts_require_captcha'] == -1)))
 		{
-			return array(
-				array('post_errors', array('\\ElkArte\\Modules\\Verification\\Post', 'post_errors'), array('_post_errors')),
-				array('prepare_save_post', array('\\ElkArte\\Modules\\Verification\\Post', 'prepare_save_post'), array('_post_errors')),
-			);
+			return [
+				['post_errors', [Post::class, 'post_errors'], ['_post_errors']],
+				['prepare_save_post', [Post::class, 'prepare_save_post'], ['_post_errors']],
+			];
 		}
 
-		return array();
+		return [];
 	}
 
 	/**
 	 * Prepare $context for the post page.
 	 *
-	 * @param \ElkArte\Errors\ErrorContext $_post_errors
-	 * @throws \ElkArte\Exceptions\Exception
+	 * @param ErrorContext $_post_errors
 	 */
 	public function post_errors($_post_errors)
 	{
 		global $context;
 
 		// Do we need to show the visual verification image?
-		$verificationOptions = array(
+		$verificationOptions = [
 			'id' => 'post',
-		);
+		];
 		$context['require_verification'] = VerificationControlsIntegrate::create($verificationOptions);
 		$context['visual_verification_id'] = $verificationOptions['id'];
 
 		// If they came from quick reply, and have to enter verification details, give them some notice.
-		if (!empty($_REQUEST['from_qr']) && $context['require_verification'] !== false)
+		if (empty($_REQUEST['from_qr']))
 		{
-			$_post_errors->addError('need_qr_verification');
+			return;
 		}
+
+		if ($context['require_verification'] === false)
+		{
+			return;
+		}
+
+		$_post_errors->addError('need_qr_verification');
 	}
 
 	/**
 	 * Checks the user passed the verifications on the post page.
 	 *
-	 * @param \ElkArte\Errors\ErrorContext $_post_errors
-	 * @throws \ElkArte\Exceptions\Exception
+	 * @param ErrorContext $_post_errors
 	 */
 	public function prepare_save_post($_post_errors)
 	{
 		global $context;
 
 		// Wrong verification code?
-		$verificationOptions = array(
+		$verificationOptions = [
 			'id' => 'post',
-		);
+		];
 		$context['require_verification'] = VerificationControlsIntegrate::create($verificationOptions, true);
 
 		if (is_array($context['require_verification']))

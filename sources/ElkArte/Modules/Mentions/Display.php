@@ -23,12 +23,12 @@ use ElkArte\EventManager;
 class Display extends AbstractMentions
 {
 	/**
-	 * {@inheritdoc }
+	 * {@inheritDoc}
 	 */
 	public static function hooks(EventManager $eventsManager)
 	{
 		self::registerHooks('display', $eventsManager);
 
-		return array();
+		return [];
 	}
 }

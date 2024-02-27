@@ -25,8 +25,7 @@ class Server extends \ArrayObject
 {
 	/** @var array */
 	public $SERVER_SOFTWARE;
-	/** @var array */
-	public $HTTPS;
+
 	/** @var array */
 	public $SERVER_PORT;
 
@@ -145,27 +144,18 @@ class Server extends \ArrayObject
 	 */
 	public function is($server)
 	{
-		switch ($server)
+		return match ($server)
 		{
-			case 'apache':
-				return $this->_is_web_server('Apache');
-			case 'cgi':
-				return isset($this->SERVER_SOFTWARE) && strpos(PHP_SAPI, 'cgi') !== false;
-			case 'iis':
-				return $this->_is_web_server('Microsoft-IIS');
-			case 'iso_case_folding':
-				return ord(strtolower(chr(138))) === 154;
-			case 'lighttpd':
-				return $this->_is_web_server('lighttpd');
-			case 'litespeed':
-				return $this->_is_web_server('LiteSpeed');
-			case 'nginx':
-				return $this->_is_web_server('nginx');
-			case 'windows':
-				return strpos(PHP_OS, 'WIN') === 0;
-			default:
-				return false;
-		}
+			'apache' => $this->_is_web_server('Apache'),
+			'cgi' => $this->SERVER_SOFTWARE !== null && strpos(PHP_SAPI, 'cgi') !== false,
+			'iis' => $this->_is_web_server('Microsoft-IIS'),
+			'iso_case_folding' => ord(strtolower(chr(138))) === 154,
+			'lighttpd' => $this->_is_web_server('lighttpd'),
+			'litespeed' => $this->_is_web_server('LiteSpeed'),
+			'nginx' => $this->_is_web_server('nginx'),
+			'windows' => strpos(PHP_OS_FAMILY, 'WIN') === 0,
+			default => false,
+		};
 	}
 
 	/**
@@ -177,7 +167,7 @@ class Server extends \ArrayObject
 	 */
 	private function _is_web_server($type)
 	{
-		return isset($this->SERVER_SOFTWARE) && strpos($this->SERVER_SOFTWARE, $type) !== false;
+		return $this->SERVER_SOFTWARE !== null && strpos($this->SERVER_SOFTWARE, $type) !== false;
 	}
 
 	/**
@@ -224,7 +214,7 @@ class Server extends \ArrayObject
 			$port = (int) $this->SERVER_PORT;
 			if ($port && $port !== 80 && $port !== 443)
 			{
-				$host .= ":$port";
+				$host .= ':' . $port;
 			}
 		}
 
@@ -282,7 +272,7 @@ class Server extends \ArrayObject
 			// Set the address literal prefix
 			$prefix = strpos($this->SERVER_ADDR, ':') !== false ? 'IPv6:' : '';
 
-			return  '[' . $prefix . $this->SERVER_ADDR . ']';
+			return '[' . $prefix . $this->SERVER_ADDR . ']';
 		}
 
 		return $fallback;

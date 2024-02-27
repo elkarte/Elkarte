@@ -14,8 +14,10 @@ namespace ElkArte\Search\API;
 
 use ElkArte\HttpReq;
 use ElkArte\Search\SearchArray;
+use ElkArte\Search\SearchParams;
 use ElkArte\Search\WeightFactors;
 use ElkArte\Util;
+use ElkArte\ValuesContainer;
 
 /**
  * Abstract class that defines the methods any search API shall implement
@@ -46,19 +48,13 @@ abstract class AbstractAPI
 	/** @var int What is the minimum word length? */
 	protected $min_word_length;
 
-	/** @var \ElkArte\ValuesContainer All the search configurations */
-	protected $config;
-
-	/** @var null|\ElkArte\Search\SearchParams Parameters of the search */
-	protected $_searchParams;
-
 	/** @var array The weights to associate to various areas for relevancy */
 	protected $_weight_factors = [];
 
 	/** @var array Weighing factor each area, ie frequency, age, sticky, etc */
 	protected $_weight = [];
 
-	/** @var int The sum of the _weight_factors, normally but not always 100*/
+	/** @var int The sum of the _weight_factors, normally but not always 100 */
 	protected $_weight_total = 0;
 
 	/** @var bool If we are creating a tmp db table */
@@ -80,12 +76,12 @@ abstract class AbstractAPI
 	protected $_db_search;
 
 	/** @var array Words excluded from indexes */
-	protected $_excludedIndexWords =[];
+	protected $_excludedIndexWords = [];
 
 	/** @var array Words not to be found in the subject (-word) */
 	protected $_excludedSubjectWords = [];
 
-	/** @var \ElkArte\Search\SearchArray Holds the words and phrases to be searched on */
+	/** @var SearchArray Holds the words and phrases to be searched on */
 	protected $_searchArray;
 
 	/** @var array What databases do we support? (In general.) */
@@ -93,13 +89,12 @@ abstract class AbstractAPI
 
 	/**
 	 * __construct()
+	 * @param ValuesContainer $config All the search configurations
+	 * @param null|SearchParams $_searchParams Parameters of the search
 	 */
-	public function __construct($config, $searchParams)
+	public function __construct(protected $config, protected $_searchParams)
 	{
-		$this->config = $config;
-		$this->_searchParams = $searchParams;
-
-		$this->bannedWords = $config->banned_words;
+		$this->bannedWords = $this->config->banned_words;
 		$this->min_word_length = $this->_getMinWordLength();
 
 		$this->_db = database();
@@ -152,7 +147,7 @@ abstract class AbstractAPI
 	/**
 	 * Sets the SearchArray... heck if I know what it is.
 	 *
-	 * @param \ElkArte\Search\SearchArray $searchArray
+	 * @param SearchArray $searchArray
 	 */
 	public function setSearchArray(SearchArray $searchArray)
 	{
@@ -172,7 +167,7 @@ abstract class AbstractAPI
 	/**
 	 * Adds the weight factors
 	 *
-	 * @param \ElkArte\Search\WeightFactors $weights
+	 * @param WeightFactors $weights
 	 */
 	public function setWeightFactors(WeightFactors $weights)
 	{

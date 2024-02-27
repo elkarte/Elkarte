@@ -20,18 +20,6 @@ namespace ElkArte;
 class Member extends ValuesContainer
 {
 	/**
-	 * The set of data loaded
-	 *
-	 * @var string
-	 */
-	protected $set = '';
-
-	/**
-	 * @var \BBC\ParserWrapper
-	 */
-	protected $bbc_parser = null;
-
-	/**
 	 * If context has been loaded or not
 	 *
 	 * @var bool
@@ -52,11 +40,12 @@ class Member extends ValuesContainer
 	 * @param string $set
 	 * @param \BBC\ParserWrapper $bbc_parser
 	 */
-	public function __construct($data, $set, $bbc_parser)
+	public function __construct($data, /**
+  * The set of data loaded
+  */
+ protected $set, protected $bbc_parser)
 	{
 		parent::__construct($data);
-		$this->set = $set;
-		$this->bbc_parser = $bbc_parser;
 	}
 
 	/**
@@ -178,8 +167,8 @@ class Member extends ValuesContainer
 		global $modSettings, $txt, $settings, $context;
 		if ($this->set !== MemberLoader::SET_MINIMAL)
 		{
-			$buddy_list = !empty($this->data['buddy_list']) ? explode(',', $this->data['buddy_list']) : array();
-			$style_color = !empty($this->data['member_group_color']) ? 'style="color:' . $this->data['member_group_color'] . ';"' : '';
+			$buddy_list = empty($this->data['buddy_list']) ? array() : explode(',', $this->data['buddy_list']);
+			$style_color = empty($this->data['member_group_color']) ? '' : 'style="color:' . $this->data['member_group_color'] . ';"';
 			$send_pm_url = getUrl('action', ['action' => 'pm', 'sa' => 'send', 'u' => $this->data['id_member']]);
 			$online_status = $this->data['is_online'] ? 'online' : 'offline';
 
@@ -190,7 +179,7 @@ class Member extends ValuesContainer
 				'is_buddy' => $this->data['buddy'],
 				'is_reverse_buddy' => in_array(User::$info->id, $buddy_list),
 				'buddies' => $buddy_list,
-				'title' => !empty($modSettings['titlesEnable']) ? $this->data['usertitle'] : '',
+				'title' => empty($modSettings['titlesEnable']) ? '' : $this->data['usertitle'],
 				'website' => array(
 					'title' => $this->data['website_title'],
 					'url' => $this->data['website_url'],
@@ -298,6 +287,7 @@ class Member extends ValuesContainer
 				{
 					$replacements['{KEY}'] = $this->data['options'][$custom['colname'] . '_key'];
 				}
+
 				$value = strtr($custom['enclose'], $replacements);
 			}
 
@@ -305,7 +295,7 @@ class Member extends ValuesContainer
 				'title' => $custom['title'],
 				'colname' => $custom['colname'],
 				'value' => $value,
-				'placement' => !empty($custom['placement']) ? $custom['placement'] : 0,
+				'placement' => empty($custom['placement']) ? 0 : $custom['placement'],
 			);
 		}
 	}

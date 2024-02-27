@@ -35,7 +35,7 @@ use ElkArte\Util;
 class Auth extends AbstractController
 {
 	/**
-	 * {@inheritdoc }
+	 * {@inheritDoc}
 	 */
 	public function needSecurity($action = '')
 	{

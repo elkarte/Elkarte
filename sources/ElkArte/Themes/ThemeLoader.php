@@ -18,10 +18,11 @@ use ElkArte\ext\Composer\Autoload\ClassLoader;
 use ElkArte\FileFunctions;
 use ElkArte\Hooks;
 use ElkArte\HttpReq;
+use ElkArte\Languages\Txt;
 use ElkArte\User;
 use ElkArte\UserInfo;
 use ElkArte\Util;
-use ElkArte\Languages\Txt;
+use ElkArte\ValuesContainer;
 
 /**
  * The ThemeLoader class is responsible for loading and initializing themes in ElkArte.
@@ -30,8 +31,10 @@ class ThemeLoader
 {
 	/** @var Directories The list of directories. */
 	protected static $dirs;
-	/** @var \ElkArte\ValuesContainer  */
+
+	/** @var ValuesContainer */
 	public $user;
+
 	/** @var string[] Theme items we shouldn't be able to change */
 	protected $immutable_theme_data = [
 		'actual_theme_url',
@@ -51,8 +54,7 @@ class ThemeLoader
 		'theme_templates',
 		'theme_url',
 	];
-	/** @var int The id of the theme being used */
-	private $id;
+
 	/** @var Theme The current theme. */
 	private $theme;
 
@@ -69,15 +71,14 @@ class ThemeLoader
 	 * - loads default JS variables for use in every theme
 	 * - loads default JS scripts for use in every theme
 	 *
-	 * @param int $id_theme = 0
+	 * @param int $id = 0
 	 * @param bool $initialize = true
 	 */
-	public function __construct($id_theme = 0, $initialize = true)
+	public function __construct(private $id = 0, $initialize = true)
 	{
 		global $context;
 
 		$this->user = User::$info;
-		$this->id = $id_theme;
 
 		$this->initTheme();
 		if (!$initialize)
@@ -291,24 +292,24 @@ class ThemeLoader
 					'id_member' => $member,
 				]
 			)->fetch_callback(
-				function ($row) use ($immutable_theme_data, &$themeData) {
+				static function ($row) use ($immutable_theme_data, &$themeData) {
 					// There are just things we shouldn't be able to change as members.
-					if ((int)$row['id_member'] !== 0 && in_array($row['variable'], $immutable_theme_data, true))
+					if ((int) $row['id_member'] !== 0 && in_array($row['variable'], $immutable_theme_data, true))
 					{
 						return;
 					}
 
 					// If this is the theme_dir of the default theme, store it.
-					if ((int)$row['id_theme'] === 1 && empty($row['id_member'])
+					if ((int) $row['id_theme'] === 1 && empty($row['id_member'])
 						&& in_array($row['variable'], ['theme_dir', 'theme_url', 'images_url']))
 					{
 						$themeData[0]['default_' . $row['variable']] = $row['value'];
 					}
 
 					// If this isn't set yet, is a theme option, or is not the default theme..
-					if (!isset($themeData[$row['id_member']][$row['variable']]) || (int)$row['id_theme'] !== 1)
+					if (!isset($themeData[$row['id_member']][$row['variable']]) || (int) $row['id_theme'] !== 1)
 					{
-						$themeData[$row['id_member']][$row['variable']] = strpos($row['variable'], 'show_') === 0 ? (int)$row['value'] === 1 : $row['value'];
+						$themeData[$row['id_member']][$row['variable']] = strpos($row['variable'], 'show_') === 0 ? (int) $row['value'] === 1 : $row['value'];
 					}
 				}
 			);
@@ -390,7 +391,7 @@ class ThemeLoader
 			}
 
 			// Okay, #4 - perhaps it's an IP address?  We're gonna want to use that one, then. (assuming it's the IP or something...)
-			if ($do_fix === true || preg_match('~^http[s]?://(?:[\d\.:]+|\[[\d:]+\](?::\d+)?)(?:$|/)~',$detected_url) === 1)
+			if ($do_fix === true || preg_match('~^http[s]?://(?:[\d\.:]+|\[[\d:]+\](?::\d+)?)(?:$|/)~', $detected_url) === 1)
 			{
 				$this->fixThemeUrls($detected_url);
 			}
@@ -407,19 +408,29 @@ class ThemeLoader
 		global $boardurl;
 
 		$detected_url = str_replace('://', '://www.', $detected_url);
-		if ($detected_url === $boardurl
-			&& ELK !== 'SSI'
-			&& (empty($_GET) || count($_GET) === 1))
+		if ($detected_url !== $boardurl)
 		{
-			// Okay, this seems weird, but we don't want an endless loop - this will make $_GET not empty ;).
-			if (empty($_GET))
-			{
-				redirectexit('wwwRedirect');
-			}
-			elseif (key($_GET) !== 'wwwRedirect')
-			{
-				redirectexit('wwwRedirect;' . key($_GET) . '=' . current($_GET));
-			}
+			return;
+		}
+
+		if (ELK === 'SSI')
+		{
+			return;
+		}
+
+		if (!empty($_GET) && count($_GET) !== 1)
+		{
+			return;
+		}
+
+		// Okay, this seems weird, but we don't want an endless loop - this will make $_GET not empty ;).
+		if (empty($_GET))
+		{
+			redirectexit('wwwRedirect');
+		}
+		elseif (key($_GET) !== 'wwwRedirect')
+		{
+			redirectexit('wwwRedirect;' . key($_GET) . '=' . current($_GET));
 		}
 	}
 
@@ -506,19 +517,26 @@ class ThemeLoader
 		global $context, $options;
 
 		$context['admin_preferences'] = [];
-
 		// Update the option.
-		if (($this->user->is_guest === false) && !empty($options['admin_preferences']))
+		if ($this->user->is_guest !== false)
 		{
-			$context['admin_preferences'] = serializeToJson($options['admin_preferences'], static function ($array_form) {
-				global $context;
-
-				require_once(SUBSDIR . '/Admin.subs.php');
-				// Required by updateAdminPreferences
-				$context['admin_preferences'] = $array_form;
-				updateAdminPreferences();
-			});
+			return;
 		}
+
+		if (empty($options['admin_preferences']))
+		{
+			return;
+		}
+
+		$context['admin_preferences'] = serializeToJson($options['admin_preferences'], static function ($array_form) {
+			global $context;
+
+			require_once(SUBSDIR . '/Admin.subs.php');
+
+			// Required by updateAdminPreferences
+			$context['admin_preferences'] = $array_form;
+			updateAdminPreferences();
+		});
 	}
 
 	/**
@@ -551,10 +569,17 @@ class ThemeLoader
 		}
 
 		// Guest may have collapsed the header, check the cookie to prevent collapse jumping
-		if ($this->user->is_guest && isset($_COOKIE['upshrink']))
+		if (!$this->user->is_guest)
 		{
-			$context['minmax_preferences'] = ['upshrink' => $_COOKIE['upshrink']];
+			return;
 		}
+
+		if (!isset($_COOKIE['upshrink']))
+		{
+			return;
+		}
+
+		$context['minmax_preferences'] = ['upshrink' => $_COOKIE['upshrink']];
 	}
 
 	/**
@@ -596,13 +621,20 @@ class ThemeLoader
 		}
 
 		// Set the new feed links for use in the template
-		if (!empty($modSettings['xmlnews_enable']) && (!empty($modSettings['allow_guestAccess']) || $context['user']['is_logged']))
+		if (empty($modSettings['xmlnews_enable']))
 		{
-			$context['newsfeed_urls'] = [
-				'rss' => getUrl('action', ['action' => '.xml', 'type' => 'rss2', 'limit' => (!empty($modSettings['xmlnews_limit']) ? $modSettings['xmlnews_limit'] : 5)]),
-				'atom' => getUrl('action', ['action' => '.xml', 'type' => 'atom', 'limit' => (!empty($modSettings['xmlnews_limit']) ? $modSettings['xmlnews_limit'] : 5)]),
-			];
+			return;
 		}
+
+		if (empty($modSettings['allow_guestAccess']) && !$context['user']['is_logged'])
+		{
+			return;
+		}
+
+		$context['newsfeed_urls'] = [
+			'rss' => getUrl('action', ['action' => '.xml', 'type' => 'rss2', 'limit' => (empty($modSettings['xmlnews_limit']) ? 5 : $modSettings['xmlnews_limit'])]),
+			'atom' => getUrl('action', ['action' => '.xml', 'type' => 'atom', 'limit' => (empty($modSettings['xmlnews_limit']) ? 5 : $modSettings['xmlnews_limit'])]),
+		];
 	}
 
 	/**
@@ -634,9 +666,8 @@ class ThemeLoader
 		$context['theme_variant'] = '';
 		$context['theme_variant_url'] = '';
 
-		$context['menu_separator'] = !empty($settings['use_image_buttons']) ? ' ' : ' | ';
-		$context['can_register'] =
-			empty($modSettings['registration_method']) || $modSettings['registration_method'] != 3;
+		$context['menu_separator'] = empty($settings['use_image_buttons']) ? ' | ' : ' ';
+		$context['can_register'] = empty($modSettings['registration_method']) || (int) $modSettings['registration_method'] !== 3;
 
 		foreach (['theme_header', 'upper_content'] as $call)
 		{
@@ -659,7 +690,7 @@ class ThemeLoader
 	{
 		global $modSettings;
 
-		return $this->user->is_guest && (bool) $modSettings['enableVBStyleLogin'] === true;
+		return $this->user->is_guest && $modSettings['enableVBStyleLogin'];
 	}
 
 	/**
@@ -715,7 +746,7 @@ class ThemeLoader
 		}
 
 		// Make a special URL for the language.
-		$settings['lang_images_url'] = $settings['images_url'] . '/' . (!empty($txt['image_lang']) ? $txt['image_lang'] : $this->user->language);
+		$settings['lang_images_url'] = $settings['images_url'] . '/' . (empty($txt['image_lang']) ? $this->user->language : $txt['image_lang']);
 	}
 
 	/**
@@ -752,10 +783,17 @@ class ThemeLoader
 			loadCSSFile('rtl.css');
 		}
 
-		if (!empty($context['theme_variant']) && $context['right_to_left'])
+		if (empty($context['theme_variant']))
 		{
-			loadCSSFile($context['theme_variant'] . '/rtl' . $context['theme_variant'] . '.css');
+			return;
 		}
+
+		if (!$context['right_to_left'])
+		{
+			return;
+		}
+
+		loadCSSFile($context['theme_variant'] . '/rtl' . $context['theme_variant'] . '.css');
 	}
 
 	/**
@@ -839,7 +877,7 @@ class ThemeLoader
 				'theme_guests' => $modSettings['theme_guests'],
 			]
 		)->fetch_callback(
-			function ($row) {
+			static function ($row) {
 				global $settings;
 
 				$settings[$row['variable']] = $row['value'];
@@ -850,10 +888,17 @@ class ThemeLoader
 				];
 
 				// Is this the default theme?
-				if ($row['id_theme'] === '1' && in_array($row['variable'], $indexes_to_default, true))
+				if ($row['id_theme'] !== '1')
 				{
-					$settings['default_' . $row['variable']] = $row['value'];
+					return;
 				}
+
+				if (!in_array($row['variable'], $indexes_to_default, true))
+				{
+					return;
+				}
+
+				$settings['default_' . $row['variable']] = $row['value'];
 			}
 		);
 
@@ -911,12 +956,7 @@ class ThemeLoader
 	 *
 	 * @return string The language actually loaded.
 	 */
-	public static function loadLanguageFiles(
-		array $template_name,
-			  $lang = '',
-			  $fatal = true,
-			  $force_reload = false
-	)
+	public static function loadLanguageFiles(array $template_name, $lang = '', $fatal = true, $force_reload = false)
 	{
 		// Needed by the loaded files
 		global $language, $settings, $modSettings, $db_show_debug, $txt;

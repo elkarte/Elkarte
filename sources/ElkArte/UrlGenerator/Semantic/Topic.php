@@ -20,17 +20,15 @@ namespace ElkArte\UrlGenerator\Semantic;
  */
 class Topic extends Standard
 {
-	/**
-	 * {@inheritdoc }
-	 */
+	/** {@inheritDoc} */
 	protected $_types = ['topic'];
 
 	/**
-	 * {@inheritdoc }
+	 * {@inheritDoc}
 	 */
 	public function generate($params)
 	{
-		$url = 't/' . urlencode(strtr($params['subject'], ' ', '-')) . '-' . $params['topic'] . (!empty($params['start']) ? '/page-' . $params['start'] : '');
+		$url = 't/' . urlencode(str_replace(' ', '-', $params['subject'])) . '-' . $params['topic'] . (empty($params['start']) ? '' : '/page-' . $params['start']);
 		unset($params['subject'], $params['topic'], $params['start']);
 
 		return $url . $this->generateQuery($params);

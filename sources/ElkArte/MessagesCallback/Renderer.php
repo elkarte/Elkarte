@@ -31,15 +31,6 @@ use ElkArte\ValuesContainer;
  */
 abstract class Renderer
 {
-	/** @var Object The request object */
-	protected $_dbRequest;
-
-	/** @var \ElkArte\UserInfo The current user data */
-	protected $user;
-
-	/** @var BodyParserInterface The parser that will convert the body */
-	protected $_bodyParser;
-
 	/** @var Object The database object */
 	protected $_db;
 
@@ -61,16 +52,13 @@ abstract class Renderer
 	/**
 	 * Renderer constructor, starts everything.
 	 *
-	 * @param Object $request
+	 * @param Object $_dbRequest
 	 * @param Object $user
-	 * @param BodyParserInterface $bodyParser
+	 * @param BodyParserInterface $_bodyParser
 	 * @param ValuesContainer $opt
 	 */
-	public function __construct($request, $user, $bodyParser, $opt = null)
+	public function __construct(protected $_dbRequest, protected $user, protected $_bodyParser, $opt = null)
 	{
-		$this->_dbRequest = $request;
-		$this->user = $user;
-		$this->_bodyParser = $bodyParser;
 		$this->_db = database();
 		$this->_idx_mapper = new ValuesContainer([
 			'id_msg' => 'id_msg',
@@ -204,10 +192,10 @@ abstract class Renderer
 
 	/**
 	 * Utility function, it can be overridden to alter something just after the
-	 * members' data have been loaded from the database.
+	 * members' data has been loaded from the database.
 	 * Run only if member exists failed.
 	 *
-	 * @param \ElkArte\ValuesContainer $member_context
+	 * @param ValuesContainer $member_context
 	 */
 	protected function _adjustGuestContext($member_context)
 	{
@@ -228,7 +216,7 @@ abstract class Renderer
 	 * members data have been set.
 	 * Run only if member doesn't exist succeeded.
 	 *
-	 * @param \ElkArte\ValuesContainer $member_context
+	 * @param ValuesContainer $member_context
 	 */
 	protected function _adjustMemberContext($member_context)
 	{
@@ -262,7 +250,7 @@ abstract class Renderer
 	 * the members or the guests data have been loaded from the database.
 	 * Run both if the member exists or not.
 	 *
-	 * @param \ElkArte\ValuesContainer $member_context
+	 * @param ValuesContainer $member_context
 	 * @return mixed
 	 */
 	abstract protected function _adjustAllMembers($member_context);
@@ -281,7 +269,7 @@ abstract class Renderer
 	 */
 	protected function _buildOutputArray()
 	{
-		return array(
+		return [
 			'id' => $this->_this_message[$this->_idx_mapper->id_msg],
 			'member' => MembersList::get($this->_this_message[$this->_idx_mapper->id_member]),
 			'subject' => $this->_this_message['subject'],
@@ -291,7 +279,7 @@ abstract class Renderer
 			'counter' => $this->_counter,
 			'body' => $this->_this_message['body'],
 			'can_see_ip' => allowedTo('moderate_forum') || ($this->_this_message[$this->_idx_mapper->id_member] == $this->user->id && !empty($this->user->id)),
-			'classes' => array()
-		);
+			'classes' => []
+		];
 	}
 }

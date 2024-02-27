@@ -21,7 +21,7 @@ use ElkArte\FileFunctions;
 /**
  * Simple FTP protocol implementation.
  *
- * http://www.faqs.org/rfcs/rfc959.html
+ * https://www.faqs.org/rfcs/rfc959.html
  */
 class FtpConnection
 {
@@ -53,7 +53,7 @@ class FtpConnection
 		// Initialize variables.
 		$this->connection = 'no_connection';
 		$this->error = false;
-		$this->pasv = array();
+		$this->pasv = [];
 
 		if ($ftp_server !== null)
 		{
@@ -78,7 +78,7 @@ class FtpConnection
 		restore_error_handler();
 		if (!$this->connection || $err_code !== 0)
 		{
-			return $this->error = !empty($err) ? $err : 'bad_server';
+			return $this->error = empty($err) ? 'bad_server' : $err;
 		}
 
 		// Get the welcome message...
@@ -115,8 +115,8 @@ class FtpConnection
 	public function getServer($ftp_server)
 	{
 		$location = parse_url($ftp_server);
-		$location['host']= $location['host'] ?? $ftp_server;
-		$location['scheme']= $location['scheme'] ?? '';
+		$location['host'] = $location['host'] ?? $ftp_server;
+		$location['scheme'] = $location['scheme'] ?? '';
 
 		$ftp_scheme = '';
 		if ($location['scheme'] === 'ftps' || $location['scheme'] === 'https')
@@ -348,7 +348,7 @@ class FtpConnection
 		}
 
 		// Snatch the IP and port information, or die horribly trying...
-		if (preg_match('~\((\d+),\s*(\d+),\s*(\d+),\s*(\d+),\s*(\d+)(?:,\s*(\d+))\)~', $this->last_response, $match) == 0)
+		if (preg_match('~\((\d+),\s*(\d+),\s*(\d+),\s*(\d+),\s*(\d+)(?:,\s*(\d+))\)~', $this->last_response, $match) !== 1)
 		{
 			$this->error = 'bad_response';
 
@@ -455,7 +455,7 @@ class FtpConnection
 			$found_path = true;
 		}
 
-		return array($username, $path, isset($found_path));
+		return [$username, $path, isset($found_path)];
 	}
 
 	/**
@@ -498,6 +498,7 @@ class FtpConnection
 		{
 			$data .= fread($fp, 4096);
 		}
+
 		fclose($fp);
 
 		// Everything go okay?
@@ -524,13 +525,14 @@ class FtpConnection
 		{
 			$listing = $this->list_dir('', true);
 		}
+
 		$listing = explode("\n", $listing);
 
 		$current_dir = '';
 		fwrite($this->connection, 'PWD' . "\r\n");
 		if ($this->check_response(257))
 		{
-			$current_dir = strtr($this->last_response, array('""' => '"'));
+			$current_dir = strtr($this->last_response, ['""' => '"']);
 		}
 
 		for ($i = 0, $n = count($listing); $i < $n; $i++)

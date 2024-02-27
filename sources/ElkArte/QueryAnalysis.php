@@ -16,15 +16,11 @@ namespace ElkArte;
 /**
  * Class QueryAnalysis
  *
- * @package ElkArte
+ * Analyzes the text and execution time of a query
  */
 class QueryAnalysis
 {
-	/**
-	 * The SELECT statement of the query (if any)
-	 *
-	 * @var string
-	 */
+	/** @var string The SELECT statement of the query (if any) */
 	protected $_select;
 
 	/**
@@ -70,12 +66,6 @@ class QueryAnalysis
 	}
 
 	/**
-	 * Analyze the text of a query and the execution time of a query
-	 *
-	 * @return string[] - 'text', 'is_select', 'position_time'
-	 */
-
-	/**
 	 * Fix query indentation
 	 *
 	 * @param string $query_data - The query string
@@ -96,6 +86,7 @@ class QueryAnalysis
 				$min_indent = strlen($temp[0]);
 			}
 		}
+
 		foreach ($query as $l => $dummy)
 		{
 			$query[$l] = substr($dummy, $min_indent);
@@ -153,17 +144,17 @@ class QueryAnalysis
 	 * @return string[] an array with the results of the EXPLAIN with two
 	 * possible structures depending if the EXPLAIN is successful or fails.
 	 *  - If successful:
-	 * 	  array(
-	 *		'headers' => array( ..list of headers.. )
-	 * 		'body' => array(
-	 * 			  array( ..cells.. ) // one row
-	 * 		)
-	 * 	  )
+	 *      array(
+	 *        'headers' => array( ..list of headers.. )
+	 *        'body' => array(
+	 *              array( ..cells.. ) // one row
+	 *        )
+	 *      )
 	 *  - If the EXPLAIN fails:
 	 *   array(
-	 * 		'is_error' => true
-	 * 		'error_text' => the error message
-	 * 	 )
+	 *        'is_error' => true
+	 *        'error_text' => the error message
+	 *     )
 	 *
 	 * @throws \ElkArte\Exceptions\Exception
 	 */

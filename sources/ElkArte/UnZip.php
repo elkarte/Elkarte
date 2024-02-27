@@ -33,21 +33,21 @@ use ElkArte\Languages\Txt;
 class UnZip
 {
 	/** @var array Holds the return array of files processed */
-	protected $return = array();
+	protected $return = [];
 
 	/** @var array Holds the data found in the end of central directory record */
-	protected $_zip_info = array();
+	protected $_zip_info = [];
 
 	/** @var array Holds the information from the central directory for each file in the archive */
-	protected $_files_info = array();
+	protected $_files_info = [];
 
 	/** @var array Hold the current file we are processing */
-	protected $_file_info = array();
+	protected $_file_info = [];
 
 	/** @var string Holds the current filename of the above */
 	protected $_filename = '';
 
-	/** @var \ElkArte\FileFunctions The file functions class */
+	/** @var FileFunctions The file functions class */
 	protected $fileFunc;
 
 	/** @var string Contains the central record string */
@@ -89,7 +89,7 @@ class UnZip
 	 * @param bool $overwrite
 	 * @param null|string[] $files_to_extract
 	 *
-	 * @throws \ElkArte\Exceptions\Exception package_no_zlib
+	 * @throws Exception package_no_zlib
 	 */
 	public function __construct($data, $destination, $single_file = false, $overwrite = false, $files_to_extract = null)
 	{
@@ -115,10 +115,22 @@ class UnZip
 
 		// The destination needs exist, and be writable, or we are doomed
 		umask(0);
-		if ($this->destination !== null && !$this->single_file && !$this->fileFunc->fileExists($this->destination))
+		if ($this->destination === null)
 		{
-			mktree($this->destination);
+			return;
 		}
+
+		if ($this->single_file)
+		{
+			return;
+		}
+
+		if ($this->fileFunc->fileExists($this->destination))
+		{
+			return;
+		}
+
+		mktree($this->destination);
 	}
 
 	/**
@@ -177,7 +189,7 @@ class UnZip
 	public function check_valid_zip()
 	{
 		// No signature?
-		if (strlen($this->data) < 10)
+		if ($this->data === null || strlen($this->data) < 10)
 		{
 			return false;
 		}
@@ -354,7 +366,7 @@ class UnZip
 			// Not a directory, add it to our results
 			if (substr($this->_filename, -1) !== '/')
 			{
-				$this->return[] = array(
+				$this->return[] = [
 					'filename' => $this->_filename,
 					'md5' => md5($this->_file_info['data']),
 					'preview' => substr($this->_file_info['data'], 0, 100),
@@ -362,7 +374,7 @@ class UnZip
 					'formatted_size' => byte_format($this->_file_info['size']),
 					'skipped' => false,
 					'crc' => $this->_crc_check,
-				);
+				];
 			}
 		}
 	}
@@ -387,12 +399,13 @@ class UnZip
 		elseif ($this->destination !== null && !$this->single_file)
 		{
 			// Just a little accident prevention, don't mind me.
-			$this->_filename = strtr($this->_filename, array('../' => '', '/..' => ''));
+			$this->_filename = strtr($this->_filename, ['../' => '', '/..' => '']);
 
 			if (!$this->fileFunc->fileExists($this->destination . '/' . $this->_filename))
 			{
 				mktree($this->destination . '/' . $this->_filename);
 			}
+
 			$this->_write_this = false;
 		}
 		else

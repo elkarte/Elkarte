@@ -31,13 +31,14 @@ use ElkArte\ValuesContainer;
 class SearchRenderer extends Renderer
 {
 	public const BEFORE_PREPARE_HOOK = 'integrate_before_prepare_search_context';
+
 	public const CONTEXT_HOOK = 'integrate_prepare_search_context';
 
 	/** @var array */
 	protected $_participants = [];
 
 	/**
-	 * {@inheritdoc }
+	 * {@inheritDoc}
 	 */
 	public function __construct($request, $user, BodyParserInterface $bodyParser, ValuesContainer $opt = null)
 	{
@@ -55,7 +56,7 @@ class SearchRenderer extends Renderer
 	}
 
 	/**
-	 * {@inheritdoc }
+	 * {@inheritDoc}
 	 */
 	protected function _setupPermissions()
 	{
@@ -66,14 +67,14 @@ class SearchRenderer extends Renderer
 	}
 
 	/**
-	 * {@inheritdoc }
+	 * {@inheritDoc}
 	 */
 	protected function _adjustMemberContext($member_context)
 	{
 	}
 
 	/**
-	 * {@inheritdoc }
+	 * {@inheritDoc}
 	 */
 	protected function _adjustAllMembers($member_context)
 	{
@@ -85,7 +86,7 @@ class SearchRenderer extends Renderer
 	}
 
 	/**
-	 * {@inheritdoc }
+	 * {@inheritDoc}
 	 */
 	protected function _buildOutputArray()
 	{
@@ -158,13 +159,11 @@ class SearchRenderer extends Renderer
 			// Fix the international characters in the keyword too.
 			$query = un_htmlspecialchars($query);
 			$query = trim($query, '\*+');
-			$query = strtr(Util::htmlspecialchars($query), ['\\\'' => '\'']);
+			$query = strtr(Util::htmlspecialchars($query), ['\\\'' => "'"]);
 
-			$search_highlight = preg_quote(strtr($query, ['\'' => '&#039;']), '/');
+			$search_highlight = preg_quote(strtr($query, ["'" => '&#039;']), '/');
 			$body_highlighted = preg_replace_callback('/((<[^>]*)|(\b' . $search_highlight . '\b)|' . $search_highlight . ')/iu',
-				function ($matches) {
-					return $this->_highlighted_callback($matches);
-				}, $body_highlighted);
+				fn($matches) => $this->_highlighted_callback($matches), $body_highlighted);
 			$subject_highlighted = preg_replace('/(' . preg_quote($query, '/') . ')/iu', '<strong class="highlight">$1</strong>', $subject_highlighted);
 		}
 
@@ -246,9 +245,7 @@ class SearchRenderer extends Renderer
 		}
 
 		// Drop any non-enabled ones
-		return array_filter($searchButtons, static function ($button) {
-			return !isset($button['enabled']) || (bool) $button['enabled'] !== false;
-		});
+		return array_filter($searchButtons, static fn($button) => !isset($button['enabled']) || (bool) $button['enabled']);
 	}
 
 	/**

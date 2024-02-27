@@ -23,38 +23,23 @@ use ElkArte\Languages\Txt;
  */
 class AdminSettingsSearch
 {
-	/**
-	 * All the settings we have found
-	 *
-	 * @var array
-	 */
+	/** @var array All the settings we have found */
 	protected $_search_data;
 
-	/**
-	 * Sections are supposed to be stored in a menu,
-	 * and the menu is in $context['menu_name']
-	 *
-	 * @var string
-	 */
+	/** @var string Sections are supposed to be stored in a menu, and the menu is in $context['menu_name'] */
 	protected $_menu_name;
 
-	/**
-	 * An array of settings used in the search
-	 *
-	 * @var string[]
-	 */
-	protected $_settings = array();
+	/** @var string[] An array of settings used in the search */
+	protected $_settings = [];
 
 	/**
 	 * Constructor!
 	 *
 	 * @param string[] $language_files - Language file names
-	 * @param string[] $include_files - File names to include (see _include_files
-	 * for details on the structure)
-	 * @param array $settings_search - Settings to search in (see
-	 * _load_settings for details on the structure)
+	 * @param string[] $include_files - File names to include (see _include_files for details on the structure)
+	 * @param array $settings_search - Settings to search in (see _load_settings for details on the structure)
 	 */
-	public function __construct($language_files = array(), $include_files = array(), $settings_search = array())
+	public function __construct($language_files = [], $include_files = [], $settings_search = [])
 	{
 		if (!empty($language_files))
 		{
@@ -79,13 +64,8 @@ class AdminSettingsSearch
 	 * it's possible to specify an array of arrays instead of an array of strings,
 	 * in that case the index 0 is the directory of the file, while the 1 is the file name.
 	 *
-	 * If a directory is not specified it will default to the value of the constant ADMINDIR
-	 * e.g.
-	 * $include_files = array(
-	 * 		'file_name.controller',
-	 * 		'file_name2.controller',
-	 * 		array('dir_name', 'file_name3.controller')
-	 * )
+	 * If a directory is not specified it will default to the value of the constant ADMINDIR e.g.
+	 * $include_files = array('file_name.controller', 'file_name2.controller', array('dir_name', 'file_name3.controller'))
 	 */
 	protected function _include_files($include_files)
 	{
@@ -108,20 +88,14 @@ class AdminSettingsSearch
 	/**
 	 * Loads all the settings
 	 *
-	 * @param array $settings_search - An array that defines where to look
-	 * for settings. The structure is:
-	 * array(
-	 * 		method name
-	 * 		url
-	 * 		controller name
-	 * )
+	 * @param array $settings_search - An array that defines where to look for settings. The structure is:
+	 * array( method name, url, controller name )
 	 *
 	 * @return array
-	 * @todo move to subs?
 	 */
 	private function _load_settings($settings_search)
 	{
-		$settings = array();
+		$settings = [];
 
 		foreach ($settings_search as $setting_area)
 		{
@@ -142,10 +116,17 @@ class AdminSettingsSearch
 
 			foreach ($config_vars as $var)
 			{
-				if (!empty($var[1]) && !in_array($var[0], array('permissions', 'callback', 'message', 'warning', 'title', 'desc')))
+				if (empty($var[1]))
 				{
-					$settings[] = array($this->_get_label($var), $setting_area[1], 'named_link' => $var[1]);
+					continue;
 				}
+
+				if (in_array($var[0], ['permissions', 'callback', 'message', 'warning', 'title', 'desc']))
+				{
+					continue;
+				}
+
+				$settings[] = [$this->_get_label($var), $setting_area[1], 'named_link' => $var[1]];
 			}
 		}
 
@@ -153,10 +134,9 @@ class AdminSettingsSearch
 	}
 
 	/**
-	 * Checks if any configuration settings have label text that should be
-	 * included in the search
+	 * Checks if any configuration settings have label text that should be included in the search
 	 *
-	 * @param $var
+	 * @param array $var
 	 *
 	 * @return string
 	 */
@@ -165,7 +145,7 @@ class AdminSettingsSearch
 		global $txt;
 
 		// Special case for file and db which go var, label, db, etc
-		if (isset($var[2]) && in_array($var[2], array('file', 'db')))
+		if (isset($var[2]) && in_array($var[2], ['file', 'db']))
 		{
 			$save = $var[1];
 			$var[1] = $var[0];
@@ -199,10 +179,9 @@ class AdminSettingsSearch
 	 * Initialize the search populating the array to search in
 	 *
 	 * @param string $menu_name - The name of the menu to look into
-	 * @param array $additional_settings - Possible additional settings
-	 * (see _load_settings for the array structure)
+	 * @param array $additional_settings - Possible additional settings (see _load_settings for the array structure)
 	 */
-	public function initSearch($menu_name, $additional_settings = array())
+	public function initSearch($menu_name, $additional_settings = [])
 	{
 		$this->_menu_name = $menu_name;
 
@@ -210,14 +189,14 @@ class AdminSettingsSearch
 		//	0 = Language index (Can be array of indexes) to search through for this setting.
 		//	1 = URL for this indexes page.
 		//	2 = Help index for help associated with this item (If different from 0)
-		$this->_search_data = array(
+		$this->_search_data = [
 			// All the major sections of the forum.
 			'sections' => $this->_load_search_sections(),
 			'settings' => array_merge(
 				$additional_settings,
 				$this->_settings
 			),
-		);
+		];
 	}
 
 	/**
@@ -227,21 +206,21 @@ class AdminSettingsSearch
 	{
 		global $context;
 
-		$sections = array();
+		$sections = [];
 
 		// Go through the admin menu structure trying to find suitably named areas!
 		foreach ($context[$this->_menu_name]['sections'] as $section)
 		{
 			foreach ($section['areas'] as $menu_key => $menu_item)
 			{
-				$sections[] = array($menu_item['label'], 'area=' . $menu_key, $menu_key);
+				$sections[] = [$menu_item['label'], 'area=' . $menu_key, $menu_key];
 				if (!empty($menu_item['subsections']))
 				{
 					foreach ($menu_item['subsections'] as $key => $sublabel)
 					{
 						if (isset($sublabel['label']))
 						{
-							$sections[] = array($sublabel['label'], 'area=' . $menu_key . ';sa=' . $key, $menu_key);
+							$sections[] = [$sublabel['label'], 'area=' . $menu_key . ';sa=' . $key, $menu_key];
 						}
 					}
 				}
@@ -266,7 +245,7 @@ class AdminSettingsSearch
 	{
 		global $scripturl, $context;
 
-		$search_results = array();
+		$search_results = [];
 
 		foreach ($this->_search_data as $section => $data)
 		{
@@ -279,9 +258,9 @@ class AdminSettingsSearch
 					$search_result['type'] = $section;
 					$search_result['url'] = $item[1] . ';' . $context['session_var'] . '=' . $context['session_id'];
 
-					if (substr($item[1], 0, 4) === 'area')
+					if (strpos($item[1], 'area') === 0)
 					{
-						$search_result['url'] = $scripturl . '?action=admin;' . $search_result['url'] . ($section == 'settings' && !empty($item['named_link']) ? '#' . $item['named_link'] : '');
+						$search_result['url'] = $scripturl . '?action=admin;' . $search_result['url'] . ($section === 'settings' && !empty($item['named_link']) ? '#' . $item['named_link'] : '');
 					}
 
 					$search_results[] = $search_result;
@@ -308,11 +287,11 @@ class AdminSettingsSearch
 		global $helptxt;
 
 		$found = false;
-		$return = array();
+		$return = [];
 
 		if (!is_array($item[0]))
 		{
-			$item[0] = array($item[0]);
+			$item[0] = [$item[0]];
 		}
 
 		foreach ($item[0] as $term)
@@ -326,12 +305,12 @@ class AdminSettingsSearch
 		// Format the name - and remove any descriptions the entry may have.
 		if ($found !== false)
 		{
-			$name = preg_replace('~<(?:div|span)\sclass="smalltext">.+?</(?:div|span)>~', '', $found);
+			$name = preg_replace('~<(?:div|span)\sclass="smalltext">.+?</(?:div|span)>~s', '', $found);
 
-			$return = array(
+			$return = [
 				'name' => $name,
 				'help' => Util::shorten_text(isset($item[2], $helptxt[$item[2]]) ? strip_tags($helptxt[$item[2]]) : (isset($helptxt[$found]) ? strip_tags($helptxt[$found]) : ''), 255),
-			);
+			];
 		}
 
 		return $return;

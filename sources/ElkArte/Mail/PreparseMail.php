@@ -46,7 +46,7 @@ class PreparseMail extends BaseMail
 		$message = censor($message);
 
 		// Convert bbc [quotes] before we go to parsebbc so they are easier to plain-textify later
-		$message = preg_replace_callback('~\[quote[^]]*?]~iu', [$this, 'quoteCallback'], $message);
+		$message = preg_replace_callback('~\[quote[^]]*?]~iu', fn(array $matches): string => $this->quoteCallback($matches), $message);
 		$message = str_replace('[/quote]', '</blockquote>', $message);
 
 		// Prevent img tags from getting linked
@@ -113,7 +113,7 @@ class PreparseMail extends BaseMail
 
 		if (preg_match('~author=([^<>\n]+?)(?=(?:link=|date=|\]))~ui', $matches[0], $match) === 1)
 		{
-			$author = $match[1] .  $txt['email_wrote'] . ': ';
+			$author = $match[1] . $txt['email_wrote'] . ': ';
 		}
 
 		return '<blockquote><cite>' . $date . ' ' . $author . '</cite><hr>';

@@ -30,11 +30,11 @@ class Post extends AbstractModule
 	{
 		global $modSettings;
 
-		$return = array();
+		$return = [];
 
 		if (!empty($modSettings['enableFollowup']))
 		{
-			$return[] = array('prepare_context', array('\\ElkArte\\Modules\\Random\\Post', 'prepare_context_followup'), array());
+			$return[] = ['prepare_context', [Post::class, 'prepare_context_followup'], []];
 
 			add_integration_function('integrate_create_topic', '\\ElkArte\\Modules\\Random\\Post::followup_create_topic', '', false);
 		}
@@ -56,13 +56,19 @@ class Post extends AbstractModule
 			$original_post = (int) $_REQUEST['followup'];
 		}
 
-		require_once(SUBSDIR . '/FollowUps.subs.php');
-
 		// Time to update the original message with a pointer to the new one
-		if (!empty($original_post) && canAccessMessage($original_post))
+		if (empty($original_post))
 		{
-			linkMessages($original_post, $topicOptions['id']);
+			return;
 		}
+
+		if (!canAccessMessage($original_post))
+		{
+			return;
+		}
+
+		require_once(SUBSDIR . '/FollowUps.subs.php');
+		linkMessages($original_post, $topicOptions['id']);
 	}
 
 	/**
@@ -79,7 +85,7 @@ class Post extends AbstractModule
 			$context['show_boards_dropdown'] = true;
 
 			require_once(SUBSDIR . '/Boards.subs.php');
-			$context += getBoardList(array('not_redirection' => true, 'allowed_to' => array('post_new', 'post_unapproved_topics')));
+			$context += getBoardList(['not_redirection' => true, 'allowed_to' => ['post_new', 'post_unapproved_topics']]);
 			$context['boards_current_disabled'] = false;
 
 			if (!empty($context['categories']))

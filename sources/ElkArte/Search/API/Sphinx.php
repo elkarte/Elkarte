@@ -20,60 +20,37 @@ namespace ElkArte\Search\API;
 use ElkArte\Cache\Cache;
 use ElkArte\Errors\Errors;
 use Elkarte\User;
+use SphinxClient;
 
 /**
  * SearchAPI-Sphinx.class.php, Sphinx API,
  *
  * What it does:
  *
- * - used when a Sphinx search daemon is running
+ * - Used when a Sphinx search daemon is running
  * - Access is via the Sphinx native search API (SphinxAPI)
- * - sphinxapi.php is part of the Sphinx package, the file must be added to SOURCEDIR
+ * - sphinxapi.php is part of the Sphinx package, YOU must add the file must be added to SOURCEDIR
  *
  * @package Search
  */
 class Sphinx extends AbstractAPI
 {
-	/**
-	 * This is the last version of ElkArte that this was tested on, to protect against API changes.
-	 *
-	 * @var string
-	 */
+	/** @var string This is the last version of ElkArte that this was tested on, to protect against API changes. */
 	public $version_compatible = 'ElkArte 2.0 dev';
 
-	/**
-	 * This won't work with versions of ElkArte less than this.
-	 *
-	 * @var string
-	 */
+	/** @var string This won't work with versions of ElkArte less than this. */
 	public $min_elk_version = 'ElkArte 1.0 Beta 1';
 
-	/**
-	 * Is it supported?
-	 *
-	 * @var bool
-	 */
+	/** @var bool Is it supported? */
 	public $is_supported = true;
 
-	/**
-	 * What words are banned?
-	 *
-	 * @var array
-	 */
+	/** @var array What words are banned? */
 	protected $bannedWords = [];
 
-	/**
-	 * What is the minimum word length?
-	 *
-	 * @var int
-	 */
+	/** @var int What is the minimum word length? */
 	protected $min_word_length = 4;
 
-	/**
-	 * What databases are supported?
-	 *
-	 * @var array
-	 */
+	/** @var array What databases are supported? */
 	protected $supported_databases = ['MySQL'];
 
 	/**
@@ -84,7 +61,7 @@ class Sphinx extends AbstractAPI
 		parent::__construct($config, $searchParams);
 
 		// Is this database supported?
-		if (!in_array($this->_db->title(), $this->supported_databases))
+		if (!in_array($this->_db->title(), $this->supported_databases, true))
 		{
 			$this->is_supported = false;
 		}
@@ -101,7 +78,7 @@ class Sphinx extends AbstractAPI
 	}
 
 	/**
-	 * {@inheritdoc }
+	 * {@inheritDoc}
 	 */
 	public function indexedWordQuery($words, $search_data)
 	{
@@ -109,7 +86,7 @@ class Sphinx extends AbstractAPI
 	}
 
 	/**
-	 *  {@inheritdoc }
+	 *  {@inheritDoc}
 	 */
 	public function supportsExtended()
 	{
@@ -117,7 +94,7 @@ class Sphinx extends AbstractAPI
 	}
 
 	/**
-	 * {@inheritdoc }
+	 * {@inheritDoc}
 	 */
 	public function prepareIndexes($word, &$wordsSearch, &$wordsExclude, $isExcluded, $excludedSubjectWords)
 	{
@@ -132,7 +109,7 @@ class Sphinx extends AbstractAPI
 	}
 
 	/**
-	 * {@inheritdoc }
+	 * {@inheritDoc}
 	 */
 	public function searchQuery($search_words, $excluded_words, &$participants)
 	{
@@ -144,12 +121,12 @@ class Sphinx extends AbstractAPI
 		if (!Cache::instance()->getVar($cached_results, $cache_key))
 		{
 			// The API communicating with the search daemon.  This file is part of Sphinix and not distributed
-			// with ElkArte.  You will need to http://sphinxsearch.com/downloads/current/ the package and copy
+			// with ElkArte.  You will need to https://sphinxsearch.com/downloads/current/ the package and copy
 			// the file from the api directory to your sourcedir ??/??/sources
 			require_once(SOURCEDIR . '/sphinxapi.php');
 
 			// Create an instance of the sphinx client and set a few options.
-			$mySphinx = new \SphinxClient();
+			$mySphinx = new SphinxClient();
 			$mySphinx->SetServer($modSettings['sphinx_searchd_server'], (int) $modSettings['sphinx_searchd_port']);
 			$mySphinx->SetLimits(0, (int) $modSettings['sphinx_max_results'], (int) $modSettings['sphinx_max_results'], 1000);
 			$mySphinx->SetSelect('*' . (empty($this->_searchParams->topic) ? ', COUNT(*) num' : '') . ', WEIGHT() relevance');
@@ -171,7 +148,7 @@ class Sphinx extends AbstractAPI
 			$mySphinx->SetSortMode(SPH_SORT_EXTENDED, $sphinx_sort);
 
 			// Update the field weights for subject vs body
-			$subject_weight = !empty($modSettings['search_weight_subject']) ? (int) $modSettings['search_weight_subject'] : 30;
+			$subject_weight = empty($modSettings['search_weight_subject']) ? 30 : (int) $modSettings['search_weight_subject'];
 			$mySphinx->SetFieldWeights(array('subject' => $subject_weight, 'body' => 100 - $subject_weight));
 
 			// Set the limits based on the search parameters.
@@ -198,7 +175,7 @@ class Sphinx extends AbstractAPI
 			$mySphinx->SetRankingMode(SPH_RANK_EXPR, 'sum((4*lcs+2*(min_hit_pos==1)+word_count)*user_weight*position) + acprel + bm25');
 
 			// Execute the search query.
-			$index = (!empty($modSettings['sphinx_index_prefix']) ? $modSettings['sphinx_index_prefix'] : 'elkarte') . '_index';
+			$index = (empty($modSettings['sphinx_index_prefix']) ? 'elkarte' : $modSettings['sphinx_index_prefix']) . '_index';
 			$request = $mySphinx->Query($query, $index);
 
 			// Can a connection to the daemon be made?
@@ -262,7 +239,7 @@ class Sphinx extends AbstractAPI
 	/**
 	 * Builds the query modifiers based on age, member, board etc
 	 *
-	 * @param \SphinxClient $mySphinx
+	 * @param SphinxClient $mySphinx
 	 */
 	public function buildQueryLimits($mySphinx)
 	{

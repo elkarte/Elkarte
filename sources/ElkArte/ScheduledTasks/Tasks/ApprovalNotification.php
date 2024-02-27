@@ -16,6 +16,7 @@
 
 namespace ElkArte\ScheduledTasks\Tasks;
 
+use ElkArte\Exceptions\Exception;
 use ElkArte\Languages\Loader;
 
 /**
@@ -31,7 +32,7 @@ class ApprovalNotification implements ScheduledTaskInterface
 	 * Checks who needs to receive approvals emails and sends them.
 	 *
 	 * @return bool
-	 * @throws \ElkArte\Exceptions\Exception
+	 * @throws Exception
 	 */
 	public function run()
 	{
@@ -40,8 +41,8 @@ class ApprovalNotification implements ScheduledTaskInterface
 		$db = database();
 
 		// Grab all the items awaiting approval and sort type then board - clear up any things that are no longer relevant.
-		$notices = array();
-		$profiles = array();
+		$notices = [];
+		$profiles = [];
 		$db->fetchQuery('
 			SELECT 
 				aq.id_msg, aq.id_attach, aq.id_event, 
@@ -54,13 +55,12 @@ class ApprovalNotification implements ScheduledTaskInterface
 				INNER JOIN {db_prefix}boards AS b ON (b.id_board = m.id_board)',
 			array()
 		)->fetch_callback(
-			function ($row) use (&$notices, &$profiles) {
+			static function ($row) use (&$notices, &$profiles) {
 				// If this is no longer around we'll ignore it.
 				if (empty($row['id_topic']))
 				{
 					return;
 				}
-
 				// What type is it?
 				if ($row['id_first_msg'] && $row['id_first_msg'] === $row['id_msg'])
 				{
@@ -74,13 +74,11 @@ class ApprovalNotification implements ScheduledTaskInterface
 				{
 					$type = 'msg';
 				}
-
 				// Add it to the array otherwise.
 				$notices[$row['id_board']][$type][] = array(
 					'subject' => $row['subject'],
 					'href' => getUrl('topic', ['topic' => $row['id_topic'], 'msg' => $row['id_msg'], 'subject' => $row['subject'], 'hash' => '#msg' . $row['id_msg']]),
 				);
-
 				// Store the profile for a bit later.
 				$profiles[$row['id_board']] = $row['id_profile'];
 			}
@@ -100,11 +98,11 @@ class ApprovalNotification implements ScheduledTaskInterface
 
 		// Now we need to think about finding out *who* can approve - this is hard!
 		// First off, get all the groups with this permission and sort by board.
-		$perms = array();
-		$addGroups = array(1);
+		$perms = [];
+		$addGroups = [1];
 		$db->fetchQuery('
 			SELECT
-			 	id_group, id_profile, add_deny
+				id_group, id_profile, add_deny
 			FROM {db_prefix}board_permissions
 			WHERE permission = {string:approve_posts}
 				AND id_profile IN ({array_int:profile_list})',
@@ -113,27 +111,26 @@ class ApprovalNotification implements ScheduledTaskInterface
 				'approve_posts' => 'approve_posts',
 			)
 		)->fetch_callback(
-			function ($row) use (&$addGroups, &$perms) {
+			static function ($row) use (&$addGroups, &$perms) {
 				// Sorry guys, but we have to ignore guests AND members - it would be too many otherwise.
 				if ($row['id_group'] < 2)
 				{
 					return;
 				}
-
-				$perms[$row['id_profile']][$row['add_deny'] ? 'add' : 'deny'][] = $row['id_group'];
+				$perms[$row['id_profile']][$row['add_deny'] ? 'add' : 'deny'][] = (int) $row['id_group'];
 
 				// Anyone who can access has to be considered.
 				if ($row['add_deny'])
 				{
-					$addGroups[] = $row['id_group'];
+					$addGroups[] = (int) $row['id_group'];
 				}
 			}
 		);
 
 		// Grab the moderators if they have permission!
-		$mods = array();
-		$membersQuery = array();
-		$members = array();
+		$mods = [];
+		$membersQuery = [];
+		$members = [];
 		if (in_array(2, $addGroups))
 		{
 			require_once(SUBSDIR . '/Boards.subs.php');
@@ -165,17 +162,16 @@ class ApprovalNotification implements ScheduledTaskInterface
 				'additional_group_list_implode' => implode(', additional_groups) != 0 OR FIND_IN_SET(', $addGroups),
 			)
 		)->fetch_callback(
-			function ($row) use (&$members) {
+			static function ($row) use (&$members) {
 				// Check whether they are interested.
 				if (!empty($row['mod_prefs']))
 				{
-					list (, , $pref_binary) = explode('|', $row['mod_prefs']);
+					[, , $pref_binary] = explode('|', $row['mod_prefs']);
 					if (!($pref_binary & 4))
 					{
 						return;
 					}
 				}
-
 				$members[$row['id_member']] = array(
 					'id' => $row['id_member'],
 					'groups' => array_merge(explode(',', $row['additional_groups']), array($row['id_group'])),

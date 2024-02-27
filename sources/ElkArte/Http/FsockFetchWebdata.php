@@ -14,6 +14,8 @@
 
 namespace ElkArte\Http;
 
+use Exception;
+
 /**
  * Class FsockFetchWebdata
  *
@@ -145,7 +147,7 @@ class FsockFetchWebdata
 			$this->_response['code'] = isset($code[1]) ? (int) $code[1] : '???';
 
 			// Make sure we ended up with a 200 OK.
-			if (in_array($this->_response['code'], array(200, 201, 206)))
+			if (in_array($this->_response['code'], [200, 201, 206], true))
 			{
 				// Provide a common valid 200 return code to the caller
 				$this->_response['code'] = 200;
@@ -156,11 +158,9 @@ class FsockFetchWebdata
 
 			return true;
 		}
-		else
-		{
-			// To the new location we go
-			$this->_fopenRequest($location);
-		}
+
+		// To the new location we go
+		$this->_fopenRequest($location);
 
 		return false;
 	}
@@ -174,7 +174,7 @@ class FsockFetchWebdata
 	{
 		$this->_url = [];
 		$this->_response['url'] = $url;
-		$this->_content_length = !empty($this->_user_options['max_length']) ? (int) $this->_user_options['max_length'] : 0;
+		$this->_content_length = empty($this->_user_options['max_length']) ? 0 : (int) $this->_user_options['max_length'];
 
 		// Make sure its valid before we parse it out
 		if (filter_var($url, FILTER_VALIDATE_URL))
@@ -187,12 +187,12 @@ class FsockFetchWebdata
 			if ($url_parse['scheme'] === 'https')
 			{
 				$this->_url['host'] = 'ssl://' . $url_parse['host'];
-				$this->_url['port'] = !empty($this->_url['port']) ? $this->_url['port'] : 443;
+				$this->_url['port'] = empty($this->_url['port']) ? 443 : $this->_url['port'];
 			}
 			else
 			{
 				$this->_url['host'] = $url_parse['host'];
-				$this->_url['port'] = !empty($this->_url['port']) ? $this->_url['port'] : 80;
+				$this->_url['port'] = empty($this->_url['port']) ? 80 : $this->_url['port'];
 			}
 
 			// Fix/Finalize the data path
@@ -216,7 +216,7 @@ class FsockFetchWebdata
 				$this->_fp = fsockopen($this->_url['host'], $this->_url['port'], $errno, $errstr, 5);
 				$this->_response['error'] = empty($errstr) ? false : $errno . ' :: ' . $errstr;
 			}
-			catch (\Exception $e)
+			catch (Exception)
 			{
 				return false;
 			}
@@ -299,7 +299,7 @@ class FsockFetchWebdata
 		foreach ($headers as $header)
 		{
 			// Get name and value
-			list($name, $value) = explode(':', $header, 2);
+			[$name, $value] = explode(':', $header, 2);
 
 			// Normalize / clean
 			$name = strtolower($name);
@@ -342,16 +342,14 @@ class FsockFetchWebdata
 			{
 				return '';
 			}
-			else
-			{
-				// Use the same connection or new?
-				if (!$this->_keep_alive)
-				{
-					fclose($this->_fp);
-				}
 
-				return $this->_headers['location'];
+			// Use the same connection or new?
+			if (!$this->_keep_alive)
+			{
+				fclose($this->_fp);
 			}
+
+			return $this->_headers['location'];
 		}
 
 		return '';
@@ -419,7 +417,7 @@ class FsockFetchWebdata
 		while (trim($body))
 		{
 			// It only claimed to be chunked, but its not.
-			if (!preg_match('~^([\da-fA-F]+)[^\r\n]*\r\n~sm', $body, $match))
+			if (!preg_match('~^([\da-fA-F]+)[^\r\n]*\r\n~m', $body, $match))
 			{
 				$decoded_body = $body;
 				break;
@@ -459,9 +457,7 @@ class FsockFetchWebdata
 		{
 			return $this->_response;
 		}
-		else
-		{
-			return $this->_response[$area] ?? $this->_response;
-		}
+
+		return $this->_response[$area] ?? $this->_response;
 	}
 }

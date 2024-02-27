@@ -16,6 +16,7 @@
 
 namespace ElkArte\Modules\Calendar;
 
+use ElkArte\AdminController\ManageCalendarModule;
 use ElkArte\EventManager;
 use ElkArte\Modules\AbstractModule;
 
@@ -28,14 +29,14 @@ use ElkArte\Modules\AbstractModule;
 class Admin extends AbstractModule
 {
 	/**
-	 * {@inheritdoc}
+	 * {@inheritDoc}
 	 */
 	public static function hooks(EventManager $eventsManager)
 	{
-		return array(
-			array('addMenu', array('\\ElkArte\\Modules\\Calendar\\Admin', 'addMenu'), array()),
-			array('addSearch', array('\\ElkArte\\Modules\\Calendar\\Admin', 'addSearch'), array()),
-		);
+		return [
+			['addMenu', [Admin::class, 'addMenu'], []],
+			['addSearch', [Admin::class, 'addSearch'], []],
+		];
 	}
 
 	/**
@@ -47,18 +48,18 @@ class Admin extends AbstractModule
 	{
 		global $txt, $modSettings;
 
-		$admin_areas['layout']['areas']['managecalendar'] = array(
+		$admin_areas['layout']['areas']['managecalendar'] = [
 			'label' => $txt['manage_calendar'],
-			'controller' => '\\ElkArte\\AdminController\\ManageCalendarModule',
+			'controller' => ManageCalendarModule::class,
 			'function' => 'action_index',
 			'class' => 'i-calendar i-admin',
-			'permission' => array('admin_forum'),
+			'permission' => ['admin_forum'],
 			'enabled' => featureEnabled('cd'),
-			'subsections' => array(
-				'holidays' => array($txt['manage_holidays'], 'admin_forum', 'enabled' => !empty($modSettings['cal_enabled'])),
-				'settings' => array($txt['calendar_settings'], 'admin_forum'),
-			),
-		);
+			'subsections' => [
+				'holidays' => [$txt['manage_holidays'], 'admin_forum', 'enabled' => !empty($modSettings['cal_enabled'])],
+				'settings' => [$txt['calendar_settings'], 'admin_forum'],
+			],
+		];
 	}
 
 	/**
@@ -71,7 +72,6 @@ class Admin extends AbstractModule
 	public function addSearch(&$language_files, &$include_files, &$settings_search)
 	{
 		$language_files[] = 'ManageCalendar';
-		$include_files[] = 'ManageCalendarModule.controller';
-		$settings_search[] = array('settings_search', 'area=managecalendar;sa=settings', '\\ElkArte\\AdminController\\ManageCalendarModule');
+		$settings_search[] = ['settings_search', 'area=managecalendar;sa=settings', ManageCalendarModule::class];
 	}
 }

@@ -28,14 +28,14 @@ class Display extends AbstractModule
 	/** @var int The mode of attachments (disabled/enabled/show only). */
 	protected static $attach_level = 0;
 
-	/** @var The good old attachments array */
-	protected static $attachments = null;
+	/** @var AttachmentsDisplay The good old attachments array */
+	protected static $attachments;
 
 	/** @var bool If unapproved posts/attachments should be shown */
 	protected static $includeUnapproved = false;
 
 	/**
-	 * {@inheritdoc }
+	 * {@inheritDoc}
 	 */
 	public static function hooks(EventManager $eventsManager)
 	{
@@ -55,7 +55,7 @@ class Display extends AbstractModule
 // 			);
 		}
 
-		return array();
+		return [];
 	}
 
 	/**

@@ -22,6 +22,7 @@ use ElkArte\Controller\Auth;
 use ElkArte\EventManager;
 use ElkArte\Exceptions\Exception;
 use ElkArte\Languages\Txt;
+use ElkArte\Member;
 use ElkArte\MembersList;
 use ElkArte\User;
 
@@ -32,8 +33,10 @@ class ProfileAccount extends AbstractController
 {
 	/** @var int Member id for the account being worked on */
 	private $_memID = 0;
-	/** @var \ElkArte\Member The \ElkArte\Member object is stored here to avoid some global */
+
+	/** @var Member The \ElkArte\Member object is stored here to avoid some global */
 	private $_profile;
+
 	/** @var array Holds any errors that were generated when issuing a warning */
 	private $_issueErrors = [];
 
@@ -61,9 +64,9 @@ class ProfileAccount extends AbstractController
 	/**
 	 * Issue/manage a user's warning status.
 	 *
-	 * @uses template_issueWarning sub template in ProfileAccount
-	 * @uses Profile template
 	 * @throws Exception
+	 * @uses Profile template
+	 * @uses template_issueWarning sub template in ProfileAccount
 	 */
 	public function action_issuewarning()
 	{
@@ -83,7 +86,7 @@ class ProfileAccount extends AbstractController
 		loadCSSFile('jquery.ui.theme.min.css');
 
 		// Get all the actual settings.
-		list ($modSettings['warning_enable'], $modSettings['user_limit']) = explode(',', $modSettings['warning_settings']);
+		[$modSettings['warning_enable'], $modSettings['user_limit']] = explode(',', $modSettings['warning_settings']);
 
 		// Doesn't hurt to be overly cautious.
 		if (empty($modSettings['warning_enable'])
@@ -98,9 +101,9 @@ class ProfileAccount extends AbstractController
 		$context['custom_error_title'] = $txt['profile_warning_errors_occurred'];
 
 		// Make sure things which are disabled stay disabled.
-		$modSettings['warning_watch'] = !empty($modSettings['warning_watch']) ? $modSettings['warning_watch'] : 110;
+		$modSettings['warning_watch'] = empty($modSettings['warning_watch']) ? 110 : $modSettings['warning_watch'];
 		$modSettings['warning_moderate'] = !empty($modSettings['warning_moderate']) && !empty($modSettings['postmod_active']) ? $modSettings['warning_moderate'] : 110;
-		$modSettings['warning_mute'] = !empty($modSettings['warning_mute']) ? $modSettings['warning_mute'] : 110;
+		$modSettings['warning_mute'] = empty($modSettings['warning_mute']) ? 110 : $modSettings['warning_mute'];
 
 		$context['warning_limit'] = allowedTo('admin_forum') ? 0 : $modSettings['user_limit'];
 		$context['member']['warning'] = $cur_profile['warning'];
@@ -160,6 +163,7 @@ class ProfileAccount extends AbstractController
 				$context['level_effects'][$modSettings['warning_' . $status]] = $txt['profile_warning_effect_' . $status];
 			}
 		}
+
 		$context['current_level'] = 0;
 
 		foreach ($context['level_effects'] as $limit => $dummy)
@@ -213,7 +217,7 @@ class ProfileAccount extends AbstractController
 		{
 			$context['notification_templates'][] = [
 				'title' => $txt['profile_warning_notify_title_' . $type],
-				'body' => sprintf($txt['profile_warning_notify_template_outline' . (!empty($warning_for_message) ? '_post' : '')], $txt['profile_warning_notify_for_' . $type]),
+				'body' => sprintf($txt['profile_warning_notify_template_outline' . (empty($warning_for_message) ? '' : '_post')], $txt['profile_warning_notify_for_' . $type]),
 			];
 		}
 
@@ -366,7 +370,7 @@ class ProfileAccount extends AbstractController
 
 		if (isset($this->_req->post->preview))
 		{
-			$warning_body = !empty($this->_req->post->warn_body) ? trim(censor($this->_req->post->warn_body)) : '';
+			$warning_body = empty($this->_req->post->warn_body) ? '' : trim(censor($this->_req->post->warn_body));
 
 			if (empty($this->_req->post->warn_sub) || empty($this->_req->post->warn_body))
 			{
@@ -409,14 +413,10 @@ class ProfileAccount extends AbstractController
 			'base_href' => getUrl('action', ['action' => 'profile', 'area' => 'issuewarning', 'sa' => 'user', 'u' => $this->_memID]),
 			'default_sort_col' => 'log_time',
 			'get_items' => [
-				'function' => function ($start, $items_per_page, $sort) {
-					return $this->list_getUserWarnings($start, $items_per_page, $sort);
-				},
+				'function' => fn($start, $items_per_page, $sort) => $this->list_getUserWarnings($start, $items_per_page, $sort),
 			],
 			'get_count' => [
-				'function' => function () {
-					return $this->list_getUserWarningCount();
-				},
+				'function' => fn() => $this->list_getUserWarningCount(),
 			],
 			'columns' => [
 				'issued_by' => [
@@ -425,9 +425,7 @@ class ProfileAccount extends AbstractController
 						'class' => 'grid20',
 					],
 					'data' => [
-						'function' => function ($warning) {
-							return $warning['issuer']['link'];
-						},
+						'function' => static fn($warning) => $warning['issuer']['link'],
 					],
 					'sort' => [
 						'default' => 'lc.member_name DESC',
@@ -452,7 +450,7 @@ class ProfileAccount extends AbstractController
 						'value' => $txt['profile_warning_previous_reason'],
 					],
 					'data' => [
-						'function' => function ($warning) {
+						'function' => static function ($warning) {
 							global $txt;
 
 							$ret = '
@@ -470,7 +468,6 @@ class ProfileAccount extends AbstractController
 							}
 
 							return $ret;
-
 						},
 					],
 				],

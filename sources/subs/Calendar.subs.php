@@ -175,7 +175,7 @@ function getEventRange($low_date, $high_date, $use_permissions = true, $limit = 
 			// If we're using permissions (calendar pages?) then just output normal contextual style information.
 			if ($use_permissions)
 			{
-				if ($row['id_board'] == 0)
+				if ((int) $row['id_board'] === 0)
 				{
 					$modify_href = ['action' => 'calendar', 'sa' => 'post', 'eventid' => $row['id_event'], '{session_data}'];
 				}
@@ -192,9 +192,9 @@ function getEventRange($low_date, $high_date, $use_permissions = true, $limit = 
 					'is_last' => false,
 					'id_board' => $row['id_board'],
 					'id_topic' => $row['id_topic'],
-					'href' => $row['id_board'] == 0 ? '' : $href,
-					'link' => $row['id_board'] == 0 ? $row['title'] : '<a href="' . $href . '">' . $row['title'] . '</a>',
-					'can_edit' => allowedTo('calendar_edit_any') || ($row['id_member'] == User::$info->id && allowedTo('calendar_edit_own')),
+					'href' => (int) $row['id_board'] === 0 ? '' : $href,
+					'link' => (int) $row['id_board'] === 0 ? $row['title'] : '<a href="' . $href . '">' . $row['title'] . '</a>',
+					'can_edit' => allowedTo('calendar_edit_any') || ((int) $row['id_member'] === User::$info->id && allowedTo('calendar_edit_own')),
 					'modify_href' => getUrl('action', $modify_href),
 					'can_export' => !empty($modSettings['cal_export']),
 					'export_href' => getUrl('action', ['action' => 'calendar', 'sa' => 'ical', 'eventid' => $row['id_event'], '{session_data}']),
@@ -211,14 +211,14 @@ function getEventRange($low_date, $high_date, $use_permissions = true, $limit = 
 					'is_last' => false,
 					'id_board' => $row['id_board'],
 					'id_topic' => $row['id_topic'],
-					'href' => $row['id_topic'] == 0 ? '' : $href,
-					'link' => $row['id_topic'] == 0 ? $row['title'] : '<a href="' . $href . '">' . $row['title'] . '</a>',
+					'href' => (int) $row['id_topic'] === 0 ? '' : $href,
+					'link' => (int) $row['id_topic'] === 0 ? $row['title'] : '<a href="' . $href . '">' . $row['title'] . '</a>',
 					'can_edit' => false,
 					'can_export' => !empty($modSettings['cal_export']),
 					'topic' => $row['id_topic'],
 					'msg' => $row['id_first_msg'],
 					'poster' => $row['id_member'],
-					'allowed_groups' => explode(',', $row['member_groups']),
+					'allowed_groups' => explode(',', (string) $row['member_groups']),
 				);
 			}
 		}
@@ -1132,25 +1132,25 @@ function getEventProperties($event_id, $calendar_only = false)
 	}
 	else
 	{
-		$return_value = array(
-			'boards' => array(),
-			'board' => $row['id_board'],
+		$return_value = [
+			'boards' => [],
+			'board' => (int) $row['id_board'],
 			'new' => 0,
-			'eventid' => $event_id,
-			'year' => $row['year'],
-			'month' => $row['month'],
-			'day' => $row['day'],
+			'eventid' => (int) $event_id,
+			'year' => (int) $row['year'],
+			'month' => (int) $row['month'],
+			'day' => (int) $row['day'],
 			'title' => $row['title'],
 			'span' => 1 + $row['span'],
-			'member' => $row['id_member'],
+			'member' => (int) $row['id_member'],
 			'realname' => $row['real_name'],
 			'sequence' => $row['modified_time'],
-			'topic' => array(
-				'id' => $row['id_topic'],
-				'member_started' => $row['id_member_started'],
-				'first_msg' => $row['id_first_msg'],
-			),
-		);
+			'topic' => [
+				'id' => (int) $row['id_topic'],
+				'member_started' => (int) $row['id_member_started'],
+				'first_msg' => (int) $row['id_first_msg'],
+			],
+		];
 
 		$return_value['last_day'] = (int) Util::strftime('%d', mktime(0, 0, 0, $return_value['month'] == 12 ? 1 : $return_value['month'] + 1, 0, $return_value['month'] == 12 ? $return_value['year'] + 1 : $return_value['year']));
 	}

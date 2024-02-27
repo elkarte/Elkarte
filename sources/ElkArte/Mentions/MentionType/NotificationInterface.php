@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Interface for mentions objects
+ * Interface for notification objects
  *
  * @package   ElkArte Forum
  * @copyright ElkArte Forum contributors
@@ -36,35 +36,37 @@ interface NotificationInterface
 	 * @param array $lang_data
 	 * @param int[] $members
 	 *
-	 * @return array array(array(
-	 *                  id_member_to (int),
-	 *                  email_address (text),
-	 *                  subject (text),
-	 *                  body (text),
-	 *                  last_id (int), ???
-	 *                ))
+	 * @return array with the following construction:
+	 * array(array(
+	 *   id_member_to (int),
+	 *   email_address (text),
+	 *   subject (text),
+	 *   body (text),
+	 *   last_id (int),
+	 *   ???
+	 * ))
 	 */
 	public function getNotificationBody($lang_data, $members);
 
 	/**
 	 * The \ElkArte\NotificationsTask contains few data that may be necessary for the processing
-	 * of the mention.
+	 * of the notification.
 	 *
-	 * @param \ElkArte\Notifications\NotificationsTask $task
+	 * @param NotificationsTask $task
 	 */
 	public function setTask(NotificationsTask $task);
 
 	/**
 	 * Used when sending an immediate email to get the last message id (email id)
-	 * so that the PbE can do its magic.
+	 * so that PbE can do its magic.
 	 *
 	 * @return string
 	 */
 	public function getLastId();
 
 	/**
-	 * Inserts a new mention into the database.
-	 * Checks if the mention already exists (in any status) to prevent any duplicates
+	 * Inserts a new notification into the database.
+	 * Checks if the notification already exists (in any status) to prevent any duplicates
 	 *
 	 * @param int $member_from the id of the member mentioning
 	 * @param int[] $members_to an array of ids of the members mentioned
@@ -79,13 +81,13 @@ interface NotificationInterface
 	public function insert($member_from, $members_to, $target, $time = null, $status = null, $is_accessible = null);
 
 	/**
-	 * Provides a list of methods that should not be used by this mention type.
+	 * Provides a list of methods that should not be used by this notification type.
 	 *
 	 * @param string $method the Notifier method that is being considered
 	 *
 	 * @return bool
 	 */
-	public static function isBlocklisted($method);
+	public static function isNotAllowed($method);
 
 	/**
 	 * If needed checks for permissions to use this specific notification

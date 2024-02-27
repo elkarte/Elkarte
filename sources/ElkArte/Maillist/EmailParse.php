@@ -11,7 +11,9 @@
  *
  */
 
-namespace ElkArte;
+namespace ElkArte\Maillist;
+
+use ValueError;
 
 /**
  * Class to parse and email in to its header and body parts for use in posting
@@ -54,7 +56,7 @@ namespace ElkArte;
  */
 class EmailParse
 {
-	/** @var string The full message section (headers, body, etc) we are working on */
+	/** @var string The full message section (headers, body, etc.) we are working on */
 	public $raw_message;
 
 	/** @var string[] Attachments found after the message */
@@ -69,7 +71,7 @@ class EmailParse
 	/** @var string Parsed and decoded message body, only plain text version */
 	public $plain_body;
 
-	/** @var mixed[] All the parsed message headers */
+	/** @var array All the parsed message headers */
 	public $headers = [];
 
 	/** @var string Full security key */
@@ -96,7 +98,7 @@ class EmailParse
 	/** @var string Holds the message subject */
 	public $subject;
 
-	/** @var mixed[] Holds the email to from & cc emails and names */
+	/** @var array Holds the email to from & cc emails and names */
 	public $email = [];
 
 	/** @var string|bool Holds the sending ip of the email */
@@ -106,7 +108,7 @@ class EmailParse
 	public $_converted_utf8 = false;
 
 	/** @var bool Whether the message is a DSN (Delivery Status Notification - aka "bounce"),
-	    indicating failed delivery */
+	 * indicating failed delivery */
 	public $_is_dsn = false;
 
 	/** @var array Holds the field/value/type report codes from DSN messages
@@ -174,7 +176,7 @@ class EmailParse
 		// Supplied a string of data, simply use it
 		if ($data !== null)
 		{
-			$this->raw_message = !empty($data) ? $data : false;
+			$this->raw_message = empty($data) ? false : $data;
 		}
 		// Not running from the CLI, must be from the ACP
 		elseif (!defined('STDIN'))
@@ -215,7 +217,7 @@ class EmailParse
 		// Called from the ACP, you must have approve permissions
 		if (isset($_POST['item']))
 		{
-			isAllowedTo(array('admin_forum', 'approve_emails'));
+			isAllowedTo(['admin_forum', 'approve_emails']);
 
 			// Read in the file from the failed log table
 			$this->raw_message = $this->_query_load_email($_POST['item']);
@@ -251,11 +253,11 @@ class EmailParse
 			FROM {db_prefix}postby_emails_error
 			WHERE id_email = {int:id}
 			LIMIT 1',
-			array(
+			[
 				'id' => $id
-			)
+			]
 		);
-		list ($message) = $request->fetch_row();
+		[$message] = $request->fetch_row();
 		$request->free_result();
 
 		return $message;
@@ -327,17 +329,14 @@ class EmailParse
 			{
 				$this->headers[$header_key] = $this->_decode_header($header_value);
 			}
-			else
+			elseif ($header_key === 'content-type' || $header_key === 'content-transfer-encoding')
 			{
 				// Only one is ever valid, so use the last one and hope its right
-				if ($header_key === 'content-type' || $header_key === 'content-transfer-encoding')
-				{
-					$this->headers[$header_key] = $this->_decode_header($header_value);
-				}
-				else
-				{
-					$this->headers[$header_key] .= ' ' . $this->_decode_header($header_value);
-				}
+				$this->headers[$header_key] = $this->_decode_header($header_value);
+			}
+			else
+			{
+				$this->headers[$header_key] .= ' ' . $this->_decode_header($header_value);
 			}
 		}
 	}
@@ -430,6 +429,7 @@ class EmailParse
 
 				$decoded .= $decoded_text;
 			}
+
 			$val = $decoded;
 		}
 
@@ -444,7 +444,7 @@ class EmailParse
 	 * @param string $encoding
 	 * @param string $charset
 	 *
-	 * @return bool|null|string|string[]
+	 * @return string
 	 */
 	private function _decode_string($string, $encoding, $charset = '')
 	{
@@ -479,7 +479,7 @@ class EmailParse
 	 * @param string $from
 	 * @param string $to
 	 *
-	 * @return null|string|string[]
+	 * @return string
 	 */
 	private function _charset_convert($string, $from, $to)
 	{
@@ -504,7 +504,7 @@ class EmailParse
 				{
 					$string = mb_convert_encoding($string_save, $to, $from);
 				}
-				catch (\ValueError $e)
+				catch (ValueError)
 				{
 					// nothing, bad character set
 				}
@@ -603,7 +603,8 @@ class EmailParse
 				$count = count($matches[0]);
 				for ($i = 0; $i < $count; $i++)
 				{
-					$this->headers['x-parameters'][$key][strtolower($matches[1][$i])] = $matches[2][$i];
+					$subKey = strtolower($matches[1][$i]);
+					$this->headers['x-parameters'][$key][$subKey] = $matches[2][$i];
 				}
 			}
 		}
@@ -791,6 +792,7 @@ class EmailParse
 								$this->inline_files[$key] = $value;
 							}
 						}
+
 						$this->body = $this->_decode_body($this->body);
 
 						// Return the right set of x-parameters and content type for the body we are returning
@@ -802,6 +804,7 @@ class EmailParse
 						$this->headers['content-type'] = $this->_boundary_section[$text_ids[0]]->headers['content-type'];
 					}
 				}
+
 				break;
 			default:
 				// deal with all the rest (e.g. image/xyx) the standard way
@@ -846,8 +849,8 @@ class EmailParse
 
 			// Is this boundary section is part of an outer boundary section
 			if (!empty($boundary_section->plain_body
-				&& $this->headers["content-type"] === "multipart/mixed"
-				&& $this->headers['content-disposition'] !== 'attachment')
+					&& $this->headers["content-type"] === "multipart/mixed"
+					&& $this->headers['content-disposition'] !== 'attachment')
 				&& $this->_boundary_section[$this->_boundary_section_count]->headers['content-disposition'] !== 'attachment')
 			{
 				$this->plain_parts[] = $boundary_section->plain_body;
@@ -873,11 +876,11 @@ class EmailParse
 		foreach (explode("\n", str_replace("\r\n", "\n", $this->_boundary_section[$i]->body)) as $line)
 		{
 			$type = '';
-			list($field, $rest) = array_pad(explode(':', $line), 2, '');
+			[$field, $rest] = array_pad(explode(':', $line), 2, '');
 
 			if (strpos($line, ';') !== false)
 			{
-				list ($type, $val) = explode(';', $rest);
+				[$type, $val] = explode(';', $rest);
 			}
 			else
 			{
@@ -1055,14 +1058,8 @@ class EmailParse
 	 */
 	public function get_failed_dest()
 	{
-		/** Body->Original-Recipient Header **/
-		if (isset($this->_dsn['body']['original-recipient']['value']))
-		{
-			return $this->_dsn['body']['original-recipient']['value'];
-		}
-
 		/** Body->Final-recipient Header **/
-		return $this->_dsn['body']['final-recipient']['value'] ?? null;
+		return $this->_dsn['body']['original-recipient']['value'] ?? $this->_dsn['body']['final-recipient']['value'] ?? null;
 	}
 
 	/**
@@ -1072,7 +1069,7 @@ class EmailParse
 	 */
 	public function load_returnpath()
 	{
-		$matches = array();
+		$matches = [];
 
 		// Fetch the return path
 		if (isset($this->headers['return-path'])
@@ -1113,7 +1110,7 @@ class EmailParse
 			$this->_load_key_from_body();
 		}
 
-		return !empty($this->message_key_id) ? $this->message_key_id : false;
+		return empty($this->message_key_id) ? false : $this->message_key_id;
 	}
 
 	/**
@@ -1216,9 +1213,9 @@ class EmailParse
 	 */
 	public function load_address()
 	{
-		$this->email['to'] = array();
-		$this->email['from'] = array();
-		$this->email['cc'] = array();
+		$this->email['to'] = [];
+		$this->email['from'] = [];
+		$this->email['cc'] = [];
 
 		// Fetch the "From" email and if possibly the senders common name
 		if (isset($this->headers['from']))

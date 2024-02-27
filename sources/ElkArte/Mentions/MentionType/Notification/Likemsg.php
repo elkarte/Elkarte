@@ -13,43 +13,44 @@
 
 namespace ElkArte\Mentions\MentionType\Notification;
 
-use ElkArte\Mentions\MentionType\AbstractNotificationBoardAccess;
-use ElkArte\Mentions\MentionType\CommonConfigTrait;
+use ElkArte\Mentions\MentionType\AbstractNotificationMessage;
 
 /**
  * Class Likemsg
  *
  * Handles mentions of likes
  */
-class Likemsg extends AbstractNotificationBoardAccess
+class Likemsg extends AbstractNotificationMessage
 {
-	use CommonConfigTrait;
-
-	/**
-	 * {@inheritdoc }
-	 */
+	/** {@inheritDoc} */
 	protected static $_type = 'likemsg';
 
 	/**
-	 * {@inheritdoc }
+	 * {@inheritDoc}
 	 */
 	public function getNotificationBody($lang_data, $members)
 	{
 		if (empty($lang_data['suffix']))
 		{
-			return $this->_getNotificationStrings('', array('subject' => static::$_type, 'body' => static::$_type), $members, $this->_task);
+			return $this->_getNotificationStrings('', [
+				'subject' => static::$_type,
+				'body' => static::$_type],
+				$members, $this->_task);
 		}
 
-		$keys = array('subject' => 'notify_new_likemsg_' . $lang_data['subject'], 'body' => 'notify_new_likemsg_' . $lang_data['body']);
+		$keys = [
+			'subject' => 'notify_new_likemsg_' . $lang_data['subject'],
+			'body' => 'notify_new_likemsg_' . $lang_data['body']
+		];
 
 		$notifier = $this->_task->getNotifierData();
 
-		$replacements = array(
+		$replacements = [
 			'ACTIONNAME' => $notifier['real_name'],
 			'SUBJECT' => $this->_task['source_data']['subject'],
 			'MSGLINK' => replaceBasicActionUrl('{script_url}?msg=' . $this->_task->id_target),
-		);
+		];
 
-		return $this->_getNotificationStrings('notify_new_likemsg', $keys, $members, $this->_task, array(), $replacements);
+		return $this->_getNotificationStrings('notify_new_likemsg', $keys, $members, $this->_task, [], $replacements);
 	}
 }

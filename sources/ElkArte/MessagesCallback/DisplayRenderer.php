@@ -27,17 +27,20 @@ use ElkArte\MembersList;
 class DisplayRenderer extends Renderer
 {
 	public const BEFORE_PREPARE_HOOK = 'integrate_before_prepare_display_context';
+
 	public const CONTEXT_HOOK = 'integrate_prepare_display_context';
 
 	/**
-	 * {@inheritdoc }
+	 * {@inheritDoc}
 	 */
 	protected function _setupPermissions()
 	{
 		global $context, $modSettings;
 
 		// Are you allowed to remove at least a single reply?
-		$context['can_remove_post'] |= allowedTo('delete_own') && (empty($modSettings['edit_disable_time']) || $this->_this_message['poster_time'] + $modSettings['edit_disable_time'] * 60 >= time()) && $this->_this_message['id_member'] == $this->user->id;
+		$context['can_remove_post'] |= allowedTo('delete_own')
+			&& (empty($modSettings['edit_disable_time']) || $this->_this_message['poster_time'] + $modSettings['edit_disable_time'] * 60 >= time())
+			&& (int) $this->_this_message['id_member'] === (int) $this->user->id;
 
 		// Have you liked this post, can you?
 		$this->_this_message['you_liked'] = !empty($context['likes'][$this->_this_message['id_msg']]['member'])
@@ -45,28 +48,31 @@ class DisplayRenderer extends Renderer
 		$this->_this_message['use_likes'] = allowedTo('like_posts') && empty($context['is_locked'])
 			&& ($this->_this_message['id_member'] != $this->user->id || !empty($modSettings['likeAllowSelf']))
 			&& (empty($modSettings['likeMinPosts']) || $modSettings['likeMinPosts'] <= $this->user->posts);
-		$this->_this_message['like_count'] = !empty($context['likes'][$this->_this_message['id_msg']]['count']) ? $context['likes'][$this->_this_message['id_msg']]['count'] : 0;
+		$this->_this_message['like_count'] = empty($context['likes'][$this->_this_message['id_msg']]['count']) ? 0 : $context['likes'][$this->_this_message['id_msg']]['count'];
 	}
 
 	/**
-	 * {@inheritdoc }
+	 * {@inheritDoc}
 	 */
 	protected function _adjustAllMembers($member_context)
 	{
-		global $settings, $context;
+		global $context;
 
 		$id_member = $this->_this_message[$this->_idx_mapper->id_member];
 		$this_member = MembersList::get($id_member);
 		$this_member->loadContext();
 
 		$this_member['ip'] = $this->_this_message['poster_ip'] ?? '';
-		$this_member['show_profile_buttons'] = (!empty($this_member['can_view_profile']) || (!empty($this_member['website']['url']) && !isset($context['disabled_fields']['website'])) || (in_array($this_member['show_email'], array('yes', 'yes_permission_override', 'no_through_forum'))) || $context['can_send_pm']);
+		$this_member['show_profile_buttons'] = (!empty($this_member['can_view_profile'])
+			|| (!empty($this_member['website']['url']) && !isset($context['disabled_fields']['website']))
+			|| (in_array($this_member['show_email'], ['yes', 'yes_permission_override', 'no_through_forum']))
+			|| $context['can_send_pm']);
 
 		$context['id_msg'] = $this->_this_message['id_msg'] ?? '';
 	}
 
 	/**
-	 * {@inheritdoc }
+	 * {@inheritDoc}
 	 */
 	protected function _buildOutputArray()
 	{
@@ -125,8 +131,9 @@ class DisplayRenderer extends Renderer
 	/**
 	 * Generates the available button array suitable for consumption by template_button_strip
 	 *
-	 * @param $output
-	 * @return array
+	 * @param array $output The output array containing post details.
+	 *
+	 * @return array The array containing all the post buttons.
 	 */
 	protected function _buildPostButtons($output)
 	{
@@ -137,7 +144,7 @@ class DisplayRenderer extends Renderer
 			'quote' => [
 				'text' => 'quote',
 				'url' => empty($options['display_quick_reply']) ? getUrl('action', ['action' => 'post', 'topic' => $topic . '.' . $context['start'], 'quote' => $output['id'], 'last_msg' => $context['topic_last_message']]) : null,
-				'custom' => !empty($options['display_quick_reply']) ? 'onclick="return oQuickReply.quote(' . $output['id'] . ');"' : '',
+				'custom' => empty($options['display_quick_reply']) ? '' : 'onclick="return oQuickReply.quote(' . $output['id'] . ');"',
 				'class' => 'quote_button last',
 				'icon' => 'quote',
 				'enabled' => !empty($context['can_quote']),
@@ -271,9 +278,7 @@ class DisplayRenderer extends Renderer
 		];
 
 		// Drop any non-enabled ones
-		$postButtons = array_filter($postButtons, static function ($button) {
-			return !isset($button['enabled']) || (bool) $button['enabled'] !== false;
-		});
+		$postButtons = array_filter($postButtons, static fn($button) => !isset($button['enabled']) || (bool) $button['enabled']);
 
 		return ['postbuttons' => $postButtons];
 	}

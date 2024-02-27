@@ -18,6 +18,7 @@ namespace ElkArte\Modules\Poll;
 
 use ElkArte\EventManager;
 use ElkArte\Modules\AbstractModule;
+use ElkArte\Themes\TemplateLayers;
 
 /**
  * Class Poll_Display_Module
@@ -31,20 +32,20 @@ class Display extends AbstractModule
 	protected $_id_poll = 0;
 
 	/**
-	 * {@inheritdoc}
+	 * {@inheritDoc}
 	 */
 	public static function hooks(EventManager $eventsManager)
 	{
 		global $modSettings;
 
 		$return = array(
-			array('topicinfo', array('\\ElkArte\\Modules\\Poll\\Display', 'topicinfo'), array('topicinfo')),
+			array('topicinfo', array(Display::class, 'topicinfo'), array('topicinfo')),
 		);
 
 		self::$_enabled = !empty($modSettings['pollMode']);
 		if (self::$_enabled && allowedTo('poll_view'))
 		{
-			$return[] = array('prepare_context', array('\\ElkArte\\Modules\\Poll\\Display', 'prepare_context'), array('template_layers'));
+			$return[] = array('prepare_context', array(Display::class, 'prepare_context'), array('template_layers'));
 		}
 
 		return $return;
@@ -80,7 +81,7 @@ class Display extends AbstractModule
 	/**
 	 * Prepare context to display the poll itself and the appropriate poll buttons
 	 *
-	 * @param \ElkArte\Themes\TemplateLayers $template_layers
+	 * @param TemplateLayers $template_layers
 	 */
 	public function prepare_context($template_layers)
 	{
@@ -116,7 +117,7 @@ class Display extends AbstractModule
 				],
 				'lock' => [
 					'test' => 'allow_lock_poll',
-					'text' => (!$context['poll']['is_locked'] ? 'poll_lock' : 'poll_unlock'),
+					'text' => ($context['poll']['is_locked'] ? 'poll_unlock' : 'poll_lock'),
 					'lang' => true,
 					'url' => getUrl('action', ['action' => 'lockvoting', 'topic' => $context['current_topic'] . '.' . $context['start'], '{session_data}'])
 				],

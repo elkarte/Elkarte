@@ -51,8 +51,7 @@ class ParseQuery extends AbstractParseQuery
 	}
 
 	/**
-	 * Boards have to have a "board" parameter, and this method ensures the query
-	 * has it.
+	 * Boards have to have a "board" parameter, and this method ensures the query has it.
 	 *
 	 * @param string $query The semantic query
 	 * @return string $query The corresponding standard query
@@ -74,12 +73,11 @@ class ParseQuery extends AbstractParseQuery
 	{
 		preg_match('~(?!board|topic),(\d+)\.([^\.]+)\.html(.*)~', $query, $parts);
 
-		return $parts[1] . '.' . $parts[2] . (!empty($parts[3]) ? $parts[3] : '');
+		return $parts[1] . '.' . $parts[2] . (empty($parts[3]) ? '' : $parts[3]);
 	}
 
 	/**
-	 * Topics have to have a "topic" parameter, and this method ensures the query
-	 * has it.
+	 * Topics have to have a "topic" parameter, and this method ensures the query has it.
 	 *
 	 * @param string $query The semantic query
 	 * @return string $query The corresponding standard query

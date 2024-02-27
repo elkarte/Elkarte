@@ -28,7 +28,7 @@ use ElkArte\FrontpageInterface;
 class BoardIndex extends AbstractController implements FrontpageInterface
 {
 	/**
-	 * {@inheritdoc }
+	 * {@inheritDoc}
 	 */
 	public static function frontPageHook(&$default_action)
 	{

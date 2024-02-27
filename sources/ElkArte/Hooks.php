@@ -1,8 +1,7 @@
 <?php
 
 /**
- * This file has all the main functions in it that relate to adding
- * removing, etc on hooks.
+ * This file has all the main functions in it that relate to adding removing, etc on hooks.
  *
  * @package   ElkArte Forum
  * @copyright ElkArte Forum contributors
@@ -17,6 +16,10 @@
 
 namespace ElkArte;
 
+use ElkArte\Database\QueryInterface;
+use FilesystemIterator;
+use GlobIterator;
+
 /**
  * Class Hooks
  */
@@ -26,27 +29,21 @@ final class Hooks
 	private static $_instance;
 
 	/** @var array Holds our standard path replacement array */
-	protected $_path_replacements = array();
+	protected $_path_replacements = [];
 
-	/** @var null|\ElkArte\Database\QueryInterface Holds the database instance */
-	protected $_db;
-
-	/** @var object|null If holds instance of debug class */
-	protected $_debug;
-
-	/** @var \ElkArte\FileFunctions */
+	/** @var FileFunctions */
 	protected $fileFunc;
 
 	/**
 	 * The class constructor, loads globals in to the class object
 	 *
-	 * @param \ElkArte\Database\QueryInterface $db
-	 * @param Debug $debug
+	 * @param QueryInterface $_db
+	 * @param Debug $_debug
 	 * @param string[]|string|null $paths - additional paths to add to the replacement array
 	 */
-	private function __construct($db, $debug, $paths = null)
+	private function __construct(protected $_db, protected $_debug, $paths = null)
 	{
-		$this->_path_replacements = array(
+		$this->_path_replacements = [
 			'BOARDDIR' => BOARDDIR,
 			'SOURCEDIR' => SOURCEDIR,
 			'EXTDIR' => EXTDIR,
@@ -54,9 +51,7 @@ final class Hooks
 			'ADMINDIR' => ADMINDIR,
 			'CONTROLLERDIR' => CONTROLLERDIR,
 			'SUBSDIR' => SUBSDIR,
-		);
-		$this->_db = $db;
-		$this->_debug = $debug;
+		];
 		$this->fileFunc = FileFunctions::instance();
 
 		if ($paths !== null)
@@ -84,11 +79,11 @@ final class Hooks
 	 * - supports static class method calls.
 	 *
 	 * @param string $hook
-	 * @param mixed[] $parameters = array()
+	 * @param array $parameters = array()
 	 *
-	 * @return mixed[] the results of the functions
+	 * @return array the results of the functions
 	 */
-	public function hook($hook, $parameters = array())
+	public function hook($hook, $parameters = [])
 	{
 		global $modSettings;
 
@@ -97,7 +92,7 @@ final class Hooks
 			$this->_debug->add('hooks', $hook);
 		}
 
-		$results = array();
+		$results = [];
 		if (empty($modSettings[$hook]))
 		{
 			return $results;
@@ -132,7 +127,7 @@ final class Hooks
 
 			if (strpos($function, '|') !== false)
 			{
-				list ($call, $file) = explode('|', $function);
+				[$call, $file] = explode('|', $function);
 			}
 			else
 			{
@@ -244,10 +239,10 @@ final class Hooks
 		}
 
 		// Make current function list usable.
-		$functions = empty($modSettings[$hook]) ? array() : explode(',', $modSettings[$hook]);
+		$functions = empty($modSettings[$hook]) ? [] : explode(',', $modSettings[$hook]);
 
 		// Do nothing, if it's already there.
-		if (in_array($integration_call, $functions))
+		if (in_array($integration_call, $functions, true))
 		{
 			return;
 		}
@@ -337,9 +332,9 @@ final class Hooks
 	public function discoverIntegrations($basepath, $ext = '.integrate.php')
 	{
 		$path = $basepath . '/*/*' . $ext;
-		$names = array();
+		$names = [];
 
-		$glob = new \GlobIterator($path, \FilesystemIterator::SKIP_DOTS);
+		$glob = new GlobIterator($path, FilesystemIterator::SKIP_DOTS);
 
 		// Find all integration files
 		foreach ($glob as $file)
@@ -393,14 +388,14 @@ final class Hooks
 }');
 			}
 
-			$names[] = array(
+			$names[] = [
 				'id' => $name,
 				'class' => str_replace('.integrate.php', '_Integrate', $file->getBasename()),
 				'title' => $composer_data->name,
 				'description' => $composer_data->description,
 				'path' => str_replace($basepath, '', $file->getPathname()),
 				'details' => $composer_data,
-			);
+			];
 		}
 
 		return $names;
@@ -443,7 +438,7 @@ final class Hooks
 	{
 		global $modSettings;
 
-		return !empty($modSettings['autoload_integrate']) ? explode(',', $modSettings['autoload_integrate']) : array();
+		return empty($modSettings['autoload_integrate']) ? [] : explode(',', $modSettings['autoload_integrate']);
 	}
 
 	/**
@@ -454,7 +449,7 @@ final class Hooks
 	protected function _store_autoload_integrate($existing)
 	{
 		$existing = array_filter(array_unique($existing));
-		updateSettings(array('autoload_integrate' => implode(',', $existing)));
+		updateSettings(['autoload_integrate' => implode(',', $existing)]);
 	}
 
 	/**
@@ -472,11 +467,11 @@ final class Hooks
 				value
 			FROM {db_prefix}settings
 			WHERE variable = {string:variable}',
-			array(
+			[
 				'variable' => $hook,
-			)
+			]
 		);
-		list ($current_functions) = $request->fetch_row();
+		[$current_functions] = $request->fetch_row();
 		$request->free_result();
 
 		if (!empty($current_functions))
@@ -487,14 +482,14 @@ final class Hooks
 				return;
 			}
 
-			$permanent_functions = array_merge($current_functions, array($integration_call));
+			$permanent_functions = array_merge($current_functions, [$integration_call]);
 		}
 		else
 		{
-			$permanent_functions = array($integration_call);
+			$permanent_functions = [$integration_call];
 		}
 
-		updateSettings(array($hook => implode(',', $permanent_functions)));
+		updateSettings([$hook => implode(',', $permanent_functions)]);
 	}
 
 	/**
@@ -521,11 +516,11 @@ final class Hooks
 				value
 			FROM {db_prefix}settings
 			WHERE variable = {string:variable}',
-			array(
+			[
 				'variable' => $hook,
-			)
+			]
 		);
-		list ($current_functions) = $request->fetch_row();
+		[$current_functions] = $request->fetch_row();
 		$request->free_result();
 
 		// If we found entries for this hook
@@ -535,7 +530,7 @@ final class Hooks
 
 			if (in_array($integration_call, $current_functions))
 			{
-				updateSettings(array($hook => implode(',', array_diff($current_functions, array($integration_call)))));
+				updateSettings([$hook => implode(',', array_diff($current_functions, [$integration_call]))]);
 				if (empty($modSettings[$hook]))
 				{
 					removeSettings($hook);
@@ -544,7 +539,7 @@ final class Hooks
 		}
 
 		// Turn the function list into something usable.
-		$functions = empty($modSettings[$hook]) ? array() : explode(',', $modSettings[$hook]);
+		$functions = empty($modSettings[$hook]) ? [] : explode(',', $modSettings[$hook]);
 
 		// You can only remove it if it's available.
 		if (!in_array($integration_call, $functions))
@@ -552,15 +547,15 @@ final class Hooks
 			return;
 		}
 
-		$functions = array_diff($functions, array($integration_call));
+		$functions = array_diff($functions, [$integration_call]);
 		$modSettings[$hook] = implode(',', $functions);
 	}
 
 	/**
 	 * Instantiation is a bit more complex, so let's give it a custom function
 	 *
-	 * @param \ElkArte\Database\QueryInterface|null $db A database connection
-	 * @param \ElkArte\Debug|null $debug A class for debugging
+	 * @param QueryInterface|null $db A database connection
+	 * @param Debug|null $debug A class for debugging
 	 * @param string[]|null $paths An array of paths for replacement
 	 */
 	public static function init($db = null, $debug = null, $paths = null)
@@ -581,7 +576,7 @@ final class Hooks
 	/**
 	 * Being a singleton, this is the static method to retrieve the instance of the class
 	 *
-	 * @param \ElkArte\Database\QueryInterface|null $db A database connection
+	 * @param QueryInterface|null $db A database connection
 	 * @param Debug|null $debug A class for debugging
 	 * @param string[]|null $paths An array of paths for replacement
 	 *

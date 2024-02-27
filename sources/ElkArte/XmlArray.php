@@ -24,25 +24,13 @@ namespace ElkArte;
  */
 class XmlArray
 {
-	/**
-	 * Holds xml parsed results
-	 *
-	 * @var array
-	 */
+	/** @var array Holds xml parsed results */
 	public $array;
 
-	/**
-	 * Holds debugging level
-	 *
-	 * @var int|null
-	 */
+	/** @var int|null Holds debugging level */
 	public $debug_level;
 
-	/**
-	 * Holds trim level textual data
-	 *
-	 * @var bool
-	 */
+	/** @var bool Holds trim level textual data */
 	public $trim;
 
 	/**
@@ -62,7 +50,7 @@ class XmlArray
 		detectServer()->setMemoryLimit('128M');
 
 		// Set the debug level.
-		$this->debug_level = $level !== null ? $level : error_reporting();
+		$this->debug_level = $level ?? error_reporting();
 		$this->trim = $auto_trim;
 
 		// Is the data already parsed?
@@ -80,7 +68,7 @@ class XmlArray
 		}
 
 		// Remove any xml declaration or doctype, and parse out comments and CDATA.
-		$data = preg_replace('/<!--.*?-->/s', '', $this->_to_cdata(preg_replace(array('/^<\?xml.+?\?' . '>/is', '/<!DOCTYPE[^>]+?' . '>/s'), '', $data)));
+		$data = preg_replace('/<!--.*?-->/s', '', $this->_to_cdata(preg_replace(['/^<\?xml.+?\?' . '>/is', '/<!DOCTYPE[^>]+?' . '>/s'], '', $data)));
 
 		// Now parse the xml!
 		$this->array = $this->_parse($data);
@@ -95,7 +83,8 @@ class XmlArray
 	 */
 	protected function _to_cdata($data)
 	{
-		$inCdata = $inComment = false;
+		$inCdata = false;
+		$inComment = false;
 		$output = '';
 
 		$parts = preg_split('~(<!\[CDATA\[|\]\]>|<!--|-->)~', $data, -1, PREG_SPLIT_DELIM_CAPTURE);
@@ -328,9 +317,7 @@ class XmlArray
 		$trans_tbl = array_flip(get_html_translation_table(HTML_ENTITIES, ENT_QUOTES));
 
 		// Translate all the entities out.
-		$data = preg_replace_callback('~&#(\d{1,4});~', function ($match) {
-			return $this->_from_cdata_callback($match);
-		}, $data);
+		$data = preg_replace_callback('~&#(\d{1,4});~', fn($match) => $this->_from_cdata_callback($match), $data);
 		$data = strtr($data, $trans_tbl);
 
 		return $this->trim ? trim($data) : $data;
@@ -445,24 +432,22 @@ class XmlArray
 				{
 					return $array[$el];
 				}
-				else
+
+				$trace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS);
+				$i = 0;
+				while ($i < count($trace) && isset($trace[$i]['class']) && $trace[$i]['class'] === get_class($this))
 				{
-					$trace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS);
-					$i = 0;
-					while ($i < count($trace) && isset($trace[$i]['class']) && $trace[$i]['class'] == get_class($this))
-					{
-						$i++;
-					}
-					$debug = ' from ' . $trace[$i - 1]['file'] . ' on line ' . $trace[$i - 1]['line'];
-
-					// Cause an error.
-					if (($this->debug_level & E_NOTICE) !== 0)
-					{
-						trigger_error('Undefined XML attribute: ' . substr($el, 1) . $debug, E_USER_NOTICE);
-					}
-
-					return false;
+					$i++;
 				}
+				$debug = ' from ' . $trace[$i - 1]['file'] . ' on line ' . $trace[$i - 1]['line'];
+
+				// Cause an error.
+				if (($this->debug_level & E_NOTICE) !== 0)
+				{
+					trigger_error('Undefined XML attribute: ' . substr($el, 1) . $debug, E_USER_NOTICE);
+				}
+
+				return false;
 			}
 			else
 			{
@@ -476,7 +461,7 @@ class XmlArray
 		// Clean up after $lvl, for $return_full.
 		if ($return_full && (!isset($array['name']) || substr($array['name'], -1) !== ']'))
 		{
-			$array = array('name' => $el . '[]', $array);
+			$array = ['name' => $el . '[]', $array];
 		}
 
 		// Create the right type of class...
@@ -494,7 +479,7 @@ class XmlArray
 	 * @param int $level How far deep into the array we should go
 	 * @param bool $no_error Whether or not to ignore errors
 	 *
-	 * @return array|bool|mixed|array
+	 * @return array|bool
 	 */
 	protected function _path($array, $path, $level, $no_error = false)
 	{
@@ -514,7 +499,7 @@ class XmlArray
 		// A * means all elements of any name.
 		$show_all = in_array('*', $paths);
 
-		$results = array();
+		$results = [];
 
 		// Check each element.
 		foreach ($array as $value)
@@ -524,7 +509,7 @@ class XmlArray
 				continue;
 			}
 
-			if ($show_all || in_array($value['name'], $paths))
+			if ($show_all || in_array($value['name'], $paths, true))
 			{
 				// Skip elements before "the one".
 				if ($level !== null && $level > 0)
@@ -543,7 +528,7 @@ class XmlArray
 		{
 			$trace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS);
 			$i = 0;
-			while ($i < count($trace) && isset($trace[$i]['class']) && $trace[$i]['class'] == get_class($this))
+			while ($i < count($trace) && isset($trace[$i]['class']) && $trace[$i]['class'] === get_class($this))
 			{
 				$i++;
 			}
@@ -558,16 +543,15 @@ class XmlArray
 
 			return false;
 		}
+
 		// Only one result.
-		elseif (count($results) === 1 || $level !== null)
+		if ($level !== null || count($results) === 1)
 		{
 			return $results[0];
 		}
+
 		// Return the result set.
-		else
-		{
-			return $results + array('name' => $path . '[]');
-		}
+		return $results + ['name' => $path . '[]'];
 	}
 
 	/**
@@ -600,7 +584,8 @@ class XmlArray
 		{
 			return $indentation . '<![CDATA[' . $array['value'] . ']]>';
 		}
-		elseif (substr($array['name'], -2) === '[]')
+
+		if (substr($array['name'], -2) === '[]')
 		{
 			$array['name'] = substr($array['name'], 0, -2);
 		}

@@ -1017,8 +1017,9 @@ function parseModification($file, $testing = true, $undo = false, $theme_paths =
 				$everything_found = false;
 				continue;
 			}
+
 			// Skip the file if it doesn't exist.
-			elseif (!file_exists($working_file) && $file->exists('@error') && trim($file->fetch('@error')) === 'skip')
+			if (!file_exists($working_file) && $file->exists('@error') && trim($file->fetch('@error')) === 'skip')
 			{
 				$actions[] = [
 					'type' => 'skipping',
@@ -1026,8 +1027,9 @@ function parseModification($file, $testing = true, $undo = false, $theme_paths =
 				];
 				continue;
 			}
+
 			// Okay, we're creating this file then...?
-			elseif (!file_exists($working_file))
+			if (!file_exists($working_file))
 			{
 				$working_data = '';
 			}
@@ -1371,12 +1373,9 @@ function package_put_contents($filename, $data, $testing = false)
 	}
 
 	@touch($filename);
-	if (!$fileFunc->fileExists($filename))
+	if (isset($package_ftp) && !$fileFunc->fileExists($filename))
 	{
-		 if (isset($package_ftp))
-		 {
-			 $package_ftp->create_file($ftp_file);
-		 }
+		$package_ftp->create_file($ftp_file);
 	}
 
 	$packageChmod = new PackageChmod();
@@ -1529,8 +1528,7 @@ function package_create_backup($id = 'backup')
 	$fileFunc = FileFunctions::instance();
 
 	// The files that reside outside of sources, in the base, we add manually
-	$base_files = ['index.php', 'SSI.php', 'subscriptions.php',
-						'email_imap_cron.php', 'emailpost.php', 'emailtopic.php'];
+	$base_files = ['index.php', 'SSI.php', 'subscriptions.php',	'email_imap_cron.php', 'emailpost.php', 'emailtopic.php'];
 	foreach ($base_files as $file)
 	{
 		if ($fileFunc->fileExists(BOARDDIR . '/' . $file))
@@ -1610,7 +1608,7 @@ function package_create_backup($id = 'backup')
 			{
 				$i++;
 			}
-			$output_file = $output_file . '_' . $i . $output_ext;
+			$output_file .= '_' . $i . $output_ext;
 		}
 		else
 		{

@@ -37,22 +37,22 @@ class ManageCalendarModule extends AbstractController
 	 */
 	public static function addCoreFeature(&$core_features)
 	{
-		$core_features['cd'] = array(
+		$core_features['cd'] = [
 			'url' => getUrl('admin', ['action' => 'admin', 'area' => 'managecalendar', '{session_data}']),
-			'settings' => array(
+			'settings' => [
 				'cal_enabled' => 1,
-			),
+			],
 			'setting_callback' => static function ($value) {
 				if ($value)
 				{
-					enableModules('calendar', array('admin', 'post', 'boardindex', 'display'));
+					enableModules('calendar', ['admin', 'post', 'boardindex', 'display']);
 				}
 				else
 				{
-					disableModules('calendar', array('admin', 'post', 'boardindex', 'display'));
+					disableModules('calendar', ['admin', 'post', 'boardindex', 'display']);
 				}
 			},
-		);
+		];
 	}
 
 	/**
@@ -72,11 +72,11 @@ class ManageCalendarModule extends AbstractController
 		$context['explain_text'] = $txt['calendar_desc'];
 
 		// Little short on the ground of functions here... but things can and maybe will change...
-		$subActions = array(
-			'editholiday' => array($this, 'action_editholiday', 'permission' => 'admin_forum'),
-			'holidays' => array($this, 'action_holidays', 'permission' => 'admin_forum'),
-			'settings' => array($this, 'action_calendarSettings_display', 'permission' => 'admin_forum')
-		);
+		$subActions = [
+			'editholiday' => [$this, 'action_editholiday', 'permission' => 'admin_forum'],
+			'holidays' => [$this, 'action_holidays', 'permission' => 'admin_forum'],
+			'settings' => [$this, 'action_calendarSettings_display', 'permission' => 'admin_forum']
+		];
 
 		// Action control
 		$action = new Action('manage_calendar');
@@ -125,45 +125,45 @@ class ManageCalendarModule extends AbstractController
 		}
 
 		createToken('admin-mc');
-		$listOptions = array(
+		$listOptions = [
 			'id' => 'holiday_list',
 			'title' => $txt['current_holidays'],
 			'items_per_page' => 20,
 			'base_href' => getUrl('admin', ['action' => 'admin', 'area' => 'managecalendar', 'sa' => 'holidays']),
 			'default_sort_col' => 'name',
-			'get_items' => array(
+			'get_items' => [
 				'file' => SUBSDIR . '/Calendar.subs.php',
 				'function' => 'list_getHolidays',
-			),
-			'get_count' => array(
+			],
+			'get_count' => [
 				'file' => SUBSDIR . '/Calendar.subs.php',
 				'function' => 'list_getNumHolidays',
-			),
+			],
 			'no_items_label' => $txt['holidays_no_entries'],
-			'columns' => array(
-				'name' => array(
-					'header' => array(
+			'columns' => [
+				'name' => [
+					'header' => [
 						'value' => $txt['holidays_title'],
-					),
-					'data' => array(
-						'sprintf' => array(
+					],
+					'data' => [
+						'sprintf' => [
 							'format' => '<a href="' . getUrl('admin', ['action' => 'admin', 'area' => 'managecalendar', 'sa' => 'editholiday', 'holiday' => '%1$d']) . '">%2$s</a>',
-							'params' => array(
+							'params' => [
 								'id_holiday' => false,
 								'title' => false,
-							),
-						),
-					),
-					'sort' => array(
+							],
+						],
+					],
+					'sort' => [
 						'default' => 'title',
 						'reverse' => 'title DESC',
-					)
-				),
-				'date' => array(
-					'header' => array(
+					]
+				],
+				'date' => [
+					'header' => [
 						'value' => $txt['date'],
-					),
-					'data' => array(
+					],
+					'data' => [
 						'function' => static function ($rowData) {
 							global $txt;
 
@@ -173,43 +173,43 @@ class ManageCalendarModule extends AbstractController
 							// Construct the date.
 							return sprintf('%1$d %2$s %3$s', $rowData['day'], $txt['months'][(int) $rowData['month']], $year);
 						},
-					),
-					'sort' => array(
+					],
+					'sort' => [
 						'default' => 'event_date',
 						'reverse' => 'event_date DESC',
-					),
-				),
-				'check' => array(
-					'header' => array(
+					],
+				],
+				'check' => [
+					'header' => [
 						'value' => '<input type="checkbox" onclick="invertAll(this, this.form);" class="input_check" />',
 						'class' => 'centertext',
-					),
-					'data' => array(
-						'sprintf' => array(
+					],
+					'data' => [
+						'sprintf' => [
 							'format' => '<input type="checkbox" name="holiday[%1$d]" class="input_check" />',
-							'params' => array(
+							'params' => [
 								'id_holiday' => false,
-							),
+							],
 
-						),
+						],
 						'class' => 'centertext'
-					),
-				),
-			),
-			'form' => array(
+					],
+				],
+			],
+			'form' => [
 				'href' => getUrl('admin', ['action' => 'admin', 'area' => 'managecalendar', 'sa' => 'holidays']),
 				'token' => 'admin-mc',
-			),
-			'additional_rows' => array(
-				array(
+			],
+			'additional_rows' => [
+				[
 					'position' => 'below_table_data',
 					'class' => 'submitbutton',
 					'value' => '
 					<a class="linkbutton floatright" href="' . getUrl('admin', ['action' => 'admin', 'area' => 'managecalendar', 'sa' => 'editholiday']) . '">' . $txt['holidays_add'] . '</a>
 					<input type="submit" name="delete" value="' . $txt['quickmod_delete_selected'] . '" onclick="return confirm(\'' . $txt['holidays_delete_confirm'] . '\');" />',
-				),
-			),
-		);
+				],
+			],
+		];
 
 		createList($listOptions);
 
@@ -230,9 +230,10 @@ class ManageCalendarModule extends AbstractController
 
 		theme()->getTemplates()->load('ManageCalendar');
 
+		$modSettings['cal_limityear'] = empty($modSettings['cal_limityear']) ? 20 : (int) $modSettings['cal_limityear'];
 		$context['is_new'] = !isset($this->_req->query->holiday);
 		$context['cal_minyear'] = $modSettings['cal_minyear'];
-		$context['cal_maxyear'] = (int) date('Y') + (int) $modSettings['cal_limityear'];
+		$context['cal_maxyear'] = (int) date('Y') + $modSettings['cal_limityear'];
 		$context['page_title'] = $context['is_new'] ? $txt['holidays_add'] : $txt['holidays_edit'];
 		$context['sub_template'] = 'edit_holiday';
 
@@ -271,13 +272,13 @@ class ManageCalendarModule extends AbstractController
 		// Default states...
 		if ($context['is_new'])
 		{
-			$context['holiday'] = array(
+			$context['holiday'] = [
 				'id' => 0,
 				'day' => date('d'),
 				'month' => date('m'),
 				'year' => '0000',
 				'title' => ''
-			);
+			];
 		}
 		// If it's not new load the data.
 		else
@@ -285,7 +286,7 @@ class ManageCalendarModule extends AbstractController
 			$context['holiday'] = getHoliday($this->_req->query->holiday);
 		}
 
-		// Last day for the drop down?
+		// Last day for the drop-down?
 		$context['holiday']['last_day'] = (int) Util::strftime('%d', mktime(0, 0, 0, $context['holiday']['month'] == 12
 			? 1
 			: $context['holiday']['month'] + 1, 0, $context['holiday']['month'] === 12
@@ -319,7 +320,7 @@ class ManageCalendarModule extends AbstractController
 			legend.parent().toggleClass("collapsed")', true);
 
 		// Get the final touches in place.
-		$context['post_url'] = getUrl('admin', ['action' => 'admin', 'area' => 'managecalendar', 'sa' => 'settings']);
+		$context['post_url'] = getUrl('admin', ['action' => 'admin', 'area' => 'managecalendar', 'sa' => 'settings', 'save']);
 		$context[$context['admin_menu_name']]['current_subsection'] = 'settings';
 
 		// Saving the settings?
@@ -331,9 +332,9 @@ class ManageCalendarModule extends AbstractController
 			$settingsForm->save();
 
 			// Update the stats in case.
-			updateSettings(array(
+			updateSettings([
 				'calendar_updated' => time(),
-			));
+			]);
 
 			redirectexit('action=admin;area=managecalendar;sa=settings');
 		}
@@ -353,45 +354,45 @@ class ManageCalendarModule extends AbstractController
 
 		// Load the boards list.
 		require_once(SUBSDIR . '/Boards.subs.php');
-		$boards_list = getBoardList(array('override_permissions' => true, 'not_redirection' => true), true);
-		$boards = array('');
+		$boards_list = getBoardList(['override_permissions' => true, 'not_redirection' => true], true);
+		$boards = [''];
 		foreach ($boards_list as $board)
 		{
 			$boards[$board['id_board']] = $board['cat_name'] . ' - ' . $board['board_name'];
 		}
 
 		// Look, all the calendar settings - of which there are many!
-		$config_vars = array(
-			array('title', 'calendar_settings'),
+		$config_vars = [
+			['title', 'calendar_settings'],
 			// All the permissions:
-			array('permissions', 'calendar_view'),
-			array('permissions', 'calendar_post'),
-			array('permissions', 'calendar_edit_own'),
-			array('permissions', 'calendar_edit_any'),
+			['permissions', 'calendar_view'],
+			['permissions', 'calendar_post'],
+			['permissions', 'calendar_edit_own'],
+			['permissions', 'calendar_edit_any'],
 			'',
-			// How many days to show on board index, and where to display events etc?
-			array('int', 'cal_days_for_index', 6, 'postinput' => $txt['days_word']),
-			array('select', 'cal_showholidays', array(0 => $txt['setting_cal_show_never'], 1 => $txt['setting_cal_show_cal'], 2 => $txt['setting_cal_show_all'], 3 => $txt['setting_cal_show_index'])),
-			array('select', 'cal_showbdays', array(0 => $txt['setting_cal_show_never'], 1 => $txt['setting_cal_show_cal'], 2 => $txt['setting_cal_show_all'], 3 => $txt['setting_cal_show_index'])),
-			array('select', 'cal_showevents', array(0 => $txt['setting_cal_show_never'], 1 => $txt['setting_cal_show_cal'], 2 => $txt['setting_cal_show_all'], 3 => $txt['setting_cal_show_index'])),
-			array('check', 'cal_export'),
+			// How many days to show on board index, and where to display events etc.?
+			['int', 'cal_days_for_index', 6, 'postinput' => $txt['days_word']],
+			['select', 'cal_showholidays', [0 => $txt['setting_cal_show_never'], 1 => $txt['setting_cal_show_cal'], 2 => $txt['setting_cal_show_all'], 3 => $txt['setting_cal_show_index']]],
+			['select', 'cal_showbdays', [0 => $txt['setting_cal_show_never'], 1 => $txt['setting_cal_show_cal'], 2 => $txt['setting_cal_show_all'], 3 => $txt['setting_cal_show_index']]],
+			['select', 'cal_showevents', [0 => $txt['setting_cal_show_never'], 1 => $txt['setting_cal_show_cal'], 2 => $txt['setting_cal_show_all'], 3 => $txt['setting_cal_show_index']]],
+			['check', 'cal_export'],
 			'',
 			// Linking events etc...
-			array('select', 'cal_defaultboard', $boards),
-			array('check', 'cal_daysaslink'),
-			array('check', 'cal_allow_unlinked'),
-			array('check', 'cal_showInTopic'),
+			['select', 'cal_defaultboard', $boards],
+			['check', 'cal_daysaslink'],
+			['check', 'cal_allow_unlinked'],
+			['check', 'cal_showInTopic'],
 			'',
 			// Dates of calendar...
-			array('int', 'cal_minyear'),
+			['int', 'cal_minyear'],
 			'',
 			// Calendar spanning...
-			array('check', 'cal_allowspan'),
-			array('int', 'cal_maxspan', 6, 'postinput' => $txt['days_word']),
-		);
+			['check', 'cal_allowspan'],
+			['int', 'cal_maxspan', 6, 'postinput' => $txt['days_word']],
+		];
 
 		// Add new settings with a nice hook, makes them available for admin settings search as well
-		call_integration_hook('integrate_modify_calendar_settings', array(&$config_vars));
+		call_integration_hook('integrate_modify_calendar_settings', [&$config_vars]);
 
 		return $config_vars;
 	}
@@ -401,6 +402,6 @@ class ManageCalendarModule extends AbstractController
 	 */
 	public function settings_search()
 	{
-		return $this->_settings();
+			return $this->_settings();
 	}
 }

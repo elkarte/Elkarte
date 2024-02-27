@@ -104,10 +104,8 @@ class UserSettings extends ValuesContainerReadOnly
 			// @todo here we should throw an exception
 			return false;
 		}
-		else
-		{
-			$this->updatePassword($passhash);
-		}
+
+		$this->updatePassword($passhash);
 	}
 
 	/**

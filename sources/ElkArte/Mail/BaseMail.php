@@ -151,7 +151,11 @@ abstract class BaseMail
 	{
 		global $modSettings, $webmaster_email;
 
-		$this->returnPath = !empty($modSettings['maillist_sitename_address']) ? $modSettings['maillist_sitename_address'] : '';
+		$this->returnPath = '';
+		if ($this->mailList === true)
+		{
+			$this->returnPath = empty($modSettings['maillist_sitename_address']) ? '' : $modSettings['maillist_sitename_address'];
+		}
 
 		if ($this->returnPath === '')
 		{

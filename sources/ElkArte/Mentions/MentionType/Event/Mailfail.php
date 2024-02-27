@@ -14,7 +14,6 @@
 namespace ElkArte\Mentions\MentionType\Event;
 
 use ElkArte\Mentions\MentionType\AbstractEventBoardAccess;
-use ElkArte\Mentions\MentionType\MailfailConfigTrait;
 
 /**
  * Class Mailfail
@@ -23,10 +22,6 @@ use ElkArte\Mentions\MentionType\MailfailConfigTrait;
  */
 class Mailfail extends AbstractEventBoardAccess
 {
-	use MailfailConfigTrait;
-
-	/**
-	 * {@inheritdoc }
-	 */
+	/** {@inheritDoc} */
 	protected static $_type = 'mailfail';
 }

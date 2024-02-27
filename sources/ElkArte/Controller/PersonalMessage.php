@@ -669,8 +669,8 @@ class PersonalMessage extends AbstractController
 		$subject_renderer = new PmRenderer($subjects_request ?? $messages_request, $this->user, $bodyParser, $opt);
 
 		// Subject and Message
-		$context['get_pmessage'] = static fn(bool $reset = false): bool|array => $renderer->getContext($reset);
-		$context['get_psubject'] = static fn(bool $reset = false): array|bool => $subject_renderer->getContext($reset);
+		$context['get_pmessage'] = [$renderer, 'getContext'];
+		$context['get_psubject'] = [$subject_renderer, 'getContext'];
 
 		// Prepare some items for the template
 		$context['topic_starter_id'] = 0;
@@ -2620,7 +2620,7 @@ class PersonalMessage extends AbstractController
 	 * Return buttons for search results, used when viewing full message as result
 	 *
 	 * @param int $id of the PM
-	 * @param array $member member information
+	 * @param ValuesContainer $member member information
 	 * @return array[]
 	 */
 	private function _setSearchPmButtons($id, $member)
@@ -2723,9 +2723,9 @@ class PersonalMessage extends AbstractController
 		}
 
 		// Default the username to a wildcard matching every user (*).
-		if (!empty($this->_search_params['userspec']) || (!empty($this->_req->post->userspec) && $this->_req->post->userspec != '*'))
+		if (!empty($this->_search_params['userspec']) || (!empty($this->_req->post->userspec) && $this->_req->post->userspec !== '*'))
 		{
-			$this->_search_params['userspec'] ??= $this->_req->post->userspec;
+			$this->_search_params['userspec'] = $this->_search_params['userspec'] ?? $this->_req->post->userspec;
 		}
 
 		// Search modifiers

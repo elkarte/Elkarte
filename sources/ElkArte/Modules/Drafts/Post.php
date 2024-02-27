@@ -20,8 +20,9 @@ use ElkArte\Errors\ErrorContext;
 use ElkArte\EventManager;
 use ElkArte\Exceptions\ControllerRedirectException;
 use ElkArte\HttpReq;
-use ElkArte\Modules\AbstractModule;
 use ElkArte\Languages\Txt;
+use ElkArte\Modules\AbstractModule;
+use ElkArte\Themes\TemplateLayers;
 use ElkArte\Util;
 
 /**
@@ -43,14 +44,14 @@ class Post extends AbstractModule
 	/** @var int Subject length that we can save */
 	protected static $_subject_length = 32;
 
-	/** @var \ElkArte\EventManager */
+	/** @var EventManager */
 	protected static $_eventsManager;
 
 	/** @var mixed Loading draft into the editor? */
 	protected $_loading_draft = false;
 
 	/**
-	 * {@inheritdoc}
+	 * {@inheritDoc}
 	 */
 	public static function hooks(EventManager $eventsManager)
 	{
@@ -76,11 +77,11 @@ class Post extends AbstractModule
 			self::$_drafts_save = allowedTo('post_draft');
 
 			$eventHooks = [
-				['prepare_modifying', ['\\ElkArte\\Modules\\Drafts\\Post', 'prepare_modifying'], ['really_previewing']],
-				['finalize_post_form', ['\\ElkArte\\Modules\\Drafts\\Post', 'finalize_post_form'], ['editorOptions', 'board', 'topic', 'template_layers']],
-				['prepare_save_post', ['\\ElkArte\\Modules\\Drafts\\Post', 'prepare_save_post'], []],
-				['before_save_post', ['\\ElkArte\\Modules\\Drafts\\Post', 'before_save_post'], []],
-				['after_save_post', ['\\ElkArte\\Modules\\Drafts\\Post', 'after_save_post'], ['msgOptions']],
+				['prepare_modifying', [Post::class, 'prepare_modifying'], ['really_previewing']],
+				['finalize_post_form', [Post::class, 'finalize_post_form'], ['editorOptions', 'board', 'topic', 'template_layers']],
+				['prepare_save_post', [Post::class, 'prepare_save_post'], []],
+				['before_save_post', [Post::class, 'before_save_post'], []],
+				['after_save_post', [Post::class, 'after_save_post'], ['msgOptions']],
 			];
 		}
 
@@ -110,7 +111,7 @@ class Post extends AbstractModule
 	 * @param array $editorOptions
 	 * @param int $board
 	 * @param int $topic
-	 * @param \ElkArte\Themes\TemplateLayers $template_layers
+	 * @param TemplateLayers $template_layers
 	 */
 	public function finalize_post_form(&$editorOptions, $board, $topic, $template_layers)
 	{
@@ -173,7 +174,7 @@ class Post extends AbstractModule
 			];
 
 			// Have drafts available, show a load button
-			if ($haveDrafts)
+			if ($haveDrafts !== 0)
 			{
 				$context['hasDrafts'] = $haveDrafts;
 				$editorOptions['buttons'][] = [
@@ -188,7 +189,7 @@ class Post extends AbstractModule
 				'value' => empty($context['id_draft']) ? 0 : $context['id_draft'],
 			];
 
-			if ($haveDrafts)
+			if ($haveDrafts !== 0)
 			{
 				unset($context['minmax_preferences']['draft']);
 				$template_layers->add('load_drafts', 100);
@@ -290,7 +291,7 @@ class Post extends AbstractModule
 			$context['drafts'][] = [
 				'subject' => censor($short_subject),
 				'poster_time' => standardTime($draft['poster_time']),
-				'link' => '<a href="' . $scripturl . '?action=post;board=' . $draft['id_board'] . ';' . (!empty($draft['id_topic']) ? 'topic=' . $draft['id_topic'] . '.0;' : '') . 'id_draft=' . $draft['id_draft'] . ';#post_subject">' . (!empty($draft['subject']) ? $draft['subject'] : $txt['drafts_none']) . '</a>',
+				'link' => '<a href="' . $scripturl . '?action=post;board=' . $draft['id_board'] . ';' . (empty($draft['id_topic']) ? '' : 'topic=' . $draft['id_topic'] . '.0;') . 'id_draft=' . $draft['id_draft'] . ';#post_subject">' . (empty($draft['subject']) ? $txt['drafts_none'] : $draft['subject']) . '</a>',
 			];
 		}
 
@@ -330,7 +331,6 @@ class Post extends AbstractModule
 	 * Does the actual saving of a Draft to the DB
 	 *
 	 * @throws ControllerRedirectException
-	 * @throws \ElkArte\Exceptions\Exception
 	 */
 	private function _save_draft()
 	{
@@ -376,14 +376,13 @@ class Post extends AbstractModule
 			obExit();
 		}
 
-		throw new ControllerRedirectException('\\ElkArte\\Controller\\Post', 'action_post');
+		throw new ControllerRedirectException(\ElkArte\Controller\Post::class, 'action_post');
 	}
 
 	/**
 	 * Loads the drafts for the current topic/member for display
 	 *
 	 * @throws ControllerRedirectException
-	 * @throws \ElkArte\Exceptions\Exception
 	 */
 	private function _load_drafts()
 	{
@@ -408,7 +407,7 @@ class Post extends AbstractModule
 		}
 
 		// Should not be here
-		throw new ControllerRedirectException('\\ElkArte\\Controller\\Post', 'action_post');
+		throw new ControllerRedirectException(\ElkArte\Controller\Post::class, 'action_post');
 	}
 
 	/**

@@ -333,7 +333,7 @@ function count_user_drafts($member_id, $draft_type = 0, $topic = false)
 		)
 	)->fetch_callback(
 		function ($row) use (&$number) {
-			$number = $row['number'];
+			$number = (int) $row['number'];
 		}
 	);
 

@@ -22,15 +22,10 @@ use ElkArte\Priority;
  */
 class TemplateLayers extends Priority
 {
-	/**
-	 * Layers not removed in case of errors
-	 */
+	/** @var array Layers not removed in case of errors */
 	private $_error_safe_layers = [];
 
-	/**
-	 * Are we handling an error?
-	 * Hopefully not, so default is false
-	 */
+	/** @var bool Are we handling an error? Hopefully not, so default is false */
 	private $_is_error = false;
 
 	/**
@@ -52,7 +47,7 @@ class TemplateLayers extends Priority
 	/**
 	 * Reverse the layers order
 	 *
-	 * @return array the reverse ordered layers
+	 * @return array The reverse ordered layers
 	 */
 	public function reverseLayers()
 	{

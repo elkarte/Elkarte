@@ -54,7 +54,18 @@ class Admin extends AbstractController
 	 */
 	public function pre_dispatch()
 	{
+		global $context, $modSettings;
+
 		Hooks::instance()->loadIntegrationsSettings();
+
+		// The Admin functions require Jquery UI ....
+		$modSettings['jquery_include_ui'] = true;
+
+		// No indexing evil stuff.
+		$context['robot_no_index'] = true;
+
+		// Need these to do much
+		require_once(SUBSDIR . '/Admin.subs.php');
 	}
 
 	/**
@@ -69,8 +80,6 @@ class Admin extends AbstractController
 	 */
 	public function action_index()
 	{
-		global $context, $modSettings;
-
 		// Make sure the administrator has a valid session...
 		validateSession();
 
@@ -79,15 +88,6 @@ class Admin extends AbstractController
 		theme()->getTemplates()->load('Admin');
 		loadCSSFile('admin.css');
 		loadJavascriptFile('admin.js', array(), 'admin_script');
-
-		// The Admin functions require Jquery UI ....
-		$modSettings['jquery_include_ui'] = true;
-
-		// No indexing evil stuff.
-		$context['robot_no_index'] = true;
-
-		// Need these to do much
-		require_once(SUBSDIR . '/Admin.subs.php');
 
 		// Actually create the menu!
 		$admin_include_data = $this->loadMenu();
@@ -112,7 +112,7 @@ class Admin extends AbstractController
 	 * @event integrate_admin_areas passed admin area, used to add items to the admin menu
 	 *
 	 * @return array
-	 * @throws \ElkArte\Exceptions\Exception no_access
+	 * @throws Exception no_access
 	 */
 	private function loadMenu()
 	{
@@ -537,14 +537,14 @@ class Admin extends AbstractController
 			),
 		);
 
-		$this->_events->trigger('addMenu', array('admin_areas' => &$admin_areas));
+		$this->_events->trigger('addMenu', ['admin_areas' => &$admin_areas]);
 
 		// Any files to include for administration?
 		call_integration_include_hook('integrate_admin_include');
 
-		$menuOptions = array(
+		$menuOptions = [
 			'hook' => 'admin',
-		);
+		];
 
 		// Actually create the admin menu!
 		$admin_include_data = (new Menu())
@@ -772,11 +772,10 @@ class Admin extends AbstractController
 	 *
 	 * What it does:
 	 *
-	 * - Can be accessed with /index.php?action=admin;sa=search;search_term=x) or
-	 * from the admin search form ("Task/Setting" option)
+	 * - Can be accessed with /index.php?action=admin;sa=search;search_term=x) or from the admin search form ("Task/Setting" option)
 	 * - Polls the controllers for their configuration settings
 	 * - Calls integrate_admin_search to allow addons to add search configs
-	 * - Loads up the "Help" language file and all of the "Manage" language files
+	 * - Loads up the "Help" language file and all "Manage" language files
 	 * - Loads up information about each item it found for the template
 	 *
 	 * @event integrate_admin_search Allows integration to add areas to the internal admin search
@@ -790,58 +789,59 @@ class Admin extends AbstractController
 		detectServer()->setMemoryLimit('128M');
 
 		// Load a lot of language files.
-		$language_files = array(
+		$language_files = [
 			'Help', 'ManageMail', 'ManageSettings', 'ManageBoards', 'ManagePaid', 'ManagePermissions', 'Search',
 			'Login', 'ManageSmileys', 'Maillist', 'Mentions'
-		);
+		];
 
 		// All the files we need to include to search for settings
-		$include_files = array();
+		$include_files = [];
 
 		// This is a special array of functions that contain setting data
 		// - we query all these to simply pull all setting bits!
-		$settings_search = array(
-			array('settings_search', 'area=logs;sa=pruning', AdminLog::class),
-			array('config_vars', 'area=corefeatures', CoreFeatures::class),
-			array('basicSettings_search', 'area=featuresettings;sa=basic', ManageFeatures::class),
-			array('layoutSettings_search', 'area=featuresettings;sa=layout', ManageFeatures::class),
-			array('karmaSettings_search', 'area=featuresettings;sa=karma', ManageFeatures::class),
-			array('likesSettings_search', 'area=featuresettings;sa=likes', ManageFeatures::class),
-			array('mentionSettings_search', 'area=featuresettings;sa=mention', ManageFeatures::class),
-			array('signatureSettings_search', 'area=featuresettings;sa=sig', ManageFeatures::class),
-			array('settings_search', 'area=addonsettings;sa=general', AddonSettings::class),
-			array('settings_search', 'area=manageattachments;sa=attachments', ManageAttachments::class),
-			array('settings_search', 'area=manageattachments;sa=avatars', ManageAvatars::class),
-			array('settings_search', 'area=postsettings;sa=bbc', ManageEditor::class),
-			array('settings_search', 'area=manageboards;sa=settings', ManageBoards::class),
-			array('settings_search', 'area=languages;sa=settings', ManageLanguages::class),
-			array('settings_search', 'area=mailqueue;sa=settings', ManageMail::class),
-			array('settings_search', 'area=maillist;sa=emailsettings', ManageMaillist::class),
-			array('settings_search', 'area=membergroups;sa=settings', ManageMembergroups::class),
-			array('settings_search', 'area=news;sa=settings', ManageNews::class),
-			array('settings_search', 'area=paidsubscribe;sa=settings', ManagePaid::class),
-			array('settings_search', 'area=permissions;sa=settings', ManagePermissions::class),
-			array('settings_search', 'area=postsettings;sa=posts', ManagePosts::class),
-			array('settings_search', 'area=regcenter;sa=settings', ManageRegistration::class),
-			array('settings_search', 'area=managesearch;sa=settings', ManageSearch::class),
-			array('settings_search', 'area=sengines;sa=settings', ManageSearchEngines::class),
-			array('securitySettings_search', 'area=securitysettings;sa=general', ManageSecurity::class),
-			array('spamSettings_search', 'area=securitysettings;sa=spam', ManageSecurity::class),
-			array('moderationSettings_search', 'area=securitysettings;sa=moderation', ManageSecurity::class),
-			array('generalSettings_search', 'area=serversettings;sa=general', ManageServer::class),
-			array('databaseSettings_search', 'area=serversettings;sa=database', ManageServer::class),
-			array('cookieSettings_search', 'area=serversettings;sa=cookie', ManageServer::class),
-			array('cacheSettings_search', 'area=serversettings;sa=cache', ManageServer::class),
-			array('balancingSettings_search', 'area=serversettings;sa=loads', ManageServer::class),
-			array('settings_search', 'area=smileys;sa=settings', ManageSmileys::class),
-			array('settings_search', 'area=postsettings;sa=topics', ManageTopics::class),
-		);
+		$settings_search = [
+			['settings_search', 'area=addonsettings;sa=general', AddonSettings::class],
+			['settings_search', 'area=logs;sa=pruning', AdminLog::class],
+			['config_vars', 'area=corefeatures', CoreFeatures::class],
+			['settings_search', 'area=manageattachments;sa=attachments', ManageAttachments::class],
+			['settings_search', 'area=manageattachments;sa=avatars', ManageAvatars::class],
+			['settings_search', 'area=manageboards;sa=settings', ManageBoards::class],
+			['settings_search', 'area=postsettings;sa=bbc', ManageEditor::class],
+			['basicSettings_search', 'area=featuresettings;sa=basic', ManageFeatures::class],
+			['layoutSettings_search', 'area=featuresettings;sa=layout', ManageFeatures::class],
+			['karmaSettings_search', 'area=featuresettings;sa=karma', ManageFeatures::class],
+			['signatureSettings_search', 'area=featuresettings;sa=pmsettings', ManageFeatures::class],
+			['likesSettings_search', 'area=featuresettings;sa=likes', ManageFeatures::class],
+			['mentionSettings_search', 'area=featuresettings;sa=mention', ManageFeatures::class],
+			['signatureSettings_search', 'area=featuresettings;sa=sig', ManageFeatures::class],
+			['settings_search', 'area=languages;sa=settings', ManageLanguages::class],
+			['settings_search', 'area=mailqueue;sa=settings', ManageMail::class],
+			['settings_search', 'area=maillist;sa=emailsettings', ManageMaillist::class],
+			['settings_search', 'area=membergroups;sa=settings', ManageMembergroups::class],
+			['settings_search', 'area=news;sa=settings', ManageNews::class],
+			['settings_search', 'area=paidsubscribe;sa=settings', ManagePaid::class],
+			['settings_search', 'area=permissions;sa=settings', ManagePermissions::class],
+			['settings_search', 'area=postsettings;sa=posts', ManagePosts::class],
+			['settings_search', 'area=regcenter;sa=settings', ManageRegistration::class],
+			['settings_search', 'area=managesearch;sa=settings', ManageSearch::class],
+			['settings_search', 'area=sengines;sa=settings', ManageSearchEngines::class],
+			['securitySettings_search', 'area=securitysettings;sa=general', ManageSecurity::class],
+			['spamSettings_search', 'area=securitysettings;sa=spam', ManageSecurity::class],
+			['moderationSettings_search', 'area=securitysettings;sa=moderation', ManageSecurity::class],
+			['generalSettings_search', 'area=serversettings;sa=general', ManageServer::class],
+			['databaseSettings_search', 'area=serversettings;sa=database', ManageServer::class],
+			['cookieSettings_search', 'area=serversettings;sa=cookie', ManageServer::class],
+			['cacheSettings_search', 'area=serversettings;sa=cache', ManageServer::class],
+			['balancingSettings_search', 'area=serversettings;sa=loads', ManageServer::class],
+			['settings_search', 'area=smileys;sa=settings', ManageSmileys::class],
+			['settings_search', 'area=postsettings;sa=topics', ManageTopics::class],
+		];
 
 		// Allow integration to add settings to search
-		call_integration_hook('integrate_admin_search', array(&$language_files, &$include_files, &$settings_search));
+		call_integration_hook('integrate_admin_search', [&$language_files, &$include_files, &$settings_search]);
 
 		// Allow active modules to add settings for internal search
-		$this->_events->trigger('search', array('language_files' => &$language_files, 'include_files' => &$include_files, 'settings_search' => &$settings_search));
+		$this->_events->trigger('addSearch', ['language_files' => &$language_files, 'include_files' => &$include_files, 'settings_search' => &$settings_search]);
 
 		// Go through all the search data trying to find this text!
 		$context['search_results'] = [];
@@ -849,10 +849,10 @@ class Admin extends AbstractController
 		{
 			$search_term = strtolower(un_htmlspecialchars($context['search_term'] ?? ''));
 			$search = new AdminSettingsSearch($language_files, $include_files, $settings_search);
-			$search->initSearch($context['admin_menu_name'], array(
-				array('COPPA', 'area=regcenter;sa=settings'),
-				array('CAPTCHA', 'area=securitysettings;sa=spam'),
-			));
+			$search->initSearch($context['admin_menu_name'], [
+				['COPPA', 'area=regcenter;sa=settings'],
+				['CAPTCHA', 'area=securitysettings;sa=spam'],
+			]);
 			$context['search_results'] = $search->doSearch($search_term);
 		}
 
@@ -881,8 +881,7 @@ class Admin extends AbstractController
 	}
 
 	/**
-	 * This file allows the user to search the wiki documentation
-	 * for a little help.
+	 * This file allows the user to search the wiki documentation for a little help.
 	 *
 	 * What it does:
 	 *

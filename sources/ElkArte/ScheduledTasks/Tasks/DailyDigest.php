@@ -16,9 +16,9 @@
 
 namespace ElkArte\ScheduledTasks\Tasks;
 
+use ElkArte\Languages\Loader;
 use ElkArte\Themes\ThemeLoader;
 use ElkArte\Util;
-use ElkArte\Languages\Loader;
 
 /**
  * Class DailyDigest - Send out a daily email of all subscribed topics, to members.
@@ -42,8 +42,9 @@ class DailyDigest implements ScheduledTaskInterface
 	/**
 	 * Send out a email of all subscribed topics, to members.
 	 *
-	 * - Builds email body's of topics and messages per user as defined by their
-	 * notification settings
+	 * What it does:
+	 *
+	 * - Builds email body's of topics and messages per user as defined by their notification settings
 	 * - If weekly builds the weekly abridged digest
 	 *
 	 * @param bool $is_weekly
@@ -67,7 +68,7 @@ class DailyDigest implements ScheduledTaskInterface
 			require_once(SUBSDIR . '/Maillist.subs.php');
 		}
 
-		$is_weekly = !empty($is_weekly) ? 1 : 0;
+		$is_weekly = empty($is_weekly) ? 0 : 1;
 
 		// Right - get all the notification data FIRST.
 		$request = $db->fetchQuery('
@@ -81,21 +82,21 @@ class DailyDigest implements ScheduledTaskInterface
 				AND mem.is_activated = {int:is_activated}',
 			array(
 				'empty_topic' => 0,
-				'notify_regularity' => $is_weekly ? '3' : '2',
+				'notify_regularity' => $is_weekly !== 0 ? '3' : '2',
 				'is_activated' => 1,
 			)
 		);
-		$members = array();
-		$langs = array();
-		$notify = array();
-		$boards = array();
+		$members = [];
+		$langs = [];
+		$notify = [];
+		$boards = [];
 		while (($row = $request->fetch_assoc()))
 		{
 			if (!isset($members[$row['id_member']]))
 			{
 				$members[$row['id_member']] = array(
 					'email' => $row['email_address'],
-					'name' => ($row['real_name'] == '') ? $row['member_name'] : un_htmlspecialchars($row['real_name']),
+					'name' => ($row['real_name'] === '') ? $row['member_name'] : un_htmlspecialchars($row['real_name']),
 					'id' => $row['id_member'],
 					'notifyMod' => $row['notify_types'] < 3,
 					'lang' => $row['lngfile'],
@@ -114,6 +115,7 @@ class DailyDigest implements ScheduledTaskInterface
 				$notify['boards'][$row['id_board']][] = $row['id_member'];
 			}
 		}
+
 		$request->free_result();
 
 		if (empty($boards))
@@ -144,7 +146,7 @@ class DailyDigest implements ScheduledTaskInterface
 				INNER JOIN {db_prefix}messages AS m ON (m.id_msg = t.id_first_msg)
 				INNER JOIN {db_prefix}messages AS ml ON (ml.id_msg = ld.id_msg)
 				INNER JOIN {db_prefix}boards AS b ON (b.id_board = t.id_board)
-			WHERE ' . ($is_weekly ? 'ld.daily != {int:daily_value}' : 'ld.daily IN (0, 2)'),
+			WHERE ' . ($is_weekly !== 0 ? 'ld.daily != {int:daily_value}' : 'ld.daily IN (0, 2)'),
 			array(
 				'board_list' => array_keys($boards),
 				'daily_value' => 2,
@@ -197,7 +199,7 @@ class DailyDigest implements ScheduledTaskInterface
 				{
 					// Convert to markdown markup e.g. text ;)
 					pbe_prepare_text($row['body']);
-					$row['body'] = Util::shorten_text($row['body'], !empty($modSettings['digest_preview_length']) ? $modSettings['digest_preview_length'] : 375, true);
+					$row['body'] = Util::shorten_text($row['body'], empty($modSettings['digest_preview_length']) ? 375 : $modSettings['digest_preview_length'], true);
 					$row['body'] = preg_replace("~\n~", "\n  ", $row['body']);
 				}
 
@@ -236,6 +238,7 @@ class DailyDigest implements ScheduledTaskInterface
 				$types[$row['note_type']][$row['id_board']]['lines'][$row['id_topic']]['members'] = array_merge($types[$row['note_type']][$row['id_board']]['lines'][$row['id_topic']]['members'], $notify['boards'][$row['id_board']]);
 			}
 		}
+
 		$request->free_result();
 
 		if (empty($types))
@@ -253,7 +256,7 @@ class DailyDigest implements ScheduledTaskInterface
 					// Replace the body array with the appropriate preview message
 					$body = $types['reply'][$id]['lines'][$topic['id']]['body_text'];
 					pbe_prepare_text($body);
-					$body = Util::shorten_text($body, !empty($modSettings['digest_preview_length']) ? $modSettings['digest_preview_length'] : 375, true);
+					$body = Util::shorten_text($body, empty($modSettings['digest_preview_length']) ? 375 : $modSettings['digest_preview_length'], true);
 					$body = preg_replace("~\n~", "\n  ", $body);
 					$types['reply'][$id]['lines'][$topic['id']]['body'] = $body;
 
@@ -271,9 +274,9 @@ class DailyDigest implements ScheduledTaskInterface
 			$lang_loader->load('index+Post+Maillist+EmailTemplates');
 
 			$langtxt[$lang] = array(
-				'subject' => $mtxt['digest_subject_' . ($is_weekly ? 'weekly' : 'daily')],
+				'subject' => $mtxt['digest_subject_' . ($is_weekly !== 0 ? 'weekly' : 'daily')],
 				'char_set' => 'UTF-8',
-				'intro' => sprintf($mtxt['digest_intro_' . ($is_weekly ? 'weekly' : 'daily')], $mbname),
+				'intro' => sprintf($mtxt['digest_intro_' . ($is_weekly !== 0 ? 'weekly' : 'daily')], $mbname),
 				'new_topics' => $mtxt['digest_new_topics'],
 				'topic_lines' => $mtxt['digest_new_topics_line'],
 				'new_replies' => $mtxt['digest_new_replies'],
@@ -287,7 +290,7 @@ class DailyDigest implements ScheduledTaskInterface
 				'move' => $mtxt['digest_mod_act_move'],
 				'merge' => $mtxt['digest_mod_act_merge'],
 				'split' => $mtxt['digest_mod_act_split'],
-				'bye' => (!empty($modSettings['maillist_sitename_regards']) ? $modSettings['maillist_sitename_regards'] : '') . "\n" . $boardurl,
+				'bye' => (empty($modSettings['maillist_sitename_regards']) ? '' : $modSettings['maillist_sitename_regards']) . "\n" . $boardurl,
 				'preview' => $mtxt['digest_preview'],
 				'see_full' => $mtxt['digest_see_full'],
 				'reply_preview' => $mtxt['digest_reply_preview'],
@@ -311,7 +314,7 @@ class DailyDigest implements ScheduledTaskInterface
 				$titled = false;
 
 				// Each type contains a board ID and then a topic number
-				foreach ($types['topic'] as $id => $board)
+				foreach ($types['topic'] as $board)
 				{
 					foreach ($board['lines'] as $topic)
 					{
@@ -346,7 +349,7 @@ class DailyDigest implements ScheduledTaskInterface
 				$titled = false;
 
 				// Each reply will have a board id and then a topic ID
-				foreach ($types['reply'] as $id => $board)
+				foreach ($types['reply'] as $board)
 				{
 					foreach ($board['lines'] as $topic)
 					{
@@ -384,7 +387,7 @@ class DailyDigest implements ScheduledTaskInterface
 					continue;
 				}
 
-				foreach ($type as $id => $board)
+				foreach ($type as $board)
 				{
 					foreach ($board['lines'] as $topic)
 					{
@@ -421,7 +424,7 @@ class DailyDigest implements ScheduledTaskInterface
 		}
 
 		// Clean up...
-		if ($is_weekly)
+		if ($is_weekly !== 0)
 		{
 			$db->query('', '
 				DELETE FROM {db_prefix}log_digest

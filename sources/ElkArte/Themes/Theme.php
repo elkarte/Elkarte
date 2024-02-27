@@ -32,8 +32,10 @@ abstract class Theme
 {
 	/** @var string */
 	public const DEFAULT_EXPIRES = 'Mon, 26 Jul 1997 05:00:00 GMT';
+
 	/** @var int */
 	public const ALL = -1;
+
 	/** @var array */
 	private const CONTENT_TYPES = [
 		'fatal_error' => 'text/html',
@@ -41,25 +43,35 @@ abstract class Theme
 		'xml' => 'text/xml',
 		'generic_xml' => 'text/xml'
 	];
+
 	/** @var ValuesContainer */
 	public $user;
+
 	/** @var HttpReq user input variables */
 	public $_req;
+
 	/** @var int The id of the theme being used */
 	protected $id;
+
 	/** @var array */
 	protected $links = [];
+
 	/** @var string[] Holds base actions that we do not want crawled / indexed */
 	public $no_index_actions = [];
+
 	/** @var bool Right to left language support */
 	protected $rtl;
+
 	/** @var Templates */
 	private $templates;
+
 	/** @var TemplateLayers */
 	private $layers;
+
 	/** @var Javascript */
 	public $javascript;
-	/** @var Css  */
+
+	/** @var Css */
 	public $css;
 
 	/**
@@ -139,18 +151,36 @@ abstract class Theme
 	 */
 	public function setRTL($toggle)
 	{
-		$this->rtl = (bool)$toggle;
+		$this->rtl = (bool) $toggle;
 
 		return $this;
 	}
 
+	/**
+	 * Get the value of 'api' from the request
+	 *
+	 * What it does:
+	 *  - Retrieves the value of the 'api' parameter from the request.
+	 *
+	 * @return string The value of the 'api' parameter from the request, trimmed.
+	 */
 	public function getRequestAPI(): string
 	{
 		return $this->_req->getRequest('api', 'trim', '');
 	}
 
-	public function setupHeadersExpiration(Headers $header, array $context): void
+	/**
+	 * Set the headers expiration
+	 *
+	 * What it does:
+	 *  - Sets the Expires and Last-Modified headers in the Headers object.
+	 *
+	 * @param Headers $header The Headers object to set the headers in.
+	 */
+	public function setupHeadersExpiration(Headers $header): void
 	{
+		global $context;
+
 		if (empty($context['no_last_modified']))
 		{
 			$header
@@ -160,7 +190,7 @@ abstract class Theme
 	}
 
 	/**
-	 * Setup the logged user context
+	 * Set up the logged user context
 	 *
 	 * What it does:
 	 *  - Copies relevant user data from the user object to the global context.
@@ -174,20 +204,13 @@ abstract class Theme
 		$context['user']['mentions'] = $this->user->mentions;
 
 		// Personal message popup...
-		if ($this->user->unread_messages > ($_SESSION['unread_messages'] ?? 0))
-		{
-			$context['user']['popup_messages'] = true;
-		}
-		else
-		{
-			$context['user']['popup_messages'] = false;
-		}
+		$context['user']['popup_messages'] = $this->user->unread_messages > ($_SESSION['unread_messages'] ?? 0);
 
 		$_SESSION['unread_messages'] = $this->user->unread_messages;
 
 		$context['user']['avatar'] = [
-			'href' => !empty($this->user->avatar['href']) ? $this->user->avatar['href'] : '',
-			'image' => !empty($this->user->avatar['image']) ? $this->user->avatar['image'] : '',
+			'href' => empty($this->user->avatar['href']) ? '' : $this->user->avatar['href'],
+			'image' => empty($this->user->avatar['image']) ? '' : $this->user->avatar['image'],
 		];
 
 		// Figure out how long they've been logged in.
@@ -215,7 +238,7 @@ abstract class Theme
 		$context['user']['total_time_logged_in'] = ['days' => 0, 'hours' => 0, 'minutes' => 0];
 		$context['user']['popup_messages'] = false;
 
-		if (!empty($modSettings['registration_method']) && (int)$modSettings['registration_method'] === 1)
+		if (!empty($modSettings['registration_method']) && (int) $modSettings['registration_method'] === 1)
 		{
 			$txt['welcome_guest'] .= $txt['welcome_guest_activate'];
 		}
@@ -269,23 +292,16 @@ abstract class Theme
 	}
 
 	/**
-	 * Setup the headers content type
+	 * Set the headers content type
 	 *
 	 * What it does:
 	 *  - Sets the content type of the headers based on the provided context and API.
 	 *
 	 * @param Headers $header The Headers instance used to set the content type.
-	 * @param array $context The context array containing the sub template.
 	 * @param string $api The API string used to determine the content type.
-	 * @return void
 	 */
-	public function setupHeadersContentType(Headers $header, array $context, string $api): void
+	public function setupHeadersContentType(Headers $header, string $api): void
 	{
-		if (isset($context['sub_template']))
-		{
-			$api = $context['sub_template'];
-		}
-
 		$contentType = self::CONTENT_TYPES[$api] ?? 'text/html';
 
 		$header->contentType($contentType, 'UTF-8');
@@ -296,13 +312,11 @@ abstract class Theme
 	 *
 	 * Updates the theme settings by replacing the URL and directory values with the default ones if the 'use_default_images'
 	 * setting is set to 'defaults' and the 'default_template' setting is provided.
-	 *
-	 * @param array &$settings The reference to the theme settings array.
-	 *
-	 * @return void
 	 */
-	public function loadDefaultThemeSettings(array &$settings): void
+	public function loadDefaultThemeSettings(): void
 	{
+		global $settings;
+
 		if (isset($settings['use_default_images'], $settings['default_template'])
 			&& $settings['use_default_images'] === 'defaults')
 		{
@@ -335,6 +349,7 @@ abstract class Theme
 			{
 				continue;
 			}
+
 			$context['news_lines'][$i] = $bbc_parser->parseNews(stripslashes(trim($iValue)));
 		}
 
@@ -431,7 +446,7 @@ abstract class Theme
 
 			$this->addInlineJavascript('
 				const oEmbedtext = ({
-					embed_limit : ' . (!empty($modSettings['video_embed_limit']) ? $modSettings['video_embed_limit'] : 25) . ',
+					embed_limit : ' . (empty($modSettings['video_embed_limit']) ? 25 : $modSettings['video_embed_limit']) . ',
 					preview_image : ' . JavaScriptEscape($txt['preview_image']) . ',
 					ctp_video : ' . JavaScriptEscape($txt['ctp_video']) . ',
 					hide_video : ' . JavaScriptEscape($txt['hide_video']) . ',
@@ -492,10 +507,17 @@ abstract class Theme
 			return;
 		}
 
-		if ($fallBack && $fileFunc->fileExists($settings['theme_dir'] . '/css/' . $cssFile . '.css'))
+		if (!$fallBack)
 		{
-			loadCSSFile($cssFile . '.css');
+			return;
 		}
+
+		if (!$fileFunc->fileExists($settings['theme_dir'] . '/css/' . $cssFile . '.css'))
+		{
+			return;
+		}
+
+		loadCSSFile($cssFile . '.css');
 	}
 
 	/**
@@ -617,7 +639,7 @@ abstract class Theme
 		$this->addJavascriptVar(['elk_forum_action' => getUrlQuery('action', $modSettings['default_forum_action'])], true);
 
 		$context['page_title'] = $context['page_title'] ?? '';
-		$context['page_title_html_safe'] = Util::htmlspecialchars(un_htmlspecialchars($context['page_title'])) . (!empty($context['current_page']) ? ' - ' . $txt['page'] . (' ' . ($context['current_page'] + 1)) : '');
+		$context['page_title_html_safe'] = Util::htmlspecialchars(un_htmlspecialchars($context['page_title'])) . (empty($context['current_page']) ? '' : ' - ' . $txt['page'] . (' ' . ($context['current_page'] + 1)));
 		$context['favicon'] = $boardurl . '/mobile.png';
 
 		$context['html_headers'] = $context['html_headers'] ?? '';
@@ -640,7 +662,7 @@ abstract class Theme
 		// User selection?
 		if (empty($settings['disable_user_variant']) || allowedTo('admin_forum'))
 		{
-			$context['theme_variant'] = !empty($_SESSION['id_variant']) ? $_SESSION['id_variant'] : (!empty($options['theme_variant']) ? $options['theme_variant'] : '');
+			$context['theme_variant'] = empty($_SESSION['id_variant']) ? (!empty($options['theme_variant']) ? $options['theme_variant'] : '') : ($_SESSION['id_variant']);
 		}
 
 		// If not a user variant, select the default.

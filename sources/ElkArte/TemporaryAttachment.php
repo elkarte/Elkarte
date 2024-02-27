@@ -173,9 +173,9 @@ class TemporaryAttachment extends ValuesContainer
 	/**
 	 * Performs various checks on an uploaded file.
 	 *
-	 * @param \ElkArte\AttachmentsDirectory $attachmentDirectory
-	 * @throws \ElkArte\Exceptions\Exception attach_check_nag
+	 * @param AttachmentsDirectory $attachmentDirectory
 	 * @return bool
+	 * @throws ElkException attach_check_nag
 	 */
 	public function doChecks($attachmentDirectory)
 	{
@@ -284,7 +284,7 @@ class TemporaryAttachment extends ValuesContainer
 					}
 				}
 			}
-			catch (\Exception $e)
+			catch (\Exception)
 			{
 				$this->setErrors('bad_attachment');
 			}
@@ -356,7 +356,7 @@ class TemporaryAttachment extends ValuesContainer
 	/**
 	 * Is there room in the directory for this file
 	 *
-	 * @param \ElkArte\AttachmentsDirectory $attachmentDirectory
+	 * @param AttachmentsDirectory $attachmentDirectory
 	 */
 	public function checkDirectorySpace($attachmentDirectory)
 	{
@@ -364,9 +364,9 @@ class TemporaryAttachment extends ValuesContainer
 		{
 			$attachmentDirectory->checkDirSpace($this);
 		}
-		catch (\Exception $e)
+		catch (\Exception $exception)
 		{
-			$this->setErrors($e->getMessage());
+			$this->setErrors($exception->getMessage());
 		}
 	}
 
@@ -378,15 +378,21 @@ class TemporaryAttachment extends ValuesContainer
 		global $modSettings;
 
 		// Is the file too big?
-		if (!empty($modSettings['attachmentSizeLimit'])
-			&& $this->data['size'] > $modSettings['attachmentSizeLimit'] * 1024)
+		if (empty($modSettings['attachmentSizeLimit']))
 		{
-			$this->setErrors([
-				'file_too_big', [
-					comma_format($modSettings['attachmentSizeLimit'], 0)
-				]
-			]);
+			return;
 		}
+
+		if ($this->data['size'] <= $modSettings['attachmentSizeLimit'] * 1024)
+		{
+			return;
+		}
+
+		$this->setErrors([
+			'file_too_big', [
+				comma_format($modSettings['attachmentSizeLimit'], 0)
+			]
+		]);
 	}
 
 	/**
@@ -398,16 +404,22 @@ class TemporaryAttachment extends ValuesContainer
 
 		// Check the total upload size for this post...
 		$context['attachments']['total_size'] += $this->data['size'];
-		if (!empty($modSettings['attachmentPostLimit'])
-			&& $context['attachments']['total_size'] > $modSettings['attachmentPostLimit'] * 1024)
+		if (empty($modSettings['attachmentPostLimit']))
 		{
-			$this->setErrors([
-				'attach_max_total_file_size', [
-					comma_format($modSettings['attachmentPostLimit'], 0),
-					comma_format($modSettings['attachmentPostLimit'] - (($context['attachments']['total_size'] - $this->data['size']) / 1024), 0)
-				]
-			]);
+			return;
 		}
+
+		if ($context['attachments']['total_size'] <= $modSettings['attachmentPostLimit'] * 1024)
+		{
+			return;
+		}
+
+		$this->setErrors([
+			'attach_max_total_file_size', [
+				comma_format($modSettings['attachmentPostLimit'], 0),
+				comma_format($modSettings['attachmentPostLimit'] - (($context['attachments']['total_size'] - $this->data['size']) / 1024), 0)
+			]
+		]);
 	}
 
 	/**
@@ -426,15 +438,21 @@ class TemporaryAttachment extends ValuesContainer
 			$modSettings['attachmentNumPerPostLimit'] = 15;
 		}
 
-		if (!empty($modSettings['attachmentNumPerPostLimit'])
-			&& $context['attachments']['quantity'] > $modSettings['attachmentNumPerPostLimit'])
+		if (empty($modSettings['attachmentNumPerPostLimit']))
 		{
-			$this->setErrors([
-				'attachments_limit_per_post', [
-					$modSettings['attachmentNumPerPostLimit']
-				]
-			]);
+			return;
 		}
+
+		if ($context['attachments']['quantity'] <= $modSettings['attachmentNumPerPostLimit'])
+		{
+			return;
+		}
+
+		$this->setErrors([
+			'attachments_limit_per_post', [
+				$modSettings['attachmentNumPerPostLimit']
+			]
+		]);
 	}
 
 	/**
@@ -450,7 +468,7 @@ class TemporaryAttachment extends ValuesContainer
 			$allowed = explode(',', strtolower($modSettings['attachmentExtensions']));
 			$allowed = array_map('trim', $allowed);
 
-			if (!in_array(strtolower(substr(strrchr($this->data['name'], '.'), 1)), $allowed))
+			if (!in_array(strtolower(substr(strrchr($this->data['name'], '.'), 1)), $allowed, true))
 			{
 				$allowed_extensions = strtr(strtolower($modSettings['attachmentExtensions']), array(',' => ', '));
 				$this->setErrors([
@@ -495,7 +513,7 @@ class TemporaryAttachment extends ValuesContainer
 
 			FileFunctions::instance()->delete($this->data['tmp_name']);
 		}
-		catch (\Exception $e)
+		catch (\Exception)
 		{
 			return false;
 		}

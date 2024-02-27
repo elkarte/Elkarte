@@ -21,45 +21,33 @@ use ElkArte\ValuesContainer;
  */
 class NotificationsTask extends ValuesContainer
 {
-	/**
-	 * Data of the members to notify.
-	 * Populated only if the getMembersData method is called.
-	 *
-	 * @var array
-	 */
-	protected $_members_data = null;
+	/** @var array Data of the members to notify. Populated only if the getMembersData method is called. */
+	protected $_members_data;
+
+	/** @var array Data of the member generating the notification. Populated only if the getNotifierData method is called. */
+	protected $_notifier_data;
 
 	/**
-	 * Data of the member generating the notification.
-	 * Populated only if the getNotifierData method is called.
-	 *
-	 * @var array
-	 */
-	protected $_notifier_data = null;
-
-	/**
-	 * The constructor prepared the data array and fills some default values
-	 * if needed.
+	 * The constructor prepared the data array and fills some default values if needed.
 	 *
 	 * @param string $type The notification type we are dealing with
 	 * @param int $id The id of the target (can be a message, a topic, a member, whatever)
 	 * @param int $id_member The id of the member generating the notification
 	 * @param array $data An array of data that can be necessary in the process
-	 * @param string $namespace A namespace for the class if different from the
-	 *               default \ElkArte\Mentions\MentionType\Notification\
+	 * @param string $namespace A namespace for the class if different from the default \ElkArte\Mentions\MentionType\Notification\
 	 */
 	public function __construct($type, $id, $id_member, $data, $namespace = '')
 	{
 		parent::__construct();
 
-		$this->data = array(
+		$this->data = [
 			'notification_type' => $type,
 			'namespace' => empty($namespace) ? '\\ElkArte\\Mentions\\MentionType\\Notification\\' : rtrim($namespace, '\\') . '\\',
 			'id_target' => $id,
 			'id_member_from' => $id_member,
 			'source_data' => $data,
 			'log_time' => time()
-		);
+		];
 
 		if (!isset($this->data['source_data']['status']))
 		{
@@ -72,7 +60,7 @@ class NotificationsTask extends ValuesContainer
 		}
 		else
 		{
-			$this->setMembers(array());
+			$this->setMembers([]);
 		}
 	}
 
@@ -96,7 +84,7 @@ class NotificationsTask extends ValuesContainer
 		if ($this->_members_data === null)
 		{
 			require_once(SUBSDIR . '/Members.subs.php');
-			$this->_members_data = getBasicMemberData($this->getMembers(), array('preferences' => true, 'authentication' => true));
+			$this->_members_data = getBasicMemberData($this->getMembers(), ['preferences' => true, 'authentication' => true]);
 		}
 
 		return $this->_members_data;

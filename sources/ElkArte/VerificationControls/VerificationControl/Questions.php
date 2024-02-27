@@ -64,7 +64,7 @@ class Questions implements ControlInterface
 	}
 
 	/**
-	 * {@inheritdoc}
+	 * {@inheritDoc}
 	 */
 	public function showVerification($sessionVal, $isNew, $force_refresh = true)
 	{
@@ -72,7 +72,7 @@ class Questions implements ControlInterface
 
 		if ($isNew)
 		{
-			$this->_number_questions = $this->_options['override_qs'] ?? (!empty($modSettings['qa_verification_number']) ? $modSettings['qa_verification_number'] : 0);
+			$this->_number_questions = $this->_options['override_qs'] ?? (empty($modSettings['qa_verification_number']) ? 0 : $modSettings['qa_verification_number']);
 
 			// If we want questions do we have a cache of all the IDs?
 			if (!empty($this->_number_questions) && empty($modSettings['question_id_cache']))
@@ -82,7 +82,7 @@ class Questions implements ControlInterface
 
 			// Let's deal with languages
 			// First thing we need to know what language the user wants and if there is at least one question
-			$questions_language = !empty($sessionVal['language']) ? $sessionVal['language'] : (!empty(User::$info->language) ? User::$info->language : $language);
+			$questions_language = empty($sessionVal['language']) ? (!empty(User::$info->language) ? User::$info->language : $language) : ($sessionVal['language']);
 
 			// No questions in the selected language?
 			if (empty($modSettings['question_id_cache'][$questions_language]))
@@ -137,7 +137,7 @@ class Questions implements ControlInterface
 				FROM {db_prefix}antispam_questions',
 				[]
 			)->fetch_callback(
-				function ($row) use (&$modSettings) {
+				static function ($row) use (&$modSettings) {
 					$modSettings['question_id_cache'][$row['language']][] = $row['id_question'];
 				}
 			);
@@ -147,7 +147,7 @@ class Questions implements ControlInterface
 	}
 
 	/**
-	 * {@inheritdoc}
+	 * {@inheritDoc}
 	 */
 	public function createTest($sessionVal, $refresh = true)
 	{
@@ -162,7 +162,7 @@ class Questions implements ControlInterface
 			$this->_questionIDs = [];
 
 			// Pick some random IDs
-			if ($this->_number_questions == 1)
+			if ($this->_number_questions === 1)
 			{
 				$this->_questionIDs[] = $this->_possible_questions[array_rand($this->_possible_questions, $this->_number_questions)];
 			}
@@ -187,7 +187,7 @@ class Questions implements ControlInterface
 	}
 
 	/**
-	 * {@inheritdoc}
+	 * {@inheritDoc}
 	 */
 	public function prepareContext($sessionVal)
 	{
@@ -251,7 +251,7 @@ class Questions implements ControlInterface
 				'current_filter' => $this->_filter === null ? '' : $this->_filter['value'],
 			]
 		)->fetch_callback(
-			function ($row) use (&$question_answers) {
+			static function ($row) use (&$question_answers) {
 				$question_answers[$row['id_question']] = [
 					'id_question' => $row['id_question'],
 					'question' => $row['question'],
@@ -265,7 +265,7 @@ class Questions implements ControlInterface
 	}
 
 	/**
-	 * {@inheritdoc}
+	 * {@inheritDoc}
 	 */
 	public function doTest($sessionVal)
 	{
@@ -315,7 +315,7 @@ class Questions implements ControlInterface
 	}
 
 	/**
-	 * {@inheritdoc}
+	 * {@inheritDoc}
 	 */
 	public function hasVisibleTemplate()
 	{
@@ -323,7 +323,7 @@ class Questions implements ControlInterface
 	}
 
 	/**
-	 * {@inheritdoc}
+	 * {@inheritDoc}
 	 */
 	public function settings()
 	{
@@ -337,6 +337,7 @@ class Questions implements ControlInterface
 				'value' => $_GET['language'],
 			]);
 		}
+
 		$languages = getLanguages();
 
 		// Languages dropdown only if we have more than a lang installed, otherwise is plain useless

@@ -1,10 +1,10 @@
 <?php
 
-use ElkArte\EmailParse;
+use ElkArte\Languages\Loader;
+use ElkArte\Maillist\EmailParse;
 use ElkArte\User;
 use ElkArte\UserInfo;
 use PHPUnit\Framework\TestCase;
-use ElkArte\Languages\Loader;
 
 /**
  * TestCase class for basic PBE functions
@@ -26,7 +26,7 @@ class TestPBE extends TestCase
 
 		$lang = new Loader('english', $txt, database());
 		$lang->load('Maillist');
-		User::$info = new UserInfo(['name' => 'name']);
+		User::$info = new UserInfo(['name' => 'itsme']);
 
 		$this->_email = 'Return-Path: <noreply@elkarte.net>
 Delivered-To: <drwho@tardis.com>

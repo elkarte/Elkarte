@@ -677,7 +677,7 @@ class ManageFeatures extends AbstractController
 				$method_name = strtolower($method_name);
 
 				// Are they excluding any, like don't let mailfail be allowed to send email !
-				if ($class::isBlocklisted($method_name))
+				if ($class::isNotAllowed($method_name))
 				{
 					continue;
 				}
@@ -1676,5 +1676,13 @@ class ManageFeatures extends AbstractController
 	public function signatureSettings_search()
 	{
 		return $this->_signatureSettings();
+	}
+
+	/**
+	 * Public method to return the PM settings, used for admin search
+	 */
+	public function pmSettings_search()
+	{
+		return $this->_pmSettings();
 	}
 }

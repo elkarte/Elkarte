@@ -23,18 +23,23 @@ namespace ElkArte;
 class Censor
 {
 	public const WHOLE_WORD = 'censorWholeWord';
+
 	public const IGNORE_CASE = 'censorIgnoreCase';
+
 	public const SHOW_NO_CENSORED = 'show_no_censored';
+
 	public const ALLOW_NO_CENSORED = 'allow_no_censored';
 
-	protected $vulgar = array();
-	protected $proper = array();
-	protected $options = array(
+	protected $vulgar = [];
+
+	protected $proper = [];
+
+	protected $options = [
 		self::WHOLE_WORD => false,
 		self::IGNORE_CASE => false,
 		self::SHOW_NO_CENSORED => false,
 		self::ALLOW_NO_CENSORED => false,
-	);
+	];
 
 	/**
 	 * Censor constructor.
@@ -77,8 +82,8 @@ class Censor
 		{
 			foreach ($vulgar as $i => $vulgar_i)
 			{
-				$vulgar[$i] = str_replace(array('\\\\\\*', '\\*', '&', '\''), array('[*]', '[^\s]*?', '&amp;', '&#039;'), preg_quote($vulgar_i, '/'));
-				$vulgar[$i] = '/(?<=^|\W)' . $vulgar[$i] . '(?=$|\W)/u' . (!$this->options[self::IGNORE_CASE] ? '' : 'i');
+				$vulgar[$i] = str_replace(['\\\\\\*', '\\*', '&', "'"], ['[*]', '[^\s]*?', '&amp;', '&#039;'], preg_quote($vulgar_i, '/'));
+				$vulgar[$i] = '/(?<=^|\W)' . $vulgar[$i] . '(?=$|\W)/u' . ($this->options[self::IGNORE_CASE] ? 'i' : '');
 			}
 		}
 
@@ -102,14 +107,10 @@ class Censor
 
 		if (!$this->options[self::WHOLE_WORD])
 		{
-			$text = !$this->options[self::IGNORE_CASE] ? str_replace($this->vulgar, $this->proper, $text) : str_ireplace($this->vulgar, $this->proper, $text);
-		}
-		else
-		{
-			$text = preg_replace($this->vulgar, $this->proper, $text);
+			return $this->options[self::IGNORE_CASE] ? str_ireplace($this->vulgar, $this->proper, $text) : str_replace($this->vulgar, $this->proper, $text);
 		}
 
-		return $text;
+		return preg_replace($this->vulgar, $this->proper, $text);
 	}
 
 	/**

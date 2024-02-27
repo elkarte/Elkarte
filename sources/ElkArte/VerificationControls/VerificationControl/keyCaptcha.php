@@ -42,7 +42,7 @@ class keyCaptcha implements ControlInterface
 	{
 		global $modSettings;
 
-		$this->_secret_key = !empty($modSettings['keycaptcha_secret_key']) ? $modSettings['keycaptcha_secret_key'] : '';
+		$this->_secret_key = empty($modSettings['keycaptcha_secret_key']) ? '' : $modSettings['keycaptcha_secret_key'];
 		$this->getSiteAndUserKeys();
 		$this->_userIP = User::$info->ip;
 
@@ -53,7 +53,7 @@ class keyCaptcha implements ControlInterface
 	}
 
 	/**
-	 * {@inheritdoc}
+	 * {@inheritDoc}
 	 */
 	public function showVerification($sessionVal, $isNew, $force_refresh = true)
 	{
@@ -65,7 +65,7 @@ class keyCaptcha implements ControlInterface
 		if ($show_captcha)
 		{
 			$sessionId = md5(uniqid('elkkeycaptcha', true));
-			$sign = md5($sessionId . $this->_userIP  . $this->_secret_key);
+			$sign = md5($sessionId . $this->_userIP . $this->_secret_key);
 			$sign2 = md5($sessionId . $this->_secret_key);
 
 			theme()->getTemplates()->load('VerificationControls');
@@ -77,7 +77,7 @@ class keyCaptcha implements ControlInterface
 		s_s_c_web_server_sign = "' . $sign . '",
 		s_s_c_web_server_sign2 = "' . $sign2 . '";
 	document.s_s_c_without_submit_search=1;'
-		);
+			);
 
 			loadJavascriptFile('https://backs.keycaptcha.com/swfs/cap.js', ['defer' => true, 'async' => 'true']);
 		}
@@ -86,7 +86,7 @@ class keyCaptcha implements ControlInterface
 	}
 
 	/**
-	 * {@inheritdoc}
+	 * {@inheritDoc}
 	 */
 	public function createTest($sessionVal, $refresh = true)
 	{
@@ -94,7 +94,7 @@ class keyCaptcha implements ControlInterface
 	}
 
 	/**
-	 * {@inheritdoc}
+	 * {@inheritDoc}
 	 */
 	public function prepareContext($sessionVal)
 	{
@@ -107,7 +107,7 @@ class keyCaptcha implements ControlInterface
 	}
 
 	/**
-	 * {@inheritdoc}
+	 * {@inheritDoc}
 	 */
 	public function doTest($sessionVal)
 	{
@@ -126,7 +126,7 @@ class keyCaptcha implements ControlInterface
 	}
 
 	/**
-	 * {@inheritdoc}
+	 * {@inheritDoc}
 	 */
 	public function hasVisibleTemplate()
 	{
@@ -134,7 +134,7 @@ class keyCaptcha implements ControlInterface
 	}
 
 	/**
-	 * {@inheritdoc}
+	 * {@inheritDoc}
 	 */
 	public function settings()
 	{
@@ -203,12 +203,18 @@ class keyCaptcha implements ControlInterface
 
 		$fetch_data = new FsockFetchWebdata([], 1, false);
 		$fetch_data->get_url_data($data);
-		if ((int) $fetch_data->result('code') === 200 && !$fetch_data->result('error'))
+		if ((int) $fetch_data->result('code') !== 200)
 		{
-			return $fetch_data->result('body');
+			// Failed to reach the server?  Let them pass instead of failing with no options
+			return true;
 		}
 
-		// Failed to reach the server?  Let them pass instead of failing with no options
-		return true;
+		if ($fetch_data->result('error'))
+		{
+			// Failed to reach the server?  Let them pass instead of failing with no options
+			return true;
+		}
+
+		return $fetch_data->result('body');
 	}
 }

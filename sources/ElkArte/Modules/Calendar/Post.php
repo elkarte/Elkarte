@@ -17,6 +17,8 @@
 namespace ElkArte\Modules\Calendar;
 
 use ElkArte\CalendarEvent;
+use ElkArte\Controller\Calendar;
+use ElkArte\Errors\ErrorContext;
 use ElkArte\EventManager;
 use ElkArte\Exceptions\ControllerRedirectException;
 use ElkArte\Exceptions\Exception;
@@ -32,15 +34,11 @@ use ElkArte\Util;
  */
 class Post extends AbstractModule
 {
-	/**
-	 * If we are making a topic event
-	 *
-	 * @var bool
-	 */
+	/** @var bool If we are making a topic event */
 	protected static $_make_event = false;
 
 	/**
-	 * {@inheritdoc }
+	 * {@inheritDoc}
 	 */
 	public static function hooks(EventManager $eventsManager)
 	{
@@ -49,25 +47,23 @@ class Post extends AbstractModule
 		// Posting an event?
 		self::$_make_event = isset($_REQUEST['calendar']);
 
-		if (empty($modSettings['cal_limityear']))
-		{
-			$modSettings['cal_limityear'] = 20;
-		}
+		$modSettings['cal_limityear'] = empty($modSettings['cal_limityear']) ? 20 : (int) $modSettings['cal_limityear'];
+
 		$context['make_event'] = self::$_make_event;
 		$context['cal_minyear'] = $modSettings['cal_minyear'];
-		$context['cal_maxyear'] = (int) date('Y') + (int) $modSettings['cal_limityear'];
+		$context['cal_maxyear'] = (int) date('Y') + $modSettings['cal_limityear'];
 
 		if (self::$_make_event)
 		{
-			return array(
-				array('prepare_post', array('\\ElkArte\\Modules\\Calendar\\Post', 'prepare_post'), array()),
-				array('prepare_context', array('\\ElkArte\\Modules\\Calendar\\Post', 'prepare_context'), array()),
-				array('before_save_post', array('\\ElkArte\\Modules\\Calendar\\Post', 'before_save_post'), array()),
-				array('after_save_post', array('\\ElkArte\\Modules\\Calendar\\Post', 'after_save_post'), array()),
-			);
+			return [
+				['prepare_post', [Post::class, 'prepare_post'], []],
+				['prepare_context', [Post::class, 'prepare_context'], ['id_member_poster']],
+				['before_save_post', [Post::class, 'before_save_post'], ['post_errors']],
+				['after_save_post', [Post::class, 'after_save_post'], []],
+			];
 		}
 
-		return array();
+		return [];
 	}
 
 	/**
@@ -81,14 +77,21 @@ class Post extends AbstractModule
 	/**
 	 * before_save_post event, checks the event title is set
 	 *
-	 * @param \ElkArte\Errors\ErrorContext $post_errors
+	 * @param ErrorContext $post_errors
 	 */
 	public function before_save_post($post_errors)
 	{
-		if (!isset($_REQUEST['deleteevent']) && Util::htmltrim($_POST['evtitle']) === '')
+		if (isset($_REQUEST['deleteevent']))
 		{
-			$post_errors->addError('no_event');
+			return;
 		}
+
+		if (Util::htmltrim($_POST['evtitle']) !== '')
+		{
+			return;
+		}
+
+		$post_errors->addError('no_event');
 	}
 
 	/**
@@ -111,9 +114,9 @@ class Post extends AbstractModule
 			$save_data['id_board'] = $board;
 			$save_data['id_topic'] = $topic;
 		}
-		catch (\Exception $e)
+		catch (\Exception $exception)
 		{
-			throw $e;
+			throw $exception;
 		}
 
 		// Editing or posting an event?
@@ -155,25 +158,26 @@ class Post extends AbstractModule
 	 * @param int $id_member_poster
 	 *
 	 * @throws ControllerRedirectException
-	 * @throws \ElkArte\Exceptions\Exception
+	 * @throws Exception
 	 */
 	public function prepare_context($id_member_poster)
 	{
 		global $txt, $context;
 
-		$event_id = isset($_REQUEST['eventid']) ? (int) $_REQUEST['eventid'] : -1;
+		$event_id = $this->_req->getRequest('eventid', 'intval', -1);
+		$id_member_poster = (int) $id_member_poster;
 
 		// Editing an event?  (but NOT previewing!?)
 		// If the user doesn't have permission to edit the post in this topic, redirect them.
 		if ($event_id !== -1 && !isset($_REQUEST['subject'])
-			&& (empty($id_member_poster) || $id_member_poster != $this->user->id || !allowedTo('modify_own')) && !allowedTo('modify_any'))
+			&& (empty($id_member_poster) || $id_member_poster !== $this->user->id || !allowedTo('modify_own')) && !allowedTo('modify_any'))
 		{
-			throw new ControllerRedirectException('\\ElkArte\\Controller\\Calendar', 'action_post');
+			throw new ControllerRedirectException(Calendar::class, 'action_post');
 		}
 
 		$this->_prepareEventContext($event_id);
 
-		$context['page_title'] = $context['event']['id'] == -1 ? $txt['calendar_post_event'] : $txt['calendar_edit'];
+		$context['page_title'] = $event_id === -1 ? $txt['calendar_post_event'] : $txt['calendar_edit'];
 	}
 
 	/**
@@ -181,23 +185,20 @@ class Post extends AbstractModule
 	 *
 	 * @param int $event_id The id of the event
 	 *
-	 * @throws \ElkArte\Exceptions\Exception cannot_post_new, invalid_year, invalid_month
+	 * @throws Exception cannot_post_new, invalid_year, invalid_month
 	 */
 	private function _prepareEventContext($event_id)
 	{
 		global $context, $modSettings, $board;
 
 		// They might want to pick a board.
-		if (!isset($context['current_board']))
-		{
-			$context['current_board'] = 0;
-		}
+		$context['current_board'] = $context['current_board'] ?? 0;
 
 		// Start loading up the event info.
-		$context['event'] = array();
+		$context['event'] = [];
 		$context['event']['title'] = isset($_REQUEST['evtitle']) ? htmlspecialchars(stripslashes($_REQUEST['evtitle']), ENT_COMPAT, 'UTF-8') : '';
-		$context['event']['id'] = $event_id;
-		$context['event']['new'] = $context['event']['id'] == -1;
+		$context['event']['id'] = (int) $event_id;
+		$context['event']['new'] = $context['event']['id'] === -1;
 
 		// Permissions check!
 		isAllowedTo('calendar_post');
@@ -210,7 +211,7 @@ class Post extends AbstractModule
 			$event_info = getEventProperties($context['event']['id']);
 
 			// Make sure the user is allowed to edit this event.
-			if ($event_info['member'] != $this->user->id)
+			if ($event_info['member'] !== $this->user->id)
 			{
 				isAllowedTo('calendar_edit_any');
 			}
@@ -231,7 +232,6 @@ class Post extends AbstractModule
 			$today = getdate();
 
 			$context['event']['month'] = isset($_REQUEST['month']) ? (int) $_REQUEST['month'] : $today['mon'];
-
 			$context['event']['year'] = isset($_REQUEST['year']) ? (int) $_REQUEST['year'] : $today['year'];
 
 			if (isset($_REQUEST['day']))
@@ -243,7 +243,7 @@ class Post extends AbstractModule
 				$context['event']['day'] = $context['event']['month'] === $today['mon'] ? $today['mday'] : 0;
 			}
 
-			$context['event']['span'] = $_REQUEST['span'] ?? 1;
+			$context['event']['span'] = $this->_req->getRequest('span', 'intval', 1);
 
 			// Make sure the year and month are in the valid range.
 			if ($context['event']['month'] < 1 || $context['event']['month'] > 12)
@@ -266,17 +266,17 @@ class Post extends AbstractModule
 			}
 
 			// Load a list of boards for this event in the context.
-			$boardListOptions = array(
+			$boardListOptions = [
 				'included_boards' => in_array(0, $boards) ? null : $boards,
 				'not_redirection' => true,
 				'selected_board' => empty($context['current_board']) ? $modSettings['cal_defaultboard'] : $context['current_board'],
-			);
+			];
 			$context += getBoardList($boardListOptions);
 		}
 
 		// Find the last day of the month.
 		$context['event']['last_day'] = (int) Util::strftime('%d', mktime(0, 0, 0, $context['event']['month'] == 12 ? 1 : $context['event']['month'] + 1, 0, $context['event']['month'] == 12 ? $context['event']['year'] + 1 : $context['event']['year']));
 
-		$context['event']['board'] = !empty($board) ? $board : $modSettings['cal_defaultboard'];
+		$context['event']['board'] = empty($board) ? $modSettings['cal_defaultboard'] : $board;
 	}
 }

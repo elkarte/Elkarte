@@ -69,7 +69,7 @@ class MenuArea extends MenuItem
 	protected $sc = '';
 
 	/** @var string $customUrl custom URL to use for this menu item. */
-	protected $customUrl = null;
+	protected $customUrl;
 
 	/** @var bool $password is the user password required to make a change, profile only use? */
 	protected $password = false;
@@ -245,11 +245,13 @@ class MenuArea extends MenuItem
 			return $obj;
 		}
 
-		return array_map(array($this, 'toArray'), is_array($obj) ? $obj : get_object_vars($obj));
+		return array_map([$this, 'toArray'], is_array($obj) ? $obj : get_object_vars($obj));
 	}
 
 	/**
-	 * @return array
+	 * Get the subsections of the MenuArea
+	 *
+	 * @return array The array of subsections
 	 */
 	public function getSubsections()
 	{
@@ -257,7 +259,9 @@ class MenuArea extends MenuItem
 	}
 
 	/**
-	 * @return string
+	 * Get the token for this instance
+	 *
+	 * @return string The token for this instance
 	 */
 	public function getToken()
 	{
@@ -265,9 +269,11 @@ class MenuArea extends MenuItem
 	}
 
 	/**
-	 * @param string $token
+	 * Sets the token for authentication.
 	 *
-	 * @return $this
+	 * @param string $token The authentication token.
+	 *
+	 * @return MenuArea
 	 */
 	public function setToken($token)
 	{
@@ -277,7 +283,9 @@ class MenuArea extends MenuItem
 	}
 
 	/**
-	 * @return string
+	 * Get the token type of this instance.
+	 *
+	 * @return string The token type.
 	 */
 	public function getTokenType()
 	{
@@ -285,9 +293,11 @@ class MenuArea extends MenuItem
 	}
 
 	/**
-	 * @param string $tokenType
+	 * Set the token type for this object.
 	 *
-	 * @return $this
+	 * @param string $tokenType The token type to be set.
+	 *
+	 * @return MenuArea
 	 */
 	public function setTokenType($tokenType)
 	{
@@ -297,7 +307,9 @@ class MenuArea extends MenuItem
 	}
 
 	/**
-	 * @return string
+	 * Get the value of sc
+	 *
+	 * @return string The value of sc
 	 */
 	public function getSc()
 	{
@@ -305,9 +317,11 @@ class MenuArea extends MenuItem
 	}
 
 	/**
-	 * @param $sc
+	 * Sets the value of sc property
 	 *
-	 * @return $this
+	 * @param mixed $sc The value to set for sc property
+	 *
+	 * @return MenuArea
 	 */
 	public function setSc($sc)
 	{
@@ -347,14 +361,13 @@ class MenuArea extends MenuItem
 	 * in the class?  Should we simply just set anything that is not a defined var?
 	 *
 	 * @param array $arr
-	 * @throws \Exception
 	 */
 	private function anythingMissed($arr)
 	{
 		$missing = array_diff_key($arr, get_object_vars($this));
 		foreach ($missing as $key => $value)
 		{
-			// excluding our private key, anything missed?
+			// Excluding our private key, anything missed?
 			if (!in_array($key, ['subsections', 'messages']))
 			{
 				Errors::instance()->log_error('Depreciated: menu key: ' . $key . ' value: ' . $value, 'depreciated');
@@ -363,10 +376,12 @@ class MenuArea extends MenuItem
 	}
 
 	/**
-	 * @param string $id
-	 * @param MenuSubsection $subsection
+	 * Add a subsection to the menu area
 	 *
-	 * @return $this
+	 * @param mixed $id The identifier of the subsection
+	 * @param mixed $subsection The subsection to be added
+	 *
+	 * @return MenuArea Returns the current instance of MenuArea
 	 */
 	public function addSubsection($id, $subsection)
 	{

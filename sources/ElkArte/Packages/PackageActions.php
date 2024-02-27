@@ -89,6 +89,7 @@ class PackageActions extends AbstractController
 	 */
 	public function action_index()
 	{
+		// Empty but needed for abstract compliance
 	}
 
 	/**
@@ -224,7 +225,7 @@ class PackageActions extends AbstractController
 				$hasFailure = true;
 			}
 
-			if ($hasFailure === true)
+			if ($hasFailure)
 			{
 				$this->has_failure = true;
 
@@ -304,6 +305,7 @@ class PackageActions extends AbstractController
 			{
 				continue;
 			}
+
 			$subAction = $action->initialize($subActions, $this->_action['type'], '');
 
 			// Lets just do it!
@@ -543,8 +545,9 @@ class PackageActions extends AbstractController
 				else
 				{
 					$this->ourActions[$this->_actual_filename]['failed'] |= $this->_failure;
-					$this->ourActions[$this->_actual_filename]['description'] = $this->ourActions[$this->_actual_filename]['failed'] ? $txt['package_action_failure'] : $txt['package_action_success'];
+					$this->ourActions[$this->_actual_filename]['description'] = $this->ourActions[$this->_actual_filename]['failed'] !== 0 ? $txt['package_action_failure'] : $txt['package_action_success'];
 				}
+
 				break;
 			case 'skipping':
 				$this->ourActions[$this->_actual_filename] = [
@@ -564,6 +567,7 @@ class PackageActions extends AbstractController
 						'failed' => true,
 					];
 				}
+
 				break;
 			case 'error':
 				$this->ourActions[$this->_actual_filename] = [
@@ -629,7 +633,7 @@ class PackageActions extends AbstractController
 	{
 		global $txt;
 
-		$this->_action['description'] = !isset($this->_action['hook'], $this->_action['function']) ? $txt['package_action_failure'] : $txt['package_action_success'];
+		$this->_action['description'] = isset($this->_action['hook'], $this->_action['function']) ? $txt['package_action_success'] : $txt['package_action_failure'];
 
 		if (!isset($this->_action['hook'], $this->_action['function']))
 		{
@@ -831,7 +835,7 @@ class PackageActions extends AbstractController
 			// This is just here as reference for what is available.
 			global $context;
 
-			if (FileFunctions::instance()->fileExists( BOARDDIR . '/packages/temp/' . $this->_base_path . $this->_action['filename']))
+			if (FileFunctions::instance()->fileExists(BOARDDIR . '/packages/temp/' . $this->_base_path . $this->_action['filename']))
 			{
 				require(BOARDDIR . '/packages/temp/' . $this->_base_path . $this->_action['filename']);
 			}
@@ -911,6 +915,7 @@ class PackageActions extends AbstractController
 			{
 				$context['redirect_text'] = $this->_uninstalling ? $txt['package_uninstall_done'] : $txt['package_installed_done'];
 			}
+
 			$context['redirect_timeout'] = $this->_action['redirect_timeout'];
 
 			// Parse out a couple of common urls.

@@ -79,12 +79,8 @@ function elk_main()
 {
 	global $modSettings, $context;
 
-	// A safer way to work with our form globals
-	// @todo Use dependency injection
-	$_req = HttpReq::instance();
-
 	// What shall we do?
-	$dispatcher = new ElkArte\SiteDispatcher($_req);
+	$dispatcher = new ElkArte\SiteDispatcher( HttpReq::instance());
 
 	if ($dispatcher->needSecurity())
 	{
@@ -131,7 +127,7 @@ function elk_main()
 			// Track forum statistics and hits...?
 			if (!empty($modSettings['hitStats']))
 			{
-				trackStats(array('hits' => '+'));
+				trackStats(['hits' => '+']);
 			}
 		}
 

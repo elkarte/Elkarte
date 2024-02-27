@@ -21,39 +21,43 @@ use ElkArte\Exceptions\Exception;
 
 class WeightFactors
 {
-	/** @var array  */
-	protected $_input_weights = [];
-
-	/** @var bool  */
+	/** @var bool */
 	protected $_is_admin = false;
 
-	/** @var array  */
+	/** @var array */
 	protected $_weight = [];
 
-	/** @var int  */
+	/** @var int */
 	protected $_weight_total = 0;
 
-	/** @var array  */
+	/** @var array */
 	protected $_weight_factors = [];
 
 	/**
-	 * @param $weights
+	 * @param $_input_weights
 	 * @param $is_admin
 	 */
-	public function __construct($weights, $is_admin = false)
+	public function __construct(protected $_input_weights, $is_admin = false)
 	{
-		$this->_input_weights = $weights;
 		$this->_is_admin = (bool) $is_admin;
 
 		$this->_setup_weight_factors();
 	}
 
 	/**
-	 * Prepares the weighting factors
+	 * Sets up the weight factors for search functionality.
+	 *
+	 * This method initializes the weight factors used in the search feature,
+	 * such as frequency, age, length, subject, etc. These weight factors are
+	 * used to determine the relevance of search results based on different
+	 * criteria.
+	 *
+	 * @return void
+	 * @throws Exception
 	 */
 	private function _setup_weight_factors()
 	{
-		$default_factors = $this->_weight_factors = array(
+		$default_factors = array(
 			'frequency' => array(
 				'search' => 'COUNT(*) / (CASE WHEN MAX(t.num_replies) < {int:short_topic_posts} THEN {int:short_topic_posts} ELSE MAX(t.num_replies) + 1 END)',
 				'results' => '(t.num_replies + 1)',
@@ -82,7 +86,35 @@ class WeightFactors
 				'results' => 't.num_likes',
 			),
 		);
-
+		$this->_weight_factors = array(
+			'frequency' => array(
+				'search' => 'COUNT(*) / (CASE WHEN MAX(t.num_replies) < {int:short_topic_posts} THEN {int:short_topic_posts} ELSE MAX(t.num_replies) + 1 END)',
+				'results' => '(t.num_replies + 1)',
+			),
+			'age' => array(
+				'search' => 'CASE WHEN MAX(m.id_msg) < {int:min_msg} THEN 0 ELSE (MAX(m.id_msg) - {int:min_msg}) / {int:recent_message} END',
+				'results' => 'CASE WHEN t.id_first_msg < {int:min_msg} THEN 0 ELSE (t.id_first_msg - {int:min_msg}) / {int:recent_message} END',
+			),
+			'length' => array(
+				'search' => 'CASE WHEN MAX(t.num_replies) < {int:huge_topic_posts} THEN MAX(t.num_replies) / {int:huge_topic_posts} ELSE 1 END',
+				'results' => 'CASE WHEN t.num_replies < {int:huge_topic_posts} THEN t.num_replies / {int:huge_topic_posts} ELSE 1 END',
+			),
+			'subject' => array(
+				'search' => 0,
+				'results' => 0,
+			),
+			'first_message' => array(
+				'search' => 'CASE WHEN MIN(m.id_msg) = MAX(t.id_first_msg) THEN 1 ELSE 0 END',
+			),
+			'sticky' => array(
+				'search' => 'MAX(t.is_sticky)',
+				'results' => 't.is_sticky',
+			),
+			'likes' => array(
+				'search' => 'CASE WHEN t.num_likes > 20 THEN 1 ELSE t.num_likes / 20 END',
+				'results' => 't.num_likes',
+			),
+		);
 		// These are fallback weights in case of errors somewhere.
 		// Not intended to be passed to the hook
 		$default_weights = array(
@@ -126,23 +158,38 @@ class WeightFactors
 	 */
 	private function _calculate_weights($factors, $weights)
 	{
-		foreach ($factors as $weight_factor => $value)
+		foreach (array_keys($factors) as $weight_factor)
 		{
 			$this->_weight[$weight_factor] = (int) ($weights['search_weight_' . $weight_factor] ?? 0);
 			$this->_weight_total += $this->_weight[$weight_factor];
 		}
 	}
 
+	/**
+	 * Retrieves the weight factors.
+	 *
+	 * @return array The weight factors.
+	 */
 	public function getFactors()
 	{
 		return $this->_weight_factors;
 	}
 
+	/**
+	 * Retrieves the weight of the object.
+	 *
+	 * @return array The weight of the object.
+	 */
 	public function getWeight()
 	{
 		return $this->_weight;
 	}
 
+	/**
+	 * Calculates the total weight.
+	 *
+	 * @return float The total weight.
+	 */
 	public function getTotal()
 	{
 		return $this->_weight_total;

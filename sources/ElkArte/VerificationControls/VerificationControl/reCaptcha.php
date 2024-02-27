@@ -32,7 +32,7 @@ class reCaptcha implements ControlInterface
 	/** @var mixed Users IP address */
 	private $_userIP;
 
-	/** @var string  */
+	/** @var string */
 	private $_siteVerifyUrl = 'https://www.google.com/recaptcha/api/siteverify?';
 
 	/**
@@ -48,8 +48,8 @@ class reCaptcha implements ControlInterface
 		// site key of 6Ld-KCcTAAAAAJTLqpKC3yba2tZZlytk0gtSxy0_
 		// secret key of 6Ld-KCcTAAAAAOeMYwZdoI8QW4Pr_h0ZhW5WFHno
 		// @todo remove at release
-		$this->_site_key = !empty($modSettings['recaptcha_site_key']) ? $modSettings['recaptcha_site_key'] : '6Ld-KCcTAAAAAJTLqpKC3yba2tZZlytk0gtSxy0_';
-		$this->_secret_key = !empty($modSettings['recaptcha_secret_key']) ? $modSettings['recaptcha_secret_key'] : '6Ld-KCcTAAAAAOeMYwZdoI8QW4Pr_h0ZhW5WFHno';
+		$this->_site_key = empty($modSettings['recaptcha_site_key']) ? '6Ld-KCcTAAAAAJTLqpKC3yba2tZZlytk0gtSxy0_' : $modSettings['recaptcha_site_key'];
+		$this->_secret_key = empty($modSettings['recaptcha_secret_key']) ? '6Ld-KCcTAAAAAOeMYwZdoI8QW4Pr_h0ZhW5WFHno' : $modSettings['recaptcha_secret_key'];
 		$this->_userIP = User::$info->ip;
 
 		if (!empty($verificationOptions))
@@ -59,7 +59,7 @@ class reCaptcha implements ControlInterface
 	}
 
 	/**
-	 * {@inheritdoc}
+	 * {@inheritDoc}
 	 */
 	public function showVerification($sessionVal, $isNew, $force_refresh = true)
 	{
@@ -83,7 +83,7 @@ class reCaptcha implements ControlInterface
 	}
 
 	/**
-	 * {@inheritdoc}
+	 * {@inheritDoc}
 	 */
 	public function createTest($sessionVal, $refresh = true)
 	{
@@ -91,7 +91,7 @@ class reCaptcha implements ControlInterface
 	}
 
 	/**
-	 * {@inheritdoc}
+	 * {@inheritDoc}
 	 */
 	public function prepareContext($sessionVal)
 	{
@@ -104,7 +104,7 @@ class reCaptcha implements ControlInterface
 	}
 
 	/**
-	 * {@inheritdoc}
+	 * {@inheritDoc}
 	 */
 	public function doTest($sessionVal)
 	{
@@ -123,7 +123,7 @@ class reCaptcha implements ControlInterface
 	}
 
 	/**
-	 * {@inheritdoc}
+	 * {@inheritDoc}
 	 */
 	public function hasVisibleTemplate()
 	{
@@ -131,7 +131,7 @@ class reCaptcha implements ControlInterface
 	}
 
 	/**
-	 * {@inheritdoc}
+	 * {@inheritDoc}
 	 */
 	public function settings()
 	{

@@ -37,8 +37,12 @@ class BuildMail extends BaseMail
 	 * @param string|null $from = null - the address to use for replies
 	 * @param string|null $message_id = null - if specified, it will be used as local part of the Message-ID header.
 	 * @param bool $send_html = false, if the message is HTML vs. plain text
-	 * @param int $priority = 3 Primarily used when the queue is enabled.  0 will bypass any queue and send now,
-	 * 4 (digest), 5 (newsletter) will bypass any PBE settings.  3 normal email, 1/2 registrations etc.
+	 * @param int $priority = 3 Useful when the queue is enabled.
+	 *  - 0 will bypass any queue and send now,
+	 * - 4 (digest),
+	 * - 5 (newsletter) will bypass any PBE settings.
+	 * - 3 normal email,
+	 * - 1/2 registrations etc.
 	 * @param bool $is_private redacts names from appearing in the mail queue
 	 * @param string|null $from_wrapper - used to provide envelope from wrapper based on if we share a
 	 * users display name
@@ -72,7 +76,7 @@ class BuildMail extends BaseMail
 
 		// Take care of from / subject encodings
 		$from_name = $this->setFromName($from);
-		list ($subject) = $this->mimeSpecialChars($subject);
+		[$subject] = $this->mimeSpecialChars($subject);
 
 		// Construct from / replyTo mail headers, based on if we show a users name
 		$this->setFromHeaders($from, $from_name, $from_wrapper, $reference);
@@ -84,6 +88,7 @@ class BuildMail extends BaseMail
 			$this->setReturnPath();
 			$this->headers[] = 'Return-Path: <' . $this->returnPath . '>';
 		}
+
 		$this->headers[] = 'Date: ' . gmdate('D, d M Y H:i:s') . ' -0000';
 		$this->headers[] = 'X-Mailer: ELK';
 
@@ -120,7 +125,7 @@ class BuildMail extends BaseMail
 		// If it's a priority mail, send it now - note though that this should NOT be used for sending many at once.
 		if (!empty($modSettings['mail_queue']) && !empty($modSettings['mail_period_limit']))
 		{
-			list ($last_mail_time, $mails_this_minute) = @explode('|', $modSettings['mail_recent']);
+			[$last_mail_time, $mails_this_minute] = @explode('|', $modSettings['mail_recent']);
 			if (empty($mails_this_minute) || time() > (int) $last_mail_time + 60)
 			{
 				$new_queue_stat = time() . '|' . 1;
@@ -172,7 +177,7 @@ class BuildMail extends BaseMail
 		$dmarc_from = $from;
 
 		// Requirements (draft) for Mail List Message (MLM) to Support Basic DMARC Compliance
-		// http://www.dmarc.org/supplemental/mailman-project-mlm-dmarc-reqs.html
+		// https://www.dmarc.org/supplemental/mailman-project-mlm-dmarc-reqs.html
 		if ($this->mailList && $from !== null && $from_wrapper !== null)
 		{
 			// Be sure there is never an email in the from name when using maillist styles
@@ -205,13 +210,13 @@ class BuildMail extends BaseMail
 	{
 		global $modSettings, $mbname;
 
-		$from_name = !empty($from) ? $from : (!empty($modSettings['maillist_sitename']) ? $modSettings['maillist_sitename'] : $mbname);
+		$from_name = empty($from) ? (!empty($modSettings['maillist_sitename']) ? $modSettings['maillist_sitename'] : $mbname) : ($from);
 		$from_name = addcslashes($from_name, '<>()\'\\"');
 
-		list($from_name, $from_encoding) = $this->mimeSpecialChars($from_name);
+		[$from_name, $from_encoding] = $this->mimeSpecialChars($from_name);
 		if ($from_encoding !== 'base64')
 		{
-			$from_name = '"' . $from_name . '"';
+			return '"' . $from_name . '"';
 		}
 
 		return $from_name;
@@ -287,7 +292,7 @@ class BuildMail extends BaseMail
 			$this->headers[] = 'From: ' . $from_name . ' <' . $from_wrapper . '>';
 
 			// If they reply where is it going to be sent?
-			$this->headers[] = 'Reply-To: "' . (!empty($modSettings['maillist_sitename']) ? $modSettings['maillist_sitename'] : $context['forum_name']) . '" <' . (!empty($modSettings['maillist_sitename_address']) ? $modSettings['maillist_sitename_address'] : (empty($modSettings['maillist_mail_from']) ? $webmaster_email : $modSettings['maillist_mail_from'])) . '>';
+			$this->headers[] = 'Reply-To: "' . (empty($modSettings['maillist_sitename']) ? $context['forum_name'] : $modSettings['maillist_sitename']) . '" <' . (empty($modSettings['maillist_sitename_address']) ? (empty($modSettings['maillist_mail_from']) ? $webmaster_email : $modSettings['maillist_mail_from']) : ($modSettings['maillist_sitename_address'])) . '>';
 			if ($reference !== null)
 			{
 				$this->headers[] = 'References: <' . $reference .
@@ -388,9 +393,8 @@ class BuildMail extends BaseMail
 		$html_message = $this->getQuotedPrintableVersion($html_message);
 		$message .= 'Content-Type: text/' . ($send_html ? 'html' : 'plain') . '; charset=UTF-8' . $this->lineBreak;
 		$message .= 'Content-Transfer-Encoding: Quoted-Printable' . $this->lineBreak . $this->lineBreak;
-		$message .= $html_message . $this->lineBreak . '--' . $mime_boundary . '--';
 
-		return $message;
+		return $message . ($html_message . $this->lineBreak . '--' . $mime_boundary . '--');
 	}
 
 	/**
@@ -492,7 +496,7 @@ class BuildMail extends BaseMail
 
 		$string = strtr($string, [$this->lineBreak => '<br />' . $this->lineBreak]);
 
-		return preg_replace('~\b(' . preg_quote($scripturl, '~') . '(?:[?/][\w-%.,?@!:&;=#]+)?)~', '<a href="$1" target="_blank" rel="noopener">$1</a>', $string);
+		return preg_replace('~\b(' . preg_quote($scripturl, '~') . '(?:[?/][\w\-%.,?@!:&;=#]+)?)~', '<a href="$1" target="_blank" rel="noopener">$1</a>', $string);
 	}
 
 	/**

@@ -61,27 +61,29 @@ class SiteDispatcher
 {
 	/** @var string Function or method to call */
 	protected $_function_name;
+
 	/** @var string Class name, for object-oriented controllers */
 	protected $_controller_name;
+
 	/** @var AbstractController The instance of the controller */
 	protected $_controller;
+
 	/** @var string */
 	protected $action;
+
 	/** @var string */
 	protected $area;
+
 	/** @var string */
 	protected $subAction;
+
 	/** The default action data (controller and function). Every time we don't know what to do, we'll do this :P */
 	protected $_default_action = [
 		'controller' => BoardIndex::class,
 		'function' => 'action_boardindex'
 	];
 
-	/**
-	 * Build our nice and cozy err... *cough*
-	 *
-	 * @var string[]
-	 */
+	/** @var string[] Build our nice and cozy err... *cough* */
 	protected $actionArray = [
 		'admin' => [Admin::class, 'action_index'],
 		'attachapprove' => [ModerateAttachments::class, 'action_attachapprove'],
@@ -286,7 +288,7 @@ class SiteDispatcher
 	{
 		$this->_controller_name = '\\ElkArte\\Controller\\' . ucfirst($this->action);
 
-		if (isset($this->subAction) && empty($this->area) && preg_match('~^\w+$~', $this->subAction))
+		if ($this->subAction !== null && empty($this->area) && preg_match('~^\w+$~', $this->subAction))
 		{
 			$this->_function_name = 'action_' . $this->subAction;
 		}
@@ -330,10 +332,17 @@ class SiteDispatcher
 	 */
 	protected function handleApiCall()
 	{
-		if (isset($_REQUEST['api']) && $_REQUEST['api'] === '')
+		if (!isset($_REQUEST['api']))
 		{
-			$this->_function_name .= '_api';
+			return;
 		}
+
+		if ($_REQUEST['api'] !== '')
+		{
+			return;
+		}
+
+		$this->_function_name .= '_api';
 	}
 
 	/**

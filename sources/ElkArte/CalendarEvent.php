@@ -16,6 +16,8 @@
 
 namespace ElkArte;
 
+use ElkArte\Exceptions\Exception;
+
 /**
  * A class to handle the basics of calendar events.
  * Namely a certain kind of validation, inserting a new one, updating existing,
@@ -23,29 +25,20 @@ namespace ElkArte;
  */
 class CalendarEvent
 {
-	/**
-	 * The id of the event.
-	 *
-	 * @var null|int
-	 */
-	protected $_event_id = null;
+	/** @var null|int The id of the event. */
+	protected $_event_id;
 
-	/**
-	 * The general settings (in fact a copy of $modSettings).
-	 *
-	 * @var array
-	 */
-	protected $_settings = array();
+	/** @var array The general settings (in fact a copy of $modSettings). */
+	protected $_settings = [];
 
 	/**
 	 * Construct the object requires the id of the event and the settings
 	 *
-	 * @param null|int $event_id Obviously the id of the event.
-	 *                  If null or -1 the event is considered new
+	 * @param null|int $event_id Obviously the id of the event. If null or -1 the event is considered new
 	 * @param array $settings An array of settings ($modSettings is the current one)
-	 * @see \ElkArte\CalendarEvent::isNew
+	 * @see CalendarEvent::isNew
 	 */
-	public function __construct($event_id, $settings = array())
+	public function __construct($event_id, $settings = [])
 	{
 		$this->_settings = $settings;
 		$this->_event_id = $event_id;
@@ -61,7 +54,7 @@ class CalendarEvent
 	 * @param array $event The options may come from a form
 	 *
 	 * @return array
-	 * @throws \ElkArte\Exceptions\Exception
+	 * @throws Exception
 	 */
 	public function validate($event)
 	{
@@ -75,12 +68,12 @@ class CalendarEvent
 			{
 				throw new Exceptions\Exception('no_span', false);
 			}
+
 			if ($event['span'] < 1 || $event['span'] > $this->_settings['cal_maxspan'])
 			{
 				throw new Exceptions\Exception('invalid_days_numb', false);
 			}
 		}
-
 
 		// There is no need to validate the following values if we are just deleting the event.
 		if (!isset($event['deleteevent']))
@@ -90,16 +83,20 @@ class CalendarEvent
 			{
 				throw new Exceptions\Exception('event_month_missing', false);
 			}
+
 			if (!isset($event['year']))
 			{
 				throw new Exceptions\Exception('event_year_missing', false);
 			}
 
 			// Check the month and year...
+			$this->_settings['cal_limityear'] = empty($this->_settings['cal_limityear']) ? 20 : (int) $this->_settings['cal_limityear'];
+
 			if ($event['month'] < 1 || $event['month'] > 12)
 			{
 				throw new Exceptions\Exception('invalid_month', false);
 			}
+
 			if ($event['year'] < $this->_settings['cal_minyear'] || $event['year'] > (int) date('Y') + $this->_settings['cal_limityear'])
 			{
 				throw new Exceptions\Exception('invalid_year', false);
@@ -115,7 +112,8 @@ class CalendarEvent
 			{
 				throw new Exceptions\Exception('event_title_missing', false);
 			}
-			elseif (!isset($event['evtitle']))
+
+			if (!isset($event['evtitle']))
 			{
 				$event['evtitle'] = $event['subject'];
 			}
@@ -131,10 +129,12 @@ class CalendarEvent
 			{
 				throw new Exceptions\Exception('no_event_title', false);
 			}
+
 			if (Util::strlen($event['evtitle']) > 100)
 			{
 				$event['evtitle'] = Util::substr($event['evtitle'], 0, 100);
 			}
+
 			$event['evtitle'] = str_replace(';', '', $event['evtitle']);
 		}
 
@@ -179,7 +179,7 @@ class CalendarEvent
 	public function update($options)
 	{
 		// There could be already a topic you are not allowed to modify
-		if (!allowedTo('post_new') && empty($this->_settings['disableNoPostingCalendarEdits']))
+		if (empty($this->_settings['disableNoPostingCalendarEdits']) && !allowedTo('post_new'))
 		{
 			$eventProperties = getEventProperties($this->_event_id, true);
 		}
@@ -224,7 +224,7 @@ class CalendarEvent
 	 * @param int $member_id - the id of the member saving the event
 	 *
 	 * @return array The event structure.
-	 * @throws \ElkArte\Exceptions\Exception no_access
+	 * @throws Exception no_access
 	 */
 	public function load($options, $member_id)
 	{
@@ -287,7 +287,7 @@ class CalendarEvent
 	 */
 	public function isNew()
 	{
-		return !isset($this->_event_id) || $this->_event_id === -1;
+		return $this->_event_id === null || $this->_event_id === -1;
 	}
 
 	/**

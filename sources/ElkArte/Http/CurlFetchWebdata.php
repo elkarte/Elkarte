@@ -172,10 +172,7 @@ class CurlFetchWebdata
 	private function _setOptions()
 	{
 		// Callback to parse the returned headers, if any
-		$this->default_options[CURLOPT_HEADERFUNCTION] =
-			function ($cr, $header) {
-				return $this->_headerCallback($cr, $header);
-			};
+		$this->default_options[CURLOPT_HEADERFUNCTION] = fn($cr, $header) => $this->_headerCallback($cr, $header);
 
 		// Any user options to account for
 		if (is_array($this->_user_options))
@@ -243,10 +240,8 @@ class CurlFetchWebdata
 		{
 			return false;
 		}
-		else
-		{
-			$this->_options[CURLOPT_URL] = $url;
-		}
+
+		$this->_options[CURLOPT_URL] = $url;
 
 		// If we have not already been redirected, set it up so we can
 		if (!$redirect)
@@ -276,8 +271,8 @@ class CurlFetchWebdata
 			'url' => $url,
 			'code' => $http_code,
 			'error' => $error,
-			'size' => !empty($curl_info['download_content_length']) ? $curl_info['download_content_length'] : 0,
-			'headers' => !empty($this->_headers) ? $this->_headers : false,
+			'size' => empty($curl_info['download_content_length']) ? 0 : $curl_info['download_content_length'],
+			'headers' => empty($this->_headers) ? false : $this->_headers,
 			'body' => $body,
 		];
 
@@ -315,7 +310,7 @@ class CurlFetchWebdata
 		$new_url_parse['query'] = $new_url_parse['query'] ?? '';
 
 		// Build the new URL that was in the http header
-		return $new_url_parse['scheme'] . '://' . $new_url_parse['host'] . $new_url_parse['path'] . (!empty($new_url_parse['query']) ? '?' . $new_url_parse['query'] : '');
+		return $new_url_parse['scheme'] . '://' . $new_url_parse['host'] . $new_url_parse['path'] . (empty($new_url_parse['query']) ? '' : '?' . $new_url_parse['query']);
 	}
 
 	/**
@@ -329,7 +324,7 @@ class CurlFetchWebdata
 	 */
 	private function _redirect($target_url, $referer_url)
 	{
-		// No no I last saw that over there ... really, 301, 302, 307
+		// No I last saw that over there ... really, 301, 302, 307
 		$this->_setOptions();
 		$this->_options[CURLOPT_REFERER] = $referer_url;
 		$this->_curlRequest($target_url, true);

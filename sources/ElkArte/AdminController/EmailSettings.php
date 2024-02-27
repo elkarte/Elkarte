@@ -13,7 +13,10 @@
  *
  */
 
-namespace ElkArte;
+namespace ElkArte\AdminController;
+
+use ElkArte\SettingsForm;
+use ElkArte\SettingsForm\SettingsFormAdapter\DbTable;
 
 /**
  * Similar in construction to saveDBSettings,
@@ -50,12 +53,13 @@ class EmailSettings extends SettingsForm\SettingsForm
 		}
 
 		$settingsForm = new self(self::DBTABLE_ADAPTER);
-		/** @var \ElkArte\SettingsForm\SettingsFormAdapter\DbTable */
+		/** @var DbTable $settingsAdapter */
 		$settingsAdapter = $settingsForm->getAdapter();
 		$settingsAdapter->setTableName($tableName);
 		$settingsAdapter->setEditId($editId);
 		$settingsAdapter->setEditName($editName);
 		$settingsAdapter->setIndexes($indexes);
+
 		$settingsForm->setConfigVars($configVars);
 		$settingsForm->setConfigValues($configValues);
 		$settingsForm->save();

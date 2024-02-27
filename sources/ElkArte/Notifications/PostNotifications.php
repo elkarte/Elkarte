@@ -107,7 +107,7 @@ class PostNotifications extends AbstractModel
 		$user_language = $this->_getUserLanguage($pbe);
 
 		// Get the subject, body and basic poster details, number of attachments if any
-		list($boards_index, $topicData) = getTopicInfos($topics, $type);
+		[$boards_index, $topicData] = getTopicInfos($topics, $type);
 
 		// Nada?
 		if (empty($topicData))
@@ -128,6 +128,7 @@ class PostNotifications extends AbstractModel
 		{
 			$digest_insert[] = [$data['topic'], $data['last_id'], $type, (int) $data['exclude']];
 		}
+
 		insertLogDigestQueue($digest_insert);
 
 		// Using the posting email function then process posts to subscribed boards
@@ -146,10 +147,17 @@ class PostNotifications extends AbstractModel
 		}
 
 		// Sent!
-		if ($type === self::NOTIFY_REPLY && !empty($this->sent))
+		if ($type !== self::NOTIFY_REPLY)
 		{
-			updateLogNotify($user_id, $topics);
+			return;
 		}
+
+		if (empty($this->sent))
+		{
+			return;
+		}
+
+		updateLogNotify($user_id, $topics);
 	}
 
 	/**
@@ -405,8 +413,11 @@ class PostNotifications extends AbstractModel
 		{
 			return false;
 		}
-
-		return $this->isUsingMailList() || empty($this->_modSettings['disallow_sendBody']);
+		if ($this->isUsingMailList())
+		{
+			return true;
+		}
+		return empty($this->_modSettings['disallow_sendBody']);
 	}
 
 	/**
@@ -579,6 +590,7 @@ class PostNotifications extends AbstractModel
 		{
 			$digest_insert[] = [$data['topic'], $data['msg'], 'topic', User::$info->id];
 		}
+
 		insertLogDigestQueue($digest_insert);
 
 		// Using the post to email functions?
@@ -695,7 +707,7 @@ class PostNotifications extends AbstractModel
 	 *
 	 * @param array $topicData
 	 */
-	public function sendApprovalNotifications(&$topicData)
+	public function sendApprovalNotifications($topicData)
 	{
 		global $language;
 
@@ -720,6 +732,7 @@ class PostNotifications extends AbstractModel
 				$digest_insert[] = [$data['topic'], $data['id'], 'reply', User::$info->id];
 			}
 		}
+
 		insertLogDigestQueue($digest_insert);
 
 		// Find everyone who needs to know about this.

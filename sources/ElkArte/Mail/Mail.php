@@ -78,7 +78,7 @@ class Mail extends BaseMail
 		$old_return = ini_set('sendmail_from', $this->returnPath);
 
 		$sent = [];
-		foreach ($mail_to_array as $key => $sendTo)
+		foreach ($mail_to_array as $sendTo)
 		{
 			// Every message sent gets a unique Message-ID header
 			$unq_head = $this->getUniqueMessageID($message_id);
@@ -221,6 +221,7 @@ class Mail extends BaseMail
 			{
 				fwrite($socket, 'To: <' . $mail_to . '>' . $this->lineBreak);
 			}
+
 			fwrite($socket, $headers . $this->lineBreak . $messageHeader . $this->lineBreak . $this->lineBreak);
 			fwrite($socket, $this_message . $this->lineBreak);
 
@@ -279,7 +280,7 @@ class Mail extends BaseMail
 		{
 			$socket = fsockopen($smtp_host, $smtp_port, $errno, $errstr, 3);
 		}
-		catch (\Exception $e)
+		catch (\Exception)
 		{
 			$socket = false;
 		}
@@ -291,7 +292,7 @@ class Mail extends BaseMail
 		if (!is_resource($socket))
 		{
 			// Maybe we can still save this?  The port might be wrong.
-			if ($smtp_port === 25 && substr($smtp_host, 0, 4) === 'ssl:')
+			if ($smtp_port === 25 && strpos($smtp_host, 'ssl:') === 0)
 			{
 				$socket = fsockopen($smtp_host, 465, $errno, $errstr, 3);
 				if (is_resource($socket))
@@ -382,7 +383,6 @@ class Mail extends BaseMail
 		$smtp_username = trim($modSettings['smtp_username']);
 		$smtp_password = trim($modSettings['smtp_password']);
 		$smtp_starttls = !empty($modSettings['smtp_starttls']);
-
 		if ($smtp_username !== '' && $smtp_password !== '')
 		{
 			// EHLO could be understood to mean encrypted hello...
@@ -394,12 +394,10 @@ class Mail extends BaseMail
 					stream_socket_enable_crypto($socket, true, STREAM_CRYPTO_METHOD_TLS_CLIENT);
 					$this->_server_parse('EHLO ' . $smtp_client, $socket, null);
 				}
-
 				if (!$this->_server_parse('AUTH LOGIN', $socket, '334'))
 				{
 					return false;
 				}
-
 				// Send the username and password, encoded.
 				if (!$this->_server_parse(base64_encode($smtp_username), $socket, '334'))
 				{
@@ -407,28 +405,13 @@ class Mail extends BaseMail
 				}
 
 				// The password is already encoded ;)
-				if (!$this->_server_parse($smtp_password, $socket, '235'))
-				{
-					return false;
-				}
-
-				return true;
+				return (bool) $this->_server_parse($smtp_password, $socket, '235');
 			}
 
-			if ($this->_server_parse('HELO ' . $smtp_client, $socket, '250'))
-			{
-				return true;
-			}
-
-			return false;
+			return (bool) $this->_server_parse('HELO ' . $smtp_client, $socket, '250');
 		}
 
 		// Just say "helo".
-		if ($this->_server_parse('HELO ' . $smtp_client, $socket, '250'))
-		{
-			return true;
-		}
-
-		return false;
+		return (bool) $this->_server_parse('HELO ' . $smtp_client, $socket, '250');
 	}
 }

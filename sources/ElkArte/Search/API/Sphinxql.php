@@ -34,46 +34,22 @@ use ElkArte\User;
  */
 class Sphinxql extends AbstractAPI
 {
-	/**
-	 * This is the last version of ElkArte that this was tested on, to protect against API changes.
-	 *
-	 * @var string
-	 */
+	/** @var string This is the last version of ElkArte that this was tested on, to protect against API changes. */
 	public $version_compatible = 'ElkArte 2.0 dev';
 
-	/**
-	 * This won't work with versions of ElkArte less than this.
-	 *
-	 * @var string
-	 */
+	/** @var string This won't work with versions of ElkArte less than this. */
 	public $min_elk_version = 'ElkArte 1.0 Beta 1';
 
-	/**
-	 * Is it supported?
-	 *
-	 * @var bool
-	 */
+	/** @var bool Is it supported?  */
 	public $is_supported = true;
 
-	/**
-	 * What words are banned?
-	 *
-	 * @var array
-	 */
+	/** @var array What words are banned? */
 	protected $bannedWords = [];
 
-	/**
-	 * What is the minimum word length?
-	 *
-	 * @var int
-	 */
+	/** @var int What is the minimum word length? */
 	protected $min_word_length = 4;
 
-	/**
-	 * What databases are supported?
-	 *
-	 * @var array
-	 */
+	/** @var array What databases are supported? */
 	protected $supported_databases = ['MySQL'];
 
 	/**
@@ -101,7 +77,7 @@ class Sphinxql extends AbstractAPI
 	}
 
 	/**
-	 * {@inheritdoc }
+	 * {@inheritDoc}
 	 */
 	public function indexedWordQuery($words, $search_data)
 	{
@@ -109,7 +85,7 @@ class Sphinxql extends AbstractAPI
 	}
 
 	/**
-	 *  {@inheritdoc }
+	 *  {@inheritDoc}
 	 */
 	public function supportsExtended()
 	{
@@ -117,7 +93,7 @@ class Sphinxql extends AbstractAPI
 	}
 
 	/**
-	 * {@inheritdoc }
+	 * {@inheritDoc}
 	 */
 	public function prepareIndexes($word, &$wordsSearch, &$wordsExclude, $isExcluded, $excludedSubjectWords)
 	{
@@ -132,7 +108,7 @@ class Sphinxql extends AbstractAPI
 	}
 
 	/**
-	 * {@inheritdoc }
+	 * {@inheritDoc}
 	 */
 	public function searchQuery($search_words, $excluded_words, &$participants)
 	{
@@ -147,7 +123,7 @@ class Sphinxql extends AbstractAPI
 			$mySphinx = $this->sphinxConnect();
 
 			// Compile different options for our query
-			$index = (!empty($modSettings['sphinx_index_prefix']) ? $modSettings['sphinx_index_prefix'] : 'elkarte') . '_index';
+			$index = (empty($modSettings['sphinx_index_prefix']) ? 'elkarte' : $modSettings['sphinx_index_prefix']) . '_index';
 			$query = 'SELECT *' . (empty($this->_searchParams->topic) ? ', COUNT(*) num' : '') . ', WEIGHT() relevance FROM ' . $index;
 
 			// Construct the (binary mode & |) query.
@@ -164,7 +140,7 @@ class Sphinxql extends AbstractAPI
 				$where_match = '@subject ' . $where_match;
 			}
 
-			$query .= ' WHERE MATCH(\'' . $where_match . '\')';
+			$query .= " WHERE MATCH('" . $where_match . "')";
 
 			// Set the limits based on the search parameters, board, member, dates, etc
 			$extra_where = $this->buildQueryLimits();
@@ -195,7 +171,7 @@ class Sphinxql extends AbstractAPI
 			// Each term will return a 0-1000 range we include our acprel value for the final total and order.  Position
 			// is the relative reply # to a post, so the later a reply in a topic the less overall weight it is given
 			// the calculated value of ranker is returned in WEIGHTS() which we name relevance in the query
-			$subject_weight = !empty($modSettings['search_weight_subject']) ? $modSettings['search_weight_subject'] : 30;
+			$subject_weight = empty($modSettings['search_weight_subject']) ? 30 : $modSettings['search_weight_subject'];
 			$query .= '
 			OPTION 
 				field_weights=(subject=' . $subject_weight . ', body=' . (100 - $subject_weight) . '),
@@ -243,6 +219,7 @@ class Sphinxql extends AbstractAPI
 					];
 				}
 			}
+
 			mysqli_free_result($request);
 			mysqli_close($mySphinx);
 
@@ -280,7 +257,7 @@ class Sphinxql extends AbstractAPI
 		{
 			$mySphinx = mysqli_connect(($modSettings['sphinx_searchd_server'] === 'localhost' ? '127.0.0.1' : $modSettings['sphinx_searchd_server']), '', '', '', (int) $modSettings['sphinxql_searchd_port']);
 		}
-		catch (\Exception $e)
+		catch (\Exception)
 		{
 			$mySphinx = false;
 		}
@@ -299,7 +276,7 @@ class Sphinxql extends AbstractAPI
 	}
 
 	/**
-	 * {@inheritdoc }
+	 * {@inheritDoc}
 	 */
 	public function useWordIndex()
 	{

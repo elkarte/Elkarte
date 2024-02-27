@@ -66,7 +66,7 @@ class ManageThemes extends AbstractController
 	private $images_url;
 
 	/**
-	 * {@inheritdoc }
+	 * {@inheritDoc}
 	 */
 	public function trackStats($action = '')
 	{

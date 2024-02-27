@@ -166,13 +166,13 @@ class MetadataIntegrate
 		// Snag us a site logo
 		$logo = $this->getLogo();
 
-		$slogan = !empty($settings['site_slogan']) ? $settings['site_slogan'] : un_htmlspecialchars($mbname);
+		$slogan = empty($settings['site_slogan']) ? un_htmlspecialchars($mbname) : $settings['site_slogan'];
 
 		// The sites organizational card
 		return [
 			'@context' => 'https://schema.org',
 			'@type' => 'Organization',
-			'url' => !empty($context['canonical_url']) ? $context['canonical_url'] : $boardurl,
+			'url' => empty($context['canonical_url']) ? $boardurl : $context['canonical_url'],
 			'logo' => [
 				'@type' => 'ImageObject',
 				'url' => $logo[2],
@@ -205,7 +205,7 @@ class MetadataIntegrate
 
 		// This will also cache these values for us
 		require_once(SUBSDIR . '/Attachments.subs.php');
-		list($width, $height) = url_image_size(un_htmlspecialchars($logo));
+		[$width, $height] = url_image_size(un_htmlspecialchars($logo));
 
 		return [$width, $height, $logo];
 	}
@@ -242,11 +242,11 @@ class MetadataIntegrate
 			'articleBody' => $this->data['html_body'],
 			'articleSection' => $board_info['name'] ?? '',
 			'datePublished' => utcTime($this->data['timestamp'], true),
-			'dateModified' => !empty($this->data['modified']['name']) ? utcTime($this->data['modified']['timestamp'], true) : utcTime($this->data['timestamp'], true),
+			'dateModified' => empty($this->data['modified']['name']) ? utcTime($this->data['timestamp'], true) : utcTime($this->data['modified']['timestamp'], true),
 			'interactionStatistic' => [
 				'@type' => 'InteractionCounter',
 				'interactionType' => 'https://schema.org/ReplyAction',
-				'userInteractionCount' => !empty($context['real_num_replies']) ? $context['real_num_replies'] : 0,
+				'userInteractionCount' => empty($context['real_num_replies']) ? 0 : $context['real_num_replies'],
 			],
 			'wordCount' => str_word_count($this->data['raw_body']),
 			'publisher' => [
@@ -261,7 +261,7 @@ class MetadataIntegrate
 			],
 			'mainEntityOfPage' => [
 				'@type' => 'WebPage',
-				'@id' => !empty($context['canonical_url']) ? $context['canonical_url'] : $boardurl,
+				'@id' => empty($context['canonical_url']) ? $boardurl : $context['canonical_url'],
 			],
 		];
 
@@ -295,15 +295,22 @@ class MetadataIntegrate
 		{
 			foreach ($this->data['attachment'] as $attachment)
 			{
-				if (isset($attachment['is_image']) && !empty($attachment['is_approved']))
+				if (!isset($attachment['is_image']))
 				{
-					return [
-						'@type' => 'ImageObject',
-						'url' => $attachment['href'],
-						'width' => $attachment['real_width'] ?? 0,
-						'height' => $attachment['real_height'] ?? 0
-					];
+					continue;
 				}
+
+				if (empty($attachment['is_approved']))
+				{
+					continue;
+				}
+
+				return [
+					'@type' => 'ImageObject',
+					'url' => $attachment['href'],
+					'width' => $attachment['real_width'] ?? 0,
+					'height' => $attachment['real_height'] ?? 0
+				];
 			}
 		}
 
@@ -312,15 +319,22 @@ class MetadataIntegrate
 		{
 			foreach ($this->data['ila'] as $ila)
 			{
-				if (isset($ila['is_image']) && !empty($ila['is_approved']))
+				if (!isset($ila['is_image']))
 				{
-					return [
-						'@type' => 'ImageObject',
-						'url' => $boardurl . '/index.php?action=dlattach;attach=' . $ila['id'] . ';image',
-						'width' => $ila['real_width'] ?? 0,
-						'height' => $ila['real_height'] ?? 0
-					];
+					continue;
 				}
+
+				if (empty($ila['is_approved']))
+				{
+					continue;
+				}
+
+				return [
+					'@type' => 'ImageObject',
+					'url' => $boardurl . '/index.php?action=dlattach;attach=' . $ila['id'] . ';image',
+					'width' => $ila['real_width'] ?? 0,
+					'height' => $ila['real_height'] ?? 0
+				];
 			}
 		}
 
@@ -383,7 +397,7 @@ class MetadataIntegrate
 			$sitename = un_htmlspecialchars($mbname);
 
 			// Avoid if possible a description like sitename - Index
-			if (isset($context['page_title']) && strpos($context['page_title'], $sitename) === 0)
+			if (isset($context['page_title']) && strpos($context['page_title'], (string) $sitename) === 0)
 			{
 				$description = $settings['site_slogan'] ?? $context['page_title'];
 			}
@@ -429,8 +443,8 @@ class MetadataIntegrate
 
 		$metaOg = [];
 		$metaOg['title'] = '<meta property="og:title" content="' . $page_title . '" />';
-		$metaOg['type'] = '<meta property="og:type" content="' . (!empty($topic) ? 'article' : 'website') . '" />';
-		$metaOg['url'] = '<meta property="og:url" content="' . (!empty($context['canonical_url']) ? $context['canonical_url'] : $boardurl) . '" />';
+		$metaOg['type'] = '<meta property="og:type" content="' . (empty($topic) ? 'website' : 'article') . '" />';
+		$metaOg['url'] = '<meta property="og:url" content="' . (empty($context['canonical_url']) ? $boardurl : $context['canonical_url']) . '" />';
 		$metaOg['image'] = '<meta property="og:image" content="' . $logo[2] . '" />';
 		$metaOg['image_width'] = '<meta property="og:image:width" content="' . $logo[0] . '" />';
 		$metaOg['image_height'] = '<meta property="og:image:height" content="' . $logo[1] . '" />';

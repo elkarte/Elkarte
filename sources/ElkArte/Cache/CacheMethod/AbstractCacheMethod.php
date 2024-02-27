@@ -52,7 +52,7 @@ abstract class AbstractCacheMethod implements CacheMethodInterface
 	}
 
 	/**
-	 * {@inheritdoc}
+	 * {@inheritDoc}
 	 */
 	public function fixkey($key)
 	{
@@ -71,7 +71,7 @@ abstract class AbstractCacheMethod implements CacheMethodInterface
 	}
 
 	/**
-	 * {@inheritdoc}
+	 * {@inheritDoc}
 	 */
 	public function isMiss()
 	{
@@ -79,7 +79,7 @@ abstract class AbstractCacheMethod implements CacheMethodInterface
 	}
 
 	/**
-	 * {@inheritdoc}
+	 * {@inheritDoc}
 	 */
 	public function remove($key)
 	{
@@ -87,14 +87,14 @@ abstract class AbstractCacheMethod implements CacheMethodInterface
 	}
 
 	/**
-	 * {@inheritdoc}
+	 * {@inheritDoc}
 	 */
 	public function settings(&$config_vars)
 	{
 	}
 
 	/**
-	 * {@inheritdoc}
+	 * {@inheritDoc}
 	 */
 	public function title()
 	{
@@ -102,7 +102,7 @@ abstract class AbstractCacheMethod implements CacheMethodInterface
 	}
 
 	/**
-	 * {@inheritdoc}
+	 * {@inheritDoc}
 	 */
 	public function getStats()
 	{

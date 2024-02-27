@@ -35,7 +35,6 @@ class RemoveTempAttachments implements ScheduledTaskInterface
 	 *
 	 * @return bool
 	 * @return bool
-	 * @throws \Exception
 	 */
 	public function run()
 	{
@@ -53,14 +52,17 @@ class RemoveTempAttachments implements ScheduledTaskInterface
 				$files = new \FilesystemIterator($attach_dir, \FilesystemIterator::SKIP_DOTS);
 				foreach ($files as $file)
 				{
-					if (strpos($file->getFilename(), 'post_tmp_') !== false)
+					if (strpos($file->getFilename(), 'post_tmp_') === false)
 					{
-						// Temp file is more than 5 hours old!
-						if ($file->getMTime() < time() - 18000)
-						{
-							$fileFunc->delete($file->getPathname());
-						}
+						continue;
 					}
+
+					// Temp file is more than 5 hours old!
+					if ($file->getMTime() >= time() - 18000)
+					{
+						continue;
+					}
+					$fileFunc->delete($file->getPathname());
 				}
 			}
 			catch (\UnexpectedValueException $e)

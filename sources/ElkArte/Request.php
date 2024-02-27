@@ -26,7 +26,7 @@ use ElkArte\Http\Headers;
 final class Request
 {
 	/** @var Request Sole private Request instance */
-	private static $_req = null;
+	private static $_req;
 
 	/** @var string Remote IP, if we can know it easily (as found in $_SERVER['REMOTE_ADDR']) */
 	private $_client_ip;
@@ -133,12 +133,12 @@ final class Request
 		$this->_ban_ip = $this->_client_ip;
 
 		// Forwarded, maybe?
-		if (!empty($_SERVER['HTTP_X_FORWARDED_FOR']) && !empty($_SERVER['HTTP_CLIENT_IP']) && (preg_match('~^' . $this->_local_ip_pattern . '~', $_SERVER['HTTP_CLIENT_IP']) == 0 || preg_match('~^' . $this->_local_ip_pattern . '~', $this->_client_ip) != 0))
+		if (!empty($_SERVER['HTTP_X_FORWARDED_FOR']) && !empty($_SERVER['HTTP_CLIENT_IP']) && (preg_match('~^' . $this->_local_ip_pattern . '~', $_SERVER['HTTP_CLIENT_IP']) !== 1 || preg_match('~^' . $this->_local_ip_pattern . '~', $this->_client_ip) === 1))
 		{
 			// Check the first forwarded for as the block - only switch if it's better that way.
 			if (strtok($_SERVER['HTTP_X_FORWARDED_FOR'], '.') !== strtok($_SERVER['HTTP_CLIENT_IP'], '.')
-				&& '.' . strtok($_SERVER['HTTP_X_FORWARDED_FOR'], '.') == strrchr($_SERVER['HTTP_CLIENT_IP'], '.')
-				&& (preg_match('~^((0|10|172\.(1[6-9]|2\d|3[01])|192\.168|255|127)\.|unknown)~', $_SERVER['HTTP_X_FORWARDED_FOR']) == 0 || preg_match('~^((0|10|172\.(1[6-9]|2\d|3[01])|192\.168|255|127)\.|unknown)~', $this->_client_ip) != 0))
+				&& '.' . strtok($_SERVER['HTTP_X_FORWARDED_FOR'], '.') === strrchr($_SERVER['HTTP_CLIENT_IP'], '.')
+				&& (preg_match('~^((0|10|172\.(1[6-9]|2\d|3[01])|192\.168|255|127)\.|unknown)~', $_SERVER['HTTP_X_FORWARDED_FOR']) !== 1 || preg_match('~^((0|10|172\.(1[6-9]|2\d|3[01])|192\.168|255|127)\.|unknown)~', $this->_client_ip) === 1))
 			{
 				$this->_ban_ip = implode('.', array_reverse(explode('.', $_SERVER['HTTP_CLIENT_IP'])));
 			}
@@ -168,7 +168,7 @@ final class Request
 				$ips = array_reverse(explode(', ', $_SERVER['HTTP_X_FORWARDED_FOR']));
 
 				// Go through each IP...
-				foreach ($ips as $i => $ip)
+				foreach ($ips as $ip)
 				{
 					// Make sure it's in a valid range...
 					if (preg_match('~^' . $this->_local_ip_pattern . '~', $ip) != 0 && preg_match('~^' . $this->_local_ip_pattern . '~', $this->_client_ip) == 0)
@@ -182,17 +182,24 @@ final class Request
 				}
 			}
 			// Otherwise just use the only one.
-			elseif (preg_match('~^' . $this->_local_ip_pattern . '~', $_SERVER['HTTP_X_FORWARDED_FOR']) == 0 || preg_match('~^' . $this->_local_ip_pattern . '~', $this->_client_ip) != 0)
+			elseif (preg_match('~^' . $this->_local_ip_pattern . '~', $_SERVER['HTTP_X_FORWARDED_FOR']) !== 1 || preg_match('~^' . $this->_local_ip_pattern . '~', $this->_client_ip) === 1)
 			{
 				$this->_ban_ip = $_SERVER['HTTP_X_FORWARDED_FOR'];
 			}
 		}
 
 		// Some final checking.
-		if (filter_var($this->_ban_ip, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4) === false && !isValidIPv6($this->_ban_ip))
+		if (filter_var($this->_ban_ip, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4) !== false)
 		{
-			$this->_ban_ip = '';
+			return;
 		}
+
+		if (isValidIPv6($this->_ban_ip))
+		{
+			return;
+		}
+
+		$this->_ban_ip = '';
 	}
 
 	/**
@@ -218,7 +225,7 @@ final class Request
 	 */
 	public function ban_ip()
 	{
-		return !empty($this->_ban_ip) ? $this->_ban_ip : $this->client_ip();
+		return empty($this->_ban_ip) ? $this->client_ip() : $this->_ban_ip;
 	}
 
 	/**
@@ -297,7 +304,7 @@ final class Request
 		// Make sure we know the URL of the current request.
 		if (empty($_SERVER['REQUEST_URI']))
 		{
-			$_SERVER['REQUEST_URL'] = $this->_scripturl . (!empty($this->_server_query_string) ? '?' . $this->_server_query_string : '');
+			$_SERVER['REQUEST_URL'] = $this->_scripturl . (empty($this->_server_query_string) ? '' : '?' . $this->_server_query_string);
 		}
 		elseif (preg_match('~^([^/]+//[^/]+)~', $this->_scripturl, $match) == 1)
 		{
@@ -354,6 +361,8 @@ final class Request
 	 *
 	 * - Fail on illegal keys
 	 * - Clear ones that should not be allowed
+	 *
+	 * @throws Exceptions\Exception
 	 */
 	private function _checkNumericKeys()
 	{
@@ -372,7 +381,7 @@ final class Request
 		}
 
 		// Numeric keys in cookies are less of a problem. Just unset those.
-		foreach ($_COOKIE as $key => $value)
+		foreach (array_keys($_COOKIE) as $key)
 		{
 			if (is_numeric($key))
 			{
@@ -414,7 +423,7 @@ final class Request
 
 					for ($i = 1, $n = count($temp); $i < $n; $i++)
 					{
-						list ($key, $val) = array_pad(explode('=', $temp[$i], 2), 2, '');
+						[$key, $val] = array_pad(explode('=', $temp[$i], 2), 2, '');
 						if (!isset($_GET[$key]))
 						{
 							$_GET[$key] = $val;
@@ -511,12 +520,12 @@ final class Request
 			// If we have ?board=3/10, that's... board=3, start=10! (old, compatible links.)
 			if (strpos($_REQUEST['board'], '/') !== false)
 			{
-				list ($_REQUEST['board'], $_REQUEST['start']) = explode('/', $_REQUEST['board']);
+				[$_REQUEST['board'], $_REQUEST['start']] = explode('/', $_REQUEST['board']);
 			}
 			// Or perhaps we have... ?board=1.0...
 			elseif (strpos($_REQUEST['board'], '.') !== false)
 			{
-				list ($_REQUEST['board'], $_REQUEST['start']) = explode('.', $_REQUEST['board']);
+				[$_REQUEST['board'], $_REQUEST['start']] = explode('.', $_REQUEST['board']);
 			}
 
 			// $board and $_REQUEST['start'] are always numbers.
@@ -554,12 +563,12 @@ final class Request
 			// It might come as ?topic=1/15, from an old, SMF beta style link
 			if (strpos($_REQUEST['topic'], '/') !== false)
 			{
-				list ($_REQUEST['topic'], $_REQUEST['start']) = explode('/', $_REQUEST['topic']);
+				[$_REQUEST['topic'], $_REQUEST['start']] = explode('/', $_REQUEST['topic']);
 			}
 			// Or it might come as ?topic=1.15.
 			elseif (strpos($_REQUEST['topic'], '.') !== false)
 			{
-				list ($_REQUEST['topic'], $_REQUEST['start']) = explode('.', $_REQUEST['topic']);
+				[$_REQUEST['topic'], $_REQUEST['start']] = explode('.', $_REQUEST['topic']);
 			}
 
 			// $topic and $_REQUEST['start'] are numbers, numbers I say.

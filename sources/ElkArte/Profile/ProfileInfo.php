@@ -23,6 +23,7 @@ use ElkArte\Action;
 use ElkArte\Exceptions\Exception;
 use ElkArte\FileFunctions;
 use ElkArte\Languages\Txt;
+use ElkArte\Member;
 use ElkArte\MembersList;
 use ElkArte\MessagesDelete;
 use ElkArte\Util;
@@ -35,8 +36,10 @@ class ProfileInfo extends AbstractController
 {
 	/** @var int Member id for the profile being worked with */
 	private $_memID = 0;
-	/** @var \ElkArte\Member The \ElkArte\Member object is stored here to avoid some global */
+
+	/** @var Member The \ElkArte\Member object is stored here to avoid some global */
 	private $_profile;
+
 	/** @var array Holds the current summary tabs to load */
 	private $_summary_areas;
 
@@ -66,6 +69,7 @@ class ProfileInfo extends AbstractController
 		{
 			throw new Exception('not_a_user', false);
 		}
+
 		$this->_profile->loadContext();
 
 		Txt::load('Profile');
@@ -83,8 +87,8 @@ class ProfileInfo extends AbstractController
 
 		// What do we do, do you even know what you do?
 		$subActions = [
-			'buddies' => [$this, 'action_profile_buddies'],
-			'recent' => [$this, 'action_profile_recent'],
+			'buddies' => fn() => $this->action_profile_buddies(),
+			'recent' => fn() => $this->action_profile_recent(),
 			'summary' => ['controller' => Profile::class, 'function' => 'action_index'],
 		];
 
@@ -186,7 +190,7 @@ class ProfileInfo extends AbstractController
 		foreach ($context['summarytabs'] as $id => $tab)
 		{
 			// If the tab is active we add it
-			if ($tab['active'] !== true)
+			if (!$tab['active'])
 			{
 				unset($context['summarytabs'][$id]);
 			}
@@ -228,7 +232,7 @@ class ProfileInfo extends AbstractController
 		$context['member']['id'] = $this->_memID;
 
 		// Is the signature even enabled on this forum?
-		$context['signature_enabled'] = strpos($modSettings['signature_settings'], 1) === 0;
+		$context['signature_enabled'] = strpos($modSettings['signature_settings'], "1") === 0;
 	}
 
 	/**
@@ -302,7 +306,7 @@ class ProfileInfo extends AbstractController
 		}
 		else
 		{
-			list ($birth_year, $birth_month, $birth_day) = sscanf($context['member']['birth_date'], '%d-%d-%d');
+			[$birth_year, $birth_month, $birth_day] = sscanf($context['member']['birth_date'], '%d-%d-%d');
 			$datearray = getdate(forum_time());
 			$context['member']['age'] = $birth_year <= 4 ? $txt['not_applicable'] : $datearray['year'] - $birth_year - (($datearray['mon'] > $birth_month || ($datearray['mon'] === $birth_month && $datearray['mday'] >= $birth_day)) ? 0 : 1);
 			$context['member']['today_is_birthday'] = $datearray['mon'] === $birth_month && $datearray['mday'] === $birth_day;
@@ -395,8 +399,8 @@ class ProfileInfo extends AbstractController
 		{
 			require_once(SUBSDIR . '/Bans.subs.php');
 
-			$hostname = !empty($context['member']['hostname']) ? $context['member']['hostname'] : '';
-			$email = !empty($context['member']['email']) ? $context['member']['email'] : '';
+			$hostname = empty($context['member']['hostname']) ? '' : $context['member']['hostname'];
+			$email = empty($context['member']['email']) ? '' : $context['member']['email'];
 			$context['member']['bans'] = BanCheckUser($this->_memID, $hostname, $email);
 
 			// Can they edit the ban?
@@ -472,12 +476,12 @@ class ProfileInfo extends AbstractController
 
 		$msgCount = $context['is_topics'] ? count_user_topics($this->_memID, $board) : count_user_posts($this->_memID, $board);
 
-		list ($min_msg_member, $max_msg_member) = findMinMaxUserMessage($this->_memID, $board);
+		[$min_msg_member, $max_msg_member] = findMinMaxUserMessage($this->_memID, $board);
 		$range_limit = '';
 		$maxIndex = (int) $modSettings['defaultMaxMessages'];
 
 		// Make sure the starting place makes sense and construct our friend the page index.
-		$context['page_index'] = constructPageIndex('{scripturl}?action=profile;u=' . $this->_memID . ';area=showposts' . ($context['is_topics'] ? ';sa=topics' : ';sa=messages') . (!empty($board) ? ';board=' . $board : ''), $context['start'], $msgCount, $maxIndex);
+		$context['page_index'] = constructPageIndex('{scripturl}?action=profile;u=' . $this->_memID . ';area=showposts' . ($context['is_topics'] ? ';sa=topics' : ';sa=messages') . (empty($board) ? '' : ';board=' . $board), $context['start'], $msgCount, $maxIndex);
 		$context['current_page'] = $context['start'] / $maxIndex;
 
 		// Reverse the query if we're past 50% of the pages for better performance.
@@ -594,6 +598,7 @@ class ProfileInfo extends AbstractController
 			{
 				$board_ids['own'][$row['id_board']][] = $counter;
 			}
+
 			$board_ids['any'][$row['id_board']][] = $counter;
 		}
 
@@ -697,25 +702,19 @@ class ProfileInfo extends AbstractController
 			'base_href' => getUrl('action', ['action' => 'profile', 'area' => 'showposts', 'sa' => 'attach', 'u' => $this->_memID]),
 			'default_sort_col' => 'filename',
 			'get_items' => [
-				'function' => function ($start, $items_per_page, $sort, $boardsAllowed) {
-					return $this->list_getAttachments($start, $items_per_page, $sort, $boardsAllowed);
-				},
+				'function' => fn($start, $items_per_page, $sort, $boardsAllowed) => $this->list_getAttachments($start, $items_per_page, $sort, $boardsAllowed),
 				'params' => [
 					$boardsAllowed,
 				],
 			],
 			'get_count' => [
-				'function' => function ($boardsAllowed) {
-					return $this->list_getNumAttachments($boardsAllowed);
-				},
+				'function' => fn($boardsAllowed) => $this->list_getNumAttachments($boardsAllowed),
 				'params' => [
 					$boardsAllowed,
 				],
 			],
 			'data_check' => [
-				'class' => function ($data) {
-					return $data['approved'] ? '' : 'approvebg';
-				},
+				'class' => static fn($data) => $data['approved'] ? '' : 'approvebg',
 			],
 			'columns' => [
 				'filename' => [
@@ -736,7 +735,7 @@ class ProfileInfo extends AbstractController
 						'value' => '',
 					],
 					'data' => [
-						'function' => function ($rowData) {
+						'function' => static function ($rowData) {
 							if ($rowData['is_image'] && !empty($rowData['id_thumb']))
 							{
 								return '<img src="' . getUrl('action', ['action' => 'dlattach', 'attach' => $rowData['id_thumb'], 'image']) . '" loading="lazy" />';
@@ -857,14 +856,10 @@ class ProfileInfo extends AbstractController
 			'base_href' => getUrl('action', ['action' => 'profile', 'area' => 'showposts', 'sa' => 'unwatchedtopics', 'u' => $this->_memID]),
 			'default_sort_col' => 'started_on',
 			'get_items' => [
-				'function' => function ($start, $items_per_page, $sort) {
-					return $this->list_getUnwatched($start, $items_per_page, $sort);
-				},
+				'function' => fn($start, $items_per_page, $sort) => $this->list_getUnwatched($start, $items_per_page, $sort),
 			],
 			'get_count' => [
-				'function' => function () {
-					return $this->list_getNumUnwatched();
-				},
+				'function' => fn() => $this->list_getNumUnwatched(),
 			],
 			'columns' => [
 				'subject' => [
@@ -1078,8 +1073,8 @@ class ProfileInfo extends AbstractController
 		foreach ($board_list as $row)
 		{
 			$row['id_board'] = (int) $row['id_board'];
-			$row['id_profile'] = (int) $row['id_profile'] ;
-			if (!$row['is_mod'] && count(array_intersect($curGroups, explode(',', $row['member_groups']))) === 0)
+			$row['id_profile'] = (int) $row['id_profile'];
+			if (!$row['is_mod'] && array_intersect($curGroups, explode(',', $row['member_groups'])) === [])
 			{
 				$context['no_access_boards'][] = [
 					'id' => $row['id_board'],
@@ -1143,9 +1138,9 @@ class ProfileInfo extends AbstractController
 		theme()->getTemplates()->load('Profile');
 
 		// Make sure things which are disabled stay disabled.
-		$modSettings['warning_watch'] = !empty($modSettings['warning_watch']) ? $modSettings['warning_watch'] : 110;
+		$modSettings['warning_watch'] = empty($modSettings['warning_watch']) ? 110 : $modSettings['warning_watch'];
 		$modSettings['warning_moderate'] = !empty($modSettings['warning_moderate']) && !empty($modSettings['postmod_active']) ? $modSettings['warning_moderate'] : 110;
-		$modSettings['warning_mute'] = !empty($modSettings['warning_mute']) ? $modSettings['warning_mute'] : 110;
+		$modSettings['warning_mute'] = empty($modSettings['warning_mute']) ? 110 : $modSettings['warning_mute'];
 
 		// Let's use a generic list to get all the current warnings
 		// and use the issue warnings grab-a-granny thing.
@@ -1273,20 +1268,34 @@ class ProfileInfo extends AbstractController
 
 		// Would you be mine? Could you be mine? Be my buddy :D
 		$context['buddies'] = [];
-		if (!empty($modSettings['enable_buddylist'])
-			&& $context['user']['is_owner']
-			&& !empty($this->user->buddies)
-			&& in_array('buddies', $this->_summary_areas, true)
-			&& MembersList::load($this->user->buddies, false, 'profile'))
+		if (empty($modSettings['enable_buddylist']))
 		{
-			// Get the info for this buddy
-			foreach ($this->user->buddies as $buddy)
-			{
-				$member = MembersList::get($buddy);
-				$member->loadContext(true);
+			return;
+		}
+		if (!$context['user']['is_owner'])
+		{
+			return;
+		}
+		if (empty($this->user->buddies))
+		{
+			return;
+		}
+		if (!in_array('buddies', $this->_summary_areas, true))
+		{
+			return;
+		}
+		if (!MembersList::load($this->user->buddies, false, 'profile'))
+		{
+			return;
+		}
 
-				$context['buddies'][$buddy] = $member;
-			}
+		// Get the info for this buddy
+		foreach ($this->user->buddies as $buddy)
+		{
+			$member = MembersList::get($buddy);
+			$member->loadContext(true);
+
+			$context['buddies'][$buddy] = $member;
 		}
 	}
 
@@ -1356,7 +1365,7 @@ class ProfileInfo extends AbstractController
 				// If they are a frequent poster, we guess the range to help minimize what the query work
 				if ($msgCount > 1000)
 				{
-					list ($min_msg_member, $max_msg_member) = findMinMaxUserMessage($this->_memID);
+					[$min_msg_member, $max_msg_member] = findMinMaxUserMessage($this->_memID);
 					$margin = floor(($max_msg_member - $min_msg_member) * (($start + $modSettings['defaultMaxMessages']) / $msgCount) + .1 * ($max_msg_member - $min_msg_member));
 					$range_limit = 'm.id_msg > ' . ($max_msg_member - $margin);
 				}
@@ -1374,15 +1383,15 @@ class ProfileInfo extends AbstractController
 					// Do the code.
 					$row['body'] = $bbc_parser->parseMessage($row['body'], $row['smileys_enabled']);
 					$preview = strip_tags(strtr($row['body'], ['<br />' => '&#10;']));
-					$preview = Util::shorten_text($preview, !empty($modSettings['ssi_preview_length']) ? $modSettings['ssi_preview_length'] : 128);
-					$short_subject = Util::shorten_text($row['subject'], !empty($modSettings['ssi_subject_length']) ? $modSettings['ssi_subject_length'] : 24);
+					$preview = Util::shorten_text($preview, empty($modSettings['ssi_preview_length']) ? 128 : $modSettings['ssi_preview_length']);
+					$short_subject = Util::shorten_text($row['subject'], empty($modSettings['ssi_subject_length']) ? 24 : $modSettings['ssi_subject_length']);
 
 					// And the array...
 					$context['posts'][] = [
 						'body' => $preview,
 						'board' => [
 							'name' => $row['bname'],
-							'link' => '<a href="' . getUrl('board', ['board' => $row['id_board'], 'start' => 0, 'name' => $row['bname']]). '">' . $row['bname'] . '</a>'
+							'link' => '<a href="' . getUrl('board', ['board' => $row['id_board'], 'start' => 0, 'name' => $row['bname']]) . '">' . $row['bname'] . '</a>'
 						],
 						'subject' => $row['subject'],
 						'short_subject' => $short_subject,
@@ -1419,7 +1428,7 @@ class ProfileInfo extends AbstractController
 				// If they are a frequent topic starter we guess the range to help the query
 				if ($topicCount > 1000)
 				{
-					list ($min_topic_member, $max_topic_member) = findMinMaxUserTopic($this->_memID);
+					[$min_topic_member, $max_topic_member] = findMinMaxUserTopic($this->_memID);
 					$margin = floor(($max_topic_member - $min_topic_member) * (($start + $modSettings['defaultMaxMessages']) / $topicCount) + .1 * ($max_topic_member - $min_topic_member));
 					$margin *= 5;
 					$range_limit = 't.id_first_msg > ' . ($max_topic_member - $margin);
@@ -1439,8 +1448,8 @@ class ProfileInfo extends AbstractController
 					// Do the code.
 					$row['body'] = $bbc_parser->parseMessage($row['body'], $row['smileys_enabled']);
 					$preview = strip_tags(strtr($row['body'], ['<br />' => '&#10;']));
-					$preview = Util::shorten_text($preview, !empty($modSettings['ssi_preview_length']) ? $modSettings['ssi_preview_length'] : 128);
-					$short_subject = Util::shorten_text($row['subject'], !empty($modSettings['ssi_subject_length']) ? $modSettings['ssi_subject_length'] : 24);
+					$preview = Util::shorten_text($preview, empty($modSettings['ssi_preview_length']) ? 128 : $modSettings['ssi_preview_length']);
+					$short_subject = Util::shorten_text($row['subject'], empty($modSettings['ssi_subject_length']) ? 24 : $modSettings['ssi_subject_length']);
 
 					// And the array...
 					$context['topics'][] = [
@@ -1523,11 +1532,11 @@ class ProfileInfo extends AbstractController
 				// Not an image so set a mime thumbnail based off the filetype
 				elseif ((!empty($modSettings['attachmentThumbWidth']) && !empty($modSettings['attachmentThumbHeight'])) && (128 > $modSettings['attachmentThumbWidth'] || 128 > $modSettings['attachmentThumbHeight']))
 				{
-					$context['thumbs'][$i]['img'] = '<img src="' . $mime_images_url . (!FileFunctions::instance()->fileExists($mime_path . $attachment['fileext'] . '.png') ? 'default' : $attachment['fileext']) . '.png" title="" alt="" width="' . $modSettings['attachmentThumbWidth'] . '" height="' . $modSettings['attachmentThumbHeight'] . '" loading="lazy" />';
+					$context['thumbs'][$i]['img'] = '<img src="' . $mime_images_url . (FileFunctions::instance()->fileExists($mime_path . $attachment['fileext'] . '.png') ? $attachment['fileext'] : 'default') . '.png" title="" alt="" width="' . $modSettings['attachmentThumbWidth'] . '" height="' . $modSettings['attachmentThumbHeight'] . '" loading="lazy" />';
 				}
 				else
 				{
-					$context['thumbs'][$i]['img'] = '<img src="' . $mime_images_url . (!FileFunctions::instance()->fileExists($mime_path . $attachment['fileext'] . '.png') ? 'default' : $attachment['fileext']) . '.png" title="" alt="" loading="lazy" />';
+					$context['thumbs'][$i]['img'] = '<img src="' . $mime_images_url . (FileFunctions::instance()->fileExists($mime_path . $attachment['fileext'] . '.png') ? $attachment['fileext'] : 'default') . '.png" title="" alt="" loading="lazy" />';
 				}
 			}
 		}

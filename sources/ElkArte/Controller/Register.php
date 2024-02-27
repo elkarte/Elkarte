@@ -46,7 +46,7 @@ class Register extends AbstractController
 	private $_row;
 
 	/**
-	 * {@inheritdoc}
+	 * {@inheritDoc}
 	 */
 	public function trackStats($action = '')
 	{

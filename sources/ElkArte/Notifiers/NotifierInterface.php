@@ -22,13 +22,13 @@ use ElkArte\Notifications\NotificationsTask;
  *
  * Core area for notifications, defines the abstract model
  */
-Interface NotifierInterface
+interface NotifierInterface
 {
 	/**
 	 * Process a certain task in order to send out the notifications.
 	 *
-	 * @param \ElkArte\Mentions\MentionType\NotificationInterface $obj
-	 * @param \ElkArte\Notifications\NotificationsTask $task
+	 * @param NotificationInterface $obj
+	 * @param NotificationsTask $task
 	 * @param string[] $bodies
 	 */
 	public function send(NotificationInterface $obj, NotificationsTask $task, $bodies);

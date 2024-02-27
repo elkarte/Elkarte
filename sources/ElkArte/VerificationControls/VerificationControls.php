@@ -32,9 +32,12 @@ use ElkArte\Sessions\SessionIndex;
  */
 class VerificationControls
 {
-	protected $_known_verifications = array();
-	protected $_verification_options = array();
-	protected $_verification_instances = array();
+	protected $_known_verifications = [];
+
+	protected $_verification_options = [];
+
+	protected $_verification_instances = [];
+
 	protected $_sessionVal;
 
 	/**
@@ -46,7 +49,7 @@ class VerificationControls
 	 * @param bool $isNew If the control was initialized before
 	 * @param bool $force_refresh If the controls should be re-initialized
 	 */
-	public function __construct(SessionIndex $sessionVal, $settings = array(), $verificationOptions = array(), $isNew = false, $force_refresh = false)
+	public function __construct(SessionIndex $sessionVal, $settings = [], $verificationOptions = [], $isNew = false, $force_refresh = false)
 	{
 		if (empty($settings['known_verifications']))
 		{
@@ -103,11 +106,12 @@ class VerificationControls
 					}
 				}
 			}
-			catch (\Error $e)
+			catch (\Error)
 			{
 				// track the error?
 			}
 		}
+
 		$to_update = json_encode($working_verifications);
 		updateSettings(['known_verifications' => $to_update]);
 

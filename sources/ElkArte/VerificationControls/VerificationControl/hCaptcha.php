@@ -44,8 +44,8 @@ class hCaptcha implements ControlInterface
 	{
 		global $modSettings;
 
-		$this->_site_key = !empty($modSettings['hcaptcha_site_key']) ? $modSettings['hcaptcha_site_key'] : '';
-		$this->_secret_key = !empty($modSettings['hcaptcha_secret_key']) ? $modSettings['hcaptcha_secret_key'] : '';
+		$this->_site_key = empty($modSettings['hcaptcha_site_key']) ? '' : $modSettings['hcaptcha_site_key'];
+		$this->_secret_key = empty($modSettings['hcaptcha_secret_key']) ? '' : $modSettings['hcaptcha_secret_key'];
 		$this->_userIP = User::$info->ip;
 
 		if (!empty($verificationOptions))
@@ -55,7 +55,7 @@ class hCaptcha implements ControlInterface
 	}
 
 	/**
-	 * {@inheritdoc}
+	 * {@inheritDoc}
 	 */
 	public function showVerification($sessionVal, $isNew, $force_refresh = true)
 	{
@@ -78,7 +78,7 @@ class hCaptcha implements ControlInterface
 	}
 
 	/**
-	 * {@inheritdoc}
+	 * {@inheritDoc}
 	 */
 	public function createTest($sessionVal, $refresh = true)
 	{
@@ -86,7 +86,7 @@ class hCaptcha implements ControlInterface
 	}
 
 	/**
-	 * {@inheritdoc}
+	 * {@inheritDoc}
 	 */
 	public function prepareContext($sessionVal)
 	{
@@ -99,7 +99,7 @@ class hCaptcha implements ControlInterface
 	}
 
 	/**
-	 * {@inheritdoc}
+	 * {@inheritDoc}
 	 */
 	public function doTest($sessionVal)
 	{
@@ -118,7 +118,7 @@ class hCaptcha implements ControlInterface
 	}
 
 	/**
-	 * {@inheritdoc}
+	 * {@inheritDoc}
 	 */
 	public function hasVisibleTemplate()
 	{
@@ -126,7 +126,7 @@ class hCaptcha implements ControlInterface
 	}
 
 	/**
-	 * {@inheritdoc}
+	 * {@inheritDoc}
 	 */
 	public function settings()
 	{

@@ -16,7 +16,6 @@ namespace ElkArte\Mentions\MentionType\Event;
 use ElkArte\DataValidator;
 use ElkArte\Mentions\Mentioning;
 use ElkArte\Mentions\MentionType\AbstractEventBoardAccess;
-use ElkArte\Mentions\MentionType\CommonConfigTrait;
 use ElkArte\Notifications\Notifications;
 use ElkArte\Notifications\NotificationsTask;
 
@@ -27,43 +26,35 @@ use ElkArte\Notifications\NotificationsTask;
  */
 class Mentionmem extends AbstractEventBoardAccess
 {
-	use CommonConfigTrait;
-
-	/**
-	 * {@inheritdoc }
-	 */
+	/** {@inheritDoc} */
 	protected static $_type = 'mentionmem';
 
-	/**
-	 * List of members mentioned
-	 *
-	 * @var int[]
-	 */
-	protected $_actually_mentioned = array();
+	/** @var int[] List of members mentioned */
+	protected $_actually_mentioned = [];
 
 	/**
-	 * {@inheritdoc }
+	 * {@inheritDoc}
 	 */
 	public static function getEvents($controller)
 	{
-		$methods = array(
-			'post' => array(
-				'prepare_context' => array(),
-				'before_save_post' => array(),
-				'after_save_post' => array('msgOptions', 'becomesApproved', 'posterOptions')
-			),
-			'display' => array('prepare_context' => array('virtual_msg')),
-		);
+		$methods = [
+			'post' => [
+				'prepare_context' => [],
+				'before_save_post' => [],
+				'after_save_post' => ['msgOptions', 'becomesApproved', 'posterOptions']
+			],
+			'display' => ['prepare_context' => ['virtual_msg']],
+		];
 
-		return $methods[$controller] ?? array();
+		return $methods[$controller] ?? [];
 	}
 
 	/**
-	 * {@inheritdoc }
+	 * {@inheritDoc}
 	 */
 	public static function getModules($modules)
 	{
-		$modules['mentions'] = array('post', 'display');
+		$modules['mentions'] = ['post', 'display'];
 
 		return $modules;
 	}
@@ -171,9 +162,9 @@ class Mentionmem extends AbstractEventBoardAccess
 				'mentionmem',
 				$msgOptions['id'],
 				$posterOptions['id'],
-				array('id_members' => $this->_actually_mentioned, 'notifier_data' => $posterOptions, 'subject' => $msgOptions['subject'], 'status' => $becomesApproved
+				['id_members' => $this->_actually_mentioned, 'notifier_data' => $posterOptions, 'subject' => $msgOptions['subject'], 'status' => $becomesApproved
 					? 'new'
-					: 'unapproved')
+					: 'unapproved']
 			));
 		}
 	}

@@ -16,6 +16,8 @@
 
 namespace ElkArte;
 
+use ElkArte\Database\QueryInterface;
+
 /**
  * Recent Post Class, retrieve information about recent posts
  *
@@ -24,55 +26,29 @@ namespace ElkArte;
  */
 class Recent
 {
-	/**
-	 * Holds the boards the member is looking at
-	 *
-	 * @var string
-	 */
+	/** @var string Holds the boards the member is looking at */
 	private $_query_this_board = '';
 
-	/**
-	 * All of hte recent messages
-	 *
-	 * @var array
-	 */
-	private $_messages = array();
+	/** @var array All of hte recent messages */
+	private $_messages = [];
 
-	/**
-	 * All of the recent posts
-	 *
-	 * @var array
-	 */
-	private $_board_ids = array();
+	/** @var array All of the recent posts */
+	private $_board_ids = [];
 
-	/**
-	 * @var array
-	 */
-	private $_posts = array();
+	/** @var array */
+	private $_posts = [];
 
-	/**
-	 * If we will cache the results
-	 *
-	 * @var bool
-	 */
+	/** @var bool If we cache the results */
 	private $_cache_results = false;
 
-	/**
-	 * user id to check for recent messages
-	 *
-	 * @var int
-	 */
-	private $_user_id = 0;
+	/** @var int user id to check for recent messages */
+	private $_user_id;
 
-	/**
-	 * @var \ElkArte\Database\QueryInterface|null
-	 */
-	private $_db = null;
+	/** @var QueryInterface|null */
+	private $_db;
 
-	/**
-	 * Parameters for the main query.
-	 */
-	private $_query_parameters = array();
+	/** @var array Parameters for the main query. */
+	private $_query_parameters = [];
 
 	/**
 	 * Constructor
@@ -120,8 +96,8 @@ class Recent
 	 */
 	public function setVisibleBoards($msg_id, $recycle)
 	{
-		$this->_query_this_board .= '{query_wanna_see_board}' . (!empty($recycle) ? '
-			AND b.id_board != {int:recycle_board}' : '') . '
+		$this->_query_this_board .= '{query_wanna_see_board}' . (empty($recycle) ? '' : '
+			AND b.id_board != {int:recycle_board}') . '
 			AND m.id_msg >= {int:max_id_msg}';
 
 		if (!empty($recycle))
@@ -189,6 +165,7 @@ class Recent
 					'limit' => $limit,
 				))
 			);
+
 			// If we don't have 10 results, try again with an unoptimized version covering all rows, and cache the result.
 			if (isset($this->_query_parameters['max_id_msg']) && $request->num_rows() < $limit)
 			{
@@ -202,11 +179,13 @@ class Recent
 				$done = true;
 			}
 		}
+
 		$this->_messages = array();
 		while (($row = $request->fetch_assoc()))
 		{
 			$this->_messages[] = $row['id_msg'];
 		}
+
 		$request->free_result();
 	}
 
@@ -218,23 +197,22 @@ class Recent
 	 * Used to define the buttons a member can see next to a message.
 	 * Format of the array is:
 	 * array(
-	 *  	'own' => array(
-	 *  		'permission_name' => 'test_name'
-	 *     		 ...
+	 *    'own' => array(
+	 *        'permission_name' => 'test_name'
+	 *             ...
 	 *       ),
 	 *       'any' => array(
-	 *       	'permission_name' => 'test_name'
+	 *        'permission_name' => 'test_name'
 	 *           ...
 	 *       )
 	 *  )
 	 *
 	 * @return array
-	 * @throws \ElkArte\Exceptions\Exception
 	 */
 	public function getRecentPosts($start, $permissions)
 	{
 		// Provide an easy way for integration to interact with the recent display items
-		call_integration_hook('integrate_recent_message_list', array($this->_messages, &$permissions));
+		call_integration_hook('integrate_recent_message_list', [$this->_messages, &$permissions]);
 
 		$this->_getRecentPosts($start);
 
@@ -312,11 +290,11 @@ class Recent
 				'message_list' => $this->_messages,
 			)
 		)->fetch_callback(
-			function ($row) use (&$returns) {
+			static function ($row) use (&$returns) {
 				$returns[] = $row;
 			}
 		);
 
-		list ($this->_posts, $this->_board_ids) = prepareRecentPosts($returns, $start);
+		[$this->_posts, $this->_board_ids] = prepareRecentPosts($returns, $start);
 	}
 }

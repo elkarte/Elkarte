@@ -26,9 +26,11 @@ class MembersList
 {
 	/** @var Member[] List of all the members already loaded */
 	protected static $members = [];
+
 	/** @var MemberLoader Instance of MemberLoader used to actually get the data out of the database and ready in a Member object */
 	protected static $loader;
-	/** @var MembersListInstance of this very class */
+
+	/** @var MembersList Instance of this very class */
 	protected static $instance;
 
 	/**
@@ -76,7 +78,7 @@ class MembersList
 			? self::$loader->loadByName($users, $set)
 			: self::$loader->loadById($users, $set);
 
-		return !empty($result) ? $result : false;
+		return empty($result) ? false : $result;
 	}
 
 	/**
@@ -103,8 +105,7 @@ class MembersList
 		$id = (int) $id;
 		$member = self::$instance->getById($id);
 
-		return $member !== false ? $member : new class() extends ValuesContainer
-		{
+		return $member !== false ? $member : new class() extends ValuesContainer {
 			public function loadContext($display_custom_fields = false)
 			{
 			}
@@ -115,7 +116,7 @@ class MembersList
 	 * Returns the \ElkArte\Member object of the requested (numeric) $id
 	 *
 	 * @param int $id id of the member
-	 * @return bool|ValuesContainer
+	 * @return false|Member
 	 */
 	public function getById($id)
 	{

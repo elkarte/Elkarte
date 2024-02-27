@@ -51,40 +51,24 @@ class GenericList
 	 *
 	 * @var array
 	 */
-	protected $listOptions = array();
+	protected $listOptions = [];
 
-	/**
-	 * Instance of \ElkArte\HttpReq
-	 *
-	 * @var \ElkArte\HttpReq
-	 */
+	/** @var HttpReq Instance of \ElkArte\HttpReq */
 	protected $req;
 
-	/**
-	 * Will hold the created $context
-	 *
-	 * @var array
-	 */
-	protected $context = array();
+	/** @var array Will hold the created $context */
+	protected $context = [];
 
-	/**
-	 * @var array
-	 */
-	protected $listItems = array();
+	/** @var array */
+	protected $listItems = [];
 
-	/**
-	 * @var string
-	 */
+	/** @var string */
 	protected $sort = '';
 
-	/**
-	 * @var string
-	 */
+	/** @var string */
 	protected $sortVar = '';
 
-	/**
-	 * @var string
-	 */
+	/** @var string */
 	protected $descVar = '';
 
 	/**
@@ -174,7 +158,7 @@ class GenericList
 			{
 				$this->context['sort'] = array(
 					'id' => $this->listOptions['default_sort_col'],
-					'desc' => (!empty($this->listOptions['default_sort_dir']) && $this->listOptions['default_sort_dir'] == 'desc') || (!empty($this->listOptions['columns'][$this->listOptions['default_sort_col']]['sort']['default']) && substr($this->listOptions['columns'][$this->listOptions['default_sort_col']]['sort']['default'], -4, 4) === 'desc'),
+					'desc' => (!empty($this->listOptions['default_sort_dir']) && $this->listOptions['default_sort_dir'] === 'desc') || (!empty($this->listOptions['columns'][$this->listOptions['default_sort_col']]['sort']['default']) && substr($this->listOptions['columns'][$this->listOptions['default_sort_col']]['sort']['default'], -4, 4) === 'desc'),
 				);
 			}
 
@@ -264,7 +248,7 @@ class GenericList
 
 		// Call the function and include which items we want and in what order.
 		$this->listItems = call_user_func_array($this->listOptions['get_items']['function'], array_merge(array($this->context['start'], $this->context['items_per_page'], $this->sort), empty($this->listOptions['get_items']['params']) ? array() : $this->listOptions['get_items']['params']));
-		$this->listItems = !empty($this->listItems) ? $this->listItems : array();
+		$this->listItems = empty($this->listItems) ? array() : $this->listItems;
 
 		$this->loopItems();
 	}
@@ -307,6 +291,7 @@ class GenericList
 					{
 						$params[] = $htmlsafe ? htmlspecialchars($list_item[$sprintf_param], ENT_COMPAT, 'UTF-8') : $list_item[$sprintf_param];
 					}
+
 					$cur_data['value'] = vsprintf($column['data']['sprintf']['format'], $params);
 				}
 				// The most flexible way probably is applying a custom function.
@@ -333,7 +318,7 @@ class GenericList
 				elseif (!empty($column['data']['timeformat']))
 				{
 					// Maybe we need a relative time?
-					if ($column['data']['timeformat'] == 'html_time')
+					if ($column['data']['timeformat'] === 'html_time')
 					{
 						$cur_data['value'] = htmlTime($cur_data['value']);
 					}
@@ -342,6 +327,7 @@ class GenericList
 						$cur_data['value'] = standardTime($cur_data['value']);
 					}
 				}
+
 				// Set a style class for this column?
 				if (isset($column['data']['class']))
 				{
@@ -357,6 +343,7 @@ class GenericList
 				// Add the data cell properties to the current row.
 				$cur_row[$column_id] = $cur_data;
 			}
+
 			$this->context['rows'][$item_id]['class'] = '';
 			$this->context['rows'][$item_id]['style'] = '';
 
@@ -512,8 +499,7 @@ class GenericList
 	}
 
 	/**
-	 * Prepare the template by loading context
-	 * variables for each setting.
+	 * Prepare the template by loading context variables for each setting.
 	 */
 	protected function prepareContext()
 	{

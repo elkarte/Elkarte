@@ -16,16 +16,16 @@ namespace ElkArte\UrlGenerator\Queryless;
 class Topic extends Standard
 {
 	/**
-	 * {@inheritdoc }
+	 * {@inheritDoc}
 	 */
 	protected $_types = ['topic'];
 
 	/**
-	 * {@inheritdoc }
+	 * {@inheritDoc}
 	 */
 	public function generate($params)
 	{
-		$url = 'topic,' . $params['topic'] . (!empty($params['start']) ? '.' . $params['start'] : '.0') . '.html';
+		$url = 'topic,' . $params['topic'] . (empty($params['start']) ? '.0' : '.' . $params['start']) . '.html';
 		unset($params['subject'], $params['topic'], $params['start']);
 
 		return $url . $this->_separator . $this->generateQuery($params);

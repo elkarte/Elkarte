@@ -74,7 +74,7 @@ class Mentions extends AbstractController
 	{
 		global $modSettings;
 
-		// I'm not sure this is needed, though better have it. :P
+		// I'm not sure if this is needed, though better have it. :P
 		if (empty($modSettings['mentions_enabled']))
 		{
 			throw new Exception('no_access', false);
@@ -114,7 +114,7 @@ class Mentions extends AbstractController
 		}
 		else
 		{
-			// default action to execute
+			// Default action to execute
 			$this->action_list();
 		}
 	}
@@ -171,9 +171,10 @@ class Mentions extends AbstractController
 	}
 
 	/**
-	 * Creates a list of mentions for the user
-	 * Allows them to mark them read or unread
-	 * Can sort the various forms of mentions, likes or @mentions
+	 * Display a list of mentions for the current user.
+	 *
+	 *  - Allows them to mark them read or unread
+	 *  - Can sort the various forms of mentions, such as likes, buddies, quoted, etc.
 	 */
 	public function action_list()
 	{
@@ -424,6 +425,7 @@ class Mentions extends AbstractController
 	 * @param bool $all : if true load all the mentions or type, otherwise only the unread
 	 * @param string $type : the type of mention
 	 *
+	 * @event view_mentions
 	 * @return array
 	 */
 	public function list_loadMentions($start, $limit, $sort, $all, $type)

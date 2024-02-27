@@ -32,13 +32,12 @@ class UserNotificationIntegrate
 
 		if (empty($modSettings['usernotif_favicon_enable']) && empty($modSettings['usernotif_desktop_enable']))
 		{
-			return array();
+			return [];
 		}
 
 		// $hook, $function, $file
-		return array(
-			array('integrate_load_theme', '\\ElkArte\\UserNotificationIntegrate::integrate_load_theme'),
-		);
+		return [
+			['integrate_load_theme', '\\ElkArte\\UserNotificationIntegrate::integrate_load_theme'],];
 	}
 
 	/**
@@ -47,10 +46,10 @@ class UserNotificationIntegrate
 	public static function settingsRegister()
 	{
 		// $hook, $function, $file
-		return array(
-			array('integrate_modify_mention_settings', '\\ElkArte\\UserNotificationIntegrate::integrate_modify_mention_settings'),
-			array('integrate_save_modify_mention_settings', '\\ElkArte\\UserNotificationIntegrate::integrate_save_modify_mention_settings'),
-		);
+		return [
+			['integrate_modify_mention_settings', '\\ElkArte\\UserNotificationIntegrate::integrate_modify_mention_settings'],
+			['integrate_save_modify_mention_settings', '\\ElkArte\\UserNotificationIntegrate::integrate_save_modify_mention_settings'],
+		];
 	}
 
 	/**

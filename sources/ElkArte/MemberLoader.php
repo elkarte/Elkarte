@@ -26,35 +26,48 @@ class MemberLoader
 {
 	/** @var string Just the bare minimum set of fields */
 	public const SET_MINIMAL = 'minimal';
+
 	/** @var string What is needed in most of the cases */
 	public const SET_NORMAL = 'normal';
+
 	/** @var string What is required to see a profile page */
 	public const SET_PROFILE = 'profile';
+
 	/** @var QueryInterface */
 	protected $db;
+
 	/** @var Cache */
 	protected $cache;
+
 	/** @var ParserWrapper */
 	protected $bbc_parser;
+
 	/** @var MembersList */
 	protected $users_list;
-	/** @var mixed[] */
+
+	/** @var array */
 	protected $options = [
 		'titlesEnable' => false,
 		'custom_fields' => false,
 		'load_moderators' => false,
 		'display_fields' => []
 	];
+
 	/** @var bool if to use the cache or not */
 	protected $useCache = false;
+
 	/** @var string which set to load */
 	protected $set = '';
+
 	/** @var string */
 	protected $base_select_columns = '';
-	/** @var string  */
+
+	/** @var string */
 	protected $base_select_tables = '';
+
 	/** @var int[] member ids that have been loaded */
 	protected $loaded_ids = [];
+
 	/** @var Member[] */
 	protected $loaded_members = [];
 
@@ -85,7 +98,7 @@ class MemberLoader
 			mem.karma_good, mem.id_post_group, mem.karma_bad, mem.lngfile, mem.id_group, mem.time_offset, mem.show_online,
 			mg.online_color AS member_group_color, COALESCE(mg.group_name, {string:blank_string}) AS member_group,
 			pg.online_color AS post_group_color, COALESCE(pg.group_name, {string:blank_string}) AS post_group,
-			mem.is_activated, mem.warning, ' . (!empty($this->options['titlesEnable']) ? 'mem.usertitle, ' : '') . '
+			mem.is_activated, mem.warning, ' . (empty($this->options['titlesEnable']) ? '' : 'mem.usertitle, ') . '
 			CASE WHEN mem.id_group = 0 OR mg.icons = {string:blank_string} THEN pg.icons ELSE mg.icons END AS icons';
 
 		$this->base_select_tables = '
@@ -154,7 +167,8 @@ class MemberLoader
 				{
 					$member->append($key, $values, $this->options['display_fields']);
 				}
-				$this->users_list->add($member, $data['data']['id_member']);
+
+				$this->users_list::add($member, $data['data']['id_member']);
 				$this->loaded_ids[] = $data['data']['id_member'];
 				$this->loaded_members[$data['data']['id_member']] = $member;
 			}
@@ -199,22 +213,22 @@ class MemberLoader
 				$select_tables = '';
 				break;
 			default:
-				trigger_error('\ElkArte\MembersList::load(): Invalid member data set \'' . $this->set . '\'', E_USER_WARNING);
+				trigger_error('\ElkArte\MembersList::load(): Invalid member data set \'' . $this->set . "'", E_USER_WARNING);
 		}
 
 		// Allow addons to easily add to the selected member data
-		call_integration_hook('integrate_load_member_data', array(&$select_columns, &$select_tables, $this->set));
+		call_integration_hook('integrate_load_member_data', [&$select_columns, &$select_tables, $this->set]);
 
 		// Load the member's data.
-		$new_loaded_ids = array();
+		$new_loaded_ids = [];
 		$this->db->fetchQuery('
 			SELECT' . $select_columns . '
 			FROM {db_prefix}members AS mem' . $select_tables . '
 			WHERE ' . $where_clause,
-			array(
+			[
 				'blank_string' => '',
 				'users' => count($to_load) === 1 ? current($to_load) : $to_load,
-			)
+			]
 		)->fetch_callback(
 			function ($row) use (&$new_loaded_ids) {
 				$row['id_member'] = (int) $row['id_member'];
@@ -224,7 +238,7 @@ class MemberLoader
 				$this->loaded_ids[] = $row['id_member'];
 				$row['options'] = [];
 				$this->loaded_members[$row['id_member']] = new Member($row, $this->set, $this->bbc_parser);
-				$this->users_list->add($this->loaded_members[$row['id_member']], $row['id_member']);
+				$this->users_list::add($this->loaded_members[$row['id_member']], $row['id_member']);
 			}
 		);
 		$this->loadCustomFields($new_loaded_ids);
@@ -232,7 +246,7 @@ class MemberLoader
 		if (!empty($new_loaded_ids))
 		{
 			// Anything else integration may want to add to the user_profile array
-			call_integration_hook('integrate_add_member_data', array($new_loaded_ids, $this->users_list));
+			call_integration_hook('integrate_add_member_data', [$new_loaded_ids, $this->users_list]);
 
 			$this->storeInCache($new_loaded_ids);
 		}
@@ -259,11 +273,11 @@ class MemberLoader
 			FROM {db_prefix}custom_fields_data AS cfd
 			JOIN {db_prefix}custom_fields AS cf ON (cf.col_name = cfd.variable)
 			WHERE id_member' . (count($new_loaded_ids) === 1 ? ' = {int:loaded_ids}' : ' IN ({array_int:loaded_ids})'),
-			array(
+			[
 				'loaded_ids' => count($new_loaded_ids) === 1 ? $new_loaded_ids[0] : $new_loaded_ids,
-			)
+			]
 		)->fetch_callback(
-			function ($row) use (&$data) {
+			static function ($row) use (&$data) {
 				$key = 0;
 				$row['id_member'] = (int) $row['id_member'];
 				if (!empty($row['field_options']))
@@ -271,7 +285,6 @@ class MemberLoader
 					$field_options = explode(',', $row['field_options']);
 					$key = (int) array_search($row['value'], $field_options, true);
 				}
-
 				$data[$row['id_member']][$row['variable'] . '_key'] = $row['variable'] . '_' . $key;
 				$data[$row['id_member']][$row['variable']] = $row['value'];
 			}
@@ -312,9 +325,9 @@ class MemberLoader
 		}
 
 		$temp_mods = array_intersect($this->loaded_ids, array_keys($board_info['moderators']));
-		if (count($temp_mods) !== 0)
+		if ($temp_mods !== [])
 		{
-			$group_info = array();
+			$group_info = [];
 			if ($this->cache->getVar($group_info, 'moderator_group_info', 480) === false)
 			{
 				require_once(SUBSDIR . '/Membergroups.subs.php');
@@ -392,6 +405,6 @@ class MemberLoader
 			'email' => $txt['guest_title'],
 			'is_guest' => true
 		], $this->set, $this->bbc_parser);
-		$this->users_list->add($this->loaded_members[0], 0);
+		$this->users_list::add($this->loaded_members[0], 0);
 	}
 }

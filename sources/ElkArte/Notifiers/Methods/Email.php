@@ -13,9 +13,11 @@
 
 namespace ElkArte\Notifiers\Methods;
 
+use ElkArte\Database\QueryInterface;
 use ElkArte\Mentions\MentionType\NotificationInterface;
 use ElkArte\Notifications\NotificationsTask;
 use ElkArte\Notifiers\AbstractNotifier;
+use ElkArte\UserInfo;
 
 /**
  * Class Notifications
@@ -29,9 +31,8 @@ class Email extends AbstractNotifier
 	 *
 	 * Registers the known notifications to the system, allows for integration to add more
 	 *
-	 * @param \ElkArte\Database\QueryInterface $db
-	 * @param \ElkArte\UserInfo|null $user
-	 * @throws \ElkArte\Exceptions\Exception
+	 * @param QueryInterface $db
+	 * @param UserInfo|null $user
 	 */
 	public function __construct($db, $user)
 	{
@@ -42,7 +43,7 @@ class Email extends AbstractNotifier
 	}
 
 	/**
-	 * {@inheritdoc }
+	 * {@inheritDoc}
 	 */
 	public function send(NotificationInterface $obj, NotificationsTask $task, $bodies)
 	{
@@ -52,8 +53,8 @@ class Email extends AbstractNotifier
 	/**
 	 * Sends an immediate email notification.
 	 *
-	 * @param \ElkArte\Mentions\MentionType\NotificationInterface $obj
-	 * @param \ElkArte\Notifications\NotificationsTask $task
+	 * @param NotificationInterface $obj
+	 * @param NotificationsTask $task
 	 * @param array $bodies
 	 */
 	protected function _send_email(NotificationInterface $obj, NotificationsTask $task, $bodies)
@@ -61,7 +62,7 @@ class Email extends AbstractNotifier
 		$last_id = $obj->getLastId();
 		foreach ($bodies as $body)
 		{
-			if (!in_array($body['id_member_to'], [0, $this->user->id]))
+			if (!in_array((int) $body['id_member_to'], [0, $this->user->id], true))
 			{
 				sendmail($body['email_address'], $body['subject'], $body['body'], null, $last_id);
 			}

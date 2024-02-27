@@ -16,12 +16,12 @@ namespace ElkArte\UrlGenerator\Standard;
 class Profile extends Standard
 {
 	/**
-	 * {@inheritdoc }
+	 * {@inheritDoc}
 	 */
 	protected $_types = ['profile'];
 
 	/**
-	 * {@inheritdoc }
+	 * {@inheritDoc}
 	 */
 	public function generate($params)
 	{

@@ -59,26 +59,29 @@
 
 namespace ElkArte\SettingsForm;
 
+use ElkArte\SettingsForm\SettingsFormAdapter\Adapter;
 use ElkArte\SettingsForm\SettingsFormAdapter\Db;
 use ElkArte\SettingsForm\SettingsFormAdapter\DbTable;
 use ElkArte\SettingsForm\SettingsFormAdapter\File;
 
 /**
- * Settings Form class.
- * This class handles display, edit, save, of forum settings.
- * It is used by the various admin areas which set their own settings,
- * and it is available for addons administration screens.
+ * Class SettingsForm
  *
+ * The SettingsForm class is responsible for managing the configuration settings for the application.
+ *
+ *  - This class handles display, edit, save, of forum settings.
+ *  - It is used by the various admin areas, and it is available for addons administration screens.
  */
 class SettingsForm
 {
+	/** @var string The constant representing the database adapter class. */
 	public const DB_ADAPTER = Db::class;
+
 	public const DBTABLE_ADAPTER = DbTable::class;
+
 	public const FILE_ADAPTER = File::class;
 
-	/**
-	 * @var \ElkArte\SettingsForm\SettingsFormAdapter\Adapter
-	 */
+	/** @var Adapter */
 	private $adapter;
 
 	/**
@@ -92,7 +95,9 @@ class SettingsForm
 	}
 
 	/**
-	 * @return array
+	 * Retrieve the configuration variables from the adapter.
+	 *
+	 * @return array The configuration variables retrieved from the adapter.
 	 */
 	public function getConfigVars()
 	{
@@ -100,7 +105,9 @@ class SettingsForm
 	}
 
 	/**
-	 * @param array $configVars
+	 * Sets the configuration variables for the adapter.
+	 *
+	 * @param array $configVars An associative array of configuration variables.
 	 */
 	public function setConfigVars(array $configVars)
 	{
@@ -108,7 +115,9 @@ class SettingsForm
 	}
 
 	/**
-	 * @return array
+	 * Get the configuration values from the adapter.
+	 *
+	 * @return array The configuration values returned by the adapter.
 	 */
 	public function getConfigValues()
 	{
@@ -116,7 +125,11 @@ class SettingsForm
 	}
 
 	/**
-	 * @param array $configValues
+	 * Sets the config values for the adapter.
+	 *
+	 * @param array $configValues An array of config values to be set.
+	 *
+	 * @return void
 	 */
 	public function setConfigValues(array $configValues)
 	{
@@ -124,7 +137,9 @@ class SettingsForm
 	}
 
 	/**
-	 * @return \ElkArte\SettingsForm\SettingsFormAdapter\Adapter
+	 * Retrieves the currently configured adapter.
+	 *
+	 * @return mixed Returns the current adapter being used.
 	 */
 	public function getAdapter()
 	{
@@ -132,8 +147,7 @@ class SettingsForm
 	}
 
 	/**
-	 * This method reads the settings and prepares them for
-	 * display within the template.
+	 * This method reads the settings and prepares them for display within the template.
 	 *
 	 * It will read either Settings.php or the settings table
 	 * according to the adapter specified in the constructor.

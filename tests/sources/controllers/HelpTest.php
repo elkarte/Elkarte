@@ -30,7 +30,7 @@ class HelpTest extends ElkArteCommonSetupTest
 
 		new ElkArte\Themes\ThemeLoader();
 		$lang = new Loader('english', $txt, database());
-		$lang->load('Manual+Help');
+		$lang->load('Help');
 	}
 
 	protected function tearDown(): void

@@ -20,22 +20,18 @@ namespace ElkArte\UrlGenerator\Queryless;
  */
 class Board extends Standard
 {
-	/**
-	 * {@inheritdoc }
-	 */
+	/** {@inheritDoc} */
 	protected $_separator = ';';
 
-	/**
-	 * {@inheritdoc }
-	 */
+	/** {@inheritDoc} */
 	protected $_types = ['board'];
 
 	/**
-	 * {@inheritdoc }
+	 * {@inheritDoc}
 	 */
 	public function generate($params)
 	{
-		$url = 'board,' . $params['board'] . (!empty($params['start']) ? '.' . $params['start'] : '.0') . '.html';
+		$url = 'board,' . $params['board'] . (empty($params['start']) ? '.0' : '.' . $params['start']) . '.html';
 		unset($params['name'], $params['board'], $params['start']);
 
 		return $url . $this->generateQuery($params);

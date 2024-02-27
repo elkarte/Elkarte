@@ -13,11 +13,13 @@
 
 namespace ElkArte\Notifiers\Methods;
 
+use ElkArte\Database\QueryInterface;
 use ElkArte\DataValidator;
 use ElkArte\Mentions\Mentioning;
 use ElkArte\Mentions\MentionType\NotificationInterface;
 use ElkArte\Notifications\NotificationsTask;
 use ElkArte\Notifiers\AbstractNotifier;
+use ElkArte\UserInfo;
 
 
 /**
@@ -39,8 +41,8 @@ class Notification extends AbstractNotifier
 	 *
 	 * Registers the known notifications to the system, allows for integration to add more
 	 *
-	 * @param \ElkArte\Database\QueryInterface $db
-	 * @param \ElkArte\UserInfo|null $user
+	 * @param QueryInterface $db
+	 * @param UserInfo|null $user
 	 */
 	public function __construct($db, $user)
 	{
@@ -50,7 +52,7 @@ class Notification extends AbstractNotifier
 	}
 
 	/**
-	 * {@inheritdoc }
+	 * {@inheritDoc}
 	 */
 	public function send(NotificationInterface $obj, NotificationsTask $task, $bodies)
 	{
@@ -60,8 +62,8 @@ class Notification extends AbstractNotifier
 	/**
 	 * Inserts a new mention in the database (those that appear in the mentions area).
 	 *
-	 * @param \ElkArte\Mentions\MentionType\NotificationInterface $obj
-	 * @param \ElkArte\Notifications\NotificationsTask $task
+	 * @param NotificationInterface $obj
+	 * @param NotificationsTask $task
 	 * @param array $bodies
 	 */
 	protected function _send_notification($obj, $task, $bodies)

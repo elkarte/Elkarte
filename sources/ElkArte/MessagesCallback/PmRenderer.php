@@ -31,6 +31,7 @@ use ElkArte\ValuesContainer;
 class PmRenderer extends Renderer
 {
 	public const BEFORE_PREPARE_HOOK = 'integrate_before_prepare_pm_context';
+
 	public const CONTEXT_HOOK = 'integrate_prepare_pm_context';
 
 	/**
@@ -41,7 +42,7 @@ class PmRenderer extends Renderer
 	protected $_temp_pm_selected;
 
 	/**
-	 * {@inheritdoc }
+	 * {@inheritDoc}
 	 */
 	public function __construct($request, $user, BodyParserInterface $bodyParser, ValuesContainer $opt = null)
 	{
@@ -58,14 +59,14 @@ class PmRenderer extends Renderer
 	}
 
 	/**
-	 * {@inheritdoc }
+	 * {@inheritDoc}
 	 */
 	protected function _setupPermissions()
 	{
 	}
 
 	/**
-	 * {@inheritdoc }
+	 * {@inheritDoc}
 	 */
 	protected function _adjustGuestContext($member_context)
 	{
@@ -80,24 +81,25 @@ class PmRenderer extends Renderer
 		{
 			$member_context['group'] = '';
 		}
+
 		$member_context['email'] = '';
 	}
 
 	/**
-	 * {@inheritdoc }
+	 * {@inheritDoc}
 	 */
 	protected function _adjustAllMembers($member_context)
 	{
-		global $context, $settings;
+		global $context;
 
 		$member_context['show_profile_buttons'] = (!empty($member_context['can_view_profile'])
 			|| (!empty($member_context['website']['url']) && !isset($context['disabled_fields']['website']))
-			|| (in_array($member_context['show_email'], array('yes', 'yes_permission_override', 'no_through_forum')))
+			|| (in_array($member_context['show_email'], ['yes', 'yes_permission_override', 'no_through_forum']))
 			|| $context['can_send_pm']);
 	}
 
 	/**
-	 * {@inheritdoc }
+	 * {@inheritDoc}
 	 */
 	protected function _buildOutputArray()
 	{
@@ -133,10 +135,10 @@ class PmRenderer extends Renderer
 		// Or give / take karma for a PM
 		if (!empty($output['member']['karma']['allow']))
 		{
-			$output['member']['karma'] += array(
+			$output['member']['karma'] += [
 				'applaud_url' => getUrl('action', ['action' => 'karma', 'sa' => 'applaud', 'uid' => $output['member']['id'], 'f' => $context['folder'], 'start' => $context['start'], 'pm' => $output['id'], '{session_data}'] + ($context['current_label_id'] != -1 ? ['l' => $context['current_label_id']] : [])),
 				'smite_url' => getUrl('action', ['action' => 'karma', 'sa' => 'smite', 'uid' => $output['member']['id'], 'f' => $context['folder'], 'start' => $context['start'], 'pm' => $output['id'], '{session_data}'] + ($context['current_label_id'] != -1 ? ['l' => $context['current_label_id']] : [])),
-			);
+			];
 		}
 
 		// Build the PM buttons, like reply, report, etc.
@@ -196,7 +198,7 @@ class PmRenderer extends Renderer
 				'custom' => 'onclick="return confirm(\'' . addslashes($txt['remove_message']) . '?\');"',
 			],
 			// Maybe there is something...more :P (this is the more button)
-			// *** Submenu
+			// *** Submenu => true
 			//
 			// Or mark it as unread
 			'restore_button' => [
@@ -227,9 +229,7 @@ class PmRenderer extends Renderer
 		];
 
 		// Drop any non-enabled ones
-		$pmButtons = array_filter($pmButtons, static function ($button) {
-			return !isset($button['enabled']) || (bool) $button['enabled'] !== false;
-		});
+		$pmButtons = array_filter($pmButtons, static fn($button) => !isset($button['enabled']) || (bool) $button['enabled']);
 
 		return ['pmbuttons' => $pmButtons];
 	}

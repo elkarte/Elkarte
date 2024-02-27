@@ -20,52 +20,29 @@ namespace ElkArte\MessagesCallback\BodyParser;
 use BBC\ParserWrapper;
 
 /**
- * Normal
- * A body parser that shows the whole text passed without highlighting.
+ * Class Normal
+ *
+ * Represents a normal body parser implementation.
+ * Implementing the BodyParserInterface, this class does not provide functionality to highlight words in a message.
+ * instead all it does is run censor and parser.
  */
 class Normal implements BodyParserInterface
 {
-	/**
-	 * An array of words that can be highlighted in the message (somehow)
-	 *
-	 * @var string[]
-	 */
-	protected $_searchArray = array();
-
-	/**
-	 * If there is something to highlight or not
-	 *
-	 * @var bool
-	 */
+	/** @var bool If there is something to highlight or not */
 	protected $_highlight = false;
 
 	/**
-	 * The BBCode parser
-	 *
-	 * @var Object
+	 * {@inheritDoc}
+	 * @param string[] $highlight An array of words that can be highlighted in the message (somehow)
+	 * @param bool $use_partial_words If highlight should happen on whole rods or part of them
 	 */
-	protected $_bbc_parser = null;
-
-	/**
-	 * If highlight should happen on whole rods or part of them
-	 *
-	 * @var bool
-	 */
-	protected $_use_partial_words = false;
-
-	/**
-	 * {@inheritdoc }
-	 */
-	public function __construct($highlight, $use_partial_words)
+	public function __construct(protected $_searchArray, protected $_use_partial_words)
 	{
-		$this->_searchArray = $highlight;
-		$this->_use_partial_words = $use_partial_words;
-		$this->_highlight = !empty($highlight);
-		$this->_bbc_parser = ParserWrapper::instance();
+		$this->_highlight = !empty($this->_searchArray);
 	}
 
 	/**
-	 * {@inheritdoc }
+	 * {@inheritDoc}
 	 */
 	public function getSearchArray()
 	{
@@ -73,13 +50,13 @@ class Normal implements BodyParserInterface
 	}
 
 	/**
-	 * {@inheritdoc }
+	 * {@inheritDoc}
 	 */
 	public function prepare($body, $smileys_enabled)
 	{
 		$body = censor($body);
 
 		// Run BBC interpreter on the message.
-		return $this->_bbc_parser->parseMessage($body, $smileys_enabled);
+		return ParserWrapper::instance()->parseMessage($body, $smileys_enabled);
 	}
 }

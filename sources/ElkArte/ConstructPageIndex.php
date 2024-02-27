@@ -53,7 +53,7 @@ class ConstructPageIndex extends AbstractModel
 	/** @var int max page # to show */
 	private $max_value;
 
-	/** @var int  */
+	/** @var int */
 	private $num_per_page;
 
 	/** @var bool  */
@@ -210,9 +210,8 @@ class ConstructPageIndex extends AbstractModel
 	{
 		$pageindex = $this->setLeftNavigation();
 		$pageindex .= $this->setAll();
-		$pageindex .= $this->setRightNavigation();
 
-		return $pageindex;
+		return $pageindex . $this->setRightNavigation();
 	}
 
 	/**

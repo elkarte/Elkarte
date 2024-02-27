@@ -46,18 +46,11 @@ class TemporaryAttachmentsList extends ValuesContainer
 	 */
 	public function removeAll($userId = null)
 	{
-		if ($userId === null)
-		{
-			$prefix = $this->getTplName('', '')[0];
-		}
-		else
-		{
-			$prefix = $this->getTplName($userId, '');
-		}
+		$prefix = $userId === null ? $this->getTplName('', '')[0] : $this->getTplName($userId, '');
 
 		foreach ($this->data as $attachID => $attachment)
 		{
-			if (strpos($attachID, $prefix) !== false)
+			if (strpos($attachID, (string) $prefix) !== false)
 			{
 				$this->remove($attachment['tmp_name']);
 				$this->remove($attachment['tmp_name'] . '_thumb');
@@ -152,10 +145,10 @@ class TemporaryAttachmentsList extends ValuesContainer
 	public function filesExist($userId)
 	{
 		$prefix = $this->getTplName($userId, '');
-		/** @var \ElkArte\TemporaryAttachment $attachment */
+		/** @var TemporaryAttachment $attachment */
 		foreach ($this->data as $attachID => $attachment)
 		{
-			if (strpos($attachID, $prefix) === false)
+			if (strpos($attachID, (string) $prefix) === false)
 			{
 				continue;
 			}
@@ -183,9 +176,9 @@ class TemporaryAttachmentsList extends ValuesContainer
 
 		foreach ($this->data as $attachID => $attachment)
 		{
-			if ((isset($this->data['post']['files'], $attachment['name']) && in_array($attachment['name'], $this->data['post']['files']))
+			if ((isset($this->data['post']['files'], $attachment['name']) && in_array($attachment['name'], $this->data['post']['files'], true))
 				|| in_array($attachID, $keep)
-				|| strpos($attachID, $prefix) === false)
+				|| strpos($attachID, (string) $prefix) === false)
 			{
 				continue;
 			}
@@ -208,7 +201,7 @@ class TemporaryAttachmentsList extends ValuesContainer
 
 		foreach ($this->data as $attachID => $attachment)
 		{
-			if (strpos($attachID, $prefix) !== false)
+			if (strpos($attachID, (string) $prefix) !== false)
 			{
 				$this->data['post']['files'][] = $attachment->getName();
 			}
@@ -242,7 +235,7 @@ class TemporaryAttachmentsList extends ValuesContainer
 	/**
 	 * Add file data, for those that passed upload tests, to the data attachid key
 	 *
-	 * @param \ElkArte\TemporaryAttachment $data
+	 * @param TemporaryAttachment $data
 	 */
 	public function addAttachment($data)
 	{
@@ -390,10 +383,17 @@ class TemporaryAttachmentsList extends ValuesContainer
 			}
 
 			$val = $val->toArray();
-			if (isset($val['public_attachid']) && $val['public_attachid'] === $public_attachid)
+			if (!isset($val['public_attachid']))
 			{
-				return $key;
+				continue;
 			}
+
+			if ($val['public_attachid'] !== $public_attachid)
+			{
+				continue;
+			}
+
+			return $key;
 		}
 
 		return $public_attachid;

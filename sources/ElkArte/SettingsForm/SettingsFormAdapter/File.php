@@ -35,7 +35,7 @@ class File extends Db
 	/** @var array */
 	private $new_settings = [];
 
-	/** @var \ElkArte\FileFunctions */
+	/** @var FileFunctions */
 	private $fileFunc;
 
 	/**
@@ -103,18 +103,21 @@ class File extends Db
 				// Special value needed from the settings file?
 				if ($configVar[2] === 'file')
 				{
-					$value = in_array($varname, $defines) ? constant(strtoupper($varname)) : $$varname;
+					$value = in_array($varname, $defines, true) ? constant(strtoupper($varname)) : ${$varname};
 
-					if (in_array($varname, $safe_strings))
+					if (in_array($varname, $safe_strings, true))
 					{
 						$new_setting['mask'] = 'nohtml';
 						$value = strtr($value, [Util::htmlspecialchars('<br />') => "\n"]);
 					}
+
 					$modSettings[$configVar[0]] = $value;
 				}
 			}
+
 			$this->new_settings[] = $new_setting;
 		}
+
 		$this->setConfigVars($this->new_settings);
 		parent::prepare();
 	}
@@ -224,10 +227,17 @@ class File extends Db
 		// Now sort everything into a big array, and figure out arrays and etc.
 		foreach ($config_passwords as $configVar)
 		{
-			if (isset($this->configValues[$configVar][1]) && $this->configValues[$configVar][0] === $this->configValues[$configVar][1])
+			if (!isset($this->configValues[$configVar][1]))
 			{
-				$this->new_settings[$configVar] = '\'' . addcslashes($this->configValues[$configVar][0], '\'\\') . '\'';
+				continue;
 			}
+
+			if ($this->configValues[$configVar][0] !== $this->configValues[$configVar][1])
+			{
+				continue;
+			}
+
+			$this->new_settings[$configVar] = "'" . addcslashes($this->configValues[$configVar][0], '\'\\') . "'";
 		}
 
 		// Escape and update Setting strings
@@ -237,11 +247,11 @@ class File extends Db
 			{
 				if (in_array($configVar, $safe_strings))
 				{
-					$this->new_settings[$configVar] = '\'' . addcslashes(Util::htmlspecialchars(strtr($this->configValues[$configVar], ["\n" => '<br />', "\r" => '']), ENT_QUOTES), '\'\\') . '\'';
+					$this->new_settings[$configVar] = "'" . addcslashes(Util::htmlspecialchars(strtr($this->configValues[$configVar], ["\n" => '<br />', "\r" => '']), ENT_QUOTES), '\'\\') . "'";
 				}
 				else
 				{
-					$this->new_settings[$configVar] = '\'' . addcslashes($this->configValues[$configVar], '\'\\') . '\'';
+					$this->new_settings[$configVar] = "'" . addcslashes($this->configValues[$configVar], '\'\\') . "'";
 				}
 			}
 		}
@@ -365,7 +375,7 @@ class File extends Db
 			}
 
 			// End of the file ... maybe
-			if (substr(trim($this->settingsArray[$i]), 0, 2) === '?' . '>')
+			if (strpos(trim($this->settingsArray[$i]), '?>') === 0)
 			{
 				$end = $i;
 			}
@@ -453,7 +463,7 @@ class File extends Db
 		{
 			// Save the old before we do anything
 			$settings_backup_fail = !$this->fileFunc->isWritable(BOARDDIR . '/Settings_bak.php') || !@copy(BOARDDIR . '/Settings.php', BOARDDIR . '/Settings_bak.php');
-			$settings_backup_fail = !$settings_backup_fail ? (!$this->fileFunc->fileExists(BOARDDIR . '/Settings_bak.php') || filesize(BOARDDIR . '/Settings_bak.php') === 0) : $settings_backup_fail;
+			$settings_backup_fail = $settings_backup_fail ?: !$this->fileFunc->fileExists(BOARDDIR . '/Settings_bak.php') || filesize(BOARDDIR . '/Settings_bak.php') === 0;
 
 			// Write out the new
 			$write_settings = implode('', $this->settingsArray);
@@ -472,7 +482,7 @@ class File extends Db
 			}
 
 			if (extension_loaded('Zend OPcache') && ini_get('opcache.enable') &&
-				((ini_get('opcache.restrict_api') === '' || stripos(BOARDDIR, ini_get('opcache.restrict_api')) !== 0)))
+				((ini_get('opcache.restrict_api') === '' || stripos(BOARDDIR, (string) ini_get('opcache.restrict_api')) !== 0)))
 			{
 				opcache_invalidate(BOARDDIR . '/Settings.php');
 			}

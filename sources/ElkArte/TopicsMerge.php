@@ -24,83 +24,38 @@ namespace ElkArte;
  */
 class TopicsMerge
 {
-	/**
-	 * For each topic a set of information (id, board, subject, poll, etc.)
-	 *
-	 * @var array
-	 */
-	public $topic_data = array();
+	/** @var array For each topic a set of information (id, board, subject, poll, etc.) */
+	public $topic_data = [];
 
-	/**
-	 * All the boards the topics are in
-	 *
-	 * @var int[]
-	 */
-	public $boards = array();
+	/** @var int[] All the boards the topics are in */
+	public $boards = [];
 
-	/**
-	 * The id_topic with the lowest id_first_msg
-	 *
-	 * @var int
-	 */
+	/** @var int The id_topic with the lowest id_first_msg */
 	public $firstTopic = 0;
 
-	/**
-	 * The id_board of the topic TopicsMerge::$firstTopic
-	 *
-	 * @var int
-	 */
+	/** @var int The id_board of the topic TopicsMerge::$firstTopic */
 	public $firstBoard = 0;
 
-	/**
-	 * Just the array of topics to merge.
-	 *
-	 * @var int[]
-	 */
-	private $_topics = array();
+	/** @var int[] Just the array of topics to merge. */
+	private $_topics;
 
-	/**
-	 * Sum of the number of views of each topic.
-	 *
-	 * @var int
-	 */
+	/** @var int Sum of the number of views of each topic. */
 	private $_num_views = 0;
 
-	/**
-	 * If at least one of the topics is sticky
-	 *
-	 * @var int
-	 */
+	/** @var int If at least one of the topics is sticky */
 	private $_is_sticky = 0;
 
-	/**
-	 * An array of "totals" (number of topics/messages, unapproved, etc.) for
-	 * each board involved
-	 *
-	 * @var array
-	 */
-	private $_boardTotals = array();
+	/** @var array An array of "totals" (number of topics/messages, unapproved, etc.) for each board involved */
+	private $_boardTotals = [];
 
-	/**
-	 * If any topic has a poll, the array of poll id
-	 *
-	 * @var int[]
-	 */
-	private $_polls = array();
+	/** @var int[] If any topic has a poll, the array of poll id */
+	private $_polls = [];
 
-	/**
-	 * List of errors occurred
-	 *
-	 * @var string[]
-	 */
-	private $_errors = array();
+	/** @var string[] List of errors occurred */
+	private $_errors = [];
 
-	/**
-	 * The database object
-	 *
-	 * @var object
-	 */
-	private $_db = null;
+	/** @var object The database object */
+	private $_db;
 
 	/**
 	 * Initialize the class with a list of topics to merge
@@ -132,7 +87,7 @@ class TopicsMerge
 		$can_approve_boards = false;
 		if ($modSettings['postmod_active'])
 		{
-			$can_approve_boards = !empty(User::$info->mod_cache['ap']) ? User::$info->mod_cache['ap'] : boardsAllowedTo('approve_posts');
+			$can_approve_boards = empty(User::$info->mod_cache['ap']) ? boardsAllowedTo('approve_posts') : User::$info->mod_cache['ap'];
 		}
 
 		// Get info about the topics and polls that will be merged.
@@ -163,6 +118,7 @@ class TopicsMerge
 
 			return false;
 		}
+
 		while (($row = $request->fetch_assoc()))
 		{
 			// Make a note for the board counts...
@@ -234,6 +190,7 @@ class TopicsMerge
 
 			$this->_is_sticky = max($this->_is_sticky, $row['is_sticky']);
 		}
+
 		$request->free_result();
 
 		$this->boards = array_map('intval', array_values(array_unique($this->boards)));
@@ -260,7 +217,7 @@ class TopicsMerge
 	/**
 	 * The first error occurred
 	 *
-	 * @return array|string
+	 * @return string
 	 */
 	public function firstError()
 	{
@@ -270,10 +227,8 @@ class TopicsMerge
 
 			return array_shift($errors);
 		}
-		else
-		{
-			return '';
-		}
+
+		return '';
 	}
 
 	/**
@@ -283,11 +238,11 @@ class TopicsMerge
 	 */
 	public function getPolls()
 	{
-		$polls = array();
+		$polls = [];
 
 		if (count($this->_polls) > 1)
 		{
-			$this->_db->fetchQuery( '
+			$this->_db->fetchQuery('
 				SELECT
 					t.id_topic, t.id_poll, m.subject, p.question
 				FROM {db_prefix}polls AS p
@@ -322,12 +277,11 @@ class TopicsMerge
 	 *
 	 * @param array $details
 	 * @return bool|int[]
-	 * @throws \ElkArte\Exceptions\Exception
 	 */
 	public function doMerge($details = array())
 	{
 		// Just to be sure, here we should not have any error around
-		$this->_errors = array();
+		$this->_errors = [];
 
 		// Determine target board.
 		$target_board = count($this->boards) > 1 ? (int) $details['board'] : $this->boards[0];
@@ -392,7 +346,7 @@ class TopicsMerge
 				'topics' => $this->_topics,
 			)
 		)->fetch_callback(
-			function ($row) use (&$topic_approved, &$first_msg, &$num_replies, &$last_msg, &$num_unapproved) {
+			static function ($row) use (&$topic_approved, &$first_msg, &$num_replies, &$last_msg, &$num_unapproved) {
 				// If this is approved, or is fully unapproved.
 				if ($row['approved'] || !isset($first_msg))
 				{
@@ -437,7 +391,7 @@ class TopicsMerge
 		}
 
 		// Fix the topic count stuff depending on what the new one counts as.
-		if ($topic_approved)
+		if ($topic_approved !== 0)
 		{
 			$this->_boardTotals[$target_board]['num_topics']--;
 		}
@@ -447,7 +401,7 @@ class TopicsMerge
 		}
 
 		$this->_boardTotals[$target_board]['unapproved_posts'] -= $num_unapproved;
-		$this->_boardTotals[$target_board]['num_posts'] -= $topic_approved ? $num_replies + 1 : $num_replies;
+		$this->_boardTotals[$target_board]['num_posts'] -= $topic_approved !== 0 ? $num_replies + 1 : $num_replies;
 
 		// Get the member ID of the first and last message.
 		$request = $this->_db->fetchQuery('
@@ -462,8 +416,8 @@ class TopicsMerge
 				'last_msg' => $last_msg,
 			)
 		);
-		list ($member_started) = $request->fetch_row();
-		list ($member_updated) = $request->fetch_row();
+		[$member_started] = $request->fetch_row();
+		[$member_updated] = $request->fetch_row();
 
 		// First and last message are the same, so only row was returned.
 		if ($member_updated === null)
@@ -553,7 +507,7 @@ class TopicsMerge
 		$response_prefix = response_prefix();
 
 		// If there's a search index that needs updating, update it...
-		$searchAPI = new Search\SearchApiWrapper(!empty($modSettings['search_index']) ? $modSettings['search_index'] : '');
+		$searchAPI = new Search\SearchApiWrapper(empty($modSettings['search_index']) ? '' : $modSettings['search_index']);
 		$searchAPI->topicMerge($id_topic, $this->_topics, $affected_msgs, empty($enforce_subject) ? null : array($response_prefix, $target_subject));
 	}
 }

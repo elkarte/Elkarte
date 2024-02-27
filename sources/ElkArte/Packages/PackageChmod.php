@@ -25,7 +25,7 @@ use ElkArte\Http\FtpConnection;
  */
 class PackageChmod extends AbstractModel
 {
-	/** @var \ElkArte\FileFunctions */
+	/** @var FileFunctions */
 	protected $fileFunc;
 
 	/**
@@ -41,7 +41,7 @@ class PackageChmod extends AbstractModel
 	 * Create a chmod control for, you guessed it, chmod-ing files / directories.
 	 *
 	 * @param string[] $chmodFiles
-	 * @param array $chmodOptions  -- force_find_error, crash_on_error, destination_url
+	 * @param array $chmodOptions -- force_find_error, crash_on_error, destination_url
 	 * @param bool $restore_write_status
 	 * @return array|bool
 	 * @package Packages
@@ -62,12 +62,12 @@ class PackageChmod extends AbstractModel
 		}
 
 		// This is where we report what we got up to.
-		$return_data = array(
-			'files' => array(
+		$return_data = [
+			'files' => [
 				'writable' => [],
 				'notwritable' => [],
-			),
-		);
+			],
+		];
 
 		// If we have some FTP information already, then let's assume it was required
 		// and try to get ourselves reconnected.
@@ -107,7 +107,7 @@ class PackageChmod extends AbstractModel
 				else
 				{
 					// Now try to change that.
-					$return_data['files'][$this->pkgChmod($file,true) ? 'writable' : 'notwritable'][] = $file;
+					$return_data['files'][$this->pkgChmod($file, true) ? 'writable' : 'notwritable'][] = $file;
 				}
 			}
 		}
@@ -177,11 +177,9 @@ class PackageChmod extends AbstractModel
 							'value' => $txt['package_restore_permissions_cur_status'],
 						),
 						'data' => array(
-							'function' => function ($rowData) {
+							'function' => static function ($rowData) {
 								global $txt;
-
-								$formatTxt = $rowData['result'] == '' || $rowData['result'] == 'skipped' ? $txt['package_restore_permissions_pre_change'] : $txt['package_restore_permissions_post_change'];
-
+								$formatTxt = $rowData['result'] === '' || $rowData['result'] === 'skipped' ? $txt['package_restore_permissions_pre_change'] : $txt['package_restore_permissions_post_change'];
 								return sprintf($formatTxt, $rowData['cur_perms'], $rowData['new_perms'], $rowData['writable_message']);
 							},
 							'class' => 'smalltext',
@@ -207,9 +205,8 @@ class PackageChmod extends AbstractModel
 							'value' => $txt['package_restore_permissions_result'],
 						),
 						'data' => array(
-							'function' => function ($rowData) {
+							'function' => static function ($rowData) {
 								global $txt;
-
 								return $txt['package_restore_permissions_action_' . $rowData['result']];
 							},
 							'class' => 'smalltext',
@@ -217,7 +214,7 @@ class PackageChmod extends AbstractModel
 					),
 				),
 				'form' => array(
-					'href' => !empty($chmodOptions['destination_url']) ? $chmodOptions['destination_url'] : $scripturl . '?action=admin;area=packages;sa=perms;restore;' . $context['session_var'] . '=' . $context['session_id'],
+					'href' => empty($chmodOptions['destination_url']) ? $scripturl . '?action=admin;area=packages;sa=perms;restore;' . $context['session_var'] . '=' . $context['session_id'] : $chmodOptions['destination_url'],
 				),
 				'additional_rows' => array(
 					array(
@@ -265,7 +262,7 @@ class PackageChmod extends AbstractModel
 	/**
 	 * Prepares $context['package_ftp'] with whatever information we may have available.
 	 *
-	 * @param \ElkArte\Http\FtpConnection|null $ftp
+	 * @param FtpConnection|null $ftp
 	 * @param array $chmodOptions
 	 * @param array $return_data
 	 */
@@ -290,7 +287,7 @@ class PackageChmod extends AbstractModel
 				$ftp_error = $ftp->last_message ?? '';
 			}
 
-			list ($username, $detect_path, $found_path) = $ftp->detect_path(BOARDDIR);
+			[$username, $detect_path, $found_path] = $ftp->detect_path(BOARDDIR);
 
 			if ($found_path)
 			{
@@ -309,7 +306,7 @@ class PackageChmod extends AbstractModel
 			'username' => $ftp_username ?? ($this->_modSettings['package_username'] ?? $username ?? ''),
 			'path' => $ftp_path ?? ($this->_modSettings['package_path'] ?? ''),
 			'error' => empty($ftp_error) ? null : $ftp_error,
-			'destination' => !empty($chmodOptions['destination_url']) ? $chmodOptions['destination_url'] : '',
+			'destination' => empty($chmodOptions['destination_url']) ? '' : $chmodOptions['destination_url'],
 		);
 
 		// Which files failed?
@@ -321,7 +318,7 @@ class PackageChmod extends AbstractModel
 	 * Using the user supplied FTP information, attempts to create a connection.  If
 	 * successful will save the supplied data in session for use in other steps.
 	 *
-	 * @return \ElkArte\Http\FtpConnection
+	 * @return FtpConnection
 	 */
 	public function getFTPControl()
 	{
@@ -352,7 +349,7 @@ class PackageChmod extends AbstractModel
 			}
 
 			// A valid path was entered
-			if (!in_array($path, array('', '/')) && empty($ftp_error))
+			if (!in_array($path, array('', '/'), true) && empty($ftp_error))
 			{
 				$ftp_root = substr(BOARDDIR, 0, -strlen($path));
 
@@ -380,7 +377,7 @@ class PackageChmod extends AbstractModel
 
 			if (!isset($this->_modSettings['package_path']) || $this->_modSettings['package_path'] !== $path)
 			{
-				updateSettings(array('package_path' => $path));
+				updateSettings(['package_path' => $path]);
 			}
 
 			// This is now the primary connection.
@@ -499,7 +496,7 @@ class PackageChmod extends AbstractModel
 	 */
 	public function chmodWithFTP($filename, $track_change)
 	{
-		/** @var $package_ftp \ElkArte\Http\FtpConnection */
+		/** @var $package_ftp FtpConnection */
 		global $package_ftp;
 
 		$ftp_file = setFtpName($filename);

@@ -25,11 +25,11 @@ use ElkArte\Cache\Cache;
 class Emoji extends AbstractModel
 {
 	/** @var string ranges that emoji may be found, not all points in the range are emoji, this is
-	    used to check whether any char in the text is potentially in a unicode emoji range */
+	 * used to check whether any char in the text is potentially in a unicode emoji range */
 	private const EMOJI_RANGES = '[\x{203C}-\x{3299}\x{1F004}-\x{1F251}\x{1F300}-\x{1FAF6}](?![\x{200d}\x{FE0F}])';
 
 	/** @var string regex to find 4byte html as &#x1f937;‍️
-	    This is how 4byte characters are stored in the utf-8 db. */
+	 * This is how 4byte characters are stored in the utf-8 db. */
 	private const POSSIBLE_HTML_EMOJI = '~(&#x[a-fA-F\d]{5,6};|&#\d{5,6};)~';
 
 	/** @var string regex to check if any none letter characters appear in the string */
@@ -38,7 +38,7 @@ class Emoji extends AbstractModel
 	/** @var string used to find :emoji: style codes */
 	private const EMOJI_NAME = '~(?:\s?|^|]|<br />|<br>)(:([-+\w]+):\s?)~u';
 
-	/** @var null|\ElkArte\Emoji holds the instance of this class */
+	/** @var null|Emoji holds the instance of this class */
 	private static $instance;
 
 	/** @var string holds the url of where the emojis are stored */
@@ -89,11 +89,11 @@ class Emoji extends AbstractModel
 		// :emoji: must be at the start of a line, or have a leading space or be after a bbc ']' tag
 		if ($uni)
 		{
-			$string = preg_replace_callback(self::EMOJI_NAME, [$emoji, 'emojiToUni'], $string);
+			$string = preg_replace_callback(self::EMOJI_NAME, static fn(array $m): string => $emoji->emojiToUni($m), $string);
 		}
 		else
 		{
-			$string = preg_replace_callback(self::EMOJI_NAME, [$emoji, 'emojiToImage'], $string);
+			$string = preg_replace_callback(self::EMOJI_NAME, static fn(array $m): string => $emoji->emojiToImage($m), $string);
 
 			// Check for any embedded html / hex emoji
 			$string = $this->keyboardEmojiToImage($string);
@@ -200,13 +200,17 @@ class Emoji extends AbstractModel
 		}
 
 		// Does it end in -fe0f / Variation Selector-16? Libraries differ in its use or not.
-		if ((substr($hex, -5) === '-fe0f')
-			&& $key = (array_search(substr($hex, 0, -5), $this->shortcode_replace, true)))
+		if (substr($hex, -5) !== '-fe0f')
 		{
-			return $key;
+			return false;
 		}
 
-		return false;
+		if (!($key = (array_search(substr($hex, 0, -5), $this->shortcode_replace, true))))
+		{
+			return false;
+		}
+
+		return $key;
 	}
 
 	/**
@@ -375,9 +379,7 @@ class Emoji extends AbstractModel
 			call_integration_hook('integrate_custom_emoji', [&$this->shortcode_replace]);
 
 			// Longest to shortest to avoid any partial matches due to sequences
-			usort($emoji_regex, static function($a, $b) {
-				return strlen($b) <=> strlen($a);
-			});
+			usort($emoji_regex, static fn($a, $b) => strlen($b) <=> strlen($a));
 
 			// Build out the regex, append the single point search at end.
 			$this->emoji_regex = '~' . implode('|', $emoji_regex) . '|' . self::EMOJI_RANGES . '~u';
@@ -410,7 +412,7 @@ class Emoji extends AbstractModel
 	/**
 	 * Retrieve the sole instance of this class.
 	 *
-	 * @return \ElkArte\Emoji
+	 * @return Emoji
 	 */
 	public static function instance()
 	{

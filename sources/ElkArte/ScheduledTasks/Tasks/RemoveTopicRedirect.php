@@ -29,17 +29,16 @@ use ElkArte\Themes\ThemeLoader;
 class RemoveTopicRedirect implements ScheduledTaskInterface
 {
 	/**
-	 * Removes all of the expired Move Redirect topic notices that people hate
+	 * Removes all the expired Move Redirect topic notices that people hate
 	 *
 	 * @return bool
-	 * @throws \ElkArte\Exceptions\Exception
 	 */
 	public function run()
 	{
 		$db = database();
 
 		// Init
-		$topics = array();
+		$topics = [];
 
 		// We will need this for language files
 		ThemeLoader::loadEssentialThemeData();
@@ -51,17 +50,20 @@ class RemoveTopicRedirect implements ScheduledTaskInterface
 			FROM {db_prefix}topics
 			WHERE redirect_expires <= {int:redirect_expires}
 				AND redirect_expires <> 0',
-			array(
+			[
 				'redirect_expires' => time(),
-			)
+			]
 		)->fetch_callback(
-			function ($row) use (&$topics) {
-				$topics[] = $row[0];
+			static function ($row) use (&$topics) {
+				if (isset($row[0]))
+				{
+					$topics[] = (int) $row[0];
+				}
 			}
 		);
 
 		// Zap, you're gone
-		if (count($topics) > 0)
+		if ($topics !== [])
 		{
 			require_once(SUBSDIR . '/Topic.subs.php');
 			removeTopics($topics, false, true);

@@ -16,12 +16,12 @@ namespace ElkArte\UrlGenerator\Standard;
 class Board extends Standard
 {
 	/**
-	 * {@inheritdoc }
+	 * {@inheritDoc}
 	 */
 	protected $_types = ['board'];
 
 	/**
-	 * {@inheritdoc }
+	 * {@inheritDoc}
 	 */
 	public function generate($params)
 	{

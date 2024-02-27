@@ -16,6 +16,9 @@
 
 namespace ElkArte\Search;
 
+use ElkArte\Database\AbstractResult;
+use ElkArte\Search\API\Standard;
+
 /**
  * Actually do the searches
  */
@@ -30,7 +33,7 @@ class Search
 	/** @var \ElkArte\Search\SearchParams */
 	protected $_searchParams;
 
-	/** @var \ElkArte\Search\SearchArray Holds the words and phrases to be searched on  */
+	/** @var \ElkArte\Search\SearchArray Holds the words and phrases to be searched on */
 	private $_searchArray;
 
 	/** @var null|object Holds instance of the search api in use such as \ElkArte\Search\API\Standard_Search */
@@ -73,6 +76,7 @@ class Search
 
 		// Create new temporary table(s) (if we can) to store preliminary results in.
 		$db_search->skip_next_error();
+
 		$this->_createTemporary = $db_search->createTemporaryTable(
 				'{db_prefix}tmp_log_search_messages',
 				array(
@@ -208,16 +212,31 @@ class Search
 		$this->_blocklist_words = $blocklist_words;
 	}
 
+	/**
+	 * Get the search array from the SearchArray object.
+	 *
+	 * @return array The search array.
+	 */
 	public function getSearchArray()
 	{
 		return $this->_searchArray->getSearchArray();
 	}
 
+	/**
+	 * Get the list of excluded words.
+	 *
+	 * @return array
+	 */
 	public function getExcludedWords()
 	{
 		return $this->_searchArray->getExcludedWords();
 	}
 
+	/**
+	 * Get the excluded subject words.
+	 *
+	 * @return array The excluded subject words.
+	 */
 	public function getExcludedSubjectWords()
 	{
 		return $this->_excludedSubjectWords;
@@ -240,6 +259,11 @@ class Search
 		return $this->_searchParams;
 	}
 
+	/**
+	 * Get the excluded phrases.
+	 *
+	 * @return array The excluded phrases.
+	 */
 	public function getExcludedPhrases()
 	{
 		return $this->_excludedPhrases;
@@ -290,7 +314,7 @@ class Search
 				'no_member' => 0,
 			)
 		)->fetch_callback(
-			function ($row) use (&$posters) {
+			static function ($row) use (&$posters) {
 				$posters[] = $row['id_member'];
 			}
 		);
@@ -304,8 +328,7 @@ class Search
 	 * @param int[] $msg_list - All the messages we want to find the posters
 	 * @param int $limit - There are only so much topics
 	 *
-	 * @return bool|\ElkArte\Database\AbstractResult
-	 * @throws \ElkArte\Exceptions\Exception
+	 * @return bool|AbstractResult
 	 */
 	public function loadMessagesRequest($msg_list, $limit)
 	{
@@ -313,21 +336,17 @@ class Search
 
 		return $this->_db->query('', '
 			SELECT
-				m.id_msg, m.subject, m.poster_name, m.poster_email, m.poster_time,
-				m.id_member, m.icon, m.poster_ip, m.body, m.smileys_enabled,
-				m.modified_time, m.modified_name, first_m.id_msg AS id_first_msg,
-				first_m.subject AS first_subject, first_m.icon AS first_icon,
-				first_m.poster_time AS first_poster_time,
+				m.id_msg, m.subject, m.poster_name, m.poster_email, m.poster_time, m.id_member, m.icon, m.poster_ip,
+				m.body, m.smileys_enabled, m.modified_time, m.modified_name, first_m.id_msg AS id_first_msg,
+				first_m.subject AS first_subject, first_m.icon AS first_icon, first_m.poster_time AS first_poster_time,
 				first_mem.id_member AS first_id_member,
 				COALESCE(first_mem.real_name, first_m.poster_name) AS first_display_name,
 				COALESCE(first_mem.member_name, first_m.poster_name) AS first_member_name,
-				last_m.id_msg AS id_last_msg, last_m.poster_time AS last_poster_time,
-				last_mem.id_member AS last_id_member,
+				last_m.id_msg AS id_last_msg, last_m.poster_time AS last_poster_time, last_mem.id_member AS last_id_member,
 				COALESCE(last_mem.real_name, last_m.poster_name) AS last_display_name,
 				COALESCE(last_mem.member_name, last_m.poster_name) AS last_member_name,
 				last_m.icon AS last_icon, last_m.subject AS last_subject,
-				t.id_topic, t.is_sticky, t.locked, t.id_poll, t.num_replies,
-				t.num_views, t.num_likes,
+				t.id_topic, t.is_sticky, t.locked, t.id_poll, t.num_replies, t.num_views, t.num_likes,
 				b.id_board, b.name AS bname, c.id_cat, c.name AS cat_name
 			FROM {db_prefix}messages AS m
 				INNER JOIN {db_prefix}topics AS t ON (t.id_topic = m.id_topic)
@@ -353,19 +372,19 @@ class Search
 	/**
 	 * Did the user find any message at all?
 	 *
-	 * @param resource $messages_request holds a query result
+	 * @param AbstractResult $messages_request holds a query result
 	 *
 	 * @return bool
 	 */
 	public function noMessages($messages_request)
 	{
-		return $messages_request->num_rows() == 0;
+		return $messages_request->num_rows() === 0;
 	}
 
 	/**
 	 * Sets the query, calls the searchQuery method of the API in use
 	 *
-	 * @param \ElkArte\Search\API\Standard $searchAPI
+	 * @param Standard $searchAPI
 	 * @return array
 	 */
 	public function searchQuery($searchAPI)
@@ -410,12 +429,12 @@ class Search
 		{
 			foreach ($searchArray as $index => $value)
 			{
-				$orParts[$index] = array($value);
+				$orParts[$index] = [$value];
 			}
 		}
 
 		// Make sure the excluded words are in all or-branches.
-		foreach ($orParts as $orIndex => $andParts)
+		foreach (array_keys($orParts) as $orIndex)
 		{
 			foreach ($excludedWords as $word)
 			{
@@ -424,15 +443,15 @@ class Search
 		}
 
 		// Determine the or-branches and the fulltext search words.
-		foreach ($orParts as $orIndex => $andParts)
+		foreach (array_keys($orParts) as $orIndex)
 		{
-			$this->_searchWords[$orIndex] = array(
-				'indexed_words' => array(),
-				'words' => array(),
-				'subject_words' => array(),
-				'all_words' => array(),
-				'complex_words' => array(),
-			);
+			$this->_searchWords[$orIndex] = [
+				'indexed_words' => [],
+				'words' => [],
+				'subject_words' => [],
+				'all_words' => [],
+				'complex_words' => [],
+			];
 
 			$this->_searchAPI->setExcludedWords($excludedWords);
 
@@ -496,7 +515,9 @@ class Search
 	}
 
 	/**
-	 * @return array
+	 * Get the participants of the event.
+	 *
+	 * @return array The participants of the event.
 	 */
 	public function getParticipants()
 	{

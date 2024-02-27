@@ -17,8 +17,8 @@
 namespace ElkArte\Modules\Drafts;
 
 use ElkArte\EventManager;
-use ElkArte\Modules\AbstractModule;
 use ElkArte\Languages\Txt;
+use ElkArte\Modules\AbstractModule;
 
 /**
  * Class \ElkArte\Modules\Drafts\Display
@@ -27,22 +27,14 @@ use ElkArte\Languages\Txt;
  */
 class Display extends AbstractModule
 {
-	/**
-	 * Autosave switch
-	 *
-	 * @var bool
-	 */
+	/** @var bool Autosave switch  */
 	protected static $_autosave_enabled = false;
 
-	/**
-	 * Autosave frequency, default to 30 seconds
-	 *
-	 * @var int
-	 */
+	/** @var int Autosave frequency, default to 30 seconds */
 	protected static $_autosave_frequency = 30000;
 
 	/**
-	 * {@inheritdoc }
+	 * {@inheritDoc}
 	 */
 	public static function hooks(EventManager $eventsManager)
 	{
@@ -58,7 +50,7 @@ class Display extends AbstractModule
 			}
 
 			return [
-				array('prepare_context', array('\\ElkArte\\Modules\\Drafts\\Display', 'prepare_context'), array('use_quick_reply', 'editorOptions', 'board')),
+				['prepare_context', [Display::class, 'prepare_context'], ['use_quick_reply', 'editorOptions', 'board']],
 			];
 		}
 
@@ -119,18 +111,18 @@ class Display extends AbstractModule
 				$editorOptions['buttons'] = $editorOptions['buttons'] ?? [];
 				$editorOptions['hidden_fields'] = $editorOptions['hidden_fields'] ?? [];
 
-				$editorOptions['buttons'][] = array(
+				$editorOptions['buttons'][] = [
 					'name' => 'save_draft',
 					'value' => $txt['draft_save'],
 					'options' => 'onclick="return confirm(' . JavaScriptEscape($txt['draft_save_note']) . ') && submitThisOnce(this);" accesskey="d"',
-				);
+				];
 
-				$editorOptions['hidden_fields'][] = array(
+				$editorOptions['hidden_fields'][] = [
 					'name' => 'id_draft',
 					'value' => empty($context['id_draft']) ? 0 : $context['id_draft'],
-				);
+				];
 
-				loadJavascriptFile('drafts.plugin.js', array('defer' => true));
+				loadJavascriptFile('drafts.plugin.js', ['defer' => true]);
 			}
 		}
 	}

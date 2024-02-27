@@ -75,9 +75,14 @@ class DbTable extends Db
 		$this->editId = (int) $editId;
 	}
 
+	/**
+	 * Saves the data by either inserting a new row or updating an existing row.
+	 *
+	 * @return void
+	 */
 	public function save()
 	{
-		list ($insertValues, $insertVars) = $this->sanitizeVars();
+		[$insertValues, $insertVars] = $this->sanitizeVars();
 		$update = false;
 
 		// Everything is now set so is this a new row or an edit?

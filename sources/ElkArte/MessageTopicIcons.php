@@ -19,6 +19,7 @@ namespace ElkArte;
 class MessageTopicIcons extends ValuesContainer
 {
 	public const IMAGE_URL = 'images_url';
+
 	public const DEFAULT_URL = 'default_images_url';
 
 	/** @var bool Whether to check if the icon exists in the expected location */
@@ -41,7 +42,7 @@ class MessageTopicIcons extends ValuesContainer
 	 *
 	 * @param bool|false $icon_check
 	 * @param string $theme_dir
-	 * @param array topic icons to load in addition to default
+	 * @param array $custom topic icons to load in addition to default
 	 * @param string $default
 	 */
 	public function __construct($icon_check = false, $theme_dir = '', $custom = [], $default = 'xx')
@@ -77,9 +78,7 @@ class MessageTopicIcons extends ValuesContainer
 	private function _merge_all_icons()
 	{
 		// Merge in additional ones
-		$custom_icons = array_map(static function ($element) {
-			return $element['value'];
-		}, $this->_custom_icons);
+		$custom_icons = array_map(static fn($element) => $element['value'], $this->_custom_icons);
 
 		$this->_icons = array_merge($this->_icons, $custom_icons);
 	}
