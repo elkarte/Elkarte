@@ -10,7 +10,7 @@
 $.sceditor.plugins.initialLoad = function() {
 	var base = this,
 		editor,
-		MAX_RETRIES = 120;
+		MAX_RETRIES = 300;
 
 	var isEditorLoaded = function(selector, callback) {
 		var retries = 0;
