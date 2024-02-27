@@ -7,7 +7,7 @@
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * @version 1.1.9
+ * @version 1.1.10
  *
  */
 
@@ -129,7 +129,7 @@ class Emailpost_Controller extends Action_Controller
 			return pbe_emailError('error_' . ($email_message->message_type === 'p' ? 'pm_' : '') . 'not_find_entry', $email_message);
 
 		// The key received was not sent to this member ... how we love those email aggregators
-		if (strtolower($key_owner) !== $email_message->email['from'] && !$force)
+		if ((empty($key_owner) || strtolower($key_owner) !== $email_message->email['from']) && !$force)
 			return pbe_emailError('error_key_sender_match', $email_message);
 
 		// In maintenance mode, just log it for now

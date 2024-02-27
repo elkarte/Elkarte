@@ -792,11 +792,11 @@ class Html_2_BBC
 					case 'text-align':
 					case 'align':
 						if ($value === 'right')
-							$bbc = '[right]' . $value . '[/right]';
+							$bbc = '[right]' . $bbc . '[/right]';
 						elseif ($value === 'left')
-							$bbc = '[left]' . $value . '[/left]';
+							$bbc = '[left]' . $bbc . '[/left]';
 						elseif ($value === 'center')
-							$bbc = '[center]' . $value . '[/center]';
+							$bbc = '[center]' . $bbc . '[/center]';
 						break;
 				}
 			}
