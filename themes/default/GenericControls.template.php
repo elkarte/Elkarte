@@ -113,15 +113,15 @@ function template_control_richedit_buttons($editor_id)
 		<input type="button" name="preview" value="', $editor_context['labels']['preview_button'] ?? $txt['preview'], '" tabindex="', $context['tabindex']++, '" onclick="', $editor_context['preview_type'] == 2 ? 'return event.ctrlKey || previewControl();' : 'return submitThisOnce(this);', '" accesskey="p" />';
 	}
 
-	foreach ($editor_context['buttons'] as $button)
-	{
-		echo '
-		<input type="button" name="', $button['name'], '" value="', $button['value'], '" tabindex="', $context['tabindex']++, '" ', $button['options'], ' />';
-	}
-
 	foreach ($editor_context['hidden_fields'] as $hidden)
 	{
 		echo '
 		<input type="hidden" id="', $hidden['name'], '" name="', $hidden['name'], '" value="', $hidden['value'], '" />';
+	}
+
+	foreach ($editor_context['buttons'] as $button)
+	{
+		echo '
+		<input type="button" name="', $button['name'], '" value="', $button['value'], '" tabindex="', $context['tabindex']++, '" ', $button['options'], ' />';
 	}
 }

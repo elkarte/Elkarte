@@ -15,8 +15,8 @@
 }
 
 .atwho-view .cur {
-	color: var(--contrast_text);
-	background: var(--bbclinks_hover);
+	color: var(--emphasize_text);
+	background: var(--menu_button_active_2);
 }
 
 .atwho-view .cur small {
@@ -29,7 +29,6 @@
 
 .atwho-view .cur strong {
 	font-weight: bold;
-	color: var(--contrast_text);
 }
 
 .atwho-view ul {

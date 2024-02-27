@@ -2,7 +2,7 @@
 ------------------------------------------------------- */
 .action_admin .generic_list_wrapper .information {
 	border-color: var(--primary_border);
-	box-shadow: 0 1px 1px var(--opacity20), 0 2px 2px var(--opacity10);
+	box-shadow: var(--shadow-elevation-medium);
 }
 
 #admin_main_section, .quick_tasks, #mod_main_section,
@@ -12,7 +12,7 @@
 #new_group, #view_group, #admin_form_wrapper, .action_admin .generic_list_wrapper {
 	border-color: var(--primary_border);
 	background: var(--content_background);
-	box-shadow: 0 -1px 1px var(--opacity20), 0 -2px 2px var(--opacity10);
+	box-shadow: var(--shadow-elevation-medium);
 }
 
 #admin_content .content {
@@ -29,7 +29,7 @@
 
 #admin_newsletters .information {
 	border-color: var(--primary_border);
-	box-shadow: 0 1px 1px var(--opacity20), 0 2px 2px var(--opacity10);
+	box-shadow: var(--shadow-elevation-medium);
 }
 
 #news_lists .newspreview div {
@@ -53,7 +53,7 @@
 	border-top-color: var(--primary_border_top);
 	border-bottom-color: var(--primary_border_bottom);
 	background: var(--content_background);
-	box-shadow: 0 1px 1px var(--opacity30), 0 -1px 1px var(--opacity30)
+	box-shadow: var(--shadow-elevation-low);
 }
 
 #live_news div.content dl {
@@ -118,7 +118,7 @@ ul.package_section {
 
 #manage_boards .content > ul {
 	border-color: var(--primary_border);
-	box-shadow: 1px 1px 1px var(--opacity20), 2px 1px 1px var(--opacity10)
+	box-shadow: var(--shadow-elevation-medium);
 }
 
 #manage_boards ul li {
@@ -150,7 +150,7 @@ ul.package_section {
 #manage_maintenance div.content {
 	border-bottom-color: var(--primary_border_bottom);
 	background: none;
-	box-shadow: 0 1px 0 var(--box_shadow);
+	box-shadow: var(--shadow-elevation-low);
 }
 
 /* Styles for the manage membergroups.
@@ -176,7 +176,7 @@ ul.package_section {
 ------------------------------------------------- */
 #modcenter {
 	background: none repeat scroll 0 0 var(--content_background);
-	box-shadow: 1px 2px 3px var(--box_shadow);
+	box-shadow: var(--shadow-elevation-medium);
 }
 
 #modcenter .content, #modcenter .generic_list_wrapper {
@@ -190,7 +190,7 @@ ul.package_section {
 	border-top-color: var(--primary_border_top);
 	border-bottom-color: var(--primary_border_bottom);
 	background: var(--content_background);
-	box-shadow: 0 2px 2px var(--opacity50), 0 -1px 2px var(--opacity10);
+	box-shadow: var(--shadow-elevation-medium);
 }
 
 .moderation_notes li {
@@ -240,7 +240,7 @@ ul.package_section {
 
 /* This is the drag/drop placeholder, normally not visible */
 .ui-state-highlight {
-	border-color: var(--pure_green) !important;
+	border-color: var(--event) !important;
 	background-color: var(--content_background) !important;
 }
 
