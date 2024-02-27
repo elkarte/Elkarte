@@ -87,8 +87,8 @@ class ProfileInfo extends AbstractController
 
 		// What do we do, do you even know what you do?
 		$subActions = [
-			'buddies' => fn() => $this->action_profile_buddies(),
-			'recent' => fn() => $this->action_profile_recent(),
+			'buddies' => [$this, 'action_profile_buddies'],
+			'recent' => [$this, 'action_profile_recent'],
 			'summary' => ['controller' => Profile::class, 'function' => 'action_index'],
 		];
 
