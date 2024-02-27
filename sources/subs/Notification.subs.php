@@ -692,7 +692,7 @@ function fetchTopicNotifications($user_id, $topics, $type, $members_only)
 		SELECT
 			mem.id_member, mem.email_address, mem.notify_regularity, mem.notify_types, mem.notify_send_body, 
 			mem.lngfile, mem.warning, mem.id_group, mem.additional_groups, mem.id_post_group, mem.password_salt,
-			t.id_member_started,
+			t.id_member_started, t.id_last_msg,
 			b.member_groups, b.name, b.id_profile, b.id_board,
 			ln.id_topic, ln.sent
 		FROM {db_prefix}log_notify AS ln
@@ -735,6 +735,7 @@ function fetchTopicNotifications($user_id, $topics, $type, $members_only)
 				'id_profile_board' => (int) $row['id_profile'],
 				'id_board' =>  (int) $row['id_board'],
 				'id_topic' => (int) $row['id_topic'],
+				'last_id' => (int) $row['id_last_msg'],
 				'sent' => (int) $row['sent'],
 			];
 
