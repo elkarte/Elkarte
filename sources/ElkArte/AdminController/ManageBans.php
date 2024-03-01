@@ -17,8 +17,8 @@ use ElkArte\AbstractController;
 use ElkArte\Action;
 use ElkArte\Errors\ErrorContext;
 use ElkArte\Exceptions\Exception;
+use ElkArte\Helper\Util;
 use ElkArte\Languages\Txt;
-use ElkArte\Util;
 
 /**
  * This class controls execution for admin actions in the bans area
@@ -561,9 +561,9 @@ class ManageBans extends AbstractController
 			);
 			$ban_info['db_expiration'] = $ban_info['expiration']['status'] === 'never' ? 'NULL' : ($ban_info['expiration']['status'] == 'one_day' ? time() + 24 * 60 * 60 * $ban_info['expire_date'] : 0);
 			$ban_info['full_ban'] = empty($this->_req->post->full_ban) ? 0 : 1;
-			$ban_info['reason'] = $this->_req->getPost('reason', '\\ElkArte\\Util::htmlspecialchars[ENT_QUOTES]', '');
-			$ban_info['name'] = $this->_req->getPost('ban_name', '\\ElkArte\\Util::htmlspecialchars[ENT_QUOTES]', '');
-			$ban_info['notes'] = $this->_req->getPost('notes', '\\ElkArte\\Util::htmlspecialchars[ENT_QUOTES]', '');
+			$ban_info['reason'] = $this->_req->getPost('reason', '\\ElkArte\\Helper\\Util::htmlspecialchars[ENT_QUOTES]', '');
+			$ban_info['name'] = $this->_req->getPost('ban_name', '\\ElkArte\\Helper\\Util::htmlspecialchars[ENT_QUOTES]', '');
+			$ban_info['notes'] = $this->_req->getPost('notes', '\\ElkArte\\Helper\\Util::htmlspecialchars[ENT_QUOTES]', '');
 			$ban_info['notes'] = str_replace(array("\r", "\n", '  '), array('', '<br />', '&nbsp; '), $ban_info['notes']);
 			$ban_info['cannot']['access'] = empty($ban_info['full_ban']) ? 0 : 1;
 			$ban_info['cannot']['post'] = !empty($ban_info['full_ban']) || empty($this->_req->post->cannot_post) ? 0 : 1;

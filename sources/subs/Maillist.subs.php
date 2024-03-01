@@ -11,8 +11,8 @@
  *
  */
 
+use ElkArte\Helper\Util;
 use ElkArte\User;
-use ElkArte\Util;
 
 /**
  * Loads failed emails from the database

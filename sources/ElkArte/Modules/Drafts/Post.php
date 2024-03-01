@@ -19,11 +19,11 @@ namespace ElkArte\Modules\Drafts;
 use ElkArte\Errors\ErrorContext;
 use ElkArte\EventManager;
 use ElkArte\Exceptions\ControllerRedirectException;
-use ElkArte\HttpReq;
+use ElkArte\Helper\HttpReq;
+use ElkArte\Helper\Util;
 use ElkArte\Languages\Txt;
 use ElkArte\Modules\AbstractModule;
 use ElkArte\Themes\TemplateLayers;
-use ElkArte\Util;
 
 /**
  * Class \ElkArte\Modules\Drafts\Post
@@ -340,7 +340,7 @@ class Post extends AbstractModule
 
 		// Prepare and clean the data, load the draft array
 		$icon = $req->getPost('icon', 'trim|strval', 'xx');
-		$subject = $req->getPost('subject', '\\ElkArte\\Util::htmlspecialchars', '');
+		$subject = $req->getPost('subject', '\\ElkArte\\Helper\\Util::htmlspecialchars', '');
 		$message = $req->getPost('message', 'trim', '');
 
 		$draft = [

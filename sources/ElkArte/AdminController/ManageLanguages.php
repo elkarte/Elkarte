@@ -19,12 +19,12 @@ namespace ElkArte\AdminController;
 use ElkArte\AbstractController;
 use ElkArte\Action;
 use ElkArte\Exceptions\Exception;
-use ElkArte\FileFunctions;
+use ElkArte\Helper\FileFunctions;
+use ElkArte\Helper\Util;
 use ElkArte\Languages\Editor as LangEditor;
 use ElkArte\Languages\Loader as LangLoader;
 use ElkArte\Languages\Txt;
 use ElkArte\SettingsForm\SettingsForm;
-use ElkArte\Util;
 
 /**
  * Manage languages controller class.

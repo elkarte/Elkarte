@@ -11,7 +11,7 @@
  *
  */
 
-use ElkArte\Util;
+use ElkArte\Helper\Util;
 use ElkArte\XmlArray;
 
 /**

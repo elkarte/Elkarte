@@ -17,12 +17,12 @@
 namespace ElkArte\Search;
 
 use ElkArte\Database\QueryInterface;
-use ElkArte\DataValidator;
 use ElkArte\Exceptions\Exception;
-use ElkArte\HttpReq;
+use ElkArte\Helper\DataValidator;
+use ElkArte\Helper\HttpReq;
+use ElkArte\Helper\Util;
+use ElkArte\Helper\ValuesContainer;
 use ElkArte\User;
-use ElkArte\Util;
-use ElkArte\ValuesContainer;
 
 /**
  * Actually do the searches
@@ -53,7 +53,7 @@ class SearchParams extends ValuesContainer
 	/** @var QueryInterface|null */
 	protected $_db;
 
-	/** @var \Elkarte\HttpReq HttpReq instance */
+	/** @var \ElkArte\Helper\HttpReq HttpReq instance */
 	protected $_req;
 
 	/**

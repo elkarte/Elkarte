@@ -19,9 +19,9 @@ namespace ElkArte\AdminController;
 use ElkArte\AbstractController;
 use ElkArte\Action;
 use ElkArte\Cache\Cache;
+use ElkArte\Helper\Util;
 use ElkArte\Languages\Txt;
 use ElkArte\User;
-use ElkArte\Util;
 
 /**
  * ManageMembers controller deals with members administration, approval,

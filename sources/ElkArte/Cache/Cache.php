@@ -17,8 +17,8 @@
 namespace ElkArte\Cache;
 
 use ElkArte\Debug;
-use ElkArte\FileFunctions;
-use ElkArte\Util;
+use ElkArte\Helper\FileFunctions;
+use ElkArte\Helper\Util;
 
 /**
  * Class Cache - Methods that deal with getting and setting cache values.

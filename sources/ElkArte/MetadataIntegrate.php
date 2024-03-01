@@ -13,6 +13,8 @@
 
 namespace ElkArte;
 
+use ElkArte\Helper\Util;
+
 /**
  * Class \ElkArte\MetadataIntegrate
  *

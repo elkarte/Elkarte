@@ -17,8 +17,8 @@
 
 use ElkArte\BoardsTree;
 use ElkArte\Cache\Cache;
+use ElkArte\Helper\Util;
 use ElkArte\User;
-use ElkArte\Util;
 
 /**
  * Mark a board or multiple boards read.

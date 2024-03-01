@@ -15,9 +15,9 @@
  *
  */
 
+use ElkArte\Helper\Util;
 use ElkArte\Http\Headers;
 use ElkArte\Languages\Txt;
-use ElkArte\Util;
 
 // Start things rolling by getting the forum alive...
 if (!file_exists(__DIR__ . '/bootstrap.php'))

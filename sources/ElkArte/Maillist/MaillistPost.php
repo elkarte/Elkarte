@@ -284,7 +284,7 @@ class MaillistPost extends AbstractController
 		}
 
 		// The key received was not sent to this member ... how we love those email aggregators
-		if (strtolower($key_owner) !== $email_message->email['from'] && !$force)
+		if ((empty($key_owner) || strtolower($key_owner) !== $email_message->email['from']) && !$force)
 		{
 			pbe_emailError('error_key_sender_match', $email_message);
 			return 'error_key_sender_match';

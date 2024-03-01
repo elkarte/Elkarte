@@ -13,7 +13,7 @@
 
 namespace ElkArte\Converters;
 
-use ElkArte\Util;
+use ElkArte\Helper\Util;
 
 /**
  * Converts HTML to Markdown text, some constructs based on

@@ -18,7 +18,7 @@ namespace ElkArte\AdminController;
 
 use ElkArte\AbstractController;
 use ElkArte\Cache\Cache;
-use ElkArte\FileFunctions;
+use ElkArte\Helper\FileFunctions;
 use ElkArte\Hooks;
 use ElkArte\Languages\Txt;
 use FilesystemIterator;

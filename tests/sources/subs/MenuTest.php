@@ -1,6 +1,6 @@
 <?php
 
-use ElkArte\HttpReq;
+use ElkArte\Helper\HttpReq;
 use ElkArte\Menu\Menu;
 use ElkArte\Menu\MenuArea;
 use ElkArte\Menu\MenuSection;

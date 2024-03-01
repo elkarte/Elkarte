@@ -19,6 +19,8 @@ namespace ElkArte\Controller;
 use ElkArte\AbstractController;
 use ElkArte\Cache\Cache;
 use ElkArte\Exceptions\Exception;
+use ElkArte\Helper\Util;
+use ElkArte\Helper\ValuesContainer;
 use ElkArte\Languages\Txt;
 use ElkArte\MembersList;
 use ElkArte\MessagesCallback\BodyParser\Compact;
@@ -28,8 +30,6 @@ use ElkArte\MessageTopicIcons;
 use ElkArte\Search\SearchApiWrapper;
 use ElkArte\Search\SearchParams;
 use ElkArte\Search\WeightFactors;
-use ElkArte\Util;
-use ElkArte\ValuesContainer;
 use ElkArte\VerificationControls\VerificationControlsIntegrate;
 
 /**

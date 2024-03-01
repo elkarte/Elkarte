@@ -17,8 +17,8 @@
 namespace ElkArte\AdminController;
 
 use ElkArte\AbstractController;
+use ElkArte\Helper\Util;
 use ElkArte\Languages\Txt;
-use ElkArte\Util;
 
 /**
  * Admin and moderation log controller.

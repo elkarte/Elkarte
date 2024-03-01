@@ -1,14 +1,14 @@
 <?php
 
 use ElkArte\Cache\Cache;
-use ElkArte\HttpReq;
+use ElkArte\Helper\HttpReq;
+use ElkArte\Helper\ValuesContainer;
 use ElkArte\Search\Search;
 use ElkArte\Search\SearchApiWrapper;
 use ElkArte\Search\SearchParams;
 use ElkArte\Search\WeightFactors;
 use ElkArte\User;
 use ElkArte\UserSettingsLoader;
-use ElkArte\ValuesContainer;
 use PHPUnit\Framework\TestCase;
 
 /**

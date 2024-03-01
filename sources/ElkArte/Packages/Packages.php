@@ -23,10 +23,10 @@ use ElkArte\Cache\Cache;
 use ElkArte\Database\AbstractTable;
 use ElkArte\EventManager;
 use ElkArte\Exceptions\Exception;
-use ElkArte\FileFunctions;
+use ElkArte\Helper\FileFunctions;
+use ElkArte\Helper\Util;
 use ElkArte\Languages\Txt;
 use ElkArte\User;
-use ElkArte\Util;
 use FilesystemIterator;
 use UnexpectedValueException;
 
@@ -63,7 +63,7 @@ class Packages extends AbstractController
 	/** @var bool If the package is installed, previously or not */
 	private $_is_installed;
 
-	/** @var FileFunctions */
+	/** @var \ElkArte\Helper\FileFunctions */
 	private $fileFunc;
 
 	/**
@@ -1224,9 +1224,9 @@ class Packages extends AbstractController
 			checkSession();
 
 			updateSettings([
-				'package_server' => $this->_req->getPost('pack_server', 'trim|\\ElkArte\\Util::htmlspecialchars'),
-				'package_port' => $this->_req->getPost('pack_port', 'trim|\\ElkArte\\Util::htmlspecialchars'),
-				'package_username' => $this->_req->getPost('pack_user', 'trim|\\ElkArte\\Util::htmlspecialchars'),
+				'package_server' => $this->_req->getPost('pack_server', 'trim|\\ElkArte\\Helper\\Util::htmlspecialchars'),
+				'package_port' => $this->_req->getPost('pack_port', 'trim|\\ElkArte\\Helper\\Util::htmlspecialchars'),
+				'package_username' => $this->_req->getPost('pack_user', 'trim|\\ElkArte\\Helper\\Util::htmlspecialchars'),
 				'package_make_backups' => !empty($this->_req->post->package_make_backups),
 				'package_make_full_backups' => !empty($this->_req->post->package_make_full_backups)
 			]);

@@ -15,9 +15,9 @@
  */
 
 use ElkArte\Cache\Cache;
+use ElkArte\Helper\Util;
 use ElkArte\Languages\Txt;
 use ElkArte\User;
-use ElkArte\Util;
 
 /**
  * Delete one of more membergroups.

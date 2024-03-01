@@ -16,8 +16,8 @@
 
 use BBC\ParserWrapper;
 use ElkArte\Cache\Cache;
+use ElkArte\Helper\Util;
 use ElkArte\User;
-use ElkArte\Util;
 
 /**
  * How many open reports do we have?

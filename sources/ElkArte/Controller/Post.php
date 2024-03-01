@@ -22,16 +22,16 @@ use BBC\ParserWrapper;
 use BBC\PreparseCode;
 use ElkArte\AbstractController;
 use ElkArte\Cache\Cache;
-use ElkArte\DataValidator;
 use ElkArte\Errors\ErrorContext;
 use ElkArte\Exceptions\ControllerRedirectException;
 use ElkArte\Exceptions\Exception;
+use ElkArte\Helper\DataValidator;
+use ElkArte\Helper\Util;
 use ElkArte\Languages\Txt;
 use ElkArte\Notifications\Notifications;
 use ElkArte\Notifications\NotificationsTask;
 use ElkArte\Themes\TemplateLayers;
 use ElkArte\User;
-use ElkArte\Util;
 
 /**
  * Everything related to posting new replies and topics and modifications of them

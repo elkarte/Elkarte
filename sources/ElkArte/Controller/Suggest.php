@@ -17,8 +17,8 @@
 namespace ElkArte\Controller;
 
 use ElkArte\AbstractController;
-use ElkArte\FileFunctions;
-use ElkArte\SuggestMember;
+use ElkArte\Helper\FileFunctions;
+use ElkArte\Helper\SuggestMember;
 
 /**
  * Suggest Controller

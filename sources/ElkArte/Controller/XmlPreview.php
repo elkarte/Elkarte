@@ -15,8 +15,8 @@ namespace ElkArte\Controller;
 use BBC\ParserWrapper;
 use ElkArte\AbstractController;
 use ElkArte\Action;
+use ElkArte\Helper\Util;
 use ElkArte\Languages\Txt;
-use ElkArte\Util;
 
 /**
  * Handles requests for previews of an item, in an ajax enabled template.

@@ -16,10 +16,10 @@ namespace ElkArte\VerificationControls\VerificationControl;
 use BBC\ParserWrapper;
 use ElkArte\Cache\Cache;
 use ElkArte\Exceptions\Exception;
-use ElkArte\HttpReq;
+use ElkArte\Helper\HttpReq;
+use ElkArte\Helper\Util;
+use ElkArte\Helper\ValuesContainer;
 use ElkArte\User;
-use ElkArte\Util;
-use ElkArte\ValuesContainer;
 
 /**
  * Class to manage, prepare, show, and validate question -> answer verifications
@@ -41,10 +41,10 @@ class Questions implements ControlInterface
 	/** @var int[] Array of question id's that they provided a wrong answer to */
 	private $_incorrectQuestions;
 
-	/** @var null|\ElkArte\ValuesContainer Filters to use to load the questions */
+	/** @var null|\ElkArte\Helper\ValuesContainer Filters to use to load the questions */
 	private $_filter;
 
-	/** @var \ElkArte\HttpReq Form variables */
+	/** @var \ElkArte\Helper\HttpReq Form variables */
 	private $_req;
 
 	/**

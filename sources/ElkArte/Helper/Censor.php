@@ -15,7 +15,7 @@
  *
  */
 
-namespace ElkArte;
+namespace ElkArte\Helper;
 
 /**
  * Class Censor

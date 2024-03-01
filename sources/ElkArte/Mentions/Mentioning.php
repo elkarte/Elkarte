@@ -15,7 +15,7 @@ namespace ElkArte\Mentions;
 
 use ElkArte\AbstractModel;
 use ElkArte\Database\QueryInterface;
-use ElkArte\DataValidator;
+use ElkArte\Helper\DataValidator;
 use ElkArte\Languages\Txt;
 use ElkArte\Mentions\MentionType\NotificationInterface;
 

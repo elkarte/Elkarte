@@ -14,6 +14,10 @@
 
 namespace ElkArte;
 
+use ElkArte\Helper\TokenHash;
+use ElkArte\Helper\Util;
+use ElkArte\Helper\ValuesContainerReadOnly;
+
 /**
  * This class holds all the data belonging to a certain member.
  */

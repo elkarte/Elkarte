@@ -18,7 +18,7 @@
 
 use ElkArte\Controller\ScheduledTasks;
 use ElkArte\EventManager;
-use ElkArte\HttpReq;
+use ElkArte\Helper\HttpReq;
 use ElkArte\User;
 
 // Bootstrap the system

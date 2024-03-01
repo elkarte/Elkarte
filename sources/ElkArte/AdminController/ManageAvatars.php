@@ -15,9 +15,9 @@ namespace ElkArte\AdminController;
 
 use ElkArte\AbstractController;
 use ElkArte\Action;
-use ElkArte\FileFunctions;
 use ElkArte\Graphics\Manipulators\Gd2;
 use ElkArte\Graphics\Manipulators\ImageMagick;
+use ElkArte\Helper\FileFunctions;
 use ElkArte\SettingsForm\SettingsForm;
 
 /**

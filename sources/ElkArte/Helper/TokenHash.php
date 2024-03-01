@@ -12,7 +12,9 @@
  *
  */
 
-namespace ElkArte;
+namespace ElkArte\Helper;
+
+use ElkArte\Errors;
 
 /**
  * Class TokenHash

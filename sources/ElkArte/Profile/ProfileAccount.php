@@ -256,7 +256,7 @@ class ProfileAccount extends AbstractController
 			checkSession();
 
 			// There must be a reason, and use of flowery words is allowed.
-			$warn_reason = $this->_req->getPost('warn_reason', 'trim|\\ElkArte\\Util::htmlspecialchars', '');
+			$warn_reason = $this->_req->getPost('warn_reason', 'trim|\\ElkArte\\Helper\\Util::htmlspecialchars', '');
 			if ($warn_reason === '' && !$context['user']['is_owner'])
 			{
 				$this->_issueErrors[] = 'warning_no_reason';
@@ -330,7 +330,7 @@ class ProfileAccount extends AbstractController
 	 */
 	private function _issue_warning_pm()
 	{
-		global $context;
+		global $context, $modSettings;
 
 		$id_notice = 0;
 		if (!empty($this->_req->post->warn_notify) && empty($this->_issueErrors))
@@ -351,6 +351,9 @@ class ProfileAccount extends AbstractController
 					'name' => $context['forum_name'],
 					'username' => $context['forum_name'],
 				];
+
+				// No sense in sending a PbE
+				$modSettings['maillist_enabled'] = 0;
 				sendpm(['to' => [$this->_memID], 'bcc' => []], $warn_sub, $warn_body, false, $from);
 
 				// Log the notice.
@@ -387,7 +390,7 @@ class ProfileAccount extends AbstractController
 			}
 
 			// Try to remember some bits.
-			$context['preview_subject'] = $this->_req->getPost('warn_sub', 'trim|\\ElkArte\\Util::htmlspecialchars', '');
+			$context['preview_subject'] = $this->_req->getPost('warn_sub', 'trim|\\ElkArte\\Helper\\Util::htmlspecialchars', '');
 			$context['warning_data'] = [
 				'reason' => $this->_req->post->warn_reason,
 				'notify' => !empty($this->_req->post->warn_notify),

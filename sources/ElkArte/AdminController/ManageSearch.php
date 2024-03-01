@@ -19,11 +19,11 @@ namespace ElkArte\AdminController;
 
 use ElkArte\AbstractController;
 use ElkArte\Action;
-use ElkArte\FileFunctions;
+use ElkArte\Helper\FileFunctions;
+use ElkArte\Helper\Util;
 use ElkArte\Languages\Txt;
 use ElkArte\Search\SearchApiWrapper;
 use ElkArte\SettingsForm\SettingsForm;
-use ElkArte\Util;
 use Exception;
 use FilesystemIterator;
 use GlobIterator;

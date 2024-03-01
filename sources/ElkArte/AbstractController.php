@@ -13,6 +13,9 @@
 
 namespace ElkArte;
 
+use ElkArte\Helper\HttpReq;
+use ElkArte\Helper\ValuesContainer;
+
 /**
  * AbstractController class
  *
@@ -31,7 +34,7 @@ abstract class AbstractController
 	/** @var string The current hook. */
 	protected $_hook = '';
 
-	/** @var HttpReq Holds instance of \ElkArte\HttpReq object */
+	/** @var HttpReq Holds instance of \ElkArte\Helper\HttpReq object */
 	protected $_req;
 
 	/** @var ValuesContainer Holds instance of \ElkArte\User::$info object */

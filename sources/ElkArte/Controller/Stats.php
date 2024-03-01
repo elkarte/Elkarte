@@ -18,8 +18,8 @@ namespace ElkArte\Controller;
 
 use ElkArte\AbstractController;
 use ElkArte\Exceptions\Exception;
+use ElkArte\Helper\Util;
 use ElkArte\Languages\Txt;
-use Elkarte\Util;
 
 /**
  * Handles the calculation of forum statistics

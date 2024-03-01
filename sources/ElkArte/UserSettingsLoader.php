@@ -19,6 +19,8 @@ namespace ElkArte;
 use ElkArte\Cache\Cache;
 use ElkArte\Database\QueryInterface;
 use ElkArte\Exceptions\Exception;
+use ElkArte\Helper\ValuesContainer;
+use ElkArte\Helper\ValuesContainerReadOnly;
 
 /**
  * This class holds all the data belonging to a certain member.

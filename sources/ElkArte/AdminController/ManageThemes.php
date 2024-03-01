@@ -38,12 +38,12 @@ use ElkArte\AbstractController;
 use ElkArte\Action;
 use ElkArte\Cache\Cache;
 use ElkArte\Exceptions\Exception;
-use ElkArte\FileFunctions;
+use ElkArte\Helper\FileFunctions;
+use ElkArte\Helper\Util;
 use ElkArte\Languages\Txt;
 use ElkArte\Profile\Profile;
 use ElkArte\Themes\ThemeLoader;
 use ElkArte\User;
-use ElkArte\Util;
 use ElkArte\XmlArray;
 
 /**

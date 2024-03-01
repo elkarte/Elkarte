@@ -15,14 +15,14 @@ namespace ElkArte\Themes;
 
 use ElkArte\Cache\Cache;
 use ElkArte\ext\Composer\Autoload\ClassLoader;
-use ElkArte\FileFunctions;
+use ElkArte\Helper\FileFunctions;
+use ElkArte\Helper\HttpReq;
+use ElkArte\Helper\Util;
+use ElkArte\Helper\ValuesContainer;
 use ElkArte\Hooks;
-use ElkArte\HttpReq;
 use ElkArte\Languages\Txt;
 use ElkArte\User;
 use ElkArte\UserInfo;
-use ElkArte\Util;
-use ElkArte\ValuesContainer;
 
 /**
  * The ThemeLoader class is responsible for loading and initializing themes in ElkArte.

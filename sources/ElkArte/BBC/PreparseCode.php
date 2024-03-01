@@ -16,7 +16,7 @@
 
 namespace BBC;
 
-use ElkArte\TokenHash;
+use ElkArte\Helper\TokenHash;
 
 /**
  * Class PreparseCode

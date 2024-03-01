@@ -12,7 +12,7 @@
 
 namespace ElkArte\Http;
 
-use ElkArte\HttpReq;
+use ElkArte\Helper\HttpReq;
 
 /**
  * Class Headers

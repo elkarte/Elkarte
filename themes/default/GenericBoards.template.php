@@ -12,7 +12,7 @@
  *
  */
 
-use ElkArte\Util;
+use ElkArte\Helper\Util;
 
 /**
  * Helper function to subdivide the boards in a number of sets with

@@ -205,6 +205,6 @@ class PreparseMail extends BaseMail
 			$signature = '<hr />' . str_replace("\n", '<br />', $signature);
 		}
 
-		return $signature;
+		return $signature ?? '';
 	}
 }

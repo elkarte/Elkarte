@@ -17,7 +17,7 @@
 namespace ElkArte\Sessions\SessionHandler;
 
 use ElkArte\Database\QueryInterface;
-use ElkArte\ValuesContainer;
+use ElkArte\Helper\ValuesContainer;
 
 /**
  * Class DatabaseHandler

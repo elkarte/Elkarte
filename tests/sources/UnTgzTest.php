@@ -1,6 +1,6 @@
 <?php
 
-use ElkArte\UnTgz;
+use ElkArte\Helper\UnTgz;
 use PHPUnit\Framework\TestCase;
 
 class UnTgzTest extends TestCase

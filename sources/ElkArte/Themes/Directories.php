@@ -14,7 +14,7 @@
 
 namespace ElkArte\Themes;
 
-use ElkArte\FileFunctions;
+use ElkArte\Helper\FileFunctions;
 use Error;
 
 /**

@@ -18,14 +18,14 @@ namespace ElkArte\AdminController;
 
 use ElkArte\AbstractController;
 use ElkArte\Action;
-use ElkArte\FileFunctions;
+use ElkArte\Attachments\AttachmentsDirectory;
 use ElkArte\Graphics\Image;
 use ElkArte\Graphics\Manipulators\Gd2;
 use ElkArte\Graphics\Manipulators\ImageMagick;
-use ElkArte\SettingsForm\SettingsForm;
-use ElkArte\Util;
-use ElkArte\AttachmentsDirectory;
+use ElkArte\Helper\FileFunctions;
+use ElkArte\Helper\Util;
 use ElkArte\Languages\Loader;
+use ElkArte\SettingsForm\SettingsForm;
 use Exception;
 use FilesystemIterator;
 use UnexpectedValueException;
@@ -58,7 +58,7 @@ class ManageAttachments extends AbstractController
 	/** @var string Destination when transferring attachments */
 	public $to;
 
-	/** @var FileFunctions */
+	/** @var \ElkArte\Helper\FileFunctions */
 	public $file_functions;
 
 	/**
@@ -1358,7 +1358,7 @@ class ManageAttachments extends AbstractController
 	/**
 	 * Saves any changes or additions to the attachment paths
 	 *
-	 * @param AttachmentsDirectory $attachmentsDir
+	 * @param \AttachmentsDirectory $attachmentsDir
 	 * @return void
 	 */
 	private function _savePaths($attachmentsDir)
@@ -1499,7 +1499,7 @@ class ManageAttachments extends AbstractController
 	/**
 	 * Saves changes to the attachment base directory section
 	 *
-	 * @param AttachmentsDirectory $attachmentsDir
+	 * @param \AttachmentsDirectory $attachmentsDir
 	 * @return void
 	 */
 	private function _saveBasePaths($attachmentsDir)

@@ -19,12 +19,11 @@
 
 use BBC\ParserWrapper;
 use ElkArte\Cache\Cache;
+use ElkArte\Helper\Util;
+use ElkArte\Languages\Loader as LangLoader;
 use ElkArte\MessagesDelete;
 use ElkArte\Search\SearchApiWrapper;
-use ElkArte\Themes\ThemeLoader;
 use ElkArte\User;
-use ElkArte\Util;
-use ElkArte\Languages\Loader as LangLoader;
 
 /**
  * Removes the passed id_topic's checking for permissions.

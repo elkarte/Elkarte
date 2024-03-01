@@ -14,11 +14,10 @@
 namespace ElkArte\Mentions\MentionType;
 
 use ElkArte\Database\QueryInterface;
-use ElkArte\Exceptions\Exception;
+use ElkArte\Helper\ValuesContainer;
 use ElkArte\Languages\Txt;
 use ElkArte\Notifications\NotificationsTask;
 use ElkArte\UserInfo;
-use ElkArte\ValuesContainer;
 
 /**
  * Class AbstractNotificationMessage
@@ -31,7 +30,7 @@ abstract class AbstractNotificationMessage implements NotificationInterface
 	/** @var QueryInterface The database object */
 	protected $_db;
 
-	/** @var ValuesContainer The current user object */
+	/** @var \ElkArte\Helper\ValuesContainer The current user object */
 	protected $user;
 
 	/** @var NotificationsTask The \ElkArte\NotificationsTask in use */

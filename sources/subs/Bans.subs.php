@@ -15,9 +15,9 @@
  */
 
 use ElkArte\Errors\ErrorContext;
-use ElkArte\MembersList;
+use ElkArte\Helper\Util;
 use ElkArte\Languages\Txt;
-use ElkArte\Util;
+use ElkArte\MembersList;
 
 /**
  * Saves one or more ban triggers into a ban item: according to the suggestions

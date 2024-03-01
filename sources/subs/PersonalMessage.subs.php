@@ -19,11 +19,11 @@
  */
 
 use ElkArte\Cache\Cache;
+use ElkArte\Helper\Util;
 use ElkArte\Languages\Txt;
 use ElkArte\Mail\BuildMail;
 use ElkArte\Mail\PreparseMail;
 use ElkArte\User;
-use ElkArte\Util;
 
 /**
  * Loads information about the users personal message limit.

@@ -18,8 +18,8 @@ namespace ElkArte\Profile;
 
 use ElkArte\AbstractController;
 use ElkArte\Exceptions\Exception;
+use ElkArte\Helper\Util;
 use ElkArte\Languages\Txt;
-use ElkArte\Util;
 
 /**
  * This class handles the paid subscriptions on a user's profile.

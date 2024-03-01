@@ -13,7 +13,9 @@
  *
  */
 
-namespace ElkArte;
+namespace ElkArte\Helper;
+
+use ElkArte\AbstractModel;
 
 /**
  * Constructs a page list.

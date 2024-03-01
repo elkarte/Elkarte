@@ -27,6 +27,8 @@ use ElkArte\EventManager;
 use ElkArte\Exceptions\ControllerRedirectException;
 use ElkArte\Exceptions\Exception;
 use ElkArte\Exceptions\PmErrorException;
+use ElkArte\Helper\Util;
+use ElkArte\Helper\ValuesContainer;
 use ElkArte\Languages\Loader;
 use ElkArte\Languages\Txt;
 use ElkArte\MembersList;
@@ -36,8 +38,6 @@ use ElkArte\Profile\Profile;
 use ElkArte\Profile\ProfileFields;
 use ElkArte\Profile\ProfileOptions;
 use ElkArte\User;
-use ElkArte\Util;
-use ElkArte\ValuesContainer;
 use ElkArte\VerificationControls\VerificationControlsIntegrate;
 
 /**

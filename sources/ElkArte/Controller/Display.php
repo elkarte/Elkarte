@@ -18,14 +18,14 @@ namespace ElkArte\Controller;
 
 use ElkArte\AbstractController;
 use ElkArte\Exceptions\Exception;
+use ElkArte\Helper\Util;
+use ElkArte\Helper\ValuesContainer;
 use ElkArte\MembersList;
 use ElkArte\MessagesCallback\BodyParser\Normal;
 use ElkArte\MessagesCallback\DisplayRenderer;
 use ElkArte\MessagesDelete;
 use ElkArte\MessageTopicIcons;
 use ElkArte\User;
-use ElkArte\Util;
-use ElkArte\ValuesContainer;
 
 /**
  * This controller is the most important and probably most accessed of all.

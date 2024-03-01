@@ -17,11 +17,11 @@
 namespace ElkArte\Controller;
 
 use ElkArte\Exceptions\Exception;
-use ElkArte\FileFunctions;
 use ElkArte\Graphics\Image;
-use ElkArte\HttpReq;
+use ElkArte\Helper\FileFunctions;
+use ElkArte\Helper\HttpReq;
+use ElkArte\Helper\TokenHash;
 use ElkArte\Languages\Txt;
-use ElkArte\TokenHash;
 
 /**
  * Everything to do with avatar handling / processing
@@ -34,7 +34,7 @@ use ElkArte\TokenHash;
  */
 class Avatars
 {
-	/** @var HttpReq */
+	/** @var \ElkArte\Helper\HttpReq */
 	private $req;
 
 	/** @var FileFunctions */

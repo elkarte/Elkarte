@@ -15,8 +15,8 @@ namespace ElkArte\Controller;
 
 use BBC\ParserWrapper;
 use ElkArte\Exceptions\Exception;
+use ElkArte\Helper\Util;
 use ElkArte\Languages\Txt;
-use ElkArte\Util;
 
 /**
  * Draft controller.

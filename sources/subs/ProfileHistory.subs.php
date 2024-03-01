@@ -15,7 +15,7 @@
  */
 
 use BBC\ParserWrapper;
-use ElkArte\Util;
+use ElkArte\Helper\Util;
 
 /**
  * Get the number of user errors.

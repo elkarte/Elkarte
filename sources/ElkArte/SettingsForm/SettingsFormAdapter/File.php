@@ -16,8 +16,8 @@
 
 namespace ElkArte\SettingsForm\SettingsFormAdapter;
 
-use ElkArte\FileFunctions;
-use ElkArte\Util;
+use ElkArte\Helper\FileFunctions;
+use ElkArte\Helper\Util;
 
 /**
  * Class File

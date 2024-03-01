@@ -13,8 +13,8 @@
 
 namespace ElkArte\Mentions\MentionType;
 
+use ElkArte\Helper\Util;
 use ElkArte\Languages\Txt;
-use ElkArte\Util;
 
 /**
  * Class AbstractEventBoardAccess

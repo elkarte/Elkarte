@@ -19,10 +19,10 @@ use BBC\ParserWrapper;
 use ElkArte\Cache\Cache;
 use ElkArte\Controller\Poll;
 use ElkArte\EventManager;
+use ElkArte\Helper\Util;
 use ElkArte\MembersList;
 use ElkArte\MessageTopicIcons;
 use ElkArte\User;
-use ElkArte\Util;
 
 /**
  * Set this to one of three values depending on what you want to happen in the case of a fatal error.

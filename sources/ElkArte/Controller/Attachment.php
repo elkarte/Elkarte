@@ -18,15 +18,15 @@ namespace ElkArte\Controller;
 
 use ElkArte\AbstractController;
 use ElkArte\Action;
-use ElkArte\AttachmentsDirectory;
+use ElkArte\Attachments\AttachmentsDirectory;
+use ElkArte\Attachments\TemporaryAttachmentsList;
 use ElkArte\Errors\AttachmentErrorContext;
 use ElkArte\Exceptions\Exception;
-use ElkArte\FileFunctions;
 use ElkArte\Graphics\Image;
 use ElkArte\Graphics\TextImage;
+use ElkArte\Helper\FileFunctions;
 use ElkArte\Http\Headers;
 use ElkArte\Languages\Txt;
-use ElkArte\TemporaryAttachmentsList;
 use ElkArte\Themes\ThemeLoader;
 use ElkArte\User;
 

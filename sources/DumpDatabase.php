@@ -14,15 +14,15 @@
  *
  */
 
+use ElkArte\Helper\Util;
 use ElkArte\Http\Headers;
-use ElkArte\Util;
 
 /**
  * Dumps the database.
  *
  * What it does:
  *
- * - It writes all of the database to standard output.
+ * - It writes all the database to standard output.
  * - It uses gzip compression if compress is set in the URL/post data.
  * - It may possibly time out, and mess up badly if you were relying on it. :P
  * - The data dumped depends on whether "struct" and "data" are passed.
@@ -167,7 +167,7 @@ function DumpDatabase2()
 			{
 				@apache_reset_timeout();
 			}
-			elseif (!empty($time_limit) && (((int) $start_time + (int) $time_limit - 20) > time()))
+			elseif (!empty($time_limit) && (($start_time + (int) $time_limit - 20) > time()))
 			{
 				$start_time = time();
 				detectServer()->setTimeLimit(150);
@@ -184,6 +184,7 @@ function DumpDatabase2()
 					$crlf;
 				$first_round = false;
 			}
+
 			$db_chunks .= $get_rows;
 			$current_used_memory += Util::strlen($db_chunks);
 
@@ -199,6 +200,7 @@ function DumpDatabase2()
 				unset($db_backup);
 				$db_backup = '';
 			}
+
 			$close_table = true;
 		}
 

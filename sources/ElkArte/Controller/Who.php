@@ -19,9 +19,9 @@ namespace ElkArte\Controller;
 
 use ElkArte\AbstractController;
 use ElkArte\Exceptions\Exception;
+use ElkArte\Helper\Util;
 use ElkArte\Languages\Txt;
 use ElkArte\MembersList;
-use ElkArte\Util;
 
 /**
  * I woke up in a Soho doorway A policeman knew my name He said "You can go sleep at home

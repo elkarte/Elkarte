@@ -13,20 +13,17 @@
  */
 
 use BBC\PreparseCode;
-use ElkArte\AttachmentsDirectory;
 use ElkArte\Cache\Cache;
 use ElkArte\Converters\Html2BBC;
 use ElkArte\Converters\Html2Md;
+use ElkArte\Helper\Util;
 use ElkArte\Languages\Txt;
 use ElkArte\Mail\PreparseMail;
-use ElkArte\Maillist\EmailParse;
 use ElkArte\Maillist\EmailFormat;
+use ElkArte\Maillist\EmailParse;
 use ElkArte\MembersList;
 use ElkArte\Notifications\Notifications;
 use ElkArte\Notifications\NotificationsTask;
-use ElkArte\TemporaryAttachment;
-use ElkArte\TemporaryAttachmentsList;
-use ElkArte\Util;
 
 /**
  * Converts text / HTML to BBC

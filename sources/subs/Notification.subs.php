@@ -11,12 +11,12 @@
  *
  */
 
+use ElkArte\Helper\TokenHash;
+use ElkArte\Helper\Util;
 use ElkArte\Languages\Loader;
 use ElkArte\Notifications\Notifications;
 use ElkArte\Notifications\PostNotifications;
-use ElkArte\TokenHash;
 use ElkArte\User;
-use ElkArte\Util;
 
 /**
  * Sends a notification to members who have elected to receive emails

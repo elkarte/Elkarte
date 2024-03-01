@@ -11,8 +11,9 @@
  *
  */
 
-namespace ElkArte;
+namespace ElkArte\Helper;
 
+use ElkArte\Exceptions\Exception;
 use ElkArte\Languages\Txt;
 
 /**
@@ -103,7 +104,7 @@ class UnZip
 		// This function sorta needs gzinflate!
 		if (!function_exists('gzinflate'))
 		{
-			throw new Exceptions\Exception('package_no_zlib', 'critical');
+			throw new Exception('package_no_zlib', 'critical');
 		}
 
 		// Make sure we have this loaded.

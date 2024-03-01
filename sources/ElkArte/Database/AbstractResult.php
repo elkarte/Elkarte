@@ -17,7 +17,7 @@
 
 namespace ElkArte\Database;
 
-use ElkArte\ValuesContainer;
+use ElkArte\Helper\ValuesContainer;
 
 /**
  * Abstract database class, implements database to control functions

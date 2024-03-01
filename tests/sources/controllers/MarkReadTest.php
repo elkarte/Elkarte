@@ -9,7 +9,7 @@
 
 use ElkArte\Controller\Markasread;
 use ElkArte\EventManager;
-use ElkArte\HttpReq;
+use ElkArte\Helper\HttpReq;
 use ElkArte\User;
 use tests\ElkArteCommonSetupTest;
 

@@ -18,9 +18,9 @@ namespace ElkArte\AdminController;
 
 use ElkArte\AbstractController;
 use ElkArte\Action;
-use ElkArte\SettingsForm\SettingsForm;
+use ElkArte\Helper\Util;
 use ElkArte\Languages\Txt;
-use ElkArte\Util;
+use ElkArte\SettingsForm\SettingsForm;
 
 /**
  * This class controls execution for actions in the manage calendar area

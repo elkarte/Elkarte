@@ -15,12 +15,12 @@
 namespace ElkArte\Packages;
 
 use ElkArte\AbstractModel;
-use ElkArte\FileFunctions;
+use ElkArte\Helper\FileFunctions;
 use ElkArte\XmlArray;
 
 class PackageParser extends AbstractModel
 {
-	/** @var FileFunctions */
+	/** @var \ElkArte\Helper\FileFunctions */
 	public $fileFunc;
 
 	/** @var array the results of our efforts */

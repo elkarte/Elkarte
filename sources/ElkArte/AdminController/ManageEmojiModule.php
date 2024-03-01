@@ -13,10 +13,10 @@ namespace ElkArte\AdminController;
 
 use ElkArte\AbstractController;
 use ElkArte\Cache\Cache;
-use ElkArte\FileFunctions;
-use ElkArte\HttpReq;
+use ElkArte\Helper\FileFunctions;
+use ElkArte\Helper\HttpReq;
+use ElkArte\Helper\UnZip;
 use ElkArte\Languages\Txt;
-use ElkArte\UnZip;
 use FilesystemIterator;
 use RecursiveDirectoryIterator;
 use RecursiveIteratorIterator;
@@ -80,7 +80,7 @@ abstract class ManageEmojiModule extends AbstractController
 	/**
 	 * Unzips a selected Emoji set if it has not already been extracted
 	 *
-	 * @param \ElkArte\HttpReq $req
+	 * @param \ElkArte\Helper\HttpReq $req
 	 */
 	private static function unZipEmoji($req)
 	{

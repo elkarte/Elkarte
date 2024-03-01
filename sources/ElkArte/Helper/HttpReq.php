@@ -12,7 +12,7 @@
  *
  */
 
-namespace ElkArte;
+namespace ElkArte\Helper;
 
 /**
  * Class used to interact with super globals, POST, GET, SERVER, COOKIES, SESSION
@@ -25,7 +25,7 @@ namespace ElkArte;
  * - Fetch cleaned values with $instance->getPost('keyname', 'sanitation needs', 'default value')
  *     - $this->-req->getPost('filename', 'trim|strval', '');
  *     - $this->-req->getQuery('filename', 'intval', 0);
- *     - Can use rules as 'htmlspecialchars[ENT_COMPAT]', '\\ElkArte\\Util::htmlspecialchars[ENT_QUOTES]'
+ *     - Can use rules as 'htmlspecialchars[ENT_COMPAT]', '\\ElkArte\\Helper\\Util::htmlspecialchars[ENT_QUOTES]'
  */
 class HttpReq
 {
@@ -47,7 +47,7 @@ class HttpReq
 	/** @var object The returned SERVER values */
 	public $server;
 
-	/** @var HttpReq Sole private \ElkArte\HttpReq instance */
+	/** @var HttpReq Sole private \ElkArte\Helper\HttpReq instance */
 	private static $instance;
 
 	/** @var array Used to hold processed (sanitised) values */
@@ -235,7 +235,7 @@ class HttpReq
 	/**
 	 * Method to return a $_GET value
 	 *
-	 * - Uses any sanitize rule(s) that can be passed to the \ElkArte\DataValidator class
+	 * - Uses any sanitize rule(s) that can be passed to the \ElkArte\Helper\DataValidator class
 	 * - Returned value will be the sanitized value or null of the key is not in $_GET
 	 * - If you just want a value back access it directly as $req->query->{$name}
 	 *
@@ -261,7 +261,7 @@ class HttpReq
 	/**
 	 * Method to return a $_POST value
 	 *
-	 * - Uses any sanitize rule(s) that can be passed to the \ElkArte\DataValidator class
+	 * - Uses any sanitize rule(s) that can be passed to the \ElkArte\Helper\DataValidator class
 	 * - Returned value will be the sanitized value or null of the key is not in $_POST
 	 * - If you just want a value back access it directly as $req->post->{$name}
 	 *
@@ -287,7 +287,7 @@ class HttpReq
 	/**
 	 * Method to return a $_REQUEST value
 	 *
-	 * - Uses any sanitize rule(s) that can be passed to the \ElkArte\DataValidator class
+	 * - Uses any sanitize rule(s) that can be passed to the \ElkArte\Helper\DataValidator class
 	 * - Returned value will be the sanitized value or null if the key is not found in either $_GET
 	 * or $_POST (in that order).  Ideally you should know if something is in GET or POST and use
 	 * those get function directly.

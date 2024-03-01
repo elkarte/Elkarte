@@ -24,12 +24,12 @@ use ElkArte\Cache\Cache;
 use ElkArte\Controller\Likes;
 use ElkArte\EventManager;
 use ElkArte\Exceptions\Exception;
+use ElkArte\Helper\Util;
 use ElkArte\Languages\Txt;
 use ElkArte\Member;
 use ElkArte\MembersList;
 use ElkArte\Menu\Menu;
 use ElkArte\User;
-use ElkArte\Util;
 
 /**
  * Has the job of showing and editing people's profiles.

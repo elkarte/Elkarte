@@ -14,8 +14,8 @@
  *
  */
 
+use ElkArte\Helper\Util;
 use ElkArte\User;
-use ElkArte\Util;
 
 /**
  * Get the number of mod log entries.

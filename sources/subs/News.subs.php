@@ -15,7 +15,7 @@
  */
 
 use BBC\ParserWrapper;
-use ElkArte\Util;
+use ElkArte\Helper\Util;
 
 /**
  * Prepares an array of the forum news items

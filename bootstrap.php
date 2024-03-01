@@ -13,18 +13,18 @@
  * @version 2.0 dev
  */
 
-use ElkArte\Debug;
-use ElkArte\ext\Composer\Autoload\ClassLoader;
-use ElkArte\Hooks;
-use ElkArte\User;
-use ElkArte\TokenHash;
-use ElkArte\Errors\Errors;
-use ElkArte\MembersList;
-use ElkArte\Cache\Cache;
-use ElkArte\Themes\ThemeLoader;
-use ElkArte\Controller\Auth;
-use ElkArte\EventManager;
 use BBC\ParserWrapper;
+use ElkArte\Cache\Cache;
+use ElkArte\Controller\Auth;
+use ElkArte\Debug;
+use ElkArte\Errors\Errors;
+use ElkArte\EventManager;
+use ElkArte\ext\Composer\Autoload\ClassLoader;
+use ElkArte\Helper\TokenHash;
+use ElkArte\Hooks;
+use ElkArte\MembersList;
+use ElkArte\Themes\ThemeLoader;
+use ElkArte\User;
 
 /**
  * Class Bootstrap

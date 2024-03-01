@@ -17,7 +17,7 @@
 namespace ElkArte\Menu;
 
 use ElkArte\Exceptions\Exception;
-use ElkArte\HttpReq;
+use ElkArte\Helper\HttpReq;
 use ElkArte\User;
 
 /**
@@ -29,7 +29,7 @@ use ElkArte\User;
  */
 class Menu
 {
-	/** @var HttpReq */
+	/** @var \ElkArte\Helper\HttpReq */
 	protected $req;
 
 	/** @var array Will hold the created $context */

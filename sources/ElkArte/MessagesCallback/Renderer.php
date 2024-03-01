@@ -14,9 +14,9 @@
 
 namespace ElkArte\MessagesCallback;
 
+use ElkArte\Helper\ValuesContainer;
 use ElkArte\MembersList;
 use ElkArte\MessagesCallback\BodyParser\BodyParserInterface;
-use ElkArte\ValuesContainer;
 
 /**
  * Class Renderer
@@ -34,7 +34,7 @@ abstract class Renderer
 	/** @var Object The database object */
 	protected $_db;
 
-	/** @var ValuesContainer Some options */
+	/** @var \ElkArte\Helper\ValuesContainer Some options */
 	protected $_options;
 
 	/** @var int Position tracker, to know where we are into the request */
@@ -46,7 +46,7 @@ abstract class Renderer
 	/** @var array The current message being prepared */
 	protected $_this_message;
 
-	/** @var ValuesContainer Index mapping, to normalize certain indexes across requests */
+	/** @var \ElkArte\Helper\ValuesContainer Index mapping, to normalize certain indexes across requests */
 	protected $_idx_mapper = [];
 
 	/**
@@ -195,7 +195,7 @@ abstract class Renderer
 	 * members' data has been loaded from the database.
 	 * Run only if member exists failed.
 	 *
-	 * @param ValuesContainer $member_context
+	 * @param \ElkArte\Helper\ValuesContainer $member_context
 	 */
 	protected function _adjustGuestContext($member_context)
 	{
@@ -216,7 +216,7 @@ abstract class Renderer
 	 * members data have been set.
 	 * Run only if member doesn't exist succeeded.
 	 *
-	 * @param ValuesContainer $member_context
+	 * @param \ElkArte\Helper\ValuesContainer $member_context
 	 */
 	protected function _adjustMemberContext($member_context)
 	{
@@ -250,7 +250,7 @@ abstract class Renderer
 	 * the members or the guests data have been loaded from the database.
 	 * Run both if the member exists or not.
 	 *
-	 * @param ValuesContainer $member_context
+	 * @param \ElkArte\Helper\ValuesContainer $member_context
 	 * @return mixed
 	 */
 	abstract protected function _adjustAllMembers($member_context);

@@ -4,7 +4,7 @@
  * TestCase class for the censorText function
  */
 
-use ElkArte\Censor;
+use ElkArte\Helper\Censor;
 use PHPUnit\Framework\TestCase;
 
 class CensoringTestBasic extends TestCase

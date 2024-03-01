@@ -12,7 +12,7 @@
 
 namespace ElkArte\Themes;
 
-use ElkArte\SiteCombiner;
+use ElkArte\Helper\SiteCombiner;
 
 /**
  * Part of core Theme functions.  Responsible for the output the Javascript, including files,

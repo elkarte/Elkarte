@@ -15,8 +15,8 @@
  */
 
 use BBC\ParserWrapper;
+use ElkArte\Helper\Util;
 use ElkArte\MembersList;
-use Elkarte\Util;
 
 /**
  * Reads the custom profile fields table and gets all items that were defined

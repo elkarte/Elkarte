@@ -13,6 +13,8 @@
 
 namespace ElkArte;
 
+use ElkArte\Helper\HttpReq;
+
 /**
  * Action class defines an action with its associated sub-actions.
  *

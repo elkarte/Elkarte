@@ -18,9 +18,9 @@
 namespace ElkArte\Graphics;
 
 use ElkArte\Exceptions\Exception;
-use ElkArte\FileFunctions;
 use ElkArte\Graphics\Manipulators\Gd2;
 use ElkArte\Graphics\Manipulators\ImageMagick;
+use ElkArte\Helper\FileFunctions;
 
 /**
  * Class Image

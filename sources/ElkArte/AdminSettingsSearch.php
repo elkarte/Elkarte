@@ -16,6 +16,7 @@
 
 namespace ElkArte;
 
+use ElkArte\Helper\Util;
 use ElkArte\Languages\Txt;
 
 /**

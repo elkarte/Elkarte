@@ -6,7 +6,7 @@
 
 use ElkArte\AdminController\ManageEmojiModule;
 use ElkArte\Emoji;
-use ElkArte\HttpReq;
+use ElkArte\Helper\HttpReq;
 use tests\ElkArteCommonSetupTest;
 
 class EmojiTest extends ElkArteCommonSetupTest

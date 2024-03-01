@@ -22,9 +22,9 @@ use ElkArte\Action;
 use ElkArte\BoardsTree;
 use ElkArte\Converters\Html2BBC;
 use ElkArte\Exceptions\Exception;
-use ElkArte\SettingsForm\SettingsForm;
+use ElkArte\Helper\Util;
 use ElkArte\Languages\Txt;
-use ElkArte\Util;
+use ElkArte\SettingsForm\SettingsForm;
 
 /**
  * This class controls execution for actions in the manage boards area

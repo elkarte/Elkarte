@@ -8,11 +8,11 @@
  */
 
 use ElkArte\EventManager;
-use ElkArte\HttpReq;
+use ElkArte\Helper\HttpReq;
+use ElkArte\Languages\Loader;
 use ElkArte\MembersList;
 use ElkArte\Profile\ProfileHistory;
 use tests\ElkArteCommonSetupTest;
-use ElkArte\Languages\Loader;
 
 class ProfileHistoryTest extends ElkArteCommonSetupTest
 {

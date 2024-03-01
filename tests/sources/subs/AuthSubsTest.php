@@ -1,7 +1,7 @@
 <?php
 
+use ElkArte\Helper\Util;
 use ElkArte\MembersList;
-use ElkArte\Util;
 use PHPUnit\Framework\TestCase;
 
 class AuthSubsTest extends TestCase

@@ -13,7 +13,7 @@
 
 namespace ElkArte\Modules;
 
-use ElkArte\HttpReq;
+use ElkArte\Helper\HttpReq;
 use ElkArte\UserInfo;
 
 /**

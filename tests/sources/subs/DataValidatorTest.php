@@ -1,6 +1,6 @@
 <?php
 
-use ElkArte\DataValidator;
+use ElkArte\Helper\DataValidator;
 use ElkArte\Languages\Loader;
 use tests\ElkArteCommonSetupTest;
 

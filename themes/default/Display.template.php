@@ -12,7 +12,7 @@
  *
  */
 
-use ElkArte\Util;
+use ElkArte\Helper\Util;
 
 /**
  * Loads the template of the poster area

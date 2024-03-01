@@ -19,8 +19,8 @@ namespace ElkArte\Controller;
 use ElkArte\AbstractController;
 use ElkArte\Errors\ErrorContext;
 use ElkArte\Exceptions\Exception;
+use ElkArte\Helper\Util;
 use ElkArte\Languages\Txt;
-use ElkArte\Util;
 
 /**
  * This receives requests for voting, locking, removing and editing polls.

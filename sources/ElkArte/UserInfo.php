@@ -14,6 +14,8 @@
 
 namespace ElkArte;
 
+use ElkArte\Helper\ValuesContainer;
+
 /**
  * This class holds all the data belonging to a certain member.
  */

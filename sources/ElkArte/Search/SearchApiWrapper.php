@@ -17,8 +17,8 @@
 namespace ElkArte\Search;
 
 use ElkArte\Errors\Errors;
+use ElkArte\Helper\ValuesContainer;
 use ElkArte\Languages\Txt;
-use ElkArte\ValuesContainer;
 
 /**
  * Actually do the searches
@@ -34,7 +34,7 @@ class SearchApiWrapper
 	/**
 	 * Constructor
 	 *
-	 * @param ValuesContainer|string $config The searchAPI
+	 * @param \ElkArte\Helper\ValuesContainer|string $config The searchAPI
 	 * @param SearchParams $searchParams
 	 * @package Search
 	 */
@@ -51,7 +51,7 @@ class SearchApiWrapper
 	/**
 	 * Creates a search API and returns the object.
 	 *
-	 * @param ValuesContainer $config
+	 * @param \ElkArte\Helper\ValuesContainer $config
 	 * @param SearchParams $searchParams
 	 */
 	protected function load($config, $searchParams)

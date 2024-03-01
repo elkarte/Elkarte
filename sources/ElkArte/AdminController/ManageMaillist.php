@@ -19,15 +19,15 @@ use ElkArte\AbstractController;
 use ElkArte\Action;
 use ElkArte\Cache\Cache;
 use ElkArte\Converters\Html2Md;
-use ElkArte\DataValidator;
 use ElkArte\EventManager;
 use ElkArte\Exceptions\Exception;
+use ElkArte\Helper\DataValidator;
+use ElkArte\Helper\Util;
 use ElkArte\Languages\Txt;
 use ElkArte\Maillist\MaillistPost;
 use ElkArte\Maillist\MaillistPreview;
 use ElkArte\SettingsForm\SettingsForm;
 use ElkArte\User;
-use ElkArte\Util;
 
 /**
  * This class is the administration maillist controller.

@@ -17,8 +17,8 @@
 namespace ElkArte\Search;
 
 use ElkArte\AbstractModel;
-use ElkArte\Util;
-use ElkArte\ValuesContainer;
+use ElkArte\Helper\Util;
+use ElkArte\Helper\ValuesContainer;
 
 /**
  * Actually do the searches

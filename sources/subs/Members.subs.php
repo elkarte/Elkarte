@@ -16,12 +16,12 @@
 
 use ElkArte\Cache\Cache;
 use ElkArte\Converters\Html2Md;
-use ElkArte\DataValidator;
 use ElkArte\Errors\ErrorContext;
+use ElkArte\Helper\DataValidator;
+use ElkArte\Helper\TokenHash;
+use ElkArte\Helper\Util;
 use ElkArte\Languages\Txt;
-use ElkArte\TokenHash;
 use ElkArte\User;
-use ElkArte\Util;
 
 /**
  * Delete one or more members.

@@ -20,10 +20,10 @@ use ElkArte\Controller\Draft;
 use ElkArte\EventManager;
 use ElkArte\Exceptions\ControllerRedirectException;
 use ElkArte\Exceptions\PmErrorException;
+use ElkArte\Helper\Util;
+use ElkArte\Helper\ValuesContainer;
 use ElkArte\Languages\Txt;
 use ElkArte\Modules\AbstractModule;
-use ElkArte\Util;
-use ElkArte\ValuesContainer;
 
 /**
  * Class \ElkArte\Modules\Drafts\PersonalMessage
@@ -44,7 +44,7 @@ class PersonalMessage extends AbstractModule
 	/** @var EventManager */
 	protected static $_eventsManager;
 
-	/** @var ValuesContainer */
+	/** @var \ElkArte\Helper\ValuesContainer */
 	protected $_loaded_draft;
 
 	/**

@@ -13,7 +13,7 @@
 
 namespace ElkArte\Notifications;
 
-use ElkArte\HttpReq;
+use ElkArte\Helper\HttpReq;
 use ElkArte\User;
 
 /**

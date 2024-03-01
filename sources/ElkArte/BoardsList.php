@@ -20,6 +20,7 @@ namespace ElkArte;
 use BBC\ParserWrapper;
 use ElkArte\Cache\Cache;
 use ElkArte\Database\QueryInterface;
+use ElkArte\Helper\Util;
 
 /**
  * This class fetches all the stuff needed to build a list of boards

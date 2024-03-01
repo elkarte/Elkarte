@@ -19,9 +19,9 @@ namespace ElkArte\Packages;
 use BBC\ParserWrapper;
 use ElkArte\AbstractController;
 use ElkArte\Action;
-use ElkArte\FileFunctions;
-use ElkArte\HttpReq;
-use ElkArte\Util;
+use ElkArte\Helper\FileFunctions;
+use ElkArte\Helper\HttpReq;
+use ElkArte\Helper\Util;
 
 /**
  * Coordinates the processing for all known package actions
@@ -69,7 +69,7 @@ class PackageActions extends AbstractController
 	/** @var array Passed array of theme paths */
 	protected $_theme_paths;
 
-	/** @var \ElkArte\FileFunctions */
+	/** @var \ElkArte\Helper\FileFunctions */
 	protected $fileFunc;
 
 	/** @var int Failed counter */

@@ -18,7 +18,7 @@
 namespace ElkArte\Search\API;
 
 use ElkArte\Database\AbstractResult;
-use ElkArte\Util;
+use ElkArte\Helper\Util;
 
 /**
  * SearchAPI-Custom.class.php, Custom Search API class .. used when custom ElkArte index is used

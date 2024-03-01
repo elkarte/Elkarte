@@ -17,7 +17,7 @@ namespace BBC;
 
 use ElkArte\Cache\Cache;
 use ElkArte\Emoji;
-use ElkArte\FileFunctions;
+use ElkArte\Helper\FileFunctions;
 
 /**
  * Class SmileyParser

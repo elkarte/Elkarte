@@ -11,7 +11,7 @@
  *
  */
 
-namespace ElkArte;
+namespace ElkArte\Helper;
 
 /**
  * Utility functions, such as to handle multi byte strings

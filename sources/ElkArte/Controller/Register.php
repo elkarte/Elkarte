@@ -21,15 +21,15 @@ namespace ElkArte\Controller;
 use ElkArte\AbstractController;
 use ElkArte\Action;
 use ElkArte\Agreement;
-use ElkArte\DataValidator;
 use ElkArte\Errors\ErrorContext;
 use ElkArte\Errors\Errors;
 use ElkArte\Exceptions\Exception;
+use ElkArte\Helper\DataValidator;
+use ElkArte\Helper\Util;
 use ElkArte\Http\Headers;
 use ElkArte\Languages\Txt;
 use ElkArte\PrivacyPolicy;
 use ElkArte\Profile\ProfileOptions;
-use ElkArte\Util;
 
 /**
  * It registers new members, and it allows the administrator moderate member registration
@@ -252,8 +252,8 @@ class Register extends AbstractController
 		$this->_events->trigger('prepare_context', array('current_step' => $current_step));
 
 		// See whether we have some pre filled values.
-		$context['username'] = $this->_req->getPost('user', '\\ElkArte\\Util::htmlspecialchars', '');
-		$context['email'] = $this->_req->getPost('email', '\\ElkArte\\Util::htmlspecialchars', '');
+		$context['username'] = $this->_req->getPost('user', '\\ElkArte\\Helper\\Util::htmlspecialchars', '');
+		$context['email'] = $this->_req->getPost('email', '\\ElkArte\\Helper\\Util::htmlspecialchars', '');
 		$context['notify_announcements'] = (int) !empty($this->_req->post->notify_announcements);
 
 		// Were there any errors?

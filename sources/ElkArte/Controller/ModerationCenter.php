@@ -23,11 +23,11 @@ use ElkArte\AdminController\ManageMembers;
 use ElkArte\AdminController\Modlog;
 use ElkArte\Cache\Cache;
 use ElkArte\Exceptions\Exception;
+use ElkArte\Helper\Util;
 use ElkArte\Languages\Txt;
 use ElkArte\Menu\Menu;
 use ElkArte\MessagesDelete;
 use ElkArte\User;
-use ElkArte\Util;
 
 /**
  * Provides overview of moderation items to the team
