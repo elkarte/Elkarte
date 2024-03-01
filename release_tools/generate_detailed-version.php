@@ -15,20 +15,14 @@ if (empty($argv[1]) && empty($_GET['b']))
 	echo "Please specify a branch to compare against master, (for example: b=patch_1-1-9)\n";
 	die();
 }
-else
-{
-	$new_release = $argv[1] ?? $_GET['b'];
-}
+$new_release = $argv[1] ?? $_GET['b'];
 
 if (empty($argv[2]) && empty($_GET['v']))
 {
 	echo "Please specify a version to check (for example v=1.1.9)\n";
 	die();
 }
-else
-{
-	$new_version = $argv[2] ?? $_GET['v'];
-}
+$new_version = $argv[2] ?? $_GET['v'];
 
 // Some constants and $settings needed to let getFileVersions do it's magic
 DEFINE('ELK', '1');
@@ -66,7 +60,7 @@ $index = file_get_contents(BOARDDIR . '/bootstrap.php');
 $index_lines = explode("\n", $index);
 foreach ($index_lines as $line)
 {
-	if (strpos($line, 'define(\'FORUM_VERSION') !== false)
+	if (strpos($line, "define('FORUM_VERSION") !== false)
 	{
 		preg_match('~\'ElkArte (.*)\'\);$~', $line, $matches);
 		$forum_version = $matches[1];
@@ -90,6 +84,7 @@ foreach (array('admin', 'controllers', 'database', 'subs') as $type)
 		{
 			$update_files[] = str_replace('subssubs', 'subs', $type . $file);
 		}
+
 		fwrite($handle, "\t'{$type}{$file}': '{$ver}',\n");
 	}
 }
@@ -100,6 +95,7 @@ foreach ($version_info['file_versions_modules'] as $file => $ver)
 	{
 		$update_files[] = 'sources' . $file;
 	}
+
 	fwrite($handle, "\t'{$type}{$file}': '{$ver}',\n");
 }
 
@@ -109,6 +105,7 @@ foreach ($version_info['file_versions'] as $file => $ver)
 	{
 		$update_files[] = 'sources' . $file;
 	}
+
 	fwrite($handle, "\t'sources{$file}': '{$ver}',\n");
 }
 
@@ -118,6 +115,7 @@ foreach ($version_info['default_template_versions'] as $file => $ver)
 	{
 		$update_files[] = 'default' . $file;
 	}
+
 	fwrite($handle, "\t'default{$file}': '{$ver}',\n");
 }
 
@@ -133,6 +131,7 @@ foreach ($version_info['default_language_versions'] as $lang => $files)
 		{
 			fwrite($handle, "\t'{$file}': '{$ver}',\n");
 		}
+
 		break;
 	}
 }
@@ -140,7 +139,7 @@ foreach ($version_info['default_language_versions'] as $lang => $files)
 // And that's all folks!
 fwrite($handle, '};');
 fclose($handle);
-if (count(array_diff($update_files, $changed_files_list)) !== 0)
+if (array_diff($update_files, $changed_files_list) !== [])
 {
 	if (empty($_GET))
 	{
@@ -154,7 +153,7 @@ if (count(array_diff($update_files, $changed_files_list)) !== 0)
 	}
 }
 
-if (count(array_diff($changed_files_list, $update_files)) !== 0)
+if (array_diff($changed_files_list, $update_files) !== [])
 {
 	if (empty($_GET))
 	{
