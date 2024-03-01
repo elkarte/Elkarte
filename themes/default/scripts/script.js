@@ -735,46 +735,6 @@ function hashLoginPassword(doForm, cur_session_id, token)
 }
 
 /**
- * Password hashing for admin login
- *
- * @param {type} doForm
- * @param {type} username
- * @param {type} cur_session_id
- * @param {type} token
- */
-function hashAdminPassword(doForm, username, cur_session_id, token)
-{
-	// Missing sha256.js?
-	if (typeof (hex_sha256) === 'undefined')
-	{
-		return;
-	}
-
-	doForm.admin_hash_pass.value = hex_sha256(username.php_strtolower() + doForm.admin_pass.value);
-	doForm.admin_pass.value = doForm.admin_pass.value.replace(/./g, '*');
-}
-
-/**
- * Hashing for the moderation login
- *
- * @param {type} doForm
- * @param {type} username
- * @param {type} cur_session_id
- * @param {type} token
- */
-function hashModeratePassword(doForm, username, cur_session_id, token)
-{
-	// Missing sha256.js?
-	if (typeof (hex_sha256) === 'undefined')
-	{
-		return;
-	}
-
-	doForm.moderate_hash_pass.value = hex_sha256(username.php_strtolower() + doForm.moderate_pass.value);
-	doForm.moderate_pass.value = doForm.moderate_pass.value.replace(/./g, '*');
-}
-
-/**
  * Used by elk_Toggle to add an image to the swap/toggle array
  *
  * @param {string} sSrc

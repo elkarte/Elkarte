@@ -32,6 +32,10 @@
 	border-radius: 4px 4px 0 0;
 }
 
+#quickReplyOptions #editor_toolbar_container {
+	border-radius: 0;
+}
+
 .sceditor-container.resizing {
 	overflow: hidden;
 }
