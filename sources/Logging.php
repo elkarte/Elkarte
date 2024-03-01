@@ -15,9 +15,9 @@
  */
 
 use ElkArte\Cache\Cache;
-use ElkArte\FileFunctions;
+use ElkArte\Helper\FileFunctions;
+use ElkArte\Helper\Util;
 use ElkArte\User;
-use Elkarte\Util;
 
 /**
  * Put this user in the online log.
@@ -164,7 +164,7 @@ function logLastDatabaseError()
 	// Save the old file before we do anything
 	$file = BOARDDIR . '/db_last_error.txt';
 	$dberror_backup_fail = !$fileFunc->isWritable(BOARDDIR . '/db_last_error_bak.txt') || !@copy($file, BOARDDIR . '/db_last_error_bak.txt');
-	$dberror_backup_fail = !$dberror_backup_fail ? (!$fileFunc->fileExists(BOARDDIR . '/db_last_error_bak.txt') || filesize(BOARDDIR . '/db_last_error_bak.txt') === 0) : $dberror_backup_fail;
+	$dberror_backup_fail = $dberror_backup_fail ? ($dberror_backup_fail) : !$fileFunc->fileExists(BOARDDIR . '/db_last_error_bak.txt') || filesize(BOARDDIR . '/db_last_error_bak.txt') === 0;
 
 	clearstatcache();
 	if (filemtime(BOARDDIR . '/db_last_error.txt') === $last_db_error_change)
@@ -217,18 +217,19 @@ function trackStats($stats = array())
 	{
 		return $cache_stats = array_merge($cache_stats, $stats);
 	}
-	elseif (empty($cache_stats))
+
+	if (empty($cache_stats))
 	{
 		return false;
 	}
 
-	$setStringUpdate = array();
-	$insert_keys = array();
+	$setStringUpdate = [];
+	$insert_keys = [];
 
 	$date = Util::strftime('%Y-%m-%d', forum_time(false));
-	$update_parameters = array(
+	$update_parameters = [
 		'current_date' => $date,
-	);
+	];
 
 	foreach ($cache_stats as $field => $change)
 	{
@@ -252,7 +253,7 @@ function trackStats($stats = array())
 	updateLogActivity($update_parameters, $setStringUpdate, $insert_keys, $cache_stats, $date);
 
 	// Don't do this again.
-	$cache_stats = array();
+	$cache_stats = [];
 
 	return true;
 }
@@ -273,13 +274,13 @@ function trackStats($stats = array())
 function logAction($action, $extra = array(), $log_type = 'moderate')
 {
 	// Set up the array and pass through to logActions
-	return logActions(array(
-		array(
-			'action' => $action,
-			'log_type' => $log_type,
-			'extra' => $extra,
-			)
-		)
+	return logActions([
+			[
+				'action' => $action,
+				'log_type' => $log_type,
+				'extra' => $extra,
+			]
+		]
 	);
 }
 
@@ -290,7 +291,7 @@ function logAction($action, $extra = array(), $log_type = 'moderate')
  * log multiple actions at once.
  *
  * @event integrate_log_types allows adding additional log types for integrations
- * @param mixed[] $logs array of actions to log [] = array(action => log_type=> extra=>)
+ * @param array $logs array of actions to log [] = array(action => log_type=> extra=>)
  *   - action => A code for the log
  *   - extra => An associated array of parameters for the item being logged.
  *     This will include 'topic' for the topic id or message for the message id
@@ -329,7 +330,7 @@ function logActions($logs)
 		// Do we have something to log here, after all?
 		if (!is_array($log['extra']))
 		{
-			trigger_error('logActions(): data is not an array with action \'' . $log['action'] . '\'', E_USER_NOTICE);
+			trigger_error("logActions(): data is not an array with action '" . $log['action'] . "'", E_USER_NOTICE);
 		}
 
 		// Pull out the parts we want to store separately, but also make sure that the data is proper
@@ -337,7 +338,7 @@ function logActions($logs)
 		{
 			if (!is_numeric($log['extra']['topic']))
 			{
-				trigger_error('logActions(): data\'s topic is not a number', E_USER_NOTICE);
+				trigger_error("logActions(): data's topic is not a number", E_USER_NOTICE);
 			}
 
 			$topic_id = empty($log['extra']['topic']) ? 0 : (int) $log['extra']['topic'];
@@ -352,8 +353,9 @@ function logActions($logs)
 		{
 			if (!is_numeric($log['extra']['message']))
 			{
-				trigger_error('logActions(): data\'s message is not a number', E_USER_NOTICE);
+				trigger_error("logActions(): data's message is not a number", E_USER_NOTICE);
 			}
+
 			$msg_id = empty($log['extra']['message']) ? 0 : (int) $log['extra']['message'];
 			unset($log['extra']['message']);
 		}
@@ -376,14 +378,14 @@ function logActions($logs)
 
 		if (isset($log['extra']['member']) && !is_numeric($log['extra']['member']))
 		{
-			trigger_error('logActions(): data\'s member is not a number', E_USER_NOTICE);
+			trigger_error("logActions(): data's member is not a number");
 		}
 
 		if (isset($log['extra']['board']))
 		{
 			if (!is_numeric($log['extra']['board']))
 			{
-				trigger_error('logActions(): data\'s board is not a number', E_USER_NOTICE);
+				trigger_error("logActions(): data's board is not a number");
 			}
 
 			$board_id = empty($log['extra']['board']) ? 0 : (int) $log['extra']['board'];
@@ -398,7 +400,7 @@ function logActions($logs)
 		{
 			if (!is_numeric($log['extra']['board_to']))
 			{
-				trigger_error('logActions(): data\'s board_to is not a number', E_USER_NOTICE);
+				trigger_error("logActions(): data's board_to is not a number");
 			}
 
 			if (empty($board_id))

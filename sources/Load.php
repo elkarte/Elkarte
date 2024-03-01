@@ -15,17 +15,18 @@
  */
 
 use BBC\ParserWrapper;
+use ElkArte\Attachments\AttachmentsDirectory;
 use ElkArte\Cache\Cache;
 use ElkArte\Debug;
 use ElkArte\Errors\Errors;
-use ElkArte\FileFunctions;
+use ElkArte\Helper\FileFunctions;
+use ElkArte\Helper\Util;
 use ElkArte\Hooks;
 use ElkArte\Http\Headers;
-use ElkArte\Themes\ThemeLoader;
 use ElkArte\Languages\Txt;
+use ElkArte\Server;
+use ElkArte\Themes\ThemeLoader;
 use ElkArte\User;
-use ElkArte\Util;
-use ElkArte\AttachmentsDirectory;
 
 /**
  * Load the $modSettings array and many necessary forum settings.
@@ -58,7 +59,7 @@ function reloadSettings()
 	{
 		$request = $db->query('', '
 			SELECT 
-			    variable, value
+				variable, value
 			FROM {db_prefix}settings',
 			array()
 		);
@@ -67,10 +68,12 @@ function reloadSettings()
 		{
 			Errors::instance()->display_db_error();
 		}
+
 		while (($row = $request->fetch_row()))
 		{
 			$modSettings[$row[0]] = $row[1];
 		}
+
 		$request->free_result();
 
 		// Do a few things to protect against missing settings or settings with invalid values...
@@ -272,14 +275,7 @@ function loadBoard()
 	if ($cache->isEnabled() && (empty($topic) || $cache->levelHigherThan(2)))
 	{
 		// @todo SLOW?
-		if (!empty($topic))
-		{
-			$temp = $cache->get('topic_board-' . $topic, 120);
-		}
-		else
-		{
-			$temp = $cache->get('board-' . $board, 120);
-		}
+		$temp = empty($topic) ? $cache->get('board-' . $board, 120) : $cache->get('topic_board-' . $topic, 120);
 
 		if (!empty($temp))
 		{
@@ -299,12 +295,12 @@ function loadBoard()
 			SELECT
 				c.id_cat, b.name AS bname, b.description, b.num_topics, b.member_groups, b.deny_member_groups,
 				b.id_parent, c.name AS cname, COALESCE(mem.id_member, 0) AS id_moderator,
-				mem.real_name' . (!empty($topic) ? ', b.id_board' : '') . ', b.child_level,
+				mem.real_name' . (empty($topic) ? '' : ', b.id_board') . ', b.child_level,
 				b.id_theme, b.override_theme, b.count_posts, b.old_posts, b.id_profile, b.redirect,
-				b.unapproved_topics, b.unapproved_posts' . (!empty($topic) ? ', t.approved, t.id_member_started' : '') . (!empty($select_columns) ? ', ' . implode(', ', $select_columns) : '') . '
-			FROM {db_prefix}boards AS b' . (!empty($topic) ? '
-				INNER JOIN {db_prefix}topics AS t ON (t.id_topic = {int:current_topic})' : '') . (!empty($select_tables) ? '
-				' . implode("\n\t\t\t\t", $select_tables) : '') . '
+				b.unapproved_topics, b.unapproved_posts' . (empty($topic) ? '' : ', t.approved, t.id_member_started') . (empty($select_columns) ? '' : ', ' . implode(', ', $select_columns)) . '
+			FROM {db_prefix}boards AS b' . (empty($topic) ? '' : '
+				INNER JOIN {db_prefix}topics AS t ON (t.id_topic = {int:current_topic})') . (empty($select_tables) ? '' : '
+				' . implode("\n\t\t\t\t", $select_tables)) . '
 				LEFT JOIN {db_prefix}categories AS c ON (c.id_cat = b.id_cat)
 				LEFT JOIN {db_prefix}moderators AS mods ON (mods.id_board = {raw:board_link})
 				LEFT JOIN {db_prefix}members AS mem ON (mem.id_member = mods.id_member)
@@ -327,25 +323,25 @@ function loadBoard()
 
 			// Basic operating information. (globals... :/)
 			$board_info = array(
-				'id' => $board,
+				'id' => (int) $board,
 				'moderators' => array(),
 				'cat' => array(
-					'id' => $row['id_cat'],
+					'id' => (int) $row['id_cat'],
 					'name' => $row['cname']
 				),
 				'name' => $row['bname'],
 				'raw_description' => $row['description'],
 				'description' => $row['description'],
-				'num_topics' => $row['num_topics'],
-				'unapproved_topics' => $row['unapproved_topics'],
-				'unapproved_posts' => $row['unapproved_posts'],
+				'num_topics' => (int) $row['num_topics'],
+				'unapproved_topics' => (int) $row['unapproved_topics'],
+				'unapproved_posts' => (int) $row['unapproved_posts'],
 				'unapproved_user_topics' => 0,
 				'parent_boards' => getBoardParents($row['id_parent']),
-				'parent' => $row['id_parent'],
-				'child_level' => $row['child_level'],
+				'parent' => (int) $row['id_parent'],
+				'child_level' => (int) $row['child_level'],
 				'theme' => $row['id_theme'],
 				'override_theme' => !empty($row['override_theme']),
-				'profile' => $row['id_profile'],
+				'profile' => (int) $row['id_profile'],
 				'redirect' => $row['redirect'],
 				'posts_count' => empty($row['count_posts']),
 				'old_posts' => empty($row['old_posts']),
@@ -374,7 +370,7 @@ function loadBoard()
 
 			// If the board only contains unapproved posts and the user can't approve then they can't see any topics.
 			// If that is the case do an additional check to see if they have any topics waiting to be approved.
-			if ($board_info['num_topics'] == 0 && $modSettings['postmod_active'] && !allowedTo('approve_posts'))
+			if ($board_info['num_topics'] === 0 && $modSettings['postmod_active'] && !allowedTo('approve_posts'))
 			{
 				// Free the previous result
 				$request->free_result();
@@ -394,7 +390,7 @@ function loadBoard()
 					)
 				);
 
-				list ($board_info['unapproved_user_topics']) = $request->fetch_row();
+				[$board_info['unapproved_user_topics']] = $request->fetch_row();
 			}
 
 			if ($cache->isEnabled() && (empty($topic) || $cache->levelHigherThan(2)))
@@ -411,13 +407,14 @@ function loadBoard()
 		else
 		{
 			// Otherwise the topic is invalid, there are no moderators, etc.
-			$board_info = array(
-				'moderators' => array(),
+			$board_info = [
+				'moderators' => [],
 				'error' => 'exist'
-			);
+			];
 			$topic = null;
 			$board = 0;
 		}
+
 		$request->free_result();
 	}
 
@@ -431,10 +428,11 @@ function loadBoard()
 		// Now check if the user is a moderator.
 		User::$info->is_mod = isset($board_info['moderators'][User::$info->id]);
 
-		if (count(array_intersect(User::$info->groups, $board_info['groups'])) == 0 && User::$info->is_admin === false)
+		if (User::$info->is_admin === false && count(array_intersect(User::$info->groups, $board_info['groups'])) === 0)
 		{
 			$board_info['error'] = 'access';
 		}
+
 		if (!empty($modSettings['deny_boards_access']) && count(array_intersect(User::$info->groups, $board_info['deny_groups'])) != 0 && User::$info->is_admin === false)
 		{
 			$board_info['error'] = 'access';
@@ -444,16 +442,16 @@ function loadBoard()
 		$context['linktree'] = array_merge(
 			$context['linktree'],
 			array(array(
-					  'url' => getUrl('action', $modSettings['default_forum_action']) . '#c' . $board_info['cat']['id'],
-					  'name' => $board_info['cat']['name']
-				  )
-			),
-			array_reverse($board_info['parent_boards']),
-			array(array(
-					  'url' => getUrl('board', ['board' => $board, 'start' => '0', 'name' => $board_info['name']]),
-					  'name' => $board_info['name']
-				  )
+				'url' => getUrl('action', $modSettings['default_forum_action']) . '#c' . $board_info['cat']['id'],
+				'name' => $board_info['cat']['name']
 			)
+			),
+			array_reverse($board_info['parent_boards']),	[
+				[
+					'url' => getUrl('board', ['board' => $board, 'start' => '0', 'name' => $board_info['name']]),
+					'name' => $board_info['name']
+				]
+			]
 		);
 	}
 
@@ -494,7 +492,8 @@ function loadBoard()
 				->sendHeaders();
 			exit;
 		}
-		elseif (User::$info->is_guest)
+
+		if (User::$info->is_guest)
 		{
 			Txt::load('Errors');
 			is_not_guest($txt['topic_gone']);
@@ -561,23 +560,21 @@ function loadPermissions()
 		{
 			$cache_groups .= '-spider';
 		}
+
 		$cache_key = 'permissions:' . $cache_groups;
 		$cache_board_key = 'permissions:' . $cache_groups . ':' . $board;
 
 		if ($cache->levelHigherThan(1) && !empty($board) && $cache->getVar($temp, $cache_board_key, 240) && time() - 240 > $modSettings['settings_updated'])
 		{
-			list (User::$info->permissions) = $temp;
+			[User::$info->permissions] = $temp;
 			banPermissions();
 
 			return;
 		}
 
-		if ($cache->getVar($temp, $cache_key, 240) && time() - 240 > $modSettings['settings_updated'])
+		if ($cache->getVar($temp, $cache_key, 240) && time() - 240 > $modSettings['settings_updated'] && is_array($temp))
 		{
-			if (is_array($temp))
-			{
-				list ($permissions, $removals) = $temp;
-			}
+			[$permissions, $removals] = $temp;
 		}
 	}
 
@@ -598,7 +595,7 @@ function loadPermissions()
 				'spider_group' => !empty($modSettings['spider_group']) && $modSettings['spider_group'] != 1 ? $modSettings['spider_group'] : 0,
 			]
 		)->fetch_callback(
-			function ($row) use (&$removals, &$permissions) {
+			static function ($row) use (&$removals, &$permissions) {
 				if (empty($row['add_deny']))
 				{
 					$removals[] = $row['permission'];
@@ -638,7 +635,7 @@ function loadPermissions()
 				'spider_group' => !empty($modSettings['spider_group']) && $modSettings['spider_group'] != 1 ? $modSettings['spider_group'] : 0,
 			)
 		)->fetch_callback(
-			function ($row) use (&$removals, &$permissions) {
+			static function ($row) use (&$removals, &$permissions) {
 				if (empty($row['add_deny']))
 				{
 					$removals[] = $row['permission'];
@@ -704,7 +701,7 @@ function loadPermissions()
  */
 function loadTheme($id_theme = 0, $initialize = true)
 {
-	Errors::instance()->log_deprecated('loadTheme()', '\\ElkArte\\Themes\\ThemeLoader');
+	Errors::instance()->log_deprecated('loadTheme()', \ElkArte\Themes\ThemeLoader::class);
 	new ThemeLoader($id_theme, $initialize);
 }
 
@@ -755,7 +752,7 @@ function loadSmileyEmojiData()
 	global $context, $modSettings, $options, $settings;
 
 	// Using the theme specific or global set
-	$context['smiley_set'] = !empty($settings['smiley_sets_default']) ? $settings['smiley_sets_default'] : $modSettings['smiley_sets_default'];
+	$context['smiley_set'] = empty($settings['smiley_sets_default']) ? $modSettings['smiley_sets_default'] : $settings['smiley_sets_default'];
 	$context['emoji_set'] = $modSettings['emoji_selection'] ?? 'no-emoji';
 
 	// Where are current smiley and emoji sets are located
@@ -872,7 +869,7 @@ function loadCSSFile($filenames, $params = array(), $id = '')
 
 	if (!is_array($filenames))
 	{
-		$filenames = array($filenames);
+		$filenames = [$filenames];
 	}
 
 	if (in_array('admin.css', $filenames))
@@ -1008,7 +1005,7 @@ function loadAssetFile($filenames, $params = array(), $id = '')
 		{
 			foreach ($temp as $temp_params)
 			{
-				Debug::instance()->add($params['debug_index'], $temp_params['options']['basename'] . '(' . (!empty($temp_params['options']['local']) ? (!empty($temp_params['options']['url']) ? basename($temp_params['options']['url']) : basename($temp_params['options']['dir'])) : '') . ')');
+				Debug::instance()->add($params['debug_index'], $temp_params['options']['basename'] . '(' . (empty($temp_params['options']['local']) ? '' : (empty($temp_params['options']['url']) ? basename($temp_params['options']['dir']) : basename($temp_params['options']['url']))) . ')');
 			}
 		}
 	}
@@ -1030,6 +1027,7 @@ function loadAssetFile($filenames, $params = array(), $id = '')
 			{
 				$params['basename'] = $filename;
 			}
+
 			$this_id = empty($id) ? str_replace('?', '_', basename($filename)) : $id;
 
 			// Is this a local file?
@@ -1065,7 +1063,7 @@ function loadAssetFile($filenames, $params = array(), $id = '')
 
 				if ($db_show_debug === true)
 				{
-					Debug::instance()->add($params['debug_index'], $params['basename'] . '(' . (!empty($params['local']) ? (!empty($params['url']) ? basename($params['url']) : basename($params['dir'])) : '') . ')');
+					Debug::instance()->add($params['debug_index'], $params['basename'] . '(' . (empty($params['local']) ? '' : (empty($params['url']) ? basename($params['dir']) : basename($params['url']))) . ')');
 				}
 			}
 
@@ -1118,13 +1116,12 @@ function addInlineJavascript($javascript, $defer = false)
  * @param string $lang = ''
  * @param bool $fatal = true
  * @param bool $force_reload = false
- * @return string The language actually loaded.
  * @deprecated since 2.0; use the theme object
  *
  */
 function loadLanguage($template_name, $lang = '', $fatal = true, $force_reload = false)
 {
-	return Txt::load($template_name, $lang, $fatal);
+	Txt::load($template_name, $lang, $fatal);
 }
 
 /**
@@ -1169,10 +1166,11 @@ function getBoardParents($id_parent)
 				)
 			);
 			// In the EXTREMELY unlikely event this happens, give an error message.
-			if ($result->num_rows() == 0)
+			if ($result->num_rows() === 0)
 			{
 				throw new \ElkArte\Exceptions\Exception('parent_not_found', 'critical');
 			}
+
 			while (($row = $result->fetch_assoc()))
 			{
 				if (!isset($boards[$row['id_board']]))
@@ -1189,7 +1187,7 @@ function getBoardParents($id_parent)
 				// If a moderator exists for this board, add that moderator for all children too.
 				if (!empty($row['id_moderator']))
 				{
-					foreach ($boards as $id => $dummy)
+					foreach (array_keys($boards) as $id)
 					{
 						$boards[$id]['moderators'][$row['id_moderator']] = array(
 							'id' => $row['id_moderator'],
@@ -1200,6 +1198,7 @@ function getBoardParents($id_parent)
 					}
 				}
 			}
+
 			$result->free_result();
 		}
 
@@ -1242,6 +1241,7 @@ function getLanguages($use_cache = true)
 				'location' => $language_dir . '/' . $entry,
 			);
 		}
+
 		$dir->close();
 
 		// Let's cash in on this deal.
@@ -1266,7 +1266,7 @@ function loadDatabase()
 	{
 		$db = database(false);
 	}
-	catch (Exception $e)
+	catch (Exception)
 	{
 		Errors::instance()->display_db_error();
 	}
@@ -1276,13 +1276,19 @@ function loadDatabase()
 	{
 		$db_prefix = $db->fix_prefix($db_prefix, $db_name);
 	}
-
 	// Case-sensitive database? Let's define a constant.
 	// @NOTE: I think it is already taken care by the abstraction, it should be possible to remove
-	if ($db->case_sensitive() && !defined('DB_CASE_SENSITIVE'))
+	if (!$db->case_sensitive())
 	{
-		define('DB_CASE_SENSITIVE', '1');
+		return;
 	}
+
+	if (defined('DB_CASE_SENSITIVE'))
+	{
+		return;
+	}
+
+	define('DB_CASE_SENSITIVE', '1');
 }
 
 /**
@@ -1310,8 +1316,12 @@ function determineAvatar($profile)
 	$gravatar = '//www.gravatar.com/avatar/' .
 		hash('md5', strtolower($profile['email_address'] ?? '')) .
 		'?s=' . $modSettings['avatar_max_height'] .
-		(!empty($modSettings['gravatar_rating']) ? ('&amp;r=' . $modSettings['gravatar_rating']) : '') .
-		((!empty($modSettings['gravatar_default']) && $modSettings['gravatar_default'] !== 'none') ? ('&amp;d=' . $modSettings['gravatar_default']) : '');
+		(empty($modSettings['gravatar_rating'])
+			? ('')
+			: '&amp;r=' . $modSettings['gravatar_rating']) .
+		((!empty($modSettings['gravatar_default']) && $modSettings['gravatar_default'] !== 'none')
+			? ('&amp;d=' . $modSettings['gravatar_default'])
+			: '');
 
 	// uploaded avatar?
 	if ($profile['id_attach'] > 0 && empty($profile['avatar']))
@@ -1319,22 +1329,22 @@ function determineAvatar($profile)
 		// where are those pesky avatars?
 		$avatar_url = empty($profile['attachment_type']) ? getUrl('action', ['action' => 'dlattach', 'attach' => $profile['id_attach'], 'type' => 'avatar']) : $modSettings['custom_avatar_url'] . '/' . $profile['filename'];
 
-		$avatar = array(
+		$avatar = [
 			'name' => $profile['avatar'],
 			'image' => '<img class="avatar avatarresize" src="' . $avatar_url . '" alt="' . $alt . '" loading="lazy" />',
 			'href' => $avatar_url,
 			'url' => '',
-		);
+		];
 	}
 	// remote avatar?
 	elseif ($avatar_protocol === 'http://' || $avatar_protocol === 'https:/')
 	{
-		$avatar = array(
+		$avatar = [
 			'name' => $profile['avatar'],
 			'image' => '<img class="avatar avatarresize" src="' . $profile['avatar'] . '" alt="' . $alt . '" loading="lazy" />',
 			'href' => $profile['avatar'],
 			'url' => $profile['avatar'],
-		);
+		];
 	}
 	// Gravatar instead?
 	elseif (!empty($profile['avatar']) && $profile['avatar'] === 'gravatar')
@@ -1349,14 +1359,14 @@ function determineAvatar($profile)
 		);
 	}
 	// an avatar from the gallery?
-	elseif (!empty($profile['avatar']) && !($avatar_protocol === 'http://' || $avatar_protocol === 'https:/'))
+	elseif (!empty($profile['avatar']) && ($avatar_protocol !== 'http://' && $avatar_protocol !== 'https:/'))
 	{
-		$avatar = array(
+		$avatar = [
 			'name' => $profile['avatar'],
 			'image' => '<img class="avatar avatarresize" src="' . $modSettings['avatar_url'] . '/' . $profile['avatar'] . '" alt="' . $alt . '" loading="lazy" />',
 			'href' => $modSettings['avatar_url'] . '/' . $profile['avatar'],
 			'url' => $modSettings['avatar_url'] . '/' . $profile['avatar'],
-		);
+		];
 	}
 	// no custom avatar found yet, maybe a default avatar?
 	elseif (!empty($modSettings['avatar_default']) && empty($profile['avatar']) && empty($profile['filename']))
@@ -1386,7 +1396,7 @@ function determineAvatar($profile)
 			// TODO: This should be incorporated into the theme.
 			$avatar = [
 				'name' => '',
-				'image' => '<img class="avatar avatarresize" src="' . $href .'" alt="' . $alt . '" loading="lazy" />',
+				'image' => '<img class="avatar avatarresize" src="' . $href . '" alt="' . $alt . '" loading="lazy" />',
 				'href' => $href,
 				'url' => 'https://',
 			];
@@ -1418,7 +1428,7 @@ function determineAvatar($profile)
 /**
  * Get information about the server
  *
- * @return \ElkArte\Server
+ * @return Server
  */
 function detectServer()
 {
@@ -1427,8 +1437,8 @@ function detectServer()
 
 	if ($server === null)
 	{
-		$server = new ElkArte\Server($_SERVER);
-		$servers = array('iis', 'apache', 'litespeed', 'lighttpd', 'nginx', 'cgi', 'windows');
+		$server = new Server($_SERVER);
+		$servers = ['iis', 'apache', 'litespeed', 'lighttpd', 'nginx', 'cgi', 'windows'];
 		$context['server'] = array();
 		foreach ($servers as $name)
 		{
@@ -1614,6 +1624,7 @@ function loadBBCParsers()
 		{
 			$disabledBBC = $modSettings['disabledBBC'];
 		}
+
 		ParserWrapper::instance()->setDisabled(empty($disabledBBC) ? array() : $disabledBBC);
 	}
 
@@ -1638,7 +1649,7 @@ function serializeToJson($variable, $save_callback = null)
 		{
 			$array_form = Util::unserialize($variable);
 		}
-		catch (Exception $e)
+		catch (Exception)
 		{
 			$array_form = false;
 		}

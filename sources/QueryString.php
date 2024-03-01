@@ -56,7 +56,7 @@ function JavaScriptEscape($string)
 {
 	global $scripturl;
 
-	return '\'' . strtr($string, array(
+	return '\'' . strtr($string, [
 			"\r" => '',
 			"\n" => '\\n',
 			"\t" => '\\t',
@@ -67,7 +67,7 @@ function JavaScriptEscape($string)
 			'<body>' => '<bo\'+\'dy>',
 			'<a href' => '<a hr\'+\'ef',
 			$scripturl => '\' + elk_scripturl + \'',
-		)) . '\'';
+		]) . '\'';
 }
 
 /**
