@@ -225,7 +225,7 @@ function template_body_above()
 
 	echo '
 		</aside>
-		<section id="header" class="wrapper', !empty($settings['header_layout']) ? ($settings['header_layout'] == 1 ? ' centerheader' : ' rightheader') : '', empty($context['minmax_preferences']['upshrink']) ? '"' : ' hide" aria-hidden="true"', '>
+		<section id="header" class="wrapper', empty($settings['header_layout']) ? '' : ($settings['header_layout'] == 1 ? ' centerheader' : ' rightheader'), empty($context['minmax_preferences']['upshrink']) ? '"' : ' hide" aria-hidden="true"', '>
 			<h1 id="forumtitle">
 				<a class="forumlink" href="', getUrl('boardindex', []), '">', $context['forum_name'], '</a>';
 
@@ -291,7 +291,7 @@ function template_search_form()
 	// Using the quick search dropdown?
 	if (!empty($modSettings['search_dropdown']))
 	{
-		$selected = !empty($context['current_topic']) ? 'current_topic' : (!empty($context['current_board']) ? 'current_board' : 'all');
+		$selected = empty($context['current_topic']) ? (!empty($context['current_board']) ? 'current_board' : 'all') : ('current_topic');
 		echo '
 				<label for="search_selection">
 					<select name="search_selection" id="search_selection" class="linklevel1" aria-label="search selection">
@@ -330,20 +330,20 @@ function template_search_form()
 	if (!empty($context['current_topic']))
 	{
 		echo '
-				<input type="hidden" name="', (!empty($modSettings['search_dropdown']) ? 'sd_topic' : 'topic'), '" value="', $context['current_topic'], '" />';
+				<input type="hidden" name="', (empty($modSettings['search_dropdown']) ? 'topic' : 'sd_topic'), '" value="', $context['current_topic'], '" />';
 	}
 
 	// If we're on a certain board, limit it to this board ;).
 	if (!empty($context['current_board']))
 	{
 		echo '
-				<input type="hidden" name="', (!empty($modSettings['search_dropdown']) ? 'sd_brd[' : 'brd['), $context['current_board'], ']"', ' value="', $context['current_board'], '" />';
+				<input type="hidden" name="', (empty($modSettings['search_dropdown']) ? 'brd[' : 'sd_brd['), $context['current_board'], ']"', ' value="', $context['current_board'], '" />';
 	}
 
 	echo '					
 				<label for="quicksearch" class="hide">', $txt['search'], '</label>
 				<input type="search" name="search" id="quicksearch" value="" class="linklevel1" placeholder="', $txt['search'], '" />
-				<button type="submit" aria-label="' . $txt['search'] . '" name="search;sa=results" class="', (!empty($modSettings['search_dropdown'])) ? 'with_select' : '', '">
+				<button type="submit" aria-label="' . $txt['search'] . '" name="search;sa=results" class="', (empty($modSettings['search_dropdown'])) ? '' : 'with_select', '">
 					<i class="icon i-search icon-shade"><s>', $txt['search'], '</s></i>
 				</button>
 				<button type="button" aria-label="' . $txt['find_close'] . '">
@@ -413,12 +413,12 @@ function template_body_below()
 				<li class="copyright">',
 					theme_copyright(), '
 				</li>',
-				!empty($context['newsfeed_urls']['rss']) ? '
+				empty($context['newsfeed_urls']['rss']) ? '' : '
 				<li>
 					<a id="button_rss" href="' . $context['newsfeed_urls']['rss'] . '" class="rssfeeds new_win">
 						<i class="icon icon-margin i-rss icon-big"><s>' . $txt['rss'] . '</s></i>
 					</a>
-				</li>' : '', '
+				</li>', '
 			</ul>';
 
 	// Show the load time?
@@ -557,17 +557,17 @@ function template_menu()
 	foreach ($context['menu_buttons'] as $act => $button)
 	{
 		// Top link details, easier to maintain broken out
-		$class = 'class="linklevel1' . (!empty($button['active_button']) ? ' active' : '') . (!empty($button['indicator']) ? ' indicator' : '') . '"';
+		$class = 'class="linklevel1' . (empty($button['active_button']) ? '' : ' active') . (empty($button['indicator']) ? '' : ' indicator') . '"';
 		$href = ' href="' . $button['href'] . '"';
 		$target = isset($button['target']) ? ' target="' . $button['target'] . '"' : '';
 		$onclick = isset($button['onclick']) ? ' onclick="' . $button['onclick'] . '"' : '';
-		$altTitle = 'title="' . (!empty($button['alttitle']) ? $button['alttitle'] : $button['title']) . '"';
-		$ally = !empty($button['active_button']) ? ' aria-current="page"' : '';
+		$altTitle = 'title="' . (empty($button['alttitle']) ? $button['title'] : $button['alttitle']) . '"';
+		$ally = empty($button['active_button']) ? '' : ' aria-current="page"';
 
 		echo '
-						<li id="button_', $act, '" class="listlevel1', !empty($button['sub_buttons']) ? ' subsections"' : '"', ' role="none">
-							<a ', $class, $href, $target, $ally, $onclick, ' role="menuitem"', !empty($button['sub_buttons']) ? ' aria-haspopup="true"' : '', '>',
-								(!empty($button['data-icon']) ? '<i class="icon icon-menu icon-lg ' . $button['data-icon'] . (!empty($button['active_button']) ? ' enabled' : '') . '" ' . $altTitle . '></i> ' : ''),
+						<li id="button_', $act, '" class="listlevel1', empty($button['sub_buttons']) ? '"' : ' subsections"', ' role="none">
+							<a ', $class, $href, $target, $ally, $onclick, ' role="menuitem"', empty($button['sub_buttons']) ? '' : ' aria-haspopup="true"', '>',
+								(empty($button['data-icon']) ? '' : '<i class="icon icon-menu icon-lg ' . $button['data-icon'] . (empty($button['active_button']) ? '' : ' enabled') . '" ' . $altTitle . '></i> '),
 								'<span class="button_title" aria-hidden="', (empty($button['sub_buttons']) ? 'false' : 'true'), '">', $button['title'], '</span>
 							</a>';
 
@@ -580,8 +580,8 @@ function template_menu()
 			foreach ($button['sub_buttons'] as $childact => $childbutton)
 			{
 				echo '
-								<li id="button_', $childact, '" class="listlevel2', !empty($childbutton['sub_buttons']) ? ' subsections"' : '"', ' role="none">
-									<a class="linklevel2" href="', $childbutton['href'], '" ', isset($childbutton['target']) ? 'target="' . $childbutton['target'] . '"' : '', isset($childbutton['onclick']) ? ' onclick="' . $childbutton['onclick'] . '"' : '', !empty($childbutton['sub_buttons']) ? ' aria-haspopup="true"' : '', ' role="menuitem">',
+								<li id="button_', $childact, '" class="listlevel2', empty($childbutton['sub_buttons']) ? '"' : ' subsections"', ' role="none">
+									<a class="linklevel2" href="', $childbutton['href'], '" ', isset($childbutton['target']) ? 'target="' . $childbutton['target'] . '"' : '', isset($childbutton['onclick']) ? ' onclick="' . $childbutton['onclick'] . '"' : '', empty($childbutton['sub_buttons']) ? '' : ' aria-haspopup="true"', ' role="menuitem">',
 										$childbutton['title'], '
 									</a>';
 
@@ -683,7 +683,7 @@ function template_basicicons_legend()
 	echo '
 		<p class="floatleft">', !empty($modSettings['enableParticipation']) && $context['user']['is_logged'] ? '
 			<span class="topicicon i-profile"></span> ' . $txt['participation_caption'] : '<span class="topicicon img_normal"> </span>' . $txt['normal_topic'], '<br />
-			' . (!empty($modSettings['pollMode']) ? '<span class="topicicon i-poll"> </span>' . $txt['poll'] : '') . '
+			' . (empty($modSettings['pollMode']) ? '' : '<span class="topicicon i-poll"> </span>' . $txt['poll']) . '
 		</p>
 		<p>
 			<span class="topicicon i-locked"> </span>' . $txt['locked_topic'] . '<br />
@@ -741,6 +741,7 @@ function template_show_error($error_id)
 			echo '
 									<li id="', $error_id, '_', $key, '">', $err, '</li>';
 		}
+
 		echo '
 								</ul>';
 	}

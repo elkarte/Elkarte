@@ -17,7 +17,7 @@ function template_install_above()
 	global $incontext, $txt, $installurl;
 
 	echo '<!DOCTYPE html>
-<html ', !empty($txt['lang_rtl']) ? 'dir="rtl"' : '', '>
+<html ', empty($txt['lang_rtl']) ? '' : 'dir="rtl"', '>
 	<head>
 		<meta charset="utf-8" />
 		<meta name="robots" content="noindex" />
@@ -529,7 +529,7 @@ function template_populate_database()
 
 	echo '
 	<form id="populate_db" action="', $incontext['form_url'], '" method="post">
-		<p>', !empty($incontext['was_refresh']) ? $txt['user_refresh_install_desc'] : $txt['db_populate_info'], '</p>';
+		<p>', empty($incontext['was_refresh']) ? $txt['db_populate_info'] : $txt['user_refresh_install_desc'], '</p>';
 
 	if (!empty($incontext['sql_results']))
 	{
@@ -658,7 +658,7 @@ function template_delete_install()
 		echo '
 		<div id="delete_label" class="hide bbc_strong">
 			<label for="delete_self">
-				<input type="checkbox" id="delete_self" onclick="doTheDelete();" class="input_check" /> ', $txt['delete_installer'], !isset($_SESSION['installer_temp_ftp']) ? ' ' . $txt['delete_installer_maybe'] : '', '
+				<input type="checkbox" id="delete_self" onclick="doTheDelete();" class="input_check" /> ', $txt['delete_installer'], isset($_SESSION['installer_temp_ftp']) ? '' : ' ' . $txt['delete_installer_maybe'], '
 			</label>
 		</div>
 		<script>

@@ -48,7 +48,7 @@ function template_move_topic()
 							</dl>
 							<label for="enforce_subject"><input type="checkbox" name="enforce_subject" id="enforce_subject" /> ', $txt['moveTopic4'], '.</label>
 						</fieldset>
-						<label for="postRedirect"><input type="checkbox" name="postRedirect" id="postRedirect" ', $context['is_approved'] ? 'checked="checked"' : '', ' onclick="', $context['is_approved'] ? '' : 'if (this.checked && !confirm(\'' . $txt['move_topic_unapproved_js'] . '\')) return false; ', 'document.getElementById(\'reasonArea\').style.display = this.checked ? \'block\' : \'none\';" /> ', $txt['moveTopic1'], '.</label>
+						<label for="postRedirect"><input type="checkbox" name="postRedirect" id="postRedirect" ', $context['is_approved'] ? 'checked="checked"' : '', ' onclick="', $context['is_approved'] ? '' : "if (this.checked && !confirm('" . $txt['move_topic_unapproved_js'] . "')) return false; ", 'document.getElementById(\'reasonArea\').style.display = this.checked ? \'block\' : \'none\';" /> ', $txt['moveTopic1'], '.</label>
 						<fieldset id="reasonArea" class="', $context['is_approved'] ? '' : 'hide', '">
 							<dl class="settings">
 								<dt>
@@ -61,7 +61,7 @@ function template_move_topic()
 									<label for="redirect_topic">', $txt['movetopic_redirect'], '</label>
 								</dt>
 								<dd>
-									<input type="checkbox" name="redirect_topic" id="redirect_topic" ', !empty($context['redirect_topic']) ? 'checked="checked"' : '', ' />
+									<input type="checkbox" name="redirect_topic" id="redirect_topic" ', empty($context['redirect_topic']) ? '' : 'checked="checked"', ' />
 								</dd>
 								<dt>
 									<label for="redirect_expires">', $txt['movetopic_expires'], '</label>

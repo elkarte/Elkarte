@@ -234,17 +234,17 @@ function template_registration_form()
 			if ($field['show_reg'] > 1)
 			{
 				echo '
-					<div class="form_field">', preg_replace_callback('~<(input|select|textarea) ~', function ($matches) {
-							global $context;
+					<div class="form_field">', preg_replace_callback('~<(input|select|textarea) ~', static function ($matches) {
+					global $context;
 
-							return '<' . $matches[1] . ' tabindex="' . ($context['tabindex']++) . '"';
-						}, $field['input_html']);
+					return '<' . $matches[1] . ' tabindex="' . ($context['tabindex']++) . '"';
+				}, $field['input_html']);
 
 				// Fieldsets already have a legend
 				if (strpos($field['input_html'], 'fieldset') === false)
 				{
 					echo '	
-						<label ', !empty($field['is_error']) ? ' class="error"' : '', ' for="', $field['colname'], '">', $field['name'], '</label>';
+						<label ', empty($field['is_error']) ? '' : ' class="error"', ' for="', $field['colname'], '">', $field['name'], '</label>';
 				}
 
 				echo '
@@ -301,6 +301,7 @@ function template_registration_form()
 				</label>';
 
 		if (!empty($context['privacy_policy']))
+		{
 			echo '	
 				<div id="privacypol_box">
 					', $context['privacy_policy'], '
@@ -309,6 +310,7 @@ function template_registration_form()
 					<input type="checkbox" name="checkbox_privacypol" id="checkbox_privacypol" value="1"', ($context['registration_passed_privacypol'] ? ' checked="checked"' : ''), ' tabindex="', $context['tabindex']++, '" />
 					', $txt['checkbox_privacypol'], '
 				</label>';
+		}
 
 		if (!empty($context['languages']))
 		{
@@ -319,7 +321,7 @@ function template_registration_form()
 			foreach ($context['languages'] as $key => $val)
 			{
 				echo '
-					<option value="', $key, '"', !empty($val['selected']) ? ' selected="selected"' : '', '>', $val['name'], '</option>';
+					<option value="', $key, '"', empty($val['selected']) ? '' : ' selected="selected"', '>', $val['name'], '</option>';
 			}
 
 			echo '
@@ -778,14 +780,14 @@ function template_contact_form()
 						<label for="emailaddress">', $txt['admin_register_email'], '</label>
 					</dt>
 					<dd>
-						<input type="email" name="emailaddress" id="emailaddress" value="', !empty($context['emailaddress']) ? $context['emailaddress'] : '', '" tabindex="', $context['tabindex']++, '" />
+						<input type="email" name="emailaddress" id="emailaddress" value="', empty($context['emailaddress']) ? '' : $context['emailaddress'], '" tabindex="', $context['tabindex']++, '" />
 						<span id="suggestion" class="smalltext"></span>
 					</dd>
 					<dt>
 						<label for="contactmessage">', $txt['contact_your_message'], '</label>
 					</dt>
 					<dd>
-						<textarea id="contactmessage" name="contactmessage" cols="50" rows="10" tabindex="', $context['tabindex']++, '">', !empty($context['contactmessage']) ? $context['contactmessage'] : '', '</textarea>
+						<textarea id="contactmessage" name="contactmessage" cols="50" rows="10" tabindex="', $context['tabindex']++, '">', empty($context['contactmessage']) ? '' : $context['contactmessage'], '</textarea>
 					</dd>';
 
 	if (!empty($context['require_verification']))

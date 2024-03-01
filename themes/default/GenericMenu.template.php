@@ -46,8 +46,8 @@ function template_generic_menu_sidebar_above()
 			}
 
 			echo '
-				<li class="listlevel1', !empty($area['subsections']) ? ' subsections"  aria-haspopup="true"' : '"', '>
-					<a class="linklevel1', !empty($area['selected']) ? ' chosen' : '', '" href="', $area['url'], '">', $area['label'], '</a>';
+				<li class="listlevel1', empty($area['subsections']) ? '"' : ' subsections"  aria-haspopup="true"', '>
+					<a class="linklevel1', empty($area['selected']) ? '' : ' chosen', '" href="', $area['url'], '">', $area['label'], '</a>';
 
 			// Are there any subsections?
 			if (!empty($area['subsections']))
@@ -64,7 +64,7 @@ function template_generic_menu_sidebar_above()
 
 					echo '
 						<li class="listlevel2">
-							<a class="linklevel2', !empty($sub['selected']) ? ' chosen' : '', '" href="', $sub['url'], '">', $sub['label'], '</a>
+							<a class="linklevel2', empty($sub['selected']) ? '' : ' chosen', '" href="', $sub['url'], '">', $sub['label'], '</a>
 						</li>';
 				}
 
@@ -86,10 +86,17 @@ function template_generic_menu_sidebar_above()
 		<div id="main_admsection">';
 
 	// If there are any "tabs" setup, this is the place to shown them.
-	if (empty($context['force_disable_tabs']) && !empty($menu_context['tab_data']))
+	if (!empty($context['force_disable_tabs']))
 	{
-		template_generic_menu_tabs($menu_context['tab_data']);
+		return;
 	}
+
+	if (empty($menu_context['tab_data']))
+	{
+		return;
+	}
+
+	template_generic_menu_tabs($menu_context['tab_data']);
 }
 
 /**
@@ -120,8 +127,8 @@ function template_generic_menu_dropdown_above()
 	foreach ($menu_context['sections'] as $section)
 	{
 		echo '
-					<li class="listlevel1', !empty($section['areas']) ? ' subsections' : '', '" role="none">
-						<a class="linklevel1', !empty($section['selected']) ? ' active" aria-current="page"' : '"', ' href="', $section['url'], '" role="menuitem"', !empty($section['areas']) ? ' aria-haspopup="true"' : '', '>',
+					<li class="listlevel1', empty($section['areas']) ? '' : ' subsections', '" role="none">
+						<a class="linklevel1', empty($section['selected']) ? '"' : ' active" aria-current="page"', ' href="', $section['url'], '" role="menuitem"', empty($section['areas']) ? '' : ' aria-haspopup="true"', '>',
 							$section['label'], '
 						</a>
 						<ul class="menulevel2" role="menu">';
@@ -137,8 +144,8 @@ function template_generic_menu_dropdown_above()
 			}
 
 			echo '
-							<li class="listlevel2', !empty($area['subsections']) ? ' subsections' : '', '" role="none">
-								<a class="linklevel2', !empty($area['selected']) ? ' chosen' : '', '" href="', $area['url'], '"', !empty($area['subsections']) ? ' aria-haspopup="true"' : '', ' role="menuitem">',
+							<li class="listlevel2', empty($area['subsections']) ? '' : ' subsections', '" role="none">
+								<a class="linklevel2', empty($area['selected']) ? '' : ' chosen', '" href="', $area['url'], '"', empty($area['subsections']) ? '' : ' aria-haspopup="true"', ' role="menuitem">',
 									$area['icon'], $area['label'], '
 								</a>';
 
@@ -157,7 +164,7 @@ function template_generic_menu_dropdown_above()
 
 					echo '
 									<li class="listlevel3" role="none">
-										<a class="linklevel3', !empty($sub['selected']) ? ' chosen ' : '', '" href="', $sub['url'], '" role="menuitem">',
+										<a class="linklevel3', empty($sub['selected']) ? '' : ' chosen ', '" href="', $sub['url'], '" role="menuitem">',
 											$sub['label'], '
 										</a>
 									</li>';
@@ -266,7 +273,7 @@ function template_generic_menu_tabs($tab_context)
 
 			echo '
 						<li class="listlevel1" role="none">
-							<a class="linklevel1', !empty($tab['selected']) ? ' active' : '', '" href="', $tab['url'], $tab['add_params'] ?? '', '" role="menuitem">', $tab['label'], '</a>
+							<a class="linklevel1', empty($tab['selected']) ? '' : ' active', '" href="', $tab['url'], $tab['add_params'] ?? '', '" role="menuitem">', $tab['label'], '</a>
 						</li>';
 		}
 

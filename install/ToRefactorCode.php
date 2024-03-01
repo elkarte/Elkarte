@@ -15,8 +15,8 @@
 /**
  * This performs a table alter, but does it unbuffered so the script can time out professionally.
  *
- * @param string  $change
- * @param int     $substep
+ * @param string $change
+ * @param int $substep
  * @param boolean $is_test
  *
  * @return boolean
@@ -103,13 +103,13 @@ function protected_alter($change, $substep, $is_test = false)
 	// Not found it yet? Bummer! How about we see if we're currently doing it?
 	$running = false;
 	$found = false;
-	while (1 == 1)
+	while (1 === 1)
 	{
 		$request = upgrade_query('
 			SHOW FULL PROCESSLIST');
 		while ($row = $db->fetch_assoc($request))
 		{
-			if (strpos($row['Info'], 'ALTER TABLE ' . $db_prefix . $change['table']) !== false && strpos($row['Info'], $change['text']) !== false)
+			if (strpos($row['Info'], 'ALTER TABLE ' . $db_prefix . $change['table']) !== false && strpos($row['Info'], (string) $change['text']) !== false)
 			{
 				$found = true;
 			}
@@ -172,6 +172,7 @@ function upgrade_query($string, $unbuffered = false)
 	$modSettings['disableQueryCheck'] = true;
 	$db->setUnbuffered($unbuffered);
 	$db->skip_next_error();
+
 	$result = $db->query('', $string, ['security_override' => true]);
 	$db->setUnbuffered(false);
 
@@ -189,7 +190,6 @@ function upgrade_query($string, $unbuffered = false)
 	{
 		$mysql_errno = mysqli_errno($db_connection);
 		$error_query = in_array(substr(trim($string), 0, 11), ['INSERT INTO', 'UPDATE IGNO', 'ALTER TABLE', 'DROP TABLE ', 'ALTER IGNOR']);
-
 		// Error numbers:
 		//    1016: Can't open file '....MYI'
 		//    1050: Table already exists.
@@ -204,7 +204,7 @@ function upgrade_query($string, $unbuffered = false)
 		//    2013: Lost connection to server during query.
 		if ($mysql_errno === 1016)
 		{
-			if (preg_match('~\'([^.\']+)~', $db_error_message, $match) ===1 && !empty($match[1]))
+			if (preg_match("~'([^.']+)~", $db_error_message, $match) === 1 && !empty($match[1]))
 			{
 				mysqli_query('
 					REPAIR TABLE `' . $match[1] . '`');
@@ -250,28 +250,24 @@ function upgrade_query($string, $unbuffered = false)
 			return false;
 		}
 	}
-	// If a table already exists don't go potty.
-	else
+	elseif (in_array(substr(trim($string), 0, 8), ['CREATE T', 'CREATE S', 'DROP TABL', 'ALTER TA', 'CREATE I']))
 	{
-		if (in_array(substr(trim($string), 0, 8), ['CREATE T', 'CREATE S', 'DROP TABL', 'ALTER TA', 'CREATE I']))
+		if (strpos($db_error_message, 'exist') !== false)
 		{
-			if (strpos($db_error_message, 'exist') !== false)
-			{
-				return true;
-			}
-
-			// SQLite
-			if (strpos($db_error_message, 'missing') !== false)
-			{
-				return true;
-			}
+			return true;
 		}
-		elseif (strpos(trim($string), 'INSERT ') !== false)
+
+		// SQLite
+		if (strpos($db_error_message, 'missing') !== false)
 		{
-			if (strpos($db_error_message, 'duplicate') !== false)
-			{
-				return true;
-			}
+			return true;
+		}
+	}
+	elseif (strpos(trim($string), 'INSERT ') !== false)
+	{
+		if (strpos($db_error_message, 'duplicate') !== false)
+		{
+			return true;
 		}
 	}
 

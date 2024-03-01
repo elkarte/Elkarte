@@ -239,6 +239,7 @@ function template_ic_recent_posts()
 		echo '
 				</table>';
 	}
+
 	echo '
 			</li>';
 }
@@ -322,8 +323,8 @@ function template_ic_show_stats()
 						</a>' : $txt['forum_stats'], '
 				</h3>
 				<p class="inline">
-					', $context['common_stats']['boardindex_total_posts'], '', !empty($settings['show_latest_member']) ? ' - ' . $txt['latest_member'] . ': <strong> ' . $context['common_stats']['latest_member']['link'] . '</strong>' : '', ' - ', $txt['most_online_today'], ': ', comma_format($modSettings['mostOnlineToday']), '<br />
-					', (!empty($context['latest_post']) ? $txt['latest_post'] . ': <strong>&quot;' . $context['latest_post']['link'] . '&quot;</strong>  ( ' . $context['latest_post']['time'] . ' )' : ''), ' - <a href="', getUrl('action', ['action' => 'recent']), '">', $txt['recent_view'], '</a>
+					', $context['common_stats']['boardindex_total_posts'], '', empty($settings['show_latest_member']) ? '' : ' - ' . $txt['latest_member'] . ': <strong> ' . $context['common_stats']['latest_member']['link'] . '</strong>', ' - ', $txt['most_online_today'], ': ', comma_format($modSettings['mostOnlineToday']), '<br />
+					', (empty($context['latest_post']) ? '' : $txt['latest_post'] . ': <strong>&quot;' . $context['latest_post']['link'] . '&quot;</strong>  ( ' . $context['latest_post']['time'] . ' )'), ' - <a href="', getUrl('action', ['action' => 'recent']), '">', $txt['recent_view'], '</a>
 				</p>
 			</li>';
 }
@@ -380,6 +381,7 @@ function template_ic_show_users()
 				<p class="inline membergroups">[' . implode(',&nbsp;', $context['membergroups']) . ']</p>';
 		}
 	}
+
 	echo '
 			</li>';
 }

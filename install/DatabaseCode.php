@@ -12,19 +12,19 @@
  *
  */
 
+use ElkArte\Database\Mysqli\Table;
+use ElkArte\Database\QueryInterface;
+
 /**
  * Wrapper for database methods
  */
 class DbWrapper
 {
-	/** @var \ElkArte\Database\ */
+	/** @var $db QueryInterface */
 	protected $db;
 
-	/** @var bool */
+	/** @var $count_mode bool */
 	protected $count_mode = false;
-
-	/** @var array */
-	protected $replaces = [];
 
 	/**
 	 * Constructs a new instance of the class.
@@ -34,10 +34,9 @@ class DbWrapper
 	 *
 	 * @return void
 	 */
-	public function __construct($db, $replaces)
+	public function __construct($db, protected $replaces)
 	{
 		$this->db = $db;
-		$this->replaces = $replaces;
 	}
 
 	/**
@@ -83,7 +82,7 @@ class DbWrapper
 			}
 		}
 
-		call_user_func_array([$this->db, 'insert'], $args);
+		$this->db->insert(...$args);
 
 		return $this->db->affected_rows();
 	}
@@ -106,13 +105,13 @@ class DbWrapper
  */
 class DbTableWrapper
 {
-	/** @var \ElkArte\Database\ */
+	/** @var $db */
 	protected $db;
 
 	/**
 	 * Set the db for the class
 	 *
-	 * @param \ElkArte\Database\ $db
+	 * @param  $db
 	 */
 	public function __construct($db)
 	{
@@ -145,7 +144,7 @@ class DbTableWrapper
 		}
 
 		// In this case errors are ignored, so the return is always true
-		call_user_func_array([$this->db, 'create_table'], $args);
+		$this->db->create_table(...$args);
 
 		return true;
 	}
@@ -160,13 +159,13 @@ class DbTableWrapper
 		$args = func_get_args();
 
 		// In this case errors are ignored, so the return is always true
-		call_user_func_array([$this->db, 'add_index'], $args);
+		$this->db->add_index(...$args);
 
 		return true;
 	}
 }
 
-if (class_exists('\\ElkArte\\Database\\Mysqli\\Table'))
+if (class_exists(Table::class))
 {
 	/**
 	 * MySQL specific implementation of the database table installer.
@@ -174,9 +173,9 @@ if (class_exists('\\ElkArte\\Database\\Mysqli\\Table'))
 	 * @package ElkArte
 	 * @subpackage Database
 	 */
-	class DbTable_MySQL_Install extends \ElkArte\Database\Mysqli\Table
+	class DbTable_MySQL_Install extends Table
 	{
-		public static $_tbl_inst = null;
+		public static $_tbl_inst;
 
 		/**
 		 * DbTable_MySQL::construct
@@ -210,7 +209,6 @@ if (class_exists('\\ElkArte\\Database\\Mysqli\\Table'))
 		 *       there are a couple of options (like implement it for MySQL and hope
 		 *       others will not break), but for the timebeing I'll leave it here broken.
 		 *       See protected_alter in ToRefactrCode.php
-		 *
 		 */
 		protected function _alter_table($table_name, $statement)
 		{
@@ -219,14 +217,8 @@ if (class_exists('\\ElkArte\\Database\\Mysqli\\Table'))
 			switch ($type)
 			{
 				case 'add_index':
-					// Check if the index exists
-					break;
 				case 'drop_index':
-					// Check if the index still exists
-					break;
 				case 'add_column':
-					// Check if the column exists
-					break;
 				case 'drop_column':
 					// Check if the column still exists
 					break;
@@ -307,7 +299,7 @@ if (class_exists('\\ElkArte\\Database\\Mysqli\\Table'))
 	}
 }
 
-if (class_exists('\\ElkArte\\Database\\Postgresql\\Table'))
+if (class_exists(\ElkArte\Database\Postgresql\Table::class))
 {
 	class DbTable_PostgreSQL_Install extends \ElkArte\Database\Postgresql\Table
 	{
@@ -354,14 +346,8 @@ if (class_exists('\\ElkArte\\Database\\Postgresql\\Table'))
 			switch ($type)
 			{
 				case 'add_index':
-					// Check if the index exists
-					break;
 				case 'drop_index':
-					// Check if the index still exists
-					break;
 				case 'add_column':
-					// Check if the column exists
-					break;
 				case 'drop_column':
 					// Check if the column still exists
 					break;

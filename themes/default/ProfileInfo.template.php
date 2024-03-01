@@ -576,7 +576,7 @@ function template_profile_block_summary()
 				</h2>
 				<div id="basicinfo">
 					<div class="username">
-						<h4>', (!empty($context['member']['group']) ? $context['member']['group'] : $context['member']['post_group']), '</h4>
+						<h4>', (empty($context['member']['group']) ? $context['member']['post_group'] : $context['member']['group']), '</h4>
 					</div>
 					', $context['member']['avatar']['image'], '
 					<span id="userstatus">', template_member_online($context['member']), '<span class="smalltext"> ' . $context['member']['online']['label'] . '</span>', '</span>
@@ -845,7 +845,7 @@ function template_profile_block_contact()
 	}
 
 	// No way to contact this member at all ... welcome home freak!
-	if ($ci_empty === true)
+	if ($ci_empty)
 	{
 		echo
 		$txt['profile_contact_no'];
@@ -1101,7 +1101,7 @@ function template_profile_block_buddies()
 		// Now show them all
 		if (isset($context['buddies']))
 		{
-			foreach ($context['buddies'] as $buddy_id => $data)
+			foreach ($context['buddies'] as $data)
 			{
 				echo '
 				<div class="attachment">
@@ -1127,7 +1127,7 @@ function template_profile_block_buddies()
 				{
 					$im = array();
 
-					foreach ($data['custom_fields'] as $key => $cpf)
+					foreach ($data['custom_fields'] as $cpf)
 					{
 						if ($cpf['placement'] == 1)
 						{
@@ -1137,6 +1137,7 @@ function template_profile_block_buddies()
 
 					echo implode(' ', $im);
 				}
+
 				// Done with the contact information
 				echo '
 						</div>
@@ -1171,12 +1172,10 @@ function template_profile_blocks()
 	{
 		return;
 	}
-	else
+
+	foreach ($context['profile_blocks'] as $profile_block)
 	{
-		foreach ($context['profile_blocks'] as $profile_block)
-		{
-			$profile_block();
-		}
+		$profile_block();
 	}
 }
 

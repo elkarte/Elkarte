@@ -109,7 +109,7 @@ function template_list_boards(array $boards, $id)
 	foreach ($boards as $board)
 	{
 		echo '
-				<li class="board_row', (!empty($board['children'])) ? ' parent_board' : '', $board['is_redirect'] ? ' board_row_redirect' : '', '" id="board_', $board['id'], '">
+				<li class="board_row', (empty($board['children'])) ? '' : ' parent_board', $board['is_redirect'] ? ' board_row_redirect' : '', '" id="board_', $board['id'], '">
 					<div class="board_icon">
 						<a class="icon_anchor" href="', ($board['is_redirect'] || $context['user']['is_guest'] ? $board['href'] : $scripturl . '?action=unread;board=' . $board['id'] . '.0;children'), '">';
 
@@ -284,7 +284,7 @@ function template_pick_boards($form_name, $input_names = 'brd', $select_all = tr
 			$category = $context['categories'][$cat_id];
 			echo '
 								<li class="category">
-									<a href="javascript:void(0);" onclick="selectBoards([', implode(', ', $category['child_ids']), '], \'', $form_name, '\', \'', $input_names, '\'); return false;">', $category['name'], '</a>
+									<a href="javascript:void(0);" onclick="selectBoards([', implode(', ', $category['child_ids']), "], '", $form_name, "', '", $input_names, '\'); return false;">', $category['name'], '</a>
 									<ul>';
 
 			foreach ($category['boards'] as $board)
@@ -301,6 +301,7 @@ function template_pick_boards($form_name, $input_names = 'brd', $select_all = tr
 									</ul>
 								</li>';
 		}
+
 		echo '
 							</ul>';
 	}

@@ -366,7 +366,7 @@ function template_edit_profiles()
 					<tr class="table_head">
 						<th>', $txt['permissions_profile_name'], '</th>
 						<th>', $txt['permissions_profile_used_by'], '</th>
-						<th class="perm_profile_delete', !empty($context['show_rename_boxes']) ? ' hide"' : '"', ' >', $txt['delete'], '</th>
+						<th class="perm_profile_delete', empty($context['show_rename_boxes']) ? '"' : ' hide"', ' >', $txt['delete'], '</th>
 					</tr>
 				</thead>
 				<tbody>';
@@ -391,9 +391,9 @@ function template_edit_profiles()
 		echo '
 						</td>
 						<td>
-							', !empty($profile['boards_text']) ? $profile['boards_text'] : $txt['permissions_profile_used_by_none'], '
+							', empty($profile['boards_text']) ? $txt['permissions_profile_used_by_none'] : $profile['boards_text'], '
 						</td>
-						<td class="centertext perm_profile_delete', !empty($context['show_rename_boxes']) ? ' hide"' : '"', '>
+						<td class="centertext perm_profile_delete', empty($context['show_rename_boxes']) ? '"' : ' hide"', '>
 							<input type="checkbox" name="delete_profile[]" value="', $profile['id'], '" ', $profile['can_delete'] ? '' : 'disabled="disabled"', ' />
 						</td>
 					</tr>';
@@ -413,7 +413,7 @@ function template_edit_profiles()
 	}
 
 	echo '
-				<span', !empty($context['show_rename_boxes']) ? ' class="hide"' : '', '>
+				<span', empty($context['show_rename_boxes']) ? '' : ' class="hide"', '>
 					<input id="delete" type="submit" name="delete" value="', $txt['quickmod_delete_selected'], '" />
 				</span>
 			</div>
@@ -762,17 +762,26 @@ function template_modify_group_classic($type)
 				}
 			}
 
-			if (!$permissionGroup['hidden'] && $has_display_content)
+			if ($permissionGroup['hidden'])
 			{
-				echo '
+				continue;
+			}
+
+			if (!$has_display_content)
+			{
+				continue;
+			}
+
+			echo '
 						<tr>
 							<td colspan="5"><!--separator--></td>
 						</tr>';
-			}
 		}
+
 		echo '
 					</table>';
 	}
+
 	echo '
 			</div>';
 }

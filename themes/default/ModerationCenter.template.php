@@ -186,7 +186,7 @@ function template_watched_users()
 	{
 		echo '
 								<li>
-									<span class="smalltext">', sprintf(!empty($user['last_login']) ? $txt['mc_seen'] : $txt['mc_seen_never'], $user['link'], $user['last_login']), '</span>
+									<span class="smalltext">', sprintf(empty($user['last_login']) ? $txt['mc_seen_never'] : $txt['mc_seen'], $user['link'], $user['last_login']), '</span>
 								</li>';
 	}
 
@@ -299,7 +299,7 @@ function template_reported_posts()
 	foreach ($context['reports'] as $report)
 	{
 		$report['class'] = 'content';
-		$report['title'] = '<strong>' . (!empty($report['board_name']) ? '<a href="' . $scripturl . '?board=' . $report['board'] . '.0">' . $report['board_name'] . '</a> / ' : '') . '<a href="' . $report['topic_href'] . '">' . $report['subject'] . '</a></strong> ' . $txt['mc_reportedp_by'] . ' <strong>' . $report['author']['link'] . '</strong>';
+		$report['title'] = '<strong>' . (empty($report['board_name']) ? '' : '<a href="' . $scripturl . '?board=' . $report['board'] . '.0">' . $report['board_name'] . '</a> / ') . '<a href="' . $report['topic_href'] . '">' . $report['subject'] . '</a></strong> ' . $txt['mc_reportedp_by'] . ' <strong>' . $report['author']['link'] . '</strong>';
 
 		// Prepare the comments...
 		$comments = array();
@@ -307,6 +307,7 @@ function template_reported_posts()
 		{
 			$comments[$comment['member']['id']] = $comment['member']['link'];
 		}
+
 		$report['date'] = $txt['mc_reportedp_last_reported'] . ': ' . $report['last_updated'] . '&nbsp;-&nbsp;' . '
 										' . $txt['mc_reportedp_reported_by'] . ': ' . implode(', ', $comments);
 
@@ -496,10 +497,8 @@ function template_user_watch_post_callback($post)
 						</ul>';
 	}
 
-	$output_html .= '
+	return $output_html . '
 					</div>';
-
-	return $output_html;
 }
 
 /**
@@ -633,13 +632,13 @@ function template_warn_template()
 						</dd>
 					</dl>
 				</div>
-				<div id="box_preview"', !empty($context['template_preview']) ? '' : ' class="hide"', '>
+				<div id="box_preview"', empty($context['template_preview']) ? ' class="hide"' : '', '>
 					<dl class="settings">
 						<dt>
 							<strong>', $txt['preview'], '</strong>
 						</dt>
 						<dd id="template_preview">
-							', !empty($context['template_preview']) ? $context['template_preview'] : '', '
+							', empty($context['template_preview']) ? '' : $context['template_preview'], '
 						</dd>
 					</dl>
 				</div>

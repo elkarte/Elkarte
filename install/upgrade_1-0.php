@@ -6,7 +6,7 @@
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
  * This file contains code covered by:
- * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * copyright:    2011 Simple Machines (http://www.simplemachines.org)
  *
  * @version 2.0 dev
  *
@@ -40,7 +40,7 @@ class UpgradeInstructions_upgrade_1_0
 	public function __construct($db, $table)
 	{
 		$this->db = $db;
-		return $this->table = $table;
+		$this->table = $table;
 	}
 
 	public function changes_101_title()
@@ -53,8 +53,7 @@ class UpgradeInstructions_upgrade_1_0
 		return array(
 			array(
 				'debug_title' => 'Adding new column to message_likes...',
-				'function' => function($db, $db_table)
-				{
+				'function' => static function ($db, $db_table) {
 					$db_table->add_column('{db_prefix}message_likes',
 						array(
 							'name' => 'like_timestamp',
@@ -70,8 +69,7 @@ class UpgradeInstructions_upgrade_1_0
 			),
 			array(
 				'debug_title' => 'More space for email filters...',
-				'function' => function($db, $db_table)
-				{
+				'function' => static function ($db, $db_table) {
 					$db_table->add_column('{db_prefix}postby_emails_filters',
 						array(
 							'name' => 'filter_style',
@@ -86,8 +84,7 @@ class UpgradeInstructions_upgrade_1_0
 			),
 			array(
 				'debug_title' => 'Possible wrong type for mail_queue...',
-				'function' => function($db, $db_table)
-				{
+				'function' => static function ($db, $db_table) {
 					$db_table->add_column('{db_prefix}mail_queue',
 						array(
 							'name' => 'message_id',
@@ -113,10 +110,8 @@ class UpgradeInstructions_upgrade_1_0
 		return array(
 			array(
 				'debug_title' => 'Remove unused avatar permissions...',
-				'function' => function($db, $db_table)
-				{
+				'function' => static function ($db, $db_table) {
 					global $modSettings;
-
 					$db->query('', '
 						DELETE FROM {db_prefix}permissions
 						WHERE permission = \'profile_upload_avatar\'',
@@ -132,14 +127,12 @@ class UpgradeInstructions_upgrade_1_0
 						WHERE permission = \'profile_gravatar\'',
 						array()
 					);
-
 					$db->query('', '
 						UPDATE {db_prefix}permissions
 						SET permission = \'profile_set_avatar\'
 						WHERE permission = \'profile_server_avatar\'',
 						array()
 					);
-
 					$db->query('', '
 						UPDATE {db_prefix}settings
 						SET value = {string:value}
@@ -149,7 +142,6 @@ class UpgradeInstructions_upgrade_1_0
 							'variable' => 'avatar_max_height'
 						)
 					);
-
 					$db->query('', '
 						UPDATE {db_prefix}settings
 						SET value = {string:value}
@@ -159,7 +151,6 @@ class UpgradeInstructions_upgrade_1_0
 							'variable' => 'avatar_max_width'
 						)
 					);
-
 					updateSettings(array(
 						'avatar_stored_enabled' => '1',
 						'avatar_external_enabled' => '1',
@@ -181,8 +172,7 @@ class UpgradeInstructions_upgrade_1_0
 		return array(
 			array(
 				'debug_title' => 'Update to new package server...',
-				'function' => function($db, $db_table)
-				{
+				'function' => static function ($db, $db_table) {
 					$db->query('', '
 						UPDATE {db_prefix}package_servers
 						SET url = {string:value}

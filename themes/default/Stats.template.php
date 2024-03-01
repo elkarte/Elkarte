@@ -225,8 +225,8 @@ function template_forum_chart()
 				<button class="stats_button linklevel1" data-title="new_posts">', $txt['stats_new_posts'], '</button>
 				<button class="stats_button linklevel1" data-title="new_members">', $txt['stats_new_members'], '</button>
 				<button class="stats_button linklevel1" data-title="most_members_online">', $txt['most_online'], '</button>',
-				(!empty($modSettings['hitStats']) ? '
-				<button class="stats_button linklevel1" data-title="hits">' . $txt['page_views'] . '</button>' : ''), '
+				(empty($modSettings['hitStats']) ? '' : '
+				<button class="stats_button linklevel1" data-title="hits">' . $txt['page_views'] . '</button>'), '
 			</div>	
 			<canvas id="yearStats" height="200" style="width:80%"></canvas>';
 
@@ -470,11 +470,11 @@ function getChartData($stats, $num = 'num_posts', $usePercent = false)
 	{
 		if ($usePercent)
 		{
-			$data[$i] = !empty($value['percent']) ? $value['percent'] : '0';
+			$data[$i] = empty($value['percent']) ? '0' : $value['percent'];
 		}
 		else
 		{
-			$data[$i] = !empty($value[$num]) ? removeComma($value[$num]) : '0';
+			$data[$i] = empty($value[$num]) ? '0' : removeComma($value[$num]);
 		}
 
 		$labels[$i] = "'" . Util::shorten_text(($value['name'] ?? strip_tags($value['link'])), 26, true, '...', true, 0) . "'";

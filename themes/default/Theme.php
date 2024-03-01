@@ -251,9 +251,9 @@ class Theme extends BaseTheme
 		if (!empty($modSettings['avatar_max_width']) || !empty($modSettings['avatar_max_height']))
 		{
 			$this->css->addCSSRules('
-		.avatarresize {' . (!empty($modSettings['avatar_max_width']) ? '
-			max-width:' . $modSettings['avatar_max_width'] . 'px;' : '') . (!empty($modSettings['avatar_max_height']) ? '
-			max-height:' . $modSettings['avatar_max_height'] . 'px;' : '') . '
+		.avatarresize {' . (empty($modSettings['avatar_max_width']) ? '' : '
+			max-width:' . $modSettings['avatar_max_width'] . 'px;') . (empty($modSettings['avatar_max_height']) ? '' : '
+			max-height:' . $modSettings['avatar_max_height'] . 'px;') . '
 		}');
 		}
 
@@ -265,7 +265,7 @@ class Theme extends BaseTheme
 		}
 
 		// Localization for the show more quote and its container height
-		$quote_height = !empty($modSettings['heightBeforeShowMore']) ? $modSettings['heightBeforeShowMore'] . 'px' : 'none';
+		$quote_height = empty($modSettings['heightBeforeShowMore']) ? 'none' : $modSettings['heightBeforeShowMore'] . 'px';
 		$this->css->addCSSRules('
 		input[type=checkbox].quote-show-more:after {content: "' . $txt['quote_expand'] . '";}
 		.quote-read-more > .bbc_quote {--quote_height: ' . $quote_height . ';}'
@@ -328,7 +328,7 @@ class Theme extends BaseTheme
 			'elk_default_theme_url' => JavaScriptEscape($settings['default_theme_url']),
 			'elk_images_url' => JavaScriptEscape($settings['images_url']),
 			'elk_smiley_url' => JavaScriptEscape($modSettings['smileys_url']),
-			'elk_scripturl' => '\'' . $scripturl . '\'',
+			'elk_scripturl' => "'" . $scripturl . "'",
 			'elk_iso_case_folding' => detectServer()->is('iso_case_folding') ? 'true' : 'false',
 			'elk_charset' => '"UTF-8"',
 			'elk_session_id' => JavaScriptEscape($context['session_id']),
@@ -337,8 +337,8 @@ class Theme extends BaseTheme
 			'ajax_notification_text' => JavaScriptEscape($txt['ajax_in_progress']),
 			'ajax_notification_cancel_text' => JavaScriptEscape($txt['modify_cancel']),
 			'help_popup_heading_text' => JavaScriptEscape($txt['help_popup']),
-			'use_click_menu' => !empty($options['use_click_menu']) ? 'true' : 'false',
-			'todayMod' => !empty($modSettings['todayMod']) ? (int) $modSettings['todayMod'] : 0]
+			'use_click_menu' => empty($options['use_click_menu']) ? 'false' : 'true',
+			'todayMod' => empty($modSettings['todayMod']) ? 0 : (int) $modSettings['todayMod']]
 		);
 
 		// Auto video embedding enabled, then load the needed JS

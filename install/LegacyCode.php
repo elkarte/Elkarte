@@ -25,6 +25,7 @@ function textfield_alter($change, $substep)
 	$db = load_database();
 
 	$db->skip_next_error();
+
 	$request = $db->query('', '
 		SHOW FULL COLUMNS
 		FROM {db_prefix}' . $change['table'] . '
@@ -37,6 +38,7 @@ function textfield_alter($change, $substep)
 	{
 		die('Unable to find column ' . $change['column'] . ' inside table ' . $db_prefix . $change['table']);
 	}
+
 	$table_row = $request->fetch_assoc();
 	$request->free_result();
 
@@ -66,6 +68,7 @@ function textfield_alter($change, $substep)
 		{
 			$collation_info = $request->fetch_assoc();
 		}
+
 		$request->free_result();
 	}
 
@@ -144,7 +147,8 @@ function checkChange(&$change)
 		{
 			return;
 		}
-		list (, $current_type) = $request->fetch_assoc();
+
+		[, $current_type] = $request->fetch_assoc();
 		$request->free_result();
 	}
 	else
@@ -162,6 +166,7 @@ function checkChange(&$change)
 		{
 			return;
 		}
+
 		// Oh where, oh where has my little field gone. Oh where can it be...
 		while ($row = $request->fetch_assoc())
 		{
@@ -174,7 +179,7 @@ function checkChange(&$change)
 	}
 
 	// If this doesn't match, the column may of been altered for a reason.
-	if (trim($current_type) != trim($temp[3]))
+	if (trim($current_type) !== trim($temp[3]))
 	{
 		$temp[3] = $current_type;
 	}

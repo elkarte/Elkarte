@@ -140,7 +140,7 @@ function template_chmod()
 					</td>
 					<td style="padding-bottom: 1ex;">
 						<input type="text" size="50" name="ftp_path" id="ftp_path" value="', $upcontext['chmod']['path'] ?? '', '" style="width: 99%;" class="input_text" />
-						<div style="font-size: smaller; margin-bottom: 2ex;">', !empty($upcontext['chmod']['path']) ? $txt['ftp_path_found_info'] : $txt['ftp_path_info'], '</div>
+						<div style="font-size: smaller; margin-bottom: 2ex;">', empty($upcontext['chmod']['path']) ? $txt['ftp_path_info'] : $txt['ftp_path_found_info'], '</div>
 					</td>
 				</tr>
 			</table>
@@ -245,8 +245,9 @@ function template_upgrade_above()
 
 	foreach ($upcontext['steps'] as $num => $step)
 	{
-		if ($num === $upcontext['current_step'])
-			$upcontext['current_step_name'] = $step[1];
+		if ($num === $upcontext['current_step']) {
+		$upcontext['current_step_name'] = $step[1];
+	}
 
 		echo '
 						<li class="', $num < $upcontext['current_step'] ? 'stepdone' : ($num == $upcontext['current_step'] ? 'stepcurrent' : 'stepwaiting'), '">', $txt['upgrade_step'], ' ', $step[0], ': ', $step[1], '</li>';
@@ -276,7 +277,7 @@ function template_upgrade_above()
 
 	// Current progress in the step, like 45% done with the database changes
 	echo '
-					<div id="substep_bar_div_2" class="', !empty($upcontext['substep_progress']) ? '' : ' hide', '">
+					<div id="substep_bar_div_2" class="', empty($upcontext['substep_progress']) ? ' hide' : '', '">
 						<div id="substep_progress" style="width: ', $upcontext['substep_progress'] ?? 0, '%;">&nbsp;</div>
 						<div id="substep_text" class="overall_progress">', $upcontext['substep_progress'] ?? '', '%</div>
 						<div id="substep_bar_div" class="overall_progress">', isset($upcontext['substep_progress_name']) ? trim(strtr($upcontext['substep_progress_name'], array('.' => ''))) : '', '</div>
@@ -294,6 +295,7 @@ function template_upgrade_above()
 						<span id="mins_elapsed">', $mins, '</span> ', $txt['upgrade_time_mins'], ', <span id="secs_elapsed">', $seconds, '</span> ', $txt['upgrade_time_secs'], '.
 					</div>';
 	}
+
 	echo '
 				</div>
 			</div>
@@ -335,6 +337,7 @@ function template_upgrade_below()
 		echo '
 						<input type="submit" id="contbutt" name="contbutt" value="', $txt['upgrade_continue'], '"', $upcontext['continue'] == 2 ? ' disabled="disabled"' : '', ' class="button_submit" />';
 	}
+
 	if (!empty($upcontext['skip']))
 	{
 		echo '
@@ -424,7 +427,7 @@ function template_error_message()
 	if (empty($upcontext['fatal']))
 	{
 		// To early to have even loaded language?
-		$txt['try_again'] = isset($txt['try_again']) ? $txt['try_again'] : 'Click here to try again.';
+		$txt['try_again'] = $txt['try_again'] ?? 'Click here to try again.';
 
 		echo '
 		<br /><br />
@@ -510,7 +513,7 @@ function template_welcome_message()
 		$ago = time() - $upcontext['started'];
 		if ($ago < 60)
 		{
-			$ago = $ago . ' seconds';
+			$ago .= ' seconds';
 		}
 		elseif ($ago < 3600)
 		{
@@ -572,7 +575,7 @@ function template_welcome_message()
 				<tr style="vertical-align: top;">
 					<td><strong ', $disable_security ? 'style="color: lightgray;"' : '', '>Username:</strong></td>
 					<td>
-						<input type="text" name="user" value="', !empty($upcontext['username']) ? $upcontext['username'] : '', '" ', $disable_security ? 'disabled="disabled"' : '', ' class="input_text" />';
+						<input type="text" name="user" value="', empty($upcontext['username']) ? '' : $upcontext['username'], '" ', $disable_security ? 'disabled="disabled"' : '', ' class="input_text" />';
 
 	if (!empty($upcontext['username_incorrect']))
 	{
@@ -872,6 +875,7 @@ function template_database_changes()
 
 			echo '<br />' . $item;
 		}
+
 		if (!empty($upcontext['changes_complete']))
 		{
 			echo ' 

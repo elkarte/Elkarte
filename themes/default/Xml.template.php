@@ -94,6 +94,7 @@ function template_modifytopicdone()
 		echo '
 		<error in_subject="', $context['message']['error_in_subject'] ? '1' : '0', '"><![CDATA[', cleanXml(implode('<br />', $context['message']['errors'])), ']]></error>';
 	}
+
 	echo '
 	</message>
 </elk>';
@@ -146,6 +147,7 @@ function template_post()
 			<is_ignored>', $post['is_ignored'] ? '1' : '0', '</is_ignored>
 		</post>';
 		}
+
 		echo '
 	</new_posts>';
 	}
@@ -211,10 +213,12 @@ function template_stats()
 				echo '
 		<day date="', $day['year'], '-', $day['month'], '-', $day['day'], '" new_topics="', $day['new_topics'], '" new_posts="', $day['new_posts'], '" new_members="', $day['new_members'], '" most_members_online="', $day['most_members_online'], '"', empty($modSettings['hitStats']) ? '' : ' hits="' . $day['hits'] . '"', ' />';
 			}
+
 			echo '
 	</month>';
 		}
 	}
+
 	echo '
 </elk>';
 }
@@ -232,7 +236,7 @@ function template_split()
 	<pageIndex section="selected" startFrom="', $context['selected']['start'], '"><![CDATA[', $context['selected']['page_index'], ']]></pageIndex>';
 	foreach ($context['changes'] as $change)
 	{
-		if ($change['type'] == 'remove')
+		if ($change['type'] === 'remove')
 		{
 			echo '
 	<change id="', $change['id'], '" curAction="remove" section="', $change['section'], '" />';
@@ -492,7 +496,7 @@ function template_xml_news($data, $i, $tag = null, $xml_format = 'rss')
 		echo "\n", str_repeat("\t", $i);
 
 		// Grr, I hate kludges... almost worth doing it properly, here, but not quite.
-		if ($xml_format == 'atom' && $key == 'link')
+		if ($xml_format === 'atom' && $key === 'link')
 		{
 			echo '<link rel="alternate" type="text/html" href="', fix_possible_url($val), '" />';
 			continue;
@@ -503,20 +507,20 @@ function template_xml_news($data, $i, $tag = null, $xml_format = 'rss')
 		{
 			echo '<', $key, ' />';
 		}
-		elseif ($xml_format == 'atom' && $key == 'category')
+		elseif ($xml_format === 'atom' && $key === 'category')
 		{
 			echo '<', $key, ' term="', $val, '" />';
 		}
 		else
 		{
 			// Beginning tag.
-			if ($xml_format == 'rdf' && $key == 'item' && isset($val['link']))
+			if ($xml_format === 'rdf' && $key === 'item' && isset($val['link']))
 			{
 				echo '<', $key, ' rdf:about="', fix_possible_url($val['link']), '">';
 				echo "\n", str_repeat("\t", $i + 1);
 				echo '<dc:format>text/html</dc:format>';
 			}
-			elseif ($xml_format == 'atom' && $key == 'summary')
+			elseif ($xml_format === 'atom' && $key === 'summary')
 			{
 				echo '<', $key, ' type="html">';
 			}
@@ -586,7 +590,7 @@ function template_feedatom()
 {
 	global $context, $scripturl, $txt;
 
-	echo '<?xml version="1.0" encoding="UTF-8"?' . '>
+	echo '<?xml version="1.0" encoding="UTF-8"?>
 	<feed xmlns="http://www.w3.org/2005/Atom">
 		<title>', $context['feed_title'], '</title>
 		<link rel="alternate" type="text/html" href="', $scripturl, '" />
@@ -615,8 +619,8 @@ function template_feedrss()
 {
 	global $context, $scripturl, $txt;
 
-	echo '<?xml version="1.0" encoding="UTF-8"?' . '>
-	<rss version=', $context['xml_format'] == 'rss2' ? '"2.0" xmlns:dc="http://purl.org/dc/elements/1.1/"' : '"0.92"', ' xml:lang="', strtr($txt['lang_locale'], '_', '-'), '">
+	echo '<?xml version="1.0" encoding="UTF-8"?>
+	<rss version=', $context['xml_format'] === 'rss2' ? '"2.0" xmlns:dc="http://purl.org/dc/elements/1.1/"' : '"0.92"', ' xml:lang="', strtr($txt['lang_locale'], '_', '-'), '">
 		<channel>
 			<title>', $context['feed_title'], '</title>
 			<link>', $scripturl, '</link>

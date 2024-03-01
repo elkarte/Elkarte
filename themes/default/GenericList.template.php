@@ -41,7 +41,7 @@ function template_show_list($list_id = null)
 	if (!empty($cur_list['title']))
 	{
 		echo '
-			<h2 class="category_header', !empty($cur_list['icon']) ? ' hdicon ' . $cur_list['icon'] : '', '">', $cur_list['title'], '</h2>';
+			<h2 class="category_header', empty($cur_list['icon']) ? '' : ' hdicon ' . $cur_list['icon'], '">', $cur_list['title'], '</h2>';
 	}
 
 	// Show any data right after the title
@@ -112,7 +112,7 @@ function template_show_list($list_id = null)
 
 	// Start of the main table
 	echo '
-			<table id="' . $list_id . '" class="table_grid"', !empty($cur_list['width']) ? ' style="width: ' . $cur_list['width'] . '"' : '', '>';
+			<table id="' . $list_id . '" class="table_grid"', empty($cur_list['width']) ? '' : ' style="width: ' . $cur_list['width'] . '"', '>';
 
 	// Show the column headers.
 	$header_count = count($cur_list['headers']);
@@ -156,7 +156,7 @@ function template_show_list($list_id = null)
 		echo '
 				<tr>
 					<td colspan="', $cur_list['num_columns'], '">
-						<div class="', !empty($cur_list['no_items_align']) ? $cur_list['no_items_align'] : 'centertext', '">', $cur_list['no_items_label'], '</div>
+						<div class="', empty($cur_list['no_items_align']) ? 'centertext' : $cur_list['no_items_align'], '">', $cur_list['no_items_label'], '</div>
 					</td>
 				</tr>';
 	}
@@ -284,8 +284,8 @@ function template_create_list_menu($list_menu)
 	{
 		echo '
 			<li class="listlevel1">
-				<a class="linklevel1', $link['is_selected'] ? ' active' : '', '" href="', !empty($link['href']) ? $link['href'] : '#', '">',
-				$link['label'], !empty($link['href']) ? '</a>' : '', '
+				<a class="linklevel1', $link['is_selected'] ? ' active' : '', '" href="', empty($link['href']) ? '#' : $link['href'], '">',
+				$link['label'], empty($link['href']) ? '' : '</a>', '
 			</li>';
 	}
 

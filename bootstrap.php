@@ -34,11 +34,7 @@ use ElkArte\User;
  */
 class Bootstrap
 {
-	/**
-	 * What is returned by the function getrusage.
-	 *
-	 * @var mixed[]
-	 */
+	/** @var array What is returned by the function getrusage. */
 	protected $rusage_start = [];
 
 	/**
@@ -104,6 +100,7 @@ class Bootstrap
 		{
 			define('ELK', '1');
 		}
+
 		define('ELKBOOT', '1');
 
 		// The software version
@@ -127,7 +124,7 @@ class Bootstrap
 	private function clearGlobals()
 	{
 		// We don't need no globals. (a bug in "old" versions of PHP)
-		foreach (array('db_character_set', 'cachedir') as $variable)
+		foreach (['db_character_set', 'cachedir'] as $variable)
 		{
 			if (isset($GLOBALS[$variable]))
 			{
@@ -162,14 +159,7 @@ class Bootstrap
 
 			if (!defined('IGNORE_INSTALL_DIR'))
 			{
-				if (file_exists($settings_loc) && empty($_SESSION['installing']))
-				{
-					$redirec_file = 'upgrade.php';
-				}
-				else
-				{
-					$redirec_file = 'install.php';
-				}
+				$redirec_file = file_exists($settings_loc) && empty($_SESSION['installing']) ? 'upgrade.php' : 'install.php';
 
 				// To early for constants or autoloader
 				require_once($boarddir . '/sources/ElkArte/Server.php');
@@ -182,7 +172,7 @@ class Bootstrap
 				$location .= ($temp !== '/') ? $temp : '';
 
 				// Too early to use Headers class etc.
-				header('Location:' . $location. '/install/' . $redirec_file . '?v=' . $version_running);
+				header('Location:' . $location . '/install/' . $redirec_file . '?v=' . $version_running);
 				die();
 			}
 		}
@@ -193,8 +183,7 @@ class Bootstrap
 	}
 
 	/**
-	 * Validate the paths set in Settings.php, correct as needed and move
-	 * them to constants.
+	 * Validate the paths set in Settings.php, correct as needed and move them to constants.
 	 */
 	private function validatePaths()
 	{
@@ -269,17 +258,29 @@ class Bootstrap
 	}
 
 	/**
-	 * Check if we are in maintance mode, if so end here.
+	 * Check if we are in maintenance mode, if so end here.
 	 */
 	private function checkMaintance()
 	{
 		global $maintenance, $ssi_maintenance_off;
 
 		// Don't do john didley if the forum's been shut down completely.
-		if (!empty($maintenance) && $maintenance == 2 && (!isset($ssi_maintenance_off) || $ssi_maintenance_off !== true))
+		if (empty($maintenance))
 		{
-			Errors::instance()->display_maintenance_message();
+			return;
 		}
+
+		if ((int) $maintenance !== 2)
+		{
+			return;
+		}
+
+		if (isset($ssi_maintenance_off) && $ssi_maintenance_off === true)
+		{
+			return;
+		}
+
+		Errors::instance()->display_maintenance_message();
 	}
 
 	/**
@@ -323,7 +324,7 @@ class Bootstrap
 		// Our good ole' contextual array, which will hold everything
 		if (empty($context))
 		{
-			$context = array();
+			$context = [];
 		}
 	}
 
@@ -435,6 +436,7 @@ class Bootstrap
 			{
 				$template_layers->addBegin($layer);
 			}
+
 			template_header();
 		}
 		else
@@ -448,14 +450,21 @@ class Bootstrap
 		// Make sure they didn't muss around with the settings... but only if it's not cli.
 		if (isset($_SERVER['REMOTE_ADDR']) && session_id() === '')
 		{
-			trigger_error($txt['ssi_session_broken'], E_USER_NOTICE);
+			trigger_error($txt['ssi_session_broken']);
 		}
 
 		// Without visiting the forum this session variable might not be set on submit.
-		if (!isset($_SESSION['USER_AGENT']) && (!isset($_GET['ssi_function']) || $_GET['ssi_function'] !== 'pollVote'))
+		if (isset($_SESSION['USER_AGENT']))
 		{
-			$_SESSION['USER_AGENT'] = $req->user_agent();
+			return;
 		}
+
+		if (isset($_GET['ssi_function']) && $_GET['ssi_function'] === 'pollVote')
+		{
+			return;
+		}
+
+		$_SESSION['USER_AGENT'] = $req->user_agent();
 	}
 
 	/**
@@ -468,8 +477,8 @@ class Bootstrap
 		// Check on any hacking attempts.
 		if (
 			isset($_REQUEST['GLOBALS']) || isset($_COOKIE['GLOBALS'])
-			|| isset($_REQUEST['ssi_theme']) && (int) $_REQUEST['ssi_theme'] == (int) $ssi_theme
-			|| isset($_COOKIE['ssi_theme']) && (int) $_COOKIE['ssi_theme'] == (int) $ssi_theme
+			|| isset($_REQUEST['ssi_theme']) && (int) $_REQUEST['ssi_theme'] === (int) $ssi_theme
+			|| isset($_COOKIE['ssi_theme']) && (int) $_COOKIE['ssi_theme'] === (int) $ssi_theme
 			|| isset($_REQUEST['ssi_layers'], $ssi_layers) && $_REQUEST['ssi_layers'] == $ssi_layers
 			|| isset($_REQUEST['context']))
 		{

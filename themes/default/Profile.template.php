@@ -100,7 +100,7 @@ function template_showDrafts()
 				$draft['title'] .= '<i class="icon icon-small i-lock" title="' . $txt['locked_topic'] . '"><s>' . $txt['locked_topic'] . '</s></i>';
 			}
 
-			$draft['date'] = '&#171; <strong>' . $txt['draft_saved_on'] . ':</strong> ' . ($draft['age'] > 0 ? sprintf($txt['draft_days_ago'], $draft['age']) : $draft['time']) . (!empty($draft['remaining']) ? ', ' . sprintf($txt['draft_retain'], $draft['remaining']) : '') . ' &#187;';
+			$draft['date'] = '&#171; <strong>' . $txt['draft_saved_on'] . ':</strong> ' . ($draft['age'] > 0 ? sprintf($txt['draft_days_ago'], $draft['age']) : $draft['time']) . (empty($draft['remaining']) ? '' : ', ' . sprintf($txt['draft_retain'], $draft['remaining'])) . ' &#187;';
 			$draft['class'] = 'content';
 
 			template_simple_message($draft);
@@ -186,7 +186,7 @@ function template_error_message()
 	if (!empty($context['post_errors']))
 	{
 		echo '
-			<span>', !empty($context['custom_error_title']) ? $context['custom_error_title'] : $txt['profile_errors_occurred'], ':</span>
+			<span>', empty($context['custom_error_title']) ? $txt['profile_errors_occurred'] : $context['custom_error_title'], ':</span>
 			<ul id="list_errors">';
 
 		// Cycle through each error and display an error message.

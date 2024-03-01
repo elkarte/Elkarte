@@ -37,7 +37,7 @@ function template_manage_themes()
 						</dt>
 						<dd>
 							<input type="hidden" value="0" name="options[theme_allow]">
-							<input type="checkbox" name="options[theme_allow]" id="options-theme_allow" value="1"', !empty($modSettings['theme_allow']) ? ' checked="checked"' : '', ' />
+							<input type="checkbox" name="options[theme_allow]" id="options-theme_allow" value="1"', empty($modSettings['theme_allow']) ? '' : ' checked="checked"', ' />
 						</dd>
 						<dt>
 							<label for="known_themes_list">', $txt['themeadmin_selectable'], '</label>
@@ -191,7 +191,7 @@ function template_list_themes()
 		echo '
 			<div class="theme_', $theme['id'], '">
 				<h2 class="category_header">
-					', $theme['name'], '', !empty($theme['version']) ? ' <em>(' . $theme['version'] . ')</em>' : '';
+					', $theme['name'], '', empty($theme['version']) ? '' : ' <em>(' . $theme['version'] . ')</em>';
 
 		// You *cannot* delete the default theme. It's important!
 		if ($theme['id'] != 1)
@@ -321,7 +321,7 @@ function template_set_options()
 		if ($context['theme_options_reset'])
 		{
 			echo '
-						<select name="', !empty($setting['default']) ? 'default_' : '', 'options_master[', $setting['id'], ']" onchange="this.form.options_', $setting['id'], '.disabled = this.selectedIndex != 1;">
+						<select name="', empty($setting['default']) ? '' : 'default_', 'options_master[', $setting['id'], ']" onchange="this.form.options_', $setting['id'], '.disabled = this.selectedIndex != 1;">
 							<option value="0" selected="selected">', $txt['themeadmin_reset_options_none'], '</option>
 							<option value="1">', $txt['themeadmin_reset_options_change'], '</option>
 							<option value="2">', $txt['themeadmin_reset_options_default'], '</option>
@@ -342,8 +342,8 @@ function template_set_options()
 			echo '
 					</dt>
 					<dd>
-						<input type="hidden" name="' . (!empty($setting['default']) ? 'default_' : '') . 'options[' . $setting['id'] . ']" value="0" />
-						<input type="checkbox" name="', !empty($setting['default']) ? 'default_' : '', 'options[', $setting['id'], ']" id="options_', $setting['id'], '"', !empty($setting['value']) ? ' checked="checked"' : '', $context['theme_options_reset'] ? ' disabled="disabled"' : '', ' value="1" class="input_check floatleft" />';
+						<input type="hidden" name="' . (empty($setting['default']) ? '' : 'default_') . 'options[' . $setting['id'] . ']" value="0" />
+						<input type="checkbox" name="', empty($setting['default']) ? '' : 'default_', 'options[', $setting['id'], ']" id="options_', $setting['id'], '"', empty($setting['value']) ? '' : ' checked="checked"', $context['theme_options_reset'] ? ' disabled="disabled"' : '', ' value="1" class="input_check floatleft" />';
 		}
 		// How about selection lists, we all love them
 		elseif ($setting['type'] == 'list')
@@ -360,7 +360,7 @@ function template_set_options()
 			echo '
 					</dt>
 					<dd>
-						<select class="floatleft" name="', !empty($setting['default']) ? 'default_' : '', 'options[', $setting['id'], ']" id="options_', $setting['id'], '"', $context['theme_options_reset'] ? ' disabled="disabled"' : '', '>';
+						<select class="floatleft" name="', empty($setting['default']) ? '' : 'default_', 'options[', $setting['id'], ']" id="options_', $setting['id'], '"', $context['theme_options_reset'] ? ' disabled="disabled"' : '', '>';
 
 			foreach ($setting['options'] as $value => $label)
 			{
@@ -386,7 +386,7 @@ function template_set_options()
 			echo '
 					</dt>
 					<dd>
-						<input type="text" name="', !empty($setting['default']) ? 'default_' : '', 'options[', $setting['id'], ']" id="options_', $setting['id'], '" value="', $setting['value'], '"', $setting['type'] == 'number' ? ' size="5"' : '', $context['theme_options_reset'] ? ' disabled="disabled"' : '', ' class="input_text" />';
+						<input type="text" name="', empty($setting['default']) ? '' : 'default_', 'options[', $setting['id'], ']" id="options_', $setting['id'], '" value="', $setting['value'], '"', $setting['type'] == 'number' ? ' size="5"' : '', $context['theme_options_reset'] ? ' disabled="disabled"' : '', ' class="input_text" />';
 		}
 
 		// End of this definition
@@ -483,7 +483,7 @@ function template_set_settings()
 					</dt>
 					<dd>
 						<input type="hidden" name="options[disable_user_variant]" value="0" />
-						<input type="checkbox" name="options[disable_user_variant]" id="disable_user_variant"', !empty($context['theme_settings']['disable_user_variant']) ? ' checked="checked"' : '', ' value="1" />
+						<input type="checkbox" name="options[disable_user_variant]" id="disable_user_variant"', empty($context['theme_settings']['disable_user_variant']) ? '' : ' checked="checked"', ' value="1" />
 					</dd>
 				</dl>
 				<img src="', $context['theme_variants'][$context['default_variant']]['thumbnail'], '" id="variant_preview" alt="" />
@@ -508,7 +508,7 @@ function template_set_settings()
 				<dl class="settings">';
 		}
 		// A checkbox?
-		elseif ($setting['type'] == 'checkbox')
+		elseif ($setting['type'] === 'checkbox')
 		{
 			echo '
 					<dt id="dt_', $setting['id'], '">
@@ -523,12 +523,12 @@ function template_set_settings()
 			echo '
 					</dt>
 					<dd id="dd_', $setting['id'], '">
-						<input type="hidden" name="', !empty($setting['default']) ? 'default_' : '', 'options[', $setting['id'], ']" value="0" />
-						<input type="checkbox" name="', !empty($setting['default']) ? 'default_' : '', 'options[', $setting['id'], ']" id="', $setting['id'], '"', !empty($setting['value']) ? ' checked="checked"' : '', ' value="1" />
+						<input type="hidden" name="', empty($setting['default']) ? '' : 'default_', 'options[', $setting['id'], ']" value="0" />
+						<input type="checkbox" name="', empty($setting['default']) ? '' : 'default_', 'options[', $setting['id'], ']" id="', $setting['id'], '"', empty($setting['value']) ? '' : ' checked="checked"', ' value="1" />
 					</dd>';
 		}
 		// A textarea?
-		elseif ($setting['type'] == 'textarea')
+		elseif ($setting['type'] === 'textarea')
 		{
 			echo '
 					<dt id="dt_', $setting['id'], '">
@@ -543,11 +543,11 @@ function template_set_settings()
 			echo '
 					</dt>
 					<dd id="dd_', $setting['id'], '">
-						<textarea name="', !empty($setting['default']) ? 'default_' : '', 'options[', $setting['id'], ']" id="', $setting['id'], '"class="input_textarea">', $setting['value'], '</textarea>
+						<textarea name="', empty($setting['default']) ? '' : 'default_', 'options[', $setting['id'], ']" id="', $setting['id'], '"class="input_textarea">', $setting['value'], '</textarea>
 					</dd>';
 		}
 		// A list with options?
-		elseif ($setting['type'] == 'list')
+		elseif ($setting['type'] === 'list')
 		{
 			echo '
 					<dt id="dt_', $setting['id'], '">
@@ -566,6 +566,7 @@ function template_set_settings()
 								<dt><strong>', $txt[$option[0]], '</strong></dt>
 								<dd>', $txt[$option[1]], '</dd>';
 					}
+
 					echo '
 							</dl>
 						</div>';
@@ -580,7 +581,7 @@ function template_set_settings()
 			echo '
 					</dt>
 					<dd id="dd_', $setting['id'], '">
-						<select name="', !empty($setting['default']) ? 'default_' : '', 'options[', $setting['id'], ']" id="', $setting['id'], '">';
+						<select name="', empty($setting['default']) ? '' : 'default_', 'options[', $setting['id'], ']" id="', $setting['id'], '">';
 
 			foreach ($setting['options'] as $value => $label)
 			{
@@ -608,7 +609,7 @@ function template_set_settings()
 			echo '
 					</dt>
 					<dd id="dd_', $setting['id'], '">
-						<input type="text" name="', !empty($setting['default']) ? 'default_' : '', 'options[', $setting['id'], ']" id="', $setting['id'], '" value="', $setting['value'], '"', $setting['type'] == 'number' ? ' size="5"' : (empty($setting['size']) ? ' size="40"' : ' size="' . $setting['size'] . '"'), ' class="input_text" />
+						<input type="text" name="', empty($setting['default']) ? '' : 'default_', 'options[', $setting['id'], ']" id="', $setting['id'], '" value="', $setting['value'], '"', $setting['type'] == 'number' ? ' size="5"' : (empty($setting['size']) ? ' size="40"' : ' size="' . $setting['size'] . '"'), ' class="input_text" />
 					</dd>';
 		}
 	}
@@ -696,7 +697,7 @@ function template_pick()
 					<em>', $theme['num_users'], ' ', ($theme['num_users'] == 1 ? $txt['theme_user'] : $txt['theme_users']), '</em>
 				</p>
 				<div class="separator"></div>
-				<a class="linkbutton" href="', $scripturl, '?action=admin;area=theme;sa=pick;u=', $context['current_member'], ';th=', $theme['id'], ';', $context['session_var'], '=', $context['session_id'], !empty($theme['variants']) ? ';vrt=' . $theme['selected_variant'] : '', '" id="theme_use_', $theme['id'], '">', $txt['theme_set'], '</a>
+				<a class="linkbutton" href="', $scripturl, '?action=admin;area=theme;sa=pick;u=', $context['current_member'], ';th=', $theme['id'], ';', $context['session_var'], '=', $context['session_id'], empty($theme['variants']) ? '' : ';vrt=' . $theme['selected_variant'], '" id="theme_use_', $theme['id'], '">', $txt['theme_set'], '</a>
 				<a class="linkbutton" href="', $scripturl, '?action=admin;area=theme;sa=pick;u=', $context['current_member'], ';theme=', $theme['id'], ';', $context['session_var'], '=', $context['session_id'], ';variant=', $theme['selected_variant'], '" id="theme_preview_', $theme['id'], '">', $txt['theme_preview'], '</a>
 			</div>';
 

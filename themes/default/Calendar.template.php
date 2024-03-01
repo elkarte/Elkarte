@@ -283,7 +283,7 @@ function template_show_month_grid($grid_name)
 		foreach ($calendar_data['week_days'] as $day)
 		{
 			echo '
-						<th scope="col" class="days">', !empty($calendar_data['short_day_titles']) ? (Util::substr($txt['days'][$day], 0, 1)) : $txt['days'][$day], '</th>';
+						<th scope="col" class="days">', empty($calendar_data['short_day_titles']) ? ($txt['days'][$day]) : Util::substr($txt['days'][$day], 0, 1), '</th>';
 		}
 
 		echo '
@@ -361,11 +361,11 @@ function template_show_month_grid($grid_name)
 									<a href="', getUrl('profile', ['action' => 'profile', 'u' => $member['id'], 'name' => $member['name']]), '">', $member['name'], isset($member['age']) ? ' (' . $member['age'] . ')' : '', '</a>', $member['is_last'] || ($count == 10 && $use_js_hide) ? '' : ', ';
 
 						// Stop at ten?
-						if ($count == 10 && $use_js_hide)
+						if ($count === 10 && $use_js_hide)
 						{
 							echo '
 									<span class="hidelink" id="bdhidelink_', $day['day'], '">...<br />
-										<a href="', getUrl('action', ['action' => 'calendar', 'year' => $calendar_data['current_year'], 'month' => $calendar_data['current_month'], 'showbd']), '" onclick="document.getElementById(\'bdhide_', $day['day'], '\').style.display = \'block\'; document.getElementById(\'bdhidelink_', $day['day'], '\').style.display = \'none\'; return false;">(', sprintf($txt['calendar_click_all'], count($day['birthdays'])), ')</a>
+										<a href="', getUrl('action', ['action' => 'calendar', 'year' => $calendar_data['current_year'], 'month' => $calendar_data['current_month'], 'showbd']), '" onclick="document.getElementById(\'bdhide_', $day['day'], "').style.display = 'block'; document.getElementById('bdhidelink_", $day['day'], '\').style.display = \'none\'; return false;">(', sprintf($txt['calendar_click_all'], count($day['birthdays'])), ')</a>
 									</span>
 									<span id="bdhide_', $day['day'], '" class="hide">, ';
 						}

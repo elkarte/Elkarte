@@ -76,8 +76,10 @@ class ProfileForumController extends ElkArteWebSupport
 		// Lets set a signature, something profound
 		$this->byId('signature')->click();
 		$this->keys('A Signature');
-		$script = 'document.querySelector(\'#save_profile\').click();';
-		$this->execute(['script' => $script, 'args' => []]);
+		//$script = 'document.querySelector(\'#save_profile\').click();';
+		//$this->execute(['script' => $script, 'args' => []]);
+
+		$this->byId('save_profile')->submit();
 
 		// We return to the forum profile page
 		$this->assertStringContainsString('A Signature', $this->byId('signature')->text());

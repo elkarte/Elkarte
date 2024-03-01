@@ -50,9 +50,9 @@ function template_messages_informations_above()
 				<i class="hdicon ', $context['class'], '"></i>
 				', $txt['topic'], ': ', $context['subject'], '&nbsp;<span class="views_text">(', $context['num_views_text'], ')</span>
 				<span class="nextlinks">',
-					!empty($context['links']['go_prev']) ? '<a href="' . $context['links']['go_prev'] . '">' . $txt['previous_next_back'] . '</a>' : '',
-					!empty($context['links']['go_next']) ? ' - <a href="' . $context['links']['go_next'] . '">' . $txt['previous_next_forward'] . '</a>' : '',
-					!empty($context['links']['derived_from']) ? ' - <a href="' . $context['links']['derived_from'] . '">' . sprintf($txt['topic_derived_from'], '<em>' . Util::shorten_text($context['topic_derived_from']['subject'], !empty($modSettings['subject_length']) ? $modSettings['subject_length'] : 32)) . '</em></a>' : '',
+					empty($context['links']['go_prev']) ? '' : '<a href="' . $context['links']['go_prev'] . '">' . $txt['previous_next_back'] . '</a>',
+					empty($context['links']['go_next']) ? '' : ' - <a href="' . $context['links']['go_next'] . '">' . $txt['previous_next_forward'] . '</a>',
+					empty($context['links']['derived_from']) ? '' : ' - <a href="' . $context['links']['derived_from'] . '">' . sprintf($txt['topic_derived_from'], '<em>' . Util::shorten_text($context['topic_derived_from']['subject'], empty($modSettings['subject_length']) ? 32 : $modSettings['subject_length'])) . '</em></a>',
 				'</span>
 			</header>
 			<section>';
@@ -91,12 +91,13 @@ function template_messages_informations_above()
 					' . sprintf($txt['no_redir'], '<a href="' . $context['topic_redirected_from']['redir_href'] . '">' . $context['topic_redirected_from']['subject'] . '</a>'), '
 				</span>';
 		}
+
 		echo '
 			</div>';
 	}
 
 	echo '
-			<form id="quickModForm" action="', $scripturl, '?action=quickmod2;topic=', $context['current_topic'], '.', $context['start'], '" method="post" accept-charset="UTF-8" name="quickModForm" onsubmit="return oQuickModify.bInEditMode ? oQuickModify.modifySave(\'' . $context['session_id'] . '\', \'' . $context['session_var'] . '\') : false">';
+			<form id="quickModForm" action="', $scripturl, '?action=quickmod2;topic=', $context['current_topic'], '.', $context['start'], '" method="post" accept-charset="UTF-8" name="quickModForm" onsubmit="return oQuickModify.bInEditMode ? oQuickModify.modifySave(\'' . $context['session_id'] . "', '" . $context['session_var'] . '\') : false">';
 }
 
 /**
@@ -156,7 +157,7 @@ function template_messages()
 		echo '
 					<div class="postarea', empty($options['hide_poster_area']) ? '' : '2', '">
 						<header class="keyinfo">
-						', (!empty($options['hide_poster_area']) ? '<ul class="poster poster2">' . template_build_poster_div($message, $ignoring) . '</ul>' : '');
+						', (empty($options['hide_poster_area']) ? '' : '<ul class="poster poster2">' . template_build_poster_div($message, $ignoring) . '</ul>');
 
 		if (!empty($context['follow_ups'][$message['id']]))
 		{
@@ -185,8 +186,8 @@ function template_messages()
 							<span id="messageicon_', $message['id'], '" class="messageicon', ($message['icon_url'] !== $settings['images_url'] . '/post/xx.png') ? '"' : ' hide"', '>
 								<img src="', $message['icon_url'] . '" alt=""', $message['can_modify'] ? ' id="msg_icon_' . $message['id'] . '"' : '', ' />
 							</span>
-							<h3 id="info_', $message['id'], '">', !empty($message['counter']) ? '
-								<a href="' . $message['href'] . '" rel="nofollow">' . sprintf($txt['reply_number'], $message['counter']) . '</a> &ndash; ' : '', $message['html_time'], '
+							<h3 id="info_', $message['id'], '">', empty($message['counter']) ? '' : '
+								<a href="' . $message['href'] . '" rel="nofollow">' . sprintf($txt['reply_number'], $message['counter']) . '</a> &ndash; ', $message['html_time'], '
 							</h3>
 							<div id="msg_', $message['id'], '_quick_mod"', $ignoring ? ' class="hide"' : '', '></div>
 						</header>';
@@ -219,7 +220,7 @@ function template_messages()
 
 		// This is the floating Quick Quote button.
 		echo '
-							<button id="button_float_qq_', $message['id'], '" type="submit" role="button" class="quick_quote_button hide">', !empty($txt['quick_quote']) ? $txt['quick_quote'] : $txt['quote'], '</button>';
+							<button id="button_float_qq_', $message['id'], '" type="submit" role="button" class="quick_quote_button hide">', empty($txt['quick_quote']) ? $txt['quote'] : $txt['quick_quote'], '</button>';
 
 
 		// Assuming there are attachments...
@@ -235,8 +236,8 @@ function template_messages()
 		if (!empty($modSettings['show_modify']))
 		{
 			echo '
-								<span id="modified_', $message['id'], '" class="smalltext modified', !empty($message['modified']['name']) ? '"' : ' hide"', '>
-									', !empty($message['modified']['name']) ? $message['modified']['last_edit_text'] : '', '
+								<span id="modified_', $message['id'], '" class="smalltext modified', empty($message['modified']['name']) ? ' hide"' : '"', '>
+									', empty($message['modified']['name']) ? '' : $message['modified']['last_edit_text'], '
 								</span>';
 		}
 
@@ -256,7 +257,7 @@ function template_messages()
 			|| (!empty($message['member']['custom_fields']) && empty($options['show_no_signatures']) && $context['signature_enabled']);
 
 		echo '
-							<div class="signature' . (!$has_top_border ? ' without_top_border' : '') . '">';
+							<div class="signature' . ($has_top_border ? '' : ' without_top_border') . '">';
 
 		if ($message['likes_enabled'])
 		{
@@ -371,7 +372,7 @@ function template_quickreply_below()
 						<h4>', $txt['reply'], '</h4>
 					</header>
 					<div id="quickReplyOptions">
-						<form action="', getUrl('action', ['action' => 'post2', 'board' => $context['current_board']]), '" method="post" accept-charset="UTF-8" name="postmodify" id="postmodify" onsubmit="submitonce(this);', (!empty($modSettings['mentions_enabled']) ? 'revalidateMentions(\'postmodify\', \'' . $context['post_box_name'] . '\');' : ''), '">
+						<form action="', getUrl('action', ['action' => 'post2', 'board' => $context['current_board']]), '" method="post" accept-charset="UTF-8" name="postmodify" id="postmodify" onsubmit="submitonce(this);', (empty($modSettings['mentions_enabled']) ? '' : "revalidateMentions('postmodify', '" . $context['post_box_name'] . "');"), '">
 							<input type="hidden" name="topic" value="', $context['current_topic'], '" />
 							<input type="hidden" name="subject" value="', $context['response_prefix'], $context['subject'], '" />
 							<input type="hidden" name="icon" value="xx" />
@@ -513,7 +514,7 @@ function template_quickreply_below()
 			sClassName: "quick_edit",
 			sIDSubject: "post_subject_",
 			sIDInfo: "info_",
-			bShowModify: ' . (!empty($modSettings['show_modify']) ? 'true' : 'false') . ',
+			bShowModify: ' . (empty($modSettings['show_modify']) ? 'false' : 'true') . ',
 			iTopicId: ' . $context['current_topic'] . ',
 			sTemplateBodyEdit: ' . JavaScriptEscape('
 				<div id="quick_edit_body_container">
@@ -523,7 +524,7 @@ function template_quickreply_below()
 						<input type="hidden" name="\' + elk_session_var + \'" value="\' + elk_session_id + \'" />
 						<input type="hidden" name="topic" value="' . $context['current_topic'] . '" />
 						<input type="hidden" name="msg" value="%msg_id%" />
-						<input type="submit" name="post" value="' . $txt['save'] . '" tabindex="' . ($context['tabindex']++) . '" onclick="return oQuickModify.modifySave(\'' . $context['session_id'] . '\', \'' . $context['session_var'] . '\');" accesskey="s" />
+						<input type="submit" name="post" value="' . $txt['save'] . '" tabindex="' . ($context['tabindex']++) . '" onclick="return oQuickModify.modifySave(\'' . $context['session_id'] . "', '" . $context['session_var'] . '\');" accesskey="s" />
 						<input type="submit" name="cancel" value="' . $txt['modify_cancel'] . '" tabindex="' . ($context['tabindex']++) . '" onclick="return oQuickModify.modifyCancel();" />
 					</div>
 				</div>') . ',
@@ -544,7 +545,7 @@ function template_quickreply_below()
 			sBackReference: "aIconLists[" + aIconLists.length + "]",
 			sIconIdPrefix: "msg_icon_",
 			sScriptUrl: elk_scripturl,
-			bShowModify: ' . (!empty($modSettings['show_modify']) ? 'true' : 'false') . ',
+			bShowModify: ' . (empty($modSettings['show_modify']) ? 'false' : 'true') . ',
 			iBoardId: ' . $context['current_board'] . ',
 			iTopicId: ' . $context['current_topic'] . ',
 			sSessionId: elk_session_id,
