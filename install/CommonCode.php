@@ -113,7 +113,7 @@ function test_db_connection()
 	{
 		return $class::initiate($db_server, $db_name, $db_user, $db_passwd, $db_prefix, $db_options);
 	}
-	catch (\Exception $e)
+	catch (\Exception)
 	{
 		return false;
 	}
@@ -250,7 +250,7 @@ function saveFileSettings($config_vars, $settingsArray)
 				}
 
 				$comment = strstr(substr(un_htmlspecialchars($settingsArray[$i]), strpos(un_htmlspecialchars($settingsArray[$i]), ';')), '#');
-				$settingsArray[$i] = '$' . $var . ' = \'' . $val . '\';' . ($comment == '' ? '' : "\t\t" . rtrim($comment)) . "\n";
+				$settingsArray[$i] = '$' . $var . " = '" . $val . "';" . ($comment === '' ? '' : "\t\t" . rtrim($comment)) . "\n";
 
 				unset($config_vars[$var]);
 			}
@@ -265,13 +265,13 @@ function saveFileSettings($config_vars, $settingsArray)
 		{
 			if ($val !== '#remove#')
 			{
-				$settingsArray[$i++] = "\n" . '$' . $var . ' = \'' . $val . '\';' . "\n";
+				$settingsArray[$i++] = "\n" . '$' . $var . " = '" . $val . "';" . "\n";
 			}
 		}
 	}
 
 	// Write out the new settings.php file
-	if (trim($settingsArray[0]) != '<?php')
+	if (trim($settingsArray[0]) !== '<?php')
 	{
 		array_unshift($settingsArray,'<?php' . "\n" );
 	}
@@ -280,7 +280,7 @@ function saveFileSettings($config_vars, $settingsArray)
 
 	// Don't let the OPcache fool us, we need the new file
 	if ($result !== false && extension_loaded('Zend OPcache') && ini_get('opcache.enable') &&
-		((ini_get('opcache.restrict_api') === '' || stripos(BOARDDIR, ini_get('opcache.restrict_api')) !== 0)))
+		((ini_get('opcache.restrict_api') === '' || stripos(BOARDDIR, (string) ini_get('opcache.restrict_api')) !== 0)))
 	{
 		opcache_invalidate(TMP_BOARDDIR . '/Settings.php', true);
 	}
@@ -378,7 +378,7 @@ function makeFilesWritable(&$files)
 			$upcontext['chmod']['ftp_error'] = $ftp->last_message ?? '';
 		}
 
-		list ($username, $detect_path, $found_path) = $ftp->detect_path(TMP_BOARDDIR);
+		[$username, $detect_path, $found_path] = $ftp->detect_path(TMP_BOARDDIR);
 
 		if ($found_path || !isset($upcontext['chmod']['path']))
 		{
@@ -430,7 +430,7 @@ function makeFilesWritable(&$files)
 		}
 
 		// Assuming that didn't work calculate the path without the boarddir.
-		if (!is_writable($file) && strpos($file, BOARDDIR) === 0)
+		if (!is_writable($file) && strpos($file, (string) BOARDDIR) === 0)
 		{
 			$ftp_file = strtr($file, [$_SESSION['installer_temp_ftp']['root'] => '']);
 			$ftp->chmod($ftp_file, 0755);
@@ -510,6 +510,7 @@ function definePaths()
 		DEFINE('CACHEDIR', $cachedir);
 
 	}
+
 	if (!defined('EXTDIR'))
 	{
 		DEFINE('EXTDIR', $extdir);
@@ -555,10 +556,13 @@ class Ftp_Connection
 {
 	/** @var resource|string holds the connection response */
 	public $connection;
+
 	/** @var string|boolean holds any errors */
 	public $error;
+
 	/** @var string holds last message from the server */
 	public $last_message;
+
 	/** @var array Passive connection */
 	public $pasv;
 
@@ -601,10 +605,12 @@ class Ftp_Connection
 		{
 			$ftp_server = 'ssl://' . substr($ftp_server, 7);
 		}
+
 		if (strpos($ftp_server, 'http://') === 0)
 		{
 			$ftp_server = substr($ftp_server, 7);
 		}
+
 		$ftp_server = strtr($ftp_server, ['/' => '', ':' => '', '@' => '']);
 
 		// Connect to the FTP server.
@@ -718,17 +724,14 @@ class Ftp_Connection
 
 		// Delete file X.
 		fwrite($this->connection, 'DELE ' . $ftp_file . "\r\n");
+
+		// Still no love?
 		if (!$this->check_response(250))
 		{
 			fwrite($this->connection, 'RMD ' . $ftp_file . "\r\n");
+			$this->error = 'bad_file';
 
-			// Still no love?
-			if (!$this->check_response(250))
-			{
-				$this->error = 'bad_file';
-
-				return false;
-			}
+			return false;
 		}
 
 		return true;
@@ -880,6 +883,7 @@ class Ftp_Connection
 		{
 			$data .= fread($fp, 4096);
 		}
+
 		fclose($fp);
 
 		// Everything go okay?
@@ -906,6 +910,7 @@ class Ftp_Connection
 		{
 			$listing = $this->list_dir('', true);
 		}
+
 		$listing = explode("\n", $listing);
 
 		@fwrite($this->connection, 'PWD' . "\r\n");
@@ -916,18 +921,11 @@ class Ftp_Connection
 		} while (substr($response, 3, 1) !== ' ' && time() - $time < 5);
 
 		// Check for 257!
-		if (preg_match('~^257 "(.+?)" ~', $response, $match) != 0)
-		{
-			$current_dir = strtr($match[1], ['""' => '"']);
-		}
-		else
-		{
-			$current_dir = '';
-		}
+		$current_dir = preg_match('~^257 "(.+?)" ~', $response, $match) === 1 ? strtr($match[1], ['""' => '"']) : '';
 
 		for ($i = 0, $n = count($listing); $i < $n; $i++)
 		{
-			if (trim($listing[$i]) == '' && isset($listing[$i + 1]))
+			if (trim($listing[$i]) === '' && isset($listing[$i + 1]))
 			{
 				$current_dir = substr(trim($listing[++$i]), 0, -1);
 				$i++;
@@ -940,10 +938,12 @@ class Ftp_Connection
 			{
 				return $listing[$i];
 			}
+
 			if (substr($file, -1) === '*' && strpos($file, substr($listing[$i], 0, strlen($file) - 1)) === 0)
 			{
 				return $listing[$i];
 			}
+
 			if (basename($listing[$i]) === $file || $listing[$i] === $file)
 			{
 				return $listing[$i];
@@ -1037,6 +1037,7 @@ class Ftp_Connection
 			{
 				$found_path = dirname($this->locate(basename($lookup_file)));
 			}
+
 			if ($found_path != false)
 			{
 				$path = $found_path;

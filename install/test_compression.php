@@ -17,10 +17,11 @@
  */
 
 ob_start('ob_gzhandler');
-if (ini_get('session.save_handler') == 'user')
+if (ini_get('session.save_handler') === 'user')
 {
 	@ini_set('session.save_handler', 'files');
 }
+
 session_start();
 
 if (!headers_sent())

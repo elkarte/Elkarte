@@ -22,7 +22,7 @@ use ElkArte\Helper\Util;
  */
 class Install_Controller
 {
-	/** @var array The installation steps*/
+	/** @var array The installation steps */
 	public $steps = [];
 
 	/** @var int Are we there yet? */
@@ -103,12 +103,6 @@ class Install_Controller
 			return true;
 		}
 
-		// Check the PHP version.
-		if (version_compare(REQUIRED_PHP_VERSION, PHP_VERSION, '>'))
-		{
-			$incontext['warning'] = $txt['error_php_too_low'];
-		}
-
 		// See if we think they have already installed it?
 		if (is_readable(TMP_BOARDDIR . '/Settings.php'))
 		{
@@ -120,10 +114,17 @@ class Install_Controller
 					$probably_installed++;
 				}
 
-				if (preg_match('~^\$boardurl\s=\s\'([^\']+)\';~', $line) && !preg_match('~^\$boardurl\s=\s\'http://127\.0\.0\.1/elkarte\';~', $line))
+				if (!preg_match('~^\$boardurl\s=\s\'([^\']+)\';~', $line))
 				{
-					$probably_installed++;
+					continue;
 				}
+
+				if (preg_match('~^\$boardurl\s=\s\'http://127\.0\.0\.1/elkarte\';~', $line))
+				{
+					continue;
+				}
+
+				$probably_installed++;
 			}
 
 			if ($probably_installed === 2)
@@ -131,7 +132,7 @@ class Install_Controller
 				$incontext['warning'] = str_replace('{try_delete}', '
 		<div id="delete_label" class="hide bbc_strong">
 			<label for="delete_self">
-			<input type="checkbox" id="delete_self" onclick="doTheDelete();" class="input_check" /> ' . $txt['delete_installer'] . (!isset($_SESSION['installer_temp_ftp']) ? ' ' . $txt['delete_installer_maybe'] : '') . '</label>
+			<input type="checkbox" id="delete_self" onclick="doTheDelete();" class="input_check" /> ' . $txt['delete_installer'] . (isset($_SESSION['installer_temp_ftp']) ? '' : ' ' . $txt['delete_installer_maybe']) . '</label>
 			<script>
 				function doTheDelete()
 				{
@@ -200,7 +201,7 @@ class Install_Controller
 		}
 		// Very simple check on the session.save_path for Windows.
 		// @todo Move this down later if they don't use database-driven sessions?
-		elseif (@ini_get('session.save_path') == '/tmp' && substr(__FILE__, 1, 2) == ':\\')
+		elseif (@ini_get('session.save_path') === '/tmp' && substr(__FILE__, 1, 2) === ':\\')
 		{
 			$error = 'error_session_save_path';
 		}
@@ -212,11 +213,17 @@ class Install_Controller
 		}
 
 		// Mod_security blocks everything that smells funny. Let us handle security.
-		if (!fixModSecurity() && !isset($_GET['overmodsecurity']))
+		if (fixModSecurity())
 		{
-			$incontext['error'] = $txt['error_mod_security'] . '<br /><br /><a href="' . $installurl . '?overmodsecurity=true">' . $txt['error_message_click'] . '</a> ' . $txt['error_message_bad_try_again'];
+			return false;
 		}
 
+		if (isset($_GET['overmodsecurity']))
+		{
+			return false;
+		}
+
+		$incontext['error'] = $txt['error_mod_security'] . '<br /><br /><a href="' . $installurl . '?overmodsecurity=true">' . $txt['error_message_click'] . '</a> ' . $txt['error_message_bad_try_again'];
 		return false;
 	}
 
@@ -282,7 +289,7 @@ class Install_Controller
 		$incontext['page_title'] = $txt['ftp_checking_writable'];
 		$incontext['sub_template'] = 'chmod_files';
 
-		$extra_files= [];
+		$extra_files = [];
 
 		$writable_files = [
 			'attachments',
@@ -325,6 +332,7 @@ class Install_Controller
 					}
 				}
 			}
+
 			foreach ($extra_files as $file)
 			{
 				@chmod(TMP_BOARDDIR . (empty($file) ? '' : '/' . $file), 0777);
@@ -358,6 +366,7 @@ class Install_Controller
 
 				@fclose($fp);
 			}
+
 			foreach ($extra_files as $file)
 			{
 				@chmod(TMP_BOARDDIR . (empty($file) ? '' : '/' . $file), 0777);
@@ -385,8 +394,9 @@ class Install_Controller
 
 			return false;
 		}
+
 		// We're going to have to use... FTP!
-		elseif ($failure)
+		if ($failure)
 		{
 			// Load any session data we might have...
 			if (!isset($_POST['ftp_username']) && isset($_SESSION['installer_temp_ftp']))
@@ -399,19 +409,15 @@ class Install_Controller
 			}
 
 			$incontext['ftp_errors'] = [];
-
 			if (isset($_POST['ftp_username']))
 			{
 				$ftp = new Ftp_Connection($_POST['ftp_server'], $_POST['ftp_port'], $_POST['ftp_username'], $_POST['ftp_password']);
 
-				if ($ftp->error === false)
+				// Try it without /home/abc just in case they messed up.
+				if ($ftp->error === false && !$ftp->chdir($_POST['ftp_path']))
 				{
-					// Try it without /home/abc just in case they messed up.
-					if (!$ftp->chdir($_POST['ftp_path']))
-					{
-						$incontext['ftp_errors'][] = $ftp->last_message;
-						$ftp->chdir(preg_replace('~^/home[2]?/[^/]+?~', '', $_POST['ftp_path']));
-					}
+					$incontext['ftp_errors'][] = $ftp->last_message;
+					$ftp->chdir(preg_replace('~^/home[2]?/[^/]+?~', '', $_POST['ftp_path']));
 				}
 			}
 
@@ -427,7 +433,7 @@ class Install_Controller
 					$incontext['ftp_errors'][] = $ftp->last_message;
 				}
 
-				list ($username, $detect_path, $found_path) = $ftp->detect_path(TMP_BOARDDIR);
+				[$username, $detect_path, $found_path] = $ftp->detect_path(TMP_BOARDDIR);
 
 				if (empty($_POST['ftp_path']) && $found_path)
 				{
@@ -445,55 +451,52 @@ class Install_Controller
 					'port' => $_POST['ftp_port'] ?? '21',
 					'username' => $_POST['ftp_username'] ?? '',
 					'path' => $_POST['ftp_path'] ?? '/',
-					'path_msg' => !empty($found_path) ? $txt['ftp_path_found_info'] : $txt['ftp_path_info'],
+					'path_msg' => empty($found_path) ? $txt['ftp_path_info'] : $txt['ftp_path_found_info'],
 				];
 
 				return false;
 			}
-			else
+
+			$_SESSION['installer_temp_ftp'] = [
+				'server' => $_POST['ftp_server'],
+				'port' => $_POST['ftp_port'],
+				'username' => $_POST['ftp_username'],
+				'password' => $_POST['ftp_password'],
+				'path' => $_POST['ftp_path']
+			];
+
+			$failed_files_updated = [];
+			foreach ($failed_files as $file)
 			{
-				$_SESSION['installer_temp_ftp'] = [
-					'server' => $_POST['ftp_server'],
-					'port' => $_POST['ftp_port'],
-					'username' => $_POST['ftp_username'],
-					'password' => $_POST['ftp_password'],
-					'path' => $_POST['ftp_path']
+				if (!is_writable(TMP_BOARDDIR . '/' . $file))
+				{
+					$ftp->chmod($file, 0755);
+				}
+
+				if (!is_writable(TMP_BOARDDIR . '/' . $file))
+				{
+					$ftp->chmod($file, 0777);
+				}
+
+				if (!is_writable(TMP_BOARDDIR . '/' . $file))
+				{
+					$failed_files_updated[] = $file;
+					$incontext['ftp_errors'][] = rtrim($ftp->last_message) . ' -> ' . $file . "\n";
+				}
+			}
+			$ftp->close();
+			// Are there any errors left?
+			if (count($failed_files_updated) >= 1)
+			{
+				// Guess there are...
+				$incontext['failed_files'] = $failed_files_updated;
+
+				// Set the username etc, into context.
+				$incontext['ftp'] = $_SESSION['installer_temp_ftp'] += [
+					'path_msg' => $txt['ftp_path_info'],
 				];
 
-				$failed_files_updated = [];
-
-				foreach ($failed_files as $file)
-				{
-					if (!is_writable(TMP_BOARDDIR . '/' . $file))
-					{
-						$ftp->chmod($file, 0755);
-					}
-					if (!is_writable(TMP_BOARDDIR . '/' . $file))
-					{
-						$ftp->chmod($file, 0777);
-					}
-					if (!is_writable(TMP_BOARDDIR . '/' . $file))
-					{
-						$failed_files_updated[] = $file;
-						$incontext['ftp_errors'][] = rtrim($ftp->last_message) . ' -> ' . $file . "\n";
-					}
-				}
-
-				$ftp->close();
-
-				// Are there any errors left?
-				if (count($failed_files_updated) >= 1)
-				{
-					// Guess there are...
-					$incontext['failed_files'] = $failed_files_updated;
-
-					// Set the username etc, into context.
-					$incontext['ftp'] = $_SESSION['installer_temp_ftp'] += [
-						'path_msg' => $txt['ftp_path_info'],
-					];
-
-					return false;
-				}
+				return false;
 			}
 		}
 
@@ -533,17 +536,20 @@ class Install_Controller
 					if (isset($db['default_host']))
 					{
 						$default_host = ini_get($db['default_host']);
-						$incontext['db']['server'] = !empty($default_host) ? $default_host : 'localhost';
+						$incontext['db']['server'] = empty($default_host) ? 'localhost' : $default_host;
 					}
+
 					if (isset($db['default_user']))
 					{
 						$incontext['db']['user'] = ini_get($db['default_user']);
 						$incontext['db']['name'] = ini_get($db['default_user']);
 					}
+
 					if (isset($db['default_password']))
 					{
 						$incontext['db']['pass'] = ini_get($db['default_password']);
 					}
+
 					if (isset($db['default_port']))
 					{
 						$db_port = ini_get($db['default_port']);
@@ -561,7 +567,7 @@ class Install_Controller
 			$incontext['db']['user'] = $_POST['db_user'];
 			$incontext['db']['name'] = $_POST['db_name'];
 			$incontext['db']['server'] = $_POST['db_server'];
-			$incontext['db']['port'] = !empty($_POST['db_port']) ? $_POST['db_port'] : '';
+			$incontext['db']['port'] = empty($_POST['db_port']) ? '' : $_POST['db_port'];
 			$incontext['db']['prefix'] = $_POST['db_prefix'];
 		}
 		else
@@ -583,7 +589,7 @@ class Install_Controller
 				}
 
 				// Duplicate name in the same dir?  Can't do that with SQLite.  Weird things happen.
-				if (file_exists($_POST['db_filename'] . (substr($_POST['db_filename'], -3) != '.db' ? '.db' : '')))
+				if (file_exists($_POST['db_filename'] . (substr($_POST['db_filename'], -3) !== '.db' ? '.db' : '')))
 				{
 					$incontext['error'] = $txt['error_db_filename_exists'];
 
@@ -611,7 +617,7 @@ class Install_Controller
 				'db_user' => $_POST['db_user'],
 				'db_passwd' => $_POST['db_passwd'] ?? '',
 				'db_server' => $_POST['db_server'],
-				'db_port' => !empty($_POST['db_port']) ? $_POST['db_port'] : '',
+				'db_port' => empty($_POST['db_port']) ? '' : $_POST['db_port'],
 				'db_prefix' => $db_prefix,
 				// The cookiename is special; we want it to be the same if it ever needs to be reinstalled with the same info.
 				'cookiename' => 'ElkArteCookie' . abs(crc32($_POST['db_name'] . preg_replace('~[^A-Za-z0-9_$]~', '', $_POST['db_prefix'])) % 1000),
@@ -700,7 +706,7 @@ class Install_Controller
 			{
 				$db->skip_next_error();
 				$db->query('', "
-					CREATE DATABASE IF NOT EXISTS `$db_name`",
+					CREATE DATABASE IF NOT EXISTS `{$db_name}`",
 					[
 						'security_override' => true,
 					]
@@ -711,7 +717,7 @@ class Install_Controller
 				{
 					$db->skip_next_error();
 					$db->query('', "
-						CREATE DATABASE IF NOT EXISTS `$_POST[db_prefix]$db_name`",
+						CREATE DATABASE IF NOT EXISTS `$_POST[db_prefix]{$db_name}`",
 						[
 							'security_override' => true,
 						]
@@ -731,6 +737,7 @@ class Install_Controller
 
 					return false;
 				}
+
 				$db_connection = load_database();
 			}
 
@@ -856,7 +863,7 @@ class Install_Controller
 		$db->skip_next_error();
 		$result = $db->query('', '
 			SELECT 
-			    variable, value
+				variable, value
 			FROM {db_prefix}settings',
 			[]
 		);
@@ -867,6 +874,7 @@ class Install_Controller
 			{
 				$modSettings[$row['variable']] = $row['value'];
 			}
+
 			$result->free_result();
 
 			// Do they match?  If so, this is just a refresh so charge on!
@@ -884,7 +892,7 @@ class Install_Controller
 		// Since we are UTF8, select it. PostgreSQL requires passing it as a string...
 		$db->skip_next_error();
 		$db->query('', '
-			SET NAMES {' . ($db_type == 'postgresql' ? 'string' : 'raw') . ':utf8}',
+			SET NAMES {' . ($db_type === 'postgresql' ? 'string' : 'raw') . ':utf8}',
 			[
 				'utf8' => 'utf8',
 			]
@@ -908,6 +916,7 @@ class Install_Controller
 				$replaces['{$' . $key . '}'] = $value;
 			}
 		}
+
 		$replaces['{$default_reserved_names}'] = strtr($replaces['{$default_reserved_names}'], ['\\\\n' => '\\n']);
 
 		// Execute the SQL.
@@ -1071,6 +1080,7 @@ class Install_Controller
 		{
 			define('ELK', 1);
 		}
+
 		definePaths();
 
 		// These files may be or may not be already included, better safe than sorry for now
@@ -1110,6 +1120,7 @@ class Install_Controller
 		{
 			return true;
 		}
+
 		$request->free_result();
 
 		// Trying to create an account?
@@ -1171,7 +1182,7 @@ class Install_Controller
 			);
 			if ($result->num_rows() !== 0)
 			{
-				list ($incontext['member_id'], $incontext['member_salt']) = $result->fetch_row();
+				[$incontext['member_id'], $incontext['member_salt']] = $result->fetch_row();
 				$result->free_result();
 
 				$incontext['account_existed'] = $txt['error_user_settings_taken'];
@@ -1248,7 +1259,7 @@ class Install_Controller
 				return false;
 			}
 
-			$incontext['member_id'] = $db->insert_id("{$db_prefix}members");
+			$incontext['member_id'] = $db->insert_id($db_prefix . 'members');
 
 			// If we're here we're good.
 			return true;
@@ -1318,7 +1329,7 @@ class Install_Controller
 		$db->insert('ignore',
 			'{db_prefix}log_activity',
 			['date' => 'date', 'topics' => 'int', 'posts' => 'int', 'registers' => 'int'],
-			[Util::strftime('%Y-%m-%d', time()), 1, 1, (!empty($incontext['member_id']) ? 1 : 0)],
+			[Util::strftime('%Y-%m-%d', time()), 1, 1, (empty($incontext['member_id']) ? 0 : 1)],
 			['date']
 		);
 
@@ -1334,7 +1345,7 @@ class Install_Controller
 			FROM {db_prefix}settings',
 			[]
 		)->fetch_callback(
-			function ($row) use (&$modSettings) {
+			static function ($row) use (&$modSettings) {
 				// Only proceed if we can load the data.
 				$modSettings[$row['variable']] = $row['value'];
 			}
@@ -1358,8 +1369,9 @@ class Install_Controller
 		);
 		if ($result->num_rows() !== 0)
 		{
-			list ($db_sessions) = $result->fetch_row();
+			[$db_sessions] = $result->fetch_row();
 		}
+
 		$result->free_result();
 
 		if (empty($db_sessions))
@@ -1405,6 +1417,7 @@ class Install_Controller
 		{
 			updateSubjectStats(1, htmlspecialchars($txt['default_topic_subject']));
 		}
+
 		$request->free_result();
 
 		// Sanity check that they loaded earlier!

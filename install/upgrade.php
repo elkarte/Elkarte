@@ -12,7 +12,7 @@
  *
  */
 
-require('installcore.php');
+require(__DIR__ . '/installcore.php');
 
 // General options for the script.
 $timeLimitThreshold = 3;
@@ -206,7 +206,7 @@ if (isset($modSettings['elkVersion']))
 			'images_url' => 'images_url',
 		]
 	)->fetch_callback(
-		function ($row) use (&$modSettings) {
+		static function ($row) use (&$modSettings) {
 			$modSettings[$row['variable']] = $row['value'];
 		}
 	);
@@ -337,7 +337,7 @@ function upgradeExit($fallThrough = false)
 		$upcontext['user']['updated'] = time();
 		$upgradeData = base64_encode(serialize($upcontext['user']));
 		copy(BOARDDIR . '/Settings.php', BOARDDIR . '/Settings_bak.php');
-		changeSettings(['upgradeData' => '\'' . $upgradeData . '\'']);
+		changeSettings(['upgradeData' => "'" . $upgradeData . "'"]);
 		updateLastError();
 	}
 
@@ -361,7 +361,7 @@ function upgradeExit($fallThrough = false)
 				debug_print_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS);
 			}
 
-			echo "\n" . 'Error: Unexpected call to use the ' . ($upcontext['sub_template'] ?? '') . ' template. Please copy and paste all the text above and visit the ElkArte Community to tell the Developers that they\'ve made a doh!; they\'ll get you up and running again.';
+			echo "\n" . 'Error: Unexpected call to use the ' . ($upcontext['sub_template'] ?? '') . " template. Please copy and paste all the text above and visit the ElkArte Community to tell the Developers that they've made a doh!; they'll get you up and running again.";
 			flush();
 			die();
 		}
@@ -374,10 +374,17 @@ function upgradeExit($fallThrough = false)
 			$upcontext['get_data'] = [];
 			foreach ($_GET as $k => $v)
 			{
-				if (strpos($k, 'amp') !== 0 && !in_array($k, ['xml', 'substep', 'lang', 'data', 'step', 'filecount']))
+				if (strpos($k, 'amp') === 0)
 				{
-					$upcontext['get_data'][$k] = $v;
+					continue;
 				}
+
+				if (in_array($k, ['xml', 'substep', 'lang', 'data', 'step', 'filecount']))
+				{
+					continue;
+				}
+
+				$upcontext['get_data'][$k] = $v;
 			}
 
 			template_xml_above();
@@ -426,7 +433,7 @@ function upgradeExit($fallThrough = false)
 /**
  * Used to direct the user to another location.
  *
- * @param string  $location
+ * @param string $location
  * @param bool $addForm
  */
 function redirectLocation($location, $addForm = true)
@@ -520,7 +527,7 @@ function loadEssentialData()
 		$db->skip_next_error();
 		$request = $db->query('', '
 			SELECT 
-			    variable, value
+				variable, value
 			FROM {db_prefix}settings',
 			[]
 		);
@@ -529,6 +536,7 @@ function loadEssentialData()
 		{
 			$modSettings[$row['variable']] = $row['value'];
 		}
+
 		$request->free_result();
 	}
 	else
@@ -594,8 +602,8 @@ function initialize_inputs()
 	header('X-Content-Type-Options: nosniff');
 
 	// Force a step, defaulting to 0.
-	$_GET['step'] = !isset($_GET['step']) ? 0 : (int) $_GET['step'];
-	$_GET['substep'] = !isset($_GET['substep']) ? 0 : (int) $_GET['substep'];
+	$_GET['step'] = isset($_GET['step']) ? (int) $_GET['step'] : 0;
+	$_GET['substep'] = isset($_GET['substep']) ? (int) $_GET['substep'] : 0;
 }
 
 /**
@@ -655,12 +663,6 @@ function action_welcomeLogin()
 		return throw_error('The upgrader was unable to find some crucial files.<br /><br />Please make sure you uploaded all of the files included in the package, including the themes, sources, and other directories.');
 	}
 
-	// Do they meet the installation requirements?
-	if (version_compare(REQUIRED_PHP_VERSION, PHP_VERSION, '>'))
-	{
-		return throw_error('Warning!  You do not appear to have a version of PHP installed on your webserver that meets ElkArte\'s minimum installations requirements.<br /><br />Please ask your host to upgrade.');
-	}
-
 	if (!db_version_check())
 	{
 		return throw_error('Your ' . $databases[$db_type]['name'] . ' version does not meet the minimum requirements of ElkArte.<br /><br />Please ask your host to upgrade.');
@@ -689,7 +691,7 @@ function action_welcomeLogin()
 	];
 
 	// Check the cache directory.
-	$CACHEDIR_temp = !defined('CACHEDIR') ? BOARDDIR . '/cache' : CACHEDIR;
+	$CACHEDIR_temp = defined('CACHEDIR') ? CACHEDIR : BOARDDIR . '/cache';
 	if (!file_exists($CACHEDIR_temp)
 		&& !mkdir($CACHEDIR_temp) && !is_dir($CACHEDIR_temp))
 	{
@@ -725,7 +727,7 @@ function action_welcomeLogin()
 	// Check agreement.txt. (it may not exist, in which case BOARDDIR must be writable.)
 	if (isset($modSettings['agreement']) && (!is_writable(BOARDDIR) || file_exists(BOARDDIR . '/agreement.txt')) && !is_writable(BOARDDIR . '/agreement.txt'))
 	{
-		return throw_error('The upgrader was unable to obtain write access to agreement.txt.<br /><br />If you are using a linux or unix based server, please ensure that the file is chmod\'d to 777, or if it does not exist that the directory this upgrader is in is 777.<br />If your server is running Windows, please ensure that the internet guest account has the proper permissions on it or its folder.');
+		return throw_error("The upgrader was unable to obtain write access to agreement.txt.<br /><br />If you are using a linux or unix based server, please ensure that the file is chmod'd to 777, or if it does not exist that the directory this upgrader is in is 777.<br />If your server is running Windows, please ensure that the internet guest account has the proper permissions on it or its folder.");
 	}
 
 	if (isset($modSettings['agreement']))
@@ -798,6 +800,7 @@ function checkLogin()
 			{
 				$oldDB = true;
 			}
+
 			$request->free_result();
 		}
 
@@ -833,7 +836,7 @@ function checkLogin()
 
 			if ($request->num_rows() !== 0)
 			{
-				list ($id_member, $name, $password, $id_group, $addGroups, $user_language) = $request->fetch_row($request);
+				[$id_member, $name, $password, $id_group, $addGroups, $user_language] = $request->fetch_row($request);
 
 				// These will come in handy, if you want to login
 				require_once(SOURCEDIR . '/Security.php');
@@ -965,6 +968,7 @@ function checkLogin()
 					{
 						return throw_error('You need to be an admin to perform an upgrade!');
 					}
+
 					$request->free_result();
 				}
 
@@ -1070,7 +1074,7 @@ function action_upgradeOptions()
 	// If we're overriding the language follow it through.
 	if (isset($_GET['lang']) && file_exists($modSettings['theme_dir'] . '/languages/' . $_GET['lang'] . '/index.' . $_GET['lang'] . '.php'))
 	{
-		$changes['language'] = '\'' . $_GET['lang'] . '\'';
+		$changes['language'] = "'" . $_GET['lang'] . "'";
 	}
 
 	// Place the board in to maintance mode?
@@ -1084,12 +1088,12 @@ function action_upgradeOptions()
 		// Specifying a unique maintenance message, like god help us all or just the default
 		if (!empty($_POST['maintitle']))
 		{
-			$changes['mtitle'] = '\'' . addslashes($_POST['maintitle']) . '\'';
-			$changes['mmessage'] = '\'' . addslashes($_POST['mainmessage']) . '\'';
+			$changes['mtitle'] = "'" . addslashes($_POST['maintitle']) . "'";
+			$changes['mmessage'] = "'" . addslashes($_POST['mainmessage']) . "'";
 		}
 		else
 		{
-			$changes['mtitle'] = '\'Upgrading the forum...\'';
+			$changes['mtitle'] = "'Upgrading the forum...'";
 			$changes['mmessage'] = '\'Don\\\'t worry, we will be back shortly with an updated forum.  It will only be a minute ;).\'';
 		}
 	}
@@ -1105,17 +1109,17 @@ function action_upgradeOptions()
 	// Fix some old paths.
 	if (strpos(BOARDDIR, '.') === 0)
 	{
-		$changes['boarddir'] = '\'' . fixRelativePath(BOARDDIR) . '\'';
+		$changes['boarddir'] = "'" . fixRelativePath(BOARDDIR) . "'";
 	}
 
 	if (strpos(SOURCEDIR, '.') === 0)
 	{
-		$changes['sourcedir'] = '\'' . fixRelativePath(SOURCEDIR) . '\'';
+		$changes['sourcedir'] = "'" . fixRelativePath(SOURCEDIR) . "'";
 	}
 
 	if (!defined('CACHEDIR') || strpos(CACHEDIR, '.') === 0)
 	{
-		$changes['cachedir'] = '\'' . fixRelativePath(BOARDDIR) . '/cache\'';
+		$changes['cachedir'] = "'" . fixRelativePath(BOARDDIR) . "/cache'";
 	}
 
 	// Not had the database type added before?
@@ -1228,7 +1232,7 @@ function action_backupDatabase()
 
 		if ($is_debug && $command_line)
 		{
-			echo "\n" . ' Successful.\'' . "\n";
+			echo "\n" . " Successful.'" . "\n";
 			flush();
 		}
 
@@ -1263,11 +1267,17 @@ function backupTable($table)
 
 	$db = load_database();
 	$db->db_backup_table($table, 'backup_' . $table);
-
-	if ($is_debug && $command_line)
+	if (!$is_debug)
 	{
-		echo ' done.';
+		return;
 	}
+
+	if (!$command_line)
+	{
+		return;
+	}
+
+	echo ' done.';
 }
 
 /**
@@ -1408,7 +1418,7 @@ function action_deleteUpgrade()
 	$endl = $command_line ? "\n" : '<br />' . "\n";
 
 	$changes = [
-		'language' => '\'' . (substr($language, -4) === '.lng' ? substr($language, 0, -4) : $language) . '\'',
+		'language' => "'" . (substr($language, -4) === '.lng' ? substr($language, 0, -4) : $language) . "'",
 		'db_error_send' => '1',
 		'upgradeData' => '#remove#'
 	];
@@ -1420,6 +1430,7 @@ function action_deleteUpgrade()
 		{
 			echo ' * ';
 		}
+
 		$upcontext['removed_maintenance'] = true;
 		$changes['maintenance'] = $upcontext['user']['main'];
 	}
@@ -1445,7 +1456,7 @@ function action_deleteUpgrade()
 	// Log what we've done.
 	if (empty($user_info['id']))
 	{
-		$user_info['id'] = !empty($upcontext['user']['id']) ? $upcontext['user']['id'] : 0;
+		$user_info['id'] = empty($upcontext['user']['id']) ? 0 : $upcontext['user']['id'];
 	}
 
 	// We need to log in the database
@@ -1516,7 +1527,7 @@ function changeSettings($config_vars)
 	$save_vars = [];
 	foreach ($config_vars as $key => $var)
 	{
-		$save_vars[$key] = trim($var, '\'');
+		$save_vars[$key] = trim($var, "'");
 	}
 
 	saveFileSettings($save_vars, $settingsArray);
@@ -1537,6 +1548,7 @@ function getMemberGroups()
 	$db = load_database();
 
 	$db->skip_next_error();
+
 	$request = $db->query('', '
 		SELECT 
 			group_name, id_group
@@ -1567,6 +1579,7 @@ function getMemberGroups()
 	{
 		$member_groups[trim($row[0])] = $row[1];
 	}
+
 	$request->free_result();
 
 	return $member_groups;
@@ -1612,9 +1625,7 @@ function parse_sql($filename)
 	$install_instance = new $class_name($db_wrapper, $db_table_wrapper);
 
 	// All the methods (steps) in this upgrade file
-	$methods = array_filter(get_class_methods($install_instance), static function ($method) {
-		return strpos($method, '__') !== 0 && substr($method, -6) !== '_title';
-	});
+	$methods = array_filter(get_class_methods($install_instance), static fn($method) => strpos($method, '__') !== 0 && substr($method, -6) !== '_title');
 
 	$substep = 0;
 	$last_step = '';
@@ -1801,10 +1812,22 @@ function nextSubstep($substep)
 	$upcontext['query_string'] = '';
 	foreach ($_GET as $k => $v)
 	{
-		if ($k !== 'data' && $k !== 'substep' && $k !== 'step')
+		if ($k === 'data')
 		{
-			$upcontext['query_string'] .= ';' . $k . '=' . $v;
+			continue;
 		}
+
+		if ($k === 'substep')
+		{
+			continue;
+		}
+
+		if ($k === 'step')
+		{
+			continue;
+		}
+
+		$upcontext['query_string'] .= ';' . $k . '=' . $v;
 	}
 
 	// Custom warning?
@@ -1838,6 +1861,7 @@ function cmdStep0()
 	{
 		$_SERVER['argv'] = [];
 	}
+
 	$_GET['maint'] = 1;
 
 	foreach ($_SERVER['argv'] as $i => $arg)
@@ -1871,18 +1895,13 @@ function cmdStep0()
 			echo 'ElkArte Command-line Upgrader
 Usage: /path/to/php -f ' . basename(__FILE__) . ' -- [OPTION]...
 
-    --language=LANG         Reset the forum\'s language to LANG.
-    --no-maintenance        Don\'t put the forum into maintenance mode.
-    --debug                 Output debugging information.
-    --backup                Create backups of tables with "backup_" prefix.';
+	--language=LANG         Reset the forum\'s language to LANG.
+	--no-maintenance        Don\'t put the forum into maintenance mode.
+	--debug                 Output debugging information.
+	--backup                Create backups of tables with "backup_" prefix.';
 			echo "\n";
 			exit;
 		}
-	}
-
-	if (version_compare(REQUIRED_PHP_VERSION, PHP_VERSION, '>='))
-	{
-		print_error('Error: PHP ' . PHP_VERSION . ' does not match version requirements.', true);
 	}
 
 	if (!db_version_check())
@@ -1960,7 +1979,7 @@ Usage: /path/to/php -f ' . basename(__FILE__) . ' -- [OPTION]...
 	}
 
 	// Make sure cache directory exists and is writable!
-	$CACHEDIR_temp = !defined('CACHEDIR') ? BOARDDIR . '/cache' : CACHEDIR;
+	$CACHEDIR_temp = defined('CACHEDIR') ? CACHEDIR : BOARDDIR . '/cache';
 	if (!file_exists($CACHEDIR_temp)
 		&& !mkdir($CACHEDIR_temp) && !is_dir($CACHEDIR_temp))
 	{
@@ -2008,7 +2027,7 @@ Usage: /path/to/php -f ' . basename(__FILE__) . ' -- [OPTION]...
 /**
  * Displays an error on standard out for cli viewing, optionally ends execution
  *
- * @param string  $message
+ * @param string $message
  * @param bool $fatal
  */
 function print_error($message, $fatal = false)
@@ -2091,7 +2110,7 @@ function loadEssentialFunctions()
 			$returned_words = [];
 			foreach ($words as $word)
 			{
-				if (($word = trim($word, '-_\'')) !== '')
+				if (($word = trim($word, "-_'")) !== '')
 				{
 					$returned_words[] = $max_chars === null ? $word : substr($word, 0, $max_chars);
 				}
@@ -2117,11 +2136,12 @@ function loadEssentialFunctions()
 			$dh = opendir(CACHEDIR);
 			while ($file = readdir($dh))
 			{
-				if ($file !== '.' && $file !== '..' && $file !== 'index.php' && $file !== '.htaccess' && (!$type || strpos($file, $type) === 0))
+				if ($file !== '.' && $file !== '..' && $file !== 'index.php' && $file !== '.htaccess' && (!$type || strpos($file, (string) $type) === 0))
 				{
 					@unlink(CACHEDIR . '/' . $file);
 				}
 			}
+
 			closedir($dh);
 
 			// Invalidate cache, to be sure!
@@ -2159,7 +2179,7 @@ function discoverCollation()
 			SHOW TABLE STATUS
 			LIKE {string:table_name}',
 			[
-				'table_name' => "{$db_prefix}members",
+				'table_name' => $db_prefix . 'members',
 			]
 		);
 		if ($request->num_rows() == 0)
@@ -2186,6 +2206,7 @@ function discoverCollation()
 			{
 				$collation_info = $db->fetch_assoc($request);
 			}
+
 			$request->free_result();
 
 			// Excellent!

@@ -53,8 +53,7 @@ class UpgradeInstructions_upgrade_2_0
 		return array(
 			array(
 				'debug_title' => 'Changing notifications levels to types...',
-				'function' => function()
-				{
+				'function' => function () {
 					// Can only do this once
 					if ($this->table->column_exists('{db_prefix}notifications_pref', 'notification_level') === true)
 					{
@@ -62,12 +61,12 @@ class UpgradeInstructions_upgrade_2_0
 							array('name' => 'notification_type', 'type' => 'text')
 						);
 						foreach ([
-							 'none' => 0,
-							 'notification' => 1,
-							 'email' => 2,
-							 'emaildaily' => 3,
-							 'emailweekly' => 4
-							 ] as $type => $level)
+							         'none' => 0,
+							         'notification' => 1,
+							         'email' => 2,
+							         'emaildaily' => 3,
+							         'emailweekly' => 4
+						         ] as $type => $level)
 						{
 							$this->db->fetchQuery('
 							UPDATE {db_prefix}notifications_pref
@@ -79,6 +78,7 @@ class UpgradeInstructions_upgrade_2_0
 								]
 							);
 						}
+
 						$this->table->remove_column('{db_prefix}notifications_pref', 'notification_level');
 					}
 
@@ -121,20 +121,17 @@ class UpgradeInstructions_upgrade_2_0
 		return array(
 			array(
 				'debug_title' => 'Converts settings to modules...',
-				'function' => function()
-				{
+				'function' => static function () {
 					global $modSettings;
-
 					if (!empty($modSettings['drafts_enabled']))
 					{
 						require_once(SUBSDIR . '/Admin.subs.php');
 						enableModules('drafts', array('post', 'display', 'profile', 'personalmessage'));
-						\ElkArte\Hooks::instance()->enableIntegration('\\ElkArte\\DraftsIntegrate');
+						\ElkArte\Hooks::instance()->enableIntegration(\ElkArte\DraftsIntegrate::class);
 					}
-
 					\ElkArte\Hooks::instance()->enableIntegration('\\ElkArte\\UserNotificationIntegrate');
-					\ElkArte\Hooks::instance()->enableIntegration('\\ElkArte\\IlaIntegrate');
-					\ElkArte\Hooks::instance()->enableIntegration('\\ElkArte\\EmojiIntegrate');
+					\ElkArte\Hooks::instance()->enableIntegration(\ElkArte\IlaIntegrate::class);
+					\ElkArte\Hooks::instance()->enableIntegration(\ElkArte\EmojiIntegrate::class);
 				}
 			)
 		);
@@ -150,14 +147,13 @@ class UpgradeInstructions_upgrade_2_0
 		return array(
 			array(
 				'debug_title' => 'Adding Language edit table...',
-				'function' => function()
-				{
+				'function' => function () {
 					$this->table->create_table('{db_prefix}languages',
 						array(
-							array('name' => 'language',     'type' => 'varchar', 'size' => 40,  'default' => ''),
-							array('name' => 'file',         'type' => 'varchar', 'size' => 40,  'default' => ''),
+							array('name' => 'language', 'type' => 'varchar', 'size' => 40, 'default' => ''),
+							array('name' => 'file', 'type' => 'varchar', 'size' => 40, 'default' => ''),
 							array('name' => 'language_key', 'type' => 'varchar', 'size' => 255, 'default' => ''),
-							array('name' => 'value',        'type' => 'text'),
+							array('name' => 'value', 'type' => 'text'),
 						),
 						array(
 							array('name' => 'id_lang', 'columns' => array('language', 'file'), 'type' => 'primary'),
@@ -169,13 +165,13 @@ class UpgradeInstructions_upgrade_2_0
 			),
 			array(
 				'debug_title' => 'Move privacy policy and agreement...',
-				'function' => function()
-				{
+				'function' => static function () {
 					if (file_exists(BOARDDIR . '/agreement.txt'))
 					{
 						// Don't want to bother for the time being with errors, especially during upgrade.
 						@rename(BOARDDIR . '/agreement.txt', SOURCEDIR . '/ElkArte/Languages/Agreement/English.txt');
 					}
+
 					$agreements = glob(BOARDDIR . '/agreement.*.txt');
 					foreach ($agreements as $agreement)
 					{
@@ -187,12 +183,12 @@ class UpgradeInstructions_upgrade_2_0
 							@rename(BOARDDIR . '/' . $file, SOURCEDIR . '/ElkArte/Languages/Agreement/' . ucfirst($matches[1]) . '.txt');
 						}
 					}
-
 					if (file_exists(BOARDDIR . '/privacypolicy.txt'))
 					{
 						// Don't want to bother for the time being with errors, especially during upgrade.
 						@rename(BOARDDIR . '/privacypolicy.txt', SOURCEDIR . '/ElkArte/Languages/PrivacyPolicy/English.txt');
 					}
+
 					$policies = glob(BOARDDIR . '/privacypolicy.*.txt');
 					foreach ($policies as $policy)
 					{
@@ -219,8 +215,7 @@ class UpgradeInstructions_upgrade_2_0
 		return array(
 			array(
 				'debug_title' => 'Dropping column openid...',
-				'function' => function()
-				{
+				'function' => function () {
 					if ($this->table->column_exists('{db_prefix}members', 'openid_uri') !== false)
 					{
 						$this->table->remove_column('{db_prefix}members', 'openid_uri');
@@ -233,7 +228,7 @@ class UpgradeInstructions_upgrade_2_0
 					$this->db->query('',
 						'DELETE FROM {db_prefix}settings
 						WHERE variable="enableOpenID" 
-						    OR variable="dh_keys"'
+							OR variable="dh_keys"'
 					);
 				}
 			)
@@ -250,8 +245,7 @@ class UpgradeInstructions_upgrade_2_0
 		return array(
 			array(
 				'debug_title' => 'Removing old hash custom search index...',
-				'function' => function()
-				{
+				'function' => function () {
 					global $modSettings;
 
 					// Drop the custom index if it exists.  The way the id_word value in text2words is
@@ -265,12 +259,19 @@ class UpgradeInstructions_upgrade_2_0
 					));
 
 					// Go back to the default search method if they were using custom
-					if (!empty($modSettings['search_index']) && $modSettings['search_index'] === 'custom')
+					if (empty($modSettings['search_index']))
 					{
-						updateSettings(array(
-							'search_index' => '',
-						));
+						return;
 					}
+
+					if ($modSettings['search_index'] !== 'custom')
+					{
+						return;
+					}
+
+					updateSettings(array(
+						'search_index' => '',
+					));
 				}
 			)
 		);
@@ -286,12 +287,11 @@ class UpgradeInstructions_upgrade_2_0
 		return array(
 			array(
 				'debug_title' => 'Moving attachment avatars to custom avatars location...',
-				'function' => function()
-				{
+				'function' => function () {
 					global $modSettings;
 
 					// Get/Set the custom avatar location, the upgrade script checks for existence and access
-					$custom_avatar_dir = !empty($modSettings['custom_avatar_dir']) ? $modSettings['custom_avatar_dir'] : BOARDDIR . '/avatars_user';
+					$custom_avatar_dir = empty($modSettings['custom_avatar_dir']) ? BOARDDIR . '/avatars_user' : $modSettings['custom_avatar_dir'];
 
 					// Perhaps we have a smart admin, and they were using a custom dir
 					if ($custom_avatar_dir !== BOARDDIR . '/avatars_user')
@@ -333,6 +333,7 @@ class UpgradeInstructions_upgrade_2_0
 							$updatedAvatars[] = $row['id_attach'];
 						}
 					}
+
 					$this->db->free_result($request);
 					if (!empty($updatedAvatars))
 					{
@@ -363,8 +364,7 @@ class UpgradeInstructions_upgrade_2_0
 		return array(
 			array(
 				'debug_title' => 'Moving settings that are now site vs theme dependant...',
-				'function' => function()
-				{
+				'function' => function () {
 					$moved = array('show_modify', 'show_user_images', 'hide_post_group');
 
 					$request = $this->db->query('', '
@@ -383,6 +383,7 @@ class UpgradeInstructions_upgrade_2_0
 					{
 						$inserts[] = array($row['variable'], $row['value']);
 					}
+
 					$this->db->free_result($request);
 					$this->db->insert('replace',
 						'{db_prefix}settings',
@@ -451,10 +452,10 @@ class UpgradeInstructions_upgrade_2_0
 			),
 			array(
 				'debug_title' => 'Remove of badbehavior settings ...',
-				'function' => function () {
+				'function' => static function () {
 					removeSettings(
 						array('badbehavior_enabled', 'badbehavior_logging', 'badbehavior_ip_wl',
-							  'badbehavior_ip_wl_desc', 'badbehavior_url_wl', 'badbehavior_url_wl_desc')
+							'badbehavior_ip_wl_desc', 'badbehavior_url_wl', 'badbehavior_url_wl_desc')
 					);
 				}
 			)
@@ -512,6 +513,7 @@ class UpgradeInstructions_upgrade_2_0
 							'oldname' => $row['filename']
 						);
 					}
+
 					$this->db->free_result($request);
 					foreach ($inserts as $insert)
 					{
@@ -529,9 +531,8 @@ class UpgradeInstructions_upgrade_2_0
 			),
 			array(
 				'debug_title' => 'Add new smiley extension values...',
-				'function' => function () {
+				'function' => static function () {
 					global $modSettings;
-
 					// Not defined is easy, but unlikely
 					if (empty($modSettings['smiley_sets_known']))
 					{
@@ -565,7 +566,6 @@ class UpgradeInstructions_upgrade_2_0
 							$smiley_sets_extensions = implode(',', $smiley_sets_extensions);
 						}
 					}
-
 					updateSettings(array(
 						'smiley_sets_known' => $smiley_sets_known,
 						'smiley_sets_names' => $smiley_sets_names,
@@ -628,6 +628,7 @@ class UpgradeInstructions_upgrade_2_0
 					{
 						$codes[$row['code']] = $row['code'];
 					}
+
 					// Add any that are missing, to minimize admin trauma, they are added to the popup, unordered
 					foreach ($emojiSmile as $entry)
 					{
@@ -638,6 +639,7 @@ class UpgradeInstructions_upgrade_2_0
 
 						$inserts[] = $entry;
 					}
+
 					$this->db->insert('ignore',
 						'{db_prefix}smileys',
 						array('code' => 'string', 'filename' => 'string', 'description' => 'string', 'smiley_order' => 'int', 'hidden' => 'int'),
@@ -665,7 +667,7 @@ class UpgradeInstructions_upgrade_2_0
 		return array(
 			array(
 				'debug_title' => 'Removing / Changing misc modSetting data ...',
-				'function' => function () {
+				'function' => static function () {
 					removeSettings(
 						array('visual_verification_type', 'visual_verification_num_chars')
 					);
@@ -691,7 +693,7 @@ class UpgradeInstructions_upgrade_2_0
 			),
 			array(
 				'debug_title' => 'Add of package servers settings ...',
-				'function' => function () {
+				'function' => static function () {
 					updateSettings(array(
 						'elkarte_addon_server' => 'https://elkarte.github.io/addons/package.json',
 					));

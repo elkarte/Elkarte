@@ -12,9 +12,9 @@
  *
  */
 
-require('installcore.php');
-require('CommonCode.php');
-require('Install_Controller.php');
+require(__DIR__ . '/installcore.php');
+require(__DIR__ . '/CommonCode.php');
+require(__DIR__ . '/Install_Controller.php');
 
 // Don't have PHP support, do you?
 // ><html dir="ltr"><head><title>Error!</title></head><body>Sorry, this installer requires PHP!<div style="display: none;">
@@ -61,7 +61,7 @@ function initialize_inputs()
 	// This is the test for support of compression
 	if (isset($_GET['obgz']))
 	{
-		require('test_compression.php');
+		require(__DIR__ . '/test_compression.php');
 		die;
 	}
 
@@ -76,6 +76,7 @@ function initialize_inputs()
 	{
 		@ini_set('session.save_handler', 'files');
 	}
+
 	if (function_exists('session_start'))
 	{
 		@session_start();
@@ -186,12 +187,12 @@ function loadLanguageFile()
 	if (!isset($_SESSION['installer_temp_lang']) || preg_match('~[^\\w_\\-.]~', $_SESSION['installer_temp_lang']) === 1 || !file_exists(TMP_BOARDDIR . '/sources/ElkArte/Languages/Install/' . $_SESSION['installer_temp_lang']))
 	{
 		// Use the first one...
-		list ($_SESSION['installer_temp_lang']) = array_keys($incontext['detected_languages']);
+		[$_SESSION['installer_temp_lang']] = array_keys($incontext['detected_languages']);
 
 		// If we have english and some other language, use the other language.  We Americans hate english :P.
 		if ($_SESSION['installer_temp_lang'] === 'English.php' && count($incontext['detected_languages']) > 1)
 		{
-			list (, $_SESSION['installer_temp_lang']) = array_values($incontext['detected_languages']);
+			[, $_SESSION['installer_temp_lang']] = array_values($incontext['detected_languages']);
 		}
 	}
 
@@ -248,10 +249,7 @@ function updateSettingsFile($config_vars)
 	{
 		@chmod(dirname(__FILE__, 2) . '/Settings.php', 0777);
 
-		if (!is_writable(dirname(__FILE__, 2) . '/Settings.php'))
-		{
-			return false;
-		}
+		return false;
 	}
 
 	// Modify Settings.php.
@@ -287,15 +285,9 @@ function parseSqlLines($sql_file, $replaces)
 
 	// Each method is a separate installation step
 	$methods = get_class_methods($install_instance);
-	$tables = array_filter($methods, static function ($method) {
-		return strpos($method, 'table_') === 0;
-	});
-	$inserts = array_filter($methods, static function ($method) {
-		return strpos($method, 'insert_') === 0;
-	});
-	$others = array_filter($methods, static function ($method) {
-		return strpos($method, '__') !== 0 && strpos($method, 'insert_') !== 0 && strpos($method, 'table_') !== 0;
-	});
+	$tables = array_filter($methods, static fn($method) => strpos($method, 'table_') === 0);
+	$inserts = array_filter($methods, static fn($method) => strpos($method, 'insert_') === 0);
+	$others = array_filter($methods, static fn($method) => strpos($method, '__') !== 0 && strpos($method, 'insert_') !== 0 && strpos($method, 'table_') !== 0);
 
 	// Create tables if they do not exist
 	foreach ($tables as $table_method)

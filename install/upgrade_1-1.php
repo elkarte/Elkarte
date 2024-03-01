@@ -6,11 +6,13 @@
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
  * This file contains code covered by:
- * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * copyright:    2011 Simple Machines (http://www.simplemachines.org)
  *
  * @version 2.0 dev
  *
  */
+
+use ElkArte\Hooks;
 
 /**
  * This class is the core of the upgrade system.
@@ -53,8 +55,7 @@ class UpgradeInstructions_upgrade_1_1
 		return array(
 			array(
 				'debug_title' => 'Remove any old file left and check if the table is empty...',
-				'function' => function()
-				{
+				'function' => function () {
 					updateSettings(array('detailed-version.js' => 'https://elkarte.github.io/Elkarte/site/detailed-version.js'));
 
 					if ($this->table->table_exists('{db_prefix}admin_info_files'))
@@ -69,6 +70,7 @@ class UpgradeInstructions_upgrade_1_1
 								)
 							);
 						}
+
 						$request = $this->db->query('', '
 							SELECT COUNT(*)
 							FROM {db_prefix}admin_info_files',
@@ -77,8 +79,8 @@ class UpgradeInstructions_upgrade_1_1
 						if ($request)
 						{
 							// Drop it only if it is empty
-							list ($count) = (int) $this->db->fetch_row($request);
-							if ($count == 0)
+							[$count] = (int) $this->db->fetch_row($request);
+							if ($count === 0)
 							{
 								$this->table->drop_table('{db_prefix}admin_info_files');
 							}
@@ -99,8 +101,7 @@ class UpgradeInstructions_upgrade_1_1
 		return array(
 			array(
 				'debug_title' => 'Adding new two factor columns to members table...',
-				'function' => function()
-				{
+				'function' => function () {
 					$this->table->add_column('{db_prefix}members',
 						array(
 							'name' => 'otp_secret',
@@ -146,8 +147,7 @@ class UpgradeInstructions_upgrade_1_1
 		return array(
 			array(
 				'debug_title' => 'Adding new tables for notifications...',
-				'function' => function()
-				{
+				'function' => function () {
 					$this->table->create_table('{db_prefix}pending_notifications',
 						array(
 							array('name' => 'notification_type', 'type' => 'varchar', 'size' => 20),
@@ -215,8 +215,7 @@ class UpgradeInstructions_upgrade_1_1
 		return array(
 			array(
 				'debug_title' => 'Separate mentions visibility from accessibility...',
-				'function' => function()
-				{
+				'function' => function () {
 					$this->table->add_column('{db_prefix}log_mentions',
 						array(
 							'name' => 'is_accessible',
@@ -240,8 +239,7 @@ class UpgradeInstructions_upgrade_1_1
 			),
 			array(
 				'debug_title' => 'Update mention logs...',
-				'function' => function()
-				{
+				'function' => function () {
 					global $modSettings;
 
 					$this->db->query('', '
@@ -287,7 +285,7 @@ class UpgradeInstructions_upgrade_1_1
 						)
 					);
 
-					$enabled_mentions = !empty($modSettings['enabled_mentions']) ? explode(',', $modSettings['enabled_mentions']) : array();
+					$enabled_mentions = empty($modSettings['enabled_mentions']) ? array() : explode(',', $modSettings['enabled_mentions']);
 					$known_settings = array(
 						'mentions_enabled' => 'mentionmem',
 						'likes_enabled' => 'likemsg',
@@ -316,13 +314,13 @@ class UpgradeInstructions_upgrade_1_1
 							)
 						);
 					}
+
 					updateSettings(array('enabled_mentions' => implode(',', $enabled_mentions)));
 				}
 			),
 			array(
 				'debug_title' => 'Make mentions generic and not message-centric...',
-				'function' => function()
-				{
+				'function' => function () {
 					$this->table->change_column('{db_prefix}log_mentions', 'id_msg',
 						array(
 							'name' => 'id_target',
@@ -343,8 +341,7 @@ class UpgradeInstructions_upgrade_1_1
 		return array(
 			array(
 				'debug_title' => 'Converts settings to modules...',
-				'function' => function()
-				{
+				'function' => static function () {
 					global $modSettings;
 
 					require_once(SUBSDIR . '/Admin.subs.php');
@@ -352,28 +349,24 @@ class UpgradeInstructions_upgrade_1_1
 					{
 						enableModules('attachments', array('post'));
 					}
-
 					if (!empty($modSettings['cal_enabled']))
 					{
 						enableModules('calendar', array('post', 'boardindex'));
 					}
-
 					if (!empty($modSettings['drafts_enabled']))
 					{
 						enableModules('drafts', array('post', 'display', 'profile', 'personalmessage'));
-						\ElkArte\Hooks::instance()->enableIntegration('Drafts_Integrate');
+						Hooks::instance()->enableIntegration('Drafts_Integrate');
 					}
-
 					if (!empty($modSettings['enabled_mentions']))
 					{
 						enableModules('mentions', array('post', 'display'));
 					}
-
 					enableModules('poll', array('display', 'post'));
 					enableModules('verification', array('post', 'personalmessage', 'register'));
 					enableModules('random', array('post', 'display'));
-					\ElkArte\Hooks::instance()->enableIntegration('User_Notification_Integrate');
-					\ElkArte\Hooks::instance()->enableIntegration('Ila_Integrate');
+					Hooks::instance()->enableIntegration('User_Notification_Integrate');
+					Hooks::instance()->enableIntegration('Ila_Integrate');
 					updateSettings(array(
 						'usernotif_favicon_bgColor' => '#ff0000',
 						'usernotif_favicon_position' => 'up',
@@ -394,9 +387,8 @@ class UpgradeInstructions_upgrade_1_1
 	{
 		return array(
 			array(
-				'debug_title' => 'Splitting email_id into it\'s components in postby_emails...',
-				'function' => function()
-				{
+				'debug_title' => "Splitting email_id into it's components in postby_emails...",
+				'function' => function () {
 					if ($this->table->column_exists('{db_prefix}postby_emails', 'message_key') === false)
 					{
 						// Add the new columns
@@ -455,8 +447,7 @@ class UpgradeInstructions_upgrade_1_1
 			),
 			array(
 				'debug_title' => 'Naming consistency for postby_emails_error table columns...',
-				'function' => function()
-				{
+				'function' => function () {
 					if ($this->table->column_exists('{db_prefix}postby_emails_error', 'data_id') === true)
 					{
 						// Rename some columns
@@ -477,8 +468,7 @@ class UpgradeInstructions_upgrade_1_1
 			),
 			array(
 				'debug_title' => 'Updating PBE filter/parser table columns...',
-				'function' => function()
-				{
+				'function' => function () {
 					// Filter type was 5 now needs to be 6
 					$this->table->change_column('{db_prefix}postby_emails_filters',
 						'filter_style',
@@ -522,8 +512,7 @@ class UpgradeInstructions_upgrade_1_1
 		return array(
 			array(
 				'debug_title' => 'Adding new columns for PM reporting...',
-				'function' => function()
-				{
+				'function' => function () {
 					if ($this->table->column_exists('{db_prefix}log_reported', 'type') === false)
 					{
 						$this->table->add_column('{db_prefix}log_reported',
@@ -564,18 +553,22 @@ class UpgradeInstructions_upgrade_1_1
 		return array(
 			array(
 				'debug_title' => 'Converting IP columns to varchar instead of int...',
-				'function' => function()
-				{
+				'function' => function () {
 					$columns = $this->table->list_columns('{db_prefix}log_online', true);
 
 					$column_name = 'ip';
 
 					foreach ($columns as $column)
 					{
-						if ($column_name == $column['name'] && $column['type'] == 'varchar')
+						if ($column_name != $column['name'])
 						{
-							return true;
+							continue;
 						}
+						if ($column['type'] != 'varchar')
+						{
+							continue;
+						}
+						return true;
 					}
 
 					$this->db->query('', '
@@ -604,8 +597,7 @@ class UpgradeInstructions_upgrade_1_1
 		return array(
 			array(
 				'debug_title' => 'Changing the pm count column to mediumint.',
-				'function' => function()
-				{
+				'function' => function () {
 					$this->table->change_column('{db_prefix}members',
 						'personal_messages',
 						array(
@@ -629,8 +621,7 @@ class UpgradeInstructions_upgrade_1_1
 		return array(
 			array(
 				'debug_title' => 'Adding new custom field columns',
-				'function' => function()
-				{
+				'function' => function () {
 					$this->table->add_column('{db_prefix}custom_fields',
 						array(
 							'name' => 'rows',
@@ -655,8 +646,7 @@ class UpgradeInstructions_upgrade_1_1
 			),
 			array(
 				'debug_title' => 'Populating new custom field columns where needed',
-				'function' => function()
-				{
+				'function' => function () {
 					$result = $this->db->query('', '
 						SELECT id_field, default_value 
 						FROM {db_prefix}custom_fields 
@@ -681,8 +671,7 @@ class UpgradeInstructions_upgrade_1_1
 			),
 			array(
 				'debug_title' => 'Inserting custom fields for gender/location/personal text',
-				'function' => function()
-				{
+				'function' => function () {
 					$this->db->replace(
 						'{db_prefix}custom_fields',
 						array('col_name' => 'string', 'field_name' => 'string', 'field_desc' => 'string', 'field_type' => 'string', 'field_length' => 'int', 'field_options' => 'string', 'mask' => 'string', 'show_reg' => 'int', 'show_display' => 'int', 'show_profile' => 'string', 'private' => 'int', 'active' => 'int', 'bbc' => 'int', 'can_search' => 'int', 'default_value' => 'string', 'enclose' => 'string', 'placement' => 'int', 'rows' => 'int', 'cols' => 'int'),
@@ -697,8 +686,7 @@ class UpgradeInstructions_upgrade_1_1
 			),
 			array(
 				'debug_title' => 'Updating icon custom fields',
-				'function' => function()
-				{
+				'function' => function () {
 					$result = $this->db->query('', '
 						SELECT id_field, col_name 
 						FROM {db_prefix}custom_fields 
@@ -731,8 +719,7 @@ class UpgradeInstructions_upgrade_1_1
 			),
 			array(
 				'debug_title' => 'Converting gender data',
-				'function' => function()
-				{
+				'function' => function () {
 					if ($this->table->column_exists('{db_prefix}members', 'gender') === true)
 					{
 						$result = $this->db->query('', '
@@ -767,8 +754,7 @@ class UpgradeInstructions_upgrade_1_1
 			),
 			array(
 				'debug_title' => 'Converting location',
-				'function' => function()
-				{
+				'function' => function () {
 					if ($this->table->column_exists('{db_prefix}members', 'location') === true)
 					{
 						$result = $this->db->query('', '
@@ -791,8 +777,7 @@ class UpgradeInstructions_upgrade_1_1
 			),
 			array(
 				'debug_title' => 'Converting personal text',
-				'function' => function()
-				{
+				'function' => function () {
 					if ($this->table->column_exists('{db_prefix}members', 'personal_text') === true)
 					{
 						$result = $this->db->query('', '
@@ -826,8 +811,7 @@ class UpgradeInstructions_upgrade_1_1
 		return array(
 			array(
 				'debug_title' => 'Adding new columns...',
-				'function' => function()
-				{
+				'function' => function () {
 					if ($this->table->column_exists('{db_prefix}user_drafts', 'is_usersaved') === false)
 					{
 						$this->table->add_column('{db_prefix}user_drafts',
@@ -856,8 +840,7 @@ class UpgradeInstructions_upgrade_1_1
 		return array(
 			array(
 				'debug_title' => 'Altering column to varchar(255)...',
-				'function' => function()
-				{
+				'function' => function () {
 					$this->table->change_column('{db_prefix}attachments',
 						'mime_type',
 						array(
@@ -881,8 +864,7 @@ class UpgradeInstructions_upgrade_1_1
 		return array(
 			array(
 				'debug_title' => 'v1.1.9 :: Altering passwd column to varchar(255)...',
-				'function' => function()
-				{
+				'function' => function () {
 					$this->table->change_column('{db_prefix}members',
 						'passwd',
 						array(
@@ -906,8 +888,7 @@ class UpgradeInstructions_upgrade_1_1
 		return array(
 			array(
 				'debug_title' => 'Adjusting cal_maxyear/cal_limityear...',
-				'function' => function()
-				{
+				'function' => static function () {
 					updateSettings(array(
 						'cal_maxyear' => '2030',
 						'cal_limityear' => '10',
@@ -928,14 +909,13 @@ class UpgradeInstructions_upgrade_1_1
 		return array(
 			array(
 				'debug_title' => 'Creating the tables...',
-				'function' => function()
-				{
+				'function' => function () {
 					$this->table->create_table('{db_prefix}log_agreement_accept',
 						array(
-							array('name' => 'version',       'type' => 'varchar', 'size' => 20, 'default' => ''),
-							array('name' => 'id_member',     'type' => 'mediumint', 'size' => 10, 'unsigned' => true, 'default' => 0),
+							array('name' => 'version', 'type' => 'varchar', 'size' => 20, 'default' => ''),
+							array('name' => 'id_member', 'type' => 'mediumint', 'size' => 10, 'unsigned' => true, 'default' => 0),
 							array('name' => 'accepted_date', 'type' => 'date', 'default' => '0001-01-01'),
-							array('name' => 'accepted_ip',   'type' => 'varchar', 'size' => 255, 'default' => ''),
+							array('name' => 'accepted_ip', 'type' => 'varchar', 'size' => 255, 'default' => ''),
 						),
 						array(
 							array('name' => 'version', 'columns' => array('version', 'id_member'), 'type' => 'primary'),
@@ -945,10 +925,10 @@ class UpgradeInstructions_upgrade_1_1
 					);
 					$this->table->create_table('{db_prefix}log_privacy_policy_accept',
 						array(
-							array('name' => 'version',       'type' => 'varchar', 'size' => 20, 'default' => ''),
-							array('name' => 'id_member',     'type' => 'mediumint', 'size' => 10, 'unsigned' => true, 'default' => 0),
+							array('name' => 'version', 'type' => 'varchar', 'size' => 20, 'default' => ''),
+							array('name' => 'id_member', 'type' => 'mediumint', 'size' => 10, 'unsigned' => true, 'default' => 0),
 							array('name' => 'accepted_date', 'type' => 'date', 'default' => '0001-01-01'),
-							array('name' => 'accepted_ip',   'type' => 'varchar', 'size' => 255, 'default' => ''),
+							array('name' => 'accepted_ip', 'type' => 'varchar', 'size' => 255, 'default' => ''),
 						),
 						array(
 							array('name' => 'version', 'columns' => array('version', 'id_member'), 'type' => 'primary'),
@@ -960,12 +940,10 @@ class UpgradeInstructions_upgrade_1_1
 			),
 			array(
 				'debug_title' => 'Preparing first status...',
-				'function' => function()
-				{
+				'function' => static function () {
 					$agreement = new \ElkArte\Agreement('english');
 					$success = $agreement->storeBackup();
 					updateSettings(array('agreementRevision' => $success));
-
 					if (file_exists(BOARDDIR . '/privacypolicy.txt'))
 					{
 						$privacypol = new \ElkArte\PrivacyPolicy('english');
@@ -987,8 +965,7 @@ class UpgradeInstructions_upgrade_1_1
 		return array(
 			array(
 				'debug_title' => 'Adding new poster time index...',
-				'function' => function()
-				{
+				'function' => function () {
 					// Adding this index to large forums can take some time
 					detectServer()->setTimeLimit(600);
 					$this->table->db_add_index('{db_prefix}messages', array('name' => 'poster_time', 'columns' => array('poster_time'), 'type' => 'key'));
@@ -1007,10 +984,8 @@ class UpgradeInstructions_upgrade_1_1
 		return array(
 			array(
 				'debug_title' => 'Changing combine and minimize to minimize only...',
-				'function' => function()
-				{
+				'function' => static function () {
 					theme()->cleanHives();
-
 					// If they are using the option, change it to use minimize only
 					if (!empty($modSettings['combine_css_js']))
 					{

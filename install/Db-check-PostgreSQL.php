@@ -14,11 +14,12 @@ $GLOBALS['databases']['postgresql'] = [
 	'extension' => 'PostgreSQL (PgSQL)',
 	'version' => '9.5',
 	'function_check' => 'pg_connect',
-	'version_check' => static function($db_connection) {
+	'version_check' => static function ($db_connection) {
 		$request = pg_query('SELECT version()');
-		list ($version) = pg_fetch_row($request);
-		list ($pgl, $version) = explode(" ", $version);
-		return $version;},
+		[$version] = pg_fetch_row($request);
+		[$pgl, $version] = explode(" ", $version);
+		return $version;
+	},
 	'supported' => function_exists('pg_connect'),
 	'additional_file' => 'install_' . DB_SCRIPT_VERSION . '_postgresql.php',
 	'test_collation' => false,
@@ -29,11 +30,15 @@ $GLOBALS['databases']['postgresql'] = [
 
 		// Is it reserved?
 		if ($value === 'pg_')
+		{
 			return $txt['error_db_prefix_reserved'];
+		}
 
 		// Is the prefix numeric?
 		if (preg_match('~^\d~', $value))
+		{
 			return $txt['error_db_prefix_numeric'];
+		}
 
 		return true;
 	},
