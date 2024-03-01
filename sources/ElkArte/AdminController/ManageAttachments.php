@@ -1358,7 +1358,7 @@ class ManageAttachments extends AbstractController
 	/**
 	 * Saves any changes or additions to the attachment paths
 	 *
-	 * @param \AttachmentsDirectory $attachmentsDir
+	 * @param AttachmentsDirectory $attachmentsDir
 	 * @return void
 	 */
 	private function _savePaths($attachmentsDir)
@@ -1499,7 +1499,7 @@ class ManageAttachments extends AbstractController
 	/**
 	 * Saves changes to the attachment base directory section
 	 *
-	 * @param \AttachmentsDirectory $attachmentsDir
+	 * @param AttachmentsDirectory $attachmentsDir
 	 * @return void
 	 */
 	private function _saveBasePaths($attachmentsDir)

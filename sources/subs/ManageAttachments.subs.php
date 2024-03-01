@@ -20,6 +20,7 @@
  */
 
 use BBC\ParserWrapper;
+use ElkArte\Attachments\AttachmentsDirectory;
 use ElkArte\Helper\FileFunctions;
 use ElkArte\Helper\Util;
 

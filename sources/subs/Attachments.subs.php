@@ -18,6 +18,8 @@
  */
 
 use ElkArte\Attachments\AttachmentsDirectory;
+use ElkArte\Attachments\TemporaryAttachment;
+use ElkArte\Attachments\TemporaryAttachmentsList;
 use ElkArte\Cache\Cache;
 use ElkArte\Errors\AttachmentErrorContext;
 use ElkArte\Errors\Errors;
