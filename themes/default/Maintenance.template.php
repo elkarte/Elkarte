@@ -316,7 +316,7 @@ function template_maintain_topics()
 		echo '
 			</div>
 			<div class="submitbutton">
-				<input type="submit" value="', $maintenace['submit'], '" ', !empty($maintenace['confirm']) ? 'onclick="return confirm(\'' . $maintenace['confirm'] . '\');"' : '', ' />';
+				<input type="submit" value="', $maintenace['submit'], '" ', empty($maintenace['confirm']) ? '' : 'onclick="return confirm(\'' . $maintenace['confirm'] . '\');"', ' />';
 
 		if (!empty($maintenace['hidden']))
 		{
@@ -331,6 +331,7 @@ function template_maintain_topics()
 			</div>
 		</form>';
 	}
+
 	echo '
 	</div>';
 }
@@ -366,7 +367,7 @@ function template_maintain_topics_olddrafts()
 
 	echo '
 					<p>
-						<label for="draftdays">', sprintf($txt['maintain_old_drafts_days'], ' <input type="text" id="draftdays" name="draftdays" value="' . (!empty($modSettings['drafts_keep_days']) ? $modSettings['drafts_keep_days'] : 30) . '" size="3" /> '), '</label>
+						<label for="draftdays">', sprintf($txt['maintain_old_drafts_days'], ' <input type="text" id="draftdays" name="draftdays" value="' . (empty($modSettings['drafts_keep_days']) ? 30 : $modSettings['drafts_keep_days']) . '" size="3" /> '), '</label>
 					</p>';
 }
 

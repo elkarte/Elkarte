@@ -89,8 +89,9 @@ function template_select_boards($name, $label = '', $extra = '', $all = false)
 		foreach ($category['boards'] as $board)
 		{
 			echo '
-			<option value="', $board['id'], '"', !empty($board['selected']) ? ' selected="selected"' : '', !empty($context['current_board']) && $board['id'] == $context['current_board'] && $context['boards_current_disabled'] ? ' disabled="disabled"' : '', '>', $board['child_level'] > 0 ? str_repeat('&#8195;', $board['child_level'] - 1) . '&#8195;&#10148;' : '', $board['name'], '</option>';
+			<option value="', $board['id'], '"', empty($board['selected']) ? '' : ' selected="selected"', !empty($context['current_board']) && $board['id'] == $context['current_board'] && $context['boards_current_disabled'] ? ' disabled="disabled"' : '', '>', $board['child_level'] > 0 ? str_repeat('&#8195;', $board['child_level'] - 1) . '&#8195;&#10148;' : '', $board['name'], '</option>';
 		}
+
 		echo '
 		</optgroup>';
 	}
@@ -160,9 +161,9 @@ function template_button_strip($button_strip, $class = '', $strip_options = [])
 		// Start with this button markup details
 		$id = (isset($buttonParameters['id']) ? 'id="button_strip_' . $buttonParameters['id'] . '"' : '');
 		$liClass = 'class="listlevel1 ' . ($buttonParameters['class'] ?? $buttonName) . '"';
-		$linkClass = 'class="linklevel1 ' . (!empty($buttonParameters['active']) ? 'active ' : '') . (!empty($buttonParameters['linkclass']) ? $buttonParameters['linkclass'] : 'button_strip_' . $buttonName) . '"';
-		$icon = !empty($buttonParameters['icon']) ? '<i class="icon icon-small i-' . $buttonParameters['icon'] . '"></i>' : '';
-		$counter = !empty($buttonParameters['counter']) ? '<span class="button_indicator">' . $buttonParameters['counter'] . '</span>' : '';
+		$linkClass = 'class="linklevel1 ' . (empty($buttonParameters['active']) ? '' : 'active ') . (empty($buttonParameters['linkclass']) ? 'button_strip_' . $buttonName : $buttonParameters['linkclass']) . '"';
+		$icon = empty($buttonParameters['icon']) ? '' : '<i class="icon icon-small i-' . $buttonParameters['icon'] . '"></i>';
+		$counter = empty($buttonParameters['counter']) ? '' : '<span class="button_indicator">' . $buttonParameters['counter'] . '</span>';
 		$url = $buttonParameters['url'] ?? 'javascript:void(0);';
 
 		// Special case, the button checkbox.
@@ -203,8 +204,8 @@ function template_button_strip($button_strip, $class = '', $strip_options = [])
 	{
 		$buttons[] = '
 						<li class="listlevel1 subsections" role="none">
-							<a aria-haspopup="true" role="menuitem" href="#" ' . (!empty($options['use_click_menu']) ? '' : 'onclick="event.stopPropagation();return false;"') . ' class="linklevel1 post_options">' .
-			$txt['post_options'] . '
+							<a aria-haspopup="true" role="menuitem" href="#" ' . (empty($options['use_click_menu']) ? 'onclick="event.stopPropagation();return false;"' : '') . ' class="linklevel1 post_options">' .
+								$txt['post_options'] . '
 							</a>
 							<ul role="menu" class="menulevel2">' . implode('', $subMenu) . '</ul>
 						</li>';
@@ -214,12 +215,12 @@ function template_button_strip($button_strip, $class = '', $strip_options = [])
 	if (!empty($buttons))
 	{
 		// The markup details for the entire strip
-		$id = !empty($strip_options['id']) ? 'id="' . $strip_options['id'] . '" ' : '';
-		$defaultClass = !empty($strip_options['no-class']) ? '' : 'buttonlist no_js';
+		$id = empty($strip_options['id']) ? '' : 'id="' . $strip_options['id'] . '" ';
+		$defaultClass = empty($strip_options['no-class']) ? 'buttonlist no_js' : '';
 		$class .= $context['right_to_left'] ? ' rtl' : '';
 
 		echo '
-					<ul ', $id, 'role="menubar" class="', $defaultClass, !empty($class) ? ' ' . $class : '', '">
+					<ul ', $id, 'role="menubar" class="', $defaultClass, empty($class) ? '' : ' ' . $class, '">
 						', implode('', $buttons), implode('', $checkbox), '
 					</ul>';
 	}

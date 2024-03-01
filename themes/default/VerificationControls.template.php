@@ -33,7 +33,7 @@ function template_verification_controls($verify_id, $before = '', $after = '')
 	}
 
 	// Loop through each item to show them.
-	foreach ($verify_context['test'] as $key => $verification)
+	foreach ($verify_context['test'] as $verification)
 	{
 		if (empty($verification['values']) || empty($verification['template']))
 		{
@@ -91,7 +91,7 @@ function template_verification_control_emptyfield($verify_id, $verify_context)
 	echo '
 			<div class="verification_control_valid">
 				<label for="', $verify_context['field_name'], '">', $txt['visual_verification_hidden'], '</label>:
-				<input type="text" id="', $verify_context['field_name'], '" name="', $verify_context['field_name'], '" autocomplete="off" size="30" value="', (!empty($verify_context['user_value']) ? $verify_context['user_value'] : ''), '" tabindex="', $context['tabindex']++, '" class="', $verify_context['is_error'] ? 'border_error ' : '', 'input_text" />
+				<input type="text" id="', $verify_context['field_name'], '" name="', $verify_context['field_name'], '" autocomplete="off" size="30" value="', (empty($verify_context['user_value']) ? '' : $verify_context['user_value']), '" tabindex="', $context['tabindex']++, '" class="', $verify_context['is_error'] ? 'border_error ' : '', 'input_text" />
 			</div>';
 }
 

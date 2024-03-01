@@ -58,7 +58,7 @@ function template_build_poster_div($message, $ignoring = false)
 	if (!empty($modSettings['show_user_images']) && empty($options['show_no_avatars']) && !empty($message['member']['avatar']['image']))
 	{
 		$poster_div .= '
-		 				<img class="avatarresize" src="' . $message['member']['avatar']['href'] . '" alt="avatar' . ' &ndash; ' . $message['member']['name'] . '" />';
+						<img class="avatarresize" src="' . $message['member']['avatar']['href'] . '" alt="avatar' . ' &ndash; ' . $message['member']['name'] . '" />';
 	}
 
 	if (!$message['member']['is_guest'])
@@ -97,20 +97,20 @@ function template_build_poster_div($message, $ignoring = false)
 		if (!empty($modSettings['karmaMode']))
 		{
 			if ($modSettings['karmaMode'] === '1' && !empty($message['member']['karma']))
-		{
-			$poster_div .= '
+			{
+				$poster_div .= '
 							<li class="listlevel2 karma">' . $modSettings['karmaLabel'] . ' ' . ($message['member']['karma']['good'] - $message['member']['karma']['bad']);
-		}
+			}
 			elseif ($modSettings['karmaMode'] === '2' && !empty($message['member']['karma']))
-		{
-			$poster_div .= '
+			{
+				$poster_div .= '
 							<li class="listlevel2 karma">' . $modSettings['karmaLabel'] . ' +' . $message['member']['karma']['good'] . '/-' . $message['member']['karma']['bad'];
-		}
+			}
 
-		// Is this user allowed to modify this member's karma?
-		if (!empty($message['member']['karma']['allow']))
-		{
-			$poster_div .= '
+			// Is this user allowed to modify this member's karma?
+			if (!empty($message['member']['karma']['allow']))
+			{
+				$poster_div .= '
 								<span class="karma_allow">
 									<a class="linkbutton" href="' . $message['member']['karma']['applaud_url'] . '">' . $modSettings['karmaApplaudLabel'] . '</a>';
 
@@ -134,11 +134,18 @@ function template_build_poster_div($message, $ignoring = false)
 			// Show above-icon placement (replacing personal text and gender)
 			foreach ($message['member']['custom_fields'] as $custom)
 			{
-				if ((int) $custom['placement'] === 3 && !empty($custom['value']))
+				if ((int) $custom['placement'] !== 3)
 				{
-					$poster_div .= '
-							<li class="listlevel2 cf_aboveicons">' . $custom['value'] . '</li>';
+					continue;
 				}
+
+				if (empty($custom['value']))
+				{
+					continue;
+				}
+
+				$poster_div .= '
+							<li class="listlevel2 cf_aboveicons">' . $custom['value'] . '</li>';
 			}
 
 			// Icon placement.
@@ -252,7 +259,7 @@ function template_build_poster_div($message, $ignoring = false)
 		$poster_div .= '
 							<li class="listlevel2 poster_ip">
 								<a class="helpicon i-help" href="' . $scripturl . '?action=quickhelp;help=see_admin_ip" onclick="return reqOverlayDiv(this.href);"><s>' . $txt['help'] . '</s></a>
-								<a class="linklevel2 help" title="' . $message['member']['ip'] . '" href="' . $scripturl . '?action=' . (!empty($message['member']['is_guest']) ? 'trackip' : 'profile;area=history;sa=ip;u=' . $message['member']['id'] . ';searchip=' . $message['member']['ip']) . '">' . $message['member']['ip'] . '</a>
+								<a class="linklevel2 help" title="' . $message['member']['ip'] . '" href="' . $scripturl . '?action=' . (empty($message['member']['is_guest']) ? 'profile;area=history;sa=ip;u=' . $message['member']['id'] . ';searchip=' . $message['member']['ip'] : 'trackip') . '">' . $message['member']['ip'] . '</a>
 							</li>';
 	}
 	// Or, should we show it because this, is you?
@@ -393,12 +400,12 @@ function template_simple_message($msg)
 	// @todo find a better name for $msg['date']
 	echo '
 			<article class="', $msg['class'], ' forumposts">
-				<header class="topic_details">', !empty($msg['counter']) ? '
-					<div class="counter">' . $msg['counter'] . '</div>' : '', '
+				<header class="topic_details">', empty($msg['counter']) ? '' : '
+					<div class="counter">' . $msg['counter'] . '</div>', '
 					<h5>
 						', $msg['title'], '
-					</h5>', !empty($msg['date']) ? '
-					<span class="smalltext">' . $msg['date'] . '</span>' : '', '
+					</h5>', empty($msg['date']) ? '' : '
+					<span class="smalltext">' . $msg['date'] . '</span>', '
 				</header>
 				<section class="messageContent">
 					', $msg['body'], '

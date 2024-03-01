@@ -44,7 +44,7 @@ function template_view_package()
 		<div class="errorbox">
 			', sprintf($txt['package_will_fail_title'], $txt['package_' . ($context['uninstalling'] ? 'uninstall' : 'install')]), '<br />
 			', sprintf($txt['package_will_fail_warning'], $txt['package_' . ($context['uninstalling'] ? 'uninstall' : 'install')]),
-		!empty($context['failure_details']) ? '<br /><br /><strong>' . $context['failure_details'] . '</strong>' : '', '
+		empty($context['failure_details']) ? '' : '<br /><br /><strong>' . $context['failure_details'] . '</strong>', '
 		</div>';
 	}
 
@@ -61,7 +61,7 @@ function template_view_package()
 		foreach ($context['readmes'] as $a => $b)
 		{
 			echo '
-						<option value="', $b, '"', $a === 'selected' ? ' selected="selected"' : '', '>', $b == 'default' ? $txt['package_readme_default'] : ucfirst($b), '</option>';
+						<option value="', $b, '"', $a === 'selected' ? ' selected="selected"' : '', '>', $b === 'default' ? $txt['package_readme_default'] : ucfirst($b), '</option>';
 		}
 
 		echo '
@@ -84,7 +84,7 @@ function template_view_package()
 		foreach ($context['licenses'] as $a => $b)
 		{
 			echo '
-						<option value="', $b, '"', $a === 'selected' ? ' selected="selected"' : '', '>', $b == 'default' ? $txt['package_license_default'] : ucfirst($b), '</option>';
+						<option value="', $b, '"', $a === 'selected' ? ' selected="selected"' : '', '>', $b === 'default' ? $txt['package_license_default'] : ucfirst($b), '</option>';
 		}
 
 		echo '
@@ -162,7 +162,7 @@ function template_view_package()
 		foreach ($context['actions'] as $packageaction)
 		{
 			// Did we pass or fail?  Need to know for later on.
-			$js_operations[$action_num] = isset($packageaction['failed']) ? $packageaction['failed'] : 0;
+			$js_operations[$action_num] = $packageaction['failed'] ?? 0;
 
 			echo '
 				<tr>
@@ -192,14 +192,14 @@ function template_view_package()
 							<tr>
 								<td class="hide"></td>
 								<td class="grid4 smalltext">
-									<a href="' . $scripturl . '?action=admin;area=packages;sa=showoperations;operation_key=', $operation['operation_key'], ';package=', $context['filename'], ';filename=', $operation['filename'], (!empty($context['uninstalling']) ? ';reverse' : ''), '" onclick="return reqWin(this.href, 680, 400, false);">
+									<a href="' . $scripturl . '?action=admin;area=packages;sa=showoperations;operation_key=', $operation['operation_key'], ';package=', $context['filename'], ';filename=', $operation['filename'], (empty($context['uninstalling']) ? '' : ';reverse'), '" onclick="return reqWin(this.href, 680, 400, false);">
 										<i class="icon i-view"></i>
 									</a>
 								</td>
 								<td class="grid4 smalltext">', $operation_num, '.</td>
 								<td class="smalltext">', $txt[$operation_text], '</td>
 								<td class="smalltext grid50">', $operation['action'], '</td>
-								<td class="smalltext grid20">', $operation['description'], !empty($operation['ignore_failure']) ? ' (' . $txt['operation_ignore'] . ')' : '', '</td>
+								<td class="smalltext grid20">', $operation['description'], empty($operation['ignore_failure']) ? '' : ' (' . $txt['operation_ignore'] . ')', '</td>
 							</tr>';
 
 					$operation_num++;
@@ -252,7 +252,7 @@ function template_view_package()
 				}
 
 				echo '
-							<input type="checkbox" name="custom_theme[]" id="custom_theme_', $id, '" value="', $id, '" onclick="', (!empty($theme['has_failure']) ? 'if (this.form.custom_theme_' . $id . '.checked && !confirm(\'' . $txt['package_theme_failure_warning'] . '\')) return false;' : ''), 'invertAll(this, this.form, \'dummy_theme_', $id, '\', true);" ', !empty($context['themes_locked']) ? 'disabled="disabled" checked="checked"' : '', '/>
+							<input type="checkbox" name="custom_theme[]" id="custom_theme_', $id, '" value="', $id, '" onclick="', (empty($theme['has_failure']) ? '' : 'if (this.form.custom_theme_' . $id . ".checked && !confirm('" . $txt['package_theme_failure_warning'] . "')) return false;"), "invertAll(this, this.form, 'dummy_theme_", $id, '\', true);" ', empty($context['themes_locked']) ? '' : 'disabled="disabled" checked="checked"', '/>
 						</td>
 						<td colspan="3">
 							', $theme['name'], '
@@ -265,7 +265,7 @@ function template_view_package()
 					<tr>
 						<td>', isset($packageaction['operations']) ? '<img id="operation_img_' . $action_num . '" src="' . $settings['images_url'] . '/selected_open.png" alt="*" class="hide" />' : '', '</td>
 						<td class="centertext" style="width: 30px;">
-							<input type="checkbox" name="theme_changes[]" value="', !empty($action['value']) ? $action['value'] : '', '" id="dummy_theme_', $id, '" ', (!empty($action['not_mod']) ? '' : 'disabled="disabled"'), ' ', !empty($context['themes_locked']) ? 'checked="checked"' : '', '/>
+							<input type="checkbox" name="theme_changes[]" value="', empty($action['value']) ? '' : $action['value'], '" id="dummy_theme_', $id, '" ', (empty($action['not_mod']) ? 'disabled="disabled"' : ''), ' ', empty($context['themes_locked']) ? '' : 'checked="checked"', '/>
 						</td>
 						<td>', $action['type'], '</td>
 						<td class="grid50">', $action['action'], '</td>
@@ -284,20 +284,20 @@ function template_view_package()
 						foreach ($action['operations'] as $operation)
 						{
 							// Determine the position text.
-							$operation_text = $operation['position'] == 'replace' ? 'operation_replace' : ($operation['position'] == 'before' ? 'operation_after' : 'operation_before');
+							$operation_text = $operation['position'] === 'replace' ? 'operation_replace' : ($operation['position'] === 'before' ? 'operation_after' : 'operation_before');
 
 							echo '
 								<tr>
 									<td class="hide"></td>
 									<td class="grid4 smalltext">
-										<a href="' . $scripturl . '?action=admin;area=packages;sa=showoperations;operation_key=', $operation['operation_key'], ';package=', $context['filename'], ';filename=', $operation['filename'], (!empty($context['uninstalling']) ? ';reverse' : ''), '" onclick="return reqWin(this.href, 600, 400, false);">
+										<a href="' . $scripturl . '?action=admin;area=packages;sa=showoperations;operation_key=', $operation['operation_key'], ';package=', $context['filename'], ';filename=', $operation['filename'], (empty($context['uninstalling']) ? '' : ';reverse'), '" onclick="return reqWin(this.href, 600, 400, false);">
 											<i class="icon i-view"></i>
 										</a>
 									</td>
 									<td class="grid4 smalltext">', $operation_num, '.</td>
 									<td class="smalltext">', $txt[$operation_text], '</td>
 									<td class="smalltext grid50">', $operation['action'], '</td>
-									<td class="smalltext grid20">', $operation['description'], !empty($operation['ignore_failure']) ? ' (' . $txt['operation_ignore'] . ')' : '', '</td>
+									<td class="smalltext grid20">', $operation['description'], empty($operation['ignore_failure']) ? '' : ' (' . $txt['operation_ignore'] . ')', '</td>
 								</tr>';
 							$operation_num++;
 						}
@@ -324,7 +324,7 @@ function template_view_package()
 	{
 		echo '
 			<div class="submitbutton">
-				<input type="submit" value="', $context['uninstalling'] ? $txt['package_uninstall_now'] : $txt['package_install_now'], '" onclick="return ', !empty($context['has_failure']) ? '(submitThisOnce(this) &amp;&amp; confirm(\'' . ($context['uninstalling'] ? $txt['package_will_fail_popup_uninstall'] : $txt['package_will_fail_popup']) . '\'))' : 'submitThisOnce(this)', ';" />
+				<input type="submit" value="', $context['uninstalling'] ? $txt['package_uninstall_now'] : $txt['package_install_now'], '" onclick="return ', empty($context['has_failure']) ? 'submitThisOnce(this)' : "(submitThisOnce(this) &amp;&amp; confirm('" . ($context['uninstalling'] ? $txt['package_will_fail_popup_uninstall'] : $txt['package_will_fail_popup']) . "'))", ';" />
 			</div>';
 	}
 	// If we need ftp information then demand it!
@@ -355,11 +355,9 @@ function template_view_package()
 		var aOperationElements = [];';
 
 	// Operations.
-	if (!empty($js_operations))
+	foreach ($js_operations as $key => $operation)
 	{
-		foreach ($js_operations as $key => $operation)
-		{
-			echo '
+		echo '
 			aOperationElements[', $key, '] = new elk_Toggle({
 				bToggleEnabled: true,
 				bCurrentlyCollapsed: ', $operation ? 'false' : 'true', ',
@@ -376,7 +374,6 @@ function template_view_package()
 					}
 				]
 			});';
-		}
 	}
 
 	echo '
@@ -398,16 +395,23 @@ function template_view_package()
 	</script>';
 
 	// And a bit more for database changes.
-	if ($context['uninstalling'] && !empty($context['database_changes']))
+	if (!$context['uninstalling'])
 	{
-		echo '
+		return;
+	}
+
+	if (empty($context['database_changes']))
+	{
+		return;
+	}
+
+	echo '
 	<script>
 		var database_changes_area = document.getElementById(\'db_changes_div\'),
 			db_vis = false;
 
 		database_changes_area.style.display = "none";
 	</script>';
-	}
 }
 
 /**
@@ -657,7 +661,7 @@ function template_control_chmod()
 	if (empty($context['package_ftp']['form_elements_only']))
 	{
 		echo '
-				', sprintf($txt['package_ftp_why'], 'document.getElementById(\'need_writable_list\').style.display = \'\'; return false;'), '<br />
+				', sprintf($txt['package_ftp_why'], "document.getElementById('need_writable_list').style.display = ''; return false;"), '<br />
 				<div id="need_writable_list" class="smalltext">
 					', $txt['package_ftp_why_file_list'], '
 					<ul class="bbc_list">';
@@ -677,8 +681,8 @@ function template_control_chmod()
 	}
 
 	echo '
-				<div id="ftp_error_div" class="errorbox', !empty($context['package_ftp']['error']) ? '"' : ' hide"', '>
-					<span id="ftp_error_message">', !empty($context['package_ftp']['error']) ? $context['package_ftp']['error'] : '', '</span>
+				<div id="ftp_error_div" class="errorbox', empty($context['package_ftp']['error']) ? ' hide"' : '"', '>
+					<span id="ftp_error_message">', empty($context['package_ftp']['error']) ? '' : $context['package_ftp']['error'], '</span>
 				</div>';
 
 	if (!empty($context['package_ftp']['destination']))

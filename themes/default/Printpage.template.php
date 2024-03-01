@@ -126,7 +126,7 @@ function template_print_above()
 	echo '
 		</div>
 		<h1 id="title">', $context['forum_name_html_safe'], '</h1>
-		<h2 id="linktree">', $context['category_name'], ' => ', (!empty($context['parent_boards']) ? implode(' => ', $context['parent_boards']) . ' => ' : ''), $context['board_name'], ' => ', $txt['topic_started'], ': ', $context['poster_name'], ' ', $txt['search_on'], ' ', $context['post_time'], '</h2>
+		<h2 id="linktree">', $context['category_name'], ' => ', (empty($context['parent_boards']) ? '' : implode(' => ', $context['parent_boards']) . ' => '), $context['board_name'], ' => ', $txt['topic_started'], ': ', $context['poster_name'], ' ', $txt['search_on'], ' ', $context['post_time'], '</h2>
 		<div id="posts">';
 }
 

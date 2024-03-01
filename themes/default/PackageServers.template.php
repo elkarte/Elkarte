@@ -381,7 +381,7 @@ function template_downloaded()
 			</ul>
 		</div>
 		<div class="submitbutton">
-			<a class="linkbutton" href="', $scripturl, '?action=admin;', (!empty($context['package_server']) ? 'area=packageservers;sa=browse;server=' . $context['package_server'] : 'area=packages;sa=browse'), '">', $txt['back'], '</a>
+			<a class="linkbutton" href="', $scripturl, '?action=admin;', (empty($context['package_server']) ? 'area=packages;sa=browse' : 'area=packageservers;sa=browse;server=' . $context['package_server']), '">', $txt['back'], '</a>
 		</div>
 	</div>';
 }

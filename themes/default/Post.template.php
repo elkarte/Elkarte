@@ -49,7 +49,7 @@ function template_postarea_above()
 
 	// Start the form and display the link tree.
 	echo '
-		<form id="postmodify" action="', $scripturl, '?action=', $context['destination'], ';', empty($context['current_board']) ? '' : 'board=' . $context['current_board'], '" method="post" accept-charset="UTF-8" name="postmodify" class="flow_hidden" onsubmit="', ($context['becomes_approved'] ? '' : 'alert(\'' . $txt['js_post_will_require_approval'] . '\');'), 'submitonce(this);smc_saveEntities(\'postmodify\', [\'subject\', \'', $context['post_box_name'], '\', \'guestname\', \'evtitle\', \'question\'], \'options\');revalidateMentions(\'postmodify\', \'', $context['post_box_name'], '\');" enctype="multipart/form-data">
+		<form id="postmodify" action="', $scripturl, '?action=', $context['destination'], ';', empty($context['current_board']) ? '' : 'board=' . $context['current_board'], '" method="post" accept-charset="UTF-8" name="postmodify" class="flow_hidden" onsubmit="', ($context['becomes_approved'] ? '' : "alert('" . $txt['js_post_will_require_approval'] . "');"), "submitonce(this);smc_saveEntities('postmodify', ['subject', '", $context['post_box_name'], "', 'guestname', 'evtitle', 'question'], 'options');revalidateMentions('postmodify', '", $context['post_box_name'], '\');" enctype="multipart/form-data">
 			<div id="preview_section"', isset($context['preview_message']) ? '' : ' class="hide"', '>
 				<h2 class="category_header">
 					<span id="preview_subject">', empty($context['preview_subject']) ? '' : $context['preview_subject'], '</span>
@@ -330,14 +330,21 @@ function template_post_page()
 						</div>';
 
 	// Create an area to show the draft last saved on text
-	if (!empty($context['drafts_autosave']) && !empty($options['drafts_autosave_enabled']))
+	if (empty($context['drafts_autosave']))
 	{
-		echo '
+		return;
+	}
+
+	if (empty($options['drafts_autosave_enabled']))
+	{
+		return;
+	}
+
+	echo '
 		<div class="draftautosave">
 			<span id="throbber" class="hide"><i class="icon i-oval"></i>&nbsp;</span>
 			<span id="draft_lastautosave"></span>
 		</div>';
-	}
 }
 
 /**
@@ -406,13 +413,13 @@ function template_additional_options_below()
 								<li>
 									<input type="hidden" name="move" value="0" />
 									<label for="check_move">
-										<input type="checkbox" name="move" id="check_move" value="1" ' . (!empty($context['move']) ? 'checked="checked" ' : '') . '/> ' . $txt['move_after2'] . '
+										<input type="checkbox" name="move" id="check_move" value="1" ' . (empty($context['move']) ? '' : 'checked="checked" ') . '/> ' . $txt['move_after2'] . '
 									</label>
 								</li>' : '', '
 								', $context['can_announce'] && $context['is_first_post'] ? '
 								<li>
 									<label for="check_announce">
-										<input type="checkbox" name="announce_topic" id="check_announce" value="1" ' . (!empty($context['announce']) ? 'checked="checked" ' : '') . '/> ' . $txt['announce_topic'] . '
+										<input type="checkbox" name="announce_topic" id="check_announce" value="1" ' . (empty($context['announce']) ? '' : 'checked="checked" ') . '/> ' . $txt['announce_topic'] . '
 									</label>
 								</li>' : '', '
 								', $context['show_approval'] ? '
@@ -743,10 +750,12 @@ function template_topic_replies_below()
 
 			// Add the hidden quick quote button
 			if ($context['can_quote'])
+			{
 				echo '
 					<footer>
 						<button id="button_float_qq_', $post['id'], '" type="submit" role="button" class="quick_quote_button hide">', $txt['quick_quote'], '</button>
 					</footer>';
+			}
 
 			echo '
 				</div>
@@ -798,7 +807,7 @@ function template_postarea_below()
 		template_verification_controls($context['visual_verification_id'], '
 						<div class="post_verification">
 							<h2 class="category_header">
-							 	<span class="' . (!empty($context['post_error']['need_qr_verification']) ? ' error"' : '"') . '>
+								<span class="' . (empty($context['post_error']['need_qr_verification']) ? '"' : ' error"') . '>
 									<strong>' . $txt['verification'] . ':</strong>
 								</span>	
 							</h2>

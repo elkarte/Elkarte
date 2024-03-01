@@ -19,9 +19,15 @@ function template_Emailuser_init()
 {
 	global $context, $txt;
 
-	if (!empty($context['sub_template']) && $context['sub_template'] === 'report')
-	{
-		theme()->addInlineJavascript('
+	 if (empty($context['sub_template'])) {
+		 return;
+	 }
+
+	 if ($context['sub_template'] !== 'report') {
+		 return;
+	 }
+
+	 theme()->addInlineJavascript('
 		error_txts[\'post_too_long\'] = ' . JavaScriptEscape($txt['error_post_too_long']) . ';
 
 		function checkReportForm()
@@ -44,7 +50,6 @@ function template_Emailuser_init()
 			return true;
 		}
 		', true);
-	}
 }
 
 /**

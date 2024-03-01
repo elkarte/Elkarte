@@ -183,7 +183,7 @@ function template_topic_listing()
 			// Is this topic pending approval, or does it have any posts pending approval?
 			if ($context['can_approve_posts'] && $topic['unapproved_posts'])
 			{
-				$color_class = !$topic['approved'] ? 'approvetopic_row' : 'approve_row';
+				$color_class = $topic['approved'] ? 'approve_row' : 'approvetopic_row';
 			}
 			// We start with locked and sticky topics.
 			elseif ($topic['is_sticky'] && $topic['is_locked'])
@@ -225,7 +225,7 @@ function template_topic_listing()
 			echo '
 				<div class="topic_info">
 
-					<div class="topic_name" ', (!empty($topic['quick_mod']['modify']) ? 'id="topic_' . $topic['first_post']['id'] . '"  ondblclick="oQuickModifyTopic.modify_topic(\'' . $topic['id'] . '\', \'' . $topic['first_post']['id'] . '\');"' : ''), '>
+					<div class="topic_name" ', (empty($topic['quick_mod']['modify']) ? '' : 'id="topic_' . $topic['first_post']['id'] . '"  ondblclick="oQuickModifyTopic.modify_topic(\'' . $topic['id'] . "', '" . $topic['first_post']['id'] . '\');"'), '>
 						<h4>';
 
 			// Is this topic new? (assuming they are logged in!)
@@ -247,8 +247,8 @@ function template_topic_listing()
 						</h4>
 					</div>
 					<div class="topic_starter">
-						', sprintf($txt['topic_started_by'], $topic['first_post']['member']['link']), !empty($topic['pages']) ? '
-						<ul class="small_pagelinks" id="pages' . $topic['first_post']['id'] . '">' . $topic['pages'] . '</ul>' : '', '
+						', sprintf($txt['topic_started_by'], $topic['first_post']['member']['link']), empty($topic['pages']) ? '' : '
+						<ul class="small_pagelinks" id="pages' . $topic['first_post']['id'] . '">' . $topic['pages'] . '</ul>', '
 					</div>
 				</div>';
 
@@ -374,13 +374,13 @@ function template_topic_listing_below()
 				bHideStrip: true,
 				sFormId: "quickModForm",
 				
-				bCanRemove: ' . (!empty($context['allow_qm']['can_remove']) ? 'true' : 'false') . ',
+				bCanRemove: ' . (empty($context['allow_qm']['can_remove']) ? 'false' : 'true') . ',
 				aActionRemove: [' . implode(',', $context['allow_qm']['can_remove']) . '],
 				sRemoveButtonLabel: "' . $txt['remove_topic'] . '",
 				sRemoveButtonImage: "i-delete",
 				sRemoveButtonConfirm: "' . $txt['quickmod_confirm'] . '",
 				
-				bCanMove: ' . (!empty($context['allow_qm']['can_move']) ? 'true' : 'false') . ',
+				bCanMove: ' . (empty($context['allow_qm']['can_move']) ? 'false' : 'true') . ',
 				aActionMove: [' . implode(',', $context['allow_qm']['can_move']) . '],
 				sMoveButtonLabel: "' . $txt['move_topic'] . '",
 				sMoveButtonImage: "i-move",
@@ -391,7 +391,7 @@ function template_topic_listing_below()
 				sLockButtonLabel: "' . $txt['set_lock'] . '",
 				sLockButtonImage: "i-lock",
 				
-				bCanApprove: ' . (!empty($context['allow_qm']['can_approve']) ? 'true' : 'false') . ',
+				bCanApprove: ' . (empty($context['allow_qm']['can_approve']) ? 'false' : 'true') . ',
 				aActionApprove: [' . implode(',', $context['allow_qm']['can_approve']) . '],
 				sApproveButtonLabel: "' . $txt['approve'] . '",
 				sApproveButtonImage: "i-check",

@@ -241,12 +241,12 @@ function template_email_members_compose()
 					<ul>
 						<li>
 							<label for="send_pm">
-								<input type="checkbox" name="send_pm" id="send_pm" ', !empty($context['send_pm']) ? 'checked="checked"' : '', 'onclick="checkboxes_status(this);" /> ', $txt['email_as_pms'], '
+								<input type="checkbox" name="send_pm" id="send_pm" ', empty($context['send_pm']) ? '' : 'checked="checked"', 'onclick="checkboxes_status(this);" /> ', $txt['email_as_pms'], '
 							</label>
 						</li>
 						<li>
 							<label for="send_html">
-								<input type="checkbox" name="send_html" id="send_html" ', !empty($context['send_html']) ? 'checked="checked"' : '', 'onclick="checkboxes_status(this);" /> ', $txt['email_as_html'], '
+								<input type="checkbox" name="send_html" id="send_html" ', empty($context['send_html']) ? '' : 'checked="checked"', 'onclick="checkboxes_status(this);" /> ', $txt['email_as_html'], '
 							</label>
 						</li>
 						<li>

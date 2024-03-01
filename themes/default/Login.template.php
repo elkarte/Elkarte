@@ -237,7 +237,7 @@ function template_admin_login()
 
 	// Since this should redirect to whatever they were doing, send all the get data.
 	echo '
-<form action="', $scripturl, $context['get_data'], '" method="post" accept-charset="UTF-8" name="frmLogin" id="frmLogin" onsubmit="hash', ucfirst($context['sessionCheckType']), 'Password(this, \'', $context['user']['username'], '\', \'', $context['session_id'], '\', \'' . (!empty($context['login_token']) ? $context['login_token'] : '') . '\');">
+<form action="', $scripturl, $context['get_data'], '" method="post" accept-charset="UTF-8" name="frmLogin" id="frmLogin" onsubmit="hash', ucfirst($context['sessionCheckType']), "Password(this, '", $context['user']['username'], "', '", $context['session_id'], "', '" . (empty($context['login_token']) ? '' : $context['login_token']) . '\');">
 	<div class="login" id="admin_login">
 		<h2 class="category_header hdicon i-menu-login">
 			', $txt['login'], '

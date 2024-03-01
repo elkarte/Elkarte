@@ -461,7 +461,7 @@ function template_add_edit_group_boards_list($form_id, $collapse = true)
 		{
 			echo '
 									<li class="category">
-										<a href="javascript:void(0);" onclick="selectBoards([', implode(', ', $category['child_ids']), '], \'', $form_id, '\', \'boardaccess\'); return false;"><strong>', $category['name'], '</strong></a>
+										<a href="javascript:void(0);" onclick="selectBoards([', implode(', ', $category['child_ids']), "], '", $form_id, '\', \'boardaccess\'); return false;"><strong>', $category['name'], '</strong></a>
 									<ul>';
 		}
 		else

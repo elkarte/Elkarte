@@ -65,7 +65,7 @@ function template_error_log()
 						&nbsp;&nbsp;', $txt['apply_filter_of_type'], ':';
 
 	$error_types = array();
-	foreach ($context['error_types'] as $type => $details)
+	foreach ($context['error_types'] as $details)
 	{
 		$error_types[] = ($details['is_selected'] ? '<img src="' . $settings['images_url'] . '/selected.png" alt="" /> ' : '') . '<a href="' . $details['url'] . '" ' . ($details['is_selected'] ? 'class="selected"' : '') . ' title="' . $details['description'] . '">' . $details['label'] . '</a>';
 	}

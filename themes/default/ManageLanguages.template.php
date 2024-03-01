@@ -301,7 +301,7 @@ function template_add_language()
 				<fieldset>
 					<legend>', $txt['add_language_elk'], '</legend>
 					<label for="lang_add" class="smalltext">', $txt['add_language_elk_browse'], '</label>
-					<input type="text" id="lang_add" name="lang_add" size="40" value="', !empty($context['elk_search_term']) ? $context['elk_search_term'] : '', '" class="input_text" />';
+					<input type="text" id="lang_add" name="lang_add" size="40" value="', empty($context['elk_search_term']) ? '' : $context['elk_search_term'], '" class="input_text" />';
 
 	// Do we have some errors? Too bad.
 	if (!empty($context['langfile_error']))

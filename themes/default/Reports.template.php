@@ -103,13 +103,13 @@ function template_generate_report()
 			else
 			{
 				echo '
-				<tr class="', !empty($row[0]['separator']) ? 'category_header' : '', '">';
+				<tr class="', empty($row[0]['separator']) ? '' : 'category_header', '">';
 			}
 
 			// Now do each column.
 			$column_number = 0;
 
-			foreach ($row as $key => $data)
+			foreach ($row as $data)
 			{
 				// If this is a special separator, skip over!
 				if (!empty($data['separator']) && $column_number == 0)
@@ -125,14 +125,14 @@ function template_generate_report()
 				if ($column_number == 0 && !empty($table['shading']['left']))
 				{
 					echo '
-					<td class="table_caption ', $table['align']['shaded'], 'text" style="', $table['width']['shaded'] != 'auto' ? 'width:' . $table['width']['shaded'] . 'px;"' : '"', '>
+					<td class="table_caption ', $table['align']['shaded'], 'text" style="', $table['width']['shaded'] !== 'auto' ? 'width:' . $table['width']['shaded'] . 'px;"' : '"', '>
 						', $data['v'] == $table['default_value'] ? '' : ($data['v'] . (empty($data['v']) ? '' : ':')), '
 					</td>';
 				}
 				else
 				{
 					echo '
-					<td class="', $table['align']['normal'], 'text" style="', $table['width']['normal'] != 'auto' ? 'width:' . $table['width']['normal'] . 'px' : '', !empty($data['style']) ? ';' . $data['style'] . '"' : '"', '>
+					<td class="', $table['align']['normal'], 'text" style="', $table['width']['normal'] !== 'auto' ? 'width:' . $table['width']['normal'] . 'px' : '', empty($data['style']) ? '"' : ';' . $data['style'] . '"', '>
 						', $data['v'], '
 					</td>';
 				}
@@ -185,7 +185,7 @@ function template_print()
 	foreach ($context['tables'] as $table)
 	{
 		echo '
-		<div style="overflow: visible;', $table['max_width'] != 'auto' ? ' width:' . $table['max_width'] . 'px;' : '', '">
+		<div style="overflow: visible;', $table['max_width'] !== 'auto' ? ' width:' . $table['max_width'] . 'px;' : '', '">
 			<table class="table_grid">';
 
 		if (!empty($table['title']))
@@ -202,7 +202,7 @@ function template_print()
 		$row_number = 0;
 		foreach ($table['data'] as $row)
 		{
-			if ($row_number == 0 && !empty($table['shading']['top']))
+			if ($row_number === 0 && !empty($table['shading']['top']))
 			{
 				echo '
 				<tr class="secondary_header">';
@@ -215,7 +215,7 @@ function template_print()
 
 			// Now do each column!!
 			$column_number = 0;
-			foreach ($row as $key => $data)
+			foreach ($row as $data)
 			{
 				// If this is a special separator, skip over!
 				if (!empty($data['separator']) && $column_number == 0)
@@ -228,17 +228,17 @@ function template_print()
 				}
 
 				// Shaded?
-				if ($column_number == 0 && !empty($table['shading']['left']))
+				if ($column_number === 0 && !empty($table['shading']['left']))
 				{
 					echo '
-					<td class="secondary_header ', $table['align']['shaded'], 'text" style="', $table['width']['shaded'] != 'auto' ? 'width:' . $table['width']['shaded'] . 'px"' : '"', '>
-						', $data['v'] == $table['default_value'] ? '' : ($data['v'] . (empty($data['v']) ? '' : ':')), '
+					<td class="secondary_header ', $table['align']['shaded'], 'text" style="', $table['width']['shaded'] !== 'auto' ? 'width:' . $table['width']['shaded'] . 'px"' : '"', '>
+						', $data['v'] === $table['default_value'] ? '' : ($data['v'] . (empty($data['v']) ? '' : ':')), '
 					</td>';
 				}
 				else
 				{
 					echo '
-					<td class="', $table['align']['normal'], 'text" style="', $table['width']['normal'] != 'auto' ? 'width:' . $table['width']['normal'] . 'px' : '', !empty($data['style']) ? ';' . $data['style'] . '"' : '"', '>
+					<td class="', $table['align']['normal'], 'text" style="', $table['width']['normal'] !== 'auto' ? 'width:' . $table['width']['normal'] . 'px' : '', empty($data['style']) ? '"' : ';' . $data['style'] . '"', '>
 						', $data['v'], '
 					</td>';
 				}

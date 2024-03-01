@@ -29,7 +29,7 @@ function template_searchform()
 
 	echo '
 				<form id="searchform" action="', $scripturl, '?action=search;sa=results" method="post" accept-charset="UTF-8" name="searchform">
-					<h2 class="category_header', !empty($settings['use_buttons']) ? ' hdicon i-search' : '', '">
+					<h2 class="category_header', empty($settings['use_buttons']) ? '' : ' hdicon i-search', '">
 						', $txt['set_parameters'], '
 					</h2>';
 
@@ -87,7 +87,7 @@ function template_searchform()
 								<dd>
 									<select name="searchtype" id="searchtype">
 										<option value="1"', empty($context['search_params']['searchtype']) ? ' selected="selected"' : '', '>', $txt['all_words'], '</option>
-										<option value="2"', !empty($context['search_params']['searchtype']) ? ' selected="selected"' : '', '>', $txt['any_words'], '</option>
+										<option value="2"', empty($context['search_params']['searchtype']) ? '' : ' selected="selected"', '>', $txt['any_words'], '</option>
 									</select>
 								</dd>
 								<dt class="righttext">
@@ -112,9 +112,9 @@ function template_searchform()
 									', $txt['search_options'], ':
 								</dt>
 								<dd class="options">
-									<input type="checkbox" name="show_complete" id="show_complete" value="1"', !empty($context['search_params']['show_complete']) ? ' checked="checked"' : '', ' />
+									<input type="checkbox" name="show_complete" id="show_complete" value="1"', empty($context['search_params']['show_complete']) ? '' : ' checked="checked"', ' />
 									<label for="show_complete">', $txt['search_show_complete_messages'], '</label><br />
-									<input type="checkbox" name="subject_only" id="subject_only" value="1"', !empty($context['search_params']['subject_only']) ? ' checked="checked"' : '', ' />
+									<input type="checkbox" name="subject_only" id="subject_only" value="1"', empty($context['search_params']['subject_only']) ? '' : ' checked="checked"', ' />
 									<label for="subject_only">', $txt['search_subject_only'], '</label>
 								</dd>
 								<dt class="righttext between">
@@ -445,13 +445,13 @@ function template_results()
 			bUseImageButton: false,
 			sFormId: "quickModForm",
 			
-			bCanRemove: ' . (!empty($context['can_remove']) ? 'true' : 'false') . ',
+			bCanRemove: ' . (empty($context['can_remove']) ? 'false' : 'true') . ',
 			aActionRemove: [' . implode(',', array_filter(array_unique($context['allow_qm']['can_remove']))) . '],
 			sRemoveButtonLabel: "' . $txt['remove_topic'] . '",
 			sRemoveButtonImage: "i-delete",
 			sRemoveButtonConfirm: "' . $txt['quickmod_confirm'] . '",
 			
-			bCanMove: ' . (!empty($context['can_move']) ? 'true' : 'false') . ',
+			bCanMove: ' . (empty($context['can_move']) ? 'false' : 'true') . ',
 			aActionMove: [' . implode(',', array_filter(array_unique($context['allow_qm']['can_move']))) . '],
 			sMoveButtonLabel: "' . $txt['move_topic'] . '",
 			sMoveButtonImage: "i-move",

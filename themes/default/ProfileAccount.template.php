@@ -138,13 +138,13 @@ function template_issueWarning()
 				</dd>
 			</dl>
 			<hr />
-			<div id="box_preview"', !empty($context['warning_data']['body_preview']) ? '' : ' class="hide"', '>
+			<div id="box_preview"', empty($context['warning_data']['body_preview']) ? ' class="hide"' : '', '>
 				<dl class="settings">
 					<dt>
 						<strong>', $txt['preview'], '</strong>
 					</dt>
 					<dd id="body_preview">
-						', !empty($context['warning_data']['body_preview']) ? $context['warning_data']['body_preview'] : '', '
+						', empty($context['warning_data']['body_preview']) ? '' : $context['warning_data']['body_preview'], '
 					</dd>
 				</dl>
 			<hr />

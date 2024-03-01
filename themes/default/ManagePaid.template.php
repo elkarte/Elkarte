@@ -67,7 +67,7 @@ function template_modify_subscription()
 						<label for="prim_group">', $txt['paid_mod_prim_group'], '</label>:<br /><span class="smalltext">', $txt['paid_mod_prim_group_desc'], '</span>
 					</dt>
 					<dd>
-						<select id="prim_group" name="prim_group" ', !empty($context['disable_groups']) ? 'disabled="disabled"' : '', '>
+						<select id="prim_group" name="prim_group" ', empty($context['disable_groups']) ? '' : 'disabled="disabled"', '>
 							<option value="0" ', $context['sub']['prim_group'] == 0 ? 'selected="selected"' : '', '>', $txt['paid_mod_no_group'], '</option>';
 
 	// Put each group into the box.
@@ -89,7 +89,7 @@ function template_modify_subscription()
 	foreach ($context['groups'] as $groups)
 	{
 		echo '
-						<input type="checkbox" id="addgroup_', $groups['id'], '" name="addgroup[', $groups['id'], ']"', in_array($groups['id'], $context['sub']['add_groups']) ? ' checked="checked"' : '', ' ', !empty($context['disable_groups']) ? ' disabled="disabled"' : '', ' />&nbsp;<label for="addgroup_', $groups['id'], '" class="smalltext">', $groups['name'], '</label><br />';
+						<input type="checkbox" id="addgroup_', $groups['id'], '" name="addgroup[', $groups['id'], ']"', in_array($groups['id'], $context['sub']['add_groups']) ? ' checked="checked"' : '', ' ', empty($context['disable_groups']) ? '' : ' disabled="disabled"', ' />&nbsp;<label for="addgroup_', $groups['id'], '" class="smalltext">', $groups['name'], '</label><br />';
 	}
 
 	echo '
@@ -428,7 +428,7 @@ function template_user_subscription()
 			</div>';
 
 		// Print out all the subscriptions.
-		foreach ($context['subscriptions'] as $id => $subscription)
+		foreach ($context['subscriptions'] as $subscription)
 		{
 			// Ignore the inactive ones...
 			if (empty($subscription['active']))
@@ -536,6 +536,7 @@ function template_user_subscription()
 					</tr>';
 		}
 	}
+
 	echo '
 				</tbody>
 			</table>

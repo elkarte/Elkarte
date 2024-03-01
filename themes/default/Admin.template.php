@@ -82,7 +82,7 @@ function template_admin()
 	{
 		echo '
 					<li>
-						', !empty($task['icon']) ? '<a href="' . $task['href'] . '"><img src="' . $settings['default_images_url'] . '/admin/' . $task['icon'] . '" alt="" class="home_image" /></a>' : '', '
+						', empty($task['icon']) ? '' : '<a href="' . $task['href'] . '"><img src="' . $settings['default_images_url'] . '/admin/' . $task['icon'] . '" alt="" class="home_image" /></a>', '
 						<h5>', $task['link'], '</h5>
 						<span class="task">', $task['description'], '</span>
 					</li>';
@@ -451,13 +451,13 @@ function template_show_settings()
 
 	echo '
 	<div id="', $context['current_subaction'] ?? 'admincenter', '" class="admincenter">
-		<form id="admin_form_wrapper" action="', $context['post_url'], '" method="post" accept-charset="UTF-8"', !empty($context['force_form_onsubmit']) ? ' onsubmit="' . $context['force_form_onsubmit'] . '"' : '', '>';
+		<form id="admin_form_wrapper" action="', $context['post_url'], '" method="post" accept-charset="UTF-8"', empty($context['force_form_onsubmit']) ? '' : ' onsubmit="' . $context['force_form_onsubmit'] . '"', '>';
 
 	// Is there a custom title, maybe even with an icon?
 	if (isset($context['settings_title']))
 	{
 		echo '
-			<h2 class="category_header', !empty($context['settings_icon']) ? ' hdicon ' . $context['settings_icon'] : '', '">', $context['settings_title'], '</h2>';
+			<h2 class="category_header', empty($context['settings_icon']) ? '' : ' hdicon ' . $context['settings_icon'], '">', $context['settings_title'], '</h2>';
 	}
 
 	// any messages or errors to show?
@@ -497,7 +497,7 @@ function template_show_settings()
 			{
 				echo
 				(isset($config_var['name']) ? '<a href="#" id="' . $config_var['name'] . '"></a>' : ''), '
-					<h3 class="', !empty($config_var['class']) ? $config_var['class'] : 'category_header', '"', !empty($config_var['force_div_id']) ? ' id="' . $config_var['force_div_id'] . '"' : '', '>';
+					<h3 class="', empty($config_var['class']) ? 'category_header' : $config_var['class'], '"', empty($config_var['force_div_id']) ? '' : ' id="' . $config_var['force_div_id'] . '"', '>';
 
 				if (isset($config_var['helptext']))
 				{
@@ -544,7 +544,7 @@ function template_show_settings()
 		}
 
 		// Hang about? Are you pulling my leg - a callback?!
-		if (is_array($config_var) && $config_var['type'] == 'callback')
+		if (is_array($config_var) && $config_var['type'] === 'callback')
 		{
 			if (function_exists('template_callback_' . $config_var['name']))
 			{
@@ -561,7 +561,7 @@ function template_show_settings()
 			{
 				echo '
 					<dt></dt>
-					<dd', $config_var['type'] === 'warning' ? ' class="alert"' : '', (!empty($config_var['force_div_id']) ? ' id="' . $config_var['force_div_id'] . '_dd"' : ''), '>
+					<dd', $config_var['type'] === 'warning' ? ' class="alert"' : '', (empty($config_var['force_div_id']) ? '' : ' id="' . $config_var['force_div_id'] . '_dd"'), '>
 						', $config_var['label'], '
 					</dd>';
 			}
@@ -572,12 +572,12 @@ function template_show_settings()
 					<dt', is_array($config_var) && !empty($config_var['force_div_id']) ? ' id="' . $config_var['force_div_id'] . '"' : '', '>';
 
 				// Some quick helpers...
-				$preinput = !empty($config_var['preinput']) ? $config_var['preinput'] : '';
-				$javascript = !empty($config_var['javascript']) ? $config_var['javascript'] : '';
-				$disabled = !empty($config_var['disabled']) ? ' disabled="disabled"' : '';
-				$invalid = !empty($config_var['invalid']) ? ' class="error"' : '';
+				$preinput = empty($config_var['preinput']) ? '' : $config_var['preinput'];
+				$javascript = empty($config_var['javascript']) ? '' : $config_var['javascript'];
+				$disabled = empty($config_var['disabled']) ? '' : ' disabled="disabled"';
+				$invalid = empty($config_var['invalid']) ? '' : ' class="error"';
 				$size = !empty($config_var['size']) && is_numeric($config_var['size']) ? ' size="' . $config_var['size'] . '"' : '';
-				$subtext = !empty($config_var['subtext']) ? '<br /><span class="smalltext' . ($disabled ? ' disabled' : ($invalid ? ' error' : '')) . '"> ' . $config_var['subtext'] . '</span>' : '';
+				$subtext = empty($config_var['subtext']) ? '' : '<br /><span class="smalltext' . ($disabled !== '' && $disabled !== '0' ? ' disabled' : ($invalid !== '' && $invalid !== '0' ? ' error' : '')) . '"> ' . $config_var['subtext'] . '</span>';
 
 				// Show the [?] button.
 				if (isset($config_var['helptext']))
@@ -595,7 +595,7 @@ function template_show_settings()
 					</a>
 					<label for="', $config_var['name'], '"', ($config_var['disabled'] ? ' class="disabled"' : $invalid), '>', $config_var['label'], '</label>', $subtext, '
 					</dt>
-					<dd', (!empty($config_var['force_div_id']) ? ' id="' . $config_var['force_div_id'] . '_dd"' : ''), '>',
+					<dd', (empty($config_var['force_div_id']) ? '' : ' id="' . $config_var['force_div_id'] . '_dd"'), '>',
 				$preinput;
 
 				// Show a check box.
@@ -613,14 +613,14 @@ function template_show_settings()
 					<dt>
 						<a id="setting_', $config_var['name'], '_confirm"></a><span', ($config_var['disabled'] ? ' class="disabled"' : $invalid), '><label for="', $config_var['name'], '_confirm"><em>', $txt['admin_confirm_password'], '</em></label></span>
 					</dt>
-					<dd ', (!empty($config_var['force_div_id']) ? ' id="' . $config_var['force_div_id'] . '_confirm_dd"' : ''), ' >
+					<dd ', (empty($config_var['force_div_id']) ? '' : ' id="' . $config_var['force_div_id'] . '_confirm_dd"'), ' >
 						<input type="password" disabled id="', $config_var['name'], '_confirm" name="', $config_var['name'], '[1]"', $size, ' class="input_password" />';
 				}
 				// Show a selection box.
 				elseif ($config_var['type'] === 'select')
 				{
 					echo '
-						<select name="', $config_var['name'], '" id="', $config_var['name'], '" ', $javascript, $disabled, (!empty($config_var['multiple']) ? ' multiple="multiple" class="select_multiple"' : ''), '>';
+						<select name="', $config_var['name'], '" id="', $config_var['name'], '" ', $javascript, $disabled, (empty($config_var['multiple']) ? '' : ' multiple="multiple" class="select_multiple"'), '>';
 
 					foreach ($config_var['data'] as $option)
 					{
@@ -644,7 +644,7 @@ function template_show_settings()
 				elseif ($config_var['type'] === 'large_text')
 				{
 					echo '
-						<textarea rows="', (!empty($config_var['size']) ? $config_var['size'] : (!empty($config_var['rows']) ? $config_var['rows'] : 4)), '" cols="', (!empty($config_var['cols']) ? $config_var['cols'] : 30), '" name="', $config_var['name'], '" id="', $config_var['name'], '">', $config_var['value'], '</textarea>';
+						<textarea rows="', (empty($config_var['size']) ? (!empty($config_var['rows']) ? $config_var['rows'] : 4) : ($config_var['size'])), '" cols="', (empty($config_var['cols']) ? 30 : $config_var['cols']), '" name="', $config_var['name'], '" id="', $config_var['name'], '">', $config_var['value'], '</textarea>';
 				}
 				// Permission group?
 				elseif ($config_var['type'] === 'permissions')
@@ -664,7 +664,7 @@ function template_show_settings()
 						echo '
 								<li>
 									<label>
-										<input type="checkbox" name="', $config_var['name'], '_enabledTags[]" value="', $bbcTag['tag'], '"', !in_array($bbcTag['tag'], $config_var['disabled_tags']) ? ' checked' : '', ' /> ', $bbcTag['tag'], '
+										<input type="checkbox" name="', $config_var['name'], '_enabledTags[]" value="', $bbcTag['tag'], '"', in_array($bbcTag['tag'], $config_var['disabled_tags']) ? '' : ' checked', ' /> ', $bbcTag['tag'], '
 									</label>', $bbcTag['show_help'] ? '
 									<a href="' . getUrl('action', ['action' => 'quickhelp', 'help' => 'tag_' . $bbcTag['tag']]) . '" onclick="return reqOverlayDiv(this.href);" class="helpicon i-help"></a>' : '', '
 								</li>';
@@ -682,7 +682,7 @@ function template_show_settings()
 				elseif ($config_var['type'] === 'var_message')
 				{
 					echo '
-						<div', !empty($config_var['name']) ? ' id="' . $config_var['name'] . '"' : '', '>', $config_var['message'], '</div>';
+						<div', empty($config_var['name']) ? '' : ' id="' . $config_var['name'] . '"', '>', $config_var['message'], '</div>';
 				}
 				// Color picker?
 				elseif ($config_var['type'] === 'color')
@@ -744,7 +744,7 @@ function template_show_settings()
 	{
 		echo '
 				<div class="submitbutton">
-					<input type="submit" value="', $txt['save'], '"', (!empty($context['save_disabled']) ? ' disabled="disabled"' : ''), (!empty($context['settings_save_onclick']) ? ' onclick="' . $context['settings_save_onclick'] . '"' : ''), ' />
+					<input type="submit" value="', $txt['save'], '"', (empty($context['save_disabled']) ? '' : ' disabled="disabled"'), (empty($context['settings_save_onclick']) ? '' : ' onclick="' . $context['settings_save_onclick'] . '"'), ' />
 				</div>';
 	}
 
@@ -794,7 +794,7 @@ function template_admin_search_results()
 		foreach ($context['search_results'] as $result)
 		{
 			// Is it a result from the online manual?
-			if ($context['search_type'] == 'online')
+			if ($context['search_type'] === 'online')
 			{
 				echo '
 								<li>
@@ -1070,7 +1070,7 @@ function template_php_info()
 			<tr>
 				<td>', $key, '</td>';
 
-				foreach ($setting as $key_lm => $value)
+				foreach ($setting as $value)
 				{
 					echo '
 				<td class="centertext">', $value, '</td>';
@@ -1089,6 +1089,7 @@ function template_php_info()
 			</tr>';
 			}
 		}
+
 		echo '
 			</tbody>
 		</table>
@@ -1155,9 +1156,9 @@ function template_admin_quick_search()
 			<form action="', getUrl('admin', ['action' => 'admin', 'area' => 'search']), '" method="post" accept-charset="UTF-8" id="quick_search" class="floatright">
 				<input type="search" name="search_term" placeholder="', $txt['admin_search'], '" class="input_text" />
 				<select name="sa">
-					<option value="internal"', (empty($context['admin_preferences']['sb']) || $context['admin_preferences']['sb'] == 'internal' ? ' selected="selected"' : ''), '>', $txt['admin_search_type_internal'], '</option>
-					<option value="member"', (!empty($context['admin_preferences']['sb']) && $context['admin_preferences']['sb'] == 'member' ? ' selected="selected"' : ''), '>', $txt['admin_search_type_member'], '</option>
-					<option value="online"', (!empty($context['admin_preferences']['sb']) && $context['admin_preferences']['sb'] == 'online' ? ' selected="selected"' : ''), '>', $txt['admin_search_type_online'], '</option>
+					<option value="internal"', (empty($context['admin_preferences']['sb']) || $context['admin_preferences']['sb'] === 'internal' ? ' selected="selected"' : ''), '>', $txt['admin_search_type_internal'], '</option>
+					<option value="member"', (!empty($context['admin_preferences']['sb']) && $context['admin_preferences']['sb'] === 'member' ? ' selected="selected"' : ''), '>', $txt['admin_search_type_member'], '</option>
+					<option value="online"', (!empty($context['admin_preferences']['sb']) && $context['admin_preferences']['sb'] === 'online' ? ' selected="selected"' : ''), '>', $txt['admin_search_type_online'], '</option>
 				</select>
 				<button type="submit" name="search_go" id="search_go" ><i class="icon i-search"></i></button>
 			</form>';

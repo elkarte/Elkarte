@@ -295,8 +295,8 @@ function template_admin_browse()
 					<input type="hidden" name="sort" value="', $context['approve_list']['sort']['id'], '" />
 					<input type="hidden" name="start" value="', $context['approve_list']['start'], '" />
 					<input type="hidden" name="orig_filter" value="', $context['current_filter'], '" />
-					<input type="hidden" name="sa" value="approve" />', !empty($context['approve_list']['sort']['desc']) ? '
-					<input type="hidden" name="desc" value="1" />' : '', '
+					<input type="hidden" name="sa" value="approve" />', empty($context['approve_list']['sort']['desc']) ? '' : '
+					<input type="hidden" name="desc" value="1" />', '
 					<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
 				</div>
 			</div>
@@ -339,8 +339,6 @@ function template_users_multiactions($groups)
 			</option>';
 	}
 
-	$select .= '</select>
-					<input type="submit" name="maction_on_members" value="' . $txt['quick_mod_go'] . '" onclick="return confirm(\'' . $txt['quickmod_confirm'] . '\');" />';
-
-	return $select;
+	return $select . ('</select>
+					<input type="submit" name="maction_on_members" value="' . $txt['quick_mod_go'] . '" onclick="return confirm(\'' . $txt['quickmod_confirm'] . '\');" />');
 }

@@ -23,7 +23,7 @@ function template_ban_edit()
 	<div id="manage_bans">
 		<form id="admin_form_wrapper" action="', $context['form_url'], '" method="post" accept-charset="UTF-8" onsubmit="return confirmBan(this);">
 			<h2 class="category_header">
-				', $context['ban']['is_new'] ? $txt['ban_add_new'] : $txt['ban_edit'] . ' \'' . $context['ban']['name'] . '\'', '
+				', $context['ban']['is_new'] ? $txt['ban_add_new'] : $txt['ban_edit'] . " '" . $context['ban']['name'] . "'", '
 			</h2>';
 
 	if ($context['ban']['is_new'])
@@ -84,7 +84,7 @@ function template_ban_edit()
 						', $txt['ban_restriction'], '
 					</legend>
 					<input type="radio" name="full_ban" id="full_ban" value="1" onclick="fUpdateStatus();"', $context['ban']['cannot']['access'] ? ' checked="checked"' : '', ' /> <label for="full_ban">', $txt['ban_full_ban'], '</label><br />
-					<input type="radio" name="full_ban" id="partial_ban" value="0" onclick="fUpdateStatus();"', !$context['ban']['cannot']['access'] ? ' checked="checked"' : '', ' /> <label for="partial_ban">', $txt['ban_partial_ban'], '</label><br />
+					<input type="radio" name="full_ban" id="partial_ban" value="0" onclick="fUpdateStatus();"', $context['ban']['cannot']['access'] ? '' : ' checked="checked"', ' /> <label for="partial_ban">', $txt['ban_partial_ban'], '</label><br />
 					<input type="checkbox" name="cannot_post" id="cannot_post" value="1"', $context['ban']['cannot']['post'] ? ' checked="checked"' : '', ' class="ban_restriction input_radio" /> <label for="cannot_post">', $txt['ban_cannot_post'], '</label><a href="', $scripturl, '?action=quickhelp;help=ban_cannot_post" onclick="return reqOverlayDiv(this.href);" class="helpicon i-help"><s>', $txt['help'], '</s></a><br />
 					<input type="checkbox" name="cannot_register" id="cannot_register" value="1"', $context['ban']['cannot']['register'] ? ' checked="checked"' : '', ' class="ban_restriction input_radio" /> <label for="cannot_register">', $txt['ban_cannot_register'], '</label><br />
 					<input type="checkbox" name="cannot_login" id="cannot_login" value="1"', $context['ban']['cannot']['login'] ? ' checked="checked"' : '', ' class="ban_restriction input_radio" /> <label for="cannot_login">', $txt['ban_cannot_login'], '</label><br />
@@ -99,7 +99,7 @@ function template_ban_edit()
 					</legend>
 					<dl class="settings">
 						<dt>
-							<input type="checkbox" name="ban_suggestions[]" id="main_ip_check" value="main_ip" ', !empty($context['ban_suggestions']['main_ip']) ? 'checked="checked" ' : '', '/>
+							<input type="checkbox" name="ban_suggestions[]" id="main_ip_check" value="main_ip" ', empty($context['ban_suggestions']['main_ip']) ? '' : 'checked="checked" ', '/>
 							<label for="main_ip_check">', $txt['ban_on_ip'], '</label>
 						</dt>
 						<dd>
@@ -110,7 +110,7 @@ function template_ban_edit()
 		{
 			echo '
 						<dt>
-							<input type="checkbox" name="ban_suggestions[]" id="hostname_check" value="hostname" ', !empty($context['ban_suggestions']['hostname']) ? 'checked="checked" ' : '', '/>
+							<input type="checkbox" name="ban_suggestions[]" id="hostname_check" value="hostname" ', empty($context['ban_suggestions']['hostname']) ? '' : 'checked="checked" ', '/>
 							<label for="hostname_check">', $txt['ban_on_hostname'], '</label>
 						</dt>
 						<dd>
@@ -120,7 +120,7 @@ function template_ban_edit()
 
 		echo '
 						<dt>
-							<input type="checkbox" name="ban_suggestions[]" id="email_check" value="email" ', !empty($context['ban_suggestions']['email']) ? 'checked="checked" ' : '', '/>
+							<input type="checkbox" name="ban_suggestions[]" id="email_check" value="email" ', empty($context['ban_suggestions']['email']) ? '' : 'checked="checked" ', '/>
 							<label for="email_check">', $txt['ban_on_email'], '</label>
 						</dt>
 						<dd>
@@ -131,7 +131,7 @@ function template_ban_edit()
 							<label for="user_check">', $txt['ban_on_username'], '</label>:
 						</dt>
 						<dd>
-							<input type="text" ', !empty($context['ban']['from_user']) ? 'readonly="readonly" value="' . ($context['ban_suggestions']['member']['name'] ?? '') . '"' : ' value="' . ($context['ban_suggestions']['member']['name'] ?? '') . '"', ' name="user" id="user" size="44" class="input_text" />
+							<input type="text" ', empty($context['ban']['from_user']) ? ' value="' . ($context['ban_suggestions']['member']['name'] ?? '') . '"' : 'readonly="readonly" value="' . ($context['ban_suggestions']['member']['name'] ?? '') . '"', ' name="user" id="user" size="44" class="input_text" />
 						</dd>
 					</dl>';
 

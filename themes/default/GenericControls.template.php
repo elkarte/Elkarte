@@ -49,7 +49,7 @@ function template_control_richedit($editor_id)
 					resizeMaxHeight: -1,
 					emoticonsCompat: true,
 					emoticonsEnabled: ', $editor_context['disable_smiley_box'] ? 'false' : 'true', ',
-					locale: "', !empty($editor_context['locale']) ? $editor_context['locale'] : 'en_US', '",
+					locale: "', empty($editor_context['locale']) ? 'en_US' : $editor_context['locale'], '",
 					rtl: ', empty($context['right_to_left']) ? 'false' : 'true', ',
 					colors: "black,red,yellow,pink,green,orange,purple,blue,beige,brown,teal,navy,maroon,limegreen,white",
 					enablePasteFiltering: true,

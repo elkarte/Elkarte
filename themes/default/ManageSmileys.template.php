@@ -504,13 +504,13 @@ function template_editicon()
 						<label for="icon_filename">', $txt['smileys_filename'], '</label>:<br /><span class="smalltext">', $txt['icons_filename_all_png'], '</span>
 					</dt>
 					<dd>
-						<input type="text" name="icon_filename" id="icon_filename" value="', !empty($context['icon']['filename']) ? $context['icon']['filename'] . '.png' : '', '" class="input_text" />
+						<input type="text" name="icon_filename" id="icon_filename" value="', empty($context['icon']['filename']) ? '' : $context['icon']['filename'] . '.png', '" class="input_text" />
 					</dd>
 					<dt>
 						<label for="icon_description">', $txt['smileys_description'], '</label>:
 					</dt>
 					<dd>
-						<input type="text" name="icon_description" id="icon_description" value="', !empty($context['icon']['title']) ? $context['icon']['title'] : '', '" class="input_text" />
+						<input type="text" name="icon_description" id="icon_description" value="', empty($context['icon']['title']) ? '' : $context['icon']['title'], '" class="input_text" />
 					</dd>
 					<dt>
 						<label for="icon_board_select">', $txt['icons_board'], '</label>:
