@@ -14,6 +14,8 @@
 namespace ElkArte;
 
 use BBC\ParserWrapper;
+use ElkArte\Helper\FileFunctions;
+use ElkArte\Helper\Util;
 
 /**
  * Class Agreement

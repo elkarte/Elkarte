@@ -38,6 +38,8 @@ use ElkArte\Controller\RemoveTopic;
 use ElkArte\Controller\SplitTopics;
 use ElkArte\Controller\Unread;
 use ElkArte\Controller\Xml;
+use ElkArte\Helper\HttpReq;
+use ElkArte\Helper\ValuesContainer;
 use ElkArte\Profile\Profile;
 use ElkArte\Profile\ProfileHistory;
 use ElkArte\Profile\ProfileInfo;

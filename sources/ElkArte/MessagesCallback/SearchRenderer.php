@@ -17,11 +17,11 @@
 
 namespace ElkArte\MessagesCallback;
 
+use ElkArte\Helper\Util;
+use ElkArte\Helper\ValuesContainer;
 use ElkArte\MembersList;
 use ElkArte\MessagesCallback\BodyParser\BodyParserInterface;
 use ElkArte\TopicUtil;
-use ElkArte\Util;
-use ElkArte\ValuesContainer;
 
 /**
  * SearchRenderer

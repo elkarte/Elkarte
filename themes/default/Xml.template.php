@@ -12,7 +12,7 @@
  *
  */
 
-use ElkArte\Util;
+use ElkArte\Helper\Util;
 
 /**
  * Returns the text of a post in response to a quote request for loading into the current editing text box

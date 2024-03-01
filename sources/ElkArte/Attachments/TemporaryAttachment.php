@@ -11,11 +11,12 @@
  *
  */
 
-namespace ElkArte;
+namespace ElkArte\Attachments;
 
 use ElkArte\Exceptions\Exception as ElkException;
 use ElkArte\Graphics\Image;
 use ElkArte\Graphics\ImageUploadResize;
+use ElkArte\Helper\ValuesContainer;
 
 /**
  * TemporaryAttachment value bag for attachments
@@ -28,9 +29,9 @@ class TemporaryAttachment extends ValuesContainer
 	public function __construct($data = null)
 	{
 		$data['errors'] = [];
-		$data['name'] = Util::clean_4byte_chars(htmlspecialchars($data['name'], ENT_COMPAT, 'UTF-8'));
+		$data['name'] = \ElkArte\Helper\Util::clean_4byte_chars(htmlspecialchars($data['name'], ENT_COMPAT, 'UTF-8'));
 
-		parent::__construct($data);
+		ValuesContainer::__construct($data);
 	}
 
 	/**
@@ -58,7 +59,7 @@ class TemporaryAttachment extends ValuesContainer
 	 */
 	public function fileWritable()
 	{
-		$fs = FileFunctions::instance();
+		$fs = \ElkArte\Helper\FileFunctions::instance();
 
 		return $fs->fileExists($this->data['tmp_name']) && $fs->isWritable($this->data['tmp_name']);
 	}
@@ -128,7 +129,7 @@ class TemporaryAttachment extends ValuesContainer
 	 */
 	public function fileExists()
 	{
-		return FileFunctions::instance()->fileExists($this->data['tmp_name']);
+		return \ElkArte\Helper\FileFunctions::instance()->fileExists($this->data['tmp_name']);
 	}
 
 	/**
@@ -156,7 +157,7 @@ class TemporaryAttachment extends ValuesContainer
 		if (@move_uploaded_file($this->data['tmp_name'], $destName))
 		{
 			$this->data['tmp_name'] = $destName;
-			FileFunctions::instance()->chmod($destName);
+			\ElkArte\Helper\FileFunctions::instance()->chmod($destName);
 		}
 		else
 		{
@@ -511,7 +512,7 @@ class TemporaryAttachment extends ValuesContainer
 				throw new \Exception('attachment_not_found');
 			}
 
-			FileFunctions::instance()->delete($this->data['tmp_name']);
+			\ElkArte\Helper\FileFunctions::instance()->delete($this->data['tmp_name']);
 		}
 		catch (\Exception)
 		{

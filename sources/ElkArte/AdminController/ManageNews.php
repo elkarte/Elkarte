@@ -18,10 +18,9 @@ namespace ElkArte\AdminController;
 
 use ElkArte\AbstractController;
 use ElkArte\Action;
-use ElkArte\Exceptions\Exception;
+use ElkArte\Helper\Util;
 use ElkArte\Languages\Txt;
 use ElkArte\SettingsForm\SettingsForm;
-use ElkArte\Util;
 
 /**
  * ManageNews controller, for news administration screens.

@@ -15,8 +15,8 @@
  */
 
 use ElkArte\Cache\Cache;
+use ElkArte\Helper\Util;
 use ElkArte\User;
-use ElkArte\Util;
 
 /**
  * Retrieve a list and several other statistics of the users currently online.

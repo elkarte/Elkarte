@@ -17,7 +17,7 @@
 namespace ElkArte\Search\API;
 
 use ElkArte\Database\AbstractResult;
-use ElkArte\Util;
+use ElkArte\Helper\Util;
 
 /**
  * SearchAPI-Fulltext.class.php, Fulltext API, used when an SQL fulltext index is used

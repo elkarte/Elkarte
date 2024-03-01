@@ -21,9 +21,9 @@ use ElkArte\AbstractController;
 use ElkArte\CalendarEvent;
 use ElkArte\EventManager;
 use ElkArte\Exceptions\Exception;
+use ElkArte\Helper\Util;
 use ElkArte\Http\Headers;
 use ElkArte\User;
-use ElkArte\Util;
 
 /**
  * Displays the calendar for the site and provides for its navigation

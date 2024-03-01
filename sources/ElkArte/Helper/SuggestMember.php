@@ -15,7 +15,7 @@
  *
  */
 
-namespace ElkArte;
+namespace ElkArte\Helper;
 
 /**
  * Suggesting names (basically a wrapper for getMember)

@@ -19,8 +19,10 @@ class DbWrapper
 {
 	/** @var \ElkArte\Database\ */
 	protected $db;
+
 	/** @var bool */
 	protected $count_mode = false;
+
 	/** @var array */
 	protected $replaces = [];
 

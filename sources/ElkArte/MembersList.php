@@ -14,6 +14,8 @@ namespace ElkArte;
 use BBC\ParserWrapper;
 use ElkArte\Cache\Cache;
 use ElkArte\Database\QueryInterface;
+use ElkArte\Helper\Util;
+use ElkArte\Helper\ValuesContainer;
 
 /**
  * This class is used as interface to load/get the members from the database.

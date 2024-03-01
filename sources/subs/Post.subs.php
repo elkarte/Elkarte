@@ -18,9 +18,9 @@
 
 use BBC\ParserWrapper;
 use BBC\PreparseCode;
+use ElkArte\Helper\Util;
 use ElkArte\Search\SearchApiWrapper;
 use ElkArte\User;
-use ElkArte\Util;
 
 /**
  * Takes a message and parses it, returning the prepared message as a reference.

@@ -17,6 +17,8 @@
 
 namespace ElkArte;
 
+use ElkArte\Helper\ValuesContainer;
+
 /**
  * Class MessagesDelete
  *

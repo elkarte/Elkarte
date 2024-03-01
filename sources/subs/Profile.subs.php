@@ -18,13 +18,13 @@ use BBC\ParserWrapper;
 use ElkArte\Cache\Cache;
 use ElkArte\Controller\Avatars;
 use ElkArte\Errors\ErrorContext;
-use ElkArte\FileFunctions;
+use ElkArte\Helper\FileFunctions;
+use ElkArte\Helper\Util;
 use ElkArte\Languages\Txt;
 use ElkArte\MembersList;
 use ElkArte\Notifications\Notifications;
 use ElkArte\Profile\ProfileFields;
 use ElkArte\User;
-use ElkArte\Util;
 
 /**
  * Find the ID of the "current" member

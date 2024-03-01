@@ -14,8 +14,8 @@
  *
  */
 
+use ElkArte\Helper\Util;
 use ElkArte\Languages\Txt;
-use ElkArte\Util;
 
 /**
  * Returns how many people are subscribed to a paid subscription.

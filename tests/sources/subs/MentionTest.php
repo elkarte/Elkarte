@@ -7,7 +7,7 @@
  * them if you need to keep your data untouched!
  */
 
-use ElkArte\DataValidator;
+use ElkArte\Helper\DataValidator;
 use ElkArte\Languages\Loader;
 use ElkArte\Mentions\Mentioning;
 use ElkArte\Notifications\Notifications;

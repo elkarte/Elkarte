@@ -19,11 +19,11 @@ namespace ElkArte\AdminController;
 
 use ElkArte\AbstractController;
 use ElkArte\Action;
-use ElkArte\DataValidator;
 use ElkArte\Exceptions\Exception;
+use ElkArte\Helper\DataValidator;
+use ElkArte\Helper\Util;
 use ElkArte\Languages\Txt;
 use ElkArte\SettingsForm\SettingsForm;
-use ElkArte\Util;
 
 /**
  * ManagePaid controller, administration controller for paid subscriptions.

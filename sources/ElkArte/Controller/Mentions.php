@@ -14,9 +14,9 @@
 namespace ElkArte\Controller;
 
 use ElkArte\AbstractController;
-use ElkArte\DataValidator;
 use ElkArte\EventManager;
 use ElkArte\Exceptions\Exception;
+use ElkArte\Helper\DataValidator;
 use ElkArte\Languages\Txt;
 use ElkArte\Mentions\Mentioning;
 

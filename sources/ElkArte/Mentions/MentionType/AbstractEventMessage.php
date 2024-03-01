@@ -13,9 +13,9 @@
 
 namespace ElkArte\Mentions\MentionType;
 
-use ElkArte\HttpReq;
+use ElkArte\Helper\HttpReq;
+use ElkArte\Helper\ValuesContainer;
 use ElkArte\UserInfo;
-use ElkArte\ValuesContainer;
 
 /**
  * Class AbstractEventMessage

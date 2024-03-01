@@ -13,7 +13,7 @@
 
 namespace ElkArte\ScheduledTasks\Tasks;
 
-use ElkArte\Util;
+use ElkArte\Helper\Util;
 
 /**
  * Re-syncs if a user can access a mention,

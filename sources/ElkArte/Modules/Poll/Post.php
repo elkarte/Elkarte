@@ -19,9 +19,9 @@ namespace ElkArte\Modules\Poll;
 use ElkArte\Errors\ErrorContext;
 use ElkArte\EventManager;
 use ElkArte\Exceptions\Exception;
+use ElkArte\Helper\Util;
 use ElkArte\Modules\AbstractModule;
 use ElkArte\Themes\TemplateLayers;
-use ElkArte\Util;
 
 /**
  * Class Poll_Post_Module

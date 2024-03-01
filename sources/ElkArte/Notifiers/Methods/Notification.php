@@ -14,7 +14,7 @@
 namespace ElkArte\Notifiers\Methods;
 
 use ElkArte\Database\QueryInterface;
-use ElkArte\DataValidator;
+use ElkArte\Helper\DataValidator;
 use ElkArte\Mentions\Mentioning;
 use ElkArte\Mentions\MentionType\NotificationInterface;
 use ElkArte\Notifications\NotificationsTask;

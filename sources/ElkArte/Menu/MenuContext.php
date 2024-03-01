@@ -14,9 +14,9 @@
 namespace ElkArte\Menu;
 
 use ElkArte\Cache\Cache;
-use ElkArte\HttpReq;
+use ElkArte\Helper\HttpReq;
+use ElkArte\Helper\ValuesContainer;
 use ElkArte\User;
-use ElkArte\ValuesContainer;
 
 /**
  * Class MenuContext

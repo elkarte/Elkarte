@@ -13,6 +13,7 @@ namespace ElkArte;
 
 use BBC\PreparseCode;
 use ElkArte\Cache\Cache;
+use ElkArte\Helper\Util;
 
 /**
  * Used to add emoji images to text

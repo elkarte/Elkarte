@@ -22,9 +22,9 @@ use ElkArte\Errors\ErrorContext;
 use ElkArte\EventManager;
 use ElkArte\Exceptions\ControllerRedirectException;
 use ElkArte\Exceptions\Exception;
-use ElkArte\HttpReq;
+use ElkArte\Helper\HttpReq;
+use ElkArte\Helper\Util;
 use ElkArte\Modules\AbstractModule;
-use ElkArte\Util;
 
 /**
  * This class's task is to bind the posting of a topic to a calendar event.

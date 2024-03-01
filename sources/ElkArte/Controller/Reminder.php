@@ -19,9 +19,9 @@ namespace ElkArte\Controller;
 use ElkArte\AbstractController;
 use ElkArte\Errors\Errors;
 use ElkArte\Exceptions\Exception;
+use ElkArte\Helper\Util;
 use ElkArte\Languages\Txt;
 use ElkArte\Profile\Profile;
-use ElkArte\Util;
 
 /**
  * Handles sending out reminders, and checking the secret answer and question.
@@ -86,8 +86,8 @@ class Reminder extends AbstractController
 		elseif ($this->_req->getPost('user') !== '')
 		{
 			$where = 'member_name = {string:member_name}';
-			$where_params['member_name'] = $this->_req->getPost('user', 'trim|\\ElkArte\\Util::htmlspecialchars[ENT_QUOTES]');
-			$where_params['email_address'] = $this->_req->getPost('user', 'trim|\\ElkArte\\Util::htmlspecialchars[ENT_QUOTES]');
+			$where_params['member_name'] = $this->_req->getPost('user', 'trim|\\ElkArte\\Helper\\Util::htmlspecialchars[ENT_QUOTES]');
+			$where_params['email_address'] = $this->_req->getPost('user', 'trim|\\ElkArte\\Helper\\Util::htmlspecialchars[ENT_QUOTES]');
 		}
 
 		// You must enter a username/email address.

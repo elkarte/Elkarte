@@ -11,7 +11,7 @@
  *
  */
 
-namespace ElkArte;
+namespace ElkArte\Helper;
 
 use Exception;
 

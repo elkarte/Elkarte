@@ -20,9 +20,9 @@ namespace ElkArte\Controller;
 use BBC\ParserWrapper;
 use ElkArte\AbstractController;
 use ElkArte\BoardsList;
-use ElkArte\DataValidator;
 use ElkArte\EventManager;
 use ElkArte\FrontpageInterface;
+use ElkArte\Helper\DataValidator;
 use ElkArte\TopicUtil;
 use ElkArte\User;
 

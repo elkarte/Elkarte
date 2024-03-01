@@ -12,7 +12,7 @@
  *
  */
 
-use ElkArte\Util;
+use ElkArte\Helper\Util;
 
 /**
  * Stats page.

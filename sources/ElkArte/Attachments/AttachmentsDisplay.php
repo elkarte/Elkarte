@@ -11,7 +11,7 @@
  *
  */
 
-namespace ElkArte;
+namespace ElkArte\Attachments;
 
 /**
  * Class AttachmentsDisplay
@@ -52,7 +52,7 @@ class AttachmentsDisplay
 			$this->getAttachments(
 				$this->messages,
 				$this->includeUnapproved,
-				static fn($attachment_info, $all_posters) => !(!$attachment_info['approved'] && (!isset($all_posters[$attachment_info['id_msg']]) || $all_posters[$attachment_info['id_msg']] !== User::$info->id)),
+				static fn($attachment_info, $all_posters) => !(!$attachment_info['approved'] && (!isset($all_posters[$attachment_info['id_msg']]) || $all_posters[$attachment_info['id_msg']] !== \ElkArte\User::$info->id)),
 				$posters
 			);
 		}

@@ -21,12 +21,12 @@ use BBC\ParserWrapper;
 use ElkArte\AbstractController;
 use ElkArte\Action;
 use ElkArte\Exceptions\Exception;
-use ElkArte\FileFunctions;
+use ElkArte\Helper\FileFunctions;
+use ElkArte\Helper\Util;
 use ElkArte\Languages\Txt;
 use ElkArte\Member;
 use ElkArte\MembersList;
 use ElkArte\MessagesDelete;
-use ElkArte\Util;
 
 /**
  * Access all profile summary areas for a user including overall summary,
@@ -87,8 +87,8 @@ class ProfileInfo extends AbstractController
 
 		// What do we do, do you even know what you do?
 		$subActions = [
-			'buddies' => fn() => $this->action_profile_buddies(),
-			'recent' => fn() => $this->action_profile_recent(),
+			'buddies' => [$this, 'action_profile_buddies'],
+			'recent' => [$this, 'action_profile_recent'],
 			'summary' => ['controller' => Profile::class, 'function' => 'action_index'],
 		];
 

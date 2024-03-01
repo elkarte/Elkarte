@@ -9,7 +9,7 @@
 
 use ElkArte\Controller\Display;
 use ElkArte\EventManager;
-use ElkArte\HttpReq;
+use ElkArte\Helper\HttpReq;
 use ElkArte\Languages\Loader;
 use ElkArte\User;
 use tests\ElkArteCommonSetupTest;

@@ -4,10 +4,10 @@
  * TestCase class for the admin search
  */
 
-use ElkArte\HttpReq;
+use ElkArte\Helper\HttpReq;
+use ElkArte\Languages\Loader;
 use ElkArte\SiteDispatcher;
 use ElkArte\User;
-use ElkArte\Languages\Loader;
 use PHPUnit\Framework\TestCase;
 
 class AdminSearchTest extends TestCase

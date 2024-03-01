@@ -13,7 +13,7 @@
 
 namespace ElkArte\Mentions\MentionType\Event;
 
-use ElkArte\DataValidator;
+use ElkArte\Helper\DataValidator;
 use ElkArte\Mentions\Mentioning;
 use ElkArte\Mentions\MentionType\AbstractEventBoardAccess;
 use ElkArte\Notifications\Notifications;

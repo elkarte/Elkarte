@@ -13,7 +13,7 @@
 
 namespace ElkArte\Sessions;
 
-use ElkArte\ValuesContainer;
+use ElkArte\Helper\ValuesContainer;
 
 /**
  * Class SessionIndex

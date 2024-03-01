@@ -15,7 +15,7 @@
  */
 
 use ElkArte\Emoji;
-use ElkArte\FileFunctions;
+use ElkArte\Helper\FileFunctions;
 
 /**
  * Validates, if a smiley already exists

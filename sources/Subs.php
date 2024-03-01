@@ -15,10 +15,11 @@
  */
 
 use ElkArte\Cache\Cache;
-use ElkArte\Censor;
-use ElkArte\ConstructPageIndex;
 use ElkArte\Debug;
-use ElkArte\GenericList;
+use ElkArte\Helper\Censor;
+use ElkArte\Helper\ConstructPageIndex;
+use ElkArte\Helper\GenericList;
+use ElkArte\Helper\Util;
 use ElkArte\Hooks;
 use ElkArte\Http\Headers;
 use ElkArte\Languages\Loader;
@@ -26,7 +27,6 @@ use ElkArte\Notifications\Notifications;
 use ElkArte\Search\Search;
 use ElkArte\UrlGenerator\UrlGenerator;
 use ElkArte\User;
-use ElkArte\Util;
 
 /**
  * Updates the settings table as well as $modSettings... only does one at a time if $update is true.
@@ -41,7 +41,7 @@ use ElkArte\Util;
  * - When update is true, the value can be true or false to increment
  *  or decrement it, respectively.
  *
- * @param mixed[] $changeArray An associative array of what we're changing in 'setting' => 'value' format
+ * @param array $changeArray An associative array of what we're changing in 'setting' => 'value' format
  * @param bool $update Use an UPDATE query instead of a REPLACE query
  */
 function updateSettings($changeArray, $update = false)
@@ -335,7 +335,7 @@ function standardTime($log_time, $show_today = true, $offset_type = false)
 		}
 
 		// Day-of-year is one less and same year, or it's the first of the year and that's the last of the year...
-		if ((int)$modSettings['todayMod'] === 2
+		if ((int) $modSettings['todayMod'] === 2
 			&& (($then['yday'] === $now['yday'] - 1 && $then['year'] === $now['year'])
 				|| (($now['yday'] === 0 && $then['year'] === $now['year'] - 1) && $then['mon'] === 12 && $then['mday'] === 31)))
 		{
@@ -343,7 +343,7 @@ function standardTime($log_time, $show_today = true, $offset_type = false)
 		}
 	}
 
-	$str = !is_bool($show_today) ? $show_today : User::$info->time_format;
+	$str = is_bool($show_today) ? User::$info->time_format : $show_today;
 
 	// Windows requires a slightly different language code identifier (LCID).
 	// https://msdn.microsoft.com/en-us/library/cc233982.aspx
@@ -358,6 +358,7 @@ function standardTime($log_time, $show_today = true, $offset_type = false)
 		{
 			$non_twelve_hour = trim(Util::strftime('%p')) === '';
 		}
+
 		if ($non_twelve_hour && strpos($str, '%p') !== false)
 		{
 			$str = str_replace('%p', (Util::strftime('%H', $time) < 12 ? $txt['time_am'] : $txt['time_pm']), $str);
@@ -367,7 +368,7 @@ function standardTime($log_time, $show_today = true, $offset_type = false)
 		{
 			if (strpos($str, $token) !== false)
 			{
-				$str = str_replace($token, !empty($txt['lang_capitalize_dates']) ? ElkArte\Util::ucwords(Elkarte\Util::strftime($token, $time)) : Elkarte\Util::strftime($token, $time), $str);
+				$str = str_replace($token, empty($txt['lang_capitalize_dates']) ? Util::strftime($token, $time) : Util::ucwords(Util::strftime($token, $time)), $str);
 			}
 		}
 	}
@@ -420,7 +421,7 @@ function htmlTime($timestamp)
 	$stdtime = standardTime($timestamp, true, true);
 
 	// @todo maybe htmlspecialchars on the title attribute?
-	return '<time title="' . (!empty($context['using_relative_time']) ? $stdtime : $txt['last_post']) . '" datetime="' . $time . '" data-timestamp="' . $timestamp . '" data-forumtime="' . $forumtime . '">' . $stdtime . '</time>';
+	return '<time title="' . (empty($context['using_relative_time']) ? $txt['last_post'] : $stdtime) . '" datetime="' . $time . '" data-timestamp="' . $timestamp . '" data-forumtime="' . $forumtime . '">' . $stdtime . '</time>';
 }
 
 /**
@@ -450,9 +451,9 @@ function utcTime($timestamp, $userAdjust = false)
 	try
 	{
 		$tz = empty($modSettings['default_timezone']) ? 'UTC' : $modSettings['default_timezone'];
-		$date = new DateTime( '@'.$timestamp, new DateTimeZone($tz));
+		$date = new DateTime('@' . $timestamp, new DateTimeZone($tz));
 	}
-	catch (Exception $e)
+	catch (Exception)
 	{
 		return standardTime($timestamp);
 	}
@@ -525,16 +526,17 @@ function un_htmlspecialchars($string)
  *
  * Source: O'Reilly PHP Cookbook
  *
- * @param mixed[] $p The array keys to apply permutation
+ * @param array $p The array keys to apply permutation
  * @param int $size The size of our permutation array
  *
- * @return mixed[]|bool the next permutation of the passed array $p
+ * @return array|bool the next permutation of the passed array $p
  */
 function pc_next_permutation($p, $size)
 {
 	// Slide down the array looking for where we're smaller than the next guy
 	for ($i = $size - 1; isset($p[$i]) && $p[$i] >= $p[$i + 1]; --$i)
 	{
+		// Required to set $i
 	}
 
 	// If this doesn't occur, we've finished our permutations
@@ -547,6 +549,7 @@ function pc_next_permutation($p, $size)
 	// Slide down the array looking for a bigger number than what we found before
 	for ($j = $size; $p[$j] <= $p[$i]; --$j)
 	{
+		// Required to set $j
 	}
 
 	// Swap them
@@ -647,7 +650,7 @@ function obExit($header = null, $do_footer = null, $from_index = false, $from_fa
 		// Was the page title set last minute? Also update the HTML safe one.
 		if (!empty($context['page_title']) && empty($context['page_title_html_safe']))
 		{
-			$context['page_title_html_safe'] = ElkArte\Util::htmlspecialchars(un_htmlspecialchars($context['page_title'])) . (!empty($context['current_page']) ? ' - ' . $txt['page'] . ' ' . ($context['current_page'] + 1) : '');
+			$context['page_title_html_safe'] = Util::htmlspecialchars(un_htmlspecialchars($context['page_title'])) . (empty($context['current_page']) ? '' : ' - ' . $txt['page'] . ' ' . ($context['current_page'] + 1));
 		}
 
 		// Start up the session URL fixer.
@@ -691,7 +694,7 @@ function obExit($header = null, $do_footer = null, $from_index = false, $from_fa
 	$_SESSION['USER_AGENT'] = $req->user_agent();
 
 	// Hand off the output to the portal, etc. we're integrated with.
-	call_integration_hook('integrate_exit', array($do_footer));
+	call_integration_hook('integrate_exit', [$do_footer]);
 
 	// Don't exit if we're coming from index.php; that will pass through normally.
 	if (!$from_index)
@@ -752,12 +755,12 @@ function setOldUrl($index = 'old_url')
 /**
  * Sets the class of the current topic based on is_very_hot, veryhot, hot, etc
  *
- * @param mixed[] $topic_context array of topic information
+ * @param array $topic_context array of topic information
  */
 function determineTopicClass(&$topic_context)
 {
 
-	$topic_context['class'] = !empty($topic_context['is_poll']) ? 'i-poll' : 'i-normal';
+	$topic_context['class'] = empty($topic_context['is_poll']) ? 'i-normal' : 'i-poll';
 
 	// Set topic class depending on locked status and number of replies.
 	if ($topic_context['is_very_hot'])
@@ -793,7 +796,7 @@ function setupThemeContext($forceload = false)
 /**
  * Helper function to convert memory string settings to bytes
  *
- * @param string $val The byte string, like 256M or 1G
+ * @param string|bool $val The byte string, like 256M or 1G
  *
  * @return int The string converted to a proper integer in bytes
  */
@@ -893,13 +896,13 @@ function template_admin_warning_above()
 }
 
 /**
- * Convert a single IP to a ranged IP.
+ * Convert IP address to IP range
  *
- * - Internal function used to convert a user-readable format to a format suitable for the database.
+ *  - Internal function used to convert a user-readable format to a format suitable for the database.
  *
- * @param string $fullip A full dot notation IP address
- *
- * @return array|string 'unknown' if the ip in the input was '255.255.255.255'
+ * @param string $fullip The IP address to convert
+ * @return array The IP range in the format [ ['low' => 'low_value_1', 'high' => 'high_value_1'], ... ]
+ * If the input IP address is invalid or cannot be converted, an empty array is returned.
  */
 function ip2range($fullip)
 {
@@ -907,26 +910,26 @@ function ip2range($fullip)
 	if (isValidIPv6($fullip))
 	{
 		$ip_parts = explode(':', expandIPv6($fullip, false));
-		$ip_array = array();
+		$ip_array = [];
 
 		if (count($ip_parts) !== 8)
 		{
-			return array();
+			return [];
 		}
 
 		for ($i = 0; $i < 8; $i++)
 		{
 			if ($ip_parts[$i] === '*')
 			{
-				$ip_array[$i] = array('low' => '0', 'high' => hexdec('ffff'));
+				$ip_array[$i] = ['low' => '0', 'high' => hexdec('ffff')];
 			}
-			elseif (preg_match('/^([0-9A-Fa-f]{1,4})\-([0-9A-Fa-f]{1,4})$/', $ip_parts[$i], $range) == 1)
+			elseif (preg_match('/^([0-9A-Fa-f]{1,4})-([0-9A-Fa-f]{1,4})$/', $ip_parts[$i], $range) === 1)
 			{
-				$ip_array[$i] = array('low' => hexdec($range[1]), 'high' => hexdec($range[2]));
+				$ip_array[$i] = ['low' => hexdec($range[1]), 'high' => hexdec($range[2])];
 			}
 			elseif (is_numeric(hexdec($ip_parts[$i])))
 			{
-				$ip_array[$i] = array('low' => hexdec($ip_parts[$i]), 'high' => hexdec($ip_parts[$i]));
+				$ip_array[$i] = ['low' => hexdec($ip_parts[$i]), 'high' => hexdec($ip_parts[$i])];
 			}
 		}
 
@@ -940,34 +943,34 @@ function ip2range($fullip)
 	}
 
 	$ip_parts = explode('.', $fullip);
-	$ip_array = array();
+	$ip_array = [];
 
 	if (count($ip_parts) !== 4)
 	{
-		return array();
+		return [];
 	}
 
 	for ($i = 0; $i < 4; $i++)
 	{
 		if ($ip_parts[$i] === '*')
 		{
-			$ip_array[$i] = array('low' => '0', 'high' => '255');
+			$ip_array[$i] = ['low' => '0', 'high' => '255'];
 		}
-		elseif (preg_match('/^(\d{1,3})\-(\d{1,3})$/', $ip_parts[$i], $range) == 1)
+		elseif (preg_match('/^(\d{1,3})-(\d{1,3})$/', $ip_parts[$i], $range) === 1)
 		{
-			$ip_array[$i] = array('low' => $range[1], 'high' => $range[2]);
+			$ip_array[$i] = ['low' => $range[1], 'high' => $range[2]];
 		}
 		elseif (is_numeric($ip_parts[$i]))
 		{
-			$ip_array[$i] = array('low' => $ip_parts[$i], 'high' => $ip_parts[$i]);
+			$ip_array[$i] = ['low' => $ip_parts[$i], 'high' => $ip_parts[$i]];
 		}
 	}
 
 	// Makes it simpler to work with.
-	$ip_array[4] = array('low' => 0, 'high' => 0);
-	$ip_array[5] = array('low' => 0, 'high' => 0);
-	$ip_array[6] = array('low' => 0, 'high' => 0);
-	$ip_array[7] = array('low' => 0, 'high' => 0);
+	$ip_array[4] = ['low' => 0, 'high' => 0];
+	$ip_array[5] = ['low' => 0, 'high' => 0];
+	$ip_array[6] = ['low' => 0, 'high' => 0];
+	$ip_array[7] = ['low' => 0, 'high' => 0];
 
 	return $ip_array;
 }
@@ -1077,7 +1080,7 @@ function text2words($text, $encrypt = false)
 	$words = preg_replace('~(?:[\x0B\0\x{A0}\t\r\s\n(){}\\[\\]<>!@$%^*.,:+=`\~\?/\\\\]+|&(?:amp|lt|gt|quot);)+~u', ' ', strtr($words, array('<br />' => ' ')));
 
 	// Step 2: Entities we left to letters, where applicable, lowercase.
-	$words = un_htmlspecialchars(ElkArte\Util::strtolower($words));
+	$words = un_htmlspecialchars(Util::strtolower($words));
 
 	// Step 3: Ready to split apart and index!
 	$words = explode(' ', $words);
@@ -1091,8 +1094,8 @@ function text2words($text, $encrypt = false)
 		$words = array_unique($words);
 		foreach ($words as $word)
 		{
-			$word = trim($word, '-_\'');
-			if ($word !== '' && !in_array($word, $blocklist) && Elkarte\Util::strlen($word) > 2)
+			$word = trim($word, "-_'");
+			if ($word !== '' && !in_array($word, $blocklist) && Util::strlen($word) > 2)
 			{
 				// Get a hex representation of this word using a database indexing hash
 				// designed to be fast while maintaining a very low collision rate
@@ -1106,21 +1109,19 @@ function text2words($text, $encrypt = false)
 
 		return $returned_ints;
 	}
-	else
-	{
-		// Trim characters before and after and add slashes for database insertion.
-		$returned_words = array();
-		foreach ($words as $word)
-		{
-			if (($word = trim($word, '-_\'')) !== '')
-			{
-				$returned_words[] = substr($word, 0, 20);
-			}
-		}
 
-		// Filter out all words that occur more than once.
-		return array_unique($returned_words);
+	// Trim characters before and after and add slashes for database insertion.
+	$returned_words = [];
+	foreach ($words as $word)
+	{
+		if (($word = trim($word, "-_'")) !== '')
+		{
+			$returned_words[] = substr($word, 0, 20);
+		}
 	}
+
+	// Filter out all words that occur more than once.
+	return array_unique($returned_words);
 }
 
 /**
@@ -1166,9 +1167,9 @@ function setupMenuContext()
  * - Supports static class method calls.
  *
  * @param string $hook The name of the hook to call
- * @param mixed[] $parameters = array() Parameters to pass to the hook
+ * @param array $parameters = array() Parameters to pass to the hook
  *
- * @return mixed[] the results of the functions
+ * @return array the results of the functions
  */
 function call_integration_hook($hook, $parameters = array())
 {
@@ -1297,7 +1298,7 @@ function replaceEntities__callback($matches)
  * - Uses capture group 1 in the supplied array
  * - Does basic checks to keep characters inside a viewable range.
  *
- * @param mixed[] $matches array of matches as output from preg_match_all
+ * @param array $matches array of matches as output from preg_match_all
  *
  * @return string $string
  */
@@ -1347,7 +1348,7 @@ function fixchar__callback($matches)
  * - Callback function used of preg_replace_callback in various $ent_checks,
  * - For example strpos, strlen, substr etc
  *
- * @param mixed[] $matches array of matches for a preg_match_all
+ * @param array $matches array of matches for a preg_match_all
  *
  * @return string
  */
@@ -1381,7 +1382,7 @@ function prepareSearchEngines()
 	$engines = [];
 	if (!empty($modSettings['additional_search_engines']))
 	{
-		$search_engines = ElkArte\Util::unserialize($modSettings['additional_search_engines']);
+		$search_engines = Util::unserialize($modSettings['additional_search_engines']);
 		foreach ($search_engines as $engine)
 		{
 			$engines[strtolower(preg_replace('~[^A-Za-z0-9 ]~', '', $engine['name']))] = $engine;
@@ -1403,7 +1404,7 @@ function prepareSearchEngines()
  * @param bool $reset
  *
  * @return int|bool
- * @throws \Exception
+ * @throws Exception
  */
 function currentContext($messages_request, $reset = false)
 {
@@ -1439,9 +1440,9 @@ function currentContext($messages_request, $reset = false)
  * - Intended for addon use to allow such things as
  * - Adding in a new menu item to an existing menu array
  *
- * @param mixed[] $input the array we will insert to
+ * @param array $input the array we will insert to
  * @param string $key the key in the array that we are looking to find for the insert action
- * @param mixed[] $insert the actual data to insert before or after the key
+ * @param array $insert the actual data to insert before or after the key
  * @param string $where adding before or after
  * @param bool $assoc if the array is a assoc array with named keys or a basic index array
  * @param bool $strict search for identical elements, this means it will also check the types of the needle.
@@ -1466,14 +1467,10 @@ function elk_array_insert($input, $key, $insert, $where = 'before', $assoc = tru
 	// Insert as first
 	if (empty($position))
 	{
-		$input = array_merge($insert, $input);
-	}
-	else
-	{
-		$input = array_merge(array_slice($input, 0, $position), $insert, array_slice($input, $position));
+		return array_merge($insert, $input);
 	}
 
-	return $input;
+	return array_merge(array_slice($input, 0, $position), $insert, array_slice($input, $position));
 }
 
 /**
@@ -1531,10 +1528,8 @@ function removeScheduleTaskImmediate($task, $calculateNextTrigger = true)
 	{
 		return;
 	}
-	else
-	{
-		$scheduleTaskImmediate = Util::unserialize($modSettings['scheduleTaskImmediate']);
-	}
+
+	$scheduleTaskImmediate = Util::unserialize($modSettings['scheduleTaskImmediate']);
 
 	// Clear / remove the task if it was set
 	if (isset($scheduleTaskImmediate[$task]))
@@ -1692,12 +1687,17 @@ function response_prefix()
 function isValidEmail($value)
 {
 	$value = trim($value);
-	if (filter_var($value, FILTER_VALIDATE_EMAIL) && ElkArte\Util::strlen($value) < 255)
+	if (!filter_var($value, FILTER_VALIDATE_EMAIL))
 	{
-		return $value;
+		return false;
 	}
 
-	return false;
+	if (Util::strlen($value) >= 255)
+	{
+		return false;
+	}
+
+	return $value;
 }
 
 /**
@@ -1718,9 +1718,7 @@ function addProtocol($url, $protocols = array())
 	}
 	else
 	{
-		$pattern = '~^(' . implode('|', array_map(function ($val) {
-				return preg_quote($val, '~');
-			}, $protocols)) . ')~i';
+		$pattern = '~^(' . implode('|', array_map(static fn($val) => preg_quote($val, '~'), $protocols)) . ')~i';
 	}
 
 	$found = false;
@@ -1793,7 +1791,7 @@ function removeNestedQuotes($text)
 	}
 
 	// Time to cull the herd
-	foreach (array_reverse($remove) as list($start_pos, $length))
+	foreach (array_reverse($remove) as [$start_pos, $length])
 	{
 		$text = substr_replace($text, '', $start_pos, $length);
 	}
@@ -1858,7 +1856,7 @@ function censor($text, $force = false)
  * Helper function able to determine if the current member can see at least
  * one button of a button strip.
  *
- * @param mixed[] $button_strip
+ * @param array $button_strip
  *
  * @return bool
  */
@@ -1866,7 +1864,7 @@ function can_see_button_strip($button_strip)
 {
 	global $context;
 
-	foreach ($button_strip as $key => $value)
+	foreach ($button_strip as $value)
 	{
 		if (!isset($value['test']) || !empty($context[$value['test']]))
 		{
@@ -1943,7 +1941,7 @@ function obStart($use_compression = false)
  *
  * @param string $type The type of the URL (depending on the type, the
  *                     generator can act differently
- * @param mixed[] $params All the parameters of the URL
+ * @param array $params All the parameters of the URL
  *
  * @return string An URL
  */
@@ -1964,7 +1962,7 @@ function getUrl($type, $params)
  *
  * @param string $type The type of the URL (depending on the type, the
  *                     generator can act differently
- * @param mixed[] $params All the parameters of the URL
+ * @param array $params All the parameters of the URL
  *
  * @return string The query part of an URL
  */
@@ -2178,7 +2176,7 @@ function expandIPv6($addr, $strict_check = true)
  * Logs the depreciation notice, returns false, sets context value such that
  * old themes don't go sour ;)
  *
- * @param string $browser  the browser we are checking for.
+ * @param string $browser the browser we are checking for.
  */
 function isBrowser($browser)
 {

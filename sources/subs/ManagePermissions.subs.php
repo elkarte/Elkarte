@@ -14,8 +14,8 @@
  *
  */
 
+use ElkArte\Helper\Util;
 use ElkArte\Permissions;
-use ElkArte\Util;
 
 /**
  * Set the permission level for a specific profile, group, or group for a profile.

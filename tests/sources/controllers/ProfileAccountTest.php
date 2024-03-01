@@ -8,10 +8,10 @@
  */
 
 use ElkArte\EventManager;
-use ElkArte\HttpReq;
+use ElkArte\Helper\HttpReq;
+use ElkArte\Languages\Loader;
 use ElkArte\Profile\ProfileAccount;
 use tests\ElkArteCommonSetupTest;
-use ElkArte\Languages\Loader;
 
 class ProfileAccountTest extends ElkArteCommonSetupTest
 {

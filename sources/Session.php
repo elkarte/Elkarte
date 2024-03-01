@@ -20,9 +20,9 @@
  *
  */
 
+use ElkArte\Helper\TokenHash;
 use ElkArte\Http\Headers;
 use ElkArte\Sessions\SessionHandler\DatabaseHandler;
-use ElkArte\TokenHash;
 
 /**
  * Attempt to start the session, unless it already has been.
@@ -84,12 +84,12 @@ function loadSession()
 
 			$handler = new DatabaseHandler(database());
 			session_set_save_handler(
-				array($handler, 'open'),
-				array($handler, 'close'),
-				array($handler, 'read'),
-				array($handler, 'write'),
-				array($handler, 'destroy'),
-				array($handler, 'gc')
+				[$handler, 'open'],
+				[$handler, 'close'],
+				static fn(string $sessionId): string => $handler->read($sessionId),
+				static fn(string $sessionId, string $data): bool => $handler->write($sessionId, $data),
+				static fn(string $sessionId): bool => $handler->destroy($sessionId),
+				static fn(int $maxLifetime): int|bool => $handler->gc($maxLifetime)
 			);
 
 			/*
@@ -116,7 +116,7 @@ function loadSession()
 		session_start();
 
 		// Change it so the cache settings are a little looser than default.
-		if (!empty($modSettings['databaseSession_loose']) || (isset($_REQUEST['action']) && $_REQUEST['action'] == 'search'))
+		if (!empty($modSettings['databaseSession_loose']) || (isset($_REQUEST['action']) && $_REQUEST['action'] === 'search'))
 		{
 			Headers::instance()->header('Cache-Control', 'private');
 		}

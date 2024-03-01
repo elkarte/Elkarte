@@ -16,9 +16,9 @@
 
 namespace ElkArte\ScheduledTasks\Tasks;
 
-use ElkArte\AttachmentsDirectory;
+use ElkArte\Attachments\AttachmentsDirectory;
 use ElkArte\Errors\Errors;
-use ElkArte\FileFunctions;
+use ElkArte\Helper\FileFunctions;
 use ElkArte\Languages\Txt;
 
 /**

@@ -15,7 +15,7 @@
  *
  */
 
-use ElkArte\Util;
+use ElkArte\Helper\Util;
 
 /**
  * Loads the signature from 50 members per request

@@ -16,7 +16,7 @@
 
 namespace ElkArte\Http;
 
-use ElkArte\FileFunctions;
+use ElkArte\Helper\FileFunctions;
 
 /**
  * Simple FTP protocol implementation.

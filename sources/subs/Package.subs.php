@@ -14,17 +14,17 @@
  *
  */
 
-use ElkArte\FileFunctions;
+use ElkArte\Helper\FileFunctions;
+use ElkArte\Helper\UnTgz;
+use ElkArte\Helper\UnZip;
+use ElkArte\Helper\Util;
 use ElkArte\Http\CurlFetchWebdata;
 use ElkArte\Http\FsockFetchWebdata;
 use ElkArte\Http\FtpConnection;
 use ElkArte\Http\StreamFetchWebdata;
 use ElkArte\Packages\PackageChmod;
 use ElkArte\Packages\PackageParser;
-use ElkArte\UnTgz;
-use ElkArte\UnZip;
 use ElkArte\User;
-use ElkArte\Util;
 use ElkArte\XmlArray;
 
 /**

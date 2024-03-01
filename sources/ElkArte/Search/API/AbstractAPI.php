@@ -12,12 +12,12 @@
 
 namespace ElkArte\Search\API;
 
-use ElkArte\HttpReq;
+use ElkArte\Helper\HttpReq;
+use ElkArte\Helper\Util;
+use ElkArte\Helper\ValuesContainer;
 use ElkArte\Search\SearchArray;
 use ElkArte\Search\SearchParams;
 use ElkArte\Search\WeightFactors;
-use ElkArte\Util;
-use ElkArte\ValuesContainer;
 
 /**
  * Abstract class that defines the methods any search API shall implement
@@ -69,7 +69,7 @@ abstract class AbstractAPI
 	/** @var \ElkArte\Database\QueryInterface Database instance */
 	protected $_db;
 
-	/** @var \Elkarte\HttpReq HttpReq instance */
+	/** @var \ElkArte\Helper\HttpReq HttpReq instance */
 	protected $_req;
 
 	/** @var \ElkArte\Database\AbstractSearch Search db instance */

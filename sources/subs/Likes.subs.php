@@ -12,9 +12,9 @@
  */
 
 use BBC\ParserWrapper;
+use ElkArte\Helper\Util;
 use ElkArte\MembersList;
 use ElkArte\User;
-use ElkArte\Util;
 
 /**
  * Updates the like value for a post/member combo if there are no problems with

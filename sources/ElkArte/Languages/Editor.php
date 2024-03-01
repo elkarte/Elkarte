@@ -14,7 +14,7 @@
 namespace ElkArte\Languages;
 
 use ElkArte\Database\QueryInterface;
-use ElkArte\Util;
+use ElkArte\Helper\Util;
 
 /**
  * This class takes care of handing language edits

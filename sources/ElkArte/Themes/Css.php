@@ -13,7 +13,7 @@
 
 namespace ElkArte\Themes;
 
-use ElkArte\SiteCombiner;
+use ElkArte\Helper\SiteCombiner;
 
 class Css
 {

@@ -206,6 +206,10 @@ fieldset {
 	border-radius: 5px;
 }
 
+h2 + fieldset {
+	border-radius: 0 0 5px 5px;
+}
+
 /* Collection of pseudo element clearfixes. */
 .category_header::after, .wrapper::after, .editor_wrapper::after,
 #main_content_section::after, #main_container::after, .quickbuttons::after,
@@ -262,9 +266,7 @@ textarea, .editor {
    differences when adding custom padding, or it will drive you mental. */
 
 /* Remove the inner border and padding in Firefox. */
-button::-moz-focus-inner,
-[type="button"]::-moz-focus-inner,
-[type="submit"]::-moz-focus-inner {
+button::-moz-focus-inner, [type="button"]::-moz-focus-inner, [type="submit"]::-moz-focus-inner {
 	padding: 0;
 	border-style: none;
 }
@@ -288,9 +290,7 @@ textarea:focus, select:focus, .editor:focus {
 }
 
 /* Correct clickable types in iOS and Safari. */
-button,
-[type="button"],
-[type="submit"] {
+button, [type="button"], [type="submit"] {
 	-webkit-appearance: button;
 }
 
@@ -1457,7 +1457,7 @@ a.bbc_link {
 	min-width: calc(100% + 30px);
 	padding: 0.6em;
 	/* Speed of transition during on/off focus/hover plus a delay for a hover intent */
-	transition: 150ms linear 375ms;
+	transition: 100ms linear 375ms;
 	/* Rotate it in to the page to provide a transition element */
 	transform: rotateX(-90deg);
 	transform-origin: top left;
@@ -1469,14 +1469,14 @@ a.bbc_link {
 .listlevel1.subsections::after {
 	position: absolute;
 	z-index: 90;
-	/* 1/2 the diagonal length of this box, the +5px is for the menu top offset above) */
-	top: calc(100% - (1.4142 * var(--pointersize)) / 2 + 5px);
+	/* 1/2 the diagonal length of this box, the +6px is for the menu top offset above) */
+	top: calc(100% - (1.4142 * var(--pointersize)) / 2 + 6px);
 	left: 10%;
 	display: block;
 	width: var(--pointersize);
 	height: var(--pointersize);
 	content: '';
-	transition: 125ms linear 375ms;
+	transition: 100ms linear 375ms;
 	transform: rotate(-45deg);
 	opacity: 0;
 	border: 1px solid;
@@ -1597,7 +1597,7 @@ a.bbc_link {
 	font-weight: 700;
 	line-height: 1.7;
 	position: absolute;
-	z-index: 2;
+	z-index: 10;
 	top: -1.45em;
 	right: -0.4em;
 	float: left;
@@ -1737,7 +1737,7 @@ a.bbc_link {
 	/* Scale the rotated square based on its diagonal length */
 	transform: scale(0.7071) rotate(45deg);
 	/* 50px seems to help prevent hover glitches caused by the border shadow */
-	border-radius: 0 4px 0 50px;
+	border-radius: 0 2px 0 50px;
 }
 
 .breadcrumb > .crumb > a > i {
@@ -1942,11 +1942,11 @@ button[type="submit"].quick_quote_button.hide {
 	flex-wrap: wrap;
 }
 
-.pagelinks :first-child {
+.pagelinks li:first-child > a {
 	border-radius: 2px 0 0 2px;
 }
 
-.pagelinks :last-child {
+.pagelinks li:last-child > a {
 	border-radius: 0 2px 2px 0;
 }
 
@@ -2092,7 +2092,7 @@ button[type="submit"].quick_quote_button.hide {
 	font-weight: bold;
 	padding: .2em .5em;
 	text-align: left;
-	border-top: 2px solid;
+	border-top: 1px solid;
 	border-bottom: 3px solid;
 }
 
@@ -3468,11 +3468,15 @@ footer .signature {
 	justify-content: flex-start;
 }
 
-#post_confirm_buttons input:first-child {
+#post_confirm_buttons > input {
+	border-radius: 0;
+}
+
+#post_confirm_buttons > input:first-of-type {
 	border-radius: 4px 0 0 4px;
 }
 
-#post_confirm_buttons input:nth-last-child(2) {
+#post_confirm_buttons > input:last-of-type {
 	border-radius: 0 4px 4px 0;
 }
 
@@ -3766,6 +3770,7 @@ ul.post_options li {
 	text-align: center;
 	opacity: 0.6;
 	border: dashed 1px;
+	border-radius: 3px 3px 0 0;
 }
 
 .drop_area_fileselect {

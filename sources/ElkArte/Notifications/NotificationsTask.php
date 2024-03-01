@@ -14,7 +14,7 @@
 
 namespace ElkArte\Notifications;
 
-use ElkArte\ValuesContainer;
+use ElkArte\Helper\ValuesContainer;
 
 /**
  * Class NotificationsTask

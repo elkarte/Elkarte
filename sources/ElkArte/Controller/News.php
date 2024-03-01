@@ -20,10 +20,10 @@ use BBC\ParserWrapper;
 use ElkArte\AbstractController;
 use ElkArte\Cache\Cache;
 use ElkArte\Exceptions\Exception;
+use ElkArte\Helper\Util;
 use ElkArte\Http\Headers;
 use ElkArte\Languages\Txt;
 use ElkArte\MembersList;
-use ElkArte\Util;
 
 /**
  * News Controller class

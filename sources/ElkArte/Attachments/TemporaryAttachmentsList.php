@@ -11,7 +11,9 @@
  *
  */
 
-namespace ElkArte;
+namespace ElkArte\Attachments;
+
+use ElkArte\Helper\ValuesContainer;
 
 /**
  * Overall List bag for interfacing/finding individual TemporaryAttachment bags
@@ -67,7 +69,7 @@ class TemporaryAttachmentsList extends ValuesContainer
 	public function remove($file)
 	{
 		// Must exist and have edit permissions
-		return FileFunctions::instance()->delete($file);
+		return \ElkArte\Helper\FileFunctions::instance()->delete($file);
 	}
 
 	/**

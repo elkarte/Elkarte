@@ -11,7 +11,7 @@
  *
  */
 
-use ElkArte\Util;
+use ElkArte\Helper\Util;
 
 /**
  * Calculate the next time the passed tasks should be triggered.

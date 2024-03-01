@@ -25,7 +25,7 @@ use ElkArte\Controller\Post;
 use ElkArte\Controller\Register;
 use ElkArte\Controller\RemoveTopic;
 use ElkArte\EventManager;
-use ElkArte\HttpReq;
+use ElkArte\Helper\HttpReq;
 use ElkArte\SiteDispatcher;
 use ElkArte\User;
 use PHPUnit\Framework\TestCase;

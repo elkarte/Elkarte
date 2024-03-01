@@ -17,7 +17,7 @@
 namespace ElkArte\Packages;
 
 use ElkArte\AbstractModel;
-use ElkArte\FileFunctions;
+use ElkArte\Helper\FileFunctions;
 use ElkArte\Http\FtpConnection;
 
 /**

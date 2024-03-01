@@ -4,9 +4,9 @@
  * TestCase class for Permissions Class.
  */
 
+use ElkArte\Helper\ValuesContainer;
 use ElkArte\Permissions;
 use ElkArte\User;
-use ElkArte\ValuesContainer;
 use tests\ElkArteCommonSetupTest;
 
 class PermissionsTest extends ElkArteCommonSetupTest

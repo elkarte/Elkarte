@@ -11,11 +11,11 @@
  *
  */
 
-use ElkArte\HttpReq;
+use ElkArte\Helper\HttpReq;
+use ElkArte\Helper\Util;
+use ElkArte\Languages\Loader as LangLoader;
 use ElkArte\Languages\Txt;
 use ElkArte\Themes\ThemeLoader;
-use ElkArte\Util;
-use ElkArte\Languages\Loader as LangLoader;
 
 /**
  * Retrieve all installed themes

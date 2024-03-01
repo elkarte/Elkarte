@@ -16,8 +16,8 @@ namespace ElkArte\Notifications;
 
 use ElkArte\AbstractModel;
 use ElkArte\Database\QueryInterface;
-use ElkArte\DataValidator;
 use ElkArte\Exceptions\Exception;
+use ElkArte\Helper\DataValidator;
 use ElkArte\Mentions;
 use ElkArte\Mentions\MentionType\AbstractNotificationMessage;
 use ElkArte\Mentions\MentionType\NotificationInterface;

@@ -62,8 +62,8 @@
 	--title-compliment: #64533F; /* if you want a fade effect */
 
 	/* Menu nav background if a different background from top_section is wanted */
-	--menu_nav_grad_1: transparant; /* Top Menu nav bar background */
-	--menu_nav_grad_2: transparant; /* Top Menu nav bar background */
+	--menu_nav_grad_1: transparent; /* Top Menu nav bar background */
+	--menu_nav_grad_2: transparent; /* Top Menu nav bar background */
 
 	/* Footer */
 	--footer_text: #BBBBBB; /* Text used in the footer */
@@ -84,7 +84,7 @@
 	--input_submit_border: #004299; /* XX[type="submit"] */
 	--input_submit_border_top: #004299; /* complimentary for inset effects */
 	--input_submit_border_left: #004299; /* complimentary for inset effects */
-	--input_submit_shadow: transparant; /* box shadow */
+	--input_submit_shadow: transparent; /* box shadow */
 	--input_submit_background: #0B0B0B; /* background */
 	--input_submit_background_compliment: #0B0B0B; /* Used as gradient */
 
@@ -310,7 +310,7 @@ input[type="submit"], .drop_area_fileselect_text, button[type="submit"], input[t
 	border-top-color: var(--input_submit_border_top);
 	border-left-color: var(--input_submit_border_left);
 	background-image: linear-gradient(to bottom, var(--input_submit_background), var(--input_submit_background_compliment));
-	box-shadow: 1px 1px 2px var(--input_submit_shadow), 0 -1px 0 var(--input_submit_shadow) inset;
+	box-shadow: 1px 1px 2px var(--box_shadow), 0 -1px 0 var(--box_shadow) inset;
 }
 
 /* Hover effects. */
@@ -320,7 +320,7 @@ input[type="submit"]:hover, button[type="submit"]:hover, input[type="button"]:ho
 	border-top-color: var(--input_submit_border_top_hover);
 	border-left-color: var(--input_submit_border_left_hover);
 	background: var(--input_submit_background_hover);
-	box-shadow: 2px 1px 1px var(--input_submit_shadow_hover) inset;
+	box-shadow: 2px 1px 1px var(--box_shadow) inset;
 }
 
 /* But don't show disabled buttons as active on hover */
@@ -328,7 +328,7 @@ input[type=submit][disabled]:hover, button[disabled], button[disabled]:hover {
 	border-color: var(--input_submit_border);
 	border-top-color: var(--input_submit_border_top);
 	border-left-color: var(--input_submit_border_left);
-	box-shadow: 1px 1px 2px var(--input_submit_shadow);
+	box-shadow: 1px 1px 2px var(--box_shadow);
 }
 
 /* the new "button" */
@@ -580,6 +580,10 @@ sup.bbc_footnotes, sup.bbc_footnotes a {
 	background-color: var(--content_background) !important;
 }
 
+#ajax_in_progress a {
+	color: var(--warn);
+}
+
 /* -------------------------------------------------------
  *	$MAIN
  * -------------------------------------------------------
@@ -643,13 +647,14 @@ sup.bbc_footnotes, sup.bbc_footnotes a {
 	color: var(--footer_text);
 	border-top-color: var(--footer_top_border);
 	background: var(--footer_background);
-	box-shadow: 0 -1px 0 var(--transparent), 0 1px 0 var(--opacity40) inset;
+	box-shadow: 0 -1px 0 var(--box_shadow), 0 1px 0 var(--opacity40) inset;
 }
 
 #footer_section p, #footer_section a {
 	color: var(--footer_text);
 }
 
+/* debug forum area. */
 .action_viewquery a, .action_viewquery strong,
 #debug_logging a, #debug_logging strong {
 	color: var(--debug_text);
@@ -767,7 +772,7 @@ sup.bbc_footnotes, sup.bbc_footnotes a {
 	border-top-color: var(--menu_border_active_hover_top);
 	border-left-color: var(--menu_border_active_hover_left);
 	background: var(--input_submit_background_hover);
-	box-shadow: 1px 1px 1px var(--transparent) inset;
+	box-shadow: 1px 1px 1px var(--box_shadow) inset;
 }
 
 /* Do one override here for .poster. Still saves code all round. */
@@ -791,7 +796,7 @@ sup.bbc_footnotes, sup.bbc_footnotes a {
 	border-top-color: var(--menu_border_top);
 	border-left-color: var(--menu_border_left);
 	background: var(--menu_background);
-	box-shadow: 2px 2px 3px var(--transparent);
+	box-shadow: 2px 2px 3px var(--box_shadow);
 }
 
 /* Poster flyout gets a reverse shadow to hide some background */
@@ -819,7 +824,7 @@ sup.bbc_footnotes, sup.bbc_footnotes a {
 }
 
 .button_indicator {
-	box-shadow: 2px 2px 2px var(--transparent);
+	box-shadow: 2px 2px 2px var(--box_shadow);
 }
 
 /* Levels 2 and 3 drop menus: link or button. */
@@ -908,7 +913,7 @@ sup.bbc_footnotes, sup.bbc_footnotes a {
 }
 
 /* Cancel generic border-radius. */
-.quickbuttons .linklevel1 {
+.quickbuttons .linklevel1:not(.active) {
 	color: var(--menu_text);
 }
 
@@ -1216,7 +1221,7 @@ sup.bbc_footnotes, sup.bbc_footnotes a {
 }
 
 /* On to the posts */
-#quickreplybox, #forumposts, #recentposts, #pmFolder, #topic_summary, #preview_section {
+#quickreplybox, #forumposts, #searchform, #recentposts, #pmFolder, #topic_summary, #preview_section {
 	background: var(--dark_background);
 	box-shadow: 1px 2px 4px var(--box_shadow);
 }
@@ -1319,6 +1324,9 @@ sup.bbc_footnotes, sup.bbc_footnotes a {
 	border-top-color: var(--transparent);
 }
 
+.likes_above_signature {
+	border-bottom-color: var(--secondary_border);
+}
 /* Attachment details below thumbnails */
 .attachment_name, .attachment_details {
 	color: var(--emphasize_text) !important;
@@ -1463,6 +1471,7 @@ sup.bbc_footnotes, sup.bbc_footnotes a {
 	border: 2px solid var(--alert);
 }
 
+/* The post page ILA button */
 .ila_container {
 	border-color: var(--secondary_border);
 	border-top-color: var(--secondary_border_top);
@@ -1505,11 +1514,13 @@ sup.bbc_footnotes, sup.bbc_footnotes a {
  * -------------------------------------------------------
  */
 
+/* The container */
 .ui-tabs .ui-tabs-panel {
 	border-color: var(--primary_border);
 	background: var(--primary_content_background) !important;
 }
 
+/* The tabs */
 .ui-tabs .ui-tabs-nav li {
 	color: var(--body_text);
 	border-color: var(--primary_border) !important;
@@ -1529,6 +1540,7 @@ sup.bbc_footnotes, sup.bbc_footnotes a {
 	background-image: linear-gradient(to bottom, var(--menu_button_active_2), var(--menu_button_active)) !important;
 }
 
+/* Hover effect */
 .ui-tabs .ui-tabs-nav li.ui-state-hover .ui-tabs-anchor {
 	color: var(--strong_text);
 	border-color: var(--input_border_hover);

@@ -1,6 +1,6 @@
 <?php
 
-use ElkArte\UnZip;
+use ElkArte\Helper\UnZip;
 use PHPUnit\Framework\TestCase;
 
 class UnZipTest extends TestCase

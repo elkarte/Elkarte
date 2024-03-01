@@ -18,11 +18,11 @@
 namespace ElkArte\Controller;
 
 use ElkArte\AbstractController;
-use ElkArte\DataValidator;
 use ElkArte\Errors\ErrorContext;
 use ElkArte\Exceptions\Exception;
+use ElkArte\Helper\DataValidator;
+use ElkArte\Helper\Util;
 use ElkArte\Languages\Txt;
-use ElkArte\Util;
 use ElkArte\VerificationControls\VerificationControlsIntegrate;
 
 /**
@@ -579,7 +579,7 @@ class Emailuser extends AbstractController
 		}
 
 		// Make sure we have a comment and it's clean.
-		if ($this->_req->getPost('comment', '\\ElkArte\\Util::htmltrim', '') === '')
+		if ($this->_req->getPost('comment', '\\ElkArte\\Helper\\Util::htmltrim', '') === '')
 		{
 			$report_errors->addError('no_comment');
 		}

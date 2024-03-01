@@ -14,6 +14,8 @@
 namespace ElkArte;
 
 use ElkArte\Database\QueryInterface;
+use ElkArte\Helper\HttpReq;
+use ElkArte\Helper\ValuesContainer;
 
 /**
  * Class AbstractModel

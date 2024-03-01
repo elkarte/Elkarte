@@ -19,8 +19,8 @@ namespace ElkArte\Controller;
 use ElkArte\AbstractController;
 use ElkArte\Action;
 use ElkArte\Cache\Cache;
+use ElkArte\Helper\Util;
 use ElkArte\Languages\Txt;
-use ElkArte\Util;
 
 /**
  * Handles post moderation actions. (approvals, unapproved)

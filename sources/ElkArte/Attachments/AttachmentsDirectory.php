@@ -11,10 +11,9 @@
  *
  */
 
-namespace ElkArte;
+namespace ElkArte\Attachments;
 
 use ElkArte\Database\QueryInterface;
-use Exception;
 
 /**
  * Class AttachmentsDirectory
@@ -92,10 +91,10 @@ class AttachmentsDirectory
 		$this->useSubdirectories = $options['use_subdirectories_for_attachments'] ?? $this->useSubdirectories;
 
 		$this->last_dirs = $options['last_attachments_directory'] ?? serialize($this->last_dirs);
-		$this->last_dirs = Util::unserialize($this->last_dirs);
+		$this->last_dirs = \ElkArte\Helper\Util::unserialize($this->last_dirs);
 
 		$this->baseDirectories = $options['attachment_basedirectories'] ?? serialize($this->baseDirectories);
-		$this->baseDirectories = Util::unserialize($this->baseDirectories);
+		$this->baseDirectories = \ElkArte\Helper\Util::unserialize($this->baseDirectories);
 
 		$this->basedirectory_for_attachments = $options['basedirectory_for_attachments'] ?? $this->basedirectory_for_attachments;
 		$this->attachment_full_notified = !empty($options['attachment_full_notified'] ?? $this->basedirectory_for_attachments);
@@ -117,7 +116,7 @@ class AttachmentsDirectory
 			));
 		}
 
-		$this->attachmentUploadDir = Util::unserialize($options['attachmentUploadDir']);
+		$this->attachmentUploadDir = \ElkArte\Helper\Util::unserialize($options['attachmentUploadDir']);
 		$this->attachmentUploadDir = $this->attachmentUploadDir ?: $options['attachmentUploadDir'];
 	}
 
@@ -476,7 +475,7 @@ class AttachmentsDirectory
 	 */
 	public function createDirectory($uploadDirectory)
 	{
-		$fileFunctions = FileFunctions::instance();
+		$fileFunctions = \ElkArte\Helper\FileFunctions::instance();
 
 		$uploadDirectory = str_replace('\\', DIRECTORY_SEPARATOR, $uploadDirectory);
 		$uploadDirectory = rtrim($uploadDirectory, DIRECTORY_SEPARATOR);
@@ -717,7 +716,7 @@ class AttachmentsDirectory
 	 * Checks if the current active directory has space allowed for a new attachment file
 	 *
 	 * @param TemporaryAttachment $sess_attach
-	 * @throws Exceptions\Exception
+	 * @throws ElkArte\Exceptions
 	 */
 	public function checkDirSpace($sess_attach)
 	{
@@ -805,7 +804,7 @@ class AttachmentsDirectory
 	 */
 	public function rename($id, &$real_path)
 	{
-		$fileFunctions = FileFunctions::instance();
+		$fileFunctions = \ElkArte\Helper\FileFunctions::instance();
 		if (!empty($this->attachmentUploadDir[$id]) && $real_path !== $this->attachmentUploadDir[$id])
 		{
 			if (!$fileFunctions->isDir($real_path))
@@ -885,7 +884,7 @@ class AttachmentsDirectory
 		// It's safe to delete. So try to delete the folder also
 		if ($num_attach === 0)
 		{
-			$fileFunctions = FileFunctions::instance();
+			$fileFunctions = \ElkArte\Helper\FileFunctions::instance();
 			$doit = false;
 
 			if ($fileFunctions->isDir($real_path))

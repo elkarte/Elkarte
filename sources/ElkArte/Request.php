@@ -13,6 +13,7 @@
 
 namespace ElkArte;
 
+use ElkArte\Helper\Util;
 use ElkArte\Http\Headers;
 
 /**

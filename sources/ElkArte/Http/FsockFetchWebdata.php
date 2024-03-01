@@ -47,7 +47,7 @@ class FsockFetchWebdata
 	/** @var null|resource the fsockopen resource */
 	private $_fp;
 
-	/** @var mixed[] Holds the passed user options array (only option is max_length) */
+	/** @var array Holds the passed user options array (only option is max_length) */
 	private $_user_options;
 
 	/** @var string|string[] Holds any data that will be posted to a form */

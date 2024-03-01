@@ -14,7 +14,7 @@
 
 namespace ElkArte\Converters;
 
-use ElkArte\Util;
+use ElkArte\Helper\Util;
 
 /**
  * Class AbstractDomParser

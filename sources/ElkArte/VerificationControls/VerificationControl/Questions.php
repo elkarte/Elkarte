@@ -16,10 +16,10 @@ namespace ElkArte\VerificationControls\VerificationControl;
 use BBC\ParserWrapper;
 use ElkArte\Cache\Cache;
 use ElkArte\Exceptions\Exception;
-use ElkArte\HttpReq;
+use ElkArte\Helper\HttpReq;
+use ElkArte\Helper\Util;
+use ElkArte\Helper\ValuesContainer;
 use ElkArte\User;
-use ElkArte\Util;
-use ElkArte\ValuesContainer;
 
 /**
  * Class to manage, prepare, show, and validate question -> answer verifications
@@ -41,10 +41,10 @@ class Questions implements ControlInterface
 	/** @var int[] Array of question id's that they provided a wrong answer to */
 	private $_incorrectQuestions;
 
-	/** @var null|\ElkArte\ValuesContainer Filters to use to load the questions */
+	/** @var null|ValuesContainer Filters to use to load the questions */
 	private $_filter;
 
-	/** @var \ElkArte\HttpReq Form variables */
+	/** @var HttpReq Form variables */
 	private $_req;
 
 	/**
@@ -72,7 +72,7 @@ class Questions implements ControlInterface
 
 		if ($isNew)
 		{
-			$this->_number_questions = $this->_options['override_qs'] ?? (empty($modSettings['qa_verification_number']) ? 0 : $modSettings['qa_verification_number']);
+			$this->_number_questions = $this->_options['override_qs'] ?? (empty($modSettings['qa_verification_number']) ? 0 : (int) $modSettings['qa_verification_number']);
 
 			// If we want questions do we have a cache of all the IDs?
 			if (!empty($this->_number_questions) && empty($modSettings['question_id_cache']))
@@ -102,7 +102,7 @@ class Questions implements ControlInterface
 			// Do we have enough questions?
 			if (!empty($this->_number_questions) && $this->_number_questions <= count($modSettings['question_id_cache'][$questions_language]))
 			{
-				$this->_possible_questions = $modSettings['question_id_cache'][$questions_language];
+				$this->_possible_questions = array_map('intval', $modSettings['question_id_cache'][$questions_language]);
 				$this->_number_questions = min($this->_number_questions, count($this->_possible_questions));
 				$this->_questionIDs = [];
 
@@ -168,6 +168,7 @@ class Questions implements ControlInterface
 			}
 			else
 			{
+
 				foreach (array_rand($this->_possible_questions, $this->_number_questions) as $index)
 				{
 					$this->_questionIDs[] = $this->_possible_questions[$index];

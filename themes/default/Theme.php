@@ -16,7 +16,7 @@
 
 namespace ElkArte\Themes\DefaultTheme;
 
-use ElkArte\FileFunctions;
+use ElkArte\Helper\FileFunctions;
 use ElkArte\Http\Headers;
 use ElkArte\Menu\MenuContext;
 use ElkArte\Themes\Theme as BaseTheme;

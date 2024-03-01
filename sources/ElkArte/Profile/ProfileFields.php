@@ -14,13 +14,13 @@
 namespace ElkArte\Profile;
 
 use BBC\ParserWrapper;
-use ElkArte\DataValidator;
 use ElkArte\Errors\ErrorContext;
 use ElkArte\Exceptions\Exception;
+use ElkArte\Helper\DataValidator;
+use ElkArte\Helper\Util;
 use ElkArte\Languages\Txt;
 use ElkArte\MembersList;
 use ElkArte\User;
-use ElkArte\Util;
 
 /**
  * The ProfileFields class is responsible for loading and rendering profile fields.

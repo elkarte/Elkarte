@@ -12,6 +12,7 @@
 namespace ElkArte;
 
 use BBC\Codes;
+use ElkArte\Helper\Util;
 
 /**
  * Class IlaIntegrate

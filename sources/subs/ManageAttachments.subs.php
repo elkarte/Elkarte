@@ -20,9 +20,9 @@
  */
 
 use BBC\ParserWrapper;
-use ElkArte\AttachmentsDirectory;
-use ElkArte\FileFunctions;
-use ElkArte\Util;
+use ElkArte\Attachments\AttachmentsDirectory;
+use ElkArte\Helper\FileFunctions;
+use ElkArte\Helper\Util;
 
 /**
  * Approve an attachment, or maybe even more - no permission check!

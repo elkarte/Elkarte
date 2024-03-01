@@ -17,6 +17,7 @@
 namespace ElkArte;
 
 use ElkArte\Exceptions\Exception;
+use ElkArte\Helper\Util;
 
 /**
  * A class to handle the basics of calendar events.

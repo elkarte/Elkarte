@@ -19,6 +19,7 @@
 namespace ElkArte;
 
 use BBC\ParserWrapper;
+use ElkArte\Helper\Util;
 
 /**
  * Class TopicUtil

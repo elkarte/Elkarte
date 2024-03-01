@@ -20,7 +20,7 @@ use BadFunctionCallException;
 use ElkArte\Debug;
 use ElkArte\Errors\Errors;
 use ElkArte\Exceptions\Exception;
-use ElkArte\FileFunctions;
+use ElkArte\Helper\FileFunctions;
 use ElkArte\Http\Headers;
 use ElkArte\Languages\Txt;
 use Error;

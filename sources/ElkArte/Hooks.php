@@ -17,6 +17,7 @@
 namespace ElkArte;
 
 use ElkArte\Database\QueryInterface;
+use ElkArte\Helper\FileFunctions;
 use FilesystemIterator;
 use GlobIterator;
 

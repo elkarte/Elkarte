@@ -18,15 +18,15 @@
 use ElkArte\Cache\Cache;
 use ElkArte\Controller\Auth;
 use ElkArte\EventManager;
-use ElkArte\FileFunctions;
+use ElkArte\Helper\FileFunctions;
+use ElkArte\Helper\TokenHash;
+use ElkArte\Helper\Util;
 use ElkArte\Http\Headers;
 use ElkArte\Languages\Txt;
-use ElkArte\TokenHash;
 use ElkArte\User;
-use ElkArte\Util;
 
 /**
- * Check if the user is who he/she says he is.
+ * Check if the user is who they say they are.
  *
  * What it does:
  *
@@ -52,7 +52,7 @@ function validateSession($type = 'admin')
 	// Validate what type of session check this is.
 	$types = [];
 	call_integration_hook('integrate_validateSession', [&$types]);
-	$type = in_array($type, $types) || $type === 'moderate' ? $type : 'admin';
+	$type = in_array($type, $types, true) || $type === 'moderate' ? $type : 'admin';
 
 	// Set the lifetime for our admin session. Default is ten minutes.
 	$refreshTime = 10;
@@ -115,12 +115,9 @@ function validateSession($type = 'admin')
 		}
 
 		// Posting the password... check it.
-		if (isset($_POST[$type . '_pass']) && str_replace('*', '', $_POST[$type . '_pass']) !== '')
+		if (isset($_POST[$type . '_pass']) && str_replace('*', '', $_POST[$type . '_pass']) !== '' && checkPassword($type))
 		{
-			if (checkPassword($type))
-			{
-				return true;
-			}
+			return true;
 		}
 	}
 
@@ -206,7 +203,7 @@ function is_not_guest($message = '', $is_fatal = true)
 	writeLog(true);
 
 	// Just die.
-	if (isset($_REQUEST['api']) && $_REQUEST['api'] === 'xml' || !$is_fatal)
+	if ((isset($_REQUEST['api']) && $_REQUEST['api'] === 'xml') || !$is_fatal)
 	{
 		obExit(false);
 	}
@@ -282,7 +279,14 @@ function is_not_banned($forceCheck = false)
 	}
 
 	// Only check the ban every so often. (to reduce load.)
-	if ($forceCheck || !isset($_SESSION['ban']) || empty($modSettings['banLastUpdated']) || ($_SESSION['ban']['last_checked'] < $modSettings['banLastUpdated']) || $_SESSION['ban']['id_member'] != User::$info->id || $_SESSION['ban']['ip'] != User::$info->ip || $_SESSION['ban']['ip2'] != User::$info->ip2 || (isset(User::$info->email, $_SESSION['ban']['email']) && $_SESSION['ban']['email'] != User::$info->email))
+	if ($forceCheck
+		|| !isset($_SESSION['ban'])
+		|| empty($modSettings['banLastUpdated'])
+		|| ($_SESSION['ban']['last_checked'] < $modSettings['banLastUpdated'])
+		|| $_SESSION['ban']['id_member'] !== User::$info->id
+		|| $_SESSION['ban']['ip'] !== User::$info->ip
+		|| $_SESSION['ban']['ip2'] !== User::$info->ip2
+		|| (isset(User::$info->email) && $_SESSION['ban']['email'] !== User::$info->email))
 	{
 		// Innocent until proven guilty.  (but we know you are! :P)
 		$_SESSION['ban'] = [
@@ -352,7 +356,7 @@ function is_not_banned($forceCheck = false)
 					(' . implode(' OR ', $ban_query) . ')',
 				$ban_query_vars
 			)->fetch_callback(
-				function ($row) use ($restrictions, &$flag_is_activated) {
+				static function ($row) use ($restrictions, &$flag_is_activated) {
 					// Store every type of ban that applies to you in your session.
 					foreach ($restrictions as $restriction)
 					{
@@ -414,7 +418,7 @@ function is_not_banned($forceCheck = false)
 				'current_time' => time(),
 			]
 		)->fetch_callback(
-			function ($row) {
+			static function ($row) {
 				$_SESSION['ban']['cannot_access']['ids'][] = $row['id_ban'];
 				$_SESSION['ban']['cannot_access']['reason'] = $row['reason'];
 			}
@@ -458,17 +462,18 @@ function is_not_banned($forceCheck = false)
 		writeLog(true);
 
 		// You banned, sucka!
-		throw new \ElkArte\Exceptions\Exception(sprintf($txt['your_ban'], $old_name) . (empty($_SESSION['ban']['cannot_access']['reason']) ? '' : '<br />' . $_SESSION['ban']['cannot_access']['reason']) . '<br />' . (!empty($_SESSION['ban']['expire_time']) ? sprintf($txt['your_ban_expires'], standardTime($_SESSION['ban']['expire_time'], false)) : $txt['your_ban_expires_never']), 'user');
+		throw new \ElkArte\Exceptions\Exception(sprintf($txt['your_ban'], $old_name) . (empty($_SESSION['ban']['cannot_access']['reason']) ? '' : '<br />' . $_SESSION['ban']['cannot_access']['reason']) . '<br />' . (empty($_SESSION['ban']['expire_time']) ? $txt['your_ban_expires_never'] : sprintf($txt['your_ban_expires'], standardTime($_SESSION['ban']['expire_time'], false))), 'user');
 	}
+
 	// You're not allowed to log in but yet you are. Let's fix that.
-	elseif (isset($_SESSION['ban']['cannot_login']) && User::$info->is_guest === false)
+	if (isset($_SESSION['ban']['cannot_login']) && User::$info->is_guest === false)
 	{
 		// We don't wanna see you!
 		require_once(SUBSDIR . '/Logging.subs.php');
 		deleteMemberLogOnline();
 
 		// 'Log' the user out.  Can't have any funny business... (save the name!)
-		$old_name = (string) User::$info->name != '' ? User::$info->name : $txt['guest_title'];
+		$old_name = (string) User::$info->name !== '' ? User::$info->name : $txt['guest_title'];
 		User::logOutUser(true);
 		loadUserContext();
 
@@ -484,14 +489,21 @@ function is_not_banned($forceCheck = false)
 		$controller->action_logout(true, false);
 
 		// Tell them thanks
-		throw new \ElkArte\Exceptions\Exception(sprintf($txt['your_ban'], $old_name) . (empty($_SESSION['ban']['cannot_login']['reason']) ? '' : '<br />' . $_SESSION['ban']['cannot_login']['reason']) . '<br />' . (!empty($_SESSION['ban']['expire_time']) ? sprintf($txt['your_ban_expires'], standardTime($_SESSION['ban']['expire_time'], false)) : $txt['your_ban_expires_never']) . '<br />' . $txt['ban_continue_browse'], 'user');
+		throw new \ElkArte\Exceptions\Exception(sprintf($txt['your_ban'], $old_name) . (empty($_SESSION['ban']['cannot_login']['reason']) ? '' : '<br />' . $_SESSION['ban']['cannot_login']['reason']) . '<br />' . (empty($_SESSION['ban']['expire_time']) ? $txt['your_ban_expires_never'] : sprintf($txt['your_ban_expires'], standardTime($_SESSION['ban']['expire_time'], false))) . '<br />' . $txt['ban_continue_browse'], 'user');
 	}
 
 	// Fix up the banning permissions.
-	if (isset(User::$info->permissions))
+	if (!property_exists(User::$info, 'permissions'))
 	{
-		banPermissions();
+		return;
 	}
+
+	if (User::$info->permissions === null)
+	{
+		return;
+	}
+
+	banPermissions();
 }
 
 /**
@@ -566,6 +578,7 @@ function banPermissions()
 				User::$info->permissions = array_merge((array) User::$info->permissions, $new);
 			}
 		}
+
 		User::$info->permissions = array_diff(User::$info->permissions, array_keys($permission_change));
 	}
 
@@ -700,7 +713,7 @@ function isBannedEmail($email, $restriction, $error)
 			'now' => time(),
 		]
 	)->fetch_callback(
-		function ($row) use (&$ban_ids, &$ban_reason, $restriction) {
+		static function ($row) use (&$ban_ids, &$ban_reason, $restriction) {
 			if (!empty($row['cannot_access']))
 			{
 				$_SESSION['ban']['cannot_access']['ids'][] = $row['id_ban'];
@@ -869,8 +882,9 @@ function checkSession($type = 'post', $from_action = '', $is_fatal = true)
 	{
 		return '';
 	}
+
 	// A session error occurred, show the error.
-	elseif ($is_fatal)
+	if ($is_fatal)
 	{
 		if (isset($_REQUEST['api']))
 		{
@@ -881,10 +895,7 @@ function checkSession($type = 'post', $from_action = '', $is_fatal = true)
 				->sendHeaders();
 			die;
 		}
-		else
-		{
-			throw new \ElkArte\Exceptions\Exception($error, isset($log_error) ? 'user' : false, $sprintf ?? []);
-		}
+		throw new \ElkArte\Exceptions\Exception($error, isset($log_error) ? 'user' : false, $sprintf ?? []);
 	}
 	// A session error occurred, return the error to the calling function.
 	else
@@ -1039,14 +1050,7 @@ function cleanTokens($complete = false, $suffix = '')
 	// Clean up tokens, trying to give enough time still.
 	foreach ($_SESSION['token'] as $key => $data)
 	{
-		if (!empty($suffix))
-		{
-			$force = $complete || strpos($key, $suffix);
-		}
-		else
-		{
-			$force = $complete;
-		}
+		$force = empty($suffix) ? $complete : $complete || strpos($key, $suffix);
 
 		if ($data[2] + 10800 < time() || $force)
 		{
@@ -1098,14 +1102,15 @@ function checkSubmitOnce($action, $is_fatal = false)
 		{
 			return true;
 		}
-		elseif (!in_array($_REQUEST['seqnum'], $_SESSION['forms'], true))
+
+		if (!in_array($_REQUEST['seqnum'], $_SESSION['forms'], true))
 		{
 			// Mark this one as used
 			$_SESSION['forms'][] = (string) $_REQUEST['seqnum'];
-
 			return true;
 		}
-		elseif ($is_fatal)
+
+		if ($is_fatal)
 		{
 			throw new \ElkArte\Exceptions\Exception('error_form_already_submitted', false);
 		}
@@ -1121,7 +1126,7 @@ function checkSubmitOnce($action, $is_fatal = false)
 	}
 	elseif ($action !== 'free')
 	{
-		trigger_error('checkSubmitOnce(): Invalid action \'' . $action . '\'', E_USER_WARNING);
+		trigger_error("checkSubmitOnce(): Invalid action '" . $action . "'", E_USER_WARNING);
 	}
 }
 
@@ -1175,7 +1180,7 @@ function allowedTo($permission, $boards = null)
 		}
 
 		// Check if they can do it, you aren't allowed, by default.
-		return count(array_intersect($permission, User::$info->permissions)) !== 0;
+		return array_intersect($permission, User::$info->permissions) !== [];
 	}
 
 	if (!is_array($boards))
@@ -1209,7 +1214,7 @@ function allowedTo($permission, $boards = null)
 	);
 
 	// Make sure they can do it on all the boards.
-	if ($request->num_rows() != count($boards))
+	if ($request->num_rows() !== count($boards))
 	{
 		return false;
 	}
@@ -1219,6 +1224,7 @@ function allowedTo($permission, $boards = null)
 	{
 		$result = $result && !empty($row['add_deny']);
 	}
+
 	$request->free_result();
 
 	// If the query returned 1, they can do it... otherwise, they can't.
@@ -1358,7 +1364,7 @@ function boardsAllowedTo($permissions, $check_access = true, $simple = true)
 			'permissions' => $permissions,
 		]
 	)->fetch_callback(
-		function ($row) use ($simple, &$deny_boards, &$boards) {
+		static function ($row) use ($simple, &$deny_boards, &$boards) {
 			if ($simple)
 			{
 				if (empty($row['add_deny']))
@@ -1487,19 +1493,12 @@ function spamProtection($error_type, $fatal = true)
 		'sendtopic' => $modSettings['spamWaitTime'] * 4,
 		'sendmail' => $modSettings['spamWaitTime'] * 5,
 		'reporttm' => $modSettings['spamWaitTime'] * 4,
-		'search' => !empty($modSettings['search_floodcontrol_time']) ? $modSettings['search_floodcontrol_time'] : 1,
+		'search' => empty($modSettings['search_floodcontrol_time']) ? 1 : $modSettings['search_floodcontrol_time'],
 	];
 	call_integration_hook('integrate_spam_protection', [&$timeOverrides]);
 
 	// Moderators are free...
-	if (!allowedTo('moderate_board'))
-	{
-		$timeLimit = $timeOverrides[$error_type] ?? $modSettings['spamWaitTime'];
-	}
-	else
-	{
-		$timeLimit = 2;
-	}
+	$timeLimit = allowedTo('moderate_board') ? 2 : $timeOverrides[$error_type] ?? $modSettings['spamWaitTime'];
 
 	// Delete old entries...
 	$db->query('', '
@@ -1528,10 +1527,8 @@ function spamProtection($error_type, $fatal = true)
 		{
 			throw new \ElkArte\Exceptions\Exception($error_type . '_WaitTime_broken', false, [$timeLimit]);
 		}
-		else
-		{
-			return $timeLimit;
-		}
+
+		return $timeLimit;
 	}
 
 	// They haven't posted within the limit.
@@ -1563,7 +1560,7 @@ function secureDirectory($path, $allow_localhost = false, $files = '*')
 
 	// How deep is this from our boarddir
 	$tree = explode(DIRECTORY_SEPARATOR, $path);
-	$root = explode(DIRECTORY_SEPARATOR,BOARDDIR);
+	$root = explode(DIRECTORY_SEPARATOR, BOARDDIR);
 	$count = max(count($tree) - count($root), 0);
 
 	$errors = [];
@@ -1608,6 +1605,7 @@ function secureDirectory($path, $allow_localhost = false, $files = '*')
 </IfModule>');
 			fclose($fh);
 		}
+
 		$errors[] = 'htaccess_cannot_create_file';
 	}
 
@@ -1638,6 +1636,7 @@ else
 	exit;');
 			fclose($fh);
 		}
+
 		$errors[] = 'index-php_cannot_create_file';
 	}
 
@@ -1645,10 +1644,8 @@ else
 	{
 		return $errors;
 	}
-	else
-	{
-		return true;
-	}
+
+	return true;
 }
 
 /**
@@ -1792,7 +1789,7 @@ function validatePasswordFlood($id_member, $password_flood_value = false, $was_c
 	}
 
 	// We need a member!
-	if (!$id_member)
+	if ($id_member === 0)
 	{
 		// Redirect back!
 		redirectexit();
@@ -1808,7 +1805,7 @@ function validatePasswordFlood($id_member, $password_flood_value = false, $was_c
 	// Right, have we got a flood value?
 	if ($password_flood_value !== false)
 	{
-		@list ($time_stamp, $number_tries) = explode('|', $password_flood_value);
+		@[$time_stamp, $number_tries] = explode('|', $password_flood_value);
 	}
 
 	// Timestamp invalid or non-existent?

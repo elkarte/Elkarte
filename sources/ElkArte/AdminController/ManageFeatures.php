@@ -21,12 +21,12 @@ use DateTimeZone;
 use ElkArte\AbstractController;
 use ElkArte\Action;
 use ElkArte\Exceptions\Exception;
+use ElkArte\Helper\Util;
 use ElkArte\Hooks;
 use ElkArte\Languages\Txt;
 use ElkArte\MetadataIntegrate;
 use ElkArte\Notifications\Notifications;
 use ElkArte\SettingsForm\SettingsForm;
-use ElkArte\Util;
 
 /**
  * Manage features and options administration page.
@@ -1295,8 +1295,8 @@ class ManageFeatures extends AbstractController
 				redirectexit('action=admin;area=featuresettings;sa=profileedit;fid=' . $this->_req->query->fid . ';msg=regex_error');
 			}
 
-			$this->_req->post->field_name = $this->_req->getPost('field_name', '\\ElkArte\\Util::htmlspecialchars');
-			$this->_req->post->field_desc = $this->_req->getPost('field_desc', '\\ElkArte\\Util::htmlspecialchars');
+			$this->_req->post->field_name = $this->_req->getPost('field_name', '\\ElkArte\\Helper\\Util::htmlspecialchars');
+			$this->_req->post->field_desc = $this->_req->getPost('field_desc', '\\ElkArte\\Helper\\Util::htmlspecialchars');
 
 			$rows = isset($this->_req->post->rows) ? (int) $this->_req->post->rows : 4;
 			$cols = isset($this->_req->post->cols) ? (int) $this->_req->post->cols : 30;

@@ -16,14 +16,14 @@ namespace ElkArte\Themes;
 use BBC\ParserWrapper;
 use ElkArte\Controller\ScheduledTasks;
 use ElkArte\EventManager;
-use ElkArte\FileFunctions;
+use ElkArte\Helper\FileFunctions;
+use ElkArte\Helper\HttpReq;
+use ElkArte\Helper\SiteCombiner;
+use ElkArte\Helper\Util;
+use ElkArte\Helper\ValuesContainer;
 use ElkArte\Http\Headers;
-use ElkArte\HttpReq;
 use ElkArte\Languages\Txt;
-use ElkArte\SiteCombiner;
 use ElkArte\User;
-use ElkArte\Util;
-use ElkArte\ValuesContainer;
 
 /**
  * Class Theme
@@ -44,7 +44,7 @@ abstract class Theme
 		'generic_xml' => 'text/xml'
 	];
 
-	/** @var ValuesContainer */
+	/** @var \ElkArte\Helper\ValuesContainer */
 	public $user;
 
 	/** @var HttpReq user input variables */
@@ -78,7 +78,7 @@ abstract class Theme
 	 * Theme constructor.
 	 *
 	 * @param int $id
-	 * @param ValuesContainer $user
+	 * @param \ElkArte\Helper\ValuesContainer $user
 	 * @param Directories $dirs
 	 */
 	public function __construct(int $id, ValuesContainer $user, Directories $dirs)

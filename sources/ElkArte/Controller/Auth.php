@@ -21,11 +21,11 @@ use ElkArte\AbstractController;
 use ElkArte\Cache\Cache;
 use ElkArte\Errors\Errors;
 use ElkArte\Exceptions\Exception;
+use ElkArte\Helper\Util;
 use ElkArte\Http\Headers;
 use ElkArte\Languages\Txt;
 use ElkArte\User;
 use ElkArte\UserSettingsLoader;
-use ElkArte\Util;
 
 /**
  * Deals with logging in and out members, and the validation of them

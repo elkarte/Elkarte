@@ -21,9 +21,9 @@ use ElkArte\AbstractController;
 use ElkArte\Action;
 use ElkArte\EventManager;
 use ElkArte\Exceptions\Exception;
+use ElkArte\Helper\Util;
 use ElkArte\Languages\Txt;
 use ElkArte\User;
-use ElkArte\Util;
 
 /**
  * Shows group access and allows for add/remove group members

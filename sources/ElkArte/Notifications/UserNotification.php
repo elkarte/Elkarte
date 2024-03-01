@@ -17,10 +17,10 @@ namespace ElkArte\Notifications;
 
 use ElkArte\AbstractModel;
 use ElkArte\Database\QueryInterface;
-use ElkArte\DataValidator;
+use ElkArte\Helper\DataValidator;
+use ElkArte\Helper\ValuesContainer;
 use ElkArte\Languages\Txt;
 use ElkArte\UserInfo;
-use ElkArte\ValuesContainer;
 
 /**
  * Class UserNotification
@@ -47,7 +47,7 @@ class UserNotification extends AbstractModel
 	 * Construct, Load the language file and make db/user info available to the class
 	 *
 	 * @param QueryInterface $db
-	 * @param UserInfo|ValuesContainer $user
+	 * @param UserInfo|\ElkArte\Helper\ValuesContainer $user
 	 */
 	public function __construct($db, $user)
 	{

@@ -14,7 +14,7 @@
  *
  */
 
-namespace ElkArte;
+namespace ElkArte\Helper;
 
 use ElkArte\Languages\Txt;
 
@@ -53,7 +53,7 @@ class GenericList
 	 */
 	protected $listOptions = [];
 
-	/** @var HttpReq Instance of \ElkArte\HttpReq */
+	/** @var HttpReq Instance of \ElkArte\Helper\HttpReq */
 	protected $req;
 
 	/** @var array Will hold the created $context */

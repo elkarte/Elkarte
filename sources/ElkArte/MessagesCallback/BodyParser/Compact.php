@@ -18,7 +18,7 @@
 namespace ElkArte\MessagesCallback\BodyParser;
 
 use BBC\ParserWrapper;
-use ElkArte\Util;
+use ElkArte\Helper\Util;
 
 /**
  * Class Compact

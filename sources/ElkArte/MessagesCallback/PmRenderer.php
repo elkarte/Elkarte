@@ -17,10 +17,10 @@
 
 namespace ElkArte\MessagesCallback;
 
+use ElkArte\Helper\ValuesContainer;
 use ElkArte\Member;
 use ElkArte\MembersList;
 use ElkArte\MessagesCallback\BodyParser\BodyParserInterface;
-use ElkArte\ValuesContainer;
 
 /**
  * PmRenderer

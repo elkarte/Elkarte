@@ -16,13 +16,13 @@
 
 namespace ElkArte\Modules\Attachments;
 
+use ElkArte\Attachments\TemporaryAttachment;
+use ElkArte\Attachments\TemporaryAttachmentsList;
 use ElkArte\Errors\AttachmentErrorContext;
 use ElkArte\Errors\ErrorContext;
 use ElkArte\EventManager;
-use ElkArte\FileFunctions;
+use ElkArte\Helper\FileFunctions;
 use ElkArte\Modules\AbstractModule;
-use ElkArte\TemporaryAttachment;
-use ElkArte\TemporaryAttachmentsList;
 
 /**
  * Class Attachments_Post_Module

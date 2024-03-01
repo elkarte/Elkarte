@@ -10,7 +10,7 @@
  * @version 2.0 dev
  */
 
-namespace ElkArte;
+namespace ElkArte\Helper;
 
 use tubalmartin\CssMin\Minifier as CSSmin;
 use Wikimedia\Minify\JavaScriptMinifier;
@@ -55,7 +55,7 @@ class SiteCombiner
 	/** @var string[] All files that was not possible to combine */
 	private $_spares = [];
 
-	/** @var \ElkArte\FileFunctions */
+	/** @var \ElkArte\Helper\FileFunctions */
 	private $fileFunc;
 
 	/**

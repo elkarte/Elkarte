@@ -11,7 +11,7 @@
  *
  */
 
-namespace ElkArte;
+namespace ElkArte\Helper;
 
 use ElkArte\Languages\Txt;
 use ParseError;
@@ -20,7 +20,7 @@ use ParseError;
  * Class used to validate and transform data
  *
  * Initiate
- *    $validation = new \ElkArte\DataValidator();
+ *    $validation = new \ElkArte\Helper\DataValidator();
  *
  * Set validation rules
  *    $validation->validation_rules(array(
@@ -57,7 +57,7 @@ use ParseError;
  *
  * Use it inline with the static method
  * $_POST['username'] = ' username '
- * if (\ElkArte\DataValidator::is_valid($_POST, array('username' => 'required|alpha_numeric'), array('username' => 'trim|strtoupper')))
+ * if (\ElkArte\Helper\DataValidator::is_valid($_POST, array('username' => 'required|alpha_numeric'), array('username' => 'trim|strtoupper')))
  *    $username = $_POST['username'] // now = 'USERNAME'
  *
  * Current validation can be one or a combination of:
@@ -1345,7 +1345,7 @@ class DataValidator
 	}
 
 	/**
-	 * Uses \ElkArte\Util::htmlspecialchars to sanitize any html in the input
+	 * Uses \ElkArte\Helper\Util::htmlspecialchars to sanitize any html in the input
 	 *
 	 * @param string $input
 	 *

@@ -16,7 +16,7 @@
 
 namespace ElkArte\Modules\Attachments;
 
-use ElkArte\AttachmentsDisplay;
+use ElkArte\Attachments\AttachmentsDisplay;
 use ElkArte\EventManager;
 use ElkArte\Modules\AbstractModule;
 
@@ -28,7 +28,7 @@ class Display extends AbstractModule
 	/** @var int The mode of attachments (disabled/enabled/show only). */
 	protected static $attach_level = 0;
 
-	/** @var AttachmentsDisplay The good old attachments array */
+	/** @var \AttachmentsDisplay The good old attachments array */
 	protected static $attachments;
 
 	/** @var bool If unapproved posts/attachments should be shown */

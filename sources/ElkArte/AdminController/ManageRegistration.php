@@ -22,12 +22,12 @@ use ElkArte\Action;
 use ElkArte\Agreement;
 use ElkArte\Errors\ErrorContext;
 use ElkArte\Exceptions\Exception;
-use ElkArte\FileFunctions;
+use ElkArte\Helper\FileFunctions;
+use ElkArte\Helper\TokenHash;
+use ElkArte\Helper\Util;
 use ElkArte\Languages\Txt;
 use ElkArte\PrivacyPolicy;
 use ElkArte\SettingsForm\SettingsForm;
-use ElkArte\TokenHash;
-use ElkArte\Util;
 
 /**
  * ManageRegistration admin controller: handles the registration pages

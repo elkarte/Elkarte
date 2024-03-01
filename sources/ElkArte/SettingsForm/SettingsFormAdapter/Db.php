@@ -17,9 +17,9 @@
 namespace ElkArte\SettingsForm\SettingsFormAdapter;
 
 use BBC\ParserWrapper;
-use ElkArte\DataValidator;
+use ElkArte\Helper\DataValidator;
+use ElkArte\Helper\Util;
 use ElkArte\Languages\Txt;
-use ElkArte\Util;
 
 /**
  * Class Db
@@ -428,7 +428,7 @@ class Db extends Adapter
 	private function setMasks(array $configVar, $str)
 	{
 		$known_rules = [
-			'nohtml' => '\\ElkArte\\Util::htmlspecialchars[' . ENT_QUOTES . ']',
+			'nohtml' => '\\ElkArte\\Helper\\Util::htmlspecialchars[' . ENT_QUOTES . ']',
 			'email' => 'valid_email',
 			'url' => 'valid_url',
 		];

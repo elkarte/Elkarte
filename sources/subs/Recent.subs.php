@@ -15,8 +15,8 @@
  */
 
 use BBC\ParserWrapper;
+use ElkArte\Helper\Util;
 use ElkArte\User;
-use ElkArte\Util;
 
 /**
  * Get the latest posts of a forum.

@@ -20,7 +20,7 @@ namespace ElkArte\Controller;
 use ElkArte\AbstractController;
 use ElkArte\Action;
 use ElkArte\Exceptions\Exception;
-use ElkArte\Util;
+use ElkArte\Helper\Util;
 
 /**
  * Allows to take a topic and split at a point or select individual messages to

@@ -1,6 +1,6 @@
 <?php
 
-use ElkArte\Util;
+use ElkArte\Helper\Util;
 use PHPUnit\Framework\TestCase;
 
 class UtilBasic extends TestCase

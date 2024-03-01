@@ -17,18 +17,18 @@
  *
  */
 
+use ElkArte\Attachments\AttachmentsDirectory;
+use ElkArte\Attachments\TemporaryAttachment;
+use ElkArte\Attachments\TemporaryAttachmentsList;
 use ElkArte\Cache\Cache;
 use ElkArte\Errors\AttachmentErrorContext;
 use ElkArte\Errors\Errors;
 use ElkArte\Graphics\Image;
+use ElkArte\Helper\FileFunctions;
+use ElkArte\Helper\TokenHash;
 use ElkArte\Http\FsockFetchWebdata;
-use ElkArte\TemporaryAttachment;
 use ElkArte\Themes\ThemeLoader;
-use ElkArte\TokenHash;
 use ElkArte\User;
-use ElkArte\AttachmentsDirectory;
-use ElkArte\TemporaryAttachmentsList;
-use ElkArte\FileFunctions;
 
 /**
  * Handles the actual saving of attachments to a directory.

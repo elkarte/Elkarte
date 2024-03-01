@@ -12,6 +12,8 @@
 
 namespace ElkArte;
 
+use ElkArte\Helper\HttpReq;
+
 /**
  * Handle events in controller and classes
  *

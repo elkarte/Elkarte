@@ -12,9 +12,9 @@
  */
 
 use ElkArte\Errors\ErrorContext;
+use ElkArte\Helper\Util;
 use ElkArte\Languages\Txt;
 use ElkArte\User;
-use ElkArte\Util;
 
 /**
  * Create PM draft in the database

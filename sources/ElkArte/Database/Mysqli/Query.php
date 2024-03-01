@@ -21,9 +21,9 @@ use ElkArte\Cache\Cache;
 use ElkArte\Database\AbstractQuery;
 use ElkArte\Database\AbstractResult;
 use ElkArte\Errors\Errors;
+use ElkArte\Helper\Util;
+use ElkArte\Helper\ValuesContainer;
 use ElkArte\Languages\Txt;
-use ElkArte\Util;
-use ElkArte\ValuesContainer;
 
 /**
  * SQL database class, implements database class to control mysql functions

@@ -524,7 +524,7 @@ class PostNotifications extends AbstractModel
 				$sendMail = new BuildMail();
 				$sendMail->setEmailReplacements($replacements);
 
-				// Using the maillist functions? Then adjust the from wrapper
+				// Using the maillist functions? Then adjust the wrapper
 				if ($maillist && $email_perm && $type === self::NOTIFY_REPLY && !empty($notifyDatum['notify_send_body']))
 				{
 					// Set from name based on group or maillist mode

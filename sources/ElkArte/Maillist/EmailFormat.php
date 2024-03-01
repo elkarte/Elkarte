@@ -13,7 +13,7 @@
 
 namespace ElkArte\Maillist;
 
-use ElkArte\Util;
+use ElkArte\Helper\Util;
 
 /**
  * Attempts, though an outrageous set of assumptions, to reflow/format an email message

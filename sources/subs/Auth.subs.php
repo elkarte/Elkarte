@@ -15,10 +15,10 @@
  */
 
 use ElkArte\Errors\ErrorContext;
+use ElkArte\Helper\TokenHash;
+use ElkArte\Helper\Util;
 use ElkArte\Languages\Txt;
-use ElkArte\TokenHash;
 use ElkArte\User;
-use ElkArte\Util;
 
 /**
  * Sets the login cookie and session based on the id_member and password passed.
