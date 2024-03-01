@@ -62,10 +62,13 @@ jobs:
           extensions: dom, curl, libxml, mbstring, zip, mysqli, gd, exif, iconv, apcu, memcached
           coverage: xdebug
           tools: composer:v2
-          ini-values: error_reporting=E_ALL, allow_url_fopen=On, opcache.enable=0, auto_prepend_file="/usr/share/php/prepend.php", auto_append_file="/usr/share/php/append.php"
+          ini-values: error_log=/tmp/php_errors.log, error_reporting=E_ALL, allow_url_fopen=On, opcache.enable=0, auto_prepend_file="/usr/share/php/prepend.php", auto_append_file="/usr/share/php/append.php"
 
       - name: Setup problem matchers for PHP
         run: echo "::add-matcher::${{ runner.tool_cache }}/php.json"
+
+      - name: Setup problem matchers for PHPUnit
+        run: echo "::add-matcher::${{ runner.tool_cache }}/phpunit.json"
 
       - name: Setup Server Environment
         env:
@@ -89,7 +92,8 @@ jobs:
           PHP_VERSION: ${{ matrix.php }}
         run: |
           sudo cat /var/log/nginx/127.0.0.1.error.log
-          sudo cat /tmp/selenium.log
+          sudo cat /tmp/php_errors.log
+          # sudo cat /tmp/selenium.log
           .github/setup-failure.sh $DB $PHP_VERSION
         working-directory: ./elkarte
   # End Selenium headless browser testing
