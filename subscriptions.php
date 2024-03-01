@@ -89,7 +89,7 @@ if (empty($txnType))
 }
 
 // Get the subscription and member ID amongst others...
-@list($subscription_id, $member_id) = $gatewayClass->precheck();
+@[$subscription_id, $member_id] = $gatewayClass->precheck();
 
 // Integer these just in case.
 $subscription_id = (int) $subscription_id;
@@ -147,6 +147,7 @@ if ($request->num_rows() === 0)
 {
 	generateSubscriptionError(sprintf($txt['paid_count_not_find_subscription_log'], $member_id, $subscription_id), $notify_users);
 }
+
 $subscription_info += $request->fetch_assoc();
 $request->free_result();
 
@@ -194,6 +195,7 @@ elseif ($gatewayClass->isPayment() || $gatewayClass->isSubscription())
 			{
 				$subscription_info['payments_pending']--;
 			}
+
 			break;
 		}
 
@@ -214,7 +216,8 @@ elseif ($gatewayClass->isPayment() || $gatewayClass->isSubscription())
 			{
 				continue;
 			}
-			elseif ((float) $value == (float) $total_cost)
+
+			if ((float) $value === (float) $total_cost)
 			{
 				$found_duration = strtoupper(substr($duration, 0, 1));
 			}
@@ -282,7 +285,7 @@ $gatewayClass->close($subscription_id);
  * Log an error then exit
  *
  * @param string $text
- * @param mixed[] $notify_users
+ * @param array $notify_users
  */
 function generateSubscriptionError($text, $notify_users = [])
 {

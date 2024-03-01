@@ -934,12 +934,9 @@ function template_homepage_sample1($method = 'source')
 		$header = '<?php require("' . (User::$info->is_admin ? addslashes(realpath(BOARDDIR . '/SSI.php')) : 'SSI.php') . '"); ?>' . "\n" . $header;
 		return $header . template_homepage_sample1_html() . $footer;
 	}
-	else
-	{
-		echo $header;
-		template_homepage_sample1_php();
-		echo $footer;
-	}
+ echo $header;
+ template_homepage_sample1_php();
+ echo $footer;
 }
 
 function template_homepage_sample1_php()
