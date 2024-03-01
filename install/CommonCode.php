@@ -13,7 +13,7 @@
  */
 
 use ElkArte\ext\Composer\Autoload\ClassLoader;
-use ElkArte\FileFunctions;
+use ElkArte\Helper\FileFunctions;
 
 /**
  * Grabs all the files with db definitions and loads them.

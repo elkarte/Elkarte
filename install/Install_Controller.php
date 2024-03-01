@@ -15,7 +15,7 @@
 use ElkArte\Agreement;
 use ElkArte\ext\Composer\Autoload\ClassLoader;
 use ElkArte\User;
-use ElkArte\Util;
+use ElkArte\Helper\Util;
 
 /**
  * This does the installation steps
@@ -24,6 +24,7 @@ class Install_Controller
 {
 	/** @var array The installation steps*/
 	public $steps = [];
+
 	/** @var int Are we there yet? */
 	public $overall_percent = 0;
 

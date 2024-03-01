@@ -22,8 +22,9 @@
  */
 class InstallInstructions_install_2_0_postgresql
 {
-	protected $db = null;
-	protected $table = null;
+	protected $db;
+
+	protected $table;
 
 	public function __construct($db, $table)
 	{

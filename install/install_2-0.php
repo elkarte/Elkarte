@@ -20,6 +20,7 @@
 class InstallInstructions_install_2_0
 {
 	protected $db;
+
 	protected $table;
 
 	public function __construct($db, $table)

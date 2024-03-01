@@ -33,8 +33,9 @@
  */
 class UpgradeInstructions_upgrade_1_1
 {
-	protected $db = null;
-	protected $table = null;
+	protected $db;
+
+	protected $table;
 
 	public function __construct($db, $table)
 	{
