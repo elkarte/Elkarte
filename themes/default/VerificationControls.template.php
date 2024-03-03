@@ -101,7 +101,7 @@ function template_verification_control_emptyfield($verify_id, $verify_context)
 function template_verification_control_recaptcha($id, $values)
 {
 	echo '
-				<div id="g-recaptcha" data-sitekey="' . $values['site_key'] . '" class="centertext" style="display: flex"></div>';
+	<div id="g-recaptcha" data-sitekey="' . $values['site_key'] . '" style="display: flex; justify-content: center;"></div>';
 }
 
 /**
@@ -110,7 +110,7 @@ function template_verification_control_recaptcha($id, $values)
 function template_verification_control_hcaptcha($id, $values)
 {
 	echo '
-				<div id="h-captcha" data-sitekey="' . $values['site_key'] . '" class="centertext" style="display: flex"></div>';
+	<div id="h-captcha" data-sitekey="' . $values['site_key'] . '" style="display: flex; justify-content: center;"></div>';
 }
 
 /**
@@ -119,9 +119,18 @@ function template_verification_control_hcaptcha($id, $values)
 function template_verification_control_keycaptcha($id, $values)
 {
 	echo '
-	<div class="centertext" style="display: flex">
+	<div style="display: flex; justify-content: center;">
 		<div id="div_for_keycaptcha">
 			<input name="key-capcode" id="key-capcode" type="hidden" value="">
 		</div>
 	</div>';
+}
+
+/**
+ * Turnstile, Empty div to be populated by the JS
+ */
+function template_verification_control_turnstile()
+{
+	echo '
+	<div id="TurnstileControl" style="display: flex; justify-content: center;"></div>';
 }
