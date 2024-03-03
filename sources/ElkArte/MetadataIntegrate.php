@@ -213,8 +213,7 @@ class MetadataIntegrate
 	}
 
 	/**
-	 * Build and return the article schema.  This is intended for use when displaying
-	 * a topic.
+	 * Build and return the article schema.  This is intended for use when displaying  a topic.
 	 *
 	 * @return array
 	 */
@@ -230,41 +229,56 @@ class MetadataIntegrate
 		}
 
 		$logo = $this->getLogo();
+		$likes = $this->getLikeCount();
 		$smd = [
 			'@context' => 'https://schema.org',
-			'@type' => 'DiscussionForumPosting',
-			'@id' => $this->data['href'],
-			'headline' => $this->getPageTitle(),
-			'author' => [
-				'@type' => 'Person',
-				'name' => $this->data['member']['name'],
-				'url' => $this->data['member']['href'] ?? ''
-			],
+			'@type' => 'WebPage',
 			'url' => $this->data['href'],
-			'articleBody' => $this->data['html_body'],
-			'articleSection' => $board_info['name'] ?? '',
-			'datePublished' => utcTime($this->data['timestamp'], true),
-			'dateModified' => empty($this->data['modified']['name']) ? utcTime($this->data['timestamp'], true) : utcTime($this->data['modified']['timestamp'], true),
-			'interactionStatistic' => [
-				'@type' => 'InteractionCounter',
-				'interactionType' => 'https://schema.org/ReplyAction',
-				'userInteractionCount' => empty($context['real_num_replies']) ? 0 : $context['real_num_replies'],
-			],
-			'wordCount' => str_word_count($this->data['raw_body']),
-			'publisher' => [
-				'@type' => 'Organization',
-				'name' => un_htmlspecialchars($mbname),
-				'logo' => [
-					'@type' => 'ImageObject',
-					'url' => $logo[2],
-					'width' => $logo[0],
-					'height' => $logo[1],
+			'mainEntity' => [
+				'@type' => 'DiscussionForumPosting',
+				'@id' => $this->data['href'],
+				'headline' => $this->getPageTitle(),
+				'datePublished' => utcTime($this->data['timestamp'], true),
+				'dateModified' => empty($this->data['modified']['name']) ? utcTime($this->data['timestamp'], true) : utcTime($this->data['modified']['timestamp'], true),
+				'url' => $this->data['href'],
+				'articleSection' => $board_info['name'] ?? '',
+				'author' => [
+					'@type' => 'Person',
+					'name' => $this->data['member']['name'],
+					'url' => $this->data['member']['href'] ?? ''
 				],
-			],
-			'mainEntityOfPage' => [
-				'@type' => 'WebPage',
-				'@id' => empty($context['canonical_url']) ? $boardurl : $context['canonical_url'],
-			],
+				//num_views
+				// count(likes)
+				'interactionStatistic' => [
+					[
+						'@type' => 'InteractionCounter',
+						'interactionType' => 'https://schema.org/ViewAction',
+						'userInteractionCount' => empty($context['num_views']) ? 0 : $context['num_views'],
+					],
+					[
+						'@type' => 'InteractionCounter',
+						'interactionType' => 'https://schema.org/CommentAction',
+						'userInteractionCount' => empty($context['real_num_replies']) ? 0 : $context['real_num_replies'],
+					],
+					[
+						'@type' => 'InteractionCounter',
+						'interactionType' => 'https://schema.org/LikeAction',
+						'userInteractionCount' => $likes,
+					]
+				],
+				'articleBody' => $this->data['html_body'],
+				'wordCount' => str_word_count($this->data['raw_body']),
+				'publisher' => [
+					'@type' => 'Organization',
+					'name' => un_htmlspecialchars($mbname),
+					'logo' => [
+						'@type' => 'ImageObject',
+						'url' => $logo[2],
+						'width' => $logo[0],
+						'height' => $logo[1],
+					],
+				],
+			]
 		];
 
 		// If the post has any attachments, set an ImageObject
@@ -454,5 +468,24 @@ class MetadataIntegrate
 		$metaOg['description'] = '<meta property="og:description" content="' . $description . '" />';
 
 		return $metaOg;
+	}
+
+	/**
+	 * Get the total count of likes.
+	 *
+	 * This method calculates the total count of likes from the $context['likes'] array.
+	 *
+	 * @return int The total count of likes.
+	 */
+	public function getLikeCount()
+	{
+		global $context;
+
+		$total = 0;
+		foreach($context['likes'] as $item) {
+			$total += $item['count'];
+		}
+
+		return $total;
 	}
 }
