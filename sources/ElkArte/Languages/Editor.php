@@ -179,7 +179,7 @@ class Editor
 	}
 
 	/**
-	 * Save method saves content to a file with the specified file name.
+	 * Save method saves content to the DB with the specified file name.
 	 *
 	 * @param string $file_name The name of the file to save the content to.
 	 * @param array $txt The array of content to save.

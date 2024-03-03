@@ -61,3 +61,4 @@ $editortxt['Insert Spoiler'] = 'Insert Spoiler';
 $editortxt['Insert Footnote'] = 'Insert Footnote';
 $editortxt['Split Tag'] = 'Split quote at cursor (ctrl+enter)';
 $editortxt['Description (optional):'] = 'Description (optional):';
+$editortxt['Insert Giphy'] = 'Insert a Giphy GIF';

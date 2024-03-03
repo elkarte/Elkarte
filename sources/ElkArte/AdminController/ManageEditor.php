@@ -131,6 +131,8 @@ class ManageEditor extends AbstractController
 	 */
 	private function _settings()
 	{
+		global $txt;
+
 		$config_vars = array(
 			array('check', 'enableBBC'),
 			array('check', 'enableBBC', 0, 'onchange' => "toggleBBCDisabled('disabledBBC', !this.checked);"),
@@ -139,6 +141,10 @@ class ManageEditor extends AbstractController
 			array('title', 'editorSettings'),
 			array('check', 'enableUndoRedo'),
 			array('check', 'enableSplitTag'),
+			array('check', 'enableGiphy'),
+			array('text', 'giphyApiKey', 40, 'subtext' => $txt['giphyApiURL']),
+			array('select', 'giphyRating', ['g' => 'G', 'pg' => 'PG', 'pg13' => 'PG13', 'r' => 'R']),
+			array('text', 'giphyLanguage', 5, 'subtext' => $txt['giphyLanguageURL']),
 
 			array('title', 'mods_cat_modifications_misc'),
 			array('check', 'autoLinkUrls'), // @todo not editor or bbc

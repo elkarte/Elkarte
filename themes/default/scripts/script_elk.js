@@ -439,7 +439,7 @@ function relativeTime(sFrom, sTo)
 	{
 		this.dateTo = new Date();
 	}
-	else if (parseInt(sTo) == 'NaN')
+	else if (parseInt(sTo) === 'NaN')
 	{
 		var sToSplit = sTo.split(/\D/);
 		this.dateTo = new Date(sToSplit[0], --sToSplit[1], sToSplit[2], sToSplit[3], sToSplit[4]);
@@ -449,7 +449,7 @@ function relativeTime(sFrom, sTo)
 		this.dateTo = new Date(sTo);
 	}
 
-	if (parseInt(sFrom) == 'NaN')
+	if (parseInt(sFrom) === 'NaN')
 	{
 		var sFromSplit = sFrom.split(/\D/);
 		this.dateFrom = new Date(sFromSplit[0], --sFromSplit[1], sFromSplit[2], sFromSplit[3], sFromSplit[4]);
@@ -2351,4 +2351,40 @@ async function isFunctionLoaded(selector, limit)
 	}
 
 	return false;
+}
+
+/**
+ * Debounces a function by delaying its execution until a certain amount of time has passed
+ * without it being called again.
+ *
+ * This is useful for scenarios like search inputs or scroll events, where you want to wait for
+ * the user to finish typing or scrolling before executing a function.
+ *
+ * https://github.com/you-dont-need/You-Dont-Need-Lodash-Underscore
+ *
+ * @param {Function} func - The function to be debounced.
+ * @param {number} wait - The time delay in milliseconds.
+ * @param {boolean} immediate - Determines whether the function should be executed immediately on the leading edge.
+ * @return {Function} - The debounced function.
+ */
+function debounce(func, wait, immediate)
+{
+	var timeout;
+	return function () {
+		var context = this, args = arguments;
+
+		clearTimeout(timeout);
+		if (immediate && !timeout)
+		{
+			func.apply(context, args);
+		}
+
+		timeout = setTimeout(function () {
+			timeout = null;
+			if (!immediate)
+			{
+				func.apply(context, args);
+			}
+		}, wait);
+	};
 }
