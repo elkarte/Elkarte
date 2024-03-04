@@ -164,12 +164,16 @@ function create_control_richedit($editorOptions)
 }
 
 /**
- * Defines plugins to load and loads the JS needed by core plugins.
- * Will merge in plugins added by addons.  Its the editor that will load
- * and call the plugins, this just defines what to load
+ *  Defines what editor plugins to load
  *
- * @param array $editor_context
- * @return array
+ *  What it does:
+ *  - loads the JS needed by core plugins.
+ *  - loads the CSS needed by core plugins
+ *  - Will merge in plugins added by addons.
+ *  - The editor will load and init the plugins
+ *
+ * @param array $editor_context The editor context containing the plugin addons.
+ * @return array The list of loaded plugins.
  */
 function loadEditorPlugins($editor_context)
 {
@@ -177,6 +181,7 @@ function loadEditorPlugins($editor_context)
 
 	$plugins = [];
 	$neededJS = [];
+	$neededCSS = [];
 
 	$plugins[] = 'initialLoad';
 	$neededJS[] = 'initialLoad.plugin.js';
@@ -199,17 +204,29 @@ function loadEditorPlugins($editor_context)
 		$neededJS = array_merge($neededJS, ['jquery.atwho.min.js', 'jquery.caret.min.js', 'mentioning.plugin.js']);
 	}
 
-	if (!empty($neededJS))
+	if (!empty($modSettings['enableGiphy']))
 	{
-		loadJavascriptFile($neededJS, array('defer' => true));
+		$plugins[] = 'giphy';
+		$neededJS[] = 'giphy.plugin.js';
+		$neededCSS[] = 'sceditor.giphy.css';
 	}
 
-	// Merge with other plugins added by core features or addons
+	if (!empty($neededJS))
+	{
+		loadJavascriptFile($neededJS, ['defer' => true]);
+	}
+
+	if (!empty($neededCSS))
+	{
+		loadCSSFile($neededCSS);
+	}
+
+	// Merge with other plugins added by core features or addons which have loaded JS/CSS as needed
 	if (!empty($editor_context['plugin_addons']))
 	{
 		if (!is_array($editor_context['plugin_addons']))
 		{
-			$editor_context['plugin_addons'] = array($editor_context['plugin_addons']);
+			$editor_context['plugin_addons'] = [$editor_context['plugin_addons']];
 		}
 
 		$plugins = array_filter(array_merge($plugins, $editor_context['plugin_addons']));
@@ -219,8 +236,7 @@ function loadEditorPlugins($editor_context)
 }
 
 /**
- * Loads any built in plugin options and merges in any addon defined
- * ones.
+ * Loads any built in plugin options and merges in any addon defined ones.
  *
  * @param array $editor_context
  * @param string $editor_id
@@ -370,7 +386,7 @@ function loadToolbarDefaults()
 		array('quote', 'code', 'table'),
 		array('bulletlist', 'orderedlist', 'horizontalrule'),
 		array('spoiler', 'footnote', 'splittag'),
-		array('image', 'link', 'email'),
+		array('image', 'giphy', 'link', 'email'),
 		array('undo', 'redo'),
 	);
 
@@ -378,7 +394,7 @@ function loadToolbarDefaults()
 	call_integration_hook('integrate_bbc_buttons', array(&$bbc_tags));
 
 	// Show the format and toggle buttons
-	$bbc_tags['row2'][] = array('removeformat', 'source');
+	$bbc_tags['row2'][] = ['removeformat', 'source'];
 
 	return $bbc_tags;
 }

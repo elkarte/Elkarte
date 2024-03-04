@@ -661,9 +661,15 @@ $txt['disabledBBC'] = 'Enabled BBC tags';
 $txt['bbcTagsToUse'] = 'Enabled BBC tags';
 $txt['bbcTagsToUse_select'] = 'Select the tags allowed to be used';
 $txt['bbcTagsToUse_select_all'] = 'Select all tags';
-$txt['editorSettings'] = 'Editor Options';
+$txt['editorSettings'] = 'Editor Plugins';
 $txt['enableUndoRedo'] = 'Enable the undo/redo plugin';
 $txt['enableSplitTag'] = 'Enable the split tag plugin';
+$txt['enableGiphy'] = 'Enable the Giphy plugin';
+$txt['giphyApiKey'] = 'Enter you Giphy API key';
+$txt['giphyRating'] = 'Permitted Giphy rating';
+$txt['giphyLanguage'] = 'Giphy language code, defaults to en';
+$txt['giphyLanguageURL'] = '<a href="https://developers.giphy.com/docs/optional-settings/#language-support">Language Codes</a>';
+$txt['giphyApiURL'] = '<a href="https://support.giphy.com/hc/en-us/articles/360020283431-Request-A-GIPHY-API-Key">Request API Key</a>';
 
 $txt['enableParticipation'] = 'Enable participation icons';
 $txt['enableFollowup'] = 'Enable followups';
