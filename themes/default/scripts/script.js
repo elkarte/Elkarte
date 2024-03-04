@@ -43,7 +43,7 @@ var ua = navigator.userAgent.toLowerCase(),
  * @param {string} sType xml, json, html, defaults to xml
  * @param {boolean} bHeader true sends X-Requested-With, expected by elkarte
  */
-function fetchDocument(sUrl, funcCallback, sType, bHeader = true)
+function fetchDocument(sUrl, funcCallback, sType = null, bHeader = true)
 {
 	let oCaller = this,
 		headers = bHeader ? {'X-Requested-With': 'XMLHttpRequest'} : {},

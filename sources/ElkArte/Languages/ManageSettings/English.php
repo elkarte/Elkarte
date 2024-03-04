@@ -197,6 +197,14 @@ $txt['keycaptcha_enable'] = 'Enable KeyCaptcha verification';
 $txt['keycaptcha_verification'] = 'Verification KeyCaptcha';
 $txt['keycaptcha_secret_key'] = 'KeyCaptcha Private key';
 
+$txt['turnstile_desc'] = 'To enable Turnstile on your forum you must create a <a href="https://www.cloudflare.com/products/turnstile/">Turnstile API</a> for your site.';
+$txt['turnstile_language'] = 'Enter language code, leave empty to for automatic detection';
+$txt['turnstile_language_desc'] = 'Find <a href="https://developers.cloudflare.com/turnstile/reference/supported-languages/">language codes here</a>';
+$txt['turnstile_enable'] = 'Enable Turnstile verification';
+$txt['turnstile_verification'] = 'Validation Turnstile';
+$txt['turnstile_site_key'] = 'Turnstile Site Key';
+$txt['turnstile_secret_key'] = 'Turnstile Secret Key';
+
 $txt['moderation_settings'] = 'Moderation Settings';
 $txt['setting_warning_enable'] = 'Enable User Warning System';
 $txt['warning_enable'] = '<strong>User Warning System</strong><br />This feature enables members of the admin and moderation team to issue warnings to members - and to use a members warning level to determine the actions available to them on the forum. Upon enabling this feature a permission will be available within the permissions section to define which groups may assign warnings to members. Warning levels can be adjusted from a member\'s profile.';
