@@ -6,6 +6,8 @@
  * @version 2.0 dev
  */
 
+/** global: elk_scripturl, elk_session_var, elk_session_id, sceditor */
+
 /*
  * Add Giphy functionality to SCEditor
  */
