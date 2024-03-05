@@ -6,6 +6,8 @@
  * @version 2.0 dev
  */
 
+/** global: elk_session_var, elk_session_id, elk_scripturl, sceditor  */
+
 /**
  * This file contains javascript associated with the drafts auto function as it
  * relates to an sceditor invocation
@@ -15,12 +17,12 @@
 	'use strict';
 
 	// Editor instance
-	var editor;
+	let editor;
 
 	function Elk_Drafts(options)
 	{
 		// All the passed options and defaults are loaded to the opts object
-		this.opts = $.extend({}, this.defaults, options);
+		this.opts = Object.assign({}, this.defaults, options || {});
 
 		// Attach mousedown events to the forms submit buttons
 		this.formCheck();
@@ -48,7 +50,7 @@
 		}
 
 		// Get the editor text, either from sceditor or from the quicktext textarea
-		var sPostdata = editor.val();
+		const sPostdata = editor.val();
 
 		// Nothing to save?
 		if (isEmptyText(sPostdata))
@@ -61,17 +63,28 @@
 		this.opts._bInDraftMode = true;
 
 		// Create a clone form to populate
-		var $aForm = $('#postmodify').clone();
+		let oForm = document.querySelector('#postmodify').cloneNode(true);
 
-		$aForm.find("textarea[name='message']").val(sPostdata.replace(/&#/g, "&#38;#"));
-		$aForm.append($('<input />').attr('name', 'save_draft').val(true));
-		$aForm.append($('<input />').attr('name', 'autosave').val(true));
+		let	textarea = oForm.querySelector("textarea[name='message']");
+		textarea.value = sPostdata.replace(/&#/g, "&#38;#");
 
-		// Keep track of source or wysiwyg when using the full editor
-		$aForm.append($('<input />').attr('name', 'message_mode').val(editor.inSourceMode() ? '1' : '0'));
+		let inputSaveDraft = document.createElement('input');
+		inputSaveDraft.setAttribute('name', 'save_draft');
+		inputSaveDraft.value = 1;
+		oForm.appendChild(inputSaveDraft);
+
+		let inputAutosave = document.createElement('input');
+		inputAutosave.setAttribute('name', 'autosave');
+		inputAutosave.value = 1;
+		oForm.appendChild(inputAutosave);
+
+		let inputMessageMode = document.createElement('input');
+		inputMessageMode.setAttribute('name', 'message_mode');
+		inputMessageMode.value = editor.inSourceMode() ? '1' : '0';
+		oForm.appendChild(inputMessageMode);
 
 		// Send in the request to save the data
-		this.draftAjax($aForm.serialize(), "?action=post2;board=" + this.opts.iBoard + ";api=xml");
+		this.draftAjax(serialize(oForm), "?action=post2;board=" + this.opts.iBoard + ";api=xml");
 	};
 
 	/**
@@ -96,7 +109,7 @@
 		}
 
 		// Get the editor data
-		var sPostdata = editor.val();
+		let sPostdata = editor.val();
 
 		// Nothing to save
 		if (isEmptyText(sPostdata))
@@ -109,33 +122,57 @@
 		this.opts._bInDraftMode = true;
 
 		// Get the to and bcc values
-		var aTo = this.draftGetRecipient('recipient_to[]'),
+		let aTo = this.draftGetRecipient('recipient_to[]'),
 			aBcc = this.draftGetRecipient('recipient_bcc[]');
 
 		// Clone the form, we will use this to send
-		var $aForm = $('#pmFolder').clone();
+		let oForm = document.querySelector('#pmFolder').cloneNode(true);
 
-		$aForm.find("textarea[name='message']").val(sPostdata.replace(/&#/g, "&#38;#"));
-		$aForm.find("input[name='subject']").val($aForm.find("input[name='subject']").val().replace(/&#/g, "&#38;#"));
-		$aForm.find("input[name='replied_to']").val(parseInt($aForm.find("input[name='replied_to']").val()));
-		if ($aForm.find("input[name='id_pm_draft']").length == 1)
+		let messageTextarea = oForm.querySelector("textarea[name='message']");
+		messageTextarea.value = sPostdata.replace(/&#/g, "&#38;#");
+
+		let subjectInput = oForm.querySelector("input[name='subject']");
+		subjectInput.value = subjectInput.value.replace(/&#/g, "&#38;#");
+
+		let repliedToInput = oForm.querySelector("input[name='replied_to']");
+		repliedToInput.value = parseInt(repliedToInput.value).toString();
+
+		let idPmDraftInput = oForm.querySelector("input[name='id_pm_draft']");
+		if (idPmDraftInput)
 		{
-			$aForm.find("input[name='id_pm_draft']").val(parseInt($aForm.find("input[name='id_pm_draft']").val()));
+			idPmDraftInput.value = parseInt(idPmDraftInput.value).toString();
 		}
 		else
 		{
-			$aForm.append($('<input />').attr('name', 'id_pm_draft').val(0));
+			let newInput = document.createElement('input');
+			newInput.name = 'id_pm_draft';
+			newInput.value = '0';
+			oForm.appendChild(newInput);
 		}
-		$aForm.append($('<input />').attr('name', 'recipient_to').val(aTo));
-		$aForm.append($('<input />').attr('name', 'recipient_bcc').val(aBcc));
-		$aForm.append($('<input />').attr('name', 'save_draft').val(true));
-		$aForm.append($('<input />').attr('name', 'autosave').val(true));
 
-		// Keep track of source or wysiwyg when using the full editor
-		$aForm.append($('<input />').attr('name', 'message_mode').val(editor.inSourceMode() ? '1' : '0'));
+		['recipient_to', 'recipient_bcc', 'save_draft', 'autosave', 'message_mode'].forEach(name => {
+			let input = document.createElement('input');
+			input.name = name;
+			switch (name)
+			{
+				case 'message_mode':
+					input.value = editor.inSourceMode() ? '1' : '0';
+					break;
+				case 'save_draft':
+				case 'autosave':
+					input.value = '1';
+					break;
+				case 'recipient_to':
+					input.value = aTo.join(', ');
+					break;
+				case 'recipient_bcc':
+					input.value = aBcc.join(', ');
+					break;			}
+			oForm.appendChild(input);
+		});
 
 		// Send in (post) the document for saving
-		this.draftAjax($aForm.serialize(), "?action=pm;sa=send2;api=xml");
+		this.draftAjax(serialize(oForm), "?action=pm;sa=send2;api=xml");
 	};
 
 	/**
@@ -153,21 +190,28 @@
 	Elk_Drafts.prototype.draftAjax = function (post, action)
 	{
 		// Send in the request to save the data
-		$.ajax({
-			type: "POST",
-			dataType: 'xml',
-			url: elk_scripturl + action,
-			data: post,
-			context: this
+		fetch(elk_scripturl + action, {
+			method: 'POST',
+			body: post,
+			headers: {
+				'X-Requested-With': 'XMLHttpRequest',
+				'Content-Type': 'application/x-www-form-urlencoded'
+			}
 		})
-			.done(function (data, textStatus, jqXHR)
-			{
-				// If it is not valid then move on
-				if (textStatus === 'success' && $(data).find("draft").length !== 0)
+			.then(response => {
+				if (!response.ok)
+				{
+					throw new Error("HTTP error " + response.status);
+				}
+				return response.text();
+			})
+			.then(str => new window.DOMParser().parseFromString(str, "text/xml"))
+			.then(data => {
+				if (data.getElementsByTagName("draft").length !== 0)
 				{
 					// Grab the returned draft id and saved time from the response
-					this.opts._sCurDraftId = $(data).find("draft").attr('id');
-					this.opts._sLastSaved = $(data).find("draft").text();
+					this.opts._sCurDraftId = data.getElementsByTagName("draft")[0].getAttribute('id');
+					this.opts._sLastSaved = data.getElementsByTagName("draft")[0].childNodes[0].nodeValue;
 
 					// Update the form to show we finished, if the id is not set, then set it
 					document.getElementById(this.opts.sLastID).value = this.opts._sCurDraftId;
@@ -181,8 +225,13 @@
 					}
 				}
 			})
-			.always(function ()
-			{
+			.catch(error => {
+				if ('console' in window && console.error)
+				{
+					console.error('Error : ', error);
+				}
+			})
+			.finally(() => {
 				// No matter what, we clear the saving indicator
 				this.opts._bInDraftMode = false;
 				document.getElementById('throbber').style.display = 'none';
@@ -201,21 +250,23 @@
 	 */
 	Elk_Drafts.prototype.draftGetRecipient = function (sField)
 	{
-		var oRecipient = document.forms.pmFolder.elements[sField],
+		let oRecipient = document.forms.pmFolder.elements[sField],
 			aRecipient = [];
 
 		if (typeof (oRecipient) !== 'undefined')
 		{
 			// Just one recipient
-			if ('value' in oRecipient)
+			if (oRecipient.nodeName === 'INPUT')
 			{
 				aRecipient.push(parseInt(oRecipient.value));
 			}
+			// Many recipients
 			else
 			{
-				// Or many !
-				for (var i = 0, n = oRecipient.length; i < n; i++)
+				for (let i = 0, n = oRecipient.length; i < n; i++)
+				{
 					aRecipient.push(parseInt(oRecipient[i].value));
+				}
 			}
 		}
 
@@ -236,7 +287,7 @@
 	 */
 	Elk_Drafts.prototype.startSaver = function ()
 	{
-		var oInstance = this;
+		const oInstance = this;
 		if (this.opts.bPM)
 		{
 			this.opts._interval_id = setInterval(function ()
@@ -260,18 +311,19 @@
 	 */
 	Elk_Drafts.prototype.formCheck = function ()
 	{
-		var oInstance = this,
-			formID = $('#' + this.opts.sTextareaID).closest("form").attr('id');
+		const oInstance = this;
+
+		let formID = document.getElementById(this.opts.sTextareaID).closest("form").id;
+		let form_submitt = document.querySelectorAll('#' + formID + ' [name="post"]');
 
 		// Prevent autosave on post/save selection by mouse or keyboard
-		var $_form_submitt =  $('#' + formID + ' [name="post"]');
-		$_form_submitt.on('mousedown', oInstance, function() {
-			oInstance.opts._bInDraftMode = true;
-		});
-
-		$_form_submitt.on('keydown', oInstance, function ()
-		{
-			oInstance.opts._bInDraftMode = true;
+		form_submitt.forEach(function(form) {
+			form.addEventListener('mousedown', function() {
+				oInstance.opts._bInDraftMode = true;
+			});
+			form.addEventListener('keydown', function() {
+				oInstance.opts._bInDraftMode = true;
+			});
 		});
 	};
 
@@ -279,34 +331,19 @@
 	 * Private draft vars to keep track of what/where/why
 	 */
 	Elk_Drafts.prototype.defaults = {
-		/**
-		 * If we are currently in draft saving mode
-		 * @type {Boolean}
-		 */
+		/** @type {Boolean} If we are currently in draft saving mode */
 		_bInDraftMode: false,
 
-		/**
-		 * The id of the draft so it save/appends
-		 * @type {String}
-		 */
+		/** @type {String} The id of the draft so it save/appends */
 		_sCurDraftId: null,
 
-		/**
-		 * How often we are going to save a draft in the background
-		 * @type {Number}
-		 */
+		/** @type {Number} How often we are going to save a draft in the background */
 		_interval_id: null,
 
-		/**
-		 * The text to place in the last saved Div, comes from the xml response
-		 * @type {String}
-		 */
+		/** @type {String} The text to place in the last saved Div, comes from the xml response */
 		_sLastSaved: null,
 
-		/**
-		 * If the user has pressed a key since the last save
-		 * @type {Boolean}
-		 */
+		/** @type {Boolean} If the user has pressed a key since the last save */
 		_bCheckDraft: false
 	};
 
@@ -323,7 +360,7 @@
 	 */
 	sceditor.plugins.draft = function ()
 	{
-		var base = this,
+		let base = this,
 			oDrafts;
 
 		/**

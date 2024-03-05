@@ -9,6 +9,8 @@
  * @version 2.0 dev
  */
 
+/** global: elk_session_var, elk_session_id, elk_scripturl */
+
 /**
  * This file contains javascript associated with an auto suggest control.
  */
@@ -763,7 +765,7 @@ smc_AutoSuggest.prototype.autoSuggestUpdate = function ()
 		postString;
 
 	// Post values plus session
-	postString = "jsonString=" + JSON.stringify(obj) + "&" + this.opt.sSessionVar + "=" + this.opt.sSessionId;
+	postString = serialize(obj) + "&" + this.opt.sSessionVar + "=" + this.opt.sSessionId;
 
 	sendXMLDocument.call(this, this.sRetrieveURL.replace(/%scripturl%/g, elk_prepareScriptUrl(elk_scripturl)), postString, this.onSuggestionReceived);
 

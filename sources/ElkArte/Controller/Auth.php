@@ -86,7 +86,7 @@ class Auth extends AbstractController
 		}
 
 		theme()->getTemplates()->load('Login');
-		loadJavascriptFile('sha256.js', array('defer' => true));
+		loadJavascriptFile('ext/sha256.js', array('defer' => true));
 		$context['sub_template'] = 'login';
 
 		// Get the template ready.... not really much else to do.
@@ -170,7 +170,7 @@ class Auth extends AbstractController
 
 		// Load the template stuff
 		theme()->getTemplates()->load('Login');
-		loadJavascriptFile('sha256.js', array('defer' => true));
+		loadJavascriptFile('ext/sha256.js', array('defer' => true));
 		$context['sub_template'] = 'login';
 
 		// Set up the default/fallback stuff.
@@ -645,7 +645,7 @@ class Auth extends AbstractController
 
 		Txt::load('Login');
 		theme()->getTemplates()->load('Login');
-		loadJavascriptFile('sha256.js', array('defer' => true));
+		loadJavascriptFile('ext/sha256.js', array('defer' => true));
 		createToken('login');
 
 		// Never redirect to an attachment
@@ -673,7 +673,7 @@ class Auth extends AbstractController
 
 		Txt::load('Login');
 		theme()->getTemplates()->load('Login');
-		loadJavascriptFile('sha256.js', array('defer' => true));
+		loadJavascriptFile('ext/sha256.js', array('defer' => true));
 		createToken('login');
 
 		// Send a 503 header, so search engines don't bother indexing while we're in maintenance mode.

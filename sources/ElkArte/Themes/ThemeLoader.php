@@ -702,7 +702,7 @@ class ThemeLoader
 
 		$context['show_login_bar'] = true;
 		$context['theme_header_callbacks'][] = 'login_bar';
-		loadJavascriptFile('sha256.js', ['defer' => true]);
+		loadJavascriptFile('ext/sha256.js', ['defer' => true]);
 	}
 
 	/**

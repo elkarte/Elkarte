@@ -841,7 +841,7 @@ function revalidateMentions(sForm, sInput)
 				})
 					.fail(function (jqXHR, textStatus, errorThrown)
 					{
-						if ('console' in window)
+						if ('console' in window && console.info)
 						{
 							window.console.info(errorThrown);
 						}
@@ -2387,4 +2387,33 @@ function debounce(func, wait, immediate)
 			}
 		}, wait);
 	};
+}
+
+/**
+ * Serializes a form or object into a URL-encoded string.
+ *
+ * @param {HTMLFormElement|object} form - The form element, or object to serialize.
+ * @returns {string} - The serialized data as a URL-encoded string.
+ */
+function serialize(form)
+{
+	// Passed a form
+	if (form instanceof HTMLFormElement)
+	{
+		const formData = new FormData(form);
+
+		return new URLSearchParams(formData).toString();
+	}
+
+	// Or an object of key->pairs
+	let str = [];
+	for (let key in form)
+	{
+		if (form.hasOwnProperty(key))
+		{
+			str.push(encodeURIComponent(key) + "=" + encodeURIComponent(form[key]));
+		}
+	}
+
+	return str.join("&");
 }

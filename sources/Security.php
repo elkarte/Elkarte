@@ -236,7 +236,7 @@ function is_not_guest($message = '', $is_fatal = true)
 	else
 	{
 		theme()->getTemplates()->load('Login');
-		loadJavascriptFile('sha256.js', ['defer' => true]);
+		loadJavascriptFile('ext/sha256.js', ['defer' => true]);
 		createToken('login');
 		$context['sub_template'] = 'kick_guest';
 		$context['robot_no_index'] = true;

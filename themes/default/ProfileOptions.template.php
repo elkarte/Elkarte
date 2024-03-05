@@ -23,7 +23,7 @@ function template_ProfileOptions_init()
 
 	if (!empty($context['menu_item_selected']) && $context['menu_item_selected'] === 'notification')
 	{
-		loadJavascriptFile('jquery.multiselect.min.js');
+		loadJavascriptFile('ext/jquery.multiselect.min.js');
 		theme()->addInlineJavascript('
 			$(\'.select_multiple\').multiselect({\'language_strings\': {\'Select all\': ' . JavascriptEscape($txt['notify_select_all']) . '}});'
 			, true);

@@ -101,7 +101,7 @@ class Stats extends AbstractController
 		// Stats it is
 		Txt::load('Stats');
 		theme()->getTemplates()->load('Stats');
-		loadJavascriptFile(['stats.js', 'chart.min.js', 'elk_chart.js']);
+		loadJavascriptFile(['stats.js', 'ext/chart.min.js', 'elk_chart.js']);
 
 		// Build the link tree......
 		$context['linktree'][] = [

@@ -12,7 +12,7 @@
 	// Core Editor startup options, css, smiley box, validate wizzy, move into view when needed
 	sceditor.plugins.initialLoad = function() {
 		let base = this;
-		const MAX_RETRIES = 120;
+		const MAX_RETRIES = 300;
 		const isEditorLoaded = async selector => {
 			let retries = 0;
 			while (document.querySelector(selector) === null && retries < MAX_RETRIES)

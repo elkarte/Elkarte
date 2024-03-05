@@ -477,7 +477,7 @@ abstract class Theme
 		if (!empty($modSettings['enableCodePrettify']))
 		{
 			$this->loadVariant('prettify');
-			loadJavascriptFile('prettify.min.js', ['defer' => true]);
+			loadJavascriptFile('ext/prettify.min.js', ['defer' => true]);
 
 			$this->addInlineJavascript('
 				document.addEventListener("DOMContentLoaded", () => {

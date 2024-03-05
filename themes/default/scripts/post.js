@@ -622,9 +622,9 @@ function onDraftsReturned(oXMLDoc)
 }
 
 /**
- * Checks for empty subject or body on post submit.  These are also checked server side
- * but this provides a nice current page reminder.
+ * Checks for empty subject or body on post submit.
  *
+ * - These are also checked server side but this provides a nice current page reminder.
  * - If empty fields are found will use errorbox_handler to populate error(s)
  * - If empty adds listener to fields to clear errors as they are fixed
  *

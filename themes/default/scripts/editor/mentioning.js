@@ -151,34 +151,38 @@ elk_mentions.prototype.attachAtWho = function () {
 
 	function suggest(obj, callback)
 	{
-		let postString = "jsonString=" + JSON.stringify(obj) + "&" + elk_session_var + "=" + elk_session_id;
-		_self.names = [];
+		let postString = serialize(obj) + "&" + elk_session_var + "=" + elk_session_id;
 
-		// And how to ask for it
-		$.ajax({
-			url: elk_scripturl + "?action=suggest;api=xml",
-			data: postString,
-			type: "post",
-			async: true
+		fetch(elk_scripturl + "?action=suggest;api=xml", {
+			method: 'POST',
+			body: postString,
+			headers: {
+				'X-Requested-With': 'XMLHttpRequest',
+				'Content-Type': 'application/x-www-form-urlencoded'
+			}
 		})
-			.done(function (request) {
-				$(request).find('item').each(function (idx, item) {
-					// Add each one to the dropdown list for view/selection
-					_self.names[idx] = {
-						"id": $(item).attr('id'),
-						"name": $(item).text()
+			.then(response => {
+				if (!response.ok)
+				{
+					throw new Error("HTTP error " + response.status);
+				}
+				return response.text();
+			})
+			.then(str => new window.DOMParser().parseFromString(str, "text/xml"))
+			.then(data => {
+				_self.names = Array.from(data.getElementsByTagName('item')).map((item, idx) => {
+					return {
+						"id": item.getAttribute('id'),
+						"name": item.textContent
 					};
 				});
-
 				callback();
 			})
-			.fail(function (jqXHR, textStatus, errorThrown) {
-				if ('console' in window)
+			.catch((error) => {
+				if ('console' in window && console.info)
 				{
-					window.console.info('Error:', textStatus, errorThrown.name);
-					window.console.info(jqXHR.responseText);
+					window.console.info('Error:', error);
 				}
-
 				callback();
 			});
 	}

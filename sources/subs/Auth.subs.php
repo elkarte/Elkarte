@@ -202,7 +202,7 @@ function adminLogin($type = 'admin')
 
 	Txt::load('Admin');
 	theme()->getTemplates()->load('Login');
-	loadJavascriptFile('sha256.js', array('defer' => true));
+	loadJavascriptFile('ext/sha256.js', array('defer' => true));
 
 	// Validate what type of session check this is.
 	$types = array();

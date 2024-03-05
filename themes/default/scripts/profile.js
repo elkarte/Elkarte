@@ -55,7 +55,7 @@ function start_tabs()
 			ui.jqXHR.fail(function (jqXHR, textStatus, errorThrown)
 			{
 				ui.panel.html('<div></div>');
-				if ('console' in window)
+				if ('console' in window && console.info)
 				{
 					window.console.info(textStatus);
 					window.console.info(errorThrown);

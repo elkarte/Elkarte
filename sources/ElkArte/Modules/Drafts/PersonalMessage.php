@@ -262,7 +262,7 @@ class PersonalMessage extends AbstractModule
 					bPM: true
 				}';
 
-			loadJavascriptFile('drafts.plugin.js', ['defer' => true]);
+			loadJavascriptFile('editor/drafts.plugin.js', ['defer' => true]);
 			Txt::load('Post');
 
 			// Our not so concise shortcut line
