@@ -158,7 +158,7 @@ class Post extends AbstractModule
 						id_draft: ' . (empty($context['id_draft']) ? 0 : $context['id_draft']) . '
 					}';
 
-				loadJavascriptFile('drafts.plugin.js', ['defer' => true]);
+				loadJavascriptFile('editor/drafts.plugin.js', ['defer' => true]);
 			}
 
 			$context['shortcuts_text'] = $context['shortcuts_text'] ?? $txt['shortcuts_drafts'];

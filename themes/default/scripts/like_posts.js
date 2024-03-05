@@ -343,7 +343,7 @@
 						// the output from php error or access denied fatal errors etc
 						// err.data = oTxt.error_occurred + ' : ' + errorThrown;
 						// handleError(err);
-						if ('console' in window)
+						if ('console' in window && console.info)
 						{
 							window.console.info('fail:', textStatus, errorThrown.name);
 							window.console.info(err.responseText);

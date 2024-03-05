@@ -122,7 +122,7 @@ class Display extends AbstractModule
 					'value' => empty($context['id_draft']) ? 0 : $context['id_draft'],
 				];
 
-				loadJavascriptFile('drafts.plugin.js', ['defer' => true]);
+				loadJavascriptFile('editor/drafts.plugin.js', ['defer' => true]);
 			}
 		}
 	}

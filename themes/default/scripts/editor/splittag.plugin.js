@@ -37,7 +37,7 @@
 		 */
 		base.init = function ()
 		{
-			// The this variable will be set to the instance of the editor calling it
+			// "this" will be set to the instance of the editor calling it
 			editor = this;
 
 			// Add handler for a ctrl+enter key press, this is our keystroke cue to split the tag(s)
@@ -168,7 +168,6 @@
 				contentAfterRangeStart,
 				quote,
 				range,
-				blank,
 				attributes;
 
 			// Save the current state in case this goes bad
@@ -197,9 +196,8 @@
 				contentAfterRangeStart = range.extractContents();
 
 				// Apply the existing quote attributes to the new quote
-				$.each(attributes, function ()
-				{
-					$(contentAfterRangeStart).attr(this.name, this.value);
+				Object.keys(attributes).forEach(function (key) {
+					contentAfterRangeStart.setAttribute(key, attributes[key]);
 				});
 
 				// Collapse the block quote range, we want to insert after this.
@@ -210,8 +208,8 @@
 				// range.collapse(false);
 
 				// Create an area to place between the two quotes for text entry
-				blank = quote.ownerDocument.createElement('p');
-				$(blank).html('&nbsp;');
+				let blank = quote.ownerDocument.createElement('p');
+				blank.innerHTML = '&nbsp;';
 
 				// Insert the new elements
 				range.insertNode(contentAfterRangeStart);

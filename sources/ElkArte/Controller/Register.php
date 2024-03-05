@@ -194,7 +194,7 @@ class Register extends AbstractController
 		// Show the user the right form.
 		$context['sub_template'] = $current_step === 1 ? 'registration_agreement' : 'registration_form';
 		$context['page_title'] = $current_step === 1 ? $txt['registration_agreement'] : $txt['registration_form'];
-		loadJavascriptFile(array('register.js', 'mailcheck.min.js'));
+		loadJavascriptFile(array('register.js', 'ext/mailcheck.min.js'));
 
 		// Add the register chain to the link tree.
 		$context['linktree'][] = array(
@@ -848,7 +848,7 @@ class Register extends AbstractController
 
 		Txt::load('Login');
 		theme()->getTemplates()->load('Login');
-		loadJavascriptFile('sha256.js', array('defer' => true));
+		loadJavascriptFile('ext/sha256.js', array('defer' => true));
 
 		// Need a user id to activate
 		if (empty($this->_req->query->u) && empty($this->_req->post->user))
@@ -1232,7 +1232,7 @@ class Register extends AbstractController
 		}
 		else
 		{
-			loadJavascriptFile('mailcheck.min.js');
+			loadJavascriptFile('ext/mailcheck.min.js');
 			$context['sub_template'] = 'contact_form';
 			$context['page_title'] = $txt['admin_contact_form'];
 

@@ -76,10 +76,10 @@ function create_control_richedit($editorOptions)
 
 		// JS makes the editor go round
 		loadJavascriptFile([
-			'jquery.sceditor.bbcode.min.js',
-			'jquery.sceditor.elkarte.js',
+			'editor/jquery.sceditor.bbcode.min.js',
+			'editor/jquery.sceditor.elkarte.js',
 			'post.js',
-			'dropAttachments.js'
+			'editor/dropAttachments.js'
 		]);
 
 		theme()->addJavascriptVar([
@@ -184,30 +184,30 @@ function loadEditorPlugins($editor_context)
 	$neededCSS = [];
 
 	$plugins[] = 'initialLoad';
-	$neededJS[] = 'initialLoad.plugin.js';
+	$neededJS[] = 'editor/initialLoad.plugin.js';
 
 	if (!empty($modSettings['enableSplitTag']))
 	{
 		$plugins[] = 'splittag';
-		$neededJS[] = 'splittag.plugin.js';
+		$neededJS[] = 'editor/splittag.plugin.js';
 	}
 
 	if (!empty($modSettings['enableUndoRedo']))
 	{
 		$plugins[] = 'undo';
-		$neededJS[] = 'undo.plugin.min.js';
+		$neededJS[] = 'editor/undo.plugin.min.js';
 	}
 
 	if (!empty($modSettings['mentions_enabled']))
 	{
 		$plugins[] = 'mention';
-		$neededJS = array_merge($neededJS, ['jquery.atwho.min.js', 'jquery.caret.min.js', 'mentioning.plugin.js']);
+		$neededJS = array_merge($neededJS, ['editor/jquery.atwho.min.js', 'editor/jquery.caret.min.js', 'editor/mentioning.plugin.js']);
 	}
 
 	if (!empty($modSettings['enableGiphy']))
 	{
 		$plugins[] = 'giphy';
-		$neededJS[] = 'giphy.plugin.js';
+		$neededJS[] = 'editor/giphy.plugin.js';
 		$neededCSS[] = 'sceditor.giphy.css';
 	}
 

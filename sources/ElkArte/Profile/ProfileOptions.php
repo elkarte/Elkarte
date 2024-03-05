@@ -330,7 +330,7 @@ class ProfileOptions extends AbstractController
 			$fields = self::getFields('account_otp');
 			setupProfileContext($fields['fields'], $fields['hook']);
 
-			loadJavascriptFile('qrcode.js');
+			loadJavascriptFile('ext/qrcode.js');
 			$context['load_google_authenticator'] = true;
 		}
 		else

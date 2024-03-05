@@ -345,13 +345,13 @@
 						$('#' + dataToSend.attachid).off().remove();
 						updateStatusText();
 					}
-					else if ('console' in window)
+					else if ('console' in window && console.info)
 					{
 						window.console.info(resp.data);
 					}
 				}).fail(function (jqXHR, textStatus, errorThrown)
 				{
-					if ('console' in window)
+					if ('console' in window && console.info)
 					{
 						window.console.info('Error:', textStatus, errorThrown.name);
 						window.console.info(jqXHR.responseText);

@@ -111,40 +111,9 @@ class HttpReq
 		$cleaned = array_intersect_key($_REQUEST, $this->_derived_post);
 		$this->_derived_post = array_merge($this->_derived_post, $cleaned);
 
-		// Load any json into _derived_post
-		$this->_loadJson();
-
 		// Make the $_GET $_POST super globals available as R/W properties
 		$this->post = new \ArrayObject($this->_derived_post, \ArrayObject::ARRAY_AS_PROPS);
 		$this->query = new \ArrayObject($derived_get, \ArrayObject::ARRAY_AS_PROPS);
-	}
-
-	/**
-	 * Looks for the post value "jsonString" and expands values to POST
-	 *
-	 * What it does:
-	 *
-	 * - Looks for jsonString passed in post
-	 * - json decodes the string and loads its values in to POST
-	 * - Does *not* overwrite any existing keys
-	 */
-	private function _loadJson()
-	{
-		// Was the magic json value posted?
-		if (!empty($this->_derived_post['jsonString']))
-		{
-			$json = json_decode($this->_derived_post['jsonString'], true);
-
-			// Valid decode
-			if (!empty($json))
-			{
-				// Maintain the original keys only add new ones
-				$json = array_diff_key($json, $this->_derived_post);
-				$this->_derived_post = array_merge($this->_derived_post, $json);
-			}
-
-			unset($this->_derived_post['jsonString']);
-		}
 	}
 
 	/**

@@ -7,7 +7,7 @@
  *
  */
 
-/** global: elk_smileys_url, elk_emoji_url, emojis, custom */
+/** global: elk_smileys_url, elk_emoji_url, emojis, custom, sceditor */
 
 /**
  * This file contains javascript associated with the :emoji: function as it
@@ -34,7 +34,7 @@ var disableDrafts = false;
 	function Elk_Emoji(options)
 	{
 		// All the passed options and defaults are loaded to the opts object
-		this.opts = $.extend({}, this.defaults, options);
+		this.opts = Object.assign({}, this.defaults, options || {});
 	}
 
 	/**
@@ -117,7 +117,7 @@ var disableDrafts = false;
 						return ":" + tpl[0] + ":";
 					}
 
-					return "<img class='emoji' data-sceditor-emoticon=':" + tpl[0] + ":' alt=':" + tpl[1] + ":' title='" + tpl[0] + "' src='" + tpl[3] + tpl[1] + "." + tpl[2] + "' />";
+					return "<img class='emoji' data-sceditor-emoticon=':" + tpl[0] + ":' alt=':" + tpl[1] + ":' title='" + tpl[0] + "" + tpl[3] + tpl[1] + "' src='..' />" + tpl[2] + "";
 				},
 				tplEval: function (tpl, map)
 				{
@@ -144,7 +144,7 @@ var disableDrafts = false;
 					}
 					catch (_error)
 					{
-						if ('console' in window)
+						if ('console' in window && console.info)
 						{
 							window.console.info(_error);
 						}
@@ -199,10 +199,9 @@ var disableDrafts = false;
 		{
 			let opts = this.opts;
 
-			$(".sceditor-button-source").on("click", function (event, offset)
-			{
+			document.querySelector('.sceditor-button-source').addEventListener('click', function () {
 				// If the button has the active class, we clicked and entered wizzy mode
-				if (!$(this).hasClass("active"))
+				if (!this.classList.contains('active'))
 				{
 					Elk_Emoji.prototype.processEmoji(opts);
 				}
@@ -301,14 +300,10 @@ var disableDrafts = false;
 		emojis = Object.values(emojisMap);
 	};
 
-	/**
-	 * Private emoji vars
-	 */
+	/** @type {{}} Represents the defaults configuration for Elk_Emoji objects. */
 	Elk_Emoji.prototype.defaults = {_names: []};
 
-	/**
-	 * Holds all current emoji (defaults + passed options)
-	 */
+	/** @type {{}} Holds all current emoji (defaults + passed options) */
 	Elk_Emoji.prototype.opts = {};
 
 	/**
@@ -354,7 +349,7 @@ var disableDrafts = false;
 					let inlineScript = document.createElement('script');
 					inlineScript.innerHTML = 'let custom = [];';
 					document.head.append(inlineScript);
-					if ('console' in window)
+					if ('console' in window && console.info)
 					{
 						window.console.info('custom_tags.js file missing or in error');
 					}
@@ -385,9 +380,8 @@ var disableDrafts = false;
 					oEmoji.attachAtWho($(oIframeBody), oIframeWindow);
 				}
 			},
-			error =>
-			{
-				if ('console' in window)
+			error => {
+				if ('console' in window && console.info)
 				{
 					window.console.info(`Error: ${error.message}`);
 				}

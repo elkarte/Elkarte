@@ -495,9 +495,8 @@ sceditor.command
 			{
 				let content = '';
 
-				$.each(selected.split(/\r?\n/), function ()
-				{
-					content += (content ? '\n' : '') + '[li]' + this + '[/li]';
+				selected.split(/\r?\n/).forEach(function(item) {
+					content += (content ? '\n' : '') + '[li]' + item + '[/li]';
 				});
 
 				return this.insertText('[list]\n' + content + '\n[/list]');
@@ -513,9 +512,8 @@ sceditor.command
 			{
 				let content = '';
 
-				$.each(selected.split(/\r?\n/), function ()
-				{
-					content += (content ? '\n' : '') + '[li]' + this + '[/li]';
+				selected.split(/\r?\n/).forEach(function(item) {
+					content += (content ? '\n' : '') + '[li]' + item + '[/li]';
 				});
 
 				return this.insertText('[list type=decimal]\n' + content + '\n[/list]');
@@ -547,7 +545,6 @@ sceditor.formats.bbcode
 	})
 	.set('pre', {
 		tags: {
-			pre: null,
 			pre: {'class': ['bbc_pre']}
 		},
 		isInline: false,
@@ -799,7 +796,7 @@ sceditor.formats.bbcode
 			{
 				// Convert it to an author tag
 				attr_link = sceditor.escapeEntities(attrs.defaultattr);
-				sLink = (attr_link.substr(0, 7) === 'http://' || attr_link.substr(0, 8) === 'https://')
+				sLink = (attr_link.substring(0, 7) === 'http://' || attr_link.substring(0, 8) === 'https://')
 					? sceditor.escapeUriScheme(attr_link)
 					: elk_scripturl + '?' + attr_link;
 				sAuthor = '<a href="' + sLink + '">' + bbc_quote_from + ': ' + sLink + '</a>';
@@ -812,7 +809,7 @@ sceditor.formats.bbcode
 				{
 					attr_link = key.length > 4 ? key.substr(5) + '=' + attrs[key] : attrs[key];
 					attr_link = $.sceditor.escapeEntities(attr_link);
-					sLink = (attr_link.substr(0, 7) === 'http://' || attr_link.substr(0, 8) === 'https://')
+					sLink = (attr_link.substring(0, 7) === 'http://' || attr_link.substring(0, 8) === 'https://')
 						? attr_link
 						: elk_scripturl + '?' + attr_link;
 					sAuthor = sAuthor === ''

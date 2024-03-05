@@ -228,7 +228,7 @@ class ManageRegistration extends AbstractController
 		}
 
 		// Basic stuff.
-		loadJavascriptFile('mailcheck.min.js');
+		loadJavascriptFile('ext/mailcheck.min.js');
 		theme()->addInlineJavascript('disableAutoComplete();
 		$("input[type=email]").on("blur", function(event) {
 			$(this).mailcheck({

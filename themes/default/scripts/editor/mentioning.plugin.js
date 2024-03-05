@@ -6,6 +6,8 @@
  * @version 2.0 dev
  */
 
+/** global: elk_session_var, elk_session_id, elk_scripturl, sceditor  */
+
 /**
  * This file contains javascript associated with the @mentions function as it
  * relates to an sceditor invocation
@@ -195,44 +197,48 @@ var disableDrafts = false;
 		}
 
 		/**
-		 * Makes the ajax call for data, returns to callback function when done.
+		 * Makes the fetch call for data, returns to callback function when done.
 		 *
 		 * @param obj values to pass to action suggest
 		 * @param callback function to call when we have completed our call
 		 */
 		function suggest(obj, callback)
 		{
-			let postString = "jsonString=" + JSON.stringify(obj) + "&" + elk_session_var + "=" + elk_session_id;
+			let postString = serialize(obj) + "&" + elk_session_var + "=" + elk_session_id;
 
 			oMentions.opts._names = [];
-
-			$.ajax({
-				url: elk_scripturl + "?action=suggest;api=xml",
-				type: "post",
-				async: true,
-				data: postString,
-				dataType: "xml"
+			fetch(elk_scripturl + "?action=suggest;api=xml", {
+				method: "POST",
+				body: postString,
+				headers: {
+					'X-Requested-With': 'XMLHttpRequest',
+					'Content-Type': 'application/x-www-form-urlencoded'
+				}
 			})
-				.done(function (data)
-				{
-					$(data).find('item').each(function (idx, item)
+				.then(response => {
+					if (!response.ok)
 					{
+						throw new Error("HTTP error " + response.status);
+					}
+					return response.text();
+				})
+				.then(str => new window.DOMParser().parseFromString(str, "text/xml"))
+				.then(data => {
+					let items = data.querySelectorAll('item');
+					items.forEach((item, idx) => {
 						oMentions.opts._names[idx] = {
-							"id": $(item).attr('id'),
-							"name": $(item).text()
+							"id": item.getAttribute('id'),
+							"name": item.textContent
 						};
 					});
-
+					console.log(callback);
 					callback();
 				})
-				.fail(function (jqXHR, textStatus, errorThrown)
-				{
-					if ('console' in window)
+				.catch(function (error) {
+					if ('console' in window && console.info)
 					{
-						window.console.info('Error:', textStatus, errorThrown.name);
-						window.console.info(jqXHR.responseText);
+						window.console.info('Error: ', error.message);
 					}
-
 					callback();
 				});
 		}

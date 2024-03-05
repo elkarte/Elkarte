@@ -980,7 +980,7 @@ class ProfileInfo extends AbstractController
 		global $txt, $context, $modSettings;
 
 		require_once(SUBSDIR . '/Stats.subs.php');
-		loadJavascriptFile(['chart.min.js', 'elk_chart.js']);
+		loadJavascriptFile(['ext/chart.min.js', 'elk_chart.js']);
 
 		$context['page_title'] = $txt['statPanel_showStats'] . ' ' . $this->_profile['real_name'];
 

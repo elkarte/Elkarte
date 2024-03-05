@@ -124,9 +124,9 @@ class Javascript
 			// Just use the local file
 			case 'local':
 				echo '
-	<script src="', $settings['default_theme_url'], '/scripts/jquery-' . $jquery_version . '.min.js" id="jquery"></script>',
+	<script src="', $settings['default_theme_url'], '/scripts/ext/jquery-' . $jquery_version . '.min.js" id="jquery"></script>',
 				(empty($modSettings['jquery_include_ui']) ? '' : '
-	<script src="' . $settings['default_theme_url'] . '/scripts/jquery-ui-' . $jqueryui_version . '.min.js" id="jqueryui"></script>');
+	<script src="' . $settings['default_theme_url'] . '/scripts/ext/jquery-ui-' . $jqueryui_version . '.min.js" id="jqueryui"></script>');
 				break;
 			// CDN with local fallback
 			case 'auto':
@@ -136,9 +136,9 @@ class Javascript
 	<script src="' . $jqueryui_cdn . '" id="jqueryui"></script>');
 				echo '
 	<script>
-		window.jQuery || document.write(\'<script src="', $settings['default_theme_url'], '/scripts/jquery-' . $jquery_version . '.min.js"><\/script>\');',
+		window.jQuery || document.write(\'<script src="', $settings['default_theme_url'], '/scripts/ext/jquery-' . $jquery_version . '.min.js"><\/script>\');',
 				(empty($modSettings['jquery_include_ui']) ? '' : '
-		window.jQuery.ui || document.write(\'<script src="' . $settings['default_theme_url'] . '/scripts/jquery-ui-' . $jqueryui_version . '.min.js"><\/script>\')'), '
+		window.jQuery.ui || document.write(\'<script src="' . $settings['default_theme_url'] . '/scripts/ext/jquery-ui-' . $jqueryui_version . '.min.js"><\/script>\')'), '
 	</script>';
 				break;
 		}

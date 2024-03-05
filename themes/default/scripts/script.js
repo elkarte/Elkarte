@@ -94,7 +94,7 @@ function fetchDocument(sUrl, funcCallback, sType = null, bHeader = true)
 			return data;
 		})
 		.catch(error => {
-			if ('console' in window)
+			if ('console' in window && console.info)
 			{
 				window.console.info(error);
 			}

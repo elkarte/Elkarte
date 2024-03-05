@@ -640,7 +640,7 @@ class ManageFeatures extends AbstractController
 		global $txt, $modSettings;
 
 		Txt::load('Profile+UserNotifications');
-		loadJavascriptFile('jquery.multiselect.min.js');
+		loadJavascriptFile('ext/jquery.multiselect.min.js');
 		theme()->addInlineJavascript('
 		$(\'.select_multiple\').multiselect({\'language_strings\': {\'Select all\': ' . JavascriptEscape($txt['notify_select_all']) . '}});', true);
 		loadCSSFile('multiselect.css');

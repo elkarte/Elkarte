@@ -80,7 +80,7 @@ class UserNotification extends AbstractModel
 	{
 		call_integration_hook('integrate_adjust_favicon_number', [&$number]);
 
-		loadJavascriptFile('favico.js', ['defer' => true]);
+		loadJavascriptFile('ext/favico.js', ['defer' => true]);
 
 		$notif_opt = [];
 		$rules = [
@@ -126,7 +126,7 @@ class UserNotification extends AbstractModel
 	 */
 	protected function _addDesktopNotifications()
 	{
-		loadJavascriptFile(['push.min.js', 'desktop-notify.js'], ['defer' => true]);
+		loadJavascriptFile(['ext/push.min.js', 'desktop-notify.js'], ['defer' => true]);
 		theme()->addInlineJavascript('
 			$(function() {
 				Push.config({serviceWorker: "./elkServiceWorker.min.js"}); 
