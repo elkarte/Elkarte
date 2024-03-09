@@ -338,7 +338,7 @@ input[type="submit"]:hover, button[type="submit"]:hover, input[type="button"]:ho
  */
 
 /* Styles for the tooltips. */
-.tooltip {
+#site_tooltip {
 	box-shadow: -3px 3px 3px var(--opacity30);
 }
 

@@ -1098,7 +1098,7 @@ div.labels {
 }
 
 /* Styles for the tooltips. */
-.tooltip {
+#site_tooltip {
 	right: -9999px;
 	left: auto;
 }

@@ -1059,14 +1059,6 @@ nav.breadcrumb {
 	border-color: var(--primary_border);
 }
 
-/* Legacy highlight color, for selected membergroups etc.
-   Used by JS to show a selected item. Still used in manage languages */
-
-.table_grid .standard_row.highlight2 {
-	color: var(--strong_text);
-	background: var(--content_background);
-}
-
 .table_grid .standard_row {
 	background: var(--primary_content_background);
 }
@@ -1767,10 +1759,14 @@ nav.breadcrumb {
 }
 
 /* Styles for the tooltips. */
-.tooltip {
+#site_tooltip {
 	border-color: var(--secondary_border);
 	background: var(--primary_content_background);
 	box-shadow: 3px 3px 3px var(--opacity30);
+}
+
+.tooltip {
+	background: linear-gradient(to bottom, var(--transparent) 160px, var(--primary_content_background) 200px);
 }
 
 /* The darkened background for help pop-ups. */
