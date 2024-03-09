@@ -462,7 +462,8 @@ function registerAgreementLanguageLoad(event)
 		body: postData,
 		headers: {
 			'X-Requested-With': 'XMLHttpRequest',
-			'Content-Type': 'application/x-www-form-urlencoded'
+			'Content-Type': 'application/x-www-form-urlencoded',
+			'Accept': 'application/json'
 		}
 	})
 		.then(function (response) {

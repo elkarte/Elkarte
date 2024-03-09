@@ -212,7 +212,8 @@ var disableDrafts = false;
 				body: postString,
 				headers: {
 					'X-Requested-With': 'XMLHttpRequest',
-					'Content-Type': 'application/x-www-form-urlencoded'
+					'Content-Type': 'application/x-www-form-urlencoded',
+					'Accept': 'application/xml'
 				}
 			})
 				.then(response => {

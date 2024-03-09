@@ -80,6 +80,7 @@ function toggleButtonAJAX(btn, confirmation_msg_variable= '', onSuccessCallback 
 		method: 'GET',
 		headers: {
 			'X-Requested-With': 'XMLHttpRequest',
+			'Accept': 'application/xml'
 		}
 	})
 		.then(response => response.text())
@@ -182,6 +183,7 @@ function toggleHeaderAJAX(btn, container_id)
 		method: 'GET',
 		headers: {
 			'X-Requested-With': 'XMLHttpRequest',
+			'Accept': 'application/xml'
 		}
 	})
 		.then(response => {

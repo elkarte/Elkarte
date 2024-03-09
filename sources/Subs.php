@@ -866,7 +866,7 @@ function template_footer()
 /**
  * Output the Javascript files
  *
- * @depreciated since 2.0, only for old theme suppot
+ * @depreciated since 2.0, only for old theme support
  * @return void
  */
 function template_javascript()

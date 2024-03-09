@@ -774,7 +774,7 @@ function loadAddNewPoll(button, id_board, form_name)
 
 			// Inject the html
 			document.querySelector('#post_header').insertAdjacentHTML('afterend', data);
-			let inputs = document.querySelectorAll('#poll_main input, #poll_options input')
+			let inputs = document.querySelectorAll('#poll_main input, #poll_options input');
 			for (let input of inputs)
 			{
 				input.tabIndex = ++max_tabIndex;

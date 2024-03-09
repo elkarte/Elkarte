@@ -604,12 +604,14 @@ function make_preview_btn (preview_id)
 	id.textContent = txt_preview;
 
 	// Attach a click event to the new button to fetch a preview
-	id.addEventListener('click', function() {
+	id.addEventListener('click', function(e) {
+		e.preventDefault();
 		fetch(elk_prepareScriptUrl(elk_scripturl) + 'action=XmlPreview;api=xml', {
 			method: 'POST',
 			headers: {
 				'X-Requested-With': 'XMLHttpRequest',
-				'Content-Type': 'application/x-www-form-urlencoded'
+				'Content-Type': 'application/x-www-form-urlencoded',
+				'Accept': 'application/xml'
 			},
 			body: serialize({
 				item: 'newspreview',
@@ -647,9 +649,9 @@ function make_preview_btn (preview_id)
 	if (!id.parentElement.classList.contains('linkbutton'))
 	{
 		const wrapper = document.createElement('a');
-
 		wrapper.className = 'linkbutton floatright';
-		wrapper.href = 'javascript:void(0);';
+		wrapper.href = '#';
+		wrapper.onclick = function() { return false; };
 		id.parentNode.insertBefore(wrapper, id);
 		wrapper.appendChild(id);
 	}
@@ -1261,7 +1263,8 @@ function ajax_getTemplatePreview ()
 		}),
 		headers: {
 			'X-Requested-With': 'XMLHttpRequest',
-			'Content-Type': 'application/x-www-form-urlencoded'
+			'Content-Type': 'application/x-www-form-urlencoded',
+			'Accept': 'application/xml'
 		}
 	})
 		.then(response => response.text())
@@ -1489,6 +1492,7 @@ function initDeleteThemes ()
 					method: 'GET',
 					headers: {
 						'X-Requested-With': 'XMLHttpRequest',
+						'Accept': 'application/xml'
 					}
 				})
 					.then(response => {
@@ -1618,6 +1622,7 @@ function ajax_getEmailTemplatePreview ()
 		headers: {
 			'X-Requested-With': 'XMLHttpRequest',
 			'Content-Type': 'application/x-www-form-urlencoded',
+			'Accept': 'application/xml'
 		},
 		body: serialize({
 			item: 'bounce_preview',
@@ -1867,7 +1872,8 @@ function coreFeatures ()
 				body: serialize(data),
 				headers: {
 					'X-Requested-With': 'XMLHttpRequest',
-					'Content-Type': 'application/x-www-form-urlencoded'
+					'Content-Type': 'application/x-www-form-urlencoded',
+					'Accept': 'application/xml'
 				}
 			})
 				.then(response => {
