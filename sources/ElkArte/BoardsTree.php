@@ -278,7 +278,7 @@ class BoardsTree
 	{
 		if (isset($this->boards[$id]))
 		{
-			return (int) $this->boards[$id];
+			return $this->boards[$id];
 		}
 
 		throw new \Exception("Board id doesn't exist: " . $id);
