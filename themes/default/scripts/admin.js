@@ -25,9 +25,8 @@
 /** global: txt_save, txt_permissions_profile_rename, ajax_notification_cancel_text, txt_theme_remove_confirm, XMLHttpRequest */
 /** global: theme_id, frames, editFilename, txt_ban_name_empty, txt_ban_restriction_empty, ElkInfoBar, txt_invalid_response */
 /** global: feature_on_text, feature_off_text, core_settings_generic_error, startOptID, add_question_template, question_last_blank */
-/** global: ourLanguageVersions, ourVersions, txt_add_another_answer, txt_permissions_commit, Image */
 
-/* jshint -W069 */
+/** global: ourLanguageVersions, ourVersions, txt_add_another_answer, txt_permissions_commit, Image */
 
 /**
  * Admin index class, its the admin landing page with site details
@@ -391,7 +390,8 @@ function toggleBBCDisabled (section, disable)
 
 	for (let i = 0; i < elems.length; i++)
 	{
-		if (typeof (elems[i].name) === 'undefined' || (elems[i].name.substring((section.length + 1), elems[i].name.length - 2) !== 'enabledTags') || (elems[i].name.indexOf(section) !== 0)) {
+		if (typeof (elems[i].name) === 'undefined' || (elems[i].name.substring((section.length + 1), elems[i].name.length - 2) !== 'enabledTags') || (elems[i].name.indexOf(section) !== 0))
+		{
 			continue;
 		}
 
@@ -621,7 +621,7 @@ function make_preview_btn (preview_id)
 			.then(response => {
 				if (!response.ok)
 				{
-					throw new Error("HTTP error " + response.status);
+					throw new Error('HTTP error ' + response.status);
 				}
 				return response.text();
 			})
@@ -1227,13 +1227,13 @@ function swapPostGroup (isChecked)
 	min_posts_text.style.color = isChecked ? '' : '#888888';
 
 	document.forms.groupForm.group_desc_input.disabled = isChecked;
-	group_desc_text.style.color = !isChecked ? '' : '#888888';
+	group_desc_text.style.color = isChecked ? '#888888' : '';
 
 	document.forms.groupForm.group_hidden_input.disabled = isChecked;
-	group_hidden_text.style.color = !isChecked ? '' : '#888888';
+	group_hidden_text.style.color = isChecked ? '#888888' : '';
 
 	document.forms.groupForm.group_moderators.disabled = isChecked;
-	group_moderators_text.style.color = !isChecked ? '' : '#888888';
+	group_moderators_text.style.color = isChecked ? '#888888' : '';
 
 	// Disable the moderator autosuggest box as well
 	if (typeof (oModeratorSuggest) !== 'undefined')

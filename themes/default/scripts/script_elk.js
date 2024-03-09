@@ -16,13 +16,14 @@
 
 /** global: notification_topic_notice, notification_board_notice, txt_mark_as_read_confirm, oRttime */
 /** global: $editor_data, elk_scripturl, elk_smiley_url, elk_session_var, elk_session_id, elk_images_url */
+
 /** global: XMLHttpRequest, ElkInfoBar */
 
 /**
  * Sets code blocks such that resize vertical works as expected.  Done this way to avoid
  * page jumps to named anchors missing the target.
  */
-function elk_codefix()
+function elk_codefix ()
 {
 	let codeBlock = document.querySelectorAll('.bbc_code');
 	codeBlock.forEach((code) => {
@@ -45,7 +46,7 @@ function elk_codefix()
  * Removes the read more overlay from quote blocks that do not need them, and for
  * ones that do, hides so the read more input can expand it out.
  */
-function elk_quotefix()
+function elk_quotefix ()
 {
 	let quotes = document.querySelectorAll('.quote-read-more');
 
@@ -74,7 +75,7 @@ function elk_quotefix()
  * @param {string} confirmation_msg_variable var name of the text sting to display in the "are you sure" box
  * @param {function} onSuccessCallback optional, a callback executed on successfully execute the AJAX call
  */
-function toggleButtonAJAX(btn, confirmation_msg_variable= '', onSuccessCallback = null)
+function toggleButtonAJAX (btn, confirmation_msg_variable = '', onSuccessCallback = null)
 {
 	fetch(btn.href + ';api=xml', {
 		method: 'GET',
@@ -91,7 +92,7 @@ function toggleButtonAJAX(btn, confirmation_msg_variable= '', onSuccessCallback 
 			}
 
 			let parser = new DOMParser(),
-				doc = parser.parseFromString(body, "application/xml"),
+				doc = parser.parseFromString(body, 'application/xml'),
 				oElement = doc.getElementsByTagName('elk')[0];
 
 			// No errors
@@ -105,19 +106,19 @@ function toggleButtonAJAX(btn, confirmation_msg_variable= '', onSuccessCallback 
 				// Update the page so button/link/confirm/etc. reflect the new on or off status
 				if (confirm_elem.length === 1)
 				{
-					confirm_text = confirm_elem[0].firstChild.nodeValue.replace(/&lt;/g, "<").replace(/&gt;/g, ">").replace(/&amp;/g, "&").replace(/&quot;/g, "\"").replace(/&#039;/g, "'");
+					confirm_text = confirm_elem[0].firstChild.nodeValue.replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&amp;/g, '&').replace(/&quot;/g, '"').replace(/&#039;/g, '\'');
 				}
 
 				let elems = document.getElementsByClassName(btn.className.replace(/(list|link)level\d/g, '').trim());
 				Array.prototype.forEach.call(elems, function(el) {
 					if (text.length === 1)
 					{
-						el.innerHTML = '<span>' + text[0].firstChild.nodeValue.replace(/&lt;/g, "<").replace(/&gt;/g, ">").replace(/&amp;/g, "&").replace(/&quot;/g, "\"").replace(/&#039;/g, "'") + '</span>';
+						el.innerHTML = '<span>' + text[0].firstChild.nodeValue.replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&amp;/g, '&').replace(/&quot;/g, '"').replace(/&#039;/g, '\'') + '</span>';
 					}
 
 					if (url.length === 1)
 					{
-						el.href = url[0].firstChild.nodeValue.replace(/&lt;/g, "<").replace(/&gt;/g, ">").replace(/&amp;/g, "&").replace(/&quot;/g, "\"").replace(/&#039;/g, "'");
+						el.href = url[0].firstChild.nodeValue.replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&amp;/g, '&').replace(/&quot;/g, '"').replace(/&#039;/g, '\'');
 					}
 
 					// Replaces the confirmation var text with the new one from the response to allow swapping on/off
@@ -133,7 +134,7 @@ function toggleButtonAJAX(btn, confirmation_msg_variable= '', onSuccessCallback 
 				// Error returned from the called function, show an alert
 				if (oElement.getElementsByTagName('text').length !== 0)
 				{
-					alert(oElement.getElementsByTagName('text')[0].firstChild.nodeValue.replace(/&lt;/g, "<").replace(/&gt;/g, ">").replace(/&amp;/g, "&").replace(/&quot;/g, "\"").replace(/&#039;/g, "'"));
+					alert(oElement.getElementsByTagName('text')[0].firstChild.nodeValue.replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&amp;/g, '&').replace(/&quot;/g, '"').replace(/&#039;/g, '\''));
 				}
 
 				if (oElement.getElementsByTagName('url').length !== 0)
@@ -172,7 +173,7 @@ function toggleButtonAJAX(btn, confirmation_msg_variable= '', onSuccessCallback 
  * @param {HTMLLinkElement|string} btn string representing this, generally the anchor link tag <a class="" href="" onclick="">
  * @param {string} container_id  css ID of the data container
  */
-function toggleHeaderAJAX(btn, container_id)
+function toggleHeaderAJAX (btn, container_id)
 {
 	let body_template = '<div class="board_row centertext">{body}</div>';
 
@@ -190,7 +191,7 @@ function toggleHeaderAJAX(btn, container_id)
 			if (!response.ok)
 			{
 				// HTTP status was not OK. Throw error to reject the promise.
-				throw new Error("HTTP error " + response.status);
+				throw new Error('HTTP error ' + response.status);
 			}
 			return response.text();
 		})
@@ -201,7 +202,7 @@ function toggleHeaderAJAX(btn, container_id)
 			}
 
 			let parser = new DOMParser(),
-				xmlDoc = parser.parseFromString(request, "text/xml"),
+				xmlDoc = parser.parseFromString(request, 'text/xml'),
 				oElement = xmlDoc.getElementsByTagName('elk')[0];
 
 			if (oElement.getElementsByTagName('error').length === 0)
@@ -243,15 +244,14 @@ function toggleHeaderAJAX(btn, container_id)
  *
  * @param {string} btn string representing this, generally the anchor link tag <a class="" href="" onclick="">
  */
-function notifyButton(btn)
+function notifyButton (btn)
 {
 	if (typeof (notification_topic_notice) !== 'undefined' && !confirm(notification_topic_notice))
 	{
 		return false;
 	}
 
-	return toggleButtonAJAX(btn, 'notification_topic_notice', function (btn, request, errors)
-	{
+	return toggleButtonAJAX(btn, 'notification_topic_notice', function(btn, request, errors) {
 		var toggle = 0;
 
 		if (errors.length > 0)
@@ -269,7 +269,7 @@ function notifyButton(btn)
 			toggle = 0;
 		}
 
-		document.querySelector("input[name='notify']").value = toggle;
+		document.querySelector('input[name=\'notify\']').value = toggle;
 	});
 }
 
@@ -278,7 +278,7 @@ function notifyButton(btn)
  *
  * @param {HTMLLinkElement} btn string representing this, generally the anchor link tag <a class="" href="" onclick="">
  */
-function notifyboardButton(btn)
+function notifyboardButton (btn)
 {
 	if (typeof (notification_board_notice) !== 'undefined' && !confirm(notification_board_notice))
 	{
@@ -295,7 +295,7 @@ function notifyboardButton(btn)
  *
  * @param {HTMLLinkElement} btn string representing this, generally the anchor link tag <a class="" href="" onclick="">
  */
-function unwatchButton(btn)
+function unwatchButton (btn)
 {
 	toggleButtonAJAX(btn);
 
@@ -307,7 +307,7 @@ function unwatchButton(btn)
  *
  * @param {HTMLLinkElement} btn string representing this, generally the anchor link tag <a class="" href="" onclick="">
  */
-function markboardreadButton(btn)
+function markboardreadButton (btn)
 {
 	if (!confirm(txt_mark_as_read_confirm))
 	{
@@ -330,7 +330,7 @@ function markboardreadButton(btn)
  *
  * @param {HTMLLinkElement} btn string representing this, generally the anchor link tag <a class="" href="" onclick="">
  */
-function markallreadButton(btn)
+function markallreadButton (btn)
 {
 	if (!confirm(txt_mark_as_read_confirm))
 	{
@@ -366,7 +366,7 @@ function markallreadButton(btn)
  *
  * @param {HTMLLinkElement} btn string representing this, generally the anchor link tag <a class="" href="" onclick="">
  */
-function markunreadButton(btn)
+function markunreadButton (btn)
 {
 	if (!confirm(txt_mark_as_read_confirm))
 	{
@@ -381,7 +381,7 @@ function markunreadButton(btn)
 /**
  * Returns the mentions from a plugin.
  */
-function getMentionsFromPlugin(all_elk, boundaries_pattern)
+function getMentionsFromPlugin (all_elk, boundaries_pattern)
 {
 	let $editor = $editor_data[all_elk.selector],
 		cached_names = $editor.opts.mentionOptions.cache.names,
@@ -397,7 +397,7 @@ function getMentionsFromPlugin(all_elk, boundaries_pattern)
 /**
  * Retrieves mentions from plain text.
  */
-function getMentionsFromPlainText(all_elk, sForm, sInput, boundaries_pattern)
+function getMentionsFromPlainText (all_elk, sForm, sInput, boundaries_pattern)
 {
 	let cached_names = all_elk.oMention.cached_names,
 		cached_queries = all_elk.oMention.cached_queries,
@@ -411,7 +411,7 @@ function getMentionsFromPlainText(all_elk, sForm, sInput, boundaries_pattern)
 /**
  * Validates mentions in a given body of text.
  */
-function validateMentions(body, cached_names, cached_queries, mentions, boundaries_pattern)
+function validateMentions (body, cached_names, cached_queries, mentions, boundaries_pattern)
 {
 	body = ' ' + body + ' ';
 	removeInvalidMentions(mentions, body, boundaries_pattern);
@@ -430,9 +430,9 @@ function validateMentions(body, cached_names, cached_queries, mentions, boundari
 /**
  * Removes invalid mentions from a given list of mentions based on the provided body and boundaries pattern.
  */
-function removeInvalidMentions(mentions, body, boundaries_pattern)
+function removeInvalidMentions (mentions, body, boundaries_pattern)
 {
-	$(mentions).find('input').each(function (idx, elem) {
+	$(mentions).find('input').each(function(idx, elem) {
 		let name = $(elem).data('name'),
 			next_char,
 			prev_char,
@@ -465,7 +465,7 @@ function removeInvalidMentions(mentions, body, boundaries_pattern)
 /**
  * Check whether the word exists in a given paragraph
  */
-function checkWordOccurrence(paragraph, word)
+function checkWordOccurrence (paragraph, word)
 {
 	return paragraph.search(new RegExp(' @\\b' + word + '\\b[ .,;!?\'\\-\\\\\\/="]', 'iu'));
 }
@@ -479,7 +479,7 @@ function checkWordOccurrence(paragraph, word)
  */
 var all_elk_mentions = [];
 
-function add_elk_mention(selector, oOptions)
+function add_elk_mention (selector, oOptions)
 {
 	// Global does not exist, hummm
 	if (all_elk_mentions.hasOwnProperty(selector))
@@ -508,7 +508,7 @@ function add_elk_mention(selector, oOptions)
  * - Used to tag mentioned names when they are entered inline but NOT selected from the dropdown list.  In that
  * case the name must have appeared in the dropdown and be found in that cache list
  */
-function revalidateMentions(sForm, sInput)
+function revalidateMentions (sForm, sInput)
 {
 	let boundaries_pattern = /[ .,;!?'\-\\\/="]/i;
 	all_elk_mentions.forEach(mention => {
@@ -529,20 +529,20 @@ function revalidateMentions(sForm, sInput)
 /**
  * Expands the ... of the page indexes
  */
-(function ($) {
+(function($) {
 	const PER_PAGE_LIMIT = 10;
 
 	// Used when the user clicks on the ... to expand
-	$.fn.expand_pages = function () {
-		function expand_pages($element)
+	$.fn.expand_pages = function() {
+		function expand_pages ($element)
 		{
-			function createPage(i)
+			function createPage (i)
 			{
 				let bElem = aModel.clone(),
 					boxModelClone = boxModel.clone();
 
 				bElem.attr('href', baseurl.replace('%1$d', i - perPage)).text(i / perPage);
-				boxModelClone.find('a').each(function () {
+				boxModelClone.find('a').each(function() {
 					$(this).replaceWith(bElem[0]);
 				});
 				$baseAppend.after(boxModelClone);
@@ -588,7 +588,7 @@ function revalidateMentions(sForm, sInput)
 			$baseAppend.remove();
 			if (oldLastPage > 0)
 			{
-				expandModel.on('click', function (e) {
+				expandModel.on('click', function(e) {
 					let $currentElement = $(this);
 
 					e.preventDefault();
@@ -602,7 +602,7 @@ function revalidateMentions(sForm, sInput)
 			}
 		}
 
-		this.attr('tabindex', 0).on('click', function (e) {
+		this.attr('tabindex', 0).on('click', function(e) {
 			let $currentElement = $(this);
 			e.preventDefault();
 			expand_pages($currentElement);
@@ -621,7 +621,7 @@ function revalidateMentions(sForm, sInput)
  */
 class SiteTooltip
 {
-	constructor(settings = {})
+	constructor (settings = {})
 	{
 		this.defaults = {
 			tooltipID: 'site_tooltip', // ID used on the outer div
@@ -642,7 +642,7 @@ class SiteTooltip
 	 *
 	 * @returns {null} - Returns null if the device is mobile or touch-enabled.
 	 */
-	create(elem)
+	create (elem)
 	{
 		// No need here
 		if (is_mobile || is_touch)
@@ -653,10 +653,10 @@ class SiteTooltip
 		// Move passed selector titles to a hidden span, then remove the selector title to prevent any default browser actions
 		for (let el of document.querySelectorAll(elem))
 		{
-			let title = el.getAttribute("title");
+			let title = el.getAttribute('title');
 
-			el.setAttribute("data-title", title);
-			el.removeAttribute("title");
+			el.setAttribute('data-title', title);
+			el.removeAttribute('title');
 			el.addEventListener('mouseenter', this.showTooltip.bind(this));
 			el.addEventListener('mouseleave', this.hideTooltip.bind(this));
 		}
@@ -667,7 +667,7 @@ class SiteTooltip
 	 *
 	 * @param {Event} event - The event object that triggered the tooltip placement.
 	 */
-	positionTooltip(event)
+	positionTooltip (event)
 	{
 		let tooltip = document.getElementById(this.settings.tooltipID);
 		if (!tooltip)
@@ -679,7 +679,7 @@ class SiteTooltip
 		let tooltipHeight = tooltip.offsetHeight;
 		let viewportHeight = window.innerHeight;
 
-		let x =  rect.left;
+		let x = rect.left;
 		let y = window.scrollY + rect.bottom + 5;
 
 		// Don't position below if it fall off-screen, instead move it above
@@ -696,7 +696,7 @@ class SiteTooltip
 	 *
 	 * @param {Event} event - The event object.
 	 */
-	showTooltip(event)
+	showTooltip (event)
 	{
 		if (this.tooltipTimeout)
 		{
@@ -704,7 +704,7 @@ class SiteTooltip
 		}
 
 		// Represents the timeout for showing a tooltip.
-		this.tooltipTimeout = setTimeout(function () {
+		this.tooltipTimeout = setTimeout(function() {
 			let title = event.target.getAttribute('data-title');
 			if (title)
 			{
@@ -744,7 +744,7 @@ class SiteTooltip
 	 *
 	 * @param {Event} event - The event object.
 	 */
-	hideTooltip(event)
+	hideTooltip (event)
 	{
 		if (this.tooltipTimeout)
 		{
@@ -767,7 +767,7 @@ class SiteTooltip
  */
 var error_txts = {};
 
-function errorbox_handler(oOptions)
+function errorbox_handler (oOptions)
 {
 	this.opt = oOptions;
 	this.oError_box = null;
@@ -775,8 +775,7 @@ function errorbox_handler(oOptions)
 	this.init();
 }
 
-errorbox_handler.prototype.init = function ()
-{
+errorbox_handler.prototype.init = function() {
 	this.oErrorHandle.instanceRef = this;
 	if (this.oError_box === null)
 	{
@@ -784,8 +783,7 @@ errorbox_handler.prototype.init = function ()
 	}
 };
 
-errorbox_handler.prototype.checkErrors = function(add = false)
-{
+errorbox_handler.prototype.checkErrors = function(add = false) {
 	let elem = document.getElementById(this.opt.error_box_id + '_' + this.opt.error_code);
 	if (add)
 	{
@@ -796,9 +794,9 @@ errorbox_handler.prototype.checkErrors = function(add = false)
 		this.removeError(this.oError_box, elem);
 	}
 
-	this.oError_box.className = "infobox";
+	this.oError_box.className = 'infobox';
 	// Hide show the error box based on if we have any errors
-	if (this.oError_box.querySelectorAll("li").length === 0)
+	if (this.oError_box.querySelectorAll('li').length === 0)
 	{
 		this.slideUp(this.oError_box);
 	}
@@ -810,49 +808,45 @@ errorbox_handler.prototype.checkErrors = function(add = false)
 	}
 };
 
-errorbox_handler.prototype.addError = function(error_elem, error_code)
-{
+errorbox_handler.prototype.addError = function(error_elem, error_code) {
 	if (!error_elem)
 	{
 		// First error, then set up the list for insertion
-		let errorList = this.oError_box.querySelector("#" + this.opt.error_box_id + "_list");
+		let errorList = this.oError_box.querySelector('#' + this.opt.error_box_id + '_list');
 		if (!errorList || errorList.innerHTML.trim() === '')
 		{
 			let ul = document.createElement('ul');
-			ul.id = this.opt.error_box_id + "_list";
+			ul.id = this.opt.error_box_id + '_list';
 			this.oError_box.appendChild(ul);
 		}
 
 		let li = document.createElement('li');
 		li.style.display = 'none';
-		li.id = this.opt.error_box_id + "_" + error_code;
+		li.id = this.opt.error_box_id + '_' + error_code;
 		li.innerText = error_txts[error_code];
-		document.getElementById(this.opt.error_box_id + "_list").appendChild(li);
-		document.getElementById(this.opt.error_box_id + "_" + error_code).style.display = 'block';
+		document.getElementById(this.opt.error_box_id + '_list').appendChild(li);
+		document.getElementById(this.opt.error_box_id + '_' + error_code).style.display = 'block';
 	}
 };
 
-errorbox_handler.prototype.removeError = function(error_box, error_elem)
-{
+errorbox_handler.prototype.removeError = function(error_box, error_elem) {
 	if (error_elem)
 	{
 		error_elem.style.display = 'none';
 		error_elem.parentNode.removeChild(error_elem);
-		if (error_box.querySelectorAll("li").length === 0)
+		if (error_box.querySelectorAll('li').length === 0)
 		{
 			this.slideUp(error_box);
 		}
 	}
 };
 
-errorbox_handler.prototype.slideUp = function(element)
-{
+errorbox_handler.prototype.slideUp = function(element) {
 	element.style.transition = 'opacity 0.5s';
 	element.style.opacity = '0';
 };
 
-errorbox_handler.prototype.slideDown = function(element)
-{
+errorbox_handler.prototype.slideDown = function(element) {
 	element.style.transition = 'opacity 0.5s';
 	element.style.opacity = '1';
 };
@@ -860,7 +854,7 @@ errorbox_handler.prototype.slideDown = function(element)
 /**
  * Shows the member search dropdown with the search options
  */
-function toggle_mlsearch_opt()
+function toggle_mlsearch_opt ()
 {
 	var $_mlsearch = $('#mlsearch_options');
 
@@ -877,8 +871,7 @@ function toggle_mlsearch_opt()
 	$('body').on('click', mlsearch_opt_hide);
 
 	// Except clicking on the box itself or into the search text input
-	$('#mlsearch_options, #mlsearch_input').off('click', mlsearch_opt_hide).on('click', function (ev)
-	{
+	$('#mlsearch_options, #mlsearch_input').off('click', mlsearch_opt_hide).on('click', function(ev) {
 		ev.stopPropagation();
 	});
 }
@@ -886,7 +879,7 @@ function toggle_mlsearch_opt()
 /**
  * Hides the member search dropdown and detach the body click event
  */
-function mlsearch_opt_hide()
+function mlsearch_opt_hide ()
 {
 	$('body').off('click', mlsearch_opt_hide);
 	$('#mlsearch_options').slideToggle('fast');
@@ -898,9 +891,9 @@ function mlsearch_opt_hide()
  * - when viewing/editing other members profiles
  * - when registering new member
  */
-function disableAutoComplete()
+function disableAutoComplete ()
 {
-	window.onload = function () {
+	window.onload = function() {
 		// Turn off autocomplete for these elements
 		const elements = document.querySelectorAll('input[type=email], .input_text, .input_clear');
 		for (let item of elements)
@@ -915,11 +908,11 @@ function disableAutoComplete()
 		}
 
 		// Chrome will fill out the form even with autocomplete off, so we need to clear the values as well
-		setTimeout(function () {
+		setTimeout(function() {
 			let clearElements = document.querySelectorAll('input[type=password], .input_clear');
 			for (let item of clearElements)
 			{
-				item.value = "";
+				item.value = '';
 			}
 		}, 1);
 	};
@@ -928,14 +921,12 @@ function disableAutoComplete()
 /**
  * A system to collect notifications from a single AJAX call and redistribute them among notifiers
  */
-(function ()
-{
+(function() {
 	/**
 	 * ElkNotifications is a module that allows sending notifications to multiple notifiers.
 	 * @returns {Object} - The ElkNotifications module.
 	 */
-	var ElkNotifications = (function (opt)
-	{
+	var ElkNotifications = (function(opt) {
 		'use strict';
 
 		opt = opt || {};
@@ -943,40 +934,35 @@ function disableAutoComplete()
 			start = true,
 			lastTime = 0;
 
-		let init = function (opt)
-		{
+		let init = function(opt) {
 			if (typeof opt.delay === 'undefined')
 			{
 				start = false;
 				opt.delay = 45000;
 			}
 
-			setTimeout(function ()
-			{
+			setTimeout(function() {
 				fetchData();
 			}, opt.delay);
 		};
 
-		let add = function (notif)
-		{
+		let add = function(notif) {
 			_notifiers.push(notif);
 		};
 
-		let send = function (request)
-		{
-			_notifiers.forEach((notification) =>
-			{
+		let send = function(request) {
+			_notifiers.forEach((notification) => {
 				notification.send(request);
 			});
 		};
 
-		let fetchData = function () {
+		let fetchData = function() {
 			if (_notifiers.length === 0)
 			{
 				return;
 			}
 
-			let url = elk_prepareScriptUrl(elk_scripturl) + "action=mentions;sa=fetch;api=json;lastsent=" + lastTime;
+			let url = elk_prepareScriptUrl(elk_scripturl) + 'action=mentions;sa=fetch;api=json;lastsent=' + lastTime;
 			fetch(url, {
 				cache: 'no-store',
 				headers: {
@@ -984,28 +970,28 @@ function disableAutoComplete()
 					'X-Requested-With': 'XMLHttpRequest',
 				}
 			})
-				.then(function (response) {
+				.then(function(response) {
 					if (!response.ok)
 					{
-						throw new Error("HTTP error " + response.status);
+						throw new Error('HTTP error ' + response.status);
 					}
 					return response.json();
 				})
-				.then(function (request) {
-					if (request !== "")
+				.then(function(request) {
+					if (request !== '')
 					{
 						send(request);
 						lastTime = request.timelast;
 					}
 				})
-				.catch(function (error) {
+				.catch(function(error) {
 					if ('console' in window && console.info)
 					{
 						console.info('Error:', error);
 					}
 				})
-				.finally(function () {
-					setTimeout(function () {
+				.finally(function() {
+					setTimeout(function() {
 						fetchData();
 					}, opt.delay);
 				});
@@ -1020,8 +1006,7 @@ function disableAutoComplete()
 	// AMD / RequireJS
 	if (typeof define !== 'undefined' && define.amd)
 	{
-		define([], function ()
-		{
+		define([], function() {
 			return ElkNotifications;
 		});
 	}
@@ -1043,10 +1028,8 @@ var ElkNotifier = new window.ElkNotifications({});
 /**
  * Initialize the ajax info-bar
  */
-(function ()
-{
-	let ElkInfoBar = (function (elem_id, opt = {})
-	{
+(function() {
+	let ElkInfoBar = (function(elem_id, opt = {}) {
 		let defaults = {
 			text: '',
 			class: 'ajax_infobar',
@@ -1059,8 +1042,7 @@ var ElkNotifier = new window.ElkNotifications({});
 
 		let elem = document.getElementById(elem_id),
 			time_out = null,
-			init = function (elem_id, settings)
-			{
+			init = function(elem_id, settings) {
 				clearTimeout(time_out);
 				if (elem === null)
 				{
@@ -1071,50 +1053,42 @@ var ElkNotifier = new window.ElkNotifications({});
 					document.body.appendChild(elem);
 				}
 			},
-			changeText = function (text)
-			{
+			changeText = function(text) {
 				clearTimeout(time_out);
 				elem.innerHTML = text;
 				return this;
 			},
-			addClass = function (aClass)
-			{
+			addClass = function(aClass) {
 				elem.classList.add(aClass);
 				return this;
 			},
-			removeClass = function (aClass)
-			{
+			removeClass = function(aClass) {
 				elem.classList.remove(aClass);
 				return this;
 			},
-			showBar = function ()
-			{
+			showBar = function() {
 				clearTimeout(time_out);
 				elem.style.opacity = '1';
 
 				if (settings.hide_delay !== 0)
 				{
-					time_out = setTimeout(function ()
-					{
+					time_out = setTimeout(function() {
 						hide();
 					}, settings.hide_delay);
 				}
 				return this;
 			},
-			isError = function ()
-			{
+			isError = function() {
 				removeClass(settings.success_class);
 				addClass(settings.error_class);
 			},
-			isSuccess = function ()
-			{
+			isSuccess = function() {
 				removeClass(settings.error_class);
 				addClass(settings.success_class);
 			},
-			hide = function ()
-			{
+			hide = function() {
 				// Short delay to avoid removing opacity while it is still be added
-				window.setTimeout(function () {
+				window.setTimeout(function() {
 					elem.style.opacity = '0';
 				}, 300);
 
@@ -1139,8 +1113,7 @@ var ElkNotifier = new window.ElkNotifications({});
 	// AMD / RequireJS
 	if (typeof define !== 'undefined' && define.amd)
 	{
-		define([], function ()
-		{
+		define([], function() {
 			return ElkInfoBar;
 		});
 	}
@@ -1210,11 +1183,11 @@ function Elk_NewsFader (element, options)
  * @param {number} [limit] - The maximum number of retries before considering the function as not loaded. Default is 180. Every 60 is ~ 1 second wait time.
  * @returns {Promise<boolean>} - A Promise that resolves to `true` if the function is loaded, or `false` if it is not loaded within the specified limit.
  */
-async function isFunctionLoaded(selector, limit)
+async function isFunctionLoaded (selector, limit)
 {
 	let MAX_RETRIES = limit || 180;
 	let retries = 0;
-	while (typeof window[selector] !== "function" && retries < MAX_RETRIES)
+	while (typeof window[selector] !== 'function' && retries < MAX_RETRIES)
 	{
 		await new Promise(resolve => requestAnimationFrame(resolve));
 		retries++;
@@ -1242,11 +1215,11 @@ async function isFunctionLoaded(selector, limit)
  * @param {boolean} immediate - Determines whether the function should be executed immediately on the leading edge.
  * @return {Function} - The debounced function.
  */
-function debounce(func, wait, immediate)
+function debounce (func, wait, immediate)
 {
 	var timeout;
 
-	return function () {
+	return function() {
 		var context = this, args = arguments;
 
 		clearTimeout(timeout);
@@ -1255,7 +1228,7 @@ function debounce(func, wait, immediate)
 			func.apply(context, args);
 		}
 
-		timeout = setTimeout(function () {
+		timeout = setTimeout(function() {
 			timeout = null;
 			if (!immediate)
 			{
@@ -1271,7 +1244,7 @@ function debounce(func, wait, immediate)
  * @param {HTMLFormElement|FormData|object} form - The form element, or object to serialize.
  * @returns {string} - The serialized data as a URL-encoded string.
  */
-function serialize(form)
+function serialize (form)
 {
 	// Passed a form
 	if (form instanceof HTMLFormElement)
@@ -1293,11 +1266,11 @@ function serialize(form)
 	{
 		if (form.hasOwnProperty(key))
 		{
-			str.push(encodeURIComponent(key) + "=" + encodeURIComponent(form[key]));
+			str.push(encodeURIComponent(key) + '=' + encodeURIComponent(form[key]));
 		}
 	}
 
-	return str.join("&");
+	return str.join('&');
 }
 
 /**
@@ -1309,9 +1282,12 @@ function serialize(form)
  * MIT License
  */
 HTMLElement.prototype.slideToggle = function(duration, callback) {
-	if (this.clientHeight === 0) {
+	if (this.clientHeight === 0)
+	{
 		_s(this, duration, callback, true);
-	} else {
+	}
+	else
+	{
 		_s(this, duration, callback);
 	}
 };
@@ -1320,15 +1296,15 @@ HTMLElement.prototype.slideUp = function(duration, callback) {
 	_s(this, duration, callback);
 };
 
-HTMLElement.prototype.slideDown = function (duration, callback) {
+HTMLElement.prototype.slideDown = function(duration, callback) {
 	_s(this, duration, callback, true);
 };
 
-HTMLElement.prototype.fadeIn = function (duration) {
+HTMLElement.prototype.fadeIn = function(duration) {
 	_s2(this, duration);
 };
 
-HTMLElement.prototype.fadeOut = function (duration, callback) {
+HTMLElement.prototype.fadeOut = function(duration, callback) {
 	_s2(this, duration, callback, true);
 };
 
@@ -1343,15 +1319,16 @@ HTMLElement.prototype.fadeOut = function (duration, callback) {
  * @param {boolean} [isDown=false] - Determines if the animation expands the element or collapses it.
  * @private
  */
-function _s(el, duration, callback, isDown) {
+function _s (el, duration, callback, isDown)
+{
 	duration = duration || 300;
 	isDown = isDown || false;
 
-	el.style.overflow = "hidden";
+	el.style.overflow = 'hidden';
 	if (isDown)
 	{
-		el.style.display = "block";
-		el.style.boxSizing = "border-box";
+		el.style.display = 'block';
+		el.style.boxSizing = 'border-box';
 	}
 
 	let elStyles = window.getComputedStyle(el),
@@ -1371,41 +1348,44 @@ function _s(el, duration, callback, isDown) {
 		start,
 		elapsed;
 
-	function step(timestamp)
+	function step (timestamp)
 	{
-		if (start === undefined) start = timestamp;
+		if (start === undefined)
+		{
+			start = timestamp;
+		}
 
 		elapsed = timestamp - start;
 
 		if (isDown)
 		{
-			el.style.height = (stepHeight * elapsed) + "px";
-			el.style.paddingTop = (stepPaddingTop * elapsed) + "px";
-			el.style.paddingBottom = (stepPaddingBottom * elapsed) + "px";
-			el.style.marginTop = (stepMarginTop * elapsed) + "px";
-			el.style.marginBottom = (stepMarginBottom * elapsed) + "px";
+			el.style.height = (stepHeight * elapsed) + 'px';
+			el.style.paddingTop = (stepPaddingTop * elapsed) + 'px';
+			el.style.paddingBottom = (stepPaddingBottom * elapsed) + 'px';
+			el.style.marginTop = (stepMarginTop * elapsed) + 'px';
+			el.style.marginBottom = (stepMarginBottom * elapsed) + 'px';
 		}
 		else
 		{
-			el.style.height = elHeight - (stepHeight * elapsed) + "px";
-			el.style.paddingTop = elPaddingTop - (stepPaddingTop * elapsed) + "px";
-			el.style.paddingBottom = elPaddingBottom - (stepPaddingBottom * elapsed) + "px";
-			el.style.marginTop = elMarginTop - (stepMarginTop * elapsed) + "px";
-			el.style.marginBottom = elMarginBottom - (stepMarginBottom * elapsed) + "px";
+			el.style.height = elHeight - (stepHeight * elapsed) + 'px';
+			el.style.paddingTop = elPaddingTop - (stepPaddingTop * elapsed) + 'px';
+			el.style.paddingBottom = elPaddingBottom - (stepPaddingBottom * elapsed) + 'px';
+			el.style.marginTop = elMarginTop - (stepMarginTop * elapsed) + 'px';
+			el.style.marginBottom = elMarginBottom - (stepMarginBottom * elapsed) + 'px';
 		}
 
 		if (elapsed >= duration)
 		{
-			el.style.height = "";
-			el.style.paddingTop = "";
-			el.style.paddingBottom = "";
-			el.style.marginTop = "";
-			el.style.marginBottom = "";
-			el.style.overflow = "";
+			el.style.height = '';
+			el.style.paddingTop = '';
+			el.style.paddingBottom = '';
+			el.style.marginTop = '';
+			el.style.marginBottom = '';
+			el.style.overflow = '';
 
 			if (!isDown)
 			{
-				el.style.display = "none";
+				el.style.display = 'none';
 			}
 
 			if (typeof callback === 'function')
@@ -1432,7 +1412,8 @@ function _s(el, duration, callback, isDown) {
  * @private
  * @return {void}
  */
-function _s2(element, duration, callback, isOut) {
+function _s2 (element, duration, callback, isOut)
+{
 	duration = duration || 1000;
 	isOut = isOut || false;
 
@@ -1449,9 +1430,12 @@ function _s2(element, duration, callback, isOut) {
 		opacityChangeFactor,
 		start;
 
-	function animateOpacity(timestamp)
+	function animateOpacity (timestamp)
 	{
-		if (start === undefined) start = timestamp;
+		if (start === undefined)
+		{
+			start = timestamp;
+		}
 
 		let progress = timestamp - start;
 		opacity = progress / duration;

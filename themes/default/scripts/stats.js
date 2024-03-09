@@ -18,7 +18,7 @@
  *
  * @param {object} oOptions
  */
-function elk_StatsCenter(oOptions)
+function elk_StatsCenter (oOptions)
 {
 	this.opt = oOptions;
 	this.oTable = null;
@@ -29,8 +29,7 @@ function elk_StatsCenter(oOptions)
 }
 
 // Start up the stats area, current year/month expanded, all others collapsed and ready for action
-elk_StatsCenter.prototype.init = function ()
-{
+elk_StatsCenter.prototype.init = function() {
 	this.oTable = document.getElementById(this.opt.sTableId);
 
 	// Is the table actually present?
@@ -73,8 +72,7 @@ elk_StatsCenter.prototype.init = function ()
 				bCurrentlyCollapsed: oCurYear.bIsCollapsed,
 				instanceRef: this,
 				sYearId: sYearId,
-				funcOnBeforeCollapse: function ()
-				{
+				funcOnBeforeCollapse: function() {
 					this.opt.instanceRef.onBeforeCollapseYear(this);
 				},
 				aSwappableContainers: [],
@@ -121,12 +119,10 @@ elk_StatsCenter.prototype.init = function ()
 				bCurrentlyCollapsed: oCurMonth.bIsCollapsed,
 				instanceRef: this,
 				sMonthId: sMonthId,
-				funcOnBeforeCollapse: function ()
-				{
+				funcOnBeforeCollapse: function() {
 					this.opt.instanceRef.onBeforeCollapseMonth(this);
 				},
-				funcOnBeforeExpand: function ()
-				{
+				funcOnBeforeExpand: function() {
 					this.opt.instanceRef.onBeforeExpandMonth(this);
 				},
 				aSwappableContainers: [],
@@ -166,8 +162,7 @@ elk_StatsCenter.prototype.init = function ()
 };
 
 // Helper function for year collapsing, close the months first
-elk_StatsCenter.prototype.onBeforeCollapseYear = function (oToggle)
-{
+elk_StatsCenter.prototype.onBeforeCollapseYear = function(oToggle) {
 	// Tell ElkArte that all underlying months have disappeared.
 	for (let sMonth in this.oYears[oToggle.opt.sYearId].oMonths)
 	{
@@ -179,8 +174,7 @@ elk_StatsCenter.prototype.onBeforeCollapseYear = function (oToggle)
 };
 
 // Helper function, called before the month is collapsed
-elk_StatsCenter.prototype.onBeforeCollapseMonth = function (oToggle)
-{
+elk_StatsCenter.prototype.onBeforeCollapseMonth = function(oToggle) {
 	if (!oToggle.bCollapsed)
 	{
 		// Tell ElkArte that the state has changed.
@@ -203,8 +197,7 @@ elk_StatsCenter.prototype.onBeforeCollapseMonth = function (oToggle)
 };
 
 // Helper function, called before the month is expanded out, makes the ajax call to get the data
-elk_StatsCenter.prototype.onBeforeExpandMonth = function (oToggle)
-{
+elk_StatsCenter.prototype.onBeforeExpandMonth = function(oToggle) {
 	// Ignore if we're still loading the previous batch.
 	if (this.bIsLoading)
 	{
@@ -231,8 +224,7 @@ elk_StatsCenter.prototype.onBeforeExpandMonth = function (oToggle)
 };
 
 // Callback for the ajax call to get the statistical information for the expanded section
-elk_StatsCenter.prototype.onDocReceived = function (oXMLDoc)
-{
+elk_StatsCenter.prototype.onDocReceived = function(oXMLDoc) {
 	// Loop through all the months we got from the XML.
 	let aMonthNodes = oXMLDoc.getElementsByTagName('month');
 

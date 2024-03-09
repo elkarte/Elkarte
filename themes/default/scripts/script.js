@@ -959,11 +959,11 @@ elk_Toggle.prototype.changeState = function (bCollapse, bInit)
 		{
 			if (bCollapse)
 			{
-				$(oContainer).slideUp();
+				oContainer.slideUp();
 			}
 			else
 			{
-				$(oContainer).slideDown();
+				oContainer.slideDown();
 			}
 		}
 	}

@@ -9,7 +9,8 @@
 /**
  * This function changes the relative time around the page real-timeish
  */
-function updateRelativeTime() {
+function updateRelativeTime ()
+{
 	const timeElements = document.querySelectorAll('time');
 
 	let relative_time_refresh = 3600000;
@@ -18,7 +19,8 @@ function updateRelativeTime() {
 		let oRelativeTime = new relativeTime(timeElement.getAttribute('data-timestamp') * 1000, oRttime.referenceTime),
 			time_text = '';
 
-		if (oRelativeTime.seconds()) {
+		if (oRelativeTime.seconds())
+		{
 			timeElement.textContent = oRttime.now;
 			relative_time_refresh = Math.min(relative_time_refresh, 10000);
 		}
@@ -75,7 +77,7 @@ function updateRelativeTime() {
  * @param {int} sFrom
  * @param {int} sTo
  */
-function relativeTime(sFrom, sTo)
+function relativeTime (sFrom, sTo)
 {
 	// helper function to reduce code repetition
 	const createDate = (s) => {
@@ -112,7 +114,7 @@ function relativeTime(sFrom, sTo)
 	this.deltaTime = 0;
 }
 
-relativeTime.prototype.seconds = function () {
+relativeTime.prototype.seconds = function() {
 	// Within the first 60 seconds it is just now.
 	if (this.past_time < 60)
 	{
@@ -123,7 +125,7 @@ relativeTime.prototype.seconds = function () {
 	return false;
 };
 
-relativeTime.prototype.minutes = function () {
+relativeTime.prototype.minutes = function() {
 	// Within the first hour?
 	if (this.past_time >= 60 && Math.round(this.past_time / 60) < 60)
 	{
@@ -134,7 +136,7 @@ relativeTime.prototype.minutes = function () {
 	return false;
 };
 
-relativeTime.prototype.hours = function () {
+relativeTime.prototype.hours = function() {
 	// Some hours but less than a day?
 	if (Math.round(this.past_time / 60) >= 60 && Math.round(this.past_time / 3600) < 24)
 	{
@@ -145,7 +147,7 @@ relativeTime.prototype.hours = function () {
 	return false;
 };
 
-relativeTime.prototype.days = function () {
+relativeTime.prototype.days = function() {
 	// Some days ago but less than a week?
 	if (Math.round(this.past_time / 3600) >= 24 && Math.round(this.past_time / (24 * 3600)) < 7)
 	{
@@ -156,7 +158,7 @@ relativeTime.prototype.days = function () {
 	return false;
 };
 
-relativeTime.prototype.weeks = function () {
+relativeTime.prototype.weeks = function() {
 	// Weeks ago but less than a month?
 	if (Math.round(this.past_time / (24 * 3600)) >= 7 && Math.round(this.past_time / (24 * 3600)) < 30)
 	{
@@ -167,7 +169,7 @@ relativeTime.prototype.weeks = function () {
 	return false;
 };
 
-relativeTime.prototype.months = function () {
+relativeTime.prototype.months = function() {
 	// Months ago but less than a year?
 	if (Math.round(this.past_time / (24 * 3600)) >= 30 && Math.round(this.past_time / (30 * 24 * 3600)) < 12)
 	{
@@ -178,7 +180,7 @@ relativeTime.prototype.months = function () {
 	return false;
 };
 
-relativeTime.prototype.years = function () {
+relativeTime.prototype.years = function() {
 	// Oha, we've passed at least a year?
 	if (Math.round(this.past_time / (30 * 24 * 3600)) >= 12)
 	{

@@ -11,7 +11,7 @@
  *
  * @param {string} menuID the selector of the top-level UL in the menu structure
  */
-function elkMenu(menuID)
+function elkMenu (menuID)
 {
 	this.menu = document.querySelector(menuID);
 	if (this.menu !== null)
@@ -23,8 +23,7 @@ function elkMenu(menuID)
 /**
  * Setup the menu to work with click / keyboard events instead of :hover
  */
-elkMenu.prototype.initMenu = function ()
-{
+elkMenu.prototype.initMenu = function() {
 	// Setup enter/spacebar keys to trigger a click on the "Skip to main content" link
 	if (this.menu.id === 'main_menu')
 	{
@@ -39,8 +38,7 @@ elkMenu.prototype.initMenu = function ()
 	let subMenu = this.menu.querySelectorAll('a + ul');
 
 	// Initial aria-hidden = true for all subMenus
-	subMenu.forEach(function (item)
-	{
+	subMenu.forEach(function(item) {
 		item.setAttribute('aria-hidden', 'true');
 	});
 
@@ -55,10 +53,8 @@ elkMenu.prototype.initMenu = function ()
 /**
  * CLose menu on click outside of its structure
  */
-elkMenu.prototype.docClick = function()
-{
-	document.body.addEventListener('click', function(e)
-	{
+elkMenu.prototype.docClick = function() {
+	document.body.addEventListener('click', function(e) {
 		// Clicked outside of this.menu
 		if (!this.menu.contains(e.target))
 		{
@@ -79,10 +75,8 @@ elkMenu.prototype.docClick = function()
  * if a menu/submenu does not capture the keyboard event first, as if they
  * are not open or lost focus.
  */
-elkMenu.prototype.docKeydown = function ()
-{
-	document.body.addEventListener('keydown', function (e)
-	{
+elkMenu.prototype.docKeydown = function() {
+	document.body.addEventListener('keydown', function(e) {
 		e = e || window.e;
 		if (e.key === 'Escape')
 		{
@@ -98,11 +92,9 @@ elkMenu.prototype.docKeydown = function ()
  *
  * @param {NodeListOf} subMenu
  */
-elkMenu.prototype.submenuReveal = function (subMenu)
-{
+elkMenu.prototype.submenuReveal = function(subMenu) {
 	// All the subMenus menulevel2, menulevel3
-	Array.prototype.forEach.call(subMenu, function (menu)
-	{
+	Array.prototype.forEach.call(subMenu, function(menu) {
 		// The menu items container LI and link LI > A
 		let parentLi = menu.parentNode,
 			subLink = parentLi.querySelector('a');
@@ -119,8 +111,7 @@ elkMenu.prototype.submenuReveal = function (subMenu)
 		this.keysAsClick(parentLi);
 
 		// The click event listener for opening sub menus
-		subLink.addEventListener('click', function (e)
-		{
+		subLink.addEventListener('click', function(e) {
 			// Reset all sublinks in this menu
 			this.resetSubLinks(subLink);
 
@@ -157,11 +148,9 @@ elkMenu.prototype.submenuReveal = function (subMenu)
  *
  * @param {HTMLElement} subLink
  */
-elkMenu.prototype.resetSubMenus = function (subLink)
-{
+elkMenu.prototype.resetSubMenus = function(subLink) {
 	let subMenus = subLink.parentNode.parentNode.querySelectorAll('li > a + ul:first-of-type');
-	subMenus.forEach(function (menu)
-	{
+	subMenus.forEach(function(menu) {
 		// Remove open from the LI and LI A for this menu
 		let parent = menu.parentNode;
 		parent.classList.remove('open');
@@ -179,12 +168,10 @@ elkMenu.prototype.resetSubMenus = function (subLink)
  *
  * @param {HTMLElement} subLink the .menulevel# link that has been clicked
  */
-elkMenu.prototype.resetSubLinks = function (subLink)
-{
+elkMenu.prototype.resetSubLinks = function(subLink) {
 	// The all closed menus
 	let subMenus = subLink.parentNode.parentNode.querySelectorAll('li > a + ul:not(.open)');
-	subMenus.forEach(function (menu)
-	{
+	subMenus.forEach(function(menu) {
 		// links to closed menus are no longer active
 		let thisLink = menu.parentNode.querySelector('a');
 		thisLink.setAttribute('aria-pressed', 'false');
@@ -196,20 +183,17 @@ elkMenu.prototype.resetSubLinks = function (subLink)
  * Reset all aria labels to initial closed state, remove all added
  * open and selected classes from this menu.
  */
-elkMenu.prototype.resetMenu = function (menu)
-{
+elkMenu.prototype.resetMenu = function(menu) {
 	this.SetItemAttribute(menu, '[aria-hidden="false"]', {'aria-hidden': 'true'});
 	this.SetItemAttribute(menu, '[aria-expanded="true"]', {'aria-expanded': 'false'});
 	this.SetItemAttribute(menu, '[aria-pressed="true"]', {'aria-pressed': 'false'});
 
-	menu.querySelectorAll('.selected').forEach(function (item)
-	{
+	menu.querySelectorAll('.selected').forEach(function(item) {
 		item.classList.remove('selected');
 		item.classList.add('un_selected');
 	});
 
-	menu.querySelectorAll('.open').forEach(function (item)
-	{
+	menu.querySelectorAll('.open').forEach(function(item) {
 		item.classList.remove('open');
 	});
 };
@@ -221,16 +205,14 @@ elkMenu.prototype.resetMenu = function (menu)
  * @param {string} selector used to target specific attribute of menu
  * @param {object} attrs
  */
-elkMenu.prototype.SetItemAttribute = function (menu, selector, attrs)
-{
+elkMenu.prototype.SetItemAttribute = function(menu, selector, attrs) {
 	if (selector === '')
 	{
 		Object.keys(attrs).forEach(key => menu.setAttribute(key, attrs[key]));
 		return;
 	}
 
-	menu.querySelectorAll(selector).forEach(function (item)
-	{
+	menu.querySelectorAll(selector).forEach(function(item) {
 		Object.keys(attrs).forEach(key => item.setAttribute(key, attrs[key]));
 	});
 };
@@ -240,10 +222,8 @@ elkMenu.prototype.SetItemAttribute = function (menu, selector, attrs)
  *
  * @param {HTMLElement} el
  */
-elkMenu.prototype.keysAsClick = function (el)
-{
-	el.addEventListener('keydown', function (event)
-	{
+elkMenu.prototype.keysAsClick = function(el) {
+	el.addEventListener('keydown', function(event) {
 		this.keysCallback(event, el);
 	}.bind(this), true);
 };
@@ -254,8 +234,7 @@ elkMenu.prototype.keysAsClick = function (el)
  * @param {KeyboardEvent} keyboardEvent
  * @param {HTMLElement} el
  */
-elkMenu.prototype.keysCallback = function (keyboardEvent, el)
-{
+elkMenu.prototype.keysCallback = function(keyboardEvent, el) {
 	// THe keys we know how to respond to
 	let keys = [' ', 'Enter', 'ArrowUp', 'ArrowLeft', 'ArrowDown', 'ArrowRight', 'Home', 'End', 'Escape'];
 

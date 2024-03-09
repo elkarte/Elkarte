@@ -20,7 +20,7 @@
  * @param {Number} passwordDifficultyLevel
  * @param {Array.} regTextStrings
  */
-function elkRegister(formID, passwordDifficultyLevel, regTextStrings)
+function elkRegister (formID, passwordDifficultyLevel, regTextStrings)
 {
 	this.verificationFields = [];
 	this.verificationFieldLength = 0;
@@ -33,8 +33,7 @@ function elkRegister(formID, passwordDifficultyLevel, regTextStrings)
 }
 
 // This is a field which requires some form of verification check.
-elkRegister.prototype.addVerificationField = function (fieldType, fieldID)
-{
+elkRegister.prototype.addVerificationField = function(fieldType, fieldID) {
 	// Check the field exists.
 	if (!document.getElementById(fieldID))
 	{
@@ -87,15 +86,13 @@ elkRegister.prototype.addVerificationField = function (fieldType, fieldID)
 	{
 		var _self = this;
 		createEventListener(inputHandle);
-		inputHandle.addEventListener('keyup', function (event)
-		{
+		inputHandle.addEventListener('keyup', function(event) {
 			_self[eventHandler].call(_self, event);
 		}, false);
 		this[eventHandler]();
 
 		// Username will auto check on blur!
-		inputHandle.addEventListener('blur', function (event)
-		{
+		inputHandle.addEventListener('blur', function(event) {
 			_self.autoCheckUsername.call(_self, event);
 		}, false);
 	}
@@ -108,22 +105,19 @@ elkRegister.prototype.addVerificationField = function (fieldType, fieldID)
 };
 
 // A button to trigger a username search
-elkRegister.prototype.addUsernameSearchTrigger = function (elementID)
-{
+elkRegister.prototype.addUsernameSearchTrigger = function(elementID) {
 	let buttonHandle = document.getElementById(elementID),
 		_self = this;
 
 	// Attach the event to this element.
 	createEventListener(buttonHandle);
-	buttonHandle.addEventListener('click', function (event)
-	{
+	buttonHandle.addEventListener('click', function(event) {
 		_self.checkUsername.call(_self, event);
 	}, false);
 };
 
 // This function will automatically pick up all the necessary verification fields and initialise their visual status.
-elkRegister.prototype.autoSetup = function (formID)
-{
+elkRegister.prototype.autoSetup = function(formID) {
 	if (!document.getElementById(formID))
 	{
 		return false;
@@ -183,8 +177,7 @@ elkRegister.prototype.autoSetup = function (formID)
 };
 
 // What is the password state?
-elkRegister.prototype.refreshMainPassword = function (called_from_verify)
-{
+elkRegister.prototype.refreshMainPassword = function(called_from_verify) {
 	if (!this.verificationFields.pwmain)
 	{
 		return false;
@@ -252,8 +245,7 @@ elkRegister.prototype.refreshMainPassword = function (called_from_verify)
 };
 
 // Check that the verification password matches the main one!
-elkRegister.prototype.refreshVerifyPassword = function ()
-{
+elkRegister.prototype.refreshVerifyPassword = function() {
 	// Can't do anything without something to check again!
 	if (!this.verificationFields.pwmain)
 	{
@@ -271,8 +263,7 @@ elkRegister.prototype.refreshVerifyPassword = function ()
 };
 
 // If the username is changed just revert the status of whether it's valid!
-elkRegister.prototype.refreshUsername = function ()
-{
+elkRegister.prototype.refreshUsername = function() {
 	if (!this.verificationFields.username)
 	{
 		return false;
@@ -300,8 +291,7 @@ elkRegister.prototype.refreshUsername = function ()
 };
 
 // If the displayname is changed just revert the status of whether it's valid!
-elkRegister.prototype.refreshDisplayname = function (e)
-{
+elkRegister.prototype.refreshDisplayname = function(e) {
 	if (!this.verificationFields.displayname)
 	{
 		return false;
@@ -332,14 +322,12 @@ elkRegister.prototype.refreshDisplayname = function (e)
 };
 
 // This is a pass through function that ensures we don't do any of the AJAX notification stuff.
-elkRegister.prototype.autoCheckUsername = function ()
-{
+elkRegister.prototype.autoCheckUsername = function() {
 	this.checkUsername(true);
 };
 
 // Check whether the username exists?
-elkRegister.prototype.checkUsername = function (is_auto)
-{
+elkRegister.prototype.checkUsername = function(is_auto) {
 	if (!this.verificationFields.username)
 	{
 		return false;
@@ -372,13 +360,12 @@ elkRegister.prototype.checkUsername = function (is_auto)
 };
 
 // Callback for getting the username data.
-elkRegister.prototype.checkUsernameCallback = function (XMLDoc)
-{
+elkRegister.prototype.checkUsernameCallback = function(XMLDoc) {
 	let isValid = 1;
 
-	if (XMLDoc.getElementsByTagName("username"))
+	if (XMLDoc.getElementsByTagName('username'))
 	{
-		isValid = parseInt(XMLDoc.getElementsByTagName("username")[0].getAttribute("valid"));
+		isValid = parseInt(XMLDoc.getElementsByTagName('username')[0].getAttribute('valid'));
 	}
 
 	// What to alt?
@@ -391,13 +378,12 @@ elkRegister.prototype.checkUsernameCallback = function (XMLDoc)
 };
 
 // Callback for getting the displayname data.
-elkRegister.prototype.checkDisplaynameCallback = function (XMLDoc)
-{
+elkRegister.prototype.checkDisplaynameCallback = function(XMLDoc) {
 	let isValid = 1;
 
-	if (XMLDoc.getElementsByTagName("username"))
+	if (XMLDoc.getElementsByTagName('username'))
 	{
-		isValid = parseInt(XMLDoc.getElementsByTagName("username")[0].getAttribute("valid"));
+		isValid = parseInt(XMLDoc.getElementsByTagName('username')[0].getAttribute('valid'));
 	}
 
 	// What to alt?
@@ -410,8 +396,7 @@ elkRegister.prototype.checkDisplaynameCallback = function (XMLDoc)
 };
 
 // Set the image to be the correct type.
-elkRegister.prototype.setVerificationImage = function (imageHandle, imageIcon, alt)
-{
+elkRegister.prototype.setVerificationImage = function(imageHandle, imageIcon, alt) {
 	if (!imageHandle)
 	{
 		return false;
@@ -434,7 +419,7 @@ elkRegister.prototype.setVerificationImage = function (imageHandle, imageIcon, a
 /**
  * Used when the admin registers a new member, enable or disables the email activation
  */
-function onCheckChange()
+function onCheckChange ()
 {
 	if (document.forms.postForm.emailActivate.checked || document.forms.postForm.password.value === '')
 	{
@@ -452,7 +437,7 @@ function onCheckChange()
  *
  * @param {Event} event - The event object passed when the language is changed.
  */
-function registerAgreementLanguageLoad(event)
+function registerAgreementLanguageLoad (event)
 {
 	let postData = serialize({lang: event.target.value.trim()});
 
@@ -466,28 +451,28 @@ function registerAgreementLanguageLoad(event)
 			'Accept': 'application/json'
 		}
 	})
-		.then(function (response) {
+		.then(function(response) {
 			if (!response.ok)
 			{
-				throw new Error("HTTP error " + response.status);
+				throw new Error('HTTP error ' + response.status);
 			}
 
 			return response.json();
 		})
-		.then(function (request) {
+		.then(function(request) {
 			if (request !== '')
 			{
 				document.querySelector('#agreement_box').innerHTML = request.agreement;
 				document.querySelector('#privacypol_box').innerHTML = request.privacypol;
 			}
 		})
-		.catch(function (error) {
+		.catch(function(error) {
 			if ('console' in window && window.console.info)
 			{
 				console.log('Error:', error);
 			}
 		})
-		.finally(function () {
+		.finally(function() {
 			// turn off the indicator
 			ajax_indicator(false);
 		});

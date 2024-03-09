@@ -512,7 +512,7 @@ function modifyWarnNotify()
 
 /**
  * onclick function, triggered in response to selecting + or - in the warning screen
- * Increases the warning level by a defined amount.  Uses jqueryUI
+ * Increases the warning level by a defined amount.  Uses jqueryUI slider
  *
  * @param {string} sliderID
  * @param {string} levelID

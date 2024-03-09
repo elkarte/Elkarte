@@ -886,7 +886,7 @@ InTopicModeration.prototype.handleSubmit = function(sSubmitType) {
  * @param {string} thumbID
  * @param {string} messageID
  */
-function expandThumbLB(thumbID, messageID)
+function expandThumbLB (thumbID, messageID)
 {
 	var link = document.getElementById('link_' + thumbID),
 		siblings = $('a[data-lightboxmessage="' + messageID + '"]'),
@@ -898,17 +898,14 @@ function expandThumbLB(thumbID, messageID)
 		$elk_prev_icon = $('<span id="elk_lb_prev"></span>'),
 		$elk_lightbox = $('#elk_lightbox'),
 		$elk_lb_content = $('#elk_lb_content'),
-		ajaxIndicatorOn = function ()
-		{
+		ajaxIndicatorOn = function() {
 			$('<div id="lightbox-loading"><i class="icon icon-xl i-concentric"></i><div>').appendTo($elk_lb_content);
 			$('html, body').addClass('elk_lb_no_scrolling');
 		},
-		ajaxIndicatorOff = function ()
-		{
+		ajaxIndicatorOff = function() {
 			$('#lightbox-loading').remove();
 		},
-		closeLightbox = function ()
-		{
+		closeLightbox = function() {
 			// Close the lightbox and remove handlers
 			$elk_expand_icon.off('click');
 			$elk_next_icon.off('click');
@@ -921,12 +918,10 @@ function expandThumbLB(thumbID, messageID)
 			$(window).off('touchstart.lb');
 			$(window).off('touchmove.lb');
 		},
-		openLightbox = function ()
-		{
+		openLightbox = function() {
 			// Load and open an image in the lightbox
 			$('<img id="elk_lb_img" src="' + link.href + '">')
-				.on('load', function ()
-				{
+				.on('load', function() {
 					var screenWidth = (window.innerWidth ? window.innerWidth : $(window).width()) * (is_mobile ? 0.8 : 0.9),
 						screenHeight = (window.innerHeight ? window.innerHeight : $(window).height()) * 0.9;
 
@@ -947,29 +942,24 @@ function expandThumbLB(thumbID, messageID)
 
 					ajaxIndicatorOff();
 				})
-				.on('error', function ()
-				{
+				.on('error', function() {
 					// Perhaps a message, but for now make it look like we tried and failed
-					setTimeout(function ()
-					{
+					setTimeout(function() {
 						ajaxIndicatorOff();
 						closeLightbox();
 						window.location = link.href;
 					}, 1500);
 				});
 		},
-		nextNav = function ()
-		{
+		nextNav = function() {
 			// Get / Set the next image ID in the array (with wrap around)
 			thumbID = navigation[($.inArray(thumbID, navigation) + 1) % navigation.length];
 		},
-		prevNav = function ()
-		{
+		prevNav = function() {
 			// Get / Set the previous image ID in the array (with wrap around)
 			thumbID = navigation[($.inArray(thumbID, navigation) - 1 + navigation.length) % navigation.length];
 		},
-		navLightbox = function ()
-		{
+		navLightbox = function() {
 			// Navigate to the next image and show it in the lightbox
 			$elk_lb_content.html('').removeAttr('style').removeClass('expand');
 			ajaxIndicatorOn();
@@ -980,11 +970,9 @@ function expandThumbLB(thumbID, messageID)
 			openLightbox();
 			expandLightbox();
 		},
-		expandLightbox = function ()
-		{
+		expandLightbox = function() {
 			// Add an expand the image to full size when the expand icon is clicked
-			$elk_expand_icon.on('click', function ()
-			{
+			$elk_expand_icon.on('click', function() {
 				$('#elk_lb_content').addClass('expand').css({
 					'height': Math.floor(window.innerHeight * 0.95) + 'px',
 					'width': Math.floor(window.innerWidth * 0.9) + 'px',
@@ -995,15 +983,13 @@ function expandThumbLB(thumbID, messageID)
 				$(window).off('keydown.lb');
 				$(window).off('touchmove.lb');
 			});
-			$elk_next_icon.on('click', function (event)
-			{
+			$elk_next_icon.on('click', function(event) {
 				event.preventDefault();
 				event.stopPropagation();
 				nextNav();
 				navLightbox();
 			});
-			$elk_prev_icon.on('click', function (event)
-			{
+			$elk_prev_icon.on('click', function(event) {
 				event.preventDefault();
 				event.stopPropagation();
 				prevNav();
@@ -1022,8 +1008,7 @@ function expandThumbLB(thumbID, messageID)
 	}
 
 	// Load the navigation array
-	siblings.each(function ()
-	{
+	siblings.each(function() {
 		navigation[navigation.length] = $(this).data('lightboximage');
 	});
 
@@ -1040,8 +1025,7 @@ function expandThumbLB(thumbID, messageID)
 	expandLightbox();
 
 	// Click anywhere on the page (except the expand icon) to close the lightbox
-	$elk_lightbox.on('click', function (event)
-	{
+	$elk_lightbox.on('click', function(event) {
 		if (event.target.id !== $elk_expand_icon.attr('id'))
 		{
 			event.preventDefault();
@@ -1050,8 +1034,7 @@ function expandThumbLB(thumbID, messageID)
 	});
 
 	// Provide some keyboard navigation
-	$(window).on('keydown.lb', function (event)
-	{
+	$(window).on('keydown.lb', function(event) {
 		event.preventDefault();
 
 		// escape
@@ -1076,8 +1059,7 @@ function expandThumbLB(thumbID, messageID)
 	});
 
 	// Make the image size fluid as the browser window changes
-	$(window).on('resize.lb', function ()
-	{
+	$(window).on('resize.lb', function() {
 		// Account for either a normal or expanded view
 		var $_elk_lb_content = $('#elk_lb_content');
 
@@ -1092,15 +1074,13 @@ function expandThumbLB(thumbID, messageID)
 	});
 
 	// Swipe navigation start, record press x/y
-	$(window).on('touchstart.lb', function (event)
-	{
+	$(window).on('touchstart.lb', function(event) {
 		xDown = event.originalEvent.touches[0].clientX;
 		yDown = event.originalEvent.touches[0].clientY;
 	});
 
 	// Swipe navigation left / right detection
-	$(window).on('touchmove.lb', function (event)
-	{
+	$(window).on('touchmove.lb', function(event) {
 		// No known start point ?
 		if (!xDown || !yDown)
 		{

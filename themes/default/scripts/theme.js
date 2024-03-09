@@ -11,8 +11,7 @@
  */
 
 // Normal JS document ready event, could simply use the jQuery one as well
-document.addEventListener("DOMContentLoaded", function ()
-{
+document.addEventListener('DOMContentLoaded', function() {
 	// If they touch the screen, then we switch to click menus
 	window.addEventListener('touchstart', onFirstTouch, false);
 
@@ -34,13 +33,13 @@ document.addEventListener("DOMContentLoaded", function ()
 	}
 
 	// Smooth scroll to top.
-	document.getElementById("gotop").addEventListener("click", function(e) {
+	document.getElementById('gotop').addEventListener('click', function(e) {
 		e.preventDefault();
 		window.scrollTo({top: 0, behavior: 'smooth'});
 	});
 
 	// Smooth scroll to bottom.
-	document.getElementById("gobottom").addEventListener("click", function(e) {
+	document.getElementById('gobottom').addEventListener('click', function(e) {
 		e.preventDefault();
 
 		// Don't scroll all the way down to the footer, just the content bottom
@@ -48,7 +47,7 @@ document.addEventListener("DOMContentLoaded", function ()
 			linkY = link.offsetHeight,
 			heightDiff = link.getBoundingClientRect().top + linkY - window.innerHeight;
 
-		window.scrollBy({ top: heightDiff, behavior: 'smooth' });
+		window.scrollBy({top: heightDiff, behavior: 'smooth'});
 	});
 
 	// Tooltips
@@ -63,7 +62,8 @@ document.addEventListener("DOMContentLoaded", function ()
 
 	// Find all nested linked images and turn off the border
 	let elements = document.querySelectorAll('a.bbc_link img.bbc_img');
-	for(let i = 0; i < elements.length; i++) {
+	for (let i = 0; i < elements.length; i++)
+	{
 		let parentElement = elements[i].parentNode;
 		parentElement.style.border = '0';
 	}
@@ -72,7 +72,7 @@ document.addEventListener("DOMContentLoaded", function ()
 	let hamburger = document.querySelector('.hamburger_30');
 	if (hamburger)
 	{
-		hamburger.addEventListener('click', function (e) {
+		hamburger.addEventListener('click', function(e) {
 			let id = this.getAttribute('data-id');
 			e.preventDefault();
 			document.getElementById(id).classList.add('visible');
@@ -82,21 +82,18 @@ document.addEventListener("DOMContentLoaded", function ()
 });
 
 // Jquery document ready
-$(function ()
-{
+$(function() {
 	// Enable the ... page expansion
 	$('.expand_pages').expand_pages();
 
 	// Collapsible fieldsets, pure candy
-	$(document).on('click', 'legend', function ()
-	{
-		$(this).siblings().slideToggle("fast");
-		$(this).parent().toggleClass("collapsed");
+	$(document).on('click', 'legend', function() {
+		$(this).siblings().slideToggle('fast');
+		$(this).parent().toggleClass('collapsed');
 	});
 
 	// For any legends with data-collapsed="true", start them collapsed
-	$('legend').each(function ()
-	{
+	$('legend').each(function() {
 		if ($(this).data('collapsed'))
 		{
 			$(this).trigger('click');
@@ -104,22 +101,19 @@ $(function ()
 	});
 
 	// Spoiler
-	$('.spoilerheader').on('click', function ()
-	{
-		$(this).next().children().slideToggle("fast");
+	$('.spoilerheader').on('click', function() {
+		$(this).next().children().slideToggle('fast');
 	});
 
 	// Attachment thumbnail expand on click, you can turn off this namespaced click
 	// event with $('[data-lightboximage]').off('click.elk_lb');
-	$('[data-lightboximage]').on('click.elk_lb', function (e)
-	{
+	$('[data-lightboximage]').on('click.elk_lb', function(e) {
 		e.preventDefault();
 		expandThumbLB($(this).data('lightboximage'), $(this).data('lightboxmessage'));
 	});
 
 	// BBC [img] element toggle for height and width styles of an image.
-	$('img').each(function ()
-	{
+	$('img').each(function() {
 		// Not a resized image? Skip it.
 		if ($(this).hasClass('bbc_img resized') === false)
 		{
@@ -130,8 +124,7 @@ $(function ()
 
 		// Note to addon authors, if you want to enable your own click events to bbc images
 		// you can turn off this namespaced click event with $("img").off("click.elk_bbc")
-		$(this).on("click.elk_bbc", function ()
-		{
+		$(this).on('click.elk_bbc', function() {
 			var $this = $(this);
 
 			// No saved data, then lets set it to auto
@@ -154,10 +147,10 @@ $(function ()
 			else
 			{
 				// Was clicked and saved, so set it back
-				$this.css({'width': $this.data("bbc_img").width});
-				$this.css({'height': $this.data("bbc_img").height});
-				$this.css({'max-width': $this.data("bbc_img")['max-width']});
-				$this.css({'max-height': $this.data("bbc_img")['max-height']});
+				$this.css({'width': $this.data('bbc_img').width});
+				$this.css({'height': $this.data('bbc_img').height});
+				$this.css({'max-width': $this.data('bbc_img')['max-width']});
+				$this.css({'max-height': $this.data('bbc_img')['max-height']});
 
 				// Remove the data
 				$this.removeData('bbc_img');
@@ -177,7 +170,7 @@ $(function ()
  * @param {boolean} bUseImage
  * @param {object} oOptions
  */
-function elk_addButton(sButtonStripId, bUseImage, oOptions)
+function elk_addButton (sButtonStripId, bUseImage, oOptions)
 {
 	let oButtonStrip = document.getElementById(sButtonStripId),
 		aItems = oButtonStrip.getElementsByTagName('span');
@@ -206,14 +199,13 @@ function elk_addButton(sButtonStripId, bUseImage, oOptions)
 		'<a class="linklevel1" href="' + oOptions.sUrl + '" ' + ('sCustom' in oOptions ? oOptions.sCustom : '') + '>' +
 		('sImage' in oOptions && bUseImage ? '<i class="icon ' + oOptions.sImage + '"></i>' : '') +
 		'   <span class="last"' + ('sId' in oOptions ? ' id="' + oOptions.sId + '_text"' : '') + '>' +
-				oOptions.sText +
+		oOptions.sText +
 		'   </span>' +
 		'</a>';
 
 	if (oOptions.aEvents)
 	{
-		oOptions.aEvents.forEach(function (e)
-		{
+		oOptions.aEvents.forEach(function(e) {
 			oNewButton.addEventListener(e[0], e[1]);
 		});
 	}
@@ -221,11 +213,12 @@ function elk_addButton(sButtonStripId, bUseImage, oOptions)
 	oButtonStripList.appendChild(oNewButton);
 }
 
-function onFirstTouch() {
+function onFirstTouch ()
+{
 	useClickMenu();
 }
 
-function useClickMenu()
+function useClickMenu ()
 {
 	// Click Menu drop downs
 	let menus = ['#main_menu', '#sort_by', 'ul.poster', 'ul.quickbuttons', 'ul.admin_menu', 'ul.sidebar_menu'];
