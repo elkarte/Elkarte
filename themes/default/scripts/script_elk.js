@@ -1454,7 +1454,10 @@ function _s2 (element, duration, callback, isOut)
 		else
 		{
 			element.style.opacity = finalOpacity;
-			callback && callback();
+			if (typeof callback === 'function')
+			{
+				callback();
+			}
 		}
 	}
 
