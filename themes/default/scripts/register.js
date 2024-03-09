@@ -42,12 +42,12 @@ elkRegister.prototype.addVerificationField = function (fieldType, fieldID)
 	}
 
 	// Get the handles.
-	var inputHandle = document.getElementById(fieldID),
+	let inputHandle = document.getElementById(fieldID),
 		imageHandle = document.getElementById(fieldID + '_img') ? document.getElementById(fieldID + '_img') : false,
 		divHandle = document.getElementById(fieldID + '_div') ? document.getElementById(fieldID + '_div') : false;
 
 	// What is the event handler?
-	var eventHandler = false;
+	let eventHandler = false;
 	if (fieldType === 'pwmain')
 	{
 		eventHandler = 'refreshMainPassword';
@@ -70,7 +70,7 @@ elkRegister.prototype.addVerificationField = function (fieldType, fieldID)
 	}
 
 	// Store this field.
-	var vFieldIndex = fieldType === 'reserved' ? fieldType + this.verificationFieldLength : fieldType;
+	let vFieldIndex = fieldType === 'reserved' ? fieldType + this.verificationFieldLength : fieldType;
 	this.verificationFields[vFieldIndex] = new Array(6);
 	this.verificationFields[vFieldIndex][0] = fieldID;
 	this.verificationFields[vFieldIndex][1] = inputHandle;
@@ -110,7 +110,7 @@ elkRegister.prototype.addVerificationField = function (fieldType, fieldID)
 // A button to trigger a username search
 elkRegister.prototype.addUsernameSearchTrigger = function (elementID)
 {
-	var buttonHandle = document.getElementById(elementID),
+	let buttonHandle = document.getElementById(elementID),
 		_self = this;
 
 	// Attach the event to this element.
@@ -129,10 +129,10 @@ elkRegister.prototype.autoSetup = function (formID)
 		return false;
 	}
 
-	var curElement,
+	let curElement,
 		curType;
 
-	for (var i = 0, n = document.getElementById(formID).elements.length; i < n; i++)
+	for (let i = 0, n = document.getElementById(formID).elements.length; i < n; i++)
 	{
 		curElement = document.getElementById(formID).elements[i];
 
@@ -158,7 +158,8 @@ elkRegister.prototype.autoSetup = function (formID)
 			else if (curElement.id.indexOf('pwverify') !== -1)
 			{
 				curType = 'pwverify';
-			}// This means this field is reserved and cannot be contained in the password!
+			}
+			// This means this field is reserved and cannot be contained in the password!
 			else if (curElement.id.indexOf('reserve') !== -1)
 			{
 				curType = 'reserved';
@@ -189,7 +190,7 @@ elkRegister.prototype.refreshMainPassword = function (called_from_verify)
 		return false;
 	}
 
-	var curPass = this.verificationFields.pwmain[1].value,
+	let curPass = this.verificationFields.pwmain[1].value,
 		stringIndex = '';
 
 	// Is it a valid length?
@@ -208,7 +209,7 @@ elkRegister.prototype.refreshMainPassword = function (called_from_verify)
 		}
 
 		// Any reserved fields?
-		for (var i in this.verificationFields)
+		for (let i in this.verificationFields)
 		{
 			if (this.verificationFields[i][4] === 'reserved' && this.verificationFields[i][1].value && curPass.indexOf(this.verificationFields[i][1].value) !== -1)
 			{
@@ -231,7 +232,7 @@ elkRegister.prototype.refreshMainPassword = function (called_from_verify)
 		}
 	}
 
-	var isValid = stringIndex === '';
+	let isValid = stringIndex === '';
 	if (stringIndex === '')
 	{
 		stringIndex = 'password_valid';
@@ -260,7 +261,7 @@ elkRegister.prototype.refreshVerifyPassword = function ()
 	}
 
 	// Check and set valid status!
-	var isValid = this.verificationFields.pwmain[1].value === this.verificationFields.pwverify[1].value && this.refreshMainPassword(true),
+	let isValid = this.verificationFields.pwmain[1].value === this.verificationFields.pwverify[1].value && this.refreshMainPassword(true),
 		alt = this.textStrings[isValid === 1 ? 'password_valid' : 'password_no_match'] ? this.textStrings[isValid === 1 ? 'password_valid' : 'password_no_match'] : '';
 
 	this.setVerificationImage(this.verificationFields.pwverify[2], isValid, alt);
@@ -289,7 +290,7 @@ elkRegister.prototype.refreshUsername = function ()
 	}
 
 	// Check the image is correct.
-	var alt = this.textStrings.username_check ? this.textStrings.username_check : '';
+	let alt = this.textStrings.username_check ? this.textStrings.username_check : '';
 	this.setVerificationImage(this.verificationFields.username[2], 'check', alt);
 
 	// Check the password is still OK.
@@ -321,7 +322,7 @@ elkRegister.prototype.refreshDisplayname = function (e)
 	}
 
 	// Check the image is correct.
-	var alt = this.textStrings.username_check ? this.textStrings.username_check : '';
+	let alt = this.textStrings.username_check ? this.textStrings.username_check : '';
 	this.setVerificationImage(this.verificationFields.displayname[2], 'check', alt);
 
 	// Check the password is still OK.
@@ -345,8 +346,8 @@ elkRegister.prototype.checkUsername = function (is_auto)
 	}
 
 	// Get the username and do nothing without one!
-	var curUsername = this.verificationFields.username[1].value;
-	var curDisplayname = typeof this.verificationFields.displayname !== 'undefined' ? this.verificationFields.displayname[1].value : '';
+	let curUsername = this.verificationFields.username[1].value,
+		curDisplayname = typeof this.verificationFields.displayname === 'undefined' ? '' : this.verificationFields.displayname[1].value;
 
 	if (!curUsername && !curDisplayname)
 	{
@@ -359,7 +360,7 @@ elkRegister.prototype.checkUsername = function (is_auto)
 	}
 
 	// Request a search on that username.
-	var checkName = curUsername.php_urlencode();
+	let checkName = curUsername.php_urlencode();
 	sendXMLDocument.call(this, elk_prepareScriptUrl(elk_scripturl) + 'action=register;sa=usernamecheck;api=xml;username=' + checkName, null, this.checkUsernameCallback);
 	if (curDisplayname)
 	{
@@ -373,7 +374,7 @@ elkRegister.prototype.checkUsername = function (is_auto)
 // Callback for getting the username data.
 elkRegister.prototype.checkUsernameCallback = function (XMLDoc)
 {
-	var isValid = true;
+	let isValid = 1;
 
 	if (XMLDoc.getElementsByTagName("username"))
 	{
@@ -381,7 +382,7 @@ elkRegister.prototype.checkUsernameCallback = function (XMLDoc)
 	}
 
 	// What to alt?
-	var alt = this.textStrings[isValid === 1 ? 'username_valid' : 'username_invalid'] ? this.textStrings[isValid === 1 ? 'username_valid' : 'username_invalid'] : '';
+	let alt = this.textStrings[isValid === 1 ? 'username_valid' : 'username_invalid'] ? this.textStrings[isValid === 1 ? 'username_valid' : 'username_invalid'] : '';
 
 	this.verificationFields.username[1].className = this.verificationFields.username[5] + ' ' + (isValid === 1 ? 'valid_input' : 'invalid_input');
 	this.setVerificationImage(this.verificationFields.username[2], isValid === 1, alt);
@@ -392,7 +393,7 @@ elkRegister.prototype.checkUsernameCallback = function (XMLDoc)
 // Callback for getting the displayname data.
 elkRegister.prototype.checkDisplaynameCallback = function (XMLDoc)
 {
-	var isValid = true;
+	let isValid = 1;
 
 	if (XMLDoc.getElementsByTagName("username"))
 	{
@@ -400,7 +401,7 @@ elkRegister.prototype.checkDisplaynameCallback = function (XMLDoc)
 	}
 
 	// What to alt?
-	var alt = this.textStrings[isValid === 1 ? 'username_valid' : 'username_invalid'] ? this.textStrings[isValid === 1 ? 'username_valid' : 'username_invalid'] : '';
+	let alt = this.textStrings[isValid === 1 ? 'username_valid' : 'username_invalid'] ? this.textStrings[isValid === 1 ? 'username_valid' : 'username_invalid'] : '';
 
 	this.verificationFields.displayname[1].className = this.verificationFields.displayname[5] + ' ' + (isValid === 1 ? 'valid_input' : 'invalid_input');
 	this.setVerificationImage(this.verificationFields.displayname[2], isValid === 1, alt);
@@ -421,7 +422,7 @@ elkRegister.prototype.setVerificationImage = function (imageHandle, imageIcon, a
 		alt = '*';
 	}
 
-	var curClass = imageIcon ? (imageIcon === 'check' ? 'i-help' : 'i-check') : 'i-warn';
+	let curClass = imageIcon ? (imageIcon === 'check' ? 'i-help' : 'i-check') : 'i-warn';
 
 	imageHandle.alt = alt;
 	imageHandle.title = alt;
@@ -446,35 +447,47 @@ function onCheckChange()
 	}
 }
 
-(function ($)
+/**
+ * Registers the language for agreement and privacy policy loading.
+ *
+ * @param {Event} event - The event object passed when the language is changed.
+ */
+function registerAgreementLanguageLoad(event)
 {
-	$(function ()
-	{
-		$('#agreement_lang').on('change', function ()
-		{
-			$.ajax({
-				type: "POST",
-				url: elk_scripturl + "?action=jslocale;sa=agreement;api=json",
-				data: {lang: $(this).val()},
-				beforeSend: ajax_indicator(true)
-			})
-				.done(function (request)
-				{
-					if (request != '')
-					{
-						$('#agreement_box').html(request.agreement);
-						$('#privacypol_box').html(request.privacypol);
-					}
-				})
-				.fail(function (request)
-				{
-					// Maybe reload with language attribute?
-				})
-				.always(function ()
-				{
-					// turn off the indicator
-					ajax_indicator(false);
-				});
+	let postData = serialize({lang: event.target.value.trim()});
+
+	ajax_indicator(true);
+	fetch(elk_prepareScriptUrl(elk_scripturl) + 'action=jslocale;sa=agreement;api=json', {
+		method: 'POST',
+		body: postData,
+		headers: {
+			'X-Requested-With': 'XMLHttpRequest',
+			'Content-Type': 'application/x-www-form-urlencoded'
+		}
+	})
+		.then(function (response) {
+			if (!response.ok)
+			{
+				throw new Error("HTTP error " + response.status);
+			}
+
+			return response.json();
+		})
+		.then(function (request) {
+			if (request !== '')
+			{
+				document.querySelector('#agreement_box').innerHTML = request.agreement;
+				document.querySelector('#privacypol_box').innerHTML = request.privacypol;
+			}
+		})
+		.catch(function (error) {
+			if ('console' in window && window.console.info)
+			{
+				console.log('Error:', error);
+			}
+		})
+		.finally(function () {
+			// turn off the indicator
+			ajax_indicator(false);
 		});
-	});
-})(jQuery);
+}
