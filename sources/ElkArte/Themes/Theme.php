@@ -530,6 +530,7 @@ abstract class Theme
 		// Relative times?
 		if (!empty($modSettings['todayMod']) && $modSettings['todayMod'] > 2)
 		{
+			loadJavascriptFile('elk_relativeTime.js', ['defer' => true]);
 			$this->addInlineJavascript('
 				const oRttime = ({
 					referenceTime : ' . forum_time() * 1000 . ',
