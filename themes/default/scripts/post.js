@@ -9,6 +9,9 @@
  * @version 2.0 dev
  */
 
+/** global: $editor_data, elk_scripturl, elk_session_var, elk_session_id */
+/** global: poll_add, poll_remove, XMLHttpRequest */
+
 /**
  * This file contains javascript associated with the posting and previewing
  */
@@ -81,15 +84,9 @@ function previewPost()
 function previewPM()
 {
 	// define what we want to get from the form
-	let textFields = [
-		'subject', post_box_name, 'to', 'bcc'
-	];
-	let numericFields = [
-		'recipient_to[]', 'recipient_bcc[]'
-	];
-	let checkboxFields = [
-		'outbox'
-	];
+	let textFields = ['subject', post_box_name, 'to', 'bcc'],
+		numericFields = ['recipient_to[]', 'recipient_bcc[]'],
+		checkboxFields = ['outbox'];
 
 	// And go get them
 	let x = getFields(textFields, numericFields, checkboxFields, form_name);
@@ -111,13 +108,9 @@ function previewPM()
 function previewNews()
 {
 	// define what we want to get from the form
-	var textFields = [
-		'subject', post_box_name
-	];
-	var numericFields = [];
-	var checkboxFields = [
-		'send_html', 'send_pm'
-	];
+	var textFields = ['subject', post_box_name],
+		numericFields = [],
+		checkboxFields = ['send_html', 'send_pm'];
 
 	// And go get them
 	var x = [];
@@ -149,7 +142,7 @@ function getFields(textFields, numericFields, checkboxFields, form_name)
 		i = 0,
 		n = 0;
 
-	// Get all of the text fields
+	// Get all the text fields
 	for (i = 0, n = textFields.length; i < n; i++)
 	{
 		if (textFields[i] in document.forms[form_name])
@@ -385,7 +378,8 @@ function onDocSent(XMLDoc)
 		}
 	}
 
-	$('html, body').animate({scrollTop: $('#preview_section').offset().top}, 'slow');
+	let element = document.getElementById('preview_section');
+	window.scrollTo({top: element.offsetTop, behavior: 'smooth'});
 
 	// Preview video links if the feature is available
 	if (typeof $.fn.linkifyvideo === 'function')
@@ -432,7 +426,7 @@ function addPollOption()
 
 	if (pollOptionNum === 0)
 	{
-		for (var i = 0, n = document.forms[form_name].elements.length; i < n; i++)
+		for (let i = 0, n = document.forms[form_name].elements.length; i < n; i++)
 			if (document.forms[form_name].elements[i].id.substr(0, 8) === 'options-')
 			{
 				pollOptionNum++;
@@ -443,6 +437,7 @@ function addPollOption()
 	pollOptionNum++;
 	pollOptionId++;
 	pollTabIndex++;
+
 	setOuterHTML(document.getElementById('pollMoreOptions'), '<li><label for="options-' + pollOptionId + '">' + txt_option + ' ' + pollOptionNum + '</label>: <input type="text" name="options[' + pollOptionId + ']" id="options-' + pollOptionId + '" value="" size="80" maxlength="255" tabindex="' + pollTabIndex + '" class="input_text" /></li><li id="pollMoreOptions"></li>');
 }
 
@@ -471,16 +466,19 @@ function addAttachment()
  * browsers don't let you set the value of a file input, even to an empty string
  * so this work around lets the user clear a choice.
  *
- * @param {type} idElement
- * @returns {undefined}
+ * @param {string} idElement
  */
 function cleanFileInput(idElement)
 {
-	let oElement = $('#' + idElement);
+	let oElement = document.getElementById(idElement),
+		parentForm = document.createElement('form');
 
-	// Wrap the element in its own form, then reset the wrapper form
-	oElement.wrap('<form>').closest('form').get(0).reset();
-	oElement.unwrap();
+	oElement.parentNode.insertBefore(parentForm, oElement);
+	parentForm.appendChild(oElement);
+	parentForm.reset();
+
+	parentForm.parentNode.insertBefore(oElement, parentForm);
+	parentForm.parentNode.removeChild(parentForm);
 }
 
 /**
@@ -622,7 +620,7 @@ function onDraftsReturned(oXMLDoc)
 }
 
 /**
- * Checks for empty subject or body on post submit.
+ * Dynamic checks for empty subject or body on post submit.
  *
  * - These are also checked server side but this provides a nice current page reminder.
  * - If empty fields are found will use errorbox_handler to populate error(s)
@@ -662,4 +660,151 @@ function onPostSubmit() {
 	}
 
 	return subject !== '' && body !== '';
+}
+
+/**
+ * Called when the add/remove poll button is pressed from the post screen
+ *
+ * Used to add/remove poll input area above the post new topic screen
+ * Updates the message icon to the poll icon
+ * Swaps poll button to match the current conditions
+ *
+ * @param {object} button
+ * @param {int} id_board
+ * @param {string} form_name
+ */
+function loadAddNewPoll(button, id_board, form_name)
+{
+	if (typeof id_board === 'undefined')
+	{
+		return true;
+	}
+
+	// Find the form and add poll to the url
+	let form = document.querySelector('#post_header').closest("form"),
+		poll_main_option = document.querySelectorAll('#poll_main, #poll_options');
+
+	// Change the button label
+	if (button.value === poll_add)
+	{
+		button.value = poll_remove;
+
+		// We usually like to have the poll icon associated to polls,
+		// but only if the currently selected is the default one
+		let pollIcon = document.querySelector('#icon');
+		if (pollIcon.value === 'xx')
+		{
+			pollIcon.value = 'poll';
+			pollIcon.dispatchEvent(new Event('change'));
+		}
+
+		// Add poll to the form action
+		form.setAttribute('action', form.getAttribute('action') + ';poll');
+
+		// If the form already exists...just show it back and go out
+		if (document.querySelector('#poll_main'))
+		{
+			poll_main_option.forEach(elem => {
+				elem.querySelectorAll('input').forEach(function (input) {
+					if (input.dataset.required === 'required')
+					{
+						input.setAttribute('required', 'required');
+					}
+				});
+
+				elem.style.display = 'block';
+			});
+
+			return false;
+		}
+	}
+	// Remove the poll section
+	else
+	{
+		let icon = document.querySelector('#icon');
+		if (icon.value === 'poll')
+		{
+			icon.value = 'xx';
+			icon.dispatchEvent(new Event('change'));
+		}
+
+		// Remove poll to the form action
+		form.setAttribute('action', form.getAttribute('action').replace(';poll', ''));
+
+		poll_main_option.forEach(elem => {
+			elem.style.display = 'none';
+
+			elem.querySelectorAll('input').forEach(function (input) {
+				if (input.getAttribute('required') === 'required')
+				{
+					input.dataset.required = 'required';
+					input.removeAttribute('required');
+				}
+			});
+		});
+
+		button.value = poll_add;
+
+		return false;
+	}
+
+	// Retrieve the poll area
+	let	max_tabIndex = 0;
+
+	ajax_indicator(true);
+	fetch(elk_prepareScriptUrl(elk_scripturl) + 'action=poll;sa=interface;board=' + id_board, {
+		method: 'GET',
+		headers: {
+			'X-Requested-With': 'XMLHttpRequest',
+		}
+	})
+		.then(response => {
+			if (!response.ok)
+			{
+				throw new Error("HTTP error " + response.status);
+			}
+			return response.text();
+		})
+		.then(data => {
+			// Find the highest tabindex already present
+			for (let i = 0, n = document.forms[form_name].elements.length; i < n; i++)
+			{
+				max_tabIndex = Math.max(max_tabIndex, document.forms[form_name].elements[i].tabIndex);
+			}
+
+			// Inject the html
+			document.querySelector('#post_header').insertAdjacentHTML('afterend', data);
+			let inputs = document.querySelectorAll('#poll_main input, #poll_options input')
+			for (let input of inputs)
+			{
+				input.tabIndex = ++max_tabIndex;
+			}
+
+			// Repeated collapse/expand of fieldsets as above
+			let legend = document.querySelectorAll('#poll_main legend, #poll_options legend');
+			for (let lg of legend)
+			{
+				lg.addEventListener('click', function () {
+					this.nextElementSibling.style.display = this.nextElementSibling.style.display === "none" ? "inline-block" : "none";
+					this.parentElement.classList.toggle("collapsed");
+				});
+
+				if (lg.dataset.collapsed)
+				{
+					lg.nextElementSibling.style.display = "none";
+					lg.parentElement.classList.toggle("collapsed");
+				}
+			}
+		})
+		.catch(error => {
+			if ('console' in window && console.error)
+			{
+				console.error('Error : ', error);
+			}
+		})
+		.finally(() => {
+			ajax_indicator(false);
+		});
+
+	return false;
 }
