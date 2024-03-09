@@ -396,9 +396,9 @@ function template_edit_group()
 	if ($context['group']['id'] != 3 && $context['group']['id'] != 4)
 	{
 		$js = '
-		isFunctionLoaded("smc_AutoSuggest").then((available) => { 
+		isFunctionLoaded("elk_AutoSuggest").then((available) => { 
 			if (available) {
-				new smc_AutoSuggest({
+				new elk_AutoSuggest({
 					sSessionId: elk_session_id,
 					sSessionVar: elk_session_var,
 					sSuggestId: \'group_moderators\',
@@ -743,9 +743,9 @@ function template_group_members()
 	if (!empty($context['group']['assignable']))
 	{
 		theme()->addInlineJavascript('
-		isFunctionLoaded("smc_AutoSuggest").then((available) => { 
+		isFunctionLoaded("elk_AutoSuggest").then((available) => { 
 			if (available) {
-				new smc_AutoSuggest({
+				new elk_AutoSuggest({
 					sSessionId: elk_session_id,
 					sSessionVar: elk_session_var,
 					sSuggestId: \'to_suggest\',

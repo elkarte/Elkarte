@@ -865,7 +865,7 @@ function template_send()
 
 	// Main message editing box.
 	echo '
-	<form id="pmFolder" action="', $scripturl, '?action=pm;sa=send2" method="post" accept-charset="UTF-8" name="pmFolder" onsubmit="submitonce(this);smc_saveEntities(\'pmFolder\', [\'subject\', \'message\']);">
+	<form id="pmFolder" action="', $scripturl, '?action=pm;sa=send2" method="post" accept-charset="UTF-8" name="pmFolder" onsubmit="submitonce(this);elk_saveEntities(\'pmFolder\', [\'subject\', \'message\']);">
 		<h2 class="category_header hdicon i-pencil">
 			', $txt['new_message'], '
 		</h2>';
