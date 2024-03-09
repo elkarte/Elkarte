@@ -58,49 +58,18 @@ class Css
 			return;
 		}
 
-		// Combine the CSS files?
-		if (!empty($modSettings['combine_css_js']))
-		{
-			// Minify?
-			$minify = !empty($modSettings['minify_css_js']);
-			$combiner = new SiteCombiner($settings['default_theme_cache_dir'], $settings['default_theme_cache_url'], $minify);
-			$combine_name = $combiner->site_css_combine($this->css_files);
-
-			call_integration_hook('post_css_combine', [&$combine_name, $combiner]);
-
-			if (!empty($combine_name))
-			{
-				echo '
-	<link rel="stylesheet" href="', $combine_name, '" id="csscombined" />';
-			}
-
-			foreach ($combiner->getSpares() as $id => $file)
-			{
-				echo '
-	<link rel="stylesheet" href="', $file['filename'], '" id="', $id, '" />';
-			}
-		}
-		// Minify and not combine
-		elseif (!empty($modSettings['minify_css_js']))
+		// Minify
+		if (!empty($modSettings['minify_css_js']))
 		{
 			$combiner = new SiteCombiner($settings['default_theme_cache_dir'], $settings['default_theme_cache_url']);
 			$this->css_files = $combiner->site_css_minify($this->css_files);
-
-			// Output all the files
-			foreach ($this->css_files as $id => $file)
-			{
-				echo '
-	<link rel="stylesheet" href="', $file['filename'], '" id="', $id, '" />';
-			}
 		}
-		// Just the original files
-		else
+
+		// Output all the files
+		foreach ($this->css_files as $id => $file)
 		{
-			foreach ($this->css_files as $id => $file)
-			{
-				echo '
+			echo '
 	<link rel="stylesheet" href="', $file['filename'], '" id="', $id, '" />';
-			}
 		}
 	}
 

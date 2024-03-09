@@ -161,46 +161,15 @@ class Javascript
 			return;
 		}
 
-		// Combine javascript
-		if (!empty($modSettings['combine_css_js']))
-		{
-			// Maybe minify as well
-			$minify = !empty($modSettings['minify_css_js']);
-			$combiner = new SiteCombiner($settings['default_theme_cache_dir'], $settings['default_theme_cache_url'], $minify);
-			$combine_standard_name = $combiner->site_js_combine($this->js_files, false);
-			$combine_deferred_name = $combiner->site_js_combine($this->js_files, true);
-
-			call_integration_hook('post_javascript_combine', [&$combine_standard_name, &$combine_deferred_name, $combiner]);
-
-			if (!empty($combine_standard_name))
-			{
-				echo '
-	<script src="', $combine_standard_name, '" id="jscombined_top"></script>';
-			}
-
-			if (!empty($combine_deferred_name))
-			{
-				echo '
-	<script src="', $combine_deferred_name, '" id="jscombined_deferred" defer="defer"></script>';
-			}
-
-			// While we have any remaining Javascript files, (not local etc)
-			$this->outputJavascriptFiles($combiner->getSpares());
-		}
-		// Just want to minify and not combine
-		elseif (!empty($modSettings['minify_css_js']))
+		// Want to minify
+		if (!empty($modSettings['minify_css_js']))
 		{
 			$combiner = new SiteCombiner($settings['default_theme_cache_dir'], $settings['default_theme_cache_url']);
 			$this->js_files = $combiner->site_js_minify($this->js_files);
+		}
 
-			// Output all the files
-			$this->outputJavascriptFiles($this->js_files);
-		}
-		// Not combining or minifying, just give them the original files
-		else
-		{
-			$this->outputJavascriptFiles($this->js_files);
-		}
+		// Output all the files
+		$this->outputJavascriptFiles($this->js_files);
 
 		// Reset, templates can still add _files_, but they will be output in template_html_below.
 		$this->js_files = [];
@@ -345,7 +314,7 @@ class Javascript
 	 * Add a Javascript variable for output later (for feeding text strings and similar to JS)
 	 *
 	 * @param array $vars array of vars to include in the output done as 'varname' => 'var value'
-	 * @param bool $escape = false, whether or not to escape the value
+	 * @param bool $escape = false, whether to escape the value
 	 */
 	public function addJavascriptVar($vars, $escape = false)
 	{

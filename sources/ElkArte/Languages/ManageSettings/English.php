@@ -66,7 +66,6 @@ $txt['jquery_local'] = 'Local';
 $txt['jquery_cdn'] = 'Google CDN';
 $txt['jquery_auto'] = 'Auto';
 $txt['minify_css_js'] = 'Minify Javascript and CSS files';
-$txt['combine_css_js'] = 'Combine Javascript and CSS files into as few as possible.  Can be used with Minify.';
 $txt['clean_hives'] = 'Clear minify cache';
 $txt['clean_hives_sucess'] = 'CSS and JS hives successfully deleted.';
 $txt['clean_hives_failed'] = 'A problem occured, hives have not been deleted.';
