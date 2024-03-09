@@ -9,15 +9,12 @@
  * providing the interface required by the latter.
  */
 
-(function ()
-{
-	let ElkDesktop = (function (opt)
-	{
+(function() {
+	let ElkDesktop = (function(opt) {
 		'use strict';
 		opt = (opt) ? opt : {};
 
-		let send = function (request)
-		{
+		let send = function(request) {
 			if (request.desktop_notifications.new_from_last > 0)
 			{
 				if (hasPermissions(request))
@@ -35,14 +32,13 @@
 			}
 		};
 
-		let hasPermissions = function ()
-		{
+		let hasPermissions = function() {
 			if (Push.Permission.has())
 			{
 				return true;
 			}
 
-			if (Push.Permission.get() === "default")
+			if (Push.Permission.get() === 'default')
 			{
 				return Push.Permission.request();
 			}

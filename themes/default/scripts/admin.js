@@ -17,7 +17,7 @@
  * We like the globals cuz they is good to us
  */
 
-/** global: previewTimeout, origText, valid, warningMessage, previewData, refreshPreviewCache, add_answer_template */
+/** global: origText, valid, warningMessage, previewData, add_answer_template */
 /** global: txt_add_another_answer, last_preview, txt_preview, elk_scripturl, txt_news_error_no_news, oThumbnails, elk_smiley_url */
 /** global: db_vis, database_changes_area, elk_session_var, package_ftp_test, package_ftp_test_connection, package_ftp_test_failed */
 /** global: elk_session_id, membersSwap, elk_images_url, maintain_members_choose, maintain_members_all */
@@ -25,24 +25,15 @@
 /** global: txt_save, txt_permissions_profile_rename, ajax_notification_cancel_text, txt_theme_remove_confirm, XMLHttpRequest */
 /** global: theme_id, frames, editFilename, txt_ban_name_empty, txt_ban_restriction_empty, ElkInfoBar, txt_invalid_response */
 /** global: feature_on_text, feature_off_text, core_settings_generic_error, startOptID, add_question_template, question_last_blank */
+
 /** global: ourLanguageVersions, ourVersions, txt_add_another_answer, txt_permissions_commit, Image */
 
-/* jshint -W069 */
-
 /**
- * Admin index class with the following methods
- * Elk_AdminIndex(oOptions)
- * {
- *		public init()
- *		public loadAdminIndex()
- *		public setAnnouncements()
- *		public showCurrentVersion()
- *		public checkUpdateAvailable()
- * }
+ * Admin index class, its the admin landing page with site details
  *
  * @param {object} oOptions
  */
-function Elk_AdminIndex(oOptions)
+function Elk_AdminIndex (oOptions)
 {
 	this.opt = oOptions;
 	this.announcements = [];
@@ -52,18 +43,15 @@ function Elk_AdminIndex(oOptions)
 }
 
 // Initialize the admin index to handle announcement, current version and updates
-Elk_AdminIndex.prototype.init = function ()
-{
+Elk_AdminIndex.prototype.init = function() {
 	window.adminIndexInstanceRef = this;
 
-	window.addEventListener("load", function ()
-	{
+	window.addEventListener('load', function() {
 		window.adminIndexInstanceRef.loadAdminIndex();
 	});
 };
 
-Elk_AdminIndex.prototype.loadAdminIndex = function ()
-{
+Elk_AdminIndex.prototype.loadAdminIndex = function() {
 	// Load the current master and your version numbers.
 	if (this.opt.bLoadVersions)
 	{
@@ -78,9 +66,8 @@ Elk_AdminIndex.prototype.loadAdminIndex = function ()
 };
 
 // Update the announcement container with news
-Elk_AdminIndex.prototype.setAnnouncement = function (announcement)
-{
-	var oElem = document.getElementById(this.opt.sAnnouncementContainerId),
+Elk_AdminIndex.prototype.setAnnouncement = function(announcement) {
+	let oElem = document.getElementById(this.opt.sAnnouncementContainerId),
 		sMessages = this.init_news ? oElem.innerHTML : '';
 
 	announcement.body = announcement.body.replace('\r\n\r\n', '\n');
@@ -105,35 +92,35 @@ Elk_AdminIndex.prototype.setAnnouncement = function (announcement)
 };
 
 // Updates the current version container with the current version found in the repository
-Elk_AdminIndex.prototype.showCurrentVersion = function ()
-{
-	var oElkVersionContainer = document.getElementById(this.opt.slatestVersionContainerId),
+Elk_AdminIndex.prototype.showCurrentVersion = function() {
+	let oElkVersionContainer = document.getElementById(this.opt.slatestVersionContainerId),
 		oinstalledVersionContainer = document.getElementById(this.opt.sinstalledVersionContainerId),
 		sCurrentVersion = oinstalledVersionContainer.innerHTML,
 		adminIndex = this,
 		elkVersion = '???',
 		verCompare = new Elk_ViewVersions();
 
-	$.getJSON('https://api.github.com/repos/elkarte/Elkarte/releases', {format: "json"},
-		function (data, textStatus, jqXHR)
-		{
-			var mostRecent = {},
+	fetch('https://api.github.com/repos/elkarte/Elkarte/releases', {
+		headers: {
+			Accept: 'application/json',
+		},
+	})
+		.then(response => response.json())
+		.then(data => {
+			let mostRecent = {},
 				previous = {};
-			adminIndex.current = adminIndex.normalizeVersion(sCurrentVersion);
 
-			$.each(data, function (idx, elem)
-			{
-				// No drafts, thank you
+			adminIndex.current = adminIndex.normalizeVersion(sCurrentVersion);
+			data.forEach(function(elem) {
+				// Skip draft releases
 				if (elem.draft)
 				{
 					return;
 				}
 
-				var release = adminIndex.normalizeVersion(elem.tag_name);
-
+				let release = adminIndex.normalizeVersion(elem.tag_name);
 				if (!previous.hasOwnProperty('major') || verCompare.compareVersions(sCurrentVersion, elem.tag_name.replace('-', '').substring(1)))
 				{
-					// Using a preprelease? Then you may need to know a new one is out!
 					if ((elem.prerelease && adminIndex.current.prerelease) || (!elem.prerelease))
 					{
 						previous = release;
@@ -141,25 +128,29 @@ Elk_AdminIndex.prototype.showCurrentVersion = function ()
 					}
 				}
 
-				// Load the text box containing the latest news items.
 				if (adminIndex.opt.bLoadAnnouncements)
 				{
 					adminIndex.setAnnouncement(elem);
 				}
 			});
-			elkVersion = mostRecent.name.replace(/elkarte/i, '').trim();
 
+			elkVersion = mostRecent.name.replace(/elkarte/i, '').trim();
 			oElkVersionContainer.innerHTML = elkVersion;
 			if (verCompare.compareVersions(sCurrentVersion, elkVersion))
 			{
 				oinstalledVersionContainer.innerHTML = adminIndex.opt.sVersionOutdatedTemplate.replace('%currentVersion%', sCurrentVersion);
 			}
+		})
+		.catch(error => {
+			if ('console' in window && console.error)
+			{
+				console.error('Error : ', error);
+			}
 		});
 };
 
-// Compare two different versions and return true if the firs is higher than the second
-Elk_AdminIndex.prototype.compareVersion = function (curVer, refVer)
-{
+// Compare two different versions and return true if the first is higher than the second
+Elk_AdminIndex.prototype.compareVersion = function(curVer, refVer) {
 	if (curVer.major > refVer.major)
 	{
 		return true;
@@ -207,9 +198,8 @@ Elk_AdminIndex.prototype.compareVersion = function (curVer, refVer)
 };
 
 // Split a string representing a version number into an object
-Elk_AdminIndex.prototype.normalizeVersion = function (sVersion)
-{
-	var splitVersion = sVersion.split(/[\s-]/),
+Elk_AdminIndex.prototype.normalizeVersion = function(sVersion) {
+	let splitVersion = sVersion.split(/[\s-]/),
 		normalVersion = {
 			major: 0,
 			minor: 0,
@@ -221,7 +211,7 @@ Elk_AdminIndex.prototype.normalizeVersion = function (sVersion)
 		prerelease = false,
 		aDevConvert = {'dev': 0, 'alpha': 1, 'beta': 2, 'rc': 3, 'stable': 4};
 
-	for (var i = 0; i < splitVersion.length; i++)
+	for (let i = 0; i < splitVersion.length; i++)
 	{
 		if (splitVersion[i].toLowerCase() === 'elkarte')
 		{
@@ -236,10 +226,10 @@ Elk_AdminIndex.prototype.normalizeVersion = function (sVersion)
 			// the tag name comes with the number attached to the beta/rc
 			if (splitVersion[i].indexOf('.') > 0)
 			{
-				var splitPre = splitVersion[i].split('.');
+				let splitPre = splitVersion[i].split('.');
 				normalVersion.nano = parseFloat(splitPre[1]);
-				normalVersion.nano = parseFloat(splitVersion[i].substr(splitVersion[i].indexOf('.') + 1));
-				normalVersion.status = aDevConvert[splitVersion[i].substr(0, splitVersion[i].indexOf('.')).toLowerCase()];
+				normalVersion.nano = parseFloat(splitVersion[i].substring(splitVersion[i].indexOf('.') + 1));
+				normalVersion.status = aDevConvert[splitVersion[i].substring(0, splitVersion[i].indexOf('.')).toLowerCase()];
 			}
 		}
 
@@ -247,7 +237,7 @@ Elk_AdminIndex.prototype.normalizeVersion = function (sVersion)
 		if (prerelease)
 		{
 			// Only numbers and dots means a number
-			if (splitVersion[i].replace(/[\d\.]/g, '') === '')
+			if (splitVersion[i].replace(/[\d.]/g, '') === '')
 			{
 				normalVersion.nano = parseFloat(splitVersion[i]);
 			}
@@ -264,7 +254,7 @@ Elk_AdminIndex.prototype.normalizeVersion = function (sVersion)
 		// Only numbers and dots means a number
 		if (splitVersion[i].replace(/[\d\.]/g, '') === '')
 		{
-			var ver = splitVersion[i].split('.');
+			let ver = splitVersion[i].split('.');
 			normalVersion.major = parseInt(ver[0]);
 			normalVersion.minor = parseInt(ver[1]);
 			normalVersion.micro = ver.length > 2 ? parseInt(ver[2]) : 0;
@@ -274,17 +264,16 @@ Elk_AdminIndex.prototype.normalizeVersion = function (sVersion)
 };
 
 // Checks if a new version of ElkArte is available and if so updates the admin info box
-Elk_AdminIndex.prototype.checkUpdateAvailable = function ()
-{
+Elk_AdminIndex.prototype.checkUpdateAvailable = function() {
 	if (!('ourUpdatePackage' in window))
 	{
 		return;
 	}
 
-	var oContainer = document.getElementById(this.opt.sUpdateNotificationContainerId);
+	let oContainer = document.getElementById(this.opt.sUpdateNotificationContainerId);
 
 	// Are we setting a custom title and message?
-	var sTitle = 'ourUpdateTitle' in window ? window.ourUpdateTitle : this.opt.sUpdateNotificationDefaultTitle,
+	let sTitle = 'ourUpdateTitle' in window ? window.ourUpdateTitle : this.opt.sUpdateNotificationDefaultTitle,
 		sMessage = 'ourUpdateNotice' in window ? window.ourUpdateNotice : this.opt.sUpdateNotificationDefaultMessage;
 
 	oContainer.innerHTML = this.opt.sUpdateNotificationTemplate.replace('%title%', sTitle).replace('%message%', sMessage);
@@ -302,42 +291,38 @@ Elk_AdminIndex.prototype.checkUpdateAvailable = function ()
 	}
 };
 
-/*
-	Elk_ViewVersions(oOptions)
-	{
-		public init()
-		public compareVersions(sCurrent, sTarget)
-	}
-*/
-function Elk_ViewVersions(oOptions)
+/**
+ * Initializes the Elk_ViewVersions object with the provided options.
+ *
+ * @param {Object} oOptions - The options for Elk_ViewVersions.
+ * @constructor
+ */
+function Elk_ViewVersions (oOptions = {})
 {
 	this.opt = oOptions;
 	this.init();
 }
 
 // initialize the version checker
-Elk_ViewVersions.prototype.init = function ()
-{
+Elk_ViewVersions.prototype.init = function() {
 	// Load this on loading of the page.
 	window.viewVersionsInstanceRef = this;
-	window.addEventListener("load", function ()
-	{
+	window.addEventListener('load', function() {
 		window.viewVersionsInstanceRef.loadViewVersions();
 	});
 };
 
 // compare a current and target version to determine if one is newer/older
-Elk_ViewVersions.prototype.compareVersions = function (sCurrent, sTarget)
-{
-	var aVersions = [],
+Elk_ViewVersions.prototype.compareVersions = function(sCurrent, sTarget) {
+	let aVersions = [],
 		aParts = [],
 		aCompare = [sCurrent, sTarget],
 		aDevConvert = {'dev': 0, 'alpha': 1, 'beta': 2, 'rc': 3};
 
-	for (var i = 0; i < 2; i++)
+	for (let i = 0; i < 2; i++)
 	{
 		// Clean the version and extract the version parts.
-		var sClean = aCompare[i].toLowerCase().replace(/ /g, '').replace(/release candidate/g, 'rc');
+		let sClean = aCompare[i].toLowerCase().replace(/ /g, '').replace(/release candidate/g, 'rc');
 		aParts = sClean.match(/(\d+)(?:\.(\d+|))?(?:\.)?(\d+|)(?:(alpha|beta|rc)\.*(\d+|)(?:\.)?(\d+|))?(?:(dev))?(\d+|)/);
 
 		// No matches?
@@ -354,12 +339,12 @@ Elk_ViewVersions.prototype.compareVersions = function (sCurrent, sTarget)
 			typeof (aParts[4]) === 'undefined' ? 'stable' : aDevConvert[aParts[4]],
 			aParts[5] > 0 ? parseInt(aParts[5]) : 0,
 			aParts[6] > 0 ? parseInt(aParts[6]) : 0,
-			typeof (aParts[7]) !== 'undefined' ? 'dev' : ''
+			typeof (aParts[7]) === 'undefined' ? '' : 'dev'
 		];
 	}
 
 	// Loop through each category.
-	for (i = 0; i < 7; i++)
+	for (let i = 0; i < 7; i++)
 	{
 		// Is there something for us to calculate?
 		if (aVersions[0][i] !== aVersions[1][i])
@@ -388,7 +373,7 @@ Elk_ViewVersions.prototype.compareVersions = function (sCurrent, sTarget)
 /**
  * Adds a new word container to the censored word list
  */
-function addNewWord()
+function addNewWord ()
 {
 	setOuterHTML(document.getElementById('moreCensoredWords'), '<div class="censorWords"><input type="text" name="censor_vulgar[]" size="30" class="input_text" /> <i class="icon i-chevron-circle-right"></i> <input type="text" name="censor_proper[]" size="30" class="input_text" /><' + '/div><div id="moreCensoredWords"><' + '/div>');
 }
@@ -399,103 +384,104 @@ function addNewWord()
  * @param {string} section id of the container
  * @param {string} disable true or false
  */
-function toggleBBCDisabled(section, disable)
+function toggleBBCDisabled (section, disable)
 {
-	var elems = document.getElementById(section).getElementsByTagName('*');
+	let elems = document.getElementById(section).getElementsByTagName('*');
 
-	for (var i = 0; i < elems.length; i++)
+	for (let i = 0; i < elems.length; i++)
 	{
-		if (typeof (elems[i].name) === "undefined" || (elems[i].name.substr((section.length + 1), (elems[i].name.length - 2 - (section.length + 1))) !== "enabledTags") || (elems[i].name.indexOf(section) !== 0))
+		if (typeof (elems[i].name) === 'undefined' || (elems[i].name.substring((section.length + 1), elems[i].name.length - 2) !== 'enabledTags') || (elems[i].name.indexOf(section) !== 0))
 		{
 			continue;
 		}
 
 		elems[i].disabled = disable;
 	}
-	document.getElementById("bbc_" + section + "_select_all").disabled = disable;
+
+	document.getElementById('bbc_' + section + '_select_all').disabled = disable;
 }
 
 /**
  * Keeps the input boxes display options appropriate for the options selected
  * when adding custom profile fields
  */
-function updateInputBoxes()
+function updateInputBoxes ()
 {
-	var curType = document.getElementById("field_type").value,
-		privStatus = document.getElementById("private").value,
+	let curType = document.getElementById('field_type').value,
+		privStatus = document.getElementById('private').value,
 		stdText = ['text', 'textarea', 'email', 'url', 'color', 'date'],
 		stdInput = ['text', 'email', 'url', 'color', 'date'],
 		stdSelect = ['select'];
 
-	var bIsStd = (stdInput.indexOf(curType) !== -1),
+	let bIsStd = (stdInput.indexOf(curType) !== -1),
 		bIsText = (stdText.indexOf(curType) !== -1),
 		bIsSelect = (stdSelect.indexOf(curType) !== -1);
 
 	// Only Text like fields can see a max length input
-	document.getElementById("max_length_dt").style.display = bIsText ? "" : "none";
-	document.getElementById("max_length_dd").style.display = bIsText ? "" : "none";
+	document.getElementById('max_length_dt').style.display = bIsText ? '' : 'none';
+	document.getElementById('max_length_dd').style.display = bIsText ? '' : 'none';
 
 	// Textareas can get a row/col definition
-	document.getElementById("dimension_dt").style.display = curType === "textarea" ? "" : "none";
-	document.getElementById("dimension_dd").style.display = curType === "textarea" ? "" : "none";
+	document.getElementById('dimension_dt').style.display = curType === 'textarea' ? '' : 'none';
+	document.getElementById('dimension_dd').style.display = curType === 'textarea' ? '' : 'none';
 
 	// Text like fields can be styled with bbc
-	document.getElementById("bbc_dt").style.display = bIsText ? "" : "none";
-	document.getElementById("bbc_dd").style.display = bIsText ? "" : "none";
+	document.getElementById('bbc_dt').style.display = bIsText ? '' : 'none';
+	document.getElementById('bbc_dd').style.display = bIsText ? '' : 'none';
 
 	// And given defaults
-	document.getElementById("defaultval_dt").style.display = bIsText ? "" : "none";
-	document.getElementById("defaultval_dd").style.display = bIsText ? "" : "none";
+	document.getElementById('defaultval_dt').style.display = bIsText ? '' : 'none';
+	document.getElementById('defaultval_dd').style.display = bIsText ? '' : 'none';
 
 	// Selects and radio can support a list of options
-	document.getElementById("options_dt").style.display = curType === "select" || curType === "radio" ? "" : "none";
-	document.getElementById("options_dd").style.display = curType === "select" || curType === "radio" ? "" : "none";
+	document.getElementById('options_dt').style.display = curType === 'select' || curType === 'radio' ? '' : 'none';
+	document.getElementById('options_dd').style.display = curType === 'select' || curType === 'radio' ? '' : 'none';
 
 	// Checkboxes can have a default
-	document.getElementById("default_dt").style.display = curType === "check" ? "" : "none";
-	document.getElementById("default_dd").style.display = curType === "check" ? "" : "none";
+	document.getElementById('default_dt').style.display = curType === 'check' ? '' : 'none';
+	document.getElementById('default_dd').style.display = curType === 'check' ? '' : 'none';
 
 	// Normal input boxes can use a validation mask as well
-	document.getElementById("mask_dt").style.display = bIsStd ? "" : "none";
-	document.getElementById("mask").style.display = bIsStd ? "" : "none";
+	document.getElementById('mask_dt').style.display = bIsStd ? '' : 'none';
+	document.getElementById('mask').style.display = bIsStd ? '' : 'none';
 
 	// And text and select fields are searchable
-	document.getElementById("can_search_dt").style.display = bIsText || bIsSelect ? "" : "none";
-	document.getElementById("can_search_dd").style.display = bIsText || bIsSelect ? "" : "none";
+	document.getElementById('can_search_dt').style.display = bIsText || bIsSelect ? '' : 'none';
+	document.getElementById('can_search_dd').style.display = bIsText || bIsSelect ? '' : 'none';
 
 	// Moving to a non searchable field, be sure searchable is unselected.
 	if (!bIsText && !bIsSelect)
 	{
-		document.getElementById("can_search_dd").checked = false;
+		document.getElementById('can_search_dd').checked = false;
 	}
 
 	// Using regex in the mask, give them a place to supply the regex
-	document.getElementById("regex_div").style.display = bIsStd && document.getElementById("mask").value === "regex" ? "" : "none";
-	document.getElementById("display").disabled = false;
+	document.getElementById('regex_div').style.display = bIsStd && document.getElementById('mask').value === 'regex' ? '' : 'none';
+	document.getElementById('display').disabled = false;
 
 	// Cannot show this on the topic
-	if (curType === "textarea" || privStatus >= 2)
+	if (curType === 'textarea' || privStatus >= 2)
 	{
-		document.getElementById("display").checked = false;
-		document.getElementById("display").disabled = true;
+		document.getElementById('display').checked = false;
+		document.getElementById('display').disabled = true;
 	}
 }
 
 /**
  * Used to add additional radio button options when editing a custom profile field
  */
-function addOption()
+function addOption ()
 {
-	setOuterHTML(document.getElementById("addopt"), '<p><input type="radio" name="default_select" value="' + startOptID + '" id="' + startOptID + '" /><input type="text" name="select_option[' + startOptID + ']" value="" class="input_text" /></p><span id="addopt"></span>');
+	setOuterHTML(document.getElementById('addopt'), '<p><input type="radio" name="default_select" value="' + startOptID + '" id="' + startOptID + '" /><input type="text" name="select_option[' + startOptID + ']" value="" class="input_text" /></p><span id="addopt"></span>');
 	startOptID++;
 }
 
 /**
  * Adds another question to the registration page
  */
-function addAnotherQuestion()
+function addAnotherQuestion ()
 {
-	var placeHolder = document.getElementById('add_more_question_placeholder');
+	let placeHolder = document.getElementById('add_more_question_placeholder');
 
 	setOuterHTML(placeHolder, add_question_template.easyReplace({
 		question_last_blank: question_last_blank,
@@ -511,7 +497,7 @@ function addAnotherQuestion()
  * @param {HTMLElement} elem
  * @param {string} question_name
  */
-function addAnotherAnswer(elem, question_name)
+function addAnotherAnswer (elem, question_name)
 {
 	setOuterHTML(elem, add_answer_template.easyReplace({
 		question_last_blank: question_name,
@@ -526,19 +512,19 @@ function addAnotherAnswer(elem, question_name)
  * @param {string} txt_url
  * @param {string} txt_word_sep
  */
-function addAnotherSearch(txt_name, txt_url, txt_word_sep)
+function addAnotherSearch (txt_name, txt_url, txt_word_sep)
 {
-	var placeHolder = document.getElementById('add_more_searches'),
-		newDT = document.createElement("dt"),
-		newInput = document.createElement("input"),
-		newLabel = document.createElement("label"),
-		newDD = document.createElement("dd");
+	let placeHolder = document.getElementById('add_more_searches'),
+		newDT = document.createElement('dt'),
+		newInput = document.createElement('input'),
+		newLabel = document.createElement('label'),
+		newDD = document.createElement('dd');
 
-	newInput.name = "engine_name[]";
-	newInput.type = "text";
-	newInput.className = "input_text";
-	newInput.size = "50";
-	newInput.setAttribute("class", "verification_question");
+	newInput.name = 'engine_name[]';
+	newInput.type = 'text';
+	newInput.className = 'input_text';
+	newInput.size = 50;
+	newInput.setAttribute('class', 'verification_question');
 
 	// Add the label and input box to the DOM
 	newLabel.textContent = txt_name + ': ';
@@ -546,29 +532,29 @@ function addAnotherSearch(txt_name, txt_url, txt_word_sep)
 	newDT.appendChild(newLabel);
 
 	// Next input box
-	newInput = document.createElement("input");
-	newInput.name = "engine_url[]";
-	newInput.type = "text";
-	newInput.className = "input_text";
-	newInput.size = "35";
-	newInput.setAttribute("class", "input_text verification_answer");
+	newInput = document.createElement('input');
+	newInput.name = 'engine_url[]';
+	newInput.type = 'text';
+	newInput.className = 'input_text';
+	newInput.size = 35;
+	newInput.setAttribute('class', 'input_text verification_answer');
 
 	// Add the new label and input box
-	newLabel = document.createElement("label");
+	newLabel = document.createElement('label');
 	newLabel.textContent = txt_url + ': ';
 	newLabel.appendChild(newInput);
 	newDD.appendChild(newLabel);
-	newDD.appendChild(document.createElement("br"));
+	newDD.appendChild(document.createElement('br'));
 
 	// Rinse and repeat
-	newInput = document.createElement("input");
-	newInput.name = "engine_separator[]";
-	newInput.type = "text";
-	newInput.className = "input_text";
-	newInput.size = "5";
-	newInput.setAttribute("class", "input_text verification_answer");
+	newInput = document.createElement('input');
+	newInput.name = 'engine_separator[]';
+	newInput.type = 'text';
+	newInput.className = 'input_text';
+	newInput.size = 5;
+	newInput.setAttribute('class', 'input_text verification_answer');
 
-	newLabel = document.createElement("label");
+	newLabel = document.createElement('label');
 	newLabel.textContent = txt_word_sep + ': ';
 	newLabel.appendChild(newInput);
 	newDD.appendChild(newLabel);
@@ -578,57 +564,96 @@ function addAnotherSearch(txt_name, txt_url, txt_word_sep)
 }
 
 /**
- * News admin page
+ * Adds another news item to the list of news.
+ *
+ * This method duplicates the last news item and appends it to the list of
+ * news.
+ * It also assigns unique IDs to the duplicated elements and sets up
+ * necessary event handlers for the new item.
+ *
+ * @return {void} This method does not return a value.
  */
-function addAnotherNews()
+function addAnotherNews ()
 {
-	var last = $("#list_news_lists_last"),
-		$new_item = last.clone();
+	let last = document.querySelector('#list_news_lists_last'),
+		newItem = last.cloneNode(true);
 
 	last_preview++;
-	$new_item.attr('id', 'list_news_lists_' + last_preview);
-	$new_item.find('textarea').attr('id', 'data_' + last_preview);
-	$new_item.find('#preview_last').attr('id', 'preview_' + last_preview);
-	$new_item.find('#box_preview_last').attr('id', 'box_preview_' + last_preview);
 
-	last.before($new_item);
-	$new_item.toggle();
+	newItem.id = 'list_news_lists_' + last_preview;
+	newItem.querySelector('textarea').id = 'data_' + last_preview;
+	newItem.querySelector('#preview_last').id = 'preview_' + last_preview;
+	newItem.querySelector('#box_preview_last').id = 'box_preview_' + last_preview;
+
+	last.parentNode.insertBefore(newItem, last);
+
+	newItem.style.display = newItem.style.display === 'none' ? '' : 'none';
+
 	make_preview_btn(last_preview);
 }
 
 /**
- * Makes the preview button when in manage news
+ * Creates a preview button for a specific preview ID.
  *
- * @param {string} preview_id
+ * @param {string} preview_id - The ID of the preview element.
  */
-function make_preview_btn(preview_id)
+function make_preview_btn (preview_id)
 {
-	var $id = $("#preview_" + preview_id);
+	// Create a preview button
+	const id = document.getElementById('preview_' + preview_id);
+	id.textContent = txt_preview;
 
-	$id.text(txt_preview).on('click', function ()
-	{
-		$.ajax({
-			type: "POST",
-			url: elk_scripturl + "?action=XmlPreview;api=xml",
-			data: {item: "newspreview", news: $("#data_" + preview_id).val()},
-			context: document.body
+	// Attach a click event to the new button to fetch a preview
+	id.addEventListener('click', function(e) {
+		e.preventDefault();
+		fetch(elk_prepareScriptUrl(elk_scripturl) + 'action=XmlPreview;api=xml', {
+			method: 'POST',
+			headers: {
+				'X-Requested-With': 'XMLHttpRequest',
+				'Content-Type': 'application/x-www-form-urlencoded',
+				'Accept': 'application/xml'
+			},
+			body: serialize({
+				item: 'newspreview',
+				news: document.getElementById('data_' + preview_id).value
+			}),
 		})
-			.done(function (request)
-			{
-				if ($(request).find("error").text() === '')
+			.then(response => {
+				if (!response.ok)
 				{
-					$(document).find("#box_preview_" + preview_id).html($(request).text());
+					throw new Error('HTTP error ' + response.status);
+				}
+				return response.text();
+			})
+			.then(text => {
+				const request = new DOMParser().parseFromString(text, 'text/xml');
+				const previewBox = document.getElementById('box_preview_' + preview_id);
+
+				if (request.querySelector('error'))
+				{
+					previewBox.textContent = txt_news_error_no_news;
 				}
 				else
 				{
-					$(document).find("#box_preview_" + preview_id).text(txt_news_error_no_news);
+					previewBox.innerHTML = request.documentElement.textContent;
+				}
+			})
+			.catch(error => {
+				if ('console' in window && console.error)
+				{
+					console.error('Error : ', error);
 				}
 			});
 	});
 
-	if (!$id.parent().hasClass('linkbutton'))
+	if (!id.parentElement.classList.contains('linkbutton'))
 	{
-		$id.wrap('<a class="linkbutton floatright" href="javascript:void(0);"></a>');
+		const wrapper = document.createElement('a');
+		wrapper.className = 'linkbutton floatright';
+		wrapper.href = '#';
+		wrapper.onclick = function() { return false; };
+		id.parentNode.insertBefore(wrapper, id);
+		wrapper.appendChild(id);
 	}
 }
 
@@ -637,56 +662,34 @@ function make_preview_btn(preview_id)
  *
  * @param {string} sVariant
  */
-function changeVariant(sVariant)
+function changeVariant (sVariant)
 {
 	document.getElementById('variant_preview').src = oThumbnails[sVariant];
 }
 
 /**
- * The idea here is simple: don't refresh the preview on every keypress, but do refresh after they type.
- *
- * @returns {undefined}
- */
-function setPreviewTimeout()
-{
-	if (previewTimeout)
-	{
-		window.clearTimeout(previewTimeout);
-		previewTimeout = null;
-	}
-
-	previewTimeout = window.setTimeout(function ()
-	{
-		refreshPreview(true);
-		previewTimeout = null;
-	}, 500);
-}
-
-/**
  * Used in manage paid subscriptions to show the fixed duration panel or
  * the variable duration panel, based on which radio button is selected
- *
- * @param {type} toChange
  */
-function toggleDuration(toChange)
+function toggleDuration ()
 {
-	$("#fixed_area").slideToggle(300);
-	$("#flexible_area").slideToggle(300);
+	document.getElementById('fixed_area').slideToggle(300);
+	document.getElementById('flexible_area').slideToggle(300);
 }
 
 /**
  * Used when editing the search weights for results, calculates the overall total weight
  */
-function calculateNewValues()
+function calculateNewValues ()
 {
-	var total = 0;
-	for (var i = 1; i <= 7; i++)
+	let total = 0;
+	for (let i = 1; i <= 7; i++)
 	{
 		total += parseInt(document.getElementById('weight' + i + '_val').value);
 	}
 
 	document.getElementById('weighttotal').innerHTML = total;
-	for (i = 1; i <= 7; i++)
+	for (let i = 1; i <= 7; i++)
 	{
 		document.getElementById('weight' + i).innerHTML = (Math.round(1000 * parseInt(document.getElementById('weight' + i + '_val').value) / total) / 10) + '%';
 	}
@@ -695,19 +698,19 @@ function calculateNewValues()
 /**
  * Toggle visibility of add smile image source options
  */
-function switchType()
+function switchType ()
 {
-	document.getElementById("ul_settings").style.display = document.getElementById("method-existing").checked ? "none" : "block";
-	document.getElementById("ex_settings").style.display = document.getElementById("method-upload").checked ? "none" : "block";
+	document.getElementById('ul_settings').style.display = document.getElementById('method-existing').checked ? 'none' : 'block';
+	document.getElementById('ex_settings').style.display = document.getElementById('method-upload').checked ? 'none' : 'block';
 }
 
 /**
  * Toggle visibility of smiley set should the user want different images in a set (add smiley)
  */
-function swapUploads()
+function swapUploads ()
 {
-	document.getElementById("uploadMore").style.display = document.getElementById("uploadSmiley").disabled ? "none" : "block";
-	document.getElementById("uploadSmiley").disabled = !document.getElementById("uploadSmiley").disabled;
+	document.getElementById('uploadMore').style.display = document.getElementById('uploadSmiley').disabled ? 'none' : 'block';
+	document.getElementById('uploadSmiley').disabled = !document.getElementById('uploadSmiley').disabled;
 }
 
 /**
@@ -715,16 +718,16 @@ function swapUploads()
  *
  * @param {string} element
  */
-function selectMethod(element)
+function selectMethod (element)
 {
-	document.getElementById("method-existing").checked = element !== "upload";
-	document.getElementById("method-upload").checked = element === "upload";
+	document.getElementById('method-existing').checked = element !== 'upload';
+	document.getElementById('method-upload').checked = element === 'upload';
 }
 
 /**
  * Updates the smiley preview to show the current one chosen
  */
-function updatePreview()
+function updatePreview ()
 {
 	let currentImage = document.getElementById('preview'),
 		selected = document.getElementById('set'),
@@ -743,7 +746,7 @@ function updatePreview()
  * @param action
  * @returns {boolean}
  */
-function makeChanges(action)
+function makeChanges (action)
 {
 	// No selection made
 	if (action === '-1')
@@ -772,7 +775,7 @@ function makeChanges(action)
  *
  * @param {string} newSet
  */
-function changeSet(newSet)
+function changeSet (newSet)
 {
 	let currentImage,
 		i,
@@ -805,10 +808,10 @@ function changeSet(newSet)
 /**
  * Used in package manager to swap the visibility of database changes
  */
-function swap_database_changes()
+function swap_database_changes ()
 {
 	db_vis = !db_vis;
-	database_changes_area.style.display = db_vis ? "" : "none";
+	database_changes_area.style.display = db_vis ? '' : 'none';
 
 	return false;
 }
@@ -816,22 +819,24 @@ function swap_database_changes()
 /**
  * Test the given form credentials to test if an FTP connection can be made
  */
-function testFTP()
+function testFTP ()
 {
 	ajax_indicator(true);
 
 	// What we need to post.
-	var oPostData = {
-		0: "ftp_server",
-		1: "ftp_port",
-		2: "ftp_username",
-		3: "ftp_password",
-		4: "ftp_path"
+	let oPostData = {
+		0: 'ftp_server',
+		1: 'ftp_port',
+		2: 'ftp_username',
+		3: 'ftp_password',
+		4: 'ftp_path'
 	};
 
-	var sPostData = "";
-	for (var i = 0; i < 5; i++)
-		sPostData = sPostData + (sPostData.length === 0 ? "" : "&") + oPostData[i] + "=" + document.getElementById(oPostData[i]).value.php_urlencode();
+	let sPostData = '';
+	for (let i = 0; i < 5; i++)
+	{
+		sPostData = sPostData + (sPostData.length === 0 ? '' : '&') + oPostData[i] + '=' + document.getElementById(oPostData[i]).value.php_urlencode();
+	}
 
 	// Post the data out.
 	sendXMLDocument(elk_prepareScriptUrl(elk_scripturl) + 'action=admin;area=packages;sa=ftptest;api=xml;' + elk_session_var + '=' + elk_session_id, sPostData, testFTPResults);
@@ -840,7 +845,7 @@ function testFTP()
 /**
  * Generate a "test ftp" button.
  */
-function generateFTPTest()
+function generateFTPTest ()
 {
 	// Don't ever call this twice!
 	if (generatedButton)
@@ -851,27 +856,27 @@ function generateFTPTest()
 	generatedButton = true;
 
 	// No XML?
-	if (!document.getElementById("test_ftp_placeholder") && !document.getElementById("test_ftp_placeholder_full"))
+	if (!document.getElementById('test_ftp_placeholder') && !document.getElementById('test_ftp_placeholder_full'))
 	{
 		return false;
 	}
 
 	// create our test button to call testFTP on click
-	var ftpTest = document.createElement("input");
-	ftpTest.type = "button";
-	ftpTest.className = "submit";
+	let ftpTest = document.createElement('input');
+	ftpTest.type = 'button';
+	ftpTest.className = 'submit';
 	ftpTest.onclick = testFTP;
 
 	// Set the button value based on which form we are on
-	if (document.getElementById("test_ftp_placeholder"))
+	if (document.getElementById('test_ftp_placeholder'))
 	{
 		ftpTest.value = package_ftp_test;
-		document.getElementById("test_ftp_placeholder").appendChild(ftpTest);
+		document.getElementById('test_ftp_placeholder').appendChild(ftpTest);
 	}
 	else
 	{
 		ftpTest.value = package_ftp_test_connection;
-		document.getElementById("test_ftp_placeholder_full").appendChild(ftpTest);
+		document.getElementById('test_ftp_placeholder_full').appendChild(ftpTest);
 	}
 
 	return true;
@@ -882,12 +887,12 @@ function generateFTPTest()
  *
  * @param {type} oXMLDoc
  */
-function testFTPResults(oXMLDoc)
+function testFTPResults (oXMLDoc)
 {
 	ajax_indicator(false);
 
 	// This assumes it went wrong!
-	var wasSuccess = false,
+	let wasSuccess = false,
 		message = package_ftp_test_failed,
 		results = oXMLDoc.getElementsByTagName('results')[0].getElementsByTagName('result');
 
@@ -898,13 +903,14 @@ function testFTPResults(oXMLDoc)
 		{
 			wasSuccess = true;
 		}
+
 		message = results[0].firstChild.nodeValue;
 	}
 
 	// place the informative box on screen so the user knows if things went well or poorly
-	document.getElementById("ftp_error_div").style.display = "";
-	document.getElementById("ftp_error_div").className = wasSuccess ? "successbox" : "errorbox";
-	document.getElementById("ftp_error_message").innerHTML = message;
+	document.getElementById('ftp_error_div').style.display = '';
+	document.getElementById('ftp_error_div').className = wasSuccess ? 'successbox' : 'errorbox';
+	document.getElementById('ftp_error_message').innerHTML = message;
 }
 
 /**
@@ -913,9 +919,9 @@ function testFTPResults(oXMLDoc)
  * @param {type} operation
  * @param {type} brd_list
  */
-function select_in_category(operation, brd_list)
+function select_in_category (operation, brd_list)
 {
-	for (var brd in brd_list)
+	for (let brd in brd_list)
 	{
 		if (!brd_list.hasOwnProperty(brd))
 		{
@@ -930,54 +936,60 @@ function select_in_category(operation, brd_list)
  * Server Settings > Caching, toggles input fields on/off as appropriate for
  * a given cache engine selection
  */
-$(function ()
+function showCache ()
 {
-	$('#cache_accelerator').on('change', function ()
-	{
-		// Hide all the settings
-		$('#cache_accelerator').find('option').each(function ()
-		{
-			$('[id^=' + $(this).val() + '_]').hide();
-		});
+	let cacheAccelerator = document.getElementById('cache_accelerator');
 
-		// Show the settings of the selected engine
-		$('[id^=' + $(this).val() + '_]').show();
-	})
-	// Trigger a change action so that the form is properly initialized
-	.trigger('change');
-});
+	// Hide all the settings
+	let allOptions = cacheAccelerator.querySelectorAll('option');
+	allOptions.forEach(function(option) {
+		let settingsElementsToHide = document.querySelectorAll('[id^=' + option.value + '_]');
+
+		settingsElementsToHide.forEach(function(element) {
+			element.style.display = 'none';
+		});
+	});
+
+	// Show the settings of the selected engine
+	let selectedOptionVal = cacheAccelerator.value,
+		settingsElementsToShow = document.querySelectorAll('[id^=' + selectedOptionVal + '_]');
+
+	settingsElementsToShow.forEach(function(element) {
+		element.style.display = 'block';
+	});
+}
 
 /**
  * Server Settings > Caching, toggles input fields on/off as appropriate for
  * a given cache engine selection
  */
-function toggleCache()
+function toggleCache ()
 {
-	var memcache = $('#cache_memcached').parent(),
-		cachedir = $('#cachedir').parent();
+	let memcache = document.getElementById('cache_memcached').parentNode,
+		cachedir = document.getElementById('cachedir').parentNode;
 
 	// Show the memcache server box only if memcache has been selected
-	if (cache_type.value.substr(0, 8) !== "memcache")
+	if (cache_type.value.substring(0, 8) === 'memcache')
 	{
-		memcache.slideUp();
-		memcache.prev().slideUp(100);
+		memcache.slideDown();
+		memcache.previousElementSibling.slideDown(100);
 	}
 	else
 	{
-		memcache.slideDown();
-		memcache.prev().slideDown(100);
+		memcache.slideUp();
+		memcache.previousElementSibling.slideUp(100);
 	}
 
 	// don't show the directory if its not filebased
-	if (cache_type.value === "filebased")
+	if (cache_type.value === 'filebased')
 	{
 		cachedir.slideDown();
-		cachedir.prev().slideDown(100);
+		cachedir.previousElementSibling.slideDown(100);
 	}
 	else
 	{
 		cachedir.slideUp(100);
-		cachedir.prev().slideUp(100);
+		cachedir.previousElementSibling.slideUp(100);
 	}
 }
 
@@ -985,71 +997,74 @@ function toggleCache()
  * Hides local / subdomain cookie options in the ACP based on selected choices
  * area=serversettings;sa=cookie
  */
-function hideGlobalCookies()
+function hideGlobalCookies ()
 {
-	var bUseLocal = document.getElementById("localCookies").checked,
-		bUseGlobal = !bUseLocal && document.getElementById("globalCookies").checked;
+	let bUseLocal = document.getElementById('localCookies').checked,
+		bUseGlobal = !bUseLocal && document.getElementById('globalCookies').checked;
 
 	// Show/Hide the areas based on what they have chosen
-	if (!bUseLocal)
+	if (bUseLocal)
 	{
-		$("#setting_globalCookies").parent().slideDown();
-		$("#globalCookies").parent().slideDown();
+		document.getElementById('setting_globalCookies').parentNode.slideUp(100);
+		document.getElementById('globalCookies').parentNode.slideUp(100);
 	}
 	else
 	{
-		$("#setting_globalCookies").parent().slideUp();
-		$("#globalCookies").parent().slideUp();
+		document.getElementById('setting_globalCookies').parentNode.slideDown(100);
+		document.getElementById('globalCookies').parentNode.slideDown(100);
 	}
 
 	// Global selected means we need to reveal the domain input box
 	if (bUseGlobal)
 	{
-		$("#setting_globalCookiesDomain").closest("dt").slideDown();
-		$("#globalCookiesDomain").closest("dd").slideDown();
+		document.getElementById('setting_globalCookiesDomain').parentNode.slideDown(100);
+		document.getElementById('globalCookiesDomain').parentNode.slideDown(100);
 	}
 	else
 	{
-		$("#setting_globalCookiesDomain").closest("dt").slideUp();
-		$("#globalCookiesDomain").closest("dd").slideUp();
+		document.getElementById('setting_globalCookiesDomain').parentNode.slideUp(100);
+		document.getElementById('globalCookiesDomain').parentNode.slideUp(100);
 	}
 }
 
 /**
  * Attachments Settings
  */
-function toggleSubDir()
+function toggleSubDir ()
 {
-	var auto_attach = document.getElementById('automanage_attachments'),
+	let auto_attach = document.getElementById('automanage_attachments'),
 		use_sub_dir = document.getElementById('use_subdirectories_for_attachments'),
-		dir_elem = document.getElementById('basedirectory_for_attachments');
+		dir_elem = document.getElementById('basedirectory_for_attachments'),
+		setting_use_sub_dir = document.getElementById('setting_use_subdirectories_for_attachments'),
+		setting_dir_elem = document.getElementById('setting_basedirectory_for_attachments');
 
 	use_sub_dir.disabled = !Boolean(auto_attach.selectedIndex);
 	if (use_sub_dir.disabled)
 	{
-		$(use_sub_dir).slideUp();
-		$('#setting_use_subdirectories_for_attachments').parent().slideUp();
+		use_sub_dir.slideUp();
+		setting_use_sub_dir.parentNode.slideUp();
 
-		$(dir_elem).slideUp();
-		$('#setting_basedirectory_for_attachments').parent().slideUp();
+		dir_elem.slideUp();
+		setting_dir_elem.parentNode.slideUp();
 	}
 	else
 	{
-		$(use_sub_dir).slideDown();
-		$('#setting_use_subdirectories_for_attachments').parent().slideDown();
+		use_sub_dir.slideDown();
+		setting_use_sub_dir.parentNode.slideDown();
 
-		$(dir_elem).slideDown();
-		$('#setting_basedirectory_for_attachments').parent().slideDown();
+		dir_elem.slideDown();
+		setting_dir_elem.parentNode.slideDown();
 	}
+
 	toggleBaseDir();
 }
 
 /**
  * Called by toggleSubDir as part of manage attachments
  */
-function toggleBaseDir()
+function toggleBaseDir ()
 {
-	var auto_attach = document.getElementById('automanage_attachments'),
+	let auto_attach = document.getElementById('automanage_attachments'),
 		sub_dir = document.getElementById('use_subdirectories_for_attachments'),
 		dir_elem = document.getElementById('basedirectory_for_attachments');
 
@@ -1068,21 +1083,21 @@ function toggleBaseDir()
  * the membergroup list.  If collapsed will select all the member groups if expanded
  * unselect them so the user can choose.
  */
-function swapMembers()
+function swapMembers ()
 {
-	var membersForm = document.getElementById('membersForm');
+	let membersForm = document.getElementById('membersForm');
 
 	// Make it close smoothly
-	$("#membersPanel").slideToggle(300);
+	$('#membersPanel').slideToggle(300);
 
 	membersSwap = !membersSwap;
-	document.getElementById("membersIcon").src = elk_images_url + (membersSwap ? "/selected_open.png" : "/selected.png");
-	document.getElementById("membersText").innerHTML = membersSwap ? maintain_members_choose : maintain_members_all;
+	document.getElementById('membersIcon').src = elk_images_url + (membersSwap ? '/selected_open.png' : '/selected.png');
+	document.getElementById('membersText').innerHTML = membersSwap ? maintain_members_choose : maintain_members_all;
 
 	// Check or uncheck them all based on if we are expanding or collasping the area
-	for (var i = 0; i < membersForm.length; i++)
+	for (let i = 0; i < membersForm.length; i++)
 	{
-		if (membersForm.elements[i].type.toLowerCase() === "checkbox")
+		if (membersForm.elements[i].type.toLowerCase() === 'checkbox')
 		{
 			membersForm.elements[i].checked = !membersSwap;
 		}
@@ -1092,10 +1107,10 @@ function swapMembers()
 }
 
 /**
- * Called from reattribute member posts to build the confirm message for the action
+ * Called from reattribute member posts to build the confirmation message for the action
  * Keeps the action button (reattribute) disabled until all necessary fields have been filled
  */
-function checkAttributeValidity()
+function checkAttributeValidity ()
 {
 	origText = reattribute_confirm;
 	valid = true;
@@ -1132,8 +1147,7 @@ function checkAttributeValidity()
 	document.getElementById('do_attribute').disabled = !valid;
 
 	// Keep checking for a valid form so we can activate the submit button
-	setTimeout(function ()
-	{
+	setTimeout(function() {
 		checkAttributeValidity();
 	}, 500);
 
@@ -1145,11 +1159,11 @@ function checkAttributeValidity()
  *
  * @returns {undefined}
  */
-function transferAttachOptions()
+function transferAttachOptions ()
 {
-	var autoSelect = document.getElementById("auto"),
+	let autoSelect = document.getElementById('auto'),
 		autoValue = parseInt(autoSelect.options[autoSelect.selectedIndex].value, 10),
-		toSelect = document.getElementById("to"),
+		toSelect = document.getElementById('to'),
 		toValue = parseInt(toSelect.options[toSelect.selectedIndex].value, 10);
 
 	toSelect.disabled = autoValue !== 0;
@@ -1162,9 +1176,9 @@ function transferAttachOptions()
  *
  * @param {string} confirmText
  */
-function confirmMoveTopics(confirmText)
+function confirmMoveTopics (confirmText)
 {
-	var from = document.getElementById('id_board_from'),
+	let from = document.getElementById('id_board_from'),
 		to = document.getElementById('id_board_to');
 
 	if (from.options[from.selectedIndex].disabled || from.options[to.selectedIndex].disabled)
@@ -1178,12 +1192,12 @@ function confirmMoveTopics(confirmText)
 /**
  * Hide the search methods area if using sphinx(ql) search
  */
-function showhideSearchMethod()
+function showhideSearchMethod ()
 {
-	var searchSphinxQl = document.getElementById('search_index_sphinxql').checked,
+	let searchSphinxQl = document.getElementById('search_index_sphinxql').checked,
 		searchSphinx = document.getElementById('search_index_sphinx').checked,
 		searchhide = searchSphinxQl || searchSphinx,
-		searchMethod = $('#search_method');
+		searchMethod = document.getElementById('search_method');
 
 	if (searchhide)
 	{
@@ -1202,24 +1216,24 @@ function showhideSearchMethod()
  *
  * @param {boolean} isChecked
  */
-function swapPostGroup(isChecked)
+function swapPostGroup (isChecked)
 {
-	var min_posts_text = document.getElementById('min_posts_text'),
+	let min_posts_text = document.getElementById('min_posts_text'),
 		group_desc_text = document.getElementById('group_desc_text'),
 		group_hidden_text = document.getElementById('group_hidden_text'),
 		group_moderators_text = document.getElementById('group_moderators_text');
 
 	document.forms.groupForm.min_posts.disabled = !isChecked;
-	min_posts_text.style.color = isChecked ? "" : "#888888";
+	min_posts_text.style.color = isChecked ? '' : '#888888';
 
 	document.forms.groupForm.group_desc_input.disabled = isChecked;
-	group_desc_text.style.color = !isChecked ? "" : "#888888";
+	group_desc_text.style.color = isChecked ? '#888888' : '';
 
 	document.forms.groupForm.group_hidden_input.disabled = isChecked;
-	group_hidden_text.style.color = !isChecked ? "" : "#888888";
+	group_hidden_text.style.color = isChecked ? '#888888' : '';
 
 	document.forms.groupForm.group_moderators.disabled = isChecked;
-	group_moderators_text.style.color = !isChecked ? "" : "#888888";
+	group_moderators_text.style.color = isChecked ? '#888888' : '';
 
 	// Disable the moderator autosuggest box as well
 	if (typeof (oModeratorSuggest) !== 'undefined')
@@ -1231,119 +1245,149 @@ function swapPostGroup(isChecked)
 /**
  * Handles the AJAX preview of the warning templates
  */
-function ajax_getTemplatePreview()
+function ajax_getTemplatePreview ()
 {
-	$.ajax({
-		type: "POST",
-		url: elk_scripturl + '?action=XmlPreview;api=xml',
-		data: {
-			item: "warning_preview",
-			title: $("#template_title").val(),
-			body: $("#template_body").val(),
-			user: $('input[name="u"]').attr("value")
-		},
-		context: document.body
+	let thisDocument = document,
+		thisBody = document.body,
+		templateTitle = thisDocument.getElementById('template_title'),
+		templateBody = thisDocument.getElementById('template_body'),
+		user = thisDocument.querySelector('input[name="u"]');
+
+	fetch(elk_prepareScriptUrl(elk_scripturl) + 'action=XmlPreview;api=xml', {
+		method: 'POST',
+		body: serialize({
+			item: 'warning_preview',
+			title: templateTitle ? templateTitle.value : '',
+			body: templateBody ? templateBody.value : '',
+			user: user ? user.value : ''
+		}),
+		headers: {
+			'X-Requested-With': 'XMLHttpRequest',
+			'Content-Type': 'application/x-www-form-urlencoded',
+			'Accept': 'application/xml'
+		}
 	})
-		.done(function (request)
-		{
-			$("#box_preview").css({display: "block"});
-			$("#template_preview").html($(request).find('body').text());
+		.then(response => response.text())
+		.then(data => {
+			let parser = new DOMParser(),
+				xmlDoc = parser.parseFromString(data, 'text/xml');
 
-			var $_errors = $("#errors");
-			if ($(request).find("error").text() !== '')
+			thisDocument.getElementById('box_preview').style.display = 'block';
+			thisDocument.getElementById('template_preview').innerHTML = xmlDoc.getElementsByTagName('body')[0].childNodes[0].nodeValue;
+
+			let _errors = thisDocument.querySelector('#errors'),
+				errors = xmlDoc.getElementsByTagName('error');
+			if (errors[0] && errors[0].childNodes[0])
 			{
-				$_errors.css({display: "block"});
+				_errors.style.display = 'block';
+				let errorsHtml = '';
+				let errors = xmlDoc.getElementsByTagName('error');
 
-				var errors_html = '',
-					errors = $(request).find('error').each(function ()
-					{
-						errors_html += $(this).text() + '<br />';
-					});
+				Array.from(errors).forEach((error) => {
+					errorsHtml += error.childNodes[0].nodeValue + '<br />';
+				});
 
-				$(document).find("#error_list").html(errors_html);
-				$('html, body').animate({scrollTop: $_errors.offset().top}, 'slow');
+				thisDocument.getElementById('error_list').innerHTML = errorsHtml;
+				thisBody.scrollTo({top: _errors.offsetTop, behavior: 'smooth'});
 			}
 			else
 			{
-				$_errors.css({display: "none"});
-				$("#error_list").html('');
-				$('html, body').animate({scrollTop: $("#box_preview").offset().top}, 'slow');
+				_errors.style.display = 'none';
+				thisDocument.getElementById('error_list').innerHTML = '';
+				thisBody.scrollTo({top: thisDocument.getElementById('box_preview').offsetTop, behavior: 'smooth'});
 			}
 
 			return false;
+		})
+		.catch(error => {
+			if ('console' in window && console.error)
+			{
+				console.error('Error : ', error);
+			}
 		});
 
 	return false;
 }
 
 /**
- * Sets up all the js events for edit and save board-specific permission
- * profiles
+ * Sets up all the js events for edit and save board-specific permission profiles
  */
-function initEditProfileBoards()
+function initEditProfileBoards ()
 {
-	$('.edit_all_board_profiles').on('click', function (e)
-	{
-		e.preventDefault();
-
-		$('.edit_board').trigger('click');
-	});
-
-	$('.edit_board').show().on('click.elkarte', function (e)
-	{
-		let $icon = $(this),
-			board_id = $icon.data('boardid'),
-			board_profile = $icon.data('boardprofile'),
-			$target = $('#edit_board_' + board_id),
-			$select = $('<select />')
-				.attr('name', 'boardprofile[' + board_id + ']')
-				.on('change', function ()
-				{
-					$(this).find('option:selected').each(function ()
-					{
-						if ($(this).attr('value') == board_profile)
-						{
-							$icon.children(":first").addClass('i-check').removeClass('i-modify i-warn');
-							$icon.addClass('nochanges').removeClass('changed');
-						}
-						else
-						{
-							$icon.children(":first").addClass('i-warn').removeClass('i-modify i-check');
-							$icon.addClass('changed').removeClass('nochanges');
-						}
-					});
-				});
-
-		e.preventDefault();
-		$(permission_profiles).each(function (key, value)
-		{
-			let $opt = $('<option />').attr('value', value.id).text(value.name);
-
-			if (value.id == board_profile)
-			{
-				$opt.attr('selected', 'selected');
-			}
-
-			$select.append($opt);
-		});
-
-		$target.replaceWith($select);
-		$select.trigger('change');
-
-		$('.edit_all_board_profiles').replaceWith($('<input type="submit" />')
-			.attr('name', 'save_changes')
-			.attr('value', txt_save)
-		);
-
-		$icon.off('click.elkarte').on('click', function (e)
-		{
+	// Selecting Edit All will open the board permission selection for every board.
+	document.querySelectorAll('.edit_all_board_profiles').forEach(function(element) {
+		element.addEventListener('click', function(e) {
 			e.preventDefault();
-			if ($(this).hasClass('changed'))
+			document.querySelectorAll('.edit_board').forEach(function(innerElement) {
+				innerElement.click();
+			});
+		});
+	});
+
+	document.querySelectorAll('.edit_board').forEach(function(element) {
+		element.style.display = 'block';
+		element.addEventListener('click', function(e) {
+			let icon = this,
+				board_id = icon.getAttribute('data-boardid'),
+				board_profile = Number(icon.getAttribute('data-boardprofile')),
+				target = document.getElementById('edit_board_' + board_id),
+				select = document.createElement('select');
+
+			select.setAttribute('name', 'boardprofile[' + board_id + ']');
+			select.addEventListener('change', function() {
+				let selectedOption = this.options[this.selectedIndex];
+
+				if (Number(selectedOption.value) === board_profile)
+				{
+					icon.children[0].classList.add('i-check');
+					icon.children[0].classList.remove('i-modify', 'i-warn');
+					icon.classList.add('nochanges');
+					icon.classList.remove('changed');
+				}
+				else
+				{
+					icon.children[0].classList.add('i-warn');
+					icon.children[0].classList.remove('i-modify', 'i-check');
+					icon.classList.add('changed');
+					icon.classList.remove('nochanges');
+				}
+			});
+
+			e.preventDefault();
+
+			permission_profiles.forEach(function(profile) {
+				let option = document.createElement('option');
+				option.value = Number(profile.id);
+				option.text = profile.name;
+
+				if (profile.id === board_profile)
+				{
+					option.selected = true;
+				}
+				select.appendChild(option);
+			});
+
+			if (target)
 			{
-				$('input[name="save_changes"]').trigger('click');
+				target.parentNode.replaceChild(select, target);
+				select.dispatchEvent(new Event('change'));
+
+				document.querySelector('.edit_all_board_profiles').outerHTML = '<input type="submit" name="save_changes" value="' + txt_save + '">';
+
+				icon.removeEventListener('click', handleIconClick);
+				icon.addEventListener('click', handleIconClick);
 			}
 		});
 	});
+
+	function handleIconClick (e)
+	{
+		e.preventDefault();
+		if (this.classList.contains('changed'))
+		{
+			document.querySelector('input[name="save_changes"]').click();
+		}
+	}
 }
 
 /**
@@ -1353,230 +1397,144 @@ function initEditProfileBoards()
  * It also removes the "Rename all" and "Remove Selected" buttons
  * and the "Delete" column for consistency
  */
-function initEditPermissionProfiles()
+function initEditPermissionProfiles ()
 {
 	// We need a variable to be sure we are going to create only 1 cancel button
-	var run_once = false,
-		$cancel;
+	let run_once = false,
+		$cancel = null;
 
-	$('.rename_profile').each(function ()
-	{
-		var $this_profile = $(this);
+	document.querySelectorAll('.rename_profile').forEach((profile) => {
+		const newButton = document.createElement('a');
+		newButton.className = 'js-ed edit_board';
+		newButton.href = '#';
 
-		$this_profile.after($('<a class="js-ed edit_board" />').attr('href', '#').on('click', function (ev)
-		{
+		const newIcon = document.createElement('i');
+		newIcon.className = 'icon icon-small i-modify';
+
+		newButton.appendChild(newIcon);
+		newButton.addEventListener('click', function(ev) {
 			ev.preventDefault();
 
 			// If we have already created the cancel let's skip it
 			if (!run_once)
 			{
 				run_once = true;
-				$cancel = $('<a class="js-ed-rm linkbutton" />').on('click', function (ev)
-				{
+
+				// Create a cancel button that restores the UI on click
+				$cancel = document.createElement('a');
+				$cancel.className = 'js-ed-rm linkbutton';
+				$cancel.href = '#';
+				$cancel.textContent = ajax_notification_cancel_text;
+				$cancel.addEventListener('click', function(ev) {
 					ev.preventDefault();
 
-					// js-ed is hopefully a class introduced by this function only
-					// Any element with this class will be restored when cancel is clicked
-					$('.js-ed').show();
+					document.querySelectorAll('.js-ed').forEach((el) => { el.style.removeProperty('display'); });
+					document.querySelectorAll('.js-ed-rm').forEach((el) => { el.remove(); });
+					document.getElementById('rename').value = txt_permissions_profile_rename;
 
-					// js-ed-rm is again a class introduced by this function
-					// Any element with this class will be removed when cancelling
-					$('.js-ed-rm').remove();
-
-					// The cancel button is removed as well,
-					// so we need to generate it again later (if we need it again)
 					run_once = false;
-
-					$('#rename').val(txt_permissions_profile_rename);
-				}).text(ajax_notification_cancel_text).attr('href', '#');
+				});
 			}
 
-			$this_profile.after($('<input type="text" class="js-ed-rm input_text" />')
-				.attr('name', 'rename_profile[' + $this_profile.data('pid') + ']')
-				.val($this_profile.text()));
+			const input = document.createElement('input');
+			input.type = 'text';
+			input.className = 'js-ed-rm input_text';
+			input.name = 'rename_profile[' + profile.dataset.pid + ']';
+			input.value = profile.textContent;
+
+			profile.after(input);
+			profile.classList.add('js-ed');
+			profile.style.display = 'none';
 
 			// These will have to pop back hitting cancel, so let's prepare them
-			$('#rename').addClass('js-ed').val(txt_permissions_commit).before($cancel);
-			$this_profile.addClass('js-ed').hide();
-			$('#delete').addClass('js-ed').hide();
-			$('.perm_profile_delete').addClass('js-ed').hide();
-			$(this).hide();
-		}));
+			document.getElementById('rename').classList.add('js-ed');
+			document.getElementById('rename').value = txt_permissions_commit;
+			document.getElementById('rename').before($cancel);
+
+			document.getElementById('delete').classList.add('js-ed');
+			document.getElementById('delete').style.display = 'none';
+
+			document.querySelectorAll('.perm_profile_delete').forEach((element) => {
+				element.classList.add('js-ed');
+				element.style.display = 'none';
+			});
+
+			this.style.display = 'none';
+		});
+
+		profile.after(newButton);
 	});
 }
 
 /**
  * Attach the AJAX handling of things to the various themes to remove
  * Used in ManageThemes (template_list_themes)
- */
-function initDeleteThemes()
-{
-	$(".delete_theme").on("click", function (event)
-	{
-		event.preventDefault();
-		var theme_id = $(this).data("theme_id"),
-			base_url = $(this).attr("href"),
-			pattern = new RegExp(elk_session_var + "=" + elk_session_id + ";(.*)$"),
-			tokens = pattern.exec(base_url)[1].split("="),
-			token = tokens[1],
-			token_var = tokens[0];
-
-		if (confirm(txt_theme_remove_confirm))
-		{
-			$.ajax({
-				type: "GET",
-				url: base_url + ";api=xml",
-				beforeSend: ajax_indicator(true)
-			})
-				.done(function (request)
-				{
-					if ($(request).find("error").length === 0)
-					{
-						var new_token = $(request).find("token").text(),
-							new_token_var = $(request).find("token_var").text();
-
-						$(".theme_" + theme_id).slideToggle("slow", function ()
-						{
-							$(this).remove();
-						});
-
-						$(".delete_theme").each(function ()
-						{
-							$(this).attr("href", $(this).attr("href").replace(token_var + "=" + token, new_token_var + "=" + new_token));
-						});
-					}
-					// @todo improve error handling
-					else
-					{
-						alert($(request).find("text").text());
-						// Redirect to the delete theme page, though it will result in a token verification error
-						window.location = base_url;
-					}
-				})
-				.fail(function (request)
-				{
-					window.location = base_url;
-				})
-				.always(function ()
-				{
-					// turn off the indicator
-					ajax_indicator(false);
-				});
-		}
-	});
-}
-
-/**
- * These two functions (navigatePreview and refreshPreview) are used in ManageThemes
- * (template_edit_style) to create a preview of the site with the changed stylesheets
  *
- * @param {string} url
+ * @todo did not test this after refactor from jquery ... did not have any themes installed!
  */
-function navigatePreview(url)
+function initDeleteThemes ()
 {
-	var myDoc = new XMLHttpRequest();
+	document.querySelectorAll('.delete_theme').forEach(item => {
+		item.addEventListener('click', function(event) {
+			event.preventDefault();
 
-	myDoc.onreadystatechange = function ()
-	{
-		if (myDoc.readyState !== 4)
-		{
-			return;
-		}
+			const theme_id = this.dataset.theme_id;
+			const pattern = new RegExp(elk_session_var + '=' + elk_session_id + ';(.*)$');
 
-		if (myDoc.responseText !== null && myDoc.status === 200)
-		{
-			previewData = myDoc.responseText;
-			document.getElementById('css_preview_box').style.display = "block";
+			let base_url = this.getAttribute('href'),
+				tokens = pattern.exec(base_url)[1].split('='),
+				token = tokens[1],
+				token_var = tokens[0];
 
-			// Revert to the theme they actually use ;).
-			var tempImage = new Image();
-			tempImage.src = elk_prepareScriptUrl(elk_scripturl) + 'action=admin;area=theme;sa=edit;theme=' + theme_id + ';preview;' + (new Date().getTime());
-
-			refreshPreviewCache = null;
-			refreshPreview(false);
-		}
-	};
-
-	var anchor = "";
-	if (url.indexOf("#") !== -1)
-	{
-		anchor = url.substr(url.indexOf("#"));
-		url = url.substr(0, url.indexOf("#"));
-	}
-
-	myDoc.open("GET", url + (url.indexOf("?") === -1 ? "?" : ";") + 'theme=' + theme_id + anchor, true);
-	myDoc.send(null);
-}
-
-/**
- * Used when editing a stylesheet.  Allows for the preview to be updated to reflect
- * changes made to the css in the editor.
- *
- * @param {boolean} check
- */
-function refreshPreview(check)
-{
-	var identical = document.forms.stylesheetForm.entire_file.value == refreshPreviewCache;
-
-	// Don't reflow the whole thing if nothing changed!!
-	if (check && identical)
-	{
-		return;
-	}
-
-	refreshPreviewCache = document.forms.stylesheetForm.entire_file.value;
-
-	// Replace the paths for images.
-	refreshPreviewCache = refreshPreviewCache.replace(/url\(\.\.\/images/gi, "url(" + elk_images_url);
-
-	// Try to do it without a complete reparse.
-	if (identical)
-	{
-		try
-		{
-			frames['css_preview_box'].document.getElementById("css_preview_sheet").innerHTML = document.forms.stylesheetForm.entire_file.value;
-		} catch (e)
-		{
-			identical = false;
-		}
-	}
-
-	// This will work most of the time... could be done with an after-apply, maybe.
-	if (!identical)
-	{
-		var data = previewData,
-			preview_sheet = document.forms.stylesheetForm.entire_file.value,
-			stylesheetMatch = new RegExp('<link rel="stylesheet"[^>]+href="[^"]+' + editFilename + '[^>]*>'),
-			iframe;
-
-		// Replace the paths for images.
-		preview_sheet = preview_sheet.replace(/url\(\.\.\/images/gi, "url(" + elk_images_url);
-		data = data.replace(stylesheetMatch, '<style type="text/css" id="css_preview_sheet">' + preview_sheet + "<" + "/style>");
-
-		iframe = document.getElementById("css_preview_box");
-		iframe.contentWindow.document.open();
-		iframe.contentWindow.document.write(data);
-		iframe.contentWindow.document.close();
-
-		// Next, fix all its links so we can handle them and reapply the new css!
-		iframe.onload = function ()
-		{
-			var fixLinks = frames["css_preview_box"].document.getElementsByTagName("a");
-			for (var i = 0; i < fixLinks.length; i++)
+			if (confirm(txt_theme_remove_confirm))
 			{
-				if (fixLinks[i].onclick)
-				{
-					continue;
-				}
+				fetch(base_url + ';api=xml', {
+					method: 'GET',
+					headers: {
+						'X-Requested-With': 'XMLHttpRequest',
+						'Accept': 'application/xml'
+					}
+				})
+					.then(response => {
+						if (!response.ok)
+						{
+							throw new Error('HTTP error ' + response.status);
+						}
+						return response.text();
+					})
+					.then(responseText => {
+						let parser = new DOMParser(),
+							xmlDoc = parser.parseFromString(responseText, 'text/xml');
 
-				fixLinks[i].onclick = function ()
-				{
-					window.parent.navigatePreview(this.href);
-					return false;
-				};
+						if (xmlDoc.getElementsByTagName('error').length === 0)
+						{
+							let new_token = xmlDoc.getElementsByTagName('token')[0].childNodes[0].nodeValue,
+								new_token_var = xmlDoc.getElementsByTagName('token_var')[0].childNodes[0].nodeValue;
+
+							document.querySelector('.theme_' + theme_id).style.display = 'none';
+							document.querySelectorAll('.delete_theme').forEach(item => {
+								let href = item.getAttribute('href');
+								item.setAttribute('href', href.replace(token_var + '=' + token, new_token_var + '=' + new_token));
+							});
+						}
+						// @todo Improve error handling
+						else
+						{
+							let error = xmlDoc.getElementsByTagName('text')[0].childNodes[0].nodeValue;
+							throw new Error('HTTP error ' + error);
+						}
+					})
+					.catch(error => {
+						ajax_indicator(false);
+						window.location = base_url;
+					})
+					.finally(() => {
+						// Turn off the indicator
+						ajax_indicator(false);
+					});
 			}
-		};
-	}
+		});
+	});
 }
 
 /**
@@ -1584,7 +1542,7 @@ function refreshPreview(check)
  *
  * @param {object} oAutoSuggest
  */
-function onUpdateName(oAutoSuggest)
+function onUpdateName (oAutoSuggest)
 {
 	document.getElementById('user_check').checked = true;
 	return true;
@@ -1596,7 +1554,7 @@ function onUpdateName(oAutoSuggest)
  *
  * @param {object} aForm this form object to check
  */
-function confirmBan(aForm)
+function confirmBan (aForm)
 {
 	if (aForm.ban_name.value === '')
 	{
@@ -1614,43 +1572,42 @@ function confirmBan(aForm)
 }
 
 // Enable/disable some fields when working with bans.
-var fUpdateStatus = function ()
-{
-	document.getElementById("expire_date").disabled = !document.getElementById("expires_one_day").checked;
-	document.getElementById("cannot_post").disabled = document.getElementById("full_ban").checked;
-	document.getElementById("cannot_register").disabled = document.getElementById("full_ban").checked;
-	document.getElementById("cannot_login").disabled = document.getElementById("full_ban").checked;
+const fUpdateStatus = function() {
+	document.getElementById('expire_date').disabled = !document.getElementById('expires_one_day').checked;
+	document.getElementById('cannot_post').disabled = document.getElementById('full_ban').checked;
+	document.getElementById('cannot_register').disabled = document.getElementById('full_ban').checked;
+	document.getElementById('cannot_login').disabled = document.getElementById('full_ban').checked;
 };
 
 /**
  * Used when setting up subscriptions, used to toggle the currency code divs
  * based on which currencies are chosen.
  */
-function toggleCurrencyOther()
+function toggleCurrencyOther ()
 {
-	var otherOn = document.getElementById("paid_currency").value === 'other',
-		currencydd = document.getElementById("custom_currency_code_div_dd");
+	let otherOn = document.getElementById('paid_currency').value === 'other',
+		currencydd = document.getElementById('custom_currency_code_div_dd');
 
 	if (otherOn)
 	{
-		document.getElementById("custom_currency_code_div").style.display = "";
-		document.getElementById("custom_currency_symbol_div").style.display = "";
+		document.getElementById('custom_currency_code_div').style.display = '';
+		document.getElementById('custom_currency_symbol_div').style.display = '';
 
 		if (currencydd)
 		{
-			document.getElementById("custom_currency_code_div_dd").style.display = "";
-			document.getElementById("custom_currency_symbol_div_dd").style.display = "";
+			document.getElementById('custom_currency_code_div_dd').style.display = '';
+			document.getElementById('custom_currency_symbol_div_dd').style.display = '';
 		}
 	}
 	else
 	{
-		document.getElementById("custom_currency_code_div").style.display = "none";
-		document.getElementById("custom_currency_symbol_div").style.display = "none";
+		document.getElementById('custom_currency_code_div').style.display = 'none';
+		document.getElementById('custom_currency_symbol_div').style.display = 'none';
 
 		if (currencydd)
 		{
-			document.getElementById("custom_currency_symbol_div_dd").style.display = "none";
-			document.getElementById("custom_currency_code_div_dd").style.display = "none";
+			document.getElementById('custom_currency_symbol_div_dd').style.display = 'none';
+			document.getElementById('custom_currency_code_div_dd').style.display = 'none';
 		}
 	}
 }
@@ -1658,53 +1615,63 @@ function toggleCurrencyOther()
 /**
  * Used to ajax-ively preview the templates of bounced emails (template_bounce_template)
  */
-function ajax_getEmailTemplatePreview()
+function ajax_getEmailTemplatePreview ()
 {
-	$.ajax({
-		type: "POST",
-		url: elk_scripturl + "?action=XmlPreview;api=xml",
-		data: {
-			item: "bounce_preview",
-			title: $("#template_title").val(),
-			body: $("#template_body").val()
+	fetch(elk_prepareScriptUrl(elk_scripturl) + 'action=XmlPreview;api=xml', {
+		method: 'POST',
+		headers: {
+			'X-Requested-With': 'XMLHttpRequest',
+			'Content-Type': 'application/x-www-form-urlencoded',
+			'Accept': 'application/xml'
 		},
-		context: document.body
+		body: serialize({
+			item: 'bounce_preview',
+			title: document.getElementById('template_title').value,
+			body: document.getElementById('template_body').value
+		})
 	})
-		.done(function (request)
-		{
-			// Show the preview section, populated with the response
-			$("#preview_section").css({display: "block"});
-			$("#preview_body").html($(request).find('body').text());
-			$("#preview_subject").html($(request).find('subject').text());
-
-			// Any error we need to let them know about?
-			if ($(request).find("error").text() !== '')
+		.then(response => {
+			if (!response.ok)
 			{
-				var errors_html = '',
-					$_errors = $("#errors"),
-					errors;
+				throw new Error('HTTP error ' + response.status);
+			}
+			return response.text();
+		})
+		.then(str => (new window.DOMParser()).parseFromString(str, 'text/xml'))
+		.then(data => {
+			document.getElementById('preview_section').style.display = 'block';
+			document.getElementById('preview_body').innerHTML = data.getElementsByTagName('body')[0].textContent;
+			document.getElementById('preview_subject').innerHTML = data.getElementsByTagName('subject')[0].textContent;
 
-				// Build the error string
-				$(request).find('error').each(function ()
+			const errorsElem = data.getElementsByTagName('error');
+			if (errorsElem.length)
+			{
+				let errors_html = '';
+
+				document.getElementById('errors').style.display = '';
+				document.getElementById('errors').className = parseInt(data.getElementsByTagName('errors')[0].getAttribute('serious')) === 0 ? 'warningbox' : 'errorbox';
+				for (let i = 0; i < errorsElem.length; i++)
 				{
-					errors_html += $(this).text() + '<br />';
-				});
-
-				// Add it to the error div, set the class level, and show it
-				$(document).find("#error_list").html(errors_html);
-				$_errors.css({display: ""});
-				$_errors.attr('class', parseInt($(request).find('errors').attr('serious')) === 0 ? 'warningbox' : 'errorbox');
+					errors_html += errorsElem[i].textContent + '<br />';
+				}
+				document.getElementById('error_list').innerHTML = errors_html;
 			}
 			else
 			{
-				$("#errors").css({display: "none"});
-				$("#error_list").html('');
+				document.getElementById('errors').style.display = 'none';
+				document.getElementById('error_list').innerHTML = '';
 			}
+			document.documentElement.scrollTo({
+				top: document.getElementById('preview_section').offsetTop,
+				behavior: 'smooth'
+			});
 
-			// Navigate to the preview
-			$('html, body').animate({scrollTop: $('#preview_section').offset().top}, 'slow');
-
-			return false;
+		})
+		.catch((error) => {
+			if ('console' in window && console.error)
+			{
+				console.error('Error : ', error);
+			}
 		});
 
 	return false;
@@ -1714,28 +1681,42 @@ function ajax_getEmailTemplatePreview()
  * Used to ajax-ively preview a word censor
  * Does no checking, it either gets a result or does nothing
  */
-function ajax_getCensorPreview()
+function ajax_getCensorPreview ()
 {
-	$.ajax({
-		type: 'POST',
-		dataType: 'json',
-		url: elk_scripturl + "?action=admin;area=postsettings;sa=censor;api=xml",
-		data: {
-			censortest: $("#censortest").val()
-		}
+	fetch(elk_prepareScriptUrl(elk_scripturl) + 'action=admin;area=postsettings;sa=censor;api=json', {
+		method: 'POST',
+		headers: {
+			'X-Requested-With': 'XMLHttpRequest',
+			'Content-Type': 'application/x-www-form-urlencoded',
+			'Accept': 'application/json'
+		},
+		body: serialize({
+			censortest: document.getElementById('censortest').value
+		})
 	})
-		.done(function (request)
-		{
-			if (request.result === true)
+		.then(response => {
+			if (!response.ok)
 			{
-				// Show the censored text section, populated with the response
-				$("#censor_result").css({display: "block"}).html(request.censor);
+				throw new Error('HTTP error ' + response.status);
+			}
+			return response.json();
+		})
+		.then(request => {
+			// Show the censored text section, populated with the response
+			document.getElementById('censor_result').style.display = 'block';
+			document.getElementById('censor_result').innerHTML = request.censor;
 
-				// Update the token
-				$("#token").attr({name: request.token_val, value: request.token});
+			// Update the token
+			document.getElementById('token').setAttribute('name', request.token_val);
+			document.getElementById('token').value = request.token;
 
-				// Clear the box
-				$('#censortest').attr({value: ''}).val('');
+			// Clear the box
+			document.getElementById('censortest').value = '';
+		})
+		.catch((error) => {
+			if ('console' in window && console.error)
+			{
+				console.error('Error : ', error);
 			}
 		});
 
@@ -1746,189 +1727,560 @@ function ajax_getCensorPreview()
  * Used to show/hide sub options for the various notifications
  * action=admin;area=featuresettings;sa=mention
  */
-$(function ()
-{
-	var $headers = $("#mention").find("input[id^='notifications'][id$='[enable]']");
+$(function() {
+	let headers = Array.from(document.querySelectorAll('input[id^=\'notifications\'][id$=\'[enable]\']'));
 
-	$headers.on('change', function ()
-	{
-		var $top = $(this).closest('dl'),
-			$hparent = $(this).parent();
+	headers.forEach(function(header) {
+		header.addEventListener('change', function() {
+			let top = this.closest('dl'),
+				hparent = this.parentNode;
 
-		if (this.checked)
-		{
-			$top.find('dt:not(:first-child)').fadeIn();
-			$top.find('dd:not(:nth-child(2))').each(function ()
+			// Enabling the notification, slide it into view and make sure the checkboxes are enabled
+			if (this.checked)
 			{
-				$(this).fadeIn();
-				$(this).find('input').prop('disabled', false);
-			});
-		}
-		else
-		{
-			$top.find('dt:not(:first-child)').hide();
-			$top.find('dd:not(:nth-child(2))').each(function ()
-			{
-				$(this).hide();
-				$(this).find('input').prop('disabled', true);
-			});
-		}
+				Array.from(top.querySelectorAll('dt:not(:first-child)')).forEach(function(el) {
+					el.slideDown();
+				});
 
-		$hparent.show();
-		$hparent.prev().show();
+				Array.from(top.querySelectorAll('dd:not(:nth-child(2))')).forEach(function(el) {
+					el.slideDown();
+					Array.from(el.querySelectorAll('input')).forEach(function(inputEl) {
+						inputEl.disabled = false;
+					});
+				});
+			}
+			// Notification type is not enabled, close that area, disable checkboxes
+			else
+			{
+				Array.from(top.querySelectorAll('dt:not(:first-child)')).forEach(function(el) {
+					el.slideUp();
+				});
+
+				Array.from(top.querySelectorAll('dd:not(:nth-child(2))')).forEach(function(el) {
+					el.slideUp();
+					Array.from(el.querySelectorAll('input')).forEach(function(inputEl) {
+						inputEl.disabled = true;
+					});
+				});
+			}
+
+			hparent.style.display = 'block';
+			hparent.previousElementSibling.style.display = 'block';
+		});
+
+		let event = new Event('change', {'bubbles': true, 'cancelable': true});
+		header.dispatchEvent(event);
 	});
-
-	$headers.trigger('change');
 });
 
 /**
  * Ajax function to clear CSS and JS hives.  Called from action=admin;area=featuresettings;sa=basic
- * Remove Hives button.
  */
-$(function ()
+function cleanHives (event)
 {
-	$('#clean_hives').on('click', function ()
-	{
-		var infoBar = new ElkInfoBar('bar_clean_hives');
+	let infoBar = new ElkInfoBar('bar_clean_hives');
 
-		$.ajax({
-			type: 'POST',
-			dataType: 'json',
-			url: elk_scripturl + "?action=admin;area=featuresettings;sa=basic;api=json",
-			data: {
-				cleanhives: true
-			}
-		})
-			.done(function (request)
+	event.preventDefault();
+	fetch(elk_prepareScriptUrl(elk_scripturl) + 'action=admin;area=featuresettings;sa=basic;api=json', {
+		method: 'POST',
+		headers: {
+			'X-Requested-With': 'XMLHttpRequest',
+			'Content-Type': 'application/x-www-form-urlencoded',
+			'Accept': 'application/json'
+		},
+		body: serialize({cleanhives: true})
+	})
+		.then(response => {
+			if (!response.ok)
 			{
-				infoBar.changeText(request.response);
-
-				if (request.success === true)
-				{
-					infoBar.isSuccess();
-				}
-				else
-				{
-					infoBar.isError();
-				}
-			})
-			.fail(function (request)
+				throw new Error('HTTP error ' + response.status);
+			}
+			return response.json();
+		})
+		.then(request => {
+			infoBar.changeText(request.response);
+			if (request.success === true)
+			{
+				infoBar.isSuccess();
+			}
+			else
 			{
 				infoBar.isError();
-				infoBar.changeText(txt_invalid_response);
-			})
-			.always(function (request)
-			{
-				infoBar.showBar();
-			});
+			}
+			infoBar.showBar();
+		})
+		.catch(error => {
+			infoBar.isError();
+			infoBar.changeText(txt_invalid_response);
+			infoBar.showBar();
+		});
 
-		return false;
-	});
-});
+	return false;
+}
 
 /**
  * Enable / disable "core" features of the software. Called from action=admin;area=corefeatures
  */
-$(function ()
+function coreFeatures ()
 {
-	if ($('#core_features').length === 0)
+	if (document.getElementById('core_features') === null)
 	{
 		return;
 	}
 
-	$(".core_features_hide").addClass('hide');
-	$(".core_features_img").show().css({'cursor': 'pointer'}).each(function ()
-	{
-		let sImageText = $(this).hasClass('i-switch-on') ? feature_on_text : feature_off_text;
-		$(this).attr({title: sImageText, alt: sImageText});
+	// Hide the standard form elements (checkboxes, submit button), this is all ajax now
+	document.querySelectorAll('.core_features_hide').forEach((element) => {
+		element.classList.add('hide');
 	});
-	$("#core_features_submit").parent().addClass('hide');
+	document.getElementById('core_features_submit').parentElement.classList.add('hide');
 
-	if (!token_name)
-	{
-		token_name = $("#core_features_token").attr("name");
-	}
+	token_name = token_name || document.getElementById('core_features_token').getAttribute('name');
+	token_value = token_value || document.getElementById('core_features_token').getAttribute('value');
 
-	if (!token_value)
-	{
-		token_value = $("#core_features_token").attr("value");
-	}
+	// Attach our action to the core features power button image
+	document.querySelectorAll('.core_features_img').forEach((element) => {
+		element.style.display = 'block';
+		element.style.cursor = 'pointer';
 
-	// Attach our action to the core features power button
-	$(".core_features_img").on('click', function ()
-	{
-		let cc = $(this),
-			cf = $(this).attr("id").substring(7),
-			new_state = !$("#feature_" + cf).attr("checked"),
-			ajax_infobar = new ElkInfoBar('core_features_bar', {error_class: 'errorbox', success_class: 'successbox'}),
-			data;
+		let sImageText = element.classList.contains('i-switch-on') ? feature_on_text : feature_off_text;
+		element.setAttribute('title', sImageText);
+		element.setAttribute('alt', sImageText);
 
-		$("#feature_" + cf).attr("checked", new_state);
+		// Clicked on the on/off image
+		element.addEventListener('click', function() {
+			let cc = this,
+				cf = this.getAttribute('id').substring(7),
+				new_state = !document.getElementById('feature_' + cf).checked,
+				ajax_infobar = new ElkInfoBar('core_features_bar', {error_class: 'errorbox', success_class: 'successbox'});
 
-		data = {save: "save", feature_id: cf};
-		data[$("#core_features_session").attr("name")] = $("#core_features_session").val();
-		data[token_name] = token_value;
+			// Set the form checkbox to the new state
+			document.getElementById('feature_' + cf).checked = new_state;
 
-		$(".core_features_status_box").each(function ()
-		{
-			data[$(this).attr("name")] = !$(this).attr("checked") ? 0 : 1;
-		});
+			// Prepare the form data to send in the request
+			let data = new FormData();
+			data.append('save', 'save');
+			data.append('feature_id', cf);
+			data.append(document.getElementById('core_features_session').getAttribute('name'), document.getElementById('core_features_session').value);
+			data.append(token_name, token_value);
+			document.querySelectorAll('.core_features_status_box').forEach(box => {
+				data.append(box.getAttribute('name'), box.checked ? '1' : '0');
+			});
 
-		// Launch AJAX request.
-		$.ajax({
-			// The link we are accessing.
-			url: elk_scripturl + "?action=xmlhttp;sa=corefeatures;api=xml",
+			// Make the on/off request via ajax
+			fetch(elk_prepareScriptUrl(elk_scripturl) + 'action=xmlhttp;sa=corefeatures;api=xml', {
+				method: 'POST',
+				body: serialize(data),
+				headers: {
+					'X-Requested-With': 'XMLHttpRequest',
+					'Content-Type': 'application/x-www-form-urlencoded',
+					'Accept': 'application/xml'
+				}
+			})
+				.then(response => {
+					if (!response.ok)
+					{
+						throw new Error('Network response was not ok');
+					}
+					return response.text();
+				})
+				.then(data => {
+					const xmlDoc = new window.DOMParser().parseFromString(data, 'text/xml');
 
-			// The type of request.
-			type: "post",
+					if (xmlDoc.getElementsByTagName('errors')[0].getElementsByTagName('error').length > 0)
+					{
+						ajax_infobar.isError();
+						ajax_infobar.changeText(xmlDoc.getElementsByTagName('errors')[0].getElementsByTagName('error')[0].textContent);
+					}
+					else if (xmlDoc.getElementsByTagName('elk').length > 0)
+					{
+						// Enable to disable the link to the feature
+						document.getElementById('feature_link_' + cf).innerHTML = xmlDoc.getElementsByTagName('corefeatures')[0].getElementsByTagName('corefeature')[0].textContent;
 
-			// The type of data that is getting returned.
-			dataType: "xml",
+						// Toggle the switch and its hover text
+						cc.classList.toggle('i-switch-on');
+						cc.classList.toggle('i-switch-off');
+						cc.setAttribute('title', new_state ? feature_on_text : feature_off_text);
+						cc.setAttribute('alt', new_state ? feature_on_text : feature_off_text);
 
-			// What we send
-			data: data
-		})
-		.done(function (request)
-		{
-			if ($(request).find("errors").find("error").length !== 0)
-			{
-				ajax_infobar.isError();
-				ajax_infobar.changeText($(request).find("errors").find("error").text()).showBar();
-			}
-			else if ($(request).find("elk").length !== 0)
-			{
-				$("#feature_link_" + cf).html($(request).find("corefeatures").find("corefeature").text());
-				cc.toggleClass('i-switch-on i-switch-off');
-				cc.attr({
-					"title": new_state ? feature_on_text : feature_off_text,
-					"alt": new_state ? feature_on_text : feature_off_text
+						token_name = xmlDoc.getElementsByTagName('tokens')[0].querySelector('[type="token"]').textContent;
+						token_value = xmlDoc.getElementsByTagName('tokens')[0].querySelector('[type="token_var"]').textContent;
+
+						let message = xmlDoc.getElementsByTagName('messages')[0].getElementsByTagName('message')[0].textContent;
+						ajax_infobar.changeText(message);
+					}
+					else
+					{
+						ajax_infobar.isError();
+						ajax_infobar.changeText(core_settings_generic_error);
+					}
+				})
+				.catch(error => {
+					ajax_infobar.changeText('Fetch Error :-S', error);
+				})
+				.finally(() => {
+					ajax_infobar.showBar();
 				});
-				$("#feature_link_" + cf).fadeOut().fadeIn();
-				ajax_infobar.isSuccess();
-				let message = $(request).find("messages").find("message").text();
-				ajax_infobar.changeText(message).showBar();
-
-				token_name = $(request).find("tokens").find('[type="token"]').text();
-				token_value = $(request).find("tokens").find('[type="token_var"]').text();
-			}
-			else
-			{
-				ajax_infobar.isError();
-				ajax_infobar.changeText(core_settings_generic_error).showBar();
-			}
-		})
-		.fail(function (error)
-		{
-			ajax_infobar.changeText(error).showBar();
 		});
 	});
-});
+}
 
-function confirmAgreement(text)
+function confirmAgreement (text)
 {
-	if ($('#checkboxAcceptAgreement').is(':checked'))
+	let checkbox = document.getElementById('checkboxAcceptAgreement');
+
+	if (checkbox.checked)
 	{
 		return confirm(text);
 	}
+
 	return true;
+}
+
+/**
+ * Add a new dt/dd pair above a parent selector
+ *
+ * - Called most often as a callback option in config options
+ * - If oData is supplied, will create a select list, populated with that data
+ * otherwise a standard input box.
+ *
+ * @param {string} parent id of the parent "add more button: we will place this before
+ * @param {object} oDtName object of dt element options (type, class, size)
+ * @param {object} oDdName object of the dd element options (type, class size)
+ * @param {object} [oData] optional select box object, 1:{id:value,name:display name}, ...
+ */
+function addAnotherOption (parent, oDtName, oDdName, oData)
+{
+	// Some defaults to use if none are passed
+	oDtName.type = oDtName.type || 'text';
+	oDtName['class'] = oDtName['class'] || 'input_text';
+	oDtName.size = oDtName.size || '20';
+
+	oDdName.type = oDdName.type || 'text';
+	oDdName['class'] = oDdName['class'] || 'input_text';
+	oDdName.size = oDdName.size || '20';
+	oData = oData || '';
+
+	// Our new <dt> element
+	let newDT = document.createElement('dt'),
+		newInput = document.createElement('input');
+
+	newInput.name = oDtName.name;
+	newInput.type = oDtName.type;
+	newInput.setAttribute('class', oDtName['class']);
+	newInput.size = oDtName.size;
+	newDT.appendChild(newInput);
+
+	// And its matching <dd>
+	let newDD = document.createElement('dd');
+
+	// If we have data for this field make it a select
+	if (oData === '')
+	{
+		newInput = document.createElement('input');
+	}
+	else
+	{
+		newInput = document.createElement('select');
+	}
+
+	newInput.name = oDdName.name;
+	newInput.type = oDdName.type;
+	newInput.size = oDdName.size;
+	newInput.setAttribute('class', oDdName['class']);
+	newDD.appendChild(newInput);
+
+	// If its a select box we add in the options
+	if (oData !== '')
+	{
+		// The options are children of the newInput select box
+		let opt,
+			key,
+			obj;
+
+		for (key in oData)
+		{
+			obj = oData[key];
+			opt = document.createElement('option');
+			opt.name = 'option';
+			opt.value = obj.id;
+			opt.innerHTML = obj.name;
+			newInput.appendChild(opt);
+		}
+	}
+
+	// Place the new dt/dd pair before our parent
+	let placeHolder = document.getElementById(parent);
+	placeHolder.parentNode.insertBefore(newDT, placeHolder);
+	placeHolder.parentNode.insertBefore(newDD, placeHolder);
+}
+
+/**
+ * Drag and drop to reorder ID's via UI Sortable
+ *
+ * @param {object} $
+ */
+(function($) {
+	'use strict';
+	$.fn.elkSortable = function(oInstanceSettings) {
+		$.fn.elkSortable.oDefaultsSettings = {
+			opacity: 0.7,
+			cursor: 'move',
+			axis: 'y',
+			scroll: true,
+			containment: 'parent',
+			delay: 150,
+			handle: '', // Restricts sort start click to the specified element, like category_header
+			href: '', // If an error occurs redirect here
+			tolerance: 'intersect', // mode to use for testing whether the item is hovering over another item.
+			setorder: 'serialize', // how to return the data, really only supports serialize and inorder
+			placeholder: '', // css class used to style the landing zone
+			preprocess: '', // This function is called at the start of the update event (when the item is dropped) must in in global space
+			tag: '#table_grid_sortable', // ID(s) of the container to work with, single or comma separated
+			connect: '', // Use to group all related containers with a common CSS class
+			sa: '', // Subaction that the xmlcontroller should know about
+			title: '', // Title of the error box
+			error: '', // What to say when we don't know what happened, like connection error
+			token: '' // Security token if needed
+		};
+
+		// Account for any user options
+		var oSettings = $.extend({}, $.fn.elkSortable.oDefaultsSettings, oInstanceSettings || {});
+
+		if (typeof oSettings.infobar === 'undefined')
+		{
+			oSettings.infobar = new ElkInfoBar('sortable_bar', {error_class: 'errorbox', success_class: 'infobox'});
+		}
+
+		// Divs to hold our responses
+		$('<div id=\'errorContainer\'><div/>').appendTo('body');
+
+		$('#errorContainer').css({'display': 'none'});
+
+		// Find all oSettings.tag and attach the UI sortable action
+		$(oSettings.tag).sortable({
+			opacity: oSettings.opacity,
+			cursor: oSettings.cursor,
+			axis: oSettings.axis,
+			handle: oSettings.handle,
+			containment: oSettings.containment,
+			connectWith: oSettings.connect,
+			placeholder: oSettings.placeholder,
+			tolerance: oSettings.tolerance,
+			delay: oSettings.delay,
+			scroll: oSettings.scroll,
+			helper: function(e, ui) {
+				// Fist create a helper container
+				var $originals = ui.children(),
+					$helper = ui.clone(),
+					$clone;
+
+				// Replace the helper elements with spans, normally this is a <td> -> <span>
+				// Done to make this container agnostic.
+				$helper.children().each(function() {
+					$(this).replaceWith(function() {
+						return $('<span />', {html: $(this).html()});
+					});
+				});
+
+				// Set the width of each helper cell span to be the width of the original cells
+				$helper.children().each(function(index) {
+					// Set helper cell sizes to match the original sizes
+					return $(this).width($originals.eq(index).width()).css('display', 'inline-block');
+				});
+
+				// Next to overcome an issue where page scrolling does not work, we add the new agnostic helper
+				// element to the body, and hide it
+				$('body').append('<div id="clone" class="' + oSettings.placeholder + '">' + $helper.html() + '</div>');
+				$clone = $('#clone');
+				$clone.hide();
+
+				// Append the clone element to the actual container we are working in and show it
+				setTimeout(function() {
+					$clone.appendTo(ui.parent());
+					$clone.show();
+				}, 1);
+
+				// The above append process allows page scrolls to work while dragging the clone element
+				return $clone;
+			},
+			update: function(e, ui) {
+				// Called when an element is dropped in a new location
+				var postdata = '',
+					moved = ui.item.attr('id'),
+					order = [],
+					receiver = ui.item.parent().attr('id');
+
+				// Calling a pre processing function?
+				if (oSettings.preprocess !== '')
+				{
+					window[oSettings.preprocess]();
+				}
+
+				// How to post the sorted data
+				if (oSettings.setorder === 'inorder')
+				{
+					// This will get the order in 1-n as shown on the screen
+					$(oSettings.tag).find('li').each(function() {
+						var aid = $(this).attr('id').split('_');
+						order.push({name: aid[0] + '[]', value: aid[1]});
+					});
+					postdata = $.param(order);
+				}
+				// Get all id's in all the sortable containers
+				else
+				{
+					$(oSettings.tag).each(function() {
+						// Serialize will be 1-n of each nesting / connector
+						if (postdata === '')
+						{
+							postdata += $(this).sortable(oSettings.setorder);
+						}
+						else
+						{
+							postdata += '&' + $(this).sortable(oSettings.setorder);
+						}
+					});
+				}
+
+				// Add in our security tags and additional options
+				postdata += '&' + elk_session_var + '=' + elk_session_id;
+				postdata += '&order=reorder';
+				postdata += '&moved=' + moved;
+				postdata += '&received=' + receiver;
+
+				if (oSettings.token !== '')
+				{
+					postdata += '&' + oSettings.token.token_var + '=' + oSettings.token.token_id;
+				}
+
+				// And with the post data prepared, lets make the ajax request
+				$.ajax({
+					type: 'POST',
+					url: elk_prepareScriptUrl(elk_scripturl) + 'action=xmlhttp;sa=' + oSettings.sa + ';api=xml',
+					dataType: 'xml',
+					data: postdata
+				})
+					.fail(function(jqXHR, textStatus, errorThrown) {
+						if ('console' in window && console.info)
+						{
+							console.info(errorThrown);
+						}
+
+						oSettings.infobar.isError();
+						oSettings.infobar.changeText(textStatus).showBar();
+						// Reset the interface?
+						if (oSettings.href !== '')
+						{
+							setTimeout(function() {
+								window.location.href = elk_scripturl + oSettings.href;
+							}, 1000);
+						}
+					})
+					.done(function(data, textStatus, jqXHR) {
+						var $_errorContent = $('#errorContent'),
+							$_errorContainer = $('#errorContainer');
+
+						if ($(data).find('error').length !== 0)
+						{
+							// Errors get a modal dialog box and redirect on close
+							$_errorContainer.append('<p id="errorContent"></p>');
+							$_errorContent.html($(data).find('error').text());
+							$_errorContent.dialog({
+								autoOpen: true,
+								title: oSettings.title,
+								modal: true,
+								close: function(event, ui) {
+									// Redirecting due to the error, that's a good idea
+									if (oSettings.href !== '')
+									{
+										window.location.href = elk_scripturl + oSettings.href;
+									}
+								}
+							});
+						}
+						else if ($(data).find('elk').length !== 0)
+						{
+							// Valid responses get the unobtrusive slider
+							oSettings.infobar.isSuccess();
+							oSettings.infobar.changeText($(data).find('elk > orders > order').text()).showBar();
+						}
+						else
+						{
+							// Something "other" happened ...
+							$_errorContainer.append('<p id="errorContent"></p>');
+							$_errorContent.html(oSettings.error + ' : ' + textStatus);
+							$_errorContent.dialog({autoOpen: true, title: oSettings.title, modal: true});
+						}
+					})
+					.always(function(data, textStatus, jqXHR) {
+						if ($(data).find('elk > tokens > token').length !== 0)
+						{
+							// Reset the token
+							oSettings.token.token_id = $(data).find('tokens').find('[type="token"]').text();
+							oSettings.token.token_var = $(data).find('tokens').find('[type="token_var"]').text();
+						}
+					});
+			}
+		});
+	};
+})(jQuery);
+
+/**
+ * Helper function used in the preprocess call for drag/drop boards
+ * Sets the id of all 'li' elements to cat#,board#,childof# for use in the
+ * $_POST back to the xmlcontroller
+ */
+function setBoardIds ()
+{
+	// For each category of board
+	$('[id^=category_]').each(function() {
+		var cat = $(this).attr('id').split('category_'),
+			uls = $(this).find('ul');
+
+		// First up add drop zones so we can drag and drop to each level
+		if (uls.length === 1)
+		{
+			// A single empty ul in a category, this can happen when a cat is dragged empty
+			if ($(uls).find('li').length === 0)
+			{
+				$(uls).append('<li id="cbp_' + cat + ',-1,-1"></li>');
+			}
+			// Otherwise the li's need a child ul so we have a "child-of" drop zone
+			else
+			{
+				$(uls).find('li:not(:has(ul))').append('<ul class="nolist elk_droppings"></ul>');
+			}
+		}
+		// All others normally
+		else
+		{
+			$(uls).find('li:not(:has(ul))').append('<ul class="nolist elk_droppings"></ul>');
+		}
+
+		// Next make find all the ul's in this category that have children, update the
+		// id's with information that indicates the 1-n and parent/child info
+		$(this).find('ul:parent').each(function(i, ul) {
+			// Get the (li) parent of this ul
+			var parentList = $(this).parent('li').attr('id'),
+				pli = 0;
+
+			// No parent, then its a base node 0, else its a child-of this node
+			if (typeof (parentList) !== 'undefined')
+			{
+				pli = parentList.split(',');
+				pli = pli[1];
+			}
+
+			// Now for each li in this ul
+			$(this).find('li').each(function(i, el) {
+				var currentList = $(el).attr('id');
+				var myid = currentList.split(',');
+
+				// Remove the old id, insert the newly computed cat,brd,childof
+				$(el).removeAttr('id');
+				myid = 'cbp_' + cat[1] + ',' + myid[1] + ',' + pli;
+				$(el).attr('id', myid);
+			});
+		});
+	});
 }

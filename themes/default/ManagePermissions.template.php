@@ -446,9 +446,11 @@ function template_edit_profiles()
 					</dd>
 				</dl>
 				<hr />
-				<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
-				<input type="hidden" name="', $context['admin-mpp_token_var'], '" value="', $context['admin-mpp_token'], '" />
-				<input type="submit" name="create" value="', $txt['permissions_profile_new_create'], '" class="right_submit" />
+				<div class="submitbutton">
+					<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
+					<input type="hidden" name="', $context['admin-mpp_token_var'], '" value="', $context['admin-mpp_token'], '" />
+					<input type="submit" name="create" value="', $txt['permissions_profile_new_create'], '" />
+				</div>
 			</div>
 		</form>
 		<script>

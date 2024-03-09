@@ -149,7 +149,6 @@ class Server extends \ArrayObject
 			'apache' => $this->_is_web_server('Apache'),
 			'cgi' => $this->SERVER_SOFTWARE !== null && strpos(PHP_SAPI, 'cgi') !== false,
 			'iis' => $this->_is_web_server('Microsoft-IIS'),
-			'iso_case_folding' => ord(strtolower(chr(138))) === 154,
 			'lighttpd' => $this->_is_web_server('lighttpd'),
 			'litespeed' => $this->_is_web_server('LiteSpeed'),
 			'nginx' => $this->_is_web_server('nginx'),

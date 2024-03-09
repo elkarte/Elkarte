@@ -19,14 +19,6 @@ var elk_formSubmitted = false,
 
 // Some very basic browser detection
 var ua = navigator.userAgent.toLowerCase(),
-	is_opera = !!window.opera, // Opera 8.0-12, past that it behaves like chrome
-	is_ff = typeof InstallTrigger !== 'undefined' || ((ua.indexOf('iceweasel') !== -1 || ua.indexOf('icecat') !== -1 || ua.indexOf('minefield') !== -1) && !is_opera),
-	is_safari = Object.prototype.toString.call(window.HTMLElement).indexOf('Constructor') > 0, // Safari 3+
-	is_edge = ua.indexOf('edge') !== -1, // Old Edge but not chrome edge
-	is_chrome = !!window.chrome && !is_edge, // Chrome 1+, Opera 15+,
-	is_ie = !!document.documentMode, // IE5-11
-	is_webkit = ua.indexOf('applewebkit') !== -1,
-	is_osx = navigator.platform.toUpperCase().indexOf('MAC') >= 0,
 	is_mobile = navigator.userAgent.indexOf('Mobi') !== -1, // Common mobile including Mozilla, Safari, IE, Opera, Chrome
 	is_touch = 'ontouchstart' in window || navigator.MaxTouchPoints > 0 || navigator.msMaxTouchPoints > 0;
 
@@ -46,16 +38,18 @@ var ua = navigator.userAgent.toLowerCase(),
 function fetchDocument(sUrl, funcCallback, sType = null, bHeader = true)
 {
 	let oCaller = this,
-		headers = bHeader ? {'X-Requested-With': 'XMLHttpRequest'} : {},
-		init = {
-			credentials: 'same-origin',
-			method: 'GET',
-			cache: 'default',
-			mode: 'cors',
-			headers: headers,
-		};
+		myHeaders = new Headers();
 
+	if (bHeader)
+		myHeaders.append('X-Requested-With', 'XMLHttpRequest');
 	sType = sType || 'xml';
+
+	let init = {
+		credentials: 'same-origin',
+		method: 'GET',
+		mode: 'cors',
+		headers: myHeaders,
+	};
 
 	fetch(sUrl, init)
 		.then(response => {
@@ -96,7 +90,7 @@ function fetchDocument(sUrl, funcCallback, sType = null, bHeader = true)
 		.catch(error => {
 			if ('console' in window && console.info)
 			{
-				window.console.info(error);
+				console.info(error);
 			}
 		});
 }
@@ -192,35 +186,10 @@ function sendXMLDocument(sUrl, sContent, funcCallback)
 }
 
 /**
- * All of our specialized string handling functions are defined here
- * php_strtr, php_strtolower, php_urlencode, php_htmlspecialchars
- * php_unhtmlspecialchars, php_addslashes, removeEntities, easyReplace
+ * All of our specialized string handling functions are defined here:
+ *
+ * php_urlencode, php_htmlspecialchars, php_unhtmlspecialchars, removeEntities, easyReplace
  */
-
-/**
- * Character-level replacement function.
- * @param {string} sFrom
- * @param {string} sTo
- */
-String.prototype.php_strtr = function (sFrom, sTo)
-{
-	return this.replace(new RegExp('[' + sFrom + ']', 'g'), function (sMatch)
-	{
-		return sTo.charAt(sFrom.indexOf(sMatch));
-	});
-};
-
-/**
- * Simulate PHP's strtolower (in SOME cases PHP uses ISO-8859-1 case folding).
- * @returns {string}
- */
-String.prototype.php_strtolower = function ()
-{
-	return typeof (elk_iso_case_folding) === 'boolean' && elk_iso_case_folding === true ? this.php_strtr(
-		'ABCDEFGHIJKLMNOPQRSTUVWXYZ\x8a\x8c\x8e\x9f\xc0\xc1\xc2\xc3\xc4\xc5\xc6\xc7\xc8\xc9\xca\xcb\xcc\xcd\xce\xcf\xd0\xd1\xd2\xd3\xd4\xd5\xd6\xd7\xd8\xd9\xda\xdb\xdc\xdd\xde',
-		'abcdefghijklmnopqrstuvwxyz\x9a\x9c\x9e\xff\xe0\xe1\xe2\xe3\xe4\xe5\xe6\xe7\xe8\xe9\xea\xeb\xec\xed\xee\xef\xf0\xf1\xf2\xf3\xf4\xf5\xf6\xf7\xf8\xf9\xfa\xfb\xfc\xfd\xfe'
-	) : this.php_strtr('ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz');
-};
 
 /**
  * Simulate php's urlencode function
@@ -247,14 +216,6 @@ String.prototype.php_unhtmlspecialchars = function ()
 };
 
 /**
- * Simulate php addslashes function
- */
-String.prototype.php_addslashes = function ()
-{
-	return this.replace(/\\/g, '\\\\').replace(/'/g, '\\\'');
-};
-
-/**
  * Callback function for the removeEntities function
  */
 String.prototype._replaceEntities = function (sInput, sDummy, sNum)
@@ -277,9 +238,9 @@ String.prototype.removeEntities = function ()
  */
 String.prototype.easyReplace = function (oReplacements)
 {
-	var sResult = this;
+	let sResult = this;
 
-	for (var sSearch in oReplacements)
+	for (let sSearch in oReplacements)
 	{
 		sSearch = sSearch.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');
 		sResult = sResult.replace(new RegExp('%' + sSearch + '%', 'g'), oReplacements[sSearch]);
@@ -287,22 +248,6 @@ String.prototype.easyReplace = function (oReplacements)
 
 	return sResult;
 };
-
-/**
- * Simulate php str_repeat function
- *
- * @param {string} sString
- * @param {int} iTime
- */
-function php_str_repeat(sString, iTime)
-{
-	if (iTime < 1)
-	{
-		return '';
-	}
-
-	return sString + php_str_repeat(sString, iTime - 1);
-}
 
 /**
  * Opens a new window
@@ -348,32 +293,39 @@ function reqOverlayDiv(desktopURL, sHeader, sIcon)
 
 	// Create the div that we are going to load
 	let oContainer = new elk_Popup({heading: sHeader, content: sAjax_indicator, icon: sIcon}),
-		oPopup_body = $('#' + oContainer.popup_id).find('.popup_content');
+		oPopup_body = document.querySelector('#' + oContainer.popup_id + ' .popup_content');
 
 	// Fetch the page content (we just want the text to show)
-	$.ajax({
-		url: desktopURL + ';api=html',
-		type: "GET",
-		dataType: "html",
-	})
-	.done(function (data, textStatus, xhr)
-	{
-		let content = $('<div id="temp_help">').html(data),
-			close = content.find('a[href$="self.close();"]');
+	const desktopURLPlusApi = desktopURL + ';api=html';
 
-		// If the content has its own close button, simply remove it
-		if (typeof close !== 'undefined' && close.length !== 0)
-		{
-			content = content.find('a[href$="self.close();"]').hide().prev('br').hide().parent();
+	fetch(desktopURLPlusApi, {
+		method: 'GET',
+		headers: {
+			'X-Requested-With': 'XMLHttpRequest',
 		}
-
-		// Replace the spinner with fetched page
-		oPopup_body.html(content.html());
 	})
-	.fail(function (xhr, textStatus, errorThrown)
-	{
-		oPopup_body.html(textStatus);
-	});
+		.then(response => response.text())
+		.then(data => {
+			let parser = new DOMParser(),
+				content = parser.parseFromString(data, 'text/html'),
+				close = content.querySelectorAll('a[href$="self.close();"]');
+
+			if (close.length !== 0)
+			{
+				close.forEach(closeLink => {
+					let prevBR = closeLink.previousElementSibling;
+					if (prevBR && prevBR.tagName.toLowerCase() === 'br')
+					{
+						prevBR.style.display = 'none';
+					}
+					closeLink.style.display = 'none';
+				});
+			}
+			oPopup_body.innerHTML = content.body.innerHTML;
+		})
+		.catch(error => {
+			oPopup_body.innerHTML = error;
+		});
 
 	return false;
 }
@@ -391,90 +343,60 @@ function elk_Popup(oOptions)
 }
 
 // Show the popup div & prepare the close events
-elk_Popup.prototype.show = function ()
-{
+elk_Popup.prototype.show = function () {
 	let popup_class = 'popup_window ' + (this.opt.custom_class ? this.opt.custom_class : 'content'),
 		icon = this.opt.icon ? '<i class="icon ' + this.opt.icon + '"></i> ' : '';
 
-	// Create the div that will be shown - max-height added here - essential anyway,
-	// so better here than in the CSS.
-	// Mind you, I still haven't figured out why it should be essential. Cargo cult coding FTW. :P
 	// Create the div that will be shown
-	$('body').append('<div id="' + this.popup_id + '" class="popup_container"><div class="' + popup_class + '" style="max-height: none;"><h3 class="popup_heading"><a href="javascript:void(0);" class="hide_popup icon i-close" title="Close"></a>' + icon + this.opt.heading + '</h3><div class="popup_content">' + this.opt.content + '</div></div></div>');
+	const popupContainer = document.createElement('div');
+	popupContainer.id = this.popup_id;
+	popupContainer.classList.add('popup_container');
+	popupContainer.innerHTML = `<div class="${popup_class}" style="max-height: none;"><h3 class="popup_heading"><a href="javascript:void(0);" class="hide_popup icon i-close" title="Close"></a>${icon + this.opt.heading}</h3><div class="popup_content">${this.opt.content}</div></div>`;
+	document.body.appendChild(popupContainer);
 
 	// Show it
-	this.popup_body = $('#' + this.popup_id).children('.popup_window');
-	this.popup_body.parent().fadeIn(300);
+	this.popup_body = document.querySelector('#' + this.popup_id + ' .popup_window');
+	this.popup_body.parentElement.style.display = 'block';
 
 	// Let the css know its now available
-	this.popup_body.addClass("in");
+	this.popup_body.classList.add("in");
 
-	// Trigger hide on escape or mouse click
-	let popup_instance = this;
-	$(document).on('mouseup', function (e)
-	{
-		if ($('#' + popup_instance.popup_id).has(e.target).length === 0)
+	// Trigger hide on escape key or mouse click
+	this.popup_instance = this;
+	document.addEventListener('mouseup', event => {
+		if (!popupContainer.contains(event.target))
 		{
-			popup_instance.hide();
+			this.popup_instance.hide();
 		}
-	}).on('keyup', function (e)
+	});
+	document.addEventListener('keyup', event => {
+		if (event.which === 27)
 		{
-			if (e.which === 27)
-			{
-				popup_instance.hide();
-			}
-		});
+			this.popup_instance.hide();
+		}
+	});
 
-	$('#' + this.popup_id).find('.hide_popup').on('click', function ()
-	{
-		return popup_instance.hide();
+	// A close button to be complete
+	const hideButton = document.querySelector('#' + this.popup_id + ' .hide_popup');
+	hideButton.addEventListener('click', () => {
+		this.popup_instance.hide();
+		return false;
 	});
 
 	return false;
 };
 
 // Hide the popup
-elk_Popup.prototype.hide = function ()
-{
-	$('#' + this.popup_id).fadeOut(300, function ()
+elk_Popup.prototype.hide = function () {
+	const popup = document.querySelector('#' + this.popup_id);
+	if (popup)
 	{
-		$(this).remove();
-	});
+		popup.style.display = 'none';
+		popup.remove();
+	}
 
 	return false;
 };
-
-/**
- * Replaces the currently selected text with the passed text.
- * Used by topic.js when inserting a quote into the plain text quick reply (not the editor QR)
- *
- * @param {string} text
- * @param {object} oTextHandle
- */
-function replaceText(text, oTextHandle)
-{
-	// Standards compliant text range replace.
-	if ('selectionStart' in oTextHandle)
-	{
-		let begin = oTextHandle.value.substr(0, oTextHandle.selectionStart),
-			end = oTextHandle.value.substr(oTextHandle.selectionEnd),
-			scrollPos = oTextHandle.scrollTop;
-
-		oTextHandle.value = begin + text + end;
-		if (oTextHandle.setSelectionRange)
-		{
-			oTextHandle.focus();
-			oTextHandle.setSelectionRange(begin.length + text.length, begin.length + text.length);
-		}
-		oTextHandle.scrollTop = scrollPos;
-	}
-	// Just put it on the end.
-	else
-	{
-		oTextHandle.value += text;
-		oTextHandle.focus(oTextHandle.value.length - 1);
-	}
-}
 
 /**
  * Checks if the passed input's value is nothing.
@@ -483,7 +405,7 @@ function replaceText(text, oTextHandle)
  */
 function isEmptyText(theField)
 {
-	var theValue;
+	let theValue;
 
 	// Copy the value so changes can be made..
 	if (typeof (theField) === 'string')
@@ -523,15 +445,16 @@ function submitThisOnce(oControl, bReadOnly)
 		aTextareas = oForm.getElementsByTagName('textarea');
 
 	bReadOnly = typeof bReadOnly == 'undefined' ? true : bReadOnly;
-	for (var i = 0, n = aTextareas.length; i < n; i++)
+	for (let i = 0, n = aTextareas.length; i < n; i++)
 		aTextareas[i].readOnly = bReadOnly;
 
 	// If in a second the form is not gone, there may be a problem somewhere
-	// (e.g. HTML5 required attribute), so release the textareas
+	// (e.g. HTML5 required attribute), so release the textarea
 	window.setTimeout(function ()
 	{
 		submitThisOnce(oControl, false);
 	}, 1000);
+
 	return !elk_formSubmitted;
 }
 
@@ -549,7 +472,8 @@ function setOuterHTML(oElement, sToValue)
 	}
 	else
 	{
-		var range = document.createRange();
+		let range = document.createRange();
+
 		range.setStartBefore(oElement);
 		oElement.parentNode.replaceChild(range.createContextualFragment(sToValue), oElement);
 	}
@@ -563,8 +487,8 @@ function setOuterHTML(oElement, sToValue)
  */
 function in_array(variable, theArray)
 {
-	for (var i in theArray)
-		if (theArray[i] == variable)
+	for (let i in theArray)
+		if (theArray[i] === variable)
 		{
 			return true;
 		}
@@ -580,8 +504,8 @@ function in_array(variable, theArray)
  */
 function array_search(variable, theArray)
 {
-	for (var i in theArray)
-		if (theArray[i] == variable)
+	for (let i in theArray)
+		if (theArray[i] === variable)
 		{
 			return i;
 		}
@@ -603,7 +527,7 @@ function selectRadioByName(oRadioGroup, sName)
 		return true;
 	}
 
-	for (var i = 0, n = oRadioGroup.length; i < n; i++)
+	for (let i = 0, n = oRadioGroup.length; i < n; i++)
 		if (oRadioGroup[i].value === sName)
 		{
 			oRadioGroup[i].checked = true;
@@ -623,11 +547,10 @@ function selectRadioByName(oRadioGroup, sName)
  */
 function selectAllRadio(oInvertCheckbox, oForm, sMask, sValue)
 {
-	for (var i = 0; i < oForm.length; i++)
-		if (oForm[i].name !== undefined && oForm[i].name.substr(0, sMask.length) == sMask && oForm[i].value == sValue)
-		{
-			oForm[i].checked = true;
-		}
+	if (oForm[i].name !== undefined && oForm[i].name.substring(0, sMask.length) === sMask && oForm[i].value === sValue)
+	{
+		oForm[i].checked = true;
+	}
 }
 
 /**
@@ -640,9 +563,9 @@ function selectAllRadio(oInvertCheckbox, oForm, sMask, sValue)
  */
 function invertAll(oInvertCheckbox, oForm, sMask, bIgnoreDisabled)
 {
-	for (var i = 0; i < oForm.length; i++)
+	for (let i = 0; i < oForm.length; i++)
 	{
-		if (!('name' in oForm[i]) || (typeof (sMask) === 'string' && oForm[i].name.substr(0, sMask.length) !== sMask && oForm[i].id.substr(0, sMask.length) !== sMask))
+		if (!('name' in oForm[i]) || (typeof (sMask) === 'string' && oForm[i].name.substring(0, sMask.length) !== sMask && oForm[i].id.substring(0, sMask.length) !== sMask))
 		{
 			continue;
 		}
@@ -659,12 +582,12 @@ function invertAll(oInvertCheckbox, oForm, sMask, bIgnoreDisabled)
  */
 function elk_sessionKeepAlive()
 {
-	var curTime = new Date().getTime();
+	let curTime = new Date().getTime();
 
 	// Prevent a Firefox bug from hammering the server.
 	if (elk_scripturl && curTime - lastKeepAliveCheck > 900000)
 	{
-		var tempImage = new Image();
+		let tempImage = new Image();
 		tempImage.src = elk_prepareScriptUrl(elk_scripturl) + 'action=keepalive;time=' + curTime;
 		lastKeepAliveCheck = curTime;
 	}
@@ -681,7 +604,7 @@ window.setTimeout(function ()
 }, 1200000);
 
 /**
- * Set a theme option through javascript. / ajax
+ * Set a theme option through javascript / ajax
  *
  * @param {string} option name being set
  * @param {string} value of the option
@@ -695,7 +618,7 @@ function elk_setThemeOption(option, value, theme, additional_vars)
 		additional_vars = '';
 	}
 
-	var tempImage = new Image();
+	let tempImage = new Image();
 	tempImage.src = elk_prepareScriptUrl(elk_scripturl) + 'action=jsoption;var=' + option + ';val=' + value + ';' + elk_session_var + '=' + elk_session_id + additional_vars + (theme === null ? '' : '&th=' + theme) + ';time=' + (new Date().getTime());
 }
 
@@ -723,12 +646,12 @@ function hashLoginPassword(doForm, cur_session_id, token)
 	doForm.passwrd.autocomplete = 'off';
 
 	// Fill in the hidden fields with our sha hash
-	doForm.hash_passwrd.value = hex_sha256(doForm.user.value.php_strtolower() + doForm.passwrd.value);
+	doForm.hash_passwrd.value = hex_sha256(doForm.user.value.toLowerCase() + doForm.passwrd.value);
 
 	// If the form also contains the old hash input fill it to smooth transitions
 	if ('old_hash_passwrd' in doForm && typeof (hex_sha1) !== 'undefined')
 	{
-		doForm.old_hash_passwrd.value = hex_sha1(hex_sha1(doForm.user.value.php_strtolower() + doForm.passwrd.value) + cur_session_id + (typeof token === 'undefined' ? '' : token));
+		doForm.old_hash_passwrd.value = hex_sha1(hex_sha1(doForm.user.value.toLowerCase() + doForm.passwrd.value) + cur_session_id + (typeof token === 'undefined' ? '' : token));
 	}
 
 	doForm.passwrd.value = doForm.passwrd.value.replace(/./g, '*');
@@ -1036,11 +959,11 @@ elk_Toggle.prototype.changeState = function (bCollapse, bInit)
 		{
 			if (bCollapse)
 			{
-				$(oContainer).slideUp();
+				oContainer.slideUp();
 			}
 			else
 			{
-				$(oContainer).slideDown();
+				oContainer.slideDown();
 			}
 		}
 	}
@@ -1196,7 +1119,7 @@ function onJumpReceived(oXMLDoc)
  * @param {type} oJumpToOptions
  */
 
-// This'll contain all JumpTo objects on the page.
+// This will contain all JumpTo objects on the page.
 var aJumpTo = [];
 
 function JumpTo(oJumpToOptions)
@@ -1378,7 +1301,7 @@ IconList.prototype.initIcons = function ()
 {
 	for (let i = document.images.length - 1, iPrefixLength = this.opt.sIconIdPrefix.length; i >= 0; i--)
 	{
-		if (document.images[i].id.substr(0, iPrefixLength) === this.opt.sIconIdPrefix)
+		if (document.images[i].id.substring(0, iPrefixLength) === this.opt.sIconIdPrefix)
 		{
 			setOuterHTML(document.images[i], '<div class="dropdown" title="' + this.opt.sLabelIconList + '" onclick="' + this.opt.sBackReference + '.openPopup(this, ' + document.images[i].id.substr(iPrefixLength) + ')" onmouseover="' + this.opt.sBackReference + '.onBoxHover(this, true)" onmouseout="' + this.opt.sBackReference + '.onBoxHover(this, false)"><img src="' + document.images[i].src + '" alt="' + document.images[i].alt + '" id="' + document.images[i].id + '" /></div>');
 		}
@@ -1538,7 +1461,7 @@ IconList.prototype.collapseList = function ()
  */
 function elk_itemPos(itemHandle)
 {
-	var itemX = 0,
+	let itemX = 0,
 		itemY = 0;
 
 	if ('offsetParent' in itemHandle)
@@ -1573,18 +1496,6 @@ function elk_prepareScriptUrl(sUrl)
 }
 
 /**
- * Load Event function, adds new events to the window onload control
- *
- * @param {object} fNewOnload function object to call
- *
- * @deprecated aince 2.0; use window.addEventListener("load", fNewOnload)
- */
-function addLoadEvent(fNewOnload)
-{
-	window.addEventListener("load", fNewOnload);
-}
-
-/**
  * Get the text in a code tag by selecting the [select] in the code header
  *
  * @param {object} oCurElement
@@ -1592,7 +1503,7 @@ function addLoadEvent(fNewOnload)
  */
 function elkSelectText(oCurElement, bActOnElement)
 {
-	var oCodeArea = null;
+	let oCodeArea;
 
 	// The place we're looking for is one div up, and next door - if it's auto detect.
 	if (typeof (bActOnElement) === 'boolean' && bActOnElement)
@@ -1616,8 +1527,6 @@ function elkSelectText(oCurElement, bActOnElement)
 	curRange.selectNodeContents(oCodeArea);
 	oCurSelection.removeAllRanges();
 	oCurSelection.addRange(curRange);
-
-	return false;
 }
 
 /**
@@ -1627,16 +1536,16 @@ function elkSelectText(oCurElement, bActOnElement)
  * @param {Array.} aElementNames
  * @param {string} sMask
  */
-function smc_saveEntities(sFormName, aElementNames, sMask)
+function elk_saveEntities(sFormName, aElementNames, sMask)
 {
-	var i = 0,
+	let i = 0,
 		n = 0;
 
 	if (typeof (sMask) === 'string')
 	{
 		for (i = 0, n = document.forms[sFormName].elements.length; i < n; i++)
 		{
-			if (document.forms[sFormName].elements[i].id.substr(0, sMask.length) === sMask)
+			if (document.forms[sFormName].elements[i].id.substring(0, sMask.length) === sMask)
 			{
 				aElementNames[aElementNames.length] = document.forms[sFormName].elements[i].name;
 			}
@@ -1693,10 +1602,9 @@ function pollOptions()
  */
 function generateDays(offset)
 {
-	// Work around JavaScript's lack of support for default values...
-	offset = typeof (offset) !== 'undefined' ? offset : '';
+	offset = offset || '';
 
-	var days = 0,
+	let days = 0,
 		selected = 0,
 		dayElement = document.getElementById("day" + offset),
 		yearElement = document.getElementById("year" + offset),
@@ -1717,7 +1625,7 @@ function generateDays(offset)
 
 	days = monthLength[monthElement.value - 1];
 
-	for (var i = 1; i <= days; i++)
+	for (let i = 1; i <= days; i++)
 		dayElement.options[dayElement.length] = new Option(i, i);
 
 	if (selected < days)
@@ -1751,33 +1659,39 @@ function initSearch()
 /**
  * Checks or unchecks the list of available boards
  *
- * @param {type} ids
+ * @param {array} ids
  * @param {string} aFormName
  * @param {string} sInputName
  */
 function selectBoards(ids, aFormName, sInputName)
 {
-	var toggle = true,
-		i = 0;
+	let toggle = true,
+		i = 0,
+		aForm;
 
-	for (var f = 0, max = document.forms.length; f < max; f++)
+	for (let f = 0, max = document.forms.length; f < max; f++)
 	{
-		if (document.forms[f].name == aFormName)
+		if (document.forms[f].name === aFormName)
 		{
 			aForm = document.forms[f];
 			break;
 		}
 	}
-	if (typeof aForm == 'undefined')
+
+	if (typeof aForm === 'undefined')
 	{
 		return;
 	}
 
 	for (i = 0; i < ids.length; i++)
+	{
 		toggle = toggle && aForm[sInputName + '[' + ids[i] + ']'].checked;
+	}
 
 	for (i = 0; i < ids.length; i++)
+	{
 		aForm[sInputName + '[' + ids[i] + ']'].checked = !toggle;
+	}
 }
 
 /**
@@ -1789,7 +1703,7 @@ function selectBoards(ids, aFormName, sInputName)
  */
 function expandCollapse(id, icon, speed)
 {
-	var oId = $('#' + id);
+	let oId = document.getElementById(id);
 
 	icon = icon || false;
 	speed = speed || 300;
@@ -1797,25 +1711,14 @@ function expandCollapse(id, icon, speed)
 	// Change the icon on the box as well?
 	if (icon)
 	{
-		$('#' + icon).attr("src", elk_images_url + (oId.is(":hidden") !== true ? "/selected.png" : "/selected_open.png"));
+		let imageEl = document.getElementById(icon),
+			src = (oId.style.display !== "none") ? "/selected.png" : "/selected_open.png";
+
+		imageEl.setAttribute("src", elk_images_url + src);
 	}
 
 	// Open or collapse the content id
 	oId.slideToggle(speed);
-}
-
-/**
- * Highlight a selection box by adding the highlight2 class
- *
- * @param {string} container_id
- */
-function initHighlightSelection(container_id)
-{
-	$('#' + container_id + ' [name="def_language"]').on('click', function (ev)
-	{
-		$('#' + container_id + ' .standard_row').removeClass('highlight2');
-		$(this).parent().parent().addClass('highlight2');
-	});
 }
 
 /**

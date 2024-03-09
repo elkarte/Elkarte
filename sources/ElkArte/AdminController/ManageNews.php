@@ -250,20 +250,21 @@ class ManageNews extends AbstractController
 			'javascript' => '
 			document.getElementById(\'list_news_lists_last\').style.display = "none";
 			document.getElementById("moreNewsItems_link").style.display = "inline";
-			var last_preview = 0,
-			    txt_preview = ' . JavaScriptEscape($txt['preview']) . ',
-			    txt_news_error_no_news = ' . JavaScriptEscape($txt['news_error_no_news']) . ';
-
 			$(function() {
 				$("div[id ^= \'preview_\']").each(function () {
 					var preview_id = $(this).attr(\'id\').split(\'_\')[1];
-					if (last_preview < preview_id)
+					if (last_preview < preview_id && preview_id !== "last")
 						last_preview = preview_id;
 					make_preview_btn(preview_id);
 				});
 			});
 		',
 		);
+
+		theme()->addJavascriptVar([
+			'last_preview' => 0,
+		    'txt_preview' => JavaScriptEscape($txt['preview']),
+		    'txt_news_error_no_news' => JavaScriptEscape($txt['news_error_no_news'])]);
 
 		// Create the request list.
 		createList($listOptions);

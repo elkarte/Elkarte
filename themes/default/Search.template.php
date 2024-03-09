@@ -157,9 +157,9 @@ function template_searchform()
 		createEventListener(window);
 		window.addEventListener("load", initSearch, false);
 
-		isFunctionLoaded("smc_AutoSuggest").then((available) => { 
+		isFunctionLoaded("elk_AutoSuggest").then((available) => { 
 			if (available) {
-				new smc_AutoSuggest({
+				new elk_AutoSuggest({
 					sSessionId: elk_session_id,
 					sSessionVar: elk_session_var,
 					sControlId: \'userspec\',

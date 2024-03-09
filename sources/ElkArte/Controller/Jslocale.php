@@ -14,6 +14,7 @@
 namespace ElkArte\Controller;
 
 use ElkArte\AbstractController;
+use ElkArte\Action;
 use ElkArte\Agreement;
 use ElkArte\Http\Headers;
 use ElkArte\PrivacyPolicy;
@@ -21,16 +22,12 @@ use ElkArte\User;
 use ElkArte\Languages\Loader as LangLoader;
 
 /**
- * This file is called via ?action=jslocale;sa=sceditor to load in a list of
- * language strings for the editor
+ * This file is called via ?action=jslocale to load in a list of
+ * language strings for a given area.
  */
 class Jslocale extends AbstractController
 {
-	/**
-	 * The content of the file to be returned
-	 *
-	 * @var string
-	 */
+	/** @var string The content of the file to be returned  */
 	private $_file_data;
 
 	/**
@@ -46,8 +43,17 @@ class Jslocale extends AbstractController
 	 */
 	public function action_index()
 	{
-		// If we don't know what to do, better not do anything
-		obExit(false);
+		$subActions = [
+			'agreement' => [$this, 'action_agreement_api'],
+			'sceditor' => [$this, 'action_sceditor']
+		];
+
+		// Set up for some action
+		$action = new Action();
+
+		// Get the sub action or set a default, call integrate_sa_avatar_settings
+		$subAction = $action->initialize($subActions);
+		$action->dispatch($subAction);
 	}
 
 	/**
@@ -121,19 +127,23 @@ class Jslocale extends AbstractController
 		obExit(false);
 	}
 
+	/**
+	 * Method to handle the API request for agreement and privacy policy by returning it in a
+	 * selected language.  Used when checkbox accept agreement is enabled.
+	 */
 	public function action_agreement_api()
 	{
 		global $context, $modSettings;
 
-		$langs = getLanguages();
-		$lang = $this->_req->post->lang;
+		$languages = getLanguages();
+		$lang = $this->_req->getPost('lang', 'trim', 'English');
 
 		theme()->getLayers()->removeAll();
 		theme()->getTemplates()->load('Json');
 		$context['sub_template'] = 'send_json';
 		$context['require_agreement'] = !empty($modSettings['requireAgreement']);
 
-		if (isset($langs[$lang]))
+		if (isset($languages[$lang]))
 		{
 			// If you have to agree to the agreement, it needs to be fetched from the file.
 			$agreement = new Agreement($lang);
@@ -142,7 +152,7 @@ class Jslocale extends AbstractController
 				$privacypol = new PrivacyPolicy($lang);
 			}
 
-			$context['json_data'] = array('agreement' => '', 'privacypol' => '');
+			$context['json_data'] = ['agreement' => '', 'privacypol' => ''];
 			try
 			{
 				$context['json_data']['agreement'] = $agreement->getParsedText();

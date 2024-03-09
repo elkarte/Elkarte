@@ -15,44 +15,31 @@
 /**
  * Simply invoke the constructor by calling likePosts with init method
  */
-(function ()
-{
-	function likePosts()
+(function() {
+	function likePosts ()
 	{
 	}
 
-	likePosts.prototype = function ()
-	{
+	likePosts.prototype = function() {
 		let oTxt = {},
-			bTooltips = false,
 
 			/**
 			 * Initiate likePosts with this method
 			 * likePosts.prototype.init(params)
 			 * currently passing the text from php
 			 */
-			init = function (params)
-			{
+			init = function(params) {
 				oTxt = params.oTxt;
 
-				// If we are using tooltips, init that function
-				bTooltips = params.bTooltips || bTooltips;
-				if (bTooltips)
-				{
-					$(".react_button, .unreact_button, .reacts_button").SiteTooltip();
-				}
-				else
-				{
-					$(".react_button, .unreact_button, .reacts_button").removeAttr('title');
-				}
+				document.querySelectorAll('.react_button, .unreact_button, .reacts_button')
+					.forEach(button => button.removeAttribute('title'));
 			},
 
 			/**
 			 * This is bound to a click event on the page like/unlike buttons
 			 * likePosts.prototype.likeUnlikePosts(event, messageID, topicID)
 			 */
-			likeUnlikePosts = function (e, mId, tId)
-			{
+			likeUnlikePosts = function(e, mId, tId) {
 				let messageId = parseInt(mId, 10),
 					topicId = parseInt(tId, 10),
 					subAction = '',
@@ -88,41 +75,50 @@
 				};
 
 				// Make the ajax call to the likes system
-				$.ajax({
-					url: elk_scripturl + '?action=likes;sa=' + subAction + ';api=json;' + elk_session_var + '=' + elk_session_id,
-					type: 'POST',
-					dataType: 'json',
-					data: values,
-					cache: false
+				let url = elk_prepareScriptUrl(elk_scripturl) + 'action=likes;sa=' + subAction + ';api=json;' + elk_session_var + '=' + elk_session_id;
+
+				fetch(url, {
+					method: 'POST',
+					headers: {
+						'X-Requested-With': 'XMLHttpRequest',
+						'Accept': 'application/json',
+						'Content-Type': 'application/x-www-form-urlencoded',
+					},
+					body: serialize(values),
+					cache: 'no-store'
 				})
-				.done(function (resp)
-				{
-					// json response from the server says success?
-					if (resp.result === true)
-					{
-						// Update the page with the new likes information
-						updateUi({
-							'count': resp.count,
-							'text': resp.text,
-							'title': resp.title,
-							'action': subAction,
-							'messageId': messageId,
-							'event': target,
-						});
-					}
-					// Some failure trying to process the request
-					else
-					{
-						handleError(resp);
-					}
-				})
-				.fail(function (err, textStatus, errorThrown)
-				{
-					// Some failure sending the request, this generally means some html in
-					// the output from php error or access denied fatal errors etc
-					err.data = oTxt.error_occurred + ' : ' + errorThrown;
-					handleError(err);
-				});
+					.then(response => {
+						if (!response.ok)
+						{
+							throw new Error('HTTP error ' + response.status);
+						}
+						return response.json();
+					})
+					.then(resp => {
+						if (resp.result === true)
+						{
+							// Update the page with the new likes information
+							updateUi({
+								'count': resp.count,
+								'text': resp.text,
+								'title': resp.title,
+								'action': subAction,
+								'messageId': messageId,
+								'event': target,
+							});
+						}
+						else
+						{
+							// Some failure trying to process the request
+							handleError(resp);
+						}
+					})
+					.catch(error => {
+						if ('console' in window && console.error)
+						{
+							console.error('Error : ', error);
+						}
+					});
 			},
 
 			/**
@@ -130,8 +126,7 @@
 			 *
 			 * @param {object} params object of new values from the ajax request
 			 */
-			updateUi = function (params)
-			{
+			updateUi = function(params) {
 				let likesList = document.getElementById('likes_for_' + params.messageId),
 					currentClass = (params.action === 'unlikepost') ? 'unreact_button' : 'react_button',
 					nextClass = (params.action === 'unlikepost') ? 'react_button' : 'unreact_button',
@@ -163,23 +158,15 @@
 						likesList.classList.add('hide');
 					}
 				}
-
-				// Changed the title text, update the tooltips
-				if (bTooltips)
-				{
-					params.event.attr('title', params.title);
-					$("." + nextClass).SiteTooltip();
-				}
 			},
 
 			/**
-			 * Show a non modal error box when something goes wrong with
+			 * Show a non-modal error box when something goes wrong with
 			 * sending the request or processing it
 			 *
 			 * @param {type} params
 			 */
-			handleError = function (params)
-			{
+			handleError = function(params) {
 				new elk_Popup({
 					heading: oTxt.likeHeadingError,
 					content: params.data,
@@ -201,12 +188,11 @@
 	 *
 	 * Simply invoke the constructor by calling likePostStats with init method
 	 */
-	function likePostStats()
+	function likePostStats ()
 	{
 	}
 
-	likePostStats.prototype = function ()
-	{
+	likePostStats.prototype = function() {
 		let currentUrlFrag = null,
 			allowedUrls = {},
 			tabsVisitedCurrentSession = {},
@@ -214,9 +200,8 @@
 			txtStrings = {},
 
 			// Initialize, load in text strings, etc
-			init = function (params)
-			{
-				txtStrings = $.extend({}, params.txtStrings);
+			init = function(params) {
+				txtStrings = Object.assign({}, params.txtStrings);
 				allowedUrls = {
 					'messagestats': {
 						'uiFunc': showMessageStats
@@ -239,29 +224,37 @@
 			},
 
 			// Show the ajax spinner
-			showSpinnerOverlay = function ()
-			{
-				$('<div id="lp_preloader"><i class="icon icon-xl i-concentric"></i><div>').appendTo('#like_post_stats_overlay');
-				$('#like_post_stats_overlay').show();
+			showSpinnerOverlay = function() {
+				let lpPreloader = document.createElement('div');
+
+				lpPreloader.id = 'lp_preloader';
+				lpPreloader.innerHTML = '<i class="icon icon-xl i-concentric"></i>';
+				document.getElementById('like_post_stats_overlay').appendChild(lpPreloader);
+				document.getElementById('like_post_stats_overlay').style.display = 'block';
 			},
 
 			// Hide the ajax spinner
-			hideSpinnerOverlay = function ()
-			{
-				$('#lp_preloader').remove();
-				$('#like_post_stats_overlay').hide();
+			hideSpinnerOverlay = function() {
+				let lpPreloader = document.getElementById('lp_preloader');
+
+				if (lpPreloader)
+				{
+					lpPreloader.parentNode.removeChild(lpPreloader);
+				}
+				document.getElementById('like_post_stats_overlay').style.display = 'none';
 			},
 
 			// Set the active stats tab
-			highlightActiveTab = function ()
-			{
-				$('.like_post_stats_menu a').removeClass('active');
-				$('#' + currentUrlFrag).addClass('active');
+			highlightActiveTab = function() {
+				document.querySelectorAll('.like_post_stats_menu a').forEach(function(element) {
+					element.classList.remove('active');
+				});
+
+				document.getElementById(currentUrlFrag).classList.add('active');
 			},
 
 			// Check the url for a valid like stat tab, load data if not done yet
-			checkUrl = function (url)
-			{
+			checkUrl = function(url) {
 				// Busy doing something
 				showSpinnerOverlay();
 
@@ -270,7 +263,7 @@
 				{
 					let currentHref = window.location.href.split('#');
 
-					currentUrlFrag = (typeof (currentHref[1]) !== 'undefined') ? currentHref[1] : defaultHash;
+					currentUrlFrag = (typeof (currentHref[1]) === 'undefined') ? defaultHash : currentHref[1];
 				}
 				else
 				{
@@ -284,7 +277,11 @@
 				}
 
 				// Hide whatever is there
-				$('.like_post_stats_data').children().hide();
+				document.querySelectorAll('.like_post_stats_data').forEach((elem) => {
+					Array.from(elem.children).forEach((child) => {
+						child.style.display = 'none';
+					});
+				});
 				highlightActiveTab();
 
 				// If we have not loaded this tabs data, then fetch it
@@ -302,26 +299,37 @@
 			},
 
 			// Fetch the specific tab data via ajax from the server
-			getDataFromServer = function (params)
-			{
-				$('.like_post_stats_error').hide().html('');
+			getDataFromServer = function(params) {
+				let element = document.querySelector('.like_post_stats_error');
+				element.style.display = 'none';
+				element.innerHTML = '';
 
-				// Make the ajax call to the likes system
-				$.ajax({
-					url: elk_scripturl + '?action=likes;sa=likestats;area=' + params.url + ';api=json;' + elk_session_var + '=' + elk_session_id,
-					type: 'POST',
-					dataType: 'json',
-					cache: false
+				let url = elk_prepareScriptUrl(elk_scripturl) + 'action=likes;sa=likestats;area=' + params.url + ';api=json;' + elk_session_var + '=' + elk_session_id;
+
+				fetch(url, {
+					method: 'POST',
+					cache: 'no-cache',
+					headers: {
+						'X-Requested-With': 'XMLHttpRequest',
+						'Accept': 'application/json',
+						'Content-Type': 'application/x-www-form-urlencoded',
+					},
 				})
-					.done(function (resp)
-					{
-						if (typeof (resp.error) !== 'undefined' && resp.error !== '')
+					.then(response => {
+						if (!response.ok)
+						{
+							throw new Error('HTTP error ' + response.status);
+						}
+						return response.json();
+					})
+					.then(resp => {
+						if (typeof resp.error !== 'undefined' && resp.error !== '')
 						{
 							genericErrorMessage({
 								errorMsg: resp.error
 							});
 						}
-						else if (typeof (resp.data) !== 'undefined' && typeof (resp.data.noDataMessage) !== 'undefined' && resp.data.noDataMessage !== '')
+						else if (typeof resp.data !== 'undefined' && typeof resp.data.noDataMessage !== 'undefined' && resp.data.noDataMessage !== '')
 						{
 							genericErrorMessage({
 								errorMsg: resp.data.noDataMessage
@@ -337,42 +345,34 @@
 							genericErrorMessage(resp);
 						}
 					})
-					.fail(function (err, textStatus, errorThrown)
-					{
-						// Some failure sending the request, this generally means some html in
-						// the output from php error or access denied fatal errors etc
-						// err.data = oTxt.error_occurred + ' : ' + errorThrown;
-						// handleError(err);
+					.catch(error => {
 						if ('console' in window && console.info)
 						{
-							window.console.info('fail:', textStatus, errorThrown.name);
-							window.console.info(err.responseText);
+							console.info('fail:', error.name);
 						}
 					})
-					.always(function ()
-					{
+					.finally(() => {
 						// All done
 						hideSpinnerOverlay();
 					});
 			},
 
 			// Show the most liked messages
-			showMessageStats = function ()
-			{
+			showMessageStats = function() {
 				let data = tabsVisitedCurrentSession[currentUrlFrag],
 					htmlContent = '',
 					messageUrl = '',
-					$like_post_message_data = $('.like_post_message_data');
+					like_post_message_data = document.querySelector('.like_post_message_data');
 
 				const nFormat = new Intl.NumberFormat();
 
 				// Clear anything that was in place
-				$like_post_message_data.html('');
+				like_post_message_data.innerHTML = '';
+				like_post_message_data.style.display = 'none';
 
 				// Build the new html to add to the page
-				data.forEach((point) =>
-				{
-					messageUrl = elk_scripturl + '?topic=' + point.id_topic + '.msg' + point.id_msg + '#new';
+				data.forEach((point) => {
+					messageUrl = elk_prepareScriptUrl(elk_scripturl) + 'topic=' + point.id_topic + '.msg' + point.id_msg + '#new';
 
 					htmlContent += '' +
 						'<div class="content forumposts">' +
@@ -388,11 +388,10 @@
 						'   </div>' +
 						'   <div class="separator"></div>' +
 						'   <div class="well">' +
-						'		<p>' + txtStrings.usersWhoLiked.easyReplace({1 : point.like_count.toLocaleString(undefined, {minimumFractionDigits: 0})}) + '</p>';
+						'		<p>' + txtStrings.usersWhoLiked.easyReplace({1: point.like_count.toLocaleString(undefined, {minimumFractionDigits: 0})}) + '</p>';
 
 					// All the members that liked this masterpiece of internet jibba jabba
-					point.member_liked_data.forEach((member_liked_data) =>
-					{
+					point.member_liked_data.forEach((member_liked_data) => {
 						htmlContent += '' +
 							'   <div class="like_stats_likers">' +
 							'       <a href="' + member_liked_data.href + '">' +
@@ -406,39 +405,34 @@
 						'</div>';
 				});
 
-				// Set the category header div (below the tabs) text
-				$('#like_post_current_tab_desc').text(txtStrings.mostLikedMessage);
-
 				// Show the htmlContent we built
-				$like_post_message_data.append(htmlContent).show();
-
-				// Hover subject link to show message body preview
-				//$('.message_title').SiteTooltip();
+				document.getElementById('like_post_current_tab_desc').textContent = txtStrings.mostLikedMessage;
+				like_post_message_data.innerHTML = htmlContent;
+				like_post_message_data.style.display = 'block';
 
 				// All done with this
 				hideSpinnerOverlay();
 			},
 
 			// The most liked Topics !
-			showTopicStats = function ()
-			{
+			showTopicStats = function() {
 				let data = tabsVisitedCurrentSession[currentUrlFrag],
 					topicUrl = '',
 					msgUrl = '',
 					htmlContent = '',
 					expand_txt = [],
 					collapse_txt = [],
-					$like_post_topic_data = $('.like_post_topic_data');
+					like_post_topic_data = document.querySelector('.like_post_topic_data');
 
 				const nFormat = new Intl.NumberFormat();
 
 				// Clear the area
-				$like_post_topic_data.html('');
+				like_post_topic_data.innerHTML = '';
+				like_post_topic_data.style.display = 'none';
 
 				// For each of the top X topics, output the info
-				data.forEach((point, index) =>
-				{
-					topicUrl = elk_scripturl + '?topic=' + point.id_topic;
+				data.forEach((point, index) => {
+					topicUrl = elk_prepareScriptUrl(elk_scripturl) + 'topic=' + point.id_topic;
 
 					// Start with the topic info
 					htmlContent += '' +
@@ -466,8 +460,7 @@
 					});
 
 					// Posts from the topic itself
-					point.msg_data.forEach((msg_data) =>
-					{
+					point.msg_data.forEach((msg_data) => {
 						msgUrl = topicUrl + '.msg' + msg_data.id_msg + '#msg' + msg_data.id_msg;
 
 						htmlContent += '' +
@@ -490,8 +483,9 @@
 				});
 
 				// Load and show the content
-				$('#like_post_current_tab_desc').text(txtStrings.mostLikedTopic);
-				$like_post_topic_data.html(htmlContent).show();
+				document.getElementById('like_post_current_tab_desc').textContent = txtStrings.mostLikedTopic;
+				like_post_topic_data.innerHTML = htmlContent;
+				like_post_topic_data.style.display = 'block';
 
 				// Add in the toggle functions
 				createCollapsibleContent(data.length, expand_txt, collapse_txt, 'topic');
@@ -501,16 +495,16 @@
 			},
 
 			// The single most liked board, like ever
-			showBoardStats = function (response)
-			{
+			showBoardStats = function(response) {
 				let data = tabsVisitedCurrentSession[currentUrlFrag],
-					boardUrl = elk_scripturl + '?board=' + data.id_board,
-					$like_post_board_data = $('.like_post_board_data');
+					boardUrl = elk_prepareScriptUrl(elk_scripturl) + 'board=' + data.id_board,
+					like_post_board_data = document.querySelector('.like_post_board_data');
 
 				const nFormat = new Intl.NumberFormat();
 
 				// Start off clean
-				$like_post_board_data.html('');
+				like_post_board_data.innerHTML = '';
+				like_post_board_data.style.display = 'none';
 
 				// First a bit about the board
 				let htmlContent = '' +
@@ -519,17 +513,16 @@
 					'       <a class="largetext" href="' + boardUrl + '">' + data.name + '</a> ' + txtStrings.mostPopularBoardHeading1 + ' ' + nFormat.format(data.like_count) + ' ' + txtStrings.genricHeading1 +
 					'   </p>' +
 					'   <p>' +
-					txtStrings.mostPopularBoardSubHeading1 + ' ' + data.num_topics + ' ' + txtStrings.mostPopularBoardSubHeading2 + ' ' + nFormat.format(data.topics_liked) + ' ' + txtStrings.mostPopularBoardSubHeading3 +
+					txtStrings.mostPopularBoardSubHeading1 + ' ' + nFormat.format(data.num_topics) + ' ' + txtStrings.mostPopularBoardSubHeading2 + ' ' + nFormat.format(data.topics_liked) + ' ' + txtStrings.mostPopularBoardSubHeading3 +
 					'   </p>' +
 					'   <p>' +
-					txtStrings.mostPopularBoardSubHeading4 + ' ' + data.num_posts + ' ' + txtStrings.mostPopularBoardSubHeading5 + ' ' + nFormat.format(data.msgs_liked) + ' ' + txtStrings.mostPopularBoardSubHeading6 +
+					txtStrings.mostPopularBoardSubHeading4 + ' ' + nFormat.format(data.num_posts) + ' ' + txtStrings.mostPopularBoardSubHeading5 + ' ' + nFormat.format(data.msgs_liked) + ' ' + txtStrings.mostPopularBoardSubHeading6 +
 					'   </p>' +
 					'</div>';
 
 				// And show some of the topics from it
-				data.topic_data.forEach((data_topic) =>
-				{
-					let topicUrl = elk_scripturl + '?topic=' + data_topic.id_topic;
+				data.topic_data.forEach((data_topic) => {
+					let topicUrl = elk_prepareScriptUrl(elk_scripturl) + 'topic=' + data_topic.id_topic;
 
 					htmlContent += '' +
 						'<div class="content forumposts">' +
@@ -547,31 +540,31 @@
 				});
 
 				// Load and show
-				$('#like_post_current_tab_desc').text(txtStrings.mostLikedBoard);
-				$like_post_board_data.html(htmlContent).show();
+				document.getElementById('like_post_current_tab_desc').textContent = txtStrings.mostLikedBoard;
+				like_post_board_data.innerHTML = htmlContent;
+				like_post_board_data.style.display = 'block';
 
 				// Done with ajax
 				hideSpinnerOverlay();
 			},
 
 			// Data for all the narcissists out there !
-			showMostLikesReceivedUserStats = function (response)
-			{
+			showMostLikesReceivedUserStats = function(response) {
 				let data = tabsVisitedCurrentSession[currentUrlFrag],
 					msgUrl = '',
 					htmlContent = '',
 					expand_txt = [],
 					collapse_txt = [],
-					$like_post_most_liked_user_data = $('.like_post_most_liked_user_data');
+					like_post_most_liked_user_data = document.querySelector('.like_post_most_liked_user_data');
 
 				const nFormat = new Intl.NumberFormat();
 
 				// Clean the screen
-				$like_post_most_liked_user_data.html('').off();
+				like_post_most_liked_user_data.innerHTML = '';
+				like_post_most_liked_user_data.style.display = 'none';
 
 				// For each member returned
-				data.forEach((point, index) =>
-				{
+				data.forEach((point, index) => {
 					// Start off with a bit about them and why they are great
 					htmlContent += '' +
 						'<div class="content forumposts">' +
@@ -599,9 +592,8 @@
 						1: txtStrings.hidePosts
 					});
 
-					point.post_data.forEach((post_data) =>
-					{
-						msgUrl = elk_scripturl + '?topic=' + post_data.id_topic + '.msg' + post_data.id_msg;
+					point.post_data.forEach((post_data) => {
+						msgUrl = elk_prepareScriptUrl(elk_scripturl) + 'topic=' + post_data.id_topic + '.msg' + post_data.id_msg;
 
 						htmlContent += '' +
 							'       <div class="content forumposts">' +
@@ -622,8 +614,9 @@
 				});
 
 				// Load the template with the data
-				$('#like_post_current_tab_desc').text(txtStrings.mostLikedMember);
-				$like_post_most_liked_user_data.html(htmlContent).show();
+				document.getElementById('like_post_current_tab_desc').textContent = txtStrings.mostLikedMember;
+				like_post_most_liked_user_data.innerHTML = htmlContent;
+				like_post_most_liked_user_data.style.display = 'block';
 
 				// Add in the toggle functions
 				createCollapsibleContent(data.length, expand_txt, collapse_txt, 'liked');
@@ -633,23 +626,22 @@
 			},
 
 			// Data for all the +1, me too, etc users as well
-			showMostLikesGivenUserStats = function (response)
-			{
+			showMostLikesGivenUserStats = function(response) {
 				let data = tabsVisitedCurrentSession[currentUrlFrag],
 					htmlContent = '',
 					msgUrl = '',
 					expand_txt = [],
 					collapse_txt = [],
-					$like_post_most_likes_given_user_data = $('.like_post_most_likes_given_user_data');
+					like_post_most_likes_given_user_data = document.querySelector('.like_post_most_likes_given_user_data');
 
 				const nFormat = new Intl.NumberFormat();
 
 				// Clear the div of any previous content
-				$like_post_most_likes_given_user_data.html('');
+				like_post_most_likes_given_user_data.innerHTML = '';
+				like_post_most_likes_given_user_data.style.display = 'none';
 
 				// For each member returned
-				data.forEach((point, index) =>
-				{
+				data.forEach((point, index) => {
 					htmlContent += '' +
 						'<div class="content forumposts">' +
 						'   <div class="like_stats_avatar">' +
@@ -676,15 +668,14 @@
 						1: txtStrings.hidePosts
 					});
 
-					point.post_data.forEach((post_data) =>
-					{
-						msgUrl = elk_scripturl + '?topic=' + post_data.id_topic + '.msg' + post_data.id_msg;
+					point.post_data.forEach((post_data) => {
+						msgUrl = elk_prepareScriptUrl(elk_scripturl) + 'topic=' + post_data.id_topic + '.msg' + post_data.id_msg;
 
 						htmlContent += '' +
 							'   <div class="content forumposts">' +
 							'	    <div class="topic_details">' +
 							'           <h5 class="like_stats_likers">' +
-											txtStrings.postedAt + ' ' + post_data.html_time +
+							txtStrings.postedAt + ' ' + post_data.html_time +
 							'           </h5>' +
 							'       </div>' +
 							'       <div class="messageContent">' + post_data.body + '</div>' +
@@ -699,8 +690,9 @@
 				});
 
 				// Load it to the page
-				$('#like_post_current_tab_desc').text(txtStrings.mostLikeGivingMember);
-				$like_post_most_likes_given_user_data.html(htmlContent).show();
+				document.getElementById('like_post_current_tab_desc').textContent = txtStrings.mostLikeGivingMember;
+				like_post_most_likes_given_user_data.innerHTML = htmlContent;
+				like_post_most_likes_given_user_data.style.display = 'block';
 
 				// Add in the toggle functions
 				createCollapsibleContent(data.length, expand_txt, collapse_txt, 'liker');
@@ -710,8 +702,7 @@
 			},
 
 			// Attach the toggle class to each hidden div
-			createCollapsibleContent = function (count, expand_txt, collapse_txt, prefix)
-			{
+			createCollapsibleContent = function(count, expand_txt, collapse_txt, prefix) {
 				for (let section = 0; section < count; section++)
 				{
 					new elk_Toggle({
@@ -740,9 +731,10 @@
 				}
 			},
 
-			genericErrorMessage = function (params)
-			{
-				$('.like_post_stats_error').html(params.errorMsg).show();
+			genericErrorMessage = function(params) {
+				let like_post_stats_error = document.querySelector('.like_post_stats_error');
+				like_post_stats_error.innerHTML = params.errorMsg;
+				like_post_stats_error.style.display = 'block';
 				hideSpinnerOverlay();
 			};
 
@@ -754,17 +746,18 @@
 
 	this.likePostStats = likePostStats;
 
-	// Setup the menu to act as ajax tabs
-	$(function ()
-	{
-		$(".like_post_stats_menu a").on("click", function (e)
-		{
-			if (e)
-			{
-				e.preventDefault();
-				e.stopPropagation();
-			}
-			likePostStats.prototype.checkUrl(this.id);
+	// Set the menu buttons to act as ajax tabs
+	document.addEventListener("DOMContentLoaded", function() {
+		const links = document.querySelectorAll('.like_post_stats_menu a');
+		links.forEach(function(link) {
+			link.addEventListener('click', function(e) {
+				if (e)
+				{
+					e.preventDefault();
+					e.stopPropagation();
+				}
+				likePostStats.prototype.checkUrl(this.id);
+			});
 		});
 	});
 }());

@@ -145,9 +145,9 @@ function template_editBuddies()
 
 	// Initialize the member suggest object
 	theme()->addInlineJavascript('
-		isFunctionLoaded("smc_AutoSuggest").then((available) => { 
+		isFunctionLoaded("elk_AutoSuggest").then((available) => { 
 			if (available) {
-				new smc_AutoSuggest({
+				new elk_AutoSuggest({
 					sSessionId: elk_session_id,
 					sSessionVar: elk_session_var,
 					sSuggestId: "new_buddy",
@@ -253,9 +253,9 @@ function template_editIgnoreList()
 	</form>';
 
 	theme()->addInlineJavascript('
-		isFunctionLoaded("smc_AutoSuggest").then((available) => { 
+		isFunctionLoaded("elk_AutoSuggest").then((available) => { 
 			if (available) {
-				new smc_AutoSuggest({
+				new elk_AutoSuggest({
 					sSessionId: elk_session_id,
 					sSessionVar: elk_session_var,
 					sSuggestId: "new_ignore",
@@ -1112,14 +1112,9 @@ function template_groupMembership()
 		// Javascript for the selector stuff.
 		echo '
 		<script>
+		console.log("bas");
 			var prevClass = "",
 				prevDiv = "";';
-
-		if (isset($context['groups']['member'][$context['primary_group']]))
-		{
-			echo '
-			initHighlightSelection("primdiv_' . $context['primary_group'] . '");';
-		}
 
 		echo '
 		</script>';
@@ -1267,7 +1262,7 @@ function template_profile_signature_modify()
 								<p class="smalltext">', $txt['sig_info'], '</p>
 							</dt>
 							<dd>
-								<textarea class="editor" onkeyup="calcCharLeft();" id="signature" name="signature" rows="5" cols="50" style="min-width: 50%; width: 99%;">', $context['member']['signature'], '</textarea>';
+								<textarea class="editor" id="signature" name="signature" rows="5" cols="50" style="min-width: 50%; width: 99%;">', $context['member']['signature'], '</textarea>';
 
 	// If there is a limit at all!
 	if (!empty($context['signature_limits']['max_length']))
@@ -1292,6 +1287,10 @@ function template_profile_signature_modify()
 	echo '
 								<script>
 									var maxLength = ', $context['signature_limits']['max_length'], ';
+
+									document.getElementById("signature").addEventListener("keyup", function(event) {
+									    calcCharLeft(false, event);
+									});
 
 									$(function() {
 										calcCharLeft(true);
@@ -1322,25 +1321,25 @@ function template_profile_avatar_select()
 										</label>
 									</li>', empty($context['member']['avatar']['allow_server_stored']) ? '' : '
 									<li>
-										<input type="radio" onclick="swap_avatar();" name="avatar_choice" id="avatar_choice_server_stored" value="server_stored"' . ($context['member']['avatar']['choice'] == 'server_stored' ? ' checked="checked"' : '') . ' />
+										<input type="radio" onclick="swap_avatar();" name="avatar_choice" id="avatar_choice_server_stored" value="server_stored"' . ($context['member']['avatar']['choice'] === 'server_stored' ? ' checked="checked"' : '') . ' />
 										<label for="avatar_choice_server_stored"' . (isset($context['modify_error']['bad_avatar']) ? ' class="error"' : '') . '>
 											' . $txt['choose_avatar_gallery'] . '
 										</label>
 									</li>', empty($context['member']['avatar']['allow_external']) ? '' : '
 									<li>
-										<input type="radio" onclick="swap_avatar();" name="avatar_choice" id="avatar_choice_external" value="external"' . ($context['member']['avatar']['choice'] == 'external' ? ' checked="checked"' : '') . ' />
+										<input type="radio" onclick="swap_avatar();" name="avatar_choice" id="avatar_choice_external" value="external"' . ($context['member']['avatar']['choice'] === 'external' ? ' checked="checked"' : '') . ' />
 										<label for="avatar_choice_external"' . (isset($context['modify_error']['bad_avatar']) ? ' class="error"' : '') . '>
 											' . $txt['my_own_pic'] . '
 										</label>
 									</li>', empty($context['member']['avatar']['allow_gravatar']) ? '' : '
 									<li>
-										<input type="radio" onclick="swap_avatar();" name="avatar_choice" id="avatar_choice_gravatar" value="gravatar"' . ($context['member']['avatar']['choice'] == 'gravatar' ? ' checked="checked"' : '') . ' />
+										<input type="radio" onclick="swap_avatar();" name="avatar_choice" id="avatar_choice_gravatar" value="gravatar"' . ($context['member']['avatar']['choice'] === 'gravatar' ? ' checked="checked"' : '') . ' />
 										<label for="avatar_choice_gravatar"' . (isset($context['modify_error']['bad_avatar']) ? ' class="error"' : '') . '>
 											' . $txt['gravatar'] . '
 										</label>
 									</li>', empty($context['member']['avatar']['allow_upload']) ? '' : '
 									<li>
-										<input type="radio" onclick="swap_avatar();" name="avatar_choice" id="avatar_choice_upload" value="upload"' . ($context['member']['avatar']['choice'] == 'upload' ? ' checked="checked"' : '') . ' />
+										<input type="radio" onclick="swap_avatar();" name="avatar_choice" id="avatar_choice_upload" value="upload"' . ($context['member']['avatar']['choice'] === 'upload' ? ' checked="checked"' : '') . ' />
 										<label for="avatar_choice_upload"' . (isset($context['modify_error']['bad_avatar']) ? ' class="error"' : '') . '>
 											' . $txt['avatar_will_upload'] . '
 										</label>
@@ -1386,7 +1385,7 @@ function template_profile_avatar_select()
 									<div class="smalltext">
 										<label for="userpicpersonal">', $txt['avatar_by_url'], '</label>
 									</div>
-									<input type="text" id="userpicpersonal" name="userpicpersonal" value="', $context['member']['avatar']['external'], '" onchange="previewExternalAvatar(this.value);" class="input_text" />
+									<input type="url" id="userpicpersonal" name="userpicpersonal" value="', $context['member']['avatar']['external'], '" onchange="previewExternalAvatar(this.value);" class="input_text" placeholder="', $context['member']['avatar']['placeholder'] ?? '', '"/>
 									<br /><br />
 									<img id="external" src="', $context['member']['avatar']['choice'] === 'external' ? $context['member']['avatar']['external'] : $modSettings['avatar_url'] . '/blank.png', '" alt="" class="avatar avatarresize" />
 								</div>';
@@ -1451,6 +1450,24 @@ function template_profile_karma_modify()
 								<label for="karma_bad">', $modSettings['karmaSmiteLabel'], '</label> <input type="text" id="karma_bad" name="karma_bad" size="4" value="', $context['member']['karma']['bad'], '" class="input_text" /><br />
 								(', $txt['total'], ': <span id="karmaTotal">', ($context['member']['karma']['good'] - $context['member']['karma']['bad']), '</span>)
 							</dd>';
+
+	echo "
+							<script>
+							document.addEventListener('DOMContentLoaded', function () {
+								let karma_good = document.querySelector('#karma_good'),
+									karma_bad = document.querySelector('#karma_bad'),
+									karmaTotal = document.querySelector('#karmaTotal');
+						
+								// Profile options changing karma
+								[karma_good, karma_bad].forEach(function (input) {
+									input.addEventListener('keyup', function () {
+										let good = parseInt(karma_good.value, 10),
+											bad = parseInt(karma_bad.value, 10);
+										karmaTotal.innerText = (isNaN(good) ? 0 : good) - (isNaN(bad) ? 0 : bad);
+									});
+								});
+							});
+							</script>";
 }
 
 /**

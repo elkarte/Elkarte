@@ -84,7 +84,7 @@
 		oForm.appendChild(inputMessageMode);
 
 		// Send in the request to save the data
-		this.draftAjax(serialize(oForm), "?action=post2;board=" + this.opts.iBoard + ";api=xml");
+		this.draftAjax(serialize(oForm), 'action=post2;board=' + this.opts.iBoard + ';api=xml');
 	};
 
 	/**
@@ -172,7 +172,7 @@
 		});
 
 		// Send in (post) the document for saving
-		this.draftAjax(serialize(oForm), "?action=pm;sa=send2;api=xml");
+		this.draftAjax(serialize(oForm), 'action=pm;sa=send2;api=xml');
 	};
 
 	/**
@@ -190,12 +190,13 @@
 	Elk_Drafts.prototype.draftAjax = function (post, action)
 	{
 		// Send in the request to save the data
-		fetch(elk_scripturl + action, {
+		fetch(elk_prepareScriptUrl(elk_scripturl) + action, {
 			method: 'POST',
 			body: post,
 			headers: {
 				'X-Requested-With': 'XMLHttpRequest',
-				'Content-Type': 'application/x-www-form-urlencoded'
+				'Content-Type': 'application/x-www-form-urlencoded',
+				'Accept': 'application/xml'
 			}
 		})
 			.then(response => {

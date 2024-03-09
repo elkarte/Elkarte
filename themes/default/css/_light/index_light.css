@@ -1008,13 +1008,6 @@ sup.bbc_footnotes, sup.bbc_footnotes a {
 	background: var(--primary_content_background);
 }
 
-/* Legacy highlight color, for selected membergroups etc.
-   Used by JS to show a selected item. Still used in manage languages */
-.table_grid .standard_row.highlight2 {
-	color: var(--body_text);
-	background: var(--primary_content_background);
-}
-
 /* For Errors.template.php. */
 #errorfile_table .current {
 	border-color: var(--primary_border);
@@ -1732,10 +1725,15 @@ ul.cf_icons {
 }
 
 /* Styles for the tooltips. */
-.tooltip {
+#site_tooltip {
 	border-color: var(--secondary_border);
 	background: var(--primary_content_background);
 	box-shadow: var(--shadow-elevation-high);
+}
+
+/* Overlay needs to account for the max-height: 225px; of #site-tooltip */
+.tooltip {
+	background: linear-gradient(to bottom, var(--transparent) 190px, var(--primary_content_background) 225px);
 }
 
 /* The darkened background for help pop-ups. */

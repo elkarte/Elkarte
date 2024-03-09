@@ -15,14 +15,14 @@
  * @param {array} tooltips
  * @returns {{data, options: {indexAxis: string, plugins: {legend: {display: boolean}, tooltip: {callbacks: {label: (function(*): *)}}, title: {display: boolean}}, elements: {bar: {borderWidth: number}}, responsive: boolean, scales: {yAxis: {ticks: {font: {size: number}}, grid: {display: boolean}, afterFit: options.scales.yAxis.afterFit}, xAxis: {ticks: {display: boolean, stepSize: number}}}, categoryPercentage: string}, type: string}}
  */
-function barConfig(bar_data, tooltips)
+function barConfig (bar_data, tooltips)
 {
 	return {
-		type: "bar",
+		type: 'bar',
 		data: bar_data,
 		options: {
-			indexAxis: "y",
-			categoryPercentage: ".9",
+			indexAxis: 'y',
+			categoryPercentage: '.9',
 			elements: {
 				bar: {
 					borderWidth: 0,
@@ -73,31 +73,31 @@ function barConfig(bar_data, tooltips)
  *
  * Request and Year are set as `global` values in the showLineChart() function in stats.template
  */
-function setYearClickEvents()
+function setYearClickEvents ()
 {
-	document.querySelectorAll(".stats_button").forEach(item => {
-		item.addEventListener("click", event => {
-			year = event.target.getAttribute("data-year") || year;
-			request = event.target.getAttribute("data-title") || request;
+	document.querySelectorAll('.stats_button').forEach(item => {
+		item.addEventListener('click', event => {
+			year = event.target.getAttribute('data-year') || year;
+			request = event.target.getAttribute('data-title') || request;
 
-			let	newDataset = {
+			let newDataset = {
 				label: titles[request],
-				data: year === "all" ? Object.values(yeardata[request]) : Object.values(monthdata[request][year]),
+				data: year === 'all' ? Object.values(yeardata[request]) : Object.values(monthdata[request][year]),
 				backgroundColor: [
-					"rgba(" + colors[request] + ", 0.1)",
+					'rgba(' + colors[request] + ', 0.1)',
 				],
 				borderColor: [
-					"rgba(" + colors[request] + ", 1)",
+					'rgba(' + colors[request] + ', 1)',
 				],
 				borderWidth: 1,
-				pointStyle: "circle",
+				pointStyle: 'circle',
 				pointRadius: 4,
 				lineTension: 0.2,
-				fill: "origin"
+				fill: 'origin'
 			};
 
 			// Out with the old and in with the new
-			yearDataset.labels = year === "all" ? Object.values(yeardata.axis_labels) : Object.values(monthdata.axis_labels[year]);
+			yearDataset.labels = year === 'all' ? Object.values(yeardata.axis_labels) : Object.values(monthdata.axis_labels[year]);
 			yearDataset.datasets.pop();
 			yearDataset.datasets.push(newDataset);
 			yearStats.update();

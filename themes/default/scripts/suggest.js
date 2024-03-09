@@ -20,7 +20,7 @@
  *
  * @param {object} oOptions
  */
-function smc_AutoSuggest(oOptions)
+function elk_AutoSuggest (oOptions)
 {
 	this.opt = oOptions;
 
@@ -59,14 +59,13 @@ function smc_AutoSuggest(oOptions)
 	this.oXmlRequestHandle = null;
 
 	// Just make sure the page is loaded before calling the init.
-	window.addEventListener("load", this.init.bind(this));
+	window.addEventListener('load', this.init.bind(this));
 }
 
 /**
  * Initialize our auto suggest object, adds events and containers to the element we monitor
  */
-smc_AutoSuggest.prototype.init = function ()
-{
+elk_AutoSuggest.prototype.init = function() {
 	// Create a div that'll contain the results later on.
 	this.oSuggestDivHandle = document.createElement('div');
 	this.oSuggestDivHandle.className = 'auto_suggest_div';
@@ -119,7 +118,7 @@ smc_AutoSuggest.prototype.init = function ()
 /**
  * Handle keypress events for the suggest controller
  */
-smc_AutoSuggest.prototype.handleKey = function (oEvent) {
+elk_AutoSuggest.prototype.handleKey = function(oEvent) {
 	let iKeyPress = this.getKeyPress(oEvent);
 
 	switch (iKeyPress)
@@ -139,14 +138,14 @@ smc_AutoSuggest.prototype.handleKey = function (oEvent) {
 /**
  * Gets the key pressed from the event handler.
  */
-smc_AutoSuggest.prototype.getKeyPress = function (oEvent) {
+elk_AutoSuggest.prototype.getKeyPress = function(oEvent) {
 	return 'which' in oEvent ? oEvent.which : oEvent.keyCode;
 };
 
 /**
  * Handles the tab key press event for the AutoSuggest component.
  */
-smc_AutoSuggest.prototype.handleTabKey = function () {
+elk_AutoSuggest.prototype.handleTabKey = function() {
 	if (this.aDisplayData.length > 0)
 	{
 		if (this.oSelectedDiv !== null)
@@ -167,7 +166,7 @@ smc_AutoSuggest.prototype.handleTabKey = function () {
  * Triggers the selectItem() method to select the highlighted item
  * when the enter key is pressed.
  */
-smc_AutoSuggest.prototype.handleEnterKey = function () {
+elk_AutoSuggest.prototype.handleEnterKey = function() {
 	if (this.aDisplayData.length > 0 && this.oSelectedDiv !== null)
 	{
 		this.itemClicked(this.oSelectedDiv);
@@ -182,7 +181,7 @@ smc_AutoSuggest.prototype.handleEnterKey = function () {
 /**
  * Handles the up/down arrow key events for the AutoSuggest component.
  */
-smc_AutoSuggest.prototype.handleArrowKey = function (iKeyPress) {
+elk_AutoSuggest.prototype.handleArrowKey = function(iKeyPress) {
 	if (this.aDisplayData.length && this.oSuggestDivHandle.style.visibility !== 'hidden')
 	{
 		// Loop through the display data trying to find our entry.
@@ -246,8 +245,7 @@ smc_AutoSuggest.prototype.handleArrowKey = function (iKeyPress) {
 /**
  * Handles the mouse over event for an item in the auto suggest menu.
  */
-smc_AutoSuggest.prototype.itemMouseOver = function (oCurElement)
-{
+elk_AutoSuggest.prototype.itemMouseOver = function(oCurElement) {
 	this.oSelectedDiv = oCurElement;
 	oCurElement.className = 'auto_suggest_item_hover';
 };
@@ -255,16 +253,14 @@ smc_AutoSuggest.prototype.itemMouseOver = function (oCurElement)
 /**
  * Handle the mouse out event on an item in the auto suggest dropdown.
  */
-smc_AutoSuggest.prototype.itemMouseOut = function (oCurElement)
-{
+elk_AutoSuggest.prototype.itemMouseOut = function(oCurElement) {
 	oCurElement.className = 'auto_suggest_item';
 };
 
 /**
  * Registers a callback function to be called when the auto-suggest results are available.
-  */
-smc_AutoSuggest.prototype.registerCallback = function (sCallbackType, sCallback)
-{
+ */
+elk_AutoSuggest.prototype.registerCallback = function(sCallbackType, sCallback) {
 	switch (sCallbackType)
 	{
 		case 'onBeforeAddItem':
@@ -290,8 +286,7 @@ smc_AutoSuggest.prototype.registerCallback = function (sCallbackType, sCallback)
  *
  * @returns {boolean} - Returns false to prevent the default form submission behavior.
  */
-smc_AutoSuggest.prototype.handleSubmit = function ()
-{
+elk_AutoSuggest.prototype.handleSubmit = function() {
 	let bReturnValue = true,
 		oFoundEntry = null;
 
@@ -342,8 +337,7 @@ smc_AutoSuggest.prototype.handleSubmit = function ()
 /**
  * Positions the suggestion dropdown div based on the input element's position.
  */
-smc_AutoSuggest.prototype.positionDiv = function ()
-{
+elk_AutoSuggest.prototype.positionDiv = function() {
 	// Only do it once.
 	if (this.bPositionComplete)
 	{
@@ -365,8 +359,7 @@ smc_AutoSuggest.prototype.positionDiv = function ()
 /**
  * Called when an item in the auto suggest list is clicked.
  */
-smc_AutoSuggest.prototype.itemClicked = function (oEvent)
-{
+elk_AutoSuggest.prototype.itemClicked = function(oEvent) {
 	let target = 'target' in oEvent ? oEvent.target : oEvent;
 
 	// Is there a div that we are populating?
@@ -388,8 +381,7 @@ smc_AutoSuggest.prototype.itemClicked = function (oEvent)
 /**
  * Removes the last entered search string from the auto-suggest component.
  */
-smc_AutoSuggest.prototype.removeLastSearchString = function ()
-{
+elk_AutoSuggest.prototype.removeLastSearchString = function() {
 	// Remove the text we searched for from the div.
 	let sTempText = this.oTextHandle.value.toLowerCase(),
 		iStartString = sTempText.indexOf(this.sLastSearch.toLowerCase());
@@ -430,8 +422,7 @@ smc_AutoSuggest.prototype.removeLastSearchString = function ()
  * @param {string} sItemName - The name of the item.
  * @param {boolean} bFromSubmit - Specifies whether the call is from a submit action.
  */
-smc_AutoSuggest.prototype.addItemLink = function (sItemId, sItemName, bFromSubmit)
-{
+elk_AutoSuggest.prototype.addItemLink = function(sItemId, sItemName, bFromSubmit) {
 	// Increase the internal item count.
 	this.iItemCount++;
 
@@ -453,7 +444,7 @@ smc_AutoSuggest.prototype.addItemLink = function (sItemId, sItemName, bFromSubmi
 		.replace(/%item_href%/g, elk_prepareScriptUrl(elk_scripturl) + this.opt.sURLMask.replace(/%item_id%/g, sItemId))
 		.replace(/%item_name%/g, sItemName)
 		.replace(/%images_url%/g, elk_images_url).replace(/%delete_text%/g, this.sTextDeleteItem);
-	oNewDiv.getElementsByClassName('icon-small')[0].addEventListener("click", this.deleteAddedItem.bind(this));
+	oNewDiv.getElementsByClassName('icon-small')[0].addEventListener('click', this.deleteAddedItem.bind(this));
 	this.oItemList.appendChild(oNewDiv);
 
 	// If there's a registered callback, call it.
@@ -474,9 +465,8 @@ smc_AutoSuggest.prototype.addItemLink = function (sItemId, sItemName, bFromSubmi
 
 /**
  * Deletes the added item from the auto-suggest component.
-  */
-smc_AutoSuggest.prototype.deleteAddedItem = function (oEvent)
-{
+ */
+elk_AutoSuggest.prototype.deleteAddedItem = function(oEvent) {
 	let oDiv;
 
 	// A registerCallback, e.g. PM preventing duplicate entries
@@ -512,8 +502,7 @@ smc_AutoSuggest.prototype.deleteAddedItem = function (oEvent)
 /**
  * Hide the auto suggest suggestions.
  */
-smc_AutoSuggest.prototype.autoSuggestHide = function ()
-{
+elk_AutoSuggest.prototype.autoSuggestHide = function() {
 	// Delay to allow events to propagate through....
 	this.oHideTimer = setTimeout(this.autoSuggestActualHide.bind(this), 350);
 };
@@ -521,8 +510,7 @@ smc_AutoSuggest.prototype.autoSuggestHide = function ()
 /**
  * Hides the actual auto-suggest dropdown after a timeout
  */
-smc_AutoSuggest.prototype.autoSuggestActualHide = function ()
-{
+elk_AutoSuggest.prototype.autoSuggestActualHide = function() {
 	this.oSuggestDivHandle.style.display = 'none';
 	this.oSuggestDivHandle.style.visibility = 'hidden';
 	this.oSelectedDiv = null;
@@ -531,8 +519,7 @@ smc_AutoSuggest.prototype.autoSuggestActualHide = function ()
 /**
  * Shows the auto suggest dropdown when triggered by the user.
  */
-smc_AutoSuggest.prototype.autoSuggestShow = function ()
-{
+elk_AutoSuggest.prototype.autoSuggestShow = function() {
 	if (this.oHideTimer)
 	{
 		clearTimeout(this.oHideTimer);
@@ -547,8 +534,7 @@ smc_AutoSuggest.prototype.autoSuggestShow = function ()
 /**
  * Populates the auto-suggest dropdown div with suggestions based on the provided data.
  */
-smc_AutoSuggest.prototype.populateDiv = function (aResults)
-{
+elk_AutoSuggest.prototype.populateDiv = function(aResults) {
 	// Cannot have any children yet.
 	while (this.oSuggestDivHandle.childNodes.length > 0)
 	{
@@ -581,12 +567,10 @@ smc_AutoSuggest.prototype.populateDiv = function (aResults)
 		this.oSuggestDivHandle.appendChild(oNewDivHandle);
 
 		// Attach some events to it, so we can do stuff.
-		oNewDivHandle.onmouseover = function ()
-		{
+		oNewDivHandle.onmouseover = function() {
 			this.className = 'auto_suggest_item_hover';
 		};
-		oNewDivHandle.onmouseout = function ()
-		{
+		oNewDivHandle.onmouseout = function() {
 			this.className = 'auto_suggest_item';
 		};
 		oNewDivHandle.onclick = this.itemClicked.bind(this);
@@ -602,8 +586,7 @@ smc_AutoSuggest.prototype.populateDiv = function (aResults)
 /**
  * Callback function for the XML request, should contain the list of users that match
  */
-smc_AutoSuggest.prototype.onSuggestionReceived = function (oXMLDoc)
-{
+elk_AutoSuggest.prototype.onSuggestionReceived = function(oXMLDoc) {
 	if (oXMLDoc === false)
 	{
 		return;
@@ -655,8 +638,7 @@ smc_AutoSuggest.prototype.onSuggestionReceived = function (oXMLDoc)
 /**
  * Update the suggestions in the auto suggest dropdown based on the user input
  */
-smc_AutoSuggest.prototype.autoSuggestUpdate = function ()
-{
+elk_AutoSuggest.prototype.autoSuggestUpdate = function() {
 	// If there's a callback then call it.
 	if (typeof this.oCallback.onBeforeUpdate === 'function')
 	{
@@ -758,14 +740,14 @@ smc_AutoSuggest.prototype.autoSuggestUpdate = function ()
 
 	// Get the document.
 	let obj = {
-			"suggest_type": this.opt.sSearchType,
-			"search": sSearchString,
-			"time": new Date().getTime()
+			'suggest_type': this.opt.sSearchType,
+			'search': sSearchString,
+			'time': new Date().getTime()
 		},
 		postString;
 
 	// Post values plus session
-	postString = serialize(obj) + "&" + this.opt.sSessionVar + "=" + this.opt.sSessionId;
+	postString = serialize(obj) + '&' + this.opt.sSessionVar + '=' + this.opt.sSessionId;
 
 	sendXMLDocument.call(this, this.sRetrieveURL.replace(/%scripturl%/g, elk_prepareScriptUrl(elk_scripturl)), postString, this.onSuggestionReceived);
 

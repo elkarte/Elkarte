@@ -33,7 +33,7 @@ function template_poll_edit()
 	{
 		echo '
 	<div id="edit_poll">
-		<form id="postmodify" name="postmodify" action="', $context['form_url'], '" method="post" accept-charset="UTF-8" onsubmit="submitonce(this); smc_saveEntities(\'postmodify\', [\'question\'], \'options-\');">
+		<form id="postmodify" name="postmodify" action="', $context['form_url'], '" method="post" accept-charset="UTF-8" onsubmit="submitonce(this); elk_saveEntities(\'postmodify\', [\'question\'], \'options-\');">
 			<h2 class="category_header">', $context['page_title'], '</h2>
 			<div>
 				<div class="well">';

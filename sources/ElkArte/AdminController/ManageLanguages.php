@@ -199,16 +199,6 @@ class ManageLanguages extends AbstractController
 			'items_per_page' => 20,
 			'base_href' => getUrl('admin', ['action' => 'admin', 'area' => 'languages']),
 			'title' => $txt['edit_languages'],
-			'data_check' => array(
-				'class' => static function ($rowData) {
-					if ($rowData['default'])
-					{
-						return 'highlight2';
-					}
-
-					return '';
-				},
-			),
 			'get_items' => array(
 				'function' => 'list_getLanguages',
 			),
@@ -266,10 +256,6 @@ class ManageLanguages extends AbstractController
 						<input type="hidden" name="' . $context['admin-ssc_token_var'] . '" value="' . $context['admin-ssc_token'] . '" />',
 				),
 			),
-			// For highlighting the default.
-			'javascript' => '
-				initHighlightSelection(\'language_list\');
-			',
 		);
 
 		// Display a warning if we cannot edit the default setting.

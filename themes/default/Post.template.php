@@ -49,7 +49,7 @@ function template_postarea_above()
 
 	// Start the form and display the link tree.
 	echo '
-		<form id="postmodify" action="', $scripturl, '?action=', $context['destination'], ';', empty($context['current_board']) ? '' : 'board=' . $context['current_board'], '" method="post" accept-charset="UTF-8" name="postmodify" class="flow_hidden" onsubmit="', ($context['becomes_approved'] ? '' : "alert('" . $txt['js_post_will_require_approval'] . "');"), "submitonce(this);smc_saveEntities('postmodify', ['subject', '", $context['post_box_name'], "', 'guestname', 'evtitle', 'question'], 'options');revalidateMentions('postmodify', '", $context['post_box_name'], '\');" enctype="multipart/form-data">
+		<form id="postmodify" action="', $scripturl, '?action=', $context['destination'], ';', empty($context['current_board']) ? '' : 'board=' . $context['current_board'], '" method="post" accept-charset="UTF-8" name="postmodify" class="flow_hidden" onsubmit="', ($context['becomes_approved'] ? '' : "alert('" . $txt['js_post_will_require_approval'] . "');"), "submitonce(this);elk_saveEntities('postmodify', ['subject', '", $context['post_box_name'], "', 'guestname', 'evtitle', 'question'], 'options');revalidateMentions('postmodify', '", $context['post_box_name'], '\');" enctype="multipart/form-data">
 			<div id="preview_section"', isset($context['preview_message']) ? '' : ' class="hide"', '>
 				<h2 class="category_header">
 					<span id="preview_subject">', empty($context['preview_subject']) ? '' : $context['preview_subject'], '</span>
@@ -323,6 +323,12 @@ function template_post_page()
 	if (empty($context['make_poll']) && $context['can_add_poll'])
 	{
 		echo '
+							<script>
+								var pollOptionNum = 0,
+									pollTabIndex = null,
+									pollOptionId = 4,
+									txt_option = "', $txt['option'], '";
+							</script>
 							<input type="submit" name="poll" tabindex="', $context['tabindex']++, '" value="', $txt['add_poll'], '" onclick="return loadAddNewPoll(this, ', empty($context['current_board']) ? '0' : $context['current_board'], ', \'postmodify\');" />';
 	}
 

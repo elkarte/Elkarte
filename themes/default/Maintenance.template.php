@@ -274,9 +274,9 @@ function template_maintain_members()
 	</div>
 
 	<script>
-		isFunctionLoaded("smc_AutoSuggest").then((available) => { 
+		isFunctionLoaded("elk_AutoSuggest").then((available) => { 
 			if (available) {
-				new smc_AutoSuggest({
+				new elk_AutoSuggest({
 					sSessionId: elk_session_id,
 					sSessionVar: elk_session_var,
 					sSuggestId: \'attributeMember\',

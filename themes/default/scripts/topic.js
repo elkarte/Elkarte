@@ -21,7 +21,7 @@
  *
  * @param {object} oOptions
  */
-function QuickModifyTopic(oOptions)
+function QuickModifyTopic (oOptions)
 {
 	this.opt = oOptions;
 	this.aHidePrefixes = this.opt.aHidePrefixes;
@@ -37,8 +37,7 @@ function QuickModifyTopic(oOptions)
 }
 
 // Used to initialise the object event handlers
-QuickModifyTopic.prototype.init = function ()
-{
+QuickModifyTopic.prototype.init = function() {
 	// Detect and act on keypress
 	this.oTopicModHandle.onkeydown = this.modify_topic_keypress.bind(this);
 
@@ -47,8 +46,7 @@ QuickModifyTopic.prototype.init = function ()
 };
 
 // called from the double click in the div
-QuickModifyTopic.prototype.modify_topic = function (topic_id, first_msg_id)
-{
+QuickModifyTopic.prototype.modify_topic = function(topic_id, first_msg_id) {
 	// already editing
 	if (this.bInEditMode)
 	{
@@ -67,12 +65,11 @@ QuickModifyTopic.prototype.modify_topic = function (topic_id, first_msg_id)
 
 	// Get the topics current subject
 	ajax_indicator(true);
-	sendXMLDocument.call(this, elk_prepareScriptUrl(elk_scripturl) + "action=quotefast;quote=" + first_msg_id + ";modify;api=xml", '', this.onDocReceived_modify_topic);
+	sendXMLDocument.call(this, elk_prepareScriptUrl(elk_scripturl) + 'action=quotefast;quote=' + first_msg_id + ';modify;api=xml', '', this.onDocReceived_modify_topic);
 };
 
 // Callback function from the modify_topic ajax call
-QuickModifyTopic.prototype.onDocReceived_modify_topic = function (XMLDoc)
-{
+QuickModifyTopic.prototype.onDocReceived_modify_topic = function(XMLDoc) {
 	// If it is not valid then clean up
 	if (!XMLDoc || !XMLDoc.getElementsByTagName('message'))
 	{
@@ -81,12 +78,12 @@ QuickModifyTopic.prototype.onDocReceived_modify_topic = function (XMLDoc)
 		return true;
 	}
 
-	this.sCurMessageId = XMLDoc.getElementsByTagName("message")[0].getAttribute("id");
+	this.sCurMessageId = XMLDoc.getElementsByTagName('message')[0].getAttribute('id');
 	this.oCurSubjectDiv = document.getElementById('msg_' + this.sCurMessageId.substring(4));
 	this.sBuffSubject = this.oCurSubjectDiv.innerHTML;
 
 	// Hide the tooltip text, don't want them for this element during the edit
-	if (typeof $.fn.SiteTooltip === 'function')
+	if (typeof SiteTooltip === 'function')
 	{
 		this.oSavetipElem = this.oCurSubjectDiv.nextSibling;
 		this.sSavetip = this.oSavetipElem.innerHTML;
@@ -98,12 +95,11 @@ QuickModifyTopic.prototype.onDocReceived_modify_topic = function (XMLDoc)
 
 	// Show we are in edit mode and allow the edit
 	ajax_indicator(false);
-	this.modify_topic_show_edit(XMLDoc.getElementsByTagName("subject")[0].childNodes[0].nodeValue);
+	this.modify_topic_show_edit(XMLDoc.getElementsByTagName('subject')[0].childNodes[0].nodeValue);
 };
 
 // Cancel out of an edit and return things to back to what they were
-QuickModifyTopic.prototype.modify_topic_cancel = function ()
-{
+QuickModifyTopic.prototype.modify_topic_cancel = function() {
 	this.oCurSubjectDiv.innerHTML = this.sBuffSubject;
 	this.set_hidden_topic_areas('');
 	this.bInEditMode = false;
@@ -118,8 +114,7 @@ QuickModifyTopic.prototype.modify_topic_cancel = function ()
 };
 
 // Simply restore/show any hidden bits during topic editing.
-QuickModifyTopic.prototype.set_hidden_topic_areas = function (set_style)
-{
+QuickModifyTopic.prototype.set_hidden_topic_areas = function(set_style) {
 	for (let i = 0; i < this.aHidePrefixes.length; i++)
 	{
 		if (document.getElementById(this.aHidePrefixes[i] + this.sCurMessageId.substring(4)) !== null)
@@ -130,8 +125,7 @@ QuickModifyTopic.prototype.set_hidden_topic_areas = function (set_style)
 };
 
 // For templating, shown that an inline edit is being made.
-QuickModifyTopic.prototype.modify_topic_show_edit = function (subject)
-{
+QuickModifyTopic.prototype.modify_topic_show_edit = function(subject) {
 	// Just template the subject.
 	this.oCurSubjectDiv.innerHTML = '<input type="text" name="subject" value="' + subject + '" size="60" style="width: 95%;" maxlength="80" class="input_text" autocomplete="off" /><input type="hidden" name="topic" value="' + this.iCurTopicId + '" /><input type="hidden" name="msg" value="' + this.sCurMessageId.substring(4) + '" />';
 
@@ -141,28 +135,26 @@ QuickModifyTopic.prototype.modify_topic_show_edit = function (subject)
 };
 
 // Yup that's right, save it
-QuickModifyTopic.prototype.modify_topic_save = function (cur_session_id, cur_session_var)
-{
+QuickModifyTopic.prototype.modify_topic_save = function(cur_session_id, cur_session_var) {
 	if (!this.bInEditMode)
 	{
 		return true;
 	}
 
 	let x = [];
-	x[x.length] = 'subject=' + document.forms.quickModForm.subject.value.replace(/&#/g, "&#38;#").php_urlencode();
+	x[x.length] = 'subject=' + document.forms.quickModForm.subject.value.replace(/&#/g, '&#38;#').php_urlencode();
 	x[x.length] = 'topic=' + parseInt(document.forms.quickModForm.elements.topic.value);
 	x[x.length] = 'msg=' + parseInt(document.forms.quickModForm.elements.msg.value);
 
 	// Send in the call to save the updated topic subject
 	ajax_indicator(true);
-	sendXMLDocument.call(this, elk_prepareScriptUrl(elk_scripturl) + "action=jsmodify;topic=" + parseInt(document.forms.quickModForm.elements.topic.value) + ";" + cur_session_var + "=" + cur_session_id + ";api=xml", x.join("&"), this.modify_topic_done);
+	sendXMLDocument.call(this, elk_prepareScriptUrl(elk_scripturl) + 'action=jsmodify;topic=' + parseInt(document.forms.quickModForm.elements.topic.value) + ';' + cur_session_var + '=' + cur_session_id + ';api=xml', x.join('&'), this.modify_topic_done);
 
 	return false;
 };
 
 // Done with the edit, if all went well show the new topic title
-QuickModifyTopic.prototype.modify_topic_done = function (XMLDoc)
-{
+QuickModifyTopic.prototype.modify_topic_done = function(XMLDoc) {
 	ajax_indicator(false);
 
 	// If it is not valid then clean up
@@ -172,9 +164,9 @@ QuickModifyTopic.prototype.modify_topic_done = function (XMLDoc)
 		return true;
 	}
 
-	let message = XMLDoc.getElementsByTagName("elk")[0].getElementsByTagName("message")[0],
-		subject = message.getElementsByTagName("subject")[0],
-		error = message.getElementsByTagName("error")[0];
+	let message = XMLDoc.getElementsByTagName('elk')[0].getElementsByTagName('message')[0],
+		subject = message.getElementsByTagName('subject')[0],
+		error = message.getElementsByTagName('error')[0];
 
 	// No subject or other error?
 	if (!subject || error)
@@ -187,31 +179,31 @@ QuickModifyTopic.prototype.modify_topic_done = function (XMLDoc)
 	this.bInEditMode = false;
 
 	// Redo tooltips if they are on since we just pulled the rug out on this one
-	if (typeof $.fn.SiteTooltip === 'function')
+	if (typeof SiteTooltip === 'function')
 	{
 		this.oSavetipElem.innerHTML = this.sSavetip;
-		$('.preview').SiteTooltip();
+
+		let tooltip = new SiteTooltip();
+		tooltip.create('.preview');
 	}
 
 	return false;
 };
 
 // Done with the edit, put in new subject and link.
-QuickModifyTopic.prototype.modify_topic_hide_edit = function (subject)
-{
+QuickModifyTopic.prototype.modify_topic_hide_edit = function(subject) {
 	// Re-template the subject!
 	this.oCurSubjectDiv.innerHTML = '<a href="' + elk_scripturl + '?topic=' + this.iCurTopicId + '.0">' + subject + '<' + '/a>';
 };
 
 // keypress event ... like enter or escape
-QuickModifyTopic.prototype.modify_topic_keypress = function (oEvent)
-{
-	if (typeof (oEvent.keyCode) !== "undefined" && this.bInEditMode)
+QuickModifyTopic.prototype.modify_topic_keypress = function(oEvent) {
+	if (typeof (oEvent.keyCode) !== 'undefined' && this.bInEditMode)
 	{
 		if (oEvent.keyCode === 27)
 		{
 			this.modify_topic_cancel();
-			if (typeof (oEvent.preventDefault) === "undefined")
+			if (typeof (oEvent.preventDefault) === 'undefined')
 			{
 				oEvent.returnValue = false;
 			}
@@ -223,7 +215,7 @@ QuickModifyTopic.prototype.modify_topic_keypress = function (oEvent)
 		else if (oEvent.keyCode === 13)
 		{
 			this.modify_topic_save(elk_session_id, elk_session_var);
-			if (typeof (oEvent.preventDefault) === "undefined")
+			if (typeof (oEvent.preventDefault) === 'undefined')
 			{
 				oEvent.returnValue = false;
 			}
@@ -236,8 +228,7 @@ QuickModifyTopic.prototype.modify_topic_keypress = function (oEvent)
 };
 
 // A click event to signal the finish of the edit
-QuickModifyTopic.prototype.modify_topic_click = function (oEvent)
-{
+QuickModifyTopic.prototype.modify_topic_click = function(oEvent) {
 	if (this.bInEditMode && !this.bMouseOnDiv)
 	{
 		this.modify_topic_save(elk_session_id, elk_session_var);
@@ -245,14 +236,12 @@ QuickModifyTopic.prototype.modify_topic_click = function (oEvent)
 };
 
 // Moved out of the editing div
-QuickModifyTopic.prototype.modify_topic_mouseout = function (oEvent)
-{
+QuickModifyTopic.prototype.modify_topic_mouseout = function(oEvent) {
 	this.bMouseOnDiv = false;
 };
 
 // Moved back over the editing div
-QuickModifyTopic.prototype.modify_topic_mouseover = function (oEvent)
-{
+QuickModifyTopic.prototype.modify_topic_mouseover = function(oEvent) {
 	this.bMouseOnDiv = true;
 	oEvent.preventDefault();
 };
@@ -263,7 +252,7 @@ QuickModifyTopic.prototype.modify_topic_mouseover = function (oEvent)
  *
  * @param {type} oOptions
  */
-function QuickReply(oOptions)
+function QuickReply (oOptions)
 {
 	this.opt = oOptions;
 	this.bCollapsed = this.opt.bDefaultCollapsed;
@@ -276,8 +265,7 @@ function QuickReply(oOptions)
 }
 
 // When a user presses quote, put it in the quick reply box (if expanded).
-QuickReply.prototype.quote = function (iMessageId, xDeprecated)
-{
+QuickReply.prototype.quote = function(iMessageId, xDeprecated) {
 	ajax_indicator(true);
 
 	// Collapsed on a quote, then simply got to the full post screen
@@ -303,24 +291,8 @@ QuickReply.prototype.delay = function(time) {
 	return new Promise(resolve => setTimeout(resolve, time));
 };
 
-// This is the callback function used after the XMLhttp request.
-QuickReply.prototype.onQuoteReceived = function (oXMLDoc)
-{
-	let sQuoteText = '';
-
-	for (let i = 0; i < oXMLDoc.getElementsByTagName('quote')[0].childNodes.length; i++)
-	{
-		sQuoteText += oXMLDoc.getElementsByTagName('quote')[0].childNodes[i].nodeValue;
-	}
-
-	replaceText(sQuoteText, document.forms.postmodify.message);
-
-	ajax_indicator(false);
-};
-
 // The function handling the swapping of the quick reply area
-QuickReply.prototype.swap = function (bInit, bSavestate)
-{
+QuickReply.prototype.swap = function(bInit, bSavestate) {
 	let oQuickReplyContainer = document.getElementById(this.opt.sClassId),
 		sEditorId = this.opt.sEditorId || this.opt.sContainerId;
 
@@ -335,7 +307,7 @@ QuickReply.prototype.swap = function (bInit, bSavestate)
 	}
 
 	// Swap the class on the expcol image as needed
-	let sTargetClass = !this.bCollapsed ? this.opt.sClassCollapsed : this.opt.sClassExpanded;
+	let sTargetClass = this.bCollapsed ? this.opt.sClassExpanded : this.opt.sClassCollapsed;
 
 	if (oQuickReplyContainer.className !== sTargetClass)
 	{
@@ -348,14 +320,13 @@ QuickReply.prototype.swap = function (bInit, bSavestate)
 	// Show or hide away
 	if (this.bCollapsed)
 	{
-		$('#' + this.opt.sContainerId).slideUp(250);
+		document.getElementById(this.opt.sContainerId).slideUp();
 	}
 	else
 	{
-		$('#' + this.opt.sContainerId).slideDown(250, function()
-		{
+		document.getElementById(this.opt.sContainerId).slideDown(250, function() {
 			// Force the editor to a min height, otherwise its just 2 lines
-			let	instance = sceditor.instance(document.getElementById(sEditorId));
+			let instance = sceditor.instance(document.getElementById(sEditorId));
 			if (instance)
 			{
 				instance.height(250);
@@ -382,7 +353,7 @@ QuickReply.prototype.swap = function (bInit, bSavestate)
  *
  * @param {object} oOptions
  */
-function QuickModify(oOptions)
+function QuickModify (oOptions)
 {
 	this.opt = oOptions;
 	this.bInEditMode = false;
@@ -400,13 +371,12 @@ function QuickModify(oOptions)
 	let aShowQuickModify = document.getElementsByClassName(this.opt.sClassName);
 	for (let i = 0, length = aShowQuickModify.length; i < length; i++)
 	{
-		aShowQuickModify[i].style.display = "inline";
+		aShowQuickModify[i].style.display = 'inline';
 	}
 }
 
 // Function called when a user presses the edit button.
-QuickModify.prototype.modifyMsg = function (iMessageId)
-{
+QuickModify.prototype.modifyMsg = function(iMessageId) {
 	// Removes the accesskeys from the quickreply inputs and saves them in an array to use them later
 	if (typeof (this.opt.sFormRemoveAccessKeys) !== 'undefined')
 	{
@@ -439,8 +409,7 @@ QuickModify.prototype.modifyMsg = function (iMessageId)
 };
 
 // The callback function used for the XMLhttp request retrieving the message.
-QuickModify.prototype.onMessageReceived = function (XMLDoc)
-{
+QuickModify.prototype.onMessageReceived = function(XMLDoc) {
 	let sBodyText = '',
 		sSubjectText;
 
@@ -453,8 +422,8 @@ QuickModify.prototype.onMessageReceived = function (XMLDoc)
 	// Show the message icon if it was hidden and its set
 	if (this.opt.sIconHide !== null)
 	{
-		this.oMsgIcon = document.getElementById('messageicon_' + this.sCurMessageId.replace("msg_", ""));
-		if (this.oMsgIcon !== null && getComputedStyle(this.oMsgIcon).getPropertyValue("display") === 'none')
+		this.oMsgIcon = document.getElementById('messageicon_' + this.sCurMessageId.replace('msg_', ''));
+		if (this.oMsgIcon !== null && getComputedStyle(this.oMsgIcon).getPropertyValue('display') === 'none')
 		{
 			this.oMsgIcon.style.display = 'inline';
 		}
@@ -465,7 +434,7 @@ QuickModify.prototype.onMessageReceived = function (XMLDoc)
 	{
 		if ('console' in window && console.info)
 		{
-			window.console.info('no id');
+			console.info('no id');
 		}
 
 		return this.modifyCancel();
@@ -473,7 +442,9 @@ QuickModify.prototype.onMessageReceived = function (XMLDoc)
 
 	// Replace the body part.
 	for (let i = 0; i < XMLDoc.getElementsByTagName("message")[0].childNodes.length; i++)
-		sBodyText += XMLDoc.getElementsByTagName("message")[0].childNodes[i].nodeValue;
+	{
+		sBodyText += XMLDoc.getElementsByTagName('message')[0].childNodes[i].nodeValue;
+	}
 
 	this.oCurMessageDiv = document.getElementById(this.sCurMessageId);
 	this.sMessageBuffer = this.oCurMessageDiv.innerHTML;
@@ -505,7 +476,7 @@ QuickModify.prototype.onMessageReceived = function (XMLDoc)
 	}
 
 	// Position the editor in the window
-	document.getElementById('info_' + this.sCurMessageId.substring(this.sCurMessageId.lastIndexOf("_") + 1)).scrollIntoView();
+	document.getElementById('info_' + this.sCurMessageId.substring(this.sCurMessageId.lastIndexOf('_') + 1)).scrollIntoView();
 
 	// Handle custom function hook before showing the new select.
 	if ('funcOnAfterCreate' in this.opt)
@@ -519,8 +490,7 @@ QuickModify.prototype.onMessageReceived = function (XMLDoc)
 };
 
 // Function in case the user presses cancel (or other circumstances cause it).
-QuickModify.prototype.modifyCancel = function ()
-{
+QuickModify.prototype.modifyCancel = function() {
 	// Roll back the HTML to its original state.
 	if (this.oCurMessageDiv)
 	{
@@ -537,7 +507,7 @@ QuickModify.prototype.modifyCancel = function ()
 	// Hide the message icon if we are doing that
 	if (this.opt.sIconHide)
 	{
-		let oCurrentMsgIcon = document.getElementById('msg_icon_' + this.sCurMessageId.replace("msg_", ""));
+		let oCurrentMsgIcon = document.getElementById('msg_icon_' + this.sCurMessageId.replace('msg_', ''));
 
 		if (oCurrentMsgIcon !== null && oCurrentMsgIcon.src.indexOf(this.opt.sIconHide) > 0)
 		{
@@ -568,8 +538,7 @@ QuickModify.prototype.modifyCancel = function ()
 };
 
 // The function called after a user wants to save his precious message.
-QuickModify.prototype.modifySave = function (sSessionId, sSessionVar)
-{
+QuickModify.prototype.modifySave = function(sSessionId, sSessionVar) {
 	let i = 0,
 		x = [],
 		uIds = [];
@@ -607,25 +576,24 @@ QuickModify.prototype.modifySave = function (sSessionId, sSessionVar)
 		}
 	}
 
-	x[x.length] = 'subject=' + document.forms.quickModForm.subject.value.replace(/&#/g, "&#38;#").php_urlencode();
-	x[x.length] = 'message=' + document.forms.quickModForm.message.value.replace(/&#/g, "&#38;#").php_urlencode();
+	x[x.length] = 'subject=' + document.forms.quickModForm.subject.value.replace(/&#/g, '&#38;#').php_urlencode();
+	x[x.length] = 'message=' + document.forms.quickModForm.message.value.replace(/&#/g, '&#38;#').php_urlencode();
 	x[x.length] = 'topic=' + parseInt(document.forms.quickModForm.elements.topic.value);
 	x[x.length] = 'msg=' + parseInt(document.forms.quickModForm.elements.msg.value);
 	if (uIds.length > 0)
 	{
-		x[x.length] = uIds.join("&");
+		x[x.length] = uIds.join('&');
 	}
 
 	// Send in the XMLhttp request and let's hope for the best.
 	ajax_indicator(true);
-	sendXMLDocument.call(this, elk_prepareScriptUrl(this.opt.sScriptUrl) + "action=jsmodify;topic=" + this.opt.iTopicId + ";" + elk_session_var + "=" + elk_session_id + ";api=xml", x.join("&"), this.onModifyDone);
+	sendXMLDocument.call(this, elk_prepareScriptUrl(this.opt.sScriptUrl) + 'action=jsmodify;topic=' + this.opt.iTopicId + ';' + elk_session_var + '=' + elk_session_id + ';api=xml', x.join('&'), this.onModifyDone);
 
 	return false;
 };
 
 // Callback function of the XMLhttp request sending the modified message.
-QuickModify.prototype.onModifyDone = function (XMLDoc)
-{
+QuickModify.prototype.onModifyDone = function(XMLDoc) {
 	let oErrordiv;
 
 	// We've finished the loading stuff.
@@ -652,15 +620,17 @@ QuickModify.prototype.onModifyDone = function (XMLDoc)
 		body = message.getElementsByTagName('body')[0],
 		error = message.getElementsByTagName('error')[0];
 
-	$(document.forms.quickModForm.message).removeClass('border_error');
-	$(document.forms.quickModForm.subject).removeClass('border_error');
+	document.forms.quickModForm.message.classList.remove('border_error');
+	document.forms.quickModForm.subject.classList.remove('border_error');
 
 	if (body)
 	{
 		// Show new body.
 		let bodyText = '';
 		for (let i = 0; i < body.childNodes.length; i++)
+		{
 			bodyText += body.childNodes[i].nodeValue;
+		}
 
 		this.sMessageBuffer = this.opt.sTemplateBodyNormal.replace(/%body%/, bodyText);
 		this.oCurMessageDiv.innerHTML = this.sMessageBuffer;
@@ -689,7 +659,7 @@ QuickModify.prototype.onModifyDone = function (XMLDoc)
 		// Hide the icon if we were told to
 		if (this.opt.sIconHide !== null)
 		{
-			let oCurrentMsgIcon = document.getElementById('msg_icon_' + this.sCurMessageId.replace("msg_", ""));
+			let oCurrentMsgIcon = document.getElementById('msg_icon_' + this.sCurMessageId.replace('msg_', ''));
 			if (oCurrentMsgIcon !== null && oCurrentMsgIcon.src.indexOf(this.opt.sIconHide) > 0)
 			{
 				this.oMsgIcon.style.display = 'none';
@@ -703,9 +673,12 @@ QuickModify.prototype.onModifyDone = function (XMLDoc)
 		}
 
 		// Hello, Sweetie
-		$('#' + this.sCurMessageId + ' .spoilerheader').on('click', function ()
-		{
-			$(this).next().children().slideToggle("fast");
+		document.getElementById(this.sCurMessageId).querySelector('.spoilerheader').addEventListener('click', function() {
+			let content = this.nextElementSibling.children;
+			for (let i = 0; i < content.length; i++)
+			{
+				content[i].slideToggle(150);
+			}
 		});
 
 		// Re-Fix quote blocks
@@ -740,12 +713,12 @@ QuickModify.prototype.onModifyDone = function (XMLDoc)
 
 		if (error.getAttribute('in_body') === '1')
 		{
-			$(document.forms.quickModForm.message).addClass('border_error');
+			document.forms.quickModForm.message.classList.add('border_error');
 		}
 
 		if (error.getAttribute('in_subject') === '1')
 		{
-			$(document.forms.quickModForm.subject).addClass('border_error');
+			document.forms.quickModForm.subject.classList.add('border_error');
 		}
 	}
 };
@@ -755,7 +728,7 @@ QuickModify.prototype.onModifyDone = function (XMLDoc)
  *
  * @param {type} oOptions
  */
-function InTopicModeration(oOptions)
+function InTopicModeration (oOptions)
 {
 	this.opt = oOptions;
 	this.bButtonsShown = false;
@@ -764,11 +737,9 @@ function InTopicModeration(oOptions)
 	this.init();
 }
 
-InTopicModeration.prototype.init = function ()
-{
+InTopicModeration.prototype.init = function() {
 	// Add checkboxes w/click event to the messages that can be removed/split
-	this.opt.aMessageIds.forEach((messageID) =>
-	{
+	this.opt.aMessageIds.forEach((messageID) => {
 		// Create the checkbox.
 		let oCheckbox = document.createElement('input'),
 			oCheckboxContainer = document.getElementById(this.opt.sCheckboxContainerMask + messageID);
@@ -786,8 +757,7 @@ InTopicModeration.prototype.init = function ()
 };
 
 // They clicked a checkbox in a message, now show the button options to them
-InTopicModeration.prototype.handleClick = function (oCheckbox)
-{
+InTopicModeration.prototype.handleClick = function(oCheckbox) {
 	let oButtonStrip = document.getElementById(this.opt.sButtonStrip),
 		oButtonStripDisplay = document.getElementById(this.opt.sButtonStripDisplay),
 		aButtonCounter = ['remove', 'restore', 'split'];
@@ -797,7 +767,7 @@ InTopicModeration.prototype.handleClick = function (oCheckbox)
 		// Make sure it can go somewhere.
 		if (typeof oButtonStripDisplay === 'object' && oButtonStripDisplay !== null)
 		{
-			oButtonStripDisplay.style.display = "";
+			oButtonStripDisplay.style.display = '';
 		}
 		else
 		{
@@ -812,8 +782,7 @@ InTopicModeration.prototype.handleClick = function (oCheckbox)
 		}
 
 		// Add the special selected buttons.
-		aButtonCounter.forEach((addButton) =>
-		{
+		aButtonCounter.forEach((addButton) => {
 			let upperButton = addButton[0].toUpperCase() + addButton.substring(1);
 
 			// As in bCanRemove etc.
@@ -839,13 +808,12 @@ InTopicModeration.prototype.handleClick = function (oCheckbox)
 	this.iNumSelected += oCheckbox.checked ? 1 : -1;
 
 	// Show the number of messages selected in each of the buttons.
-	aButtonCounter.forEach((addButton) =>
-	{
+	aButtonCounter.forEach((addButton) => {
 		let upperButton = addButton[0].toUpperCase() + addButton.substring(1);
 		if (this.opt['bCan' + upperButton])
 		{
 			oButtonStrip.querySelector('#' + addButton + '_button_text').innerHTML = this.opt['s' + upperButton + 'ButtonLabel'] + ' [' + this.iNumSelected + ']';
-			oButtonStrip.querySelector('#' + addButton + '_button').style.display = this.iNumSelected < 1 ? "none" : "";
+			oButtonStrip.querySelector('#' + addButton + '_button').style.display = this.iNumSelected < 1 ? 'none' : '';
 		}
 	});
 
@@ -861,8 +829,7 @@ InTopicModeration.prototype.handleClick = function (oCheckbox)
 };
 
 // Called when the user clicks one of the buttons that we added
-InTopicModeration.prototype.handleSubmit = function (sSubmitType)
-{
+InTopicModeration.prototype.handleSubmit = function(sSubmitType) {
 	// Make sure this form isn't submitted in another way than this function.
 	let oForm = document.getElementById(this.opt.sFormId),
 		oInput = document.createElement('input');
@@ -919,7 +886,7 @@ InTopicModeration.prototype.handleSubmit = function (sSubmitType)
  * @param {string} thumbID
  * @param {string} messageID
  */
-function expandThumbLB(thumbID, messageID)
+function expandThumbLB (thumbID, messageID)
 {
 	var link = document.getElementById('link_' + thumbID),
 		siblings = $('a[data-lightboxmessage="' + messageID + '"]'),
@@ -931,17 +898,14 @@ function expandThumbLB(thumbID, messageID)
 		$elk_prev_icon = $('<span id="elk_lb_prev"></span>'),
 		$elk_lightbox = $('#elk_lightbox'),
 		$elk_lb_content = $('#elk_lb_content'),
-		ajaxIndicatorOn = function ()
-		{
+		ajaxIndicatorOn = function() {
 			$('<div id="lightbox-loading"><i class="icon icon-xl i-concentric"></i><div>').appendTo($elk_lb_content);
 			$('html, body').addClass('elk_lb_no_scrolling');
 		},
-		ajaxIndicatorOff = function ()
-		{
+		ajaxIndicatorOff = function() {
 			$('#lightbox-loading').remove();
 		},
-		closeLightbox = function ()
-		{
+		closeLightbox = function() {
 			// Close the lightbox and remove handlers
 			$elk_expand_icon.off('click');
 			$elk_next_icon.off('click');
@@ -954,12 +918,10 @@ function expandThumbLB(thumbID, messageID)
 			$(window).off('touchstart.lb');
 			$(window).off('touchmove.lb');
 		},
-		openLightbox = function ()
-		{
+		openLightbox = function() {
 			// Load and open an image in the lightbox
 			$('<img id="elk_lb_img" src="' + link.href + '">')
-				.on('load', function ()
-				{
+				.on('load', function() {
 					var screenWidth = (window.innerWidth ? window.innerWidth : $(window).width()) * (is_mobile ? 0.8 : 0.9),
 						screenHeight = (window.innerHeight ? window.innerHeight : $(window).height()) * 0.9;
 
@@ -980,29 +942,24 @@ function expandThumbLB(thumbID, messageID)
 
 					ajaxIndicatorOff();
 				})
-				.on('error', function ()
-				{
+				.on('error', function() {
 					// Perhaps a message, but for now make it look like we tried and failed
-					setTimeout(function ()
-					{
+					setTimeout(function() {
 						ajaxIndicatorOff();
 						closeLightbox();
 						window.location = link.href;
 					}, 1500);
 				});
 		},
-		nextNav = function ()
-		{
+		nextNav = function() {
 			// Get / Set the next image ID in the array (with wrap around)
 			thumbID = navigation[($.inArray(thumbID, navigation) + 1) % navigation.length];
 		},
-		prevNav = function ()
-		{
+		prevNav = function() {
 			// Get / Set the previous image ID in the array (with wrap around)
 			thumbID = navigation[($.inArray(thumbID, navigation) - 1 + navigation.length) % navigation.length];
 		},
-		navLightbox = function ()
-		{
+		navLightbox = function() {
 			// Navigate to the next image and show it in the lightbox
 			$elk_lb_content.html('').removeAttr('style').removeClass('expand');
 			ajaxIndicatorOn();
@@ -1013,11 +970,9 @@ function expandThumbLB(thumbID, messageID)
 			openLightbox();
 			expandLightbox();
 		},
-		expandLightbox = function ()
-		{
+		expandLightbox = function() {
 			// Add an expand the image to full size when the expand icon is clicked
-			$elk_expand_icon.on('click', function ()
-			{
+			$elk_expand_icon.on('click', function() {
 				$('#elk_lb_content').addClass('expand').css({
 					'height': Math.floor(window.innerHeight * 0.95) + 'px',
 					'width': Math.floor(window.innerWidth * 0.9) + 'px',
@@ -1028,15 +983,13 @@ function expandThumbLB(thumbID, messageID)
 				$(window).off('keydown.lb');
 				$(window).off('touchmove.lb');
 			});
-			$elk_next_icon.on('click', function (event)
-			{
+			$elk_next_icon.on('click', function(event) {
 				event.preventDefault();
 				event.stopPropagation();
 				nextNav();
 				navLightbox();
 			});
-			$elk_prev_icon.on('click', function (event)
-			{
+			$elk_prev_icon.on('click', function(event) {
 				event.preventDefault();
 				event.stopPropagation();
 				prevNav();
@@ -1055,8 +1008,7 @@ function expandThumbLB(thumbID, messageID)
 	}
 
 	// Load the navigation array
-	siblings.each(function ()
-	{
+	siblings.each(function() {
 		navigation[navigation.length] = $(this).data('lightboximage');
 	});
 
@@ -1073,8 +1025,7 @@ function expandThumbLB(thumbID, messageID)
 	expandLightbox();
 
 	// Click anywhere on the page (except the expand icon) to close the lightbox
-	$elk_lightbox.on('click', function (event)
-	{
+	$elk_lightbox.on('click', function(event) {
 		if (event.target.id !== $elk_expand_icon.attr('id'))
 		{
 			event.preventDefault();
@@ -1083,8 +1034,7 @@ function expandThumbLB(thumbID, messageID)
 	});
 
 	// Provide some keyboard navigation
-	$(window).on('keydown.lb', function (event)
-	{
+	$(window).on('keydown.lb', function(event) {
 		event.preventDefault();
 
 		// escape
@@ -1109,8 +1059,7 @@ function expandThumbLB(thumbID, messageID)
 	});
 
 	// Make the image size fluid as the browser window changes
-	$(window).on('resize.lb', function ()
-	{
+	$(window).on('resize.lb', function() {
 		// Account for either a normal or expanded view
 		var $_elk_lb_content = $('#elk_lb_content');
 
@@ -1125,15 +1074,13 @@ function expandThumbLB(thumbID, messageID)
 	});
 
 	// Swipe navigation start, record press x/y
-	$(window).on('touchstart.lb', function (event)
-	{
+	$(window).on('touchstart.lb', function(event) {
 		xDown = event.originalEvent.touches[0].clientX;
 		yDown = event.originalEvent.touches[0].clientY;
 	});
 
 	// Swipe navigation left / right detection
-	$(window).on('touchmove.lb', function (event)
-	{
+	$(window).on('touchmove.lb', function(event) {
 		// No known start point ?
 		if (!xDown || !yDown)
 		{
@@ -1177,7 +1124,7 @@ function expandThumbLB(thumbID, messageID)
  * @param {object} msgids
  * @param {string} text
  */
-function ignore_toggles(msgids, text)
+function ignore_toggles (msgids, text)
 {
 	for (let i = 0; i < msgids.length; i++)
 	{
@@ -1208,7 +1155,7 @@ function ignore_toggles(msgids, text)
  * @param {type} sHeader
  * @param {type} sIcon
  */
-function sendtopicOverlayDiv(desktopURL, sHeader, sIcon)
+function sendtopicOverlayDiv (desktopURL, sHeader, sIcon)
 {
 	// Set up our div details
 	var sAjax_indicator = '<div class="centertext"><i class="icon i-oval"></i></div>',
@@ -1221,16 +1168,14 @@ function sendtopicOverlayDiv(desktopURL, sHeader, sIcon)
 	// Load the send topic overlay div
 	$.ajax({
 		url: desktopURL,
-		type: "GET",
-		dataType: "html"
+		type: 'GET',
+		dataType: 'html'
 	})
-		.done(function (data)
-		{
+		.done(function(data) {
 			var $base_obj = $('<div id="temp_help">').html(data).find('#send_topic'),
 				title = '';
 
-			$base_obj.find('h3').each(function ()
-			{
+			$base_obj.find('h3').each(function() {
 				title = $(this).text();
 				$(this).remove();
 			});
@@ -1240,7 +1185,7 @@ function sendtopicOverlayDiv(desktopURL, sHeader, sIcon)
 
 			// Create the div that we are going to load
 			var oContainer = new elk_Popup({
-				heading: (title !== '' ? title : sHeader),
+				heading: (title === '' ? sHeader : title),
 				content: sAjax_indicator,
 				icon: sIcon
 			});
@@ -1252,8 +1197,7 @@ function sendtopicOverlayDiv(desktopURL, sHeader, sIcon)
 
 			sendtopicForm(oPopup_body, url, oContainer);
 		})
-		.fail(function (xhr, textStatus, errorThrown)
-		{
+		.fail(function(xhr, textStatus, errorThrown) {
 			oPopup_body.html(textStatus);
 		});
 
@@ -1268,7 +1212,7 @@ function sendtopicOverlayDiv(desktopURL, sHeader, sIcon)
  * @param {string} classname
  * @param {boolean} focused
  */
-function addRequiredElem($this_form, classname, focused)
+function addRequiredElem ($this_form, classname, focused)
 {
 	if (typeof focused === 'undefined')
 	{
@@ -1276,10 +1220,8 @@ function addRequiredElem($this_form, classname, focused)
 	}
 
 	$this_form.find('input[name="' + classname + '"]').after($('<span class="requiredfield" />').text(required_field).fadeIn());
-	$this_form.find('input[name="' + classname + '"]').keyup(function ()
-	{
-		$this_form.find('.' + classname + ' .requiredfield').fadeOut(function ()
-		{
+	$this_form.find('input[name="' + classname + '"]').keyup(function() {
+		$this_form.find('.' + classname + ' .requiredfield').fadeOut(function() {
 			$(this).remove();
 		});
 	});
@@ -1298,7 +1240,7 @@ function addRequiredElem($this_form, classname, focused)
  * @param {string} url
  * @param {object} oContainer
  */
-function sendtopicForm(oPopup_body, url, oContainer)
+function sendtopicForm (oPopup_body, url, oContainer)
 {
 	if (typeof (this_body) !== 'undefined')
 	{
@@ -1316,8 +1258,7 @@ function sendtopicForm(oPopup_body, url, oContainer)
 		$this_form.find('input[name="r_email"]').val(recipient_mail);
 	}
 
-	oPopup_body.find('input[name="send"]').on('click', function (event)
-	{
+	oPopup_body.find('input[name="send"]').on('click', function(event) {
 		event.preventDefault();
 
 		var data = $this_form.serialize() + '&send=1',
@@ -1364,8 +1305,7 @@ function sendtopicForm(oPopup_body, url, oContainer)
 			url: url + ';api=xml',
 			data: data
 		})
-			.done(function (request)
-			{
+			.done(function(request) {
 				var oElement = $(request).find('elk')[0],
 					text = null;
 
@@ -1378,10 +1318,8 @@ function sendtopicForm(oPopup_body, url, oContainer)
 					oPopup_body.html(text);
 
 					// Setup the cancel button to end this entire process
-					oPopup_body.find('input[name="cancel"]').each(function ()
-					{
-						$(this).on('click', function (event)
-						{
+					oPopup_body.find('input[name="cancel"]').each(function() {
+						$(this).on('click', function(event) {
 							event.preventDefault();
 							oContainer.hide();
 						});
@@ -1396,10 +1334,8 @@ function sendtopicForm(oPopup_body, url, oContainer)
 						text += '<br /><br /><input type="submit" name="send" value="' + sendtopic_back + '" class="button_submit"/><input type="submit" name="cancel" value="' + sendtopic_close + '" class="button_submit"/>';
 
 						oPopup_body.html(text);
-						oPopup_body.find('input[name="send"]').each(function ()
-						{
-							$(this).on('click', function (event)
-							{
+						oPopup_body.find('input[name="send"]').each(function() {
+							$(this).on('click', function(event) {
 								event.preventDefault();
 								data = $(oPopup_body).find('form').serialize() + '&send=1';
 								sendtopicForm(oPopup_body, url, oContainer);
@@ -1407,10 +1343,8 @@ function sendtopicForm(oPopup_body, url, oContainer)
 						});
 
 						// Cancel means cancel
-						oPopup_body.find('input[name="cancel"]').each(function ()
-						{
-							$(this).on('click', function (event)
-							{
+						oPopup_body.find('input[name="cancel"]').each(function() {
+							$(this).on('click', function(event) {
 								event.preventDefault();
 								oContainer.hide();
 							});
@@ -1424,8 +1358,7 @@ function sendtopicForm(oPopup_body, url, oContainer)
 					}
 				}
 			})
-			.fail(function ()
-			{
+			.fail(function() {
 				oPopup_body.html(sendtopic_error.replace('{href}', url));
 			});
 	});
@@ -1438,9 +1371,9 @@ function sendtopicForm(oPopup_body, url, oContainer)
  * @param {string} direction up / down / reset
  * @param {int} msg_id message id that is being moved
  */
-function topicSplitselect(direction, msg_id)
+function topicSplitselect (direction, msg_id)
 {
-	getXMLDocument(elk_prepareScriptUrl(elk_scripturl) + "action=splittopics;sa=selectTopics;subname=" + topic_subject + ";topic=" + topic_id + "." + start[0] + ";start2=" + start[1] + ";move=" + direction + ";msg=" + msg_id + ";api=xml", onTopicSplitReceived);
+	getXMLDocument(elk_prepareScriptUrl(elk_scripturl) + 'action=splittopics;sa=selectTopics;subname=' + topic_subject + ';topic=' + topic_id + '.' + start[0] + ';start2=' + start[1] + ';move=' + direction + ';msg=' + msg_id + ';api=xml', onTopicSplitReceived);
 
 	return false;
 }
@@ -1450,23 +1383,23 @@ function topicSplitselect(direction, msg_id)
  *
  * @param {xmlCallback} XMLDoc
  */
-function onTopicSplitReceived(XMLDoc)
+function onTopicSplitReceived (XMLDoc)
 {
-	var i,
+	let i,
 		j,
 		pageIndex;
 
 	// Find the selected and not_selected page index containers
 	for (i = 0; i < 2; i++)
 	{
-		pageIndex = XMLDoc.getElementsByTagName("pageIndex")[i];
+		pageIndex = XMLDoc.getElementsByTagName('pageIndex')[i];
 
 		// Update the page container with our xml response
-		document.getElementById("pageindex_" + pageIndex.getAttribute("section")).innerHTML = pageIndex.firstChild.nodeValue;
-		start[i] = pageIndex.getAttribute("startFrom");
+		document.getElementById('pageindex_' + pageIndex.getAttribute('section')).innerHTML = pageIndex.firstChild.nodeValue;
+		start[i] = pageIndex.getAttribute('startFrom');
 	}
 
-	var numChanges = XMLDoc.getElementsByTagName("change").length,
+	var numChanges = XMLDoc.getElementsByTagName('change').length,
 		curChange,
 		curSection,
 		curAction,
@@ -1481,16 +1414,16 @@ function onTopicSplitReceived(XMLDoc)
 	// Loop through all changes ajax returned
 	for (i = 0; i < numChanges; i++)
 	{
-		curChange = XMLDoc.getElementsByTagName("change")[i];
-		curSection = curChange.getAttribute("section");
-		curAction = curChange.getAttribute("curAction");
-		curId = curChange.getAttribute("id");
-		curList = document.getElementById("messages_" + curSection);
+		curChange = XMLDoc.getElementsByTagName('change')[i];
+		curSection = curChange.getAttribute('section');
+		curAction = curChange.getAttribute('curAction');
+		curId = curChange.getAttribute('id');
+		curList = document.getElementById('messages_' + curSection);
 
 		// Remove it from the source list, so we can insert it in the destination list
-		if (curAction === "remove")
+		if (curAction === 'remove')
 		{
-			curList.removeChild(document.getElementById(curSection + "_" + curId));
+			curList.removeChild(document.getElementById(curSection + '_' + curId));
 		}
 		// Insert a message.
 		else
@@ -1499,7 +1432,7 @@ function onTopicSplitReceived(XMLDoc)
 			sInsertBeforeId = null;
 
 			// Loop through the list to try and find an item to insert after.
-			oListItems = curList.getElementsByTagName("li");
+			oListItems = curList.getElementsByTagName('li');
 			for (j = 0; j < oListItems.length; j++)
 			{
 				if (parseInt(oListItems[j].id.substring(curSection.length + 1)) < curId)
@@ -1513,24 +1446,24 @@ function onTopicSplitReceived(XMLDoc)
 			}
 
 			// Let's create a nice container for the message.
-			newItem = document.createElement("li");
-			newItem.className = "";
-			newItem.id = curSection + "_" + curId;
+			newItem = document.createElement('li');
+			newItem.className = '';
+			newItem.id = curSection + '_' + curId;
 			newItem.innerHTML = '' +
 				'<div class="content">' +
 				'   <div class="message_header">' +
-				'       <a class="split_icon float' + (curSection === "selected" ? "left" : "right") + '" href="' + elk_prepareScriptUrl(elk_scripturl) + 'action=splittopics;sa=selectTopics;subname=' + topic_subject + ';topic=' + topic_id + '.' + not_selected_start + ';start2=' + selected_start + ';move=' + (curSection === "selected" ? "up" : "down") + ';msg=' + curId + '" onclick="return topicSplitselect(\'' + (curSection === "selected" ? 'up' : 'down') + '\', ' + curId + ');">' +
-				(curSection === "selected" ? left_arrow : right_arrow) +
+				'       <a class="split_icon float' + (curSection === 'selected' ? 'left' : 'right') + '" href="' + elk_prepareScriptUrl(elk_scripturl) + 'action=splittopics;sa=selectTopics;subname=' + topic_subject + ';topic=' + topic_id + '.' + not_selected_start + ';start2=' + selected_start + ';move=' + (curSection === 'selected' ? 'up' : 'down') + ';msg=' + curId + '" onclick="return topicSplitselect(\'' + (curSection === 'selected' ? 'up' : 'down') + '\', ' + curId + ');">' +
+				(curSection === 'selected' ? left_arrow : right_arrow) +
 				'       </a>' +
-				'       <strong>' + curChange.getElementsByTagName("subject")[0].firstChild.nodeValue + '</strong> ' + txt_by + ' <strong>' + curChange.getElementsByTagName("poster")[0].firstChild.nodeValue + '</strong>' +
+				'       <strong>' + curChange.getElementsByTagName('subject')[0].firstChild.nodeValue + '</strong> ' + txt_by + ' <strong>' + curChange.getElementsByTagName('poster')[0].firstChild.nodeValue + '</strong>' +
 				'       <br />' +
-				'       <em>' + curChange.getElementsByTagName("time")[0].firstChild.nodeValue + '</em>' +
+				'       <em>' + curChange.getElementsByTagName('time')[0].firstChild.nodeValue + '</em>' +
 				'   </div>' +
-				'   <div class="post">' + curChange.getElementsByTagName("body")[0].firstChild.nodeValue + '</div>' +
+				'   <div class="post">' + curChange.getElementsByTagName('body')[0].firstChild.nodeValue + '</div>' +
 				'</div>';
 
 			// So, where do we insert it?
-			if (typeof sInsertBeforeId === "string")
+			if (typeof sInsertBeforeId === 'string')
 			{
 				curList.insertBefore(newItem, document.getElementById(sInsertBeforeId));
 			}
@@ -1559,7 +1492,7 @@ function onTopicSplitReceived(XMLDoc)
  * 		- sRemoveButtonImage: svg icon name from css, like "i-delete",
  * 		- sRemoveButtonConfirm: optional, text to show in a confirm dialog
  */
-function InTopicListModeration(oOptions)
+function InTopicListModeration (oOptions)
 {
 	this.opt = oOptions;
 	this.bButtonsShown = false;
@@ -1569,15 +1502,13 @@ function InTopicListModeration(oOptions)
 	this.init();
 }
 
-InTopicListModeration.prototype.init = function ()
-{
+InTopicListModeration.prototype.init = function() {
 	// fetch all topic[] checkbox elements
-	let eCheckboxes = document.getElementsByName("topics[]"),
+	let eCheckboxes = document.getElementsByName('topics[]'),
 		eSelectAll = document.getElementById('select_all');
 
 	// Bind a click event to each action button
-	eCheckboxes.forEach((eCheck) =>
-	{
+	eCheckboxes.forEach((eCheck) => {
 		eCheck.onclick = this.handleClick.bind(this, eCheck);
 	});
 
@@ -1590,23 +1521,20 @@ InTopicListModeration.prototype.init = function ()
 	// Watch for the select/unselect all click
 	if (eSelectAll !== null)
 	{
-		eSelectAll.addEventListener('change', () =>
-		{
+		eSelectAll.addEventListener('change', () => {
 			this.handleClick();
 		});
 	}
 };
 
 // They clicked a checkbox in the topic listing, show additional button options / counters
-InTopicListModeration.prototype.handleClick = function (oCheckbox)
-{
+InTopicListModeration.prototype.handleClick = function(oCheckbox) {
 	let oButtonStrip = document.getElementById(this.opt.sButtonStrip),
 		eCheckboxes = document.querySelectorAll('input[name="topics[]"]:checked'),
 		aCurrentlySelected = [];
 
 	// Topic array of currently selected (checked) topics
-	eCheckboxes.forEach((check) =>
-	{
+	eCheckboxes.forEach((check) => {
 		aCurrentlySelected.push(parseInt(check.value));
 	});
 
@@ -1620,8 +1548,7 @@ InTopicListModeration.prototype.handleClick = function (oCheckbox)
 	this.iNumSelected = aCurrentlySelected.length;
 
 	// Check each action, update counters to show availability for the selected topics
-	this.opt.aQmActions.forEach((action) =>
-	{
+	this.opt.aQmActions.forEach((action) => {
 		let upperAction = action[0].toUpperCase() + action.substring(1),
 			thisTopics = this.opt['aAction' + upperAction],
 			indicator = 0;
@@ -1651,12 +1578,12 @@ InTopicListModeration.prototype.handleClick = function (oCheckbox)
 				if (buttonAlt !== null)
 				{
 					buttonAlt.text = this.opt['s' + upperAction + 'ButtonLabel'];
-					button.classList.add("hide");
+					button.classList.add('hide');
 				}
 				else
 				{
 					button.text = this.opt['s' + upperAction + 'ButtonLabel'];
-					button.parentElement.classList.add("hide");
+					button.parentElement.classList.add('hide');
 				}
 			}
 			else
@@ -1664,12 +1591,12 @@ InTopicListModeration.prototype.handleClick = function (oCheckbox)
 				if (buttonAlt !== null)
 				{
 					buttonAlt.textContent = this.opt['s' + upperAction + 'ButtonLabel'] + ' [' + indicator + ']';
-					button.classList.remove("hide");
+					button.classList.remove('hide');
 				}
 				else
 				{
 					button.text = this.opt['s' + upperAction + 'ButtonLabel'] + ' [' + indicator + ']';
-					button.parentElement.classList.remove("hide");
+					button.parentElement.classList.remove('hide');
 				}
 			}
 		}
@@ -1680,11 +1607,11 @@ InTopicListModeration.prototype.handleClick = function (oCheckbox)
 		oButtonStrip.querySelector('#restore_button_text').innerHTML = this.opt.sRestoreButtonLabel + ' [' + this.iNumSelected + ']';
 		if (this.iNumSelected < 1)
 		{
-			oButtonStrip.querySelector('#restore_button').classList.add("hide");
+			oButtonStrip.querySelector('#restore_button').classList.add('hide');
 		}
 		else
 		{
-			oButtonStrip.querySelector('#restore_button').classList.remove("hide");
+			oButtonStrip.querySelector('#restore_button').classList.remove('hide');
 		}
 	}
 
@@ -1705,10 +1632,8 @@ InTopicListModeration.prototype.handleClick = function (oCheckbox)
 };
 
 // Add / modifying buttons as defined in the options
-InTopicListModeration.prototype.addButtons = function ()
-{
-	this.opt.aQmActions.forEach((action) =>
-	{
+InTopicListModeration.prototype.addButtons = function() {
+	this.opt.aQmActions.forEach((action) => {
 		let sUpperAction = action[0].toUpperCase() + action.substring(1),
 			bCheck = document.getElementById('button_strip_' + action);
 
@@ -1759,8 +1684,7 @@ InTopicListModeration.prototype.addButtons = function ()
 };
 
 // Called when the user clicks one of the buttons that we added
-InTopicListModeration.prototype.handleSubmit = function (sSubmitType)
-{
+InTopicListModeration.prototype.handleSubmit = function(sSubmitType) {
 	// Make sure this form isn't submitted in another way than this function.
 	let oForm = document.getElementById(this.opt.sFormId),
 		oInput = document.getElementById('qaction'),

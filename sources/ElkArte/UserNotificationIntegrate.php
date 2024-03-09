@@ -11,10 +11,10 @@
  *
  */
 
-namespace ElkArte\Notifications;
+namespace ElkArte;
 
 use ElkArte\Helper\HttpReq;
-use ElkArte\User;
+use ElkArte\Notifications\UserNotification;
 
 /**
  * Class UserNotificationIntegrate

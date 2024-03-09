@@ -931,7 +931,8 @@ function profileLoadAvatarData()
 		$context['member']['avatar'] += array(
 			'choice' => 'upload',
 			'server_pic' => 'blank.png',
-			'external' => $schema
+			'external' => '',
+			'placeholder' => $schema
 		);
 
 		$context['member']['avatar'] += array(
@@ -956,11 +957,11 @@ function profileLoadAvatarData()
 			'external' => 'https://'
 		);
 	}
-	elseif ($cur_profile['avatar']['name'] != '' && FileFunctions::instance()->fileExists($modSettings['avatar_directory'] . '/' . $cur_profile['avatar']['name']) && $context['member']['avatar']['allow_server_stored'])
+	elseif ($cur_profile['avatar']['name'] !== '' && FileFunctions::instance()->fileExists($modSettings['avatar_directory'] . '/' . $cur_profile['avatar']['name']) && $context['member']['avatar']['allow_server_stored'])
 	{
 		$context['member']['avatar'] += array(
 			'choice' => 'server_stored',
-			'server_pic' => $cur_profile['avatar']['name'] === '' ? 'blank.png' : $cur_profile['avatar']['name'],
+			'server_pic' => $cur_profile['avatar']['name'],
 			'external' => $schema
 		);
 	}

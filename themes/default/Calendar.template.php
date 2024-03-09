@@ -75,7 +75,7 @@ function template_unlinked_event_post()
 
 	// Start the javascript for drop down boxes...
 	echo '
-		<form action="', getUrl('action', ['action' => 'calendar', 'sa' => 'post']), '" method="post" name="postevent" accept-charset="UTF-8" onsubmit="submitonce(this);smc_saveEntities(\'postevent\', [\'evtitle\']);">';
+		<form action="', getUrl('action', ['action' => 'calendar', 'sa' => 'post']), '" method="post" name="postevent" accept-charset="UTF-8" onsubmit="submitonce(this);elk_saveEntities(\'postevent\', [\'evtitle\']);">';
 
 	if (!empty($context['event']['new']))
 	{

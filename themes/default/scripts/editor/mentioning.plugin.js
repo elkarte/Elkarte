@@ -70,6 +70,13 @@ var disableDrafts = false;
 						return;
 					}
 
+					// We allow spaces in the mention name, but stop after 2
+					let spaces = query.match(/ /g);
+					if (spaces && spaces.length > 1)
+					{
+						return;
+					}
+
 					// No slamming the server either
 					let current_call = Math.round(new Date().getTime());
 					if (oMentions.opts._last_call !== 0 && oMentions.opts._last_call + 150 > current_call)
@@ -207,12 +214,13 @@ var disableDrafts = false;
 			let postString = serialize(obj) + "&" + elk_session_var + "=" + elk_session_id;
 
 			oMentions.opts._names = [];
-			fetch(elk_scripturl + "?action=suggest;api=xml", {
+			fetch(elk_prepareScriptUrl(elk_scripturl) + "action=suggest;api=xml", {
 				method: "POST",
 				body: postString,
 				headers: {
 					'X-Requested-With': 'XMLHttpRequest',
-					'Content-Type': 'application/x-www-form-urlencoded'
+					'Content-Type': 'application/x-www-form-urlencoded',
+					'Accept': 'application/xml'
 				}
 			})
 				.then(response => {
@@ -231,13 +239,12 @@ var disableDrafts = false;
 							"name": item.textContent
 						};
 					});
-					console.log(callback);
 					callback();
 				})
 				.catch(function (error) {
 					if ('console' in window && console.info)
 					{
-						window.console.info('Error: ', error.message);
+						console.info('Error: ', error.message);
 					}
 					callback();
 				});
