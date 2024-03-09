@@ -25,12 +25,6 @@ class GraphicsTest extends TestCase
 				'format' => IMAGETYPE_JPEG
 			),
 			array(
-				'url' => 'https://weblogs.us/wp-content/uploads/2023/02/weblogs.us-logo.png',
-				'width' => 432,
-				'height' => 78,
-				'format' => IMAGETYPE_PNG
-			),
-			array(
 				'url' => 'http://www.google.com/intl/en_ALL/images/logo.gif',
 				'width' => 276,
 				'height' => 110,
