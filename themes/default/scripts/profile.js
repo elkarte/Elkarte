@@ -13,29 +13,6 @@
  * This file contains javascript associated with the user profile
  */
 
-$(function ()
-{
-	// Profile options changing karma
-	$('#karma_good, #karma_bad').on('keyup', function ()
-	{
-		var good = parseInt($('#karma_good').val()),
-			bad = parseInt($('#karma_bad').val());
-
-		$('#karmaTotal').text((isNaN(good) ? 0 : good) - (isNaN(bad) ? 0 : bad));
-	});
-	$('.toggle_notify').on('change', function ()
-	{
-		if (this.checked)
-		{
-			$('#' + this.id + '_method').fadeIn('fast');
-		}
-		else
-		{
-			$('#' + this.id + '_method').fadeOut('fast');
-		}
-	}).trigger('change');
-});
-
 /**
  * Profile tabs (summary, recent, buddy), for use with jqueryUI
  */
@@ -57,8 +34,8 @@ function start_tabs()
 				ui.panel.html('<div></div>');
 				if ('console' in window && console.info)
 				{
-					window.console.info(textStatus);
-					window.console.info(errorThrown);
+					console.info(textStatus);
+					console.info(errorThrown);
 				}
 			});
 		}
@@ -70,11 +47,10 @@ function start_tabs()
  *
  * @param {string} currentTime
  */
-var localTime = new Date();
-
 function autoDetectTimeOffset(currentTime)
 {
-	var serverTime;
+	let localTime = new Date(),
+		serverTime;
 
 	if (typeof (currentTime) !== 'string')
 	{
@@ -92,7 +68,7 @@ function autoDetectTimeOffset(currentTime)
 	}
 
 	// Get the difference between the two, set it up so that the sign will tell us who is ahead of who.
-	var diff = Math.round((localTime.getTime() - serverTime.getTime()) / 3600000);
+	let diff = Math.round((localTime.getTime() - serverTime.getTime()) / 3600000);
 
 	// Make sure we are limiting this to one day's difference.
 	diff %= 24;
@@ -101,49 +77,63 @@ function autoDetectTimeOffset(currentTime)
 }
 
 /**
- * Calculates the number of available characters remaining when filling in the
- * signature box
+ * Calculates the number of available characters remaining when filling in the signature box
  */
-let oldSignature = "";
-function calcCharLeft(init)
+function calcCharLeft(init, event = {})
 {
-	var currentSignature = document.forms.creator.signature.value,
+	let currentSignature = document.forms.creator.signature.value,
 		currentChars = 0;
 
-	if (!document.getElementById("signatureLeft"))
+	if (!document.getElementById('signatureLeft'))
 	{
 		return;
 	}
 
 	init = typeof init !== 'undefined' ? init : false;
 
-	if (oldSignature !== currentSignature)
+	currentChars = currentSignature.replace(/\r/, "").length;
+
+	if (currentChars > maxLength)
 	{
-		oldSignature = currentSignature;
-		currentChars = currentSignature.replace(/\r/, "").length;
+		document.getElementById("signatureLeft").className = "error";
+	}
+	else
+	{
+		document.getElementById("signatureLeft").className = "";
+	}
 
-		if (currentChars > maxLength)
+	let profileError = document.getElementById('profile_error');
+	if (currentChars > maxLength && window.getComputedStyle(profileError).display !== 'none')
+	{
+		ajax_getSignaturePreview(false);
+	}
+	// Only hide it if the only errors were signature errors...
+	// @todo with so many possible signature errors, this needs to be enhanced
+	else if (currentChars <= maxLength && window.getComputedStyle(profileError).display !== 'none' && !init)
+	{
+		// Check if #list_errors element exist
+		let errorList = document.getElementById('list_errors');
+		if (errorList)
 		{
-			document.getElementById("signatureLeft").className = "error";
-		}
-		else
-		{
-			document.getElementById("signatureLeft").className = "";
-		}
+			// Remove any signature errors
+			let signatureErrors = errorList.querySelectorAll('.signature_error');
+			signatureErrors.forEach(function (elem) {
+				errorList.removeChild(elem);
+			});
 
-		let $_profile_error = $("#profile_error");
-		if (currentChars > maxLength && !$_profile_error.is(":visible"))
-		{
-			ajax_getSignaturePreview(false);
-		}
-		else if (currentChars <= maxLength && $_profile_error.is(":visible") && !init)
-		{
-			$_profile_error.css({display: "none"});
-			$_profile_error.html('');
+			let listItems = errorList.querySelectorAll('li');
+			if (listItems.length === 0)
+			{
+				if (profileError)
+				{
+					profileError.style.display = "none";
+					profileError.innerHTML = '';
+				}
+			}
 		}
 	}
 
-	document.getElementById("signatureLeft").innerHTML = maxLength - currentChars;
+	document.getElementById('signatureLeft').innerHTML = maxLength - currentChars;
 }
 
 /**
@@ -154,63 +144,98 @@ function calcCharLeft(init)
 function ajax_getSignaturePreview(showPreview)
 {
 	showPreview = (typeof showPreview === 'undefined') ? false : showPreview;
-	$.ajax({
-		type: "POST",
-		url: elk_scripturl + "?action=XmlPreview;api=xml",
-		data: {item: "sig_preview", signature: $("#signature").val(), user: $('input[name="u"]').attr("value")},
-		context: document.body
+
+	let postData = serialize({
+		item: 'sig_preview',
+		signature: document.getElementById('signature').value,
+		user: document.querySelector('input[name="u"]').value
+	});
+
+	let profileError = document.getElementById('profile_error'),
+		profileErrorVisible = window.getComputedStyle(profileError).display !== 'none';
+
+	fetch(elk_prepareScriptUrl(elk_scripturl) + 'action=XmlPreview;api=xml', {
+		method: 'POST',
+		body: postData,
+		headers: {
+			'X-Requested-With': 'XMLHttpRequest',
+			'Content-Type': 'application/x-www-form-urlencoded',
+			'Accept': 'application/xml'
+		}
 	})
-		.done(function (request)
-		{
-			var i = 0;
+		.then(response => {
+			if (!response.ok)
+			{
+				throw new Error("HTTP error " + response.status);
+			}
+			return response.text();
+		})
+		.then(request => {
+			let parser = new DOMParser(),
+				xmlDoc = parser.parseFromString(request, "text/xml");
 
 			if (showPreview)
 			{
-				var signatures = ["current", "preview"];
-				for (i = 0; i < signatures.length; i++)
+				let signatures = ['current', 'preview'];
+				for (let i = 0; i < signatures.length; i++)
 				{
-					$("#" + signatures[i] + "_signature").css({display: "block"});
-					$("#" + signatures[i] + "_signature_display").css({display: "block"}).html($(request).find('[type="' + signatures[i] + '"]').text() + '<hr />');
+					document.getElementById(signatures[i] + "_signature").style.display = "block";
+					document.getElementById(signatures[i] + "_signature_display").style.display = "block";
+					document.getElementById(signatures[i] + "_signature_display").innerHTML = xmlDoc.querySelector('[type="' + signatures[i] + '"]').textContent + '<hr>';
 				}
-
-				$('.spoilerheader').on('click', function ()
-				{
-					$(this).next().children().slideToggle("fast");
-				});
 			}
 
-			var $_profile_error = $("#profile_error");
-
-			if ($(request).find("error").text() !== '')
+			let errorElement = xmlDoc.querySelector('error');
+			if (errorElement)
 			{
-				if (!$_profile_error.is(":visible"))
+				// Populate and show the hidden profile_error div
+				if (!profileErrorVisible)
 				{
-					$_profile_error.css({
-						display: "",
-						position: "fixed",
-						top: 0,
-						left: 0,
-						width: "100%",
-						'z-index': '100'
-					});
+					profileError.innerHTML = '<span>' + xmlDoc.querySelector('[type="errors_occurred"]').textContent + '</span><ul id="list_errors"></ul>';
+					profileError.style.display = 'block';
+				}
+				else
+				{
+					let list_errors = document.getElementById('list_errors'),
+						errors = list_errors.querySelectorAll('.signature_error');
+
+					errors.forEach(error => error.remove());
 				}
 
-				var errors = $(request).find('[type="error"]'),
-					errors_html = '<span>' + $(request).find('[type="errors_occurred"]').text() + '</span><ul>';
+				let errors = xmlDoc.querySelectorAll('[type="error"]'),
+					errors_list = '';
 
-				for (i = 0; i < errors.length; i++)
-					errors_html += '<li>' + $(errors).text() + '</li>';
-
-				errors_html += '</ul>';
-				$(document).find("#profile_error").html(errors_html);
+				errors.forEach(error => {
+					errors_list += '<li class="signature_error">' + error.textContent + '</li>';
+				});
+				document.getElementById("list_errors").innerHTML = errors_list;
 			}
+			// No errors, clear any previous signature related ones
 			else
 			{
-				$_profile_error.css({display: "none"});
-				$_profile_error.html('');
+				let list_error = document.getElementById('list_errors');
+				if (list_error)
+				{
+					let errors = list_error.querySelectorAll('.signature_error');
+
+					errors.forEach(error => error.remove());
+
+					// Nothing remaining, hide and clear the profile_error div
+					if (!list_error.hasChildNodes())
+					{
+						profileError.style.display = 'none';
+						profileError.innerHTML = '';
+					}
+				}
 			}
 
 			return false;
+		})
+		.catch((error) => {
+			if ('console' in window && console.info)
+			{
+				console.info('Error: ', error);
+			}
 		});
 
 	return false;
@@ -219,7 +244,7 @@ function ajax_getSignaturePreview(showPreview)
 /**
  * Allows previewing of server stored avatars.
  *
- * @param {type} selected
+ * @param {string} selected
  */
 function changeSel(selected)
 {
@@ -298,17 +323,23 @@ function init_avatars()
 // Show the right avatar based on what radio button they just selected
 function swap_avatar()
 {
-	$('#avatar_choices').find('input').each(function ()
-	{
-		var choice_id = $(this).attr('id');
+	let nodeList = document.querySelectorAll('#avatar_choices input'),
+		inputs = Array.from(nodeList),
+		choice;
 
-		if ($(this).is(':checked'))
+	inputs.forEach(function (input) {
+		choice = document.getElementById(input.id.replace('_choice', ''));
+
+		if (choice !== null)
 		{
-			$('#' + choice_id.replace('_choice', '')).css({display: 'block'});
-		}
-		else
-		{
-			$('#' + choice_id.replace('_choice', '')).css({display: 'none'});
+			if (input.checked)
+			{
+				choice.style.display = 'block';
+			}
+			else
+			{
+				choice.style.display = 'none';
+			}
 		}
 	});
 
@@ -325,38 +356,44 @@ function showAvatar()
 		return;
 	}
 
-	var oAvatar = document.getElementById("avatar");
+	let oAvatar = document.getElementById('avatar');
 
 	oAvatar.src = avatardir + file.options[file.selectedIndex].value;
 	oAvatar.alt = file.options[file.selectedIndex].text;
-	oAvatar.style.width = "";
-	oAvatar.style.height = "";
+	oAvatar.style.width = '';
+	oAvatar.style.height = '';
 }
 
 /**
- * Allows for the previewing of an externally stored avatar
+ * Allows for the previewing of an externally stored avatar.
+ *
+ * Sets an error if the image is over size limits
  *
  * @param {string} src
  */
 function previewExternalAvatar(src)
 {
-	var oSid = document.getElementById("external");
+	let oSid = document.getElementById('external');
 
 	// Assign the source to the image tag
 	oSid.src = src;
 
-	// Create an in-memory element to measure the real size of the image
-	$('<img />').on('load', function ()
-	{
-		if (refuse_too_large && ((maxWidth !== 0 && this.width > maxWidth) || (maxHeight !== 0 && this.height > maxHeight)))
+	// Create a new image element
+	let img = new Image();
+	img.onload = function () {
+		// You have access to naturalWidth and naturalHeight here
+		if (refuse_too_large &&
+			((maxWidth !== 0 && this.naturalWidth > maxWidth) || (maxHeight !== 0 && this.naturalHeight > maxHeight)))
 		{
-			$('#avatar_external').addClass('error');
+			document.getElementById('avatar_external').classList.add('error');
 		}
 		else
 		{
-			$('#avatar_external').removeClass('error');
+			document.getElementById('avatar_external').classList.remove('error');
 		}
-	}).attr('src', src);
+	};
+
+	img.src = src;
 }
 
 /**
@@ -385,61 +422,88 @@ function previewUploadedAvatar(src)
 }
 
 /**
- * Disable notification boxes as required.  This is in response to selecting the
- * notify user checkbox in the issue a warning screen
+ * This function modifies the behavior of the warning notification feature.
+ * It enables or disables certain elements based on the checked state of the 'warn_notify' checkbox.
+ * It handles the warning template preview
+ *
+ * @returns {boolean} - Returns 'false' to prevent the default behavior of the event.
  */
 function modifyWarnNotify()
 {
-	var disable = !document.getElementById('warn_notify').checked;
+	let disable = !document.getElementById('warn_notify').checked;
 
 	document.getElementById('warn_sub').disabled = disable;
 	document.getElementById('warn_body').disabled = disable;
 	document.getElementById('warn_temp').disabled = disable;
 	document.getElementById('new_template_link').style.display = disable ? 'none' : 'inline-block';
+
 	document.getElementById('preview_button').style.display = disable ? 'none' : 'inline-block';
+	document.getElementById('preview_button').addEventListener('click', (event) => {
+		event.preventDefault();
+		let postData = serialize({
+			'item': 'warning_preview',
+			'title': document.getElementById('warn_sub').value,
+			'body': document.getElementById('warn_body').value,
+			'issuing': 'true'
+		});
 
-	$("#preview_button").on('click', function ()
-	{
-		$.ajax({
-			type: "POST",
-			url: elk_scripturl + "?action=XmlPreview;api=xml",
-			data: {
-				item: "warning_preview",
-				title: $("#warn_sub").val(),
-				body: $("#warn_body").val(),
-				issuing: true
-			},
-			context: document.body
+		fetch(elk_prepareScriptUrl(elk_scripturl) + 'action=XmlPreview;api=xml', {
+			method: 'POST',
+			body: postData,
+			headers: {
+				'X-Requested-With': 'XMLHttpRequest',
+				'Content-Type': 'application/x-www-form-urlencoded',
+				'Accept': 'application/xml'
+			}
 		})
-			.done(function (request)
-			{
-				var $_preview = $("#box_preview"),
-					$_profile_error = $("#profile_error");
-
-				$_preview.show();
-				$_preview.html($(request).find('body').text());
-
-				if ($(request).find("error").text() !== '')
+			.then(response => {
+				if (!response.ok)
 				{
-					$_profile_error.show();
-					var errors_html = '<span>' + $_profile_error.find("span").html() + '</span>' + '<ul class="list_errors">';
+					throw new Error("HTTP error " + response.status);
+				}
+				return response.text();
+			})
+			.then(text => new DOMParser().parseFromString(text, 'text/xml'))
+			.then(request => {
+				let preview = document.getElementById('box_preview'),
+					preview_body = document.getElementById('body_preview'),
+					profile_error = document.getElementById('profile_error'),
+					errorNodeList = request.getElementsByTagName('error'),
+					errors = Array.from(errorNodeList);
 
-					$(request).find('error').each(function ()
-					{
-						errors_html += '<li>' + $(this).text() + '</li>';
+				// Show the preview area and populate the text
+				preview.style.display = 'block';
+				preview_body.innerHTML = request.getElementsByTagName('body')[0].textContent;
+
+				if (errors.length)
+				{
+					profile_error.style.display = 'block';
+
+					let errors_html = '<span>' + profile_error.querySelector("span").innerHTML + '</span><ul class="list_errors">';
+					errors.forEach(error => {
+						errors_html += '<li>' + error.textContent + '</li>';
 					});
 					errors_html += '</ul>';
-					$_profile_error.html(errors_html);
-					$('html, body').animate({scrollTop: $_profile_error.offset().top}, 'slow');
+
+					profile_error.innerHTML = errors_html;
+					window.scrollTo({top: profile_error.offsetTop, behavior: 'smooth'});
 				}
 				else
 				{
-					$_profile_error.hide();
-					$("#error_list").html('');
-					$('html, body').animate({scrollTop: $("#box_preview").offset().top}, 'slow');
+					profile_error.style.display = 'none';
+					let errorList = document.getElementById('error_list');
+					if (errorList)
+						errorList.innerHTML = '';
+					window.scrollTo({top: preview.offsetTop, behavior: 'smooth'});
 				}
 
 				return false;
+			})
+			.catch(error => {
+				if ('console' in window && console.error)
+				{
+					console.error('Error : ', error);
+				}
 			});
 
 		return false;
@@ -448,7 +512,7 @@ function modifyWarnNotify()
 
 /**
  * onclick function, triggered in response to selecting + or - in the warning screen
- * Increases the warning level by a defined amount
+ * Increases the warning level by a defined amount.  Uses jqueryUI
  *
  * @param {string} sliderID
  * @param {string} levelID
@@ -503,10 +567,10 @@ function initWarnSlider(sliderID, levelID, levels)
 		}
 	}).slider("value", $_levelID.val());
 
-	// Just in case someone wants to type, let's keep the two in synch
+	// Just in case someone wants to type, let's keep the two in sync
 	$_levelID.on('keyup', function ()
 	{
-		var val = Math.max(0, Math.min(100, $(this).val()));
+		let val = Math.max(0, Math.min(100, $(this).val()));
 
 		$_sliderID.slider("value", val);
 	});
@@ -517,7 +581,7 @@ function initWarnSlider(sliderID, levelID, levels)
  */
 function populateNotifyTemplate()
 {
-	var index = document.getElementById('warn_temp').value;
+	let index = document.getElementById('warn_temp').value;
 
 	// No selection means no template
 	if (index === -1)
@@ -526,7 +590,7 @@ function populateNotifyTemplate()
 	}
 
 	// Otherwise see what we can do...
-	for (var key in templates)
+	for (let key in templates)
 	{
 		// Found the template, load it and stop
 		if (index === key)
