@@ -418,11 +418,16 @@ class ManageServer extends AbstractController
 
 		// Some javascript to enable / disable certain settings if the option is not selected
 		theme()->addInlineJavascript('
-			var cache_type = document.getElementById(\'cache_accelerator\');
+			let cache_type = document.getElementById(\'cache_accelerator\');
 
+			cache_type.addEventListener("change", showCache);
+			
 			createEventListener(cache_type);
 			cache_type.addEventListener("change", toggleCache);
-			toggleCache();', true);
+			
+			let event = new Event("change");
+			cache_type.dispatchEvent(event);
+			', true);
 
 		$context['post_url'] = getUrl('admin', ['action' => 'admin', 'area' => 'serversettings', 'sa' => 'cache', 'save']);
 		$context['settings_title'] = $txt['caching_settings'];

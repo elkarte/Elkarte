@@ -523,7 +523,7 @@ class ManageBans extends AbstractController
 		);
 
 		// And a bit of javascript to enable/disable some fields
-		theme()->addInlineJavascript('window.addEventListener("load", fUpdateStatus);', true);
+		theme()->addInlineJavascript('fUpdateStatus();', true);
 	}
 
 	/**

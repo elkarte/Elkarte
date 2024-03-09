@@ -363,6 +363,10 @@ function template_registration_form()
 		</form>
 
 		<script>
+			document.getElementById("agreement_lang").addEventListener("change", function (event) {
+				registerAgreementLanguageLoad(event);
+			});
+
 			var regTextStrings = {
 				"username_valid": "', $txt['registration_username_available'], '",
 				"username_invalid": "', $txt['registration_username_unavailable'], '",

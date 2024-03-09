@@ -189,8 +189,7 @@ class ManageFeatures extends AbstractController
 			}
 
 			// If they have changed Hive settings, lets clear them to avoid issues
-			if (empty($modSettings['combine_css_js']) !== empty($this->_req->post->combine_css_js)
-				|| empty($modSettings['minify_css_js']) !== empty($this->_req->post->minify_css_js))
+			if (empty($modSettings['minify_css_js']) !== empty($this->_req->post->minify_css_js))
 			{
 				theme()->cleanHives();
 			}
@@ -202,7 +201,7 @@ class ManageFeatures extends AbstractController
 			redirectexit('action=admin;area=featuresettings;sa=basic');
 		}
 
-		if (isset($this->_req->post->cleanhives))
+		if (isset($this->_req->post->cleanhives) && $this->getApi() === 'json')
 		{
 			$clean_hives_result = theme()->cleanHives();
 
@@ -243,7 +242,6 @@ class ManageFeatures extends AbstractController
 			// Javascript and CSS options
 			array('select', 'jquery_source', array('auto' => $txt['jquery_auto'], 'local' => $txt['jquery_local'], 'cdn' => $txt['jquery_cdn'])),
 			array('check', 'minify_css_js', 'postinput' => '<a href="#" id="clean_hives" class="linkbutton">' . $txt['clean_hives'] . '</a>'),
-			array('check', 'combine_css_js'),
 			'',
 			// Number formatting, timezones.
 			array('text', 'time_format'),
@@ -279,6 +277,9 @@ class ManageFeatures extends AbstractController
 				$config_vars['default_timezone'][2][$zone] = $zone;
 			}
 		}
+
+		theme()->addInlineJavascript('
+			document.getElementById("clean_hives").addEventListener("click", function(event) {return cleanHives(event);});', ['defer' => true]);
 
 		call_integration_hook('integrate_modify_basic_settings', array(&$config_vars));
 

@@ -79,7 +79,8 @@ function create_control_richedit($editorOptions)
 			'editor/jquery.sceditor.bbcode.min.js',
 			'editor/jquery.sceditor.elkarte.js',
 			'post.js',
-			'editor/dropAttachments.js'
+			'editor/dropAttachments.js',
+			'editor/ilaAttachments.js'
 		]);
 
 		theme()->addJavascriptVar([

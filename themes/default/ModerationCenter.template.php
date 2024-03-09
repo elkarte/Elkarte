@@ -683,10 +683,14 @@ function template_warn_template()
 	</form>
 
 	<script>
-		$(function() {
-			$("#preview_button").on("click", function() {
-				return ajax_getTemplatePreview();
-			});
+		document.addEventListener("DOMContentLoaded", function () {
+		    let button = document.getElementById("preview_button");
+		    if (button) 
+			{
+		        button.addEventListener("click", function() {
+		            return ajax_getTemplatePreview();
+		        });
+		    }
 		});
 	</script>';
 }

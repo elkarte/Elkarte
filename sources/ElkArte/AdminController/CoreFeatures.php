@@ -74,7 +74,7 @@ class CoreFeatures extends AbstractController
 
 		$this->loadGeneralSettingParameters();
 
-		$api = $this->_req->getQuery('api', 'trim', '');
+		$api = $this->getApi();
 
 		// Are we saving?
 		if (isset($this->_req->post->save))
@@ -130,12 +130,14 @@ class CoreFeatures extends AbstractController
 			'description' => 'core_settings_desc',
 		]);
 
-		theme()->addJavascriptVar(array(
-			'token_name' => '',
-			'token_value' => '',
-			'feature_on_text' => $txt['core_settings_switch_off'],
-			'feature_off_text' => $txt['core_settings_switch_on']
-		), true);
+		theme()->addJavascriptVar([
+			'token_name' => JavaScriptEscape(''),
+			'token_value' => JavaScriptEscape(''),
+			'feature_on_text' => JavaScriptEscape($txt['core_settings_switch_off']),
+			'feature_off_text' => JavaScriptEscape($txt['core_settings_switch_on'])
+		]);
+
+		theme()->addInlineJavascript('window.addEventListener("load", (event) => {coreFeatures(event);})', ['defer' => true]);
 
 		// We love our tokens.
 		createToken('admin-core');

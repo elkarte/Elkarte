@@ -319,7 +319,7 @@ class Theme extends BaseTheme
 		global $settings, $context, $modSettings, $scripturl, $txt, $options;
 
 		// Queue our Javascript
-		loadJavascriptFile(['script.js', 'script_elk.js']);
+		loadJavascriptFile(['script.js', 'script_elk.js', 'elk_menu.js']);
 		loadJavascriptFile(['elk_jquery_plugins.js', 'theme.js'], ['defer' => true]);
 
 		// Default JS variables for use in every theme
@@ -329,7 +329,6 @@ class Theme extends BaseTheme
 			'elk_images_url' => JavaScriptEscape($settings['images_url']),
 			'elk_smiley_url' => JavaScriptEscape($modSettings['smileys_url']),
 			'elk_scripturl' => "'" . $scripturl . "'",
-			'elk_iso_case_folding' => detectServer()->is('iso_case_folding') ? 'true' : 'false',
 			'elk_charset' => '"UTF-8"',
 			'elk_session_id' => JavaScriptEscape($context['session_id']),
 			'elk_session_var' => JavaScriptEscape($context['session_var']),
