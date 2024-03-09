@@ -198,7 +198,7 @@ class ManagePosts extends AbstractController
 		createToken('admin-censor');
 
 		// Using ajax?
-		if (isset($this->_req->query->xml, $this->_req->post->censortest))
+		if (isset($this->_req->post->censortest) && $this->getApi() === 'json')
 		{
 			// Clear the templates
 			$template_layers = theme()->getLayers();
