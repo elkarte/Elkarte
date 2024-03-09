@@ -108,10 +108,10 @@ function template_modify_subscription()
 					</dd>
 				</dl>
 				<hr />
-				<input type="radio" name="duration_type" id="duration_type_fixed" value="fixed" ', empty($context['sub']['duration']) || $context['sub']['duration'] == 'fixed' ? 'checked="checked"' : '', ' onclick="toggleDuration(\'fixed\');" />
+				<input type="radio" name="duration_type" id="duration_type_fixed" value="fixed" ', empty($context['sub']['duration']) || $context['sub']['duration'] === 'fixed' ? 'checked="checked"' : '', ' onclick="toggleDuration();" />
 				<strong>', $txt['paid_mod_fixed_price'], '</strong>
 				<br />
-				<div id="fixed_area" ', empty($context['sub']['duration']) || $context['sub']['duration'] == 'fixed' ? '' : 'class="hide"', '>
+				<div id="fixed_area" ', empty($context['sub']['duration']) || $context['sub']['duration'] === 'fixed' ? '' : 'class="hide"', '>
 					<fieldset>
 						<dl class="settings">
 							<dt>
@@ -126,19 +126,19 @@ function template_modify_subscription()
 							<dd>
 								<input type="text" id="span_value" name="span_value" value="', $context['sub']['span']['value'], '" size="4" class="input_text" />
 								<select name="span_unit">
-									<option value="D" ', $context['sub']['span']['unit'] == 'D' ? 'selected="selected"' : '', '>', $txt['paid_mod_span_days'], '</option>
-									<option value="W" ', $context['sub']['span']['unit'] == 'W' ? 'selected="selected"' : '', '>', $txt['paid_mod_span_weeks'], '</option>
-									<option value="M" ', $context['sub']['span']['unit'] == 'M' ? 'selected="selected"' : '', '>', $txt['paid_mod_span_months'], '</option>
-									<option value="Y" ', $context['sub']['span']['unit'] == 'Y' ? 'selected="selected"' : '', '>', $txt['paid_mod_span_years'], '</option>
+									<option value="D" ', $context['sub']['span']['unit'] === 'D' ? 'selected="selected"' : '', '>', $txt['paid_mod_span_days'], '</option>
+									<option value="W" ', $context['sub']['span']['unit'] === 'W' ? 'selected="selected"' : '', '>', $txt['paid_mod_span_weeks'], '</option>
+									<option value="M" ', $context['sub']['span']['unit'] === 'M' ? 'selected="selected"' : '', '>', $txt['paid_mod_span_months'], '</option>
+									<option value="Y" ', $context['sub']['span']['unit'] === 'Y' ? 'selected="selected"' : '', '>', $txt['paid_mod_span_years'], '</option>
 								</select>
 							</dd>
 						</dl>
 					</fieldset>
 				</div>
-				<input type="radio" name="duration_type" id="duration_type_flexible" value="flexible" ', !empty($context['sub']['duration']) && $context['sub']['duration'] == 'flexible' ? 'checked="checked"' : '', ' onclick="toggleDuration(\'flexible\');" />
+				<input type="radio" name="duration_type" id="duration_type_flexible" value="flexible" ', !empty($context['sub']['duration']) && $context['sub']['duration'] === 'flexible' ? 'checked="checked"' : '', ' onclick="toggleDuration();" />
 				<strong>', $txt['paid_mod_flexible_price'], '</strong>
 				<br />
-				<div id="flexible_area" ', !empty($context['sub']['duration']) && $context['sub']['duration'] == 'flexible' ? '' : 'class="hide"', '>
+				<div id="flexible_area" ', !empty($context['sub']['duration']) && $context['sub']['duration'] === 'flexible' ? '' : 'class="hide"', '>
 					<fieldset>';
 
 	/** Removed until implemented
@@ -355,9 +355,9 @@ function template_modify_user_subscription()
 		</form>';
 
 	theme()->addInlineJavascript('
-		isFunctionLoaded("smc_AutoSuggest").then((available) => { 
+		isFunctionLoaded("elk_AutoSuggest").then((available) => { 
 		if (available) {
-			new smc_AutoSuggest({
+			new elk_AutoSuggest({
 				sSessionId: elk_session_id,
 				sSessionVar: elk_session_var,
 				sSuggestId: \'name_subscriber\',
