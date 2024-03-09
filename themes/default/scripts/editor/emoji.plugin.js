@@ -146,7 +146,7 @@ var disableDrafts = false;
 					{
 						if ('console' in window && console.info)
 						{
-							window.console.info(_error);
+							console.info(_error);
 						}
 
 						return "";
@@ -351,7 +351,7 @@ var disableDrafts = false;
 					document.head.append(inlineScript);
 					if ('console' in window && console.info)
 					{
-						window.console.info('custom_tags.js file missing or in error');
+						console.info('custom_tags.js file missing or in error');
 					}
 				}
 			})
@@ -383,7 +383,7 @@ var disableDrafts = false;
 			error => {
 				if ('console' in window && console.info)
 				{
-					window.console.info(`Error: ${error.message}`);
+					console.info(`Error: ${error.message}`);
 				}
 			});
 		};

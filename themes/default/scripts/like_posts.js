@@ -24,7 +24,6 @@
 	likePosts.prototype = function ()
 	{
 		let oTxt = {},
-			bTooltips = false,
 
 			/**
 			 * Initiate likePosts with this method
@@ -35,16 +34,7 @@
 			{
 				oTxt = params.oTxt;
 
-				// If we are using tooltips, init that function
-				bTooltips = params.bTooltips || bTooltips;
-				if (bTooltips)
-				{
-					$(".react_button, .unreact_button, .reacts_button").SiteTooltip();
-				}
-				else
-				{
-					$(".react_button, .unreact_button, .reacts_button").removeAttr('title');
-				}
+				$(".react_button, .unreact_button, .reacts_button").removeAttr('title');
 			},
 
 			/**
@@ -162,13 +152,6 @@
 						likesList.innerHTML = '';
 						likesList.classList.add('hide');
 					}
-				}
-
-				// Changed the title text, update the tooltips
-				if (bTooltips)
-				{
-					params.event.attr('title', params.title);
-					$("." + nextClass).SiteTooltip();
 				}
 			},
 
@@ -345,8 +328,8 @@
 						// handleError(err);
 						if ('console' in window && console.info)
 						{
-							window.console.info('fail:', textStatus, errorThrown.name);
-							window.console.info(err.responseText);
+							console.info('fail:', textStatus, errorThrown.name);
+							console.info(err.responseText);
 						}
 					})
 					.always(function ()
@@ -411,9 +394,6 @@
 
 				// Show the htmlContent we built
 				$like_post_message_data.append(htmlContent).show();
-
-				// Hover subject link to show message body preview
-				//$('.message_title').SiteTooltip();
 
 				// All done with this
 				hideSpinnerOverlay();

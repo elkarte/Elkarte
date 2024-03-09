@@ -69,7 +69,7 @@ elk_PersonalMessageSend.prototype.init = function ()
 		}.bind(this);
 	}
 
-	this.oToAutoSuggest = new smc_AutoSuggest({
+	this.oToAutoSuggest = new elk_AutoSuggest({
 		sSessionId: this.opt.sSessionId,
 		sSessionVar: this.opt.sSessionVar,
 		sSuggestId: 'to_suggest',
@@ -84,7 +84,7 @@ elk_PersonalMessageSend.prototype.init = function ()
 	});
 	this.oToAutoSuggest.registerCallback('onBeforeAddItem', this.callbackAddItem.bind(this));
 
-	this.oBccAutoSuggest = new smc_AutoSuggest({
+	this.oBccAutoSuggest = new elk_AutoSuggest({
 		sSessionId: this.opt.sSessionId,
 		sSessionVar: this.opt.sSessionVar,
 		sSuggestId: 'bcc_suggest',

@@ -207,7 +207,7 @@ var disableDrafts = false;
 			let postString = serialize(obj) + "&" + elk_session_var + "=" + elk_session_id;
 
 			oMentions.opts._names = [];
-			fetch(elk_scripturl + "?action=suggest;api=xml", {
+			fetch(elk_prepareScriptUrl(elk_scripturl) + "action=suggest;api=xml", {
 				method: "POST",
 				body: postString,
 				headers: {
@@ -237,7 +237,7 @@ var disableDrafts = false;
 				.catch(function (error) {
 					if ('console' in window && console.info)
 					{
-						window.console.info('Error: ', error.message);
+						console.info('Error: ', error.message);
 					}
 					callback();
 				});

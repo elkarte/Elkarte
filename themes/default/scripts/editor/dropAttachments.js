@@ -353,8 +353,8 @@
 				{
 					if ('console' in window && console.info)
 					{
-						window.console.info('Error:', textStatus, errorThrown.name);
-						window.console.info(jqXHR.responseText);
+						console.info('Error:', textStatus, errorThrown.name);
+						console.info(jqXHR.responseText);
 					}
 				});
 			},

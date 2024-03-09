@@ -153,7 +153,7 @@ elk_mentions.prototype.attachAtWho = function () {
 	{
 		let postString = serialize(obj) + "&" + elk_session_var + "=" + elk_session_id;
 
-		fetch(elk_scripturl + "?action=suggest;api=xml", {
+		fetch(elk_prepareScriptUrl(elk_scripturl) + "action=suggest;api=xml", {
 			method: 'POST',
 			body: postString,
 			headers: {
@@ -181,7 +181,7 @@ elk_mentions.prototype.attachAtWho = function () {
 			.catch((error) => {
 				if ('console' in window && console.info)
 				{
-					window.console.info('Error:', error);
+					console.info('Error:', error);
 				}
 				callback();
 			});
