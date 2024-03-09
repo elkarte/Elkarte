@@ -32,39 +32,58 @@ document.addEventListener("DOMContentLoaded", function ()
 	{
 		elk_quotefix();
 	}
-});
 
-// Jquery document ready
-$(function ()
-{
 	// Smooth scroll to top.
-	$("#gotop").on("click", function (e)
-	{
+	document.getElementById("gotop").addEventListener("click", function(e) {
 		e.preventDefault();
-		$("html,body").animate({scrollTop: 0}, 700);
+		window.scrollTo({top: 0, behavior: 'smooth'});
 	});
 
 	// Smooth scroll to bottom.
-	$("#gobottom").on("click", function (e)
-	{
+	document.getElementById("gobottom").addEventListener("click", function(e) {
 		e.preventDefault();
 
 		// Don't scroll all the way down to the footer, just the content bottom
-		let link = $('#footer_section'),
-			link_y = link.height();
+		let link = document.querySelector('#footer_section'),
+			linkY = link.offsetHeight,
+			heightDiff = link.getBoundingClientRect().top + linkY - window.innerHeight;
 
-		$("html,body").animate({scrollTop: link.offset().top + link_y - $(window).height()}, 700);
+		window.scrollBy({ top: heightDiff, behavior: 'smooth' });
 	});
 
 	// Tooltips
 	if ((!is_mobile && !is_touch) || use_click_menu)
 	{
-		$('.preview').SiteTooltip();
+		if (typeof SiteTooltip === 'function')
+		{
+			let tooltip = new SiteTooltip();
+			tooltip.create('.preview');
+		}
 	}
 
 	// Find all nested linked images and turn off the border
-	$('a.bbc_link img.bbc_img').parent().css('border', '0');
+	let elements = document.querySelectorAll('a.bbc_link img.bbc_img');
+	for(let i = 0; i < elements.length; i++) {
+		let parentElement = elements[i].parentNode;
+		parentElement.style.border = '0';
+	}
 
+	// Expand the moderation button view for mobile devices
+	let hamburger = document.querySelector('.hamburger_30');
+	if (hamburger)
+	{
+		hamburger.addEventListener('click', function (e) {
+			let id = this.getAttribute('data-id');
+			e.preventDefault();
+			document.getElementById(id).classList.add('visible');
+			this.classList.add('visible');
+		});
+	}
+});
+
+// Jquery document ready
+$(function ()
+{
 	// Enable the ... page expansion
 	$('.expand_pages').expand_pages();
 
@@ -148,16 +167,6 @@ $(function ()
 				$this.css({'max-width': '100%'});
 			}
 		});
-	});
-
-	// expand the moderation button view for mobile devices
-	$('.hamburger_30').on('click', function (e)
-	{
-		let id = $(this).data('id');
-
-		e.preventDefault();
-		$('#' + id).addClass('visible');
-		$(this).addClass('visible');
 	});
 });
 
