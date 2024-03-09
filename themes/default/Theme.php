@@ -320,7 +320,7 @@ class Theme extends BaseTheme
 
 		// Queue our Javascript
 		loadJavascriptFile(['script.js', 'script_elk.js', 'elk_menu.js']);
-		loadJavascriptFile(['elk_jquery_plugins.js', 'theme.js'], ['defer' => true]);
+		loadJavascriptFile(['theme.js'], ['defer' => true]);
 
 		// Default JS variables for use in every theme
 		$this->addJavascriptVar([

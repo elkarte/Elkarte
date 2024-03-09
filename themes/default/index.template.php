@@ -790,7 +790,7 @@ function template_news_fader()
 					</li>
 				</ul>
 				<script type="module">
-					$("#elkFadeScroller").Elk_NewsFader(' . (empty($settings['newsfader_time']) ? '' : '{iFadeDelay: ' . $settings['newsfader_time'] . '}') . ');
+					Elk_NewsFader("elkFadeScroller", {' .  (empty($settings['newsfader_time']) ? '' : 'iFadeDelay: ' . $settings['newsfader_time']) . '})
 				</script>';
 }
 

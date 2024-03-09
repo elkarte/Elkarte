@@ -1157,6 +1157,49 @@ var ElkNotifier = new window.ElkNotifications({});
 })();
 
 /**
+ * Define the Elk_NewsFader function
+ *
+ * Inspired by Paul Mason's tutorial:
+ * http://paulmason.name/item/simple-jquery-carousel-slider-tutorial
+ *
+ * Licensed under the MIT license:
+ * http://www.opensource.org/licenses/mit-license.php
+ */
+function Elk_NewsFader (element, options)
+{
+	let settings = {iFadeDelay: 5000, iFadeSpeed: 1000},
+		iFadeIndex = 0,
+		news = document.getElementById(element).querySelectorAll('li');
+
+	if (news.length > 1)
+	{
+		// Merge custom options with default settings
+		Object.assign(settings, options);
+
+		// Hide all news items except the first one
+		for (let i = 1; i < news.length; i++)
+		{
+			news[i].style.opacity = '0';
+		}
+
+		// Set up the interval for fading news items
+		setInterval(function() {
+			let currentNews = news[iFadeIndex],
+				nextNews = news[(iFadeIndex + 1) % news.length];
+
+			// Fade out current news item
+			currentNews.fadeOut(settings.iFadeSpeed, function() {
+				// Fade in next news item
+				nextNews.fadeIn(settings.iFadeSpeed);
+			});
+
+			// Update index for the next news item
+			iFadeIndex = (iFadeIndex + 1) % news.length;
+		}, settings.iFadeSpeed + settings.iFadeDelay);
+	}
+}
+
+/**
  * This function regularly checks for the existence of a specific function in the global scope,
  * until either the function appears or a time limit passes. This could be helpful for scripts
  * that rely on deferred or asynchronously loaded scripts.
@@ -1258,7 +1301,9 @@ function serialize(form)
 }
 
 /**
- * Toggles the visibility and height of the specified HTMLElement using sliding animation.
+ * Toggles the visibility and height of the specified HTMLElement using animation.
+ *
+ * Mimics jQ slideToggle, slideUp, slideDown, fadeIn, fadeOut
  *
  * https://github.com/ericbutler555/plain-js-slidetoggle
  * MIT License
@@ -1277,6 +1322,14 @@ HTMLElement.prototype.slideUp = function(duration, callback) {
 
 HTMLElement.prototype.slideDown = function (duration, callback) {
 	_s(this, duration, callback, true);
+};
+
+HTMLElement.prototype.fadeIn = function (duration) {
+	_s2(this, duration);
+};
+
+HTMLElement.prototype.fadeOut = function (duration, callback) {
+	_s2(this, duration, callback, true);
 };
 
 /**
@@ -1367,4 +1420,59 @@ function _s(el, duration, callback, isDown) {
 	}
 
 	window.requestAnimationFrame(step);
+}
+
+/**
+ * Animates the opacity of an element to fadeIn or fadeOut an element
+ *
+ * @param {HTMLElement} element - The element to animate.
+ * @param {number} [duration=1000] - The duration of the animation in milliseconds.
+ * @param {Function} [callback] - A function to be called when the animation completes.
+ * @param {boolean} [isOut=false] - Specifies whether the animation should fade out the element.
+ * @private
+ * @return {void}
+ */
+function _s2(element, duration, callback, isOut) {
+	duration = duration || 1000;
+	isOut = isOut || false;
+
+	let initialOpacity = 0,
+		finalOpacity = 1;
+
+	if (isOut)
+	{
+		initialOpacity = 1;
+		finalOpacity = 0;
+	}
+
+	let opacity = initialOpacity,
+		opacityChangeFactor,
+		start;
+
+	function animateOpacity(timestamp)
+	{
+		if (start === undefined) start = timestamp;
+
+		let progress = timestamp - start;
+		opacity = progress / duration;
+		opacityChangeFactor = isOut ? 1 - opacity : opacity;
+
+		if (isOut && opacityChangeFactor > finalOpacity)
+		{
+			element.style.opacity = opacityChangeFactor;
+			window.requestAnimationFrame(animateOpacity);
+		}
+		else if (!isOut && opacityChangeFactor < finalOpacity)
+		{
+			element.style.opacity = opacityChangeFactor;
+			window.requestAnimationFrame(animateOpacity);
+		}
+		else
+		{
+			element.style.opacity = finalOpacity;
+			callback && callback();
+		}
+	}
+
+	window.requestAnimationFrame(animateOpacity);
 }
