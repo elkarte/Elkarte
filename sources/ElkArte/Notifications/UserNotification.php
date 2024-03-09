@@ -2,6 +2,7 @@
 
 /**
  * Notifies the user about mentions and alike.
+ *
  * The version provided shows the number of notifications in the favicon
  * and sends a desktop notification if a new notification is present.
  *
@@ -18,7 +19,6 @@ namespace ElkArte\Notifications;
 use ElkArte\AbstractModel;
 use ElkArte\Database\QueryInterface;
 use ElkArte\Helper\DataValidator;
-use ElkArte\Helper\ValuesContainer;
 use ElkArte\Languages\Txt;
 use ElkArte\UserInfo;
 
@@ -65,7 +65,8 @@ class UserNotification extends AbstractModel
 			$this->_addFaviconNumbers($this->user->mentions);
 		}
 
-		if (!empty($this->_modSettings['usernotif_desktop_enable']))
+		// Can only do this over secure connections
+		if (!empty($this->_modSettings['usernotif_desktop_enable']) && detectServer()->supportsSSL())
 		{
 			$this->_addDesktopNotifications();
 		}
