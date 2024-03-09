@@ -70,6 +70,13 @@ var disableDrafts = false;
 						return;
 					}
 
+					// We allow spaces in the mention name, but stop after 2
+					let spaces = query.match(/ /g);
+					if (spaces && spaces.length > 1)
+					{
+						return;
+					}
+
 					// No slamming the server either
 					let current_call = Math.round(new Date().getTime());
 					if (oMentions.opts._last_call !== 0 && oMentions.opts._last_call + 150 > current_call)
@@ -232,7 +239,6 @@ var disableDrafts = false;
 							"name": item.textContent
 						};
 					});
-					console.log(callback);
 					callback();
 				})
 				.catch(function (error) {
