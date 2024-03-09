@@ -701,4 +701,29 @@ class UpgradeInstructions_upgrade_2_0
 			)
 		);
 	}
+
+	public function message_mimimize_title()
+	{
+		return 'v1.1.10 :: Changing behavior of JS/CSS Minimizer...';
+	}
+
+	public function message_mimimize()
+	{
+		return array(
+			array(
+				'debug_title' => 'Changing combine and minimize to minimize only...',
+				'function' => static function () {
+					theme()->cleanHives();
+					// If they are using the option, change it to use minimize only
+					if (!empty($modSettings['combine_css_js']))
+					{
+						updateSettings(array(
+							'combine_css_js' => '0',
+							'minify_css_js' => '1',
+						));
+					}
+				}
+			)
+		);
+	}
 }
