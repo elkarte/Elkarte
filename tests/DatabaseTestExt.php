@@ -152,7 +152,7 @@ class TestDatabase extends TestCase
 		$db = database();
 
 		$known_inserts = [
-			'board_permissions' => 367,
+			'board_permissions' => 355,
 			'boards' => 1,
 			'calendar_holidays' => 116,
 			'categories' => 1,
