@@ -273,16 +273,6 @@ class Display extends AbstractController
 
 		theme()->addJavascriptVar(['notification_topic_notice' => $context['is_marked_notify'] ? $txt['notification_disable_topic'] : $txt['notification_enable_topic']], true);
 
-		if ($context['can_send_topic'])
-		{
-			theme()->addJavascriptVar([
-				'sendtopic_cancel' => $txt['modify_cancel'],
-				'sendtopic_back' => $txt['back'],
-				'sendtopic_close' => $txt['find_close'],
-				'sendtopic_error' => $txt['send_error_occurred'],
-				'required_field' => $txt['require_field']], true);
-		}
-
 		// Build the common to all buttons like Reply Notify Mark ....
 		$this->buildNormalButtons();
 
@@ -820,7 +810,6 @@ class Display extends AbstractController
 			'can_merge' => 'merge_any',
 			'can_split' => 'split_any',
 			'can_mark_notify' => 'mark_any_notify',
-			'can_send_topic' => 'send_topic',
 			'can_send_pm' => 'pm_send',
 			'can_send_email' => 'send_email_to_members',
 			'can_report_moderator' => 'report_any',
@@ -866,7 +855,6 @@ class Display extends AbstractController
 		$context['can_quote'] = $context['can_reply'] && (empty($modSettings['disabledBBC']) || !in_array('quote', explode(',', $modSettings['disabledBBC'])));
 		$context['can_mark_unread'] = $this->user->is_guest === false && $settings['show_mark_read'];
 		$context['can_unwatch'] = $this->user->is_guest === false && $modSettings['enable_unwatch'];
-		$context['can_send_topic'] = (!$modSettings['postmod_active'] || $this->topicinfo['approved']) && allowedTo('send_topic');
 		$context['can_print'] = empty($modSettings['disable_print_topic']);
 
 		// Start this off for quick moderation - it will be or'd for each post.
@@ -913,14 +901,6 @@ class Display extends AbstractController
 				'lang' => true,
 				'custom' => 'onclick="return unwatchButton(this);"',
 				'url' => getUrl('action', ['action' => 'unwatchtopic', 'sa' => $context['topic_unwatched'] ? 'off' : 'on', 'topic' => $context['current_topic'] . '.' . $context['start'], '{session_data}']),
-				'submenu' => true,
-			],
-			'send' => [
-				'test' => 'can_send_topic',
-				'text' => 'send_topic',
-				'lang' => true,
-				'url' => getUrl('action', ['action' => 'emailuser', 'sa' => 'sendtopic', 'topic' => $context['current_topic'] . '.0']),
-				'custom' => 'onclick="return sendtopicOverlayDiv(this.href, \'' . $txt['send_topic'] . '\');"',
 				'submenu' => true,
 			],
 			'print' => [
