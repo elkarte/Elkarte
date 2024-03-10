@@ -1414,16 +1414,17 @@ function _s (el, duration, callback, isDown)
  */
 function _s2 (element, duration, callback, isOut)
 {
-	duration = duration || 1000;
+	duration = duration || 500;
 	isOut = isOut || false;
 
-	let initialOpacity = 0,
-		finalOpacity = 1;
-
-	if (isOut)
-	{
-		initialOpacity = 1;
+	let initialOpacity = 1,
 		finalOpacity = 0;
+
+	if (!isOut)
+	{
+		initialOpacity = 0;
+		finalOpacity = 1;
+		element.style.display = 'block';
 	}
 
 	let opacity = initialOpacity,
@@ -1441,19 +1442,21 @@ function _s2 (element, duration, callback, isOut)
 		opacity = progress / duration;
 		opacityChangeFactor = isOut ? 1 - opacity : opacity;
 
-		if (isOut && opacityChangeFactor > finalOpacity)
-		{
-			element.style.opacity = opacityChangeFactor;
-			window.requestAnimationFrame(animateOpacity);
-		}
-		else if (!isOut && opacityChangeFactor < finalOpacity)
+		if ((isOut && opacityChangeFactor > finalOpacity) || (!isOut && opacityChangeFactor < finalOpacity))
 		{
 			element.style.opacity = opacityChangeFactor;
 			window.requestAnimationFrame(animateOpacity);
 		}
 		else
 		{
+			// Animation complete
 			element.style.opacity = finalOpacity;
+
+			if (isOut)
+			{
+				element.style.display = 'none';
+			}
+
 			if (typeof callback === 'function')
 			{
 				callback();
