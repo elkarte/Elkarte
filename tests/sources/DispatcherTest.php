@@ -43,7 +43,6 @@ class DispatcherTest extends TestCase
 		$auto_actions = array(
 			'announce' => array('send', 'selectgroup'),
 			'calendar' => array('calendar', 'ical', 'post'),
-			'emailuser' => array('sendtopic', 'email'),
 			'groups' => array('index', 'members', 'requests'),
 			'help' => array('index'),
 			'topic' => array('lock', 'printpage', 'sticky'),

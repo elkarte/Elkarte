@@ -726,4 +726,24 @@ class UpgradeInstructions_upgrade_2_0
 			)
 		);
 	}
+
+	public function remove_sendtopic_title()
+	{
+		return 'v2.0 :: Remove Send Topic...';
+	}
+
+	public function remove_sendtopic()
+	{
+		return array(
+			array(
+				'debug_title' => 'Removing Send Topic Permission',
+				'function' => function () {
+					$this->db->query('',
+						'DELETE FROM {db_prefix}board_permissions
+						WHERE permission="send_topic"'
+					);
+				}
+			)
+		);
+	}
 }

@@ -46,32 +46,6 @@ class EmailUserTest extends ElkArteCommonSetupTest
 	}
 
 	/**
-	 * Test trying to email a topic
-	 */
-	public function testActionSendTopic()
-	{
-		global $context;
-
-		// Get the controller, call index
-		$controller = new Emailuser(new EventManager());
-		$controller->setUser(User::$info);
-		$controller->pre_dispatch();
-		$controller->action_index();
-
-		// Check that the send topic template was set
-		$this->assertEquals('send_topic', $context['sub_template']);
-
-		// Now try to send it, but without filling out the form we get a error instead
-		$req = HttpReq::instance();
-		$req->post->send = true;
-
-		$controller->pre_dispatch();
-		$controller->action_index();
-
-		$this->assertNotEmpty($context['sendtopic_error']);
-	}
-
-	/**
 	 * Test trying to report a post
 	 */
 	public function testActionReporttm()

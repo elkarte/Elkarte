@@ -52,258 +52,13 @@ class Emailuser extends AbstractController
 	public function action_index()
 	{
 		// just accept we haz a default action: action_sendtopic()
-		$this->action_sendtopic();
-	}
-
-	/**
-	 * Send a topic to a friend.
-	 *
-	 * What it does:
-	 *
-	 * - Requires the send_topic permission.
-	 * - Redirects back to the first page of the topic when done.
-	 * - Is accessed via ?action=emailuser;sa=sendtopic.
-	 *
-	 * @uses the Emailuser template, with the main sub template.
-	 */
-	public function action_sendtopic()
-	{
-		global $topic, $txt, $context, $modSettings;
-
-		// Check permissions...
-		isAllowedTo('send_topic');
-
-		if ($this->getApi() === 'xml')
-		{
-			$this->action_sendtopic_api();
-			return;
-		}
-
-		// We need at least a topic... go away if you don't have one.
-		if (empty($topic))
-		{
-			throw new Exception('not_a_topic', false);
-		}
-
-		require_once(SUBSDIR . '/Topic.subs.php');
-		$row = getTopicInfo($topic, 'message');
-		if (empty($row))
-		{
-			throw new Exception('not_a_topic', false);
-		}
-
-		// Can't send topic if its unapproved and using post moderation.
-		if ($modSettings['postmod_active'] && !$row['approved'])
-		{
-			throw new Exception('not_approved_topic', false);
-		}
-
-		// Censor the subject....
-		$row['subject'] = censor($row['subject']);
-
-		// Sending yet, or just getting prepped?
-		if (empty($this->_req->post->send))
-		{
-			$context['page_title'] = sprintf($txt['sendtopic_title'], $row['subject']);
-			$context['start'] = $this->_req->query->start;
-			$context['sub_template'] = 'send_topic';
-
-			return;
-		}
-
-		// Actually send the message...
-		checkSession();
-		spamProtection('sendtopic');
-
-		$result = $this->_sendTopic($row);
-		if ($result !== true)
-		{
-			$context['sendtopic_error'] = $result;
-		}
-
-		// Back to the topic!
-		redirectexit('topic=' . $topic . '.0');
-	}
-
-	/**
-	 * Prepares the form data and database data for sending in an email format
-	 * Does the actual sending of the email if everything checks out as OK
-	 *
-	 * @param mixed[] $row
-	 *
-	 * @return array|bool
-	 * @throws \ElkArte\Exceptions\Exception
-	 */
-	private function _sendTopic($row)
-	{
-		global $txt;
-
-		// This is needed for sendmail().
-		require_once(SUBSDIR . '/Mail.subs.php');
-
-		// Time to check and clean what was placed in the form
-		$validator = new DataValidator();
-		$validator->sanitation_rules(array(
-			'y_name' => 'trim',
-			'r_name' => 'trim'
-		));
-		$validator->validation_rules(array(
-			'y_name' => 'required|notequal[_]',
-			'y_email' => 'required|valid_email',
-			'r_name' => 'required|notequal[_]',
-			'r_email' => 'required|valid_email'
-		));
-		$validator->text_replacements(array(
-			'y_name' => $txt['sendtopic_sender_name'],
-			'y_email' => $txt['sendtopic_sender_email'],
-			'r_name' => $txt['sendtopic_receiver_name'],
-			'r_email' => $txt['sendtopic_receiver_email']
-		));
-
-		// Any errors or are we good to go?
-		if (!$validator->validate($this->_req->post))
-		{
-			$errors = $validator->validation_errors();
-
-			return array(
-				'errors' => $errors,
-				'type' => 'minor',
-				'title' => $txt['validation_failure'],
-				// And something for ajax
-				'error' => 1,
-				'text' => $errors[0],
-			);
-		}
-
-		// Emails don't like entities...
-		$row['subject'] = un_htmlspecialchars($row['subject']);
-
-		$replacements = array(
-			'TOPICSUBJECT' => $row['subject'],
-			'SENDERNAME' => $validator->y_name,
-			'RECPNAME' => $validator->r_name,
-			'TOPICLINK' => getUrl('topic', ['topic' => $row['id_topic'], 'start' => '0', 'subject' => $row['subject']]),
-		);
-
-		$emailtemplate = 'send_topic';
-
-		if (!empty($this->_req->post->comment))
-		{
-			$emailtemplate .= '_comment';
-			$replacements['COMMENT'] = $this->_req->post->comment;
-		}
-
-		$emaildata = loadEmailTemplate($emailtemplate, $replacements);
-
-		// And off we go!
-		sendmail($validator->r_email, $emaildata['subject'], $emaildata['body'], $validator->y_email);
-
-		return true;
-	}
-
-	/**
-	 * Like action_sendtopic, but done via ajax from an API request
-	 *
-	 * @uses Xml Template generic_xml_buttons sub template
-	 */
-	public function action_sendtopic_api()
-	{
-		global $topic, $modSettings, $txt, $context;
-
-		theme()->getTemplates()->load('Xml');
-		theme()->getLayers()->removeAll();
-		$context['sub_template'] = 'generic_xml_buttons';
-
-		if (empty($this->_req->post->send))
-		{
-			die();
-		}
-
-		// We need at least a topic... go away if you don't have one.
-		// Guests can't mark things.
-		if (empty($topic))
-		{
-			Txt::load('Errors');
-			$context['xml_data'] = array(
-				'error' => 1,
-				'text' => $txt['not_a_topic']
-			);
-
-			return;
-		}
-
-		// Is the session valid?
-		if (checkSession('post', '', false))
-		{
-			Txt::load('Errors');
-			$context['xml_data'] = array(
-				'error' => 1,
-				'url' => getUrl('action', ['action' => 'emailuser', 'sa' => 'sendtopic', 'topic' => $topic . '.0']),
-			);
-
-			return;
-		}
-
-		require_once(SUBSDIR . '/Topic.subs.php');
-
-		$row = getTopicInfo($topic, 'message');
-		if (empty($row))
-		{
-			Txt::load('Errors');
-			$context['xml_data'] = array(
-				'error' => 1,
-				'text' => $txt['not_a_topic']
-			);
-
-			return;
-		}
-
-		// Can't send topic if its unapproved and using post moderation.
-		if ($modSettings['postmod_active'] && !$row['approved'])
-		{
-			Txt::load('Errors');
-			$context['xml_data'] = array(
-				'error' => 1,
-				'text' => $txt['not_approved_topic']
-			);
-
-			return;
-		}
-
-		$is_spam = spamProtection('sendtopic', false);
-		if ($is_spam !== false)
-		{
-			Txt::load('Errors');
-			$context['xml_data'] = array(
-				'error' => 1,
-				'text' => sprintf($txt['sendtopic_WaitTime_broken'], $is_spam)
-			);
-
-			return;
-		}
-
-		// Censor the subject....
-		$row['subject'] = censor($row['subject']);
-
-		// Actually send it off
-		$result = $this->_sendTopic($row);
-		if ($result !== true)
-		{
-			Txt::load('Errors');
-			$context['xml_data'] = $result;
-
-			return;
-		}
-
-		$context['xml_data'] = array(
-			'text' => $txt['topic_sent'],
-		);
+		$this->action_email();
 	}
 
 	/**
 	 * Allow a user to send an email.
 	 *
-	 * - Send an email to the user - allow the sender to write the message.
+	 * - Send email to the user - allow the sender to write the message.
 	 * - Can either be passed a user ID as uid or a message id as msg.
 	 * - Does not check permissions for a message ID as there is no information disclosed.
 	 * - accessed by ?action=emailuser;sa=email from the message list, profile view or message view
@@ -321,7 +76,7 @@ class Emailuser extends AbstractController
 		isAllowedTo('send_email_to_members');
 
 		// Are we sending to a user?
-		$context['form_hidden_vars'] = array();
+		$context['form_hidden_vars'] = [];
 		$uid = '';
 		$mid = '';
 		if (isset($this->_req->post->uid) || isset($this->_req->query->uid))
@@ -364,13 +119,13 @@ class Emailuser extends AbstractController
 		}
 
 		// Setup the context!
-		$context['recipient'] = array(
+		$context['recipient'] = [
 			'id' => $row['id_member'],
 			'name' => $row['real_name'],
 			'email' => $row['email_address'],
 			'email_link' => ($context['show_email_address'] === 'yes_permission_override' ? '<em>' : '') . '<a href="mailto:' . $row['email_address'] . '">' . $row['email_address'] . '</a>' . ($context['show_email_address'] === 'yes_permission_override' ? '</em>' : ''),
 			'link' => $row['id_member'] ? '<a href="' . getUrl('profile', ['action' => 'profile', 'u' => $row['id_member'], 'name' => $row['real_name']]) . '">' . $row['real_name'] . '</a>' : $row['real_name'],
-		);
+		];
 
 		// Can we see this person's email address?
 		$context['can_view_recipient_email'] = $context['show_email_address'] === 'yes' || $context['show_email_address'] === 'yes_permission_override';
@@ -391,36 +146,36 @@ class Emailuser extends AbstractController
 
 			// We will need to do some data checking
 			$validator = new DataValidator();
-			$validator->sanitation_rules(array(
+			$validator->sanitation_rules([
 				'y_name' => 'trim',
 				'email_body' => 'trim',
 				'email_subject' => 'trim'
-			));
-			$validator->validation_rules(array(
+			]);
+			$validator->validation_rules([
 				'y_name' => 'required|notequal[_]',
 				'y_email' => 'required|valid_email',
 				'email_body' => 'required',
 				'email_subject' => 'required'
-			));
-			$validator->text_replacements(array(
+			]);
+			$validator->text_replacements([
 				'y_name' => $txt['sendtopic_sender_name'],
 				'y_email' => $txt['sendtopic_sender_email'],
 				'email_body' => $txt['message'],
 				'email_subject' => $txt['send_email_subject']
-			));
+			]);
 			$validator->validate($this->_req->post);
 
 			// If it's a guest sort out their names.
 			if ($this->user->is_guest)
 			{
-				$errors = $validator->validation_errors(array('y_name', 'y_email'));
+				$errors = $validator->validation_errors(['y_name', 'y_email']);
 				if ($errors)
 				{
-					$context['sendemail_error'] = array(
+					$context['sendemail_error'] = [
 						'errors' => $errors,
 						'type' => 'minor',
 						'title' => $txt['validation_failure'],
-					);
+					];
 
 					return;
 				}
@@ -435,25 +190,25 @@ class Emailuser extends AbstractController
 			}
 
 			// Check we have a body (etc).
-			$errors = $validator->validation_errors(array('email_body', 'email_subject'));
+			$errors = $validator->validation_errors(['email_body', 'email_subject']);
 			if (!empty($errors))
 			{
-				$context['sendemail_error'] = array(
+				$context['sendemail_error'] = [
 					'errors' => $errors,
 					'type' => 'minor',
 					'title' => $txt['validation_failure'],
-				);
+				];
 
 				return;
 			}
 
 			// We use a template in case they want to customise!
-			$replacements = array(
+			$replacements = [
 				'EMAILSUBJECT' => $validator->email_subject,
 				'EMAILBODY' => $validator->email_body,
 				'SENDERNAME' => $from_name,
 				'RECPNAME' => $context['recipient']['name'],
-			);
+			];
 
 			// Get the template and get out!
 			$emaildata = loadEmailTemplate('send_email', $replacements);
@@ -498,10 +253,10 @@ class Emailuser extends AbstractController
 		$report_errors = ErrorContext::context('report', 1);
 
 		// ...or maybe some.
-		$context['report_error'] = array(
+		$context['report_error'] = [
 			'errors' => $report_errors->prepareErrors(),
 			'type' => $report_errors->getErrorType() == 0 ? 'minor' : 'serious',
-		);
+		];
 
 		// If they're posting, it should be processed by action_reporttm2.
 		if ((isset($this->_req->post->{$context['session_var']}) || isset($this->_req->post->save)) && !$report_errors->hasErrors())
@@ -527,9 +282,9 @@ class Emailuser extends AbstractController
 		$context['require_verification'] = $this->user->is_guest && !empty($modSettings['guests_report_require_captcha']);
 		if ($context['require_verification'])
 		{
-			$verificationOptions = array(
+			$verificationOptions = [
 				'id' => 'report',
-			);
+			];
 			$context['require_verification'] = VerificationControlsIntegrate::create($verificationOptions);
 			$context['visual_verification_id'] = $verificationOptions['id'];
 		}
@@ -584,7 +339,7 @@ class Emailuser extends AbstractController
 			$report_errors->addError('no_comment');
 		}
 
-		$poster_comment = strtr(Util::htmlspecialchars($this->_req->post->comment), array("\r" => '', "\t" => ''));
+		$poster_comment = strtr(Util::htmlspecialchars($this->_req->post->comment), ["\r" => '', "\t" => '']);
 
 		if (Util::strlen($poster_comment) > 254)
 		{
@@ -594,7 +349,7 @@ class Emailuser extends AbstractController
 		// Guests need to provide their address!
 		if ($this->user->is_guest)
 		{
-			if (!DataValidator::is_valid($this->_req->post, array('email' => 'valid_email'), array('email' => 'trim')))
+			if (!DataValidator::is_valid($this->_req->post, ['email' => 'valid_email'], ['email' => 'trim']))
 			{
 				empty($this->_req->post->email) ? $report_errors->addError('no_email') : $report_errors->addError('bad_email');
 			}
@@ -607,9 +362,9 @@ class Emailuser extends AbstractController
 		// Could they get the right verification code?
 		if ($this->user->is_guest && !empty($modSettings['guests_report_require_captcha']))
 		{
-			$verificationOptions = array(
+			$verificationOptions = [
 				'id' => 'report',
-			);
+			];
 			$context['require_verification'] = VerificationControlsIntegrate::create($verificationOptions, true);
 
 			if (is_array($context['require_verification']))
@@ -645,8 +400,8 @@ class Emailuser extends AbstractController
 		// Get a list of members with the moderate_board permission.
 		require_once(SUBSDIR . '/Members.subs.php');
 		$moderators = membersAllowedTo('moderate_board', $board);
-		$result = getBasicMemberData($moderators, array('preferences' => true, 'sort' => 'lngfile'));
-		$mod_to_notify = array();
+		$result = getBasicMemberData($moderators, ['preferences' => true, 'sort' => 'lngfile']);
+		$mod_to_notify = [];
 		foreach ($result as $row)
 		{
 			if ($row['notify_types'] !== 4)
@@ -692,14 +447,14 @@ class Emailuser extends AbstractController
 				}
 			}
 
-			$replacements = array(
+			$replacements = [
 				'TOPICSUBJECT' => $subject,
 				'POSTERNAME' => $poster_name,
 				'REPORTERNAME' => $reporterName,
 				'TOPICLINK' => getUrl('topic', ['topic' => $topic, 'start' => 'msg' . $msg_id, 'subject' => $subject]) . '#msg' . $msg_id,
 				'REPORTLINK' => empty($id_report) ? '' : getUrl('action', ['action' => 'moderate', 'area' => 'reports', 'report' => $id_report]),
 				'COMMENT' => $this->_req->post->comment,
-			);
+			];
 
 			$emaildata = loadEmailTemplate('report_to_moderator', $replacements, empty($row['lngfile']) || empty($modSettings['userLanguage']) ? $language : $row['lngfile']);
 
@@ -708,7 +463,7 @@ class Emailuser extends AbstractController
 		}
 
 		// Keep track of when the mod reports get updated, that way we know when we need to look again.
-		updateSettings(array('last_mod_report_action' => time()));
+		updateSettings(['last_mod_report_action' => time()]);
 
 		// Back to the post we reported!
 		redirectexit('reportsent;topic=' . $topic . '.msg' . $msg_id . '#msg' . $msg_id);
