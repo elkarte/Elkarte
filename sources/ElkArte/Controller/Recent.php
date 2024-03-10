@@ -54,13 +54,13 @@ class Recent extends AbstractController implements FrontpageInterface
 	 */
 	public static function frontPageHook(&$default_action)
 	{
-		add_integration_function('integrate_menu_buttons', 'MessageIndex_Controller::addForumButton', '', false);
-		add_integration_function('integrate_current_action', 'MessageIndex_Controller::fixCurrentAction', '', false);
+		add_integration_function('integrate_menu_buttons', '\\ElkArte\\Controller\\MessageIndex::addForumButton', '', false);
+		add_integration_function('integrate_current_action', '\\ElkArte\\Controller\\MessageIndex::fixCurrentAction', '', false);
 
-		$default_action = array(
-			'controller' => 'Recent_Controller',
+		$default_action = [
+			'controller' => Recent::class,
 			'function' => 'action_recent_front'
-		);
+		];
 	}
 
 	/**
@@ -71,21 +71,22 @@ class Recent extends AbstractController implements FrontpageInterface
 		parent::frontPageOptions();
 
 		theme()->addInlineJavascript('
-			$(\'#front_page\').on(\'change\', function() {
-				var $base = $(\'#recent_frontpage\').parent();
-				if ($(this).val() == \'Recent_Controller\')
-				{
-					$base.fadeIn();
-					$base.prev().fadeIn();
-				}
-				else
-				{
-					$base.fadeOut();
-					$base.prev().fadeOut();
-				}
-			}).change();', true);
+			document.getElementById("front_page").addEventListener("change", function() {
+			    let base = document.getElementById("recent_frontpage").parentNode;
+			
+			    if (this.value.endsWith("Recent")) 
+			    {
+			        base.fadeIn();
+			        base.previousElementSibling.fadeIn();
+			    }
+			    else 
+			    {
+			        base.fadeOut();
+			        base.previousElementSibling.fadeOut();
+			    }
+			});', true);
 
-		return array(array('int', 'recent_frontpage'));
+		return [['int', 'recent_frontpage']];
 	}
 
 	/**

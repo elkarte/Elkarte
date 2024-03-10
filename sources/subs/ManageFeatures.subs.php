@@ -861,10 +861,10 @@ function getFrontPageControllers()
 
 	$classes = array();
 
-	$glob = new GlobIterator(CONTROLLERDIR . '/*.controller.php', FilesystemIterator::SKIP_DOTS);
-	$classes += scanFileSystemForControllers($glob);
+	$glob = new GlobIterator(CONTROLLERDIR . '/*.php', FilesystemIterator::SKIP_DOTS);
+	$classes += scanFileSystemForControllers($glob, '\\ElkArte\\Controller\\');
 
-	$glob = new GlobIterator(ADDONSDIR . '/*/controllers/*.controller.php', FilesystemIterator::SKIP_DOTS);
+	$glob = new GlobIterator(ADDONSDIR . '/*/controllers/*.php', FilesystemIterator::SKIP_DOTS);
 	$classes += scanFileSystemForControllers($glob, '\\ElkArte\\Addon\\');
 
 	$config_vars = array(array('select', 'front_page', $classes));
@@ -893,26 +893,28 @@ function scanFileSystemForControllers($iterator, $namespace = '')
 {
 	global $txt;
 
-	$types = array();
+	$types = [];
 
 	foreach ($iterator as $file)
 	{
-		$class_name = $namespace . $file->getBasename('.php');
+		$fileName =  $file->getBasename('.php');
+		$className = $namespace . $fileName;
 
-		if (!class_exists($class_name))
+		if (!class_exists($className))
 		{
 			continue;
 		}
 
-		if (is_subclass_of($class_name, '\\ElkArte\\AbstractController') && $class_name::canFrontPage())
+		if (is_subclass_of($className, '\\ElkArte\\AbstractController') && $className::canFrontPage())
 		{
 			// Temporary
-			if (!isset($txt[$class_name]))
+			$txtString = $fileName . '_Controller';
+			if (!isset($txt[$txtString]))
 			{
 				continue;
 			}
 
-			$types[$class_name] = $txt[$class_name];
+			$types[$className] = $txt[$txtString];
 		}
 	}
 
