@@ -184,6 +184,7 @@ function template_settings()
 			'id' => 'show_mark_read',
 			'label' => $txt['enable_mark_as_read'],
 		),
+		'',
 		array(
 			'id' => 'enable_news',
 			'label' => $txt['enable_news'],
@@ -252,23 +253,38 @@ function template_settings()
 		),
 	);
 
-	theme()->addInlineJavascript('
+	// This is a special case as theme settings will trigger new ThemeLoader() which essentially clears inline JS
+	$context['html_headers'] = '
+	<script>
+	document.addEventListener("DOMContentLoaded", function() {
 		// Hide the option first
-		$("#dt_newsfader_time, #dd_newsfader_time").hide();
-
-		// Update visablity based on the select value
-		toggleNewsFaderTime($("#enable_news").val());
-
+		document.getElementById("dt_newsfader_time").style.display = "none";
+		document.getElementById("dd_newsfader_time").style.display = "none";
+		
+		// Update visibility based on the current value
+		toggleNewsFaderTime(document.getElementById("enable_news").value);
+		
 		// Set up the onchange event
-		$("#enable_news").on("change", function() {
-			toggleNewsFaderTime($(this).val());
+		document.getElementById("enable_news").addEventListener("change", function() {
+		    toggleNewsFaderTime(this.value);
 		});
-
-		function toggleNewsFaderTime(val)
+		
+		function toggleNewsFaderTime(value)
 		{
-			if (val == 2)
-				$("#dt_newsfader_time, #dd_newsfader_time").fadeIn();
-			else
-				$("#dt_newsfader_time, #dd_newsfader_time").fadeOut();
-		}', true);
+		    let dtElem = document.getElementById("dt_newsfader_time"),
+		        ddElem = document.getElementById("dd_newsfader_time");
+		  
+		    if (value === "2")
+		    {
+		        dtElem.fadeIn(500);
+		        ddElem.fadeIn(500);
+		    }
+		    else
+		    {
+		        dtElem.fadeOut(500);
+		        ddElem.fadeOut(500);
+		    }
+		}
+	});
+	</script>';
 }
