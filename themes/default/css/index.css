@@ -2195,7 +2195,7 @@ button[type="submit"].quick_quote_button.hide {
 	width: 55%;
 	min-height: 2.5em;
 	margin: 0 0 3px 0;
-	padding: 0 0 .25em .25em;
+	padding: 2px 0 2px .25em;
 }
 
 .settings dd input[type="checkbox"] {
