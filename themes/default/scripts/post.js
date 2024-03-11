@@ -24,7 +24,7 @@
 // These are variables the xml response is going to need
 var bPost;
 
-function previewControl()
+function previewControl ()
 {
 	// Lets make a background preview request
 	bPost = false;
@@ -49,7 +49,7 @@ function previewControl()
 /**
  * Used to preview a post
  */
-function previewPost()
+function previewPost ()
 {
 	// @todo Currently not sending poll options and option checkboxes.
 	var textFields = [
@@ -81,7 +81,7 @@ function previewPost()
 /**
  * Used to preview a PM
  */
-function previewPM()
+function previewPM ()
 {
 	// define what we want to get from the form
 	let textFields = ['subject', post_box_name, 'to', 'bcc'],
@@ -105,7 +105,7 @@ function previewPM()
 /**
  * Used to preview a News item
  */
-function previewNews()
+function previewNews ()
 {
 	// define what we want to get from the form
 	var textFields = ['subject', post_box_name],
@@ -136,7 +136,7 @@ function previewNews()
  * @param {string[]} checkboxFields
  * @param {string} form_name
  */
-function getFields(textFields, numericFields, checkboxFields, form_name)
+function getFields (textFields, numericFields, checkboxFields, form_name)
 {
 	var fields = [],
 		i = 0,
@@ -172,7 +172,9 @@ function getFields(textFields, numericFields, checkboxFields, form_name)
 			else
 			{
 				for (var j = 0, num = document.forms[form_name][numericFields[i]].length; j < num; j++)
+				{
 					fields[fields.length] = numericFields[i] + '=' + parseInt(document.forms[form_name].elements[numericFields[i]][j].value);
+				}
 			}
 		}
 	}
@@ -197,7 +199,7 @@ function getFields(textFields, numericFields, checkboxFields, form_name)
  *
  * @param {object} XMLDoc
  */
-function onDocSent(XMLDoc)
+function onDocSent (XMLDoc)
 {
 	var i = 0,
 		n = 0,
@@ -207,8 +209,7 @@ function onDocSent(XMLDoc)
 
 	if (!XMLDoc || !XMLDoc.getElementsByTagName('elk')[0])
 	{
-		document.forms[form_name].preview.onclick = function ()
-		{
+		document.forms[form_name].preview.onclick = function() {
 			return true;
 		};
 		document.forms[form_name].preview.click();
@@ -224,7 +225,9 @@ function onDocSent(XMLDoc)
 	// Load in the body
 	var bodyText = '';
 	for (i = 0, n = preview.getElementsByTagName('body')[0].childNodes.length; i < n; i++)
+	{
 		bodyText += preview.getElementsByTagName('body')[0].childNodes[i].nodeValue;
+	}
 
 	document.getElementById('preview_body').innerHTML = bodyText;
 	document.getElementById('preview_body').className = 'post';
@@ -241,7 +244,7 @@ function onDocSent(XMLDoc)
 	// should use errorbox_handler (at the moment it cannot be used because is not enough generic)
 	for (i = 0, numErrors = errors.getElementsByTagName('error').length; i < numErrors; i++)
 	{
-		errorCode = errors.getElementsByTagName('error')[i].attributes.getNamedItem("code").value;
+		errorCode = errors.getElementsByTagName('error')[i].attributes.getNamedItem('code').value;
 		if (errorCode === 'no_message' || errorCode === 'long_message')
 		{
 			error_post = true;
@@ -249,22 +252,23 @@ function onDocSent(XMLDoc)
 		errorList += '<li id="' + error_area + '_' + errorCode + '" class="error">' + errors.getElementsByTagName('error')[i].firstChild.nodeValue + '</li>';
 	}
 
-	var oError_box = $(document.getElementById(error_area));
-	if ($.trim(oError_box.children(error_list).html()) === '')
+	let oError_box = document.getElementById(error_area);
+	let checkUl = oError_box.querySelector('#'.error_list);
+	if (!checkUl)
 	{
-		oError_box.append("<ul id='" + error_list + "'></ul>");
+		oError_box.innerHTML = '<ul id=\'' + error_list + '\'></ul>';
 	}
 
 	// Add the error it and show it
 	if (numErrors === 0)
 	{
-		oError_box.css("display", "none");
+		oError_box.style.display = 'none';
 	}
 	else
 	{
 		document.getElementById(error_list).innerHTML = errorList;
-		oError_box.css("display", "");
-		oError_box.attr('class', parseInt(errors.getAttribute('serious')) === 0 ? 'warningbox' : 'errorbox');
+		oError_box.className = parseInt(errors.getAttribute('serious')) === 0 ? 'warningbox' : 'errorbox';
+		oError_box.style.display = '';
 	}
 
 	// Show a warning if the topic has been locked.
@@ -274,7 +278,7 @@ function onDocSent(XMLDoc)
 	}
 
 	// Adjust the color of captions if the given data is erroneous.
-	var captions = errors.getElementsByTagName('caption');
+	let captions = errors.getElementsByTagName('caption');
 	for (i = 0, numCaptions = errors.getElementsByTagName('caption').length; i < numCaptions; i++)
 	{
 		if (document.getElementById('caption_' + captions[i].getAttribute('name')))
@@ -283,22 +287,15 @@ function onDocSent(XMLDoc)
 		}
 	}
 
-	if (typeof $editor_container[post_box_name] !== 'undefined')
-	{
-		$editor = $editor_container[post_box_name];
-	}
-	else
-	{
-		$editor = $(document.forms[form_name][post_box_name]);
-	}
+	$editor = $editor_container[post_box_name];
 
 	if (error_post)
 	{
-		$editor.find("textarea, iframe").addClass('border_error');
+		$editor.find('textarea, iframe').addClass('border_error');
 	}
 	else
 	{
-		$editor.find("textarea, iframe").removeClass('border_error');
+		$editor.find('textarea, iframe').removeClass('border_error');
 	}
 
 	// If this is a post preview, then we have some extra work to do
@@ -318,20 +315,20 @@ function onDocSent(XMLDoc)
 
 		if (numNewPosts !== 0)
 		{
-			var newPostsHTML = '<span id="new_replies"><' + '/span>';
+			let newPostsHTML = '<span id="new_replies"><' + '/span>';
 			for (i = 0; i < numNewPosts; i++)
 			{
-				new_replies[new_replies.length] = newPosts[i].getAttribute("id");
+				new_replies[new_replies.length] = newPosts[i].getAttribute('id');
 
 				ignoring = false;
-				if (newPosts[i].getElementsByTagName("is_ignored")[0].firstChild.nodeValue !== '0')
+				if (newPosts[i].getElementsByTagName('is_ignored')[0].firstChild.nodeValue !== '0')
 				{
-					ignored_replies[ignored_replies.length] = ignoring = newPosts[i].getAttribute("id");
+					ignored_replies[ignored_replies.length] = ignoring = newPosts[i].getAttribute('id');
 				}
 
-				newPostsHTML += '<div class="content forumposts"><div class="postarea2" id="msg' + newPosts[i].getAttribute("id") + '"><div class="keyinfo">';
-				newPostsHTML += '<h3 class="floatleft"><span>' + txt_posted_by + '</span>&nbsp;' + newPosts[i].getElementsByTagName("poster")[0].firstChild.nodeValue + '&nbsp;-&nbsp;' + newPosts[i].getElementsByTagName("time")[0].firstChild.nodeValue;
-				newPostsHTML += ' <span class="new_posts" id="image_new_' + newPosts[i].getAttribute("id") + '">' + txt_new + '</span></h3>';
+				newPostsHTML += '<div class="content forumposts"><div class="postarea2" id="msg' + newPosts[i].getAttribute('id') + '"><div class="keyinfo">';
+				newPostsHTML += '<h3 class="floatleft"><span>' + txt_posted_by + '</span>&nbsp;' + newPosts[i].getElementsByTagName('poster')[0].firstChild.nodeValue + '&nbsp;-&nbsp;' + newPosts[i].getElementsByTagName('time')[0].firstChild.nodeValue;
+				newPostsHTML += ' <span class="new_posts" id="image_new_' + newPosts[i].getAttribute('id') + '">' + txt_new + '</span></h3>';
 
 				if (can_quote)
 				{
@@ -342,19 +339,21 @@ function onDocSent(XMLDoc)
 
 				if (ignoring)
 				{
-					newPostsHTML += '<div id="msg_' + newPosts[i].getAttribute("id") + '_ignored_prompt">' + txt_ignoring_user + '<a href="#" id="msg_' + newPosts[i].getAttribute("id") + '_ignored_link" class="hide linkbutton">' + show_ignore_user_post + '</a></div>';
+					newPostsHTML += '<div id="msg_' + newPosts[i].getAttribute('id') + '_ignored_prompt">' + txt_ignoring_user + '<a href="#" id="msg_' + newPosts[i].getAttribute('id') + '_ignored_link" class="hide linkbutton">' + show_ignore_user_post + '</a></div>';
 				}
 
-				newPostsHTML += '<div class="messageContent" id="msg_' + newPosts[i].getAttribute("id") + '_body">' + newPosts[i].getElementsByTagName("message")[0].firstChild.nodeValue + '</div></div></div>';
+				newPostsHTML += '<div class="messageContent" id="msg_' + newPosts[i].getAttribute('id') + '_body">' + newPosts[i].getElementsByTagName('message')[0].firstChild.nodeValue + '</div></div></div>';
 			}
 			setOuterHTML(document.getElementById('new_replies'), newPostsHTML);
 		}
 
 		// Remove the new image from old-new replies!
 		for (i = 0; i < new_replies.length; i++)
+		{
 			document.getElementById('image_new_' + new_replies[i]).style.display = 'none';
+		}
 
-		var numIgnoredReplies = ignored_replies.length;
+		let numIgnoredReplies = ignored_replies.length;
 		if (numIgnoredReplies !== 0)
 		{
 			for (i = 0; i < numIgnoredReplies; i++)
@@ -388,9 +387,10 @@ function onDocSent(XMLDoc)
 	}
 
 	// Spoilers, Sweetie
-	$('.spoilerheader').on('click', function ()
-	{
-		$(this).next().children().slideToggle("fast");
+	document.querySelectorAll('.spoilerheader').forEach(element => {
+		element.addEventListener('click', function() {
+			element.nextElementSibling.children[0].slideToggle(250);
+		});
 	});
 
 	// Show more quote blocks
@@ -411,8 +411,7 @@ function onDocSent(XMLDoc)
 	}
 
 	// Prevent lightbox or default action on the preview
-	$('[data-lightboximage]').on('click.elk_lb', function (e)
-	{
+	$('[data-lightboximage]').on('click.elk_lb', function(e) {
 		e.preventDefault();
 	});
 }
@@ -420,18 +419,20 @@ function onDocSent(XMLDoc)
 /**
  * Add additional poll option fields
  */
-function addPollOption()
+function addPollOption ()
 {
-	var pollTabIndex;
+	let pollTabIndex;
 
 	if (pollOptionNum === 0)
 	{
 		for (let i = 0, n = document.forms[form_name].elements.length; i < n; i++)
-			if (document.forms[form_name].elements[i].id.substr(0, 8) === 'options-')
+		{
+			if (document.forms[form_name].elements[i].id.substring(0, 8) === 'options-')
 			{
 				pollOptionNum++;
 				pollTabIndex = document.forms[form_name].elements[i].tabIndex;
 			}
+		}
 	}
 
 	pollOptionNum++;
@@ -444,7 +445,7 @@ function addPollOption()
 /**
  * Add additional attachment selection boxes
  */
-function addAttachment()
+function addAttachment ()
 {
 	/** global: allowed_attachments */
 	allowed_attachments -= 1;
@@ -456,7 +457,7 @@ function addAttachment()
 		return alert(txt_more_attachments_error);
 	}
 
-	setOuterHTML(document.getElementById("moreAttachments"), '<dd class="smalltext"><input type="file" size="60" name="attachment[]" id="attachment' + current_attachment + '" class="input_file" /> (<a href="javascript:void(0);" onclick="cleanFileInput(\'attachment' + current_attachment + '\');">' + txt_clean_attach + '<\/a>)' + '<\/dd><dd class="smalltext" id="moreAttachments"><a href="#" onclick="addAttachment(); return false;">(' + txt_more_attachments + ')</a></dd>');
+	setOuterHTML(document.getElementById('moreAttachments'), '<dd class="smalltext"><input type="file" size="60" name="attachment[]" id="attachment' + current_attachment + '" class="input_file" /> (<a href="javascript:void(0);" onclick="cleanFileInput(\'attachment' + current_attachment + '\');">' + txt_clean_attach + '<\/a>)' + '<\/dd><dd class="smalltext" id="moreAttachments"><a href="#" onclick="addAttachment(); return false;">(' + txt_more_attachments + ')</a></dd>');
 
 	return true;
 }
@@ -468,7 +469,7 @@ function addAttachment()
  *
  * @param {string} idElement
  */
-function cleanFileInput(idElement)
+function cleanFileInput (idElement)
 {
 	let oElement = document.getElementById(idElement),
 		parentForm = document.createElement('form');
@@ -486,7 +487,7 @@ function cleanFileInput(idElement)
  *
  * @param {string} messageid
  */
-function insertQuoteFast(messageid)
+function insertQuoteFast (messageid)
 {
 	getXMLDocument(elk_prepareScriptUrl(elk_scripturl) + 'action=quotefast;quote=' + messageid + ';api=xml;pb=' + post_box_name + ';mode=0', onDocReceived);
 
@@ -498,13 +499,15 @@ function insertQuoteFast(messageid)
  *
  * @param {object} XMLDoc
  */
-function onDocReceived(XMLDoc)
+function onDocReceived (XMLDoc)
 {
 	let text = '',
 		$editor = $editor_data[post_box_name];
 
 	for (let i = 0, n = XMLDoc.getElementsByTagName('quote')[0].childNodes.length; i < n; i++)
+	{
 		text += XMLDoc.getElementsByTagName('quote')[0].childNodes[i].nodeValue;
+	}
 
 	$editor.insert(text);
 
@@ -525,7 +528,7 @@ function onDocReceived(XMLDoc)
 		$editor.insert('\n');
 	}
 
-	document.getElementById("editor_toolbar_container").scrollIntoView();
+	document.getElementById('editor_toolbar_container').scrollIntoView();
 
 	ajax_indicator(false);
 }
@@ -533,7 +536,7 @@ function onDocReceived(XMLDoc)
 /**
  * The actual message icon selector, shows the chosen icon on the post screen
  */
-function showimage()
+function showimage ()
 {
 	document.images.icons.src = icon_urls[document.forms.postmodify.icon.options[document.forms.postmodify.icon.selectedIndex].value];
 }
@@ -541,7 +544,7 @@ function showimage()
 /**
  * When using Go Back due to fatal_error, allows the form to be re-submitted with change
  */
-function reActivate()
+function reActivate ()
 {
 	document.forms.postmodify.message.readOnly = false;
 }
@@ -549,7 +552,7 @@ function reActivate()
 /**
  * Function to request a set of drafts for a topic
  */
-function loadDrafts()
+function loadDrafts ()
 {
 	let textFields = [],
 		numericFields = ['board', 'topic'],
@@ -569,10 +572,10 @@ function loadDrafts()
  * @param oXMLDoc
  * @returns {boolean}
  */
-function onDraftsReturned(oXMLDoc)
+function onDraftsReturned (oXMLDoc)
 {
 	let drafts = oXMLDoc.getElementsByTagName('drafts')[0].getElementsByTagName('draft'),
-		thisDL = document.getElementById("draft_selection"),
+		thisDL = document.getElementById('draft_selection'),
 		subject,
 		time,
 		link,
@@ -628,7 +631,8 @@ function onDraftsReturned(oXMLDoc)
  *
  * @returns {boolean} if false will block post submit
  */
-function onPostSubmit() {
+function onPostSubmit ()
+{
 	let body = $editor_data[post_box_name].val().trim(),
 		subject = document.getElementById('post_subject').value.trim();
 
@@ -641,8 +645,7 @@ function onPostSubmit() {
 	error.checkErrors(body === '');
 	if (body === '')
 	{
-		$editor_data[post_box_name].addEvent(post_box_name, 'keyup', function ()
-		{
+		$editor_data[post_box_name].addEvent(post_box_name, 'keyup', function() {
 			onPostSubmit();
 		});
 	}
@@ -673,7 +676,7 @@ function onPostSubmit() {
  * @param {int} id_board
  * @param {string} form_name
  */
-function loadAddNewPoll(button, id_board, form_name)
+function loadAddNewPoll (button, id_board, form_name)
 {
 	if (typeof id_board === 'undefined')
 	{
@@ -681,7 +684,7 @@ function loadAddNewPoll(button, id_board, form_name)
 	}
 
 	// Find the form and add poll to the url
-	let form = document.querySelector('#post_header').closest("form"),
+	let form = document.querySelector('#post_header').closest('form'),
 		poll_main_option = document.querySelectorAll('#poll_main, #poll_options');
 
 	// Change the button label
@@ -705,7 +708,7 @@ function loadAddNewPoll(button, id_board, form_name)
 		if (document.querySelector('#poll_main'))
 		{
 			poll_main_option.forEach(elem => {
-				elem.querySelectorAll('input').forEach(function (input) {
+				elem.querySelectorAll('input').forEach(function(input) {
 					if (input.dataset.required === 'required')
 					{
 						input.setAttribute('required', 'required');
@@ -734,7 +737,7 @@ function loadAddNewPoll(button, id_board, form_name)
 		poll_main_option.forEach(elem => {
 			elem.style.display = 'none';
 
-			elem.querySelectorAll('input').forEach(function (input) {
+			elem.querySelectorAll('input').forEach(function(input) {
 				if (input.getAttribute('required') === 'required')
 				{
 					input.dataset.required = 'required';
@@ -749,7 +752,7 @@ function loadAddNewPoll(button, id_board, form_name)
 	}
 
 	// Retrieve the poll area
-	let	max_tabIndex = 0;
+	let max_tabIndex = 0;
 
 	ajax_indicator(true);
 	fetch(elk_prepareScriptUrl(elk_scripturl) + 'action=poll;sa=interface;board=' + id_board, {
@@ -761,7 +764,7 @@ function loadAddNewPoll(button, id_board, form_name)
 		.then(response => {
 			if (!response.ok)
 			{
-				throw new Error("HTTP error " + response.status);
+				throw new Error('HTTP error ' + response.status);
 			}
 			return response.text();
 		})
@@ -784,15 +787,15 @@ function loadAddNewPoll(button, id_board, form_name)
 			let legend = document.querySelectorAll('#poll_main legend, #poll_options legend');
 			for (let lg of legend)
 			{
-				lg.addEventListener('click', function () {
-					this.nextElementSibling.style.display = this.nextElementSibling.style.display === "none" ? "inline-block" : "none";
-					this.parentElement.classList.toggle("collapsed");
+				lg.addEventListener('click', function() {
+					this.nextElementSibling.style.display = this.nextElementSibling.style.display === 'none' ? 'inline-block' : 'none';
+					this.parentElement.classList.toggle('collapsed');
 				});
 
 				if (lg.dataset.collapsed)
 				{
-					lg.nextElementSibling.style.display = "none";
-					lg.parentElement.classList.toggle("collapsed");
+					lg.nextElementSibling.style.display = 'none';
+					lg.parentElement.classList.toggle('collapsed');
 				}
 			}
 		})

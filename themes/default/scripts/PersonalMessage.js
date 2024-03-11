@@ -60,7 +60,7 @@ elk_PersonalMessageSend.prototype.init = function() {
 		oBccLinkContainer.innerHTML = this.opt.sShowBccLinkTemplate;
 
 		// Make the link show the BCC control.
-		var oBccLink = document.getElementById(this.opt.sBccLinkId);
+		let oBccLink = document.getElementById(this.opt.sBccLinkId);
 		oBccLink.onclick = function() {
 			this.showBcc();
 			return false;
@@ -120,8 +120,6 @@ function loadLabelChoices ()
 {
 	var listing = document.forms.pmFolder.elements,
 		theSelect = document.forms.pmFolder.pm_action,
-		add,
-		remove,
 		toAdd = {length: 0},
 		toRemove = {length: 0};
 
@@ -133,16 +131,16 @@ function loadLabelChoices ()
 	// This is done this way for internationalization reasons.
 	if (!('-1' in allLabels))
 	{
-		for (var o = 0; o < theSelect.options.length; o++)
+		for (let o = 0; o < theSelect.options.length; o++)
 		{
-			if (theSelect.options[o].value.substr(0, 4) === 'rem_')
+			if (theSelect.options[o].value.substring(0, 4) === 'rem_')
 			{
-				allLabels[theSelect.options[o].value.substr(4)] = theSelect.options[o].text;
+				allLabels[theSelect.options[o].value.substring(4)] = theSelect.options[o].text;
 			}
 		}
 	}
 
-	for (var i = 0; i < listing.length; i++)
+	for (let i = 0; i < listing.length; i++)
 	{
 		if (listing[i].name !== 'pms[]' || !listing[i].checked)
 		{
@@ -184,7 +182,7 @@ function loadLabelChoices ()
 		theSelect.options[theSelect.options.length - 1].className = 'jump_to_header';
 		theSelect.options[theSelect.options.length - 1].disabled = true;
 
-		for (i in toAdd)
+		for (let i in toAdd)
 		{
 			if (i !== 'length')
 			{
@@ -200,7 +198,7 @@ function loadLabelChoices ()
 		theSelect.options[theSelect.options.length - 1].className = 'jump_to_header';
 		theSelect.options[theSelect.options.length - 1].disabled = true;
 
-		for (i in toRemove)
+		for (let i in toRemove)
 		{
 			if (i !== 'length')
 			{
@@ -354,34 +352,36 @@ function rebuildRuleDesc ()
 	document.getElementById('ruletext').innerHTML = text;
 }
 
+/**
+ * Initializes the update rules actions.
+ *
+ * @returns {void}
+ */
 function initUpdateRulesActions ()
 {
-	/**
-	 * Maintains the personal message rule options to conform with the rule choice
-	 * so that the form only makes available the proper choices (input, select, none, etc)
-	 */
-
-		// Handy shortcuts
-	var $criteria = $('#criteria'),
-		$actions = $('#actions');
-
-	$criteria.on('change', '[name^="ruletype"]', function() {
-		var optNum = $(this).data('optnum');
-
-		if (document.getElementById('ruletype' + optNum).value === 'gid')
+	// Maintain the personal message rule options to comply with the rule choice
+	let criteria = document.getElementById('criteria');
+	criteria.addEventListener('change', function(event) {
+		if (event.target.name.startsWith('ruletype'))
 		{
-			document.getElementById('defdiv' + optNum).style.display = 'none';
-			document.getElementById('defseldiv' + optNum).style.display = 'inline';
-		}
-		else if (document.getElementById('ruletype' + optNum).value === 'bud' || document.getElementById('ruletype' + optNum).value === '')
-		{
-			document.getElementById('defdiv' + optNum).style.display = 'none';
-			document.getElementById('defseldiv' + optNum).style.display = 'none';
-		}
-		else
-		{
-			document.getElementById('defdiv' + optNum).style.display = 'inline';
-			document.getElementById('defseldiv' + optNum).style.display = 'none';
+			let optNum = event.target.getAttribute('data-optnum'),
+				selectBox = document.getElementById('ruletype' + optNum);
+
+			if (selectBox.value === 'gid')
+			{
+				document.getElementById('defdiv' + optNum).style.display = 'none';
+				document.getElementById('defseldiv' + optNum).style.display = 'inline';
+			}
+			else if (selectBox.value === 'bud' || selectBox.value === '')
+			{
+				document.getElementById('defdiv' + optNum).style.display = 'none';
+				document.getElementById('defseldiv' + optNum).style.display = 'none';
+			}
+			else
+			{
+				document.getElementById('defdiv' + optNum).style.display = 'inline';
+				document.getElementById('defseldiv' + optNum).style.display = 'none';
+			}
 		}
 	});
 
@@ -389,39 +389,87 @@ function initUpdateRulesActions ()
 	 * Maintains the personal message rule action options to conform with the action choice
 	 * so that the form only makes available the proper choice
 	 */
-	$actions.on('change', '[name^="acttype"]', function() {
-		var optNum = $(this).data('actnum');
+	let actions = document.getElementById('actions');
+	actions.addEventListener('change', function(e) {
+		let targetEl = e.target,
+			name = targetEl.getAttribute('name');
 
-		if (document.getElementById('acttype' + optNum).value === 'lab')
+		if (name && name.startsWith('acttype'))
 		{
-			document.getElementById('labdiv' + optNum).style.display = 'inline';
-		}
-		else
-		{
-			document.getElementById('labdiv' + optNum).style.display = 'none';
+			let optNum = targetEl.getAttribute('data-actnum');
+
+			if (document.getElementById('acttype' + optNum).value === 'lab')
+			{
+				document.getElementById('labdiv' + optNum).style.display = 'inline';
+			}
+			else
+			{
+				document.getElementById('labdiv' + optNum).style.display = 'none';
+			}
 		}
 	});
 
 	// Trigger a change on the existing in order to let the function run
-	$criteria.find('[name^="ruletype"]').trigger('change');
-	$actions.find('[name^="acttype"]').trigger('change');
+	Array.from(criteria.querySelectorAll('[name^="ruletype"]')).forEach(function(elem) {
+		elem.dispatchEvent(new Event('change'));
+	});
+	Array.from(criteria.querySelectorAll('[name^="acttype"]')).forEach(function(elem) {
+		elem.dispatchEvent(new Event('change'));
+	});
 
 	// Make sure the description is rebuilt every time something changes, even on elements not yet existing
-	$criteria.on('change keyup',
-		'[name^="ruletype"], [name^="ruledefgroup"], [name^="ruledef"], [name^="acttype"], [name^="labdef"], #logic',
-		function() {
-			rebuildRuleDesc();
-		});
+	addMultipleListeners(criteria, 'change keyup', function(e) {
+			let nameAttr = e.target.getAttribute('name');
+			if (
+				nameAttr.startsWith('ruletype') ||
+				nameAttr.startsWith('ruledefgroup') ||
+				nameAttr.startsWith('ruledef') ||
+				nameAttr.startsWith('acttype') ||
+				nameAttr.startsWith('labdef') ||
+				e.target.id === 'logic'
+			)
+			{
+				rebuildRuleDesc();
+			}
+		}
+	);
 
 	// Make sure the description is rebuilt every time something changes, even on elements not yet existing
-	$('#criteria, #actions').on('change keyup',
-		'[name^="ruletype"], [name^="ruledefgroup"], [name^="ruledef"], [name^="acttype"], [name^="labdef"], #logic',
-		function() {
-			rebuildRuleDesc();
-		});
+	['criteria', 'actions'].forEach(function(id) {
+		let el = document.getElementById(id);
+		addMultipleListeners(el, 'change keyup', function(e) {
+				let nameAttr = e.target.getAttribute('name');
+				if (
+					nameAttr.startsWith('ruletype') ||
+					nameAttr.startsWith('ruledefgroup') ||
+					nameAttr.startsWith('ruledef') ||
+					nameAttr.startsWith('acttype') ||
+					nameAttr.startsWith('labdef') ||
+					e.target.id === 'logic'
+				)
+				{
+					rebuildRuleDesc();
+				}
+			}
+		);
+	});
 
 	// Rebuild once at the beginning to ensure everything is correct
 	rebuildRuleDesc();
+}
+
+/**
+ * Adds multiple event listeners to an element.
+ *
+ * @param {HTMLElement} element - The element to attach the event listeners to.
+ * @param {string} events - A string containing one or more space-separated event types, e.g., "click mouseover".
+ * @param {Function} handler - The function to be called when the event is triggered.
+ *
+ * @return {void}
+ */
+function addMultipleListeners (element, events, handler)
+{
+	events.split(' ').forEach(e => element.addEventListener(e, handler, false));
 }
 
 /**
@@ -429,11 +477,12 @@ function initUpdateRulesActions ()
  */
 function addCriteriaOption ()
 {
+	console.log(criteriaNum);
 	if (criteriaNum === 0)
 	{
-		for (var i = 0; i < document.forms.addrule.elements.length; i++)
+		for (let i = 0; i < document.forms.addrule.elements.length; i++)
 		{
-			if (document.forms.addrule.elements[i].id.substr(0, 8) === 'ruletype')
+			if (document.forms.addrule.elements[i].id.substring(0, 8) === 'ruletype')
 			{
 				criteriaNum++;
 			}
@@ -480,14 +529,14 @@ function addCriteriaOption ()
 
 	setOuterHTML(document.getElementById('criteriaAddHere'), '<br />' +
 		'<select class="criteria" name="ruletype[' + criteriaNum + ']" id="ruletype' + criteriaNum + '" data-optnum="' + criteriaNum + '">' +
-		'<option value="">' + txt_pm_rule_criteria_pick + ':</option>' + rules_option + '' +
+		'   <option value="">' + txt_pm_rule_criteria_pick + ':</option>' + rules_option + '' +
 		'</select>&nbsp;' +
 		'<span id="defdiv' + criteriaNum + '" class="hide">' +
-		'<input type="text" name="ruledef[' + criteriaNum + ']" id="ruledef' + criteriaNum + '" value="" class="input_text" />' +
+		'<input type="text" name="ruledef[' + criteriaNum + ']" id="ruledef' + criteriaNum + '" value="" />' +
 		'</span>' +
 		'<span id="defseldiv' + criteriaNum + '" class="hide">' +
 		'<select class="criteria" name="ruledefgroup[' + criteriaNum + ']" id="ruledefgroup' + criteriaNum + '">' +
-		'<option value="">' + txt_pm_rule_sel_group + '</option>' + group_option +
+		'   <option value="">' + txt_pm_rule_sel_group + '</option>' + group_option +
 		'</select>' +
 		'</span>' +
 		'<span id="criteriaAddHere"></span>');
@@ -502,7 +551,7 @@ function addActionOption ()
 {
 	if (actionNum === 0)
 	{
-		for (var i = 0; i < document.forms.addrule.elements.length; i++)
+		for (let i = 0; i < document.forms.addrule.elements.length; i++)
 		{
 			if (document.forms.addrule.elements[i].id.substr(0, 7) === 'acttype')
 			{
@@ -527,13 +576,13 @@ function addActionOption ()
 
 	setOuterHTML(document.getElementById('actionAddHere'), '<br />' +
 		'<select name="acttype[' + actionNum + ']" id="acttype' + actionNum + '" data-actnum="' + actionNum + '">' +
-		'<option value="">' + txt_pm_rule_sel_action + ':</option>' +
-		'<option value="lab">' + txt_pm_rule_label + '</option>' +
-		'<option value="del">' + txt_pm_rule_delete + '</option>' +
+		'   <option value="">' + txt_pm_rule_sel_action + ':</option>' +
+		'   <option value="lab">' + txt_pm_rule_label + '</option>' +
+		'   <option value="del">' + txt_pm_rule_delete + '</option>' +
 		'</select>&nbsp;' +
 		'<span id="labdiv' + actionNum + '" class="hide">' +
 		'<select name="labdef[' + actionNum + ']" id="labdef' + actionNum + '">' +
-		'<option value="">' + txt_pm_rule_sel_label + '</option>' + label_option +
+		'   <option value="">' + txt_pm_rule_sel_label + '</option>' + label_option +
 		'</select></span>' +
 		'<span id="actionAddHere"></span>');
 }
