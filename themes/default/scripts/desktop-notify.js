@@ -10,11 +10,11 @@
  */
 
 (function() {
-	let ElkDesktop = (function(opt) {
-		'use strict';
+	const ElkDesktop = (function(opt) {
+
 		opt = (opt) ? opt : {};
 
-		let send = function(request) {
+		const send = function(request) {
 			if (request.desktop_notifications.new_from_last > 0)
 			{
 				if (hasPermissions(request))
@@ -32,7 +32,7 @@
 			}
 		};
 
-		let hasPermissions = function() {
+		const hasPermissions = function() {
 			if (Push.Permission.has())
 			{
 				return true;
