@@ -48,6 +48,7 @@ class Javascript
 	{
 		$this->js_files = &$GLOBALS['context']['js_files'];
 		$this->js_vars = &$GLOBALS['context']['js_vars'];
+		$this->js_inline = &$GLOBALS['context']['js_inline'];
 	}
 
 	/**

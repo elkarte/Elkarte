@@ -338,8 +338,10 @@ class ManageServer extends AbstractController
 		hideGlobalCookies();
 
 		// Update when clicked
-		$("#localCookies, #globalCookies").click(function () {
-			hideGlobalCookies();
+		document.querySelectorAll("#localCookies, #globalCookies").forEach(function(element) {
+             element.addEventListener("click", function() {
+			    hideGlobalCookies();
+              });
 		});', true);
 
 		// Fill the config array.

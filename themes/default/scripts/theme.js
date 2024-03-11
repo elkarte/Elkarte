@@ -10,8 +10,9 @@
  * This file contains javascript associated with the current theme
  */
 
-// Normal JS document ready event, could simply use the jQuery one as well
+// Normal JS document ready event
 document.addEventListener('DOMContentLoaded', function() {
+
 	// If they touch the screen, then we switch to click menus
 	window.addEventListener('touchstart', onFirstTouch, false);
 
@@ -68,7 +69,7 @@ document.addEventListener('DOMContentLoaded', function() {
 		parentElement.style.border = '0';
 	}
 
-	// Expand the moderation button view for mobile devices
+	// Expand the moderation hamburger icon/button view for mobile devices
 	let hamburger = document.querySelector('.hamburger_30');
 	if (hamburger)
 	{
@@ -79,31 +80,37 @@ document.addEventListener('DOMContentLoaded', function() {
 			this.classList.add('visible');
 		});
 	}
+
+	// Collapsible fieldsets, pure candy
+	document.querySelector('body').addEventListener('click', function(event) {
+		if (event.target.matches('legend'))
+		{
+			let siblings = elkGetSiblings(event.target);
+			siblings.forEach(sib => sib.slideToggle());
+			event.target.parentNode.classList.toggle('collapsed');
+		}
+	});
+
+	// For any legends with data-collapsed="true", start them collapsed
+	document.querySelectorAll('legend').forEach(function(el) {
+		if (el.getAttribute('data-collapsed') !== null)
+		{
+			el.click();
+		}
+	});
+
+	// Spoiler
+	document.querySelectorAll('.spoilerheader').forEach(element => {
+		element.addEventListener('click', function() {
+			element.nextElementSibling.children[0].slideToggle(250);
+		});
+	});
 });
 
 // Jquery document ready
 $(function() {
 	// Enable the ... page expansion
 	$('.expand_pages').expand_pages();
-
-	// Collapsible fieldsets, pure candy
-	$(document).on('click', 'legend', function() {
-		$(this).siblings().slideToggle('fast');
-		$(this).parent().toggleClass('collapsed');
-	});
-
-	// For any legends with data-collapsed="true", start them collapsed
-	$('legend').each(function() {
-		if ($(this).data('collapsed'))
-		{
-			$(this).trigger('click');
-		}
-	});
-
-	// Spoiler
-	$('.spoilerheader').on('click', function() {
-		$(this).next().children().slideToggle('fast');
-	});
 
 	// Attachment thumbnail expand on click, you can turn off this namespaced click
 	// event with $('[data-lightboximage]').off('click.elk_lb');

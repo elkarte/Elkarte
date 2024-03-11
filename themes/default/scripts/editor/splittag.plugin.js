@@ -103,8 +103,6 @@
 				// Insert the new close/open tags at the cursor position
 				return editor.insertText(tagTextStart, tagTextEnd);
 			}
-
-			return '';
 		};
 
 		/**
@@ -168,6 +166,7 @@
 				contentAfterRangeStart,
 				quote,
 				range,
+				blank,
 				attributes;
 
 			// Save the current state in case this goes bad
@@ -186,8 +185,8 @@
 			// Did we find it, did we?
 			if (quote)
 			{
-				// Copy all of the quotes attributes, like author, date, etc
-				attributes = $(quote).prop("attributes");
+				// Get attributes of the quote element
+				attributes = quote.attributes;
 
 				// Place the end of the range after the blockquote, start is the cursor location.
 				range.setEndAfter(quote);
@@ -195,9 +194,17 @@
 				// Extract the contents of the above range, it goes in the split.
 				contentAfterRangeStart = range.extractContents();
 
-				// Apply the existing quote attributes to the new quote
-				Object.keys(attributes).forEach(function (key) {
-					contentAfterRangeStart.setAttribute(key, attributes[key]);
+				// Apply the existing quote attributes to the new quote (document fragment)
+				Array.prototype.forEach.call(attributes, function(attr) {
+					// Iterate through child nodes of the fragment and set attributes
+					for (let i = 0; i < contentAfterRangeStart.childNodes.length; i++)
+					{
+						let node = contentAfterRangeStart.childNodes[i];
+						if (node.nodeType === Node.ELEMENT_NODE)
+						{
+							node.setAttribute(attr.name, attr.value);
+						}
+					}
 				});
 
 				// Collapse the block quote range, we want to insert after this.
@@ -208,7 +215,7 @@
 				// range.collapse(false);
 
 				// Create an area to place between the two quotes for text entry
-				let blank = quote.ownerDocument.createElement('p');
+				blank = quote.ownerDocument.createElement('p');
 				blank.innerHTML = '&nbsp;';
 
 				// Insert the new elements

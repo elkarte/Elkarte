@@ -53,19 +53,24 @@ class MessageIndex extends AbstractController implements FrontpageInterface
 		parent::frontPageOptions();
 
 		theme()->addInlineJavascript('
-			$(\'#front_page\').on(\'change\', function() {
-				var $base = $(\'#message_index_frontpage\').parent();
-				if ($(this).val() == \'\ElkArte\Controller\MessageIndex\')
-				{
-					$base.fadeIn();
-					$base.prev().fadeIn();
-				}
-				else
-				{
-					$base.fadeOut();
-					$base.prev().fadeOut();
-				}
-			}).change();', true);
+			document.getElementById("front_page").addEventListener("change", function() {
+			    let base = document.getElementById("message_index_frontpage").parentNode;
+			
+			    if (this.value.endsWith("MessageIndex")) 
+			    {
+			        base.fadeIn();
+			        base.previousElementSibling.fadeIn();
+			    }
+			    else 
+			    {
+			        base.fadeOut();
+			        base.previousElementSibling.fadeOut();
+			    }
+			});
+			
+			// Trigger change event
+			var event = new Event("change");
+			document.getElementById("front_page").dispatchEvent(event);', true);
 
 		return [['select', 'message_index_frontpage', self::_getBoardsList()]];
 	}

@@ -32,10 +32,10 @@ class BoardIndex extends AbstractController implements FrontpageInterface
 	 */
 	public static function frontPageHook(&$default_action)
 	{
-		$default_action = array(
+		$default_action = [
 			'controller' => BoardIndex::class,
 			'function' => 'action_boardindex'
-		);
+		];
 	}
 
 	/**

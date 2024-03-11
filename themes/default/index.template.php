@@ -162,7 +162,7 @@ function template_html_above()
 	<link rel="index" href="', $scripturl, '?board=', $context['current_board'], '.0" />';
 	}
 
-	// load in any javascript files from addons and themes
+	// load in any javascript files and inline from addons and themes
 	theme()->themeJs()->template_javascript();
 
 	// load in any css files from addons and themes

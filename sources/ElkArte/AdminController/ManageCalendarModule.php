@@ -314,11 +314,6 @@ class ManageCalendarModule extends AbstractController
 		$context['page_title'] = $txt['calendar_settings'];
 		$context['sub_template'] = 'show_settings';
 
-		// Lets start off with the permission blocks collapsed
-		theme()->addInlineJavascript('var legend = $(\'legend\');
-			legend.siblings().slideToggle("fast");
-			legend.parent().toggleClass("collapsed")', true);
-
 		// Get the final touches in place.
 		$context['post_url'] = getUrl('admin', ['action' => 'admin', 'area' => 'managecalendar', 'sa' => 'settings', 'save']);
 		$context[$context['admin_menu_name']]['current_subsection'] = 'settings';
@@ -365,10 +360,10 @@ class ManageCalendarModule extends AbstractController
 		$config_vars = [
 			['title', 'calendar_settings'],
 			// All the permissions:
-			['permissions', 'calendar_view'],
-			['permissions', 'calendar_post'],
-			['permissions', 'calendar_edit_own'],
-			['permissions', 'calendar_edit_any'],
+			['permissions', 'calendar_view', 'collapsed' => true],
+			['permissions', 'calendar_post', 'collapsed' => true],
+			['permissions', 'calendar_edit_own', 'collapsed' => true],
+			['permissions', 'calendar_edit_any', 'collapsed' => true],
 			'',
 			// How many days to show on board index, and where to display events etc.?
 			['int', 'cal_days_for_index', 6, 'postinput' => $txt['days_word']],

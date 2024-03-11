@@ -1878,7 +1878,7 @@ function can_see_button_strip($button_strip)
 /**
  * Get the current theme instance.
  *
- * @return Theme The current theme instance.
+ * @return \ElkArte\Themes\DefaultTheme\Theme The current theme instance.
  */
 function theme()
 {

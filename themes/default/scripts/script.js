@@ -35,13 +35,15 @@ var ua = navigator.userAgent.toLowerCase(),
  * @param {string} sType xml, json, html, defaults to xml
  * @param {boolean} bHeader true sends X-Requested-With, expected by elkarte
  */
-function fetchDocument(sUrl, funcCallback, sType = null, bHeader = true)
+function fetchDocument (sUrl, funcCallback, sType = null, bHeader = true)
 {
 	let oCaller = this,
 		myHeaders = new Headers();
 
 	if (bHeader)
+	{
 		myHeaders.append('X-Requested-With', 'XMLHttpRequest');
+	}
 	sType = sType || 'xml';
 
 	let init = {
@@ -63,11 +65,10 @@ function fetchDocument(sUrl, funcCallback, sType = null, bHeader = true)
 
 			if (sType === 'xml')
 			{
-				return response.text().then(data =>
-				{
+				return response.text().then(data => {
 					let parser = new DOMParser();
 
-					return parser.parseFromString(data, "application/xml");
+					return parser.parseFromString(data, 'application/xml');
 				});
 			}
 
@@ -102,7 +103,7 @@ function fetchDocument(sUrl, funcCallback, sType = null, bHeader = true)
  * @param {string} sUrl
  * @param {function} funcCallback
  */
-function getXMLDocument(sUrl, funcCallback)
+function getXMLDocument (sUrl, funcCallback)
 {
 	// If the fetch API is available, use it instead
 	if (window.fetch)
@@ -116,8 +117,7 @@ function getXMLDocument(sUrl, funcCallback)
 
 	if (bAsync)
 	{
-		oMyDoc.onreadystatechange = function ()
-		{
+		oMyDoc.onreadystatechange = function() {
 			if (oMyDoc.readyState !== 4)
 			{
 				return;
@@ -147,7 +147,7 @@ function getXMLDocument(sUrl, funcCallback)
  * @param {string} sContent
  * @param {string} funcCallback
  */
-function sendXMLDocument(sUrl, sContent, funcCallback)
+function sendXMLDocument (sUrl, sContent, funcCallback)
 {
 	var oSendDoc = new window.XMLHttpRequest(),
 		oCaller = this;
@@ -156,8 +156,7 @@ function sendXMLDocument(sUrl, sContent, funcCallback)
 
 	if (typeof (funcCallback) !== 'undefined')
 	{
-		oSendDoc.onreadystatechange = function ()
-		{
+		oSendDoc.onreadystatechange = function() {
 			if (oSendDoc.readyState !== 4)
 			{
 				return;
@@ -194,40 +193,35 @@ function sendXMLDocument(sUrl, sContent, funcCallback)
 /**
  * Simulate php's urlencode function
  */
-String.prototype.php_urlencode = function ()
-{
+String.prototype.php_urlencode = function() {
 	return encodeURIComponent(this).replace(/!/g, '%21').replace(/'/g, '%27').replace(/\(/g, '%28').replace(/\)/g, '%29').replace(/\*/g, '%2A').replace(/%20/g, '+');
 };
 
 /**
  * Simulate php htmlspecialchars function
  */
-String.prototype.php_htmlspecialchars = function ()
-{
+String.prototype.php_htmlspecialchars = function() {
 	return this.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 };
 
 /**
  * Simulate php unhtmlspecialchars function
  */
-String.prototype.php_unhtmlspecialchars = function ()
-{
+String.prototype.php_unhtmlspecialchars = function() {
 	return this.replace(/&quot;/g, '"').replace(/&gt;/g, '>').replace(/&lt;/g, '<').replace(/&amp;/g, '&');
 };
 
 /**
  * Callback function for the removeEntities function
  */
-String.prototype._replaceEntities = function (sInput, sDummy, sNum)
-{
+String.prototype._replaceEntities = function(sInput, sDummy, sNum) {
 	return String.fromCharCode(parseInt(sNum));
 };
 
 /**
  * Removes entities from a string and replaces them with a character code
  */
-String.prototype.removeEntities = function ()
-{
+String.prototype.removeEntities = function() {
 	return this.replace(/&(amp;)?#(\d+);/g, this._replaceEntities);
 };
 
@@ -236,8 +230,7 @@ String.prototype.removeEntities = function ()
  *
  * @param {object} oReplacements object of search:replace terms
  */
-String.prototype.easyReplace = function (oReplacements)
-{
+String.prototype.easyReplace = function(oReplacements) {
 	let sResult = this;
 
 	for (let sSearch in oReplacements)
@@ -257,7 +250,7 @@ String.prototype.easyReplace = function (oReplacements)
  * @param {int} alternateHeight
  * @param {boolean} noScrollbars
  */
-function reqWin(desktopURL, alternateWidth, alternateHeight, noScrollbars)
+function reqWin (desktopURL, alternateWidth, alternateHeight, noScrollbars)
 {
 	if ((alternateWidth && self.screen.availWidth * 0.8 < alternateWidth) || (alternateHeight && self.screen.availHeight * 0.8 < alternateHeight))
 	{
@@ -283,7 +276,7 @@ function reqWin(desktopURL, alternateWidth, alternateHeight, noScrollbars)
  * @param {string} [sHeader]
  * @param {string} [sIcon]
  */
-function reqOverlayDiv(desktopURL, sHeader, sIcon)
+function reqOverlayDiv (desktopURL, sHeader, sIcon)
 {
 	// Set up our div details
 	let sAjax_indicator = '<div class="centertext"><i class="icon icon-big i-oval"></i></div>';
@@ -335,7 +328,7 @@ function reqOverlayDiv(desktopURL, sHeader, sIcon)
  *
  * @param {object} oOptions
  */
-function elk_Popup(oOptions)
+function elk_Popup (oOptions)
 {
 	this.opt = oOptions;
 	this.popup_id = this.opt.custom_id ? this.opt.custom_id : 'elk_popup';
@@ -343,7 +336,7 @@ function elk_Popup(oOptions)
 }
 
 // Show the popup div & prepare the close events
-elk_Popup.prototype.show = function () {
+elk_Popup.prototype.show = function() {
 	let popup_class = 'popup_window ' + (this.opt.custom_class ? this.opt.custom_class : 'content'),
 		icon = this.opt.icon ? '<i class="icon ' + this.opt.icon + '"></i> ' : '';
 
@@ -359,7 +352,7 @@ elk_Popup.prototype.show = function () {
 	this.popup_body.parentElement.style.display = 'block';
 
 	// Let the css know its now available
-	this.popup_body.classList.add("in");
+	this.popup_body.classList.add('in');
 
 	// Trigger hide on escape key or mouse click
 	this.popup_instance = this;
@@ -387,7 +380,7 @@ elk_Popup.prototype.show = function () {
 };
 
 // Hide the popup
-elk_Popup.prototype.hide = function () {
+elk_Popup.prototype.hide = function() {
 	const popup = document.querySelector('#' + this.popup_id);
 	if (popup)
 	{
@@ -403,7 +396,7 @@ elk_Popup.prototype.hide = function () {
  *
  * @param {string|object} theField
  */
-function isEmptyText(theField)
+function isEmptyText (theField)
 {
 	let theValue;
 
@@ -433,12 +426,12 @@ function isEmptyText(theField)
 }
 
 // Only allow form submission ONCE.
-function submitonce(theform)
+function submitonce (theform)
 {
 	elk_formSubmitted = true;
 }
 
-function submitThisOnce(oControl, bReadOnly)
+function submitThisOnce (oControl, bReadOnly)
 {
 	// oControl might also be a form.
 	var oForm = 'form' in oControl ? oControl.form : oControl,
@@ -446,12 +439,13 @@ function submitThisOnce(oControl, bReadOnly)
 
 	bReadOnly = typeof bReadOnly == 'undefined' ? true : bReadOnly;
 	for (let i = 0, n = aTextareas.length; i < n; i++)
+	{
 		aTextareas[i].readOnly = bReadOnly;
+	}
 
 	// If in a second the form is not gone, there may be a problem somewhere
 	// (e.g. HTML5 required attribute), so release the textarea
-	window.setTimeout(function ()
-	{
+	window.setTimeout(function() {
 		submitThisOnce(oControl, false);
 	}, 1000);
 
@@ -464,7 +458,7 @@ function submitThisOnce(oControl, bReadOnly)
  * @param {HTMLElement} oElement
  * @param {string} sToValue
  */
-function setOuterHTML(oElement, sToValue)
+function setOuterHTML (oElement, sToValue)
 {
 	if ('outerHTML' in oElement)
 	{
@@ -485,13 +479,15 @@ function setOuterHTML(oElement, sToValue)
  * @param {string} variable
  * @param {string[]} theArray
  */
-function in_array(variable, theArray)
+function in_array (variable, theArray)
 {
 	for (let i in theArray)
+	{
 		if (theArray[i] === variable)
 		{
 			return true;
 		}
+	}
 
 	return false;
 }
@@ -502,13 +498,15 @@ function in_array(variable, theArray)
  * @param {string} variable
  * @param {Array.} theArray
  */
-function array_search(variable, theArray)
+function array_search (variable, theArray)
 {
 	for (let i in theArray)
+	{
 		if (theArray[i] === variable)
 		{
 			return i;
 		}
+	}
 
 	return null;
 }
@@ -519,7 +517,7 @@ function array_search(variable, theArray)
  * @param {HTMLInputElement} oRadioGroup
  * @param {type} sName
  */
-function selectRadioByName(oRadioGroup, sName)
+function selectRadioByName (oRadioGroup, sName)
 {
 	if (!('length' in oRadioGroup))
 	{
@@ -528,11 +526,13 @@ function selectRadioByName(oRadioGroup, sName)
 	}
 
 	for (let i = 0, n = oRadioGroup.length; i < n; i++)
+	{
 		if (oRadioGroup[i].value === sName)
 		{
 			oRadioGroup[i].checked = true;
 			return true;
 		}
+	}
 
 	return false;
 }
@@ -545,7 +545,7 @@ function selectRadioByName(oRadioGroup, sName)
  * @param {string} sMask
  * @param {string} sValue
  */
-function selectAllRadio(oInvertCheckbox, oForm, sMask, sValue)
+function selectAllRadio (oInvertCheckbox, oForm, sMask, sValue)
 {
 	if (oForm[i].name !== undefined && oForm[i].name.substring(0, sMask.length) === sMask && oForm[i].value === sValue)
 	{
@@ -561,7 +561,7 @@ function selectAllRadio(oInvertCheckbox, oForm, sMask, sValue)
  * @param {string} [sMask]
  * @param {boolean} [bIgnoreDisabled]
  */
-function invertAll(oInvertCheckbox, oForm, sMask, bIgnoreDisabled)
+function invertAll (oInvertCheckbox, oForm, sMask, bIgnoreDisabled)
 {
 	for (let i = 0; i < oForm.length; i++)
 	{
@@ -580,7 +580,7 @@ function invertAll(oInvertCheckbox, oForm, sMask, bIgnoreDisabled)
 /**
  * Keep the session alive - always!
  */
-function elk_sessionKeepAlive()
+function elk_sessionKeepAlive ()
 {
 	let curTime = new Date().getTime();
 
@@ -592,14 +592,12 @@ function elk_sessionKeepAlive()
 		lastKeepAliveCheck = curTime;
 	}
 
-	window.setTimeout(function ()
-	{
+	window.setTimeout(function() {
 		elk_sessionKeepAlive();
 	}, 1200000);
 }
 
-window.setTimeout(function ()
-{
+window.setTimeout(function() {
 	elk_sessionKeepAlive();
 }, 1200000);
 
@@ -611,7 +609,7 @@ window.setTimeout(function ()
  * @param {string|null} theme its being set or null for all
  * @param {string|null} additional_vars to use in the url request that will be sent
  */
-function elk_setThemeOption(option, value, theme, additional_vars)
+function elk_setThemeOption (option, value, theme, additional_vars)
 {
 	if (additional_vars === null || typeof (additional_vars) === 'undefined')
 	{
@@ -629,7 +627,7 @@ function elk_setThemeOption(option, value, theme, additional_vars)
  * @param {type} cur_session_id
  * @param {type} token
  */
-function hashLoginPassword(doForm, cur_session_id, token)
+function hashLoginPassword (doForm, cur_session_id, token)
 {
 	// Don't have our hash lib available?
 	if (typeof (hex_sha256) === 'undefined')
@@ -662,7 +660,7 @@ function hashLoginPassword(doForm, cur_session_id, token)
  *
  * @param {string} sSrc
  */
-function smc_preCacheImage(sSrc)
+function smc_preCacheImage (sSrc)
 {
 	if (!('smc_aCachedImages' in window))
 	{
@@ -681,15 +679,14 @@ function smc_preCacheImage(sSrc)
  *
  * @param {object} oOptions
  */
-function Elk_Cookie(oOptions)
+function Elk_Cookie (oOptions)
 {
 	this.opt = oOptions;
 	this.oCookies = {};
 	this.init();
 }
 
-Elk_Cookie.prototype.init = function ()
-{
+Elk_Cookie.prototype.init = function() {
 	if ('cookie' in document && document.cookie !== '')
 	{
 		let aCookieList = document.cookie.split(';');
@@ -701,13 +698,11 @@ Elk_Cookie.prototype.init = function ()
 	}
 };
 
-Elk_Cookie.prototype.get = function (sKey)
-{
+Elk_Cookie.prototype.get = function(sKey) {
 	return sKey in this.oCookies ? this.oCookies[sKey] : null;
 };
 
-Elk_Cookie.prototype.set = function (sKey, sValue)
-{
+Elk_Cookie.prototype.set = function(sKey, sValue) {
 	document.cookie = sKey + '=' + encodeURIComponent(sValue);
 };
 
@@ -723,7 +718,7 @@ Elk_Cookie.prototype.set = function (sKey, sValue)
  * @param {object} oOptions
  * @returns {elk_Toggle}
  */
-function elk_Toggle(oOptions)
+function elk_Toggle (oOptions)
 {
 	this.opt = oOptions;
 	this.bCollapsed = false;
@@ -732,8 +727,7 @@ function elk_Toggle(oOptions)
 }
 
 // Initialize the toggle class
-elk_Toggle.prototype.init = function ()
-{
+elk_Toggle.prototype.init = function() {
 	let i = 0,
 		n = 0;
 
@@ -772,14 +766,13 @@ elk_Toggle.prototype.init = function ()
 			if (typeof (oImage) === 'object' && oImage !== null)
 			{
 				// Display the image in case it was hidden.
-				if (getComputedStyle(oImage).getPropertyValue("display") === 'none')
+				if (getComputedStyle(oImage).getPropertyValue('display') === 'none')
 				{
 					oImage.style.display = 'inline';
 				}
 
 				oImage.instanceRef = this;
-				oImage.onclick = function ()
-				{
+				oImage.onclick = function() {
 					this.instanceRef.toggle();
 					this.blur();
 				};
@@ -799,15 +792,14 @@ elk_Toggle.prototype.init = function ()
 			if (typeof (oContainer) === 'object' && oContainer !== null)
 			{
 				// Display the image in case it was hidden.
-				if (getComputedStyle(oContainer).getPropertyValue("display") === 'none')
+				if (getComputedStyle(oContainer).getPropertyValue('display') === 'none')
 				{
 					oContainer.style.display = 'block';
 				}
 
 				oContainer.instanceRef = this;
 
-				oContainer.onclick = function ()
-				{
+				oContainer.onclick = function() {
 					this.instanceRef.toggle();
 					this.blur();
 				};
@@ -825,14 +817,13 @@ elk_Toggle.prototype.init = function ()
 			if (typeof (oLink) === 'object' && oLink !== null)
 			{
 				// Display the link in case it was hidden.
-				if (getComputedStyle(oLink).getPropertyValue("display") === 'none')
+				if (getComputedStyle(oLink).getPropertyValue('display') === 'none')
 				{
 					oLink.style.display = 'inline-block';
 				}
 
 				oLink.instanceRef = this;
-				oLink.onclick = function ()
-				{
+				oLink.onclick = function() {
 					this.instanceRef.toggle();
 					this.blur();
 					return false;
@@ -851,8 +842,7 @@ elk_Toggle.prototype.init = function ()
  * @param {string} text
  * @returns {string}
  */
-elk_Toggle.prototype.convertHTML = function(text)
-{
+elk_Toggle.prototype.convertHTML = function(text) {
 	let span = document.createElement('span');
 
 	span.innerHTML = text;
@@ -868,8 +858,7 @@ elk_Toggle.prototype.convertHTML = function(text)
  * @param {boolean} bCollapse
  * @param {boolean} [bInit]
  */
-elk_Toggle.prototype.changeState = function (bCollapse, bInit)
-{
+elk_Toggle.prototype.changeState = function(bCollapse, bInit) {
 	let i = 0,
 		n = 0,
 		oContainer;
@@ -983,8 +972,7 @@ elk_Toggle.prototype.changeState = function (bCollapse, bInit)
 	}
 };
 
-elk_Toggle.prototype.toggle = function ()
-{
+elk_Toggle.prototype.toggle = function() {
 	// Change the state by reversing the current state.
 	this.changeState(!this.bCollapsed);
 };
@@ -995,7 +983,7 @@ elk_Toggle.prototype.toggle = function ()
  *
  * @param {boolean} turn_on
  */
-function ajax_indicator(turn_on)
+function ajax_indicator (turn_on)
 {
 	if (ajax_indicator_ele === null)
 	{
@@ -1029,31 +1017,27 @@ function ajax_indicator(turn_on)
  *
  * @param {HTMLElement} oTarget
  */
-function createEventListener(oTarget)
+function createEventListener (oTarget)
 {
 	if (!('addEventListener' in oTarget))
 	{
 		if (oTarget.attachEvent)
 		{
-			oTarget.addEventListener = function (sEvent, funcHandler, bCapture)
-			{
+			oTarget.addEventListener = function(sEvent, funcHandler, bCapture) {
 				oTarget.attachEvent('on' + sEvent, funcHandler);
 			};
 
-			oTarget.removeEventListener = function (sEvent, funcHandler, bCapture)
-			{
+			oTarget.removeEventListener = function(sEvent, funcHandler, bCapture) {
 				oTarget.detachEvent('on' + sEvent, funcHandler);
 			};
 		}
 		else
 		{
-			oTarget.addEventListener = function (sEvent, funcHandler, bCapture)
-			{
+			oTarget.addEventListener = function(sEvent, funcHandler, bCapture) {
 				oTarget['on' + sEvent] = funcHandler;
 			};
 
-			oTarget.removeEventListener = function (sEvent, funcHandler, bCapture)
-			{
+			oTarget.removeEventListener = function(sEvent, funcHandler, bCapture) {
 				oTarget['on' + sEvent] = null;
 			};
 		}
@@ -1063,7 +1047,7 @@ function createEventListener(oTarget)
 /**
  * This function will retrieve the contents needed for the jump to boxes.
  */
-function grabJumpToContent()
+function grabJumpToContent ()
 {
 	getXMLDocument(elk_prepareScriptUrl(elk_scripturl) + 'action=xmlhttp;sa=jumpto;api=xml', onJumpReceived);
 
@@ -1075,7 +1059,7 @@ function grabJumpToContent()
  *
  * @param {object} oXMLDoc
  */
-function onJumpReceived(oXMLDoc)
+function onJumpReceived (oXMLDoc)
 {
 	let aBoardsAndCategories = [],
 		i,
@@ -1094,7 +1078,9 @@ function onJumpReceived(oXMLDoc)
 	}
 
 	for (i = 0, n = aJumpTo.length; i < n; i++)
+	{
 		aJumpTo[i].fillSelect(aBoardsAndCategories);
+	}
 }
 
 /**
@@ -1122,7 +1108,7 @@ function onJumpReceived(oXMLDoc)
 // This will contain all JumpTo objects on the page.
 var aJumpTo = [];
 
-function JumpTo(oJumpToOptions)
+function JumpTo (oJumpToOptions)
 {
 	this.opt = oJumpToOptions;
 	this.dropdownList = null;
@@ -1147,8 +1133,7 @@ function JumpTo(oJumpToOptions)
 }
 
 // Remove all the options in the select. Method of the JumpTo class.
-JumpTo.prototype.removeAll = function ()
-{
+JumpTo.prototype.removeAll = function() {
 	for (let i = this.dropdownList.options.length; i > 0; i--)
 	{
 		this.dropdownList.remove(i - 1);
@@ -1156,8 +1141,7 @@ JumpTo.prototype.removeAll = function ()
 };
 
 // Show the initial select box (onload). Method of the JumpTo class.
-JumpTo.prototype.showSelect = function ()
-{
+JumpTo.prototype.showSelect = function() {
 	let sChildLevelPrefix = '';
 
 	for (let i = this.opt.iCurBoardChildLevel; i > 0; i--)
@@ -1175,8 +1159,7 @@ JumpTo.prototype.showSelect = function ()
 };
 
 // Fill the select box with entries. Method of the JumpTo class.
-JumpTo.prototype.fillSelect = function (aBoardsAndCategories)
-{
+JumpTo.prototype.fillSelect = function(aBoardsAndCategories) {
 	this.removeAll();
 
 	// Create a document fragment that'll allow inserting big parts at once.
@@ -1238,8 +1221,7 @@ JumpTo.prototype.fillSelect = function (aBoardsAndCategories)
 	// Add an onchange action
 	if (!this.opt.bNoRedirect)
 	{
-		this.dropdownList.onchange = function ()
-		{
+		this.dropdownList.onchange = function() {
 			if (this.selectedIndex >= 0 && this.options[this.selectedIndex].value)
 			{
 				window.location.href = elk_scripturl + this.options[this.selectedIndex].value.substr(elk_scripturl.indexOf('?') === -1 || this.options[this.selectedIndex].value.substr(0, 1) !== '?' ? 0 : 1);
@@ -1278,7 +1260,7 @@ JumpTo.prototype.fillSelect = function (aBoardsAndCategories)
 // A global array containing all IconList objects.
 var aIconLists = [];
 
-function IconList(oOptions)
+function IconList (oOptions)
 {
 	this.opt = oOptions;
 	this.bListLoaded = false;
@@ -1297,8 +1279,7 @@ function IconList(oOptions)
 }
 
 // Replace all message icons by icons with hoverable and clickable div's.
-IconList.prototype.initIcons = function ()
-{
+IconList.prototype.initIcons = function() {
 	for (let i = document.images.length - 1, iPrefixLength = this.opt.sIconIdPrefix.length; i >= 0; i--)
 	{
 		if (document.images[i].id.substring(0, iPrefixLength) === this.opt.sIconIdPrefix)
@@ -1309,14 +1290,12 @@ IconList.prototype.initIcons = function ()
 };
 
 // Event for the mouse hovering over the original icon.
-IconList.prototype.onBoxHover = function (oDiv, bMouseOver)
-{
+IconList.prototype.onBoxHover = function(oDiv, bMouseOver) {
 	/* Do something spectacular on hover, or not */
 };
 
 // Show the list of icons after the user clicked the original icon.
-IconList.prototype.openPopup = function (oDiv, iMessageId)
-{
+IconList.prototype.openPopup = function(oDiv, iMessageId) {
 	this.iCurMessageId = iMessageId;
 
 	if (!this.bListLoaded && this.oContainerDiv === null)
@@ -1352,8 +1331,7 @@ IconList.prototype.openPopup = function (oDiv, iMessageId)
 };
 
 // Setup the list of icons once it is received through xmlHTTP.
-IconList.prototype.onIconsReceived = function (oXMLDoc)
-{
+IconList.prototype.onIconsReceived = function(oXMLDoc) {
 	let icons = oXMLDoc.getElementsByTagName('elk')[0].getElementsByTagName('icon'),
 		sItems = '';
 
@@ -1370,8 +1348,7 @@ IconList.prototype.onIconsReceived = function (oXMLDoc)
 };
 
 // Event handler for hovering over the icons.
-IconList.prototype.onItemHover = function (oDiv, bMouseOver)
-{
+IconList.prototype.onItemHover = function(oDiv, bMouseOver) {
 	if (this.iCurTimeout !== 0)
 	{
 		window.clearTimeout(this.iCurTimeout);
@@ -1388,8 +1365,7 @@ IconList.prototype.onItemHover = function (oDiv, bMouseOver)
 };
 
 // Event handler for clicking on one of the icons.
-IconList.prototype.onItemMouseDown = function (oDiv, sNewIcon)
-{
+IconList.prototype.onItemMouseDown = function(oDiv, sNewIcon) {
 	if (this.iCurMessageId !== 0)
 	{
 		ajax_indicator(true);
@@ -1415,8 +1391,7 @@ IconList.prototype.onItemMouseDown = function (oDiv, sNewIcon)
  *
  * @param oXMLDoc
  */
-IconList.prototype.onIconResponse = function (oXMLDoc)
-{
+IconList.prototype.onIconResponse = function(oXMLDoc) {
 	ajax_indicator(false);
 
 	let oMessage = oXMLDoc.getElementsByTagName('elk')[0].getElementsByTagName('message')[0];
@@ -1434,8 +1409,7 @@ IconList.prototype.onIconResponse = function (oXMLDoc)
 };
 
 // Event handler for clicking outside the list (will make the list disappear).
-IconList.prototype.onWindowMouseDown = function ()
-{
+IconList.prototype.onWindowMouseDown = function() {
 	for (let i = aIconLists.length - 1; i >= 0; i--)
 	{
 		aIconLists[i].funcParent.tmpMethod = aIconLists[i].collapseList;
@@ -1445,8 +1419,7 @@ IconList.prototype.onWindowMouseDown = function ()
 };
 
 // Collapse the list of icons.
-IconList.prototype.collapseList = function ()
-{
+IconList.prototype.collapseList = function() {
 	this.onBoxHover(this.oClickedIcon, false);
 	this.oContainerDiv.style.display = 'none';
 	this.iCurMessageId = 0;
@@ -1459,7 +1432,7 @@ IconList.prototype.collapseList = function ()
  *
  * @param {object} itemHandle
  */
-function elk_itemPos(itemHandle)
+function elk_itemPos (itemHandle)
 {
 	let itemX = 0,
 		itemY = 0;
@@ -1490,7 +1463,7 @@ function elk_itemPos(itemHandle)
  *
  * @param {string} sUrl
  */
-function elk_prepareScriptUrl(sUrl)
+function elk_prepareScriptUrl (sUrl)
 {
 	return sUrl.indexOf('?') === -1 ? sUrl + '?' : sUrl + (sUrl.charAt(sUrl.length - 1) === '?' || sUrl.charAt(sUrl.length - 1) === '&' || sUrl.charAt(sUrl.length - 1) === ';' ? '' : ';');
 }
@@ -1501,7 +1474,7 @@ function elk_prepareScriptUrl(sUrl)
  * @param {object} oCurElement
  * @param {boolean} bActOnElement the passed element contains the code
  */
-function elkSelectText(oCurElement, bActOnElement)
+function elkSelectText (oCurElement, bActOnElement)
 {
 	let oCodeArea;
 
@@ -1536,7 +1509,7 @@ function elkSelectText(oCurElement, bActOnElement)
  * @param {Array.} aElementNames
  * @param {string} sMask
  */
-function elk_saveEntities(sFormName, aElementNames, sMask)
+function elk_saveEntities (sFormName, aElementNames, sMask)
 {
 	let i = 0,
 		n = 0;
@@ -1576,7 +1549,7 @@ function elk_saveEntities(sFormName, aElementNames, sMask)
  *
  * @returns {undefined}
  */
-function pollOptions()
+function pollOptions ()
 {
 	var expire_time = document.getElementById('poll_expire');
 
@@ -1600,15 +1573,15 @@ function pollOptions()
  *
  * @param {int} [offset] optional
  */
-function generateDays(offset)
+function generateDays (offset)
 {
 	offset = offset || '';
 
 	let days = 0,
 		selected = 0,
-		dayElement = document.getElementById("day" + offset),
-		yearElement = document.getElementById("year" + offset),
-		monthElement = document.getElementById("month" + offset),
+		dayElement = document.getElementById('day' + offset),
+		yearElement = document.getElementById('year' + offset),
+		monthElement = document.getElementById('month' + offset),
 		monthLength = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
 
 	monthLength[1] = 28;
@@ -1626,7 +1599,9 @@ function generateDays(offset)
 	days = monthLength[monthElement.value - 1];
 
 	for (let i = 1; i <= days; i++)
+	{
 		dayElement.options[dayElement.length] = new Option(i, i);
+	}
 
 	if (selected < days)
 	{
@@ -1639,7 +1614,7 @@ function generateDays(offset)
  *
  * @param {string} form
  */
-function toggleLinked(form)
+function toggleLinked (form)
 {
 	form.board.disabled = !form.link_to_board.checked;
 }
@@ -1648,9 +1623,9 @@ function toggleLinked(form)
  * load event for search for and PM search, un escapes any existing search
  * value for back button or change search etc.
  */
-function initSearch()
+function initSearch ()
 {
-	if (document.forms.searchform.search.value.indexOf("%u") !== -1)
+	if (document.forms.searchform.search.value.indexOf('%u') !== -1)
 	{
 		document.forms.searchform.search.value = decodeURI(document.forms.searchform.search.value);
 	}
@@ -1663,7 +1638,7 @@ function initSearch()
  * @param {string} aFormName
  * @param {string} sInputName
  */
-function selectBoards(ids, aFormName, sInputName)
+function selectBoards (ids, aFormName, sInputName)
 {
 	let toggle = true,
 		i = 0,
@@ -1701,7 +1676,7 @@ function selectBoards(ids, aFormName, sInputName)
  * @param {string} icon
  * @param {int} speed
  */
-function expandCollapse(id, icon, speed)
+function expandCollapse (id, icon, speed)
 {
 	let oId = document.getElementById(id);
 
@@ -1712,9 +1687,9 @@ function expandCollapse(id, icon, speed)
 	if (icon)
 	{
 		let imageEl = document.getElementById(icon),
-			src = (oId.style.display !== "none") ? "/selected.png" : "/selected_open.png";
+			src = (oId.style.display !== 'none') ? '/selected.png' : '/selected_open.png';
 
-		imageEl.setAttribute("src", elk_images_url + src);
+		imageEl.setAttribute('src', elk_images_url + src);
 	}
 
 	// Open or collapse the content id
@@ -1728,9 +1703,9 @@ function expandCollapse(id, icon, speed)
  * @param {string} txt_message
  * @param {string} [formName=autoSubmit]
  */
-function doAutoSubmit(countdown, txt_message, formName)
+function doAutoSubmit (countdown, txt_message, formName)
 {
-	var formID = typeof (formName) !== 'undefined' ? formName : "autoSubmit";
+	var formID = typeof (formName) !== 'undefined' ? formName : 'autoSubmit';
 
 	if (countdown === 0)
 	{
@@ -1744,8 +1719,7 @@ function doAutoSubmit(countdown, txt_message, formName)
 	document.forms[formID].cont.value = txt_message + ' (' + countdown + ')';
 	countdown--;
 
-	setTimeout(function ()
-	{
+	setTimeout(function() {
 		doAutoSubmit(countdown, txt_message, formID);
 	}, 1000);
 }
@@ -1757,7 +1731,7 @@ function doAutoSubmit(countdown, txt_message, formName)
  *
  * @param {element} element
  */
-function isElementInViewport(element)
+function isElementInViewport (element)
 {
 	if (typeof element === 'undefined')
 	{

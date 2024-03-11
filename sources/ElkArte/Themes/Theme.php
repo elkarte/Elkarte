@@ -44,7 +44,7 @@ abstract class Theme
 		'generic_xml' => 'text/xml'
 	];
 
-	/** @var \ElkArte\Helper\ValuesContainer */
+	/** @var ValuesContainer */
 	public $user;
 
 	/** @var HttpReq user input variables */
@@ -78,7 +78,7 @@ abstract class Theme
 	 * Theme constructor.
 	 *
 	 * @param int $id
-	 * @param \ElkArte\Helper\ValuesContainer $user
+	 * @param ValuesContainer $user
 	 * @param Directories $dirs
 	 */
 	public function __construct(int $id, ValuesContainer $user, Directories $dirs)

@@ -337,6 +337,7 @@ class ManageThemes extends AbstractController
 
 		$old_id = $settings['theme_id'];
 		$old_settings = $settings;
+		$old_js_inline = $context['js_inline'];
 
 		new ThemeLoader($theme, false);
 
@@ -490,6 +491,7 @@ class ManageThemes extends AbstractController
 		new ThemeLoader($old_id, true);
 
 		$settings = $old_settings;
+		$context['js_inline'] = $old_js_inline;
 
 		// Reinit just incase.
 		theme()->getSettings();

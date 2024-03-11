@@ -100,11 +100,11 @@ class UserNotification extends AbstractModel
 		}
 
 		theme()->addInlineJavascript('
-			$(function() {
+			document.addEventListener("DOMContentLoaded", function() {
 				ElkNotifier.add(new ElkFavicon({
 					number: ' . $number . ',
-					fontStyle: \'bolder\',
-					animation: \'none\'' . (empty($notif_opt) ? '' : ',' . implode(',', $notif_opt)) . '
+					fontStyle: "bolder",
+					animation: "none"' . (empty($notif_opt) ? '' : ',' . implode(',', $notif_opt)) . '
 				}));
 			});', true);
 	}
@@ -129,11 +129,12 @@ class UserNotification extends AbstractModel
 	{
 		loadJavascriptFile(['ext/push.min.js', 'desktop-notify.js'], ['defer' => true]);
 		theme()->addInlineJavascript('
-			$(function() {
+			document.addEventListener("DOMContentLoaded", function() {
 				Push.config({serviceWorker: "./elkServiceWorker.min.js"}); 
 				
-				ElkNotifier.add(new ElkDesktop(
-					{\'icon\': $(\'head\').find("link[rel=\'shortcut icon\']").attr("href")}
+				// Grab the site icon to use in the desktop notification widget
+				ElkNotifications.add(new ElkDesktop(
+					{"icon": $("head").find("link[rel=\'shortcut icon\']").attr("href")}
 				));
 			});', true);
 	}

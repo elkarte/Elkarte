@@ -177,7 +177,7 @@ const itemCodes = ["*:disc", "@:disc", "+:square", "x:square", "#:decimal", "0:d
 			if (currentRange.selectedRange() && typeof currentRange.selectedRange() !== 'undefined')
 			{
 				let end = currentRange.selectedRange().startOffset,
-					text = typeof currentNode !== 'undefined' ? currentNode.textContent : '';
+					text = typeof currentNode === 'undefined' ? '' : currentNode.textContent;
 
 				// Left and right text from the cursor position and tag positions
 				let left = text.substring(0, end),
@@ -742,6 +742,8 @@ sceditor.formats.bbcode
 			blockquote: null,
 			cite: null
 		},
+		quoteType: sceditor.BBCodeParser.QuoteType.never,
+		breakBefore: false,
 		isInline: false,
 		format: function (element, content)
 		{
@@ -754,19 +756,19 @@ sceditor.formats.bbcode
 				return '';
 			}
 
-			if (element.hasAttribute('author'))
+			if (element.hasAttribute('data-author'))
 			{
-				author = ' author=' + element.getAttribute('author').php_unhtmlspecialchars();
+				author = ' author=' + element.getAttribute('data-author').php_unhtmlspecialchars();
 			}
 
-			if (element.hasAttribute('date'))
+			if (element.hasAttribute('data-date'))
 			{
-				date = ' date=' + element.getAttribute('date');
+				date = ' date=' + element.getAttribute('data-date');
 			}
 
-			if (element.hasAttribute('link'))
+			if (element.hasAttribute('data-link'))
 			{
-				link = ' link=' + element.getAttribute('link');
+				link = ' link=' + element.getAttribute('data-link');
 			}
 
 			if (author === '' && date === '' && link !== '')
@@ -805,9 +807,9 @@ sceditor.formats.bbcode
 			// Links could be in the form: link=topic=71.msg201#msg201 that would fool javascript, so we need a workaround
 			for (let key in attrs)
 			{
-				if (key.substr(0, 4) === 'link' && attrs.hasOwnProperty(key))
+				if (key.substring(0, 4) === 'link' && attrs.hasOwnProperty(key))
 				{
-					attr_link = key.length > 4 ? key.substr(5) + '=' + attrs[key] : attrs[key];
+					attr_link = key.length > 4 ? key.substring(5) + '=' + attrs[key] : attrs[key];
 					attr_link = $.sceditor.escapeEntities(attr_link);
 					sLink = (attr_link.substring(0, 7) === 'http://' || attr_link.substring(0, 8) === 'https://')
 						? attr_link
@@ -832,10 +834,10 @@ sceditor.formats.bbcode
 			}
 			else
 			{
-				sAuthor += sDate !== '' ? ' ' + bbc_search_on : '';
+				sAuthor += sDate === '' ? '' : ' ' + bbc_search_on;
 			}
 
-			content = '<blockquote author="' + attr_author + '" link="' + attr_link + '" date="' + attr_date + '"><cite>' + sAuthor + ' ' + sDate + '</cite>' + content + '</blockquote>';
+			content = '<blockquote data-author="' + attr_author + '" data-link="' + attr_link + '" data-date="' + attr_date + '"><cite>' + sAuthor + ' ' + sDate + '</cite>' + content + '</blockquote>';
 
 			return content;
 		}
@@ -983,9 +985,9 @@ sceditor.formats.bbcode
 			let url = element.getAttribute('href');
 
 			// return the type of link we are currently dealing with
-			if (url.substr(0, 7) === 'mailto:')
+			if (url.substring(0, 7) === 'mailto:')
 			{
-				return '[email="' + url.substr(7) + '"]' + content + '[/email]';
+				return '[email="' + url.substring(7) + '"]' + content + '[/email]';
 			}
 
 			if (element.hasAttribute('data-mention'))

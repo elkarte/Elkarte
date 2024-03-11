@@ -747,7 +747,7 @@
 	this.likePostStats = likePostStats;
 
 	// Set the menu buttons to act as ajax tabs
-	document.addEventListener("DOMContentLoaded", function() {
+	document.addEventListener('DOMContentLoaded', function() {
 		const links = document.querySelectorAll('.like_post_stats_menu a');
 		links.forEach(function(link) {
 			link.addEventListener('click', function(e) {

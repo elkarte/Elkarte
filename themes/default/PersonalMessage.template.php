@@ -30,10 +30,10 @@ function template_pm_above()
 	// The every helpful javascript!
 	echo '
 					<script>
-						let allLabels = {},
+						var allLabels = {},
 							currentLabels = {},
-							txt_pm_msg_label_remove = "', $txt['pm_msg_label_remove'], '",
-							txt_pm_msg_label_apply = "', $txt['pm_msg_label_apply'], '";
+							txt_pm_msg_label_remove = "', JavaScriptEscape($txt['pm_msg_label_remove']), '",
+							txt_pm_msg_label_apply = "', JavaScriptEscape($txt['pm_msg_label_apply']), '";
 					</script>
 					<section id="personal_messages">';
 
@@ -207,7 +207,7 @@ function template_folder()
 				}
 
 				// ... and are there any that can be removed?
-				if (!empty($message['labels']) && (count($message['labels']) > 1 || !isset($message['labels'][-1])))
+				if (!empty($message['labels']) && (count($message['labels']) > 1 || !isset($message['labels']["-1"])))
 				{
 					echo '
 										<option value="" disabled="disabled">', $txt['pm_msg_label_remove'], ':</option>';
@@ -366,22 +366,22 @@ function template_subject_list()
 						<thead>
 							<tr class="table_head">
 								<th class="pm_icon grid4">
-									<a href="', $scripturl, '?action=pm;view;f=', $context['folder'], ';start=', $context['start'], ';sort=', $context['sort_by'], ($context['sort_direction'] === 'up' ? ';asc' : ';desc'), ($context['current_label_id'] != -1 ? ';l=' . $context['current_label_id'] : ''), '">
+									<a href="', $scripturl, '?action=pm;view;f=', $context['folder'], ';start=', $context['start'], ';sort=', $context['sort_by'], ($context['sort_direction'] === 'up' ? ';asc' : ';desc'), ($context['current_label_id'] !== "-1" ? ';l=' . $context['current_label_id'] : ''), '">
 										<i class="icon i-shuffle" title="', $txt['pm_change_view'], '"><s>', $txt['pm_change_view'], '</s></i>
 									</a>
 								</th>
 								<th class="pm_date grid20">
-									<a href="', $scripturl, '?action=pm;f=', $context['folder'], ';start=', $context['start'], ';sort=date', ($context['sort_by'] === 'date' && $context['sort_direction'] === 'up' ? ';desc' : ';asc'), $context['current_label_id'] != -1 ? ';l=' . $context['current_label_id'] : '', '">
+									<a href="', $scripturl, '?action=pm;f=', $context['folder'], ';start=', $context['start'], ';sort=date', ($context['sort_by'] === 'date' && $context['sort_direction'] === 'up' ? ';desc' : ';asc'), $context['current_label_id'] !== "-1" ? ';l=' . $context['current_label_id'] : '', '">
 										', $txt['date'], $context['sort_by'] === 'date' ? ' <i class="icon icon-small i-sort-numeric-' . $context['sort_direction'] . '"></i>' : '', '
 									</a>
 								</th>
 								<th class="pm_subject">
-									<a href="', $scripturl, '?action=pm;f=', $context['folder'], ';start=', $context['start'], ';sort=subject', ($context['sort_by'] === 'subject' && $context['sort_direction'] === 'up' ? ';desc' : ';asc'), $context['current_label_id'] != -1 ? ';l=' . $context['current_label_id'] : '', '">
+									<a href="', $scripturl, '?action=pm;f=', $context['folder'], ';start=', $context['start'], ';sort=subject', ($context['sort_by'] === 'subject' && $context['sort_direction'] === 'up' ? ';desc' : ';asc'), $context['current_label_id'] !== "-1" ? ';l=' . $context['current_label_id'] : '', '">
 										', $txt['subject'], $context['sort_by'] === 'subject' ? ' <i class="icon icon-small i-sort-alpha-' . $context['sort_direction'] . '"></i>' : '', '
 									</a>
 								</th>
 								<th class="pm_from grid20">
-									<a href="', $scripturl, '?action=pm;f=', $context['folder'], ';start=', $context['start'], ';sort=name', ($context['sort_by'] === 'name' && $context['sort_direction'] === 'up' ? ';desc' : ';asc'), $context['current_label_id'] != -1 ? ';l=' . $context['current_label_id'] : '', '">
+									<a href="', $scripturl, '?action=pm;f=', $context['folder'], ';start=', $context['start'], ';sort=name', ($context['sort_by'] === 'name' && $context['sort_direction'] === 'up' ? ';desc' : ';asc'), $context['current_label_id'] !== "-1" ? ';l=' . $context['current_label_id'] : '', '">
 										', ($context['from_or_to'] === 'from' ? $txt['from'] : $txt['to']), $context['sort_by'] === 'name' ? ' <i class="icon icon-small i-sort-alpha-' . $context['sort_direction'] . '"></i>' : '', '
 									</a>
 								</th>
@@ -404,7 +404,7 @@ function template_subject_list()
 	$controller = $context['get_psubject'][0];
 	while ($message = $controller->{$context['get_psubject'][1]}())
 	{
-		$discussion_url = $context['display_mode'] == 0 || $context['current_pm'] == $message['id'] ? '' : ($scripturl . '?action=pm;pmid=' . $message['id'] . ';kstart;f=' . $context['folder'] . ';start=' . $context['start'] . ';sort=' . $context['sort_by'] . ($context['sort_direction'] == 'up' ? ';asc' : ';desc') . ($context['current_label_id'] != -1 ? ';l=' . $context['current_label_id'] : ''));
+		$discussion_url = $context['display_mode'] == 0 || $context['current_pm'] == $message['id'] ? '' : ($scripturl . '?action=pm;pmid=' . $message['id'] . ';kstart;f=' . $context['folder'] . ';start=' . $context['start'] . ';sort=' . $context['sort_by'] . ($context['sort_direction'] == 'up' ? ';asc' : ';desc') . ($context['current_label_id'] !== "-1" ? ';l=' . $context['current_label_id'] : ''));
 
 		echo '
 							<tr class="standard_row">
@@ -467,7 +467,7 @@ function template_subject_list()
 
 			foreach ($context['labels'] as $label)
 			{
-				if ($label['id'] != $context['current_label_id'])
+				if ($label['id'] !== $context['current_label_id'])
 				{
 					$extra .= '
 								<option value="add_' . $label['id'] . '">&#10148;&nbsp;' . $label['name'] . '</option>';
@@ -968,7 +968,7 @@ function template_send()
 				<input type="hidden" name="replied_to" value="', empty($context['quoted_message']['id']) ? 0 : $context['quoted_message']['id'], '" />
 				<input type="hidden" name="pm_head" value="', empty($context['quoted_message']['pm_head']) ? 0 : $context['quoted_message']['pm_head'], '" />
 				<input type="hidden" name="f" value="', $context['folder'] ?? '', '" />
-				<input type="hidden" name="l" value="', $context['current_label_id'] ?? -1, '" />';
+				<input type="hidden" name="l" value="', $context['current_label_id'] ?? "-1", '" />';
 
 	// If the admin enabled the pm drafts feature, show a draft selection box
 	if (!empty($context['drafts_pm_save']) && !empty($context['drafts']))
@@ -1127,7 +1127,7 @@ function template_ask_delete()
 		<h2 class="category_header">', ($context['delete_all'] ? $txt['delete_message'] : $txt['delete_all']), '</h2>
 		<div class="content">
 			<p>', $txt['delete_all_confirm'], '</p><br />
-			<strong><a href="', $scripturl, '?action=pm;sa=removeall2;f=', $context['folder'], ';', $context['current_label_id'] != -1 ? ';l=' . $context['current_label_id'] : '', ';', $context['session_var'], '=', $context['session_id'], '">', $txt['yes'], '</a> - <a href="javascript:window.location.assign(document.referrer);">', $txt['no'], '</a></strong>
+			<strong><a href="', $scripturl, '?action=pm;sa=removeall2;f=', $context['folder'], ';', $context['current_label_id'] !== "-1" ? ';l=' . $context['current_label_id'] : '', ';', $context['session_var'], '=', $context['session_id'], '">', $txt['yes'], '</a> - <a href="javascript:window.location.assign(document.referrer);">', $txt['no'], '</a></strong>
 		</div>';
 }
 
@@ -1197,7 +1197,7 @@ function template_labels()
 	{
 		foreach ($context['labels'] as $label)
 		{
-			if ($label['id'] == -1)
+			if ($label['id'] === "-1")
 			{
 				continue;
 			}
@@ -1379,8 +1379,8 @@ function template_add_rule()
 	global $context, $txt, $scripturl;
 
 	echo '
-	<form action="', $scripturl, '?action=pm;sa=manrules;save;rid=', $context['rid'], '" method="post" accept-charset="UTF-8" name="addrule" id="addrule" class="flow_hidden">
-		<h2 class="category_header">', $context['rid'] == 0 ? $txt['pm_add_rule'] : $txt['pm_edit_rule'], '</h2>
+	<form name="addrule" id="addrule" class="flow_hidden" action="', $scripturl, '?action=pm;sa=manrules;save;rid=', $context['rid'], '" method="post" accept-charset="UTF-8">
+		<h2 class="category_header">', $context['rid'] === 0 ? $txt['pm_add_rule'] : $txt['pm_edit_rule'], '</h2>
 		<div class="content">
 			<dl class="addrules">
 				<dt class="floatleft">
@@ -1398,7 +1398,7 @@ function template_add_rule()
 	$isFirst = true;
 	foreach ($context['rule']['criteria'] as $k => $criteria)
 	{
-		if (!$isFirst && $criteria['t'] == '')
+		if (!$isFirst && $criteria['t'] === '')
 		{
 			echo '
 				<div id="removeonjs1">';
@@ -1416,13 +1416,13 @@ function template_add_rule()
 		foreach ($context['known_rules'] as $rule)
 		{
 			echo '
-						<option value="', $rule, '" ', $criteria['t'] == $rule ? 'selected="selected"' : '', '>', $txt['pm_rule_' . $rule], '</option>';
+						<option value="', $rule, '" ', $criteria['t'] === $rule ? 'selected="selected"' : '', '>', $txt['pm_rule_' . $rule], '</option>';
 		}
 
 		echo '
 					</select>
 					<span id="defdiv', $k, '" ', in_array($criteria['t'], array('gid', 'bud')) ? 'class="hide"' : '', '>
-						<input type="text" name="ruledef[', $k, ']" id="ruledef', $k, '" value="', in_array($criteria['t'], array('mid', 'sub', 'msg')) ? $criteria['v'] : '', '" class="input_text" />
+						<input type="text" name="ruledef[', $k, ']" id="ruledef', $k, '" value="', in_array($criteria['t'], ['mid', 'sub', 'msg']) ? $criteria['v'] : '', '" />
 					</span>
 					<span id="defseldiv', $k, '" ', $criteria['t'] === 'gid' ? '' : 'class="hide"', '>
 						<select class="criteria" name="ruledefgroup[', $k, ']" id="ruledefgroup', $k, '">
@@ -1431,7 +1431,7 @@ function template_add_rule()
 		foreach ($context['groups'] as $id => $group)
 		{
 			echo '
-							<option value="', $id, '" ', $criteria['t'] === 'gid' && $criteria['v'] == $id ? 'selected="selected"' : '', '>', $group, '</option>';
+							<option value="', $id, '" ', $criteria['t'] === 'gid' && $criteria['v'] === $id ? 'selected="selected"' : '', '>', $group, '</option>';
 		}
 
 		echo '
@@ -1443,7 +1443,7 @@ function template_add_rule()
 		{
 			$isFirst = false;
 		}
-		elseif ($criteria['t'] == '')
+		elseif ($criteria['t'] === '')
 		{
 			echo '
 				</div>';
@@ -1452,7 +1452,7 @@ function template_add_rule()
 
 	echo '
 				<span id="criteriaAddHere"></span>
-				<br />
+				<br /><br />
 				<a id="addonjs1" class="linkbutton hide" href="#" onclick="addCriteriaOption(); return false;">', $txt['pm_rule_criteria_add'], '</a>
 				<br /><br />
 				', $txt['pm_rule_logic'], ':
@@ -1465,13 +1465,13 @@ function template_add_rule()
 				<legend>', $txt['pm_rule_actions'], '</legend>';
 
 	// As with criteria - add a dummy action for "expansion".
-	$context['rule']['actions'][] = array('t' => '', 'v' => '');
+	$context['rule']['actions'][] = ['t' => '', 'v' => ''];
 
 	// Print each action.
 	$isFirst = true;
 	foreach ($context['rule']['actions'] as $k => $action)
 	{
-		if (!$isFirst && $action['t'] == '')
+		if (!$isFirst && $action['t'] === '')
 		{
 			echo '
 				<div id="removeonjs2">';
@@ -1494,10 +1494,10 @@ function template_add_rule()
 
 		foreach ($context['labels'] as $label)
 		{
-			if ($label['id'] != -1)
+			if ($label['id'] !== "-1")
 			{
 				echo '
-							<option value="', ($label['id'] + 1), '" ', $action['t'] === 'lab' && $action['v'] == $label['id'] ? 'selected="selected"' : '', '>', $label['name'], '</option>';
+							<option value="', ($label['id'] + 1), '" ', $action['t'] === 'lab' && $action['v'] === $label['id'] ? 'selected="selected"' : '', '>', $label['name'], '</option>';
 			}
 		}
 
@@ -1517,7 +1517,8 @@ function template_add_rule()
 	}
 
 	echo '
-				<span id="actionAddHere"></span><br />
+				<span id="actionAddHere"></span>
+				<br /><br />
 				<a href="#" id="addonjs2" class="linkbutton hide" onclick="addActionOption(); return false;">', $txt['pm_rule_add_action'], '</a>
 			</fieldset>
 		</div>
@@ -1532,9 +1533,10 @@ function template_add_rule()
 	</form>';
 
 	// Now setup all the bits!
+	theme()->addInlineJavascript('initUpdateRulesActions();', true);
+
 	echo '
-	<script>
-		initUpdateRulesActions();';
+	<script>';
 
 	// If this isn't a new rule, and we have JS enabled remove the JS compatibility stuff.
 	if ($context['rid'])

@@ -856,22 +856,25 @@ errorbox_handler.prototype.slideDown = function(element) {
  */
 function toggle_mlsearch_opt ()
 {
-	var $_mlsearch = $('#mlsearch_options');
+	let mlsearch = document.getElementById('mlsearch_options');
 
 	// If the box is already visible just forget about it
-	if ($_mlsearch.is(':visible'))
+	if (window.getComputedStyle(mlsearch).display !== 'none')
 	{
 		return;
 	}
 
 	// Time to show the droppy
-	$_mlsearch.fadeIn('fast');
+	mlsearch.fadeIn(250);
 
 	// A click anywhere on the page will close the droppy
-	$('body').on('click', mlsearch_opt_hide);
+	document.body.addEventListener('click', mlsearch_opt_hide);
 
 	// Except clicking on the box itself or into the search text input
-	$('#mlsearch_options, #mlsearch_input').off('click', mlsearch_opt_hide).on('click', function(ev) {
+	document.getElementById('mlsearch_options').addEventListener('click', function(ev) {
+		ev.stopPropagation();
+	});
+	document.getElementById('mlsearch_input').addEventListener('click', function(ev) {
 		ev.stopPropagation();
 	});
 }
@@ -881,8 +884,10 @@ function toggle_mlsearch_opt ()
  */
 function mlsearch_opt_hide ()
 {
-	$('body').off('click', mlsearch_opt_hide);
-	$('#mlsearch_options').slideToggle('fast');
+	document.querySelector('body').removeEventListener('click', mlsearch_opt_hide);
+
+	let mlsearchOptions = document.getElementById('mlsearch_options');
+	mlsearchOptions.slideToggle(250);
 }
 
 /**
@@ -926,7 +931,7 @@ function disableAutoComplete ()
 	 * ElkNotifications is a module that allows sending notifications to multiple notifiers.
 	 * @returns {Object} - The ElkNotifications module.
 	 */
-	var ElkNotifications = (function(opt) {
+	const ElkNotifications = (function(opt) {
 		'use strict';
 
 		opt = opt || {};
@@ -941,21 +946,26 @@ function disableAutoComplete ()
 				opt.delay = 45000;
 			}
 
+			// Run at startup
 			setTimeout(function() {
 				fetchData();
-			}, opt.delay);
+			}, 500);
 		};
 
+		// Add a notifier, like favicon
 		let add = function(notif) {
 			_notifiers.push(notif);
 		};
 
+		// Trigger a notifier update
 		let send = function(request) {
 			_notifiers.forEach((notification) => {
 				notification.send(request);
 			});
 		};
 
+		// Recursively calls itself on a timeout loop looking for new mentions.  When found will
+		// trigger send request to all bound notifiers.
 		let fetchData = function() {
 			if (_notifiers.length === 0)
 			{
@@ -980,6 +990,7 @@ function disableAutoComplete ()
 				.then(function(request) {
 					if (request !== '')
 					{
+						// Trigger any updates
 						send(request);
 						lastTime = request.timelast;
 					}
@@ -1003,27 +1014,59 @@ function disableAutoComplete ()
 		};
 	});
 
-	// AMD / RequireJS
-	if (typeof define !== 'undefined' && define.amd)
-	{
-		define([], function() {
-			return ElkNotifications;
-		});
-	}
-	// CommonJS
-	else if (typeof module !== 'undefined' && module.exports)
-	{
-		module.exports = ElkNotifications;
-	}
-	// included directly via <script> tag
-	else
-	{
-		this.ElkNotifications = ElkNotifications;
-	}
-
+	this.ElkNotifications = ElkNotifications;
 })();
 
-var ElkNotifier = new window.ElkNotifications({});
+const ElkNotifier = new window.ElkNotifications({});
+
+/**
+ * @package   ElkArte Forum
+ * @copyright ElkArte Forum contributors
+ * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
+ *
+ * @version 2.0 dev
+ *
+ * This bits acts as middle-man between the Favico and the ElkNotifications
+ * providing the interface required by the latter.
+ */
+(function() {
+	const ElkFavicon = (function(opt) {
+
+		opt = (opt) ? opt : {};
+
+		// Holds the favico class
+		let mentions= new Favico(opt);
+
+		// Set the favicon count indicator on startup
+		const init = function(opt) {
+			if (opt.number > 0)
+			{
+				mentions.badge(opt.number);
+				document.querySelector('#button_mentions .pm_indicator').innerHTML = opt.number;
+			}
+		};
+
+		// Update the indicator when new items are added or removed.
+		const send = function(request) {
+			if (request.mentions > 0)
+			{
+				mentions.badge(request.mentions);
+				document.querySelector('#button_mentions .pm_indicator').innerHTML = request.mentions;
+			}
+			else
+			{
+				mentions.reset();
+			}
+		};
+
+		init(opt);
+		return {
+			send: send
+		};
+	});
+
+	this.ElkFavicon = ElkFavicon;
+})();
 
 /**
  * Initialize the ajax info-bar
@@ -1403,27 +1446,29 @@ function _s (el, duration, callback, isDown)
 }
 
 /**
- * Animates the opacity of an element to fadeIn or fadeOut an element
+ * Animates the opacity of an element to make it fade in to out
+ *
+ * Intended to be a replacement for jQuery fadeIn and fadeOut
  *
  * @param {HTMLElement} element - The element to animate.
  * @param {number} [duration=1000] - The duration of the animation in milliseconds.
  * @param {Function} [callback] - A function to be called when the animation completes.
  * @param {boolean} [isOut=false] - Specifies whether the animation should fade out the element.
  * @private
- * @return {void}
  */
 function _s2 (element, duration, callback, isOut)
 {
-	duration = duration || 1000;
+	duration = duration || 500;
 	isOut = isOut || false;
 
-	let initialOpacity = 0,
-		finalOpacity = 1;
-
-	if (isOut)
-	{
-		initialOpacity = 1;
+	let initialOpacity = 1,
 		finalOpacity = 0;
+
+	if (!isOut)
+	{
+		initialOpacity = 0;
+		finalOpacity = 1;
+		element.style.display = 'block';
 	}
 
 	let opacity = initialOpacity,
@@ -1441,19 +1486,21 @@ function _s2 (element, duration, callback, isOut)
 		opacity = progress / duration;
 		opacityChangeFactor = isOut ? 1 - opacity : opacity;
 
-		if (isOut && opacityChangeFactor > finalOpacity)
-		{
-			element.style.opacity = opacityChangeFactor;
-			window.requestAnimationFrame(animateOpacity);
-		}
-		else if (!isOut && opacityChangeFactor < finalOpacity)
+		if ((isOut && opacityChangeFactor > finalOpacity) || (!isOut && opacityChangeFactor < finalOpacity))
 		{
 			element.style.opacity = opacityChangeFactor;
 			window.requestAnimationFrame(animateOpacity);
 		}
 		else
 		{
+			// Animation complete
 			element.style.opacity = finalOpacity;
+
+			if (isOut)
+			{
+				element.style.display = 'none';
+			}
+
 			if (typeof callback === 'function')
 			{
 				callback();
@@ -1462,4 +1509,24 @@ function _s2 (element, duration, callback, isOut)
 	}
 
 	window.requestAnimationFrame(animateOpacity);
+}
+
+/**
+ * Retrieves the siblings of the given element.
+ *
+ * @param {HTMLElement} el - The element whose siblings to retrieve.
+ * @returns {HTMLElement[]} - An array of HTMLElement objects representing the siblings of the given element.
+ */
+function elkGetSiblings (el)
+{
+	let siblings = [];
+	for (let i = 0; i < el.parentNode.children.length; i++)
+	{
+		if (el.parentNode.children[i] !== el)
+		{
+			siblings.push(el.parentNode.children[i]);
+		}
+	}
+
+	return siblings;
 }
