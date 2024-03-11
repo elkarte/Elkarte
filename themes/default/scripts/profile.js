@@ -16,21 +16,19 @@
 /**
  * Profile tabs (summary, recent, buddy), for use with jqueryUI
  */
-function start_tabs()
+function start_tabs ()
 {
-	$("#tabs").tabs({
+	$('#tabs').tabs({
 		ajaxOptions: {
-			dataType: "xml",
+			dataType: 'xml',
 		},
 		// Called before tab content is loaded with href
-		beforeLoad: function (event, ui)
-		{
+		beforeLoad: function(event, ui) {
 			// The ubiquitous ajax spinner
 			ui.panel.html('<div class="centertext"><i class="icon icon-big i-oval"></i></div>');
 
 			// Ajax call failed to retrieve content
-			ui.jqXHR.fail(function (jqXHR, textStatus, errorThrown)
-			{
+			ui.jqXHR.fail(function(jqXHR, textStatus, errorThrown) {
 				ui.panel.html('<div></div>');
 				if ('console' in window && console.info)
 				{
@@ -47,7 +45,7 @@ function start_tabs()
  *
  * @param {string} currentTime
  */
-function autoDetectTimeOffset(currentTime)
+function autoDetectTimeOffset (currentTime)
 {
 	let localTime = new Date(),
 		serverTime;
@@ -79,7 +77,7 @@ function autoDetectTimeOffset(currentTime)
 /**
  * Calculates the number of available characters remaining when filling in the signature box
  */
-function calcCharLeft(init, event = {})
+function calcCharLeft (init, event = {})
 {
 	let currentSignature = document.forms.creator.signature.value,
 		currentChars = 0;
@@ -91,15 +89,15 @@ function calcCharLeft(init, event = {})
 
 	init = typeof init !== 'undefined' ? init : false;
 
-	currentChars = currentSignature.replace(/\r/, "").length;
+	currentChars = currentSignature.replace(/\r/, '').length;
 
 	if (currentChars > maxLength)
 	{
-		document.getElementById("signatureLeft").className = "error";
+		document.getElementById('signatureLeft').className = 'error';
 	}
 	else
 	{
-		document.getElementById("signatureLeft").className = "";
+		document.getElementById('signatureLeft').className = '';
 	}
 
 	let profileError = document.getElementById('profile_error');
@@ -107,7 +105,7 @@ function calcCharLeft(init, event = {})
 	{
 		ajax_getSignaturePreview(false);
 	}
-	// Only hide it if the only errors were signature errors...
+		// Only hide it if the only errors were signature errors...
 	// @todo with so many possible signature errors, this needs to be enhanced
 	else if (currentChars <= maxLength && window.getComputedStyle(profileError).display !== 'none' && !init)
 	{
@@ -117,7 +115,7 @@ function calcCharLeft(init, event = {})
 		{
 			// Remove any signature errors
 			let signatureErrors = errorList.querySelectorAll('.signature_error');
-			signatureErrors.forEach(function (elem) {
+			signatureErrors.forEach(function(elem) {
 				errorList.removeChild(elem);
 			});
 
@@ -126,7 +124,7 @@ function calcCharLeft(init, event = {})
 			{
 				if (profileError)
 				{
-					profileError.style.display = "none";
+					profileError.style.display = 'none';
 					profileError.innerHTML = '';
 				}
 			}
@@ -141,7 +139,7 @@ function calcCharLeft(init, event = {})
  *
  * @param {boolean} showPreview
  */
-function ajax_getSignaturePreview(showPreview)
+function ajax_getSignaturePreview (showPreview)
 {
 	showPreview = (typeof showPreview === 'undefined') ? false : showPreview;
 
@@ -166,22 +164,22 @@ function ajax_getSignaturePreview(showPreview)
 		.then(response => {
 			if (!response.ok)
 			{
-				throw new Error("HTTP error " + response.status);
+				throw new Error('HTTP error ' + response.status);
 			}
 			return response.text();
 		})
 		.then(request => {
 			let parser = new DOMParser(),
-				xmlDoc = parser.parseFromString(request, "text/xml");
+				xmlDoc = parser.parseFromString(request, 'text/xml');
 
 			if (showPreview)
 			{
 				let signatures = ['current', 'preview'];
 				for (let i = 0; i < signatures.length; i++)
 				{
-					document.getElementById(signatures[i] + "_signature").style.display = "block";
-					document.getElementById(signatures[i] + "_signature_display").style.display = "block";
-					document.getElementById(signatures[i] + "_signature_display").innerHTML = xmlDoc.querySelector('[type="' + signatures[i] + '"]').textContent + '<hr>';
+					document.getElementById(signatures[i] + '_signature').style.display = 'block';
+					document.getElementById(signatures[i] + '_signature_display').style.display = 'block';
+					document.getElementById(signatures[i] + '_signature_display').innerHTML = xmlDoc.querySelector('[type="' + signatures[i] + '"]').textContent + '<hr>';
 				}
 			}
 
@@ -208,7 +206,7 @@ function ajax_getSignaturePreview(showPreview)
 				errors.forEach(error => {
 					errors_list += '<li class="signature_error">' + error.textContent + '</li>';
 				});
-				document.getElementById("list_errors").innerHTML = errors_list;
+				document.getElementById('list_errors').innerHTML = errors_list;
 			}
 			// No errors, clear any previous signature related ones
 			else
@@ -246,31 +244,34 @@ function ajax_getSignaturePreview(showPreview)
  *
  * @param {string} selected
  */
-function changeSel(selected)
+function changeSel (selected)
 {
 	if (cat.selectedIndex === -1)
 	{
 		return;
 	}
 
-	if (cat.options[cat.selectedIndex].value.indexOf("/") > 0)
+	if (cat.options[cat.selectedIndex].value.indexOf('/') > 0)
 	{
 		let i,
 			count = 0;
 
-		file.style.display = "inline";
+		file.style.display = 'inline';
 		file.disabled = false;
 
 		for (i = file.length; i >= 0; i -= 1)
+		{
 			file.options[i] = null;
+		}
 
 		for (i = 0; i < files.length; i++)
+		{
 			if (files[i].indexOf(cat.options[cat.selectedIndex].value) === 0)
 			{
-				let filename = files[i].substr(files[i].indexOf("/") + 1),
-					showFilename = filename.substr(0, filename.lastIndexOf("."));
+				let filename = files[i].substr(files[i].indexOf('/') + 1),
+					showFilename = filename.substr(0, filename.lastIndexOf('.'));
 
-				showFilename = showFilename.replace(/[_]/g, " ");
+				showFilename = showFilename.replace(/[_]/g, ' ');
 
 				file.options[count] = new Option(showFilename, files[i]);
 
@@ -288,6 +289,7 @@ function changeSel(selected)
 
 				count++;
 			}
+		}
 
 		if (file.selectedIndex === -1 && file.options[0])
 		{
@@ -298,17 +300,17 @@ function changeSel(selected)
 	}
 	else
 	{
-		file.style.display = "none";
+		file.style.display = 'none';
 		file.disabled = true;
-		document.getElementById("avatar").src = avatardir + cat.options[cat.selectedIndex].value;
-		document.getElementById("avatar").style.width = "";
-		document.getElementById("avatar").style.height = "";
+		document.getElementById('avatar').src = avatardir + cat.options[cat.selectedIndex].value;
+		document.getElementById('avatar').style.width = '';
+		document.getElementById('avatar').style.height = '';
 	}
 }
 
-function init_avatars()
+function init_avatars ()
 {
-	var avatar = document.getElementById("avatar");
+	var avatar = document.getElementById('avatar');
 
 	// If we are using an avatar from the gallery, let's load it
 	if (avatar !== null)
@@ -321,13 +323,13 @@ function init_avatars()
 }
 
 // Show the right avatar based on what radio button they just selected
-function swap_avatar()
+function swap_avatar ()
 {
 	let nodeList = document.querySelectorAll('#avatar_choices input'),
 		inputs = Array.from(nodeList),
 		choice;
 
-	inputs.forEach(function (input) {
+	inputs.forEach(function(input) {
 		choice = document.getElementById(input.id.replace('_choice', ''));
 
 		if (choice !== null)
@@ -349,7 +351,7 @@ function swap_avatar()
 /**
  * Updates the avatar img preview with the selected one
  */
-function showAvatar()
+function showAvatar ()
 {
 	if (file.selectedIndex === -1)
 	{
@@ -371,7 +373,7 @@ function showAvatar()
  *
  * @param {string} src
  */
-function previewExternalAvatar(src)
+function previewExternalAvatar (src)
 {
 	let oSid = document.getElementById('external');
 
@@ -380,7 +382,7 @@ function previewExternalAvatar(src)
 
 	// Create a new image element
 	let img = new Image();
-	img.onload = function () {
+	img.onload = function() {
 		// You have access to naturalWidth and naturalHeight here
 		if (refuse_too_large &&
 			((maxWidth !== 0 && this.naturalWidth > maxWidth) || (maxHeight !== 0 && this.naturalHeight > maxHeight)))
@@ -401,15 +403,14 @@ function previewExternalAvatar(src)
  *
  * @param {object} src
  */
-function previewUploadedAvatar(src)
+function previewUploadedAvatar (src)
 {
 	if (src.files && src.files[0])
 	{
 		let reader = new FileReader();
 
 		reader.readAsDataURL(src.files[0]);
-		reader.onload = function ()
-		{
+		reader.onload = function() {
 			let current_avatar = document.getElementById('current_avatar'),
 				current_avatar_new = document.getElementById('current_avatar_new'),
 				current_avatar_new_preview = document.getElementById('current_avatar_new_preview');
@@ -428,7 +429,7 @@ function previewUploadedAvatar(src)
  *
  * @returns {boolean} - Returns 'false' to prevent the default behavior of the event.
  */
-function modifyWarnNotify()
+function modifyWarnNotify ()
 {
 	let disable = !document.getElementById('warn_notify').checked;
 
@@ -459,7 +460,7 @@ function modifyWarnNotify()
 			.then(response => {
 				if (!response.ok)
 				{
-					throw new Error("HTTP error " + response.status);
+					throw new Error('HTTP error ' + response.status);
 				}
 				return response.text();
 			})
@@ -479,7 +480,7 @@ function modifyWarnNotify()
 				{
 					profile_error.style.display = 'block';
 
-					let errors_html = '<span>' + profile_error.querySelector("span").innerHTML + '</span><ul class="list_errors">';
+					let errors_html = '<span>' + profile_error.querySelector('span').innerHTML + '</span><ul class="list_errors">';
 					errors.forEach(error => {
 						errors_html += '<li>' + error.textContent + '</li>';
 					});
@@ -493,7 +494,9 @@ function modifyWarnNotify()
 					profile_error.style.display = 'none';
 					let errorList = document.getElementById('error_list');
 					if (errorList)
+					{
 						errorList.innerHTML = '';
+					}
 					window.scrollTo({top: preview.offsetTop, behavior: 'smooth'});
 				}
 
@@ -518,68 +521,65 @@ function modifyWarnNotify()
  * @param {string} levelID
  * @param {int[]} levels
  */
-function initWarnSlider(sliderID, levelID, levels)
+function initWarnSlider (sliderID, levelID, levels)
 {
-	var $_levelID = $("#" + levelID),
-		$_sliderID = $("#" + sliderID);
+	var $_levelID = $('#' + levelID),
+		$_sliderID = $('#' + sliderID);
 
 	$_sliderID.slider({
-		range: "min",
+		range: 'min',
 		min: 0,
 		max: 100,
-		slide: function (event, ui)
-		{
+		slide: function(event, ui) {
 			$_levelID.val(ui.value);
 
-			$(this).removeClass("watched moderated muted");
+			$(this).removeClass('watched moderated muted');
 
 			if (ui.value >= levels[3])
 			{
-				$(this).addClass("muted");
+				$(this).addClass('muted');
 			}
 			else if (ui.value >= levels[2])
 			{
-				$(this).addClass("moderated");
+				$(this).addClass('moderated');
 			}
 			else if (ui.value >= levels[1])
 			{
-				$(this).addClass("watched");
+				$(this).addClass('watched');
 			}
 		},
-		change: function (event, ui)
-		{
+		change: function(event, ui) {
 			$_levelID.val(ui.value);
 
-			$(this).removeClass("watched moderated muted");
+			$(this).removeClass('watched moderated muted');
 
 			if (ui.value >= levels[3])
 			{
-				$(this).addClass("muted");
+				$(this).addClass('muted');
 			}
 			else if (ui.value >= levels[2])
 			{
-				$(this).addClass("moderated");
+				$(this).addClass('moderated');
 			}
 			else if (ui.value >= levels[1])
 			{
-				$(this).addClass("watched");
+				$(this).addClass('watched');
 			}
 		}
-	}).slider("value", $_levelID.val());
+	}).slider('value', $_levelID.val());
 
 	// Just in case someone wants to type, let's keep the two in sync
-	$_levelID.on('keyup', function ()
-	{
+	$_levelID.on('keyup', function() {
 		let val = Math.max(0, Math.min(100, $(this).val()));
 
-		$_sliderID.slider("value", val);
+		$_sliderID.slider('value', val);
 	});
 }
 
 /**
  * Fills the warning template box based on the one chosen by the user
  */
-function populateNotifyTemplate()
+function populateNotifyTemplate ()
 {
 	let index = document.getElementById('warn_temp').value;
 

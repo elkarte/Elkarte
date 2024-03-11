@@ -1086,10 +1086,6 @@ function toggleBaseDir ()
 function swapMembers ()
 {
 	let membersForm = document.getElementById('membersForm');
-
-	// Make it close smoothly
-	$('#membersPanel').slideToggle(300);
-
 	membersSwap = !membersSwap;
 	document.getElementById('membersIcon').src = elk_images_url + (membersSwap ? '/selected_open.png' : '/selected.png');
 	document.getElementById('membersText').innerHTML = membersSwap ? maintain_members_choose : maintain_members_all;
