@@ -134,8 +134,8 @@ class PersonalMessage extends AbstractController
 		$label = $this->_req->getQuery('l', 'intval');
 		$folder = $this->_req->getQuery('f', 'trim', '');
 		$start = $this->_req->getQuery('start', 'trim');
-		$context['current_label_id'] = isset($label, $context['labels'][$label]) ? $label : -1;
-		$context['current_label'] = &$context['labels'][(int) $context['current_label_id']]['name'];
+		$context['current_label_id'] = isset($label, $context['labels'][$label]) ? (int) $label : -1;
+		$context['current_label'] = &$context['labels'][$context['current_label_id']]['name'];
 		$context['folder'] = $folder !== 'sent' ? 'inbox' : 'sent';
 
 		// This is convenient.  Do you know how annoying it is to do this every time?!
@@ -251,7 +251,7 @@ class PersonalMessage extends AbstractController
 		// Set the right index bar for the action
 		if ($subAction === 'inbox')
 		{
-			$this->_messageIndexBar($context['current_label_id'] == -1 ? $context['folder'] : 'label' . $context['current_label_id']);
+			$this->_messageIndexBar($context['current_label_id'] === -1 ? $context['folder'] : 'label' . $context['current_label_id']);
 		}
 		elseif ($this->getApi() === false)
 		{
@@ -343,7 +343,7 @@ class PersonalMessage extends AbstractController
 			$label_counters['labels_unread_total'] = 0;
 			foreach ($context['labels'] as $label)
 			{
-				if ($label['id'] == -1)
+				if ($label['id'] === -1)
 				{
 					continue;
 				}
@@ -690,7 +690,7 @@ class PersonalMessage extends AbstractController
 		$context['page_index'] = constructPageIndex('{scripturl}?action=pm;f=' . $context['folder'] . (isset($this->_req->query->l) ? ';l=' . (int) $this->_req->query->l : '') . ';sort=' . $context['sort_by'] . ($descending ? ';desc' : ''), $start, $max_messages, $modSettings['defaultMaxMessages']);
 		$context['start'] = $start;
 
-		$context['pm_form_url'] = $scripturl . '?action=pm;sa=pmactions;' . ($context['display_mode'] === self::DISPLAY_AS_CONVERSATION ? 'conversation;' : '') . 'f=' . $context['folder'] . ';start=' . $context['start'] . ($context['current_label_id'] != -1 ? ';l=' . $context['current_label_id'] : '');
+		$context['pm_form_url'] = $scripturl . '?action=pm;sa=pmactions;' . ($context['display_mode'] === self::DISPLAY_AS_CONVERSATION ? 'conversation;' : '') . 'f=' . $context['folder'] . ';start=' . $context['start'] . ($context['current_label_id'] !== -1 ? ';l=' . $context['current_label_id'] : '');
 
 		// Finally, mark the relevant messages as read.
 		if ($context['folder'] !== 'sent' && !empty($context['labels'][(int) $context['current_label_id']]['unread_messages']))
@@ -714,7 +714,7 @@ class PersonalMessage extends AbstractController
 				'delete' => array(
 					'text' => 'delete_conversation',
 					'lang' => true,
-					'url' => $scripturl . '?action=pm;sa=pmactions;pm_actions%5B' . $context['current_pm'] . '%5D=delete;conversation;f=' . $context['folder'] . ';start=' . $context['start'] . ($context['current_label_id'] != -1 ? ';l=' . $context['current_label_id'] : '') . ';' . $context['session_var'] . '=' . $context['session_id'],
+					'url' => $scripturl . '?action=pm;sa=pmactions;pm_actions%5B' . $context['current_pm'] . '%5D=delete;conversation;f=' . $context['folder'] . ';start=' . $context['start'] . ($context['current_label_id'] !== -1 ? ';l=' . $context['current_label_id'] : '') . ';' . $context['session_var'] . '=' . $context['session_id'],
 					'custom' => 'onclick="return confirm(\'' . addslashes($txt['remove_message']) . '?\');"'
 				),
 			);
@@ -1523,7 +1523,7 @@ class PersonalMessage extends AbstractController
 					$type = 'unk';
 			}
 
-			if ($action === '-1' || $action === '0' || (int) $action > 0)
+			if ((int) $action === -1 || (int) $action === 0 || (int) $action > 0)
 			{
 				$to_label[(int) $pm] = (int) $action;
 				$label_type[(int) $pm] = $type;
@@ -1650,7 +1650,7 @@ class PersonalMessage extends AbstractController
 		$the_labels = array();
 		foreach ($context['labels'] as $label)
 		{
-			if ($label['id'] != -1)
+			if ($label['id'] !== -1)
 			{
 				$the_labels[$label['id']] = $label['name'];
 			}
@@ -1707,7 +1707,7 @@ class PersonalMessage extends AbstractController
 				$i = 0;
 				foreach (array_keys($the_labels) as $id)
 				{
-					if ($id == -1)
+					if ($id === -1)
 					{
 						continue;
 					}
@@ -2087,7 +2087,7 @@ class PersonalMessage extends AbstractController
 			$js_labels = [];
 			foreach ($context['labels'] as $label)
 			{
-				if ($label['id'] != -1)
+				if ($label['id'] !== -1)
 				{
 					$js_labels[$label['id'] + 1] = $label['name'];
 				}
@@ -2098,10 +2098,14 @@ class PersonalMessage extends AbstractController
 			// And all the groups as well
 			$js_groups = json_encode($context['groups']);
 
-			// Oh my, we have a lot of text strings for this
-			theme()->addJavascriptVar(array(
+			theme()->addJavascriptVar([
 				'criteriaNum' => 0,
 				'actionNum' => 0,
+				]
+			);
+
+			// Oh my, we have a lot of text strings for this
+			theme()->addJavascriptVar(array(
 				'groups' => $js_groups,
 				'labels' => $js_labels,
 				'rules' => $js_rules,
@@ -2631,14 +2635,14 @@ class PersonalMessage extends AbstractController
 			// Reply, Quote
 			'reply_button' => [
 				'text' => 'reply',
-				'url' => getUrl('action', ['action' => 'pm', 'sa' => 'send', 'f' => $context['folder'], 'pmsg' => $id, 'u' => $member['id']]) . ($context['current_label_id'] != -1 ? ';l=' . $context['current_label_id'] : ''),
+				'url' => getUrl('action', ['action' => 'pm', 'sa' => 'send', 'f' => $context['folder'], 'pmsg' => $id, 'u' => $member['id']]) . ($context['current_label_id'] !== "-1" ? ';l=' . $context['current_label_id'] : ''),
 				'class' => 'reply_button',
 				'icon' => 'modify',
 				'enabled' => !$member['is_guest'] && $context['can_send_pm'],
 			],
 			'quote_button' => [
 				'text' => 'quote',
-				'url' => getUrl('action', ['action' => 'pm', 'sa' => 'send', 'f' => $context['folder'], 'pmsg' => $id, 'quote' => '']) . ($context['current_label_id'] != -1 ? ';l=' . $context['current_label_id'] : '') . ($context['folder'] === 'sent' ? '' : ';u=' . $member['id']),
+				'url' => getUrl('action', ['action' => 'pm', 'sa' => 'send', 'f' => $context['folder'], 'pmsg' => $id, 'quote' => '']) . ($context['current_label_id'] !== "-1" ? ';l=' . $context['current_label_id'] : '') . ($context['folder'] === 'sent' ? '' : ';u=' . $member['id']),
 				'class' => 'quote_button',
 				'icon' => 'quote',
 				'enabled' => !$member['is_guest'] && $context['can_send_pm'],
@@ -2646,7 +2650,7 @@ class PersonalMessage extends AbstractController
 			// This is for "forwarding" - even if the member is gone.
 			'reply_quote_button' => [
 				'text' => 'reply_quote',
-				'url' => getUrl('action', ['action' => 'pm', 'sa' => 'send', 'f' => $context['folder'], 'pmsg' => $id, 'quote' => '']) . ($context['current_label_id'] != -1 ? ';l=' . $context['current_label_id'] : ''),
+				'url' => getUrl('action', ['action' => 'pm', 'sa' => 'send', 'f' => $context['folder'], 'pmsg' => $id, 'quote' => '']) . ($context['current_label_id'] !== "-1" ? ';l=' . $context['current_label_id'] : ''),
 				'class' => 'reply_button',
 				'icon' => 'modify',
 				'enabled' => $member['is_guest'] && $context['can_send_pm'],

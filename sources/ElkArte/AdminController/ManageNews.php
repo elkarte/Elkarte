@@ -248,17 +248,17 @@ class ManageNews extends AbstractController
 				),
 			),
 			'javascript' => '
-			document.getElementById(\'list_news_lists_last\').style.display = "none";
-			document.getElementById("moreNewsItems_link").style.display = "inline";
-			$(function() {
-				$("div[id ^= \'preview_\']").each(function () {
-					var preview_id = $(this).attr(\'id\').split(\'_\')[1];
-					if (last_preview < preview_id && preview_id !== "last")
-						last_preview = preview_id;
-					make_preview_btn(preview_id);
-				});
-			});
-		',
+				document.getElementById("list_news_lists_last").style.display = "none";
+				document.getElementById("moreNewsItems_link").style.display = "inline";
+				document.addEventListener("DOMContentLoaded", function() {
+				    let divs = document.querySelectorAll(\'div[id^="preview_"]\');
+				    divs.forEach(function (div) {
+				        let preview_id = div.id.split("_")[1];
+				        if (last_preview < preview_id && preview_id !== "last")
+				            last_preview = preview_id;
+				        make_preview_btn(preview_id);
+				    });
+				});',
 		);
 
 		theme()->addJavascriptVar([

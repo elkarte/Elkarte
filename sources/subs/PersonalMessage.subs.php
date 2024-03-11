@@ -1356,7 +1356,7 @@ function applyRules($all_messages = false)
 			$realLabels = array();
 			foreach ($context['labels'] as $label)
 			{
-				if (in_array($label['id'], $labels) && ($label['id'] != -1 || empty($options['pm_remove_inbox_label'])))
+				if (in_array($label['id'], $labels) && ($label['id'] !== "-1" || empty($options['pm_remove_inbox_label'])))
 				{
 					$realLabels[] = $label['id'];
 				}
