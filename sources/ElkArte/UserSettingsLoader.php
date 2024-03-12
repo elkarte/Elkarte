@@ -525,7 +525,6 @@ class UserSettingsLoader
 				return true;
 			}
 
-			$context['disable_login_hashing'] = true;
 			$context['login_errors'][] = $txt['awaiting_delete_account'];
 			$context['login_show_undelete'] = true;
 

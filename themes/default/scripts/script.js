@@ -621,41 +621,6 @@ function elk_setThemeOption (option, value, theme, additional_vars)
 }
 
 /**
- * Password hashing for user
- *
- * @param {type} doForm
- * @param {type} cur_session_id
- * @param {type} token
- */
-function hashLoginPassword (doForm, cur_session_id, token)
-{
-	// Don't have our hash lib available?
-	if (typeof (hex_sha256) === 'undefined')
-	{
-		return;
-	}
-
-	// Are they using an email address?
-	if (doForm.user.value.indexOf('@') !== -1)
-	{
-		return;
-	}
-
-	doForm.passwrd.autocomplete = 'off';
-
-	// Fill in the hidden fields with our sha hash
-	doForm.hash_passwrd.value = hex_sha256(doForm.user.value.toLowerCase() + doForm.passwrd.value);
-
-	// If the form also contains the old hash input fill it to smooth transitions
-	if ('old_hash_passwrd' in doForm && typeof (hex_sha1) !== 'undefined')
-	{
-		doForm.old_hash_passwrd.value = hex_sha1(hex_sha1(doForm.user.value.toLowerCase() + doForm.passwrd.value) + cur_session_id + (typeof token === 'undefined' ? '' : token));
-	}
-
-	doForm.passwrd.value = doForm.passwrd.value.replace(/./g, '*');
-}
-
-/**
  * Used by elk_Toggle to add an image to the swap/toggle array
  *
  * @param {string} sSrc

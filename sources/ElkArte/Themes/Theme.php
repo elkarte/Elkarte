@@ -244,12 +244,6 @@ abstract class Theme
 		}
 
 		$txt['welcome_guest'] = replaceBasicActionUrl($txt['welcome_guest']);
-
-		// If we've upgraded recently, go easy on the passwords.
-		if (!empty($modSettings['enable_password_conversion']))
-		{
-			$context['disable_login_hashing'] = true;
-		}
 	}
 
 	/**

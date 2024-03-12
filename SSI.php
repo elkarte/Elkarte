@@ -1137,10 +1137,7 @@ function ssi_login($redirect_to = '', $output_method = 'echo')
 	$context['default_username'] = isset($_POST['user']) ? preg_replace('~&amp;#(\\d{1,7}|x[0-9a-fA-F]{1,6});~', '&#\\1;', htmlspecialchars($_POST['user'], ENT_COMPAT, 'UTF-8')) : '';
 
 	echo '
-		<script src="', $settings['default_theme_url'], '/scripts/ext/sha256.js"></script>';
-
-	echo '
-		<form action="', $scripturl, '?action=login2" name="frmLogin" id="frmLogin" method="post" accept-charset="UTF-8" ', empty($context['disable_login_hashing']) ? ' onsubmit="hashLoginPassword(this, \'' . $context['session_id'] . '\');"' : '', '>
+		<form action="', $scripturl, '?action=login2" name="frmLogin" id="frmLogin" method="post" accept-charset="UTF-8">
 		<div class="login centertext">
 			<div class="well">';
 
@@ -1174,7 +1171,6 @@ function ssi_login($redirect_to = '', $output_method = 'echo')
 				<p class="smalltext">
 					<a href="', $scripturl, '?action=reminder">', $txt['forgot_your_password'], '</a>
 				</p>
-				<input type="hidden" name="hash_passwrd" value="" />
 				<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
 				<input type="hidden" name="', $context['login_token_var'], '" value="', $context['login_token'], '" />
 			</div>
