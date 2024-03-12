@@ -1,7 +1,5 @@
 node_modules
 **/jquery*
 **/*.min.js
-themes/default/scripts/ext/qrcode.js
-themes/default/scripts/ext/sha256.js
-themes/default/scripts/bbcode.js
+themes/default/scripts/ext/*.js
 vendor/**/*.js

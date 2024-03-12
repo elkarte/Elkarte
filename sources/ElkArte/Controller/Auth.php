@@ -86,7 +86,6 @@ class Auth extends AbstractController
 		}
 
 		theme()->getTemplates()->load('Login');
-		loadJavascriptFile('ext/sha256.js', array('defer' => true));
 		$context['sub_template'] = 'login';
 
 		// Get the template ready.... not really much else to do.
@@ -170,7 +169,6 @@ class Auth extends AbstractController
 
 		// Load the template stuff
 		theme()->getTemplates()->load('Login');
-		loadJavascriptFile('ext/sha256.js', array('defer' => true));
 		$context['sub_template'] = 'login';
 
 		// Set up the default/fallback stuff.
@@ -201,8 +199,7 @@ class Auth extends AbstractController
 		}
 
 		// Can't use a password > 64 characters sorry, to long and only good for a DoS attack
-		// Plus we expect a 64 character one from SHA-256
-		if ((isset($_POST['passwrd']) && strlen($_POST['passwrd']) > 64) || (isset($_POST['hash_passwrd']) && strlen($_POST['hash_passwrd']) > 64))
+		if (isset($_POST['passwrd']) && strlen($_POST['passwrd']) > 64)
 		{
 			$context['login_errors'] = array($txt['improper_password']);
 
@@ -210,7 +207,7 @@ class Auth extends AbstractController
 		}
 
 		// Hmm... maybe 'admin' will login with no password. Uhh... NO!
-		if ((!isset($_POST['passwrd']) || $_POST['passwrd'] === '') && (!isset($_POST['hash_passwrd']) || strlen($_POST['hash_passwrd']) !== 64))
+		if (!isset($_POST['passwrd']) || $_POST['passwrd'] === '')
 		{
 			$context['login_errors'] = array($txt['no_password']);
 
@@ -226,10 +223,9 @@ class Auth extends AbstractController
 		}
 
 		// Are we using any sort of integration to validate the login?
-		if (in_array('retry', call_integration_hook('integrate_validate_login', array($_POST['user'], isset($_POST['hash_passwrd']) && strlen($_POST['hash_passwrd']) === 40 ? $_POST['hash_passwrd'] : null, $modSettings['cookieTime'])), true))
+		if (in_array('retry', call_integration_hook('integrate_validate_login', array($_POST['user'], null, $modSettings['cookieTime'])), true))
 		{
 			$context['login_errors'] = array($txt['login_hash_error']);
-			$context['disable_login_hashing'] = true;
 
 			return false;
 		}
@@ -284,64 +280,9 @@ class Auth extends AbstractController
 			return false;
 		}
 
-		// Figure out if the password is using Elk's encryption - if what they typed is right.
-		if (isset($_POST['hash_passwrd']) && strlen($_POST['hash_passwrd']) === 64)
-		{
-			// Challenge what was passed
-			$valid_password = $user->validatePassword($_POST['hash_passwrd']);
-
-			// Let them in
-			if ($valid_password)
-			{
-				$sha_passwd = $_POST['hash_passwrd'];
-			}
-			// Maybe is an old SHA-1 and needs upgrading if the db string is an actual 40 hexchar SHA-1
-			elseif (preg_match('/^[0-9a-f]{40}$/i', $user_setting['passwd']) && isset($_POST['old_hash_passwrd']) && $_POST['old_hash_passwrd'] === hash('sha1', $user_setting['passwd'] . $_SESSION['session_value']))
-			{
-				// Old password passed, turn off hashing and ask for it again so we can update the db to something more secure.
-				$context['login_errors'] = array($txt['login_hash_error']);
-				$context['disable_login_hashing'] = true;
-				User::logOutUser(true);
-
-				return false;
-			}
-			// Bad password entered
-			else
-			{
-				// Don't allow this!
-				validatePasswordFlood($user_setting['id_member'], $user_setting['passwd_flood']);
-
-				$_SESSION['failed_login'] = isset($_SESSION['failed_login']) ? ($_SESSION['failed_login'] + 1) : 1;
-
-				// To many tries, maybe they need a reminder
-				if ($_SESSION['failed_login'] >= $modSettings['failed_login_threshold'])
-				{
-					redirectexit('action=reminder');
-				}
-				else
-				{
-					Errors::instance()->log_error($txt['incorrect_password'] . ' - <span class="remove">' . $user_setting['member_name'] . '</span>', 'user');
-
-					// Wrong password, lets enable plain text responses in case form hashing is causing problems
-					$context['disable_login_hashing'] = true;
-					$context['login_errors'] = array($txt['incorrect_password']);
-					User::logOutUser(true);
-
-					// Invalidate the guest session, start new
-					unset($_SESSION['session_var']);
-					loadSession();
-
-					return false;
-				}
-			}
-		}
-		// Plain text password, no JS or hashing has been turned off
-		else
-		{
-			// validateLoginPassword will hash this like the form normally would and check its valid
-			$sha_passwd = $_POST['passwrd'];
-			$valid_password = $user->validatePassword($sha_passwd);
-		}
+		// validateLoginPassword will hash this and check its valid
+		$sha_passwd = $_POST['passwrd'];
+		$valid_password = $user->validatePassword($sha_passwd);
 
 		require_once(SUBSDIR . '/Members.subs.php');
 
@@ -645,7 +586,6 @@ class Auth extends AbstractController
 
 		Txt::load('Login');
 		theme()->getTemplates()->load('Login');
-		loadJavascriptFile('ext/sha256.js', array('defer' => true));
 		createToken('login');
 
 		// Never redirect to an attachment
@@ -673,7 +613,6 @@ class Auth extends AbstractController
 
 		Txt::load('Login');
 		theme()->getTemplates()->load('Login');
-		loadJavascriptFile('ext/sha256.js', array('defer' => true));
 		createToken('login');
 
 		// Send a 503 header, so search engines don't bother indexing while we're in maintenance mode.
@@ -703,7 +642,7 @@ class Auth extends AbstractController
 				throw new Exception('login_cookie_error', false);
 			}
 
-			// Some whitelisting for login_url...
+			// Some pass listing for login_url...
 			$temp = empty($_SESSION['login_url']) || validLoginUrl($_SESSION['login_url']) === false ? '' : $_SESSION['login_url'];
 			unset($_SESSION['login_url']);
 			redirectexit($temp);
@@ -774,7 +713,6 @@ function checkActivation()
 		}
 		else
 		{
-			$context['disable_login_hashing'] = true;
 			$context['login_errors'][] = $txt['awaiting_delete_account'];
 			$context['login_show_undelete'] = true;
 
@@ -816,7 +754,7 @@ function doLogin(UserSettingsLoader $user)
 	User::reloadByUser($user, true);
 
 	// Call login integration functions.
-	call_integration_hook('integrate_login', array(User::$settings['member_name'], isset($_POST['hash_passwrd']) && strlen($_POST['hash_passwrd']) === 64 ? $_POST['hash_passwrd'] : null, $modSettings['cookieTime']));
+	call_integration_hook('integrate_login', array(User::$settings['member_name'], $modSettings['cookieTime']));
 
 	// Bam!  Cookie set.  A session too, just in case.
 	setLoginCookie(60 * $modSettings['cookieTime'], User::$settings['id_member'], hash('sha256', (User::$settings['passwd'] . User::$settings['password_salt'])));

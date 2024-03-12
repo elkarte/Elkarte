@@ -279,7 +279,6 @@ class Reminder extends AbstractController
 		call_integration_hook('integrate_reset_pass', array($member['member_name'], $member['member_name'], $this->_req->post->passwrd1));
 
 		theme()->getTemplates()->load('Login');
-		loadJavascriptFile('ext/sha256.js', array('defer' => true));
 		$context += array(
 			'page_title' => $txt['reminder_password_set'],
 			'sub_template' => 'login',
@@ -357,7 +356,6 @@ class Reminder extends AbstractController
 
 		// Tell them it went fine.
 		theme()->getTemplates()->load('Login');
-		loadJavascriptFile('ext/sha256.js', array('defer' => true));
 		$context += array(
 			'page_title' => $txt['reminder_password_set'],
 			'sub_template' => 'login',

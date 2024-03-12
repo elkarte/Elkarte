@@ -848,7 +848,6 @@ class Register extends AbstractController
 
 		Txt::load('Login');
 		theme()->getTemplates()->load('Login');
-		loadJavascriptFile('ext/sha256.js', array('defer' => true));
 
 		// Need a user id to activate
 		if (empty($this->_req->query->u) && empty($this->_req->post->user))

@@ -20,7 +20,7 @@ function template_login()
 	global $context, $scripturl, $modSettings, $txt;
 
 	echo '
-		<form action="', $scripturl, '?action=login2" name="frmLogin" id="frmLogin" method="post" accept-charset="UTF-8" ', empty($context['disable_login_hashing']) ? ' onsubmit="hashLoginPassword(this, \'' . $context['session_id'] . '\');"' : '', '>
+		<form action="', $scripturl, '?action=login2" name="frmLogin" id="frmLogin" method="post" accept-charset="UTF-8">
 			<div class="login">
 				<h2 class="category_header hdicon i-menu-login centertext">
 					', $txt['login'], '
@@ -83,8 +83,6 @@ function template_login()
 	echo '
 					<div class="submitbutton">
 						<input type="submit" value="', $txt['login'], '" />
-						<input type="hidden" name="hash_passwrd" value="" />
-						<input type="hidden" name="old_hash_passwrd" value="" />
 						<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
 						<input type="hidden" name="', $context['login_token_var'], '" value="', $context['login_token'], '" />
 					</div>';
@@ -118,7 +116,7 @@ function template_kick_guest()
 
 	// This isn't that much... just like normal login but with a message at the top.
 	echo '
-	<form action="', $scripturl, '?action=login2" method="post" accept-charset="UTF-8" name="frmLogin" id="frmLogin"', empty($context['disable_login_hashing']) ? ' onsubmit="hashLoginPassword(this, \'' . $context['session_id'] . '\');"' : '', '>
+	<form action="', $scripturl, '?action=login2" method="post" accept-charset="UTF-8" name="frmLogin" id="frmLogin">
 		<div class="login">
 			<h2 class="category_header">', $txt['notice'], '</h2>';
 
@@ -173,7 +171,6 @@ function template_kick_guest()
 					<input type="submit" value="', $txt['login'], '" />
 					<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
 					<input type="hidden" name="', $context['login_token_var'], '" value="', $context['login_token'], '" />
-					<input type="hidden" name="hash_passwrd" value="" />
 				</div>
 			</div>	
 		</div>
@@ -195,7 +192,7 @@ function template_maintenance()
 
 	// Display the administrator's message at the top.
 	echo '
-<form action="', $scripturl, '?action=login2" method="post" accept-charset="UTF-8"', empty($context['disable_login_hashing']) ? ' onsubmit="hashLoginPassword(this, \'' . $context['session_id'] . '\');"' : '', '>
+<form action="', $scripturl, '?action=login2" method="post" accept-charset="UTF-8">
 	<div id="maintenance_mode" class="login" >
 		<h2 class="category_header">', $context['title'], '</h2>
 		<p class="description flow_auto">
@@ -221,7 +218,6 @@ function template_maintenance()
 			</div>
 			<input type="submit" value="', $txt['login'], '" />
 		</div>
-		<input type="hidden" name="hash_passwrd" value="" />
 		<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
 		<input type="hidden" name="', $context['login_token_var'], '" value="', $context['login_token'], '" />
 	</div>
@@ -237,7 +233,7 @@ function template_admin_login()
 
 	// Since this should redirect to whatever they were doing, send all the get data.
 	echo '
-<form action="', $scripturl, $context['get_data'], '" method="post" accept-charset="UTF-8" name="frmLogin" id="frmLogin" onsubmit="hash', ucfirst($context['sessionCheckType']), "Password(this, '", $context['user']['username'], "', '", $context['session_id'], "', '" . (empty($context['login_token']) ? '' : $context['login_token']) . '\');">
+<form action="', $scripturl, $context['get_data'], '" method="post" accept-charset="UTF-8" name="frmLogin" id="frmLogin">
 	<div class="login" id="admin_login">
 		<h2 class="category_header hdicon i-menu-login">
 			', $txt['login'], '
