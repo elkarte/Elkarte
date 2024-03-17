@@ -205,9 +205,7 @@ class ManageFeatures extends AbstractController
 		{
 			$clean_hives_result = theme()->cleanHives();
 
-			theme()->getLayers()->removeAll();
-			theme()->getTemplates()->load('Json');
-			$context['sub_template'] = 'send_json';
+			setJsonTemplate();
 			$context['json_data'] = array(
 				'success' => $clean_hives_result,
 				'response' => $clean_hives_result ? $txt['clean_hives_sucess'] : $txt['clean_hives_failed']
@@ -643,7 +641,10 @@ class ManageFeatures extends AbstractController
 		Txt::load('Profile+UserNotifications');
 		loadJavascriptFile('ext/jquery.multiselect.min.js');
 		theme()->addInlineJavascript('
-		$(\'.select_multiple\').multiselect({\'language_strings\': {\'Select all\': ' . JavascriptEscape($txt['notify_select_all']) . '}});', true);
+			$(\'.select_multiple\').multiselect({\'language_strings\': {\'Select all\': ' . JavascriptEscape($txt['notify_select_all']) . '}});
+			document.addEventListener("DOMContentLoaded", function() {
+                 prepareNotificationOptions();
+			});', true);
 		loadCSSFile('multiselect.css');
 
 		// The mentions settings

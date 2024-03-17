@@ -201,12 +201,9 @@ class ManagePosts extends AbstractController
 		if (isset($this->_req->post->censortest) && $this->getApi() === 'json')
 		{
 			// Clear the templates
-			$template_layers = theme()->getLayers();
-			$template_layers->removeAll();
+			setJsonTemplate();
 
 			// Send back a response
-			theme()->getTemplates()->load('Json');
-			$context['sub_template'] = 'send_json';
 			$context['json_data'] = array(
 				'result' => true,
 				'censor' => $pre_censor . ' <i class="icon i-chevron-circle-right"></i> ' . $context['censor_test'],

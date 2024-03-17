@@ -177,10 +177,7 @@ class Giphy extends AbstractController
 	{
 		global $context;
 
-		theme()->getLayers()->removeAll();
-		theme()->getTemplates()->load('Json');
-		$context['sub_template'] = 'send_json';
-
+		setJsonTemplate();
 		$context['json_data'] = [
 			'giphy' => $images,
 			'data' => $result

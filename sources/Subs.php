@@ -1886,6 +1886,27 @@ function theme()
 }
 
 /**
+ * Set the JSON template for sending JSON response.
+ *
+ * This method prepares the template layers, loads the 'Json' template,
+ * and sets the sub_template to 'send_json' in the global $context array.
+ * The JSON data is initialized to null.
+ *
+ * @return void
+ */
+function setJsonTemplate()
+{
+	global $context;
+
+	$template_layers = $GLOBALS['context']['theme_instance']->getLayers();
+	$template_layers->removeAll();
+	$GLOBALS['context']['theme_instance']->getTemplates()->load('Json');
+	$context['sub_template'] = 'send_json';
+
+	$context['json_data'] = null;
+}
+
+/**
  * Send a 1x1 GIF response and terminate the script execution
  *
  * @param bool $expired Flag to determine if header Expires should be sent
