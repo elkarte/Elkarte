@@ -9,6 +9,8 @@
  *
  */
 
+use tests\headless\ElkArteWebSupport;
+
 /**
  * ElkArteInstallWeb
  *

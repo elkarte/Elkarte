@@ -21,11 +21,11 @@ $mySource = './sources';
 $_SERVER['SERVER_NAME'] = '127.0.0.1';
 $_SERVER['REMOTE_ADDR'] = '127.0.0.1';
 
-// A few files we cannot live without and will not be autoload
+// A few files we cannot live without and will not autoload
 require_once($mySource . '/Subs.php');
 require_once($mySource . '/Load.php');
 require_once($mySource . '/ext/ClassLoader.php');
-require_once('./tests/sources/controllers/ElkArteWebSupport.php');
+require_once('./tests/headless/ElkArteWebSupport.php');
 
 $loader = new ClassLoader();
 $loader->setPsr4('ElkArte\\', $mySource . '/ElkArte');
