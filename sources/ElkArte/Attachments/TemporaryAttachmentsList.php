@@ -13,6 +13,7 @@
 
 namespace ElkArte\Attachments;
 
+use ElkArte\Helper\FileFunctions;
 use ElkArte\Helper\ValuesContainer;
 
 /**
@@ -69,7 +70,7 @@ class TemporaryAttachmentsList extends ValuesContainer
 	public function remove($file)
 	{
 		// Must exist and have edit permissions
-		return \ElkArte\Helper\FileFunctions::instance()->delete($file);
+		return FileFunctions::instance()->delete($file);
 	}
 
 	/**
@@ -138,8 +139,7 @@ class TemporaryAttachmentsList extends ValuesContainer
 	}
 
 	/**
-	 * Checks if at least one temporary file for a certain user exists in the
-	 * file system.
+	 * Checks if at least one temporary file for a certain user exists in the file system.
 	 *
 	 * @param int $userId
 	 * @return bool
