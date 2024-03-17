@@ -16,6 +16,8 @@ namespace ElkArte\Attachments;
 use ElkArte\Exceptions\Exception as ElkException;
 use ElkArte\Graphics\Image;
 use ElkArte\Graphics\ImageUploadResize;
+use ElkArte\Helper\FileFunctions;
+use ElkArte\Helper\Util;
 use ElkArte\Helper\ValuesContainer;
 
 /**
@@ -29,7 +31,7 @@ class TemporaryAttachment extends ValuesContainer
 	public function __construct($data = null)
 	{
 		$data['errors'] = [];
-		$data['name'] = \ElkArte\Helper\Util::clean_4byte_chars(htmlspecialchars($data['name'], ENT_COMPAT, 'UTF-8'));
+		$data['name'] = Util::clean_4byte_chars(htmlspecialchars($data['name'], ENT_COMPAT, 'UTF-8'));
 
 		ValuesContainer::__construct($data);
 	}
@@ -48,7 +50,7 @@ class TemporaryAttachment extends ValuesContainer
 
 		if ($fatal && !$this->fileWritable())
 		{
-			throw new \Exception('attachment_not_found');
+			throw new ElkException('attachment_not_found');
 		}
 
 		return $this->unlinkFile();
@@ -59,7 +61,7 @@ class TemporaryAttachment extends ValuesContainer
 	 */
 	public function fileWritable()
 	{
-		$fs = \ElkArte\Helper\FileFunctions::instance();
+		$fs = FileFunctions::instance();
 
 		return $fs->fileExists($this->data['tmp_name']) && $fs->isWritable($this->data['tmp_name']);
 	}
@@ -129,7 +131,7 @@ class TemporaryAttachment extends ValuesContainer
 	 */
 	public function fileExists()
 	{
-		return \ElkArte\Helper\FileFunctions::instance()->fileExists($this->data['tmp_name']);
+		return FileFunctions::instance()->fileExists($this->data['tmp_name']);
 	}
 
 	/**
@@ -144,26 +146,50 @@ class TemporaryAttachment extends ValuesContainer
 	}
 
 	/**
-	 * Move a file from one location to another.  Generally used to move from /tmp
-	 * to the current attachment directory
+	 * Moves the uploaded file to a specified destination folder.
 	 *
-	 * @param $file_path
+	 * @param string $file_path The destination folder path.
+	 * @param bool $strict Determines whether to use strict file moving or not.
+	 * @return bool Returns true if the file is moved successfully, false otherwise.
 	 */
-	public function moveUploaded($file_path)
+	public function moveUploaded($file_path, $strict = true)
 	{
 		$destName = $file_path . '/' . $this->data['attachid'];
 
-		// Move the file to the attachment folder with a temp name for now.
-		if (@move_uploaded_file($this->data['tmp_name'], $destName))
+		if (!$strict)
 		{
-			$this->data['tmp_name'] = $destName;
-			\ElkArte\Helper\FileFunctions::instance()->chmod($destName);
+			$result = rename($this->data['tmp_name'], $destName);
 		}
 		else
 		{
-			$this->setErrors('attach_timeout');
-			$this->unlinkFile();
+			// Move the file to the attachment folder with a temp name for now.
+			set_error_handler(static function () { /* ignore warnings */ });
+			try
+			{
+				$result = move_uploaded_file($this->data['tmp_name'], $destName);
+			}
+			catch (\Throwable)
+			{
+				$result = false;
+			}
+			finally
+			{
+				restore_error_handler();
+			}
 		}
+
+		if ($result === true)
+		{
+			$this->data['tmp_name'] = $destName;
+			FileFunctions::instance()->chmod($destName);
+
+			return true;
+		}
+
+		$this->setErrors('attach_timeout');
+		$this->unlinkFile();
+
+		return false;
 	}
 
 	public function setIdFolder($id)
@@ -178,7 +204,7 @@ class TemporaryAttachment extends ValuesContainer
 	 * @return bool
 	 * @throws ElkException attach_check_nag
 	 */
-	public function doChecks($attachmentDirectory)
+	public function doElkarteUploadChecks($attachmentDirectory)
 	{
 		global $context;
 
@@ -206,7 +232,7 @@ class TemporaryAttachment extends ValuesContainer
 		}
 
 		// Just in case this slipped by the first checks, we stop it here and now
-		if ($this->data['size'] == 0)
+		if ($this->data['size'] === 0)
 		{
 			$this->setErrors('attach_0_byte_file');
 
@@ -224,6 +250,9 @@ class TemporaryAttachment extends ValuesContainer
 
 		// We may allow resizing uploaded images, so they take less room
 		$this->adjustImageSizeType();
+
+		// We may want to correct rotated images
+		$this->autoRotate();
 
 		// Run our batch of tests, set any errors along the way
 		$this->checkDirectorySpace($attachmentDirectory);
@@ -486,7 +515,9 @@ class TemporaryAttachment extends ValuesContainer
 	 */
 	public function autoRotate()
 	{
-		if ($this->hasErrors() === false && substr($this->data['type'], 0, 5) === 'image')
+		// Want to correct for phone rotated photos, hell yeah ya do!
+		if (!empty($modSettings['attachment_autorotate'])
+			&& $this->hasErrors() === false && substr($this->data['type'], 0, 5) === 'image')
 		{
 			$image = new Image($this->data['tmp_name']);
 			if ($image->isImageLoaded() && $image->autoRotate())
@@ -512,7 +543,8 @@ class TemporaryAttachment extends ValuesContainer
 				throw new \Exception('attachment_not_found');
 			}
 
-			\ElkArte\Helper\FileFunctions::instance()->delete($this->data['tmp_name']);
+			FileFunctions::instance()->delete($this->data['tmp_name']);
+			FileFunctions::instance()->delete($this->data['tmp_name'] . '_thumb');
 		}
 		catch (\Exception)
 		{

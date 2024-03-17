@@ -14,6 +14,10 @@
 namespace ElkArte\Attachments;
 
 use ElkArte\Database\QueryInterface;
+use ElkArte\Errors\Errors;
+use ElkArte\Exceptions\Exception;
+use ElkArte\Helper\FileFunctions;
+use ElkArte\Helper\Util;
 
 /**
  * Class AttachmentsDirectory
@@ -71,7 +75,7 @@ class AttachmentsDirectory
 	/** @var string Current base to use from the above array */
 	protected $basedirectory_for_attachments = '';
 
-	/** @var array|mixed|string  */
+	/** @var array|mixed|string */
 	protected $last_dirs = [];
 
 	/**
@@ -91,10 +95,10 @@ class AttachmentsDirectory
 		$this->useSubdirectories = $options['use_subdirectories_for_attachments'] ?? $this->useSubdirectories;
 
 		$this->last_dirs = $options['last_attachments_directory'] ?? serialize($this->last_dirs);
-		$this->last_dirs = \ElkArte\Helper\Util::unserialize($this->last_dirs);
+		$this->last_dirs = Util::unserialize($this->last_dirs);
 
 		$this->baseDirectories = $options['attachment_basedirectories'] ?? serialize($this->baseDirectories);
-		$this->baseDirectories = \ElkArte\Helper\Util::unserialize($this->baseDirectories);
+		$this->baseDirectories = Util::unserialize($this->baseDirectories);
 
 		$this->basedirectory_for_attachments = $options['basedirectory_for_attachments'] ?? $this->basedirectory_for_attachments;
 		$this->attachment_full_notified = !empty($options['attachment_full_notified'] ?? $this->basedirectory_for_attachments);
@@ -116,7 +120,7 @@ class AttachmentsDirectory
 			));
 		}
 
-		$this->attachmentUploadDir = \ElkArte\Helper\Util::unserialize($options['attachmentUploadDir']);
+		$this->attachmentUploadDir = Util::unserialize($options['attachmentUploadDir']);
 		$this->attachmentUploadDir = $this->attachmentUploadDir ?: $options['attachmentUploadDir'];
 	}
 
@@ -475,7 +479,7 @@ class AttachmentsDirectory
 	 */
 	public function createDirectory($uploadDirectory)
 	{
-		$fileFunctions = \ElkArte\Helper\FileFunctions::instance();
+		$fileFunctions = FileFunctions::instance();
 
 		$uploadDirectory = str_replace('\\', DIRECTORY_SEPARATOR, $uploadDirectory);
 		$uploadDirectory = rtrim($uploadDirectory, DIRECTORY_SEPARATOR);
@@ -486,7 +490,7 @@ class AttachmentsDirectory
 		}
 		catch (Exception $exception)
 		{
-			\ElkArte\Errors\Errors::instance()->log_error($exception->getMessage());
+			Errors::instance()->log_error($exception->getMessage());
 			throw $exception;
 		}
 
@@ -685,11 +689,12 @@ class AttachmentsDirectory
 	}
 
 	/**
-	 * Simply checks if any tmp attachments have been submitted
+	 * Checks if there are any temporary file attachments
 	 *
-	 * @return bool
+	 * @param bool $strict Whether to perform strict check on uploaded files
+	 * @return bool Returns true if there are temporary file attachments, false otherwise
 	 */
-	public function hasFileTmpAttachments()
+	public function hasFileTmpAttachments($strict = true)
 	{
 		if (isset($_FILES['attachment']['tmp_name']))
 		{
@@ -700,12 +705,15 @@ class AttachmentsDirectory
 					continue;
 				}
 
-				if (!is_uploaded_file($tmp_name))
+				if (!$strict)
 				{
-					continue;
+					return true;
 				}
 
-				return true;
+				if (is_uploaded_file($tmp_name))
+				{
+					return true;
+				}
 			}
 		}
 
@@ -716,7 +724,7 @@ class AttachmentsDirectory
 	 * Checks if the current active directory has space allowed for a new attachment file
 	 *
 	 * @param TemporaryAttachment $sess_attach
-	 * @throws ElkArte\Exceptions
+	 * @throws Exception
 	 */
 	public function checkDirSpace($sess_attach)
 	{
@@ -804,7 +812,7 @@ class AttachmentsDirectory
 	 */
 	public function rename($id, &$real_path)
 	{
-		$fileFunctions = \ElkArte\Helper\FileFunctions::instance();
+		$fileFunctions = FileFunctions::instance();
 		if (!empty($this->attachmentUploadDir[$id]) && $real_path !== $this->attachmentUploadDir[$id])
 		{
 			if (!$fileFunctions->isDir($real_path))
@@ -884,7 +892,7 @@ class AttachmentsDirectory
 		// It's safe to delete. So try to delete the folder also
 		if ($num_attach === 0)
 		{
-			$fileFunctions = \ElkArte\Helper\FileFunctions::instance();
+			$fileFunctions = FileFunctions::instance();
 			$doit = false;
 
 			if ($fileFunctions->isDir($real_path))

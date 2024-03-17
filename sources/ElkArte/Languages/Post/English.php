@@ -21,9 +21,6 @@ $txt['lamp'] = 'Lamp';
 $txt['add_smileys'] = 'Add smileys';
 $txt['topic_notify_no'] = 'There are no topics with notification.';
 
-$txt['rich_edit_wont_work'] = 'Your browser does not support Rich Text editing.';
-$txt['rich_edit_function_disabled'] = 'Your browser does not support this function.';
-
 // Use numeric entities in the below five strings.
 $txt['notifyUnsubscribe'] = 'Unsubscribe to this topic by clicking here';
 
@@ -151,6 +148,7 @@ $txt['php_upload_error_4'] = 'No file was uploaded. This is a PHP related error.
 $txt['php_upload_error_6'] = 'Unable to save. Missing a temporary directory. Please contact your host if you are unable to correct this problem.';
 $txt['php_upload_error_7'] = 'Failed to write file to disk. This is a PHP related error. Please contact your host if this problem continues.';
 $txt['php_upload_error_8'] = 'A PHP extension stopped the file upload. This is a PHP related error. Please contact your host if this problem continues.';
+
 $txt['error_temp_attachments_new'] = 'There are attachments which you had previously attached but not posted. These attachments are still attached to this post. This post does need to be submitted before these attachments are either saved or removed. <a class="linkbutton" href="#postAttachment">You can do that here</a>';
 $txt['error_temp_attachments_found'] = 'The following attachments were found which you had previously attached to another post but not posted. It is advisable that you do not post until these are either removed or that post has been submitted.<br /><a class="linkbutton" href="%1$s">Click here to remove </a>those attachments. Or <a class="linkbutton" href="%2$s">here to return to that post</a>.%3$s';
 $txt['error_temp_attachments_lost'] = 'The following attachments were found which you had previously attached to another post but not posted. It is advisable that you do not upload any more attachments until these are removed or that post has been submitted.<br /><a class="linkbutton" href="%1$s">Click here to remove these attachments</a>.%2$s';
@@ -163,11 +161,20 @@ $txt['file_too_big'] = 'Your file is too large. The maximum attachment size allo
 $txt['attach_timeout'] = 'Your attachment couldn\'t be saved. This might happen because it took too long to upload or the file is bigger than the server will allow.<br /><br />Please consult your server administrator for more information.';
 $txt['bad_attachment'] = 'Your attachment has failed security checks and cannot be uploaded. Please consult the forum administrator.';
 $txt['ran_out_of_space'] = 'The upload directory is full. Please contact an administrator about this problem.';
+
 $txt['attachments_no_write'] = 'The attachments upload directory is not writable.  Your attachment or avatar cannot be saved.';
 $txt['attachments_no_create'] = 'Unable to create a new attachment directory.  Your attachment or avatar cannot be saved.';
 $txt['attachments_limit_per_post'] = 'You may not upload more than %1$d attachments per post';
 $txt['attachment_upload_abort'] = 'The upload was canceled on user request.';
 $txt['attachment_processing'] = 'Processing';
+
+$txt['attachment_invalid_chunk'] = 'An unexpected file fragment was received.';
+$txt['attachment_invalid_uuid'] = 'No fragment identifier was found in the request.';
+$txt['attachment_no_files'] = 'No file fragment was found to process.';
+$txt['attachment_chunk_quota'] = 'The file is larger than the server will accept.';
+$txt['attachment_upload_error'] = 'There was an error uploading the file, this is a PHP related error on the server.';
+$txt['attachment_not_found'] = 'There was an error copying the fragment.';
+$txt['attachment_not_writable'] = 'The attachment directory is not writable, the file cannot be saved.';
 
 // Post settings (when I implement the post interface)
 $txt['ila_insert'] = 'Insert Attachment %1$d in the message';

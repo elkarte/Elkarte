@@ -606,6 +606,7 @@ function template_add_new_attachments()
 		individualSizeAllowed: ' . (empty($modSettings['attachmentSizeLimit']) ? 0 : $modSettings['attachmentSizeLimit'] * 1024) . ',
 		numOfAttachmentAllowed: ' . (empty($modSettings['attachmentNumPerPostLimit']) ? 50 : $modSettings['attachmentNumPerPostLimit']) . ',
 		numAttachUploaded: ' . $context['attachments']['quantity'] . ',
+		chunkSize: ' . (empty($modSettings['attachmentChunkSize']) ? 250000 : $modSettings['attachmentChunkSize']) . ',
 		resizeImageEnabled: ' . (empty($modSettings['attachment_image_resize_enabled']) ? 0 : 1) . ',
 		fileDisplayTemplate: \'<div class="statusbar"><div class="info"></div><div class="progressBar"><div></div></div><div class="control icon i-close"></div></div>\',
 		oTxt: {

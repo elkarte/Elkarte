@@ -17,6 +17,7 @@
 namespace ElkArte\Modules\Attachments;
 
 use ElkArte\Attachments\TemporaryAttachment;
+use ElkArte\Attachments\TemporaryAttachmentProcess;
 use ElkArte\Attachments\TemporaryAttachmentsList;
 use ElkArte\Errors\AttachmentErrorContext;
 use ElkArte\Errors\ErrorContext;
@@ -443,7 +444,8 @@ class Post extends AbstractModule
 		if ($context['attachments']['can']['post'] && empty($this->_req->getPost('from_qr')))
 		{
 			require_once(SUBSDIR . '/Attachments.subs.php');
-			$this->ignore_temp = processAttachments((int) $msg);
+			$processAttachments = new TemporaryAttachmentProcess();
+			$this->ignore_temp = $processAttachments->processAttachments((int) $msg);
 		}
 	}
 
