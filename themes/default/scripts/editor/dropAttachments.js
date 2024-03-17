@@ -14,16 +14,15 @@
 /**
  * Simply invoke the constructor by calling new dragDropAttachment
  */
-(function ()
-{
-	let dragDropAttachment = (function (params)
-	{
+(function() {
+	const dragDropAttachment = (function(params) {
 		// Few internal global vars
-		var allowedExtensions = [],
+		let allowedExtensions = [],
 			curFileNum = 0,
 			totalSizeAllowed = null,
 			individualSizeAllowed = null,
 			numOfAttachmentAllowed = null,
+			attachmentChunkSize = null,
 			totalAttachSizeUploaded = 0,
 			numAttachUploaded = 0,
 			filesUploadedSuccessfully = [],
@@ -48,8 +47,7 @@
 			 *    totalAttachSizeUploaded - total size of already attached files(modifying post)
 			 *    numAttachUploaded - number of already attached files(modifying post)
 			 */
-			init = function (params)
-			{
+			init = function(params) {
 				if (typeof params.events !== 'undefined')
 				{
 					for (let event in params.events)
@@ -66,13 +64,11 @@
 				individualSizeAllowed = params.individualSizeAllowed || 0;
 				numOfAttachmentAllowed = params.numOfAttachmentAllowed || 0;
 				totalAttachSizeUploaded = params.totalAttachSizeUploaded || 0;
+				attachmentChunkSize = params.totalAttachSizeUploaded || 250000;
 				numAttachUploaded = params.numAttachUploaded || 0;
 				resizeImageEnabled = params.resizeImageEnabled;
 				filesUploadedSuccessfully = [];
-				if (typeof params.topic !== 'undefined')
-				{
-					topic = params.topic;
-				}
+				topic = params.topic ? params.topic : topic;
 				$str = $(params.fileDisplayTemplate);
 				board = params.board;
 				oTxt = params.oTxt;
@@ -91,10 +87,8 @@
 			 *
 			 * @param {object} $files Array of elements of existing input files
 			 */
-			processExisting = function ($files)
-			{
-				$files.each(function (idx, value)
-				{
+			processExisting = function($files) {
+				$files.each(function(idx, value) {
 					let status = new createStatusbar({}),
 						$file = $(this);
 
@@ -124,127 +118,117 @@
 			 * @param {int} fileSize current progress bar UI instance
 			 * @param {string} fileName current progress bar UI instance
 			 */
-			sendFileToServer = function (formData, status, fileSize, fileName)
-			{
-				let jqXHR = $.ajax({
-					xhr: function ()
-					{
-						let xhrobj = $.ajaxSettings.xhr();
+			sendFileToServer = function(formData, status) {
+				const abortController = new AbortController();
+				const abortSignal = abortController.signal;
 
-						if (xhrobj.upload)
-						{
-							// Set up a progress event listener to update the UI
-							xhrobj.upload.addEventListener('progress', function (event)
-							{
-								let percent = 0,
-									position = event.loaded || event.position,
-									total = event.total;
-
-								if (event.lengthComputable)
-								{
-									percent = Math.ceil(position / total * 100);
-								}
-
-								status.setProgress(percent);
-							}, false);
-						}
-
-						return xhrobj;
-					},
-					url: elk_scripturl + '?action=attachment;sa=ulattach;api=json;' + elk_session_var + '=' + elk_session_id + ';board=' + board,
-					type: "POST",
-					dataType: "json",
-					contentType: false,
-					processData: false,
-					cache: false,
-					data: formData,
-					context: {
-						'fileName': fileName,
-						'fileSize': fileSize
-					}
-				}).done(function (resp)
+				let fileName = formData.get('attachment[]').name,
+					fileSize = formData.get('attachment[]').size,
+					url = elk_prepareScriptUrl(elk_scripturl) + 'action=attachment;sa=ulasync;api=json;;board=' + board;
+				try
 				{
-					if (typeof (resp) !== 'object')
-					{
-						resp = JSON.parse(resp);
-					}
-
-					// Well it is done, lets make sure the server says so as well
-					if (resp.result)
-					{
-						let curFileNum = filesUploadedSuccessfully.length,
-							data = resp.data;
-
-						// Show it as complete
-						status.setProgress(100);
-						filesUploadedSuccessfully.push(data);
-						data.curFileNum = curFileNum;
-						status.onUploadSuccess(data);
-
-						// Correct the upload size
-						if (resizeImageEnabled && fileSize !== data.size) {
-							totalAttachSizeUploaded -= fileSize - data.size;
-						}
-					}
-					else
-					{
-						// The server was unable to process the file, show it as not sent
-						let errorMsgs = {},
-							serverErrorFiles = [];
-
-						for (let err in resp.data)
-						{
-							if (resp.data.hasOwnProperty(err))
+					const uploader = new chunkUpload({url: url, form: formData, chunkSize: attachmentChunkSize, signal: abortSignal})
+						.on('progress', (progress) => {
+							status.setProgress(progress.detail);
+						})
+						.on('complete', (resp) => {
+							if (resp.detail.result === true)
 							{
-								errorMsgs.individualServerErr = resp.data[err].title.php_unhtmlspecialchars() + '<br />';
+								uploader.finalize();
+							}
+						})
+						.on('done', (resp) => {
+							// Well it is done, lets make sure the server says so as well
+							if (resp.detail.result)
+							{
+								let curFileNum = filesUploadedSuccessfully.length,
+									data = resp.detail.data;
 
-								for (let errMsg in resp.data[err].errors)
+								// Show it as complete
+								filesUploadedSuccessfully.push(data);
+								data.curFileNum = curFileNum;
+								status.onUploadSuccess(data);
+
+								// Correct the upload size
+								if (resizeImageEnabled && fileSize !== data.size)
 								{
-									if (resp.data[err].errors.hasOwnProperty(errMsg))
-									{
-										serverErrorFiles.push(resp.data[err].errors[errMsg].php_unhtmlspecialchars());
-									}
+									totalAttachSizeUploaded -= fileSize - data.size;
 								}
 							}
+							else
+							{
+								// The server was unable to process the file, show it as not sent
+								let errorMsgs = {},
+									serverErrorFiles = [];
+
+								for (let err in resp.detail.data)
+								{
+									if (resp.detail.data.hasOwnProperty(err))
+									{
+										errorMsgs.individualServerErr = resp.detail.data[err].title.php_unhtmlspecialchars() + '<br />';
+
+										for (let errMsg in resp.detail.data[err].errors)
+										{
+											if (resp.detail.data[err].errors.hasOwnProperty(errMsg))
+											{
+												serverErrorFiles.push(resp.detail.data[err].errors[errMsg].php_unhtmlspecialchars());
+											}
+										}
+									}
+									numAttachUploaded--;
+									totalAttachSizeUploaded -= fileSize;
+									populateErrors({
+										'errorMsgs': errorMsgs,
+										'serverErrorFiles': serverErrorFiles
+									});
+								}
+								status.setServerFail(0);
+							}
+						})
+						.on('error', (err) => {
+							let errorMsgs = {},
+								sizeErrorFiles = [];
+
 							numAttachUploaded--;
 							totalAttachSizeUploaded -= fileSize;
+
+							if (err.detail === 'abort')
+							{
+								errorMsgs.default = oTxt.uploadAbort;
+							}
+							else
+							{
+								errorMsgs.individualSizeErr = oTxt.postUploadError;
+								sizeErrorFiles.push(fileName.php_htmlspecialchars());
+							}
+
 							populateErrors({
 								'errorMsgs': errorMsgs,
-								'serverErrorFiles': serverErrorFiles
+								'sizeErrorFiles': sizeErrorFiles
 							});
-						}
-						status.setServerFail(0);
-					}
-				}).fail(function (e, textStatus, errorThrown)
+
+							status.setServerFail(0);
+						})
+						.on('always', () => {
+							uploadInProgress = false;
+							updateStatusText();
+							runAttachmentQueue();
+						});
+				}
+				catch (error)
 				{
-					let errorMsgs = {},
-						sizeErrorFiles = [];
-
-					numAttachUploaded--;
-					totalAttachSizeUploaded -= fileSize;
-
-					if (textStatus === 'abort')
+					if (error instanceof TypeError && 'console' in window && console.info)
 					{
-						errorMsgs.default = oTxt.uploadAbort;
+						console.error('There was a TypeError:', error);
 					}
 					else
 					{
-						errorMsgs.individualSizeErr = oTxt.postUploadError;
-						sizeErrorFiles.push(this.fileName.php_htmlspecialchars());
+						// Re-throw the error if it's not a TypeError
+						throw error;
 					}
-					populateErrors({
-						'errorMsgs': errorMsgs,
-						'sizeErrorFiles': sizeErrorFiles
-					});
-					status.setServerFail(0);
-
-				}).always(function ()
-				{
-					uploadInProgress = false;
-					updateStatusText();
-					runAttachmentQueue();
-				});
-				status.setAbort(jqXHR);
+				}
+				status.setProgress(0);
+				status.setAbort(abortController);
 			},
 
 			/**
@@ -252,8 +236,7 @@
 			 *
 			 * Updates the restrictions text line with current values
 			 */
-			updateStatusText = function()
-			{
+			updateStatusText = function() {
 				let numberAllowed = document.getElementById('attachmentNumPerPostLimit'),
 					totalSize = document.getElementById('attachmentPostLimit');
 
@@ -276,14 +259,13 @@
 			 * @param bytes
 			 * @returns {string}
 			 */
-			formatBytes = function (bytes)
-			{
+			formatBytes = function(bytes) {
 				if (bytes === 0)
 				{
 					return '0';
 				}
 
-				for (let kb of ['Bytes', 'KB', 'MB', 'GB'])
+				for (let kb of ['Bytes', 'KB', 'MB', 'GB', 'TB'])
 				{
 					if (bytes < 1024)
 					{
@@ -313,56 +295,56 @@
 			 *
 			 * @param {object} options
 			 */
-			removeFileFromServer = function (options)
-			{
-				let dataToSend = filesUploadedSuccessfully[options.fileNum];
+			removeFileFromServer = function(options) {
+				const postForm = new FormData();
 
-				// So you did not want to upload that file?
-				$.ajax({
-					url: elk_scripturl + '?action=attachment;sa=rmattach;api=json;' + elk_session_var + '=' + elk_session_id,
-					type: "POST",
-					cache: false,
-					dataType: 'json',
-					data: {
-						'attachid': dataToSend.attachid
-					}
-				}).done(function (resp)
-				{
-					if (typeof (resp) !== 'object')
-					{
-						resp = JSON.parse(resp);
-					}
+				let attachid = filesUploadedSuccessfully[options.fileNum].attachid;
 
-					// Make sure we have a result:true in the response
-					if (resp.result)
-					{
-						// Update our counters, number of files allowed and total data payload
-						totalAttachSizeUploaded -= filesUploadedSuccessfully[options.fileNum].size;
-						numAttachUploaded--;
-						triggerEvt('RemoveSuccess', options.control, [dataToSend.attachid]);
+				postForm.append('attachid', attachid);
+				postForm.append(elk_session_var, elk_session_id);
 
-						// Done with this one, so remove it from existence
-						$('#' + dataToSend.attachid).off().remove();
-						updateStatusText();
-					}
-					else if ('console' in window && console.info)
-					{
-						window.console.info(resp.data);
-					}
-				}).fail(function (jqXHR, textStatus, errorThrown)
-				{
-					if ('console' in window && console.info)
-					{
-						console.info('Error:', textStatus, errorThrown.name);
-						console.info(jqXHR.responseText);
-					}
-				});
+				fetch(elk_prepareScriptUrl(elk_scripturl) + 'action=attachment;sa=rmattach;api=json;', {
+					method: 'POST',
+					headers: {
+						'X-Requested-With': 'XMLHttpRequest',
+						'Accept': 'application/json'
+					},
+					body: postForm,
+				})
+					.then(response => {
+						if (!response.ok)
+						{
+							throw new Error('Http error:' + response.status);
+						}
+
+						return response.json();
+					})
+					.then(resp => {
+						if (resp.result)
+						{
+							totalAttachSizeUploaded -= filesUploadedSuccessfully[options.fileNum].size;
+							numAttachUploaded--;
+							triggerEvt('RemoveSuccess', options.control, [attachid]);
+							document.getElementById(attachid).remove();
+							updateStatusText();
+						}
+						else if ('console' in window && console.info)
+						{
+							console.info(resp.data);
+						}
+					})
+					.catch((error) => {
+						if ('console' in window && console.info)
+						{
+							console.info('Error:', error.message);
+						}
+					});
 			},
 
 			/**
 			 * private function
 			 *
-			 * Creates the status UI for each file dropped
+			 * Creates the status UI for each file added
 			 * Initiate as new createStatusbar
 			 * Has the following methods available to it
 			 *  - setFileNameSize
@@ -372,8 +354,7 @@
 			 *  - onUploadSuccess
 			 * @param {object} obj options
 			 */
-			createStatusbar = function (obj)
-			{
+			createStatusbar = function(obj) {
 				let $control = $str.clone(),
 					$button = $control.find('.control'),
 					$progressbar = $control.find('.progressBar');
@@ -383,22 +364,28 @@
 				$('.progress_tracker').append($control);
 
 				// Provide the file size in something more legible, like 100KB or 1.1MB
-				this.setFileNameSize = function (name, size)
-				{
+				this.setFileNameSize = function(name, size) {
 					let sizeStr = formatBytes(size);
 					$control.find('.info').html(name + ' (' + sizeStr + ')');
 				};
 
 				// Set the progress bar position
-				this.setProgress = function (progress)
-				{
-					let progressBarWidth = progress * $progressbar.width() / 100;
+				this.setProgress = function(progress) {
+					let progressBarWidth = progress * $progressbar.width() / 100,
+						progressBarDiv = $progressbar.find('div');
 
-					$progressbar.find('div').animate({
-						width: progressBarWidth
-					}, 10).html(progress + "% ");
+					if (progressBarWidth === 0)
+					{
+						progressBarDiv.css('width', '0');
+					}
+					else
+					{
+						progressBarDiv.animate({
+							width: progressBarWidth
+						}, 250).html(progress + '% ');
+					}
 
-					// Completed upload, server is making thumbs, doing checks, resize, etc
+					// Completed upload, server is making thumbs, resizing, rotating, doing checks, etc
 					if (progress === 100)
 					{
 						$progressbar.find('div').html(oTxt.processing);
@@ -407,38 +394,33 @@
 				};
 
 				// Provide a way to stop the upload before it is done
-				this.setAbort = function (jqxhr)
-				{
+				this.setAbort = function(abortController) {
 					let sb = $control,
 						pb = $progressbar;
 
-					$button.on('click', function (e)
-					{
+					$button.on('click', function(e) {
 						e.preventDefault();
-						jqxhr.abort();
+						abortController.abort();
 						sb.hide();
 						pb.siblings('.i-concentric').remove();
 						populateErrors({});
 					});
 				};
 
-				this.getButton = function ()
-				{
+				this.getButton = function() {
 					return $button;
 				};
 
 				// Server Failure is always an option when sending files
-				this.setServerFail = function (data)
-				{
+				this.setServerFail = function(data) {
 					this.setProgress(0);
 					$button.removeClass('i-close').addClass('i-alert');
-					$progressbar.siblings('.icon .i-concentric').remove();
-					$progressbar.css("background-color", "var(--warn)");
+					$progressbar.siblings('.i-concentric').remove();
+					$progressbar.css('background-color', 'var(--warn)');
 				};
 
 				// The file upload is successful, remove our abort event and swap the class
-				this.onUploadSuccess = function (data)
-				{
+				this.onUploadSuccess = function(data) {
 					fileUploadedInterface($control, $button, data);
 					triggerEvt('UploadSuccess', $control, [$button, data]);
 				};
@@ -453,8 +435,7 @@
 			 * @param {object} $button
 			 * @param {object} data
 			 */
-			fileUploadedInterface = function ($control, $button, data)
-			{
+			fileUploadedInterface = function($control, $button, data) {
 				$button.off('click');
 				$button.removeClass('abort i-close').addClass('remove i-delete colorize-delete');
 
@@ -483,12 +464,10 @@
 				$progressbar.remove();
 
 				// Provide a way to remove a file that has been sent by mistake
-				$button.on('click', function (e)
-				{
+				$button.on('click', function(e) {
 					e.preventDefault();
 
 					let fileNum = e.target.id;
-
 					if (confirm(oTxt.areYouSure))
 					{
 						removeFileFromServer({
@@ -509,8 +488,7 @@
 			 * @param {object} files what files to upload
 			 * @param {object} obj parent object in which file progress is shown
 			 */
-			handleFileUpload = function (files, obj)
-			{
+			handleFileUpload = function(files, obj) {
 				let errorMsgs = {},
 					extnErrorFiles = [],
 					sizeErrorFiles = [];
@@ -525,7 +503,7 @@
 						errorFlag = false;
 
 					// Make sure the server will allow this type of file
-					if (allowedExtensions.length > 0 && allowedExtensions.indexOf(extension) < 0)
+					if (allowedExtensions.length > 0 && !allowedExtensions.includes(extension))
 					{
 						errorMsgs.extnError = '(<strong>' + extension + '</strong>) ' + oTxt.allowedExtensions;
 						extnErrorFiles.push(files[i].name);
@@ -556,7 +534,7 @@
 
 					if (totalSizeAllowed !== 0 && totalAttachSizeUploaded > totalSizeAllowed)
 					{
-						errorMsgs.totalSizeError = oTxt.totalSizeAllowed.replace("%1$s", formatBytes(totalSizeAllowed)).replace("%2$s", formatBytes(totalSizeAllowed - (totalAttachSizeUploaded - fileSize)));
+						errorMsgs.totalSizeError = oTxt.totalSizeAllowed.replace('%1$s', formatBytes(totalSizeAllowed)).replace('%2$s', formatBytes(totalSizeAllowed - (totalAttachSizeUploaded - fileSize)));
 						errorFlag = true;
 						totalAttachSizeUploaded -= fileSize;
 					}
@@ -566,16 +544,14 @@
 					if (errorFlag === false)
 					{
 						let fd = new FormData(),
-							status = new createStatusbar(obj);
+							statusBar = new createStatusbar(obj);
 
 						numAttachUploaded++;
 						fd.append('attachment[]', files[i]);
-						status.setFileNameSize(files[i].name.php_htmlspecialchars(), files[i].size);
+						statusBar.setFileNameSize(files[i].name.php_htmlspecialchars(), files[i].size);
 						attachmentQueue.push({
 							'formData': fd,
-							'statusInstance': status,
-							'fileName': files[i].name,
-							'fileSize': files[i].size
+							'statusInstance': statusBar
 						});
 					}
 				}
@@ -595,16 +571,14 @@
 			 *
 			 * Checks if there are any files pending upload
 			 */
-			runAttachmentQueue = function ()
-			{
+			runAttachmentQueue = function() {
 				if (attachmentQueue.length > 0 && uploadInProgress === false)
 				{
-					setTimeout(function ()
-					{
+					setTimeout(function() {
 						let currentData = attachmentQueue[0];
 
 						uploadInProgress = true;
-						sendFileToServer(currentData.formData, currentData.statusInstance, currentData.fileSize, currentData.fileName);
+						sendFileToServer(currentData.formData, currentData.statusInstance);
 						attachmentQueue.splice(0, 1);
 					}, 200);
 				}
@@ -620,8 +594,7 @@
 			 *    file names having extension error
 			 *    file names having size error
 			 */
-			populateErrors = function (params)
-			{
+			populateErrors = function(params) {
 				let $drop_attachments_error = $('.drop_attachments_error');
 
 				$drop_attachments_error.html('');
@@ -656,40 +629,6 @@
 			},
 
 			/**
-			 * private function
-			 *
-			 * Used to check if a value exists in an array
-			 *
-			 * @param {string} needle
-			 */
-			indexOf = function (needle)
-			{
-				if (typeof Array.prototype.indexOf === 'function')
-				{
-					indexOf = Array.prototype.indexOf;
-				}
-				else
-				{
-					indexOf = function (needle)
-					{
-						let i,
-							index = -1;
-
-						for (i = 0; i < this.length; i++)
-						{
-							if (this[i] === needle)
-							{
-								index = i;
-								break;
-							}
-						}
-
-						return index;
-					};
-				}
-			},
-
-			/**
 			 * public function
 			 *
 			 * Used to extend the code
@@ -697,8 +636,7 @@
 			 * @param {string} event
 			 * @param {object} listener
 			 */
-			addEventListener = function (event, listener)
-			{
+			addEventListener = function(event, listener) {
 				if (!oEvents.hasOwnProperty(event))
 				{
 					oEvents[event] = [];
@@ -716,8 +654,7 @@
 			 * @param {object} aThis
 			 * @param {object} args
 			 */
-			triggerEvt = function (event, aThis, args)
-			{
+			triggerEvt = function(event, aThis, args) {
 				if (!oEvents.hasOwnProperty(event))
 				{
 					return;
@@ -732,64 +669,60 @@
 		/**
 		 * Initialize the drag and drop function!
 		 */
-		$(function ()
-		{
-			let obj = $(".drop_area");
+		window.onload = function() {
+			const obj = document.querySelector('.drop_area');
 
 			// Make sure the browser supports this
-			if (!(window.FormData && ("onprogress" in $.ajaxSettings.xhr())))
+			if (!(window.FormData && window.fetch))
 			{
 				return;
 			}
 
 			// All clear, show the drop zone
-			obj.toggle();
-			$('.drop_attachments_no_js').hide();
+			obj.style.display = 'block';
+			document.querySelectorAll('.drop_attachments_no_js').forEach(element => element.style.display = 'none');
 
 			// Entering the dropzone, show it
-			obj.on('dragenter', function (e)
-			{
+			obj.addEventListener('dragenter', function(e) {
 				e.stopPropagation();
 				e.preventDefault();
-				$(this).css('opacity', '1');
+
+				obj.style.opacity = '1';
 			});
 
 			// Hovering over, waiting waiting waiting, show we are waiting
-			obj.on('dragover', function (e)
-			{
+			obj.addEventListener('dragover', function(e) {
 				e.stopPropagation();
 				e.preventDefault();
 			});
 
 			// Catch what you dropped, and send it off to be processed
-			obj.on('drop', function (e)
-			{
-				let files = e.originalEvent.dataTransfer.files;
-
+			obj.addEventListener('drop', function(e) {
+				let files = e.dataTransfer.files;
 				e.preventDefault();
-				$(this).css('opacity', '0.6');
+				obj.style.opacity = '0.6';
 				handleFileUpload(files, obj);
 			});
 
 			// Wait, where are you going?  Lets show you are outside the zone
-			obj.on('dragexit', function (e)
-			{
+			obj.addEventListener('dragexit', function(e) {
 				e.preventDefault();
-				$(this).css('opacity', '0.6');
+				obj.style.opacity = '0.6';
 			});
 
 			// Rather click and select?
-			let $input = obj.find('#attachment_click');
-			$input.on('change', function (e)
-			{
+			const input = document.querySelector('#attachment_click');
+			const cloneElem = input.cloneNode(true);
+
+			document.querySelector('.drop_area_fileselect_text').appendChild(cloneElem);
+			cloneElem.addEventListener('change', function(e) {
 				e.preventDefault();
-				let files = $(this)[0].files;
+				const files = this.files;
 				handleFileUpload(files, obj);
 				this.value = null;
 			});
-			$input.clone(true, true).appendTo('.drop_area_fileselect_text');
-			$input.hide();
-		});
+			input.style.display = 'none';
+		};
 
 		init(params);
 		return {
@@ -799,22 +732,5 @@
 		};
 	});
 
-	// AMD / RequireJS
-	if (typeof define !== 'undefined' && define.amd)
-	{
-		define([], function ()
-		{
-			return dragDropAttachment;
-		});
-	}
-	// CommonJS
-	else if (typeof module !== 'undefined' && module.exports)
-	{
-		module.exports = dragDropAttachment;
-	}
-	// included directly via <script> tag
-	else
-	{
-		this.dragDropAttachment = dragDropAttachment;
-	}
+	this.dragDropAttachment = dragDropAttachment;
 }());
