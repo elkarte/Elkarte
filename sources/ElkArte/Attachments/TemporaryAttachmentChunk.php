@@ -30,6 +30,9 @@ class TemporaryAttachmentChunk
 	/** @var AttachmentsDirectory */
 	public $attachmentDirectory;
 
+	/** @var TemporaryAttachment */
+	public $tempAttachment;
+
 	/** @var string Active attachment directory */
 	public $attach_current_dir;
 
@@ -50,6 +53,7 @@ class TemporaryAttachmentChunk
 
 		$this->req = HttpReq::instance();
 		$this->attachmentDirectory = new AttachmentsDirectory($modSettings, database());
+		$this->tempAttachment = new TemporaryAttachment();
 
 		$this->attachmentDirectory->automanageCheckDirectory();
 
@@ -86,13 +90,13 @@ class TemporaryAttachmentChunk
 	{
 		[$uuid, $chunkIndex, $totalChunkCount] = $this->extractPostData();
 		$postValidationError = $this->validatePostData($uuid, $chunkIndex, $totalChunkCount);
-		if ($postValidationError !== true)
+		if (is_string($postValidationError))
 		{
 			return $this->errorAsyncFile($postValidationError, $uuid);
 		}
 
 		$validationError = $this->validateReceivedFile();
-		if ($validationError !== true)
+		if (is_string($validationError))
 		{
 			return $this->errorAsyncFile($validationError, $uuid);
 		}
@@ -110,7 +114,7 @@ class TemporaryAttachmentChunk
 	/**
 	 * Extracts post data from the request
 	 *
-	 * @return array[int, int, int] An array containing the UUID, chunk index, and total chunk count
+	 * @return array [int, int, int] An array containing the UUID, chunk index, and total chunk count
 	 */
 	private function extractPostData()
 	{
@@ -134,7 +138,7 @@ class TemporaryAttachmentChunk
 	 * @param int $chunkIndex The index of the current chunk.
 	 * @param int $totalChunkCount The total number of chunks.
 	 *
-	 * @return string Returns 'invalid_chunk' if the chunk index is invalid or 'invalid_uuid' if the UUID is not set.
+	 * @return string|bool Returns 'invalid_chunk' if the chunk index is invalid or 'invalid_uuid' if the UUID is not set.
 	 * If the chunk and UUID are valid, it delegates the validation to the validateInitialChunk method and returns its result.
 	 */
 	private function validatePostData($uuid, $chunkIndex, $totalChunkCount)
@@ -192,6 +196,8 @@ class TemporaryAttachmentChunk
 	 */
 	public function checkTotalSize($totalChunks, $chunkSize = 250000)
 	{
+		global $modSettings;
+
 		$expectedSize = $totalChunks * $chunkSize;
 
 		// What upload max sizes are defined
@@ -298,6 +304,7 @@ class TemporaryAttachmentChunk
 		}
 
 		// If we have an initial PHP upload error, then we are baked
+		// @todo this will not work as expected as tempAttachments is not tied to the fragment
 		$errors = doPHPUploadChecks(0);
 		if (!empty($errors))
 		{
@@ -338,9 +345,23 @@ class TemporaryAttachmentChunk
 	{
 		$out = $this->attach_current_dir . '/' . $local_file;
 		$in = $_FILES['attachment']['tmp_name'][0];
-		@move_uploaded_file($in, $out);
 
-		if (!FileFunctions::instance()->fileExists($out))
+		// Move the file to the attachment folder with a temp name for now.
+		set_error_handler(static function () { /* ignore warnings */ });
+		try
+		{
+			$result = move_uploaded_file($in, $out);
+		}
+		catch (\Throwable)
+		{
+			$result = false;
+		}
+		finally
+		{
+			restore_error_handler();
+		}
+
+		if (!$result || !FileFunctions::instance()->fileExists($out))
 		{
 			return 'not_found';
 		}
@@ -496,7 +517,13 @@ class TemporaryAttachmentChunk
 		foreach ($files as $file)
 		{
 			$fileInputPath = $this->attach_current_dir . '/' . $file->getFilename();
-			$success &= file_put_contents($this->combinedFilePath, file_get_contents($fileInputPath), LOCK_EX | FILE_APPEND) !== false;
+			$writeResult = file_put_contents($this->combinedFilePath, file_get_contents($fileInputPath), LOCK_EX | FILE_APPEND);
+
+			if ($writeResult === false)
+			{
+				$success = false;
+			}
+
 			@unlink($fileInputPath);
 		}
 
