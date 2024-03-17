@@ -1723,7 +1723,7 @@ function ajax_getCensorPreview ()
  * Used to show/hide sub options for the various notifications
  * action=admin;area=featuresettings;sa=mention
  */
-$(function() {
+function prepareNotificationOptions () {
 	let headers = Array.from(document.querySelectorAll('input[id^=\'notifications\'][id$=\'[enable]\']'));
 
 	headers.forEach(function(header) {
@@ -1767,7 +1767,7 @@ $(function() {
 		let event = new Event('change', {'bubbles': true, 'cancelable': true});
 		header.dispatchEvent(event);
 	});
-});
+}
 
 /**
  * Ajax function to clear CSS and JS hives.  Called from action=admin;area=featuresettings;sa=basic

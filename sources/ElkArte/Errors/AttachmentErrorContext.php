@@ -223,7 +223,7 @@ class AttachmentErrorContext
 	{
 		global $txt;
 
-		$returns = array();
+		$returns = [];
 
 		if ($this->_generic_error !== null)
 		{
@@ -238,11 +238,11 @@ class AttachmentErrorContext
 		{
 			foreach ($this->_attachs as $attachID => $error)
 			{
-				$returns[$attachID] = array(
+				$returns[$attachID] = [
 					'errors' => $error['error']->prepareErrors($severity),
 					'type' => $this->getErrorType(),
 					'title' => sprintf($txt['attach_warning'], $error['name']),
-				);
+				];
 			}
 		}
 

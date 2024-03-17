@@ -220,9 +220,7 @@ class Likes extends AbstractController
 		global $context, $txt;
 
 		// Make room for ajax
-		theme()->getLayers()->removeAll();
-		theme()->getTemplates()->load('Json');
-		$context['sub_template'] = 'send_json';
+		setJsonTemplate();
 
 		// No errors, build the new button tag
 		if (empty($this->_likes_response))

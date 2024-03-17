@@ -134,10 +134,7 @@ class Mentions extends AbstractController
 			die();
 		}
 
-		$template_layers = theme()->getLayers();
-		$template_layers->removeAll();
-		theme()->getTemplates()->load('Json');
-		$context['sub_template'] = 'send_json';
+		setJsonTemplate();
 
 		require_once(SUBSDIR . '/Mentions.subs.php');
 

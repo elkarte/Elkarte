@@ -133,7 +133,7 @@ class UserNotification extends AbstractModel
 				Push.config({serviceWorker: "./elkServiceWorker.min.js"}); 
 				
 				// Grab the site icon to use in the desktop notification widget
-				ElkNotifications.add(new ElkDesktop(
+				ElkNotifier.add(new ElkDesktop(
 					{"icon": $("head").find("link[rel=\'shortcut icon\']").attr("href")}
 				));
 			});', true);

@@ -38,6 +38,11 @@ class Standard extends AbstractUrlGenerator
 	 */
 	protected function generateQuery($params)
 	{
+		if (!is_array($params))
+		{
+			return '';
+		}
+
 		$args = [];
 		foreach ($params as $k => $v)
 		{

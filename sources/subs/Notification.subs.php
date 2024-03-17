@@ -455,11 +455,11 @@ function getNotifierToken($memID, $memEmail, $memSalt, $area, $extra)
 {
 	global $modSettings;
 
-	$tokenizer = new TokenHash();
-
 	// We need a site salt to keep things moving
 	if (empty($modSettings['unsubscribe_site_salt']))
 	{
+		$tokenizer = new TokenHash();
+
 		// Extra digits of salt
 		$unsubscribe_site_salt = $tokenizer->generate_hash(22);
 		updateSettings(['unsubscribe_site_salt' => $unsubscribe_site_salt]);

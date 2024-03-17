@@ -138,9 +138,7 @@ class Jslocale extends AbstractController
 		$languages = getLanguages();
 		$lang = $this->_req->getPost('lang', 'trim', 'English');
 
-		theme()->getLayers()->removeAll();
-		theme()->getTemplates()->load('Json');
-		$context['sub_template'] = 'send_json';
+		setJsonTemplate();
 		$context['require_agreement'] = !empty($modSettings['requireAgreement']);
 
 		if (isset($languages[$lang]))

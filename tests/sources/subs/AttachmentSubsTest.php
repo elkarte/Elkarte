@@ -10,6 +10,7 @@
  *
  */
 
+use ElkArte\Attachments\TemporaryAttachmentProcess;
 use ElkArte\Errors\AttachmentErrorContext;
 use ElkArte\Languages\Loader;
 use tests\ElkArteCommonSetupTest;
@@ -66,7 +67,8 @@ class AttachmentSubsTest extends ElkArteCommonSetupTest
 	public function testProcessAttachments()
 	{
 		// Better not pass
-		$result = processAttachments(0);
+		$processAttachments = new TemporaryAttachmentProcess();
+		$result = $processAttachments->processAttachments(0);
 		$this->assertFalse($result);
 
 		// What did it think of this

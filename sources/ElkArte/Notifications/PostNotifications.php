@@ -433,7 +433,7 @@ class PostNotifications extends AbstractModel
 		// In group mode like google groups or yahoo groups, the mail is from the poster
 		if (!empty($this->_modSettings['maillist_group_mode']))
 		{
-			return un_htmlspecialchars($topicDatum['name']);
+			return un_htmlspecialchars($topicDatum['name'] ?? 'N/A');
 		}
 
 		// Otherwise in maillist mode, it is from the site
@@ -528,7 +528,7 @@ class PostNotifications extends AbstractModel
 				if ($maillist && $email_perm && $type === self::NOTIFY_REPLY && !empty($notifyDatum['notify_send_body']))
 				{
 					// Set from name based on group or maillist mode
-					$email_from = $this->_getEmailFrom($topicNotifications[$notifyDatum['id_topic']]);
+					$email_from = $this->_getEmailFrom($topicData[$notifyDatum['id_topic']]);
 					$from_wrapper = $this->_getFromWrapper();
 
 					$sendMail->buildEmail($notifyDatum['email_address'], $emaildata['subject'], $emaildata['body'], $email_from, 'm' . $topicNotifications[$notifyDatum['id_topic']]['last_id'], true, 3, false, $from_wrapper, $notifyDatum['id_topic']);

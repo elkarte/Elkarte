@@ -19,6 +19,8 @@ namespace ElkArte\Controller;
 use ElkArte\AbstractController;
 use ElkArte\Action;
 use ElkArte\Attachments\AttachmentsDirectory;
+use ElkArte\Attachments\TemporaryAttachmentChunk;
+use ElkArte\Attachments\TemporaryAttachmentProcess;
 use ElkArte\Attachments\TemporaryAttachmentsList;
 use ElkArte\Errors\AttachmentErrorContext;
 use ElkArte\Exceptions\Exception;
@@ -60,7 +62,8 @@ class Attachment extends AbstractController
 		{
 			$sa = $this->_req->getQuery('sa', 'trim', '');
 
-			return $sa === 'ulattach' || $sa === 'rmattach';
+			// We will need to respond with Json
+			return $sa === 'ulattach' || $sa === 'rmattach' || $sa === 'ulasync';
 		}
 
 		// ... politely kick them out
@@ -86,6 +89,7 @@ class Attachment extends AbstractController
 			'dlattach' => array($this, 'action_dlattach'),
 			'tmpattach' => array($this, 'action_tmpattach'),
 			'ulattach' => array($this, 'action_ulattach'),
+			'ulasync' => array($this, 'action_ulasync'),
 			'rmattach' => array($this, 'action_rmattach'),
 		);
 
@@ -98,28 +102,112 @@ class Attachment extends AbstractController
 	}
 
 	/**
-	 * Function to upload attachments via ajax calls
+	 *  Method to upload attachments as fragments via ajax
 	 *
 	 * - Currently called by drag drop attachment functionality
-	 * - Pass the form data with session vars
+	 * - Passed the form data with session vars
 	 * - Responds back with errors or file data
+	 *
+	 * @return bool Returns false if there was an error, otherwise true.
 	 */
-	public function action_ulattach()
+	public function action_ulasync()
+	{
+		global $context;
+
+		// Going to send back Json
+		setJsonTemplate();
+
+		// Final request, rebuild the file and do standard upload checks
+		if ($this->_req->comparePost('async', 'complete', 'trim'))
+		{
+			$this->combineChunksAndProcess();
+			return true;
+		}
+
+		Txt::load('Errors');
+
+		// Process the chunk
+		$chunk = new TemporaryAttachmentChunk();
+		$resp_data = $chunk->action_async();
+
+		// If we have a PHP related upload error, set the error context
+		if ($resp_data['result'] !== true)
+		{
+			$attach_errors = AttachmentErrorContext::context();
+			$attach_errors->activate();
+			if ($attach_errors->hasErrors())
+			{
+				$errors = $attach_errors->prepareErrors();
+				foreach ($errors as $error)
+				{
+					$resp_data[] = $error;
+				}
+
+				$context['json_data'] = array('result' => false, 'data' => $resp_data);
+				return false;
+			}
+		}
+
+		// Set up the template details
+		$context['json_data'] = $resp_data;
+
+		return true;
+	}
+
+	/**
+	 * Combines the temporary attachment chunks into a single file
+	 *
+	 * This method combines the temporary attachment chunks into a single file and performs the final
+	 * processing request for the combined chunks. If the response data indicates that the result is
+	 * successful, the method passes the file off to the action_ulattach method as if it were a single file.
+	 * Otherwise, the response data is assigned to the $context['json_data'] variable.
+	 *
+	 * @return void
+	 */
+	private function combineChunksAndProcess()
+	{
+		global $context;
+
+		// Final chuck processing request
+		$chunk = new TemporaryAttachmentChunk();
+
+		$resp_data = $chunk->action_combineChunks();
+		if ($resp_data['result'] === true)
+		{
+			// Pass this off to action_ulattach just like it was a single file, set strict as false as we already have the
+			// combined chunks in the attachment directory and we dont need to verify it was a php upload any longer
+			$this->action_ulattach(false);
+		}
+		else
+		{
+			$context['json_data'] = $resp_data;
+		}
+	}
+
+	/**
+	 *  Method to upload attachments via ajax
+	 *
+	 *  - Currently called by drag drop attachment functionality
+	 *  - Passed the form data with session vars
+	 *  - Responds back with errors or file data
+	 *
+	 * @param bool $strict True if attachment processing should use move_uploaded_file, rename otherwise. Default is true.
+	 *
+	 * @return bool|void False if the session is invalid or an error occurred, void otherwise.
+	 */
+	public function action_ulattach($strict = true)
 	{
 		global $context, $modSettings, $txt;
 
 		$resp_data = array();
 		Txt::load('Errors');
-		$context['attachments']['can']['post'] = !empty($modSettings['attachmentEnable']) && $modSettings['attachmentEnable'] == 1 && (allowedTo('post_attachment') || ($modSettings['postmod_active'] && allowedTo('post_unapproved_attachments')));
+		$context['attachments']['can']['post'] = !empty($modSettings['attachmentEnable']) && (int) $modSettings['attachmentEnable'] === 1 && (allowedTo('post_attachment') || ($modSettings['postmod_active'] && allowedTo('post_unapproved_attachments')));
 
 		// Set up the template details
-		$template_layers = theme()->getLayers();
-		$template_layers->removeAll();
-		theme()->getTemplates()->load('Json');
-		$context['sub_template'] = 'send_json';
+		setJsonTemplate();
 
 		// Make sure the session is still valid
-		if (checkSession('request', '', false) !== '')
+		if (checkSession('post', '', false) !== '')
 		{
 			$context['json_data'] = array('result' => false, 'data' => $txt['session_timeout_file_upload']);
 
@@ -136,9 +224,9 @@ class Attachment extends AbstractController
 
 			if ($context['attachments']['can']['post'] && empty($this->_req->post->from_qr))
 			{
-				require_once(SUBSDIR . '/Attachments.subs.php');
-
-				processAttachments($this->_req->getPost('msg', 'intval', 0));
+				$processAttachments = new TemporaryAttachmentProcess();
+				$processAttachments->strict = $strict;
+				$processAttachments->processAttachments($this->_req->getPost('msg', 'intval', 0));
 			}
 
 			// Any mistakes?
@@ -172,13 +260,13 @@ class Attachment extends AbstractController
 					}
 				}
 
-				$context['json_data'] = array('result' => true, 'data' => $resp_data);
+				$context['json_data'] = ['result' => true, 'data' => $resp_data];
 			}
 		}
 		// Could not find the files you claimed to have sent
 		else
 		{
-			$context['json_data'] = array('result' => false, 'data' => $txt['no_files_uploaded']);
+			$context['json_data'] = ['result' => false, 'data' => $txt['no_files_uploaded']];
 		}
 	}
 
@@ -197,13 +285,10 @@ class Attachment extends AbstractController
 		global $context, $txt;
 
 		// Prepare the template so we can respond with json
-		$template_layers = theme()->getLayers();
-		$template_layers->removeAll();
-		theme()->getTemplates()->load('Json');
-		$context['sub_template'] = 'send_json';
+		setJsonTemplate();
 
 		// Make sure the session is valid
-		if (checkSession('request', '', false) !== '')
+		if (checkSession('post', '', false) !== '')
 		{
 			Txt::load('Errors');
 			$context['json_data'] = array('result' => false, 'data' => $txt['session_timeout']);
@@ -349,7 +434,7 @@ class Attachment extends AbstractController
 				$attachment['filename'] = empty($full_attach['filename']) ? '' : $full_attach['filename'];
 				$attachment['id_attach'] = 0;
 				$attachment['attachment_type'] = 0;
-				$attachment['approved'] = $full_attach['approved'];
+				$attachment['approved'] = $full_attach['approved'] ?? 0;
 				$attachment['id_member'] = $full_attach['id_member'];
 
 				// If it is a known extension, show a mimetype extension image

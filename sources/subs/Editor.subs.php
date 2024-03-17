@@ -80,7 +80,8 @@ function create_control_richedit($editorOptions)
 			'editor/jquery.sceditor.elkarte.js',
 			'post.js',
 			'editor/dropAttachments.js',
-			'editor/ilaAttachments.js'
+			'editor/ilaAttachments.js',
+			'editor/chunkUpload.js'
 		]);
 
 		theme()->addJavascriptVar([

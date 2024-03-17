@@ -18,209 +18,26 @@
  */
 
 use ElkArte\Attachments\AttachmentsDirectory;
-use ElkArte\Attachments\TemporaryAttachment;
-use ElkArte\Attachments\TemporaryAttachmentsList;
+use ElkArte\Attachments\TemporaryAttachmentProcess;
 use ElkArte\Cache\Cache;
-use ElkArte\Errors\AttachmentErrorContext;
 use ElkArte\Errors\Errors;
 use ElkArte\Graphics\Image;
 use ElkArte\Helper\FileFunctions;
 use ElkArte\Helper\TokenHash;
 use ElkArte\Http\FsockFetchWebdata;
 use ElkArte\Themes\ThemeLoader;
-use ElkArte\User;
 
 /**
  * Handles the actual saving of attachments to a directory.
  *
- * What it does:
+ * @deprecated since 2.0, use the TemporaryAttachmentProcess class
  *
- * - Loops through $_FILES['attachment'] array and saves each file to the current attachments' folder.
- * - Validates the save location actually exists.
- *
- * @param int $id_msg 0 or id of the message with attachments, if any.
- *                    If 0, this is an upload in progress for a new post.
  * @return bool
  */
 function processAttachments($id_msg = 0)
 {
-	global $context, $modSettings, $txt, $topic, $board;
-
-	$attach_errors = AttachmentErrorContext::context();
-	$file_functions = FileFunctions::instance();
-	$tmp_attachments = new TemporaryAttachmentsList();
-	$attachmentDirectory = new AttachmentsDirectory($modSettings, database());
-
-	// Validate we need to do processing, nothing new, nothing previously sent
-	if ($tmp_attachments->getPostParam('files') === null
-		&& !$tmp_attachments->hasAttachments()
-		&& !$attachmentDirectory->hasFileTmpAttachments())
-	{
-		return false;
-	}
-
-	// Make sure we're uploading to the right place.
-	$attachmentDirectory->automanageCheckDirectory(isset($_REQUEST['action']) && $_REQUEST['action'] === 'admin');
-	$attach_current_dir = $attachmentDirectory->getCurrent();
-	if (!$file_functions->isDir($attach_current_dir))
-	{
-		$tmp_attachments->setSystemError('attach_folder_warning');
-		Errors::instance()->log_error(sprintf($txt['attach_folder_admin_warning'], $attach_current_dir), 'critical');
-	}
-
-	if ($tmp_attachments->hasSystemError() === false && !isset($context['attachments']['quantity']))
-	{
-		$context['attachments']['quantity'] = 0;
-		$context['attachments']['total_size'] = 0;
-
-		// If this isn't a new post, check the current attachments.
-		if ($id_msg !== 0)
-		{
-			list ($context['attachments']['quantity'], $context['attachments']['total_size']) = attachmentsSizeForMessage($id_msg);
-		}
-	}
-
-	// There are files in session (temporary attachments list), likely already processed
-	$ignore_temp = false;
-	if ($tmp_attachments->getPostParam('files') !== null && $tmp_attachments->hasAttachments())
-	{
-		// Let's try to keep them. But...
-		$ignore_temp = true;
-
-		// If new files are being added. We can't ignore those
-		// If the array is not empty
-		if (!empty($_FILES['attachment']['tmp_name']) && count(array_filter($_FILES['attachment']['tmp_name'])) !== 0)
-		{
-			$ignore_temp = false;
-		}
-
-		// Need to make space for the new files. So, bye bye.
-		if (!$ignore_temp)
-		{
-			$tmp_attachments->removeAll(User::$info->id);
-			$tmp_attachments->unset();
-
-			$attach_errors->activate()->addError('temp_attachments_flushed');
-		}
-	}
-
-	if (!isset($_FILES['attachment']['name']))
-	{
-		$_FILES['attachment']['tmp_name'] = [];
-	}
-
-	// Remember where we are at. If it's anywhere at all.
-	if (!$ignore_temp)
-	{
-		$tmp_attachments->setPostParam([
-			'msg' => $id_msg,
-			'last_msg' => (int) ($_REQUEST['last_msg'] ?? 0),
-			'topic' => (int) ($topic ?? 0),
-			'board' => (int) ($board ?? 0),
-		]);
-	}
-
-	// If we have an initial error, lets just display it.
-	if ($tmp_attachments->hasSystemError())
-	{
-		// This is a generic error
-		$attach_errors->activate();
-		$attach_errors->addError('attach_no_upload');
-
-		// And delete the files 'cos they ain't going nowhere.
-		foreach ($_FILES['attachment']['tmp_name'] as $n => $dummy)
-		{
-			if (is_writable($_FILES['attachment']['tmp_name'][$n]))
-			{
-				unlink($_FILES['attachment']['tmp_name'][$n]);
-			}
-		}
-
-		$_FILES['attachment']['tmp_name'] = array();
-	}
-
-	// Loop through $_FILES['attachment'] array and move each file to the current attachments' folder.
-	foreach ($_FILES['attachment']['tmp_name'] as $n => $dummy)
-	{
-		if ($_FILES['attachment']['name'][$n] === '')
-		{
-			continue;
-		}
-
-		// First, let's check for PHP upload errors.
-		$errors = attachmentUploadChecks($n);
-
-		$tokenizer = new TokenHash();
-		$temp_file = new TemporaryAttachment([
-			'name' => basename($_FILES['attachment']['name'][$n]),
-			'tmp_name' => $_FILES['attachment']['tmp_name'][$n],
-			'attachid' => $tmp_attachments->getTplName(User::$info->id, $tokenizer->generate_hash(16)),
-			'public_attachid' => $tmp_attachments->getTplName(User::$info->id, $tokenizer->generate_hash(16)),
-			'user_id' => User::$info->id,
-			'size' => $_FILES['attachment']['size'][$n],
-			'type' => $_FILES['attachment']['type'][$n],
-			'id_folder' => $attachmentDirectory->currentDirectoryId(),
-			'mime' => getMimeType($_FILES['attachment']['tmp_name'][$n]),
-		]);
-
-		// If we are error free, Try to move and rename the file before doing more checks on it.
-		if (empty($errors))
-		{
-			$temp_file->moveUploaded($attach_current_dir);
-		}
-		// Upload error(s) were detected, flag the error, remove the file
-		else
-		{
-			$temp_file->setErrors($errors);
-			$temp_file->remove(false);
-		}
-
-		// The file made it to the server, so do more checks injection, size, extension
-		$temp_file->doChecks($attachmentDirectory);
-
-		// Sort out the errors for display and delete any associated files.
-		if ($temp_file->hasErrors())
-		{
-			$attach_errors->addAttach($temp_file['attachid'], $temp_file->getName());
-			$log_these = ['attachments_no_create', 'attachments_no_write', 'attach_timeout',
-						  'ran_out_of_space', 'cant_access_upload_path', 'attach_0_byte_file', 'bad_attachment'];
-
-			foreach ($temp_file->getErrors() as $error)
-			{
-				$error = array_filter($error);
-				$attach_errors->addError(isset($error[1]) ? $error : $error[0]);
-				if (in_array($error[0], $log_these))
-				{
-					Errors::instance()->log_error($temp_file->getName() . ': ' . $txt[$error[0]], 'critical');
-
-					// For critical errors, we don't want the file or session data to persist
-					$temp_file->remove(false);
-				}
-			}
-		}
-
-		// Want to correct for phone rotated photos, hell yeah ya do!
-		if (!empty($modSettings['attachment_autorotate']))
-		{
-			$temp_file->autoRotate();
-		}
-
-		$tmp_attachments->addAttachment($temp_file);
-	}
-
-	// Mod authors, finally a hook to hang an alternate attachment upload system upon
-	// Upload to the current attachment folder with the file name $attachID or 'post_tmp_' . User::$info->id . '_' . md5(mt_rand())
-	// Populate TemporaryAttachmentsList[$attachID] with the following:
-	//   name => The file name
-	//   tmp_name => Path to the temp file (AttachmentsDirectory->getCurrent() . '/' . $attachID).
-	//   size => File size (required).
-	//   type => MIME type (optional if not available on upload).
-	//   id_folder => AttachmentsDirectory->currentDirectoryId
-	//   errors => An array of errors (use the index of the $txt variable for that error).
-	// Template changes can be done using "integrate_upload_template".
-	call_integration_hook('integrate_attachment_upload');
-
-	return $ignore_temp;
+	$processAttachments = new TemporaryAttachmentProcess();
+	return $processAttachments->processAttachments($id_msg);
 }
 
 /**
@@ -235,7 +52,7 @@ function processAttachments($id_msg = 0)
  *
  * @return array
  */
-function attachmentUploadChecks($attachID)
+function doPHPUploadChecks($attachID)
 {
 	global $modSettings, $txt;
 
@@ -246,25 +63,18 @@ function attachmentUploadChecks($attachID)
 	{
 		switch ($_FILES['attachment']['error'][$attachID])
 		{
-			case 1:
-			case 2:
-				// 1 The file exceeds the max_filesize directive in php.ini
-				// 2 The uploaded file exceeds the MAX_FILE_SIZE directive in the HTML form.
-				$errors[] = array('file_too_big', array($modSettings['attachmentSizeLimit']));
+			case UPLOAD_ERR_INI_SIZE:
+			case UPLOAD_ERR_FORM_SIZE:
+				$errors[] = ['file_too_big', [$modSettings['attachmentSizeLimit']]];
 				break;
-			case 3:
-			case 4:
-			case 8:
-				// 3 partially uploaded
-				// 4 no file uploaded
-				// 8 upload blocked by extension
+			case UPLOAD_ERR_PARTIAL:
+			case UPLOAD_ERR_NO_FILE:
+			case UPLOAD_ERR_EXTENSION:
 				Errors::instance()->log_error($_FILES['attachment']['name'][$attachID] . ': ' . $txt['php_upload_error_' . $_FILES['attachment']['error'][$attachID]]);
 				$errors[] = 'attach_php_error';
 				break;
-			case 6:
-			case 7:
-				// 6 Missing or a full a temp directory on the server
-				// 7 Failed to write file
+			case UPLOAD_ERR_NO_TMP_DIR:
+			case UPLOAD_ERR_CANT_WRITE:
 				Errors::instance()->log_error($_FILES['attachment']['name'][$attachID] . ': ' . $txt['php_upload_error_' . $_FILES['attachment']['error'][$attachID]], 'critical');
 				$errors[] = 'attach_php_error';
 				break;
@@ -328,7 +138,7 @@ function createAttachment(&$attachmentOptions)
 	if (empty($attachmentOptions['fileext']))
 	{
 		$attachmentOptions['fileext'] = strtolower(strrpos($attachmentOptions['name'], '.') !== false ? substr($attachmentOptions['name'], strrpos($attachmentOptions['name'], '.') + 1) : '');
-		if (strlen($attachmentOptions['fileext']) > 8 || '.' . $attachmentOptions['fileext'] == $attachmentOptions['name'])
+		if (strlen($attachmentOptions['fileext']) > 8 || '.' . $attachmentOptions['fileext'] === $attachmentOptions['name'])
 		{
 			$attachmentOptions['fileext'] = '';
 		}
