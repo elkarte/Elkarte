@@ -32,7 +32,7 @@ class LanguageStringsTestStatic extends TestCase
 	 */
 	public function testLanguageIndexes()
 	{
-		$files = glob(LANGUAGEDIR . '/*/English.php');
+		$files = glob('/home/runner/work/Elkarte/Elkarte/elkarte/sources/ElkArte/Languages/*/English.php');
 		foreach ($files as $file)
 		{
 			$content = file($file);
