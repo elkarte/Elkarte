@@ -1,11 +1,22 @@
 <?php
 
-use PHPUnit\Framework\TestCase;
+/**
+ *
+ * @package   ElkArte Forum
+ * @copyright ElkArte Forum contributors
+ * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
+ *
+ * @version 2.0 dev
+ *
+ */
 
 /**
  * TestCase class for (ideally) all the functions in the Subs.php file
  * that do not fit in any other test
  */
+
+use PHPUnit\Framework\TestCase;
+
 class SubsTest extends TestCase
 {
 	protected $backupGlobalsExcludeList = ['user_info'];

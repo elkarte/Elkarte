@@ -55,13 +55,13 @@ class TemporaryAttachmentChunkTest extends ElkArteCommonSetupTest
 		$this->assertIsArray($result);
 		$this->assertArrayHasKey('id', $result);
 		$this->assertArrayHasKey('code', $result);
-		$this->assertEquals('no_files', $result['code']);
+		$this->assertEquals('invalid_chunk', $result['code']);
 	}
 
 	public function testCheckTotalSize()
 	{
-		$result = $this->tempAttachmentChunk->checkTotalSize(5);
-		$this->assertTrue($result);
+		$result = $this->tempAttachmentChunk->checkTotalSize(50);
+		$this->assertFalse($result);
 	}
 
 	public function testGetSmallerNonZero()

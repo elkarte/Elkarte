@@ -14,10 +14,9 @@
           <directory suffix="DatabaseTestExt.php">../tests</directory>
       </testsuite>
       <testsuite name="Unit Tests">
+          <directory suffix="Test.php">../tests/ElkArte</directory>
+          <directory suffix="Test.php">../tests/subs</directory>
           <directory suffix="Test.php">../tests/sources</directory>
-      </testsuite>
-      <testsuite name="Basic Tests">
-          <directory suffix="Basic.php">../tests/sources</directory>
       </testsuite>
       <testsuite name="Bootstrap Tests">
           <directory suffix="BootstrapRunTestExt.php">../tests</directory>

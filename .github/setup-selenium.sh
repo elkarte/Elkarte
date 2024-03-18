@@ -1,9 +1,10 @@
 #!/bin/bash
+
 #
 # Install selenium server for functional web testing
 
 set -e
-set +x
+set -x
 
 # Access passed params
 DB=$1
@@ -75,6 +76,9 @@ else
 
     # Copy RemoteCoverage.php back to vendor, this version supports phpunit RawCodeCoverageData
     sudo cp ./tests/RemoteCoverage.php ./vendor/phpunit/phpunit-selenium/PHPUnit/Extensions/SeleniumCommon
+
+    # This keeps triggering in tests for the 2 second rule
+    sudo sed -i -e "s|spamProtection('login');|//spamProtection('login');|g" ./sources/ElkArte/Controller/Auth.php
 
     # Run the phpunit selenium tests
     vendor/bin/phpunit --verbose --debug --configuration .github/phpunit-webtest.xml

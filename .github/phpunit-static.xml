@@ -10,7 +10,7 @@
          verbose="true">
     <testsuites>
         <testsuite name="Static Tests">
-            <directory suffix="Static.php">../tests</directory>
+            <directory suffix="Static.php">../tests/sources</directory>
         </testsuite>
     </testsuites>
 </phpunit>

@@ -12,7 +12,8 @@
          bootstrap="bootstrapInstall.php">
   <testsuites>
       <testsuite name="Browser Tests">
-          <directory suffix="Web.php">../tests</directory>
+          <directory suffix="Web.php">../tests/install</directory>
+          <directory suffix="Web.php">../tests/headless</directory>
       </testsuite>
   </testsuites>
 

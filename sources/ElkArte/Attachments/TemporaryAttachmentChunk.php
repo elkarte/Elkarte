@@ -30,9 +30,6 @@ class TemporaryAttachmentChunk
 	/** @var AttachmentsDirectory */
 	public $attachmentDirectory;
 
-	/** @var TemporaryAttachment */
-	public $tempAttachment;
-
 	/** @var string Active attachment directory */
 	public $attach_current_dir;
 
@@ -53,7 +50,6 @@ class TemporaryAttachmentChunk
 
 		$this->req = HttpReq::instance();
 		$this->attachmentDirectory = new AttachmentsDirectory($modSettings, database());
-		$this->tempAttachment = new TemporaryAttachment();
 
 		$this->attachmentDirectory->automanageCheckDirectory();
 
@@ -304,13 +300,9 @@ class TemporaryAttachmentChunk
 		}
 
 		// If we have an initial PHP upload error, then we are baked
-		// @todo this will not work as expected as tempAttachments is not tied to the fragment
 		$errors = doPHPUploadChecks(0);
 		if (!empty($errors))
 		{
-			$this->tempAttachment->setErrors($errors);
-			$this->tempAttachment->remove(false);
-
 			return 'upload_error';
 		}
 
