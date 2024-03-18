@@ -275,6 +275,9 @@ function getPluginOptions($editor_context, $editor_id)
 /**
  * Loads the editor toolbar with just the enabled commands
  *
+ * Each row will be a comma seperated list of commands that the editor knows (or should)
+ * bold,italic,quote,.....
+ *
  * @return array
  */
 function loadEditorToolbar()
@@ -378,25 +381,24 @@ function loadToolbarDefaults()
 	// see jquery.sceditor.elkarte.js under the sceditor.formats.bbcode area
 	// for examples of how to use the .set command to add codes.  Include your new
 	// JS with addInlineJavascript() or loadJavascriptFile() in your addon
-	$bbc_tags['row1'] = array(
-		array('bold', 'italic', 'underline', 'strike', 'superscript', 'subscript'),
-		array('left', 'center', 'right', 'pre', 'tt'),
-		array('font', 'size', 'color'),
-	);
+	$bbc_tags['row1'] = [
+		['bold', 'italic', 'underline', 'strike'],
+		['left', 'center', 'right', 'pre'],
+		['image', 'link', 'giphy'],
+		['bulletlist', 'orderedlist'],
+		['source', 'expand'],
+	];
 
-	$bbc_tags['row2'] = array(
-		array('quote', 'code', 'table'),
-		array('bulletlist', 'orderedlist', 'horizontalrule'),
-		array('spoiler', 'footnote', 'splittag'),
-		array('image', 'giphy', 'link', 'email'),
-		array('undo', 'redo'),
-	);
+	$bbc_tags['row2'] = [
+		['tt', 'superscript', 'subscript'],
+		['spoiler', 'footnote', 'removeformat'],
+		['quote', 'code', 'table', 'horizontalrule', 'email'],
+		['font', 'size', 'color'],
+		['splittag', 'undo', 'redo'],
+	];
 
 	// Allow mods to add BBC buttons to the toolbar, actions are defined in the JS
 	call_integration_hook('integrate_bbc_buttons', array(&$bbc_tags));
-
-	// Show the format and toggle buttons
-	$bbc_tags['row2'][] = ['removeformat', 'source'];
 
 	return $bbc_tags;
 }
@@ -517,6 +519,16 @@ function buildSmileyToolbar($useSmileys)
 	}';
 }
 
+/**
+ *  Builds the BBC toolbar configuration for the editor.
+ *
+ *  What it does:
+ *  - If the $bbcContainer parameter is null, it returns the configuration for the source mode toolbar.
+ *  - Otherwise, it builds the toolbar configuration based on the buttons in the $context['bbc_toolbar'] array.
+ *
+ * @param mixed|null $bbcContainer The container of the editor. Null for source mode, otherwise the container element.
+ * @return string The configuration for the BBC toolbar.
+ */
 function buildBBCToolbar($bbcContainer)
 {
 	global $context;
@@ -532,9 +544,9 @@ function buildBBCToolbar($bbcContainer)
 		toolbar: "';
 
 	// Create the tooltag rows to display the buttons in the editor
-	foreach ($context['bbc_toolbar'] as $i => $buttonRow)
+	foreach ($context['bbc_toolbar'] as $buttonRow)
 	{
-		$toolbar .= $buttonRow[0] . '||';
+		$toolbar .= $buttonRow[0] . '|';
 	}
 
 	$toolbar .= '"';

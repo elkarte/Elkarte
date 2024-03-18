@@ -9,14 +9,14 @@
  */
 
 .sceditor-container {
+	position: relative;
 	display: flex;
 	flex-direction: column;
-	position: relative;
-	border: 1px solid #BBBBBB;
+	margin: 0 0 6px 0;
+	border: 1px solid var(--primary_border);
 	border-top: 0;
 	border-radius: 0 0 4px 4px;
-	background: #FFFFFF;
-	margin: 0 0 6px 0;
+	background: var(--content_background);
 }
 
 .sceditor-unselectable {
@@ -27,7 +27,7 @@
 
 #editor_toolbar_container {
 	width: 100%;
-	border: 1px solid #BBBBBB;
+	border: 1px solid var(--primary_border);;
 	border-bottom: 0;
 	border-radius: 4px 4px 0 0;
 }
@@ -49,8 +49,8 @@
 	flex-basis: 100%;
 	margin: 0 0 2em;
 	padding: 0 5px;
-	color: #444444;
 	resize: none;
+	color: var(--body_text);
 	border-radius: 0;
 }
 
@@ -64,46 +64,46 @@
 
 /* Necessary for stabilising font-size in source mode! */
 .sceditor-container textarea, .sceditor-container textarea:focus {
-	box-shadow: none;
 	font-size: 1em;
+	box-shadow: none;
 }
 
 .sceditor-resize-cover {
 	position: absolute;
+	z-index: 2;
 	top: 0;
 	left: 0;
-	z-index: 2;
 	width: 100%;
 	height: 100%;
-	background: #222222;
 	opacity: 0.2;
+	background: var(--dark_background);
 }
 
 .sceditor-grip {
 	position: absolute;
+	z-index: 3;
 	right: 0;
 	bottom: 0;
 	left: 0;
-	z-index: 3;
 	overflow: hidden;
 	height: 2em;
-	border-top: 1px solid #CCCCCC;
+	cursor: n-resize;
+	border-top: 1px solid var(--primary_border_top);
 	border-radius: 0 0 4px 4px;
 	background: #FAFAFA url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='-8 -8 36 36'%3E%3Ccircle cx='12' cy='24' r='1.5' class='clr-i-outline clr-i-outline-path-1'/%3E%3Ccircle cx='18' cy='24' r='1.5' class='clr-i-outline clr-i-outline-path-2'/%3E%3Ccircle cx='18' cy='18' r='1.5' class='clr-i-outline clr-i-outline-path-3'/%3E%3Ccircle cx='24' cy='12' r='1.5' class='clr-i-outline clr-i-outline-path-4'/%3E%3Ccircle cx='24' cy='24' r='1.5' class='clr-i-outline clr-i-outline-path-5'/%3E%3Ccircle cx='24' cy='18' r='1.5' class='clr-i-outline clr-i-outline-path-6'/%3E%3Cpath fill='none' d='M0 0h36v36H0z'/%3E%3C/svg%3E") 100% 100% no-repeat;;
 	box-shadow: -1px -2px 4px var(--opacity10) inset;
-	cursor: n-resize;
 }
 
 .sceditor-dropdown {
+	line-height: 1.3em;
 	position: absolute;
 	z-index: 6;
 	margin: 22px 0 0 0;
-	border: 1px solid #CCCCCC;
+	color: var(--body_text);
+	border: 1px solid var(--secondary_border);
 	border-radius: 0 0 2px 2px;
-	background: #FFFFFF;
+	background: var(--content_background);
 	box-shadow: var(--shadow-elevation-high);
-	color: #444444;
-	line-height: 1.3em;
 }
 
 .sceditor-dropdown form {
@@ -111,10 +111,10 @@
 }
 
 .sceditor-dropdown label {
+	font-size: .929em;
+	font-weight: bold;
 	display: block;
 	margin: .65em 0 .15em;
-	font-weight: bold;
-	font-size: .929em;
 }
 
 .sceditor-dropdown .button {
@@ -123,7 +123,7 @@
 
 .sceditor-pastetext textarea {
 	width: 20em;
-	border: 1px solid #BBBBBB;
+	border: 1px solid var(--primary_border);;
 }
 
 .sceditor-inserttable, .sceditor-insertimage, .sceditor-pastetext, .sceditor-insertlink, .sceditor-insertemail {
@@ -147,45 +147,45 @@
 	position: fixed;
 	display: inline;
 	overflow: auto;
-	margin: 0;
-	max-width: 50%;
 	min-width: 10%;
+	max-width: 50%;
 	max-height: 50%;
-	text-align: center;
+	margin: 0;
 	cursor: pointer;
+	text-align: center;
 }
 
 #sceditor-popup-smiley {
 	overflow: auto;
-	border-right: 1px solid #BBBBBB;
-	border-left: 1px solid #BBBBBB;
+	border-right: 1px solid var(--primary_border);
+	border-left: 1px solid var(--primary_border);
 }
 
 #sceditor-popup-close {
-	display: inline-block;
-	padding: 0 4px;
-	border-radius: 2px;
 	font-size: 0.857em;
 	line-height: 1.85em;
-	color: #585858;
-	border: 1px solid #AFAFAF;
-	border-top-color: #CFCFCF;
-	border-left-color: #BFBFBF;
-	background: #F4F4F4 linear-gradient(to bottom, #FEFEFE, #E4E4E4);
-	box-shadow: 1px 1px 2px #E5E5E5, 0 -1px 0 #E5E5E5 inset;
+	display: inline-block;
+	padding: 0 4px;
+	color: var(--input_text);
+	border: 1px solid var(--input_submit_border);
+	border-top-color: var(--input_submit_border_top);
+	border-left-color: var(--input_submit_border_left);
+	border-radius: 2px;
+	background-image: linear-gradient(to bottom, var(--input_submit_background), var(--input_submit_background_compliment));
+	box-shadow: var(--shadow-elevation-low);
 }
 
 .sceditor-fontsize-option, .sceditor-font-option {
+	font-size: 1em;
 	display: block;
 	padding: 4px 6px;
-	color: #444444;
-	text-decoration: none;
-	font-size: 1em;
 	cursor: pointer;
+	text-decoration: none;
+	color: var(--emphasize_text);
 }
 
 .sceditor-fontsize-option:hover, .sceditor-font-option:hover {
-	background: #EEEEEE;
+	background: var(--forum_category);
 }
 
 .sceditor-color-column {
@@ -195,46 +195,45 @@
 .sceditor-color-option {
 	display: block;
 	overflow: hidden;
-	margin: 4px;
 	width: 100px;
 	height: 20px;
+	margin: 4px;
 	border: 2px solid transparent;
 }
 
 .sceditor-color-option:hover {
-	border: 2px solid #333333;
+	border: 2px solid var(--menu_border_active_hover);
 }
 
 .sceditor-toolbar {
 	overflow: hidden;
 	padding: 5px 5px 0 5px;
-	border-bottom: 1px solid #AAAAAA;
+	border-bottom: 1px solid var(--secondary_border);
 	border-radius: 4px 4px 0 0;
-	background: #EFEFEF;
+	background: var(--mid_grey_background);
 	box-shadow: 0 -1px 2px var(--opacity10) inset;
 }
 
 .sceditor-group {
-	display: inline-block;
+	display: flex;
 	overflow: hidden;
-	margin: 2px 0 2px -1px;
+	flex-wrap: wrap;
+	justify-content: flex-start;
+	margin: 0;
 }
 
-.sceditor-row {
-	display: inline-block;
-	overflow: hidden;
-	margin: 4px;
-}
+.sceditor-group.sceditor-toolbar-toggle {
+	 display: none;
+ }
 
 .sceditor-button {
 	float: left;
 	margin-bottom: 5px;
 	padding: 0;
-	border: 1px solid transparent;
-	background: #EFEFEF;
-	box-shadow: none;
-	color: #222222;
 	cursor: pointer;
+	border: 1px solid transparent;
+	background: var(--mid_grey_background);
+	box-shadow: none;
 }
 
 .sceditor-button.disabled div {
@@ -242,40 +241,40 @@
 }
 
 .sceditor-button.disabled:hover {
-	background: inherit;
 	cursor: default;
+	background: inherit;
 }
 
 .sceditor-button div, .sceditor-button {
+	position: relative;
 	display: block;
 	width: 32px;
 	height: 32px;
-	background-position: center center !important;
 	background-repeat: no-repeat !important;
+	background-position: center center !important;
 	scale: 1.05;
-	position: relative;
 }
 
 .sceditor-button div {
 	text-indent: -9999px;
 }
 
-.sceditor-button:hover {
-	background: #FAFAFA;
-	box-shadow: 1px 1px 1px var(--opacity30)  inset;
+.sceditor-button:hover, .sceditor-button-source.active:hover {
 	border-radius: 4px;
+	background: var(--input_background_hover);
+	box-shadow: 1px 1px 1px var(--opacity30)  inset;
 }
 
 a.sceditor-button-space:hover, .sceditor-button-space div:hover {
-	background: inherit;
 	cursor: default;
+	background: inherit;
 	box-shadow: none;
 }
 
 .sceditor-button.active {
-	background: #DFFFBF;
-	box-shadow: 1px 1px 1px var(--opacity30) inset;
 	border-radius: 4px;
+	background: var(--valid);
+	box-shadow: 1px 1px 1px var(--opacity30) inset;
 }
 
 .sceditor-button-emoticon {
@@ -288,15 +287,10 @@ a.sceditor-button-space:hover, .sceditor-button-space div:hover {
 	cursor: move;
 }
 
-div.sceditor-group {
-	display: block;
-	margin: 0;
-}
-
 /* ElkArte BBC buttons styles */
 a.sceditor-button-space, .sceditor-button-space div {
-	padding: 4px 0;
 	width: 16px;
+	padding: 4px 0;
 	border: none;
 	border-left: 1px solid transparent;
 	background: transparent;
@@ -305,20 +299,24 @@ a.sceditor-button-space, .sceditor-button-space div {
 
 /* Show source button as active when in wizzy and off when in source */
 .sceditor-button-source {
-	background: #DFFFBF;
-	box-shadow: 1px 1px 1px var(--opacity30) inset;
 	border-radius: 4px;
+	background: var(--valid);;
+	box-shadow: 1px 1px 1px var(--opacity30) inset;
 }
 
 .sceditor-button-source.active {
+	border-radius: 4px;
 	background: transparent;
 	box-shadow: none;
-	border-radius: 4px;
 }
 
-/* The button images */
+/* The button images, most are MIT License (MIT) from Bootstrap */
 .sceditor-button-source div, .sceditor-button-toggle div {
 	background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='currentColor' class='bi bi-vector-pen' viewBox='0 0 16 16'%3E%3Cpath fill-rule='evenodd' d='M10.646.646a.5.5 0 0 1 .708 0l4 4a.5.5 0 0 1 0 .708l-1.902 1.902-.829 3.313a1.5 1.5 0 0 1-1.024 1.073L1.254 14.746 4.358 4.4A1.5 1.5 0 0 1 5.43 3.377l3.313-.828zm-1.8 2.908-3.173.793a.5.5 0 0 0-.358.342l-2.57 8.565 8.567-2.57a.5.5 0 0 0 .34-.357l.794-3.174-3.6-3.6z'/%3E%3Cpath fill-rule='evenodd' d='M2.832 13.228 8 9a1 1 0 1 0-1-1l-4.228 5.168-.026.086z'/%3E%3C/svg%3E");
+}
+
+.sceditor-button-expand div {
+	background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='currentColor' class='bi bi-three-dots-vertical' viewBox='0 0 16 16'%3E%3Cpath d='M9.5 13a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0m0-5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0m0-5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0'/%3E%3C/svg%3E");
 }
 
 .sceditor-button-font div {
