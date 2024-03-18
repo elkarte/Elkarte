@@ -39,7 +39,7 @@ jobs:
 
     steps:
       - name: Checkout ElkArte
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
         with:
           repository: Spuds/Elkarte
           fetch-depth: 10
@@ -111,7 +111,7 @@ jobs:
 
     steps:
       - name: Checkout ElkArte
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
         with:
           repository: elkarte/elkarte
           fetch-depth: 10
@@ -186,7 +186,7 @@ jobs:
 
     steps:
       - name: Checkout ElkArte
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
         with:
           repository: elkarte/elkarte
           fetch-depth: 10
@@ -265,7 +265,7 @@ jobs:
 
     steps:
       - name: Checkout ElkArte
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
         with:
           repository: elkarte/elkarte
           fetch-depth: 10
