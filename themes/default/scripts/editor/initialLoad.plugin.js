@@ -6,7 +6,7 @@
  * @version 2.0 dev
  */
 
-(function (sceditor) {
+(function(sceditor) {
 	'use strict';
 
 	// Core Editor startup options, css, smiley box, validate wizzy, move into view when needed
@@ -28,20 +28,24 @@
 
 			// signalReady can be called before the extensionMethods are available
 			isEditorLoaded('.sceditor-toolbar').then((selector) => {
+
+				let lastToolbarRow = document.querySelector('.sceditor-group:last-of-type');
+				lastToolbarRow.classList.add('sceditor-toolbar-toggle');
+
 				editor.createPermanentDropDown();
-				editor.css("code {white-space: pre;}");
+				editor.css('code {white-space: pre;}');
 			});
 
 			if (sceditor.isWysiwygSupported === false)
 			{
-				document.querySelectorAll(".sceditor-button-source").forEach((elem) => {elem.style.display = "none";});
+				document.querySelectorAll('.sceditor-button-source').forEach((elem) => {elem.style.display = 'none';});
 			}
 
 			// Move the editor into view
-			if (document.getElementById("dropdown_menu_1") !== null || document.getElementById("preview_section") !== null)
+			if (document.getElementById('dropdown_menu_1') !== null || document.getElementById('preview_section') !== null)
 			{
 				// Do not scroll this menu off-screen when present
-				document.getElementById("skipnav").scrollIntoView();
+				document.getElementById('skipnav').scrollIntoView();
 			}
 		};
 	};

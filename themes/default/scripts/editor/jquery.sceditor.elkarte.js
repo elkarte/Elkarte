@@ -398,6 +398,24 @@ const itemCodes = ["*:disc", "@:disc", "+:square", "x:square", "#:decimal", "0:d
  */
 sceditor.command
 	.set('space', {})
+	.set('expand', {
+		exec: function ()
+		{
+			let lastToolbarRow = document.querySelector('.sceditor-toolbar-toggle');
+			if (lastToolbarRow)
+			{
+				lastToolbarRow.slideToggle(150);
+			}
+		},
+		txtExec: function() {
+			let lastToolbarRow = document.querySelector('.sceditor-toolbar-toggle');
+			if (lastToolbarRow)
+			{
+				lastToolbarRow.slideToggle(150);
+			}
+		},
+		tooltip: 'Expand Toolbar'
+	})
 	.set('spoiler', {
 		state: function ()
 		{
