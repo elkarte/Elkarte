@@ -30,7 +30,7 @@
           <directory suffix=".php">../sources/ext</directory>
       </exclude>
       <report>
-          <clover outputDirectory="/tmp" outputFile="pgdb.xml"/>
+          <clover outputFile="/tmp/pgdb.xml"/>
       </report>
   </coverage>
 

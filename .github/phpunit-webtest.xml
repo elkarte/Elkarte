@@ -26,7 +26,7 @@
           <directory suffix=".php">../sources/ext</directory>
       </exclude>
       <report>
-          <clover outputDirectory="/tmp" outputFile="web.xml"/>
+          <clover outputFile="/tmp/web.xml"/>
       </report>
   </coverage>
 
