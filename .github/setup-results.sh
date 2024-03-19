@@ -18,5 +18,5 @@ vendor/bin/phpunit ${CONFIG}
 # Agents will merge all coverage data...
 if [[ "${GITHUB_EVENT_NAME}" == "pull_request" ]]
 then
-    bash <(curl -s https://codecov.io/bash) -s "/tmp" -f '*.clover'
+    bash <(curl -s https://codecov.io/bash) -s "/tmp" -f '*.xml'
 fi
