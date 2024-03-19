@@ -8,6 +8,7 @@
          processIsolation="false"
          stopOnFailure="false"
          verbose="true">
+
     <testsuites>
         <testsuite name="Static Tests">
             <directory suffix="Static.php">../tests/sources</directory>

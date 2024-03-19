@@ -680,15 +680,16 @@ class SiteTooltip
 		let viewportHeight = window.innerHeight;
 
 		let x = rect.left;
-		let y = window.scrollY + rect.bottom + 5;
+		// Initially trying to position above the element
+		let y = window.scrollY + rect.top - tooltipHeight - 5;
 
-		// Don't position below if it fall off-screen, instead move it above
-		if (rect.bottom + 5 + tooltipHeight > viewportHeight)
+		// Don't position above if it falls off-screen, instead move it below
+		if (rect.top - (tooltipHeight + 5) < 0)
 		{
-			y -= tooltipHeight + rect.height + 20;
+			y = window.scrollY + rect.bottom + 5;
 		}
 
-		tooltip.style.cssText = `left:${x}px; top:${y}px`;
+		tooltip.style.cssText = 'left:' + x + 'px; top:' + y + 'px';
 	}
 
 	/**

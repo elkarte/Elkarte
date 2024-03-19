@@ -3,38 +3,36 @@
 <phpunit backupGlobals="true"
          colors="true"
          convertErrorsToExceptions="true"
-         convertNoticesToExceptions="false"
+         convertNoticesToExceptions="true"
          convertWarningsToExceptions="true"
          processIsolation="false"
          stopOnFailure="false"
          verbose="true"
          bootstrap="bootstrap.php">
+
   <testsuites>
       <testsuite name="DB Tests">
           <directory suffix="DatabaseTestExt.php">../tests</directory>
       </testsuite>
       <testsuite name="Unit Tests">
-          <directory suffix="Test.php">../tests/ElkArte</directory>
-          <directory suffix="Test.php">../tests/subs</directory>
-          <directory suffix="Test.php">../tests/sources</directory>
+          <directory suffix="Test.php">../tests</directory>
       </testsuite>
       <testsuite name="Bootstrap Tests">
           <directory suffix="BootstrapRunTestExt.php">../tests</directory>
       </testsuite>
   </testsuites>
 
-  <logging>
-     <log type="coverage-clover" target="/tmp/coverage.mydb.clover"/>
-  </logging>
-
-  <filter>
-      <whitelist addUncoveredFilesFromWhitelist="true">
+  <coverage includeUncoveredFiles="false">
+      <include>
           <directory suffix=".php">../sources</directory>
-          <exclude>
-              <directory suffix=".php">../sources/ext</directory>
-          </exclude>
-      </whitelist>
-  </filter>
+      </include>
+      <exclude>
+          <directory suffix=".php">../sources/ext</directory>
+      </exclude>
+      <report>
+          <clover outputFile="/tmp/mydb.xml"/>
+      </report>
+  </coverage>
 
   <php>
       <const name="DBTYPE" value="MySQL"/>

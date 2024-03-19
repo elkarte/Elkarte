@@ -10,6 +10,7 @@
          verbose="true"
          beStrictAboutTestsThatDoNotTestAnything="false"
          bootstrap="bootstrapInstall.php">
+
   <testsuites>
       <testsuite name="Browser Tests">
           <directory suffix="Web.php">../tests/install</directory>
@@ -17,20 +18,17 @@
       </testsuite>
   </testsuites>
 
-   <filter>
-      <whitelist addUncoveredFilesFromWhitelist="false">
+  <coverage includeUncoveredFiles="false">
+      <include>
           <directory suffix=".php">../sources</directory>
-          <directory suffix=".php">../themes/default</directory>
-          <exclude>
-              <directory suffix=".php">../sources/ext</directory>
-              <directory suffix=".php">../themes/ElkArte/Languages</directory>
-          </exclude>
-      </whitelist>
-  </filter>
-
-   <logging>
-       <log type="coverage-clover" target="/tmp/coverage.web.clover"/>
-   </logging>
+      </include>
+      <exclude>
+          <directory suffix=".php">../sources/ext</directory>
+      </exclude>
+      <report>
+          <clover outputFile="/tmp/web.xml"/>
+      </report>
+  </coverage>
 
   <php>
       <const name="DBTYPE" value="MySQL"/>

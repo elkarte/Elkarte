@@ -5,7 +5,7 @@ use PHPUnit\Framework\TestCase;
 /**
  * TestCase class for language files integrity
  */
-class LanguageStringsTestStatic extends TestCase
+class LanguageStringsTest extends TestCase
 {
 	protected $backupGlobalsExcludeList = ['user_info'];
 
