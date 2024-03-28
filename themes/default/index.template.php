@@ -77,7 +77,7 @@ function template_html_above()
 
 	// Show right to left and the character set for ease of translating.
 	echo '<!DOCTYPE html>
-<html', $context['right_to_left'] ? ' dir="rtl"' : '', ' lang="', str_replace('_', '-', $txt['lang_locale']), '">
+<html dir=', $context['right_to_left'] ? ' "RTL"' : 'LTR', ' lang="', str_replace('_', '-', $txt['lang_locale']), '">
 <head>
 	<title>', $context['page_title_html_safe'], '</title>
 	<meta charset="utf-8" />';
@@ -91,7 +91,8 @@ function template_html_above()
 	echo '
 	<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 	<meta name="mobile-web-app-capable" content="yes" />
-	<meta name="description" content="', $description, '" />';
+	<meta name="description" content="', $description, '" />
+	<meta name="theme-color" content="', $context['theme-color'], '" />';
 
 	// Please don't index these Mr Robot.
 	if (!empty($context['robot_no_index']))
@@ -107,9 +108,6 @@ function template_html_above()
 	' .implode("\n\t", $context['open_graph']);
 	}
 
-	// load in any css from addons or themes, so they can overwrite if wanted
-	theme()->themeCss()->template_css();
-
 	// Present a canonical url for search engines to prevent duplicate content in their indices.
 	if (!empty($context['canonical_url']))
 	{
@@ -117,9 +115,19 @@ function template_html_above()
 	<link rel="canonical" href="', $context['canonical_url'], '" />';
 	}
 
+	// Various icons and optionally a PWA manifest
+	echo '
+	<link rel="icon" sizes="any" href="' . $context['favicon'] . '" />
+	<link rel="apple-touch-icon" href="' . $context['apple_touch'] . '" />';
+
+	if (!empty($context['pwa_manifest_enabled']))
+	{
+		echo '
+	<link rel="manifest" href="./elkManifest.php">';
+	}
+
 	// Show all the relative links, such as help, search, contents, and the like.
 	echo '
-	<link rel="shortcut icon" sizes="196x196" href="' . $context['favicon'] . '" />
 	<link rel="help" href="', getUrl('action', ['action' => 'help']), '" />
 	<link rel="contents" href="', $scripturl, '" />', ($context['allow_search'] ? '
 	<link rel="search" href="' . getUrl('action', ['action' => 'search']) . '" />' : '');
@@ -162,10 +170,13 @@ function template_html_above()
 	<link rel="index" href="', $scripturl, '?board=', $context['current_board'], '.0" />';
 	}
 
+	// load in css from addons or themes, do it first so overrides are possible
+	theme()->themeCss()->template_css();
+
 	// load in any javascript files and inline from addons and themes
 	theme()->themeJs()->template_javascript();
 
-	// load in any css files from addons and themes
+	// load in any inline css files from addons and themes
 	theme()->themeCss()->template_inlinecss();
 
 	// Output any remaining HTML headers. (from addons, maybe?)

@@ -221,12 +221,13 @@ class Admin extends AbstractController
 						'subsections' => array(
 							'basic' => array($txt['mods_cat_features']),
 							'layout' => array($txt['mods_cat_layout']),
-							'pmsettings' => array($txt['personal_messages']),
-							'karma' => array($txt['karma'], 'enabled' => featureEnabled('k')),
-							'likes' => array($txt['likes'], 'enabled' => featureEnabled('l')),
 							'mention' => array($txt['mention']),
+							'pwa' => array($txt['pwa_label']),
+							'pmsettings' => array($txt['personal_messages']),
 							'sig' => array($txt['signature_settings_short']),
 							'profile' => array($txt['custom_profile_shorttitle'], 'enabled' => featureEnabled('cp')),
+							'karma' => array($txt['karma'], 'enabled' => featureEnabled('k')),
+							'likes' => array($txt['likes'], 'enabled' => featureEnabled('l')),
 						),
 					),
 					'serversettings' => array(

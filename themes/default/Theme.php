@@ -340,6 +340,9 @@ class Theme extends BaseTheme
 			'todayMod' => empty($modSettings['todayMod']) ? 0 : (int) $modSettings['todayMod']]
 		);
 
+		// PWA?
+		$this->progressiveWebApp();
+
 		// Auto video embedding enabled, then load the needed JS
 		$this->autoEmbedVideo();
 

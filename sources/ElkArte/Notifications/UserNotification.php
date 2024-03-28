@@ -81,7 +81,7 @@ class UserNotification extends AbstractModel
 	{
 		call_integration_hook('integrate_adjust_favicon_number', [&$number]);
 
-		loadJavascriptFile('ext/favico.js', ['defer' => true]);
+		loadJavascriptFile(['ext/favico.js', 'favicon-notify.js'], ['defer' => true]);
 
 		$notif_opt = [];
 		$rules = [
@@ -130,11 +130,22 @@ class UserNotification extends AbstractModel
 		loadJavascriptFile(['ext/push.min.js', 'desktop-notify.js'], ['defer' => true]);
 		theme()->addInlineJavascript('
 			document.addEventListener("DOMContentLoaded", function() {
-				Push.config({serviceWorker: "./elkServiceWorker.min.js"}); 
+				Push.config({serviceWorker: "elkServiceWorker.js"}); 
 				
+				var linkElements = document.head.getElementsByTagName("link"),
+					iconHref = null;
+			
+				// Loop through the link elements to find the shortcut icon
+				for (var i = 0; i < linkElements.length; i++) {
+					if (linkElements[i].getAttribute("rel") === "icon") {
+						iconHref = linkElements[i].getAttribute("href");
+						break;
+					}
+				}
+			
 				// Grab the site icon to use in the desktop notification widget
 				ElkNotifier.add(new ElkDesktop(
-					{"icon": $("head").find("link[rel=\'shortcut icon\']").attr("href")}
+					{"icon": iconHref}
 				));
 			});', true);
 	}

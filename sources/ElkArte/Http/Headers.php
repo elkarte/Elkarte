@@ -99,7 +99,7 @@ class Headers
 	 */
 	public function send()
 	{
-		handleMaintance();
+		handleMaintenance();
 		$this->sendHeaders();
 	}
 
