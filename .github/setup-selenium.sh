@@ -29,6 +29,8 @@ sudo wget -nv -O "$SELENIUM_JAR" "$SELENIUM_DOWNLOAD_URL"
 
 # Install Fx or Chrome
 echo "Installing Browser"
+wget -v https://dl.google.com/linux/chrome/deb/pool/main/g/google-chrome-stable/google-chrome-stable_112.0.5615.49-1_amd64.deb
+
 # sudo apt install firefox -y -qq > /dev/null
 # Available Chrome Versions
 # https://www.ubuntuupdates.org/package/google_chrome/stable/main/base/google-chrome-stable?id=202706
