@@ -2,6 +2,7 @@
 
 namespace ElkArte\Controller;
 
+use ElkArte\EventManager;
 use tests\ElkArteCommonSetupTest;
 
 class OfflineTest extends ElkArteCommonSetupTest
@@ -13,7 +14,7 @@ class OfflineTest extends ElkArteCommonSetupTest
 
     public function setUp(): void
     {
-        $this->offlineController = new Offline();
+        $this->offlineController = new Offline(new EventManager());
     }
 
     /**

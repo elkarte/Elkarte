@@ -697,6 +697,12 @@ function obExit($header = null, $do_footer = null, $from_index = false, $from_fa
 	// Hand off the output to the portal, etc. we're integrated with.
 	call_integration_hook('integrate_exit', [$do_footer]);
 
+	// Allow a way for phpunit to run controller methods, pretty? no but allows us to return to the test
+	if (defined('PHPUNITBOOTSTRAP') && defined('STDIN'))
+	{
+		return;
+	}
+
 	// Don't exit if we're coming from index.php; that will pass through normally.
 	if (!$from_index)
 	{

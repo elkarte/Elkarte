@@ -484,6 +484,7 @@ function runFunctionString (funcStr)
 {
 	if (funcStr.trim().length > 0)
 	{
+		/*jshint -W054 */
 		const func = new Function(funcStr);
 		if (isFunction(func))
 		{

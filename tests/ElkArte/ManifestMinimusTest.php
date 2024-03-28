@@ -34,6 +34,7 @@ class ManifestMinimusTest extends ElkArteCommonSetupTest
         $txt = ['lang_locale' => 'en-US.utf8', 'lang_rtl' => 0];
         $boardurl = 'http://www.testforum.com/path';
 
+	    require_once(SOURCEDIR . '/Subs.php');
         $this->manifestMinimus = new ManifestMinimus();
     }
 
