@@ -19,6 +19,7 @@ use ElkArte\Debug;
 use ElkArte\Helper\Censor;
 use ElkArte\Helper\ConstructPageIndex;
 use ElkArte\Helper\GenericList;
+use ElkArte\Helper\TokenHash;
 use ElkArte\Helper\Util;
 use ElkArte\Hooks;
 use ElkArte\Http\Headers;
@@ -645,7 +646,7 @@ function obExit($header = null, $do_footer = null, $from_index = false, $from_fa
 	// Has the template/header been done yet?
 	if ($do_header)
 	{
-		handleMaintance();
+		handleMaintenance();
 
 		// Was the page title set last minute? Also update the HTML safe one.
 		if (!empty($context['page_title']) && empty($context['page_title_html_safe']))
@@ -704,9 +705,9 @@ function obExit($header = null, $do_footer = null, $from_index = false, $from_fa
 }
 
 /**
- * Takes care of a few dynamic maintenance items
+ * Takes care of a few dynamic maintenance items Maintenance
  */
-function handleMaintance()
+function handleMaintenance()
 {
 	global $context;
 
@@ -759,7 +760,6 @@ function setOldUrl($index = 'old_url')
  */
 function determineTopicClass(&$topic_context)
 {
-
 	$topic_context['class'] = empty($topic_context['is_poll']) ? 'i-normal' : 'i-poll';
 
 	// Set topic class depending on locked status and number of replies.
@@ -1906,6 +1906,19 @@ function setJsonTemplate()
 	$context['json_data'] = null;
 }
 
+function setPWACacheStale($refresh = false)
+{
+	global $modSettings;
+
+	// We need a PWA cache stale to keep things moving, changing this will trigger a PWA cache flush
+	if (empty($modSettings['elk_pwa_cache_stale']) || $refresh)
+	{
+		$tokenizer = new TokenHash();
+		$elk_pwa_cache_stale = $tokenizer->generate_hash(8);
+		updateSettings(['elk_pwa_cache_stale' => $elk_pwa_cache_stale]);
+	}
+}
+
 /**
  * Send a 1x1 GIF response and terminate the script execution
  *
@@ -2052,8 +2065,7 @@ function featureEnabled($feature)
  *
  * What it does:
  *
- * - Removes invalid XML characters to assure the input string being
- * parsed properly.
+ * - Removes invalid XML characters to assure the input string being parsed properly.
  *
  * @param string $string The string to clean
  *

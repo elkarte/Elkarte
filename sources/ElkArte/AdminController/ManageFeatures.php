@@ -21,6 +21,7 @@ use DateTimeZone;
 use ElkArte\AbstractController;
 use ElkArte\Action;
 use ElkArte\Exceptions\Exception;
+use ElkArte\Helper\DataValidator;
 use ElkArte\Helper\Util;
 use ElkArte\Hooks;
 use ElkArte\Languages\Txt;
@@ -60,7 +61,7 @@ class ManageFeatures extends AbstractController
 		// Often Helpful
 		Txt::load('Help+ManageSettings+Mentions');
 
-		// All the actions we know about
+		// All the actions we know about.  These must exist in loadMenu() of the admin controller.
 		$subActions = array(
 			'basic' => array(
 				'controller' => $this,
@@ -70,6 +71,12 @@ class ManageFeatures extends AbstractController
 			'layout' => array(
 				'controller' => $this,
 				'function' => 'action_layoutSettings_display',
+				'permission' => 'admin_forum'
+			),
+			'pwa' => array(
+				'controller' => $this,
+				'function' => 'action_pwaSettings_display',
+				'enabled' => true,
 				'permission' => 'admin_forum'
 			),
 			'karma' => array(
@@ -115,7 +122,7 @@ class ManageFeatures extends AbstractController
 		// Set up the action control
 		$action = new Action('modify_features');
 
-		// By default do the basic settings, call integrate_sa_modify_features
+		// By default, do the basic settings, call integrate_sa_modify_features
 		$subAction = $action->initialize($subActions, 'basic');
 
 		// Some final pieces for the template
@@ -138,6 +145,9 @@ class ManageFeatures extends AbstractController
 				],
 				'profile' => [
 					'description' => $txt['custom_profile_desc'],
+				],
+				'pwa' => [
+					'description' => $txt['pwa_settings_desc'],
 				],
 			],
 		]);
@@ -374,6 +384,123 @@ class ManageFeatures extends AbstractController
 	}
 
 	/**
+	 * Display configuration settings page for progressive web application settings.
+	 *
+	 * - Accessed from ?action=admin;area=featuresettings;sa=pwa;
+	 *
+	 * @event integrate_save_pwa_settings
+	 */
+	public function action_pwaSettings_display()
+	{
+		global $txt, $context;
+
+		// Initialize the form
+		$settingsForm = new SettingsForm(SettingsForm::DB_ADAPTER);
+
+		// Initialize it with our settings
+		$settingsForm->setConfigVars($this->_pwaSettings());
+
+		// Saving, lots of checks then
+		if (isset($this->_req->query->save))
+		{
+			checkSession();
+
+			call_integration_hook('integrate_save_pwa_settings');
+
+			// Don't allow it to be enabled if we don't have SSL
+			$canUse = detectServer()->supportsSSL();
+			if (!$canUse)
+			{
+				$this->_req->post->pwa_enabled = 0;
+			}
+
+			// And you must enable this if PWA is enabled
+			if ($this->_req->getPost('pwa_enabled', 'intval') === 1)
+			{
+				$this->_req->post->pwa_manifest_enabled = 1;
+			}
+
+			$validator = new DataValidator();
+			$validation_rules = [
+				'pwa_theme_color' => 'valid_color',
+				'pwa_background_color' => 'valid_color',
+				'pwa_short_name' => 'max_length[12]'
+			];
+
+			// Only check the rest if they entered something.
+			$valid_urls = ['pwa_small_icon', 'pwa_large_icon', 'favicon_icon', 'apple_touch_icon'];
+			foreach ($valid_urls as $url)
+			{
+				if ($this->_req->getPost($url, 'trim') !== '')
+				{
+					$validation_rules[$url] = 'valid_url';
+				}
+			}
+			$validator->validation_rules($validation_rules);
+
+			if (!$validator->validate($this->_req->post))
+			{
+				// Some input error, lets tell them what is wrong
+				$context['error_type'] = 'minor';
+				$context['settings_message'] = [];
+				foreach ($validator->validation_errors() as $error)
+				{
+					$context['settings_message'][] = $error;
+				}
+			}
+			else
+			{
+				$settingsForm->setConfigValues((array) $this->_req->post);
+				$settingsForm->save();
+				redirectexit('action=admin;area=featuresettings;sa=pwa');
+			}
+		}
+
+		$context['post_url'] = getUrl('admin', ['action' => 'admin', 'area' => 'featuresettings', 'sa' => 'pwa', 'save']);
+		$context['settings_title'] = $txt['pwa_settings'];
+		theme()->addInlineJavascript('
+			pwaPreview("pwa_small_icon");
+			pwaPreview("pwa_large_icon");
+			pwaPreview("favicon_icon");
+			pwaPreview("apple_touch_icon");', ['defer' => true]);
+
+		$settingsForm->prepare();
+	}
+
+	/**
+	 * Return PWA settings.
+	 *
+	 * @event integrate_modify_karma_settings Adds to Configuration->Pwa
+	 */
+	private function _pwaSettings()
+	{
+		global $txt;
+
+		// PWA requires SSL
+		$canUse = detectServer()->supportsSSL();
+
+		$config_vars = array(
+			// PWA - On or off?
+			array('check', 'pwa_enabled', 'disabled' => !$canUse, 'invalid' => !$canUse, 'postinput' => !$canUse ? $txt['pwa_disabled'] : ''),
+			'',
+			array('check', 'pwa_manifest_enabled', 'helptext' => $txt['pwa_manifest_enabled_desc']),
+			array('text', 'pwa_short_name', 12, 'mask' => 'nohtml', 'helptext' => $txt['pwa_short_name_desc'], 'maxlength' => 12),
+			array('color', 'pwa_theme_color', 'helptext' => $txt['pwa_theme_color_desc']),
+			array('color', 'pwa_background_color', 'helptext' => $txt['pwa_background_color_desc']),
+			'',
+			array('url', 'pwa_small_icon', 'size' => 40, 'helptext' => $txt['pwa_small_icon_desc'], 'onchange' => "pwaPreview('pwa_small_icon');"),
+			array('url', 'pwa_large_icon', 'size' => 40, 'helptext' => $txt['pwa_large_icon_desc'], 'onchange' => "pwaPreview('pwa_large_icon');"),
+			array('title', 'other_icons_title'),
+			array('url', 'favicon_icon', 'size' => 40, 'helptext' => $txt['favicon_icon_desc'], 'onchange' => "pwaPreview('favicon_icon');"),
+			array('url', 'apple_touch_icon', 'size' => 40, 'helptext' => $txt['apple_touch_icon_desc'], 'onchange' => "pwaPreview('apple_touch_icon');"),
+		);
+
+		call_integration_hook('integrate_modify_pwa_settings', array(&$config_vars));
+
+		return $config_vars;
+	}
+
+	/**
 	 * Display configuration settings page for karma settings.
 	 *
 	 * - Accessed from ?action=admin;area=featuresettings;sa=karma;
@@ -402,7 +529,7 @@ class ManageFeatures extends AbstractController
 			redirectexit('action=admin;area=featuresettings;sa=karma');
 		}
 
-		$context['post_url'] = getUrl('admin', ['action' => 'admin', 'area' => 'featuresettings', 'sa' => 'karm', 'save']);
+		$context['post_url'] = getUrl('admin', ['action' => 'admin', 'area' => 'featuresettings', 'sa' => 'karma', 'save']);
 		$context['settings_title'] = $txt['karma'];
 
 		$settingsForm->prepare();

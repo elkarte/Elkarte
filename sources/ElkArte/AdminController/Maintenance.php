@@ -373,6 +373,9 @@ class Maintenance extends AbstractController
 		// Just wipe the whole cache directory!
 		Cache::instance()->clean();
 
+		// Change the PWA stale so it will refresh (if enabled)
+		setPWACacheStale(true);
+
 		$context['maintenance_finished'] = $txt['maintain_cache'];
 	}
 

@@ -97,6 +97,7 @@ $txt['errlog'] = 'Error Log';
 $txt['package'] = 'Package Manager';
 $txt['edit_permissions'] = 'Permissions';
 $txt['modSettings_title'] = 'Features and Options';
+$txt['pwa_label'] = 'Web Application';
 
 $txt['moderate'] = 'Moderate';
 // Sub menu labels
@@ -936,3 +937,7 @@ $txt['otp_generate'] = 'Generate';
 $txt['otp_show_qr'] = 'Show QR-Code';
 
 $txt['other'] = 'Other';
+
+$txt['offline'] = 'OFFLINE';
+$txt['retry'] = 'RETRY';
+$txt['check_connection'] = 'Please check your internet connection';

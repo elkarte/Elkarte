@@ -424,6 +424,9 @@ abstract class Theme
 			$result = $result && $combiner->removeJsHives();
 		}
 
+		// Force a cache refresh for the PWA
+		setPWACacheStale(true);
+
 		return $result;
 	}
 
@@ -459,6 +462,75 @@ abstract class Theme
 					}
 				});', true);
 		}
+	}
+
+	/**
+	 * Progressive Web App initialization
+	 *
+	 * What it does:
+	 *  - Sets up the necessary configurations for the Progressive Web App (PWA).
+	 *  - Adds JavaScript variables, loads necessary JavaScript files, and adds inline JavaScript code.
+	 *
+	 * @return void
+	 */
+	public function progressiveWebApp()
+	{
+		global $modSettings, $boardurl, $settings;
+
+//$modSettings['pwa_enabled'] = 1==1;
+
+		$this->addJavascriptVar([
+			'elk_board_url' => JavaScriptEscape($boardurl),
+		]);
+		loadJavascriptFile('elk_pwa.js', ['defer' => false]);
+
+		// Not enabled, lets be sure to remove it should it exist
+		if (empty($modSettings['pwa_enabled']))
+		{
+			$this->addInlineJavascript('
+				elkPwa().removeServiceWorker();
+			');
+
+			return;
+		}
+
+		setPWACacheStale();
+		$theme_scope = $this->getScopeFromUrl($settings['actual_theme_url']);
+		$default_theme_scope = $this->getScopeFromUrl($settings['default_theme_url']);
+		$sw_scope = $this->getScopeFromUrl($boardurl);
+		$this->addInlineJavascript('
+			document.addEventListener("DOMContentLoaded", function() {
+				let myOptions = {
+					swUrl: "elkServiceWorker.js",
+					swOpt: {
+						cache_stale: ' . JavaScriptEscape(CACHE_STALE) . ',
+						cache_id: ' . JavaScriptEscape($modSettings['elk_pwa_cache_stale']) . ',
+						theme_scope: ' . JavaScriptEscape($theme_scope) . ',
+						default_theme_scope: ' . JavaScriptEscape($default_theme_scope) . ',
+						sw_scope: ' . JavaScriptEscape($sw_scope) . ',
+					}
+				};
+	
+				let elkPwaInstance = elkPwa(myOptions);
+				elkPwaInstance.init();
+				elkPwaInstance.sendMessage("deleteOldCache", {cache_id: ' . JavaScriptEscape($modSettings['elk_pwa_cache_stale']) . '});
+				elkPwaInstance.sendMessage("pruneCache");
+			});'
+		);
+	}
+
+	/**
+	 * Get the scope from the given URL
+	 *
+	 * @param string $url The URL from which to extract the scope
+	 *
+	 * @return string The scope extracted from the URL, or the root scope if not found
+	 */
+	public function getScopeFromUrl($url)
+	{
+		$parts = parse_url($url);
+
+		return empty($parts['path']) ? '/' : '/' . trim($parts['path'], '/') . '/';
 	}
 
 	/**
@@ -624,7 +696,7 @@ abstract class Theme
 	 */
 	public function setContextThemeData()
 	{
-		global $context, $scripturl, $settings, $boardurl, $modSettings, $txt;
+		global $context, $scripturl, $settings, $boardurl, $modSettings, $txt, $mbname;
 
 		if (empty($settings['theme_version']))
 		{
@@ -633,11 +705,13 @@ abstract class Theme
 
 		$this->addJavascriptVar(['elk_forum_action' => getUrlQuery('action', $modSettings['default_forum_action'])], true);
 
-		$context['page_title'] = $context['page_title'] ?? '';
+		$context['page_title'] = $context['page_title'] ?? $mbname;
 		$context['page_title_html_safe'] = Util::htmlspecialchars(un_htmlspecialchars($context['page_title'])) . (empty($context['current_page']) ? '' : ' - ' . $txt['page'] . (' ' . ($context['current_page'] + 1)));
-		$context['favicon'] = $boardurl . '/mobile.png';
-
+		$context['favicon'] = $boardurl . '/favicon.ico';
+		$context['apple_touch'] = $boardurl . '/themes/default/images/apple-touch-icon.png';
 		$context['html_headers'] = $context['html_headers'] ?? '';
+		$context['theme-color'] = $modSettings['pwa_theme-color'] ?? '#3d6e32';
+		$context['pwa_manifest_enabled'] = !empty($modSettings['pwa_manifest_enabled']);
 	}
 
 	/**

@@ -29,7 +29,7 @@
 /** global: ourLanguageVersions, ourVersions, txt_add_another_answer, txt_permissions_commit, Image */
 
 /**
- * Admin index class, its the admin landing page with site details
+ * Admin index class, it's the admin landing page with site details
  *
  * @param {object} oOptions
  */
@@ -2279,4 +2279,37 @@ function setBoardIds ()
 			});
 		});
 	});
+}
+
+/**
+ * Generates a preview image based on the value of the provided element.
+ * If the element is undefined or empty, no preview image will be generated.
+ *
+ * @param {string} elem - The id of the element to generate the preview for.
+ */
+function pwaPreview(elem) {
+	if (typeof elem === 'undefined')
+	{
+		return;
+	}
+
+	let oSelection = document.getElementById(elem);
+	if (oSelection && oSelection.value !== '')
+	{
+		let img = new Image();
+		img.src = oSelection.value;
+		img.id = elem + '_preview';
+		img.style.height = '45px';
+		img.style.margin = '0 20px';
+
+		img.onload = function() {
+			let oldImage = document.getElementById(img.id);
+			if (oldImage)
+			{
+				oldImage.remove();
+			}
+			let imgHTML = '<img src="' + img.src + '" id="' + img.id + '" style="height:' + img.style.height + ';margin:' + img.style.margin + '"/>';
+			oSelection.insertAdjacentHTML('afterend', imgHTML);
+		};
+	}
 }
