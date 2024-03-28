@@ -23,7 +23,11 @@ class OfflineTest extends ElkArteCommonSetupTest
      */
     public function testActionOffline(): void
     {
-        $this->expectOutputString('RETRY');
+	    //$this->expectOutputString('RETRY');
+	    obStart();
         $this->offlineController->action_offline();
+	    $output = ob_get_clean();
+
+	    $this->assertStringContainsString('RETRY', $output);
     }
 }

@@ -33,9 +33,9 @@ echo "Installing Browser"
 # Available Chrome Versions
 # https://www.ubuntuupdates.org/package/google_chrome/stable/main/base/google-chrome-stable?id=202706
 #
-CHROME_VERSION='110.0.5481.100-1' # '91.0.4472.114-1'
+CHROME_VERSION='112.0.5615.49-1' #'110.0.5481.100-1' # '91.0.4472.114-1'
 
-sudo wget https://dl.google.com/linux/chrome/deb/pool/main/g/google-chrome-stable/google-chrome-stable_${CHROME_VERSION}_amd64.deb -q
+wget https://dl.google.com/linux/chrome/deb/pool/main/g/google-chrome-stable/google-chrome-stable_${CHROME_VERSION}_amd64.deb
 sudo dpkg -i google-chrome-stable_${CHROME_VERSION}_amd64.deb
 
 # Download Chrome Driver
