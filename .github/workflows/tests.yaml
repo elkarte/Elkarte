@@ -78,6 +78,9 @@ jobs:
         run: .github/setup-elkarte.sh $DB $PHP_VERSION
         working-directory: ./elkarte
 
+      - name: Setup ChromeDriver
+        uses: nanasess/setup-chromedriver@v2
+
       - name: Run Unit Tests
         env:
           DB: ${{ matrix.db }}

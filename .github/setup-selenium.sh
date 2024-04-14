@@ -29,32 +29,27 @@ sudo mkdir -p $(dirname "$SELENIUM_JAR")
 sudo wget -nv -O "$SELENIUM_JAR" "$SELENIUM_DOWNLOAD_URL"
 sudo chmod 777 "$SELENIUM_JAR"
 
-# Install Fx or Chrome
+# Install Chrome
 echo "Installing Browser"
 
 # Available Chrome Versions
 # https://www.ubuntuupdates.org/package/google_chrome/stable/main/base/google-chrome-stable?id=202706
 #
-# Current Versions for Ref
-# Selenium 3.141.59 jar
-# Chrome 123.0.6312.58
-# ChromeDriver 123.0.6312.58
-#
-CHROME_VERSION='123.0.6312.58-1' # '91.0.4472.114-1'
-
+CHROME_VERSION='123.0.6312.58-1'
 wget https://dl.google.com/linux/chrome/deb/pool/main/g/google-chrome-stable/google-chrome-stable_${CHROME_VERSION}_amd64.deb -q
 sudo dpkg -i google-chrome-stable_${CHROME_VERSION}_amd64.deb
 
 # Download Chrome Driver
-echo "Downloading chromedriver"
-CHROME_VERSION=$(google-chrome --version | cut -f 3 -d ' ' | cut -d '.' -f 1) \
-  && CHROMEDRIVER_RELEASE=$(curl --location --fail --retry 3 https://chromedriver.storage.googleapis.com/LATEST_RELEASE_${CHROME_VERSION}) \
-  && wget -nv -O "$CHROMEDRIVER_ZIP" "https://chromedriver.storage.googleapis.com/$CHROMEDRIVER_RELEASE/chromedriver_linux64.zip" \
-  && unzip "$CHROMEDRIVER_ZIP" \
-  && rm -rf "$CHROMEDRIVER_ZIP" \
-  && sudo mv chromedriver /usr/local/bin/chromedriver \
-  && sudo chmod +x /usr/local/bin/chromedriver \
-  && chromedriver --version
+# https://chromedriver.storage.googleapis.com/${VERSION}/chromedriver_linux64.zip"
+#echo "Downloading chromedriver"
+#CHROME_VERSION=$(google-chrome --version | cut -f 3 -d ' ' | cut -d '.' -f 1) \
+#  && CHROMEDRIVER_RELEASE=$(curl --location --fail --retry 3 https://chromedriver.storage.googleapis.com/LATEST_RELEASE_${CHROME_VERSION}) \
+#  && wget -nv -O "$CHROMEDRIVER_ZIP" "https://chromedriver.storage.googleapis.com/$CHROMEDRIVER_RELEASE/chromedriver_linux64.zip" \
+#  && unzip "$CHROMEDRIVER_ZIP" \
+#  && rm -rf "$CHROMEDRIVER_ZIP" \
+#  && sudo mv chromedriver /usr/local/bin/chromedriver \
+#  && sudo chmod +x /usr/local/bin/chromedriver \
+#  && chromedriver --version
 
 # Start Selenium using default chosen webdriver
 export DISPLAY=:99.0
