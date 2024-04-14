@@ -70,7 +70,7 @@ jobs:
       - name: Setup problem matchers for PHPUnit
         run: echo "::add-matcher::${{ runner.tool_cache }}/phpunit.json"
 
-      - name: Setup Server Environment
+      - name: Setup Web Server Environment
         env:
           DB: ${{ matrix.db }}
           PHP_VERSION: ${{ matrix.php }}

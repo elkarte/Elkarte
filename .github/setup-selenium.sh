@@ -27,7 +27,7 @@ CHROMEDRIVER_ZIP=/tmp/chromedriver_linux64.zip
 echo "Downloading Selenium"
 sudo mkdir -p $(dirname "$SELENIUM_JAR")
 sudo wget -nv -O "$SELENIUM_JAR" "$SELENIUM_DOWNLOAD_URL"
-sudo chmod 777 "SELENIUM_JAR"
+sudo chmod 777 "$SELENIUM_JAR"
 
 # Install Fx or Chrome
 echo "Installing Browser"
