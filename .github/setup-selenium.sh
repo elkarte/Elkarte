@@ -44,12 +44,12 @@ sudo dpkg -i google-chrome-stable_${CHROME_VERSION}_amd64.deb
 #echo "Downloading chromedriver"
 #CHROME_VERSION=$(google-chrome --version) \
 #  && CHROMEDRIVER_RELEASE=$(curl --location --fail --retry 3 https://chromedriver.storage.googleapis.com/LATEST_RELEASE_${CHROME_VERSION}) \
-#  && wget -nv -O "$CHROMEDRIVER_ZIP" "https://chromedriver.storage.googleapis.com/$CHROMEDRIVER_RELEASE/chromedriver_linux64.zip" \
-#  && unzip "$CHROMEDRIVER_ZIP" \
-#  && rm -rf "$CHROMEDRIVER_ZIP" \
-#  && sudo mv chromedriver /usr/local/bin/chromedriver \
-#  && sudo chmod +x /usr/local/bin/chromedriver \
-#  && chromedriver --version
+  && wget -nv -O "$CHROMEDRIVER_ZIP" "https://storage.googleapis.com/chrome-for-testing-public/123.0.6312.58/linux64/chromedriver-linux64.zip" \
+  && unzip "$CHROMEDRIVER_ZIP" \
+  && rm -rf "$CHROMEDRIVER_ZIP" \
+  && sudo mv chromedriver /usr/local/bin/chromedriver \
+  && sudo chmod +x /usr/local/bin/chromedriver \
+  && chromedriver --version
 
 # Start Selenium using default chosen webdriver
 export DISPLAY=:99.0
