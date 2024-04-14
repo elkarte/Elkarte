@@ -42,12 +42,10 @@ sudo dpkg -i google-chrome-stable_${CHROME_VERSION}_amd64.deb
 # https://chromedriver.storage.googleapis.com/${VERSION}/chromedriver_linux64.zip"
 # https://storage.googleapis.com/chrome-for-testing-public/123.0.6312.58/linux64/chromedriver-linux64.zip
 #echo "Downloading chromedriver"
-#CHROME_VERSION=$(google-chrome --version) \
-#  && CHROMEDRIVER_RELEASE=$(curl --location --fail --retry 3 https://chromedriver.storage.googleapis.com/LATEST_RELEASE_${CHROME_VERSION}) \
+CHROME_VERSION=$(google-chrome --version) \
   && wget -nv -O "$CHROMEDRIVER_ZIP" "https://storage.googleapis.com/chrome-for-testing-public/123.0.6312.58/linux64/chromedriver-linux64.zip" \
   && unzip "$CHROMEDRIVER_ZIP" \
-  && rm -rf "$CHROMEDRIVER_ZIP" \
-  && sudo mv chromedriver /usr/local/bin/chromedriver \
+  && sudo mv chromedriver-linux64/chromedriver /usr/local/bin/chromedriver \
   && sudo chmod +x /usr/local/bin/chromedriver \
   && chromedriver --version
 
