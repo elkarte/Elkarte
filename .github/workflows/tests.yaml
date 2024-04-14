@@ -80,6 +80,8 @@ jobs:
 
       - name: Setup ChromeDriver
         uses: nanasess/setup-chromedriver@v2
+        with:
+          chromedriver-version: '123.0.6312.58'
 
       - name: Run Unit Tests
         env:

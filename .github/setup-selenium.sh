@@ -41,8 +41,9 @@ sudo dpkg -i google-chrome-stable_${CHROME_VERSION}_amd64.deb
 
 # Download Chrome Driver
 # https://chromedriver.storage.googleapis.com/${VERSION}/chromedriver_linux64.zip"
+# https://storage.googleapis.com/chrome-for-testing-public/123.0.6312.58/linux64/chromedriver-linux64.zip
 #echo "Downloading chromedriver"
-#CHROME_VERSION=$(google-chrome --version | cut -f 3 -d ' ' | cut -d '.' -f 1) \
+#CHROME_VERSION=$(google-chrome --version) \
 #  && CHROMEDRIVER_RELEASE=$(curl --location --fail --retry 3 https://chromedriver.storage.googleapis.com/LATEST_RELEASE_${CHROME_VERSION}) \
 #  && wget -nv -O "$CHROMEDRIVER_ZIP" "https://chromedriver.storage.googleapis.com/$CHROMEDRIVER_RELEASE/chromedriver_linux64.zip" \
 #  && unzip "$CHROMEDRIVER_ZIP" \
@@ -79,8 +80,8 @@ else
     vendor/bin/phpunit --verbose --debug --configuration .github/phpunit-webtest.xml
 
     # Agents will merge all coverage data...
-    if [[ "${GITHUB_EVENT_NAME}" == "pull_request" ]]
-    then
+  #  if [[ "${GITHUB_EVENT_NAME}" == "pull_request" ]]
+   # then
         bash <(curl -s https://codecov.io/bash) -s "/tmp" -f '*.xml' -t "${CODECOV_TOKEN}"
-    fi
+   # fi
 fi
