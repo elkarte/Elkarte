@@ -9,7 +9,6 @@ set -x
 # Access passed params
 DB=$1
 PHP_VERSION=$2
-CODECOV_TOKEN=$3
 
 # Some vars to make this easy to change
 SELENIUM_HUB_URL='http://127.0.0.1:4444'
@@ -82,6 +81,6 @@ else
     # Agents will merge all coverage data...
   #  if [[ "${GITHUB_EVENT_NAME}" == "pull_request" ]]
    # then
-        bash <(curl -s https://codecov.io/bash) -s "/tmp" -f '*.xml' -t "${CODECOV_TOKEN}"
+  #      bash <(curl -s https://codecov.io/bash) -s "/tmp" -f '*.xml' -t "${CODECOV_TOKEN}"
    # fi
 fi

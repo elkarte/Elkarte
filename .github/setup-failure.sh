@@ -10,9 +10,11 @@ set +x
 # Passed params
 DB=$1
 PHP_VERSION=$2
+CODECOV_TOKEN=$3
 
 # Agents will merge all coverage data...
 if [[ "${GITHUB_EVENT_NAME}" == "pull_request" ]]
 then
-    bash <(curl -s https://codecov.io/bash) -s "/tmp" -f '*.clover'
+    bash <(curl -s https://codecov.io/bash) -s "/tmp" -f '*.xml' -t "${CODECOV_TOKEN}"
+    #bash <(curl -s https://codecov.io/bash) -s "/tmp" -f '*.clover'
 fi
