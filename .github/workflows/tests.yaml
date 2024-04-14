@@ -41,7 +41,7 @@ jobs:
       - name: Checkout ElkArte
         uses: actions/checkout@v4
         with:
-          repository: Spuds/Elkarte
+          repository: elkarte/Elkarte
           fetch-depth: 10
           ref: ${{ env.ELKARTE_BRANCH }}
           path: elkarte
