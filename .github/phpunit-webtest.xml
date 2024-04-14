@@ -11,29 +11,29 @@
          beStrictAboutTestsThatDoNotTestAnything="false"
          bootstrap="bootstrapInstall.php">
 
-  <testsuites>
-      <testsuite name="Browser Tests">
-          <directory suffix="Web.php">../tests/install</directory>
-          <directory suffix="Web.php">../tests/headless</directory>
-      </testsuite>
-  </testsuites>
+    <testsuites>
+        <testsuite name="Browser Tests">
+            <directory suffix="Web.php">../tests/install</directory>
+            <directory suffix="Web.php">../tests/headless</directory>
+        </testsuite>
+    </testsuites>
 
-  <coverage includeUncoveredFiles="false">
-      <include>
-          <directory suffix=".php">../sources</directory>
-      </include>
-      <exclude>
-          <directory suffix=".php">../sources/ext</directory>
-      </exclude>
-      <report>
-          <clover outputFile="/tmp/web.xml"/>
-      </report>
-  </coverage>
+    <coverage includeUncoveredFiles="false">
+        <include>
+            <directory suffix=".php">../sources</directory>
+        </include>
+        <exclude>
+            <directory suffix=".php">../sources/ext</directory>
+        </exclude>
+        <report>
+            <clover outputFile="/tmp/web.xml"/>
+        </report>
+    </coverage>
 
-  <php>
-      <const name="DBTYPE" value="MySQL"/>
-      <const name="PHPUNIT_SELENIUM" value="true"/>
-      <const name="PHPUNIT_TESTSUITE" value="true"/>
-  </php>
+    <php>
+        <const name="DBTYPE" value="MySQL"/>
+        <const name="PHPUNIT_SELENIUM" value="true"/>
+        <const name="PHPUNIT_TESTSUITE" value="true"/>
+    </php>
 
 </phpunit>

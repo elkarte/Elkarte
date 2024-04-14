@@ -6,20 +6,59 @@
 set -e
 set -x
 
-# Passed params
+# Access passed params
 DB=$1
 PHP_VERSION=$2
 CODECOV_TOKEN=$3
 
-# Per actions in the tests.yaml file
+# Some vars to make this easy to change
+SELENIUM_HUB_URL='http://127.0.0.1:4444'
+SELENIUM_JAR=/usr/share/selenium/selenium-server-standalone.jar
+SELENIUM_DOWNLOAD_URL=https://selenium-release.storage.googleapis.com/3.141/selenium-server-standalone-3.141.59.jar
+
+# Location of geckodriver for use as webdriver in xvfb
+GECKODRIVER_DOWNLOAD_URL=https://github.com/mozilla/geckodriver/releases/download/v0.29.1/geckodriver-v0.29.1-linux64.tar.gz
+GECKODRIVER_TAR=/tmp/geckodriver.tar.gz
+
+# Location of chromedriver for use as webdriver in xvfb
+CHROMEDRIVER_ZIP=/tmp/chromedriver_linux64.zip
+
+# Download Selenium
+echo "Downloading Selenium"
+sudo mkdir -p $(dirname "$SELENIUM_JAR")
+sudo wget -nv -O "$SELENIUM_JAR" "$SELENIUM_DOWNLOAD_URL"
+sudo chmod 777 "SELENIUM_JAR"
+
+# Install Fx or Chrome
+echo "Installing Browser"
+
+# Available Chrome Versions
+# https://www.ubuntuupdates.org/package/google_chrome/stable/main/base/google-chrome-stable?id=202706
 #
 # Current Versions for Ref
 # Selenium 3.141.59 jar
 # Chrome 123.0.6312.58
 # ChromeDriver 123.0.6312.58
+#
+CHROME_VERSION='123.0.6312.58-1' # '91.0.4472.114-1'
 
-echo "Ensuring Selenium Started"
-SELENIUM_HUB_URL='http://127.0.0.1:4444'
+wget https://dl.google.com/linux/chrome/deb/pool/main/g/google-chrome-stable/google-chrome-stable_${CHROME_VERSION}_amd64.deb -q
+sudo dpkg -i google-chrome-stable_${CHROME_VERSION}_amd64.deb
+
+# Download Chrome Driver
+echo "Downloading chromedriver"
+CHROME_VERSION=$(google-chrome --version | cut -f 3 -d ' ' | cut -d '.' -f 1) \
+  && CHROMEDRIVER_RELEASE=$(curl --location --fail --retry 3 https://chromedriver.storage.googleapis.com/LATEST_RELEASE_${CHROME_VERSION}) \
+  && wget -nv -O "$CHROMEDRIVER_ZIP" "https://chromedriver.storage.googleapis.com/$CHROMEDRIVER_RELEASE/chromedriver_linux64.zip" \
+  && unzip "$CHROMEDRIVER_ZIP" \
+  && rm -rf "$CHROMEDRIVER_ZIP" \
+  && sudo mv chromedriver /usr/local/bin/chromedriver \
+  && sudo chmod +x /usr/local/bin/chromedriver \
+  && chromedriver --version
+
+# Start Selenium using default chosen webdriver
+export DISPLAY=:99.0
+xvfb-run --server-args="-screen 0, 2560x1440x24" java -Dwebdriver.chrome.driver=/usr/local/bin/chromedriver -jar "$SELENIUM_JAR" > /tmp/selenium.log &
 wget --retry-connrefused --tries=120 --waitretry=3 --output-file=/dev/null "$SELENIUM_HUB_URL/wd/hub/status" -O /dev/null
 
 # Test to see if the selenium server really did start
