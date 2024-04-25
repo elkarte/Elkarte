@@ -1,5 +1,5 @@
 <?php
-// Version: 1.1; Login
+// Version: 1.1.10; Login
 
 // Registration agreement page.
 $txt['registration_agreement'] = 'Registration Agreement';
@@ -137,6 +137,7 @@ $txt['registration_username_available'] = 'Username is available';
 $txt['registration_username_unavailable'] = 'Username is not available';
 $txt['registration_username_check'] = 'Check if username is available';
 $txt['registration_password_short'] = 'Password is too short';
+$txt['registration_password_long'] = 'Password is too long';
 $txt['registration_password_reserved'] = 'Password contains your username/email';
 $txt['registration_password_numbercase'] = 'Password must contain both upper and lower case, and numbers';
 $txt['registration_password_no_match'] = 'Passwords do not match';

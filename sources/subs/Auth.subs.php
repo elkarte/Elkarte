@@ -11,7 +11,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.1.7
+ * @version 1.1.10
  *
  */
 
@@ -540,6 +540,13 @@ function validatePassword($password, $username, $restrict_in = array())
 	{
 		loadLanguage('Errors');
 		$txt['profile_error_password_short'] = sprintf($txt['profile_error_password_short'], empty($modSettings['password_strength']) ? 4 : 8);
+		return 'short';
+	}
+
+	if (Util::strlen($password) > 64)
+	{
+		loadLanguage('Errors');
+		$txt['profile_error_password_long'] = sprintf($txt['profile_error_password_long'], 64);
 		return 'short';
 	}
 
