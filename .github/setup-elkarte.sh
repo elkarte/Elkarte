@@ -24,7 +24,7 @@ fi
 
 # Phpunit and support
 # composer config --file=composer2.json && composer install --no-interaction --quiet
-composer install --no-interaction --quiet
+composer install --no-interaction
 if [[ "$PHP_VERSION" =~ ^8 ]]
 then
 	composer remove phpunit/phpunit phpunit/phpunit-selenium --dev --update-with-dependencies
