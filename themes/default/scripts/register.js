@@ -7,7 +7,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.1
+ * @version 1.1.10
  */
 
 /**
@@ -156,6 +156,9 @@ elkRegister.prototype.refreshMainPassword = function(called_from_verify)
 	// Is it a valid length?
 	if ((curPass.length < 8 && this.passwordLevel >= 1) || curPass.length < 4)
 		stringIndex = 'password_short';
+
+	if (curPass.length > 64)
+		stringIndex = 'password_long';
 
 	// More than basic?
 	if (this.passwordLevel >= 1)

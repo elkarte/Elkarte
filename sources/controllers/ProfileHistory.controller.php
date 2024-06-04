@@ -11,7 +11,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.1.9
+ * @version 1.1.10
  *
  */
 
@@ -433,25 +433,21 @@ class ProfileHistory_Controller extends Action_Controller
 		if ($context['single_ip'])
 		{
 			$context['whois_servers'] = array(
-				'afrinic' => array(
-					'name' => $txt['whois_afrinic'],
-					'url' => 'http://www.afrinic.net/whois?searchtext=' . $context['ip'],
-				),
 				'apnic' => array(
 					'name' => $txt['whois_apnic'],
-					'url' => 'http://wq.apnic.net/apnic-bin/whois.pl?searchtext=' . $context['ip'],
+					'url' => 'https://wq.apnic.net/apnic-bin/whois.pl?searchtext=' . $context['ip'],
 				),
 				'arin' => array(
 					'name' => $txt['whois_arin'],
-					'url' => 'http://whois.arin.net/rest/ip/' . $context['ip'],
+					'url' => 'https://whois.arin.net/rest/ip/' . $context['ip'],
 				),
 				'lacnic' => array(
 					'name' => $txt['whois_lacnic'],
-					'url' => 'http://lacnic.net/cgi-bin/lacnic/whois?query=' . $context['ip'],
+					'url' => 'https://query.milacnic.lacnic.net/search?id=' . $context['ip'],
 				),
 				'ripe' => array(
 					'name' => $txt['whois_ripe'],
-					'url' => 'https://apps.db.ripe.net/search/query.html?searchtext=' . $context['ip'],
+					'url' => 'https://apps.db.ripe.net/db-web-ui/query?searchtext=' . $context['ip'],
 				),
 			);
 

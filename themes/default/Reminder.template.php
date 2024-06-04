@@ -9,7 +9,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.1
+ * @version 1.1.10
  *
  */
 
@@ -146,6 +146,7 @@ function template_set_password()
 	<script>
 		var regTextStrings = {
 			"password_short": "', $txt['registration_password_short'], '",
+			"password_long": "', $txt['registration_password_long'], '",
 			"password_reserved": "', $txt['registration_password_reserved'], '",
 			"password_numbercase": "', $txt['registration_password_numbercase'], '",
 			"password_no_match": "', $txt['registration_password_no_match'], '",
@@ -219,6 +220,7 @@ function template_ask()
 <script>
 	var regTextStrings = {
 		"password_short": "', $txt['registration_password_short'], '",
+		"password_long": "', $txt['registration_password_long'], '",
 		"password_reserved": "', $txt['registration_password_reserved'], '",
 		"password_numbercase": "', $txt['registration_password_numbercase'], '",
 		"password_no_match": "', $txt['registration_password_no_match'], '",
