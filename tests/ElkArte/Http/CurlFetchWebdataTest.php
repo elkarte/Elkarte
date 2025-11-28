@@ -105,7 +105,7 @@ class CurlFetchWebdataTest extends TestCase
 			// Check for correct fetch
 			if (!empty($testcase[2]))
 			{
-				$this->assertContains($curl->result('code'), $testcase[2]);
+				$this->assertContains($curl->result('code'), $testcase[2], 'FetchCodeError:: ' . $curl->result('code'));
 			}
 
 			if (!empty($testcase[3]) && $curl->result('code') == 200)
