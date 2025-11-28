@@ -591,6 +591,8 @@ class Register extends AbstractController
 
 			redirectexit('action=auth;sa=check;member=' . $memberID);
 		}
+
+		return null;
 	}
 
 	/**
