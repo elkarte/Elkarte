@@ -588,7 +588,7 @@ function redirectexit($setLocation = '')
 	global $db_show_debug;
 
 	// Note to developers.  The testbed will add the following, allowing phpunit test returns
-	if (defined("PHPUNITBOOTSTRAP") && defined("STDIN")){return $setLocation;}
+	//if (defined("PHPUNITBOOTSTRAP") && defined("STDIN")){return $setLocation;}
 
 	// Send headers, call integration, do maintenance
 	Headers::instance()
@@ -697,7 +697,7 @@ function obExit($header = null, $do_footer = null, $from_index = false, $from_fa
 	call_integration_hook('integrate_exit', [$do_footer]);
 
 	// Note to developers.  The testbed will add the following, allowing phpunit test returns
-	if (defined("PHPUNITBOOTSTRAP") && defined("STDIN")){return;}
+	//if (defined("PHPUNITBOOTSTRAP") && defined("STDIN")){return;}
 
 	// Don't exit if we're coming from index.php; that will pass through normally.
 	if (!$from_index)

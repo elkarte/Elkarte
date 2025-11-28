@@ -153,7 +153,7 @@ class Markasread extends AbstractController
 		}
 
 		// No need to output anything, just return to the button
-		obExit(false);
+		return obExit(false);
 	}
 
 	/**
@@ -235,8 +235,7 @@ class Markasread extends AbstractController
 			return '';
 		}
 
-		redirectexit('action=unreadreplies');
-		return null;
+		return redirectexit('action=unreadreplies');
 	}
 
 	/**
