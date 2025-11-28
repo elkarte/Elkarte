@@ -25,7 +25,8 @@ echo "Installing Browser"
 
 # Available Chrome Versions
 CHROME_VERSION='123.0.6312.58-1'
-wget https://dl.google.com/linux/chrome/deb/pool/main/g/google-chrome-stable/google-chrome-stable_${CHROME_VERSION}_amd64.deb -q
+wget https://mirror.cs.uchicago.edu/google-chrome/pool/main/g/google-chrome-stable/google-chrome-stable_${CHROME_VERSION}_amd64.deb -q
+#wget https://dl.google.com/linux/chrome/deb/pool/main/g/google-chrome-stable/google-chrome-stable_${CHROME_VERSION}_amd64.deb -q
 sudo dpkg -i google-chrome-stable_${CHROME_VERSION}_amd64.deb
 
 # Download Chrome Driver

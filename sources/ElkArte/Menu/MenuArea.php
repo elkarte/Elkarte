@@ -254,11 +254,11 @@ class MenuArea extends MenuItem
 	/**
 	 * Converts an object and any branches to an array, recursive.
 	 *
-	 * @param mixed $obj
+	 * @param MenuArea $obj
 	 *
-	 * @return array|string|null
+	 * @return array|MenuArea
 	 */
-	public function toArray($obj): array|string|null
+	public function toArray($obj)
 	{
 		if (!is_object($obj) && !is_array($obj))
 		{
