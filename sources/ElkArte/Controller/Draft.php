@@ -73,7 +73,7 @@ class Draft extends Post
 	 * @uses the showdrafts template
 	 *
 	 */
-	public function action_showProfileDrafts()
+	public function action_showProfileDrafts(): void
 	{
 		global $txt, $modSettings, $context;
 
@@ -183,7 +183,7 @@ class Draft extends Post
 	 * @param string $redirect - The url to redirect to after the drafts have
 	 * been deleted
 	 */
-	private function _action_delete($redirect = '')
+	private function _action_delete($redirect = ''): void
 	{
 		checkSession(empty($this->_req->post) ? 'get' : '');
 
@@ -215,7 +215,7 @@ class Draft extends Post
 	 *
 	 * @return array - an array consisting of: $maxIndex, $reverse, $limit, $order
 	 */
-	private function _query_limits($msgCount, $maxIndex)
+	private function _query_limits($msgCount, $maxIndex): array
 	{
 		global $context, $modSettings;
 
@@ -243,7 +243,7 @@ class Draft extends Post
 	 * @param string $default_subject - The default subject if $subject is empty
 	 * @param bool $smiley_enabled - Is the smiley are enabled or not
 	 */
-	private function _prepare_body_subject(&$body, &$subject, $default_subject, $smiley_enabled = true)
+	private function _prepare_body_subject(&$body, &$subject, $default_subject, $smiley_enabled = true): void
 	{
 		// Cleanup...
 		if (empty($body))
@@ -277,7 +277,7 @@ class Draft extends Post
 	/**
 	 * @override
 	 */
-	public function action_save()
+	public function action_save(): void
 	{
 		$this->action_index();
 	}
@@ -291,7 +291,7 @@ class Draft extends Post
 	 *
 	 * @uses the showPMDrafts template
 	 */
-	public function action_showPMDrafts()
+	public function action_showPMDrafts(): void
 	{
 		global $txt, $modSettings, $context;
 
@@ -309,7 +309,8 @@ class Draft extends Post
 		// If just deleting a draft, do it and then redirect back.
 		if (!empty($this->_req->query->delete) || !empty($this->_req->post->delete))
 		{
-			return $this->_action_delete('action=pm;sa=showpmdrafts;start=' . $context['start']);
+			$this->_action_delete('action=pm;sa=showpmdrafts;start=' . $context['start']);
+			return;
 		}
 
 		// Perhaps a draft was selected for editing? if so pass this off
@@ -332,16 +333,16 @@ class Draft extends Post
 
 		// Start counting at the number of the first message displayed.
 		$counter = $reverse ? $context['start'] + $maxIndex + 1 : $context['start'];
-		$context['posts'] = array();
+		$context['posts'] = [];
 		foreach ($user_drafts as $row)
 		{
 			$this->_prepare_body_subject($row['body'], $row['subject'], $txt['no_subject'], true);
 
 			// Have they provided who this will go to?
-			$recipients = array(
-				'to' => array(),
-				'bcc' => array(),
-			);
+			$recipients = [
+				'to' => [],
+				'bcc' => [],
+			];
 			$recipient_ids = (empty($row['to_list'])) ? [] : Util::unserialize($row['to_list']);
 
 			// Get nice names to show the user, the id's are not that great to see!

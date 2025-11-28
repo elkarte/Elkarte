@@ -38,9 +38,9 @@ class Standard extends AbstractUrlGenerator
 	/**
 	 * {@inheritDoc}
 	 */
-	protected function generateQuery($params)
+	protected function generateQuery($params): string
 	{
-		$args = array();
+		$args = [];
 		foreach ($params as $k => $v)
 		{
 			if (is_int($k))

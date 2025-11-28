@@ -43,11 +43,11 @@ class ManageSecurity extends AbstractController
 
 		Txt::load('Help+ManageSettings');
 
-		$subActions = array(
-			'general' => array($this, 'action_securitySettings_display', 'permission' => 'admin_forum'),
-			'spam' => array($this, 'action_spamSettings_display', 'permission' => 'admin_forum'),
-			'moderation' => array($this, 'action_moderationSettings_display', 'enabled' => featureEnabled('w'), 'permission' => 'admin_forum'),
-		);
+		$subActions = [
+			'general' => [$this, 'action_securitySettings_display', 'permission' => 'admin_forum'],
+			'spam' => [$this, 'action_spamSettings_display', 'permission' => 'admin_forum'],
+			'moderation' => [$this, 'action_moderationSettings_display', 'enabled' => featureEnabled('w'), 'permission' => 'admin_forum'],
+		];
 
 		// Action control
 		$action = new Action('modify_security');
@@ -78,7 +78,7 @@ class ManageSecurity extends AbstractController
 	 *
 	 * @event integrate_save_general_security_settings
 	 */
-	public function action_securitySettings_display()
+	public function action_securitySettings_display(): void
 	{
 		global $txt, $context;
 
@@ -121,35 +121,35 @@ class ManageSecurity extends AbstractController
 		$context['invalid_badbehavior_httpbl_key'] = (!empty($modSettings['badbehavior_httpbl_key']) && (strlen($modSettings['badbehavior_httpbl_key']) !== 12));
 
 		// Set up the config array for use
-		$config_vars = array(
-			array('int', 'failed_login_threshold'),
-			array('int', 'loginHistoryDays'),
+		$config_vars = [
+			['int', 'failed_login_threshold'],
+			['int', 'loginHistoryDays'],
 			'',
-			array('int', 'admin_session_lifetime'),
-			array('check', 'auto_admin_session'),
-			array('check', 'securityDisable'),
-			array('check', 'securityDisable_moderate'),
+			['int', 'admin_session_lifetime'],
+			['check', 'auto_admin_session'],
+			['check', 'securityDisable'],
+			['check', 'securityDisable_moderate'],
 			'',
-			array('check', 'enableOTP'),
+			['check', 'enableOTP'],
 			'',
 			// Reactive on email, and approve on delete
-			array('check', 'send_validation_onChange'),
-			array('check', 'approveAccountDeletion'),
+			['check', 'send_validation_onChange'],
+			['check', 'approveAccountDeletion'],
 			'',
 			// Password strength.
-			array('select', 'password_strength', array($txt['setting_password_strength_low'], $txt['setting_password_strength_medium'], $txt['setting_password_strength_high'])),
-			array('check', 'enable_password_conversion'),
+			['select', 'password_strength', [$txt['setting_password_strength_low'], $txt['setting_password_strength_medium'], $txt['setting_password_strength_high']]],
+			['check', 'enable_password_conversion'],
 			'',
-			array('select', 'frame_security', array('SAMEORIGIN' => $txt['setting_frame_security_SAMEORIGIN'], 'DENY' => $txt['setting_frame_security_DENY'], 'DISABLE' => $txt['setting_frame_security_DISABLE'])),
+			['select', 'frame_security', ['SAMEORIGIN' => $txt['setting_frame_security_SAMEORIGIN'], 'DENY' => $txt['setting_frame_security_DENY'], 'DISABLE' => $txt['setting_frame_security_DISABLE']]],
 			// Bad Behavior
-			array('title', 'badbehavior_title'),
-			array('check', 'badbehavior_accept_header'),
-			array('text', 'badbehavior_httpbl_key', 12, 'invalid' => $context['invalid_badbehavior_httpbl_key']),
-			array('int', 'badbehavior_httpbl_threat', 'postinput' => $txt['badbehavior_httpbl_threat_desc']),
-			array('int', 'badbehavior_httpbl_maxage', 'postinput' => $txt['badbehavior_httpbl_maxage_desc']),
-		);
+			['title', 'badbehavior_title'],
+			['check', 'badbehavior_accept_header'],
+			['text', 'badbehavior_httpbl_key', 12, 'invalid' => $context['invalid_badbehavior_httpbl_key']],
+			['int', 'badbehavior_httpbl_threat', 'postinput' => $txt['badbehavior_httpbl_threat_desc']],
+			['int', 'badbehavior_httpbl_maxage', 'postinput' => $txt['badbehavior_httpbl_maxage_desc']],
+		];
 
-		call_integration_hook('integrate_general_security_settings', array(&$config_vars));
+		call_integration_hook('integrate_general_security_settings', [&$config_vars]);
 
 		return $config_vars;
 	}
@@ -161,7 +161,7 @@ class ManageSecurity extends AbstractController
 	 *
 	 * @event integrate_save_moderation_settings
 	 */
-	public function action_moderationSettings_display()
+	public function action_moderationSettings_display(): void
 	{
 		global $txt, $context, $modSettings;
 
@@ -193,7 +193,7 @@ class ManageSecurity extends AbstractController
 
 			// Fix the warning setting array!
 			$this->_req->post->warning_settings = '1,' . min(100, (int) $this->_req->post->user_limit) . ',' . min(100, (int) $this->_req->post->warning_decrement);
-			$config_vars[] = array('text', 'warning_settings');
+			$config_vars[] = ['text', 'warning_settings'];
 			unset($config_vars['rem1'], $config_vars['rem2']);
 
 			call_integration_hook('integrate_save_moderation_settings');
@@ -223,17 +223,17 @@ class ManageSecurity extends AbstractController
 	{
 		global $txt;
 
-		$config_vars = array(
+		$config_vars = [
 			// Warning system?
-			array('int', 'warning_watch', 'subtext' => $txt['setting_warning_watch_note'], 'help' => 'watch_enable'),
-			'moderate' => array('int', 'warning_moderate', 'subtext' => $txt['setting_warning_moderate_note'], 'help' => 'moderate_enable'),
-			array('int', 'warning_mute', 'subtext' => $txt['setting_warning_mute_note'], 'help' => 'mute_enable'),
-			'rem1' => array('int', 'user_limit', 'subtext' => $txt['setting_user_limit_note'], 'help' => 'perday_limit'),
-			'rem2' => array('int', 'warning_decrement', 'subtext' => $txt['setting_warning_decrement_note']),
-			array('select', 'warning_show', 'subtext' => $txt['setting_warning_show_note'], array($txt['setting_warning_show_mods'], $txt['setting_warning_show_user'], $txt['setting_warning_show_all'])),
-		);
+			['int', 'warning_watch', 'subtext' => $txt['setting_warning_watch_note'], 'help' => 'watch_enable'],
+			'moderate' => ['int', 'warning_moderate', 'subtext' => $txt['setting_warning_moderate_note'], 'help' => 'moderate_enable'],
+			['int', 'warning_mute', 'subtext' => $txt['setting_warning_mute_note'], 'help' => 'mute_enable'],
+			'rem1' => ['int', 'user_limit', 'subtext' => $txt['setting_user_limit_note'], 'help' => 'perday_limit'],
+			'rem2' => ['int', 'warning_decrement', 'subtext' => $txt['setting_warning_decrement_note']],
+			['select', 'warning_show', 'subtext' => $txt['setting_warning_show_note'], [$txt['setting_warning_show_mods'], $txt['setting_warning_show_user'], $txt['setting_warning_show_all']]],
+		];
 
-		call_integration_hook('integrate_modify_moderation_settings', array(&$config_vars));
+		call_integration_hook('integrate_modify_moderation_settings', [&$config_vars]);
 
 		return $config_vars;
 	}
@@ -245,7 +245,7 @@ class ManageSecurity extends AbstractController
 	 *
 	 * @event integrate_save_spam_settings
 	 */
-	public function action_spamSettings_display()
+	public function action_spamSettings_display(): void
 	{
 		global $txt, $context, $modSettings;
 
@@ -272,7 +272,7 @@ class ManageSecurity extends AbstractController
 
 			unset($config_vars['pm1'], $config_vars['pm2'], $config_vars['pm3'], $config_vars['guest_verify']);
 
-			$config_vars[] = array('text', 'pm_spam_settings');
+			$config_vars[] = ['text', 'pm_spam_settings'];
 
 			call_integration_hook('integrate_save_spam_settings');
 
@@ -311,19 +311,19 @@ class ManageSecurity extends AbstractController
 		global $txt, $modSettings;
 
 		// Build up our options array
-		$config_vars = array(
-			array('check', 'reg_verification'),
-			array('check', 'search_enable_captcha'),
+		$config_vars = [
+			['check', 'reg_verification'],
+			['check', 'search_enable_captcha'],
 			// This, my friend, is a cheat :p
-			'guest_verify' => array('check', 'guests_require_captcha', 'postinput' => $txt['setting_guests_require_captcha_desc']),
-			array('int', 'posts_require_captcha', 'postinput' => $txt['posts_require_captcha_desc'], 'onchange' => "if (this.value > 0){ document.getElementById('guests_require_captcha').checked = true; document.getElementById('guests_require_captcha').disabled = true;} else {document.getElementById('guests_require_captcha').disabled = false;}"),
-			array('check', 'guests_report_require_captcha'),
+			'guest_verify' => ['check', 'guests_require_captcha', 'postinput' => $txt['setting_guests_require_captcha_desc']],
+			['int', 'posts_require_captcha', 'postinput' => $txt['posts_require_captcha_desc'], 'onchange' => "if (this.value > 0){ document.getElementById('guests_require_captcha').checked = true; document.getElementById('guests_require_captcha').disabled = true;} else {document.getElementById('guests_require_captcha').disabled = false;}"],
+			['check', 'guests_report_require_captcha'],
 			// PM Settings
-			array('title', 'antispam_PM'),
-			'pm1' => array('int', 'max_pm_recipients', 'postinput' => $txt['max_pm_recipients_note']),
-			'pm2' => array('int', 'pm_posts_verification', 'postinput' => $txt['pm_posts_verification_note']),
-			'pm3' => array('int', 'pm_posts_per_hour', 'postinput' => $txt['pm_posts_per_hour_note']),
-		);
+			['title', 'antispam_PM'],
+			'pm1' => ['int', 'max_pm_recipients', 'postinput' => $txt['max_pm_recipients_note']],
+			'pm2' => ['int', 'pm_posts_verification', 'postinput' => $txt['pm_posts_verification_note']],
+			'pm3' => ['int', 'pm_posts_per_hour', 'postinput' => $txt['pm_posts_per_hour_note']],
+		];
 
 		// Cannot use moderation if post moderation is not enabled.
 		if (!$modSettings['postmod_active'])
@@ -332,7 +332,7 @@ class ManageSecurity extends AbstractController
 		}
 
 		// @todo: it may be removed, it may stay, the two hooks may have different functions
-		call_integration_hook('integrate_spam_settings', array(&$config_vars));
+		call_integration_hook('integrate_spam_settings', [&$config_vars]);
 
 		return $config_vars;
 	}

@@ -58,17 +58,18 @@ function deleteMembers($users, $check_not_admin = false)
 	// Try to get some more memory.
 	detectServer()->setMemoryLimit('128M');
 
-	$users = !is_array($users) ? array($users) : array_unique($users);
+	$users = !is_array($users) ? [$users] : array_unique($users);
 
 	// Make sure there's no void user in here.
-	$users = array_diff($users, array(0));
+	$users = array_diff($users, [0]);
 
 	// How many are they deleting?
 	if (empty($users))
 	{
 		return;
 	}
-	elseif (count($users) === 1)
+
+	if (count($users) === 1)
 	{
 		list ($user) = $users;
 
@@ -93,19 +94,19 @@ function deleteMembers($users, $check_not_admin = false)
 	}
 
 	// Get their names for logging purposes.
-	$admins = array();
-	$emails = array();
-	$user_log_details = array();
+	$admins = [];
+	$emails = [];
+	$user_log_details = [];
 	$db->fetchQuery('
 		SELECT 
 			id_member, member_name, email_address, CASE WHEN id_group = {int:admin_group} OR FIND_IN_SET({int:admin_group}, additional_groups) != 0 THEN 1 ELSE 0 END AS is_admin
 		FROM {db_prefix}members
 		WHERE id_member IN ({array_int:user_list})
 		LIMIT ' . count($users),
-		array(
+		[
 			'user_list' => $users,
 			'admin_group' => 1,
-		)
+		]
 	)->fetch_callback(
 		function ($row) use (&$admins, &$emails, &$user_log_details) {
 			if ($row['is_admin'])
@@ -113,7 +114,7 @@ function deleteMembers($users, $check_not_admin = false)
 				$admins[] = $row['id_member'];
 			}
 
-			$user_log_details[$row['id_member']] = array($row['id_member'], $row['member_name']);
+			$user_log_details[$row['id_member']] = [$row['id_member'], $row['member_name']];
 			$emails[] = $row['email_address'];
 		}
 	);
@@ -140,18 +141,18 @@ function deleteMembers($users, $check_not_admin = false)
 	}
 
 	// Log the action - regardless of who is deleting it.
-	$log_changes = array();
+	$log_changes = [];
 	foreach ($user_log_details as $user)
 	{
-		$log_changes[] = array(
+		$log_changes[] = [
 			'action' => 'delete_member',
 			'log_type' => 'admin',
-			'extra' => array(
+			'extra' => [
 				'member' => $user[0],
 				'name' => $user[1],
 				'member_acted' => User::$info->name,
-			),
-		);
+			],
+		];
 
 		// Remove any cached data if enabled.
 		Cache::instance()->remove('user_settings-' . $user[0]);
@@ -164,21 +165,21 @@ function deleteMembers($users, $check_not_admin = false)
 			id_member = {int:guest_id}' . (!empty($modSettings['deleteMembersRemovesEmail']) ? ',
 		poster_email = {string:blank_email}' : '') . '
 		WHERE id_member IN ({array_int:users})',
-		array(
+		[
 			'guest_id' => 0,
 			'blank_email' => '',
 			'users' => $users,
-		)
+		]
 	);
 	$db->query('', '
 		UPDATE {db_prefix}polls
 		SET 
 			id_member = {int:guest_id}
 		WHERE id_member IN ({array_int:users})',
-		array(
+		[
 			'guest_id' => 0,
 			'users' => $users,
-		)
+		]
 	);
 
 	// Make these peoples' posts guest first posts and last posts.
@@ -187,20 +188,20 @@ function deleteMembers($users, $check_not_admin = false)
 		SET 
 			id_member_started = {int:guest_id}
 		WHERE id_member_started IN ({array_int:users})',
-		array(
+		[
 			'guest_id' => 0,
 			'users' => $users,
-		)
+		]
 	);
 	$db->query('', '
 		UPDATE {db_prefix}topics
 		SET 
 			id_member_updated = {int:guest_id}
 		WHERE id_member_updated IN ({array_int:users})',
-		array(
+		[
 			'guest_id' => 0,
 			'users' => $users,
-		)
+		]
 	);
 
 	$db->query('', '
@@ -208,10 +209,10 @@ function deleteMembers($users, $check_not_admin = false)
 		SET 
 			id_member = {int:guest_id}
 		WHERE id_member IN ({array_int:users})',
-		array(
+		[
 			'guest_id' => 0,
 			'users' => $users,
-		)
+		]
 	);
 
 	$db->query('', '
@@ -219,10 +220,10 @@ function deleteMembers($users, $check_not_admin = false)
 		SET 
 			id_member = {int:guest_id}
 		WHERE id_member IN ({array_int:users})',
-		array(
+		[
 			'guest_id' => 0,
 			'users' => $users,
-		)
+		]
 	);
 
 	$db->query('', '
@@ -230,46 +231,46 @@ function deleteMembers($users, $check_not_admin = false)
 		SET 
 			id_member = {int:guest_id}
 		WHERE id_member IN ({array_int:users})',
-		array(
+		[
 			'guest_id' => 0,
 			'users' => $users,
-		)
+		]
 	);
 
 	// Delete the member.
 	$db->query('', '
 		DELETE FROM {db_prefix}members
 		WHERE id_member IN ({array_int:users})',
-		array(
+		[
 			'users' => $users,
-		)
+		]
 	);
 
 	// Delete any likes...
 	$db->query('', '
 		DELETE FROM {db_prefix}message_likes
 		WHERE id_member IN ({array_int:users})',
-		array(
+		[
 			'users' => $users,
-		)
+		]
 	);
 
 	// Delete any custom field data...
 	$db->query('', '
 		DELETE FROM {db_prefix}custom_fields_data
 		WHERE id_member IN ({array_int:users})',
-		array(
+		[
 			'users' => $users,
-		)
+		]
 	);
 
 	// Delete any post by email keys...
 	$db->query('', '
 		DELETE FROM {db_prefix}postby_emails
 		WHERE email_to IN ({array_string:emails})',
-		array(
+		[
 			'emails' => $emails,
-		)
+		]
 	);
 
 	// Delete the logs...
@@ -277,83 +278,83 @@ function deleteMembers($users, $check_not_admin = false)
 		DELETE FROM {db_prefix}log_actions
 		WHERE id_log = {int:log_type}
 			AND id_member IN ({array_int:users})',
-		array(
+		[
 			'log_type' => 2,
 			'users' => $users,
-		)
+		]
 	);
 	$db->query('', '
 		DELETE FROM {db_prefix}log_boards
 		WHERE id_member IN ({array_int:users})',
-		array(
+		[
 			'users' => $users,
-		)
+		]
 	);
 	$db->query('', '
 		DELETE FROM {db_prefix}log_comments
 		WHERE id_recipient IN ({array_int:users})
 			AND comment_type = {string:warntpl}',
-		array(
+		[
 			'users' => $users,
 			'warntpl' => 'warntpl',
-		)
+		]
 	);
 	$db->query('', '
 		DELETE FROM {db_prefix}log_group_requests
 		WHERE id_member IN ({array_int:users})',
-		array(
+		[
 			'users' => $users,
-		)
+		]
 	);
 	$db->query('', '
 		DELETE FROM {db_prefix}log_karma
 		WHERE id_target IN ({array_int:users})
 			OR id_executor IN ({array_int:users})',
-		array(
+		[
 			'users' => $users,
-		)
+		]
 	);
 	$db->query('', '
 		DELETE FROM {db_prefix}log_mark_read
 		WHERE id_member IN ({array_int:users})',
-		array(
+		[
 			'users' => $users,
-		)
+		]
 	);
 	$db->query('', '
 		DELETE FROM {db_prefix}log_notify
 		WHERE id_member IN ({array_int:users})',
-		array(
+		[
 			'users' => $users,
-		)
+		]
 	);
 	$db->query('', '
 		DELETE FROM {db_prefix}log_online
 		WHERE id_member IN ({array_int:users})',
-		array(
+		[
 			'users' => $users,
-		)
+		]
 	);
 	$db->query('', '
 		DELETE FROM {db_prefix}log_subscribed
 		WHERE id_member IN ({array_int:users})',
-		array(
+		[
 			'users' => $users,
-		)
+		]
 	);
 	$db->query('', '
 		DELETE FROM {db_prefix}log_topics
 		WHERE id_member IN ({array_int:users})',
-		array(
+		[
 			'users' => $users,
-		)
+		]
 	);
 	$db->query('', '
 		DELETE FROM {db_prefix}collapsed_categories
 		WHERE id_member IN ({array_int:users})',
-		array(
+		[
 			'users' => $users,
-		)
+		]
 	);
 
 	// Make their votes appear as guest votes - at least it keeps the totals right.
@@ -363,19 +364,19 @@ function deleteMembers($users, $check_not_admin = false)
 		SET 
 			id_member = {int:guest_id}
 		WHERE id_member IN ({array_int:users})',
-		array(
+		[
 			'guest_id' => 0,
 			'users' => $users,
-		)
+		]
 	);
 
 	// Remove the mentions
 	$db->query('', '
 		DELETE FROM {db_prefix}log_mentions
 		WHERE id_member IN ({array_int:users})',
-		array(
+		[
 			'users' => $users,
-		)
+		]
 	);
 	// And null all those that were added by him
 	$db->query('', '
@@ -383,10 +384,10 @@ function deleteMembers($users, $check_not_admin = false)
 		SET 
 			id_member_from = {int:zero}
 		WHERE id_member_from IN ({array_int:users})',
-		array(
+		[
 			'zero' => 0,
 			'users' => $users,
-		)
+		]
 	);
 
 	// Delete personal messages.
@@ -398,57 +399,57 @@ function deleteMembers($users, $check_not_admin = false)
 		SET 
 			id_member_from = {int:guest_id}
 		WHERE id_member_from IN ({array_int:users})',
-		array(
+		[
 			'guest_id' => 0,
 			'users' => $users,
-		)
+		]
 	);
 
 	// They no longer exist, so we don't know who it was sent to.
 	$db->query('', '
 		DELETE FROM {db_prefix}pm_recipients
 		WHERE id_member IN ({array_int:users})',
-		array(
+		[
 			'users' => $users,
-		)
+		]
 	);
 
 	// Delete avatar.
 	require_once(SUBSDIR . '/ManageAttachments.subs.php');
-	removeAttachments(array('id_member' => $users));
+	removeAttachments(['id_member' => $users]);
 
 	// It's over, no more moderation for you.
 	$db->query('', '
 		DELETE FROM {db_prefix}moderators
 		WHERE id_member IN ({array_int:users})',
-		array(
+		[
 			'users' => $users,
-		)
+		]
 	);
 	$db->query('', '
 		DELETE FROM {db_prefix}group_moderators
 		WHERE id_member IN ({array_int:users})',
-		array(
+		[
 			'users' => $users,
-		)
+		]
 	);
 
 	// If you don't exist we can't ban you.
 	$db->query('', '
 		DELETE FROM {db_prefix}ban_items
 		WHERE id_member IN ({array_int:users})',
-		array(
+		[
 			'users' => $users,
-		)
+		]
 	);
 
 	// Remove individual theme settings.
 	$db->query('', '
 		DELETE FROM {db_prefix}themes
 		WHERE id_member IN ({array_int:users})',
-		array(
+		[
 			'users' => $users,
-		)
+		]
 	);
 
 	// These users are nobody's buddy nomore.
@@ -457,26 +458,26 @@ function deleteMembers($users, $check_not_admin = false)
 			id_member, pm_ignore_list, buddy_list
 		FROM {db_prefix}members
 		WHERE FIND_IN_SET({raw:pm_ignore_list}, pm_ignore_list) != 0 OR FIND_IN_SET({raw:buddy_list}, buddy_list) != 0',
-		array(
+		[
 			'pm_ignore_list' => implode(', pm_ignore_list) != 0 OR FIND_IN_SET(', $users),
 			'buddy_list' => implode(', buddy_list) != 0 OR FIND_IN_SET(', $users),
-		)
+		]
 	)->fetch_callback(
 		function ($row) use ($users) {
-			updateMemberData($row['id_member'], array(
+			updateMemberData($row['id_member'], [
 				'pm_ignore_list' => implode(',', array_diff(explode(',', $row['pm_ignore_list']), $users)),
 				'buddy_list' => implode(',', array_diff(explode(',', $row['buddy_list']), $users))
-			));
+			]);
 		}
 	);
 
 	// Make sure no member's birthday is still sticking in the calendar...
-	updateSettings(array(
+	updateSettings([
 		'calendar_updated' => time(),
-	));
+	]);
 
 	// Integration rocks!
-	call_integration_hook('integrate_delete_members', array($users));
+	call_integration_hook('integrate_delete_members', [$users]);
 
 	updateMemberStats();
 
@@ -495,7 +496,7 @@ function deleteMembers($users, $check_not_admin = false)
  * - The function will adjust member statistics.
  * - If an error is detected will fatal error on all errors unless return_errors is true.
  *
- * @param mixed[] $regOptions
+ * @param array $regOptions
  * @param string $ErrorContext
  *
  * @return int the ID of the newly created member
@@ -526,7 +527,7 @@ function registerMember(&$regOptions, $ErrorContext = 'register')
 	$regOptions['username'] = trim(preg_replace('~[\t\n\r \x0B\0\x{A0}\x{AD}\x{2000}-\x{200F}\x{201F}\x{202F}\x{3000}\x{FEFF}]+~u', ' ', $regOptions['username']));
 
 	// Valid emails only
-	if (!DataValidator::is_valid($regOptions, array('email' => 'valid_email|required|max_length[255]'), array('email' => 'trim')))
+	if (!DataValidator::is_valid($regOptions, ['email' => 'valid_email|required|max_length[255]'], ['email' => 'trim']))
 	{
 		$reg_errors->addError('bad_email');
 	}
@@ -558,7 +559,7 @@ function registerMember(&$regOptions, $ErrorContext = 'register')
 	// Now perform hard password validation as required.
 	if (!empty($regOptions['check_password_strength']) && $regOptions['password'] != '')
 	{
-		$passwordError = validatePassword($regOptions['password'], $regOptions['username'], array($regOptions['email']));
+		$passwordError = validatePassword($regOptions['password'], $regOptions['username'], [$regOptions['email']]);
 
 		// Password isn't legal?
 		if ($passwordError !== null)
@@ -577,11 +578,11 @@ function registerMember(&$regOptions, $ErrorContext = 'register')
 	// Check if the email address is in use.
 	if (userByEmail($regOptions['email'], $regOptions['username']))
 	{
-		$reg_errors->addError(array('email_in_use', array(htmlspecialchars($regOptions['email'], ENT_COMPAT, 'UTF-8'))));
+		$reg_errors->addError(['email_in_use', [htmlspecialchars($regOptions['email'], ENT_COMPAT, 'UTF-8')]]);
 	}
 
 	// Perhaps someone else wants to check this user
-	call_integration_hook('integrate_register_check', array(&$regOptions, &$reg_errors));
+	call_integration_hook('integrate_register_check', [&$regOptions, &$reg_errors]);
 
 	// If there's any errors left return them at once!
 	if ($reg_errors->hasErrors())
@@ -589,7 +590,7 @@ function registerMember(&$regOptions, $ErrorContext = 'register')
 		return false;
 	}
 
-	$reservedVars = array(
+	$reservedVars = [
 		'actual_theme_url',
 		'actual_images_url',
 		'base_theme_dir',
@@ -605,7 +606,7 @@ function registerMember(&$regOptions, $ErrorContext = 'register')
 		'theme_layers',
 		'theme_templates',
 		'theme_url',
-	);
+	];
 
 	// Can't change reserved vars.
 	if (isset($regOptions['theme_vars']) && count(array_intersect(array_keys($regOptions['theme_vars']), $reservedVars)) !== 0)
@@ -622,7 +623,7 @@ function registerMember(&$regOptions, $ErrorContext = 'register')
 	$password = $regOptions['password'];
 
 	// Some of these might be overwritten. (the lower ones that are in the arrays below.)
-	$regOptions['register_vars'] = array(
+	$regOptions['register_vars'] = [
 		'member_name' => $regOptions['username'],
 		'email_address' => $regOptions['email'],
 		'passwd' => validateLoginPassword($password, '', $regOptions['username'], true),
@@ -651,7 +652,7 @@ function registerMember(&$regOptions, $ErrorContext = 'register')
 		'additional_groups' => '',
 		'ignore_boards' => '',
 		'notify_announcements' => (!empty($regOptions['notify_announcements']) ? 1 : 0),
-	);
+	];
 
 	// Setup the activation status on this new account so it is correct - firstly is it an under age account?
 	if ($regOptions['require'] === 'coppa')
@@ -702,7 +703,7 @@ function registerMember(&$regOptions, $ErrorContext = 'register')
 	}
 
 	// Integrate optional user theme options to be set.
-	$theme_vars = array();
+	$theme_vars = [];
 	if (!empty($regOptions['theme_vars']))
 	{
 		foreach ($regOptions['theme_vars'] as $var => $value)
@@ -712,21 +713,21 @@ function registerMember(&$regOptions, $ErrorContext = 'register')
 	}
 
 	// Right, now let's prepare for insertion.
-	$knownInts = array(
+	$knownInts = [
 		'date_registered', 'posts', 'id_group', 'last_login', 'personal_messages', 'unread_messages', 'notifications',
 		'new_pm', 'pm_prefs', 'show_online', 'pm_email_notify', 'karma_good', 'karma_bad',
 		'notify_announcements', 'notify_send_body', 'notify_regularity', 'notify_types', 'notify_from',
 		'id_theme', 'is_activated', 'id_msg_last_visit', 'id_post_group', 'total_time_logged_in', 'warning',
-	);
-	$knownFloats = array(
+	];
+	$knownFloats = [
 		'time_offset',
-	);
+	];
 
 	// Call an optional function to validate the users' input.
-	call_integration_hook('integrate_register', array(&$regOptions, &$theme_vars, &$knownInts, &$knownFloats));
+	call_integration_hook('integrate_register', [&$regOptions, &$theme_vars, &$knownInts, &$knownFloats]);
 
-	$column_names = array();
-	$values = array();
+	$column_names = [];
+	$values = [];
 	foreach ($regOptions['register_vars'] as $var => $val)
 	{
 		$type = 'string';
@@ -752,7 +753,7 @@ function registerMember(&$regOptions, $ErrorContext = 'register')
 		'{db_prefix}members',
 		$column_names,
 		$values,
-		array('id_member')
+		['id_member']
 	);
 	$memberID = $db->insert_id('{db_prefix}members');
 
@@ -770,26 +771,26 @@ function registerMember(&$regOptions, $ErrorContext = 'register')
 	// Theme variables too?
 	if (!empty($theme_vars))
 	{
-		$inserts = array();
+		$inserts = [];
 		foreach ($theme_vars as $var => $val)
 		{
-			$inserts[] = array($memberID, $var, $val);
+			$inserts[] = [$memberID, $var, $val];
 		}
 		$db->insert('insert',
 			'{db_prefix}themes',
-			array('id_member' => 'int', 'variable' => 'string-255', 'value' => 'string-65534'),
+			['id_member' => 'int', 'variable' => 'string-255', 'value' => 'string-65534'],
 			$inserts,
-			array('id_member', 'variable')
+			['id_member', 'variable']
 		);
 	}
 
 	// If it's enabled, increase the registrations for today.
-	trackStats(array('registers' => '+'));
+	trackStats(['registers' => '+']);
 
 	// @todo emails should be sent from the controller, with a new method.
 
 	// Don't worry about what the emails might want to replace. Just give them everything and let them sort it out.
-	$replacements = array(
+	$replacements = [
 		'REALNAME' => $regOptions['register_vars']['real_name'],
 		'USERNAME' => $regOptions['username'],
 		'PASSWORD' => $regOptions['password'],
@@ -798,7 +799,7 @@ function registerMember(&$regOptions, $ErrorContext = 'register')
 		'ACTIVATIONLINKWITHOUTCODE' => $scripturl . '?action=register;sa=activate;u=' . $memberID,
 		'ACTIVATIONCODE' => $validation_code,
 		'COPPALINK' => $scripturl . '?action=about;sa=coppa;u=' . $memberID,
-	);
+	];
 
 	// Administrative registrations are a bit different...
 	if ($regOptions['interface'] === 'admin')
@@ -826,12 +827,12 @@ function registerMember(&$regOptions, $ErrorContext = 'register')
 		{
 			if (!empty($regOptions['send_welcome_email']))
 			{
-				$replacements = array(
+				$replacements = [
 					'REALNAME' => $regOptions['register_vars']['real_name'],
 					'USERNAME' => $regOptions['username'],
 					'PASSWORD' => $regOptions['password'],
 					'FORGOTPASSWORDLINK' => $scripturl . '?action=reminder',
-				);
+				];
 				$emaildata = loadEmailTemplate('register_immediate', $replacements);
 				$mark_down = new Html2Md(str_replace("\n", '<br>', $emaildata['body']));
 				$emaildata['body'] = $mark_down->get_markdown();
@@ -855,12 +856,12 @@ function registerMember(&$regOptions, $ErrorContext = 'register')
 		// Must be awaiting approval.
 		else
 		{
-			$replacements = array(
+			$replacements = [
 				'REALNAME' => $regOptions['register_vars']['real_name'],
 				'USERNAME' => $regOptions['username'],
 				'PASSWORD' => $regOptions['password'],
 				'FORGOTPASSWORDLINK' => $scripturl . '?action=reminder',
-			);
+			];
 
 			$emaildata = loadEmailTemplate('register_pending', $replacements);
 			$mark_down = new Html2Md(str_replace("\n", '<br>', $emaildata['body']));
@@ -878,7 +879,7 @@ function registerMember(&$regOptions, $ErrorContext = 'register')
 	}
 
 	// If they are for sure registered, let other people to know about it
-	call_integration_hook('integrate_register_after', array($regOptions, $memberID));
+	call_integration_hook('integrate_register_after', [$regOptions, $memberID]);
 
 	return $memberID;
 }
@@ -939,7 +940,7 @@ function isReservedName($name, $current_ID_MEMBER = 0, $is_name = true, $fatal =
 			{
 				if ($fatal)
 				{
-					throw new \ElkArte\Exceptions\Exception('username_reserved', 'password', array($reserved));
+					throw new \ElkArte\Exceptions\Exception('username_reserved', 'password', [$reserved]);
 				}
 
 				return true;
@@ -951,7 +952,7 @@ function isReservedName($name, $current_ID_MEMBER = 0, $is_name = true, $fatal =
 		{
 			if ($fatal)
 			{
-				throw new \ElkArte\Exceptions\Exception('name_censored', 'password', array($name));
+				throw new \ElkArte\Exceptions\Exception('name_censored', 'password', [$name]);
 			}
 
 			return true;
@@ -959,13 +960,13 @@ function isReservedName($name, $current_ID_MEMBER = 0, $is_name = true, $fatal =
 	}
 
 	// Characters we just shouldn't allow, regardless.
-	foreach (array('*') as $char)
+	foreach (['*'] as $char)
 	{
 		if (strpos($checkName, $char) !== false)
 		{
 			if ($fatal)
 			{
-				throw new \ElkArte\Exceptions\Exception('username_reserved', 'password', array($char));
+				throw new \ElkArte\Exceptions\Exception('username_reserved', 'password', [$char]);
 			}
 
 			return true;
@@ -973,7 +974,7 @@ function isReservedName($name, $current_ID_MEMBER = 0, $is_name = true, $fatal =
 	}
 
 	// Get rid of any SQL parts of the reserved name...
-	$checkName = strtr($name, array('_' => '\\_', '%' => '\\%'));
+	$checkName = strtr($name, ['_' => '\\_', '%' => '\\%']);
 
 	// Make sure they don't want someone else's name.
 	$request = $db->query('', '
@@ -983,10 +984,10 @@ function isReservedName($name, $current_ID_MEMBER = 0, $is_name = true, $fatal =
 		WHERE ' . (empty($current_ID_MEMBER) ? '' : 'id_member != {int:current_member}
 			AND ') . '({column_case_insensitive:real_name} LIKE {string_case_insensitive:check_name} OR {column_case_insensitive:member_name} LIKE {string:check_name})
 		LIMIT 1',
-		array(
+		[
 			'current_member' => $current_ID_MEMBER,
 			'check_name' => $checkName,
-		)
+		]
 	);
 	if ($request->num_rows() > 0)
 	{
@@ -1002,9 +1003,9 @@ function isReservedName($name, $current_ID_MEMBER = 0, $is_name = true, $fatal =
 		FROM {db_prefix}membergroups
 		WHERE {column_case_insensitive:group_name} LIKE {string_case_insensitive:check_name}
 		LIMIT 1',
-		array(
+		[
 			'check_name' => $checkName,
-		)
+		]
 	);
 	if ($request->num_rows() > 0)
 	{
@@ -1092,10 +1093,10 @@ function groupsAllowedTo($permission, $board_id = null)
 			FROM {db_prefix}board_permissions AS bp
 			WHERE bp.permission = {string:permission}
 				AND bp.id_profile = {int:profile_id}',
-			array(
+			[
 				'profile_id' => $profile_id,
 				'permission' => $permission,
-			)
+			]
 		)->fetch_callback(
 			function ($row) use (&$member_groups) {
 				$member_groups[$row['add_deny'] === '1' ? 'allowed' : 'denied'][] = (int) $row['id_group'];
@@ -1129,10 +1130,10 @@ function membersAllowedTo($permission, $board_id = null)
 	$member_groups = groupsAllowedTo($permission, $board_id);
 
 	$include_moderators = in_array(3, $member_groups['allowed']) && $board_id !== null;
-	$member_groups['allowed'] = array_diff($member_groups['allowed'], array(3));
+	$member_groups['allowed'] = array_diff($member_groups['allowed'], [3]);
 
 	$exclude_moderators = in_array(3, $member_groups['denied']) && $board_id !== null;
-	$member_groups['denied'] = array_diff($member_groups['denied'], array(3));
+	$member_groups['denied'] = array_diff($member_groups['denied'], [3]);
 
 	return $db->fetchQuery('
 		SELECT 
@@ -1141,16 +1142,16 @@ function membersAllowedTo($permission, $board_id = null)
 			LEFT JOIN {db_prefix}moderators AS mods ON (mods.id_member = mem.id_member AND mods.id_board = {int:board_id})' : '') . '
 		WHERE (' . ($include_moderators ? 'mods.id_member IS NOT NULL OR ' : '') . 'mem.id_group IN ({array_int:member_groups_allowed}) OR FIND_IN_SET({raw:member_group_allowed_implode}, mem.additional_groups) != 0 OR mem.id_post_group IN ({array_int:member_groups_allowed}))' . (empty($member_groups['denied']) ? '' : '
 			AND NOT (' . ($exclude_moderators ? 'mods.id_member IS NOT NULL OR ' : '') . 'mem.id_group IN ({array_int:member_groups_denied}) OR FIND_IN_SET({raw:member_group_denied_implode}, mem.additional_groups) != 0 OR mem.id_post_group IN ({array_int:member_groups_denied}))'),
-		array(
+		[
 			'member_groups_allowed' => $member_groups['allowed'],
 			'member_groups_denied' => $member_groups['denied'],
 			'board_id' => $board_id,
 			'member_group_allowed_implode' => implode(', mem.additional_groups) != 0 OR FIND_IN_SET(', $member_groups['allowed']),
 			'member_group_denied_implode' => implode(', mem.additional_groups) != 0 OR FIND_IN_SET(', $member_groups['denied']),
-		)
+		]
 	)->fetch_callback(
 		function ($row) {
-			return $row['id_member'];
+			return (int) $row['id_member'];
 		}
 	);
 }
@@ -1195,22 +1196,22 @@ function reattributePosts($memID, $email = false, $membername = false, $post_cou
 				AND m.icon != {string:recycled_icon}' . (empty($email) ? '' : '
 				AND m.poster_email = {string:email_address}') . (empty($membername) ? '' : '
 				AND m.poster_name = {string:member_name}'),
-			array(
+			[
 				'count_posts' => 0,
 				'guest_id' => 0,
 				'email_address' => $email,
 				'member_name' => $membername,
 				'is_approved' => 1,
 				'recycled_icon' => 'recycled',
-			)
+			]
 		);
 		list ($messageCount) = $request->fetch_row();
 		$request->free_result();
 
-		updateMemberData($memID, array('posts' => 'posts + ' . $messageCount));
+		updateMemberData($memID, ['posts' => 'posts + ' . $messageCount]);
 	}
 
-	$query_parts = array();
+	$query_parts = [];
 	if (!empty($email))
 	{
 		$query_parts[] = 'poster_email = {string:email_address}';
@@ -1229,11 +1230,11 @@ function reattributePosts($memID, $email = false, $membername = false, $post_cou
 		SET 
 			id_member = {int:memID}
 		WHERE ' . $query,
-		array(
+		[
 			'memID' => $memID,
 			'email_address' => $email,
 			'member_name' => $membername,
-		)
+		]
 	);
 
 	// ...and the topics too!
@@ -1243,13 +1244,13 @@ function reattributePosts($memID, $email = false, $membername = false, $post_cou
 			t.id_member_started = {int:memID}
 		WHERE m.id_member = {int:memID}
 			AND t.id_first_msg = m.id_msg',
-		array(
+		[
 			'memID' => $memID,
-		)
+		]
 	);
 
 	// Allow mods with their own post tables to re-attribute posts as well :)
-	call_integration_hook('integrate_reattribute_posts', array($memID, $email, $membername, $post_count));
+	call_integration_hook('integrate_reattribute_posts', [$memID, $email, $membername, $post_count]);
 }
 
 /**
@@ -1259,14 +1260,14 @@ function reattributePosts($memID, $email = false, $membername = false, $post_cou
  * @param int $items_per_page The number of items to show per page
  * @param string $sort A string indicating how to sort the results
  * @param string $where
- * @param mixed[] $where_params
+ * @param array $where_params
  * @param bool $get_duplicates
  *
  * @return array
  * @package Members
  *
  */
-function list_getMembers($start, $items_per_page, $sort, $where, $where_params = array(), $get_duplicates = false)
+function list_getMembers($start, $items_per_page, $sort, $where, $where_params = [], $get_duplicates = false)
 {
 	$db = database();
 
@@ -1279,11 +1280,11 @@ function list_getMembers($start, $items_per_page, $sort, $where, $where_params =
 		WHERE ' . ($where == '1' ? '1=1' : $where) . '
 		ORDER BY {raw:sort}
 		LIMIT {int:per_page} OFFSET {int:start}',
-		array_merge($where_params, array(
+		array_merge($where_params, [
 			'sort' => $sort,
 			'start' => $start,
 			'per_page' => $items_per_page,
-		))
+		])
 	)->fetch_all();
 
 	// If we want duplicates pass the members array off.
@@ -1299,13 +1300,13 @@ function list_getMembers($start, $items_per_page, $sort, $where, $where_params =
  * Gets the number of members, Callback for createList().
  *
  * @param string $where
- * @param mixed[] $where_params
+ * @param array $where_params
  *
  * @return int
  * @package Members
  *
  */
-function list_getNumMembers($where, $where_params = array())
+function list_getNumMembers($where, $where_params = [])
 {
 	global $modSettings;
 
@@ -1324,7 +1325,7 @@ function list_getNumMembers($where, $where_params = array())
 			SELECT COUNT(*)
 			FROM {db_prefix}members AS mem
 			WHERE ' . $where,
-			array_merge($where_params, array())
+			array_merge($where_params, [])
 		);
 		list ($num_members) = $request->fetch_row();
 		$request->free_result();
@@ -1336,7 +1337,7 @@ function list_getNumMembers($where, $where_params = array())
 /**
  * Find potential duplicate registration members based on the same IP address
  *
- * @param mixed[] $members
+ * @param array $members
  *
  * @return bool
  * @package Members
@@ -1347,11 +1348,11 @@ function populateDuplicateMembers(&$members)
 	$db = database();
 
 	// This will hold all the ip addresses.
-	$ips = array();
+	$ips = [];
 	foreach ($members as $key => $member)
 	{
 		// Create the duplicate_members element.
-		$members[$key]['duplicate_members'] = array();
+		$members[$key]['duplicate_members'] = [];
 
 		// Store the IPs.
 		if (!empty($member['member_ip']))
@@ -1375,20 +1376,20 @@ function populateDuplicateMembers(&$members)
 	// Fetch all members with this IP address, we'll filter out the current ones in a sec.
 	$potential_dupes = membersByIP($ips, 'exact', true);
 
-	$duplicate_members = array();
-	$duplicate_ids = array();
+	$duplicate_members = [];
+	$duplicate_ids = [];
 	foreach ($potential_dupes as $row)
 	{
 		//$duplicate_ids[] = $row['id_member'];
 
-		$member_context = array(
+		$member_context = [
 			'id' => $row['id_member'],
 			'name' => $row['member_name'],
 			'email' => $row['email_address'],
 			'is_banned' => $row['is_activated'] > 10,
 			'ip' => $row['member_ip'],
 			'ip2' => $row['member_ip2'],
-		);
+		];
 
 		if (in_array($row['member_ip'], $ips))
 		{
@@ -1401,7 +1402,7 @@ function populateDuplicateMembers(&$members)
 	}
 
 	// Also try to get a list of messages using these ips.
-	$had_ips = array();
+	$had_ips = [];
 	$db->fetchQuery('
 		SELECT
 			m.poster_ip, mem.id_member, mem.member_name, mem.email_address, mem.is_activated
@@ -1410,10 +1411,10 @@ function populateDuplicateMembers(&$members)
 		WHERE m.id_member != 0
 			' . (!empty($duplicate_ids) ? 'AND m.id_member NOT IN ({array_int:duplicate_ids})' : '') . '
 			AND m.poster_ip IN ({array_string:ips})',
-		array(
+		[
 			'duplicate_ids' => $duplicate_ids,
 			'ips' => $ips,
-		)
+		]
 	)->fetch_callback(
 		function ($row) use (&$had_ips, &$duplicate_members) {
 			// Don't collect lots of the same.
@@ -1423,14 +1424,14 @@ function populateDuplicateMembers(&$members)
 			}
 			$had_ips[$row['poster_ip']][] = $row['id_member'];
 
-			$duplicate_members[$row['poster_ip']][] = array(
+			$duplicate_members[$row['poster_ip']][] = [
 				'id' => $row['id_member'],
 				'name' => $row['member_name'],
 				'email' => $row['email_address'],
 				'is_banned' => $row['is_activated'] > 10,
 				'ip' => $row['poster_ip'],
 				'ip2' => $row['poster_ip'],
-			);
+			];
 		}
 	);
 
@@ -1450,7 +1451,7 @@ function populateDuplicateMembers(&$members)
 			}
 
 			// Check we don't have lots of the same member.
-			$member_track = array($member['id_member']);
+			$member_track = [$member['id_member']];
 			foreach ($members[$key]['duplicate_members'] as $duplicate_id_member => $duplicate_member)
 			{
 				if (in_array($duplicate_member['id'], $member_track))
@@ -1481,9 +1482,9 @@ function membersByIP($ip1, $match = 'exact', $ip2 = false)
 {
 	$db = database();
 
-	$ip_params = array('ips' => array());
-	$ip_query = array();
-	foreach (array($ip1, $ip2) as $id => $ip)
+	$ip_params = ['ips' => []];
+	$ip_query = [];
+	foreach ([$ip1, $ip2] as $id => $ip)
 	{
 		if ($ip === false)
 		{
@@ -1554,10 +1555,10 @@ function isAnotherAdmin($memberID)
 		WHERE (id_group = {int:admin_group} OR FIND_IN_SET({int:admin_group}, additional_groups) != 0)
 			AND id_member != {int:selected_member}
 		LIMIT 1',
-		array(
+		[
 			'admin_group' => 1,
 			'selected_member' => $memberID,
-		)
+		]
 	);
 	list ($another) = $request->fetch_row();
 	$request->free_result();
@@ -1568,8 +1569,8 @@ function isAnotherAdmin($memberID)
 /**
  * This function retrieves a list of member ids based on a set of conditions
  *
- * @param mixed[]|string $query see prepareMembersByQuery
- * @param mixed[] $query_params see prepareMembersByQuery
+ * @param array|string $query see prepareMembersByQuery
+ * @param array $query_params see prepareMembersByQuery
  * @param bool $details if true returns additional member details (name, email, ip, etc.)
  *             false will only return an array of member id's that match the conditions
  * @param bool $only_active see prepareMembersByQuery
@@ -1585,7 +1586,7 @@ function membersBy($query, $query_params, $details = false, $only_active = true)
 	$query_where = prepareMembersByQuery($query, $query_params, $only_active);
 
 	// Lets see who we can find that meets the built up conditions
-	$members = array();
+	$members = [];
 	$db->fetchQuery('
 		SELECT
 		 	id_member' . ($details ? ', member_name, real_name, email_address, member_ip, date_registered, last_login,
@@ -1618,7 +1619,7 @@ function membersBy($query, $query_params, $details = false, $only_active = true)
  * Counts the number of members based on conditions
  *
  * @param string[]|string $query see prepareMembersByQuery
- * @param mixed[] $query_params see prepareMembersByQuery
+ * @param array $query_params see prepareMembersByQuery
  * @param bool $only_active see prepareMembersByQuery
  *
  * @return int
@@ -1647,26 +1648,26 @@ function countMembersBy($query, $query_params, $only_active = true)
 /**
  * Builds the WHERE clause for the functions countMembersBy and membersBy
  *
- * @param mixed[]|string $query can be an array of "type" of conditions,
+ * @param array|string $query can be an array of "type" of conditions,
  *             or a string used as raw query
  *             or a string that represents one of the built-in conditions
  *             like member_names, not_in_group, etc
- * @param mixed[] $query_params is an array containing the parameters passed to the query
+ * @param array $query_params is an array containing the parameters passed to the query
  *             'start' and 'limit' used in LIMIT
  *             'order' used raw in ORDER BY
  *             others passed as query params
  * @param bool $only_active only fetch active members
  *
- * @return bool|mixed|mixed[]|string
+ * @return bool|mixed|array|string
  * @package Members
  *
  */
 function prepareMembersByQuery($query, &$query_params, $only_active = true)
 {
-	$allowed_conditions = array(
+	$allowed_conditions = [
 		'member_ids' => 'id_member IN ({array_int:member_ids})',
 		'member_names' => function (&$members) {
-			$mem_query = array();
+			$mem_query = [];
 
 			foreach ($members['member_names'] as $key => $param)
 			{
@@ -1681,12 +1682,12 @@ function prepareMembersByQuery($query, &$query_params, $only_active = true)
 		'in_group_primary' => 'id_group = {int:in_group_primary}',
 		'in_post_group' => 'id_post_group = {int:in_post_group}',
 		'in_group_no_add' => '(id_group = {int:in_group_no_add} AND FIND_IN_SET({int:in_group_no_add}, additional_groups) = 0)',
-	);
+	];
 
 	// Are there multiple parts to this query
 	if (is_array($query))
 	{
-		$query_parts = array('or' => array(), 'and' => array());
+		$query_parts = ['or' => [], 'and' => []];
 		foreach ($query as $type => $query_conditions)
 		{
 			if (is_array($query_conditions))
@@ -1765,7 +1766,7 @@ function admins($id_admin = 0)
 	$db = database();
 
 	// Now let's get out and loop through the admins.
-	$admins = array();
+	$admins = [];
 	$db->fetchQuery('
 		SELECT 
 			id_member, real_name, lngfile
@@ -1773,13 +1774,13 @@ function admins($id_admin = 0)
 		WHERE (id_group = {int:admin_group} OR FIND_IN_SET({int:admin_group}, additional_groups) != 0)
 			' . (empty($id_admin) ? '' : 'AND id_member = {int:specific_admin}') . '
 		ORDER BY real_name, lngfile',
-		array(
+		[
 			'admin_group' => 1,
 			'specific_admin' => isset($id_admin) ? (int) $id_admin : 0,
-		)
+		]
 	)->fetch_callback(
 		function ($row) use (&$admins) {
-			$admins[$row['id_member']] = array($row['real_name'], $row['lngfile']);
+			$admins[$row['id_member']] = [$row['real_name'], $row['lngfile']];
 		}
 	);
 
@@ -1799,7 +1800,7 @@ function maxMemberID()
 		SELECT 
 			MAX(id_member)
 		FROM {db_prefix}members',
-		array()
+		[]
 	);
 	list ($max_id) = $request->fetch_row();
 	$request->free_result();
@@ -1811,7 +1812,7 @@ function maxMemberID()
  * Load some basic member information
  *
  * @param int[]|int $member_ids an array of member IDs or a single ID
- * @param mixed[] $options an array of possible little alternatives, can be:
+ * @param array $options an array of possible little alternatives, can be:
  *  - 'add_guest' (bool) to add a guest user to the returned array
  *  - 'limit' int if set overrides the default query limit
  *  - 'sort' (string) a column to sort the results
@@ -1822,7 +1823,7 @@ function maxMemberID()
  * @return array
  * @package Members
  */
-function getBasicMemberData($member_ids, $options = array())
+function getBasicMemberData($member_ids, $options = [])
 {
 	global $txt, $language;
 
@@ -1839,19 +1840,19 @@ function getBasicMemberData($member_ids, $options = array())
 	if (!is_array($member_ids))
 	{
 		$single = true;
-		$member_ids = array($member_ids);
+		$member_ids = [$member_ids];
 	}
 
 	if (!empty($options['add_guest']))
 	{
 		$single = false;
 		// This is a guest...
-		$members[0] = array(
+		$members[0] = [
 			'id_member' => 0,
 			'member_name' => '',
 			'real_name' => $txt['guest_title'],
 			'email_address' => '',
-		);
+		];
 	}
 
 	// Get some additional member info...
@@ -1867,11 +1868,11 @@ function getBasicMemberData($member_ids, $options = array())
 		' . (isset($options['sort']) ? '
 		ORDER BY {raw:sort}' : '') . '
 		LIMIT {int:limit}',
-		array(
+		[
 			'member_list' => $member_ids,
 			'limit' => $options['limit'] ?? count($member_ids),
 			'sort' => $options['sort'] ?? '',
-		)
+		]
 	)->fetch_callback(
 		function ($row) use (&$members, $language, $single, $options) {
 			$row['id_member'] = (int) $row['id_member'];
@@ -1917,7 +1918,7 @@ function countInactiveMembers()
 {
 	$db = database();
 
-	$inactive_members = array();
+	$inactive_members = [];
 
 	$db->fetchQuery('
 		SELECT 
@@ -1925,9 +1926,9 @@ function countInactiveMembers()
 		FROM {db_prefix}members
 		WHERE is_activated != {int:is_activated}
 		GROUP BY is_activated',
-		array(
+		[
 			'is_activated' => 1,
-		)
+		]
 	)->fetch_callback(
 		function ($row) use (&$inactive_members) {
 			$inactive_members[(int) $row['is_activated']] = (int) $row['total_members'];
@@ -1958,9 +1959,9 @@ function getMemberByName($name, $flexible = false)
 		WHERE {column_case_insensitive:real_name} LIKE {string_case_insensitive:name}' . ($flexible ? '
 			OR {column_case_insensitive:member_name} LIKE {string_case_insensitive:name}' : '') . '
 		LIMIT 1',
-		array(
+		[
 			'name' => Util::strtolower($name),
-		)
+		]
 	);
 	if ($request->num_rows() === 0)
 	{
@@ -1984,16 +1985,16 @@ function getMemberByName($name, $flexible = false)
  * @package Members
  *
  */
-function getMember($search, $buddies = array())
+function getMember($search, $buddies = [])
 {
 	$db = database();
 
-	$xml_data = array(
-		'items' => array(
+	$xml_data = [
+		'items' => [
 			'identifier' => 'item',
-			'children' => array(),
-		),
-	);
+			'children' => [],
+		],
+	];
 	// Find the member.
 	$xml_data['items']['children'] = $db->fetchQuery('
 		SELECT 
@@ -2004,22 +2005,22 @@ function getMember($search, $buddies = array())
 			AND is_activated IN ({array_int:activation_status})
 		ORDER BY LENGTH(real_name), real_name
 		LIMIT {int:limit}',
-		array(
+		[
 			'buddy_list' => $buddies,
 			'search' => $search,
-			'activation_status' => array(1, 12),
+			'activation_status' => [1, 12],
 			'limit' => Util::strlen($search) <= 2 ? 100 : 200,
-		)
+		]
 	)->fetch_callback(
 		function ($row) {
-			$row['real_name'] = strtr($row['real_name'], array('&amp;' => '&#038;', '&lt;' => '&#060;', '&gt;' => '&#062;', '&quot;' => '&#034;'));
+			$row['real_name'] = strtr($row['real_name'], ['&amp;' => '&#038;', '&lt;' => '&#060;', '&gt;' => '&#062;', '&quot;' => '&#034;']);
 
-			return array(
-				'attributes' => array(
+			return [
+				'attributes' => [
 					'id' => $row['id_member'],
-				),
+				],
 				'value' => $row['real_name'],
-			);
+			];
 		}
 	);
 
@@ -2029,7 +2030,7 @@ function getMember($search, $buddies = array())
 /**
  * Retrieves MemberData based on conditions
  *
- * @param mixed[] $conditions associative array holding the conditions for the WHERE clause of the query.
+ * @param array $conditions associative array holding the conditions for the WHERE clause of the query.
  * Possible keys:
  * - activated_status (boolean) must be present
  * - time_before (integer)
@@ -2049,7 +2050,7 @@ function retrieveMemberData($conditions)
 
 	$db = database();
 
-	$available_conditions = array(
+	$available_conditions = [
 		'time_before' => '
 				AND date_registered < {int:time_before}',
 		'members' => '
@@ -2066,9 +2067,9 @@ function retrieveMemberData($conditions)
 				AND (id_group IN ({array_int:group_list}) OR id_post_group IN ({array_int:group_list}) OR FIND_IN_SET({raw:additional_group_list}, additional_groups) != 0)',
 		'notify_announcements' => '
 				AND notify_announcements = {int:notify_announcements}'
-	);
+	];
 
-	$query_cond = array();
+	$query_cond = [];
 	foreach ($conditions as $key => $dummy)
 	{
 		if (isset($available_conditions[$key]))
@@ -2082,7 +2083,7 @@ function retrieveMemberData($conditions)
 		$conditions['additional_group_list'] = implode(', additional_groups) != 0 OR FIND_IN_SET(', $conditions['group_list']);
 	}
 
-	$data = array();
+	$data = [];
 
 	if (!isset($conditions['order_by']))
 	{
@@ -2105,14 +2106,14 @@ function retrieveMemberData($conditions)
 			global $modSettings, $language;
 
 			$data['members'][] = (int) $row['id_member'];
-			$data['member_info'][] = array(
+			$data['member_info'][] = [
 				'id' => (int) $row['id_member'],
 				'username' => $row['member_name'],
 				'name' => $row['real_name'],
 				'email' => $row['email_address'],
 				'language' => empty($row['lngfile']) || empty($modSettings['userLanguage']) ? $language : $row['lngfile'],
 				'code' => $row['validation_code']
-			);
+			];
 		}
 	);
 
@@ -2124,7 +2125,7 @@ function retrieveMemberData($conditions)
 /**
  * Activate members
  *
- * @param mixed[] $conditions associative array holding the conditions for the WHERE clause of the query.
+ * @param array $conditions associative array holding the conditions for the WHERE clause of the query.
  * Possible keys:
  * - activated_status (boolean) must be present
  * - time_before (integer)
@@ -2141,15 +2142,15 @@ function approveMembers($conditions)
 	// This shall be present
 	assert(isset($conditions['activated_status']));
 
-	$available_conditions = array(
+	$available_conditions = [
 		'time_before' => '
 				AND date_registered < {int:time_before}',
 		'members' => '
 				AND id_member IN ({array_int:members})',
-	);
+	];
 
 	// @todo maybe an hook here?
-	$query_cond = array();
+	$query_cond = [];
 	$query = false;
 	foreach ($conditions as $key => $dummy)
 	{
@@ -2166,7 +2167,7 @@ function approveMembers($conditions)
 	if ($query)
 	{
 		$data = retrieveMemberData($conditions);
-		$members_id = array();
+		$members_id = [];
 		foreach ($data['member_info'] as $member)
 		{
 			$members_id[] = $member['username'];
@@ -2191,7 +2192,7 @@ function approveMembers($conditions)
 	// Let the integration know that they've been activated!
 	foreach ($members_id as $member_id)
 	{
-		call_integration_hook('integrate_activate', array($member_id, $conditions['activated_status'], $conditions['is_activated']));
+		call_integration_hook('integrate_activate', [$member_id, $conditions['activated_status'], $conditions['is_activated']]);
 	}
 
 	return $conditions['is_activated'];
@@ -2200,7 +2201,7 @@ function approveMembers($conditions)
 /**
  * Set these members for activation
  *
- * @param mixed[] $conditions associative array holding the conditions for the  WHERE clause of the query.
+ * @param array $conditions associative array holding the conditions for the  WHERE clause of the query.
  * Possible keys:
  * - selected_member (integer) must be present
  * - activated_status (boolean) must be present
@@ -2220,14 +2221,14 @@ function enforceReactivation($conditions)
 
 	$conditions['validation_code'] = substr(hash('sha256', $conditions['validation_code']), 0, 10);
 
-	$available_conditions = array(
+	$available_conditions = [
 		'time_before' => '
 				AND date_registered < {int:time_before}',
 		'members' => '
 				AND id_member IN ({array_int:members})',
-	);
+	];
 
-	$query_cond = array();
+	$query_cond = [];
 	foreach ($conditions as $key => $dummy)
 	{
 		if (isset($available_conditions[$key]))
@@ -2265,9 +2266,9 @@ function countMembersInGroup($id_group = 0)
 		 	COUNT(*)
 		FROM {db_prefix}members
 		WHERE id_group = {int:group}',
-		array(
+		[
 			'group' => $id_group,
-		)
+		]
 	);
 	list ($num_members) = $request->fetch_row();
 	$request->free_result();
@@ -2292,7 +2293,7 @@ function countMembersOnline($conditions)
 		FROM {db_prefix}log_online AS lo
 			LEFT JOIN {db_prefix}members AS mem ON (lo.id_member = mem.id_member)' . (!empty($conditions) ? '
 		WHERE ' . implode(' AND ', $conditions) : ''),
-		array()
+		[]
 	);
 	list ($totalMembers) = $request->fetch_row();
 	$request->free_result();
@@ -2327,13 +2328,13 @@ function onlineMembers($conditions, $sort_method, $sort_direction, $start)
 		WHERE ' . implode(' AND ', $conditions) : '') . '
 		ORDER BY {raw:sort_method} {raw:sort_direction}
 		LIMIT {int:limit} OFFSET {int:offset}',
-		array(
+		[
 			'regular_member' => 0,
 			'sort_method' => $sort_method,
 			'sort_direction' => $sort_direction === 'up' ? 'ASC' : 'DESC',
 			'offset' => $start,
 			'limit' => $modSettings['defaultMaxMembers'],
-		)
+		]
 	)->fetch_all();
 }
 
@@ -2357,9 +2358,9 @@ function recentMembers($limit)
 		FROM {db_prefix}members
 		ORDER BY id_member DESC
 		LIMIT {int:limit}',
-		array(
+		[
 			'limit' => $limit,
-		)
+		]
 	)->fetch_all();
 }
 
@@ -2373,7 +2374,7 @@ function recentMembers($limit)
  */
 function assignGroupsToMember($member, $primary_group, $additional_groups)
 {
-	updateMemberData($member, array('id_group' => $primary_group, 'additional_groups' => implode(',', $additional_groups)));
+	updateMemberData($member, ['id_group' => $primary_group, 'additional_groups' => implode(',', $additional_groups)]);
 }
 
 /**
@@ -2390,8 +2391,8 @@ function getConcernedMembers($groups, $where, $change_groups = false)
 	$db = database();
 
 	// Get the details of all the members concerned...
-	$email_details = array();
-	$group_changes = array();
+	$email_details = [];
+	$group_changes = [];
 	$db->fetchQuery('
 		SELECT 
 			lgr.id_request, lgr.id_member, lgr.id_group, mem.email_address, mem.id_group AS primary_group,
@@ -2403,9 +2404,9 @@ function getConcernedMembers($groups, $where, $change_groups = false)
 		WHERE ' . $where . '
 			AND lgr.id_request IN ({array_int:request_list})
 		ORDER BY mem.lngfile',
-		array(
+		[
 			'request_list' => $groups,
-		)
+		]
 	)->fetch_callback(
 		function ($row) use (&$email_details, &$group_changes, $change_groups) {
 			global $modSettings, $language;
@@ -2443,16 +2444,16 @@ function getConcernedMembers($groups, $where, $change_groups = false)
 				}
 
 				// Add them to the group master list.
-				$group_changes[$row['id_member']] = array(
+				$group_changes[$row['id_member']] = [
 					'primary' => $row['primary_group'],
 					'add' => $row['additional_groups'],
-				);
+				];
 			}
 
 			// Add required information to email them.
 			if ($row['notify_types'] != 4)
 			{
-				$email_details[] = array(
+				$email_details[] = [
 					'rid' => $row['id_request'],
 					'member_id' => $row['id_member'],
 					'member_name' => $row['member_name'],
@@ -2460,15 +2461,15 @@ function getConcernedMembers($groups, $where, $change_groups = false)
 					'group_name' => $row['group_name'],
 					'email' => $row['email_address'],
 					'language' => $row['lngfile'],
-				);
+				];
 			}
 		}
 	);
 
-	return array(
+	return [
 		'email_details' => $email_details,
 		'group_changes' => $group_changes
-	);
+	];
 }
 
 /**
@@ -2489,9 +2490,9 @@ function canContact($who)
 			receive_from, buddy_list, pm_ignore_list
 		FROM {db_prefix}members
 		WHERE id_member = {int:member}',
-		array(
+		[
 			'member' => $who,
-		)
+		]
 	);
 	list ($receive_from, $buddies, $ignore) = $request->fetch_row();
 	$request->free_result();
@@ -2538,9 +2539,9 @@ function updateMemberStats($id_member = null, $real_name = null)
 
 	$db = database();
 
-	$changes = array(
+	$changes = [
 		'memberlist_updated' => time(),
-	);
+	];
 
 	// #1 latest member ID, #2 the real name for a new registration.
 	if (is_int($id_member))
@@ -2548,7 +2549,7 @@ function updateMemberStats($id_member = null, $real_name = null)
 		$changes['latestMember'] = $id_member;
 		$changes['latestRealName'] = $real_name;
 
-		updateSettings(array('totalMembers' => true), true);
+		updateSettings(['totalMembers' => true], true);
 	}
 	// We need to calculate the totals.
 	else
@@ -2559,9 +2560,9 @@ function updateMemberStats($id_member = null, $real_name = null)
 			 	COUNT(*), MAX(id_member)
 			FROM {db_prefix}members
 			WHERE is_activated = {int:is_activated}',
-			array(
+			[
 				'is_activated' => 1,
-			)
+			]
 		);
 		list ($changes['totalMembers'], $changes['latestMember']) = $request->fetch_row();
 		$request->free_result();
@@ -2579,9 +2580,9 @@ function updateMemberStats($id_member = null, $real_name = null)
 					COUNT(*)
 				FROM {db_prefix}members
 				WHERE is_activated IN ({array_int:activation_status})',
-				array(
-					'activation_status' => array(3, 4),
-				)
+				[
+					'activation_status' => [3, 4],
+				]
 			);
 			list ($changes['unapprovedMembers']) = $request->fetch_row();
 			$request->free_result();
@@ -2595,9 +2596,9 @@ function updateMemberStats($id_member = null, $real_name = null)
 					COUNT(*)
 				FROM {db_prefix}members
 				WHERE is_activated = {int:coppa_approval}',
-				array(
+				[
 					'coppa_approval' => 5,
-				)
+				]
 			);
 			list ($coppa_approvals) = $request->fetch_row();
 			$request->free_result();
@@ -2628,7 +2629,7 @@ function memberQuerySeeBoard($id_member)
 {
 	global $modSettings;
 
-	$member = getBasicMemberData($id_member, array('moderation' => true));
+	$member = getBasicMemberData($id_member, ['moderation' => true]);
 	if (empty($member))
 	{
 		return '0=1';
@@ -2636,12 +2637,12 @@ function memberQuerySeeBoard($id_member)
 
 	if (empty($member['additional_groups']))
 	{
-		$groups = array($member['id_group'], $member['id_post_group']);
+		$groups = [$member['id_group'], $member['id_post_group']];
 	}
 	else
 	{
 		$groups = array_merge(
-			array($member['id_group'], $member['id_post_group']),
+			[$member['id_group'], $member['id_post_group']],
 			explode(',', $member['additional_groups'])
 		);
 	}
@@ -2656,15 +2657,13 @@ function memberQuerySeeBoard($id_member)
 	{
 		return '1=1';
 	}
-	else
-	{
-		require_once(SUBSDIR . '/Boards.subs.php');
 
-		$boards_mod = boardsModerated($id_member);
-		$mod_query = empty($boards_mod) ? '' : ' OR b.id_board IN (' . implode(',', $boards_mod) . ')';
+	require_once(SUBSDIR . '/Boards.subs.php');
 
-		return '((FIND_IN_SET(' . implode(', b.member_groups) != 0 OR FIND_IN_SET(', $groups) . ', b.member_groups) != 0)' . (!empty($modSettings['deny_boards_access']) ? ' AND (FIND_IN_SET(' . implode(', b.deny_member_groups) = 0 AND FIND_IN_SET(', $groups) . ', b.deny_member_groups) = 0)' : '') . $mod_query . ')';
-	}
+	$boards_mod = boardsModerated($id_member);
+	$mod_query = empty($boards_mod) ? '' : ' OR b.id_board IN (' . implode(',', $boards_mod) . ')';
+
+	return '((FIND_IN_SET(' . implode(', b.member_groups) != 0 OR FIND_IN_SET(', $groups) . ', b.member_groups) != 0)' . (!empty($modSettings['deny_boards_access']) ? ' AND (FIND_IN_SET(' . implode(', b.deny_member_groups) = 0 AND FIND_IN_SET(', $groups) . ', b.deny_member_groups) = 0)' : '') . $mod_query . ')';
 }
 
 /**
@@ -2688,7 +2687,7 @@ function updateMemberData($members, $data)
 
 	$db = database();
 
-	$parameters = array();
+	$parameters = [];
 	if (is_array($members))
 	{
 		$condition = 'id_member IN ({array_int:members})';
@@ -2705,16 +2704,16 @@ function updateMemberData($members, $data)
 	}
 
 	// Everything is assumed to be a string unless it's in the below.
-	$knownInts = array(
+	$knownInts = [
 		'date_registered', 'posts', 'id_group', 'last_login', 'personal_messages', 'unread_messages', 'mentions',
 		'new_pm', 'pm_prefs', 'show_online', 'pm_email_notify', 'receive_from', 'karma_good', 'karma_bad',
 		'notify_announcements', 'notify_send_body', 'notify_regularity', 'notify_types', 'notify_from',
 		'id_theme', 'is_activated', 'id_msg_last_visit', 'id_post_group', 'total_time_logged_in', 'warning', 'likes_given',
 		'likes_received', 'enable_otp', 'otp_used'
-	);
-	$knownFloats = array(
+	];
+	$knownFloats = [
 		'time_offset',
-	);
+	];
 
 	if (!empty($modSettings['integrate_change_member_data']))
 	{
@@ -2761,7 +2760,7 @@ function updateMemberData($members, $data)
 			{
 				foreach ($vars_to_integrate as $var)
 				{
-					call_integration_hook('integrate_change_member_data', array($member_names, &$var, &$data[$var], &$knownInts, &$knownFloats));
+					call_integration_hook('integrate_change_member_data', [$member_names, &$var, &$data[$var], &$knownInts, &$knownFloats]);
 				}
 			}
 		}
@@ -2793,7 +2792,7 @@ function updateMemberData($members, $data)
 		}
 
 		// Ensure posts, personal_messages, and unread_messages don't overflow or underflow.
-		if (in_array($var, array('posts', 'personal_messages', 'unread_messages')))
+		if (in_array($var, ['posts', 'personal_messages', 'unread_messages']))
 		{
 			if (preg_match('~^' . $var . ' (\+ |- |\+ -)([\d]+)~', $val, $match))
 			{
@@ -2826,7 +2825,7 @@ function updateMemberData($members, $data)
 	{
 		if (!is_array($members))
 		{
-			$members = array($members);
+			$members = [$members];
 		}
 
 		foreach ($members as $member)
@@ -2855,15 +2854,15 @@ function loadMembersIPs($ip_string, $ip_var)
 {
 	$db = database();
 
-	$ips = array();
+	$ips = [];
 	$db->fetchQuery('
 		SELECT
 			id_member, real_name AS display_name, member_ip
 		FROM {db_prefix}members
 		WHERE member_ip ' . $ip_string,
-		array(
+		[
 			'ip_address' => $ip_var,
-		)
+		]
 	)->fetch_callback(
 		function ($row) use (&$ips) {
 			$ips[$row['member_ip']][] = '<a href="' . getUrl('profile', ['action' => 'profile', 'u' => $row['id_member'], 'name' => $row['display_name']]) . '">' . $row['display_name'] . '</a>';
@@ -2888,20 +2887,20 @@ function registerAgreementAccepted($id_member, $ip, $agreement_version)
 
 	$db->insert('',
 		'{db_prefix}log_agreement_accept',
-		array(
+		[
 			'version' => 'date',
 			'id_member' => 'int',
 			'accepted_date' => 'date',
 			'accepted_ip' => 'string-255',
-		),
-		array(
-			array(
+		],
+		[
+			[
 				'version' => $agreement_version,
 				'id_member' => $id_member,
 				'accepted_date' => Util::strftime('%Y-%m-%d', forum_time(false)),
 				'accepted_ip' => $ip,
-			)
-		),
-		array('version', 'id_member')
+			]
+		],
+		['version', 'id_member']
 	);
 }

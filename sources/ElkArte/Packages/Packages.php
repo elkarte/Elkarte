@@ -39,7 +39,7 @@ use UnexpectedValueException;
  */
 class Packages extends AbstractController
 {
-	/** @var array|boolean listing of files in a packages */
+	/** @var array|bool listing of files in a packages */
 	private $_extracted_files;
 
 	/** @var int The id from the DB or an installed package */
@@ -144,7 +144,7 @@ class Packages extends AbstractController
 	/**
 	 * Test install/uninstall a package.
 	 */
-	public function action_install()
+	public function action_install(): void
 	{
 		global $txt, $context;
 
@@ -277,7 +277,7 @@ class Packages extends AbstractController
 	 *
 	 * @throws Exception when no directory can be made
 	 */
-	private function _create_temp_dir()
+	private function _create_temp_dir(): void
 	{
 		global $context, $scripturl, $package_ftp;
 
@@ -307,7 +307,7 @@ class Packages extends AbstractController
 	 * - Sets the base path as needed
 	 * - Loads $extracted_files with the package file listing
 	 */
-	private function _extract_files_temp()
+	private function _extract_files_temp(): void
 	{
 		// Is it a file in the package directory
 		if (is_file(BOARDDIR . '/packages/' . $this->_filename))
@@ -362,7 +362,7 @@ class Packages extends AbstractController
 	 * @return array
 	 * @throws Exception package_cant_uninstall, package_uninstall_cannot
 	 */
-	private function _get_package_actions($package_installed, $packageInfo, $testing = true)
+	private function _get_package_actions($package_installed, $packageInfo, $testing = true): array
 	{
 		global $context;
 
@@ -458,7 +458,7 @@ class Packages extends AbstractController
 	 *
 	 * @param array $themeFinds
 	 */
-	private function _multi_theme($themeFinds)
+	private function _multi_theme($themeFinds): void
 	{
 		global $settings, $txt, $context;
 
@@ -556,7 +556,7 @@ class Packages extends AbstractController
 	/**
 	 * Actually installs/uninstalls a package
 	 */
-	public function action_install2()
+	public function action_install2(): void
 	{
 		global $txt, $context, $modSettings;
 
@@ -779,7 +779,7 @@ class Packages extends AbstractController
 	 *
 	 * @return array
 	 */
-	private function _getCustomThemes()
+	private function _getCustomThemes(): array
 	{
 		global $modSettings;
 
@@ -808,7 +808,7 @@ class Packages extends AbstractController
 	 *
 	 * @return array
 	 */
-	private function _installThemes()
+	private function _installThemes(): array
 	{
 		global $context;
 
@@ -846,7 +846,7 @@ class Packages extends AbstractController
 	/**
 	 * List the files in a package.
 	 */
-	public function action_list()
+	public function action_list(): void
 	{
 		global $txt, $context;
 
@@ -881,7 +881,7 @@ class Packages extends AbstractController
 	/**
 	 * Display one of the files in a package.
 	 */
-	public function action_examine()
+	public function action_examine(): void
 	{
 		global $txt, $context;
 
@@ -943,7 +943,7 @@ class Packages extends AbstractController
 	/**
 	 * Empty out the installed list.
 	 */
-	public function action_flush()
+	public function action_flush(): void
 	{
 		// Always check the session.
 		checkSession('get');
@@ -962,7 +962,7 @@ class Packages extends AbstractController
 	/**
 	 * Delete a package.
 	 */
-	public function action_remove()
+	public function action_remove(): void
 	{
 		// Check it.
 		checkSession('get');
@@ -1010,7 +1010,7 @@ class Packages extends AbstractController
 	/**
 	 * Browse a list of packages.
 	 */
-	public function action_browse()
+	public function action_browse(): void
 	{
 		global $txt, $context;
 
@@ -1179,7 +1179,7 @@ class Packages extends AbstractController
 	 *
 	 * @uses Xml Template, generic_xml sub template
 	 */
-	public function action_ftptest()
+	public function action_ftptest(): void
 	{
 		global $context, $txt, $package_ftp;
 
@@ -1215,7 +1215,7 @@ class Packages extends AbstractController
 	/**
 	 * Used when a temp FTP access is needed to package functions
 	 */
-	public function action_options()
+	public function action_options(): void
 	{
 		global $txt, $context, $modSettings;
 
@@ -1255,7 +1255,7 @@ class Packages extends AbstractController
 	/**
 	 * List operations
 	 */
-	public function action_showoperations()
+	public function action_showoperations(): void
 	{
 		global $context, $txt;
 
@@ -1702,7 +1702,7 @@ class Packages extends AbstractController
 	 *
 	 * @return void
 	 */
-	public function determineDatabaseChanges($packageInfo, $package_installed)
+	public function determineDatabaseChanges($packageInfo, $package_installed): void
 	{
 		global $context, $txt;
 
@@ -1739,7 +1739,7 @@ class Packages extends AbstractController
 	 *
 	 * @return int
 	 */
-	private function _sort_table_first($a, $b)
+	private function _sort_table_first($a, $b): int
 	{
 		if ($a[0] === $b[0])
 		{

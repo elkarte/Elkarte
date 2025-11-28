@@ -54,7 +54,7 @@ class Agreement
 	public function __construct($language, $backup_dir = null)
 	{
 		$this->fileFunc = FileFunctions::instance();
-		$this->_language = ucfirst(strtr($language, array('.' => '')));
+		$this->_language = ucfirst(strtr($language, ['.' => '']));
 
 		if ($backup_dir === null || !$this->fileFunc->fileExists($backup_dir))
 		{
@@ -117,7 +117,7 @@ class Agreement
 	 *
 	 * @return string
 	 */
-	public function getPlainText($fallback = true, $language = null)
+	public function getPlainText($fallback = true, $language = null): string
 	{
 		$language = $language ?? $this->_language;
 		$file = $this->buildName($language);
@@ -146,7 +146,7 @@ class Agreement
 	 *
 	 * @return string
 	 */
-	public function getParsedText($fallback = true)
+	public function getParsedText($fallback = true): string
 	{
 		return ParserWrapper::instance()->parseAgreement($this->getPlainText($fallback));
 	}
@@ -156,7 +156,7 @@ class Agreement
 	 *
 	 * If the file does not exist, attempts to create it.
 	 */
-	public function isWritable()
+	public function isWritable(): bool
 	{
 		$filename = $this->buildName($this->_language);
 
@@ -175,17 +175,17 @@ class Agreement
 	 * @param int $id_member The id of the member
 	 * @param string $version The date of the agreement
 	 */
-	public function checkAccepted($id_member, $version)
+	public function checkAccepted($id_member, $version): bool
 	{
 		$accepted = $this->_db->fetchQuery('
 			SELECT 1
 			FROM ' . $this->_log_table_name . '
 			WHERE version = {string:version}
 				AND id_member = {int:id_member}',
-			array(
+			[
 				'id_member' => $id_member,
 				'version' => $version,
-			)
+			]
 		);
 
 		return !empty($accepted);
@@ -199,27 +199,27 @@ class Agreement
 	 * @param string $version
 	 * @throws \Exception
 	 */
-	public function accept($id_member, $ip, $version)
+	public function accept($id_member, $ip, $version): void
 	{
 		$db = database();
 
 		$db->insert('ignore',
 			$this->_log_table_name,
-			array(
+			[
 				'version' => 'string-20',
 				'id_member' => 'int',
 				'accepted_date' => 'date',
 				'accepted_ip' => 'string-255',
-			),
-			array(
-				array(
+			],
+			[
+				[
 					'version' => $version,
 					'id_member' => $id_member,
 					'accepted_date' => Util::strftime('%Y-%m-%d', forum_time(false)),
 					'accepted_ip' => $ip,
-				)
-			),
-			array('version', 'id_member')
+				]
+			],
+			['version', 'id_member']
 		);
 	}
 
@@ -232,7 +232,7 @@ class Agreement
 	 *
 	 * @return string The generated backup ID
 	 */
-	protected function _backupId()
+	protected function _backupId(): string
 	{
 		$backup_id = Util::strftime('%Y-%m-%d', forum_time(false));
 		$counter = '';
@@ -253,7 +253,7 @@ class Agreement
 	 * @param string $backup_id the name of the directory of the backup
 	 * @return bool true if successful, false if fails to create the directory
 	 */
-	protected function _createBackup($backup_id)
+	protected function _createBackup($backup_id): bool
 	{
 		$destination = $this->_backup_dir . '/' . $backup_id . '/';
 		if (!$this->fileFunc->fileExists($this->_backup_dir))
@@ -281,7 +281,7 @@ class Agreement
 	 * @param string $language
 	 * @return string
 	 */
-	protected function buildName($language)
+	protected function buildName($language): string
 	{
 		return SOURCEDIR . '/ElkArte/Languages/' . $this->_file_name . '/' . $language . '.txt';
 	}

@@ -100,7 +100,7 @@ class PackageActions extends AbstractController
 	 * @param string $base_path base path for the package within the temp directory
 	 * @param array $theme_paths
 	 */
-	public function test_init($actions, $uninstalling, $base_path, $theme_paths)
+	public function test_init($actions, $uninstalling, $base_path, $theme_paths): void
 	{
 		// This will hold data about anything that can be installed in other themes.
 		$this->themeFinds = [
@@ -127,7 +127,7 @@ class PackageActions extends AbstractController
 	/**
 	 * "controller" for the test installation actions
 	 */
-	public function action_test()
+	public function action_test(): void
 	{
 		// Admins-only!
 		isAllowedTo('admin_forum');
@@ -188,7 +188,7 @@ class PackageActions extends AbstractController
 	/**
 	 * Test install loop collector
 	 */
-	private function _action_our_actions()
+	private function _action_our_actions(): void
 	{
 		global $txt;
 
@@ -254,7 +254,7 @@ class PackageActions extends AbstractController
 	 * @param array $theme_paths
 	 * @param array $themes_installed
 	 */
-	public function install_init($actions, $uninstalling, $base_path, $theme_paths, $themes_installed)
+	public function install_init($actions, $uninstalling, $base_path, $theme_paths, $themes_installed): void
 	{
 		// Pass the vars
 		$this->_passed_actions = $actions;
@@ -270,7 +270,7 @@ class PackageActions extends AbstractController
 	/**
 	 * Called when we are actually installing an addon
 	 */
-	public function action_install()
+	public function action_install(): void
 	{
 		// Admins-only!
 		isAllowedTo('admin_forum');
@@ -316,7 +316,7 @@ class PackageActions extends AbstractController
 	/**
 	 * Chmod action requested, add it to the list
 	 */
-	public function action_chmod()
+	public function action_chmod(): void
 	{
 		$this->chmod_files[] = $this->_action['filename'];
 	}
@@ -324,7 +324,7 @@ class PackageActions extends AbstractController
 	/**
 	 * The readme that addon authors always spend quality time producing
 	 */
-	public function action_readme()
+	public function action_readme(): void
 	{
 		global $context;
 
@@ -362,21 +362,21 @@ class PackageActions extends AbstractController
 	/**
 	 * Noted for test, handled in the real install
 	 */
-	public function action_redirect()
+	public function action_redirect(): void
 	{
 	}
 
 	/**
 	 * Don't know this one or handled outside.
 	 */
-	public function action_skip()
+	public function action_skip(): void
 	{
 	}
 
 	/**
 	 * Set the warning message that there is a problem
 	 */
-	public function action_error()
+	public function action_error(): void
 	{
 		global $txt;
 
@@ -398,7 +398,7 @@ class PackageActions extends AbstractController
 	 * <modification></modification> or <modification />
 	 * <search>, <add>, <replace>, before, after, ignore attributes
 	 */
-	public function action_modification()
+	public function action_modification(): void
 	{
 		global $context, $txt;
 
@@ -468,7 +468,7 @@ class PackageActions extends AbstractController
 	 * @param array $mod_action
 	 * @param string $key
 	 */
-	private function _get_filename($mod_action, $key)
+	private function _get_filename($mod_action, $key): void
 	{
 		// Lets get the last section of the file name.
 		if (isset($mod_action['filename']) && substr($mod_action['filename'], -13) !== '.template.php')
@@ -490,7 +490,7 @@ class PackageActions extends AbstractController
 	 *
 	 * @param array $mod_action
 	 */
-	private function _check_modification($mod_action)
+	private function _check_modification($mod_action): void
 	{
 		global $context, $txt;
 
@@ -586,7 +586,7 @@ class PackageActions extends AbstractController
 	 * <code></code> or <code /> (for use with type="file" only)
 	 * Filename of a php file to be required.
 	 */
-	public function action_code()
+	public function action_code(): void
 	{
 		global $txt;
 
@@ -602,7 +602,7 @@ class PackageActions extends AbstractController
 	 * <database></database> or <database /> (for use with type="file" only)
 	 * Filename of a database code to be executed.
 	 */
-	public function action_database()
+	public function action_database(): void
 	{
 		global $txt;
 
@@ -616,7 +616,7 @@ class PackageActions extends AbstractController
 	 * An empty directory or blank file will need to be created
 	 * <create-dir /> or <create-file />
 	 */
-	public function action_create_dir_file()
+	public function action_create_dir_file(): void
 	{
 		global $txt;
 
@@ -629,7 +629,7 @@ class PackageActions extends AbstractController
 	/**
 	 * Hooks to add during the installation
 	 */
-	public function action_hook()
+	public function action_hook(): void
 	{
 		global $txt;
 
@@ -649,7 +649,7 @@ class PackageActions extends AbstractController
 	/**
 	 * Credits that will be added to the about area
 	 */
-	public function action_credits()
+	public function action_credits(): void
 	{
 		global $txt;
 
@@ -662,7 +662,7 @@ class PackageActions extends AbstractController
 	/**
 	 * Checks if this addon relies on other addons to be installed
 	 */
-	public function action_requries()
+	public function action_requries(): void
 	{
 		global $txt;
 
@@ -697,7 +697,7 @@ class PackageActions extends AbstractController
 	 * - <require-file /> require-file destination
 	 * - <require-dir /> require-dir destination
 	 */
-	public function action_require_dir_file()
+	public function action_require_dir_file(): void
 	{
 		global $txt;
 
@@ -720,7 +720,7 @@ class PackageActions extends AbstractController
 	 * @param string $destination
 	 * @param bool $set_destination
 	 */
-	private function _check_theme_actions($destination, $set_destination = false)
+	private function _check_theme_actions($destination, $set_destination = false): void
 	{
 		if (preg_match('~^\$(languagedir|languages_dir|imagesdir|themedir|themes_dir)~i', $destination, $matches))
 		{
@@ -762,7 +762,7 @@ class PackageActions extends AbstractController
 	 * <move-dir />
 	 * <move-file />
 	 */
-	public function action_move_dir_file()
+	public function action_move_dir_file(): void
 	{
 		global $txt;
 
@@ -777,7 +777,7 @@ class PackageActions extends AbstractController
 	 * <remove-dir />
 	 * <remove-file />
 	 */
-	public function action_remove_dir_file()
+	public function action_remove_dir_file(): void
 	{
 		global $txt;
 
@@ -797,7 +797,7 @@ class PackageActions extends AbstractController
 	 * Modify one of the core files!  Lets parseModification do the work and
 	 * reports on errors
 	 */
-	public function action_modification2()
+	public function action_modification2(): void
 	{
 		if (!empty($this->_action['filename']))
 		{
@@ -828,7 +828,7 @@ class PackageActions extends AbstractController
 	/**
 	 * Runs a code file that was supplied with the addon
 	 */
-	public function action_code2()
+	public function action_code2(): void
 	{
 		if ($this->_action['type'] === 'code' && !empty($this->_action['filename']))
 		{
@@ -845,7 +845,7 @@ class PackageActions extends AbstractController
 	/**
 	 * Sets up for installing addon credits to the forum
 	 */
-	public function action_credits2()
+	public function action_credits2(): void
 	{
 		if ($this->_action['type'] === 'credits')
 		{
@@ -862,7 +862,7 @@ class PackageActions extends AbstractController
 	/**
 	 * Do the actual add or removal of hooks
 	 */
-	public function action_hook2()
+	public function action_hook2(): void
 	{
 		if (isset($this->_action['hook'], $this->_action['function']))
 		{
@@ -880,7 +880,7 @@ class PackageActions extends AbstractController
 	/**
 	 * Updates the database as defined by the addon db files
 	 */
-	public function action_database2()
+	public function action_database2(): void
 	{
 		// Only do the database changes on uninstall if requested.
 		if (!empty($this->_action['filename']) && (!$this->_uninstalling || !empty(HttpReq::instance()->post->do_db_changes)))
@@ -899,7 +899,7 @@ class PackageActions extends AbstractController
 	/**
 	 * Redirect to a page, generally the addon settings page but could be anywhere
 	 */
-	public function action_redirect2()
+	public function action_redirect2(): void
 	{
 		global $boardurl, $scripturl, $context, $txt;
 

@@ -120,6 +120,7 @@ function template_html_above()
 	<link rel="icon" sizes="any" href="' . $context['favicon'] . '" />
 	<link rel="apple-touch-icon" href="' . $context['apple_touch'] . '" />';
 
+	// Personal Web Application Manifest
 	if (!empty($context['pwa_manifest_enabled']))
 	{
 		echo '
@@ -170,13 +171,13 @@ function template_html_above()
 	<link rel="index" href="', $scripturl, '?board=', $context['current_board'], '.0" />';
 	}
 
-	// load in css from addons or themes, do it first so overrides are possible
+	// load in CSS from addons or themes, do it first so overrides are possible
 	theme()->themeCss()->template_css();
 
-	// load in any javascript files and inline from addons and themes
+	// load in any JavaScript files and inline from addons and themes
 	theme()->themeJs()->template_javascript();
 
-	// load in any inline css files from addons and themes
+	// load in any inline CSS files from addons and themes
 	theme()->themeCss()->template_inlinecss();
 
 	// Output any remaining HTML headers. (from addons, maybe?)
@@ -541,7 +542,6 @@ function template_menu()
 
 	// WAI-ARIA a11y tweaks have been applied here.
 	echo '
-				
 				<nav id="menu_nav" aria-label="', $txt['main_menu'], '">
 					<div class="wrapper no_js">
 					<input type="checkbox" id="search_form_check" aria-hidden="true" />
@@ -550,7 +550,7 @@ function template_menu()
 	// Add any additional menu buttons from addons
 	call_template_callbacks('mb', $context['theme_header_callbacks']);
 
-	// This defines the start of right aligned buttons, simply set your button order > 10
+	// This defines the start of right-aligned buttons, set your button order > 10
 	echo '
 						<li id="button_none" class="listlevel1" role="none">
 							<a role="none"></a>
@@ -652,9 +652,9 @@ function template_menu()
 			aSwapClasses: [
 				{
 					sId: \'upshrink\',
-					classExpanded: \'chevricon i-chevron-up icon-lg\',
+					classExpanded: \'main-menu-icon i-chevron-up\',
 					titleExpanded: ' . JavaScriptEscape($txt['upshrink_description']) . ',
-					classCollapsed: \'chevricon i-chevron-down icon-lg\',
+					classCollapsed: \'main-menu-icon i-chevron-down\',
 					titleCollapsed: ' . JavaScriptEscape($txt['upshrink_description']) . '
 				},
 			],

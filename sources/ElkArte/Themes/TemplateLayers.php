@@ -22,7 +22,7 @@ use ElkArte\Priority;
  */
 class TemplateLayers extends Priority
 {
-	/** @var array Layers not removed in case of errors */
+	/** @var array Layers aren't removed in case of errors */
 	private $_error_safe_layers = [];
 
 	/** @var bool Are we handling an error? Hopefully not, so default is false */
@@ -31,7 +31,7 @@ class TemplateLayers extends Priority
 	/**
 	 * @return string[]
 	 */
-	public function getErrorSafeLayers()
+	public function getErrorSafeLayers(): array
 	{
 		return $this->_error_safe_layers;
 	}
@@ -39,17 +39,17 @@ class TemplateLayers extends Priority
 	/**
 	 * @param string[] $error_safe_layers
 	 */
-	public function setErrorSafeLayers(array $error_safe_layers)
+	public function setErrorSafeLayers(array $error_safe_layers): void
 	{
 		$this->_error_safe_layers = $error_safe_layers;
 	}
 
 	/**
-	 * Reverse the layers order
+	 * Reverse the layer order
 	 *
-	 * @return array The reverse ordered layers
+	 * @return array The reverse-ordered layers
 	 */
-	public function reverseLayers()
+	public function reverseLayers(): array
 	{
 		if ($this->_sorted_entities === null)
 		{
@@ -66,7 +66,7 @@ class TemplateLayers extends Priority
 	 *
 	 * @return array the sorted layers
 	 */
-	public function prepareContext()
+	public function prepareContext(): array
 	{
 		$all_layers = $this->sort();
 
@@ -74,15 +74,10 @@ class TemplateLayers extends Priority
 		if ($this->_is_error)
 		{
 			$dummy = $all_layers;
-			$all_layers = [];
 
-			foreach ($dummy as $key => $val)
-			{
-				if (in_array($key, $this->_error_safe_layers))
-				{
-					$all_layers[$key] = $val;
-				}
-			}
+			$all_layers = array_filter($dummy, function ($key) {
+				return in_array($key, $this->_error_safe_layers);
+			}, ARRAY_FILTER_USE_KEY);
 		}
 
 		asort($all_layers);
@@ -113,18 +108,41 @@ class TemplateLayers extends Priority
 	}
 
 	/**
-	 * Return the layers that have been loaded
+	 * Checks if a specific layer has been loaded
+	 *
+	 * @param string $layerName The name of the layer to check
+	 * @return bool True if the layer exists, false otherwise
 	 */
-	public function getLayers()
+	public function hasLayer(string $layerName): bool
 	{
-		return array_keys(array_merge($this->_all_general, $this->_all_begin, $this->_all_end, $this->_all_after,
-			$this->_all_before));
+		return array_key_exists($layerName, $this->getLoadedLayers());
+	}
+
+	/**
+	 * Retrieves all the currently loaded layers by combining various categories of layers.
+	 * The method merges general layers, begin layers, end layers, after layers, and before layers into a single array.
+	 *
+	 * @return array the combined list of all loaded layers
+	 */
+	public function getLoadedLayers(): array
+	{
+		return array_merge($this->_all_general, $this->_all_begin, $this->_all_end, $this->_all_after, $this->_all_before);
+	}
+
+	/**
+	 * Retrieves all layers by merging different layer groups and returning their keys.
+	 *
+	 * @return array the keys of the merged layer groups
+	 */
+	public function getLayers(): array
+	{
+		return array_keys(array_merge($this->_all_general, $this->_all_begin, $this->_all_end, $this->_all_after, $this->_all_before));
 	}
 
 	/**
 	 * Turns "error mode" on, so that only the allowed layers are displayed
 	 */
-	public function isError()
+	public function isError(): void
 	{
 		$this->_is_error = true;
 	}

@@ -40,7 +40,7 @@ abstract class AbstractTable
 	public function __construct(protected $_db, protected $_db_prefix)
 	{
 		// We won't do any remove on these
-		$this->_reservedTables = array('admin_info_files', 'approval_queue', 'attachments', 'ban_groups', 'ban_items',
+		$this->_reservedTables = ['admin_info_files', 'approval_queue', 'attachments', 'ban_groups', 'ban_items',
 			'board_permissions', 'boards', 'calendar', 'calendar_holidays', 'categories', 'collapsed_categories',
 			'custom_fields', 'group_moderators', 'log_actions', 'log_activity', 'log_banned', 'log_boards',
 			'log_digest', 'log_errors', 'log_floodcontrol', 'log_group_requests', 'log_karma', 'log_mark_read',
@@ -49,7 +49,7 @@ abstract class AbstractTable
 			'log_search_topics', 'log_topics', 'mail_queue', 'membergroups', 'members', 'message_icons',
 			'messages', 'moderators', 'package_servers', 'permission_profiles', 'permissions', 'personal_messages',
 			'pm_recipients', 'poll_choices', 'polls', 'scheduled_tasks', 'sessions', 'settings', 'smileys',
-			'themes', 'topics');
+			'themes', 'topics'];
 
 		foreach ($this->_reservedTables as $k => $table_name)
 		{
@@ -93,12 +93,12 @@ abstract class AbstractTable
 	 *                )
 	 * @return bool
 	 */
-	public function create_table($table_name, $columns, $indexes = array(), $parameters = array())
+	public function create_table($table_name, $columns, $indexes = [], $parameters = []): bool
 	{
-		$parameters = array_merge(array(
+		$parameters = array_merge([
 			'if_exists' => 'ignore',
 			'temporary' => false,
-		), $parameters);
+		], $parameters);
 
 		// With or without the database name, the fullname looks like this.
 		$full_table_name = str_replace('{db_prefix}', $this->_real_prefix(), $table_name);
@@ -111,7 +111,7 @@ abstract class AbstractTable
 		}
 
 		// Log that we'll want to remove this on uninstall.
-		$this->_package_log[] = array('remove_table', $table_name);
+		$this->_package_log[] = ['remove_table', $table_name];
 
 		// This... my friends... is a function in a half - let's start by checking if the table exists!
 		if ($parameters['if_exists'] === 'force_drop')
@@ -160,9 +160,9 @@ abstract class AbstractTable
 
 		// Create the table!
 		$this->_db->query('', $table_query,
-			array(
+			[
 				'security_override' => true,
-			)
+			]
 		);
 
 		// And the indexes... if any
@@ -194,7 +194,7 @@ abstract class AbstractTable
 	 * @param string $table_name
 	 * @return bool
 	 */
-	public function table_exists($table_name)
+	public function table_exists($table_name): bool
 	{
 		$filter = $this->_db->list_tables(false, $table_name);
 
@@ -237,7 +237,7 @@ abstract class AbstractTable
 	 * @param array $parameters default array()
 	 * @param string $if_exists default 'update'
 	 */
-	abstract public function add_column($table_name, $column_info, $parameters = array(), $if_exists = 'update');
+	abstract public function add_column($table_name, $column_info, $parameters = [], $if_exists = 'update');
 
 	/**
 	 * Removes a column.
@@ -246,7 +246,7 @@ abstract class AbstractTable
 	 * @param string $column_name
 	 * @param array $parameters default array()
 	 */
-	abstract public function remove_column($table_name, $column_name, $parameters = array());
+	abstract public function remove_column($table_name, $column_name, $parameters = []);
 
 	/**
 	 * Change a column.
@@ -256,7 +256,7 @@ abstract class AbstractTable
 	 * @param array $column_info
 	 * @param array $parameters default array()
 	 */
-	abstract public function change_column($table_name, $old_column, $column_info, $parameters = array());
+	abstract public function change_column($table_name, $old_column, $column_info, $parameters = []);
 
 	/**
 	 * Add an index.
@@ -266,7 +266,7 @@ abstract class AbstractTable
 	 * @param array $parameters default array()
 	 * @param string $if_exists default 'update'
 	 */
-	abstract public function add_index($table_name, $index_info, $parameters = array(), $if_exists = 'update');
+	abstract public function add_index($table_name, $index_info, $parameters = [], $if_exists = 'update');
 
 	/**
 	 * Remove an index.
@@ -275,7 +275,7 @@ abstract class AbstractTable
 	 * @param string $index_name
 	 * @param array $parameters default array()
 	 */
-	abstract public function remove_index($table_name, $index_name, $parameters = array());
+	abstract public function remove_index($table_name, $index_name, $parameters = []);
 
 	/**
 	 * Get the schema formatted name for a type.
@@ -309,7 +309,7 @@ abstract class AbstractTable
 	 * @param string $column_name
 	 * @return bool
 	 */
-	public function column_exists($table_name, $column_name)
+	public function column_exists($table_name, $column_name): bool
 	{
 		return $this->_get_column_info($table_name, $column_name) !== false;
 	}
@@ -344,7 +344,7 @@ abstract class AbstractTable
 	 * @param array $parameters default array()
 	 * @return mixed
 	 */
-	abstract public function list_columns($table_name, $detail = false, $parameters = array());
+	abstract public function list_columns($table_name, $detail = false, $parameters = []);
 
 	/**
 	 * Returns name, columns and indexes of a table
@@ -371,13 +371,13 @@ abstract class AbstractTable
 	 * @param array $parameters
 	 * @return mixed
 	 */
-	abstract public function list_indexes($table_name, $detail = false, $parameters = array());
+	abstract public function list_indexes($table_name, $detail = false, $parameters = []);
 
 	/**
 	 * Clean the indexes strings (e.g. PostgreSQL doesn't support max length)
 	 *
 	 * @param string[] $columns
-	 * @return string
+	 * @return string[]
 	 */
 	protected function _clean_indexes($columns)
 	{
@@ -397,9 +397,9 @@ abstract class AbstractTable
 		return $this->_db->query('', '
 			ALTER TABLE ' . $table_name . '
 			' . $statement,
-			array(
+			[
 				'security_override' => true,
-			)
+			]
 		);
 	}
 }

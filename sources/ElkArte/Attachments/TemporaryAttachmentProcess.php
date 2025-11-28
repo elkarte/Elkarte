@@ -25,22 +25,22 @@ use ElkArte\Helper\HttpReq;
 class TemporaryAttachmentProcess
 {
 	/** @var AttachmentErrorContext */
-	public $attach_errors;
+	public AttachmentErrorContext $attach_errors;
 
 	/** @var FileFunctions */
-	public $file_functions;
+	public FileFunctions $file_functions;
 
 	/** @var TemporaryAttachmentsList */
-	public $tmp_attachments;
+	public TemporaryAttachmentsList $tmp_attachments;
 
 	/** @var AttachmentsDirectory */
-	public $attachmentDirectory;
+	public AttachmentsDirectory $attachmentDirectory;
 
 	/** @var HttpReq */
-	public $req;
+	public HttpReq $req;
 
 	/** @var bool if to use rename or move_uploaded_file (strict) */
-	public $strict = true;
+	public bool $strict = true;
 
 	/**
 	 * Class constructor.
@@ -72,7 +72,7 @@ class TemporaryAttachmentProcess
 	 *                    If 0, this is an upload in progress for a new post.
 	 * @return bool
 	 */
-	public function processAttachments($id_msg = 0)
+	public function processAttachments(int $id_msg = 0): bool
 	{
 		global $topic, $board;
 
@@ -136,7 +136,7 @@ class TemporaryAttachmentProcess
 	 *
 	 * @return bool Returns `true` if processing is needed, otherwise returns `false`.
 	 */
-	private function hasAttachmentsToProcess()
+	private function hasAttachmentsToProcess(): bool
 	{
 		if ($this->tmp_attachments->getPostParam('files') !== null)
 		{
@@ -158,7 +158,7 @@ class TemporaryAttachmentProcess
 	 *
 	 * @return void
 	 */
-	private function setupAttachmentDirectory()
+	private function setupAttachmentDirectory(): void
 	{
 		$action = $this->req->getRequest('action', 'trim', '');
 
@@ -171,7 +171,7 @@ class TemporaryAttachmentProcess
 	 *
 	 * @param string $attach_current_dir The path to the attachment directory.
 	 */
-	private function ensureDirectoryExists($attach_current_dir)
+	private function ensureDirectoryExists(string $attach_current_dir): void
 	{
 		global $txt;
 
@@ -194,7 +194,7 @@ class TemporaryAttachmentProcess
 	 * @param int $id_msg The message id
 	 * @return void
 	 */
-	private function currentValuesForAttachments($id_msg)
+	private function currentValuesForAttachments(int $id_msg): void
 	{
 		global $context;
 
@@ -217,7 +217,7 @@ class TemporaryAttachmentProcess
 	 *
 	 * @return bool Returns true if temporary attachments should be ignored, false otherwise.
 	 */
-	private function hasPendingSessionAttachments()
+	private function hasPendingSessionAttachments(): bool
 	{
 		$ignore_temp = false;
 		if ($this->tmp_attachments->getPostParam('files') !== null && $this->tmp_attachments->hasAttachments())
@@ -250,7 +250,7 @@ class TemporaryAttachmentProcess
 	 *
 	 * @return void
 	 */
-	private function ensureValidAttachmentFile()
+	private function ensureValidAttachmentFile(): void
 	{
 		// If we have an array of already attached files, but no longer any files being uploaded.
 		if (empty($_FILES['attachment']['tmp_name']))
@@ -283,14 +283,14 @@ class TemporaryAttachmentProcess
 	 * @param int|null $board The ID of the board (optional).
 	 * @return void
 	 */
-	private function postTemporaryAttachments($id_msg, $topic, $board)
+	private function postTemporaryAttachments(int $id_msg, ?int $topic, ?int $board): void
 	{
 		// Remember where we are at. If it's anywhere at all.
 		$this->tmp_attachments->setPostParam([
 			'msg' => $id_msg,
 			'last_msg' => (int) ($_REQUEST['last_msg'] ?? 0),
-			'topic' => (int) ($topic ?? 0),
-			'board' => (int) ($board ?? 0),
+			'topic' => $topic ?? 0,
+			'board' => $board ?? 0,
 		]);
 	}
 
@@ -299,7 +299,7 @@ class TemporaryAttachmentProcess
 	 *
 	 * This method is used to display a generic error message, delete temporary files, and reset the attachment array.
 	 */
-	private function processInitialErrors()
+	private function processInitialErrors(): void
 	{
 		$this->attach_errors->activate();
 		$this->attach_errors->addError('attach_no_upload');
@@ -324,9 +324,14 @@ class TemporaryAttachmentProcess
 	 * @param string $attach_current_dir The directory to which the attachments should be moved.
 	 * @return void
 	 */
-	private function moveAttachmentsToCurrentDirectory($attach_current_dir)
+	private function moveAttachmentsToCurrentDirectory(string $attach_current_dir): void
 	{
 		// Loop through $_FILES['attachment'] array and move each file to the current attachments' folder.
+		if (empty($_FILES['attachment']['tmp_name']))
+		{
+			return;
+		}
+
 		foreach ($_FILES['attachment']['tmp_name'] as $index => $dummy)
 		{
 			if ($_FILES['attachment']['name'][$index] === '')
@@ -383,7 +388,7 @@ class TemporaryAttachmentProcess
 	 * - id_folder: The ID of the current attachment directory.
 	 * - mime: The MIME type of the attachment file.
 	 */
-	public function prepareTemporaryAttachmentData($index)
+	public function prepareTemporaryAttachmentData(int $index): TemporaryAttachment
 	{
 		$tokenizer = new TokenHash();
 
@@ -408,7 +413,7 @@ class TemporaryAttachmentProcess
 	 * @param object $tempAttachment The temporary attachment object.
 	 * @return void
 	 */
-	private function handleAttachmentErrors($tempAttachment)
+	private function handleAttachmentErrors(object $tempAttachment): void
 	{
 		global $txt;
 

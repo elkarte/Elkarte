@@ -45,9 +45,9 @@ class Dump extends AbstractDump
 			FROM information_schema.columns
 			WHERE table_name = {string:table}
 			ORDER BY ordinal_position',
-			array(
+			[
 				'table' => $tableName,
-			)
+			]
 		);
 		while (($row = $result->fetch_assoc()))
 		{
@@ -80,10 +80,10 @@ class Dump extends AbstractDump
 					$count_req = $this->_db->query('', '
 						SELECT MAX("{raw:column}")
 						FROM {raw:table}',
-						array(
+						[
 							'column' => $row['column_name'],
 							'table' => $tableName,
-						)
+						]
 					);
 					[$max_ind] = $count_req->fetch_row();
 					$count_req->free_result();
@@ -108,9 +108,9 @@ class Dump extends AbstractDump
 				INNER JOIN pg_index AS i ON (i.indrelid = c.oid)
 				INNER JOIN pg_class AS c2 ON (c2.oid = i.indexrelid)
 			WHERE c.relname = {string:table}',
-			array(
+			[
 				'table' => $tableName,
-			)
+			]
 		);
 
 		while (($row = $result->fetch_assoc()))
@@ -149,12 +149,12 @@ class Dump extends AbstractDump
 			WHERE schemaname = {string:schema_public}' . ($filter === false ? '' : '
 				AND tablename LIKE {string:filter}') . '
 			ORDER BY tablename',
-			array(
+			[
 				'schema_public' => 'public',
 				'filter' => $filter,
-			)
+			]
 		);
-		$tables = array();
+		$tables = [];
 		while (($row = $request->fetch_row()))
 		{
 			$tables[] = $row[0];
@@ -182,19 +182,19 @@ class Dump extends AbstractDump
 				LIKE {raw:table}
 				INCLUDING DEFAULTS
 			)',
-			array(
+			[
 				'backup_table' => $backup_table,
 				'table' => $table_name,
-			)
+			]
 		);
 
 		$this->_db->query('', '
 			INSERT INTO {raw:backup_table}
 			SELECT * FROM {raw:table}',
-			array(
+			[
 				'backup_table' => $backup_table,
 				'table' => $table_name,
-			)
+			]
 		);
 	}
 
@@ -221,9 +221,9 @@ class Dump extends AbstractDump
 			SELECT *
 			FROM ' . $tableName . '
 			LIMIT ' . $limit . ' OFFSET ' . $start,
-			array(
+			[
 				'security_override' => true,
-			)
+			]
 		);
 
 		// The number of rows, just for record keeping and breaking INSERTs up.
@@ -247,7 +247,7 @@ class Dump extends AbstractDump
 		while (($row = $result->fetch_assoc()))
 		{
 			// Get the fields in this row...
-			$field_list = array();
+			$field_list = [];
 
 			foreach ($row as $item)
 			{

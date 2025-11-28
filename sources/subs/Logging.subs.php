@@ -31,10 +31,10 @@ function deleteLogOnlineInterval($session_id)
 		DELETE FROM {db_prefix}log_online
 		WHERE log_time < {int:log_time}
 			AND session != {string:session}',
-		array(
+		[
 			'log_time' => time() - $modSettings['lastActive'] * 60,
 			'session' => $session_id,
-		)
+		]
 	);
 }
 
@@ -55,12 +55,12 @@ function updateLogOnline($session_id, $serialized)
 			ip = {string:ip},
 			url = {string:url}
 		WHERE session = {string:session}',
-		array(
+		[
 			'log_time' => time(),
 			'ip' => User::$info->ip,
 			'url' => $serialized,
 			'session' => $session_id,
-		)
+		]
 	);
 
 	// Guess it got deleted.
@@ -88,24 +88,24 @@ function insertdeleteLogOnline($session_id, $serialized, $do_delete = false)
 		$db->query('', '
 			DELETE FROM {db_prefix}log_online
 			WHERE ' . ($do_delete ? 'log_time < {int:log_time}' : '') . ($do_delete && !empty(User::$info->id) ? ' OR ' : '') . (empty(User::$info->id) ? '' : 'id_member = {int:current_member}'),
-			array(
+			[
 				'current_member' => User::$info->id,
 				'log_time' => time() - $modSettings['lastActive'] * 60,
-			)
+			]
 		);
 	}
 
 	$db->insert($do_delete ? 'ignore' : 'replace',
 		'{db_prefix}log_online',
-		array(
+		[
 			'session' => 'string', 'id_member' => 'int', 'id_spider' => 'int', 'log_time' => 'int', 'ip' => 'string', 'url' => 'string'
-		),
-		array(
+		],
+		[
 			$session_id, User::$info->id, empty($_SESSION['id_robot']) ? 0 : $_SESSION['id_robot'], time(), User::$info->ip, $serialized
-		),
-		array(
+		],
+		[
 			'session'
-		)
+		]
 	);
 }
 
@@ -114,10 +114,10 @@ function insertdeleteLogOnline($session_id, $serialized, $do_delete = false)
  *
  * - Used by trackStats
  *
- * @param mixed[] $update_parameters
+ * @param array $update_parameters
  * @param string $setStringUpdate
- * @param mixed[] $insert_keys
- * @param mixed[] $cache_stats
+ * @param array $insert_keys
+ * @param array $cache_stats
  * @param string $date
  */
 function updateLogActivity($update_parameters, $setStringUpdate, $insert_keys, $cache_stats, $date)
@@ -135,9 +135,9 @@ function updateLogActivity($update_parameters, $setStringUpdate, $insert_keys, $
 	{
 		$db->insert('ignore',
 			'{db_prefix}log_activity',
-			array_merge($insert_keys, array('date' => 'date')),
-			array_merge($cache_stats, array($date)),
-			array('date')
+			array_merge($insert_keys, ['date' => 'date']),
+			array_merge($cache_stats, [$date]),
+			['date']
 		);
 	}
 }
@@ -157,15 +157,15 @@ function logLoginHistory($id_member, $ip, $ip2)
 
 	$db->insert('insert',
 		'{db_prefix}member_logins',
-		array(
+		[
 			'id_member' => 'int', 'time' => 'int', 'ip' => 'string', 'ip2' => 'string',
-		),
-		array(
+		],
+		[
 			$id_member, time(), $ip, $ip2
-		),
-		array(
+		],
+		[
 			'id_member', 'time'
-		)
+		]
 	);
 }
 
@@ -189,11 +189,11 @@ function loadLogReported($msg_id, $topic_id, $type = 'msg')
 		WHERE {raw:column_name} = {int:reported}
 			AND type = {string:type}
 		LIMIT 1',
-		array(
+		[
 			'column_name' => !empty($msg_id) ? 'id_msg' : 'id_topic',
 			'reported' => !empty($msg_id) ? $msg_id : $topic_id,
 			'type' => $type,
-		)
+		]
 	);
 	$num = $request->num_rows();
 	$request->free_result();
@@ -204,7 +204,7 @@ function loadLogReported($msg_id, $topic_id, $type = 'msg')
 /**
  * Log a change to the forum, such as moderation events or administrative changes.
  *
- * @param mixed[] $inserts
+ * @param array $inserts
  */
 function insertLogActions($inserts)
 {
@@ -212,12 +212,12 @@ function insertLogActions($inserts)
 
 	$db->insert('',
 		'{db_prefix}log_actions',
-		array(
+		[
 			'log_time' => 'int', 'id_log' => 'int', 'id_member' => 'int', 'ip' => 'string-16', 'action' => 'string',
 			'id_board' => 'int', 'id_topic' => 'int', 'id_msg' => 'int', 'extra' => 'string-65534',
-		),
+		],
 		$inserts,
-		array('id_action')
+		['id_action']
 	);
 
 	return $db->insert_id('{db_prefix}log_actions');
@@ -230,9 +230,9 @@ function deleteMemberLogOnline()
 	$db->query('', '
 		DELETE FROM {db_prefix}log_online
 		WHERE id_member = {int:current_member}',
-		array(
+		[
 			'current_member' => User::$info->id,
-		)
+		]
 	);
 }
 
@@ -249,9 +249,9 @@ function deleteOnline($session)
 	$db->query('', '
 		DELETE FROM {db_prefix}log_online
 		WHERE session = {string:session}',
-		array(
+		[
 			'session' => $session,
-		)
+		]
 	);
 }
 
@@ -268,7 +268,7 @@ function logOnline($ids, $on = false)
 
 	if (!is_array($ids))
 	{
-		$ids = array($ids);
+		$ids = [$ids];
 	}
 
 	if (empty($on))
@@ -277,9 +277,9 @@ function logOnline($ids, $on = false)
 		$db->query('', '
 			DELETE FROM {db_prefix}log_online
 			WHERE id_member IN ({array_int:members})',
-			array(
+			[
 				'members' => $ids,
-			)
+			]
 		);
 	}
 }

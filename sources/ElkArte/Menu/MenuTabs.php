@@ -64,7 +64,7 @@ class MenuTabs
 	 *
 	 * @return array
 	 */
-	public function getTabs($currentArea)
+	public function getTabs($currentArea): array
 	{
 		foreach ($currentArea['subsections'] as $area => $subsection)
 		{
@@ -83,7 +83,7 @@ class MenuTabs
 	 *
 	 * @return array
 	 */
-	public function setHeader()
+	public function setHeader(): array
 	{
 		// Define the area above the tabs
 		return [
@@ -104,7 +104,7 @@ class MenuTabs
 	 * @param string $area
 	 * @return string
 	 */
-	public function getIndividualDescription($currentArea, $area)
+	public function getIndividualDescription($currentArea, $area): string
 	{
 		global $txt;
 
@@ -122,7 +122,7 @@ class MenuTabs
 	/**
 	 * Get the area title
 	 */
-	public function getTitle()
+	public function getTitle(): string
 	{
 		if ($this->title === null)
 		{
@@ -141,7 +141,7 @@ class MenuTabs
 	 * @param $title
 	 * @return $this
 	 */
-	public function setTitle($title = '')
+	public function setTitle($title = ''): self
 	{
 		global $txt;
 
@@ -155,9 +155,9 @@ class MenuTabs
 	/**
 	 * Get the area help
 	 *
-	 * @return string
+	 * @return string|null
 	 */
-	public function getHelp()
+	public function getHelp(): ?string
 	{
 		if ($this->help === null)
 		{
@@ -173,7 +173,7 @@ class MenuTabs
 	 * @param $help
 	 * @return $this
 	 */
-	public function setHelp($help = null)
+	public function setHelp($help = null): self
 	{
 		$this->help = $help ?? null;
 
@@ -185,7 +185,7 @@ class MenuTabs
 	 *
 	 * @return string
 	 */
-	public function getDescription()
+	public function getDescription(): string
 	{
 		if ($this->description === null)
 		{
@@ -205,7 +205,7 @@ class MenuTabs
 	 * @param string $description
 	 * @return $this
 	 */
-	public function setDescription($description = '')
+	public function setDescription($description = ''): self
 	{
 		global $txt;
 
@@ -221,7 +221,7 @@ class MenuTabs
 	 *
 	 * @return string
 	 */
-	public function getClass()
+	public function getClass(): string
 	{
 		if ($this->class === null)
 		{
@@ -237,7 +237,7 @@ class MenuTabs
 	 * @param $class
 	 * @return $this
 	 */
-	public function setClass($class = null)
+	public function setClass($class = null): self
 	{
 		$this->class = $class ?? '';
 
@@ -249,7 +249,7 @@ class MenuTabs
 	 *
 	 * @return string
 	 */
-	public function getPrefix()
+	public function getPrefix(): string
 	{
 		if ($this->prefix === null)
 		{
@@ -265,7 +265,7 @@ class MenuTabs
 	 * @param $prefix
 	 * @return $this
 	 */
-	public function setPrefix($prefix = null)
+	public function setPrefix($prefix = null): self
 	{
 		$this->prefix = $prefix ?? '';
 

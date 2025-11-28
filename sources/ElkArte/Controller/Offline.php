@@ -25,7 +25,7 @@ class Offline extends AbstractController
 		$this->action_offline();
 	}
 
-	public function action_offline()
+	public function action_offline(): void
 	{
 		// Load the template
 		theme()->getTemplates()->load('Offline');

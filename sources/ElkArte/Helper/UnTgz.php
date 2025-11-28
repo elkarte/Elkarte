@@ -186,7 +186,7 @@ class UnTgz
 	 *
 	 * @return bool
 	 */
-	public function check_valid_tgz()
+	public function check_valid_tgz(): bool
 	{
 		// No signature?
 		if (strlen($this->data) < 10)
@@ -221,7 +221,7 @@ class UnTgz
 	 * - Compression flags (or extra flags): 1 byte
 	 * - Operating system, Value that indicates on which operating system file was created, 1 byte
 	 */
-	private function _read_header_tgz()
+	private function _read_header_tgz(): ?bool
 	{
 		// Compression method needs to be 8 = deflate!
 		if ($this->_header['t'] !== 8)
@@ -278,7 +278,7 @@ class UnTgz
 	 * We now know where the start of the compressed data is in the archive
 	 * The data is terminated with 4 bytes of CRC and 4 bytes of the original input size
 	 */
-	public function _ungzip_data()
+	public function _ungzip_data(): ?bool
 	{
 		// Unpack the crc and original size, its the trailing 8 bytes
 		$check = unpack('Vcrc32/Visize', substr($this->data, strlen($this->data) - 8));
@@ -298,7 +298,7 @@ class UnTgz
 	/**
 	 * Checks the saved vs calculated crc values
 	 */
-	private function _check_crc()
+	private function _check_crc(): bool
 	{
 		// Make sure we have unsigned crc padded hex.
 		$crc_uncompressed = hash('crc32b', $this->data);
@@ -313,7 +313,7 @@ class UnTgz
 	 * What it does
 	 * - Assumes its Ustar format
 	 */
-	private function _process_files()
+	private function _process_files(): void
 	{
 		// Tar files are written in 512 byte chunks
 		$blocks = strlen($this->data) / 512 - 1;
@@ -397,7 +397,7 @@ class UnTgz
 	 * - char devminor[8]; Device minor number
 	 * - char path[155]; Filename prefix
 	 */
-	private function _read_current_header()
+	private function _read_current_header(): void
 	{
 		$octdec = ['mode', 'uid', 'gid', 'size', 'mtime', 'checksum', 'type'];
 
@@ -435,7 +435,7 @@ class UnTgz
 	/**
 	 * Does what it says, determines if we are writing this file or not
 	 */
-	private function _determine_write_this()
+	private function _determine_write_this(): void
 	{
 		// Not a directory and doesn't exist already...
 		if (substr($this->_current['filename'], -1) !== '/' && !$this->fileFunc->fileExists($this->destination . '/' . $this->_current['filename']))
@@ -472,7 +472,7 @@ class UnTgz
 	 * - Writes the extracted file to disk or if we are extracting a single file
 	 * - it returns the extracted data
 	 */
-	private function _write_this_file()
+	private function _write_this_file(): void
 	{
 		$this->_skip = false;
 		$this->_found = false;
@@ -522,7 +522,7 @@ class UnTgz
 	/**
 	 * Checks the saved vs calculated crc values
 	 */
-	private function _check_header_crc()
+	private function _check_header_crc(): bool
 	{
 		$this->_crc = 256;
 

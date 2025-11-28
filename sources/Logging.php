@@ -135,7 +135,7 @@ function writeLog($force = false)
 
 		User::$settings->updateTotalTimeLoggedIn($_SESSION['timeOnlineUpdated']);
 		require_once(SUBSDIR . '/Members.subs.php');
-		updateMemberData(User::$info->id, array('last_login' => time(), 'member_ip' => User::$info->ip, 'member_ip2' => $req->ban_ip(), 'total_time_logged_in' => User::$settings['total_time_logged_in']));
+		updateMemberData(User::$info->id, ['last_login' => time(), 'member_ip' => User::$info->ip, 'member_ip2' => $req->ban_ip(), 'total_time_logged_in' => User::$settings['total_time_logged_in']]);
 
 		if ($cache->levelHigherThan(1))
 		{
@@ -204,10 +204,10 @@ function logLastDatabaseError()
  *
  * @return bool|array
  */
-function trackStats($stats = array())
+function trackStats($stats = [])
 {
 	global $modSettings;
-	static $cache_stats = array();
+	static $cache_stats = [];
 
 	if (empty($modSettings['trackStats']))
 	{
@@ -272,7 +272,7 @@ function trackStats($stats = array())
  * @example logAction('remove', array('starter' => $id_member_started));
  *
  */
-function logAction($action, $extra = array(), $log_type = 'moderate')
+function logAction($action, $extra = [], $log_type = 'moderate')
 {
 	// Set up the array and pass through to logActions
 	return logActions([
@@ -366,13 +366,13 @@ function logActions($logs)
 		}
 
 		// Is there an associated report on this?
-		if (in_array($log['action'], array('move', 'remove', 'split', 'merge')))
+		if (in_array($log['action'], ['move', 'remove', 'split', 'merge']))
 		{
 			require_once(SUBSDIR . '/Logging.subs.php');
 			if (loadLogReported($msg_id, $topic_id))
 			{
 				require_once(SUBSDIR . '/Moderation.subs.php');
-				updateSettings(array('last_mod_report_action' => time()));
+				updateSettings(['last_mod_report_action' => time()]);
 				recountOpenReports(true, allowedTo('admin_forum'));
 			}
 		}
@@ -413,10 +413,10 @@ function logActions($logs)
 
 		$memID = $log['extra']['member_affected'] ?? User::$info->id;
 
-		$inserts[] = array(
+		$inserts[] = [
 			time(), $log_types[$log['log_type']], $memID, User::$info->ip, $log['action'],
 			$board_id, $topic_id, $msg_id, serialize($log['extra']),
-		);
+		];
 	}
 
 	if (!empty($inserts))

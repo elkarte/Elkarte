@@ -43,9 +43,9 @@ class Dump extends AbstractDump
 		$result = $this->_db->query('', '
 			SHOW FIELDS
 			FROM `{raw:table}`',
-			array(
+			[
 				'table' => $tableName,
-			)
+			]
 		);
 		while (($row = $result->fetch_assoc()))
 		{
@@ -84,9 +84,9 @@ class Dump extends AbstractDump
 		$result = $this->_db->query('', '
 			SHOW KEYS
 			FROM `{raw:table}`',
-			array(
+			[
 				'table' => $tableName,
-			)
+			]
 		);
 		$indexes = [];
 		while (($row = $result->fetch_assoc()))
@@ -97,7 +97,7 @@ class Dump extends AbstractDump
 			// Is this the first column in the index?
 			if (empty($indexes[$row['Key_name']]))
 			{
-				$indexes[$row['Key_name']] = array();
+				$indexes[$row['Key_name']] = [];
 			}
 
 			// A sub part, like only indexing 15 characters of a varchar.
@@ -126,9 +126,9 @@ class Dump extends AbstractDump
 		$result = $this->_db->query('', '
 			SHOW TABLE STATUS
 			LIKE {string:table}',
-			array(
-				'table' => strtr($tableName, array('_' => '\\_', '%' => '\\%')),
-			)
+			[
+				'table' => strtr($tableName, ['_' => '\\_', '%' => '\\%']),
+			]
 		);
 		$row = $result->fetch_assoc();
 		$result->free_result();
@@ -155,12 +155,12 @@ class Dump extends AbstractDump
 			SHOW TABLES
 			FROM `{raw:db_name_str}`
 			{raw:filter}',
-			array(
-				'db_name_str' => $db_name_str[0] === '`' ? strtr($db_name_str, array('`' => '')) : $db_name_str,
+			[
+				'db_name_str' => $db_name_str[0] === '`' ? strtr($db_name_str, ['`' => '']) : $db_name_str,
 				'filter' => $filter,
-			)
+			]
 		);
-		$tables = array();
+		$tables = [];
 		while (($row = $request->fetch_row()))
 		{
 			$tables[] = $row[0];
@@ -184,10 +184,10 @@ class Dump extends AbstractDump
 		// Can we do this the quick way?
 		$result = $this->_db->query('', '
 			CREATE TABLE {raw:backup_table} LIKE {raw:table}',
-			array(
+			[
 				'backup_table' => $backup_table,
 				'table' => $table
-			));
+			]);
 		// If this failed, we go old school.
 		if ($result->hasResults())
 		{
@@ -195,10 +195,10 @@ class Dump extends AbstractDump
 				INSERT INTO {raw:backup_table}
 				SELECT *
 				FROM {raw:table}',
-				array(
+				[
 					'backup_table' => $backup_table,
 					'table' => $table
-				));
+				]);
 
 			// Old school or no school?
 			if ($request)
@@ -210,9 +210,9 @@ class Dump extends AbstractDump
 		// At this point, the quick method failed.
 		$result = $this->_db->query('', '
 			SHOW CREATE TABLE {raw:table}',
-			array(
+			[
 				'table' => $table,
-			)
+			]
 		);
 		[, $create] = $result->fetch_row();
 		$result->free_result();
@@ -277,14 +277,14 @@ class Dump extends AbstractDump
 			ENGINE={raw:engine}' . (empty($charset) ? '' : ' CHARACTER SET {raw:charset}' . (empty($collate) ? '' : ' COLLATE {raw:collate}')) . '
 			SELECT *
 			FROM {raw:table}',
-			array(
+			[
 				'backup_table' => $backup_table,
 				'table' => $table,
 				'create' => $create,
 				'engine' => $engine,
 				'charset' => empty($charset) ? '' : $charset,
 				'collate' => empty($collate) ? '' : $collate,
-			)
+			]
 		);
 
 		if ($auto_inc !== '')
@@ -297,11 +297,11 @@ class Dump extends AbstractDump
 			$this->_db->query('', '
 				ALTER TABLE {raw:backup_table}
 				CHANGE COLUMN {raw:column_detail} {raw:auto_inc}',
-				array(
+				[
 					'backup_table' => $backup_table,
 					'column_detail' => $match[1],
 					'auto_inc' => $auto_inc,
-				)
+				]
 			);
 		}
 
@@ -330,9 +330,9 @@ class Dump extends AbstractDump
 			SELECT /*!40001 SQL_NO_CACHE */ *
 			FROM `' . $tableName . '`
 			LIMIT ' . $limit . ' OFFSET ' . $start,
-			array(
+			[
 				'security_override' => true,
-			)
+			]
 		);
 
 		// The number of rows, just for record keeping and breaking INSERTs up.
@@ -356,7 +356,7 @@ class Dump extends AbstractDump
 		while (($row = $result->fetch_assoc()))
 		{
 			// Get the fields in this row...
-			$field_list = array();
+			$field_list = [];
 
 			foreach ($row as $item)
 			{

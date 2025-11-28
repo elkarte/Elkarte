@@ -69,7 +69,7 @@ class Image
 	/**
 	 * Sets the filename / path in use
 	 */
-	public function setFileName($fileName)
+	public function setFileName($fileName): void
 	{
 		$this->_fileName = $fileName;
 	}
@@ -79,7 +79,7 @@ class Image
 	 *
 	 * @return bool
 	 */
-	public function hasWebpSupport()
+	public function hasWebpSupport(): bool
 	{
 		if (!$this->_force_gd && ImageMagick::canUse())
 		{
@@ -107,7 +107,7 @@ class Image
 	 *
 	 * @return bool
 	 */
-	public function canUseWebp()
+	public function canUseWebp(): bool
 	{
 		global $modSettings;
 
@@ -155,7 +155,7 @@ class Image
 	 *
 	 * @return bool
 	 */
-	public function isImageLoaded()
+	public function isImageLoaded(): bool
 	{
 		return $this->_image_loaded && $this->isImage();
 	}
@@ -165,7 +165,7 @@ class Image
 	 *
 	 * @throws \Exception
 	 */
-	protected function setManipulator()
+	protected function setManipulator(): void
 	{
 		// Later this could become an array of "manipulators" (or not) and remove the hard-coded IM/GD requirements
 		if (!$this->_force_gd && ImageMagick::canUse())
@@ -189,7 +189,7 @@ class Image
 	 *
 	 * @return string
 	 */
-	public function getManipulator()
+	public function getManipulator(): string
 	{
 		return $this->_current_manipulator ?? '';
 	}
@@ -205,7 +205,7 @@ class Image
 	}
 
 	/**
-	 * It's how big ?
+	 * It's how big?
 	 *
 	 * @return int
 	 */
@@ -221,7 +221,7 @@ class Image
 	 *
 	 * @return string
 	 */
-	public function getMimeType()
+	public function getMimeType(): string
 	{
 		// Try Exif which reads the file headers, most accurate for images
 		if (function_exists('exif_imagetype'))
@@ -295,7 +295,7 @@ class Image
 	 *
 	 * @return int
 	 */
-	public function getDefaultFormat()
+	public function getDefaultFormat(): int
 	{
 		global $modSettings;
 
@@ -366,7 +366,7 @@ class Image
 	 *
 	 * @return int
 	 */
-	public function getOrientation()
+	public function getOrientation(): int
 	{
 		return $this->_manipulator->getOrientation();
 	}
@@ -422,7 +422,7 @@ class Image
 	}
 
 	/**
-	 * Used to re-encodes an image to a specified image format
+	 * Used to re-encode an image to a specified image format
 	 *
 	 * What it does:
 	 *
@@ -462,7 +462,7 @@ class Image
 	 *
 	 * @return array
 	 */
-	public function getImageDimensions()
+	public function getImageDimensions(): array
 	{
 		return $this->_manipulator->imageDimensions;
 	}
@@ -477,7 +477,7 @@ class Image
 	 *
 	 * @return bool
 	 */
-	public function getTransparency($png = true)
+	public function getTransparency($png = true): bool
 	{
 		// If it claims transparency, we do pixel inspection
 		$header = file_get_contents($this->_fileName, false, null, 0, 26);

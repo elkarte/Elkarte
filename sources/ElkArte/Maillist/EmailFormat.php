@@ -94,7 +94,7 @@ class EmailFormat
 	 *
 	 * @return string
 	 */
-	public function reflow($data, $real_name = '', $charset = 'UTF-8', $bbc_br = true)
+	public function reflow($data, $real_name = '', $charset = 'UTF-8', $bbc_br = true): string
 	{
 		global $modSettings;
 
@@ -120,7 +120,7 @@ class EmailFormat
 	 * @param string $data
 	 * @param bool $bbc_br
 	 */
-	private function _prep_data($data, $bbc_br)
+	private function _prep_data($data, $bbc_br): void
 	{
 		// Un-wordwrap the email, create a line by line array broken on the newlines
 		if ($bbc_br)
@@ -172,7 +172,7 @@ class EmailFormat
 	 *
 	 * @param string $value
 	 */
-	private function _trim_value(&$value)
+	private function _trim_value(&$value): void
 	{
 		$value = trim($value);
 		$value = trim($value, chr(0xC2) . chr(0xA0));
@@ -188,7 +188,7 @@ class EmailFormat
 	 *
 	 * @return bool
 	 */
-	private function _in_plainlist($var)
+	private function _in_plainlist($var): bool
 	{
 		// Starting a list like a) 1. 1) etc ...
 		$temp = $this->_in_plainlist;
@@ -212,7 +212,7 @@ class EmailFormat
 	 *
 	 * @param string $var
 	 */
-	private function _in_quote($var)
+	private function _in_quote($var): void
 	{
 		// In a quote?
 		if (preg_match('~\[quote( author=.*)?]?~', $var))
@@ -236,7 +236,7 @@ class EmailFormat
 	 *
 	 * @param string $var
 	 */
-	private function _in_code($var)
+	private function _in_code($var): void
 	{
 		// In a code block?
 		if (preg_match('~\[code]?~', $var))
@@ -260,7 +260,7 @@ class EmailFormat
 	 *
 	 * @param string $var
 	 */
-	private function _in_bbclist($var)
+	private function _in_bbclist($var): void
 	{
 		// Starting a bbc list
 		if (preg_match('~\[list]?~', $var))
@@ -282,7 +282,7 @@ class EmailFormat
 	 * signature lines and end of paragraphs ... all assuming it can figure or
 	 * best guess those areas.
 	 */
-	private function _fix_body()
+	private function _fix_body(): void
 	{
 		// Go line by line and put in line breaks *only* where (we often erroneously assume) they are needed
 		for ($i = 0, $num = count($this->_body_array); $i < $num; $i++)
@@ -334,7 +334,7 @@ class EmailFormat
 				$this->_body_array[$i]['content'] = $this->_in_quote !== 0 ? "\n" : $this->_body_array[$i]['content'] . "\n";
 			}
 			// Line starts with a link .....
-			elseif (in_array(substr($this->_body_array[$i]['content'], 0, 4), array('www.', 'WWW.', 'http', 'HTTP')))
+			elseif (in_array(substr($this->_body_array[$i]['content'], 0, 4), ['www.', 'WWW.', 'http', 'HTTP']))
 			{
 				$this->_body_array[$i]['content'] = "\n" . $this->_body_array[$i]['content'];
 			}
@@ -404,7 +404,7 @@ class EmailFormat
 	 *
 	 * @return bool
 	 */
-	private function _in_sig($i)
+	private function _in_sig($i): bool
 	{
 		// Not in a sig yet, the line starts with a sig key as defined by the ACP, and its a short line of text
 		if (!$this->_found_sig && !empty($this->_maillist_sig_keys) && (preg_match('~^(' . $this->_maillist_sig_keys . ')~i', $this->_body_array[$i]['content']) && ($this->_body_array[$i]['length'] < $this->_maillist_short_line)))
@@ -427,7 +427,7 @@ class EmailFormat
 	 *
 	 * @param string $charset
 	 */
-	private function _clean_up($charset)
+	private function _clean_up($charset): void
 	{
 		// Remove any chitta chatta from either end
 		$tag = '(>([^a-zA-Z0-9_\[\s]){0,3}){1}';
@@ -478,12 +478,12 @@ class EmailFormat
 		$this->_body = htmlspecialchars_decode($this->_body, ENT_QUOTES);
 
 		// Convert other characters like MS "smart" quotes both uf8
-		$this->_body = strtr($this->_body, array("\xe2\x80\x98" => "'", "\xe2\x80\x99" => "'", "\xe2\x80\x9c" => '"', "\xe2\x80\x9d" => '"', "\xe2\x80\x93" => '-', "\xe2\x80\x94" => '--', "\xe2\x80\xa6" => '...'));
+		$this->_body = strtr($this->_body, ["\xe2\x80\x98" => "'", "\xe2\x80\x99" => "'", "\xe2\x80\x9c" => '"', "\xe2\x80\x9d" => '"', "\xe2\x80\x93" => '-', "\xe2\x80\x94" => '--', "\xe2\x80\xa6" => '...']);
 
 		// And its 1252 variants
 		if (strcasecmp($charset, 'UTF-8') !== 0)
 		{
-			$this->_body = strtr($this->_body, array(chr(145) => "'", chr(146) => "'", chr(147) => '"', chr(148) => '"', chr(150) => '-', chr(151) => '--', chr(133) => '...'));
+			$this->_body = strtr($this->_body, [chr(145) => "'", chr(146) => "'", chr(147) => '"', chr(148) => '"', chr(150) => '-', chr(151) => '--', chr(133) => '...']);
 		}
 	}
 }

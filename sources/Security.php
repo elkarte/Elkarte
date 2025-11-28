@@ -890,17 +890,17 @@ function checkSession($type = 'post', $from_action = '', $is_fatal = true)
 			@ob_end_clean();
 			Headers::instance()
 				->removeHeader('all')
-				->headerSpecial('HTTP/1.1 403 Forbidden - Session timeout')
+				->httpCode(403)
+				->header('X-Error-Message', 'Session timeout')
 				->sendHeaders();
 			die;
 		}
+
 		throw new \ElkArte\Exceptions\Exception($error, isset($log_error) ? 'user' : false, $sprintf ?? []);
 	}
+
 	// A session error occurred, return the error to the calling function.
-	else
-	{
-		return $error;
-	}
+	return $error;
 
 	// We really should never fall through here, for very important reasons.  Let's make sure.
 	trigger_error('Hacking attempt...', E_USER_ERROR);
@@ -1872,7 +1872,11 @@ function stop_prefetching()
 		@ob_end_clean();
 		Headers::instance()
 			->removeHeader('all')
-			->headerSpecial('HTTP/1.1 403 Prefetch Forbidden')
+			->header('X-DNS-Prefetch-Control', 'off')
+			->header('Permissions-Policy', 'browsing-topics=(), prefetch-src=()')
+			->header('Cache-Control', 'no-store, no-cache, must-revalidate')
+			->header('X-Prefetch-Reason', 'Prefetch Forbidden')
+			->httpCode(403)
 			->sendHeaders();
 		die;
 	}

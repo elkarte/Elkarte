@@ -24,7 +24,7 @@ class AdminSearchTest extends TestCase
 		User::$info->permissions = array();
 		global $context, $user_info;
 
-		$user_info['permissions'] = array();
+		User::$info->permissions = array();
 		unset($context['search_term'], $context['search_results']);
 	}
 

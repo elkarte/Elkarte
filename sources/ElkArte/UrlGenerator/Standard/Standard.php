@@ -36,7 +36,7 @@ class Standard extends AbstractUrlGenerator
 	/**
 	 * {@inheritDoc}
 	 */
-	protected function generateQuery($params)
+	protected function generateQuery($params): string
 	{
 		if (!is_array($params))
 		{

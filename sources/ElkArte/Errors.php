@@ -27,7 +27,7 @@ class Errors
 	 *
 	 * @return E
 	 */
-	public static function instance()
+	public static function instance(): E
 	{
 		return E::instance();
 	}

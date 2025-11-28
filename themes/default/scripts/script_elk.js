@@ -776,7 +776,7 @@ function disableAutoComplete ()
 
 /**
  * A system to collect notifications from a single AJAX call and redistribute them among notifiers
- * via their .send methods
+ * via their .send methods.  The default polling time is every 45 seconds.
  *
  * Current notifiers are:
  * - ElkDesktop for desktop push notifications
@@ -794,7 +794,9 @@ function disableAutoComplete ()
 		opt = opt || {};
 		let _notifiers = [],
 			start = true,
-			lastTime = 0;
+			lastTime = 0,
+			_timerId = null,
+			_fetching = false;
 
 		let init = function(opt) {
 			if (typeof opt.delay === 'undefined')
@@ -804,7 +806,7 @@ function disableAutoComplete ()
 			}
 
 			// Run at startup
-			setTimeout(function() {
+			_timerId = setTimeout(function() {
 				fetchData();
 			}, 500);
 		};
@@ -821,12 +823,24 @@ function disableAutoComplete ()
 			});
 		};
 
-		// Recursively calls itself on a timeout loop looking for new mentions.  When found will
+		// Recursively calls itself on a timeout loop looking for new mentions. When found will
 		// trigger send request to all bound notifiers.
 		let fetchData = function() {
 			if (_notifiers.length === 0)
 			{
 				return;
+			}
+
+			// Prevent overlapping fetch cycles and clear any pending timer
+			if (_fetching)
+			{
+				return;
+			}
+			_fetching = true;
+			if (_timerId !== null)
+			{
+				clearTimeout(_timerId);
+				_timerId = null;
 			}
 
 			let url = elk_prepareScriptUrl(elk_scripturl) + 'action=mentions;sa=fetch;api=json;lastsent=' + lastTime;
@@ -859,7 +873,8 @@ function disableAutoComplete ()
 					}
 				})
 				.finally(() => {
-					setTimeout(function() {
+					_fetching = false;
+					_timerId = setTimeout(function() {
 						fetchData();
 					}, opt.delay);
 				});
@@ -867,7 +882,9 @@ function disableAutoComplete ()
 
 		init(opt);
 		return {
-			add: add
+			add: add,
+			// Expose a public method to trigger an immediate update
+			update: function() { fetchData(); }
 		};
 	});
 

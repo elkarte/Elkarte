@@ -88,7 +88,7 @@ class ProfileHistory extends AbstractController
 	/**
 	 * Subaction for profile history actions: activity log.
 	 */
-	public function action_trackactivity()
+	public function action_trackactivity(): void
 	{
 		global $scripturl, $txt, $modSettings, $context;
 
@@ -227,7 +227,7 @@ class ProfileHistory extends AbstractController
 	 * @param array $where_vars array of values used in the where statement
 	 * @return array error messages array
 	 */
-	public function list_getUserErrors($start, $items_per_page, $sort, $where, $where_vars = [])
+	public function list_getUserErrors($start, $items_per_page, $sort, $where, $where_vars = []): array
 	{
 		require_once(SUBSDIR . '/ProfileHistory.subs.php');
 
@@ -244,7 +244,7 @@ class ProfileHistory extends AbstractController
 	 * @param array $where_vars = array() or values used in the where statement
 	 * @return string number of user errors
 	 */
-	public function list_getUserErrorCount($where, $where_vars = [])
+	public function list_getUserErrorCount($where, $where_vars = []): string
 	{
 		require_once(SUBSDIR . '/ProfileHistory.subs.php');
 
@@ -256,7 +256,7 @@ class ProfileHistory extends AbstractController
 	 * Accessed through ?action=trackip
 	 * and through ?action=profile;area=history;sa=ip
 	 */
-	public function action_trackip()
+	public function action_trackip(): void
 	{
 		global $scripturl, $txt, $modSettings, $context;
 
@@ -525,7 +525,7 @@ class ProfileHistory extends AbstractController
 	 * @param array $where_vars array of values used in the where statement
 	 * @return array an array of basic messages / details
 	 */
-	public function list_getIPMessages($start, $items_per_page, $sort, $where, $where_vars = [])
+	public function list_getIPMessages($start, $items_per_page, $sort, $where, $where_vars = []): array
 	{
 		require_once(SUBSDIR . '/ProfileHistory.subs.php');
 
@@ -541,7 +541,7 @@ class ProfileHistory extends AbstractController
 	 * @param array $where_vars array of values used in the where statement
 	 * @return string count of messages matching the IP
 	 */
-	public function list_getIPMessageCount($where, $where_vars = [])
+	public function list_getIPMessageCount($where, $where_vars = []): string
 	{
 		require_once(SUBSDIR . '/ProfileHistory.subs.php');
 
@@ -553,7 +553,7 @@ class ProfileHistory extends AbstractController
 	 *
 	 * - Accessed by ?action=trackip and ?action=profile;area=history;sa=ip
 	 */
-	public function action_tracklogin()
+	public function action_tracklogin(): void
 	{
 		global $scripturl, $txt, $context;
 
@@ -639,7 +639,7 @@ class ProfileHistory extends AbstractController
 	 *
 	 * @return array an array of messages
 	 */
-	public function list_getLogins($start, $items_per_page, $sort, $where, $where_vars = [])
+	public function list_getLogins($start, $items_per_page, $sort, $where, $where_vars = []): array
 	{
 		require_once(SUBSDIR . '/ProfileHistory.subs.php');
 
@@ -656,7 +656,7 @@ class ProfileHistory extends AbstractController
 	 * @param array $where_vars array of values used in the where statement
 	 * @return string count of messages matching the IP
 	 */
-	public function list_getLoginCount($where, $where_vars = [])
+	public function list_getLoginCount($where, $where_vars = []): string
 	{
 		require_once(SUBSDIR . '/ProfileHistory.subs.php');
 
@@ -666,7 +666,7 @@ class ProfileHistory extends AbstractController
 	/**
 	 * Logs edits to a members profile.
 	 */
-	public function action_trackedits()
+	public function action_trackedits(): void
 	{
 		global $scripturl, $txt, $modSettings, $context;
 
@@ -753,7 +753,7 @@ class ProfileHistory extends AbstractController
 	 * @param string $sort A string indicating how to sort the results
 	 * @return array array of profile edits
 	 */
-	public function list_getProfileEdits($start, $items_per_page, $sort)
+	public function list_getProfileEdits($start, $items_per_page, $sort): array
 	{
 		require_once(SUBSDIR . '/ProfileHistory.subs.php');
 
@@ -767,7 +767,7 @@ class ProfileHistory extends AbstractController
 	 *
 	 * @return string number of profile edits
 	 */
-	public function list_getProfileEditCount()
+	public function list_getProfileEditCount(): string
 	{
 		require_once(SUBSDIR . '/ProfileHistory.subs.php');
 

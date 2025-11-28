@@ -110,7 +110,7 @@ class SettingsForm
 	 *
 	 * @return array The configuration variables retrieved from the adapter.
 	 */
-	public function getConfigVars()
+	public function getConfigVars(): array
 	{
 		return $this->adapter->getConfigVars();
 	}
@@ -120,7 +120,7 @@ class SettingsForm
 	 *
 	 * @param array $configVars An associative array of configuration variables.
 	 */
-	public function setConfigVars(array $configVars)
+	public function setConfigVars(array $configVars): void
 	{
 		$this->adapter->setConfigVars($configVars);
 	}
@@ -130,7 +130,7 @@ class SettingsForm
 	 *
 	 * @return array The configuration values returned by the adapter.
 	 */
-	public function getConfigValues()
+	public function getConfigValues(): array
 	{
 		return $this->adapter->getConfigValues();
 	}
@@ -142,7 +142,7 @@ class SettingsForm
 	 *
 	 * @return void
 	 */
-	public function setConfigValues(array $configValues)
+	public function setConfigValues(array $configValues): void
 	{
 		$this->adapter->setConfigValues($configValues);
 	}
@@ -165,7 +165,7 @@ class SettingsForm
 	 *
 	 * Creates the token `admin-ssc`
 	 */
-	public function prepare()
+	public function prepare(): void
 	{
 		createToken('admin-ssc');
 		$this->adapter->prepare();
@@ -179,7 +179,7 @@ class SettingsForm
 	 *
 	 * Validates the token `admin-ssc`
 	 */
-	public function save()
+	public function save(): void
 	{
 		validateToken('admin-ssc');
 

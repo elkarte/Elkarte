@@ -7,7 +7,7 @@
  */
 
 /**
- * This file contains javascript associated with the current theme
+ * This file contains JavaScript associated with the current theme
  */
 
 // Normal JS document ready event
@@ -33,7 +33,8 @@ document.addEventListener('DOMContentLoaded', function() {
 		elk_quotefix();
 	}
 
-	// If you want a sticky menu on scroll, add an appropriate .sticky css class to your theme
+	// If you want a sticky menu on scroll, add an appropriate .sticky CSS class to your theme
+	// This adds / removes a .sticky class on scroll, see index_gold.css for an example.
 	stickyMenu();
 
 	// Smooth scroll to top.
@@ -105,61 +106,50 @@ $(function() {
 	// Enable the ... page expansion
 	$('.expand_pages').expand_pages();
 
-	// Attachment thumbnail expand on click, you can turn off this namespaced click
-	// event with $('[data-lightboximage]').off('click.elk_lb');
+	// Attachment thumbnail expands on click
+	// You can remove this namespaced click with $('[data-lightboximage]').off('click.elk_lb');
 	$('[data-lightboximage]').on('click.elk_lb', function(e) {
 		e.preventDefault();
 		expandThumbLB($(this).data('lightboximage'), $(this).data('lightboxmessage'));
 	});
 
-	// BBC [img] element toggle for height and width styles of an image.
-	$('img').each(function() {
-		// Not a resized image? Skip it.
-		if ($(this).hasClass('bbc_img resized') === false)
+	// BBC image inline expand on click.
+	// You can turn off this namespaced click event with $('[data-bbcexpandimage]').off("click.elk_bbc")
+	$('[data-bbcexpandimage]').on('click.elk_bbc', function(e) {
+		let $this = $(this);
+
+		// No saved data, then set it to auto expand
+		if ($.isEmptyObject($this.data('bbc_img')))
 		{
-			return true;
+			$this.data('bbc_img', {
+				width: $this.css('width'),
+				height: $this.css('height'),
+				'max-width': $this.css('max-width'),
+				'max-height': $this.css('max-height'),
+			});
+			$this.css({'width': $this.css('width') === 'auto' ? null : 'auto'});
+			$this.css({'height': $this.css('height') === 'auto' ? null : 'auto'});
+
+			// Override default css to allow the image to expand fully, add a div to expand in
+			$this.css({'max-height': 'none'});
+			$this.css({'max-width': '100%'});
+			$this.wrap('<div style="overflow:auto;display:inline-block;"></div>');
 		}
+		else
+		{
+			// Was previously clicked and saved, so set it back
+			$this.css({'width': $this.data('bbc_img').width});
+			$this.css({'height': $this.data('bbc_img').height});
+			$this.css({'max-width': $this.data('bbc_img')['max-width']});
+			$this.css({'max-height': $this.data('bbc_img')['max-height']});
 
-		$(this).css({'cursor': 'pointer'});
+			// Remove the data
+			$this.removeData('bbc_img');
 
-		// Note to addon authors, if you want to enable your own click events to bbc images
-		// you can turn off this namespaced click event with $("img").off("click.elk_bbc")
-		$(this).on('click.elk_bbc', function() {
-			var $this = $(this);
-
-			// No saved data, then lets set it to auto
-			if ($.isEmptyObject($this.data('bbc_img')))
-			{
-				$this.data('bbc_img', {
-					width: $this.css('width'),
-					height: $this.css('height'),
-					'max-width': $this.css('max-width'),
-					'max-height': $this.css('max-height')
-				});
-				$this.css({'width': $this.css('width') === 'auto' ? null : 'auto'});
-				$this.css({'height': $this.css('height') === 'auto' ? null : 'auto'});
-
-				// Override default css to allow the image to expand fully, add a div to expand in
-				$this.css({'max-height': 'none'});
-				$this.css({'max-width': '100%'});
-				$this.wrap('<div style="overflow:auto;display:inline-block;"></div>');
-			}
-			else
-			{
-				// Was clicked and saved, so set it back
-				$this.css({'width': $this.data('bbc_img').width});
-				$this.css({'height': $this.data('bbc_img').height});
-				$this.css({'max-width': $this.data('bbc_img')['max-width']});
-				$this.css({'max-height': $this.data('bbc_img')['max-height']});
-
-				// Remove the data
-				$this.removeData('bbc_img');
-
-				// Remove the div we added to allow the image to overflow expand in
-				$this.unwrap();
-				$this.css({'max-width': '100%'});
-			}
-		});
+			// Remove the div we added to allow the image to overflow expand in
+			$this.unwrap();
+			$this.css({'max-width': '100%'});
+		}
 	});
 });
 
@@ -213,21 +203,38 @@ function elk_addButton (sButtonStripId, bUseImage, oOptions)
 	oButtonStripList.appendChild(oNewButton);
 }
 
+// Get your paws off me
 function onFirstTouch ()
 {
 	useClickMenu();
 }
 
+// Activates click menus when a touch event is detected.
 function useClickMenu ()
 {
-	// Click Menu drop downs
-	let menus = ['#main_menu', '#sort_by', 'ul.poster', 'ul.quickbuttons', 'ul.admin_menu', 'ul.sidebar_menu'];
+    // Click Menu drop downs
+    let menus = ['#main_menu', '#sort_by', 'ul.poster', 'ul.quickbuttons', 'ul.admin_menu', 'ul.sidebar_menu', 'ul.buttonlist'];
 
-	menus.forEach((area) => new elkMenu(area));
+    menus.forEach((selector) => {
+        // Initialize each matching element individually so all instances work (e.g., multiple quickbuttons)
+        let nodes = document.querySelectorAll(selector);
+        if (nodes && nodes.length)
+        {
+            Array.prototype.forEach.call(nodes, function(node) {
+                new elkMenu(node);
+            });
+        }
+        else
+        {
+            // For unique selectors (like IDs), try initializing once by selector
+            new elkMenu(selector);
+        }
+    });
 
-	window.removeEventListener('touchstart', onFirstTouch, false);
+    window.removeEventListener('touchstart', onFirstTouch, false);
 }
 
+// Adds/Removes sticky class to id='menu_nav'
 function stickyMenu ()
 {
 	let menu = document.getElementById('menu_nav');

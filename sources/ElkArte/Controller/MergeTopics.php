@@ -47,12 +47,12 @@ class MergeTopics extends AbstractController
 		// Load the template....
 		theme()->getTemplates()->load('MergeTopics');
 
-		$subActions = array(
-			'done' => array($this, 'action_mergeDone'),
-			'execute' => array($this, 'action_mergeExecute'),
-			'index' => array($this, 'action_mergeIndex'),
-			'options' => array($this, 'action_mergeExecute')
-		);
+		$subActions = [
+			'done' => [$this, 'action_mergeDone'],
+			'execute' => [$this, 'action_mergeExecute'],
+			'index' => [$this, 'action_mergeIndex'],
+			'options' => [$this, 'action_mergeExecute']
+		];
 
 		// ?action=mergetopics;sa=LETSBREAKIT won't work, sorry.
 		$action = new Action('merge_topics');
@@ -71,7 +71,7 @@ class MergeTopics extends AbstractController
 	 * - uses 'merge' sub template of the MergeTopics template.
 	 * - allows to set a different target board.
 	 */
-	public function action_mergeIndex()
+	public function action_mergeIndex(): void
 	{
 		global $txt, $board, $context, $modSettings;
 
@@ -89,7 +89,7 @@ class MergeTopics extends AbstractController
 		if ($modSettings['postmod_active'])
 		{
 			$can_approve_boards = empty($this->user->mod_cache['ap']) ? boardsAllowedTo('approve_posts') : $this->user->mod_cache['ap'];
-			$onlyApproved = $can_approve_boards !== array(0) && !in_array($target_board, $can_approve_boards);
+			$onlyApproved = $can_approve_boards !== [0] && !in_array($target_board, $can_approve_boards);
 		}
 		else
 		{
@@ -128,9 +128,9 @@ class MergeTopics extends AbstractController
 
 		// Get a list of boards they can navigate to to merge.
 		require_once(SUBSDIR . '/Boards.subs.php');
-		$boardListOptions = array(
+		$boardListOptions = [
 			'not_redirection' => true
-		);
+		];
 
 		if (!in_array(0, $merge_boards))
 		{
@@ -138,15 +138,15 @@ class MergeTopics extends AbstractController
 		}
 
 		$boards_list = getBoardList($boardListOptions, true);
-		$context['boards'] = array();
+		$context['boards'] = [];
 
 		foreach ($boards_list as $board)
 		{
-			$context['boards'][] = array(
+			$context['boards'][] = [
 				'id' => $board['id_board'],
 				'name' => $board['board_name'],
 				'category' => $board['cat_name']
-			);
+			];
 		}
 
 		// Get some topics to merge it with.
@@ -180,7 +180,7 @@ class MergeTopics extends AbstractController
 	 * @return bool
 	 * @throws Exception merge_need_more_topics
 	 */
-	public function action_mergeExecute($topics = array())
+	public function action_mergeExecute($topics = []): bool
 	{
 		global $txt, $context;
 
@@ -193,7 +193,7 @@ class MergeTopics extends AbstractController
 		// Handle URLs from action_mergeIndex.
 		if (!empty($this->_req->query->from) && !empty($this->_req->query->to))
 		{
-			$topics = array((int) $this->_req->query->from, (int) $this->_req->query->to);
+			$topics = [(int) $this->_req->query->from, (int) $this->_req->query->to];
 		}
 
 		// If we came from a form, the topic IDs came by post.
@@ -232,7 +232,7 @@ class MergeTopics extends AbstractController
 		}
 
 		// Make sure they can see all boards....
-		$query_boards = array('boards' => $merger->boards);
+		$query_boards = ['boards' => $merger->boards];
 
 		if (!in_array(0, $allowedto_merge_boards))
 		{
@@ -243,10 +243,10 @@ class MergeTopics extends AbstractController
 		require_once(SUBSDIR . '/Boards.subs.php');
 		$boards_info = fetchBoardsInfo($query_boards);
 
-		$boardListOptions = array(
+		$boardListOptions = [
 			'not_redirection' => true,
 			'selected_board' => $merger->firstBoard,
-		);
+		];
 
 		if (!in_array(0, $allowedto_merge_boards))
 		{
@@ -284,7 +284,7 @@ class MergeTopics extends AbstractController
 			return true;
 		}
 
-		$result = $merger->doMerge(array(
+		$result = $merger->doMerge([
 			'board' => $merger->boards[0],
 			'poll' => $this->_req->getPost('poll', 'intval', 0),
 			'subject' => $this->_req->getPost('subject', 'trim', ''),
@@ -292,7 +292,7 @@ class MergeTopics extends AbstractController
 			'enforce_subject' => $this->_req->getPost('enforce_subject', 'trim', ''),
 			'notifications' => $this->_req->getPost('notifications', 'trim', ''),
 			'accessible_boards' => array_keys($boards_info),
-		));
+		]);
 
 		if ($merger->hasErrors())
 		{
@@ -312,7 +312,7 @@ class MergeTopics extends AbstractController
 	 * - is accessed with ?action=mergetopics;sa=done.
 	 * - uses 'merge_done' sub template of the MergeTopics template.
 	 */
-	public function action_mergeDone()
+	public function action_mergeDone(): void
 	{
 		global $txt, $context;
 

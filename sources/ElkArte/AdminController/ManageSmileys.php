@@ -36,10 +36,10 @@ use ElkArte\SettingsForm\SettingsForm;
 class ManageSmileys extends AbstractController
 {
 	/** @var array Contextual information about smiley sets. */
-	private $_smiley_context = [];
+	private array $_smiley_context = [];
 
 	/** @var string[] allowed extensions for smiles */
-	private $_smiley_types = ['jpg', 'gif', 'jpeg', 'png', 'webp', 'svg'];
+	private array $_smiley_types = ['jpg', 'gif', 'jpeg', 'png', 'webp', 'svg'];
 
 	/**
 	 * This is the dispatcher of smileys administration.
@@ -108,7 +108,7 @@ class ManageSmileys extends AbstractController
 	/**
 	 * Sets our internal smiley context.
 	 */
-	private function _initSmileyContext()
+	private function _initSmileyContext(): void
 	{
 		global $modSettings;
 
@@ -127,7 +127,7 @@ class ManageSmileys extends AbstractController
 	 *
 	 * @uses show_settings sub template
 	 */
-	public function action_smileySettings_display()
+	public function action_smileySettings_display(): void
 	{
 		global $context;
 
@@ -197,7 +197,7 @@ class ManageSmileys extends AbstractController
 	/**
 	 * Clear the cache to avoid changes not immediately appearing
 	 */
-	protected function clearSmileyCache()
+	protected function clearSmileyCache(): void
 	{
 		Cache::instance()->remove('parsing_smileys');
 		Cache::instance()->remove('posting_smileys');
@@ -211,7 +211,7 @@ class ManageSmileys extends AbstractController
 	 *
 	 * @return void
 	 */
-	protected function createCustomTagsFile()
+	protected function createCustomTagsFile(): void
 	{
 		global $context, $settings;
 
@@ -266,11 +266,11 @@ class ManageSmileys extends AbstractController
 	}
 
 	/**
-	 * List, add, remove, modify smileys sets.
+	 * List, add, remove, modify smiley sets.
 	 *
 	 * @event integrate_list_smiley_set_list
 	 */
-	public function action_edit()
+	public function action_edit(): void
 	{
 		global $modSettings, $context, $txt;
 
@@ -412,7 +412,7 @@ class ManageSmileys extends AbstractController
 	 * - Adding a new set
 	 * - Modifying an existing set, such as setting it as the default
 	 */
-	private function _subActionSubmit()
+	private function _subActionSubmit(): void
 	{
 		global $context, $modSettings;
 
@@ -520,9 +520,9 @@ class ManageSmileys extends AbstractController
 	 *
 	 * @param string $smileyPath
 	 *
-	 * @throws \ElkArte\Exceptions\Exception smiley_set_unable_to_import
+	 * @throws Exception smiley_set_unable_to_import
 	 */
-	public function importSmileys($smileyPath)
+	public function importSmileys(string $smileyPath): void
 	{
 		global $modSettings;
 
@@ -564,9 +564,9 @@ class ManageSmileys extends AbstractController
 	 *
 	 * @param array $foundSmileys array as returned from file functions listTree
 	 * @return array
-	 * @throws \ElkArte\Exceptions\Exception
+	 * @throws Exception
 	 */
-	private function _getUniqueSmileys($foundSmileys)
+	private function _getUniqueSmileys(array $foundSmileys): array
 	{
 		global $context;
 
@@ -607,7 +607,7 @@ class ManageSmileys extends AbstractController
 	/**
 	 * Importing smileys from an existing smiley set
 	 */
-	private function _subActionImport()
+	private function _subActionImport(): void
 	{
 		global $context;
 
@@ -634,10 +634,8 @@ class ManageSmileys extends AbstractController
 	/**
 	 * If we're modifying or adding a smileyset, or if we imported from another
 	 * set, then some context info needs to be set.
-	 *
-	 * @throws \ElkArte\Exceptions\Exception in superfluity
 	 */
-	private function _subActionModifySet()
+	private function _subActionModifySet(): void
 	{
 		global $context, $txt, $modSettings;
 
@@ -707,7 +705,7 @@ class ManageSmileys extends AbstractController
 	/**
 	 * Add a smiley, that's right.
 	 */
-	public function action_addsmiley()
+	public function action_addsmiley(): void
 	{
 		global $modSettings, $context, $txt;
 
@@ -955,7 +953,7 @@ class ManageSmileys extends AbstractController
 	 *
 	 * @event integrate_list_smiley_list
 	 */
-	public function action_editsmiley()
+	public function action_editsmiley(): void
 	{
 		global $modSettings, $context, $txt;
 
@@ -1291,7 +1289,7 @@ class ManageSmileys extends AbstractController
 	 *
 	 * @event integrate_list_message_icon_list
 	 */
-	public function action_editicon()
+	public function action_editicon(): void
 	{
 		global $context, $settings, $txt;
 
@@ -1566,7 +1564,7 @@ class ManageSmileys extends AbstractController
 	/**
 	 * Allows to edit smileys order.
 	 */
-	public function action_setorder()
+	public function action_setorder(): void
 	{
 		global $context, $txt;
 
@@ -1656,7 +1654,7 @@ class ManageSmileys extends AbstractController
 	/**
 	 * Install a smiley set.
 	 */
-	public function action_install()
+	public function action_install(): void
 	{
 		global $modSettings, $context, $txt, $scripturl;
 
@@ -1905,7 +1903,7 @@ class ManageSmileys extends AbstractController
 	 *
 	 * @return void
 	 */
-	public function loadSmileySets()
+	public function loadSmileySets(): void
 	{
 		global $context, $modSettings;
 
@@ -1935,7 +1933,7 @@ class ManageSmileys extends AbstractController
 	 * @param array $smiley_sets array of smiley sets (end directory names) to search
 	 * @return array of unique smiley names across one or many "sets"
 	 */
-	public function getAllPossibleFilenamesForTheSmileys($smiley_sets)
+	public function getAllPossibleFilenamesForTheSmileys(array $smiley_sets): array
 	{
 		global $context, $modSettings;
 

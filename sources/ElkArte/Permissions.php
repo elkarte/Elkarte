@@ -82,7 +82,7 @@ class Permissions
 	/**
 	 * Loads those reserved permissions into context.
 	 */
-	public function loadIllegal()
+	public function loadIllegal(): void
 	{
 		global $context;
 
@@ -95,18 +95,18 @@ class Permissions
 		}
 
 		$context['illegal_permissions'] = &$this->illegal_permissions;
-		call_integration_hook('integrate_load_illegal_permissions', array(&$this->illegal_permissions));
+		call_integration_hook('integrate_load_illegal_permissions', [&$this->illegal_permissions]);
 	}
 
 	/**
 	 * Loads those permissions guests cannot have, into context.
 	 */
-	public function loadIllegalGuest()
+	public function loadIllegalGuest(): void
 	{
 		global $context;
 
 		$context['non_guest_permissions'] = &$this->illegal_guest_permissions;
-		call_integration_hook('integrate_load_illegal_guest_permissions', array(&$this->illegal_guest_permissions));
+		call_integration_hook('integrate_load_illegal_guest_permissions', [&$this->illegal_guest_permissions]);
 	}
 
 	/**
@@ -114,7 +114,7 @@ class Permissions
 	 *
 	 * @return string[]
 	 */
-	public function getIllegalPermissions()
+	public function getIllegalPermissions(): array
 	{
 		return $this->illegal_permissions;
 	}
@@ -124,7 +124,7 @@ class Permissions
 	 *
 	 * @return string[]
 	 */
-	public function getIllegalGuestPermissions()
+	public function getIllegalGuestPermissions(): array
 	{
 		return $this->illegal_guest_permissions;
 	}
@@ -136,7 +136,7 @@ class Permissions
 	 * @param string[] $where
 	 * @param array $where_parameters = array() or values used in the where statement
 	 */
-	public function deletePermissions($permissions, $where = array(), $where_parameters = array())
+	public function deletePermissions($permissions, $where = [], $where_parameters = []): void
 	{
 		if (count($this->illegal_permissions) > 0)
 		{
@@ -158,16 +158,16 @@ class Permissions
 	 * This function updates the permissions of any groups based on the given groups.
 	 *
 	 * @param array|int $parents (array or int) group or groups whose children are to be updated
-	 * @param int|null $profile = null an int or null for the customized profile, if any
+	 * @param null $profile = null an int or null for the customized profile, if any
 	 *
-	 * @return bool
+	 * @return bool|null
 	 */
-	public function updateChild($parents, $profile = null)
+	public function updateChild($parents, $profile = null): ?bool
 	{
 		// All the parent groups to sort out.
 		if (!is_array($parents))
 		{
-			$parents = array($parents);
+			$parents = [$parents];
 		}
 
 		// Find all the children of this group.
@@ -179,10 +179,10 @@ class Permissions
 			FROM {db_prefix}membergroups
 			WHERE id_parent != {int:not_inherited}
 				' . (empty($parents) ? '' : 'AND id_parent IN ({array_int:parent_list})'),
-			array(
+			[
 				'parent_list' => $parents,
 				'not_inherited' => -2,
-			)
+			]
 		)->fetch_callback(
 			static function ($row) use (&$children, &$child_groups, &$parents) {
 				$children[$row['id_parent']][] = $row['id_group'];
@@ -211,18 +211,18 @@ class Permissions
 				SELECT id_group, permission, add_deny
 				FROM {db_prefix}permissions
 				WHERE id_group IN ({array_int:parent_list})',
-				array(
+				[
 					'parent_list' => $parents,
-				)
+				]
 			)->fetch_callback(
 				static function ($row) use ($children, &$permissions) {
 					foreach ($children[$row['id_group']] as $child)
 					{
-						$permissions[] = array(
+						$permissions[] = [
 							'id_group' => (int) $child,
 							'permission' => $row['permission'],
 							'add_deny' => $row['add_deny'],
-						);
+						];
 					}
 				}
 			);
@@ -230,9 +230,9 @@ class Permissions
 			$this->db->query('', '
 				DELETE FROM {db_prefix}permissions
 				WHERE id_group IN ({array_int:child_groups})',
-				array(
+				[
 					'child_groups' => $child_groups,
-				)
+				]
 			);
 
 			// Finally insert.
@@ -248,22 +248,22 @@ class Permissions
 			$profileQuery = $profile === null ? '' : ' AND id_profile = {int:current_profile}';
 
 			// Again, get all the parent permissions.
-			$permissions = array();
+			$permissions = [];
 			$this->db->fetchQuery('
 				SELECT 
 					id_profile, id_group, permission, add_deny
 				FROM {db_prefix}board_permissions
 				WHERE id_group IN ({array_int:parent_groups})
 					' . $profileQuery,
-				array(
+				[
 					'parent_groups' => $parents,
 					'current_profile' => $profile !== null && $profile ? $profile : 1,
-				)
+				]
 			)->fetch_callback(
 				static function ($row) use (&$permissions, $children) {
 					foreach ($children[$row['id_group']] as $child)
 					{
-						$permissions[] = array($row['permission'], $child, $row['add_deny'], $row['id_profile']);
+						$permissions[] = [$row['permission'], $child, $row['add_deny'], $row['id_profile']];
 					}
 				}
 			);
@@ -272,10 +272,10 @@ class Permissions
 				DELETE FROM {db_prefix}board_permissions
 				WHERE id_group IN ({array_int:child_groups})
 					' . $profileQuery,
-				array(
+				[
 					'child_groups' => $child_groups,
 					'current_profile' => $profile !== null && $profile ? $profile : 1,
-				)
+				]
 			);
 
 			// Do the insert.
@@ -284,5 +284,7 @@ class Permissions
 				replaceBoardPermission($permissions);
 			}
 		}
+
+		return true;
 	}
 }

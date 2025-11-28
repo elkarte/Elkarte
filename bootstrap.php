@@ -43,8 +43,8 @@ class Bootstrap
 	 * Bootstrap constructor.
 	 *
 	 * @param bool $standalone
-	 *  - true to boot outside elkarte
-	 *  - false to bootstrap the main elkarte site.
+	 *  - True to boot outside elkarte
+	 *  - False to bootstrap the main elkarte site.
 	 */
 	public function __construct($standalone = true)
 	{
@@ -75,7 +75,7 @@ class Bootstrap
 	}
 
 	/**
-	 * Calls the various initialization functions in the needed order
+	 * Calls various initialization functions in the necessary order
 	 */
 	public function bringUpBasics()
 	{
@@ -136,7 +136,7 @@ class Bootstrap
 	}
 
 	/**
-	 * Loads the settings values into the global space
+	 * Loads the Settings.php values into the global space
 	 */
 	private function loadSettingsFile()
 	{
@@ -227,7 +227,8 @@ class Bootstrap
 		define('ADMINDIR', $sourcedir . '/ElkArte/AdminController');
 		define('CONTROLLERDIR', $sourcedir . '/ElkArte/Controller');
 		define('SUBSDIR', $sourcedir . '/subs');
-		define('ADDONSDIR', $boarddir . '/addons');
+		define('ADDONSDIR', $boarddir . '/Addons');
+		define('ELKARTEDIR', $sourcedir . '/ElkArte');
 		unset($boarddir, $cachedir, $sourcedir, $languagedir, $extdir);
 	}
 
@@ -247,7 +248,7 @@ class Bootstrap
 	}
 
 	/**
-	 * The autoloader will take care most requests for files
+	 * The autoloader will take care of most requests for files
 	 */
 	private function loadAutoloader()
 	{
@@ -256,6 +257,7 @@ class Bootstrap
 		$loader = new ClassLoader();
 		$loader->setPsr4('ElkArte\\', SOURCEDIR . '/ElkArte');
 		$loader->setPsr4('BBC\\', SOURCEDIR . '/ElkArte/BBC');
+		$loader->setPsr4('Addons\\', BOARDDIR . '/Addons');
 		$loader->register();
 	}
 

@@ -45,17 +45,17 @@ class BoardIndex extends AbstractModule
 	/**
 	 * Pre-load hooks as part of board index
 	 */
-	public function pre_load()
+	public function pre_load(): void
 	{
 		global $modSettings, $context;
 
 		// Retrieve the calendar data (events, birthdays, holidays).
-		$eventOptions = array(
+		$eventOptions = [
 			'include_holidays' => $modSettings['cal_showholidays'] > 1,
 			'include_birthdays' => $modSettings['cal_showbdays'] > 1,
 			'include_events' => $modSettings['cal_showevents'] > 1,
 			'num_days_shown' => empty($modSettings['cal_days_for_index']) || $modSettings['cal_days_for_index'] < 1 ? 1 : $modSettings['cal_days_for_index'],
-		);
+		];
 
 		$context += Cache::instance()->quick_get('calendar_index_offset_' . ($this->user->time_offset + $modSettings['time_offset']), 'subs/Calendar.subs.php', 'cache_getRecentEvents', [$eventOptions]);
 
@@ -71,7 +71,7 @@ class BoardIndex extends AbstractModule
 	 *
 	 * @param array $callbacks
 	 */
-	public function post_load(&$callbacks)
+	public function post_load(&$callbacks): void
 	{
 		global $context;
 

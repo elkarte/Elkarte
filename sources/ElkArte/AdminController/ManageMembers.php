@@ -32,10 +32,10 @@ use ElkArte\User;
 class ManageMembers extends AbstractController
 {
 	/** @var array Holds various setting conditions for the current action */
-	protected $conditions;
+	protected array $conditions;
 
 	/** @var array Holds the members that the action is being applied to */
-	protected $member_info;
+	protected array $member_info;
 
 	/**
 	 * The main entrance point for the Manage Members screen.
@@ -59,28 +59,28 @@ class ManageMembers extends AbstractController
 		Txt::load('ManageMembers');
 		theme()->getTemplates()->load('ManageMembers');
 
-		$subActions = array(
-			'all' => array(
+		$subActions = [
+			'all' => [
 				'controller' => $this,
 				'function' => 'action_list',
-				'permission' => 'moderate_forum'),
-			'approve' => array(
+				'permission' => 'moderate_forum'],
+			'approve' => [
 				'controller' => $this,
 				'function' => 'action_approve',
-				'permission' => 'moderate_forum'),
-			'browse' => array(
+				'permission' => 'moderate_forum'],
+			'browse' => [
 				'controller' => $this,
 				'function' => 'action_browse',
-				'permission' => 'moderate_forum'),
-			'search' => array(
+				'permission' => 'moderate_forum'],
+			'search' => [
 				'controller' => $this,
 				'function' => 'action_search',
-				'permission' => 'moderate_forum'),
-			'query' => array(
+				'permission' => 'moderate_forum'],
+			'query' => [
 				'controller' => $this,
 				'function' => 'action_list',
-				'permission' => 'moderate_forum'),
-		);
+				'permission' => 'moderate_forum'],
+		];
 
 		// Prepare our action control
 		$action = new Action();
@@ -97,11 +97,11 @@ class ManageMembers extends AbstractController
 
 		foreach ($context['activation_numbers'] as $activation_type => $total_members)
 		{
-			if (in_array($activation_type, array(0, 2), true))
+			if (in_array($activation_type, [0, 2], true))
 			{
 				$context['awaiting_activation'] += $total_members;
 			}
-			elseif (in_array($activation_type, array(3, 4, 5), true))
+			elseif (in_array($activation_type, [3, 4, 5], true))
 			{
 				$context['awaiting_approval'] += $total_members;
 			}
@@ -153,7 +153,7 @@ class ManageMembers extends AbstractController
 		]);
 
 		// Call integrate_manage_members
-		call_integration_hook('integrate_manage_members', array(&$subActions));
+		call_integration_hook('integrate_manage_members', [&$subActions]);
 
 		// Off we go
 		$action->dispatch($subAction);
@@ -171,7 +171,7 @@ class ManageMembers extends AbstractController
 	 * @event integrate_view_members_params passed $params
 	 * @uses the view_members sub template of the ManageMembers template.
 	 */
-	public function action_list()
+	public function action_list(): void
 	{
 		global $txt, $context, $modSettings;
 
@@ -189,73 +189,73 @@ class ManageMembers extends AbstractController
 		{
 			// Retrieving the membergroups and postgroups.
 			require_once(SUBSDIR . '/Membergroups.subs.php');
-			$groups = getBasicMembergroupData(array(), array('moderator'), null, true);
+			$groups = getBasicMembergroupData([], ['moderator'], null, true);
 
 			$context['membergroups'] = $groups['membergroups'];
 			$context['postgroups'] = $groups['groups'];
 			unset($groups);
 
 			// Some data about the form fields and how they are linked to the database.
-			$params = array(
-				'mem_id' => array(
-					'db_fields' => array('id_member'),
+			$params = [
+				'mem_id' => [
+					'db_fields' => ['id_member'],
 					'type' => 'int',
 					'range' => true
-				),
-				'age' => array(
-					'db_fields' => array('birthdate'),
+				],
+				'age' => [
+					'db_fields' => ['birthdate'],
 					'type' => 'age',
 					'range' => true
-				),
-				'posts' => array(
-					'db_fields' => array('posts'),
+				],
+				'posts' => [
+					'db_fields' => ['posts'],
 					'type' => 'int',
 					'range' => true
-				),
-				'reg_date' => array(
-					'db_fields' => array('date_registered'),
+				],
+				'reg_date' => [
+					'db_fields' => ['date_registered'],
 					'type' => 'date',
 					'range' => true
-				),
-				'last_online' => array(
-					'db_fields' => array('last_login'),
+				],
+				'last_online' => [
+					'db_fields' => ['last_login'],
 					'type' => 'date',
 					'range' => true
-				),
-				'activated' => array(
-					'db_fields' => array('is_activated'),
+				],
+				'activated' => [
+					'db_fields' => ['is_activated'],
 					'type' => 'checkbox',
-					'values' => array('0', '1', '11'),
-				),
-				'membername' => array(
-					'db_fields' => array('member_name', 'real_name'),
+					'values' => ['0', '1', '11'],
+				],
+				'membername' => [
+					'db_fields' => ['member_name', 'real_name'],
 					'type' => 'string'
-				),
-				'email' => array(
-					'db_fields' => array('email_address'),
+				],
+				'email' => [
+					'db_fields' => ['email_address'],
 					'type' => 'string'
-				),
-				'website' => array(
-					'db_fields' => array('website_title', 'website_url'),
+				],
+				'website' => [
+					'db_fields' => ['website_title', 'website_url'],
 					'type' => 'string'
-				),
-				'ip' => array(
-					'db_fields' => array('member_ip'),
+				],
+				'ip' => [
+					'db_fields' => ['member_ip'],
 					'type' => 'string'
-				)
-			);
+				]
+			];
 
-			$range_trans = array(
+			$range_trans = [
 				'--' => '<',
 				'-' => '<=',
 				'=' => '=',
 				'+' => '>=',
 				'++' => '>'
-			);
+			];
 
-			call_integration_hook('integrate_view_members_params', array(&$params));
+			call_integration_hook('integrate_view_members_params', [&$params]);
 
-			$search_params = array();
+			$search_params = [];
 			if ($context['sub_action'] === 'query' && !empty($this->_req->query->params) && empty($this->_req->post->types))
 			{
 				$search_params = @json_decode(base64_decode($this->_req->query->params), true);
@@ -276,8 +276,8 @@ class ManageMembers extends AbstractController
 
 			// @todo Validate a little more.
 			// Loop through every field of the form.
-			$query_parts = array();
-			$where_params = array();
+			$query_parts = [];
+			$where_params = [];
 			foreach ($params as $param_name => $param_info)
 			{
 				// Not filled in?
@@ -287,7 +287,7 @@ class ManageMembers extends AbstractController
 				}
 
 				// Make sure numeric values are really numeric.
-				if (in_array($param_info['type'], array('int', 'age')))
+				if (in_array($param_info['type'], ['int', 'age']))
 				{
 					$search_params[$param_name] = (int) $search_params[$param_name];
 				}
@@ -320,13 +320,13 @@ class ManageMembers extends AbstractController
 						$upperlimit = sprintf('%04d-%02d-%02d', $datearray['year'] - $search_params[$param_name], $datearray['mon'], $datearray['mday']);
 						$lowerlimit = sprintf('%04d-%02d-%02d', $datearray['year'] - $search_params[$param_name] - 1, $datearray['mon'], $datearray['mday']);
 
-						if (in_array($search_params['types'][$param_name], array('-', '--', '=')))
+						if (in_array($search_params['types'][$param_name], ['-', '--', '=']))
 						{
 							$query_parts[] = ($param_info['db_fields'][0]) . ' > {string:' . $param_name . '_minlimit}';
 							$where_params[$param_name . '_minlimit'] = ($search_params['types'][$param_name] === '--' ? $upperlimit : $lowerlimit);
 						}
 
-						if (in_array($search_params['types'][$param_name], array('+', '++', '=')))
+						if (in_array($search_params['types'][$param_name], ['+', '++', '=']))
 						{
 							$query_parts[] = ($param_info['db_fields'][0]) . ' <= {string:' . $param_name . '_pluslimit}';
 							$where_params[$param_name . '_pluslimit'] = ($search_params['types'][$param_name] === '++' ? $lowerlimit : $upperlimit);
@@ -361,7 +361,7 @@ class ManageMembers extends AbstractController
 				else
 				{
 					// Replace the wildcard characters ('*' and '?') into MySQL ones.
-					$parameter = strtolower(strtr(Util::htmlspecialchars($search_params[$param_name], ENT_QUOTES), array('%' => '\%', '_' => '\_', '*' => '%', '?' => '_')));
+					$parameter = strtolower(strtr(Util::htmlspecialchars($search_params[$param_name], ENT_QUOTES), ['%' => '\%', '_' => '\_', '*' => '%', '?' => '_']));
 
 					$query_parts[] = '({column_case_insensitive:' . implode('} LIKE {string_case_insensitive:' . $param_name . '_normal} OR {column_case_insensitive:', $param_info['db_fields']) . '} LIKE {string_case_insensitive:' . $param_name . '_normal})';
 
@@ -370,7 +370,7 @@ class ManageMembers extends AbstractController
 			}
 
 			// Set up the membergroup query part.
-			$mg_query_parts = array();
+			$mg_query_parts = [];
 
 			// Primary membergroups, but only if at least was not selected.
 			if (!empty($search_params['membergroups'][1]) && count($context['membergroups']) !== count($search_params['membergroups'][1]))
@@ -418,116 +418,116 @@ class ManageMembers extends AbstractController
 		$context['page_title'] = $txt['admin_members'];
 		$where_params = $where_params ?? [];
 
-		$listOptions = array(
+		$listOptions = [
 			'id' => 'member_list',
 			'title' => $txt['members_list'],
 			'items_per_page' => $modSettings['defaultMaxMembers'],
 			'base_href' => getUrl('admin', ['action' => 'admin', 'area' => 'viewmembers'] + $context['params_url']),
 			'default_sort_col' => 'user_name',
-			'get_items' => array(
+			'get_items' => [
 				'file' => SUBSDIR . '/Members.subs.php',
 				'function' => 'list_getMembers',
-				'params' => array(
+				'params' => [
 					$where ?? '1=1',
 					$where_params,
-				),
-			),
-			'get_count' => array(
+				],
+			],
+			'get_count' => [
 				'file' => SUBSDIR . '/Members.subs.php',
 				'function' => 'list_getNumMembers',
-				'params' => array(
+				'params' => [
 					$where ?? '1=1',
 					$where_params,
-				),
-			),
-			'columns' => array(
-				'id_member' => array(
-					'header' => array(
+				],
+			],
+			'columns' => [
+				'id_member' => [
+					'header' => [
 						'value' => $txt['member_id'],
-					),
-					'data' => array(
+					],
+					'data' => [
 						'db' => 'id_member',
-					),
-					'sort' => array(
+					],
+					'sort' => [
 						'default' => 'id_member',
 						'reverse' => 'id_member DESC',
-					),
-				),
-				'user_name' => array(
-					'header' => array(
+					],
+				],
+				'user_name' => [
+					'header' => [
 						'value' => $txt['username'],
-					),
-					'data' => array(
-						'sprintf' => array(
+					],
+					'data' => [
+						'sprintf' => [
 							'format' => '<a href="' . getUrl('profile', ['action' => 'profile', 'u' => '%1$d', 'name' => '%2$s']) . '">%2$s</a>',
-							'params' => array(
+							'params' => [
 								'id_member' => false,
 								'member_name' => false,
-							),
-						),
-					),
-					'sort' => array(
+							],
+						],
+					],
+					'sort' => [
 						'default' => 'member_name',
 						'reverse' => 'member_name DESC',
-					),
-				),
-				'display_name' => array(
-					'header' => array(
+					],
+				],
+				'display_name' => [
+					'header' => [
 						'value' => $txt['display_name'],
-					),
-					'data' => array(
-						'sprintf' => array(
+					],
+					'data' => [
+						'sprintf' => [
 							'format' => '<a href="' . getUrl('profile', ['action' => 'profile', 'u' => '%1$d']) . '">%2$s</a>',
-							'params' => array(
+							'params' => [
 								'id_member' => false,
 								'real_name' => false,
-							),
-						),
-					),
-					'sort' => array(
+							],
+						],
+					],
+					'sort' => [
 						'default' => 'real_name',
 						'reverse' => 'real_name DESC',
-					),
-				),
-				'email' => array(
-					'header' => array(
+					],
+				],
+				'email' => [
+					'header' => [
 						'value' => $txt['email_address'],
-					),
-					'data' => array(
-						'sprintf' => array(
+					],
+					'data' => [
+						'sprintf' => [
 							'format' => '<a href="mailto:%1$s">%1$s</a>',
-							'params' => array(
+							'params' => [
 								'email_address' => true,
-							),
-						),
-					),
-					'sort' => array(
+							],
+						],
+					],
+					'sort' => [
 						'default' => 'email_address',
 						'reverse' => 'email_address DESC',
-					),
-				),
-				'ip' => array(
-					'header' => array(
+					],
+				],
+				'ip' => [
+					'header' => [
 						'value' => $txt['ip_address'],
-					),
-					'data' => array(
-						'sprintf' => array(
+					],
+					'data' => [
+						'sprintf' => [
 							'format' => '<a href="' . getUrl('action', ['action' => 'trackip', 'searchip' => '%1$s']) . '">%1$s</a>',
-							'params' => array(
+							'params' => [
 								'member_ip' => false,
-							),
-						),
-					),
-					'sort' => array(
+							],
+						],
+					],
+					'sort' => [
 						'default' => 'member_ip',
 						'reverse' => 'member_ip DESC',
-					),
-				),
-				'last_active' => array(
-					'header' => array(
+					],
+				],
+				'last_active' => [
+					'header' => [
 						'value' => $txt['viewmembers_online'],
-					),
-					'data' => array(
+					],
+					'data' => [
 						'function' => static function ($rowData) {
 							global $txt;
 
@@ -544,48 +544,48 @@ class ManageMembers extends AbstractController
 
 							return $difference;
 						},
-					),
-					'sort' => array(
+					],
+					'sort' => [
 						'default' => 'last_login DESC',
 						'reverse' => 'last_login',
-					),
-				),
-				'posts' => array(
-					'header' => array(
+					],
+				],
+				'posts' => [
+					'header' => [
 						'value' => $txt['member_postcount'],
-					),
-					'data' => array(
+					],
+					'data' => [
 						'db' => 'posts',
-					),
-					'sort' => array(
+					],
+					'sort' => [
 						'default' => 'posts',
 						'reverse' => 'posts DESC',
-					),
-				),
-				'check' => array(
-					'header' => array(
+					],
+				],
+				'check' => [
+					'header' => [
 						'value' => '<input type="checkbox" onclick="invertAll(this, this.form);" class="input_check" />',
 						'class' => 'centertext',
-					),
-					'data' => array(
+					],
+					'data' => [
 						'function' => static fn($rowData) => '<input type="checkbox" name="members[]" value="' . $rowData['id_member'] . '" class="input_check" ' . ($rowData['id_member'] === User::$info->id || $rowData['id_group'] == 1 || in_array(1, explode(',', $rowData['additional_groups'])) ? 'disabled="disabled"' : '') . ' />',
 						'class' => 'centertext',
-					),
-				),
-			),
-			'form' => array(
+					],
+				],
+			],
+			'form' => [
 				'href' => getUrl('admin', ['action' => 'admin', 'area' => 'viewmembers'] + $context['params_url']),
 				'include_start' => true,
 				'include_sort' => true,
-			),
-			'additional_rows' => array(
-				array(
+			],
+			'additional_rows' => [
+				[
 					'position' => 'below_table_data',
 					'value' => template_users_multiactions($this->_getGroups()),
 					'class' => 'flow_flex_additional_row',
-				),
-			),
-		);
+				],
+			],
+		];
 
 		// Without enough permissions, don't show 'delete members' checkboxes.
 		if (!allowedTo('profile_remove_any'))
@@ -606,7 +606,7 @@ class ManageMembers extends AbstractController
 	 * - Group changes
 	 * - Banning
 	 */
-	protected function _multiMembersAction()
+	protected function _multiMembersAction(): void
 	{
 		global $txt;
 
@@ -614,7 +614,7 @@ class ManageMembers extends AbstractController
 		checkSession();
 
 		// Clean the input.
-		$members = array();
+		$members = [];
 		foreach ($this->_req->post->members as $value)
 		{
 			// Don't delete yourself, idiot.
@@ -643,11 +643,11 @@ class ManageMembers extends AbstractController
 		}
 
 		// Are we changing groups?
-		if (in_array($this->_req->post->maction, array('pgroup', 'agroup')) && allowedTo('manage_membergroups'))
+		if (in_array($this->_req->post->maction, ['pgroup', 'agroup']) && allowedTo('manage_membergroups'))
 		{
 			require_once(SUBSDIR . '/Membergroups.subs.php');
 
-			$groups = array('p', 'a');
+			$groups = ['p', 'a'];
 			foreach ($groups as $group)
 			{
 				if ($this->_req->post->maction == $group . 'group' && !empty($this->_req->post->new_membergroup))
@@ -668,28 +668,28 @@ class ManageMembers extends AbstractController
 		}
 
 		// Are we banning?
-		if (in_array($this->_req->post->maction, array('ban_names', 'ban_mails', 'ban_ips', 'ban_names_mails')) && allowedTo('manage_bans'))
+		if (in_array($this->_req->post->maction, ['ban_names', 'ban_mails', 'ban_ips', 'ban_names_mails']) && allowedTo('manage_bans'))
 		{
 			require_once(SUBSDIR . '/Bans.subs.php');
 			require_once(SUBSDIR . '/Members.subs.php');
 
-			$ban_group_id = insertBanGroup(array(
+			$ban_group_id = insertBanGroup([
 				'name' => $txt['admin_ban_name'],
-				'cannot' => array(
+				'cannot' => [
 					'access' => 1,
 					'register' => 0,
 					'post' => 0,
 					'login' => 0,
-				),
+				],
 				'db_expiration' => 'NULL',
 				'reason' => '',
 				'notes' => '',
-			));
+			]);
 
-			$ban_name = in_array($this->_req->post->maction, array('ban_names', 'ban_names_mails'));
-			$ban_email = in_array($this->_req->post->maction, array('ban_mails', 'ban_names_mails'));
+			$ban_name = in_array($this->_req->post->maction, ['ban_names', 'ban_names_mails']);
+			$ban_email = in_array($this->_req->post->maction, ['ban_mails', 'ban_names_mails']);
 			$ban_ips = $this->_req->post->maction === 'ban_ips';
-			$suggestions = array();
+			$suggestions = [];
 
 			if ($ban_email)
 			{
@@ -706,16 +706,16 @@ class ManageMembers extends AbstractController
 				$suggestions[] = 'main_ip';
 			}
 
-			$members_data = getBasicMemberData($members, array('moderation' => true));
+			$members_data = getBasicMemberData($members, ['moderation' => true]);
 			foreach ($members_data as $member)
 			{
-				saveTriggers(array(
+				saveTriggers([
 					'main_ip' => $ban_ips ? $member['member_ip'] : '',
 					'hostname' => '',
 					'email' => $ban_email ? $member['email_address'] : '',
 					'user' => $ban_name ? $member['member_name'] : '',
 					'ban_suggestions' => $suggestions,
-				), $ban_group_id, $ban_name ? $member['id_member'] : 0);
+				], $ban_group_id, $ban_name ? $member['id_member'] : 0);
 			}
 		}
 	}
@@ -725,7 +725,7 @@ class ManageMembers extends AbstractController
 	 *
 	 * @return array
 	 */
-	protected function _getGroups()
+	protected function _getGroups(): array
 	{
 		global $txt;
 
@@ -734,18 +734,18 @@ class ManageMembers extends AbstractController
 		$member_groups = getGroupsList();
 
 		// Better remove admin membergroup...and set it to a "remove all"
-		$member_groups[1] = array(
+		$member_groups[1] = [
 			'id' => -1,
 			'name' => $txt['remove_groups'],
 			'is_primary' => 0,
-		);
+		];
 
 		// no primary is tricky...
-		$member_groups[0] = array(
+		$member_groups[0] = [
 			'id' => 0,
 			'name' => '',
 			'is_primary' => 1,
-		);
+		];
 
 		return $member_groups;
 	}
@@ -761,13 +761,13 @@ class ManageMembers extends AbstractController
 	 *
 	 * @uses the search_members sub template of the ManageMembers template.
 	 */
-	public function action_search()
+	public function action_search(): void
 	{
 		global $context, $txt;
 
 		// Get a list of all the membergroups and postgroups that can be selected.
 		require_once(SUBSDIR . '/Membergroups.subs.php');
-		$groups = getBasicMembergroupData(array(), array('moderator'), null, true);
+		$groups = getBasicMembergroupData([], ['moderator'], null, true);
 
 		$context['membergroups'] = $groups['membergroups'];
 		$context['postgroups'] = $groups['postgroups'];
@@ -791,7 +791,7 @@ class ManageMembers extends AbstractController
 	 * @event integrate_list_approve_list
 	 * @uses the admin_browse sub template of the ManageMembers template.
 	 */
-	public function action_browse()
+	public function action_browse(): void
 	{
 		global $txt, $context, $modSettings;
 
@@ -806,11 +806,11 @@ class ManageMembers extends AbstractController
 		}
 
 		// Allowed filters are those we can have, in theory.
-		$context['allowed_filters'] = $context['browse_type'] === 'approve' ? array(3, 4, 5) : array(0, 2);
+		$context['allowed_filters'] = $context['browse_type'] === 'approve' ? [3, 4, 5] : [0, 2];
 		$context['current_filter'] = isset($this->_req->query->filter) && in_array($this->_req->query->filter, $context['allowed_filters']) && !empty($context['activation_numbers'][$this->_req->query->filter]) ? (int) $this->_req->query->filter : -1;
 
 		// Sort out the different sub areas that we can actually filter by.
-		$context['available_filters'] = array();
+		$context['available_filters'] = [];
 		foreach ($context['activation_numbers'] as $type => $amount)
 		{
 			// We have some of these...
@@ -824,12 +824,12 @@ class ManageMembers extends AbstractController
 				continue;
 			}
 
-			$context['available_filters'][] = array(
+			$context['available_filters'][] = [
 				'type' => $type,
 				'amount' => $amount,
 				'desc' => $txt['admin_browse_filter_type_' . $type] ?? '?',
 				'selected' => $type === $context['current_filter']
-			);
+			];
 		}
 
 		// If the filter was not sent, set it to whatever has people in it!
@@ -843,13 +843,13 @@ class ManageMembers extends AbstractController
 		$context['show_filter'] = ($context['current_filter'] != 0 && $context['current_filter'] != 3) || count($context['available_filters']) > 1;
 
 		// The columns that can be sorted.
-		$context['columns'] = array(
-			'id_member' => array('label' => $txt['admin_browse_id']),
-			'member_name' => array('label' => $txt['admin_browse_username']),
-			'email_address' => array('label' => $txt['admin_browse_email']),
-			'member_ip' => array('label' => $txt['admin_browse_ip']),
-			'date_registered' => array('label' => $txt['admin_browse_registered']),
-		);
+		$context['columns'] = [
+			'id_member' => ['label' => $txt['admin_browse_id']],
+			'member_name' => ['label' => $txt['admin_browse_username']],
+			'email_address' => ['label' => $txt['admin_browse_email']],
+			'member_ip' => ['label' => $txt['admin_browse_ip']],
+			'date_registered' => ['label' => $txt['admin_browse_registered']],
+		];
 
 		// Are we showing duplicate information?
 		if (isset($this->_req->query->showdupes))
@@ -941,128 +941,128 @@ class ManageMembers extends AbstractController
 					document.forms.postForm.submit();
 			}';
 
-		$listOptions = array(
+		$listOptions = [
 			'id' => 'approve_list',
 			'items_per_page' => $modSettings['defaultMaxMembers'],
 			'base_href' => getUrl('admin', ['action' => 'admin', 'area' => 'viewmembers', 'sa' => 'browse', 'type' => $context['browse_type'] . (empty($context['show_filter']) ? '' : ", 'filter' =>" . $context['current_filter'])]),
 			'default_sort_col' => 'date_registered',
-			'get_items' => array(
+			'get_items' => [
 				'file' => SUBSDIR . '/Members.subs.php',
 				'function' => 'list_getMembers',
-				'params' => array(
+				'params' => [
 					'is_activated = {int:activated_status}',
-					array('activated_status' => $context['current_filter']),
+					['activated_status' => $context['current_filter']],
 					$context['show_duplicates'],
-				),
-			),
-			'get_count' => array(
+				],
+			],
+			'get_count' => [
 				'file' => SUBSDIR . '/Members.subs.php',
 				'function' => 'list_getNumMembers',
-				'params' => array(
+				'params' => [
 					'is_activated = {int:activated_status}',
-					array('activated_status' => $context['current_filter']),
-				),
-			),
-			'columns' => array(
-				'id_member' => array(
-					'header' => array(
+					['activated_status' => $context['current_filter']],
+				],
+			],
+			'columns' => [
+				'id_member' => [
+					'header' => [
 						'value' => $txt['member_id'],
-					),
-					'data' => array(
+					],
+					'data' => [
 						'db' => 'id_member',
-					),
-					'sort' => array(
+					],
+					'sort' => [
 						'default' => 'id_member',
 						'reverse' => 'id_member DESC',
-					),
-				),
-				'user_name' => array(
-					'header' => array(
+					],
+				],
+				'user_name' => [
+					'header' => [
 						'value' => $txt['username'],
-					),
-					'data' => array(
-						'sprintf' => array(
+					],
+					'data' => [
+						'sprintf' => [
 							'format' => '<a href="' . getUrl('profile', ['action' => 'profile', 'u' => '%1$d']) . '">%2$s</a>',
-							'params' => array(
+							'params' => [
 								'id_member' => false,
 								'member_name' => false,
-							),
-						),
-					),
-					'sort' => array(
+							],
+						],
+					],
+					'sort' => [
 						'default' => 'member_name',
 						'reverse' => 'member_name DESC',
-					),
-				),
-				'email' => array(
-					'header' => array(
+					],
+				],
+				'email' => [
+					'header' => [
 						'value' => $txt['email_address'],
-					),
-					'data' => array(
-						'sprintf' => array(
+					],
+					'data' => [
+						'sprintf' => [
 							'format' => '<a href="mailto:%1$s">%1$s</a>',
-							'params' => array(
+							'params' => [
 								'email_address' => true,
-							),
-						),
-					),
-					'sort' => array(
+							],
+						],
+					],
+					'sort' => [
 						'default' => 'email_address',
 						'reverse' => 'email_address DESC',
-					),
-				),
-				'ip' => array(
-					'header' => array(
+					],
+				],
+				'ip' => [
+					'header' => [
 						'value' => $txt['ip_address'],
-					),
-					'data' => array(
-						'sprintf' => array(
+					],
+					'data' => [
+						'sprintf' => [
 							'format' => '<a href="' . getUrl('profile', ['action' => 'trackip', 'searchip' => '%1$s']) . '">%1$s</a>',
-							'params' => array(
+							'params' => [
 								'member_ip' => false,
-							),
-						),
-					),
-					'sort' => array(
+							],
+						],
+					],
+					'sort' => [
 						'default' => 'member_ip',
 						'reverse' => 'member_ip DESC',
-					),
-				),
-				'hostname' => array(
-					'header' => array(
+					],
+				],
+				'hostname' => [
+					'header' => [
 						'value' => $txt['hostname'],
-					),
-					'data' => array(
+					],
+					'data' => [
 						'function' => static fn($rowData) => host_from_ip($rowData['member_ip']),
 						'class' => 'smalltext',
-					),
-				),
-				'date_registered' => array(
-					'header' => array(
+					],
+				],
+				'date_registered' => [
+					'header' => [
 						'value' => $context['current_filter'] == 4 ? $txt['viewmembers_online'] : $txt['date_registered'],
-					),
-					'data' => array(
+					],
+					'data' => [
 						'function' => static function ($rowData) {
 							global $context;
 							return standardTime($rowData[($context['current_filter'] == 4 ? 'last_login' : 'date_registered')]);
 						},
-					),
-					'sort' => array(
+					],
+					'sort' => [
 						'default' => $context['current_filter'] == 4 ? 'mem.last_login DESC' : 'date_registered DESC',
 						'reverse' => $context['current_filter'] == 4 ? 'mem.last_login' : 'date_registered',
-					),
-				),
-				'duplicates' => array(
-					'header' => array(
+					],
+				],
+				'duplicates' => [
+					'header' => [
 						'value' => $txt['duplicates'],
 						// Make sure it doesn't go too wide.
 						'style' => 'width: 20%;',
-					),
-					'data' => array(
+					],
+					'data' => [
 						'function' => static function ($rowData) {
 							global $txt;
 
-							$member_links = array();
+							$member_links = [];
 							foreach ($rowData['duplicate_members'] as $member)
 							{
 								if ($member['id'])
@@ -1078,36 +1078,36 @@ class ManageMembers extends AbstractController
 							return implode(', ', $member_links);
 						},
 						'class' => 'smalltext',
-					),
-				),
-				'check' => array(
-					'header' => array(
+					],
+				],
+				'check' => [
+					'header' => [
 						'value' => '<input type="checkbox" onclick="invertAll(this, this.form);" class="input_check" />',
 						'class' => 'centertext',
-					),
-					'data' => array(
-						'sprintf' => array(
+					],
+					'data' => [
+						'sprintf' => [
 							'format' => '<input type="checkbox" name="todoAction[]" value="%1$d" class="input_check" />',
-							'params' => array(
+							'params' => [
 								'id_member' => false,
-							),
-						),
+							],
+						],
 						'class' => 'centertext',
-					),
-				),
-			),
+					],
+				],
+			],
 			'javascript' => $javascript,
-			'form' => array(
+			'form' => [
 				'href' => getUrl('action', ['action' => 'admin', 'area' => 'viewmembers', 'sa' => 'approve', 'type' => $context['browse_type']]),
 				'name' => 'postForm',
 				'include_start' => true,
 				'include_sort' => true,
-				'hidden_fields' => array(
+				'hidden_fields' => [
 					'orig_filter' => $context['current_filter'],
-				),
-			),
-			'additional_rows' => array(
-				array(
+				],
+			],
+			'additional_rows' => [
+				[
 					'position' => 'below_table_data',
 					'class' => 'flow_flex_additional_row',
 					'value' => '
@@ -1121,9 +1121,9 @@ class ManageMembers extends AbstractController
 							</noscript>
 						</div>
 					',
-				),
-			),
-		);
+				],
+			],
+		];
 
 		// Pick what column to actually include if we're showing duplicates.
 		if ($context['show_duplicates'])
@@ -1144,18 +1144,18 @@ class ManageMembers extends AbstractController
 		// Is there any need to show filters?
 		if (isset($context['available_filters']))
 		{
-			$listOptions['list_menu'] = array(
+			$listOptions['list_menu'] = [
 				'show_on' => 'top',
-				'links' => array()
-			);
+				'links' => []
+			];
 
 			foreach ($context['available_filters'] as $filter)
 			{
-				$listOptions['list_menu']['links'][] = array(
+				$listOptions['list_menu']['links'][] = [
 					'is_selected' => $filter['selected'],
 					'href' => getUrl('action', ['action' => 'admin', 'area' => 'viewmembers', 'sa' => 'browse', 'type' => $context['browse_type'], 'filter' => $filter['type']]),
 					'label' => $filter['desc'] . ' - ' . $filter['amount'] . ' ' . ($filter['amount'] == 1 ? $txt['user'] : $txt['users'])
-				);
+				];
 			}
 		}
 
@@ -1173,7 +1173,7 @@ class ManageMembers extends AbstractController
 	 * - Redirects to ?action=admin;area=viewmembers;sa=browse
 	 * with the same parameters as the calling page.
 	 */
-	public function action_approve()
+	public function action_approve(): void
 	{
 		global $modSettings;
 
@@ -1187,7 +1187,7 @@ class ManageMembers extends AbstractController
 		Txt::load('Login');
 
 		// Start off clean
-		$this->conditions = array();
+		$this->conditions = [];
 
 		// Sort out where we are going...
 		$original_filter = $this->_req->getPost('orig_filter', 'intval', null);
@@ -1221,7 +1221,7 @@ class ManageMembers extends AbstractController
 		// Coming from checkboxes - validate the members passed through to us.
 		else
 		{
-			$this->conditions['members'] = array();
+			$this->conditions['members'] = [];
 			foreach ($todoAction as $id)
 			{
 				$this->conditions['members'][] = (int) $id;
@@ -1279,7 +1279,7 @@ class ManageMembers extends AbstractController
 		// Although updateMemberStats *may* catch this, best to do it manually just in case (Doesn't always sort out unapprovedMembers).
 		if (in_array($current_filter, [3, 4, 5]))
 		{
-			updateSettings(array('unapprovedMembers' => ($modSettings['unapprovedMembers'] > $data['member_count'] ? $modSettings['unapprovedMembers'] - $data['member_count'] : 0)));
+			updateSettings(['unapprovedMembers' => ($modSettings['unapprovedMembers'] > $data['member_count'] ? $modSettings['unapprovedMembers'] - $data['member_count'] : 0)]);
 		}
 
 		// Update the member's stats. (but, we know the member didn't change their name.)
@@ -1299,7 +1299,7 @@ class ManageMembers extends AbstractController
 	/**
 	 * Approve a member application
 	 */
-	private function _okMember()
+	private function _okMember(): void
 	{
 		// Approve / activate this member.
 		approveMembers($this->conditions);
@@ -1309,12 +1309,12 @@ class ManageMembers extends AbstractController
 		{
 			foreach ($this->member_info as $member)
 			{
-				$replacements = array(
+				$replacements = [
 					'NAME' => $member['name'],
 					'USERNAME' => $member['username'],
 					'PROFILELINK' => getUrl('profile', ['action' => 'profile', 'u' => $member['id'], 'name' => $member['name']]),
 					'FORGOTPASSWORDLINK' => getUrl('action', ['action' => 'reminder']),
-				);
+				];
 
 				$emaildata = loadEmailTemplate('admin_approve_accept', $replacements, $member['language']);
 				sendmail($member['email'], $emaildata['subject'], $emaildata['body'], null, null, false, 0);
@@ -1328,7 +1328,7 @@ class ManageMembers extends AbstractController
 	/**
 	 * Tell some members that they require activation of their account
 	 */
-	private function _requireMember()
+	private function _requireMember(): void
 	{
 		require_once(SUBSDIR . '/Auth.subs.php');
 
@@ -1343,12 +1343,12 @@ class ManageMembers extends AbstractController
 			// Set these members for activation - I know this includes two id_member checks but it's safer than bodging $condition ;).
 			enforceReactivation($this->conditions);
 
-			$replacements = array(
+			$replacements = [
 				'USERNAME' => $member['name'],
 				'ACTIVATIONLINK' => getUrl('action', ['action' => 'register', 'sa' => 'activate', 'u' => $member['id'], 'code' => $this->conditions['validation_code']]),
 				'ACTIVATIONLINKWITHOUTCODE' => getUrl('action', ['action' => 'register', 'sa' => 'activate', 'u' => $member['id']]),
 				'ACTIVATIONCODE' => $this->conditions['validation_code'],
-			);
+			];
 
 			$emaildata = loadEmailTemplate('admin_approve_activation', $replacements, $member['language']);
 			sendmail($member['email'], $emaildata['subject'], $emaildata['body'], null, null, false, 0);
@@ -1358,7 +1358,7 @@ class ManageMembers extends AbstractController
 	/**
 	 * Reject a set a member applications, maybe even tell them
 	 */
-	private function _rejectMember()
+	private function _rejectMember(): void
 	{
 		deleteMembers($this->conditions['members']);
 
@@ -1367,9 +1367,9 @@ class ManageMembers extends AbstractController
 		{
 			foreach ($this->member_info as $member)
 			{
-				$replacements = array(
+				$replacements = [
 					'USERNAME' => $member['name'],
-				);
+				];
 
 				$emaildata = loadEmailTemplate('admin_approve_reject', $replacements, $member['language']);
 				sendmail($member['email'], $emaildata['subject'], $emaildata['body'], null, null, false, 1);
@@ -1388,7 +1388,7 @@ class ManageMembers extends AbstractController
 	 *
 	 * @return void
 	 */
-	private function _deleteMember()
+	private function _deleteMember(): void
 	{
 		deleteMembers($this->conditions['members']);
 
@@ -1397,9 +1397,9 @@ class ManageMembers extends AbstractController
 		{
 			foreach ($this->member_info as $member)
 			{
-				$replacements = array(
+				$replacements = [
 					'USERNAME' => $member['name'],
-				);
+				];
 
 				$emaildata = loadEmailTemplate('admin_approve_delete', $replacements, $member['language']);
 				sendmail($member['email'], $emaildata['subject'], $emaildata['body'], null, null, false, 1);
@@ -1410,7 +1410,7 @@ class ManageMembers extends AbstractController
 	/**
 	 * Remind a set of members that they have an activation email waiting
 	 */
-	private function _remindMember()
+	private function _remindMember(): void
 	{
 		require_once(SUBSDIR . '/Auth.subs.php');
 
@@ -1421,12 +1421,12 @@ class ManageMembers extends AbstractController
 
 			enforceReactivation($this->conditions);
 
-			$replacements = array(
+			$replacements = [
 				'USERNAME' => $member['name'],
 				'ACTIVATIONLINK' => getUrl('action', ['action' => 'register', 'sa' => 'activate', 'u' => $member['id'], 'code' => $this->conditions['validation_code']]),
 				'ACTIVATIONLINKWITHOUTCODE' => getUrl('action', ['action' => 'register', 'sa' => 'activate', 'u' => $member['id']]),
 				'ACTIVATIONCODE' => $this->conditions['validation_code'],
-			);
+			];
 
 			$emaildata = loadEmailTemplate('admin_approve_remind', $replacements, $member['language']);
 			sendmail($member['email'], $emaildata['subject'], $emaildata['body'], null, null, false, 1);

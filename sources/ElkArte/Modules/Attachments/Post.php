@@ -72,7 +72,7 @@ class Post extends AbstractModule
 	/**
 	 * Get the error handler ready for post attachments
 	 */
-	public function prepare_post()
+	public function prepare_post(): void
 	{
 		$this->_initErrors();
 	}
@@ -80,7 +80,7 @@ class Post extends AbstractModule
 	/**
 	 * Set and activate the attachment error instance
 	 */
-	protected function _initErrors()
+	protected function _initErrors(): void
 	{
 		if ($this->_attach_errors === null)
 		{
@@ -95,7 +95,7 @@ class Post extends AbstractModule
 	 *
 	 * @param ErrorContext $post_errors
 	 */
-	public function prepare_context($post_errors)
+	public function prepare_context($post_errors): void
 	{
 		global $context;
 
@@ -122,7 +122,7 @@ class Post extends AbstractModule
 	 * @param int $board
 	 * @param int $topic
 	 */
-	public function finalize_post_form(&$show_additional_options, $board, $topic)
+	public function finalize_post_form(&$show_additional_options, $board, $topic): void
 	{
 		global $txt, $context, $modSettings;
 
@@ -297,7 +297,7 @@ class Post extends AbstractModule
 	 *
 	 * @return array
 	 */
-	private function _getCurrentSize()
+	private function _getCurrentSize(): array
 	{
 		global $context;
 
@@ -326,7 +326,7 @@ class Post extends AbstractModule
 	 * @param int $board
 	 * @param int $topic
 	 */
-	private function _determineExistingFate($tmp_attachments, $board, $topic)
+	private function _determineExistingFate($tmp_attachments, $board, $topic): void
 	{
 		global $context, $txt, $scripturl;
 
@@ -379,7 +379,7 @@ class Post extends AbstractModule
 	 *
 	 * @param ErrorContext $post_errors
 	 */
-	public function prepare_save_post($post_errors)
+	public function prepare_save_post($post_errors): void
 	{
 		$this->_initErrors();
 
@@ -397,11 +397,11 @@ class Post extends AbstractModule
 	 *
 	 * @param int $msg
 	 */
-	protected function saveAttachments($msg)
+	protected function saveAttachments($msg): void
 	{
 		global $context, $modSettings;
 
-		// First check to see if they are trying to delete any current attachments.
+		// First, check to see if they are trying to delete any current attachments.
 		if (isset($_POST['attach_del']))
 		{
 			require_once(SUBSDIR . '/Attachments.subs.php');
@@ -440,7 +440,9 @@ class Post extends AbstractModule
 		}
 
 		// Then try to upload any attachments.
-		$context['attachments']['can']['post'] = self::$_attach_level === 1 && (allowedTo('post_attachment') || ($modSettings['postmod_active'] && allowedTo('post_unapproved_attachments')));
+		$context['attachments']['can']['post'] = self::$_attach_level === 1
+			&& (allowedTo('post_attachment')
+				|| ($modSettings['postmod_active'] && allowedTo('post_unapproved_attachments')));
 		if ($context['attachments']['can']['post'] && empty($this->_req->getPost('from_qr')))
 		{
 			require_once(SUBSDIR . '/Attachments.subs.php');
@@ -454,7 +456,7 @@ class Post extends AbstractModule
 	 *
 	 * @param array $msgOptions
 	 */
-	public function pre_save_post(&$msgOptions)
+	public function pre_save_post(&$msgOptions): void
 	{
 		global $context, $modSettings;
 
@@ -542,7 +544,7 @@ class Post extends AbstractModule
 	 *
 	 * @param array $msgOptions
 	 */
-	public function after_save_post($msgOptions)
+	public function after_save_post($msgOptions): void
 	{
 		if (!$this->_is_new_message)
 		{

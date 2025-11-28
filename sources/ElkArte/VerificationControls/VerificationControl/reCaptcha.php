@@ -152,7 +152,7 @@ class reCaptcha implements ControlInterface
 	 * @param string $response response string from recaptcha verification.
 	 *
 	 */
-	public function verifyResponse($remoteIp, $response)
+	public function verifyResponse($remoteIp, $response): array
 	{
 		$recaptchaResponse = [];
 		$recaptchaResponse['success'] = false;

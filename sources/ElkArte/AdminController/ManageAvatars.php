@@ -49,9 +49,9 @@ class ManageAvatars extends AbstractController
 		// You have to be able to moderate the forum to do this.
 		isAllowedTo('manage_attachments');
 
-		$subActions = array(
-			'display' => array($this, 'action_avatarSettings_display')
-		);
+		$subActions = [
+			'display' => [$this, 'action_avatarSettings_display']
+		];
 
 		// Set up for some action
 		$action = new Action('manage_avatars');
@@ -75,7 +75,7 @@ class ManageAvatars extends AbstractController
 	 * @event integrate_save_avatar_settings
 	 * @uses 'avatars' sub-template.
 	 */
-	public function action_avatarSettings_display()
+	public function action_avatarSettings_display(): void
 	{
 		global $txt, $context, $boardurl;
 
@@ -132,52 +132,52 @@ class ManageAvatars extends AbstractController
 			&& FileFunctions::instance()->isWritable($modSettings['custom_avatar_dir']);
 
 		// Load the configuration vars for the form
-		$config_vars = array(
-			array('title', 'avatar_settings'),
-			array('check', 'avatar_default'),
-			array('int', 'avatar_max_width', 'subtext' => $txt['zero_for_no_limit'], 6),
-			array('int', 'avatar_max_height', 'subtext' => $txt['zero_for_no_limit'], 6),
-			array('select', 'avatar_action_too_large',
-				array(
+		$config_vars = [
+			['title', 'avatar_settings'],
+			['check', 'avatar_default'],
+			['int', 'avatar_max_width', 'subtext' => $txt['zero_for_no_limit'], 6],
+			['int', 'avatar_max_height', 'subtext' => $txt['zero_for_no_limit'], 6],
+			['select', 'avatar_action_too_large',
+				[
 					'option_refuse' => $txt['option_refuse'],
 					'option_resize' => $txt['option_resize'],
 					'option_download_and_resize' => $txt['option_download_and_resize'],
-				),
-			),
-			array('permissions', 'profile_set_avatar', 0, $txt['profile_set_avatar']),
+				],
+			],
+			['permissions', 'profile_set_avatar', 0, $txt['profile_set_avatar']],
 			// Server stored avatars!
-			array('title', 'avatar_server_stored'),
-			array('warning', $testImg === false ? 'avatar_img_enc_warning' : ''),
-			array('check', 'avatar_stored_enabled'),
-			array('text', 'avatar_directory', 40, 'invalid' => !$context['valid_avatar_dir']),
-			array('text', 'avatar_url', 40),
+			['title', 'avatar_server_stored'],
+			['warning', $testImg === false ? 'avatar_img_enc_warning' : ''],
+			['check', 'avatar_stored_enabled'],
+			['text', 'avatar_directory', 40, 'invalid' => !$context['valid_avatar_dir']],
+			['text', 'avatar_url', 40],
 			// External avatars?
-			array('title', 'avatar_external'),
-			array('check', 'avatar_external_enabled'),
-			array('check', 'avatar_download_external', 0, 'onchange' => 'fUpdateStatus();'),
-			array('title', 'gravatar'),
-			array('check', 'avatar_gravatar_enabled'),
-			array('check', 'gravatar_as_default'),
-			array('select', 'gravatar_rating', ['g' => 'g', 'pg' => 'pg', 'r' => 'r', 'x' => 'x']),
-			array('select', 'gravatar_default', [
+			['title', 'avatar_external'],
+			['check', 'avatar_external_enabled'],
+			['check', 'avatar_download_external', 0, 'onchange' => 'fUpdateStatus();'],
+			['title', 'gravatar'],
+			['check', 'avatar_gravatar_enabled'],
+			['check', 'gravatar_as_default'],
+			['select', 'gravatar_rating', ['g' => 'g', 'pg' => 'pg', 'r' => 'r', 'x' => 'x']],
+			['select', 'gravatar_default', [
 				'none' => $txt['gravatar_none'],
 				'identicon' => $txt['gravatar_identicon'],
 				'monsterid' => $txt['gravatar_monsterid'],
 				'wavatar' => $txt['gravatar_wavatar'],
 				'retro' => $txt['gravatar_retro'],
-				'robohash' => $txt['gravatar_robohash']]),
+				'robohash' => $txt['gravatar_robohash']]],
 			// Upload-able avatars?
-			array('title', 'avatar_upload'),
-			array('check', 'avatar_upload_enabled'),
-			array('text', 'custom_avatar_dir', 40, 'subtext' => $txt['custom_avatar_dir_desc'], 'invalid' => !$context['valid_custom_avatar_dir']),
-			array('text', 'custom_avatar_url', 40),
-			array('title', 'avatar_resize_options'),
-			array('check', 'avatar_reencode'),
-			array('check', 'avatar_download_png'),
-		);
+			['title', 'avatar_upload'],
+			['check', 'avatar_upload_enabled'],
+			['text', 'custom_avatar_dir', 40, 'subtext' => $txt['custom_avatar_dir_desc'], 'invalid' => !$context['valid_custom_avatar_dir']],
+			['text', 'custom_avatar_url', 40],
+			['title', 'avatar_resize_options'],
+			['check', 'avatar_reencode'],
+			['check', 'avatar_download_png'],
+		];
 
 		// Add new settings with a nice hook, makes them available for admin settings search as well
-		call_integration_hook('integrate_modify_avatar_settings', array(&$config_vars));
+		call_integration_hook('integrate_modify_avatar_settings', [&$config_vars]);
 
 		return $config_vars;
 	}

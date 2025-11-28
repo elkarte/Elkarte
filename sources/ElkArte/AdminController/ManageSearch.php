@@ -19,7 +19,6 @@ namespace ElkArte\AdminController;
 
 use ElkArte\AbstractController;
 use ElkArte\Action;
-use ElkArte\Helper\FileFunctions;
 use ElkArte\Helper\Util;
 use ElkArte\Languages\Txt;
 use ElkArte\Search\SearchApiWrapper;
@@ -27,7 +26,6 @@ use ElkArte\SettingsForm\SettingsForm;
 use Exception;
 use FilesystemIterator;
 use GlobIterator;
-use SphinxClient;
 use UnexpectedValueException;
 
 /**
@@ -60,17 +58,17 @@ class ManageSearch extends AbstractController
 		Txt::load('Search');
 		theme()->getTemplates()->load('ManageSearch');
 
-		$subActions = array(
-			'settings' => array($this, 'action_searchSettings_display', 'permission' => 'admin_forum'),
-			'weights' => array($this, 'action_weight', 'permission' => 'admin_forum'),
-			'method' => array($this, 'action_edit', 'permission' => 'admin_forum'),
-			'createfulltext' => array($this, 'action_edit', 'permission' => 'admin_forum'),
-			'removecustom' => array($this, 'action_edit', 'permission' => 'admin_forum'),
-			'removefulltext' => array($this, 'action_edit', 'permission' => 'admin_forum'),
-			'createmsgindex' => array($this, 'action_create', 'permission' => 'admin_forum'),
-			'managesphinx' => array($this, 'action_managesphinx', 'permission' => 'admin_forum'),
-			'managesphinxql' => array($this, 'action_managesphinx', 'permission' => 'admin_forum'),
-		);
+		$subActions = [
+			'settings' => [$this, 'action_searchSettings_display', 'permission' => 'admin_forum'],
+			'weights' => [$this, 'action_weight', 'permission' => 'admin_forum'],
+			'method' => [$this, 'action_edit', 'permission' => 'admin_forum'],
+			'createfulltext' => [$this, 'action_edit', 'permission' => 'admin_forum'],
+			'removecustom' => [$this, 'action_edit', 'permission' => 'admin_forum'],
+			'removefulltext' => [$this, 'action_edit', 'permission' => 'admin_forum'],
+			'createmsgindex' => [$this, 'action_create', 'permission' => 'admin_forum'],
+			'managemanticore' => [$this, 'action_managemanticore', 'permission' => 'admin_forum'],
+			'managesphinxql' => [$this, 'action_managesphinx', 'permission' => 'admin_forum'],
+		];
 
 		// Control for actions
 		$action = new Action('manage_search');
@@ -103,7 +101,7 @@ class ManageSearch extends AbstractController
 	 * @event integrate_save_search_settings
 	 * @uses ManageSearch template, 'modify_settings' sub-template.
 	 */
-	public function action_searchSettings_display()
+	public function action_searchSettings_display(): void
 	{
 		global $txt, $context, $modSettings;
 
@@ -116,19 +114,20 @@ class ManageSearch extends AbstractController
 		$context['page_title'] = $txt['search_settings_title'];
 		$context['sub_template'] = 'show_settings';
 
-		$context['search_engines'] = array();
+		$context['search_engines'] = [];
 		if (!empty($modSettings['additional_search_engines']))
 		{
 			$context['search_engines'] = Util::unserialize($modSettings['additional_search_engines']);
+			$context['search_engines'] = $context['search_engines'] === false ? [] : $context['search_engines'];
 		}
 
 		for ($count = 0; $count < 3; $count++)
 		{
-			$context['search_engines'][] = array(
+			$context['search_engines'][] = [
 				'name' => '',
 				'url' => '',
 				'separator' => '',
-			);
+			];
 		}
 
 		// A form was submitted.
@@ -143,10 +142,10 @@ class ManageSearch extends AbstractController
 				$this->_req->post->search_results_per_page = empty($modSettings['search_results_per_page']) ? $modSettings['defaultMaxMessages'] : $modSettings['search_results_per_page'];
 			}
 
-			$new_engines = array();
+			$new_engines = [];
 			foreach ($this->_req->post->engine_name as $id => $searchengine)
 			{
-				$url = trim(str_replace(array('"', '<', '>'), array('&quot;', '&lt;', '&gt;'), $this->_req->post->engine_url[$id]));
+				$url = trim(str_replace(['"', '<', '>'], ['&quot;', '&lt;', '&gt;'], $this->_req->post->engine_url[$id]));
 				// If no url, forget it
 				if (empty($searchengine))
 				{
@@ -163,16 +162,16 @@ class ManageSearch extends AbstractController
 					continue;
 				}
 
-				$new_engines[] = array(
+				$new_engines[] = [
 					'name' => trim(Util::htmlspecialchars($searchengine, ENT_COMPAT)),
 					'url' => $url,
 					'separator' => trim(Util::htmlspecialchars(empty($this->_req->post->engine_separator[$id]) ? '+' : $this->_req->post->engine_separator[$id], ENT_COMPAT)),
-				);
+				];
 			}
 
-			updateSettings(array(
+			updateSettings([
 				'additional_search_engines' => $new_engines === [] ? '' : serialize($new_engines)
-			));
+			]);
 
 			$settingsForm->setConfigValues((array) $this->_req->post);
 			$settingsForm->save();
@@ -196,25 +195,25 @@ class ManageSearch extends AbstractController
 		global $txt, $modSettings;
 
 		// What are we editing anyway?
-		$config_vars = array(
+		$config_vars = [
 			// Permission...
-			array('permissions', 'search_posts', 'collapsed' => 'true'),
+			['permissions', 'search_posts', 'collapsed' => 'true'],
 			// Some simple settings.
-			array('check', 'search_dropdown'),
-			array('int', 'search_results_per_page'),
-			array('int', 'search_max_results', 'subtext' => $txt['search_max_results_disable']),
+			['check', 'search_dropdown'],
+			['int', 'search_results_per_page'],
+			['int', 'search_max_results', 'subtext' => $txt['search_max_results_disable']],
 			// Some limitations.
-			array('int', 'search_floodcontrol_time', 'subtext' => $txt['search_floodcontrol_time_desc'], 6, 'postinput' => $txt['seconds']),
-			array('title', 'additional_search_engines'),
-			array('callback', 'external_search_engines'),
-		);
+			['int', 'search_floodcontrol_time', 'subtext' => $txt['search_floodcontrol_time_desc'], 6, 'postinput' => $txt['seconds']],
+			['title', 'additional_search_engines'],
+			['callback', 'external_search_engines'],
+		];
 
 		// Perhaps the search method wants to add some settings?
 		$searchAPI = new SearchApiWrapper(empty($modSettings['search_index']) ? '' : $modSettings['search_index']);
 		$searchAPI->searchSettings($config_vars);
 
 		// Add new settings with a nice hook, makes them available for admin settings search as well
-		call_integration_hook('integrate_modify_search_settings', array(&$config_vars));
+		call_integration_hook('integrate_modify_search_settings', [&$config_vars]);
 
 		return $config_vars;
 	}
@@ -237,14 +236,14 @@ class ManageSearch extends AbstractController
 	 * @event integrate_save_search_weights
 	 * @uses ManageSearch template, 'modify_weights' sub-template.
 	 */
-	public function action_weight()
+	public function action_weight(): void
 	{
 		global $txt, $context, $modSettings;
 
 		$context['page_title'] = $txt['search_weights_title'];
 		$context['sub_template'] = 'modify_weights';
 
-		$factors = array(
+		$factors = [
 			'search_weight_frequency',
 			'search_weight_age',
 			'search_weight_length',
@@ -252,9 +251,9 @@ class ManageSearch extends AbstractController
 			'search_weight_first_message',
 			'search_weight_sticky',
 			'search_weight_likes',
-		);
+		];
 
-		call_integration_hook('integrate_modify_search_weights', array(&$factors));
+		call_integration_hook('integrate_modify_search_weights', [&$factors]);
 
 		// A form was submitted.
 		if (isset($this->_req->post->save))
@@ -264,7 +263,7 @@ class ManageSearch extends AbstractController
 
 			call_integration_hook('integrate_save_search_weights');
 
-			$changes = array();
+			$changes = [];
 			foreach ($factors as $factor)
 			{
 				$changes[$factor] = (int) $this->_req->post->{$factor};
@@ -273,7 +272,7 @@ class ManageSearch extends AbstractController
 			updateSettings($changes);
 		}
 
-		$context['relative_weights'] = array('total' => 0);
+		$context['relative_weights'] = ['total' => 0];
 		foreach ($factors as $factor)
 		{
 			$context['relative_weights']['total'] += $modSettings[$factor] ?? 0;
@@ -300,7 +299,7 @@ class ManageSearch extends AbstractController
 	 *
 	 * @uses ManageSearch template, 'select_search_method' sub-template.
 	 */
-	public function action_edit()
+	public function action_edit(): void
 	{
 		global $txt, $context, $modSettings;
 
@@ -330,7 +329,7 @@ class ManageSearch extends AbstractController
 			checkSession('get');
 			validateToken('admin-msm', 'get');
 
-			alterFullTextIndex('{db_prefix}messages', array('body', 'subject', 'body,subject'), true);
+			alterFullTextIndex('{db_prefix}messages', ['body', 'subject', 'body,subject'], true);
 			$fulltext_index = true;
 		}
 		elseif ($sa === 'removefulltext' && !empty($fulltext_index))
@@ -344,9 +343,9 @@ class ManageSearch extends AbstractController
 			// Go back to the default search method.
 			if (!empty($modSettings['search_index']) && $modSettings['search_index'] === 'fulltext')
 			{
-				updateSettings(array(
+				updateSettings([
 					'search_index' => '',
-				));
+				]);
 			}
 		}
 		elseif ($sa === 'removecustom')
@@ -356,17 +355,17 @@ class ManageSearch extends AbstractController
 
 			drop_log_search_words();
 
-			updateSettings(array(
+			updateSettings([
 				'search_custom_index_config' => '',
 				'search_custom_index_resume' => '',
-			));
+			]);
 
 			// Go back to the default search method.
 			if (!empty($modSettings['search_index']) && $modSettings['search_index'] === 'custom')
 			{
-				updateSettings(array(
+				updateSettings([
 					'search_index' => '',
-				));
+				]);
 			}
 		}
 		elseif (isset($this->_req->post->save))
@@ -374,19 +373,19 @@ class ManageSearch extends AbstractController
 			checkSession();
 			validateToken('admin-msmpost');
 
-			updateSettings(array(
-				'search_index' => empty($this->_req->post->search_index) || (!in_array($this->_req->post->search_index, array('fulltext', 'custom')) && !isset($context['search_apis'][$this->_req->post->search_index])) ? '' : $this->_req->post->search_index,
+			updateSettings([
+				'search_index' => empty($this->_req->post->search_index) || (!in_array($this->_req->post->search_index, ['fulltext', 'custom']) && !isset($context['search_apis'][$this->_req->post->search_index])) ? '' : $this->_req->post->search_index,
 				'search_force_index' => isset($this->_req->post->search_force_index) ? '1' : '0',
 				'search_match_words' => isset($this->_req->post->search_match_words) ? '1' : '0',
-			));
+			]);
 		}
 
-		$table_info_defaults = array(
+		$table_info_defaults = [
 			'data_length' => 0,
 			'index_length' => 0,
 			'fulltext_length' => 0,
 			'custom_index_length' => 0,
-		);
+		];
 
 		// Get some info about the messages table, to show its size and index size.
 		if (method_exists($db_search, 'membersTableInfo'))
@@ -396,15 +395,15 @@ class ManageSearch extends AbstractController
 		else
 		{
 			// Here may be wolves.
-			$context['table_info'] = array(
+			$context['table_info'] = [
 				'data_length' => $txt['not_applicable'],
 				'index_length' => $txt['not_applicable'],
 				'fulltext_length' => $txt['not_applicable'],
 				'custom_index_length' => $txt['not_applicable'],
-			);
+			];
 		}
 
-		// Format the data and index length in human readable form.
+		// Format the data and index length in human-readable form.
 		foreach ($context['table_info'] as $type => $size)
 		{
 			// If it's not numeric then just break.  This database engine doesn't support size.
@@ -432,11 +431,11 @@ class ManageSearch extends AbstractController
 	 * - It loads the search API classes if identified.
 	 * - This function is used by action_edit to list all installed API implementations.
 	 */
-	private function loadSearchAPIs()
+	private function loadSearchAPIs(): array
 	{
 		global $txt;
 
-		$apis = array();
+		$apis = [];
 		try
 		{
 			$files = new GlobIterator(SOURCEDIR . '/ElkArte/Search/API/*.php', FilesystemIterator::SKIP_DOTS);
@@ -452,13 +451,13 @@ class ManageSearch extends AbstractController
 						continue;
 					}
 
-					$apis[$index_name] = array(
+					$apis[$index_name] = [
 						'filename' => $file->getFilename(),
 						'setting_index' => $index_name,
-						'has_template' => in_array($common_name, array('custom', 'fulltext', 'standard')),
+						'has_template' => in_array($common_name, ['custom', 'fulltext', 'standard']),
 						'label' => $index_name && isset($txt['search_index_' . $common_name]) ? str_replace('{managesearch_url}', getUrl('admin', ['action' => 'admin', 'area' => 'managesearch', 'sa' => 'manage' . $common_name]), $txt['search_index_' . $common_name]) : '',
 						'desc' => $index_name && isset($txt['search_index_' . $common_name . '_desc']) ? str_replace('{managesearch_url}', getUrl('admin', ['action' => 'admin', 'area' => 'managesearch', 'sa' => 'manage' . $common_name]), $txt['search_index_' . $common_name . '_desc']) : '',
-					);
+					];
 				}
 			}
 		}
@@ -483,7 +482,7 @@ class ManageSearch extends AbstractController
 	 * @uses ManageSearch template, 'create_index_progress', and 'create_index_done'
 	 * sub-templates.
 	 */
-	public function action_create()
+	public function action_create(): void
 	{
 		global $modSettings, $context, $txt, $db_show_debug;
 
@@ -506,7 +505,7 @@ class ManageSearch extends AbstractController
 		}
 		else
 		{
-			$context['index_settings'] = array();
+			$context['index_settings'] = [];
 			$context['start'] = $this->_req->getPost('start', 'intval', 0);
 			$context['step'] = $this->_req->getPost('step', 'intval', 1);
 		}
@@ -549,18 +548,18 @@ class ManageSearch extends AbstractController
 		{
 			$context['sub_template'] = 'create_index_done';
 
-			updateSettings(array('search_index' => 'custom', 'search_custom_index_config' => serialize($context['index_settings'])));
+			updateSettings(['search_index' => 'custom', 'search_custom_index_config' => serialize($context['index_settings'])]);
 			removeSettings('search_custom_index_resume');
 		}
 	}
 
 	/**
-	 * Edit settings related to the sphinx or sphinxQL search function.
+	 * Edit settings related to the sphinxQL search function.
 	 *
 	 * - Called by ?action=admin;area=managesearch;sa=sphinx.
 	 * - Checks if connection to search daemon is possible
 	 */
-	public function action_managesphinx()
+	public function action_managesphinx(): void
 	{
 		global $txt, $context, $modSettings;
 
@@ -582,12 +581,6 @@ class ManageSearch extends AbstractController
 			{
 				$context['settings_message'][] = $txt['sphinx_test_not_selected'];
 				$context['error_type'] = 'notice';
-			}
-
-			// Try to connect via Sphinx API?
-			if (empty($modSettings['search_index']) || $modSettings['search_index'] === 'Sphinx')
-			{
-				$this->connectSphinxApi();
 			}
 
 			// Try to connect via SphinxQL
@@ -618,64 +611,24 @@ class ManageSearch extends AbstractController
 	/**
 	 * Save the form values in modsettings
 	 */
-	private function _saveSphinxConfig()
+	private function _saveSphinxConfig(): void
 	{
-		updateSettings(array(
+		updateSettings([
 			'sphinx_index_prefix' => rtrim($this->_req->post->sphinx_index_prefix, '/'),
 			'sphinx_data_path' => rtrim($this->_req->post->sphinx_data_path, '/'),
 			'sphinx_log_path' => rtrim($this->_req->post->sphinx_log_path, '/'),
 			'sphinx_stopword_path' => $this->_req->getPost('sphinx_stopword_path', 'trim', ''),
 			'sphinx_indexer_mem' => $this->_req->getPost('sphinx_indexer_mem', 'intval', 128),
 			'sphinx_searchd_server' => $this->_req->getPost('sphinx_searchd_server', 'trim', 'localhost'),
-			'sphinx_searchd_port' => $this->_req->getPost('sphinx_searchd_port', 'intval', 0),
 			'sphinxql_searchd_port' => $this->_req->getPost('sphinxql_searchd_port', 'intval', 0),
 			'sphinx_max_results' => $this->_req->getPost('sphinx_max_results', 'intval', 0)
-		));
-	}
-
-	/**
-	 * Attempt to connect to sphinx using the API methods
-	 */
-	public function connectSphinxApi()
-	{
-		global $txt, $modSettings, $context;
-
-		// This is included with sphinx and not distrubuted with ElkArte
-		if (FileFunctions::instance()->fileExists(SOURCEDIR . '/sphinxapi.php'))
-		{
-			include_once(SOURCEDIR . '/sphinxapi.php');
-			$server = empty($modSettings['sphinx_searchd_server']) ? 'localhost' : $modSettings['sphinx_searchd_server'];
-			$port = empty($modSettings['sphinx_searchd_port']) ? 9312 : $modSettings['sphinx_searchd_port'];
-
-			$mySphinx = new SphinxClient();
-			$mySphinx->SetServer($server, (int) $port);
-			$mySphinx->SetLimits(0, 25, 1);
-
-			$index = (empty($modSettings['sphinx_index_prefix']) ? 'elkarte' : $modSettings['sphinx_index_prefix']) . '_index';
-			$request = $mySphinx->Query('ElkArte', $index);
-
-			if ($request === false)
-			{
-				$context['settings_message'][] = $txt['sphinx_test_connect_failed'];
-				$context['error_type'] = 'serious';
-			}
-			else
-			{
-				updateSettings(array('sphinx_searchd_server' => $server, 'sphinx_searchd_port' => $port));
-				$context['settings_message'][] = $txt['sphinx_test_passed'];
-			}
-
-			return;
-		}
-
-		$context['settings_message'][] = $txt['sphinx_test_api_missing'];
-		$context['error_type'] = 'serious';
+		]);
 	}
 
 	/**
 	 * Attempt to connect to Sphinx using the preferred QL way
 	 */
-	public function connectSphinxQL()
+	public function connectSphinxQL(): void
 	{
 		global $txt, $modSettings, $context;
 
@@ -705,7 +658,116 @@ class ManageSearch extends AbstractController
 			return;
 		}
 
-		updateSettings(array('sphinx_searchd_server' => $server, 'sphinxql_searchd_port' => $port));
+		updateSettings(['sphinx_searchd_server' => $server, 'sphinxql_searchd_port' => $port]);
 		$context['settings_message'][] = $txt['sphinxql_test_passed'];
+	}
+
+	/**
+	 * Edit settings related to the Manticore search function.
+	 *
+	 * - Called by ?action=admin;area=managesearch;sa=manticore.
+	 * - Checks if connection to search daemon is possible
+	 */
+	public function action_managemanticore(): void
+	{
+		global $txt, $context, $modSettings;
+
+		// Saving the settings
+		if (isset($this->_req->post->save))
+		{
+			checkSession();
+			validateToken('admin-msmanticore');
+			$this->_saveManticoreConfig();
+		}
+		// Checking if we can connect?
+		elseif (isset($this->_req->post->checkconnect))
+		{
+			checkSession();
+			validateToken('admin-msmanticore');
+
+			// If they have not picked manticore yet, let them know, but we can still check connections
+			if (empty($modSettings['search_index']) || stripos($modSettings['search_index'], 'manticore') === false)
+			{
+				$context['settings_message'][] = $txt['manticore_test_not_selected'];
+				$context['error_type'] = 'notice';
+			}
+
+			// Try to connect
+			//if (empty($modSettings['search_index']) || $modSettings['search_index'] === 'Manticore')
+			//{
+				$this->connectManticore();
+			//}
+		}
+		elseif (isset($this->_req->post->createconfig))
+		{
+			checkSession();
+			validateToken('admin-msmanticore');
+			$this->_saveManticoreConfig();
+
+			require_once(SUBSDIR . '/ManageSearch.subs.php');
+
+			createManticoreConfig();
+		}
+
+		// Setup for the template
+		$context[$context['admin_menu_name']]['current_subsection'] = 'managemanticore';
+		$context['page_title'] = $txt['search_manticore'];
+		$context['page_description'] = $txt['manticore_create_config'];
+		$context['sub_template'] = 'manage_manticore';
+		createToken('admin-msmanticore');
+	}
+
+	/**
+	 * Save the form values
+	 */
+	private function _saveManticoreConfig(): void
+	{
+		updateSettings([
+			'manticore_index_prefix' => rtrim($this->_req->post->manticore_index_prefix, '/'),
+			'manticore_data_path' => rtrim($this->_req->post->manticore_data_path, '/'),
+			'manticore_log_path' => rtrim($this->_req->post->manticore_log_path, '/'),
+			'manticore_stopword_path' => $this->_req->getPost('manticore_stopword_path', 'trim', ''),
+			'manticore_indexer_mem' => $this->_req->getPost('manticore_indexer_mem', 'intval', 128),
+			'manticore_searchd_server' => $this->_req->getPost('manticore_searchd_server', 'trim', 'localhost'),
+			'manticore_searchd_port' => $this->_req->getPost('manticore_searchd_port', 'intval', 0),
+			'manticore_max_results' => $this->_req->getPost('manticore_max_results', 'intval', 0)
+		]);
+	}
+
+	/**
+	 * Attempt to connect to Sphinx using the preferred QL way
+	 */
+	public function connectManticore(): void
+	{
+		global $txt, $modSettings, $context;
+
+		$server = empty($modSettings['manticore_searchd_server']) ? 'localhost' : $modSettings['manticore_searchd_server'];
+		$server = $server === 'localhost' ? '127.0.0.1' : $server;
+		$port = empty($modSettings['manticore_searchd_port']) ? '9306' : $modSettings['manticore_searchd_port'];
+
+		set_error_handler(static function () { /* ignore errors */ });
+		try
+		{
+			$result = mysqli_connect($server, '', '', '', (int) $port);
+		}
+		catch (Exception)
+		{
+			$result = false;
+		}
+		finally
+		{
+			restore_error_handler();
+		}
+
+		if ($result === false)
+		{
+			$context['settings_message'][] = $txt['manticore_test_connect_failed'];
+			$context['error_type'] = 'serious';
+
+			return;
+		}
+
+		updateSettings(['manticore_searchd_server' => $server, 'manticore_searchd_port' => $port]);
+		$context['settings_message'][] = $txt['manticore_test_passed'];
 	}
 }

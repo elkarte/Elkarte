@@ -376,6 +376,7 @@
 
 			return [oSettings.twitter, tag, 'portrait'];
 		};
+		handlers['x.com'] = handlers['twitter.com'];
 
 		// Facebook
 		handlers['facebook.com'] = function(path, a) {

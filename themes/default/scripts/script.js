@@ -596,7 +596,7 @@ window.setTimeout(function() {
 }, 1200000);
 
 /**
- * Set a theme option through javascript / ajax
+ * Set a theme option through JavaScript / ajax
  *
  * @param {string} option name being set
  * @param {string} value of the option
@@ -793,9 +793,9 @@ elk_Toggle.prototype.init = function() {
 };
 
 /**
- * This allows the use of html characters in alt/title attributes.
+ * This allows the use of HTML characters in alt/title attributes.
  *
- * It simply converts from HTML to text as you can not directly inject
+ * It simply converts from HTML to text as you cannot directly inject
  * character codes in alt/title as they do not `render`
  *
  * @param {string} text
@@ -1712,4 +1712,51 @@ function isElementInViewport (element)
 		insideY = rect.top >= 0 && rect.top + rect.height <= windowHeight;
 
 	return insideX && insideY;
+}
+
+/**
+ * Replaces the selected text range or appends the specified text to the end of a text input or textarea element.
+ *
+ * @param {string} text - The text to insert or replace within the text input or textarea element.
+ * @param {HTMLInputElement|HTMLTextAreaElement} oTextHandle - The text input or textarea element where the text will be replaced or appended.
+ * @return {void} No return value. The method directly modifies the value of the provided text input or textarea element.
+ */
+function replaceText (text, oTextHandle)
+{
+	try
+	{
+		if ('selectionStart' in oTextHandle)
+		{
+			const begin = oTextHandle.value.substring(0, oTextHandle.selectionStart);
+			const end = oTextHandle.value.substring(oTextHandle.selectionEnd);
+			const scrollPos = oTextHandle.scrollTop;
+
+			oTextHandle.value = begin + text + end;
+
+			if (typeof oTextHandle.setSelectionRange === 'function')
+			{
+				const newPosition = begin.length + text.length;
+				oTextHandle.focus();
+				oTextHandle.setSelectionRange(newPosition, newPosition);
+			}
+
+			oTextHandle.scrollTop = scrollPos;
+		}
+		else
+		{
+			oTextHandle.value += text;
+			oTextHandle.focus();
+			if (typeof oTextHandle.setSelectionRange === 'function')
+			{
+				oTextHandle.setSelectionRange(oTextHandle.value.length, oTextHandle.value.length);
+			}
+		}
+	}
+	catch (error)
+	{
+		if (console && console.error)
+		{
+			console.error('Error inserting text:', error);
+		}
+	}
 }

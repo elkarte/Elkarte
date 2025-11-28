@@ -147,7 +147,7 @@ class hCaptcha implements ControlInterface
 	 * @param string $response response string from captcha verification.
 	 *
 	 */
-	public function verifyResponse($remoteIp, $response)
+	public function verifyResponse($remoteIp, $response): array
 	{
 		$hcaptchaResponse = [];
 		$hcaptchaResponse['success'] = false;

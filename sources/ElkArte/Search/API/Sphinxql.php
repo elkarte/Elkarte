@@ -71,7 +71,7 @@ class Sphinxql extends AbstractAPI
 	/**
 	 * If the settings don't exist we can't continue.
 	 */
-	public function isValid()
+	public function isValid(): bool
 	{
 		global $modSettings;
 
@@ -89,7 +89,7 @@ class Sphinxql extends AbstractAPI
 	/**
 	 *  {@inheritDoc}
 	 */
-	public function supportsExtended()
+	public function supportsExtended(): bool
 	{
 		return true;
 	}
@@ -290,7 +290,7 @@ class Sphinxql extends AbstractAPI
 	 *
 	 * @return array
 	 */
-	public function buildQueryLimits()
+	public function buildQueryLimits(): array
 	{
 		global $modSettings;
 

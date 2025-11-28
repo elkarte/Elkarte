@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Handles the job of attachment chunked upload management.
+ * Handles the job of attachment-chunked upload management.
  *
  * @package   ElkArte Forum
  * @copyright ElkArte Forum contributors
@@ -16,28 +16,32 @@ namespace ElkArte\Attachments;
 use ElkArte\Helper\FileFunctions;
 use ElkArte\Helper\HttpReq;
 use ElkArte\Helper\TokenHash;
+use ElkArte\User;
+use FilesystemIterator;
+use GlobIterator;
+use Throwable;
 
 /**
  * Class TemporaryAttachmentChunk
  *
- * Handles the job of attachment chunked upload management.
+ * Handles the job of chunked upload management.
  */
 class TemporaryAttachmentChunk
 {
 	/** @var HttpReq */
-	public $req;
+	public HttpReq $req;
 
 	/** @var AttachmentsDirectory */
-	public $attachmentDirectory;
+	public AttachmentsDirectory $attachmentDirectory;
 
 	/** @var string Active attachment directory */
-	public $attach_current_dir;
+	public string $attach_current_dir;
 
 	/** @var int Maximum chunk size allowed */
-	public $chunkSize;
+	public mixed $chunkSize;
 
 	/** @var string the combined file temporary path and name */
-	private $combinedFilePath;
+	private string $combinedFilePath;
 
 	/**
 	 * Class constructor.
@@ -50,22 +54,19 @@ class TemporaryAttachmentChunk
 
 		$this->req = HttpReq::instance();
 		$this->attachmentDirectory = new AttachmentsDirectory($modSettings, database());
-
 		$this->attachmentDirectory->automanageCheckDirectory();
-
 		$this->attach_current_dir = $this->attachmentDirectory->getCurrent();
-
 		$this->chunkSize = empty($modSettings['attachmentChunkSize']) ? 250000 : $modSettings['attachmentChunkSize'];
 
 		require_once(SUBSDIR . '/Attachments.subs.php');
 	}
 
 	/**
-	 * Handle asynchronous file upload by saving all fragments submitted
+	 * Handles an asynchronous action by validating the session and saving the file.
 	 *
-	 * @return array
+	 * @return array The result of the action, including status and related data.
 	 */
-	public function action_async()
+	public function action_async(): array
 	{
 		if (checkSession('post', '', false) !== '')
 		{
@@ -78,11 +79,16 @@ class TemporaryAttachmentChunk
 	}
 
 	/**
-	 * Saves an asynchronously uploaded file.
+	 * Process and save an asynchronously uploaded file chunk.
 	 *
-	 * @return array An array containing the ID of the uploaded file and an error code.
+	 * This method handles the extraction and validation of post data,
+	 * validation of the received file, writing the file chunk to a local temporary file,
+	 * and managing errors during these operations.
+	 *
+	 * @return array|string Returns an array containing the unique identifier and status
+	 * code on successful processing, or a string describing the error on failure.
 	 */
-	public function saveAsyncFile()
+	public function saveAsyncFile(): array|string
 	{
 		[$uuid, $chunkIndex, $totalChunkCount] = $this->extractPostData();
 		$postValidationError = $this->validatePostData($uuid, $chunkIndex, $totalChunkCount);
@@ -108,11 +114,12 @@ class TemporaryAttachmentChunk
 	}
 
 	/**
-	 * Extracts post data from the request
+	 * Extract post data parameters from the request.
 	 *
-	 * @return array [int, int, int] An array containing the UUID, chunk index, and total chunk count
+	 * @return array An array containing the UUID, chunk index, and total chunk count.
+	 * Defaults to [null, 0, 0] if values are not provided.
 	 */
-	private function extractPostData()
+	private function extractPostData(): array
 	{
 		$chunkIndex = $this->req->getPost('elkchunkindex', 'intval');
 		$totalChunkCount = $this->req->getPost('elktotalchunkcount', 'intval');
@@ -137,7 +144,7 @@ class TemporaryAttachmentChunk
 	 * @return string|bool Returns 'invalid_chunk' if the chunk index is invalid or 'invalid_uuid' if the UUID is not set.
 	 * If the chunk and UUID are valid, it delegates the validation to the validateInitialChunk method and returns its result.
 	 */
-	private function validatePostData($uuid, $chunkIndex, $totalChunkCount)
+	private function validatePostData(string $uuid, int $chunkIndex, int $totalChunkCount): bool|string
 	{
 		if ($chunkIndex < 0 || $totalChunkCount < 1 || $chunkIndex >= $totalChunkCount)
 		{
@@ -164,7 +171,7 @@ class TemporaryAttachmentChunk
 	 * @return string|bool Returns 'chunk_quota' if the chunk quota check fails, 'not_writable' if the attachment directory is not writable.
 	 * If the checks passed, it returns true.
 	 */
-	private function validateInitialChunk($totalChunkCount, $chunkIndex)
+	private function validateInitialChunk(int $totalChunkCount, int $chunkIndex): bool|string
 	{
 		// Make sure this (when completed) file size will not exceed what we are willing to accept
 		if ($totalChunkCount === 1 || ($totalChunkCount > 1 && $chunkIndex === 0))
@@ -184,19 +191,20 @@ class TemporaryAttachmentChunk
 	}
 
 	/**
-	 * Make sure total file size isn't going to be bigger than limit
+	 * Check if the total size of the chunks is within the allowed upload limits.
 	 *
-	 * @param int $totalChunks
-	 * @param int $chunkSize
-	 * @return bool
+	 * @param int $totalChunks The total number of chunks.
+	 * @param int $chunkSize The size of each chunk, in bytes. Default is 250,000.
+	 *
+	 * @return bool True if the total size does not exceed the allowed limits, false otherwise.
 	 */
-	public function checkTotalSize($totalChunks, $chunkSize = 250000)
+	public function checkTotalSize(int $totalChunks, int $chunkSize = 250000): bool
 	{
 		global $modSettings;
 
 		$expectedSize = $totalChunks * $chunkSize;
 
-		// What upload max sizes are defined
+		// What upload max sizes are defined?
 		$post_max_size = ini_get('post_max_size');
 		$testPM = memoryReturnBytes($post_max_size);
 		$acpPM = isset($modSettings['attachmentPostLimit']) ? $modSettings['attachmentPostLimit'] * 1024 : 0;
@@ -216,13 +224,13 @@ class TemporaryAttachmentChunk
 	/**
 	 * Returns the smaller non-zero number between two given numbers.
 	 *
-	 * @param int|float $num1 The first number to compare.
-	 * @param int|float $num2 The second number to compare.
+	 * @param float|int $num1 The first number to compare.
+	 * @param float|int $num2 The second number to compare.
 	 *
 	 * @return int|float Returns the smaller non-zero number between $num1 and $num2.
 	 * If $num1 is equal to $num2 or if both numbers are zero, returns zero.
 	 */
-	public function getSmallerNonZero($num1, $num2)
+	public function getSmallerNonZero(float|int $num1, float|int $num2): float|int
 	{
 		if (empty($num1))
 		{
@@ -245,11 +253,11 @@ class TemporaryAttachmentChunk
 	/**
 	 * Retrieves the error message for the given code and cleans up any related async files.
 	 *
-	 * @param string|int $code The error code.
+	 * @param int|string $code The error code.
 	 * @param string $fileID The ID of the file. Default is an empty string.
 	 * @return array An associative array containing the error message, code, and file ID.
 	 */
-	public function errorAsyncFile($code, $fileID = '')
+	public function errorAsyncFile(int|string $code, string $fileID = ''): array
 	{
 		global $txt;
 
@@ -258,7 +266,7 @@ class TemporaryAttachmentChunk
 		// Clean up
 		$user_ident = $this->getUserIdentifier();
 		$in = $this->attach_current_dir . '/post_tmp_async_' . $user_ident . '_' . $fileID . '*.dat';
-		$iterator = new \GlobIterator($in, \FilesystemIterator::SKIP_DOTS | \FilesystemIterator::KEY_AS_FILENAME);
+		$iterator = new GlobIterator($in, FilesystemIterator::SKIP_DOTS | FilesystemIterator::KEY_AS_FILENAME);
 		foreach ($iterator as $file)
 		{
 			@unlink($file->getPathname());
@@ -274,11 +282,9 @@ class TemporaryAttachmentChunk
 	 * @global array $user_info The user information array.
 	 *
 	 */
-	protected function getUserIdentifier()
+	protected function getUserIdentifier(): string
 	{
-		global $user_info;
-
-		return empty($user_info['id']) ? preg_replace('~[^0-9a-z]~i', '', $_SESSION['session_value']) : $user_info['id'];
+		return empty(User::$info->id) ? preg_replace('~[^0-9a-z]~i', '', $_SESSION['session_value']) : User::$info->id;
 	}
 
 	/**
@@ -287,7 +293,7 @@ class TemporaryAttachmentChunk
 	 * @return string|bool Returns a string indicating the error type,
 	 *                     or a boolean true if the file is valid.
 	 */
-	private function validateReceivedFile()
+	private function validateReceivedFile(): bool|string
 	{
 		if (!$this->attachmentDirectory->hasFileTmpAttachments())
 		{
@@ -317,7 +323,7 @@ class TemporaryAttachmentChunk
 	 *
 	 * @return string The generated local file name.
 	 */
-	private function generateLocalFileName($uuid, $chunkIndex): string
+	private function generateLocalFileName(string $uuid, int $chunkIndex): string
 	{
 		$salt = basename($_FILES['attachment']['tmp_name'][0]);
 		$user_ident = $this->getUserIdentifier();
@@ -332,7 +338,7 @@ class TemporaryAttachmentChunk
 	 *
 	 * @return bool|string Returns true if the chunk was written successfully, 'not_found' if the destination file was not found.
 	 */
-	private function writeChunkToFile($local_file)
+	private function writeChunkToFile(string $local_file): bool|string
 	{
 		$out = $this->attach_current_dir . '/' . $local_file;
 		$in = $_FILES['attachment']['tmp_name'][0];
@@ -343,7 +349,7 @@ class TemporaryAttachmentChunk
 		{
 			$result = move_uploaded_file($in, $out);
 		}
-		catch (\Throwable)
+		catch (Throwable)
 		{
 			$result = false;
 		}
@@ -367,7 +373,7 @@ class TemporaryAttachmentChunk
 	 *
 	 * @return array The result array
 	 */
-	public function returnResults($result)
+	public function returnResults(array $result): array
 	{
 		// Some error?
 		if (!empty($result['code']))
@@ -392,7 +398,7 @@ class TemporaryAttachmentChunk
 	 *
 	 * @return array The path of the combined file.
 	 */
-	public function action_combineChunks()
+	public function action_combineChunks(): array
 	{
 		[$uuid, , $totalChunkCount] = $this->extractPostData();
 		$user_ident = $this->getUserIdentifier();
@@ -430,7 +436,7 @@ class TemporaryAttachmentChunk
 	 *
 	 * @return void
 	 */
-	public function build_fileArray()
+	public function build_fileArray(): void
 	{
 		unset($_FILES['attachment']);
 
@@ -454,7 +460,7 @@ class TemporaryAttachmentChunk
 	 *
 	 * @return string The generated path to the file with chunks.
 	 */
-	private function getPathWithChunks($user_ident, $uuid)
+	private function getPathWithChunks(string $user_ident, string $uuid): string
 	{
 		return $this->attach_current_dir . '/post_tmp_async_' . $user_ident . '_' . $uuid . '_part_*.dat';
 	}
@@ -482,9 +488,9 @@ class TemporaryAttachmentChunk
 	 *
 	 * @return bool True if all chunks exist, false otherwise.
 	 */
-	private function verifyChunkExistence($in, $totalChunkCount)
+	private function verifyChunkExistence(string $in, int $totalChunkCount): bool
 	{
-		$iterator = new \GlobIterator($in, \FilesystemIterator::SKIP_DOTS | \FilesystemIterator::KEY_AS_FILENAME);
+		$iterator = new GlobIterator($in, FilesystemIterator::SKIP_DOTS | FilesystemIterator::KEY_AS_FILENAME);
 
 		return $iterator->count() && $iterator->count() === $totalChunkCount;
 	}
@@ -498,10 +504,10 @@ class TemporaryAttachmentChunk
 	 *
 	 * @return bool Returns true if the file fragments were successfully combined into a single file, false otherwise.
 	 */
-	private function combineFileFragments($user_ident, $uuid, $in)
+	private function combineFileFragments(string $user_ident, string $uuid, string $in): bool
 	{
-		$files = iterator_to_array(new \GlobIterator($in, \FilesystemIterator::SKIP_DOTS | \FilesystemIterator::KEY_AS_FILENAME));
-		ksort($files);
+		$files = iterator_to_array(new GlobIterator($in, FilesystemIterator::SKIP_DOTS | FilesystemIterator::KEY_AS_FILENAME));
+		natsort($files);
 		$this->combinedFilePath = $this->getCombinedFilePath($user_ident, $uuid);
 		$success = true;
 

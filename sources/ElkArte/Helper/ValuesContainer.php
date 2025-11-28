@@ -135,6 +135,17 @@ class ValuesContainer implements \ArrayAccess
 	}
 
 	/**
+	 * Check if a key exists in the data container
+	 *
+	 * @param string $key The key to check for
+	 * @return bool True if the key exists, false otherwise
+	 */
+	public function exists($key): bool
+	{
+		return array_key_exists($key, $this->data);
+	}
+
+	/**
 	 * Unset a certain offset key.
 	 *
 	 * @param string|int $offset
@@ -161,14 +172,13 @@ class ValuesContainer implements \ArrayAccess
 	 *
 	 * @return bool
 	 */
-	public function isEmpty()
+	public function isEmpty(): bool
 	{
 		return empty($this->data);
 	}
 
 	/**
 	 * Merges the passed array into the existing one.
-	 * Works the same as array_merge.
 	 *
 	 * @param array $new_data
 	 */
@@ -180,7 +190,7 @@ class ValuesContainer implements \ArrayAccess
 	/**
 	 * Returns the number of elements in the object
 	 */
-	public function count()
+	public function count(): int
 	{
 		return $this->isEmpty() ? 0 : count($this->data);
 	}

@@ -42,41 +42,41 @@ class AttachmentsDirectory
 	public const AUTO_RAND2 = 5;
 
 	/** @var int Current size of data in a directory */
-	protected static $dir_size = 0;
+	protected static int $dir_size = 0;
 
 	/** @var int Limits on the above */
-	protected $sizeLimit = 0;
+	protected int $sizeLimit = 0;
 
 	/** @var int Current number of files in a directory */
-	protected static $dir_files = 0;
+	protected static int $dir_files = 0;
 
 	/** @var int Limits on the above */
-	protected $numFilesLimit = 0;
+	protected int $numFilesLimit = 0;
 
 	/** @var int if auto manage attachment function is enabled and at what level
 	 * 0 = normal/off, 1 = by space (#files/size), 2 = by years, 3 = by months 4 = random */
-	protected $automanage_attachments = 0;
+	protected int $automanage_attachments = 0;
 
 	/** @var array Potential attachment directories */
-	protected $attachmentUploadDir = [];
+	protected array $attachmentUploadDir = [];
 
 	/** @var int Pointer to the above upload directory array */
-	protected $currentAttachmentUploadDir = 0;
+	protected int $currentAttachmentUploadDir = 0;
 
 	/** @var int|mixed If we are using subdirectories */
-	protected $useSubdirectories = 0;
+	protected mixed $useSubdirectories = 0;
 
 	/** @var bool If to notify the admin when a directory is full */
-	protected $attachment_full_notified = false;
+	protected bool $attachment_full_notified = false;
 
-	/** @var array Potential root/base directories to which we can add directories/files */
-	protected $baseDirectories = [];
+	/** @var array|string Potential root/base directories to which we can add directories/files */
+	protected array|string $baseDirectories = [];
 
 	/** @var string Current base to use from the above array */
-	protected $basedirectory_for_attachments = '';
+	protected string $basedirectory_for_attachments = '';
 
 	/** @var array|mixed|string */
-	protected $last_dirs = [];
+	protected mixed $last_dirs = [];
 
 	/**
 	 * The constructor for attachment directories, controls where to add files
@@ -85,7 +85,7 @@ class AttachmentsDirectory
 	 * @param array $options all the stuff
 	 * @param QueryInterface $db
 	 */
-	public function __construct($options, protected $db)
+	public function __construct(array $options, protected QueryInterface $db)
 	{
 		$this->automanage_attachments = (int) ($options['automanage_attachments'] ?? $this->automanage_attachments);
 		$this->sizeLimit = $options['attachmentDirSizeLimit'] ?? $this->sizeLimit;
@@ -114,14 +114,14 @@ class AttachmentsDirectory
 		{
 			$this->currentAttachmentUploadDir = 1;
 
-			updateSettings(array(
-				'attachmentUploadDir' => serialize(array(1 => $options['attachmentUploadDir'])),
+			updateSettings([
+				'attachmentUploadDir' => serialize([1 => $options['attachmentUploadDir']]),
 				'currentAttachmentUploadDir' => 1,
-			));
+			]);
 		}
 
-		$this->attachmentUploadDir = Util::unserialize($options['attachmentUploadDir']);
-		$this->attachmentUploadDir = $this->attachmentUploadDir ?: $options['attachmentUploadDir'];
+		$current = Util::unserialize($options['attachmentUploadDir']);
+		$this->attachmentUploadDir = $current ?: $options['attachmentUploadDir'];
 	}
 
 	/**
@@ -130,7 +130,7 @@ class AttachmentsDirectory
 	 * @param int $current_files
 	 * @return false|mixed
 	 */
-	public function remainingFiles($current_files)
+	public function remainingFiles(int $current_files): mixed
 	{
 		if ($this->hasNumFilesLimit())
 		{
@@ -145,7 +145,7 @@ class AttachmentsDirectory
 	 *
 	 * @return bool
 	 */
-	public function hasNumFilesLimit()
+	public function hasNumFilesLimit(): bool
 	{
 		return !empty($this->numFilesLimit);
 	}
@@ -156,7 +156,7 @@ class AttachmentsDirectory
 	 * @param $current_dir_size
 	 * @return false|mixed
 	 */
-	public function remainingSpace($current_dir_size)
+	public function remainingSpace($current_dir_size): mixed
 	{
 		if ($this->hasSizeLimit())
 		{
@@ -171,7 +171,7 @@ class AttachmentsDirectory
 	 *
 	 * @return bool
 	 */
-	public function hasSizeLimit()
+	public function hasSizeLimit(): bool
 	{
 		return !empty($this->sizeLimit);
 	}
@@ -187,7 +187,7 @@ class AttachmentsDirectory
 	 * @return int 1 if multiple attachment directories are not enabled,
 	 * or the id of the current attachment directory otherwise.
 	 */
-	public function currentDirectoryId()
+	public function currentDirectoryId(): int
 	{
 		if (!array_key_exists($this->currentAttachmentUploadDir, $this->attachmentUploadDir))
 		{
@@ -204,7 +204,7 @@ class AttachmentsDirectory
 	 * @param int|string $id
 	 * @return bool
 	 */
-	public function directoryExists($id)
+	public function directoryExists(int|string $id): bool
 	{
 		if (is_int($id))
 		{
@@ -221,7 +221,7 @@ class AttachmentsDirectory
 	 * @param string $dir
 	 * @return int
 	 */
-	public function countSubdirs($dir)
+	public function countSubdirs(string $dir): int
 	{
 		$expected_dirs = 0;
 		foreach ($this->getPaths() as $sub)
@@ -238,9 +238,9 @@ class AttachmentsDirectory
 	/**
 	 * Returns the list of directories as an array.
 	 *
-	 * @return mixed[] the attachments directory/directories
+	 * @return array the attachments directory/directories
 	 */
-	public function getPaths()
+	public function getPaths(): array
 	{
 		return $this->attachmentUploadDir;
 	}
@@ -253,7 +253,7 @@ class AttachmentsDirectory
 	 *
 	 * @throws Exception
 	 */
-	public function getPathById($id)
+	public function getPathById(int $id): string
 	{
 		if (isset($this->attachmentUploadDir[$id]))
 		{
@@ -268,7 +268,7 @@ class AttachmentsDirectory
 	 *
 	 * @return array
 	 */
-	public function getBaseDirs()
+	public function getBaseDirs(): array
 	{
 		return is_array($this->baseDirectories)
 			? $this->baseDirectories
@@ -280,7 +280,7 @@ class AttachmentsDirectory
 	 *
 	 * @return bool
 	 */
-	public function hasBaseDir()
+	public function hasBaseDir(): bool
 	{
 		return !empty($this->baseDirectories);
 	}
@@ -291,7 +291,7 @@ class AttachmentsDirectory
 	 * @param $dir
 	 * @return bool
 	 */
-	public function isBaseDir($dir)
+	public function isBaseDir($dir): bool
 	{
 		return in_array($dir, $this->baseDirectories, true);
 	}
@@ -302,7 +302,7 @@ class AttachmentsDirectory
 	 * @param int $dir_id The key in the last_dirs array
 	 * @return void
 	 */
-	public function updateLastDirs($dir_id)
+	public function updateLastDirs(int $dir_id): void
 	{
 		if (!empty($this->last_dirs) && (isset($this->last_dirs[$dir_id]) || isset($this->last_dirs[0])))
 		{
@@ -330,11 +330,11 @@ class AttachmentsDirectory
 				$this->basedirectory_for_attachments = empty($this->basedirectory_for_attachments) ? '' : $this->basedirectory_for_attachments;
 				$this->useSubdirectories = (int) $this->useSubdirectories;
 
-				updateSettings(array(
+				updateSettings([
 					'last_attachments_directory' => serialize($this->last_dirs),
 					'basedirectory_for_attachments' => $bid == 0 ? $this->basedirectory_for_attachments : $this->attachmentUploadDir[$bid],
 					'use_subdirectories_for_attachments' => $use_subdirectories,
-				));
+				]);
 			}
 		}
 	}
@@ -346,7 +346,7 @@ class AttachmentsDirectory
 	 *
 	 * @param $thumb_size
 	 */
-	public function checkDirSize($thumb_size)
+	public function checkDirSize($thumb_size): void
 	{
 		if ($this->autoManageIsLevel(self::AUTO_SEQUENCE) && (!empty($this->sizeLimit) || !empty($this->numFilesLimit)))
 		{
@@ -370,7 +370,7 @@ class AttachmentsDirectory
 	 * @param $level
 	 * @return bool
 	 */
-	public function autoManageIsLevel($level)
+	public function autoManageIsLevel($level): bool
 	{
 		return $this->automanage_attachments === (int) $level;
 	}
@@ -384,7 +384,7 @@ class AttachmentsDirectory
 	 * - Uses createDirectory to create the incremental directory
 	 *
 	 */
-	public function manageBySpace()
+	public function manageBySpace(): ?bool
 	{
 		if ($this->autoManageEnabled(self::AUTO_SEQUENCE))
 		{
@@ -421,10 +421,10 @@ class AttachmentsDirectory
 			$this->createDirectory($uploadDirectory);
 
 			$this->currentAttachmentUploadDir = array_search($uploadDirectory, $this->attachmentUploadDir, true);
-			updateSettings(array(
+			updateSettings([
 				'last_attachments_directory' => serialize($this->last_dirs),
 				'currentAttachmentUploadDir' => $this->currentAttachmentUploadDir,
-			));
+			]);
 
 			return true;
 		}
@@ -440,7 +440,7 @@ class AttachmentsDirectory
 	 * @param int|null $minLevel
 	 * @return bool
 	 */
-	public function autoManageEnabled($minLevel = null)
+	public function autoManageEnabled(int $minLevel = null): bool
 	{
 		if ($minLevel === null)
 		{
@@ -456,7 +456,7 @@ class AttachmentsDirectory
 	 * @param string $base_dir the base directory
 	 * @return void
 	 */
-	protected function initLastDir($base_dir)
+	protected function initLastDir(string $base_dir): void
 	{
 		if (!isset($this->last_dirs[$base_dir]))
 		{
@@ -477,7 +477,7 @@ class AttachmentsDirectory
 	 * @throws Exception
 	 *
 	 */
-	public function createDirectory($uploadDirectory)
+	public function createDirectory(string $uploadDirectory): bool
 	{
 		$fileFunctions = FileFunctions::instance();
 
@@ -514,7 +514,7 @@ class AttachmentsDirectory
 	 *
 	 * @return int
 	 */
-	public function countDirs()
+	public function countDirs(): int
 	{
 		return count($this->attachmentUploadDir);
 	}
@@ -525,33 +525,33 @@ class AttachmentsDirectory
 	 * @param array $file_tree the original attachment tree
 	 * @return array the modified attachment tree
 	 */
-	public function getAttachmentsTree($file_tree)
+	public function getAttachmentsTree(array $file_tree): array
 	{
 		// Are we using multiple attachment directories?
 		if ($this->hasMultiPaths())
 		{
-			unset($file_tree[strtr(BOARDDIR, array('\\' => '/'))]['contents']['attachments']);
+			unset($file_tree[strtr(BOARDDIR, ['\\' => '/'])]['contents']['attachments']);
 
 			// @todo Should we suggest non-current directories be read only?
 			foreach ($this->attachmentUploadDir as $dir)
 			{
-				$file_tree[strtr($dir, array('\\' => '/'))] = array(
+				$file_tree[strtr($dir, ['\\' => '/'])] = [
 					'type' => 'dir',
 					'writable_on' => 'restrictive',
-				);
+				];
 			}
 		}
 		else
 		{
 			if (substr($this->attachmentUploadDir[1], 0, strlen(BOARDDIR)) != BOARDDIR)
 			{
-				unset($file_tree[strtr(BOARDDIR, array('\\' => '/'))]['contents']['attachments']);
+				unset($file_tree[strtr(BOARDDIR, ['\\' => '/'])]['contents']['attachments']);
 			}
 
-			$file_tree[strtr($this->attachmentUploadDir[1], array('\\' => '/'))] = array(
+			$file_tree[strtr($this->attachmentUploadDir[1], ['\\' => '/'])] = [
 				'type' => 'dir',
 				'writable_on' => 'restrictive',
-			);
+			];
 		}
 
 		return $file_tree;
@@ -562,7 +562,7 @@ class AttachmentsDirectory
 	 *
 	 * @return bool
 	 */
-	public function hasMultiPaths()
+	public function hasMultiPaths(): bool
 	{
 		return $this->autoManageEnabled() && count($this->attachmentUploadDir) > 1;
 	}
@@ -571,8 +571,9 @@ class AttachmentsDirectory
 	 * Check and create a directory automatically.
 	 *
 	 * @param bool $is_admin_interface
+	 * @return bool
 	 */
-	public function automanageCheckDirectory($is_admin_interface = false)
+	public function automanageCheckDirectory(bool $is_admin_interface = false): bool
 	{
 		if ($this->autoManageEnabled() === false)
 		{
@@ -654,9 +655,9 @@ class AttachmentsDirectory
 		{
 			$this->currentAttachmentUploadDir = array_search($uploadDirectory, $this->attachmentUploadDir, true);
 
-			updateSettings(array(
+			updateSettings([
 				'currentAttachmentUploadDir' => $this->currentAttachmentUploadDir,
-			));
+			]);
 		}
 
 		return $outputCreation;
@@ -671,7 +672,7 @@ class AttachmentsDirectory
 	 * @param bool $is_admin_interface
 	 * @return bool
 	 */
-	protected function checkNewDir($is_admin_interface)
+	protected function checkNewDir(bool $is_admin_interface): bool
 	{
 		// Not pretty, but since we don't want folders created for every post.
 		// It'll do unless a better solution can be found.
@@ -694,7 +695,7 @@ class AttachmentsDirectory
 	 * @param bool $strict Whether to perform strict check on uploaded files
 	 * @return bool Returns true if there are temporary file attachments, false otherwise
 	 */
-	public function hasFileTmpAttachments($strict = true)
+	public function hasFileTmpAttachments(bool $strict = true): bool
 	{
 		if (isset($_FILES['attachment']['tmp_name']))
 		{
@@ -726,7 +727,7 @@ class AttachmentsDirectory
 	 * @param TemporaryAttachment $sess_attach
 	 * @throws Exception
 	 */
-	public function checkDirSpace($sess_attach)
+	public function checkDirSpace(TemporaryAttachment $sess_attach): void
 	{
 		if (empty(self::$dir_size) || empty(self::$dir_files))
 		{
@@ -739,7 +740,7 @@ class AttachmentsDirectory
 		{
 			require_once(SUBSDIR . '/Admin.subs.php');
 			emailAdmins('admin_attachments_full');
-			updateSettings(array('attachment_full_notified' => 1));
+			updateSettings(['attachment_full_notified' => 1]);
 		}
 
 		// No room left.... What to do now???
@@ -768,10 +769,10 @@ class AttachmentsDirectory
 	/**
 	 * Current space consumed by the files in a directory plus what a new file will add
 	 *
-	 * @param $tmp_attach_size
+	 * @param int $tmp_attach_size
 	 * @return void
 	 */
-	protected function dirSpace($tmp_attach_size = 0)
+	protected function dirSpace(int $tmp_attach_size = 0): void
 	{
 		require_once(SUBSDIR . '/ManageAttachments.subs.php');
 		$current_dir = attachDirProperties($this->currentAttachmentUploadDir);
@@ -792,7 +793,7 @@ class AttachmentsDirectory
 	 *  - otherwise, the current path is $modSettings['attachmentUploadDir'].
 	 *
 	 */
-	public function getCurrent()
+	public function getCurrent(): string
 	{
 		if (empty($this->attachmentUploadDir))
 		{
@@ -810,7 +811,7 @@ class AttachmentsDirectory
 	 *
 	 * @throws Exception When the directory cannot be renamed or already exists
 	 */
-	public function rename($id, &$real_path)
+	public function rename(int $id, string &$real_path): void
 	{
 		$fileFunctions = FileFunctions::instance();
 		if (!empty($this->attachmentUploadDir[$id]) && $real_path !== $this->attachmentUploadDir[$id])
@@ -835,10 +836,10 @@ class AttachmentsDirectory
 				$base = $this->basedirectory_for_attachments === $this->attachmentUploadDir[$id] ? $real_path : $this->basedirectory_for_attachments;
 
 				$this->baseDirectories[$id] = $real_path;
-				updateSettings(array(
+				updateSettings([
 					'attachment_basedirectories' => serialize($this->baseDirectories),
 					'basedirectory_for_attachments' => $base,
-				));
+				]);
 			}
 		}
 	}
@@ -848,10 +849,10 @@ class AttachmentsDirectory
 	 *
 	 * @param $id
 	 * @param $real_path
-	 * @return bool|void
+	 * @return bool|null
 	 * @throws Exception
 	 */
-	public function delete($id, &$real_path)
+	public function delete($id, &$real_path): ?bool
 	{
 		$real_path = $this->attachmentUploadDir[$id];
 
@@ -925,7 +926,7 @@ class AttachmentsDirectory
 			}
 
 			// Remove it from the base directory list.
-			if (empty($error) && !empty($this->baseDirectories))
+			if (!empty($result) && !empty($this->baseDirectories))
 			{
 				$this->clear($id);
 				return true;
@@ -942,12 +943,12 @@ class AttachmentsDirectory
 	 *
 	 * @param $id
 	 */
-	public function clear($id)
+	public function clear($id): void
 	{
 		unset($this->baseDirectories[$id]);
-		updateSettings(array(
+		updateSettings([
 			'attachment_basedirectories' => serialize($this->baseDirectories)
-		));
+		]);
 	}
 
 	/**
@@ -956,7 +957,7 @@ class AttachmentsDirectory
 	 * @param int $id The ID to check against the current directory ID
 	 * @return bool Returns true if the given ID is the same as the current directory ID, otherwise returns false
 	 */
-	public function isCurrentDirectoryId($id)
+	public function isCurrentDirectoryId(int $id): bool
 	{
 		return $this->currentAttachmentUploadDir == $id;
 	}
@@ -964,10 +965,10 @@ class AttachmentsDirectory
 	/**
 	 * Returns if a given directory is the current base directory used for attachments
 	 *
-	 * @param int $id
+	 * @param int|string $id
 	 * @return bool
 	 */
-	public function isCurrentBaseDir($id)
+	public function isCurrentBaseDir(int|string $id): bool
 	{
 		if (is_int($id))
 		{

@@ -23,6 +23,8 @@ use ElkArte\Helper\HttpReq;
  *      - enableModules($moduleName, $class) e.g. enableModules('Mymodule', ['display','post'])
  * - You can create a core feature
  *     - Add a file ADMINDIR/ManageMymoduleModule.php containing a static class of addCoreFeature.
+ *     - Or add a file in the ADDONSDIR as MyAddonIntegrate.php containing a static class of addCoreFeature.
+ *     - Or add a file in the ADDONSDIR as *.integrate.php) containing a static class of addCoreFeature
  *     - The file and class will be auto discovered and called.
  * - Place your module files in ElkArte/Modules as a directory like
  *     - /Mymodule/Display.php and /Mymodule/Post.php
@@ -61,12 +63,12 @@ class EventManager
 	/**
 	 * Allows to set the object that instantiated the \ElkArte\EventManager.
 	 *
-	 * - Necessary in order to be able to provide the dependencies later on, allows
+	 * - Necessary to be able to provide the dependencies later on, allows
 	 * one to access the calling class properties in the registered event
 	 *
 	 * @param object $source The controller that instantiated the \ElkArte\EventManager
 	 */
-	public function setSource($source)
+	public function setSource($source): void
 	{
 		$this->_source = $source;
 	}
@@ -79,9 +81,9 @@ class EventManager
 	 * @param string $position The "identifier" of the event, such as prepare_post
 	 * @param array $args The arguments passed to the methods registered
 	 *
-	 * @return bool
+	 * @return bool|null
 	 */
-	public function trigger($position, $args = [])
+	public function trigger($position, $args = []): ?bool
 	{
 		// Nothing registered against this event, just return
 		if (!array_key_exists($position, $this->_registered_events) || !$this->_registered_events[$position]->hasEvents())
@@ -144,6 +146,8 @@ class EventManager
 				}
 			}
 		}
+
+		return null;
 	}
 
 	/**
@@ -151,7 +155,7 @@ class EventManager
 	 *
 	 * What it does:
 	 *
-	 * - Objects are stored in order to be shared between different triggers in the same \ElkArte\EventManager.
+	 * - Objects are stored to be shared between different triggers in the same \ElkArte\EventManager.
 	 * - If the object doesn't exist yet, it is created
 	 *
 	 * @param string $class_name The name of the class.
@@ -176,7 +180,7 @@ class EventManager
 	 * @param string $class_name The name of the class.
 	 * @param object $instance The object.
 	 */
-	protected function _setInstance($class_name, $instance)
+	protected function _setInstance($class_name, $instance): void
 	{
 		if (!isset($this->_instances[$class_name]))
 		{
@@ -192,7 +196,7 @@ class EventManager
 	 *
 	 * @param string[] $classes A set of class names that should be attached
 	 */
-	public function registerClasses($classes)
+	public function registerClasses($classes): void
 	{
 		$this->_register_events($classes);
 	}
@@ -208,7 +212,7 @@ class EventManager
 	 *
 	 * @param string[] $classes A list of class names.
 	 */
-	protected function _register_events($classes)
+	protected function _register_events($classes): void
 	{
 		foreach ($classes as $class)
 		{
@@ -251,7 +255,7 @@ class EventManager
 	 *          - globals
 	 * @param int $priority Defines the order the method is called.
 	 */
-	public function register($position, $event, $priority = 0)
+	public function register($position, $event, $priority = 0): void
 	{
 		if (!isset($this->_registered_events[$position]))
 		{
@@ -264,9 +268,9 @@ class EventManager
 	/**
 	 * Gets the names of all the classes already loaded.
 	 *
-	 * @return string[]
+	 * @return array|null
 	 */
-	protected function _declared_classes()
+	protected function _declared_classes(): ?array
 	{
 		if ($this->_declared_classes === null)
 		{
@@ -279,7 +283,7 @@ class EventManager
 	/**
 	 * Reflects a specific class method to see what parameters are needed
 	 *
-	 * Currently only checks on number required, can be expanded to make use of
+	 * Currently, only checks on the number required can be expanded to make use of
 	 * $params = $r->getParameters() and then $param-> getName isOptional etc
 	 * to ensure required named are being passed.
 	 *
@@ -287,7 +291,7 @@ class EventManager
 	 * @param string $method_name
 	 * @param array $dependencies the dependencies the event registered
 	 */
-	protected function _checkParameters($class_name, $method_name, &$dependencies)
+	protected function _checkParameters($class_name, $method_name, &$dependencies): void
 	{
 		// Lets check on the actual methods parameters
 		try

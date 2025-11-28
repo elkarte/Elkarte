@@ -22,10 +22,10 @@ use ElkArte\Helper\Util;
  * Callback for createList in action_trackip() and action_trackactivity()
  *
  * @param string $where
- * @param mixed[] $where_vars = array() or values used in the where statement
+ * @param array $where_vars = array() or values used in the where statement
  * @return string number of user errors
  */
-function getUserErrorCount($where, $where_vars = array())
+function getUserErrorCount($where, $where_vars = [])
 {
 	$db = database();
 
@@ -49,17 +49,17 @@ function getUserErrorCount($where, $where_vars = array())
  * @param int $items_per_page The number of items to show per page
  * @param string $sort A string indicating how to sort the results
  * @param string $where
- * @param mixed[] $where_vars array of values used in the where statement
- * @return mixed[] error messages array
+ * @param array $where_vars array of values used in the where statement
+ * @return array error messages array
  */
-function getUserErrors($start, $items_per_page, $sort, $where, $where_vars = array())
+function getUserErrors($start, $items_per_page, $sort, $where, $where_vars = [])
 {
 	global $txt;
 
 	$db = database();
 
 	// Get a list of error messages from this ip (range).
-	$error_messages = array();
+	$error_messages = [];
 	$db->fetchQuery('
 		SELECT
 			le.log_time, le.ip, le.url, le.message, COALESCE(mem.id_member, 0) AS id_member,
@@ -69,20 +69,20 @@ function getUserErrors($start, $items_per_page, $sort, $where, $where_vars = arr
 		WHERE ' . $where . '
 		ORDER BY ' . $sort . '
 		LIMIT ' . $items_per_page . '  OFFSET ' . $start,
-		array_merge($where_vars, array(
+		array_merge($where_vars, [
 			'guest_title' => $txt['guest_title'],
-		))
+		])
 	)->fetch_callback(
 		function ($row) use (&$error_messages) {
-			$error_messages[] = array(
+			$error_messages[] = [
 				'ip' => $row['ip'],
 				'member_link' => $row['id_member'] > 0 ? '<a href="' . getUrl('profile', ['action' => 'profile', 'u' => $row['id_member']]) . '">' . $row['display_name'] . '</a>' : $row['display_name'],
-				'message' => strtr($row['message'], array('&lt;span class=&quot;remove&quot;&gt;' => '', '&lt;/span&gt;' => '')),
+				'message' => strtr($row['message'], ['&lt;span class=&quot;remove&quot;&gt;' => '', '&lt;/span&gt;' => '']),
 				'url' => $row['url'],
 				'time' => standardTime($row['log_time']),
 				'html_time' => htmlTime($row['log_time']),
 				'timestamp' => forum_time(true, $row['log_time']),
-			);
+			];
 		}
 	);
 
@@ -93,10 +93,10 @@ function getUserErrors($start, $items_per_page, $sort, $where, $where_vars = arr
  * Callback for createList() in TrackIP()
  *
  * @param string $where
- * @param mixed[] $where_vars array of values used in the where statement
+ * @param array $where_vars array of values used in the where statement
  * @return string count of messages matching the IP
  */
-function getIPMessageCount($where, $where_vars = array())
+function getIPMessageCount($where, $where_vars = [])
 {
 	$db = database();
 
@@ -121,16 +121,16 @@ function getIPMessageCount($where, $where_vars = array())
  * @param int $items_per_page The number of items to show per page
  * @param string $sort A string indicating how to sort the results
  * @param string $where
- * @param mixed[] $where_vars array of values used in the where statement
- * @return mixed[] an array of basic messages / details
+ * @param array $where_vars array of values used in the where statement
+ * @return array an array of basic messages / details
  */
-function getIPMessages($start, $items_per_page, $sort, $where, $where_vars = array())
+function getIPMessages($start, $items_per_page, $sort, $where, $where_vars = [])
 {
 	$db = database();
 
 	// Get all the messages fitting this where clause.
 	// @todo SLOW This query is using a filesort.
-	$messages = array();
+	$messages = [];
 	$db->fetchQuery('
 		SELECT
 			m.id_msg, m.poster_ip, COALESCE(mem.real_name, m.poster_name) AS display_name, mem.id_member,
@@ -141,23 +141,23 @@ function getIPMessages($start, $items_per_page, $sort, $where, $where_vars = arr
 		WHERE {query_see_board} AND ' . $where . '
 		ORDER BY ' . $sort . '
 		LIMIT ' . $items_per_page . '  OFFSET ' . $start,
-		array_merge($where_vars, array())
+		array_merge($where_vars, [])
 	)->fetch_callback(
 		function ($row) use (&$messages) {
-			$messages[] = array(
+			$messages[] = [
 				'ip' => $row['poster_ip'],
 				'member_link' => empty($row['id_member']) ? $row['display_name'] : '<a href="' . getUrl('profile', ['action' => 'profile', 'u' => $row['id_member']]) . '">' . $row['display_name'] . '</a>',
-				'board' => array(
+				'board' => [
 					'id' => $row['id_board'],
 					'href' => getUrl('action', ['board' => $row['id_board']])
-				),
+				],
 				'topic' => $row['id_topic'],
 				'id' => $row['id_msg'],
 				'subject' => $row['subject'],
 				'time' => standardTime($row['poster_time']),
 				'html_time' => htmlTime($row['poster_time']),
 				'timestamp' => forum_time(true, $row['poster_time'])
-			);
+			];
 		}
 	);
 
@@ -171,10 +171,10 @@ function getIPMessages($start, $items_per_page, $sort, $where, $where_vars = arr
  * (createList() in TrackLogins())
  *
  * @param string $where
- * @param mixed[] $where_vars array of values used in the where statement
+ * @param array $where_vars array of values used in the where statement
  * @return string count of messages matching the IP
  */
-function getLoginCount($where, $where_vars = array())
+function getLoginCount($where, $where_vars = [])
 {
 	$db = database();
 
@@ -183,9 +183,9 @@ function getLoginCount($where, $where_vars = array())
 			COUNT(*) AS message_count
 		FROM {db_prefix}member_logins
 		WHERE ' . $where,
-		array(
+		[
 			'id_member' => $where_vars['current_member'],
-		)
+		]
 	);
 	list ($count) = $request->fetch_row();
 	$request->free_result();
@@ -199,33 +199,33 @@ function getLoginCount($where, $where_vars = array())
  * Callback for trackLogins data.
  *
  * @param string $where
- * @param mixed[] $where_vars array of values used in the where statement
+ * @param array $where_vars array of values used in the where statement
  *
- * @return mixed[] an array of messages
+ * @return array an array of messages
  */
-function getLogins($where, $where_vars = array())
+function getLogins($where, $where_vars = [])
 {
 	$db = database();
 
-	$logins = array();
+	$logins = [];
 	$db->fetchQuery('
 		SELECT 
 			time, ip, ip2
 		FROM {db_prefix}member_logins
 		WHERE ' . $where . '
 		ORDER BY time DESC',
-		array(
+		[
 			'current_member' => $where_vars['current_member'],
-		)
+		]
 	)->fetch_callback(
 		function ($row) use (&$logins) {
-			$logins[] = array(
+			$logins[] = [
 				'time' => standardTime($row['time']),
 				'html_time' => htmlTime($row['time']),
 				'timestamp' => forum_time(true, $row['time']),
 				'ip' => $row['ip'],
 				'ip2' => $row['ip2'],
-			);
+			];
 		}
 	);
 
@@ -248,10 +248,10 @@ function getProfileEditCount($memID)
 		FROM {db_prefix}log_actions
 		WHERE id_log = {int:log_type}
 			AND id_member = {int:owner}',
-		array(
+		[
 			'log_type' => 2,
 			'owner' => $memID,
-		)
+		]
 	);
 	list ($edit_count) = $request->fetch_row();
 	$request->free_result();
@@ -268,7 +268,7 @@ function getProfileEditCount($memID)
  * @param int $items_per_page The number of items to show per page
  * @param string $sort A string indicating how to sort the results
  * @param int $memID
- * @return mixed[] array of profile edits
+ * @return array array of profile edits
  */
 function getProfileEdits($start, $items_per_page, $sort, $memID)
 {
@@ -285,13 +285,13 @@ function getProfileEdits($start, $items_per_page, $sort, $memID)
 			AND id_member = {int:owner}
 		ORDER BY ' . $sort . '
 		LIMIT ' . $items_per_page . '  OFFSET ' . $start,
-		array(
+		[
 			'log_type' => 2,
 			'owner' => $memID,
-		)
+		]
 	);
-	$edits = array();
-	$members = array();
+	$edits = [];
+	$members = [];
 	$bbc_parser = ParserWrapper::instance();
 	while (($row = $request->fetch_assoc()))
 	{
@@ -323,7 +323,7 @@ function getProfileEdits($start, $items_per_page, $sort, $memID)
 		// Parse BBC?
 		$parse_bbc = isset($context['custom_field_titles'][$row['action']]) && $context['custom_field_titles'][$row['action']]['parse_bbc'];
 
-		$edits[] = array(
+		$edits[] = [
 			'id' => $row['id_action'],
 			'ip' => $row['ip'],
 			'id_member' => !empty($extra['applicator']) ? $extra['applicator'] : 0,
@@ -335,7 +335,7 @@ function getProfileEdits($start, $items_per_page, $sort, $memID)
 			'time' => standardTime($row['log_time']),
 			'html_time' => htmlTime($row['log_time']),
 			'timestamp' => forum_time(true, $row['log_time']),
-		);
+		];
 	}
 	$request->free_result();
 
@@ -345,7 +345,7 @@ function getProfileEdits($start, $items_per_page, $sort, $memID)
 		require_once(SUBSDIR . '/Members.subs.php');
 		$result = getBasicMemberData($members);
 
-		$members = array();
+		$members = [];
 		foreach ($result as $row)
 		{
 			$members[$row['id_member']] = $row['real_name'];

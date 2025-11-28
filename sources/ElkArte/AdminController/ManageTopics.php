@@ -32,12 +32,12 @@ class ManageTopics extends AbstractController
 	{
 		global $context, $txt;
 
-		$subActions = array(
-			'display' => array(
+		$subActions = [
+			'display' => [
 				'controller' => $this,
 				'function' => 'action_topicSettings_display',
-				'permission' => 'admin_forum')
-		);
+				'permission' => 'admin_forum']
+		];
 
 		// Control for an action, why not!
 		$action = new Action('manage_topics');
@@ -64,7 +64,7 @@ class ManageTopics extends AbstractController
 	 * @event integrate_save_topic_settings
 	 * @uses Admin template, edit_topic_settings sub-template.
 	 */
-	public function action_topicSettings_display()
+	public function action_topicSettings_display(): void
 	{
 		global $context, $txt;
 
@@ -124,30 +124,30 @@ class ManageTopics extends AbstractController
 		// @todo there is not interface for $modSettings['subject_length'], should it be added here?
 
 		// initialize it with our settings
-		$config_vars = array(
+		$config_vars = [
 			// Some simple big bools...
-			array('check', 'enableParticipation'),
-			array('check', 'enableFollowup'),
-			array('check', 'enable_unwatch'),
-			array('check', 'pollMode'),
+			['check', 'enableParticipation'],
+			['check', 'enableFollowup'],
+			['check', 'enable_unwatch'],
+			['check', 'pollMode'],
 			'',
 			// Pagination etc...
-			array('int', 'oldTopicDays', 'postinput' => $txt['manageposts_days'], 'subtext' => $txt['oldTopicDays_zero']),
-			array('int', 'defaultMaxTopics', 'postinput' => $txt['manageposts_topics']),
-			array('int', 'defaultMaxMessages', 'postinput' => $txt['manageposts_posts']),
-			array('check', 'disable_print_topic'),
+			['int', 'oldTopicDays', 'postinput' => $txt['manageposts_days'], 'subtext' => $txt['oldTopicDays_zero']],
+			['int', 'defaultMaxTopics', 'postinput' => $txt['manageposts_topics']],
+			['int', 'defaultMaxMessages', 'postinput' => $txt['manageposts_posts']],
+			['check', 'disable_print_topic'],
 			'',
 			// Hot topics (etc)...
-			array('int', 'hotTopicPosts', 'postinput' => $txt['manageposts_posts']),
-			array('int', 'hotTopicVeryPosts', 'postinput' => $txt['manageposts_posts']),
+			['int', 'hotTopicPosts', 'postinput' => $txt['manageposts_posts']],
+			['int', 'hotTopicVeryPosts', 'postinput' => $txt['manageposts_posts']],
 			'',
 			// All, next/prev...
-			array('int', 'enableAllMessages', 'postinput' => $txt['manageposts_posts'], 'subtext' => $txt['enableAllMessages_zero']),
-			array('check', 'disableCustomPerPage'),
-			array('check', 'enablePreviousNext'),
-		);
+			['int', 'enableAllMessages', 'postinput' => $txt['manageposts_posts'], 'subtext' => $txt['enableAllMessages_zero']],
+			['check', 'disableCustomPerPage'],
+			['check', 'enablePreviousNext'],
+		];
 
-		call_integration_hook('integrate_modify_topic_settings', array(&$config_vars));
+		call_integration_hook('integrate_modify_topic_settings', [&$config_vars]);
 
 		return $config_vars;
 	}

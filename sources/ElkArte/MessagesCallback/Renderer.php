@@ -159,7 +159,7 @@ abstract class Renderer
 	 *
 	 * @return bool
 	 */
-	protected function _currentContext($reset = false)
+	protected function _currentContext($reset = false): bool
 	{
 		// Start from the beginning...
 		if ($reset)

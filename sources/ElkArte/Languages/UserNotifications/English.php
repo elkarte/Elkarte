@@ -1,7 +1,7 @@
 <?php
 // Version: 2.0; UserNotifications
 
-$txt['usernotif_title'] = 'User Notifications Settings';
+$txt['usernotif_title'] = 'Browser Notifications Settings';
 $txt['usernotif_desktop_enable'] = 'Enable desktop notifications';
 $txt['usernotif_favicon_enable'] = 'Enable Number of notifications in favicon';
 

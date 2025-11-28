@@ -51,7 +51,7 @@ class DailyDigest implements ScheduledTaskInterface
 	 *
 	 * @return bool
 	 */
-	public function runDigest($is_weekly = false)
+	public function runDigest($is_weekly = false): bool
 	{
 		global $mbname, $modSettings, $boardurl;
 
@@ -80,11 +80,11 @@ class DailyDigest implements ScheduledTaskInterface
 				LEFT JOIN {db_prefix}topics AS t ON (ln.id_topic != {int:empty_topic} AND t.id_topic = ln.id_topic)
 			WHERE mem.notify_regularity = {int:notify_regularity}
 				AND mem.is_activated = {int:is_activated}',
-			array(
+			[
 				'empty_topic' => 0,
 				'notify_regularity' => $is_weekly !== 0 ? '3' : '2',
 				'is_activated' => 1,
-			)
+			]
 		);
 		$members = [];
 		$langs = [];
@@ -94,13 +94,13 @@ class DailyDigest implements ScheduledTaskInterface
 		{
 			if (!isset($members[$row['id_member']]))
 			{
-				$members[$row['id_member']] = array(
+				$members[$row['id_member']] = [
 					'email' => $row['email_address'],
 					'name' => ($row['real_name'] === '') ? $row['member_name'] : un_htmlspecialchars($row['real_name']),
 					'id' => $row['id_member'],
 					'notifyMod' => $row['notify_types'] < 3,
 					'lang' => $row['lngfile'],
-				);
+				];
 				$langs[$row['lngfile']] = $row['lngfile'];
 			}
 
@@ -125,7 +125,7 @@ class DailyDigest implements ScheduledTaskInterface
 
 		// Just get the board names.
 		require_once(SUBSDIR . '/Boards.subs.php');
-		$boards = fetchBoardsInfo(array('boards' => $boards), array('override_permissions' => true));
+		$boards = fetchBoardsInfo(['boards' => $boards], ['override_permissions' => true]);
 
 		if (empty($boards))
 		{
@@ -147,21 +147,21 @@ class DailyDigest implements ScheduledTaskInterface
 				INNER JOIN {db_prefix}messages AS ml ON (ml.id_msg = ld.id_msg)
 				INNER JOIN {db_prefix}boards AS b ON (b.id_board = t.id_board)
 			WHERE ' . ($is_weekly !== 0 ? 'ld.daily != {int:daily_value}' : 'ld.daily IN (0, 2)'),
-			array(
+			[
 				'board_list' => array_keys($boards),
 				'daily_value' => 2,
-			)
+			]
 		);
-		$types = array();
+		$types = [];
 		while (($row = $request->fetch_assoc()))
 		{
 			if (!isset($types[$row['note_type']][$row['id_board']]))
 			{
-				$types[$row['note_type']][$row['id_board']] = array(
-					'lines' => array(),
+				$types[$row['note_type']][$row['id_board']] = [
+					'lines' => [],
 					'name' => un_htmlspecialchars($row['board_name']),
 					'id' => $row['id_board'],
-				);
+				];
 			}
 
 			// A reply has been made
@@ -182,14 +182,14 @@ class DailyDigest implements ScheduledTaskInterface
 				else
 				{
 					// First time we have seen a reply to this topic, so load our array
-					$types[$row['note_type']][$row['id_board']]['lines'][$row['id_topic']] = array(
+					$types[$row['note_type']][$row['id_board']]['lines'][$row['id_topic']] = [
 						'id' => $row['id_topic'],
 						'subject' => un_htmlspecialchars($row['subject']),
 						'link' => getUrl('action', ['topic' => $row['id_topic'] . '.new', 'topicseen', 'hash' => '#new']),
 						'count' => 1,
 						'body_id' => $row['last_reply'],
 						'body_text' => $row['last_body'],
-					);
+					];
 				}
 			}
 			// New topics are good too
@@ -206,27 +206,27 @@ class DailyDigest implements ScheduledTaskInterface
 				// Topics are simple since we are only concerned with the first post
 				if (!isset($types[$row['note_type']][$row['id_board']]['lines'][$row['id_topic']]))
 				{
-					$types[$row['note_type']][$row['id_board']]['lines'][$row['id_topic']] = array(
+					$types[$row['note_type']][$row['id_board']]['lines'][$row['id_topic']] = [
 						'id' => $row['id_topic'],
 						'link' => getUrl('action', ['topic' => $row['id_topic'] . '.new', 'topicseen', 'hash' => '#new']),
 						'subject' => un_htmlspecialchars($row['subject']),
 						'body' => $row['body'],
-					);
+					];
 				}
 			}
 			elseif ($maillist && empty($modSettings['pbe_no_mod_notices']))
 			{
 				if (!isset($types[$row['note_type']][$row['id_board']]['lines'][$row['id_topic']]))
 				{
-					$types[$row['note_type']][$row['id_board']]['lines'][$row['id_topic']] = array(
+					$types[$row['note_type']][$row['id_board']]['lines'][$row['id_topic']] = [
 						'id' => $row['id_topic'],
 						'subject' => un_htmlspecialchars($row['subject']),
 						'starter' => $row['id_member_started'],
-					);
+					];
 				}
 			}
 
-			$types[$row['note_type']][$row['id_board']]['lines'][$row['id_topic']]['members'] = array();
+			$types[$row['note_type']][$row['id_board']]['lines'][$row['id_topic']]['members'] = [];
 
 			if (!empty($notify['topics'][$row['id_topic']]))
 			{
@@ -266,14 +266,14 @@ class DailyDigest implements ScheduledTaskInterface
 		}
 
 		// Let's load all the languages into a cache thingy.
-		$langtxt = array();
+		$langtxt = [];
 		foreach ($langs as $lang)
 		{
 			$mtxt = [];
 			$lang_loader = new Loader($lang, $mtxt, database());
 			$lang_loader->load('index+Post+Maillist+EmailTemplates');
 
-			$langtxt[$lang] = array(
+			$langtxt[$lang] = [
 				'subject' => $mtxt['digest_subject_' . ($is_weekly !== 0 ? 'weekly' : 'daily')],
 				'char_set' => 'UTF-8',
 				'intro' => sprintf($mtxt['digest_intro_' . ($is_weekly !== 0 ? 'weekly' : 'daily')], $mbname),
@@ -295,18 +295,18 @@ class DailyDigest implements ScheduledTaskInterface
 				'see_full' => $mtxt['digest_see_full'],
 				'reply_preview' => $mtxt['digest_reply_preview'],
 				'unread_reply_link' => $mtxt['digest_unread_reply_link'],
-			);
+			];
 		}
 
 		// Right - send out the silly things - this will take quite some space!
 		foreach ($members as $mid => $member)
 		{
 			// Do the start stuff!
-			$email = array(
+			$email = [
 				'subject' => $mbname . ' - ' . $langtxt[$lang]['subject'],
 				'body' => $member['name'] . ',' . "\n\n" . $langtxt[$lang]['intro'] . "\n" . getUrl('profile', ['action' => 'profile', 'area' => 'notification', 'u' => $member['id'], 'name' => $member['name']]) . "\n",
 				'email' => $member['email'],
-			);
+			];
 
 			// All the new topics
 			if (isset($types['topic']))
@@ -429,18 +429,18 @@ class DailyDigest implements ScheduledTaskInterface
 			$db->query('', '
 				DELETE FROM {db_prefix}log_digest
 				WHERE daily != {int:not_daily}',
-				array(
+				[
 					'not_daily' => 0,
-				)
+				]
 			);
 			$db->query('', '
 				UPDATE {db_prefix}log_digest
 				SET daily = {int:daily_value}
 				WHERE daily = {int:not_daily}',
-				array(
+				[
 					'daily_value' => 2,
 					'not_daily' => 0,
-				)
+				]
 			);
 		}
 		else
@@ -449,18 +449,18 @@ class DailyDigest implements ScheduledTaskInterface
 			$db->query('', '
 				DELETE FROM {db_prefix}log_digest
 				WHERE daily = {int:daily_value}',
-				array(
+				[
 					'daily_value' => 2,
-				)
+				]
 			);
 			$db->query('', '
 				UPDATE {db_prefix}log_digest
 				SET daily = {int:both_value}
 				WHERE daily = {int:no_value}',
-				array(
+				[
 					'both_value' => 1,
 					'no_value' => 0,
-				)
+				]
 			);
 		}
 
@@ -470,10 +470,10 @@ class DailyDigest implements ScheduledTaskInterface
 			UPDATE {db_prefix}log_notify
 			SET sent = {int:is_sent}
 			WHERE id_member IN ({array_int:member_list})',
-			array(
+			[
 				'member_list' => $members,
 				'is_sent' => 1,
-			)
+			]
 		);
 
 		// Log we've done it...

@@ -78,7 +78,7 @@ class Announce extends AbstractController
 	 *
 	 * @uses Announce template announce sub template
 	 */
-	public function action_selectgroup()
+	public function action_selectgroup(): void
 	{
 		global $context, $topic, $board_info;
 
@@ -86,7 +86,7 @@ class Announce extends AbstractController
 		require_once(SUBSDIR . '/Topic.subs.php');
 
 		// Build a list of groups that can see this board
-		$groups = array_merge($board_info['groups'], array(1));
+		$groups = array_merge($board_info['groups'], [1]);
 		foreach ($groups as $id => $group)
 		{
 			$groups[$id] = (int) $group;
@@ -119,15 +119,15 @@ class Announce extends AbstractController
 	 *
 	 * @uses announcement template announcement_send sub template
 	 */
-	public function action_send()
+	public function action_send(): void
 	{
 		global $topic, $board, $board_info, $context, $modSettings;
 
 		checkSession();
 
 		$context['start'] = $this->_req->getPost('start', 'intval', 0);
-		$groups = array_merge($board_info['groups'], array(1));
-		$who = array();
+		$groups = array_merge($board_info['groups'], [1]);
+		$who = [];
 
 		$_who = isset($this->_req->post->membergroups)
 			? explode(',', $this->_req->post->membergroups)
@@ -158,14 +158,14 @@ class Announce extends AbstractController
 		require_once(SUBSDIR . '/Members.subs.php');
 
 		// Select the email addresses for this batch.
-		$conditions = array(
+		$conditions = [
 			'activated_status' => 1,
 			'member_greater' => $context['start'],
 			'group_list' => $who,
 			'order_by' => 'id_member',
 			// @todo interface for this
 			'limit' => empty($modSettings['mail_queue']) ? 25 : 500,
-		);
+		];
 
 		// Have we allowed members to opt out of announcements?
 		if (!empty($modSettings['allow_disableAnnounce']))
@@ -178,7 +178,7 @@ class Announce extends AbstractController
 		// All members have received a mail. Go to the next screen.
 		if (empty($data) || $data['member_count'] === 0)
 		{
-			logAction('announce_topic', array('topic' => $topic), 'user');
+			logAction('announce_topic', ['topic' => $topic], 'user');
 
 			if (!empty($this->_req->post->move) && allowedTo('move_any'))
 			{
@@ -233,12 +233,12 @@ class Announce extends AbstractController
 	 *                  - body: the body of the topic
 	 * @throws \ElkArte\Exceptions\Exception
 	 */
-	private function _send_announcement($member_info, $topic_info)
+	private function _send_announcement($member_info, $topic_info): void
 	{
 		global $modSettings, $language, $context;
 
 		// Loop through all members that'll receive an announcement in this batch.
-		$announcements = array();
+		$announcements = [];
 		foreach ($member_info as $row)
 		{
 			$cur_language = empty($row['language']) || empty($modSettings['userLanguage']) ? $language : $row['language'];
@@ -246,19 +246,19 @@ class Announce extends AbstractController
 			// If the language wasn't defined yet, load it and compose a notification message.
 			if (!isset($announcements[$cur_language]))
 			{
-				$replacements = array(
+				$replacements = [
 					'TOPICSUBJECT' => $topic_info['subject'],
 					'MESSAGE' => $topic_info['body'],
 					'TOPICLINK' => getUrl('topic', ['topic' => $topic_info['id_topic'], 'start' => '0', 'subject' => $topic_info['subject']]),
-				);
+				];
 
 				$emaildata = loadEmailTemplate('new_announcement', $replacements, $cur_language);
 
-				$announcements[$cur_language] = array(
+				$announcements[$cur_language] = [
 					'subject' => $emaildata['subject'],
 					'body' => $emaildata['body'],
-					'recipients' => array(),
-				);
+					'recipients' => [],
+				];
 			}
 
 			$announcements[$cur_language]['recipients'][$row['id']] = $row['email'];

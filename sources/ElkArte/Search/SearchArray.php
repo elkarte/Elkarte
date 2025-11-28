@@ -65,7 +65,7 @@ class SearchArray extends AbstractModel
 	 *
 	 * @return array
 	 */
-	protected function searchArray()
+	protected function searchArray(): array
 	{
 		// Change non-word characters into spaces.
 		$stripped_query = $this->cleanString($this->_search_string);
@@ -134,7 +134,7 @@ class SearchArray extends AbstractModel
 	 *
 	 * @return string[]
 	 */
-	private function _checkExcludePhrase($matches, $phraseArray)
+	private function _checkExcludePhrase($matches, $phraseArray): array
 	{
 		foreach ($matches as $index => $word)
 		{
@@ -162,7 +162,7 @@ class SearchArray extends AbstractModel
 	 *
 	 * @return string[]
 	 */
-	private function _checkExcludeWord($wordArray)
+	private function _checkExcludeWord($wordArray): array
 	{
 		foreach ($wordArray as $index => $word)
 		{
@@ -188,7 +188,7 @@ class SearchArray extends AbstractModel
 	 *
 	 * @return string
 	 */
-	public function searchArrayExtended()
+	public function searchArrayExtended(): string
 	{
 		$keywords = ['include' => [], 'exclude' => []];
 
@@ -278,7 +278,7 @@ class SearchArray extends AbstractModel
 	 * @param string $string A string to clean
 	 * @return string A cleaned up string
 	 */
-	public function cleanString($string)
+	public function cleanString($string): string
 	{
 		// Decode the entities first
 		$string = html_entity_decode($string, ENT_QUOTES, 'UTF-8');
@@ -298,7 +298,7 @@ class SearchArray extends AbstractModel
 	 *
 	 * @return array The search array
 	 */
-	public function getSearchArray()
+	public function getSearchArray(): array
 	{
 		return $this->_searchArray;
 	}
@@ -308,7 +308,7 @@ class SearchArray extends AbstractModel
 	 *
 	 * @return array The array of excluded words
 	 */
-	public function getExcludedWords()
+	public function getExcludedWords(): array
 	{
 		return $this->_excludedWords;
 	}
@@ -318,7 +318,7 @@ class SearchArray extends AbstractModel
 	 *
 	 * @return bool
 	 */
-	public function getNoRegexp()
+	public function getNoRegexp(): bool
 	{
 		return $this->_no_regexp;
 	}
@@ -328,7 +328,7 @@ class SearchArray extends AbstractModel
 	 *
 	 * @return bool
 	 */
-	public function foundBlockListedWords()
+	public function foundBlockListedWords(): bool
 	{
 		return $this->_foundBlockListedWords;
 	}
@@ -338,7 +338,7 @@ class SearchArray extends AbstractModel
 	 *
 	 * @return array The array of ignored items
 	 */
-	public function getIgnored()
+	public function getIgnored(): array
 	{
 		return $this->_ignored;
 	}

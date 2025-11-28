@@ -59,7 +59,7 @@ class Memcached extends AbstractCacheMethod
 	 *
 	 * @return string|null
 	 */
-	private function _is_persist()
+	private function _is_persist(): ?string
 	{
 		global $db_persist;
 
@@ -69,7 +69,7 @@ class Memcached extends AbstractCacheMethod
 	/**
 	 * {@inheritDoc}
 	 */
-	protected function setOptions()
+	protected function setOptions(): void
 	{
 		/*
 		 * the timeout after which a server is considered DEAD.
@@ -132,7 +132,7 @@ class Memcached extends AbstractCacheMethod
 	 *
 	 * @return array A list of servers in the daemon.
 	 */
-	protected function getServers()
+	protected function getServers(): array
 	{
 		$list = $this->obj->getStats();
 
@@ -154,7 +154,7 @@ class Memcached extends AbstractCacheMethod
 	 *
 	 * If the statistics cannot be obtained, an empty array is returned.
 	 */
-	public function getStats()
+	public function getStats(): array
 	{
 		$results = [];
 

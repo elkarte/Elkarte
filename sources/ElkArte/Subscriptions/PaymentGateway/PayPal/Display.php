@@ -73,15 +73,15 @@ class Display implements DisplayInterface
 	{
 		global $modSettings, $txt, $boardurl;
 
-		$return_data = array(
+		$return_data = [
 			'form' => 'https://www.' . (empty($modSettings['paidsubs_test']) ? '' : 'sandbox.') . 'paypal.com/cgi-bin/webscr',
 			'id' => 'paypal',
-			'hidden' => array(),
+			'hidden' => [],
 			'title' => $txt['paypal'],
 			'desc' => $txt['paid_confirm_paypal'],
 			'submit' => $txt['paid_paypal_order'],
 			'javascript' => '',
-		);
+		];
 
 		// All the standard bits.
 		$return_data['hidden']['business'] = $modSettings['paypal_email'];

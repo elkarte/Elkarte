@@ -33,6 +33,8 @@ DEFINE('ADMINDIR', SOURCEDIR . '/admin');
 DEFINE('EXTDIR', SOURCEDIR . '/ext');
 DEFINE('CONTROLLERDIR', SOURCEDIR . '/controllers');
 DEFINE('SUBSDIR', SOURCEDIR . '/subs');
+DEFINE('ADDONSDIR', BOARDDIR . '/Addons');
+DEFINE('ELKARTEDIR', SOURCEDIR . '/ElkArte');
 
 global $settings;
 $settings['default_theme_dir'] = BOARDDIR . '/themes/default';
@@ -198,7 +200,7 @@ function getFilesChanged($from, $to)
 		str_replace(BOARDDIR . '/', '', CONTROLLERDIR . '/') => 'controllers',
 		str_replace(BOARDDIR . '/', '', SOURCEDIR . '/') => 'sources',
 		str_replace(BOARDDIR . '/', '', ADMINDIR . '/') => 'admin',
-		str_replace(BOARDDIR . '/', '', ADMINDIR . '/') => 'admin',
+		str_replace(BOARDDIR . '/', '', ADDONSDIR . '/') => 'addons',
 		str_replace(BOARDDIR . '/', '', $settings['theme_dir'] . '/') => 'default',
 	);
 

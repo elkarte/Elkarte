@@ -85,7 +85,7 @@ class News extends AbstractController
 	 *
 	 * @uses Stats language file.
 	 */
-	public function action_showfeed()
+	public function action_showfeed(): void
 	{
 		global $board, $board_info, $context, $txt, $modSettings, $db_show_debug;
 
@@ -109,9 +109,9 @@ class News extends AbstractController
 
 		// Handle the cases where a board, boards, or category is asked for.
 		$this->_query_this_board = '1=1';
-		$context['optimize_msg'] = array(
+		$context['optimize_msg'] = [
 			'highest' => 'm.id_msg <= b.id_last_msg',
-		);
+		];
 
 		// Specifying specific categories only?
 		if (!empty($this->_req->query->c) && empty($board))
@@ -126,7 +126,7 @@ class News extends AbstractController
 			}
 
 			require_once(SUBSDIR . '/Boards.subs.php');
-			$boards_posts = boardsPosts(array(), $categories);
+			$boards_posts = boardsPosts([], $categories);
 			$total_cat_posts = array_sum($boards_posts);
 			$boards = array_keys($boards_posts);
 
@@ -147,7 +147,7 @@ class News extends AbstractController
 			require_once(SUBSDIR . '/Boards.subs.php');
 			$query_boards = array_map('intval', explode(',', $this->_req->query->boards));
 
-			$boards_data = fetchBoardsInfo(array('boards' => $query_boards), array('selects' => 'detailed'));
+			$boards_data = fetchBoardsInfo(['boards' => $query_boards], ['selects' => 'detailed']);
 
 			// Either the board specified doesn't exist or you have no access.
 			$num_boards = count($boards_data);
@@ -180,7 +180,7 @@ class News extends AbstractController
 		elseif (!empty($board))
 		{
 			require_once(SUBSDIR . '/Boards.subs.php');
-			$boards_data = fetchBoardsInfo(array('boards' => $board), array('selects' => 'posts'));
+			$boards_data = fetchBoardsInfo(['boards' => $board], ['selects' => 'posts']);
 
 			$feed_title = ' - ' . strip_tags($board_info['name']);
 
@@ -201,28 +201,28 @@ class News extends AbstractController
 
 		// If format isn't set, or is wrong, rss2 is default
 		$xml_format = $this->_req->getQuery('type', 'trim', 'rss2');
-		if (!in_array($xml_format, array('rss', 'rss2', 'atom', 'rdf')))
+		if (!in_array($xml_format, ['rss', 'rss2', 'atom', 'rdf']))
 		{
 			$xml_format = 'rss2';
 		}
 
 		// List all the different types of data they can pull.
-		$subActions = array(
-			'recent' => array('action_xmlrecent'),
-			'news' => array('action_xmlnews'),
-			'members' => array('action_xmlmembers'),
-			'profile' => array('action_xmlprofile'),
-		);
+		$subActions = [
+			'recent' => ['action_xmlrecent'],
+			'news' => ['action_xmlnews'],
+			'members' => ['action_xmlmembers'],
+			'profile' => ['action_xmlprofile'],
+		];
 
 		// Easy adding of sub actions
-		call_integration_hook('integrate_xmlfeeds', array(&$subActions));
+		call_integration_hook('integrate_xmlfeeds', [&$subActions]);
 
 		$subAction = $this->_req->getQuery('sa', 'strtolower', 'recent');
 		$subAction = isset($subActions[$subAction]) ? $subAction : 'recent';
 
 		// We only want some information, not all of it.
-		$cachekey = array($xml_format, $this->_req->query->action, $this->_limit, $subAction);
-		foreach (array('board', 'boards', 'c') as $var)
+		$cachekey = [$xml_format, $this->_req->query->action, $this->_limit, $subAction];
+		foreach (['board', 'boards', 'c'] as $var)
 		{
 			if (isset($this->_req->query->{$var}))
 			{
@@ -293,8 +293,8 @@ class News extends AbstractController
 		}
 		elseif ($xml_format === 'atom')
 		{
-			$url_parts = array();
-			foreach (array('board', 'boards', 'c') as $var)
+			$url_parts = [];
+			foreach (['board', 'boards', 'c'] as $var)
 			{
 				if (isset($this->_req->query->{$var}))
 				{
@@ -319,14 +319,14 @@ class News extends AbstractController
 	 * @param string $xml_format
 	 * @return array
 	 */
-	public function action_xmlmembers($xml_format)
+	public function action_xmlmembers($xml_format): array
 	{
 		global $scripturl;
 
 		// Not allowed, then you get nothing
 		if (!allowedTo('view_mlist'))
 		{
-			return array();
+			return [];
 		}
 
 		// Find the most recent members.
@@ -334,7 +334,7 @@ class News extends AbstractController
 		$members = recentMembers((int) $this->_limit);
 
 		// No data yet
-		$data = array();
+		$data = [];
 
 		require_once(SUBSDIR . '/News.subs.php');
 		foreach ($members as $member)
@@ -342,40 +342,40 @@ class News extends AbstractController
 			// Make the data look rss-ish.
 			if ($xml_format === 'rss' || $xml_format === 'rss2')
 			{
-				$data[] = array(
+				$data[] = [
 					'title' => cdata_parse($member['real_name']),
 					'link' => $scripturl . '?action=profile;u=' . $member['id_member'],
 					'comments' => $scripturl . '?action=pm;sa=send;u=' . $member['id_member'],
 					'pubDate' => gmdate('D, d M Y H:i:s \G\M\T', $member['date_registered']),
 					'guid' => $scripturl . '?action=profile;u=' . $member['id_member'],
-				);
+				];
 			}
 			elseif ($xml_format === 'rdf')
 			{
-				$data[] = array(
+				$data[] = [
 					'title' => cdata_parse($member['real_name']),
 					'link' => $scripturl . '?action=profile;u=' . $member['id_member'],
-				);
+				];
 			}
 			elseif ($xml_format === 'atom')
 			{
-				$data[] = array(
+				$data[] = [
 					'title' => cdata_parse($member['real_name']),
 					'link' => $scripturl . '?action=profile;u=' . $member['id_member'],
 					'published' => Util::gmstrftime('%Y-%m-%dT%H:%M:%SZ', $member['date_registered']),
 					'updated' => Util::gmstrftime('%Y-%m-%dT%H:%M:%SZ', $member['last_login']),
 					'id' => $scripturl . '?action=profile;u=' . $member['id_member'],
-				);
+				];
 			}
 			// More logical format for the data, but harder to apply.
 			else
 			{
-				$data[] = array(
+				$data[] = [
 					'name' => cdata_parse($member['real_name']),
 					'time' => htmlspecialchars(strip_tags(standardTime($member['date_registered'])), ENT_COMPAT, 'UTF-8'),
 					'id' => $member['id_member'],
 					'link' => $scripturl . '?action=profile;u=' . $member['id_member']
-				);
+				];
 			}
 		}
 
@@ -389,7 +389,7 @@ class News extends AbstractController
 	 * @param string $xml_format one of rss, rss2, rdf, atom
 	 * @return array array of topics
 	 */
-	public function action_xmlnews($xml_format)
+	public function action_xmlnews($xml_format): array
 	{
 		global $scripturl, $modSettings, $board;
 
@@ -398,7 +398,7 @@ class News extends AbstractController
 		$results = getXMLNews($this->_query_this_board, $board, $this->_limit);
 
 		// Prepare it for the feed in the format chosen (rss, atom, etc)
-		$data = array();
+		$data = [];
 		$bbc_parser = ParserWrapper::instance();
 
 		foreach ($results as $row)
@@ -406,7 +406,7 @@ class News extends AbstractController
 			// Limit the length of the message, if the option is set.
 			if (!empty($modSettings['xmlnews_maxlen']) && Util::strlen(str_replace('<br />', "\n", $row['body'])) > $modSettings['xmlnews_maxlen'])
 			{
-				$row['body'] = strtr(Util::shorten_text(str_replace('<br />', "\n", $row['body']), $modSettings['xmlnews_maxlen'], true), array("\n" => '<br />'));
+				$row['body'] = strtr(Util::shorten_text(str_replace('<br />', "\n", $row['body']), $modSettings['xmlnews_maxlen'], true), ["\n" => '<br />']);
 			}
 
 			$row['body'] = $bbc_parser->parseMessage($row['body'], $row['smileys_enabled']);
@@ -418,7 +418,7 @@ class News extends AbstractController
 			// Being news, this actually makes sense in rss format.
 			if ($xml_format === 'rss' || $xml_format === 'rss2')
 			{
-				$data[] = array(
+				$data[] = [
 					'title' => cdata_parse($row['subject']),
 					'link' => $scripturl . '?topic=' . $row['id_topic'] . '.0',
 					'description' => cdata_parse(str_replace('&', '&#x26;', un_htmlspecialchars($row['body']))),
@@ -427,7 +427,7 @@ class News extends AbstractController
 					'category' => '<![CDATA[' . $row['bname'] . ']]>',
 					'pubDate' => gmdate('D, d M Y H:i:s \G\M\T', $row['poster_time']),
 					'guid' => $scripturl . '?topic=' . $row['id_topic'] . '.0',
-				);
+				];
 
 				// Add the poster name on if we are rss2
 				if ($xml_format === 'rss2')
@@ -439,51 +439,51 @@ class News extends AbstractController
 			// RDF Format anyone
 			elseif ($xml_format === 'rdf')
 			{
-				$data[] = array(
+				$data[] = [
 					'title' => cdata_parse($row['subject']),
 					'link' => $scripturl . '?topic=' . $row['id_topic'] . '.0',
 					'description' => cdata_parse($row['body']),
-				);
+				];
 			}
 			// Atom feed
 			elseif ($xml_format === 'atom')
 			{
-				$data[] = array(
+				$data[] = [
 					'title' => cdata_parse($row['subject']),
 					'link' => $scripturl . '?topic=' . $row['id_topic'] . '.0',
 					'summary' => cdata_parse($row['body']),
 					'category' => $row['bname'],
-					'author' => array(
+					'author' => [
 						'name' => $row['poster_name'],
 						'email' => showEmailAddress($row['id_member']) ? $row['poster_email'] : null,
 						'uri' => empty($row['id_member']) ? '' : $scripturl . '?action=profile;u=' . $row['id_member'],
-					),
+					],
 					'published' => Util::gmstrftime('%Y-%m-%dT%H:%M:%SZ', $row['poster_time']),
 					'modified' => Util::gmstrftime('%Y-%m-%dT%H:%M:%SZ', empty($row['modified_time']) ? $row['poster_time'] : $row['modified_time']),
 					'id' => $scripturl . '?topic=' . $row['id_topic'] . '.0',
-				);
+				];
 			}
 			// The biggest difference here is more information.
 			else
 			{
-				$data[] = array(
+				$data[] = [
 					'time' => htmlspecialchars(strip_tags(standardTime($row['poster_time'])), ENT_COMPAT, 'UTF-8'),
 					'id' => $row['id_topic'],
 					'subject' => cdata_parse($row['subject']),
 					'body' => cdata_parse($row['body']),
-					'poster' => array(
+					'poster' => [
 						'name' => cdata_parse($row['poster_name']),
 						'id' => $row['id_member'],
 						'link' => empty($row['id_member']) ? '' : $scripturl . '?action=profile;u=' . $row['id_member'],
-					),
+					],
 					'topic' => $row['id_topic'],
-					'board' => array(
+					'board' => [
 						'name' => cdata_parse($row['bname']),
 						'id' => $row['id_board'],
 						'link' => $scripturl . '?board=' . $row['id_board'] . '.0',
-					),
+					],
 					'link' => $scripturl . '?topic=' . $row['id_topic'] . '.0',
-				);
+				];
 			}
 		}
 
@@ -497,7 +497,7 @@ class News extends AbstractController
 	 * @param string $xml_format one of rss, rss2, rdf, atom
 	 * @return array of recent posts
 	 */
-	public function action_xmlrecent($xml_format)
+	public function action_xmlrecent($xml_format): array
 	{
 		global $scripturl, $modSettings, $board;
 
@@ -506,7 +506,7 @@ class News extends AbstractController
 		$results = getXMLRecent($this->_query_this_board, $board, $this->_limit);
 
 		// Loop on the results and prepare them in the format requested
-		$data = array();
+		$data = [];
 		$bbc_parser = ParserWrapper::instance();
 
 		foreach ($results as $row)
@@ -514,7 +514,7 @@ class News extends AbstractController
 			// Limit the length of the message, if the option is set.
 			if (!empty($modSettings['xmlnews_maxlen']) && Util::strlen(str_replace('<br />', "\n", $row['body'])) > $modSettings['xmlnews_maxlen'])
 			{
-				$row['body'] = strtr(Util::shorten_text(str_replace('<br />', "\n", $row['body']), $modSettings['xmlnews_maxlen'], true), array("\n" => '<br />'));
+				$row['body'] = strtr(Util::shorten_text(str_replace('<br />', "\n", $row['body']), $modSettings['xmlnews_maxlen'], true), ["\n" => '<br />']);
 			}
 
 			$row['body'] = $bbc_parser->parseMessage($row['body'], $row['smileys_enabled']);
@@ -526,7 +526,7 @@ class News extends AbstractController
 			// Doesn't work as well as news, but it kinda does..
 			if ($xml_format === 'rss' || $xml_format === 'rss2')
 			{
-				$data[] = array(
+				$data[] = [
 					'title' => $row['subject'],
 					'link' => $scripturl . '?topic=' . $row['id_topic'] . '.msg' . $row['id_msg'] . '#msg' . $row['id_msg'],
 					'description' => cdata_parse(strtr(un_htmlspecialchars($row['body']), '&', '&#x26;')),
@@ -535,7 +535,7 @@ class News extends AbstractController
 					'comments' => $scripturl . '?action=post;topic=' . $row['id_topic'] . '.0',
 					'pubDate' => gmdate('D, d M Y H:i:s \G\M\T', $row['poster_time']),
 					'guid' => $scripturl . '?topic=' . $row['id_topic'] . '.msg' . $row['id_msg'] . '#msg' . $row['id_msg']
-				);
+				];
 
 				// Add the poster name on if we are rss2
 				if ($xml_format === 'rss2')
@@ -546,59 +546,59 @@ class News extends AbstractController
 			}
 			elseif ($xml_format === 'rdf')
 			{
-				$data[] = array(
+				$data[] = [
 					'title' => $row['subject'],
 					'link' => $scripturl . '?topic=' . $row['id_topic'] . '.msg' . $row['id_msg'] . '#msg' . $row['id_msg'],
 					'description' => cdata_parse($row['body']),
-				);
+				];
 			}
 			elseif ($xml_format === 'atom')
 			{
-				$data[] = array(
+				$data[] = [
 					'title' => $row['subject'],
 					'link' => $scripturl . '?topic=' . $row['id_topic'] . '.msg' . $row['id_msg'] . '#msg' . $row['id_msg'],
 					'summary' => cdata_parse($row['body']),
 					'category' => $row['bname'],
-					'author' => array(
+					'author' => [
 						'name' => $row['poster_name'],
 						'email' => showEmailAddress($row['id_member']) ? $row['poster_email'] : null,
 						'uri' => empty($row['id_member']) ? '' : $scripturl . '?action=profile;u=' . $row['id_member']
-					),
+					],
 					'published' => Util::gmstrftime('%Y-%m-%dT%H:%M:%SZ', $row['poster_time']),
 					'updated' => Util::gmstrftime('%Y-%m-%dT%H:%M:%SZ', empty($row['modified_time']) ? $row['poster_time'] : $row['modified_time']),
 					'id' => $scripturl . '?topic=' . $row['id_topic'] . '.msg' . $row['id_msg'] . '#msg' . $row['id_msg'],
-				);
+				];
 			}
 			// A lot of information here.  Should be enough to please the rss-ers.
 			else
 			{
-				$data[] = array(
+				$data[] = [
 					'time' => htmlspecialchars(strip_tags(standardTime($row['poster_time'])), ENT_COMPAT, 'UTF-8'),
 					'id' => $row['id_msg'],
 					'subject' => cdata_parse($row['subject']),
 					'body' => cdata_parse($row['body']),
-					'starter' => array(
+					'starter' => [
 						'name' => cdata_parse($row['first_poster_name']),
 						'id' => $row['id_first_member'],
 						'link' => empty($row['id_first_member']) ? '' : $scripturl . '?action=profile;u=' . $row['id_first_member']
-					),
-					'poster' => array(
+					],
+					'poster' => [
 						'name' => cdata_parse($row['poster_name']),
 						'id' => $row['id_member'],
 						'link' => empty($row['id_member']) ? '' : $scripturl . '?action=profile;u=' . $row['id_member']
-					),
-					'topic' => array(
+					],
+					'topic' => [
 						'subject' => cdata_parse($row['first_subject']),
 						'id' => $row['id_topic'],
 						'link' => $scripturl . '?topic=' . $row['id_topic'] . '.new#new'
-					),
-					'board' => array(
+					],
+					'board' => [
 						'name' => cdata_parse($row['bname']),
 						'id' => $row['id_board'],
 						'link' => $scripturl . '?board=' . $row['id_board'] . '.0'
-					),
+					],
 					'link' => $scripturl . '?topic=' . $row['id_topic'] . '.msg' . $row['id_msg'] . '#msg' . $row['id_msg']
-				);
+				];
 			}
 		}
 
@@ -612,14 +612,14 @@ class News extends AbstractController
 	 * @param string $xml_format one of rss, rss2, rdf, atom
 	 * @return array array of profile data.
 	 */
-	public function action_xmlprofile($xml_format)
+	public function action_xmlprofile($xml_format): array
 	{
 		global $scripturl, $modSettings, $language;
 
 		// You must input a valid user....
 		if (empty($this->_req->query->u))
 		{
-			return array();
+			return [];
 		}
 
 		// Make sure the id is a number and not "I like trying to hack the database".
@@ -628,70 +628,70 @@ class News extends AbstractController
 		// You must input a valid user....
 		if (MembersList::load($uid) === false)
 		{
-			return array();
+			return [];
 		}
 
 		// Load the member's contextual information!
 		if (!allowedTo('profile_view_any'))
 		{
-			return array();
+			return [];
 		}
 
 		$member = MembersList::get($uid);
 		$member->loadContext();
 
 		// No feed data yet
-		$data = array();
+		$data = [];
 
 		require_once(SUBSDIR . '/News.subs.php');
 		if ($xml_format === 'rss' || $xml_format === 'rss2')
 		{
-			$data = array(array(
+			$data = [[
 				'title' => cdata_parse($member['name']),
 				'link' => $scripturl . '?action=profile;u=' . $member['id'],
 				'description' => cdata_parse($member['group'] ?? $member['post_group']),
 				'comments' => $scripturl . '?action=pm;sa=send;u=' . $member['id'],
 				'pubDate' => gmdate('D, d M Y H:i:s \G\M\T', $member->date_registered),
 				'guid' => $scripturl . '?action=profile;u=' . $member['id'],
-			));
+			]];
 		}
 		elseif ($xml_format === 'rdf')
 		{
-			$data = array(array(
+			$data = [[
 				'title' => cdata_parse($member['name']),
 				'link' => $scripturl . '?action=profile;u=' . $member['id'],
 				'description' => cdata_parse($member['group'] ?? $member['post_group']),
-			));
+			]];
 		}
 		elseif ($xml_format === 'atom')
 		{
-			$data[] = array(
+			$data[] = [
 				'title' => cdata_parse($member['name']),
 				'link' => $scripturl . '?action=profile;u=' . $member['id'],
 				'summary' => cdata_parse($member['group'] ?? $member['post_group']),
-				'author' => array(
+				'author' => [
 					'name' => $member['real_name'],
 					'email' => showEmailAddress($member['id']) ? $member['email'] : null,
 					'uri' => empty($member['website']) ? '' : $member['website']['url']
-				),
+				],
 				'published' => Util::gmstrftime('%Y-%m-%dT%H:%M:%SZ', $member->date_registered),
 				'updated' => Util::gmstrftime('%Y-%m-%dT%H:%M:%SZ', $member->last_login),
 				'id' => $scripturl . '?action=profile;u=' . $member['id'],
 				'logo' => empty($member['avatar']) ? '' : $member['avatar']['url'],
-			);
+			];
 		}
 		else
 		{
-			$data = array(
+			$data = [
 				'username' => $this->user->is_admin || $this->user->id == $member['id'] ? cdata_parse($member['username']) : '',
 				'name' => cdata_parse($member['name']),
 				'link' => $scripturl . '?action=profile;u=' . $member['id'],
 				'posts' => $member['posts'],
 				'post-group' => cdata_parse($member['post_group']),
-				'language' => cdata_parse(empty($member['language']) ? Util::ucwords(strtr($language, array('_' => ' ', '-utf8' => ''))) : $member['language']),
+				'language' => cdata_parse(empty($member['language']) ? Util::ucwords(strtr($language, ['_' => ' ', '-utf8' => ''])) : $member['language']),
 				'last-login' => gmdate('D, d M Y H:i:s \G\M\T', $member->last_login),
 				'registered' => gmdate('D, d M Y H:i:s \G\M\T', $member->date_registered)
-			);
+			];
 
 			// Everything below here might not be set, and thus maybe shouldn't be displayed.
 			if ($member['avatar']['name'] !== '')
@@ -717,10 +717,10 @@ class News extends AbstractController
 
 			if ($member['website']['title'] !== '')
 			{
-				$data['website'] = array(
+				$data['website'] = [
 					'title' => cdata_parse($member['website']['title']),
 					'link' => $member['website']['url']
-				);
+				];
 			}
 
 			if ($member['group'] !== '')
@@ -730,10 +730,10 @@ class News extends AbstractController
 
 			if (!empty($modSettings['karmaMode']))
 			{
-				$data['karma'] = array(
+				$data['karma'] = [
 					'good' => $member['karma']['good'],
 					'bad' => $member['karma']['bad']
-				);
+				];
 			}
 
 			if ($member['show_email'])

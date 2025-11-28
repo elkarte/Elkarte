@@ -169,10 +169,10 @@ class Codes
 	/** @var int Constant that represents no trimming. */
 	public const TRIM_NONE = 0;
 
-	/** @var int Constant that represents trimming inside of a tag. */
+	/** @var int Constant that represents trimming inside a tag. */
 	public const TRIM_INSIDE = 1;
 
-	/** @var int Constant that represents trimming outside of a tag. */
+	/** @var int Constant that represents trimming outside a tag. */
 	public const TRIM_OUTSIDE = 2;
 
 	/** @var int Constant that represents trimming both the left and right sides of a string. */
@@ -202,10 +202,10 @@ class Codes
 	/**
 	 * Codes constructor.
 	 *
-	 * @param array $tags
+	 * @param array $additional_bbc
 	 * @param array $disabled
 	 */
-	public function __construct(array $additional_bbc = array(), array $disabled = array())
+	public function __construct(array $additional_bbc = [], array $disabled = [])
 	{
 		foreach ($disabled as $tag)
 		{
@@ -225,7 +225,7 @@ class Codes
 	 *
 	 * @param array $code
 	 */
-	public function add(array $code)
+	public function add(array $code): void
 	{
 
 		// $first_char = $code[self::ATTR_TAG][0];
@@ -243,7 +243,7 @@ class Codes
 	 *
 	 * @param $tag
 	 */
-	public function remove($tag)
+	public function remove($tag): void
 	{
 		foreach ($this->bbc as $k => $v)
 		{
@@ -255,17 +255,17 @@ class Codes
 	}
 
 	/**
-	 * Load all of the default BBC codes
+	 * Load all the default BBC codes
 	 *
-	 * @return mixed
+	 * @return array
 	 */
 	public function getDefault()
 	{
 		global $modSettings, $txt, $scripturl;
 
 		// This array can be arranged in any order.
-		return array_merge($this->bbc, array(
-			array(
+		return array_merge($this->bbc, [
+			[
 				self::ATTR_TAG => 'abbr',
 				self::ATTR_TYPE => self::TYPE_UNPARSED_EQUALS,
 				self::ATTR_TEST => '([A-Za-z][A-Za-z0-9_\-\s&;]*)',
@@ -276,8 +276,8 @@ class Codes
 				self::ATTR_BLOCK_LEVEL => false,
 				self::ATTR_AUTOLINK => true,
 				self::ATTR_LENGTH => 4,
-			),
-			array(
+			],
+			[
 				self::ATTR_TAG => 'anchor',
 				self::ATTR_TYPE => self::TYPE_UNPARSED_EQUALS,
 				self::ATTR_TEST => '[#]?([A-Za-z][A-Za-z0-9_\-]*)',
@@ -286,8 +286,8 @@ class Codes
 				self::ATTR_BLOCK_LEVEL => false,
 				self::ATTR_AUTOLINK => true,
 				self::ATTR_LENGTH => 6,
-			),
-			array(
+			],
+			[
 				self::ATTR_TAG => 'b',
 				self::ATTR_TYPE => self::TYPE_PARSED_CONTENT,
 				self::ATTR_BEFORE => '<strong class="bbc_strong">',
@@ -295,16 +295,16 @@ class Codes
 				self::ATTR_BLOCK_LEVEL => false,
 				self::ATTR_AUTOLINK => true,
 				self::ATTR_LENGTH => 1,
-			),
-			array(
+			],
+			[
 				self::ATTR_TAG => 'br',
 				self::ATTR_TYPE => self::TYPE_CLOSED,
 				self::ATTR_CONTENT => '<br />',
 				self::ATTR_BLOCK_LEVEL => false,
 				self::ATTR_AUTOLINK => false,
 				self::ATTR_LENGTH => 2,
-			),
-			array(
+			],
+			[
 				self::ATTR_TAG => 'center',
 				self::ATTR_TYPE => self::TYPE_PARSED_CONTENT,
 				self::ATTR_BEFORE => '<div class="centertext">',
@@ -312,30 +312,30 @@ class Codes
 				self::ATTR_BLOCK_LEVEL => true,
 				self::ATTR_AUTOLINK => true,
 				self::ATTR_LENGTH => 6,
-			),
-			array(
+			],
+			[
 				self::ATTR_TAG => 'code',
 				self::ATTR_TYPE => self::TYPE_UNPARSED_CONTENT,
 				self::ATTR_CONTENT => '<div class="codeheader">' . $txt['code'] . ': <a href="#" onclick="return elkSelectText(this);" class="codeoperation">' . $txt['code_select'] . '</a></div><pre class="bbc_code prettyprint">$1</pre>',
 				self::ATTR_VALIDATE => $this->isDisabled('code') ? null : static function (&$data) {
-					$data = tabToHtmlTab(strtr($data, array('[' => '&#91;', ']' => '&#93;')));
+					$data = tabToHtmlTab(strtr($data, ['[' => '&#91;', ']' => '&#93;']));
 				},
 				self::ATTR_BLOCK_LEVEL => true,
 				self::ATTR_AUTOLINK => false,
 				self::ATTR_LENGTH => 4,
-			),
-			array(
+			],
+			[
 				self::ATTR_TAG => 'code',
 				self::ATTR_TYPE => self::TYPE_UNPARSED_EQUALS_CONTENT,
 				self::ATTR_CONTENT => '<div class="codeheader">' . $txt['code'] . ': ($2) <a href="#" onclick="return elkSelectText(this);" class="codeoperation">' . $txt['code_select'] . '</a></div><pre class="bbc_code prettyprint">$1</pre>',
 				self::ATTR_VALIDATE => $this->isDisabled('code') ? null : static function (&$data) {
-					$data[0] = tabToHtmlTab(strtr($data[0], array('[' => '&#91;', ']' => '&#93;')));
+					$data[0] = tabToHtmlTab(strtr($data[0], ['[' => '&#91;', ']' => '&#93;']));
 				},
 				self::ATTR_BLOCK_LEVEL => true,
 				self::ATTR_AUTOLINK => false,
 				self::ATTR_LENGTH => 4,
-			),
-			array(
+			],
+			[
 				self::ATTR_TAG => 'color',
 				self::ATTR_TYPE => self::TYPE_UNPARSED_EQUALS,
 				self::ATTR_TEST => '(#[\da-fA-F]{3}|#[\da-fA-F]{6}|[A-Za-z]{1,20}|rgb\((?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\s?,\s?){2}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\))',
@@ -344,50 +344,50 @@ class Codes
 				self::ATTR_BLOCK_LEVEL => false,
 				self::ATTR_AUTOLINK => true,
 				self::ATTR_LENGTH => 5,
-			),
-			array(
+			],
+			[
 				self::ATTR_TAG => 'email',
 				self::ATTR_TYPE => self::TYPE_UNPARSED_CONTENT,
 				self::ATTR_CONTENT => '<a href="mailto:$1" class="bbc_email">$1</a>',
 				self::ATTR_BLOCK_LEVEL => false,
 				self::ATTR_AUTOLINK => false,
 				self::ATTR_LENGTH => 5,
-			),
-			array(
+			],
+			[
 				self::ATTR_TAG => 'email',
 				self::ATTR_TYPE => self::TYPE_UNPARSED_EQUALS,
 				self::ATTR_BEFORE => '<a href="mailto:$1" class="bbc_email">',
 				self::ATTR_AFTER => '</a>',
-				self::ATTR_DISALLOW_CHILDREN => array(
+				self::ATTR_DISALLOW_CHILDREN => [
 					'email' => 1,
 					'url' => 1,
 					'iurl' => 1,
-				),
+				],
 				self::ATTR_DISABLED_AFTER => ' ($1)',
 				self::ATTR_BLOCK_LEVEL => false,
 				self::ATTR_AUTOLINK => false,
 				self::ATTR_LENGTH => 5,
-			),
-			array(
+			],
+			[
 				self::ATTR_TAG => 'footnote',
 				self::ATTR_TYPE => self::TYPE_PARSED_CONTENT,
 				self::ATTR_BEFORE => '<sup class="bbc_footnotes">%fn%',
 				self::ATTR_AFTER => '%fn%</sup>',
 				self::ATTR_TRIM => self::TRIM_NONE,
-				self::ATTR_DISALLOW_PARENTS => array(
+				self::ATTR_DISALLOW_PARENTS => [
 					'footnote' => 1,
 					'code' => 1,
 					'anchor' => 1,
 					'url' => 1,
 					'iurl' => 1,
-				),
+				],
 				self::ATTR_DISALLOW_BEFORE => '',
 				self::ATTR_DISALLOW_AFTER => '',
 				self::ATTR_BLOCK_LEVEL => false,
 				self::ATTR_AUTOLINK => true,
 				self::ATTR_LENGTH => 8,
-			),
-			array(
+			],
+			[
 				self::ATTR_TAG => 'font',
 				self::ATTR_TYPE => self::TYPE_UNPARSED_EQUALS,
 				self::ATTR_TEST => '[A-Za-z0-9_,\-\s]+?',
@@ -396,16 +396,16 @@ class Codes
 				self::ATTR_BLOCK_LEVEL => false,
 				self::ATTR_AUTOLINK => true,
 				self::ATTR_LENGTH => 4,
-			),
-			array(
+			],
+			[
 				self::ATTR_TAG => 'hr',
 				self::ATTR_TYPE => self::TYPE_CLOSED,
 				self::ATTR_CONTENT => '<hr />',
 				self::ATTR_BLOCK_LEVEL => true,
 				self::ATTR_AUTOLINK => false,
 				self::ATTR_LENGTH => 2,
-			),
-			array(
+			],
+			[
 				self::ATTR_TAG => 'i',
 				self::ATTR_TYPE => self::TYPE_PARSED_CONTENT,
 				self::ATTR_BEFORE => '<em>',
@@ -413,42 +413,42 @@ class Codes
 				self::ATTR_BLOCK_LEVEL => false,
 				self::ATTR_AUTOLINK => true,
 				self::ATTR_LENGTH => 1,
-			),
-			array(
+			],
+			[
 				self::ATTR_TAG => 'icode',
 				self::ATTR_TYPE => self::TYPE_UNPARSED_CONTENT,
 				self::ATTR_CONTENT => '<span class="bbc_code_inline">$1</span>',
 				self::ATTR_VALIDATE => $this->isDisabled('icode') ? null : static function (&$data) {
-					$data = strtr($data, array('[' => '&#91;', ']' => '&#93;'));
+					$data = strtr($data, ['[' => '&#91;', ']' => '&#93;']);
 				},
 				self::ATTR_BLOCK_LEVEL => false,
 				self::ATTR_AUTOLINK => false,
 				self::ATTR_LENGTH => 5,
-			),
-			array(
+			],
+			[
 				self::ATTR_TAG => 'img',
 				self::ATTR_TYPE => self::TYPE_UNPARSED_CONTENT,
-				self::ATTR_PARAM => array(
-					'width' => array(
+				self::ATTR_PARAM => [
+					'width' => [
 						self::PARAM_ATTR_VALUE => 'width:100%;max-width:$1px;',
 						self::PARAM_ATTR_MATCH => '(\d+)',
 						self::PARAM_ATTR_OPTIONAL => true,
-					),
-					'height' => array(
+					],
+					'height' => [
 						self::PARAM_ATTR_VALUE => 'max-height:$1px;',
 						self::PARAM_ATTR_MATCH => '(\d+)',
 						self::PARAM_ATTR_OPTIONAL => true,
-					),
-					'title' => array(
+					],
+					'title' => [
 						self::PARAM_ATTR_MATCH => '(.+?)',
 						self::PARAM_ATTR_OPTIONAL => true,
-					),
-					'alt' => array(
+					],
+					'alt' => [
 						self::PARAM_ATTR_MATCH => '(.+?)',
 						self::PARAM_ATTR_OPTIONAL => true,
-					),
-				),
-				self::ATTR_CONTENT => '<img src="$1" title="{title}" alt="{alt}" style="{width}{height}" class="bbc_img resized" />',
+					],
+				],
+				self::ATTR_CONTENT => '<img src="$1" title="{title}" alt="{alt}" style="{width}{height}" class="bbc_img resized" data-bbcexpandimage="1" />',
 				self::ATTR_VALIDATE => static function (&$data) {
 					$data = addProtocol($data);
 				},
@@ -456,8 +456,8 @@ class Codes
 				self::ATTR_BLOCK_LEVEL => false,
 				self::ATTR_AUTOLINK => false,
 				self::ATTR_LENGTH => 3,
-			),
-			array(
+			],
+			[
 				self::ATTR_TAG => 'img',
 				self::ATTR_TYPE => self::TYPE_UNPARSED_CONTENT,
 				self::ATTR_CONTENT => '<img src="$1" alt="" class="bbc_img" />',
@@ -468,8 +468,8 @@ class Codes
 				self::ATTR_BLOCK_LEVEL => false,
 				self::ATTR_AUTOLINK => false,
 				self::ATTR_LENGTH => 3,
-			),
-			array(
+			],
+			[
 				self::ATTR_TAG => 'iurl',
 				self::ATTR_TYPE => self::TYPE_UNPARSED_CONTENT,
 				self::ATTR_CONTENT => '<a href="$1" class="bbc_link">$1</a>',
@@ -480,8 +480,8 @@ class Codes
 				self::ATTR_BLOCK_LEVEL => false,
 				self::ATTR_AUTOLINK => false,
 				self::ATTR_LENGTH => 4,
-			),
-			array(
+			],
+			[
 				self::ATTR_TAG => 'iurl',
 				self::ATTR_TYPE => self::TYPE_UNPARSED_EQUALS,
 				self::ATTR_BEFORE => '<a href="$1" class="bbc_link">',
@@ -489,17 +489,17 @@ class Codes
 				self::ATTR_VALIDATE => static function (&$data) {
 					$data = $data[0] === '#' ? '#post_' . substr($data, 1) : addProtocol($data);
 				},
-				self::ATTR_DISALLOW_CHILDREN => array(
+				self::ATTR_DISALLOW_CHILDREN => [
 					'email' => 1,
 					'url' => 1,
 					'iurl' => 1,
-				),
+				],
 				self::ATTR_DISABLED_AFTER => ' ($1)',
 				self::ATTR_BLOCK_LEVEL => false,
 				self::ATTR_AUTOLINK => false,
 				self::ATTR_LENGTH => 4,
-			),
-			array(
+			],
+			[
 				self::ATTR_TAG => 'left',
 				self::ATTR_TYPE => self::TYPE_PARSED_CONTENT,
 				self::ATTR_BEFORE => '<div style="text-align: left;">',
@@ -507,55 +507,55 @@ class Codes
 				self::ATTR_BLOCK_LEVEL => true,
 				self::ATTR_AUTOLINK => true,
 				self::ATTR_LENGTH => 4,
-			),
-			array(
+			],
+			[
 				self::ATTR_TAG => 'li',
 				self::ATTR_TYPE => self::TYPE_PARSED_CONTENT,
 				self::ATTR_BEFORE => '<li>',
 				self::ATTR_AFTER => '</li>',
 				self::ATTR_TRIM => self::TRIM_OUTSIDE,
-				self::ATTR_REQUIRE_PARENTS => array(
+				self::ATTR_REQUIRE_PARENTS => [
 					'list' => 1,
-				),
+				],
 				self::ATTR_BLOCK_LEVEL => true,
 				self::ATTR_DISABLED_BEFORE => '',
 				self::ATTR_DISABLED_AFTER => '<br />',
 				self::ATTR_AUTOLINK => true,
 				self::ATTR_LENGTH => 2,
-			),
-			array(
+			],
+			[
 				self::ATTR_TAG => 'list',
 				self::ATTR_TYPE => self::TYPE_PARSED_CONTENT,
 				self::ATTR_BEFORE => '<ul class="bbc_list">',
 				self::ATTR_AFTER => '</ul>',
 				self::ATTR_TRIM => self::TRIM_INSIDE,
-				self::ATTR_REQUIRE_CHILDREN => array(
+				self::ATTR_REQUIRE_CHILDREN => [
 					'li' => 1,
 					'list' => 1,
-				),
+				],
 				self::ATTR_BLOCK_LEVEL => true,
 				self::ATTR_AUTOLINK => true,
 				self::ATTR_LENGTH => 4,
-			),
-			array(
+			],
+			[
 				self::ATTR_TAG => 'list',
 				self::ATTR_TYPE => self::TYPE_PARSED_CONTENT,
-				self::ATTR_PARAM => array(
-					'type' => array(
+				self::ATTR_PARAM => [
+					'type' => [
 						self::PARAM_ATTR_MATCH => '(none|disc|circle|square|decimal|decimal-leading-zero|lower-roman|upper-roman|lower-alpha|upper-alpha|lower-greek|lower-latin|upper-latin|hebrew|armenian|georgian|cjk-ideographic|hiragana|katakana|hiragana-iroha|katakana-iroha)',
-					),
-				),
+					],
+				],
 				self::ATTR_BEFORE => '<ul class="bbc_list" style="list-style-type: {type};">',
 				self::ATTR_AFTER => '</ul>',
 				self::ATTR_TRIM => self::TRIM_INSIDE,
-				self::ATTR_REQUIRE_CHILDREN => array(
+				self::ATTR_REQUIRE_CHILDREN => [
 					'li' => 1,
-				),
+				],
 				self::ATTR_BLOCK_LEVEL => true,
 				self::ATTR_AUTOLINK => true,
 				self::ATTR_LENGTH => 4,
-			),
-			array(
+			],
+			[
 				self::ATTR_TAG => 'me',
 				self::ATTR_TYPE => self::TYPE_UNPARSED_EQUALS,
 				self::ATTR_BEFORE => '<div class="meaction">&nbsp;$1 ',
@@ -566,8 +566,8 @@ class Codes
 				self::ATTR_DISABLED_AFTER => '<br />',
 				self::ATTR_AUTOLINK => true,
 				self::ATTR_LENGTH => 2,
-			),
-			array(
+			],
+			[
 				self::ATTR_TAG => 'member',
 				self::ATTR_TYPE => self::TYPE_UNPARSED_EQUALS,
 				self::ATTR_TEST => '\d*',
@@ -578,16 +578,16 @@ class Codes
 				self::ATTR_BLOCK_LEVEL => false,
 				self::ATTR_AUTOLINK => true,
 				self::ATTR_LENGTH => 6,
-			),
-			array(
+			],
+			[
 				self::ATTR_TAG => 'nobbc',
 				self::ATTR_TYPE => self::TYPE_UNPARSED_CONTENT,
 				self::ATTR_CONTENT => '$1',
 				self::ATTR_BLOCK_LEVEL => false,
 				self::ATTR_AUTOLINK => true,
 				self::ATTR_LENGTH => 5,
-			),
-			array(
+			],
+			[
 				self::ATTR_TAG => 'pre',
 				self::ATTR_TYPE => self::TYPE_PARSED_CONTENT,
 				self::ATTR_BEFORE => '<pre class="bbc_pre">',
@@ -595,8 +595,8 @@ class Codes
 				self::ATTR_BLOCK_LEVEL => false,
 				self::ATTR_AUTOLINK => true,
 				self::ATTR_LENGTH => 3,
-			),
-			array(
+			],
+			[
 				self::ATTR_TAG => 'quote',
 				self::ATTR_TYPE => self::TYPE_PARSED_CONTENT,
 				self::ATTR_BEFORE => '<blockquote class="bbc_quote"><cite>' . $txt['quote'] . '</cite>',
@@ -604,72 +604,72 @@ class Codes
 				self::ATTR_BLOCK_LEVEL => true,
 				self::ATTR_AUTOLINK => true,
 				self::ATTR_LENGTH => 5,
-			),
-			array(
+			],
+			[
 				self::ATTR_TAG => 'quote',
 				self::ATTR_TYPE => self::TYPE_PARSED_CONTENT,
-				self::ATTR_PARAM => array(
-					'author' => array(
+				self::ATTR_PARAM => [
+					'author' => [
 						self::PARAM_ATTR_MATCH => '([^<>]{1,192}?)',
 						self::PARAM_ATTR_QUOTED => self::OPTIONAL,
-					),
-				),
+					],
+				],
 				self::ATTR_BEFORE => '<blockquote class="bbc_quote"><cite>' . $txt['quote_from'] . ': {author}</cite>',
 				self::ATTR_AFTER => '</blockquote>',
 				self::ATTR_BLOCK_LEVEL => true,
 				self::ATTR_AUTOLINK => true,
 				self::ATTR_LENGTH => 5,
-			),
-			array(
+			],
+			[
 				self::ATTR_TAG => 'quote',
 				self::ATTR_TYPE => self::TYPE_PARSED_EQUALS,
 				self::ATTR_BEFORE => '<blockquote class="bbc_quote"><cite>' . $txt['quote_from'] . ': $1</cite>',
 				self::ATTR_AFTER => '</blockquote>',
 				self::ATTR_QUOTED => self::OPTIONAL,
-				self::ATTR_PARSED_TAGS_ALLOWED => array(
+				self::ATTR_PARSED_TAGS_ALLOWED => [
 					'url',
 					'iurl',
-				),
+				],
 				self::ATTR_BLOCK_LEVEL => true,
 				self::ATTR_AUTOLINK => true,
 				self::ATTR_LENGTH => 5,
-			),
-			array(
+			],
+			[
 				self::ATTR_TAG => 'quote',
 				self::ATTR_TYPE => self::TYPE_PARSED_CONTENT,
-				self::ATTR_PARAM => array(
-					'author' => array(
+				self::ATTR_PARAM => [
+					'author' => [
 						self::PARAM_ATTR_MATCH => '([^<>]{1,192}?)',
-					),
-					'link' => array(
+					],
+					'link' => [
 						self::PARAM_ATTR_MATCH => '(?:board=\d+;)?((?:topic|threadid)=[\dmsg#\./]{1,40}(?:;start=[\dmsg#\./]{1,40})?|msg=\d{1,40}|action=profile;u=\d+)',
-					),
-					'date' => array(
+					],
+					'date' => [
 						self::PARAM_ATTR_MATCH => '(\d+)',
 						self::PARAM_ATTR_VALIDATE => 'htmlTime',
-					),
-				),
+					],
+				],
 				self::ATTR_BEFORE => '<blockquote class="bbc_quote"><cite><a href="' . $scripturl . '?{link}">' . $txt['quote_from'] . ': {author} &ndash;' . ($modSettings['todayMod'] == 3 ? '' : ' ' . $txt['search_on']) . ' {date}</a></cite>',
 				self::ATTR_AFTER => '</blockquote>',
 				self::ATTR_BLOCK_LEVEL => true,
 				self::ATTR_AUTOLINK => true,
 				self::ATTR_LENGTH => 5,
-			),
-			array(
+			],
+			[
 				self::ATTR_TAG => 'quote',
 				self::ATTR_TYPE => self::TYPE_PARSED_CONTENT,
-				self::ATTR_PARAM => array(
-					'author' => array(
+				self::ATTR_PARAM => [
+					'author' => [
 						self::PARAM_ATTR_MATCH => '([^<>]{1,192}?)',
-					),
-				),
+					],
+				],
 				self::ATTR_BEFORE => '<blockquote class="bbc_quote"><cite>' . $txt['quote_from'] . ': {author}</cite>',
 				self::ATTR_AFTER => '</blockquote>',
 				self::ATTR_BLOCK_LEVEL => true,
 				self::ATTR_AUTOLINK => true,
 				self::ATTR_LENGTH => 5,
-			),
-			array(
+			],
+			[
 				self::ATTR_TAG => 'right',
 				self::ATTR_TYPE => self::TYPE_PARSED_CONTENT,
 				self::ATTR_BEFORE => '<div style="text-align: right;">',
@@ -677,8 +677,8 @@ class Codes
 				self::ATTR_BLOCK_LEVEL => true,
 				self::ATTR_AUTOLINK => true,
 				self::ATTR_LENGTH => 5,
-			),
-			array(
+			],
+			[
 				self::ATTR_TAG => 's',
 				self::ATTR_TYPE => self::TYPE_PARSED_CONTENT,
 				self::ATTR_BEFORE => '<del>',
@@ -686,40 +686,40 @@ class Codes
 				self::ATTR_BLOCK_LEVEL => false,
 				self::ATTR_AUTOLINK => true,
 				self::ATTR_LENGTH => 1,
-			),
-			array(
+			],
+			[
 				self::ATTR_TAG => 'size',
 				self::ATTR_TYPE => self::TYPE_UNPARSED_EQUALS,
 				self::ATTR_TEST => '[1-7]{1}',
 				self::ATTR_BEFORE => '<span style="font-size: $1;" class="bbc_size">',
 				self::ATTR_AFTER => '</span>',
 				self::ATTR_VALIDATE => static function (&$data) {
-					$sizes = array(1 => 0.7, 2 => 1.0, 3 => 1.35, 4 => 1.45, 5 => 2.0, 6 => 2.65, 7 => 3.95);
+					$sizes = [1 => 0.7, 2 => 1.0, 3 => 1.35, 4 => 1.45, 5 => 2.0, 6 => 2.65, 7 => 3.95];
 					$data = $sizes[(int) $data] . 'em';
 				},
-				self::ATTR_DISALLOW_PARENTS => array(
+				self::ATTR_DISALLOW_PARENTS => [
 					'size' => 1,
-				),
+				],
 				self::ATTR_DISALLOW_BEFORE => '<span>',
 				self::ATTR_DISALLOW_AFTER => '</span>',
 				self::ATTR_BLOCK_LEVEL => false,
 				self::ATTR_AUTOLINK => true,
 				self::ATTR_LENGTH => 4,
-			),
-			array(
+			],
+			[
 				self::ATTR_TAG => 'size',
 				self::ATTR_TYPE => self::TYPE_UNPARSED_EQUALS,
 				self::ATTR_TEST => '([1-9][\d]?p[xt]|small(?:er)?|large[r]?|x[x]?-(?:small|large)|medium|(0\.[1-9]|[1-9](\.[\d][\d]?)?)?em)',
 				self::ATTR_BEFORE => '<span style="font-size: $1;" class="bbc_size">',
 				self::ATTR_AFTER => '</span>',
-				self::ATTR_DISALLOW_PARENTS => array('size' => 1),
+				self::ATTR_DISALLOW_PARENTS => ['size' => 1],
 				self::ATTR_DISALLOW_BEFORE => '<span>',
 				self::ATTR_DISALLOW_AFTER => '</span>',
 				self::ATTR_BLOCK_LEVEL => false,
 				self::ATTR_AUTOLINK => true,
 				self::ATTR_LENGTH => 4,
-			),
-			array(
+			],
+			[
 				self::ATTR_TAG => 'spoiler',
 				self::ATTR_TYPE => self::TYPE_PARSED_CONTENT,
 				self::ATTR_BEFORE => '<span class="spoilerheader">' . $txt['spoiler'] . '</span><div class="spoiler"><div class="bbc_spoiler" style="display: none;">',
@@ -727,8 +727,8 @@ class Codes
 				self::ATTR_BLOCK_LEVEL => true,
 				self::ATTR_AUTOLINK => true,
 				self::ATTR_LENGTH => 7,
-			),
-			array(
+			],
+			[
 				self::ATTR_TAG => 'sub',
 				self::ATTR_TYPE => self::TYPE_PARSED_CONTENT,
 				self::ATTR_BEFORE => '<sub>',
@@ -736,8 +736,8 @@ class Codes
 				self::ATTR_BLOCK_LEVEL => false,
 				self::ATTR_AUTOLINK => true,
 				self::ATTR_LENGTH => 3,
-			),
-			array(
+			],
+			[
 				self::ATTR_TAG => 'sup',
 				self::ATTR_TYPE => self::TYPE_PARSED_CONTENT,
 				self::ATTR_BEFORE => '<sup>',
@@ -745,70 +745,70 @@ class Codes
 				self::ATTR_BLOCK_LEVEL => false,
 				self::ATTR_AUTOLINK => true,
 				self::ATTR_LENGTH => 3,
-			),
-			array(
+			],
+			[
 				self::ATTR_TAG => 'table',
 				self::ATTR_TYPE => self::TYPE_PARSED_CONTENT,
 				self::ATTR_BEFORE => '<div class="bbc_table_container"><table class="bbc_table">',
 				self::ATTR_AFTER => '</table></div>',
 				self::ATTR_TRIM => self::TRIM_BOTH,
-				self::ATTR_REQUIRE_CHILDREN => array(
+				self::ATTR_REQUIRE_CHILDREN => [
 					'tr' => 1,
-				),
+				],
 				self::ATTR_BLOCK_LEVEL => true,
 				self::ATTR_AUTOLINK => true,
 				self::ATTR_LENGTH => 5,
-			),
-			array(
+			],
+			[
 				self::ATTR_TAG => 'td',
 				self::ATTR_TYPE => self::TYPE_PARSED_CONTENT,
 				self::ATTR_BEFORE => '<td>',
 				self::ATTR_AFTER => '</td>',
-				self::ATTR_REQUIRE_PARENTS => array(
+				self::ATTR_REQUIRE_PARENTS => [
 					'tr' => 1,
-				),
+				],
 				self::ATTR_TRIM => self::TRIM_OUTSIDE,
 				self::ATTR_BLOCK_LEVEL => true,
 				self::ATTR_DISABLED_BEFORE => '',
 				self::ATTR_DISABLED_AFTER => '',
 				self::ATTR_AUTOLINK => true,
 				self::ATTR_LENGTH => 2,
-			),
-			array(
+			],
+			[
 				self::ATTR_TAG => 'th',
 				self::ATTR_TYPE => self::TYPE_PARSED_CONTENT,
 				self::ATTR_BEFORE => '<th>',
 				self::ATTR_AFTER => '</th>',
-				self::ATTR_REQUIRE_PARENTS => array(
+				self::ATTR_REQUIRE_PARENTS => [
 					'tr' => 1,
-				),
+				],
 				self::ATTR_TRIM => self::TRIM_OUTSIDE,
 				self::ATTR_BLOCK_LEVEL => true,
 				self::ATTR_DISABLED_BEFORE => '',
 				self::ATTR_DISABLED_AFTER => '',
 				self::ATTR_AUTOLINK => true,
 				self::ATTR_LENGTH => 2,
-			),
-			array(
+			],
+			[
 				self::ATTR_TAG => 'tr',
 				self::ATTR_TYPE => self::TYPE_PARSED_CONTENT,
 				self::ATTR_BEFORE => '<tr>',
 				self::ATTR_AFTER => '</tr>',
-				self::ATTR_REQUIRE_PARENTS => array(
+				self::ATTR_REQUIRE_PARENTS => [
 					'table' => 1,
-				),
-				self::ATTR_REQUIRE_CHILDREN => array(
+				],
+				self::ATTR_REQUIRE_CHILDREN => [
 					'td' => 1,
 					'th' => 1,
-				),
+				],
 				self::ATTR_TRIM => self::TRIM_BOTH,
 				self::ATTR_BLOCK_LEVEL => true,
 				self::ATTR_DISABLED_BEFORE => '',
 				self::ATTR_DISABLED_AFTER => '',
 				self::ATTR_AUTOLINK => true,
 				self::ATTR_LENGTH => 2,
-			),
-			array(
+			],
+			[
 				self::ATTR_TAG => 'tt',
 				self::ATTR_TYPE => self::TYPE_PARSED_CONTENT,
 				self::ATTR_BEFORE => '<span class="bbc_tt">',
@@ -816,8 +816,8 @@ class Codes
 				self::ATTR_BLOCK_LEVEL => false,
 				self::ATTR_AUTOLINK => true,
 				self::ATTR_LENGTH => 2,
-			),
-			array(
+			],
+			[
 				self::ATTR_TAG => 'u',
 				self::ATTR_TYPE => self::TYPE_PARSED_CONTENT,
 				self::ATTR_BEFORE => '<span class="bbc_u">',
@@ -825,8 +825,8 @@ class Codes
 				self::ATTR_BLOCK_LEVEL => false,
 				self::ATTR_AUTOLINK => true,
 				self::ATTR_LENGTH => 1,
-			),
-			array(
+			],
+			[
 				self::ATTR_TAG => 'url',
 				self::ATTR_TYPE => self::TYPE_UNPARSED_CONTENT,
 				self::ATTR_CONTENT => &self::$contentTag,
@@ -840,8 +840,8 @@ class Codes
 				self::ATTR_BLOCK_LEVEL => false,
 				self::ATTR_AUTOLINK => false,
 				self::ATTR_LENGTH => 3,
-			),
-			array(
+			],
+			[
 				self::ATTR_TAG => 'url',
 				self::ATTR_TYPE => self::TYPE_UNPARSED_EQUALS,
 				self::ATTR_BEFORE => &self::$contentTag,
@@ -852,49 +852,49 @@ class Codes
 					self::$contentTag = '<a href="$1" class="bbc_link" target="_blank"';
 					self::$contentTag .= validateURLAllowList($data) ? ' rel="noopener ugc">' : ' rel="noopener noreferrer nofollow ugc">';
 				},
-				self::ATTR_DISALLOW_CHILDREN => array(
+				self::ATTR_DISALLOW_CHILDREN => [
 					'email' => 1,
 					'url' => 1,
 					'iurl' => 1,
-				),
+				],
 				self::ATTR_DISABLED_AFTER => ' ($1)',
 				self::ATTR_BLOCK_LEVEL => false,
 				self::ATTR_AUTOLINK => false,
 				self::ATTR_LENGTH => 3,
-			),
-			array(
+			],
+			[
 				self::ATTR_TAG => 'url',
 				self::ATTR_TYPE => self::TYPE_PARSED_CONTENT,
 				self::ATTR_BEFORE => '<a href="{url}" class="bbc_link" target="_blank" rel="{follow}">',
 				self::ATTR_AFTER => '</a>',
-				self::ATTR_PARAM => array(
-					'url' => array(
+				self::ATTR_PARAM => [
+					'url' => [
 						self::PARAM_ATTR_MATCH => '([^\s\]]+\]?)',
 						// preparse will check the domain allowList
 						self::PARAM_ATTR_VALIDATE => static function($param) {
 							return addProtocol($param);
 						}
-					),
-					'follow' => array(
+					],
+					'follow' => [
 						self::PARAM_ATTR_MATCH => '([^\s\]]+\]?)',
 						self::PARAM_ATTR_VALIDATE => static function($param) {
 							// preparse will validate permissions
 							$on = in_array($param, ['follow', 'true', 'on', 'yes'], true);
 							return ($on) ? 'noopener ugc' : 'noopener noreferrer nofollow ugc';
 						}
-					),
-				),
-				self::ATTR_DISALLOW_CHILDREN => array(
+					],
+				],
+				self::ATTR_DISALLOW_CHILDREN => [
 					'email' => 1,
 					'url' => 1,
 					'iurl' => 1,
-				),
+				],
 				self::ATTR_DISABLED_AFTER => ' ($1)',
 				self::ATTR_BLOCK_LEVEL => false,
 				self::ATTR_AUTOLINK => false,
 				self::ATTR_LENGTH => 3
-			),
-		));
+			],
+		]);
 	}
 
 	/**
@@ -902,9 +902,9 @@ class Codes
 	 *
 	 * @return array
 	 */
-	public function getItemCodes()
+	public function getItemCodes(): array
 	{
-		$item_codes = array(
+		$item_codes = [
 			'*' => 'disc',
 			'@' => 'disc',
 			'+' => 'square',
@@ -913,10 +913,10 @@ class Codes
 			'0' => 'decimal',
 			'o' => 'circle',
 			'O' => 'circle',
-		);
+		];
 
 		// Want to add some more ?
-		call_integration_hook('integrate_item_codes', array(&$item_codes));
+		call_integration_hook('integrate_item_codes', [&$item_codes]);
 
 		return $item_codes;
 	}
@@ -936,14 +936,14 @@ class Codes
 	 *
 	 * @return array
 	 */
-	public function getCodesGroupedByTag()
+	public function getCodesGroupedByTag(): array
 	{
-		$bbc = array();
+		$bbc = [];
 		foreach ($this->bbc as $code)
 		{
 			if (!isset($bbc[$code[self::ATTR_TAG]]))
 			{
-				$bbc[$code[self::ATTR_TAG]] = array();
+				$bbc[$code[self::ATTR_TAG]] = [];
 			}
 
 			$bbc[$code[self::ATTR_TAG]][] = $code;
@@ -957,9 +957,9 @@ class Codes
 	 *
 	 * @return array
 	 */
-	public function getTags()
+	public function getTags(): array
 	{
-		$tags = array();
+		$tags = [];
 		foreach ($this->bbc as $tag)
 		{
 			$tags[$tag[self::ATTR_TAG]] = $tag[self::ATTR_TAG];
@@ -974,11 +974,11 @@ class Codes
 	 * Even, just remove the itemcodes when needed
 	 *
 	 */
-	public function getForParsing()
+	public function getForParsing(): array
 	{
 		$bbc = $this->bbc;
 		$item_codes = $this->getItemCodes();
-		call_integration_hook('bbc_codes_parsing', array(&$bbc, &$item_codes));
+		call_integration_hook('bbc_codes_parsing', [&$bbc, &$item_codes]);
 
 		if (!$this->isDisabled('li') && !$this->isDisabled('list'))
 		{
@@ -994,7 +994,7 @@ class Codes
 			}
 		}
 
-		$return = array();
+		$return = [];
 
 		// Find the first letter of the tag faster
 		foreach ($bbc as $code)
@@ -1012,7 +1012,7 @@ class Codes
 	 * @todo not used
 	 *
 	 */
-	public function setParsingCodes()
+	public function setParsingCodes(): self
 	{
 		$this->parsing_codes = $this->getForParsing();
 
@@ -1029,7 +1029,7 @@ class Codes
 	 * @todo not used
 	 *
 	 */
-	public function hasChar($char)
+	public function hasChar($char): bool
 	{
 		return isset($this->parsing_codes[$char]);
 	}
@@ -1055,14 +1055,14 @@ class Codes
 	 *
 	 * @return array
 	 */
-	protected function getItemCodeTag($code)
+	protected function getItemCodeTag($code): array
 	{
-		return array(
+		return [
 			self::ATTR_TAG => $code,
 			self::ATTR_TYPE => self::TYPE_ITEMCODE,
 			self::ATTR_BLOCK_LEVEL => true,
 			self::ATTR_LENGTH => 1,
-		);
+		];
 	}
 
 	/**
@@ -1070,7 +1070,7 @@ class Codes
 	 *
 	 * @return $this
 	 */
-	public function setForPrinting()
+	public function setForPrinting(): self
 	{
 		// Colors can't well be displayed... supposed to be black and white.
 		$this->disable('color');
@@ -1089,7 +1089,7 @@ class Codes
 		}
 
 		// @todo Interface/setting to add more?
-		call_integration_hook('integrate_bbc_set_printing', array($this));
+		call_integration_hook('integrate_bbc_set_printing', [$this]);
 
 		return $this;
 	}
@@ -1101,7 +1101,7 @@ class Codes
 	 *
 	 * @return bool
 	 */
-	public function isDisabled($tag)
+	public function isDisabled($tag): bool
 	{
 		return isset($this->disabled[$tag]);
 	}
@@ -1111,7 +1111,7 @@ class Codes
 	 *
 	 * @return array
 	 */
-	public function getDisabled()
+	public function getDisabled(): array
 	{
 		return $this->disabled;
 	}
@@ -1123,7 +1123,7 @@ class Codes
 	 *
 	 * @return bool
 	 */
-	public function disable($tag)
+	public function disable($tag): bool
 	{
 		$this->disabled[$tag] = $tag;
 
@@ -1137,7 +1137,7 @@ class Codes
 	 *
 	 * @return bool
 	 */
-	public function restore($tag)
+	public function restore($tag): bool
 	{
 		if (isset($this->disabled[$tag]))
 		{
@@ -1152,7 +1152,7 @@ class Codes
 	 *
 	 * @param $parse_tags
 	 */
-	public function setParsedTags($parse_tags)
+	public function setParsedTags($parse_tags): void
 	{
 		foreach ($this->bbc as $k => $code)
 		{

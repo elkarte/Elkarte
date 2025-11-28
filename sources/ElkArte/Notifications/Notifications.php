@@ -90,7 +90,7 @@ class Notifications extends AbstractModel
 	 * Used to identify the strings for the subject and body respectively of the notification.
 	 * @throws Exception Throws an exception if the notifier is already instantiated
 	 */
-	public function register($class_name, $namespace = null)
+	public function register($class_name, $namespace = null): void
 	{
 		if ($namespace === null)
 		{
@@ -113,7 +113,7 @@ class Notifications extends AbstractModel
 	 *
 	 * @return Notifications
 	 */
-	public static function instance()
+	public static function instance(): Notifications
 	{
 		if (self::$_instance === null)
 		{
@@ -130,7 +130,7 @@ class Notifications extends AbstractModel
 	 *
 	 * @param NotificationsTask $task
 	 */
-	public function add(NotificationsTask $task)
+	public function add(NotificationsTask $task): void
 	{
 		$this->_to_send[] = $task;
 	}
@@ -141,7 +141,7 @@ class Notifications extends AbstractModel
 	 * to actually send any type of notification that has piled up during
 	 * the execution
 	 */
-	public function send()
+	public function send(): void
 	{
 		if (!empty($this->_to_send))
 		{
@@ -159,7 +159,7 @@ class Notifications extends AbstractModel
 	 *
 	 * @param NotificationsTask $task
 	 */
-	protected function _send_task(NotificationsTask $task)
+	protected function _send_task(NotificationsTask $task): void
 	{
 		/** @var NotificationInterface $class */
 		$class = $task->getClass();
@@ -210,7 +210,7 @@ class Notifications extends AbstractModel
 	 *
 	 * @return array
 	 */
-	protected function _getNotificationPreferences($notifiers, $notification_type, $members)
+	protected function _getNotificationPreferences($notifiers, $notification_type, $members): array
 	{
 		$preferences = getUsersNotificationsPreferences($notification_type, $members);
 
@@ -251,7 +251,7 @@ class Notifications extends AbstractModel
 	 *
 	 * @return string[]
 	 */
-	public function getNotifiers()
+	public function getNotifiers(): array
 	{
 		return $this->_notifiers;
 	}
@@ -263,7 +263,7 @@ class Notifications extends AbstractModel
 	 * @param NotificationsTask $task
 	 * @param array $bodies
 	 */
-	protected function _send_notification(NotificationInterface $obj, NotificationsTask $task, $bodies)
+	protected function _send_notification(NotificationInterface $obj, NotificationsTask $task, $bodies): void
 	{
 		$mentioning = new Mentions\Mentioning($this->_db, $this->user, new DataValidator(), $this->_modSettings->enabled_mentions);
 		foreach ($bodies as $body)
@@ -286,7 +286,7 @@ class Notifications extends AbstractModel
 	 * @param NotificationsTask $task
 	 * @param array $bodies
 	 */
-	protected function _send_email(NotificationInterface $obj, NotificationsTask $task, $bodies)
+	protected function _send_email(NotificationInterface $obj, NotificationsTask $task, $bodies): void
 	{
 		$last_id = $obj->getLastId();
 		foreach ($bodies as $body)
@@ -305,7 +305,7 @@ class Notifications extends AbstractModel
 	 * @param NotificationsTask $task
 	 * @param array $bodies
 	 */
-	protected function _send_daily_email(NotificationInterface $obj, NotificationsTask $task, $bodies)
+	protected function _send_daily_email(NotificationInterface $obj, NotificationsTask $task, $bodies): void
 	{
 		foreach ($bodies as $body)
 		{
@@ -327,7 +327,7 @@ class Notifications extends AbstractModel
 	 *
 	 * @param array $insert_array
 	 */
-	protected function _insert_delayed($insert_array)
+	protected function _insert_delayed($insert_array): void
 	{
 		$this->_db->insert('ignore',
 			'{db_prefix}pending_notifications',
@@ -350,7 +350,7 @@ class Notifications extends AbstractModel
 	 * @param NotificationsTask $task
 	 * @param array $bodies
 	 */
-	protected function _send_weekly_email(NotificationInterface $obj, NotificationsTask $task, $bodies)
+	protected function _send_weekly_email(NotificationInterface $obj, NotificationsTask $task, $bodies): void
 	{
 		foreach ($bodies as $body)
 		{

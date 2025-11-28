@@ -70,7 +70,7 @@ class Session
 	 * @param int $pointer (optional) The starting search ID pointer. Default is 0.
 	 * @return int The updated ID value.
 	 */
-	public function increaseId($pointer = 0)
+	public function increaseId($pointer = 0): int
 	{
 		$this->_id_search = (int) $pointer;
 		++$this->_id_search;
@@ -88,7 +88,7 @@ class Session
 	 *
 	 * @return int The ID of the search.
 	 */
-	public function getId()
+	public function getId(): int
 	{
 		return $this->_id_search;
 	}
@@ -101,7 +101,7 @@ class Session
 	 * @return bool Returns true if the given parameters match the internal params,
 	 *              false otherwise.
 	 */
-	public function existsWithParams($params)
+	public function existsWithParams($params): bool
 	{
 		return $this->_params === $params;
 	}
@@ -111,12 +111,12 @@ class Session
 	 *
 	 * @return int
 	 */
-	public function getNumResults()
+	public function getNumResults(): int
 	{
 		return $this->_num_results;
 	}
 
-	public function setNumResults($num_results = 0)
+	public function setNumResults($num_results = 0): void
 	{
 		$this->_num_results = (int) $num_results;
 	}

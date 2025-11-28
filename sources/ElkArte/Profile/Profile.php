@@ -210,7 +210,7 @@ class Profile extends AbstractController
 	 *    - array $subsections: Array of subsections, in order of appearance.
 	 *    - array $permission:  Array of permissions to determine who can access this area. Should contain arrays $own and $any.
 	 */
-	private function _define_profile_menu()
+	private function _define_profile_menu(): void
 	{
 		global $txt, $context, $modSettings;
 
@@ -521,7 +521,7 @@ class Profile extends AbstractController
 	/**
 	 * Does session and token checks for the areas that require those
 	 */
-	private function _check_access()
+	private function _check_access(): void
 	{
 		global $context;
 
@@ -564,7 +564,7 @@ class Profile extends AbstractController
 	 * Just builds the link tree based on where were are in the profile section
 	 * and whose profile is being viewed, etc.
 	 */
-	private function _build_profile_breadcrumbs()
+	private function _build_profile_breadcrumbs(): void
 	{
 		global $context, $txt;
 
@@ -605,7 +605,7 @@ class Profile extends AbstractController
 	/**
 	 * Save profile updates
 	 */
-	private function _save_updates()
+	private function _save_updates(): void
 	{
 		global $txt, $context, $modSettings, $post_errors, $profile_vars;
 
@@ -778,7 +778,7 @@ class Profile extends AbstractController
 	 * @param bool $check_password if this profile update requires a password verification
 	 * @throws Exception
 	 */
-	private function _check_password($check_password)
+	private function _check_password($check_password): void
 	{
 		global $post_errors, $context;
 

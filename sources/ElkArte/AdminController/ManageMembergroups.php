@@ -55,32 +55,32 @@ class ManageMembergroups extends AbstractController
 		Txt::load('ManageMembers');
 		theme()->getTemplates()->load('ManageMembergroups');
 
-		$subActions = array(
-			'add' => array(
+		$subActions = [
+			'add' => [
 				'controller' => $this,
 				'function' => 'action_add',
-				'permission' => 'manage_membergroups'),
-			'delete' => array(
+				'permission' => 'manage_membergroups'],
+			'delete' => [
 				'controller' => $this,
 				'function' => 'action_delete',
-				'permission' => 'manage_membergroups'),
-			'edit' => array(
+				'permission' => 'manage_membergroups'],
+			'edit' => [
 				'controller' => $this,
 				'function' => 'action_edit',
-				'permission' => 'manage_membergroups'),
-			'index' => array(
+				'permission' => 'manage_membergroups'],
+			'index' => [
 				'controller' => $this,
 				'function' => 'action_list',
-				'permission' => 'manage_membergroups'),
-			'members' => array(
+				'permission' => 'manage_membergroups'],
+			'members' => [
 				'controller' => Groups::class,
 				'function' => 'action_index',
-				'permission' => 'manage_membergroups'),
-			'settings' => array(
+				'permission' => 'manage_membergroups'],
+			'settings' => [
 				'controller' => $this,
 				'function' => 'action_groupSettings_display',
-				'permission' => 'admin_forum'),
-		);
+				'permission' => 'admin_forum'],
+		];
 
 		$action = new Action('manage_membergroups');
 
@@ -116,34 +116,34 @@ class ManageMembergroups extends AbstractController
 	 * @event integrate_list_post_count_membergroups_list
 	 * @uses ManageMembergroups template, main.
 	 */
-	public function action_list()
+	public function action_list(): void
 	{
 		global $txt, $context;
 
 		$context['page_title'] = $txt['membergroups_title'];
 
 		// The first list shows the regular membergroups.
-		$listOptions = array(
+		$listOptions = [
 			'id' => 'regular_membergroups_list',
 			'title' => $txt['membergroups_regular'],
 			'base_href' => getUrl('admin', ['action' => 'admin', 'area' => 'membergroups'] + (isset($this->_req->query->sort2) ? ['sort2' => urlencode($this->_req->query->sort2)] : [])),
 			'default_sort_col' => 'name',
-			'get_items' => array(
+			'get_items' => [
 				'file' => SUBSDIR . '/Membergroups.subs.php',
 				'function' => 'list_getMembergroups',
-				'params' => array(
+				'params' => [
 					'regular',
 					$this->user->id,
 					allowedTo('manage_membergroups'),
 					allowedTo('admin_forum'),
-				),
-			),
-			'columns' => array(
-				'name' => array(
-					'header' => array(
+				],
+			],
+			'columns' => [
+				'name' => [
+					'header' => [
 						'value' => $txt['membergroups_name'],
-					),
-					'data' => array(
+					],
+					'data' => [
 						'function' => static function ($rowData) {
 							// Since the moderator group has no explicit members, no link is needed.
 							if ($rowData['id_group'] === 3)
@@ -166,17 +166,17 @@ class ManageMembergroups extends AbstractController
 							}
 							return $group_name;
 						},
-					),
-					'sort' => array(
+					],
+					'sort' => [
 						'default' => 'CASE WHEN mg.id_group < 4 THEN mg.id_group ELSE 4 END, mg.group_name',
 						'reverse' => 'CASE WHEN mg.id_group < 4 THEN mg.id_group ELSE 4 END, mg.group_name DESC',
-					),
-				),
-				'icons' => array(
-					'header' => array(
+					],
+				],
+				'icons' => [
+					'header' => [
 						'value' => $txt['membergroups_icons'],
-					),
-					'data' => array(
+					],
+					'data' => [
 						'function' => static function ($rowData) {
 							global $settings;
 
@@ -192,91 +192,91 @@ class ManageMembergroups extends AbstractController
 
 							return str_repeat('<img src="' . $settings['images_url'] . '/group_icons/' . $rowData['icons'][1] . '" alt="*" />', $rowData['icons'][0]);
 						},
-					),
-					'sort' => array(
+					],
+					'sort' => [
 						'default' => 'mg.icons',
 						'reverse' => 'mg.icons DESC',
-					)
-				),
-				'members' => array(
-					'header' => array(
+					]
+				],
+				'members' => [
+					'header' => [
 						'value' => $txt['membergroups_members_top'],
-					),
-					'data' => array(
+					],
+					'data' => [
 						'function' => static function ($rowData) {
 							global $txt;
 							// No explicit members for the moderator group.
 							return $rowData['id_group'] === 3 ? $txt['membergroups_guests_na'] : comma_format($rowData['num_members']);
 						},
-					),
-					'sort' => array(
+					],
+					'sort' => [
 						'default' => 'CASE WHEN mg.id_group < 4 THEN mg.id_group ELSE 4 END, 1',
 						'reverse' => 'CASE WHEN mg.id_group < 4 THEN mg.id_group ELSE 4 END, 1 DESC',
-					),
-				),
-				'modify' => array(
-					'header' => array(
+					],
+				],
+				'modify' => [
+					'header' => [
 						'value' => $txt['modify'],
-					),
-					'data' => array(
-						'sprintf' => array(
+					],
+					'data' => [
+						'sprintf' => [
 							'format' => '<a href="' . getUrl('admin', ['action' => 'admin', 'area' => 'membergroups', 'sa' => 'edit', 'group' => '']) . '%1$d">' . $txt['membergroups_modify'] . '</a>',
-							'params' => array(
+							'params' => [
 								'id_group' => false,
-							),
-						),
-					),
-				),
-			),
-			'additional_rows' => array(
-				array(
+							],
+						],
+					],
+				],
+			],
+			'additional_rows' => [
+				[
 					'position' => 'below_table_data',
 					'class' => 'submitbutton',
 					'value' => '<a class="linkbutton" href="' . getUrl('admin', ['action' => 'admin', 'area' => 'membergroups', 'sa' => 'add', 'generalgroup']) . '">' . $txt['membergroups_add_group'] . '</a>',
-				),
-			),
-		);
+				],
+			],
+		];
 
 		createList($listOptions);
 
 		// The second list shows the post count based groups.
-		$listOptions = array(
+		$listOptions = [
 			'id' => 'post_count_membergroups_list',
 			'title' => $txt['membergroups_post'],
 			'base_href' => getUrl('admin', ['action' => 'admin', 'area' => 'membergroups'] + (isset($this->_req->query->sort) ? ['sort' => urlencode($this->_req->query->sort)] : [])),
 			'default_sort_col' => 'required_posts',
-			'request_vars' => array(
+			'request_vars' => [
 				'sort' => 'sort2',
 				'desc' => 'desc2',
-			),
-			'get_items' => array(
+			],
+			'get_items' => [
 				'file' => SUBSDIR . '/Membergroups.subs.php',
 				'function' => 'list_getMembergroups',
-				'params' => array(
+				'params' => [
 					'post_count',
 					$this->user->id,
 					allowedTo('manage_membergroups'),
 					allowedTo('admin_forum'),
-				),
-			),
-			'columns' => array(
-				'name' => array(
-					'header' => array(
+				],
+			],
+			'columns' => [
+				'name' => [
+					'header' => [
 						'value' => $txt['membergroups_name'],
-					),
-					'data' => array(
+					],
+					'data' => [
 						'function' => static fn($rowData) => sprintf('<a href="' . getUrl('admin', ['action' => 'admin', 'area' => 'membergroups', 'sa' => 'members', 'group' => $rowData['id_group']]) . '">%1$s</a>', $rowData['group_name_color']),
-					),
-					'sort' => array(
+					],
+					'sort' => [
 						'default' => 'mg.group_name',
 						'reverse' => 'mg.group_name DESC',
-					),
-				),
-				'icons' => array(
-					'header' => array(
+					],
+				],
+				'icons' => [
+					'header' => [
 						'value' => $txt['membergroups_icons'],
-					),
-					'data' => array(
+					],
+					'data' => [
 						'function' => static function ($rowData) {
 							global $settings;
 
@@ -292,58 +292,58 @@ class ManageMembergroups extends AbstractController
 
 							return str_repeat('<img src="' . $settings['images_url'] . '/group_icons/' . $rowData['icons'][1] . '" alt="*" />', $rowData['icons'][0]);
 						},
-					),
-					'sort' => array(
+					],
+					'sort' => [
 						'default' => 'CASE WHEN mg.id_group < 4 THEN mg.id_group ELSE 4 END, icons',
 						'reverse' => 'CASE WHEN mg.id_group < 4 THEN mg.id_group ELSE 4 END, icons DESC',
-					)
-				),
-				'members' => array(
-					'header' => array(
+					]
+				],
+				'members' => [
+					'header' => [
 						'value' => $txt['membergroups_members_top'],
-					),
-					'data' => array(
+					],
+					'data' => [
 						'db' => 'num_members',
-					),
-					'sort' => array(
+					],
+					'sort' => [
 						'default' => '1 DESC',
 						'reverse' => '1',
-					),
-				),
-				'required_posts' => array(
-					'header' => array(
+					],
+				],
+				'required_posts' => [
+					'header' => [
 						'value' => $txt['membergroups_min_posts'],
-					),
-					'data' => array(
+					],
+					'data' => [
 						'db' => 'min_posts',
-					),
-					'sort' => array(
+					],
+					'sort' => [
 						'default' => 'mg.min_posts',
 						'reverse' => 'mg.min_posts DESC',
-					),
-				),
-				'modify' => array(
-					'header' => array(
+					],
+				],
+				'modify' => [
+					'header' => [
 						'value' => $txt['modify'],
-					),
-					'data' => array(
-						'sprintf' => array(
+					],
+					'data' => [
+						'sprintf' => [
 							'format' => '<a href="' . getUrl('admin', ['action' => 'admin', 'area' => 'membergroups', 'sa' => 'edit', 'group' => '']) . '%1$d">' . $txt['membergroups_modify'] . '</a>',
-							'params' => array(
+							'params' => [
 								'id_group' => false,
-							),
-						),
-					),
-				),
-			),
-			'additional_rows' => array(
-				array(
+							],
+						],
+					],
+				],
+			],
+			'additional_rows' => [
+				[
 					'position' => 'below_table_data',
 					'class' => 'submitbutton',
 					'value' => '<a class="linkbutton" href="' . getUrl('admin', ['action' => 'admin', 'area' => 'membergroups', 'sa' => 'add', 'postgroup']) . '">' . $txt['membergroups_add_group'] . '</a>',
-				),
-			),
-		);
+				],
+			],
+		];
 
 		createList($listOptions);
 	}
@@ -361,7 +361,7 @@ class ManageMembergroups extends AbstractController
 	 * @event integrate_add_membergroup passed $id_group and $postCountBasedGroup
 	 * @uses the new_group sub template of ManageMembergroups.
 	 */
-	public function action_add()
+	public function action_add(): void
 	{
 		global $context, $txt, $modSettings;
 
@@ -385,7 +385,7 @@ class ManageMembergroups extends AbstractController
 
 			$id_group = createMembergroup($this->_req->post->group_name, $minposts, $group_type);
 
-			call_integration_hook('integrate_add_membergroup', array($id_group, $postCountBasedGroup));
+			call_integration_hook('integrate_add_membergroup', [$id_group, $postCountBasedGroup]);
 
 			// Update the post groups now, if this is a post group!
 			if (isset($this->_req->post->min_posts))
@@ -440,17 +440,17 @@ class ManageMembergroups extends AbstractController
 			}
 
 			// Make sure all boards selected are stored in a proper array.
-			$changed_boards = array();
-			$accesses = empty($this->_req->post->boardaccess) || !is_array($this->_req->post->boardaccess) ? array() : $this->_req->post->boardaccess;
-			$changed_boards['allow'] = array();
-			$changed_boards['deny'] = array();
-			$changed_boards['ignore'] = array();
+			$changed_boards = [];
+			$accesses = empty($this->_req->post->boardaccess) || !is_array($this->_req->post->boardaccess) ? [] : $this->_req->post->boardaccess;
+			$changed_boards['allow'] = [];
+			$changed_boards['deny'] = [];
+			$changed_boards['ignore'] = [];
 			foreach ($accesses as $group_id => $action)
 			{
 				$changed_boards[$action][] = (int) $group_id;
 			}
 
-			foreach (array('allow', 'deny') as $board_action)
+			foreach (['allow', 'deny'] as $board_action)
 			{
 				// Only do this if they have special access requirements.
 				if (!isset($changed_boards[$board_action]))
@@ -469,16 +469,16 @@ class ManageMembergroups extends AbstractController
 			// If this is joinable then set it to show group membership in people's profiles.
 			if (empty($modSettings['show_group_membership']) && $group_type > 1)
 			{
-				updateSettings(array('show_group_membership' => 1));
+				updateSettings(['show_group_membership' => 1]);
 			}
 
 			// Rebuild the group cache.
-			updateSettings(array(
+			updateSettings([
 				'settings_updated' => time(),
-			));
+			]);
 
 			// We did it.
-			logAction('add_group', array('group' => $this->_req->post->group_name), 'admin');
+			logAction('add_group', ['group' => $this->_req->post->group_name], 'admin');
 
 			// Go change some more settings.
 			redirectexit('action=admin;area=membergroups;sa=edit;group=' . $id_group);
@@ -496,7 +496,7 @@ class ManageMembergroups extends AbstractController
 			Txt::load('ManagePermissions');
 		}
 
-		$context['groups'] = getBasicMembergroupData(array('globalmod'), array(), 'min_posts, id_group != {int:global_mod_group}, group_name');
+		$context['groups'] = getBasicMembergroupData(['globalmod'], [], 'min_posts, id_group != {int:global_mod_group}, group_name');
 
 		require_once(SUBSDIR . '/Boards.subs.php');
 		$context += getBoardList();
@@ -521,7 +521,7 @@ class ManageMembergroups extends AbstractController
 	 *
 	 * @todo look at this
 	 */
-	public function action_delete()
+	public function action_delete(): void
 	{
 		checkSession('get');
 
@@ -547,12 +547,12 @@ class ManageMembergroups extends AbstractController
 	 * @event integrate_view_membergroup
 	 * @uses the edit_group sub template of ManageMembergroups.
 	 */
-	public function action_edit()
+	public function action_edit(): void
 	{
 		global $context, $txt, $modSettings;
 
 		$current_group_id = $this->_req->getQuery('group', 'intval', 0);
-		$current_group = array();
+		$current_group = [];
 
 		if (!empty($modSettings['deny_boards_access']))
 		{
@@ -602,14 +602,14 @@ class ManageMembergroups extends AbstractController
 			}
 
 			// Empty values will be replaced by validator values where they exist
-			$empty_post = array('max_messages' => null, 'min_posts' => null, 'group_type' => null, 'group_desc' => '',
+			$empty_post = ['max_messages' => null, 'min_posts' => null, 'group_type' => null, 'group_desc' => '',
 				'group_name' => '', 'group_hidden' => null, 'group_inherit' => null, 'icon_count' => null,
-				'icon_image' => '', 'online_color' => '', 'boardaccess' => null);
+				'icon_image' => '', 'online_color' => '', 'boardaccess' => null];
 
 			$validator = new DataValidator();
 
 			// Cleanup the inputs! :D
-			$validator->sanitation_rules(array(
+			$validator->sanitation_rules([
 				'max_messages' => 'intval',
 				'min_posts' => 'intval|abs',
 				'group_type' => 'intval',
@@ -620,20 +620,20 @@ class ManageMembergroups extends AbstractController
 				'icon_count' => 'intval',
 				'icon_image' => 'trim|\\ElkArte\\Helper\\Util::htmlspecialchars',
 				'online_color' => 'trim|valid_color',
-			));
-			$validator->input_processing(array(
+			]);
+			$validator->input_processing([
 				'boardaccess' => 'array',
-			));
-			$validator->validation_rules(array(
+			]);
+			$validator->validation_rules([
 				'boardaccess' => 'contains[allow,ignore,deny]',
-			));
+			]);
 			$validator->validate($this->_req->post);
 
 			// Insert the clean data
 			$our_post = array_replace((array) $this->_req->post, $empty_post, $validator->validation_data());
 
 			// Can they really inherit from this group?
-			$inherit_type = array();
+			$inherit_type = [];
 			if ($our_post['group_inherit'] != -2 && !allowedTo('admin_forum'))
 			{
 				$inherit_type = membergroupById($our_post['group_inherit']);
@@ -645,7 +645,7 @@ class ManageMembergroups extends AbstractController
 			//@todo Don't set online_color for the Moderators group?
 
 			// Do the update of the membergroup settings.
-			$properties = array(
+			$properties = [
 				'max_messages' => $our_post['max_messages'],
 				'min_posts' => $min_posts,
 				'group_type' => $our_post['group_type'] < 0 || $our_post['group_type'] > 3 || ($our_post['group_type'] == 1 && !allowedTo('admin_forum')) ? 0 : $our_post['group_type'],
@@ -657,18 +657,18 @@ class ManageMembergroups extends AbstractController
 				'icons' => $our_post['icon_count'] <= 0 ? '' : min($our_post['icon_count'], 10) . '#' . $our_post['icon_image'],
 				// /me wonders why admin is *so* special
 				'description' => $current_group['id_group'] == 1 || $our_post['group_type'] != -1 ? $our_post['group_desc'] : '',
-			);
+			];
 			updateMembergroupProperties($properties);
 
-			call_integration_hook('integrate_save_membergroup', array($current_group['id_group']));
+			call_integration_hook('integrate_save_membergroup', [$current_group['id_group']]);
 
 			// Time to update the boards this membergroup has access to.
 			if ($current_group['id_group'] == 2 || $current_group['id_group'] > 3)
 			{
-				$changed_boards = array();
-				$changed_boards['allow'] = array();
-				$changed_boards['deny'] = array();
-				$changed_boards['ignore'] = array();
+				$changed_boards = [];
+				$changed_boards['allow'] = [];
+				$changed_boards['deny'] = [];
+				$changed_boards['ignore'] = [];
 
 				if ($our_post['boardaccess'])
 				{
@@ -678,7 +678,7 @@ class ManageMembergroups extends AbstractController
 					}
 				}
 
-				foreach (array('allow', 'deny') as $board_action)
+				foreach (['allow', 'deny'] as $board_action)
 				{
 					// Find all board this group is in, but shouldn't be in.
 					detachGroupFromBoards($current_group['id_group'], $changed_boards, $board_action);
@@ -731,7 +731,7 @@ class ManageMembergroups extends AbstractController
 				// Get all the usernames from the string
 				if (!empty($moderator_string))
 				{
-					$moderator_string = strtr(preg_replace('~&amp;#(\d{4,5}|[2-9]\d{2,4}|1[2-9]\d);~', '&#$1;', htmlspecialchars($moderator_string, ENT_QUOTES, 'UTF-8')), array('&quot;' => '"'));
+					$moderator_string = strtr(preg_replace('~&amp;#(\d{4,5}|[2-9]\d{2,4}|1[2-9]\d);~', '&#$1;', htmlspecialchars($moderator_string, ENT_QUOTES, 'UTF-8')), ['&quot;' => '"']);
 					preg_match_all('~"([^"]+)"~', $moderator_string, $matches);
 					$moderators = array_merge($matches[1], explode(',', preg_replace('~"[^"]+"~', '', $moderator_string)));
 					$moderators = array_filter(array_map('trim', $moderators));
@@ -744,13 +744,13 @@ class ManageMembergroups extends AbstractController
 				}
 				else
 				{
-					$moderators = array();
+					$moderators = [];
 					foreach ($this->_req->post->moderator_list as $moderator)
 					{
 						$moderators[] = (int) $moderator;
 					}
 
-					$group_moderators = array();
+					$group_moderators = [];
 					if (!empty($moderators))
 					{
 						require_once(SUBSDIR . '/Members.subs.php');
@@ -774,12 +774,12 @@ class ManageMembergroups extends AbstractController
 			updatePostGroupStats();
 
 			// We've definitely changed some group stuff.
-			updateSettings(array(
+			updateSettings([
 				'settings_updated' => time(),
-			));
+			]);
 
 			// Log the edit.
-			logAction('edited_group', array('group' => $our_post['group_name']), 'admin');
+			logAction('edited_group', ['group' => $our_post['group_name']], 'admin');
 
 			redirectexit('action=admin;area=membergroups');
 		}
@@ -794,7 +794,7 @@ class ManageMembergroups extends AbstractController
 
 		$row['icons'] = explode('#', $row['icons']);
 
-		$context['group'] = array(
+		$context['group'] = [
 			'id' => $row['id_group'],
 			'name' => $row['group_name'],
 			'description' => htmlspecialchars($row['description'], ENT_COMPAT, 'UTF-8'),
@@ -811,7 +811,7 @@ class ManageMembergroups extends AbstractController
 			'allow_post_group' => $row['id_group'] === 2 || $row['id_group'] > 4,
 			'allow_delete' => $row['id_group'] === 2 || $row['id_group'] > 4,
 			'allow_protected' => allowedTo('admin_forum'),
-		);
+		];
 
 		// Get any moderators for this group
 		$context['group']['moderators'] = getGroupModerators($row['id_group']);
@@ -823,11 +823,11 @@ class ManageMembergroups extends AbstractController
 		}
 
 		// Get a list of boards this membergroup is allowed to see.
-		$context['boards'] = array();
+		$context['boards'] = [];
 		if ($row['id_group'] === 2 || $row['id_group'] > 3)
 		{
 			require_once(SUBSDIR . '/Boards.subs.php');
-			$context += getBoardList(array('override_permissions' => true, 'access' => $row['id_group'], 'not_redirection' => true));
+			$context += getBoardList(['override_permissions' => true, 'access' => $row['id_group'], 'not_redirection' => true]);
 
 			// Include a list of boards per category for easy toggling.
 			foreach ($context['categories'] as $category)
@@ -847,7 +847,7 @@ class ManageMembergroups extends AbstractController
 		// Use the autosuggest script when needed
 		if ($context['group']['id'] != 3 && $context['group']['id'] != 4)
 		{
-			loadJavascriptFile('suggest.js', array('defer' => true));
+			loadJavascriptFile('suggest.js', ['defer' => true]);
 		}
 
 		createToken('admin-mmg');
@@ -865,7 +865,7 @@ class ManageMembergroups extends AbstractController
 	 * @event integrate_save_membergroup_settings
 	 * @uses membergroup_settings sub template of ManageMembergroups.
 	 */
-	public function action_groupSettings_display()
+	public function action_groupSettings_display(): void
 	{
 		global $context, $txt;
 
@@ -902,12 +902,12 @@ class ManageMembergroups extends AbstractController
 	private function _settings()
 	{
 		// Only one thing here!
-		$config_vars = array(
-			array('permissions', 'manage_membergroups'),
-		);
+		$config_vars = [
+			['permissions', 'manage_membergroups'],
+		];
 
 		// Add new settings with a nice hook, makes them available for admin settings search as well
-		call_integration_hook('integrate_modify_membergroup_settings', array(&$config_vars));
+		call_integration_hook('integrate_modify_membergroup_settings', [&$config_vars]);
 
 		return $config_vars;
 	}

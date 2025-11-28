@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This file is here solely to protect your addons directory.
+ * This file is here solely to protect your Addons directory.
  */
 
 // Look for Settings.php....
@@ -13,4 +13,6 @@ if (file_exists(dirname(__FILE__, 2) . '/Settings.php'))
 }
 // Can't find it... just forget it.
 else
-	exit;
+{
+	exit(0);
+}

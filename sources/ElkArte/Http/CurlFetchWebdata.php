@@ -49,11 +49,11 @@ class CurlFetchWebdata
 		CURLOPT_FOLLOWLOCATION => false, // Don't follow, we will do it ourselves so safe mode and open_basedir will dig it
 		CURLOPT_USERAGENT => 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML like Gecko) Chrome/51.0.2704.79 Safari/537.36 Edge/14.14931', // set a normal looking user agent
 		CURLOPT_CONNECTTIMEOUT => 10, // Don't wait forever on a connection
-		CURLOPT_TIMEOUT => 10, // A page should load in this amount of time
+		CURLOPT_TIMEOUT => 20, // A page should load in this amount of time
 		CURLOPT_MAXREDIRS => 3, // stop after this many redirects
 		CURLOPT_ENCODING => 'gzip,deflate', // accept gzip and decode it
-		CURLOPT_SSL_VERIFYPEER => false, // stop cURL from verifying the peer's certificate
-		CURLOPT_SSL_VERIFYHOST => 0, // stop cURL from verifying the peer's host
+		CURLOPT_SSL_VERIFYPEER => true, // Allow cURL to verify the peer's certificate
+		CURLOPT_SSL_VERIFYHOST => 2, // Allow cURL to verify the peer's host
 		CURLOPT_POST => false, // no post data unless its passed
 		CURLOPT_HTTPHEADER => ['Accept-Encoding: gzip,compress,identity'], // no special headers unless supplied
 	];
@@ -109,7 +109,7 @@ class CurlFetchWebdata
 	 *
 	 * @return CurlFetchWebdata
 	 */
-	public function get_url_data($url, $post_data = [])
+	public function get_url_data($url, $post_data = []): CurlFetchWebdata
 	{
 		// POSTing some data perhaps?
 		if (!empty($post_data) && is_array($post_data))
@@ -169,7 +169,7 @@ class CurlFetchWebdata
 	 *
 	 * @uses _headerCallback()
 	 */
-	private function _setOptions()
+	private function _setOptions(): void
 	{
 		// Callback to parse the returned headers, if any
 		$this->default_options[CURLOPT_HEADERFUNCTION] = fn($cr, $header) => $this->_headerCallback($cr, $header);
@@ -199,14 +199,14 @@ class CurlFetchWebdata
 	 *
 	 * What it does:
 	 *
-	 * - lowercase everything to make it consistent
+	 * - Lowercase everything to make it consistent
 	 *
 	 * @param object $cr Not used but passed by the cURL agent
 	 * @param string $header The headers received
 	 *
 	 * @return int
 	 */
-	private function _headerCallback($cr, $header)
+	private function _headerCallback($cr, $header): int
 	{
 		$_header = trim($header);
 		$temp = explode(': ', $_header, 2);
@@ -233,12 +233,19 @@ class CurlFetchWebdata
 	 *
 	 * @return bool
 	 */
-	private function _curlRequest($url, $redirect = false)
+	private function _curlRequest($url, $redirect = false): bool
 	{
 		// We do have a url I hope
 		if (trim($url) === '')
 		{
 			return false;
+		}
+
+		// Not a secure site?
+		if (parse_url($url,PHP_URL_SCHEME ) === 'http')
+		{
+			$this->_options[CURLOPT_SSL_VERIFYPEER] = false; // stop cURL from verifying the peer's certificate
+			$this->_options[CURLOPT_SSL_VERIFYHOST] = 0; // stop cURL from verifying the peer's host
 		}
 
 		$this->_options[CURLOPT_URL] = $url;
@@ -253,35 +260,34 @@ class CurlFetchWebdata
 		// Initialize the curl object and make the call
 		$cr = curl_init();
 		curl_setopt_array($cr, $this->_options);
-		curl_exec($cr);
-
-		// Get what was returned
+		$result = curl_exec($cr);
 		$curl_info = curl_getinfo($cr);
-		$curl_content = curl_multi_getcontent($cr);
-		$url = $curl_info['url']; // Last effective URL
-		$http_code = $curl_info['http_code']; // Last HTTP code
-		$body = (curl_error($cr) === '') ? substr($curl_content, $curl_info['header_size']) : false;
-		$error = (curl_error($cr) !== '') ? curl_error($cr) : false;
+		$error = ($result === false) ? curl_error($cr) : false;
+		$body = $error ? false : substr($result, $curl_info['header_size']);
 
 		// Close this request
 		curl_close($cr);
 
 		// Store this 'loops' data, someone may want all of these :O
 		$this->_response[] = [
-			'url' => $url,
-			'code' => $http_code,
+			'url' => $curl_info['url'],
+			'code' =>  $curl_info['http_code'],
 			'error' => $error,
-			'size' => empty($curl_info['download_content_length']) ? 0 : $curl_info['download_content_length'],
-			'headers' => empty($this->_headers) ? false : $this->_headers,
+			'size' => $curl_info['download_content_length'] ?: 0,
+			'headers' => $this->_headers ?: false,
 			'body' => $body,
 		];
 
 		// If this a redirect with a location header and we have not given up, then we play it again Sam
-		if (!empty($this->_headers['location']) && $this->_current_redirect <= $this->_max_redirect && preg_match('~30[127]~', $http_code) === 1)
+		if (!empty($this->_headers['location'])
+			&& $this->_current_redirect <= $this->_max_redirect
+			&& preg_match('~30[127]~', $curl_info['http_code']) === 1)
 		{
 			$this->_current_redirect++;
-			$header_location = $this->_getRedirectURL($url, $this->_headers['location']);
-			$this->_redirect($header_location, $url);
+			$this->_redirect(
+				$this->_getRedirectURL($curl_info['url'], $this->_headers['location']),
+				$curl_info['url']
+			);
 		}
 
 		return true;
@@ -297,7 +303,7 @@ class CurlFetchWebdata
 	 *
 	 * @return string
 	 */
-	private function _getRedirectURL($last_url = '', $new_url = '')
+	private function _getRedirectURL($last_url = '', $new_url = ''): string
 	{
 		// Get the elements for these urls
 		$last_url_parse = parse_url($last_url);
@@ -322,7 +328,7 @@ class CurlFetchWebdata
 	 * @param string $target_url The URL of the target
 	 * @param string $referer_url The URL of the link that referred us to the new target
 	 */
-	private function _redirect($target_url, $referer_url)
+	private function _redirect($target_url, $referer_url): void
 	{
 		// No I last saw that over there ... really, 301, 302, 307
 		$this->_setOptions();
@@ -342,7 +348,7 @@ class CurlFetchWebdata
 	 *
 	 * @return string
 	 */
-	public function result($area = '')
+	public function result($area = ''): string
 	{
 		$max_result = count($this->_response) - 1;
 

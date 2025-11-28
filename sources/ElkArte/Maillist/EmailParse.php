@@ -149,7 +149,7 @@ class EmailParse
 	 * @param string $data - full header+message string
 	 * @param string $location - optional, used for debug
 	 */
-	public function read_email($html = false, $data = '', $location = '')
+	public function read_email($html = false, $data = '', $location = ''): void
 	{
 		// Main, will read, split, parse, decode an email
 		$this->read_data($data, $location);
@@ -171,7 +171,7 @@ class EmailParse
 	 * @param string $data optional, if supplied must be a full headers+body email string
 	 * @param string $location optional, used for debug
 	 */
-	public function read_data($data = '', $location = '')
+	public function read_data($data = '', $location = ''): void
 	{
 		// Supplied a string of data, simply use it
 		if ($data !== null)
@@ -195,7 +195,7 @@ class EmailParse
 	 *
 	 * @return string
 	 */
-	public function getPlainBody()
+	public function getPlainBody(): string
 	{
 		if (!empty($this->plain_parts))
 		{
@@ -212,7 +212,7 @@ class EmailParse
 	 *
 	 * @param string $location
 	 */
-	private function _readFailed($location)
+	private function _readFailed($location): void
 	{
 		// Called from the ACP, you must have approve permissions
 		if (isset($_POST['item']))
@@ -237,7 +237,7 @@ class EmailParse
 	 *
 	 * @return string
 	 */
-	private function _query_load_email($id)
+	private function _query_load_email($id): string
 	{
 		$db = database();
 
@@ -270,7 +270,7 @@ class EmailParse
 	 *  - 1 the first empty line or
 	 *  - 2 a line that does not start with a tab, a field name followed by a colon or a space
 	 */
-	private function _split_headers()
+	private function _split_headers(): void
 	{
 		$this->_header_block = '';
 		$match = [];
@@ -298,7 +298,7 @@ class EmailParse
 	 * Takes the header block created with _split_headers and separates it
 	 * in to header keys => value pairs
 	 */
-	private function _parse_headers()
+	private function _parse_headers(): void
 	{
 		// Remove windows style \r\n's
 		$this->_header_block = str_replace("\r\n", "\n", $this->_header_block);
@@ -355,7 +355,7 @@ class EmailParse
 	 * @param bool $strict
 	 * @return string
 	 */
-	private function _decode_header($val, $strict = false)
+	private function _decode_header($val, $strict = false): string
 	{
 		// Check if this header even needs to be decoded.
 		if (strpos($val, '=?') === false || strpos($val, '?=') === false)
@@ -446,7 +446,7 @@ class EmailParse
 	 *
 	 * @return string
 	 */
-	private function _decode_string($string, $encoding, $charset = '')
+	private function _decode_string($string, $encoding, $charset = ''): string
 	{
 		// Decode if its quoted printable or base64 encoded
 		if ($encoding === 'quoted-printable')
@@ -481,7 +481,7 @@ class EmailParse
 	 *
 	 * @return string
 	 */
-	private function _charset_convert($string, $from, $to)
+	private function _charset_convert($string, $from, $to): string
 	{
 		// Lets assume we have one of the functions available to us
 		$this->_converted_utf8 = true;
@@ -532,7 +532,7 @@ class EmailParse
 	 * - Parses or sets defaults for the following:
 	 * content-type, content-disposition, content-transfer-encoding
 	 */
-	private function _parse_content_headers()
+	private function _parse_content_headers(): void
 	{
 		// What kind of message content do we have
 		if (isset($this->headers['content-type']))
@@ -585,7 +585,7 @@ class EmailParse
 	 * @param string $value
 	 * @param string $key
 	 */
-	private function _parse_content_header_parameters($value, $key)
+	private function _parse_content_header_parameters($value, $key): void
 	{
 		$matches = [];
 
@@ -620,7 +620,7 @@ class EmailParse
 	 *
 	 * @param bool $html
 	 */
-	private function _parse_body($html = false)
+	private function _parse_body($html = false): void
 	{
 		// Based on the content type for this body, determine what to do
 		switch ($this->headers['content-type'])
@@ -820,7 +820,7 @@ class EmailParse
 	 * @param string $boundary
 	 * @param bool $html - flag to indicate html content
 	 */
-	private function _boundary_split($boundary, $html)
+	private function _boundary_split($boundary, $html): void
 	{
 		// Split this message up on its boundary sections
 		$parts = explode('--' . $boundary, $this->body);
@@ -867,7 +867,7 @@ class EmailParse
 	 *
 	 * @param int $i The section being worked
 	 */
-	private function _process_DSN($i)
+	private function _process_DSN($i): void
 	{
 		// These sections often have extra blank lines, so cannot be counted on to be
 		// fully accessible in ->headers. The "body" of this section contains values
@@ -913,7 +913,7 @@ class EmailParse
 	 *
 	 * @param int $i The section being worked
 	 */
-	private function _process_attachments($i)
+	private function _process_attachments($i): void
 	{
 		if ($this->_boundary_section[$i]->headers['content-disposition'] === 'attachment'
 			|| $this->_boundary_section[$i]->headers['content-disposition'] === 'inline'
@@ -961,7 +961,7 @@ class EmailParse
 	 * @param string $val
 	 * @return string
 	 */
-	private function _decode_body($val)
+	private function _decode_body($val): string
 	{
 		if (empty($val))
 		{
@@ -1008,7 +1008,7 @@ class EmailParse
 	 *
 	 * @return string or null
 	 */
-	public function load_subject()
+	public function load_subject(): string
 	{
 		// Account for those no-subject emails
 		if (!isset($this->headers['subject']))
@@ -1035,7 +1035,7 @@ class EmailParse
 	 *
 	 * @return bool|null
 	 */
-	private function _check_dsn()
+	private function _check_dsn(): ?bool
 	{
 		// If we already know it's a DSN, bug out
 		if ($this->_is_dsn)
@@ -1054,9 +1054,9 @@ class EmailParse
 	 * - Checks the headers of a DSN for the various ways that the intended recipient
 	 *   Might have been included in the DSN headers
 	 *
-	 * @return string or null
+	 * @return string|null
 	 */
-	public function get_failed_dest()
+	public function get_failed_dest(): ?string
 	{
 		/** Body->Final-recipient Header **/
 		return $this->_dsn['body']['original-recipient']['value'] ?? $this->_dsn['body']['final-recipient']['value'] ?? null;
@@ -1067,7 +1067,7 @@ class EmailParse
 	 *
 	 * @return string or null
 	 */
-	public function load_returnpath()
+	public function load_returnpath(): string
 	{
 		$matches = [];
 
@@ -1123,7 +1123,7 @@ class EmailParse
 	 *
 	 * @return bool is the security key is found or not
 	 */
-	private function _load_key_from_headers($regex_key)
+	private function _load_key_from_headers($regex_key): bool
 	{
 		$found_key = false;
 
@@ -1162,7 +1162,7 @@ class EmailParse
 	 *
 	 * @param string[] $match from regex 1=>full, 2=>key, 3=>p|t|m, 4=>12345
 	 */
-	private function _load_key_details($match)
+	private function _load_key_details($match): void
 	{
 		if (!empty($match[1]))
 		{
@@ -1180,7 +1180,7 @@ class EmailParse
 	 * - Not found in the headers, so lets search the body for the [key]
 	 * as we insert that on outbound email just for this
 	 */
-	private function _load_key_from_body()
+	private function _load_key_from_body(): bool
 	{
 		$regex_key = '~\[(([a-z0-9]{32})\-(p|t|m)(\d+))\]~i';
 		$found_key = false;
@@ -1211,7 +1211,7 @@ class EmailParse
 	 *
 	 * @return array of addresses
 	 */
-	public function load_address()
+	public function load_address(): array
 	{
 		$this->email['to'] = [];
 		$this->email['from'] = [];
@@ -1257,7 +1257,7 @@ class EmailParse
 	 *
 	 * @param string $val
 	 */
-	private function _parse_address($val)
+	private function _parse_address($val): void
 	{
 		$this->_email_name = '';
 
@@ -1343,7 +1343,7 @@ class EmailParse
 	 * @param string|null $string
 	 * @return string
 	 */
-	private function _parse_ip($string)
+	private function _parse_ip($string): string
 	{
 		if (preg_match('~\[?(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})\]?~', $string, $matches) !== 1)
 		{
@@ -1368,7 +1368,7 @@ class EmailParse
 	 *
 	 * @return bool on fail
 	 */
-	public function load_spam()
+	public function load_spam(): bool
 	{
 		// SpamAssassin (and others like rspamd)
 		if (isset($this->headers['x-spam-flag']) && strtolower(substr($this->headers['x-spam-flag'], 0, 3)) === 'yes')

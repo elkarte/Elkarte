@@ -27,6 +27,7 @@ use ElkArte\Languages\Loader;
 use ElkArte\Themes\ThemeLoader;
 use ElkArte\User;
 use ElkArte\UserInfo;
+use JetBrains\PhpStorm\NoReturn;
 
 /**
  * Class to handle all forum errors and exceptions
@@ -67,7 +68,7 @@ class Errors extends AbstractModel
 	 *
 	 * @return Errors
 	 */
-	public static function instance()
+	public static function instance(): Errors
 	{
 		if (self::$_errors === null)
 		{
@@ -83,7 +84,7 @@ class Errors extends AbstractModel
 	 * @param string|int $errorType The error type to be added
 	 * @return void
 	 */
-	public function addErrorTypes($errorType)
+	public function addErrorTypes($errorType): void
 	{
 		$this->errorTypes[] = $errorType;
 	}
@@ -104,7 +105,7 @@ class Errors extends AbstractModel
 	 *
 	 * @return string
 	 */
-	public function log_lang_error($error, $error_type = 'general', $sprintf = [], $file = '', $line = 0)
+	public function log_lang_error($error, $error_type = 'general', $sprintf = [], $file = '', $line = 0): string
 	{
 		global $language;
 
@@ -158,7 +159,7 @@ class Errors extends AbstractModel
 	 *
 	 * @return string
 	 */
-	public function log_error($error_message, $error_type = 'general', $file = '', $line = 00)
+	public function log_error($error_message, $error_type = 'general', $file = '', $line = 00): string
 	{
 		// Check if error logging is actually on.
 		if (empty($this->_modSettings['enableErrorLogging']))
@@ -194,7 +195,7 @@ class Errors extends AbstractModel
 	 *
 	 * @return string The parsed query string
 	 */
-	private function parseQueryString()
+	private function parseQueryString(): string
 	{
 		global $scripturl;
 
@@ -215,7 +216,7 @@ class Errors extends AbstractModel
 		}
 
 		// Don't log the session hash in the url twice, it's a waste.
-		$query_string = htmlspecialchars((ELK === 'SSI' ? '' : '?') . preg_replace(array('~;sesc=[^&;]+~', '~' . session_name() . '=' . session_id() . '[&;]~'), array(';sesc', ''), $query_string), ENT_COMPAT, 'UTF-8');
+		$query_string = htmlspecialchars((ELK === 'SSI' ? '' : '?') . preg_replace(['~;sesc=[^&;]+~', '~' . session_name() . '=' . session_id() . '[&;]~'], [';sesc', ''], $query_string), ENT_COMPAT, 'UTF-8');
 
 		// Just so we know what board error messages are from.
 		if (isset($_POST['board']) && !isset($_GET['board']))
@@ -229,7 +230,7 @@ class Errors extends AbstractModel
 	/**
 	 * @return string[]
 	 */
-	protected function getErrorTypes()
+	protected function getErrorTypes(): array
 	{
 		static $tried_hook = false;
 
@@ -239,7 +240,7 @@ class Errors extends AbstractModel
 		{
 			// This prevents us from infinite looping if the hook or call produces an error.
 			$tried_hook = true;
-			call_integration_hook('integrate_error_types', array(&$errorTypes));
+			call_integration_hook('integrate_error_types', [&$errorTypes]);
 			$this->errorTypes += $errorTypes;
 		}
 
@@ -255,7 +256,7 @@ class Errors extends AbstractModel
 	 * @param string $file
 	 * @param int $line
 	 */
-	private function insertLog($query_string, $error_message, $error_type, $file, $line)
+	private function insertLog($query_string, $error_message, $error_type, $file, $line): void
 	{
 		global $last_error;
 
@@ -266,16 +267,16 @@ class Errors extends AbstractModel
 		$user_ip = $this->user->ip ?? '';
 
 		// Don't log the same error countless times, as we can get in a cycle of depression...
-		$error_info = array($user_id, time(), $user_ip, $query_string, $error_message, isset($_SESSION['session_value']) ? (string) $_SESSION['session_value'] : 'no_session_data', $error_type, $file, $line);
+		$error_info = [$user_id, time(), $user_ip, $query_string, $error_message, isset($_SESSION['session_value']) ? (string) $_SESSION['session_value'] : 'no_session_data', $error_type, $file, $line];
 		if (empty($last_error) || $last_error != $error_info)
 		{
 			// Insert the error into the database.
 			$this->_db->insert(
 				'',
 				'{db_prefix}log_errors',
-				array('id_member' => 'int', 'log_time' => 'int', 'ip' => 'string-16', 'url' => 'string-65534', 'message' => 'string-65534', 'session' => 'string', 'error_type' => 'string', 'file' => 'string-255', 'line' => 'int'),
+				['id_member' => 'int', 'log_time' => 'int', 'ip' => 'string-16', 'url' => 'string-65534', 'message' => 'string-65534', 'session' => 'string', 'error_type' => 'string', 'file' => 'string-255', 'line' => 'int'],
 				$error_info,
-				array('id_error')
+				['id_error']
 			);
 			$last_error = $error_info;
 		}
@@ -294,7 +295,7 @@ class Errors extends AbstractModel
 	 *
 	 * @throws Exception
 	 */
-	public function fatal_error($error = '', $log = 'general')
+	public function fatal_error($error = '', $log = 'general'): void
 	{
 		throw new Exception($error, $log);
 	}
@@ -316,7 +317,7 @@ class Errors extends AbstractModel
 	 *
 	 * @throws Exception
 	 */
-	public function fatal_lang_error($error, $log = 'general', $sprintf = array())
+	public function fatal_lang_error($error, $log = 'general', $sprintf = []): void
 	{
 		throw new Exception($error, $log, $sprintf);
 	}
@@ -330,7 +331,7 @@ class Errors extends AbstractModel
 	 * - It is used only if $maintenance = 2 in Settings.php.
 	 * - It stops further execution of the script.
 	 */
-	public function display_maintenance_message()
+	public function display_maintenance_message(): void
 	{
 		global $maintenance, $mtitle, $mmessage;
 
@@ -359,7 +360,7 @@ class Errors extends AbstractModel
 	 *
 	 * - Used by display_db_error(), display_loadavg_error(), display_maintenance_message()
 	 */
-	private function _set_fatal_error_headers()
+	private function _set_fatal_error_headers(): void
 	{
 		// Don't cache this page!
 		Headers::instance()
@@ -368,7 +369,6 @@ class Errors extends AbstractModel
 			->header('Last-Modified', gmdate('D, d M Y H:i:s') . ' GMT')
 			->header('Cache-Control', 'no-cache')
 			->contentType('text/html', 'UTF-8')
-			->headerSpecial('HTTP/1.1 503 Service Temporarily Unavailable')
 			->header('Status', '503 Service Temporarily Unavailable')
 			->header('Retry-After', '3600')
 			->sendHeaders();
@@ -379,7 +379,7 @@ class Errors extends AbstractModel
 	 *
 	 * @param string|int $error
 	 */
-	protected function terminate($error = '')
+	protected function terminate($error = ''): never
 	{
 		die(htmlspecialchars($error));
 	}
@@ -393,7 +393,7 @@ class Errors extends AbstractModel
 	 * - It is used only if $maintenance = 2 in Settings.php.
 	 * - It stops further execution of the script.
 	 */
-	public function display_minimal_error($message)
+	public function display_minimal_error($message): void
 	{
 		$this->_set_fatal_error_headers();
 
@@ -421,7 +421,7 @@ class Errors extends AbstractModel
 	 * - It is used only if there's no way to connect to the database.
 	 * - It stops further execution of the script.
 	 */
-	public function display_db_error($additional_msg = '')
+	public function display_db_error($additional_msg = ''): void
 	{
 		global $mbname, $maintenance, $webmaster_email, $db_error_send;
 
@@ -485,7 +485,7 @@ class Errors extends AbstractModel
 	 * - It is used only if the load averages are too high to continue execution.
 	 * - It stops further execution of the script.
 	 */
-	public function display_loadavg_error()
+	public function display_loadavg_error(): void
 	{
 		// If this is a load average problem, display an appropriate message (but we still don't have language files!)
 		$this->_set_fatal_error_headers();
@@ -517,13 +517,12 @@ class Errors extends AbstractModel
 	 * @param bool $log if to log the error to the system (user) log
 	 * @param string $message Optional message to show
 	 */
-	public function display_403_error($log = true, $message = '')
+	public function display_403_error($log = true, $message = ''): void
 	{
 		global $language;
 
 		Headers::instance()
 			->httpCode(403)
-			->headerSpecial('HTTP/1.1 403 Forbidden')
 			->sendHeaders();
 
 		if (!empty($message))
@@ -562,7 +561,7 @@ class Errors extends AbstractModel
 	 * @param $function
 	 * @param $replacement
 	 */
-	public function log_deprecated($function, $replacement)
+	public function log_deprecated($function, $replacement): void
 	{
 		$debug = '<br><br>';
 		foreach (debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 2)[1] as $var => $val)
@@ -587,11 +586,10 @@ class Errors extends AbstractModel
 	 * @param string $error_message
 	 * @param string $error_code string or int code
 	 *
-	 * @return bool
+	 * @return bool|null
 	 * @uses Errors template, fatal_error sub template
-	 *
 	 */
-	final protected function _setup_fatal_ErrorContext($error_message, $error_code)
+	final protected function _setup_fatal_ErrorContext($error_message, $error_code): ?bool
 	{
 		global $context, $txt, $ssi_on_error_method;
 		static $level = 0;
@@ -609,7 +607,7 @@ class Errors extends AbstractModel
 			global $modSettings;
 
 			// Who knew dying took this much effort
-			$context['breadcrumbs'] = $context['breadcrumbs'] ?? array();
+			$context['breadcrumbs'] = $context['breadcrumbs'] ?? [];
 			User::load(true);
 
 			$_SESSION['session_var'] = $_SESSION['session_var'] ?? '';

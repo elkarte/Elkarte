@@ -83,7 +83,7 @@ class VerificationControls
 	public static function discoverControls(&$config_vars = null)
 	{
 		$known_verifications = self::loadFSControls();
-		$working_verifications = array();
+		$working_verifications = [];
 
 		foreach ($known_verifications as $verification)
 		{
@@ -124,7 +124,7 @@ class VerificationControls
 	protected static function loadFSControls()
 	{
 		$glob = new \GlobIterator(SOURCEDIR . '/ElkArte/VerificationControls/VerificationControl/*.php', \FilesystemIterator::SKIP_DOTS);
-		$foundControls = array();
+		$foundControls = [];
 
 		foreach ($glob as $file)
 		{
@@ -142,7 +142,7 @@ class VerificationControls
 
 		// Let integration add some more controls
 		// @deprecated since 2.0 dev - remove before final
-		call_integration_hook('integrate_control_verification', array(&$foundControls));
+		call_integration_hook('integrate_control_verification', [&$foundControls]);
 
 		return $foundControls;
 	}
@@ -154,7 +154,7 @@ class VerificationControls
 	 * @param int $max_errors
 	 * @return bool
 	 */
-	public function test($verification_errors, $max_errors)
+	public function test($verification_errors, $max_errors): bool
 	{
 		$increase_error_count = false;
 		$force_refresh = false;
@@ -202,7 +202,7 @@ class VerificationControls
 	 * @param bool $force_refresh If the controls should be re-initialized
 	 * @return array
 	 */
-	public function create($force_refresh = false)
+	public function create($force_refresh = false): array
 	{
 		foreach ($this->_verification_instances as $test => $instance)
 		{
@@ -226,7 +226,7 @@ class VerificationControls
 	/**
 	 * Is there any control to show?
 	 */
-	public function hasControls()
+	public function hasControls(): bool
 	{
 		return count($this->_verification_instances) !== 0;
 	}

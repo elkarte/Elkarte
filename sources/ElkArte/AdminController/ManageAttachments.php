@@ -38,28 +38,28 @@ use UnexpectedValueException;
 class ManageAttachments extends AbstractController
 {
 	/** @var int Loop counter for paused attachment maintenance actions */
-	public $step;
+	public int $step;
 
 	/** @var int substep counter for paused attachment maintenance actions */
-	public $substep;
+	public int $substep;
 
 	/** @var int Substep at the beginning of a maintenance loop */
-	public $starting_substep;
+	public int $starting_substep;
 
 	/** @var int Current directory key being processed */
-	public $current_dir;
+	public int $current_dir;
 
 	/** @var string Used during transfer of files */
-	public $from;
+	public string $from;
 
 	/** @var string Type of attachment management in use */
-	public $auto;
+	public string $auto;
 
 	/** @var string Destination when transferring attachments */
-	public $to;
+	public string $to;
 
-	/** @var \ElkArte\Helper\FileFunctions */
-	public $file_functions;
+	/** @var FileFunctions */
+	public FileFunctions $file_functions;
 
 	/**
 	 * Pre dispatch, load functions needed by all methods
@@ -99,21 +99,21 @@ class ManageAttachments extends AbstractController
 		theme()->getTemplates()->load('ManageAttachments');
 
 		// All the things we can do with attachments
-		$subActions = array(
-			'attachments' => array($this, 'action_attachSettings_display'),
-			'avatars' => array(
+		$subActions = [
+			'attachments' => [$this, 'action_attachSettings_display'],
+			'avatars' => [
 				'controller' => ManageAvatars::class,
-				'function' => 'action_index'),
-			'attachpaths' => array($this, 'action_attachpaths'),
-			'browse' => array($this, 'action_browse'),
-			'byAge' => array($this, 'action_byAge'),
-			'bySize' => array($this, 'action_bySize'),
-			'maintenance' => array($this, 'action_maintenance'),
-			'repair' => array($this, 'action_repair'),
-			'remove' => array($this, 'action_remove'),
-			'removeall' => array($this, 'action_removeall'),
-			'transfer' => array($this, 'action_transfer'),
-		);
+				'function' => 'action_index'],
+			'attachpaths' => [$this, 'action_attachpaths'],
+			'browse' => [$this, 'action_browse'],
+			'byAge' => [$this, 'action_byAge'],
+			'bySize' => [$this, 'action_bySize'],
+			'maintenance' => [$this, 'action_maintenance'],
+			'repair' => [$this, 'action_repair'],
+			'remove' => [$this, 'action_remove'],
+			'removeall' => [$this, 'action_removeall'],
+			'transfer' => [$this, 'action_transfer'],
+		];
 
 		// Get ready for some action
 		$action = new Action('manage_attachments');
@@ -145,7 +145,7 @@ class ManageAttachments extends AbstractController
 	 * @event integrate_save_attachment_settings
 	 * @uses 'attachments' sub template.
 	 */
-	public function action_attachSettings_display()
+	public function action_attachSettings_display(): void
 	{
 		global $modSettings, $context;
 
@@ -173,11 +173,11 @@ class ManageAttachments extends AbstractController
 
 			if (!empty($this->_req->post->attachmentEnable))
 			{
-				enableModules('attachments', array('post', 'display'));
+				enableModules('attachments', ['post', 'display']);
 			}
 			else
 			{
-				disableModules('attachments', array('post', 'display'));
+				disableModules('attachments', ['post', 'display']);
 			}
 
 			// Default/Manual implies no subdirectories
@@ -196,7 +196,7 @@ class ManageAttachments extends AbstractController
 					rename($modSettings['attachmentUploadDir'], $this->_req->post->attachmentUploadDir);
 				}
 
-				$modSettings['attachmentUploadDir'] = array(1 => $this->_req->post->attachmentUploadDir);
+				$modSettings['attachmentUploadDir'] = [1 => $this->_req->post->attachmentUploadDir];
 				$this->_req->post->attachmentUploadDir = serialize($modSettings['attachmentUploadDir']);
 			}
 
@@ -219,7 +219,7 @@ class ManageAttachments extends AbstractController
 				}
 				else
 				{
-					$modSettings['attachment_basedirectories'] = array();
+					$modSettings['attachment_basedirectories'] = [];
 				}
 
 				// Trying to use a nonexistent base directory
@@ -244,7 +244,7 @@ class ManageAttachments extends AbstractController
 					if (!in_array($this->_req->post->basedirectory_for_attachments, $modSettings['attachment_basedirectories']))
 					{
 						$modSettings['attachment_basedirectories'][$modSettings['currentAttachmentUploadDir']] = $this->_req->post->basedirectory_for_attachments;
-						updateSettings(array('attachment_basedirectories' => serialize($modSettings['attachment_basedirectories']), 'currentAttachmentUploadDir' => $currentAttachmentUploadDir,));
+						updateSettings(['attachment_basedirectories' => serialize($modSettings['attachment_basedirectories']), 'currentAttachmentUploadDir' => $currentAttachmentUploadDir,]);
 
 						$this->_req->post->attachmentUploadDir = serialize($modSettings['attachmentUploadDir']);
 					}
@@ -340,64 +340,64 @@ class ManageAttachments extends AbstractController
 		$post_max_size_text = sprintf($txt['zero_for_system_limit'], $post_max_size === '' || $post_max_size === '0' || $post_max_size === false ? $txt['none'] : $post_max_size, 'post_max_size');
 		$upload_max_filesize_text = sprintf($txt['zero_for_system_limit'], $upload_max_filesize === '' || $upload_max_filesize === '0' || $upload_max_filesize === false ? $txt['none'] : $upload_max_filesize, 'upload_max_filesize');
 
-		$config_vars = array(
-			array('title', 'attachment_manager_settings'),
+		$config_vars = [
+			['title', 'attachment_manager_settings'],
 			// Are attachments enabled?
-			array('select', 'attachmentEnable', array($txt['attachmentEnable_deactivate'], $txt['attachmentEnable_enable_all'], $txt['attachmentEnable_disable_new'])),
+			['select', 'attachmentEnable', [$txt['attachmentEnable_deactivate'], $txt['attachmentEnable_enable_all'], $txt['attachmentEnable_disable_new']]],
 			'',
 			// Directory and size limits.
-			array('select', 'automanage_attachments', array(0 => $txt['attachments_normal'], 1 => $txt['attachments_auto_space'], 2 => $txt['attachments_auto_years'], 3 => $txt['attachments_auto_months'], 4 => $txt['attachments_auto_16'])),
-			array('check', 'use_subdirectories_for_attachments', 'subtext' => $txt['use_subdirectories_for_attachments_note']),
+			['select', 'automanage_attachments', [0 => $txt['attachments_normal'], 1 => $txt['attachments_auto_space'], 2 => $txt['attachments_auto_years'], 3 => $txt['attachments_auto_months'], 4 => $txt['attachments_auto_16']]],
+			['check', 'use_subdirectories_for_attachments', 'subtext' => $txt['use_subdirectories_for_attachments_note']],
 			(empty($modSettings['attachment_basedirectories'])
-				? array('text', 'basedirectory_for_attachments', 40,)
-				: array('var_message', 'basedirectory_for_attachments', 'message' => 'basedirectory_for_attachments_path', 'invalid' => empty($context['valid_basedirectory']), 'text_label' => (empty($context['valid_basedirectory'])
+				? ['text', 'basedirectory_for_attachments', 40,]
+				: ['var_message', 'basedirectory_for_attachments', 'message' => 'basedirectory_for_attachments_path', 'invalid' => empty($context['valid_basedirectory']), 'text_label' => (empty($context['valid_basedirectory'])
 					? $txt['basedirectory_for_attachments_warning']
-					: $txt['basedirectory_for_attachments_current']))
+					: $txt['basedirectory_for_attachments_current'])]
 			),
 			Util::is_serialized($modSettings['attachmentUploadDir'])
-				? array('var_message', 'attach_current_directory', 'postinput' => $txt['attachmentUploadDir_multiple_configure'], 'message' => 'attachment_path', 'invalid' => empty($context['valid_upload_dir']),
+				? ['var_message', 'attach_current_directory', 'postinput' => $txt['attachmentUploadDir_multiple_configure'], 'message' => 'attachment_path', 'invalid' => empty($context['valid_upload_dir']),
 				'text_label' => (empty($context['valid_upload_dir'])
 					? $txt['attach_current_dir_warning']
-					: $txt['attach_current_dir']))
-				: array('text', 'attachmentUploadDir', 'postinput' => $txt['attachmentUploadDir_multiple_configure'], 40, 'invalid' => !$context['valid_upload_dir']),
-			array('int', 'attachmentDirFileLimit', 'subtext' => $txt['zero_for_no_limit'], 6),
-			array('int', 'attachmentDirSizeLimit', 'subtext' => $txt['zero_for_no_limit'], 6, 'postinput' => $txt['kilobyte']),
+					: $txt['attach_current_dir'])]
+				: ['text', 'attachmentUploadDir', 'postinput' => $txt['attachmentUploadDir_multiple_configure'], 40, 'invalid' => !$context['valid_upload_dir']],
+			['int', 'attachmentDirFileLimit', 'subtext' => $txt['zero_for_no_limit'], 6],
+			['int', 'attachmentDirSizeLimit', 'subtext' => $txt['zero_for_no_limit'], 6, 'postinput' => $txt['kilobyte']],
 			'',
 			// Posting limits
-			array('int', 'attachmentPostLimit', 'subtext' => $post_max_size_text, 6, 'postinput' => $testPM === false ? $txt['attachment_postsize_warning'] : $txt['kilobyte'], 'invalid' => $testPM === false),
-			array('int', 'attachmentSizeLimit', 'subtext' => $upload_max_filesize_text, 6, 'postinput' => $testUM === false ? $txt['attachment_postsize_warning'] : $txt['kilobyte'], 'invalid' => $testUM === false),
-			array('int', 'attachmentNumPerPostLimit', 'subtext' => $txt['zero_for_no_limit'], 6),
+			['int', 'attachmentPostLimit', 'subtext' => $post_max_size_text, 6, 'postinput' => $testPM === false ? $txt['attachment_postsize_warning'] : $txt['kilobyte'], 'invalid' => $testPM === false],
+			['int', 'attachmentSizeLimit', 'subtext' => $upload_max_filesize_text, 6, 'postinput' => $testUM === false ? $txt['attachment_postsize_warning'] : $txt['kilobyte'], 'invalid' => $testUM === false],
+			['int', 'attachmentNumPerPostLimit', 'subtext' => $txt['zero_for_no_limit'], 6],
 			'',
-			array('check', 'attachment_webp_enable', 'disabled' => !$testWebP, 'postinput' => $testWebP ? "" : $txt['attachment_webp_enable_na']),
-			array('check', 'attachment_autorotate', 'disabled' => !$testImgRotate, 'postinput' => $testImgRotate ? '' : $txt['attachment_autorotate_na']),
+			['check', 'attachment_webp_enable', 'disabled' => !$testWebP, 'postinput' => $testWebP ? "" : $txt['attachment_webp_enable_na']],
+			['check', 'attachment_autorotate', 'disabled' => !$testImgRotate, 'postinput' => $testImgRotate ? '' : $txt['attachment_autorotate_na']],
 			// Resize limits
-			array('title', 'attachment_image_resize'),
-			array('check', 'attachment_image_resize_enabled'),
-			array('check', 'attachment_image_resize_reformat'),
-			array('text', 'attachment_image_resize_width', 'subtext' => $txt['zero_for_no_limit'], 6, 'postinput' => $txt['attachment_image_resize_post']),
-			array('text', 'attachment_image_resize_height', 'subtext' => $txt['zero_for_no_limit'], 6, 'postinput' => $txt['attachment_image_resize_post']),
+			['title', 'attachment_image_resize'],
+			['check', 'attachment_image_resize_enabled'],
+			['check', 'attachment_image_resize_reformat'],
+			['text', 'attachment_image_resize_width', 'subtext' => $txt['zero_for_no_limit'], 6, 'postinput' => $txt['attachment_image_resize_post']],
+			['text', 'attachment_image_resize_height', 'subtext' => $txt['zero_for_no_limit'], 6, 'postinput' => $txt['attachment_image_resize_post']],
 			// Security Items
-			array('title', 'attachment_security_settings'),
+			['title', 'attachment_security_settings'],
 			// Extension checks etc.
-			array('check', 'attachmentCheckExtensions'),
-			array('text', 'attachmentExtensions', 40),
+			['check', 'attachmentCheckExtensions'],
+			['text', 'attachmentExtensions', 40],
 			'',
 			// Image checks.
-			array('warning', $testImg === false ? 'attachment_img_enc_warning' : ''),
-			array('check', 'attachment_image_reencode'),
+			['warning', $testImg === false ? 'attachment_img_enc_warning' : ''],
+			['check', 'attachment_image_reencode'],
 			// Thumbnail settings.
-			array('title', 'attachment_thumbnail_settings'),
-			array('check', 'attachmentShowImages'),
-			array('check', 'attachmentThumbnails'),
-			array('text', 'attachmentThumbWidth', 6),
-			array('text', 'attachmentThumbHeight', 6),
+			['title', 'attachment_thumbnail_settings'],
+			['check', 'attachmentShowImages'],
+			['check', 'attachmentThumbnails'],
+			['text', 'attachmentThumbWidth', 6],
+			['text', 'attachmentThumbHeight', 6],
 			'',
-			array('int', 'max_image_width', 'subtext' => $txt['zero_for_no_limit']),
-			array('int', 'max_image_height', 'subtext' => $txt['zero_for_no_limit']),
-		);
+			['int', 'max_image_width', 'subtext' => $txt['zero_for_no_limit']],
+			['int', 'max_image_height', 'subtext' => $txt['zero_for_no_limit']],
+		];
 
 		// Add new settings with a nice hook, makes them available for admin settings search as well
-		call_integration_hook('integrate_modify_attachment_settings', array(&$config_vars));
+		call_integration_hook('integrate_modify_attachment_settings', [&$config_vars]);
 
 		return $config_vars;
 	}
@@ -422,7 +422,7 @@ class ManageAttachments extends AbstractController
 	 *
 	 * @uses the 'browse' sub template
 	 */
-	public function action_browse()
+	public function action_browse(): void
 	{
 		global $context, $txt, $modSettings;
 
@@ -431,32 +431,32 @@ class ManageAttachments extends AbstractController
 		loadJavascriptFile('topic.js');
 
 		// Set the options for the list component.
-		$listOptions = array(
+		$listOptions = [
 			'id' => 'attach_browse',
 			'title' => $txt['attachment_manager_browse_files'],
-			'items_per_page' => $modSettings['defaultMaxMessages'],
+			'items_per_page' => 25,
 			'base_href' => getUrl('admin', ['action' => 'admin', 'area' => 'manageattachments', 'sa' => 'browse'] + ($context['browse_type'] === 'avatars' ? ['avatars'] : ($context['browse_type'] === 'thumbs' ? ['thumbs'] : []))),
 			'default_sort_col' => 'name',
 			'no_items_label' => $txt['attachment_manager_' . ($context['browse_type'] === 'avatars' ? 'avatars' : ($context['browse_type'] === 'thumbs' ? 'thumbs' : 'attachments')) . '_no_entries'],
-			'get_items' => array(
+			'get_items' => [
 				'function' => 'list_getFiles',
-				'params' => array(
+				'params' => [
 					$context['browse_type'],
-				),
-			),
-			'get_count' => array(
+				],
+			],
+			'get_count' => [
 				'function' => 'list_getNumFiles',
-				'params' => array(
+				'params' => [
 					$context['browse_type'],
-				),
-			),
-			'columns' => array(
-				'name' => array(
-					'header' => array(
+				],
+			],
+			'columns' => [
+				'name' => [
+					'header' => [
 						'value' => $txt['attachment_name'],
 						'class' => 'grid50',
-					),
-					'data' => array(
+					],
+					'data' => [
 						'function' => static function ($rowData) {
 							global $modSettings, $context;
 
@@ -494,31 +494,31 @@ class ManageAttachments extends AbstractController
 
 							return $link;
 						},
-					),
-					'sort' => array(
+					],
+					'sort' => [
 						'default' => 'a.filename',
 						'reverse' => 'a.filename DESC',
-					),
-				),
-				'filesize' => array(
-					'header' => array(
+					],
+				],
+				'filesize' => [
+					'header' => [
 						'value' => $txt['attachment_file_size'],
 						'class' => 'nowrap',
-					),
-					'data' => array(
+					],
+					'data' => [
 						'function' => static fn($rowData) => byte_format($rowData['size']),
-					),
-					'sort' => array(
+					],
+					'sort' => [
 						'default' => 'a.size',
 						'reverse' => 'a.size DESC',
-					),
-				),
-				'member' => array(
-					'header' => array(
+					],
+				],
+				'member' => [
+					'header' => [
 						'value' => $context['browse_type'] === 'avatars' ? $txt['attachment_manager_member'] : $txt['posted_by'],
 						'class' => 'nowrap',
-					),
-					'data' => array(
+					],
+					'data' => [
 						'function' => static function ($rowData) {
 							// In case of an attachment, return the poster of the attachment.
 							if (empty($rowData['id_member']))
@@ -528,18 +528,18 @@ class ManageAttachments extends AbstractController
 
 							return '<a href="' . getUrl('profile', ['action' => 'profile', 'u' => (int) $rowData['id_member'], 'name' => $rowData['poster_name']]) . '">' . $rowData['poster_name'] . '</a>';
 						},
-					),
-					'sort' => array(
+					],
+					'sort' => [
 						'default' => 'mem.real_name',
 						'reverse' => 'mem.real_name DESC',
-					),
-				),
-				'date' => array(
-					'header' => array(
+					],
+				],
+				'date' => [
+					'header' => [
 						'value' => $context['browse_type'] === 'avatars' ? $txt['attachment_manager_last_active'] : $txt['date'],
 						'class' => 'nowrap',
-					),
-					'data' => array(
+					],
+					'data' => [
 						'function' => static function ($rowData) {
 							global $txt, $context;
 
@@ -553,78 +553,78 @@ class ManageAttachments extends AbstractController
 
 							return $date;
 						},
-					),
-					'sort' => array(
+					],
+					'sort' => [
 						'default' => $context['browse_type'] === 'avatars' ? 'mem.last_login' : 'm.id_msg',
 						'reverse' => $context['browse_type'] === 'avatars' ? 'mem.last_login DESC' : 'm.id_msg DESC',
-					),
-				),
-				'downloads' => array(
-					'header' => array(
+					],
+				],
+				'downloads' => [
+					'header' => [
 						'value' => $txt['downloads'],
 						'class' => 'nowrap',
-					),
-					'data' => array(
+					],
+					'data' => [
 						'db' => 'downloads',
 						'comma_format' => true,
-					),
-					'sort' => array(
+					],
+					'sort' => [
 						'default' => 'a.downloads',
 						'reverse' => 'a.downloads DESC',
-					),
-				),
-				'check' => array(
-					'header' => array(
+					],
+				],
+				'check' => [
+					'header' => [
 						'value' => '<input type="checkbox" onclick="invertAll(this, this.form);" class="input_check" />',
 						'class' => 'centertext',
-					),
-					'data' => array(
-						'sprintf' => array(
+					],
+					'data' => [
+						'sprintf' => [
 							'format' => '<input type="checkbox" name="remove[%1$d]" class="input_check" />',
-							'params' => array(
+							'params' => [
 								'id_attach' => false,
-							),
-						),
+							],
+						],
 						'class' => 'centertext',
-					),
-				),
-			),
-			'form' => array(
+					],
+				],
+			],
+			'form' => [
 				'href' => getUrl('admin', ['action' => 'admin', 'area' => 'manageattachments', 'sa' => 'remove', ($context['browse_type'] === 'avatars' ? 'avatars' : ($context['browse_type'] === 'thumbs' ? 'thumbs' : ''))]),
 				'include_sort' => true,
 				'include_start' => true,
-				'hidden_fields' => array(
+				'hidden_fields' => [
 					'type' => $context['browse_type'],
-				),
-			),
-			'additional_rows' => array(
-				array(
+				],
+			],
+			'additional_rows' => [
+				[
 					'position' => 'below_table_data',
 					'value' => '<input type="submit" name="remove_submit" class="right_submit" value="' . $txt['quickmod_delete_selected'] . '" onclick="return confirm(\'' . $txt['confirm_delete_attachments'] . '\');" />',
-				),
-			),
-			'list_menu' => array(
+				],
+			],
+			'list_menu' => [
 				'show_on' => 'top',
 				'class' => 'flow_flex_right',
-				'links' => array(
-					array(
+				'links' => [
+					[
 						'href' => getUrl('admin', ['action' => 'admin', 'area' => 'manageattachments', 'sa' => 'browse']),
 						'is_selected' => $context['browse_type'] === 'attachments',
 						'label' => $txt['attachment_manager_attachments']
-					),
-					array(
+					],
+					[
 						'href' => getUrl('admin', ['action' => 'admin', 'area' => 'manageattachments', 'sa' => 'browse', 'avatars']),
 						'is_selected' => $context['browse_type'] === 'avatars',
 						'label' => $txt['attachment_manager_avatars']
-					),
-					array(
+					],
+					[
 						'href' => getUrl('admin', ['action' => 'admin', 'area' => 'manageattachments', 'sa' => 'browse', 'thumbs']),
 						'is_selected' => $context['browse_type'] === 'thumbs',
 						'label' => $txt['attachment_manager_thumbs']
-					),
-				),
-			),
-		);
+					],
+				],
+			],
+		];
 
 		// Create the list.
 		createList($listOptions);
@@ -641,7 +641,7 @@ class ManageAttachments extends AbstractController
 	 *
 	 * @uses the 'maintenance' sub template.
 	 */
-	public function action_maintenance()
+	public function action_maintenance(): void
 	{
 		global $context, $modSettings;
 
@@ -679,7 +679,7 @@ class ManageAttachments extends AbstractController
 		$context['attachment_current_files'] = comma_format($current_dir['files'], 0);
 		$context['attach_multiple_dirs'] = count($attach_dirs) > 1;
 		$context['attach_dirs'] = $attach_dirs;
-		$context['base_dirs'] = empty($modSettings['attachment_basedirectories']) ? array() : Util::unserialize($modSettings['attachment_basedirectories']);
+		$context['base_dirs'] = empty($modSettings['attachment_basedirectories']) ? [] : Util::unserialize($modSettings['attachment_basedirectories']);
 		$context['checked'] = $this->_req->getSession('checked', true);
 
 		if (!empty($_SESSION['results']))
@@ -697,7 +697,7 @@ class ManageAttachments extends AbstractController
 	 *
 	 * @todo refactor this silly superglobals use...
 	 */
-	public function action_byAge()
+	public function action_byAge(): void
 	{
 		checkSession('post', 'admin');
 
@@ -707,7 +707,7 @@ class ManageAttachments extends AbstractController
 		if (!$this->_req->compareQuery('type', 'avatars', 'trim|strval'))
 		{
 			// Get rid of all the old attachments.
-			$messages = removeAttachments(array('attachment_type' => 0, 'poster_time' => (time() - 24 * 60 * 60 * $this->_req->post->age)), 'messages', true);
+			$messages = removeAttachments(['attachment_type' => 0, 'poster_time' => (time() - 24 * 60 * 60 * $this->_req->post->age)], 'messages', true);
 
 			// Update the messages to reflect the change.
 			if (!empty($messages) && !empty($this->_req->post->notice))
@@ -718,7 +718,7 @@ class ManageAttachments extends AbstractController
 		// Remove all the old avatars.
 		else
 		{
-			removeAttachments(array('not_id_member' => 0, 'last_login' => (time() - 24 * 60 * 60 * $this->_req->post->age)), 'members');
+			removeAttachments(['not_id_member' => 0, 'last_login' => (time() - 24 * 60 * 60 * $this->_req->post->age)], 'members');
 		}
 
 		redirectexit('action=admin;area=manageattachments' . (empty($this->_req->query->avatars) ? ';sa=maintenance' : ';avatars'));
@@ -730,12 +730,12 @@ class ManageAttachments extends AbstractController
 	 * - Called from the maintenance screen by ?action=admin;area=manageattachments;sa=bySize.
 	 * - Optionally adds a certain text to the messages the attachments were removed from.
 	 */
-	public function action_bySize()
+	public function action_bySize(): void
 	{
 		checkSession('post', 'admin');
 
 		// Find humongous attachments.
-		$messages = removeAttachments(array('attachment_type' => 0, 'size' => 1024 * $this->_req->post->size), 'messages', true);
+		$messages = removeAttachments(['attachment_type' => 0, 'size' => 1024 * $this->_req->post->size], 'messages', true);
 
 		// And make a note on the post.
 		if (!empty($messages) && !empty($this->_req->post->notice))
@@ -751,7 +751,7 @@ class ManageAttachments extends AbstractController
 	 *
 	 * - Called from the browse screen as submitted form by ?action=admin;area=manageattachments;sa=remove
 	 */
-	public function action_remove()
+	public function action_remove(): void
 	{
 		global $language;
 
@@ -760,7 +760,7 @@ class ManageAttachments extends AbstractController
 		if (!empty($this->_req->post->remove))
 		{
 			// There must be a quicker way to pass this safety test??
-			$attachments = array();
+			$attachments = [];
 			foreach ($this->_req->post->remove as $removeID => $dummy)
 			{
 				$attachments[] = (int) $removeID;
@@ -768,11 +768,11 @@ class ManageAttachments extends AbstractController
 
 			if ($this->_req->compareQuery('type', 'avatars', 'trim|strval') && !empty($attachments))
 			{
-				removeAttachments(array('id_attach' => $attachments));
+				removeAttachments(['id_attach' => $attachments]);
 			}
 			elseif (!empty($attachments))
 			{
-				$messages = removeAttachments(array('id_attach' => $attachments), 'messages', true);
+				$messages = removeAttachments(['id_attach' => $attachments], 'messages', true);
 
 				// And change the message to reflect this.
 				if (!empty($messages))
@@ -794,13 +794,13 @@ class ManageAttachments extends AbstractController
 	 *
 	 * - Called from the maintenance screen by ?action=admin;area=manageattachments;sa=removeall.
 	 */
-	public function action_removeall()
+	public function action_removeall(): void
 	{
 		global $txt;
 
 		checkSession('get', 'admin');
 
-		$messages = removeAttachments(array('attachment_type' => 0), '', true);
+		$messages = removeAttachments(['attachment_type' => 0], '', true);
 
 		$notice = $this->_req->getPost('notice', 'trim|strval', $txt['attachment_delete_admin']);
 
@@ -830,7 +830,7 @@ class ManageAttachments extends AbstractController
 	 * - Avatars with no members associated with them.
 	 * - Attachments that are in the attachment folder, but not listed in the DB
 	 */
-	public function action_repair()
+	public function action_repair(): void
 	{
 		global $modSettings, $context, $txt;
 
@@ -884,7 +884,7 @@ class ManageAttachments extends AbstractController
 			'files_without_attachment' => 0,
 		];
 
-		$to_fix = empty($_SESSION['attachments_to_fix']) ? array() : $_SESSION['attachments_to_fix'];
+		$to_fix = empty($_SESSION['attachments_to_fix']) ? [] : $_SESSION['attachments_to_fix'];
 		$context['repair_errors'] = $_SESSION['attachments_to_fix2'] ?? $context['repair_errors'];
 		$fix_errors = isset($this->_req->query->fixErrors);
 
@@ -1103,7 +1103,7 @@ class ManageAttachments extends AbstractController
 	 * @throws \ElkArte\Exceptions\Exception
 	 * @todo Move to ManageAttachments.subs.php
 	 */
-	private function _pauseAttachmentMaintenance($to_fix, $max_substep = 0)
+	private function _pauseAttachmentMaintenance(array $to_fix, int $max_substep = 0): void
 	{
 		global $context, $txt, $time_start;
 
@@ -1148,12 +1148,12 @@ class ManageAttachments extends AbstractController
 	/**
 	 * This function lists and allows updating of multiple attachments paths.
 	 */
-	public function action_attachpaths()
+	public function action_attachpaths(): void
 	{
 		global $modSettings, $context, $txt;
 
 		$attachmentsDir = new AttachmentsDirectory($modSettings, database());
-		$errors = array();
+		$errors = [];
 
 		// Saving or changing attachment paths
 		if (isset($this->_req->post->save))
@@ -1193,160 +1193,160 @@ class ManageAttachments extends AbstractController
 		}
 
 		// Show the list of base and path directories + any errors generated
-		$listOptions = array(
+		$listOptions = [
 			'id' => 'attach_paths',
 			'base_href' => getUrl('admin', ['action' => 'admin', 'area' => 'manageattachments', 'sa' => 'attachpaths', '{sesstion_data}']),
 			'title' => $txt['attach_paths'],
-			'get_items' => array(
+			'get_items' => [
 				'function' => 'list_getAttachDirs',
-			),
-			'columns' => array(
-				'current_dir' => array(
-					'header' => array(
+			],
+			'columns' => [
+				'current_dir' => [
+					'header' => [
 						'value' => $txt['attach_current'],
 						'class' => 'centertext',
-					),
-					'data' => array(
+					],
+					'data' => [
 						'function' => static fn($rowData) => '<input type="radio" name="current_dir" value="' . $rowData['id'] . '" ' . ($rowData['current'] ? ' checked="checked"' : '') . (empty($rowData['disable_current']) ? '' : ' disabled="disabled"') . ' class="input_radio" />',
 						'class' => 'grid8 centertext',
-					),
-				),
-				'path' => array(
-					'header' => array(
+					],
+				],
+				'path' => [
+					'header' => [
 						'value' => $txt['attach_path'],
-					),
-					'data' => array(
+					],
+					'data' => [
 						'function' => static fn($rowData) => '
 							<input type="hidden" name="dirs[' . $rowData['id'] . ']" value="' . $rowData['path'] . '" />
 							<input type="text" size="40" name="dirs[' . $rowData['id'] . ']" value="' . $rowData['path'] . '"' . (empty($rowData['disable_base_dir']) ? '' : ' disabled="disabled"') . ' class="input_text"/>',
 						'class' => 'grid50',
-					),
-				),
-				'current_size' => array(
-					'header' => array(
+					],
+				],
+				'current_size' => [
+					'header' => [
 						'value' => $txt['attach_current_size'],
-					),
-					'data' => array(
+					],
+					'data' => [
 						'db' => 'current_size',
-					),
-				),
-				'num_files' => array(
-					'header' => array(
+					],
+				],
+				'num_files' => [
+					'header' => [
 						'value' => $txt['attach_num_files'],
-					),
-					'data' => array(
+					],
+					'data' => [
 						'db' => 'num_files',
-					),
-				),
-				'status' => array(
-					'header' => array(
+					],
+				],
+				'status' => [
+					'header' => [
 						'value' => $txt['attach_dir_status'],
-					),
-					'data' => array(
+					],
+					'data' => [
 						'db' => 'status',
 						'class' => 'grid20',
-					),
-				),
-			),
-			'form' => array(
+					],
+				],
+			],
+			'form' => [
 				'href' => getUrl('admin', ['action' => 'admin', 'area' => 'manageattachments', 'sa' => 'attachpaths', '{sesstion_data}']),
-			),
-			'additional_rows' => array(
-				array(
+			],
+			'additional_rows' => [
+				[
 					'class' => 'submitbutton',
 					'position' => 'below_table_data',
 					'value' => '
 					<input type="hidden" name="' . $context['session_var'] . '" value="' . $context['session_id'] . '" />
 					<input type="submit" name="new_path" value="' . $txt['attach_add_path'] . '" />
 					<input type="submit" name="save" value="' . $txt['save'] . '" />',
-				),
-				empty($errors['dir']) ? array(
+				],
+				empty($errors['dir']) ? [
 					'position' => 'top_of_list',
 					'value' => $txt['attach_dir_desc'],
 					'style' => 'padding: 5px 10px;',
 					'class' => 'description'
-				) : array(
+				] : [
 					'position' => 'top_of_list',
 					'value' => $txt['attach_dir_save_problem'] . '<br />' . implode('<br />', $errors['dir']),
 					'style' => 'padding-left: 2.75em;',
 					'class' => 'warningbox',
-				),
-			),
-		);
+				],
+			],
+		];
 		createList($listOptions);
 
 		if (!empty($modSettings['attachment_basedirectories']))
 		{
-			$listOptions2 = array(
+			$listOptions2 = [
 				'id' => 'base_paths',
 				'base_href' => getUrl('admin', ['action' => 'admin', 'area' => 'manageattachments', 'sa' => 'attachpaths', '{sesstion_data}']),
 				'title' => $txt['attach_base_paths'],
-				'get_items' => array(
+				'get_items' => [
 					'function' => 'list_getBaseDirs',
-				),
-				'columns' => array(
-					'current_dir' => array(
-						'header' => array(
+				],
+				'columns' => [
+					'current_dir' => [
+						'header' => [
 							'value' => $txt['attach_current'],
 							'class' => 'centertext',
-						),
-						'data' => array(
+						],
+						'data' => [
 							'function' => static fn($rowData) => '<input type="radio" name="current_base_dir" value="' . $rowData['id'] . '" ' . ($rowData['current'] ? ' checked="checked"' : '') . ' class="input_radio" />',
 							'class' => 'grid8 centertext',
-						),
-					),
-					'path' => array(
-						'header' => array(
+						],
+					],
+					'path' => [
+						'header' => [
 							'value' => $txt['attach_path'],
-						),
-						'data' => array(
+						],
+						'data' => [
 							'db' => 'path',
 							'class' => 'grid50',
-						),
-					),
-					'num_dirs' => array(
-						'header' => array(
+						],
+					],
+					'num_dirs' => [
+						'header' => [
 							'value' => $txt['attach_num_dirs'],
-						),
-						'data' => array(
+						],
+						'data' => [
 							'db' => 'num_dirs',
-						),
-					),
-					'status' => array(
-						'header' => array(
+						],
+					],
+					'status' => [
+						'header' => [
 							'value' => $txt['attach_dir_status'],
-						),
-						'data' => array(
+						],
+						'data' => [
 							'db' => 'status',
 							'class' => 'grid20',
-						),
-					),
-				),
-				'form' => array(
+						],
+					],
+				],
+				'form' => [
 					'href' => getUrl('admin', ['action' => 'admin', 'area' => 'manageattachments', 'sa' => 'attachpaths', '{sesstion_data}']),
-				),
-				'additional_rows' => array(
-					array(
+				],
+				'additional_rows' => [
+					[
 						'class' => 'submitbutton',
 						'position' => 'below_table_data',
 						'value' => '
 							<input type="hidden" name="' . $context['session_var'] . '" value="' . $context['session_id'] . '" />
 							<input type="submit" name="new_base_path" value="' . $txt['attach_add_path'] . '" />
 							<input type="submit" name="save2" value="' . $txt['save'] . '" />',
-					),
-					empty($errors['base']) ? array(
+					],
+					empty($errors['base']) ? [
 						'position' => 'top_of_list',
 						'value' => $txt['attach_dir_base_desc'],
 						'style' => 'padding: 5px 10px;',
 						'class' => 'description'
-					) : array(
+					] : [
 						'position' => 'top_of_list',
 						'value' => $txt['attach_dir_save_problem'] . '<br />' . implode('<br />', $errors['base']),
 						'style' => 'padding-left: 2.75em',
 						'class' => 'warningbox',
-					),
-				),
-			);
+					],
+				],
+			];
 			createList($listOptions2);
 		}
 
@@ -1361,7 +1361,7 @@ class ManageAttachments extends AbstractController
 	 * @param AttachmentsDirectory $attachmentsDir
 	 * @return void
 	 */
-	private function _savePaths($attachmentsDir)
+	private function _savePaths(AttachmentsDirectory $attachmentsDir): void
 	{
 		global $txt, $context;
 
@@ -1374,7 +1374,7 @@ class ManageAttachments extends AbstractController
 		// Can't use these directories for attachments
 		require_once(SUBSDIR . '/Themes.subs.php');
 		$themes = installedThemes();
-		$reserved_dirs = array(BOARDDIR, SOURCEDIR, SUBSDIR, CONTROLLERDIR, CACHEDIR, EXTDIR, LANGUAGEDIR, ADMINDIR);
+		$reserved_dirs = [BOARDDIR, SOURCEDIR, SUBSDIR, CONTROLLERDIR, CACHEDIR, EXTDIR, LANGUAGEDIR, ADMINDIR, ADDONSDIR, ELKARTEDIR];
 		foreach ($themes as $theme)
 		{
 			$reserved_dirs[] = $theme['theme_dir'];
@@ -1474,13 +1474,13 @@ class ManageAttachments extends AbstractController
 					updateAttachmentIdFolder($id, 1);
 				}
 
-				$update = array('currentAttachmentUploadDir' => 1, 'attachmentUploadDir' => serialize(array(1 => $dir)),);
+				$update = ['currentAttachmentUploadDir' => 1, 'attachmentUploadDir' => serialize([1 => $dir]),];
 			}
 		}
 		else
 		{
 			// Save it to the database.
-			$update = array('currentAttachmentUploadDir' => $current_dir, 'attachmentUploadDir' => serialize($new_dirs),);
+			$update = ['currentAttachmentUploadDir' => $current_dir, 'attachmentUploadDir' => serialize($new_dirs),];
 		}
 
 		if (!empty($update))
@@ -1502,7 +1502,7 @@ class ManageAttachments extends AbstractController
 	 * @param AttachmentsDirectory $attachmentsDir
 	 * @return void
 	 */
-	private function _saveBasePaths($attachmentsDir)
+	private function _saveBasePaths(AttachmentsDirectory $attachmentsDir): void
 	{
 		global $modSettings, $txt, $context;
 
@@ -1530,7 +1530,7 @@ class ManageAttachments extends AbstractController
 				{
 					$attachmentUploadDir[$id] = $dir;
 					$attachmentBaseDirectories[$id] = $dir;
-					$update = (array('attachmentUploadDir' => serialize($attachmentUploadDir), 'attachment_basedirectories' => serialize($attachmentBaseDirectories), 'basedirectory_for_attachments' => $attachmentUploadDir[$current_base_dir],));
+					$update = (['attachmentUploadDir' => serialize($attachmentUploadDir), 'attachment_basedirectories' => serialize($attachmentBaseDirectories), 'basedirectory_for_attachments' => $attachmentUploadDir[$current_base_dir],]);
 				}
 
 				// Or remove it (from selection only)
@@ -1592,7 +1592,7 @@ class ManageAttachments extends AbstractController
 	/**
 	 * Maintenance function to move attachments from one directory to another
 	 */
-	public function action_transfer()
+	public function action_transfer(): void
 	{
 		global $modSettings, $txt;
 
@@ -1609,7 +1609,7 @@ class ManageAttachments extends AbstractController
 
 		// Prepare for the moving
 		$limit = 501;
-		$results = array();
+		$results = [];
 		$dir_files = 0;
 		$current_progress = 0;
 		$total_moved = 0;
@@ -1700,7 +1700,7 @@ class ManageAttachments extends AbstractController
 				}
 
 				// Move them
-				$moved = array();
+				$moved = [];
 				$dir_size = empty($dir_size) ? 0 : $dir_size;
 				$limiting_by_size_num = $attachmentsDir->hasSizeLimit() || $attachmentsDir->hasNumFilesLimit();
 

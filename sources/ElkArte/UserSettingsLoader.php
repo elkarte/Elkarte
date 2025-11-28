@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This file does all of the data loading for members.
+ * This file does all the data loading for members.
  *
  * @package   ElkArte Forum
  * @copyright ElkArte Forum contributors
@@ -64,7 +64,7 @@ class UserSettingsLoader
 	 *
 	 * @return ValuesContainerReadOnly
 	 */
-	public function getSettings()
+	public function getSettings(): ValuesContainerReadOnly
 	{
 		return $this->settings;
 	}
@@ -74,7 +74,7 @@ class UserSettingsLoader
 	 *
 	 * @return ValuesContainer
 	 */
-	public function getInfo()
+	public function getInfo(): ValuesContainer
 	{
 		return $this->info;
 	}
@@ -88,7 +88,7 @@ class UserSettingsLoader
 	 *
 	 * @event integrate_user_info
 	 */
-	public function loadUserById($id, $already_verified, $session_password)
+	public function loadUserById($id, $already_verified, $session_password): void
 	{
 		$this->id = (int) $id;
 
@@ -113,7 +113,7 @@ class UserSettingsLoader
 	 * @param bool $already_verified
 	 * @param string $session_password
 	 */
-	protected function loadUserData($already_verified, $session_password)
+	protected function loadUserData($already_verified, $session_password): void
 	{
 		$user_settings = [];
 
@@ -127,9 +127,9 @@ class UserSettingsLoader
 					LEFT JOIN {db_prefix}attachments AS a ON (a.id_member = {int:id_member})
 				WHERE mem.id_member = {int:id_member}
 				LIMIT 1',
-				array(
+				[
 					'id_member' => $this->id,
-				)
+				]
 			);
 
 			$user_settings = $this_user->fetch_assoc();
@@ -185,7 +185,7 @@ class UserSettingsLoader
 	 *
 	 * @param array $user_settings
 	 */
-	protected function initSettings($user_settings)
+	protected function initSettings($user_settings): void
 	{
 		$this->settings = new UserSettings($user_settings);
 	}
@@ -195,7 +195,7 @@ class UserSettingsLoader
 	 *
 	 * @return array
 	 */
-	protected function initUser()
+	protected function initUser(): array
 	{
 		global $modSettings;
 
@@ -222,7 +222,7 @@ class UserSettingsLoader
 			if ($visitOpt === false || $visitOpt['poster_time'] < time() - 5 * 3600)
 			{
 				require_once(SUBSDIR . '/Members.subs.php');
-				updateMemberData($this->id, array('id_msg_last_visit' => (int) $modSettings['maxMsgID'], 'last_login' => time(), 'member_ip' => $this->req->client_ip(), 'member_ip2' => $this->req->ban_ip()));
+				updateMemberData($this->id, ['id_msg_last_visit' => (int) $modSettings['maxMsgID'], 'last_login' => time(), 'member_ip' => $this->req->client_ip(), 'member_ip2' => $this->req->ban_ip()]);
 				$this->settings->updateLastLogin();
 
 				if ($this->cache->levelHigherThan(1))
@@ -242,18 +242,18 @@ class UserSettingsLoader
 
 		if (empty($this->settings['additional_groups']))
 		{
-			$user_info = array(
-				'groups' => array($this->settings['id_group'], $this->settings['id_post_group'])
-			);
+			$user_info = [
+				'groups' => [$this->settings['id_group'], $this->settings['id_post_group']]
+			];
 		}
 		else
 		{
-			$user_info = array(
+			$user_info = [
 				'groups' => array_merge(
-					array($this->settings['id_group'], $this->settings['id_post_group']),
+					[$this->settings['id_group'], $this->settings['id_post_group']],
 					explode(',', $this->settings['additional_groups'])
 				)
-			);
+			];
 		}
 
 		// Because history has proven that it is possible for groups to go bad - clean up in case.
@@ -271,7 +271,7 @@ class UserSettingsLoader
 			require_once(SUBSDIR . '/Members.subs.php');
 			require_once(SUBSDIR . '/Auth.subs.php');
 
-			updateMemberData($this->settings['id_member'], array('password_salt' => $this->settings['password_salt']));
+			updateMemberData($this->settings['id_member'], ['password_salt' => $this->settings['password_salt']]);
 			setLoginCookie(60 * $modSettings['cookieTime'], $this->settings['id_member'], hash('sha256', ($this->settings['passwd'] . $this->settings['password_salt'])));
 		}
 
@@ -283,7 +283,7 @@ class UserSettingsLoader
 	 *
 	 * @return array
 	 */
-	protected function initGuest()
+	protected function initGuest(): array
 	{
 		global $cookiename, $context, $modSettings;
 
@@ -325,12 +325,12 @@ class UserSettingsLoader
 	 *
 	 * @param array $user_info
 	 */
-	protected function compileInfo($user_info)
+	protected function compileInfo($user_info): void
 	{
 		global $modSettings;
 
 		// Set up the $user_info array.
-		$user_info += array(
+		$user_info += [
 			'id' => $this->id,
 			'username' => $this->member_name,
 			'name' => $this->settings->real_name(''),
@@ -357,7 +357,7 @@ class UserSettingsLoader
 			'ignoreusers' => explode(',', (string) $this->settings->pm_ignore_list),
 			'warning' => (int) $this->settings->warning,
 			'permissions' => [],
-		);
+		];
 		$user_info['groups'] = array_unique($user_info['groups']);
 
 		// Make sure that the last item in ignore boards array is valid.
@@ -405,7 +405,7 @@ class UserSettingsLoader
 	 *
 	 * @return string
 	 */
-	protected function getLanguage()
+	protected function getLanguage(): string
 	{
 		global $modSettings, $language;
 
@@ -436,7 +436,7 @@ class UserSettingsLoader
 	 *
 	 * @return array
 	 */
-	protected function buildAvatarArray()
+	protected function buildAvatarArray(): array
 	{
 		return array_merge([
 			'url' => $this->settings->avatar(''),
@@ -452,7 +452,7 @@ class UserSettingsLoader
 	 *
 	 * @param string $password
 	 */
-	public function rehashPassword($password)
+	public function rehashPassword($password): void
 	{
 		$this->settings->rehashPassword($password);
 	}
@@ -463,7 +463,7 @@ class UserSettingsLoader
 	 * @param string $password
 	 * @return bool
 	 */
-	public function validatePassword($password)
+	public function validatePassword($password): bool
 	{
 		return $this->settings->validatePassword($password);
 	}
@@ -487,13 +487,13 @@ class UserSettingsLoader
 	 * @return bool
 	 * @throws Exception
 	 */
-	public function checkActivation($undelete)
+	public function checkActivation($undelete): bool
 	{
 		global $context, $txt, $modSettings;
 
 		if (!isset($context['login_errors']))
 		{
-			$context['login_errors'] = array();
+			$context['login_errors'] = [];
 		}
 
 		// What is the true activation status of this account?
@@ -519,8 +519,8 @@ class UserSettingsLoader
 			if ($undelete)
 			{
 				require_once(SUBSDIR . '/Members.subs.php');
-				updateMemberData($this->settings['id_member'], array('is_activated' => 1));
-				updateSettings(array('unapprovedMembers' => ($modSettings['unapprovedMembers'] > 0 ? $modSettings['unapprovedMembers'] - 1 : 0)));
+				updateMemberData($this->settings['id_member'], ['is_activated' => 1]);
+				updateSettings(['unapprovedMembers' => ($modSettings['unapprovedMembers'] > 0 ? $modSettings['unapprovedMembers'] - 1 : 0)]);
 
 				return true;
 			}

@@ -66,7 +66,7 @@ abstract class AbstractManipulator
 	abstract public function resizeImage($max_width = null, $max_height = null, $strip = false, $force_resize = true, $thumbnail = false);
 
 	/**
-	 * Rotate an image based on its EXIF flag, used to correct for smart phone pictures.
+	 * Rotate an image based on its EXIF flag, used to correct for smartphone pictures.
 	 *
 	 * @return mixed
 	 */
@@ -115,7 +115,7 @@ abstract class AbstractManipulator
 	 * @param string $type
 	 * @param string $data only used when calling the function in string mode
 	 */
-	public function setImageDimensions($type = 'file', $data = '')
+	public function setImageDimensions($type = 'file', $data = ''): void
 	{
 		try
 		{
@@ -138,7 +138,7 @@ abstract class AbstractManipulator
 	 *
 	 * @return array|int[]
 	 */
-	public function getImageDimensions()
+	public function getImageDimensions(): array
 	{
 		if (empty($this->imageDimensions))
 		{
@@ -170,7 +170,7 @@ abstract class AbstractManipulator
 	 * @return bool Whether the memory is available.
 	 * @throws \Exception
 	 */
-	public function memoryCheck($fatal = false)
+	public function memoryCheck($fatal = false): bool
 	{
 		// No Need
 		if (empty($this->_width) || empty($this->_height))
@@ -203,7 +203,7 @@ abstract class AbstractManipulator
 	 * @param int $max_height
 	 * @return array
 	 */
-	public function imageRatio($max_width, $max_height)
+	public function imageRatio($max_width, $max_height): array
 	{
 		// Determine whether to resize to max width or to max height (depending on the limits.)
 		$image_ratio = $this->_width / $this->_height;
@@ -229,7 +229,7 @@ abstract class AbstractManipulator
 	 * @param int $limit max width or height, based on current aspect ratio
 	 * @return int[]
 	 */
-	public function imageScaleFactor($limit = 800)
+	public function imageScaleFactor($limit = 800): array
 	{
 		$thumb_w = $limit;
 		$thumb_h = $limit;

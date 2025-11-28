@@ -69,7 +69,7 @@ class Post extends AbstractModule
 	/**
 	 * Prepare post event, add the make event template layer
 	 */
-	public function prepare_post()
+	public function prepare_post(): void
 	{
 		theme()->getLayers()->addAfter('make_event', 'postarea');
 	}
@@ -79,7 +79,7 @@ class Post extends AbstractModule
 	 *
 	 * @param ErrorContext $post_errors
 	 */
-	public function before_save_post($post_errors)
+	public function before_save_post($post_errors): void
 	{
 		if (isset($_REQUEST['deleteevent']))
 		{
@@ -99,7 +99,7 @@ class Post extends AbstractModule
 	 *
 	 * @throws \Exception
 	 */
-	public function after_save_post()
+	public function after_save_post(): void
 	{
 		global $modSettings, $board, $topic;
 
@@ -160,7 +160,7 @@ class Post extends AbstractModule
 	 * @throws ControllerRedirectException
 	 * @throws Exception
 	 */
-	public function prepare_context($id_member_poster)
+	public function prepare_context($id_member_poster): void
 	{
 		global $txt, $context;
 
@@ -187,7 +187,7 @@ class Post extends AbstractModule
 	 *
 	 * @throws Exception cannot_post_new, invalid_year, invalid_month
 	 */
-	private function _prepareEventContext($event_id)
+	private function _prepareEventContext($event_id): void
 	{
 		global $context, $modSettings, $board;
 

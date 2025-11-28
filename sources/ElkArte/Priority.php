@@ -14,7 +14,7 @@
 namespace ElkArte;
 
 /**
- * Priority Class An abstract class to deal with priority of template layers
+ * Priority Class An abstract class to deal with the priority of template layers
  */
 class Priority
 {
@@ -55,7 +55,7 @@ class Priority
 	 * @param string $entity name of a entity
 	 * @param int|null $priority an integer defining the priority of the entity.
 	 */
-	public function add($entity, $priority = null)
+	public function add($entity, $priority = null): void
 	{
 		$this->_all_general[$entity] = $priority === null
 			? $this->_general_highest_priority
@@ -69,7 +69,7 @@ class Priority
 	 * @param string $entity the name of a entity
 	 * @param string $following the name of the entity before which $entity must be added
 	 */
-	public function addBefore($entity, $following)
+	public function addBefore($entity, $following): void
 	{
 		$this->_all_before[$entity] = $following;
 	}
@@ -80,7 +80,7 @@ class Priority
 	 * @param string $entity the name of a entity
 	 * @param string $previous the name of the entity after which $entity must be added
 	 */
-	public function addAfter($entity, $previous)
+	public function addAfter($entity, $previous): void
 	{
 		$this->_all_after[$entity] = $previous;
 	}
@@ -91,7 +91,7 @@ class Priority
 	 * @param string $entity name of a entity
 	 * @param int|null $priority an integer defining the priority of the entity.
 	 */
-	public function addEnd($entity, $priority = null)
+	public function addEnd($entity, $priority = null): void
 	{
 		$this->_all_end[$entity] = $priority === null
 			? $this->_end_highest_priority
@@ -105,7 +105,7 @@ class Priority
 	 * @param string $entity name of a entity
 	 * @param int|null $priority an integer defining the priority of the entity.
 	 */
-	public function addBegin($entity, $priority = null)
+	public function addBegin($entity, $priority = null): void
 	{
 		$this->_all_begin[$entity] = $priority === null
 			? $this->_begin_highest_priority
@@ -118,7 +118,7 @@ class Priority
 	 *
 	 * @param string $entity the name of a entity
 	 */
-	public function remove($entity)
+	public function remove($entity): void
 	{
 		if (isset($this->_all_general[$entity]))
 		{
@@ -145,13 +145,13 @@ class Priority
 	/**
 	 * Remove all the entities added up to the moment the function is called
 	 */
-	public function removeAll()
+	public function removeAll(): void
 	{
-		$this->_all_general = array();
-		$this->_all_after = array();
-		$this->_all_before = array();
-		$this->_all_end = array();
-		$this->_all_begin = array();
+		$this->_all_general = [];
+		$this->_all_after = [];
+		$this->_all_before = [];
+		$this->_all_end = [];
+		$this->_all_begin = [];
 		$this->_general_highest_priority = 0;
 		$this->_end_highest_priority = 10000;
 		$this->_begin_highest_priority = -10000;
@@ -163,7 +163,7 @@ class Priority
 	 *
 	 * @return array the sorted entities with priority
 	 */
-	public function sort()
+	public function sort(): array
 	{
 		// Sorting
 		asort($this->_all_begin);
@@ -199,7 +199,7 @@ class Priority
 		}
 
 		// This is not terribly optimized, though it shouldn't loop over too many things (hopefully)
-		// 2.0 I've tried to make things a bit more efficient, although maybe harder to read !
+		// 2.0 I've made things a bit more efficient, although maybe harder to read !
 		// It "iteratively" adds all the after/before entities shifting priority
 		// of all the other entities to ensure each one has a different value
 		while (!empty($all['after']) || !empty($all['before']))
@@ -247,7 +247,7 @@ class Priority
 	 * @return bool true if at least one entity has been added
 	 * @todo at that moment _all_after and _all_before are not considered because they may not be "forced"
 	 */
-	public function hasEntities()
+	public function hasEntities(): bool
 	{
 		if ($this->_sorted_entities === null)
 		{
@@ -260,7 +260,7 @@ class Priority
 	/**
 	 * Return the entities that have been loaded
 	 */
-	public function getEntities()
+	public function getEntities(): array
 	{
 		return array_keys(array_merge($this->_all_general, $this->_all_begin, $this->_all_end, $this->_all_after, $this->_all_before));
 	}
@@ -268,7 +268,7 @@ class Priority
 	/**
 	 * Return the entities that have been loaded
 	 */
-	public function getSortedEntities()
+	public function getSortedEntities(): array
 	{
 		return $this->_sorted_entities;
 	}

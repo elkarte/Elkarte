@@ -32,9 +32,6 @@ class HttpReq
 	/** @var object The returned POST values */
 	public $post;
 
-	/** @var array The compiled post values (json and cleaned from request) */
-	private $_derived_post;
-
 	/** @var object The returned GET values */
 	public $query;
 
@@ -74,7 +71,7 @@ class HttpReq
 		}
 		else
 		{
-			$this->session = new \ArrayObject(array(), \ArrayObject::ARRAY_AS_PROPS);
+			$this->session = new \ArrayObject([], \ArrayObject::ARRAY_AS_PROPS);
 		}
 
 		$this->server = detectServer();
@@ -98,21 +95,21 @@ class HttpReq
 	 *   values, being they are "sanitized"
 	 * - $_GET ones are already re-stuffed by cleanRequest
 	 */
-	private function _loadParsed()
+	private function _loadParsed(): void
 	{
 		// Any that were born in cleanRequest, like start from topic=xyz.START
 		// are added to the other supers
 		$derived = array_diff_key($_REQUEST, $_POST, $_GET);
 		$derived_get = array_merge($_GET, $derived);
-		$this->_derived_post = array_merge($_POST, $derived);
+		$_derived_post = array_merge($_POST, $derived);
 
 		// Others may have been "sanitized" from either get or post and saved in request
 		// these values replace the existing ones in $_POST
-		$cleaned = array_intersect_key($_REQUEST, $this->_derived_post);
-		$this->_derived_post = array_merge($this->_derived_post, $cleaned);
+		$cleaned = array_intersect_key($_REQUEST, $_derived_post);
+		$_derived_post = array_merge($_derived_post, $cleaned);
 
 		// Make the $_GET $_POST super globals available as R/W properties
-		$this->post = new \ArrayObject($this->_derived_post, \ArrayObject::ARRAY_AS_PROPS);
+		$this->post = new \ArrayObject($_derived_post, \ArrayObject::ARRAY_AS_PROPS);
 		$this->query = new \ArrayObject($derived_get, \ArrayObject::ARRAY_AS_PROPS);
 	}
 
@@ -136,12 +133,7 @@ class HttpReq
 			return $this->_param[$key];
 		}
 
-		if (isset($this->query->{$key}))
-		{
-			return $this->query->{$key};
-		}
-
-		return $this->post->{$key} ?? null;
+		return $this->query->{$key} ?? $this->post->{$key} ?? null;
 	}
 
 	/**
@@ -196,9 +188,31 @@ class HttpReq
 	 *
 	 * @return bool
 	 */
-	public function isSet($key)
+	public function isSet($key): bool
 	{
 		return $this->__isset($key);
+	}
+
+	/**
+	 * Checks if a POST value was sent
+	 *
+	 * @param string $name The key name to check in POST data
+	 * @return bool Returns true if the POST value exists, false otherwise
+	 */
+	public function hasPost($name): bool
+	{
+		return isset($this->post->{$name});
+	}
+
+	/**
+	 * Checks if a GET value was sent
+	 *
+	 * @param string $name The key name to check in POST data
+	 * @return bool Returns true if the POST value exists, false otherwise
+	 */
+	public function hasQuery($name): bool
+	{
+		return isset($this->query->{$name});
 	}
 
 	/**
@@ -296,7 +310,7 @@ class HttpReq
 	 *
 	 * @return bool
 	 */
-	public function compareQuery($name, $compare, $sanitize = null, $default = null)
+	public function compareQuery($name, $compare, $sanitize = null, $default = null): bool
 	{
 		$this->getQuery($name, $sanitize, $default);
 
@@ -314,7 +328,7 @@ class HttpReq
 	 *
 	 * @return bool
 	 */
-	public function comparePost($name, $compare, $sanitize = null, $default = null)
+	public function comparePost($name, $compare, $sanitize = null, $default = null): bool
 	{
 		$this->getPost($name, $sanitize, $default);
 
@@ -353,12 +367,7 @@ class HttpReq
 	 */
 	public function getSession($name = '', $default = null)
 	{
-		if (isset($this->session->{$name}))
-		{
-			return $this->session->{$name};
-		}
-
-		return $default ?? null;
+		return $this->session->{$name} ?? $default ?? null;
 	}
 
 	/**
@@ -398,7 +407,7 @@ class HttpReq
 	 * @param string $name the key name in the _param array
 	 * @param string|null $type where you want the value removed from post, query, both
 	 */
-	public function clearValue($name, $type)
+	public function clearValue($name, $type): void
 	{
 		unset($this->_param[$name]);
 
@@ -418,7 +427,7 @@ class HttpReq
 	 *
 	 * @return HttpReq
 	 */
-	public static function instance()
+	public static function instance(): HttpReq
 	{
 		if (self::$instance === null)
 		{

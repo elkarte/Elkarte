@@ -58,23 +58,23 @@ class ManageMaillist extends AbstractController
 		Txt::load('Maillist');
 
 		// All the functions available
-		$subActions = array(
-			'emaillist' => array($this, 'action_unapproved_email', 'permission' => 'approve_emails'),
-			'approve' => array($this, 'action_approve_email', 'permission' => 'approve_emails'),
-			'delete' => array($this, 'action_delete_email', 'permission' => 'approve_emails'),
-			'bounce' => array($this, 'action_bounce_email', 'permission' => 'approve_emails'),
-			'emailtemplates' => array($this, 'action_view_bounce_templates', 'permission' => 'approve_emails'),
-			'view' => array($this, 'action_view_email', 'permission' => 'approve_emails'),
-			'emailsettings' => array($this, 'action_settings', 'permission' => 'admin_forum'),
-			'emailfilters' => array($this, 'action_list_filters', 'permission' => 'admin_forum'),
-			'editfilter' => array($this, 'action_edit_filters', 'permission' => 'admin_forum'),
-			'deletefilter' => array($this, 'action_delete_filters', 'permission' => 'admin_forum'),
-			'emailparser' => array($this, 'action_list_parsers', 'permission' => 'admin_forum'),
-			'editparser' => array($this, 'action_edit_parsers', 'permission' => 'admin_forum'),
-			'deleteparser' => array($this, 'action_delete_parsers', 'permission' => 'admin_forum'),
-			'sortparsers' => array($this, 'action_sort_parsers', 'permission' => 'admin_forum'),
-			'sortfilters' => array($this, 'action_sort_filters', 'permission' => 'admin_forum'),
-		);
+		$subActions = [
+			'emaillist' => [$this, 'action_unapproved_email', 'permission' => 'approve_emails'],
+			'approve' => [$this, 'action_approve_email', 'permission' => 'approve_emails'],
+			'delete' => [$this, 'action_delete_email', 'permission' => 'approve_emails'],
+			'bounce' => [$this, 'action_bounce_email', 'permission' => 'approve_emails'],
+			'emailtemplates' => [$this, 'action_view_bounce_templates', 'permission' => 'approve_emails'],
+			'view' => [$this, 'action_view_email', 'permission' => 'approve_emails'],
+			'emailsettings' => [$this, 'action_settings', 'permission' => 'admin_forum'],
+			'emailfilters' => [$this, 'action_list_filters', 'permission' => 'admin_forum'],
+			'editfilter' => [$this, 'action_edit_filters', 'permission' => 'admin_forum'],
+			'deletefilter' => [$this, 'action_delete_filters', 'permission' => 'admin_forum'],
+			'emailparser' => [$this, 'action_list_parsers', 'permission' => 'admin_forum'],
+			'editparser' => [$this, 'action_edit_parsers', 'permission' => 'admin_forum'],
+			'deleteparser' => [$this, 'action_delete_parsers', 'permission' => 'admin_forum'],
+			'sortparsers' => [$this, 'action_sort_parsers', 'permission' => 'admin_forum'],
+			'sortfilters' => [$this, 'action_sort_filters', 'permission' => 'admin_forum'],
+		];
 
 		// Action Controller
 		$action = new Action('manage_maillist');
@@ -121,7 +121,7 @@ class ManageMaillist extends AbstractController
 	 * @event integrate_list_view_email_errors
 	 * @uses showlist sub template
 	 */
-	public function action_unapproved_email()
+	public function action_unapproved_email(): void
 	{
 		global $context, $modSettings, $txt;
 
@@ -135,41 +135,41 @@ class ManageMaillist extends AbstractController
 		createToken('admin-ml', 'get');
 
 		// Build the list option array to display the email data
-		$listOptions = array(
+		$listOptions = [
 			'id' => 'view_email_errors',
 			'title' => $txt['ml_emailerror'],
 			'items_per_page' => $modSettings['defaultMaxMessages'],
 			'no_items_label' => $txt['ml_emailerror_none'],
 			'base_href' => getUrl('admin', ['action' => 'admin', 'area' => 'maillist']),
 			'default_sort_col' => 'id_email',
-			'get_items' => array(
+			'get_items' => [
 				'function' => fn(int $start, int $items_per_page, string $sort = '', int $id = 0): array => $this->list_maillist_unapproved($start, $items_per_page, $sort, $id),
-				'params' => array(
+				'params' => [
 					$id,
-				),
-			),
-			'get_count' => array(
+				],
+			],
+			'get_count' => [
 				'function' => 'list_maillist_count_unapproved',
-			),
-			'columns' => array(
-				'id_email' => array(
-					'header' => array(
+			],
+			'columns' => [
+				'id_email' => [
+					'header' => [
 						'value' => $txt['id'],
 						'class' => 'nowrap',
-					),
-					'data' => array(
+					],
+					'data' => [
 						'db' => 'id_email',
-					),
-					'sort' => array(
+					],
+					'sort' => [
 						'default' => 'id_email ',
 						'reverse' => 'id_email DESC',
-					),
-				),
-				'error' => array(
-					'header' => array(
+					],
+				],
+				'error' => [
+					'header' => [
 						'value' => $txt['error'],
-					),
-					'data' => array(
+					],
+					'data' => [
 						'function' => static function ($rowData) {
 							$error = $rowData['error_code'];
 							if ($error === 'error_pm_not_found')
@@ -179,72 +179,72 @@ class ManageMaillist extends AbstractController
 
 							return $rowData['error'];
 						},
-					),
-					'sort' => array(
+					],
+					'sort' => [
 						'default' => 'error ',
 						'reverse' => 'error DESC',
-					),
-				),
-				'subject' => array(
-					'header' => array(
+					],
+				],
+				'subject' => [
+					'header' => [
 						'value' => $txt['subject'],
-					),
-					'data' => array(
+					],
+					'data' => [
 						'db' => 'subject',
-					),
-					'sort' => array(
+					],
+					'sort' => [
 						'default' => 'subject',
 						'reverse' => 'subject DESC',
-					),
-				),
-				'key' => array(
-					'header' => array(
+					],
+				],
+				'key' => [
+					'header' => [
 						'value' => $txt['key'],
-					),
-					'data' => array(
+					],
+					'data' => [
 						'db' => 'key',
 						'class' => 'wordbreak'
-					),
-					'sort' => array(
+					],
+					'sort' => [
 						'default' => 'message_key',
 						'reverse' => 'message_key DESC',
-					),
-				),
-				'message' => array(
-					'header' => array(
+					],
+				],
+				'message' => [
+					'header' => [
 						'value' => $txt['message_id'],
-					),
-					'data' => array(
-						'sprintf' => array(
+					],
+					'data' => [
+						'sprintf' => [
 							'format' => '<a href="%1$s">%2$s</a>',
-							'params' => array(
+							'params' => [
 								'link' => true,
 								'message' => true,
-							),
-						),
-					),
-					'sort' => array(
+							],
+						],
+					],
+					'sort' => [
 						'default' => 'message_id',
 						'reverse' => 'message_id DESC',
-					),
-				),
-				'from' => array(
-					'header' => array(
+					],
+				],
+				'from' => [
+					'header' => [
 						'value' => $txt['from'],
-					),
-					'data' => array(
+					],
+					'data' => [
 						'db' => 'from',
-					),
-					'sort' => array(
+					],
+					'sort' => [
 						'default' => 'email_from',
 						'reverse' => 'email_from DESC',
-					),
-				),
-				'type' => array(
-					'header' => array(
+					],
+				],
+				'type' => [
+					'header' => [
 						'value' => $txt['message_type'],
-					),
-					'data' => array(
+					],
+					'data' => [
 						'function' => static function ($rowData) {
 							global $txt;
 
@@ -268,22 +268,22 @@ class ManageMaillist extends AbstractController
 
 							return $txt['topic'] . ' ' . $txt['reply'];
 						},
-					),
-					'sort' => array(
+					],
+					'sort' => [
 						'default' => 'message_type',
 						'reverse' => 'message_type DESC',
-					),
-				),
-				'action' => array(
-					'header' => array(
+					],
+				],
+				'action' => [
+					'header' => [
 						'value' => $txt['message_action'],
-					),
-					'data' => array(
+					],
+					'data' => [
 						'function' => static function ($rowData) {
 							global $context, $txt;
 
 							$id = $rowData['id_email'] . ';';
-							$commands = array();
+							$commands = [];
 							$security = $context['session_var'] . '=' . $context['session_id'] . ';' . $context['admin-ml_token_var'] . '=' . $context['admin-ml_token'];
 
 							if ($rowData['error_code'] === 'error_pm_not_found')
@@ -301,23 +301,23 @@ class ManageMaillist extends AbstractController
 
 							return implode('', $commands);
 						},
-					),
+					],
 					'class' => 'listaction',
-				),
-			),
-			'form' => array(
+				],
+			],
+			'form' => [
 				'href' => getUrl('admin', ['action' => 'admin', 'area' => 'maillist', 'sa' => 'emaillist']),
 				'include_sort' => true,
 				'include_start' => true,
-			),
-			'additional_rows' => array(
-				array(
+			],
+			'additional_rows' => [
+				[
 					'position' => 'after_title',
 					'class' => isset($_SESSION['email_error'], $_SESSION['email_error_type']) ? 'successbox' : (isset($_SESSION['email_error']) ? 'errorbox' : 'description'),
 					'value' => $this->_req->session->email_error ?? $txt['heading'],
-				),
-			),
-		);
+				],
+			],
+		];
 
 		// Clear any errors
 		unset($_SESSION['email_error'], $_SESSION['email_error_type']);
@@ -341,7 +341,7 @@ class ManageMaillist extends AbstractController
 	 *
 	 * @uses show_email sub template
 	 */
-	public function action_view_email()
+	public function action_view_email(): void
 	{
 		global $txt, $context;
 
@@ -406,7 +406,7 @@ class ManageMaillist extends AbstractController
 	 * - Accessed by ?action=admin;area=maillist;sa=delete;item=?'
 	 * - Redirects to ?action=admin;area=maillist;sa=emaillist
 	 */
-	public function action_delete_email()
+	public function action_delete_email(): void
 	{
 		checkSession('get');
 		validateToken('admin-ml', 'get');
@@ -437,7 +437,7 @@ class ManageMaillist extends AbstractController
 	 * - Accessed by ?action=admin;area=maillist;sa=approve;item=?'
 	 * - Redirects to action=admin;area=maillist;sa=emaillist
 	 */
-	public function action_approve_email()
+	public function action_approve_email(): void
 	{
 		global $txt;
 
@@ -454,14 +454,14 @@ class ManageMaillist extends AbstractController
 			if (!empty($temp_email))
 			{
 				// Do we have the needed data to approve this, after all it failed for a reason yes?
-				if (!empty($temp_email[0]['key']) && (!in_array($temp_email[0]['error_code'], array('error_no_message', 'error_not_find_board', 'error_topic_gone'))))
+				if (!empty($temp_email[0]['key']) && (!in_array($temp_email[0]['error_code'], ['error_no_message', 'error_not_find_board', 'error_topic_gone'])))
 				{
 					// Set up the details needed to get this posted
 					$key = $temp_email[0]['key'] . '-' . $temp_email[0]['type'] . $temp_email[0]['message'];
 					$data = $temp_email[0]['body'];
 
 					// Unknown from email?  Update the message ONLY if we found an appropriate one during the error checking process
-					if (in_array($temp_email[0]['error_code'], array('error_not_find_member', 'error_key_sender_match')))
+					if (in_array($temp_email[0]['error_code'], ['error_not_find_member', 'error_key_sender_match']))
 					{
 						// did we actually find a potential correct name, if so we post from the valid member
 						$check_emails = array_pad(explode('=>', $temp_email[0]['from']), 2, '');
@@ -526,7 +526,7 @@ class ManageMaillist extends AbstractController
 	 *
 	 * @uses bounce_email sub-template
 	 */
-	public function action_bounce_email()
+	public function action_bounce_email(): void
 	{
 		global $context, $txt, $modSettings, $scripturl, $mbname;
 
@@ -552,7 +552,7 @@ class ManageMaillist extends AbstractController
 				$fullerrortext = $txt[$temp_email[0]['error_code']];
 
 				// Build the template selection area, first the standard ones
-				$bounce = array('bounce', 'inform');
+				$bounce = ['bounce', 'inform'];
 				foreach ($bounce as $k => $type)
 				{
 					$context['bounce_templates'][$k]['body'] = $txt['ml_' . $type . '_body'];
@@ -566,7 +566,7 @@ class ManageMaillist extends AbstractController
 				// Replace all the variables in the templates
 				foreach ($context['bounce_templates'] as $k => $name)
 				{
-					$context['bounce_templates'][$k]['body'] = strtr($name['body'], array(
+					$context['bounce_templates'][$k]['body'] = strtr($name['body'], [
 						'{MEMBER}' => un_htmlspecialchars($temp_email[0]['name']),
 						'{SCRIPTURL}' => $scripturl,
 						'{FORUMNAME}' => $mbname,
@@ -575,7 +575,7 @@ class ManageMaillist extends AbstractController
 						'{ERROR}' => $fullerrortext,
 						'{FORUMNAMESHORT}' => (empty($modSettings['maillist_sitename']) ? $mbname : $modSettings['maillist_sitename']),
 						'{EMAILREGARDS}' => (empty($modSettings['maillist_sitename_regards']) ? '' : $modSettings['maillist_sitename_regards']),
-					));
+					]);
 				}
 			}
 			else
@@ -620,7 +620,7 @@ class ManageMaillist extends AbstractController
 
 		// Prepare and show the template
 		createToken('admin-ml');
-		$context['warning_data'] = array('notify' => '', 'notify_subject' => '', 'notify_body' => '');
+		$context['warning_data'] = ['notify' => '', 'notify_subject' => '', 'notify_body' => ''];
 		$context['body'] = isset($fullerrortext) ? ParserWrapper::instance()->parseEmail($fullerrortext) : '';
 		$context['item'] = $this->_req->post->item ?? '';
 		$context['notice_to'] = $txt['to'] . ' ' . isset($temp_email[0]['from']) !== '' ? $temp_email[0]['from'] : '';
@@ -640,92 +640,92 @@ class ManageMaillist extends AbstractController
 	 *
 	 * @event integrate_list_email_filter
 	 */
-	public function action_list_filters()
+	public function action_list_filters(): void
 	{
 		global $context, $txt, $modSettings;
 
 		$id = 0;
 
 		// Build the listoption array to display the filters
-		$listOptions = array(
+		$listOptions = [
 			'id' => 'email_filter',
 			'title' => $txt['filters'],
 			'items_per_page' => $modSettings['defaultMaxMessages'],
 			'no_items_label' => $txt['no_filters'],
 			'base_href' => getUrl('admin', ['action' => 'admin', 'area' => 'maillist', 'sa' => 'emailfilters']),
 			'default_sort_col' => 'name',
-			'get_items' => array(
+			'get_items' => [
 				'function' => fn(int $start, int $items_per_page, string $sort, int $id, string $style): array => $this->load_filter_parser($start, $items_per_page, $sort, $id, $style),
-				'params' => array(
+				'params' => [
 					$id,
 					'filter'
-				),
-			),
-			'get_count' => array(
+				],
+			],
+			'get_count' => [
 				'function' => fn(int $id, string $style): int => $this->count_filter_parser($id, $style),
-				'params' => array(
+				'params' => [
 					$id,
 					'filter'
-				),
-			),
-			'columns' => array(
-				'name' => array(
-					'header' => array(
+				],
+			],
+			'columns' => [
+				'name' => [
+					'header' => [
 						'value' => $txt['filter_name'],
 						'style' => 'white-space: nowrap;'
-					),
-					'data' => array(
+					],
+					'data' => [
 						'db' => 'filter_name',
-					),
-					'sort' => array(
+					],
+					'sort' => [
 						'default' => 'filter_name, id_filter',
 						'reverse' => 'filter_name DESC, id_filter DESC',
-					),
-				),
-				'from' => array(
-					'header' => array(
+					],
+				],
+				'from' => [
+					'header' => [
 						'value' => $txt['filter_from'],
-					),
-					'data' => array(
+					],
+					'data' => [
 						'db' => 'filter_from',
-					),
-					'sort' => array(
+					],
+					'sort' => [
 						'default' => 'filter_from, id_filter',
 						'reverse' => 'filter_from DESC, id_filter DESC',
-					),
-				),
-				'to' => array(
-					'header' => array(
+					],
+				],
+				'to' => [
+					'header' => [
 						'value' => $txt['filter_to'],
 						'style' => 'width:10em;',
-					),
-					'data' => array(
+					],
+					'data' => [
 						'db' => 'filter_to',
-					),
-					'sort' => array(
+					],
+					'sort' => [
 						'default' => 'filter_to, id_filter',
 						'reverse' => 'filter_to DESC, id_filter DESC',
-					),
-				),
-				'type' => array(
-					'header' => array(
+					],
+				],
+				'type' => [
+					'header' => [
 						'value' => $txt['filter_type'],
-					),
-					'data' => array(
+					],
+					'data' => [
 						'db' => 'filter_type',
-					),
-					'sort' => array(
+					],
+					'sort' => [
 						'default' => 'filter_type, id_filter',
 						'reverse' => 'filter_type DESC, id_filter DESC',
-					),
-				),
-				'action' => array(
-					'header' => array(
+					],
+				],
+				'action' => [
+					'header' => [
 						'value' => $txt['message_action'],
 						'class' => 'centertext',
-					),
-					'data' => array(
-						'sprintf' => array(
+					],
+					'data' => [
+						'sprintf' => [
 							'format' => '
 								<a href="?action=admin;area=maillist;sa=editfilter;f_id=%1$s;' . $context['session_var'] . '=' . $context['session_id'] . '">
 									<i class="icon i-modify" title="' . $txt['modify'] . '"></i>
@@ -733,38 +733,38 @@ class ManageMaillist extends AbstractController
 								<a href="?action=admin;area=maillist;sa=deletefilter;f_id=%1$s;' . $context['session_var'] . '=' . $context['session_id'] . '" onclick="return confirm(' . JavaScriptEscape($txt['filter_delete_warning']) . ') && submitThisOnce(this);" accesskey="d">
 									<i class="icon i-delete" title="' . $txt['delete'] . '"></i>
 								</a>',
-							'params' => array(
+							'params' => [
 								'id_filter' => true,
-							),
-						),
+							],
+						],
 						'class' => 'centertext',
 						'style' => 'white-space:nowrap;',
-					),
-				),
-			),
-			'form' => array(
+					],
+				],
+			],
+			'form' => [
 				'href' => getUrl('admin', ['action' => 'admin', 'area' => 'maillist', 'sa' => 'editfilter']),
 				'include_sort' => true,
 				'include_start' => true,
-				'hidden_fields' => array(
+				'hidden_fields' => [
 					$context['session_var'] => $context['session_id'],
-				),
-			),
-			'additional_rows' => array(
-				array(
+				],
+			],
+			'additional_rows' => [
+				[
 					'position' => 'top_of_list',
 					'class' => isset($this->_req->query->saved) ? 'successbox' : '',
 					'value' => isset($this->_req->query->saved) ? $txt['saved'] : '',
-				),
-				array(
+				],
+				[
 					'position' => 'below_table_data',
 					'class' => 'submitbutton',
 					'value' => '
 						<input type="submit" name="addfilter" value="' . $txt['add_filter'] . '" />
 						<a class="linkbutton" href="' . getUrl('admin', ['action' => 'admin', 'area' => 'maillist', 'sa' => 'sortfilters']) . '">' . $txt['sort_filter'] . '</a>',
-				),
-			),
-		);
+				],
+			],
+		];
 
 		// Set the context values
 		$context['page_title'] = $txt['filters'];
@@ -780,7 +780,7 @@ class ManageMaillist extends AbstractController
 	 *
 	 * @event integrate_list_sort_email_fp
 	 */
-	public function action_sort_filters()
+	public function action_sort_filters(): void
 	{
 		global $context, $txt;
 
@@ -788,85 +788,85 @@ class ManageMaillist extends AbstractController
 		$token = createToken('admin-sort');
 
 		// build the listoption array to display the data
-		$listOptions = array(
+		$listOptions = [
 			'id' => 'sort_email_fp',
 			'title' => $txt['sort_filter'],
 			'sortable' => true,
 			'items_per_page' => 0,
 			'no_items_label' => $txt['no_filters'],
 			'base_href' => getUrl('admin', ['action' => 'admin', 'area' => 'maillist', 'sa' => 'sortfilters']),
-			'get_items' => array(
+			'get_items' => [
 				'function' => fn(int $start, int $items_per_page, string $sort, int $id, string $style): array => $this->load_filter_parser($start, $items_per_page, $sort, $id, $style),
-				'params' => array(
+				'params' => [
 					$id,
 					'filter'
-				),
-			),
-			'get_count' => array(
+				],
+			],
+			'get_count' => [
 				'function' => fn(int $id, string $style): int => $this->count_filter_parser($id, $style),
-				'params' => array(
+				'params' => [
 					$id,
 					'filter'
-				),
-			),
-			'columns' => array(
-				'filterorder' => array(
-					'header' => array(
+				],
+			],
+			'columns' => [
+				'filterorder' => [
+					'header' => [
 						'value' => '',
 						'class' => 'hide',
-					),
-					'data' => array(
+					],
+					'data' => [
 						'db' => 'filter_order',
 						'class' => 'hide',
-					),
-				),
-				'name' => array(
-					'header' => array(
+					],
+				],
+				'name' => [
+					'header' => [
 						'value' => $txt['filter_name'],
 						'style' => 'white-space: nowrap;width: 10em'
-					),
-					'data' => array(
+					],
+					'data' => [
 						'db' => 'filter_name',
-					),
-				),
-				'from' => array(
-					'header' => array(
+					],
+				],
+				'from' => [
+					'header' => [
 						'value' => $txt['filter_from'],
-					),
-					'data' => array(
+					],
+					'data' => [
 						'db' => 'filter_from',
-					),
-				),
-				'to' => array(
-					'header' => array(
+					],
+				],
+				'to' => [
+					'header' => [
 						'value' => $txt['filter_to'],
 						'style' => 'width:10em;',
-					),
-					'data' => array(
+					],
+					'data' => [
 						'db' => 'filter_to',
-					),
-				),
-				'type' => array(
-					'header' => array(
+					],
+				],
+				'type' => [
+					'header' => [
 						'value' => $txt['filter_type'],
-					),
-					'data' => array(
+					],
+					'data' => [
 						'db' => 'filter_type',
-					),
-				),
-			),
-			'form' => array(
+					],
+				],
+			],
+			'form' => [
 				'href' => getUrl('admin', ['action' => 'admin', 'area' => 'maillist', 'sa' => 'sortfilters']),
-				'hidden_fields' => array(
+				'hidden_fields' => [
 					$context['session_var'] => $context['session_id'],
-				),
-			),
-			'additional_rows' => array(
-				array(
+				],
+			],
+			'additional_rows' => [
+				[
 					'position' => 'after_title',
 					'value' => $txt['filter_sort_description'],
-				),
-			),
+				],
+			],
 			'javascript' => '
 				$().elkSortable({
 					sa: "parserorder",
@@ -878,7 +878,7 @@ class ManageMaillist extends AbstractController
 					token: {token_var: "' . $token['admin-sort_token_var'] . '", token_id: "' . $token['admin-sort_token'] . '"}
 				});
 			',
-		);
+		];
 
 		// Set the context values
 		$context['page_title'] = $txt['filters'];
@@ -899,7 +899,7 @@ class ManageMaillist extends AbstractController
 	 *
 	 * @return int
 	 */
-	public function count_filter_parser($id, $style)
+	public function count_filter_parser(int $id, string $style): int
 	{
 		return list_count_filter_parser($id, $style);
 	}
@@ -917,7 +917,7 @@ class ManageMaillist extends AbstractController
 	 *
 	 * @return array
 	 */
-	public function load_filter_parser($start, $items_per_page, $sort, $id, $style)
+	public function load_filter_parser(int $start, int $items_per_page, string $sort, int $id, string $style): array
 	{
 		return list_get_filter_parser($start, $items_per_page, $sort, $id, $style);
 	}
@@ -930,7 +930,7 @@ class ManageMaillist extends AbstractController
 	 * @event integrate_save_filter_settings
 	 *
 	 */
-	public function action_edit_filters()
+	public function action_edit_filters(): void
 	{
 		global $context, $txt, $modSettings;
 
@@ -955,7 +955,7 @@ class ManageMaillist extends AbstractController
 			// Some items for the form
 			$context['page_title'] = $txt['edit_filter'];
 			$context['editing'] = true;
-			$context['settings_message'] = array();
+			$context['settings_message'] = [];
 		}
 		else
 		{
@@ -967,7 +967,7 @@ class ManageMaillist extends AbstractController
 
 			$context['page_title'] = $txt['add_filter'];
 			$context['editing'] = false;
-			$context['settings_message'] = array();
+			$context['settings_message'] = [];
 		}
 
 		// Initialize the form
@@ -1014,10 +1014,10 @@ class ManageMaillist extends AbstractController
 			if (empty($context['settings_message']))
 			{
 				// And ... its a filter
-				$config_vars[] = array('text', 'filter_style');
+				$config_vars[] = ['text', 'filter_style'];
 				$this->_req->post->filter_style = 'filter';
 
-				MaillistSettings::saveTableSettings($config_vars, 'postby_emails_filters', $this->_req->post, array('id_filter'), $editId, $editName);
+				MaillistSettings::saveTableSettings($config_vars, 'postby_emails_filters', $this->_req->post, ['id_filter'], $editId, $editName);
 				redirectexit('action=admin;area=maillist;sa=emailfilters;saved');
 			}
 		}
@@ -1026,10 +1026,10 @@ class ManageMaillist extends AbstractController
 		$title = empty($this->_req->query->saved) ? ($context['editing'] === true ? 'edit_filter' : 'add_filter') : ('saved_filter');
 		$context['post_url'] = getUrl('admin', ['action' => 'admin', 'area' => 'maillist', 'sa' => 'editfilter', 'edit' => $context['editing'] ? $modSettings['id_filter'] : 'new', 'save']);
 		$context['settings_title'] = $txt[$title];
-		$context['breadcrumbs'][] = array(
+		$context['breadcrumbs'][] = [
 			'url' => getUrl('admin', ['action' => 'admin', 'area' => 'maillist', 'sa' => 'editfilter']),
 			'name' => ($context['editing']) ? $txt['edit_filter'] : $txt['add_filter'],
-		);
+		];
 
 		// Load and show
 		$settingsForm->prepare();
@@ -1047,19 +1047,19 @@ class ManageMaillist extends AbstractController
 	{
 		global $txt;
 
-		$config_vars = array(
-			array('text', 'filter_name', 25, 'subtext' => $txt['filter_name_desc']),
-			array('select', 'filter_type',
-				array(
+		$config_vars = [
+			['text', 'filter_name', 25, 'subtext' => $txt['filter_name_desc']],
+			['select', 'filter_type',
+				[
 					'standard' => $txt['option_standard'],
 					'regex' => $txt['option_regex'],
-				),
-			),
-			array('large_text', 'filter_from', 4, 'subtext' => $txt['filter_from_desc']),
-			array('text', 'filter_to', 25, 'subtext' => $txt['filter_to_desc']),
-		);
+				],
+			],
+			['large_text', 'filter_from', 4, 'subtext' => $txt['filter_from_desc']],
+			['text', 'filter_to', 25, 'subtext' => $txt['filter_to_desc']],
+		];
 
-		call_integration_hook('integrate_modify_maillist_filter_settings', array(&$config_vars));
+		call_integration_hook('integrate_modify_maillist_filter_settings', [&$config_vars]);
 
 		return $config_vars;
 	}
@@ -1082,7 +1082,7 @@ class ManageMaillist extends AbstractController
 	/**
 	 * Deletes a filter from the system / database
 	 */
-	public function action_delete_filters()
+	public function action_delete_filters(): void
 	{
 		// Removing the filter?
 		if (isset($this->_req->query->f_id))
@@ -1107,78 +1107,78 @@ class ManageMaillist extends AbstractController
 	 *
 	 * @event integrate_list_email_parser
 	 */
-	public function action_list_parsers()
+	public function action_list_parsers(): void
 	{
 		global $context, $txt, $modSettings;
 
 		$id = 0;
 
 		// Build the listoption array to display the data
-		$listOptions = array(
+		$listOptions = [
 			'id' => 'email_parser',
 			'title' => $txt['parsers'],
 			'items_per_page' => $modSettings['defaultMaxMessages'],
 			'no_items_label' => $txt['no_parsers'],
 			'base_href' => getUrl('admin', ['action' => 'admin', 'area' => 'maillist', 'sa' => 'emailparser']),
-			'get_items' => array(
+			'get_items' => [
 				'function' => fn(int $start, int $items_per_page, string $sort, int $id, string $style): array => $this->load_filter_parser($start, $items_per_page, $sort, $id, $style),
-				'params' => array(
+				'params' => [
 					$id,
 					'parser'
-				),
-			),
-			'get_count' => array(
+				],
+			],
+			'get_count' => [
 				'function' => fn(int $id, string $style): int => $this->count_filter_parser($id, $style),
-				'params' => array(
+				'params' => [
 					$id,
 					'parser'
-				),
-			),
-			'columns' => array(
-				'name' => array(
-					'header' => array(
+				],
+			],
+			'columns' => [
+				'name' => [
+					'header' => [
 						'value' => $txt['parser_name'],
 						'style' => 'white-space: nowrap;'
-					),
-					'data' => array(
+					],
+					'data' => [
 						'db' => 'filter_name',
-					),
-					'sort' => array(
+					],
+					'sort' => [
 						'default' => 'filter_name',
 						'reverse' => 'filter_name DESC',
-					),
-				),
-				'from' => array(
-					'header' => array(
+					],
+				],
+				'from' => [
+					'header' => [
 						'value' => $txt['parser_from'],
-					),
-					'data' => array(
+					],
+					'data' => [
 						'db' => 'filter_from',
-					),
-					'sort' => array(
+					],
+					'sort' => [
 						'default' => 'filter_from',
 						'reverse' => 'filter_from DESC',
-					),
-				),
-				'type' => array(
-					'header' => array(
+					],
+				],
+				'type' => [
+					'header' => [
 						'value' => $txt['parser_type'],
-					),
-					'data' => array(
+					],
+					'data' => [
 						'db' => 'filter_type',
-					),
-					'sort' => array(
+					],
+					'sort' => [
 						'default' => 'filter_type',
 						'reverse' => 'filter_type DESC',
-					),
-				),
-				'action' => array(
-					'header' => array(
+					],
+				],
+				'action' => [
+					'header' => [
 						'value' => $txt['message_action'],
 						'class' => 'centertext',
-					),
-					'data' => array(
-						'sprintf' => array(
+					],
+					'data' => [
+						'sprintf' => [
 							'format' => '
 								<a href="?action=admin;area=maillist;sa=editparser;f_id=%1$s;' . $context['session_var'] . '=' . $context['session_id'] . '">
 									<i class="icon i-modify" title="' . $txt['modify'] . '"></i>
@@ -1186,38 +1186,38 @@ class ManageMaillist extends AbstractController
 								<a href="?action=admin;area=maillist;sa=deleteparser;f_id=%1$s;' . $context['session_var'] . '=' . $context['session_id'] . '" onclick="return confirm(' . JavaScriptEscape($txt['parser_delete_warning']) . ') && submitThisOnce(this);" accesskey="d">
 									<i class="icon i-delete" title="' . $txt['delete'] . '"></i>
 								</a>',
-							'params' => array(
+							'params' => [
 								'id_filter' => true,
-							),
-						),
+							],
+						],
 						'class' => 'centertext',
 						'style' => 'white-space:nowrap;',
-					),
-				),
-			),
-			'form' => array(
+					],
+				],
+			],
+			'form' => [
 				'href' => getUrl('admin', ['action' => 'admin', 'area' => 'maillist', 'sa' => 'editparser']),
 				'include_sort' => true,
 				'include_start' => true,
-				'hidden_fields' => array(
+				'hidden_fields' => [
 					$context['session_var'] => $context['session_id'],
-				),
-			),
-			'additional_rows' => array(
-				array(
+				],
+			],
+			'additional_rows' => [
+				[
 					'position' => 'top_of_list',
 					'class' => isset($this->_req->query->saved) ? 'successbox' : '',
 					'value' => isset($this->_req->query->saved) ? $txt['saved'] : '',
-				),
-				array(
+				],
+				[
 					'position' => 'below_table_data',
 					'class' => 'submitbutton',
 					'value' => '
 						<input type="submit" name="addparser" value="' . $txt['add_parser'] . '" />
 						<a class="linkbutton" href="' . getUrl('admin', ['action' => 'admin', 'area' => 'maillist', 'sa' => 'sortparsers']) . '">' . $txt['sort_parser'] . '</a>',
-				),
-			),
-		);
+				],
+			],
+		];
 
 		// Set the context values
 		$context['page_title'] = $txt['parsers'];
@@ -1233,7 +1233,7 @@ class ManageMaillist extends AbstractController
 	 *
 	 * @event integrate_list_email_parser
 	 */
-	public function action_sort_parsers()
+	public function action_sort_parsers(): void
 	{
 		global $context, $txt;
 
@@ -1241,76 +1241,76 @@ class ManageMaillist extends AbstractController
 		$token = createToken('admin-sort');
 
 		// Build the listoption array to display the data
-		$listOptions = array(
+		$listOptions = [
 			'id' => 'sort_email_fp',
 			'title' => $txt['sort_parser'],
 			'sortable' => true,
 			'items_per_page' => 0,
 			'no_items_label' => $txt['no_parsers'],
 			'base_href' => getUrl('admin', ['action' => 'admin', 'area' => 'maillist', 'sa' => 'sortparsers']),
-			'get_items' => array(
+			'get_items' => [
 				'function' => fn(int $start, int $items_per_page, string $sort, int $id, string $style): array => $this->load_filter_parser($start, $items_per_page, $sort, $id, $style),
-				'params' => array(
+				'params' => [
 					$id,
 					'parser'
-				),
-			),
-			'get_count' => array(
+				],
+			],
+			'get_count' => [
 				'function' => fn(int $id, string $style): int => $this->count_filter_parser($id, $style),
-				'params' => array(
+				'params' => [
 					$id,
 					'parser'
-				),
-			),
-			'columns' => array(
-				'filterorder' => array(
-					'header' => array(
+				],
+			],
+			'columns' => [
+				'filterorder' => [
+					'header' => [
 						'value' => '',
 						'class' => 'hide',
-					),
-					'data' => array(
+					],
+					'data' => [
 						'db' => 'filter_order',
 						'class' => 'hide',
-					),
-				),
-				'name' => array(
-					'header' => array(
+					],
+				],
+				'name' => [
+					'header' => [
 						'value' => $txt['parser_name'],
 						'style' => 'white-space: nowrap;width: 10em'
-					),
-					'data' => array(
+					],
+					'data' => [
 						'db' => 'filter_name',
-					),
-				),
-				'from' => array(
-					'header' => array(
+					],
+				],
+				'from' => [
+					'header' => [
 						'value' => $txt['parser_from'],
-					),
-					'data' => array(
+					],
+					'data' => [
 						'db' => 'filter_from',
-					),
-				),
-				'type' => array(
-					'header' => array(
+					],
+				],
+				'type' => [
+					'header' => [
 						'value' => $txt['parser_type'],
-					),
-					'data' => array(
+					],
+					'data' => [
 						'db' => 'filter_type',
-					),
-				),
-			),
-			'form' => array(
+					],
+				],
+			],
+			'form' => [
 				'href' => getUrl('admin', ['action' => 'admin', 'area' => 'maillist', 'sa' => 'sortparsers']),
-				'hidden_fields' => array(
+				'hidden_fields' => [
 					$context['session_var'] => $context['session_id'],
-				),
-			),
-			'additional_rows' => array(
-				array(
+				],
+			],
+			'additional_rows' => [
+				[
 					'position' => 'after_title',
 					'value' => $txt['parser_sort_description'],
-				),
-			),
+				],
+			],
 			'javascript' => '
 				$().elkSortable({
 					sa: "parserorder",
@@ -1322,7 +1322,7 @@ class ManageMaillist extends AbstractController
 					token: {token_var: "' . $token['admin-sort_token_var'] . '", token_id: "' . $token['admin-sort_token'] . '"}
 				});
 			',
-		);
+		];
 
 		// Set the context values
 		$context['page_title'] = $txt['parsers'];
@@ -1340,7 +1340,7 @@ class ManageMaillist extends AbstractController
 	 *
 	 * @event integrate_save_parser_settings
 	 */
-	public function action_edit_parsers()
+	public function action_edit_parsers(): void
 	{
 		global $context, $txt, $modSettings;
 
@@ -1421,11 +1421,11 @@ class ManageMaillist extends AbstractController
 			if (empty($context['settings_message']))
 			{
 				// Shhh ... its really a parser
-				$config_vars[] = array('text', 'filter_style');
+				$config_vars[] = ['text', 'filter_style'];
 				$this->_req->post->filter_style = 'parser';
 
 				// Save, log, show
-				MaillistSettings::saveTableSettings($config_vars, 'postby_emails_filters', $this->_req->post, array('id_filter'), $editId, $editName);
+				MaillistSettings::saveTableSettings($config_vars, 'postby_emails_filters', $this->_req->post, ['id_filter'], $editId, $editName);
 				redirectexit('action=admin;area=maillist;sa=emailparser;saved');
 			}
 		}
@@ -1455,18 +1455,18 @@ class ManageMaillist extends AbstractController
 	{
 		global $txt;
 
-		$config_vars = array(
-			array('text', 'filter_name', 25, 'subtext' => $txt['parser_name_desc']),
-			array('select', 'filter_type', 'subtext' => $txt['parser_type_desc'],
-				array(
+		$config_vars = [
+			['text', 'filter_name', 25, 'subtext' => $txt['parser_name_desc']],
+			['select', 'filter_type', 'subtext' => $txt['parser_type_desc'],
+				[
 					'regex' => $txt['option_regex'],
 					'standard' => $txt['option_standard'],
-				),
-			),
-			array('large_text', 'filter_from', 4, 'subtext' => $txt['parser_from_desc']),
-		);
+				],
+			],
+			['large_text', 'filter_from', 4, 'subtext' => $txt['parser_from_desc']],
+		];
 
-		call_integration_hook('integrate_modify_maillist_parser_settings', array(&$config_vars));
+		call_integration_hook('integrate_modify_maillist_parser_settings', [&$config_vars]);
 
 		return $config_vars;
 	}
@@ -1489,7 +1489,7 @@ class ManageMaillist extends AbstractController
 	/**
 	 * Removes a parser from the system and database
 	 */
-	public function action_delete_parsers()
+	public function action_delete_parsers(): void
 	{
 		// Removing the filter?
 		if (isset($this->_req->query->f_id))
@@ -1508,7 +1508,7 @@ class ManageMaillist extends AbstractController
 	 * @event integrate_save_maillist_settings
 	 * @uses Admin language
 	 */
-	public function action_settings()
+	public function action_settings(): void
 	{
 		global $context, $txt, $modSettings;
 
@@ -1524,15 +1524,15 @@ class ManageMaillist extends AbstractController
 		loadCSSFile('admin.css');
 
 		// Load any existing email => board values used for new topic creation
-		$context['maillist_from_to_board'] = array();
-		$data = (empty($modSettings['maillist_receiving_address'])) ? array() : Util::unserialize($modSettings['maillist_receiving_address']);
+		$context['maillist_from_to_board'] = [];
+		$data = (empty($modSettings['maillist_receiving_address'])) ? [] : Util::unserialize($modSettings['maillist_receiving_address']);
 		foreach ($data as $key => $addr)
 		{
-			$context['maillist_from_to_board'][$key] = array(
+			$context['maillist_from_to_board'][$key] = [
 				'id' => $key,
 				'emailfrom' => $addr[0],
 				'boardto' => $addr[1],
-			);
+			];
 		}
 
 		// Initialize the maillist settings form
@@ -1550,20 +1550,20 @@ class ManageMaillist extends AbstractController
 
 			$email_error = false;
 			$board_error = false;
-			$maillist_receiving_address = array();
+			$maillist_receiving_address = [];
 
 			// Basic checking of the email addresses
-			if (!DataValidator::is_valid($this->_req->post, array('maillist_sitename_address' => 'valid_email'), array('maillist_sitename_address' => 'trim')))
+			if (!DataValidator::is_valid($this->_req->post, ['maillist_sitename_address' => 'valid_email'], ['maillist_sitename_address' => 'trim']))
 			{
 				$email_error = $this->_req->post->maillist_sitename_address;
 			}
 
-			if (!DataValidator::is_valid($this->_req->post, array('maillist_sitename_help' => 'valid_email'), array('maillist_sitename_help' => 'trim')))
+			if (!DataValidator::is_valid($this->_req->post, ['maillist_sitename_help' => 'valid_email'], ['maillist_sitename_help' => 'trim']))
 			{
 				$email_error = $this->_req->post->maillist_sitename_help;
 			}
 
-			if (!DataValidator::is_valid($this->_req->post, array('maillist_mail_from' => 'valid_email'), array('maillist_mail_from' => 'trim')))
+			if (!DataValidator::is_valid($this->_req->post, ['maillist_mail_from' => 'valid_email'], ['maillist_mail_from' => 'trim']))
 			{
 				$email_error = $this->_req->post->maillist_mail_from;
 			}
@@ -1575,13 +1575,13 @@ class ManageMaillist extends AbstractController
 				$boards = maillist_board_list();
 
 				// Check the receiving emails and the board id as well
-				$boardtocheck = empty($this->_req->post->boardto) ? array() : $this->_req->post->boardto;
-				$addresstocheck = empty($this->_req->post->emailfrom) ? array() : $this->_req->post->emailfrom;
+				$boardtocheck = empty($this->_req->post->boardto) ? [] : $this->_req->post->boardto;
+				$addresstocheck = empty($this->_req->post->emailfrom) ? [] : $this->_req->post->emailfrom;
 
 				foreach ($addresstocheck as $key => $checkme)
 				{
 					// Valid email syntax
-					if (!DataValidator::is_valid($addresstocheck, array($key => 'valid_email'), array($key => 'trim')))
+					if (!DataValidator::is_valid($addresstocheck, [$key => 'valid_email'], [$key => 'trim']))
 					{
 						$email_error = $checkme;
 						$context['error_type'] = 'notice';
@@ -1597,7 +1597,7 @@ class ManageMaillist extends AbstractController
 					}
 
 					// Decipher as [0] emailaddress and [1] board id
-					$maillist_receiving_address[] = array($checkme, $boardtocheck[$key]);
+					$maillist_receiving_address[] = [$checkme, $boardtocheck[$key]];
 				}
 			}
 
@@ -1621,10 +1621,10 @@ class ManageMaillist extends AbstractController
 				// Should be off if mail posting is on, we ignore it anyway but this at least updates the ACP
 				if (!empty($this->_req->post->maillist_enabled))
 				{
-					updateSettings(array('disallow_sendBody' => ''));
+					updateSettings(['disallow_sendBody' => '']);
 				}
 
-				updateSettings(array('maillist_receiving_address' => serialize($maillist_receiving_address)));
+				updateSettings(['maillist_receiving_address' => serialize($maillist_receiving_address)]);
 				$settingsForm->setConfigValues((array) $this->_req->post);
 				$settingsForm->save();
 				writeLog();
@@ -1734,7 +1734,7 @@ class ManageMaillist extends AbstractController
 			]);
 		}
 
-		call_integration_hook('integrate_modify_maillist_settings', array(&$config_vars));
+		call_integration_hook('integrate_modify_maillist_settings', [&$config_vars]);
 
 		return $config_vars;
 	}
@@ -1765,7 +1765,7 @@ class ManageMaillist extends AbstractController
 	 *
 	 * @event integrate_list_bounce_template_list
 	 */
-	public function action_view_bounce_templates()
+	public function action_view_bounce_templates(): ?bool
 	{
 		global $modSettings, $context, $txt;
 
@@ -1787,90 +1787,90 @@ class ManageMaillist extends AbstractController
 		}
 
 		// This is all the information required for showing the email templates.
-		$listOptions = array(
+		$listOptions = [
 			'id' => 'email_bounce_template_list',
 			'title' => $txt['ml_bounce_templates_title'],
 			'items_per_page' => $modSettings['defaultMaxMessages'],
 			'no_items_label' => $txt['ml_bounce_templates_none'],
 			'base_href' => getUrl('admin', ['action' => 'admin', 'area' => 'maillist', 'sa' => 'emailtemplates', '{session_data}']),
 			'default_sort_col' => 'title',
-			'get_items' => array(
+			'get_items' => [
 				'function' => fn(int $start, int $items_per_page, string $sort): array => $this->list_getBounceTemplates($start, $items_per_page, $sort),
-			),
-			'get_count' => array(
+			],
+			'get_count' => [
 				'function' => fn() => $this->list_getBounceTemplateCount(),
-				'params' => array('bnctpl'),
-			),
-			'columns' => array(
-				'title' => array(
-					'header' => array(
+				'params' => ['bnctpl'],
+			],
+			'columns' => [
+				'title' => [
+					'header' => [
 						'value' => $txt['ml_bounce_templates_name'],
-					),
-					'data' => array(
-						'sprintf' => array(
+					],
+					'data' => [
+						'sprintf' => [
 							'format' => '<a href="' . getUrl('admin', ['action' => 'admin', 'area' => 'maillist', 'sa' => 'emailtemplates', 'tid' => '%1$d']) . '">%2$s</a>',
-							'params' => array(
+							'params' => [
 								'id_comment' => false,
 								'title' => false,
 								'body' => false,
-							),
-						),
-					),
-					'sort' => array(
+							],
+						],
+					],
+					'sort' => [
 						'default' => 'template_title',
 						'reverse' => 'template_title DESC',
-					),
-				),
-				'creator' => array(
-					'header' => array(
+					],
+				],
+				'creator' => [
+					'header' => [
 						'value' => $txt['ml_bounce_templates_creator'],
-					),
-					'data' => array(
+					],
+					'data' => [
 						'db' => 'creator',
-					),
-					'sort' => array(
+					],
+					'sort' => [
 						'default' => 'creator_name',
 						'reverse' => 'creator_name DESC',
-					),
-				),
-				'time' => array(
-					'header' => array(
+					],
+				],
+				'time' => [
+					'header' => [
 						'value' => $txt['ml_bounce_templates_time'],
-					),
-					'data' => array(
+					],
+					'data' => [
 						'db' => 'time',
-					),
-					'sort' => array(
+					],
+					'sort' => [
 						'default' => 'lc.log_time DESC',
 						'reverse' => 'lc.log_time',
-					),
-				),
-				'delete' => array(
-					'header' => array(
+					],
+				],
+				'delete' => [
+					'header' => [
 						'value' => '<input type="checkbox" class="input_check" onclick="invertAll(this, this.form);" />',
 						'style' => 'width: 4%;',
 						'class' => 'centertext',
-					),
-					'data' => array(
+					],
+					'data' => [
 						'function' => static fn($rowData) => '<input type="checkbox" name="deltpl[]" value="' . $rowData['id_comment'] . '" class="input_check" />',
 						'class' => 'centertext',
-					),
-				),
-			),
-			'form' => array(
+					],
+				],
+			],
+			'form' => [
 				'href' => getUrl('admin', ['action' => 'admin', 'area' => 'maillist', 'sa' => 'emailtemplates']),
 				'token' => 'mod-mlt',
-			),
-			'additional_rows' => array(
-				array(
+			],
+			'additional_rows' => [
+				[
 					'class' => 'submitbutton',
 					'position' => 'below_table_data',
 					'value' => '
 						<input type="submit" name="delete" value="' . $txt['ml_bounce_template_delete'] . '" onclick="return confirm(\'' . $txt['ml_bounce_template_delete_confirm'] . '\');" />
 						<input type="submit" name="add" value="' . $txt['ml_bounce_template_add'] . '" />',
-				),
-			),
-		);
+				],
+			],
+		];
 
 		// Create the template list.
 		$context['page_title'] = $txt['ml_bounce_templates_title'];
@@ -1881,6 +1881,8 @@ class ManageMaillist extends AbstractController
 		// Show the list
 		$context['sub_template'] = 'show_list';
 		$context['default_list'] = 'email_bounce_template_list';
+
+		return null;
 	}
 
 	/**
@@ -1888,7 +1890,7 @@ class ManageMaillist extends AbstractController
 	 *
 	 * @uses bounce_template sub template
 	 */
-	public function action_modify_bounce_templates()
+	public function action_modify_bounce_templates(): bool
 	{
 		global $context, $txt;
 
@@ -1904,13 +1906,13 @@ class ManageMaillist extends AbstractController
 		//$context[$context['admin_menu_name']]['current_subsection'] = 'templates';
 
 		// Defaults to show
-		$context['template_data'] = array(
+		$context['template_data'] = [
 			'title' => '',
 			'body' => $txt['ml_bounce_template_body_default'],
 			'subject' => $txt['ml_bounce_template_subject_default'],
 			'personal' => false,
 			'can_edit_personal' => true,
-		);
+		];
 
 		// If it's an edit load it.
 		if ($context['is_edit'])
@@ -1941,7 +1943,7 @@ class ManageMaillist extends AbstractController
 				preparsecode($template_body);
 
 				// But put line breaks back!
-				$template_body = strtr($template_body, array('<br />' => "\n"));
+				$template_body = strtr($template_body, ['<br />' => "\n"]);
 
 				// Is this personal?
 				$recipient_id = empty($this->_req->post->make_personal) ? 0 : $this->user->id;
@@ -1955,23 +1957,23 @@ class ManageMaillist extends AbstractController
 					// If it wasn't visible and now is they've effectively added it.
 					if ($context['template_data']['personal'] && !$recipient_id)
 					{
-						logAction('add_bounce_template', array('template' => $template_title));
+						logAction('add_bounce_template', ['template' => $template_title]);
 					}
 					// Conversely if they made it personal it's a delete.
 					elseif (!$context['template_data']['personal'] && $recipient_id)
 					{
-						logAction('delete_bounce_template', array('template' => $template_title));
+						logAction('delete_bounce_template', ['template' => $template_title]);
 					}
 					// Otherwise just an edit.
 					else
 					{
-						logAction('modify_bounce_template', array('template' => $template_title));
+						logAction('modify_bounce_template', ['template' => $template_title]);
 					}
 				}
 				else
 				{
 					modAddUpdateTemplate($recipient_id, $template_title, $template_body, $context['id_template'], false, 'bnctpl');
-					logAction('add_bounce_template', array('template' => $template_title));
+					logAction('add_bounce_template', ['template' => $template_title]);
 				}
 
 				// Get out of town...
@@ -1979,7 +1981,7 @@ class ManageMaillist extends AbstractController
 			}
 			else
 			{
-				$context['warning_errors'] = array();
+				$context['warning_errors'] = [];
 				$context['template_data']['title'] = empty($template_title) ? '' : $template_title;
 				$context['template_data']['body'] = empty($template_body) ? $txt['ml_bounce_template_body_default'] : $template_body;
 				$context['template_data']['personal'] = !empty($this->_req->post->make_personal);
@@ -2012,7 +2014,7 @@ class ManageMaillist extends AbstractController
 	 *
 	 * @return array
 	 */
-	public function list_getBounceTemplates($start, $items_per_page, $sort)
+	public function list_getBounceTemplates(int $start, int $items_per_page, string $sort): array
 	{
 		return warningTemplates($start, $items_per_page, $sort, 'bnctpl');
 	}
@@ -2022,7 +2024,7 @@ class ManageMaillist extends AbstractController
 	 *
 	 * - Callback for createList() to warningTemplateCount
 	 */
-	public function list_getBounceTemplateCount()
+	public function list_getBounceTemplateCount(): int
 	{
 		return warningTemplateCount('bnctpl');
 	}
@@ -2039,7 +2041,7 @@ class ManageMaillist extends AbstractController
 	 *
 	 * @return array
 	 */
-	public function list_maillist_unapproved($start, $items_per_page, $sort = '', $id = 0)
+	public function list_maillist_unapproved(int $start, int $items_per_page, string $sort = '', int $id = 0): array
 	{
 		return list_maillist_unapproved($id, $start, $items_per_page, $sort);
 	}

@@ -41,7 +41,7 @@ class Apc extends AbstractCacheMethod
 	 *
 	 *  If the statistics cannot be obtained, an empty array is returned.
      */
-	public function getStats()
+	public function getStats(): array
 	{
 		$results = [];
 

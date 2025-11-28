@@ -112,7 +112,7 @@ class FtpConnection
 	 * @param $ftp_server
 	 * @return string
 	 */
-	public function getServer($ftp_server)
+	public function getServer($ftp_server): string
 	{
 		$location = parse_url($ftp_server);
 		$location['host'] = $location['host'] ?? $ftp_server;
@@ -124,7 +124,7 @@ class FtpConnection
 			$ftp_scheme = 'ssl://';
 		}
 
-		return $ftp_scheme . strtr($location['host'], array('/' => '', ':' => '', '@' => ''));
+		return $ftp_scheme . strtr($location['host'], ['/' => '', ':' => '', '@' => '']);
 	}
 
 	/**
@@ -134,7 +134,7 @@ class FtpConnection
 	 *
 	 * @return bool
 	 */
-	public function check_response($desired)
+	public function check_response($desired): bool
 	{
 		$return_code = false;
 		$time = time();
@@ -160,7 +160,7 @@ class FtpConnection
 	 * @param string $ftp_path The path to the directory
 	 * @return bool
 	 */
-	public function chdir($ftp_path)
+	public function chdir($ftp_path): bool
 	{
 		if (!$this->hasConnection())
 		{
@@ -191,7 +191,7 @@ class FtpConnection
 	 * @param int $chmod The value for the CHMOD operation
 	 * @return bool If the chmod was successful or not
 	 */
-	public function chmod($ftp_file, $chmod)
+	public function chmod($ftp_file, $chmod): bool
 	{
 		if (!$this->hasConnection())
 		{
@@ -223,7 +223,7 @@ class FtpConnection
 	 * @param array|int $chmod
 	 * @return bool
 	 */
-	public function ftp_chmod($ftp_file, $chmod)
+	public function ftp_chmod($ftp_file, $chmod): bool
 	{
 		$chmod = is_array($chmod) ? $chmod : (array) $chmod;
 
@@ -249,7 +249,7 @@ class FtpConnection
 	 * @param string $ftp_file The file to delete
 	 * @return bool If delete was successful or not
 	 */
-	public function unlink($ftp_file)
+	public function unlink($ftp_file): bool
 	{
 		// We are actually connected, right?
 		if (!$this->hasConnection())
@@ -281,7 +281,7 @@ class FtpConnection
 	 * @param string $ftp_file The file to create
 	 * @return bool If we were able to create the file
 	 */
-	public function create_file($ftp_file)
+	public function create_file($ftp_file): bool
 	{
 		// First, we have to be connected... very important.
 		if (!$this->hasConnection())
@@ -327,7 +327,7 @@ class FtpConnection
 	 *
 	 * @return bool If the connection was made or not
 	 */
-	public function passive()
+	public function passive(): bool
 	{
 		// We can't create a passive data connection without a primary one first being there.
 		if (!$this->hasConnection())
@@ -370,7 +370,7 @@ class FtpConnection
 	 * @param string $ftp_dir The name of the directory to create
 	 * @return bool If the operation was successful
 	 */
-	public function create_dir($ftp_dir)
+	public function create_dir($ftp_dir): bool
 	{
 		// We must be connected to the server to do something.
 		if (!$this->hasConnection())
@@ -397,7 +397,7 @@ class FtpConnection
 	 * @param string|null $lookup_file The name of a file in the specified path
 	 * @return array string $username, string $path, bool found_path
 	 */
-	public function detect_path($filesystem_path, $lookup_file = null)
+	public function detect_path($filesystem_path, $lookup_file = null): array
 	{
 		$username = '';
 
@@ -407,7 +407,7 @@ class FtpConnection
 			{
 				$username = $match[1];
 
-				$path = strtr($_SERVER['DOCUMENT_ROOT'], array('/home/' . $match[1] . '/' => '', '/home2/' . $match[1] . '/' => ''));
+				$path = strtr($_SERVER['DOCUMENT_ROOT'], ['/home/' . $match[1] . '/' => '', '/home2/' . $match[1] . '/' => '']);
 
 				if (substr($path, -1) === '/')
 				{
@@ -425,7 +425,7 @@ class FtpConnection
 			}
 			else
 			{
-				$path = strtr(strtr($filesystem_path, array('\\' => '/')), array($_SERVER['DOCUMENT_ROOT'] => ''));
+				$path = strtr(strtr($filesystem_path, ['\\' => '/']), [$_SERVER['DOCUMENT_ROOT'] => '']);
 			}
 		}
 		else
@@ -484,7 +484,7 @@ class FtpConnection
 
 		// Connect, assuming we've got a connection.
 		$fp = @fsockopen($this->pasv['ip'], $this->pasv['port'], $err, $err, 5);
-		if (!$fp || !$this->check_response(array(150, 125)))
+		if (!$fp || !$this->check_response([150, 125]))
 		{
 			$this->error = 'bad_response';
 			@fclose($fp);
@@ -570,7 +570,7 @@ class FtpConnection
 	 *
 	 * @return bool
 	 */
-	public function close()
+	public function close(): bool
 	{
 		// Goodbye!
 		if ($this->hasConnection())
@@ -587,7 +587,7 @@ class FtpConnection
 	 *
 	 * @return bool
 	 */
-	public function hasConnection()
+	public function hasConnection(): bool
 	{
 		return is_resource($this->connection);
 	}

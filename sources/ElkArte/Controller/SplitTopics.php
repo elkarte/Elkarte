@@ -53,7 +53,7 @@ class SplitTopics extends AbstractController
 	 * - Requires the split_any permission.
 	 * - Accessed with ?action=splittopics.
 	 */
-	public function action_splittopics()
+	public function action_splittopics(): void
 	{
 		global $topic;
 
@@ -74,12 +74,12 @@ class SplitTopics extends AbstractController
 		require_once(SUBSDIR . '/Post.subs.php');
 
 		// The things we know to do
-		$subActions = array(
-			'selectTopics' => array($this, 'action_splitSelectTopics', 'permission' => 'split_any'),
-			'execute' => array($this, 'action_splitExecute', 'permission' => 'split_any'),
-			'index' => array($this, 'action_splitIndex', 'permission' => 'split_any'),
-			'splitSelection' => array($this, 'action_splitSelection', 'permission' => 'split_any'),
-		);
+		$subActions = [
+			'selectTopics' => [$this, 'action_splitSelectTopics', 'permission' => 'split_any'],
+			'execute' => [$this, 'action_splitExecute', 'permission' => 'split_any'],
+			'index' => [$this, 'action_splitIndex', 'permission' => 'split_any'],
+			'splitSelection' => [$this, 'action_splitSelection', 'permission' => 'split_any'],
+		];
 
 		// To the right sub action or index if an invalid choice was submitted
 		$action = new Action('split_topics');
@@ -100,7 +100,7 @@ class SplitTopics extends AbstractController
 	 *
 	 * @uses template_ask() in SplitTopics.template
 	 */
-	public function action_splitIndex()
+	public function action_splitIndex(): void
 	{
 		global $txt, $context, $modSettings;
 
@@ -118,7 +118,7 @@ class SplitTopics extends AbstractController
 		require_once(SUBSDIR . '/Messages.subs.php');
 
 		// Let's load up the boards in case they are useful.
-		$context += getBoardList(array('not_redirection' => true));
+		$context += getBoardList(['not_redirection' => true]);
 
 		// Retrieve message info for the message at the split point.
 		$messageInfo = basicMessageInfo($splitAt, false, true);
@@ -158,10 +158,10 @@ class SplitTopics extends AbstractController
 		else
 		{
 			// Basic template information....
-			$context['message'] = array(
+			$context['message'] = [
 				'id' => $splitAt,
 				'subject' => $messageInfo['subject']
-			);
+			];
 			$context['sub_template'] = 'ask';
 			$context['page_title'] = $txt['split_topic'];
 		}
@@ -170,7 +170,7 @@ class SplitTopics extends AbstractController
 	/**
 	 * Set the values for this split session
 	 */
-	private function _set_session_values()
+	private function _set_session_values(): void
 	{
 		global $txt;
 
@@ -212,7 +212,7 @@ class SplitTopics extends AbstractController
 	 * @uses template_select() of SplitTopics.template
 	 * @uses template_split() of SplitTopics.template
 	 */
-	public function action_splitSelectTopics()
+	public function action_splitSelectTopics(): void
 	{
 		global $txt, $topic, $context, $modSettings, $options;
 
@@ -220,7 +220,7 @@ class SplitTopics extends AbstractController
 		$context['destination_board'] = empty($this->_req->post->move_to_board) ? 0 : (int) $this->_req->post->move_to_board;
 
 		// Haven't selected anything have we?
-		$_SESSION['split_selection'][$topic] = empty($_SESSION['split_selection'][$topic]) ? array() : $_SESSION['split_selection'][$topic];
+		$_SESSION['split_selection'][$topic] = empty($_SESSION['split_selection'][$topic]) ? [] : $_SESSION['split_selection'][$topic];
 
 		// This is a special case for split topics from quick-moderation checkboxes
 		if (isset($this->_req->query->subname_enc))
@@ -232,11 +232,11 @@ class SplitTopics extends AbstractController
 		require_once(SUBSDIR . '/Topic.subs.php');
 		require_once(SUBSDIR . '/Messages.subs.php');
 
-		$context['not_selected'] = array(
+		$context['not_selected'] = [
 			'num_messages' => 0,
 			'start' => $this->_req->getPost('start', 'intval', 0),
-			'messages' => array(),
-		);
+			'messages' => [],
+		];
 
 		$context['selected'] = [
 			'num_messages' => 0,
@@ -284,11 +284,11 @@ class SplitTopics extends AbstractController
 
 			if (!empty($_SESSION['split_selection'][$topic]))
 			{
-				$original_msgs['selected'] = messageAt($context['selected']['start'], $topic, array(
-					'include' => empty($_SESSION['split_selection'][$topic]) ? array() : $_SESSION['split_selection'][$topic],
+				$original_msgs['selected'] = messageAt($context['selected']['start'], $topic, [
+					'include' => empty($_SESSION['split_selection'][$topic]) ? [] : $_SESSION['split_selection'][$topic],
 					'only_approved' => !$modSettings['postmod_active'] || !allowedTo('approve_posts'),
 					'limit' => $context['messages_per_page'],
-				));
+				]);
 			}
 		}
 
@@ -299,11 +299,11 @@ class SplitTopics extends AbstractController
 
 			if ($this->_req->query->move === 'reset')
 			{
-				$_SESSION['split_selection'][$topic] = array();
+				$_SESSION['split_selection'][$topic] = [];
 			}
 			elseif ($this->_req->query->move === 'up')
 			{
-				$_SESSION['split_selection'][$topic] = array_diff($_SESSION['split_selection'][$topic], array($_id_msg));
+				$_SESSION['split_selection'][$topic] = array_diff($_SESSION['split_selection'][$topic], [$_id_msg]);
 			}
 			else
 			{
@@ -314,16 +314,16 @@ class SplitTopics extends AbstractController
 		// Make sure the selection is still accurate.
 		if (!empty($_SESSION['split_selection'][$topic]))
 		{
-			$_SESSION['split_selection'][$topic] = messageAt(0, $topic, array(
-				'include' => empty($_SESSION['split_selection'][$topic]) ? array() : $_SESSION['split_selection'][$topic],
+			$_SESSION['split_selection'][$topic] = messageAt(0, $topic, [
+				'include' => empty($_SESSION['split_selection'][$topic]) ? [] : $_SESSION['split_selection'][$topic],
 				'only_approved' => !$modSettings['postmod_active'] || !allowedTo('approve_posts'),
 				'limit' => false,
-			));
+			]);
 			$selection = $_SESSION['split_selection'][$topic];
 		}
 		else
 		{
-			$selection = array();
+			$selection = [];
 		}
 
 		// Get the number of messages (not) selected to be split.
@@ -339,7 +339,7 @@ class SplitTopics extends AbstractController
 			$context['selected']['start'] = $context['selected']['num_messages'] <= $context['messages_per_page'] ? 0 : ($context['selected']['num_messages'] - (($context['selected']['num_messages'] % $context['messages_per_page']) == 0 ? $context['messages_per_page'] : ($context['selected']['num_messages'] % $context['messages_per_page'])));
 		}
 
-		$page_index_url = '{scripturl}?action=splittopics;sa=selectTopics;subname=' . strtr(urlencode($_SESSION['new_topic_subject']), array('%' => '%%')) . ';topic=' . $topic;
+		$page_index_url = '{scripturl}?action=splittopics;sa=selectTopics;subname=' . strtr(urlencode($_SESSION['new_topic_subject']), ['%' => '%%']) . ';topic=' . $topic;
 
 		// Build a page list of the not-selected topics...
 		$context['not_selected']['page_index'] = constructPageIndex($page_index_url . '.%1$d;start2=' . $context['selected']['start'], $context['not_selected']['start'], $context['not_selected']['num_messages'], $context['messages_per_page'], true);
@@ -348,12 +348,12 @@ class SplitTopics extends AbstractController
 		$context['selected']['page_index'] = constructPageIndex($page_index_url . '.' . $context['not_selected']['start'] . ';start2=%1$d', $context['selected']['start'], $context['selected']['num_messages'], $context['messages_per_page'], true);
 
 		// Retrieve the unselected messages.
-		$context['not_selected']['messages'] = selectMessages($topic, $context['not_selected']['start'], $context['messages_per_page'], empty($_SESSION['split_selection'][$topic]) ? array() : array('excluded' => $_SESSION['split_selection'][$topic]), $modSettings['postmod_active'] && !allowedTo('approve_posts'));
+		$context['not_selected']['messages'] = selectMessages($topic, $context['not_selected']['start'], $context['messages_per_page'], empty($_SESSION['split_selection'][$topic]) ? [] : ['excluded' => $_SESSION['split_selection'][$topic]], $modSettings['postmod_active'] && !allowedTo('approve_posts'));
 
 		// Now retrieve the selected messages.
 		if (!empty($_SESSION['split_selection'][$topic]))
 		{
-			$context['selected']['messages'] = selectMessages($topic, $context['selected']['start'], $context['messages_per_page'], array('included' => $_SESSION['split_selection'][$topic]), $modSettings['postmod_active'] && !allowedTo('approve_posts'));
+			$context['selected']['messages'] = selectMessages($topic, $context['selected']['start'], $context['messages_per_page'], ['included' => $_SESSION['split_selection'][$topic]], $modSettings['postmod_active'] && !allowedTo('approve_posts'));
 		}
 
 		// The XMLhttp method only needs the stuff that changed, so let's compare.
@@ -382,11 +382,11 @@ class SplitTopics extends AbstractController
 
 					foreach ($msg_array as $id_msg)
 					{
-						$context['changes'][$change_type . $id_msg] = array(
+						$context['changes'][$change_type . $id_msg] = [
 							'id' => $id_msg,
 							'type' => $change_type,
 							'section' => $section,
-						);
+						];
 
 						if ($change_type === 'insert')
 						{
@@ -412,7 +412,7 @@ class SplitTopics extends AbstractController
 	 *
 	 * @uses template_split_successful() in SplitTopics.template
 	 */
-	public function action_splitExecute()
+	public function action_splitExecute(): bool
 	{
 		global $txt, $context, $topic;
 
@@ -452,7 +452,7 @@ class SplitTopics extends AbstractController
 		$boards = splitDestinationBoard($_SESSION['move_to_board']);
 
 		$splitAt = $this->_req->getPost('at', 'intval', 0);
-		$messagesToBeSplit = array();
+		$messagesToBeSplit = [];
 
 		// Fetch the message IDs of the topic that are at or after the message.
 		if ($this->_req->post->step2 === 'afterthis')
@@ -493,7 +493,7 @@ class SplitTopics extends AbstractController
 	/**
 	 * Clear out this split session
 	 */
-	private function _unset_session_values()
+	private function _unset_session_values(): void
 	{
 		unset(
 			$_SESSION['move_to_board'],
@@ -515,7 +515,7 @@ class SplitTopics extends AbstractController
 	 * @uses splitTopic() function to do the actual splitting.
 	 * @uses template_split_successful() of SplitTopics.template
 	 */
-	public function action_splitSelection()
+	public function action_splitSelection(): void
 	{
 		global $txt, $topic, $context;
 

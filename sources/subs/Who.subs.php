@@ -29,7 +29,7 @@ function viewers($id, $session, $type = 'topic')
 	$db = database();
 
 	// Make sure we have a default value
-	if (!in_array($type, array('topic', 'board')))
+	if (!in_array($type, ['topic', 'board']))
 	{
 		$type = 'topic';
 	}
@@ -42,11 +42,11 @@ function viewers($id, $session, $type = 'topic')
 			LEFT JOIN {db_prefix}members AS mem ON (mem.id_member = lo.id_member)
 			LEFT JOIN {db_prefix}membergroups AS mg ON (mg.id_group = CASE WHEN mem.id_group = {int:reg_member_group} THEN mem.id_post_group ELSE mem.id_group END)
 		WHERE INSTR(lo.url, {string:in_url_string}) > 0 OR lo.session = {string:session}',
-		array(
+		[
 			'reg_member_group' => 0,
 			'in_url_string' => 's:5:"' . $type . '";i:' . $id . ';',
 			'session' => $session
-		)
+		]
 	)->fetch_all();
 }
 
@@ -61,8 +61,8 @@ function formatViewers($id, $type)
 	global $context;
 
 	// Lets say there's no one around. (what? could happen!)
-	$context['view_members'] = array();
-	$context['view_members_list'] = array();
+	$context['view_members'] = [];
+	$context['view_members_list'] = [];
 	$context['view_num_hidden'] = 0;
 	$context['view_num_guests'] = 0;
 
@@ -101,7 +101,7 @@ function formatViewers($id, $type)
 		}
 
 		// fill the detailed list
-		$context['view_members'][$viewer['log_time'] . $viewer['member_name']] = array(
+		$context['view_members'][$viewer['log_time'] . $viewer['member_name']] = [
 			'id' => $viewer['id_member'],
 			'username' => $viewer['member_name'],
 			'name' => $viewer['real_name'],
@@ -110,7 +110,7 @@ function formatViewers($id, $type)
 			'link' => $link,
 			'is_buddy' => $is_buddy,
 			'hidden' => empty($viewer['show_online']),
-		);
+		];
 
 		// add the hidden members to the count (and don't show them in the template)
 		if (empty($viewer['show_online']))
@@ -139,9 +139,9 @@ function formatViewers($id, $type)
  * - for actions that should be viewable only with certain permissions, use whoallow_ACTION and
  * add a list of possible permissions to the $allowedActions array, using ACTION as the key.
  *
- * @param mixed[]|string $urls a single url (string) or an array of arrays, each inner array being (serialized request data, id_member)
+ * @param array|string $urls a single url (string) or an array of arrays, each inner array being (serialized request data, id_member)
  * @param string|bool $preferred_prefix = false
- * @return mixed[]|string an array of descriptions if you passed an array, otherwise the string describing their current location.
+ * @return array|string an array of descriptions if you passed an array, otherwise the string describing their current location.
  */
 function determineActions($urls, $preferred_prefix = false)
 {
@@ -151,40 +151,40 @@ function determineActions($urls, $preferred_prefix = false)
 
 	if (!allowedTo('who_view'))
 	{
-		return array();
+		return [];
 	}
 
 	Txt::load('Who');
 
 	// Actions that require a specific permission level.
-	$allowedActions = array(
-		'admin' => array('moderate_forum', 'manage_membergroups', 'manage_bans', 'admin_forum', 'manage_permissions', 'send_mail', 'manage_attachments', 'manage_smileys', 'manage_boards', 'edit_news'),
-		'ban' => array('manage_bans'),
-		'boardrecount' => array('admin_forum'),
-		'calendar' => array('calendar_view'),
-		'editnews' => array('edit_news'),
-		'mailing' => array('send_mail'),
-		'maintain' => array('admin_forum'),
-		'manageattachments' => array('manage_attachments'),
-		'manageboards' => array('manage_boards'),
-		'memberlist' => array('view_mlist'),
-		'moderate' => array('access_mod_center', 'moderate_forum', 'manage_membergroups'),
-		'optimizetables' => array('admin_forum'),
-		'repairboards' => array('admin_forum'),
-		'search' => array('search_posts'),
-		'setcensor' => array('moderate_forum'),
-		'setreserve' => array('moderate_forum'),
-		'stats' => array('view_stats'),
-		'viewErrorLog' => array('admin_forum'),
-		'viewmembers' => array('moderate_forum'),
-	);
+	$allowedActions = [
+		'admin' => ['moderate_forum', 'manage_membergroups', 'manage_bans', 'admin_forum', 'manage_permissions', 'send_mail', 'manage_attachments', 'manage_smileys', 'manage_boards', 'edit_news'],
+		'ban' => ['manage_bans'],
+		'boardrecount' => ['admin_forum'],
+		'calendar' => ['calendar_view'],
+		'editnews' => ['edit_news'],
+		'mailing' => ['send_mail'],
+		'maintain' => ['admin_forum'],
+		'manageattachments' => ['manage_attachments'],
+		'manageboards' => ['manage_boards'],
+		'memberlist' => ['view_mlist'],
+		'moderate' => ['access_mod_center', 'moderate_forum', 'manage_membergroups'],
+		'optimizetables' => ['admin_forum'],
+		'repairboards' => ['admin_forum'],
+		'search' => ['search_posts'],
+		'setcensor' => ['moderate_forum'],
+		'setreserve' => ['moderate_forum'],
+		'stats' => ['view_stats'],
+		'viewErrorLog' => ['admin_forum'],
+		'viewmembers' => ['moderate_forum'],
+	];
 
 	// Provide integration a way to add to the allowed action array
-	call_integration_hook('integrate_whos_online_allowed', array(&$allowedActions));
+	call_integration_hook('integrate_whos_online_allowed', [&$allowedActions]);
 
 	if (!is_array($urls))
 	{
-		$url_list = array(array($urls, User::$info->id));
+		$url_list = [[$urls, User::$info->id]];
 	}
 	else
 	{
@@ -192,11 +192,11 @@ function determineActions($urls, $preferred_prefix = false)
 	}
 
 	// These are done to query these in large chunks. (instead of one by one.)
-	$topic_ids = array();
-	$profile_ids = array();
-	$board_ids = array();
+	$topic_ids = [];
+	$profile_ids = [];
+	$board_ids = [];
 
-	$data = array();
+	$data = [];
 	foreach ($url_list as $k => $url)
 	{
 		// Get the request parameters..
@@ -207,13 +207,13 @@ function determineActions($urls, $preferred_prefix = false)
 		}
 
 		// If it's the admin or moderation center, and there is an area set, use that instead.
-		if (isset($actions['action']) && ($actions['action'] == 'admin' || $actions['action'] == 'moderate') && isset($actions['area']))
+		if (isset($actions['action'], $actions['area']) && ($actions['action'] === 'admin' || $actions['action'] === 'moderate'))
 		{
 			$actions['action'] = $actions['area'];
 		}
 
 		// Check if there was no action or the action is display.
-		if (!isset($actions['action']) || $actions['action'] == 'display')
+		if (!isset($actions['action']) || $actions['action'] === 'display')
 		{
 			// It's a topic!  Must be!
 			if (isset($actions['topic']))
@@ -321,10 +321,10 @@ function determineActions($urls, $preferred_prefix = false)
 						AND {query_see_board}' . ($modSettings['postmod_active'] ? '
 						AND m.approved = {int:is_approved}' : '') . '
 					LIMIT 1',
-					array(
+					[
 						'is_approved' => 1,
 						'id_msg' => $msgid,
-					)
+					]
 				);
 				list ($id_topic, $subject) = $result->fetch_row();
 				$data[$k] = sprintf($txt['whopost_' . $actions['action']], getUrl('topic', ['topic' => $id_topic, 'start' => '0', 'subject' => $subject]), $subject);
@@ -380,7 +380,7 @@ function determineActions($urls, $preferred_prefix = false)
 		}
 
 		// Maybe the action is integrated into another system?
-		if (count($integrate_actions = call_integration_hook('integrate_whos_online', array($actions))) > 0)
+		if (count($integrate_actions = call_integration_hook('integrate_whos_online', [$actions])) > 0)
 		{
 			// Try each integration hook with this url and see if they can fill in the details
 			foreach ($integrate_actions as $integrate_action)
@@ -416,7 +416,7 @@ function determineActions($urls, $preferred_prefix = false)
 	{
 		require_once(SUBSDIR . '/Boards.subs.php');
 
-		$boards_list = getBoardList(array('included_boards' => array_keys($board_ids)), true);
+		$boards_list = getBoardList(['included_boards' => array_keys($board_ids)], true);
 		foreach ($boards_list as $board)
 		{
 			// Put the board name into the string for each member...
@@ -452,8 +452,6 @@ function determineActions($urls, $preferred_prefix = false)
 	{
 		return $data[0] ?? false;
 	}
-	else
-	{
-		return $data;
-	}
+
+	return $data;
 }

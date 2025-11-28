@@ -36,7 +36,7 @@ class IlaIntegrate
 	 *
 	 * @return array
 	 */
-	public static function register()
+	public static function register(): array
 	{
 		global $modSettings;
 
@@ -57,7 +57,7 @@ class IlaIntegrate
 	 *
 	 * @return array
 	 */
-	public static function settingsRegister()
+	public static function settingsRegister(): array
 	{
 		// $hook, $function, $file
 		return [
@@ -70,7 +70,7 @@ class IlaIntegrate
 	 *
 	 * @param string $message
 	 */
-	public static function integrate_post_parser(&$message)
+	public static function integrate_post_parser(&$message): void
 	{
 		global $context;
 
@@ -83,7 +83,7 @@ class IlaIntegrate
 	 *
 	 * @param array $additional_bbc
 	 */
-	public static function integrate_additional_bbc(&$additional_bbc)
+	public static function integrate_additional_bbc(&$additional_bbc): void
 	{
 		global $modSettings, $txt;
 
@@ -97,7 +97,7 @@ class IlaIntegrate
 		];
 
 		// Why enable it to disable the tags, oh well
-		$disabledBBC = empty($modSettings['disabledBBC']) ? array() : explode(',', $modSettings['disabledBBC']);
+		$disabledBBC = empty($modSettings['disabledBBC']) ? [] : explode(',', $modSettings['disabledBBC']);
 		$disabled = in_array('attach', $disabledBBC, true);
 		$disabledUrl = in_array('attachurl', $disabledBBC, true);
 
@@ -108,9 +108,9 @@ class IlaIntegrate
 		}
 
 		// Add ILA codes
-		$additional_bbc = array_merge($additional_bbc, array(
+		$additional_bbc = array_merge($additional_bbc, [
 			// Just a simple attach [attach][/attach]
-			array(
+			[
 				Codes::ATTR_TAG => 'attach',
 				Codes::ATTR_TYPE => Codes::TYPE_UNPARSED_CONTENT,
 				Codes::ATTR_DISABLED => $disabled,
@@ -122,18 +122,18 @@ class IlaIntegrate
 				Codes::ATTR_BLOCK_LEVEL => false,
 				Codes::ATTR_AUTOLINK => false,
 				Codes::ATTR_LENGTH => 6,
-			),
+			],
 			// Attach, with perhaps a type [attach type=xyz][/attach]
-			array(
+			[
 				Codes::ATTR_TAG => 'attach',
 				Codes::ATTR_TYPE => Codes::TYPE_UNPARSED_CONTENT,
-				Codes::ATTR_PARAM => array(
-					'type' => array(
+				Codes::ATTR_PARAM => [
+					'type' => [
 						Codes::PARAM_ATTR_OPTIONAL => true,
 						Codes::PARAM_ATTR_VALUE => ';$1',
 						Codes::PARAM_ATTR_MATCH => '(thumb|image)',
-					),
-				),
+					],
+				],
 				Codes::ATTR_DISABLED => $disabled,
 				Codes::ATTR_RESET => '~~{type}',
 				Codes::ATTR_CONTENT => &self::$typeTag,
@@ -143,28 +143,28 @@ class IlaIntegrate
 				Codes::ATTR_BLOCK_LEVEL => false,
 				Codes::ATTR_AUTOLINK => false,
 				Codes::ATTR_LENGTH => 6,
-			),
+			],
 			// Require a width with optional height/align, allows either use of full image and/or ;thumb
 			// [attach width=300 align=??][/attach]
-			array(
+			[
 				Codes::ATTR_TAG => 'attach',
 				Codes::ATTR_TYPE => Codes::TYPE_UNPARSED_CONTENT,
-				Codes::ATTR_PARAM => array(
-					'width' => array(
+				Codes::ATTR_PARAM => [
+					'width' => [
 						Codes::PARAM_ATTR_VALUE => 'width:100%;max-width:$1px;',
 						Codes::PARAM_ATTR_MATCH => '(\d+)',
-					),
-					'height' => array(
+					],
+					'height' => [
 						Codes::PARAM_ATTR_OPTIONAL => true,
 						Codes::PARAM_ATTR_VALUE => 'max-height:$1px;',
 						Codes::PARAM_ATTR_MATCH => '(\d+)',
-					),
-					'align' => array(
+					],
+					'align' => [
 						Codes::PARAM_ATTR_OPTIONAL => true,
 						Codes::PARAM_ATTR_VALUE => 'float$1;',
 						Codes::PARAM_ATTR_MATCH => '(right|left|center)',
-					),
-				),
+					],
+				],
 				Codes::ATTR_DISABLED => $disabled,
 				Codes::ATTR_RESET => '{width}{height}~{align}',
 				Codes::ATTR_CONTENT => &self::$typeTag,
@@ -174,27 +174,27 @@ class IlaIntegrate
 				Codes::ATTR_BLOCK_LEVEL => false,
 				Codes::ATTR_AUTOLINK => false,
 				Codes::ATTR_LENGTH => 6,
-			),
+			],
 			// Require a height with option width/align [attach height=300 align=??][/attach]
-			array(
+			[
 				Codes::ATTR_TAG => 'attach',
 				Codes::ATTR_TYPE => Codes::TYPE_UNPARSED_CONTENT,
-				Codes::ATTR_PARAM => array(
-					'height' => array(
+				Codes::ATTR_PARAM => [
+					'height' => [
 						Codes::PARAM_ATTR_VALUE => 'max-height:$1px;',
 						Codes::PARAM_ATTR_MATCH => '(\d+)',
-					),
-					'width' => array(
+					],
+					'width' => [
 						Codes::PARAM_ATTR_OPTIONAL => true,
 						Codes::PARAM_ATTR_VALUE => 'width:100%;max-width:$1px;',
 						Codes::PARAM_ATTR_MATCH => '(\d+)',
-					),
-					'align' => array(
+					],
+					'align' => [
 						Codes::PARAM_ATTR_OPTIONAL => true,
 						Codes::PARAM_ATTR_VALUE => 'float$1',
 						Codes::PARAM_ATTR_MATCH => '(right|left|center)',
-					),
-				),
+					],
+				],
 				Codes::ATTR_DISABLED => $disabled,
 				Codes::ATTR_RESET => '{width}{height}~{align}',
 				Codes::ATTR_CONTENT => &self::$typeTag,
@@ -204,22 +204,22 @@ class IlaIntegrate
 				Codes::ATTR_BLOCK_LEVEL => false,
 				Codes::ATTR_AUTOLINK => false,
 				Codes::ATTR_LENGTH => 6,
-			),
+			],
 			// Align with an optional a type? [attach align=right type=thumb][/attach]
-			array(
+			[
 				Codes::ATTR_TAG => 'attach',
 				Codes::ATTR_TYPE => Codes::TYPE_UNPARSED_CONTENT,
-				Codes::ATTR_PARAM => array(
-					'align' => array(
+				Codes::ATTR_PARAM => [
+					'align' => [
 						Codes::PARAM_ATTR_VALUE => 'float$1',
 						Codes::PARAM_ATTR_MATCH => '(right|left|center)',
-					),
-					'type' => array(
+					],
+					'type' => [
 						Codes::PARAM_ATTR_OPTIONAL => true,
 						Codes::PARAM_ATTR_VALUE => ';$1',
 						Codes::PARAM_ATTR_MATCH => '(thumb|image)',
-					),
-				),
+					],
+				],
 				Codes::ATTR_DISABLED => $disabled,
 				Codes::ATTR_RESET => '~{align}~{type}',
 				Codes::ATTR_CONTENT => &self::$typeTag,
@@ -229,9 +229,9 @@ class IlaIntegrate
 				Codes::ATTR_BLOCK_LEVEL => false,
 				Codes::ATTR_AUTOLINK => false,
 				Codes::ATTR_LENGTH => 6,
-			),
+			],
 			// [attachurl=xx] -- no image but a link with some details
-			array(
+			[
 				Codes::ATTR_TAG => 'attachurl',
 				Codes::ATTR_TYPE => Codes::TYPE_UNPARSED_CONTENT,
 				Codes::ATTR_DISABLED => $disabledUrl,
@@ -242,8 +242,8 @@ class IlaIntegrate
 				Codes::ATTR_BLOCK_LEVEL => false,
 				Codes::ATTR_AUTOLINK => false,
 				Codes::ATTR_LENGTH => 9,
-			),
-		));
+			],
+		]);
 	}
 
 	/**
@@ -258,7 +258,7 @@ class IlaIntegrate
 	 *
 	 * @return callable
 	 */
-	public static function buildTag()
+	public static function buildTag(): callable
 	{
 		global $modSettings;
 
@@ -335,7 +335,7 @@ class IlaIntegrate
 	 *
 	 * @return callable
 	 */
-	public static function validate_url()
+	public static function validate_url(): callable
 	{
 		global $txt;
 
@@ -386,7 +386,7 @@ class IlaIntegrate
 	 * @param string $data if ila will be (int)'ed otherwise left alone
 	 * @return bool
 	 */
-	public static function isPreview(&$data)
+	public static function isPreview(&$data): bool
 	{
 		if (strpos($data, 'post_tmp_' . User::$info->id . '_') === false)
 		{
@@ -402,7 +402,7 @@ class IlaIntegrate
 	 *
 	 * @param int $data
 	 */
-	public static function trackIlaUsage($data)
+	public static function trackIlaUsage($data): void
 	{
 		global $context;
 
@@ -419,7 +419,7 @@ class IlaIntegrate
 	 *
 	 * @param array $config_vars
 	 */
-	public static function integrate_modify_attachment_settings(&$config_vars)
+	public static function integrate_modify_attachment_settings(&$config_vars): void
 	{
 		$config_vars[] = ['title', 'attachment_inline_title'];
 		$config_vars[] = ['check', 'attachment_inline_enabled'];

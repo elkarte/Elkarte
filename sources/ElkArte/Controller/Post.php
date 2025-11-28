@@ -45,7 +45,7 @@ class Post extends AbstractController
 	protected $_template_layers;
 
 	/** @var array An array of attributes of the topic (if not new) */
-	protected $_topic_attributes = array();
+	protected $_topic_attributes = [];
 
 	/** @var string The message subject */
 	protected $_form_subject = '';
@@ -155,7 +155,7 @@ class Post extends AbstractController
 		];
 
 		// Trigger the finalize_post_form event
-		$this->_events->trigger('finalize_post_form', array('destination' => &$context['destination'], 'page_title' => &$context['page_title'], 'show_additional_options' => &$context['show_additional_options'], 'editorOptions' => &$editorOptions));
+		$this->_events->trigger('finalize_post_form', ['destination' => &$context['destination'], 'page_title' => &$context['page_title'], 'show_additional_options' => &$context['show_additional_options'], 'editorOptions' => &$editorOptions]);
 
 		// Initialize the editor
 		create_control_richedit($editorOptions);
@@ -166,7 +166,7 @@ class Post extends AbstractController
 	/**
 	 * Load language files, templates and prepare posting basics
 	 */
-	protected function _beforePreparePost()
+	protected function _beforePreparePost(): void
 	{
 		global $context;
 
@@ -175,7 +175,7 @@ class Post extends AbstractController
 
 		$context['robot_no_index'] = true;
 		$this->_template_layers->add('postarea');
-		$this->_topic_attributes = array(
+		$this->_topic_attributes = [
 			'locked' => 0,
 			'notify' => 0,
 			'is_sticky' => 0,
@@ -184,7 +184,7 @@ class Post extends AbstractController
 			'id_first_msg' => 0,
 			'subject' => '',
 			'last_post_time' => 0
-		);
+		];
 	}
 
 	/**
@@ -197,7 +197,7 @@ class Post extends AbstractController
 	 *
 	 * @throws Exception
 	 */
-	protected function _beforePrepareContext()
+	protected function _beforePrepareContext(): void
 	{
 		global $topic, $modSettings, $board, $context;
 
@@ -312,7 +312,7 @@ class Post extends AbstractController
 			$this->_topic_attributes['locked'] = 0;
 
 			// @todo These won't work if you're making an event.
-			$context['can_lock'] = allowedTo(array('lock_any', 'lock_own'));
+			$context['can_lock'] = allowedTo(['lock_any', 'lock_own']);
 			$context['can_sticky'] = allowedTo('make_sticky');
 
 			$context['notify'] = !empty($context['notify']);
@@ -357,7 +357,7 @@ class Post extends AbstractController
 	 * - Shows the message preview if requested
 	 * - Triggers prepare_modifying, prepare_editing, prepare_posting
 	 */
-	protected function _generatingMessage()
+	protected function _generatingMessage(): void
 	{
 		global $txt, $topic, $modSettings, $context, $options, $board_info;
 
@@ -422,7 +422,7 @@ class Post extends AbstractController
 			&& empty($this->_topic_attributes['is_sticky'])
 			&& !isset($_REQUEST['subject']))
 		{
-			$this->_post_errors->addError(array('old_topic', array($modSettings['oldTopicDays'])), 0);
+			$this->_post_errors->addError(['old_topic', [$modSettings['oldTopicDays']]], 0);
 		}
 	}
 
@@ -436,7 +436,7 @@ class Post extends AbstractController
 	 * @param string $message
 	 * @param string $subject
 	 */
-	private function _previewPost($msg, $topic, $message, $subject)
+	private function _previewPost($msg, $topic, $message, $subject): void
 	{
 		global $txt, $modSettings, $context;
 
@@ -480,7 +480,7 @@ class Post extends AbstractController
 		$context['can_announce'] = $context['can_announce'] && $context['becomes_approved'];
 
 		// Set up the inputs for the form.
-		$this->_form_subject = strtr(Util::htmlspecialchars($subject), array("\r" => '', "\n" => '', "\t" => ''));
+		$this->_form_subject = strtr(Util::htmlspecialchars($subject), ["\r" => '', "\n" => '', "\t" => '']);
 		$this->_form_message = Util::htmlspecialchars($message, ENT_QUOTES, 'UTF-8', true);
 
 		// Make sure the subject isn't too long - taking into account special characters.
@@ -570,7 +570,7 @@ class Post extends AbstractController
 	 * @param int $msg
 	 * @param int $topic
 	 */
-	private function _editPost($msg, $topic)
+	private function _editPost($msg, $topic): void
 	{
 		global $txt, $context;
 
@@ -583,7 +583,7 @@ class Post extends AbstractController
 		}
 
 		// Trigger the prepare_editing event
-		$this->_events->trigger('prepare_editing', array('topic' => $topic, 'message' => &$message));
+		$this->_events->trigger('prepare_editing', ['topic' => $topic, 'message' => &$message]);
 
 		if (!empty($message['errors']))
 		{
@@ -612,7 +612,7 @@ class Post extends AbstractController
 	 * @param int $topic
 	 * @param string $subject
 	 */
-	private function _makePost($topic, $subject)
+	private function _makePost($topic, $subject): void
 	{
 		global $context, $txt, $modSettings;
 
@@ -662,7 +662,7 @@ class Post extends AbstractController
 	 *
 	 * @param bool $ns no smiley flag
 	 */
-	private function _setupPreviewContext($ns)
+	private function _setupPreviewContext($ns): void
 	{
 		global $txt, $modSettings, $context;
 
@@ -692,7 +692,7 @@ class Post extends AbstractController
 		}
 		elseif (!empty($modSettings['max_messageLength']) && Util::strlen($this->_form_message) > $modSettings['max_messageLength'])
 		{
-			$this->_post_errors->addError(array('long_message', array($modSettings['max_messageLength'])));
+			$this->_post_errors->addError(['long_message', [$modSettings['max_messageLength']]]);
 		}
 
 		// Protect any CDATA blocks.
@@ -705,16 +705,16 @@ class Post extends AbstractController
 	/**
 	 * Preparing the page for post preview or error handling.
 	 */
-	protected function _preparingPage()
+	protected function _preparingPage(): void
 	{
 		global $txt, $topic, $modSettings, $board, $context;
 
 		// Any errors occurred?
-		$context['post_error'] = array(
+		$context['post_error'] = [
 			'errors' => $this->_post_errors->prepareErrors(),
 			'type' => $this->_post_errors->getErrorType() === 0 ? 'minor' : 'serious',
 			'title' => $this->_post_errors->getErrorType() === 0 ? $txt['warning_while_submitting'] : $txt['error_while_submitting'],
-		);
+		];
 
 		// What are you doing? Posting, modifying, previewing, new post, or reply...
 		if (empty($context['page_title']))
@@ -751,7 +751,7 @@ class Post extends AbstractController
 				$limit = $modSettings['topicSummaryPosts'];
 			}
 
-			$before = isset($_REQUEST['msg']) ? array('before' => (int) $_REQUEST['msg']) : array();
+			$before = isset($_REQUEST['msg']) ? ['before' => (int) $_REQUEST['msg']] : [];
 
 			$counter = 0;
 			$context['previous_posts'] = empty($limit) ? [] : selectMessages($topic, 0, $limit, $before, $only_approved);
@@ -784,7 +784,7 @@ class Post extends AbstractController
 		}
 
 		$context['subject'] = addcslashes($this->_form_subject, '"');
-		$context['message'] = str_replace(array('"', '<', '>', '&nbsp;'), array('&quot;', '&lt;', '&gt;', ' '), $this->_form_message);
+		$context['message'] = str_replace(['"', '<', '>', '&nbsp;'], ['&quot;', '&lt;', '&gt;', ' '], $this->_form_message);
 
 		// Message icons - customized or not, retrieve them...
 		require_once(SUBSDIR . '/MessageIcons.subs.php');
@@ -826,9 +826,15 @@ class Post extends AbstractController
 	}
 
 	/**
+	 * Finalizes the page setup for the post form, including the link tree, context flags, and template loading.
+	 * - Determines whether the action is for creating a new topic, a new post, or editing an existing post.
+	 * - Updates breadcrumb navigation based on the topic or new topic creation.
+	 * - Registers the form to prevent duplicate submissions.
+	 * - Loads the appropriate template for rendering the post form if not using an API.
 	 *
+	 * @return void
 	 */
-	protected function _finalizePage()
+	protected function _finalizePage(): void
 	{
 		global $txt, $scripturl, $topic, $context;
 
@@ -1006,7 +1012,7 @@ class Post extends AbstractController
 			}
 
 			// Trigger the save_replying event
-			$this->_events->trigger('save_replying', array('topic_info' => &$topic_info));
+			$this->_events->trigger('save_replying', ['topic_info' => &$topic_info]);
 
 			// If the number of replies has changed, if the setting is enabled, go back to action_post() - which handles the error.
 			if (empty($options['no_new_reply_warning']) && isset($_POST['last_msg']) && $topic_info['id_last_msg'] > $_POST['last_msg'])
@@ -1036,7 +1042,7 @@ class Post extends AbstractController
 			}
 
 			// Trigger the save new topic event
-			$this->_events->trigger('save_new_topic', array('becomesApproved' => &$becomesApproved));
+			$this->_events->trigger('save_new_topic', ['becomesApproved' => &$becomesApproved]);
 
 			if (isset($_POST['lock']))
 			{
@@ -1063,7 +1069,7 @@ class Post extends AbstractController
 			}
 
 			// Trigger teh save_modify event
-			$this->_events->trigger('save_modify', array('msgInfo' => &$msgInfo));
+			$this->_events->trigger('save_modify', ['msgInfo' => &$msgInfo]);
 
 			if (!empty($topic_info['locked']) && !allowedTo('moderate_board'))
 			{
@@ -1154,7 +1160,7 @@ class Post extends AbstractController
 			if (empty($modSettings['guest_post_no_email']))
 			{
 				// Only check if they changed it!
-				if ((!isset($msgInfo) || $msgInfo['poster_email'] !== $_POST['email']) && (!allowedTo('moderate_forum') && !DataValidator::is_valid($_POST, array('email' => 'valid_email|required'), array('email' => 'trim'))))
+				if ((!isset($msgInfo) || $msgInfo['poster_email'] !== $_POST['email']) && (!allowedTo('moderate_forum') && !DataValidator::is_valid($_POST, ['email' => 'valid_email|required'], ['email' => 'trim'])))
 				{
 					empty($_POST['email']) ? $this->_post_errors->addError('no_email') : $this->_post_errors->addError('bad_email');
 				}
@@ -1174,7 +1180,7 @@ class Post extends AbstractController
 		// Trigger before_save_post event
 		try
 		{
-			$this->_events->trigger('before_save_post', array('post_errors' => $this->_post_errors, 'topic_info' => $topic_info));
+			$this->_events->trigger('before_save_post', ['post_errors' => $this->_post_errors, 'topic_info' => $topic_info]);
 		}
 		catch (ControllerRedirectException $controllerRedirectException)
 		{
@@ -1193,7 +1199,7 @@ class Post extends AbstractController
 		}
 		elseif (!empty($modSettings['max_messageLength']) && Util::strlen($_POST['message']) > $modSettings['max_messageLength'])
 		{
-			$this->_post_errors->addError(array('long_message', array($modSettings['max_messageLength'])));
+			$this->_post_errors->addError(['long_message', [$modSettings['max_messageLength']]]);
 		}
 		else
 		{
@@ -1243,7 +1249,7 @@ class Post extends AbstractController
 
 				if (!empty($post_in_board))
 				{
-					$this->_post_errors->addError(array('post_new_board', array($post_in_board['name'])));
+					$this->_post_errors->addError(['post_new_board', [$post_in_board['name']]]);
 				}
 				else
 				{
@@ -1273,7 +1279,7 @@ class Post extends AbstractController
 		detectServer()->setTimeLimit(300);
 
 		// Add special html entities to the subject, name, and email.
-		$_POST['subject'] = strtr(Util::htmlspecialchars($_POST['subject']), array("\r" => '', "\n" => '', "\t" => ''));
+		$_POST['subject'] = strtr(Util::htmlspecialchars($_POST['subject']), ["\r" => '', "\n" => '', "\t" => '']);
 		$_POST['guestname'] = htmlspecialchars($_POST['guestname'], ENT_COMPAT, 'UTF-8');
 		$_POST['email'] = htmlspecialchars($_POST['email'], ENT_COMPAT, 'UTF-8');
 
@@ -1287,33 +1293,33 @@ class Post extends AbstractController
 		$newTopic = empty($_REQUEST['msg']) && empty($topic);
 
 		// Collect all parameters for the creation or modification of a post.
-		$msgOptions = array(
+		$msgOptions = [
 			'id' => empty($_REQUEST['msg']) ? 0 : (int) $_REQUEST['msg'],
 			'subject' => $_POST['subject'],
 			'body' => $_POST['message'],
 			'icon' => preg_replace('~[\./\\\\*:"\'<>]~', '', $_POST['icon']),
 			'smileys_enabled' => !isset($_POST['ns']),
 			'approved' => $becomesApproved,
-		);
+		];
 
-		$topicOptions = array(
+		$topicOptions = [
 			'id' => empty($topic) ? 0 : $topic,
 			'board' => $board,
 			'lock_mode' => isset($_POST['lock']) ? (int) $_POST['lock'] : null,
 			'sticky_mode' => isset($_POST['sticky']) ? (int) $_POST['sticky'] : null,
 			'mark_as_read' => true,
 			'is_approved' => !$modSettings['postmod_active'] || empty($topic) || !empty($board_info['cur_topic_approved']),
-		);
+		];
 
-		$posterOptions = array(
+		$posterOptions = [
 			'id' => $this->user->id,
 			'name' => $_POST['guestname'],
 			'email' => $_POST['email'],
 			'update_post_count' => $this->user->is_guest === false && !isset($_REQUEST['msg']) && $board_info['posts_count'],
-		);
+		];
 
 		// Trigger the pre_save_post event
-		$this->_events->trigger('pre_save_post', array('msgOptions' => &$msgOptions, 'topicOptions' => &$topicOptions, 'posterOptions' => &$posterOptions));
+		$this->_events->trigger('pre_save_post', ['msgOptions' => &$msgOptions, 'topicOptions' => &$topicOptions, 'posterOptions' => &$posterOptions]);
 
 		// This is an already existing message. Edit it.
 		if (!empty($_REQUEST['msg']))
@@ -1357,13 +1363,13 @@ class Post extends AbstractController
 		}
 
 		// Trigger the after_save_post event
-		$this->_events->trigger('after_save_post', array('board' => $board, 'topic' => $topic, 'msgOptions' => $msgOptions, 'topicOptions' => $topicOptions, 'becomesApproved' => $becomesApproved, 'posterOptions' => $posterOptions));
+		$this->_events->trigger('after_save_post', ['board' => $board, 'topic' => $topic, 'msgOptions' => $msgOptions, 'topicOptions' => $topicOptions, 'becomesApproved' => $becomesApproved, 'posterOptions' => $posterOptions]);
 
 		// Marking boards as read.
 		// (You just posted and they will be unread.)
 		if ($this->user->is_guest === false)
 		{
-			$board_list = empty($board_info['parent_boards']) ? array() : array_keys($board_info['parent_boards']);
+			$board_list = empty($board_info['parent_boards']) ? [] : array_keys($board_info['parent_boards']);
 
 			// Returning to the topic?
 			if (!empty($_REQUEST['goback']))
@@ -1390,17 +1396,17 @@ class Post extends AbstractController
 		// Log an act of moderation - modifying.
 		if (!empty($moderationAction))
 		{
-			logAction('modify', array('topic' => $topic, 'message' => (int) $_REQUEST['msg'], 'member' => $msgInfo['id_member'], 'board' => $board));
+			logAction('modify', ['topic' => $topic, 'message' => (int) $_REQUEST['msg'], 'member' => $msgInfo['id_member'], 'board' => $board]);
 		}
 
 		if (isset($_POST['lock']) && $_POST['lock'] != 2)
 		{
-			logAction(empty($_POST['lock']) ? 'unlock' : 'lock', array('topic' => $topicOptions['id'], 'board' => $topicOptions['board']));
+			logAction(empty($_POST['lock']) ? 'unlock' : 'lock', ['topic' => $topicOptions['id'], 'board' => $topicOptions['board']]);
 		}
 
 		if (isset($_POST['sticky']))
 		{
-			logAction(empty($_POST['sticky']) ? 'unsticky' : 'sticky', array('topic' => $topicOptions['id'], 'board' => $topicOptions['board']));
+			logAction(empty($_POST['sticky']) ? 'unsticky' : 'sticky', ['topic' => $topicOptions['id'], 'board' => $topicOptions['board']]);
 		}
 
 		// Notify any members who have notification turned on for this topic/board - only do this if it's going to be approved(!)
@@ -1409,7 +1415,7 @@ class Post extends AbstractController
 			require_once(SUBSDIR . '/Notification.subs.php');
 			if ($newTopic)
 			{
-				$notifyData = array(
+				$notifyData = [
 					'body' => $_POST['message'],
 					'subject' => $_POST['subject'],
 					'name' => $this->user->name,
@@ -1418,7 +1424,7 @@ class Post extends AbstractController
 					'board' => $board,
 					'topic' => $topic,
 					'signature' => User::$settings->signature(''),
-				);
+				];
 				sendBoardNotifications($notifyData);
 			}
 			elseif (empty($_REQUEST['msg']))
@@ -1430,7 +1436,7 @@ class Post extends AbstractController
 				}
 				else
 				{
-					sendNotifications($topic, 'reply', array(), $topic_info['id_member_started']);
+					sendNotifications($topic, 'reply', [], $topic_info['id_member_started']);
 				}
 			}
 		}
@@ -1474,7 +1480,7 @@ class Post extends AbstractController
 	 *
 	 * @return int|null
 	 */
-	protected function _checkLocked($lock, $topic_info = null)
+	protected function _checkLocked($lock, $topic_info = null): ?int
 	{
 		// A new topic
 		if ($topic_info === null)
@@ -1485,7 +1491,7 @@ class Post extends AbstractController
 				return null;
 			}
 			// Besides, you need permission.
-			if (!allowedTo(array('lock_any', 'lock_own')))
+			if (!allowedTo(['lock_any', 'lock_own']))
 			{
 				return null;
 			}
@@ -1501,7 +1507,7 @@ class Post extends AbstractController
 			return null;
 		}
 		// You're simply not allowed to (un)lock this.
-		if (!allowedTo(array('lock_any', 'lock_own')) || (!allowedTo('lock_any') && $this->user->id != $topic_info['id_member_started']))
+		if (!allowedTo(['lock_any', 'lock_own']) || (!allowedTo('lock_any') && $this->user->id != $topic_info['id_member_started']))
 		{
 			return null;
 		}
@@ -1533,7 +1539,7 @@ class Post extends AbstractController
 	 * uses special (sadly browser dependent) javascript to parse entities for internationalization reasons.
 	 * accessed with ?action=quotefast and ?action=quotefast;modify
 	 */
-	public function action_quotefast()
+	public function action_quotefast(): void
 	{
 		global $context;
 
@@ -1566,11 +1572,11 @@ class Post extends AbstractController
 				$row['subject'] = censor($row['subject']);
 
 				$context['sub_template'] = 'modifyfast';
-				$context['message'] = array(
+				$context['message'] = [
 					'id' => $_REQUEST['quote'],
 					'body' => $row['body'],
 					'subject' => addcslashes($row['subject'], '"'),
-				);
+				];
 
 				return;
 			}
@@ -1580,7 +1586,7 @@ class Post extends AbstractController
 
 			// Add a quote string on the front and end.
 			$context['quote']['xml'] = '[quote author=' . $row['poster_name'] . ' link=msg=' . (int) $_REQUEST['quote'] . ' date=' . $row['poster_time'] . "]\n" . $row['body'] . "\n[/quote]";
-			$context['quote']['text'] = strtr(un_htmlspecialchars($context['quote']['xml']), array("'" => '\\\'', '\\' => '\\\\', "\n" => '\\n', '</script>' => "</' + 'script>"));
+			$context['quote']['text'] = strtr(un_htmlspecialchars($context['quote']['xml']), ["'" => '\\\'', '\\' => '\\\\', "\n" => '\\n', '</script>' => "</' + 'script>"]);
 			$context['quote']['xml'] = strtr($context['quote']['xml'], ['&nbsp;' => '&#160;', '<' => '&lt;', '>' => '&gt;']);
 		}
 		//@todo Needs a nicer interface.
@@ -1607,7 +1613,7 @@ class Post extends AbstractController
 	 * Used to edit the body or subject of a message inline
 	 * called from action=jsmodify from script and topic js
 	 */
-	public function action_jsmodify()
+	public function action_jsmodify(): void
 	{
 		global $modSettings, $board, $topic, $context;
 
@@ -1664,7 +1670,7 @@ class Post extends AbstractController
 
 		if (isset($_POST['subject']) && Util::htmltrim(Util::htmlspecialchars($_POST['subject'])) !== '')
 		{
-			$_POST['subject'] = strtr(Util::htmlspecialchars($_POST['subject']), array("\r" => '', "\n" => '', "\t" => ''));
+			$_POST['subject'] = strtr(Util::htmlspecialchars($_POST['subject']), ["\r" => '', "\n" => '', "\t" => '']);
 
 			// Maximum number of characters.
 			if (Util::strlen($_POST['subject']) > 100)
@@ -1687,7 +1693,7 @@ class Post extends AbstractController
 			}
 			elseif (!empty($modSettings['max_messageLength']) && Util::strlen($_POST['message']) > $modSettings['max_messageLength'])
 			{
-				$this->_post_errors->addError(array('long_message', array($modSettings['max_messageLength'])));
+				$this->_post_errors->addError(['long_message', [$modSettings['max_messageLength']]]);
 				unset($_POST['message']);
 			}
 			else
@@ -1721,13 +1727,13 @@ class Post extends AbstractController
 			{
 				if (!empty($_REQUEST['uid']))
 				{
-					$query_params = array();
+					$query_params = [];
 					$query_params['member_ids'] = array_unique(array_map('intval', $_REQUEST['uid']));
 
 					require_once(SUBSDIR . '/Members.subs.php');
 					$mentioned_members = membersBy('member_ids', $query_params, true);
 					$replacements = 0;
-					$actually_mentioned = array();
+					$actually_mentioned = [];
 					foreach ($mentioned_members as $member)
 					{
 						$_POST['message'] = str_replace('@' . $member['real_name'], '[member=' . $member['id_member'] . ']' . $member['real_name'] . '[/member]', $_POST['message'], $replacements);
@@ -1745,27 +1751,27 @@ class Post extends AbstractController
 						'Mentionmem',
 						$row['id_msg'],
 						$row['id_member'],
-						array('id_members' => $actually_mentioned, 'status' => $row['approved'] ? 'new' : 'unapproved')
+						['id_members' => $actually_mentioned, 'status' => $row['approved'] ? 'new' : 'unapproved']
 					));
 				}
 			}
 
-			$msgOptions = array(
+			$msgOptions = [
 				'id' => $row['id_msg'],
 				'subject' => $_POST['subject'] ?? null,
 				'body' => $_POST['message'] ?? null,
 				'icon' => isset($_REQUEST['icon']) ? preg_replace('~[\./\\\\*\':"<>]~', '', $_REQUEST['icon']) : null,
-			);
+			];
 
-			$topicOptions = array(
+			$topicOptions = [
 				'id' => $topic,
 				'board' => $board,
 				'lock_mode' => isset($_POST['lock']) ? (int) $_POST['lock'] : null,
 				'sticky_mode' => isset($_POST['sticky']) ? (int) $_POST['sticky'] : null,
 				'mark_as_read' => false,
-			);
+			];
 
-			$posterOptions = array();
+			$posterOptions = [];
 
 			// Only consider marking as editing if they have edited the subject, message or icon.
 			if ((isset($_POST['subject']) && $_POST['subject'] !== $row['subject']) || (isset($_POST['message']) && $_POST['message'] !== $row['body']) || (isset($_REQUEST['icon']) && $_REQUEST['icon'] !== $row['icon']))
@@ -1798,12 +1804,12 @@ class Post extends AbstractController
 				// Get the proper (default language) response prefix first.
 				$context['response_prefix'] = response_prefix();
 
-				topicSubject(array('id_topic' => $topic, 'id_first_msg' => $row['id_first_msg']), $_POST['subject'], $context['response_prefix'], true);
+				topicSubject(['id_topic' => $topic, 'id_first_msg' => $row['id_first_msg']], $_POST['subject'], $context['response_prefix'], true);
 			}
 
 			if (!empty($moderationAction))
 			{
-				logAction('modify', array('topic' => $topic, 'message' => $row['id_msg'], 'member' => $row['id_member'], 'board' => $board));
+				logAction('modify', ['topic' => $topic, 'message' => $row['id_msg'], 'member' => $row['id_member'], 'board' => $board]);
 			}
 		}
 
@@ -1817,18 +1823,18 @@ class Post extends AbstractController
 
 			if (isset($msgOptions['subject'], $msgOptions['body']) && !$this->_post_errors->hasErrors())
 			{
-				$context['message'] = array(
+				$context['message'] = [
 					'id' => $row['id_msg'],
-					'modified' => array(
+					'modified' => [
 						'time' => isset($msgOptions['modify_time']) ? standardTime($msgOptions['modify_time']) : '',
 						'html_time' => isset($msgOptions['modify_time']) ? htmlTime($msgOptions['modify_time']) : '',
 						'timestamp' => isset($msgOptions['modify_time']) ? forum_time(true, $msgOptions['modify_time']) : 0,
 						'name' => isset($msgOptions['modify_time']) ? $msgOptions['modify_name'] : '',
-					),
+					],
 					'subject' => $msgOptions['subject'],
 					'first_in_topic' => $row['id_msg'] == $row['id_first_msg'],
-					'body' => strtr($msgOptions['body'], array(']]>' => ']]]]><![CDATA[>')),
-				);
+					'body' => strtr($msgOptions['body'], [']]>' => ']]]]><![CDATA[>']),
+				];
 
 				$context['message']['subject'] = censor($context['message']['subject']);
 				$context['message']['body'] = censor($context['message']['body']);
@@ -1839,27 +1845,27 @@ class Post extends AbstractController
 			elseif (!$this->_post_errors->hasErrors())
 			{
 				$context['sub_template'] = 'modifytopicdone';
-				$context['message'] = array(
+				$context['message'] = [
 					'id' => $row['id_msg'],
-					'modified' => array(
+					'modified' => [
 						'time' => isset($msgOptions['modify_time']) ? standardTime($msgOptions['modify_time']) : '',
 						'html_time' => isset($msgOptions['modify_time']) ? htmlTime($msgOptions['modify_time']) : '',
 						'timestamp' => isset($msgOptions['modify_time']) ? forum_time(true, $msgOptions['modify_time']) : 0,
 						'name' => isset($msgOptions['modify_time']) ? $msgOptions['modify_name'] : '',
-					),
+					],
 					'subject' => $msgOptions['subject'] ?? '',
-				);
+				];
 
 				$context['message']['subject'] = censor($context['message']['subject']);
 			}
 			else
 			{
-				$context['message'] = array(
+				$context['message'] = [
 					'id' => $row['id_msg'],
-					'errors' => array(),
+					'errors' => [],
 					'error_in_subject' => $this->_post_errors->hasError('no_subject'),
 					'error_in_body' => $this->_post_errors->hasError('no_message') || $this->_post_errors->hasError('long_message'),
-				);
+				];
 				$context['message']['errors'] = $this->_post_errors->prepareErrors();
 			}
 		}

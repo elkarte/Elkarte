@@ -68,9 +68,9 @@ class Recent
 	 *
 	 * @param int|int[] $boards - the id of the boards
 	 */
-	public function setBoards($boards)
+	public function setBoards($boards): void
 	{
-		$this->_query_parameters['boards'] = is_array($boards) ? $boards : array($boards);
+		$this->_query_parameters['boards'] = is_array($boards) ? $boards : [$boards];
 
 		$this->_query_this_board .= 'b.id_board IN ({array_int:boards})';
 	}
@@ -80,7 +80,7 @@ class Recent
 	 *
 	 * @param int $msg_id - id of the earliest message to consider
 	 */
-	public function setEarliestMsg($msg_id)
+	public function setEarliestMsg($msg_id): void
 	{
 		$this->_query_this_board .= '
 			AND m.id_msg >= {int:max_id_msg}';
@@ -94,7 +94,7 @@ class Recent
 	 * @param int $msg_id - id of the earliest message to consider
 	 * @param int $recycle - id of the recycle board
 	 */
-	public function setVisibleBoards($msg_id, $recycle)
+	public function setVisibleBoards($msg_id, $recycle): void
 	{
 		$this->_query_this_board .= '{query_wanna_see_board}' . (empty($recycle) ? '' : '
 			AND b.id_board != {int:recycle_board}') . '
@@ -116,10 +116,10 @@ class Recent
 	 *
 	 * @return bool
 	 */
-	public function findRecentMessages($start, $limit = 10)
+	public function findRecentMessages($start, $limit = 10): bool
 	{
 		$cache = Cache\Cache::instance();
-		$key = 'recent-' . $this->_user_id . '-' . md5(serialize(array_diff_key($this->_query_parameters, array('max_id_msg' => 0)))) . '-' . $start . '-' . $limit;
+		$key = 'recent-' . $this->_user_id . '-' . md5(serialize(array_diff_key($this->_query_parameters, ['max_id_msg' => 0]))) . '-' . $start . '-' . $limit;
 		$this->_messages = $cache->get($key, 120);
 
 		if ($cache->isMiss())
@@ -141,7 +141,7 @@ class Recent
 	 * @param int $start - position to start the query
 	 * @param int $limit - number of entries to grab
 	 */
-	private function _findRecentMessages($start, $limit = 10)
+	private function _findRecentMessages($start, $limit = 10): void
 	{
 		$done = false;
 		while (!$done)
@@ -159,11 +159,11 @@ class Recent
 					AND t.approved = {int:is_approved}
 				ORDER BY m.id_msg DESC
 				LIMIT {int:limit} OFFSET {int:offset}',
-				array_merge($this->_query_parameters, array(
+				array_merge($this->_query_parameters, [
 					'is_approved' => 1,
 					'offset' => $start,
 					'limit' => $limit,
-				))
+				])
 			);
 
 			// If we don't have 10 results, try again with an unoptimized version covering all rows, and cache the result.
@@ -180,7 +180,7 @@ class Recent
 			}
 		}
 
-		$this->_messages = array();
+		$this->_messages = [];
 		while (($row = $request->fetch_assoc()))
 		{
 			$this->_messages[] = $row['id_msg'];
@@ -209,7 +209,7 @@ class Recent
 	 *
 	 * @return array
 	 */
-	public function getRecentPosts($start, $permissions)
+	public function getRecentPosts($start, $permissions): array
 	{
 		// Provide an easy way for integration to interact with the recent display items
 		call_integration_hook('integrate_recent_message_list', [$this->_messages, &$permissions]);
@@ -266,10 +266,10 @@ class Recent
 	 *
 	 * @param int $start
 	 */
-	private function _getRecentPosts($start)
+	private function _getRecentPosts($start): void
 	{
 		// Get all the most recent posts.
-		$returns = array();
+		$returns = [];
 		$this->_db->fetchQuery('
 			SELECT
 				m.id_msg, m.subject, m.smileys_enabled, m.poster_time, m.body, m.id_topic, t.id_board, b.id_cat,
@@ -286,9 +286,9 @@ class Recent
 			WHERE m.id_msg IN ({array_int:message_list})
 			ORDER BY m.id_msg DESC
 			LIMIT ' . count($this->_messages),
-			array(
+			[
 				'message_list' => $this->_messages,
-			)
+			]
 		)->fetch_callback(
 			static function ($row) use (&$returns) {
 				$returns[] = $row;

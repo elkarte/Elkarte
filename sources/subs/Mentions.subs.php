@@ -108,16 +108,16 @@ function getUserMentions($start, $limit, $sort, $all = false, $type = '')
 			AND mtn.mention_type = {string:current_type}')) . '
 		ORDER BY {raw:sort}
 		LIMIT {int:limit} OFFSET {int:start} ',
-		array(
+		[
 			'current_user' => User::$info->id,
 			'current_type' => $type,
-			'status' => $all ? array(0, 1) : array(0),
+			'status' => $all ? [0, 1] : [0],
 			'guest_text' => $txt['guest'],
 			'is_accessible' => 1,
 			'start' => $start,
 			'limit' => $limit,
 			'sort' => $sort,
-		)
+		]
 	)->fetch_callback(
 		function ($row) {
 			$row['avatar'] = determineAvatar($row);
@@ -145,9 +145,9 @@ function removeMentions($id_mentions)
 	$request = $db->query('', '
 		DELETE FROM {db_prefix}log_mentions
 		WHERE id_mention IN ({array_int:id_mentions})',
-		array(
+		[
 			'id_mentions' => $id_mentions,
-		)
+		]
 	);
 	$success = $request->affected_rows() !== 0;
 
@@ -178,10 +178,10 @@ function toggleMentionsApproval($msgs, $approved)
 		SET 
 			status = {int:status}
 		WHERE id_target IN ({array_int:messages})',
-		array(
+		[
 			'messages' => $msgs,
 			'status' => $approved ? 0 : 3,
-		)
+		]
 	);
 
 	// Update the mentions menu count for the members that have this message
@@ -191,9 +191,9 @@ function toggleMentionsApproval($msgs, $approved)
 			id_member, status
 		FROM {db_prefix}log_mentions
 		WHERE id_target IN ({array_int:messages})',
-		array(
+		[
 			'messages' => $msgs,
-		)
+		]
 	)->fetch_callback(
 		function ($row) use ($status) {
 			updateMentionMenuCount($status, $row['id_member']);
@@ -222,10 +222,10 @@ function toggleMentionsVisibility($type, $enable)
 		WHERE mention_type = {string:type}
 			AND status ' . ($enable ? '>=' : '<') . ' {int:toggle}
 			AND is_accessible = 1',
-		array(
+		[
 			'type' => $type,
 			'toggle' => 10,
-		)
+		]
 	);
 
 	$db->query('', '
@@ -235,10 +235,10 @@ function toggleMentionsVisibility($type, $enable)
 		WHERE mention_type = {string:type}
 			AND status ' . ($enable ? '<' : '>=') . ' 0
 			AND is_accessible = 0',
-		array(
+		[
 			'type' => $type,
 			'toggle' => 10,
-		)
+		]
 	);
 }
 
@@ -259,9 +259,9 @@ function toggleMentionsAccessibility($mentions, $access)
 			is_accessible = CASE WHEN is_accessible = 1 THEN 0 ELSE 1 END
 		WHERE id_mention IN ({array_int:mentions})
 			AND is_accessible ' . ($access ? '=' : '!=') . ' 0',
-		array(
+		[
 			'mentions' => $mentions,
-		)
+		]
 	);
 }
 
@@ -287,12 +287,12 @@ function validate_own_mention($field, $input, $validation_parameters = null)
 
 	if (!findMemberMention($input[$field], User::$info->id))
 	{
-		return array(
+		return [
 			'field' => $field,
 			'input' => $input[$field],
 			'function' => __FUNCTION__,
 			'param' => $validation_parameters
-		);
+		];
 	}
 }
 
@@ -315,10 +315,10 @@ function findMemberMention($id_mention, $id_member)
 		WHERE id_mention = {int:id_mention}
 			AND id_member = {int:id_member}
 		LIMIT 1',
-		array(
+		[
 			'id_mention' => $id_mention,
 			'id_member' => $id_member,
-		)
+		]
 	);
 	$return = $request->num_rows();
 	$request->free_result();
@@ -340,12 +340,12 @@ function updateMentionMenuCount($status, $member_id)
 	// If its new add to our menu count
 	if ($status === 0)
 	{
-		updateMemberData($member_id, array('mentions' => '+'));
+		updateMemberData($member_id, ['mentions' => '+']);
 	}
 	// Mark as read we decrease the count
 	elseif ($status === 1)
 	{
-		updateMemberData($member_id, array('mentions' => '-'));
+		updateMemberData($member_id, ['mentions' => '-']);
 	}
 	// Deleting or un-approving may have been read or not, so a count is required
 	else
@@ -373,10 +373,10 @@ function getTimeLastMention($id_member)
 			AND id_member = {int:member}
 		ORDER BY id_mention DESC
 		LIMIT 1',
-		array(
+		[
 			'status' => 0,
 			'member' => $id_member
-		)
+		]
 	);
 	list ($log_time) = $request->fetch_row();
 	$request->free_result();
@@ -405,11 +405,11 @@ function getNewMentions($id_member, $timestamp)
 			WHERE status = {int:status}
 				AND id_member = {int:member}
 				AND is_accessible = {int:has_access}',
-			array(
+			[
 				'status' => 0,
 				'has_access' => 1,
 				'member' => $id_member
-			)
+			]
 		)->fetch_assoc();
 	}
 	else
@@ -422,12 +422,12 @@ function getNewMentions($id_member, $timestamp)
 				AND log_time > {int:last_seen}
 				AND id_member = {int:member}
 				AND is_accessible = {int:has_access}',
-			array(
+			[
 				'status' => 0,
 				'has_access' => 1,
 				'last_seen' => $timestamp,
 				'member' => $id_member
-			)
+			]
 		)->fetch_assoc();
 	}
 
@@ -545,7 +545,7 @@ function markNotificationsRead($messages)
  *  - Note that delete is a "soft-delete" because otherwise anyway we have to remember
  *  - When a user was already mentioned for a certain message (e.g. in case of editing)
  *
- * @param int|array $id_mentions The id(s) of the mentions to update
+ * @param int|int[] $id_mentions The id(s) of the mentions to update
  * @param int $member_id The id of the member
  * @param int $status The new status for the mentions (default: 1)
  * @param bool $update Whether to update the mentions count (default: true)

@@ -1341,7 +1341,7 @@ function template_profile_avatar_select()
 								<label id="personal_picture">', $txt['personal_picture'], '</label>
 								<ul id="avatar_choices">
 									<li>
-										<input type="radio" onclick="swap_avatar();" name="avatar_choice" id="avatar_choice_none" value="none"' . ($context['member']['avatar']['choice'] == 'none' ? ' checked="checked"' : '') . ' />
+										<input type="radio" onclick="swap_avatar();" name="avatar_choice" id="avatar_choice_none" value="none"' . ($context['member']['avatar']['choice'] === 'none' ? ' checked="checked"' : '') . ' />
 										<label for="avatar_choice_none"' . (isset($context['modify_error']['bad_avatar']) ? ' class="error"' : '') . '>
 											' . $txt['no_avatar'] . '
 										</label>
@@ -1404,6 +1404,7 @@ function template_profile_avatar_select()
 	}
 
 	// If the user can link to an off server avatar, show them a box to input the address.
+	// note do not use type="url" or the form will fail to validate (browser) as this is an optional field
 	if (!empty($context['member']['avatar']['allow_external']))
 	{
 		echo '
@@ -1411,7 +1412,7 @@ function template_profile_avatar_select()
 									<div class="smalltext">
 										<label for="userpicpersonal">', $txt['avatar_by_url'], '</label>
 									</div>
-									<input type="url" id="userpicpersonal" name="userpicpersonal" value="', $context['member']['avatar']['external'], '" onchange="previewExternalAvatar(this.value);" class="input_text" placeholder="', $context['member']['avatar']['placeholder'] ?? '', '"/>
+									<input type="text" id="userpicpersonal" name="userpicpersonal" value="', $context['member']['avatar']['external'], '" onchange="previewExternalAvatar(this.value);" class="input_text" placeholder="', $context['member']['avatar']['placeholder'] ?? '', '"/>
 									<br /><br />
 									<img id="external" src="', $context['member']['avatar']['choice'] === 'external' ? $context['member']['avatar']['external'] : $modSettings['avatar_url'] . '/blank.png', '" alt="" class="avatar avatarresize" />
 								</div>';
@@ -1445,7 +1446,7 @@ function template_profile_avatar_select()
 
 	echo '
 								<script>
-									var files = ["' . implode('", "', $context['avatar_list']) . '"],
+									let files = ["' . implode('", "', $context['avatar_list']) . '"],
 										cat = document.getElementById("cat"),
 										file = document.getElementById("file"),
 										selavatar = "' . $context['avatar_selected'] . '",
@@ -1619,6 +1620,7 @@ function template_authentication_method()
 	<script>
 		var regTextStrings = {
 			"password_short": "', $txt['registration_password_short'], '",
+			"password_long": "', $txt['registration_password_long'], '",
 			"password_reserved": "', $txt['registration_password_reserved'], '",
 			"password_numbercase": "', $txt['registration_password_numbercase'], '",
 			"password_no_match": "', $txt['registration_password_no_match'], '",

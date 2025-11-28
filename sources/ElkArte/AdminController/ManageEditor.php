@@ -41,12 +41,12 @@ class ManageEditor extends AbstractController
 	{
 		global $context, $txt;
 
-		$subActions = array(
-			'display' => array(
+		$subActions = [
+			'display' => [
 				'controller' => $this,
 				'function' => 'action_editorSettings_display',
-				'permission' => 'admin_forum')
-		);
+				'permission' => 'admin_forum']
+		];
 
 		// Set up
 		$action = new Action('manage_editor');
@@ -68,7 +68,7 @@ class ManageEditor extends AbstractController
 	 * @event integrate_save_bbc_settings called during the save action
 	 * @uses Admin template, edit_editor_settings sub-template.
 	 */
-	public function action_editorSettings_display()
+	public function action_editorSettings_display(): void
 	{
 		global $context, $txt, $modSettings;
 
@@ -83,7 +83,7 @@ class ManageEditor extends AbstractController
 			toggleBBCDisabled(\'disabledBBC\', ' . (empty($modSettings['enableBBC']) ? 'true' : 'false') . ');', true);
 
 		// Make sure we check the right tags!
-		$modSettings['bbc_disabled_disabledBBC'] = empty($modSettings['disabledBBC']) ? array() : explode(',', $modSettings['disabledBBC']);
+		$modSettings['bbc_disabled_disabledBBC'] = empty($modSettings['disabledBBC']) ? [] : explode(',', $modSettings['disabledBBC']);
 
 		// Save page
 		if (isset($this->_req->query->save))
@@ -97,14 +97,14 @@ class ManageEditor extends AbstractController
 			$disabledBBC_enabledTags = $this->_req->getPost('disabledBBC_enabledTags', null, []);
 			if (!is_array($disabledBBC_enabledTags))
 			{
-				$disabledBBC_enabledTags = array($disabledBBC_enabledTags);
+				$disabledBBC_enabledTags = [$disabledBBC_enabledTags];
 			}
 
 			// Work out what is actually disabled!
 			$this->_req->post->disabledBBC = implode(',', array_diff($bbcTags, $disabledBBC_enabledTags));
 
 			// Notify addons and integrations
-			call_integration_hook('integrate_save_bbc_settings', array($bbcTags));
+			call_integration_hook('integrate_save_bbc_settings', [$bbcTags]);
 
 			// Save the result
 			$settingsForm->setConfigValues((array) $this->_req->post);
@@ -133,22 +133,22 @@ class ManageEditor extends AbstractController
 	{
 		global $txt;
 
-		$config_vars = array(
-			array('check', 'enableBBC'),
-			array('check', 'enableBBC', 0, 'onchange' => "toggleBBCDisabled('disabledBBC', !this.checked);"),
-			array('bbc', 'disabledBBC'),
+		$config_vars = [
+			['check', 'enableBBC'],
+			['check', 'enableBBC', 0, 'onchange' => "toggleBBCDisabled('disabledBBC', !this.checked);"],
+			['bbc', 'disabledBBC'],
 
-			array('title', 'editorSettings'),
-			array('check', 'enableUndoRedo'),
-			array('check', 'enableSplitTag'),
-			array('check', 'enableGiphy'),
-			array('text', 'giphyApiKey', 40, 'subtext' => $txt['giphyApiURL']),
-			array('select', 'giphyRating', ['g' => 'G', 'pg' => 'PG', 'pg13' => 'PG13', 'r' => 'R']),
-			array('text', 'giphyLanguage', 5, 'subtext' => $txt['giphyLanguageURL']),
-		);
+			['title', 'editorSettings'],
+			['check', 'enableUndoRedo'],
+			['check', 'enableSplitTag'],
+			['check', 'enableGiphy'],
+			['text', 'giphyApiKey', 40, 'subtext' => $txt['giphyApiURL']],
+			['select', 'giphyRating', ['g' => 'G', 'pg' => 'PG', 'pg13' => 'PG13', 'r' => 'R']],
+			['text', 'giphyLanguage', 5, 'subtext' => $txt['giphyLanguageURL']],
+		];
 
 		// Add new settings with a nice hook, makes them available for admin settings search as well
-		call_integration_hook('integrate_modify_editor_settings', array(&$config_vars));
+		call_integration_hook('integrate_modify_editor_settings', [&$config_vars]);
 		return $config_vars;
 	}
 

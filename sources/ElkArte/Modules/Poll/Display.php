@@ -38,14 +38,14 @@ class Display extends AbstractModule
 	{
 		global $modSettings;
 
-		$return = array(
-			array('topicinfo', array(Display::class, 'topicinfo'), array('topicinfo')),
-		);
+		$return = [
+			['topicinfo', [Display::class, 'topicinfo'], ['topicinfo']],
+		];
 
 		self::$_enabled = !empty($modSettings['pollMode']);
 		if (self::$_enabled && allowedTo('poll_view'))
 		{
-			$return[] = array('prepare_context', array(Display::class, 'prepare_context'), array('template_layers'));
+			$return[] = ['prepare_context', [Display::class, 'prepare_context'], ['template_layers']];
 		}
 
 		return $return;
@@ -56,16 +56,16 @@ class Display extends AbstractModule
 	 *
 	 * @param array $topicinfo
 	 */
-	public function topicinfo($topicinfo)
+	public function topicinfo($topicinfo): void
 	{
 		global $context;
 
 		$this->_id_poll = $topicinfo['id_poll'];
 
-		$anyown_permissions = array(
+		$anyown_permissions = [
 			'can_add_poll' => 'poll_add',
 			'can_remove_poll' => 'poll_remove',
-		);
+		];
 
 		$userStarted = ((int) $this->user->id === (int) $topicinfo['id_member_started']) && !$this->user->is_guest;
 
@@ -83,7 +83,7 @@ class Display extends AbstractModule
 	 *
 	 * @param TemplateLayers $template_layers
 	 */
-	public function prepare_context($template_layers)
+	public function prepare_context($template_layers): void
 	{
 		global $context, $txt;
 
@@ -137,7 +137,7 @@ class Display extends AbstractModule
 			];
 
 			// Allow mods to add additional buttons here
-			call_integration_hook('integrate_poll_buttons', array(&$context['poll_buttons']));
+			call_integration_hook('integrate_poll_buttons', [&$context['poll_buttons']]);
 		}
 	}
 }

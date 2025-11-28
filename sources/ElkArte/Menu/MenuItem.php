@@ -43,7 +43,7 @@ abstract class MenuItem
 	 *
 	 * @return MenuItem
 	 */
-	public static function buildFromArray($arr, $sa = '')
+	public static function buildFromArray($arr, $sa = ''): MenuItem
 	{
 		$obj = new static();
 
@@ -67,13 +67,13 @@ abstract class MenuItem
 	}
 
 	/**
-	 * Renames array keys from under_score to underScore camelCase
+	 * Renames array keys from under_score to underScore a.k.a. camelCase
 	 *
 	 * @param array $arr
 	 *
 	 * @return array
 	 */
-	private function camelCaseKeys($arr)
+	private function camelCaseKeys($arr): array
 	{
 		$keys = array_keys($arr);
 		foreach ($keys as $key)
@@ -94,7 +94,7 @@ abstract class MenuItem
 	 *
 	 * @return string
 	 */
-	public function getLabel()
+	public function getLabel(): string
 	{
 		return $this->label;
 	}
@@ -106,7 +106,7 @@ abstract class MenuItem
 	 *
 	 * @return MenuItem
 	 */
-	public function setLabel($label)
+	public function setLabel($label): MenuItem
 	{
 		$this->label = $label;
 
@@ -118,7 +118,7 @@ abstract class MenuItem
 	 *
 	 * @return string
 	 */
-	public function getCounter()
+	public function getCounter(): string
 	{
 		return $this->counter;
 	}
@@ -130,7 +130,7 @@ abstract class MenuItem
 	 *
 	 * @return MenuItem
 	 */
-	public function setCounter($counter)
+	public function setCounter($counter): MenuItem
 	{
 		$this->counter = $counter;
 
@@ -142,7 +142,7 @@ abstract class MenuItem
 	 *
 	 * @return string
 	 */
-	public function getUrl()
+	public function getUrl(): string
 	{
 		return $this->url;
 	}
@@ -154,7 +154,7 @@ abstract class MenuItem
 	 *
 	 * @return MenuItem
 	 */
-	public function setUrl($url)
+	public function setUrl($url): MenuItem
 	{
 		$this->url = $url;
 
@@ -166,7 +166,7 @@ abstract class MenuItem
 	 *
 	 * @return string[]
 	 */
-	public function getPermission()
+	public function getPermission(): array
 	{
 		return $this->permission;
 	}
@@ -178,7 +178,7 @@ abstract class MenuItem
 	 *
 	 * @return MenuItem
 	 */
-	public function setPermission($permission)
+	public function setPermission($permission): MenuItem
 	{
 		$this->permission = $permission;
 
@@ -190,7 +190,7 @@ abstract class MenuItem
 	 *
 	 * @return bool
 	 */
-	public function isEnabled()
+	public function isEnabled(): bool
 	{
 		return $this->enabled;
 	}
@@ -202,7 +202,7 @@ abstract class MenuItem
 	 *
 	 * @return MenuItem
 	 */
-	public function setEnabled($enabled)
+	public function setEnabled($enabled): MenuItem
 	{
 		$this->enabled = $enabled;
 

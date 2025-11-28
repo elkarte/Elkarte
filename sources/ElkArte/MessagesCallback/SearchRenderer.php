@@ -50,7 +50,7 @@ class SearchRenderer extends Renderer
 	/**
 	 * @param array $participants
 	 */
-	public function setParticipants($participants)
+	public function setParticipants($participants): void
 	{
 		$this->_participants = $participants;
 	}
@@ -203,7 +203,7 @@ class SearchRenderer extends Renderer
 	 * @param bool $quote_enabled
 	 * @return array
 	 */
-	protected function _buildSearchButtons($output, $quote_enabled)
+	protected function _buildSearchButtons($output, $quote_enabled): array
 	{
 		global $context;
 
@@ -260,7 +260,7 @@ class SearchRenderer extends Renderer
 	 *
 	 * @return string
 	 */
-	private function _highlighted_callback($matches)
+	private function _highlighted_callback($matches): string
 	{
 		if (isset($matches[2]) && $matches[2] === $matches[1])
 		{
@@ -282,7 +282,7 @@ class SearchRenderer extends Renderer
 	 * @param bool $started
 	 * @return bool
 	 */
-	private function _canLock($output, $started)
+	private function _canLock($output, $started): bool
 	{
 		return in_array(0, $this->_options['boards_can']['lock_any'])
 			|| in_array($output['board']['id'], $this->_options['boards_can']['lock_any'])
@@ -296,7 +296,7 @@ class SearchRenderer extends Renderer
 	 * @param array $output
 	 * @return bool
 	 */
-	private function _canSticky($output)
+	private function _canSticky($output): bool
 	{
 		return in_array(0, $this->_options['boards_can']['make_sticky'])
 			|| in_array($output['board']['id'], $this->_options['boards_can']['make_sticky']);
@@ -309,7 +309,7 @@ class SearchRenderer extends Renderer
 	 * @param bool $started
 	 * @return bool
 	 */
-	private function _canMove($output, $started)
+	private function _canMove($output, $started): bool
 	{
 		return in_array(0, $this->_options['boards_can']['move_any'])
 			|| in_array($output['board']['id'], $this->_options['boards_can']['move_any'])
@@ -325,7 +325,7 @@ class SearchRenderer extends Renderer
 	 * @param bool $started
 	 * @return bool
 	 */
-	private function _canRemove($output, $started)
+	private function _canRemove($output, $started): bool
 	{
 		return in_array(0, $this->_options['boards_can']['remove_any'])
 			|| in_array($output['board']['id'], $this->_options['boards_can']['remove_any'])

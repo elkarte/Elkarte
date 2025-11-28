@@ -27,25 +27,25 @@ function getNews()
 {
 	global $modSettings;
 
-	$admin_current_news = array();
+	$admin_current_news = [];
 
 	$bbc_parser = ParserWrapper::instance();
 
 	// Ready the current news.
 	foreach (explode("\n", $modSettings['news']) as $id => $line)
 	{
-		$admin_current_news[$id] = array(
+		$admin_current_news[$id] = [
 			'id' => $id,
 			'unparsed' => un_preparsecode($line),
 			'parsed' => preg_replace('~<([/]?)form[^>]*?[>]*>~i', '<em class="smalltext">&lt;$1form&gt;</em>', $bbc_parser->parseNews($line)),
-		);
+		];
 	}
 
-	$admin_current_news['last'] = array(
+	$admin_current_news['last'] = [
 		'id' => 'last',
 		'unparsed' => '',
 		'parsed' => '<div id="moreNewsItems_preview"></div>',
-	);
+	];
 
 	return $admin_current_news;
 }
@@ -63,7 +63,7 @@ function excludeBannedMembers()
 {
 	$db = database();
 
-	$excludes = array();
+	$excludes = [];
 	$db->fetchQuery('
 		SELECT 
 			DISTINCT mem.id_member
@@ -72,19 +72,19 @@ function excludeBannedMembers()
 			INNER JOIN {db_prefix}members AS mem ON (bi.id_member = mem.id_member)
 		WHERE (bg.cannot_access = {int:cannot_access} OR bg.cannot_login = {int:cannot_login})
 			AND (bg.expire_time IS NULL OR bg.expire_time > {int:current_time})',
-		array(
+		[
 			'cannot_access' => 1,
 			'cannot_login' => 1,
 			'current_time' => time(),
-		)
+		]
 	)->fetch_callback(
 		function ($row) use (&$excludes) {
 			$excludes[] = $row['id_member'];
 		}
 	);
 
-	$condition_array = array();
-	$condition_array_params = array();
+	$condition_array = [];
+	$condition_array_params = [];
 	$count = 0;
 	$db->fetchQuery('
 		SELECT DISTINCT bi.email_address
@@ -93,12 +93,12 @@ function excludeBannedMembers()
 		WHERE (bg.cannot_access = {int:cannot_access} OR bg.cannot_login = {int:cannot_login})
 			AND (bg.expire_time IS NULL OR bg.expire_time > {int:current_time})
 			AND bi.email_address != {string:blank_string}',
-		array(
+		[
 			'cannot_access' => 1,
 			'cannot_login' => 1,
 			'current_time' => time(),
 			'blank_string' => '',
-		)
+		]
 	)->fetch_callback(
 		function ($row) use (&$condition_array, &$condition_array_params, &$count) {
 			$condition_array[] = '{string:email_' . $count . '}';
@@ -134,7 +134,7 @@ function getModerators()
 {
 	$db = database();
 
-	$mods = array();
+	$mods = [];
 
 	$db->fetchQuery('
 		SELECT 
@@ -142,9 +142,9 @@ function getModerators()
 		FROM {db_prefix}members AS mem
 			INNER JOIN {db_prefix}moderators AS mods ON (mods.id_member = mem.id_member)
 		WHERE mem.is_activated = {int:is_activated}',
-		array(
+		[
 			'is_activated' => 1,
-		)
+		]
 	)->fetch_callback(
 		function ($row) use (&$mods) {
 			$mods[] = $row['identifier'];
@@ -158,7 +158,7 @@ function getModerators()
  * Lists our newsletter recipients, step by step.
  *
  * @param string $sendQuery
- * @param mixed[] $sendParams
+ * @param array $sendParams
  * @param int $start
  * @param int $increment
  * @param int $counter
@@ -169,7 +169,7 @@ function getNewsletterRecipients($sendQuery, $sendParams, $start, $increment, $c
 {
 	$db = database();
 
-	$recipients = array();
+	$recipients = [];
 
 	$db->fetchQuery('
 		SELECT 
@@ -181,14 +181,14 @@ function getNewsletterRecipients($sendQuery, $sendParams, $start, $increment, $c
 			AND mem.is_activated = {int:is_activated}
 		ORDER BY mem.id_member ASC
 		LIMIT {int:atonce}',
-		array_merge($sendParams, array(
+		array_merge($sendParams, [
 			'min_id_member' => $start,
 			'max_id_member' => $start + $increment - $counter,
 			'atonce' => $increment - $counter,
 			'regular_group' => 0,
 			'notify_announcements' => 1,
 			'is_activated' => 1,
-		))
+		])
 	)->fetch_callback(
 		function ($row) use (&$recipients) {
 			$recipients[] = $row;
@@ -242,12 +242,12 @@ function getXMLNews($query_this_board, $board, $limit)
 				AND t.approved = {int:is_approved}' : '') . '
 			ORDER BY t.id_first_msg DESC
 			LIMIT {int:limit}',
-			array(
+			[
 				'current_board' => $board,
 				'is_approved' => 1,
 				'limit' => $limit,
 				'optimize_msg' => $optimize_msg,
-			)
+			]
 		);
 		// If we don't have $limit results, we try again with an unoptimized version covering all rows.
 		if ($loops < 2 && $request->num_rows() < $limit)
@@ -271,7 +271,7 @@ function getXMLNews($query_this_board, $board, $limit)
 			$done = true;
 		}
 	}
-	$data = array();
+	$data = [];
 	while (($row = $request->fetch_assoc()))
 	{
 		$data[] = $row;
@@ -316,12 +316,12 @@ function getXMLRecent($query_this_board, $board, $limit)
 				AND m.approved = {int:is_approved}' : '') . '
 			ORDER BY m.id_msg DESC
 			LIMIT {int:limit}',
-			array(
+			[
 				'limit' => $limit,
 				'current_board' => $board,
 				'is_approved' => 1,
 				'optimize_msg' => $optimize_msg,
-			)
+			]
 		);
 		// If we don't have $limit results, try again with an unoptimized version covering all rows.
 		if ($loops < 2 && $request->num_rows() < $limit)
@@ -344,7 +344,7 @@ function getXMLRecent($query_this_board, $board, $limit)
 			$done = true;
 		}
 	}
-	$messages = array();
+	$messages = [];
 	while (($row = $request->fetch_assoc()))
 	{
 		$messages[] = $row['id_msg'];
@@ -354,11 +354,11 @@ function getXMLRecent($query_this_board, $board, $limit)
 	// No messages found, then return nothing
 	if (empty($messages))
 	{
-		return array();
+		return [];
 	}
 
 	// Find the most recent posts from our message list that this user can see.
-	$data = array();
+	$data = [];
 	$db->fetchQuery('
 		SELECT
 			m.smileys_enabled, m.poster_time, m.id_msg, m.subject, m.body, m.id_topic, t.id_board,
@@ -376,11 +376,11 @@ function getXMLRecent($query_this_board, $board, $limit)
 			' . (empty($board) ? '' : 'AND t.id_board = {int:current_board}') . '
 		ORDER BY m.id_msg DESC
 		LIMIT {int:limit}',
-		array(
+		[
 			'limit' => $limit,
 			'current_board' => $board,
 			'message_list' => $messages,
-		)
+		]
 	)->fetch_callback(
 		function ($row) use (&$data) {
 			$data[] = $row;
@@ -407,7 +407,7 @@ function fix_possible_url($val)
 		return $val;
 	}
 
-	call_integration_hook('integrate_fix_url', array(&$val));
+	call_integration_hook('integrate_fix_url', [&$val]);
 
 	return $val;
 }
@@ -422,7 +422,7 @@ function fix_possible_url($val)
  */
 function encode_special($data)
 {
-	return strtr($data, array('>' => '&#x3E;', '&' => '&#x26;', '<' => '&#x3C;'));
+	return strtr($data, ['>' => '&#x3E;', '&' => '&#x26;', '<' => '&#x3C;']);
 }
 
 /**
@@ -454,10 +454,10 @@ function cdata_parse($data, $ns = '', $override = null)
 
 	for ($pos = 0, $n = Util::strlen($data); $pos < $n; null)
 	{
-		$positions = array(
+		$positions = [
 			Util::strpos($data, '&', $pos),
 			Util::strpos($data, ']]>', $pos),
-		);
+		];
 
 		if ($ns !== '')
 		{
@@ -524,7 +524,7 @@ function cdata_parse($data, $ns = '', $override = null)
 			{
 				$cdata .= ']]>' . Util::substr($data, $pos, $pos2 - $pos + 1) . '<![CDATA[';
 			}
-			elseif (in_array($ent, array('amp', 'lt', 'gt', 'quot')))
+			elseif (in_array($ent, ['amp', 'lt', 'gt', 'quot']))
 			{
 				$cdata .= ']]>' . Util::substr($data, $pos, $pos2 - $pos + 1) . '<![CDATA[';
 			}
@@ -535,5 +535,5 @@ function cdata_parse($data, $ns = '', $override = null)
 
 	$cdata .= ']]>';
 
-	return strtr($cdata, array('<![CDATA[]]>' => ''));
+	return strtr($cdata, ['<![CDATA[]]>' => '']);
 }

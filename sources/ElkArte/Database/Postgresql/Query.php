@@ -90,9 +90,9 @@ class Query extends AbstractQuery
 			VALUES
 			' . implode(',
 			', $insertRows) . $this->on_conflict,
-			array(
+			[
 				'security_override' => true,
-			)
+			]
 		);
 		if ($method === 'ignore')
 		{
@@ -174,11 +174,11 @@ class Query extends AbstractQuery
 	protected function initialChecks($db_string, $db_values, $identifier = '')
 	{
 		// Special queries that need processing.
-		$replacements = array(
-			'pm_conversation_list' => array(
+		$replacements = [
+			'pm_conversation_list' => [
 				'~ORDER\\s+BY\\s+\\{raw:sort\\}~' => 'ORDER BY ' . (isset($db_values['sort']) ? ($db_values['sort'] === 'pm.id_pm' ? 'MAX(pm.id_pm)' : $db_values['sort']) : ''),
-			),
-		);
+			],
+		];
 
 		if (isset($replacements[$identifier]))
 		{
@@ -240,7 +240,7 @@ class Query extends AbstractQuery
 		// Try get the last ID for the auto increment field.
 		$request = $this->query('', '
 			SELECT CURRVAL(\'' . $table . "_seq') AS insertID",
-			array('security_override' => true)
+			['security_override' => true]
 		);
 
 		if (!$request)
@@ -263,7 +263,7 @@ class Query extends AbstractQuery
 	 */
 	public function unescape_string($string)
 	{
-		return strtr($string, array("''" => "'"));
+		return strtr($string, ["''" => "'"]);
 	}
 
 	/**

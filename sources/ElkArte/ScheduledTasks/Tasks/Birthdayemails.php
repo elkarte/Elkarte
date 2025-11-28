@@ -51,7 +51,7 @@ class Birthdayemails implements ScheduledTaskInterface
 		$day = date('j'); // Day without leading zeros.
 
 		// So who are the lucky ones?  Don't include those who are banned and those who don't want them.
-		$birthdays = array();
+		$birthdays = [];
 		$db->fetchQuery('
 			SELECT 
 				id_member, real_name, lngfile, email_address
@@ -61,23 +61,23 @@ class Birthdayemails implements ScheduledTaskInterface
 				AND DAYOFMONTH(birthdate) = {int:day}
 				AND notify_announcements = {int:notify_announcements}
 				AND YEAR(birthdate) > {int:year}',
-			array(
+			[
 				'notify_announcements' => 1,
 				'year' => 1,
 				'month' => $month,
 				'day' => $day,
-			)
+			]
 		)->fetch_callback(
 			static function ($row) use (&$birthdays) {
 				// Group them by languages.
 				if (!isset($birthdays[$row['lngfile']]))
 				{
-					$birthdays[$row['lngfile']] = array();
+					$birthdays[$row['lngfile']] = [];
 				}
-				$birthdays[$row['lngfile']][$row['id_member']] = array(
+				$birthdays[$row['lngfile']][$row['id_member']] = [
 					'name' => $row['real_name'],
 					'email' => $row['email_address']
-				);
+				];
 			}
 		);
 
@@ -93,9 +93,9 @@ class Birthdayemails implements ScheduledTaskInterface
 
 			foreach ($recps as $recp)
 			{
-				$replacements = array(
+				$replacements = [
 					'REALNAME' => $recp['name'],
-				);
+				];
 
 				$emaildata = loadEmailTemplate('happy_birthday', $replacements, $lang, false, false);
 

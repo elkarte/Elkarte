@@ -42,9 +42,6 @@ class MessageIndex extends AbstractController implements FrontpageInterface
 	/** @var bool Sort direction asc or desc */
 	public $ascending = '';
 
-	/** @var TemplateLayers The template layers object */
-	private $template_layers;
-
 	/** @var bool if we are marking as read */
 	public $is_marked_notify;
 
@@ -104,7 +101,7 @@ class MessageIndex extends AbstractController implements FrontpageInterface
 	 * @return string[] list of boards with key = id and value = cat + name
 	 * @uses getBoardList()
 	 */
-	protected static function _getBoardsList()
+	protected static function _getBoardsList(): array
 	{
 		// Load the boards list.
 		require_once(SUBSDIR . '/Boards.subs.php');
@@ -153,7 +150,7 @@ class MessageIndex extends AbstractController implements FrontpageInterface
 	 *
 	 * @uses template_topic_listing() sub template of the MessageIndex template
 	 */
-	public function action_messageindex()
+	public function action_messageindex(): void
 	{
 		global $txt, $context, $board_info;
 
@@ -200,16 +197,16 @@ class MessageIndex extends AbstractController implements FrontpageInterface
 		$this->quickModeration();
 
 		// Set template details/layers
-		$this->template_layers = theme()->getLayers();
+		$template_layers = theme()->getLayers();
 		if (!empty($context['boards']) && $this->sort_start === 0)
 		{
-			$this->template_layers->add('display_child_boards');
+			$template_layers->add('display_child_boards');
 		}
 
 		// If there are children, but no topics and no ability to post topics...
 		$context['no_topic_listing'] = !empty($context['boards']) && empty($context['topics']) && !$context['can_post_new'];
 
-		$this->template_layers->add('topic_listing');
+		$template_layers->add('topic_listing');
 
 		theme()->addJavascriptVar(['notification_board_notice' => $this->is_marked_notify ? $txt['notification_disable_board'] : $txt['notification_enable_board']], true);
 
@@ -272,9 +269,9 @@ class MessageIndex extends AbstractController implements FrontpageInterface
 	 *
 	 * @return bool
 	 */
-	public function setRobotNoIndex()
+	public function setRobotNoIndex(): bool
 	{
-		global $context;
+		global $modSettings;
 
 		foreach ($this->_req->query as $k => $v)
 		{
@@ -286,7 +283,7 @@ class MessageIndex extends AbstractController implements FrontpageInterface
 		}
 
 		return !empty($this->_req->query->start)
-			&& (!is_numeric($this->_req->query->start) || $this->_req->query->start % $context['messages_per_page'] !== 0);
+			&& (!is_numeric($this->_req->query->start) || $this->_req->query->start % $modSettings['defaultMaxMessages'] !== 0);
 	}
 
 	/**
@@ -409,7 +406,7 @@ class MessageIndex extends AbstractController implements FrontpageInterface
 	/**
 	 * Sets up the page navigation for the board view.
 	 */
-	private function setPageNavigation()
+	private function setPageNavigation(): void
 	{
 		global $board, $modSettings, $context, $options, $board_info;
 
@@ -453,7 +450,7 @@ class MessageIndex extends AbstractController implements FrontpageInterface
 	 *
 	 * @return string The sorting string with the chosen sort method and direction
 	 */
-	private function buildSortingString()
+	private function buildSortingString(): string
 	{
 		global $context, $txt;
 
@@ -483,9 +480,9 @@ class MessageIndex extends AbstractController implements FrontpageInterface
 	}
 
 	/**
-	 * Loads board moderator links into the context for displaying on the template.
+	 * Load board moderator links into context for displaying on the template.
 	 */
-	private function setBoardModeratorLinks()
+	private function setBoardModeratorLinks(): void
 	{
 		global $board_info, $context, $txt;
 
@@ -497,15 +494,15 @@ class MessageIndex extends AbstractController implements FrontpageInterface
 		{
 			foreach ($board_info['moderators'] as $mod)
 			{
-				$context['link_moderators'][] = '<a href="' . getUrl('profile', ['action' => 'profile', 'u' => $mod['id'], 'name' => $mod['name']]) . '" title="' . $txt . '">' . $mod['name'] . '</a>';
+				$context['link_moderators'][] = '<a href="' . getUrl('profile', ['action' => 'profile', 'u' => $mod['id'], 'name' => $mod['name']]) . '" title="' . $txt['board_moderator'] . '">' . $mod['name'] . '</a>';
 			}
 		}
 	}
 
 	/**
-	 * Marks the current board and its parent boards as seen for the current user
+	 * Mark the current board and its parent boards as seen for the current user
 	 */
-	public function markCurrentAndParentBoardsAsSeen()
+	public function markCurrentAndParentBoardsAsSeen(): void
 	{
 		global $board_info, $board;
 
@@ -557,7 +554,7 @@ class MessageIndex extends AbstractController implements FrontpageInterface
 	/**
 	 * Prepare and load sub-boards for display.
 	 */
-	private function prepareSubBoardsForDisplay()
+	private function prepareSubBoardsForDisplay(): void
 	{
 		global $board_info, $modSettings, $context;
 
@@ -577,7 +574,7 @@ class MessageIndex extends AbstractController implements FrontpageInterface
 	/**
 	 * Prepares and loads into context the information about who is currently viewing the board
 	 */
-	private function prepareWhoViewing()
+	private function prepareWhoViewing(): void
 	{
 		global $settings, $board;
 
@@ -592,7 +589,7 @@ class MessageIndex extends AbstractController implements FrontpageInterface
 	/**
 	 * Sets the sort icons for the topics headers in the context.
 	 */
-	private function setSortIcons()
+	private function setSortIcons(): void
 	{
 		global $context, $board, $board_info, $txt;
 
@@ -618,7 +615,7 @@ class MessageIndex extends AbstractController implements FrontpageInterface
 	/**
 	 * Loads board topics into the context
 	 */
-	private function loadBoardTopics()
+	private function loadBoardTopics(): void
 	{
 		global $board, $modSettings, $context, $settings, $board_info;
 
@@ -681,7 +678,7 @@ class MessageIndex extends AbstractController implements FrontpageInterface
 	 * Determines which quick moderation actions are available for this user.
 	 * Loads which actions are available, on a per-topic basis, into $context.
 	 */
-	private function quickModeration()
+	private function quickModeration(): void
 	{
 		global $modSettings, $context, $options, $board_info;
 
@@ -735,7 +732,7 @@ class MessageIndex extends AbstractController implements FrontpageInterface
 	 * Loads into $context the moderation button array for template use.
 	 * Call integrate_message_index_mod_buttons hook
 	 */
-	public function buildQuickModerationButtons()
+	public function buildQuickModerationButtons(): void
 	{
 		global $context;
 
@@ -948,7 +945,7 @@ class MessageIndex extends AbstractController implements FrontpageInterface
 	 *
 	 * @uses template_topic_listing() sub template of the MessageIndex template
 	 */
-	public function action_messageindex_fp()
+	public function action_messageindex_fp(): void
 	{
 		global $modSettings, $board;
 
@@ -963,7 +960,7 @@ class MessageIndex extends AbstractController implements FrontpageInterface
 	 *
 	 * @todo refactor this...
 	 */
-	public function action_quickmod()
+	public function action_quickmod(): ?bool
 	{
 		global $board, $modSettings, $context;
 
@@ -1246,7 +1243,7 @@ class MessageIndex extends AbstractController implements FrontpageInterface
 	 * @param array $boards_can
 	 * @return array
 	 */
-	public function setPossibleQmActions($boards_can)
+	public function setPossibleQmActions($boards_can): array
 	{
 		$possibleActions = [];
 
@@ -1295,7 +1292,7 @@ class MessageIndex extends AbstractController implements FrontpageInterface
 	 * @param array $row
 	 * @return bool
 	 */
-	public function canMakeSticky($boards_can, $row)
+	public function canMakeSticky($boards_can, $row): bool
 	{
 		return in_array(0, $boards_can['make_sticky'])
 			|| in_array($row['id_board'], $boards_can['make_sticky']);
@@ -1308,7 +1305,7 @@ class MessageIndex extends AbstractController implements FrontpageInterface
 	 * @param array $row
 	 * @return bool
 	 */
-	public function canMove($boards_can, $row)
+	public function canMove($boards_can, $row): bool
 	{
 		return in_array(0, $boards_can['move_any'])
 			|| in_array($row['id_board'], $boards_can['move_any'])
@@ -1323,7 +1320,7 @@ class MessageIndex extends AbstractController implements FrontpageInterface
 	 * @param array $row
 	 * @return bool
 	 */
-	public function canRemove($boards_can, $row)
+	public function canRemove($boards_can, $row): bool
 	{
 		return in_array(0, $boards_can['remove_any'])
 			|| in_array($row['id_board'], $boards_can['remove_any'])
@@ -1339,7 +1336,7 @@ class MessageIndex extends AbstractController implements FrontpageInterface
 	 * @param array $row
 	 * @return bool
 	 */
-	public function canLock($boards_can, $row)
+	public function canLock($boards_can, $row): bool
 	{
 		return in_array(0, $boards_can['lock_any'])
 			|| in_array($row['id_board'], $boards_can['lock_any'])

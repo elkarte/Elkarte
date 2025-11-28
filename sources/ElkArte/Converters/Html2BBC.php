@@ -73,11 +73,11 @@ class Html2BBC extends AbstractDomParser
 	 *
 	 * @param string|string[] $tags
 	 */
-	public function skip_tags($tags)
+	public function skip_tags($tags): void
 	{
 		if (!is_array($tags))
 		{
-			$tags = array($tags);
+			$tags = [$tags];
 		}
 
 		if (!empty($tags))
@@ -91,11 +91,11 @@ class Html2BBC extends AbstractDomParser
 	 *
 	 * @param string|string[] $styles
 	 */
-	public function skip_styles($styles)
+	public function skip_styles($styles): void
 	{
 		if (!is_array($styles))
 		{
-			$styles = array($styles);
+			$styles = [$styles];
 		}
 
 		if (!empty($styles))
@@ -108,7 +108,7 @@ class Html2BBC extends AbstractDomParser
 	 * Loads the html body and sends it to the parsing loop to convert all
 	 * DOM nodes to BBC
 	 */
-	public function get_bbc()
+	public function get_bbc(): string
 	{
 		// Convert all the nodes that we know how to
 		$this->convertChildNodes($this->getDOMBodyNode());
@@ -126,7 +126,7 @@ class Html2BBC extends AbstractDomParser
 	 *
 	 * @param \DOMNode|object $node
 	 */
-	public function convertChildNodes($node)
+	public function convertChildNodes($node): void
 	{
 		if (self::hasParentCode($node, $this->internalParser) && $this->getName($node) !== 'code')
 		{
@@ -153,7 +153,7 @@ class Html2BBC extends AbstractDomParser
 	 *
 	 * @param \DOMNode|object $node
 	 */
-	public function convertToBBC($node)
+	public function convertToBBC($node): void
 	{
 		// HTML tag names
 		$tag = $this->getName($node);
@@ -197,7 +197,7 @@ class Html2BBC extends AbstractDomParser
 				$bbc = $this->_convertCode($node);
 				break;
 			case 'dt':
-				$bbc = str_replace(array("\n", "\r", "\n\r"), '', $this->getValue($node)) . $this->line_end;
+				$bbc = str_replace(["\n", "\r", "\n\r"], '', $this->getValue($node)) . $this->line_end;
 				break;
 			case 'dd':
 				$bbc = ':   ' . $this->getValue($node) . $this->line_break;
@@ -323,7 +323,7 @@ class Html2BBC extends AbstractDomParser
 	 *
 	 * @return string
 	 */
-	private function _convertAnchor($node)
+	private function _convertAnchor($node): string
 	{
 		global $modSettings, $scripturl;
 
@@ -384,7 +384,7 @@ class Html2BBC extends AbstractDomParser
 	 *
 	 * @return string
 	 */
-	private function _convertAbbr($node)
+	private function _convertAbbr($node): string
 	{
 		$title = $node->getAttribute('title');
 		$value = $this->getValue($node);
@@ -402,7 +402,7 @@ class Html2BBC extends AbstractDomParser
 	 *
 	 * @return string
 	 */
-	private function _convertBdo($node)
+	private function _convertBdo($node): string
 	{
 		$bbc = '';
 
@@ -424,7 +424,7 @@ class Html2BBC extends AbstractDomParser
 	 *
 	 * @return string
 	 */
-	private function _convertCode($node)
+	private function _convertCode($node): string
 	{
 		$bbc = '';
 		$this->strip_newlines = false;
@@ -476,7 +476,7 @@ class Html2BBC extends AbstractDomParser
 	 *
 	 * @return string
 	 */
-	private function _convertStyles($node)
+	private function _convertStyles($node): string
 	{
 		$style = $node->getAttribute('style');
 		$value = $this->getInnerHTML($node);
@@ -508,7 +508,7 @@ class Html2BBC extends AbstractDomParser
 						$styleValue = substr($styleValue, 0, strpos($styleValue, ','));
 					}
 
-					$bbc = '[font=' . strtr($styleValue, array("'" => '')) . ']' . $bbc . '[/font]';
+					$bbc = '[font=' . strtr($styleValue, ["'" => '']) . ']' . $bbc . '[/font]';
 					break;
 				case 'font-weight':
 					if ($styleValue === 'bold' || $styleValue === 'bolder' || $styleValue === '700' || $styleValue === '600')
@@ -579,9 +579,9 @@ class Html2BBC extends AbstractDomParser
 	 *
 	 * @return array
 	 */
-	private function _getStyleValues($style)
+	private function _getStyleValues($style): array
 	{
-		$styles = array();
+		$styles = [];
 
 		if (preg_match_all('~.*?:.*?(;|$)~', $style, $matches, PREG_SET_ORDER))
 		{
@@ -608,7 +608,7 @@ class Html2BBC extends AbstractDomParser
 	 *
 	 * @return string
 	 */
-	private function _convertFont($node)
+	private function _convertFont($node): string
 	{
 		$size = $node->getAttribute('size');
 		$color = $node->getAttribute('color');
@@ -649,10 +649,10 @@ class Html2BBC extends AbstractDomParser
 	 *
 	 * @return string
 	 */
-	private function _convertHeader($level, $content)
+	private function _convertHeader($level, $content): string
 	{
 		$level = (int) trim($level, 'h');
-		$hsize = array(1 => 7, 2 => 6, 3 => 5, 4 => 4, 5 => 3, 6 => 2, 7 => 1);
+		$hsize = [1 => 7, 2 => 6, 3 => 5, 4 => 4, 5 => 3, 6 => 2, 7 => 1];
 
 		$size = $this->sizes_equivalence[$hsize[$level]] ?? $this->sizes_equivalence[4];
 
@@ -752,7 +752,7 @@ class Html2BBC extends AbstractDomParser
 	 *
 	 * @return string
 	 */
-	private function _convertTableCell($node)
+	private function _convertTableCell($node): string
 	{
 		$value = $this->getInnerHTML($node);
 		$align = $node->getAttribute('align');
@@ -790,7 +790,7 @@ class Html2BBC extends AbstractDomParser
 	 *
 	 * @return string
 	 */
-	private function _recursive_decode($text)
+	private function _recursive_decode($text): string
 	{
 		do
 		{
@@ -806,7 +806,7 @@ class Html2BBC extends AbstractDomParser
 	 * @param string $bbc
 	 * @return string
 	 */
-	public function cleanBBC($bbc)
+	public function cleanBBC($bbc): string
 	{
 		// Remove comment blocks
 		$bbc = preg_replace('~\\<\\!--.*?-->~', '', $bbc);
@@ -817,7 +817,7 @@ class Html2BBC extends AbstractDomParser
 		$bbc = preg_replace("~(?:\s?\n\s?){2,6}~", "\n\n", $bbc);
 
 		// Return protected tags
-		$bbc = strtr($bbc, array('&amp#91;' => '[', '&amp#93;' => ']'));
+		$bbc = strtr($bbc, ['&amp#91;' => '[', '&amp#93;' => ']']);
 
 		// Remove any html tags we left behind ( outside of code tags that is )
 		$parts = preg_split('~(\[/code\]|\[code(?:=[^\]]+)?\])~i', $bbc, -1, PREG_SPLIT_DELIM_CAPTURE);

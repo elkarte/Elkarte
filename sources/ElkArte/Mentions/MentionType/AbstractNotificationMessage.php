@@ -208,7 +208,7 @@ abstract class AbstractNotificationMessage implements NotificationInterface
 	 *
 	 * @return array
 	 */
-	protected function getMembersData($members_to)
+	protected function getMembersData($members_to): array
 	{
 		if ($this->_to_members_data === null)
 		{
@@ -226,7 +226,7 @@ abstract class AbstractNotificationMessage implements NotificationInterface
 	 * @param int $toMember The ID of the member receiving the notification.
 	 * @return bool Returns true if the notification can be sent, false otherwise.
 	 */
-	protected function _validateMemberRelationship($fromMember, $toMember)
+	protected function _validateMemberRelationship($fromMember, $toMember): bool
 	{
 		// Everyone
 		if (empty($this->_to_members_data[$toMember]['notify_from']))
@@ -317,7 +317,7 @@ abstract class AbstractNotificationMessage implements NotificationInterface
 	 * @param array $replacements Additional replacements for the loadEmailTemplate function (optional)
 	 * @return array The array of generated notification strings.
 	 */
-	protected function _getNotificationStrings($template, $keys, $members, NotificationsTask $task, $lang_files = [], $replacements = [])
+	protected function _getNotificationStrings($template, $keys, $members, NotificationsTask $task, $lang_files = [], $replacements = []): array
 	{
 		$recipientData = $task->getMembersData();
 
@@ -372,7 +372,7 @@ abstract class AbstractNotificationMessage implements NotificationInterface
 	 * @param array $replacements Optional. An array of replacements for the template.
 	 * @return array An associative array where the keys are language codes and the values are the loaded template strings.
 	 */
-	protected function _loadStringsByTemplate($template, $users, $users_data, $lang_files = array(), $replacements = array())
+	protected function _loadStringsByTemplate($template, $users, $users_data, $lang_files = [], $replacements = []): array
 	{
 		require_once(SUBSDIR . '/Mail.subs.php');
 
@@ -387,7 +387,7 @@ abstract class AbstractNotificationMessage implements NotificationInterface
 		$langtxt = [];
 		foreach ($langs as $lang)
 		{
-			$langtxt[$lang] = loadEmailTemplate($template, $replacements, $lang, false, true, array('digest', 'snippet'), $lang_files);
+			$langtxt[$lang] = loadEmailTemplate($template, $replacements, $lang, false, true, ['digest', 'snippet'], $lang_files);
 		}
 
 		// Better be sure we have the correct language loaded (though it may be useless)

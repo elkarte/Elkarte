@@ -82,7 +82,7 @@ class Giphy extends AbstractController
 	 *
 	 * @return array The updated configuration settings after merging with the existing configuration.
 	 */
-	public function setConfig()
+	public function setConfig(): array
 	{
 		global $modSettings;
 
@@ -111,7 +111,7 @@ class Giphy extends AbstractController
 	 *
 	 * @return bool The trending GIFs and pagination information.
 	 */
-	public function action_getTrending()
+	public function action_getTrending(): bool
 	{
 		checkSession('get');
 
@@ -140,7 +140,7 @@ class Giphy extends AbstractController
 	 *
 	 * @return bool The search results and pagination information.
 	 */
-	public function action_getSearchResults()
+	public function action_getSearchResults(): bool
 	{
 		checkSession('get');
 
@@ -173,7 +173,7 @@ class Giphy extends AbstractController
 	 *
 	 * @return bool Returns true after sending the results.
 	 */
-	public function sendResults($images, $result)
+	public function sendResults($images, $result): bool
 	{
 		global $context;
 
@@ -191,7 +191,7 @@ class Giphy extends AbstractController
 	 *
 	 * @param string $path The API endpoint path.
 	 * @param array $params The additional parameters for the request (optional).
-	 * @param string &$error A variable to hold any error message (optional).
+	 * @param string|null $error A variable to hold any error message (optional).
 	 *
 	 * @return array The response from the API as an associative array, or an empty array if there was an error.
 	 */
@@ -254,7 +254,7 @@ class Giphy extends AbstractController
 	 * @param string $url The URL to be normalized.
 	 * @return string The normalized URL without query parameters or fragments.
 	 */
-	protected function normalizeUrl($url)
+	protected function normalizeUrl($url): string
 	{
 		$parts = parse_url($url);
 

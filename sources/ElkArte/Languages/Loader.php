@@ -38,7 +38,7 @@ class Loader
 	protected $loadFallback = true;
 
 	/** @var array */
-	protected $variable = true;
+	protected $variable = [];
 
 	/** @var string[] Holds the name of the files already loaded to load them only once */
 	protected $loaded = [];
@@ -74,7 +74,7 @@ class Loader
 	 *
 	 * @param bool $newStatus
 	 */
-	public function setFallback(bool $newStatus)
+	public function setFallback(bool $newStatus): void
 	{
 		$this->loadFallback = $newStatus;
 	}
@@ -84,7 +84,7 @@ class Loader
 	 *
 	 * @param string $path
 	 */
-	public function changePath($path)
+	public function changePath($path): void
 	{
 		$this->path = $path;
 	}
@@ -94,10 +94,10 @@ class Loader
 	 * implement a language fallback if enabled.
 	 *
 	 * @param string $file_name area language file to load, separate multiple with a +
-	 * @param boolean $fatal what to do if we can not load the requested area
-	 * @param boolean $fix_calendar_arrays if to update the calendar [] as well
+	 * @param bool $fatal what to do if we can not load the requested area
+	 * @param bool $fix_calendar_arrays if to update the calendar [] as well
 	 */
-	public function load($file_name, $fatal = true, $fix_calendar_arrays = false)
+	public function load($file_name, $fatal = true, $fix_calendar_arrays = false): void
 	{
 		$file_names = explode('+', $file_name);
 
@@ -123,7 +123,7 @@ class Loader
 	 *
 	 * @return void
 	 */
-	private function handleFile($file, $fatal)
+	private function handleFile($file, $fatal): void
 	{
 		global $db_show_debug;
 
@@ -161,7 +161,7 @@ class Loader
 	 * @param string $file The name of the file
 	 * @return void
 	 */
-	private function logDebug($file)
+	private function logDebug($file): void
 	{
 		Debug::instance()->add(
 			'language_files',
@@ -176,7 +176,7 @@ class Loader
 	 * @param bool $found_fallback Whether a fallback was found or not.
 	 * @return void
 	 */
-	private function logError($file, $found_fallback)
+	private function logError($file, $found_fallback): void
 	{
 		global $txt;
 
@@ -207,7 +207,7 @@ class Loader
 	 *
 	 * @param string[] $files
 	 */
-	protected function loadFromDb($files)
+	protected function loadFromDb($files): void
 	{
 		$result = $this->db->fetchQuery('
 			SELECT 
@@ -231,13 +231,25 @@ class Loader
 	/**
 	 * Load a language file, merging localization strings into the default.
 	 *
-	 * @param string $name the lexicon file to load
+	 * @param string $name the lexicon file to load.
 	 * @param string $language and in which language
 	 * @return bool
 	 */
-	protected function loadFile($name, $language)
+	protected function loadFile($name, $language): bool
 	{
-		$filepath = $this->path . $name . '/' . basename($language, '.php') . '.php';
+		// Split the name if it contains a forward slash
+		$parts = explode('/', $name, 2);
+
+		// Some addons may have a language file in a subdirectory, so we need to check for that too.
+		if (count($parts) === 2)
+		{
+			$filepath = $this->path . $parts[0] . '/' . basename($language, '.php') . '/' . $parts[1] . '.php';
+		}
+		else
+		{
+			$filepath = $this->path . $name . '/' . basename($language, '.php') . '.php';
+		}
+
 		if (file_exists($filepath))
 		{
 			require($filepath);
@@ -259,7 +271,7 @@ class Loader
 	 *  2. Transifex (that we use for translating the strings) doesn't support array of arrays, so if we
 	 * move this to a language file we'd need to move away from Tx.
 	 */
-	protected function fix_calendar_text()
+	protected function fix_calendar_text(): void
 	{
 		global $txt;
 

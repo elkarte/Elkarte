@@ -27,6 +27,7 @@ use ElkArte\Languages\Loader;
 use ElkArte\Notifications\Notifications;
 use ElkArte\Request;
 use ElkArte\Search\Search;
+use ElkArte\Themes\DefaultTheme\Theme;
 use ElkArte\UrlGenerator\UrlGenerator;
 use ElkArte\User;
 
@@ -67,10 +68,10 @@ function updateSettings($changeArray, $update = false)
 				UPDATE {db_prefix}settings
 				SET value = {' . ($value === false || $value === true ? 'raw' : 'string') . ':value}
 				WHERE variable = {string:variable}',
-				array(
+				[
 					'value' => $value === true ? 'value + 1' : ($value === false ? 'value - 1' : $value),
 					'variable' => $variable,
-				)
+				]
 			);
 
 			$modSettings[$variable] = $value === true ? $modSettings[$variable] + 1 : ($value === false ? $modSettings[$variable] - 1 : $value);
@@ -82,7 +83,7 @@ function updateSettings($changeArray, $update = false)
 		return;
 	}
 
-	$replaceArray = array();
+	$replaceArray = [];
 	foreach ($changeArray as $variable => $value)
 	{
 		// Don't bother if it's already like that ;).
@@ -97,7 +98,7 @@ function updateSettings($changeArray, $update = false)
 			continue;
 		}
 
-		$replaceArray[] = array($variable, $value);
+		$replaceArray[] = [$variable, $value];
 
 		$modSettings[$variable] = $value;
 	}
@@ -109,9 +110,9 @@ function updateSettings($changeArray, $update = false)
 
 	$db->replace(
 		'{db_prefix}settings',
-		array('variable' => 'string-255', 'value' => 'string-65534'),
+		['variable' => 'string-255', 'value' => 'string-65534'],
 		$replaceArray,
-		array('variable')
+		['variable']
 	);
 
 	// Kill the cache - it needs redoing now, but we won't bother ourselves with that here.
@@ -136,16 +137,16 @@ function removeSettings($toRemove)
 
 	if (!is_array($toRemove))
 	{
-		$toRemove = array($toRemove);
+		$toRemove = [$toRemove];
 	}
 
 	// Remove the setting from the db
 	$db->query('', '
 		DELETE FROM {db_prefix}settings
 		WHERE variable IN ({array_string:setting_name})',
-		array(
+		[
 			'setting_name' => $toRemove,
-		)
+		]
 	);
 
 	// Remove it from $modSettings now so it does not persist
@@ -246,7 +247,7 @@ function byte_format($number)
 {
 	global $txt;
 
-	foreach (array('byte', 'kilobyte', 'megabyte', 'gigabyte') as $kb)
+	foreach (['byte', 'kilobyte', 'megabyte', 'gigabyte'] as $kb)
 	{
 		if ($number < 1024)
 		{
@@ -444,9 +445,9 @@ function utcTime($timestamp, $userAdjust = false)
 	global $user_info, $modSettings;
 
 	// Back out user time
-	if ($userAdjust === true && !empty($user_info['time_offset']))
+	if ($userAdjust === true && !empty(User::$info->time_offset))
 	{
-		$timestamp -= ($modSettings['time_offset'] + $user_info['time_offset']) * 3600;
+		$timestamp -= ($modSettings['time_offset'] + User::$info->time_offset) * 3600;
 	}
 
 	// Using the system timezone offset, format the date
@@ -589,7 +590,7 @@ function redirectexit($setLocation = '')
 	// Note to developers.  The testbed will add the following, allowing phpunit test returns
 	//if (defined("PHPUNITBOOTSTRAP") && defined("STDIN")){return $setLocation;}
 
-	// Send headers, call integration, do maintance
+	// Send headers, call integration, do maintenance
 	Headers::instance()
 		->removeHeader('all')
 		->redirect($setLocation)
@@ -732,12 +733,12 @@ function handleMaintenance()
 function setOldUrl($index = 'old_url')
 {
 	// Remember this URL in case someone doesn't like sending HTTP_REFERER.
-	$invalid_old_url = array(
+	$invalid_old_url = [
 		'action=dlattach',
 		'action=jsoption',
 		';api=xml',
-	);
-	call_integration_hook('integrate_invalid_old_url', array(&$invalid_old_url));
+	];
+	call_integration_hook('integrate_invalid_old_url', [&$invalid_old_url]);
 	$make_old = true;
 	foreach ($invalid_old_url as $url)
 	{
@@ -1022,7 +1023,7 @@ function host_from_ip($ip)
 			// Invalid server option?
 			elseif ((stripos($test, 'invalid option') || stripos($test, 'Invalid query name 1')) && !isset($modSettings['host_to_dis']))
 			{
-				updateSettings(array('host_to_dis' => 1));
+				updateSettings(['host_to_dis' => 1]);
 			}
 			// Maybe it found something, after all?
 			elseif (preg_match('~\s([^\s]+?)\.\s~', $test, $match) == 1)
@@ -1078,7 +1079,7 @@ function text2words($text, $encrypt = false)
 	$words = preg_replace('~([\d]+)[.-/]+(?=[\d])~u', '$1_', $text);
 
 	// Step 1: Remove entities/things we don't consider words:
-	$words = preg_replace('~(?:[\x0B\0\x{A0}\t\r\s\n(){}\\[\\]<>!@$%^*.,:+=`\~\?/\\\\]+|&(?:amp|lt|gt|quot);)+~u', ' ', strtr($words, array('<br />' => ' ')));
+	$words = preg_replace('~(?:[\x0B\0\x{A0}\t\r\s\n(){}\\[\\]<>!@$%^*.,:+=`\~\?/\\\\]+|&(?:amp|lt|gt|quot);)+~u', ' ', strtr($words, ['<br />' => ' ']));
 
 	// Step 2: Entities we left to letters, where applicable, lowercase.
 	$words = un_htmlspecialchars(Util::strtolower($words));
@@ -1172,7 +1173,7 @@ function setupMenuContext()
  *
  * @return array the results of the functions
  */
-function call_integration_hook($hook, $parameters = array())
+function call_integration_hook($hook, $parameters = [])
 {
 	return Hooks::instance()->hook($hook, $parameters);
 }
@@ -1256,7 +1257,7 @@ function replaceEntities__callback($matches)
 	}
 
 	// Quote, Ampersand, Apostrophe, Less/Greater Than get html replaced
-	if (in_array($num, array(0x22, 0x26, 0x27, 0x3C, 0x3E)))
+	if (in_array($num, [0x22, 0x26, 0x27, 0x3C, 0x3E]))
 	{
 		return '&#' . $num . ';';
 	}
@@ -1490,7 +1491,7 @@ function scheduleTaskImmediate($task)
 
 	if (!isset($modSettings['scheduleTaskImmediate']))
 	{
-		$scheduleTaskImmediate = array();
+		$scheduleTaskImmediate = [];
 	}
 	else
 	{
@@ -1501,7 +1502,7 @@ function scheduleTaskImmediate($task)
 	if (!isset($scheduleTaskImmediate[$task]))
 	{
 		$scheduleTaskImmediate[$task] = 0;
-		updateSettings(array('scheduleTaskImmediate' => serialize($scheduleTaskImmediate)));
+		updateSettings(['scheduleTaskImmediate' => serialize($scheduleTaskImmediate)]);
 
 		require_once(SUBSDIR . '/ScheduledTasks.subs.php');
 
@@ -1536,7 +1537,7 @@ function removeScheduleTaskImmediate($task, $calculateNextTrigger = true)
 	if (isset($scheduleTaskImmediate[$task]))
 	{
 		unset($scheduleTaskImmediate[$task]);
-		updateSettings(array('scheduleTaskImmediate' => serialize($scheduleTaskImmediate)));
+		updateSettings(['scheduleTaskImmediate' => serialize($scheduleTaskImmediate)]);
 
 		// Recalculate the next task to execute
 		if ($calculateNextTrigger)
@@ -1563,7 +1564,7 @@ function replaceBasicActionUrl($string)
 
 	if ($find_replace === null)
 	{
-		$find_replace = array(
+		$find_replace = [
 			'{forum_name}' => $context['forum_name'],
 			'{forum_name_html_safe}' => $context['forum_name_html_safe'],
 			'{forum_name_html_unsafe}' => un_htmlspecialchars($context['forum_name_html_safe']),
@@ -1582,8 +1583,8 @@ function replaceBasicActionUrl($string)
 			'{calendar_url}' => getUrl('action', ['action' => 'calendar']),
 			'{memberlist_url}' => getUrl('action', ['action' => 'memberlist']),
 			'{stats_url}' => getUrl('action', ['action' => 'stats']),
-		);
-		call_integration_hook('integrate_basic_url_replacement', array(&$find_replace));
+		];
+		call_integration_hook('integrate_basic_url_replacement', [&$find_replace]);
 	}
 
 	return str_replace(array_keys($find_replace), array_values($find_replace), $string);
@@ -1601,7 +1602,7 @@ function replaceBasicActionUrl($string)
  */
 function createList($listOptions)
 {
-	call_integration_hook('integrate_list_' . $listOptions['id'], array(&$listOptions));
+	call_integration_hook('integrate_list_' . $listOptions['id'], [&$listOptions]);
 
 	$list = new GenericList($listOptions);
 
@@ -1710,12 +1711,12 @@ function isValidEmail($value)
  *
  * @return string - The url with the protocol
  */
-function addProtocol($url, $protocols = array())
+function addProtocol($url, $protocols = [])
 {
 	if (empty($protocols))
 	{
 		$pattern = '~^(http://|https://)~i';
-		$protocols = array('http://');
+		$protocols = ['http://'];
 	}
 	else
 	{
@@ -1723,7 +1724,7 @@ function addProtocol($url, $protocols = array())
 	}
 
 	$found = false;
-	$url = preg_replace_callback($pattern, static function ($match) use (&$found) {
+	$urlNew = preg_replace_callback($pattern, static function ($match) use (&$found) {
 		$found = true;
 
 		return strtolower($match[0]);
@@ -1731,10 +1732,10 @@ function addProtocol($url, $protocols = array())
 
 	if ($found)
 	{
-		return $url;
+		return $urlNew;
 	}
 
-	return $protocols[0] . $url;
+	return $protocols[0] . $urlNew;
 }
 
 /**
@@ -1918,7 +1919,7 @@ function can_see_button_strip($button_strip)
 /**
  * Get the current theme instance.
  *
- * @return \ElkArte\Themes\DefaultTheme\Theme The current theme instance.
+ * @return Theme The current theme instance.
  */
 function theme()
 {
@@ -1966,7 +1967,7 @@ function setPWACacheStale($refresh = false)
  *
  * @return void
  */
-function dieGif($expired = false)
+function dieGif($expired = false): never
 {
 	// The following is an attempt at stopping the behavior identified in #2391
 	if (function_exists('fastcgi_finish_request'))
@@ -2141,7 +2142,7 @@ function isValidIPv6($ip)
  */
 function convertIPv6toInts($ip)
 {
-	static $expanded = array();
+	static $expanded = [];
 
 	// Check if we have done this already.
 	if (isset($expanded[$ip]))
@@ -2152,7 +2153,7 @@ function convertIPv6toInts($ip)
 	// Expand the IP out.
 	$expanded_ip = explode(':', expandIPv6($ip));
 
-	$new_ip = array();
+	$new_ip = [];
 	foreach ($expanded_ip as $int)
 	{
 		$new_ip[] = hexdec($int);
@@ -2174,7 +2175,7 @@ function convertIPv6toInts($ip)
  */
 function expandIPv6($addr, $strict_check = true)
 {
-	static $converted = array();
+	static $converted = [];
 
 	// Check if we have done this already.
 	if (isset($converted[$addr]))
@@ -2188,7 +2189,7 @@ function expandIPv6($addr, $strict_check = true)
 		$part = explode('::', $addr);
 		$part[0] = explode(':', $part[0]);
 		$part[1] = explode(':', $part[1]);
-		$missing = array();
+		$missing = [];
 
 		// Looks like this is an IPv4 address
 		if (isset($part[1][1]) && strpos($part[1][1], '.') !== false)
@@ -2197,11 +2198,11 @@ function expandIPv6($addr, $strict_check = true)
 			$p1 = dechex($ipoct[0]) . dechex($ipoct[1]);
 			$p2 = dechex($ipoct[2]) . dechex($ipoct[3]);
 
-			$part[1] = array(
+			$part[1] = [
 				$part[1][0],
 				$p1,
 				$p2
-			);
+			];
 		}
 
 		$limit = count($part[0]) + count($part[1]);

@@ -768,9 +768,11 @@ $txt['boardsEdit'] = 'Modify Boards';
 $txt['mboards_new_cat'] = 'Create new category';
 $txt['manage_holidays'] = 'Manage Holidays';
 $txt['calendar_settings'] = 'Calendar Settings';
+
 $txt['search_weights'] = 'Weights';
 $txt['search_method'] = 'Search Method';
 $txt['search_sphinx'] = 'Configure Sphinx';
+$txt['search_manticore'] = 'Configure Manticore';
 
 $txt['smiley_sets'] = 'Smiley Sets';
 $txt['smileys_add'] = 'Add Smiley';

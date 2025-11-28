@@ -68,7 +68,7 @@ class AdminSettingsSearch
 	 * If a directory is not specified it will default to the value of the constant ADMINDIR e.g.
 	 * $include_files = array('file_name.controller', 'file_name2.controller', array('dir_name', 'file_name3.controller'))
 	 */
-	protected function _include_files($include_files)
+	protected function _include_files($include_files): void
 	{
 		foreach ($include_files as $file)
 		{
@@ -94,7 +94,7 @@ class AdminSettingsSearch
 	 *
 	 * @return array
 	 */
-	private function _load_settings($settings_search)
+	private function _load_settings($settings_search): array
 	{
 		$settings = [];
 
@@ -141,7 +141,7 @@ class AdminSettingsSearch
 	 *
 	 * @return string
 	 */
-	private function _get_label($var)
+	private function _get_label($var): string
 	{
 		global $txt;
 
@@ -187,7 +187,7 @@ class AdminSettingsSearch
 	 * @param string $menu_name - The name of the menu to look into
 	 * @param array $additional_settings - Possible additional settings (see _load_settings for the array structure)
 	 */
-	public function initSearch($menu_name, $additional_settings = [])
+	public function initSearch($menu_name, $additional_settings = []): void
 	{
 		$this->_menu_name = $menu_name;
 
@@ -208,7 +208,7 @@ class AdminSettingsSearch
 	/**
 	 * Loads all the admin sections
 	 */
-	private function _load_search_sections()
+	private function _load_search_sections(): array
 	{
 		global $context;
 
@@ -247,7 +247,7 @@ class AdminSettingsSearch
 	 *    - type
 	 *    - help
 	 */
-	public function doSearch($search_term)
+	public function doSearch($search_term): array
 	{
 		global $scripturl, $context;
 
@@ -288,7 +288,7 @@ class AdminSettingsSearch
 	 * part of the search_result array (consisting of 'name' and 'help')
 	 * of the term the result was found
 	 */
-	protected function _find_term($search_term, $item)
+	protected function _find_term($search_term, $item): array
 	{
 		global $helptxt;
 

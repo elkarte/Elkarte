@@ -41,9 +41,9 @@ class TemporaryAttachment extends ValuesContainer
 	 *
 	 * @param bool $fatal
 	 * @return bool
-	 * @throws \Exception thrown if fatal is true
+	 * @throws ElkException thrown if fatal is true
 	 */
-	public function remove($fatal = true)
+	public function remove(bool $fatal = true): bool
 	{
 		$this->data['size'] = 0;
 		$this->data['type'] = '';
@@ -59,7 +59,7 @@ class TemporaryAttachment extends ValuesContainer
 	/**
 	 * Checks if the file (not a directory) exists, and is editable, in the file system.
 	 */
-	public function fileWritable()
+	public function fileWritable(): bool
 	{
 		$fs = FileFunctions::instance();
 
@@ -71,7 +71,7 @@ class TemporaryAttachment extends ValuesContainer
 	 *
 	 * @return string
 	 */
-	public function getName()
+	public function getName(): string
 	{
 		return $this->data['name'];
 	}
@@ -81,7 +81,7 @@ class TemporaryAttachment extends ValuesContainer
 	 *
 	 * @param $error
 	 */
-	public function setErrors($error)
+	public function setErrors($error): void
 	{
 		$this->data['errors'][] = array_merge($this->data['errors'], (array) $error);
 	}
@@ -91,7 +91,7 @@ class TemporaryAttachment extends ValuesContainer
 	 *
 	 * @return bool
 	 */
-	public function hasErrors()
+	public function hasErrors(): bool
 	{
 		return !empty($this->data['errors']);
 	}
@@ -99,9 +99,9 @@ class TemporaryAttachment extends ValuesContainer
 	/**
 	 * Error getter
 	 *
-	 * @return mixed
+	 * @return array
 	 */
-	public function getErrors()
+	public function getErrors(): mixed
 	{
 		return $this->data['errors'];
 	}
@@ -111,7 +111,7 @@ class TemporaryAttachment extends ValuesContainer
 	 *
 	 * @return int
 	 */
-	public function getSize()
+	public function getSize(): int
 	{
 		return $this->data['size'];
 	}
@@ -121,7 +121,7 @@ class TemporaryAttachment extends ValuesContainer
 	 *
 	 * @return string
 	 */
-	public function getMime()
+	public function getMime(): string
 	{
 		return $this->data['mime'] ?? '';
 	}
@@ -129,7 +129,7 @@ class TemporaryAttachment extends ValuesContainer
 	/**
 	 * Checks if the file exists, and is editable, in the file system.
 	 */
-	public function fileExists()
+	public function fileExists(): bool
 	{
 		return FileFunctions::instance()->fileExists($this->data['tmp_name']);
 	}
@@ -139,7 +139,7 @@ class TemporaryAttachment extends ValuesContainer
 	 *
 	 * @param $file_path
 	 */
-	public function moveTo($file_path)
+	public function moveTo($file_path): void
 	{
 		rename($this->data['tmp_name'], $file_path . '/' . $this->data['attachid']);
 		$this->data['tmp_name'] = $file_path;
@@ -152,7 +152,7 @@ class TemporaryAttachment extends ValuesContainer
 	 * @param bool $strict Determines whether to use strict file moving or not.
 	 * @return bool Returns true if the file is moved successfully, false otherwise.
 	 */
-	public function moveUploaded($file_path, $strict = true)
+	public function moveUploaded(string $file_path, bool $strict = true): bool
 	{
 		$destName = $file_path . '/' . $this->data['attachid'];
 
@@ -192,7 +192,13 @@ class TemporaryAttachment extends ValuesContainer
 		return false;
 	}
 
-	public function setIdFolder($id)
+	/**
+	 * Sets the folder ID value in the object's data.
+	 *
+	 * @param int $id The ID to be assigned to the folder.
+	 * @return void
+	 */
+	public function setIdFolder(int $id): void
 	{
 		$this->data['id_folder'] = $id;
 	}
@@ -204,7 +210,7 @@ class TemporaryAttachment extends ValuesContainer
 	 * @return bool
 	 * @throws ElkException attach_check_nag
 	 */
-	public function doElkarteUploadChecks($attachmentDirectory)
+	public function doElkarteUploadChecks(AttachmentsDirectory $attachmentDirectory): bool
 	{
 		global $context;
 
@@ -287,7 +293,7 @@ class TemporaryAttachment extends ValuesContainer
 	 * If we have a valid image type, inspect to see if there is any
 	 * injected code fragments.  If found re encode to remove those fragments
 	 */
-	public function checkImageContents()
+	public function checkImageContents(): void
 	{
 		global $modSettings;
 
@@ -327,7 +333,7 @@ class TemporaryAttachment extends ValuesContainer
 	 * If enabled, call the attachment image resizing functions.  These reduce the image WxH
 	 * and potentially change the format in order to reduce size.
 	 */
-	public function adjustImageSizeType()
+	public function adjustImageSizeType(): void
 	{
 		global $modSettings;
 
@@ -342,11 +348,11 @@ class TemporaryAttachment extends ValuesContainer
 	/**
 	 * If the admin does not want to save webP (attachment_webp_enable is off) but they accept
 	 * webp extensions and the server has webp capabilities, then webP -> PNG or -> JPG (best choice)
-	 * based on input image
+	 * based on the input image
 	 *
 	 * @return void
 	 */
-	public function convertFromWebp()
+	public function convertFromWebp(): void
 	{
 		global $modSettings;
 
@@ -388,7 +394,7 @@ class TemporaryAttachment extends ValuesContainer
 	 *
 	 * @param AttachmentsDirectory $attachmentDirectory
 	 */
-	public function checkDirectorySpace($attachmentDirectory)
+	public function checkDirectorySpace(AttachmentsDirectory $attachmentDirectory): void
 	{
 		try
 		{
@@ -403,7 +409,7 @@ class TemporaryAttachment extends ValuesContainer
 	/**
 	 * Is the file larger than we accept
 	 */
-	public function checkFileSize()
+	public function checkFileSize(): void
 	{
 		global $modSettings;
 
@@ -428,7 +434,7 @@ class TemporaryAttachment extends ValuesContainer
 	/**
 	 * Check if they are sending too much data in a single post
 	 */
-	public function checkTotalUploadSize()
+	public function checkTotalUploadSize(): void
 	{
 		global $context, $modSettings;
 
@@ -455,7 +461,7 @@ class TemporaryAttachment extends ValuesContainer
 	/**
 	 * Check if they are sending too many files at once
 	 */
-	public function checkTotalUploadCount()
+	public function checkTotalUploadCount(): void
 	{
 		global $context, $modSettings;
 
@@ -488,7 +494,7 @@ class TemporaryAttachment extends ValuesContainer
 	/**
 	 * If enabled, check if this is a filetype we accept (by extension)
 	 */
-	public function checkFileExtensions()
+	public function checkFileExtensions(): void
 	{
 		global $modSettings;
 
@@ -500,7 +506,7 @@ class TemporaryAttachment extends ValuesContainer
 
 			if (!in_array(strtolower(substr(strrchr($this->data['name'], '.'), 1)), $allowed, true))
 			{
-				$allowed_extensions = strtr(strtolower($modSettings['attachmentExtensions']), array(',' => ', '));
+				$allowed_extensions = strtr(strtolower($modSettings['attachmentExtensions']), [',' => ', ']);
 				$this->setErrors([
 					'cant_upload_type', [
 						$allowed_extensions
@@ -513,13 +519,13 @@ class TemporaryAttachment extends ValuesContainer
 	/**
 	 * Rotate an image top side up based on its EXIF data
 	 */
-	public function autoRotate()
+	public function autoRotate(): void
 	{
 		global $modSettings;
 
 		// Want to correct for phone rotated photos, hell yeah ya do!
 		if (!empty($modSettings['attachment_autorotate'])
-			&& $this->hasErrors() === false && substr($this->data['type'], 0, 5) === 'image')
+			&& $this->hasErrors() === false && strpos($this->data['type'], 'image') === 0)
 		{
 			$image = new Image($this->data['tmp_name']);
 			if ($image->isImageLoaded() && $image->autoRotate())
@@ -536,7 +542,7 @@ class TemporaryAttachment extends ValuesContainer
 	 *
 	 * @return bool
 	 */
-	private function unlinkFile()
+	private function unlinkFile(): bool
 	{
 		try
 		{

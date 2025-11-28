@@ -791,6 +791,7 @@ sup.bbc_footnotes, sup.bbc_footnotes a {
 	border-color: var(--menu_button_border_active);
 	border-top-color: var(--menu_button_border_active_top);
 	background-image: linear-gradient(to bottom, var(--menu_button_active_2), var(--menu_button_active));
+	background-origin: border-box;
 	box-shadow: 1px 1px 2px var(--box_shadow);
 }
 
@@ -842,7 +843,7 @@ sup.bbc_footnotes, sup.bbc_footnotes a {
 /* PM and Notification bubble indicator */
 .pm_indicator {
 	/* overriding structure, make this a small circle, no counter (off screen) */
-	top: -.4rem;
+	top: -1rem;
 	right: -.2rem;
 	width: 1.6rem;
 	height: 1.6rem;
@@ -2089,10 +2090,10 @@ ul.cf_icons {
 	}
 }
 
-/* This one does 800 screens at default font size.
+/* This one does 960 screens at default font size.
    -------------------------------------------------------------------------------------------*/
 
-@media screen and (max-width: 50em) {
+@media screen and (max-width: 60em) {
 	#main_menu .linklevel1.active, #main_menu .linklevel1.active:hover,
 	#main_menu .linklevel1:not(.panel_toggle):not(.panel_search):not(#quicksearch):not(#search_selection) {
 		border-color: var(--transparent);

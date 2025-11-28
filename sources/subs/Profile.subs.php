@@ -94,7 +94,7 @@ function setupProfileContext($fields, $hook = '')
 
 	if (!empty($hook))
 	{
-		call_integration_hook('integrate_' . $hook . '_profile_fields', array(&$fields));
+		call_integration_hook('integrate_' . $hook . '_profile_fields', [&$fields]);
 	}
 
 	// Make sure we have this!
@@ -213,7 +213,7 @@ function saveProfileChanges(&$profile_vars, $memID)
 	// Permissions...
 	if ($context['user']['is_owner'])
 	{
-		$changeOther = allowedTo(array('profile_extra_any', 'profile_extra_own'));
+		$changeOther = allowedTo(['profile_extra_any', 'profile_extra_own']);
 	}
 	else
 	{
@@ -221,29 +221,29 @@ function saveProfileChanges(&$profile_vars, $memID)
 	}
 
 	// Arrays of all the changes - makes things easier.
-	$profile_bools = array(
+	$profile_bools = [
 		'notify_announcements',
 		'notify_send_body',
-	);
+	];
 
-	$profile_ints = array(
+	$profile_ints = [
 		'notify_regularity',
 		'notify_types',
 		'notify_from',
-	);
+	];
 
-	$profile_floats = array();
+	$profile_floats = [];
 
-	$profile_strings = array(
+	$profile_strings = [
 		'buddy_list',
 		'ignore_boards',
-	);
+	];
 
-	call_integration_hook('integrate_save_profile_changes', array(&$profile_bools, &$profile_ints, &$profile_floats, &$profile_strings));
+	call_integration_hook('integrate_save_profile_changes', [&$profile_bools, &$profile_ints, &$profile_floats, &$profile_strings]);
 
 	if (isset($_POST['sa']) && $_POST['sa'] === 'ignoreboards' && empty($_POST['ignore_brd']))
 	{
-		$_POST['ignore_brd'] = array();
+		$_POST['ignore_brd'] = [];
 	}
 
 	// Whatever it is set to is a dirty filthy thing.  Kinda like our minds.
@@ -253,7 +253,7 @@ function saveProfileChanges(&$profile_vars, $memID)
 	{
 		if (!is_array($_POST['ignore_brd']))
 		{
-			$_POST['ignore_brd'] = array($_POST['ignore_brd']);
+			$_POST['ignore_brd'] = [$_POST['ignore_brd']];
 		}
 
 		foreach ($_POST['ignore_brd'] as $k => $d)
@@ -333,7 +333,7 @@ function makeThemeChanges($memID, $id_theme)
 
 	$db = database();
 
-	$reservedVars = array(
+	$reservedVars = [
 		'actual_theme_url',
 		'actual_images_url',
 		'base_theme_dir',
@@ -350,7 +350,7 @@ function makeThemeChanges($memID, $id_theme)
 		'theme_layers',
 		'theme_templates',
 		'theme_url',
-	);
+	];
 
 	// Can't change reserved vars.
 	if ((isset($_POST['options']) && count(array_intersect(array_keys($_POST['options']), $reservedVars)) !== 0) || (isset($_POST['default_options']) && count(array_intersect(array_keys($_POST['default_options']), $reservedVars)) !== 0))
@@ -359,15 +359,15 @@ function makeThemeChanges($memID, $id_theme)
 	}
 
 	// Don't allow any overriding of custom fields with default or non-default options.
-	$custom_fields = array();
+	$custom_fields = [];
 	$db->fetchQuery('
 		SELECT 
 			col_name
 		FROM {db_prefix}custom_fields
 		WHERE active = {int:is_active}',
-		array(
+		[
 			'is_active' => 1,
-		)
+		]
 	)->fetch_callback(
 		function ($row) use (&$custom_fields) {
 			$custom_fields[] = $row['col_name'];
@@ -375,7 +375,7 @@ function makeThemeChanges($memID, $id_theme)
 	);
 
 	// These are the theme changes...
-	$themeSetArray = array();
+	$themeSetArray = [];
 	if (isset($_POST['options']) && is_array($_POST['options']))
 	{
 		foreach ($_POST['options'] as $opt => $val)
@@ -396,11 +396,11 @@ function makeThemeChanges($memID, $id_theme)
 				continue;
 			}
 
-			$themeSetArray[] = array($id_theme, $memID, $opt, is_array($val) ? implode(',', $val) : $val);
+			$themeSetArray[] = [$id_theme, $memID, $opt, is_array($val) ? implode(',', $val) : $val];
 		}
 	}
 
-	$erase_options = array();
+	$erase_options = [];
 	if (isset($_POST['default_options']) && is_array($_POST['default_options']))
 	{
 		foreach ($_POST['default_options'] as $opt => $val)
@@ -421,7 +421,7 @@ function makeThemeChanges($memID, $id_theme)
 				continue;
 			}
 
-			$themeSetArray[] = array(1, $memID, $opt, is_array($val) ? implode(',', $val) : $val);
+			$themeSetArray[] = [1, $memID, $opt, is_array($val) ? implode(',', $val) : $val];
 			$erase_options[] = $opt;
 		}
 	}
@@ -508,7 +508,7 @@ function makeNotificationChanges($memID)
 	{
 		if (!isset($_POST['notify_boards']))
 		{
-			$_POST['notify_boards'] = array();
+			$_POST['notify_boards'] = [];
 		}
 
 		// Make sure only integers are added/deleted.
@@ -518,20 +518,20 @@ function makeNotificationChanges($memID)
 		}
 
 		// id_board = 0 is reserved for topic notifications only
-		$notification_wanted = array_diff($_POST['notify_boards'], array(0));
+		$notification_wanted = array_diff($_POST['notify_boards'], [0]);
 
 		// Gather up any any existing board notifications.
-		$notification_current = array();
+		$notification_current = [];
 		$db->fetchQuery('
 			SELECT 
 				id_board
 			FROM {db_prefix}log_notify
 			WHERE id_member = {int:selected_member}
 				AND id_board != {int:id_board}',
-			array(
+			[
 				'selected_member' => $memID,
 				'id_board' => 0,
-			)
+			]
 		)->fetch_callback(
 			function ($row) use (&$notification_current) {
 				$notification_current[] = $row['id_board'];
@@ -546,50 +546,50 @@ function makeNotificationChanges($memID)
 				DELETE FROM {db_prefix}log_notify
 				WHERE id_board IN ({array_int:board_list})
 					AND id_member = {int:selected_member}',
-				array(
+				[
 					'board_list' => $notification_deletes,
 					'selected_member' => $memID,
-				)
+				]
 			);
 		}
 
 		// Now add in what they do want
-		$notification_inserts = array();
+		$notification_inserts = [];
 		foreach ($notification_wanted as $id)
 		{
-			$notification_inserts[] = array($memID, $id);
+			$notification_inserts[] = [$memID, $id];
 		}
 
 		if (!empty($notification_inserts))
 		{
 			$db->insert('ignore',
 				'{db_prefix}log_notify',
-				array('id_member' => 'int', 'id_board' => 'int'),
+				['id_member' => 'int', 'id_board' => 'int'],
 				$notification_inserts,
-				array('id_member', 'id_board')
+				['id_member', 'id_board']
 			);
 		}
 	}
 	// We are editing topic notifications......
 	elseif (isset($_POST['edit_notify_topics']) && !empty($_POST['notify_topics']))
 	{
-		$edit_notify_topics = array();
+		$edit_notify_topics = [];
 		foreach ($_POST['notify_topics'] as $index => $id)
 		{
 			$edit_notify_topics[$index] = (int) $id;
 		}
 
 		// Make sure there are no zeros left.
-		$edit_notify_topics = array_diff($edit_notify_topics, array(0));
+		$edit_notify_topics = array_diff($edit_notify_topics, [0]);
 
 		$db->query('', '
 			DELETE FROM {db_prefix}log_notify
 			WHERE id_topic IN ({array_int:topic_list})
 				AND id_member = {int:selected_member}',
-			array(
+			[
 				'topic_list' => $edit_notify_topics,
 				'selected_member' => $memID,
-			)
+			]
 		);
 	}
 }
@@ -621,13 +621,13 @@ function makeCustomFieldChanges($memID, $area, $sanitize = true)
 		FROM {db_prefix}custom_fields
 		WHERE ' . $where . '
 			AND active = {int:is_active}',
-		array(
+		[
 			'is_active' => 1,
 			'area' => $area,
-		)
+		]
 	);
-	$changes = array();
-	$log_changes = array();
+	$changes = [];
+	$log_changes = [];
 	while (($row = $request->fetch_assoc()))
 	{
 		/* This means don't save if:
@@ -646,7 +646,7 @@ function makeCustomFieldChanges($memID, $area, $sanitize = true)
 		{
 			$value = isset($_POST['customfield'][$row['col_name']]) ? 1 : 0;
 		}
-		elseif (in_array($row['field_type'], array('radio', 'select')))
+		elseif (in_array($row['field_type'], ['radio', 'select']))
 		{
 			$value = $row['default_value'];
 			$options = explode(',', $row['field_options']);
@@ -691,19 +691,19 @@ function makeCustomFieldChanges($memID, $area, $sanitize = true)
 		// Did it change or has it been set?
 		if ((!isset($options[$row['col_name']]) && !empty($value)) || (isset($options[$row['col_name']]) && $options[$row['col_name']] !== $value))
 		{
-			$log_changes[] = array(
+			$log_changes[] = [
 				'action' => 'customfield_' . $row['col_name'],
 				'log_type' => 'user',
-				'extra' => array(
+				'extra' => [
 					'previous' => !empty($options[$row['col_name']]) ? $options[$row['col_name']] : '',
 					'new' => $value,
 					'applicator' => User::$info->id,
 					'member_affected' => $memID,
-				),
-			);
+				],
+			];
 
-			$changes[] = array($row['col_name'], $value, $memID);
-			if (in_array($row['field_type'], array('radio', 'select')))
+			$changes[] = [$row['col_name'], $value, $memID];
+			if (in_array($row['field_type'], ['radio', 'select']))
 			{
 				$options[$row['col_name']] = $value;
 				$options[$row['col_name'] . '_key'] = $row['col_name'] . '_' . ($key ?? 0);
@@ -716,16 +716,16 @@ function makeCustomFieldChanges($memID, $area, $sanitize = true)
 	}
 	$request->free_result();
 
-	call_integration_hook('integrate_save_custom_profile_fields', array(&$changes, &$log_changes, $memID, $area, $sanitize));
+	call_integration_hook('integrate_save_custom_profile_fields', [&$changes, &$log_changes, $memID, $area, $sanitize]);
 
 	// Make those changes!
 	if (!empty($changes) && empty($context['password_auth_failed']))
 	{
 		$db->replace(
 			'{db_prefix}custom_fields_data',
-			array('variable' => 'string-255', 'value' => 'string-65534', 'id_member' => 'int'),
+			['variable' => 'string-255', 'value' => 'string-65534', 'id_member' => 'int'],
 			$changes,
-			array('variable', 'id_member')
+			['variable', 'id_member']
 		);
 
 		if (!empty($log_changes) && featureEnabled('ml') && !empty($modSettings['userlog_enabled']))
@@ -792,11 +792,11 @@ function profileSendActivation()
 		return;
 	}
 
-	$replacements = array(
+	$replacements = [
 		'ACTIVATIONLINK' => $scripturl . '?action=register;sa=activate;u=' . $context['id_member'] . ';code=' . $old_profile['validation_code'],
 		'ACTIVATIONCODE' => $old_profile['validation_code'],
 		'ACTIVATIONLINKWITHOUTCODE' => $scripturl . '?action=register;sa=activate;u=' . $context['id_member'],
-	);
+	];
 
 	// Send off the email.
 	$emaildata = loadEmailTemplate('activate_reactivate', $replacements, empty($cur_profile['lngfile']) || empty($modSettings['userLanguage']) ? $language : $cur_profile['lngfile']);
@@ -806,7 +806,7 @@ function profileSendActivation()
 	require_once(SUBSDIR . '/Logging.subs.php');
 	logOnline($context['id_member'], false);
 	$_SESSION['log_time'] = 0;
-	$_SESSION['login_' . $cookiename] = serialize(array(0, '', 0));
+	$_SESSION['login_' . $cookiename] = serialize([0, '', 0]);
 
 	if (isset($_COOKIE[$cookiename]))
 	{
@@ -843,7 +843,7 @@ function profileLoadSignatureData()
 	$sig_limits = explode(',', $sig_limits);
 
 	$context['signature_enabled'] = $sig_limits[0] ?? 0;
-	$context['signature_limits'] = array(
+	$context['signature_limits'] = [
 		'max_length' => $sig_limits[1] ?? 0,
 		'max_lines' => $sig_limits[2] ?? 0,
 		'max_images' => $sig_limits[3] ?? 0,
@@ -851,8 +851,8 @@ function profileLoadSignatureData()
 		'max_image_width' => $sig_limits[5] ?? 0,
 		'max_image_height' => $sig_limits[6] ?? 0,
 		'max_font_size' => $sig_limits[7] ?? 0,
-		'bbc' => !empty($sig_bbc) ? explode(',', $sig_bbc) : array(),
-	);
+		'bbc' => !empty($sig_bbc) ? explode(',', $sig_bbc) : [],
+	];
 
 	// Warning message for signature image limits?
 	$context['signature_warning'] = '';
@@ -867,7 +867,7 @@ function profileLoadSignatureData()
 
 	if (empty($context['do_preview']))
 	{
-		$context['member']['signature'] = empty($cur_profile['signature_raw']) ? '' : str_replace(array('<br />', '<', '>', '"', '\''), array("\n", '&lt;', '&gt;', '&quot;', '&#039;'), $cur_profile['signature_raw']);
+		$context['member']['signature'] = empty($cur_profile['signature_raw']) ? '' : str_replace(['<br />', '<', '>', '"', '\''], ["\n", '&lt;', '&gt;', '&quot;', '&#039;'], $cur_profile['signature_raw']);
 	}
 	else
 	{
@@ -876,7 +876,7 @@ function profileLoadSignatureData()
 		if (empty($context['post_errors']))
 		{
 			Txt::load('Errors');
-			$context['post_errors'] = array();
+			$context['post_errors'] = [];
 		}
 
 		$context['post_errors'][] = 'signature_not_yet_saved';
@@ -917,7 +917,7 @@ function profileLoadAvatarData()
 	// @todo Temporary
 	if ($context['user']['is_owner'])
 	{
-		$allowedChange = allowedTo('profile_set_avatar') && allowedTo(array('profile_extra_any', 'profile_extra_own'));
+		$allowedChange = allowedTo('profile_set_avatar') && allowedTo(['profile_extra_any', 'profile_extra_own']);
 	}
 	else
 	{
@@ -925,7 +925,7 @@ function profileLoadAvatarData()
 	}
 
 	// Default context.
-	$context['member']['avatar'] += array(
+	$context['member']['avatar'] += [
 		'custom' => $valid_protocol ? $cur_profile['avatar']['name'] : $schema,
 		'selection' => $valid_protocol ? $cur_profile['avatar']['name'] : '',
 		'id_attach' => $cur_profile['id_attach'],
@@ -934,67 +934,67 @@ function profileLoadAvatarData()
 		'allow_upload' => !empty($modSettings['avatar_upload_enabled']) && $allowedChange,
 		'allow_external' => !empty($modSettings['avatar_external_enabled']) && $allowedChange,
 		'allow_gravatar' => !empty($modSettings['avatar_gravatar_enabled']) && $allowedChange,
-	);
+	];
 
 	if ($cur_profile['avatar']['name'] === '' && $cur_profile['id_attach'] > 0 && $context['member']['avatar']['allow_upload'])
 	{
-		$context['member']['avatar'] += array(
+		$context['member']['avatar'] += [
 			'choice' => 'upload',
 			'server_pic' => 'blank.png',
 			'external' => '',
 			'placeholder' => $schema
-		);
+		];
 
-		$context['member']['avatar'] += array(
+		$context['member']['avatar'] += [
 			'href' => empty($cur_profile['attachment_type'])
 				? getUrl('attach', ['action' => 'dlattach', 'attach' => (int) $cur_profile['id_attach'], 'name' => $cur_profile['filename'], 'type' => 'avatar'])
 				: $modSettings['custom_avatar_url'] . '/' . $cur_profile['filename']
-		);
+		];
 	}
 	elseif ($valid_protocol && $context['member']['avatar']['allow_external'])
 	{
-		$context['member']['avatar'] += array(
+		$context['member']['avatar'] += [
 			'choice' => 'external',
 			'server_pic' => 'blank.png',
 			'external' => $cur_profile['avatar']['name']
-		);
+		];
 	}
 	elseif ($cur_profile['avatar']['name'] === 'gravatar' && $context['member']['avatar']['allow_gravatar'])
 	{
-		$context['member']['avatar'] += array(
+		$context['member']['avatar'] += [
 			'choice' => 'gravatar',
 			'server_pic' => 'blank.png',
 			'external' => 'https://'
-		);
+		];
 	}
 	elseif ($cur_profile['avatar']['name'] !== '' && FileFunctions::instance()->fileExists($modSettings['avatar_directory'] . '/' . $cur_profile['avatar']['name']) && $context['member']['avatar']['allow_server_stored'])
 	{
-		$context['member']['avatar'] += array(
+		$context['member']['avatar'] += [
 			'choice' => 'server_stored',
 			'server_pic' => $cur_profile['avatar']['name'],
 			'external' => $schema
-		);
+		];
 	}
 	else
 	{
-		$context['member']['avatar'] += array(
+		$context['member']['avatar'] += [
 			'choice' => 'none',
 			'server_pic' => 'blank.png',
 			'external' => $schema
-		);
+		];
 	}
 
 	// Get a list of all the avatars.
 	if ($context['member']['avatar']['allow_server_stored'])
 	{
 		require_once(SUBSDIR . '/Attachments.subs.php');
-		$context['avatar_list'] = array();
-		$context['avatars'] = FileFunctions::instance()->isDir($modSettings['avatar_directory']) ? getServerStoredAvatars('') : array();
+		$context['avatar_list'] = [];
+		$context['avatars'] = FileFunctions::instance()->isDir($modSettings['avatar_directory']) ? getServerStoredAvatars('') : [];
 	}
 	else
 	{
-		$context['avatar_list'] = array();
-		$context['avatars'] = array();
+		$context['avatar_list'] = [];
+		$context['avatars'] = [];
 	}
 
 	// Second level selected avatar...
@@ -1046,7 +1046,7 @@ function profileLoadLanguages()
 {
 	global $context;
 
-	$context['profile_languages'] = array();
+	$context['profile_languages'] = [];
 
 	// Get our languages!
 	$languages = getLanguages();
@@ -1104,9 +1104,9 @@ function profileValidateSignature(&$value)
 		// Load all the signature limits.
 		list ($sig_limits, $sig_bbc) = explode(':', $modSettings['signature_settings']);
 		$sig_limits = explode(',', $sig_limits);
-		$disabledTags = !empty($sig_bbc) ? explode(',', $sig_bbc) : array();
+		$disabledTags = !empty($sig_bbc) ? explode(',', $sig_bbc) : [];
 
-		$unparsed_signature = strtr(un_htmlspecialchars($value), array("\r" => '', '&#039' => '\''));
+		$unparsed_signature = strtr(un_htmlspecialchars($value), ["\r" => '', '&#039' => '\'']);
 
 		// Too many lines?
 		if (!empty($sig_limits[2]) && substr_count($unparsed_signature, "\n") >= $sig_limits[2])
@@ -1148,7 +1148,7 @@ function profileValidateSignature(&$value)
 		if (!empty($sig_limits[7]) && preg_match_all('~\[size=([\d\.]+)(\]|px|pt|em|x-large|larger)~i', $unparsed_signature, $matches) !== false)
 		{
 			// Same as parse_bbc
-			$sizes = array(1 => 0.7, 2 => 1.0, 3 => 1.35, 4 => 1.45, 5 => 2.0, 6 => 2.65, 7 => 3.95);
+			$sizes = [1 => 0.7, 2 => 1.0, 3 => 1.35, 4 => 1.45, 5 => 2.0, 6 => 2.65, 7 => 3.95];
 
 			foreach ($matches[1] as $ind => $size)
 			{
@@ -1213,7 +1213,7 @@ function profileValidateSignature(&$value)
 				}
 			}
 
-			$replaces = array();
+			$replaces = [];
 
 			// Try to find all the images!
 			if (!empty($matches))
@@ -1357,10 +1357,10 @@ function profileSaveAvatarData($value)
 		// @todo add some specific errors to the class
 		$errors = ErrorContext::context('profile', 0);
 		$errors->addError($result);
-		$context['post_errors'] = array(
+		$context['post_errors'] = [
 			'errors' => $errors->prepareErrors(),
 			'type' => $errors->getErrorType() == 0 ? 'minor' : 'serious',
-		);
+		];
 
 		return $result;
 	}
@@ -1388,15 +1388,15 @@ function profileSaveGroups(&$value)
 	// Do we need to protect some groups?
 	if (!allowedTo('admin_forum'))
 	{
-		$protected_groups = array(1);
+		$protected_groups = [1];
 		$db->fetchQuery('
 			SELECT 
 				id_group
 			FROM {db_prefix}membergroups
 			WHERE group_type = {int:is_protected}',
-			array(
+			[
 				'is_protected' => 1,
-			)
+			]
 		)->fetch_callback(
 			function ($row) use (&$protected_groups) {
 				$protected_groups[] = (int) $row['id_group'];
@@ -1407,7 +1407,7 @@ function profileSaveGroups(&$value)
 	}
 
 	// The account page allows the change of your id_group - but not to a protected group!
-	if (empty($protected_groups) || count(array_intersect(array((int) $value, $old_profile['id_group']), $protected_groups)) === 0)
+	if (empty($protected_groups) || count(array_intersect([(int) $value, $old_profile['id_group']], $protected_groups)) === 0)
 	{
 		$value = (int) $value;
 	}
@@ -1420,7 +1420,7 @@ function profileSaveGroups(&$value)
 	// Find the additional membergroups (if any)
 	if (isset($_POST['additional_groups']) && is_array($_POST['additional_groups']))
 	{
-		$additional_groups = array();
+		$additional_groups = [];
 		foreach ($_POST['additional_groups'] as $group_id)
 		{
 			$group_id = (int) $group_id;
@@ -1462,10 +1462,10 @@ function profileSaveGroups(&$value)
 				WHERE (id_group = {int:admin_group} OR FIND_IN_SET({int:admin_group}, additional_groups) != 0)
 					AND id_member != {int:selected_member}
 				LIMIT 1',
-				array(
+				[
 					'admin_group' => 1,
 					'selected_member' => $context['id_member'],
-				)
+				]
 			);
 			list ($another) = $request->fetch_row();
 			$request->free_result();
@@ -1486,7 +1486,7 @@ function profileSaveGroups(&$value)
 		}
 		else
 		{
-			updateSettings(array('settings_updated' => time()));
+			updateSettings(['settings_updated' => time()]);
 		}
 	}
 
@@ -1508,7 +1508,7 @@ function list_getUserWarnings($start, $items_per_page, $sort, $memID)
 {
 	$db = database();
 
-	$previous_warnings = array();
+	$previous_warnings = [];
 	$db->fetchQuery('
 		SELECT 
 			COALESCE(mem.id_member, 0) AS id_member, COALESCE(mem.real_name, lc.member_name) AS member_name,
@@ -1519,24 +1519,24 @@ function list_getUserWarnings($start, $items_per_page, $sort, $memID)
 			AND lc.comment_type = {string:warning}
 		ORDER BY ' . $sort . '
 		LIMIT ' . $items_per_page . '  OFFSET ' . $start,
-		array(
+		[
 			'selected_member' => $memID,
 			'warning' => 'warning',
-		)
+		]
 	)->fetch_callback(
 		function ($row) use (&$previous_warnings) {
-			$previous_warnings[] = array(
-				'issuer' => array(
+			$previous_warnings[] = [
+				'issuer' => [
 					'id' => $row['id_member'],
 					'link' => $row['id_member'] ? ('<a href="' . getUrl('profile', ['action' => 'profile', 'u' => $row['id_member'], 'name' => $row['member_name']]) . '">' . $row['member_name'] . '</a>') : $row['member_name'],
-				),
+				],
 				'time' => standardTime($row['log_time']),
 				'html_time' => htmlTime($row['log_time']),
 				'timestamp' => forum_time(true, $row['log_time']),
 				'reason' => $row['body'],
 				'counter' => $row['counter'] > 0 ? '+' . $row['counter'] : $row['counter'],
 				'id_notice' => $row['id_notice'],
-			);
+			];
 		}
 	);
 
@@ -1560,10 +1560,10 @@ function list_getUserWarningCount($memID)
 		FROM {db_prefix}log_comments
 		WHERE id_recipient = {int:selected_member}
 			AND comment_type = {string:warning}',
-		array(
+		[
 			'selected_member' => $memID,
 			'warning' => 'warning',
-		)
+		]
 	);
 	list ($total_warnings) = $request->fetch_row();
 	$request->free_result();
@@ -1592,11 +1592,11 @@ function profileLoadAttachments($start, $items_per_page, $sort, $boardsAllowed, 
 
 	if ($exclude_boards === null && !empty($modSettings['recycle_enable']) && $modSettings['recycle_board'] > 0)
 	{
-		$exclude_boards = array($modSettings['recycle_board']);
+		$exclude_boards = [$modSettings['recycle_board']];
 	}
 
 	// Retrieve some attachments.
-	$attachments = array();
+	$attachments = [];
 	$db->fetchQuery('
 		SELECT
 		 	a.id_attach, a.id_msg, a.filename, a.downloads, a.approved, a.fileext, a.width, a.height, ' .
@@ -1615,7 +1615,7 @@ function profileLoadAttachments($start, $items_per_page, $sort, $boardsAllowed, 
 			AND m.approved = {int:is_approved}') . '
 		ORDER BY {raw:sort}
 		LIMIT {int:limit} OFFSET {int:offset} ',
-		array(
+		[
 			'boards_list' => $boardsAllowed,
 			'exclude_boards' => $exclude_boards,
 			'attachment_type' => 0,
@@ -1626,7 +1626,7 @@ function profileLoadAttachments($start, $items_per_page, $sort, $boardsAllowed, 
 			'sort' => $sort,
 			'offset' => $start,
 			'limit' => $items_per_page,
-		)
+		]
 	)->fetch_callback(
 		function ($row) use (&$attachments) {
 			global $txt, $settings, $modSettings;
@@ -1634,14 +1634,14 @@ function profileLoadAttachments($start, $items_per_page, $sort, $boardsAllowed, 
 			$row['subject'] = censor($row['subject']);
 			if (!$row['approved'])
 			{
-				$row['filename'] = str_replace(array('{attachment_link}', '{txt_awaiting}'), array('<a href="' . getUrl('attach', ['action' => 'dlattach', 'attach' => $row['id_attach'], 'name' => $row['filename'], 'topic' => $row['id_topic'], 'subject' => $row['subject']]) . '">' . $row['filename'] . '</a>', $txt['awaiting_approval']), $settings['attachments_awaiting_approval']);
+				$row['filename'] = str_replace(['{attachment_link}', '{txt_awaiting}'], ['<a href="' . getUrl('attach', ['action' => 'dlattach', 'attach' => $row['id_attach'], 'name' => $row['filename'], 'topic' => $row['id_topic'], 'subject' => $row['subject']]) . '">' . $row['filename'] . '</a>', $txt['awaiting_approval']], $settings['attachments_awaiting_approval']);
 			}
 			else
 			{
 				$row['filename'] = '<a href="' . getUrl('attach', ['action' => 'dlattach', 'attach' => $row['id_attach'], 'name' => $row['filename'], 'topic' => $row['id_topic'], 'subject' => $row['subject']]) . '">' . $row['filename'] . '</a>';
 			}
 
-			$attachments[] = array(
+			$attachments[] = [
 				'id' => $row['id_attach'],
 				'filename' => $row['filename'],
 				'fileext' => $row['fileext'],
@@ -1657,7 +1657,7 @@ function profileLoadAttachments($start, $items_per_page, $sort, $boardsAllowed, 
 				'board' => $row['id_board'],
 				'board_name' => $row['name'],
 				'approved' => $row['approved'],
-			);
+			];
 		}
 	);
 
@@ -1691,14 +1691,14 @@ function getNumAttachments($boardsAllowed, $memID)
 			AND b.id_board = {int:board}' : '') . (!in_array(0, $boardsAllowed) ? '
 			AND b.id_board IN ({array_int:boards_list})' : '') . (!$modSettings['postmod_active'] || $context['user']['is_owner'] ? '' : '
 			AND m.approved = {int:is_approved}'),
-		array(
+		[
 			'boards_list' => $boardsAllowed,
 			'attachment_type' => 0,
 			'no_message' => 0,
 			'current_member' => $memID,
 			'is_approved' => 1,
 			'board' => $board,
-		)
+		]
 	);
 	list ($attachCount) = $request->fetch_row();
 	$request->free_result();
@@ -1722,26 +1722,26 @@ function getUnwatchedBy($start, $items_per_page, $sort, $memID)
 	$db = database();
 
 	// Get the list of topics we can see
-	$topics = array();
+	$topics = [];
 	$db->fetchQuery('
 		SELECT
 		 	lt.id_topic
 		FROM {db_prefix}log_topics AS lt
 			LEFT JOIN {db_prefix}topics AS t ON (lt.id_topic = t.id_topic)
 			LEFT JOIN {db_prefix}boards AS b ON (t.id_board = b.id_board)
-			LEFT JOIN {db_prefix}messages AS m ON (t.id_first_msg = m.id_msg)' . (in_array($sort, array('mem.real_name', 'mem.real_name DESC', 'mem.poster_time', 'mem.poster_time DESC')) ? '
+			LEFT JOIN {db_prefix}messages AS m ON (t.id_first_msg = m.id_msg)' . (in_array($sort, ['mem.real_name', 'mem.real_name DESC', 'mem.poster_time', 'mem.poster_time DESC']) ? '
 			LEFT JOIN {db_prefix}members AS mem ON (m.id_member = mem.id_member)' : '') . '
 		WHERE lt.id_member = {int:current_member}
 			AND lt.unwatched = 1
 			AND {query_see_board}
 		ORDER BY {raw:sort}
 		LIMIT {int:limit} OFFSET {int:offset} ',
-		array(
+		[
 			'current_member' => $memID,
 			'sort' => $sort,
 			'offset' => $start,
 			'limit' => $items_per_page,
-		)
+		]
 	)->fetch_callback(
 		function ($row) use (&$topics) {
 			$topics[] = $row['id_topic'];
@@ -1749,7 +1749,7 @@ function getUnwatchedBy($start, $items_per_page, $sort, $memID)
 	);
 
 	// Any topics found?
-	$topicsInfo = array();
+	$topicsInfo = [];
 	if (!empty($topics))
 	{
 		$db->fetchQuery('
@@ -1761,9 +1761,9 @@ function getUnwatchedBy($start, $items_per_page, $sort, $memID)
 				LEFT JOIN {db_prefix}members AS meml ON (meml.id_member = ml.id_member)
 				LEFT JOIN {db_prefix}members AS memf ON (memf.id_member = mf.id_member)
 			WHERE t.id_topic IN ({array_int:topics})',
-			array(
+			[
 				'topics' => $topics,
-			)
+			]
 		)->fetch_callback(
 			function ($row) use (&$topicsInfo) {
 				$topicsInfo[] = $row;
@@ -1794,9 +1794,9 @@ function getNumUnwatchedBy($memID)
 		WHERE id_member = {int:current_member}
 			AND unwatched = 1
 			AND {query_see_board}',
-		array(
+		[
 			'current_member' => $memID,
-		)
+		]
 	);
 	list ($unwatchedCount) = $request->fetch_row();
 	$request->free_result();
@@ -1829,11 +1829,11 @@ function count_user_posts($memID, $board = null)
 		WHERE m.id_member = {int:current_member}' . (!empty($board) ? '
 			AND m.id_board = {int:board}' : '') . (!$modSettings['postmod_active'] || $is_owner ? '' : '
 			AND m.approved = {int:is_approved}'),
-		array(
+		[
 			'current_member' => $memID,
 			'is_approved' => 1,
 			'board' => $board,
-		)
+		]
 	);
 	list ($msgCount) = $request->fetch_row();
 	$request->free_result();
@@ -1866,11 +1866,11 @@ function count_user_topics($memID, $board = null)
 		WHERE t.id_member_started = {int:current_member}' . (!empty($board) ? '
 			AND t.id_board = {int:board}' : '') . (!$modSettings['postmod_active'] || $is_owner ? '' : '
 			AND t.approved = {int:is_approved}'),
-		array(
+		[
 			'current_member' => $memID,
 			'is_approved' => 1,
 			'board' => $board,
-		)
+		]
 	);
 	list ($msgCount) = $request->fetch_row();
 	$request->free_result();
@@ -1904,16 +1904,16 @@ function findMinMaxUserMessage($memID, $board = null)
 		WHERE m.id_member = {int:current_member}' . (!empty($board) ? '
 			AND m.id_board = {int:board}' : '') . (!$modSettings['postmod_active'] || $is_owner ? '' : '
 			AND m.approved = {int:is_approved}'),
-		array(
+		[
 			'current_member' => $memID,
 			'is_approved' => 1,
 			'board' => $board,
-		)
+		]
 	);
 	$minmax = $request->fetch_row();
 	$request->free_result();
 
-	return empty($minmax) ? array(0, 0) : $minmax;
+	return empty($minmax) ? [0, 0] : $minmax;
 }
 
 /**
@@ -1942,16 +1942,16 @@ function findMinMaxUserTopic($memID, $board = null)
 		WHERE t.id_member_started = {int:current_member}' . (!empty($board) ? '
 			AND t.id_board = {int:board}' : '') . (!$modSettings['postmod_active'] || $is_owner ? '' : '
 			AND t.approved = {int:is_approved}'),
-		array(
+		[
 			'current_member' => $memID,
 			'is_approved' => 1,
 			'board' => $board,
-		)
+		]
 	);
 	$minmax = $request->fetch_row();
 	$request->free_result();
 
-	return empty($minmax) ? array(0, 0) : $minmax;
+	return empty($minmax) ? [0, 0] : $minmax;
 }
 
 /**
@@ -1977,7 +1977,7 @@ function load_user_posts($memID, $start, $count, $range_limit = '', $reverse = f
 	$db = database();
 
 	$is_owner = $memID == User::$info->id;
-	$user_posts = array();
+	$user_posts = [];
 
 	// Find this user's posts. The left join on categories somehow makes this faster, weird as it looks.
 	for ($i = 0; $i < 2; $i++)
@@ -1999,11 +1999,11 @@ function load_user_posts($memID, $start, $count, $range_limit = '', $reverse = f
 				AND t.approved = {int:is_approved} AND m.approved = {int:is_approved}') . '
 			ORDER BY m.id_msg ' . ($reverse ? 'ASC' : 'DESC') . '
 			LIMIT ' . $start . ', ' . $count,
-			array(
+			[
 				'current_member' => $memID,
 				'is_approved' => 1,
 				'board' => $board,
-			)
+			]
 		);
 
 		// Did we get what we wanted, if so stop looking
@@ -2011,10 +2011,8 @@ function load_user_posts($memID, $start, $count, $range_limit = '', $reverse = f
 		{
 			break;
 		}
-		else
-		{
-			$range_limit = '';
-		}
+
+		$range_limit = '';
 	}
 
 	// Place them in the post array
@@ -2050,7 +2048,7 @@ function load_user_topics($memID, $start, $count, $range_limit = '', $reverse = 
 	$db = database();
 
 	$is_owner = $memID == User::$info->id;
-	$user_topics = array();
+	$user_topics = [];
 
 	// Find this user's topics.  The left join on categories somehow makes this faster, weird as it looks.
 	for ($i = 0; $i < 2; $i++)
@@ -2072,11 +2070,11 @@ function load_user_topics($memID, $start, $count, $range_limit = '', $reverse = 
 				AND t.approved = {int:is_approved} AND m.approved = {int:is_approved}') . '
 			ORDER BY t.id_first_msg ' . ($reverse ? 'ASC' : 'DESC') . '
 			LIMIT ' . $start . ', ' . $count,
-			array(
+			[
 				'current_member' => $memID,
 				'is_approved' => 1,
 				'board' => $board,
-			)
+			]
 		);
 
 		// Did we get what we wanted, if so stop looking
@@ -2084,10 +2082,8 @@ function load_user_topics($memID, $start, $count, $range_limit = '', $reverse = 
 		{
 			break;
 		}
-		else
-		{
-			$range_limit = '';
-		}
+
+		$range_limit = '';
 	}
 
 	// Place them in the topic array
@@ -2113,7 +2109,7 @@ function getMemberGeneralPermissions($curGroups)
 	Txt::load('ManagePermissions');
 
 	// Get all general permissions.
-	$general_permission = array();
+	$general_permission = [];
 	$db->fetchQuery('
 		SELECT 
 			p.permission, p.add_deny, mg.group_name, p.id_group
@@ -2121,10 +2117,10 @@ function getMemberGeneralPermissions($curGroups)
 			LEFT JOIN {db_prefix}membergroups AS mg ON (mg.id_group = p.id_group)
 		WHERE p.id_group IN ({array_int:group_list})
 		ORDER BY p.add_deny DESC, p.permission, mg.min_posts, CASE WHEN mg.id_group < {int:newbie_group} THEN mg.id_group ELSE 4 END, mg.group_name',
-		array(
+		[
 			'group_list' => $curGroups,
 			'newbie_group' => 4,
-		)
+		]
 	)->fetch_callback(
 		function ($row) use (&$general_permission) {
 			global $txt;
@@ -2136,7 +2132,7 @@ function getMemberGeneralPermissions($curGroups)
 			}
 
 			// Permissions that end with _own or _any consist of two parts.
-			if (in_array(substr($row['permission'], -4), array('_own', '_any')) && isset($txt['permissionname_' . substr($row['permission'], 0, -4)]))
+			if (in_array(substr($row['permission'], -4), ['_own', '_any']) && isset($txt['permissionname_' . substr($row['permission'], 0, -4)]))
 			{
 				$name = $txt['permissionname_' . substr($row['permission'], 0, -4)] . ' - ' . $txt['permissionname_' . $row['permission']];
 			}
@@ -2148,16 +2144,16 @@ function getMemberGeneralPermissions($curGroups)
 			// Add this permission if it doesn't exist yet.
 			if (!isset($general_permission[$row['permission']]))
 			{
-				$general_permission[$row['permission']] = array(
+				$general_permission[$row['permission']] = [
 					'id' => $row['permission'],
-					'groups' => array(
-						'allowed' => array(),
-						'denied' => array()
-					),
+					'groups' => [
+						'allowed' => [],
+						'denied' => []
+					],
 					'name' => $name,
 					'is_denied' => false,
 					'is_global' => true,
-				);
+				];
 			}
 
 			// Add the membergroup to either the denied or the allowed groups.
@@ -2190,7 +2186,7 @@ function getMemberBoardPermissions($memID, $curGroups, $board = null)
 	$db = database();
 	Txt::load('ManagePermissions');
 
-	$board_permission = array();
+	$board_permission = [];
 	$db->fetchQuery('
 		SELECT
 			bp.add_deny, bp.permission, bp.id_group, mg.group_name' . (empty($board) ? '' : ',
@@ -2202,13 +2198,13 @@ function getMemberBoardPermissions($memID, $curGroups, $board = null)
 		WHERE bp.id_profile = {raw:current_profile}
 			AND bp.id_group IN ({array_int:group_list}' . (empty($board) ? ')' : ', {int:moderator_group})
 			AND (mods.id_member IS NOT NULL OR bp.id_group != {int:moderator_group})'),
-		array(
+		[
 			'current_board' => $board,
 			'group_list' => $curGroups,
 			'current_member' => $memID,
 			'current_profile' => empty($board) ? '1' : 'b.id_profile',
 			'moderator_group' => 3,
-		)
+		]
 	)->fetch_callback(
 		function ($row) use (&$board_permission, $board) {
 			global $txt;
@@ -2220,7 +2216,7 @@ function getMemberBoardPermissions($memID, $curGroups, $board = null)
 			}
 
 			// The name of the permission using the format 'permission name' - 'own/any topic/event/etc.'.
-			if (in_array(substr($row['permission'], -4), array('_own', '_any')) && isset($txt['permissionname_' . substr($row['permission'], 0, -4)]))
+			if (in_array(substr($row['permission'], -4), ['_own', '_any']) && isset($txt['permissionname_' . substr($row['permission'], 0, -4)]))
 			{
 				$name = $txt['permissionname_' . substr($row['permission'], 0, -4)] . ' - ' . $txt['permissionname_' . $row['permission']];
 			}
@@ -2232,16 +2228,16 @@ function getMemberBoardPermissions($memID, $curGroups, $board = null)
 			// Create the structure for this permission.
 			if (!isset($board_permission[$row['permission']]))
 			{
-				$board_permission[$row['permission']] = array(
+				$board_permission[$row['permission']] = [
 					'id' => $row['permission'],
-					'groups' => array(
-						'allowed' => array(),
-						'denied' => array()
-					),
+					'groups' => [
+						'allowed' => [],
+						'denied' => []
+					],
 					'name' => $name,
 					'is_denied' => false,
 					'is_global' => empty($board),
-				);
+				];
 			}
 
 			$board_permission[$row['permission']]['groups'][empty($row['add_deny'])
@@ -2279,9 +2275,9 @@ function getMembersIPs($memID)
 				MAX(id_msg)
 			FROM {db_prefix}messages AS m
 			WHERE m.id_member = {int:current_member}',
-			array(
+			[
 				'current_member' => $memID,
-			)
+			]
 		);
 		list ($max_msg_member) = $request->fetch_row();
 		$request->free_result();
@@ -2291,10 +2287,10 @@ function getMembersIPs($memID)
 	}
 
 	// Default to at least the ones we know about.
-	$ips = array(
+	$ips = [
 		$member->member_ip,
 		$member->member_ip2,
-	);
+	];
 
 	// @todo cache this
 	// Get all IP addresses this user has used for his messages.
@@ -2303,11 +2299,11 @@ function getMembersIPs($memID)
 		FROM {db_prefix}messages
 		WHERE id_member = {int:current_member} ' . (isset($min_msg_member) ? '
 			AND id_msg >= {int:min_msg_member} AND id_msg <= {int:max_msg_member}' : ''),
-		array(
+		[
 			'current_member' => $memID,
 			'min_msg_member' => $min_msg_member ?? 0,
 			'max_msg_member' => $max_msg_member ?? 0,
-		)
+		]
 	)->fetch_callback(
 		function ($row) use (&$ips) {
 			$ips[] = $row['poster_ip'];
@@ -2315,23 +2311,23 @@ function getMembersIPs($memID)
 	);
 
 	// Now also get the IP addresses from the error messages.
-	$error_ips = array();
+	$error_ips = [];
 	$db->fetchQuery('
 		SELECT 
 			COUNT(*) AS error_count, ip
 		FROM {db_prefix}log_errors
 		WHERE id_member = {int:current_member}
 		GROUP BY ip',
-		array(
+		[
 			'current_member' => $memID,
-		)
+		]
 	)->fetch_callback(
 		function ($row) use (&$error_ips) {
 			$error_ips[] = $row['ip'];
 		}
 	);
 
-	return array('message_ips' => array_unique($ips), 'error_ips' => array_unique($error_ips));
+	return ['message_ips' => array_unique($ips), 'error_ips' => array_unique($error_ips)];
 }
 
 /**
@@ -2347,8 +2343,8 @@ function getMembersInRange($ips, $memID)
 {
 	$db = database();
 
-	$message_members = array();
-	$members_in_range = array();
+	$message_members = [];
+	$members_in_range = [];
 
 	// Get member ID's which are in messages...
 	$db->fetchQuery('
@@ -2357,10 +2353,10 @@ function getMembersInRange($ips, $memID)
 			INNER JOIN {db_prefix}members AS mem ON (mem.id_member = m.id_member)
 		WHERE m.poster_ip IN ({array_string:ip_list})
 			AND mem.id_member != {int:current_member}',
-		array(
+		[
 			'current_member' => $memID,
 			'ip_list' => $ips,
-		)
+		]
 	)->fetch_callback(
 		function ($row) use (&$message_members) {
 			$message_members[] = $row['id_member'];
@@ -2374,10 +2370,10 @@ function getMembersInRange($ips, $memID)
 		FROM {db_prefix}members
 		WHERE id_member != {int:current_member}
 			AND member_ip IN ({array_string:ip_list})',
-		array(
+		[
 			'current_member' => $memID,
 			'ip_list' => $ips,
-		)
+		]
 	)->fetch_callback(
 		function ($row) use (&$message_members) {
 			$message_members[] = $row['id_member'];

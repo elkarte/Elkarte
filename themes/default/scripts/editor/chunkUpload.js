@@ -7,7 +7,7 @@
  */
 
 /**
- * This file contains javascript associated with the chunked upload functionality
+ * This file contains JavaScript associated with the chunked upload functionality
  */
 class chunkUpload
 {
@@ -39,7 +39,7 @@ class chunkUpload
 	 * - error
 	 * - complete
 	 */
-	on (eType, fn)
+	on(eType, fn)
 	{
 		this._eventEmitter.on(eType, fn);
 

@@ -521,7 +521,6 @@ $txt['gigabyte'] = 'GB';
 
 $txt['more_stats'] = '[More Stats]';
 
-// Use numeric entities in the below three strings.
 $txt['code'] = 'Code';
 $txt['code_select'] = '[Select]';
 $txt['quote_from'] = 'Quote from';
@@ -532,7 +531,7 @@ $txt['follow_ups'] = 'Follow-ups';
 $txt['topic_derived_from'] = 'Topic derived from %1$s';
 $txt['edit'] = 'Edit';
 $txt['quick_edit'] = 'Quick Edit';
-$txt['post_options'] = 'Other Options';
+$txt['post_options'] = 'More Options';
 $txt['quote_expand'] = 'Show Quote';
 
 $txt['set_sticky'] = 'Pin';
@@ -907,7 +906,7 @@ $txt['youtube'] = 'YouTube:';
 $txt['vimeo'] = 'Vimeo:';
 $txt['dailymotion'] = 'Dailymotion:';
 $txt['tiktok'] = 'TikTok:';
-$txt['twitter'] = 'Twitter:';
+$txt['twitter'] = 'X/Twitter:';
 $txt['facebook'] = 'Facebook:';
 $txt['instagram'] = 'Instagram:';
 

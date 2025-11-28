@@ -63,7 +63,7 @@ class Event
 	 * @param int $priority A value that defines the relative priority at which
 	 *            the event should be triggered.
 	 */
-	public function add($event, $priority)
+	public function add($event, $priority): void
 	{
 		$name = is_array($event[1]) ? $event[1][0] : $event[1];
 
@@ -76,7 +76,7 @@ class Event
 	 *
 	 * @return bool
 	 */
-	public function hasEvents()
+	public function hasEvents(): bool
 	{
 		if (!$this->_sorted)
 		{
@@ -86,7 +86,7 @@ class Event
 		return $this->_priority->hasEntities();
 	}
 
-	protected function _doSorting()
+	protected function _doSorting(): void
 	{
 		$this->_priority->sort();
 		$this->_sorted = true;
@@ -97,7 +97,7 @@ class Event
 	 *
 	 * @return array
 	 */
-	public function getEvents()
+	public function getEvents(): array
 	{
 		$return = [];
 

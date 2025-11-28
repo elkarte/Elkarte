@@ -70,14 +70,14 @@ function list_getLanguages()
 		// Load the file to get the character set.
 		require($lang['location']);
 
-		$languages[$lang['filename']] = array(
+		$languages[$lang['filename']] = [
 			'id' => basename($lang['filename'], '.php'),
 			'count' => 0,
 			'char_set' => 'UTF-8',
 			'default' => $language === $lang['name'] || ($language === '' && strtolower($lang['name']) === 'english'),
 			'locale' => $txt['lang_locale'],
-			'name' => Util::ucwords(strtr($lang['name'], array('_' => ' ', '-utf8' => ''))),
-		);
+			'name' => Util::ucwords(strtr($lang['name'], ['_' => ' ', '-utf8' => ''])),
+		];
 	}
 
 	// Work out how many people are using each language.
@@ -86,7 +86,7 @@ function list_getLanguages()
 			lngfile, COUNT(*) AS num_users
 		FROM {db_prefix}members
 		GROUP BY lngfile',
-		array()
+		[]
 	)->fetch_callback(
 		function ($row) use (&$languages, $language) {
 			// Default?
@@ -127,7 +127,7 @@ function list_getLanguagesList()
 
 	// We're going to use this URL.
 	// @todo no we are not, this needs to be changed - again
-	$url = 'http://download.elkarte.net/fetch_language.php?version=' . urlencode(strtr(FORUM_VERSION, array('ElkArte ' => '')));
+	$url = 'http://download.elkarte.net/fetch_language.php?version=' . urlencode(strtr(FORUM_VERSION, ['ElkArte ' => '']));
 
 	// Load the class file and stick it into an array.
 	$language_list = new XmlArray(fetch_web_data($url), true);
@@ -145,7 +145,7 @@ function list_getLanguagesList()
 	{
 		$language_list = $language_list->path('languages[0]');
 		$lang_files = $language_list->set('language');
-		$languages = array();
+		$languages = [];
 		foreach ($lang_files as $file)
 		{
 			// Were we searching?
@@ -154,14 +154,14 @@ function list_getLanguagesList()
 				continue;
 			}
 
-			$languages[] = array(
+			$languages[] = [
 				'id' => $file->fetch('id'),
 				'name' => Util::ucwords($file->fetch('name')),
 				'version' => $file->fetch('version'),
 				'utf8' => $txt['yes'],
 				'description' => $file->fetch('description'),
 				'install_link' => '<a href="' . $scripturl . '?action=admin;area=languages;sa=downloadlang;did=' . $file->fetch('id') . ';' . $context['session_var'] . '=' . $context['session_id'] . '">' . $txt['add_language_elk_install'] . '</a>',
-			);
+			];
 		}
 		if (empty($languages))
 		{
@@ -191,10 +191,10 @@ function findPossiblePackages($lang)
 		FROM {db_prefix}log_packages
 		WHERE package_id LIKE {string:contains_lang}
 			AND install_state = {int:installed}',
-		array(
+		[
 			'contains_lang' => 'elk_' . $lang . '_contribs:elk_' . $lang,
 			'installed' => 1,
-		)
+		]
 	);
 	$file_name = '';
 	if ($request->num_rows() > 0)
@@ -205,7 +205,7 @@ function findPossiblePackages($lang)
 
 	if (!empty($pid))
 	{
-		return array($pid, $file_name);
+		return [$pid, $file_name];
 	}
 
 	return false;

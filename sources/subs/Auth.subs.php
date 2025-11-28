@@ -20,6 +20,7 @@ use ElkArte\Helper\Util;
 use ElkArte\Languages\Txt;
 use ElkArte\Request;
 use ElkArte\User;
+use JetBrains\PhpStorm\NoReturn;
 
 /**
  * Sets the login cookie and session based on the id_member and password passed.
@@ -63,12 +64,12 @@ function setLoginCookie($cookie_length, $id, $password = '')
 		if (isset($array[3]) && $array[3] != $cookie_state)
 		{
 			$cookie_url = url_parts($array[3] & 1 > 0, $array[3] & 2 > 0);
-			elk_setcookie($cookiename, json_encode(array(0, '', 0)), time() - 3600, $cookie_url[1], $cookie_url[0]);
+			elk_setcookie($cookiename, json_encode([0, '', 0]), time() - 3600, $cookie_url[1], $cookie_url[0]);
 		}
 	}
 
 	// Get the data and path to set it on.
-	$data = json_encode(empty($id) ? array(0, '', 0) : array($id, $password, time() + $cookie_length, $cookie_state));
+	$data = json_encode(empty($id) ? [0, '', 0] : [$id, $password, time() + $cookie_length, $cookie_state]);
 	$cookie_url = url_parts(!empty($modSettings['localCookies']), !empty($modSettings['globalCookies']));
 
 	// Set the cookie, $_COOKIE, and session variable.
@@ -89,7 +90,7 @@ function setLoginCookie($cookie_length, $id, $password = '')
 		foreach ($aliases as $alias)
 		{
 			// Fake the $boardurl so we can set a different cookie.
-			$alias = strtr(trim($alias), array('http://' => '', 'https://' => ''));
+			$alias = strtr(trim($alias), ['http://' => '', 'https://' => '']);
 			$boardurl = 'http://' . $alias;
 
 			$cookie_url = url_parts(!empty($modSettings['localCookies']), !empty($modSettings['globalCookies']));
@@ -117,7 +118,7 @@ function setLoginCookie($cookie_length, $id, $password = '')
 		$oldSessionData = $_SESSION;
 
 		// Remove the old session data and file / db entry
-		$_SESSION = array();
+		$_SESSION = [];
 		session_destroy();
 
 		// Recreate and restore the new session.
@@ -186,7 +187,7 @@ function url_parts($local, $global)
 		$parsed_url['host'] = '';
 	}
 
-	return array($parsed_url['host'], $parsed_url['path'] . '/');
+	return [$parsed_url['host'], $parsed_url['path'] . '/'];
 }
 
 /**
@@ -201,7 +202,7 @@ function url_parts($local, $global)
  * @param string $type = 'admin'
  * @package Authorization
  */
-function adminLogin($type = 'admin')
+function adminLogin($type = 'admin'): never
 {
 	global $context, $txt;
 
@@ -209,8 +210,8 @@ function adminLogin($type = 'admin')
 	theme()->getTemplates()->load('Login');
 
 	// Validate what type of session check this is.
-	$types = array();
-	call_integration_hook('integrate_validateSession', array(&$types));
+	$types = [];
+	call_integration_hook('integrate_validateSession', [&$types]);
 	$type = in_array($type, $types) || $type === 'moderate' ? $type : 'admin';
 
 	// They used a wrong password, log it and unset that.
@@ -281,7 +282,7 @@ function adminLogin_outputPostVars($k, $v)
 	if (!is_array($v))
 	{
 		return '
-<input type="hidden" name="' . htmlspecialchars($k, ENT_COMPAT, 'UTF-8') . '" value="' . strtr($v, array('"' => '&quot;', '<' => '&lt;', '>' => '&gt;')) . '" />';
+<input type="hidden" name="' . htmlspecialchars($k, ENT_COMPAT, 'UTF-8') . '" value="' . strtr($v, ['"' => '&quot;', '<' => '&lt;', '>' => '&gt;']) . '" />';
 	}
 	else
 	{
@@ -378,21 +379,21 @@ function findMembers($names, $use_wildcards = false, $buddies_only = false, $max
 		// Make it so standard wildcards will work. (* and ?)
 		if ($use_wildcards)
 		{
-			$names[$i] = strtr($names[$i], array('%' => '\%', '_' => '\_', '*' => '%', '?' => '_', '\'' => '&#039;'));
+			$names[$i] = strtr($names[$i], ['%' => '\%', '_' => '\_', '*' => '%', '?' => '_', '\'' => '&#039;']);
 		}
 		else
 		{
-			$names[$i] = strtr($names[$i], array('\'' => '&#039;'));
+			$names[$i] = strtr($names[$i], ['\'' => '&#039;']);
 		}
 
-		$names[$i] = $db->quote('{string:name}', array('name' => $names[$i]));
+		$names[$i] = $db->quote('{string:name}', ['name' => $names[$i]]);
 	}
 
 	// What are we using to compare?
 	$comparison = $use_wildcards ? 'LIKE' : '=';
 
 	// Nothing found yet.
-	$results = array();
+	$results = [];
 
 	// This ensures you can't search someones email address if you can't see it.
 	$email_condition = allowedTo('moderate_forum') ? '' : '1=0 AND ';
@@ -417,24 +418,24 @@ function findMembers($names, $use_wildcards = false, $buddies_only = false, $max
 			' . ($buddies_only ? 'AND id_member IN ({array_int:buddy_list})' : '') . '
 			AND is_activated IN (1, 11)
 		LIMIT {int:limit}',
-		array(
+		[
 			'buddy_list' => User::$info->buddies,
 			'member_name_search' => $member_name . ' ' . $comparison . ' ' . implode(' OR ' . $member_name . ' ' . $comparison . ' ', $names),
 			'real_name_search' => $real_name . ' ' . $comparison . ' ' . implode(' OR ' . $real_name . ' ' . $comparison . ' ', $names),
 			'email_condition' => $email_condition,
 			'limit' => $max,
 			'recursive' => true,
-		)
+		]
 	)->fetch_callback(
 		function ($row) use (&$results, $scripturl) {
-			$results[$row['id_member']] = array(
+			$results[$row['id_member']] = [
 				'id' => (int) $row['id_member'],
 				'name' => $row['real_name'],
 				'username' => $row['member_name'],
 				'email' => showEmailAddress($row['id_member']) ? $row['email_address'] : '',
 				'href' => $scripturl . '?action=profile;u=' . $row['id_member'],
 				'link' => '<a href="' . $scripturl . '?action=profile;u=' . $row['id_member'] . '">' . $row['real_name'] . '</a>'
-			);
+			];
 		}
 	);
 
@@ -470,7 +471,7 @@ function resetPassword($memID, $username = null)
 
 	// Get some important details.
 	require_once(SUBSDIR . '/Members.subs.php');
-	$result = getBasicMemberData($memID, array('preferences' => true));
+	$result = getBasicMemberData($memID, ['preferences' => true]);
 	$user = $result['member_name'];
 	$email = $result['email_address'];
 	$lngfile = $result['lngfile'];
@@ -506,19 +507,19 @@ function resetPassword($memID, $username = null)
 		}
 
 		// Update the database...
-		updateMemberData($memID, array('member_name' => $user, 'passwd' => $db_hash));
+		updateMemberData($memID, ['member_name' => $user, 'passwd' => $db_hash]);
 	}
 	else
 	{
-		updateMemberData($memID, array('passwd' => $db_hash));
+		updateMemberData($memID, ['passwd' => $db_hash]);
 	}
 
-	call_integration_hook('integrate_reset_pass', array($old_user, $user, $newPassword));
+	call_integration_hook('integrate_reset_pass', [$old_user, $user, $newPassword]);
 
-	$replacements = array(
+	$replacements = [
 		'USERNAME' => $user,
 		'PASSWORD' => $newPassword,
-	);
+	];
 
 	$emaildata = loadEmailTemplate('change_password', $replacements, empty($lngfile) || empty($modSettings['userLanguage']) ? $language : $lngfile);
 
@@ -558,14 +559,14 @@ function validateUsername($memID, $username, $ErrorContext = 'register', $check_
 	}
 
 	// Only these characters are permitted.
-	if (in_array($username, array('_', '|')) || preg_match('~[<>&"\'=\\\\]~', preg_replace('~&#(?:\\d{1,7}|x[0-9a-fA-F]{1,6});~', '', $username)) != 0 || strpos($username, '[code') !== false || strpos($username, '[/code') !== false)
+	if (in_array($username, ['_', '|']) || preg_match('~[<>&"\'=\\\\]~', preg_replace('~&#(?:\\d{1,7}|x[0-9a-fA-F]{1,6});~', '', $username)) != 0 || strpos($username, '[code') !== false || strpos($username, '[/code') !== false)
 	{
 		$errors->addError('error_invalid_characters_username');
 	}
 
 	if (stripos($username, $txt['guest_title']) !== false)
 	{
-		$errors->addError(array('username_reserved', array($txt['guest_title'])), 1);
+		$errors->addError(['username_reserved', [$txt['guest_title']]], 1);
 	}
 
 	if ($check_reserved_name)
@@ -573,7 +574,7 @@ function validateUsername($memID, $username, $ErrorContext = 'register', $check_
 		require_once(SUBSDIR . '/Members.subs.php');
 		if (isReservedName($username, $memID, false, $fatal))
 		{
-			$errors->addError(array('name_in_use', array(htmlspecialchars($username, ENT_COMPAT, 'UTF-8'))));
+			$errors->addError(['name_in_use', [htmlspecialchars($username, ENT_COMPAT, 'UTF-8')]]);
 		}
 	}
 }
@@ -594,7 +595,7 @@ function validateUsername($memID, $username, $ErrorContext = 'register', $check_
  * @return string an error identifier if the password is invalid
  * @package Authorization
  */
-function validatePassword($password, $username, $restrict_in = array())
+function validatePassword($password, $username, $restrict_in = [])
 {
 	global $modSettings, $txt;
 
@@ -604,6 +605,13 @@ function validatePassword($password, $username, $restrict_in = array())
 		Txt::load('Errors');
 		$txt['profile_error_password_short'] = sprintf($txt['profile_error_password_short'], empty($modSettings['password_strength']) ? 4 : 8);
 
+		return 'short';
+	}
+
+	if (Util::strlen($password) > 64)
+	{
+		Txt::load('Errors');
+		$txt['profile_error_password_long'] = sprintf($txt['profile_error_password_long'], 64);
 		return 'short';
 	}
 
@@ -618,7 +626,8 @@ function validatePassword($password, $username, $restrict_in = array())
 	{
 		return 'restricted_words';
 	}
-	elseif (Util::strpos($password, $username) !== false)
+
+	if (Util::strpos($password, $username) !== false)
 	{
 		return 'restricted_words';
 	}
@@ -696,9 +705,9 @@ function rebuildModCache()
 				id_group
 			FROM {db_prefix}group_moderators
 			WHERE id_member = {int:current_member}',
-			array(
+			[
 				'current_member' => User::$info->id,
-			)
+			]
 		)->fetch_callback(
 			function ($row) {
 				return $row['id_group'];
@@ -719,7 +728,7 @@ function rebuildModCache()
 	}
 
 	// What boards are they the moderator of?
-	$boards_mod = array();
+	$boards_mod = [];
 	if (User::$info->is_guest === false)
 	{
 		require_once(SUBSDIR . '/Boards.subs.php');
@@ -728,7 +737,7 @@ function rebuildModCache()
 
 	$mod_query = empty($boards_mod) ? '0=1' : 'b.id_board IN (' . implode(',', $boards_mod) . ')';
 
-	$_SESSION['mc'] = array(
+	$_SESSION['mc'] = [
 		'time' => time(),
 		// This looks a bit funny but protects against the login redirect.
 		'id' => User::$info->id && User::$info->name ? User::$info->id : 0,
@@ -738,7 +747,7 @@ function rebuildModCache()
 		'ap' => boardsAllowedTo('approve_posts'),
 		'mb' => $boards_mod,
 		'mq' => $mod_query,
-	);
+	];
 	call_integration_hook('integrate_mod_cache');
 
 	User::$info->mod_cache = $_SESSION['mc'];
@@ -786,20 +795,20 @@ function elk_setcookie($name, $value = '', $expire = 0, $path = '', $domain = ''
 	$samesite = (!$secure && $samesite === 'None') ? 'Lax' : $samesite;
 
 	// Intercept cookie?
-	call_integration_hook('integrate_cookie', array($name, $value, $expire, $path, $domain, $secure, $httponly, $samesite));
+	call_integration_hook('integrate_cookie', [$name, $value, $expire, $path, $domain, $secure, $httponly, $samesite]);
 
 	if (PHP_VERSION_ID < 70300)
 	{
 		return setcookie($name, $value, $expire, $path, $domain, $secure, $httponly);
 	}
 
-	return setcookie($name, $value, array(
+	return setcookie($name, $value, [
 		'expires' => $expire,
 		'path' => $path,
 		'domain' => $domain,
 		'secure' => $secure,
 		'httponly' => $httponly,
-		'samesite' => $samesite));
+		'samesite' => $samesite]);
 }
 
 /**
@@ -816,7 +825,7 @@ function isFirstLogin($id_member)
 {
 	// First login?
 	require_once(SUBSDIR . '/Members.subs.php');
-	$member = getBasicMemberData($id_member, array('moderation' => true));
+	$member = getBasicMemberData($id_member, ['moderation' => true]);
 
 	return !empty($member) && $member['last_login'] == 0;
 }
@@ -845,7 +854,7 @@ function findUser($where, $where_params, $fatal = true)
 		FROM {db_prefix}members
 		WHERE ' . $where . '
 		LIMIT 1',
-		array_merge($where_params, array())
+		array_merge($where_params, [])
 	);
 
 	// Maybe email?
@@ -860,7 +869,7 @@ function findUser($where, $where_params, $fatal = true)
 			FROM {db_prefix}members
 			WHERE email_address = {string:email_address}
 			LIMIT 1',
-			array_merge($where_params, array())
+			array_merge($where_params, [])
 		);
 		if ($request->num_rows() === 0)
 		{
@@ -902,10 +911,10 @@ function userByEmail($email, $username = null)
 		WHERE email_address = {string:email_address}' . ($username === null ? '' : '
 			OR email_address = {string:username}') . '
 		LIMIT 1',
-		array(
+		[
 			'email_address' => $email,
 			'username' => $username,
-		)
+		]
 	)->fetch_callback(
 		function ($row) use (&$return) {
 			$return = (int) $row['id_member'];
@@ -952,9 +961,9 @@ function loadExistingMember($name, $is_id = false)
 			FROM {db_prefix}members
 			WHERE id_member = {int:id_member}
 			LIMIT 1',
-			array(
+			[
 				'id_member' => (int) $name,
-			)
+			]
 		);
 	}
 	else
@@ -967,9 +976,9 @@ function loadExistingMember($name, $is_id = false)
 			FROM {db_prefix}members
 			WHERE {column_case_insensitive:member_name} = {string_case_insensitive:user_name}
 			LIMIT 1',
-			array(
+			[
 				'user_name' => $name,
-			)
+			]
 		);
 		// Didn't work. Try it as an email address.
 		if ($request->num_rows() === 0 && strpos($name, '@') !== false)
@@ -983,9 +992,9 @@ function loadExistingMember($name, $is_id = false)
 				FROM {db_prefix}members
 				WHERE email_address = {string:user_name}
 				LIMIT 1',
-				array(
+				[
 					'user_name' => $name,
-				)
+				]
 			);
 		}
 	}

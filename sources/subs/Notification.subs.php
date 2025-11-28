@@ -796,7 +796,7 @@ function fetchTopicNotifications($user_id, $topics, $type, $members_only, $regul
  *
  * @param int $user_id
  * @param array $data
- * @param boolean $board if true updates a boards log notify, else topic
+ * @param bool $board if true updates a board log notify, else topic
  * @return void
  */
 function updateLogNotify($user_id, $data, $board = false)

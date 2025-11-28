@@ -48,7 +48,7 @@ class Censor
 	 * @param array $proper
 	 * @param array $options
 	 */
-	public function __construct(array $vulgar, array $proper, array $options = array())
+	public function __construct(array $vulgar, array $proper, array $options = [])
 	{
 		if (count($vulgar) !== count($proper))
 		{
@@ -64,7 +64,7 @@ class Censor
 	 *
 	 * @param array $options
 	 */
-	protected function setOptions(array $options)
+	protected function setOptions(array $options): void
 	{
 		$this->options = array_merge($this->options, $options);
 	}
@@ -75,7 +75,7 @@ class Censor
 	 * @param array $vulgar
 	 * @param array $proper
 	 */
-	protected function setVulgarProper(array $vulgar, array $proper)
+	protected function setVulgarProper(array $vulgar, array $proper): void
 	{
 		// Quote them for use in regular expressions.
 		if ($this->options[self::WHOLE_WORD])
@@ -96,9 +96,9 @@ class Censor
 	 *
 	 * @param string $text
 	 * @param bool $force
-	 * @return string
+	 * @return string|null
 	 */
-	public function censor($text, $force = false)
+	public function censor($text, $force = false): ?string
 	{
 		if (empty($text) || empty($this->vulgar) || (!$force && !$this->doCensor()))
 		{
@@ -120,7 +120,7 @@ class Censor
 	 * @todo replace with inline checking at some point
 	 *
 	 */
-	public function doCensor()
+	public function doCensor(): bool
 	{
 		global $options, $modSettings;
 

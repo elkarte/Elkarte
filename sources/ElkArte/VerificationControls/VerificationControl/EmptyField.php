@@ -128,7 +128,7 @@ class EmptyField implements ControlInterface
 	/**
 	 * Test the field, easy, it is on, it is set, and it is empty
 	 */
-	private function _verifyField($sessionVal)
+	private function _verifyField($sessionVal): bool
 	{
 		return $this->_empty_field && !empty($sessionVal['empty_field']) && empty($_REQUEST[$sessionVal['empty_field']]);
 	}

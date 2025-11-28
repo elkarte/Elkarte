@@ -19,7 +19,7 @@ namespace ElkArte\Database;
 abstract class AbstractSearch implements SearchInterface
 {
 	/** @var string[] The supported search methods */
-	protected $_supported_types = array();
+	protected $_supported_types = [];
 
 	/** @var bool The way to skip a database error */
 	protected $_skip_error = false;
@@ -43,7 +43,7 @@ abstract class AbstractSearch implements SearchInterface
 	/**
 	 * {@inheritDoc}
 	 */
-	public function search_query($identifier, $db_string, $db_values = array())
+	public function search_query($identifier, $db_string, $db_values = [])
 	{
 		if ($this->_skip_error)
 		{
@@ -91,9 +91,9 @@ abstract class AbstractSearch implements SearchInterface
 					'default' => 0
 				],
 			],
-			array(
-				array('name' => 'id_word', 'columns' => array('id_word', 'id_msg'), 'type' => 'primary')
-			)
+			[
+				['name' => 'id_word', 'columns' => ['id_word', 'id_msg'], 'type' => 'primary']
+			]
 		);
 	}
 
@@ -102,9 +102,9 @@ abstract class AbstractSearch implements SearchInterface
 	 */
 	public function createTemporaryTable($name, $columns, $indexes)
 	{
-		return db_table()->create_table($name, $columns, $indexes, array(
+		return db_table()->create_table($name, $columns, $indexes, [
 			'temporary' => true,
 			'if_exists' => 'force_drop'
-		));
+		]);
 	}
 }

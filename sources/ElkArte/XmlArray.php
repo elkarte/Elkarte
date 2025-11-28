@@ -68,7 +68,7 @@ class XmlArray
 		}
 
 		// Remove any xml declaration or doctype, and parse out comments and CDATA.
-		$data = preg_replace('/<!--.*?-->/s', '', $this->_to_cdata(preg_replace(['/^<\?xml.+?\?' . '>/is', '/<!DOCTYPE[^>]+?' . '>/s'], '', $data)));
+		$data = preg_replace('/<!--.*?-->/s', '', $this->_to_cdata(preg_replace(['/^<\?xml.+?\?' . '>/is', '/<!DOCTYPE[^>]+?' . '>/'], '', $data)));
 
 		// Now parse the xml!
 		$this->array = $this->_parse($data);
@@ -81,7 +81,7 @@ class XmlArray
 	 *
 	 * @return string
 	 */
-	protected function _to_cdata($data)
+	protected function _to_cdata($data): string
 	{
 		$inCdata = false;
 		$inComment = false;
@@ -135,10 +135,10 @@ class XmlArray
 	 *
 	 * @return array
 	 */
-	protected function _parse($data)
+	protected function _parse($data): array
 	{
 		// Start with an 'empty' array with no data.
-		$current = array();
+		$current = [];
 
 		// Loop until we're out of data.
 		while ($data !== '')
@@ -162,10 +162,10 @@ class XmlArray
 
 					if ($text_value !== '')
 					{
-						$current[] = array(
+						$current[] = [
 							'name' => '!',
 							'value' => $text_value
-						);
+						];
 					}
 				}
 				// If the < isn't immediately next to the current position... more data.
@@ -176,10 +176,10 @@ class XmlArray
 
 					if ($text_value !== '')
 					{
-						$current[] = array(
+						$current[] = [
 							'name' => '!',
 							'value' => $text_value
-						);
+						];
 					}
 				}
 				// If we're looking at a </something> with no start, kill it.
@@ -193,10 +193,10 @@ class XmlArray
 
 						if ($text_value !== '')
 						{
-							$current[] = array(
+							$current[] = [
 								'name' => '!',
 								'value' => $text_value
-							);
+							];
 						}
 					}
 					else
@@ -206,10 +206,10 @@ class XmlArray
 
 						if ($text_value !== '')
 						{
-							$current[] = array(
+							$current[] = [
 								'name' => '!',
 								'value' => $text_value
-							);
+							];
 						}
 					}
 				}
@@ -277,10 +277,10 @@ class XmlArray
 						$text_value = $this->_from_cdata($inner_match);
 						if (trim($text_value) !== '')
 						{
-							$el[] = array(
+							$el[] = [
 								'name' => '!',
 								'value' => $text_value
-							);
+							];
 						}
 					}
 				}
@@ -311,7 +311,7 @@ class XmlArray
 	 *
 	 * @return string
 	 */
-	protected function _from_cdata($data)
+	protected function _from_cdata($data): string
 	{
 		// Get the HTML translation table and reverse it
 		$trans_tbl = array_flip(get_html_translation_table(HTML_ENTITIES, ENT_QUOTES));
@@ -330,7 +330,7 @@ class XmlArray
 	 *
 	 * @return string
 	 */
-	protected function _from_cdata_callback($match)
+	protected function _from_cdata_callback($match): string
 	{
 		return chr($match[1]);
 	}
@@ -562,7 +562,7 @@ class XmlArray
 	 *
 	 * @return string
 	 */
-	protected function _xml($array, $indent)
+	protected function _xml($array, $indent): string
 	{
 		$indentation = $indent !== null ? '
 ' . str_repeat('	', $indent) : '';
@@ -630,7 +630,7 @@ class XmlArray
 	 *
 	 * @return string
 	 */
-	protected function _fetch($array)
+	protected function _fetch($array): string
 	{
 		// Don't return anything if this is just a string.
 		if (is_string($array))
@@ -672,7 +672,7 @@ class XmlArray
 	 * @param string $path - the path to the element to get.
 	 * @return bool
 	 */
-	public function exists($path)
+	public function exists($path): bool
 	{
 		// Split up the path.
 		$path = explode('/', $path);
@@ -717,7 +717,7 @@ class XmlArray
 	 * @param string $path - the path to search for.
 	 * @return int the number of elements the path matches.
 	 */
-	public function count($path)
+	public function count($path): int
 	{
 		// Get the element, always returning a full set.
 		$temp = $this->path($path, true);
@@ -747,10 +747,10 @@ class XmlArray
 	 * @param string $path - the path to search for.
 	 * @return array an array of \ElkArte\XmlArray objects
 	 */
-	public function set($path)
+	public function set($path): array
 	{
 		// None as yet, just get the path.
-		$array = array();
+		$array = [];
 		$xml = $this->path($path, true);
 
 		foreach ($xml->array as $val)
@@ -848,7 +848,7 @@ class XmlArray
 	 */
 	protected function _array($array)
 	{
-		$return = array();
+		$return = [];
 		$text = '';
 		foreach ($array as $value)
 		{

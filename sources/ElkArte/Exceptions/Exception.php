@@ -20,15 +20,13 @@ use ElkArte\Languages\Txt;
 use ElkArte\User;
 
 /**
- * Class ElkArte\Exception
+ * General exception handler aimed at extending the default functionality of PHP exceptions.
+ * This class introduces additional features to format and log error messages, load language files,
+ * handle custom error messages, and integrate with the ElkArte system.
  */
 class Exception extends \Exception
 {
-	/**
-	 * Values to use in vsprintf.
-	 *
-	 * @var string[]
-	 */
+	/** @var string[] Values to use in vsprintf. */
 	protected $sprintf = [];
 
 	/**
@@ -59,7 +57,7 @@ class Exception extends \Exception
 	 *
 	 * @return string The index or the message.
 	 */
-	protected function loadMessage($message)
+	protected function loadMessage($message): string
 	{
 		global $txt;
 
@@ -103,7 +101,7 @@ class Exception extends \Exception
 	 *
 	 * @return array
 	 */
-	protected function parseMessage($message)
+	protected function parseMessage($message): array
 	{
 		// Load message with language support
 		if (is_array($message))
@@ -128,7 +126,7 @@ class Exception extends \Exception
 	 * @param string $msg
 	 * @param string $lang
 	 */
-	protected function logMessage($msg, $lang)
+	protected function logMessage($msg, $lang): void
 	{
 		global $language, $txt;
 
@@ -149,9 +147,9 @@ class Exception extends \Exception
 	/**
 	 * Calls fatal_lang_error and ends the execution of the script.
 	 *
-	 * @DEPRECATED
+	 * @deprecated since 2.0, use Errors::instance()->fatal_lang_error directly
 	 */
-	public function fatalLangError()
+	public function fatalLangError(): void
 	{
 		Errors::instance()->fatal_lang_error($this->message, $this->log, $this->sprintf);
 	}

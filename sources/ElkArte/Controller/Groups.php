@@ -77,11 +77,11 @@ class Groups extends AbstractController
 		global $context;
 
 		// Little short on the list here
-		$subActions = array(
-			'list' => array($this, 'action_list', 'permission' => 'view_mlist'),
-			'members' => array($this, 'action_members', 'permission' => 'view_mlist'),
-			'requests' => array($this, 'action_requests'),
-		);
+		$subActions = [
+			'list' => [$this, 'action_list', 'permission' => 'view_mlist'],
+			'members' => [$this, 'action_members', 'permission' => 'view_mlist'],
+			'requests' => [$this, 'action_requests'],
+		];
 
 		// I don't think we know what to do... throw dies?
 		$action = new Action('groups');
@@ -93,7 +93,7 @@ class Groups extends AbstractController
 	/**
 	 * This very simply lists the groups, nothing snazzy.
 	 */
-	public function action_list()
+	public function action_list(): void
 	{
 		global $txt, $context;
 
@@ -101,9 +101,9 @@ class Groups extends AbstractController
 		$current_area = $context['admin_menu_name'] ?? ($context['moderation_menu_name'] ?? '');
 		if (!empty($current_area))
 		{
-			$context[$current_area]['tab_data'] = array(
+			$context[$current_area]['tab_data'] = [
 				'title' => $txt['mc_group_requests'],
-			);
+			];
 		}
 
 		if (isset($context['admin_menu_name']))
@@ -123,26 +123,26 @@ class Groups extends AbstractController
 		}
 
 		// Use the standard templates for showing this.
-		$listOptions = array(
+		$listOptions = [
 			'id' => 'group_lists',
 			'base_href' => getUrl($base_type, $base_params),
 			'default_sort_col' => 'group',
-			'get_items' => array(
+			'get_items' => [
 				'file' => SUBSDIR . '/Membergroups.subs.php',
 				'function' => 'list_getMembergroups',
-				'params' => array(
+				'params' => [
 					'regular',
 					$this->user->id,
 					allowedTo('manage_membergroups'),
 					allowedTo('admin_forum'),
-				),
-			),
-			'columns' => array(
-				'group' => array(
-					'header' => array(
+				],
+			],
+			'columns' => [
+				'group' => [
+					'header' => [
 						'value' => $txt['name'],
-					),
-					'data' => array(
+					],
+					'data' => [
 						'function' => static function ($rowData) use ($base_type, $base_params) {
           // Since the moderator group has no explicit members, no link is needed.
           if ($rowData['id_group'] == 3)
@@ -165,17 +165,17 @@ class Groups extends AbstractController
    							}
           return $group_name;
       },
-					),
-					'sort' => array(
+					],
+					'sort' => [
 						'default' => 'CASE WHEN mg.id_group < 4 THEN mg.id_group ELSE 4 END, mg.group_name',
 						'reverse' => 'CASE WHEN mg.id_group < 4 THEN mg.id_group ELSE 4 END, mg.group_name DESC',
-					),
-				),
-				'icons' => array(
-					'header' => array(
+					],
+				],
+				'icons' => [
+					'header' => [
 						'value' => $txt['membergroups_icons'],
-					),
-					'data' => array(
+					],
+					'data' => [
 						'function' => static function ($rowData) {
           global $settings;
           if (empty($rowData['icons'][0])) {
@@ -186,42 +186,42 @@ class Groups extends AbstractController
           }
           return str_repeat('<img src="' . $settings['images_url'] . '/group_icons/' . $rowData['icons'][1] . '" alt="*" />', $rowData['icons'][0]);
       },
-					),
-					'sort' => array(
+					],
+					'sort' => [
 						'default' => 'mg.icons',
 						'reverse' => 'mg.icons DESC',
-					)
-				),
-				'moderators' => array(
-					'header' => array(
+					]
+				],
+				'moderators' => [
+					'header' => [
 						'value' => $txt['moderators'],
-					),
-					'data' => array(
+					],
+					'data' => [
 						'function' => static function ($group) {
           global $txt;
           return empty($group['moderators']) ? '<em>' . $txt['membergroups_new_copy_none'] . '</em>' : implode(', ', $group['moderators']);
       },
-					),
-				),
-				'members' => array(
-					'header' => array(
+					],
+				],
+				'members' => [
+					'header' => [
 						'value' => $txt['membergroups_members_top'],
-					),
-					'data' => array(
+					],
+					'data' => [
 						'function' => static function ($rowData) {
           global $txt;
           // No explicit members for the moderator group.
           return $rowData['id_group'] == 3 ? $txt['membergroups_guests_na'] : comma_format($rowData['num_members']);
       },
 						'class' => 'centertext',
-					),
-					'sort' => array(
+					],
+					'sort' => [
 						'default' => 'CASE WHEN mg.id_group < 4 THEN mg.id_group ELSE 4 END, 1',
 						'reverse' => 'CASE WHEN mg.id_group < 4 THEN mg.id_group ELSE 4 END, 1 DESC',
-					),
-				),
-			),
-		);
+					],
+				],
+			],
+		];
 
 		// Create the request list.
 		createList($listOptions);
@@ -245,7 +245,7 @@ class Groups extends AbstractController
 	 *
 	 * @uses ManageMembergroups template, group_members sub template.
 	 */
-	public function action_members()
+	public function action_members(): void
 	{
 		global $txt, $context, $modSettings, $settings;
 
@@ -259,7 +259,7 @@ class Groups extends AbstractController
 		$context['group'] = membergroupById($current_group, true, true);
 
 		// No browsing of guests, membergroup 0 or moderators or non-existing groups.
-		if ($context['group'] === false || in_array($current_group, array(-1, 0, 3)))
+		if ($context['group'] === false || in_array($current_group, [-1, 0, 3]))
 		{
 			throw new Exception('membergroup_does_not_exist', false);
 		}
@@ -285,14 +285,14 @@ class Groups extends AbstractController
 		// @todo: use createList
 
 		// Load all the group moderators, for fun.
-		$context['group']['moderators'] = array();
+		$context['group']['moderators'] = [];
 		$moderators = getGroupModerators($current_group);
 		foreach ($moderators as $id_member => $name)
 		{
-			$context['group']['moderators'][] = array(
+			$context['group']['moderators'][] = [
 				'id' => $id_member,
 				'name' => $name
-			);
+			];
    if ($this->user->id != $id_member) {
        continue;
    }
@@ -341,11 +341,11 @@ class Groups extends AbstractController
 			checkSession();
 			validateToken('mod-mgm');
 
-			$member_query = array(array('and' => 'not_in_group'));
-			$member_parameters = array('not_in_group' => $current_group);
+			$member_query = [['and' => 'not_in_group']];
+			$member_parameters = ['not_in_group' => $current_group];
 
 			// Get all the members to be added... taking into account names can be quoted ;)
-			$toAdd = strtr(Util::htmlspecialchars($this->_req->post->toAdd, ENT_QUOTES), array('&quot;' => '"'));
+			$toAdd = strtr(Util::htmlspecialchars($this->_req->post->toAdd, ENT_QUOTES), ['&quot;' => '"']);
 			preg_match_all('~"([^"]+)"~', $toAdd, $matches);
 			$member_names = array_unique(array_merge($matches[1], explode(',', preg_replace('~"[^"]+"~', '', $toAdd))));
 
@@ -359,7 +359,7 @@ class Groups extends AbstractController
 			}
 
 			// Any members passed by ID?
-			$member_ids = array();
+			$member_ids = [];
 			if (!empty($this->_req->post->member_add))
 			{
 				foreach ($this->_req->post->member_add as $id)
@@ -374,14 +374,14 @@ class Groups extends AbstractController
 			// Construct the query elements, first for adds by name
 			if (!empty($member_ids))
 			{
-				$member_query[] = array('or' => 'member_ids');
+				$member_query[] = ['or' => 'member_ids'];
 				$member_parameters['member_ids'] = $member_ids;
 			}
 
 			// And then adds by ID
 			if (!empty($member_names))
 			{
-				$member_query[] = array('or' => 'member_names');
+				$member_query[] = ['or' => 'member_names'];
 				$member_parameters['member_names'] = $member_names;
 			}
 
@@ -396,13 +396,13 @@ class Groups extends AbstractController
 		}
 
 		// Sort out the sorting!
-		$sort_methods = array(
+		$sort_methods = [
 			'name' => 'real_name',
 			'email' => allowedTo('moderate_forum') ? 'email_address' : ' ' . (isset($this->_req->query->desc) ? 'DESC' : 'ASC') . ', email_address',
 			'active' => 'last_login',
 			'registered' => 'date_registered',
 			'posts' => 'posts',
-		);
+		];
 
 		// They didn't pick one, or tried a wrong one, so default to by name..
 		if (!isset($this->_req->query->sort, $sort_methods[$this->_req->query->sort]))
@@ -428,7 +428,7 @@ class Groups extends AbstractController
 		}
 
 		// Count members of the group.
-		$context['total_members'] = countMembersBy($where, array($where => $current_group));
+		$context['total_members'] = countMembersBy($where, [$where => $current_group]);
 		$context['total_members'] = comma_format($context['total_members']);
 
 		// Create the page index.
@@ -447,7 +447,7 @@ class Groups extends AbstractController
 				$last_online = '<em title="' . $txt['not_activated'] . '">' . $last_online . '</em>';
 			}
 
-			$context['members'][$id] = array(
+			$context['members'][$id] = [
 				'id' => $row['id_member'],
 				'name' => '<a href="' . getUrl('profile', ['action' => 'profile', 'u' => $row['id_member'], 'name' => $row['real_name']]) . '">' . $row['real_name'] . '</a>',
 				'email' => $row['email_address'],
@@ -457,7 +457,7 @@ class Groups extends AbstractController
 				'last_online' => $last_online,
 				'posts' => comma_format($row['posts']),
 				'is_activated' => $row['is_activated'] % 10 === 1,
-			);
+			];
 		}
 
 		if (!empty($context['group']['assignable']))
@@ -474,7 +474,7 @@ class Groups extends AbstractController
 	/**
 	 * Show and manage all group requests.
 	 */
-	public function action_requests()
+	public function action_requests(): void
 	{
 		global $txt, $context, $modSettings;
 
@@ -493,7 +493,7 @@ class Groups extends AbstractController
 
 		// Normally, we act normally...
 		$where = $this->user->mod_cache['gq'] == '1=1' || $this->user->mod_cache['gq'] == '0=1' ? $this->user->mod_cache['gq'] : 'lgr.' . $this->user->mod_cache['gq'];
-		$where_parameters = array();
+		$where_parameters = [];
 
 		// We've submitted?
 		if (isset($this->_req->post->{$context['session_var']})
@@ -535,7 +535,7 @@ class Groups extends AbstractController
 				deleteGroupRequests($this->_req->post->groupr);
 
 				// Ensure everyone who is online gets their changes right away.
-				updateSettings(array('settings_updated' => time()));
+				updateSettings(['settings_updated' => time()]);
 
 				if (!empty($concerned['email_details']))
 				{
@@ -561,10 +561,10 @@ class Groups extends AbstractController
 
 						foreach ($concerned['email_details'] as $email)
 						{
-							$replacements = array(
+							$replacements = [
 								'USERNAME' => $email['member_name'],
 								'GROUPNAME' => $email['group_name'],
-							);
+							];
 
 							$emaildata = loadEmailTemplate('mc_group_approve', $replacements, $email['language']);
 
@@ -577,12 +577,12 @@ class Groups extends AbstractController
 						// Same as for approving, kind of.
 						foreach ($concerned['email_details'] as $email)
 						{
-							$custom_reason = isset($this->_req->post->groupreason) && isset($this->_req->post->groupreason[$email['rid']]) ? $this->_req->post->groupreason[$email['rid']] : '';
+							$custom_reason = $this->_req->post->groupreason[$email['rid']] ?? '';
 
-							$replacements = array(
+							$replacements = [
 								'USERNAME' => $email['member_name'],
 								'GROUPNAME' => $email['group_name'],
-							);
+							];
 
 							if (!empty($custom_reason))
 							{
@@ -605,96 +605,96 @@ class Groups extends AbstractController
 		require_once(SUBSDIR . '/Membergroups.subs.php');
 
 		// This is all the information required for a group listing.
-		$listOptions = array(
+		$listOptions = [
 			'id' => 'group_request_list',
 			'width' => '100%',
 			'items_per_page' => $modSettings['defaultMaxMessages'],
 			'no_items_label' => $txt['mc_groupr_none_found'],
 			'base_href' => getUrl('group', ['action' => 'groups', 'sa' => 'requests']),
 			'default_sort_col' => 'member',
-			'get_items' => array(
+			'get_items' => [
 				'function' => 'list_getGroupRequests',
-				'params' => array(
+				'params' => [
 					$where,
 					$where_parameters,
-				),
-			),
-			'get_count' => array(
+				],
+			],
+			'get_count' => [
 				'function' => 'list_getGroupRequestCount',
-				'params' => array(
+				'params' => [
 					$where,
 					$where_parameters,
-				),
-			),
-			'columns' => array(
-				'member' => array(
-					'header' => array(
+				],
+			],
+			'columns' => [
+				'member' => [
+					'header' => [
 						'value' => $txt['mc_groupr_member'],
-					),
-					'data' => array(
+					],
+					'data' => [
 						'db' => 'member_link',
-					),
-					'sort' => array(
+					],
+					'sort' => [
 						'default' => 'mem.member_name',
 						'reverse' => 'mem.member_name DESC',
-					),
-				),
-				'group' => array(
-					'header' => array(
+					],
+				],
+				'group' => [
+					'header' => [
 						'value' => $txt['mc_groupr_group'],
-					),
-					'data' => array(
+					],
+					'data' => [
 						'db' => 'group_link',
-					),
-					'sort' => array(
+					],
+					'sort' => [
 						'default' => 'mg.group_name',
 						'reverse' => 'mg.group_name DESC',
-					),
-				),
-				'reason' => array(
-					'header' => array(
+					],
+				],
+				'reason' => [
+					'header' => [
 						'value' => $txt['mc_groupr_reason'],
-					),
-					'data' => array(
+					],
+					'data' => [
 						'db' => 'reason',
-					),
-				),
-				'date' => array(
-					'header' => array(
+					],
+				],
+				'date' => [
+					'header' => [
 						'value' => $txt['date'],
 						'style' => 'width: 18%; white-space:nowrap;',
-					),
-					'data' => array(
+					],
+					'data' => [
 						'db' => 'time_submitted',
-					),
-				),
-				'action' => array(
-					'header' => array(
+					],
+				],
+				'action' => [
+					'header' => [
 						'value' => '<input type="checkbox" class="input_check" onclick="invertAll(this, this.form);" />',
 						'style' => 'width: 4%;text-align: center;',
-					),
-					'data' => array(
-						'sprintf' => array(
+					],
+					'data' => [
+						'sprintf' => [
 							'format' => '<input type="checkbox" name="groupr[]" value="%1$d" class="input_check" />',
-							'params' => array(
+							'params' => [
 								'id' => false,
-							),
-						),
+							],
+						],
 						'class' => 'centertext',
-					),
-				),
-			),
-			'form' => array(
+					],
+				],
+			],
+			'form' => [
 				'href' => getUrl('group', ['action' => 'groups', 'sa' => 'requests']),
 				'include_sort' => true,
 				'include_start' => true,
-				'hidden_fields' => array(
+				'hidden_fields' => [
 					$context['session_var'] => $context['session_id'],
-				),
+				],
 				'token' => 'mod-gr',
-			),
-			'additional_rows' => array(
-				array(
+			],
+			'additional_rows' => [
+				[
 					'position' => 'bottom_of_list',
 					'value' => '
 						<select name="req_action" onchange="if (this.value != 0 &amp;&amp; (this.value === \'reason\' || confirm(\'' . $txt['mc_groupr_warning'] . '\'))) this.form.submit();">
@@ -706,9 +706,9 @@ class Groups extends AbstractController
 						</select>
 						<input type="submit" name="go" value="' . $txt['go'] . '" onclick="var sel = document.getElementById(\'req_action\'); if (sel.value != 0 &amp;&amp; sel.value !== \'reason\' &amp;&amp; !confirm(\'' . $txt['mc_groupr_warning'] . '\')) return false;" />',
 					'class' => 'floatright',
-				),
-			),
-		);
+				],
+			],
+		];
 
 		// Create the request list.
 		createToken('mod-gr');

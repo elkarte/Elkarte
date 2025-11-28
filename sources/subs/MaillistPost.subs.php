@@ -13,6 +13,9 @@
  */
 
 use BBC\PreparseCode;
+use ElkArte\Attachments\AttachmentsDirectory;
+use ElkArte\Attachments\TemporaryAttachment;
+use ElkArte\Attachments\TemporaryAttachmentsList;
 use ElkArte\Cache\Cache;
 use ElkArte\Converters\Html2BBC;
 use ElkArte\Converters\Html2Md;
@@ -100,7 +103,7 @@ function pbe_email_to_bbc($text, $html)
 
 /**
  * Runs the ACP email parsers
- *   - returns cut email or original if the cut would result in a blank message
+ *   - returns cut email or original if the cut results in a blank message
  *
  * @param string $text
  * @return string

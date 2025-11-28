@@ -148,7 +148,7 @@ class Unread extends AbstractController
 	/**
 	 * Validates the server can perform the required operation given its current loading
 	 */
-	private function _checkServerLoad()
+	private function _checkServerLoad(): void
 	{
 		global $context, $modSettings;
 		// Check for any server load issues
@@ -175,13 +175,13 @@ class Unread extends AbstractController
 	/**
 	 * Finds out the boards the user want.
 	 */
-	private function _wanted_boards()
+	private function _wanted_boards(): void
 	{
 		global $board, $context;
 
 		if (isset($this->_req->query->children) && (!empty($board) || !empty($this->_req->query->boards)))
 		{
-			$this->_boards = array();
+			$this->_boards = [];
 
 			if (!empty($this->_req->query->boards))
 			{
@@ -201,7 +201,7 @@ class Unread extends AbstractController
 		}
 		elseif (!empty($board))
 		{
-			$this->_boards = array($board);
+			$this->_boards = [$board];
 			$context['querystring_board_limits'] = ';board=' . $board . '.%1$d';
 		}
 		elseif (!empty($this->_req->query->boards))
@@ -216,7 +216,7 @@ class Unread extends AbstractController
 		{
 			$categories = array_map('intval', explode(',', $this->_req->query->c));
 
-			$this->_boards = array_keys(boardsPosts(array(), $categories, $this->_action_unread));
+			$this->_boards = array_keys(boardsPosts([], $categories, $this->_action_unread));
 
 			$context['querystring_board_limits'] = ';c=' . $this->_req->query->c . ';start=%1$d';
 
@@ -244,18 +244,18 @@ class Unread extends AbstractController
 	/**
 	 * Set up the array for the sorting dropdown.
 	 */
-	private function _sorting_conditions()
+	private function _sorting_conditions(): void
 	{
 		global $context, $txt, $scripturl;
 
-		$sort_methods = array(
+		$sort_methods = [
 			'subject' => 'ms.subject',
 			'starter' => 'COALESCE(mems.real_name, ms.poster_name)',
 			'replies' => 't.num_replies',
 			'views' => 't.num_views',
 			'first_post' => 't.id_topic',
 			'last_post' => 't.id_last_msg'
-		);
+		];
 
 		// The default is the most logical: newest first.
 		if (!isset($this->_req->query->sort) || !isset($sort_methods[$this->_req->query->sort]))
@@ -294,7 +294,7 @@ class Unread extends AbstractController
 					$sorticon = 'numeric';
 			}
 
-			$context['topics_headers'][$key] = array('url' => $scripturl . '?action=' . $this->_action . ($context['showing_all_topics'] ? ';all' : '') . sprintf($context['querystring_board_limits'], $this->_req->query->start) . ';sort=' . $key . ($context['sort_by'] == $key && $context['sort_direction'] === 'up' ? ';desc' : ''), 'sort_dir_img' => $context['sort_by'] == $key ? '<i class="icon icon-small i-sort-' . $sorticon . '-' . $context['sort_direction'] . '" title="' . $context['sort_title'] . '"></i>' : '',);
+			$context['topics_headers'][$key] = ['url' => $scripturl . '?action=' . $this->_action . ($context['showing_all_topics'] ? ';all' : '') . sprintf($context['querystring_board_limits'], $this->_req->query->start) . ';sort=' . $key . ($context['sort_by'] == $key && $context['sort_direction'] === 'up' ? ';desc' : ''), 'sort_dir_img' => $context['sort_by'] == $key ? '<i class="icon icon-small i-sort-' . $sorticon . '-' . $context['sort_direction'] . '" title="' . $context['sort_title'] . '"></i>' : '',];
 		}
 	}
 
@@ -314,7 +314,7 @@ class Unread extends AbstractController
 	 *
 	 * Accessed by action=unread
 	 */
-	public function action_unread()
+	public function action_unread(): ?bool
 	{
 		global $context, $settings;
 
@@ -330,7 +330,8 @@ class Unread extends AbstractController
 		// Does it make sense?... Dunno.
 		else
 		{
-			return $this->action_unreadreplies();
+			$this->action_unreadreplies();
+			return null;
 		}
 
 		if ($this->_num_topics == 0)
@@ -344,7 +345,7 @@ class Unread extends AbstractController
 				markBoardsRead($this->_boards, false, true);
 			}
 
-			$context['topics'] = array();
+			$context['topics'] = [];
 
 			if ($context['querystring_board_limits'] === ';start=%1$d')
 			{
@@ -370,7 +371,7 @@ class Unread extends AbstractController
 	 *
 	 * Accessed by action=unreadreplies
 	 */
-	public function action_unreadreplies()
+	public function action_unreadreplies(): void
 	{
 		global $scripturl, $context, $settings;
 
@@ -380,7 +381,7 @@ class Unread extends AbstractController
 
 		if ($this->_num_topics == 0)
 		{
-			$context['topics'] = array();
+			$context['topics'] = [];
 			if ($context['querystring_board_limits'] === ';start=%1$d')
 			{
 				$context['querystring_board_limits'] = '';
@@ -392,16 +393,16 @@ class Unread extends AbstractController
 		}
 		else
 		{
-			$context['links'] += array(
+			$context['links'] += [
 				'first' => $this->_req->query->start >= $context['topics_per_page'] ? $scripturl . '?action=' . $this->_action . ($context['showing_all_topics'] ? ';all' : '') . sprintf($context['querystring_board_limits'], 0) . $context['querystring_sort_limits'] : '',
 				'last' => $this->_req->query->start + $context['topics_per_page'] < $this->_num_topics ? $scripturl . '?action=' . $this->_action . ($context['showing_all_topics'] ? ';all' : '') . sprintf($context['querystring_board_limits'], floor(($this->_num_topics - 1) / $context['topics_per_page']) * $context['topics_per_page']) . $context['querystring_sort_limits'] : '',
 				'up' => $scripturl,
-			);
+			];
 			$context['topics'] = $this->_grabber->getUnreads(null, $this->_req->query->start, $context['topics_per_page'], $settings['avatars_on_indexes']);
 
 			if ($context['topics'] === false)
 			{
-				$context['topics'] = array();
+				$context['topics'] = [];
 
 				if ($context['querystring_board_limits'] === ';start=%1$d')
 				{
@@ -422,7 +423,7 @@ class Unread extends AbstractController
 	/**
 	 * Some common things done at the end of each action.
 	 */
-	private function _exiting_unread()
+	private function _exiting_unread(): void
 	{
 		global $scripturl, $context, $settings, $modSettings, $txt;
 
@@ -463,10 +464,10 @@ class Unread extends AbstractController
 			$txt['unread_topics_visit_none'] = str_replace('{unread_all_url}', $scripturl . '?action=unread;all' . sprintf($context['querystring_board_limits'], 0) . $context['querystring_sort_limits'], $txt['unread_topics_visit_none']);
 		}
 
-		$context['links'] += array(
+		$context['links'] += [
 			'prev' => $this->_req->query->start >= $context['topics_per_page'] ? $scripturl . '?action=' . $this->_action . $all . sprintf($context['querystring_board_limits'], $this->_req->query->start - $context['topics_per_page']) . $context['querystring_sort_limits'] : '',
 			'next' => $this->_req->query->start + $context['topics_per_page'] < $this->_num_topics ? $scripturl . '?action=' . $this->_action . $all . sprintf($context['querystring_board_limits'], $this->_req->query->start + $context['topics_per_page']) . $context['querystring_sort_limits'] : '',
-		);
+		];
 
 		$context['querystring_board_limits'] = sprintf($context['querystring_board_limits'], $this->_req->query->start);
 		$topics_to_mark = implode('-', $topic_ids);
@@ -491,68 +492,68 @@ class Unread extends AbstractController
 	 *
 	 * @return array
 	 */
-	private function _buttonsArray($topics_to_mark)
+	private function _buttonsArray($topics_to_mark): array
 	{
 		global $context, $scripturl, $txt;
 
 		if ($this->_is_topics)
 		{
-			theme()->addJavascriptVar(array(
+			theme()->addJavascriptVar([
 				'txt_mark_as_read_confirm' => $txt['mark_these_as_read_confirm']
-			), true);
+			], true);
 
-			$recent_buttons = array(
-				'markread' => array(
+			$recent_buttons = [
+				'markread' => [
 					'text' => empty($context['no_board_limits']) ? 'mark_read_short' : 'mark_as_read',
 					'lang' => true,
 					'custom' => 'onclick="return markunreadButton(this);"',
 					'url' => $scripturl . '?action=markasread;sa=' . (empty($context['no_board_limits']) ? 'board' . $context['querystring_board_limits'] : 'all') . ';' . $context['session_var'] . '=' . $context['session_id'],
-				),
-			);
+				],
+			];
 
 			if ($context['showCheckboxes'])
 			{
-				$recent_buttons['markselectread'] = array(
+				$recent_buttons['markselectread'] = [
 					'text' => 'quick_mod_markread',
 					'lang' => true,
 					'url' => 'javascript:document.quickModForm.submit();',
-				);
+				];
 			}
 
 			if (!empty($context['topics']) && !$context['showing_all_topics'])
 			{
-				$recent_buttons['readall'] = array('text' => 'unread_topics_all',
+				$recent_buttons['readall'] = ['text' => 'unread_topics_all',
 					'lang' => true,
 					'url' => $scripturl . '?action=unread;all' . $context['querystring_board_limits'],
-					'active' => true);
+					'active' => true];
 			}
 		}
 		elseif (!$this->_is_topics && isset($topics_to_mark))
 		{
-			theme()->addJavascriptVar(array(
+			theme()->addJavascriptVar([
 				'txt_mark_as_read_confirm' => $txt['mark_these_as_read_confirm']
-			), true);
+			], true);
 
-			$recent_buttons = array(
-				'markread' => array(
+			$recent_buttons = [
+				'markread' => [
 					'text' => 'mark_these_as_read',
 					'lang' => true,
 					'url' => $scripturl . '?action=markasread;sa=unreadreplies;topics=' . $topics_to_mark . ';' . $context['session_var'] . '=' . $context['session_id'],
-				),
-			);
+				],
+			];
 
 			if ($context['showCheckboxes'])
 			{
-				$recent_buttons['markselectread'] = array(
+				$recent_buttons['markselectread'] = [
 					'text' => 'quick_mod_markread',
 					'lang' => true,
 					'url' => 'javascript:document.quickModForm.submit();',
-				);
+				];
 			}
 		}
 
 		// Allow mods to add additional buttons here
-		call_integration_hook('integrate_recent_buttons', array(&$recent_buttons));
+		call_integration_hook('integrate_recent_buttons', [&$recent_buttons]);
 
 		return $recent_buttons;
 	}

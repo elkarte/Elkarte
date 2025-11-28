@@ -19,7 +19,7 @@ use ElkArte\User;
 /**
  * Create PM draft in the database
  *
- * @param mixed[] $draft
+ * @param array $draft
  * @param string[] $recipientList
  * @package Drafts
  */
@@ -27,7 +27,7 @@ function create_pm_draft($draft, $recipientList)
 {
 	$db = database();
 
-	$draft_columns = array(
+	$draft_columns = [
 		'id_reply' => 'int',
 		'type' => 'int',
 		'poster_time' => 'int',
@@ -36,8 +36,8 @@ function create_pm_draft($draft, $recipientList)
 		'body' => 'string-65534',
 		'to_list' => 'string-255',
 		'is_usersaved' => 'int',
-	);
-	$draft_parameters = array(
+	];
+	$draft_parameters = [
 		$draft['reply_id'],
 		1,
 		time(),
@@ -46,14 +46,14 @@ function create_pm_draft($draft, $recipientList)
 		$draft['body'],
 		serialize($recipientList),
 		$draft['is_usersaved'],
-	);
+	];
 	$db->insert('',
 		'{db_prefix}user_drafts',
 		$draft_columns,
 		$draft_parameters,
-		array(
+		[
 			'id_draft'
-		)
+		]
 	);
 
 	// Return the new id
@@ -63,7 +63,7 @@ function create_pm_draft($draft, $recipientList)
 /**
  * Update an existing PM draft with the new data
  *
- * @param mixed[] $draft
+ * @param array $draft
  * @param string[] $recipientList
  * @package Drafts
  */
@@ -83,7 +83,7 @@ function modify_pm_draft($draft, $recipientList)
 			is_usersaved = {int:is_usersaved}
 		WHERE id_draft = {int:id_pm_draft}
 		LIMIT 1',
-		array(
+		[
 			'id_reply' => $draft['reply_id'],
 			'type' => 1,
 			'poster_time' => time(),
@@ -92,14 +92,14 @@ function modify_pm_draft($draft, $recipientList)
 			'id_pm_draft' => $draft['id_pm_draft'],
 			'to_list' => serialize($recipientList),
 			'is_usersaved' => $draft['is_usersaved'],
-		)
+		]
 	);
 }
 
 /**
  * Create a new post draft in the database
  *
- * @param mixed[] $draft
+ * @param array $draft
  * @package Drafts
  */
 function create_post_draft($draft)
@@ -108,7 +108,7 @@ function create_post_draft($draft)
 
 	$db = database();
 
-	$draft_columns = array(
+	$draft_columns = [
 		'id_topic' => 'int',
 		'id_board' => 'int',
 		'type' => 'int',
@@ -121,8 +121,8 @@ function create_post_draft($draft)
 		'locked' => 'int',
 		'is_sticky' => 'int',
 		'is_usersaved' => 'int'
-	);
-	$draft_parameters = array(
+	];
+	$draft_parameters = [
 		$draft['topic_id'],
 		$draft['board'],
 		0,
@@ -135,14 +135,14 @@ function create_post_draft($draft)
 		$draft['locked'],
 		$draft['sticky'],
 		$draft['is_usersaved']
-	);
+	];
 	$db->insert('',
 		'{db_prefix}user_drafts',
 		$draft_columns,
 		$draft_parameters,
-		array(
+		[
 			'id_draft'
-		)
+		]
 	);
 
 	// Get the id of the new draft
@@ -152,7 +152,7 @@ function create_post_draft($draft)
 /**
  * Update a Post draft with the supplied data
  *
- * @param mixed[] $draft
+ * @param array $draft
  * @package Drafts
  */
 function modify_post_draft($draft)
@@ -173,7 +173,7 @@ function modify_post_draft($draft)
 			is_sticky = {int:is_sticky},
 			is_usersaved = {int:is_usersaved}
 		WHERE id_draft = {int:id_draft}',
-		array(
+		[
 			'id_topic' => $draft['topic_id'],
 			'id_board' => $draft['board'],
 			'poster_time' => time(),
@@ -185,7 +185,7 @@ function modify_post_draft($draft)
 			'is_sticky' => $draft['sticky'],
 			'id_draft' => $draft['id_draft'],
 			'is_usersaved' => $draft['is_usersaved'],
-		)
+		]
 	);
 }
 
@@ -222,12 +222,12 @@ function load_draft($id_draft, $uid, $type = 0, $drafts_keep_days = 0, $check = 
 			AND type = {int:type}' . (!empty($drafts_keep_days) ? '
 			AND poster_time > {int:time}' : '') . '
 		LIMIT 1',
-		array(
+		[
 			'id_member' => $uid,
 			'id_draft' => $id_draft,
 			'type' => $type,
 			'time' => $drafts_keep_days,
-		)
+		]
 	);
 
 	// No results?
@@ -287,13 +287,13 @@ function load_user_drafts($member_id, $draft_type = 0, $topic = false, $order = 
 			AND poster_time > {int:time}' : '') . (!empty($order) ? '
 		ORDER BY {raw:order}' : '') . (!empty($limit) ? '
 		LIMIT ' . $limit : ''),
-		array(
+		[
 			'id_member' => $member_id,
 			'id_topic' => (int) $topic,
 			'draft_type' => $draft_type,
 			'time' => !empty($modSettings['drafts_keep_days']) ? (time() - ($modSettings['drafts_keep_days'] * 86400)) : 0,
 			'order' => $order,
-		)
+		]
 	)->fetch_all();
 }
 
@@ -325,12 +325,12 @@ function count_user_drafts($member_id, $draft_type = 0, $topic = false)
 			AND id_reply = {int:id_topic}') . '
 			AND type = {int:draft_type}' . (!empty($modSettings['drafts_keep_days']) ? '
 			AND poster_time > {int:time}' : ''),
-		array(
+		[
 			'id_member' => $member_id,
 			'id_topic' => (int) $topic,
 			'draft_type' => $draft_type,
 			'time' => !empty($modSettings['drafts_keep_days']) ? (time() - ($modSettings['drafts_keep_days'] * 86400)) : 0,
-		)
+		]
 	)->fetch_callback(
 		function ($row) use (&$number) {
 			$number = (int) $row['number'];
@@ -363,7 +363,7 @@ function deleteDrafts($id_draft, $member_id = -1, $check = true)
 	// Only a single draft.
 	if (!is_array($id_draft))
 	{
-		$id_draft = array($id_draft);
+		$id_draft = [$id_draft];
 	}
 
 	$id_draft = array_map('intval', $id_draft);
@@ -378,10 +378,10 @@ function deleteDrafts($id_draft, $member_id = -1, $check = true)
 		DELETE FROM {db_prefix}user_drafts
 		WHERE id_draft IN ({array_int:id_draft})' . ($check ? '
 			AND  id_member = {int:id_member}' : ''),
-		array(
+		[
 			'id_draft' => $id_draft,
 			'id_member' => $member_id,
-		)
+		]
 	);
 }
 
@@ -411,11 +411,11 @@ function draftsCount($member_id, $draft_type = 0)
 		WHERE id_member = {int:id_member}
 			AND type={int:draft_type}' . (!empty($modSettings['drafts_keep_days']) ? '
 			AND poster_time > {int:time}' : ''),
-		array(
+		[
 			'id_member' => $member_id,
 			'draft_type' => $draft_type,
 			'time' => !empty($modSettings['drafts_keep_days']) ? (time() - ($modSettings['drafts_keep_days'] * 86400)) : 0,
-		)
+		]
 	);
 	list ($msgCount) = $request->fetch_row();
 	$request->free_result();
@@ -430,7 +430,7 @@ function draftsCount($member_id, $draft_type = 0)
  * - keeps track of bcc and to names for the PM
  *
  * @param int[] $allRecipients
- * @param mixed[] $recipient_ids
+ * @param array $recipient_ids
  *
  * @return array
  * @todo this is the same as whats in PersonalMessage.controller, when that gets refactored
@@ -441,10 +441,10 @@ function draftsCount($member_id, $draft_type = 0)
 function draftsRecipients($allRecipients, $recipient_ids)
 {
 	// Holds our results
-	$recipients = array(
-		'to' => array(),
-		'bcc' => array(),
-	);
+	$recipients = [
+		'to' => [],
+		'bcc' => [],
+	];
 
 	require_once(SUBSDIR . '/Members.subs.php');
 
@@ -479,9 +479,9 @@ function getOldDrafts($days)
 			id_draft
 		FROM {db_prefix}user_drafts
 		WHERE poster_time <= {int:poster_time_old}',
-		array(
+		[
 			'poster_time_old' => time() - (86400 * $days),
-		)
+		]
 	)->fetch_callback(
 		function ($row) {
 			return (int) $row['id_draft'];
@@ -495,7 +495,7 @@ function getOldDrafts($days)
  * - The core draft feature must be enabled, as well as the post draft option
  * - Determines if this is a new or an existing draft
  *
- * @param mixed[] $draft
+ * @param array $draft
  * @param bool $check_last_save
  * @package Drafts
  */

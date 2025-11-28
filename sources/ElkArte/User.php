@@ -42,9 +42,8 @@ class User
 	 * Load all the important user information.
 	 *
 	 * @param bool $compat_mode if true sets the deprecated $user_info global
-	 * @throws \Exception
 	 */
-	public static function load($compat_mode = false)
+	public static function load($compat_mode = false): void
 	{
 		if (self::$instance === null)
 		{
@@ -72,7 +71,7 @@ class User
 	 *
 	 * @event integrate_verify_user allow for integration to verify a user
 	 */
-	protected static function loadFromIntegration()
+	protected static function loadFromIntegration(): bool
 	{
 		// Check first the integration, then the cookie, and last the session.
 		if (count($integration_ids = Hooks::instance()->hook('integrate_verify_user')) > 0)
@@ -98,7 +97,7 @@ class User
 	 * @param string $user_agent the Browser user agent, used to do some checkes
 	 *               based on the session data to reduce spamming and hacking
 	 */
-	protected static function loadFromCookie($user_agent)
+	protected static function loadFromCookie($user_agent): void
 	{
 		global $cookiename, $modSettings;
 
@@ -129,7 +128,7 @@ class User
 	 *
 	 * @param false $compat_mode
 	 */
-	public static function logOutUser($compat_mode = false)
+	public static function logOutUser($compat_mode = false): void
 	{
 		self::$instance->loadUserById(0, true, '');
 		self::reloadByUser(self::$instance, $compat_mode);
@@ -142,7 +141,7 @@ class User
 	 * @param \ElkArte\UserSettingsLoader $user An user
 	 * @param bool $compat_mode if true sets the deprecated $user_info global
 	 */
-	public static function reloadByUser(UserSettingsLoader $user, $compat_mode = false)
+	public static function reloadByUser(UserSettingsLoader $user, $compat_mode = false): void
 	{
 		self::$instance = $user;
 		self::$settings = self::$instance->getSettings();

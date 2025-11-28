@@ -281,8 +281,9 @@ function template_results()
 	}
 
 	echo '
-				<h2 class="category_header hdicon i-search">
-					<span class="floatright">';
+				<h2 class="category_header hdicon i-search">',
+					$txt['mlist_search_results'], ':&nbsp;', $context['search_params']['search'], '
+					<span class="flow_flex_right">';
 
 	if (!empty($options['display_quick_mod']))
 	{
@@ -292,7 +293,6 @@ function template_results()
 
 	echo '
 					</span>
-					', $txt['mlist_search_results'], ':&nbsp;', $context['search_params']['search'], '
 				</h2>';
 
 	// Was anything even found?

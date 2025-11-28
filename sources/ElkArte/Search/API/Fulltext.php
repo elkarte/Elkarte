@@ -70,7 +70,7 @@ class Fulltext extends Standard
 	 *
 	 * What is the minimum word length full text supports?
 	 */
-	protected function _getMinWordLength()
+	protected function _getMinWordLength(): int
 	{
 		// Need some search specific database tricks
 		$db_search = db_search();
@@ -141,7 +141,7 @@ class Fulltext extends Standard
 	 *
 	 * Returns a boolean value indicating whether the word index should be used for searching.
 	 *
-	 * @return boolean Returns true if the word index should be used, otherwise false.
+	 * @return bool Returns true if the word index should be used, otherwise false.
 	 */
 	public function useWordIndex()
 	{
@@ -156,7 +156,7 @@ class Fulltext extends Standard
 	 * @param array $words Words to index
 	 * @param array $search_data
 	 *
-	 * @return AbstractResult|boolean
+	 * @return AbstractResult|bool
 	 */
 	public function indexedWordQuery($words, $search_data)
 	{

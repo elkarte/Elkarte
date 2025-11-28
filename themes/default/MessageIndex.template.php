@@ -147,14 +147,14 @@ function template_topic_listing()
 
 	if (!$context['no_topic_listing'])
 	{
-		// If this person can approve items, and we have some awaiting approval tell them.
+		// If this person can approve items, and we have some awaiting approval, tell them.
 		if (!empty($context['unapproved_posts_message']))
 		{
 			echo '
 		<div class="warningbox">', $context['unapproved_posts_message'], '</div>';
 		}
 
-		// Quick Topic enabled ?
+		// Quick Topic enabled?
 		template_quicktopic_above();
 
 		// If Quick Moderation is enabled start the form.

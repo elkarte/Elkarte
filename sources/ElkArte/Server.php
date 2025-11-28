@@ -57,7 +57,7 @@ class Server extends \ArrayObject
 	 *
 	 * @return bool true if we have at least the needed memory
 	 */
-	public function setMemoryLimit($needed, $in_use = false)
+	public function setMemoryLimit($needed, $in_use = false): bool
 	{
 		// Everything in bytes
 		$memory_current = memoryReturnBytes(ini_get('memory_limit'));
@@ -108,7 +108,7 @@ class Server extends \ArrayObject
 	 *
 	 * @return string
 	 */
-	public function setTimeLimit($time_limit, $server_reset = true)
+	public function setTimeLimit($time_limit, $server_reset = true): string
 	{
 		// Make sure the function exists, it may be in the ini disable_functions list
 		if (function_exists('set_time_limit'))
@@ -142,7 +142,7 @@ class Server extends \ArrayObject
 	 *
 	 * @return bool
 	 */
-	public function is($server)
+	public function is($server): bool
 	{
 		return match ($server)
 		{
@@ -164,7 +164,7 @@ class Server extends \ArrayObject
 	 *
 	 * @return bool
 	 */
-	private function _is_web_server($type)
+	private function _is_web_server($type): bool
 	{
 		return $this->SERVER_SOFTWARE !== null && strpos($this->SERVER_SOFTWARE, $type) !== false;
 	}
@@ -174,7 +174,7 @@ class Server extends \ArrayObject
 	 *
 	 * @return bool
 	 */
-	public function supportRewrite()
+	public function supportRewrite(): bool
 	{
 		return (!$this->is('cgi') || ini_get('cgi.fix_pathinfo') == 1 || @get_cfg_var('cgi.fix_pathinfo') == 1)
 			&& ($this->is('apache') || $this->is('nginx') || $this->is('lighttpd') || $this->is('litespeed'));
@@ -185,7 +185,7 @@ class Server extends \ArrayObject
 	 *
 	 * @return bool
 	 */
-	public function outPutCompressionEnabled()
+	public function outPutCompressionEnabled(): bool
 	{
 		return ini_get('zlib.output_compression') >= 1 || ini_get('output_handler') === 'ob_gzhandler';
 	}
@@ -195,7 +195,7 @@ class Server extends \ArrayObject
 	 *
 	 * @return bool
 	 */
-	public function supportsSSL()
+	public function supportsSSL(): bool
 	{
 		return
 			(isset($this->HTTPS) && ($this->HTTPS === 'on' || (int) $this->HTTPS === 1))
@@ -214,7 +214,7 @@ class Server extends \ArrayObject
 	 *
 	 * @return string The host of the current request
 	 */
-	public function getHost()
+	public function getHost(): string
 	{
 		$host = $this->HTTP_HOST;
 		if (!$host)
@@ -248,7 +248,7 @@ class Server extends \ArrayObject
 	 * @param string $fallback the fallback to use when we fail
 	 * @return string a FQDN
 	 */
-	public function getFQDN($fallback = '[127.0.0.1]')
+	public function getFQDN($fallback = '[127.0.0.1]'): string
 	{
 		// Try gethostname
 		if (function_exists('gethostname') && $this->_isValidFQDN(gethostname()))
@@ -293,7 +293,7 @@ class Server extends \ArrayObject
 	 * @param string $hostname
 	 * @return bool
 	 */
-	private function _isValidFQDN($hostname)
+	private function _isValidFQDN($hostname): bool
 	{
 		if (empty($hostname) || strpos($hostname, '.') === false)
 		{
@@ -314,7 +314,7 @@ class Server extends \ArrayObject
 	 *
 	 * @return string
 	 */
-	public function getProtocol()
+	public function getProtocol(): string
 	{
 		if (empty($this->SERVER_PROTOCOL))
 		{

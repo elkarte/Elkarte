@@ -57,7 +57,7 @@ final class ErrorContext
 		}
 
 		// Initialize severity levels... waiting for details!
-		$this->_severity_levels = array(self::MINOR, self::SERIOUS);
+		$this->_severity_levels = [self::MINOR, self::SERIOUS];
 
 		// Initialize default severity (not sure this is needed)
 		if ($default_severity === null || !in_array($default_severity, $this->_severity_levels))
@@ -81,7 +81,7 @@ final class ErrorContext
 	 *
 	 * @return ErrorContext
 	 */
-	public static function context($id = 'default', $default_severity = null)
+	public static function context($id = 'default', $default_severity = null): ErrorContext
 	{
 		if (self::$_contexts === null)
 		{
@@ -103,7 +103,7 @@ final class ErrorContext
 	 * @param string|int|null $severity error severity
 	 * @param string|null $lang_file lang_file
 	 */
-	public function addError($error, $severity = null, $lang_file = null)
+	public function addError($error, $severity = null, $lang_file = null): void
 	{
 		$severity = $severity !== null && in_array($severity, $this->_severity_levels) ? $severity : $this->_default_severity;
 
@@ -160,7 +160,7 @@ final class ErrorContext
 	 *
 	 * @param array|mixed $error error code
 	 */
-	public function removeError($error)
+	public function removeError($error): void
 	{
 		if (!empty($error))
 		{
@@ -226,7 +226,7 @@ final class ErrorContext
 	 *
 	 * @return bool
 	 */
-	public function hasErrors($severity = null)
+	public function hasErrors($severity = null): bool
 	{
 		if ($severity !== null && in_array($severity, $this->_severity_levels))
 		{
@@ -248,7 +248,7 @@ final class ErrorContext
 	 *
 	 * @return bool
 	 */
-	public function hasError($errors)
+	public function hasError($errors): bool
 	{
 		if (!empty($errors))
 		{
@@ -297,18 +297,18 @@ final class ErrorContext
 	 *
 	 * @return array
 	 */
-	public function prepareErrors($severity = null)
+	public function prepareErrors($severity = null): array
 	{
 		global $txt;
 
 		if (empty($this->_errors))
 		{
-			return array();
+			return [];
 		}
 
 		$this->_loadLang();
 
-		call_integration_hook('integrate_' . $this->_name . '_errors', array(&$this->_errors, &$this->_severity_levels));
+		call_integration_hook('integrate_' . $this->_name . '_errors', [&$this->_errors, &$this->_severity_levels]);
 
 		$errors = [];
 		$returns = [];
@@ -353,7 +353,7 @@ final class ErrorContext
 	/**
 	 * Load the default error language and any other language file needed
 	 */
-	private function _loadLang()
+	private function _loadLang(): void
 	{
 		// Errors is always needed
 		Txt::load('Errors');
@@ -377,9 +377,9 @@ final class ErrorContext
 	 *
 	 * @param mixed|array $error error code
 	 *
-	 * @return null
+	 * @return array|null
 	 */
-	protected function getErrorValue($error)
+	protected function getErrorValue($error): ?array
 	{
 		if (is_array($error))
 		{

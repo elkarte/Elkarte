@@ -34,16 +34,16 @@ use ElkArte\SettingsForm\SettingsForm;
 class ManagePermissions extends AbstractController
 {
 	/** @var int|null The profile ID that we are working with */
-	protected $_pid;
+	protected ?int $_pid;
 
 	/** @var \Elkarte\Permissions Permissions object */
-	private $permissionsObject;
+	private Permissions $permissionsObject;
 
 	/** @var string[] */
-	private $illegal_permissions = array();
+	private array $illegal_permissions = [];
 
 	/** @var string[] */
-	private $illegal_guest_permissions = array();
+	private array $illegal_guest_permissions = [];
 
 	/**
 	 * Dispatches to the right function based on the given subaction.
@@ -69,45 +69,45 @@ class ManagePermissions extends AbstractController
 		theme()->getTemplates()->load('ManagePermissions');
 
 		// Format: 'sub-action' => array('function_to_call', 'permission_needed'),
-		$subActions = array(
-			'board' => array(
+		$subActions = [
+			'board' => [
 				'controller' => $this,
 				'function' => 'action_board',
-				'permission' => 'manage_permissions'),
-			'index' => array(
+				'permission' => 'manage_permissions'],
+			'index' => [
 				'controller' => $this,
 				'function' => 'action_list',
-				'permission' => 'manage_permissions'),
-			'modify' => array(
+				'permission' => 'manage_permissions'],
+			'modify' => [
 				'controller' => $this,
 				'function' => 'action_modify',
-				'permission' => 'manage_permissions'),
-			'modify2' => array(
+				'permission' => 'manage_permissions'],
+			'modify2' => [
 				'controller' => $this,
 				'function' => 'action_modify2',
-				'permission' => 'manage_permissions'),
-			'quick' => array(
+				'permission' => 'manage_permissions'],
+			'quick' => [
 				'controller' => $this,
 				'function' => 'action_quick',
-				'permission' => 'manage_permissions'),
-			'quickboard' => array(
+				'permission' => 'manage_permissions'],
+			'quickboard' => [
 				'controller' => $this,
 				'function' => 'action_quickboard',
-				'permission' => 'manage_permissions'),
-			'postmod' => array(
+				'permission' => 'manage_permissions'],
+			'postmod' => [
 				'controller' => $this,
 				'function' => 'action_postmod',
 				'permission' => 'manage_permissions',
-				'disabled' => !featureEnabled('pm')),
-			'profiles' => array(
+				'disabled' => !featureEnabled('pm')],
+			'profiles' => [
 				'controller' => $this,
 				'function' => 'action_profiles',
-				'permission' => 'manage_permissions'),
-			'settings' => array(
+				'permission' => 'manage_permissions'],
+			'settings' => [
 				'controller' => $this,
 				'function' => 'action_permSettings_display',
-				'permission' => 'admin_forum'),
-		);
+				'permission' => 'admin_forum'],
+		];
 
 		// Action controller
 		$action = new Action('manage_permissions');
@@ -158,7 +158,7 @@ class ManagePermissions extends AbstractController
 	 * @uses ManagePermissions template file.
 	 * @uses ManageBoards template, permission_index sub-template.
 	 */
-	public function action_list()
+	public function action_list(): void
 	{
 		global $txt, $context, $modSettings;
 
@@ -180,15 +180,15 @@ class ManagePermissions extends AbstractController
 		// Also load profiles, we may want to reset.
 		loadPermissionProfiles();
 
-		$listOptions = array(
+		$listOptions = [
 			'id' => 'regular_membergroups_list',
 			'title' => $txt['membergroups_regular'],
 			'base_href' => getUrl('admin', ['action' => 'admin', 'area' => 'permissions', 'sa' => 'index'] + (isset($this->_req->query->sort2) ? ['sort2' => $this->_req->query->sort2] : []) + ($this->_pid !== null ? ['pid' => $this->_pid] : [])),
 			'default_sort_col' => 'name',
-			'get_items' => array(
+			'get_items' => [
 				'file' => SUBSDIR . '/Membergroups.subs.php',
 				'function' => 'list_getMembergroups',
-				'params' => array(
+				'params' => [
 					'all',
 					$this->user->id,
 					allowedTo('manage_membergroups'),
@@ -196,19 +196,19 @@ class ManagePermissions extends AbstractController
 					true,
 					true,
 					$this->_pid,
-				),
-			),
-			'columns' => array(
-				'name' => array(
-					'header' => array(
+				],
+			],
+			'columns' => [
+				'name' => [
+					'header' => [
 						'value' => $txt['membergroups_name'],
-					),
-					'data' => array(
+					],
+					'data' => [
 						'function' => static function ($rowData) {
 							global $txt;
 							// Since the moderator group has no explicit members, no link is needed.
 							// Since guests and regular members are not groups, no link is needed.
-							if (in_array($rowData['id_group'], array(-1, 0, 3), true))
+							if (in_array($rowData['id_group'], [-1, 0, 3], true))
 							{
 								$group_name = $rowData['group_name'];
 							}
@@ -232,23 +232,23 @@ class ManagePermissions extends AbstractController
 
 							return $group_name;
 						},
-					),
-					'sort' => array(
+					],
+					'sort' => [
 						'default' => 'CASE WHEN mg.id_group < 4 THEN mg.id_group ELSE 4 END, mg.group_name',
 						'reverse' => 'CASE WHEN mg.id_group < 4 THEN mg.id_group ELSE 4 END, mg.group_name DESC',
-					),
-				),
-				'members' => array(
-					'header' => array(
+					],
+				],
+				'members' => [
+					'header' => [
 						'value' => $txt['membergroups_members_top'],
 						'class' => 'grid17',
-					),
-					'data' => array(
+					],
+					'data' => [
 						'function' => static function ($rowData) {
 							global $txt;
 
 							// No explicit members for guests and the moderator group.
-							if (in_array($rowData['id_group'], array(-1, 3)))
+							if (in_array($rowData['id_group'], [-1, 3]))
 							{
 								return $txt['membergroups_guests_na'];
 							}
@@ -260,37 +260,37 @@ class ManagePermissions extends AbstractController
 
 							return comma_format($rowData['num_members']);
 						},
-					),
-					'sort' => array(
+					],
+					'sort' => [
 						'default' => 'CASE WHEN mg.id_group < 4 THEN mg.id_group ELSE 4 END, 1',
 						'reverse' => 'CASE WHEN mg.id_group < 4 THEN mg.id_group ELSE 4 END, 1 DESC',
-					),
-				),
-				'permissions_allowed' => array(
-					'header' => array(
+					],
+				],
+				'permissions_allowed' => [
+					'header' => [
 						'value' => empty($modSettings['permission_enable_deny']) ? $txt['membergroups_permissions'] : $txt['permissions_allowed'],
 						'class' => 'grid17',
-					),
-					'data' => array(
+					],
+					'data' => [
 						'function' => static fn($rowData) => $rowData['num_permissions']['allowed'],
-					),
-				),
-				'permissions_denied' => array(
+					],
+				],
+				'permissions_denied' => [
 					'evaluate' => !empty($modSettings['permission_enable_deny']),
-					'header' => array(
+					'header' => [
 						'value' => $txt['permissions_denied'],
 						'class' => 'grid17',
-					),
-					'data' => array(
+					],
+					'data' => [
 						'function' => static fn($rowData) => $rowData['num_permissions']['denied'],
-					),
-				),
-				'modify' => array(
-					'header' => array(
+					],
+				],
+				'modify' => [
+					'header' => [
 						'value' => $context['can_modify'] ? $txt['permissions_modify'] : $txt['permissions_view'],
 						'class' => 'grid17',
-					),
-					'data' => array(
+					],
+					'data' => [
 						'function' => function ($rowData) {
 							global $txt;
 
@@ -301,15 +301,15 @@ class ManagePermissions extends AbstractController
 
 							return '';
 						},
-					),
-				),
-				'check' => array(
-					'header' => array(
+					],
+				],
+				'check' => [
+					'header' => [
 						'value' => '<input type="checkbox" onclick="invertAll(this, this.form);" class="input_check" />',
 						'class' => 'centertext',
 						'style' => 'width:4%;',
-					),
-					'data' => array(
+					],
+					'data' => [
 						'function' => static function ($rowData) {
 							if ($rowData['id_group'] !== 1)
 							{
@@ -319,29 +319,29 @@ class ManagePermissions extends AbstractController
 							return '';
 						},
 						'class' => 'centertext',
-					),
-				),
-			),
-		);
+					],
+				],
+			],
+		];
 
 		createList($listOptions);
 
 		// The second list shows the post count based groups...if enabled
 		if (!empty($modSettings['permission_enable_postgroups']))
 		{
-			$listOptions = array(
+			$listOptions = [
 				'id' => 'post_count_membergroups_list',
 				'title' => $txt['membergroups_post'],
 				'base_href' => getUrl('admin', ['action' => 'admin', 'area' => 'permissions', 'sa' => 'index'] + (isset($this->_req->query->sort) ? ['sort' => $this->_req->query->sort] : []) + ($this->_pid !== null ? ['pid' => $this->_pid] : [])),
 				'default_sort_col' => 'required_posts',
-				'request_vars' => array(
+				'request_vars' => [
 					'sort' => 'sort2',
 					'desc' => 'desc2',
-				),
-				'get_items' => array(
+				],
+				'get_items' => [
 					'file' => SUBSDIR . '/Membergroups.subs.php',
 					'function' => 'list_getMembergroups',
-					'params' => array(
+					'params' => [
 						'post_count',
 						$this->user->id,
 						allowedTo('manage_membergroups'),
@@ -349,41 +349,41 @@ class ManagePermissions extends AbstractController
 						false,
 						true,
 						$this->_pid,
-					),
-				),
-				'columns' => array(
-					'name' => array(
-						'header' => array(
+					],
+				],
+				'columns' => [
+					'name' => [
+						'header' => [
 							'value' => $txt['membergroups_name'],
 							'class' => 'grid25',
-						),
-						'data' => array(
+						],
+						'data' => [
 							'function' => static fn($rowData) => sprintf('<a href="' . getUrl('admin', ['action' => 'admin', 'area' => 'permissions', 'sa' => 'members', 'group' => $rowData['id_group']]) . '">%1$s</a>', $rowData['group_name_color']),
-						),
-						'sort' => array(
+						],
+						'sort' => [
 							'default' => 'mg.group_name',
 							'reverse' => 'mg.group_name DESC',
-						),
-					),
-					'required_posts' => array(
-						'header' => array(
+						],
+					],
+					'required_posts' => [
+						'header' => [
 							'value' => $txt['membergroups_min_posts'],
 							'class' => 'grid25',
-						),
-						'data' => array(
+						],
+						'data' => [
 							'db' => 'min_posts',
-						),
-						'sort' => array(
+						],
+						'sort' => [
 							'default' => 'mg.min_posts',
 							'reverse' => 'mg.min_posts DESC',
-						),
-					),
-					'members' => array(
-						'header' => array(
+						],
+					],
+					'members' => [
+						'header' => [
 							'value' => $txt['membergroups_members_top'],
 							'class' => 'grid10',
-						),
-						'data' => array(
+						],
+						'data' => [
 							'function' => static function ($rowData) {
 								if ($rowData['can_search'])
 								{
@@ -392,37 +392,37 @@ class ManagePermissions extends AbstractController
 
 								return comma_format($rowData['num_members']);
 							},
-						),
-						'sort' => array(
+						],
+						'sort' => [
 							'default' => '1 DESC',
 							'reverse' => '1',
-						),
-					),
-					'permissions_allowed' => array(
-						'header' => array(
+						],
+					],
+					'permissions_allowed' => [
+						'header' => [
 							'value' => empty($modSettings['permission_enable_deny']) ? $txt['membergroups_permissions'] : $txt['permissions_allowed'],
 							'class' => 'grid8',
-						),
-						'data' => array(
+						],
+						'data' => [
 							'function' => static fn($rowData) => $rowData['num_permissions']['allowed'],
-						),
-					),
-					'permissions_denied' => array(
+						],
+					],
+					'permissions_denied' => [
 						'evaluate' => !empty($modSettings['permission_enable_deny']),
-						'header' => array(
+						'header' => [
 							'value' => $txt['permissions_denied'],
 							'class' => 'grid8',
-						),
-						'data' => array(
+						],
+						'data' => [
 							'function' => static fn($rowData) => $rowData['num_permissions']['denied'],
-						),
-					),
-					'modify' => array(
-						'header' => array(
+						],
+					],
+					'modify' => [
+						'header' => [
 							'value' => $txt['modify'],
 							'class' => 'grid17',
-						),
-						'data' => array(
+						],
+						'data' => [
 							'function' => function ($rowData) {
 								global $txt;
 
@@ -435,26 +435,26 @@ class ManagePermissions extends AbstractController
 										<br />
 										<a href="' . getUrl('admin', ['action' => 'admin', 'area' => 'permissions', 'sa' => 'modify', 'group' => $rowData['id_parent']] + ($this->_pid !== null ? ['pid' => $this->_pid] : [])) . '">' . $txt['membergroups_modify_parent'] . '</a>';
 							}
-						),
-					),
-					'check' => array(
-						'header' => array(
+						],
+					],
+					'check' => [
+						'header' => [
 							'value' => '<input type="checkbox" onclick="invertAll(this, this.form);" class="input_check" />',
 							'class' => 'centertext',
 							'style' => 'width:4%;',
-						),
-						'data' => array(
-							'sprintf' => array(
+						],
+						'data' => [
+							'sprintf' => [
 								'format' => '<input type="checkbox" name="group[]" value="%1$d" class="input_check" />',
-								'params' => array(
+								'params' => [
 									'id_group' => false,
-								),
-							),
+								],
+							],
 							'class' => 'centertext',
-						),
-					),
-				),
-			);
+						],
+					],
+				],
+			];
 
 			createList($listOptions);
 		}
@@ -470,13 +470,13 @@ class ManagePermissions extends AbstractController
 			// Change the selected tab to better reflect that this really is a board profile.
 			$context[$context['admin_menu_name']]['current_subsection'] = 'profiles';
 
-			$context['profile'] = array(
+			$context['profile'] = [
 				'id' => $this->_pid,
 				'name' => $context['profiles'][$this->_pid]['name'],
-			);
+			];
 		}
 
-		$context['groups'] = array_merge(array(0 => $txt['membergroups_members']), getInheritableGroups());
+		$context['groups'] = array_merge([0 => $txt['membergroups_members']], getInheritableGroups());
 
 		// Load the proper template.
 		$context['sub_template'] = 'permission_index';
@@ -486,7 +486,7 @@ class ManagePermissions extends AbstractController
 	/**
 	 * Handle permissions by board... more or less. :P
 	 */
-	public function action_board()
+	public function action_board(): void
 	{
 		global $context, $txt;
 
@@ -501,7 +501,7 @@ class ManagePermissions extends AbstractController
 			checkSession('request');
 			validateToken('admin-mpb');
 
-			$changes = array();
+			$changes = [];
 			foreach ($this->_req->post->boardprofile as $board => $profile)
 			{
 				$changes[(int) $profile][] = (int) $board;
@@ -526,10 +526,10 @@ class ManagePermissions extends AbstractController
 				$js .= '{name: ' . JavaScriptEscape($profile['name']) . ', id: ' . $id . '},';
 			}
 
-			theme()->addJavascriptVar(array(
+			theme()->addJavascriptVar([
 				'permission_profiles' => substr($js, 0, -1) . ')',
 				'txt_save' => JavaScriptEscape($txt['save']),
-			));
+			]);
 		}
 
 		// Get the board tree.
@@ -539,15 +539,15 @@ class ManagePermissions extends AbstractController
 		$boards = $boardTree->getBoards();
 
 		// Build the list of the boards.
-		$context['categories'] = array();
+		$context['categories'] = [];
 		$bbc_parser = ParserWrapper::instance();
 		foreach ($cat_tree as $catid => $tree)
 		{
-			$context['categories'][$catid] = array(
+			$context['categories'][$catid] = [
 				'name' => &$tree['node']['name'],
 				'id' => &$tree['node']['id'],
-				'boards' => array()
-			);
+				'boards' => []
+			];
 			foreach ($boardList[$catid] as $boardid)
 			{
 				$boards[$boardid]['description'] = $bbc_parser->parseBoard($boards[$boardid]['description']);
@@ -557,14 +557,14 @@ class ManagePermissions extends AbstractController
 					$boards[$boardid]['profile'] = 1;
 				}
 
-				$context['categories'][$catid]['boards'][$boardid] = array(
+				$context['categories'][$catid]['boards'][$boardid] = [
 					'id' => &$boards[$boardid]['id'],
 					'name' => &$boards[$boardid]['name'],
 					'description' => &$boards[$boardid]['description'],
 					'child_level' => &$boards[$boardid]['level'],
 					'profile' => &$boards[$boardid]['profile'],
 					'profile_name' => $context['profiles'][$boards[$boardid]['profile']]['name'],
-				);
+				];
 			}
 		}
 
@@ -576,9 +576,9 @@ class ManagePermissions extends AbstractController
 	 * Handles permission modification actions from the upper part of the
 	 * permission manager index.
 	 *
-	 * @throws \ElkArte\Exceptions\Exception
+	 * @throws Exception
 	 */
-	public function action_quick()
+	public function action_quick(): void
 	{
 		checkSession();
 		validateToken('admin-mpq', 'quick');
@@ -594,7 +594,7 @@ class ManagePermissions extends AbstractController
 
 		if (empty($this->_req->post->group) || !is_array($this->_req->post->group))
 		{
-			$this->_req->post->group = array();
+			$this->_req->post->group = [];
 		}
 
 		// Only accept numeric values for selected membergroups.
@@ -613,7 +613,7 @@ class ManagePermissions extends AbstractController
 		}
 
 		// Clear out any cached authority.
-		updateSettings(array('settings_updated' => time()));
+		updateSettings(['settings_updated' => time()]);
 
 		// No groups where selected.
 		if (empty($this->_req->post->group))
@@ -625,7 +625,7 @@ class ManagePermissions extends AbstractController
 		if (!empty($this->_req->post->predefined))
 		{
 			// Make sure it's a predefined permission set we expect.
-			if (!in_array($this->_req->post->predefined, array('restrict', 'standard', 'moderator', 'maintenance')))
+			if (!in_array($this->_req->post->predefined, ['restrict', 'standard', 'moderator', 'maintenance']))
 			{
 				redirectexit('action=admin;area=permissions;pid=' . $this->_pid);
 			}
@@ -652,7 +652,7 @@ class ManagePermissions extends AbstractController
 			}
 
 			// Make sure the group we're copying to is never included.
-			$this->_req->post->group = array_diff($this->_req->post->group, array($this->_req->post->copy_from));
+			$this->_req->post->group = array_diff($this->_req->post->group, [$this->_req->post->copy_from]);
 
 			// No groups left? Too bad.
 			if (empty($this->_req->post->group))
@@ -678,7 +678,7 @@ class ManagePermissions extends AbstractController
 			[$permissionType, $permission] = explode('/', $this->_req->post->permissions);
 
 			// Check whether our input is within expected range.
-			if (!in_array($this->_req->post->add_remove, array('add', 'clear', 'deny')) || !in_array($permissionType, array('membergroup', 'board')))
+			if (!in_array($this->_req->post->add_remove, ['add', 'clear', 'deny']) || !in_array($permissionType, ['membergroup', 'board']))
 			{
 				redirectexit('action=admin;area=permissions;pid=' . $this->_pid);
 			}
@@ -698,7 +698,7 @@ class ManagePermissions extends AbstractController
 			else
 			{
 				$add_deny = $this->_req->post->add_remove === 'add' ? '1' : '0';
-				$permChange = array();
+				$permChange = [];
 				foreach ($this->_req->post->group as $groupID)
 				{
 					if ($groupID == -1 && in_array($permission, $this->illegal_guest_permissions))
@@ -708,11 +708,11 @@ class ManagePermissions extends AbstractController
 
 					if ($permissionType === 'membergroup' && $groupID != 1 && $groupID != 3 && (empty($this->illegal_permissions) || !in_array($permission, $this->illegal_permissions)))
 					{
-						$permChange[] = array($permission, $groupID, $add_deny);
+						$permChange[] = [$permission, $groupID, $add_deny];
 					}
 					elseif ($permissionType !== 'membergroup')
 					{
-						$permChange[] = array($permission, $groupID, $add_deny, $bid);
+						$permChange[] = [$permission, $groupID, $add_deny, $bid];
 					}
 				}
 
@@ -740,7 +740,7 @@ class ManagePermissions extends AbstractController
 	/**
 	 * Initializes the necessary to modify a membergroup's permissions.
 	 */
-	public function action_modify()
+	public function action_modify(): void
 	{
 		global $context, $txt;
 
@@ -806,10 +806,10 @@ class ManagePermissions extends AbstractController
 		}
 
 		// Fetch the current permissions.
-		$permissions = array(
-			'membergroup' => array('allowed' => array(), 'denied' => array()),
-			'board' => array('allowed' => array(), 'denied' => array())
-		);
+		$permissions = [
+			'membergroup' => ['allowed' => [], 'denied' => []],
+			'board' => ['allowed' => [], 'denied' => []]
+		];
 
 		// General permissions?
 		if ($context['permission_type'] === 'membergroup')
@@ -855,7 +855,7 @@ class ManagePermissions extends AbstractController
 	/**
 	 * This function actually saves modifications to a membergroup's board permissions.
 	 */
-	public function action_modify2()
+	public function action_modify2(): void
 	{
 		checkSession();
 		validateToken('admin-mp');
@@ -889,7 +889,7 @@ class ManagePermissions extends AbstractController
 			throw new Exception('cannot_edit_permissions_inherited');
 		}
 
-		$givePerms = array('membergroup' => array(), 'board' => array());
+		$givePerms = ['membergroup' => [], 'board' => []];
 
 		// Guest group, we need illegal, guest permissions.
 		if ($current_group_id === -1)
@@ -914,7 +914,7 @@ class ManagePermissions extends AbstractController
 								continue;
 							}
 
-							$givePerms[$perm_type][] = array($permission, $current_group_id, $value === 'deny' ? 0 : 1);
+							$givePerms[$perm_type][] = [$permission, $current_group_id, $value === 'deny' ? 0 : 1];
 						}
 					}
 				}
@@ -934,7 +934,7 @@ class ManagePermissions extends AbstractController
 
 		// Insert the boardpermissions.
 		$profileid = max(1, $this->_pid);
-		deleteAllBoardPermissions(array($current_group_id), $profileid);
+		deleteAllBoardPermissions([$current_group_id], $profileid);
 
 		if (isset($givePerms['board']) && $givePerms['board'] !== [])
 		{
@@ -950,7 +950,7 @@ class ManagePermissions extends AbstractController
 		$this->permissionsObject->updateChild($current_group_id, $this->_pid);
 
 		// Clear cached privs.
-		updateSettings(array('settings_updated' => time()));
+		updateSettings(['settings_updated' => time()]);
 
 		redirectexit('action=admin;area=permissions;pid=' . $this->_pid);
 	}
@@ -960,7 +960,7 @@ class ManagePermissions extends AbstractController
 	 *
 	 * @event integrate_save_permission_settings
 	 */
-	public function action_permSettings_display()
+	public function action_permSettings_display(): void
 	{
 		global $context, $modSettings, $txt;
 
@@ -1014,18 +1014,18 @@ class ManagePermissions extends AbstractController
 	private function _settings()
 	{
 		// All the setting variables
-		$config_vars = array(
-			array('title', 'settings'),
+		$config_vars = [
+			['title', 'settings'],
 			// Inline permissions.
-			array('permissions', 'manage_permissions', 'collapsed' => true),
+			['permissions', 'manage_permissions', 'collapsed' => true],
 			'',
 			// A few useful settings
-			array('check', 'permission_enable_deny'),
-			array('check', 'permission_enable_postgroups'),
-		);
+			['check', 'permission_enable_deny'],
+			['check', 'permission_enable_postgroups'],
+		];
 
 		// Add new settings with a nice hook, makes them available for admin settings search as well
-		call_integration_hook('integrate_modify_permission_settings', array(&$config_vars));
+		call_integration_hook('integrate_modify_permission_settings', [&$config_vars]);
 
 		return $config_vars;
 	}
@@ -1041,7 +1041,7 @@ class ManagePermissions extends AbstractController
 	/**
 	 * Add/Edit/Delete profiles.
 	 */
-	public function action_profiles()
+	public function action_profiles(): void
 	{
 		global $context, $txt;
 
@@ -1083,7 +1083,7 @@ class ManagePermissions extends AbstractController
 			checkSession('post');
 			validateToken('admin-mpp');
 
-			$profiles = array();
+			$profiles = [];
 			foreach ($this->_req->post->delete_profile as $profile)
 			{
 				if ($profile > 4)
@@ -1116,10 +1116,10 @@ class ManagePermissions extends AbstractController
 			$context['profiles'][$id]['can_delete'] = $context['profiles'][$id]['can_edit'] && empty($profile['in_use']);
 		}
 
-		theme()->addJavascriptVar(array(
+		theme()->addJavascriptVar([
 			'txt_permissions_commit' => $txt['permissions_commit'],
 			'txt_permissions_profile_rename' => $txt['permissions_profile_rename'],
-		), true);
+		], true);
 		createToken('admin-mpp');
 	}
 
@@ -1128,7 +1128,7 @@ class ManagePermissions extends AbstractController
 	 *
 	 * @event integrate_post_moderation_mapping passed $mappings to add other post moderation values
 	 */
-	public function action_postmod()
+	public function action_postmod(): void
 	{
 		global $context, $txt;
 
@@ -1145,21 +1145,21 @@ class ManagePermissions extends AbstractController
 		loadPermissionProfiles();
 
 		// Mappings, our key => array(can_do_moderated, can_do_all)
-		$mappings = array(
-			'new_topic' => array('post_new', 'post_unapproved_topics'),
-			'replies_own' => array('post_reply_own', 'post_unapproved_replies_own'),
-			'replies_any' => array('post_reply_any', 'post_unapproved_replies_any'),
-			'attachment' => array('post_attachment', 'post_unapproved_attachments'),
-		);
+		$mappings = [
+			'new_topic' => ['post_new', 'post_unapproved_topics'],
+			'replies_own' => ['post_reply_own', 'post_unapproved_replies_own'],
+			'replies_any' => ['post_reply_any', 'post_unapproved_replies_any'],
+			'attachment' => ['post_attachment', 'post_unapproved_attachments'],
+		];
 
-		call_integration_hook('integrate_post_moderation_mapping', array(&$mappings));
+		call_integration_hook('integrate_post_moderation_mapping', [&$mappings]);
 
 		// Load the groups.
 		require_once(SUBSDIR . '/Membergroups.subs.php');
 		$context['profile_groups'] = prepareMembergroupPermissions();
 
 		// What are the permissions we are querying?
-		$all_permissions = array();
+		$all_permissions = [];
 		foreach ($mappings as $perm_set)
 		{
 			$all_permissions = array_merge($all_permissions, $perm_set);
@@ -1174,7 +1174,7 @@ class ManagePermissions extends AbstractController
 			deleteBoardPermissions($context['profile_groups'], $context['current_profile'], $all_permissions);
 
 			// Do it group by group.
-			$new_permissions = array();
+			$new_permissions = [];
 			foreach ($context['profile_groups'] as $group)
 			{
 				foreach ($mappings as $index => $data)
@@ -1185,12 +1185,12 @@ class ManagePermissions extends AbstractController
 						if ($temp[$group['id']] === 'allow')
 						{
 							// Give them both sets for fun.
-							$new_permissions[] = array($context['current_profile'], $group['id'], $data[0], 1);
-							$new_permissions[] = array($context['current_profile'], $group['id'], $data[1], 1);
+							$new_permissions[] = [$context['current_profile'], $group['id'], $data[0], 1];
+							$new_permissions[] = [$context['current_profile'], $group['id'], $data[1], 1];
 						}
 						elseif ($temp[$group['id']] === 'moderate')
 						{
-							$new_permissions[] = array($context['current_profile'], $group['id'], $data[1], 1);
+							$new_permissions[] = [$context['current_profile'], $group['id'], $data[1], 1];
 						}
 					}
 				}

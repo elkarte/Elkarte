@@ -163,7 +163,7 @@ class MaillistPost extends AbstractController
 	 * @return bool Returns true if the mail list is enabled, false otherwise.
 	 * @global array $modSettings The settings array.
 	 */
-	private function isMailListEnabled()
+	private function isMailListEnabled(): bool
 	{
 		global $modSettings;
 
@@ -178,7 +178,7 @@ class MaillistPost extends AbstractController
 	 *
 	 * @return EmailParse The parsed email message.
 	 */
-	private function loadEmailMessage($data, $key)
+	private function loadEmailMessage($data, $key): EmailParse
 	{
 		// Load the email parser and set some data to work with
 		$email_message = new EmailParse();
@@ -342,7 +342,7 @@ class MaillistPost extends AbstractController
 	 *
 	 * @return void
 	 */
-	private function adjustForUserLanguage()
+	private function adjustForUserLanguage(): void
 	{
 		global $txt, $language;
 
@@ -366,7 +366,7 @@ class MaillistPost extends AbstractController
 	 * @param object $email_message The email message object.
 	 * @return bool Whether a new topic needs to be created or not.
 	 */
-	private function makeNewTopicBySubjectChange($email_message)
+	private function makeNewTopicBySubjectChange($email_message): bool
 	{
 		global $modSettings;
 

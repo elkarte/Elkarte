@@ -67,13 +67,13 @@ class Reports extends AbstractController
 		$context['page_title'] = $txt['generate_reports'];
 
 		// These are the types of reports which exist - and the functions to generate them.
-		$context['report_types'] = array(
+		$context['report_types'] = [
 			'boards' => 'action_boards',
 			'board_perms' => 'action_board_perms',
 			'member_groups' => 'action_member_groups',
 			'group_perms' => 'action_group_perms',
 			'staff' => 'action_staff',
-		);
+		];
 
 		call_integration_hook('integrate_report_types');
 
@@ -87,13 +87,13 @@ class Reports extends AbstractController
 		$is_first = 0;
 		foreach ($context['report_types'] as $k => $temp)
 		{
-			$context['report_types'][$k] = array(
+			$context['report_types'][$k] = [
 				'id' => $k,
 				'title' => $txt['gr_type_' . $k] ?? $k,
 				'description' => $txt['gr_type_desc_' . $k] ?? null,
 				'function' => $temp,
 				'is_first' => $is_first++ === 0,
-			);
+			];
 		}
 
 		$report_type = empty($this->_req->post->rt) ? (!empty($this->_req->query->rt) ? $this->_req->query->rt : null) : ($this->_req->post->rt);
@@ -110,14 +110,14 @@ class Reports extends AbstractController
 		$context['sub_template'] = 'generate_report';
 
 		// What are valid templates for showing reports?
-		$reportTemplates = array(
-			'main' => array(
+		$reportTemplates = [
+			'main' => [
 				'layers' => null,
-			),
-			'print' => array(
-				'layers' => array('print'),
-			),
-		);
+			],
+			'print' => [
+				'layers' => ['print'],
+			],
+		];
 
 		// Specific template? Use that instead of main!
 		$set_template = $this->_req->query->st ?? null;
@@ -141,20 +141,20 @@ class Reports extends AbstractController
 		$context['page_title'] .= ' - ' . ($txt['gr_type_' . $context['report_type']] ?? $context['report_type']);
 
 		// Build the reports button array.
-		$context['report_buttons'] = array(
-			'generate_reports' => array(
+		$context['report_buttons'] = [
+			'generate_reports' => [
 				'text' => 'generate_reports',
 				'lang' => true,
 				'url' => getUrl('admin', ['action' => 'admin', 'area' => 'reports']),
 				'active' => true,
-			),
-			'print' => array(
+			],
+			'print' => [
 				'text' => 'print',
 				'lang' => true,
 				'url' => getUrl('admin', ['action' => 'admin', 'area' => 'reports', 'rt' => $context['report_type'], 'st' => 'print']),
 				'custom' => 'target="_blank"',
-			),
-		);
+			],
+		];
 
 		// Allow mods to add additional buttons here
 		call_integration_hook('integrate_report_buttons');
@@ -175,7 +175,7 @@ class Reports extends AbstractController
 	 * - Never access the context directly, but use the data handling
 	 * functions to do so.
 	 */
-	public function action_boards()
+	public function action_boards(): void
 	{
 		global $context, $txt, $modSettings;
 
@@ -191,7 +191,7 @@ class Reports extends AbstractController
 		// Get every moderator.
 		$moderators = allBoardModerators();
 
-		$boards_moderated = array();
+		$boards_moderated = [];
 		foreach ($moderators as $id_board => $rows)
 		{
 			foreach ($rows as $row)
@@ -201,15 +201,15 @@ class Reports extends AbstractController
 		}
 
 		// Get all the possible membergroups!
-		$all_groups = getBasicMembergroupData(array('all'), array(), null, false);
-		$groups = array(-1 => $txt['guest_title'], 0 => $txt['full_member']);
+		$all_groups = getBasicMembergroupData(['all'], [], null, false);
+		$groups = [-1 => $txt['guest_title'], 0 => $txt['full_member']];
 		foreach ($all_groups as $row)
 		{
 			$groups[$row['id']] = empty($row['online_color']) ? $row['name'] : '<span style="color: ' . $row['online_color'] . '">' . $row['name'] . '</span>';
 		}
 
 		// All the fields we'll show.
-		$boardSettings = array(
+		$boardSettings = [
 			'category' => $txt['board_category'],
 			'parent' => $txt['board_parent'],
 			'num_topics' => $txt['board_num_topics'],
@@ -221,7 +221,7 @@ class Reports extends AbstractController
 			'profile' => $txt['board_profile'],
 			'moderators' => $txt['board_moderators'],
 			'groups' => $txt['board_groups'],
-		);
+		];
 
 		if (!empty($modSettings['deny_boards_access']))
 		{
@@ -246,7 +246,7 @@ class Reports extends AbstractController
 			$profile_name = $context['profiles'][$row['id_profile']]['name'];
 
 			// Create the main data array.
-			$boardData = array(
+			$boardData = [
 				'category' => $row['cat_name'],
 				'parent' => $row['parent_name'],
 				'num_posts' => $row['num_posts'],
@@ -257,7 +257,7 @@ class Reports extends AbstractController
 				'profile' => $profile_name,
 				'override_theme' => $row['override_theme'] ? $txt['yes'] : $txt['no'],
 				'moderators' => empty($boards_moderated[$row['id_board']]) ? $txt['none'] : implode(', ', $boards_moderated[$row['id_board']]),
-			);
+			];
 
 			// Work out the membergroups who can and cannot access it (but only if enabled).
 			$allowedGroups = explode(',', $row['member_groups']);
@@ -307,7 +307,7 @@ class Reports extends AbstractController
 	 * - Never access the context directly, but use the data handling
 	 * functions to do so.
 	 */
-	public function action_board_perms()
+	public function action_board_perms(): void
 	{
 		global $txt;
 
@@ -319,7 +319,7 @@ class Reports extends AbstractController
 		require_once(SUBSDIR . '/Membergroups.subs.php');
 
 		// Lets get started
-		$query_boards = array();
+		$query_boards = [];
 
 		if (isset($this->_req->post->boards))
 		{
@@ -339,15 +339,15 @@ class Reports extends AbstractController
 
 		// Fetch the board names and profiles.
 		// This returns id_board, name, id_profile keys
-		$boards = fetchBoardsInfo($query_boards, array('sort_by' => 'id_board', 'selects' => 'permissions'));
-		$profiles = array();
+		$boards = fetchBoardsInfo($query_boards, ['sort_by' => 'id_board', 'selects' => 'permissions']);
+		$profiles = [];
 		foreach ($boards as $b)
 		{
 			$profiles[] = $b['id_profile'];
 		}
 
 		// Groups, next.
-		$query_groups = array();
+		$query_groups = [];
 		if (isset($this->_req->post->groups))
 		{
 			if (!is_array($this->_req->post->groups))
@@ -372,11 +372,11 @@ class Reports extends AbstractController
 
 		if (empty($query_groups) || in_array(-1, $query_groups) || in_array(0, $query_groups))
 		{
-			$member_groups = array('col' => '', -1 => $txt['membergroups_guests'], 0 => $txt['membergroups_members']) + $all_groups;
+			$member_groups = ['col' => '', -1 => $txt['membergroups_guests'], 0 => $txt['membergroups_members']] + $all_groups;
 		}
 		else
 		{
-			$member_groups = array('col' => '') + $all_groups;
+			$member_groups = ['col' => ''] + $all_groups;
 		}
 
 		// Make sure that every group is represented - plus in rows!
@@ -384,8 +384,8 @@ class Reports extends AbstractController
 
 		// Permissions, last!
 		$boardPermissions = boardPermissions($profiles, $group_clause, $query_groups);
-		$permissions = array();
-		$board_permissions = array();
+		$permissions = [];
+		$board_permissions = [];
 
 		foreach ($boardPermissions as $row)
 		{
@@ -401,9 +401,9 @@ class Reports extends AbstractController
 			if (!isset($permissions[$row['permission']]))
 			{
 				// This will be reused on other boards.
-				$permissions[$row['permission']] = array(
+				$permissions[$row['permission']] = [
 					'title' => $txt['board_perms_name_' . $row['permission']] ?? $row['permission'],
-				);
+				];
 			}
 		}
 
@@ -423,7 +423,7 @@ class Reports extends AbstractController
 			foreach ($permissions as $ID_PERM => $perm_info)
 			{
 				// Default data for this row.
-				$curData = array('col' => $perm_info['title']);
+				$curData = ['col' => $perm_info['title']];
 
 				// Now cycle each membergroup in this set of permissions.
 				foreach (array_keys($member_groups) as $id_group)
@@ -434,7 +434,7 @@ class Reports extends AbstractController
 						continue;
 					}
 
-					$group_permissions = $groups[$id_group] ?? array();
+					$group_permissions = $groups[$id_group] ?? [];
 
 					$curData[$id_group] = $group_permissions[$ID_PERM] ?? 'x';
 
@@ -466,7 +466,7 @@ class Reports extends AbstractController
 	 * they are all called from action_index.
 	 * - Never access the context directly, but use the data handling functions to do so.
 	 */
-	public function action_member_groups()
+	public function action_member_groups(): void
 	{
 		global $txt, $settings, $modSettings;
 
@@ -474,25 +474,25 @@ class Reports extends AbstractController
 		require_once(SUBSDIR . '/Reports.subs.php');
 
 		// Fetch all the board names.
-		$raw_boards = fetchBoardsInfo('all', array('selects' => 'reports'));
-		$boards = array();
+		$raw_boards = fetchBoardsInfo('all', ['selects' => 'reports']);
+		$boards = [];
 		foreach ($raw_boards as $row)
 		{
-			$groups = trim($row['member_groups']) === '' ? array(1) : array_merge(array(1), explode(',', $row['member_groups']));
+			$groups = trim($row['member_groups']) === '' ? [1] : array_merge([1], explode(',', $row['member_groups']));
 
-			$denyGroups = trim($row['deny_member_groups']) === '' ? array() : explode(',', $row['deny_member_groups']);
+			$denyGroups = trim($row['deny_member_groups']) === '' ? [] : explode(',', $row['deny_member_groups']);
 
-			$boards[$row['id_board']] = array(
+			$boards[$row['id_board']] = [
 				'id' => $row['id_board'],
 				'name' => $row['name'],
 				'profile' => $row['id_profile'],
 				'groups' => $groups,
 				'deny_groups' => $denyGroups,
-			);
+			];
 		}
 
 		// Standard settings.
-		$mgSettings = array(
+		$mgSettings = [
 			'name' => '',
 			'#sep#1' => $txt['member_group_settings'],
 			'color' => $txt['member_group_color'],
@@ -500,7 +500,7 @@ class Reports extends AbstractController
 			'max_messages' => $txt['member_group_max_messages'],
 			'icons' => $txt['member_group_icons'],
 			'#sep#2' => $txt['member_group_access'],
-		);
+		];
 
 		// Add on the boards!
 		foreach ($boards as $board)
@@ -523,13 +523,13 @@ class Reports extends AbstractController
 		{
 			$row['icons'] = explode('#', $row['icons']);
 
-			$group = array(
+			$group = [
 				'name' => $row['group_name'],
 				'color' => empty($row['online_color']) ? '-' : '<span style="color: ' . $row['online_color'] . ';">' . $row['online_color'] . '</span>',
 				'min_posts' => $row['min_posts'] == -1 ? 'N/A' : $row['min_posts'],
 				'max_messages' => $row['max_messages'],
-				'icons' => isset($row['icons'][0]) && ($row['icons'][0] !== '' && $row['icons'][0] !== '0') && (isset($row['icons'][1]) && ($row['icons'][1] !== '' && $row['icons'][1] !== '0')) ? str_repeat('<img src="' . $settings['images_url'] . '/group_icons/' . $row['icons'][1] . '" alt="*" />', $row['icons'][0]) : '',
-			);
+				'icons' => isset($row['icons'][0], $row['icons'][1]) && $row['icons'][0] !== '' && $row['icons'][0] !== '0' && $row['icons'][1] !== '' && $row['icons'][1] !== '0' ? str_repeat('<img src="' . $settings['images_url'] . '/group_icons/' . $row['icons'][1] . '" alt="*" />', $row['icons'][0]) : '',
+			];
 
 			// Board permissions.
 			foreach ($boards as $board)
@@ -549,7 +549,7 @@ class Reports extends AbstractController
 	 * - Never access the context directly, but use the data handling
 	 * functions to do so.
 	 */
-	public function action_group_perms()
+	public function action_group_perms(): void
 	{
 		global $txt;
 
@@ -560,12 +560,12 @@ class Reports extends AbstractController
 				$this->_req->post->groups = explode(',', $this->_req->post->groups);
 			}
 
-			$query_groups = array_diff(array_map('intval', $this->_req->post->groups), array(3));
+			$query_groups = array_diff(array_map('intval', $this->_req->post->groups), [3]);
 			$group_clause = 'id_group IN ({array_int:groups})';
 		}
 		else
 		{
-			$query_groups = array();
+			$query_groups = [];
 			$group_clause = 'id_group != {int:moderator_group}';
 		}
 
@@ -575,11 +575,11 @@ class Reports extends AbstractController
 
 		if (!isset($this->_req->post->groups) || in_array(-1, $this->_req->post->groups) || in_array(0, $this->_req->post->groups))
 		{
-			$groups = array('col' => '', -1 => $txt['membergroups_guests'], 0 => $txt['membergroups_members']) + $all_groups;
+			$groups = ['col' => '', -1 => $txt['membergroups_guests'], 0 => $txt['membergroups_members']] + $all_groups;
 		}
 		else
 		{
-			$groups = array('col' => '') + $all_groups;
+			$groups = ['col' => ''] + $all_groups;
 		}
 
 		// Make sure that every group is represented!
@@ -595,9 +595,9 @@ class Reports extends AbstractController
 		addSeparator($txt['board_perms_permission']);
 
 		// Now the big permission fetch!
-		$perms = boardPermissionsByGroup($group_clause, $this->_req->post->groups ?? array());
+		$perms = boardPermissionsByGroup($group_clause, $this->_req->post->groups ?? []);
 		$lastPermission = null;
-		$curData = array();
+		$curData = [];
 		foreach ($perms as $row)
 		{
 			// If this is a new permission flush the last row.
@@ -610,7 +610,7 @@ class Reports extends AbstractController
 				}
 
 				// Add the permission name in the left column.
-				$curData = array('col' => $txt['group_perms_name_' . $row['permission']] ?? $row['permission']);
+				$curData = ['col' => $txt['group_perms_name_' . $row['permission']] ?? $row['permission']];
 
 				$lastPermission = $row['permission'];
 			}
@@ -639,7 +639,7 @@ class Reports extends AbstractController
 	 * - Never access the context directly, but use the data handling
 	 * functions to do so.
 	 */
-	public function action_staff()
+	public function action_staff(): void
 	{
 		global $txt;
 
@@ -650,7 +650,7 @@ class Reports extends AbstractController
 		// Fetch all the board names.
 		$boards = fetchBoardsInfo('all');
 		$moderators = allBoardModerators(true);
-		$boards_moderated = array();
+		$boards_moderated = [];
 
 		foreach ($moderators as $id_member => $rows)
 		{
@@ -676,26 +676,26 @@ class Reports extends AbstractController
 		}
 
 		// Get all the possible membergroups!
-		$all_groups = getBasicMembergroupData(array('all'), array(), null, false);
-		$groups = array(0 => $txt['full_member']);
+		$all_groups = getBasicMembergroupData(['all'], [], null, false);
+		$groups = [0 => $txt['full_member']];
 		foreach ($all_groups as $row)
 		{
 			$groups[$row['id']] = empty($row['online_color']) ? $row['name'] : '<span style="color: ' . $row['online_color'] . '">' . $row['name'] . '</span>';
 		}
 
 		// All the fields we'll show.
-		$staffSettings = array(
+		$staffSettings = [
 			'position' => $txt['report_staff_position'],
 			'moderates' => $txt['report_staff_moderates'],
 			'posts' => $txt['report_staff_posts'],
 			'last_login' => $txt['report_staff_last_login'],
-		);
+		];
 
 		// Do it in columns, it's just easier.
 		setKeys('cols');
 
 		// Get the latest activated member's display name.
-		$result = getBasicMemberData($allStaff, array('moderation' => true, 'sort' => 'real_name'));
+		$result = getBasicMemberData($allStaff, ['moderation' => true, 'sort' => 'real_name']);
 		foreach ($result as $row)
 		{
 			// Each member gets their own table!.
@@ -705,12 +705,12 @@ class Reports extends AbstractController
 			addData($staffSettings);
 
 			// Create the main data array.
-			$staffData = array(
+			$staffData = [
 				'position' => $groups[$row['id_group']] ?? $groups[0],
 				'posts' => $row['posts'],
 				'last_login' => standardTime($row['last_login']),
-				'moderates' => array(),
-			);
+				'moderates' => [],
+			];
 
 			// What do they moderate?
 			if (in_array($row['id_member'], $global_mods))
@@ -759,7 +759,7 @@ class Reports extends AbstractController
  * @param string $width_shaded = 'auto' width of a shaded column (auto means not defined).
  * @param string $align_shaded = 'auto' alignment of data in a shaded column.
  */
-function newTable($title = '', $default_value = '', $shading = 'all', $width_normal = 'auto', $align_normal = 'center', $width_shaded = 'auto', $align_shaded = 'auto')
+function newTable(string $title = '', string $default_value = '', string $shading = 'all', string $width_normal = 'auto', string $align_normal = 'center', string $width_shaded = 'auto', string $align_shaded = 'auto')
 {
 	global $context;
 
@@ -770,23 +770,23 @@ function newTable($title = '', $default_value = '', $shading = 'all', $width_nor
 	}
 
 	// Create the table!
-	$context['tables'][$context['table_count']] = array(
+	$context['tables'][$context['table_count']] = [
 		'title' => $title,
 		'default_value' => $default_value,
-		'shading' => array(
+		'shading' => [
 			'left' => $shading === 'all' || $shading === 'left',
 			'top' => $shading === 'all' || $shading === 'top',
-		),
-		'width' => array(
+		],
+		'width' => [
 			'normal' => $width_normal,
 			'shaded' => $width_shaded,
-		),
-		'align' => array(
+		],
+		'align' => [
 			'normal' => $align_normal,
 			'shaded' => $align_shaded,
-		),
-		'data' => array(),
-	);
+		],
+		'data' => [],
+	];
 
 	$context['current_table'] = $context['table_count'];
 
@@ -814,7 +814,7 @@ function newTable($title = '', $default_value = '', $shading = 'all', $width_nor
  *
  * @return bool
  */
-function addData($inc_data, $custom_table = null)
+function addData(array $inc_data, int $custom_table = null)
 {
 	global $context;
 
@@ -833,15 +833,15 @@ function addData($inc_data, $custom_table = null)
 	$table = $custom_table ?? $context['current_table'];
 
 	// If we have keys, sanitise the data...
-	$data = array();
+	$data = [];
 	if (!empty($context['keys']))
 	{
 		// Basically, check every key exists!
 		foreach ($context['keys'] as $key => $dummy)
 		{
-			$data[$key] = array(
+			$data[$key] = [
 				'v' => empty($inc_data[$key]) ? $context['tables'][$table]['default_value'] : $inc_data[$key],
-			);
+			];
 			// Special "hack" the adding separators when doing data by column.
 			if (substr($key, 0, 5) === '#sep#')
 			{
@@ -854,9 +854,9 @@ function addData($inc_data, $custom_table = null)
 		$data = $inc_data;
 		foreach ($data as $key => $value)
 		{
-			$data[$key] = array(
+			$data[$key] = [
 				'v' => $value,
-			);
+			];
 
 			if (substr($key, 0, 5) === '#sep#')
 			{
@@ -889,7 +889,7 @@ function addData($inc_data, $custom_table = null)
  *
  * @return null|false false if there are no tables
  */
-function addSeparator($title = '', $custom_table = null)
+function addSeparator(string $title = '', string $custom_table = null)
 {
 	global $context;
 
@@ -908,12 +908,12 @@ function addSeparator($title = '', $custom_table = null)
 	$table = $custom_table ?? $context['current_table'];
 
 	// Plumb in the separator
-	$context['tables'][$table]['data'][] = array(
-		0 => array(
+	$context['tables'][$table]['data'][] = [
+		0 => [
 			'separator' => true,
 			'v' => $title
-		)
-	);
+		]
+	];
 }
 
 /**
@@ -976,7 +976,7 @@ function finishTables()
  * @param array $keys = array()
  * @param bool $reverse = false
  */
-function setKeys($method = 'rows', $keys = array(), $reverse = false)
+function setKeys(string $method = 'rows', array $keys = [], bool $reverse = false)
 {
 	global $context;
 

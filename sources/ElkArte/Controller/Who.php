@@ -53,7 +53,7 @@ class Who extends AbstractController
 	 * @uses  template_whos_online() sub-template in Who.template
 	 * @uses  Who language file.
 	 */
-	public function action_who()
+	public function action_who(): void
 	{
 		global $context, $txt, $modSettings;
 
@@ -71,28 +71,28 @@ class Who extends AbstractController
 		Txt::load('Who');
 
 		// Sort out... the column sorting.
-		$sort_methods = array(
+		$sort_methods = [
 			'user' => 'mem.real_name',
 			'time' => 'lo.log_time'
-		);
+		];
 
-		$show_methods = array(
+		$show_methods = [
 			'members' => '(lo.id_member != 0)',
 			'guests' => '(lo.id_member = 0)',
 			'all' => '1=1',
-		);
+		];
 
 		// Store the sort methods and the show types for use in the template.
-		$context['sort_methods'] = array(
+		$context['sort_methods'] = [
 			'user' => $txt['who_user'],
 			'time' => $txt['who_time'],
-		);
+		];
 
-		$context['show_methods'] = array(
+		$context['show_methods'] = [
 			'all' => $txt['who_show_all'],
 			'members' => $txt['who_show_members_only'],
 			'guests' => $txt['who_show_guests_only'],
-		);
+		];
 
 		// Can they see spiders too?
 		if (!empty($modSettings['show_spider_online']) && ($modSettings['show_spider_online'] == 2 || allowedTo('admin_forum')) && !empty($modSettings['spider_name_cache']))
@@ -127,7 +127,7 @@ class Who extends AbstractController
 
 		$context['sort_direction'] = isset($this->_req->query->asc) || ($this->_req->getQuery('sort_dir', 'trim', '') === 'asc') ? 'up' : 'down';
 
-		$conditions = array();
+		$conditions = [];
 		if (!allowedTo('moderate_forum'))
 		{
 			$conditions[] = '(COALESCE(mem.show_online, 1) = 1)';
@@ -169,9 +169,9 @@ class Who extends AbstractController
 		// Look for people online, provided they don't mind if you see they are.
 		$members = onlineMembers($conditions, $sort_method, $context['sort_direction'], $context['start']);
 
-		$context['members'] = array();
-		$member_ids = array();
-		$url_data = array();
+		$context['members'] = [];
+		$member_ids = [];
+		$url_data = [];
 
 		foreach ($members as $row)
 		{
@@ -182,7 +182,7 @@ class Who extends AbstractController
 			}
 
 			// Send the information to the template.
-			$context['members'][$row['session']] = array(
+			$context['members'][$row['session']] = [
 				'id' => $row['id_member'],
 				'ip' => allowedTo('moderate_forum') ? $row['ip'] : '',
 				// It is *going* to be today or yesterday, so why keep that information in there?
@@ -193,9 +193,9 @@ class Who extends AbstractController
 				'is_hidden' => $row['show_online'] == 0,
 				'id_spider' => $row['id_spider'],
 				'color' => empty($row['online_color']) ? '' : $row['online_color']
-			);
+			];
 
-			$url_data[$row['session']] = array($row['url'], $row['id_member']);
+			$url_data[$row['session']] = [$row['url'], $row['id_member']];
 			$member_ids[] = $row['id_member'];
 		}
 
@@ -204,12 +204,12 @@ class Who extends AbstractController
 		MembersList::loadGuest();
 
 		// Are we showing spiders?
-		$spiderContext = array();
+		$spiderContext = [];
 		if (!empty($modSettings['show_spider_online']) && ($modSettings['show_spider_online'] == 2 || allowedTo('admin_forum')) && !empty($modSettings['spider_name_cache']))
 		{
 			foreach (unserialize($modSettings['spider_name_cache']) as $id => $name)
 			{
-				$spiderContext[$id] = array(
+				$spiderContext[$id] = [
 					'id' => 0,
 					'name' => $name,
 					'group' => $txt['spiders'],
@@ -217,7 +217,7 @@ class Who extends AbstractController
 					'link' => $name,
 					'email' => $name,
 					'is_guest' => true
-				);
+				];
 			}
 		}
 
@@ -274,6 +274,6 @@ class Who extends AbstractController
 		$context['can_send_email'] = allowedTo('send_email_to_members');
 
 		// Any profile fields disabled?
-		$context['disabled_fields'] = isset($modSettings['disabled_profile_fields']) ? array_flip(explode(',', $modSettings['disabled_profile_fields'])) : array();
+		$context['disabled_fields'] = isset($modSettings['disabled_profile_fields']) ? array_flip(explode(',', $modSettings['disabled_profile_fields'])) : [];
 	}
 }

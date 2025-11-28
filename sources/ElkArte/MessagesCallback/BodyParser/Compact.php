@@ -83,7 +83,7 @@ class Compact implements BodyParserInterface
 	 * @return string The transformed body of the message with censored words, parsed BBCodes,
 	 *                converted line breaks, and stripped HTML tags except for <br>.
 	 */
-	private function transformBody($body, $smileys_enabled)
+	private function transformBody($body, $smileys_enabled): string
 	{
 		$bbc_parser = ParserWrapper::instance();
 		$body = censor($body);
@@ -104,7 +104,7 @@ class Compact implements BodyParserInterface
 	 * @param int $charLimit The maximum number of characters allowed in the message body.
 	 * @return string The highlighted or shortened message body.
 	 */
-	private function highlightOrShortenBody($body, $charLimit)
+	private function highlightOrShortenBody($body, $charLimit): string
 	{
 		if (!$this->_highlight)
 		{
@@ -125,7 +125,7 @@ class Compact implements BodyParserInterface
 	 * @param int $charLimit The character limit for highlighting.
 	 * @return string The highlighted body.
 	 */
-	private function highlightBody($body, $charLimit)
+	private function highlightBody($body, $charLimit): string
 	{
 		$matchString = $this->getMatchString();
 		$body = un_htmlspecialchars(strtr($body, ['&nbsp;' => ' ', '<br />' => "\n", '&#91;' => '[', '&#93;' => ']', '&#58;' => ':', '&#64;' => '@']));
@@ -157,7 +157,7 @@ class Compact implements BodyParserInterface
 	 *
 	 * @return string The match string.
 	 */
-	private function getMatchString()
+	private function getMatchString(): string
 	{
 		$matchString = '';
 		$this->force_partial_word = false;
@@ -186,7 +186,7 @@ class Compact implements BodyParserInterface
 	 * @param string $pattern The regular expression pattern used for matching.
 	 * @return array Returns an array containing all matches found in the body text.
 	 */
-	private function getMatches($body, $pattern)
+	private function getMatches($body, $pattern): array
 	{
 		preg_match_all($pattern, $body, $matches);
 
@@ -199,7 +199,7 @@ class Compact implements BodyParserInterface
 	 * @param array $matches An array of matches found in the body text.
 	 * @return string Returns the body text with highlighted matches.
 	 */
-	private function getHighlightedBody($matches)
+	private function getHighlightedBody($matches): string
 	{
 		$body = '';
 
@@ -218,7 +218,7 @@ class Compact implements BodyParserInterface
 	 * @param string $body The body text with international characters to be fixed.
 	 * @return string Returns the body text with the fixed international characters.
 	 */
-	private function fixInternationalCharacters($body)
+	private function fixInternationalCharacters($body): string
 	{
 		return preg_replace_callback('~(&amp;#(\d{1,7}|x[0-9a-fA-F]{1,6});)~', 'entity_fix__callback', $body);
 	}

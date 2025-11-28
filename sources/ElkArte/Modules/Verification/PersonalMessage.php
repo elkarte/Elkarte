@@ -52,7 +52,7 @@ class PersonalMessage extends AbstractModule
 	/**
 	 * Prepare $context for the PM page.
 	 */
-	public function prepare_send_context()
+	public function prepare_send_context(): void
 	{
 		global $context;
 
@@ -71,7 +71,7 @@ class PersonalMessage extends AbstractModule
 	 *
 	 * @param ErrorContext $post_errors
 	 */
-	public function before_sending($post_errors)
+	public function before_sending($post_errors): void
 	{
 		global $context;
 

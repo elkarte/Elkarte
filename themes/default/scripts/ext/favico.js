@@ -3,7 +3,7 @@
  * @fileOverview Favico animations
  * @author Miroslav Magda, http://blog.ejci.net
  * @source: https://github.com/ejci/favico.js
- * @version 0.3.10
+ * @version 0.3.10 / elkarte
  */
 
 /**
@@ -101,21 +101,27 @@
 			}
 			_opt.type = (type['' + _opt.type]) ? _opt.type : _def.type;
 
-			_orig = link. getIcons();
+			// get available favicon <link> elements (or create one)
+			_orig = link.getIcons();
 			//create temp canvas
 			_canvas = document.createElement('canvas');
 			//create temp image
 			_img = document.createElement('img');
-			var lastIcon = _orig[_orig.length - 1];
-			if (lastIcon.hasAttribute('href')) {
+			var lastIcon = (_orig && _orig.length) ? link.pickBest(_orig) : null;
+			if (lastIcon && lastIcon.hasAttribute('href')) {
 				_img.setAttribute('crossOrigin', 'anonymous');
 				//get width/height
 				_img.onload = function () {
 					_h = (_img.height > 0) ? _img.height : 32;
 					_w = (_img.width > 0) ? _img.width : 32;
-					_canvas.height = _h;
-					_canvas.width = _w;
+					// High-DPI support: scale the canvas for devicePixelRatio to keep text sharp
+					var _scale = Math.max(1, Math.floor((_opt.win && _opt.win.devicePixelRatio) ? _opt.win.devicePixelRatio : (window.devicePixelRatio || 1)));
+					_canvas.height = _h * _scale;
+					_canvas.width = _w * _scale;
 					_context = _canvas.getContext('2d');
+					if (_scale !== 1) {
+						_context.scale(_scale, _scale);
+					}
 					icon.ready();
 				};
 				_img.setAttribute('src', lastIcon.getAttribute('href'));
@@ -124,9 +130,13 @@
 				_w = 32;
 				_img.height = _h;
 				_img.width = _w;
-				_canvas.height = _h;
-				_canvas.width = _w;
+				var _scale2 = Math.max(1, Math.floor((_opt.win && _opt.win.devicePixelRatio) ? _opt.win.devicePixelRatio : (window.devicePixelRatio || 1)));
+				_canvas.height = _h * _scale2;
+				_canvas.width = _w * _scale2;
 				_context = _canvas.getContext('2d');
+				if (_scale2 !== 1) {
+					_context.scale(_scale2, _scale2);
+				}
 				icon.ready();
 			}
 
@@ -505,9 +515,12 @@
 			//get link element
 			var getLinks = function () {
 				var icons = [];
-				var links = _doc.getElementsByTagName('head')[0].getElementsByTagName('link');
+				var head = _doc.getElementsByTagName('head')[0];
+				if (!head) return icons;
+				var links = head.getElementsByTagName('link');
 				for (var i = 0; i < links.length; i++) {
-					if ((/(^|\s)icon(\s|$)/i).test(links[i].getAttribute('rel'))) {
+					var rel = links[i].getAttribute('rel') || '';
+					if ((/(^|\s)(shortcut\s+icon|apple-touch-icon|mask-icon|icon)(\s|$)/i).test(rel)) {
 						icons.push(links[i]);
 					}
 				}
@@ -517,8 +530,16 @@
 				elms = [_opt.element];
 			} else if (_opt.elementId) {
 				//if img element identified by elementId
-				elms = [_doc.getElementById(_opt.elementId)];
-				elms[0].setAttribute('href', elms[0].getAttribute('src'));
+				var byId = _doc.getElementById(_opt.elementId);
+				if (byId) {
+					elms = [byId];
+					if (byId.getAttribute('src')) {
+						byId.setAttribute('href', byId.getAttribute('src'));
+					}
+				} else {
+					// fallback to auto-detect links if element not found
+					elms = getLinks();
+				}
 			} else {
 				//if link element
 				elms = getLinks();
@@ -533,14 +554,45 @@
 			});
 			return elms;
 		};
+		// choose the most suitable link element (prefer largest sizes and PNG)
+		link.pickBest = function (elms) {
+			if (!elms || !elms.length) return null;
+			var parsed = [];
+			for (var i = 0; i < elms.length; i++) {
+				var e = elms[i];
+				var sizesAttr = e.getAttribute('sizes') || '';
+				var size = 0;
+				if (sizesAttr && sizesAttr.toLowerCase() !== 'any') {
+					var m = sizesAttr.match(/(\d+)x(\d+)/);
+					if (m) {
+						size = parseInt(m[1], 10);
+					}
+				}
+				var type = (e.getAttribute('type') || '').toLowerCase();
+				var href = e.getAttribute('href') || '';
+				parsed.push({ elm: e, size: size, png: (type.indexOf('png') > -1) || (/\.png(\?|$)/i).test(href) });
+			}
+			parsed.sort(function (a, b) {
+				if (a.size !== b.size) return b.size - a.size;
+				if (a.png !== b.png) return (a.png ? -1 : 1);
+				return 0;
+			});
+			return parsed[0].elm;
+		};
 		link.setIcon = function (canvas) {
-			var url = canvas.toDataURL('image/png');
+			var url = '';
+			try {
+				url = canvas.toDataURL('image/png');
+			} catch (e) {
+				// if canvas is tainted or unsupported, do nothing
+				return;
+			}
 			link.setIconSrc(url);
 		};
 		link.setIconSrc = function (url) {
 			if (_opt.dataUrl) {
 				//if using custom exporter
-				_opt.dataUrl(url);
+				try { _opt.dataUrl(url); } catch (e) { /* ignore exporter errors */ }
 			}
 			if (_opt.element) {
 				_opt.element.setAttribute('href', url);
@@ -634,66 +686,66 @@
 			h: 0.6,
 			o: 0.0
 		}, {
-				x: 0.4,
-				y: 0.4,
-				w: 0.6,
-				h: 0.6,
-				o: 0.1
-			}, {
-				x: 0.4,
-				y: 0.4,
-				w: 0.6,
-				h: 0.6,
-				o: 0.2
-			}, {
-				x: 0.4,
-				y: 0.4,
-				w: 0.6,
-				h: 0.6,
-				o: 0.3
-			}, {
-				x: 0.4,
-				y: 0.4,
-				w: 0.6,
-				h: 0.6,
-				o: 0.4
-			}, {
-				x: 0.4,
-				y: 0.4,
-				w: 0.6,
-				h: 0.6,
-				o: 0.5
-			}, {
-				x: 0.4,
-				y: 0.4,
-				w: 0.6,
-				h: 0.6,
-				o: 0.6
-			}, {
-				x: 0.4,
-				y: 0.4,
-				w: 0.6,
-				h: 0.6,
-				o: 0.7
-			}, {
-				x: 0.4,
-				y: 0.4,
-				w: 0.6,
-				h: 0.6,
-				o: 0.8
-			}, {
-				x: 0.4,
-				y: 0.4,
-				w: 0.6,
-				h: 0.6,
-				o: 0.9
-			}, {
-				x: 0.4,
-				y: 0.4,
-				w: 0.6,
-				h: 0.6,
-				o: 1.0
-			}];
+			x: 0.4,
+			y: 0.4,
+			w: 0.6,
+			h: 0.6,
+			o: 0.1
+		}, {
+			x: 0.4,
+			y: 0.4,
+			w: 0.6,
+			h: 0.6,
+			o: 0.2
+		}, {
+			x: 0.4,
+			y: 0.4,
+			w: 0.6,
+			h: 0.6,
+			o: 0.3
+		}, {
+			x: 0.4,
+			y: 0.4,
+			w: 0.6,
+			h: 0.6,
+			o: 0.4
+		}, {
+			x: 0.4,
+			y: 0.4,
+			w: 0.6,
+			h: 0.6,
+			o: 0.5
+		}, {
+			x: 0.4,
+			y: 0.4,
+			w: 0.6,
+			h: 0.6,
+			o: 0.6
+		}, {
+			x: 0.4,
+			y: 0.4,
+			w: 0.6,
+			h: 0.6,
+			o: 0.7
+		}, {
+			x: 0.4,
+			y: 0.4,
+			w: 0.6,
+			h: 0.6,
+			o: 0.8
+		}, {
+			x: 0.4,
+			y: 0.4,
+			w: 0.6,
+			h: 0.6,
+			o: 0.9
+		}, {
+			x: 0.4,
+			y: 0.4,
+			w: 0.6,
+			h: 0.6,
+			o: 1.0
+		}];
 		animation.types.none = [{
 			x: 0.4,
 			y: 0.4,
@@ -708,42 +760,42 @@
 			h: 0,
 			o: 1
 		}, {
-				x: 0.9,
-				y: 0.9,
-				w: 0.1,
-				h: 0.1,
-				o: 1
-			}, {
-				x: 0.8,
-				y: 0.8,
-				w: 0.2,
-				h: 0.2,
-				o: 1
-			}, {
-				x: 0.7,
-				y: 0.7,
-				w: 0.3,
-				h: 0.3,
-				o: 1
-			}, {
-				x: 0.6,
-				y: 0.6,
-				w: 0.4,
-				h: 0.4,
-				o: 1
-			}, {
-				x: 0.5,
-				y: 0.5,
-				w: 0.5,
-				h: 0.5,
-				o: 1
-			}, {
-				x: 0.4,
-				y: 0.4,
-				w: 0.6,
-				h: 0.6,
-				o: 1
-			}];
+			x: 0.9,
+			y: 0.9,
+			w: 0.1,
+			h: 0.1,
+			o: 1
+		}, {
+			x: 0.8,
+			y: 0.8,
+			w: 0.2,
+			h: 0.2,
+			o: 1
+		}, {
+			x: 0.7,
+			y: 0.7,
+			w: 0.3,
+			h: 0.3,
+			o: 1
+		}, {
+			x: 0.6,
+			y: 0.6,
+			w: 0.4,
+			h: 0.4,
+			o: 1
+		}, {
+			x: 0.5,
+			y: 0.5,
+			w: 0.5,
+			h: 0.5,
+			o: 1
+		}, {
+			x: 0.4,
+			y: 0.4,
+			w: 0.6,
+			h: 0.6,
+			o: 1
+		}];
 		animation.types.popFade = [{
 			x: 0.75,
 			y: 0.75,
@@ -751,42 +803,42 @@
 			h: 0,
 			o: 0
 		}, {
-				x: 0.65,
-				y: 0.65,
-				w: 0.1,
-				h: 0.1,
-				o: 0.2
-			}, {
-				x: 0.6,
-				y: 0.6,
-				w: 0.2,
-				h: 0.2,
-				o: 0.4
-			}, {
-				x: 0.55,
-				y: 0.55,
-				w: 0.3,
-				h: 0.3,
-				o: 0.6
-			}, {
-				x: 0.50,
-				y: 0.50,
-				w: 0.4,
-				h: 0.4,
-				o: 0.8
-			}, {
-				x: 0.45,
-				y: 0.45,
-				w: 0.5,
-				h: 0.5,
-				o: 0.9
-			}, {
-				x: 0.4,
-				y: 0.4,
-				w: 0.6,
-				h: 0.6,
-				o: 1
-			}];
+			x: 0.65,
+			y: 0.65,
+			w: 0.1,
+			h: 0.1,
+			o: 0.2
+		}, {
+			x: 0.6,
+			y: 0.6,
+			w: 0.2,
+			h: 0.2,
+			o: 0.4
+		}, {
+			x: 0.55,
+			y: 0.55,
+			w: 0.3,
+			h: 0.3,
+			o: 0.6
+		}, {
+			x: 0.50,
+			y: 0.50,
+			w: 0.4,
+			h: 0.4,
+			o: 0.8
+		}, {
+			x: 0.45,
+			y: 0.45,
+			w: 0.5,
+			h: 0.5,
+			o: 0.9
+		}, {
+			x: 0.4,
+			y: 0.4,
+			w: 0.6,
+			h: 0.6,
+			o: 1
+		}];
 		animation.types.slide = [{
 			x: 0.4,
 			y: 1,
@@ -794,48 +846,48 @@
 			h: 0.6,
 			o: 1
 		}, {
-				x: 0.4,
-				y: 0.9,
-				w: 0.6,
-				h: 0.6,
-				o: 1
-			}, {
-				x: 0.4,
-				y: 0.9,
-				w: 0.6,
-				h: 0.6,
-				o: 1
-			}, {
-				x: 0.4,
-				y: 0.8,
-				w: 0.6,
-				h: 0.6,
-				o: 1
-			}, {
-				x: 0.4,
-				y: 0.7,
-				w: 0.6,
-				h: 0.6,
-				o: 1
-			}, {
-				x: 0.4,
-				y: 0.6,
-				w: 0.6,
-				h: 0.6,
-				o: 1
-			}, {
-				x: 0.4,
-				y: 0.5,
-				w: 0.6,
-				h: 0.6,
-				o: 1
-			}, {
-				x: 0.4,
-				y: 0.4,
-				w: 0.6,
-				h: 0.6,
-				o: 1
-			}];
+			x: 0.4,
+			y: 0.9,
+			w: 0.6,
+			h: 0.6,
+			o: 1
+		}, {
+			x: 0.4,
+			y: 0.9,
+			w: 0.6,
+			h: 0.6,
+			o: 1
+		}, {
+			x: 0.4,
+			y: 0.8,
+			w: 0.6,
+			h: 0.6,
+			o: 1
+		}, {
+			x: 0.4,
+			y: 0.7,
+			w: 0.6,
+			h: 0.6,
+			o: 1
+		}, {
+			x: 0.4,
+			y: 0.6,
+			w: 0.6,
+			h: 0.6,
+			o: 1
+		}, {
+			x: 0.4,
+			y: 0.5,
+			w: 0.6,
+			h: 0.6,
+			o: 1
+		}, {
+			x: 0.4,
+			y: 0.4,
+			w: 0.6,
+			h: 0.6,
+			o: 1
+		}];
 		/**
 		 * Run animation
 		 * @param {Object} opt Animation options

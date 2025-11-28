@@ -40,7 +40,7 @@ class Avatars
 	/** @var FileFunctions */
 	private $file_functions;
 
-	/** @var boolean */
+	/** @var bool */
 	private $downloadedExternalAvatar;
 
 	/** @var int */
@@ -128,7 +128,7 @@ class Avatars
 	 *
 	 * @throws Exception attachments_no_write
 	 */
-	public function processExternalStored()
+	public function processExternalStored(): bool
 	{
 		Txt::load('Post');
 
@@ -163,7 +163,7 @@ class Avatars
 	/**
 	 * Do nothing, a favored opportunity for many
 	 */
-	public function processNone()
+	public function processNone(): bool
 	{
 		global $profile_vars;
 
@@ -176,7 +176,7 @@ class Avatars
 	/**
 	 * Use one of the many fantastic avatars provided by ElkArte or the Admin
 	 */
-	public function processServerStored()
+	public function processServerStored(): bool
 	{
 		global $modSettings, $profile_vars;
 
@@ -184,7 +184,7 @@ class Avatars
 		$cat = $this->req->getPost('cat', 'trim', '');
 		$file = $this->req->getPost('file', 'trim', '');
 
-		$profile_vars['avatar'] = strtr(empty($file) ? $cat : $file, array('&amp;' => '&'));
+		$profile_vars['avatar'] = strtr(empty($file) ? $cat : $file, ['&amp;' => '&']);
 		$profile_vars['avatar'] = preg_match('~^([\w _!@%*=\-#()\[\]&.,]+/)?[\w _!@%*=\-#()\[\]&.,]+$~', $profile_vars['avatar']) === 1
 			&& preg_match('/\.\./', $profile_vars['avatar']) === 0
 			&& $this->file_functions->fileExists($modSettings['avatar_directory'] . '/' . $profile_vars['avatar'])
@@ -196,7 +196,7 @@ class Avatars
 	/**
 	 * Use a Gravatar image based on your email address
 	 */
-	public function processGravatar()
+	public function processGravatar(): bool
 	{
 		global $profile_vars;
 
@@ -209,7 +209,7 @@ class Avatars
 	/**
 	 * Use an external URL to display your ugly mug.
 	 */
-	public function processExternalUrl()
+	public function processExternalUrl(): bool
 	{
 		global $profile_vars, $modSettings;
 
@@ -259,9 +259,9 @@ class Avatars
 	/**
 	 * Process an uploaded avatar, similar functionality to attaching an image in a post
 	 *
-	 * @return boolean
+	 * @return bool
 	 */
-	public function processUploaded()
+	public function processUploaded(): bool
 	{
 		global $modSettings, $profile_vars;
 
@@ -322,9 +322,9 @@ class Avatars
 	 *
 	 * @param array $sizes
 	 * @param Image $image
-	 * @return boolean
+	 * @return bool
 	 */
-	public function prepareAvatarImage($sizes, $image)
+	public function prepareAvatarImage($sizes, $image): bool
 	{
 		global $modSettings;
 
@@ -371,9 +371,9 @@ class Avatars
 	 * Image has been loaded, validated as an image, and gone through security checks.
 	 *
 	 * @param Image $image
-	 * @return boolean
+	 * @return bool
 	 */
-	private function _saveUploadedAvatar($image)
+	private function _saveUploadedAvatar($image): bool
 	{
 		global $modSettings;
 
@@ -431,19 +431,19 @@ class Avatars
 		if ($success)
 		{
 			// Remove previous attachments this member might have had.
-			removeAttachments(array('id_member' => $this->memID));
+			removeAttachments(['id_member' => $this->memID]);
 
 			$db->insert('',
 				'{db_prefix}attachments',
-				array(
+				[
 					'id_member' => 'int', 'attachment_type' => 'int', 'filename' => 'string', 'file_hash' => 'string', 'fileext' => 'string', 'size' => 'int',
 					'width' => 'int', 'height' => 'int', 'mime_type' => 'string', 'id_folder' => 'int',
-				),
-				array(
+				],
+				[
 					$this->memID, 1, $destName, '', $extension, $file_size,
 					(int) $sizes[0], (int) $sizes[1], $mime_type, 1,
-				),
-				array('id_attach')
+				],
+				['id_attach']
 			);
 
 			// Retain this globally in case the script wants it.
@@ -463,9 +463,9 @@ class Avatars
 	 * Reset attachment avatar data after a successful save.
 	 * $modSettings['new_avatar_data'] is set via the saveAvatar function
 	 *
-	 * @param boolean $reset true to set empty values
+	 * @param bool $reset true to set empty values
 	 */
-	private function _resetAvatarData($reset = false)
+	private function _resetAvatarData($reset = false): bool
 	{
 		global $modSettings, $cur_profile;
 
@@ -476,7 +476,7 @@ class Avatars
 
 		if ($reset)
 		{
-			removeAttachments(array('id_member' => $this->memID));
+			removeAttachments(['id_member' => $this->memID]);
 		}
 
 		return true;
@@ -488,7 +488,7 @@ class Avatars
 	 *
 	 * @throws Exception attachments_no_write, attach_timeout
 	 */
-	private function _moveTempAvatar()
+	private function _moveTempAvatar(): void
 	{
 		if (!$this->file_functions->isWritable($this->uploadDir))
 		{
@@ -508,9 +508,9 @@ class Avatars
 	/**
 	 * Sets a value to downloadedExternalAvatar
 	 *
-	 * @param boolean $value
+	 * @param bool $value
 	 */
-	private function _setDownloadedExternalAvatar($value)
+	private function _setDownloadedExternalAvatar($value): void
 	{
 		$this->downloadedExternalAvatar = $value;
 	}
@@ -520,7 +520,7 @@ class Avatars
 	 *
 	 * @return bool
 	 */
-	private function _getDownloadedExternalAvatar()
+	private function _getDownloadedExternalAvatar(): bool
 	{
 		return $this->downloadedExternalAvatar;
 	}
@@ -530,7 +530,7 @@ class Avatars
 	 *
 	 * @return bool
 	 */
-	private function _isValidHttp()
+	private function _isValidHttp(): bool
 	{
 		$userPicPersonal = $this->req->getPost('userpicpersonal', 'trim', '');
 
@@ -544,7 +544,7 @@ class Avatars
 	 *
 	 * @return bool
 	 */
-	private function _isValidHttps()
+	private function _isValidHttps(): bool
 	{
 		$userPicPersonal = $this->req->getPost('userpicpersonal', 'trim', '');
 

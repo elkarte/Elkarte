@@ -149,7 +149,7 @@ class keyCaptcha implements ControlInterface
 	/**
 	 * The site and user keys are joined by a 0
 	 */
-	private function getSiteAndUserKeys()
+	private function getSiteAndUserKeys(): void
 	{
 		$set = explode('0', trim($this->_secret_key), 2);
 		if (count($set) === 2)

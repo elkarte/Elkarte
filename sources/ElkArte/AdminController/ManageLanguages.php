@@ -52,12 +52,12 @@ class ManageLanguages extends AbstractController
 		theme()->getTemplates()->load('ManageLanguages');
 		Txt::load('ManageSettings');
 
-		$subActions = array(
-			'edit' => array($this, 'action_edit', 'permission' => 'admin_forum'),
-			'settings' => array($this, 'action_languageSettings_display', 'permission' => 'admin_forum'),
-			'downloadlang' => array($this, 'action_downloadlang', 'permission' => 'admin_forum'),
-			'editlang' => array($this, 'action_editlang', 'permission' => 'admin_forum'),
-		);
+		$subActions = [
+			'edit' => [$this, 'action_edit', 'permission' => 'admin_forum'],
+			'settings' => [$this, 'action_languageSettings_display', 'permission' => 'admin_forum'],
+			'downloadlang' => [$this, 'action_downloadlang', 'permission' => 'admin_forum'],
+			'editlang' => [$this, 'action_editlang', 'permission' => 'admin_forum'],
+		];
 
 		// Get ready for action
 		$action = new Action('manage_languages');
@@ -85,7 +85,7 @@ class ManageLanguages extends AbstractController
 	 *
 	 * @uses ManageLanguages template, add_language sub-template.
 	 */
-	public function action_add()
+	public function action_add(): void
 	{
 		global $context, $txt;
 
@@ -98,56 +98,56 @@ class ManageLanguages extends AbstractController
 
 			$context['elk_search_term'] = $this->_req->getPost('lang_add', 'trim|htmlspecialchars[ENT_COMPAT]');
 
-			$listOptions = array(
+			$listOptions = [
 				'id' => 'languages',
-				'get_items' => array(
+				'get_items' => [
 					'function' => 'list_getLanguagesList',
-				),
-				'columns' => array(
-					'name' => array(
-						'header' => array(
+				],
+				'columns' => [
+					'name' => [
+						'header' => [
 							'value' => $txt['name'],
-						),
-						'data' => array(
+						],
+						'data' => [
 							'db' => 'name',
-						),
-					),
-					'description' => array(
-						'header' => array(
+						],
+					],
+					'description' => [
+						'header' => [
 							'value' => $txt['add_language_elk_desc'],
-						),
-						'data' => array(
+						],
+						'data' => [
 							'db' => 'description',
-						),
-					),
-					'version' => array(
-						'header' => array(
+						],
+					],
+					'version' => [
+						'header' => [
 							'value' => $txt['add_language_elk_version'],
-						),
-						'data' => array(
+						],
+						'data' => [
 							'db' => 'version',
-						),
-					),
-					'utf8' => array(
-						'header' => array(
+						],
+					],
+					'utf8' => [
+						'header' => [
 							'value' => $txt['add_language_elk_utf8'],
-						),
-						'data' => array(
+						],
+						'data' => [
 							'db' => 'utf8',
-						),
-					),
-					'install_link' => array(
-						'header' => array(
+						],
+					],
+					'install_link' => [
+						'header' => [
 							'value' => $txt['add_language_elk_install'],
 							'class' => 'centertext',
-						),
-						'data' => array(
+						],
+						'data' => [
 							'db' => 'install_link',
 							'class' => 'centertext',
-						),
-					),
-				),
-			);
+						],
+					],
+				],
+			];
 
 			createList($listOptions);
 		}
@@ -158,7 +158,7 @@ class ManageLanguages extends AbstractController
 	/**
 	 * This lists all the current languages and allows editing of them.
 	 */
-	public function action_edit()
+	public function action_edit(): void
 	{
 		global $txt, $context, $language;
 
@@ -194,78 +194,78 @@ class ManageLanguages extends AbstractController
 		createToken('admin-lang');
 		createToken('admin-ssc');
 
-		$listOptions = array(
+		$listOptions = [
 			'id' => 'language_list',
 			'items_per_page' => 20,
 			'base_href' => getUrl('admin', ['action' => 'admin', 'area' => 'languages']),
 			'title' => $txt['edit_languages'],
-			'get_items' => array(
+			'get_items' => [
 				'function' => 'list_getLanguages',
-			),
-			'get_count' => array(
+			],
+			'get_count' => [
 				'function' => 'list_getNumLanguages',
-			),
-			'columns' => array(
-				'default' => array(
-					'header' => array(
+			],
+			'columns' => [
+				'default' => [
+					'header' => [
 						'value' => $txt['languages_default'],
 						'class' => 'centertext',
-					),
-					'data' => array(
+					],
+					'data' => [
 						'function' => static fn($rowData) => '<input type="radio" name="def_language" value="' . $rowData['id'] . '" ' . ($rowData['default'] ? 'checked="checked"' : '') . ' class="input_radio" />',
 						'style' => 'width: 8%;',
 						'class' => 'centertext',
-					),
-				),
-				'name' => array(
-					'header' => array(
+					],
+				],
+				'name' => [
+					'header' => [
 						'value' => $txt['languages_lang_name'],
-					),
-					'data' => array(
+					],
+					'data' => [
 						'function' => static fn($rowData) => sprintf('<a href="%1$s">%2$s<i class="icon icon-small i-modify"></i></a>', getUrl('admin', ['action' => 'admin', 'area' => 'languages', 'sa' => 'editlang', 'lid' => $rowData['id']]), $rowData['name']),
-					),
-				),
-				'count' => array(
-					'header' => array(
+					],
+				],
+				'count' => [
+					'header' => [
 						'value' => $txt['languages_users'],
-					),
-					'data' => array(
+					],
+					'data' => [
 						'db_htmlsafe' => 'count',
-					),
-				),
-				'locale' => array(
-					'header' => array(
+					],
+				],
+				'locale' => [
+					'header' => [
 						'value' => $txt['languages_locale'],
-					),
-					'data' => array(
+					],
+					'data' => [
 						'db_htmlsafe' => 'locale',
-					),
-				),
-			),
-			'form' => array(
+					],
+				],
+			],
+			'form' => [
 				'href' => getUrl('admin', ['action' => 'admin', 'area' => 'languages']),
 				'token' => 'admin-lang',
-			),
-			'additional_rows' => array(
-				array(
+			],
+			'additional_rows' => [
+				[
 					'class' => 'submitbutton',
 					'position' => 'bottom_of_list',
 					'value' => '
 						<input type="hidden" name="' . $context['session_var'] . '" value="' . $context['session_id'] . '" />
 						<input type="submit" name="set_default" value="' . $txt['save'] . '"' . ($fileFunc->isWritable(BOARDDIR . '/Settings.php') ? '' : ' disabled="disabled"') . ' />
 						<input type="hidden" name="' . $context['admin-ssc_token_var'] . '" value="' . $context['admin-ssc_token'] . '" />',
-				),
-			),
-		);
+				],
+			],
+		];
 
 		// Display a warning if we cannot edit the default setting.
 		if (!$fileFunc->isWritable(BOARDDIR . '/Settings.php'))
 		{
-			$listOptions['additional_rows'][] = array(
+			$listOptions['additional_rows'][] = [
 				'position' => 'after_title',
 				'value' => $txt['language_settings_writable'],
 				'class' => 'smalltext alert',
-			);
+			];
 		}
 
 		createList($listOptions);
@@ -279,14 +279,14 @@ class ManageLanguages extends AbstractController
 	 *
 	 * @param string $language
 	 */
-	private function updateLanguage($language)
+	private function updateLanguage(string $language): void
 	{
-		$configVars = array(
-			array('language', '', 'file')
-		);
-		$configValues = array(
+		$configVars = [
+			['language', '', 'file']
+		];
+		$configValues = [
 			'language' => $language
-		);
+		];
 		$settingsForm = new SettingsForm(SettingsForm::FILE_ADAPTER);
 		$settingsForm->setConfigVars($configVars);
 		$settingsForm->setConfigValues($configValues);
@@ -306,7 +306,7 @@ class ManageLanguages extends AbstractController
 	 * @uses ManageLanguages template, download_language sub-template.
 	 * @uses Admin template, show_list sub-template.
 	 */
-	public function action_downloadlang()
+	public function action_downloadlang(): void
 	{
 		// @todo for the moment there is no facility to download packages, so better kill it here
 		throw new Exception('no_access', false);
@@ -315,7 +315,7 @@ class ManageLanguages extends AbstractController
 	/**
 	 * Edit a particular set of language entries.
 	 */
-	public function action_editlang()
+	public function action_editlang(): void
 	{
 		global $context, $txt;
 
@@ -364,13 +364,13 @@ class ManageLanguages extends AbstractController
 		$new_lang->load('Index', true);
 
 		// Setup the primary settings context.
-		$context['primary_settings'] = array(
-			'name' => Util::ucwords(strtr($context['lang_id'], array('_' => ' ', '-utf8' => ''))),
+		$context['primary_settings'] = [
+			'name' => Util::ucwords(strtr($context['lang_id'], ['_' => ' ', '-utf8' => ''])),
 			'locale' => $mtxt['lang_locale'],
 			'dictionary' => $mtxt['lang_dictionary'],
 			'spelling' => $mtxt['lang_spelling'],
 			'rtl' => $mtxt['lang_rtl'],
-		);
+		];
 
 		// Quickly load index language entries.
 		$edit_lang = new LangEditor($context['lang_id'], database());
@@ -401,7 +401,7 @@ class ManageLanguages extends AbstractController
 	 *
 	 * @event integrate_save_language_settings
 	 */
-	public function action_languageSettings_display()
+	public function action_languageSettings_display(): void
 	{
 		global $context, $txt;
 
@@ -460,18 +460,18 @@ class ManageLanguages extends AbstractController
 		// Warn the user if the backup of Settings.php failed.
 		$settings_not_writable = !is_writable(BOARDDIR . '/Settings.php');
 
-		$config_vars = array(
-			'language' => array('language', $txt['default_language'], 'file', 'select', array(), null, 'disabled' => $settings_not_writable),
-			array('userLanguage', $txt['userLanguage'], 'db', 'check', null, 'userLanguage'),
-		);
+		$config_vars = [
+			'language' => ['language', $txt['default_language'], 'file', 'select', [], null, 'disabled' => $settings_not_writable],
+			['userLanguage', $txt['userLanguage'], 'db', 'check', null, 'userLanguage'],
+		];
 
-		call_integration_hook('integrate_modify_language_settings', array(&$config_vars));
+		call_integration_hook('integrate_modify_language_settings', [&$config_vars]);
 
 		// Get our languages. No cache.
 		$languages = getLanguages(false);
 		foreach ($languages as $lang)
 		{
-			$config_vars['language'][4][] = array($lang['name'], strtr($lang['name'], array('-utf8' => ' (UTF-8)')));
+			$config_vars['language'][4][] = [$lang['name'], strtr($lang['name'], ['-utf8' => ' (UTF-8)'])];
 		}
 
 		return $config_vars;

@@ -57,13 +57,13 @@ use ElkArte\XmlArray;
 class ManageThemes extends AbstractController
 {
 	/** @var string Name of the theme */
-	private $theme_name;
+	private string $theme_name;
 
 	/** @var string Full path to the theme */
-	private $theme_dir;
+	private string $theme_dir;
 
 	/** @var string|null The themes image url if any */
-	private $images_url;
+	private ?string $images_url;
 
 	/**
 	 * {@inheritDoc}
@@ -109,15 +109,15 @@ class ManageThemes extends AbstractController
 		is_not_guest();
 
 		// Theme administration, removal, choice, or installation...
-		$subActions = array(
-			'admin' => array($this, 'action_admin', 'permission' => 'admin_forum'),
-			'list' => array($this, 'action_list', 'permission' => 'admin_forum'),
-			'reset' => array($this, 'action_options', 'permission' => 'admin_forum'),
-			'options' => array($this, 'action_options', 'permission' => 'admin_forum'),
-			'install' => array($this, 'action_install', 'permission' => 'admin_forum'),
-			'remove' => array($this, 'action_remove', 'permission' => 'admin_forum'),
-			'pick' => array($this, 'action_pick', 'permission' => 'admin_forum'),
-		);
+		$subActions = [
+			'admin' => [$this, 'action_admin', 'permission' => 'admin_forum'],
+			'list' => [$this, 'action_list', 'permission' => 'admin_forum'],
+			'reset' => [$this, 'action_options', 'permission' => 'admin_forum'],
+			'options' => [$this, 'action_options', 'permission' => 'admin_forum'],
+			'install' => [$this, 'action_install', 'permission' => 'admin_forum'],
+			'remove' => [$this, 'action_remove', 'permission' => 'admin_forum'],
+			'pick' => [$this, 'action_pick', 'permission' => 'admin_forum'],
+		];
 
 		// Action controller
 		$action = new Action('manage_themes');
@@ -147,7 +147,7 @@ class ManageThemes extends AbstractController
 	 *
 	 * @uses generic_xml_buttons sub template
 	 */
-	public function action_index_api()
+	public function action_index_api(): void
 	{
 		global $txt, $context;
 
@@ -161,17 +161,17 @@ class ManageThemes extends AbstractController
 		if ($this->user->is_guest)
 		{
 			Txt::load('Errors');
-			$context['xml_data'] = array(
+			$context['xml_data'] = [
 				'error' => 1,
 				'text' => $txt['not_guests']
-			);
+			];
 
 			return;
 		}
 
 		// Theme administration, removal, choice, or installation...
 		// Of all the actions we currently know only this
-		$subActions = array(
+		$subActions = [
 			// 'admin' => 'action_admin',
 			// 'list' => 'action_list',
 			// 'reset' => 'action_options',
@@ -179,7 +179,7 @@ class ManageThemes extends AbstractController
 			// 'install' => 'action_install',
 			'remove' => 'action_remove_api',
 			// 'pick' => 'action_pick',
-		);
+		];
 
 		// Follow the sa or just go to administration.
 		if (isset($this->_req->query->sa, $subActions[$this->_req->query->sa]) && $subActions[$this->_req->query->sa] !== '' && $subActions[$this->_req->query->sa] !== '0')
@@ -189,10 +189,10 @@ class ManageThemes extends AbstractController
 		else
 		{
 			Txt::load('Errors');
-			$context['xml_data'] = array(
+			$context['xml_data'] = [
 				'error' => 1,
 				'text' => $txt['error_sa_not_set']
-			);
+			];
 		}
 	}
 
@@ -202,7 +202,7 @@ class ManageThemes extends AbstractController
 	 *
 	 * @uses sub template list_themes, template ManageThemes
 	 */
-	public function action_list()
+	public function action_list(): void
 	{
 		global $context, $boardurl, $txt;
 
@@ -224,22 +224,22 @@ class ManageThemes extends AbstractController
 			validateToken('admin-tl');
 
 			$themes = installedThemes();
-			$setValues = array();
+			$setValues = [];
 
 			foreach ($themes as $id => $theme)
 			{
 				if ($fileFunc->isDir($this->_req->post->reset_dir . '/' . basename($theme['theme_dir'])))
 				{
-					$setValues[] = array($id, 0, 'theme_dir', realpath($this->_req->post->reset_dir . '/' . basename($theme['theme_dir'])));
-					$setValues[] = array($id, 0, 'theme_url', $this->_req->post->reset_url . '/' . basename($theme['theme_dir']));
-					$setValues[] = array($id, 0, 'images_url', $this->_req->post->reset_url . '/' . basename($theme['theme_dir']) . '/' . basename($theme['images_url']));
+					$setValues[] = [$id, 0, 'theme_dir', realpath($this->_req->post->reset_dir . '/' . basename($theme['theme_dir']))];
+					$setValues[] = [$id, 0, 'theme_url', $this->_req->post->reset_url . '/' . basename($theme['theme_dir'])];
+					$setValues[] = [$id, 0, 'images_url', $this->_req->post->reset_url . '/' . basename($theme['theme_dir']) . '/' . basename($theme['images_url'])];
 				}
 
 				if (isset($theme['base_theme_dir']) && $fileFunc->isDir($this->_req->post->reset_dir . '/' . basename($theme['base_theme_dir'])))
 				{
-					$setValues[] = array($id, 0, 'base_theme_dir', realpath($this->_req->post->reset_dir . '/' . basename($theme['base_theme_dir'])));
-					$setValues[] = array($id, 0, 'base_theme_url', $this->_req->post->reset_url . '/' . basename($theme['base_theme_dir']));
-					$setValues[] = array($id, 0, 'base_images_url', $this->_req->post->reset_url . '/' . basename($theme['base_theme_dir']) . '/' . basename($theme['base_images_url']));
+					$setValues[] = [$id, 0, 'base_theme_dir', realpath($this->_req->post->reset_dir . '/' . basename($theme['base_theme_dir']))];
+					$setValues[] = [$id, 0, 'base_theme_url', $this->_req->post->reset_url . '/' . basename($theme['base_theme_dir'])];
+					$setValues[] = [$id, 0, 'base_images_url', $this->_req->post->reset_url . '/' . basename($theme['base_theme_dir']) . '/' . basename($theme['base_images_url'])];
 				}
 
 				Cache::instance()->remove('theme_settings-' . $id);
@@ -278,7 +278,7 @@ class ManageThemes extends AbstractController
 
 		// Off to the template we go
 		$context['sub_template'] = 'list_themes';
-		theme()->addJavascriptVar(array('txt_theme_remove_confirm' => $txt['theme_remove_confirm']), true);
+		theme()->addJavascriptVar(['txt_theme_remove_confirm' => $txt['theme_remove_confirm']], true);
 		$context['reset_dir'] = realpath(BOARDDIR . '/themes');
 		$context['reset_url'] = $boardurl . '/themes';
 
@@ -299,7 +299,7 @@ class ManageThemes extends AbstractController
 	 *
 	 * @event integrate_init_theme
 	 */
-	public function action_setthemesettings()
+	public function action_setthemesettings(): void
 	{
 		global $txt, $context, $settings, $modSettings;
 
@@ -329,7 +329,7 @@ class ManageThemes extends AbstractController
 		// Fetch the smiley sets...
 		$sets = explode(',', 'none,' . $modSettings['smiley_sets_known']);
 		$set_names = explode("\n", $txt['smileys_none'] . "\n" . $modSettings['smiley_sets_names']);
-		$context['smiley_sets'] = array('' => $txt['smileys_no_default']);
+		$context['smiley_sets'] = ['' => $txt['smileys_no_default']];
 		foreach ($sets as $i => $set)
 		{
 			$context['smiley_sets'][$set] = htmlspecialchars($set_names[$i], ENT_COMPAT);
@@ -355,8 +355,8 @@ class ManageThemes extends AbstractController
 		if ($fileFunc->fileExists($settings['theme_dir'] . '/index.template.php'))
 		{
 			$variants = theme()->getSettings();
-			$settings['theme_variants'] = $variants['theme_variants'] ?? array();
-			call_integration_hook('integrate_init_theme', array($theme, &$settings));
+			$settings['theme_variants'] = $variants['theme_variants'] ?? [];
+			call_integration_hook('integrate_init_theme', [$theme, &$settings]);
 		}
 
 		// Submitting!
@@ -366,9 +366,9 @@ class ManageThemes extends AbstractController
 			checkSession();
 			validateToken('admin-sts');
 
-			$options = array();
-			$options['options'] = empty($this->_req->post->options) ? array() : (array) $this->_req->post->options;
-			$options['default_options'] = empty($this->_req->post->default_options) ? array() : (array) $this->_req->post->default_options;
+			$options = [];
+			$options['options'] = empty($this->_req->post->options) ? [] : (array) $this->_req->post->options;
+			$options['default_options'] = empty($this->_req->post->default_options) ? [] : (array) $this->_req->post->default_options;
 
 			// Make sure items are cast correctly.
 			foreach ($context['theme_settings'] as $item)
@@ -380,7 +380,7 @@ class ManageThemes extends AbstractController
 				}
 
 				// Clean them up for the database
-				foreach (array('options', 'default_options') as $option)
+				foreach (['options', 'default_options'] as $option)
 				{
 					if (!isset($options[$option][$item['id']]))
 					{
@@ -402,15 +402,15 @@ class ManageThemes extends AbstractController
 			}
 
 			// Set up the sql query.
-			$inserts = array();
+			$inserts = [];
 			foreach ($options['options'] as $opt => $val)
 			{
-				$inserts[] = array($theme, 0, $opt, is_array($val) ? implode(',', $val) : $val);
+				$inserts[] = [$theme, 0, $opt, is_array($val) ? implode(',', $val) : $val];
 			}
 
 			foreach ($options['default_options'] as $opt => $val)
 			{
-				$inserts[] = array(1, 0, $opt, is_array($val) ? implode(',', $val) : $val);
+				$inserts[] = [1, 0, $opt, is_array($val) ? implode(',', $val) : $val];
 			}
 
 			// If we're actually inserting something..
@@ -422,7 +422,7 @@ class ManageThemes extends AbstractController
 			// Clear and Invalidate the cache.
 			Cache::instance()->remove('theme_settings-' . $theme);
 			Cache::instance()->remove('theme_settings-1');
-			updateSettings(array('settings_updated' => time()));
+			updateSettings(['settings_updated' => time()]);
 
 			redirectexit('action=admin;area=theme;sa=list;th=' . $theme . ';' . $context['session_var'] . '=' . $context['session_id']);
 		}
@@ -432,7 +432,7 @@ class ManageThemes extends AbstractController
 
 		foreach ($settings as $setting => $set)
 		{
-			if (!in_array($setting, array('theme_url', 'theme_dir', 'images_url', 'template_dirs')))
+			if (!in_array($setting, ['theme_url', 'theme_dir', 'images_url', 'template_dirs']))
 			{
 				$settings[$setting] = Util::htmlspecialchars__recursive($set);
 			}
@@ -474,14 +474,14 @@ class ManageThemes extends AbstractController
 		// Do we support variants?
 		if (!empty($settings['theme_variants']))
 		{
-			$context['theme_variants'] = array();
+			$context['theme_variants'] = [];
 			foreach ($settings['theme_variants'] as $variant)
 			{
 				// Have any text, old chap?
-				$context['theme_variants'][$variant] = array(
+				$context['theme_variants'][$variant] = [
 					'label' => $txt['variant_' . $variant] ?? $variant,
 					'thumbnail' => !$fileFunc->fileExists($settings['theme_dir'] . '/images/thumbnail.png') || $fileFunc->fileExists($settings['theme_dir'] . '/images/thumbnail_' . $variant . '.png') ? $settings['images_url'] . '/thumbnail_' . $variant . '.png' : ($settings['images_url'] . '/thumbnail.png'),
-				);
+				];
 			}
 
 			$context['default_variant'] = !empty($settings['default_variant']) && isset($context['theme_variants'][$settings['default_variant']]) ? $settings['default_variant'] : $settings['theme_variants'][0];
@@ -514,7 +514,7 @@ class ManageThemes extends AbstractController
 	 * @uses Themes template
 	 * @uses Admin language file
 	 */
-	public function action_admin()
+	public function action_admin(): void
 	{
 		global $context, $modSettings;
 
@@ -545,16 +545,16 @@ class ManageThemes extends AbstractController
 			}
 
 			// Commit the new settings.
-			updateSettings(array(
+			updateSettings([
 				'theme_allow' => !empty($this->_req->post->options['theme_allow']),
 				'theme_guests' => $this->_req->post->options['theme_guests'],
 				'knownThemes' => implode(',', $this->_req->post->options['known_themes']),
-			));
+			]);
 
 			if ((int) $this->_req->post->theme_reset === 0 || in_array($this->_req->post->theme_reset, $this->_req->post->options['known_themes']))
 			{
 				require_once(SUBSDIR . '/Members.subs.php');
-				updateMemberData(null, array('id_theme' => (int) $this->_req->post->theme_reset));
+				updateMemberData(null, ['id_theme' => (int) $this->_req->post->theme_reset]);
 			}
 
 			redirectexit('action=admin;area=theme;' . $context['session_var'] . '=' . $context['session_id'] . ';sa=admin');
@@ -568,7 +568,7 @@ class ManageThemes extends AbstractController
 			$context['sub_template'] = 'manage_themes';
 
 			// Make our known themes a little easier to work with.
-			$knownThemes = empty($modSettings['knownThemes']) ? array() : explode(',', $modSettings['knownThemes']);
+			$knownThemes = empty($modSettings['knownThemes']) ? [] : explode(',', $modSettings['knownThemes']);
 
 			// Load up all the themes.
 			require_once(SUBSDIR . '/Themes.subs.php');
@@ -600,7 +600,7 @@ class ManageThemes extends AbstractController
 	 * @uses sub template set_options, template file Settings
 	 * @uses template file ManageThemes
 	 */
-	public function action_options()
+	public function action_options(): void
 	{
 		global $txt, $context, $settings, $modSettings;
 
@@ -651,21 +651,21 @@ class ManageThemes extends AbstractController
 			checkSession();
 			validateToken('admin-sto');
 
-			$_options = $this->_req->getPost('options', '', array());
-			$_default_options = $this->_req->getPost('default_options', '', array());
+			$_options = $this->_req->getPost('options', '', []);
+			$_default_options = $this->_req->getPost('default_options', '', []);
 
 			// Set up the query values.
-			$setValues = array();
+			$setValues = [];
 			foreach ($_options as $opt => $val)
 			{
-				$setValues[] = array($theme, -1, $opt, is_array($val) ? implode(',', $val) : $val);
+				$setValues[] = [$theme, -1, $opt, is_array($val) ? implode(',', $val) : $val];
 			}
 
-			$old_settings = array();
+			$old_settings = [];
 			foreach ($_default_options as $opt => $val)
 			{
 				$old_settings[] = $opt;
-				$setValues[] = array(1, -1, $opt, is_array($val) ? implode(',', $val) : $val);
+				$setValues[] = [1, -1, $opt, is_array($val) ? implode(',', $val) : $val];
 			}
 
 			// If we're actually inserting something..
@@ -693,13 +693,13 @@ class ManageThemes extends AbstractController
 			checkSession();
 			validateToken('admin-sto');
 
-			$_options = $this->_req->getPost('options', '', array());
-			$_options_master = $this->_req->getPost('options_master', '', array());
+			$_options = $this->_req->getPost('options', '', []);
+			$_options_master = $this->_req->getPost('options_master', '', []);
 
-			$_default_options = $this->_req->getPost('default_options', '', array());
-			$_default_options_master = $this->_req->getPost('default_options_master', '', array());
+			$_default_options = $this->_req->getPost('default_options', '', []);
+			$_default_options_master = $this->_req->getPost('default_options_master', '', []);
 
-			$old_settings = array();
+			$old_settings = [];
 			foreach ($_default_options as $opt => $val)
 			{
 				if ($_default_options_master[$opt] == 0)
@@ -782,12 +782,12 @@ class ManageThemes extends AbstractController
 		// Load the options for these theme
 		if (empty($this->_req->query->who))
 		{
-			$context['theme_options'] = loadThemeOptionsInto(array(1, $theme), -1, $context['theme_options']);
+			$context['theme_options'] = loadThemeOptionsInto([1, $theme], -1, $context['theme_options']);
 			$context['theme_options_reset'] = false;
 		}
 		else
 		{
-			$context['theme_options'] = array();
+			$context['theme_options'] = [];
 			$context['theme_options_reset'] = true;
 		}
 
@@ -846,7 +846,7 @@ class ManageThemes extends AbstractController
 	 * - Accessed with ?action=admin;area=theme;sa=remove.
 	 * - Does not remove files
 	 */
-	public function action_remove()
+	public function action_remove(): void
 	{
 		global $modSettings, $context;
 
@@ -873,11 +873,11 @@ class ManageThemes extends AbstractController
 		// Fix it if the theme was the overall default theme.
 		if ($modSettings['theme_guests'] === $theme)
 		{
-			updateSettings(array('theme_guests' => '1', 'knownThemes' => $known));
+			updateSettings(['theme_guests' => '1', 'knownThemes' => $known]);
 		}
 		else
 		{
-			updateSettings(array('knownThemes' => $known));
+			updateSettings(['knownThemes' => $known]);
 		}
 
 		redirectexit('action=admin;area=theme;sa=list;' . $context['session_var'] . '=' . $context['session_id']);
@@ -889,7 +889,7 @@ class ManageThemes extends AbstractController
 	 * @param string $theme current theme
 	 * @return string
 	 */
-	private function _knownTheme($theme)
+	private function _knownTheme(string $theme): string
 	{
 		global $modSettings;
 
@@ -903,7 +903,7 @@ class ManageThemes extends AbstractController
 			}
 		}
 
-		return strtr(implode(',', $known), array(',,' => ','));
+		return strtr(implode(',', $known), [',,' => ',']);
 	}
 
 	/**
@@ -915,7 +915,7 @@ class ManageThemes extends AbstractController
 	 * - Requires an administrator.
 	 * - Accessed with ?action=admin;area=theme;sa=remove;api
 	 */
-	public function action_remove_api()
+	public function action_remove_api(): void
 	{
 		global $modSettings, $context, $txt;
 
@@ -925,10 +925,10 @@ class ManageThemes extends AbstractController
 		if (checkSession('get', '', false))
 		{
 			Txt::load('Errors');
-			$context['xml_data'] = array(
+			$context['xml_data'] = [
 				'error' => 1,
 				'text' => $txt['session_verify_fail'],
-			);
+			];
 
 			return;
 		}
@@ -937,10 +937,10 @@ class ManageThemes extends AbstractController
 		if (!allowedTo('admin_forum'))
 		{
 			Txt::load('Errors');
-			$context['xml_data'] = array(
+			$context['xml_data'] = [
 				'error' => 1,
 				'text' => $txt['cannot_admin_forum'],
-			);
+			];
 
 			return;
 		}
@@ -949,10 +949,10 @@ class ManageThemes extends AbstractController
 		if (!validateToken('admin-tr', 'request', true, false))
 		{
 			Txt::load('Errors');
-			$context['xml_data'] = array(
+			$context['xml_data'] = [
 				'error' => 1,
 				'text' => $txt['token_verify_fail'],
-			);
+			];
 
 			return;
 		}
@@ -964,10 +964,10 @@ class ManageThemes extends AbstractController
 		if ($theme === 1)
 		{
 			Txt::load('Errors');
-			$context['xml_data'] = array(
+			$context['xml_data'] = [
 				'error' => 1,
 				'text' => $txt['no_access'],
-			);
+			];
 
 			return;
 		}
@@ -981,20 +981,20 @@ class ManageThemes extends AbstractController
 		// Fix it if the theme was the overall default theme.
 		if ($modSettings['theme_guests'] === $theme)
 		{
-			updateSettings(array('theme_guests' => '1', 'knownThemes' => $known));
+			updateSettings(['theme_guests' => '1', 'knownThemes' => $known]);
 		}
 		else
 		{
-			updateSettings(array('knownThemes' => $known));
+			updateSettings(['knownThemes' => $known]);
 		}
 
 		// Let them know it worked, all without a page refresh
 		createToken('admin-tr', 'request');
-		$context['xml_data'] = array(
+		$context['xml_data'] = [
 			'success' => 1,
 			'token_var' => $context['admin-tr_token_var'],
 			'token' => $context['admin-tr_token'],
-		);
+		];
 	}
 
 	/**
@@ -1011,7 +1011,7 @@ class ManageThemes extends AbstractController
 	 * @uses ManageThemes template
 	 * with centralized admin permissions on ManageThemes.
 	 */
-	public function action_pick()
+	public function action_pick(): void
 	{
 		global $txt, $context, $modSettings;
 
@@ -1061,7 +1061,7 @@ class ManageThemes extends AbstractController
 			// If changing members or guests - and there's a variant - assume changing default variant.
 			if (!empty($variant) && ($u === 0 || $u === -1))
 			{
-				updateThemeOptions(array($themePicked, 0, 'default_variant', $variant));
+				updateThemeOptions([$themePicked, 0, 'default_variant', $variant]);
 
 				// Make it obvious that it's changed
 				Cache::instance()->remove('theme_settings-' . $themePicked);
@@ -1071,7 +1071,7 @@ class ManageThemes extends AbstractController
 			if ($u === 0)
 			{
 				require_once(SUBSDIR . '/Members.subs.php');
-				updateMemberData(null, array('id_theme' => $themePicked));
+				updateMemberData(null, ['id_theme' => $themePicked]);
 
 				// Remove any custom variants.
 				if (!empty($variant))
@@ -1084,7 +1084,7 @@ class ManageThemes extends AbstractController
 			// Change the default/guest theme.
 			elseif ($u === -1)
 			{
-				updateSettings(array('theme_guests' => $themePicked));
+				updateSettings(['theme_guests' => $themePicked]);
 
 				redirectexit('action=admin;area=theme;sa=admin;' . $context['session_var'] . '=' . $context['session_id']);
 			}
@@ -1155,10 +1155,10 @@ class ManageThemes extends AbstractController
 
 			$context['sub_template'] = 'installed';
 			$context['page_title'] = $txt['theme_installed'];
-			$context['installed_theme'] = array(
+			$context['installed_theme'] = [
 				'id' => $this->_req->query->theme_id,
 				'name' => getThemeName($this->_req->query->theme_id),
-			);
+			];
 
 			return null;
 		}
@@ -1201,12 +1201,12 @@ class ManageThemes extends AbstractController
 		if ($this->theme_dir !== '' && basename($this->theme_dir) !== 'themes')
 		{
 			// Defaults.
-			$install_info = array(
+			$install_info = [
 				'theme_url' => $boardurl . '/themes/' . basename($this->theme_dir),
 				'images_url' => $this->images_url ?? $boardurl . '/themes/' . basename($this->theme_dir) . '/images',
 				'theme_dir' => $this->theme_dir,
 				'name' => $this->theme_name
-			);
+			];
 			$explicit_images = false;
 
 			if ($fileFunc->fileExists($this->theme_dir . '/theme_info.xml'))
@@ -1225,12 +1225,12 @@ class ManageThemes extends AbstractController
 				$theme_info_xml = $theme_info_xml->path('theme-info[0]');
 				$theme_info_xml = $theme_info_xml->to_array();
 
-				$xml_elements = array(
+				$xml_elements = [
 					'name' => 'name',
 					'theme_layers' => 'layers',
 					'theme_templates' => 'templates',
 					'based_on' => 'based-on',
-				);
+				];
 				foreach ($xml_elements as $var => $name)
 				{
 					if (!empty($theme_info_xml[$name]))
@@ -1282,10 +1282,10 @@ class ManageThemes extends AbstractController
 			// Find the newest id_theme.
 			$id_theme = nextTheme();
 
-			$inserts = array();
+			$inserts = [];
 			foreach ($install_info as $var => $val)
 			{
-				$inserts[] = array($id_theme, $var, $val);
+				$inserts[] = [$id_theme, $var, $val];
 			}
 
 			if (!empty($inserts))
@@ -1293,7 +1293,7 @@ class ManageThemes extends AbstractController
 				addTheme($inserts);
 			}
 
-			updateSettings(array('knownThemes' => strtr($modSettings['knownThemes'] . ',' . $id_theme, array(',,' => ','))));
+			updateSettings(['knownThemes' => strtr($modSettings['knownThemes'] . ',' . $id_theme, [',,' => ','])]);
 
 			redirectexit('action=admin;area=theme;sa=install;theme_id=' . $id_theme . ';' . $context['session_var'] . '=' . $context['session_id']);
 		}
@@ -1304,7 +1304,7 @@ class ManageThemes extends AbstractController
 	/**
 	 * Make a copy of the default theme in a new directory
 	 */
-	public function copyDefault()
+	public function copyDefault(): void
 	{
 		global $boardurl, $modSettings, $settings;
 
@@ -1330,7 +1330,7 @@ class ManageThemes extends AbstractController
 		$fileFunc->createDirectory($this->theme_dir . '/webfonts', false);
 
 		// Copy over the default non-theme files.
-		$to_copy = array('/index.php', '/index.template.php', '/scripts/theme.js', '/Theme.php');
+		$to_copy = ['/index.php', '/index.template.php', '/scripts/theme.js', '/Theme.php'];
 		foreach ($to_copy as $file)
 		{
 			copy($settings['default_theme_dir'] . $file, $this->theme_dir . $file);
@@ -1348,7 +1348,7 @@ class ManageThemes extends AbstractController
 		$this->theme_dir = realpath($this->theme_dir);
 
 		// Lets get some data for the new theme (default theme (1), default settings (0)).
-		$theme_values = loadThemeOptionsInto(1, 0, array(), array('theme_templates', 'theme_layers'));
+		$theme_values = loadThemeOptionsInto(1, 0, [], ['theme_templates', 'theme_layers']);
 
 		// Lets add a theme_info.xml to this theme.
 		write_theme_info($this->_req->post->copy, $modSettings['elkVersion'], $this->theme_dir, $theme_values);
@@ -1364,7 +1364,7 @@ class ManageThemes extends AbstractController
 	 *
 	 * - Expects the directory is properly loaded with theme files
 	 */
-	public function installFromDir()
+	public function installFromDir(): void
 	{
 		$fileFunc = FileFunctions::instance();
 
@@ -1380,7 +1380,7 @@ class ManageThemes extends AbstractController
 	/**
 	 * Install a new theme from an uploaded zip archive
 	 */
-	public function installFromZip()
+	public function installFromZip(): void
 	{
 		$fileFunc = FileFunctions::instance();
 
@@ -1398,7 +1398,7 @@ class ManageThemes extends AbstractController
 
 		// Set the default settings...
 		$this->theme_name = strtok(basename(isset($_FILES['theme_gz']) ? $_FILES['theme_gz']['name'] : $this->_req->post->theme_gz), '.');
-		$this->theme_name = preg_replace(array('/\s/', '/\.[\.]+/', '/[^\w_\.\-]/'), array('_', '.', ''), $this->theme_name);
+		$this->theme_name = preg_replace(['/\s/', '/\.[\.]+/', '/[^\w_\.\-]/'], ['_', '.', ''], $this->theme_name);
 
 		$this->theme_dir = BOARDDIR . '/themes/' . $this->theme_name;
 
@@ -1425,7 +1425,7 @@ class ManageThemes extends AbstractController
 	 * - optionally contains &th=theme id
 	 * - does not log access to the Who's Online log. (in index.php..)
 	 */
-	public function action_jsoption()
+	public function action_jsoption(): void
 	{
 		global $settings, $options;
 
@@ -1444,7 +1444,7 @@ class ManageThemes extends AbstractController
 			obExit(false);
 		}
 
-		$reservedVars = array(
+		$reservedVars = [
 			'actual_theme_url',
 			'actual_images_url',
 			'base_theme_dir',
@@ -1462,7 +1462,7 @@ class ManageThemes extends AbstractController
 			'theme_templates',
 			'theme_url',
 			'name',
-		);
+		];
 
 		// Can't change reserved vars.
 		if (in_array(strtolower($this->_req->query->var), $reservedVars))
@@ -1494,7 +1494,7 @@ class ManageThemes extends AbstractController
 			}
 			else
 			{
-				$options['admin_preferences'] = array();
+				$options['admin_preferences'] = [];
 			}
 
 			// New thingy...
@@ -1514,12 +1514,12 @@ class ManageThemes extends AbstractController
 				$minmax_preferences = serializeToJson($options['minmax_preferences'], static function ($array_form) use ($settings) {
 					// Update the option.
 					require_once(SUBSDIR . '/Themes.subs.php');
-					updateThemeOptions(array($settings['theme_id'], User::$info->id, 'minmax_preferences', json_encode($array_form)));
+					updateThemeOptions([$settings['theme_id'], User::$info->id, 'minmax_preferences', json_encode($array_form)]);
 				});
 			}
 			else
 			{
-				$minmax_preferences = array();
+				$minmax_preferences = [];
 			}
 
 			// New value for them
@@ -1534,7 +1534,7 @@ class ManageThemes extends AbstractController
 
 		// Update the option.
 		require_once(SUBSDIR . '/Themes.subs.php');
-		updateThemeOptions(array($settings['theme_id'], $this->user->id, $this->_req->query->var, is_array($this->_req->query->val) ? implode(',', $this->_req->query->val) : $this->_req->query->val));
+		updateThemeOptions([$settings['theme_id'], $this->user->id, $this->_req->query->var, is_array($this->_req->query->val) ? implode(',', $this->_req->query->val) : $this->_req->query->val]);
 
 		Cache::instance()->remove('theme_settings-' . $settings['theme_id'] . ':' . $this->user->id);
 

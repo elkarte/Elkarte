@@ -70,7 +70,7 @@ class Watchedtopic extends AbstractNotificationMessage
 	 *
 	 * @return array Returns an array containing the settings.
 	 */
-	public static function getSettings()
+	public static function getSettings(): array
 	{
 		return ['enable' => 1, 'notification' => 1, 'default' => [0 => 'notification']];
 	}

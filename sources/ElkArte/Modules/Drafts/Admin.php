@@ -43,7 +43,7 @@ class Admin extends AbstractModule
 	 *
 	 * @param array $admin_areas The admin menu array
 	 */
-	public function addMenu(&$admin_areas)
+	public function addMenu(&$admin_areas): void
 	{
 		global $txt;
 
@@ -64,7 +64,7 @@ class Admin extends AbstractModule
 	 * @param string[] $include_files
 	 * @param array $settings_search
 	 */
-	public function addSearch(&$language_files, &$include_files, &$settings_search)
+	public function addSearch(&$language_files, &$include_files, &$settings_search): void
 	{
 		$language_files[] = 'Drafts';
 		$settings_search[] = ['settings_search', 'area=managedrafts', ManageDraftsModule::class];

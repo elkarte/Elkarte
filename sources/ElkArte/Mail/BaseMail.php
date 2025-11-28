@@ -50,7 +50,7 @@ abstract class BaseMail
 	/**
 	 * Sets if we use php mail or smtp mail transport
 	 */
-	public function setMailTransport()
+	public function setMailTransport(): void
 	{
 		global $modSettings;
 
@@ -60,7 +60,7 @@ abstract class BaseMail
 	/**
 	 * Based on OS or mail transport, sets the needed linebreak value
 	 */
-	public function setLineBreak()
+	public function setLineBreak(): void
 	{
 		// If messages are not received while not using SMTP, then try using a LF (\n) only. Some Unix
 		// mail transfer agents (notably qmail) replace LF by CRLF automatically (which leads to doubling
@@ -78,7 +78,7 @@ abstract class BaseMail
 	 * @param string $message_id
 	 * @param int $priority
 	 */
-	public function setMailList($from_wrapper, $message_id, $priority)
+	public function setMailList($from_wrapper, $message_id, $priority): void
 	{
 		global $modSettings;
 
@@ -96,7 +96,7 @@ abstract class BaseMail
 	 * @param string $message_id
 	 * @return string cleaned message id
 	 */
-	public function setMessageType($message_id)
+	public function setMessageType($message_id): string
 	{
 		$this->messageType = 'm';
 		if ($message_id !== null && isset($message_id[0]) && in_array($message_id[0], ['m', 'p', 't']))
@@ -119,7 +119,7 @@ abstract class BaseMail
 	 * @param $message_id
 	 * @return string
 	 */
-	public function getUniqueMessageID($message_id)
+	public function getUniqueMessageID($message_id): string
 	{
 		global $boardurl, $modSettings;
 
@@ -147,7 +147,7 @@ abstract class BaseMail
 	 *
 	 * @return void
 	 */
-	public function setReturnPath()
+	public function setReturnPath(): void
 	{
 		global $modSettings, $webmaster_email;
 

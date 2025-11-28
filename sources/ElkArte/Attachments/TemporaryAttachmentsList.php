@@ -1,18 +1,19 @@
 <?php
 
 /**
- *
+ * Represents a list of temporary attachments for managing attachments in a session,
+ * including operations to add, remove, and validate them.
  *
  * @package   ElkArte Forum
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
  * @version 2.0 dev
- *
  */
 
 namespace ElkArte\Attachments;
 
+use Elkarte\Exceptions\Exception;
 use ElkArte\Helper\FileFunctions;
 use ElkArte\Helper\ValuesContainer;
 
@@ -27,7 +28,7 @@ class TemporaryAttachmentsList extends ValuesContainer
 	public const TMPNAME_TPL = 'post_tmp_{user}_{hash}';
 
 	/** @var string System level error, such as permissions issue to a folder */
-	protected $sysError = '';
+	protected string $sysError = '';
 
 	/**
 	 * Constructor
@@ -40,14 +41,16 @@ class TemporaryAttachmentsList extends ValuesContainer
 		}
 
 		$this->data = &$_SESSION[static::ID];
+
+		parent::__construct($this->data);
 	}
 
 	/**
 	 * Removes all the temporary attachments of the user
 	 *
-	 * @param int $userId
+	 * @param int|null $userId
 	 */
-	public function removeAll($userId = null)
+	public function removeAll(int $userId = null): void
 	{
 		$prefix = $userId === null ? $this->getTplName('', '')[0] : $this->getTplName($userId, '');
 
@@ -67,7 +70,7 @@ class TemporaryAttachmentsList extends ValuesContainer
 	 * @param string $file
 	 * @return bool
 	 */
-	public function remove($file)
+	public function remove(string $file): bool
 	{
 		// Must exist and have edit permissions
 		return FileFunctions::instance()->delete($file);
@@ -78,7 +81,7 @@ class TemporaryAttachmentsList extends ValuesContainer
 	 *
 	 * @param string $msg
 	 */
-	public function setSystemError($msg)
+	public function setSystemError(string $msg): void
 	{
 		$this->sysError = $msg;
 	}
@@ -88,7 +91,7 @@ class TemporaryAttachmentsList extends ValuesContainer
 	 *
 	 * @return string
 	 */
-	public function getSystemError()
+	public function getSystemError(): string
 	{
 		return $this->sysError;
 	}
@@ -98,7 +101,7 @@ class TemporaryAttachmentsList extends ValuesContainer
 	 *
 	 * @return bool
 	 */
-	public function hasSystemError()
+	public function hasSystemError(): bool
 	{
 		return !empty($this->sysError);
 	}
@@ -109,18 +112,18 @@ class TemporaryAttachmentsList extends ValuesContainer
 	 * @param string $attachID the temporary name generated when a file is uploaded
 	 *               and used in $_SESSION to help identify the attachment itself
 	 * @param bool $fatal
-	 * @throws \Exception if fatal is true
+	 * @throws Exception if fatal is true
 	 */
-	public function removeById($attachID, $fatal = true)
+	public function removeById(string $attachID, bool $fatal = true): void
 	{
 		if ($fatal && !isset($this->data[$attachID]))
 		{
-			throw new \Exception('attachment_not_found');
+			throw new Exception('attachment_not_found');
 		}
 
 		if ($fatal && !$this->data[$attachID]->fileExists())
 		{
-			throw new \Exception('attachment_not_found');
+			throw new Exception('attachment_not_found');
 		}
 
 		$this->data[$attachID]->remove($fatal);
@@ -133,7 +136,7 @@ class TemporaryAttachmentsList extends ValuesContainer
 	 * @param int $board
 	 * @return bool
 	 */
-	public function belongToBoard($board)
+	public function belongToBoard(int $board): bool
 	{
 		return empty($this->data['post']['msg']) && (int) $this->data['post']['board'] === (int) $board;
 	}
@@ -144,7 +147,7 @@ class TemporaryAttachmentsList extends ValuesContainer
 	 * @param int $userId
 	 * @return bool
 	 */
-	public function filesExist($userId)
+	public function filesExist(int $userId): bool
 	{
 		$prefix = $this->getTplName($userId, '');
 		/** @var TemporaryAttachment $attachment */
@@ -172,7 +175,7 @@ class TemporaryAttachmentsList extends ValuesContainer
 	 * @param string[] $keep
 	 * @param int $userId
 	 */
-	public function removeExcept($keep, $userId)
+	public function removeExcept(array $keep, int $userId): void
 	{
 		$prefix = $this->getTplName($userId, '');
 
@@ -197,7 +200,7 @@ class TemporaryAttachmentsList extends ValuesContainer
 	 * @param int $userId
 	 * @return mixed
 	 */
-	public function getFileNames($userId)
+	public function getFileNames(int $userId): mixed
 	{
 		$prefix = $this->getTplName($userId, '');
 
@@ -217,9 +220,9 @@ class TemporaryAttachmentsList extends ValuesContainer
 	 *
 	 * @param int $userId
 	 * @param string $hash
-	 * @return string|string[]
+	 * @return string
 	 */
-	public function getTplName($userId, $hash = '')
+	public function getTplName(int $userId, string $hash = ''): string
 	{
 		return str_replace(['{user}', '{hash}'], [$userId, $hash], static::TMPNAME_TPL);
 	}
@@ -229,7 +232,7 @@ class TemporaryAttachmentsList extends ValuesContainer
 	 *
 	 * @return bool
 	 */
-	public function hasPostData()
+	public function hasPostData(): bool
 	{
 		return isset($this->data['post']);
 	}
@@ -239,17 +242,27 @@ class TemporaryAttachmentsList extends ValuesContainer
 	 *
 	 * @param TemporaryAttachment $data
 	 */
-	public function addAttachment($data)
+	public function addAttachment(TemporaryAttachment $data): void
 	{
 		$this->data[$data['attachid']] = $data;
 	}
 
-	public function getAttachment()
+	/**
+	 * Retrieves the attachment data.
+	 *
+	 * @return array
+	 */
+	public function getAttachment(): array
 	{
 		return $this->data;
 	}
 
-	public function areLostAttachments()
+	/**
+	 * Checks if there are any lost attachments
+	 *
+	 * @return bool
+	 */
+	public function areLostAttachments(): bool
 	{
 		return empty($this->data['post']['msg']);
 	}
@@ -260,7 +273,7 @@ class TemporaryAttachmentsList extends ValuesContainer
 	 * @param $idx
 	 * @return mixed|null
 	 */
-	public function getPostParam($idx)
+	public function getPostParam($idx): mixed
 	{
 		return $this->data['post'][$idx] ?? null;
 	}
@@ -270,7 +283,7 @@ class TemporaryAttachmentsList extends ValuesContainer
 	 *
 	 * @param array $vals
 	 */
-	public function setPostParam(array $vals)
+	public function setPostParam(array $vals): void
 	{
 		if (!isset($this->data['post']))
 		{
@@ -286,7 +299,7 @@ class TemporaryAttachmentsList extends ValuesContainer
 	 * @param int $msg
 	 * @return bool
 	 */
-	public function belongToMsg($msg)
+	public function belongToMsg(int $msg): bool
 	{
 		return (int) $this->data['post']['msg'] === (int) $msg;
 	}
@@ -294,7 +307,7 @@ class TemporaryAttachmentsList extends ValuesContainer
 	/**
 	 * Checks if there is any attachment that has been processed
 	 */
-	public function hasAttachments()
+	public function hasAttachments(): bool
 	{
 		return $this->count() > 0;
 	}
@@ -304,17 +317,18 @@ class TemporaryAttachmentsList extends ValuesContainer
 	 *
 	 * @param string $attach_id the temporary name generated when a file is uploaded
 	 *  and used in $_SESSION to help identify the attachment itself
-	 *
+	 * @param string $attachmentsDir
+	 * @param int $userId
 	 * @return mixed
-	 * @throws \Exception
+	 * @throws Exception
 	 */
-	public function getTempAttachById($attach_id, $attachmentsDir, $userId)
+	public function getTempAttachById(string $attach_id, $attachmentsDir, $userId): mixed
 	{
 		$attach_real_id = null;
 
 		if ($this->hasAttachments() === false)
 		{
-			throw new \Exception('no_access');
+			throw new Exception('no_access');
 		}
 
 		foreach ($this->data as $attachID => $val)
@@ -333,7 +347,7 @@ class TemporaryAttachmentsList extends ValuesContainer
 
 		if (empty($attach_real_id))
 		{
-			throw new \Exception('no_access');
+			throw new Exception('no_access');
 		}
 
 		// The common name form is "post_tmp_123_0ac9a0b1fc18604e8704084656ed5f09"
@@ -342,7 +356,7 @@ class TemporaryAttachmentsList extends ValuesContainer
 		// Permissions: only temporary attachments
 		if (substr($id_attach, 0, 8) !== 'post_tmp')
 		{
-			throw new \Exception('no_access');
+			throw new Exception('no_access');
 		}
 
 		// Permissions: only author is allowed.
@@ -350,17 +364,17 @@ class TemporaryAttachmentsList extends ValuesContainer
 
 		if (!isset($pieces[0]) || $pieces[0] != $userId)
 		{
-			throw new \Exception('no_access');
+			throw new Exception('no_access');
 		}
 
 		$attach_dir = $attachmentsDir->getCurrent();
 
-		if (file_exists($attach_dir . '/' . $attach_real_id) && isset($this->data[$attach_real_id]))
+		if (isset($this->data[$attach_real_id]) && file_exists($attach_dir . '/' . $attach_real_id))
 		{
 			return $this->data[$attach_real_id];
 		}
 
-		throw new \Exception('no_access');
+		throw new Exception('no_access');
 	}
 
 	/**
@@ -370,7 +384,7 @@ class TemporaryAttachmentsList extends ValuesContainer
 	 *
 	 * @return string
 	 */
-	public function getIdFromPublic($public_attachid)
+	public function getIdFromPublic(string $public_attachid): string
 	{
 		if ($this->hasAttachments() === false)
 		{
@@ -405,7 +419,7 @@ class TemporaryAttachmentsList extends ValuesContainer
 	 * Destroy all the attachment data in $_SESSION
 	 * Maybe it should also do some cleanup?
 	 */
-	public function unset()
+	public function unset(): void
 	{
 		$this->data = [];
 	}

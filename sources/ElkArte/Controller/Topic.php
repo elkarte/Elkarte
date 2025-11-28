@@ -66,7 +66,7 @@ class Topic extends AbstractController
 	 *  - Returns to the topic after it is done.
 	 *  - It is accessed via ?action=topic;sa=lock.
 	 */
-	public function action_lock()
+	public function action_lock(): void
 	{
 		global $topic, $board;
 
@@ -119,12 +119,12 @@ class Topic extends AbstractController
 		}
 
 		// Lock the topic!
-		setTopicAttribute($topic, array('locked' => $locked));
+		setTopicAttribute($topic, ['locked' => $locked]);
 
 		// If they are allowed a "moderator" permission, log it in the moderator log.
 		if (!$user_lock)
 		{
-			logAction($locked !== '' ? 'lock' : 'unlock', array('topic' => $topic, 'board' => $board));
+			logAction($locked !== '' ? 'lock' : 'unlock', ['topic' => $topic, 'board' => $board]);
 		}
 
 		// Notify people that this topic has been locked?
@@ -146,7 +146,7 @@ class Topic extends AbstractController
 	 *  - When done, sends the user back to the topic.
 	 *  - Accessed via ?action=topic;sa=sticky.
 	 */
-	public function action_sticky()
+	public function action_sticky(): void
 	{
 		global $topic, $board;
 
@@ -172,10 +172,10 @@ class Topic extends AbstractController
 		$is_sticky = $sticky['is_sticky'];
 
 		// Toggle the sticky value.
-		setTopicAttribute($topic, array('is_sticky' => (empty($is_sticky) ? 1 : 0)));
+		setTopicAttribute($topic, ['is_sticky' => (empty($is_sticky) ? 1 : 0)]);
 
 		// Log this sticky action - always a moderator thing.
-		logAction(empty($is_sticky) ? 'sticky' : 'unsticky', array('topic' => $topic, 'board' => $board));
+		logAction(empty($is_sticky) ? 'sticky' : 'unsticky', ['topic' => $topic, 'board' => $board]);
 
 		// Notify people that this topic has been stickied?
 		if (empty($is_sticky))
@@ -198,7 +198,7 @@ class Topic extends AbstractController
 	 * @uses template_print_above() later without the main layer.
 	 * @uses template_print_below() without the main layer
 	 */
-	public function action_printpage()
+	public function action_printpage(): void
 	{
 		global $topic, $context, $board_info, $modSettings;
 
@@ -253,7 +253,7 @@ class Topic extends AbstractController
 		$context['category_name'] = $board_info['cat']['name'];
 		$context['poster_name'] = $topicinfo['poster_name'];
 		$context['post_time'] = standardTime($topicinfo['poster_time'], false);
-		$context['parent_boards'] = array();
+		$context['parent_boards'] = [];
 
 		foreach ($board_info['parent_boards'] as $parent)
 		{
@@ -279,9 +279,9 @@ class Topic extends AbstractController
 
 		// Set a canonical URL for this page.
 		$context['canonical_url'] = getUrl('action', ['topic' => $topic . '.0']);
-		$context['view_attach_mode'] = array(
+		$context['view_attach_mode'] = [
 			'text' => getUrl('action', ['action' => 'topic', 'sa' => 'printpage', 'topic' => $topic . '.0']),
 			'images' => getUrl('action', ['action' => 'topic', 'sa' => 'printpage', 'topic' => $topic . '.0', 'images']),
-		);
+		];
 	}
 }

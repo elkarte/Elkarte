@@ -72,7 +72,7 @@ class Post extends AbstractModule
 	 * @param int $topic
 	 * @param array $topic_attributes
 	 */
-	public function prepare_post($topic, &$topic_attributes)
+	public function prepare_post($topic, &$topic_attributes): void
 	{
 		$topic_attributes['id_poll'] = 0;
 
@@ -98,7 +98,7 @@ class Post extends AbstractModule
 	/**
 	 * Helper function to remove a poll, either by user choice or by catching naughty users
 	 */
-	protected function _unset_poll()
+	protected function _unset_poll(): bool
 	{
 		self::$_make_poll = false;
 
@@ -124,7 +124,7 @@ class Post extends AbstractModule
 	 * @return bool
 	 * @throws Exception
 	 */
-	public function prepare_context($topic_attributes, $topic, $board)
+	public function prepare_context($topic_attributes, $topic, $board): bool
 	{
 		global $context, $txt;
 
@@ -208,7 +208,7 @@ class Post extends AbstractModule
 	/**
 	 * Loads in context stuff related to polls
 	 */
-	protected function _preparePollContext()
+	protected function _preparePollContext(): void
 	{
 		global $context;
 
@@ -262,7 +262,7 @@ class Post extends AbstractModule
 	 * @param string $page_title
 	 * @param TemplateLayers $template_layers
 	 */
-	public function finalize_post_form(&$destination, &$page_title, $template_layers)
+	public function finalize_post_form(&$destination, &$page_title, $template_layers): void
 	{
 		global $txt, $context;
 
@@ -296,7 +296,7 @@ class Post extends AbstractModule
 	 *
 	 * @param int $topic_info
 	 */
-	public function save_replying($topic_info)
+	public function save_replying($topic_info): void
 	{
 		// Sorry, multiple polls aren't allowed... yet.  You should stop giving me ideas :P.
 		if (!isset($_REQUEST['poll']))
@@ -320,7 +320,7 @@ class Post extends AbstractModule
 	 *
 	 * @throws Exception no_access
 	 */
-	public function before_save_post($post_errors, $topic_info)
+	public function before_save_post($post_errors, $topic_info): void
 	{
 		// Validate the poll...
 		if (!empty($topic_info) && !isset($_REQUEST['msg']))
@@ -377,7 +377,7 @@ class Post extends AbstractModule
 	 * @param array $topicOptions
 	 * @throws Exception
 	 */
-	public function pre_save_post(&$topicOptions)
+	public function pre_save_post(&$topicOptions): void
 	{
 		$id_poll = self::$_make_poll ? $this->_createPoll($_POST, $_POST['guestname']) : 0;
 
@@ -393,7 +393,7 @@ class Post extends AbstractModule
 	 * @return int - the id of the newly created poll
 	 * @throws Exception poll_range_error
 	 */
-	protected function _createPoll($options, $user_name)
+	protected function _createPoll($options, $user_name): int
 	{
 		global $board;
 

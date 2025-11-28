@@ -16,6 +16,7 @@
 
 use ElkArte\Cache\Cache;
 use ElkArte\Cache\CacheMethod\AbstractCacheMethod;
+use ElkArte\Errors\Errors;
 
 /**
  * Try to retrieve a cache entry. On failure, call the appropriate function.
@@ -34,7 +35,7 @@ use ElkArte\Cache\CacheMethod\AbstractCacheMethod;
  */
 function cache_quick_get($key, $file, $function, $params, $level = 1)
 {
-	\ElkArte\Errors\Errors::instance()->log_deprecated('cache_quick_get()', '\\ElkArte\\Cache\\Cache::instance()->quick_get');
+	Errors::instance()->log_deprecated('cache_quick_get()', '\\ElkArte\\Cache\\Cache::instance()->quick_get');
 
 	return Cache::instance()->quick_get($key, $file, $function, $params, $level);
 }
@@ -54,7 +55,7 @@ function cache_quick_get($key, $file, $function, $params, $level = 1)
  */
 function cache_put_data($key, $value, $ttl = 120)
 {
-	\ElkArte\Errors\Errors::instance()->log_deprecated('cache_put_data()', '\\ElkArte\\Cache\\Cache::instance()->put');
+	Errors::instance()->log_deprecated('cache_put_data()', '\\ElkArte\\Cache\\Cache::instance()->put');
 	Cache::instance()->put($key, $value, $ttl);
 }
 
@@ -67,13 +68,13 @@ function cache_put_data($key, $value, $ttl = 120)
  * @param string $key
  * @param int $ttl = 120
  *
- * @return bool|null
+ * @return array|null
  * @deprecated since 2.0
  *
  */
 function cache_get_data($key, $ttl = 120)
 {
-	\ElkArte\Errors\Errors::instance()->log_deprecated('cache_get_data()', '\\ElkArte\\Cache\\Cache::instance()->get');
+	Errors::instance()->log_deprecated('cache_get_data()', '\\ElkArte\\Cache\\Cache::instance()->get');
 
 	return Cache::instance()->get($key, $ttl);
 }
@@ -94,7 +95,7 @@ function cache_get_data($key, $ttl = 120)
  */
 function clean_cache($type = '')
 {
-	\ElkArte\Errors\Errors::instance()->log_deprecated('clean_cache()', '\\ElkArte\\Cache\\Cache::instance()->clean');
+	Errors::instance()->log_deprecated('clean_cache()', '\\ElkArte\\Cache\\Cache::instance()->clean');
 	Cache::instance()->clean($type);
 }
 

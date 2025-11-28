@@ -55,7 +55,7 @@ class WeightFactors
 	 * @return void
 	 * @throws Exception
 	 */
-	private function _setup_weight_factors()
+	private function _setup_weight_factors(): void
 	{
 		$default_factors = [
 			'frequency' => [
@@ -156,7 +156,7 @@ class WeightFactors
 	 * @param array $factors
 	 * @param int[] $weights
 	 */
-	private function _calculate_weights($factors, $weights)
+	private function _calculate_weights($factors, $weights): void
 	{
 		foreach (array_keys($factors) as $weight_factor)
 		{
@@ -170,7 +170,7 @@ class WeightFactors
 	 *
 	 * @return array The weight factors.
 	 */
-	public function getFactors()
+	public function getFactors(): array
 	{
 		return $this->_weight_factors;
 	}
@@ -180,7 +180,7 @@ class WeightFactors
 	 *
 	 * @return array The weight of the object.
 	 */
-	public function getWeight()
+	public function getWeight(): array
 	{
 		return $this->_weight;
 	}

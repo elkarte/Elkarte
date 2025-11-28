@@ -19,10 +19,12 @@
 use ElkArte\Controller\ScheduledTasks;
 use ElkArte\EventManager;
 use ElkArte\Helper\HttpReq;
+use ElkArte\SiteDispatcher;
+use ElkArte\Themes\ThemeLoader;
 use ElkArte\User;
 
 // Bootstrap the system
-require_once(dirname(__FILE__) . '/bootstrap.php');
+require_once(__DIR__ . '/bootstrap.php');
 new Bootstrap(false);
 
 // Turn on output buffering if it isn't already on (via php.ini for example)
@@ -80,7 +82,7 @@ function elk_main()
 	global $modSettings, $context;
 
 	// What shall we do?
-	$dispatcher = new ElkArte\SiteDispatcher( HttpReq::instance());
+	$dispatcher = new SiteDispatcher( HttpReq::instance());
 
 	if ($dispatcher->needSecurity())
 	{
@@ -109,7 +111,7 @@ function elk_main()
 				\ElkArte\Errors\Errors::instance()->display_403_error(true);
 			}
 
-			new ElkArte\Themes\ThemeLoader();
+			new ThemeLoader();
 
 			// The parser is not an object just yet
 			loadBBCParsers();

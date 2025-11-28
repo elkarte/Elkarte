@@ -111,7 +111,7 @@ function template_control_richedit_buttons($editor_id)
 	if ($editor_context['preview_type'])
 	{
 		echo '
-		<input type="button" name="preview" value="', $editor_context['labels']['preview_button'] ?? $txt['preview'], '" tabindex="', $context['tabindex']++, '" onclick="', $editor_context['preview_type'] == 2 ? 'return event.ctrlKey || previewControl();' : 'return submitThisOnce(this);', '" accesskey="p" />';
+		<input type="', $editor_context['preview_type'] == 2 ? 'button' : 'submit', '" name="preview" value="', $editor_context['labels']['preview_button'] ?? $txt['preview'], '" tabindex="', $context['tabindex']++, '" onclick="', $editor_context['preview_type'] == 2 ? 'return event.ctrlKey || previewControl();' : 'return submitThisOnce(this);', '" accesskey="p" />';
 	}
 
 	foreach ($editor_context['hidden_fields'] as $hidden)

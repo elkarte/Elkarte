@@ -21,7 +21,7 @@
  * @param int $items_per_page The number of items to show per page
  * @param string $sort_by how to sort the results asc/desc
  * @param string $sort_column which value we sort by
- * @param mixed[] $indexOptions
+ * @param array $indexOptions
  *     'include_sticky' => if on, loads sticky topics as additional
  *     'only_approved' => if on, only load approved topics
  *     'previews' => if on, loads in a substring of the first/last message text for use in previews
@@ -36,24 +36,24 @@ function messageIndexTopics($id_board, $id_member, $start, $items_per_page, $sor
 {
 	$db = database();
 
-	$topics = array();
-	$indexOptions = array_merge(array(
+	$topics = [];
+	$indexOptions = array_merge([
 		'include_sticky' => true,
 		'fake_ascending' => false,
 		'ascending' => true,
 		'only_approved' => true,
 		'previews' => -1,
 		'include_avatars' => false,
-		'custom_selects' => array(),
-		'custom_joins' => array(),
-	), $indexOptions);
+		'custom_selects' => [],
+		'custom_joins' => [],
+	], $indexOptions);
 
 	// Fetch topic list in the order we want.
 	$db->fetchQuery('
 		SELECT 
 			t.id_topic
 		FROM {db_prefix}topics AS t' . ($sort_by === 'last_poster' ? '
-			INNER JOIN {db_prefix}messages AS ml ON (ml.id_msg = t.id_last_msg)' : (in_array($sort_by, array('starter', 'subject')) ? '
+			INNER JOIN {db_prefix}messages AS ml ON (ml.id_msg = t.id_last_msg)' : (in_array($sort_by, ['starter', 'subject']) ? '
 			INNER JOIN {db_prefix}messages AS mf ON (mf.id_msg = t.id_first_msg)' : '')) . ($sort_by === 'starter' ? '
 			LEFT JOIN {db_prefix}members AS memf ON (memf.id_member = mf.id_member)' : '') . ($sort_by === 'last_poster' ? '
 			LEFT JOIN {db_prefix}members AS meml ON (meml.id_member = ml.id_member)' : '') . '
@@ -61,14 +61,14 @@ function messageIndexTopics($id_board, $id_member, $start, $items_per_page, $sor
 			AND (t.approved = {int:is_approved}' . ($id_member == 0 ? '' : ' OR t.id_member_started = {int:current_member}') . ')') . '
 		ORDER BY ' . ($indexOptions['include_sticky'] ? 'is_sticky' . ($indexOptions['fake_ascending'] ? '' : ' DESC') . ', ' : '') . $sort_column . ($indexOptions['ascending'] ? '' : ' DESC') . '
 		LIMIT {int:maxindex} OFFSET {int:start}',
-		array(
+		[
 			'current_board' => $id_board,
 			'current_member' => $id_member,
 			'is_approved' => 1,
 			'id_member_guest' => 0,
 			'start' => $start,
 			'maxindex' => $items_per_page,
-		)
+		]
 	)->fetch_callback(
 		function ($row) use (&$topics) {
 			$topics[$row['id_topic']] = [];
@@ -78,26 +78,26 @@ function messageIndexTopics($id_board, $id_member, $start, $items_per_page, $sor
 	// -1 means preview the whole body
 	if ($indexOptions['previews'] === -1)
 	{
-		$indexOptions['custom_selects'] = array_merge($indexOptions['custom_selects'], array('ml.body AS last_body', 'mf.body AS first_body'));
+		$indexOptions['custom_selects'] = array_merge($indexOptions['custom_selects'], ['ml.body AS last_body', 'mf.body AS first_body']);
 	}
 	// Default: a SUBSTRING
 	elseif (!empty($indexOptions['previews']))
 	{
-		$indexOptions['custom_selects'] = array_merge($indexOptions['custom_selects'], array('SUBSTRING(ml.body, 1, ' . ($indexOptions['previews'] + 256) . ') AS last_body', 'SUBSTRING(mf.body, 1, ' . ($indexOptions['previews'] + 256) . ') AS first_body'));
+		$indexOptions['custom_selects'] = array_merge($indexOptions['custom_selects'], ['SUBSTRING(ml.body, 1, ' . ($indexOptions['previews'] + 256) . ') AS last_body', 'SUBSTRING(mf.body, 1, ' . ($indexOptions['previews'] + 256) . ') AS first_body']);
 	}
 
 	if (!empty($indexOptions['include_avatars']))
 	{
 		if ($indexOptions['include_avatars'] === 1 || $indexOptions['include_avatars'] === 3)
 		{
-			$indexOptions['custom_selects'] = array_merge($indexOptions['custom_selects'], array('meml.avatar', 'COALESCE(a.id_attach, 0) AS id_attach', 'a.filename', 'a.attachment_type', 'meml.email_address'));
-			$indexOptions['custom_joins'] = array_merge($indexOptions['custom_joins'], array('LEFT JOIN {db_prefix}attachments AS a ON (a.id_member = ml.id_member AND a.id_member != 0)'));
+			$indexOptions['custom_selects'] = array_merge($indexOptions['custom_selects'], ['meml.avatar', 'COALESCE(a.id_attach, 0) AS id_attach', 'a.filename', 'a.attachment_type', 'meml.email_address']);
+			$indexOptions['custom_joins'] = array_merge($indexOptions['custom_joins'], ['LEFT JOIN {db_prefix}attachments AS a ON (a.id_member = ml.id_member AND a.id_member != 0)']);
 		}
 
 		if ($indexOptions['include_avatars'] === 2 || $indexOptions['include_avatars'] === 3)
 		{
-			$indexOptions['custom_selects'] = array_merge($indexOptions['custom_selects'], array('memf.avatar AS avatar_first', 'COALESCE(af.id_attach, 0) AS id_attach_first', 'af.filename AS filename_first', 'af.attachment_type AS attachment_type_first', 'memf.email_address AS email_address_first'));
-			$indexOptions['custom_joins'] = array_merge($indexOptions['custom_joins'], array('LEFT JOIN {db_prefix}attachments AS af ON (af.id_member = mf.id_member AND af.id_member != 0)'));
+			$indexOptions['custom_selects'] = array_merge($indexOptions['custom_selects'], ['memf.avatar AS avatar_first', 'COALESCE(af.id_attach, 0) AS id_attach_first', 'af.filename AS filename_first', 'af.attachment_type AS attachment_type_first', 'memf.email_address AS email_address_first']);
+			$indexOptions['custom_joins'] = array_merge($indexOptions['custom_joins'], ['LEFT JOIN {db_prefix}attachments AS af ON (af.id_member = mf.id_member AND af.id_member != 0)']);
 		}
 
 		$request = $db->fetchQuery('
@@ -121,11 +121,11 @@ function messageIndexTopics($id_board, $id_member, $start, $items_per_page, $sor
 				LEFT JOIN {db_prefix}log_mark_read AS lmr ON (lmr.id_board = {int:current_board} AND lmr.id_member = {int:current_member})') .
 			(!empty($indexOptions['custom_joins']) ? implode("\n\t\t\t\t", $indexOptions['custom_joins']) : '') . '
 			WHERE t.id_topic IN ({array_int:topic_list})',
-			array(
+			[
 				'current_board' => $id_board,
 				'current_member' => $id_member,
 				'topic_list' => $topics === [] ? [0] : array_keys($topics),
-			)
+			]
 		);
 		// Now we fill the above array, maintaining index association.
 		while (($row = $request->fetch_assoc()))
@@ -144,7 +144,7 @@ function messageIndexTopics($id_board, $id_member, $start, $items_per_page, $sor
 function messageIndexSort()
 {
 	// Default sort methods for message index.
-	$sort_methods = array(
+	$sort_methods = [
 		'subject' => 'mf.subject',
 		'starter' => 'COALESCE(memf.real_name, mf.poster_name)',
 		'last_poster' => 'COALESCE(meml.real_name, ml.poster_name)',
@@ -153,9 +153,9 @@ function messageIndexSort()
 		'likes' => 't.num_likes',
 		'first_post' => 't.id_topic',
 		'last_post' => 't.id_last_msg'
-	);
+	];
 
-	call_integration_hook('integrate_messageindex_sort', array(&$sort_methods));
+	call_integration_hook('integrate_messageindex_sort', [&$sort_methods]);
 
 	return $sort_methods;
 }
@@ -172,17 +172,17 @@ function messageIndexSort()
 function topicsParticipation($id_member, $topic_ids)
 {
 	$db = database();
-	$topics = array();
+	$topics = [];
 
 	$db->fetchQuery('
 		SELECT DISTINCT id_topic
 		FROM {db_prefix}messages
 		WHERE id_topic IN ({array_int:topic_list})
 			AND id_member = {int:current_member}',
-		array(
+		[
 			'current_member' => $id_member,
 			'topic_list' => $topic_ids,
-		)
+		]
 	)->fetch_callback(
 		function ($row) use (&$topics) {
 			$topics[] = $row;

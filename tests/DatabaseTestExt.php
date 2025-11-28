@@ -42,7 +42,7 @@ class TestDatabase extends TestCase
 		define('ADMINDIR', $sourcedir . '/admin');
 		define('CONTROLLERDIR', $sourcedir . '/controllers');
 		define('SUBSDIR', $sourcedir . '/subs');
-		define('ADDONSDIR', $sourcedir . '/addons');
+		define('ADDONSDIR', $boarddir . '/Addons');
 
 		require_once('.github/bootstrap.php');
 	}

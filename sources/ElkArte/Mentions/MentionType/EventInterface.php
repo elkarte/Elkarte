@@ -21,7 +21,7 @@ namespace ElkArte\Mentions\MentionType;
 interface EventInterface
 {
 	/**
-	 * This static function is used to obtain the events to register to a controller.
+	 * This static function is used to get the events to register to a controller.
 	 *
 	 * @param string $controller The name of the controller initializing the system
 	 */
@@ -46,7 +46,7 @@ interface EventInterface
  	public function view($type, &$mentions);
 
 	/**
-	 * Provides a list of methods that should not be used by this mention type.
+	 * Provides a list of notification methods (email, emaildaily, emailweekly, etc). that should NOT be used by this mention type.
 	 *
 	 * @param string $method the Notifier method that is being considered
 	 *

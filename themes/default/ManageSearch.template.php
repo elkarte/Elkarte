@@ -441,7 +441,7 @@ function template_manage_sphinx()
 
 	echo '
 	<div id="admincenter">
-		<form id="admin_form_wrapper" action="', $scripturl, '?action=admin;area=managesearch;sa=managesphinx;save=1" method="post"  accept-charset="UTF-8" name="create_index">
+		<form id="admin_form_wrapper" action="', $scripturl, '?action=admin;area=managesearch;sa=managesphinxql;save=1" method="post"  accept-charset="UTF-8" name="create_index">
 			<h2 class="category_header">', $context['page_title'], '</h2>';
 
 	// any results to show?
@@ -511,13 +511,6 @@ function template_manage_sphinx()
 						<input type="text" name="sphinxql_searchd_port" id="sphinxql_searchd_port_input" value="', $modSettings['sphinxql_searchd_port'] ?? '9306', '" size="4" />
 					</dd>
 					<dt>
-						<label for="sphinx_searchd_port_input">', $txt['sphinx_searchd_port'], '</label><br />
-						<span class="smalltext">', $txt['sphinx_searchd_port_desc'], '</span>
-					</dt>
-					<dd>
-						<input type="text" name="sphinx_searchd_port" id="sphinx_searchd_port_input" value="', $modSettings['sphinx_searchd_port'] ?? '9312', '" size="4" />
-					</dd>
-					<dt>
 						<label for="sphinx_max_results_input">', $txt['sphinx_max_matches'], '</label><br />
 						<span class="smalltext">', $txt['sphinx_max_matches_desc'], '</span>
 					</dt>
@@ -531,6 +524,111 @@ function template_manage_sphinx()
 					<input type="submit" name="save" value="', $txt['save'], '"  />
 					<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
 					<input type="hidden" name="', $context['admin-mssphinx_token_var'], '" value="', $context['admin-mssphinx_token'], '" />
+				</div>
+			</div>
+		</form>
+	</div>';
+}
+
+/**
+ * The settings page for Manticore search
+ */
+function template_manage_manticore()
+{
+	global $context, $modSettings, $txt, $scripturl;
+
+	echo '
+	<div id="admincenter">
+		<form id="admin_form_wrapper" action="', $scripturl, '?action=admin;area=managesearch;sa=managemanticore;save=1" method="post"  accept-charset="UTF-8" name="create_index">
+			<h2 class="category_header">', $context['page_title'], '</h2>';
+
+	// any results to show?
+	if (!empty($context['settings_message']))
+	{
+		echo '
+			<div class="', (empty($context['error_type']) ? 'successbox' : ($context['error_type'] !== 'serious' ? 'warningbox' : 'errorbox')), '" id="errors">
+				<ul>
+					<li>', implode('</li><li>', $context['settings_message']), '</li>
+				</ul>
+			</div>';
+	}
+
+	echo '
+			<div class="information">
+				', $txt['manticore_description'], '
+			</div>
+			<div class="content">
+				<dl class="settings">
+					<dt>
+						<label for="manticore_index_prefix_input">', $txt['manticore_index_prefix'], '</label><br />
+						<span class="smalltext">', $txt['manticore_index_prefix_desc'], '</span>
+					</dt>
+					<dd>
+						<input type="text" name="manticore_index_prefix" id="manticore_index_prefix_input" value="', $modSettings['manticore_index_prefix'] ?? 'elkarte', '" size="65" />
+					</dd>
+					<dt>
+						<label for="manticore_data_path_input">', $txt['manticore_index_data_path'], '</label><br />
+						<span class="smalltext">', $txt['manticore_index_data_path_desc'], '</span>
+					</dt>
+					<dd>
+						<input type="text" name="manticore_data_path" id="manticore_data_path_input" value="', $modSettings['manticore_data_path'] ?? '/var/manticore/data', '" size="65" />
+					</dd>
+					<dt>
+						<label for="manticore_log_path_input">', $txt['manticore_log_file_path'], '</label><br />
+						<span class="smalltext">', $txt['manticore_log_file_path_desc'], '</span>
+					</dt>
+					<dd>
+						<input type="text" name="manticore_log_path" id="manticore_log_path_input" value="', $modSettings['manticore_log_path'] ?? '/var/manticore/log', '" size="65" />
+					</dd>
+					<dt>
+						<label for="manticore_stopword_path_input">', $txt['manticore_stop_word_path'], '</label><br />
+						<span class="smalltext">', $txt['manticore_stop_word_path_desc'], '</span>
+					</dt>
+					<dd>
+						<input type="text" name="manticore_stopword_path" id="manticore_stopword_path_input" value="', $modSettings['manticore_wordform_path'] ?? '', '" size="65" />
+					</dd>
+					<dt>
+						<label for="manticore_wordform_path_input">', $txt['manticore_word_form_path'], '</label><br />
+						<span class="smalltext">', $txt['manticore_word_form_path_desc'], '</span>
+					</dt>
+					<dd>
+						<input type="text" name="manticore_wordform_path" id="manticore_wordform_path_input" value="', $modSettings['manticore_wordform_path'] ?? '', '" size="65" />
+					</dd>					
+					<dt>
+						<label for="manticore_indexer_mem_input">', $txt['manticore_memory_limit'], '</label><br />
+						<span class="smalltext">', $txt['manticore_memory_limit_desc'], '</span>
+					</dt>
+					<dd>
+						<input type="text" name="manticore_indexer_mem" id="manticore_indexer_mem_input" value="', $modSettings['manticore_indexer_mem'] ?? '128', '" size="4" /> MB
+					</dd>
+					<dt>
+						<label for="manticore_searchd_server_input">', $txt['manticore_searchd_server'], '</label><br />
+						<span class="smalltext">', $txt['manticore_searchd_server_desc'], '</span>
+					</dt>
+					<dd>
+						<input type="text" name="manticore_searchd_server" id="manticore_searchd_server_input" value="', $modSettings['manticore_searchd_server'] ?? 'localhost', '" size="65" />
+					</dd>
+					<dt>
+						<label for="manticore_searchd_port_input">', $txt['manticore_searchd_port'], '</label><br />
+						<span class="smalltext">', $txt['manticore_searchd_port_desc'], '</span>
+					</dt>
+					<dd>
+						<input type="text" name="manticore_searchd_port" id="manticore_searchd_port_input" value="', $modSettings['manticore_searchd_port'] ?? '9306', '" size="4" />
+					</dd>
+					<dt>
+						<label for="manticore_max_results_input">', $txt['manticore_max_matches'], '</label><br />
+						<span class="smalltext">', $txt['manticore_max_matches_desc'], '</span>
+					</dt>
+					<dd>
+						<input type="text" name="manticore_max_results" id="manticore_max_results_input" value="', $modSettings['manticore_max_results'] ?? '2000', '" size="4" />
+					</dd>
+				</dl>
+				<div class="submitbutton">
+					<input type="submit" name="createconfig" value="', $txt['manticore_create_config'], '" />
+					<input type="submit" name="checkconnect" value="', $txt['manticore_test_connection'], '" />
+					<input type="submit" name="save" value="', $txt['save'], '"  />
+					<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
+					<input type="hidden" name="', $context['admin-msmanticore_token_var'], '" value="', $context['admin-msmanticore_token'], '" />
 				</div>
 			</div>
 		</form>

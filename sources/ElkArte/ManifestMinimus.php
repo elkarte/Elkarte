@@ -39,14 +39,14 @@ class ManifestMinimus
 	{
 	}
 
-	public function create()
+	public function create(): void
 	{
 		$this->prepareAndSendHeaders();
 
 		echo json_encode($this->getManifestParts(), JSON_PRETTY_PRINT);
 	}
 
-	protected function prepareAndSendHeaders()
+	protected function prepareAndSendHeaders(): void
 	{
 		$headers = Headers::instance();
 
@@ -84,7 +84,7 @@ class ManifestMinimus
 		return array_filter($manifest);
 	}
 
-	protected function getDescription()
+	protected function getDescription(): string
 	{
 		global $settings, $mbname;
 
@@ -111,7 +111,7 @@ class ManifestMinimus
 		return str_replace(['.utf8', '_'], ['', '-'], trim($lang));
 	}
 
-	protected function getLanguageDirection()
+	protected function getLanguageDirection(): string
 	{
 		global $txt;
 
@@ -128,17 +128,17 @@ class ManifestMinimus
 		return 'any';
 	}
 
-	protected function getId()
+	protected function getId(): string
 	{
 		return trim($this->getScope(), '/') . '?elk_pwa=1';
 	}
 
-	protected function getScope()
+	protected function getScope(): string
 	{
 		return $this->getStartUrl();
 	}
 
-	protected function getStartUrl()
+	protected function getStartUrl(): string
 	{
 		global $boardurl;
 

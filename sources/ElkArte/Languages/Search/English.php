@@ -74,8 +74,8 @@ $txt['search_index_create_custom'] = 'Create custom index';
 $txt['search_index_custom_remove'] = 'Remove custom index';
 
 $txt['search_managesphinx_desc'] = 'Here you can set up the config file for Sphinx.';
-$txt['search_index_sphinx'] = 'SphinxAPI';
-$txt['search_index_sphinx_desc'] = 'To adjust Sphinx settings, use <a class="linkbutton" href="{managesearch_url}">Configure Sphinx</a>';
+$txt['search_index_manticore'] = 'Manticore';
+$txt['search_index_manticore_desc'] = 'To adjust Manticore settings, use <a class="linkbutton" href="{managesearch_url}">Configure Manticore</a>';
 $txt['search_index_sphinxql'] = 'SphinxQL';
 $txt['search_index_sphinxql_desc'] = 'To adjust SphinxQL settings, use <a class="linkbutton" href="{managesearch_url}">Configure Sphinx</a>';
 
@@ -177,7 +177,6 @@ $txt['sphinx_test_passed'] = 'All tests were successful, the system was able to 
 $txt['sphinxql_test_passed'] = 'All tests were successful, the system was able to connect to the sphinx search daemon using SphinxQL commands.';
 $txt['sphinx_test_connect_failed'] = 'Unable to connect to the Sphinx daemon. Make sure it is running and configured properly. Sphinx search will not work until you fix the problem.';
 $txt['sphinxql_test_connect_failed'] = 'Unable to access SphinxQL. Make sure your sphinx.conf has a separate listen directive for the SphinxQL port. SphinxQL search will not work until you fix the problem';
-$txt['sphinx_test_api_missing'] = 'The sphinxapi.php file is missing in your &quot;sources&quot; directory. You need to copy this file from the Sphinx distribution. Sphinx search will not work until you fix the problem.';
 $txt['sphinx_description'] = 'Use this interface to supply the access details to your Sphinx search daemon. <strong>These settings are only used to create</strong> an initial sphinx.conf configuration file which you will need to save in your Sphinx configuration directory (typically /usr/local/etc or /etc/sphinxsearch). Generally the options below can be left untouched, however they assume that the Sphinx software was installed in /usr/local and use /var/sphinx for the search index data storage. In order to keep Sphinx up to date, you must use a cron job to update the indexes, otherwise new or deleted content will not be reflected in the search results. The configuration file defines two indexes:<br /><br/><strong>elkarte_delta_index</strong>, an index that only stores recent changes and can be called frequently. <strong>elkarte_base_index</strong>, an index that stores the full database and should be called less frequently. Example:<br /><span class="tt">10 3 * * * /usr/local/bin/indexer --config /usr/local/etc/sphinx.conf --rotate elkarte_base_index<br />0 * * * * /usr/local/bin/indexer --config /usr/local/etc/sphinx.conf --rotate elkarte_delta_index</span>';
 $txt['sphinx_index_prefix'] = 'Index prefix:';
 $txt['sphinx_index_prefix_desc'] = 'This is the prefix for the base and delta indexes.<br />By default it uses elkarte and the two indexes will be elkarte_base_index and elkarte_delta_index. Sphinx will connect to elkarte_index (prefix_index).  If you change this be sure to use the correct prefix in your cron task.';
@@ -199,3 +198,29 @@ $txt['sphinx_max_matches'] = 'Maximum # matches:';
 $txt['sphinx_max_matches_desc'] = 'Maximum amount of matches the search daemon will return.';
 $txt['sphinx_create_config'] = 'Create Sphinx config';
 $txt['sphinx_test_connection'] = 'Test connection to Sphinx daemon';
+
+// strings for setting up manticore search
+$txt['manticore_test_not_selected'] = 'You have not yet selected to use Manticore as your Search Method';
+$txt['manticore_test_passed'] = 'All tests were successful, the system was able to connect to the Manticore search daemon.';
+$txt['manticore_test_connect_failed'] = 'Unable to connect to the Manticore daemon. Make sure it is running and configured properly. Manticore search will not work until you fix the problem.';
+$txt['manticore_description'] = 'Use this interface to supply the access details to your Manticore search daemon. <strong>These settings are only used to create</strong> an initial .conf configuration file which you will need to save in your Manticore configuration directory (typically /usr/local/etc or /etc/manticoresearch). Generally the options below can be left untouched, however they assume that the Manticore software was installed in /usr/local and use /var/manticore for the search index data storage. In order to keep Manticore up to date, you must use a cron job to update the indexes, otherwise new or deleted content will not be reflected in the search results. The configuration file defines two indexes:<br /><br/><strong>elkarte_delta_index</strong>, an index that only stores recent changes and can be called frequently. <strong>elkarte_base_index</strong>, an index that stores the full database and should be called less frequently. Example:<br /><span class="tt">10 3 * * * /usr/bin/indexer --config /etc/manticoresearch/manticore.conf --rotate elkarte_base_index<br />0 * * * * /usr/bin/indexer --config /etc/manticoresearch/manticore.conf --rotate elkarte_delta_index</span>';
+$txt['manticore_index_prefix'] = 'Index prefix:';
+$txt['manticore_index_prefix_desc'] = 'This is the prefix for the base and delta indexes.<br />By default it uses elkarte and the two indexes will be elkarte_base_index and elkarte_delta_index. Manticore will connect to elkarte_index (prefix_index).  If you change this be sure to use the correct prefix in your cron task.';
+$txt['manticore_index_data_path'] = 'Index data path:';
+$txt['manticore_index_data_path_desc'] = 'This is the path that contains the search index files used by Manticore.<br />It <strong>must</strong> exist and be accessible for reading and writing by the Manticore indexer and search daemon.';
+$txt['manticore_log_file_path'] = 'Log file path:';
+$txt['manticore_log_file_path_desc'] = 'Server path that will contain the log files created by Manticore.<br />This directory must exist on your server and must be writable by the Manticore search daemon and indexer.';
+$txt['manticore_stop_word_path'] = 'Stopword path:';
+$txt['manticore_stop_word_path_desc'] = 'The server path to the stopword list ex. /etc/manticoresearch/stopwords.txt<br />Leave empty for no stopword list.';
+$txt['manticore_word_form_path'] = 'Wordform path:';
+$txt['manticore_word_form_path_desc'] = 'The server path to the wordform list ex. /etc/manticoresearch/wordforms.txt<br />Leave empty for no wordform list.';
+$txt['manticore_memory_limit'] = 'Manticore indexer memory limit:';
+$txt['manticore_memory_limit_desc'] = 'The maximum amount of (RAM) memory the indexer is allowed to use.';
+$txt['manticore_searchd_server'] = 'Search daemon server:';
+$txt['manticore_searchd_server_desc'] = 'Address of the server running the search daemon. This must be a valid host name or IP address.<br />If not set, localhost will be used.';
+$txt['manticore_searchd_port'] = 'Manticore API daemon port:';
+$txt['manticore_searchd_port_desc'] = 'Port on which the search daemon will listen for API queries.';
+$txt['manticore_max_matches'] = 'Maximum # matches:';
+$txt['manticore_max_matches_desc'] = 'Maximum amount of matches the search daemon will return.';
+$txt['manticore_create_config'] = 'Create Manticore config';
+$txt['manticore_test_connection'] = 'Test connection to Manticore daemon';

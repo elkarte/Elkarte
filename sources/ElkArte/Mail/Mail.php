@@ -32,7 +32,7 @@ class Mail extends BaseMail
 	 * @return bool whether the email was accepted properly.
 	 * @package Mail
 	 */
-	public function sendMail($to, $subject, $headers, $message, $message_id = null)
+	public function sendMail($to, $subject, $headers, $message, $message_id = null): bool
 	{
 		$message_id = $this->setMessageType($message_id);
 
@@ -56,7 +56,7 @@ class Mail extends BaseMail
 	 * @param string $message_id
 	 * @return bool if the mail was accepted by the system
 	 */
-	public function sendPHP($mail_to_array, $subject, $message, $headers, $message_id)
+	public function sendPHP($mail_to_array, $subject, $message, $headers, $message_id): bool
 	{
 		global $webmaster_email, $modSettings, $txt;
 
@@ -143,7 +143,7 @@ class Mail extends BaseMail
 	 * @return bool whether it sent or not.
 	 * @package Mail
 	 */
-	public function SMTP($mail_to_array, $subject, $message, $headers, $message_id = null)
+	public function SMTP($mail_to_array, $subject, $message, $headers, $message_id = null): bool
 	{
 		global $modSettings, $webmaster_email;
 
@@ -376,7 +376,7 @@ class Mail extends BaseMail
 	 * @param string $smtp_client
 	 * @return bool
 	 */
-	private function _loginSMTPClient($socket, $smtp_client)
+	private function _loginSMTPClient($socket, $smtp_client): bool
 	{
 		global $modSettings;
 

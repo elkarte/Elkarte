@@ -49,7 +49,7 @@ class Post extends AbstractModule
 	 * @param array $topicOptions
 	 * @param array $posterOptions
 	 */
-	public static function followup_create_topic($msgOptions, $topicOptions, $posterOptions)
+	public static function followup_create_topic($msgOptions, $topicOptions, $posterOptions): void
 	{
 		if (!empty($_REQUEST['followup']))
 		{
@@ -74,7 +74,7 @@ class Post extends AbstractModule
 	/**
 	 * Show followups.
 	 */
-	public function prepare_context_followup()
+	public function prepare_context_followup(): void
 	{
 		global $context, $board;
 

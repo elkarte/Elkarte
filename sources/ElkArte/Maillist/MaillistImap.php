@@ -81,7 +81,7 @@ class MaillistImap extends AbstractModel
 	/**
 	 * Does the actual processing of the inbox posting new emails as needed
 	 */
-	public function process()
+	public function process(): bool
 	{
 		$this->_get_inbox();
 
@@ -131,7 +131,7 @@ class MaillistImap extends AbstractModel
 	/**
 	 * Finds the inbox of the email
 	 */
-	protected function _get_inbox()
+	protected function _get_inbox(): void
 	{
 		$this->_inbox = $this->_checkValues();
 
@@ -163,7 +163,7 @@ class MaillistImap extends AbstractModel
 	 *
 	 * @return bool
 	 */
-	private function _checkValues()
+	private function _checkValues(): bool
 	{
 		// I suppose that without this information we can't do anything.
 		return !((empty($this->_hostname) || empty($this->_username) || empty($this->_password)));
@@ -172,7 +172,7 @@ class MaillistImap extends AbstractModel
 	/**
 	 * Sets port and connection flags based on the chosen protocol
 	 */
-	protected function _port_type()
+	protected function _port_type(): array
 	{
 		switch ($this->_type)
 		{
@@ -230,7 +230,7 @@ class MaillistImap extends AbstractModel
 	 *
 	 * @return string
 	 */
-	protected function _fetch_email($email_uid)
+	protected function _fetch_email($email_uid): string
 	{
 		// Get the headers and prefetch the body as well to avoid a second request
 		$headers = imap_fetchheader($this->_inbox, $email_uid, FT_PREFETCHTEXT | FT_UID);
@@ -244,7 +244,7 @@ class MaillistImap extends AbstractModel
 	 *
 	 * @param int $email_uid - The email id
 	 */
-	protected function _delete_email($email_uid)
+	protected function _delete_email($email_uid): void
 	{
 		// Gmail labels make this more complicated
 		if ($this->_is_gmail)
@@ -263,7 +263,7 @@ class MaillistImap extends AbstractModel
 	 *
 	 * @return string
 	 */
-	protected function _get_trash_folder()
+	protected function _get_trash_folder(): string
 	{
 		// Known names for the trash bin, I'm sure there are more
 		$trashBox = ['[Google Mail]/Bin', '[Google Mail]/Trash', '[Gmail]/Bin', '[Gmail]/Trash'];

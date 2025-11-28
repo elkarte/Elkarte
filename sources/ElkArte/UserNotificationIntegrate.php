@@ -26,7 +26,7 @@ class UserNotificationIntegrate
 	/**
 	 * Dynamically registers the hooks for the feature.
 	 */
-	public static function register()
+	public static function register(): array
 	{
 		global $modSettings;
 
@@ -43,7 +43,7 @@ class UserNotificationIntegrate
 	/**
 	 * Dynamically registers the admin panel hooks for the feature.
 	 */
-	public static function settingsRegister()
+	public static function settingsRegister(): array
 	{
 		// $hook, $function, $file
 		return [
@@ -55,7 +55,7 @@ class UserNotificationIntegrate
 	/**
 	 * Adds the relevant javascript code when loading the page.
 	 */
-	public static function integrate_load_theme()
+	public static function integrate_load_theme(): void
 	{
 		if (User::$info->is_guest)
 		{
@@ -71,7 +71,7 @@ class UserNotificationIntegrate
 	 *
 	 * @param array $config_vars
 	 */
-	public static function integrate_modify_mention_settings(&$config_vars)
+	public static function integrate_modify_mention_settings(&$config_vars): void
 	{
 		$notification = new UserNotification(database(), User::$info);
 
@@ -82,7 +82,7 @@ class UserNotificationIntegrate
 	/**
 	 * Does some magic when settings are saved.
 	 */
-	public static function integrate_save_modify_mention_settings()
+	public static function integrate_save_modify_mention_settings(): void
 	{
 		$req = HttpReq::instance();
 

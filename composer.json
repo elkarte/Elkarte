@@ -17,8 +17,7 @@
 	"support": {
 		"issues": "https://github.com/elkarte/Elkarte/issues",
 		"forum": "https://www.elkarte.com/community/",
-		"wiki": "https://github.com/elkarte/Elkarte/wiki",
-		"irc": "irc://irc.freenode.org/elkarte"
+		"wiki": "https://github.com/elkarte/Elkarte/wiki"
 	},
 	"minimum-stability": "beta",
 	"scripts": {
@@ -32,23 +31,24 @@
 		"ext-curl": "*",
 		"ext-mysqli": "*",
 		"ext-fileinfo": "*",
-		"ext-exif": "*"
-	},
+		"ext-exif": "*",
+		"michelf/php-markdown": "2.*",
+        "ext-libxml": "*",
+        "ext-dom": "Allows operations on XML and HTML documents through the DOM API.",
+      "ext-imagick": "Imagick is a native php extension to create and modify images using the ImageMagick API."
+    },
 	"suggest": {
-		"ext-memcache": "*",
-		"ext-zlib": "*",
-		"ext-pgsql": "*",
-		"ext-imap": "*",
-		"ext-memcached": "*",
-		"ext-zend-opcache": "*",
-		"ext-mbstring": "*",
-		"ext-apcu": "*",
-		"ext-libxml": "*",
-		"ext-dom": "*",
-		"ext-apache": "*",
-		"ext-iconv": "*",
-		"ext-imagick": "*"
-	},
+		"ext-memcache": "Allows use of memcache cache",
+		"ext-memcached": "Allows use of memcached cache",
+		"predis/predis": "Allows interface to Redis server via Predis, can also use phpredis extension via Pecl",
+		"ext-apcu": "Adds an in-memory key-value store cache.",
+		"ext-zlib": "Enables you to transparently read and write (.gz) compressed files, ",
+		"ext-pgsql": "Provides Postgre SQL support",
+		"ext-imap": "Operate with the IMAP protocol, as well as POP3 and local mailbox access methods.",
+		"ext-zend-opcache": "Improves PHP performance by storing precompiled script bytecode in shared memory.",
+		"ext-mbstring": "Provides multibyte specific string functions that help process multibyte encodings.",
+		"ext-iconv": "Interface to allow for easy character set conversions."
+    },
 	"require-dev": {
 		"phpunit/phpunit-selenium": "9.0.1",
 		"phpunit/phpunit": "9.6.*",

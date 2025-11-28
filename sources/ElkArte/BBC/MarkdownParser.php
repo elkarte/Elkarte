@@ -37,7 +37,7 @@ class MarkdownParser
 	 *
 	 * @return string
 	 */
-	public function parse($data)
+	public function parse($data): string
 	{
 		// Start tag search and replace
 		$data = $this->boldTags($data);
@@ -55,7 +55,7 @@ class MarkdownParser
 	 *
 	 * @return string
 	 */
-	protected function quoteTags($data)
+	protected function quoteTags($data): string
 	{
 		if (strpos($data, '>') !== false)
 		{
@@ -78,7 +78,7 @@ class MarkdownParser
 	 *
 	 * @return string
 	 */
-	protected function boldTags($data)
+	protected function boldTags($data): string
 	{
 		if (strpos($data, '**') !== false)
 		{
@@ -100,7 +100,7 @@ class MarkdownParser
 	 *
 	 * @return string
 	 */
-	protected function italicTags($data)
+	protected function italicTags($data): string
 	{
 		if (strpos($data, '*') !== false)
 		{
@@ -122,7 +122,7 @@ class MarkdownParser
 	 *
 	 * @return string
 	 */
-	protected function strikeTags($data)
+	protected function strikeTags($data): string
 	{
 		if (strpos($data, '~~') !== false)
 		{
@@ -139,7 +139,7 @@ class MarkdownParser
 	 *
 	 * @return string
 	 */
-	protected function ruleTags($data)
+	protected function ruleTags($data): string
 	{
 		// convert rule
 		$data = preg_replace('~(^|\n|<br \/>)---+?(^|\n|<br \/>)~', '$1[hr]', $data);
@@ -158,7 +158,7 @@ class MarkdownParser
 	 *
 	 * @return string
 	 */
-	private function doubleTagConvert($md, $bbc, $data)
+	private function doubleTagConvert($md, $bbc, $data): string
 	{
 		$md = preg_quote($md, '~');
 
@@ -185,7 +185,7 @@ class MarkdownParser
 	 *
 	 * @return string
 	 */
-	private function tagConvert($md, $bbc, $data)
+	private function tagConvert($md, $bbc, $data): string
 	{
 		$md = preg_quote($md, '~');
 		$regex = '~(^|\s|;|<br \/>)([' . $md . '])(?!\2)(.+?)\2(?!\2)(\s|$|&|<br \/>)~sm';
@@ -202,7 +202,7 @@ class MarkdownParser
 	 *
 	 * @return string
 	 */
-	public function inlineCodeTags($data)
+	public function inlineCodeTags($data): string
 	{
 		// code block
 		if (strpos($data, '```') !== false)

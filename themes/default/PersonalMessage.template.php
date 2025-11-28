@@ -116,8 +116,8 @@ function template_folder()
 		if (empty($options['hide_poster_area']))
 		{
 			echo '
-							<aside>
-								<ul class="poster">', template_build_poster_div($message), '</ul>
+							<aside class="poster">
+								<ul class="poster no_js">', template_build_poster_div($message), '</ul>
 							</aside>';
 		}
 

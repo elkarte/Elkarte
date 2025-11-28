@@ -31,7 +31,7 @@ function ml_CustomProfile()
 
 	$db = database();
 
-	$context['custom_profile_fields'] = array();
+	$context['custom_profile_fields'] = [];
 
 	// Find any custom profile fields that are to be shown for the memberlist?
 	$db->fetchQuery('
@@ -42,11 +42,11 @@ function ml_CustomProfile()
 			AND show_memberlist = {int:show}
 			AND private < {int:private_level}
 		ORDER BY vieworder',
-		array(
+		[
 			'active' => 1,
 			'show' => 1,
 			'private_level' => 2,
-		)
+		]
 	)->fetch_callback(
 		function ($row) {
 			global $context;
@@ -55,7 +55,7 @@ function ml_CustomProfile()
 			$curField = 'cust_' . $row['col_name'];
 
 			// Load the standard column info
-			$context['custom_profile_fields']['columns'][$curField] = array(
+			$context['custom_profile_fields']['columns'][$curField] = [
 				'label' => $row['field_name'],
 				'class' => $row['field_name'],
 				'type' => $row['field_type'],
@@ -63,7 +63,7 @@ function ml_CustomProfile()
 				'enclose' => $row['enclose'],
 				'default_value' => $row['default_value'],
 				'field_options' => explode(',', $row['field_options']),
-			);
+			];
 
 			// Have they selected to sort on a custom column? .., then we build the query
 			if (isset($_REQUEST['sort']) && $_REQUEST['sort'] === $curField)
@@ -71,17 +71,17 @@ function ml_CustomProfile()
 				// Build the sort queries.
 				if ($row['field_type'] != 'check')
 				{
-					$context['custom_profile_fields']['columns'][$curField]['sort'] = array(
+					$context['custom_profile_fields']['columns'][$curField]['sort'] = [
 						'down' => 'LENGTH(cfd' . $curField . '.value) > 0 ASC, COALESCE(cfd' . $curField . '.value, 1=1) DESC, cfd' . $curField . '.value DESC',
 						'up' => 'LENGTH(cfd' . $curField . '.value) > 0 DESC, COALESCE(cfd' . $curField . '.value, 1=1) ASC, cfd' . $curField . '.value ASC'
-					);
+					];
 				}
 				else
 				{
-					$context['custom_profile_fields']['columns'][$curField]['sort'] = array(
+					$context['custom_profile_fields']['columns'][$curField]['sort'] = [
 						'down' => 'cfd' . $curField . '.value DESC',
 						'up' => 'cfd' . $curField . '.value ASC'
-					);
+					];
 				}
 
 				// Build the join and parameters for the sort query
@@ -115,16 +115,16 @@ function ml_memberCache($cache_step_size)
 		FROM {db_prefix}members
 		WHERE is_activated = {int:is_activated}
 		ORDER BY real_name',
-		array(
+		[
 			'is_activated' => 1,
-		)
+		]
 	);
 
-	$memberlist_cache = array(
+	$memberlist_cache = [
 		'last_update' => time(),
 		'num_members' => $request->num_rows(),
-		'index' => array(),
-	);
+		'index' => [],
+	];
 
 	// Get/Set our pointers in this list, used to later help limit our query
 	for ($i = 0, $n = $request->num_rows(); $i < $n; $i += $cache_step_size)
@@ -139,7 +139,7 @@ function ml_memberCache($cache_step_size)
 	$request->free_result();
 
 	// Now we've got the cache...store it.
-	updateSettings(array('memberlist_cache' => serialize($memberlist_cache)));
+	updateSettings(['memberlist_cache' => serialize($memberlist_cache)]);
 
 	return $memberlist_cache;
 }
@@ -156,9 +156,9 @@ function ml_memberCount()
 			COUNT(*)
 		FROM {db_prefix}members
 		WHERE is_activated = {int:is_activated}',
-		array(
+		[
 			'is_activated' => 1,
-		)
+		]
 	);
 	list ($num_members) = $request->fetch_row();
 	$request->free_result();
@@ -183,10 +183,10 @@ function ml_alphaStart($start)
 		FROM {db_prefix}members
 		WHERE LOWER(SUBSTRING(real_name, 1, 1)) < {string:first_letter}
 			AND is_activated = {int:is_activated}',
-		array(
+		[
 			'is_activated' => 1,
 			'first_letter' => $start,
-		)
+		]
 	);
 	list ($start) = $request->fetch_row();
 	$request->free_result();
@@ -198,7 +198,7 @@ function ml_alphaStart($start)
  * Primary query for the memberlist display, runs the query based on the users
  * sort and start selections.
  *
- * @param mixed[] $query_parameters
+ * @param array $query_parameters
  * @param string $where
  * @param int $limit
  * @param string $sort
@@ -233,7 +233,7 @@ function ml_selectMembers($query_parameters, $where = '', $limit = 0, $sort = ''
  * sort and start selections.
  *  - Uses printMemberListRows to load the query results in to context
  *
- * @param mixed[] $query_parameters
+ * @param array $query_parameters
  * @param string|string[]|null $customJoin
  * @param string $where
  * @param int $limit
@@ -291,7 +291,7 @@ function ml_findSearchableCustomFields()
 
 	$db = database();
 
-	$context['custom_search_fields'] = array();
+	$context['custom_search_fields'] = [];
 	$db->fetchQuery('
 		SELECT 
 			col_name, field_name, field_desc
@@ -300,23 +300,23 @@ function ml_findSearchableCustomFields()
 			' . (allowedTo('admin_forum') ? '' : ' AND private < {int:private_level}') . '
 			AND can_search = {int:can_search}
 			AND (field_type IN ({string:field_type_text}, {string:field_type_textarea}, {string:field_type_select}))',
-		array(
+		[
 			'active' => 1,
 			'can_search' => 1,
 			'private_level' => 2,
 			'field_type_text' => 'text',
 			'field_type_textarea' => 'textarea',
 			'field_type_select' => 'select',
-		)
+		]
 	)->fetch_callback(
 		function ($row) {
 			global $context;
 
-			$context['custom_search_fields'][$row['col_name']] = array(
+			$context['custom_search_fields'][$row['col_name']] = [
 				'colname' => $row['col_name'],
 				'name' => $row['field_name'],
 				'desc' => $row['field_desc'],
-			);
+			];
 		}
 	);
 }
@@ -325,7 +325,7 @@ function ml_findSearchableCustomFields()
  * Retrieves results of the request passed to it
  * Puts results of request into the context for the sub template.
  *
- * @param resource $request
+ * @param mysqli_result $request
  */
 function printMemberListRows($request)
 {
@@ -338,7 +338,7 @@ function printMemberListRows($request)
 		SELECT 
 			MAX(posts)
 		FROM {db_prefix}members',
-		array()
+		[]
 	);
 	list ($most_posts) = $result->fetch_row();
 	$result->free_result();
@@ -349,7 +349,7 @@ function printMemberListRows($request)
 		$most_posts = 1;
 	}
 
-	$members = array();
+	$members = [];
 	while (($row = $request->fetch_assoc($request)))
 	{
 		$members[] = $row['id_member'];
@@ -360,7 +360,7 @@ function printMemberListRows($request)
 
 	$bbc_parser = ParserWrapper::instance();
 
-	$context['members'] = array();
+	$context['members'] = [];
 	foreach ($members as $member)
 	{
 		$member_context = MembersList::get($member);
@@ -404,13 +404,13 @@ function printMemberListRows($request)
 				// Should it be enclosed for display?
 				if (!empty($column['enclose']) && !empty($member_options[$curField]))
 				{
-					$replacements = array(
+					$replacements = [
 						'{SCRIPTURL}' => $scripturl,
 						'{IMAGES_URL}' => $settings['images_url'],
 						'{DEFAULT_IMAGES_URL}' => $settings['default_images_url'],
 						'{INPUT}' => $member_options[$curField],
-					);
-					if (in_array($column['type'], array('radio', 'select')))
+					];
+					if (in_array($column['type'], ['radio', 'select']))
 					{
 						$replacements['{KEY}'] = $member_options[$curField . '_key'];
 					}

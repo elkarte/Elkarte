@@ -77,7 +77,7 @@ class Mentioning extends AbstractModel
 	 *
 	 * @return int[]
 	 */
-	public function create($mention_obj, $data)
+	public function create($mention_obj, $data): array
 	{
 		$this->_data = $this->_prepareData($data);
 
@@ -88,7 +88,7 @@ class Mentioning extends AbstractModel
 		}
 
 		// Cleanup, validate and remove the invalid values (0 and $this->_data['id_member_from'])
-		$id_targets = array_diff(array_map('intval', array_unique($this->_validator->uid)), array(0, $this->_data['id_member_from']));
+		$id_targets = array_diff(array_map('intval', array_unique($this->_validator->uid)), [0, $this->_data['id_member_from']]);
 
 		if (empty($id_targets))
 		{
@@ -113,7 +113,7 @@ class Mentioning extends AbstractModel
 	 *
 	 * @return array
 	 */
-	protected function _prepareData($data)
+	protected function _prepareData($data): array
 	{
 		if (isset($data['id_member']))
 		{
@@ -147,7 +147,7 @@ class Mentioning extends AbstractModel
 	 *
 	 * @return bool
 	 */
-	protected function _isValid()
+	protected function _isValid(): bool
 	{
 		$sanitization = [
 			'type' => 'trim',
@@ -193,7 +193,7 @@ class Mentioning extends AbstractModel
 	 * @param int $member_id
 	 * @package Mentions
 	 */
-	protected function _updateMenuCount($status, $member_id)
+	protected function _updateMenuCount($status, $member_id): void
 	{
 		require_once(SUBSDIR . '/Members.subs.php');
 
@@ -222,7 +222,7 @@ class Mentioning extends AbstractModel
 	 * @param int|int[] $mention_id
 	 * @return bool if successfully changed or not
 	 */
-	public function markread($mention_id)
+	public function markread($mention_id): bool
 	{
 		return $this->updateStatus($mention_id, 'readall');
 	}
@@ -234,7 +234,7 @@ class Mentioning extends AbstractModel
 	 * @param string $mark
 	 * @return bool if successfully changed or not
 	 */
-	public function updateStatus($items, $mark)
+	public function updateStatus($items, $mark): bool
 	{
 		// Make sure it is all good
 		$own_id = $this->_getAccessible((array) $items, $mark);
@@ -263,7 +263,7 @@ class Mentioning extends AbstractModel
 	 * @param string $action
 	 * @return int[]
 	 */
-	protected function _getAccessible($mention_ids, $action)
+	protected function _getAccessible($mention_ids, $action): array
 	{
 		require_once(SUBSDIR . '/Mentions.subs.php');
 		$sanitization = [
@@ -302,16 +302,17 @@ class Mentioning extends AbstractModel
 	 * @return bool if successfully changed or not
 	 * @package Mentions
 	 */
-	protected function _changeStatus($id_mentions, $status = 'read')
+	protected function _changeStatus($id_mentions, $status = 'read'): bool
 	{
 		require_once(SUBSDIR . '/Mentions.subs.php');
 
-		$success = changeStatus($id_mentions, $this->user->id, $this->_known_status[$status], false);
+		$user_id = is_int($this->user) ? $this->user : $this->user->id;
+		$success = changeStatus($id_mentions, $user_id, $this->_known_status[$status], false);
 
 		// Update the top level mentions count
 		if ($success)
 		{
-			$this->_updateMenuCount($this->_known_status[$status], $this->user->id);
+			$this->_updateMenuCount($this->_known_status[$status], $user_id);
 		}
 
 		return $success;

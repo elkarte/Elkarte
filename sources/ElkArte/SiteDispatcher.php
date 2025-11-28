@@ -161,7 +161,7 @@ class SiteDispatcher
 	 *
 	 * @return array The default action for the front page
 	 */
-	protected function getFrontPage()
+	protected function getFrontPage(): array
 	{
 		global $modSettings;
 
@@ -181,10 +181,9 @@ class SiteDispatcher
 	}
 
 	/**
-	 * Finds out if the current action is one of those without
-	 * an "action" parameter in the URL
+	 * Finds out if the current action is one of those without an "action" parameter in the URL
 	 */
-	protected function determineDefaultAction()
+	protected function determineDefaultAction(): void
 	{
 		global $board, $topic;
 
@@ -220,9 +219,9 @@ class SiteDispatcher
 	 * Allows extending or changing the action array through a hook.
 	 * If the controller class does not exist, sets the default controller and function names.
 	 */
-	protected function determineAction()
+	protected function determineAction(): void
 	{
-		// Allow to extend or change $actionArray through a hook
+		// Allow extending or changing $actionArray through a hook
 		// Format: $_GET['action'] => array($class, $method)
 		call_integration_hook('integrate_actions', [&$this->actionArray]);
 
@@ -261,7 +260,7 @@ class SiteDispatcher
 	 *   - If the subAction is specified and matches the pattern, appends it to "action_" as the function name.
 	 *   - If none of the above conditions are met, sets the function name to "action_index".
 	 */
-	protected function setActionAndControllerFromActionArray()
+	protected function setActionAndControllerFromActionArray(): void
 	{
 		$this->_controller_name = $this->actionArray[$this->action][0];
 		$this->_function_name = 'action_index';
@@ -282,14 +281,24 @@ class SiteDispatcher
 	 * Sets the action and controller names based on naming patterns.
 	 *
 	 * What it does:
-	 * - The action name is used to determine the controller class, action=gallery => Gallery.controller.php
+	 * - The action name is used to determine the controller class, action=gallery => Gallery.php
 	 * - The subAction is used to determine the action function, sa=upload => action_upload()
 	 * - If the subAction is not set or the area is set, the action function will default to 'action_index'
-	 * - controller classes must be in the Controller directory
+	 * - controller classes must be in the Controller directory or in the Addons directory
+	 * - action functions must be:
+	 *      - in the Controller directory
+	 *      - or in the Addons directory as a subdirectory named the same as the action
 	 */
-	protected function setActionAndControllerFromNamingPatterns()
+	protected function setActionAndControllerFromNamingPatterns(): void
 	{
+		// Try the main ElkArte controller directory first
 		$this->_controller_name = '\\ElkArte\\Controller\\' . ucfirst($this->action);
+
+		if (!class_exists($this->_controller_name))
+		{
+			// Try the addons directory
+			$this->_controller_name = '\\Addons\\' . ucfirst($this->action) . '\\' . ucfirst($this->action);
+		}
 
 		if ($this->subAction !== null && empty($this->area) && preg_match('~^\w+$~', $this->subAction))
 		{
@@ -305,7 +314,7 @@ class SiteDispatcher
 	 * Sets the default action and controller if they are empty.
 	 * If either the controller or the function name is empty, this method calls the setDefaultActionAndController method.
 	 */
-	protected function setDefaultActionAndControllerIfEmpty()
+	protected function setDefaultActionAndControllerIfEmpty(): void
 	{
 		if (empty($this->_controller_name) || empty($this->_function_name))
 		{
@@ -321,7 +330,7 @@ class SiteDispatcher
 	 *  - When the current action does not have an "action" parameter in the URL.
 	 *  - It assigns the values from the `_default_action` property to the `_controller_name` and `_function_name` properties.
 	 */
-	protected function setDefaultActionAndController()
+	protected function setDefaultActionAndController(): void
 	{
 		$this->_controller_name = $this->_default_action['controller'];
 		$this->_function_name = $this->_default_action['function'];
@@ -333,7 +342,7 @@ class SiteDispatcher
 	 *  - If the 'api' parameter is set in the request and its value is empty, it appends the '_api' suffix to the current function name.
 	 *  - This needs to be reviewed, all api calls really should be qualified as json, xml, html, etc
 	 */
-	protected function handleApiCall()
+	protected function handleApiCall(): void
 	{
 		if (!isset($_REQUEST['api']))
 		{
@@ -353,7 +362,7 @@ class SiteDispatcher
 	 *
 	 * @return bool Returns true if both the controller and action exist, false otherwise.
 	 */
-	protected function checkIfControllerExists()
+	protected function checkIfControllerExists(): bool
 	{
 		// 3, 2, ... and go
 		if (class_exists($this->_controller_name))
@@ -381,7 +390,7 @@ class SiteDispatcher
 	 *
 	 * @param ValuesContainer $user
 	 */
-	public function setUser($user)
+	public function setUser($user): void
 	{
 		$this->_controller->setUser($user);
 	}
@@ -424,7 +433,7 @@ class SiteDispatcher
 	/**
 	 * If the current controller needs to load all the security framework.
 	 */
-	public function needSecurity()
+	public function needSecurity(): bool
 	{
 		return $this->_controller->needSecurity($this->_function_name);
 	}
@@ -432,7 +441,7 @@ class SiteDispatcher
 	/**
 	 * If the current controller needs to load the theme.
 	 */
-	public function needTheme()
+	public function needTheme(): bool
 	{
 		global $maintenance;
 
@@ -474,7 +483,7 @@ class SiteDispatcher
 	 *
 	 * @return bool
 	 */
-	protected function restrictedGuestAccess()
+	protected function restrictedGuestAccess(): bool
 	{
 		global $modSettings;
 
@@ -486,7 +495,7 @@ class SiteDispatcher
 	/**
 	 * If the current controller wants to track access and stats.
 	 */
-	public function trackStats($action = '')
+	public function trackStats($action = ''): bool
 	{
 		return $this->_controller->trackStats($this->_function_name);
 	}
@@ -494,7 +503,7 @@ class SiteDispatcher
 	/**
 	 * @return AbstractController
 	 */
-	public function getController()
+	public function getController(): AbstractController
 	{
 		return $this->_controller;
 	}
@@ -504,7 +513,7 @@ class SiteDispatcher
 	 *
 	 * @return string
 	 */
-	public function site_action()
+	public function site_action(): string
 	{
 		if (!empty($this->_controller_name))
 		{

@@ -135,7 +135,7 @@ class Search
 	/**
 	 * Sets $this->_searchParams with all the search parameters.
 	 */
-	public function getParams()
+	public function getParams(): void
 	{
 		$this->_searchParams->mergeWith([
 			'min_msg_id' => $this->_searchParams->_minMsgID,
@@ -147,7 +147,7 @@ class Search
 	/**
 	 * Returns the ignored words
 	 */
-	public function getIgnored()
+	public function getIgnored(): array
 	{
 		return $this->_searchArray->getIgnored();
 	}
@@ -157,7 +157,7 @@ class Search
 	 *
 	 * @param WeightFactors $weight
 	 */
-	public function setWeights($weight)
+	public function setWeights($weight): void
 	{
 		$this->_weightFactors = $weight;
 	}
@@ -168,7 +168,7 @@ class Search
 	 * @param SearchParams $paramObject
 	 * @param false $search_simple_fulltext
 	 */
-	public function setParams($paramObject, $search_simple_fulltext = false)
+	public function setParams($paramObject, $search_simple_fulltext = false): void
 	{
 		$this->_searchParams = $paramObject;
 		$this->setBlockListedWords();
@@ -180,7 +180,7 @@ class Search
 	 *
 	 * @return bool
 	 */
-	public function foundBlockListedWords()
+	public function foundBlockListedWords(): bool
 	{
 		return $this->_searchArray->foundBlockListedWords();
 	}
@@ -190,7 +190,7 @@ class Search
 	 *
 	 * @return array
 	 */
-	public function getBlockListedWords()
+	public function getBlockListedWords(): array
 	{
 		if (empty($this->_blocklist_words))
 		{
@@ -203,7 +203,7 @@ class Search
 	/**
 	 * Sets the block-listed word array
 	 */
-	public function setBlockListedWords()
+	public function setBlockListedWords(): void
 	{
 		// Unfortunately, searching for words like these is going to result in to many hits,
 		// so we're blocking them.
@@ -218,7 +218,7 @@ class Search
 	 *
 	 * @return array The search array.
 	 */
-	public function getSearchArray()
+	public function getSearchArray(): array
 	{
 		return $this->_searchArray->getSearchArray();
 	}
@@ -228,7 +228,7 @@ class Search
 	 *
 	 * @return array
 	 */
-	public function getExcludedWords()
+	public function getExcludedWords(): array
 	{
 		return $this->_searchArray->getExcludedWords();
 	}
@@ -238,7 +238,7 @@ class Search
 	 *
 	 * @return array The excluded subject words.
 	 */
-	public function getExcludedSubjectWords()
+	public function getExcludedSubjectWords(): array
 	{
 		return $this->_excludedSubjectWords;
 	}
@@ -265,7 +265,7 @@ class Search
 	 *
 	 * @return array The excluded phrases.
 	 */
-	public function getExcludedPhrases()
+	public function getExcludedPhrases(): array
 	{
 		return $this->_excludedPhrases;
 	}
@@ -273,7 +273,7 @@ class Search
 	/**
 	 * Tell me, do I want to see the full message or just a piece?
 	 */
-	public function isCompact()
+	public function isCompact(): bool
 	{
 		return empty($this->_searchParams['show_complete']);
 	}
@@ -285,7 +285,7 @@ class Search
 	 *
 	 * @return string - the encoded string to be appended to the URL
 	 */
-	public function compileURLparams($search = [])
+	public function compileURLparams($search = []): string
 	{
 		return $this->_searchParams->compileURL($search);
 	}
@@ -298,7 +298,7 @@ class Search
 	 *
 	 * @return int[] - array of members id
 	 */
-	public function loadPosters($msg_list, $limit)
+	public function loadPosters($msg_list, $limit): array
 	{
 		// Load the posters...
 		$posters = [];
@@ -329,7 +329,7 @@ class Search
 	 * @param int[] $msg_list - All the messages we want to find the posters
 	 * @param int $limit - There are only so many topics
 	 *
-	 * @return bool|AbstractResult
+	 * @return AbstractResult
 	 */
 	public function loadMessagesRequest($msg_list, $limit)
 	{
@@ -377,7 +377,7 @@ class Search
 	 *
 	 * @return bool
 	 */
-	public function noMessages($messages_request)
+	public function noMessages($messages_request): bool
 	{
 		return $messages_request->num_rows() === 0;
 	}
@@ -388,7 +388,7 @@ class Search
 	 * @param Standard $searchAPI
 	 * @return array
 	 */
-	public function searchQuery($searchAPI)
+	public function searchQuery($searchAPI): array
 	{
 		$this->_searchAPI = $searchAPI;
 		$searchAPI->setExcludedPhrases($this->_excludedPhrases);
@@ -406,7 +406,7 @@ class Search
 	/**
 	 * Builds the array of words for the query
 	 */
-	public function searchWords()
+	public function searchWords(): array
 	{
 		global $modSettings, $context;
 
@@ -510,7 +510,7 @@ class Search
 	 *
 	 * @return int
 	 */
-	public function getNumResults()
+	public function getNumResults(): int
 	{
 		return $this->_searchAPI->getNumResults();
 	}
@@ -520,7 +520,7 @@ class Search
 	 *
 	 * @return array The participants of the event.
 	 */
-	public function getParticipants()
+	public function getParticipants(): array
 	{
 		return $this->_participants;
 	}

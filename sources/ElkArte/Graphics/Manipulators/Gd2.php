@@ -2,7 +2,7 @@
 
 /**
  * This file deals with low-level graphics operations performed on images,
- * specially as needed for the GD library
+ * specifically as needed for the GD library
  *
  * @package   ElkArte Forum
  * @copyright ElkArte Forum contributors
@@ -100,7 +100,7 @@ class Gd2 extends AbstractManipulator
 	 *
 	 * @param GdImage $image
 	 */
-	protected function _setImage($image)
+	protected function _setImage($image): void
 	{
 		$this->_image = $image;
 
@@ -214,7 +214,7 @@ class Gd2 extends AbstractManipulator
 	 *
 	 * @param resource $dst_img
 	 */
-	protected function _createCanvas($dst_img)
+	protected function _createCanvas($dst_img): void
 	{
 		// Make a true color image, because it just looks better for resizing.
 		imagesavealpha($dst_img, true);
@@ -251,6 +251,7 @@ class Gd2 extends AbstractManipulator
 					imagepalettetotruecolor($this->_image);
 					imagealphablending($this->_image, true);
 					imagesavealpha($this->_image, true);
+					imageinterlace($this->_image, false);
 					$success = imagepng($this->_image, $output_name, 9, PNG_ALL_FILTERS);
 				}
 
@@ -363,7 +364,7 @@ class Gd2 extends AbstractManipulator
 	/**
 	 * Flop an image using GD functions by copying top to bottom / flop
 	 */
-	protected function flopImage()
+	protected function flopImage(): void
 	{
 		$this->flipImage('horizontal');
 	}
@@ -373,7 +374,7 @@ class Gd2 extends AbstractManipulator
 	 *
 	 * @param string $axis vertical for flip about vertical otherwise horizontal flip
 	 */
-	protected function flipImage($axis = 'vertical')
+	protected function flipImage($axis = 'vertical'): void
 	{
 		imageflip($this->_image, $axis === 'vertical' ? IMG_FLIP_VERTICAL : IMG_FLIP_HORIZONTAL);
 	}
@@ -383,7 +384,7 @@ class Gd2 extends AbstractManipulator
 	 *
 	 * @param int $degrees
 	 */
-	protected function rotateImage($degrees)
+	protected function rotateImage($degrees): void
 	{
 		// Kind of need this to do anything
 		if (function_exists('imagerotate'))
@@ -405,7 +406,7 @@ class Gd2 extends AbstractManipulator
 	public function getOrientation()
 	{
 		// Read the EXIF data
-		$exif = function_exists('exif_read_data') ? @exif_read_data($this->_fileName) : array();
+		$exif = function_exists('exif_read_data') ? @exif_read_data($this->_fileName) : [];
 
 		$this->orientation = $exif['Orientation'] ?? 0;
 
@@ -540,7 +541,7 @@ class Gd2 extends AbstractManipulator
 	 *
 	 * @return bool
 	 */
-	public function hasWebpSupport()
+	public function hasWebpSupport(): bool
 	{
 		$check = gd_info();
 

@@ -57,7 +57,7 @@ class InlinePermissions extends Adapter
 	/**
 	 * @return string[]
 	 */
-	public function getPermissions()
+	public function getPermissions(): array
 	{
 		return $this->permissions;
 	}
@@ -65,7 +65,7 @@ class InlinePermissions extends Adapter
 	/**
 	 * @param string[] $permissions
 	 */
-	public function setPermissions($permissions)
+	public function setPermissions($permissions): void
 	{
 		$this->permissions = $permissions;
 
@@ -84,7 +84,7 @@ class InlinePermissions extends Adapter
 	/**
 	 * @return int[]
 	 */
-	public function getExcludedGroups()
+	public function getExcludedGroups(): array
 	{
 		return $this->excluded_groups;
 	}
@@ -92,7 +92,7 @@ class InlinePermissions extends Adapter
 	/**
 	 * @param int[] $excluded_groups
 	 */
-	public function setExcludedGroups($excluded_groups)
+	public function setExcludedGroups($excluded_groups): void
 	{
 		$this->excluded_groups = $excluded_groups;
 	}
@@ -242,7 +242,7 @@ class InlinePermissions extends Adapter
 	/**
 	 * Some permissions cannot be given to certain groups. Remove them.
 	 */
-	private function filterIllegalPermissions()
+	private function filterIllegalPermissions(): void
 	{
 		foreach ($this->permissions as $permission)
 		{

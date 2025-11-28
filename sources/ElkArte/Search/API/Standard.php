@@ -51,7 +51,7 @@ class Standard extends AbstractAPI
 	 * @return array
 	 * @throws Exception
 	 */
-	public function searchQuery($search_words, $excluded_words, &$participants)
+	public function searchQuery($search_words, $excluded_words, &$participants): array
 	{
 		global $context, $modSettings;
 
@@ -101,7 +101,7 @@ class Standard extends AbstractAPI
 	 *
 	 * @param int $id_search - the id of the search to delete from logs
 	 */
-	public function clearCacheResults($id_search)
+	public function clearCacheResults($id_search): void
 	{
 		$this->_db_search->search_query('', '
 			DELETE FROM {db_prefix}log_search_results
@@ -119,7 +119,7 @@ class Standard extends AbstractAPI
 	 *
 	 * @return int - number of results otherwise
 	 */
-	protected function getSubjectResults($id_search, $search_words, $excluded_words)
+	protected function getSubjectResults($id_search, $search_words, $excluded_words): int
 	{
 		global $modSettings;
 
@@ -244,7 +244,7 @@ class Standard extends AbstractAPI
 	 *
 	 * @return bool
 	 */
-	protected function noRegexp()
+	protected function noRegexp(): bool
 	{
 		return $this->_searchArray->getNoRegexp();
 	}
@@ -258,7 +258,7 @@ class Standard extends AbstractAPI
 	 *
 	 * @return string
 	 */
-	private function _build_relevance($factors = null)
+	private function _build_relevance($factors = null): string
 	{
 		$relevance = '1000 * (';
 
@@ -316,7 +316,7 @@ class Standard extends AbstractAPI
 	 *
 	 * @return int - the number of rows affected by the query
 	 */
-	private function _build_search_results_log($main_query, $query_identifier = '', $use_old_ids = false)
+	private function _build_search_results_log($main_query, $query_identifier = '', $use_old_ids = false): int
 	{
 		static $usedIDs;
 
@@ -612,7 +612,7 @@ class Standard extends AbstractAPI
 	 *
 	 * @return int - the number of search results
 	 */
-	private function _log_search_subjects($id_search)
+	private function _log_search_subjects($id_search): int
 	{
 		global $modSettings;
 
@@ -805,7 +805,7 @@ class Standard extends AbstractAPI
 	 *
 	 * @return int - the number of indexed results
 	 */
-	private function _prepare_word_index($id_search)
+	private function _prepare_word_index($id_search): int
 	{
 		$indexedResults = 0;
 		$inserts = [];
@@ -910,7 +910,7 @@ class Standard extends AbstractAPI
 	 *
 	 * @return bool[]
 	 */
-	public function addRelevance(&$topics, $id_search, $start, $limit)
+	public function addRelevance(&$topics, $id_search, $start, $limit): array
 	{
 		// *** Retrieve the results to be shown on the page
 		$participants = [];
@@ -953,7 +953,7 @@ class Standard extends AbstractAPI
 	 * @param $query_params
 	 * @return array
 	 */
-	public function queryWhereModifiers($query_params)
+	public function queryWhereModifiers($query_params): array
 	{
 		$query_where = [];
 
@@ -996,7 +996,7 @@ class Standard extends AbstractAPI
 	 * @param $search_data
 	 * @return array
 	 */
-	public function queryExclusionModifiers(&$query_params, $search_data)
+	public function queryExclusionModifiers(&$query_params, $search_data): array
 	{
 		global $modSettings;
 

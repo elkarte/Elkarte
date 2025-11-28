@@ -153,7 +153,7 @@ class PmRenderer extends Renderer
 	 * @param $output
 	 * @return array
 	 */
-	protected function _buildPmButtons($output)
+	protected function _buildPmButtons($output): array
 	{
 		global $context, $txt;
 

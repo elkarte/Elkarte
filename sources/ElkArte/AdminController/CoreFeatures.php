@@ -43,7 +43,7 @@ class CoreFeatures extends AbstractController
 	 */
 	public function action_index()
 	{
-		// just delegate to our preferred default
+		// Delegate to our preferred default
 		return $this->action_features();
 	}
 
@@ -57,7 +57,7 @@ class CoreFeatures extends AbstractController
 	 *    - title - Text title of this item (If standard string does not exist).
 	 *    - desc - Description of this feature (If standard string does not exist).
 	 *    - settings - Array of settings to change (For each name => value) on enable
-	 *      reverse is done for disable. If value > 1 will not change value if set.
+	 *      reverse is done for disabling. If value > 1 does not change value if set.
 	 *    - setting_callback - Function that returns an array of settings to save
 	 *      takes one parameter which is value for this feature.
 	 *    - save_callback - Function called on save, takes state as parameter.
@@ -113,7 +113,7 @@ class CoreFeatures extends AbstractController
 		// Don't show them this twice!
 		if ($context['is_new_install'])
 		{
-			updateSettings(array('admin_features' => ''));
+			updateSettings(['admin_features' => '']);
 		}
 
 		// sub_template is already generic_xml and the token is created somewhere else
@@ -153,37 +153,37 @@ class CoreFeatures extends AbstractController
 	 */
 	public function settings()
 	{
-		$core_features = array(
+		$core_features = [
 			// cp = custom profile fields.
-			'cp' => array(
+			'cp' => [
 				'url' => getUrl('admin', ['action' => 'admin', 'area' => 'featuresettings', 'sa' => 'profile', '{session_data}']),
 				'save_callback' => 'custom_profiles_toggle_callback',
 				'setting_callback' => static function ($value) {
 					if (!$value)
 					{
-						return array(
+						return [
 							'disabled_profile_fields' => '',
 							'registration_fields' => '',
 							'displayFields' => '',
-						);
+						];
 					}
 
-					return array();
+					return [];
 				},
-			),
+			],
 			// k = karma.
-			'k' => array(
+			'k' => [
 				'url' => getUrl('admin', ['action' => 'admin', 'area' => 'featuresettings', 'sa' => 'karma', '{session_data}']),
-				'settings' => array(
+				'settings' => [
 					'karmaMode' => 2,
-				),
-			),
+				],
+			],
 			// l = likes.
-			'l' => array(
+			'l' => [
 				'url' => getUrl('admin', ['action' => 'admin', 'area' => 'featuresettings', 'sa' => 'likes', '{session_data}']),
-				'settings' => array(
+				'settings' => [
 					'likes_enabled' => 1,
-				),
+				],
 				'setting_callback' => static function ($value) {
 					global $modSettings;
 
@@ -196,32 +196,32 @@ class CoreFeatures extends AbstractController
 					$current = getEnabledNotifications();
 					if (!empty($value))
 					{
-						return array('enabled_mentions' => implode(',', array_unique(array_merge($current, array('likemsg', 'rlikemsg')))));
+						return ['enabled_mentions' => implode(',', array_unique(array_merge($current, ['likemsg', 'rlikemsg'])))];
 					}
 
-					return array('enabled_mentions' => implode(',', array_unique(array_diff($current, array('likemsg', 'rlikemsg')))));
+					return ['enabled_mentions' => implode(',', array_unique(array_diff($current, ['likemsg', 'rlikemsg'])))];
 				},
-			),
+			],
 			// ml = moderation log.
-			'ml' => array(
+			'ml' => [
 				'url' => getUrl('admin', ['action' => 'admin', 'area' => 'logs', 'sa' => 'modlog', '{session_data}']),
-				'settings' => array(
+				'settings' => [
 					'modlog_enabled' => 1,
 					'userlog_enabled' => 1,
-				),
-			),
+				],
+			],
 			// pe = post email
-			'pe' => array(
+			'pe' => [
 				'url' => getUrl('admin', ['action' => 'admin', 'area' => 'maillist', 'sa' => 'emailsettings']),
 				'save_callback' => 'postbyemail_toggle_callback',
-				'settings' => array(
+				'settings' => [
 					'maillist_enabled' => 1,
 					'pbe_post_enabled' => 2,
 					'pbe_pm_enabled' => 2,
-				),
-			),
+				],
+			],
 			// pm = post moderation.
-			'pm' => array(
+			'pm' => [
 				'url' => getUrl('admin', ['action' => 'admin', 'area' => 'permissions', 'sa' => 'postmod', '{session_data}']),
 				'setting_callback' => static function ($value) {
 					// Cannot use warning post moderation if disabled!
@@ -230,26 +230,26 @@ class CoreFeatures extends AbstractController
 						require_once(SUBSDIR . '/Moderation.subs.php');
 						approveAllUnapproved();
 
-						return array('warning_moderate' => 0);
+						return ['warning_moderate' => 0];
 					}
 
-					return array();
+					return [];
 				},
-			),
+			],
 			// ps = Paid Subscriptions.
-			'ps' => array(
+			'ps' => [
 				'url' => getUrl('admin', ['action' => 'admin', 'area' => 'paidsubscribe']),
-				'settings' => array(
+				'settings' => [
 					'paid_enabled' => 1,
-				),
+				],
 				'setting_callback' => 'subscriptions_toggle_callback',
-			),
+			],
 			// rg = report generator.
-			'rg' => array(
+			'rg' => [
 				'url' => getUrl('admin', ['action' => 'admin', 'area' => 'reports']),
-			),
+			],
 			// w = warning.
-			'w' => array(
+			'w' => [
 				'url' => getUrl('admin', ['action' => 'admin', 'area' => 'securitysettings', 'sa' => 'moderation']),
 				'setting_callback' => static function ($value) {
 					global $modSettings;
@@ -258,67 +258,91 @@ class CoreFeatures extends AbstractController
 					$warning_settings = ($value ? 1 : 0) . ',' . $modSettings['user_limit'] . ',' . $modSettings['warning_decrement'];
 					if (!$value)
 					{
-						$returnSettings = array(
+						$returnSettings = [
 							'warning_watch' => 0,
 							'warning_moderate' => 0,
 							'warning_mute' => 0,
-						);
+						];
 					}
-					elseif (empty($modSettings['warning_enable']) && $value)
+					elseif (empty($modSettings['warning_enable']))
 					{
-						$returnSettings = array(
+						$returnSettings = [
 							'warning_watch' => 10,
 							'warning_moderate' => 35,
 							'warning_mute' => 60,
-						);
+						];
 					}
 					else
 					{
-						$returnSettings = array();
+						$returnSettings = [];
 					}
 
 					$returnSettings['warning_settings'] = $warning_settings;
 					return $returnSettings;
 				},
-			),
+			],
 			// Search engines
-			'sp' => array(
+			'sp' => [
 				'url' => getUrl('admin', ['action' => 'admin', 'area' => 'sengines']),
-				'settings' => array(
+				'settings' => [
 					'spider_mode' => 1,
-				),
+				],
 				'setting_callback' => static function ($value) {
 					// Turn off the spider group if disabling.
 					if (!$value)
 					{
-						return array('spider_group' => 0, 'show_spider_online' => 0, 'spider_no_guest' => 0);
+						return ['spider_group' => 0, 'show_spider_online' => 0, 'spider_no_guest' => 0];
 					}
 				},
 				'on_save' => static function () {
 					require_once(SUBSDIR . '/SearchEngines.subs.php');
 				},
-			),
-		);
+			],
+		];
 
-		$this->_getModulesConfig($core_features);
+		$this->_discoverCoreFeatures($core_features);
 
 		// Anyone who would like to add a core feature?
-		call_integration_hook('integrate_core_features', array(&$core_features));
+		call_integration_hook('integrate_core_features', [&$core_features]);
 
 		return $core_features;
 	}
 
 	/**
-	 * Searches the ADMINDIR looking for module managers and load the "Core Feature"
-	 * if existing.
+	 * Retrieves configuration for all modules, including core features and addons, by scanning predefined directories
+	 * for relevant files and classes, and integrating their configurations.
 	 *
-	 * @param array $core_features The core features array
+	 * - Searches the ADMINDIR looking for XXXModule.php managers and loads the "Core Feature" if existing.
+	 * - Searches the ADDONSDIR looking for xxxIntegrate.php managers and loads the "Core Feature" if existing.
+	 * - Calls discoverIntegrations() to search ADDONSDIR for .integrate.php files for Core Feature inclusion.
+	 *
+	 * @param array $core_features Reference to an array that will be populated with core feature configurations
+	 *                              collected from the specified directories and integration hooks.
+	 * @return void
 	 */
-	protected function _getModulesConfig(&$core_features)
+	protected function _discoverCoreFeatures(array &$core_features): void
 	{
-		// Find appropriately named core feature files in the admin directory
-		$glob = new GlobIterator(ADMINDIR . '/Manage*Module.php', FilesystemIterator::SKIP_DOTS);
+		// Admin directory ManageXyzModule.php style
+		$this->_getModulesConfig($core_features);
 
+		// Addons abcIntegrate.php style
+		$core_features = $this->_getAddonIntegrationsConfig($core_features);
+
+		// Addons xyz.integrate.php style
+		$core_features = $this->_getDotIntegrateCoreConfig($core_features);
+	}
+
+	/**
+	 * Updates the provided core features array with module data by discovering and invoking addCoreFeature methods
+	 * from appropriately named core feature files in the admin directory.
+	 *
+	 * @param array $core_features An associative array representing the core features to be updated with module data.
+	 * @return void
+	 */
+	public function _getModulesConfig(array $core_features): void
+	{
+		// Find appropriately named core feature files in the admin (\sources\ElkArte\AdminController) directory
+		$glob = new GlobIterator(ADMINDIR . '/Manage*Module.php', FilesystemIterator::SKIP_DOTS);
 		foreach ($glob as $file)
 		{
 			$class = '\ElkArte\AdminController\\' . $file->getBasename('.php');
@@ -327,16 +351,60 @@ class CoreFeatures extends AbstractController
 				$class::addCoreFeature($core_features);
 			}
 		}
+	}
 
+	/**
+	 * Scans the ADDONSDIR directory for integration files and retrieves configuration for addon core features.
+	 *
+	 * - Searches for files with the pattern *Integrate.php within subdirectories of ADDONSDIR.
+	 * - Validates that each file contains a class definition to avoid processing non-relevant files.
+	 * - Calls the `addCoreFeature` method of classes found within these integration files to populate the
+	 *   core features configuration array.
+	 *
+	 * @param array $core_features An associative array representing the core features to be updated with integration data.
+	 * @return array The updated core features array containing additional details about the integrations.
+     */
+	public function _getAddonIntegrationsConfig(array $core_features): array
+	{
+		// Find appropriately named core feature files in the Addons (\Addons) and below directory
+		$glob = new GlobIterator(ADDONSDIR . '/*/*Integrate.php', FilesystemIterator::SKIP_DOTS);
+		foreach ($glob as $file)
+		{
+			// Read the start of the file and validate as a class. Prevents loading non-class files
+			// possibly generating a fatal error for "including" the same file twice.
+			$fileContent = file_get_contents($file->getRealPath(), false, null, 0, 2000);
+			if (!preg_match('/^class\s+[a-zA-Z]\w+/m', $fileContent))
+			{
+				continue;
+			}
+
+			// Will call \Addons\SUBDIRECTORY\XyzIntegrate.php.
+			$class = '\Addons' . str_replace(ADDONSDIR . '/', '\\', $file->getPath()) . '\\' . $file->getBasename('.php');
+			if (method_exists($class, 'addCoreFeature'))
+			{
+				$class::addCoreFeature($core_features);
+			}
+		}
+
+		return $core_features;
+	}
+
+	/**
+	 * Populates the provided core features array with integration data discovered from the Addons directory.
+	 *
+	 * @param array $core_features An associative array representing the core features to be updated with integration data.
+	 * @return array The updated core features array containing additional details about the integrations.
+	 */
+	public function _getDotIntegrateCoreConfig(array $core_features): array
+	{
 		$integrations = Hooks::instance()->discoverIntegrations(ADDONSDIR);
-
 		foreach ($integrations as $integration)
 		{
-			$core_features[$integration['id']] = array(
+			$core_features[$integration['id']] = [
 				'url' => empty($integration['details']->extra->setting_url) ? getUrl('admin', ['action' => 'admin', 'area' => 'addonsettings']) : $integration['details']->extra->setting_url,
 				'title' => $integration['title'],
 				'desc' => $integration['description'],
-			);
+			];
 
 			if (method_exists($integration['class'], 'setting_callback'))
 			{
@@ -352,6 +420,8 @@ class CoreFeatures extends AbstractController
 				};
 			}
 		}
+
+		return $core_features;
 	}
 
 	/**
@@ -361,7 +431,7 @@ class CoreFeatures extends AbstractController
 	 * @param array $subActions = array() An array containing all possible subactions.
 	 * @param string $defaultAction = '' the default action to be called if no valid subaction was found.
 	 */
-	public function loadGeneralSettingParameters($subActions = array(), $defaultAction = '')
+	public function loadGeneralSettingParameters(array $subActions = [], string $defaultAction = ''): void
 	{
 		global $context;
 
@@ -387,11 +457,11 @@ class CoreFeatures extends AbstractController
 	 * @param array $core_features - The array of all the core features, as
 	 *                returned by $this->settings()
 	 */
-	private function _save_core_features($core_features)
+	private function _save_core_features(array $core_features): void
 	{
 		global $modSettings;
 
-		$setting_changes = array('admin_features' => array());
+		$setting_changes = ['admin_features' => []];
 
 		// Cycle each feature and change things as required!
 		foreach ($core_features as $id => $feature)
@@ -409,7 +479,7 @@ class CoreFeatures extends AbstractController
 			{
 				foreach ($feature['settings'] as $key => $value)
 				{
-					if (empty($feature_id) || (!empty($feature_id) && ($value < 2 || empty($modSettings[$key]))))
+					if (empty($feature_id) || ($value < 2 || empty($modSettings[$key])))
 					{
 						$setting_changes[$key] = empty($feature_id) ? !$value : $value;
 					}
@@ -464,21 +534,21 @@ class CoreFeatures extends AbstractController
 	 *
 	 * @return array
 	 */
-	protected function _prepare_corefeatures($core_features)
+	protected function _prepare_corefeatures(array $core_features): array
 	{
 		global $txt, $settings;
 
-		$features = array();
+		$features = [];
 		foreach ($core_features as $id => $feature)
 		{
-			$features[$id] = array(
+			$features[$id] = [
 				'title' => $feature['title'] ?? $txt['core_settings_item_' . $id],
 				'desc' => $feature['desc'] ?? $txt['core_settings_item_' . $id . '_desc'],
 				'enabled' => featureEnabled($id),
 				'state' => featureEnabled($id) ? 'on' : 'off',
 				'url' => $feature['url'],
 				'image' => (FileFunctions::instance()->fileExists($settings['theme_dir'] . '/images/admin/feature_' . $id . '.png') ? $settings['images_url'] : $settings['default_images_url']) . '/admin/feature_' . $id . '.png',
-			);
+			];
 		}
 
 		// Sort by title attribute
@@ -494,18 +564,18 @@ class CoreFeatures extends AbstractController
 	 *
 	 * @return array array in a config_var format
 	 */
-	public function config_vars()
+	public function config_vars(): array
 	{
 		global $txt;
 
-		$return_data = array();
+		$return_data = [];
 
 		$core_features = $this->settings();
 
 		// Convert this to a format that admin search will understand
 		foreach ($core_features as $id => $data)
 		{
-			$return_data[] = array('switch', $data['title'] ?? $txt['core_settings_item_' . $id]);
+			$return_data[] = ['switch', $data['title'] ?? $txt['core_settings_item_' . $id]];
 		}
 
 		return $return_data;

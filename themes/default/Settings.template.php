@@ -103,8 +103,7 @@ function template_options()
 				50 => 50,
 			),
 			'default' => true,
-		),
-		array(
+		),		array(
 			'id' => 'calendar_start_day',
 			'label' => $txt['calendar_start_day'],
 			'options' => array(

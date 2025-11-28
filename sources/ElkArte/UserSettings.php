@@ -26,7 +26,7 @@ class UserSettings extends ValuesContainerReadOnly
 	/**
 	 * Sets last_login to the current time
 	 */
-	public function updateLastLogin()
+	public function updateLastLogin(): void
 	{
 		$this->data['last_login'] = time();
 	}
@@ -37,7 +37,7 @@ class UserSettings extends ValuesContainerReadOnly
 	 *
 	 * @param string $password The hashed password
 	 */
-	public function updatePassword($password)
+	public function updatePassword($password): void
 	{
 		$this->data['passwd'] = $password;
 
@@ -50,7 +50,7 @@ class UserSettings extends ValuesContainerReadOnly
 	 *
 	 * @param int $increment_offset
 	 */
-	public function updateTotalTimeLoggedIn($increment_offset)
+	public function updateTotalTimeLoggedIn($increment_offset): void
 	{
 		$this->data['total_time_logged_in'] += time() - $increment_offset;
 	}
@@ -60,7 +60,7 @@ class UserSettings extends ValuesContainerReadOnly
 	 *
 	 * @param bool $force - If true the salt is changed no matter what
 	 */
-	public function fixSalt($force = false)
+	public function fixSalt($force = false): bool
 	{
 		// Correct password, but they've got no salt or not enough; fix it!
 		if ($this->data['password_salt'] === '' || $force || strlen($this->data['password_salt']) < 10)
@@ -81,7 +81,7 @@ class UserSettings extends ValuesContainerReadOnly
 	 * @param bool $strip_ban
 	 * @return int
 	 */
-	public function getActivationStatus($strip_ban = true)
+	public function getActivationStatus($strip_ban = true): int
 	{
 		return (int) ($this->is_activated > UserSettingsLoader::BAN_OFFSET ? $this->is_activated - UserSettingsLoader::BAN_OFFSET : $this->is_activated);
 	}
@@ -92,7 +92,7 @@ class UserSettings extends ValuesContainerReadOnly
 	 * @param string $password The plain text (or sha256 hashed) password
 	 * @return bool|null Returns false if something fails
 	 */
-	public function rehashPassword($password)
+	public function rehashPassword($password): ?bool
 	{
 		// If the password is not already 64 characters, lets make it a (SHA-256)
 		if (strlen($password) !== 64)
@@ -125,7 +125,7 @@ class UserSettings extends ValuesContainerReadOnly
 	 * @param string $password
 	 * @return bool
 	 */
-	public function validatePassword($password)
+	public function validatePassword($password): bool
 	{
 		// If the password is not 64 characters, lets make it a (SHA-256)
 		if (strlen($password) !== 64)

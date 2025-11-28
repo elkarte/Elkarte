@@ -42,7 +42,7 @@ class RemoveOldDrafts implements ScheduledTaskInterface
 		}
 
 		// init
-		$drafts = array();
+		$drafts = [];
 
 		// We need this for language items
 		ThemeLoader::loadEssentialThemeData();
@@ -53,9 +53,9 @@ class RemoveOldDrafts implements ScheduledTaskInterface
 				id_draft
 			FROM {db_prefix}user_drafts
 			WHERE poster_time <= {int:poster_time_old}',
-			array(
+			[
 				'poster_time_old' => time() - (86400 * $modSettings['drafts_keep_days']),
-			)
+			]
 		);
 		while (($row = $request->fetch_row()))
 		{

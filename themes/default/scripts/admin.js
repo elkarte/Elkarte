@@ -33,7 +33,7 @@
  *
  * @param {object} oOptions
  */
-function Elk_AdminIndex (oOptions)
+function Elk_AdminIndex (oOptions = {})
 {
 	this.opt = oOptions;
 	this.announcements = [];
@@ -300,17 +300,7 @@ Elk_AdminIndex.prototype.checkUpdateAvailable = function() {
 function Elk_ViewVersions (oOptions = {})
 {
 	this.opt = oOptions;
-	this.init();
 }
-
-// initialize the version checker
-Elk_ViewVersions.prototype.init = function() {
-	// Load this on loading of the page.
-	window.viewVersionsInstanceRef = this;
-	window.addEventListener('load', function() {
-		window.viewVersionsInstanceRef.loadViewVersions();
-	});
-};
 
 // compare a current and target version to determine if one is newer/older
 Elk_ViewVersions.prototype.compareVersions = function(sCurrent, sTarget) {
@@ -2061,7 +2051,7 @@ function addAnotherOption (parent, oDtName, oDdName, oData)
 			scroll: true,
 			containment: 'parent',
 			delay: 150,
-			handle: '', // Restricts sort start click to the specified element, like category_header
+			handle: '', // Restricts sort start to click to the specified element, like category_header
 			href: '', // If an error occurs redirect here
 			tolerance: 'intersect', // mode to use for testing whether the item is hovering over another item.
 			setorder: 'serialize', // how to return the data, really only supports serialize and inorder

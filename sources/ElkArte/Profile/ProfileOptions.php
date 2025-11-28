@@ -71,7 +71,7 @@ class ProfileOptions extends AbstractController
 	 *
 	 * @throws Exception
 	 */
-	public function action_editBuddyIgnoreLists()
+	public function action_editBuddyIgnoreLists(): void
 	{
 		global $context, $txt, $modSettings;
 
@@ -112,7 +112,7 @@ class ProfileOptions extends AbstractController
 	 *
 	 * @uses template_editBuddies()
 	 */
-	public function action_editBuddies()
+	public function action_editBuddies(): void
 	{
 		global $context;
 
@@ -122,7 +122,7 @@ class ProfileOptions extends AbstractController
 		$context['sub_template'] = 'editBuddies';
 
 		// Use suggest finding the right buddies
-		loadJavascriptFile('suggest.js', array('defer' => true));
+		loadJavascriptFile('suggest.js', ['defer' => true]);
 
 		// For making changes!
 		$buddiesArray = array_map('intval', explode(',', $this->_profile['buddy_list']));
@@ -216,7 +216,7 @@ class ProfileOptions extends AbstractController
 	 *
 	 * - Provides the option to manage members on it.
 	 */
-	public function action_editIgnoreList()
+	public function action_editIgnoreList(): void
 	{
 		global $context;
 
@@ -224,7 +224,7 @@ class ProfileOptions extends AbstractController
 
 		// We want to view what we're doing :P
 		$context['sub_template'] = 'editIgnoreList';
-		loadJavascriptFile('suggest.js', array('defer' => true));
+		loadJavascriptFile('suggest.js', ['defer' => true]);
 
 		// For making changes!
 		$ignoreArray = array_map('intval', explode(',', $this->_profile['pm_ignore_list']));
@@ -309,7 +309,7 @@ class ProfileOptions extends AbstractController
 	/**
 	 * Allows the user to see or change their account info.
 	 */
-	public function action_account()
+	public function action_account(): void
 	{
 		global $modSettings, $context, $txt;
 
@@ -344,7 +344,7 @@ class ProfileOptions extends AbstractController
 	/**
 	 * Load the options for a user.
 	 */
-	public function loadThemeOptions()
+	public function loadThemeOptions(): void
 	{
 		global $context, $cur_profile, $options;
 
@@ -391,7 +391,7 @@ class ProfileOptions extends AbstractController
 	 * @param string $area
 	 * @return array
 	 */
-	public static function getFields($area)
+	public static function getFields($area): array
 	{
 		global $modSettings;
 
@@ -455,7 +455,7 @@ class ProfileOptions extends AbstractController
 	/**
 	 * Allow the user to change the forum options in their profile.
 	 */
-	public function action_forumProfile()
+	public function action_forumProfile(): void
 	{
 		global $context, $txt;
 
@@ -479,7 +479,7 @@ class ProfileOptions extends AbstractController
 	/**
 	 * Allow the edit of *someone else's* personal message settings.
 	 */
-	public function action_pmprefs()
+	public function action_pmprefs(): void
 	{
 		global $context, $txt;
 
@@ -500,7 +500,7 @@ class ProfileOptions extends AbstractController
 	 * Allow the user to pick a theme, Set time formats, and set
 	 * overall look and layout options.
 	 */
-	public function action_themepick()
+	public function action_themepick(): void
 	{
 		global $txt, $context;
 
@@ -531,7 +531,7 @@ class ProfileOptions extends AbstractController
 	 * - Accessed with ?action=admin;area=theme;sa=pick.
 	 * - Allows previewing of the theme and variants
 	 */
-	public function action_pick()
+	public function action_pick(): void
 	{
 		global $txt, $context, $modSettings, $scripturl;
 
@@ -616,7 +616,7 @@ class ProfileOptions extends AbstractController
 	/**
 	 * Display the notification settings for the user and allow changes.
 	 */
-	public function action_notification()
+	public function action_notification(): void
 	{
 		global $txt, $context;
 
@@ -648,7 +648,7 @@ class ProfileOptions extends AbstractController
 	/**
 	 * Generate the users existing notification options and allow for updates
 	 */
-	public function action_editNotificationSettings()
+	public function action_editNotificationSettings(): void
 	{
 		global $context;
 
@@ -669,7 +669,7 @@ class ProfileOptions extends AbstractController
 	 * Generate the users existing board notification list.
 	 * Loads data into $context to be displayed wth template_board_notification_list
 	 */
-	public function action_editNotificationBoards()
+	public function action_editNotificationBoards(): void
 	{
 		global $txt, $scripturl, $context;
 
@@ -768,7 +768,7 @@ class ProfileOptions extends AbstractController
 	 * Generate the users existing topic notification list.
 	 * Loads data into $context to be displayed wth template_topic_notification_list
 	 */
-	public function action_editNotificationTopics()
+	public function action_editNotificationTopics(): void
 	{
 		global $txt, $scripturl, $context, $modSettings;
 
@@ -908,7 +908,7 @@ class ProfileOptions extends AbstractController
 	 * @return array array of board notifications
 	 * @uses template_ignoreboards()
 	 */
-	public function list_getBoardNotifications($start, $items_per_page, $sort, $memID)
+	public function list_getBoardNotifications($start, $items_per_page, $sort, $memID): array
 	{
 		// Return boards you see and their notification status for the list
 		return boardNotifications($sort, $memID);
@@ -924,7 +924,7 @@ class ProfileOptions extends AbstractController
 	 *
 	 * @return array array of topic notifications
 	 */
-	public function list_getTopicNotifications($start, $items_per_page, $sort, $memID)
+	public function list_getTopicNotifications($start, $items_per_page, $sort, $memID): array
 	{
 		// Topic notifications, for the list
 		return topicNotifications($start, $items_per_page, $sort, $memID);
@@ -938,7 +938,7 @@ class ProfileOptions extends AbstractController
 	 * @param int $memID id_member the id of the member who's notifications we are loading
 	 * @return int
 	 */
-	public function list_getTopicNotificationCount($memID)
+	public function list_getTopicNotificationCount($memID): int
 	{
 		// Topic notifications count, for the list
 		return topicNotificationCount($memID);
@@ -948,7 +948,7 @@ class ProfileOptions extends AbstractController
 	 * Allows the user to see the list of their ignored boards.
 	 * (and un-ignore them)
 	 */
-	public function action_ignoreboards()
+	public function action_ignoreboards(): void
 	{
 		global $context, $modSettings, $cur_profile;
 
@@ -977,7 +977,7 @@ class ProfileOptions extends AbstractController
 	/**
 	 * Function to allow the user to choose group membership etc...
 	 */
-	public function action_groupMembership()
+	public function action_groupMembership(): void
 	{
 		global $txt, $context;
 
@@ -1049,7 +1049,7 @@ class ProfileOptions extends AbstractController
 	 * @return string
 	 * @throws Exception no_access
 	 */
-	public function action_groupMembership2()
+	public function action_groupMembership2(): string
 	{
 		global $context, $modSettings, $scripturl, $language;
 

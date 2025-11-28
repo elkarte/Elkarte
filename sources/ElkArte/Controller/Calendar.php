@@ -53,7 +53,7 @@ class Calendar extends AbstractController
 	 *
 	 * @uses the main sub template in the Calendar template.
 	 */
-	public function action_calendar()
+	public function action_calendar(): void
 	{
 		global $txt, $context, $modSettings, $options;
 
@@ -118,17 +118,17 @@ class Calendar extends AbstractController
 		}
 
 		// Load all the context information needed to show the calendar grid.
-		$calendarOptions = array(
+		$calendarOptions = [
 			'start_day' => empty($options['calendar_start_day']) ? 0 : $options['calendar_start_day'],
-			'show_birthdays' => in_array((int) $modSettings['cal_showbdays'], array(1, 2)),
-			'show_events' => in_array((int) $modSettings['cal_showevents'], array(1, 2)),
-			'show_holidays' => in_array((int) $modSettings['cal_showholidays'], array(1, 2)),
+			'show_birthdays' => in_array((int) $modSettings['cal_showbdays'], [1, 2]),
+			'show_events' => in_array((int) $modSettings['cal_showevents'], [1, 2]),
+			'show_holidays' => in_array((int) $modSettings['cal_showholidays'], [1, 2]),
 			'show_week_num' => true,
 			'short_day_titles' => false,
 			'show_next_prev' => true,
 			'show_week_links' => true,
 			'size' => 'large',
-		);
+		];
 
 		// Load up the main view.
 		if ($context['view_week'])
@@ -192,14 +192,14 @@ class Calendar extends AbstractController
 		}
 
 		// Build the calendar button array.
-		$context['calendar_buttons'] = array(
-			'post_event' => array(
+		$context['calendar_buttons'] = [
+			'post_event' => [
 				'test' => 'can_post',
 				'text' => 'calendar_post_event',
 				'lang' => true,
 				'url' => getUrl('action', ['action' => 'calendar', 'sa' => 'post', 'year' => $context['current_year'], 'month' => $context['current_month'], '{session_data}'])
-			),
-		);
+			],
+		];
 
 		// Allow mods to add additional buttons here
 		call_integration_hook('integrate_calendar_buttons');
@@ -282,7 +282,7 @@ class Calendar extends AbstractController
 	/**
 	 * Takes care of the saving process.
 	 */
-	public function action_save()
+	public function action_save(): ?bool
 	{
 		global $modSettings;
 
@@ -348,7 +348,7 @@ class Calendar extends AbstractController
 	 *  - Instantiate the controller
 	 *  - Runs pre_dispatch
 	 */
-	protected function _returnToPost()
+	protected function _returnToPost(): bool
 	{
 		$controller = new Post(new EventManager());
 		$controller->setUser(User::$info);
@@ -377,7 +377,7 @@ class Calendar extends AbstractController
 	 * - Sets a sequence number if the event has been modified.
 	 * - Accessed by action=calendar;sa=ical
 	 */
-	public function action_ical()
+	public function action_ical(): void
 	{
 		global $modSettings;
 

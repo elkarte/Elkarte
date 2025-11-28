@@ -23,7 +23,7 @@ use ElkArte\Languages\Txt;
 
 /**
  * ManageScheduledTasks admin Controller: handles the scheduled task pages
- * which allow to see and edit and run the systems scheduled tasks
+ * which allow one to see, edit and run the systems scheduled tasks
  *
  * @package ScheduledTasks
  */
@@ -42,23 +42,23 @@ class ManageScheduledTasks extends AbstractController
 	 *
 	 * @see  AbstractController::action_index()
 	 */
-	public function action_index()
+	public function action_index(): void
 	{
 		global $context, $txt;
 
 		Txt::load('ManageScheduled');
 		theme()->getTemplates()->load('ManageScheduledTasks');
 
-		$subActions = array(
-			'taskedit' => array($this, 'action_edit', 'permission' => 'admin_forum'),
-			'tasklog' => array($this, 'action_log', 'permission' => 'admin_forum'),
-			'tasks' => array($this, 'action_tasks', 'permission' => 'admin_forum'),
-		);
+		$subActions = [
+			'taskedit' => [$this, 'action_edit', 'permission' => 'admin_forum'],
+			'tasklog' => [$this, 'action_log', 'permission' => 'admin_forum'],
+			'tasks' => [$this, 'action_tasks', 'permission' => 'admin_forum'],
+		];
 
 		// Control those actions
 		$action = new Action('manage_scheduled_tasks');
 
-		// We need to find what's the action. call integrate_sa_manage_scheduled_tasks
+		// We need to find what's the action. Call integrate_sa_manage_scheduled_tasks
 		$subAction = $action->initialize($subActions, 'tasks');
 
 		// Page details
@@ -90,15 +90,13 @@ class ManageScheduledTasks extends AbstractController
 	 * @event integrate_list_scheduled_tasks
 	 * @uses ManageScheduledTasks template, view_scheduled_tasks sub-template
 	 */
-	public function action_tasks()
+	public function action_tasks(): void
 	{
 		global $context, $txt;
 
 		// We'll need to recalculate dates and stuff like that.
 		require_once(SUBSDIR . '/ScheduledTasks.subs.php');
 
-		// Mama, setup the template first - cause it's like the most important bit, like pickle in a sandwich.
-		// ... ironically I don't like pickle. </grudge>
 		$context['sub_template'] = 'view_scheduled_tasks';
 		$context['page_title'] = $txt['maintain_tasks'];
 
@@ -108,7 +106,7 @@ class ManageScheduledTasks extends AbstractController
 			checkSession();
 
 			// Enable and disable as required.
-			$enablers = array(0);
+			$enablers = [0];
 			foreach ($this->_req->post->enable_task as $id => $enabled)
 			{
 				if ($enabled)
@@ -125,10 +123,10 @@ class ManageScheduledTasks extends AbstractController
 		}
 
 		// Want to run any of the tasks?
-		if (isset($this->_req->post->run) && isset($this->_req->post->run_task))
+		if (isset($this->_req->post->run, $this->_req->post->run_task))
 		{
 			// Lets figure out which ones they want to run.
-			$tasks = array();
+			$tasks = [];
 			foreach ($this->_req->post->run_task as $task => $dummy)
 			{
 				$tasks[] = (int) $task;
@@ -155,100 +153,100 @@ class ManageScheduledTasks extends AbstractController
 		}
 
 		// Build the list so we can see the tasks
-		$listOptions = array(
+		$listOptions = [
 			'id' => 'scheduled_tasks',
 			'title' => $txt['maintain_tasks'],
 			'base_href' => getUrl('admin', ['action' => 'admin', 'area' => 'scheduledtasks']),
-			'get_items' => array(
+			'get_items' => [
 				'function' => fn() => $this->list_getScheduledTasks(),
-			),
-			'columns' => array(
-				'name' => array(
-					'header' => array(
+			],
+			'columns' => [
+				'name' => [
+					'header' => [
 						'value' => $txt['scheduled_tasks_name'],
 						'style' => 'width: 40%;',
-					),
-					'data' => array(
-						'sprintf' => array(
+					],
+					'data' => [
+						'sprintf' => [
 							'format' => '
-								<a class="linkbutton" href="' . getUrl('admin', ['action' => 'admin', 'area' => 'scheduledtasks', 'sa' => 'taskedit', 'tid' => '%1$d']) . '" title="' . $txt['scheduled_task_edit'] . ' %2$s"><i class="icon icon-small i-pencil"></i> %2$s</a><br /><span class="smalltext">%3$s</span>',
-							'params' => array(
+								<a class="linkbutton w_icon" href="' . getUrl('admin', ['action' => 'admin', 'area' => 'scheduledtasks', 'sa' => 'taskedit', 'tid' => '%1$d']) . '" title="' . $txt['scheduled_task_edit'] . ' %2$s"><i class="icon i-pencil"></i> %2$s</a><br /><span class="smalltext">%3$s</span>',
+							'params' => [
 								'id' => false,
 								'name' => false,
 								'desc' => false,
-							),
-						),
-					),
-				),
-				'next_due' => array(
-					'header' => array(
+							],
+						],
+					],
+				],
+				'next_due' => [
+					'header' => [
 						'value' => $txt['scheduled_tasks_next_time'],
-					),
-					'data' => array(
+					],
+					'data' => [
 						'db' => 'next_time',
 						'class' => 'smalltext',
-					),
-				),
-				'regularity' => array(
-					'header' => array(
+					],
+				],
+				'regularity' => [
+					'header' => [
 						'value' => $txt['scheduled_tasks_regularity'],
-					),
-					'data' => array(
+					],
+					'data' => [
 						'db' => 'regularity',
 						'class' => 'smalltext',
-					),
-				),
-				'enabled' => array(
-					'header' => array(
+					],
+				],
+				'enabled' => [
+					'header' => [
 						'value' => $txt['scheduled_tasks_enabled'],
 						'style' => 'width: 6%;text-align: center;',
-					),
-					'data' => array(
-						'sprintf' => array(
+					],
+					'data' => [
+						'sprintf' => [
 							'format' => '
 								<input type="hidden" name="enable_task[%1$d]" id="task_%1$d" value="0" /><input type="checkbox" name="enable_task[%1$d]" id="task_check_%1$d" %2$s class="input_check" />',
-							'params' => array(
+							'params' => [
 								'id' => false,
 								'checked_state' => false,
-							),
-						),
+							],
+						],
 						'class' => 'centertext',
-					),
-				),
-				'run_now' => array(
-					'header' => array(
+					],
+				],
+				'run_now' => [
+					'header' => [
 						'value' => $txt['scheduled_tasks_run_now'],
 						'style' => 'width: 12%;text-align: center;',
-					),
-					'data' => array(
-						'sprintf' => array(
+					],
+					'data' => [
+						'sprintf' => [
 							'format' => '
 								<input type="checkbox" name="run_task[%1$d]" id="run_task_%1$d" class="input_check" />',
-							'params' => array(
+							'params' => [
 								'id' => false,
-							),
-						),
+							],
+						],
 						'class' => 'centertext',
-					),
-				),
-			),
-			'form' => array(
+					],
+				],
+			],
+			'form' => [
 				'href' => getUrl('admin', ['action' => 'admin', 'area' => 'scheduledtasks']),
-			),
-			'additional_rows' => array(
-				array(
+			],
+			'additional_rows' => [
+				[
 					'class' => 'submitbutton',
 					'position' => 'below_table_data',
 					'value' => '
 						<input type="submit" name="run" value="' . $txt['scheduled_tasks_run_now'] . '" class="right_submit" />
 						<input type="submit" name="save" value="' . $txt['scheduled_tasks_save_changes'] . '" class="right_submit" />',
-				),
-				array(
+				],
+				[
 					'position' => 'after_title',
 					'value' => $txt['scheduled_tasks_time_offset'],
-				),
-			),
-		);
+				],
+			],
+		];
 
 		createList($listOptions);
 
@@ -267,7 +265,7 @@ class ManageScheduledTasks extends AbstractController
 	 * Callback function for createList() in action_tasks().
 	 *
 	 */
-	public function list_getScheduledTasks()
+	public function list_getScheduledTasks(): array
 	{
 		return scheduledTasks();
 	}
@@ -277,7 +275,7 @@ class ManageScheduledTasks extends AbstractController
 	 *
 	 * @uses ManageScheduledTasks template, edit_scheduled_tasks sub-template
 	 */
-	public function action_edit()
+	public function action_edit(): void
 	{
 		global $context, $txt;
 
@@ -323,10 +321,10 @@ class ManageScheduledTasks extends AbstractController
 
 			// The other time bits are simple!
 			$interval = max((int) $this->_req->post->regularity, 1);
-			$unit = in_array(substr($this->_req->post->unit, 0, 1), array('m', 'h', 'd', 'w')) ? substr($this->_req->post->unit, 0, 1) : 'd';
+			$unit = in_array(substr($this->_req->post->unit, 0, 1), ['m', 'h', 'd', 'w']) ? substr($this->_req->post->unit, 0, 1) : 'd';
 
 			// Don't allow one minute intervals.
-			if ($interval == 1 && $unit === 'm')
+			if ($interval === 1 && $unit === 'm')
 			{
 				$interval = 2;
 			}
@@ -335,7 +333,6 @@ class ManageScheduledTasks extends AbstractController
 			$disabled = isset($this->_req->post->enabled) ? 0 : 1;
 
 			// Do the update!
-			$this->_req->query->tid = (int) $this->_req->query->tid;
 			updateTask($this->_req->query->tid, $disabled, $offset, $interval, $unit);
 
 			// Check the next event.
@@ -346,7 +343,6 @@ class ManageScheduledTasks extends AbstractController
 		}
 
 		// Load the task, understand? Que? Que?
-		$this->_req->query->tid = (int) $this->_req->query->tid;
 		$context['task'] = loadTaskDetails($this->_req->query->tid);
 
 		createToken('admin-st');
@@ -357,7 +353,7 @@ class ManageScheduledTasks extends AbstractController
 	 *
 	 * @uses ManageScheduledTasks language file
 	 */
-	public function action_log()
+	public function action_log(): void
 	{
 		global $context, $txt;
 
@@ -376,86 +372,86 @@ class ManageScheduledTasks extends AbstractController
 		}
 
 		// Setup the list.
-		$listOptions = array(
+		$listOptions = [
 			'id' => 'task_log',
 			'items_per_page' => 30,
 			'title' => $txt['scheduled_log'],
 			'no_items_label' => $txt['scheduled_log_empty'],
 			'base_href' => $context['admin_area'] === 'scheduledtasks' ? getUrl('admin', ['action' => 'admin', 'area' => 'scheduledtasks', 'sa' => 'tasklog']) : getUrl('admin', ['action' => 'admin', 'area' => 'logs', 'sa' => 'tasklog']),
 			'default_sort_col' => 'date',
-			'get_items' => array(
+			'get_items' => [
 				'function' => fn($start, $items_per_page, $sort) => $this->list_getTaskLogEntries($start, $items_per_page, $sort),
-			),
-			'get_count' => array(
+			],
+			'get_count' => [
 				'function' => fn() => $this->list_getNumTaskLogEntries(),
-			),
-			'columns' => array(
-				'name' => array(
-					'header' => array(
+			],
+			'columns' => [
+				'name' => [
+					'header' => [
 						'value' => $txt['scheduled_tasks_name'],
-					),
-					'data' => array(
+					],
+					'data' => [
 						'db' => 'name'
-					),
-				),
-				'date' => array(
-					'header' => array(
+					],
+				],
+				'date' => [
+					'header' => [
 						'value' => $txt['scheduled_log_time_run'],
-					),
-					'data' => array(
+					],
+					'data' => [
 						'function' => static fn($rowData) => standardTime($rowData['time_run'], true),
-					),
-					'sort' => array(
+					],
+					'sort' => [
 						'default' => 'lst.id_log DESC',
 						'reverse' => 'lst.id_log',
-					),
-				),
-				'time_taken' => array(
-					'header' => array(
+					],
+				],
+				'time_taken' => [
+					'header' => [
 						'value' => $txt['scheduled_log_time_taken'],
-					),
-					'data' => array(
-						'sprintf' => array(
+					],
+					'data' => [
+						'sprintf' => [
 							'format' => $txt['scheduled_log_time_taken_seconds'],
-							'params' => array(
+							'params' => [
 								'time_taken' => false,
-							),
-						),
-					),
-					'sort' => array(
+							],
+						],
+					],
+					'sort' => [
 						'default' => 'lst.time_taken',
 						'reverse' => 'lst.time_taken DESC',
-					),
-				),
-				'task_completed' => array(
-					'header' => array(
+					],
+				],
+				'task_completed' => [
+					'header' => [
 						'value' => $txt['scheduled_log_completed'],
-					),
-					'data' => array(
+					],
+					'data' => [
 						'function' => static function ($rowData) {
 							global $txt;
 
 							return '<i class="icon ' . ($rowData['task_completed'] ? 'i-check' : 'i-fail') . '" title="' . sprintf($txt[$rowData['task_completed'] ? 'maintain_done' : 'maintain_fail'], $rowData['name']) . '" />';
 						},
-					),
-				),
-			),
-			'form' => array(
+					],
+				],
+			],
+			'form' => [
 				'href' => $context['admin_area'] === 'scheduledtasks' ? getUrl('admin', ['action' => 'admin', 'area' => 'scheduledtasks', 'sa' => 'tasklog']) : getUrl('admin', ['action' => 'admin', 'area' => 'logs', 'sa' => 'tasklog']),
 				'token' => 'admin-tl',
-			),
-			'additional_rows' => array(
-				array(
+			],
+			'additional_rows' => [
+				[
 					'position' => 'below_table_data',
 					'value' => '
 						<input type="submit" name="removeAll" value="' . $txt['scheduled_log_empty_log'] . '" onclick="return confirm(\'' . $txt['scheduled_log_empty_log_confirm'] . '\');" class="right_submit" />',
-				),
-				array(
+				],
+				[
 					'position' => 'after_title',
 					'value' => $txt['scheduled_tasks_time_offset'],
-				),
-			),
-		);
+				],
+			],
+		];
 
 		createToken('admin-tl');
 		createList($listOptions);
@@ -477,7 +473,7 @@ class ManageScheduledTasks extends AbstractController
 	 *
 	 * @return array
 	 */
-	public function list_getTaskLogEntries($start, $items_per_page, $sort)
+	public function list_getTaskLogEntries(int $start, int $items_per_page, string $sort): array
 	{
 		return getTaskLogEntries($start, $items_per_page, $sort);
 	}
@@ -485,7 +481,7 @@ class ManageScheduledTasks extends AbstractController
 	/**
 	 * Callback function for createList() in action_log().
 	 */
-	public function list_getNumTaskLogEntries()
+	public function list_getNumTaskLogEntries(): int
 	{
 		return countTaskLogEntries();
 	}

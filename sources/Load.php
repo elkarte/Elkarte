@@ -61,9 +61,9 @@ function reloadSettings()
 			SELECT 
 				variable, value
 			FROM {db_prefix}settings',
-			array()
+			[]
 		);
-		$modSettings = array();
+		$modSettings = [];
 		if (!$request)
 		{
 			Errors::instance()->display_db_error();
@@ -118,7 +118,7 @@ function reloadSettings()
 
 		if ($modSettings['load_average'] !== false)
 		{
-			call_integration_hook('integrate_load_average', array($modSettings['load_average']));
+			call_integration_hook('integrate_load_average', [$modSettings['load_average']]);
 		}
 
 		// Let's have at least a zero
@@ -142,9 +142,9 @@ function reloadSettings()
 	}
 
 	// Is post moderation alive and well?
-	$modSettings['postmod_active'] = !isset($modSettings['admin_features']) || in_array('pm', explode(',', $modSettings['admin_features']));
+	$modSettings['postmod_active'] = !isset($modSettings['admin_features']) || in_array('pm', explode(',', $modSettings['admin_features']), true);
 
-	if (!isset($_SERVER['HTTPS']) || strtolower($_SERVER['HTTPS']) == 'off')
+	if (!isset($_SERVER['HTTPS']) || strtolower($_SERVER['HTTPS']) === 'off')
 	{
 		$modSettings['secureCookies'] = 0;
 	}
@@ -171,13 +171,13 @@ function reloadSettings()
  *
  * What it does:
  *
- * - sets up the $user_info array
- * - assigns $user_info['query_wanna_see_board'] for what boards the user can see.
- * - first checks for cookie or integration validation.
- * - uses the current session if no integration function or cookie is found.
- * - checks password length, if member is activated and the login span isn't over.
- * - if validation fails for the user, $id_member is set to 0.
- * - updates the last visit time when needed.
+ * - Sets up the $user_info array.
+ * - Assigns User::$info->query_wanna_see_board for what boards the user can see.
+ * - First checks for cookie or integration validation.
+ * - Uses the current session if no integration function or cookie is found.
+ * - Checks password length, if member is activated and the login span isn't over.
+ * - If validation fails for the user, $id_member is set to 0.
+ * - Updates the last visit time when needed.
  *
  * @event integrate_verify_user allow for integration to verify a user
  * @event integrate_user_info to allow for adding to $user_info array
@@ -255,7 +255,7 @@ function loadBoard()
 			{
 				Headers::instance()
 					->removeHeader('all')
-					->headerSpecial('HTTP/1.1 410 Gone')
+					->httpCode(410)
 					->sendHeaders();
 			}
 
@@ -266,7 +266,7 @@ function loadBoard()
 	// Load this board only if it is specified.
 	if (empty($board) && empty($topic))
 	{
-		$board_info = array('moderators' => array());
+		$board_info = ['moderators' => []];
 
 		return;
 	}
@@ -285,10 +285,10 @@ function loadBoard()
 
 	if (empty($temp))
 	{
-		$select_columns = array();
-		$select_tables = array();
+		$select_columns = [];
+		$select_tables = [];
 		// Wanna grab something more from the boards table or another table at all?
-		call_integration_hook('integrate_load_board_query', array(&$select_columns, &$select_tables));
+		call_integration_hook('integrate_load_board_query', [&$select_columns, &$select_tables]);
 
 		$request = $db->query('', '
 			SELECT
@@ -304,10 +304,10 @@ function loadBoard()
 				LEFT JOIN {db_prefix}moderators AS mods ON (mods.id_board = {raw:board_link})
 				LEFT JOIN {db_prefix}members AS mem ON (mem.id_member = mods.id_member)
 			WHERE b.id_board = {raw:board_link}',
-			array(
+			[
 				'current_topic' => $topic,
-				'board_link' => empty($topic) ? $db->quote('{int:current_board}', array('current_board' => $board)) : 't.id_board',
-			)
+				'board_link' => empty($topic) ? $db->quote('{int:current_board}', ['current_board' => $board]) : 't.id_board',
+			]
 		);
 		// If there aren't any, skip.
 		if ($request->num_rows() > 0)
@@ -321,13 +321,13 @@ function loadBoard()
 			}
 
 			// Basic operating information. (globals... :/)
-			$board_info = array(
+			$board_info = [
 				'id' => $board,
-				'moderators' => array(),
-				'cat' => array(
+				'moderators' => [],
+				'cat' => [
 					'id' => (int) $row['id_cat'],
 					'name' => $row['cname']
-				),
+				],
 				'name' => $row['bname'],
 				'raw_description' => $row['description'],
 				'description' => $row['description'],
@@ -346,24 +346,24 @@ function loadBoard()
 				'old_posts' => empty($row['old_posts']),
 				'cur_topic_approved' => empty($topic) || $row['approved'],
 				'cur_topic_starter' => empty($topic) ? 0 : $row['id_member_started'],
-			);
+			];
 
 			// Load the membergroups allowed, and check permissions.
-			$board_info['groups'] = $row['member_groups'] === '' ? array() : explode(',', $row['member_groups']);
-			$board_info['deny_groups'] = $row['deny_member_groups'] === '' ? array() : explode(',', $row['deny_member_groups']);
+			$board_info['groups'] = $row['member_groups'] === '' ? [] : explode(',', $row['member_groups']);
+			$board_info['deny_groups'] = $row['deny_member_groups'] === '' ? [] : explode(',', $row['deny_member_groups']);
 
-			call_integration_hook('integrate_loaded_board', array(&$board_info, &$row));
+			call_integration_hook('integrate_loaded_board', [&$board_info, &$row]);
 
 			do
 			{
 				if (!empty($row['id_moderator']))
 				{
-					$board_info['moderators'][$row['id_moderator']] = array(
+					$board_info['moderators'][$row['id_moderator']] = [
 						'id' => $row['id_moderator'],
 						'name' => $row['real_name'],
 						'href' => getUrl('profile', ['action' => 'profile', 'u' => $row['id_moderator']]),
 						'link' => '<a href="' . getUrl('profile', ['action' => 'profile', 'u' => $row['id_moderator']]) . '">' . $row['real_name'] . '</a>'
-					);
+					];
 				}
 			} while (($row = $request->fetch_assoc()));
 
@@ -382,11 +382,11 @@ function loadBoard()
 					WHERE id_member_started={int:id_member}
 						AND approved = {int:unapproved}
 						AND id_board = {int:board}',
-					array(
+					[
 						'id_member' => User::$info->id,
 						'unapproved' => 0,
 						'board' => $board,
-					)
+					]
 				);
 
 				[$board_info['unapproved_user_topics']] = $request->fetch_row();
@@ -405,7 +405,7 @@ function loadBoard()
 		}
 		else
 		{
-			// Otherwise the topic is invalid, there are no moderators, etc.
+			// Otherwise the topic is invalid; there are no moderators, etc.
 			$board_info = [
 				'moderators' => [],
 				'error' => 'exist'
@@ -484,10 +484,10 @@ function loadBoard()
 		// If we're requesting an attachment.
 		if (!empty($_REQUEST['action']) && $_REQUEST['action'] === 'dlattach')
 		{
-			ob_end_clean();
+			@ob_end_clean();
 			Headers::instance()
 				->removeHeader('all')
-				->headerSpecial('HTTP/1.1 403 Forbidden')
+				->httpCode(403)
 				->sendHeaders();
 			exit;
 		}
@@ -503,7 +503,7 @@ function loadBoard()
 			{
 				Headers::instance()
 					->removeHeader('all')
-					->headerSpecial('HTTP/1.1 410 Gone')
+					->httpCode(410)
 					->sendHeaders();
 			}
 
@@ -628,11 +628,11 @@ function loadPermissions()
 			WHERE (id_group IN ({array_int:member_groups})
 				' . $spider_restrict . ')
 				AND id_profile = {int:id_profile}',
-			array(
+			[
 				'member_groups' => User::$info->groups,
 				'id_profile' => $board_info['profile'],
 				'spider_group' => !empty($modSettings['spider_group']) && $modSettings['spider_group'] != 1 ? $modSettings['spider_group'] : 0,
-			)
+			]
 		)->fetch_callback(
 			static function ($row) use (&$removals, &$permissions) {
 				if (empty($row['add_deny']))
@@ -812,7 +812,7 @@ function loadEssentialThemeData()
  *
  * @uses the requireTemplate() function to actually load the file.
  */
-function loadTemplate($template_name, $style_sheets = array(), $fatal = true)
+function loadTemplate($template_name, $style_sheets = [], $fatal = true)
 {
 	Errors::instance()->log_deprecated('loadTemplate()', 'theme()->getTemplates()->load()');
 
@@ -855,9 +855,10 @@ function loadSubTemplate($sub_template_name, $fatal = false)
  *   from the default theme if not found in the current theme
  * - ['stale'] (true/false/string): if true or null, use cache stale,
  *   false do not, or used a supplied string
+ * - ['subdir'] subdirectory to use from the parent themes/default/...
  * @param string $id optional id to use in html id=""
  */
-function loadCSSFile($filenames, $params = array(), $id = '')
+function loadCSSFile($filenames, $params = [], $id = '')
 {
 	global $context;
 
@@ -909,7 +910,7 @@ function loadCSSFile($filenames, $params = array(), $id = '')
  *     not, or used a supplied string
  * @param string $id = '' optional id to use in html id=""
  */
-function loadJavascriptFile($filenames, $params = array(), $id = '')
+function loadJavascriptFile($filenames, $params = [], $id = '')
 {
 	if (empty($filenames))
 	{
@@ -957,7 +958,7 @@ function loadJavascriptFile($filenames, $params = array(), $id = '')
  *     not, or used a supplied string
  * @param string $id = '' optional id to use in html id=""
  */
-function loadAssetFile($filenames, $params = array(), $id = '')
+function loadAssetFile($filenames, $params = [], $id = '')
 {
 	global $settings, $context, $db_show_debug;
 
@@ -971,7 +972,7 @@ function loadAssetFile($filenames, $params = array(), $id = '')
 
 	if (!is_array($filenames))
 	{
-		$filenames = array($filenames);
+		$filenames = [$filenames];
 	}
 
 	// Static values for all these settings
@@ -1057,7 +1058,7 @@ function loadAssetFile($filenames, $params = array(), $id = '')
 			// Add it to the array for use in the template
 			if (!empty($filename))
 			{
-				$this_build[$this_id] = array('filename' => $filename, 'options' => $params);
+				$this_build[$this_id] = ['filename' => $filename, 'options' => $params];
 				$context[$params['index_name']][$this_id] = $this_build[$this_id];
 
 				if ($db_show_debug === true)
@@ -1111,16 +1112,17 @@ function addInlineJavascript($javascript, $defer = false)
  *
  * - Tries the current and default themes as well as the user and global languages.
  *
- * @param string $template_name
+ * @param string $language_file
  * @param string $lang = ''
  * @param bool $fatal = true
  * @param bool $force_reload = false
- * @deprecated since 2.0; use the theme object
+ *
+ * @deprecated since 2.0; use the txt object
  *
  */
-function loadLanguage($template_name, $lang = '', $fatal = true, $force_reload = false)
+function loadLanguage($language_file, $lang = '', $fatal = true, $force_reload = false)
 {
-	Txt::load($template_name, $lang, $fatal);
+	Txt::load($language_file, $fatal, $force_reload);
 }
 
 /**
@@ -1141,12 +1143,12 @@ function getBoardParents($id_parent)
 {
 	$db = database();
 	$cache = Cache::instance();
-	$boards = array();
+	$boards = [];
 
 	// First check if we have this cached already.
 	if (!$cache->getVar($boards, 'board_parents-' . $id_parent, 480))
 	{
-		$boards = array();
+		$boards = [];
 		$original_parent = $id_parent;
 
 		// Loop while the parent is non-zero.
@@ -1160,9 +1162,9 @@ function getBoardParents($id_parent)
 					LEFT JOIN {db_prefix}moderators AS mods ON (mods.id_board = b.id_board)
 					LEFT JOIN {db_prefix}members AS mem ON (mem.id_member = mods.id_member)
 				WHERE b.id_board = {int:board_parent}',
-				array(
+				[
 					'board_parent' => $id_parent,
-				)
+				]
 			);
 			// In the EXTREMELY unlikely event this happens, give an error message.
 			if ($result->num_rows() === 0)
@@ -1175,12 +1177,12 @@ function getBoardParents($id_parent)
 				if (!isset($boards[$row['id_board']]))
 				{
 					$id_parent = $row['id_parent'];
-					$boards[$row['id_board']] = array(
+					$boards[$row['id_board']] = [
 						'url' => getUrl('board', ['board' => $row['id_board'], 'name' => $row['name'], 'start' => '0']),
 						'name' => $row['name'],
 						'level' => $row['child_level'],
-						'moderators' => array()
-					);
+						'moderators' => []
+					];
 				}
 
 				// If a moderator exists for this board, add that moderator for all children too.
@@ -1188,12 +1190,12 @@ function getBoardParents($id_parent)
 				{
 					foreach (array_keys($boards) as $id)
 					{
-						$boards[$id]['moderators'][$row['id_moderator']] = array(
+						$boards[$id]['moderators'][$row['id_moderator']] = [
 							'id' => $row['id_moderator'],
 							'name' => $row['real_name'],
 							'href' => getUrl('profile', ['action' => 'profile', 'u' => $row['id_moderator']]),
 							'link' => '<a href="' . getUrl('profile', ['action' => 'profile', 'u' => $row['id_moderator']]) . '">' . $row['real_name'] . '</a>'
-						);
+						];
 					}
 				}
 			}
@@ -1233,12 +1235,12 @@ function getLanguages($use_cache = true)
 			}
 
 			$basename = basename($entry, '.php');
-			$languages[$basename] = array(
+			$languages[$basename] = [
 				'name' => $basename,
 				'selected' => false,
 				'filename' => $entry,
 				'location' => $language_dir . '/' . $entry,
-			);
+			];
 		}
 
 		$dir->close();
@@ -1350,12 +1352,12 @@ function determineAvatar($profile)
 	{
 		// Gravatars URL.
 		$gravatar_url = $gravatar;
-		$avatar = array(
+		$avatar = [
 			'name' => $profile['avatar'],
 			'image' => '<img class="avatar avatarresize" src="' . $gravatar_url . '" alt="' . $alt . '" loading="lazy" />',
 			'href' => $gravatar_url,
 			'url' => $gravatar_url,
-		);
+		];
 	}
 	// an avatar from the gallery?
 	elseif (!empty($profile['avatar']) && ($avatar_protocol !== 'http://' && $avatar_protocol !== 'https:/'))
@@ -1419,7 +1421,7 @@ function determineAvatar($profile)
 	// Make sure there's a preview for gravatars available.
 	$avatar['gravatar_preview'] = $gravatar;
 
-	call_integration_hook('integrate_avatar', array(&$avatar, $profile));
+	call_integration_hook('integrate_avatar', [&$avatar, $profile]);
 
 	return $avatar;
 }
@@ -1438,7 +1440,7 @@ function detectServer()
 	{
 		$server = new Server($_SERVER);
 		$servers = ['iis', 'apache', 'litespeed', 'lighttpd', 'nginx', 'cgi', 'windows'];
-		$context['server'] = array();
+		$context['server'] = [];
 		foreach ($servers as $name)
 		{
 			$context['server']['is_' . $name] = $server->is($name);
@@ -1525,14 +1527,14 @@ function doSecurityChecks()
 		// New updates
 		if (defined('FORUM_VERSION'))
 		{
-			$index = 'new_in_' . str_replace(array('ElkArte ', '.'), array('', '_'), FORUM_VERSION);
+			$index = 'new_in_' . str_replace(['ElkArte ', '.'], ['', '_'], FORUM_VERSION);
 			if (!empty($modSettings[$index]) && empty($options['dismissed_' . $index]))
 			{
 				$show_warnings = true;
-				$context['new_version_updates'] = array(
+				$context['new_version_updates'] = [
 					'title' => $txt['new_version_updates'],
-					'errors' => array(replaceBasicActionUrl($txt['new_version_updates_text'])),
-				);
+					'errors' => [replaceBasicActionUrl($txt['new_version_updates_text'])],
+				];
 			}
 		}
 	}
@@ -1624,7 +1626,7 @@ function loadBBCParsers()
 			$disabledBBC = $modSettings['disabledBBC'];
 		}
 
-		ParserWrapper::instance()->setDisabled(empty($disabledBBC) ? array() : $disabledBBC);
+		ParserWrapper::instance()->setDisabled(empty($disabledBBC) ? [] : $disabledBBC);
 	}
 
 	return 1;
@@ -1656,7 +1658,7 @@ function serializeToJson($variable, $save_callback = null)
 		// If unserialize fails as well, let's just store an empty array
 		if ($array_form === false)
 		{
-			$array_form = array(0, '', 0);
+			$array_form = [0, '', 0];
 		}
 
 		// Time to update the value if necessary

@@ -43,9 +43,9 @@ class RemoveOldFollowups implements ScheduledTaskInterface
 				LEFT JOIN {db_prefix}messages AS m ON (fu.derived_from = m.id_msg)
 			WHERE m.id_msg IS NULL
 			LIMIT {int:limit}',
-			array(
+			[
 				'limit' => 100,
-			)
+			]
 		)->fetch_callback(
 			static function ($row) use (&$remove) {
 				$remove[] = $row['derived_from'];

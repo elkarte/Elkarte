@@ -39,11 +39,11 @@ class Memberlist extends AbstractController
 		$context['can_send_email'] = allowedTo('send_email_to_members') && showEmailAddress(0);
 
 		// These are all the possible fields.
-		$this->_search_fields = array(
+		$this->_search_fields = [
 			'name' => $txt['mlist_search_name'],
 			'website' => $txt['mlist_search_website'],
 			'group' => $txt['mlist_search_group'],
-		);
+		];
 
 		if ($context['can_send_email'])
 		{
@@ -89,89 +89,89 @@ class Memberlist extends AbstractController
 
 		// $subActions array format:
 		// 'subaction' => array('label', 'function', 'is_selected')
-		$subActions = array(
-			'all' => array($txt['view_all_members'], 'action_mlall', $context['listing_by'] === 'all'),
-			'search' => array($txt['mlist_search'], 'action_mlsearch', $context['listing_by'] === 'search'),
-		);
+		$subActions = [
+			'all' => [$txt['view_all_members'], 'action_mlall', $context['listing_by'] === 'all'],
+			'search' => [$txt['mlist_search'], 'action_mlsearch', $context['listing_by'] === 'search'],
+		];
 
 		// Set up the sort links.
-		$context['sort_links'] = array();
+		$context['sort_links'] = [];
 		foreach ($subActions as $act => $text)
 		{
-			$context['sort_links'][] = array(
+			$context['sort_links'][] = [
 				'label' => $text[0],
 				'action' => $act,
 				'selected' => $text[2],
-			);
+			];
 		}
 
 		$context['num_members'] = $modSettings['totalMembers'];
 
 		// Set up the standard columns...
-		$context['columns'] = array(
-			'avatar' => array(
+		$context['columns'] = [
+			'avatar' => [
 				'label' => '',
 				'class' => 'avatar',
-			),
-			'real_name' => array(
+			],
+			'real_name' => [
 				'label' => $txt['username'],
 				'class' => 'username',
-				'sort' => array(
+				'sort' => [
 					'down' => 'mem.real_name DESC',
 					'up' => 'mem.real_name ASC'
-				),
-			),
-			'online' => array(
+				],
+			],
+			'online' => [
 				'label' => $txt['status'],
 				'class' => 'status',
-				'sort' => array(
+				'sort' => [
 					'down' => allowedTo('moderate_forum') ? 'COALESCE(lo.log_time, 1) ASC, real_name ASC' : 'CASE WHEN mem.show_online THEN COALESCE(lo.log_time, 1) ELSE 1 END ASC, real_name ASC',
 					'up' => allowedTo('moderate_forum') ? 'COALESCE(lo.log_time, 1) DESC, real_name DESC' : 'CASE WHEN mem.show_online THEN COALESCE(lo.log_time, 1) ELSE 1 END DESC, real_name DESC'
-				),
-			),
-			'email_address' => array(
+				],
+			],
+			'email_address' => [
 				'label' => $txt['email'],
 				'class' => 'email',
-				'sort' => array(
+				'sort' => [
 					'down' => allowedTo('moderate_forum') ? 'mem.email_address DESC' : '',
 					'up' => allowedTo('moderate_forum') ? 'mem.email_address ASC' : ''
-				),
-			),
-			'website_url' => array(
+				],
+			],
+			'website_url' => [
 				'label' => $txt['website'],
 				'class' => 'website',
 				'link_with' => 'website',
-				'sort' => array(
+				'sort' => [
 					'down' => 'LENGTH(mem.website_url) > 0 ASC, COALESCE(mem.website_url, 1=1) DESC, mem.website_url DESC',
 					'up' => 'LENGTH(mem.website_url) > 0 DESC, COALESCE(mem.website_url, 1=1) ASC, mem.website_url ASC'
-				),
-			),
-			'id_group' => array(
+				],
+			],
+			'id_group' => [
 				'label' => $txt['position'],
 				'class' => 'group',
-				'sort' => array(
+				'sort' => [
 					'down' => 'COALESCE(mg.group_name, 1=1) DESC, mg.group_name DESC',
 					'up' => 'COALESCE(mg.group_name, 1=1) ASC, mg.group_name ASC'
-				),
-			),
-			'date_registered' => array(
+				],
+			],
+			'date_registered' => [
 				'label' => $txt['date_registered'],
 				'class' => 'date_registered',
-				'sort' => array(
+				'sort' => [
 					'down' => 'mem.date_registered DESC',
 					'up' => 'mem.date_registered ASC'
-				),
-			),
-			'posts' => array(
+				],
+			],
+			'posts' => [
 				'label' => $txt['posts'],
 				'class' => 'posts',
 				'default_sort_rev' => true,
-				'sort' => array(
+				'sort' => [
 					'down' => 'mem.posts DESC',
 					'up' => 'mem.posts ASC'
-				),
-			)
-		);
+				],
+			]
+		];
 
 		// Add in any custom profile columns
 		if (ml_CustomProfile())
@@ -181,7 +181,7 @@ class Memberlist extends AbstractController
 
 		// The template may appreciate how many columns it needs to display
 		$context['colspan'] = 0;
-		$context['disabled_fields'] = isset($modSettings['disabled_profile_fields']) ? array_flip(explode(',', $modSettings['disabled_profile_fields'])) : array();
+		$context['disabled_fields'] = isset($modSettings['disabled_profile_fields']) ? array_flip(explode(',', $modSettings['disabled_profile_fields'])) : [];
 		foreach ($context['columns'] as $key => $column)
 		{
 			if (isset($context['disabled_fields'][$key]) || (isset($column['link_with']) && isset($context['disabled_fields'][$column['link_with']])))
@@ -203,17 +203,17 @@ class Memberlist extends AbstractController
 		// Build the memberlist button array.
 		if ($context['in_search'])
 		{
-			$context['memberlist_buttons'] = array(
-				'view_all_members' => array(
+			$context['memberlist_buttons'] = [
+				'view_all_members' => [
 					'text' => 'view_all_members',
 					'lang' => true,
 					'url' => $scripturl . '?action=memberlist;sa=all',
-					'active' => true),
-			);
+					'active' => true],
+			];
 		}
 		else
 		{
-			$context['memberlist_buttons'] = array();
+			$context['memberlist_buttons'] = [];
 		}
 
 		// Make fields available to the template
@@ -260,7 +260,7 @@ class Memberlist extends AbstractController
 	 * - Can be passed a sort parameter, to order the display of members.
 	 * - Calls printMemberListRows to retrieve the results of the query.
 	 */
-	public function action_mlall()
+	public function action_mlall(): void
 	{
 		global $txt, $scripturl, $modSettings, $context;
 
@@ -372,11 +372,11 @@ class Memberlist extends AbstractController
 
 		$limit = $start;
 		$where = '';
-		$query_parameters = array(
+		$query_parameters = [
 			'regular_id_group' => 0,
 			'is_activated' => 1,
 			'sort' => $context['columns'][$sort]['sort'][$context['sort_direction']],
-		);
+		];
 
 		// Using cache allows to narrow down the list to be retrieved.
 		if ($use_cache && $sort === 'real_name' && !isset($desc))
@@ -440,7 +440,7 @@ class Memberlist extends AbstractController
 	 * using the search sub-template.
 	 * - Calls printMemberListRows to retrieve the results of the query.
 	 */
-	public function action_mlsearch()
+	public function action_mlsearch(): void
 	{
 		global $txt, $scripturl, $context, $modSettings;
 
@@ -459,7 +459,7 @@ class Memberlist extends AbstractController
 			$input_fields = isset($this->_req->query->fields) ? explode(',', $this->_req->query->fields) : $this->_req->post->fields;
 
 			$fields_key = array_keys($this->_search_fields);
-			$context['search_defaults'] = array();
+			$context['search_defaults'] = [];
 			foreach ($input_fields as $val)
 			{
 				if (in_array($val, $fields_key, true))
@@ -503,41 +503,41 @@ class Memberlist extends AbstractController
 			// set up some things for use in the template
 			$context['sort_direction'] = isset($desc) ? 'down' : 'up';
 			$context['sort_by'] = $sort;
-			$context['memberlist_buttons'] = array(
-				'view_all_members' => array('text' => 'view_all_members',
+			$context['memberlist_buttons'] = [
+				'view_all_members' => ['text' => 'view_all_members',
 					'lang' => true,
 					'url' => $scripturl . '?action=memberlist;sa=all',
-					'active' => true),
-			);
+					'active' => true],
+			];
 
-			$query_parameters = array(
+			$query_parameters = [
 				'regular_id_group' => 0,
 				'is_activated' => 1,
 				'blank_string' => '',
-				'search' => '%' . strtr($search, array('_' => '\\_', '%' => '\\%', '*' => '%')) . '%',
+				'search' => '%' . strtr($search, ['_' => '\\_', '%' => '\\%', '*' => '%']) . '%',
 				'sort' => $context['columns'][$sort]['sort'][$context['sort_direction']],
-			);
+			];
 
 			// Search for a name
 			if (in_array('name', $input_fields))
 			{
-				$fields = allowedTo('moderate_forum') ? array('member_name', 'real_name') : array('real_name');
+				$fields = allowedTo('moderate_forum') ? ['member_name', 'real_name'] : ['real_name'];
 			}
 			else
 			{
-				$fields = array();
+				$fields = [];
 			}
 
 			// Search for websites.
 			if (in_array('website', $input_fields))
 			{
-				$fields += array(7 => 'website_title', 'website_url');
+				$fields += [7 => 'website_title', 'website_url'];
 			}
 
 			// Search for groups.
 			if (in_array('group', $input_fields))
 			{
-				$fields += array(9 => 'COALESCE(group_name, {string:blank_string})');
+				$fields += [9 => 'COALESCE(group_name, {string:blank_string})'];
 			}
 
 			// Search for an email address?
@@ -562,9 +562,9 @@ class Memberlist extends AbstractController
 				$fields[$key] = '{column_case_insensitive:' . $field . '}';
 			}
 
-			$customJoin = array();
+			$customJoin = [];
 			$customCount = 10;
-			$validFields = $input_fields ?? array();
+			$validFields = $input_fields ?? [];
 
 			// Any custom fields to search for - these being tricky?
 			foreach ($input_fields as $field)
@@ -574,7 +574,7 @@ class Memberlist extends AbstractController
 				{
 					$customJoin[] = 'LEFT JOIN {db_prefix}custom_fields_data AS cfd' . $field . ' ON (cfd' . $field . '.variable = {string:cfd' . $field . '} AND cfd' . $field . '.id_member = mem.id_member)';
 					$query_parameters['cfd' . $field] = $curField;
-					$fields += array($customCount++ => 'COALESCE(cfd' . $field . '.value, {string:blank_string})');
+					$fields += [$customCount++ => 'COALESCE(cfd' . $field . '.value, {string:blank_string})'];
 					$validFields[] = $field;
 				}
 			}

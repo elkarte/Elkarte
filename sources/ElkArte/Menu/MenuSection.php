@@ -21,7 +21,7 @@ namespace ElkArte\Menu;
  * The array is a unnamed index array interpreted as follows,
  *   - string $title      => Section title
  *   - bool $enabled      => Is the section enabled / shown
- *   - array $areas       => Array of areas within this menu section, each area options processed by MenuArea
+ *   - array $areas       => Array of areas within this menu section, each area option processed by MenuArea
  *   - array $permission  => Permission required to access the whole section
  *
  * @package ElkArte\Menu
@@ -36,7 +36,7 @@ class MenuSection extends MenuItem
 	 *
 	 * @return array Returns an array of areas for the given object
 	 */
-	public function getAreas()
+	public function getAreas(): array
 	{
 		return $this->areas;
 	}
@@ -47,7 +47,7 @@ class MenuSection extends MenuItem
 	 * @param array $arr the array containing the menu item data
 	 * @return $this
 	 */
-	public function buildMoreFromArray($arr)
+	public function buildMoreFromArray($arr): self
 	{
 		if (isset($arr['title']))
 		{
@@ -73,7 +73,7 @@ class MenuSection extends MenuItem
 	 *
 	 * @return $this
 	 */
-	public function addArea($id, $area)
+	public function addArea($id, $area): self
 	{
 		$this->areas[$id] = $area;
 
@@ -81,7 +81,7 @@ class MenuSection extends MenuItem
 	}
 
 	/**
-	 * Allow to insert a new menu section after a supplied location
+	 * Allow inserting a new menu section after a supplied location
 	 *
 	 * @param string $id the name of the new section
 	 * @param string $location the name of the section after which to insert $id
@@ -89,7 +89,7 @@ class MenuSection extends MenuItem
 	 *
 	 * @return $this
 	 */
-	public function insertArea($id, $location, $area)
+	public function insertArea($id, $location, $area): self
 	{
 		$current = $this->getAreas();
 

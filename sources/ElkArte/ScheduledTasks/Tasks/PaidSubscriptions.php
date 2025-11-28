@@ -45,10 +45,10 @@ class PaidSubscriptions implements ScheduledTaskInterface
 			FROM {db_prefix}log_subscribed
 			WHERE status = {int:is_active}
 				AND end_time < {int:time_now}',
-			array(
+			[
 				'is_active' => 1,
 				'time_now' => time(),
-			)
+			]
 		)->fetch_callback(
 			static function ($row) {
 				removeSubscription($row['id_subscribe'], $row['id_member']);
@@ -56,7 +56,7 @@ class PaidSubscriptions implements ScheduledTaskInterface
 		);
 
 		// Get all those about to expire that have not had a reminder sent.
-		$subs_reminded = array();
+		$subs_reminded = [];
 		$db->fetchQuery('
 			SELECT 
 				ls.id_sublog, ls.end_time,
@@ -69,21 +69,21 @@ class PaidSubscriptions implements ScheduledTaskInterface
 				AND ls.reminder_sent = {int:reminder_sent}
 				AND s.reminder > {int:reminder_wanted}
 				AND ls.end_time < ({int:time_now} + s.reminder * 86400)',
-			array(
+			[
 				'is_active' => 1,
 				'reminder_sent' => 0,
 				'reminder_wanted' => 0,
 				'time_now' => time(),
-			)
+			]
 		)->fetch_callback(
 			static function ($row) use (&$subs_reminded, $modSettings, $language) {
 				$subs_reminded[] = $row['id_sublog'];
-				$replacements = array(
+				$replacements = [
 					'PROFILE_LINK' => getUrl('profile', ['action' => 'profile', 'area' => 'subscriptions', 'name' => $row['member_name'], 'u' => $row['id_member']]),
 					'REALNAME' => $row['member_name'],
 					'SUBSCRIPTION' => $row['name'],
 					'END_DATE' => strip_tags(standardTime($row['end_time'])),
-				);
+				];
 				$emaildata = loadEmailTemplate('paid_subscription_reminder', $replacements, empty($row['lngfile']) || empty($modSettings['userLanguage']) ? $language : $row['lngfile']);
 
 				// Send the actual email.
@@ -98,10 +98,10 @@ class PaidSubscriptions implements ScheduledTaskInterface
 				UPDATE {db_prefix}log_subscribed
 				SET reminder_sent = {int:reminder_sent}
 				WHERE id_sublog IN ({array_int:subscription_list})',
-				array(
+				[
 					'subscription_list' => $subs_reminded,
 					'reminder_sent' => 1,
-				)
+				]
 			);
 		}
 

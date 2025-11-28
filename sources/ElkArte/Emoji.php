@@ -80,7 +80,7 @@ class Emoji extends AbstractModel
 	 * @param bool $protect if false will bypass codeblock protection (useful if already done!)
 	 * @return string
 	 */
-	public function emojiNameToImage($string, $uni = false, $protect = true)
+	public function emojiNameToImage($string, $uni = false, $protect = true): string
 	{
 		$emoji = self::instance();
 
@@ -111,7 +111,7 @@ class Emoji extends AbstractModel
 	 * @param string $string
 	 * @return string
 	 */
-	private function _protectCodeBlocks($string)
+	private function _protectCodeBlocks($string): string
 	{
 		// Quick sniff, was that you? I thought so !
 		if (strpos($string, ':') === false
@@ -129,7 +129,7 @@ class Emoji extends AbstractModel
 	 *
 	 * @return string
 	 */
-	private function _restoreCodeBlocks($string)
+	private function _restoreCodeBlocks($string): string
 	{
 		return PreparseCode::instance('')->restoreCodeBlocks($string);
 	}
@@ -145,7 +145,7 @@ class Emoji extends AbstractModel
 	 * @param string $string
 	 * @return string
 	 */
-	public function keyboardEmojiToImage($string)
+	public function keyboardEmojiToImage($string): string
 	{
 		$string = $this->emojiFromHTML($string);
 
@@ -161,7 +161,7 @@ class Emoji extends AbstractModel
 	 * @param string $string
 	 * @return string
 	 */
-	public function emojiFromHTML($string)
+	public function emojiFromHTML($string): string
 	{
 		// If there are 4byte encoded values &#x1f123, change those back to utf8 characters
 		return preg_replace_callback(self::POSSIBLE_HTML_EMOJI, static function ($match) {
@@ -223,7 +223,7 @@ class Emoji extends AbstractModel
 	 * @param array $m results from preg_replace_callback or other array
 	 * @return string
 	 */
-	public function emojiToImage($m)
+	public function emojiToImage($m): string
 	{
 		// No :tag: found or not a complete result, return
 		if (empty($m[2]))
@@ -259,7 +259,7 @@ class Emoji extends AbstractModel
 	 * @param $string
 	 * @return string
 	 */
-	public function emojiFromUni($string)
+	public function emojiFromUni($string): string
 	{
 		$this->setSearchReplaceRegex();
 
@@ -296,7 +296,7 @@ class Emoji extends AbstractModel
 	 * @param array $m results from preg_replace_callback or other array
 	 * @return string
 	 */
-	public function emojiToUni($m)
+	public function emojiToUni($m): string
 	{
 		// No :tag: found or not a complete result, return
 		if (!is_array($m) || empty($m[2]))
@@ -330,13 +330,13 @@ class Emoji extends AbstractModel
 	 * @param string $code
 	 * @return string
 	 */
-	public function unicodeCharacterToNumber($code)
+	public function unicodeCharacterToNumber($code): string
 	{
 		$points = [];
 
 		for ($i = 0; $i < Util::strlen($code); $i++)
 		{
-			$points[] = str_pad(strtolower(dechex(Util::uniord(Util::substr($code, $i, 1)))), 4, '0', STR_PAD_LEFT);
+			$points[] = str_pad(strtolower(dechex(Util::getUnicodeOrdinal(Util::substr($code, $i, 1)))), 4, '0', STR_PAD_LEFT);
 		}
 
 		return implode('-', $points);
@@ -349,7 +349,7 @@ class Emoji extends AbstractModel
 	 * singleton emoji such as 1f600 as all multipoint ones would have already been found
 	 * and processed
 	 */
-	public function setSearchReplaceRegex()
+	public function setSearchReplaceRegex(): void
 	{
 		global $settings;
 
@@ -397,7 +397,7 @@ class Emoji extends AbstractModel
 	 *
 	 * @return void
 	 */
-	private function _checkCache()
+	private function _checkCache(): void
 	{
 		if (empty($this->shortcode_replace))
 		{
@@ -413,9 +413,9 @@ class Emoji extends AbstractModel
 	/**
 	 * Retrieve the sole instance of this class.
 	 *
-	 * @return Emoji
+	 * @return Emoji|null
 	 */
-	public static function instance()
+	public static function instance(): ?Emoji
 	{
 		if (self::$instance === null)
 		{

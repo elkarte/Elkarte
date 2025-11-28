@@ -34,17 +34,17 @@ class ManageDraftsModule extends AbstractController
 	 *
 	 * @param array $core_features The core features array
 	 */
-	public static function addCoreFeature(&$core_features)
+	public static function addCoreFeature(array &$core_features): void
 	{
-		$core_features['dr'] = array(
+		$core_features['dr'] = [
 			'url' => getUrl('admin', ['action' => 'admin', 'area' => 'managedrafts', '{session_data}']),
-			'settings' => array(
+			'settings' => [
 				'drafts_enabled' => 1,
 				'drafts_post_enabled' => 2,
 				'drafts_pm_enabled' => 2,
 				'drafts_autosave_enabled' => 2,
 				'drafts_show_saved_enabled' => 2,
-			),
+			],
 			'setting_callback' => static function ($value) {
 				require_once(SUBSDIR . '/ScheduledTasks.subs.php');
 				toggleTaskStatusByName('remove_old_drafts', $value);
@@ -64,7 +64,7 @@ class ManageDraftsModule extends AbstractController
 					Hooks::instance()->disableIntegration(DraftsIntegrate::class);
 				}
 			},
-		);
+		];
 	}
 
 	/**
@@ -73,7 +73,7 @@ class ManageDraftsModule extends AbstractController
 	 * @param int[] $users
 	 * @throws Exception
 	 */
-	public static function integrate_delete_members($users)
+	public static function integrate_delete_members(array $users): void
 	{
 		$db = database();
 
@@ -81,9 +81,9 @@ class ManageDraftsModule extends AbstractController
 		$db->query('', '
 			DELETE FROM {db_prefix}user_drafts
 			WHERE id_member IN ({array_int:users})',
-			array(
+			[
 				'users' => $users,
-			)
+			]
 		);
 	}
 
@@ -93,30 +93,30 @@ class ManageDraftsModule extends AbstractController
 	 * @param array $permissionGroups
 	 * @param array $permissionList
 	 */
-	public static function integrate_load_permissions(&$permissionGroups, &$permissionList)
+	public static function integrate_load_permissions(array &$permissionGroups, array &$permissionList): void
 	{
-		$permissionList['board'] += array(
-			'post_draft' => array(false, 'topic'),
-			'post_autosave_draft' => array(false, 'topic'),
-		);
+		$permissionList['board'] += [
+			'post_draft' => [false, 'topic'],
+			'post_autosave_draft' => [false, 'topic'],
+		];
 
-		$permissionList['membergroup'] += array(
-			'pm_draft' => array(false, 'pm'),
-			'pm_autosave_draft' => array(false, 'pm'),
-		);
+		$permissionList['membergroup'] += [
+			'pm_draft' => [false, 'pm'],
+			'pm_autosave_draft' => [false, 'pm'],
+		];
 	}
 
 	/**
 	 * Integrate draft permission in to illegal guest permissions
 	 */
-	public static function integrate_load_illegal_guest_permissions()
+	public static function integrate_load_illegal_guest_permissions(): void
 	{
 		global $context;
 
-		$context['non_guest_permissions'] += array(
+		$context['non_guest_permissions'] += [
 			'post_draft',
 			'post_autosave_draft',
-		);
+		];
 	}
 
 	/**
@@ -124,20 +124,20 @@ class ManageDraftsModule extends AbstractController
 	 *
 	 * @param array $topics_actions
 	 */
-	public static function integrate_topics_maintenance(&$topics_actions)
+	public static function integrate_topics_maintenance(array &$topics_actions): void
 	{
 		global $txt;
 
-		$topics_actions['olddrafts'] = array(
+		$topics_actions['olddrafts'] = [
 			'url' => getUrl('admin', ['action' => 'admin', 'area' => 'maintain', 'sa' => 'topics', 'activity' => 'olddrafts']),
 			'title' => $txt['maintain_old_drafts'],
 			'submit' => $txt['maintain_old_remove'],
 			'confirm' => $txt['maintain_old_drafts_confirm'],
-			'hidden' => array(
+			'hidden' => [
 				'session_var' => 'session_id',
 				'admin-maint_token_var' => 'admin-maint_token',
-			)
-		);
+			]
+		];
 	}
 
 	/**
@@ -145,7 +145,7 @@ class ManageDraftsModule extends AbstractController
 	 *
 	 * @param array $subActions
 	 */
-	public static function integrate_sa_manage_maintenance(&$subActions)
+	public static function integrate_sa_manage_maintenance(array &$subActions): void
 	{
 		$subActions['topics']['activities']['olddrafts'] = static function () {
 			$controller = new ManageDraftsModule(new EventManager());
@@ -158,7 +158,7 @@ class ManageDraftsModule extends AbstractController
 	/**
 	 * This method removes old drafts.
 	 */
-	public function action_olddrafts_display()
+	public function action_olddrafts_display(): void
 	{
 		global $context, $txt;
 
@@ -174,9 +174,9 @@ class ManageDraftsModule extends AbstractController
 		}
 
 		// Errors?  no errors, only success !
-		$context['maintenance_finished'] = array(
-			'errors' => array(sprintf($txt['maintain_done'], $txt['maintain_old_drafts'])),
-		);
+		$context['maintenance_finished'] = [
+			'errors' => [sprintf($txt['maintain_done'], $txt['maintain_old_drafts'])],
+		];
 	}
 
 	/**
@@ -202,7 +202,7 @@ class ManageDraftsModule extends AbstractController
 	 * @event integrate_save_drafts_settings
 	 * @uses Admin template, edit_topic_settings sub-template.
 	 */
-	public function action_draftSettings_display()
+	public function action_draftSettings_display(): void
 	{
 		global $context, $txt;
 
@@ -274,17 +274,17 @@ class ManageDraftsModule extends AbstractController
 		Txt::load('Drafts');
 
 		// Here are all the draft settings, a bit lite for now, but we can add more :P
-		$config_vars = array(
+		$config_vars = [
 			// Draft settings ...
-			array('check', 'drafts_post_enabled'),
-			array('check', 'drafts_pm_enabled'),
-			array('int', 'drafts_keep_days', 'postinput' => $txt['days_word'], 'subtext' => $txt['drafts_keep_days_subnote']),
+			['check', 'drafts_post_enabled'],
+			['check', 'drafts_pm_enabled'],
+			['int', 'drafts_keep_days', 'postinput' => $txt['days_word'], 'subtext' => $txt['drafts_keep_days_subnote']],
 			'',
-			array('check', 'drafts_autosave_enabled', 'subtext' => $txt['drafts_autosave_enabled_subnote']),
-			array('int', 'drafts_autosave_frequency', 'postinput' => $txt['manageposts_seconds'], 'subtext' => $txt['drafts_autosave_frequency_subnote']),
-		);
+			['check', 'drafts_autosave_enabled', 'subtext' => $txt['drafts_autosave_enabled_subnote']],
+			['int', 'drafts_autosave_frequency', 'postinput' => $txt['manageposts_seconds'], 'subtext' => $txt['drafts_autosave_frequency_subnote']],
+		];
 
-		call_integration_hook('integrate_modify_drafts_settings', array(&$config_vars));
+		call_integration_hook('integrate_modify_drafts_settings', [&$config_vars]);
 
 		return $config_vars;
 	}

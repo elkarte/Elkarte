@@ -66,7 +66,7 @@ class Auth extends AbstractController
 	 *
 	 * @uses Login template and language file with the login sub-template.
 	 */
-	public function action_login()
+	public function action_login(): void
 	{
 		global $txt, $context;
 
@@ -130,7 +130,7 @@ class Auth extends AbstractController
 	 *
 	 * @uses the same templates action_login()
 	 */
-	public function action_login2()
+	public function action_login2(): bool
 	{
 		global $txt, $modSettings, $context;
 
@@ -176,7 +176,7 @@ class Auth extends AbstractController
 		$context['default_username'] = isset($_POST['user']) ? preg_replace('~&amp;#(\\d{1,7}|x[0-9a-fA-F]{1,6});~', '&#\\1;', htmlspecialchars($_POST['user'], ENT_COMPAT, 'UTF-8')) : '';
 		$context['default_password'] = '';
 		$context['never_expire'] = $modSettings['cookieTime'] === 525600 || $modSettings['cookieTime'] === 3153600;
-		$context['login_errors'] = array($txt['error_occurred']);
+		$context['login_errors'] = [$txt['error_occurred']];
 		$context['page_title'] = $txt['login'];
 
 		// Add the login chain to the link tree.
@@ -188,7 +188,7 @@ class Auth extends AbstractController
 		// You forgot to type your username, dummy!
 		if (!isset($_POST['user']) || $_POST['user'] === '')
 		{
-			$context['login_errors'] = array($txt['need_username']);
+			$context['login_errors'] = [$txt['need_username']];
 
 			return false;
 		}
@@ -202,7 +202,7 @@ class Auth extends AbstractController
 		// Can't use a password > 64 characters sorry, to long and only good for a DoS attack
 		if (isset($_POST['passwrd']) && strlen($_POST['passwrd']) > 64)
 		{
-			$context['login_errors'] = array($txt['improper_password']);
+			$context['login_errors'] = [$txt['improper_password']];
 
 			return false;
 		}
@@ -210,7 +210,7 @@ class Auth extends AbstractController
 		// Hmm... maybe 'admin' will login with no password. Uhh... NO!
 		if (!isset($_POST['passwrd']) || $_POST['passwrd'] === '')
 		{
-			$context['login_errors'] = array($txt['no_password']);
+			$context['login_errors'] = [$txt['no_password']];
 
 			return false;
 		}
@@ -218,15 +218,15 @@ class Auth extends AbstractController
 		// No funky symbols either.
 		if (preg_match('~[<>&"\'=\\\]~', preg_replace('~(&#(\\d{1,7}|x[0-9a-fA-F]{1,6});)~', '', $_POST['user'])) != 0)
 		{
-			$context['login_errors'] = array($txt['error_invalid_characters_username']);
+			$context['login_errors'] = [$txt['error_invalid_characters_username']];
 
 			return false;
 		}
 
 		// Are we using any sort of integration to validate the login?
-		if (in_array('retry', call_integration_hook('integrate_validate_login', array($_POST['user'], null, $modSettings['cookieTime'])), true))
+		if (in_array('retry', call_integration_hook('integrate_validate_login', [$_POST['user'], null, $modSettings['cookieTime']]), true))
 		{
-			$context['login_errors'] = array($txt['login_hash_error']);
+			$context['login_errors'] = [$txt['login_hash_error']];
 
 			return false;
 		}
@@ -245,7 +245,7 @@ class Auth extends AbstractController
 		// User using 2FA for login? Let's validate the token...
 		if (!empty($modSettings['enableOTP']) && !empty($user_setting['enable_otp']) && empty($_POST['otp_token']))
 		{
-			$context['login_errors'] = array($txt['otp_required']);
+			$context['login_errors'] = [$txt['otp_required']];
 
 			return false;
 		}
@@ -259,7 +259,7 @@ class Auth extends AbstractController
 			$checkResult = $ga->verifyCode($user_setting['otp_secret'], $_POST['otp_token'], 2);
 			if (!$checkResult)
 			{
-				$context['login_errors'] = array($txt['invalid_otptoken']);
+				$context['login_errors'] = [$txt['invalid_otptoken']];
 
 				return false;
 			}
@@ -267,7 +267,7 @@ class Auth extends AbstractController
 			// OTP already used? Sorry, but this is a ONE TIME password..
 			if ($user_setting['otp_used'] === $_POST['otp_token'])
 			{
-				$context['login_errors'] = array($txt['otp_used']);
+				$context['login_errors'] = [$txt['otp_used']];
 
 				return false;
 			}
@@ -276,7 +276,7 @@ class Auth extends AbstractController
 		// Let them try again, it didn't match anything...
 		if (empty($member_found))
 		{
-			$context['login_errors'] = array($txt['username_no_exist']);
+			$context['login_errors'] = [$txt['username_no_exist']];
 
 			return false;
 		}
@@ -302,7 +302,7 @@ class Auth extends AbstractController
 				$user->rehashPassword($sha_passwd);
 
 				// Update the password hash and set up the salt.
-				updateMemberData($user_setting['id_member'], array('passwd' => $user_setting['passwd'], 'password_salt' => $user_setting['password_salt'], 'passwd_flood' => ''));
+				updateMemberData($user_setting['id_member'], ['passwd' => $user_setting['passwd'], 'password_salt' => $user_setting['password_salt'], 'passwd_flood' => '']);
 			}
 			// Okay, they for sure didn't enter the password!
 			else
@@ -321,7 +321,7 @@ class Auth extends AbstractController
 					// Log an error so we know that it didn't go well in the error log.
 					Errors::instance()->log_error($txt['incorrect_password'] . ' - <span class="remove">' . $user_setting['member_name'] . '</span>', 'user');
 
-					$context['login_errors'] = array($txt['incorrect_password']);
+					$context['login_errors'] = [$txt['incorrect_password']];
 
 					return false;
 				}
@@ -333,18 +333,18 @@ class Auth extends AbstractController
 			validatePasswordFlood($user_setting['id_member'], $user_setting['passwd_flood'], true);
 
 			// If we got here then we can reset the flood counter.
-			updateMemberData($user_setting['id_member'], array('passwd_flood' => ''));
+			updateMemberData($user_setting['id_member'], ['passwd_flood' => '']);
 		}
 
 		if ($user_setting->fixSalt() === true)
 		{
-			updateMemberData($user_setting['id_member'], array('password_salt' => $user_setting['password_salt']));
+			updateMemberData($user_setting['id_member'], ['password_salt' => $user_setting['password_salt']]);
 		}
 
 		// Let's track the last used one-time password.
 		if (!empty($_POST['otp_token']))
 		{
-			updateMemberData($user_setting['id_member'], array('otp_used' => (int) $_POST['otp_token']));
+			updateMemberData($user_setting['id_member'], ['otp_used' => (int) $_POST['otp_token']]);
 		}
 
 		// Check their activation status.
@@ -370,7 +370,7 @@ class Auth extends AbstractController
 	 *
 	 * @return array
 	 */
-	private function _other_passwords($posted_password, $member_name, $passwrd, $password_salt)
+	private function _other_passwords($posted_password, $member_name, $passwrd, $password_salt): array
 	{
 		global $modSettings;
 
@@ -440,14 +440,11 @@ class Auth extends AbstractController
 			$other_passwords[] = sha1(strtolower($member_name) . un_htmlspecialchars($posted_password));
 			$other_passwords[] = sha1($passwrd . $_SESSION['session_value']);
 
-			if (!empty($modSettings['enable_password_conversion']))
-			{
-				// BurningBoard3 style of hashing.
-				$other_passwords[] = sha1($password_salt . sha1($password_salt . sha1($posted_password)));
+			// BurningBoard3 style of hashing.
+			$other_passwords[] = sha1($password_salt . sha1($password_salt . sha1($posted_password)));
 
-				// PunBB 1.4 and later
-				$other_passwords[] = sha1($password_salt . sha1($posted_password));
-			}
+			// PunBB 1.4 and later
+			$other_passwords[] = sha1($password_salt . sha1($posted_password));
 
 			// Perhaps we converted from a non UTF-8 db and have a valid password being hashed differently.
 			if (!empty($modSettings['previousCharacterSet']) && $modSettings['previousCharacterSet'] !== 'utf8')
@@ -486,7 +483,7 @@ class Auth extends AbstractController
 		}
 
 		// Allows mods to easily extend the $other_passwords array
-		call_integration_hook('integrate_other_passwords', array(&$other_passwords));
+		call_integration_hook('integrate_other_passwords', [&$other_passwords]);
 
 		return $other_passwords;
 	}
@@ -504,7 +501,7 @@ class Auth extends AbstractController
 	 * @param bool $redirect if true, redirect to the board index
 	 * @throws \ElkArte\Exceptions\Exception
 	 */
-	public function action_logout($internal = false, $redirect = true)
+	public function action_logout($internal = false, $redirect = true): void
 	{
 		// Make sure they aren't being auto-logged out.
 		if (!$internal)
@@ -523,10 +520,10 @@ class Auth extends AbstractController
 		unset($_SESSION['first_login']);
 
 		// Just ensure they aren't a guest!
-		if (empty(User::$info['is_guest']))
+		if (empty(User::$info->is_guest))
 		{
 			// Pass the logout information to integrations.
-			call_integration_hook('integrate_logout', array(User::$settings['member_name']));
+			call_integration_hook('integrate_logout', [User::$settings['member_name']]);
 
 			// If you log out, you aren't online anymore :P.
 			require_once(SUBSDIR . '/Logging.subs.php');
@@ -534,8 +531,8 @@ class Auth extends AbstractController
 		}
 
 		// Logout? Let's kill the admin/moderate/other sessions, too.
-		$types = array('admin', 'moderate');
-		call_integration_hook('integrate_validateSession', array(&$types));
+		$types = ['admin', 'moderate'];
+		call_integration_hook('integrate_validateSession', [&$types]);
 		foreach ($types as $type)
 		{
 			unset($_SESSION[$type . '_time']);
@@ -552,7 +549,7 @@ class Auth extends AbstractController
 		{
 			User::$settings->fixSalt(true);
 			require_once(SUBSDIR . '/Members.subs.php');
-			updateMemberData(User::$info['id'], array('password_salt' => User::$settings['password_salt']));
+			updateMemberData(User::$info['id'], ['password_salt' => User::$settings['password_salt']]);
 		}
 
 		// Off to the merry board index we go!
@@ -586,7 +583,7 @@ class Auth extends AbstractController
 	 *
 	 * @uses 'kick_guest' sub template found in Login.template.php.
 	 */
-	public function action_kickguest()
+	public function action_kickguest(): void
 	{
 		global $txt, $context;
 
@@ -613,7 +610,7 @@ class Auth extends AbstractController
 	 * - Displays a login screen with sub template 'maintenance'.
 	 * - It sends a 503 header, so search engines don't index while we're in maintenance mode.
 	 */
-	public function action_maintenance_mode()
+	public function action_maintenance_mode(): void
 	{
 		global $txt, $mtitle, $mmessage, $context;
 
@@ -623,7 +620,7 @@ class Auth extends AbstractController
 
 		// Send a 503 header, so search engines don't bother indexing while we're in maintenance mode.
 		Headers::instance()
-			->headerSpecial('HTTP/1.1 503 Service Temporarily Unavailable')
+			->httpCode(503)
 			->header('Status', '503 Service Temporarily Unavailable')
 			->header('Retry-After', '3600');
 
@@ -637,7 +634,7 @@ class Auth extends AbstractController
 	/**
 	 * Double check the cookie.
 	 */
-	public function action_check()
+	public function action_check(): void
 	{
 		// Only our members, please.
 		if ($this->user->is_guest === false)
@@ -661,7 +658,7 @@ class Auth extends AbstractController
 	/**
 	 * Ping the server to keep the session alive and not let it disappear.
 	 */
-	public function action_keepalive()
+	public function action_keepalive(): void
 	{
 		dieGif();
 	}
@@ -689,7 +686,7 @@ function checkActivation()
 
 	if (!isset($context['login_errors']))
 	{
-		$context['login_errors'] = array();
+		$context['login_errors'] = [];
 	}
 
 	// What is the true activation status of this account?
@@ -714,8 +711,8 @@ function checkActivation()
 		if (isset($_REQUEST['undelete']))
 		{
 			require_once(SUBSDIR . '/Members.subs.php');
-			updateMemberData(User::$settings['id_member'], array('is_activated' => 1));
-			updateSettings(array('unapprovedMembers' => ($modSettings['unapprovedMembers'] > 0 ? $modSettings['unapprovedMembers'] - 1 : 0)));
+			updateMemberData(User::$settings['id_member'], ['is_activated' => 1]);
+			updateSettings(['unapprovedMembers' => ($modSettings['unapprovedMembers'] > 0 ? $modSettings['unapprovedMembers'] - 1 : 0)]);
 		}
 		else
 		{
@@ -760,7 +757,7 @@ function doLogin(UserSettingsLoader $user)
 	User::reloadByUser($user, true);
 
 	// Call login integration functions.
-	call_integration_hook('integrate_login', array(User::$settings['member_name'], $modSettings['cookieTime']));
+	call_integration_hook('integrate_login', [User::$settings['member_name'], $modSettings['cookieTime']]);
 
 	// Bam!  Cookie set.  A session too, just in case.
 	setLoginCookie(60 * $modSettings['cookieTime'], User::$settings['id_member'], hash('sha256', (User::$settings['passwd'] . User::$settings['password_salt'])));
@@ -792,7 +789,7 @@ function doLogin(UserSettingsLoader $user)
 
 	// You've logged in, haven't you?
 	require_once(SUBSDIR . '/Members.subs.php');
-	updateMemberData(User::$info->id, array('last_login' => time(), 'member_ip' => User::$info->ip, 'member_ip2' => $req->ban_ip()));
+	updateMemberData(User::$info->id, ['last_login' => time(), 'member_ip' => User::$info->ip, 'member_ip2' => $req->ban_ip()]);
 
 	// Get rid of the online entry for that old guest....
 	require_once(SUBSDIR . '/Logging.subs.php');

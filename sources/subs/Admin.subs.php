@@ -66,15 +66,15 @@ function getServerVersions($checkFor)
 	if (in_array('gd', $checkFor) && function_exists('gd_info'))
 	{
 		$temp = gd_info();
-		$versions['gd'] = array('title' => $txt['support_versions_gd'], 'version' => $temp['GD Version']);
+		$versions['gd'] = ['title' => $txt['support_versions_gd'], 'version' => $temp['GD Version']];
 	}
 
 	// Why not have a look at ImageMagick? If installed, we should show version information for it too.
 	if (in_array('imagick', $checkFor) && class_exists('Imagick'))
 	{
 		$temp = new Imagick();
-		$temp2 = $temp->getVersion();
-		$versions['imagick'] = array('title' => $txt['support_versions_imagick'], 'version' => $temp2['versionString']);
+		$temp2 = $temp::getVersion();
+		$versions['imagick'] = ['title' => $txt['support_versions_imagick'], 'version' => $temp2['versionString']];
 	}
 
 	if (in_array('opcache', $checkFor) && extension_loaded('Zend OPcache'))
@@ -146,18 +146,18 @@ function getQuickAdminTasks()
 	global $txt, $context;
 
 	// The format of this array is: permission, action, title, description, icon.
-	$quick_admin_tasks = array(
-		array('', 'credits', 'support_credits_title', 'support_credits_info', 'support_and_credits.png'),
-		array('admin_forum', 'featuresettings', 'modSettings_title', 'modSettings_info', 'features_and_options.png'),
-		array('admin_forum', 'maintain', 'maintain_title', 'maintain_info', 'forum_maintenance.png'),
-		array('manage_permissions', 'permissions', 'edit_permissions', 'edit_permissions_info', 'permissions_lg.png'),
-		array('admin_forum', 'theme;sa=admin;' . $context['session_var'] . '=' . $context['session_id'], 'theme_admin', 'theme_admin_info', 'themes_and_layout.png'),
-		array('admin_forum', 'packages', 'package', 'package_info', 'packages_lg.png'),
-		array('manage_smileys', 'smileys', 'smileys_manage', 'smileys_manage_info', 'smilies_and_messageicons.png'),
-		array('moderate_forum', 'viewmembers', 'admin_users', 'member_center_info', 'members_lg.png'),
-	);
+	$quick_admin_tasks = [
+		['', 'credits', 'support_credits_title', 'support_credits_info', 'support_and_credits.png'],
+		['admin_forum', 'featuresettings', 'modSettings_title', 'modSettings_info', 'features_and_options.png'],
+		['admin_forum', 'maintain', 'maintain_title', 'maintain_info', 'forum_maintenance.png'],
+		['manage_permissions', 'permissions', 'edit_permissions', 'edit_permissions_info', 'permissions_lg.png'],
+		['admin_forum', 'theme;sa=admin;' . $context['session_var'] . '=' . $context['session_id'], 'theme_admin', 'theme_admin_info', 'themes_and_layout.png'],
+		['admin_forum', 'packages', 'package', 'package_info', 'packages_lg.png'],
+		['manage_smileys', 'smileys', 'smileys_manage', 'smileys_manage_info', 'smilies_and_messageicons.png'],
+		['moderate_forum', 'viewmembers', 'admin_users', 'member_center_info', 'members_lg.png'],
+	];
 
-	$available_admin_tasks = array();
+	$available_admin_tasks = [];
 	foreach ($quick_admin_tasks as $task)
 	{
 		if (!empty($task[0]) && !allowedTo($task[0]))
@@ -165,25 +165,25 @@ function getQuickAdminTasks()
 			continue;
 		}
 
-		$available_admin_tasks[] = array(
+		$available_admin_tasks[] = [
 			'href' => getUrl('admin', ['action' => 'admin', 'area' => $task[1]]),
 			'link' => '<a href="' . getUrl('admin', ['action' => 'admin', 'area' => $task[1]]) . '">' . $txt[$task[2]] . '</a>',
 			'title' => $txt[$task[2]],
 			'description' => $txt[$task[3]],
 			'icon' => $task[4],
 			'is_last' => false
-		);
+		];
 	}
 
 	if (count($available_admin_tasks) % 2 === 1)
 	{
-		$available_admin_tasks[] = array(
+		$available_admin_tasks[] = [
 			'href' => '',
 			'link' => '',
 			'title' => '',
 			'description' => '',
 			'is_last' => true
-		);
+		];
 		$available_admin_tasks[count($available_admin_tasks) - 2]['is_last'] = true;
 	}
 	elseif (count($available_admin_tasks) !== 0)
@@ -232,7 +232,7 @@ function updateAdminPreferences()
 	// Just check we haven't ended up with something theme exclusive somehow.
 	removeThemeOptions('custom', 'all', 'admin_preferences');
 
-	updateThemeOptions(array(1, User::$info->id, 'admin_preferences', $options['admin_preferences']));
+	updateThemeOptions([1, User::$info->id, 'admin_preferences', $options['admin_preferences']]);
 
 	// Make sure we invalidate any cache.
 	Cache::instance()->put('theme_settings-' . $settings['theme_id'] . ':' . User::$info->id, null, 0);
@@ -250,11 +250,11 @@ function updateAdminPreferences()
  * - It sends an email.
  *
  * @param string $template
- * @param mixed[] $replacements
+ * @param array $replacements
  * @param int[] $additional_recipients
  * @package Admin
  */
-function emailAdmins($template, $replacements = array(), $additional_recipients = array())
+function emailAdmins($template, $replacements = [], $additional_recipients = [])
 {
 	global $language, $modSettings;
 
@@ -270,11 +270,11 @@ function emailAdmins($template, $replacements = array(), $additional_recipients 
 		WHERE permission = {string:admin_forum}
 			AND add_deny = {int:add_deny}
 			AND id_group != {int:id_group}',
-		array(
+		[
 			'add_deny' => 1,
 			'id_group' => 0,
 			'admin_forum' => 'admin_forum',
-		)
+		]
 	)->fetch_all();
 	$groups[] = 1;
 	$groups = array_unique($groups);
@@ -285,11 +285,11 @@ function emailAdmins($template, $replacements = array(), $additional_recipients 
 		WHERE (id_group IN ({array_int:group_list}) OR FIND_IN_SET({raw:group_array_implode}, additional_groups) != 0)
 			AND notify_types != {int:notify_types}
 		ORDER BY lngfile',
-		array(
+		[
 			'group_list' => $groups,
 			'notify_types' => 4,
 			'group_array_implode' => implode(', additional_groups) != 0 OR FIND_IN_SET(', $groups),
-		)
+		]
 	)->fetch_callback(
 		function ($row) use ($replacements, $modSettings, $language, $template) {
 			// Stick their particulars in the replacement data.
@@ -350,10 +350,10 @@ function custom_profiles_toggle_callback($value)
 			UPDATE {db_prefix}custom_fields
 			SET active = {int:inactive}
 			WHERE active = {int:active}',
-			array(
+			[
 				'active' => 1,
 				'inactive' => -1,
-			)
+			]
 		);
 	}
 	else
@@ -363,10 +363,10 @@ function custom_profiles_toggle_callback($value)
 			UPDATE {db_prefix}custom_fields
 			SET active = {int:inactive}
 			WHERE active = {int:active}',
-			array(
+			[
 				'active' => -1,
 				'inactive' => 1,
-			)
+			]
 		);
 
 		// Set the display cache for the custom profile fields.
@@ -464,11 +464,11 @@ function disableModules($module, $controllers)
 		}
 		else
 		{
-			$existing = array();
+			$existing = [];
 		}
 
 		$existing = array_diff($existing, (array) $module);
-		updateSettings(array('modules_' . $controller => implode(',', $existing)));
+		updateSettings(['modules_' . $controller => implode(',', $existing)]);
 	}
 }
 

@@ -40,14 +40,14 @@ class XmlPreview extends AbstractController
 	{
 		global $context;
 
-		$subActions = array(
-			'newspreview' => array($this, 'action_newspreview'),
-			'newsletterpreview' => array($this, 'action_newsletterpreview'),
-			'sig_preview' => array($this, 'action_sig_preview'),
-			'warning_preview' => array($this, 'action_warning_preview'),
-			'bounce_preview' => array($this, 'action_bounce_preview'),
-			'invalid' => array(),
-		);
+		$subActions = [
+			'newspreview' => [$this, 'action_newspreview'],
+			'newsletterpreview' => [$this, 'action_newsletterpreview'],
+			'sig_preview' => [$this, 'action_sig_preview'],
+			'warning_preview' => [$this, 'action_warning_preview'],
+			'bounce_preview' => [$this, 'action_bounce_preview'],
+			'invalid' => [],
+		];
 
 		// Valid action?
 		$action = new Action('xml_preview');
@@ -71,18 +71,18 @@ class XmlPreview extends AbstractController
 	 *
 	 *  - Calls parse bbc to render bbc tags for the preview
 	 */
-	public function action_newspreview()
+	public function action_newspreview(): void
 	{
 		global $context;
 
 		// Needed for parse bbc
 		require_once(SUBSDIR . '/Post.subs.php');
 
-		$errors = array();
+		$errors = [];
 		$news = isset($this->_req->post->news) ? Util::htmlspecialchars($this->_req->post->news, ENT_QUOTES) : '';
 		if (empty($news))
 		{
-			$errors[] = array('value' => 'no_news');
+			$errors[] = ['value' => 'no_news'];
 		}
 		else
 		{
@@ -92,20 +92,20 @@ class XmlPreview extends AbstractController
 		$bbc_parser = ParserWrapper::instance();
 
 		// Return the xml response to the template
-		$context['xml_data'] = array(
-			'news' => array(
+		$context['xml_data'] = [
+			'news' => [
 				'identifier' => 'parsedNews',
-				'children' => array(
-					array(
+				'children' => [
+					[
 						'value' => $bbc_parser->parseNews($news),
-					),
-				),
-			),
-			'errors' => array(
+					],
+				],
+			],
+			'errors' => [
 				'identifier' => 'error',
 				'children' => $errors
-			),
-		);
+			],
+		];
 	}
 
 	/**
@@ -113,7 +113,7 @@ class XmlPreview extends AbstractController
 	 *
 	 *  - Uses prepareMailingForPreview to create the actual preview
 	 */
-	public function action_newsletterpreview()
+	public function action_newsletterpreview(): void
 	{
 		global $context, $txt;
 
@@ -121,7 +121,7 @@ class XmlPreview extends AbstractController
 		require_once(SUBSDIR . '/Mail.subs.php');
 		Txt::load('Errors');
 
-		$context['post_error']['errors'] = array();
+		$context['post_error']['errors'] = [];
 		$context['send_pm'] = empty($this->_req->post->send_pm) ? 0 : 1;
 		$context['send_html'] = empty($this->_req->post->send_html) ? 0 : 1;
 
@@ -144,7 +144,7 @@ class XmlPreview extends AbstractController
 	/**
 	 * Let them see what their signature looks like before they use it like spam
 	 */
-	public function action_sig_preview()
+	public function action_sig_preview(): void
 	{
 		global $context, $txt;
 
@@ -156,15 +156,15 @@ class XmlPreview extends AbstractController
 
 		// @todo Temporary
 		// Borrowed from loadAttachmentContext in Display.controller.php
-		$can_change = $is_owner ? allowedTo(array('profile_extra_any', 'profile_extra_own')) : allowedTo('profile_extra_any');
+		$can_change = $is_owner ? allowedTo(['profile_extra_any', 'profile_extra_own']) : allowedTo('profile_extra_any');
 
-		$errors = array();
+		$errors = [];
 		if (!empty($user) && $can_change)
 		{
 			require_once(SUBSDIR . '/Members.subs.php');
 
 			// Get the current signature
-			$member = getBasicMemberData($user, array('preferences' => true));
+			$member = getBasicMemberData($user, ['preferences' => true]);
 
 			$member['signature'] = censor($member['signature']);
 			$bbc_parser = ParserWrapper::instance();
@@ -177,7 +177,7 @@ class XmlPreview extends AbstractController
 			// An odd check for errors to be sure
 			if ($validation !== true && $validation !== false)
 			{
-				$errors[] = array('value' => $txt['profile_error_' . $validation], 'attributes' => array('type' => 'error'));
+				$errors[] = ['value' => $txt['profile_error_' . $validation], 'attributes' => ['type' => 'error']];
 			}
 
 			preparsecode($preview_signature);
@@ -189,67 +189,67 @@ class XmlPreview extends AbstractController
 		{
 			if ($is_owner)
 			{
-				$errors[] = array('value' => $txt['cannot_profile_extra_own'], 'attributes' => array('type' => 'error'));
+				$errors[] = ['value' => $txt['cannot_profile_extra_own'], 'attributes' => ['type' => 'error']];
 			}
 			else
 			{
-				$errors[] = array('value' => $txt['cannot_profile_extra_any'], 'attributes' => array('type' => 'error'));
+				$errors[] = ['value' => $txt['cannot_profile_extra_any'], 'attributes' => ['type' => 'error']];
 			}
 		}
 		else
 		{
-			$errors[] = array('value' => $txt['no_user_selected'], 'attributes' => array('type' => 'error'));
+			$errors[] = ['value' => $txt['no_user_selected'], 'attributes' => ['type' => 'error']];
 		}
 
 		// Return the response for the template
-		$context['xml_data']['signatures'] = array(
+		$context['xml_data']['signatures'] = [
 			'identifier' => 'signature',
-			'children' => array()
-		);
+			'children' => []
+		];
 
 		if (isset($member['signature']))
 		{
-			$context['xml_data']['signatures']['children'][] = array(
+			$context['xml_data']['signatures']['children'][] = [
 				'value' => $member['signature'],
-				'attributes' => array('type' => 'current'),
-			);
+				'attributes' => ['type' => 'current'],
+			];
 		}
 
 		if (isset($preview_signature))
 		{
-			$context['xml_data']['signatures']['children'][] = array(
+			$context['xml_data']['signatures']['children'][] = [
 				'value' => $preview_signature,
-				'attributes' => array('type' => 'preview'),
-			);
+				'attributes' => ['type' => 'preview'],
+			];
 		}
 
 		if (!empty($errors))
 		{
-			$context['xml_data']['errors'] = array(
+			$context['xml_data']['errors'] = [
 				'identifier' => 'error',
 				'children' => array_merge(
-					array(
-						array(
+					[
+						[
 							'value' => $txt['profile_errors_occurred'],
-							'attributes' => array('type' => 'errors_occurred'),
-						),
-					), $errors
+							'attributes' => ['type' => 'errors_occurred'],
+						],
+					], $errors
 				),
-			);
+			];
 		}
 	}
 
 	/**
 	 * Used to preview custom warning templates before they are saved to submitted to the user
 	 */
-	public function action_warning_preview()
+	public function action_warning_preview(): void
 	{
 		global $context, $txt, $scripturl, $mbname;
 
 		require_once(SUBSDIR . '/Post.subs.php');
 		Txt::load('Errors+ModerationCenter');
 
-		$context['post_error']['errors'] = array();
+		$context['post_error']['errors'] = [];
 
 		// If you can't issue the warning, what are you doing here?
 		if (allowedTo('issue_warning'))
@@ -284,18 +284,18 @@ class XmlPreview extends AbstractController
 				 * - {SCRIPTURL} - Web address of forum.
 				 * - {REGARDS} - Standard email sign-off.
 				 */
-				$find = array(
+				$find = [
 					'{MEMBER}',
 					'{FORUMNAME}',
 					'{SCRIPTURL}',
 					'{REGARDS}',
-				);
-				$replace = array(
+				];
+				$replace = [
 					$this->user->name,
 					$mbname,
 					$scripturl,
 					replaceBasicActionUrl($txt['regards_team']),
-				);
+				];
 				$warning_body = str_replace($find, $replace, $warning_body);
 			}
 
@@ -311,7 +311,7 @@ class XmlPreview extends AbstractController
 		}
 		else
 		{
-			$context['post_error']['errors'][] = array('value' => $txt['cannot_issue_warning'], 'attributes' => array('type' => 'error'));
+			$context['post_error']['errors'][] = ['value' => $txt['cannot_issue_warning'], 'attributes' => ['type' => 'error']];
 		}
 
 		$context['sub_template'] = 'generic_preview';
@@ -320,14 +320,14 @@ class XmlPreview extends AbstractController
 	/**
 	 * Used to preview custom email bounce templates before they are saved for use
 	 */
-	public function action_bounce_preview()
+	public function action_bounce_preview(): void
 	{
 		global $context, $txt, $scripturl, $mbname, $modSettings;
 
 		require_once(SUBSDIR . '/Post.subs.php');
 		Txt::load('Errors+ModerationCenter');
 
-		$context['post_error']['errors'] = array();
+		$context['post_error']['errors'] = [];
 
 		// If you can't approve emails, what are you doing here?
 		if (allowedTo('approve_emails'))
@@ -365,20 +365,20 @@ class XmlPreview extends AbstractController
 				 * - {REGARDS} - Standard email sign-off.
 				 * - {EMAILREGARDS} - Maybe a bit more friendly sign-off.
 				 */
-				$find = array(
+				$find = [
 					'{FORUMNAME}',
 					'{FORUMNAMESHORT}',
 					'{SCRIPTURL}',
 					'{REGARDS}',
 					'{EMAILREGARDS}',
-				);
-				$replace = array(
+				];
+				$replace = [
 					$mbname,
 					(empty($modSettings['maillist_sitename']) ? $mbname : $modSettings['maillist_sitename']),
 					$scripturl,
 					replaceBasicActionUrl($txt['regards_team']),
 					(empty($modSettings['maillist_sitename_regards']) ? '' : $modSettings['maillist_sitename_regards'])
-				);
+				];
 				$body = str_replace($find, $replace, $body);
 			}
 

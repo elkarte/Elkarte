@@ -65,7 +65,7 @@ abstract class AbstractCacheMethod implements CacheMethodInterface
 	 * @param string $key
 	 * @return string
 	 */
-	public function getprefixedKey($key)
+	public function getprefixedKey($key): string
 	{
 		return $this->prefix . '::' . $key;
 	}
@@ -73,7 +73,7 @@ abstract class AbstractCacheMethod implements CacheMethodInterface
 	/**
 	 * {@inheritDoc}
 	 */
-	public function isMiss()
+	public function isMiss(): bool
 	{
 		return $this->is_miss;
 	}
@@ -81,7 +81,7 @@ abstract class AbstractCacheMethod implements CacheMethodInterface
 	/**
 	 * {@inheritDoc}
 	 */
-	public function remove($key)
+	public function remove($key): void
 	{
 		$this->put($key, null, 0);
 	}
@@ -96,7 +96,7 @@ abstract class AbstractCacheMethod implements CacheMethodInterface
 	/**
 	 * {@inheritDoc}
 	 */
-	public function title()
+	public function title(): string
 	{
 		return $this->title;
 	}
@@ -104,7 +104,7 @@ abstract class AbstractCacheMethod implements CacheMethodInterface
 	/**
 	 * {@inheritDoc}
 	 */
-	public function getStats()
+	public function getStats(): array
 	{
 		return [];
 	}

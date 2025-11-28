@@ -42,27 +42,27 @@ class WeeklyMaintenance implements ScheduledTaskInterface
 		$db = database();
 
 		// Delete some settings that needn't be set if they are otherwise empty.
-		$emptySettings = array(
+		$emptySettings = [
 			'warning_mute', 'warning_moderate', 'warning_watch', 'warning_show', 'disableCustomPerPage', 'spider_mode', 'spider_group',
 			'paid_currency_code', 'paid_currency_symbol', 'paid_email_to', 'paid_email', 'paid_enabled', 'paypal_email',
 			'search_enable_captcha', 'search_floodcontrol_time', 'show_spider_online',
-		);
+		];
 
 		$db->query('', '
 			DELETE FROM {db_prefix}settings
 			WHERE variable IN ({array_string:setting_list})
 				AND (value = {string:zero_value} OR value = {string:blank_value})',
-			array(
+			[
 				'zero_value' => '0',
 				'blank_value' => '',
 				'setting_list' => $emptySettings,
-			)
+			]
 		);
 
 		// Some settings we never want to keep - they are just there for temporary purposes.
-		$deleteAnywaySettings = array(
+		$deleteAnywaySettings = [
 			'attachment_full_notified',
-		);
+		];
 
 		removeSettings($deleteAnywaySettings);
 
@@ -82,9 +82,9 @@ class WeeklyMaintenance implements ScheduledTaskInterface
 				$db->query('', '
 					DELETE FROM {db_prefix}log_errors
 					WHERE log_time < {int:log_time}',
-					array(
+					[
 						'log_time' => $t,
-					)
+					]
 				);
 			}
 
@@ -97,10 +97,10 @@ class WeeklyMaintenance implements ScheduledTaskInterface
 					DELETE FROM {db_prefix}log_actions
 					WHERE log_time < {int:log_time}
 						AND id_log = {int:moderation_log}',
-					array(
+					[
 						'log_time' => $t,
 						'moderation_log' => 1,
-					)
+					]
 				);
 			}
 
@@ -112,9 +112,9 @@ class WeeklyMaintenance implements ScheduledTaskInterface
 				$db->query('', '
 					DELETE FROM {db_prefix}log_banned
 					WHERE log_time < {int:log_time}',
-					array(
+					[
 						'log_time' => $t,
-					)
+					]
 				);
 			}
 
@@ -124,17 +124,17 @@ class WeeklyMaintenance implements ScheduledTaskInterface
 				$t = time() - $modSettings['pruneReportLog'] * 86400;
 
 				// This one is more complex then the other logs.  First we need to figure out which reports are too old.
-				$reports = array();
+				$reports = [];
 				$db->fetchQuery('
 					SELECT 
 						id_report
 					FROM {db_prefix}log_reported
 					WHERE time_started < {int:time_started}
 						AND closed = {int:closed}',
-					array(
+					[
 						'time_started' => $t,
 						'closed' => 1,
-					)
+					]
 				)->fetch_callback(
 					static function ($row) use (&$reports) {
 						if (isset($row[0]))
@@ -150,17 +150,17 @@ class WeeklyMaintenance implements ScheduledTaskInterface
 					$db->query('', '
 						DELETE FROM {db_prefix}log_reported
 						WHERE id_report IN ({array_int:report_list})',
-						array(
+						[
 							'report_list' => $reports,
-						)
+						]
 					);
 					// And delete the comments for those reports...
 					$db->query('', '
 						DELETE FROM {db_prefix}log_reported_comments
 						WHERE id_report IN ({array_int:report_list})',
-						array(
+						[
 							'report_list' => $reports,
-						)
+						]
 					);
 				}
 			}
@@ -173,9 +173,9 @@ class WeeklyMaintenance implements ScheduledTaskInterface
 				$db->query('', '
 					DELETE FROM {db_prefix}log_scheduled_tasks
 					WHERE time_run < {int:time_run}',
-					array(
+					[
 						'time_run' => $t,
-					)
+					]
 				);
 			}
 
@@ -196,21 +196,21 @@ class WeeklyMaintenance implements ScheduledTaskInterface
 				AND status = {int:not_active}
 				AND start_time < {int:start_time}
 				AND payments_pending < {int:payments_pending}',
-			array(
+			[
 				'no_end_time' => 0,
 				'not_active' => 0,
 				'start_time' => time() - 60,
 				'payments_pending' => 1,
-			)
+			]
 		);
 
 		// Some OS's don't seem to clean out their sessions.
 		$db->query('', '
 			DELETE FROM {db_prefix}sessions
 			WHERE last_update < {int:last_update}',
-			array(
+			[
 				'last_update' => time() - 86400,
-			)
+			]
 		);
 
 		return true;

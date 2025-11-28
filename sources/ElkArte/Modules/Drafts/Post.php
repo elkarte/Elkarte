@@ -93,7 +93,7 @@ class Post extends AbstractModule
 	 *
 	 * @param bool $really_previewing
 	 */
-	public function prepare_modifying(&$really_previewing)
+	public function prepare_modifying(&$really_previewing): void
 	{
 		$really_previewing = $really_previewing && !isset($_REQUEST['save_draft']);
 	}
@@ -113,7 +113,7 @@ class Post extends AbstractModule
 	 * @param int $topic
 	 * @param TemplateLayers $template_layers
 	 */
-	public function finalize_post_form(&$editorOptions, $board, $topic, $template_layers)
+	public function finalize_post_form(&$editorOptions, $board, $topic, $template_layers): void
 	{
 		global $context, $options, $txt;
 
@@ -205,7 +205,7 @@ class Post extends AbstractModule
 	 * @param $id_topic
 	 * @return int number of drafts found
 	 */
-	protected function _user_has_drafts($member_id, $id_topic)
+	protected function _user_has_drafts($member_id, $id_topic): int
 	{
 		if (empty($member_id))
 		{
@@ -220,9 +220,9 @@ class Post extends AbstractModule
 	/**
 	 * If a draft has been selected, will use loadDraft function to fetch it into the editor
 	 *
-	 * @return bool true if a draft is laoded
+	 * @return bool true if a draft is loaded
 	 */
-	protected function _load_draft()
+	protected function _load_draft(): bool
 	{
 		require_once(SUBSDIR . '/Drafts.subs.php');
 		$req = HttpReq::instance();
@@ -256,7 +256,7 @@ class Post extends AbstractModule
 	 * @param int|bool $id_topic if set, load drafts for the specified topic
 	 * @return bool|null
 	 */
-	protected function _prepareDraftsContext($member_id, $id_topic = false)
+	protected function _prepareDraftsContext($member_id, $id_topic = false): ?bool
 	{
 		global $scripturl, $context, $txt;
 
@@ -303,7 +303,7 @@ class Post extends AbstractModule
 	 * When the prepare_save_post event fires, checks if it was
 	 * in response to a save or load draft event
 	 */
-	public function prepare_save_post()
+	public function prepare_save_post(): void
 	{
 		// Drafts enabled and needed?
 		if (isset($_POST['save_draft']) || isset($_POST['id_draft']) || isset($_POST['load_drafts']))
@@ -315,7 +315,7 @@ class Post extends AbstractModule
 	/**
 	 * Call the appropriate draft action, save, load or nothing
 	 */
-	public function before_save_post()
+	public function before_save_post(): void
 	{
 		// If drafts are enabled, then pass this off
 		if (isset($_POST['save_draft']) && !empty(self::$_drafts_save))
@@ -333,7 +333,7 @@ class Post extends AbstractModule
 	 *
 	 * @throws ControllerRedirectException
 	 */
-	private function _save_draft()
+	private function _save_draft(): void
 	{
 		global $context, $board;
 
@@ -385,21 +385,23 @@ class Post extends AbstractModule
 	 *
 	 * @throws ControllerRedirectException
 	 */
-	private function _load_drafts()
+	private function _load_drafts(): bool
 	{
 		global $context;
 
 		$req = HttpReq::instance();
 		$post_errors = ErrorContext::context('post', 1);
-		$topic = $req->getPost('topic', 'intval', 0);
+		$topic = $req->getPost('topic', 'intval');
 
 		// @todo handle topic=0 board <> 0 indicating a new topic, we need a new sub to load those drafts.
 		$board = $req->getPost('board', 'intval', 0);
-		if (empty($topic) && !empty($board))
+		if (!isset($topic) && !empty($board))
+		{
 			return false;
+		}
 
 		// Validate the request
-		if (!empty($topic) && $this->getApi() !== false && !$post_errors->hasError('session_timeout'))
+		if (isset($topic) && $this->getApi() !== false && !$post_errors->hasError('session_timeout'))
 		{
 			$this->_prepareDraftsContext($this->user->id, $topic);
 
@@ -419,7 +421,7 @@ class Post extends AbstractModule
 	/**
 	 * Fired after the saving of a post, attempts to remove any drafts that are associated with it
 	 */
-	public function after_save_post()
+	public function after_save_post(): void
 	{
 		$req = HttpReq::instance();
 		$id_draft = $req->getPost('id_draft', 'intval', 0);

@@ -87,7 +87,7 @@ class FsockFetchWebdata
 	 * @param string|string[] $post_data
 	 *
 	 */
-	public function get_url_data($url, $post_data = '')
+	public function get_url_data($url, $post_data = ''): void
 	{
 		// Prepare any given post data
 		if (!empty($post_data))
@@ -114,7 +114,7 @@ class FsockFetchWebdata
 	 *
 	 * @return bool
 	 */
-	private function _fopenRequest($url)
+	private function _fopenRequest($url): bool
 	{
 		// We do have a url I hope
 		$this->_setOptions($url);
@@ -166,51 +166,59 @@ class FsockFetchWebdata
 	}
 
 	/**
-	 * Parses a url into the components we need
+	 * Parses an url into the components we need
 	 *
 	 * @param string $url
 	 */
-	private function _setOptions($url)
+	private function _setOptions($url): void
 	{
 		$this->_url = [];
 		$this->_response['url'] = $url;
-		$this->_content_length = empty($this->_user_options['max_length']) ? 0 : (int) $this->_user_options['max_length'];
+		$this->_content_length = $this->_user_options['max_length'] ?? 0;
 
-		// Make sure its valid before we parse it out
+		// Use parse_url only once and cache results
 		if (filter_var($url, FILTER_VALIDATE_URL))
 		{
-			// Get the elements for this url
 			$url_parse = parse_url($url);
+			if ($url_parse === false)
+			{
+				return;
+			}
+
 			$this->_url['host_raw'] = $url_parse['host'];
+			$scheme_is_https = ($url_parse['scheme'] === 'https');
 
-			// Handle SSL connections
-			if ($url_parse['scheme'] === 'https')
-			{
-				$this->_url['host'] = 'ssl://' . $url_parse['host'];
-				$this->_url['port'] = empty($this->_url['port']) ? 443 : $this->_url['port'];
-			}
-			else
-			{
-				$this->_url['host'] = $url_parse['host'];
-				$this->_url['port'] = empty($this->_url['port']) ? 80 : $this->_url['port'];
-			}
+			$this->_url['host'] = ($scheme_is_https ? 'ssl://' : '') . $url_parse['host'];
+			$this->_url['port'] = $url_parse['port'] ?? ($scheme_is_https ? 443 : 80);
 
-			// Fix/Finalize the data path
-			$this->_url['path'] = ($url_parse['path'] ?? '/') . (isset($url_parse['query']) ? '?' . $url_parse['query'] : '');
+			// Combine path and query efficiently
+			$this->_url['path'] = $url_parse['path'] ?? '/';
+			if (isset($url_parse['query']))
+			{
+				$this->_url['path'] .= '?' . $url_parse['query'];
+			}
 		}
 	}
+
 
 	/**
 	 * Connect to the host/port as requested
 	 *
 	 * @return bool
 	 */
-	private function _sockOpen()
+	private function _sockOpen(): bool
 	{
 		// no socket, then we need to open one to do much
 		if (!is_resource($this->_fp))
 		{
-			set_error_handler(static function () { /* ignore errors */ });
+			stream_context_create([
+				'socket' => [
+					'tcp_nodelay' => true,
+				]
+			]);
+
+			set_error_handler(static function () { /* ignore errors */
+			});
 			try
 			{
 				$this->_fp = fsockopen($this->_url['host'], $this->_url['port'], $errno, $errstr, 5);
@@ -232,7 +240,7 @@ class FsockFetchWebdata
 	/**
 	 * Make the request to the host, either get or post, and get the initial response.
 	 */
-	private function _makeRequest()
+	private function _makeRequest(): void
 	{
 		$request = (empty($this->_post_data) ? 'GET ' : 'POST ') . $this->_url['path'] . ' HTTP/1.1' . "\r\n";
 		$request .= 'Host: ' . $this->_url['host_raw'] . "\r\n";
@@ -263,7 +271,7 @@ class FsockFetchWebdata
 	/**
 	 * Sets the proper Keep-Alive header and sets the fp/host if the option is enabled
 	 */
-	private function _keepAlive()
+	private function _keepAlive(): string
 	{
 		if ($this->_keep_alive)
 		{
@@ -282,52 +290,53 @@ class FsockFetchWebdata
 	/**
 	 * Reads the stream until the end of the headers section and then parses those headers
 	 */
-	private function _readHeaders()
+	private function _readHeaders(): void
 	{
 		$this->_headers = [];
-		$headers = '';
 
-		// Read / request more data, Looking for a blank line which separates headers from body
-		while (!feof($this->_fp) && trim($header = fgets($this->_fp)) !== '')
+		while (!feof($this->_fp))
 		{
-			$headers .= $header;
-		}
-
-		// Separate the data into standard headers
-		$headers = explode("\r\n", $headers);
-		array_pop($headers);
-		foreach ($headers as $header)
-		{
-			// Get name and value
-			[$name, $value] = explode(':', $header, 2);
-
-			// Normalize / clean
-			$name = strtolower($name);
-			$value = trim($value);
-
-			// If its already there, then add to it as an array
-			if (isset($this->_headers[$name]))
+			$header = fgets($this->_fp);
+			if ($header === "\r\n" || $header === "\n")
 			{
-				if (is_string($this->_headers[$name]))
-				{
-					$this->_headers[$name] = array($this->_headers[$name]);
-				}
-
-				$this->_headers[$name][] = $value;
+				break;
 			}
-			else
+
+			if ($header === false)
 			{
-				$this->_headers[$name] = $value;
+				break;
+			}
+
+			// Process single header at a time instead of concatenating
+			if (strpos($header, ':') !== false)
+			{
+				[$name, $value] = explode(':', $header, 2);
+				$name = strtolower(trim($name));
+				$value = trim($value);
+
+				if (isset($this->_headers[$name]))
+				{
+					if (is_string($this->_headers[$name]))
+					{
+						$this->_headers[$name] = [$this->_headers[$name]];
+					}
+					$this->_headers[$name][] = $value;
+				}
+				else
+				{
+					$this->_headers[$name] = $value;
+				}
 			}
 		}
 	}
+
 
 	/**
 	 * Looks at the server response and header array to determine if we are redirecting
 	 *
 	 * @return string
 	 */
-	private function _checkRedirect()
+	private function _checkRedirect(): string
 	{
 		// Redirect in case this location is permanently or temporarily moved (301, 302, 307)
 		if ($this->_current_redirect < $this->_max_redirect && preg_match('~^HTTP/\S+\s+(30[127])~i', $this->_server_response, $code) === 1)
@@ -358,31 +367,41 @@ class FsockFetchWebdata
 	/**
 	 * Fetch the data for the selected site.
 	 */
-	private function _fetchData()
+	private function _fetchData(): void
 	{
-		// Respect the headers
 		$this->_processHeaders();
 
-		// Now the body of the response
+		// Use a fixed buffer size for reading
+		$buffer_size = 8192;
 		$response = '';
 
 		if (!empty($this->_content_length))
 		{
-			$response = stream_get_contents($this->_fp, $this->_content_length);
+			$remaining = $this->_content_length;
+			while ($remaining > 0 && !feof($this->_fp))
+			{
+				$read = min($buffer_size, $remaining);
+				$response .= stream_get_contents($this->_fp, $read);
+				$remaining -= $read;
+			}
 		}
 		else
 		{
-			$response .= stream_get_contents($this->_fp);
+			while (!feof($this->_fp))
+			{
+				$response .= stream_get_contents($this->_fp, $buffer_size);
+			}
 		}
 
-		$this->_response['body'] = $this->_unChunk($response);
+		$this->_response['body'] = $this->_chunked ? $this->_unChunk($response) : $response;
 		$this->_response['size'] = strlen($this->_response['body']);
 	}
+
 
 	/**
 	 * Read the response up to the end of the headers
 	 */
-	private function _processHeaders()
+	private function _processHeaders(): void
 	{
 		// If told to close the connection, do so
 		if (isset($this->_headers['connection']) && $this->_headers['connection'] === 'close')
@@ -406,7 +425,7 @@ class FsockFetchWebdata
 	 * @param string $body
 	 * @return string
 	 */
-	private function _unChunk($body)
+	private function _unChunk($body): string
 	{
 		if (!$this->_chunked)
 		{
@@ -452,7 +471,7 @@ class FsockFetchWebdata
 	 */
 	public function result($area = '')
 	{
-		// Just return a specified area or the entire result?
+		// Return a specified area or the entire result?
 		if (trim($area) === '')
 		{
 			return $this->_response;

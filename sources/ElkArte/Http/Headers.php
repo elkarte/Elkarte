@@ -62,7 +62,7 @@ class Headers
 	 * @param string $setLocation = '' The URL to redirect to
 	 * @param int $httpCode defaults to 200
 	 */
-	public function redirect($setLocation = '', $httpCode = null)
+	public function redirect($setLocation = '', $httpCode = null): Headers
 	{
 		global $scripturl;
 
@@ -77,7 +77,7 @@ class Headers
 		{
 			$setLocation = preg_replace('/^' . preg_quote($scripturl, '/') . '(?!\?' . preg_quote(SID, '/') . ')\\??/', $scripturl . '?' . SID . ';', $setLocation);
 		}
-		// Keep that debug in their for template debugging!
+		// Keep that debug in there for template debugging!
 		elseif (isset($this->req->debug))
 		{
 			$setLocation = preg_replace('/^' . preg_quote($scripturl, '/') . '\\??/', $scripturl . '?debug;', $setLocation);
@@ -95,9 +95,9 @@ class Headers
 	}
 
 	/**
-	 * Run maintenance function and then send the all collected headers
+	 * Run a maintenance function and then send the all collected headers
 	 */
-	public function send()
+	public function send(): void
 	{
 		handleMaintenance();
 		$this->sendHeaders();
@@ -111,7 +111,7 @@ class Headers
 	 * @param $value
 	 * @return $this
 	 */
-	public function headerSpecial($value)
+	public function headerSpecial($value): self
 	{
 		$this->specialHeaders[] = $value;
 
@@ -126,7 +126,7 @@ class Headers
 	 *
 	 * @return $this
 	 */
-	public function header($name, $value = null)
+	public function header($name, $value = null): self
 	{
 		$name = $this->standardizeHeaderName($name);
 
@@ -142,7 +142,7 @@ class Headers
 	 * @param string $name
 	 * @return string
 	 */
-	protected function standardizeHeaderName($name)
+	protected function standardizeHeaderName($name): string
 	{
 		// Combine spaces and Convert dashes "clear    Site-Data" => "clear Site Data"
 		$name = preg_replace('~\s+~', ' ', str_replace('-', ' ', trim($name)));
@@ -153,12 +153,12 @@ class Headers
 
 	/**
 	 * Set the http header code, like 404, 200, 301, etc.
-	 * Only output if content type is not empty
+	 * Only output if the content type is empty
 	 *
 	 * @param int $httpCode
 	 * @return $this
 	 */
-	public function httpCode($httpCode)
+	public function httpCode($httpCode): self
 	{
 		$this->httpCode = (int) $httpCode;
 
@@ -174,7 +174,7 @@ class Headers
 	 * @param string $disposition 'attachment' or 'inline';
 	 * @return $this
 	 */
-	public function setAttachmentFileParams($mime_type, $fileName, $disposition = 'attachment')
+	public function setAttachmentFileParams($mime_type, $fileName, $disposition = 'attachment'): self
 	{
 		// If an image, set the content type to the image/type defined in the mime_type
 		if (!empty($mime_type) && strpos($mime_type, 'image/') === 0)
@@ -199,7 +199,7 @@ class Headers
 	 * @param string $fileName That would be the name
 	 * @param string $disposition 'inline' or 'attachment'
 	 */
-	private function setDownloadFileNameHeader($fileName, $disposition = false)
+	private function setDownloadFileNameHeader($fileName, $disposition = false): void
 	{
 		$type = ($disposition ? 'inline' : 'attachment');
 
@@ -213,8 +213,6 @@ class Headers
 		}
 
 		$this->header('Content-Disposition', $type . '; filename="' . $fileName . '"' . $altName);
-
-		return $this;
 	}
 
 	/**
@@ -225,7 +223,7 @@ class Headers
 	 * @param string|null $charset
 	 * @return $this
 	 */
-	public function contentType($contentType, $charset = null)
+	public function contentType($contentType, $charset = null): self
 	{
 		$this->contentType = $contentType;
 
@@ -243,7 +241,7 @@ class Headers
 	 * @param string $charset
 	 * @return $this
 	 */
-	public function charset($charset)
+	public function charset($charset): self
 	{
 		$this->charset = $charset;
 
@@ -257,7 +255,7 @@ class Headers
 	 * @param string $name
 	 * @return $this
 	 */
-	public function removeHeader($name)
+	public function removeHeader($name): self
 	{
 		// Full reset like nothing had been sent
 		if ($name === 'all')
@@ -277,9 +275,10 @@ class Headers
 	}
 
 	/**
-	 * Send the collection of headers using standard php header() function
+	 * Send the collection of headers using standard php header() function.  If you need to send
+	 * a response header, set the return code via httpCode with no contentType header set.
 	 */
-	public function sendHeaders()
+	public function sendHeaders(): void
 	{
 		if (headers_sent())
 		{
@@ -300,6 +299,42 @@ class Headers
 		{
 			header('Content-Type: ' . $this->contentType . ($this->charset ? '; charset=' . $this->charset : ''), true, $this->httpCode);
 		}
+		else
+		{
+			$this->setResponse();
+		}
+	}
+
+	/**
+	 * Sets the HTTP response header based on the provided HTTP status code.
+	 * If the status code is not in the predefined list, defaults to 500 Internal Server Error.
+	 *
+	 * @return void
+	 */
+	public function setResponse(): void
+	{
+		$responseHeaders = [
+			200 => '200 OK',
+			206 => '206 Partial Content',
+			301 => '301 Moved Permanently',
+			302 => '302 Found',
+			304 => '304 Not Modified',
+			400 => '400 Bad Request',
+			403 => '403 Forbidden',
+			404 => '404 Not Found',
+			406 => '406 Not Acceptable',
+			410 => '403 Gone',
+			416 => '416 Requested Range Not Satisfiable',
+			500 => '500 Internal Server Error',
+			503 => '503 Service Temporarily Unavailable',
+		];
+
+		if (!isset($responseHeaders[$this->httpCode]))
+		{
+			$this->httpCode = 500;
+		}
+
+		header(detectServer()->getProtocol() . ' ' . $responseHeaders[$this->httpCode]);
 	}
 
 	/**
@@ -307,7 +342,7 @@ class Headers
 	 *
 	 * @return Headers
 	 */
-	public static function instance()
+	public static function instance(): Headers
 	{
 		if (self::$instance === null)
 		{
