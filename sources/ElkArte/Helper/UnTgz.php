@@ -295,6 +295,8 @@ class UnTgz
 		{
 			return false;
 		}
+
+		return null;
 	}
 
 	/**

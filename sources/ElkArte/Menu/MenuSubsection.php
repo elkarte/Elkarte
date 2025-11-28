@@ -68,10 +68,11 @@ class MenuSubsection extends MenuItem
 	 * Get the value of the "active" property of the object.
 	 *
 	 * This method returns the value of the "active" property of the object.
+	 * Support for boolean here, wrong but has been used
 	 *
-	 * @return string[]
+	 * @return string[]|bool
 	 */
-	public function getActive(): array
+	public function getActive(): array|bool
 	{
 		return $this->active;
 	}
