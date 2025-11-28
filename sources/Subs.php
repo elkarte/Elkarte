@@ -582,13 +582,15 @@ function pc_next_permutation($p, $size)
  *
  * @event integrate_redirect called before headers are sent
  * @param string $setLocation = '' The URL to redirect to
+ *
+ * @return void|string will return $setLocation string when run via the testbed
  */
 function redirectexit($setLocation = '')
 {
 	global $db_show_debug;
 
-	// Note to developers.  The testbed will add the following, allowing phpunit test returns
-	//if (defined("PHPUNITBOOTSTRAP") && defined("STDIN")){return $setLocation;}
+	// Note to developers.  The testbed will automatically add the following, allowing phpunit test returns
+	//if (defined("PHPUNITBOOTSTRAP") && defined("STDIN")){return $setLocation;} see setup-elkarte.sh
 
 	// Send headers, call integration, do maintenance
 	Headers::instance()

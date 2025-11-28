@@ -153,7 +153,8 @@ class Markasread extends AbstractController
 		}
 
 		// No need to output anything, just return to the button
-		return obExit(false);
+		obExit(false);
+		return null;
 	}
 
 	/**
@@ -291,8 +292,7 @@ class Markasread extends AbstractController
 			return '';
 		}
 
-		redirectexit('board=' . $board . '.0');
-		return null;
+		return redirectexit('board=' . $board . '.0');
 	}
 
 	/**
