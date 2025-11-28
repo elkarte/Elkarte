@@ -76,7 +76,7 @@ class MessagesDelete
 
 		if (empty($msgs))
 		{
-			return;
+			return null;
 		}
 
 		$db = database();
