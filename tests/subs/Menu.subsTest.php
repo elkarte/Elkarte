@@ -145,7 +145,7 @@ class TestMenuSubs extends ElkArteCommonSetupTest
 			'label' => 'Area1 Label',
 			'url' => 'http://127.0.0.1/index.php?action=section1;area=area1;extra=param;elk_test_session=elk_test_session',
 			'permission' => array(),
-			'enabled' => '1',
+			'enabled' => true,
 			'current_action' => 'section1',
 			'current_area' => 'area1',
 			'current_section' => 'section1',
@@ -172,8 +172,6 @@ class TestMenuSubs extends ElkArteCommonSetupTest
 			'function' => 'action_area3',
 			'icon' => 'transparent.png',
 			'class' => 'test_img_area3',
-			'hidden' => false,
-			'password' => false,
 			'subsections' => array(
 				'sub1' => array('label' => 'Sub One', 'counter' => '', 'url' => 'some url', 'permission' => array(), 'enabled' => true),
 				'sub2' => array('label' => 'Sub Two', 'counter' => '', 'url' => '', 'permission' => array(), 'enabled' => false),

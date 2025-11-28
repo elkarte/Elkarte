@@ -226,7 +226,7 @@ class MenuArea extends MenuItem
 	 */
 	public function setHidden($hidden): MenuArea
 	{
-		$this->hidden = $hidden;
+		$this->hidden = (bool) $hidden;
 
 		return $this;
 	}
@@ -246,7 +246,7 @@ class MenuArea extends MenuItem
 	 */
 	public function setPassword($password): MenuArea
 	{
-		$this->password = $password;
+		$this->password = (bool) $password;
 
 		return $this;
 	}
