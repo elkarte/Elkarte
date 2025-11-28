@@ -1,7 +1,7 @@
 {
 	"name": "elkarte/elkarte",
 	"description": "ElkArte PHP-based community discussion forum.",
-	"version": "2.0 dev",
+	"version": "2.0",
 	"type": "project",
 	"keywords": ["elkarte", "forum", "discussion", "php", "community"],
 	"homepage": "https://www.elkarte.net",
@@ -25,32 +25,33 @@
 	"replace": {
 	},
 	"require": {
-		"php": ">=8.0.0",
-      	"ext-json": "*",
-		"ext-gd": "*",
-		"ext-curl": "*",
-		"ext-mysqli": "*",
-		"ext-fileinfo": "*",
-		"ext-exif": "*",
-		"michelf/php-markdown": "2.*",
+	    "php": ">=8.1.0",
+        "ext-json": "*",
+	    "ext-gd": "*",
+	    "ext-curl": "*",
+	    "ext-mysqli": "*",
+	    "ext-fileinfo": "*",
+	    "ext-exif": "*",
+	    "michelf/php-markdown": "2.*",
         "ext-libxml": "*",
-        "ext-dom": "Allows operations on XML and HTML documents through the DOM API.",
-      "ext-imagick": "Imagick is a native php extension to create and modify images using the ImageMagick API."
+        "ext-dom": "*",
+        "ext-imagick": "*"
     },
 	"suggest": {
-		"ext-memcache": "Allows use of memcache cache",
-		"ext-memcached": "Allows use of memcached cache",
-		"predis/predis": "Allows interface to Redis server via Predis, can also use phpredis extension via Pecl",
-		"ext-apcu": "Adds an in-memory key-value store cache.",
-		"ext-zlib": "Enables you to transparently read and write (.gz) compressed files, ",
-		"ext-pgsql": "Provides Postgre SQL support",
-		"ext-imap": "Operate with the IMAP protocol, as well as POP3 and local mailbox access methods.",
-		"ext-zend-opcache": "Improves PHP performance by storing precompiled script bytecode in shared memory.",
-		"ext-mbstring": "Provides multibyte specific string functions that help process multibyte encodings.",
-		"ext-iconv": "Interface to allow for easy character set conversions."
+		"ext-memcache": "*",
+		"ext-memcached": "*",
+		"predis/predis": "*",
+		"ext-apcu": "*",
+		"ext-zlib": "*",
+		"ext-pgsql": "*",
+		"ext-imap": "*",
+		"ext-zend-opcache": "*",
+		"ext-mbstring": "*",
+		"ext-iconv": "*"
     },
 	"require-dev": {
-		"phpunit/phpunit-selenium": "9.0.1",
+        "roave/security-advisories": "dev-latest",
+        "phpunit/phpunit-selenium": "9.0.1",
 		"phpunit/phpunit": "9.6.*",
 		"myclabs/deep-copy": "1.11.0"
     },
