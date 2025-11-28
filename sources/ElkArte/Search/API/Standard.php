@@ -16,6 +16,7 @@
 
 namespace ElkArte\Search\API;
 
+use ElkArte\Database\AbstractResult;
 use ElkArte\Search\Cache\Session;
 use Exception;
 
@@ -896,7 +897,7 @@ class Standard extends AbstractAPI
 	/**
 	 * {@inheritDoc}
 	 */
-	public function indexedWordQuery($words, $search_data)
+	public function indexedWordQuery(array $words, array $search_data)
 	{
 	}
 

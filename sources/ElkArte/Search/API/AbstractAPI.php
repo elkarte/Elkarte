@@ -245,10 +245,8 @@ abstract class AbstractAPI
 	 *
 	 * @param array $words An array of words
 	 * @param array $search_data An array of search data
-	 *
-	 * @return AbstractResult
 	 */
-	abstract public function indexedWordQuery($words, $search_data): AbstractResult;
+	abstract public function indexedWordQuery(array $words, array $search_data);
 
 	/**
 	 * Escape words passed by the client

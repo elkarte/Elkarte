@@ -241,13 +241,13 @@ class AdminSettingsSearch
 	 *
 	 * @param string $search_term - The term to search
 	 *
-	 * @return string[] - an array of search results with 4 indexes:
+	 * @return array - an array of search results with 4 indexes:
 	 *    - url
 	 *    - name
 	 *    - type
 	 *    - help
 	 */
-	public function doSearch($search_term): array
+	public function doSearch(string $search_term): array
 	{
 		global $scripturl, $context;
 

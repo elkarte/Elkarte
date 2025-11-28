@@ -155,10 +155,8 @@ class Fulltext extends Standard
 	 *
 	 * @param array $words Words to index
 	 * @param array $search_data
-	 *
-	 * @return AbstractResult|bool
 	 */
-	public function indexedWordQuery($words, $search_data)
+	public function indexedWordQuery(array $words, array $search_data)
 	{
 		global $modSettings;
 

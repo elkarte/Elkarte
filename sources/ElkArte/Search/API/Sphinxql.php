@@ -81,7 +81,7 @@ class Sphinxql extends AbstractAPI
 	/**
 	 * {@inheritDoc}
 	 */
-	public function indexedWordQuery($words, $search_data)
+	public function indexedWordQuery(array $words, array $search_data)
 	{
 		// Sphinx uses its internal engine
 	}

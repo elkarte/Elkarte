@@ -126,9 +126,8 @@ class Custom extends Standard
 	 * @param array $words An array of words
 	 * @param array $search_data An array of search data
 	 *
-	 * @return AbstractResult|bool
 	 */
-	public function indexedWordQuery($words, $search_data)
+	public function indexedWordQuery(array $words, array $search_data)
 	{
 		global $modSettings;
 
