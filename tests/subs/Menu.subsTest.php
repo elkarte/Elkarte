@@ -170,6 +170,7 @@ class TestMenuSubs extends ElkArteCommonSetupTest
 		$expected = array(
 			'controller' => 'Area3_Controller',
 			'function' => 'action_area3',
+			'hidden' => false,
 			'icon' => 'transparent.png',
 			'class' => 'test_img_area3',
 			'subsections' => array(
@@ -177,6 +178,7 @@ class TestMenuSubs extends ElkArteCommonSetupTest
 				'sub2' => array('label' => 'Sub Two', 'counter' => '', 'url' => '', 'permission' => array(), 'enabled' => false),
 			),
 			'label' => 'Area3 Label',
+			'password' => false,
 			'url' => 'http://127.0.0.1/index.php?action=section2;area=area3;extra=param;elk_test_session=elk_test_session',
 			'permission' => array(0 => 'area3 permission'),
 			'enabled' => true,

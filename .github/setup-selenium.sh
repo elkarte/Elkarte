@@ -20,22 +20,30 @@ sudo mkdir -p $(dirname "$SELENIUM_JAR")
 sudo wget -nv -O "$SELENIUM_JAR" "$SELENIUM_DOWNLOAD_URL"
 sudo chmod 777 "$SELENIUM_JAR"
 
-# Install Chrome
-echo "Installing Browser"
+# 1. Install dependencies required for Chrome and JSON parsing
+sudo apt-get update
+sudo apt-get install -y libu2f-udev jq unzip
 
-# Available Chrome Versions
-CHROME_VERSION='123.0.6312.58-1'
-wget https://mirror.cs.uchicago.edu/google-chrome/pool/main/g/google-chrome-stable/google-chrome-stable_${CHROME_VERSION}_amd64.deb -q
-#wget https://dl.google.com/linux/chrome/deb/pool/main/g/google-chrome-stable/google-chrome-stable_${CHROME_VERSION}_amd64.deb -q
-sudo dpkg -i google-chrome-stable_${CHROME_VERSION}_amd64.deb
+# 2. (Optional) Ensure Chrome is installed/updated to the latest stable version
+# Most GitHub Actions runners already have this, but this ensures it's there.
+#wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | sudo apt-key add -
+#echo "deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main" | sudo tee /etc/apt/sources.list.d/google-chrome.list
+#sudo apt-get update
+#sudo apt-get install -y google-chrome-stable
 
-# Download Chrome Driver
-# https://storage.googleapis.com/chrome-for-testing-public/123.0.6312.58/linux64/chromedriver-linux64.zip
-echo "Downloading chromedriver"
-CHROME_VERSION=$(google-chrome --version) \
-  && wget -nv -O "$CHROMEDRIVER_ZIP" "https://storage.googleapis.com/chrome-for-testing-public/123.0.6312.58/linux64/chromedriver-linux64.zip" \
-  && unzip "$CHROMEDRIVER_ZIP" \
-  && sudo mv chromedriver-linux64/chromedriver /usr/local/bin/chromedriver \
+# 3. Detect the installed Chrome version
+CHROME_VERSION=$(google-chrome --version | awk '{print $3}')
+echo "Detected Chrome Version: $CHROME_VERSION"
+
+# 4. Download the matching ChromeDriver using the Chrome for Testing API
+CHROMEDRIVER_URL=$(curl -s "https://googlechromelabs.github.io/chrome-for-testing/last-known-good-versions-with-downloads.json" | \
+  jq -r '.channels.Stable.downloads.chromedriver[] | select(.platform=="linux64") | .url')
+
+echo "Downloading ChromeDriver from: $CHROMEDRIVER_URL"
+
+wget -q -O /tmp/chromedriver.zip "$CHROMEDRIVER_URL" \
+  && unzip -o /tmp/chromedriver.zip -d /tmp/ \
+  && sudo mv /tmp/chromedriver-linux64/chromedriver /usr/local/bin/chromedriver \
   && sudo chmod +x /usr/local/bin/chromedriver \
   && chromedriver --version
 
