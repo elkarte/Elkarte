@@ -136,7 +136,7 @@ class Menu
 			$newAreas = ['areas' => []];
 			foreach ($section['areas'] as $area_id => $area)
 			{
-				// subsections are deeper menus inside of a area (3rd level menu)
+				// subsections are deeper menus inside a area (3rd level menu)
 				$newSubsections = ['subsections' => []];
 				if (!empty($area['subsections']))
 				{

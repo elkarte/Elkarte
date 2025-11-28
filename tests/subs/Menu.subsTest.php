@@ -145,7 +145,7 @@ class TestMenuSubs extends ElkArteCommonSetupTest
 			'label' => 'Area1 Label',
 			'url' => 'http://127.0.0.1/index.php?action=section1;area=area1;extra=param;elk_test_session=elk_test_session',
 			'permission' => array(),
-			'enabled' => 1,
+			'enabled' => '1',
 			'current_action' => 'section1',
 			'current_area' => 'area1',
 			'current_section' => 'section1',

@@ -204,7 +204,7 @@ abstract class MenuItem
 	 */
 	public function setEnabled($enabled): MenuItem
 	{
-		$this->enabled = $enabled;
+		$this->enabled = (bool) $enabled;
 
 		return $this;
 	}
