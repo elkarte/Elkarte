@@ -2851,7 +2851,8 @@ class InstallInstructions_install_2_0
 				array('Yandex (Images)', 'YandexImages', ''),
 				array('Yandex (Media)', 'YandexMedia', ''),
 				array('Yandex (Video)', 'YandexVideo', '')
-			);
+			)
+		);
 	}
 
 	public function table_subscriptions()
