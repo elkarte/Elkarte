@@ -14,7 +14,7 @@ env:
 jobs:
   # Selenium headless browser testing
   Selenium-checks:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     strategy:
       matrix:
         include:
@@ -107,7 +107,7 @@ jobs:
 
   # Static checks, e.g. syntax errors, lint, etc
   static-checks:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     strategy:
       matrix:
         include:
@@ -164,7 +164,7 @@ jobs:
 
   # START MySQL / MariaDB Tests
   mysql-tests:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     strategy:
       matrix:
         include:
@@ -251,7 +251,7 @@ jobs:
 
   # START Postgres Tests
   postgres-tests:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     strategy:
       matrix:
         include:
