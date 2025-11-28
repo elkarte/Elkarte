@@ -179,7 +179,7 @@ class TestMenuSubs extends ElkArteCommonSetupTest
 			'label' => 'Area3 Label',
 			'url' => 'http://127.0.0.1/index.php?action=section2;area=area3;extra=param;elk_test_session=elk_test_session',
 			'permission' => array(0 => 'area3 permission'),
-			'enabled' => 1,
+			'enabled' => true,
 			'current_action' => 'section2',
 			'current_area' => 'area3',
 			'current_section' => 'section2',
@@ -231,7 +231,7 @@ class TestMenuSubs extends ElkArteCommonSetupTest
 		$add = array('section3' => array(
 			'title' => 'ThreeNew',
 			'permission' => array('admin_forum'),
-			'enabled' => 1,
+			'enabled' => true,
 			'areas' => array(
 				'area5' => array(
 					'label' => 'Area5 Label',

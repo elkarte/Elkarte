@@ -80,7 +80,7 @@ class CurlFetchWebdataTest extends TestCase
 			// Check for correct results
 			if (!empty($testcase[1]))
 			{
-				$this->assertEquals($testcase[1], $curl->result('code'));
+				$this->assertEquals($testcase[1], $curl->result('code'), 'FetchCodeError:: ' . $curl->result('code'));
 			}
 			if (!empty($testcase[2]))
 			{
