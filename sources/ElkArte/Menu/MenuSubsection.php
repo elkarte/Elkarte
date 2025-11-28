@@ -44,7 +44,7 @@ class MenuSubsection extends MenuItem
 	 *
 	 * @return bool Returns true if the object is a default value, false otherwise.
 	 */
-	public function isDefault()
+	public function isDefault(): bool
 	{
 		return $this->default;
 	}
@@ -57,7 +57,7 @@ class MenuSubsection extends MenuItem
 	 * @param mixed $default The new default value to be set.
 	 * @return $this This method returns the current instance of the object, allowing for method chaining.
 	 */
-	public function setDefault($default)
+	public function setDefault($default): self
 	{
 		$this->default = $default;
 
@@ -68,10 +68,11 @@ class MenuSubsection extends MenuItem
 	 * Get the value of the "active" property of the object.
 	 *
 	 * This method returns the value of the "active" property of the object.
+	 * Support for boolean here, wrong but has been used
 	 *
-	 * @return string[]
+	 * @return string[]|bool
 	 */
-	public function getActive()
+	public function getActive(): array|bool
 	{
 		return $this->active;
 	}
@@ -85,7 +86,7 @@ class MenuSubsection extends MenuItem
 	 *
 	 * @return $this The modified object instance.
 	 */
-	public function setActive($active)
+	public function setActive($active): self
 	{
 		$this->active = $active;
 
@@ -101,9 +102,9 @@ class MenuSubsection extends MenuItem
 	 *
 	 * @return MenuSubsection
 	 */
-	public function buildMoreFromArray($arr, $sa)
+	public function buildMoreFromArray($arr, $sa): MenuSubsection
 	{
-		// These are special due to the non named index so there is no generic setter
+		// These are special due to the non-named index so there is no generic setter
 		$this->label = $arr[0];
 		$this->permission = isset($arr[1]) ? (array) $arr[1] : [];
 		$this->default = isset($arr[2]) && (bool) $arr[2];

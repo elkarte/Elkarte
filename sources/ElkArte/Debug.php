@@ -82,7 +82,7 @@ class Debug
 	 *    t => time taken to get/put the entry
 	 *    s => length of the serialized value
 	 */
-	public function cache($value)
+	public function cache($value): void
 	{
 		if (!$this->_track)
 		{
@@ -103,7 +103,7 @@ class Debug
 	 *     s => seconds at which the query has been executed into the request
 	 *     t => time taken by the query
 	 */
-	public function db_query($value)
+	public function db_query($value): void
 	{
 		if (!$this->_track)
 		{
@@ -119,7 +119,7 @@ class Debug
 	 *
 	 * @param array $value An array of queries info, see the db method for details
 	 */
-	public function merge_db($value)
+	public function merge_db($value): void
 	{
 		if (!$this->_track)
 		{
@@ -135,7 +135,7 @@ class Debug
 	 *
 	 * @return array
 	 */
-	public function get_db()
+	public function get_db(): array
 	{
 		if (!$this->_track)
 		{
@@ -148,7 +148,7 @@ class Debug
 	/**
 	 * Enables tracking of debug entries
 	 */
-	public function on()
+	public function on(): void
 	{
 		$this->_track = true;
 	}
@@ -156,7 +156,7 @@ class Debug
 	/**
 	 * Disables tracking of debug entries
 	 */
-	public function off()
+	public function off(): void
 	{
 		$this->_track = false;
 	}
@@ -164,7 +164,7 @@ class Debug
 	/**
 	 * Toggles the visibility of the queries
 	 */
-	public function toggleViewQueries()
+	public function toggleViewQueries(): void
 	{
 		$_SESSION['view_queries'] = (int) $_SESSION['view_queries'] === 1 ? 0 : 1;
 	}
@@ -172,7 +172,7 @@ class Debug
 	/**
 	 * This function shows the debug information tracked
 	 */
-	public function display()
+	public function display(): void
 	{
 		global $txt;
 
@@ -196,7 +196,7 @@ class Debug
 			}
 		}
 
-		$expandable = array('hooks', 'files_included');
+		$expandable = ['hooks', 'files_included'];
 
 		foreach ($this->_debugs as $key => $value)
 		{
@@ -221,7 +221,7 @@ class Debug
 		// If the cache is on, how successful was it?
 		if (Cache\Cache::instance()->isEnabled() && !empty($this->_cache_hits))
 		{
-			$entries = array();
+			$entries = [];
 			$total_t = 0;
 			$total_s = 0;
 			foreach ($this->_cache_hits as $cache_hit)
@@ -274,7 +274,7 @@ class Debug
 	 * Collects some other generic system information necessary for the
 	 * debug screen
 	 */
-	private function _prepare_last_bits()
+	private function _prepare_last_bits(): void
 	{
 		global $context;
 
@@ -325,9 +325,9 @@ class Debug
 	 * Adds a new generic debug entry
 	 *
 	 * @param string $type the kind of debug entry
-	 * @param string|string[] string or array of the entry to show
+	 * @param string|string[] $value string or array of the entry to show
 	 */
-	public function add($type, $value)
+	public function add($type, $value): void
 	{
 		if (!$this->_track)
 		{
@@ -352,7 +352,7 @@ class Debug
 	 *               is called
 	 * @param string[]|null $rusage value of getrusage or null to let the method call it
 	 */
-	public function rusage($point, $rusage = null)
+	public function rusage($point, $rusage = null): void
 	{
 		// getrusage is missing in php < 7 on Windows
 		if (!$this->_track || !function_exists('getrusage'))
@@ -368,7 +368,7 @@ class Debug
 	 *
 	 * @return int
 	 */
-	public function cache_count()
+	public function cache_count(): int
 	{
 		return $this->_cache_count;
 	}
@@ -377,7 +377,7 @@ class Debug
 	 * Displays a list of queries executed during the current
 	 * page load
 	 */
-	private function _show_queries()
+	private function _show_queries(): void
 	{
 		global $txt;
 
@@ -388,7 +388,7 @@ class Debug
 			// Temporary tables created in earlier queries are not explainable.
 			if ($is_select)
 			{
-				foreach (array('tmp_log_search_topics', 'tmp_log_search_messages') as $tmp)
+				foreach (['tmp_log_search_topics', 'tmp_log_search_messages'] as $tmp)
 				{
 					if (strpos(trim($qq['q']), $tmp) !== false)
 					{
@@ -439,9 +439,9 @@ class Debug
 	 *
 	 * @return array
 	 */
-	public function viewQueries($query_id)
+	public function viewQueries($query_id): array
 	{
-		$queries_data = array();
+		$queries_data = [];
 
 		$query_analysis = new QueryAnalysis();
 

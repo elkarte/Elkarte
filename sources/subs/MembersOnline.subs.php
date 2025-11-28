@@ -25,7 +25,7 @@ use ElkArte\User;
  * - Also returns the membergroups of the users that are currently online.
  * - (optionally) hides members that chose to hide their online presence.
  *
- * @param mixed[] $membersOnlineOptions
+ * @param array $membersOnlineOptions
  * @return array
  * @package Members
  */
@@ -36,14 +36,14 @@ function getMembersOnlineStats($membersOnlineOptions)
 	$db = database();
 
 	// The list can be sorted in several ways.
-	$allowed_sort_options = array(
+	$allowed_sort_options = [
 		'', // No sorting.
 		'log_time',
 		'real_name',
 		'show_online',
 		'online_color',
 		'group_name',
-	);
+	];
 
 	// Default the sorting method to 'most recent online members first'.
 	if (!isset($membersOnlineOptions['sort']))
@@ -59,7 +59,7 @@ function getMembersOnlineStats($membersOnlineOptions)
 	}
 
 	// Get it from the cache and send it back.
-	$temp = array();
+	$temp = [];
 	$cache = Cache::instance();
 	if ($cache->levelHigherThan(1) && $cache->getVar($temp, 'membersOnlineStats-' . $membersOnlineOptions['sort'], 240))
 	{
@@ -67,20 +67,20 @@ function getMembersOnlineStats($membersOnlineOptions)
 	}
 
 	// Initialize the array that'll be returned later on.
-	$membersOnlineStats = array(
-		'users_online' => array(),
-		'list_users_online' => array(),
-		'online_groups' => array(),
+	$membersOnlineStats = [
+		'users_online' => [],
+		'list_users_online' => [],
+		'online_groups' => [],
 		'num_guests' => 0,
 		'num_spiders' => 0,
 		'num_buddies' => 0,
 		'num_users_hidden' => 0,
 		'num_users_online' => 0,
-	);
+	];
 
 	// Get any spiders if enabled.
-	$spiders = array();
-	$spider_finds = array();
+	$spiders = [];
+	$spider_finds = [];
 	if (!empty($modSettings['show_spider_online']) && ($modSettings['show_spider_online'] < 3 || allowedTo('admin_forum')) && !empty($modSettings['spider_name_cache']))
 	{
 		$spiders = Util::unserialize($modSettings['spider_name_cache']);
@@ -94,9 +94,9 @@ function getMembersOnlineStats($membersOnlineOptions)
 		FROM {db_prefix}log_online AS lo
 			LEFT JOIN {db_prefix}members AS mem ON (mem.id_member = lo.id_member)
 			LEFT JOIN {db_prefix}membergroups AS mg ON (mg.id_group = CASE WHEN mem.id_group = {int:reg_mem_group} THEN mem.id_post_group ELSE mem.id_group END)',
-		array(
+		[
 			'reg_mem_group' => 0,
-		)
+		]
 	);
 	while (($row = $request->fetch_assoc()))
 	{
@@ -113,7 +113,8 @@ function getMembersOnlineStats($membersOnlineOptions)
 
 			continue;
 		}
-		elseif (empty($row['show_online']) && empty($membersOnlineOptions['show_hidden']))
+
+		if (empty($row['show_online']) && empty($membersOnlineOptions['show_hidden']))
 		{
 			// Just increase the stats and don't add this hidden user to any list.
 			$membersOnlineStats['num_users_hidden']++;
@@ -141,7 +142,7 @@ function getMembersOnlineStats($membersOnlineOptions)
 		}
 
 		// A lot of useful information for each member.
-		$membersOnlineStats['users_online'][$row[$membersOnlineOptions['sort']] . '_' . $row['member_name']] = array(
+		$membersOnlineStats['users_online'][$row[$membersOnlineOptions['sort']] . '_' . $row['member_name']] = [
 			'id' => $row['id_member'],
 			'username' => $row['member_name'],
 			'name' => $row['real_name'],
@@ -151,16 +152,16 @@ function getMembersOnlineStats($membersOnlineOptions)
 			'is_buddy' => $is_buddy,
 			'hidden' => empty($row['show_online']),
 			'is_last' => false,
-		);
+		];
 
 		// Store all distinct (primary) membergroups that are shown.
 		if (!isset($membersOnlineStats['online_groups'][$row['id_group']]))
 		{
-			$membersOnlineStats['online_groups'][$row['id_group']] = array(
+			$membersOnlineStats['online_groups'][$row['id_group']] = [
 				'id' => $row['id_group'],
 				'name' => $row['group_name'],
 				'color' => $row['online_color']
-			);
+			];
 		}
 	}
 	$request->free_result();
@@ -172,7 +173,7 @@ function getMembersOnlineStats($membersOnlineOptions)
 		foreach ($spider_finds as $id => $count)
 		{
 			$link = $spiders[$id] . ($count > 1 ? ' (' . $count . ')' : '');
-			$membersOnlineStats['users_online'][$sort . '_' . $spiders[$id]] = array(
+			$membersOnlineStats['users_online'][$sort . '_' . $spiders[$id]] = [
 				'id' => 0,
 				'username' => $spiders[$id],
 				'name' => $link,
@@ -182,7 +183,7 @@ function getMembersOnlineStats($membersOnlineOptions)
 				'is_buddy' => false,
 				'hidden' => false,
 				'is_last' => false,
-			);
+			];
 			$membersOnlineStats['list_users_online'][$sort . '_' . $spiders[$id]] = $link;
 		}
 	}
@@ -200,9 +201,9 @@ function getMembersOnlineStats($membersOnlineOptions)
  * Needed mainly for when the cache is enabled and online users have to be
  * filtered out based on permissions.
  *
- * @param mixed[] $membersOnlineStats
+ * @param array $membersOnlineStats
  * @param string $sortFunction
- * @return mixed[]
+ * @return array
  * @package Members
  */
 function filter_members_online($membersOnlineStats, $sortFunction)
@@ -247,15 +248,15 @@ function trackStatsUsersOnline($total_users_online)
 
 	$db = database();
 
-	$settingsToUpdate = array();
+	$settingsToUpdate = [];
 
 	// More members on now than ever were?  Update it!
 	if (!isset($modSettings['mostOnline']) || $total_users_online >= $modSettings['mostOnline'])
 	{
-		$settingsToUpdate = array(
+		$settingsToUpdate = [
 			'mostOnline' => $total_users_online,
 			'mostDate' => time()
-		);
+		];
 	}
 
 	$date = Util::strftime('%Y-%m-%d', forum_time(false));
@@ -269,9 +270,9 @@ function trackStatsUsersOnline($total_users_online)
 			FROM {db_prefix}log_activity
 			WHERE date = {date:date}
 			LIMIT 1',
-			array(
+			[
 				'date' => $date,
-			)
+			]
 		);
 
 		// The log_activity hasn't got an entry for today?
@@ -279,9 +280,9 @@ function trackStatsUsersOnline($total_users_online)
 		{
 			$db->insert('ignore',
 				'{db_prefix}log_activity',
-				array('date' => 'date', 'most_on' => 'int'),
-				array($date, $total_users_online),
-				array('date')
+				['date' => 'date', 'most_on' => 'int'],
+				[$date, $total_users_online],
+				['date']
 			);
 		}
 		// There's an entry in log_activity on today...
@@ -291,7 +292,7 @@ function trackStatsUsersOnline($total_users_online)
 
 			if ($total_users_online > $modSettings['mostOnlineToday'])
 			{
-				trackStats(array('most_on' => $total_users_online));
+				trackStats(['most_on' => $total_users_online]);
 			}
 
 			$total_users_online = max($total_users_online, $modSettings['mostOnlineToday']);
@@ -304,7 +305,7 @@ function trackStatsUsersOnline($total_users_online)
 	// Highest number of users online today?
 	elseif ($total_users_online > $modSettings['mostOnlineToday'])
 	{
-		trackStats(array('most_on' => $total_users_online));
+		trackStats(['most_on' => $total_users_online]);
 		$settingsToUpdate['mostOnlineToday'] = $total_users_online;
 	}
 

@@ -14,6 +14,7 @@ namespace ElkArte;
 use BBC\ParserWrapper;
 use ElkArte\Cache\Cache;
 use ElkArte\Database\QueryInterface;
+use ElkArte\Exceptions\Exception;
 use ElkArte\Helper\Util;
 use ElkArte\Helper\ValuesContainer;
 
@@ -49,7 +50,7 @@ class MembersList
 	 * @param Cache $cache Cache object used to... well cache content of each member
 	 * @param ParserWrapper $bbc_parser BBC parser to convert BBC to HTML
 	 */
-	public static function init($db, $cache, $bbc_parser)
+	public static function init($db, $cache, $bbc_parser): void
 	{
 		global $modSettings, $board_info;
 
@@ -86,7 +87,7 @@ class MembersList
 	/**
 	 * Loads a guest member (i.e. some standard data for guests)
 	 */
-	public static function loadGuest()
+	public static function loadGuest(): void
 	{
 		if (isset(self::$members[0]))
 		{
@@ -108,7 +109,7 @@ class MembersList
 		$member = self::$instance->getById($id);
 
 		return $member !== false ? $member : new class() extends ValuesContainer {
-			public function loadContext($display_custom_fields = false)
+			public function loadContext($display_custom_fields = false): void
 			{
 			}
 		};
@@ -126,12 +127,12 @@ class MembersList
 	}
 
 	/**
-	 * Adds a \ElkArte\Member object to the list.
+	 * Adds an \ElkArte\Member object to the list.
 	 *
 	 * @param Member $member_data The object representing
 	 * @param int $id id of the member
 	 */
-	public static function add($member_data, $id)
+	public static function add($member_data, $id): void
 	{
 		self::$members[$id] = $member_data;
 	}
@@ -141,7 +142,7 @@ class MembersList
 	 *
 	 * @param int $id id of the member
 	 */
-	public static function unset($id)
+	public static function unset($id): void
 	{
 		if (isset(self::$members[$id]))
 		{
@@ -157,8 +158,57 @@ class MembersList
 	 * @param int $id The id of the member
 	 * @param array $display_fields - Basically the content of $modSettings['displayFields']
 	 */
-	public function appendTo($data, $type, $id, $display_fields = [])
+	public function appendTo($data, $type, $id, $display_fields = []): void
 	{
 		self::$members[$id]->append($type, $data, $display_fields);
+	}
+
+	/**
+	 * Loads member data and their context into a structured array.
+	 *
+	 * This method loads the specified members, fetches their context data,
+	 * and organizes the information into an associative array indexed by member IDs.
+	 * It places that data in a global $memberContext array to mimic previous behavior.
+	 *
+	 * Helper function for loadMemberData() + loadMemberContext(), intended to help with addon transition to 2.0
+	 *
+	 * @param int|int[]|string|string[] $members Name/s or id/s of the members to load
+	 * @param bool $is_name Indicates whether the input in $members represents names (true) or IDs (false)
+	 * @param string $set The amount of data to load, typically defined by a pre-configured set type
+	 * @return false|int[]
+	 */
+	public static function loadMemberData($members, $is_name = false, $set = 'normal')
+	{
+		if ($set === 'minimal')
+		{
+			return self::load($members, $is_name, $set);
+		}
+
+		$members = (array) $members;
+		$members = array_map('intval', $members);
+		$loaded_ids = [];
+
+		if (self::load($members, $is_name, $set))
+		{
+			foreach ($members as $id)
+			{
+				$member = self::get($id);
+
+				// Load their context data.
+				if ($member->isEmpty())
+				{
+					continue;
+				}
+
+				/* @var Member $member */
+				$member->loadContext();
+
+				// Store this member's information.
+				$GLOBALS['memberContext'][$id] = $member;
+				$loaded_ids[] = $id;
+			}
+		}
+
+		return empty($loaded_ids) ? false : $loaded_ids;
 	}
 }

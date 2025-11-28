@@ -33,7 +33,7 @@ class About extends AbstractController
 	 * Default action of this class.
 	 * Accessed with ?action=about
 	 */
-	public function action_index()
+	public function action_index() :void
 	{
 		// Add an subaction array to act accordingly
 		$subActions = [
@@ -56,7 +56,7 @@ class About extends AbstractController
 	 * - Functionality needs to be enabled in the ACP for this to be used
 	 * - Triggers the verify_contact event
 	 */
-	public function action_contact()
+	public function action_contact(): void
 	{
 		global $context, $txt, $modSettings;
 
@@ -156,7 +156,7 @@ class About extends AbstractController
 	 *
 	 * - Accessed by action=about;sa=coppa
 	 */
-	public function action_coppa()
+	public function action_coppa(): void
 	{
 		global $context, $modSettings, $txt;
 
@@ -197,7 +197,7 @@ class About extends AbstractController
 	 *
 	 * @param array $member The member data from getBasicMemberData())
 	 */
-	private function handleContactForm($member)
+	private function handleContactForm($member): void
 	{
 		global $context, $modSettings, $txt;
 
@@ -254,7 +254,7 @@ class About extends AbstractController
 	 *
 	 * @return void
 	 */
-	private function handleCoppa()
+	private function handleCoppa(): void
 	{
 		global $context, $modSettings, $txt;
 
@@ -281,7 +281,7 @@ class About extends AbstractController
 	 * @uses Who language file
 	 * @uses template_credits() sub template in Who.template,
 	 */
-	public function action_credits()
+	public function action_credits(): void
 	{
 		global $context, $txt;
 

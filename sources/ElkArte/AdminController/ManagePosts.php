@@ -46,16 +46,16 @@ class ManagePosts extends AbstractController
 	{
 		global $context, $txt;
 
-		$subActions = array(
-			'posts' => array(
-				$this, 'action_postSettings_display', 'permission' => 'admin_forum'),
-			'censor' => array(
-				$this, 'action_censor', 'permission' => 'admin_forum'),
-			'topics' => array(
+		$subActions = [
+			'posts' => [
+				$this, 'action_postSettings_display', 'permission' => 'admin_forum'],
+			'censor' => [
+				$this, 'action_censor', 'permission' => 'admin_forum'],
+			'topics' => [
 				'function' => 'action_index',
 				'controller' => ManageTopics::class,
-				'permission' => 'admin_forum'),
-		);
+				'permission' => 'admin_forum'],
+		];
 
 		// Good old action handle
 		$action = new Action('manage_posts');
@@ -101,7 +101,7 @@ class ManagePosts extends AbstractController
 	 * @event integrate_censors
 	 * @uses the Admin template and the edit_censored sub template.
 	 */
-	public function action_censor()
+	public function action_censor(): void
 	{
 		global $txt, $modSettings, $context;
 
@@ -111,13 +111,13 @@ class ManagePosts extends AbstractController
 			checkSession();
 			validateToken('admin-censor');
 
-			$censored_vulgar = array();
-			$censored_proper = array();
+			$censored_vulgar = [];
+			$censored_proper = [];
 
 			// Rip it apart, then split it into two arrays.
 			if (isset($this->_req->post->censortext))
 			{
-				$this->_req->post->censortext = explode("\n", strtr($this->_req->post->censortext, array("\r" => '')));
+				$this->_req->post->censortext = explode("\n", strtr($this->_req->post->censortext, ["\r" => '']));
 
 				foreach ($this->_req->post->censortext as $c)
 				{
@@ -141,21 +141,21 @@ class ManagePosts extends AbstractController
 				}
 				else
 				{
-					$censored_vulgar = explode("\n", strtr($this->_req->post->censor_vulgar, array("\r" => '')));
-					$censored_proper = explode("\n", strtr($this->_req->post->censor_proper, array("\r" => '')));
+					$censored_vulgar = explode("\n", strtr($this->_req->post->censor_vulgar, ["\r" => '']));
+					$censored_proper = explode("\n", strtr($this->_req->post->censor_proper, ["\r" => '']));
 				}
 			}
 
 			// Set the new arrays and settings in the database.
-			$updates = array(
+			$updates = [
 				'censor_vulgar' => implode("\n", $censored_vulgar),
 				'censor_proper' => implode("\n", $censored_proper),
 				'censorWholeWord' => empty($this->_req->post->censorWholeWord) ? '0' : '1',
 				'censorIgnoreCase' => empty($this->_req->post->censorIgnoreCase) ? '0' : '1',
 				'allow_no_censored' => empty($this->_req->post->allow_no_censored) ? '0' : '1',
-			);
+			];
 
-			call_integration_hook('integrate_save_censors', array(&$updates));
+			call_integration_hook('integrate_save_censors', [&$updates]);
 
 			updateSettings($updates);
 		}
@@ -168,14 +168,14 @@ class ManagePosts extends AbstractController
 			$censorText = htmlspecialchars($this->_req->post->censortest, ENT_QUOTES, 'UTF-8');
 			preparsecode($censorText);
 			$pre_censor = $censorText;
-			$context['censor_test'] = strtr(censor($censorText), array('"' => '&quot;'));
+			$context['censor_test'] = strtr(censor($censorText), ['"' => '&quot;']);
 		}
 
 		// Set everything up for the template to do its thang.
 		$censor_vulgar = explode("\n", $modSettings['censor_vulgar']);
 		$censor_proper = explode("\n", $modSettings['censor_proper']);
 
-		$context['censored_words'] = array();
+		$context['censored_words'] = [];
 		foreach ($censor_vulgar as $i => $censor_vulgar_i)
 		{
 			if ($censor_vulgar_i === '' || $censor_vulgar_i === '0')
@@ -204,12 +204,12 @@ class ManagePosts extends AbstractController
 			setJsonTemplate();
 
 			// Send back a response
-			$context['json_data'] = array(
+			$context['json_data'] = [
 				'result' => true,
 				'censor' => $pre_censor . ' <i class="icon i-chevron-circle-right"></i> ' . $context['censor_test'],
 				'token_val' => $context['admin-censor_token_var'],
 				'token' => $context['admin-censor_token'],
-			);
+			];
 		}
 		else
 		{
@@ -227,7 +227,7 @@ class ManagePosts extends AbstractController
 	 * @event integrate_save_post_settings
 	 * @uses Admin template, edit_post_settings sub-template.
 	 */
-	public function action_postSettings_display()
+	public function action_postSettings_display(): void
 	{
 		global $context, $txt, $modSettings;
 
@@ -267,7 +267,7 @@ class ManagePosts extends AbstractController
 
 				if (isset($body_type) && ($this->_req->post->max_messageLength > 65535 || $this->_req->post->max_messageLength == 0) && $body_type === 'text')
 				{
-					throw new Exception('convert_to_mediumtext', false, array(getUrl('admin', ['action' => 'admin', 'area' => 'maintain', 'sa' => 'database'])));
+					throw new Exception('convert_to_mediumtext', false, [getUrl('admin', ['action' => 'admin', 'area' => 'maintain', 'sa' => 'database'])]);
 				}
 			}
 
@@ -347,7 +347,7 @@ class ManagePosts extends AbstractController
 		];
 
 		// Add new settings with a nice hook, makes them available for admin settings search as well
-		call_integration_hook('integrate_modify_post_settings', array(&$config_vars));
+		call_integration_hook('integrate_modify_post_settings', [&$config_vars]);
 
 		return $config_vars;
 	}

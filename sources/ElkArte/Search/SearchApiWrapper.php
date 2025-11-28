@@ -55,7 +55,7 @@ class SearchApiWrapper
 	 * @param ValuesContainer $config
 	 * @param SearchParams $searchParams
 	 */
-	protected function load($config, $searchParams)
+	protected function load($config, $searchParams): void
 	{
 		global $txt;
 
@@ -96,7 +96,7 @@ class SearchApiWrapper
 	 * @param array $topicOptions
 	 * @param array $posterOptions
 	 */
-	public function postCreated($msgOptions, $topicOptions, $posterOptions)
+	public function postCreated($msgOptions, $topicOptions, $posterOptions): void
 	{
 		if (is_callable([$this->_searchAPI, 'postCreated']))
 		{
@@ -111,7 +111,7 @@ class SearchApiWrapper
 	 * @param array $topicOptions
 	 * @param array $posterOptions
 	 */
-	public function postModified($msgOptions, $topicOptions, $posterOptions)
+	public function postModified($msgOptions, $topicOptions, $posterOptions): void
 	{
 		if (is_callable([$this->_searchAPI, 'postModified']))
 		{
@@ -125,7 +125,7 @@ class SearchApiWrapper
 	 * @param int $split2_ID_TOPIC
 	 * @param int[] $splitMessages
 	 */
-	public function topicSplit($split2_ID_TOPIC, $splitMessages)
+	public function topicSplit($split2_ID_TOPIC, $splitMessages): void
 	{
 		if (is_callable([$this->_searchAPI, 'topicSplit']))
 		{
@@ -141,7 +141,7 @@ class SearchApiWrapper
 	 * @param int[] $affected_msgs
 	 * @param string[] $subject array($response_prefix, $target_subject)
 	 */
-	public function topicMerge($id_topic, $topics, $affected_msgs, $subject)
+	public function topicMerge($id_topic, $topics, $affected_msgs, $subject): void
 	{
 		if (is_callable([$this->_searchAPI, 'topicMerge']))
 		{
@@ -154,7 +154,7 @@ class SearchApiWrapper
 	 *
 	 * @param array $config_vars
 	 */
-	public function searchSettings(&$config_vars)
+	public function searchSettings(&$config_vars): void
 	{
 		if (is_callable([$this->_searchAPI, 'searchSettings']))
 		{
@@ -171,7 +171,7 @@ class SearchApiWrapper
 	 *
 	 * @return array
 	 */
-	public function searchQuery($search_words, $excluded_words, &$participants)
+	public function searchQuery($search_words, $excluded_words, &$participants): array
 	{
 		return $this->_searchAPI->searchQuery($search_words, $excluded_words, $participants);
 	}
@@ -181,7 +181,7 @@ class SearchApiWrapper
 	 *
 	 * @return string
 	 */
-	public function prepareWord($phrase, $no_regexp)
+	public function prepareWord($phrase, $no_regexp): string
 	{
 		return $this->_searchAPI->prepareWord($phrase, $no_regexp);
 	}
@@ -189,7 +189,7 @@ class SearchApiWrapper
 	/**
 	 * Wrapper for supportsExtended
 	 */
-	public function supportsExtended()
+	public function supportsExtended(): bool
 	{
 		return $this->_searchAPI->supportsExtended();
 	}
@@ -199,7 +199,7 @@ class SearchApiWrapper
 	 *
 	 * @param string[] $phrase An array of phrases to exclude
 	 */
-	public function setExcludedPhrases($phrase)
+	public function setExcludedPhrases($phrase): void
 	{
 		$this->_searchAPI->setExcludedPhrases($phrase);
 	}
@@ -209,7 +209,7 @@ class SearchApiWrapper
 	 *
 	 * @param string[] $words An array of words to exclude
 	 */
-	public function setExcludedWords($words)
+	public function setExcludedWords($words): void
 	{
 		$this->_searchAPI->setExcludedWords($words);
 	}
@@ -219,7 +219,7 @@ class SearchApiWrapper
 	 *
 	 * @param SearchArray $searchArray
 	 */
-	public function setSearchArray(SearchArray $searchArray)
+	public function setSearchArray(SearchArray $searchArray): void
 	{
 		$this->_searchAPI->setSearchArray($searchArray);
 	}
@@ -230,10 +230,10 @@ class SearchApiWrapper
 	 * @param string $word
 	 * @param string $wordsSearch
 	 * @param string $wordsExclude
-	 * @param boolean $isExcluded
+	 * @param bool $isExcluded
 	 * @param string $excludedSubjectWords
 	 */
-	public function prepareIndexes($word, &$wordsSearch, &$wordsExclude, $isExcluded, $excludedSubjectWords)
+	public function prepareIndexes($word, &$wordsSearch, &$wordsExclude, $isExcluded, $excludedSubjectWords): void
 	{
 		$this->_searchAPI->prepareIndexes($word, $wordsSearch, $wordsExclude, $isExcluded, $excludedSubjectWords);
 	}
@@ -245,7 +245,7 @@ class SearchApiWrapper
 	 * @param string $b Word B
 	 * @return int An integer indicating how the words should be sorted (-1, 0 1)
 	 */
-	public function searchSort($a, $b)
+	public function searchSort($a, $b): int
 	{
 		return $this->_searchAPI->searchSort($a, $b);
 	}
@@ -255,7 +255,7 @@ class SearchApiWrapper
 	 *
 	 * @param WeightFactors $weights
 	 */
-	public function setWeightFactors(WeightFactors $weights)
+	public function setWeightFactors(WeightFactors $weights): void
 	{
 		$this->_searchAPI->setWeightFactors($weights);
 	}
@@ -265,7 +265,7 @@ class SearchApiWrapper
 	 *
 	 * @param bool $use
 	 */
-	public function useTemporary($use = false)
+	public function useTemporary($use = false): void
 	{
 		$this->_searchAPI->useTemporary($use);
 	}
@@ -275,7 +275,7 @@ class SearchApiWrapper
 	 *
 	 * @return int
 	 */
-	public function getNumResults()
+	public function getNumResults(): int
 	{
 		return $this->_searchAPI->getNumResults();
 	}

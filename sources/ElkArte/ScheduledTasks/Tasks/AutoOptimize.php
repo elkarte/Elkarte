@@ -49,7 +49,7 @@ class AutoOptimize implements ScheduledTaskInterface
 			$request = $db->query('', '
 				SELECT COUNT(*)
 				FROM {db_prefix}log_online',
-				array()
+				[]
 			);
 			[$dont_do_it] = $request->fetch_row();
 			$request->free_result();

@@ -21,7 +21,7 @@ namespace BBC;
 final class ParserWrapper
 {
 	/** @var array Disabled tags */
-	protected $disabled = array();
+	protected $disabled = [];
 
 	/** @var Codes */
 	protected $codes;
@@ -53,7 +53,7 @@ final class ParserWrapper
 	 *
 	 * @return ParserWrapper
 	 */
-	public static function instance()
+	public static function instance(): ParserWrapper
 	{
 		if (self::$instance === null)
 		{
@@ -76,7 +76,7 @@ final class ParserWrapper
 	 *
 	 * @return bool If the parser can execute
 	 */
-	protected function checkLoad()
+	protected function checkLoad(): bool
 	{
 		global $modSettings, $context;
 
@@ -95,7 +95,7 @@ final class ParserWrapper
 	 *
 	 * @return bool
 	 */
-	protected function isEnabled()
+	protected function isEnabled(): bool
 	{
 		global $modSettings;
 
@@ -109,7 +109,7 @@ final class ParserWrapper
 	 *
 	 * @return $this
 	 */
-	public function enableSmileys($toggle)
+	public function enableSmileys($toggle): self
 	{
 		$this->smileys_enabled = (bool) $toggle;
 
@@ -121,7 +121,7 @@ final class ParserWrapper
 	 *
 	 * @return bool
 	 */
-	public function getSmileysEnabled()
+	public function getSmileysEnabled(): bool
 	{
 		return $this->smileys_enabled;
 	}
@@ -132,20 +132,20 @@ final class ParserWrapper
 	 * @param string $area Where it is being called from
 	 * @return array
 	 */
-	protected function getParsersByArea($area)
+	protected function getParsersByArea($area): array
 	{
-		$parsers = array(
+		$parsers = [
 			'autolink' => false,
 			'html' => false,
 			'bbc' => false,
 			'smiley' => false,
 			'markdown' => false,
-		);
+		];
 
 		// First see if any hooks set a parser.
 		foreach ($parsers as $parser_type => &$parser)
 		{
-			call_integration_hook('integrate_' . $area . '_' . $parser_type . '_parser', array(&$parser, $this));
+			call_integration_hook('integrate_' . $area . '_' . $parser_type . '_parser', [&$parser, $this]);
 
 			// If not, use the default one
 			$parser = $this->{'get' . ucfirst($parser_type) . 'Parser'}($area);
@@ -159,7 +159,7 @@ final class ParserWrapper
 	 *
 	 * @return array
 	 */
-	public function getMessageParser()
+	public function getMessageParser(): array
 	{
 		return $this->getParsersByArea('message');
 	}
@@ -169,7 +169,7 @@ final class ParserWrapper
 	 *
 	 * @return array
 	 */
-	public function getSignatureParser()
+	public function getSignatureParser(): array
 	{
 		return $this->getParsersByArea('signature');
 	}
@@ -179,7 +179,7 @@ final class ParserWrapper
 	 *
 	 * @return array
 	 */
-	public function getNewsParser()
+	public function getNewsParser(): array
 	{
 		return $this->getParsersByArea('news');
 	}
@@ -192,7 +192,7 @@ final class ParserWrapper
 	 *
 	 * @return string The Parsed message
 	 */
-	protected function parse($area, $message)
+	protected function parse($area, $message): string
 	{
 		// If the load average is too high, don't parse the BBC.
 		if (!$this->checkLoad())
@@ -228,7 +228,7 @@ final class ParserWrapper
 	 *
 	 * @return string
 	 */
-	public function parseMessage($message, $smileys_enabled)
+	public function parseMessage($message, $smileys_enabled): string
 	{
 		return $this->enableSmileys($smileys_enabled)->parse('message', $message);
 	}
@@ -241,7 +241,7 @@ final class ParserWrapper
 	 *
 	 * @return string
 	 */
-	public function parseSignature($signature, $smileys_enabled)
+	public function parseSignature($signature, $smileys_enabled): string
 	{
 		return $this->enableSmileys($smileys_enabled)->parse('signature', $signature);
 	}
@@ -253,7 +253,7 @@ final class ParserWrapper
 	 *
 	 * @return string
 	 */
-	public function parseNews($news)
+	public function parseNews($news): string
 	{
 		return $this->enableSmileys(true)->parse('news', $news);
 	}
@@ -265,7 +265,7 @@ final class ParserWrapper
 	 *
 	 * @return string
 	 */
-	public function parseEmail($email)
+	public function parseEmail($email): string
 	{
 		return $this->enableSmileys(false)->parse('email', $email);
 	}
@@ -277,7 +277,7 @@ final class ParserWrapper
 	 *
 	 * @return string
 	 */
-	public function parseCustomFields($field)
+	public function parseCustomFields($field): string
 	{
 		// @todo this should account for which field is being parsed and hook on that
 
@@ -291,7 +291,7 @@ final class ParserWrapper
 	 *
 	 * @return string
 	 */
-	public function parsePoll($poll)
+	public function parsePoll($poll): string
 	{
 		return $this->enableSmileys(true)->parse('poll', $poll);
 	}
@@ -303,7 +303,7 @@ final class ParserWrapper
 	 *
 	 * @return string
 	 */
-	public function parseAgreement($agreement)
+	public function parseAgreement($agreement): string
 	{
 		return $this->enableSmileys(true)->parse('agreement', $agreement);
 	}
@@ -315,7 +315,7 @@ final class ParserWrapper
 	 *
 	 * @return string
 	 */
-	public function parsePM($pm)
+	public function parsePM($pm): string
 	{
 		return $this->enableSmileys(true)->parse('pm', $pm);
 	}
@@ -327,7 +327,7 @@ final class ParserWrapper
 	 *
 	 * @return string
 	 */
-	public function parseReport($report)
+	public function parseReport($report): string
 	{
 		return $this->enableSmileys(true)->parse('report', $report);
 	}
@@ -339,7 +339,7 @@ final class ParserWrapper
 	 *
 	 * @return string
 	 */
-	public function parsePackage($package)
+	public function parsePackage($package): string
 	{
 		return $this->enableSmileys(true)->parse('package', $package);
 	}
@@ -351,7 +351,7 @@ final class ParserWrapper
 	 *
 	 * @return string
 	 */
-	public function parseVerificationControls($question)
+	public function parseVerificationControls($question): string
 	{
 		return $this->enableSmileys(true)->parse('package', $question);
 	}
@@ -363,7 +363,7 @@ final class ParserWrapper
 	 *
 	 * @return string
 	 */
-	public function parseNotice($notice)
+	public function parseNotice($notice): string
 	{
 		return $this->enableSmileys(true)->parse('notice', $notice);
 	}
@@ -375,7 +375,7 @@ final class ParserWrapper
 	 *
 	 * @return string
 	 */
-	public function parseBoard($board)
+	public function parseBoard($board): string
 	{
 		return $this->enableSmileys(true)->parse('board', $board);
 	}
@@ -387,7 +387,7 @@ final class ParserWrapper
 	 *
 	 * @return $this
 	 */
-	public function setDisabled(array $disabled)
+	public function setDisabled(array $disabled): self
 	{
 		foreach ($disabled as $tag)
 		{
@@ -402,12 +402,12 @@ final class ParserWrapper
 	 *
 	 * @return Codes
 	 */
-	public function getCodes()
+	public function getCodes(): Codes
 	{
 		if ($this->codes === null)
 		{
-			$additional_bbc = array();
-			call_integration_hook('integrate_additional_bbc', array(&$additional_bbc));
+			$additional_bbc = [];
+			call_integration_hook('integrate_additional_bbc', [&$additional_bbc]);
 			$this->codes = new Codes($additional_bbc, array_keys($this->disabled));
 		}
 
@@ -419,7 +419,7 @@ final class ParserWrapper
 	 *
 	 * @return BBCParser
 	 */
-	public function getBBCParser()
+	public function getBBCParser(): BBCParser
 	{
 		if ($this->bbc_parser === null)
 		{
@@ -434,7 +434,7 @@ final class ParserWrapper
 	 *
 	 * @return Autolink
 	 */
-	public function getAutolinkParser()
+	public function getAutolinkParser(): Autolink
 	{
 		if ($this->autolink_parser === null)
 		{
@@ -449,7 +449,7 @@ final class ParserWrapper
 	 *
 	 * @return SmileyParser
 	 */
-	public function getSmileyParser()
+	public function getSmileyParser(): SmileyParser
 	{
 		global $context;
 
@@ -472,7 +472,7 @@ final class ParserWrapper
 	 *
 	 * @return HtmlParser
 	 */
-	public function getHtmlParser()
+	public function getHtmlParser(): HtmlParser
 	{
 		if ($this->html_parser === null)
 		{
@@ -487,7 +487,7 @@ final class ParserWrapper
 	 *
 	 * @return MarkdownParser
 	 */
-	public function getMarkdownParser()
+	public function getMarkdownParser(): MarkdownParser
 	{
 		if ($this->markdown_parser === null)
 		{

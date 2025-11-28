@@ -41,17 +41,17 @@ function getBuddiesID($buddies, $adding = true)
 	}
 
 	// Find the id_member of the buddy(s).
-	$buddiesArray = array();
+	$buddiesArray = [];
 	$db->fetchQuery('
 		SELECT 
 			id_member
 		FROM {db_prefix}members
 		WHERE member_name IN ({array_string:buddies}) OR real_name IN ({array_string:buddies})
 		LIMIT {int:count_new_buddies}',
-		array(
+		[
 			'buddies' => $buddies,
 			'count_new_buddies' => count($buddies),
-		)
+		]
 	)->fetch_callback(
 		function ($row) use (&$buddiesArray, $notifier) {
 			$buddiesArray[] = (int) $row['id_member'];
@@ -63,7 +63,7 @@ function getBuddiesID($buddies, $adding = true)
 					'buddy',
 					$row['id_member'],
 					User::$info->id,
-					array('id_members' => array($row['id_member']))
+					['id_members' => [$row['id_member']]]
 				));
 			}
 		}
@@ -85,10 +85,10 @@ function loadMembergroupsJoin($current_groups, $memID)
 	$db = database();
 
 	// This beast will be our group holder.
-	$groups = array(
-		'member' => array(),
-		'available' => array()
-	);
+	$groups = [
+		'member' => [],
+		'available' => []
+	];
 
 	// Get all the membergroups they can join.
 	$db->fetchQuery('
@@ -101,13 +101,13 @@ function loadMembergroupsJoin($current_groups, $memID)
 			AND mg.min_posts = {int:min_posts}
 			AND mg.id_group != {int:moderator_group}
 		ORDER BY group_name',
-		array(
+		[
 			'group_list' => $current_groups,
 			'selected_member' => $memID,
 			'nonjoin_group_id' => 1,
 			'min_posts' => -1,
 			'moderator_group' => 3,
-		)
+		]
 	)->fetch_callback(
 		function ($row) use (&$groups, $current_groups) {
 			global $context;
@@ -125,7 +125,7 @@ function loadMembergroupsJoin($current_groups, $memID)
 				return;
 			}
 
-			$groups[in_array($row['id_group'], $current_groups) ? 'member' : 'available'][$row['id_group']] = array(
+			$groups[in_array($row['id_group'], $current_groups) ? 'member' : 'available'][$row['id_group']] = [
 				'id' => $row['id_group'],
 				'name' => $row['group_name'],
 				'desc' => $row['description'],
@@ -136,7 +136,7 @@ function loadMembergroupsJoin($current_groups, $memID)
 				'can_be_primary' => $row['hidden'] != 2,
 				// Anything more than this needs to be done through account settings for security.
 				'can_leave' => $row['id_group'] != 1 && $row['group_type'] > 1 ? true : false,
-			);
+			];
 		}
 	);
 
@@ -161,11 +161,11 @@ function checkMembergroupChange($group_id)
 		WHERE id_group = {int:selected_group}
 			AND permission = {string:admin_forum}
 			AND add_deny = {int:not_denied}',
-		array(
+		[
 			'selected_group' => $group_id,
 			'admin_forum' => 'admin_forum',
 			'not_denied' => 1,
-		)
+		]
 	);
 	list ($disallow) = $request->fetch_row();
 	$request->free_result();
@@ -190,10 +190,10 @@ function logMembergroupRequest($group_id, $memID)
 		FROM {db_prefix}log_group_requests
 		WHERE id_member = {int:selected_member}
 			AND id_group = {int:selected_group}',
-		array(
+		[
 			'selected_member' => $memID,
 			'selected_group' => $group_id,
-		)
+		]
 	)->num_rows();
 
 	// Log the request.
@@ -201,13 +201,13 @@ function logMembergroupRequest($group_id, $memID)
 	{
 		$db->insert('',
 			'{db_prefix}log_group_requests',
-			array(
+			[
 				'id_member' => 'int', 'id_group' => 'int', 'time_applied' => 'int', 'reason' => 'string-65534',
-			),
-			array(
+			],
+			[
 				$memID, $group_id, time(), $_POST['reason'],
-			),
-			array('id_request')
+			],
+			['id_request']
 		);
 	}
 

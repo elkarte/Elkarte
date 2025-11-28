@@ -53,7 +53,7 @@ class ApprovalNotification implements ScheduledTaskInterface
 				INNER JOIN {db_prefix}messages AS m ON (m.id_msg = aq.id_msg)
 				INNER JOIN {db_prefix}topics AS t ON (t.id_topic = m.id_topic)
 				INNER JOIN {db_prefix}boards AS b ON (b.id_board = m.id_board)',
-			array()
+			[]
 		)->fetch_callback(
 			static function ($row) use (&$notices, &$profiles) {
 				// If this is no longer around we'll ignore it.
@@ -75,10 +75,10 @@ class ApprovalNotification implements ScheduledTaskInterface
 					$type = 'msg';
 				}
 				// Add it to the array otherwise.
-				$notices[$row['id_board']][$type][] = array(
+				$notices[$row['id_board']][$type][] = [
 					'subject' => $row['subject'],
 					'href' => getUrl('topic', ['topic' => $row['id_topic'], 'msg' => $row['id_msg'], 'subject' => $row['subject'], 'hash' => '#msg' . $row['id_msg']]),
-				);
+				];
 				// Store the profile for a bit later.
 				$profiles[$row['id_board']] = $row['id_profile'];
 			}
@@ -87,7 +87,7 @@ class ApprovalNotification implements ScheduledTaskInterface
 		// Delete it all!
 		$db->query('', '
 			DELETE FROM {db_prefix}approval_queue',
-			array()
+			[]
 		);
 
 		// If nothing quit now.
@@ -106,10 +106,10 @@ class ApprovalNotification implements ScheduledTaskInterface
 			FROM {db_prefix}board_permissions
 			WHERE permission = {string:approve_posts}
 				AND id_profile IN ({array_int:profile_list})',
-			array(
+			[
 				'profile_list' => $profiles,
 				'approve_posts' => 'approve_posts',
-			)
+			]
 		)->fetch_callback(
 			static function ($row) use (&$addGroups, &$perms) {
 				// Sorry guys, but we have to ignore guests AND members - it would be too many otherwise.
@@ -156,11 +156,11 @@ class ApprovalNotification implements ScheduledTaskInterface
 				OR FIND_IN_SET({raw:additional_group_list_implode}, additional_groups) != 0' . (empty($members) ? '' : '
 				OR id_member IN ({array_int:member_list})') . '
 			ORDER BY lngfile',
-			array(
+			[
 				'additional_group_list' => $addGroups,
 				'member_list' => $membersQuery,
 				'additional_group_list_implode' => implode(', additional_groups) != 0 OR FIND_IN_SET(', $addGroups),
-			)
+			]
 		)->fetch_callback(
 			static function ($row) use (&$members) {
 				// Check whether they are interested.
@@ -172,13 +172,13 @@ class ApprovalNotification implements ScheduledTaskInterface
 						return;
 					}
 				}
-				$members[$row['id_member']] = array(
+				$members[$row['id_member']] = [
 					'id' => $row['id_member'],
-					'groups' => array_merge(explode(',', $row['additional_groups']), array($row['id_group'])),
+					'groups' => array_merge(explode(',', $row['additional_groups']), [$row['id_group']]),
 					'language' => $row['lngfile'],
 					'email' => $row['email_address'],
 					'name' => $row['real_name'],
-				);
+				];
 			}
 		);
 
@@ -259,10 +259,10 @@ class ApprovalNotification implements ScheduledTaskInterface
 				continue;
 			}
 
-			$replacements = array(
+			$replacements = [
 				'REALNAME' => $member['name'],
 				'BODY' => $emailbody,
-			);
+			];
 
 			$emaildata = loadEmailTemplate('scheduled_approval', $replacements, $current_language);
 

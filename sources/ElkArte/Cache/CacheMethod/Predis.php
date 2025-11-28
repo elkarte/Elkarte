@@ -24,7 +24,7 @@ class Predis extends AbstractCacheMethod
 	/** @var \Predis Predis instance representing the connection to the Redis servers. */
 	protected $obj;
 
-	/** @var server */
+	/** @var array */
 	protected $server = [];
 
 	/**
@@ -54,9 +54,9 @@ class Predis extends AbstractCacheMethod
 	 *
 	 * Don't add servers if they already exist. Ideal for persistent connections.
 	 *
-	 * @return bool True if there are servers in the daemon, false if not.
+	 * @return bool|null
 	 */
-	protected function addServers()
+	protected function addServers(): ?bool
 	{
 		if (!empty($this->_options['servers']))
 		{
@@ -90,9 +90,9 @@ class Predis extends AbstractCacheMethod
 	 *
 	 * @return array A list of servers in the daemon.
 	 */
-	protected function getServers()
+	protected function getServers(): array
 	{
-		return $this->server;
+		return reset($this->_options['servers']);
 	}
 
 	/**
@@ -110,7 +110,7 @@ class Predis extends AbstractCacheMethod
 	 *
 	 * If the statistics cannot be obtained, an empty array is returned.
 	 */
-	public function getStats()
+	public function getStats(): array
 	{
 		$results = [];
 
@@ -152,11 +152,11 @@ class Predis extends AbstractCacheMethod
 	{
 		if (!is_object($this->obj))
 		{
-			return '';
+			return null;
 		}
 
 		$result = $this->obj->get($key);
-		$this->is_miss = $result == null;
+		$this->is_miss = $result === null;
 
 		return $result;
 	}
@@ -168,7 +168,7 @@ class Predis extends AbstractCacheMethod
 	{
 		if (!is_object($this->obj))
 		{
-			return '';
+			return null;
 		}
 
 		if ($value === null)
@@ -186,7 +186,7 @@ class Predis extends AbstractCacheMethod
 	{
 		if (!is_object($this->obj))
 		{
-			return '';
+			return null;
 		}
 
 		// Clear it out, really invalidate whats there
@@ -200,15 +200,18 @@ class Predis extends AbstractCacheMethod
 	{
 		if (!is_object($this->obj))
 		{
-			return '';
+			return [
+				'title' => $this->title(),
+				'version' => 'n/a'
+			];
 		}
 
 		$version = $this->obj->info()['Server'];
 
-		return array(
+		return [
 			'title' => $this->title(),
 			'version' => !empty($version['redis_version']) ? $version['redis_version'] : '0.0.0'
-		);
+		];
 	}
 
 	/**

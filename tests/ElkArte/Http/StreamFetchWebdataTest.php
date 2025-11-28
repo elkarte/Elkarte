@@ -43,7 +43,7 @@ class StreamFetchWebdataTest extends TestCase
 			array(
 				'https://developer.mozilla.org/en-US/',
 				200,
-				'Resources for <u>Developers</u>',
+				'Community Participation Guidelines',
 			),
 			array(
 				'http://www.google.com/elkarte',

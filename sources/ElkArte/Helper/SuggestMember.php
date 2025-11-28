@@ -43,7 +43,7 @@ class SuggestMember
 	 *
 	 * @return array
 	 */
-	public function member()
+	public function member(): array
 	{
 		// Escape the search string
 		$this->_search = strtr($this->_search, ['%' => '\%', '_' => '\_', '*' => '%', '?' => '_', '&#038;' => '&amp;']);
@@ -51,6 +51,6 @@ class SuggestMember
 		require_once(SUBSDIR . '/Members.subs.php');
 
 		// Find the member.
-		return getMember($this->_search, empty($this->_params['buddies']) ? array() : User::$info->buddies);
+		return getMember($this->_search, empty($this->_params['buddies']) ? [] : User::$info->buddies);
 	}
 }

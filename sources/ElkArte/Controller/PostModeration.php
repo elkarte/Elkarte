@@ -27,8 +27,6 @@ use ElkArte\Languages\Txt;
  */
 class PostModeration extends AbstractController
 {
-	/** @var array|null Holds any passed brd values, used for filtering and the like */
-	private $_brd;
 
 	/**
 	 * This is the entry point for all things post moderation.
@@ -45,12 +43,12 @@ class PostModeration extends AbstractController
 		theme()->getTemplates()->load('ModerationCenter');
 
 		// Allowed sub-actions, you know the drill by now!
-		$subActions = array(
-			'approve' => array($this, 'action_approve'),
-			'attachments' => array($this, 'action_unapproved_attachments'),
-			'replies' => array($this, 'action_unapproved'),
-			'topics' => array($this, 'action_unapproved'),
-		);
+		$subActions = [
+			'approve' => [$this, 'action_approve'],
+			'attachments' => [$this, 'action_unapproved_attachments'],
+			'replies' => [$this, 'action_unapproved'],
+			'topics' => [$this, 'action_unapproved'],
+		];
 
 		// Pick something valid...
 		$action = new Action('post_moderation');
@@ -61,7 +59,7 @@ class PostModeration extends AbstractController
 	/**
 	 * View all unapproved posts or topics
 	 */
-	public function action_unapproved()
+	public function action_unapproved(): void
 	{
 		global $txt, $context;
 
@@ -72,17 +70,17 @@ class PostModeration extends AbstractController
 		// Work out what boards we can work in!
 		$approve_boards = empty($this->user->mod_cache['ap']) ? boardsAllowedTo('approve_posts') : $this->user->mod_cache['ap'];
 
-		$this->_brd = $this->_req->getPost('brd', 'intval', $this->_req->getQuery('brd', 'intval', null));
+		$_brd = $this->_req->getPost('brd', 'intval', $this->_req->getQuery('brd', 'intval', null));
 
 		// If we filtered by board remove ones outside of this board.
 		// @todo Put a message saying we're filtered?
-		if ($this->_brd !== null)
+		if ($_brd !== null)
 		{
-			$filter_board = array($this->_brd);
-			$approve_boards = $approve_boards == array(0) ? $filter_board : array_intersect($approve_boards, $filter_board);
+			$filter_board = [$_brd];
+			$approve_boards = $approve_boards == [0] ? $filter_board : array_intersect($approve_boards, $filter_board);
 		}
 
-		if ($approve_boards == array(0))
+		if ($approve_boards == [0])
 		{
 			$approve_query = '';
 		}
@@ -101,7 +99,7 @@ class PostModeration extends AbstractController
 		{
 			$delete_own_boards = boardsAllowedTo('remove_own');
 			$delete_any_boards = boardsAllowedTo('remove_any');
-			$delete_own_replies = array();
+			$delete_own_replies = [];
 		}
 		else
 		{
@@ -111,7 +109,7 @@ class PostModeration extends AbstractController
 		}
 
 		// No action yet
-		$toAction = array();
+		$toAction = [];
 
 		// Check if we have something to do?
 		if (isset($this->_req->query->approve))
@@ -152,23 +150,23 @@ class PostModeration extends AbstractController
 
 			// Now for each message work out whether it's actually a topic, and what board it's on.
 			$request = loadMessageDetails(
-				array('m.id_board', 't.id_topic', 't.id_first_msg', 't.id_member_started'),
-				array(
+				['m.id_board', 't.id_topic', 't.id_first_msg', 't.id_member_started'],
+				[
 					'INNER JOIN {db_prefix}topics AS t ON (t.id_topic = m.id_topic)',
 					'LEFT JOIN {db_prefix}boards AS b ON (t.id_board = b.id_board)'
-				),
-				array(
+				],
+				[
 					'message_list' => $toAction,
 					'not_approved' => 0,
-				),
-				array(
+				],
+				[
 					'additional_conditions' => '
 					AND m.approved = {int:not_approved}
 					AND {query_see_board}'
-				)
+				]
 			);
-			$toAction = array();
-			$details = array();
+			$toAction = [];
+			$details = [];
 			foreach ($request as $row)
 			{
 				// If it's not within what our view is ignore it...
@@ -180,7 +178,7 @@ class PostModeration extends AbstractController
 				$can_add = false;
 
 				// If we're approving this is simple.
-				if ($curAction === 'approve' && ($any_array == array(0) || in_array($row['id_board'], $any_array)))
+				if ($curAction === 'approve' && ($any_array == [0] || in_array($row['id_board'], $any_array)))
 				{
 					$can_add = true;
 				}
@@ -188,17 +186,17 @@ class PostModeration extends AbstractController
 				elseif ($curAction === 'delete')
 				{
 					// Own post is easy!
-					if ($row['id_member'] == $this->user->id && ($delete_own_boards == array(0) || in_array($row['id_board'], $delete_own_boards)))
+					if ($row['id_member'] == $this->user->id && ($delete_own_boards == [0] || in_array($row['id_board'], $delete_own_boards)))
 					{
 						$can_add = true;
 					}
 					// Is it a reply to their own topic?
-					elseif ($row['id_member'] == $row['id_member_started'] && $row['id_msg'] != $row['id_first_msg'] && ($delete_own_replies == array(0) || in_array($row['id_board'], $delete_own_replies)))
+					elseif ($row['id_member'] == $row['id_member_started'] && $row['id_msg'] != $row['id_first_msg'] && ($delete_own_replies == [0] || in_array($row['id_board'], $delete_own_replies)))
 					{
 						$can_add = true;
 					}
 					// Someone else's?
-					elseif ($row['id_member'] != $this->user->id && ($delete_any_boards == array(0) || in_array($row['id_board'], $delete_any_boards)))
+					elseif ($row['id_member'] != $this->user->id && ($delete_any_boards == [0] || in_array($row['id_board'], $delete_any_boards)))
 					{
 						$can_add = true;
 					}
@@ -210,7 +208,7 @@ class PostModeration extends AbstractController
 					$toAction[] = $anItem;
 
 					// All clear. What have we got now, what, what?
-					$details[$anItem] = array();
+					$details[$anItem] = [];
 					$details[$anItem]['subject'] = $row['subject'];
 					$details[$anItem]['topic'] = $row['id_topic'];
 					$details[$anItem]['member'] = ($context['current_view'] === 'topics') ? $row['id_member_started'] : $row['id_member'];
@@ -236,11 +234,11 @@ class PostModeration extends AbstractController
 
 		// Get the moderation values for the board level
 		require_once(SUBSDIR . '/Moderation.subs.php');
-		$mod_count = loadModeratorMenuCounts($this->_brd);
+		$mod_count = loadModeratorMenuCounts($_brd);
 
 		$context['total_unapproved_topics'] = $mod_count['topics'];
 		$context['total_unapproved_posts'] = $mod_count['posts'];
-		$context['page_index'] = constructPageIndex('{scripturl}?action=moderate;area=postmod;sa=' . $context['current_view'] . ($this->_brd !== null ? ';brd=' . $this->_brd : ''), $this->_req->query->start, $context['current_view'] === 'topics' ? $context['total_unapproved_topics'] : $context['total_unapproved_posts'], 10);
+		$context['page_index'] = constructPageIndex('{scripturl}?action=moderate;area=postmod;sa=' . $context['current_view'] . ($_brd !== null ? ';brd=' . $_brd : ''), $this->_req->query->start, $context['current_view'] === 'topics' ? $context['total_unapproved_topics'] : $context['total_unapproved_posts'], 10);
 		$context['start'] = $this->_req->query->start;
 
 		// We have enough to make some pretty tabs!
@@ -255,18 +253,18 @@ class PostModeration extends AbstractController
 		$context['menu_data_' . $context['moderation_menu_id']]['sections']['posts']['areas']['postmod']['subsections']['topics']['label'] = $context['menu_data_' . $context['moderation_menu_id']]['sections']['posts']['areas']['postmod']['subsections']['topics']['label'] . ' [' . $context['total_unapproved_topics'] . ']';
 
 		// If we are filtering some boards out then make sure to send that along with the links.
-		if ($this->_brd !== null)
+		if ($_brd !== null)
 		{
-			$context['menu_data_' . $context['moderation_menu_id']]['sections']['posts']['areas']['postmod']['subsections']['posts']['add_params'] = ';brd=' . $this->_brd;
-			$context['menu_data_' . $context['moderation_menu_id']]['sections']['posts']['areas']['postmod']['subsections']['topics']['add_params'] = ';brd=' . $this->_brd;
+			$context['menu_data_' . $context['moderation_menu_id']]['sections']['posts']['areas']['postmod']['subsections']['posts']['add_params'] = ';brd=' . $_brd;
+			$context['menu_data_' . $context['moderation_menu_id']]['sections']['posts']['areas']['postmod']['subsections']['topics']['add_params'] = ';brd=' . $_brd;
 		}
 
 		// Get all unapproved posts.
-		$context['unapproved_items'] = getUnapprovedPosts($approve_query, $context['current_view'], array(
+		$context['unapproved_items'] = getUnapprovedPosts($approve_query, $context['current_view'], [
 			'delete_own_boards' => $delete_own_boards,
 			'delete_any_boards' => $delete_any_boards,
 			'delete_own_replies' => $delete_own_replies,
-		), $context['start'], 10);
+		], $context['start'], 10);
 
 		foreach ($context['unapproved_items'] as $key => $item)
 		{
@@ -295,7 +293,7 @@ class PostModeration extends AbstractController
 	/**
 	 * View all unapproved attachments.
 	 */
-	public function action_unapproved_attachments()
+	public function action_unapproved_attachments(): void
 	{
 		global $txt, $context, $modSettings;
 
@@ -304,7 +302,7 @@ class PostModeration extends AbstractController
 		// Once again, permissions are king!
 		$approve_boards = empty($this->user->mod_cache['ap']) ? boardsAllowedTo('approve_posts') : $this->user->mod_cache['ap'];
 
-		if ($approve_boards == array(0))
+		if ($approve_boards == [0])
 		{
 			$approve_query = '';
 		}
@@ -318,7 +316,7 @@ class PostModeration extends AbstractController
 		}
 
 		// Get together the array of things to act on, if any.
-		$attachments = array();
+		$attachments = [];
 		if (isset($this->_req->query->approve))
 		{
 			$attachments[] = (int) $this->_req->query->approve;
@@ -365,7 +363,7 @@ class PostModeration extends AbstractController
 				}
 				else
 				{
-					removeAttachments(array('id_attach' => $attachments, 'do_logging' => true));
+					removeAttachments(['id_attach' => $attachments, 'do_logging' => true]);
 				}
 
 				Cache::instance()->remove('num_menu_errors');
@@ -374,120 +372,120 @@ class PostModeration extends AbstractController
 
 		require_once(SUBSDIR . '/ManageAttachments.subs.php');
 
-		$listOptions = array(
+		$listOptions = [
 			'id' => 'mc_unapproved_attach',
 			'width' => '100%',
 			'items_per_page' => $modSettings['defaultMaxMessages'],
 			'no_items_label' => $txt['mc_unapproved_attachments_none_found'],
 			'base_href' => getUrl('action', ['action' => 'moderate', 'area' => 'attachmod', 'sa' => 'attachments']),
 			'default_sort_col' => 'attach_name',
-			'get_items' => array(
+			'get_items' => [
 				'function' => 'list_getUnapprovedAttachments',
-				'params' => array(
+				'params' => [
 					$approve_query,
-				),
-			),
-			'get_count' => array(
+				],
+			],
+			'get_count' => [
 				'function' => 'list_getNumUnapprovedAttachments',
-				'params' => array(
+				'params' => [
 					$approve_query,
-				),
-			),
-			'columns' => array(
-				'attach_name' => array(
-					'header' => array(
+				],
+			],
+			'columns' => [
+				'attach_name' => [
+					'header' => [
 						'value' => $txt['mc_unapproved_attach_name'],
-					),
-					'data' => array(
+					],
+					'data' => [
 						'db' => 'filename',
-					),
-					'sort' => array(
+					],
+					'sort' => [
 						'default' => 'a.filename',
 						'reverse' => 'a.filename DESC',
-					),
-				),
-				'attach_size' => array(
-					'header' => array(
+					],
+				],
+				'attach_size' => [
+					'header' => [
 						'value' => $txt['mc_unapproved_attach_size'],
-					),
-					'data' => array(
+					],
+					'data' => [
 						'db' => 'size',
-					),
-					'sort' => array(
+					],
+					'sort' => [
 						'default' => 'a.size',
 						'reverse' => 'a.size DESC',
-					),
-				),
-				'attach_poster' => array(
-					'header' => array(
+					],
+				],
+				'attach_poster' => [
+					'header' => [
 						'value' => $txt['mc_unapproved_attach_poster'],
-					),
-					'data' => array(
+					],
+					'data' => [
 						'function' => static fn($data) => $data['poster']['link'],
-					),
-					'sort' => array(
+					],
+					'sort' => [
 						'default' => 'm.id_member',
 						'reverse' => 'm.id_member DESC',
-					),
-				),
-				'date' => array(
-					'header' => array(
+					],
+				],
+				'date' => [
+					'header' => [
 						'value' => $txt['date'],
 						'style' => 'width: 18%;',
-					),
-					'data' => array(
+					],
+					'data' => [
 						'db' => 'time',
 						'class' => 'smalltext',
 						'style' => 'white-space:nowrap;',
-					),
-					'sort' => array(
+					],
+					'sort' => [
 						'default' => 'm.poster_time',
 						'reverse' => 'm.poster_time DESC',
-					),
-				),
-				'message' => array(
-					'header' => array(
+					],
+				],
+				'message' => [
+					'header' => [
 						'value' => $txt['post'],
-					),
-					'data' => array(
+					],
+					'data' => [
 						'function' => static function ($data) {
 							global $modSettings;
 							return '<a href="' . $data['message']['href'] . '">' . Util::shorten_text($data['message']['subject'], empty($modSettings['subject_length']) ? 32 : $modSettings['subject_length']) . '</a>';
 						},
 						'class' => 'smalltext',
 						'style' => 'width:15em;',
-					),
-					'sort' => array(
+					],
+					'sort' => [
 						'default' => 'm.subject',
 						'reverse' => 'm.subject DESC',
-					),
-				),
-				'action' => array(
-					'header' => array(
+					],
+				],
+				'action' => [
+					'header' => [
 						'value' => '<input type="checkbox" class="input_check" onclick="invertAll(this, this.form);" />',
 						'style' => 'width: 4%',
-					),
-					'data' => array(
-						'sprintf' => array(
+					],
+					'data' => [
+						'sprintf' => [
 							'format' => '<input type="checkbox" name="item[]" value="%1$d" class="input_check" />',
-							'params' => array(
+							'params' => [
 								'id' => false,
-							),
-						),
-					),
-				),
-			),
-			'form' => array(
+							],
+						],
+					],
+				],
+			],
+			'form' => [
 				'href' => getUrl('action', ['action' => 'moderate', 'area' => 'attachmod', 'sa' => 'attachments']),
 				'include_sort' => true,
 				'include_start' => true,
-				'hidden_fields' => array(
+				'hidden_fields' => [
 					$context['session_var'] => $context['session_id'],
-				),
+				],
 				'token' => 'mod-ap',
-			),
-			'additional_rows' => array(
-				array(
+			],
+			'additional_rows' => [
+				[
 					'position' => 'bottom_of_list',
 					'value' => '
 						<select name="do" onchange="if (this.value != 0 &amp;&amp; confirm(\'' . $txt['mc_unapproved_sure'] . '\')) submit();">
@@ -498,9 +496,9 @@ class PostModeration extends AbstractController
 						</select>
 						<noscript><input type="submit" name="ml_go" value="' . $txt['go'] . '" class="right_submit" /></noscript>',
 					'class' => 'floatright',
-				),
-			),
-		);
+				],
+			],
+		];
 
 		// Create the request list.
 		createToken('mod-ap');
@@ -517,7 +515,7 @@ class PostModeration extends AbstractController
 	/**
 	 * Approve or un-approve a post just the one or a topic if its the first post
 	 */
-	public function action_approve()
+	public function action_approve(): void
 	{
 		global $topic, $board;
 
@@ -545,7 +543,7 @@ class PostModeration extends AbstractController
 
 			if ($message_info['id_member'] != $this->user->id)
 			{
-				logAction(($message_info['approved'] ? 'un' : '') . 'approve', array('topic' => $topic, 'subject' => $message_info['subject'], 'member' => $message_info['id_member'], 'board' => $board));
+				logAction(($message_info['approved'] ? 'un' : '') . 'approve', ['topic' => $topic, 'subject' => $message_info['subject'], 'member' => $message_info['id_member'], 'board' => $board]);
 			}
 		}
 

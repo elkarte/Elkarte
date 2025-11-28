@@ -57,7 +57,7 @@ class MaillistTopic extends AbstractController
 	 *
 	 * @return bool
 	 */
-	public function action_pbe_topic($data = null)
+	public function action_pbe_topic($data = null): bool
 	{
 		global $maintenance;
 
@@ -120,7 +120,7 @@ class MaillistTopic extends AbstractController
 	 * @return bool Returns true if the mail list is enabled, false otherwise.
 	 * @global array $modSettings The settings array.
 	 */
-	private function isMailListEnabled()
+	private function isMailListEnabled(): bool
 	{
 		global $modSettings;
 
@@ -134,7 +134,7 @@ class MaillistTopic extends AbstractController
 	 *
 	 * @return EmailParse The parsed email message.
 	 */
-	private function loadEmailMessage($data)
+	private function loadEmailMessage($data): EmailParse
 	{
 		// Load the email parser and set some data to work with
 		$email_message = new EmailParse();

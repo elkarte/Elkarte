@@ -1,7 +1,7 @@
 {
 	"name": "elkarte/elkarte",
 	"description": "ElkArte PHP-based community discussion forum.",
-	"version": "2.0 dev",
+	"version": "2.0",
 	"type": "project",
 	"keywords": ["elkarte", "forum", "discussion", "php", "community"],
 	"homepage": "https://www.elkarte.net",
@@ -17,8 +17,7 @@
 	"support": {
 		"issues": "https://github.com/elkarte/Elkarte/issues",
 		"forum": "https://www.elkarte.com/community/",
-		"wiki": "https://github.com/elkarte/Elkarte/wiki",
-		"irc": "irc://irc.freenode.org/elkarte"
+		"wiki": "https://github.com/elkarte/Elkarte/wiki"
 	},
 	"minimum-stability": "beta",
 	"scripts": {
@@ -26,31 +25,33 @@
 	"replace": {
 	},
 	"require": {
-		"php": ">=8.0.0",
-      	"ext-json": "*",
-		"ext-gd": "*",
-		"ext-curl": "*",
-		"ext-mysqli": "*",
-		"ext-fileinfo": "*",
-		"ext-exif": "*"
-	},
+	    "php": ">=8.1.0",
+        "ext-json": "*",
+	    "ext-gd": "*",
+	    "ext-curl": "*",
+	    "ext-mysqli": "*",
+	    "ext-fileinfo": "*",
+	    "ext-exif": "*",
+	    "michelf/php-markdown": "2.*",
+        "ext-libxml": "*",
+        "ext-dom": "*",
+        "ext-imagick": "*"
+    },
 	"suggest": {
 		"ext-memcache": "*",
+		"ext-memcached": "*",
+		"predis/predis": "*",
+		"ext-apcu": "*",
 		"ext-zlib": "*",
 		"ext-pgsql": "*",
 		"ext-imap": "*",
-		"ext-memcached": "*",
 		"ext-zend-opcache": "*",
 		"ext-mbstring": "*",
-		"ext-apcu": "*",
-		"ext-libxml": "*",
-		"ext-dom": "*",
-		"ext-apache": "*",
-		"ext-iconv": "*",
-		"ext-imagick": "*"
-	},
+		"ext-iconv": "*"
+    },
 	"require-dev": {
-		"phpunit/phpunit-selenium": "9.0.1",
+        "roave/security-advisories": "dev-latest",
+        "phpunit/phpunit-selenium": "9.0.1",
 		"phpunit/phpunit": "9.6.*",
 		"myclabs/deep-copy": "1.11.0"
     },

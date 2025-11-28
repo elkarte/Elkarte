@@ -47,20 +47,20 @@ class Xml extends AbstractController
 		theme()->getTemplates()->load('Xml');
 		theme()->getLayers()->removeAll();
 
-		$subActions = array(
-			'jumpto' => array('controller' => $this, 'function' => 'action_jumpto'),
-			'messageicons' => array('controller' => $this, 'function' => 'action_messageicons'),
-			'groupicons' => array('controller' => $this, 'function' => 'action_groupicons'),
-			'corefeatures' => array('controller' => $this, 'function' => 'action_corefeatures', 'permission' => 'admin_forum'),
-			'profileorder' => array('controller' => $this, 'function' => 'action_profileorder', 'permission' => 'admin_forum'),
-			'messageiconorder' => array('controller' => $this, 'function' => 'action_messageiconorder', 'permission' => 'admin_forum'),
-			'smileyorder' => array('controller' => $this, 'function' => 'action_smileyorder', 'permission' => 'admin_forum'),
-			'boardorder' => array('controller' => $this, 'function' => 'action_boardorder', 'permission' => 'manage_boards'),
-			'parserorder' => array('controller' => $this, 'function' => 'action_parserorder', 'permission' => 'admin_forum'),
-			'videoembed' => array('controller' => $this, 'function' => 'action_videoembed'),
-		);
+		$subActions = [
+			'jumpto' => ['controller' => $this, 'function' => 'action_jumpto'],
+			'messageicons' => ['controller' => $this, 'function' => 'action_messageicons'],
+			'groupicons' => ['controller' => $this, 'function' => 'action_groupicons'],
+			'corefeatures' => ['controller' => $this, 'function' => 'action_corefeatures', 'permission' => 'admin_forum'],
+			'profileorder' => ['controller' => $this, 'function' => 'action_profileorder', 'permission' => 'admin_forum'],
+			'messageiconorder' => ['controller' => $this, 'function' => 'action_messageiconorder', 'permission' => 'admin_forum'],
+			'smileyorder' => ['controller' => $this, 'function' => 'action_smileyorder', 'permission' => 'admin_forum'],
+			'boardorder' => ['controller' => $this, 'function' => 'action_boardorder', 'permission' => 'manage_boards'],
+			'parserorder' => ['controller' => $this, 'function' => 'action_parserorder', 'permission' => 'admin_forum'],
+			'videoembed' => ['controller' => $this, 'function' => 'action_videoembed'],
+		];
 
-		// Easy adding of xml sub actions with integrate_xmlhttp
+		// Easy adding of xml sub actions with integrate_sa_xmlhttp
 		$action = new Action('xmlhttp');
 		$subAction = $action->initialize($subActions);
 
@@ -77,15 +77,15 @@ class Xml extends AbstractController
 	/**
 	 * Get a list of boards and categories used for the jumpto dropdown.
 	 */
-	public function action_jumpto()
+	public function action_jumpto(): void
 	{
 		global $context;
 
 		// Find the boards/categories they can see.
 		require_once(SUBSDIR . '/Boards.subs.php');
-		$boardListOptions = array(
+		$boardListOptions = [
 			'selected_board' => $context['current_board'] ?? 0,
-		);
+		];
 		$context += getBoardList($boardListOptions);
 
 		// Make the board safe for display.
@@ -104,7 +104,7 @@ class Xml extends AbstractController
 	/**
 	 * Get the message icons available for a given board
 	 */
-	public function action_messageicons()
+	public function action_messageicons(): void
 	{
 		global $context, $board;
 
@@ -117,15 +117,15 @@ class Xml extends AbstractController
 	/**
 	 * Get the member group icons
 	 */
-	public function action_groupicons()
+	public function action_groupicons(): void
 	{
 		global $context, $settings;
 
 		// Only load images
-		$allowedTypes = array('jpeg', 'jpg', 'gif', 'png', 'bmp');
-		$context['membergroup_icons'] = array();
+		$allowedTypes = ['jpeg', 'jpg', 'gif', 'png', 'bmp'];
+		$context['membergroup_icons'] = [];
 		$directory = $settings['theme_dir'] . '/images/group_icons';
-		$icons = array();
+		$icons = [];
 
 		// Get all the available member group icons
 		$files = new \FilesystemIterator($directory, \FilesystemIterator::SKIP_DOTS);
@@ -138,12 +138,12 @@ class Xml extends AbstractController
 
 			if (in_array(strtolower($file->getExtension()), $allowedTypes))
 			{
-				$icons[] = array(
+				$icons[] = [
 					'value' => $file->getFilename(),
 					'name' => '',
 					'url' => $settings['images_url'] . '/group_icons/' . $file->getFilename(),
 					'is_last' => false,
-				);
+				];
 			}
 		}
 
@@ -154,11 +154,11 @@ class Xml extends AbstractController
 	/**
 	 * Turns on or off a core forum feature via ajax
 	 */
-	public function action_corefeatures()
+	public function action_corefeatures(): void
 	{
 		global $context, $txt;
 
-		$context['xml_data'] = array();
+		$context['xml_data'] = [];
 
 		// Just in case, maybe we don't need it
 		Txt::load('Errors');
@@ -167,9 +167,9 @@ class Xml extends AbstractController
 		// We need (at least) this to ensure that mod files are included
 		call_integration_include_hook('integrate_admin_include');
 
-		$errors = array();
-		$returns = array();
-		$tokens = array();
+		$errors = [];
+		$returns = [];
+		$tokens = [];
 		$feature_title = '';
 
 		// You have to be allowed to do this of course
@@ -192,77 +192,77 @@ class Xml extends AbstractController
 					$feature = $context['features'][$id];
 					$feature_id = 'feature_' . $id;
 					$feature_title = (!empty($this->_req->post->{$feature_id}) && $feature['url'] ? '<a href="' . $feature['url'] . '">' . $feature['title'] . '</a>' : $feature['title']);
-					$returns[] = array(
+					$returns[] = [
 						'value' => $feature_title,
-					);
+					];
 
 					createToken('admin-core', 'post');
-					$tokens = array(
-						array(
+					$tokens = [
+						[
 							'value' => $context['admin-core_token'],
-							'attributes' => array('type' => 'token_var'),
-						),
-						array(
+							'attributes' => ['type' => 'token_var'],
+						],
+						[
 							'value' => $context['admin-core_token_var'],
-							'attributes' => array('type' => 'token'),
-						),
-					);
+							'attributes' => ['type' => 'token'],
+						],
+					];
 				}
 				else
 				{
-					$errors[] = array('value' => $txt['feature_no_exists']);
+					$errors[] = ['value' => $txt['feature_no_exists']];
 				}
 			}
 			// Some problem loading in the core feature set
 			else
 			{
-				$errors[] = array('value' => $txt[$result]);
+				$errors[] = ['value' => $txt[$result]];
 			}
 		}
 		// Failed session validation I'm afraid
 		else
 		{
-			$errors[] = array('value' => $txt[$validation] ?? $txt['error_occurred']);
+			$errors[] = ['value' => $txt[$validation] ?? $txt['error_occurred']];
 		}
 
 		// Return the response to the calling program
 		$context['sub_template'] = 'generic_xml';
-		theme()->addJavascriptVar(array('core_settings_generic_error' => $txt['core_settings_generic_error']), true);
+		theme()->addJavascriptVar(['core_settings_generic_error' => $txt['core_settings_generic_error']], true);
 
 		$message = str_replace('{core_feature}', $feature_title, !empty($feature_id) && !empty($this->_req->post->{$feature_id}) ? $txt['core_settings_activation_message'] : $txt['core_settings_deactivation_message']);
-		$context['xml_data'] = array(
-			'corefeatures' => array(
+		$context['xml_data'] = [
+			'corefeatures' => [
 				'identifier' => 'corefeature',
 				'children' => $returns,
-			),
-			'messages' => array(
+			],
+			'messages' => [
 				'identifier' => 'message',
-				'children' => array(array(
+				'children' => [[
 					'value' => $message
-				)),
-			),
-			'tokens' => array(
+				]],
+			],
+			'tokens' => [
 				'identifier' => 'token',
 				'children' => $tokens,
-			),
-			'errors' => array(
+			],
+			'errors' => [
 				'identifier' => 'error',
 				'children' => $errors,
-			),
-		);
+			],
+		];
 	}
 
 	/**
 	 * Reorders the custom profile fields from a drag/drop event
 	 */
-	public function action_profileorder()
+	public function action_profileorder(): void
 	{
 		global $context, $txt;
 
 		// Start off with nothing
-		$context['xml_data'] = array();
-		$errors = array();
-		$order = array();
+		$context['xml_data'] = [];
+		$errors = [];
+		$order = [];
 
 		// Chances are
 		Txt::load('Errors');
@@ -296,71 +296,71 @@ class Xml extends AbstractController
 				}
 				else
 				{
-					$errors[] = array('value' => $txt['no_sortable_items']);
+					$errors[] = ['value' => $txt['no_sortable_items']];
 				}
 			}
 
-			$order[] = array(
+			$order[] = [
 				'value' => $txt['custom_profile_reordered'],
-			);
+			];
 		}
 		// Failed validation, tough to be you
 		else
 		{
 			if ($validation_session !== true)
 			{
-				$errors[] = array('value' => $txt['session_verify_fail']);
+				$errors[] = ['value' => $txt['session_verify_fail']];
 			}
 
 			if ($validation_token === false)
 			{
-				$errors[] = array('value' => $txt['token_verify_fail']);
+				$errors[] = ['value' => $txt['token_verify_fail']];
 			}
 		}
 
 		// New generic token for use
 		createToken('admin-sort', 'post');
-		$tokens = array(
-			array(
+		$tokens = [
+			[
 				'value' => $context['admin-sort_token'],
-				'attributes' => array('type' => 'token'),
-			),
-			array(
+				'attributes' => ['type' => 'token'],
+			],
+			[
 				'value' => $context['admin-sort_token_var'],
-				'attributes' => array('type' => 'token_var'),
-			),
-		);
+				'attributes' => ['type' => 'token_var'],
+			],
+		];
 
 		// Return the response
 		$context['sub_template'] = 'generic_xml';
-		$context['xml_data'] = array(
-			'orders' => array(
+		$context['xml_data'] = [
+			'orders' => [
 				'identifier' => 'order',
 				'children' => $order,
-			),
-			'tokens' => array(
+			],
+			'tokens' => [
 				'identifier' => 'token',
 				'children' => $tokens,
-			),
-			'errors' => array(
+			],
+			'errors' => [
 				'identifier' => 'error',
 				'children' => $errors,
-			),
-		);
+			],
+		];
 	}
 
 	/**
 	 * Reorders the boards in response to an ajax sortable request
 	 */
-	public function action_boardorder()
+	public function action_boardorder(): void
 	{
 		global $context, $txt;
 
 		// Start off clean
-		$context['xml_data'] = array();
-		$errors = array();
-		$order = array();
-		$board_tree = array();
+		$context['xml_data'] = [];
+		$errors = [];
+		$order = [];
+		$board_tree = [];
 
 		// Chances are we will need these
 		Txt::load('Errors');
@@ -395,12 +395,12 @@ class Xml extends AbstractController
 						continue;
 					}
 
-					$board_tree[] = array(
+					$board_tree[] = [
 						'category' => $category,
 						'parent' => $childof,
 						'order' => $list_order,
 						'id' => $board,
-					);
+					];
 
 					// Keep track of where the moved board is in the sort stack
 					if ($board == $board_moved)
@@ -445,31 +445,31 @@ class Xml extends AbstractController
 				// Dropped on a sibling node, move after that
 				if (isset($board_previous_sibling))
 				{
-					$boardOptions = array(
+					$boardOptions = [
 						'move_to' => 'after',
 						'target_board' => $board_previous_sibling['id'],
-					);
-					$order[] = array('value' => $board_current['name'] . ' ' . $txt['mboards_order_after'] . ' ' . $boardTree->getBoardById($board_previous_sibling['id'])['name']);
+					];
+					$order[] = ['value' => $board_current['name'] . ' ' . $txt['mboards_order_after'] . ' ' . $boardTree->getBoardById($board_previous_sibling['id'])['name']];
 				}
 				// No sibling, maybe a new child
 				elseif (isset($board_previous))
 				{
-					$boardOptions = array(
+					$boardOptions = [
 						'move_to' => 'child',
 						'target_board' => $board_previous['id'],
 						'move_first_child' => true,
-					);
-					$order[] = array('value' => $board_current['name'] . ' ' . $txt['mboards_order_child_of'] . ' ' . $boardTree->getBoardById($board_previous['id'])['name']);
+					];
+					$order[] = ['value' => $board_current['name'] . ' ' . $txt['mboards_order_child_of'] . ' ' . $boardTree->getBoardById($board_previous['id'])['name']];
 				}
 				// Nothing before this board at all, move to the top of the cat
 				else
 				{
-					$boardOptions = array(
+					$boardOptions = [
 						'move_to' => 'top',
 						'target_category' => $board_new['category'],
 						'move_first_child' => true,
-					);
-					$order[] = array('value' => $board_current['name'] . ' ' . $txt['mboards_order_in_category'] . ' ' . $boardTree->getCategoryNodeById($board_new['category'])['node']['name']);
+					];
+					$order[] = ['value' => $board_current['name'] . ' ' . $txt['mboards_order_in_category'] . ' ' . $boardTree->getCategoryNodeById($board_new['category'])['node']['name']];
 				}
 
 				// If we have figured out what to do
@@ -479,7 +479,7 @@ class Xml extends AbstractController
 				}
 				else
 				{
-					$errors[] = array('value' => $txt['mboards_board_error']);
+					$errors[] = ['value' => $txt['mboards_board_error']];
 				}
 			}
 		}
@@ -488,44 +488,44 @@ class Xml extends AbstractController
 		{
 			if ($validation_session !== true)
 			{
-				$errors[] = array('value' => $txt['session_verify_fail']);
+				$errors[] = ['value' => $txt['session_verify_fail']];
 			}
 
 			if ($validation_token === false)
 			{
-				$errors[] = array('value' => $txt['token_verify_fail']);
+				$errors[] = ['value' => $txt['token_verify_fail']];
 			}
 		}
 
 		// New generic token for use
 		createToken('admin-sort', 'post');
-		$tokens = array(
-			array(
+		$tokens = [
+			[
 				'value' => $context['admin-sort_token'],
-				'attributes' => array('type' => 'token'),
-			),
-			array(
+				'attributes' => ['type' => 'token'],
+			],
+			[
 				'value' => $context['admin-sort_token_var'],
-				'attributes' => array('type' => 'token_var'),
-			),
-		);
+				'attributes' => ['type' => 'token_var'],
+			],
+		];
 
 		// Return the response
 		$context['sub_template'] = 'generic_xml';
-		$context['xml_data'] = array(
-			'orders' => array(
+		$context['xml_data'] = [
+			'orders' => [
 				'identifier' => 'order',
 				'children' => $order,
-			),
-			'tokens' => array(
+			],
+			'tokens' => [
 				'identifier' => 'token',
 				'children' => $tokens,
-			),
-			'errors' => array(
+			],
+			'errors' => [
 				'identifier' => 'error',
 				'children' => $errors,
-			),
-		);
+			],
+		];
 	}
 
 	/**
@@ -536,14 +536,14 @@ class Xml extends AbstractController
 	 * - Will move them from post to popup location and visa-versa
 	 * - Will move them to new rows
 	 */
-	public function action_smileyorder()
+	public function action_smileyorder(): void
 	{
 		global $context, $txt;
 
 		// Start off with an empty response
-		$context['xml_data'] = array();
-		$errors = array();
-		$order = array();
+		$context['xml_data'] = [];
+		$errors = [];
+		$order = [];
 
 		Txt::load('Errors');
 		Txt::load('ManageSmileys');
@@ -568,10 +568,10 @@ class Xml extends AbstractController
 				$smile_received_row = null;
 				if (!empty($this->_req->post->received))
 				{
-					$displayTypes = array(
+					$displayTypes = [
 						'postform' => 0,
 						'popup' => 2
-					);
+					];
 					[$smile_received_location, $smile_received_row] = explode('|', $this->_req->post->received);
 					$smile_received_location = $displayTypes[substr($smile_received_location, 7)];
 				}
@@ -582,7 +582,7 @@ class Xml extends AbstractController
 					// Read the new ordering, remember where the moved smiley is in the stack
 					$list_order = 0;
 					$moved_key = 0;
-					$smiley_tree = array();
+					$smiley_tree = [];
 
 					foreach ($this->_req->post->smile as $smile_id)
 					{
@@ -598,7 +598,7 @@ class Xml extends AbstractController
 					}
 
 					// Now get the updated row, location, order
-					$smiley = array();
+					$smiley = [];
 					$smiley['row'] = $smile_received_row;
 					$smiley['location'] = $smile_received_location;
 					$smiley['order'] = -1;
@@ -647,13 +647,13 @@ class Xml extends AbstractController
 						// Clear the cache, its stale now
 						Cache::instance()->remove('parsing_smileys');
 						Cache::instance()->remove('posting_smileys');
-						$order[] = array('value' => $txt['smileys_moved_done']);
+						$order[] = ['value' => $txt['smileys_moved_done']];
 					}
 				}
 			}
 			else
 			{
-				$errors[] = array('value' => $txt['smileys_moved_fail']);
+				$errors[] = ['value' => $txt['smileys_moved_fail']];
 			}
 		}
 		// Failed validation :'(
@@ -661,57 +661,57 @@ class Xml extends AbstractController
 		{
 			if ($validation_session !== true)
 			{
-				$errors[] = array('value' => $txt['session_verify_fail']);
+				$errors[] = ['value' => $txt['session_verify_fail']];
 			}
 
 			if ($validation_token === false)
 			{
-				$errors[] = array('value' => $txt['token_verify_fail']);
+				$errors[] = ['value' => $txt['token_verify_fail']];
 			}
 		}
 
 		// New generic token for use
 		createToken('admin-sort', 'post');
-		$tokens = array(
-			array(
+		$tokens = [
+			[
 				'value' => $context['admin-sort_token'],
-				'attributes' => array('type' => 'token'),
-			),
-			array(
+				'attributes' => ['type' => 'token'],
+			],
+			[
 				'value' => $context['admin-sort_token_var'],
-				'attributes' => array('type' => 'token_var'),
-			),
-		);
+				'attributes' => ['type' => 'token_var'],
+			],
+		];
 
 		// Return the response, whatever it is
 		$context['sub_template'] = 'generic_xml';
-		$context['xml_data'] = array(
-			'orders' => array(
+		$context['xml_data'] = [
+			'orders' => [
 				'identifier' => 'order',
 				'children' => $order,
-			),
-			'tokens' => array(
+			],
+			'tokens' => [
 				'identifier' => 'token',
 				'children' => $tokens,
-			),
-			'errors' => array(
+			],
+			'errors' => [
 				'identifier' => 'error',
 				'children' => $errors,
-			),
-		);
+			],
+		];
 	}
 
 	/**
 	 * Reorders the PBE parsers or filters from a drag/drop event
 	 */
-	public function action_parserorder()
+	public function action_parserorder(): void
 	{
 		global $context, $txt;
 
 		// Start off with nothing
-		$context['xml_data'] = array();
-		$errors = array();
-		$order = array();
+		$context['xml_data'] = [];
+		$errors = [];
+		$order = [];
 
 		// Chances are
 		Txt::load('Errors');
@@ -727,7 +727,7 @@ class Xml extends AbstractController
 			// No questions that we are reordering
 			if (isset($this->_req->post->order, $this->_req->post->list_sort_email_fp) && $this->_req->post->order === 'reorder')
 			{
-				$filters = array();
+				$filters = [];
 				$filter_order = 1;
 				$replace = '';
 
@@ -746,70 +746,70 @@ class Xml extends AbstractController
 				}
 				else
 				{
-					$errors[] = array('value' => $txt['no_sortable_items']);
+					$errors[] = ['value' => $txt['no_sortable_items']];
 				}
 			}
 
-			$order[] = array(
+			$order[] = [
 				'value' => $txt['parser_reordered'],
-			);
+			];
 		}
 		// Failed validation, tough to be you
 		else
 		{
 			if ($validation_session !== true)
 			{
-				$errors[] = array('value' => $txt['session_verify_fail']);
+				$errors[] = ['value' => $txt['session_verify_fail']];
 			}
 
 			if ($validation_token === false)
 			{
-				$errors[] = array('value' => $txt['token_verify_fail']);
+				$errors[] = ['value' => $txt['token_verify_fail']];
 			}
 		}
 
 		// New generic token for use
 		createToken('admin-sort', 'post');
-		$tokens = array(
-			array(
+		$tokens = [
+			[
 				'value' => $context['admin-sort_token'],
-				'attributes' => array('type' => 'token'),
-			),
-			array(
+				'attributes' => ['type' => 'token'],
+			],
+			[
 				'value' => $context['admin-sort_token_var'],
-				'attributes' => array('type' => 'token_var'),
-			),
-		);
+				'attributes' => ['type' => 'token_var'],
+			],
+		];
 
 		// Return the response
 		$context['sub_template'] = 'generic_xml';
-		$context['xml_data'] = array(
-			'orders' => array(
+		$context['xml_data'] = [
+			'orders' => [
 				'identifier' => 'order',
 				'children' => $order,
-			),
-			'tokens' => array(
+			],
+			'tokens' => [
 				'identifier' => 'token',
 				'children' => $tokens,
-			),
-			'errors' => array(
+			],
+			'errors' => [
 				'identifier' => 'error',
 				'children' => $errors,
-			),
-		);
+			],
+		];
 	}
 
 	/**
 	 * Reorders the message icons from a drag/drop event
 	 */
-	public function action_messageiconorder()
+	public function action_messageiconorder(): void
 	{
 		global $context, $txt;
 
 		// Initialize
-		$context['xml_data'] = array();
-		$errors = array();
-		$order = array();
+		$context['xml_data'] = [];
+		$errors = [];
+		$order = [];
 
 		// Seems these will be needed
 		Txt::load('Errors');
@@ -829,12 +829,12 @@ class Xml extends AbstractController
 				$message_icons = fetchMessageIconsDetails();
 
 				$view_order = 0;
-				$iconInsert = array();
+				$iconInsert = [];
 
 				// The field ids arrive in 1-n view order, so we simply build an update array
 				foreach ($this->_req->post->list_message_icon_list as $id)
 				{
-					$iconInsert[] = array($id, $message_icons[$id]['board_id'], $message_icons[$id]['title'], $message_icons[$id]['filename'], $view_order);
+					$iconInsert[] = [$id, $message_icons[$id]['board_id'], $message_icons[$id]['title'], $message_icons[$id]['filename'], $view_order];
 					$view_order++;
 				}
 
@@ -845,63 +845,63 @@ class Xml extends AbstractController
 				}
 				else
 				{
-					$errors[] = array('value' => $txt['no_sortable_items']);
+					$errors[] = ['value' => $txt['no_sortable_items']];
 				}
 			}
 
-			$order[] = array(
+			$order[] = [
 				'value' => $txt['icons_reordered'],
-			);
+			];
 		}
 		// Failed validation, tough to be you
 		else
 		{
 			if ($validation_session !== true)
 			{
-				$errors[] = array('value' => $txt['session_verify_fail']);
+				$errors[] = ['value' => $txt['session_verify_fail']];
 			}
 
 			if ($validation_token === false)
 			{
-				$errors[] = array('value' => $txt['token_verify_fail']);
+				$errors[] = ['value' => $txt['token_verify_fail']];
 			}
 		}
 
 		// New generic token for use
 		createToken('admin-sort', 'post');
-		$tokens = array(
-			array(
+		$tokens = [
+			[
 				'value' => $context['admin-sort_token'],
-				'attributes' => array('type' => 'token'),
-			),
-			array(
+				'attributes' => ['type' => 'token'],
+			],
+			[
 				'value' => $context['admin-sort_token_var'],
-				'attributes' => array('type' => 'token_var'),
-			),
-		);
+				'attributes' => ['type' => 'token_var'],
+			],
+		];
 
 		// Return the response
 		$context['sub_template'] = 'generic_xml';
-		$context['xml_data'] = array(
-			'orders' => array(
+		$context['xml_data'] = [
+			'orders' => [
 				'identifier' => 'order',
 				'children' => $order,
-			),
-			'tokens' => array(
+			],
+			'tokens' => [
 				'identifier' => 'token',
 				'children' => $tokens,
-			),
-			'errors' => array(
+			],
+			'errors' => [
 				'identifier' => 'error',
 				'children' => $errors,
-			),
-		);
+			],
+		];
 	}
 
 	/**
 	 * An experimental function to fetch a videos embed code when JS will throw CORS errors
 	 */
-	public function action_videoembed()
+	public function action_videoembed(): void
 	{
 		global $context;
 
@@ -924,7 +924,7 @@ class Xml extends AbstractController
 		if (!empty($videoID) && !empty($site))
 		{
 			require_once(SUBSDIR . '/Package.subs.php');
-			$data = fetch_web_data('https://api.twitter.com/1.1/statuses/oembed.json?id=' . $videoID);
+			$data = fetch_web_data('https://api.x.com/1.1/statuses/oembed.json?id=' . $videoID);
 			if ($data !== false)
 			{
 				$context['json_data'] = trim($data);

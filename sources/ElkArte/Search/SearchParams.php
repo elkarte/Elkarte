@@ -81,7 +81,7 @@ class SearchParams extends ValuesContainer
 	/**
 	 * Extract search params from a string
 	 */
-	protected function prepare()
+	protected function prepare(): void
 	{
 		// Due to IE's 2083 character limit, we have to compress long search strings
 		$temp_params = base64_decode(str_replace(['-', '_', '.'], ['+', '/', '='], $this->_search_string));
@@ -112,7 +112,7 @@ class SearchParams extends ValuesContainer
 	 *
 	 * @return string - the encoded string to be appended to the URL
 	 */
-	public function compileURL($search = [])
+	public function compileURL($search = []): string
 	{
 		$temp_params = $this->_search_params;
 
@@ -152,7 +152,7 @@ class SearchParams extends ValuesContainer
 	 * @param int $recentPercentage - A coefficient to calculate the lowest message id to start search from
 	 * @param int $maxMembersToSearch - The maximum number of members to consider when multiple are found
 	 */
-	public function merge($params, $recentPercentage, $maxMembersToSearch)
+	public function merge($params, $recentPercentage, $maxMembersToSearch): void
 	{
 		global $modSettings;
 
@@ -203,7 +203,7 @@ class SearchParams extends ValuesContainer
 	 *
 	 * @param mixed $params
 	 */
-	public function cleanParams(&$params)
+	public function cleanParams(&$params): void
 	{
 		$validator = new DataValidator();
 
@@ -239,7 +239,7 @@ class SearchParams extends ValuesContainer
 	 *
 	 * @param mixed $params
 	 */
-	public function setAdvanced($params)
+	public function setAdvanced($params): void
 	{
 		// Store whether simple search was used (needed if the user wants to do another query).
 		if (!isset($this->_search_params['advanced']))
@@ -253,7 +253,7 @@ class SearchParams extends ValuesContainer
 	 *
 	 * @param mixed $params
 	 */
-	public function setSearchType($params)
+	public function setSearchType($params): void
 	{
 		// 1 => 'allwords' (default, don't set as param) / 2 => 'anywords'.
 		if (!empty($this->_search_params['searchtype']) || (!empty($params['searchtype']) && $params['searchtype'] === 2))
@@ -267,7 +267,7 @@ class SearchParams extends ValuesContainer
 	 *
 	 * @param mixed $params
 	 */
-	public function setMinMaxAge($params)
+	public function setMinMaxAge($params): void
 	{
 		// Minimum age of messages. Default to zero (don't set param in that case).
 		if (!empty($this->_search_params['minage']) || (!empty($params['minage']) && $params['minage'] > 0))
@@ -290,7 +290,7 @@ class SearchParams extends ValuesContainer
 	/**
 	 * Determines and sets the min and max message ID based on timelines of min/max
 	 */
-	private function getMinMaxLimits()
+	private function getMinMaxLimits(): void
 	{
 		global $modSettings, $context;
 
@@ -322,7 +322,7 @@ class SearchParams extends ValuesContainer
 	 *
 	 * @param mixed $params
 	 */
-	public function setTopic($params)
+	public function setTopic($params): void
 	{
 		// Searching a specific topic?
 		if (!empty($params['topic']) || (!empty($params['search_selection']) && $params['search_selection'] === 'topic'))
@@ -337,7 +337,7 @@ class SearchParams extends ValuesContainer
 	 *
 	 * @param mixed $params
 	 */
-	public function setUser($params)
+	public function setUser($params): void
 	{
 		// Default the user name to a wildcard matching every user (*).
 		if (!empty($this->_search_params['userspec']) || (!empty($params['userspec']) && $params['userspec'] !== '*'))
@@ -353,7 +353,7 @@ class SearchParams extends ValuesContainer
 	 *
 	 * @param int $maxMembersToSearch
 	 */
-	public function buildUserQuery($maxMembersToSearch)
+	public function buildUserQuery($maxMembersToSearch): void
 	{
 		$userString = strtr(Util::htmlspecialchars($this->_search_params['userspec'], ENT_QUOTES), ['&quot;' => '"']);
 		$userString = strtr($userString, ['%' => '\%', '_' => '\_', '*' => '%', '?' => '_']);
@@ -430,7 +430,7 @@ class SearchParams extends ValuesContainer
 	 * @param $params
 	 * @return int[]
 	 */
-	public function setBoards($params)
+	public function setBoards($params): array
 	{
 		if (!empty($this->_search_params['brd']) && is_array($this->_search_params['brd']))
 		{
@@ -457,7 +457,7 @@ class SearchParams extends ValuesContainer
 	 * @return int[] array of boards to search in
 	 * @throws Exception topic_gone
 	 */
-	public function setTopicBoardLimit($query_boards)
+	public function setTopicBoardLimit($query_boards): array
 	{
 		global $modSettings, $context;
 
@@ -521,7 +521,7 @@ class SearchParams extends ValuesContainer
 	 *
 	 * @return string
 	 */
-	public function setBoardQuery()
+	public function setBoardQuery(): string
 	{
 		if (count($this->_search_params['brd']) !== 0)
 		{
@@ -555,7 +555,7 @@ class SearchParams extends ValuesContainer
 	 * @event integrate_search_sort_columns
 	 * @param mixed $params
 	 */
-	public function setSortAndDirection($params)
+	public function setSortAndDirection($params): void
 	{
 		$sort_columns = ['relevance', 'num_replies', 'id_msg',];
 
@@ -583,7 +583,7 @@ class SearchParams extends ValuesContainer
 	 *
 	 * @return string
 	 */
-	public function setSearchTerm()
+	public function setSearchTerm(): string
 	{
 		if (!empty($this->_search_params['search']))
 		{
@@ -598,7 +598,7 @@ class SearchParams extends ValuesContainer
 	 *
 	 * @return string[]
 	 */
-	public function get()
+	public function get(): array
 	{
 		return $this->_search_params;
 	}

@@ -156,7 +156,7 @@ class Turnstile implements ControlInterface
 	 *
 	 * @param string $response response string from captcha verification.
 	 */
-	public function verifyResponse($response)
+	public function verifyResponse($response): array
 	{
 		$turnstileResponse = [];
 		$turnstileResponse['success'] = false;

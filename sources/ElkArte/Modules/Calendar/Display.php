@@ -39,18 +39,18 @@ class Display extends AbstractModule
 
 		if (!empty($modSettings['cal_showInTopic']))
 		{
-			return array(
-				array('topicinfo', array(Display::class, 'topicinfo'), array('topicinfo', 'topic')),
-			);
+			return [
+				['topicinfo', [Display::class, 'topicinfo'], ['topicinfo', 'topic']],
+			];
 		}
 
-		return array();
+		return [];
 	}
 
 	/**
 	 * Add the calendar buttons
 	 */
-	public static function integrate_mod_buttons()
+	public static function integrate_mod_buttons(): void
 	{
 		global $context;
 
@@ -70,7 +70,7 @@ class Display extends AbstractModule
 	 * @param array $topicinfo
 	 * @param int $topic
 	 */
-	public function topicinfo(&$topicinfo, $topic)
+	public function topicinfo(&$topicinfo, $topic): void
 	{
 		global $context;
 
@@ -102,7 +102,7 @@ class Display extends AbstractModule
 				$end_date = sscanf($event['end_date'], '%04d-%02d-%02d');
 				$end_date = mktime(12, 0, 0, $end_date[1], $end_date[2], $end_date[0]);
 
-				$context['linked_calendar_events'][] = array(
+				$context['linked_calendar_events'][] = [
 					'id' => $event['id_event'],
 					'title' => $event['title'],
 					'can_edit' => allowedTo('calendar_edit_any') || ($event['id_member'] == $this->user->id && allowedTo('calendar_edit_own')),
@@ -114,7 +114,7 @@ class Display extends AbstractModule
 					'end_date' => standardTime($end_date, $date_string, 'none'),
 					'end_timestamp' => $end_date,
 					'is_last' => false
-				);
+				];
 			}
 
 			if (!empty($context['linked_calendar_events']))

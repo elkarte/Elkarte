@@ -9,15 +9,30 @@
 /**
  * Menu functions to allow touchscreen / keyboard interaction in place of hover/mouse
  *
- * @param {string} menuID the selector of the top-level UL in the menu structure
+ * @param {string|HTMLElement} menuRef CSS selector of the top-level UL, or the UL element itself
  */
-function elkMenu (menuID)
+function elkMenu (menuRef)
 {
-	this.menu = document.querySelector(menuID);
-	if (this.menu !== null)
-	{
-		this.initMenu();
-	}
+    // Accept either a selector string or a concrete element
+	this.menu = null;
+    if (typeof menuRef === 'string')
+    {
+        this.menu = document.querySelector(menuRef);
+    }
+    else if (menuRef && menuRef.nodeType === 1)
+    {
+        this.menu = menuRef;
+    }
+
+    if (this.menu !== null)
+    {
+        // Prevent double-initialization on the same menu element
+        if (!this.menu.dataset.elkMenuInit)
+        {
+            this.menu.dataset.elkMenuInit = '1';
+            this.initMenu();
+        }
+    }
 }
 
 /**
@@ -27,12 +42,19 @@ elkMenu.prototype.initMenu = function() {
 	// Setup enter/spacebar keys to trigger a click on the "Skip to main content" link
 	if (this.menu.id === 'main_menu')
 	{
-		this.keysAsClick(document.getElementById('skipnav'));
+		const skip = document.getElementById('skipnav');
+		if (skip)
+		{
+			this.keysAsClick(skip);
+		}
 	}
 
 	// Removing this class prevents the standard hover effect, assuming the CSS is set up correctly
 	this.menu.classList.remove('no_js');
-	this.menu.parentElement.classList.remove('no_js');
+	if (this.menu.parentElement)
+	{
+		this.menu.parentElement.classList.remove('no_js');
+	}
 
 	// The subMenus (ul.menulevel#)
 	let subMenu = this.menu.querySelectorAll('a + ul');
@@ -43,31 +65,39 @@ elkMenu.prototype.initMenu = function() {
 	});
 
 	// Document level events to close dropdowns on page click or ESC
-	this.docKeydown();
-	this.docClick();
+	// Attach these only once per document to avoid duplicate handlers when multiple menus are initialized
+	if (!document.body.dataset.elkMenuDocHandlers)
+	{
+		document.body.dataset.elkMenuDocHandlers = '1';
+		this.docKeydown();
+		this.docClick();
+	}
 
 	// Setup the subMenus (menulevel2, menulevel3) to open when clicked
 	this.submenuReveal(subMenu);
 };
 
 /**
- * CLose menu on click outside of its structure
+ * CLose menu when clicked outside its structure
  */
 elkMenu.prototype.docClick = function() {
-	document.body.addEventListener('click', function(e) {
-		// Clicked outside of this.menu
-		if (!this.menu.contains(e.target))
-		{
-			this.resetMenu(this.menu);
-		}
+    document.body.addEventListener('click', function(e) {
+        // For each initialized menu on the page, decide if it should be closed
+        document.querySelectorAll('[data-elk-menu-init="1"]').forEach(function(menuEl) {
+            // Clicked outside of this menu instance
+            if (!menuEl.contains(e.target))
+            {
+                this.resetMenu(menuEl);
+                return;
+            }
 
-		// Clicked inside of the this.menu hierarchy, but not on a link
-		let menuClick = e.target.closest('#' + this.menu.getAttribute('id'));
-		if ((menuClick && e.target.tagName.toLowerCase() === 'ul'))
-		{
-			this.resetMenu(this.menu);
-		}
-	}.bind(this));
+            // Clicked inside the menu hierarchy, but not on a link (on UL)
+            if (e.target && e.target.tagName && e.target.tagName.toLowerCase() === 'ul')
+            {
+                this.resetMenu(menuEl);
+            }
+        }.bind(this));
+    }.bind(this));
 };
 
 /**
@@ -76,13 +106,16 @@ elkMenu.prototype.docClick = function() {
  * are not open or lost focus.
  */
 elkMenu.prototype.docKeydown = function() {
-	document.body.addEventListener('keydown', function(e) {
-		e = e || window.e;
-		if (e.key === 'Escape')
-		{
-			this.resetMenu(this.menu);
-		}
-	}.bind(this));
+    document.body.addEventListener('keydown', function(e) {
+        e = e || window.e;
+        if (e.key === 'Escape')
+        {
+            // Close all initialized menus on Escape
+            document.querySelectorAll('[data-elk-menu-init="1"]').forEach(function(menuEl) {
+                this.resetMenu(menuEl);
+            }.bind(this));
+        }
+    }.bind(this));
 };
 
 /**
@@ -97,7 +130,12 @@ elkMenu.prototype.submenuReveal = function(subMenu) {
 	Array.prototype.forEach.call(subMenu, function(menu) {
 		// The menu items container LI and link LI > A
 		let parentLi = menu.parentNode,
-			subLink = parentLi.querySelector('a');
+			subLink = parentLi ? parentLi.querySelector('a') : null;
+
+		if (!parentLi || !subLink)
+		{
+			return; // malformed structure, skip
+		}
 
 		// Initial aria and role for each submenu trigger
 		this.SetItemAttribute(subLink, '', {
@@ -129,16 +167,19 @@ elkMenu.prototype.submenuReveal = function(subMenu) {
 			this.resetSubMenus(subLink);
 
 			// Grab the selected UL submenu
-			let currentMenu = subLink.parentNode.querySelector('ul:first-of-type');
+			let currentMenu = subLink.parentNode ? subLink.parentNode.querySelector('ul:first-of-type') : null;
 
 			// Open its link and list
 			parentLi.classList.add('open');
 			e.currentTarget.classList.add('open');
 
 			// Open the UL menu
-			currentMenu.classList.remove('un_selected');
-			currentMenu.classList.add('selected');
-			currentMenu.setAttribute('aria-hidden', 'false');
+			if (currentMenu)
+			{
+				currentMenu.classList.remove('un_selected');
+				currentMenu.classList.add('selected');
+				currentMenu.setAttribute('aria-hidden', 'false');
+			}
 		}.bind(this));
 	}.bind(this));
 };
@@ -149,7 +190,19 @@ elkMenu.prototype.submenuReveal = function(subMenu) {
  * @param {HTMLElement} subLink
  */
 elkMenu.prototype.resetSubMenus = function(subLink) {
-	let subMenus = subLink.parentNode.parentNode.querySelectorAll('li > a + ul:first-of-type');
+	if (!subLink)
+	{
+		return;
+	}
+
+	// Determine the UL scope of the current level
+	let levelUl = subLink.closest ? subLink.closest('ul') : (subLink.parentNode && subLink.parentNode.parentNode ? subLink.parentNode.parentNode : null);
+	if (!levelUl)
+	{
+		return;
+	}
+
+	let subMenus = levelUl.querySelectorAll('li > a + ul:first-of-type');
 	subMenus.forEach(function(menu) {
 		// Remove open from the LI and LI A for this menu
 		let parent = menu.parentNode;
@@ -169,13 +222,27 @@ elkMenu.prototype.resetSubMenus = function(subLink) {
  * @param {HTMLElement} subLink the .menulevel# link that has been clicked
  */
 elkMenu.prototype.resetSubLinks = function(subLink) {
-	// The all closed menus
-	let subMenus = subLink.parentNode.parentNode.querySelectorAll('li > a + ul:not(.open)');
+	if (!subLink)
+	{
+		return;
+	}
+
+	// The all closed menus at this level
+	let levelUl = subLink.closest ? subLink.closest('ul') : (subLink.parentNode && subLink.parentNode.parentNode ? subLink.parentNode.parentNode : null);
+	if (!levelUl)
+	{
+		return;
+	}
+
+	let subMenus = levelUl.querySelectorAll('li > a + ul:not(.open)');
 	subMenus.forEach(function(menu) {
 		// links to closed menus are no longer active
 		let thisLink = menu.parentNode.querySelector('a');
-		thisLink.setAttribute('aria-pressed', 'false');
-		thisLink.setAttribute('aria-expanded', 'false');
+		if (thisLink)
+		{
+			thisLink.setAttribute('aria-pressed', 'false');
+			thisLink.setAttribute('aria-expanded', 'false');
+		}
 	});
 };
 
@@ -212,6 +279,11 @@ elkMenu.prototype.SetItemAttribute = function(menu, selector, attrs) {
 		return;
 	}
 
+	if (!menu)
+	{
+		return;
+	}
+
 	menu.querySelectorAll(selector).forEach(function(item) {
 		Object.keys(attrs).forEach(key => item.setAttribute(key, attrs[key]));
 	});
@@ -223,6 +295,11 @@ elkMenu.prototype.SetItemAttribute = function(menu, selector, attrs) {
  * @param {HTMLElement} el
  */
 elkMenu.prototype.keysAsClick = function(el) {
+	if (!el || !el.addEventListener)
+	{
+		return;
+	}
+
 	el.addEventListener('keydown', function(event) {
 		this.keysCallback(event, el);
 	}.bind(this), true);
@@ -236,13 +313,18 @@ elkMenu.prototype.keysAsClick = function(el) {
  */
 elkMenu.prototype.keysCallback = function(keyboardEvent, el) {
 	// THe keys we know how to respond to
-	let keys = [' ', 'Enter', 'ArrowUp', 'ArrowLeft', 'ArrowDown', 'ArrowRight', 'Home', 'End', 'Escape'];
+	let keys = [' ', 'Enter', 'ArrowUp', 'ArrowLeft', 'ArrowDown', 'ArrowRight', 'Home', 'End', 'Escape', 'Spacebar'];
 
 	if (keys.includes(keyboardEvent.key))
 	{
 		// What menu and links are we "in"
-		let menu = keyboardEvent.target.closest('ul'),
-			menuLinks = Array.prototype.slice.call(menu.querySelectorAll('a')),
+		let menu = keyboardEvent.target.closest ? keyboardEvent.target.closest('ul') : null;
+		if (!menu)
+		{
+			return;
+		}
+
+		let menuLinks = Array.prototype.slice.call(menu.querySelectorAll('a')),
 			currentIndex = menuLinks.indexOf(document.activeElement);
 
 		// Don't follow the links, don't bubble the event
@@ -254,8 +336,12 @@ elkMenu.prototype.keysCallback = function(keyboardEvent, el) {
 				this.resetSubMenus(menu);
 				break;
 			case ' ':
+			case 'Spacebar':
 			case 'Enter':
-				menuLinks[currentIndex].click();
+				if (currentIndex > -1 && menuLinks[currentIndex])
+				{
+					menuLinks[currentIndex].click();
+				}
 				break;
 			case 'ArrowUp':
 			case 'ArrowLeft':
@@ -274,10 +360,16 @@ elkMenu.prototype.keysCallback = function(keyboardEvent, el) {
 				}
 				break;
 			case 'Home':
-				menuLinks[1].focus();
+				if (menuLinks.length)
+				{
+					menuLinks[0].focus();
+				}
 				break;
 			case 'End':
-				menuLinks[menuLinks.length - 1].focus();
+				if (menuLinks.length)
+				{
+					menuLinks[menuLinks.length - 1].focus();
+				}
 				break;
 		}
 	}

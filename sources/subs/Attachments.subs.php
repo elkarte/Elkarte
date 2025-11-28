@@ -56,7 +56,7 @@ function doPHPUploadChecks($attachID)
 {
 	global $modSettings, $txt;
 
-	$errors = array();
+	$errors = [];
 
 	// Did PHP create any errors during the upload processing of this file?
 	if (!empty($_FILES['attachment']['error'][$attachID]))
@@ -96,7 +96,7 @@ function doPHPUploadChecks($attachID)
  * - Renames the temporary file.
  * - Creates a thumbnail if the file is an image and the option enabled.
  *
- * @param mixed[] $attachmentOptions associative array of options
+ * @param array $attachmentOptions associative array of options
  *
  * @return bool
  */
@@ -116,7 +116,7 @@ function createAttachment(&$attachmentOptions)
 	$attachmentOptions['width'] = max(0, $attachmentOptions['width']);
 	$attachmentOptions['height'] = max(0, $attachmentOptions['height']);
 
-	// If it's an image get the mime type right.
+	// If it's an image, get the mime type right.
 	if ($is_image)
 	{
 		$attachmentOptions['mime_type'] = getValidMimeImageType($size[2]);
@@ -146,17 +146,24 @@ function createAttachment(&$attachmentOptions)
 
 	$db->insert('',
 		'{db_prefix}attachments',
-		array(
+		[
 			'id_folder' => 'int', 'id_msg' => 'int', 'filename' => 'string-255', 'file_hash' => 'string-40', 'fileext' => 'string-8',
 			'size' => 'int', 'width' => 'int', 'height' => 'int',
 			'mime_type' => 'string-20', 'approved' => 'int',
-		),
-		array(
-			(int) $attachmentOptions['id_folder'], (int) $attachmentOptions['post'], $attachmentOptions['name'], $attachmentOptions['file_hash'], $attachmentOptions['fileext'],
-			(int) $attachmentOptions['size'], (empty($attachmentOptions['width']) ? 0 : (int) $attachmentOptions['width']), (empty($attachmentOptions['height']) ? '0' : (int) $attachmentOptions['height']),
-			(!empty($attachmentOptions['mime_type']) ? $attachmentOptions['mime_type'] : ''), (int) $attachmentOptions['approved'],
-		),
-		array('id_attach')
+		],
+		[
+			(int) $attachmentOptions['id_folder'],
+			(int) $attachmentOptions['post'],
+			$attachmentOptions['name'],
+			$attachmentOptions['file_hash'],
+			$attachmentOptions['fileext'],
+			(int) $attachmentOptions['size'],
+			(empty($attachmentOptions['width']) ? 0 : (int) $attachmentOptions['width']),
+			(empty($attachmentOptions['height']) ? 0 : (int) $attachmentOptions['height']),
+			(!empty($attachmentOptions['mime_type']) ? $attachmentOptions['mime_type'] : ''),
+			(int) $attachmentOptions['approved'],
+		],
+		['id_attach']
 	);
 	$attachmentOptions['id'] = $db->insert_id('{db_prefix}attachments');
 
@@ -179,13 +186,13 @@ function createAttachment(&$attachmentOptions)
 	{
 		$db->insert('',
 			'{db_prefix}approval_queue',
-			array(
+			[
 				'id_attach' => 'int', 'id_msg' => 'int',
-			),
-			array(
+			],
+			[
 				$attachmentOptions['id'], (int) $attachmentOptions['post'],
-			),
-			array()
+			],
+			[]
 		);
 	}
 
@@ -227,15 +234,15 @@ function createAttachment(&$attachmentOptions)
 			// To the database we go!
 			$db->insert('',
 				'{db_prefix}attachments',
-				array(
+				[
 					'id_folder' => 'int', 'id_msg' => 'int', 'attachment_type' => 'int', 'filename' => 'string-255', 'file_hash' => 'string-40', 'fileext' => 'string-8',
 					'size' => 'int', 'width' => 'int', 'height' => 'int', 'mime_type' => 'string-20', 'approved' => 'int',
-				),
-				array(
+				],
+				[
 					$current_dir_id, (int) $attachmentOptions['post'], 3, $thumb_filename, $thumb_file_hash, $attachmentOptions['fileext'],
 					$thumb_size, $thumb_width, $thumb_height, $thumb_mime, (int) $attachmentOptions['approved'],
-				),
-				array('id_attach')
+				],
+				['id_attach']
 			);
 			$attachmentOptions['thumb'] = $db->insert_id('{db_prefix}attachments');
 
@@ -245,10 +252,10 @@ function createAttachment(&$attachmentOptions)
 					UPDATE {db_prefix}attachments
 					SET id_thumb = {int:id_thumb}
 					WHERE id_attach = {int:id_attach}',
-					array(
+					[
 						'id_thumb' => $attachmentOptions['thumb'],
 						'id_attach' => $attachmentOptions['id'],
-					)
+					]
 				);
 
 				rename($thumb_path, getAttachmentFilename($thumb_filename, $attachmentOptions['thumb'], $current_dir_id, false, $thumb_file_hash));
@@ -279,7 +286,7 @@ function getAttachmentFromTopic($id_attach, $id_topic)
 	$db = database();
 
 	// Make sure this attachment is on this board.
-	$attachmentData = array();
+	$attachmentData = [];
 	$request = $db->fetchQuery('
 		SELECT 
 			a.id_folder, a.filename, a.file_hash, a.fileext, a.id_attach, a.attachment_type, 
@@ -289,10 +296,10 @@ function getAttachmentFromTopic($id_attach, $id_topic)
 			INNER JOIN {db_prefix}boards AS b ON (b.id_board = m.id_board AND {query_see_board})
 		WHERE a.id_attach = {int:attach}
 		LIMIT 1',
-		array(
+		[
 			'attach' => $id_attach,
 			'current_topic' => $id_topic,
-		)
+		]
 	);
 	if ($request->num_rows() !== 0)
 	{
@@ -341,10 +348,10 @@ function getAttachmentThumbFromTopic($id_attach, $id_topic)
 			INNER JOIN {db_prefix}boards AS b ON (b.id_board = m.id_board AND {query_see_board})
 			LEFT JOIN {db_prefix}attachments AS th ON (th.id_attach = a.id_thumb)
 		WHERE a.id_attach = {int:attach}',
-		array(
+		[
 			'attach' => $id_attach,
 			'current_topic' => $id_topic,
-		)
+		]
 	);
 	$attachmentData = [
 		'id_folder' => '', 'filename' => '', 'file_hash' => '', 'fileext' => '', 'id_attach' => '',
@@ -356,7 +363,7 @@ function getAttachmentThumbFromTopic($id_attach, $id_topic)
 		// If there is a hash then the thumbnail exists
 		if (!empty($row['file_hash']))
 		{
-			$attachmentData = array(
+			$attachmentData = [
 				'id_folder' => $row['id_folder'],
 				'filename' => $row['filename'],
 				'file_hash' => $row['file_hash'],
@@ -366,12 +373,12 @@ function getAttachmentThumbFromTopic($id_attach, $id_topic)
 				'mime_type' => $row['mime_type'],
 				'approved' => $row['approved'],
 				'id_member' => $row['id_member'],
-			);
+			];
 		}
 		// otherwise $modSettings['attachmentThumbnails'] may be (or was) off, so original file
 		elseif (getValidMimeImageType($row['attach_mime_type']) !== '')
 		{
-			$attachmentData = array(
+			$attachmentData = [
 				'id_folder' => $row['attach_id_folder'],
 				'filename' => $row['attach_filename'],
 				'file_hash' => $row['attach_file_hash'],
@@ -381,7 +388,7 @@ function getAttachmentThumbFromTopic($id_attach, $id_topic)
 				'mime_type' => $row['attach_mime_type'],
 				'approved' => $row['approved'],
 				'id_member' => $row['id_member'],
-			);
+			];
 		}
 	}
 
@@ -407,7 +414,7 @@ function isAttachmentImage($id_attach)
 	$db = database();
 
 	// Make sure this attachment is on this board.
-	$attachmentData = array();
+	$attachmentData = [];
 	$db->fetchQuery('
 		SELECT
 			a.filename, a.fileext, a.id_attach, a.attachment_type, a.mime_type, a.approved, 
@@ -418,10 +425,10 @@ function isAttachmentImage($id_attach)
 		WHERE id_attach = {int:attach}
 			AND attachment_type = {int:type}
 		LIMIT 1',
-		array(
+		[
 			'attach' => $id_attach,
 			'type' => 0,
-		)
+		]
 	)->fetch_callback(
 		function ($row) use (&$attachmentData) {
 			$attachmentData = $row;
@@ -451,9 +458,9 @@ function increaseDownloadCounter($id_attach)
 		UPDATE {db_prefix}attachments
 		SET downloads = downloads + 1
 		WHERE id_attach = {int:id_attach}',
-		array(
+		[
 			'id_attach' => $id_attach,
-		)
+		]
 	);
 }
 
@@ -506,18 +513,18 @@ function saveAvatar($temporary_path, $memID, $max_width, $max_height)
 
 	// Clear out any old attachment
 	require_once(SUBSDIR . '/ManageAttachments.subs.php');
-	removeAttachments(array('id_member' => $memID));
+	removeAttachments(['id_member' => $memID]);
 
 	$db->insert('',
 		'{db_prefix}attachments',
-		array(
+		[
 			'id_member' => 'int', 'attachment_type' => 'int', 'filename' => 'string-255',
 			'file_hash' => 'string-255', 'fileext' => 'string-8', 'size' => 'int', 'id_folder' => 'int',
-		),
-		array(
+		],
+		[
 			$memID, 1, $fileName, '', $ext, 1, 1,
-		),
-		array('id_attach')
+		],
+		['id_attach']
 	);
 	$attachID = $db->insert_id('{db_prefix}attachments');
 
@@ -543,21 +550,21 @@ function saveAvatar($temporary_path, $memID, $max_width, $max_height)
 				size = {int:filesize}, width = {int:width}, height = {int:height}, 
 				mime_type = {string:mime_type}
 			WHERE id_attach = {int:current_attachment}',
-			array(
+			[
 				'filesize' => $thumb_image->getFilesize(),
 				'width' => (int) $width,
 				'height' => (int) $height,
 				'current_attachment' => $attachID,
 				'mime_type' => $mime_type,
-			)
+			]
 		);
 
 		// Retain this globally in case the script wants it.
-		$modSettings['new_avatar_data'] = array(
+		$modSettings['new_avatar_data'] = [
 			'id' => $attachID,
 			'filename' => $destName,
 			'type' => 1,
-		);
+		];
 
 		return true;
 	}
@@ -566,9 +573,9 @@ function saveAvatar($temporary_path, $memID, $max_width, $max_height)
 	$db->query('', '
 		DELETE FROM {db_prefix}attachments
 		WHERE id_attach = {int:current_attachment}',
-		array(
+		[
 			'current_attachment' => $attachID,
-		)
+		]
 	);
 
 	return false;
@@ -585,7 +592,7 @@ function saveAvatar($temporary_path, $memID, $max_width, $max_height)
  * the mime type.
  *
  * @param string $url
- * @return mixed[]|bool the image size as array(width, height), or false on failure
+ * @return array|bool the image size as array(width, height), or false on failure
  */
 function url_image_size($url)
 {
@@ -710,7 +717,7 @@ function getServerStoredAvatars($directory)
 		}
 
 		// Add the files under the current directory we are iterating on
-		if (!in_array($entry->getFilename(), array('blank.png', 'index.php', '.htaccess')))
+		if (!in_array($entry->getFilename(), ['blank.png', 'index.php', '.htaccess']))
 		{
 			$extension = $entry->getExtension();
 			$filename = $entry->getBasename('.' . $extension);
@@ -752,7 +759,7 @@ function updateAttachmentThumbnail($filename, $id_attach, $id_msg, $old_id_thumb
 {
 	global $modSettings;
 
-	$attachment = array('id_attach' => $id_attach);
+	$attachment = ['id_attach' => $id_attach];
 
 	// Load our image functions, it will determine which graphics library to use
 	$image = new Image($filename);
@@ -781,9 +788,9 @@ function updateAttachmentThumbnail($filename, $id_attach, $id_msg, $old_id_thumb
 		$db = database();
 		$db->insert('',
 			'{db_prefix}attachments',
-			array('id_folder' => 'int', 'id_msg' => 'int', 'attachment_type' => 'int', 'filename' => 'string-255', 'file_hash' => 'string-40', 'size' => 'int', 'width' => 'int', 'height' => 'int', 'fileext' => 'string-8', 'mime_type' => 'string-255'),
-			array($id_folder_thumb, $id_msg, 3, $thumb_filename, $thumb_hash, (int) $thumb_size, (int) $attachment['thumb_width'], (int) $attachment['thumb_height'], $thumb_ext, $thumb_mime),
-			array('id_attach')
+			['id_folder' => 'int', 'id_msg' => 'int', 'attachment_type' => 'int', 'filename' => 'string-255', 'file_hash' => 'string-40', 'size' => 'int', 'width' => 'int', 'height' => 'int', 'fileext' => 'string-8', 'mime_type' => 'string-255'],
+			[$id_folder_thumb, $id_msg, 3, $thumb_filename, $thumb_hash, (int) $thumb_size, (int) $attachment['thumb_width'], (int) $attachment['thumb_height'], $thumb_ext, $thumb_mime],
+			['id_attach']
 		);
 
 		$attachment['id_thumb'] = $db->insert_id('{db_prefix}attachments');
@@ -793,10 +800,10 @@ function updateAttachmentThumbnail($filename, $id_attach, $id_msg, $old_id_thumb
 				UPDATE {db_prefix}attachments
 				SET id_thumb = {int:id_thumb}
 				WHERE id_attach = {int:id_attach}',
-				array(
+				[
 					'id_thumb' => $attachment['id_thumb'],
 					'id_attach' => $attachment['id_attach'],
-				)
+				]
 			);
 
 			$thumb_realname = getAttachmentFilename($thumb_filename, $attachment['id_thumb'], $id_folder_thumb, false, $thumb_hash);
@@ -809,7 +816,7 @@ function updateAttachmentThumbnail($filename, $id_attach, $id_msg, $old_id_thumb
 			if (!empty($old_id_thumb))
 			{
 				require_once(SUBSDIR . '/ManageAttachments.subs.php');
-				removeAttachments(array('id_attach' => $old_id_thumb), '', false, false);
+				removeAttachments(['id_attach' => $old_id_thumb], '', false, false);
 			}
 		}
 	}
@@ -836,10 +843,10 @@ function attachmentsSizeForMessage($id_msg, $include_count = true)
 			FROM {db_prefix}attachments
 			WHERE id_msg = {int:id_msg}
 				AND attachment_type = {int:attachment_type}',
-			array(
+			[
 				'id_msg' => $id_msg,
 				'attachment_type' => 0,
-			)
+			]
 		);
 	}
 	else
@@ -850,10 +857,10 @@ function attachmentsSizeForMessage($id_msg, $include_count = true)
 			FROM {db_prefix}attachments
 			WHERE id_msg = {int:id_msg}
 				AND attachment_type = {int:attachment_type}',
-			array(
+			[
 				'id_msg' => $id_msg,
 				'attachment_type' => 0,
-			)
+			]
 		);
 	}
 
@@ -877,7 +884,7 @@ function getLegacyAttachmentFilename($filename, $attachment_id, $dir = null, $ne
 	$clean_name = $filename;
 
 	// Sorry, no spaces, dots, or anything else but letters allowed.
-	$clean_name = preg_replace(array('/\s/', '/[^\w_\.\-]/'), array('_', ''), $clean_name);
+	$clean_name = preg_replace(['/\s/', '/[^\w_\.\-]/'], ['_', ''], $clean_name);
 
 	$enc_name = $attachment_id . '_' . strtr($clean_name, '.', '_') . md5($clean_name);
 	$clean_name = preg_replace('~\.[\.]+~', '.', $clean_name);
@@ -886,7 +893,8 @@ function getLegacyAttachmentFilename($filename, $attachment_id, $dir = null, $ne
 	{
 		return $clean_name;
 	}
-	elseif ($new)
+
+	if ($new)
 	{
 		return $enc_name;
 	}
@@ -911,10 +919,10 @@ function bindMessageAttachments($id_msg, $attachment_ids)
 		UPDATE {db_prefix}attachments
 		SET id_msg = {int:id_msg}
 		WHERE id_attach IN ({array_int:attachment_list})',
-		array(
+		[
 			'attachment_list' => $attachment_ids,
 			'id_msg' => $id_msg,
-		)
+		]
 	);
 }
 
@@ -983,9 +991,9 @@ function getAttachmentPosition($id_attach)
 		WHERE a.id_attach = {int:attach}
 			AND {query_see_board}
 		LIMIT 1',
-		array(
+		[
 			'attach' => $id_attach,
-		)
+		]
 	);
 
 	$attachmentData = $request->fetch_all();
@@ -1032,16 +1040,16 @@ function returnMimeThumb($file_ext, $url = false)
 	global $settings;
 
 	// These are not meant to be exhaustive, just some of the most common attached on a forum
-	$generics = array(
-		'arc' => array('tgz', 'zip', 'rar', '7z', 'gz'),
-		'doc' => array('doc', 'docx', 'wpd', 'odt'),
-		'sound' => array('wav', 'mp3', 'pcm', 'aiff', 'wma', 'm4a', 'flac'),
-		'video' => array('mp4', 'mgp', 'mpeg', 'mp4', 'wmv', 'mkv', 'flv', 'aiv', 'mov', 'swf'),
-		'txt' => array('rtf', 'txt', 'log'),
-		'presentation' => array('ppt', 'pps', 'odp'),
-		'spreadsheet' => array('xls', 'xlr', 'ods'),
-		'web' => array('html', 'htm')
-	);
+	$generics = [
+		'arc' => ['tgz', 'zip', 'rar', '7z', 'gz'],
+		'doc' => ['doc', 'docx', 'wpd', 'odt'],
+		'sound' => ['wav', 'mp3', 'pcm', 'aiff', 'wma', 'm4a', 'flac'],
+		'video' => ['mp4', 'mgp', 'mpeg', 'mp4', 'wmv', 'mkv', 'flv', 'aiv', 'mov', 'swf'],
+		'txt' => ['rtf', 'txt', 'log'],
+		'presentation' => ['ppt', 'pps', 'odp'],
+		'spreadsheet' => ['xls', 'xlr', 'ods'],
+		'web' => ['html', 'htm']
+	];
 	foreach ($generics as $generic_extension => $generic_types)
 	{
 		if (in_array($file_ext, $generic_types))
@@ -1051,8 +1059,8 @@ function returnMimeThumb($file_ext, $url = false)
 		}
 	}
 
-	static $distinct = array('arc', 'doc', 'sound', 'video', 'txt', 'presentation', 'spreadsheet', 'web',
-							 'c', 'cpp', 'css', 'csv', 'java', 'js', 'pdf', 'php', 'sql', 'xml');
+	static $distinct = ['arc', 'doc', 'sound', 'video', 'txt', 'presentation', 'spreadsheet', 'web',
+							 'c', 'cpp', 'css', 'csv', 'java', 'js', 'pdf', 'php', 'sql', 'xml'];
 
 	if (empty($settings))
 	{
@@ -1081,7 +1089,7 @@ function returnMimeThumb($file_ext, $url = false)
 function getValidMimeImageType($mime)
 {
 	// These are the only valid image types.
-	$validImageTypes = array(
+	$validImageTypes = [
 		-1 => 'jpg',
 		// Starting from here are the IMAGETYPE_* constants
 		IMAGETYPE_GIF => 'gif',
@@ -1095,7 +1103,7 @@ function getValidMimeImageType($mime)
 		IMAGETYPE_IFF => 'iff',
 		IMAGETYPE_WBMP => 'bmp',
 		IMAGETYPE_WEBP => 'webp'
-	);
+	];
 
 	$ext = (int) $mime > 0 && isset($validImageTypes[(int) $mime]) ? $validImageTypes[(int) $mime] : '';
 	if (empty($ext))

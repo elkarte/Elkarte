@@ -74,7 +74,7 @@ class Reminder extends AbstractController
 		require_once(SUBSDIR . '/Auth.subs.php');
 
 		// No where params just yet
-		$where_params = array();
+		$where_params = [];
 		$where = '';
 
 		// Coming with a known ID?
@@ -98,7 +98,7 @@ class Reminder extends AbstractController
 
 		// Make sure we are not being slammed
 		// Don't call this if you're coming from the "Choose a reminder type" page - otherwise you'll likely get an error
-		if (!isset($this->_req->post->reminder_type) || !in_array($this->_req->post->reminder_type, array('email', 'secret')))
+		if (!isset($this->_req->post->reminder_type) || !in_array($this->_req->post->reminder_type, ['email', 'secret']))
 		{
 			spamProtection('remind');
 		}
@@ -133,12 +133,12 @@ class Reminder extends AbstractController
 			// Randomly generate a new password, with only alpha numeric characters that is a max length of 14 chars.
 			$password = generateValidationCode(14);
 			require_once(SUBSDIR . '/Mail.subs.php');
-			$replacements = array(
+			$replacements = [
 				'REALNAME' => $member['real_name'],
 				'REMINDLINK' => getUrl('action', ['action' => 'reminder', 'sa' => 'setpassword', 'u' => $member['id_member'], 'code' => $password]),
 				'IP' => $this->user->ip,
 				'MEMBERNAME' => $member['member_name'],
-			);
+			];
 
 			// Email them their new password
 			$emaildata = loadEmailTemplate('forgot_' . $context['account_type'], $replacements, empty($member['lngfile']) || empty($modSettings['userLanguage']) ? $language : $member['lngfile']);
@@ -161,10 +161,10 @@ class Reminder extends AbstractController
 		// No we're here setup the context for template number 2!
 		createToken('remind');
 		$context['sub_template'] = 'reminder_pick';
-		$context['current_member'] = array(
+		$context['current_member'] = [
 			'id' => $member['id_member'],
 			'name' => $member['member_name'],
-		);
+		];
 	}
 
 	/**
@@ -172,7 +172,7 @@ class Reminder extends AbstractController
 	 *
 	 * sa=setpassword
 	 */
-	public function action_setpassword()
+	public function action_setpassword(): void
 	{
 		global $txt, $context;
 
@@ -185,12 +185,12 @@ class Reminder extends AbstractController
 		}
 
 		// Fill the context array.
-		$context += array(
+		$context += [
 			'page_title' => $txt['reminder_set_password'],
 			'sub_template' => 'set_password',
 			'code' => Util::htmlspecialchars($this->_req->query->code),
 			'memID' => (int) $this->_req->query->u
-		);
+		];
 
 		// Some extra js is needed
 		loadJavascriptFile('register.js');
@@ -204,7 +204,7 @@ class Reminder extends AbstractController
 	 *
 	 * sa=setpassword2
 	 */
-	public function action_setpassword2()
+	public function action_setpassword2(): void
 	{
 		global $context, $txt;
 
@@ -233,7 +233,7 @@ class Reminder extends AbstractController
 
 		// Get the code as it should be from the database.
 		require_once(SUBSDIR . '/Members.subs.php');
-		$member = getBasicMemberData($member_id, array('authentication' => true));
+		$member = getBasicMemberData($member_id, ['authentication' => true]);
 
 		// Does this user exist at all? Is he activated? Does he have a validation code?
 		if (empty($member) || $member['is_activated'] != 1 || $member['validation_code'] === '')
@@ -243,7 +243,7 @@ class Reminder extends AbstractController
 
 		// Is the password actually valid to the forums rules?
 		require_once(SUBSDIR . '/Auth.subs.php');
-		$passwordError = validatePassword($this->_req->post->passwrd1, $member['member_name'], array($member['email_address']));
+		$passwordError = validatePassword($this->_req->post->passwrd1, $member['member_name'], [$member['email_address']]);
 
 		// What - it's not?
 		if ($passwordError !== null)
@@ -269,24 +269,24 @@ class Reminder extends AbstractController
 		require_once(SUBSDIR . '/Members.subs.php');
 		if (isset($this->_req->post->otp))
 		{
-			updateMemberData($member_id, array('validation_code' => '', 'passwd' => validateLoginPassword($sha_passwd, '', $member['member_name'], true), 'enable_otp' => 0));
+			updateMemberData($member_id, ['validation_code' => '', 'passwd' => validateLoginPassword($sha_passwd, '', $member['member_name'], true), 'enable_otp' => 0]);
 		}
 		else
 		{
-			updateMemberData($member_id, array('validation_code' => '', 'passwd' => validateLoginPassword($sha_passwd, '', $member['member_name'], true)));
+			updateMemberData($member_id, ['validation_code' => '', 'passwd' => validateLoginPassword($sha_passwd, '', $member['member_name'], true)]);
 		}
 
-		call_integration_hook('integrate_reset_pass', array($member['member_name'], $member['member_name'], $this->_req->post->passwrd1));
+		call_integration_hook('integrate_reset_pass', [$member['member_name'], $member['member_name'], $this->_req->post->passwrd1]);
 
 		theme()->getTemplates()->load('Login');
-		$context += array(
+		$context += [
 			'page_title' => $txt['reminder_password_set'],
 			'sub_template' => 'login',
 			'default_username' => $member['member_name'],
 			'default_password' => $this->_req->post->passwrd1,
 			'never_expire' => false,
 			'description' => $txt['reminder_password_set']
-		);
+		];
 		createToken('login');
 	}
 
@@ -294,7 +294,7 @@ class Reminder extends AbstractController
 	 * Verify the answer to the secret question.
 	 * Accessed with sa=secret2
 	 */
-	public function action_secret2()
+	public function action_secret2(): void
 	{
 		global $txt, $context;
 
@@ -311,7 +311,7 @@ class Reminder extends AbstractController
 
 		// Get the information from the database.
 		require_once(SUBSDIR . '/Members.subs.php');
-		$member = getBasicMemberData((int) $this->_req->post->uid, array('authentication' => true));
+		$member = getBasicMemberData((int) $this->_req->post->uid, ['authentication' => true]);
 		if (empty($member))
 		{
 			throw new Exception('username_no_exist', false);
@@ -338,7 +338,7 @@ class Reminder extends AbstractController
 
 		// Make sure they have a strong enough password.
 		require_once(SUBSDIR . '/Auth.subs.php');
-		$passwordError = validatePassword($this->_req->post->passwrd1, $member['member_name'], array($member['email_address']));
+		$passwordError = validatePassword($this->_req->post->passwrd1, $member['member_name'], [$member['email_address']]);
 
 		// Invalid?
 		if ($passwordError !== null)
@@ -350,20 +350,20 @@ class Reminder extends AbstractController
 		require_once(SUBSDIR . '/Auth.subs.php');
 		$sha_passwd = $this->_req->post->passwrd1;
 		require_once(SUBSDIR . '/Members.subs.php');
-		updateMemberData($member['id_member'], array('passwd' => validateLoginPassword($sha_passwd, '', $member['member_name'], true)));
+		updateMemberData($member['id_member'], ['passwd' => validateLoginPassword($sha_passwd, '', $member['member_name'], true)]);
 
-		call_integration_hook('integrate_reset_pass', array($member['member_name'], $member['member_name'], $this->_req->post->passwrd1));
+		call_integration_hook('integrate_reset_pass', [$member['member_name'], $member['member_name'], $this->_req->post->passwrd1]);
 
 		// Tell them it went fine.
 		theme()->getTemplates()->load('Login');
-		$context += array(
+		$context += [
 			'page_title' => $txt['reminder_password_set'],
 			'sub_template' => 'login',
 			'default_username' => $member['member_name'],
 			'default_password' => $this->_req->post->passwrd1,
 			'never_expire' => false,
 			'description' => $txt['reminder_password_set']
-		);
+		];
 
 		createToken('login');
 	}
@@ -389,7 +389,7 @@ function secretAnswerInput()
 
 	// Get the stuff....
 	require_once(SUBSDIR . '/Members.subs.php');
-	$member = getBasicMemberData((int) $_POST['uid'], array('authentication' => true));
+	$member = getBasicMemberData((int) $_POST['uid'], ['authentication' => true]);
 	if (empty($member))
 	{
 		throw new Exception('username_no_exist', false);

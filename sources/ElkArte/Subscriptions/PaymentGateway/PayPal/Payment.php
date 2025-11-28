@@ -81,7 +81,7 @@ class Payment implements PaymentInterface
 	{
 		global $modSettings, $txt;
 
-		$my_post = array();
+		$my_post = [];
 
 		// Reading POSTed data directly from $_POST may causes serialization issues with array data
 		// in the POST. Instead, read raw POST data from the input stream.
@@ -157,7 +157,7 @@ class Payment implements PaymentInterface
 	 * Makes the request to paypal and returns the response
 	 * Attempts curl first and if not available fsockopen
 	 */
-	private function _fetchReturnResponse()
+	private function _fetchReturnResponse(): void
 	{
 		// First we try cURL
 		if (function_exists('curl_init') && $curl = curl_init(($this->paidsubsTest ? 'https://ipnpb.sandbox.' : 'https://ipnpb.') . 'paypal.com/cgi-bin/webscr'))
@@ -176,11 +176,10 @@ class Payment implements PaymentInterface
 	 *
 	 * @param resource $curl
 	 */
-	private function _fetchReturnResponseCurl($curl)
+	private function _fetchReturnResponseCurl($curl): void
 	{
 		// Set the post data.
 		curl_setopt($curl, CURLOPT_POST, true);
-		curl_setopt($curl, CURLOPT_POSTFIELDSIZE, 0);
 		curl_setopt($curl, CURLOPT_POSTFIELDS, $this->requestString);
 
 		// Set up the headers so paypal will accept the post
@@ -193,12 +192,12 @@ class Payment implements PaymentInterface
 		curl_setopt($curl, CURLOPT_CONNECTTIMEOUT, 30);
 
 		// Set the http headers
-		curl_setopt($curl, CURLOPT_HTTPHEADER, array(
+		curl_setopt($curl, CURLOPT_HTTPHEADER, [
 			'Content-Type: application/x-www-form-urlencoded',
 			'Content-Length: ' . strlen($this->requestString),
 			'Host: ipnpb.' . ($this->paidsubsTest ? 'sandbox.' : '') . 'paypal.com',
 			'Connection: close'
-		));
+		]);
 
 		// The data returned as a string.
 		curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
@@ -213,7 +212,7 @@ class Payment implements PaymentInterface
 	/**
 	 * Get paypal response to our requestString using curl
 	 */
-	private function _fetchReturnResponseFs()
+	private function _fetchReturnResponseFs(): void
 	{
 		global $txt;
 
@@ -272,7 +271,7 @@ class Payment implements PaymentInterface
 	 *
 	 * @return false|null
 	 */
-	private function _findSubscription()
+	private function _findSubscription(): ?bool
 	{
 		$db = database();
 
@@ -289,9 +288,9 @@ class Payment implements PaymentInterface
 			FROM {db_prefix}log_subscribed
 			WHERE vendor_ref = {string:vendor_ref}
 			LIMIT 1',
-			array(
+			[
 				'vendor_ref' => $_POST['subscr_id'],
-			)
+			]
 		);
 		// No joy?
 		if ($request->num_rows() === 0)
@@ -307,9 +306,9 @@ class Payment implements PaymentInterface
 						INNER JOIN {db_prefix}members AS mem ON (mem.id_member = ls.id_member)
 					WHERE mem.email_address = {string:payer_email}
 					LIMIT 1',
-					array(
+					[
 						'payer_email' => $_POST['payer_email'],
-					)
+					]
 				);
 				if ($request->num_rows() === 0)
 				{
@@ -383,7 +382,7 @@ class Payment implements PaymentInterface
 	 *
 	 * @param int $subscription_id
 	 */
-	public function close($subscription_id)
+	public function close($subscription_id): never
 	{
 		$db = database();
 
@@ -394,10 +393,10 @@ class Payment implements PaymentInterface
 				UPDATE {db_prefix}log_subscribed
 				SET vendor_ref = {string:vendor_ref}
 				WHERE id_sublog = {int:current_subscription}',
-				array(
+				[
 					'current_subscription' => $subscription_id,
 					'vendor_ref' => $_POST['subscr_id'],
-				)
+				]
 			);
 		}
 

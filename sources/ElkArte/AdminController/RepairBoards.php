@@ -46,7 +46,7 @@ class RepairBoards extends AbstractController
 	 *
 	 * @uses raw_data sub-template.
 	 */
-	public function action_repairboards()
+	public function action_repairboards(): void
 	{
 		global $txt, $context, $db_show_debug;
 
@@ -83,7 +83,7 @@ class RepairBoards extends AbstractController
 		if (!isset($this->_req->query->fixErrors))
 		{
 			$context['error_search'] = true;
-			$context['repair_errors'] = array();
+			$context['repair_errors'] = [];
 
 			// Logging may cause session issues with many queries
 			$old_db_show_debug = $db_show_debug;
@@ -108,7 +108,7 @@ class RepairBoards extends AbstractController
 		else
 		{
 			$context['error_search'] = false;
-			$context['to_fix'] = $this->_req->session->repairboards_to_fix ?? array();
+			$context['to_fix'] = $this->_req->session->repairboards_to_fix ?? [];
 
 			require_once(SUBSDIR . '/Boards.subs.php');
 
@@ -123,9 +123,9 @@ class RepairBoards extends AbstractController
 			$db_show_debug = $old_db_show_debug;
 
 			// Note that we've changed everything possible ;)
-			updateSettings(array(
+			updateSettings([
 				'settings_updated' => time(),
-			));
+			]);
 
 			require_once(SUBSDIR . '/Messages.subs.php');
 			updateMessageStats();
@@ -133,9 +133,9 @@ class RepairBoards extends AbstractController
 			require_once(SUBSDIR . '/Topic.subs.php');
 			updateTopicStats();
 
-			updateSettings(array(
+			updateSettings([
 				'calendar_updated' => time(),
-			));
+			]);
 
 			if (!empty($_SESSION['redirect_to_recount']))
 			{

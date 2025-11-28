@@ -59,14 +59,14 @@ class ManageServer extends AbstractController
 		isAllowedTo('admin_forum');
 		checkSession('request');
 
-		$subActions = array(
-			'general' => array($this, 'action_generalSettings_display', 'permission' => 'admin_forum'),
-			'database' => array($this, 'action_databaseSettings_display', 'permission' => 'admin_forum'),
-			'cookie' => array($this, 'action_cookieSettings_display', 'permission' => 'admin_forum'),
-			'cache' => array($this, 'action_cacheSettings_display', 'permission' => 'admin_forum'),
-			'loads' => array($this, 'action_loadavgSettings_display', 'permission' => 'admin_forum'),
-			'phpinfo' => array($this, 'action_phpinfo', 'permission' => 'admin_forum'),
-		);
+		$subActions = [
+			'general' => [$this, 'action_generalSettings_display', 'permission' => 'admin_forum'],
+			'database' => [$this, 'action_databaseSettings_display', 'permission' => 'admin_forum'],
+			'cookie' => [$this, 'action_cookieSettings_display', 'permission' => 'admin_forum'],
+			'cache' => [$this, 'action_cacheSettings_display', 'permission' => 'admin_forum'],
+			'loads' => [$this, 'action_loadavgSettings_display', 'permission' => 'admin_forum'],
+			'phpinfo' => [$this, 'action_phpinfo', 'permission' => 'admin_forum'],
+		];
 
 		$action = new Action('server_settings');
 
@@ -127,7 +127,7 @@ class ManageServer extends AbstractController
 	 *
 	 * @event integrate_save_general_settings
 	 */
-	public function action_generalSettings_display()
+	public function action_generalSettings_display(): void
 	{
 		global $context, $txt;
 
@@ -168,22 +168,22 @@ class ManageServer extends AbstractController
 		global $txt;
 
 		// initialize configuration
-		$config_vars = array(
-			array('mbname', $txt['admin_title'], 'file', 'text', 30),
+		$config_vars = [
+			['mbname', $txt['admin_title'], 'file', 'text', 30],
 			'',
-			array('maintenance', $txt['admin_maintain'], 'file', 'check'),
-			array('mtitle', $txt['maintenance_subject'], 'file', 'text', 36),
-			array('mmessage', $txt['maintenance_message'], 'file', 'large_text', 6),
+			['maintenance', $txt['admin_maintain'], 'file', 'check'],
+			['mtitle', $txt['maintenance_subject'], 'file', 'text', 36],
+			['mmessage', $txt['maintenance_message'], 'file', 'large_text', 6],
 			'',
-			array('webmaster_email', $txt['admin_webmaster_email'], 'file', 'text', 30),
+			['webmaster_email', $txt['admin_webmaster_email'], 'file', 'text', 30],
 			'',
-			array('enableCompressedOutput', $txt['enableCompressedOutput'], 'db', 'check', null, 'enableCompressedOutput'),
-			array('disableHostnameLookup', $txt['disableHostnameLookup'], 'db', 'check', null, 'disableHostnameLookup'),
-			array('url_format', $txt['url_format'], 'file', 'select', array('standard' => $txt['url_format_standard'], 'semantic' => $txt['url_format_semantic'], 'queryless' => $txt['url_format_queryless'])),
-		);
+			['enableCompressedOutput', $txt['enableCompressedOutput'], 'db', 'check', null, 'enableCompressedOutput'],
+			['disableHostnameLookup', $txt['disableHostnameLookup'], 'db', 'check', null, 'disableHostnameLookup'],
+			['url_format', $txt['url_format'], 'file', 'select', ['standard' => $txt['url_format_standard'], 'semantic' => $txt['url_format_semantic'], 'queryless' => $txt['url_format_queryless']]],
+		];
 
 		// Notify the integration
-		call_integration_hook('integrate_modify_general_settings', array(&$config_vars));
+		call_integration_hook('integrate_modify_general_settings', [&$config_vars]);
 
 		return $config_vars;
 	}
@@ -204,7 +204,7 @@ class ManageServer extends AbstractController
 	 *
 	 * @event integrate_save_database_settings
 	 */
-	public function action_databaseSettings_display()
+	public function action_databaseSettings_display(): void
 	{
 		global $context, $txt;
 
@@ -243,28 +243,28 @@ class ManageServer extends AbstractController
 		global $txt;
 
 		// initialize settings
-		$config_vars = array(
-			array('db_server', $txt['database_server'], 'file', 'text'),
-			array('db_user', $txt['database_user'], 'file', 'text'),
-			array('db_passwd', $txt['database_password'], 'file', 'password'),
-			array('db_name', $txt['database_name'], 'file', 'text'),
-			array('db_prefix', $txt['database_prefix'], 'file', 'text'),
-			array('db_persist', $txt['db_persist'], 'file', 'check', null, 'db_persist'),
-			array('db_error_send', $txt['db_error_send'], 'file', 'check'),
-			array('ssi_db_user', $txt['ssi_db_user'], 'file', 'text', null, 'ssi_db_user'),
-			array('ssi_db_passwd', $txt['ssi_db_passwd'], 'file', 'password'),
+		$config_vars = [
+			['db_server', $txt['database_server'], 'file', 'text'],
+			['db_user', $txt['database_user'], 'file', 'text'],
+			['db_passwd', $txt['database_password'], 'file', 'password'],
+			['db_name', $txt['database_name'], 'file', 'text'],
+			['db_prefix', $txt['database_prefix'], 'file', 'text'],
+			['db_persist', $txt['db_persist'], 'file', 'check', null, 'db_persist'],
+			['db_error_send', $txt['db_error_send'], 'file', 'check'],
+			['ssi_db_user', $txt['ssi_db_user'], 'file', 'text', null, 'ssi_db_user'],
+			['ssi_db_passwd', $txt['ssi_db_passwd'], 'file', 'password'],
 			'',
-			array('autoFixDatabase', $txt['autoFixDatabase'], 'db', 'check', false, 'autoFixDatabase'),
-			array('autoOptMaxOnline', $txt['autoOptMaxOnline'], 'subtext' => $txt['zero_for_no_limit'], 'db', 'int'),
+			['autoFixDatabase', $txt['autoFixDatabase'], 'db', 'check', false, 'autoFixDatabase'],
+			['autoOptMaxOnline', $txt['autoOptMaxOnline'], 'subtext' => $txt['zero_for_no_limit'], 'db', 'int'],
 			'',
-			array('boardurl', $txt['admin_url'], 'file', 'text', 36),
-			array('boarddir', $txt['boarddir'], 'file', 'text', 36),
-			array('sourcedir', $txt['sourcesdir'], 'file', 'text', 36),
-			array('cachedir', $txt['cachedir'], 'file', 'text', 36),
-		);
+			['boardurl', $txt['admin_url'], 'file', 'text', 36],
+			['boarddir', $txt['boarddir'], 'file', 'text', 36],
+			['sourcedir', $txt['sourcesdir'], 'file', 'text', 36],
+			['cachedir', $txt['cachedir'], 'file', 'text', 36],
+		];
 
 		// Notify the integration
-		call_integration_hook('integrate_modify_database_settings', array(&$config_vars));
+		call_integration_hook('integrate_modify_database_settings', [&$config_vars]);
 
 		return $config_vars;
 	}
@@ -277,7 +277,7 @@ class ManageServer extends AbstractController
 	 *
 	 * @event integrate_save_cookie_settings
 	 */
-	public function action_cookieSettings_display()
+	public function action_cookieSettings_display(): void
 	{
 		global $context, $txt, $modSettings, $cookiename, $boardurl;
 
@@ -359,24 +359,24 @@ class ManageServer extends AbstractController
 		global $txt;
 
 		// Define the variables we want to edit or show in the cookie form.
-		$config_vars = array(
+		$config_vars = [
 			// Cookies...
-			array('cookiename', $txt['cookie_name'], 'file', 'text', 20),
-			array('cookieTime', $txt['cookieTime'], 'db', 'int', 'postinput' => $txt['minutes']),
-			array('localCookies', $txt['localCookies'], 'subtext' => $txt['localCookies_note'], 'db', 'check', false, 'localCookies'),
-			array('globalCookies', $txt['globalCookies'], 'subtext' => $txt['globalCookies_note'], 'db', 'check', false, 'globalCookies'),
-			array('globalCookiesDomain', $txt['globalCookiesDomain'], 'subtext' => $txt['globalCookiesDomain_note'], 'db', 'text', false, 'globalCookiesDomain'),
-			array('secureCookies', $txt['secureCookies'], 'subtext' => $txt['secureCookies_note'], 'db', 'check', false, 'secureCookies', 'disabled' => !isset($_SERVER['HTTPS']) || strtolower($_SERVER['HTTPS']) !== 'on' && strtolower($_SERVER['HTTPS']) != '1'),
-			array('httponlyCookies', $txt['httponlyCookies'], 'subtext' => $txt['httponlyCookies_note'], 'db', 'check', false, 'httponlyCookies'),
+			['cookiename', $txt['cookie_name'], 'file', 'text', 20],
+			['cookieTime', $txt['cookieTime'], 'db', 'int', 'postinput' => $txt['minutes']],
+			['localCookies', $txt['localCookies'], 'subtext' => $txt['localCookies_note'], 'db', 'check', false, 'localCookies'],
+			['globalCookies', $txt['globalCookies'], 'subtext' => $txt['globalCookies_note'], 'db', 'check', false, 'globalCookies'],
+			['globalCookiesDomain', $txt['globalCookiesDomain'], 'subtext' => $txt['globalCookiesDomain_note'], 'db', 'text', false, 'globalCookiesDomain'],
+			['secureCookies', $txt['secureCookies'], 'subtext' => $txt['secureCookies_note'], 'db', 'check', false, 'secureCookies', 'disabled' => !isset($_SERVER['HTTPS']) || strtolower($_SERVER['HTTPS']) !== 'on' && strtolower($_SERVER['HTTPS']) != '1'],
+			['httponlyCookies', $txt['httponlyCookies'], 'subtext' => $txt['httponlyCookies_note'], 'db', 'check', false, 'httponlyCookies'],
 			'',
 			// Sessions
-			array('databaseSession_enable', $txt['databaseSession_enable'], 'db', 'check', false, 'databaseSession_enable'),
-			array('databaseSession_loose', $txt['databaseSession_loose'], 'db', 'check', false, 'databaseSession_loose'),
-			array('databaseSession_lifetime', $txt['databaseSession_lifetime'], 'db', 'int', false, 'databaseSession_lifetime', 'postinput' => $txt['seconds']),
-		);
+			['databaseSession_enable', $txt['databaseSession_enable'], 'db', 'check', false, 'databaseSession_enable'],
+			['databaseSession_loose', $txt['databaseSession_loose'], 'db', 'check', false, 'databaseSession_loose'],
+			['databaseSession_lifetime', $txt['databaseSession_lifetime'], 'db', 'int', false, 'databaseSession_lifetime', 'postinput' => $txt['seconds']],
+		];
 
 		// Notify the integration
-		call_integration_hook('integrate_modify_cookie_settings', array(&$config_vars));
+		call_integration_hook('integrate_modify_cookie_settings', [&$config_vars]);
 
 		// Set them vars for our settings form
 		return $config_vars;
@@ -390,7 +390,7 @@ class ManageServer extends AbstractController
 	 *
 	 * @event integrate_save_cache_settings
 	 */
-	public function action_cacheSettings_display()
+	public function action_cacheSettings_display(): void
 	{
 		global $context, $txt;
 
@@ -516,7 +516,7 @@ class ManageServer extends AbstractController
 	 * @event integrate_loadavg_settings
 	 * @event integrate_save_loadavg_settings
 	 */
-	public function action_loadavgSettings_display()
+	public function action_loadavgSettings_display(): void
 	{
 		global $txt, $context;
 
@@ -599,12 +599,12 @@ class ManageServer extends AbstractController
 		}
 
 		// Start with a simple checkbox.
-		$config_vars = array(
-			array('check', 'loadavg_enable', 'disabled' => $disabled),
-		);
+		$config_vars = [
+			['check', 'loadavg_enable', 'disabled' => $disabled],
+		];
 
 		// Set the default values for each option.
-		$default_values = array(
+		$default_values = [
 			'loadavg_auto_opt' => '1.0',
 			'loadavg_search' => '2.5',
 			'loadavg_allunread' => '2.0',
@@ -613,18 +613,18 @@ class ManageServer extends AbstractController
 			'loadavg_userstats' => '10.0',
 			'loadavg_bbc' => '30.0',
 			'loadavg_forum' => '40.0',
-		);
+		];
 
 		// Loop through the settings.
 		foreach ($default_values as $name => $value)
 		{
 			// Use the default value if the setting isn't set yet.
 			$value = $modSettings[$name] ?? $value;
-			$config_vars[] = array('text', $name, 'value' => $value, 'disabled' => $disabled);
+			$config_vars[] = ['text', $name, 'value' => $value, 'disabled' => $disabled];
 		}
 
 		// Notify the integration that we're preparing to mess with load management settings...
-		call_integration_hook('integrate_modify_loadavg_settings', array(&$config_vars));
+		call_integration_hook('integrate_modify_loadavg_settings', [&$config_vars]);
 
 		return $config_vars;
 	}
@@ -639,12 +639,12 @@ class ManageServer extends AbstractController
 	 *
 	 * @uses sub-template php_info
 	 */
-	public function action_phpinfo()
+	public function action_phpinfo(): void
 	{
 		global $context, $txt;
 
 		$category = $txt['phpinfo_settings'];
-		$pinfo = array();
+		$pinfo = [];
 
 		// Get the data
 		ob_start();
@@ -679,7 +679,7 @@ class ManageServer extends AbstractController
 			}
 			elseif (preg_match('~<tr><td[^>]+>([^<]*)</td><td[^>]+>([^<]*)</td><td[^>]+>([^<]*)</td></tr>~', $line, $val))
 			{
-				$pinfo[$category][$val[1]] = array($txt['phpinfo_localsettings'] => $val[2], $txt['phpinfo_defaultsettings'] => $val[3]);
+				$pinfo[$category][$val[1]] = [$txt['phpinfo_localsettings'] => $val[2], $txt['phpinfo_defaultsettings'] => $val[3]];
 			}
 		}
 

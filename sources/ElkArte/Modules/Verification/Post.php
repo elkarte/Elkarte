@@ -53,7 +53,7 @@ class Post extends AbstractModule
 	 *
 	 * @param ErrorContext $_post_errors
 	 */
-	public function post_errors($_post_errors)
+	public function post_errors($_post_errors): void
 	{
 		global $context;
 
@@ -83,7 +83,7 @@ class Post extends AbstractModule
 	 *
 	 * @param ErrorContext $_post_errors
 	 */
-	public function prepare_save_post($_post_errors)
+	public function prepare_save_post($_post_errors): void
 	{
 		global $context;
 

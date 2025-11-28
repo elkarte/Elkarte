@@ -43,7 +43,7 @@ class Filebased extends AbstractCacheMethod
 	 *
 	 * @return string
 	 */
-	public function getFileName($key)
+	public function getFileName($key): string
 	{
 		return $this->prefix . '_' . $key . '.' . $this->ext;
 	}
@@ -125,7 +125,7 @@ class Filebased extends AbstractCacheMethod
 	 *
 	 * @param string $fName The name of the cached file.
 	 */
-	private function opcacheReset($fName)
+	private function opcacheReset($fName): void
 	{
 		if (extension_loaded('Zend OPcache') && ini_get('opcache.enable'))
 		{

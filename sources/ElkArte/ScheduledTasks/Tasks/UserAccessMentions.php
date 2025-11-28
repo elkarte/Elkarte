@@ -77,8 +77,8 @@ class UserAccessMentions implements ScheduledTaskInterface
 					while (true)
 					{
 						// Find all the mentions that this user can or cannot see
-						$mentions = array();
-						$remove = array();
+						$mentions = [];
+						$remove = [];
 						$db->fetchQuery('
 							SELECT 
 								mnt.id_mention, m.id_board
@@ -89,13 +89,13 @@ class UserAccessMentions implements ScheduledTaskInterface
 								AND mnt.mention_type IN ({array_string:mention_types})
 								AND {raw:user_see_board}
 							LIMIT {int:limit} OFFSET {int:start}',
-							array(
+							[
 								'current_member' => $member,
 								'mention_types' => $mentionTypes,
 								'user_see_board' => ($can === 'can' ? '' : 'NOT ') . '(' . $user_see_board . (!empty($modSettings['recycle_enable']) && $modSettings['recycle_board'] > 0 ? ' AND b.id_board != ' . $modSettings['recycle_board'] : '') . ')',
 								'start' => $start,
 								'limit' => $limit,
-							)
+							]
 						)->fetch_callback(
 							static function ($row) use (&$remove, &$mentions) {
 								if (empty($row['id_board']))
@@ -134,7 +134,7 @@ class UserAccessMentions implements ScheduledTaskInterface
 				unset($user_access_mentions[$member]);
 
 				// And save everything for the next run
-				updateSettings(array('user_access_mentions' => serialize($user_access_mentions)));
+				updateSettings(['user_access_mentions' => serialize($user_access_mentions)]);
 
 				// Count helps keep things correct
 				countUserMentions(false, '', $member);
@@ -165,10 +165,10 @@ class UserAccessMentions implements ScheduledTaskInterface
 			FROM {db_prefix}log_mentions
 			WHERE id_member > {int:last_id_member}
 				AND mention_type IN ({array_string:mention_types})',
-			array(
+			[
 				'last_id_member' => $current_check,
 				'mention_types' => $mentionTypes,
-			)
+			]
 		);
 		[$remaining] = $request->fetch_row();
 		$request->free_result();
@@ -185,15 +185,15 @@ class UserAccessMentions implements ScheduledTaskInterface
 			WHERE id_member > {int:last_id_member}
 				AND mention_type IN ({array_string:mention_types})
 			LIMIT {int:limit}',
-			array(
+			[
 				'last_id_member' => $current_check,
 				'mention_types' => $mentionTypes,
 				'limit' => $limit,
-			)
+			]
 		);
 
 		// Remember where to start for the next scheduled task run
-		updateSettings(array('mentions_member_check' => $current_check + $limit));
+		updateSettings(['mentions_member_check' => $current_check + $limit]);
 		while (($row = $request->fetch_assoc()))
 		{
 			// Rebuild 'query_see_board', a lot of code duplication... :(
@@ -211,11 +211,11 @@ class UserAccessMentions implements ScheduledTaskInterface
 						AND {raw:user_see_board}
 						AND mnt.is_accessible = 1
 					LIMIT 1',
-				array(
+				[
 					'current_member' => $row['id_member'],
 					'mention_types' => $mentionTypes,
 					'user_see_board' => 'NOT (' . $user_see_board . (!empty($modSettings['recycle_enable']) && $modSettings['recycle_board'] > 0 ? ' AND b.id_board != ' . $modSettings['recycle_board'] : '') . ')',
-				)
+				]
 			);
 
 			// One row of results is enough: scheduleTaskImmediate!
@@ -227,14 +227,14 @@ class UserAccessMentions implements ScheduledTaskInterface
 				}
 				else
 				{
-					$modSettings['user_access_mentions'] = array();
+					$modSettings['user_access_mentions'] = [];
 				}
 
 				// But if the member is already on the list, let's skip it
 				if (!isset($modSettings['user_access_mentions'][$row['id_member']]))
 				{
 					$modSettings['user_access_mentions'][$row['id_member']] = 0;
-					updateSettings(array('user_access_mentions' => serialize(array_unique($modSettings['user_access_mentions']))));
+					updateSettings(['user_access_mentions' => serialize(array_unique($modSettings['user_access_mentions']))]);
 					scheduleTaskImmediate('user_access_mentions');
 				}
 			}

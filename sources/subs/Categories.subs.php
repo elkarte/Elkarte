@@ -22,24 +22,24 @@ use ElkArte\BoardsTree;
  * used by ManageBoards.controller.php to change the settings of a category.
  *
  * @param int $category_id
- * @param mixed[] $catOptions
+ * @param array $catOptions
  */
 function modifyCategory($category_id, $catOptions)
 {
 	$db = database();
 
-	$catUpdates = array();
-	$catParameters = array();
+	$catUpdates = [];
+	$catParameters = [];
 
 	$cat_id = $category_id;
-	call_integration_hook('integrate_pre_modify_category', array($cat_id, &$catOptions));
+	call_integration_hook('integrate_pre_modify_category', [$cat_id, &$catOptions]);
 
 	// Wanna change the categories position?
 	if (isset($catOptions['move_after']))
 	{
 		// Store all categories in the proper order.
-		$cats = array();
-		$cat_order = array();
+		$cats = [];
+		$cat_order = [];
 
 		// Setting 'move_after' to '0' moves the category to the top.
 		if ($catOptions['move_after'] == 0)
@@ -53,7 +53,7 @@ function modifyCategory($category_id, $catOptions)
 				id_cat, cat_order
 			FROM {db_prefix}categories
 			ORDER BY cat_order',
-			array()
+			[]
 		)->fetch_callback(
 			function ($row) use (&$cat_order, &$cats, $category_id, $catOptions) {
 				if ($row['id_cat'] != $category_id)
@@ -80,10 +80,10 @@ function modifyCategory($category_id, $catOptions)
 					SET 
 						cat_order = {int:new_order}
 					WHERE id_cat = {int:current_category}',
-					array(
+					[
 						'new_order' => $index,
 						'current_category' => $cat,
-					)
+					]
 				);
 			}
 		}
@@ -107,7 +107,7 @@ function modifyCategory($category_id, $catOptions)
 	}
 
 	$cat_id = $category_id;
-	call_integration_hook('integrate_modify_category', array($cat_id, &$catUpdates, &$catParameters));
+	call_integration_hook('integrate_modify_category', [$cat_id, &$catUpdates, &$catParameters]);
 
 	// Do the updates (if any).
 	if (!empty($catUpdates))
@@ -118,14 +118,14 @@ function modifyCategory($category_id, $catOptions)
 				' . implode(',
 				', $catUpdates) . '
 			WHERE id_cat = {int:current_category}',
-			array_merge($catParameters, array(
+			array_merge($catParameters, [
 				'current_category' => $category_id,
-			))
+			])
 		);
 
 		if (empty($catOptions['dont_log']))
 		{
-			logAction('edit_cat', array('catname' => $catOptions['cat_name'] ?? $category_id), 'admin');
+			logAction('edit_cat', ['catname' => $catOptions['cat_name'] ?? $category_id], 'admin');
 		}
 	}
 }
@@ -136,7 +136,7 @@ function modifyCategory($category_id, $catOptions)
  * allows (almost) the same options as the modifyCat() function.
  * returns the ID of the newly created category.
  *
- * @param mixed[] $catOptions
+ * @param array $catOptions
  */
 function createCategory($catOptions)
 {
@@ -161,21 +161,21 @@ function createCategory($catOptions)
 	// Don't log an edit right after.
 	$catOptions['dont_log'] = true;
 
-	$cat_columns = array(
+	$cat_columns = [
 		'name' => 'string-48',
-	);
-	$cat_parameters = array(
+	];
+	$cat_parameters = [
 		$catOptions['cat_name'],
-	);
+	];
 
-	call_integration_hook('integrate_create_category', array(&$catOptions, &$cat_columns, &$cat_parameters));
+	call_integration_hook('integrate_create_category', [&$catOptions, &$cat_columns, &$cat_parameters]);
 
 	// Add the category to the database.
 	$db->insert('',
 		'{db_prefix}categories',
 		$cat_columns,
 		$cat_parameters,
-		array('id_cat')
+		['id_cat']
 	);
 
 	// Grab the new category ID.
@@ -184,7 +184,7 @@ function createCategory($catOptions)
 	// Set the given properties to the newly created category.
 	modifyCategory($category_id, $catOptions);
 
-	logAction('add_cat', array('catname' => $catOptions['cat_name']), 'admin');
+	logAction('add_cat', ['catname' => $catOptions['cat_name']], 'admin');
 
 	// Return the database ID of the category.
 	return $category_id;
@@ -209,12 +209,12 @@ function deleteCategories($categories, $moveBoardsTo = null)
 
 	$boardTree = new BoardsTree($db);
 
-	call_integration_hook('integrate_delete_category', array($categories, &$moveBoardsTo));
+	call_integration_hook('integrate_delete_category', [$categories, &$moveBoardsTo]);
 
 	// With no category set to move the boards to, delete them all.
 	if ($moveBoardsTo === null)
 	{
-		$boards_inside = array_keys(fetchBoardsInfo(array('categories' => $categories)));
+		$boards_inside = array_keys(fetchBoardsInfo(['categories' => $categories]));
 
 		if (!empty($boards_inside))
 		{
@@ -234,10 +234,10 @@ function deleteCategories($categories, $moveBoardsTo = null)
 			SET 
 				id_cat = {int:new_parent_cat}
 			WHERE id_cat IN ({array_int:category_list})',
-			array(
+			[
 				'category_list' => $categories,
 				'new_parent_cat' => $moveBoardsTo,
-			)
+			]
 		);
 	}
 
@@ -245,24 +245,24 @@ function deleteCategories($categories, $moveBoardsTo = null)
 	$db->query('', '
 		DELETE FROM {db_prefix}collapsed_categories
 		WHERE id_cat IN ({array_int:category_list})',
-		array(
+		[
 			'category_list' => $categories,
-		)
+		]
 	);
 
 	// Do the deletion of the category itself
 	$db->query('', '
 		DELETE FROM {db_prefix}categories
 		WHERE id_cat IN ({array_int:category_list})',
-		array(
+		[
 			'category_list' => $categories,
-		)
+		]
 	);
 
 	// Log what we've done.
 	foreach ($categories as $category)
 	{
-		logAction('delete_cat', array('catname' => $boardTree->getCategoryNodeById($category)['name']), 'admin');
+		logAction('delete_cat', ['catname' => $boardTree->getCategoryNodeById($category)['name']], 'admin');
 	}
 
 	// Get all boards back into the right order.
@@ -291,10 +291,10 @@ function collapseCategories($categories, $new_status, $members = null, $check_co
 			DELETE FROM {db_prefix}collapsed_categories
 			WHERE id_cat IN ({array_int:category_list})' . ($members === null ? '' : '
 				AND id_member IN ({array_int:member_list})'),
-			array(
+			[
 				'category_list' => $categories,
 				'member_list' => $members,
-			)
+			]
 		);
 
 		if ($new_status === 'collapse')
@@ -308,11 +308,11 @@ function collapseCategories($categories, $new_status, $members = null, $check_co
 						mem.id_member IN ({array_int:member_list})') . ')
 				WHERE c.id_cat IN ({array_int:category_list})' . ($check_collapsable ? '
 					AND c.can_collapse = {int:is_collapsible}' : ''),
-				array(
+				[
 					'member_list' => $members,
 					'category_list' => $categories,
 					'is_collapsible' => 1,
-				)
+				]
 			);
 		}
 	}
@@ -321,10 +321,10 @@ function collapseCategories($categories, $new_status, $members = null, $check_co
 	elseif ($new_status === 'toggle')
 	{
 		// Get the current state of the categories.
-		$updates = array(
-			'insert' => array(),
-			'remove' => array(),
-		);
+		$updates = [
+			'insert' => [],
+			'remove' => [],
+		];
 		$db->fetchQuery('
 			SELECT 
 				mem.id_member, c.id_cat, COALESCE(cc.id_cat, 0) AS is_collapsed, c.can_collapse
@@ -333,15 +333,15 @@ function collapseCategories($categories, $new_status, $members = null, $check_co
 				LEFT JOIN {db_prefix}collapsed_categories AS cc ON (cc.id_cat = c.id_cat AND cc.id_member = mem.id_member)
 			' . ($members === null ? '' : '
 				WHERE mem.id_member IN ({array_int:member_list})'),
-			array(
+			[
 				'category_list' => $categories,
 				'member_list' => $members,
-			)
+			]
 		)->fetch_callback(
 			function ($row) use (&$updates, $check_collapsable) {
 				if (empty($row['is_collapsed']) && (!empty($row['can_collapse']) || !$check_collapsable))
 				{
-					$updates['insert'][] = array($row['id_member'], $row['id_cat']);
+					$updates['insert'][] = [$row['id_member'], $row['id_cat']];
 				}
 				elseif (!empty($row['is_collapsed']))
 				{
@@ -355,11 +355,11 @@ function collapseCategories($categories, $new_status, $members = null, $check_co
 		{
 			$db->replace(
 				'{db_prefix}collapsed_categories',
-				array(
+				[
 					'id_cat' => 'int', 'id_member' => 'int',
-				),
+				],
 				$updates['insert'],
-				array('id_cat', 'id_member')
+				['id_cat', 'id_member']
 			);
 		}
 
@@ -369,7 +369,7 @@ function collapseCategories($categories, $new_status, $members = null, $check_co
 			$db->query('', '
 				DELETE FROM {db_prefix}collapsed_categories
 				WHERE ' . implode(' OR ', $updates['remove']),
-				array()
+				[]
 			);
 		}
 	}
@@ -391,9 +391,9 @@ function categoryName($id_cat)
 		FROM {db_prefix}categories
 		WHERE id_cat = {int:id_cat}
 		LIMIT 1',
-		array(
+		[
 			'id_cat' => $id_cat,
-		)
+		]
 	);
 	list ($name) = $request->fetch_row();
 	$request->free_result();

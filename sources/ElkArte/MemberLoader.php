@@ -184,7 +184,7 @@ class MemberLoader
 	 * @param int[] $to_load Array of ids to load
 	 * @return bool If loaded anything or not
 	 */
-	protected function loadByCondition($where_clause, $to_load)
+	protected function loadByCondition($where_clause, $to_load): bool
 	{
 		if (empty($to_load))
 		{
@@ -259,7 +259,7 @@ class MemberLoader
 	 *
 	 * @param int[] $new_loaded_ids Array of ids to load
 	 */
-	protected function loadCustomFields($new_loaded_ids)
+	protected function loadCustomFields($new_loaded_ids): void
 	{
 		if (empty($new_loaded_ids) || $this->options['custom_fields'] === false)
 		{
@@ -301,7 +301,7 @@ class MemberLoader
 	 *
 	 * @param int[] $new_loaded_ids Ids of members that have been loaded
 	 */
-	protected function storeInCache($new_loaded_ids)
+	protected function storeInCache($new_loaded_ids): void
 	{
 		if ($this->useCache)
 		{
@@ -315,7 +315,7 @@ class MemberLoader
 	/**
 	 * Loads moderators data into the \ElkArte\Member objects
 	 */
-	protected function loadModerators()
+	protected function loadModerators(): void
 	{
 		global $board_info;
 
@@ -387,7 +387,7 @@ class MemberLoader
 	/**
 	 * Loads a guest member (i.e. some standard data for guests)
 	 */
-	public function loadGuest()
+	public function loadGuest(): void
 	{
 		global $txt;
 

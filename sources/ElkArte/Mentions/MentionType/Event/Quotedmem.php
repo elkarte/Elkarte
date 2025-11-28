@@ -60,7 +60,7 @@ class Quotedmem extends AbstractEventBoardAccess
 	 *
 	 * @param int $virtual_msg
 	 */
-	public function display_prepare_context($virtual_msg)
+	public function display_prepare_context($virtual_msg): void
 	{
 		global $modSettings;
 
@@ -79,7 +79,7 @@ class Quotedmem extends AbstractEventBoardAccess
 	 * @param bool $becomesApproved
 	 * @param array $posterOptions
 	 */
-	public function post_after_save_post($msgOptions, $becomesApproved, $posterOptions)
+	public function post_after_save_post($msgOptions, $becomesApproved, $posterOptions): void
 	{
 		$status = $becomesApproved ? 'new' : 'unapproved';
 		$this->_sendNotification($msgOptions, $status, $posterOptions);
@@ -92,7 +92,7 @@ class Quotedmem extends AbstractEventBoardAccess
 	 * @param string $status
 	 * @param array $posterOptions
 	 */
-	protected function _sendNotification($msgOptions, $status, $posterOptions)
+	protected function _sendNotification($msgOptions, $status, $posterOptions): void
 	{
 		$quoted_names = $this->_findQuotedMembers($msgOptions['body']);
 
@@ -151,7 +151,7 @@ class Quotedmem extends AbstractEventBoardAccess
 		*/
 		if (strpos($text, '[quote ') !== false)
 		{
-			$quoted = array();
+			$quoted = [];
 			$blocks = preg_split('~\[quote~', $text);
 
 			$skip_next = false;

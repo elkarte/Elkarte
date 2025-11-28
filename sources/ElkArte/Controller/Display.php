@@ -79,7 +79,7 @@ class Display extends AbstractController
 	 *
 	 * @uses the main sub template of the Display template.
 	 */
-	public function action_display()
+	public function action_display(): void
 	{
 		global $txt, $modSettings, $context, $settings, $options, $topic, $board;
 		global $messages_request;
@@ -117,7 +117,7 @@ class Display extends AbstractController
 		$this->handleRedirection();
 
 		// Trigger the topicinfo event for display
-		$this->_events->trigger('topicinfo', array('topicinfo' => &$this->topicinfo, 'includeUnapproved' => $this->includeUnapproved));
+		$this->_events->trigger('topicinfo', ['topicinfo' => &$this->topicinfo, 'includeUnapproved' => $this->includeUnapproved]);
 
 		// If this topic has unapproved posts, we need to work out how many posts the user can see, for page indexing.
 		$total_visible_posts = $this->getVisiblePosts($this->topicinfo['num_replies']);
@@ -192,7 +192,7 @@ class Display extends AbstractController
 			];
 			$msg_selects = [];
 			$msg_tables = [];
-			call_integration_hook('integrate_message_query', array(&$msg_selects, &$msg_tables, &$msg_parameters));
+			call_integration_hook('integrate_message_query', [&$msg_selects, &$msg_tables, &$msg_parameters]);
 
 			MembersList::loadGuest();
 
@@ -321,7 +321,7 @@ class Display extends AbstractController
 	/**
 	 * Sets the message per page
 	 */
-	public function setMessagesPerPage()
+	public function setMessagesPerPage(): void
 	{
 		global $modSettings, $options;
 
@@ -333,7 +333,7 @@ class Display extends AbstractController
 	 *
 	 * @return bool
 	 */
-	public function getIncludeUnapproved()
+	public function getIncludeUnapproved(): bool
 	{
 		global $modSettings;
 
@@ -346,7 +346,7 @@ class Display extends AbstractController
 	 * @param int $total_visible_posts
 	 * @return bool
 	 */
-	public function getCanShowAll($total_visible_posts)
+	public function getCanShowAll($total_visible_posts): bool
 	{
 		global $modSettings;
 
@@ -362,7 +362,7 @@ class Display extends AbstractController
 	 * @param int $total_visible_posts
 	 * @return void
 	 */
-	public function setupShowAll($can_show_all, $total_visible_posts)
+	public function setupShowAll($can_show_all, $total_visible_posts): void
 	{
 		global $scripturl, $topic, $context;
 
@@ -382,14 +382,14 @@ class Display extends AbstractController
 		}
 
 		// Construct the page index, allowing for the .START method...
-		$context['page_index'] = constructPageIndex($scripturl . '?topic=' . $topic . '.%1$d', $this->_start, $total_visible_posts, $this->messages_per_page, true, array('all' => $can_show_all, 'all_selected' => isset($all_requested)));
+		$context['page_index'] = constructPageIndex($scripturl . '?topic=' . $topic . '.%1$d', $this->_start, $total_visible_posts, $this->messages_per_page, true, ['all' => $can_show_all, 'all_selected' => isset($all_requested)]);
 		$context['start'] = $this->_start;
 
 		// Figure out all the link to the next/prev
-		$context['links'] += array(
+		$context['links'] += [
 			'prev' => $this->_start >= $this->messages_per_page ? $scripturl . '?topic=' . $topic . '.' . ($this->_start - $this->messages_per_page) : '',
 			'next' => $this->_start + $this->messages_per_page < $total_visible_posts ? $scripturl . '?topic=' . $topic . '.' . ($this->_start + $this->messages_per_page) : '',
-		);
+		];
 
 		// If they are viewing all the posts, show all the posts, otherwise limit the number.
 		if ($can_show_all && isset($all_requested))
@@ -406,7 +406,7 @@ class Display extends AbstractController
 	 * Returns the previous or next topic based on the get/query value
 	 * @return void
 	 */
-	public function getPreviousNextTopic()
+	public function getPreviousNextTopic(): void
 	{
 		global $board_info, $topic, $board, $context;
 
@@ -434,7 +434,7 @@ class Display extends AbstractController
 	 * Add one for the stats
 	 * @param $topic
 	 */
-	public function increaseTopicViews($topic)
+	public function increaseTopicViews($topic): void
 	{
 		if ($this->user->possibly_robot === false
 			&& (empty($_SESSION['last_read_topic']) || $_SESSION['last_read_topic'] !== $topic))
@@ -451,7 +451,7 @@ class Display extends AbstractController
 	 * @param int $board
 	 * @throws Exception on invalid topic value
 	 */
-	public function loadTopicInfo($topic, $board)
+	public function loadTopicInfo($topic, $board): void
 	{
 		$topic_selects = [];
 		$topic_tables = [];
@@ -462,7 +462,7 @@ class Display extends AbstractController
 		];
 
 		// Allow addons to add additional details to the topic query
-		call_integration_hook('integrate_topic_query', array(&$topic_selects, &$topic_tables, &$topic_parameters));
+		call_integration_hook('integrate_topic_query', [&$topic_selects, &$topic_tables, &$topic_parameters]);
 
 		// Load the topic details
 		$this->topicinfo = getTopicInfo($topic_parameters, 'all', $topic_selects, $topic_tables);
@@ -477,14 +477,14 @@ class Display extends AbstractController
 	/**
 	 * Sometimes topics have been moved, this will direct the user to the right spot
 	 */
-	public function handleRedirection()
+	public function handleRedirection(): void
 	{
 		global $context;
 
 		// Need to send the user to the new location?
 		if (!empty($this->topicinfo['id_redirect_topic']) && !isset($this->_req->query->noredir))
 		{
-			markTopicsRead(array($this->user->id, $this->topicinfo['id_topic'], $this->topicinfo['id_last_msg'], 0), $this->topicinfo['new_from'] !== 0);
+			markTopicsRead([$this->user->id, $this->topicinfo['id_topic'], $this->topicinfo['id_last_msg'], 0], $this->topicinfo['new_from'] !== 0);
 			redirectexit('topic=' . $this->topicinfo['id_redirect_topic'] . '.0;redirfrom=' . $this->topicinfo['id_topic']);
 		}
 
@@ -492,7 +492,7 @@ class Display extends AbstractController
 		if (isset($this->_req->query->redirfrom))
 		{
 			$redirfrom = $this->_req->getQuery('redirfrom', 'intval');
-			$redir_topics = topicsList(array($redirfrom));
+			$redir_topics = topicsList([$redirfrom]);
 			if (!empty($redir_topics[$redirfrom]))
 			{
 				$context['topic_redirected_from'] = $redir_topics[$redirfrom];
@@ -507,7 +507,7 @@ class Display extends AbstractController
 	 * @param int $num_replies
 	 * @return int
 	 */
-	public function getVisiblePosts($num_replies)
+	public function getVisiblePosts($num_replies): int
 	{
 		if (!$this->includeUnapproved && $this->topicinfo['unapproved_posts'] && $this->user->is_guest === false)
 		{
@@ -530,7 +530,7 @@ class Display extends AbstractController
 	 *
 	 * @param int $total_visible_posts
 	 */
-	public function makeStartAdjustments($total_visible_posts)
+	public function makeStartAdjustments($total_visible_posts): void
 	{
 		global $modSettings;
 
@@ -578,7 +578,7 @@ class Display extends AbstractController
 	 * Note: After this processes, some amount of additional context is still added, read
 	 * the code.
 	 */
-	public function setMessageContext()
+	public function setMessageContext(): void
 	{
 		global $context, $modSettings, $txt, $board_info;
 
@@ -672,7 +672,7 @@ class Display extends AbstractController
 	 *
 	 * @return bool
 	 */
-	public function setRobotNoIndex()
+	public function setRobotNoIndex(): bool
 	{
 		// Let's do some work on what to search index.
 		if (count((array) $this->_req->query) > 2)
@@ -695,7 +695,7 @@ class Display extends AbstractController
 	 *
 	 * @return bool
 	 */
-	public function didThisUserStart()
+	public function didThisUserStart(): bool
 	{
 		return ((int) $this->user->id === (int) $this->topicinfo['id_member_started']) && !$this->user->is_guest;
 	}
@@ -705,7 +705,7 @@ class Display extends AbstractController
 	 *
 	 * @return bool
 	 */
-	public function warnOldTopic()
+	public function warnOldTopic(): bool
 	{
 		global $modSettings, $board_info;
 
@@ -730,7 +730,7 @@ class Display extends AbstractController
 	 * @param array $messages An array of message ids
 	 * @return void
 	 */
-	private function markNotificationsRead($messages)
+	private function markNotificationsRead($messages): void
 	{
 		global $modSettings;
 
@@ -758,7 +758,7 @@ class Display extends AbstractController
 	 * @param array $messages
 	 * @param int $board
 	 */
-	private function markRead($messages, $board)
+	private function markRead($messages, $board): void
 	{
 		global $modSettings;
 
@@ -801,7 +801,7 @@ class Display extends AbstractController
 	 * If the QR is on, we need to load the user information into $context, so we
 	 * can show the new improved 2.0 QR area
 	 */
-	public function prepareQuickReply()
+	public function prepareQuickReply(): void
 	{
 		global $options, $context;
 
@@ -821,7 +821,7 @@ class Display extends AbstractController
 	/**
 	 * Sets if we are showing signatures or not
 	 */
-	public function setSignatureShowStatus()
+	public function setSignatureShowStatus(): void
 	{
 		global $modSettings;
 
@@ -841,12 +841,12 @@ class Display extends AbstractController
 	 * Loads into context the various message/topic permissions so the template
 	 * knows what buttons etc. to show
 	 */
-	public function setTopicCanPermissions()
+	public function setTopicCanPermissions(): void
 	{
 		global $modSettings, $context, $settings, $board;
 
 		// First the common ones
-		$common_permissions = array(
+		$common_permissions = [
 			'can_approve' => 'approve_posts',
 			'can_ban' => 'manage_bans',
 			'can_sticky' => 'make_sticky',
@@ -860,20 +860,20 @@ class Display extends AbstractController
 			'can_issue_warning' => 'issue_warning',
 			'can_restore_topic' => 'move_any',
 			'can_restore_msg' => 'move_any',
-		);
+		];
 		foreach ($common_permissions as $contextual => $perm)
 		{
 			$context[$contextual] = allowedTo($perm);
 		}
 
 		// Permissions with _any/_own versions.  $context[YYY] => ZZZ_any/_own.
-		$anyown_permissions = array(
+		$anyown_permissions = [
 			'can_move' => 'move',
 			'can_lock' => 'lock',
 			'can_delete' => 'remove',
 			'can_reply' => 'post_reply',
 			'can_reply_unapproved' => 'post_unapproved_replies',
-		);
+		];
 		foreach ($anyown_permissions as $contextual => $perm)
 		{
 			$context[$contextual] = allowedTo($perm . '_any') || ($this->didThisUserStart() && allowedTo($perm . '_own'));
@@ -912,7 +912,7 @@ class Display extends AbstractController
 	 * Loads into $context the normal button array for template use.
 	 * Calls integrate_display_buttons hook
 	 */
-	public function buildNormalButtons()
+	public function buildNormalButtons(): void
 	{
 		global $context, $txt;
 
@@ -965,53 +965,53 @@ class Display extends AbstractController
 	 * Loads into $context the moderation button array for template use.
 	 * Call integrate_mod_buttons hook
 	 */
-	public function buildModerationButtons()
+	public function buildModerationButtons(): void
 	{
 		global $context, $txt;
 
 		// Build the mod button array
-		$context['mod_buttons'] = array(
-			'move' => array(
+		$context['mod_buttons'] = [
+			'move' => [
 				'test' => 'can_move',
 				'text' => 'move_topic',
 				'lang' => true,
 				'url' => getUrl('action', ['action' => 'movetopic', 'current_board' => $context['current_board'], 'topic' => $context['current_topic'] . '.0'])
-			),
-			'delete' => array(
+			],
+			'delete' => [
 				'test' => 'can_delete',
 				'text' => 'remove_topic',
 				'lang' => true,
 				'custom' => 'onclick="return confirm(\'' . $txt['are_sure_remove_topic'] . '\');"',
 				'url' => getUrl('action', ['action' => 'removetopic2', 'topic' => $context['current_topic'] . '.0', '{session_data}'])
-			),
-			'lock' => array(
+			],
+			'lock' => [
 				'test' => 'can_lock',
 				'text' => empty($this->topicinfo['locked']) ? 'set_lock' : 'set_unlock',
 				'lang' => true,
 				'url' => getUrl('action', ['action' => 'topic', 'sa' => 'lock', 'topic' => $context['current_topic'] . '.' . $context['start'], '{session_data}'])
-			),
-			'sticky' => array(
+			],
+			'sticky' => [
 				'test' => 'can_sticky',
 				'text' => empty($this->topicinfo['is_sticky']) ? 'set_sticky' : 'set_nonsticky',
 				'lang' => true,
 				'url' => getUrl('action', ['action' => 'topic', 'sa' => 'sticky', 'topic' => $context['current_topic'] . '.' . $context['start'], '{session_data}'])
-			),
-			'merge' => array(
+			],
+			'merge' => [
 				'test' => 'can_merge',
 				'text' => 'merge',
 				'lang' => true,
 				'url' => getUrl('action', ['action' => 'mergetopics', 'board' => $context['current_board'] . '.0', 'from' => $context['current_topic']])
-			),
-		);
+			],
+		];
 
 		// Restore topic. eh?  No monkey business.
 		if ($context['can_restore_topic'])
 		{
-			$context['mod_buttons'][] = array(
+			$context['mod_buttons'][] = [
 				'text' => 'restore_topic',
 				'lang' => true,
 				'url' => getUrl('action', ['action' => 'restoretopic', 'topics' => $context['current_topic'], '{session_data}'])
-			);
+			];
 		}
 
 		// Allow adding new buttons easily.
@@ -1047,7 +1047,7 @@ class Display extends AbstractController
 	 *
 	 * Accessed by ?action=quickmod2 from quickModForm
 	 */
-	public function action_quickmod2()
+	public function action_quickmod2(): void
 	{
 		global $topic, $board, $context, $modSettings;
 
@@ -1126,7 +1126,7 @@ class Display extends AbstractController
 	 * @param array $topic_info
 	 * @return bool
 	 */
-	public function canDeleteAll($topic_info)
+	public function canDeleteAll($topic_info): bool
 	{
 		if (allowedTo('delete_any'))
 		{

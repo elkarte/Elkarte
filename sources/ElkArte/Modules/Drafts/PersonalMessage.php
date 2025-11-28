@@ -97,7 +97,7 @@ class PersonalMessage extends AbstractModule
 	 *
 	 * @param array $pm_areas
 	 */
-	public static function integrate_pm_areas(&$pm_areas)
+	public static function integrate_pm_areas(&$pm_areas): void
 	{
 		global $scripturl, $txt;
 
@@ -115,7 +115,7 @@ class PersonalMessage extends AbstractModule
 	 *
 	 * @param array $subActions
 	 */
-	public static function integrate_sa_pm_index(&$subActions)
+	public static function integrate_sa_pm_index(&$subActions): void
 	{
 		$subActions['showpmdrafts'] = [
 			'controller' => Draft::class,
@@ -131,7 +131,7 @@ class PersonalMessage extends AbstractModule
 	 *
 	 * @throws PmErrorException
 	 */
-	public function before_set_context($pmsg)
+	public function before_set_context($pmsg): void
 	{
 		global $context;
 
@@ -163,7 +163,7 @@ class PersonalMessage extends AbstractModule
 	 *
 	 * @return false|null
 	 */
-	protected function _loadDraft($member_id, $id_draft)
+	protected function _loadDraft($member_id, $id_draft): ?bool
 	{
 		// Need a member
 		if (empty($member_id) || empty($id_draft))
@@ -193,7 +193,7 @@ class PersonalMessage extends AbstractModule
 	 *
 	 * @return bool
 	 */
-	protected function _prepareDraftsContext($member_id, $id_pm = false)
+	protected function _prepareDraftsContext($member_id, $id_pm = false): bool
 	{
 		global $scripturl, $context, $txt;
 
@@ -236,7 +236,7 @@ class PersonalMessage extends AbstractModule
 	 *
 	 * @param array $editorOptions
 	 */
-	public function prepare_send_context(&$editorOptions)
+	public function prepare_send_context(&$editorOptions): void
 	{
 		global $context, $options, $txt;
 
@@ -291,7 +291,7 @@ class PersonalMessage extends AbstractModule
 	 *
 	 * @throws ControllerRedirectException
 	 */
-	public function before_sending($recipientList)
+	public function before_sending($recipientList): void
 	{
 		global $context, $modSettings;
 
@@ -334,7 +334,7 @@ class PersonalMessage extends AbstractModule
 	 *
 	 * @param $failed
 	 */
-	public function message_sent($failed)
+	public function message_sent($failed): void
 	{
 		global $context;
 		// If we had a PM draft for this one, then its time to remove it since it was just sent

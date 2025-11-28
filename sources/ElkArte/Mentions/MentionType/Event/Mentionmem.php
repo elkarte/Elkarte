@@ -65,7 +65,7 @@ class Mentionmem extends AbstractEventBoardAccess
 	 *
 	 * @param int $virtual_msg
 	 */
-	public function display_prepare_context($virtual_msg)
+	public function display_prepare_context($virtual_msg): void
 	{
 		global $modSettings, $context;
 
@@ -84,7 +84,7 @@ class Mentionmem extends AbstractEventBoardAccess
 	/**
 	 * Takes care of setting up the editor javascript.
 	 */
-	protected function _setup_editor()
+	protected function _setup_editor(): void
 	{
 		loadCSSFile('jquery.atwho.css');
 
@@ -102,7 +102,7 @@ class Mentionmem extends AbstractEventBoardAccess
 	 *
 	 * @global $_REQUEST
 	 */
-	public function post_prepare_context()
+	public function post_prepare_context(): void
 	{
 		global $context;
 
@@ -121,18 +121,18 @@ class Mentionmem extends AbstractEventBoardAccess
 	 * @global $_REQUEST
 	 * @global $_POST
 	 */
-	public function post_before_save_post()
+	public function post_before_save_post(): void
 	{
 		if (!empty($_REQUEST['uid']))
 		{
-			$query_params = array(
+			$query_params = [
 				'member_ids' => array_unique(array_map('intval', $_REQUEST['uid']))
-			);
+			];
 
 			require_once(SUBSDIR . '/Members.subs.php');
 			$mentioned_members = membersBy('member_ids', $query_params, true);
 			$replacements = 0;
-			$this->_actually_mentioned = array();
+			$this->_actually_mentioned = [];
 
 			foreach ($mentioned_members as $member)
 			{
@@ -153,7 +153,7 @@ class Mentionmem extends AbstractEventBoardAccess
 	 * @param bool $becomesApproved
 	 * @param array $posterOptions
 	 */
-	public function post_after_save_post($msgOptions, $becomesApproved, $posterOptions)
+	public function post_after_save_post($msgOptions, $becomesApproved, $posterOptions): void
 	{
 		if (!empty($this->_actually_mentioned))
 		{

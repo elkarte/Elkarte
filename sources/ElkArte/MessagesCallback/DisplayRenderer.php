@@ -135,7 +135,7 @@ class DisplayRenderer extends Renderer
 	 *
 	 * @return array The array containing all the post buttons.
 	 */
-	protected function _buildPostButtons($output)
+	protected function _buildPostButtons($output): array
 	{
 		global $context, $txt, $topic, $options, $board;
 

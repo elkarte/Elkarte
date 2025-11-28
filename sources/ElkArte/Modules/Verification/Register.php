@@ -53,7 +53,7 @@ class Register extends AbstractModule
 	 *
 	 * @param int $current_step current step of the registration process
 	 */
-	public function prepare_context($current_step)
+	public function prepare_context($current_step): void
 	{
 		global $context;
 
@@ -78,7 +78,7 @@ class Register extends AbstractModule
 	 *
 	 * @param ErrorContext $reg_errors Errors object from the registration controller
 	 */
-	public function before_complete_register($reg_errors)
+	public function before_complete_register($reg_errors): void
 	{
 		global $context;
 
@@ -100,7 +100,7 @@ class Register extends AbstractModule
 	/**
 	 * Checks the user passed the verifications on the contact page.
 	 */
-	public function verify_contact()
+	public function verify_contact(): void
 	{
 		global $context, $txt;
 
@@ -122,7 +122,7 @@ class Register extends AbstractModule
 	/**
 	 * Prepare $context for the contact page.
 	 */
-	public function setup_contact()
+	public function setup_contact(): void
 	{
 		global $context;
 

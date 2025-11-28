@@ -39,7 +39,7 @@ class TopicUtil
 	 * @param int|null $preview_length - length of the preview
 	 * @return array - array of data related to topics
 	 */
-	public static function prepareContext($topics_info, $topic_seen = false, $preview_length = null)
+	public static function prepareContext($topics_info, $topic_seen = false, $preview_length = null): array
 	{
 		global $modSettings, $options, $txt, $settings;
 
@@ -63,7 +63,7 @@ class TopicUtil
 			if (isset($row['first_body']))
 			{
 				// Limit them to $preview_length characters - do this FIRST because it's a lot of wasted censoring otherwise.
-				$row['first_body'] = strtr($parser->parseMessage($row['first_body'], $row['first_smileys']), array('<br />' => "\n", '&nbsp;' => ' '));
+				$row['first_body'] = strtr($parser->parseMessage($row['first_body'], $row['first_smileys']), ['<br />' => "\n", '&nbsp;' => ' ']);
 				$row['first_body'] = Util::htmlspecialchars(Util::shorten_html($row['first_body'], $preview_length));
 
 				// No reply then they are the same, no need to process it again
@@ -73,7 +73,7 @@ class TopicUtil
 				}
 				else
 				{
-					$row['last_body'] = strtr($parser->parseMessage($row['last_body'], $row['last_smileys']), array('<br />' => "\n", '&nbsp;' => ' '));
+					$row['last_body'] = strtr($parser->parseMessage($row['last_body'], $row['last_smileys']), ['<br />' => "\n", '&nbsp;' => ' ']);
 					$row['last_body'] = Util::htmlspecialchars(Util::shorten_html($row['last_body'], $preview_length));
 				}
 
@@ -117,7 +117,7 @@ class TopicUtil
 				// We can't pass start by reference.
 				$start = -1;
 				$show_all = !empty($modSettings['enableAllMessages']) && $topic_length < $modSettings['enableAllMessages'];
-				$pages = constructPageIndex('{scripturl}?topic=' . $row['id_topic'] . '.%1$d' . $topicseen, $start, $topic_length, $messages_per_page, true, array('prev_next' => false, 'all' => $show_all));
+				$pages = constructPageIndex('{scripturl}?topic=' . $row['id_topic'] . '.%1$d' . $topicseen, $start, $topic_length, $messages_per_page, true, ['prev_next' => false, 'all' => $show_all]);
 			}
 
 			$row['new_from'] = $row['new_from'] ?? 0;
@@ -137,17 +137,17 @@ class TopicUtil
 			$href = getUrl('topic', ['topic' => $row['id_topic'], 'start' => $row['num_replies'] == 0 ? '0' : ('msg' . $row['new_from']), 'subject' => $row['first_subject'], $topicseen]) . $row['num_replies'] == 0 ? '' : '#new';
 
 			// And build the array.
-			$topics[$row['id_topic']] = array(
+			$topics[$row['id_topic']] = [
 				'id' => $row['id_topic'],
-				'first_post' => array(
+				'first_post' => [
 					'id' => $row['id_first_msg'],
-					'member' => array(
+					'member' => [
 						'username' => $row['first_member_name'],
 						'name' => $row['first_display_name'],
 						'id' => $row['first_id_member'],
 						'href' => empty($row['first_id_member']) ? '' : $first_poster_href,
 						'link' => empty($row['first_id_member']) ? $row['first_display_name'] : '<a href="' . $first_poster_href . '" title="' . $txt['profile_of'] . ' ' . $row['first_display_name'] . '">' . $row['first_display_name'] . '</a>'
-					),
+					],
 					'time' => standardTime($row['first_poster_time']),
 					'html_time' => htmlTime($row['first_poster_time']),
 					'timestamp' => forum_time(true, $row['first_poster_time']),
@@ -157,16 +157,16 @@ class TopicUtil
 					'icon_url' => $icon_sources->getIconURL($row['first_icon']),
 					'href' => $first_topic_href,
 					'link' => '<a href="' . $first_topic_href . '">' . $row['first_subject'] . '</a>'
-				),
-				'last_post' => array(
+				],
+				'last_post' => [
 					'id' => $row['id_last_msg'],
-					'member' => array(
+					'member' => [
 						'username' => $row['last_member_name'],
 						'name' => $row['last_display_name'],
 						'id' => $row['last_id_member'],
 						'href' => empty($row['last_id_member']) ? '' : $last_poster_href,
 						'link' => empty($row['last_id_member']) ? $row['last_display_name'] : '<a href="' . $last_poster_href . '" title="' . $txt['profile_of'] . ' ' . $row['last_display_name'] . '">' . $row['last_display_name'] . '</a>'
-					),
+					],
 					'time' => standardTime($row['last_poster_time']),
 					'html_time' => htmlTime($row['last_poster_time']),
 					'timestamp' => forum_time(true, $row['last_poster_time']),
@@ -176,7 +176,7 @@ class TopicUtil
 					'icon_url' => $icon_sources->getIconURL($row['last_icon']),
 					'href' => $topic_href,
 					'link' => '<a href="' . $topic_href . '" ' . ($row['num_replies'] == 0 ? '' : 'rel="nofollow"') . '>' . $row['last_subject'] . '</a>',
-				),
+				],
 				'default_preview' => trim($row[!empty($modSettings['message_index_preview']) && $modSettings['message_index_preview'] == 2 ? 'last_body' : 'first_body']),
 				'is_sticky' => !empty($row['is_sticky']),
 				'is_locked' => !empty($row['locked']),
@@ -200,18 +200,18 @@ class TopicUtil
 				'likes' => comma_format($row['num_likes']),
 				'approved' => $row['approved'] ?? 1,
 				'unapproved_posts' => empty($row['unapproved_posts']) ? 0 : $row['unapproved_posts'],
-				'classes' => array(),
-			);
+				'classes' => [],
+			];
 
 			if (!empty($row['id_board']))
 			{
 				$board_href = getUrl('board', ['board' => $row['id_board'], 'start' => '0', 'name' => $row['bname']]);
-				$topics[$row['id_topic']]['board'] = array(
+				$topics[$row['id_topic']]['board'] = [
 					'id' => $row['id_board'],
 					'name' => $row['bname'],
 					'href' => $board_href,
 					'link' => '<a href="' . $board_href . '.0">' . $row['bname'] . '</a>'
-				);
+				];
 			}
 
 			if (isset($row['avatar']) || !empty($row['id_attach']))
@@ -221,13 +221,13 @@ class TopicUtil
 
 			if (!empty($row['avatar_first']) || !empty($row['id_attach_first']))
 			{
-				$first_avatar = array(
+				$first_avatar = [
 					'avatar' => $row['avatar_first'],
 					'id_attach' => $row['id_attach_first'],
 					'attachment_type' => $row['attachment_type_first'],
 					'filename' => $row['filename_first'],
 					'email_address' => $row['email_address_first'],
-				);
+				];
 				$topics[$row['id_topic']]['first_post']['member']['avatar'] = determineAvatar($first_avatar);
 			}
 

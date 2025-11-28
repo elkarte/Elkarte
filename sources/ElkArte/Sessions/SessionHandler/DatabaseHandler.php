@@ -42,7 +42,7 @@ class DatabaseHandler extends \SessionHandler
 		global $modSettings;
 
 		$this->_db = $db ?: database();
-		$this->_modSettings = new ValuesContainer($modSettings ?: array());
+		$this->_modSettings = new ValuesContainer($modSettings ?: []);
 	}
 
 	/**
@@ -60,9 +60,9 @@ class DatabaseHandler extends \SessionHandler
 		$this->_db->query('', '
 			DELETE FROM {db_prefix}sessions
 			WHERE session_id = {string:session_id}',
-			array(
+			[
 				'session_id' => $sessionId,
-			)
+			]
 		);
 
 		return true;
@@ -84,9 +84,9 @@ class DatabaseHandler extends \SessionHandler
 		$result = $this->_db->query('', '
 			DELETE FROM {db_prefix}sessions
 			WHERE last_update < {int:last_update}',
-			array(
+			[
 				'last_update' => time() - $maxLifetime,
-			)
+			]
 		);
 
 		return $result->affected_rows() !== 0;
@@ -108,9 +108,9 @@ class DatabaseHandler extends \SessionHandler
 			FROM {db_prefix}sessions
 			WHERE session_id = {string:session_id}
 			LIMIT 1',
-			array(
+			[
 				'session_id' => $sessionId,
-			)
+			]
 		);
 		[$sessionData] = $result->fetch_row();
 		$result->free_result();

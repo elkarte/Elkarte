@@ -61,21 +61,21 @@ class Notification extends AbstractNotifier
 	 * @param NotificationsTask $task
 	 * @param array $bodies
 	 */
-	protected function _send_notification($obj, $task, $bodies)
+	protected function _send_notification($obj, $task, $bodies): void
 	{
 		global $modSettings;
 
 		$mentioning = new Mentioning($this->db, $this->user, new DataValidator(), $modSettings['enabled_mentions']);
 		foreach ($bodies as $body)
 		{
-			$mentioning->create($obj, array(
+			$mentioning->create($obj, [
 				'id_member_from' => $task['id_member_from'],
 				'id_member' => $body['id_member_to'],
 				'id_msg' => $task['id_target'],
 				'type' => $task['notification_type'],
 				'log_time' => $task['log_time'],
 				'status' => $task['source_data']['status'],
-			));
+			]);
 		}
 	}
 }

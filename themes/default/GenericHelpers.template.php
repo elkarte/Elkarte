@@ -152,7 +152,6 @@ function template_button_strip($button_strip, $class = '', $strip_options = [])
 	foreach ($button_strip as $buttonName => $buttonParameters)
 	{
 		// Don't have the right permission, or it has been disabled, no button for you!
-
 		if ((isset($buttonParameters['enabled']) && $buttonParameters['enabled'] === false)
 			|| (isset($buttonParameters['test']) && empty($context[$buttonParameters['test']])))
 		{
@@ -163,7 +162,7 @@ function template_button_strip($button_strip, $class = '', $strip_options = [])
 		$id = (isset($buttonParameters['id']) ? 'id="button_strip_' . $buttonParameters['id'] . '"' : '');
 		$liClass = 'class="listlevel1 ' . ($buttonParameters['class'] ?? $buttonName) . '"';
 		$linkClass = 'class="linklevel1 ' . (empty($buttonParameters['active']) ? '' : 'active ') . (empty($buttonParameters['linkclass']) ? 'button_strip_' . $buttonName : $buttonParameters['linkclass']) . '"';
-		$icon = empty($buttonParameters['icon']) ? '' : '<i class="icon icon-small i-' . $buttonParameters['icon'] . '"></i>';
+		$icon = empty($buttonParameters['icon']) ? '' : '<i class="icon icon-small i-' . preg_replace('/^i-/', '',$buttonParameters['icon']) . '"></i>';
 		$counter = empty($buttonParameters['counter']) ? '' : '<span class="button_indicator">' . $buttonParameters['counter'] . '</span>';
 		$url = $buttonParameters['url'] ?? 'javascript:void(0);';
 
@@ -219,9 +218,10 @@ function template_button_strip($button_strip, $class = '', $strip_options = [])
 		$id = empty($strip_options['id']) ? '' : 'id="' . $strip_options['id'] . '" ';
 		$defaultClass = empty($strip_options['no-class']) ? 'buttonlist no_js' : '';
 		$class .= $context['right_to_left'] ? ' rtl' : '';
+		$class = trim($defaultClass .  (empty($class) ? '' : ' ' . $class));
 
 		echo '
-					<ul ', $id, 'role="menubar" class="', $defaultClass, empty($class) ? '' : ' ' . $class, '">
+					<ul ', $id, 'role="menubar" class="', $class, '">
 						', implode('', $buttons), implode('', $checkbox), '
 					</ul>';
 	}

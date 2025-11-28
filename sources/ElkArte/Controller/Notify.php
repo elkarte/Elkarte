@@ -45,10 +45,10 @@ class Notify extends AbstractController
 	public function action_index()
 	{
 		// The number of choices is boggling, ok there are just 2
-		$subActions = array(
-			'notify' => array($this, 'action_notify'),
-			'unsubscribe' => array($this, 'action_unsubscribe'),
-		);
+		$subActions = [
+			'notify' => [$this, 'action_notify'],
+			'unsubscribe' => [$this, 'action_unsubscribe'],
+		];
 
 		// We like action, so lets get ready for some
 		$action = new Action('notify');
@@ -73,7 +73,7 @@ class Notify extends AbstractController
 	 *
 	 * @uses Notify.template, main sub-template
 	 */
-	public function action_notify()
+	public function action_notify(): bool
 	{
 		global $topic, $txt, $context;
 
@@ -124,7 +124,7 @@ class Notify extends AbstractController
 	/**
 	 * Toggle a topic notification on/off
 	 */
-	private function _toggle_topic_notification($memID = null)
+	private function _toggle_topic_notification($memID = null): void
 	{
 		global $topic;
 
@@ -137,7 +137,7 @@ class Notify extends AbstractController
 	 *
 	 * - Intended for use in XML or JSON calls
 	 */
-	public function action_notify_api()
+	public function action_notify_api(): void
 	{
 		global $topic, $txt, $context;
 
@@ -150,10 +150,10 @@ class Notify extends AbstractController
 		if ($this->user->is_guest)
 		{
 			Txt::load('Errors');
-			$context['xml_data'] = array(
+			$context['xml_data'] = [
 				'error' => 1,
 				'text' => $txt['not_guests']
-			);
+			];
 
 			return;
 		}
@@ -162,10 +162,10 @@ class Notify extends AbstractController
 		if (!allowedTo('mark_any_notify') || empty($topic) || empty($this->_req->query->sa))
 		{
 			Txt::load('Errors');
-			$context['xml_data'] = array(
+			$context['xml_data'] = [
 				'error' => 1,
 				'text' => $txt['cannot_mark_any_notify']
-			);
+			];
 
 			return;
 		}
@@ -174,10 +174,10 @@ class Notify extends AbstractController
 		if (checkSession('get', '', false))
 		{
 			Txt::load('Errors');
-			$context['xml_data'] = array(
+			$context['xml_data'] = [
 				'error' => 1,
 				'url' => getUrl('action', ['action' => 'notify', 'sa' => ($this->_req->query->sa === 'on' ? 'on' : 'off'), 'topic' => $topic . '.' . $this->_req->query->start, '{session_data}']),
-			);
+			];
 
 			return;
 		}
@@ -185,11 +185,11 @@ class Notify extends AbstractController
 		$this->_toggle_topic_notification();
 
 		// Return the results so the UI can be updated properly
-		$context['xml_data'] = array(
+		$context['xml_data'] = [
 			'text' => $this->_req->query->sa === 'on' ? $txt['unnotify'] : $txt['notify'],
 			'url' => getUrl('action', ['action' => 'notify', 'sa' => ($this->_req->query->sa === 'on' ? 'off' : 'on'), 'topic' => $topic . '.' . $this->_req->query->start, '{session_data}', 'api' => '1']),
 			'confirm' => $this->_req->query->sa === 'on' ? $txt['notification_disable_topic'] : $txt['notification_enable_topic']
-		);
+		];
 	}
 
 	/**
@@ -205,7 +205,7 @@ class Notify extends AbstractController
 	 *
 	 * @uses template_notify_board() sub-template in Notify.template
 	 */
-	public function action_notifyboard()
+	public function action_notifyboard(): ?bool
 	{
 		global $txt, $board, $context;
 
@@ -241,7 +241,7 @@ class Notify extends AbstractController
 			$context['page_title'] = $txt['notifications'];
 			$context['sub_template'] = 'notify_board';
 
-			return;
+			return null;
 		}
 
 		checkSession('get');
@@ -251,12 +251,14 @@ class Notify extends AbstractController
 
 		// Back to the board!
 		redirectexit('board=' . $board . '.' . $this->_req->query->start);
+
+		return null;
 	}
 
 	/**
 	 * Toggle a board notification on/off
 	 */
-	private function _toggle_board_notification($memID = null)
+	private function _toggle_board_notification($memID = null): void
 	{
 		global $board;
 
@@ -273,7 +275,7 @@ class Notify extends AbstractController
 	 * - Intended for use in XML or JSON calls
 	 * - Performs the same actions as action_notifyboard but provides ajax responses
 	 */
-	public function action_notifyboard_api()
+	public function action_notifyboard_api(): void
 	{
 		global $txt, $board, $context;
 
@@ -286,10 +288,10 @@ class Notify extends AbstractController
 		if ($this->user->is_guest)
 		{
 			Txt::load('Errors');
-			$context['xml_data'] = array(
+			$context['xml_data'] = [
 				'error' => 1,
 				'text' => $txt['not_guests']
-			);
+			];
 
 			return;
 		}
@@ -298,10 +300,10 @@ class Notify extends AbstractController
 		if (!allowedTo('mark_notify') || empty($board) || empty($this->_req->query->sa))
 		{
 			Txt::load('Errors');
-			$context['xml_data'] = array(
+			$context['xml_data'] = [
 				'error' => 1,
 				'text' => $txt['cannot_mark_notify'],
-			);
+			];
 
 			return;
 		}
@@ -310,21 +312,21 @@ class Notify extends AbstractController
 		if (checkSession('get', '', false))
 		{
 			Txt::load('Errors');
-			$context['xml_data'] = array(
+			$context['xml_data'] = [
 				'error' => 1,
 				'url' => getUrl('action', ['action' => 'notifyboard', 'sa' => ($this->_req->query->sa === 'on' ? 'on' : 'off'), 'board' => $board . '.' . $this->_req->query->start, '{session_data}']),
-			);
+			];
 
 			return;
 		}
 
 		$this->_toggle_board_notification();
 
-		$context['xml_data'] = array(
+		$context['xml_data'] = [
 			'text' => $this->_req->query->sa === 'on' ? $txt['unnotify'] : $txt['notify'],
 			'url' => getUrl('action', ['action' => 'notifyboard', 'sa' => ($this->_req->query->sa === 'on' ? 'off' : 'on'), 'board' => $board . '.' . $this->_req->query->start, '{session_data}', 'api' => '1'] + (isset($_REQUEST['json']) ? ['json'] : [])),
 			'confirm' => $this->_req->query->sa === 'on' ? $txt['notification_disable_board'] : $txt['notification_enable_board']
-		);
+		];
 	}
 
 	/**
@@ -338,7 +340,7 @@ class Notify extends AbstractController
 	 * - Upon successful completion of action will direct user back to topic.
 	 * - Accessed via ?action=unwatchtopic.
 	 */
-	public function action_unwatchtopic()
+	public function action_unwatchtopic(): void
 	{
 		global $topic, $modSettings;
 
@@ -365,7 +367,7 @@ class Notify extends AbstractController
 	/**
 	 * Toggle a watch topic on/off
 	 */
-	private function _toggle_topic_watch()
+	private function _toggle_topic_watch(): void
 	{
 		global $topic;
 
@@ -377,7 +379,7 @@ class Notify extends AbstractController
 	 *
 	 * - Intended for use in XML or JSON calls
 	 */
-	public function action_unwatchtopic_api()
+	public function action_unwatchtopic_api(): void
 	{
 		global $topic, $modSettings, $txt, $context;
 
@@ -390,10 +392,10 @@ class Notify extends AbstractController
 		if ($this->user->is_guest)
 		{
 			Txt::load('Errors');
-			$context['xml_data'] = array(
+			$context['xml_data'] = [
 				'error' => 1,
 				'text' => $txt['not_guests']
-			);
+			];
 
 			return;
 		}
@@ -402,10 +404,10 @@ class Notify extends AbstractController
 		if (empty($modSettings['enable_unwatch']))
 		{
 			Txt::load('Errors');
-			$context['xml_data'] = array(
+			$context['xml_data'] = [
 				'error' => 1,
 				'text' => $txt['feature_disabled'],
-			);
+			];
 
 			return;
 		}
@@ -414,20 +416,20 @@ class Notify extends AbstractController
 		if (checkSession('get', '', false))
 		{
 			Txt::load('Errors');
-			$context['xml_data'] = array(
+			$context['xml_data'] = [
 				'error' => 1,
 				'url' => getUrl('action', ['action' => 'unwatchtopic', 'sa' => ($this->_req->query->sa === 'on' ? 'on' : 'off'), 'topic' => $topic . '.' . $this->_req->query->start, '{session_data}'])
-			);
+			];
 
 			return;
 		}
 
 		$this->_toggle_topic_watch();
 
-		$context['xml_data'] = array(
+		$context['xml_data'] = [
 			'text' => $this->_req->query->sa === 'on' ? $txt['watch'] : $txt['unwatch'],
 			'url' => getUrl('action', ['action' => 'unwatchtopic', 'sa' => ($this->_req->query->sa === 'on' ? 'off' : 'on'), 'topic' => $context['current_topic'] . '.' . $this->_req->query->start, '{session_data}', 'api' => '1'] + (isset($_REQUEST['json']) ? ['json'] : [])),
-		);
+		];
 
 		setTopicWatch($this->user->id, $topic, $this->_req->query->sa === 'on');
 	}
@@ -437,7 +439,7 @@ class Notify extends AbstractController
 	 * unsubscribe the user from a board or a topic (depending on the link) without them
 	 * having to login.
 	 */
-	public function action_unsubscribe()
+	public function action_unsubscribe(): bool
 	{
 		// Looks like we need to unsubscribe someone
 		if ($this->_validateUnsubscribeToken($member, $area, $extra))
@@ -464,7 +466,7 @@ class Notify extends AbstractController
 	 * @param string $area area they want to be removed from
 	 * @param string $extra parameters needed for some areas
 	 */
-	private function _unsubscribeToggle($member, $area, $extra)
+	private function _unsubscribeToggle($member, $area, $extra): bool
 	{
 		global $user_info, $board, $topic;
 
@@ -510,7 +512,7 @@ class Notify extends AbstractController
 	 *
 	 * @return bool if the $unsubscribe method was called
 	 */
-	private function _unsubscribeModuleToggle($member, $area, $extra)
+	private function _unsubscribeModuleToggle($member, $area, $extra): bool
 	{
 		$class_name = '\\ElkArte\\Mentions\\MentionType\\Event\\' . ucwords($area);
 
@@ -537,7 +539,7 @@ class Notify extends AbstractController
 	 * @param string $extra parameters needed for some areas
 	 * @return bool
 	 */
-	private function _validateUnsubscribeToken(&$member, &$area, &$extra)
+	private function _validateUnsubscribeToken(&$member, &$area, &$extra): bool
 	{
 		// Token was passed and matches our expected pattern
 		$token = $this->_req->getQuery('token', 'trim', '');
@@ -580,7 +582,7 @@ class Notify extends AbstractController
 
 		// Find the claimed member
 		require_once(SUBSDIR . '/Members.subs.php');
-		$member = getBasicMemberData((int) $id_member, array('authentication' => true));
+		$member = getBasicMemberData((int) $id_member, ['authentication' => true]);
 		if (empty($member))
 		{
 			return false;
@@ -602,7 +604,7 @@ class Notify extends AbstractController
 	 * @param int $memID
 	 * @param string $area buddy, likemsg, mentionmem, quotedmem, rlikemsg
 	 */
-	private function _setUserEmailNotificationOff($memID, $area)
+	private function _setUserEmailNotificationOff($memID, $area): void
 	{
 		require_once(SUBSDIR . '/Profile.subs.php');
 		Txt::load('Profile');
@@ -636,7 +638,7 @@ class Notify extends AbstractController
 	 * @param string $area
 	 * @param string $extra
 	 */
-	private function _prepareTemplateMessage($area, $extra, $email)
+	private function _prepareTemplateMessage($area, $extra, $email): void
 	{
 		global $txt, $context;
 

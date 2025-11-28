@@ -81,7 +81,7 @@ class TopicsMerge
 	 * Grabs all the details of the topics involved in the merge process and loads
 	 * then in $this->topic_data
 	 */
-	protected function _loadTopicDetails()
+	protected function _loadTopicDetails(): bool
 	{
 		global $modSettings;
 
@@ -107,16 +107,16 @@ class TopicsMerge
 			WHERE t.id_topic IN ({array_int:topic_list})
 			ORDER BY t.id_first_msg
 			LIMIT {int:limit}',
-			array(
+			[
 				'topic_list' => $this->_topics,
 				'limit' => count($this->_topics),
-			)
+			]
 		);
 		if ($request->num_rows() < 2)
 		{
 			$request->free_result();
 
-			$this->_errors[] = array('no_topic_id', true);
+			$this->_errors[] = ['no_topic_id', true];
 
 			return false;
 		}
@@ -126,16 +126,16 @@ class TopicsMerge
 			// Make a note for the board counts...
 			if (!isset($this->_boardTotals[$row['id_board']]))
 			{
-				$this->_boardTotals[$row['id_board']] = array(
+				$this->_boardTotals[$row['id_board']] = [
 					'num_posts' => 0,
 					'num_topics' => 0,
 					'unapproved_posts' => 0,
 					'unapproved_topics' => 0
-				);
+				];
 			}
 
 			// We can't see unapproved topics here?
-			if ($modSettings['postmod_active'] && !$row['approved'] && $can_approve_boards != array(0) && !in_array($row['id_board'], $can_approve_boards))
+			if ($modSettings['postmod_active'] && !$row['approved'] && $can_approve_boards != [0] && !in_array($row['id_board'], $can_approve_boards))
 			{
 				unset($this->_topics[$row['id_topic']]);
 				continue;
@@ -153,27 +153,27 @@ class TopicsMerge
 			$this->_boardTotals[$row['id_board']]['unapproved_posts'] += $row['unapproved_posts'];
 			$this->_boardTotals[$row['id_board']]['num_posts'] += $row['num_replies'] + ($row['approved'] ? 1 : 0);
 
-			$this->topic_data[$row['id_topic']] = array(
+			$this->topic_data[$row['id_topic']] = [
 				'id' => $row['id_topic'],
 				'board' => $row['id_board'],
 				'poll' => $row['id_poll'],
 				'num_views' => $row['num_views'],
 				'subject' => $row['subject'],
-				'started' => array(
+				'started' => [
 					'time' => standardTime($row['time_started']),
 					'html_time' => htmlTime($row['time_started']),
 					'timestamp' => forum_time(true, $row['time_started']),
 					'href' => empty($row['id_member_started']) ? '' : getUrl('profile', ['action' => 'profile', 'u' => $row['id_member_started'], 'name' => $row['name_started']]),
 					'link' => empty($row['id_member_started']) ? $row['name_started'] : '<a href="' . getUrl('profile', ['action' => 'profile', 'u' => $row['id_member_started'], 'name' => $row['name_started']]) . '">' . $row['name_started'] . '</a>'
-				),
-				'updated' => array(
+				],
+				'updated' => [
 					'time' => standardTime($row['time_updated']),
 					'html_time' => htmlTime($row['time_updated']),
 					'timestamp' => forum_time(true, $row['time_updated']),
 					'href' => empty($row['id_member_updated']) ? '' : getUrl('profile', ['action' => 'profile', 'u' => $row['id_member_updated'], 'name' => $row['name_updated']]),
 					'link' => empty($row['id_member_updated']) ? $row['name_updated'] : '<a href="' . getUrl('profile', ['action' => 'profile', 'u' => $row['id_member_updated'], 'name' => $row['name_updated']]) . '">' . $row['name_updated'] . '</a>'
-				)
-			);
+				]
+			];
 			$this->_num_views += $row['num_views'];
 			$this->boards[] = $row['id_board'];
 
@@ -200,7 +200,7 @@ class TopicsMerge
 		// If we didn't get any topics then they've been messing with unapproved stuff.
 		if (empty($this->topic_data))
 		{
-			$this->_errors[] = array('no_topic_id', true);
+			$this->_errors[] = ['no_topic_id', true];
 		}
 
 		return true;
@@ -211,7 +211,7 @@ class TopicsMerge
 	 *
 	 * @return bool
 	 */
-	public function hasErrors()
+	public function hasErrors(): bool
 	{
 		return !empty($this->_errors);
 	}
@@ -221,7 +221,7 @@ class TopicsMerge
 	 *
 	 * @return string
 	 */
-	public function firstError()
+	public function firstError(): string
 	{
 		if (!empty($this->_errors))
 		{
@@ -238,7 +238,7 @@ class TopicsMerge
 	 *
 	 * @return array
 	 */
-	public function getPolls()
+	public function getPolls(): array
 	{
 		$polls = [];
 
@@ -252,21 +252,21 @@ class TopicsMerge
 					INNER JOIN {db_prefix}messages AS m ON (m.id_msg = t.id_first_msg)
 				WHERE p.id_poll IN ({array_int:polls})
 				LIMIT {int:limit}',
-				array(
+				[
 					'polls' => $this->_polls,
 					'limit' => count($this->_polls),
-				)
+				]
 			)->fetch_callback(
 				function ($row) use (&$polls) {
-					$polls[] = array(
+					$polls[] = [
 						'id' => $row['id_poll'],
-						'topic' => array(
+						'topic' => [
 							'id' => $row['id_topic'],
 							'subject' => $row['subject']
-						),
+						],
 						'question' => $row['question'],
 						'selected' => $row['id_topic'] == $this->firstTopic
-					);
+					];
 				}
 			);
 		}
@@ -280,7 +280,7 @@ class TopicsMerge
 	 * @param array $details
 	 * @return bool|int[]
 	 */
-	public function doMerge($details = array())
+	public function doMerge($details = [])
 	{
 		// Just to be sure, here we should not have any error around
 		$this->_errors = [];
@@ -289,7 +289,7 @@ class TopicsMerge
 		$target_board = count($this->boards) > 1 ? (int) $details['board'] : $this->boards[0];
 		if (!in_array($target_board, $details['accessible_boards']))
 		{
-			$this->_errors[] = array('no_board', true);
+			$this->_errors[] = ['no_board', true];
 
 			return false;
 		}
@@ -298,17 +298,17 @@ class TopicsMerge
 		$target_poll = count($this->_polls) > 1 ? (int) $details['poll'] : (count($this->_polls) === 1 ? $this->_polls[0] : 0);
 		if ($target_poll > 0 && !in_array($target_poll, $this->_polls))
 		{
-			$this->_errors[] = array('no_access', false);
+			$this->_errors[] = ['no_access', false];
 
 			return false;
 		}
 
-		$deleted_polls = empty($target_poll) ? $this->_polls : array_diff($this->_polls, array($target_poll));
+		$deleted_polls = empty($target_poll) ? $this->_polls : array_diff($this->_polls, [$target_poll]);
 
 		// Determine the subject of the newly merged topic - was a custom subject specified?
 		if (empty($details['subject']) && $details['custom_subject'] != '')
 		{
-			$target_subject = strtr(Util::htmltrim(Util::htmlspecialchars($details['custom_subject'])), array("\r" => '', "\n" => '', "\t" => ''));
+			$target_subject = strtr(Util::htmltrim(Util::htmlspecialchars($details['custom_subject'])), ["\r" => '', "\n" => '', "\t" => '']);
 
 			// Keep checking the length.
 			if (Util::strlen($target_subject) > 100)
@@ -344,9 +344,9 @@ class TopicsMerge
 			WHERE id_topic IN ({array_int:topics})
 			GROUP BY approved
 			ORDER BY approved DESC',
-			array(
+			[
 				'topics' => $this->_topics,
-			)
+			]
 		)->fetch_callback(
 			static function ($row) use (&$topic_approved, &$first_msg, &$num_replies, &$last_msg, &$num_unapproved) {
 				// If this is approved, or is fully unapproved.
@@ -384,12 +384,12 @@ class TopicsMerge
 		// Ensure we have a board stat for the target board.
 		if (!isset($this->_boardTotals[$target_board]))
 		{
-			$this->_boardTotals[$target_board] = array(
+			$this->_boardTotals[$target_board] = [
 				'num_posts' => 0,
 				'num_topics' => 0,
 				'unapproved_posts' => 0,
 				'unapproved_topics' => 0
-			);
+			];
 		}
 
 		// Fix the topic count stuff depending on what the new one counts as.
@@ -413,10 +413,10 @@ class TopicsMerge
 			WHERE id_msg IN ({int:first_msg}, {int:last_msg})
 			ORDER BY id_msg
 			LIMIT 2',
-			array(
+			[
 				'first_msg' => $first_msg,
 				'last_msg' => $last_msg,
-			)
+			]
 		);
 		[$member_started] = $request->fetch_row();
 		[$member_updated] = $request->fetch_row();
@@ -438,11 +438,11 @@ class TopicsMerge
 		$enforce_subject = Util::htmlspecialchars(trim($details['enforce_subject']));
 
 		// Merge topic notifications.
-		$notifications = is_array($details['notifications']) ? array_intersect($this->_topics, $details['notifications']) : array();
+		$notifications = is_array($details['notifications']) ? array_intersect($this->_topics, $details['notifications']) : [];
 		fixMergedTopics($first_msg, $this->_topics, $id_topic, $target_board, $target_subject, $enforce_subject, $notifications);
 
 		// Assign the properties of the newly merged topic.
-		setTopicAttribute($id_topic, array(
+		setTopicAttribute($id_topic, [
 			'id_board' => $target_board,
 			'is_sticky' => $this->_is_sticky,
 			'approved' => $topic_approved,
@@ -454,7 +454,7 @@ class TopicsMerge
 			'num_replies' => $num_replies,
 			'unapproved_posts' => $num_unapproved,
 			'num_views' => $this->_num_views,
-		));
+		]);
 
 		// Get rid of the redundant polls.
 		if (!empty($deleted_polls))
@@ -465,7 +465,7 @@ class TopicsMerge
 
 		$this->_updateStats($affected_msgs, $id_topic, $target_subject, $enforce_subject);
 
-		return array($id_topic, $target_board);
+		return [$id_topic, $target_board];
 	}
 
 	/**
@@ -477,7 +477,7 @@ class TopicsMerge
 	 * @param bool $enforce_subject
 	 * @throws \ElkArte\Exceptions\Exception
 	 */
-	protected function _updateStats($affected_msgs, $id_topic, $target_subject, $enforce_subject)
+	protected function _updateStats($affected_msgs, $id_topic, $target_subject, $enforce_subject): void
 	{
 		global $modSettings;
 
@@ -499,7 +499,7 @@ class TopicsMerge
 		updateSubjectStats($id_topic, $target_subject);
 		updateLastMessages($this->boards);
 
-		logAction('merge', array('topic' => $id_topic, 'board' => $id_board));
+		logAction('merge', ['topic' => $id_topic, 'board' => $id_board]);
 
 		// Notify people that these topics have been merged?
 		require_once(SUBSDIR . '/Notification.subs.php');
@@ -510,6 +510,6 @@ class TopicsMerge
 
 		// If there's a search index that needs updating, update it...
 		$searchAPI = new Search\SearchApiWrapper(empty($modSettings['search_index']) ? '' : $modSettings['search_index']);
-		$searchAPI->topicMerge($id_topic, $this->_topics, $affected_msgs, empty($enforce_subject) ? null : array($response_prefix, $target_subject));
+		$searchAPI->topicMerge($id_topic, $this->_topics, $affected_msgs, empty($enforce_subject) ? null : [$response_prefix, $target_subject]);
 	}
 }

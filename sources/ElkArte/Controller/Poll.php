@@ -51,7 +51,7 @@ class Poll extends AbstractController
 	 *
 	 * @uses Post language file.
 	 */
-	public function action_vote()
+	public function action_vote(): void
 	{
 		global $topic, $modSettings;
 
@@ -161,17 +161,17 @@ class Poll extends AbstractController
 		// Too many options checked!
 		if (count($this->_req->post->options) > $row['max_votes'])
 		{
-			throw new Exception('poll_too_many_votes', false, array($row['max_votes']));
+			throw new Exception('poll_too_many_votes', false, [$row['max_votes']]);
 		}
 
-		$pollOptions = array();
-		$inserts = array();
+		$pollOptions = [];
+		$inserts = [];
 		foreach ($this->_req->post->options as $id)
 		{
 			$id = (int) $id;
 
 			$pollOptions[] = $id;
-			$inserts[] = array($row['id_poll'], $this->user->id, $id);
+			$inserts[] = [$row['id_poll'], $this->user->id, $id];
 		}
 
 		// Add their vote to the tally.
@@ -197,7 +197,7 @@ class Poll extends AbstractController
 		}
 
 		// Maybe let a social networking mod log this, or something?
-		call_integration_hook('integrate_poll_vote', array(&$row['id_poll'], &$pollOptions));
+		call_integration_hook('integrate_poll_vote', [&$row['id_poll'], &$pollOptions]);
 
 		// Return to the post...
 		redirectexit('topic=' . $topic . '.' . $this->_req->post->start);
@@ -215,7 +215,7 @@ class Poll extends AbstractController
 	 * - Upon successful completion of action will direct user back to topic.
 	 * - Accessed via ?action=lockvoting.
 	 */
-	public function action_lockvoting()
+	public function action_lockvoting(): void
 	{
 		global $topic;
 
@@ -278,7 +278,7 @@ class Poll extends AbstractController
 	 * - Upon successful completion of action will direct user back to topic.
 	 * - Accessed via ?action=editpoll2.
 	 */
-	public function action_editpoll2()
+	public function action_editpoll2(): void
 	{
 		global $topic, $board;
 
@@ -443,9 +443,9 @@ class Poll extends AbstractController
 		// Get all the choices.  (no better way to remove all emptied and add previously non-existent ones.)
 		$choices = array_keys(pollOptions($bcinfo['id_poll']));
 
-		$add_options = array();
-		$update_options = array();
-		$delete_options = array();
+		$add_options = [];
+		$update_options = [];
+		$delete_options = [];
 		foreach ($this->_req->post->options as $k => $option)
 		{
 			// Make sure the key is numeric for sanity's sake.
@@ -470,11 +470,11 @@ class Poll extends AbstractController
 			// If it's already there, update it.  If it's not... add it.
 			if (in_array($k, $choices))
 			{
-				$update_options[] = array($bcinfo['id_poll'], $k, $option);
+				$update_options[] = [$bcinfo['id_poll'], $k, $option];
 			}
 			else
 			{
-				$add_options[] = array($bcinfo['id_poll'], $k, $option, 0);
+				$add_options[] = [$bcinfo['id_poll'], $k, $option, 0];
 			}
 		}
 
@@ -500,7 +500,7 @@ class Poll extends AbstractController
 			resetVotes($bcinfo['id_poll']);
 		}
 
-		call_integration_hook('integrate_poll_add_edit', array($bcinfo['id_poll'], $isEdit));
+		call_integration_hook('integrate_poll_add_edit', [$bcinfo['id_poll'], $isEdit]);
 
 		// Off we go.
 		redirectexit('topic=' . $topic . '.' . $this->_req->post->start);
@@ -522,7 +522,7 @@ class Poll extends AbstractController
 	 * @uses Post language file.
 	 * @uses template_poll_edit() sub-template in Poll.template,
 	 */
-	public function action_editpoll()
+	public function action_editpoll(): void
 	{
 		global $txt, $context, $topic, $board;
 
@@ -537,7 +537,7 @@ class Poll extends AbstractController
 
 		Txt::load('Post');
 		theme()->getTemplates()->load('Poll');
-		loadJavascriptFile('post.js', array(), 'post_scripts');
+		loadJavascriptFile('post.js', [], 'post_scripts');
 
 		$context['sub_template'] = 'poll_edit';
 		$context['start'] = $this->_req->getQuery('start', 'intval');
@@ -574,7 +574,7 @@ class Poll extends AbstractController
 			isAllowedTo('poll_add_' . ($this->user->id == $pollinfo['id_member_started'] ? 'own' : 'any'));
 		}
 
-		$context['can_moderate_poll'] = isset($this->_req->post->add) ? true : allowedTo('poll_edit_' . ($this->user->id == $pollinfo['id_member_started'] || ($pollinfo['poll_starter'] != 0 && $this->user->id == $pollinfo['poll_starter']) ? 'own' : 'any'));
+		$context['can_moderate_poll'] = isset($this->_req->post->add) || allowedTo('poll_edit_' . ($this->user->id == $pollinfo['id_member_started'] || ($pollinfo['poll_starter'] != 0 && $this->user->id == $pollinfo['poll_starter']) ? 'own' : 'any'));
 
 		// Do we enable guest voting?
 		require_once(SUBSDIR . '/Members.subs.php');
@@ -586,7 +586,7 @@ class Poll extends AbstractController
 			$question = Util::htmlspecialchars($this->_req->post->question);
 
 			// Basic theme info...
-			$context['poll'] = array(
+			$context['poll'] = [
 				'id' => $pollinfo['id_poll'],
 				'question' => $question,
 				'hide_results' => empty($this->_req->post->poll_hide) ? 0 : $this->_req->post->poll_hide,
@@ -594,7 +594,7 @@ class Poll extends AbstractController
 				'guest_vote' => isset($this->_req->post->poll_guest_vote),
 				'guest_vote_allowed' => in_array(-1, $groupsAllowedVote['allowed']),
 				'max_votes' => empty($this->_req->post->poll_max_votes) ? '1' : max(1, $this->_req->post->poll_max_votes),
-			);
+			];
 
 			// Start at number one with no last id to speak of.
 			$number = 1;
@@ -604,7 +604,7 @@ class Poll extends AbstractController
 			if ($context['is_edit'])
 			{
 				$pollOptions = pollOptions($pollinfo['id_poll']);
-				$context['poll']['choices'] = array();
+				$context['poll']['choices'] = [];
 
 				foreach ($pollOptions as $option)
 				{
@@ -621,13 +621,13 @@ class Poll extends AbstractController
 					}
 
 					// Add the choice!
-					$context['poll']['choices'][$option['id_choice']] = array(
+					$context['poll']['choices'][$option['id_choice']] = [
 						'id' => $option['id_choice'],
 						'number' => $number++,
 						'votes' => $option['votes'],
 						'label' => $option['label'],
 						'is_last' => false
-					);
+					];
 				}
 			}
 
@@ -654,13 +654,13 @@ class Poll extends AbstractController
 				}
 				elseif ($label !== '')
 				{
-					$context['poll']['choices'][] = array(
+					$context['poll']['choices'][] = [
 						'id' => $last_id++,
 						'number' => $number++,
 						'label' => $label,
 						'votes' => -1,
 						'is_last' => $count++ === $totalPostOptions && $totalPostOptions > 1,
-					);
+					];
 				}
 			}
 
@@ -670,26 +670,26 @@ class Poll extends AbstractController
 				// Need two?
 				if ($totalPostOptions === 0)
 				{
-					$context['poll']['choices'][] = array(
+					$context['poll']['choices'][] = [
 						'id' => $last_id++,
 						'number' => $number++,
 						'label' => '',
 						'votes' => -1,
 						'is_last' => false
-					);
+					];
 				}
 
 				$poll_errors->addError('poll_few');
 			}
 
 			// Always show one extra box...
-			$context['poll']['choices'][] = array(
+			$context['poll']['choices'][] = [
 				'id' => $last_id++,
 				'number' => $number,
 				'label' => '',
 				'votes' => -1,
 				'is_last' => true
-			);
+			];
 
 			$context['last_choice_id'] = $last_id;
 
@@ -709,16 +709,16 @@ class Poll extends AbstractController
 			checkSubmitOnce('free');
 
 			// Take a check for any errors... assuming we haven't already done so!
-			$context['poll_error'] = array(
+			$context['poll_error'] = [
 				'errors' => $poll_errors->prepareErrors(),
 				'type' => $poll_errors->getErrorType() == 0 ? 'minor' : 'serious',
 				'title' => $context['is_edit'] ? $txt['error_while_editing_poll'] : $txt['error_while_adding_poll'],
-			);
+			];
 		}
 		else
 		{
 			// Basic theme info...
-			$context['poll'] = array(
+			$context['poll'] = [
 				'id' => $pollinfo['id_poll'],
 				'question' => $pollinfo['question'],
 				'hide_results' => $pollinfo['hide_results'],
@@ -726,7 +726,7 @@ class Poll extends AbstractController
 				'change_vote' => !empty($pollinfo['change_vote']),
 				'guest_vote' => !empty($pollinfo['guest_vote']),
 				'guest_vote_allowed' => in_array(-1, $groupsAllowedVote['allowed']),
-			);
+			];
 
 			// Poll expiration time?
 			$context['poll']['expiration'] = empty($pollinfo['expire_time']) || !$context['can_moderate_poll'] ? '' : ceil($pollinfo['expire_time'] <= time() ? -1 : ($pollinfo['expire_time'] - time()) / (3600 * 24));
@@ -739,20 +739,20 @@ class Poll extends AbstractController
 				$last_id = max(array_keys($context['poll']['choices'])) + 1;
 
 				// Add an extra choice...
-				$context['poll']['choices'][] = array(
+				$context['poll']['choices'][] = [
 					'id' => $last_id,
 					'number' => $context['poll']['choices'][$last_id - 1]['number'] + 1,
 					'votes' => -1,
 					'label' => '',
 					'is_last' => true
-				);
+				];
 				$context['last_choice_id'] = $last_id;
 			}
 			// New poll?
 			else
 			{
 				// Setup the default poll options.
-				$context['poll'] = array(
+				$context['poll'] = [
 					'id' => 0,
 					'question' => '',
 					'hide_results' => 0,
@@ -761,16 +761,16 @@ class Poll extends AbstractController
 					'guest_vote' => 0,
 					'guest_vote_allowed' => in_array(-1, $groupsAllowedVote['allowed']),
 					'expiration' => '',
-				);
+				];
 
 				// Make all five poll choices empty.
-				$context['poll']['choices'] = array(
-					array('id' => 0, 'number' => 1, 'votes' => -1, 'label' => '', 'is_last' => false),
-					array('id' => 1, 'number' => 2, 'votes' => -1, 'label' => '', 'is_last' => false),
-					array('id' => 2, 'number' => 3, 'votes' => -1, 'label' => '', 'is_last' => false),
-					array('id' => 3, 'number' => 4, 'votes' => -1, 'label' => '', 'is_last' => false),
-					array('id' => 4, 'number' => 5, 'votes' => -1, 'label' => '', 'is_last' => true)
-				);
+				$context['poll']['choices'] = [
+					['id' => 0, 'number' => 1, 'votes' => -1, 'label' => '', 'is_last' => false],
+					['id' => 1, 'number' => 2, 'votes' => -1, 'label' => '', 'is_last' => false],
+					['id' => 2, 'number' => 3, 'votes' => -1, 'label' => '', 'is_last' => false],
+					['id' => 3, 'number' => 4, 'votes' => -1, 'label' => '', 'is_last' => false],
+					['id' => 4, 'number' => 5, 'votes' => -1, 'label' => '', 'is_last' => true]
+				];
 				$context['last_choice_id'] = 4;
 			}
 		}
@@ -780,10 +780,10 @@ class Poll extends AbstractController
 
 		// Build the link tree.
 		$pollinfo['subject'] = censor($pollinfo['subject']);
-		$context['breadcrumbs'][] = array(
+		$context['breadcrumbs'][] = [
 			'url' => getUrl('topic', ['topic' => $topic, 'start' => '0', 'subject' => $pollinfo['subject']]),
 			'name' => $pollinfo['subject'],
-		);
+		];
 		$context['breadcrumbs'][] = [
 			'name' => $context['page_title'],
 		];
@@ -803,7 +803,7 @@ class Poll extends AbstractController
 	 * - Upon successful completion of action will direct user back to topic.
 	 * - Accessed via ?action=poll;sa=remove.
 	 */
-	public function action_remove()
+	public function action_remove(): void
 	{
 		global $topic;
 
@@ -845,7 +845,7 @@ class Poll extends AbstractController
 		associatedPoll($topic, 0);
 
 		// A mod might have logged this (social network?), so let them remove, it too
-		call_integration_hook('integrate_poll_remove', array($pollID));
+		call_integration_hook('integrate_poll_remove', [$pollID]);
 
 		// Take the moderator back to the topic.
 		redirectexit('topic=' . $topic . '.' . $this->_req->post->start);
@@ -854,7 +854,7 @@ class Poll extends AbstractController
 	/**
 	 * The only reason of this function is to build the poll UI and send it back in an XML form
 	 */
-	public function action_interface()
+	public function action_interface(): void
 	{
 		global $context, $board, $db_show_debug;
 
@@ -870,25 +870,25 @@ class Poll extends AbstractController
 		$allowedVoteGroups = groupsAllowedTo('poll_vote', $board);
 
 		// Set up the poll options.
-		$context['poll'] = array(
+		$context['poll'] = [
 			'max_votes' => 1,
 			'hide_results' => 0,
 			'expiration' => '',
 			'change_vote' => false,
 			'guest_vote' => false,
 			'guest_vote_allowed' => in_array(-1, $allowedVoteGroups['allowed']),
-		);
+		];
 
 		$context['can_moderate_poll'] = true;
 
 		// Make all five poll choices empty.
-		$context['poll']['choices'] = array(
-			array('id' => 0, 'number' => 1, 'label' => '', 'is_last' => false),
-			array('id' => 1, 'number' => 2, 'label' => '', 'is_last' => false),
-			array('id' => 2, 'number' => 3, 'label' => '', 'is_last' => false),
-			array('id' => 3, 'number' => 4, 'label' => '', 'is_last' => false),
-			array('id' => 4, 'number' => 5, 'label' => '', 'is_last' => true)
-		);
+		$context['poll']['choices'] = [
+			['id' => 0, 'number' => 1, 'label' => '', 'is_last' => false],
+			['id' => 1, 'number' => 2, 'label' => '', 'is_last' => false],
+			['id' => 2, 'number' => 3, 'label' => '', 'is_last' => false],
+			['id' => 3, 'number' => 4, 'label' => '', 'is_last' => false],
+			['id' => 4, 'number' => 5, 'label' => '', 'is_last' => true]
+		];
 		$context['last_choice_id'] = 4;
 	}
 }

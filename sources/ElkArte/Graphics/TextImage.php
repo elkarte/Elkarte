@@ -58,7 +58,7 @@ class TextImage extends Image
 	 *
 	 * @param string $source
 	 */
-	public function setSource($source)
+	public function setSource($source): void
 	{
 	}
 
@@ -185,7 +185,7 @@ class TextImage extends Image
 	 *
 	 * @return array
 	 */
-	public function getSize()
+	public function getSize(): array
 	{
 		return $this->_manipulator->imageDimensions;
 	}

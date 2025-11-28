@@ -47,7 +47,7 @@ function spiderCheck()
 	$_SESSION['robot_check'] = time();
 
 	// We cache the sorted spider data for five minutes.
-	$spider_data = array();
+	$spider_data = [];
 	$cache = Cache::instance();
 	if (!$cache->getVar($spider_data, 'spider_search', 300))
 	{
@@ -56,7 +56,7 @@ function spiderCheck()
 				id_spider, user_agent, ip_info
 			FROM {db_prefix}spiders
 			ORDER BY LENGTH(user_agent) DESC',
-			array()
+			[]
 		)->fetch_all();
 
 		// Save it in the cache
@@ -170,24 +170,24 @@ function logSpider()
 				last_seen = {int:current_time}, page_hits = page_hits + 1
 			WHERE id_spider = {int:current_spider}
 				AND stat_date = {date:current_date}',
-			array(
+			[
 				'current_date' => $date,
 				'current_time' => time(),
 				'current_spider' => $_SESSION['id_robot'],
-			)
+			]
 		);
 		// Nothing updated?
 		if ($result->affected_rows() == 0)
 		{
 			$db->insert('ignore',
 				'{db_prefix}log_spider_stats',
-				array(
+				[
 					'id_spider' => 'int', 'last_seen' => 'int', 'stat_date' => 'date', 'page_hits' => 'int',
-				),
-				array(
+				],
+				[
 					$_SESSION['id_robot'], time(), $date, 1,
-				),
-				array('id_spider', 'stat_date')
+				],
+				['id_spider', 'stat_date']
 			);
 		}
 	}
@@ -215,9 +215,9 @@ function logSpider()
 
 		$db->insert('insert',
 			'{db_prefix}log_spider_hits',
-			array('id_spider' => 'int', 'log_time' => 'int', 'url' => 'string'),
-			array($_SESSION['id_robot'], time(), $url),
-			array()
+			['id_spider' => 'int', 'log_time' => 'int', 'url' => 'string'],
+			[$_SESSION['id_robot'], time(), $url],
+			[]
 		);
 	}
 }
@@ -237,9 +237,9 @@ function consolidateSpiderStats()
 		FROM {db_prefix}log_spider_hits
 		WHERE processed = {int:not_processed}
 		GROUP BY id_spider',
-		array(
+		[
 			'not_processed' => 0,
-		)
+		]
 	)->fetch_all();
 
 	if (empty($spider_hits))
@@ -248,7 +248,7 @@ function consolidateSpiderStats()
 	}
 
 	// Attempt to update the master data.
-	$stat_inserts = array();
+	$stat_inserts = [];
 	foreach ($spider_hits as $stat)
 	{
 		// We assume the max date is within the right day.
@@ -260,15 +260,15 @@ function consolidateSpiderStats()
 				last_seen = CASE WHEN last_seen > {int:last_seen} THEN last_seen ELSE {int:last_seen} END
 			WHERE id_spider = {int:current_spider}
 				AND stat_date = {date:last_seen_date}',
-			array(
+			[
 				'last_seen_date' => $date,
 				'last_seen' => $stat['last_seen'],
 				'current_spider' => $stat['id_spider'],
-			)
+			]
 		);
 		if ($result->affected_rows() == 0)
 		{
-			$stat_inserts[] = array($date, $stat['id_spider'], $stat['num_hits'], $stat['last_seen']);
+			$stat_inserts[] = [$date, $stat['id_spider'], $stat['num_hits'], $stat['last_seen']];
 		}
 	}
 
@@ -277,9 +277,9 @@ function consolidateSpiderStats()
 	{
 		$db->insert('ignore',
 			'{db_prefix}log_spider_stats',
-			array('stat_date' => 'date', 'id_spider' => 'int', 'page_hits' => 'int', 'last_seen' => 'int'),
+			['stat_date' => 'date', 'id_spider' => 'int', 'page_hits' => 'int', 'last_seen' => 'int'],
 			$stat_inserts,
-			array('stat_date', 'id_spider')
+			['stat_date', 'id_spider']
 		);
 	}
 
@@ -289,10 +289,10 @@ function consolidateSpiderStats()
 		SET 
 			processed = {int:is_processed}
 		WHERE processed = {int:not_processed}',
-		array(
+		[
 			'is_processed' => 1,
 			'not_processed' => 0,
-		)
+		]
 	);
 }
 
@@ -305,19 +305,19 @@ function recacheSpiderNames()
 {
 	$db = database();
 
-	$spiders = array();
+	$spiders = [];
 	$db->fetchQuery('
 		SELECT 
 			id_spider, spider_name
 		FROM {db_prefix}spiders',
-		array()
+		[]
 	)->fetch_callback(
 		function ($row) use (&$spiders) {
 			$spiders[$row['id_spider']] = $row['spider_name'];
 		}
 	);
 
-	updateSettings(array('spider_name_cache' => serialize($spiders)));
+	updateSettings(['spider_name_cache' => serialize($spiders)]);
 }
 
 /**
@@ -336,18 +336,18 @@ function getSpiders($start, $items_per_page, $sort)
 {
 	$db = database();
 
-	$spiders = array();
+	$spiders = [];
 	$db->fetchQuery('
 		SELECT 
 			id_spider, spider_name, user_agent, ip_info
 		FROM {db_prefix}spiders
 		ORDER BY {raw:sort}
 		LIMIT {int:limit} OFFSET {int:start} ',
-		array(
+		[
 			'sort' => $sort,
 			'start' => $start,
 			'limit' => $items_per_page,
-		)
+		]
 	)->fetch_callback(
 		function ($row) use (&$spiders) {
 			$spiders[$row['id_spider']] = $row;
@@ -361,7 +361,7 @@ function getSpiders($start, $items_per_page, $sort)
  * Return details of one spider from its ID
  *
  * @param int $spider_id id of a spider
- * @return mixed[]
+ * @return array
  * @package SearchEngines
  */
 function getSpiderDetails($spider_id)
@@ -373,9 +373,9 @@ function getSpiderDetails($spider_id)
 			id_spider as id, spider_name as name, user_agent as agent, ip_info
 		FROM {db_prefix}spiders
 		WHERE id_spider = {int:current_spider}',
-		array(
+		[
 			'current_spider' => $spider_id,
-		)
+		]
 	);
 	$spider = $request->fetch_assoc();
 	$request->free_result();
@@ -398,7 +398,7 @@ function getNumSpiders()
 		SELECT 
 			COUNT(*) AS num_spiders
 		FROM {db_prefix}spiders',
-		array()
+		[]
 	);
 	list ($numSpiders) = $request->fetch_row();
 	$request->free_result();
@@ -428,7 +428,7 @@ function getSpiderLogs($start, $items_per_page, $sort)
 			INNER JOIN {db_prefix}spiders AS s ON (s.id_spider = sl.id_spider)
 		ORDER BY ' . $sort . '
 		LIMIT ' . $items_per_page . '  OFFSET ' . $start,
-		array()
+		[]
 	)->fetch_all();
 }
 
@@ -447,7 +447,7 @@ function getNumSpiderLogs()
 		SELECT 
 			COUNT(*) AS num_logs
 		FROM {db_prefix}log_spider_hits',
-		array()
+		[]
 	);
 	list ($numLogs) = $request->fetch_row();
 	$request->free_result();
@@ -479,7 +479,7 @@ function getSpiderStats($start, $items_per_page, $sort)
 			INNER JOIN {db_prefix}spiders AS s ON (s.id_spider = ss.id_spider)
 		ORDER BY ' . $sort . '
 		LIMIT ' . $items_per_page . '  OFFSET ' . $start,
-		array()
+		[]
 	)->fetch_all();
 }
 
@@ -500,9 +500,9 @@ function getNumSpiderStats($time = null)
 			COUNT(*)
 		FROM {db_prefix}log_spider_stats' . ($time === null ? '' : '
 		WHERE stat_date < {date:date_being_viewed}'),
-		array(
+		[
 			'date_being_viewed' => $time,
-		)
+		]
 	);
 	list ($numStats) = $request->fetch_row();
 	$request->free_result();
@@ -524,9 +524,9 @@ function removeSpiderOldLogs($time)
 	$db->query('', '
 		DELETE FROM {db_prefix}log_spider_hits
 		WHERE log_time < {int:delete_period}',
-		array(
+		[
 			'delete_period' => $time,
-		)
+		]
 	);
 }
 
@@ -544,9 +544,9 @@ function removeSpiderOldStats($time)
 	$db->query('', '
 		DELETE FROM {db_prefix}log_spider_stats
 		WHERE last_seen < {int:delete_period}',
-		array(
+		[
 			'delete_period' => $time,
-		)
+		]
 	);
 }
 
@@ -563,23 +563,23 @@ function removeSpiders($spiders_id)
 	$db->query('', '
 		DELETE FROM {db_prefix}spiders
 		WHERE id_spider IN ({array_int:remove_list})',
-		array(
+		[
 			'remove_list' => $spiders_id,
-		)
+		]
 	);
 	$db->query('', '
 		DELETE FROM {db_prefix}log_spider_hits
 		WHERE id_spider IN ({array_int:remove_list})',
-		array(
+		[
 			'remove_list' => $spiders_id,
-		)
+		]
 	);
 	$db->query('', '
 		DELETE FROM {db_prefix}log_spider_stats
 		WHERE id_spider IN ({array_int:remove_list})',
-		array(
+		[
 			'remove_list' => $spiders_id,
-		)
+		]
 	);
 }
 
@@ -592,13 +592,13 @@ function spidersLastSeen()
 {
 	$db = database();
 
-	$spider_last_seen = array();
+	$spider_last_seen = [];
 	$db->query('', '
 		SELECT 
 			id_spider, MAX(last_seen) AS last_seen_time
 		FROM {db_prefix}log_spider_stats
 		GROUP BY id_spider',
-		array()
+		[]
 	)->fetch_callback(
 		function ($row) use (&$spider_last_seen) {
 			$spider_last_seen[$row['id_spider']] = $row['last_seen_time'];
@@ -624,7 +624,7 @@ function spidersStatsDates()
 		SELECT 
 			MIN(stat_date) AS first_date, MAX(stat_date) AS last_date
 		FROM {db_prefix}log_spider_stats',
-		array()
+		[]
 	);
 	list ($min_date, $max_date) = $request->fetch_row();
 	$request->free_result();
@@ -635,7 +635,7 @@ function spidersStatsDates()
 	$max_month = (int) substr($max_date, 5, 2);
 
 	// Prepare the dates for the drop down.
-	$date_choices = array();
+	$date_choices = [];
 	for ($y = $min_year; $y <= $max_year; $y++)
 	{
 		for ($m = 1; $m <= 12; $m++)
@@ -676,13 +676,13 @@ function updateSpider($id = 0, $name = '', $agent = '', $info_ip = '')
 	{
 		$db->insert('insert',
 			'{db_prefix}spiders',
-			array(
+			[
 				'spider_name' => 'string', 'user_agent' => 'string', 'ip_info' => 'string',
-			),
-			array(
+			],
+			[
 				$name, $agent, $info_ip,
-			),
-			array('id_spider')
+			],
+			['id_spider']
 		);
 	}
 	// Existing spider update
@@ -694,12 +694,12 @@ function updateSpider($id = 0, $name = '', $agent = '', $info_ip = '')
 				spider_name = {string:spider_name}, user_agent = {string:spider_agent},
 				ip_info = {string:ip_info}
 			WHERE id_spider = {int:current_spider}',
-			array(
+			[
 				'current_spider' => $id,
 				'spider_name' => $name,
 				'spider_agent' => $agent,
 				'ip_info' => $info_ip,
-			)
+			]
 		);
 	}
 }

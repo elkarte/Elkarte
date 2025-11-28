@@ -45,7 +45,7 @@ class Directories
 	 *
 	 * @return $this
 	 */
-	public function addDirectory($dir)
+	public function addDirectory($dir): self
 	{
 		$this->dirs[] = (string) $dir;
 
@@ -57,7 +57,7 @@ class Directories
 	 *
 	 * @return bool
 	 */
-	public function hasDirectories()
+	public function hasDirectories(): bool
 	{
 		return !empty($this->dirs);
 	}
@@ -67,7 +67,7 @@ class Directories
 	 *
 	 * @return string[]
 	 */
-	public function getDirectories()
+	public function getDirectories(): array
 	{
 		return $this->dirs;
 	}
@@ -77,7 +77,7 @@ class Directories
 	 *
 	 * @param array $settings
 	 */
-	public function reloadDirectories(array $settings)
+	public function reloadDirectories(array $settings): void
 	{
 		$this->dirs = [];
 
@@ -112,7 +112,7 @@ class Directories
 	 * @param string $filename
 	 * @param bool $once = false, if true only includes the file once (like include_once)
 	 */
-	public function fileInclude($filename, $once = false)
+	public function fileInclude($filename, $once = false): void
 	{
 		// Don't include the file more than once, if $once is true.
 		if ($once && in_array($filename, $this->templates))

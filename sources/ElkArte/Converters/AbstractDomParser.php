@@ -45,7 +45,7 @@ abstract class AbstractDomParser
 	 *
 	 * @return bool
 	 */
-	public static function hasParentCode($node, $internalParser)
+	public static function hasParentCode($node, $internalParser): bool
 	{
 		$parent = $internalParser ? $node->parentNode : $node->parentNode();
 		while ($parent)
@@ -66,7 +66,7 @@ abstract class AbstractDomParser
 	/**
 	 * Set the DOM parser for class, loads the supplied HTML
 	 */
-	public function setParser()
+	public function setParser(): void
 	{
 		$this->internalParser = true;
 
@@ -83,7 +83,7 @@ abstract class AbstractDomParser
 	 *
 	 * @param string $html
 	 */
-	public function loadHTML($html)
+	public function loadHTML($html): void
 	{
 		if ($this->internalParser)
 		{
@@ -118,7 +118,7 @@ abstract class AbstractDomParser
 	 *
 	 * @return string
 	 */
-	public function getBodyText($text)
+	public function getBodyText($text): string
 	{
 		if (preg_match_all('~<body[^>]*?>(.*?)</body>~su', $text, $bodies))
 		{
@@ -171,7 +171,7 @@ abstract class AbstractDomParser
 	 *
 	 * This is done due to poor structure of some received HTML via email ect
 	 */
-	private function _removeHeadNode()
+	private function _removeHeadNode(): void
 	{
 		$head = ($this->internalParser) ? $this->document->getElementsByTagName('head')->item(0) : $this->document->find('head', 0);
 
@@ -199,7 +199,7 @@ abstract class AbstractDomParser
 	 * @param string $break
 	 * @return string
 	 */
-	public function utf8Wordwrap($string, $width = 76, $break = "\n")
+	public function utf8Wordwrap($string, $width = 76, $break = "\n"): string
 	{
 		if ($width < 76)
 		{
@@ -219,7 +219,7 @@ abstract class AbstractDomParser
 
 			while (!empty($string))
 			{
-				// Get the next #width characters before a break (space, punctuation tab etc)
+				// Get the next #width characters before a break (space, punctuation tab etc.)
 				if (preg_match('~^(.{1,' . $width . '})(?:\s|$|,|\.)~u', $string, $matches))
 				{
 					// Add the #width to the output and set up for the next pass
@@ -246,7 +246,7 @@ abstract class AbstractDomParser
 	 *
 	 * @return int
 	 */
-	public function hasParentList($node)
+	public function hasParentList($node): int
 	{
 		$depth = 0;
 
@@ -289,7 +289,7 @@ abstract class AbstractDomParser
 	 * @param $node
 	 * @return string
 	 */
-	public function getName($node)
+	public function getName($node): string
 	{
 		if ($node === null)
 		{
@@ -304,7 +304,7 @@ abstract class AbstractDomParser
 	 *
 	 * @return string
 	 */
-	public function getHTML()
+	public function getHTML(): string
 	{
 		if ($this->internalParser)
 		{
@@ -332,7 +332,7 @@ abstract class AbstractDomParser
 	 * @param object|array $node
 	 * @return int
 	 */
-	public function getLength($node)
+	public function getLength($node): int
 	{
 		return $this->internalParser ? $node->length : count($node);
 	}
@@ -352,7 +352,6 @@ abstract class AbstractDomParser
 	 * gets a specific child of a parent node
 	 *
 	 * @param object|array $node
-	 * @param int child number to return
 	 * @return object
 	 */
 	public function getChild($node, $child)
@@ -377,7 +376,7 @@ abstract class AbstractDomParser
 	 * @param object $node
 	 * @return string
 	 */
-	public function getValue($node)
+	public function getValue($node): string
 	{
 		if ($node === null)
 		{
@@ -398,7 +397,7 @@ abstract class AbstractDomParser
 	 * @param $node
 	 * @param $text
 	 */
-	public function setTextNode($node, $text)
+	public function setTextNode($node, $text): void
 	{
 		if ($this->internalParser)
 		{
@@ -417,7 +416,7 @@ abstract class AbstractDomParser
 	 * @param \DOMNode|object $node
 	 * @return string
 	 */
-	public function getInnerHTML($node)
+	public function getInnerHTML($node): string
 	{
 		if ($this->internalParser)
 		{
@@ -439,7 +438,7 @@ abstract class AbstractDomParser
 	 * @param \DOMNode|object $node
 	 * @return string
 	 */
-	public function getOuterHTML($node)
+	public function getOuterHTML($node): string
 	{
 		return $this->internalParser ? htmlspecialchars_decode($this->document->saveHTML($node)) : $node->outertext;
 	}
@@ -450,7 +449,7 @@ abstract class AbstractDomParser
 	 * @param \DOMNode|object $node
 	 * @return string
 	 */
-	public function setInnerHTML($node)
+	public function setInnerHTML($node): string
 	{
 		if ($this->internalParser)
 		{

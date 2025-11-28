@@ -129,7 +129,7 @@ abstract class Theme
 	/**
 	 * Get the layers associated with the current theme
 	 */
-	public function getLayers()
+	public function getLayers(): TemplateLayers
 	{
 		return $this->layers;
 	}
@@ -137,7 +137,7 @@ abstract class Theme
 	/**
 	 * Get the templates associated with the current theme
 	 */
-	public function getTemplates()
+	public function getTemplates(): Templates
 	{
 		return $this->templates;
 	}
@@ -149,7 +149,7 @@ abstract class Theme
 	 *
 	 * @return $this
 	 */
-	public function setRTL($toggle)
+	public function setRTL($toggle): self
 	{
 		$this->rtl = (bool) $toggle;
 
@@ -195,7 +195,7 @@ abstract class Theme
 	 * What it does:
 	 *  - Copies relevant user data from the user object to the global context.
 	 */
-	public function setupLoggedUserContext()
+	public function setupLoggedUserContext(): void
 	{
 		global $context;
 
@@ -227,7 +227,7 @@ abstract class Theme
 	 * What it does:
 	 *  - Initializes global variables for guest user context
 	 */
-	public function setupGuestContext()
+	public function setupGuestContext(): void
 	{
 		global $modSettings, $context, $txt;
 
@@ -253,7 +253,7 @@ abstract class Theme
 	 *  - Sets the total posts, total topics, total members, and latest member stats in the common_stats array of the context
 	 *  - Sets the formatted string for displaying the total posts in the boardindex_total_posts variable of the context
 	 */
-	public function setContextCommonStats()
+	public function setContextCommonStats(): void
 	{
 		global $context, $txt, $modSettings;
 
@@ -278,7 +278,7 @@ abstract class Theme
 	/**
 	 * This is the only template included in the sources.
 	 */
-	public function template_rawdata()
+	public function template_rawdata(): void
 	{
 		global $context;
 
@@ -331,7 +331,7 @@ abstract class Theme
 	 *  - Adds the 'news_fader' callback to the 'upper_content_callbacks' array in the context
 	 *  - Sets the 'show_news' variable in the context based on the 'enable_news' setting in $settings
 	 */
-	public function setupNewsLines()
+	public function setupNewsLines(): void
 	{
 		global $context, $modSettings, $settings;
 
@@ -362,7 +362,7 @@ abstract class Theme
 	/**
 	 * Show the copyright.
 	 */
-	public function theme_copyright()
+	public function theme_copyright(): void
 	{
 		global $forum_copyright;
 
@@ -380,23 +380,23 @@ abstract class Theme
 	}
 
 	/**
-	 * Add a block of inline Javascript code to be executed later
+	 * Add a block of inline JavaScript code to be executed later
 	 *
 	 * @param string $javascript
 	 * @param bool $defer = false, define if the script should load in <head> or before the closing <html> tag
 	 */
-	public function addInlineJavascript($javascript, $defer = false)
+	public function addInlineJavascript($javascript, $defer = false): void
 	{
 		$this->javascript->addInlineJavascript($javascript, $defer);
 	}
 
 	/**
-	 * Add a Javascript variable for output later (for feeding text strings and similar to JS)
+	 * Add a JavaScript variable for output later (for feeding text strings and similar to JS)
 	 *
 	 * @param array $vars array of vars to include in the output done as 'varname' => 'var value'
-	 * @param bool $escape = false, whether or not to escape the value
+	 * @param bool $escape = false, whether to escape the value
 	 */
-	public function addJavascriptVar($vars, $escape = false)
+	public function addJavascriptVar($vars, $escape = false): void
 	{
 		$this->javascript->addJavascriptVar($vars, $escape);
 	}
@@ -407,7 +407,7 @@ abstract class Theme
 	 * @param string $type (Optional) The type of hives to clean. Default is 'all'. Possible values are 'all', 'css', 'js'.
 	 * @return bool Returns true if the hives are successfully cleaned, otherwise false.
 	 */
-	public function cleanHives($type = 'all')
+	public function cleanHives($type = 'all'): bool
 	{
 		global $settings;
 
@@ -433,7 +433,7 @@ abstract class Theme
 	/**
 	 * If video embedding is enabled, this loads the needed JS and vars
 	 */
-	public function autoEmbedVideo()
+	public function autoEmbedVideo(): void
 	{
 		global $txt, $modSettings;
 
@@ -473,11 +473,9 @@ abstract class Theme
 	 *
 	 * @return void
 	 */
-	public function progressiveWebApp()
+	public function progressiveWebApp(): void
 	{
 		global $modSettings, $boardurl, $settings;
-
-//$modSettings['pwa_enabled'] = 1==1;
 
 		$this->addJavascriptVar([
 			'elk_board_url' => JavaScriptEscape($boardurl),
@@ -526,7 +524,7 @@ abstract class Theme
 	 *
 	 * @return string The scope extracted from the URL, or the root scope if not found
 	 */
-	public function getScopeFromUrl($url)
+	public function getScopeFromUrl($url): string
 	{
 		$parts = parse_url($url);
 
@@ -536,7 +534,7 @@ abstract class Theme
 	/**
 	 * If the option to pretty output code is on, this loads the JS and CSS
 	 */
-	public function addCodePrettify()
+	public function addCodePrettify(): void
 	{
 		global $modSettings;
 
@@ -560,9 +558,9 @@ abstract class Theme
 	 * theme's directory
 	 *
 	 * @param string $cssFile
-	 * @param boolean $fallBack
+	 * @param bool $fallBack
 	 */
-	public function loadVariant($cssFile, $fallBack = true)
+	public function loadVariant($cssFile, $fallBack = true): void
 	{
 		global $settings, $context;
 
@@ -589,7 +587,7 @@ abstract class Theme
 	/**
 	 * Relative times require a few variables be set in the JS
 	 */
-	public function relativeTimes()
+	public function relativeTimes(): void
 	{
 		global $modSettings, $context, $txt;
 
@@ -624,7 +622,7 @@ abstract class Theme
 	 * Ensures we kick the mail queue from time to time so that it gets
 	 * checked as often as possible.
 	 */
-	public function doScheduledSendMail()
+	public function doScheduledSendMail(): void
 	{
 		global $modSettings;
 
@@ -664,7 +662,7 @@ abstract class Theme
 	 * What it does:
 	 *  - Sets the context variable $context['show_pm_popup'] based on user preferences and current action
 	 */
-	public function setContextShowPmPopup()
+	public function setContextShowPmPopup(): void
 	{
 		global $context, $options, $txt, $scripturl;
 
@@ -694,7 +692,7 @@ abstract class Theme
 	 *  - Sets the page title and favicon
 	 *  - Updates the HTML headers
 	 */
-	public function setContextThemeData()
+	public function setContextThemeData(): void
 	{
 		global $context, $scripturl, $settings, $boardurl, $modSettings, $txt, $mbname;
 
@@ -717,7 +715,7 @@ abstract class Theme
 	/**
 	 * If a variant CSS is needed, this loads it
 	 */
-	public function loadThemeVariant()
+	public function loadThemeVariant(): void
 	{
 		global $context, $settings, $options;
 
@@ -761,7 +759,7 @@ abstract class Theme
 	 * Calls on template_show_error from index.template.php to show warnings
 	 * and security errors for admins
 	 */
-	public function template_admin_warning_above()
+	public function template_admin_warning_above(): void
 	{
 		global $context, $txt;
 
@@ -810,7 +808,7 @@ abstract class Theme
 	 * - Loads xml, index or no templates as needed
 	 * - Loads templates as defined by $settings['theme_templates']
 	 */
-	public function loadDefaultLayers()
+	public function loadDefaultLayers(): void
 	{
 		global $settings;
 
@@ -867,7 +865,7 @@ abstract class Theme
 	/**
 	 * Return the instance of /ElkArte/Themes/Css
 	 */
-	public function themeCss()
+	public function themeCss(): Css
 	{
 		return $this->css;
 	}
@@ -875,7 +873,7 @@ abstract class Theme
 	/**
 	 * Return the instance of /ElkArte/Themes/Javascript
 	 */
-	public function themeJs()
+	public function themeJs(): Javascript
 	{
 		return $this->javascript;
 	}

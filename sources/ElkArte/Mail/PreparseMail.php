@@ -40,7 +40,7 @@ class PreparseMail extends BaseMail
 	 * @param string $message the post in glorious html format
 	 * @return string html text suitable for html2md or html output
 	 */
-	public function preparseHtml($message)
+	public function preparseHtml($message): string
 	{
 		// Clean it up, can't have naughty words in an email
 		$message = censor($message);
@@ -99,7 +99,7 @@ class PreparseMail extends BaseMail
 	 * @param string[] $matches array of matches from the regex in the preg_replace
 	 * @return string
 	 */
-	private function quoteCallback($matches)
+	private function quoteCallback($matches): string
 	{
 		global $txt;
 
@@ -126,7 +126,7 @@ class PreparseMail extends BaseMail
 	 * @param string $message
 	 * @return string
 	 */
-	private function preparseTables($message)
+	private function preparseTables($message): string
 	{
 		// Do we have any tables? if so we may need to add in th's based on the number of cols.
 		$table_content = [];
@@ -162,7 +162,7 @@ class PreparseMail extends BaseMail
 	 * @param $subject
 	 * @return string
 	 */
-	public function preparseSubject($subject)
+	public function preparseSubject($subject): string
 	{
 		// What are you trying to do, get the IP blocked?
 		return censor(un_htmlspecialchars($subject));
@@ -175,7 +175,7 @@ class PreparseMail extends BaseMail
 	 * @param $signature
 	 * @return string
 	 */
-	public function preparseSignature($signature)
+	public function preparseSignature($signature): string
 	{
 		// The signature goes as just plain text
 		if ($signature !== '')

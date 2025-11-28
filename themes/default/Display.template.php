@@ -737,7 +737,7 @@ function template_pages_and_buttons_below()
 }
 
 /**
- * Used to display additonal items below the page, like moderation buttons
+ * Used to display additional items below the page, like moderation buttons
  */
 function template_moderation_buttons_below()
 {

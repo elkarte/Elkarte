@@ -2084,10 +2084,10 @@ nav.breadcrumb {
 	}
 }
 
-/* This one does 800 screens at default font size.
+/* This one does 825 screens at default font size.
    -------------------------------------------------------------------------------------------*/
 
-@media screen and (max-width: 50em) {
+@media screen and (max-width: 51.5em) {
 	#forumtitle {
 		font-size: var(--font24);
 		padding: .8rem 0;

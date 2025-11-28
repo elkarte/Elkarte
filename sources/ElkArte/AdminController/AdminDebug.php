@@ -55,7 +55,7 @@ class AdminDebug extends AbstractController
 	 * - Is accessed via ?action=viewquery.
 	 * - Strings in this function have not been internationalized.
 	 */
-	public function action_viewquery()
+	public function action_viewquery(): void
 	{
 		global $context, $db_show_debug;
 

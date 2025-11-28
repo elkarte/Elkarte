@@ -71,7 +71,7 @@ class PreparseCode
 	 * @param string $message
 	 * @param bool $previewing
 	 */
-	public function preparsecode(&$message, $previewing = false)
+	public function preparsecode(&$message, $previewing = false): ?string
 	{
 		if (empty($message))
 		{
@@ -92,7 +92,7 @@ class PreparseCode
 		$this->message = preg_replace_callback('~\[nobbc\](.+?)\[/nobbc\]~i', fn($matches) => $this->_preparsecode_nobbc_callback($matches), $this->message);
 
 		// Remove \r's... they're evil!
-		$this->message = strtr($this->message, array("\r" => ''));
+		$this->message = strtr($this->message, ["\r" => '']);
 
 		// You won't believe this - but too many periods upsets apache it seems!
 		$this->message = preg_replace('~\.{100,}~', '...', $this->message);
@@ -138,35 +138,37 @@ class PreparseCode
 		$this->_validateLinks();
 
 		// Allow integration to do further processing on protected code block message
-		call_integration_hook('integrate_preparse_tokenized_code', array(&$this->message, $previewing, $this->code_blocks));
+		call_integration_hook('integrate_preparse_tokenized_code', [&$this->message, $previewing, $this->code_blocks]);
 
 		// Put it back together!
 		$this->message = $this->restoreCodeBlocks($this->message);
 
 		// Allow integration to do further processing
-		call_integration_hook('integrate_preparse_code', array(&$this->message, 0, $previewing));
+		call_integration_hook('integrate_preparse_code', [&$this->message, 0, $previewing]);
 
 		// Safe Spacing
 		if (!$previewing)
 		{
-			$this->message = strtr($this->message, array('  ' => '&nbsp; ', "\n" => '<br />', "\xC2\xA0" => '&nbsp;'));
+			$this->message = strtr($this->message, ['  ' => '&nbsp; ', "\n" => '<br />', "\xC2\xA0" => '&nbsp;']);
 		}
 		else
 		{
-			$this->message = strtr($this->message, array('  ' => '&nbsp; ', "\xC2\xA0" => '&nbsp;'));
+			$this->message = strtr($this->message, ['  ' => '&nbsp; ', "\xC2\xA0" => '&nbsp;']);
 		}
 
 		// Now we're going to do full scale table checking...
 		$this->_preparseTable();
 
 		// Quickly clean up things that will slow our parser (which are common in posted code.)
-		$message = strtr($this->message, array('[]' => '&#91;]', '[&#039;' => '&#91;&#039;'));
+		$message = strtr($this->message, ['[]' => '&#91;]', '[&#039;' => '&#91;&#039;']);
+
+		return null;
 	}
 
 	/**
 	 * Trim dangling quotes
 	 */
-	private function _trimTrailingQuotes()
+	private function _trimTrailingQuotes(): void
 	{
 		// Trim off trailing quotes - these often happen by accident.
 		while (substr($this->message, -7) === '[quote]')
@@ -185,7 +187,7 @@ class PreparseCode
 	 * Find all code blocks, work out whether we'd be parsing them,
 	 * then ensure they are all closed.
 	 */
-	private function _validateCodeBlocks()
+	private function _validateCodeBlocks(): void
 	{
 		$in_tag = false;
 		$had_tag = false;
@@ -241,7 +243,7 @@ class PreparseCode
 	/**
 	 * Find all icode blocks, ensure they are complete pairs and do not span lines
 	 */
-	private function _validateICodeBlocks()
+	private function _validateICodeBlocks(): void
 	{
 		$lines = explode("\n", $this->message);
 		foreach ($lines as $number => $line)
@@ -280,7 +282,7 @@ class PreparseCode
 	 * @param string $message
 	 * @return string
 	 */
-	public function tokenizeCodeBlocks($message, $html = false)
+	public function tokenizeCodeBlocks($message, $html = false): string
 	{
 		// Split up the message on the code start/end tags/
 		$patterns = $html
@@ -324,54 +326,54 @@ class PreparseCode
 	 * - Fix the img and url tags...
 	 * - Fixes links in message and returns nothing.
 	 */
-	private function _fixTags()
+	private function _fixTags(): void
 	{
 		global $modSettings;
 
 		// WARNING: Editing the below can cause large security holes in your forum.
 		// Edit only if you are sure you know what you are doing.
 
-		$fixArray = array(
+		$fixArray = [
 			// [img]http://...[/img] or [img width=1]http://...[/img]
-			array(
+			[
 				'tag' => 'img',
-				'protocols' => array('http', 'https'),
+				'protocols' => ['http', 'https'],
 				'embeddedUrl' => false,
 				'hasEqualSign' => false,
 				'hasExtra' => true,
-			),
+			],
 			// [url]http://...[/url]
-			array(
+			[
 				'tag' => 'url',
-				'protocols' => array('http', 'https'),
+				'protocols' => ['http', 'https'],
 				'embeddedUrl' => true,
 				'hasEqualSign' => false,
-			),
+			],
 			// [url=http://...]name[/url]
-			array(
+			[
 				'tag' => 'url',
-				'protocols' => array('http', 'https'),
+				'protocols' => ['http', 'https'],
 				'embeddedUrl' => true,
 				'hasEqualSign' => true,
-			),
+			],
 			// [iurl]http://...[/iurl]
-			array(
+			[
 				'tag' => 'iurl',
-				'protocols' => array('http', 'https'),
+				'protocols' => ['http', 'https'],
 				'embeddedUrl' => true,
 				'hasEqualSign' => false,
-			),
+			],
 			// [iurl=http://...]name[/iurl]
-			array(
+			[
 				'tag' => 'iurl',
-				'protocols' => array('http', 'https'),
+				'protocols' => ['http', 'https'],
 				'embeddedUrl' => true,
 				'hasEqualSign' => true,
-			),
-		);
+			],
+		];
 
 		// Integration may want to add to this array
-		call_integration_hook('integrate_fixtags', array(&$fixArray, &$this->message));
+		call_integration_hook('integrate_fixtags', [&$fixArray, &$this->message]);
 
 		// Fix each type of tag.
 		foreach ($fixArray as $param)
@@ -401,11 +403,11 @@ class PreparseCode
 	 * @param bool $hasEqualSign = false, whether it *is* set to something
 	 * @param bool $hasExtra = false - whether it can have extra cruft after the begin tag.
 	 */
-	private function _fixTag($myTag, $protocols, $embeddedUrl = false, $hasEqualSign = false, $hasExtra = false)
+	private function _fixTag($myTag, $protocols, $embeddedUrl = false, $hasEqualSign = false, $hasExtra = false): void
 	{
 		global $boardurl, $scripturl;
 
-		$replaces = array();
+		$replaces = [];
 
 		$domain_url = preg_match('~^([^:]+://[^/]+)~', $boardurl, $match) != 0 ? $match[1] : $boardurl . '/';
 
@@ -510,7 +512,7 @@ class PreparseCode
 	 *
 	 * - Will add the width/height attrib if needed, or update existing ones if they break the rules
 	 */
-	public function resizeBBCImages()
+	public function resizeBBCImages(): void
 	{
 		global $modSettings;
 
@@ -520,7 +522,7 @@ class PreparseCode
 		// Find all the img tags - with or without width and height.
 		preg_match_all('~\[img(\s+width=\d+)?(\s+height=\d+)?(\s+width=\d+)?](.+?)\[/img]~is', $this->message, $matches, PREG_PATTERN_ORDER);
 
-		$replaces = array();
+		$replaces = [];
 		foreach (array_keys($matches[0]) as $match)
 		{
 			// If the width was after the height, handle it.
@@ -586,7 +588,7 @@ class PreparseCode
 	/**
 	 * Replace /me with the users name, including inside footnotes
 	 */
-	private function _itsAllAbout()
+	private function _itsAllAbout(): void
 	{
 		$me_regex = '~(\A|\n)/me(?: |&nbsp;)([^\n]*)(?:\z)?~i';
 		$footnote_regex = '~(\[footnote\])/me(?: |&nbsp;)([^\n]*?)(\[\/footnote\])~i';
@@ -606,7 +608,7 @@ class PreparseCode
 	/**
 	 * Make sure lists have open and close tags
 	 */
-	private function _validateLists()
+	private function _validateLists(): void
 	{
 		$list_open = substr_count($this->message, '[list]') + substr_count($this->message, '[list ');
 		$list_close = substr_count($this->message, '[/list]');
@@ -625,9 +627,9 @@ class PreparseCode
 	/**
 	 * Repair a few *cough* common mistakes from user input and from wizzy cut/paste
 	 */
-	private function _fixMistakes()
+	private function _fixMistakes(): void
 	{
-		$mistake_fixes = array(
+		$mistake_fixes = [
 			// Find [table]s not followed by [tr].
 			'~\[table\](?![\s' . self::NBS . ']*\[tr\])~su' => '[table][tr]',
 			// Find [tr]s not followed by [td] or [th]
@@ -671,7 +673,7 @@ class PreparseCode
 			'~\[_(li|/li|td|tr|/tr)_\]~' => '[$1]',
 			// Images with no real url.
 			'~\[img\]https?://.{0,7}\[/img\]~' => '',
-		);
+		];
 
 		// Fix up some use of tables without [tr]s, etc. (it has to be done more than once to catch it all.)
 		for ($j = 0; $j < 3; $j++)
@@ -686,7 +688,7 @@ class PreparseCode
 	 * @param string $message
 	 * @return string
 	 */
-	public function restoreCodeBlocks($message)
+	public function restoreCodeBlocks($message): string
 	{
 		if (!empty($this->code_blocks))
 		{
@@ -706,19 +708,19 @@ class PreparseCode
 	 * driving the post author in to a furious rage
 	 *
 	 */
-	private function _preparseTable()
+	private function _preparseTable(): void
 	{
 		$table_check = $this->message;
 		$table_offset = 0;
-		$table_array = array();
+		$table_array = [];
 
 		// Define the allowable tags after a give tag
-		$table_order = array(
-			'table' => array('tr'),
-			'tr' => array('td', 'th'),
-			'td' => array('table'),
-			'th' => array(''),
-		);
+		$table_order = [
+			'table' => ['tr'],
+			'tr' => ['td', 'th'],
+			'td' => ['table'],
+			'th' => [''],
+		];
 
 		// Find all closing tags (/table /tr /td etc)
 		while (preg_match('~\[(/)*(table|tr|td|th)\]~', $table_check, $matches) === 1)
@@ -779,7 +781,7 @@ class PreparseCode
 	 * - Modifies if the user does not have the post_nofollow permission
 	 * - Checks if the domain is on the allowList and modifies as required
 	 */
-	private function _validateLinks()
+	private function _validateLinks(): void
 	{
 		$allowed = allowedTo('post_nofollow');
 		$regexFollow = '~\[url[^]]*(follow=([^] \s]+))[^]]*]~';
@@ -844,9 +846,9 @@ class PreparseCode
 	 *
 	 * @return string
 	 */
-	private function _preparsecode_nobbc_callback($matches)
+	private function _preparsecode_nobbc_callback($matches): string
 	{
-		return '[nobbc]' . strtr($matches[1], array('[' => '&#91;', ']' => '&#93;', ':' => '&#58;', '@' => '&#64;')) . '[/nobbc]';
+		return '[nobbc]' . strtr($matches[1], ['[' => '&#91;', ']' => '&#93;', ':' => '&#58;', '@' => '&#64;']) . '[/nobbc]';
 	}
 
 	/**
@@ -856,7 +858,7 @@ class PreparseCode
 	 *
 	 * @return string
 	 */
-	private function _preparsecode_font_callback($matches)
+	private function _preparsecode_font_callback($matches): string
 	{
 		$fonts = explode(',', $matches[1]);
 		$font = trim(un_htmlspecialchars($fonts[0]), ' "\'');
@@ -871,7 +873,7 @@ class PreparseCode
 	 *
 	 * @return string
 	 */
-	private function _preparsecode_lowertags_callback($matches)
+	private function _preparsecode_lowertags_callback($matches): string
 	{
 		return '[' . $matches[1] . strtolower($matches[2]) . $matches[3] . ']';
 	}
@@ -883,7 +885,7 @@ class PreparseCode
 	 *
 	 * @return string
 	 */
-	private function _fixTags_img_callback($matches)
+	private function _fixTags_img_callback($matches): string
 	{
 		return $matches[1] . preg_replace('~action(=|%3d)(?!dlattach)~i', 'action-', $matches[2]) . '[/img]';
 	}
@@ -896,7 +898,7 @@ class PreparseCode
 	 *
 	 * @return PreparseCode
 	 */
-	public static function instance($user)
+	public static function instance($user): PreparseCode
 	{
 		if (self::$instance === null)
 		{

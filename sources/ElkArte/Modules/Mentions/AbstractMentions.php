@@ -31,7 +31,7 @@ abstract class AbstractMentions extends AbstractModule
 	 * @param EventManager $eventsManager
 	 * @global $modSettings
 	 */
-	protected static function registerHooks($action, EventManager $eventsManager)
+	protected static function registerHooks($action, EventManager $eventsManager): void
 	{
 		global $modSettings;
 

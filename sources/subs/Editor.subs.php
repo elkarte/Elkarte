@@ -97,7 +97,7 @@ function create_control_richedit($editorOptions)
 		// Editor language file
 		if (!empty($txt['lang_locale']))
 		{
-			loadJavascriptFile($scripturl . '?action=jslocale;sa=sceditor', array('defer' => true), 'sceditor_language');
+			loadJavascriptFile($scripturl . '?action=jslocale;sa=sceditor', ['defer' => true], 'sceditor_language');
 		}
 
 		// Our not so concise shortcut line
@@ -123,9 +123,9 @@ function create_control_richedit($editorOptions)
 	];
 
 	// Allow addons an easy way to add plugins, initialization objects, etc to the editor control
-	call_integration_hook('integrate_editor_plugins', array($editorOptions['id']));
+	call_integration_hook('integrate_editor_plugins', [$editorOptions['id']]);
 
-	// Switch between default images and back... mostly in case you don't have an PersonalMessage template, but do have a Post template.
+	// Switch between default images and back... mostly in case you don't have a PersonalMessage template, but do have a Post template.
 	$use_defaults = isset($settings['use_default_images'], $settings['default_template']) && $settings['use_default_images'] === 'defaults';
 	if ($use_defaults)
 	{
@@ -398,7 +398,7 @@ function loadToolbarDefaults()
 	];
 
 	// Allow mods to add BBC buttons to the toolbar, actions are defined in the JS
-	call_integration_hook('integrate_bbc_buttons', array(&$bbc_tags));
+	call_integration_hook('integrate_bbc_buttons', [&$bbc_tags]);
 
 	return $bbc_tags;
 }

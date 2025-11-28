@@ -25,6 +25,7 @@ use ElkArte\Errors\Errors;
  *   - string $label      => Optional text string for link (Otherwise $txt[$index] will be used)
  *   - string $controller => Name of controller required for this area
  *   - string $function   => Method in controller to call when area is selected
+ *   - string $namespace  => Namespace to prefix to controller to allow autoloading
  *   - string $icon       => File name of an icon to use on the menu, if using a class set as transparent.png
  *   - string $class      => CSS class name to apply to the icon img, used to apply a sprite icon
  *   - string $custom_url => URL to call for this menu item
@@ -41,7 +42,7 @@ use ElkArte\Errors\Errors;
  */
 class MenuArea extends MenuItem
 {
-	/** @var string $select References another area to be highlighted while this one is active */
+	/** @var string $select References to another area to be highlighted while this one is active */
 	protected $select = '';
 
 	/** @var string $controller URL to use for this menu item. */
@@ -49,6 +50,9 @@ class MenuArea extends MenuItem
 
 	/** @var callable $function function to call when area is selected. */
 	protected $function;
+
+	/** @var string $namespace to use when area is selected. */
+	protected $namespace;
 
 	/** @var string $icon File name of an icon to use on the menu, if using the sprite class, set as transparent.png */
 	protected $icon = '';
@@ -80,7 +84,7 @@ class MenuArea extends MenuItem
 	/**
 	 * @return callable
 	 */
-	public function getFunction()
+	public function getFunction(): callable
 	{
 		return $this->function;
 	}
@@ -90,7 +94,7 @@ class MenuArea extends MenuItem
 	 *
 	 * @return MenuArea
 	 */
-	public function setFunction($function)
+	public function setFunction($function): MenuArea
 	{
 		$this->function = $function;
 
@@ -100,7 +104,7 @@ class MenuArea extends MenuItem
 	/**
 	 * @return string
 	 */
-	public function getIcon()
+	public function getIcon(): string
 	{
 		return $this->icon;
 	}
@@ -110,7 +114,7 @@ class MenuArea extends MenuItem
 	 *
 	 * @return MenuArea
 	 */
-	public function setIcon($icon)
+	public function setIcon($icon): MenuArea
 	{
 		$this->icon = $icon;
 
@@ -120,7 +124,7 @@ class MenuArea extends MenuItem
 	/**
 	 * @return string
 	 */
-	public function getController()
+	public function getController(): string
 	{
 		return $this->controller;
 	}
@@ -130,7 +134,7 @@ class MenuArea extends MenuItem
 	 *
 	 * @return MenuArea
 	 */
-	public function setController($controller)
+	public function setController($controller): MenuArea
 	{
 		$this->controller = $controller;
 
@@ -140,7 +144,23 @@ class MenuArea extends MenuItem
 	/**
 	 * @return string
 	 */
-	public function getSelect()
+	public function getNamespace(): string
+	{
+		return $this->namespace;
+	}
+
+	/**
+	 * @return string|null $namespace
+	 */
+	public function setNamespace($namespace): ?string
+	{
+		return $this->namespace = $namespace;
+	}
+
+	/**
+	 * @return string
+	 */
+	public function getSelect(): string
 	{
 		return $this->select;
 	}
@@ -150,7 +170,7 @@ class MenuArea extends MenuItem
 	 *
 	 * @return MenuArea
 	 */
-	public function setSelect($select)
+	public function setSelect($select): MenuArea
 	{
 		$this->select = $select;
 
@@ -160,7 +180,7 @@ class MenuArea extends MenuItem
 	/**
 	 * @return string
 	 */
-	public function getClass()
+	public function getClass(): string
 	{
 		return $this->class;
 	}
@@ -170,7 +190,7 @@ class MenuArea extends MenuItem
 	 *
 	 * @return MenuArea
 	 */
-	public function setClass($class)
+	public function setClass($class): MenuArea
 	{
 		$this->class = $class;
 
@@ -184,7 +204,7 @@ class MenuArea extends MenuItem
 	 *
 	 * @return MenuItem
 	 */
-	public function setCustomUrl($url)
+	public function setCustomUrl($url): MenuItem
 	{
 		$this->customUrl = $url;
 
@@ -194,7 +214,7 @@ class MenuArea extends MenuItem
 	/**
 	 * @return bool
 	 */
-	public function isHidden()
+	public function isHidden(): bool
 	{
 		return $this->hidden;
 	}
@@ -204,9 +224,9 @@ class MenuArea extends MenuItem
 	 *
 	 * @return MenuArea
 	 */
-	public function setHidden($hidden)
+	public function setHidden($hidden): MenuArea
 	{
-		$this->hidden = $hidden;
+		$this->hidden = (bool) $hidden;
 
 		return $this;
 	}
@@ -214,7 +234,7 @@ class MenuArea extends MenuItem
 	/**
 	 * @return bool
 	 */
-	public function isPassword()
+	public function isPassword(): bool
 	{
 		return $this->password;
 	}
@@ -224,9 +244,9 @@ class MenuArea extends MenuItem
 	 *
 	 * @return MenuArea
 	 */
-	public function setPassword($password)
+	public function setPassword($password): MenuArea
 	{
-		$this->password = $password;
+		$this->password = (bool) $password;
 
 		return $this;
 	}
@@ -234,9 +254,9 @@ class MenuArea extends MenuItem
 	/**
 	 * Converts an object and any branches to an array, recursive.
 	 *
-	 * @param mixed $obj
+	 * @param MenuArea $obj
 	 *
-	 * @return array
+	 * @return array|MenuArea
 	 */
 	public function toArray($obj)
 	{
@@ -253,7 +273,7 @@ class MenuArea extends MenuItem
 	 *
 	 * @return array The array of subsections
 	 */
-	public function getSubsections()
+	public function getSubsections(): array
 	{
 		return $this->subsections;
 	}
@@ -263,7 +283,7 @@ class MenuArea extends MenuItem
 	 *
 	 * @return string The token for this instance
 	 */
-	public function getToken()
+	public function getToken(): string
 	{
 		return $this->token;
 	}
@@ -275,7 +295,7 @@ class MenuArea extends MenuItem
 	 *
 	 * @return MenuArea
 	 */
-	public function setToken($token)
+	public function setToken($token): MenuArea
 	{
 		$this->token = $token;
 
@@ -287,7 +307,7 @@ class MenuArea extends MenuItem
 	 *
 	 * @return string The token type.
 	 */
-	public function getTokenType()
+	public function getTokenType(): string
 	{
 		return $this->tokenType;
 	}
@@ -299,7 +319,7 @@ class MenuArea extends MenuItem
 	 *
 	 * @return MenuArea
 	 */
-	public function setTokenType($tokenType)
+	public function setTokenType($tokenType): MenuArea
 	{
 		$this->tokenType = $tokenType;
 
@@ -311,7 +331,7 @@ class MenuArea extends MenuItem
 	 *
 	 * @return string The value of sc
 	 */
-	public function getSc()
+	public function getSc(): string
 	{
 		return $this->sc;
 	}
@@ -323,7 +343,7 @@ class MenuArea extends MenuItem
 	 *
 	 * @return MenuArea
 	 */
-	public function setSc($sc)
+	public function setSc($sc): MenuArea
 	{
 		$this->sc = $sc;
 
@@ -338,7 +358,7 @@ class MenuArea extends MenuItem
 	 * @return MenuArea
 	 * @throws \Exception
 	 */
-	protected function buildMoreFromArray($arr)
+	protected function buildMoreFromArray($arr): MenuArea
 	{
 		$this->url = $this->customUrl ?: $this->url;
 
@@ -357,12 +377,12 @@ class MenuArea extends MenuItem
 	}
 
 	/**
-	 * Right now this is here just for debug.  Do any addons create keys that we have not accounted for
+	 * This is here just for debugging.  Do any addons create keys that we have not accounted for
 	 * in the class?  Should we simply just set anything that is not a defined var?
 	 *
 	 * @param array $arr
 	 */
-	private function anythingMissed($arr)
+	private function anythingMissed($arr): void
 	{
 		$missing = array_diff_key($arr, get_object_vars($this));
 		foreach ($missing as $key => $value)
@@ -383,7 +403,7 @@ class MenuArea extends MenuItem
 	 *
 	 * @return MenuArea Returns the current instance of MenuArea
 	 */
-	public function addSubsection($id, $subsection)
+	public function addSubsection($id, $subsection): MenuArea
 	{
 		$this->subsections[$id] = $subsection;
 

@@ -162,9 +162,9 @@ const itemCodes = ["*:disc", "@:disc", "+:square", "x:square", "#:decimal", "0:d
 			}
 		},
 		/**
-		 * When you don't have a DOM node to check (non rendering tag), this will
+		 * When you don't have a DOM node to check (non-rendering tag), this will
 		 * check if the cursor is inside the supplied tag.  Used for footnote
-		 * and spoiler which don't and should not have wizzy rendering for best UE
+		 * and spoiler which don't and should not have a wizzy rendering for best UE
 		 *
 		 * @param tag
 		 * @returns {number}
@@ -224,7 +224,7 @@ const itemCodes = ["*:disc", "@:disc", "+:square", "x:square", "#:decimal", "0:d
 				tag = tag.parentNode;
 			}
 
-			// If we found one, we are in it and the user has requested to end this one
+			// If we found one, we are in it, and the user has requested to end this one
 			if (tag)
 			{
 				// Place the markers at the end of the found node
@@ -253,7 +253,7 @@ const itemCodes = ["*:disc", "@:disc", "+:square", "x:square", "#:decimal", "0:d
 		},
 		/**
 		 * If they selected any text in the node, assumes they want to remove that
-		 * formatting defined by the parent.  If nothing is selected simply returns
+		 * formatting defined by the parent. If nothing is selected, simply returns
 		 *
 		 * @param tag name of tag/node to remove
 		 * @returns {boolean}
@@ -289,7 +289,7 @@ const itemCodes = ["*:disc", "@:disc", "+:square", "x:square", "#:decimal", "0:d
 		},
 		/**
 		 * Determine the caret position inside sceditor's iframe for dropdown
-		 * positioning of select box
+		 * positioning of the select box
 		 *
 		 * What it does:
 		 * - Finds a supplied tag (@ or :) and adds a placeholder before it
@@ -501,7 +501,7 @@ sceditor.command
 		tooltip: 'Preformatted Text'
 	})
 	/*
-	 * ElkArte modifications to existing commands so they display as we like
+	 * ElkArte modifications to existing commands, so they display as we like
 	 *
 	 * Makes changes to the text inserted for Bulletlist, OrderedList and Table
 	 */
@@ -545,10 +545,10 @@ sceditor.command
 	});
 
 /**
- * ElkArte custom bbc tags added to provide for the existing user experience
+ * ElkArte custom BBC tags added to provide for the existing user experience
  *
- * These command define what happens to tags as we toggle from and to wizzy mode
- * It converts html back to bbc or bbc back to html.  Read the sceditor docs for more
+ * These commands define what happens to tags as we toggle from and to wizzy mode
+ * It converts HTML back to BBC or BBC back to HTML.  Read the sceditor docs for more
  *
  * Adds / modifies BBC codes List, Tt, Pre, Quote, Code, Img
  */
@@ -915,7 +915,7 @@ sceditor.formats.bbcode
 					{
 						if (typeof attrs[name] !== 'undefined')
 						{
-							attribs += ' ' + name + '="' + scediotr.escapeEntities(attrs[name]) + '"';
+							attribs += ' ' + name + '="' + sceditor.escapeEntities(attrs[name]) + '"';
 						}
 					});
 				};

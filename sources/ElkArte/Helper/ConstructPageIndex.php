@@ -38,7 +38,7 @@ use ElkArte\AbstractModel;
  * @param int $max_value The total number of items you are paginating for.
  * @param int $num_per_page The number of items to be displayed on a given page.
  * @param bool $flexible_start = false Use "url.page" instead of "url;start=page"
- * @param mixed[] $show associative array of option => boolean paris
+ * @param array $show associative array of option => boolean paris
  *
  * @return string
  * @example $pageindex = constructPageIndex({scripturl} . '?board=' . $board, $_REQUEST['start'], $num_messages,
@@ -109,7 +109,7 @@ class ConstructPageIndex extends AbstractModel
 	/**
 	 * Does what it says, creates the handy pageindex navigation bar
 	 */
-	public function createPageIndex()
+	public function createPageIndex(): void
 	{
 		global $context;
 
@@ -140,7 +140,7 @@ class ConstructPageIndex extends AbstractModel
 	 *
 	 * @return string
 	 */
-	public function getPageIndex()
+	public function getPageIndex(): string
 	{
 		return $this->pageindex;
 	}
@@ -150,7 +150,7 @@ class ConstructPageIndex extends AbstractModel
 	 *
 	 * @return int
 	 */
-	public function setStart()
+	public function setStart(): int
 	{
 		// Save whether $start was less than 0 or not.
 		$this->start_invalid = $this->start < 0;
@@ -180,13 +180,13 @@ class ConstructPageIndex extends AbstractModel
 	 * will replace {base_link} and {scripturl} as needed.
 	 * Uses ['page_index_template']['base_link'] template
 	 */
-	private function setBaseLink()
+	private function setBaseLink(): void
 	{
 		global $scripturl, $settings;
 
 		$base_link = str_replace('{base_link}', ($this->flexible_start
 			? $this->base_url
-			: strtr($this->base_url, array('%' => '%%')) . ';start=%1$d'), $settings['page_index_template']['base_link']);
+			: strtr($this->base_url, ['%' => '%%']) . ';start=%1$d'), $settings['page_index_template']['base_link']);
 
 		$this->base_link = str_replace('{scripturl}', $scripturl, $base_link);
 	}
@@ -196,7 +196,7 @@ class ConstructPageIndex extends AbstractModel
 	 *
 	 * @return string
 	 */
-	private function noLinks()
+	private function noLinks(): string
 	{
 		global $settings;
 
@@ -208,7 +208,7 @@ class ConstructPageIndex extends AbstractModel
 	 *
 	 * @return string
 	 */
-	private function simplelLinks()
+	private function simplelLinks(): string
 	{
 		$pageindex = $this->setLeftNavigation();
 		$pageindex .= $this->setAll();
@@ -222,7 +222,7 @@ class ConstructPageIndex extends AbstractModel
 	 *
 	 * @return string
 	 */
-	private function setLeftNavigation()
+	private function setLeftNavigation(): string
 	{
 		global $settings, $txt;
 
@@ -240,7 +240,7 @@ class ConstructPageIndex extends AbstractModel
 	 *
 	 * @return string
 	 */
-	private function setAll()
+	private function setAll(): string
 	{
 		global $settings;
 
@@ -265,7 +265,7 @@ class ConstructPageIndex extends AbstractModel
 	 *
 	 * @return string
 	 */
-	private function setRightNavigation()
+	private function setRightNavigation(): string
 	{
 		global $settings, $txt;
 
@@ -293,7 +293,7 @@ class ConstructPageIndex extends AbstractModel
 	 *
 	 * @return string
 	 */
-	private function compactLinks()
+	private function compactLinks(): string
 	{
 		$pageindex = '';
 
@@ -348,7 +348,7 @@ class ConstructPageIndex extends AbstractModel
 	 *
 	 * @return string
 	 */
-	private function compactPreviousNavigation()
+	private function compactPreviousNavigation(): string
 	{
 		global $settings, $txt;
 
@@ -428,7 +428,7 @@ class ConstructPageIndex extends AbstractModel
 	 * @param $PageContiguous
 	 * @return string
 	 */
-	private function compactBeforeCurrent($PageContiguous)
+	private function compactBeforeCurrent($PageContiguous): string
 	{
 		$pageindex = '';
 		for ($nCont = $PageContiguous; $nCont >= 1; $nCont--)
@@ -449,7 +449,7 @@ class ConstructPageIndex extends AbstractModel
 	 *
 	 * @return string
 	 */
-	private function compactCurrent()
+	private function compactCurrent(): string
 	{
 		global $settings;
 
@@ -467,7 +467,7 @@ class ConstructPageIndex extends AbstractModel
 	 * @param $PageContiguous
 	 * @return string
 	 */
-	private function compactAfterCurrent($PageContiguous)
+	private function compactAfterCurrent($PageContiguous): string
 	{
 		$pageindex = '';
 		for ($nCont = 1; $nCont <= $PageContiguous; $nCont++)
@@ -488,7 +488,7 @@ class ConstructPageIndex extends AbstractModel
 	 *
 	 * @return string
 	 */
-	private function compactNextNavigation()
+	private function compactNextNavigation(): string
 	{
 		global $settings, $txt;
 

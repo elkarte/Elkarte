@@ -63,9 +63,9 @@ class Table extends AbstractTable
 
 			$this->_db->query('',
 				$table_query,
-				array(
+				[
 					'security_override' => true,
-				)
+				]
 			);
 
 			$this->_db->transaction('commit');
@@ -79,9 +79,9 @@ class Table extends AbstractTable
 			$sequence_query = 'DROP SEQUENCE IF EXISTS ' . $table_name . '_seq';
 			$this->_db->query('',
 				$sequence_query,
-				array(
+				[
 					'security_override' => true,
-				)
+				]
 			);
 
 			return true;
@@ -102,12 +102,12 @@ class Table extends AbstractTable
 	/**
 	 * {@inheritDoc}
 	 */
-	public function add_column($table_name, $column_info, $parameters = array(), $if_exists = 'update')
+	public function add_column($table_name, $column_info, $parameters = [], $if_exists = 'update')
 	{
 		$table_name = str_replace('{db_prefix}', $this->_db_prefix, $table_name);
 
 		// Log that we will want to uninstall this!
-		$this->_package_log[] = array('remove_column', $table_name, $column_info['name']);
+		$this->_package_log[] = ['remove_column', $table_name, $column_info['name']];
 
 		// Does it exist - if so don't add it again!
 		if ($this->_get_column_info($table_name, $column_info['name']))
@@ -147,7 +147,7 @@ class Table extends AbstractTable
 	/**
 	 * {@inheritDoc}
 	 */
-	public function change_column($table_name, $old_column, $column_info, $parameters = array())
+	public function change_column($table_name, $old_column, $column_info, $parameters = [])
 	{
 		$table_name = str_replace('{db_prefix}', $this->_db_prefix, $table_name);
 
@@ -188,9 +188,9 @@ class Table extends AbstractTable
 					UPDATE ' . $table_name . '
 					SET ' . $column_info['name'] . " = '" . $setTo . '\'
 					WHERE ' . $column_info['name'] . ' IS NULL',
-					array(
+					[
 						'security_override' => true,
-					)
+					]
 				);
 			}
 
@@ -216,9 +216,9 @@ class Table extends AbstractTable
 			$this->_db->query('', '
 				UPDATE ' . $table_name . '
 				SET ' . $column_info['name'] . '_tempxx = CAST(' . $column_info['name'] . ' AS ' . $type . ')',
-				array(
+				[
 					'security_override' => true,
-				)
+				]
 			);
 			$this->_alter_table($table_name, '
 				DROP COLUMN ' . $column_info['name']);
@@ -238,9 +238,9 @@ class Table extends AbstractTable
 					ALTER COLUMN ' . $column_info['name'] . " SET DEFAULT '0'");
 				$this->_db->query('', '
 					DROP SEQUENCE ' . $table_name . '_seq',
-					array(
+					[
 						'security_override' => true,
-					)
+					]
 				);
 			}
 			// Otherwise add it!
@@ -248,9 +248,9 @@ class Table extends AbstractTable
 			{
 				$this->_db->query('', '
 					CREATE SEQUENCE ' . $table_name . '_seq',
-					array(
+					[
 						'security_override' => true,
-					)
+					]
 				);
 				$this->_alter_table($table_name, '
 					ALTER COLUMN ' . $column_info['name'] . " SET DEFAULT nextval('" . $table_name . "_seq')");
@@ -271,7 +271,7 @@ class Table extends AbstractTable
 		// Generic => Specific.
 		if (!$reverse)
 		{
-			$types = array(
+			$types = [
 				'varchar' => 'character varying',
 				'char' => 'character',
 				'mediumint' => 'int',
@@ -279,15 +279,15 @@ class Table extends AbstractTable
 				'tinytext' => 'character varying',
 				'mediumtext' => 'text',
 				'largetext' => 'text',
-			);
+			];
 		}
 		else
 		{
-			$types = array(
+			$types = [
 				'character varying' => 'varchar',
 				'character' => 'char',
 				'integer' => 'int',
-			);
+			];
 		}
 
 		// Got it? Change it!
@@ -313,7 +313,7 @@ class Table extends AbstractTable
 	/**
 	 * {@inheritDoc}
 	 */
-	public function remove_column($table_name, $column_name, $parameters = array())
+	public function remove_column($table_name, $column_name, $parameters = [])
 	{
 		$table_name = str_replace('{db_prefix}', $this->_db_prefix, $table_name);
 
@@ -326,9 +326,9 @@ class Table extends AbstractTable
 			{
 				$this->_db->query('',
 					'DROP SEQUENCE ' . $table_name . '_seq',
-					array(
+					[
 						'security_override' => true,
-					)
+					]
 				);
 			}
 
@@ -345,7 +345,7 @@ class Table extends AbstractTable
 	/**
 	 * {@inheritDoc}
 	 */
-	public function add_index($table_name, $index_info, $parameters = array(), $if_exists = 'update')
+	public function add_index($table_name, $index_info, $parameters = [], $if_exists = 'update')
 	{
 		$table_name = str_replace('{db_prefix}', $this->_db_prefix, $table_name);
 
@@ -385,7 +385,7 @@ class Table extends AbstractTable
 		}
 
 		// Log that we are going to want to remove this!
-		$this->_package_log[] = array('remove_index', $table_name, $index_info['name']);
+		$this->_package_log[] = ['remove_index', $table_name, $index_info['name']];
 
 		// Let's get all our indexes.
 		$indexes = $this->list_indexes($table_name, true);
@@ -414,9 +414,9 @@ class Table extends AbstractTable
 		{
 			$this->_db->query('', '
 				CREATE ' . (isset($index_info['type']) && $index_info['type'] === 'unique' ? 'UNIQUE' : '') . ' INDEX ' . $index_info['name'] . ' ON ' . $table_name . ' (' . $columns . ')',
-				array(
+				[
 					'security_override' => true,
-				)
+				]
 			);
 		}
 
@@ -426,7 +426,7 @@ class Table extends AbstractTable
 	/**
 	 * {@inheritDoc}
 	 */
-	public function list_indexes($table_name, $detail = false, $parameters = array())
+	public function list_indexes($table_name, $detail = false, $parameters = [])
 	{
 		$table_name = str_replace('{db_prefix}', $this->_db_prefix, $table_name);
 
@@ -440,11 +440,11 @@ class Table extends AbstractTable
 			WHERE c.relname = \'' . $table_name . '\'
 				AND c.oid = i.indrelid
 				AND i.indexrelid = c2.oid',
-			array(
+			[
 				'security_override' => true,
-			)
+			]
 		);
-		$indexes = array();
+		$indexes = [];
 		while (($row = $result->fetch_assoc()))
 		{
 			// Try get the columns that make it up.
@@ -481,11 +481,11 @@ class Table extends AbstractTable
 			}
 			else
 			{
-				$indexes[$row['name']] = array(
+				$indexes[$row['name']] = [
 					'name' => $row['name'],
 					'type' => $row['is_primary'] ? 'primary' : ($row['is_unique'] ? 'unique' : 'index'),
 					'columns' => $columns,
-				);
+				];
 			}
 		}
 
@@ -497,7 +497,7 @@ class Table extends AbstractTable
 	/**
 	 * {@inheritDoc}
 	 */
-	public function remove_index($table_name, $index_name, $parameters = array())
+	public function remove_index($table_name, $index_name, $parameters = [])
 	{
 		$table_name = str_replace('{db_prefix}', $this->_db_prefix, $table_name);
 
@@ -525,9 +525,9 @@ class Table extends AbstractTable
 				// Drop the bugger...
 				$this->_db->query('', '
 					DROP INDEX ' . $index_name,
-					array(
+					[
 						'security_override' => true,
-					)
+					]
 				);
 
 				return true;
@@ -545,17 +545,17 @@ class Table extends AbstractTable
 	{
 		$table_name = str_replace('{db_prefix}', $this->_db_prefix, $table_name);
 
-		return array(
+		return [
 			'name' => $table_name,
 			'columns' => $this->list_columns($table_name, true),
 			'indexes' => $this->list_indexes($table_name, true),
-		);
+		];
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
-	public function list_columns($table_name, $detail = false, $parameters = array())
+	public function list_columns($table_name, $detail = false, $parameters = [])
 	{
 		$table_name = str_replace('{db_prefix}', $this->_db_prefix, $table_name);
 
@@ -565,11 +565,11 @@ class Table extends AbstractTable
 			FROM information_schema.columns
 			WHERE table_name = \'' . $table_name . '\'
 			ORDER BY ordinal_position',
-			array(
+			[
 				'security_override' => true,
-			)
+			]
 		);
-		$columns = array();
+		$columns = [];
 		while (($row = $result->fetch_assoc()))
 		{
 			if (!$detail)
@@ -598,14 +598,14 @@ class Table extends AbstractTable
 				// Make the type generic.
 				[$type, $size] = $this->calculate_type($row['data_type'], $row['character_maximum_length'], true);
 
-				$columns[$row['column_name']] = array(
+				$columns[$row['column_name']] = [
 					'name' => $row['column_name'],
 					'null' => (bool) $row['is_nullable'],
 					'default' => $default,
 					'type' => $type,
 					'size' => $size,
 					'auto' => $auto,
-				);
+				];
 			}
 		}
 
@@ -623,9 +623,9 @@ class Table extends AbstractTable
 
 		$request = $this->_db->fetchQuery('
 			VACUUM ANALYZE {raw:table}',
-			array(
+			[
 				'table' => $table,
-			)
+			]
 		);
 		if (!$request)
 		{
@@ -659,9 +659,9 @@ class Table extends AbstractTable
 		foreach ($this->_indexes as $query)
 		{
 			$this->_db->query('', $query,
-				array(
+				[
 					'security_override' => true,
-				)
+				]
 			);
 		}
 	}
@@ -680,7 +680,7 @@ class Table extends AbstractTable
 	protected function _create_query_indexes($indexes, $table_name)
 	{
 		// Loop through the indexes next...
-		$this->_indexes = array();
+		$this->_indexes = [];
 		$table_query = '';
 		foreach ($indexes as $index)
 		{
@@ -733,16 +733,16 @@ class Table extends AbstractTable
 	 * @return string
 	 * @throws Exception
 	 */
-	protected function _db_create_query_column($column, $table_name)
+	protected function _db_create_query_column($column, $table_name): string
 	{
 		// If we have an auto increment do it!
 		if (!empty($column['auto']))
 		{
 			$this->_db->query('', '
 				CREATE SEQUENCE ' . $table_name . '_seq',
-				array(
+				[
 					'security_override' => true,
-				)
+				]
 			);
 			$default = "default nextval('" . $table_name . "_seq')";
 		}

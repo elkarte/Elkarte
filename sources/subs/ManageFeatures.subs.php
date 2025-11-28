@@ -28,7 +28,7 @@ function getSignatureFromMembers($start_member)
 {
 	$db = database();
 
-	$members = array();
+	$members = [];
 
 	$db->fetchQuery('
 		SELECT 
@@ -37,9 +37,9 @@ function getSignatureFromMembers($start_member)
 		WHERE id_member BETWEEN ' . $start_member . ' AND ' . $start_member . ' + 49
 			AND id_group != {int:admin_group}
 			AND FIND_IN_SET({int:admin_group}, additional_groups) = 0',
-		array(
+		[
 			'admin_group' => 11,
-		)
+		]
 	)->fetch_callback(
 		function ($row) use (&$members) {
 			$members[$row['id_member']]['id_member'] = $row['id_member'];
@@ -59,7 +59,7 @@ function getSignatureFromMembers($start_member)
 function updateSignature($id_member, $signature)
 {
 	require_once(SUBSDIR . '/Members.subs.php');
-	updateMemberData($id_member, array('signature' => $signature));
+	updateMemberData($id_member, ['signature' => $signature]);
 }
 
 /**
@@ -81,7 +81,7 @@ function updateAllSignatures($applied_sigs)
 	// Load all the signature settings.
 	list ($sig_limits, $sig_bbc) = explode(':', $modSettings['signature_settings']);
 	$sig_limits = explode(',', $sig_limits);
-	$disabledTags = !empty($sig_bbc) ? explode(',', $sig_bbc) : array();
+	$disabledTags = !empty($sig_bbc) ? explode(',', $sig_bbc) : [];
 
 	// @todo temporary since it does not work, and seriously why would you do this?
 	$disabledTags[] = 'footnote';
@@ -89,7 +89,7 @@ function updateAllSignatures($applied_sigs)
 	while (!$done)
 	{
 		// No changed signatures yet
-		$changes = array();
+		$changes = [];
 
 		// Get a group of member signatures, 50 at a clip
 		$update_sigs = getSignatureFromMembers($applied_sigs);
@@ -102,7 +102,7 @@ function updateAllSignatures($applied_sigs)
 		foreach ($update_sigs as $row)
 		{
 			// Apply all the rules we can realistically do.
-			$sig = strtr($row['signature'], array('<br />' => "\n"));
+			$sig = strtr($row['signature'], ['<br />' => "\n"]);
 
 			// Max characters...
 			if (!empty($sig_limits[1]))
@@ -122,7 +122,7 @@ function updateAllSignatures($applied_sigs)
 						$count++;
 						if ($count >= $sig_limits[2])
 						{
-							$sig = substr($sig, 0, $i) . strtr(substr($sig, $i), array("\n" => ' '));
+							$sig = substr($sig, 0, $i) . strtr(substr($sig, $i), ["\n" => ' ']);
 						}
 					}
 				}
@@ -132,7 +132,7 @@ function updateAllSignatures($applied_sigs)
 			if (!empty($sig_limits[7]) && preg_match_all('~\[size=([\d\.]+)?(px|pt|em|x-large|larger)?~i', $sig, $matches) !== false && isset($matches[2]))
 			{
 				// Same as parse_bbc
-				$sizes = array(1 => 0.7, 2 => 1.0, 3 => 1.35, 4 => 1.45, 5 => 2.0, 6 => 2.65, 7 => 3.95);
+				$sizes = [1 => 0.7, 2 => 1.0, 3 => 1.35, 4 => 1.45, 5 => 2.0, 6 => 2.65, 7 => 3.95];
 
 				foreach ($matches[1] as $ind => $size)
 				{
@@ -173,7 +173,7 @@ function updateAllSignatures($applied_sigs)
 			// Stupid images - this is stupidly, stupidly challenging.
 			if ((!empty($sig_limits[3]) || !empty($sig_limits[5]) || !empty($sig_limits[6])))
 			{
-				$replaces = array();
+				$replaces = [];
 				$img_count = 0;
 
 				// Get all BBC tags...
@@ -201,7 +201,7 @@ function updateAllSignatures($applied_sigs)
 				// Try to find all the images!
 				if (!empty($matches))
 				{
-					$image_count_holder = array();
+					$image_count_holder = [];
 					foreach ($matches[0] as $key => $image)
 					{
 						$width = -1;
@@ -325,8 +325,8 @@ function updateAllSignatures($applied_sigs)
 				$sig = preg_replace('~\[/(?:' . implode('|', $disabledTags) . ')\]~i', '', $sig);
 			}
 
-			$sig = strtr($sig, array("\n" => '<br />'));
-			call_integration_hook('integrate_apply_signature_settings', array(&$sig, $sig_limits, $disabledTags));
+			$sig = strtr($sig, ["\n" => '<br />']);
+			call_integration_hook('integrate_apply_signature_settings', [&$sig, $sig_limits, $disabledTags]);
 			if ($sig != $row['signature'])
 			{
 				$changes[$row['id_member']] = $sig;
@@ -367,24 +367,24 @@ function list_getProfileFields($start, $items_per_page, $sort, $standardFields)
 
 	$db = database();
 
-	$list = array();
+	$list = [];
 
 	if ($standardFields)
 	{
-		$standard_fields = array('website', 'posts', 'warning_status', 'date_registered', 'action');
-		$fields_no_registration = array('posts', 'warning_status', 'date_registered', 'action');
-		$disabled_fields = isset($modSettings['disabled_profile_fields']) ? explode(',', $modSettings['disabled_profile_fields']) : array();
-		$registration_fields = isset($modSettings['registration_fields']) ? explode(',', $modSettings['registration_fields']) : array();
+		$standard_fields = ['website', 'posts', 'warning_status', 'date_registered', 'action'];
+		$fields_no_registration = ['posts', 'warning_status', 'date_registered', 'action'];
+		$disabled_fields = isset($modSettings['disabled_profile_fields']) ? explode(',', $modSettings['disabled_profile_fields']) : [];
+		$registration_fields = isset($modSettings['registration_fields']) ? explode(',', $modSettings['registration_fields']) : [];
 
 		foreach ($standard_fields as $field)
 		{
-			$list[] = array(
+			$list[] = [
 				'id' => $field,
 				'label' => $txt['standard_profile_field_' . $field] ?? ($txt[$field] ?? $field),
 				'disabled' => in_array($field, $disabled_fields),
 				'on_register' => in_array($field, $registration_fields) && !in_array($field, $fields_no_registration),
 				'can_show_register' => !in_array($field, $fields_no_registration),
-			);
+			];
 		}
 	}
 	else
@@ -396,11 +396,11 @@ function list_getProfileFields($start, $items_per_page, $sort, $standardFields)
 			FROM {db_prefix}custom_fields
 			ORDER BY {raw:sort}, vieworder ASC
 			LIMIT {int:start}, {int:items_per_page}',
-			array(
+			[
 				'sort' => $sort,
 				'start' => $start,
 				'items_per_page' => $items_per_page,
-			)
+			]
 		)->fetch_callback(
 			function ($row) use (&$list) {
 				$list[$row['id_field']] = $row;
@@ -422,7 +422,7 @@ function list_getProfileFieldSize()
 		SELECT 
 			COUNT(*)
 		FROM {db_prefix}custom_fields',
-		array()
+		[]
 	);
 	list ($numProfileFields) = $request->fetch_row();
 	$request->free_result();
@@ -440,7 +440,7 @@ function getProfileField($id_field)
 {
 	$db = database();
 
-	$field = array();
+	$field = [];
 
 	// The fully-qualified name for rows is here because it's a reserved word in Mariadb 10.2.4+ and quoting would be different for MySQL/Mariadb and PSQL
 	$db->fetchQuery('
@@ -450,12 +450,12 @@ function getProfileField($id_field)
 			bbc, mask, enclose, placement, vieworder, {db_prefix}custom_fields.rows, cols
 		FROM {db_prefix}custom_fields
 		WHERE id_field = {int:current_field}',
-		array(
+		[
 			'current_field' => $id_field,
-		)
+		]
 	)->fetch_callback(
 		function ($row) use (&$field) {
-			$field = array(
+			$field = [
 				'name' => $row['field_name'],
 				'desc' => $row['field_desc'],
 				'colname' => $row['col_name'],
@@ -472,7 +472,7 @@ function getProfileField($id_field)
 				'default_select' => $row['field_type'] === 'select' || $row['field_type'] === 'radio' ? $row['default_value'] : '',
 				'show_nodefault' => $row['field_type'] === 'select' || $row['field_type'] === 'radio',
 				'default_value' => $row['default_value'],
-				'options' => strlen($row['field_options']) > 1 ? explode(',', $row['field_options']) : array('', '', ''),
+				'options' => strlen($row['field_options']) > 1 ? explode(',', $row['field_options']) : ['', '', ''],
 				'active' => $row['active'],
 				'private' => $row['private'],
 				'can_search' => $row['can_search'],
@@ -480,7 +480,7 @@ function getProfileField($id_field)
 				'regex' => strpos($row['mask'], 'regex') === 0 ? substr($row['mask'], 5) : '',
 				'enclose' => $row['enclose'],
 				'placement' => $row['placement'],
-			);
+			];
 		}
 	);
 
@@ -507,9 +507,9 @@ function ensureUniqueProfileField($colname, $initial_colname, $unique = false)
 				id_field
 			FROM {db_prefix}custom_fields
 			WHERE col_name = {string:current_column}',
-			array(
+			[
 				'current_column' => $colname,
-			)
+			]
 		);
 		if ($request->num_rows() === 0)
 		{
@@ -529,7 +529,7 @@ function ensureUniqueProfileField($colname, $initial_colname, $unique = false)
  * Update the profile fields name
  *
  * @param string $key
- * @param mixed[] $newOptions
+ * @param array $newOptions
  * @param string $name
  * @param string $option
  */
@@ -543,12 +543,12 @@ function updateRenamedProfileField($key, $newOptions, $name, $option)
 		WHERE variable = {string:current_column}
 			AND value = {string:old_value}
 			AND id_member > {int:no_member}',
-		array(
+		[
 			'no_member' => 0,
 			'new_value' => $newOptions[$key],
 			'current_column' => $name,
 			'old_value' => $option,
-		)
+		]
 	);
 }
 
@@ -565,16 +565,16 @@ function updateRenamedProfileStatus($enabled)
 	$db->query('', '
 		UPDATE {db_prefix}custom_fields
 		SET active = CASE WHEN id_field IN ({array_int:id_cust_enable}) THEN 1 ELSE 0 END',
-		array(
+		[
 			'id_cust_enable' => $enabled,
-		)
+		]
 	);
 }
 
 /**
  * Update the profile field
  *
- * @param mixed[] $field_data
+ * @param array $field_data
  */
 function updateProfileField($field_data)
 {
@@ -594,7 +594,7 @@ function updateProfileField($field_data)
 			enclose = {string:enclose}, placement = {int:placement}, {db_prefix}custom_fields.rows = {int:rows},
 			cols = {int:cols}
 		WHERE id_field = {int:current_field}',
-		array(
+		[
 			'field_length' => $field_data['field_length'],
 			'show_reg' => $field_data['show_reg'],
 			'show_display' => $field_data['show_display'],
@@ -615,7 +615,7 @@ function updateProfileField($field_data)
 			'placement' => $field_data['placement'],
 			'rows' => $field_data['rows'],
 			'cols' => $field_data['cols'],
-		)
+		]
 	);
 }
 
@@ -632,7 +632,7 @@ function updateProfileFieldOrder($replace)
 	$db->query('', '
 		UPDATE {db_prefix}custom_fields
 		SET vieworder = CASE ' . $replace . ' ELSE 0 END',
-		array('')
+		['']
 	);
 }
 
@@ -651,18 +651,18 @@ function deleteOldProfileFieldSelects($newOptions, $fieldname)
 		WHERE variable = {string:current_column}
 			AND value NOT IN ({array_string:new_option_values})
 			AND id_member > {int:no_member}',
-		array(
+		[
 			'no_member' => 0,
 			'new_option_values' => $newOptions,
 			'current_column' => $fieldname,
-		)
+		]
 	);
 }
 
 /**
  * Used to add a new custom profile field
  *
- * @param mixed[] $field
+ * @param array $field
  */
 function addProfileField($field)
 {
@@ -670,23 +670,23 @@ function addProfileField($field)
 
 	$db->insert('',
 		'{db_prefix}custom_fields',
-		array(
+		[
 			'col_name' => 'string', 'field_name' => 'string', 'field_desc' => 'string',
 			'field_type' => 'string', 'field_length' => 'string', 'field_options' => 'string',
 			'show_reg' => 'int', 'show_display' => 'int', 'show_memberlist' => 'int', 'show_profile' => 'string',
 			'private' => 'int', 'active' => 'int', 'default_value' => 'string', 'can_search' => 'int',
 			'bbc' => 'int', 'mask' => 'string', 'enclose' => 'string', 'placement' => 'int', 'vieworder' => 'int',
 			'rows' => 'int', 'cols' => 'int'
-		),
-		array(
+		],
+		[
 			$field['col_name'], $field['field_name'], $field['field_desc'],
 			$field['field_type'], $field['field_length'], $field['field_options'],
 			$field['show_reg'], $field['show_display'], $field['show_memberlist'], $field['show_profile'],
 			$field['private'], $field['active'], $field['default_value'], $field['can_search'],
 			$field['bbc'], $field['mask'], $field['enclose'], $field['placement'], $field['vieworder'],
 			$field['rows'], $field['cols']
-		),
-		array('id_field')
+		],
+		['id_field']
 	);
 }
 
@@ -704,10 +704,10 @@ function deleteProfileFieldUserData($name)
 		DELETE FROM {db_prefix}custom_fields_data
 		WHERE variable = {string:current_column}
 			AND id_member > {int:no_member}',
-		array(
+		[
 			'no_member' => 0,
 			'current_column' => $name,
-		)
+		]
 	);
 }
 
@@ -723,9 +723,9 @@ function deleteProfileField($id)
 	$db->query('', '
 		DELETE FROM {db_prefix}custom_fields
 		WHERE id_field = {int:current_field}',
-		array(
+		[
 			'current_field' => $id,
-		)
+		]
 	);
 }
 
@@ -745,26 +745,26 @@ function updateDisplayCache()
 			AND private != {int:not_owner_only}
 			AND private != {int:not_admin_only}
 		ORDER BY vieworder',
-		array(
+		[
 			'is_displayed' => 1,
 			'active' => 1,
 			'not_owner_only' => 2,
 			'not_admin_only' => 3,
-		)
+		]
 	)->fetch_callback(
 		function ($row) {
-			return array(
-				'colname' => strtr($row['col_name'], array('|' => '', ';' => '')),
-				'title' => strtr($row['field_name'], array('|' => '', ';' => '')),
+			return [
+				'colname' => strtr($row['col_name'], ['|' => '', ';' => '']),
+				'title' => strtr($row['field_name'], ['|' => '', ';' => '']),
 				'type' => $row['field_type'],
 				'bbc' => $row['bbc'] ? 1 : 0,
 				'placement' => !empty($row['placement']) ? $row['placement'] : 0,
 				'enclose' => !empty($row['enclose']) ? $row['enclose'] : '',
-			);
+			];
 		}
 	);
 
-	updateSettings(array('displayFields' => serialize($fields)));
+	updateSettings(['displayFields' => serialize($fields)]);
 }
 
 /**
@@ -775,18 +775,18 @@ function loadAllCustomFields()
 	$db = database();
 
 	// Get the names of any custom fields.
-	$custom_field_titles = array();
+	$custom_field_titles = [];
 	$db->fetchQuery('
 		SELECT
 			col_name, field_name, bbc
 		FROM {db_prefix}custom_fields',
-		array()
+		[]
 	)->fetch_callback(
 		function ($row) use (&$custom_field_titles) {
-			$custom_field_titles['customfield_' . $row['col_name']] = array(
+			$custom_field_titles['customfield_' . $row['col_name']] = [
 				'title' => $row['field_name'],
 				'parse_bbc' => $row['bbc'],
-			);
+			];
 		}
 	);
 
@@ -805,7 +805,7 @@ function loadAllCustomFields()
 function getAvailableNotifications()
 {
 	$glob = new GlobIterator(SOURCEDIR . '/ElkArte/Mentions/MentionType/Notification/*.php', FilesystemIterator::SKIP_DOTS);
-	$types = array();
+	$types = [];
 
 	// For each file found, return its FQN
 	foreach ($glob as $file)
@@ -831,7 +831,7 @@ function getAvailableNotifications()
  */
 function getMentionsModules($enabled_mentions)
 {
-	$modules = array();
+	$modules = [];
 
 	foreach ($enabled_mentions as $mention)
 	{
@@ -859,7 +859,7 @@ function getFrontPageControllers()
 {
 	global $txt;
 
-	$classes = array();
+	$classes = [];
 
 	$glob = new GlobIterator(CONTROLLERDIR . '/*.php', FilesystemIterator::SKIP_DOTS);
 	$classes += scanFileSystemForControllers($glob, '\\ElkArte\\Controller\\');
@@ -867,7 +867,7 @@ function getFrontPageControllers()
 	$glob = new GlobIterator(ADDONSDIR . '/*/controllers/*.php', FilesystemIterator::SKIP_DOTS);
 	$classes += scanFileSystemForControllers($glob, '\\ElkArte\\Addon\\');
 
-	$config_vars = array(array('select', 'front_page', $classes));
+	$config_vars = [['select', 'front_page', $classes]];
 	array_unshift($config_vars[0][2], $txt['default']);
 
 	foreach (array_keys($classes) as $class_name)

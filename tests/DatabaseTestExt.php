@@ -42,7 +42,7 @@ class TestDatabase extends TestCase
 		define('ADMINDIR', $sourcedir . '/admin');
 		define('CONTROLLERDIR', $sourcedir . '/controllers');
 		define('SUBSDIR', $sourcedir . '/subs');
-		define('ADDONSDIR', $sourcedir . '/addons');
+		define('ADDONSDIR', $boarddir . '/Addons');
 
 		require_once('.github/bootstrap.php');
 	}
@@ -166,7 +166,7 @@ class TestDatabase extends TestCase
 			'scheduled_tasks' => 14,
 			'settings' => 200,
 			'smileys' => 54,
-			'spiders' => 31,
+			'spiders' => 57,
 			'themes' => 22,
 			'topics' => 1,
 		];

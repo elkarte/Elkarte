@@ -17,6 +17,7 @@
 namespace ElkArte\VerificationControls;
 
 use ElkArte\Errors\ErrorContext;
+use ElkArte\Exceptions\Exception;
 use ElkArte\Sessions\SessionIndex;
 
 /**
@@ -33,7 +34,7 @@ class VerificationControlsIntegrate
 	 *
 	 * @return array
 	 */
-	public static function settingsRegister()
+	public static function settingsRegister(): array
 	{
 		// $hook, $function, $file
 		return [
@@ -44,7 +45,7 @@ class VerificationControlsIntegrate
 	/**
 	 * Appends the configurations to $config_vars
 	 */
-	public static function integrate_spam_settings(&$config_vars)
+	public static function integrate_spam_settings(&$config_vars): void
 	{
 		VerificationControls::discoverControls($config_vars);
 	}
@@ -56,7 +57,7 @@ class VerificationControlsIntegrate
 	 * @param bool $do_test = false If we are validating the input to a verification control
 	 *
 	 * @return array|bool
-	 * @throws \ElkArte\Exceptions\Exception no_access
+	 * @throws Exception no_access
 	 */
 	public static function create(&$verificationOptions, $do_test = false)
 	{

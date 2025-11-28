@@ -43,13 +43,13 @@ class ManageSearchEngines extends AbstractController
 		Txt::load('Search');
 		theme()->getTemplates()->load('ManageSearch');
 
-		$subActions = array(
-			'editspiders' => array($this, 'action_editspiders', 'permission' => 'admin_forum'),
-			'logs' => array($this, 'action_logs', 'permission' => 'admin_forum'),
-			'settings' => array($this, 'action_engineSettings_display', 'permission' => 'admin_forum'),
-			'spiders' => array($this, 'action_spiders', 'permission' => 'admin_forum'),
-			'stats' => array($this, 'action_stats', 'permission' => 'admin_forum'),
-		);
+		$subActions = [
+			'editspiders' => [$this, 'action_editspiders', 'permission' => 'admin_forum'],
+			'logs' => [$this, 'action_logs', 'permission' => 'admin_forum'],
+			'settings' => [$this, 'action_engineSettings_display', 'permission' => 'admin_forum'],
+			'spiders' => [$this, 'action_spiders', 'permission' => 'admin_forum'],
+			'stats' => [$this, 'action_stats', 'permission' => 'admin_forum'],
+		];
 
 		// Control
 		$action = new Action('manage_search_engines');
@@ -76,7 +76,7 @@ class ManageSearchEngines extends AbstractController
 	 *
 	 * @event integrate_save_search_engine_settings
 	 */
-	public function action_engineSettings_display()
+	public function action_engineSettings_display(): void
 	{
 		global $context, $txt;
 
@@ -159,18 +159,18 @@ class ManageSearchEngines extends AbstractController
 	{
 		global $txt;
 
-		$config_vars = array(
+		$config_vars = [
 			// How much detail?
-			array('select', 'spider_mode', 'subtext' => $txt['spider_mode_note'], array($txt['spider_mode_off'], $txt['spider_mode_standard'], $txt['spider_mode_high'], $txt['spider_mode_vhigh']), 'onchange' => 'disableFields();'),
-			'spider_group' => array('select', 'spider_group', 'subtext' => $txt['spider_group_note'], array($txt['spider_group_none'])),
-			array('check', 'spider_no_guest', 'subtext' => $txt['spider_no_guest_note']),
-			array('select', 'show_spider_online', array($txt['show_spider_online_no'], $txt['show_spider_online_summary'], $txt['show_spider_online_detail'], $txt['show_spider_online_detail_admin'])),
-		);
+			['select', 'spider_mode', 'subtext' => $txt['spider_mode_note'], [$txt['spider_mode_off'], $txt['spider_mode_standard'], $txt['spider_mode_high'], $txt['spider_mode_vhigh']], 'onchange' => 'disableFields();'],
+			'spider_group' => ['select', 'spider_group', 'subtext' => $txt['spider_group_note'], [$txt['spider_group_none']]],
+			['check', 'spider_no_guest', 'subtext' => $txt['spider_no_guest_note']],
+			['select', 'show_spider_online', [$txt['show_spider_online_no'], $txt['show_spider_online_summary'], $txt['show_spider_online_detail'], $txt['show_spider_online_detail_admin']]],
+		];
 
 		require_once(SUBSDIR . '/SearchEngines.subs.php');
 		require_once(SUBSDIR . '/Membergroups.subs.php');
 
-		$groups = getBasicMembergroupData(array('globalmod', 'postgroups', 'protected', 'member'));
+		$groups = getBasicMembergroupData(['globalmod', 'postgroups', 'protected', 'member']);
 		foreach ($groups as $row)
 		{
 			// Unfortunately, regular members have to be 1 because 0 is for disabled.
@@ -185,7 +185,7 @@ class ManageSearchEngines extends AbstractController
 		}
 
 		// Notify the integration that we're preparing to mess up with search engine settings...
-		call_integration_hook('integrate_modify_search_engine_settings', array(&$config_vars));
+		call_integration_hook('integrate_modify_search_engine_settings', [&$config_vars]);
 
 		return $config_vars;
 	}
@@ -203,7 +203,7 @@ class ManageSearchEngines extends AbstractController
 	 *
 	 * @event integrate_list_spider_list
 	 */
-	public function action_spiders()
+	public function action_spiders(): void
 	{
 		global $context, $txt;
 
@@ -245,101 +245,101 @@ class ManageSearchEngines extends AbstractController
 		createToken('admin-ser');
 
 		// Build the list
-		$listOptions = array(
+		$listOptions = [
 			'id' => 'spider_list',
 			'title' => $txt['spiders'],
 			'items_per_page' => 20,
 			'base_href' => getUrl('admin', ['action' => 'admin', 'area' => 'sengines', 'sa' => 'spiders']),
 			'default_sort_col' => 'name',
-			'get_items' => array(
+			'get_items' => [
 				'function' => 'getSpiders',
-			),
-			'get_count' => array(
+			],
+			'get_count' => [
 				'function' => 'getNumSpiders',
 				'file' => SUBSDIR . '/SearchEngines.subs.php',
-			),
+			],
 			'no_items_label' => $txt['spiders_no_entries'],
-			'columns' => array(
-				'name' => array(
-					'header' => array(
+			'columns' => [
+				'name' => [
+					'header' => [
 						'value' => $txt['spider_name'],
-					),
-					'data' => array(
+					],
+					'data' => [
 						'function' => static fn($rowData) => sprintf('<a href=' . getUrl('admin', ['action' => 'admin', 'area' => 'sengines', 'sa' => 'editspiders', 'sid' => $rowData['id_spider']]) . '">%1$s</a>', htmlspecialchars($rowData['spider_name'], ENT_COMPAT, 'UTF-8')),
-					),
-					'sort' => array(
+					],
+					'sort' => [
 						'default' => 'spider_name',
 						'reverse' => 'spider_name DESC',
-					),
-				),
-				'last_seen' => array(
-					'header' => array(
+					],
+				],
+				'last_seen' => [
+					'header' => [
 						'value' => $txt['spider_last_seen'],
-					),
-					'data' => array(
+					],
+					'data' => [
 						'function' => static function ($rowData) {
 							global $context, $txt;
 
 							return isset($context['spider_last_seen'][$rowData['id_spider']]) ? standardTime($context['spider_last_seen'][$rowData['id_spider']]) : $txt['spider_last_never'];
 						},
-					),
-				),
-				'user_agent' => array(
-					'header' => array(
+					],
+				],
+				'user_agent' => [
+					'header' => [
 						'value' => $txt['spider_agent'],
-					),
-					'data' => array(
+					],
+					'data' => [
 						'db_htmlsafe' => 'user_agent',
-					),
-					'sort' => array(
+					],
+					'sort' => [
 						'default' => 'user_agent',
 						'reverse' => 'user_agent DESC',
-					),
-				),
-				'ip_info' => array(
-					'header' => array(
+					],
+				],
+				'ip_info' => [
+					'header' => [
 						'value' => $txt['spider_ip_info'],
-					),
-					'data' => array(
+					],
+					'data' => [
 						'db_htmlsafe' => 'ip_info',
 						'class' => 'smalltext',
-					),
-					'sort' => array(
+					],
+					'sort' => [
 						'default' => 'ip_info',
 						'reverse' => 'ip_info DESC',
-					),
-				),
-				'check' => array(
-					'header' => array(
+					],
+				],
+				'check' => [
+					'header' => [
 						'value' => '<input type="checkbox" onclick="invertAll(this, this.form);" class="input_check" />',
 						'class' => 'centertext',
-					),
-					'data' => array(
-						'sprintf' => array(
+					],
+					'data' => [
+						'sprintf' => [
 							'format' => '<input type="checkbox" name="remove[]" value="%1$d" class="input_check" />',
-							'params' => array(
+							'params' => [
 								'id_spider' => false,
-							),
-						),
+							],
+						],
 						'class' => 'centertext',
-					),
-				),
-			),
-			'form' => array(
+					],
+				],
+			],
+			'form' => [
 				'href' => getUrl('admin', ['action' => 'admin', 'area' => 'sengines', 'sa' => 'spiders']),
 				'token' => 'admin-ser',
-			),
-			'additional_rows' => array(
-				array(
+			],
+			'additional_rows' => [
+				[
 					'class' => 'submitbutton',
 					'position' => 'bottom_of_list',
 					'value' => '
 						<input type="submit" name="removeSpiders" value="' . $txt['spiders_remove_selected'] . '" onclick="return confirm(\'' . $txt['spider_remove_selected_confirm'] . '\');" />
 						<input type="submit" name="addSpider" value="' . $txt['spiders_add'] . '" class="right_submit" />
 					',
-				),
-			),
-		);
+				],
+			],
+		];
 
 		createList($listOptions);
 
@@ -350,7 +350,7 @@ class ManageSearchEngines extends AbstractController
 	/**
 	 * Here we can add, and edit, spider info!
 	 */
-	public function action_editspiders()
+	public function action_editspiders(): void
 	{
 		global $context, $txt;
 
@@ -367,7 +367,7 @@ class ManageSearchEngines extends AbstractController
 			validateToken('admin-ses');
 
 			// Check the IP range is valid.
-			$ips = array();
+			$ips = [];
 			$ip_sets = explode(',', $this->_req->post->spider_ip);
 			foreach ($ip_sets as $set)
 			{
@@ -390,12 +390,12 @@ class ManageSearchEngines extends AbstractController
 		}
 
 		// The default is new.
-		$context['spider'] = array(
+		$context['spider'] = [
 			'id' => 0,
 			'name' => '',
 			'agent' => '',
 			'ip_info' => '',
-		);
+		];
 
 		// An edit?
 		if ($context['id_spider'])
@@ -411,7 +411,7 @@ class ManageSearchEngines extends AbstractController
 	 *
 	 * @event integrate_list_spider_logs
 	 */
-	public function action_logs()
+	public function action_logs(): void
 	{
 		global $context, $txt, $modSettings;
 
@@ -434,69 +434,69 @@ class ManageSearchEngines extends AbstractController
 		}
 
 		// Build out the spider log list
-		$listOptions = array(
+		$listOptions = [
 			'id' => 'spider_logs',
 			'items_per_page' => 20,
 			'title' => $txt['spider_logs'],
 			'no_items_label' => $txt['spider_logs_empty'],
 			'base_href' => $context['admin_area'] === 'sengines' ? getUrl('admin', ['action' => 'admin', 'area' => 'sengines', 'sa' => 'logs']) : getUrl('admin', ['action' => 'admin', 'area' => 'logs', 'sa' => 'spiderlog']),
 			'default_sort_col' => 'log_time',
-			'get_items' => array(
+			'get_items' => [
 				'function' => 'getSpiderLogs',
-			),
-			'get_count' => array(
+			],
+			'get_count' => [
 				'function' => 'getNumSpiderLogs',
 				'file' => SUBSDIR . '/SearchEngines.subs.php',
-			),
-			'columns' => array(
-				'name' => array(
-					'header' => array(
+			],
+			'columns' => [
+				'name' => [
+					'header' => [
 						'value' => $txt['spider'],
-					),
-					'data' => array(
+					],
+					'data' => [
 						'db' => 'spider_name',
-					),
-					'sort' => array(
+					],
+					'sort' => [
 						'default' => 's.spider_name',
 						'reverse' => 's.spider_name DESC',
-					),
-				),
-				'log_time' => array(
-					'header' => array(
+					],
+				],
+				'log_time' => [
+					'header' => [
 						'value' => $txt['spider_time'],
-					),
-					'data' => array(
+					],
+					'data' => [
 						'function' => static fn($rowData) => standardTime($rowData['log_time']),
-					),
-					'sort' => array(
+					],
+					'sort' => [
 						'default' => 'sl.id_hit DESC',
 						'reverse' => 'sl.id_hit',
-					),
-				),
-				'viewing' => array(
-					'header' => array(
+					],
+				],
+				'viewing' => [
+					'header' => [
 						'value' => $txt['spider_viewing'],
-					),
-					'data' => array(
+					],
+					'data' => [
 						'db' => 'url',
-					),
-				),
-			),
-			'form' => array(
+					],
+				],
+			],
+			'form' => [
 				'token' => 'admin-sl',
 				'href' => getUrl('admin', ['action' => 'admin', 'area' => 'sengines', 'sa' => 'logs']),
-			),
-			'additional_rows' => array(
-				array(
+			],
+			'additional_rows' => [
+				[
 					'position' => 'after_title',
 					'value' => $txt['spider_logs_info'],
-				),
-				array(
+				],
+				[
 					'position' => 'below_table_data',
 					'value' => '<input type="submit" name="removeAll" value="' . $txt['spider_log_empty_log'] . '" onclick="return confirm(\'' . $txt['spider_log_empty_log_confirm'] . '\');" class="right_submit" />',
-				),
-			),
-		);
+				],
+			],
+		];
 
 		createToken('admin-sl');
 		createList($listOptions);
@@ -504,7 +504,7 @@ class ManageSearchEngines extends AbstractController
 		// Now determine the actions of the URLs.
 		if (!empty($context['spider_logs']['rows']))
 		{
-			$urls = array();
+			$urls = [];
 
 			// Grab the current /url.
 			foreach ($context['spider_logs']['rows'] as $k => $row)
@@ -516,7 +516,7 @@ class ManageSearchEngines extends AbstractController
 				}
 				else
 				{
-					$urls[$k] = array($row['data']['viewing']['value'], -1);
+					$urls[$k] = [$row['data']['viewing']['value'], -1];
 				}
 			}
 
@@ -538,7 +538,7 @@ class ManageSearchEngines extends AbstractController
 	 *
 	 * @event integrate_list_spider_stat_list
 	 */
-	public function action_stats()
+	public function action_stats(): void
 	{
 		global $context, $txt;
 
@@ -604,70 +604,70 @@ class ManageSearchEngines extends AbstractController
 			$_REQUEST['start'] = getNumSpiderStats($date_query);
 		}
 
-		$listOptions = array(
+		$listOptions = [
 			'id' => 'spider_stat_list',
 			'title' => $txt['spider'] . ' ' . $txt['spider_stats'],
 			'items_per_page' => 20,
 			'base_href' => getUrl('admin', ['action' => 'admin', 'area' => 'sengines', 'sa' => 'stats']),
 			'default_sort_col' => 'stat_date',
-			'get_items' => array(
+			'get_items' => [
 				'function' => 'getSpiderStats',
-			),
-			'get_count' => array(
+			],
+			'get_count' => [
 				'function' => 'getNumSpiderStats',
 				'file' => SUBSDIR . '/SearchEngines.subs.php',
-			),
+			],
 			'no_items_label' => $txt['spider_stats_no_entries'],
-			'columns' => array(
-				'stat_date' => array(
-					'header' => array(
+			'columns' => [
+				'stat_date' => [
+					'header' => [
 						'value' => $txt['date'],
-					),
-					'data' => array(
+					],
+					'data' => [
 						'db' => 'stat_date',
-					),
-					'sort' => array(
+					],
+					'sort' => [
 						'default' => 'stat_date',
 						'reverse' => 'stat_date DESC',
-					),
-				),
-				'name' => array(
-					'header' => array(
+					],
+				],
+				'name' => [
+					'header' => [
 						'value' => $txt['spider_name'],
-					),
-					'data' => array(
+					],
+					'data' => [
 						'db' => 'spider_name',
-					),
-					'sort' => array(
+					],
+					'sort' => [
 						'default' => 's.spider_name',
 						'reverse' => 's.spider_name DESC',
-					),
-				),
-				'page_hits' => array(
-					'header' => array(
+					],
+				],
+				'page_hits' => [
+					'header' => [
 						'value' => $txt['spider_stats_page_hits'],
-					),
-					'data' => array(
+					],
+					'data' => [
 						'db' => 'page_hits',
-					),
-					'sort' => array(
+					],
+					'sort' => [
 						'default' => 'ss.page_hits',
 						'reverse' => 'ss.page_hits DESC',
-					),
-				),
-			),
-			'form' => array(
+					],
+				],
+			],
+			'form' => [
 				'href' => getUrl('admin', ['action' => 'admin', 'area' => 'sengines', 'sa' => 'stats']),
 				'name' => 'spider_stat_list',
-			),
-			'additional_rows' => array(
-				array(
+			],
+			'additional_rows' => [
+				[
 					'position' => 'below_table_data',
 					'value' => $date_select,
 					'style' => 'text-align: right;',
-				),
-			),
-		);
+				],
+			],
+		];
 
 		createToken('admin-ss');
 

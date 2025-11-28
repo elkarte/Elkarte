@@ -83,7 +83,7 @@ abstract class AbstractController
 	 *
 	 * @param array $buttons
 	 */
-	public static function addForumButton(&$buttons)
+	public static function addForumButton(&$buttons): void
 	{
 		global $scripturl, $txt, $modSettings;
 
@@ -105,7 +105,7 @@ abstract class AbstractController
 	 *
 	 * @param string $current_action
 	 */
-	public static function fixCurrentAction(&$current_action)
+	public static function fixCurrentAction(&$current_action): void
 	{
 		if ($current_action === 'home')
 		{
@@ -130,7 +130,7 @@ abstract class AbstractController
 	 *
 	 * @return bool
 	 */
-	public static function canFrontPage()
+	public static function canFrontPage(): bool
 	{
 		return in_array(FrontpageInterface::class, class_implements(static::class), true);
 	}
@@ -198,7 +198,7 @@ abstract class AbstractController
 	/**
 	 * Public function to return the controllers generic hook name
 	 */
-	public function getHook()
+	public function getHook(): string
 	{
 		if ($this->_hook === '')
 		{
@@ -215,7 +215,7 @@ abstract class AbstractController
 	/**
 	 * Public function to return the modules hook class name
 	 */
-	public function getModuleClass()
+	public function getModuleClass(): string
 	{
 		// Use the base controller name for the hook, ie post
 		$module_class = explode('\\', trim(static::class, '\\'));
@@ -229,7 +229,7 @@ abstract class AbstractController
 	 *
 	 * Uses the \ElkArte\Controller\XXX name to define the set of event hooks to load
 	 */
-	protected function _initEventManager()
+	protected function _initEventManager(): void
 	{
 		// Find any module classes associated with this controller
 		$classes = $this->_loadModules();
@@ -254,7 +254,7 @@ abstract class AbstractController
 	 *
 	 * @return string[] Valid Module Classes for this Controller
 	 */
-	protected function _loadModules()
+	protected function _loadModules(): array
 	{
 		global $modSettings;
 
@@ -262,7 +262,7 @@ abstract class AbstractController
 		$setting_key = 'modules_' . $this->getHook();
 		$namespace = '\\ElkArte\\Modules\\';
 
-		// For all the modules that have been registered see if we have a class to load for this hook area
+		// For all the modules that have been registered, see if we have a class to load for this hook area
 		if (!empty($modSettings[$setting_key]))
 		{
 			$modules = explode(',', $modSettings[$setting_key]);
@@ -293,7 +293,7 @@ abstract class AbstractController
 	 * @param string $dep - The name of the property the even wants
 	 * @param array $dependencies - the array that will be filled with the references to the dependencies
 	 */
-	public function provideDependencies($dep, &$dependencies)
+	public function provideDependencies($dep, &$dependencies): void
 	{
 		if (property_exists($this, $dep))
 		{
@@ -324,13 +324,13 @@ abstract class AbstractController
 	 *
 	 * @param ValuesContainer $user
 	 */
-	public function setUser($user)
+	public function setUser($user): void
 	{
 		$this->user = $user;
 	}
 
 	/**
-	 * Helper function to see if the request is asking for any api processing
+	 * Helper function to see if a request is asking for api processing
 	 *
 	 * @return string|false
 	 */
@@ -358,11 +358,11 @@ abstract class AbstractController
 	 * @param string $method - The method that will be executed.
 	 * @param string[] $to_register - An array of classes to register.
 	 */
-	protected function _registerEvent($name, $method, $to_register)
+	protected function _registerEvent($name, $method, $to_register): void
 	{
 		foreach ($to_register as $class)
 		{
-			$this->_events->register($name, array($name, array($class, $method, 0)));
+			$this->_events->register($name, [$name, [$class, $method, 0]]);
 		}
 	}
 }

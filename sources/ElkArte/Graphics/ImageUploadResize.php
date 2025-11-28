@@ -41,7 +41,7 @@ class ImageUploadResize
 	 *
 	 * @param array $fileData
 	 */
-	public function autoResize(&$fileData)
+	public function autoResize(&$fileData): bool
 	{
 		global $modSettings;
 
@@ -88,7 +88,7 @@ class ImageUploadResize
 	/**
 	 * Sets the width X height bounds for resizing, ensuring we never scale up
 	 */
-	private function _setBounds()
+	private function _setBounds(): void
 	{
 		global $modSettings;
 
@@ -106,10 +106,10 @@ class ImageUploadResize
 	 * - Change an images WxH dimensions to those defined in the resize section of the ACP
 	 * - Optionally will change the format PNG->JPG, JPG->WebP, PNG->WebP
 	 *
-	 * @param boolean $same_format if true will maintain the current image format
-	 * @return boolean
+	 * @param bool $same_format if true will maintain the current image format
+	 * @return bool
 	 */
-	public function resize($same_format = true)
+	public function resize($same_format = true): bool
 	{
 		// Attempt to resize the bounds
 		if ($this->image->resizeImage($this->_bounds[0], $this->_bounds[1]))
@@ -126,10 +126,10 @@ class ImageUploadResize
 	/**
 	 * Updates return values as we manipulate the image
 	 *
-	 * @param boolean $same_format if to update the type values
+	 * @param bool $same_format if to update the type values
 	 * @return array
 	 */
-	public function updateSizing($same_format = true)
+	public function updateSizing($same_format = true): array
 	{
 		$update = [
 			'size' => $this->image->getFilesize(),
@@ -161,7 +161,7 @@ class ImageUploadResize
 	 *
 	 * @return bool
 	 */
-	public function canChangeFormat()
+	public function canChangeFormat(): bool
 	{
 		global $modSettings;
 
@@ -192,7 +192,7 @@ class ImageUploadResize
 	 *
 	 * @return bool
 	 */
-	public function getWebP()
+	public function getWebP(): bool
 	{
 		return $this->image->canUseWebp() && $this->image->hasWebpSupport();
 	}

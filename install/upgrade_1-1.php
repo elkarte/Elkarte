@@ -702,7 +702,7 @@ class UpgradeInstructions_upgrade_1_1
 								$this->db->query('', 'UPDATE {db_prefix}custom_fields SET enclose=\'<a target="_blank" href="https://www.facebook.com/{INPUT}" class="icon i-facebook icon-big" title="Facebook"><s>Facebook</s></a>\' WHERE id_field=' . $row['id_field']);
 								break;
 							case 'cust_twitt':
-								$this->db->query('', 'UPDATE {db_prefix}custom_fields SET enclose=\'<a target="_blank" href="https://www.twitter.com/{INPUT}" class="icon i-twitter icon-big" title="Twitter Profile"><s>Twitter Profile</s></a>\' WHERE id_field=' . $row['id_field']);
+								$this->db->query('', 'UPDATE {db_prefix}custom_fields SET enclose=\'<a target="_blank" href="https://www.x.com/{INPUT}" class="icon i-twitter icon-big" title="Twitter Profile"><s>Twitter Profile</s></a>\' WHERE id_field=' . $row['id_field']);
 								break;
 							case 'cust_linked':
 								$this->db->query('', 'UPDATE {db_prefix}custom_fields SET enclose=\'<a href="{INPUT}" class="icon i-linkedin icon-big" title="Linkedin Profile"><s>Linkedin Profile</s></a>\' WHERE id_field=' . $row['id_field']);

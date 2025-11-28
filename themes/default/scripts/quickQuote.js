@@ -37,6 +37,8 @@ Elk_QuickQuote.prototype.init = function() {
 		s: {before: '[s]', after: '[/s]'},
 		sup: {before: '[sup]', after: '[/sup]'},
 		sub: {before: '[sub]', after: '[/sub]'},
+		u: {before: '[u]', after: '[/u]'},
+		code: {before: '[code]', after: '[/code]'},
 		pre: {before: '[code]', after: '[/code]'},
 		br: {before: '\n', after: ''}
 	};
@@ -458,7 +460,7 @@ Elk_QuickQuote.prototype.treeToBBCode = function(node) {
 								link = node.getAttribute('data-link');
 
 							bb.push('[quote' +
-								(author ? ' author=' + author : '') +
+								(author ? ' author="' + this.escapeBBAttr(author) + '"' : '') +
 								((link && datetime) ? ' link=' + link + ' date=' + datetime : '') +
 								']\n');
 							bb.push(this.treeToBBCode(node.childNodes));
@@ -509,6 +511,26 @@ Elk_QuickQuote.prototype.trim = function(str, charToReplace) {
 	}
 
 	return str.trim();
+};
+
+/**
+ * Escapes a string for safe inclusion in BBCode attribute values
+ * - Wrap values using double quotes in callers; this only escapes characters
+ *
+ * @param {string} str
+ * @returns {string}
+ */
+Elk_QuickQuote.prototype.escapeBBAttr = function(str) {
+	if (!str)
+	{
+		return '';
+	}
+
+	return String(str)
+		.replace(/"/g, '\\"')
+		.replace(/\]/g, '\\]')
+		.replace(/\[/g, '\\[')
+		.trim();
 };
 
 /**
@@ -700,7 +722,7 @@ Elk_QuickQuote.prototype.prepareQuickQuoteButton = function(event) {
 
 		// Build the quick quote wrapper and set the button click event
 		link.startTag = '[quote' +
-			(username ? ' author=' + username : '') +
+			(username ? ' author="' + this.escapeBBAttr(username) + '"' : '') +
 			((msgid && time_unix) ? ' link=msg=' + msgid + ' date=' + time_unix : '') + ']\n';
 		link.endTag = '\n[/quote]';
 
@@ -733,7 +755,7 @@ Elk_QuickQuote.prototype.removeQuickQuote = function(event, always = false) {
 		let topicContents = document.querySelectorAll('.messageContent'),
 			link;
 
-		// Reset the UI on de-selection
+		// Reset the UI on de-selection or external click
 		topicContents.forEach((message) => {
 			link = message.parentElement.querySelector('.quick_quote_button');
 			link.classList.add('hide');

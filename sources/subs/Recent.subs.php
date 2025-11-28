@@ -21,7 +21,7 @@ use ElkArte\User;
 /**
  * Get the latest posts of a forum.
  *
- * @param mixed[] $latestPostOptions
+ * @param array $latestPostOptions
  * @return array
  */
 function getLastPosts($latestPostOptions)
@@ -30,7 +30,7 @@ function getLastPosts($latestPostOptions)
 
 	$db = database();
 
-	$posts = array();
+	$posts = [];
 	$bbc_parser = ParserWrapper::instance();
 
 	// Find all the posts. Newer ones will have higher IDs. (assuming the last 20 * number are accessible...)
@@ -54,11 +54,11 @@ function getLastPosts($latestPostOptions)
 			AND m.approved = {int:is_approved}' : '') . '
 		ORDER BY m.id_msg DESC
 		LIMIT ' . $latestPostOptions['number_posts'],
-		array(
+		[
 			'likely_max_msg' => max(0, $modSettings['maxMsgID'] - 50 * $latestPostOptions['number_posts']),
 			'recycle_board' => $modSettings['recycle_board'],
 			'is_approved' => 1,
-		)
+		]
 	)->fetch_callback(
 		function ($row) use (&$posts, $bbc_parser) {
 			global $modSettings;
@@ -67,7 +67,7 @@ function getLastPosts($latestPostOptions)
 			$row['subject'] = censor($row['subject']);
 			$row['body'] = censor($row['body']);
 
-			$row['body'] = strip_tags(strtr($bbc_parser->parseMessage($row['body'], $row['smileys_enabled']), array('<br />' => '&#10;')));
+			$row['body'] = strip_tags(strtr($bbc_parser->parseMessage($row['body'], $row['smileys_enabled']), ['<br />' => '&#10;']));
 			$row['body'] = Util::shorten_text($row['body'], !empty($modSettings['lastpost_preview_characters']) ? $modSettings['lastpost_preview_characters'] : 128, true);
 
 			$board_href = getUrl('board', ['board' => $row['id_board'], 'start' => '0', 'name' => $row['board_name']]);
@@ -75,21 +75,21 @@ function getLastPosts($latestPostOptions)
 			$topic_href = getUrl('topic', ['topic' => $row['id_topic'], 'start' => 'msg' . $row['id_msg'], 'subject' => $row['subject'], 'topicseen']);
 
 			// Build the array.
-			$posts[] = array(
-				'board' => array(
+			$posts[] = [
+				'board' => [
 					'id' => $row['id_board'],
 					'name' => $row['board_name'],
 					'href' => $board_href,
 					'link' => '<a href="' . $board_href . '">' . $row['board_name'] . '</a>'
-				),
+				],
 				'topic' => $row['id_topic'],
-				'poster' => array(
+				'poster' => [
 					'avatar' => determineAvatar($row),
 					'id' => $row['id_member'],
 					'name' => $row['poster_name'],
 					'href' => empty($row['id_member']) ? '' : $poster_href,
 					'link' => empty($row['id_member']) ? $row['poster_name'] : '<a href="' . $poster_href . '">' . $row['poster_name'] . '</a>'
-				),
+				],
 				'subject' => $row['subject'],
 				'short_subject' => Util::shorten_text($row['subject'], !empty($modSettings['subject_length']) ? $modSettings['subject_length'] : 32),
 				'preview' => $row['body'],
@@ -99,7 +99,7 @@ function getLastPosts($latestPostOptions)
 				'raw_timestamp' => $row['poster_time'],
 				'href' => $topic_href . '#msg' . $row['id_msg'],
 				'link' => '<a href="' . $topic_href . '#msg' . $row['id_msg'] . '" rel="nofollow">' . $row['subject'] . '</a>'
-			);
+			];
 		}
 	);
 
@@ -109,13 +109,13 @@ function getLastPosts($latestPostOptions)
 /**
  * Callback-function for the cache for getLastPosts().
  *
- * @param mixed[] $latestPostOptions
+ * @param array $latestPostOptions
  *
  * @return array
  */
 function cache_getLastPosts($latestPostOptions)
 {
-	return array(
+	return [
 		'data' => getLastPosts($latestPostOptions),
 		'expires' => time() + 60,
 		'post_retri_eval' => '
@@ -127,13 +127,13 @@ function cache_getLastPosts($latestPostOptions)
 					\'timestamp\' => $post[\'raw_timestamp\'],
 				);
 			}',
-	);
+	];
 }
 
 /**
  * Formats data supplied into a form that can be used in the template
  *
- * @param mixed[] $messages
+ * @param array $messages
  * @param int $start
  *
  * @return array
@@ -143,8 +143,8 @@ function prepareRecentPosts($messages, $start)
 	global $modSettings;
 
 	$counter = $start + 1;
-	$posts = array();
-	$board_ids = array('own' => array(), 'any' => array());
+	$posts = [];
+	$board_ids = ['own' => [], 'any' => []];
 	$bbc_parser = ParserWrapper::instance();
 	foreach ($messages as $row)
 	{
@@ -161,21 +161,21 @@ function prepareRecentPosts($messages, $start)
 		$poster_href = getUrl('profile', ['action' => 'profile', 'u' => $row['id_member'], 'name' => $row['poster_name']]);
 
 		// And build the array.
-		$posts[$row['id_msg']] = array(
+		$posts[$row['id_msg']] = [
 			'id' => $row['id_msg'],
 			'counter' => $counter++,
-			'category' => array(
+			'category' => [
 				'id' => $row['id_cat'],
 				'name' => $row['cname'],
 				'href' => getUrl('action', $modSettings['default_forum_action']) . '#c' . $row['id_cat'],
 				'link' => '<a href="' . getUrl('action', $modSettings['default_forum_action']) . '#c' . $row['id_cat'] . '">' . $row['cname'] . '</a>'
-			),
-			'board' => array(
+			],
+			'board' => [
 				'id' => $row['id_board'],
 				'name' => $row['bname'],
 				'href' => $board_href,
 				'link' => '<a href="' . $board_href . '">' . $row['bname'] . '</a>'
-			),
+			],
 			'topic' => $row['id_topic'],
 			'href' => $topic_href . '#msg' . $row['id_msg'],
 			'link' => '<a href="' . $topic_href . '#msg' . $row['id_msg'] . '" rel="nofollow">' . $row['subject'] . '</a>',
@@ -184,27 +184,27 @@ function prepareRecentPosts($messages, $start)
 			'time' => standardTime($row['poster_time']),
 			'html_time' => htmlTime($row['poster_time']),
 			'timestamp' => forum_time(true, $row['poster_time']),
-			'first_poster' => array(
+			'first_poster' => [
 				'id' => $row['first_id_member'],
 				'name' => $row['first_display_name'],
 				'href' => empty($row['first_id_member']) ? '' : $first_poster_href,
 				'link' => empty($row['first_id_member']) ? $row['first_display_name'] : '<a href="' . $first_poster_href . '">' . $row['first_display_name'] . '</a>'
-			),
-			'poster' => array(
+			],
+			'poster' => [
 				'id' => $row['id_member'],
 				'name' => $row['poster_name'],
 				'href' => empty($row['id_member']) ? '' : $poster_href,
 				'link' => empty($row['id_member']) ? $row['poster_name'] : '<a href="' . $poster_href . '">' . $row['poster_name'] . '</a>'
-			),
+			],
 			'body' => $row['body'],
 			'message' => $row['body'],
-			'tests' => array(
+			'tests' => [
 				'can_reply' => false,
 				'can_mark_notify' => false,
 				'can_delete' => false,
-			),
+			],
 			'delete_possible' => ($row['id_first_msg'] != $row['id_msg'] || $row['id_last_msg'] == $row['id_msg']) && (empty($modSettings['edit_disable_time']) || $row['poster_time'] + $modSettings['edit_disable_time'] * 60 >= time()),
-		);
+		];
 
 		if (User::$info->id == $row['first_id_member'])
 		{
@@ -213,7 +213,7 @@ function prepareRecentPosts($messages, $start)
 		$board_ids['any'][$row['id_board']][] = $row['id_msg'];
 	}
 
-	return array($posts, $board_ids);
+	return [$posts, $board_ids];
 }
 
 /**
@@ -233,10 +233,10 @@ function earliest_msg()
 			FROM {db_prefix}log_mark_read
 			WHERE id_member = {int:current_member}
 				AND id_board = {int:current_board}',
-			array(
+			[
 				'current_board' => $board,
 				'current_member' => User::$info->id,
-			)
+			]
 		);
 		list ($earliest_msg) = $request->fetch_row();
 		$request->free_result();
@@ -249,9 +249,9 @@ function earliest_msg()
 			FROM {db_prefix}boards AS b
 				LEFT JOIN {db_prefix}log_mark_read AS lmr ON (lmr.id_board = b.id_board AND lmr.id_member = {int:current_member})
 			WHERE {query_see_board}',
-			array(
+			[
 				'current_member' => User::$info->id,
-			)
+			]
 		);
 		list ($earliest_msg) = $request->fetch_row();
 		$request->free_result();
@@ -277,9 +277,9 @@ function earliest_msg()
 					MIN(id_msg)
 				FROM {db_prefix}log_topics
 				WHERE id_member = {int:current_member}',
-				array(
+				[
 					'current_member' => User::$info->id,
-				)
+				]
 			);
 			list ($earliest_msg2) = $request->fetch_row();
 			$request->free_result();
@@ -290,7 +290,7 @@ function earliest_msg()
 				$earliest_msg2 = -1;
 			}
 
-			$_SESSION['cached_log_time'] = array(time(), $earliest_msg2);
+			$_SESSION['cached_log_time'] = [time(), $earliest_msg2];
 		}
 
 		$earliest_msg = min($earliest_msg2, $earliest_msg);
@@ -302,13 +302,13 @@ function earliest_msg()
 /**
  * Callback-function for the cache for getLastTopics().
  *
- * @param mixed[] $latestTopicOptions
+ * @param array $latestTopicOptions
  *
  * @return array
  */
 function cache_getLastTopics($latestTopicOptions)
 {
-	return array(
+	return [
 		'data' => getLastTopics($latestTopicOptions),
 		'expires' => time() + 60,
 		'post_retri_eval' => '
@@ -320,13 +320,13 @@ function cache_getLastTopics($latestTopicOptions)
 					\'timestamp\' => $post[\'raw_timestamp\'],
 				);
 			}',
-	);
+	];
 }
 
 /**
  * Get the latest posts of a forum.
  *
- * @param mixed[] $latestTopicOptions
+ * @param array $latestTopicOptions
  * @return array
  */
 function getLastTopics($latestTopicOptions)
@@ -335,7 +335,7 @@ function getLastTopics($latestTopicOptions)
 
 	$db = database();
 
-	$posts = array();
+	$posts = [];
 	$bbc_parser = ParserWrapper::instance();
 
 	// Find all the posts. Newer ones will have higher IDs. (assuming the last 20 * number are accessible...)
@@ -362,13 +362,13 @@ function getLastTopics($latestTopicOptions)
 			AND t.approved = {int:is_approved}' : '') . '
 		ORDER BY t.id_last_msg DESC
 		LIMIT {int:num_msgs}',
-		array(
+		[
 			'likely_max_msg' => max(0, $modSettings['maxMsgID'] - 50 * $latestTopicOptions['number_posts']),
 			'recycle_board' => $modSettings['recycle_board'],
 			'is_approved' => 1,
 			'num_msgs' => $latestTopicOptions['number_posts'],
 			'current_member' => $latestTopicOptions['id_member'],
-		)
+		]
 	)->fetch_callback(
 		function ($row) use (&$posts, $bbc_parser) {
 			global $modSettings, $txt;
@@ -377,7 +377,7 @@ function getLastTopics($latestTopicOptions)
 			$row['subject'] = censor($row['subject']);
 			$row['body'] = censor($row['body']);
 
-			$row['body'] = strip_tags(strtr($bbc_parser->parseMessage($row['body'], $row['smileys_enabled']), array('<br />' => '&#10;')));
+			$row['body'] = strip_tags(strtr($bbc_parser->parseMessage($row['body'], $row['smileys_enabled']), ['<br />' => '&#10;']));
 			$row['body'] = Util::shorten_text($row['body'], !empty($modSettings['lastpost_preview_characters']) ? $modSettings['lastpost_preview_characters'] : 128, true);
 
 			$board_href = getUrl('board', ['board' => $row['id_board'], 'start' => '0', 'name' => $row['board_name']]);
@@ -385,21 +385,21 @@ function getLastTopics($latestTopicOptions)
 			$topic_href = getUrl('topic', ['topic' => $row['id_topic'], 'start' => 'msg' . $row['id_msg'], 'subject' => $row['subject'], 'topicseen']);
 
 			// Build the array.
-			$post = array(
-				'board' => array(
+			$post = [
+				'board' => [
 					'id' => $row['id_board'],
 					'name' => $row['board_name'],
 					'href' => $board_href,
 					'link' => '<a href="' . $board_href . '">' . $row['board_name'] . '</a>'
-				),
+				],
 				'topic' => $row['id_topic'],
-				'poster' => array(
+				'poster' => [
 					'avatar' => determineAvatar($row),
 					'id' => $row['id_member'],
 					'name' => $row['poster_name'],
 					'href' => empty($row['id_member']) ? '' : $poster_href,
 					'link' => empty($row['id_member']) ? $row['poster_name'] : '<a href="' . $poster_href . '">' . $row['poster_name'] . '</a>'
-				),
+				],
 				'subject' => $row['subject'],
 				'short_subject' => Util::shorten_text($row['subject'], !empty($modSettings['subject_length']) ? $modSettings['subject_length'] : 32),
 				'preview' => $row['body'],
@@ -413,7 +413,7 @@ function getLastTopics($latestTopicOptions)
 				'new_from' => $row['new_from'],
 				'newtime' => $row['new_from'],
 				'new_href' => getUrl('topic', ['topic' => $row['id_topic'], 'start' => 'msg' . $row['new_from'], 'subject' => $row['subject']]) . '#new',
-			);
+			];
 
 			if ($post['new'])
 			{

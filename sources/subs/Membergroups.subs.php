@@ -41,7 +41,7 @@ function deleteMembergroups($groups)
 	// Make sure it's an array.
 	if (!is_array($groups))
 	{
-		$groups = array((int) $groups);
+		$groups = [(int) $groups];
 	}
 	else
 	{
@@ -55,7 +55,7 @@ function deleteMembergroups($groups)
 	}
 
 	// Some groups are protected (guests, administrators, moderators, newbies).
-	$protected_groups = array(-1, 0, 1, 3, 4);
+	$protected_groups = [-1, 0, 1, 3, 4];
 
 	// There maybe some others as well.
 	if (!allowedTo('admin_forum'))
@@ -65,9 +65,9 @@ function deleteMembergroups($groups)
 				id_group
 			FROM {db_prefix}membergroups
 			WHERE group_type = {int:is_protected}',
-			array(
+			[
 				'is_protected' => 1,
-			)
+			]
 		)->fetch_callback(
 			function ($row) use (&$protected_groups) {
 				$protected_groups[] = $row['id_group'];
@@ -86,50 +86,50 @@ function deleteMembergroups($groups)
 	$groups_to_log = membergroupsById($groups, 0);
 	foreach ($groups_to_log as $key => $row)
 	{
-		logAction('delete_group', array('group' => $row['group_name']), 'admin');
+		logAction('delete_group', ['group' => $row['group_name']], 'admin');
 	}
 
-	call_integration_hook('integrate_delete_membergroups', array($groups));
+	call_integration_hook('integrate_delete_membergroups', [$groups]);
 
 	// Remove the membergroups themselves.
 	$db->query('', '
 		DELETE FROM {db_prefix}membergroups
 		WHERE id_group IN ({array_int:group_list})',
-		array(
+		[
 			'group_list' => $groups,
-		)
+		]
 	);
 
 	// Remove the permissions of the membergroups.
 	$db->query('', '
 		DELETE FROM {db_prefix}permissions
 		WHERE id_group IN ({array_int:group_list})',
-		array(
+		[
 			'group_list' => $groups,
-		)
+		]
 	);
 	$db->query('', '
 		DELETE FROM {db_prefix}board_permissions
 		WHERE id_group IN ({array_int:group_list})',
-		array(
+		[
 			'group_list' => $groups,
-		)
+		]
 	);
 	$db->query('', '
 		DELETE FROM {db_prefix}group_moderators
 		WHERE id_group IN ({array_int:group_list})',
-		array(
+		[
 			'group_list' => $groups,
-		)
+		]
 	);
 
 	// Delete any outstanding requests.
 	$db->query('', '
 		DELETE FROM {db_prefix}log_group_requests
 		WHERE id_group IN ({array_int:group_list})',
-		array(
+		[
 			'group_list' => $groups,
-		)
+		]
 	);
 
 	// Update the primary groups of members.
@@ -137,10 +137,10 @@ function deleteMembergroups($groups)
 		UPDATE {db_prefix}members
 		SET id_group = {int:regular_group}
 		WHERE id_group IN ({array_int:group_list})',
-		array(
+		[
 			'group_list' => $groups,
 			'regular_group' => 0,
-		)
+		]
 	);
 
 	// Update any inherited groups (Lose inheritance).
@@ -148,22 +148,22 @@ function deleteMembergroups($groups)
 		UPDATE {db_prefix}membergroups
 		SET id_parent = {int:uninherited}
 		WHERE id_parent IN ({array_int:group_list})',
-		array(
+		[
 			'group_list' => $groups,
 			'uninherited' => -2,
-		)
+		]
 	);
 
 	// Update the additional groups of members.
-	$updates = array();
+	$updates = [];
 	$db->fetchQuery('
 		SELECT 
 			id_member, additional_groups
 		FROM {db_prefix}members
 		WHERE FIND_IN_SET({raw:additional_groups_explode}, additional_groups) != 0',
-		array(
+		[
 			'additional_groups_explode' => implode(', additional_groups) != 0 OR FIND_IN_SET(', $groups),
-		)
+		]
 	)->fetch_callback(
 		function ($row) use (&$updates) {
 			// Update each member information.
@@ -174,19 +174,19 @@ function deleteMembergroups($groups)
 	require_once(SUBSDIR . '/Members.subs.php');
 	foreach ($updates as $additional_groups => $memberArray)
 	{
-		updateMemberData($memberArray, array('additional_groups' => implode(',', array_diff(explode(',', $additional_groups), $groups))));
+		updateMemberData($memberArray, ['additional_groups' => implode(',', array_diff(explode(',', $additional_groups), $groups))]);
 	}
 
 	// No boards can provide access to these membergroups anymore.
-	$updates = array();
+	$updates = [];
 	$db->fetchQuery('
 		SELECT 
 			id_board, member_groups
 		FROM {db_prefix}boards
 		WHERE FIND_IN_SET({raw:member_groups_explode}, member_groups) != 0',
-		array(
+		[
 			'member_groups_explode' => implode(', member_groups) != 0 OR FIND_IN_SET(', $groups),
-		)
+		]
 	)->fetch_callback(
 		function ($row) use (&$updates) {
 			$updates[$row['member_groups']][] = $row['id_board'];
@@ -199,10 +199,10 @@ function deleteMembergroups($groups)
 			UPDATE {db_prefix}boards
 			SET member_groups = {string:member_groups}
 			WHERE id_board IN ({array_int:board_lists})',
-			array(
+			[
 				'board_lists' => $boardArray,
 				'member_groups' => implode(',', array_diff(explode(',', $member_groups), $groups)),
-			)
+			]
 		);
 	}
 
@@ -210,7 +210,7 @@ function deleteMembergroups($groups)
 	updatePostGroupStats();
 
 	// Make a note of the fact that the cache may be wrong.
-	$settings_update = array('settings_updated' => time());
+	$settings_update = ['settings_updated' => time()];
 
 	// Have we deleted the spider group?
 	// @memo we are lucky that the group 1 and 0 cannot be deleted
@@ -253,12 +253,12 @@ function removeMembersFromGroups($members, $groups = null, $permissionCheckDone 
 	}
 
 	// Assume something will happen.
-	updateSettings(array('settings_updated' => time()));
+	updateSettings(['settings_updated' => time()]);
 
 	// Cleaning the input.
 	if (!is_array($members))
 	{
-		$members = array((int) $members);
+		$members = [(int) $members];
 	}
 	else
 	{
@@ -274,7 +274,7 @@ function removeMembersFromGroups($members, $groups = null, $permissionCheckDone 
 	// Before we get started, let's check we won't leave the admin group empty!
 	if ($groups === null || $groups == 1 || (is_array($groups) && in_array(1, $groups)))
 	{
-		$admins = array();
+		$admins = [];
 		listMembergroupMembers_Href($admins, 1);
 
 		// Remove any admins if there are too many.
@@ -303,12 +303,12 @@ function removeMembersFromGroups($members, $groups = null, $permissionCheckDone 
 			WHERE id_member IN ({array_int:member_list})' . (allowedTo('admin_forum') ? '' : '
 				AND id_group != {int:admin_group}
 				AND FIND_IN_SET({int:admin_group}, additional_groups) = 0'),
-			array(
+			[
 				'member_list' => $members,
 				'regular_member' => 0,
 				'admin_group' => 1,
 				'blank_string' => '',
-			)
+			]
 		);
 
 		updatePostGroupStats($members);
@@ -316,14 +316,15 @@ function removeMembersFromGroups($members, $groups = null, $permissionCheckDone 
 		// Log what just happened.
 		foreach ($members as $member)
 		{
-			logAction('removed_all_groups', array('member' => $member), 'admin');
+			logAction('removed_all_groups', ['member' => $member], 'admin');
 		}
 
 		return true;
 	}
-	elseif (!is_array($groups))
+
+	if (!is_array($groups))
 	{
-		$groups = array((int) $groups);
+		$groups = [(int) $groups];
 	}
 	// Make sure all groups are integer.
 	else
@@ -332,8 +333,8 @@ function removeMembersFromGroups($members, $groups = null, $permissionCheckDone 
 	}
 
 	// Fetch a list of groups members cannot be assigned to explicitly, and the group names of the ones we want.
-	$implicitGroups = array(-1, 0, 3);
-	$group_names = array();
+	$implicitGroups = [-1, 0, 3];
+	$group_names = [];
 	$group_details = membergroupsById($groups, 0, true);
 	foreach ($group_details as $key => $row)
 	{
@@ -353,15 +354,15 @@ function removeMembersFromGroups($members, $groups = null, $permissionCheckDone 
 	// Don't forget the protected groups.
 	if (!allowedTo('admin_forum'))
 	{
-		$protected_groups = array(1);
+		$protected_groups = [1];
 		$db->fetchQuery('
 			SELECT 
 				id_group
 			FROM {db_prefix}membergroups
 			WHERE group_type = {int:is_protected}',
-			array(
+			[
 				'is_protected' => 1,
-			)
+			]
 		)->fetch_callback(
 			function ($row) use (&$protected_groups) {
 				$protected_groups[] = $row['id_group'];
@@ -385,13 +386,13 @@ function removeMembersFromGroups($members, $groups = null, $permissionCheckDone 
 		FROM {db_prefix}members AS members
 		WHERE id_group IN ({array_int:group_list})
 			AND id_member IN ({array_int:member_list})',
-		array(
+		[
 			'group_list' => $groups,
 			'member_list' => $members,
-		)
+		]
 	)->fetch_callback(
 		function ($row) use ($group_names) {
-			return array('group' => $group_names[$row['id_group']], 'member' => $row['id_member']);
+			return ['group' => $group_names[$row['id_group']], 'member' => $row['id_member']];
 		}
 	);
 
@@ -400,15 +401,15 @@ function removeMembersFromGroups($members, $groups = null, $permissionCheckDone 
 		SET id_group = {int:regular_member}
 		WHERE id_group IN ({array_int:group_list})
 			AND id_member IN ({array_int:member_list})',
-		array(
+		[
 			'group_list' => $groups,
 			'member_list' => $members,
 			'regular_member' => 0,
-		)
+		]
 	);
 
 	// Those who have it as part of their additional group must be updated the long way... sadly.
-	$updates = array();
+	$updates = [];
 	$db->fetchQuery('
 		SELECT 
 			id_member, additional_groups
@@ -416,10 +417,10 @@ function removeMembersFromGroups($members, $groups = null, $permissionCheckDone 
 		WHERE (FIND_IN_SET({raw:additional_groups_implode}, additional_groups) != 0)
 			AND id_member IN ({array_int:member_list})
 		LIMIT ' . count($members),
-		array(
+		[
 			'member_list' => $members,
 			'additional_groups_implode' => implode(', additional_groups) != 0 OR FIND_IN_SET(', $groups),
-		)
+		]
 	)->fetch_callback(
 		function ($row) use (&$updates, $groups, $group_names) {
 			// What log entries must we make for this one, eh?
@@ -427,10 +428,10 @@ function removeMembersFromGroups($members, $groups = null, $permissionCheckDone 
 			{
 				if (in_array($group, $groups))
 				{
-					$log_inserts[] = array(
+					$log_inserts[] = [
 						'group' => $group_names[$group],
 						'member' => $row['id_member']
-					);
+					];
 				}
 			}
 
@@ -441,7 +442,7 @@ function removeMembersFromGroups($members, $groups = null, $permissionCheckDone 
 	require_once(SUBSDIR . '/Members.subs.php');
 	foreach ($updates as $additional_groups => $memberArray)
 	{
-		updateMemberData($memberArray, array('additional_groups' => implode(',', array_diff(explode(',', $additional_groups), $groups))));
+		updateMemberData($memberArray, ['additional_groups' => implode(',', array_diff(explode(',', $additional_groups), $groups))]);
 	}
 
 	// Their post groups may have changed now...
@@ -495,15 +496,15 @@ function addMembersToGroup($members, $group, $type = 'auto', $permissionCheckDon
 	}
 
 	// Make sure we don't keep old stuff cached.
-	updateSettings(array('settings_updated' => time()));
+	updateSettings(['settings_updated' => time()]);
 
-	$members = !is_array($members) ? array((int) $members) : array_unique(array_map('intval', $members));
+	$members = !is_array($members) ? [(int) $members] : array_unique(array_map('intval', $members));
 
 	$group = (int) $group;
 
 	// Some groups just don't like explicitly having members.
-	$implicitGroups = array(-1, 0, 3);
-	$group_names = array();
+	$implicitGroups = [-1, 0, 3];
+	$group_names = [];
 	$group_details = membergroupById($group, true);
 	if ($group_details['min_posts'] != -1)
 	{
@@ -525,11 +526,12 @@ function addMembersToGroup($members, $group, $type = 'auto', $permissionCheckDon
 	{
 		return false;
 	}
-	// ... and assign protected groups!
-	elseif (!allowedTo('admin_forum') && $group_details['group_type'] == 1)
+
+	if (!allowedTo('admin_forum') && $group_details['group_type'] == 1)
 	{
 		return false;
 	}
+	// ... and assign protected groups!
 
 	// Do the actual updates.
 	if ($type === 'only_additional')
@@ -540,13 +542,13 @@ function addMembersToGroup($members, $group, $type = 'auto', $permissionCheckDon
 			WHERE id_member IN ({array_int:member_list})
 				AND id_group != {int:id_group}
 				AND FIND_IN_SET({int:id_group}, additional_groups) = 0',
-			array(
+			[
 				'member_list' => $members,
 				'id_group' => $group,
 				'id_group_string' => (string) $group,
 				'id_group_string_extend' => ',' . $group,
 				'blank_string' => '',
-			)
+			]
 		);
 	}
 	elseif ($type === 'only_primary' || $type === 'force_primary')
@@ -557,11 +559,11 @@ function addMembersToGroup($members, $group, $type = 'auto', $permissionCheckDon
 			WHERE id_member IN ({array_int:member_list})' . ($type === 'force_primary' ? '' : '
 				AND id_group = {int:regular_group}
 				AND FIND_IN_SET({int:id_group}, additional_groups) = 0'),
-			array(
+			[
 				'member_list' => $members,
 				'id_group' => $group,
 				'regular_group' => 0,
-			)
+			]
 		);
 	}
 	elseif ($type === 'auto')
@@ -576,14 +578,14 @@ function addMembersToGroup($members, $group, $type = 'auto', $permissionCheckDon
 			WHERE id_member IN ({array_int:member_list})
 				AND id_group != {int:id_group}
 				AND FIND_IN_SET({int:id_group}, additional_groups) = 0',
-			array(
+			[
 				'member_list' => $members,
 				'regular_group' => 0,
 				'id_group' => $group,
 				'blank_string' => '',
 				'id_group_string' => (string) $group,
 				'id_group_string_extend' => ',' . $group,
-			)
+			]
 		);
 	}
 	// Ack!!?  What happened?
@@ -592,7 +594,7 @@ function addMembersToGroup($members, $group, $type = 'auto', $permissionCheckDon
 		trigger_error('addMembersToGroup(): Unknown type \'' . $type . '\'', E_USER_WARNING);
 	}
 
-	call_integration_hook('integrate_add_members_to_group', array($members, $group_details, &$group_names));
+	call_integration_hook('integrate_add_members_to_group', [$members, $group_details, &$group_names]);
 
 	// Update their postgroup statistics.
 	updatePostGroupStats($members);
@@ -600,7 +602,7 @@ function addMembersToGroup($members, $group, $type = 'auto', $permissionCheckDon
 	require_once(SOURCEDIR . '/Logging.php');
 	foreach ($members as $member)
 	{
-		logAction('added_to_group', array('group' => $group_names[$group], 'member' => $member), 'admin');
+		logAction('added_to_group', ['group' => $group_names[$group], 'member' => $member], 'admin');
 	}
 
 	return true;
@@ -621,16 +623,16 @@ function listMembergroupMembers_Href(&$members, $membergroup, $limit = null)
 {
 	$db = database();
 
-	$members = array();
+	$members = [];
 	$db->fetchQuery('
 		SELECT 
 			id_member, real_name
 		FROM {db_prefix}members
 		WHERE id_group = {int:id_group} OR FIND_IN_SET({int:id_group}, additional_groups) != 0' . ($limit === null ? '' : '
 		LIMIT ' . ($limit + 1)),
-		array(
+		[
 			'id_group' => $membergroup,
-		)
+		]
 	)->fetch_callback(
 		function ($row) use (&$members) {
 			$members[$row['id_member']] = '<a href="' . getUrl('profile', ['action' => 'profile', 'u' => $row['id_member'], 'name' => $row['real_name']]) . '">' . $row['real_name'] . '</a>';
@@ -666,23 +668,23 @@ function cache_getMembergroupList()
 			AND id_group != {int:mod_group}
 			AND online_color != {string:blank_string}
 		ORDER BY group_name',
-		array(
+		[
 			'min_posts' => -1,
 			'not_hidden' => 0,
 			'mod_group' => 3,
 			'blank_string' => '',
-		)
+		]
 	)->fetch_callback(
 		function ($row) {
 			return '<a href="' . getUrl('group', ['action' => 'groups', 'sa' => 'members', 'group' => $row['id_group'], 'name' => $row['group_name']]) . '" ' . ($row['online_color'] ? 'style="color: ' . $row['online_color'] . '"' : '') . '>' . $row['group_name'] . '</a>';
 		}
 	);
 
-	return array(
+	return [
 		'data' => $groupCache,
 		'expires' => time() + 3600,
 		'refresh_eval' => 'return $GLOBALS[\'modSettings\'][\'settings_updated\'] > ' . time() . ';',
-	);
+	];
 }
 
 /**
@@ -711,9 +713,9 @@ function list_getMembergroups($start, $items_per_page, $sort, $membergroup_type,
 	Txt::load('Admin');
 
 	// Start collecting the data.
-	$groups = array();
-	$group_ids = array();
-	$parent_groups = array();
+	$groups = [];
+	$group_ids = [];
+	$parent_groups = [];
 
 	if ($membergroup_type === 'all')
 	{
@@ -721,8 +723,8 @@ function list_getMembergroups($start, $items_per_page, $sort, $membergroup_type,
 		$num_members = countMembersInGroup(0);
 
 		// Fill the context variable with 'Guests' and 'Regular Members'.
-		$groups = array(
-			-1 => array(
+		$groups = [
+			-1 => [
 				'id_group' => -1,
 				'group_name' => $txt['membergroups_guests'],
 				'group_name_color' => $txt['membergroups_guests'],
@@ -732,12 +734,12 @@ function list_getMembergroups($start, $items_per_page, $sort, $membergroup_type,
 				'icons' => '',
 				'can_search' => false,
 				'id_parent' => -2,
-				'num_permissions' => array(
+				'num_permissions' => [
 					'allowed' => 0,
 					'denied' => 0,
-				)
-			),
-			0 => array(
+				]
+			],
+			0 => [
 				'id_group' => 0,
 				'group_name' => $txt['membergroups_members'],
 				'group_name_color' => $txt['membergroups_members'],
@@ -747,12 +749,12 @@ function list_getMembergroups($start, $items_per_page, $sort, $membergroup_type,
 				'icons' => '',
 				'can_search' => true,
 				'id_parent' => -2,
-				'num_permissions' => array(
+				'num_permissions' => [
 					'allowed' => 0,
 					'denied' => 0,
-				)
-			),
-		);
+				]
+			],
+		];
 	}
 
 	$db->fetchQuery('
@@ -765,13 +767,13 @@ function list_getMembergroups($start, $items_per_page, $sort, $membergroup_type,
 			AND mg.id_group != {int:mod_group}
 			AND mg.group_type != {int:is_protected}') . '
 		ORDER BY {raw:sort}',
-		array(
+		[
 			'current_member' => $user_id,
 			'min_posts' => ($membergroup_type === 'post_count' ? '!= -1' : '= -1'),
 			'mod_group' => 3,
 			'is_protected' => 1,
 			'sort' => $sort,
-		)
+		]
 	)->fetch_callback(
 		function ($row) use (&$parent_groups, &$groups, &$group_ids, &$include_hidden, $count_permissions, $aggregate) {
 			global $txt;
@@ -800,7 +802,7 @@ function list_getMembergroups($start, $items_per_page, $sort, $membergroup_type,
 
 			$row['icons'] = explode('#', $row['icons']);
 			$row['id_group'] = (int) $row['id_group'];
-			$groups[$row['id_group']] = array(
+			$groups[$row['id_group']] = [
 				'id_group' => $row['id_group'],
 				'group_name' => $row['group_name'],
 				'group_name_color' => empty($row['online_color']) ? $row['group_name'] : '<span style="color: ' . $row['online_color'] . '">' . $row['group_name'] . '</span>',
@@ -809,18 +811,18 @@ function list_getMembergroups($start, $items_per_page, $sort, $membergroup_type,
 				'online_color' => $row['online_color'],
 				'type' => (int) $row['group_type'],
 				'num_members' => (int) $row['num_members'],
-				'moderators' => array(),
+				'moderators' => [],
 				'icons' => $row['icons'],
 				'can_search' => $row['id_group'] !== 3,
 				'id_parent' => (int) $row['id_parent'],
-			);
+			];
 
 			if ($count_permissions)
 			{
-				$groups[$row['id_group']]['num_permissions'] = array(
+				$groups[$row['id_group']]['num_permissions'] = [
 					'allowed' => $row['id_group'] === 1 ? '(' . $txt['permissions_all'] . ')' : 0,
 					'denied' => $row['id_group'] === 1 ? '(' . $txt['permissions_none'] . ')' : 0,
-				);
+				];
 			}
 
 			$include_hidden |= $row['can_moderate'];
@@ -837,7 +839,7 @@ function list_getMembergroups($start, $items_per_page, $sort, $membergroup_type,
 		}
 		else
 		{
-			$groups_count = membersInGroups(array(), $group_ids, $include_hidden);
+			$groups_count = membersInGroups([], $group_ids, $include_hidden);
 		}
 
 		// @todo not sure why += wouldn't = be enough?
@@ -852,9 +854,9 @@ function list_getMembergroups($start, $items_per_page, $sort, $membergroup_type,
 			FROM {db_prefix}group_moderators AS mods
 				INNER JOIN {db_prefix}members AS mem ON (mem.id_member = mods.id_member)
 			WHERE mods.id_group IN ({array_int:group_list})',
-			array(
+			[
 				'group_list' => $group_ids,
-			)
+			]
 		)->fetch_callback(
 			function ($row) use (&$groups) {
 				$groups[$row['id_group']]['moderators'][] = '<a href="' . getUrl('profile', ['action' => 'profile', 'u' => $row['id_member'], 'name' => $row['real_name']]) . '">' . $row['real_name'] . '</a>';
@@ -864,18 +866,18 @@ function list_getMembergroups($start, $items_per_page, $sort, $membergroup_type,
 
 	if (!empty($parent_groups))
 	{
-		$all_group_names = array(
+		$all_group_names = [
 			-1 => $txt['membergroups_guests'],
 			0 => $txt['membergroups_members']
-		);
+		];
 		$db->fetchQuery('
 			SELECT 
 				id_group, group_name
 			FROM {db_prefix}membergroups
 			WHERE id_group IN ({array_int:groups})',
-			array(
+			[
 				'groups' => $parent_groups,
-			)
+			]
 		)->fetch_callback(
 			function ($row) use (&$all_group_names) {
 				$all_group_names[$row['id_group']] = $row['group_name'];
@@ -894,7 +896,7 @@ function list_getMembergroups($start, $items_per_page, $sort, $membergroup_type,
 	if (substr($sort, 0, 1) === '1' || strpos($sort, ', 1') !== false)
 	{
 		$sort_ascending = strpos($sort, 'DESC') === false;
-		$sort_array = array();
+		$sort_array = [];
 
 		foreach ($groups as $group)
 		{
@@ -934,11 +936,11 @@ function list_getMembergroups($start, $items_per_page, $sort, $membergroup_type,
  * @return array
  * @package Membergroups
  */
-function membersInGroups($postGroups, $normalGroups = array(), $include_hidden = false, $include_moderators = false, $include_non_active = false)
+function membersInGroups($postGroups, $normalGroups = [], $include_hidden = false, $include_moderators = false, $include_non_active = false)
 {
 	$db = database();
 
-	$groups = array();
+	$groups = [];
 
 	// If we have post groups, let's count the number of members...
 	if (!empty($postGroups))
@@ -950,10 +952,10 @@ function membersInGroups($postGroups, $normalGroups = array(), $include_hidden =
 			WHERE id_post_group IN ({array_int:post_group_list})' . ($include_non_active ? '' : '
 				AND is_activated = {int:active_members}') . '
 			GROUP BY id_post_group',
-			array(
+			[
 				'post_group_list' => $postGroups,
 				'active_members' => 1,
-			)
+			]
 		)->fetch_callback(
 			function ($row) use (&$groups) {
 				$groups[$row['id_group']] = $row['member_count'];
@@ -971,10 +973,10 @@ function membersInGroups($postGroups, $normalGroups = array(), $include_hidden =
 			WHERE id_group IN ({array_int:normal_group_list})' . ($include_non_active ? '' : '
 				AND is_activated = {int:active_members}') . '
 			GROUP BY id_group',
-			array(
+			[
 				'normal_group_list' => $normalGroups,
 				'active_members' => 1,
-			)
+			]
 		)->fetch_callback(
 			function ($row) use (&$groups) {
 				$groups[$row['id_group']] = $row['member_count'];
@@ -995,11 +997,11 @@ function membersInGroups($postGroups, $normalGroups = array(), $include_hidden =
 				WHERE mg.id_group IN ({array_int:normal_group_list})' . ($include_non_active ? '' : '
 					AND mem.is_activated = {int:active_members}') . '
 				GROUP BY mg.id_group',
-				array(
+				[
 					'normal_group_list' => $normalGroups,
 					'active_members' => 1,
 					'blank_string' => '',
-				)
+				]
 			)->fetch_callback(
 				function ($row) use (&$groups) {
 					if (isset($groups[$row['id_group']]))
@@ -1023,7 +1025,7 @@ function membersInGroups($postGroups, $normalGroups = array(), $include_hidden =
 				COUNT(DISTINCT id_member) AS num_distinct_mods
 			FROM {db_prefix}moderators
 			LIMIT 1',
-			array()
+			[]
 		);
 		list ($groups[3]) = $request->fetch_row();
 		$request->free_result();
@@ -1053,9 +1055,9 @@ function membergroupsById($group_ids, $limit = 1, $detailed = false, $assignable
 		return [];
 	}
 
-	$group_ids = !is_array($group_ids) ? array($group_ids) : $group_ids;
+	$group_ids = !is_array($group_ids) ? [$group_ids] : $group_ids;
 
-	$groups = array();
+	$groups = [];
 	$group_ids = array_map('intval', $group_ids);
 
 	$db->fetchQuery('
@@ -1067,11 +1069,11 @@ function membergroupsById($group_ids, $limit = 1, $detailed = false, $assignable
 		FROM {db_prefix}membergroups
 		WHERE id_group IN ({array_int:group_ids})' . (empty($limit) ? '' : '
 		LIMIT {int:limit}'),
-		array(
+		[
 			'min_posts' => -1,
 			'group_ids' => $group_ids,
 			'limit' => $limit,
-		)
+		]
 	)->fetch_callback(
 		function ($row) use (&$groups, $detailed) {
 			$row['id_group'] = (int) $row['id_group'];
@@ -1104,7 +1106,7 @@ function membergroupsById($group_ids, $limit = 1, $detailed = false, $assignable
  */
 function membergroupById($group_id, $detailed = false, $assignable = false)
 {
-	$groups = membergroupsById(array($group_id), 1, $detailed, $assignable);
+	$groups = membergroupsById([$group_id], 1, $detailed, $assignable);
 
 	return $groups[$group_id] ?? false;
 }
@@ -1136,7 +1138,7 @@ function membergroupById($group_id, $detailed = false, $assignable = false)
  * @return array
  * @package Membergroups
  */
-function getBasicMembergroupData($includes = array(), $excludes = array(), $sort_order = null, $split = null)
+function getBasicMembergroupData($includes = [], $excludes = [], $sort_order = null, $split = null)
 {
 	global $txt, $modSettings;
 
@@ -1145,14 +1147,14 @@ function getBasicMembergroupData($includes = array(), $excludes = array(), $sort
 	// No $includes parameters given? Let's set some default values
 	if (empty($includes))
 	{
-		$includes = array('globalmod', 'member', 'postgroups');
+		$includes = ['globalmod', 'member', 'postgroups'];
 	}
 	elseif (!is_array($includes))
 	{
-		$includes = array($includes);
+		$includes = [$includes];
 	}
 
-	$groups = array();
+	$groups = [];
 
 	$where = '';
 	$sort_order = $sort_order ?? 'min_posts, CASE WHEN id_group < {int:newbie_group} THEN id_group ELSE 4 END, group_name';
@@ -1193,7 +1195,7 @@ function getBasicMembergroupData($includes = array(), $excludes = array(), $sort
 		WHERE 1 = 1
 			' . $where . '
 		ORDER BY ' . $sort_order,
-		array(
+		[
 			'admin_group' => 1,
 			'moderator_group' => 3,
 			'global_mod_group' => 2,
@@ -1201,57 +1203,57 @@ function getBasicMembergroupData($includes = array(), $excludes = array(), $sort
 			'is_protected' => 1,
 			'newbie_group' => 4,
 			'hidden_group' => 2,
-		)
+		]
 	);
 
 	// Include the default membergroup? the ones with id_member = 0
 	if (in_array('member', $includes) && !isset($split))
 	{
-		$groups[] = array(
+		$groups[] = [
 			'id' => 0,
 			'name' => $txt['membergroups_members']
-		);
+		];
 	}
 
 	if (!empty($split))
 	{
 		if (empty($modSettings['permission_enable_postgroups']))
 		{
-			$groups['groups'][0] = array(
+			$groups['groups'][0] = [
 				'id' => 0,
 				'name' => $txt['membergroups_members'],
 				'can_be_additional' => false,
 				'member_count' => 0,
-			);
-			$groups['membergroups'][0] = array(
+			];
+			$groups['membergroups'][0] = [
 				'id' => 0,
 				'name' => $txt['membergroups_members'],
 				'can_be_additional' => false,
 				'member_count' => 0,
-			);
+			];
 		}
 		while (($row = $request->fetch_assoc()))
 		{
-			$groups['groups'][$row['id_group']] = array(
+			$groups['groups'][$row['id_group']] = [
 				'id' => $row['id_group'],
 				'name' => $row['group_name'],
 				'member_count' => 0,
-			);
+			];
 
 			if ($row['min_posts'] == -1)
 			{
-				$groups['membergroups'][] = array(
+				$groups['membergroups'][] = [
 					'id' => $row['id_group'],
 					'name' => $row['group_name'],
 					'can_be_additional' => true,
-				);
+				];
 			}
 			else
 			{
-				$groups['postgroups'][] = array(
+				$groups['postgroups'][] = [
 					'id' => $row['id_group'],
 					'name' => $row['group_name'],
-				);
+				];
 			}
 		}
 	}
@@ -1259,11 +1261,11 @@ function getBasicMembergroupData($includes = array(), $excludes = array(), $sort
 	{
 		while (($row = $request->fetch_assoc()))
 		{
-			$groups[] = array(
+			$groups[] = [
 				'id' => $row['id_group'],
 				'name' => $row['group_name'],
 				'online_color' => $row['online_color'],
-			);
+			];
 		}
 	}
 
@@ -1285,14 +1287,14 @@ function getGroups($groupList)
 
 	$db = database();
 
-	$groups = array();
+	$groups = [];
 	if (in_array(0, $groupList))
 	{
-		$groups[0] = array(
+		$groups[0] = [
 			'id' => 0,
 			'name' => $txt['announce_regular_members'],
 			'member_count' => 'n/a',
-		);
+		];
 	}
 
 	// Get all membergroups that have access to the board the announcement was made on.
@@ -1303,16 +1305,16 @@ function getGroups($groupList)
 			LEFT JOIN {db_prefix}members AS mem ON (mem.id_group = mg.id_group OR FIND_IN_SET(mg.id_group, mem.additional_groups) != 0 OR mg.id_group = mem.id_post_group)
 		WHERE mg.id_group IN ({array_int:group_list})
 		GROUP BY mg.id_group, mg.group_name',
-		array(
+		[
 			'group_list' => $groupList,
-		)
+		]
 	)->fetch_callback(
 		function ($row) use (&$groups) {
-			$groups[$row['id_group']] = array(
+			$groups[$row['id_group']] = [
 				'id' => $row['id_group'],
 				'name' => $row['group_name'],
 				'member_count' => $row['num_members'],
-			);
+			];
 		}
 	);
 
@@ -1333,7 +1335,7 @@ function getMaxGroupID()
 		SELECT 
 			MAX(id_group)
 		FROM {db_prefix}membergroups',
-		array()
+		[]
 	);
 	list ($id_group) = $request->fetch_row();
 	$request->free_result();
@@ -1355,15 +1357,15 @@ function createMembergroup($groupname, $minposts, $type)
 
 	$db->insert('',
 		'{db_prefix}membergroups',
-		array(
+		[
 			'description' => 'string', 'group_name' => 'string-80', 'min_posts' => 'int',
 			'icons' => 'string', 'online_color' => 'string', 'group_type' => 'int',
-		),
-		array(
+		],
+		[
 			'', Util::htmlspecialchars($groupname, ENT_QUOTES), $minposts,
 			'1#icon.png', '', $type,
-		),
-		array('id_group')
+		],
+		['id_group']
 	);
 
 	return $db->insert_id('{db_prefix}membergroups');
@@ -1382,21 +1384,21 @@ function copyPermissions($id_group, $copy_from, $illegal_permissions)
 {
 	$db = database();
 
-	$inserts = array();
+	$inserts = [];
 
 	$db->fetchQuery('
 		SELECT 
 			permission, add_deny
 		FROM {db_prefix}permissions
 		WHERE id_group = {int:copy_from}',
-		array(
+		[
 			'copy_from' => $copy_from,
-		)
+		]
 	)->fetch_callback(
 		function ($row) use (&$inserts, $illegal_permissions, $id_group) {
 			if (empty($illegal_permissions) || !in_array($row['permission'], $illegal_permissions))
 			{
-				$inserts[] = array($id_group, $row['permission'], $row['add_deny']);
+				$inserts[] = [$id_group, $row['permission'], $row['add_deny']];
 			}
 		}
 	);
@@ -1405,9 +1407,9 @@ function copyPermissions($id_group, $copy_from, $illegal_permissions)
 	{
 		$db->insert('insert',
 			'{db_prefix}permissions',
-			array('id_group' => 'int', 'permission' => 'string', 'add_deny' => 'int'),
+			['id_group' => 'int', 'permission' => 'string', 'add_deny' => 'int'],
 			$inserts,
-			array('id_group', 'permission')
+			['id_group', 'permission']
 		);
 	}
 }
@@ -1428,12 +1430,12 @@ function copyBoardPermissions($id_group, $copy_from)
 			id_profile, permission, add_deny
 		FROM {db_prefix}board_permissions
 		WHERE id_group = {int:copy_from}',
-		array(
+		[
 			'copy_from' => $copy_from,
-		)
+		]
 	)->fetch_callback(
 		function ($row) use ($id_group) {
-			return array($id_group, $row['id_profile'], $row['permission'], $row['add_deny']);
+			return [$id_group, $row['id_profile'], $row['permission'], $row['add_deny']];
 		}
 	);
 
@@ -1441,9 +1443,9 @@ function copyBoardPermissions($id_group, $copy_from)
 	{
 		$db->insert('insert',
 			'{db_prefix}board_permissions',
-			array('id_group' => 'int', 'id_profile' => 'int', 'permission' => 'string', 'add_deny' => 'int'),
+			['id_group' => 'int', 'id_profile' => 'int', 'permission' => 'string', 'add_deny' => 'int'],
 			$inserts,
-			array('id_group', 'id_profile', 'permission')
+			['id_group', 'id_profile', 'permission']
 		);
 	}
 }
@@ -1470,12 +1472,12 @@ function updateCopiedGroup($id_group, $copy_from)
 			max_messages = {int:max_messages},
 			icons = {string:icons}
 			WHERE id_group = {int:current_group}',
-		array(
+		[
 			'max_messages' => $group_info['max_messages'],
 			'current_group' => $id_group,
 			'online_color' => $group_info['online_color'],
 			'icons' => $group_info['icons'],
-		)
+		]
 	);
 }
 
@@ -1494,10 +1496,10 @@ function updateInheritedGroup($id_group, $copy_id)
 		UPDATE {db_prefix}membergroups
 		SET id_parent = {int:copy_from}
 		WHERE id_group = {int:current_group}',
-		array(
+		[
 			'copy_from' => $copy_id,
 			'current_group' => $id_group,
-		)
+		]
 	);
 }
 
@@ -1507,27 +1509,27 @@ function updateInheritedGroup($id_group, $copy_id)
  * - It's passed an associative array $properties, with 'current_group' holding
  * the group to update. The rest of the keys are details to update it with.
  *
- * @param mixed[] $properties
+ * @param array $properties
  * @package Membergroups
  */
 function updateMembergroupProperties($properties)
 {
 	$db = database();
 
-	$known_properties = array(
-		'max_messages' => array('type' => 'int'),
-		'min_posts' => array('type' => 'int'),
-		'group_type' => array('type' => 'int'),
-		'hidden' => array('type' => 'int'),
-		'id_parent' => array('type' => 'int'),
-		'group_name' => array('type' => 'string'),
-		'online_color' => array('type' => 'string'),
-		'icons' => array('type' => 'string'),
-		'description' => array('type' => 'string'),
-	);
+	$known_properties = [
+		'max_messages' => ['type' => 'int'],
+		'min_posts' => ['type' => 'int'],
+		'group_type' => ['type' => 'int'],
+		'hidden' => ['type' => 'int'],
+		'id_parent' => ['type' => 'int'],
+		'group_name' => ['type' => 'string'],
+		'online_color' => ['type' => 'string'],
+		'icons' => ['type' => 'string'],
+		'description' => ['type' => 'string'],
+	];
 
-	$values = array('current_group' => $properties['current_group']);
-	$updates = array();
+	$values = ['current_group' => $properties['current_group']];
+	$updates = [];
 	foreach ($properties as $name => $value)
 	{
 		if (isset($known_properties[$name]))
@@ -1561,7 +1563,7 @@ function updateMembergroupProperties($properties)
  * Detaches a membergroup from the boards listed in $boards.
  *
  * @param int $id_group
- * @param mixed[] $boards
+ * @param array $boards
  * @param string $access_list ('allow', 'deny')
  * @package Membergroups
  */
@@ -1576,22 +1578,22 @@ function detachGroupFromBoards($id_group, $boards, $access_list)
 		FROM {db_prefix}boards
 		WHERE FIND_IN_SET({string:current_group}, {raw:column}) != 0' . (empty($boards[$access_list]) ? '' : '
 			AND id_board NOT IN ({array_int:board_access_list})'),
-		array(
+		[
 			'current_group' => $id_group,
 			'board_access_list' => $boards[$access_list],
 			'column' => $access_list === 'allow' ? 'member_groups' : 'deny_member_groups',
-		)
+		]
 	)->fetch_callback(
 		function ($row) use ($id_group, $access_list, $db) {
 			$db->query('', '
 				UPDATE {db_prefix}boards
 				SET {raw:column} = {string:member_group_access}
 				WHERE id_board = {int:current_board}',
-				array(
+				[
 					'current_board' => $row['id_board'],
-					'member_group_access' => implode(',', array_diff(explode(',', $row['member_groups']), array($id_group))),
+					'member_group_access' => implode(',', array_diff(explode(',', $row['member_groups']), [$id_group])),
 					'column' => $access_list === 'allow' ? 'member_groups' : 'deny_member_groups',
-				)
+				]
 			);
 		}
 	);
@@ -1602,7 +1604,7 @@ function detachGroupFromBoards($id_group, $boards, $access_list)
  * the 'allow' or 'deny' list.
  *
  * @param int $id_group
- * @param mixed[] $boards
+ * @param array $boards
  * @param string $access_list ('allow', 'deny')
  * @package Membergroups
  */
@@ -1615,14 +1617,14 @@ function assignGroupToBoards($id_group, $boards, $access_list)
 		SET {raw:column} = CASE WHEN {raw:column} = {string:blank_string} THEN {string:group_id_string} ELSE CONCAT({raw:column}, {string:comma_group}) END
 		WHERE id_board IN ({array_int:board_list})
 			AND FIND_IN_SET({int:current_group}, {raw:column}) = 0',
-		array(
+		[
 			'board_list' => $boards[$access_list],
 			'blank_string' => '',
 			'current_group' => $id_group,
 			'group_id_string' => (string) $id_group,
 			'comma_group' => ',' . $id_group,
 			'column' => $access_list === 'allow' ? 'member_groups' : 'deny_member_groups',
-		)
+		]
 	);
 }
 
@@ -1636,16 +1638,16 @@ function detachDeletedGroupFromMembers($id_group)
 {
 	$db = database();
 
-	$updates = array();
+	$updates = [];
 
 	$db->query('', '
 		UPDATE {db_prefix}members
 		SET id_group = {int:regular_member}
 		WHERE id_group = {int:current_group}',
-		array(
+		[
 			'regular_member' => 0,
 			'current_group' => $id_group,
-		)
+		]
 	);
 
 	$db->fetchQuery('
@@ -1653,9 +1655,9 @@ function detachDeletedGroupFromMembers($id_group)
 			id_member, additional_groups
 		FROM {db_prefix}members
 		WHERE FIND_IN_SET({string:current_group}, additional_groups) != 0',
-		array(
+		[
 			'current_group' => $id_group,
-		)
+		]
 	)->fetch_callback(
 		function ($row) use (&$updates) {
 			$updates[$row['additional_groups']][] = $row['id_member'];
@@ -1665,7 +1667,7 @@ function detachDeletedGroupFromMembers($id_group)
 	require_once(SUBSDIR . '/Members.subs.php');
 	foreach ($updates as $additional_groups => $memberArray)
 	{
-		updateMemberData($memberArray, array('additional_groups' => implode(',', array_diff(explode(',', $additional_groups), array($id_group)))));
+		updateMemberData($memberArray, ['additional_groups' => implode(',', array_diff(explode(',', $additional_groups), [$id_group]))]);
 	}
 
 }
@@ -1680,7 +1682,7 @@ function setGroupToHidden($id_group)
 {
 	$db = database();
 
-	$updates = array();
+	$updates = [];
 
 	$db->fetchQuery('
 		SELECT 
@@ -1688,9 +1690,9 @@ function setGroupToHidden($id_group)
 		FROM {db_prefix}members
 		WHERE id_group = {int:current_group}
 			AND FIND_IN_SET({int:current_group}, additional_groups) = 0',
-		array(
+		[
 			'current_group' => $id_group,
-		)
+		]
 	)->fetch_callback(
 		function ($row) use (&$updates) {
 			$updates[$row['additional_groups']][] = $row['id_member'];
@@ -1700,17 +1702,17 @@ function setGroupToHidden($id_group)
 	require_once(SUBSDIR . '/Members.subs.php');
 	foreach ($updates as $additional_groups => $memberArray)
 	{
-		updateMemberData($memberArray, array('additional_groups' => implode(',', array_merge(explode(',', $additional_groups), array($id_group)))));
+		updateMemberData($memberArray, ['additional_groups' => implode(',', array_merge(explode(',', $additional_groups), [$id_group]))]);
 	}
 
 	$db->query('', '
 		UPDATE {db_prefix}members
 		SET id_group = {int:regular_member}
 		WHERE id_group = {int:current_group}',
-		array(
+		[
 			'regular_member' => 0,
 			'current_group' => $id_group,
-		)
+		]
 	);
 }
 
@@ -1731,9 +1733,9 @@ function validateShowGroupMembership()
 		 	COUNT(*)
 		FROM {db_prefix}membergroups
 		WHERE group_type > {int:non_joinable}',
-		array(
+		[
 			'non_joinable' => 1,
-		)
+		]
 	);
 	list ($have_joinable) = $request->fetch_row();
 	$request->free_result();
@@ -1741,7 +1743,7 @@ function validateShowGroupMembership()
 	// Do we need to update the setting?
 	if ((empty($modSettings['show_group_membership']) && $have_joinable) || (!empty($modSettings['show_group_membership']) && !$have_joinable))
 	{
-		updateSettings(array('show_group_membership' => $have_joinable ? 1 : 0));
+		updateSettings(['show_group_membership' => $have_joinable ? 1 : 0]);
 	}
 }
 
@@ -1758,9 +1760,9 @@ function detachGroupModerators($id_group)
 	$db->query('', '
 		DELETE FROM {db_prefix}group_moderators
 		WHERE id_group = {int:current_group}',
-		array(
+		[
 			'current_group' => $id_group,
-		)
+		]
 	);
 }
 
@@ -1782,9 +1784,9 @@ function getIDMemberFromGroupModerators($moderators)
 		FROM {db_prefix}members
 		WHERE member_name IN ({array_string:moderators}) OR real_name IN ({array_string:moderators})
 		LIMIT ' . count($moderators),
-		array(
+		[
 			'moderators' => $moderators,
-		)
+		]
 	)->fetch_callback(
 		function ($row) {
 			return $row['id_member'];
@@ -1803,17 +1805,17 @@ function assignGroupModerators($id_group, $group_moderators)
 {
 	$db = database();
 
-	$mod_insert = array();
+	$mod_insert = [];
 	foreach ($group_moderators as $moderator)
 	{
-		$mod_insert[] = array($id_group, $moderator);
+		$mod_insert[] = [$id_group, $moderator];
 	}
 
 	$db->insert('insert',
 		'{db_prefix}group_moderators',
-		array('id_group' => 'int', 'id_member' => 'int'),
+		['id_group' => 'int', 'id_member' => 'int'],
 		$mod_insert,
-		array('id_group', 'id_member')
+		['id_group', 'id_member']
 	);
 }
 
@@ -1828,7 +1830,7 @@ function getGroupModerators($id_group)
 {
 	$db = database();
 
-	$moderators = array();
+	$moderators = [];
 
 	$db->fetchQuery('
 		SELECT 
@@ -1836,9 +1838,9 @@ function getGroupModerators($id_group)
 		FROM {db_prefix}group_moderators AS mods
 			INNER JOIN {db_prefix}members AS mem ON (mem.id_member = mods.id_member)
 		WHERE mods.id_group = {int:current_group}',
-		array(
+		[
 			'current_group' => $id_group,
-		)
+		]
 	)->fetch_callback(
 		function ($row) use (&$moderators) {
 			$moderators[$row['id_member']] = $row['real_name'];
@@ -1863,7 +1865,7 @@ function getInheritableGroups($id_group = false)
 
 	$db = database();
 
-	$inheritable_groups = array();
+	$inheritable_groups = [];
 
 	$db->fetchQuery('
 		SELECT 
@@ -1875,12 +1877,12 @@ function getInheritableGroups($id_group = false)
 			AND min_posts = {int:min_posts}' : '') . (allowedTo('admin_forum') ? '' : '
 			AND group_type != {int:is_protected}') . '
 			AND id_group NOT IN (1, 3)',
-		array(
+		[
 			'current_group' => $id_group,
 			'min_posts' => -1,
 			'not_inherited' => -2,
 			'is_protected' => 1,
-		)
+		]
 	)->fetch_callback(
 		function ($row) use (&$inheritable_groups) {
 			$inheritable_groups[$row['id_group']] = $row['group_name'];
@@ -1903,8 +1905,8 @@ function prepareMembergroupPermissions()
 	$db = database();
 
 	// Start this with the guests/members.
-	$profile_groups = array(
-		-1 => array(
+	$profile_groups = [
+		-1 => [
 			'id' => -1,
 			'name' => $txt['membergroups_guests'],
 			'color' => '',
@@ -1912,9 +1914,9 @@ function prepareMembergroupPermissions()
 			'replies_own' => 'disallow',
 			'replies_any' => 'disallow',
 			'attachment' => 'disallow',
-			'children' => array(),
-		),
-		0 => array(
+			'children' => [],
+		],
+		0 => [
 			'id' => 0,
 			'name' => $txt['membergroups_members'],
 			'color' => '',
@@ -1922,9 +1924,9 @@ function prepareMembergroupPermissions()
 			'replies_own' => 'disallow',
 			'replies_any' => 'disallow',
 			'attachment' => 'disallow',
-			'children' => array(),
-		),
-	);
+			'children' => [],
+		],
+	];
 
 	$db->fetchQuery('
 		SELECT 
@@ -1933,15 +1935,15 @@ function prepareMembergroupPermissions()
 		WHERE id_group != {int:admin_group}
 			' . (empty($modSettings['permission_enable_postgroups']) ? ' AND min_posts = {int:min_posts}' : '') . '
 		ORDER BY id_parent ASC',
-		array(
+		[
 			'admin_group' => 1,
 			'min_posts' => -1,
-		)
+		]
 	)->fetch_callback(
 		function ($row) use (&$profile_groups) {
 			if ($row['id_parent'] == -2)
 			{
-				$profile_groups[$row['id_group']] = array(
+				$profile_groups[$row['id_group']] = [
 					'id' => $row['id_group'],
 					'name' => $row['group_name'],
 					'color' => $row['online_color'],
@@ -1949,8 +1951,8 @@ function prepareMembergroupPermissions()
 					'replies_own' => 'disallow',
 					'replies_any' => 'disallow',
 					'attachment' => 'disallow',
-					'children' => array(),
-				);
+					'children' => [],
+				];
 			}
 			elseif (isset($profile_groups[$row['id_parent']]))
 			{
@@ -1978,7 +1980,7 @@ function loadGroups($id_member, $show_hidden = false, $min_posts = -1)
 {
 	$db = database();
 
-	$groups = array();
+	$groups = [];
 	$db->fetchQuery('
 		SELECT 
 			mg.id_group, mg.group_name, COALESCE(gm.id_member, 0) AS can_moderate, mg.hidden
@@ -1988,12 +1990,12 @@ function loadGroups($id_member, $show_hidden = false, $min_posts = -1)
 			AND mg.id_group != {int:moderator_group}' . ($show_hidden ? '' : '
 			AND mg.hidden = {int:not_hidden}') . '
 		ORDER BY mg.group_name',
-		array(
+		[
 			'current_member' => $id_member,
 			'min_posts' => $min_posts,
 			'moderator_group' => 3,
 			'not_hidden' => 0,
-		)
+		]
 	)->fetch_callback(
 		function ($row) use (&$groups, $show_hidden) {
 			// Hide hidden groups!
@@ -2022,7 +2024,7 @@ function accessibleGroups()
 {
 	$db = database();
 
-	$groups = array();
+	$groups = [];
 	$db->fetchQuery('
 		SELECT 
 			mg.id_group, mg.group_name, COALESCE(gm.id_member, 0) AS can_moderate, mg.hidden
@@ -2030,11 +2032,11 @@ function accessibleGroups()
 			LEFT JOIN {db_prefix}group_moderators AS gm ON (gm.id_group = mg.id_group AND gm.id_member = {int:current_member})
 		WHERE mg.min_posts = {int:min_posts}
 			AND mg.id_group != {int:moderator_group}',
-		array(
+		[
 			'current_member' => User::$info->id,
 			'min_posts' => -1,
 			'moderator_group' => 3,
-		)
+		]
 	)->fetch_callback(
 		function ($row) use (&$groups) {
 			// Hide hidden groups!
@@ -2071,7 +2073,7 @@ function list_getGroupRequestCount($where, $where_parameters)
 			COUNT(*)
 		FROM {db_prefix}log_group_requests AS lgr
 		WHERE ' . $where,
-		array_merge($where_parameters, array())
+		array_merge($where_parameters, [])
 	);
 	list ($totalRequests) = $request->fetch_row();
 	$request->free_result();
@@ -2089,7 +2091,7 @@ function list_getGroupRequestCount($where, $where_parameters)
  * @param string $sort A string indicating how to sort the results
  * @param string $where
  * @param string[] $where_parameters
- * @return mixed[] an array of group requests
+ * @return array an array of group requests
  * Each group request has:
  *   'id'
  *   'member_link'
@@ -2112,18 +2114,18 @@ function list_getGroupRequests($start, $items_per_page, $sort, $where, $where_pa
 		WHERE ' . $where . '
 		ORDER BY {raw:sort}
 		LIMIT ' . $items_per_page . '  OFFSET ' . $start,
-		array_merge($where_parameters, array(
+		array_merge($where_parameters, [
 			'sort' => $sort,
-		))
+		])
 	)->fetch_callback(
 		function ($row) {
-			return array(
+			return [
 				'id' => $row['id_request'],
 				'member_link' => '<a href="' . getUrl('profile', ['action' => 'profile', 'u' => $row['id_member'], 'name' => $row['real_name']]) . '">' . $row['real_name'] . '</a>',
 				'group_link' => '<span style="color: ' . $row['online_color'] . '">' . $row['group_name'] . '</span>',
 				'reason' => censor($row['reason']),
 				'time_submitted' => standardTime($row['time_applied']),
-			);
+			];
 		}
 	);
 }
@@ -2142,9 +2144,9 @@ function deleteGroupRequests($groups)
 	$db->query('', '
 		DELETE FROM {db_prefix}log_group_requests
 		WHERE id_request IN ({array_int:request_list})',
-		array(
+		[
 			'request_list' => $groups,
-		)
+		]
 	);
 }
 
@@ -2170,15 +2172,15 @@ function updatePostGroupStats($members = null, $parameter2 = null)
 	if ($postgroups === null || $members === null)
 	{
 		// Fetch the postgroups!
-		$postgroups = array();
+		$postgroups = [];
 		$db->fetchQuery('
 			SELECT 
 			 	id_group, min_posts
 			FROM {db_prefix}membergroups
 			WHERE min_posts != {int:min_posts}',
-			array(
+			[
 				'min_posts' => -1,
-			)
+			]
 		)->fetch_callback(
 			function ($row) use (&$postgroups) {
 				$postgroups[$row['id_group']] = $row['min_posts'];
@@ -2214,9 +2216,9 @@ function updatePostGroupStats($members = null, $parameter2 = null)
 				ELSE 0
 			END' . ($members !== null ? '
 		WHERE id_member IN ({array_int:members})' : ''),
-		array(
-			'members' => is_array($members) ? $members : array($members),
-		)
+		[
+			'members' => is_array($members) ? $members : [$members],
+		]
 	);
 }
 
@@ -2236,15 +2238,15 @@ function getUnassignableGroups($ignore_protected)
 		FROM {db_prefix}membergroups
 		WHERE min_posts != {int:min_posts}' . ($ignore_protected ? '' : '
 			OR group_type = {int:is_protected}'),
-		array(
+		[
 			'min_posts' => -1,
 			'is_protected' => 1,
-		)
+		]
 	)->fetch_callback(
 		function ($row) {
 			return $row['id_group'];
 		},
-		array(-1, 3)
+		[-1, 3]
 	);
 }
 
@@ -2260,15 +2262,15 @@ function getGroupsList()
 	Txt::load('Profile');
 
 	$db = database();
-	$member_groups = array(
-		0 => array(
+	$member_groups = [
+		0 => [
 			'id' => 0,
 			'name' => $txt['no_primary_membergroup'],
 			'is_primary' => false,
 			'can_be_additional' => false,
 			'can_be_primary' => true,
-		)
-	);
+		]
+	];
 
 	// Load membergroups, but only those groups the user can assign.
 	$db->fetchQuery('
@@ -2279,12 +2281,12 @@ function getGroupsList()
 			AND min_posts = {int:min_posts}' . (allowedTo('admin_forum') ? '' : '
 			AND group_type != {int:is_protected}') . '
 		ORDER BY min_posts, CASE WHEN id_group < {int:newbie_group} THEN id_group ELSE 4 END, group_name',
-		array(
+		[
 			'moderator_group' => 3,
 			'min_posts' => -1,
 			'is_protected' => 1,
 			'newbie_group' => 4,
-		)
+		]
 	)->fetch_callback(
 		function ($row) use (&$member_groups) {
 			// We should skip the administrator group if they don't have the admin_forum permission!
@@ -2293,13 +2295,13 @@ function getGroupsList()
 				return;
 			}
 
-			$member_groups[$row['id_group']] = array(
+			$member_groups[$row['id_group']] = [
 				'id' => $row['id_group'],
 				'name' => $row['group_name'],
 				'hidden' => $row['hidden'],
 				'is_primary' => false,
 				'can_be_primary' => $row['hidden'] != 2,
-			);
+			];
 		}
 	);
 

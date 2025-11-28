@@ -59,7 +59,7 @@ class Jslocale extends AbstractController
 	/**
 	 * Creates the javascript code for localization of the editor (SCEditor)
 	 */
-	public function action_sceditor()
+	public function action_sceditor(): void
 	{
 		global $txt;
 
@@ -95,7 +95,7 @@ class Jslocale extends AbstractController
 	 *
 	 * @param string $language_file
 	 */
-	private function _prepareLocale($language_file)
+	private function _prepareLocale($language_file): array
 	{
 		global $modSettings, $language;
 
@@ -114,7 +114,7 @@ class Jslocale extends AbstractController
 	/**
 	 * Takes care of echo'ing the javascript file stored in $this->_file_data
 	 */
-	private function _sendFile()
+	private function _sendFile(): void
 	{
 		// Make sure they know what type of file we are.
 		Headers::instance()
@@ -131,7 +131,7 @@ class Jslocale extends AbstractController
 	 * Method to handle the API request for agreement and privacy policy by returning it in a
 	 * selected language.  Used when checkbox accept agreement is enabled.
 	 */
-	public function action_agreement_api()
+	public function action_agreement_api(): void
 	{
 		global $context, $modSettings;
 

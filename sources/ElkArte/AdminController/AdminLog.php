@@ -40,31 +40,31 @@ class AdminLog extends AbstractController
 		global $context, $txt, $modSettings;
 
 		// These are the logs they can load.
-		$subActions = array(
-			'errorlog' => array(
+		$subActions = [
+			'errorlog' => [
 				'function' => 'action_index',
-				'controller' => ManageErrors::class),
+				'controller' => ManageErrors::class],
 				'disabled' => empty($modSettings['enableErrorLogging']),
-			'adminlog' => array(
+			'adminlog' => [
 				'function' => 'action_log',
-				'controller' => Modlog::class),
-			'modlog' => array(
+				'controller' => Modlog::class],
+			'modlog' => [
 				'function' => 'action_log',
 				'controller' => Modlog::class,
-				'disabled' => !featureEnabled('ml') || empty($modSettings['modlog_enabled'])),
-			'banlog' => array(
+				'disabled' => !featureEnabled('ml') || empty($modSettings['modlog_enabled'])],
+			'banlog' => [
 				'function' => 'action_log',
-				'controller' => ManageBans::class),
-			'spiderlog' => array(
+				'controller' => ManageBans::class],
+			'spiderlog' => [
 				'function' => 'action_logs',
-				'controller' => ManageSearchEngines::class),
-			'tasklog' => array(
+				'controller' => ManageSearchEngines::class],
+			'tasklog' => [
 				'function' => 'action_log',
-				'controller' => ManageScheduledTasks::class),
-			'pruning' => array(
+				'controller' => ManageScheduledTasks::class],
+			'pruning' => [
 				'controller' => $this,
-				'function' => 'action_pruningSettings_display'),
-		);
+				'function' => 'action_pruningSettings_display'],
+		];
 
 		// Setup the custom tabs.
 		$context[$context['admin_menu_name']]['object']->prepareTabData([
@@ -123,7 +123,7 @@ class AdminLog extends AbstractController
 	 * weekly scheduled task.
 	 * @uses _pruningSettings form.
 	 */
-	public function action_pruningSettings_display()
+	public function action_pruningSettings_display(): void
 	{
 		global $txt, $context, $modSettings;
 
@@ -201,7 +201,7 @@ class AdminLog extends AbstractController
 	/**
 	 * Returns the configuration settings for pruning logs.
 	 */
-	private function _settings()
+	private function _settings(): array
 	{
 		global $txt;
 
@@ -233,7 +233,7 @@ class AdminLog extends AbstractController
 	/**
 	 * Return the search engine settings for use in admin search
 	 */
-	public function settings_search()
+	public function settings_search(): array
 	{
 		return $this->_settings();
 	}

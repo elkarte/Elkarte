@@ -49,24 +49,23 @@ interface QueryInterface
 	public function quote($db_string, $db_values);
 
 	/**
-	 * Do a query.  Takes care of errors too.
+	 * Executes a database query using the provided identifier, query string, and values.
 	 *
-	 * @param string $identifier
-	 * @param string $db_string
-	 * @param array|false $db_values = array()
-	 *
-	 * @return bool|AbstractResult
+	 * @param string $identifier A unique identifier for the query.
+	 * @param string $db_string The SQL query string to be executed.
+	 * @param array $db_values An associative array of values to bind to the query. Default is an empty array.
+	 * @return AbstractResult
 	 */
-	public function query($identifier, $db_string, $db_values = array());
+	public function query($identifier, $db_string, $db_values = []);
 
 	/**
-	 * Do a query, and returns the results.
+	 * Executes a database fetch operation using the provided query string and values.
 	 *
-	 * @param string $db_string
-	 * @param array $db_values = array()
-	 * @return bool|AbstractResult
+	 * @param string $db_string The SQL query string to be executed.
+	 * @param array $db_values An associative array of values to bind to the query. Default is an empty array.
+	 * @return AbstractResult
 	 */
-	public function fetchQuery($db_string, $db_values = array());
+	public function fetchQuery($db_string, $db_values = []);
 
 	/**
 	 * Last insert id
@@ -107,27 +106,29 @@ interface QueryInterface
 	public function skip_next_error();
 
 	/**
-	 * Insert data.
+	 * Insert data into a database table using the specified method.
 	 *
-	 * @param string $method - options 'replace', 'ignore', 'insert'
-	 * @param string $table
-	 * @param array $columns
-	 * @param array $data
-	 * @param string[] $keys
-	 * @param bool $disable_trans = false
-	 * @return bool|resource
+	 * @param string $method The method of insertion (options 'replace', 'ignore', 'insert').
+	 * @param string $table The name of the database table.
+	 * @param array $columns The list of columns to insert data into.
+	 * @param array $data The data to be inserted, structured as an array of rows.
+	 * @param array $keys The key columns to be used for conflicts or duplicates.
+	 * @param bool $disable_trans Whether to disable transactions during insertion.
+	 *
+	 * @return object The result of the insertion query, including details about the operation.
 	 */
 	public function insert($method, $table, $columns, $data, $keys, $disable_trans = false);
 
 	/**
-	 * Replaces data.
+	 * Replace or insert data into a specified table based on unique keys.
 	 *
-	 * @param string $table
-	 * @param array $columns
-	 * @param array $data
-	 * @param string[] $keys
-	 * @param bool $disable_trans = false
-	 * @return bool|resource
+	 * @param string $table The name of the table where the data should be replaced.
+	 * @param array $columns An array of column names for the table.
+	 * @param array $data An array of data to insert or replace in the table.
+	 * @param array $keys An array of unique keys used to determine if a row should be replaced or inserted.
+	 * @param bool $disable_trans Optional. Whether to disable transactions for the operation. Default is false.
+	 *
+	 * @return bool True on success, false on failure.
 	 */
 	public function replace($table, $columns, $data, $keys, $disable_trans = false);
 

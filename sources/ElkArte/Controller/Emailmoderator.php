@@ -64,7 +64,7 @@ class Emailmoderator extends AbstractController
 	 * - Uses action_reporttm2() if post data was sent.
 	 * - Accessed through ?action=reporttm.
 	 */
-	public function action_reporttm()
+	public function action_reporttm(): void
 	{
 		global $txt, $modSettings, $context;
 
@@ -136,7 +136,7 @@ class Emailmoderator extends AbstractController
 	 * - Called by action_reporttm(), and thus has the same permission and setting requirements as it does.
 	 * - Accessed through ?action=reporttm when posting.
 	 */
-	public function action_reporttm2()
+	public function action_reporttm2(): ?bool
 	{
 		global $txt, $topic, $board, $modSettings, $language, $context;
 
@@ -291,5 +291,7 @@ class Emailmoderator extends AbstractController
 
 		// Back to the post we reported!
 		redirectexit('reportsent;topic=' . $topic . '.msg' . $msg_id . '#msg' . $msg_id);
+
+		return null;
 	}
 }

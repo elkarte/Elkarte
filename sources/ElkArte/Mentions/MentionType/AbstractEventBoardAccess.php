@@ -68,7 +68,7 @@ abstract class AbstractEventBoardAccess extends AbstractEventMessage
 	 *
 	 * @return bool
 	 */
-	protected function _validateAccess($boards, &$mentions, $unset_keys)
+	protected function _validateAccess($boards, &$mentions, $unset_keys): bool
 	{
 		global $modSettings;
 

@@ -56,7 +56,7 @@ class AttachmentErrorContext
 	 *
 	 * @return bool
 	 */
-	public function addAttach($id, $name)
+	public function addAttach($id, $name): bool
 	{
 		if (empty($id) || empty($name))
 		{
@@ -67,10 +67,10 @@ class AttachmentErrorContext
 
 		if (!isset($this->_attachs[$id]))
 		{
-			$this->_attachs[$id] = array(
+			$this->_attachs[$id] = [
 				'name' => $name,
 				'error' => ErrorContext::context($id, 1),
-			);
+			];
 		}
 
 		$this->activate($id);
@@ -85,7 +85,7 @@ class AttachmentErrorContext
 	 *
 	 * @return AttachmentErrorContext
 	 */
-	public function activate($id = null)
+	public function activate($id = null): AttachmentErrorContext
 	{
 		$this->_active_attach = empty($id) || !isset($this->_attachs[$id]) ? 'generic' : $id;
 
@@ -98,7 +98,7 @@ class AttachmentErrorContext
 	 * @param mixed|array $error error code
 	 * @param string|null $lang_file = null
 	 */
-	public function addError($error, $lang_file = null)
+	public function addError($error, $lang_file = null): void
 	{
 		if (empty($error))
 		{
@@ -126,7 +126,7 @@ class AttachmentErrorContext
 	 *
 	 * @param string $error error code
 	 */
-	public function removeError($error)
+	public function removeError($error): void
 	{
 		if (empty($error))
 		{
@@ -144,7 +144,7 @@ class AttachmentErrorContext
 	 *
 	 * @return bool
 	 */
-	public function hasErrors($attachID = null, $severity = null)
+	public function hasErrors($attachID = null, $severity = null): bool
 	{
 		if (($this->_generic_error !== null) && $this->_generic_error->hasErrors($severity))
 		{
@@ -183,7 +183,7 @@ class AttachmentErrorContext
 	 *
 	 * @return bool
 	 */
-	public function hasError($error_code, $attachID = null)
+	public function hasError($error_code, $attachID = null): bool
 	{
 		if ($this->_generic_error !== null && $this->_generic_error->hasError($error_code))
 		{
@@ -219,7 +219,7 @@ class AttachmentErrorContext
 	 *
 	 * @return array
 	 */
-	public function prepareErrors($severity = null)
+	public function prepareErrors($severity = null): array
 	{
 		global $txt;
 
@@ -227,11 +227,11 @@ class AttachmentErrorContext
 
 		if ($this->_generic_error !== null)
 		{
-			$returns['attach_generic'] = array(
+			$returns['attach_generic'] = [
 				'errors' => $this->_generic_error->prepareErrors($severity),
 				'type' => $this->getErrorType(),
 				'title' => $txt['attach_error_title'],
-			);
+			];
 		}
 
 		if (!empty($this->_attachs))
@@ -252,12 +252,12 @@ class AttachmentErrorContext
 	/**
 	 * Return the type of the error
 	 */
-	public function getErrorType()
+	public function getErrorType(): int
 	{
 		return 1;
 	}
 
-	public function getName()
+	public function getName(): string
 	{
 		return 'attach_error_title';
 	}

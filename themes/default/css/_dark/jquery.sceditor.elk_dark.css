@@ -430,7 +430,7 @@ a.sceditor-button-space, .sceditor-button-space div {
 }
 
 /* Use larger buttons for targeting on the smaller screens */
-@media screen and (max-width: 50em) {
+@media screen and (max-width: 51.5em) {
 	.sceditor-button div, .sceditor-button {
 		width: 36px;
 		height: 36px;

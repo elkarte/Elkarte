@@ -113,18 +113,13 @@ class Db extends Adapter
 			return $configVar['text_label'];
 		}
 
-		if (isset($txt[$configVar[1]]))
-		{
-			return $txt[$configVar[1]];
-		}
-
-		return $txt['setting_' . $configVar[1]] ?? $txt['groups_' . $configVar[1]] ?? $configVar[1];
+		return $txt[$configVar[1]] ?? $txt['setting_' . $configVar[1]] ?? $txt['groups_' . $configVar[1]] ?? $configVar[1];
 	}
 
 	/**
 	 * @param array $configVar
 	 */
-	private function handleSelect(array $configVar)
+	private function handleSelect(array $configVar): void
 	{
 		if (!empty($configVar[2]) && is_array($configVar[2]))
 		{
@@ -154,9 +149,9 @@ class Db extends Adapter
 	 * @param array $configVar
 	 * @param string $str
 	 *
-	 * @return string
+	 * @return string|array
 	 */
-	private function revertMasks(array $configVar, $str)
+	private function revertMasks(array $configVar, $str): string|array
 	{
 		$known_rules = [
 			'nohtml' => 'htmlspecialchars_decode[' . ENT_NOQUOTES . ']',
@@ -170,9 +165,9 @@ class Db extends Adapter
 	 * @param string $str
 	 * @param array $known_rules
 	 *
-	 * @return string
+	 * @return string|array
 	 */
-	private function applyMasks(array $configVar, $str, $known_rules)
+	private function applyMasks(array $configVar, $str, $known_rules): string|array
 	{
 		if (isset($configVar['mask']))
 		{
@@ -205,7 +200,7 @@ class Db extends Adapter
 	/**
 	 * @param array $configVar
 	 */
-	private function allowOverrides(array $configVar)
+	private function allowOverrides(array $configVar): void
 	{
 		global $txt, $helptxt;
 
@@ -247,7 +242,7 @@ class Db extends Adapter
 	/**
 	 * Initialize inline permissions settings.
 	 */
-	private function init_inline_permissions()
+	private function init_inline_permissions(): void
 	{
 		global $context;
 
@@ -269,7 +264,7 @@ class Db extends Adapter
 	/**
 	 * Initialize a list of available BB codes.
 	 */
-	private function initBbcChoices()
+	private function initBbcChoices(): void
 	{
 		global $helptxt, $modSettings;
 
@@ -352,7 +347,7 @@ class Db extends Adapter
 	 *
 	 * @return array
 	 */
-	protected function sanitizeVars()
+	protected function sanitizeVars(): array
 	{
 		$setTypes = [];
 		$setArray = [];
@@ -430,7 +425,7 @@ class Db extends Adapter
 	 *
 	 * @return string
 	 */
-	private function setMasks(array $configVar, $str)
+	private function setMasks(array $configVar, $str): string
 	{
 		$known_rules = [
 			'nohtml' => '\\ElkArte\\Helper\\Util::htmlspecialchars[' . ENT_QUOTES . ']',
@@ -446,7 +441,7 @@ class Db extends Adapter
 	 *
 	 * @return string
 	 */
-	private function setBbcChoices($var)
+	private function setBbcChoices($var): string
 	{
 		$codes = ParserWrapper::instance()->getCodes();
 		$bbcTags = $codes->getTags();

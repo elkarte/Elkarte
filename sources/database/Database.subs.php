@@ -12,6 +12,9 @@
  *
  */
 
+use ElkArte\Database\AbstractTable;
+use ElkArte\Database\QueryInterface;
+
 /**
  * Initialize database classes and connection.
  *
@@ -20,10 +23,10 @@
  * @param string $db_user userid to attempt db connection
  * @param string $db_passwd password of user to attempt db connection
  * @param string $db_prefix prefix of the database, like elkarte_
- * @param mixed[] $db_options
+ * @param array $db_options
  * @param string $db_type
  *
- * @return \ElkArte\Database\QueryInterface
+ * @return QueryInterface
  */
 function elk_db_initiate($db_server, $db_name, $db_user, $db_passwd, $db_prefix, $db_options = array(), $db_type = 'mysql')
 {
@@ -38,7 +41,7 @@ function elk_db_initiate($db_server, $db_name, $db_user, $db_passwd, $db_prefix,
  *                      If set to true, from that moment onwards the old
  *                      instance will be lost and only the new one returned
  *
- * @return \ElkArte\Database\QueryInterface
+ * @return QueryInterface
  * @throws \Exception if fatal is false
  */
 function database($fatal = true, $force = false)
@@ -88,7 +91,7 @@ function database($fatal = true, $force = false)
  * @param object|null $db - A database object (e.g. \ElkArte\Mysqli\Query)
  * @param bool $fatal - Stop the execution or throw an \Exception
  *
- * @return \ElkArte\Database\AbstractTable
+ * @return AbstractTable
  */
 function db_table($db = null, $fatal = false)
 {

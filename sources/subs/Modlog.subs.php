@@ -22,16 +22,16 @@ use ElkArte\User;
  * Callback for createList() in Modlog::action_log().
  *
  * @param string|null $query_string
- * @param mixed[] $query_params
+ * @param array $query_params
  * @param int $log_type
  *
  * @return int
  */
-function list_getModLogEntryCount($query_string = '', $query_params = array(), $log_type = 1)
+function list_getModLogEntryCount($query_string = '', $query_params = [], $log_type = 1)
 {
 	$db = database();
 
-	$modlog_query = allowedTo('admin_forum') || User::$info->mod_cache['bq'] == '1=1' ? '1=1' : (User::$info->mod_cache['bq'] == '0=1' ? 'lm.id_board = 0 AND lm.id_topic = 0' : (strtr(User::$info->mod_cache['bq'], array('id_board' => 'b.id_board')) . ' AND ' . strtr(User::$info->mod_cache['bq'], array('id_board' => 't.id_board'))));
+	$modlog_query = allowedTo('admin_forum') || User::$info->mod_cache['bq'] == '1=1' ? '1=1' : (User::$info->mod_cache['bq'] == '0=1' ? 'lm.id_board = 0 AND lm.id_topic = 0' : (strtr(User::$info->mod_cache['bq'], ['id_board' => 'b.id_board']) . ' AND ' . strtr(User::$info->mod_cache['bq'], ['id_board' => 't.id_board'])));
 
 	$request = $db->query('', '
 		SELECT 
@@ -44,11 +44,11 @@ function list_getModLogEntryCount($query_string = '', $query_params = array(), $
 		WHERE id_log = {int:log_type}
 			AND {raw:modlog_query}'	. (!empty($query_string) ? '
 			AND ' . $query_string : ''),
-		array_merge($query_params, array(
+		array_merge($query_params, [
 			'reg_group_id' => 0,
 			'log_type' => $log_type,
 			'modlog_query' => $modlog_query,
-		))
+		])
 	);
 	list ($entry_count) = $request->fetch_row();
 	$request->free_result();
@@ -64,18 +64,18 @@ function list_getModLogEntryCount($query_string = '', $query_params = array(), $
  * @param int $items_per_page The number of items to show per page
  * @param string $sort A string indicating how to sort the results
  * @param string|null $query_string
- * @param mixed[] $query_params
+ * @param array $query_params
  * @param int $log_type
  *
  * @return array
  */
-function list_getModLogEntries($start, $items_per_page, $sort, $query_string = '', $query_params = array(), $log_type = 1)
+function list_getModLogEntries($start, $items_per_page, $sort, $query_string = '', $query_params = [], $log_type = 1)
 {
 	global $context, $scripturl, $txt;
 
 	$db = database();
 
-	$modlog_query = allowedTo('admin_forum') || User::$info->mod_cache['bq'] == '1=1' ? '1=1' : (User::$info->mod_cache['bq'] == '0=1' ? 'lm.id_board = 0 AND lm.id_topic = 0' : (strtr(User::$info->mod_cache['bq'], array('id_board' => 'b.id_board')) . ' AND ' . strtr(User::$info->mod_cache['bq'], array('id_board' => 't.id_board'))));
+	$modlog_query = allowedTo('admin_forum') || User::$info->mod_cache['bq'] == '1=1' ? '1=1' : (User::$info->mod_cache['bq'] == '0=1' ? 'lm.id_board = 0 AND lm.id_topic = 0' : (strtr(User::$info->mod_cache['bq'], ['id_board' => 'b.id_board']) . ' AND ' . strtr(User::$info->mod_cache['bq'], ['id_board' => 't.id_board'])));
 
 	// Do a little bit of self protection.
 	if (!isset($context['hoursdisable']))
@@ -102,25 +102,25 @@ function list_getModLogEntries($start, $items_per_page, $sort, $query_string = '
 				AND ' . $query_string : '') . '
 		ORDER BY ' . $sort . '
 		LIMIT ' . $items_per_page . '  OFFSET ' . $start,
-		array_merge($query_params, array(
+		array_merge($query_params, [
 			'reg_group_id' => 0,
 			'log_type' => $log_type,
 			'modlog_query' => $modlog_query,
-		))
+		])
 	);
 
 	// Arrays for decoding objects into.
-	$topics = array();
-	$boards = array();
-	$members = array();
-	$messages = array();
-	$entries = array();
+	$topics = [];
+	$boards = [];
+	$members = [];
+	$messages = [];
+	$entries = [];
 	while (($row = $request->fetch_assoc()))
 	{
 		$row['extra'] = Util::unserialize($row['extra']);
 
 		// Corrupt?
-		$row['extra'] = is_array($row['extra']) ? $row['extra'] : array();
+		$row['extra'] = is_array($row['extra']) ? $row['extra'] : [];
 
 		// Add on some of the column stuff info
 		if (!empty($row['id_board']))
@@ -228,7 +228,7 @@ function list_getModLogEntries($start, $items_per_page, $sort, $query_string = '
 				$row['action_text'] = $txt['modlog_ac_ban_remove'];
 			}
 
-			foreach (array('member', 'email', 'ip_range', 'hostname') as $type)
+			foreach (['member', 'email', 'ip_range', 'hostname'] as $type)
 			{
 				if (isset($row['extra'][$type]))
 				{
@@ -238,7 +238,7 @@ function list_getModLogEntries($start, $items_per_page, $sort, $query_string = '
 		}
 
 		// The array to go to the template. Note here that action is set to a "default" value of the action doesn't match anything in the descriptions. Allows easy adding of logging events with basic details.
-		$entries[$row['id_action']] = array(
+		$entries[$row['id_action']] = [
 			'id' => $row['id_action'],
 			'ip' => $seeIP ? $row['ip'] : $txt['logged'],
 			'position' => empty($row['real_name']) && empty($row['group_name']) ? $txt['guest'] : $row['group_name'],
@@ -250,14 +250,14 @@ function list_getModLogEntries($start, $items_per_page, $sort, $query_string = '
 			'extra' => $row['extra'],
 			'action' => $row['action'],
 			'action_text' => $row['action_text'] ?? '',
-		);
+		];
 	}
 	$request->free_result();
 
 	if (!empty($boards))
 	{
 		require_once(SUBSDIR . '/Boards.subs.php');
-		$boards_info = fetchBoardsInfo(array('boards' => array_keys($boards)));
+		$boards_info = fetchBoardsInfo(['boards' => array_keys($boards)]);
 
 		foreach ($boards_info as $row)
 		{
@@ -289,9 +289,9 @@ function list_getModLogEntries($start, $items_per_page, $sort, $query_string = '
 				INNER JOIN {db_prefix}messages AS ms ON (ms.id_msg = t.id_first_msg)
 			WHERE t.id_topic IN ({array_int:topic_list})
 			LIMIT ' . count(array_keys($topics)),
-			array(
+			[
 				'topic_list' => array_keys($topics),
-			)
+			]
 		);
 		while (($row = $request->fetch_assoc()))
 		{
@@ -300,12 +300,12 @@ function list_getModLogEntries($start, $items_per_page, $sort, $query_string = '
 				$this_action = &$entries[$action];
 
 				// This isn't used in the current theme.
-				$this_action['topic'] = array(
+				$this_action['topic'] = [
 					'id' => $row['id_topic'],
 					'subject' => $row['subject'],
 					'href' => $scripturl . '?topic=' . $row['id_topic'] . '.0',
 					'link' => '<a href="' . $scripturl . '?topic=' . $row['id_topic'] . '.0">' . $row['subject'] . '</a>'
-				);
+				];
 
 				// Make the topic number into a link - dealing with splitting too.
 				if (isset($this_action['extra']['topic']) && $this_action['extra']['topic'] == $row['id_topic'])
@@ -329,9 +329,9 @@ function list_getModLogEntries($start, $items_per_page, $sort, $query_string = '
 			FROM {db_prefix}messages
 			WHERE id_msg IN ({array_int:message_list})
 			LIMIT ' . count(array_keys($messages)),
-			array(
+			[
 				'message_list' => array_keys($messages),
-			)
+			]
 		);
 		while (($row = $request->fetch_assoc()))
 		{
@@ -340,12 +340,12 @@ function list_getModLogEntries($start, $items_per_page, $sort, $query_string = '
 				$this_action = &$entries[$action];
 
 				// This isn't used in the current theme.
-				$this_action['message'] = array(
+				$this_action['message'] = [
 					'id' => $row['id_msg'],
 					'subject' => $row['subject'],
 					'href' => $scripturl . '?msg=' . $row['id_msg'],
 					'link' => '<a href="' . $scripturl . '?msg=' . $row['id_msg'] . '">' . $row['subject'] . '</a>',
-				);
+				];
 
 				// Make the message number into a link.
 				if (isset($this_action['extra']['message']) && $this_action['extra']['message'] == $row['id_msg'])
@@ -368,12 +368,12 @@ function list_getModLogEntries($start, $items_per_page, $sort, $query_string = '
 			foreach ($members[$row['id_member']] as $action)
 			{
 				// Not used currently.
-				$entries[$action]['member'] = array(
+				$entries[$action]['member'] = [
 					'id' => $row['id_member'],
 					'name' => $row['real_name'],
 					'href' => $scripturl . '?action=profile;u=' . $row['id_member'],
 					'link' => '<a href="' . $scripturl . '?action=profile;u=' . $row['id_member'] . '">' . $row['real_name'] . '</a>'
-				);
+				];
 
 				// Make the member number into a name.
 				$entries[$action]['extra']['member'] = '<a href="' . $scripturl . '?action=profile;u=' . $row['id_member'] . '">' . $row['real_name'] . '</a>';
@@ -393,7 +393,7 @@ function list_getModLogEntries($start, $items_per_page, $sort, $query_string = '
 		}
 
 		// Mark up any deleted members, topics and boards.
-		foreach (array('board', 'board_from', 'board_to', 'member', 'topic', 'new_topic') as $type)
+		foreach (['board', 'board_from', 'board_to', 'member', 'topic', 'new_topic'] as $type)
 		{
 			if (!empty($entry['extra'][$type]) && is_numeric($entry['extra'][$type]))
 			{
@@ -407,7 +407,7 @@ function list_getModLogEntries($start, $items_per_page, $sort, $query_string = '
 		}
 
 		$callback->key = $k;
-		$entries[$k]['action_text'] = preg_replace_callback('~\{([A-Za-z\d_]+)\}~i', array($callback, 'callback'), $entries[$k]['action_text']);
+		$entries[$k]['action_text'] = preg_replace_callback('~\{([A-Za-z\d_]+)\}~i', [$callback, 'callback'], $entries[$k]['action_text']);
 	}
 
 	// Back we go!
@@ -432,7 +432,7 @@ class ModLogEntriesReplacement
 	 *
 	 * @return string
 	 */
-	public function callback($matches)
+	public function callback($matches): string
 	{
 		return $this->entries[$this->key]['extra'][$matches[1]] ?? '';
 	}
@@ -454,11 +454,11 @@ function deleteLogAction($id_log, $time, $delete = null)
 		WHERE id_log = {int:moderate_log}
 			' . (isset($delete) ? 'AND id_action IN ({array_string:delete_actions})' : '') . '
 			AND log_time < {int:twenty_four_hours_wait}',
-		array(
+		[
 			'twenty_four_hours_wait' => time() - $time * 3600,
 			'delete_actions' => !is_null($delete) ? array_unique($delete) : null,
 			'moderate_log' => $id_log,
-		)
+		]
 	);
 }
 
@@ -480,10 +480,10 @@ function recentlyLogged($action, $time = 60)
 		FROM {db_prefix}log_actions
 		WHERE action = {string:action}
 			AND log_time >= {int:last_logged}',
-		array(
+		[
 			'action' => $action,
 			'last_logged' => time() - $time,
-		)
+		]
 	);
 	list ($present) = $request->fetch_row();
 	$request->free_result();

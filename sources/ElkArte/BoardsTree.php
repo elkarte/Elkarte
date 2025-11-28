@@ -28,12 +28,16 @@ use ElkArte\Exceptions\Exception;
  */
 class BoardsTree
 {
+	/** @var array */
 	protected $cat_tree = [];
 
+	/** @var array */
 	protected $boards = [];
 
+	/** @var array */
 	protected $boardList = [];
 
+	/** @var QueryInterface */
 	protected $db;
 
 	public function __construct(QueryInterface $db)
@@ -55,10 +59,10 @@ class BoardsTree
 	 *
 	 * @throws Exception no_valid_parent
 	 */
-	protected function loadBoardTree($query = array())
+	protected function loadBoardTree($query = []): void
 	{
 		// Addons may want to add their own information to the board table.
-		call_integration_hook('integrate_board_tree_query', array(&$query));
+		call_integration_hook('integrate_board_tree_query', [&$query]);
 
 		// Getting all the board and category information you'd ever wanted.
 		$request = $this->db->query('', '
@@ -71,10 +75,10 @@ class BoardsTree
 				LEFT JOIN {db_prefix}boards AS b ON (b.id_cat = c.id_cat)' . (empty($query['join']) ?
 				'' : $query['join']) . '
 			ORDER BY c.cat_order, b.child_level, b.board_order',
-			array()
+			[]
 		);
-		$this->cat_tree = array();
-		$this->boards = array();
+		$this->cat_tree = [];
+		$this->boards = [];
 		$last_board_order = 0;
 		while (($row = $request->fetch_assoc()))
 		{
@@ -105,7 +109,7 @@ class BoardsTree
 					$prevBoard = 0;
 				}
 
-				$this->boards[$row['id_board']] = array(
+				$this->boards[$row['id_board']] = [
 					'id' => $row['id_board'],
 					'category' => $row['id_cat'],
 					'parent' => (int) $row['id_parent'],
@@ -124,17 +128,17 @@ class BoardsTree
 					'profile' => $row['id_profile'],
 					'redirect' => $row['redirect'],
 					'prev_board' => $prevBoard
-				);
+				];
 				$prevBoard = $row['id_board'];
 				$last_board_order = $row['board_order'];
 
 				if (empty($row['child_level']))
 				{
-					$this->cat_tree[$row['id_cat']]['children'][$row['id_board']] = array(
+					$this->cat_tree[$row['id_cat']]['children'][$row['id_board']] = [
 						'node' => &$this->boards[$row['id_board']],
 						'is_first' => empty($this->cat_tree[$row['id_cat']]['children']),
 						'children' => []
-					);
+					];
 					$this->boards[$row['id_board']]['tree'] = &$this->cat_tree[$row['id_cat']]['children'][$row['id_board']];
 				}
 				else
@@ -142,7 +146,7 @@ class BoardsTree
 					// Parent doesn't exist!
 					if (!isset($this->boards[$row['id_parent']]['tree']))
 					{
-						throw new Exception('no_valid_parent', false, array($row['board_name']));
+						throw new Exception('no_valid_parent', false, [$row['board_name']]);
 					}
 
 					// Wrong childlevel...we can silently fix this...
@@ -153,24 +157,24 @@ class BoardsTree
 							SET 
 								child_level = {int:new_child_level}
 							WHERE id_board = {int:selected_board}',
-							array(
+							[
 								'new_child_level' => $this->boards[$row['id_parent']]['tree']['node']['level'] + 1,
 								'selected_board' => $row['id_board'],
-							)
+							]
 						);
 					}
 
-					$this->boards[$row['id_parent']]['tree']['children'][$row['id_board']] = array(
+					$this->boards[$row['id_parent']]['tree']['children'][$row['id_board']] = [
 						'node' => &$this->boards[$row['id_board']],
 						'is_first' => empty($this->boards[$row['id_parent']]['tree']['children']),
 						'children' => []
-					);
+					];
 					$this->boards[$row['id_board']]['tree'] = &$this->boards[$row['id_parent']]['tree']['children'][$row['id_board']];
 				}
 			}
 
 			// Let integration easily add data to $this->boards and $this->cat_tree
-			call_integration_hook('integrate_board_tree', array($row));
+			call_integration_hook('integrate_board_tree', [$row]);
 		}
 
 		$request->free_result();
@@ -190,7 +194,7 @@ class BoardsTree
 	 *
 	 * @param int $catID The category id
 	 */
-	public function boardsInCategory($catID)
+	public function boardsInCategory($catID): void
 	{
 		$this->boardList[$catID] = [];
 
@@ -212,7 +216,7 @@ class BoardsTree
 	 * @param int $board_id The ID of the parent board.
 	 * @return array An array of all the child board IDs.
 	 */
-	public function allChildsOf($board_id)
+	public function allChildsOf($board_id): array
 	{
 		if (empty($this->boards[$board_id]['tree']['children']))
 		{
@@ -229,17 +233,17 @@ class BoardsTree
 		return $boardsList;
 	}
 
-	public function getBoardList()
+	public function getBoardList(): array
 	{
 		return $this->boardList;
 	}
 
-	public function getCategories()
+	public function getCategories(): array
 	{
 		return $this->cat_tree;
 	}
 
-	public function getBoards()
+	public function getBoards(): array
 	{
 		return $this->boards;
 	}
@@ -251,7 +255,7 @@ class BoardsTree
 			return $this->cat_tree[$id];
 		}
 
-		throw new \Exception("Category id doesn't exist: " . $id);
+		throw new Exception("Category id doesn't exist: " . $id);
 	}
 
 	public function getBoardsInCat($id)
@@ -261,15 +265,15 @@ class BoardsTree
 			return $this->boardList[$id];
 		}
 
-		throw new \Exception("Category id doesn't exist: " . $id);
+		throw new Exception("Category id doesn't exist: " . $id);
 	}
 
-	public function categoryExists($id)
+	public function categoryExists($id): bool
 	{
 		return isset($this->boardList[$id]);
 	}
 
-	public function boardExists($id)
+	public function boardExists($id): bool
 	{
 		return isset($this->boards[$id]);
 	}
@@ -279,18 +283,18 @@ class BoardsTree
 	 *
 	 * @param int $id The id of the board.
 	 *
-	 * @return Board The board object with the specified id.
+	 * @return array|Board The board object with the specified id.
 	 *
-	 * @throws \Exception When the board id doesn't exist.
+	 * @throws Exception When the board id doesn't exist.
 	 */
-	public function getBoardById($id)
+	public function getBoardById($id): array|Board
 	{
 		if (isset($this->boards[$id]))
 		{
 			return $this->boards[$id];
 		}
 
-		throw new \Exception("Board id doesn't exist: " . $id);
+		throw new Exception("Board id doesn't exist: " . $id);
 	}
 
 	/**
@@ -301,7 +305,7 @@ class BoardsTree
 	 *
 	 * @return bool if the specified child board is a child of the specified parent board.
 	 */
-	public function isChildOf($child, $parent)
+	public function isChildOf($child, $parent): bool
 	{
 		if (empty($this->boards[$child]['parent']))
 		{
@@ -328,9 +332,8 @@ class BoardsTree
 	 *
 	 * @param int[] $boards_to_remove
 	 * @param int|null $moveChildrenTo = null
-	 * @throws \ElkArte\Exceptions\Exception
 	 */
-	public function deleteBoards($boards_to_remove, $moveChildrenTo = null)
+	public function deleteBoards($boards_to_remove, $moveChildrenTo = null): void
 	{
 		// No boards to delete? Return!
 		if (empty($boards_to_remove))
@@ -338,13 +341,13 @@ class BoardsTree
 			return;
 		}
 
-		call_integration_hook('integrate_delete_board', array($boards_to_remove, &$moveChildrenTo));
+		call_integration_hook('integrate_delete_board', [$boards_to_remove, &$moveChildrenTo]);
 
 		// If $moveChildrenTo is set to null, include the children in the removal.
 		if ($moveChildrenTo === null)
 		{
 			// Get a list of the sub-boards that will also be removed.
-			$child_boards_to_remove = array();
+			$child_boards_to_remove = [];
 			foreach ($boards_to_remove as $board_to_remove)
 			{
 				$child_boards_to_remove = array_merge($child_boards_to_remove, $this->allChildsOf($board_to_remove));
@@ -379,9 +382,9 @@ class BoardsTree
 				id_topic
 			FROM {db_prefix}topics
 			WHERE id_board IN ({array_int:boards_to_remove})',
-			array(
+			[
 				'boards_to_remove' => $boards_to_remove,
-			)
+			]
 		)->fetch_all();
 
 		require_once(SUBSDIR . '/Topic.subs.php');
@@ -391,59 +394,59 @@ class BoardsTree
 		$this->db->query('', '
 			DELETE FROM {db_prefix}log_mark_read
 			WHERE id_board IN ({array_int:boards_to_remove})',
-			array(
+			[
 				'boards_to_remove' => $boards_to_remove,
-			)
+			]
 		);
 		$this->db->query('', '
 			DELETE FROM {db_prefix}log_boards
 			WHERE id_board IN ({array_int:boards_to_remove})',
-			array(
+			[
 				'boards_to_remove' => $boards_to_remove,
-			)
+			]
 		);
 		$this->db->query('', '
 			DELETE FROM {db_prefix}log_notify
 			WHERE id_board IN ({array_int:boards_to_remove})',
-			array(
+			[
 				'boards_to_remove' => $boards_to_remove,
-			)
+			]
 		);
 
 		// Delete this board's moderators.
 		$this->db->query('', '
 			DELETE FROM {db_prefix}moderators
 			WHERE id_board IN ({array_int:boards_to_remove})',
-			array(
+			[
 				'boards_to_remove' => $boards_to_remove,
-			)
+			]
 		);
 
 		// Delete any extra events in the calendar.
 		$this->db->query('', '
 			DELETE FROM {db_prefix}calendar
 			WHERE id_board IN ({array_int:boards_to_remove})',
-			array(
+			[
 				'boards_to_remove' => $boards_to_remove,
-			)
+			]
 		);
 
 		// Delete any message icons that only appear on these boards.
 		$this->db->query('', '
 			DELETE FROM {db_prefix}message_icons
 			WHERE id_board IN ({array_int:boards_to_remove})',
-			array(
+			[
 				'boards_to_remove' => $boards_to_remove,
-			)
+			]
 		);
 
 		// Delete the boards.
 		$this->db->query('', '
 			DELETE FROM {db_prefix}boards
 			WHERE id_board IN ({array_int:boards_to_remove})',
-			array(
+			[
 				'boards_to_remove' => $boards_to_remove,
-			)
+			]
 		);
 
 		// Latest message/topic might not be there anymore.
@@ -452,10 +455,10 @@ class BoardsTree
 
 		require_once(SUBSDIR . '/Topic.subs.php');
 		updateTopicStats();
-		updateSettings(array('calendar_updated' => time()));
+		updateSettings(['calendar_updated' => time()]);
 
 		// Plus reset the cache to stop people getting odd results.
-		updateSettings(array('settings_updated' => time()));
+		updateSettings(['settings_updated' => time()]);
 
 		// Clean the cache as well.
 		Cache::instance()->clean('data');
@@ -463,7 +466,7 @@ class BoardsTree
 		// Let's do some serious logging.
 		foreach ($boards_to_remove as $id_board)
 		{
-			logAction('delete_board', array('boardname' => $this->boards[$id_board]['name']), 'admin');
+			logAction('delete_board', ['boardname' => $this->boards[$id_board]['name']], 'admin');
 		}
 
 		$this->reorderBoards();
@@ -478,7 +481,7 @@ class BoardsTree
 	 * @param int $newLevel
 	 * @param int $newParent
 	 */
-	private function fixChildren($parent, $newLevel, $newParent)
+	private function fixChildren($parent, $newLevel, $newParent): void
 	{
 		// Grab all children of $parent...
 		$children = $this->db->fetchQuery('
@@ -486,9 +489,9 @@ class BoardsTree
 				id_board
 			FROM {db_prefix}boards
 			WHERE id_parent = {int:parent_board}',
-			array(
+			[
 				'parent_board' => $parent,
-			)
+			]
 		)->fetch_callback(
 			static fn($row) => (int) $row['id_board']
 		);
@@ -499,11 +502,11 @@ class BoardsTree
 			SET 
 				id_parent = {int:new_parent}, child_level = {int:new_child_level}
 			WHERE id_parent = {int:parent_board}',
-			array(
+			[
 				'new_parent' => $newParent,
 				'new_child_level' => $newLevel,
 				'parent_board' => $parent,
-			)
+			]
 		);
 
 		// Recursively fix the children of the children.
@@ -518,7 +521,7 @@ class BoardsTree
 	 *
 	 * - Used by modifyBoard(), deleteBoards(), modifyCategory(), and deleteCategories() functions
 	 */
-	public function reorderBoards()
+	public function reorderBoards(): void
 	{
 		$update_query = '';
 		$update_params = [];

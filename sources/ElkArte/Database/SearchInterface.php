@@ -25,9 +25,9 @@ interface SearchInterface
 	 * @param string $db_string
 	 * @param array $db_values
 	 *
-	 * @return AbstractResult|boolean
+	 * @return AbstractResult|bool
 	 */
-	public function search_query($identifier, $db_string, $db_values = array());
+	public function search_query($identifier, $db_string, $db_values = []);
 
 	/**
 	 * This method will tell you whether this database type supports this search type.

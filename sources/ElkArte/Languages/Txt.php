@@ -28,10 +28,10 @@ class Txt
 	 * Loads the language lexicon file(s) in the proper language
 	 *
 	 * @param string|string[] $lexicon File(s) to load
-	 * @param boolean $fatal
-	 * @param boolean $fix_calendar_arrays
+	 * @param bool $fatal
+	 * @param bool $fix_calendar_arrays
 	 */
-	public static function load($lexicon, $fatal = true, $fix_calendar_arrays = false)
+	public static function load($lexicon, $fatal = true, $fix_calendar_arrays = false): void
 	{
 		global $txt, $language, $modSettings;
 

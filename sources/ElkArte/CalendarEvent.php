@@ -57,7 +57,7 @@ class CalendarEvent
 	 * @return array
 	 * @throws Exception
 	 */
-	public function validate($event)
+	public function validate($event): array
 	{
 		// Make sure they're allowed to post...
 		isAllowedTo('calendar_post');
@@ -148,16 +148,16 @@ class CalendarEvent
 	 * @param array $options - An array of options for the event.
 	 * @param int $member_id - the id of the member saving the event.
 	 */
-	public function insert($options, $member_id)
+	public function insert($options, $member_id): void
 	{
-		$eventOptions = array(
+		$eventOptions = [
 			'id_board' => $options['id_board'] ?? 0,
 			'id_topic' => $options['id_topic'] ?? 0,
 			'title' => Util::substr($options['evtitle'], 0, 100),
 			'member' => $member_id,
 			'start_date' => sprintf('%04d-%02d-%02d', $options['year'], $options['month'], $options['day']),
 			'span' => isset($options['span']) && $options['span'] > 0 ? min((int) $this->_settings['cal_maxspan'], (int) $options['span'] - 1) : 0,
-		);
+		];
 		insertEvent($eventOptions);
 	}
 
@@ -165,7 +165,7 @@ class CalendarEvent
 	 * Deletes an event.
 	 * No permission checks.
 	 */
-	public function remove()
+	public function remove(): void
 	{
 		removeEvent($this->_event_id);
 	}
@@ -177,7 +177,7 @@ class CalendarEvent
 	 *
 	 * @param array $options The options may come from a form
 	 */
-	public function update($options)
+	public function update($options): void
 	{
 		// There could be already a topic you are not allowed to modify
 		if (empty($this->_settings['disableNoPostingCalendarEdits']) && !allowedTo('post_new'))
@@ -205,13 +205,13 @@ class CalendarEvent
 			$span = min((int) $this->_settings['cal_maxspan'], (int) $options['span'] - 1);
 		}
 
-		$eventOptions = array(
+		$eventOptions = [
 			'title' => Util::substr($options['evtitle'], 0, 100),
 			'span' => $span,
 			'start_date' => Util::strftime('%Y-%m-%d', mktime(0, 0, 0, (int) $options['month'], (int) $options['day'], (int) $options['year'])),
 			'id_board' => (int) $id_board,
 			'id_topic' => (int) $id_topic,
-		);
+		];
 
 		modifyEvent($this->_event_id, $eventOptions);
 	}
@@ -227,7 +227,7 @@ class CalendarEvent
 	 * @return array The event structure.
 	 * @throws Exception no_access
 	 */
-	public function load($options, $member_id)
+	public function load($options, $member_id): array
 	{
 		global $topic;
 
@@ -236,8 +236,8 @@ class CalendarEvent
 		{
 			$today = getdate();
 
-			$event = array(
-				'boards' => array(),
+			$event = [
+				'boards' => [],
 				'board' => 0,
 				'new' => 1,
 				'eventid' => -1,
@@ -246,7 +246,7 @@ class CalendarEvent
 				'day' => $options['day'] ?? $today['mday'],
 				'title' => '',
 				'span' => 1,
-			);
+			];
 			$event['last_day'] = (int) Util::strftime('%d', mktime(0, 0, 0, $event['month'] == 12 ? 1 : $event['month'] + 1, 0, $event['month'] == 12 ? $event['year'] + 1 : $event['year']));
 		}
 		else
@@ -286,7 +286,7 @@ class CalendarEvent
 	 *
 	 * @return bool
 	 */
-	public function isNew()
+	public function isNew(): bool
 	{
 		return $this->_event_id === null || $this->_event_id === -1;
 	}
@@ -297,7 +297,7 @@ class CalendarEvent
 	 * @param int $member_id
 	 * @return bool
 	 */
-	public function isStarter($member_id)
+	public function isStarter($member_id): bool
 	{
 		return !empty($member_id) && getEventPoster($this->_event_id) == $member_id;
 	}

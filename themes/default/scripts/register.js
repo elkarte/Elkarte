@@ -192,6 +192,11 @@ elkRegister.prototype.refreshMainPassword = function(called_from_verify) {
 		stringIndex = 'password_short';
 	}
 
+	if (curPass.length > 64)
+	{
+		stringIndex = 'password_long';
+	}
+
 	// More than basic?
 	if (this.passwordLevel >= 1)
 	{

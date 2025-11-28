@@ -110,7 +110,7 @@ class ProfileInfo extends AbstractController
 	 *
 	 * @uses ProfileInfo template
 	 */
-	public function action_summary()
+	public function action_summary(): void
 	{
 		global $context, $modSettings;
 
@@ -154,7 +154,7 @@ class ProfileInfo extends AbstractController
 	 * - Templates are named template_profile_block_YOURNAME
 	 * - Tabs with href defined will not preload/create any page divs but instead be loaded via ajax
 	 */
-	private function _register_summarytabs()
+	private function _register_summarytabs(): void
 	{
 		global $txt, $context, $modSettings;
 
@@ -212,7 +212,7 @@ class ProfileInfo extends AbstractController
 	 *
 	 * - Defines various user permissions for profile views
 	 */
-	private function _define_user_values()
+	private function _define_user_values(): void
 	{
 		global $context, $modSettings, $txt;
 
@@ -238,7 +238,7 @@ class ProfileInfo extends AbstractController
 	/**
 	 * Loads the information needed to create the profile summary view
 	 */
-	private function _load_summary()
+	private function _load_summary(): void
 	{
 		// Load all areas of interest in to context for template use
 		$this->_determine_warning_level();
@@ -253,7 +253,7 @@ class ProfileInfo extends AbstractController
 	/**
 	 * If they have been disciplined, show the warning level for those that can see it.
 	 */
-	private function _determine_warning_level()
+	private function _determine_warning_level(): void
 	{
 		global $modSettings, $context, $txt;
 
@@ -275,7 +275,7 @@ class ProfileInfo extends AbstractController
 	/**
 	 * Gives their spam level as a posts per day kind of statistic
 	 */
-	private function _determine_posts_per_day()
+	private function _determine_posts_per_day(): void
 	{
 		global $context, $txt;
 
@@ -294,7 +294,7 @@ class ProfileInfo extends AbstractController
 	/**
 	 * Show age and birthday data if applicable.
 	 */
-	private function _determine_age_birth()
+	private function _determine_age_birth(): void
 	{
 		global $context, $txt;
 
@@ -317,7 +317,7 @@ class ProfileInfo extends AbstractController
 	/**
 	 * Show IP and hostname information for the users current IP of record.
 	 */
-	private function _determine_member_ip()
+	private function _determine_member_ip(): void
 	{
 		global $context, $modSettings;
 
@@ -344,7 +344,7 @@ class ProfileInfo extends AbstractController
 	/**
 	 * Determines what action user is "doing" at the time of the summary view
 	 */
-	private function _determine_member_action()
+	private function _determine_member_action(): void
 	{
 		global $context, $modSettings;
 
@@ -366,7 +366,7 @@ class ProfileInfo extends AbstractController
 	 *
 	 * - Creates a link if the viewing member can activate a user
 	 */
-	private function _determine_member_activation()
+	private function _determine_member_activation(): void
 	{
 		global $context, $txt;
 
@@ -390,7 +390,7 @@ class ProfileInfo extends AbstractController
 	/**
 	 * Checks if a member has been banned
 	 */
-	private function _determine_member_bans()
+	private function _determine_member_bans(): void
 	{
 		global $context;
 
@@ -413,7 +413,7 @@ class ProfileInfo extends AbstractController
 	 *
 	 * @todo This function needs to be split up properly.
 	 */
-	public function action_showPosts()
+	public function action_showPosts(): void
 	{
 		global $txt, $modSettings, $context, $board;
 
@@ -680,7 +680,7 @@ class ProfileInfo extends AbstractController
 	/**
 	 * Show all the attachments of a user.
 	 */
-	public function action_showAttachments()
+	public function action_showAttachments(): void
 	{
 		global $txt, $modSettings, $context;
 
@@ -813,7 +813,7 @@ class ProfileInfo extends AbstractController
 	 *
 	 * @return array
 	 */
-	public function list_getAttachments($start, $items_per_page, $sort, $boardsAllowed)
+	public function list_getAttachments($start, $items_per_page, $sort, $boardsAllowed): array
 	{
 		// @todo tweak this method to use $context, etc,
 		// then call subs function with params set.
@@ -827,7 +827,7 @@ class ProfileInfo extends AbstractController
 	 *
 	 * @return int
 	 */
-	public function list_getNumAttachments($boardsAllowed)
+	public function list_getNumAttachments($boardsAllowed): int
 	{
 		// @todo tweak this method to use $context, etc,
 		// then call subs function with params set.
@@ -837,7 +837,7 @@ class ProfileInfo extends AbstractController
 	/**
 	 * Show all the unwatched topics.
 	 */
-	public function action_showUnwatched()
+	public function action_showUnwatched(): void
 	{
 		global $txt, $modSettings, $context;
 
@@ -958,7 +958,7 @@ class ProfileInfo extends AbstractController
 	 *
 	 * @return array
 	 */
-	public function list_getUnwatched($start, $items_per_page, $sort)
+	public function list_getUnwatched($start, $items_per_page, $sort): array
 	{
 		return getUnwatchedBy($start, $items_per_page, $sort, $this->_memID);
 	}
@@ -967,7 +967,7 @@ class ProfileInfo extends AbstractController
 	 * Count the number of topics in the unwatched list
 	 * Callback for createList()
 	 */
-	public function list_getNumUnwatched()
+	public function list_getNumUnwatched(): int
 	{
 		return getNumUnwatchedBy($this->_memID);
 	}
@@ -975,7 +975,7 @@ class ProfileInfo extends AbstractController
 	/**
 	 * Gets the user stats for display.
 	 */
-	public function action_statPanel()
+	public function action_statPanel(): void
 	{
 		global $txt, $context, $modSettings;
 
@@ -1036,7 +1036,7 @@ class ProfileInfo extends AbstractController
 	/**
 	 * Show permissions for a user.
 	 */
-	public function action_showPermissions()
+	public function action_showPermissions(): void
 	{
 		global $txt, $board, $context;
 
@@ -1122,7 +1122,7 @@ class ProfileInfo extends AbstractController
 	/**
 	 * View a members warnings.
 	 */
-	public function action_viewWarning()
+	public function action_viewWarning(): void
 	{
 		global $modSettings, $context, $txt;
 
@@ -1235,7 +1235,7 @@ class ProfileInfo extends AbstractController
 	 *
 	 * - Ajax call from profile info buddy tab
 	 */
-	public function action_profile_buddies()
+	public function action_profile_buddies(): void
 	{
 		global $context;
 
@@ -1262,7 +1262,7 @@ class ProfileInfo extends AbstractController
 	/**
 	 * Load the buddies tab with their buddies, real or imaginary
 	 */
-	private function _load_buddies()
+	private function _load_buddies(): void
 	{
 		global $context, $modSettings;
 
@@ -1304,7 +1304,7 @@ class ProfileInfo extends AbstractController
 	 *
 	 * - Ajax call from profile info recent tab
 	 */
-	public function action_profile_recent()
+	public function action_profile_recent(): void
 	{
 		global $context;
 
@@ -1345,7 +1345,7 @@ class ProfileInfo extends AbstractController
 	/**
 	 * Load a members most recent posts
 	 */
-	private function _load_recent_posts()
+	private function _load_recent_posts(): void
 	{
 		global $context, $modSettings;
 
@@ -1408,7 +1408,7 @@ class ProfileInfo extends AbstractController
 	/**
 	 * Load a users recent topics
 	 */
-	private function _load_recent_topics()
+	private function _load_recent_topics(): void
 	{
 		global $context, $modSettings;
 
@@ -1473,7 +1473,7 @@ class ProfileInfo extends AbstractController
 	/**
 	 * If they have made recent attachments, lets get a list of them to display
 	 */
-	private function _load_recent_attachments()
+	private function _load_recent_attachments(): void
 	{
 		global $context, $modSettings, $settings;
 
@@ -1547,7 +1547,7 @@ class ProfileInfo extends AbstractController
 	 *
 	 * @return bool Returns true if the current load average is higher than the specified threshold, otherwise false.
 	 */
-	private function isOverLoadAverage()
+	private function isOverLoadAverage(): bool
 	{
 		global $modSettings;
 

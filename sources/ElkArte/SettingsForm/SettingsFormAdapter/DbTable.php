@@ -46,7 +46,7 @@ class DbTable extends Db
 	/**
 	 * @param string $editName used when editing a row, needs to be the name of the col to find $this->editId
 	 */
-	public function setEditName($editName)
+	public function setEditName($editName): void
 	{
 		$this->editName = $editName;
 	}
@@ -54,7 +54,7 @@ class DbTable extends Db
 	/**
 	 * @param string $tableName name of the table the values will be saved in
 	 */
-	public function setTableName($tableName)
+	public function setTableName($tableName): void
 	{
 		$this->tableName = $tableName;
 	}
@@ -62,7 +62,7 @@ class DbTable extends Db
 	/**
 	 * @param string[] $indexes name of the table indexes (just the primary keys will suffice)
 	 */
-	public function setIndexes(array $indexes)
+	public function setIndexes(array $indexes): void
 	{
 		$this->indexes = $indexes;
 	}
@@ -70,7 +70,7 @@ class DbTable extends Db
 	/**
 	 * @param int $editId -1 add a row, otherwise edit a row with the supplied key ($this->editName) of this value
 	 */
-	public function setEditId($editId)
+	public function setEditId($editId): void
 	{
 		$this->editId = (int) $editId;
 	}

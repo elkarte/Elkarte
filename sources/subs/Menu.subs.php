@@ -75,7 +75,7 @@ function createMenu($menuData, $menuOptions = [])
 	// Call the hook in compatibility mode
 	if (!empty($menuOptions['hook']))
 	{
-		call_integration_hook('integrate_' . $menuOptions['hook'] . '_areas', array(&$menuData, &$menuOptions));
+		call_integration_hook('integrate_' . $menuOptions['hook'] . '_areas', [&$menuData, &$menuOptions]);
 		$menuOptions['hook'] = '';
 	}
 
@@ -162,262 +162,262 @@ function loadDefaultMenuButtons()
 {
 	global $scripturl, $txt, $context, $modSettings;
 
-	$buttons = array(
-		'home' => array(
+	$buttons = [
+		'home' => [
 			'title' => $txt['community'],
 			'href' => getUrl('home', []),
 			'data-icon' => 'i-home',
 			'show' => true,
-			'sub_buttons' => array(
-				'help' => array(
+			'sub_buttons' => [
+				'help' => [
 					'title' => $txt['help'],
 					'href' => 'https://github.com/elkarte/Elkarte/wiki/User-Home',
 					'show' => true,
-				),
-				'search' => array(
+				],
+				'search' => [
 					'title' => $txt['search'],
 					'href' => getUrl('action', ['action' => 'search']),
 					'show' => $context['allow_search'],
-				),
-				'calendar' => array(
+				],
+				'calendar' => [
 					'title' => $txt['calendar'],
 					'href' => getUrl('action', ['action' => 'calendar']),
 					'show' => $context['allow_calendar'],
-				),
-				'memberlist' => array(
+				],
+				'memberlist' => [
 					'title' => $txt['members_title'],
 					'href' => getUrl('action', ['action' => 'memberlist']),
 					'show' => $context['allow_memberlist'],
-				),
-				'recent' => array(
+				],
+				'recent' => [
 					'title' => $txt['recent_posts'],
 					'href' => getUrl('action', ['action' => 'recent']),
 					'show' => true,
-				),
-				'like_stats' => array(
+				],
+				'like_stats' => [
 					'title' => $txt['like_post_stats'],
 					'href' => getUrl('action', ['action' => 'likes', 'sa' => 'likestats']),
 					'show' => !empty($modSettings['likes_enabled']) && allowedTo('like_posts_stats'),
-				),
-				'contact' => array(
+				],
+				'contact' => [
 					'title' => $txt['contact'],
 					'href' => getUrl('action', ['action' => 'about', 'sa' => 'contact']),
 					'show' => User::$info->is_guest && !empty($modSettings['enable_contactform']) && $modSettings['enable_contactform'] == 'menu',
-				),
-			),
-		)
-	);
+				],
+			],
+		]
+	];
 
 	// Will change title correctly if user is either a mod or an admin.
 	// Button highlighting works properly too (see current action stuffz).
 	if ($context['allow_admin'])
 	{
-		$buttons['admin'] = array(
+		$buttons['admin'] = [
 			'title' => $context['current_action'] !== 'moderate' ? $txt['admin'] : $txt['moderate'],
 			'counter' => 'grand_total',
 			'href' => $scripturl . '?action=admin',
 			'data-icon' => 'i-menu-admin',
 			'show' => true,
-			'sub_buttons' => array(
-				'admin_center' => array(
+			'sub_buttons' => [
+				'admin_center' => [
 					'title' => $txt['admin_center'],
 					'href' => $scripturl . '?action=admin',
 					'show' => $context['allow_admin'],
-				),
-				'featuresettings' => array(
+				],
+				'featuresettings' => [
 					'title' => $txt['modSettings_title'],
 					'href' => $scripturl . '?action=admin;area=featuresettings',
 					'show' => allowedTo('admin_forum'),
-				),
-				'packages' => array(
+				],
+				'packages' => [
 					'title' => $txt['package'],
 					'href' => $scripturl . '?action=admin;area=packages',
 					'show' => allowedTo('admin_forum'),
-				),
-				'permissions' => array(
+				],
+				'permissions' => [
 					'title' => $txt['edit_permissions'],
 					'href' => $scripturl . '?action=admin;area=permissions',
 					'show' => allowedTo('manage_permissions'),
-				),
-				'errorlog' => array(
+				],
+				'errorlog' => [
 					'title' => $txt['errlog'],
 					'href' => $scripturl . '?action=admin;area=logs;sa=errorlog;desc',
 					'show' => allowedTo('admin_forum') && !empty($modSettings['enableErrorLogging']),
-				),
-				'moderate_sub' => array(
+				],
+				'moderate_sub' => [
 					'title' => $txt['moderate'],
 					'counter' => 'grand_total',
 					'href' => $scripturl . '?action=moderate',
 					'show' => $context['allow_moderation_center'],
-					'sub_buttons' => array(
-						'reports' => array(
+					'sub_buttons' => [
+						'reports' => [
 							'title' => $txt['mc_reported_posts'],
 							'counter' => 'reports',
 							'href' => $scripturl . '?action=moderate;area=reports',
 							'show' => !empty(User::$info->mod_cache) && User::$info->mod_cache['bq'] != '0=1',
-						),
-						'modlog' => array(
+						],
+						'modlog' => [
 							'title' => $txt['modlog_view'],
 							'href' => $scripturl . '?action=moderate;area=modlog',
 							'show' => featureEnabled('ml') && !empty($modSettings['modlog_enabled']) && !empty(User::$info->mod_cache) && User::$info->mod_cache['bq'] != '0=1',
-						),
-						'attachments' => array(
+						],
+						'attachments' => [
 							'title' => $txt['mc_unapproved_attachments'],
 							'counter' => 'attachments',
 							'href' => $scripturl . '?action=moderate;area=attachmod;sa=attachments',
 							'show' => $modSettings['postmod_active'] && !empty(User::$info->mod_cache['ap']),
-						),
-						'poststopics' => array(
+						],
+						'poststopics' => [
 							'title' => $txt['mc_unapproved_poststopics'],
 							'counter' => 'postmod',
 							'href' => $scripturl . '?action=moderate;area=postmod;sa=posts',
 							'show' => $modSettings['postmod_active'] && !empty(User::$info->mod_cache['ap']),
-						),
-						'postbyemail' => array(
+						],
+						'postbyemail' => [
 							'title' => $txt['mc_emailerror'],
 							'counter' => 'emailmod',
 							'href' => $scripturl . '?action=admin;area=maillist;sa=emaillist',
 							'show' => !empty($modSettings['maillist_enabled']) && allowedTo('approve_emails'),
-						),
-					),
-				),
-			),
-		);
+						],
+					],
+				],
+			],
+		];
 	}
 	else
 	{
-		$buttons['admin'] = array(
+		$buttons['admin'] = [
 			'title' => $txt['moderate'],
 			'counter' => 'grand_total',
 			'href' => $scripturl . '?action=moderate',
 			'data-icon' => 'i-menu-admin',
 			'show' => $context['allow_moderation_center'],
-			'sub_buttons' => array(
-				'reports' => array(
+			'sub_buttons' => [
+				'reports' => [
 					'title' => $txt['mc_reported_posts'],
 					'counter' => 'reports',
 					'href' => $scripturl . '?action=moderate;area=reports',
 					'show' => !empty(User::$info->mod_cache) && User::$info->mod_cache['bq'] != '0=1',
-				),
-				'modlog' => array(
+				],
+				'modlog' => [
 					'title' => $txt['modlog_view'],
 					'href' => $scripturl . '?action=moderate;area=modlog',
 					'show' => featureEnabled('ml') && !empty($modSettings['modlog_enabled']) && !empty(User::$info->mod_cache) && User::$info->mod_cache['bq'] != '0=1',
-				),
-				'attachments' => array(
+				],
+				'attachments' => [
 					'title' => $txt['mc_unapproved_attachments'],
 					'counter' => 'attachments',
 					'href' => $scripturl . '?action=moderate;area=attachmod;sa=attachments',
 					'show' => $modSettings['postmod_active'] && !empty(User::$info->mod_cache['ap']),
-				),
-				'poststopics' => array(
+				],
+				'poststopics' => [
 					'title' => $txt['mc_unapproved_poststopics'],
 					'counter' => 'postmod',
 					'href' => $scripturl . '?action=moderate;area=postmod;sa=posts',
 					'show' => $modSettings['postmod_active'] && !empty(User::$info->mod_cache['ap']),
-				),
-				'postbyemail' => array(
+				],
+				'postbyemail' => [
 					'title' => $txt['mc_emailerror'],
 					'counter' => 'emailmod',
 					'href' => $scripturl . '?action=admin;area=maillist;sa=emaillist',
 					'show' => !empty($modSettings['maillist_enabled']) && allowedTo('approve_emails'),
-				),
-			),
-		);
+				],
+			],
+		];
 	}
 
-	$buttons += array(
-		'profile' => array(
+	$buttons += [
+		'profile' => [
 			'title' => !empty($modSettings['displayMemberNames']) ? User::$info->name : $txt['account_short'],
 			'href' => getUrl('profile', ['action' => 'profile', 'u' => User::$info->id, 'name' => User::$info->name]),
 			'data-icon' => 'i-menu-profile',
 			'show' => $context['allow_edit_profile'],
-			'sub_buttons' => array(
-				'account' => array(
+			'sub_buttons' => [
+				'account' => [
 					'title' => $txt['account'],
 					'href' => getUrl('profile', ['action' => 'profile', 'area' => 'account', 'u' => User::$info->id, 'name' => User::$info->name]),
-					'show' => allowedTo(array('profile_identity_any', 'profile_identity_own', 'manage_membergroups')),
-				),
-				'drafts' => array(
+					'show' => allowedTo(['profile_identity_any', 'profile_identity_own', 'manage_membergroups']),
+				],
+				'drafts' => [
 					'title' => $txt['mydrafts'],
 					'href' => getUrl('profile', ['action' => 'profile', 'area' => 'showdrafts', 'u' => User::$info->id, 'name' => User::$info->name]),
 					'show' => !empty($modSettings['drafts_enabled']) && !empty($modSettings['drafts_post_enabled']),
-				),
-				'forumprofile' => array(
+				],
+				'forumprofile' => [
 					'title' => $txt['forumprofile'],
 					'href' => getUrl('profile', ['action' => 'profile', 'area' => 'forumprofile', 'u' => User::$info->id, 'name' => User::$info->name]),
-					'show' => allowedTo(array('profile_extra_any', 'profile_extra_own')),
-				),
-				'theme' => array(
+					'show' => allowedTo(['profile_extra_any', 'profile_extra_own']),
+				],
+				'theme' => [
 					'title' => $txt['theme'],
 					'href' => getUrl('profile', ['action' => 'profile', 'area' => 'theme', 'u' => User::$info->id, 'name' => User::$info->name]),
-					'show' => allowedTo(array('profile_extra_any', 'profile_extra_own', 'profile_extra_any')),
-				),
-				'logout' => array(
+					'show' => allowedTo(['profile_extra_any', 'profile_extra_own', 'profile_extra_any']),
+				],
+				'logout' => [
 					'title' => $txt['logout'],
 					'href' => getUrl('action', ['action' => 'logout']),
 					'show' => User::$info->is_guest === false,
-				),
-			),
-		),
-		'pm' => array(
+				],
+			],
+		],
+		'pm' => [
 			'title' => $txt['pm_short'],
 			'counter' => 'unread_messages',
 			'href' => getUrl('action', ['action' => 'pm']),
 			'data-icon' => ($context['user']['unread_messages'] ? 'i-menu-pm-on' : 'i-menu-pm-off'),
 			'show' => $context['allow_pm'],
-			'sub_buttons' => array(
-				'pm_read' => array(
+			'sub_buttons' => [
+				'pm_read' => [
 					'title' => $txt['pm_menu_read'],
 					'href' => getUrl('action', ['action' => 'pm']),
 					'show' => allowedTo('pm_read'),
-				),
-				'pm_send' => array(
+				],
+				'pm_send' => [
 					'title' => $txt['pm_menu_send'],
 					'href' => getUrl('action', ['action' => 'pm', 'sa' => 'send']),
 					'show' => allowedTo('pm_send'),
-				),
-			),
-		),
-		'mentions' => array(
+				],
+			],
+		],
+		'mentions' => [
 			'title' => $txt['mention'],
 			'counter' => 'mentions',
 			'href' => getUrl('action', ['action' => 'mentions']),
 			'data-icon' => ($context['user']['mentions'] ? 'i-menu-mentions-on' : 'i-menu-mentions-off'),
 			'show' => User::$info->is_guest === false && !empty($modSettings['mentions_enabled']),
-		),
+		],
 		// The old language string made no sense, and was too long.
 		// "New posts" is better, because there are probably a pile
 		// of old unread posts, and they won't be reached from this button.
-		'unread' => array(
+		'unread' => [
 			'title' => $txt['view_unread_category'],
 			'href' => getUrl('action', ['action' => 'unread']),
 			'data-icon' => 'i-menu-unread',
 			'show' => User::$info->is_guest === false,
-		),
+		],
 		// The old language string made no sense, and was too long.
 		// "New replies" is better, because there are "updated topics"
 		// that the user has never posted in and doesn't care about.
-		'unreadreplies' => array(
+		'unreadreplies' => [
 			'title' => $txt['view_replies_category'],
 			'href' => getUrl('action', ['action' => 'unreadreplies']),
 			'data-icon' => 'i-menu-unreadreplies',
 			'show' => User::$info->is_guest === false,
-		),
-		'login' => array(
+		],
+		'login' => [
 			'title' => $txt['login'],
 			'href' => getUrl('action', ['action' => 'login']),
 			'onclick' => 'return reqOverlayDiv(this.href, ' . JavaScriptEscape($txt['login']) . ', \'i-menu-login\');',
 			'data-icon' => 'i-menu-login',
 			'show' => User::$info->is_guest,
-		),
-		'register' => array(
+		],
+		'register' => [
 			'title' => $txt['register'],
 			'href' => getUrl('action', ['action' => 'register']),
 			'data-icon' => 'i-menu-register',
 			'show' => User::$info->is_guest && $context['can_register'],
-		),
-	);
+		],
+	];
 
 	return $buttons;
 }

@@ -23,7 +23,7 @@
  */
 function utf8_strtolower($string)
 {
-	static $case_folding = array(
+	static $case_folding = [
 		'A' => 'a', 'B' => 'b', 'C' => 'c', 'D' => 'd',
 		'E' => 'e', 'F' => 'f', 'G' => 'g', 'H' => 'h',
 		'I' => 'i', 'J' => 'j', 'K' => 'k', 'L' => 'l',
@@ -277,7 +277,7 @@ function utf8_strtolower($string)
 		'𐐞' => '𐑆', '𐐟' => '𐑇', '𐐠' => '𐑈', '𐐡' => '𐑉',
 		'𐐢' => '𐑊', '𐐣' => '𐑋', '𐐤' => '𐑌', '𐐥' => '𐑍',
 		'𐑎' => '𐐦', '𐑏' => '𐐧',
-	);
+	];
 
 	return strtr($string, $case_folding);
 }
@@ -291,7 +291,7 @@ function utf8_strtolower($string)
  */
 function utf8_strtoupper($string)
 {
-	static $case_folding = array(
+	static $case_folding = [
 		'a' => 'A', 'b' => 'B', 'c' => 'C', 'd' => 'D',
 		'e' => 'E', 'f' => 'F', 'g' => 'G', 'h' => 'H',
 		'i' => 'I', 'j' => 'J', 'k' => 'K', 'l' => 'L',
@@ -545,7 +545,7 @@ function utf8_strtoupper($string)
 		'𐑆' => '𐐞', '𐑇' => '𐐟', '𐑈' => '𐐠', '𐑉' => '𐐡',
 		'𐑊' => '𐐢', '𐑋' => '𐐣', '𐑌' => '𐐤', '𐑍' => '𐐥',
 		'𐐦' => '𐑎', '𐐧' => '𐑏',
-	);
+	];
 
 	return strtr($string, $case_folding);
 }
@@ -561,10 +561,10 @@ function fix_serialized_columns()
 		SELECT id_action, extra
 		FROM {db_prefix}log_actions
 		WHERE action IN ({string:remove}, {string:delete})',
-		array(
+		[
 			'remove' => 'remove',
 			'delete' => 'delete',
-		)
+		]
 	);
 	while ($row = $db->fetch_assoc($request))
 	{
@@ -574,17 +574,17 @@ function fix_serialized_columns()
 				UPDATE {db_prefix}log_actions
 				SET extra = {string:extra}
 				WHERE id_action = {int:current_action}',
-				array(
+				[
 					'current_action' => $row['id_action'],
 					'extra' => $matches[1] . strlen($matches[3]) . ':"' . $matches[3] . '"' . $matches[4],
-				)
+				]
 			);
 		}
 	}
 	$db->free_result($request);
 
 	// Refresh some cached data.
-	updateSettings(array(
+	updateSettings([
 		'memberlist_updated' => time(),
-	));
+	]);
 }

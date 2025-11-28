@@ -109,7 +109,7 @@ class Mentions extends AbstractController
 	 *
 	 * @todo probably should be placed somewhere else.
 	 */
-	public function action_fetch()
+	public function action_fetch(): void
 	{
 		global $context, $txt, $modSettings;
 
@@ -159,7 +159,7 @@ class Mentions extends AbstractController
 	 *  - Allows them to mark them read or unread
 	 *  - Can sort the various forms of mentions, such as likes, buddies, quoted, etc.
 	 */
-	public function action_list()
+	public function action_list(): void
 	{
 		global $context, $txt, $scripturl;
 
@@ -326,7 +326,7 @@ class Mentions extends AbstractController
 	/**
 	 * Builds the link back, so you return to the right list of mentions
 	 */
-	protected function _buildUrl()
+	protected function _buildUrl(): void
 	{
 		$this->_all = $this->_req->getQuery('all') !== null;
 		$this->_sort = in_array($this->_req->getQuery('sort', 'trim'), $this->_known_sorting, true) ? $this->_req->getQuery('sort', 'trim') : $this->_default_sort;
@@ -343,7 +343,7 @@ class Mentions extends AbstractController
 	 * @param bool $all : if true counts all the mentions, otherwise only the unread
 	 * @param string $type : the type of mention
 	 *
-	 * @return mixed
+	 * @return array|int
 	 */
 	public function list_getMentionCount($all, $type)
 	{
@@ -354,7 +354,7 @@ class Mentions extends AbstractController
 	 * Did you read the mention? Then let's move it to the graveyard.
 	 * Used by Events registered to the prepare_context event of the Display controller
 	 */
-	public function action_markread()
+	public function action_markread(): void
 	{
 		global $modSettings;
 
@@ -370,7 +370,7 @@ class Mentions extends AbstractController
 	/**
 	 * Updating the status from the listing?
 	 */
-	public function action_updatestatus()
+	public function action_updatestatus(): void
 	{
 		global $modSettings;
 
@@ -413,7 +413,7 @@ class Mentions extends AbstractController
 	 * @event view_mentions
 	 * @return array
 	 */
-	public function list_loadMentions($start, $limit, $sort, $all, $type)
+	public function list_loadMentions($start, $limit, $sort, $all, $type): array
 	{
 		$totalMentions = countUserMentions($all, $type);
 		$mentions = [];
@@ -468,7 +468,7 @@ class Mentions extends AbstractController
 	 *
 	 * @param string|null $type Specific mention type
 	 */
-	protected function _registerEvents($type)
+	protected function _registerEvents($type): void
 	{
 		if (!empty($type))
 		{

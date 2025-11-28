@@ -113,7 +113,7 @@ class Search extends AbstractController
 	 *
 	 * @uses Search language file and Errors language when needed
 	 */
-	public function action_search()
+	public function action_search(): void
 	{
 		global $txt, $modSettings, $context;
 
@@ -130,17 +130,17 @@ class Search extends AbstractController
 		{
 			theme()->getTemplates()->load('Search');
 			$context['sub_template'] = 'searchform';
-			loadJavascriptFile('suggest.js', array('defer' => true));
+			loadJavascriptFile('suggest.js', ['defer' => false]);
 		}
 
 		// Check the user's permissions.
 		isAllowedTo('search_posts');
 
 		// Link tree....
-		$context['breadcrumbs'][] = array(
+		$context['breadcrumbs'][] = [
 			'url' => getUrl('action', ['action' => 'search']),
 			'name' => $txt['search']
-		);
+		];
 
 		// This is hard coded maximum string length.
 		$context['search_string_limit'] = 100;
@@ -149,9 +149,9 @@ class Search extends AbstractController
 		if ($context['require_verification'])
 		{
 			// Build a verification control for the form
-			$verificationOptions = array(
+			$verificationOptions = [
 				'id' => 'search',
-			);
+			];
 
 			$context['require_verification'] = VerificationControlsIntegrate::create($verificationOptions);
 			$context['visual_verification_id'] = $verificationOptions['id'];
@@ -229,9 +229,9 @@ class Search extends AbstractController
 		}
 
 		require_once(SUBSDIR . '/Boards.subs.php');
-		$context += getBoardList(array('not_redirection' => true));
+		$context += getBoardList(['not_redirection' => true]);
 
-		$context['boards_in_category'] = array();
+		$context['boards_in_category'] = [];
 		foreach ($context['categories'] as $cat => &$category)
 		{
 			$context['boards_in_category'][$cat] = count($category['boards']);
@@ -253,10 +253,10 @@ class Search extends AbstractController
 		{
 			$context['search_params']['topic'] = (int) $context['search_params']['topic'];
 
-			$context['search_topic'] = array(
+			$context['search_topic'] = [
 				'id' => $context['search_params']['topic'],
 				'href' => getUrl('action', ['topic' => $context['search_params']['topic'] . '.0']),
-			);
+			];
 
 			require_once(SUBSDIR . '/Topic.subs.php');
 			$context['search_topic']['subject'] = getSubject($context['search_params']['topic']);
@@ -282,9 +282,9 @@ class Search extends AbstractController
 	 *
 	 * @return array
 	 */
-	private function _fill_default_search_params($array)
+	private function _fill_default_search_params($array): array
 	{
-		$default = array(
+		$default = [
 			'search' => '',
 			'userspec' => '*',
 			'searchtype' => 0,
@@ -293,7 +293,7 @@ class Search extends AbstractController
 			'minage' => 0,
 			'maxage' => 9999,
 			'sort' => 'relevance',
-		);
+		];
 
 		$array = array_merge($default, $array);
 		if (empty($array['userspec']))
@@ -338,7 +338,7 @@ class Search extends AbstractController
 		$maxMessageResults = empty($modSettings['search_max_results']) ? 0 : $modSettings['search_max_results'] * 5;
 
 		// Start with no errors.
-		$context['search_errors'] = array();
+		$context['search_errors'] = [];
 
 		// Number of pages hard maximum - normally not set at all.
 		$modSettings['search_max_results'] = empty($modSettings['search_max_results']) ? 200 * $modSettings['search_results_per_page'] : (int) $modSettings['search_max_results'];
@@ -460,7 +460,8 @@ class Search extends AbstractController
 		// One or more search errors? Go back to the first search screen.
 		if (!empty($context['search_errors']))
 		{
-			return $this->action_search();
+			$this->action_search();
+			return null;
 		}
 
 		// Spam me not, Spam-a-lot?
@@ -489,19 +490,20 @@ class Search extends AbstractController
 		{
 			$context['search_errors'][$exception->getMessage()] = true;
 
-			return $this->action_search();
+			$this->action_search();
+			return null;
 		}
 
 		// Did we find anything?
 		if (!empty($context['topics']))
 		{
 			// Create an array for the permissions.
-			$boards_can = boardsAllowedTo(array('post_reply_own', 'post_reply_any', 'mark_any_notify'), true, false);
+			$boards_can = boardsAllowedTo(['post_reply_own', 'post_reply_any', 'mark_any_notify'], true, false);
 
 			// How's about some quick moderation?
 			if (!empty($options['display_quick_mod']))
 			{
-				$boards_can = array_merge($boards_can, boardsAllowedTo(array('lock_any', 'lock_own', 'make_sticky', 'move_any', 'move_own', 'remove_any', 'remove_own', 'merge_any'), true, false));
+				$boards_can = array_merge($boards_can, boardsAllowedTo(['lock_any', 'lock_own', 'make_sticky', 'move_any', 'move_own', 'remove_any', 'remove_own', 'merge_any'], true, false));
 
 				$context['can_lock'] = in_array(0, $boards_can['lock_any']);
 				$context['can_sticky'] = in_array(0, $boards_can['make_sticky']);
@@ -514,7 +516,7 @@ class Search extends AbstractController
 			$msg_list = array_keys($context['topics']);
 			$posters = $this->_search->loadPosters($msg_list, count($context['topics']));
 
-			call_integration_hook('integrate_search_message_list', array(&$msg_list, &$posters));
+			call_integration_hook('integrate_search_message_list', [&$msg_list, &$posters]);
 
 			if (!empty($posters))
 			{
@@ -527,7 +529,7 @@ class Search extends AbstractController
 			// If there are no results that means the things in the cache got deleted, so pretend we have no topics anymore.
 			if ($this->_search->noMessages($messages_request))
 			{
-				$context['topics'] = array();
+				$context['topics'] = [];
 			}
 
 			$this->_prepareParticipants(!empty($modSettings['enableParticipation']), (int) $this->user->id);
@@ -579,7 +581,7 @@ class Search extends AbstractController
 	/**
 	 * Show an anti-spam verification control
 	 */
-	protected function _controlVerifications()
+	protected function _controlVerifications(): void
 	{
 		global $modSettings, $context;
 
@@ -614,7 +616,7 @@ class Search extends AbstractController
 	 *
 	 * @return void
 	 */
-	protected function _prepareParticipants($participationEnabled, $user_id)
+	protected function _prepareParticipants($participationEnabled, $user_id): void
 	{
 		// If we want to know who participated in what then load this now.
 		if ($participationEnabled === true && $user_id !== 0)
@@ -635,7 +637,7 @@ class Search extends AbstractController
 	 * Loads into $context the moderation button array for template use.
 	 * Call integrate_message_index_mod_buttons hook
 	 */
-	protected function buildQuickModerationButtons()
+	protected function buildQuickModerationButtons(): void
 	{
 		global $context;
 

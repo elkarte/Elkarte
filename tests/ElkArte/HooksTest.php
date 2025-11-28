@@ -118,8 +118,8 @@ class HooksTest extends TestCase
 				'hook_name'=> $this->_hook_name,
 			)
 		);
-		list ($db_hook_string) = $db->fetch_row($request);
-		$db->free_result($request);
+		list ($db_hook_string) = $request->fetch_row();
+		$request->free_result();
 
 		$db_hooks = $this->_parse_hooks($db_hook_string);
 

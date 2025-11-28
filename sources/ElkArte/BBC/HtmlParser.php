@@ -29,10 +29,10 @@ class HtmlParser
 	public $image_height;
 
 	/** @var array tags that are stand alone */
-	protected $empty_tags = array('br', 'hr');
+	protected $empty_tags = ['br', 'hr'];
 
 	/** @var array tags we will allow */
-	protected $closable_tags = array('b', 'u', 'i', 's', 'em', 'ins', 'del', 'pre', 'blockquote');
+	protected $closable_tags = ['b', 'u', 'i', 's', 'em', 'ins', 'del', 'pre', 'blockquote'];
 
 	/**
 	 * HtmlParser constructor.
@@ -45,7 +45,7 @@ class HtmlParser
 		$empty_tags = $this->empty_tags;
 		$closable_tags = $this->closable_tags;
 
-		call_integration_hook('integrate_html_parser_load', array(&$empty_tags, &$closable_tags));
+		call_integration_hook('integrate_html_parser_load', [&$empty_tags, &$closable_tags]);
 		$this->empty_tags = $empty_tags;
 		$this->closable_tags = $closable_tags;
 	}
@@ -57,7 +57,7 @@ class HtmlParser
 	 *
 	 * @return string
 	 */
-	public function parse($data)
+	public function parse($data): string
 	{
 		$data = $this->anchorTags($data);
 
@@ -76,7 +76,7 @@ class HtmlParser
 	 *
 	 * @return $this
 	 */
-	public function setImageWidthHeight($width, $height)
+	public function setImageWidthHeight($width, $height): self
 	{
 		$this->image_width = (int) $width;
 		$this->image_height = (int) $height;
@@ -111,7 +111,7 @@ class HtmlParser
 		// <br /> should be empty.
 		foreach ($this->empty_tags as $tag)
 		{
-			$data = str_replace(array('&lt;' . $tag . '&gt;', '&lt;' . $tag . '/&gt;', '&lt;' . $tag . ' /&gt;'), '[' . $tag . ' /]', $data);
+			$data = str_replace(['&lt;' . $tag . '&gt;', '&lt;' . $tag . '/&gt;', '&lt;' . $tag . ' /&gt;'], '[' . $tag . ' /]', $data);
 		}
 
 		return $data;
@@ -124,12 +124,12 @@ class HtmlParser
 	 *
 	 * @return string
 	 */
-	protected function closableTags($data)
+	protected function closableTags($data): string
 	{
 		foreach ($this->closable_tags as $tag)
 		{
 			$diff = substr_count($data, '&lt;' . $tag . '&gt;') - substr_count($data, '&lt;/' . $tag . '&gt;');
-			$data = strtr($data, array('&lt;' . $tag . '&gt;' => '<' . $tag . '>', '&lt;/' . $tag . '&gt;' => '</' . $tag . '>'));
+			$data = strtr($data, ['&lt;' . $tag . '&gt;' => '<' . $tag . '>', '&lt;/' . $tag . '&gt;' => '</' . $tag . '>']);
 
 			// Stray open tags, close them all!
 			if ($diff > 0)
@@ -148,7 +148,7 @@ class HtmlParser
 	 *
 	 * @return string
 	 */
-	protected function imageTags($data)
+	protected function imageTags($data): string
 	{
 		global $modSettings;
 
@@ -156,7 +156,7 @@ class HtmlParser
 		preg_match_all('~&lt;img\s+src=((?:&quot;)?)((?:https?://)\S+?)\\1(?:\s+alt=(&quot;.*?&quot;|\S*?))?(?:\s?/)?&gt;~i', $data, $matches, PREG_PATTERN_ORDER);
 		if (!empty($matches[0]))
 		{
-			$replaces = array();
+			$replaces = [];
 			require_once(SUBSDIR . '/Attachments.subs.php');
 			foreach ($matches[2] as $match => $imgtag)
 			{

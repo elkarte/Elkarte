@@ -32,12 +32,12 @@ function associatedPoll($topicID, $pollID = null)
 	if ($pollID === null)
 	{
 		require_once(SUBSDIR . '/Topic.subs.php');
-		$pollID = topicAttribute($topicID, array('id_poll'));
+		$pollID = topicAttribute($topicID, ['id_poll']);
 
 		return $pollID['id_poll'];
 	}
 
-	setTopicAttribute($topicID, array('id_poll' => $pollID));
+	setTopicAttribute($topicID, ['id_poll' => $pollID]);
 
 	return false;
 }
@@ -51,33 +51,33 @@ function removePoll($pollID)
 {
 	$db = database();
 
-	$pollID = is_array($pollID) ? $pollID : array($pollID);
+	$pollID = is_array($pollID) ? $pollID : [$pollID];
 
 	// Remove votes.
 	$db->query('', '
 		DELETE FROM {db_prefix}log_polls
 		WHERE id_poll IN ({array_int:id_polls})',
-		array(
+		[
 			'id_polls' => $pollID,
-		)
+		]
 	);
 
 	// Remove the choices associated with this poll.
 	$db->query('', '
 		DELETE FROM {db_prefix}poll_choices
 		WHERE id_poll IN ({array_int:id_polls})',
-		array(
+		[
 			'id_polls' => $pollID,
-		)
+		]
 	);
 
 	// Remove the poll.
 	$db->query('', '
 		DELETE FROM {db_prefix}polls
 		WHERE id_poll IN ({array_int:id_polls})',
-		array(
+		[
 			'id_polls' => $pollID,
-		)
+		]
 	);
 }
 
@@ -95,11 +95,11 @@ function resetVotes($pollID)
 		SET 
 			num_guest_voters = {int:no_votes}, reset_poll = {int:time}
 		WHERE id_poll = {int:id_poll}',
-		array(
+		[
 			'no_votes' => 0,
 			'id_poll' => $pollID,
 			'time' => time(),
-		)
+		]
 	);
 
 	$db->query('', '
@@ -107,18 +107,18 @@ function resetVotes($pollID)
 		SET 
 			votes = {int:no_votes}
 		WHERE id_poll = {int:id_poll}',
-		array(
+		[
 			'no_votes' => 0,
 			'id_poll' => $pollID,
-		)
+		]
 	);
 
 	$db->query('', '
 		DELETE FROM {db_prefix}log_polls
 		WHERE id_poll = {int:id_poll}',
-		array(
+		[
 			'id_poll' => $pollID,
-		)
+		]
 	);
 }
 
@@ -141,7 +141,7 @@ function pollInfo($id_poll, $ignore_permissions = true)
 
 	$db = database();
 
-	$boardsAllowed = array();
+	$boardsAllowed = [];
 	if ($ignore_permissions === false)
 	{
 		$boardsAllowed = boardsAllowedTo('poll_view');
@@ -166,11 +166,11 @@ function pollInfo($id_poll, $ignore_permissions = true)
 			AND b.id_board IN ({array_int:boards_allowed_see})') . (!$modSettings['postmod_active'] ? '' : '
 			AND t.approved = {int:is_approved}'))) . '
 		LIMIT 1',
-		array(
+		[
 			'id_poll' => $id_poll,
 			'boards_allowed_see' => $boardsAllowed,
 			'is_approved' => 1,
-		)
+		]
 	);
 	$poll_info = $request->fetch_assoc();
 	$request->free_result();
@@ -185,10 +185,10 @@ function pollInfo($id_poll, $ignore_permissions = true)
 		FROM {db_prefix}log_polls
 		WHERE id_poll = {int:id_poll}
 			AND id_member != {int:not_guest}',
-		array(
+		[
 			'id_poll' => $id_poll,
 			'not_guest' => 0,
-		)
+		]
 	);
 	list ($poll_info['total']) = $request->fetch_row();
 	$request->free_result();
@@ -222,9 +222,9 @@ function pollInfoForTopic($topicID)
 			LEFT JOIN {db_prefix}polls AS p ON (p.id_poll = t.id_poll)
 		WHERE t.id_topic = {int:current_topic}
 		LIMIT 1',
-		array(
+		[
 			'current_topic' => $topicID,
-		)
+		]
 	);
 
 	// The topic must exist
@@ -259,9 +259,9 @@ function topicFromPoll($pollID)
 			LEFT JOIN {db_prefix}boards AS b ON (b.id_board = t.id_board)
 		WHERE p.id_poll = {int:current_poll}
 		LIMIT 1',
-		array(
+		[
 			'current_poll' => $pollID,
-		)
+		]
 	);
 
 	// The topic must exist
@@ -277,7 +277,7 @@ function topicFromPoll($pollID)
 
 	$request->free_result();
 
-	return array($topicID, $boardID);
+	return [$topicID, $boardID];
 }
 
 /**
@@ -299,7 +299,7 @@ function pollOptionsForMember($id_poll, $id_member)
 	$db = database();
 
 	// Get the choices
-	$pollOptions = array();
+	$pollOptions = [];
 	$db->fetchQuery('
 		SELECT 
 			pc.id_choice, pc.label, pc.votes, COALESCE(lp.id_choice, -1) AS voted_this
@@ -307,11 +307,11 @@ function pollOptionsForMember($id_poll, $id_member)
 			LEFT JOIN {db_prefix}log_polls AS lp ON (lp.id_choice = pc.id_choice AND lp.id_poll = {int:id_poll} AND lp.id_member = {int:current_member} AND lp.id_member != {int:not_guest})
 		WHERE pc.id_poll = {int:id_poll}
 		ORDER by pc.id_choice',
-		array(
+		[
 			'current_member' => $id_member,
 			'id_poll' => $id_poll,
 			'not_guest' => 0,
-		)
+		]
 	)->fetch_callback(
 		function ($row) use (&$pollOptions) {
 			$row['label'] = censor($row['label']);
@@ -334,15 +334,15 @@ function pollOptions($id_poll)
 {
 	$db = database();
 
-	$pollOptions = array();
+	$pollOptions = [];
 	$db->fetchQuery('
 		SELECT 
 			label, votes, id_choice
 		FROM {db_prefix}poll_choices
 		WHERE id_poll = {int:id_poll}',
-		array(
+		[
 			'id_poll' => $id_poll,
-		)
+		]
 	)->fetch_callback(
 		function ($row) use (&$pollOptions) {
 			$row['label'] = censor($row['label']);
@@ -364,25 +364,25 @@ function pollOptions($id_poll)
  * @param int $expire = 0 The time in days that this poll will expire
  * @param int $can_change_vote = 0 If you can change your vote
  * @param int $can_guest_vote = 0 If guests can vote
- * @param mixed[] $options = array() The poll options
+ * @param array $options = array() The poll options
  * @return int the id of the created poll
  */
-function createPoll($question, $id_member, $poster_name, $max_votes = 1, $hide_results = 1, $expire = 0, $can_change_vote = 0, $can_guest_vote = 0, array $options = array())
+function createPoll($question, $id_member, $poster_name, $max_votes = 1, $hide_results = 1, $expire = 0, $can_change_vote = 0, $can_guest_vote = 0, array $options = [])
 {
 	$expire = empty($expire) ? 0 : time() + $expire * 3600 * 24;
 
 	$db = database();
 	$db->insert('',
 		'{db_prefix}polls',
-		array(
+		[
 			'question' => 'string-255', 'hide_results' => 'int', 'max_votes' => 'int', 'expire_time' => 'int', 'id_member' => 'int',
 			'poster_name' => 'string-255', 'change_vote' => 'int', 'guest_vote' => 'int'
-		),
-		array(
+		],
+		[
 			$question, $hide_results, $max_votes, $expire, $id_member,
 			$poster_name, $can_change_vote, $can_guest_vote,
-		),
-		array('id_poll')
+		],
+		['id_poll']
 	);
 
 	$id_poll = $db->insert_id('{db_prefix}polls');
@@ -392,7 +392,7 @@ function createPoll($question, $id_member, $poster_name, $max_votes = 1, $hide_r
 		addPollOptions($id_poll, $options);
 	}
 
-	call_integration_hook('integrate_poll_add_edit', array($id_poll, false));
+	call_integration_hook('integrate_poll_add_edit', [$id_poll, false]);
 
 	return $id_poll;
 }
@@ -420,7 +420,7 @@ function modifyPoll($id_poll, $question, $max_votes = 1, $hide_results = 1, $exp
 			guest_vote = {int:guest_vote}' : '
 			hide_results = CASE WHEN expire_time = {int:expire_time_zero} AND {int:hide_results} = 2 THEN 1 ELSE {int:hide_results} END') . '
 		WHERE id_poll = {int:id_poll}',
-		array(
+		[
 			'id_poll' => $id_poll,
 			'question' => $question,
 			'max_votes' => $max_votes,
@@ -429,40 +429,40 @@ function modifyPoll($id_poll, $question, $max_votes = 1, $hide_results = 1, $exp
 			'change_vote' => $can_change_vote,
 			'guest_vote' => $can_guest_vote,
 			'expire_time_zero' => 0,
-		)
+		]
 	);
 
-	call_integration_hook('integrate_poll_add_edit', array($id_poll, true));
+	call_integration_hook('integrate_poll_add_edit', [$id_poll, true]);
 }
 
 /**
  * Add options to an already created poll
  *
  * @param int $id_poll The id of the poll you're adding the options to
- * @param mixed[] $options The options to choose from
+ * @param array $options The options to choose from
  */
 function addPollOptions($id_poll, array $options)
 {
 	$db = database();
 
-	$pollOptions = array();
+	$pollOptions = [];
 	foreach ($options as $i => $option)
 	{
-		$pollOptions[] = array($id_poll, $i, $option);
+		$pollOptions[] = [$id_poll, $i, $option];
 	}
 
 	$db->insert('insert',
 		'{db_prefix}poll_choices',
-		array('id_poll' => 'int', 'id_choice' => 'int', 'label' => 'string-255'),
+		['id_poll' => 'int', 'id_choice' => 'int', 'label' => 'string-255'],
 		$pollOptions,
-		array('id_poll', 'id_choice')
+		['id_poll', 'id_choice']
 	);
 }
 
 /**
  * Insert some options to an already created poll
  *
- * @param mixed[] $options An array holding the poll choices
+ * @param array $options An array holding the poll choices
  */
 function insertPollOptions($options)
 {
@@ -470,18 +470,18 @@ function insertPollOptions($options)
 
 	$db->insert('',
 		'{db_prefix}poll_choices',
-		array(
+		[
 			'id_poll' => 'int', 'id_choice' => 'int', 'label' => 'string-255', 'votes' => 'int',
-		),
+		],
 		$options,
-		array()
+		[]
 	);
 }
 
 /**
  * Add a single option to an already created poll
  *
- * @param mixed[] $options An array holding the poll choices
+ * @param array $options An array holding the poll choices
  */
 function modifyPollOption($options)
 {
@@ -495,11 +495,11 @@ function modifyPollOption($options)
 				label = {string:option_name}
 			WHERE id_poll = {int:id_poll}
 				AND id_choice = {int:id_choice}',
-			array(
+			[
 				'id_poll' => $option[0],
 				'id_choice' => $option[1],
 				'option_name' => $option[2],
-			)
+			]
 		);
 	}
 }
@@ -518,20 +518,20 @@ function deletePollOptions($id_poll, $id_options)
 		DELETE FROM {db_prefix}log_polls
 		WHERE id_poll = {int:id_poll}
 			AND id_choice IN ({array_int:delete_options})',
-		array(
+		[
 			'delete_options' => $id_options,
 			'id_poll' => $id_poll,
-		)
+		]
 	);
 
 	$db->query('', '
 		DELETE FROM {db_prefix}poll_choices
 		WHERE id_poll = {int:id_poll}
 			AND id_choice IN ({array_int:delete_options})',
-		array(
+		[
 			'delete_options' => $id_options,
 			'id_poll' => $id_poll,
-		)
+		]
 	);
 }
 
@@ -547,7 +547,7 @@ function pollStarters($id_topic)
 {
 	$db = database();
 
-	$pollStarters = array();
+	$pollStarters = [];
 	$request = $db->query('', '
 		SELECT 
 			t.id_member_started, p.id_member AS poll_starter
@@ -555,9 +555,9 @@ function pollStarters($id_topic)
 			INNER JOIN {db_prefix}polls AS p ON (p.id_poll = t.id_poll)
 		WHERE t.id_topic = {int:current_topic}
 		LIMIT 1',
-		array(
+		[
 			'current_topic' => $id_topic,
-		)
+		]
 	);
 
 	if ($request->num_rows() !== 0)
@@ -574,7 +574,7 @@ function pollStarters($id_topic)
  * Check if they have already voted, or voting is locked.
  *
  * @param int $topic the topic with an associated poll
- * @return mixed[]
+ * @return array
  */
 function checkVote($topic)
 {
@@ -589,11 +589,11 @@ function checkVote($topic)
 			LEFT JOIN {db_prefix}log_polls AS lp ON (p.id_poll = lp.id_poll AND lp.id_member = {int:current_member} AND lp.id_member != {int:not_guest})
 		WHERE t.id_topic = {int:current_topic}
 		LIMIT 1',
-		array(
+		[
 			'current_member' => User::$info->id,
 			'current_topic' => $topic,
 			'not_guest' => 0,
-		)
+		]
 	)->fetch_assoc();
 }
 
@@ -611,10 +611,10 @@ function removeVote($id_member, $id_poll)
 		DELETE FROM {db_prefix}log_polls
 		WHERE id_member = {int:current_member}
 			AND id_poll = {int:id_poll}',
-		array(
+		[
 			'current_member' => $id_member,
 			'id_poll' => $id_poll,
-		)
+		]
 	);
 }
 
@@ -635,11 +635,11 @@ function decreaseVoteCounter($id_poll, $options)
 		WHERE id_poll = {int:id_poll}
 			AND id_choice IN ({array_int:poll_options})
 			AND votes > {int:votes}',
-		array(
+		[
 			'poll_options' => $options,
 			'id_poll' => $id_poll,
 			'votes' => 0,
-		)
+		]
 	);
 }
 
@@ -659,17 +659,17 @@ function increaseVoteCounter($id_poll, $options)
 			votes = votes + 1
 		WHERE id_poll = {int:id_poll}
 			AND id_choice IN ({array_int:poll_options})',
-		array(
+		[
 			'poll_options' => $options,
 			'id_poll' => $id_poll,
-		)
+		]
 	);
 }
 
 /**
  * Add a vote to a poll.
  *
- * @param mixed[] $insert array of vote details, includes member and their choice
+ * @param array $insert array of vote details, includes member and their choice
  */
 function addVote($insert)
 {
@@ -677,9 +677,9 @@ function addVote($insert)
 
 	$db->insert('insert',
 		'{db_prefix}log_polls',
-		array('id_poll' => 'int', 'id_member' => 'int', 'id_choice' => 'int'),
+		['id_poll' => 'int', 'id_member' => 'int', 'id_choice' => 'int'],
 		$insert,
-		array('id_poll', 'id_member', 'id_choice')
+		['id_poll', 'id_member', 'id_choice']
 	);
 }
 
@@ -697,9 +697,9 @@ function increaseGuestVote($id_poll)
 		SET 
 			num_guest_voters = num_guest_voters + 1
 		WHERE id_poll = {int:id_poll}',
-		array(
+		[
 			'id_poll' => $id_poll,
-		)
+		]
 	);
 }
 
@@ -722,10 +722,10 @@ function determineVote($id_member, $id_poll)
 		FROM {db_prefix}log_polls
 		WHERE id_member = {int:current_member}
 			AND id_poll = {int:id_poll}',
-		array(
+		[
 			'current_member' => $id_member,
 			'id_poll' => $id_poll,
-		)
+		]
 	)->fetch_callback(
 		function ($row) use (&$pollOptions) {
 			if (isset($row['id_choice']))
@@ -767,10 +767,10 @@ function lockPoll($id_poll, $locked)
 		SET 
 			voting_locked = {int:voting_locked}
 		WHERE id_poll = {int:id_poll}',
-		array(
+		[
 			'voting_locked' => $locked,
 			'id_poll' => $id_poll,
-		)
+		]
 	);
 }
 
@@ -784,26 +784,26 @@ function getPollChoices($id_poll)
 {
 	$db = database();
 
-	$choices = array();
+	$choices = [];
 	$number = 1;
 	$db->fetchQuery('
 		SELECT 
 			label, votes, id_choice
 		FROM {db_prefix}poll_choices
 		WHERE id_poll = {int:id_poll}',
-		array(
+		[
 			'id_poll' => $id_poll,
-		)
+		]
 	)->fetch_callback(
 		function ($row) use (&$choices, &$number) {
 			$row['label'] = censor($row['label']);
-			$choices[$row['id_choice']] = array(
+			$choices[$row['id_choice']] = [
 				'id' => $row['id_choice'],
 				'number' => $number++,
 				'votes' => $row['votes'],
 				'label' => $row['label'],
 				'is_last' => false
-			);
+			];
 		}
 	);
 
@@ -829,9 +829,9 @@ function getPollStarter($id_topic)
 			LEFT JOIN {db_prefix}polls AS p ON (p.id_poll = t.id_poll)
 		WHERE t.id_topic = {int:current_topic}
 		LIMIT 1',
-		array(
+		[
 			'current_topic' => $id_topic,
-		)
+		]
 	);
 	if ($request->num_rows() === 0)
 	{
@@ -918,27 +918,27 @@ function loadPollContext($poll_id)
 
 	// Set up the basic poll information.
 	$starter_href = getUrl('profile', ['action' => 'profile', 'u' => $pollinfo['id_member'], 'name' => $pollinfo['poster_name']]);
-	$context['poll'] = array(
+	$context['poll'] = [
 		'id' => $poll_id,
 		'image' => 'normal_' . (empty($pollinfo['voting_locked']) ? 'poll' : 'locked_poll'),
 		'question' => $bbc_parser->parsePoll($pollinfo['question']),
 		'total_votes' => $pollinfo['total'],
 		'change_vote' => !empty($pollinfo['change_vote']),
 		'is_locked' => !empty($pollinfo['voting_locked']),
-		'options' => array(),
+		'options' => [],
 		'lock' => allowedTo('poll_lock_any') || ($context['user']['started'] && allowedTo('poll_lock_own')),
 		'edit' => allowedTo('poll_edit_any') || ($context['user']['started'] && allowedTo('poll_edit_own')),
 		'allowed_warning' => $pollinfo['max_votes'] > 1 ? sprintf($txt['poll_options6'], min(count($pollOptions), $pollinfo['max_votes'])) : '',
 		'is_expired' => !empty($pollinfo['expire_time']) && $pollinfo['expire_time'] < time(),
 		'expire_time' => !empty($pollinfo['expire_time']) ? standardTime($pollinfo['expire_time']) : 0,
 		'has_voted' => !empty($pollinfo['has_voted']),
-		'starter' => array(
+		'starter' => [
 			'id' => $pollinfo['id_member'],
 			'name' => $pollinfo['poster_name'],
 			'href' => $pollinfo['id_member'] == 0 ? '' : $starter_href,
 			'link' => $pollinfo['id_member'] == 0 ? $pollinfo['poster_name'] : '<a href="' . $starter_href . '">' . $pollinfo['poster_name'] . '</a>'
-		)
-	);
+		]
+	];
 
 	// Make the lock and edit permissions defined above more directly accessible.
 	$context['allow_lock_poll'] = $context['poll']['lock'];
@@ -989,7 +989,7 @@ function loadPollContext($poll_id)
 		$barWide = $bar == 0 ? 1 : floor(($bar * 8) / 3);
 
 		// Now add it to the poll's contextual theme data.
-		$context['poll']['options'][$i] = array(
+		$context['poll']['options'][$i] = [
 			'id' => 'options-' . $i,
 			'percent' => $bar,
 			'votes' => $option['votes'],
@@ -999,6 +999,6 @@ function loadPollContext($poll_id)
 			'bar_width' => $barWide,
 			'option' => $bbc_parser->parsePoll($option['label']),
 			'vote_button' => '<input type="' . ($pollinfo['max_votes'] > 1 ? 'checkbox' : 'radio') . '" name="options[]" id="options-' . $i . '" value="' . $i . '" class="input_' . ($pollinfo['max_votes'] > 1 ? 'check' : 'radio') . '" />'
-		);
+		];
 	}
 }

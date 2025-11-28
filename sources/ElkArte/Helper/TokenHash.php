@@ -55,7 +55,7 @@ class TokenHash
 	 *
 	 * @return string the random token
 	 */
-	public function generate_hash($length = 10, $salt = '')
+	public function generate_hash($length = 10, $salt = ''): string
 	{
 		if ($length > 64)
 		{
@@ -89,7 +89,7 @@ class TokenHash
 	 * @param int $length
 	 * @return string
 	 */
-	private function _prepareToken($hash, $length)
+	private function _prepareToken($hash, $length): string
 	{
 		// Strip off the salt and just use the crypt value
 		$ourHash = explode('$', $hash);
@@ -114,7 +114,7 @@ class TokenHash
 	 * - Wraps a random or supplied salt with $6$ ... $
 	 * - If supplied a salt, validates it is good to use
 	 */
-	private function _gen_salt()
+	private function _gen_salt(): void
 	{
 		// We are just using this as a random generator, so opt for speed
 		$saltPrefix = '$6$rounds=1000$';
@@ -141,7 +141,7 @@ class TokenHash
 	 *
 	 * @return string
 	 */
-	private function _private_salt($input)
+	private function _private_salt($input): string
 	{
 		$i = 0;
 		$output = '';
@@ -182,7 +182,7 @@ class TokenHash
 	 *
 	 * @return string
 	 */
-	public function get_random_bytes($count)
+	public function get_random_bytes($count): string
 	{
 		return random_bytes($count);
 	}

@@ -49,14 +49,14 @@ class ManageBans extends AbstractController
 		theme()->getTemplates()->load('ManageBans');
 		require_once(SUBSDIR . '/Bans.subs.php');
 
-		$subActions = array(
-			'add' => array($this, 'action_edit', 'permission' => 'manage_bans'),
-			'browse' => array($this, 'action_browse', 'permission' => 'manage_bans'),
-			'edittrigger' => array($this, 'action_edittrigger', 'permission' => 'manage_bans'),
-			'edit' => array($this, 'action_edit', 'permission' => 'manage_bans'),
-			'list' => array($this, 'action_list', 'permission' => 'manage_bans'),
-			'log' => array($this, 'action_log', 'permission' => 'manage_bans'),
-		);
+		$subActions = [
+			'add' => [$this, 'action_edit', 'permission' => 'manage_bans'],
+			'browse' => [$this, 'action_browse', 'permission' => 'manage_bans'],
+			'edittrigger' => [$this, 'action_edittrigger', 'permission' => 'manage_bans'],
+			'edit' => [$this, 'action_edit', 'permission' => 'manage_bans'],
+			'list' => [$this, 'action_list', 'permission' => 'manage_bans'],
+			'log' => [$this, 'action_log', 'permission' => 'manage_bans'],
+		];
 
 		// Start up the controller
 		$action = new Action('manage_bans');
@@ -65,7 +65,7 @@ class ManageBans extends AbstractController
 		$subAction = $action->initialize($subActions, 'list');
 
 		// Make the call to integrate-manage_bans
-		call_integration_hook('integrate_manage_bans', array(&$subActions));
+		call_integration_hook('integrate_manage_bans', [&$subActions]);
 
 		// Prepare some items for the template
 		$context['page_title'] = $txt['ban_title'];
@@ -114,7 +114,7 @@ class ManageBans extends AbstractController
 	 *
 	 * @uses the main ManageBans template.
 	 */
-	public function action_list()
+	public function action_list(): void
 	{
 		global $txt, $context;
 
@@ -133,7 +133,7 @@ class ManageBans extends AbstractController
 			removeBanTriggers($to_remove);
 
 			// No more caching this ban!
-			updateSettings(array('banLastUpdated' => time()));
+			updateSettings(['banLastUpdated' => time()]);
 
 			// Some members might be unbanned now. Update the members table.
 			updateBanMembers();
@@ -150,79 +150,79 @@ class ManageBans extends AbstractController
 		}
 
 		// Lets build a nice create list to show them the bans
-		$listOptions = array(
+		$listOptions = [
 			'id' => 'ban_list',
 			'title' => $txt['ban_title'],
 			'items_per_page' => 20,
 			'base_href' => getUrl('admin', ['action' => 'admin', 'area' => 'ban', 'sa' => 'list']),
 			'default_sort_col' => 'added',
 			'default_sort_dir' => 'desc',
-			'get_items' => array(
+			'get_items' => [
 				'function' => 'list_getBans',
-			),
-			'get_count' => array(
+			],
+			'get_count' => [
 				'function' => 'list_getNumBans',
-			),
+			],
 			'no_items_label' => $txt['ban_no_entries'],
-			'columns' => array(
-				'name' => array(
-					'header' => array(
+			'columns' => [
+				'name' => [
+					'header' => [
 						'value' => $txt['ban_name'],
-					),
-					'data' => array(
+					],
+					'data' => [
 						'db' => 'name',
-					),
-					'sort' => array(
+					],
+					'sort' => [
 						'default' => 'bg.name',
 						'reverse' => 'bg.name DESC',
-					),
-				),
-				'notes' => array(
-					'header' => array(
+					],
+				],
+				'notes' => [
+					'header' => [
 						'value' => $txt['ban_notes'],
-					),
-					'data' => array(
+					],
+					'data' => [
 						'db' => 'notes',
 						'class' => 'smalltext',
-					),
-					'sort' => array(
+					],
+					'sort' => [
 						'default' => 'LENGTH(bg.notes) > 0 DESC, bg.notes',
 						'reverse' => 'LENGTH(bg.notes) > 0, bg.notes DESC',
-					),
-				),
-				'reason' => array(
-					'header' => array(
+					],
+				],
+				'reason' => [
+					'header' => [
 						'value' => $txt['ban_reason'],
-					),
-					'data' => array(
+					],
+					'data' => [
 						'db' => 'reason',
 						'class' => 'smalltext',
-					),
-					'sort' => array(
+					],
+					'sort' => [
 						'default' => 'LENGTH(bg.reason) > 0 DESC, bg.reason',
 						'reverse' => 'LENGTH(bg.reason) > 0, bg.reason DESC',
-					),
-				),
-				'added' => array(
-					'header' => array(
+					],
+				],
+				'added' => [
+					'header' => [
 						'value' => $txt['ban_added'],
-					),
-					'data' => array(
+					],
+					'data' => [
 						'function' => static function ($rowData) {
 							global $context;
 							return standardTime($rowData['ban_time'], empty($context['ban_time_format']) ? true : $context['ban_time_format']);
 						},
-					),
-					'sort' => array(
+					],
+					'sort' => [
 						'default' => 'bg.ban_time',
 						'reverse' => 'bg.ban_time DESC',
-					),
-				),
-				'expires' => array(
-					'header' => array(
+					],
+				],
+				'expires' => [
+					'header' => [
 						'value' => $txt['ban_expires'],
-					),
-					'data' => array(
+					],
+					'data' => [
 						'function' => static function ($rowData) {
 							global $txt;
 							// This ban never expires...whahaha.
@@ -241,64 +241,64 @@ class ManageBans extends AbstractController
 								return sprintf('%1$d&nbsp;%2$s', ceil(($rowData['expire_time'] - time()) / (60 * 60 * 24)), $txt['ban_days']);
 							}
 						},
-					),
-					'sort' => array(
+					],
+					'sort' => [
 						'default' => 'COALESCE(bg.expire_time, 1=1) DESC, bg.expire_time DESC',
 						'reverse' => 'COALESCE(bg.expire_time, 1=1), bg.expire_time',
-					),
-				),
-				'num_triggers' => array(
-					'header' => array(
+					],
+				],
+				'num_triggers' => [
+					'header' => [
 						'value' => $txt['ban_triggers'],
 						'class' => 'centertext',
-					),
-					'data' => array(
+					],
+					'data' => [
 						'db' => 'num_triggers',
 						'class' => 'centertext'
-					),
-					'sort' => array(
+					],
+					'sort' => [
 						'default' => 'num_triggers DESC',
 						'reverse' => 'num_triggers',
-					),
-				),
-				'actions' => array(
-					'header' => array(
+					],
+				],
+				'actions' => [
+					'header' => [
 						'value' => $txt['ban_actions'],
-					),
-					'data' => array(
-						'sprintf' => array(
+					],
+					'data' => [
+						'sprintf' => [
 							'format' => '<a href="' . getUrl('admin', ['action' => 'admin', 'area' => 'ban', 'sa' => 'edit', 'bg' => '%1$d']) . '">' . $txt['modify'] . '</a>',
-							'params' => array(
+							'params' => [
 								'id_ban_group' => false,
-							),
-						),
-					),
-				),
-				'check' => array(
-					'header' => array(
+							],
+						],
+					],
+				],
+				'check' => [
+					'header' => [
 						'value' => '<input type="checkbox" onclick="invertAll(this, this.form);" class="input_check" />',
-					),
-					'data' => array(
-						'sprintf' => array(
+					],
+					'data' => [
+						'sprintf' => [
 							'format' => '<input type="checkbox" name="remove[]" value="%1$d" class="input_check" />',
-							'params' => array(
+							'params' => [
 								'id_ban_group' => false,
-							),
-						),
-					),
-				),
-			),
-			'form' => array(
+							],
+						],
+					],
+				],
+			],
+			'form' => [
 				'href' => getUrl('admin', ['action' => 'admin', 'area' => 'ban', 'sa' => 'list']),
-			),
-			'additional_rows' => array(
-				array(
+			],
+			'additional_rows' => [
+				[
 					'class' => 'submitbutton flow_flex_additional_row',
 					'position' => 'below_table_data',
 					'value' => '<input type="submit" name="removeBans" value="' . $txt['ban_remove_selected'] . '" onclick="return confirm(\'' . $txt['ban_remove_selected_confirm'] . '\');" />',
-				),
-			),
-		);
+				],
+			],
+		];
 
 		createList($listOptions);
 	}
@@ -317,7 +317,7 @@ class ManageBans extends AbstractController
 	 *
 	 * @event integrate_list_ban_items
 	 */
-	public function action_edit()
+	public function action_edit(): void
 	{
 		global $txt, $modSettings, $context;
 
@@ -339,11 +339,11 @@ class ManageBans extends AbstractController
 		$context['form_url'] = getUrl('admin', ['action' => 'admin', 'area' => 'ban', 'sa' => 'edit']);
 
 		// Prepare any errors found to the template to show
-		$context['ban_errors'] = array(
+		$context['ban_errors'] = [
 			'errors' => $ban_errors->prepareErrors(),
 			'type' => $ban_errors->getErrorType() == 0 ? 'minor' : 'serious',
 			'title' => $txt['ban_errors_detected'],
-		);
+		];
 
 		if (!$ban_errors->hasErrors())
 		{
@@ -353,34 +353,34 @@ class ManageBans extends AbstractController
 				$context['ban_group_id'] = $ban_group_id;
 
 				// Setup for a createlist
-				$listOptions = array(
+				$listOptions = [
 					'id' => 'ban_items',
 					'base_href' => getUrl('admin', ['action' => 'admin', 'area' => 'ban', 'sa' => 'edit', 'bg' => $ban_group_id]),
 					'no_items_label' => $txt['ban_no_triggers'],
 					'items_per_page' => $modSettings['defaultMaxMessages'],
-					'get_items' => array(
+					'get_items' => [
 						'function' => 'list_getBanItems',
-						'params' => array(
+						'params' => [
 							'ban_group_id' => $ban_group_id,
-						),
-					),
-					'get_count' => array(
+						],
+					],
+					'get_count' => [
 						'function' => 'list_getNumBanItems',
-						'params' => array(
+						'params' => [
 							'ban_group_id' => $ban_group_id,
-						),
-					),
-					'columns' => array(
-						'type' => array(
-							'header' => array(
+						],
+					],
+					'columns' => [
+						'type' => [
+							'header' => [
 								'value' => $txt['ban_banned_entity'],
 								'style' => 'width: 60%;',
-							),
-							'data' => array(
+							],
+							'data' => [
 								'function' => static function ($ban_item) {
 									global $txt;
 
-									if (in_array($ban_item['type'], array('ip', 'hostname', 'email')))
+									if (in_array($ban_item['type'], ['ip', 'hostname', 'email']))
 									{
 										return '<strong>' . $txt[$ban_item['type']] . ':</strong>&nbsp;' . $ban_item[$ban_item['type']];
 									}
@@ -392,50 +392,50 @@ class ManageBans extends AbstractController
 
 									return '<strong>' . $txt['unknown'] . ':</strong>&nbsp;' . $ban_item['no_bantype_selected'];
 								},
-							),
-						),
-						'hits' => array(
-							'header' => array(
+							],
+						],
+						'hits' => [
+							'header' => [
 								'value' => $txt['ban_hits'],
 								'style' => 'width: 15%;text-align: center',
-							),
-							'data' => array(
+							],
+							'data' => [
 								'db' => 'hits',
 								'class' => 'centertext'
-							),
-						),
-						'id' => array(
-							'header' => array(
+							],
+						],
+						'id' => [
+							'header' => [
 								'value' => $txt['ban_actions'],
 								'style' => 'width: 15%;',
-							),
-							'data' => array(
+							],
+							'data' => [
 								'function' => static function ($ban_item) {
 									global $txt, $context;
 									return '<a href="' . getUrl('admin', ['action' => 'admin', 'area' => 'ban', 'sa' => 'edittrigger', 'bg' => $context['ban']['id'], 'bi' => $ban_item['id']]) . '">' . $txt['ban_edit_trigger'] . '</a>';
 								},
-							),
-						),
-						'checkboxes' => array(
-							'header' => array(
+							],
+						],
+						'checkboxes' => [
+							'header' => [
 								'value' => '<input type="checkbox" onclick="invertAll(this, this.form, \'ban_items\');" class="input_check" />',
 								'style' => 'width: 5%;',
-							),
-							'data' => array(
-								'sprintf' => array(
+							],
+							'data' => [
+								'sprintf' => [
 									'format' => '<input type="checkbox" name="ban_items[]" value="%1$d" class="input_check" />',
-									'params' => array(
+									'params' => [
 										'id' => false,
-									),
-								),
-							),
-						),
-					),
-					'form' => array(
+									],
+								],
+							],
+						],
+					],
+					'form' => [
 						'href' => getUrl('admin', ['action' => 'admin', 'area' => 'ban', 'sa' => 'edit', 'bg' => $ban_group_id]),
-					),
-					'additional_rows' => array(
-						array(
+					],
+					'additional_rows' => [
+						[
 							'position' => 'below_table_data',
 							'class' => 'submitbutton',
 							'value' => '
@@ -444,40 +444,40 @@ class ManageBans extends AbstractController
 								<input type="hidden" name="bg" value="' . $ban_group_id . '" />
 								<input type="hidden" name="' . $context['session_var'] . '" value="' . $context['session_id'] . '" />
 								<input type="hidden" name="' . $context['admin-bet_token_var'] . '" value="' . $context['admin-bet_token'] . '" />',
-						),
-					),
-				);
+						],
+					],
+				];
 				createList($listOptions);
 			}
 			// Not an existing one, then it's probably a new one.
 			else
 			{
-				$context['ban'] = array(
+				$context['ban'] = [
 					'id' => 0,
 					'name' => '',
-					'expiration' => array(
+					'expiration' => [
 						'status' => 'never',
 						'days' => 0
-					),
+					],
 					'reason' => '',
 					'notes' => '',
 					'ban_days' => 0,
-					'cannot' => array(
+					'cannot' => [
 						'access' => true,
 						'post' => false,
 						'register' => false,
 						'login' => false,
-					),
+					],
 					'is_new' => true,
-				);
-				$context['ban_suggestions'] = array(
+				];
+				$context['ban_suggestions'] = [
 					'main_ip' => '',
 					'hostname' => '',
 					'email' => '',
-					'member' => array(
+					'member' => [
 						'id' => 0,
-					),
-				);
+					],
+				];
 
 				// Overwrite some of the default form values if a user ID was given.
 				if (!empty($this->_req->query->u))
@@ -508,7 +508,7 @@ class ManageBans extends AbstractController
 				else
 				{
 					$context['use_autosuggest'] = true;
-					loadJavascriptFile('suggest.js', array('defer' => true));
+					loadJavascriptFile('suggest.js', ['defer' => true]);
 				}
 			}
 		}
@@ -517,9 +517,9 @@ class ManageBans extends AbstractController
 		$context['sub_template'] = 'ban_edit';
 
 		// A couple of text strings we *may* need
-		theme()->addJavascriptVar(array(
+		theme()->addJavascriptVar([
 			'txt_ban_name_empty' => $txt['ban_name_empty'],
-			'txt_ban_restriction_empty' => $txt['ban_restriction_empty']), true
+			'txt_ban_restriction_empty' => $txt['ban_restriction_empty']], true
 		);
 
 		// And a bit of javascript to enable/disable some fields
@@ -529,7 +529,7 @@ class ManageBans extends AbstractController
 	/**
 	 * This function handles submitted forms that add, modify or remove ban triggers.
 	 */
-	public function action_edit2()
+	public function action_edit2(): void
 	{
 		global $context;
 
@@ -544,7 +544,7 @@ class ManageBans extends AbstractController
 		// Adding or editing a ban group
 		if (isset($this->_req->post->add_ban) || isset($this->_req->post->modify_ban))
 		{
-			$ban_info = array();
+			$ban_info = [];
 
 			// Let's collect all the information we need
 			$ban_info['id'] = $this->_req->getQuery('bg', 'intval', 0);
@@ -555,16 +555,16 @@ class ManageBans extends AbstractController
 
 			$ban_info['is_new'] = empty($ban_info['id']);
 			$ban_info['expire_date'] = $this->_req->getPost('expire_date', 'intval', 0);
-			$ban_info['expiration'] = array(
-				'status' => isset($this->_req->post->expiration) && in_array($this->_req->post->expiration, array('never', 'one_day', 'expired')) ? $this->_req->post->expiration : 'never',
+			$ban_info['expiration'] = [
+				'status' => isset($this->_req->post->expiration) && in_array($this->_req->post->expiration, ['never', 'one_day', 'expired']) ? $this->_req->post->expiration : 'never',
 				'days' => $ban_info['expire_date'],
-			);
+			];
 			$ban_info['db_expiration'] = $ban_info['expiration']['status'] === 'never' ? 'NULL' : ($ban_info['expiration']['status'] == 'one_day' ? time() + 24 * 60 * 60 * $ban_info['expire_date'] : 0);
 			$ban_info['full_ban'] = empty($this->_req->post->full_ban) ? 0 : 1;
 			$ban_info['reason'] = $this->_req->getPost('reason', '\\ElkArte\\Helper\\Util::htmlspecialchars[ENT_QUOTES]', '');
 			$ban_info['name'] = $this->_req->getPost('ban_name', '\\ElkArte\\Helper\\Util::htmlspecialchars[ENT_QUOTES]', '');
 			$ban_info['notes'] = $this->_req->getPost('notes', '\\ElkArte\\Helper\\Util::htmlspecialchars[ENT_QUOTES]', '');
-			$ban_info['notes'] = str_replace(array("\r", "\n", '  '), array('', '<br />', '&nbsp; '), $ban_info['notes']);
+			$ban_info['notes'] = str_replace(["\r", "\n", '  '], ['', '<br />', '&nbsp; '], $ban_info['notes']);
 			$ban_info['cannot']['access'] = empty($ban_info['full_ban']) ? 0 : 1;
 			$ban_info['cannot']['post'] = !empty($ban_info['full_ban']) || empty($this->_req->post->cannot_post) ? 0 : 1;
 			$ban_info['cannot']['register'] = !empty($ban_info['full_ban']) || empty($this->_req->post->cannot_register) ? 0 : 1;
@@ -612,7 +612,8 @@ class ManageBans extends AbstractController
 				$context['ban_suggestions']['other_ips'] = banLoadAdditionalIPs($context['ban_suggestions']['member']['id']);
 			}
 
-			return $this->action_edit();
+			$this->action_edit();
+			return;
 		}
 
 		if (isset($this->_req->post->ban_items))
@@ -624,7 +625,7 @@ class ManageBans extends AbstractController
 		}
 
 		// Register the last modified date.
-		updateSettings(array('banLastUpdated' => time()));
+		updateSettings(['banLastUpdated' => time()]);
 
 		// Update the member table to represent the new ban situation.
 		updateBanMembers();
@@ -643,7 +644,7 @@ class ManageBans extends AbstractController
 	 * - allows sorting of several columns.
 	 * - also handles deletion of (a selection of) log entries.
 	 */
-	public function action_log()
+	public function action_log(): void
 	{
 		global $context, $txt;
 
@@ -670,111 +671,111 @@ class ManageBans extends AbstractController
 		}
 
 		// Build a nice log list for viewing
-		$listOptions = array(
+		$listOptions = [
 			'id' => 'ban_log',
 			'title' => $txt['ban_log'],
 			'items_per_page' => 30,
 			'base_href' => $context['admin_area'] === 'ban' ? getUrl('admin', ['action' => 'admin', 'area' => 'ban', 'sa' => 'log']) : getUrl('admin', ['action' => 'admin', 'area' => 'logs', 'sa' => 'banlog']),
 			'default_sort_col' => 'date',
-			'get_items' => array(
+			'get_items' => [
 				'function' => 'list_getBanLogEntries',
-			),
-			'get_count' => array(
+			],
+			'get_count' => [
 				'function' => 'list_getNumBanLogEntries',
-			),
+			],
 			'no_items_label' => $txt['ban_log_no_entries'],
-			'columns' => array(
-				'ip' => array(
-					'header' => array(
+			'columns' => [
+				'ip' => [
+					'header' => [
 						'value' => $txt['ban_log_ip'],
-					),
-					'data' => array(
-						'sprintf' => array(
+					],
+					'data' => [
+						'sprintf' => [
 							'format' => '<a href="' . getUrl('admin', ['action' => 'trackip', 'searchip' => '%1$s']) . '">%1$s</a>',
-							'params' => array(
+							'params' => [
 								'ip' => false,
-							),
-						),
-					),
-					'sort' => array(
+							],
+						],
+					],
+					'sort' => [
 						'default' => 'lb.ip',
 						'reverse' => 'lb.ip DESC',
-					),
-				),
-				'email' => array(
-					'header' => array(
+					],
+				],
+				'email' => [
+					'header' => [
 						'value' => $txt['ban_log_email'],
-					),
-					'data' => array(
+					],
+					'data' => [
 						'db_htmlsafe' => 'email',
-					),
-					'sort' => array(
+					],
+					'sort' => [
 						'default' => "lb.email = '', lb.email",
 						'reverse' => "lb.email != '', lb.email DESC",
-					),
-				),
-				'member' => array(
-					'header' => array(
+					],
+				],
+				'member' => [
+					'header' => [
 						'value' => $txt['ban_log_member'],
-					),
-					'data' => array(
-						'sprintf' => array(
+					],
+					'data' => [
+						'sprintf' => [
 							'format' => '<a href="' . getUrl('profile', ['action' => 'profile', 'u' => '%1$d', 'name' => '%2$s']) . '">%2$s</a>',
-							'params' => array(
+							'params' => [
 								'id_member' => false,
 								'real_name' => false,
-							),
-						),
-					),
-					'sort' => array(
+							],
+						],
+					],
+					'sort' => [
 						'default' => 'COALESCE(mem.real_name, 1=1), mem.real_name',
 						'reverse' => 'COALESCE(mem.real_name, 1=1) DESC, mem.real_name DESC',
-					),
-				),
-				'date' => array(
-					'header' => array(
+					],
+				],
+				'date' => [
+					'header' => [
 						'value' => $txt['ban_log_date'],
-					),
-					'data' => array(
+					],
+					'data' => [
 						'function' => static fn($rowData) => standardTime($rowData['log_time']),
-					),
-					'sort' => array(
+					],
+					'sort' => [
 						'default' => 'lb.log_time DESC',
 						'reverse' => 'lb.log_time',
-					),
-				),
-				'check' => array(
-					'header' => array(
+					],
+				],
+				'check' => [
+					'header' => [
 						'value' => '<input type="checkbox" onclick="invertAll(this, this.form);" class="input_check" />',
 						'class' => 'centertext',
-					),
-					'data' => array(
-						'sprintf' => array(
+					],
+					'data' => [
+						'sprintf' => [
 							'format' => '<input type="checkbox" name="remove[]" value="%1$d" class="input_check" />',
-							'params' => array(
+							'params' => [
 								'id_ban_log' => false,
-							),
-						),
+							],
+						],
 						'class' => 'centertext',
-					),
-				),
-			),
-			'form' => array(
+					],
+				],
+			],
+			'form' => [
 				'href' => $context['admin_area'] === 'ban' ? getUrl('admin', ['action' => 'admin', 'area' => 'ban', 'sa' => 'log']) : getUrl('admin', ['action' => 'admin', 'area' => 'logs', 'sa' => 'banlog']),
 				'include_start' => true,
 				'include_sort' => true,
 				'token' => 'admin-bl',
-			),
-			'additional_rows' => array(
-				array(
+			],
+			'additional_rows' => [
+				[
 					'class' => 'submitbutton',
 					'position' => 'bottom_of_list',
 					'value' => '
 						<input type="submit" name="removeSelected" value="' . $txt['ban_log_remove_selected'] . '" onclick="return confirm(\'' . $txt['ban_log_remove_selected_confirm'] . '\');" />
 						<input type="submit" name="removeAll" value="' . $txt['ban_log_remove_all'] . '" onclick="return confirm(\'' . $txt['ban_log_remove_all_confirm'] . '\');" class="right_submit" />',
-				),
-			),
-		);
+				],
+			],
+		];
 
 		createToken('admin-bl');
 
@@ -798,7 +799,7 @@ class ManageBans extends AbstractController
 	 *
 	 * @uses sub template ban_edit_trigger
 	 */
-	public function action_edittrigger()
+	public function action_edittrigger(): void
 	{
 		global $context;
 
@@ -843,27 +844,27 @@ class ManageBans extends AbstractController
 		// No id supplied, this must be a new trigger being added
 		if (empty($ban_id))
 		{
-			$context['ban_trigger'] = array(
+			$context['ban_trigger'] = [
 				'id' => 0,
 				'group' => $ban_group,
-				'ip' => array(
+				'ip' => [
 					'value' => '',
 					'selected' => true,
-				),
-				'hostname' => array(
+				],
+				'hostname' => [
 					'selected' => false,
 					'value' => '',
-				),
-				'email' => array(
+				],
+				'email' => [
 					'value' => '',
 					'selected' => false,
-				),
-				'banneduser' => array(
+				],
+				'banneduser' => [
 					'value' => '',
 					'selected' => false,
-				),
+				],
 				'is_new' => true,
-			);
+			];
 		}
 		// Otherwise its an existing trigger they want to edit
 		else
@@ -877,31 +878,31 @@ class ManageBans extends AbstractController
 			$row = $ban_row[$ban_id];
 
 			// Load it up for the template
-			$context['ban_trigger'] = array(
+			$context['ban_trigger'] = [
 				'id' => $row['id_ban'],
 				'group' => $row['id_ban_group'],
-				'ip' => array(
-					'value' => empty($row['ip_low1']) ? '' : range2ip(array($row['ip_low1'], $row['ip_low2'], $row['ip_low3'], $row['ip_low4'], $row['ip_low5'], $row['ip_low6'], $row['ip_low7'], $row['ip_low8']), array($row['ip_high1'], $row['ip_high2'], $row['ip_high3'], $row['ip_high4'], $row['ip_high5'], $row['ip_high6'], $row['ip_high7'], $row['ip_high8'])),
+				'ip' => [
+					'value' => empty($row['ip_low1']) ? '' : range2ip([$row['ip_low1'], $row['ip_low2'], $row['ip_low3'], $row['ip_low4'], $row['ip_low5'], $row['ip_low6'], $row['ip_low7'], $row['ip_low8']], [$row['ip_high1'], $row['ip_high2'], $row['ip_high3'], $row['ip_high4'], $row['ip_high5'], $row['ip_high6'], $row['ip_high7'], $row['ip_high8']]),
 					'selected' => !empty($row['ip_low1']),
-				),
-				'hostname' => array(
+				],
+				'hostname' => [
 					'value' => str_replace('%', '*', $row['hostname']),
 					'selected' => !empty($row['hostname']),
-				),
-				'email' => array(
+				],
+				'email' => [
 					'value' => str_replace('%', '*', $row['email_address']),
 					'selected' => !empty($row['email_address'])
-				),
-				'banneduser' => array(
+				],
+				'banneduser' => [
 					'value' => $row['member_name'],
 					'selected' => !empty($row['member_name'])
-				),
+				],
 				'is_new' => false,
-			);
+			];
 		}
 
 		// The template uses the autosuggest functions
-		loadJavascriptFile('suggest.js', array('defer' => true));
+		loadJavascriptFile('suggest.js', ['defer' => true]);
 
 		// Template we will use
 		$context['sub_template'] = 'ban_edit_trigger';
@@ -920,7 +921,7 @@ class ManageBans extends AbstractController
 	 *
 	 * @uses ManageBans template, browse_triggers sub template.
 	 */
-	public function action_browse()
+	public function action_browse(): void
 	{
 		global $modSettings, $context, $txt;
 
@@ -942,127 +943,127 @@ class ManageBans extends AbstractController
 			}
 
 			// Make sure the ban cache is refreshed.
-			updateSettings(array('banLastUpdated' => time()));
+			updateSettings(['banLastUpdated' => time()]);
 		}
 
-		$context['selected_entity'] = isset($this->_req->query->entity) && in_array($this->_req->query->entity, array('ip', 'hostname', 'email', 'member')) ? $this->_req->query->entity : 'ip';
+		$context['selected_entity'] = isset($this->_req->query->entity) && in_array($this->_req->query->entity, ['ip', 'hostname', 'email', 'member']) ? $this->_req->query->entity : 'ip';
 
-		$listOptions = array(
+		$listOptions = [
 			'id' => 'ban_trigger_list',
 			'title' => $txt['ban_trigger_browse'],
 			'items_per_page' => $modSettings['defaultMaxMessages'],
 			'base_href' => getUrl('admin', ['action' => 'admin', 'area' => 'ban', 'sa' => 'browse', 'entity' => $context['selected_entity']]),
 			'default_sort_col' => 'banned_entity',
 			'no_items_label' => $txt['ban_no_triggers'],
-			'get_items' => array(
+			'get_items' => [
 				'function' => 'list_getBanTriggers',
-				'params' => array(
+				'params' => [
 					$context['selected_entity'],
-				),
-			),
-			'get_count' => array(
+				],
+			],
+			'get_count' => [
 				'function' => 'list_getNumBanTriggers',
-				'params' => array(
+				'params' => [
 					$context['selected_entity'],
-				),
-			),
-			'columns' => array(
-				'banned_entity' => array(
-					'header' => array(
+				],
+			],
+			'columns' => [
+				'banned_entity' => [
+					'header' => [
 						'value' => $txt['ban_banned_entity'],
-					),
-				),
-				'ban_name' => array(
-					'header' => array(
+					],
+				],
+				'ban_name' => [
+					'header' => [
 						'value' => $txt['ban_name'],
-					),
-					'data' => array(
-						'sprintf' => array(
+					],
+					'data' => [
+						'sprintf' => [
 							'format' => '<a href="' . getUrl('admin', ['action' => 'admin', 'area' => 'ban', 'sa' => 'edit', 'bg' => '%1$d']) . '">%2$s</a>',
-							'params' => array(
+							'params' => [
 								'id_ban_group' => false,
 								'name' => false,
-							),
-						),
-					),
-					'sort' => array(
+							],
+						],
+					],
+					'sort' => [
 						'default' => 'bg.name',
 						'reverse' => 'bg.name DESC',
-					),
-				),
-				'hits' => array(
-					'header' => array(
+					],
+				],
+				'hits' => [
+					'header' => [
 						'value' => $txt['ban_hits'],
-					),
-					'data' => array(
+					],
+					'data' => [
 						'db' => 'hits',
-					),
-					'sort' => array(
+					],
+					'sort' => [
 						'default' => 'bi.hits DESC',
 						'reverse' => 'bi.hits',
-					),
-				),
-				'check' => array(
-					'header' => array(
+					],
+				],
+				'check' => [
+					'header' => [
 						'value' => '<input type="checkbox" onclick="invertAll(this, this.form);" class="input_check" />',
 						'class' => 'centertext',
-					),
-					'data' => array(
-						'sprintf' => array(
+					],
+					'data' => [
+						'sprintf' => [
 							'format' => '<input type="checkbox" name="remove[]" value="%1$d" class="input_check" />',
-							'params' => array(
+							'params' => [
 								'id_ban' => false,
-							),
-						),
+							],
+						],
 						'class' => 'centertext',
-					),
-				),
-			),
-			'form' => array(
+					],
+				],
+			],
+			'form' => [
 				'href' => getUrl('admin', ['action' => 'admin', 'area' => 'ban', 'sa' => 'browse', 'entity' => $context['selected_entity']]),
 				'include_start' => true,
 				'include_sort' => true,
-			),
-			'additional_rows' => array(
-				array(
+			],
+			'additional_rows' => [
+				[
 					'class' => 'submitbutton flow_flex_additional_row',
 					'position' => 'below_table_data',
 					'value' => '<input type="submit" name="remove_triggers" value="' . $txt['ban_remove_selected_triggers'] . '" onclick="return confirm(\'' . $txt['ban_remove_selected_triggers_confirm'] . '\');" />',
-				),
-			),
-			'list_menu' => array(
+				],
+			],
+			'list_menu' => [
 				'show_on' => 'top',
 				'class' => 'flow_flex_right',
-				'links' => array(
-					array(
+				'links' => [
+					[
 						'href' => getUrl('admin', ['action' => 'admin', 'area' => 'ban', 'sa' => 'browse', 'entity' => 'ip']),
 						'is_selected' => $context['selected_entity'] === 'ip',
 						'label' => $txt['ip']
-					),
-					array(
+					],
+					[
 						'href' => getUrl('admin', ['action' => 'admin', 'area' => 'ban', 'sa' => 'browse', 'entity' => 'hostname']),
 						'is_selected' => $context['selected_entity'] === 'hostname',
 						'label' => $txt['hostname']
-					),
-					array(
+					],
+					[
 						'href' => getUrl('admin', ['action' => 'admin', 'area' => 'ban', 'sa' => 'browse', 'entity' => 'email']),
 						'is_selected' => $context['selected_entity'] === 'email',
 						'label' => $txt['email']
-					),
-					array(
+					],
+					[
 						'href' => getUrl('admin', ['action' => 'admin', 'area' => 'ban', 'sa' => 'browse', 'entity' => 'member']),
 						'is_selected' => $context['selected_entity'] === 'member',
 						'label' => $txt['username']
-					)
-				),
-			),
-		);
+					]
+				],
+			],
+		];
 
 		// Specific data for the first column depending on the selected entity.
 		if ($context['selected_entity'] === 'ip')
 		{
-			$listOptions['columns']['banned_entity']['data'] = array(
-				'function' => static fn($rowData) => range2ip(array(
+			$listOptions['columns']['banned_entity']['data'] = [
+				'function' => static fn($rowData) => range2ip([
 					$rowData['ip_low1'],
 					$rowData['ip_low2'],
 					$rowData['ip_low3'],
@@ -1071,7 +1072,7 @@ class ManageBans extends AbstractController
 					$rowData['ip_low6'],
 					$rowData['ip_low7'],
 					$rowData['ip_low8']
-				), array(
+				], [
 					$rowData['ip_high1'],
 					$rowData['ip_high2'],
 					$rowData['ip_high3'],
@@ -1080,48 +1081,48 @@ class ManageBans extends AbstractController
 					$rowData['ip_high6'],
 					$rowData['ip_high7'],
 					$rowData['ip_high8']
-				)),
-			);
-			$listOptions['columns']['banned_entity']['sort'] = array(
+				]),
+			];
+			$listOptions['columns']['banned_entity']['sort'] = [
 				'default' => 'bi.ip_low1, bi.ip_high1, bi.ip_low2, bi.ip_high2, bi.ip_low3, bi.ip_high3, bi.ip_low4, bi.ip_high4, bi.ip_low5, bi.ip_high5, bi.ip_low6, bi.ip_high6, bi.ip_low7, bi.ip_high7, bi.ip_low8, bi.ip_high8',
 				'reverse' => 'bi.ip_low1 DESC, bi.ip_high1 DESC, bi.ip_low2 DESC, bi.ip_high2 DESC, bi.ip_low3 DESC, bi.ip_high3 DESC, bi.ip_low4 DESC, bi.ip_high4 DESC, bi.ip_low5 DESC, bi.ip_high5 DESC, bi.ip_low6 DESC, bi.ip_high6 DESC, bi.ip_low7 DESC, bi.ip_high7 DESC, bi.ip_low8 DESC, bi.ip_high8 DESC',
-			);
+			];
 		}
 		elseif ($context['selected_entity'] === 'hostname')
 		{
-			$listOptions['columns']['banned_entity']['data'] = array(
-				'function' => static fn($rowData) => strtr(Util::htmlspecialchars($rowData['hostname']), array('%' => '*')),
-			);
-			$listOptions['columns']['banned_entity']['sort'] = array(
+			$listOptions['columns']['banned_entity']['data'] = [
+				'function' => static fn($rowData) => strtr(Util::htmlspecialchars($rowData['hostname']), ['%' => '*']),
+			];
+			$listOptions['columns']['banned_entity']['sort'] = [
 				'default' => 'bi.hostname',
 				'reverse' => 'bi.hostname DESC',
-			);
+			];
 		}
 		elseif ($context['selected_entity'] === 'email')
 		{
-			$listOptions['columns']['banned_entity']['data'] = array(
-				'function' => static fn($rowData) => strtr(Util::htmlspecialchars($rowData['email_address']), array('%' => '*')),
-			);
-			$listOptions['columns']['banned_entity']['sort'] = array(
+			$listOptions['columns']['banned_entity']['data'] = [
+				'function' => static fn($rowData) => strtr(Util::htmlspecialchars($rowData['email_address']), ['%' => '*']),
+			];
+			$listOptions['columns']['banned_entity']['sort'] = [
 				'default' => 'bi.email_address',
 				'reverse' => 'bi.email_address DESC',
-			);
+			];
 		}
 		elseif ($context['selected_entity'] === 'member')
 		{
-			$listOptions['columns']['banned_entity']['data'] = array(
-				'sprintf' => array(
+			$listOptions['columns']['banned_entity']['data'] = [
+				'sprintf' => [
 					'format' => '<a href="' . getUrl('profile', ['action' => 'profile', 'u' => '%1$d']) . '">%2$s</a>',
-					'params' => array(
+					'params' => [
 						'id_member' => false,
 						'real_name' => false,
-					),
-				),
-			);
-			$listOptions['columns']['banned_entity']['sort'] = array(
+					],
+				],
+			];
+			$listOptions['columns']['banned_entity']['sort'] = [
 				'default' => 'mem.real_name',
 				'reverse' => 'mem.real_name DESC',
-			);
+			];
 		}
 
 		// Create the list.

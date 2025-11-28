@@ -255,10 +255,10 @@ input[type="submit"]:hover, button[type="submit"]:hover, input[type="button"]:ho
  * -------------------------------------------------------
  */
 
-/* This one does 800 screens at default font size.
+/* This one does 825 screens at default font size.
    -------------------------------------------------------------------------------------------*/
 
-@media screen and (max-width: 50em) {
+@media screen and (max-width: 51.5em) {
 	#menu_sidebar {
 		box-shadow: -3px 3px 3px var(--opacity30);
 	}

@@ -63,62 +63,62 @@ class ManageFeatures extends AbstractController
 		Txt::load('Help+ManageSettings+Mentions');
 
 		// All the actions we know about.  These must exist in loadMenu() of the admin controller.
-		$subActions = array(
-			'basic' => array(
+		$subActions = [
+			'basic' => [
 				'controller' => $this,
 				'function' => 'action_basicSettings_display',
 				'permission' => 'admin_forum'
-			),
-			'layout' => array(
+			],
+			'layout' => [
 				'controller' => $this,
 				'function' => 'action_layoutSettings_display',
 				'permission' => 'admin_forum'
-			),
-			'pwa' => array(
+			],
+			'pwa' => [
 				'controller' => $this,
 				'function' => 'action_pwaSettings_display',
 				'enabled' => true,
 				'permission' => 'admin_forum'
-			),
-			'karma' => array(
+			],
+			'karma' => [
 				'controller' => $this,
 				'function' => 'action_karmaSettings_display',
 				'enabled' => featureEnabled('k'),
 				'permission' => 'admin_forum'
-			),
-			'pmsettings' => array(
+			],
+			'pmsettings' => [
 				'controller' => $this,
 				'function' => 'action_pmsettings',
 				'permission' => 'admin_forum'
-			),
-			'likes' => array(
+			],
+			'likes' => [
 				'controller' => $this,
 				'function' => 'action_likesSettings_display',
 				'enabled' => featureEnabled('l'),
 				'permission' => 'admin_forum'
-			),
-			'mention' => array(
+			],
+			'mention' => [
 				'controller' => $this,
 				'function' => 'action_notificationsSettings_display',
 				'permission' => 'admin_forum'
-			),
-			'sig' => array(
+			],
+			'sig' => [
 				'controller' => $this,
 				'function' => 'action_signatureSettings_display',
 				'permission' => 'admin_forum'
-			),
-			'profile' => array(
+			],
+			'profile' => [
 				'controller' => $this,
 				'function' => 'action_profile',
 				'enabled' => featureEnabled('cp'),
 				'permission' => 'admin_forum'
-			),
-			'profileedit' => array(
+			],
+			'profileedit' => [
 				'controller' => $this,
 				'function' => 'action_profileedit',
 				'permission' => 'admin_forum'
-			),
-		);
+			],
+		];
 
 		// Set up the action control
 		$action = new Action('modify_features');
@@ -164,7 +164,7 @@ class ManageFeatures extends AbstractController
 	 *
 	 * @event integrate_save_basic_settings
 	 */
-	public function action_basicSettings_display()
+	public function action_basicSettings_display(): void
 	{
 		global $txt, $context, $modSettings;
 
@@ -217,10 +217,10 @@ class ManageFeatures extends AbstractController
 			$clean_hives_result = theme()->cleanHives();
 
 			setJsonTemplate();
-			$context['json_data'] = array(
+			$context['json_data'] = [
 				'success' => $clean_hives_result,
 				'response' => $clean_hives_result ? $txt['clean_hives_sucess'] : $txt['clean_hives_failed']
-			);
+			];
 
 			return;
 		}
@@ -240,37 +240,37 @@ class ManageFeatures extends AbstractController
 	{
 		global $txt;
 
-		$config_vars = array(
+		$config_vars = [
 			// Basic stuff, titles, permissions...
-			array('check', 'allow_guestAccess'),
-			array('check', 'enable_buddylist'),
-			array('check', 'allow_editDisplayName'),
-			array('check', 'allow_hideOnline'),
-			array('check', 'titlesEnable'),
+			['check', 'allow_guestAccess'],
+			['check', 'enable_buddylist'],
+			['check', 'allow_editDisplayName'],
+			['check', 'allow_hideOnline'],
+			['check', 'titlesEnable'],
 			'',
 			// Javascript and CSS options
-			array('select', 'jquery_source', array('auto' => $txt['jquery_auto'], 'local' => $txt['jquery_local'], 'cdn' => $txt['jquery_cdn'])),
-			array('check', 'minify_css_js', 'postinput' => '<a href="#" id="clean_hives" class="linkbutton">' . $txt['clean_hives'] . '</a>'),
+			['select', 'jquery_source', ['auto' => $txt['jquery_auto'], 'local' => $txt['jquery_local'], 'cdn' => $txt['jquery_cdn']]],
+			['check', 'minify_css_js', 'postinput' => '<a href="#" id="clean_hives" class="linkbutton">' . $txt['clean_hives'] . '</a>'],
 			'',
 			// Number formatting, timezones.
-			array('text', 'time_format'),
-			array('float', 'time_offset', 'subtext' => $txt['setting_time_offset_note'], 6, 'postinput' => $txt['hours']),
-			'default_timezone' => array('select', 'default_timezone', array()),
+			['text', 'time_format'],
+			['float', 'time_offset', 'subtext' => $txt['setting_time_offset_note'], 6, 'postinput' => $txt['hours']],
+			'default_timezone' => ['select', 'default_timezone', []],
 			'',
 			// Who's online?
-			array('check', 'who_enabled'),
-			array('int', 'lastActive', 6, 'postinput' => $txt['minutes']),
+			['check', 'who_enabled'],
+			['int', 'lastActive', 6, 'postinput' => $txt['minutes']],
 			'',
 			// Statistics.
-			array('check', 'trackStats'),
-			array('check', 'hitStats'),
+			['check', 'trackStats'],
+			['check', 'hitStats'],
 			'',
 			// Option-ish things... miscellaneous sorta.
-			array('check', 'metadata_enabled'),
-			array('check', 'allow_disableAnnounce'),
-			array('check', 'disallow_sendBody'),
-			array('select', 'enable_contactform', array('disabled' => $txt['contact_form_disabled'], 'registration' => $txt['contact_form_registration'], 'menu' => $txt['contact_form_menu'])),
-		);
+			['check', 'metadata_enabled'],
+			['check', 'allow_disableAnnounce'],
+			['check', 'disallow_sendBody'],
+			['select', 'enable_contactform', ['disabled' => $txt['contact_form_disabled'], 'registration' => $txt['contact_form_registration'], 'menu' => $txt['contact_form_menu']]],
+		];
 
 		// Get all the time zones.
 		$all_zones = DateTimeZone::listIdentifiers();
@@ -290,7 +290,7 @@ class ManageFeatures extends AbstractController
 		theme()->addInlineJavascript('
 			document.getElementById("clean_hives").addEventListener("click", function(event) {return cleanHives(event);});', ['defer' => true]);
 
-		call_integration_hook('integrate_modify_basic_settings', array(&$config_vars));
+		call_integration_hook('integrate_modify_basic_settings', [&$config_vars]);
 
 		return $config_vars;
 	}
@@ -302,7 +302,7 @@ class ManageFeatures extends AbstractController
 	 *
 	 * @event integrate_save_layout_settings
 	 */
-	public function action_layoutSettings_display()
+	public function action_layoutSettings_display(): void
 	{
 		global $txt, $context, $modSettings;
 
@@ -358,28 +358,28 @@ class ManageFeatures extends AbstractController
 	{
 		global $txt;
 
-		$config_vars = array_merge(getFrontPageControllers(), array(
+		$config_vars = array_merge(getFrontPageControllers(), [
 			'',
 			// Pagination stuff.
-			array('check', 'compactTopicPagesEnable'),
-			array('int', 'compactTopicPagesContiguous', 'subtext' => str_replace(' ', '&nbsp;', '"3" ' . $txt['to_display'] . ': <strong>1 ... 4 [5] 6 ... 9</strong>') . '<br />' . str_replace(' ', '&nbsp;', '"5" ' . $txt['to_display'] . ': <strong>1 ... 3 4 [5] 6 7 ... 9</strong>')),
-			array('int', 'defaultMaxMembers'),
-			array('check', 'displayMemberNames'),
+			['check', 'compactTopicPagesEnable'],
+			['int', 'compactTopicPagesContiguous', 'subtext' => str_replace(' ', '&nbsp;', '"3" ' . $txt['to_display'] . ': <strong>1 ... 4 [5] 6 ... 9</strong>') . '<br />' . str_replace(' ', '&nbsp;', '"5" ' . $txt['to_display'] . ': <strong>1 ... 3 4 [5] 6 7 ... 9</strong>')],
+			['int', 'defaultMaxMembers'],
+			['check', 'displayMemberNames'],
 			'',
 			// Stuff that just is everywhere - today, search, online, etc.
-			array('select', 'todayMod', array($txt['today_disabled'], $txt['today_only'], $txt['yesterday_today'], $txt['relative_time'])),
-			array('check', 'onlineEnable'),
-			array('check', 'enableVBStyleLogin'),
+			['select', 'todayMod', [$txt['today_disabled'], $txt['today_only'], $txt['yesterday_today'], $txt['relative_time']]],
+			['check', 'onlineEnable'],
+			['check', 'enableVBStyleLogin'],
 			'',
 			// Automagic image resizing.
-			array('int', 'max_image_width', 'subtext' => $txt['zero_for_no_limit']),
-			array('int', 'max_image_height', 'subtext' => $txt['zero_for_no_limit']),
+			['int', 'max_image_width', 'subtext' => $txt['zero_for_no_limit']],
+			['int', 'max_image_height', 'subtext' => $txt['zero_for_no_limit']],
 			'',
 			// This is like debugging sorta.
-			array('check', 'timeLoadPageEnable'),
-		));
+			['check', 'timeLoadPageEnable'],
+		]);
 
-		call_integration_hook('integrate_modify_layout_settings', array(&$config_vars));
+		call_integration_hook('integrate_modify_layout_settings', [&$config_vars]);
 
 		return $config_vars;
 	}
@@ -391,7 +391,7 @@ class ManageFeatures extends AbstractController
 	 *
 	 * @event integrate_save_pwa_settings
 	 */
-	public function action_pwaSettings_display()
+	public function action_pwaSettings_display(): void
 	{
 		global $txt, $context;
 
@@ -480,23 +480,23 @@ class ManageFeatures extends AbstractController
 		// PWA requires SSL
 		$canUse = detectServer()->supportsSSL();
 
-		$config_vars = array(
+		$config_vars = [
 			// PWA - On or off?
-			array('check', 'pwa_enabled', 'disabled' => !$canUse, 'invalid' => !$canUse, 'postinput' => !$canUse ? $txt['pwa_disabled'] : ''),
+			['check', 'pwa_enabled', 'disabled' => !$canUse, 'invalid' => !$canUse, 'postinput' => !$canUse ? $txt['pwa_disabled'] : ''],
 			'',
-			array('check', 'pwa_manifest_enabled', 'helptext' => $txt['pwa_manifest_enabled_desc']),
-			array('text', 'pwa_short_name', 12, 'mask' => 'nohtml', 'helptext' => $txt['pwa_short_name_desc'], 'maxlength' => 12),
-			array('color', 'pwa_theme_color', 'helptext' => $txt['pwa_theme_color_desc']),
-			array('color', 'pwa_background_color', 'helptext' => $txt['pwa_background_color_desc']),
+			['check', 'pwa_manifest_enabled', 'helptext' => $txt['pwa_manifest_enabled_desc']],
+			['text', 'pwa_short_name', 12, 'mask' => 'nohtml', 'helptext' => $txt['pwa_short_name_desc'], 'maxlength' => 12],
+			['color', 'pwa_theme_color', 'helptext' => $txt['pwa_theme_color_desc']],
+			['color', 'pwa_background_color', 'helptext' => $txt['pwa_background_color_desc']],
 			'',
-			array('url', 'pwa_small_icon', 'size' => 40, 'helptext' => $txt['pwa_small_icon_desc'], 'onchange' => "pwaPreview('pwa_small_icon');"),
-			array('url', 'pwa_large_icon', 'size' => 40, 'helptext' => $txt['pwa_large_icon_desc'], 'onchange' => "pwaPreview('pwa_large_icon');"),
-			array('title', 'other_icons_title'),
-			array('url', 'favicon_icon', 'size' => 40, 'helptext' => $txt['favicon_icon_desc'], 'onchange' => "pwaPreview('favicon_icon');"),
-			array('url', 'apple_touch_icon', 'size' => 40, 'helptext' => $txt['apple_touch_icon_desc'], 'onchange' => "pwaPreview('apple_touch_icon');"),
-		);
+			['url', 'pwa_small_icon', 'size' => 40, 'helptext' => $txt['pwa_small_icon_desc'], 'onchange' => "pwaPreview('pwa_small_icon');"],
+			['url', 'pwa_large_icon', 'size' => 40, 'helptext' => $txt['pwa_large_icon_desc'], 'onchange' => "pwaPreview('pwa_large_icon');"],
+			['title', 'other_icons_title'],
+			['url', 'favicon_icon', 'size' => 40, 'helptext' => $txt['favicon_icon_desc'], 'onchange' => "pwaPreview('favicon_icon');"],
+			['url', 'apple_touch_icon', 'size' => 40, 'helptext' => $txt['apple_touch_icon_desc'], 'onchange' => "pwaPreview('apple_touch_icon');"],
+		];
 
-		call_integration_hook('integrate_modify_pwa_settings', array(&$config_vars));
+		call_integration_hook('integrate_modify_pwa_settings', [&$config_vars]);
 
 		return $config_vars;
 	}
@@ -508,7 +508,7 @@ class ManageFeatures extends AbstractController
 	 *
 	 * @event integrate_save_karma_settings
 	 */
-	public function action_karmaSettings_display()
+	public function action_karmaSettings_display(): void
 	{
 		global $txt, $context;
 
@@ -545,23 +545,23 @@ class ManageFeatures extends AbstractController
 	{
 		global $txt;
 
-		$config_vars = array(
+		$config_vars = [
 			// Karma - On or off?
-			array('select', 'karmaMode', explode('|', $txt['karma_options'])),
+			['select', 'karmaMode', explode('|', $txt['karma_options'])],
 			'',
 			// Who can do it.... and who is restricted by time limits?
-			array('int', 'karmaMinPosts', 6, 'postinput' => $txt['manageposts_posts']),
-			array('float', 'karmaWaitTime', 6, 'postinput' => $txt['hours']),
-			array('check', 'karmaTimeRestrictAdmins'),
-			array('check', 'karmaDisableSmite'),
+			['int', 'karmaMinPosts', 6, 'postinput' => $txt['manageposts_posts']],
+			['float', 'karmaWaitTime', 6, 'postinput' => $txt['hours']],
+			['check', 'karmaTimeRestrictAdmins'],
+			['check', 'karmaDisableSmite'],
 			'',
 			// What does it look like?  [smite]?
-			array('text', 'karmaLabel'),
-			array('text', 'karmaApplaudLabel', 'mask' => 'nohtml'),
-			array('text', 'karmaSmiteLabel', 'mask' => 'nohtml'),
-		);
+			['text', 'karmaLabel'],
+			['text', 'karmaApplaudLabel', 'mask' => 'nohtml'],
+			['text', 'karmaSmiteLabel', 'mask' => 'nohtml'],
+		];
 
-		call_integration_hook('integrate_modify_karma_settings', array(&$config_vars));
+		call_integration_hook('integrate_modify_karma_settings', [&$config_vars]);
 
 		return $config_vars;
 	}
@@ -573,7 +573,7 @@ class ManageFeatures extends AbstractController
 	 *
 	 * @event integrate_save_likes_settings
 	 */
-	public function action_likesSettings_display()
+	public function action_likesSettings_display(): void
 	{
 		global $txt, $context;
 
@@ -610,22 +610,22 @@ class ManageFeatures extends AbstractController
 	{
 		global $txt;
 
-		$config_vars = array(
+		$config_vars = [
 			// Likes - On or off?
-			array('check', 'likes_enabled'),
+			['check', 'likes_enabled'],
 			'',
 			// Who can do it.... and who is restricted by count limits?
-			array('int', 'likeMinPosts', 6, 'postinput' => $txt['manageposts_posts']),
-			array('int', 'likeWaitTime', 6, 'postinput' => $txt['minutes']),
-			array('int', 'likeWaitCount', 6),
-			array('check', 'likeRestrictAdmins'),
-			array('check', 'likeAllowSelf'),
-			array('check', 'useLikesNotViews'),
+			['int', 'likeMinPosts', 6, 'postinput' => $txt['manageposts_posts']],
+			['int', 'likeWaitTime', 6, 'postinput' => $txt['minutes']],
+			['int', 'likeWaitCount', 6],
+			['check', 'likeRestrictAdmins'],
+			['check', 'likeAllowSelf'],
+			['check', 'useLikesNotViews'],
 			'',
-			array('int', 'likeDisplayLimit', 6)
-		);
+			['int', 'likeDisplayLimit', 6]
+		];
 
-		call_integration_hook('integrate_modify_likes_settings', array(&$config_vars));
+		call_integration_hook('integrate_modify_likes_settings', [&$config_vars]);
 
 		return $config_vars;
 	}
@@ -637,7 +637,7 @@ class ManageFeatures extends AbstractController
 	 *
 	 * @event integrate_save_modify_mention_settings
 	 */
-	public function action_notificationsSettings_display()
+	public function action_notificationsSettings_display(): void
 	{
 		global $txt, $context, $modSettings;
 
@@ -662,11 +662,11 @@ class ManageFeatures extends AbstractController
 
 			if (!empty($this->_req->post->mentions_enabled))
 			{
-				enableModules('mentions', array('post', 'display'));
+				enableModules('mentions', ['post', 'display']);
 			}
 			else
 			{
-				disableModules('mentions', array('post', 'display'));
+				disableModules('mentions', ['post', 'display']);
 			}
 
 			if (!empty($modSettings['hidden_notification_methods']))
@@ -679,7 +679,7 @@ class ManageFeatures extends AbstractController
 
 			if (empty($this->_req->post->notifications))
 			{
-				$notification_methods = serialize(array());
+				$notification_methods = serialize([]);
 			}
 			else
 			{
@@ -703,11 +703,11 @@ class ManageFeatures extends AbstractController
 			}
 
 			require_once(SUBSDIR . '/Mentions.subs.php');
-			$enabled_mentions = array();
+			$enabled_mentions = [];
 			$current_settings = Util::unserialize($modSettings['notification_methods']);
 
 			// Fist hide what was visible
-			$modules_toggle = array('enable' => array(), 'disable' => array());
+			$modules_toggle = ['enable' => [], 'disable' => []];
 			foreach ($current_settings as $type => $val)
 			{
 				if (!isset($this->_req->post->notifications[$type]))
@@ -755,7 +755,7 @@ class ManageFeatures extends AbstractController
 				}
 			}
 
-			updateSettings(array('enabled_mentions' => implode(',', array_unique($enabled_mentions)), 'notification_methods' => $notification_methods));
+			updateSettings(['enabled_mentions' => implode(',', array_unique($enabled_mentions)), 'notification_methods' => $notification_methods]);
 			$settingsForm->setConfigValues((array) $this->_req->post);
 			$settingsForm->save();
 			redirectexit('action=admin;area=featuresettings;sa=mention');
@@ -785,10 +785,10 @@ class ManageFeatures extends AbstractController
 		loadCSSFile('multiselect.css');
 
 		// The mentions settings
-		$config_vars = array(
-			array('title', 'mentions_settings'),
-			array('check', 'mentions_enabled'),
-		);
+		$config_vars = [
+			['title', 'mentions_settings'],
+			['check', 'mentions_enabled'],
+		];
 
 		$notification_methods = Notifications::instance()->getNotifiers();
 		$notification_classes = getAvailableNotifications();
@@ -811,8 +811,8 @@ class ManageFeatures extends AbstractController
 
 			// Set up config enable/disable setting for all notifications.
 			$title = strtolower($class::getType());
-			$config_vars[] = array('title', 'setting_' . $title);
-			$config_vars[] = array('check', 'notifications[' . $title . '][enable]', 'text_label' => $txt['setting_notify_enable_this']);
+			$config_vars[] = ['title', 'setting_' . $title];
+			$config_vars[] = ['check', 'notifications[' . $title . '][enable]', 'text_label' => $txt['setting_notify_enable_this']];
 			$modSettings['notifications[' . $title . '][enable]'] = !empty($current_settings[$title]);
 			$default_values = [];
 			$is_default = [];
@@ -828,7 +828,7 @@ class ManageFeatures extends AbstractController
 					continue;
 				}
 
-				$config_vars[] = array('check', 'notifications[' . $title . '][' . $method_name . ']', 'text_label' => $txt['notify_' . $method_name]);
+				$config_vars[] = ['check', 'notifications[' . $title . '][' . $method_name . ']', 'text_label' => $txt['notify_' . $method_name]];
 				$modSettings['notifications[' . $title . '][' . $method_name . ']'] = !empty($current_settings[$title][$method_name]);
 				$default_values[] = [$method_name, $txt['notify_' . $method_name]];
 				if (empty($current_settings[$title][$method_name]))
@@ -844,11 +844,11 @@ class ManageFeatures extends AbstractController
 				$is_default[] = $method_name;
 			}
 
-			$config_vars[] = array('select', 'notifications[' . $title . '][default]', $default_values, 'text_label' => $txt['default_active'], 'multiple' => true, 'value' => $is_default);
+			$config_vars[] = ['select', 'notifications[' . $title . '][default]', $default_values, 'text_label' => $txt['default_active'], 'multiple' => true, 'value' => $is_default];
 			$modSettings['notifications[' . $title . '][default]'] = $is_default;
 		}
 
-		call_integration_hook('integrate_modify_mention_settings', array(&$config_vars));
+		call_integration_hook('integrate_modify_mention_settings', [&$config_vars]);
 
 		return $config_vars;
 	}
@@ -860,7 +860,7 @@ class ManageFeatures extends AbstractController
 	 *
 	 * @event integrate_save_signature_settings
 	 */
-	public function action_signatureSettings_display()
+	public function action_signatureSettings_display(): void
 	{
 		global $context, $txt, $modSettings;
 
@@ -881,7 +881,7 @@ class ManageFeatures extends AbstractController
 		// Load all the signature settings.
 		[$sig_limits, $sig_bbc] = explode(':', $modSettings['signature_settings']);
 		$sig_limits = explode(',', $sig_limits);
-		$disabledTags = empty($sig_bbc) ? array() : explode(',', $sig_bbc);
+		$disabledTags = empty($sig_bbc) ? [] : explode(',', $sig_bbc);
 
 		// @todo temporary since it does not work, and seriously why would you do this?
 		$disabledTags[] = 'footnote';
@@ -899,7 +899,7 @@ class ManageFeatures extends AbstractController
 			$settings_applied = true;
 		}
 
-		$context['signature_settings'] = array(
+		$context['signature_settings'] = [
 			'enable' => $sig_limits[0] ?? 0,
 			'max_length' => $sig_limits[1] ?? 0,
 			'max_lines' => $sig_limits[2] ?? 0,
@@ -911,7 +911,7 @@ class ManageFeatures extends AbstractController
 			'max_font_size' => $sig_limits[7] ?? 0,
 			'repetition_guests' => $sig_limits[8] ?? 0,
 			'repetition_members' => $sig_limits[9] ?? 0,
-		);
+		];
 
 		// Temporarily make each setting a modSetting!
 		foreach ($context['signature_settings'] as $key => $value)
@@ -934,12 +934,12 @@ class ManageFeatures extends AbstractController
 			$signature_bbc_enabledTags = $this->_req->getPost('signature_bbc_enabledTags', null, []);
 			if (!is_array($signature_bbc_enabledTags))
 			{
-				$signature_bbc_enabledTags = array($signature_bbc_enabledTags);
+				$signature_bbc_enabledTags = [$signature_bbc_enabledTags];
 			}
 
 			$this->_req->post->signature_bbc_enabledTags = $signature_bbc_enabledTags;
 
-			$sig_limits = array();
+			$sig_limits = [];
 			foreach (array_keys($context['signature_settings']) as $key)
 			{
 				if ($key === 'allow_smileys')
@@ -957,13 +957,13 @@ class ManageFeatures extends AbstractController
 				}
 			}
 
-			call_integration_hook('integrate_save_signature_settings', array(&$sig_limits, &$bbcTags));
+			call_integration_hook('integrate_save_signature_settings', [&$sig_limits, &$bbcTags]);
 
 			$this->_req->post->signature_settings = implode(',', $sig_limits) . ':' . implode(',', array_diff($bbcTags, $this->_req->post->signature_bbc_enabledTags));
 
 			// Even though we have practically no settings let's keep the convention going!
-			$save_vars = array();
-			$save_vars[] = array('text', 'signature_settings');
+			$save_vars = [];
+			$save_vars[] = ['text', 'signature_settings'];
 
 			$settingsForm->setConfigVars($save_vars);
 			$settingsForm->setConfigValues((array) $this->_req->post);
@@ -989,40 +989,40 @@ class ManageFeatures extends AbstractController
 	{
 		global $txt;
 
-		$config_vars = array(
+		$config_vars = [
 			// Are signatures even enabled?
-			array('check', 'signature_enable'),
+			['check', 'signature_enable'],
 			'',
 			// Tweaking settings!
-			array('int', 'signature_max_length', 'subtext' => $txt['zero_for_no_limit']),
-			array('int', 'signature_max_lines', 'subtext' => $txt['zero_for_no_limit']),
-			array('int', 'signature_max_font_size', 'subtext' => $txt['zero_for_no_limit']),
-			array('check', 'signature_allow_smileys', 'onclick' => "document.getElementById('signature_max_smileys').disabled = !this.checked;"),
-			array('int', 'signature_max_smileys', 'subtext' => $txt['zero_for_no_limit']),
-			array('select', 'signature_repetition_guests',
-				array(
+			['int', 'signature_max_length', 'subtext' => $txt['zero_for_no_limit']],
+			['int', 'signature_max_lines', 'subtext' => $txt['zero_for_no_limit']],
+			['int', 'signature_max_font_size', 'subtext' => $txt['zero_for_no_limit']],
+			['check', 'signature_allow_smileys', 'onclick' => "document.getElementById('signature_max_smileys').disabled = !this.checked;"],
+			['int', 'signature_max_smileys', 'subtext' => $txt['zero_for_no_limit']],
+			['select', 'signature_repetition_guests',
+				[
 					$txt['signature_always'],
 					$txt['signature_onlyfirst'],
 					$txt['signature_never'],
-				),
-			),
-			array('select', 'signature_repetition_members',
-				array(
+				],
+			],
+			['select', 'signature_repetition_members',
+				[
 					$txt['signature_always'],
 					$txt['signature_onlyfirst'],
 					$txt['signature_never'],
-				),
-			),
+				],
+			],
 			'',
 			// Image settings.
-			array('int', 'signature_max_images', 'subtext' => $txt['signature_max_images_note']),
-			array('int', 'signature_max_image_width', 'subtext' => $txt['zero_for_no_limit']),
-			array('int', 'signature_max_image_height', 'subtext' => $txt['zero_for_no_limit']),
+			['int', 'signature_max_images', 'subtext' => $txt['signature_max_images_note']],
+			['int', 'signature_max_image_width', 'subtext' => $txt['zero_for_no_limit']],
+			['int', 'signature_max_image_height', 'subtext' => $txt['zero_for_no_limit']],
 			'',
-			array('bbc', 'signature_bbc'),
-		);
+			['bbc', 'signature_bbc'],
+		];
 
-		call_integration_hook('integrate_modify_signature_settings', array(&$config_vars));
+		call_integration_hook('integrate_modify_signature_settings', [&$config_vars]);
 
 		return $config_vars;
 	}
@@ -1035,7 +1035,7 @@ class ManageFeatures extends AbstractController
 	 *
 	 * @uses sub template show_custom_profile
 	 */
-	public function action_profile()
+	public function action_profile(): void
 	{
 		global $txt, $context;
 
@@ -1044,10 +1044,10 @@ class ManageFeatures extends AbstractController
 		$context['sub_template'] = 'show_custom_profile';
 
 		// What about standard fields they can tweak?
-		$standard_fields = array('website', 'posts', 'warning_status', 'date_registered', 'action');
+		$standard_fields = ['website', 'posts', 'warning_status', 'date_registered', 'action'];
 
 		// What fields can't you put on the registration page?
-		$context['fields_no_registration'] = array('posts', 'warning_status', 'date_registered', 'action');
+		$context['fields_no_registration'] = ['posts', 'warning_status', 'date_registered', 'action'];
 
 		// Are we saving any standard field changes?
 		if (isset($this->_req->post->save))
@@ -1055,7 +1055,7 @@ class ManageFeatures extends AbstractController
 			checkSession();
 			validateToken('admin-scp');
 
-			$changes = array();
+			$changes = [];
 
 			// Do the active ones first.
 			$disable_fields = array_flip($standard_fields);
@@ -1074,7 +1074,7 @@ class ManageFeatures extends AbstractController
 			$changes['disabled_profile_fields'] = empty($disable_fields) ? '' : implode(',', array_keys($disable_fields));
 
 			// Things we want to show on registration?
-			$reg_fields = array();
+			$reg_fields = [];
 			if (!empty($this->_req->post->reg))
 			{
 				foreach ($this->_req->post->reg as $value)
@@ -1102,32 +1102,32 @@ class ManageFeatures extends AbstractController
 		createToken('admin-scp');
 
 		// Create a listing for all our standard fields
-		$listOptions = array(
+		$listOptions = [
 			'id' => 'standard_profile_fields',
 			'title' => $txt['standard_profile_title'],
 			'base_href' => getUrl('admin', ['action' => 'admin', 'area' => 'featuresettings', 'sa' => 'profile']),
-			'get_items' => array(
+			'get_items' => [
 				'function' => 'list_getProfileFields',
-				'params' => array(
+				'params' => [
 					true,
-				),
-			),
-			'columns' => array(
-				'field' => array(
-					'header' => array(
+				],
+			],
+			'columns' => [
+				'field' => [
+					'header' => [
 						'value' => $txt['standard_profile_field'],
-					),
-					'data' => array(
+					],
+					'data' => [
 						'db' => 'label',
 						'style' => 'width: 60%;',
-					),
-				),
-				'active' => array(
-					'header' => array(
+					],
+				],
+				'active' => [
+					'header' => [
 						'value' => $txt['custom_edit_active'],
 						'class' => 'centertext',
-					),
-					'data' => array(
+					],
+					'data' => [
 						'function' => static function ($rowData) {
 							$isChecked = $rowData['disabled'] ? '' : ' checked="checked"';
 							$onClickHandler = $rowData['can_show_register'] ? sprintf('onclick="document.getElementById(\'reg_%1$s\').disabled = !this.checked;"', $rowData['id']) : '';
@@ -1136,14 +1136,14 @@ class ManageFeatures extends AbstractController
 						},
 						'style' => 'width: 20%;',
 						'class' => 'centertext',
-					),
-				),
-				'show_on_registration' => array(
-					'header' => array(
+					],
+				],
+				'show_on_registration' => [
+					'header' => [
 						'value' => $txt['custom_edit_registration'],
 						'class' => 'centertext',
-					),
-					'data' => array(
+					],
+					'data' => [
 						'function' => static function ($rowData) {
 							$isChecked = $rowData['on_register'] && !$rowData['disabled'] ? ' checked="checked"' : '';
 							$isDisabled = $rowData['can_show_register'] ? '' : ' disabled="disabled"';
@@ -1152,26 +1152,26 @@ class ManageFeatures extends AbstractController
 						},
 						'style' => 'width: 20%;',
 						'class' => 'centertext',
-					),
-				),
-			),
-			'form' => array(
+					],
+				],
+			],
+			'form' => [
 				'href' => getUrl('admin', ['action' => 'admin', 'area' => 'featuresettings', 'sa' => 'profile']),
 				'name' => 'standardProfileFields',
 				'token' => 'admin-scp',
-			),
-			'additional_rows' => array(
-				array(
+			],
+			'additional_rows' => [
+				[
 					'position' => 'below_table_data',
 					'value' => '<input type="submit" name="save" value="' . $txt['save'] . '" class="right_submit" />',
-				),
-			),
-		);
+				],
+			],
+		];
 		createList($listOptions);
 
 		// And now we do the same for all of our custom ones
 		$token = createToken('admin-sort');
-		$listOptions = array(
+		$listOptions = [
 			'id' => 'custom_profile_fields',
 			'title' => $txt['custom_profile_title'],
 			'base_href' => getUrl('admin', ['action' => 'admin', 'area' => 'featuresettings', 'sa' => 'profile']),
@@ -1179,47 +1179,47 @@ class ManageFeatures extends AbstractController
 			'no_items_label' => $txt['custom_profile_none'],
 			'items_per_page' => 25,
 			'sortable' => true,
-			'get_items' => array(
+			'get_items' => [
 				'function' => 'list_getProfileFields',
-				'params' => array(
+				'params' => [
 					false,
-				),
-			),
-			'get_count' => array(
+				],
+			],
+			'get_count' => [
 				'function' => 'list_getProfileFieldSize',
-			),
-			'columns' => array(
-				'vieworder' => array(
-					'header' => array(
+			],
+			'columns' => [
+				'vieworder' => [
+					'header' => [
 						'value' => '',
 						'class' => 'hide',
-					),
-					'data' => array(
+					],
+					'data' => [
 						'db' => 'vieworder',
 						'class' => 'hide',
-					),
-					'sort' => array(
+					],
+					'sort' => [
 						'default' => 'vieworder',
-					),
-				),
-				'field_name' => array(
-					'header' => array(
+					],
+				],
+				'field_name' => [
+					'header' => [
 						'value' => $txt['custom_profile_fieldname'],
-					),
-					'data' => array(
+					],
+					'data' => [
 						'function' => static fn($rowData) => sprintf('<a href="%1$s">%2$s</a><div class="smalltext">%3$s</div>', getUrl('admin', ['action' => 'admin', 'area' => 'featuresettings', 'sa' => 'profileedit', 'fid' => (int) $rowData['id_field']]), $rowData['field_name'], $rowData['field_desc']),
 						'style' => 'width: 65%;',
-					),
-					'sort' => array(
+					],
+					'sort' => [
 						'default' => 'field_name',
 						'reverse' => 'field_name DESC',
-					),
-				),
-				'field_type' => array(
-					'header' => array(
+					],
+				],
+				'field_type' => [
+					'header' => [
 						'value' => $txt['custom_profile_fieldtype'],
-					),
-					'data' => array(
+					],
+					'data' => [
 						'function' => static function ($rowData) {
 							global $txt;
 
@@ -1228,18 +1228,18 @@ class ManageFeatures extends AbstractController
 							return $txt[$textKey] ?? $textKey;
 						},
 						'style' => 'width: 10%;',
-					),
-					'sort' => array(
+					],
+					'sort' => [
 						'default' => 'field_type',
 						'reverse' => 'field_type DESC',
-					),
-				),
-				'cust' => array(
-					'header' => array(
+					],
+				],
+				'cust' => [
+					'header' => [
 						'value' => $txt['custom_profile_active'],
 						'class' => 'centertext',
-					),
-					'data' => array(
+					],
+					'data' => [
 						'function' => static function ($rowData) {
 							$isChecked = $rowData['active'] === '1' ? ' checked="checked"' : '';
 
@@ -1247,17 +1247,17 @@ class ManageFeatures extends AbstractController
 						},
 						'style' => 'width: 8%;',
 						'class' => 'centertext',
-					),
-					'sort' => array(
+					],
+					'sort' => [
 						'default' => 'active DESC',
 						'reverse' => 'active',
-					),
-				),
-				'placement' => array(
-					'header' => array(
+					],
+				],
+				'placement' => [
+					'header' => [
 						'value' => $txt['custom_profile_placement'],
-					),
-					'data' => array(
+					],
+					'data' => [
 						'function' => static function ($rowData) {
 							global $txt;
 
@@ -1281,42 +1281,42 @@ class ManageFeatures extends AbstractController
 							return $txt[$placement];
 						},
 						'style' => 'width: 5%;',
-					),
-					'sort' => array(
+					],
+					'sort' => [
 						'default' => 'placement DESC',
 						'reverse' => 'placement',
-					),
-				),
-				'modify' => array(
-					'data' => array(
-						'sprintf' => array(
+					],
+				],
+				'modify' => [
+					'data' => [
+						'sprintf' => [
 							'format' => '<a href="' . getUrl('admin', ['action' => 'admin', 'area' => 'featuresettings', 'sa' => 'profileedit']) . ';fid=%1$s">' . $txt['modify'] . '</a>',
-							'params' => array(
+							'params' => [
 								'id_field' => false,
-							),
-						),
+							],
+						],
 						'style' => 'width: 5%;',
-					),
-				),
-			),
-			'form' => array(
+					],
+				],
+			],
+			'form' => [
 				'href' => getUrl('admin', ['action' => 'admin', 'area' => 'featuresettings', 'sa' => 'profileedit']),
 				'name' => 'customProfileFields',
 				'token' => 'admin-scp',
-			),
-			'additional_rows' => array(
-				array(
+			],
+			'additional_rows' => [
+				[
 					'class' => 'submitbutton flow_flex_additional_row',
 					'position' => 'below_table_data',
 					'value' => '
 						<input type="submit" name="onoff" value="' . $txt['save'] . '" />
 						<input type="submit" name="new" value="' . $txt['custom_profile_make_new'] . '" />',
-				),
-				array(
+				],
+				[
 					'position' => 'top_of_list',
 					'value' => '<p class="infobox">' . $txt['custom_profile_sort'] . '</p>',
-				),
-			),
+				],
+			],
 			'javascript' => '
 				$().elkSortable({
 					sa: "profileorder",
@@ -1327,7 +1327,7 @@ class ManageFeatures extends AbstractController
 					token: {token_var: "' . $token['admin-sort_token_var'] . '", token_id: "' . $token['admin-sort_token'] . '"}
 				});
 			',
-		);
+		];
 
 		createList($listOptions);
 	}
@@ -1339,7 +1339,7 @@ class ManageFeatures extends AbstractController
 	 *
 	 * @uses sub template edit_profile_field
 	 */
-	public function action_profileedit()
+	public function action_profileedit(): void
 	{
 		global $txt, $context;
 
@@ -1374,7 +1374,7 @@ class ManageFeatures extends AbstractController
 		// Setup the default values as needed.
 		if (empty($context['field']))
 		{
-			$context['field'] = array(
+			$context['field'] = [
 				'name' => '',
 				'colname' => '???',
 				'desc' => '',
@@ -1390,7 +1390,7 @@ class ManageFeatures extends AbstractController
 				'default_check' => false,
 				'default_select' => '',
 				'default_value' => '',
-				'options' => array('', '', ''),
+				'options' => ['', '', ''],
 				'active' => true,
 				'private' => false,
 				'can_search' => false,
@@ -1398,11 +1398,11 @@ class ManageFeatures extends AbstractController
 				'regex' => '',
 				'enclose' => '',
 				'placement' => 0,
-			);
+			];
 		}
 
 		// All the javascript for this page... everything else is in admin.js
-		theme()->addJavascriptVar(array('startOptID' => count($context['field']['options'])));
+		theme()->addJavascriptVar(['startOptID' => count($context['field']['options'])]);
 		theme()->addInlineJavascript('updateInputBoxes();', true);
 
 		// Are we toggling which ones are active?
@@ -1412,7 +1412,7 @@ class ManageFeatures extends AbstractController
 			validateToken('admin-scp');
 
 			// Enable and disable custom fields as required.
-			$enabled = array(0);
+			$enabled = [0];
 			if (isset($this->_req->post->cust) && is_array($this->_req->post->cust))
 			{
 				foreach ($this->_req->post->cust as $id)
@@ -1470,7 +1470,7 @@ class ManageFeatures extends AbstractController
 
 			// Select options?
 			$field_options = '';
-			$newOptions = array();
+			$newOptions = [];
 
 			// Set default
 			$default = '';
@@ -1488,7 +1488,7 @@ class ManageFeatures extends AbstractController
 						{
 							// Clean, clean, clean...
 							$v = Util::htmlspecialchars($v);
-							$v = strtr($v, array(',' => ''));
+							$v = strtr($v, [',' => '']);
 
 							// Nada, zip, etc...
 							if (trim($v) === '')
@@ -1532,7 +1532,7 @@ class ManageFeatures extends AbstractController
 			// Come up with the unique name?
 			if (empty($context['fid']))
 			{
-				$colname = Util::substr(strtr($this->_req->post->field_name, array(' ' => '')), 0, 6);
+				$colname = Util::substr(strtr($this->_req->post->field_name, [' ' => '']), 0, 6);
 				preg_match('~([\w_-]+)~', $colname, $matches);
 
 				// If there is nothing to the name, then let's start our own - for foreign languages etc.
@@ -1556,7 +1556,7 @@ class ManageFeatures extends AbstractController
 				}
 
 				// And create a new field
-				$new_field = array(
+				$new_field = [
 					'col_name' => $colname,
 					'field_name' => $this->_req->post->field_name,
 					'field_desc' => $this->_req->post->field_desc,
@@ -1578,7 +1578,7 @@ class ManageFeatures extends AbstractController
 					'enclose' => $enclose,
 					'placement' => $placement,
 					'vieworder' => list_getProfileFieldSize() + 1,
-				);
+				];
 				addProfileField($new_field);
 			}
 			// Work out what to do with the user data otherwise...
@@ -1595,7 +1595,7 @@ class ManageFeatures extends AbstractController
 				elseif ($this->_req->post->field_type === 'select' || $this->_req->post->field_type === 'radio')
 				{
 					$optionChanges = $context['field']['options'];
-					$takenKeys = array();
+					$takenKeys = [];
 
 					// Work out what's changed!
 					foreach ($optionChanges as $k => $option)
@@ -1633,7 +1633,7 @@ class ManageFeatures extends AbstractController
 				// @todo Maybe we should adjust based on new text length limits?
 
 				// And finally update an existing field
-				$field_data = array(
+				$field_data = [
 					'field_length' => $field_length,
 					'show_reg' => $show_reg,
 					'show_display' => $show_display,
@@ -1654,7 +1654,7 @@ class ManageFeatures extends AbstractController
 					'placement' => $placement,
 					'rows' => $rows,
 					'cols' => $cols,
-				);
+				];
 
 				updateProfileField($field_data);
 
@@ -1696,7 +1696,7 @@ class ManageFeatures extends AbstractController
 	 *
 	 * @event integrate_save_pmsettings_settings
 	 */
-	public function action_pmsettings()
+	public function action_pmsettings(): void
 	{
 		global $txt, $context;
 
@@ -1729,7 +1729,7 @@ class ManageFeatures extends AbstractController
 					continue;
 				}
 
-				updateMembergroupProperties(array('current_group' => $group_id, 'max_messages' => $this->_req->post->group[$group_id]));
+				updateMembergroupProperties(['current_group' => $group_id, 'max_messages' => $this->_req->post->group[$group_id]]);
 			}
 
 			call_integration_hook('integrate_save_pmsettings_settings');
@@ -1756,22 +1756,22 @@ class ManageFeatures extends AbstractController
 	{
 		global $txt;
 
-		$config_vars = array(
+		$config_vars = [
 			// Reporting of personal messages?
-			array('check', 'enableReportPM'),
+			['check', 'enableReportPM'],
 			// Inline permissions.
-			array('permissions', 'pm_send'),
+			['permissions', 'pm_send'],
 			// PM Settings
-			array('title', 'antispam_PM'),
-			'pm1' => array('int', 'max_pm_recipients', 'postinput' => $txt['max_pm_recipients_note']),
-			'pm2' => array('int', 'pm_posts_verification', 'postinput' => $txt['pm_posts_verification_note']),
-			'pm3' => array('int', 'pm_posts_per_hour', 'postinput' => $txt['pm_posts_per_hour_note']),
-			array('title', 'membergroups_max_messages'),
-			array('desc', 'membergroups_max_messages_desc'),
-			array('callback', 'pm_limits'),
-		);
+			['title', 'antispam_PM'],
+			'pm1' => ['int', 'max_pm_recipients', 'postinput' => $txt['max_pm_recipients_note']],
+			'pm2' => ['int', 'pm_posts_verification', 'postinput' => $txt['pm_posts_verification_note']],
+			'pm3' => ['int', 'pm_posts_per_hour', 'postinput' => $txt['pm_posts_per_hour_note']],
+			['title', 'membergroups_max_messages'],
+			['desc', 'membergroups_max_messages_desc'],
+			['callback', 'pm_limits'],
+		];
 
-		call_integration_hook('integrate_modify_pmsettings_settings', array(&$config_vars));
+		call_integration_hook('integrate_modify_pmsettings_settings', [&$config_vars]);
 
 		return $config_vars;
 	}

@@ -187,7 +187,7 @@ class UnZip
 	 *
 	 * @return bool
 	 */
-	public function check_valid_zip()
+	public function check_valid_zip(): bool
 	{
 		// No signature?
 		if ($this->data === null || strlen($this->data) < 10)
@@ -218,7 +218,7 @@ class UnZip
 	 * - Zipfile comment length: 2 bytes
 	 * - Zipfile comment (variable size)
 	 */
-	private function _read_endof_cdr()
+	private function _read_endof_cdr(): void
 	{
 		// Look for the end of central directory signature 0x06054b50
 		$data_ecdr = explode("\x50\x4b\x05\x06", $this->data);
@@ -259,7 +259,7 @@ class UnZip
 	 * - External file attributes: 4 bytes
 	 * - Relative offset of local header: 4 bytes
 	 */
-	private function _load_file_headers()
+	private function _load_file_headers(): ?bool
 	{
 		$pointer = 0;
 		$i = 0;
@@ -295,6 +295,8 @@ class UnZip
 		{
 			return false;
 		}
+
+		return null;
 	}
 
 	/**
@@ -308,7 +310,7 @@ class UnZip
 	 * - Uncompressed and saves if needed
 	 * - Returns processing array
 	 */
-	private function _process_files()
+	private function _process_files(): void
 	{
 		foreach ($this->_files_info as $this->_filename => $this->_file_info)
 		{
@@ -383,7 +385,7 @@ class UnZip
 	/**
 	 * Does what it says, determines if we are writing this file or not
 	 */
-	private function _determine_write_this()
+	private function _determine_write_this(): void
 	{
 		// If this is a file, and it doesn't exist.... happy days!
 		if (substr($this->_filename, -1) !== '/'
@@ -439,7 +441,7 @@ class UnZip
 	 * - Filename (variable size)
 	 * - Extra field (variable size)
 	 */
-	private function _read_local_header()
+	private function _read_local_header(): void
 	{
 		// The local header data is always the 26 bytes after the 4 byte signature
 		$local_file_data = unpack('vversion_needed/vgeneral_purpose/vcompress_method/vfile_time/vfile_date/Vcrc/Vcompressed_size/Vsize/vfilename_length/vextra_field_length', substr($this->_file_info['data'], 4, 26));
@@ -469,7 +471,7 @@ class UnZip
 	 * This descriptor is used only when it was not possible to seek in the output zip
 	 * file, e.g., when the output zip file was standard output or a non seekable device.
 	 */
-	private function _check_general_purpose_flag()
+	private function _check_general_purpose_flag(): void
 	{
 		// If bit 1 is set the file is encrypted so empty it instead of writing out gibberish
 		if (($this->_file_info['general_purpose'] & 0x0001) !== 0)
@@ -503,7 +505,7 @@ class UnZip
 	 * - Writes the extracted file to disk or if we are extracting a single file
 	 * - It returns the extracted data
 	 */
-	private function _write_this_file()
+	private function _write_this_file(): void
 	{
 		$this->_skip = false;
 		$this->_found = false;
@@ -552,7 +554,7 @@ class UnZip
 	/**
 	 * Checks the saved vs calculated crc values
 	 */
-	private function _check_crc()
+	private function _check_crc(): bool
 	{
 		// Convert everything to a hex value (unsigned)
 		$crc_uncompressed = hash('crc32b', $this->_file_info['data']);

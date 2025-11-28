@@ -105,7 +105,7 @@ class SiteCombiner
 				continue;
 			}
 
-			$this->_addSpare(array($id => $file));
+			$this->_addSpare([$id => $file]);
 		}
 
 		// Nothing to combine
@@ -146,7 +146,7 @@ class SiteCombiner
 	 * @param $files
 	 * @return bool
 	 */
-	private function _validRequest($files)
+	private function _validRequest($files): bool
 	{
 		// No files or missing we are done
 		if (empty($files))
@@ -163,7 +163,7 @@ class SiteCombiner
 	 *
 	 * @return bool
 	 */
-	protected function _validDestination()
+	protected function _validDestination(): bool
 	{
 		return $this->fileFunc->isDir($this->_archive_dir) && $this->fileFunc->isWritable($this->_archive_dir);
 	}
@@ -171,9 +171,9 @@ class SiteCombiner
 	/**
 	 * Adds files to the spare list
 	 *
-	 * @param array
+	 * @param array $files
 	 */
-	protected function _addSpare($files)
+	protected function _addSpare($files): void
 	{
 		foreach ($files as $id => $file)
 		{
@@ -199,7 +199,7 @@ class SiteCombiner
 	 *
 	 * @return bool
 	 */
-	private function _addFile($options)
+	private function _addFile($options): bool
 	{
 		if (!isset($options['dir']))
 		{
@@ -212,13 +212,13 @@ class SiteCombiner
 			return false;
 		}
 
-		$this->_combine_files[$options['basename']] = array(
+		$this->_combine_files[$options['basename']] = [
 			'file' => $filename,
 			'basename' => $options['basename'],
 			'url' => $options['url'],
 			'filemtime' => filemtime($filename),
 			'minimized' => strpos($options['basename'], '.min.js') || strpos($options['basename'], '.min.css') !== false,
-		);
+		];
 
 		return true;
 	}
@@ -228,7 +228,7 @@ class SiteCombiner
 	 *
 	 * @param string $type - should be one of '.js' or '.css'
 	 */
-	private function _buildName($type)
+	private function _buildName($type): void
 	{
 		global $settings;
 
@@ -256,7 +256,7 @@ class SiteCombiner
 	 *
 	 * - If any date of the files that make up the archive are newer than the archive, its considered stale
 	 */
-	private function _isStale()
+	private function _isStale(): bool
 	{
 		// If any files in the archive are newer than the archive file itself, then the archive is stale
 		$filemtime = $this->fileFunc->fileExists($this->_archive_dir . '/' . $this->_archive_name) ? filemtime($this->_archive_dir . '/' . $this->_archive_name) : 0;
@@ -283,7 +283,7 @@ class SiteCombiner
 	 *
 	 * @param string $type one of css or js
 	 */
-	private function _combineFiles($type)
+	private function _combineFiles($type): void
 	{
 		// Remove any old cache file(s)
 		$this->fileFunc->delete($this->_archive_dir . '/' . $this->_archive_name);
@@ -308,7 +308,7 @@ class SiteCombiner
 			// @todo needs to be smarter, based on "new" cache location
 			if ($type === 'css')
 			{
-				$tempfile = str_replace(array('../../images', '../../webfonts', '../../scripts'), array($file['url'] . '/images', $file['url'] . '/webfonts', $file['url'] . '/scripts'), $tempfile);
+				$tempfile = str_replace(['../../images', '../../webfonts', '../../scripts'], [$file['url'] . '/images', $file['url'] . '/webfonts', $file['url'] . '/scripts'], $tempfile);
 			}
 
 			// Add the file to the correct array for processing
@@ -348,7 +348,7 @@ class SiteCombiner
 	/**
 	 * Save a compilation file
 	 */
-	private function _saveFiles()
+	private function _saveFiles(): void
 	{
 		// Add in the file header if available
 		if (!empty($this->_archive_header))
@@ -367,7 +367,7 @@ class SiteCombiner
 	 *
 	 * @return array
 	 */
-	public function site_js_minify($files)
+	public function site_js_minify($files): array
 	{
 		if (!$this->_validRequest($files))
 		{
@@ -433,7 +433,7 @@ class SiteCombiner
 			// Get the ones that we would load locally so we can merge them
 			if (empty($file['options']['local']) || !$this->_addFile($file['options']))
 			{
-				$this->_addSpare(array($id => $file));
+				$this->_addSpare([$id => $file]);
 			}
 		}
 
@@ -477,7 +477,7 @@ class SiteCombiner
 	 * @param bool $fast if true, only remove whitespace to minify
 	 * @return string Minified CSS data
 	 */
-	public function cssMinify($css = '', $fast = false)
+	public function cssMinify($css = '', $fast = false): string
 	{
 		if ($fast)
 		{
@@ -508,7 +508,7 @@ class SiteCombiner
 	 *
 	 * @return array
 	 */
-	public function site_css_minify($files)
+	public function site_css_minify($files): array
 	{
 		if (!$this->_validRequest($files))
 		{
@@ -554,7 +554,7 @@ class SiteCombiner
 	 *
 	 * @return string[]
 	 */
-	public function getSpares()
+	public function getSpares(): array
 	{
 		return $this->_spares;
 	}
@@ -562,7 +562,7 @@ class SiteCombiner
 	/**
 	 * Deletes the CSS hives from the cache.
 	 */
-	public function removeCssHives()
+	public function removeCssHives(): bool
 	{
 		return $this->_removeHives('css');
 	}
@@ -574,7 +574,7 @@ class SiteCombiner
 	 *
 	 * @return bool
 	 */
-	protected function _removeHives($ext)
+	protected function _removeHives($ext): bool
 	{
 		$path = $this->_archive_dir . '/hive-*.' . $ext;
 
@@ -593,7 +593,7 @@ class SiteCombiner
 	/**
 	 * Deletes the JS hives from the cache.
 	 */
-	public function removeJsHives()
+	public function removeJsHives(): bool
 	{
 		return $this->_removeHives('js');
 	}

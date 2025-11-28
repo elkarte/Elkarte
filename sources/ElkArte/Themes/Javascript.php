@@ -15,7 +15,9 @@ namespace ElkArte\Themes;
 use ElkArte\Helper\SiteCombiner;
 
 /**
- * Part of core Theme functions.  Responsible for the output the Javascript, including files,
+ * class Javascript
+ *
+ * Part of core Theme functions.  Responsible for the outputting JavaScript, including files,
  * inline and vars.  Will do simple compression if enabled in the ACP
  */
 class Javascript
@@ -52,7 +54,7 @@ class Javascript
 	}
 
 	/**
-	 * Output the Javascript, including files, inline and vars
+	 * Output the JavaScript, including files, inline and vars
 	 *
 	 * What it does:
 	 *
@@ -62,11 +64,11 @@ class Javascript
 	 * - Outputs in <head> all *inline* JS that is not deferred, deferred ones are placed after </body>
 	 * - If the admin option to combine files is set, will use Combiner.class
 	 */
-	public function template_javascript()
+	public function template_javascript(): void
 	{
 		global $modSettings;
 
-		// Output any declared Javascript variables first, they tend to be globals
+		// Output any declared JavaScript variables first, they tend to be globals
 		$js_vars = [];
 		if (!empty($this->js_vars))
 		{
@@ -87,7 +89,7 @@ class Javascript
 			$this->templateJquery();
 		}
 
-		// Use this hook to work with Javascript files and vars pre output
+		// Use this hook to work with JavaScript files and vars pre output
 		call_integration_hook('pre_javascript_output', []);
 
 		// Load all the Javascript files
@@ -102,11 +104,11 @@ class Javascript
 	 *
 	 * - Determines the correct script tags to add based on CDN/Local/Auto
 	 */
-	public function templateJquery()
+	public function templateJquery(): void
 	{
 		global $modSettings, $settings;
 
-		// Use a specified version of jquery 3.7.1  / 1.13.2
+		// Use a specified version of jquery 3.7.1 / 1.13.2
 		$jquery_version = '3.7.1';
 		$jqueryui_version = '1.13.2';
 
@@ -153,7 +155,7 @@ class Javascript
 	 * - Clears all files from $this->js_files so that it can be called multiple times.  Current
 	 * this is called from here and then again in index.template (for files added by templates)
 	 */
-	public function templateJavascriptFiles()
+	public function templateJavascriptFiles(): void
 	{
 		global $modSettings, $settings;
 
@@ -185,7 +187,7 @@ class Javascript
 	 * @param array $files
 	 * @return void
 	 */
-	public function outputJavascriptFiles($files)
+	public function outputJavascriptFiles($files): void
 	{
 		// While we have Javascript files to place in the template
 		foreach ($files as $id => $js_file)
@@ -204,7 +206,7 @@ class Javascript
 	 * @param bool $do_deferred if true outputs the inline JS that was marked as deferred.
 	 * @return void
 	 */
-	public function template_inline_javascript($do_deferred = false, $tabs = 3)
+	public function template_inline_javascript($do_deferred = false, $tabs = 3): void
 	{
 		if (empty($this->js_inline))
 		{
@@ -241,7 +243,7 @@ class Javascript
 	 *
 	 * @return array
 	 */
-	public function formatInlineJS($files, $tabs = 3)
+	public function formatInlineJS($files, $tabs = 3): array
 	{
 		global $modSettings, $settings;
 
@@ -293,17 +295,17 @@ class Javascript
 	}
 
 	/**
-	 * Add a block of inline Javascript code to be executed later
+	 * Adds a block of inline Javascript code to be executed later
 	 *
 	 * What it does:
 	 * - only use this if you have to, generally external JS files are better, but for very small scripts
 	 *   or for scripts that require help from PHP/whatever, this can be useful.
-	 * - all code added with this function is added to the same <script> tag so do make sure your JS is clean!
+	 * - All code added with this function is added to the same <script> tag so do make sure your JS is clean!
 	 *
 	 * @param string $javascript
 	 * @param bool $defer = false, define if the script should load in <head> or before the closing <html> tag
 	 */
-	public function addInlineJavascript($javascript, $defer = false)
+	public function addInlineJavascript($javascript, $defer = false): void
 	{
 		if (!empty($javascript))
 		{
@@ -312,12 +314,12 @@ class Javascript
 	}
 
 	/**
-	 * Add a Javascript variable for output later (for feeding text strings and similar to JS)
+	 * Add a JavaScript variable for output later (for feeding text strings and similar to JS)
 	 *
 	 * @param array $vars array of vars to include in the output done as 'varname' => 'var value'
 	 * @param bool $escape = false, whether to escape the value
 	 */
-	public function addJavascriptVar($vars, $escape = false)
+	public function addJavascriptVar($vars, $escape = false): void
 	{
 		if (empty($vars) || !is_array($vars))
 		{
@@ -335,7 +337,7 @@ class Javascript
 	 *
 	 * @return array
 	 */
-	public function getJSFiles()
+	public function getJSFiles(): array
 	{
 		return $this->js_files;
 	}

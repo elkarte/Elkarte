@@ -46,7 +46,7 @@ class ModerateAttachments extends AbstractController
 	 * - works out what we want to do with attachments and actions it.
 	 * - Accessed by ?action=attachapprove
 	 */
-	public function action_attachapprove()
+	public function action_attachapprove(): void
 	{
 		// Security is our primary concern...
 		checkSession('get');

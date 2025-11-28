@@ -776,8 +776,8 @@ function repairAttachmentData($start, $fix_errors, $to_fix)
 				FileFunctions::instance()->delete($filename);
 			}
 		}
-		// Size listed and actual size are not the same?
-		elseif (FileFunctions::instance()->fileSize($filename) !== $row['size'])
+		// Size listed and actual size are different?
+		elseif (FileFunctions::instance()->fileSize($filename) !== (int) $row['size'])
 		{
 			$repair_errors['file_wrong_size']++;
 

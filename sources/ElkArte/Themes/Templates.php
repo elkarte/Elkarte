@@ -102,6 +102,32 @@ class Templates
 	}
 
 	/**
+	 * Check if a template has already been loaded
+	 *
+	 * @param string $template_name Name of the template to check
+	 * @return bool True if template is loaded, false otherwise
+	 */
+	public function isTemplateLoaded(string $template_name): bool
+	{
+		$template_functions = [
+			'template_' . $template_name,
+			'template_' . $template_name . '_above',
+			'template_' . $template_name . '_below',
+			'template_' . $template_name . '_init'
+		];
+
+		foreach ($template_functions as $function)
+		{
+			if (function_exists($function))
+			{
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	/**
 	 * <b>Internal function! Do not use it, use theme()->getTemplates()->load instead</b>
 	 *
 	 * What it does:
@@ -122,6 +148,11 @@ class Templates
 	protected function requireTemplate($template_name, $style_sheets, $fatal): bool
 	{
 		global $context, $settings, $txt, $db_show_debug;
+
+		if ($this->isTemplateLoaded($template_name))
+		{
+			return true;
+		}
 
 		if (!is_array($style_sheets))
 		{
@@ -261,7 +292,7 @@ class Templates
 	 *
 	 * @param Error $e
 	 */
-	protected function templateNotFound(Error $e)
+	protected function templateNotFound(Error $e): never
 	{
 		global $context, $txt, $scripturl, $boardurl;
 
@@ -447,7 +478,7 @@ class Templates
 	 * @throws Exception theme_template_error
 	 *
 	 */
-	public function loadSubTemplate($sub_template_name, $fatal = false)
+	public function loadSubTemplate($sub_template_name, $fatal = false): void
 	{
 		global $txt, $db_show_debug;
 
@@ -504,7 +535,7 @@ class Templates
 	 * @param bool $start
 	 * @param string $sub_template_name
 	 */
-	private function _templateDebug($sub_template_name, $start = false)
+	private function _templateDebug($sub_template_name, $start = false): void
 	{
 		$req = HttpReq::instance();
 
@@ -523,7 +554,7 @@ class Templates
 	/**
 	 * @return Directories
 	 */
-	public function getDirectory()
+	public function getDirectory(): Directories
 	{
 		return $this->dirs;
 	}

@@ -113,9 +113,9 @@ class Query extends AbstractQuery
 			VALUES
 				' . implode(',
 				', $insertRows),
-			array(
+			[
 				'security_override' => true,
-			)
+			]
 		);
 
 		$this->result->updateDetails([
@@ -237,7 +237,7 @@ class Query extends AbstractQuery
 	 * @param int $line The line number where the error occurred.
 	 * @return bool|null Returns false if the command is DELETE, UPDATE, or INSERT. Returns null otherwise.
 	 */
-	private function handleCommandDeniedError($db_string, $query_error, $file, $line)
+	private function handleCommandDeniedError($db_string, $query_error, $file, $line): ?bool
 	{
 		global $txt, $modSettings;
 
@@ -267,7 +267,7 @@ class Query extends AbstractQuery
 	 *
 	 * @return null|AbstractResult Returns the result of the query if successful, otherwise null.
 	 */
-	private function handleTableOrKeyFileError($db_string, $query_errno, $query_error)
+	private function handleTableOrKeyFileError($db_string, $query_errno, $query_error): ?AbstractResult
 	{
 		global $modSettings;
 
@@ -313,7 +313,7 @@ class Query extends AbstractQuery
 	 * @param string $db_string The database query string.
 	 * @return null|AbstractResult Returns the result of the query if successful, otherwise null.
 	 */
-	private function handleConnectionError($db_string)
+	private function handleConnectionError($db_string): ?AbstractResult
 	{
 		global $db_persist, $db_server, $db_user, $db_passwd, $db_name, $ssi_db_user, $ssi_db_passwd, $db_port;
 
@@ -365,7 +365,7 @@ class Query extends AbstractQuery
 	 * @param string $query_error The error message of the query.
 	 * @return string The updated error message with space error handling.
 	 */
-	private function handleSpaceError($query_errno, $query_error)
+	private function handleSpaceError($query_errno, $query_error): string
 	{
 		global $txt;
 
@@ -448,7 +448,7 @@ class Query extends AbstractQuery
 	 *
 	 * @return null|AbstractResult Returns the query results if the repair was successful, null otherwise.
 	 */
-	private function attemptRepair($fix_tables, $db_string)
+	private function attemptRepair($fix_tables, $db_string): ?AbstractResult
 	{
 		global $webmaster_email, $txt;
 
@@ -512,7 +512,7 @@ class Query extends AbstractQuery
 	{
 		$request = $this->query('', '
 			SELECT VERSION()',
-			array()
+			[]
 		);
 		[$ver] = $request->fetch_row();
 		$request->free_result();
@@ -561,7 +561,7 @@ class Query extends AbstractQuery
 	{
 		$request = $this->query('', '
 			SELECT VERSION()',
-			array()
+			[]
 		);
 		[$ver] = $request->fetch_row();
 		$request->free_result();

@@ -25,7 +25,7 @@ class Connection implements ConnectionInterface
 	/**
 	 * {@inheritDoc}
 	 */
-	public static function initiate($db_server, $db_name, $db_user, $db_passwd, $db_prefix, $db_options = array())
+	public static function initiate($db_server, $db_name, $db_user, $db_passwd, $db_prefix, $db_options = [])
 	{
 		$db_port = empty($db_options['port']) ? '' : ' port=' . (int) $db_options['port'];
 

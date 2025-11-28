@@ -60,7 +60,7 @@ class RemoveTopic extends AbstractController
 	 * - Accessed by ?action=removetopic2
 	 * - Removes a topic if it has not already been removed.
 	 */
-	public function action_removetopic2()
+	public function action_removetopic2(): void
 	{
 		global $topic, $board, $modSettings;
 
@@ -103,11 +103,11 @@ class RemoveTopic extends AbstractController
 		// Note, only log topic ID in native form if it's not gone forever.
 		if (allowedTo('remove_any') || (allowedTo('remove_own') && $this->_topic_info['id_member_started'] == $this->user->id))
 		{
-			logAction('remove', array(
+			logAction('remove', [
 					(empty($modSettings['recycle_enable']) || $modSettings['recycle_board'] != $board ? 'topic' : 'old_topic_id') => $topic,
 					'subject' => $this->_topic_info['subject'],
 					'member' => $this->_topic_info['id_member_started'],
-					'board' => $board)
+					'board' => $board]
 			);
 		}
 
@@ -118,7 +118,7 @@ class RemoveTopic extends AbstractController
 	/**
 	 * Verifies the user has permissions to remove an unapproved message/topic
 	 */
-	private function _checkApproval()
+	private function _checkApproval(): void
 	{
 		global $modSettings;
 
@@ -140,7 +140,7 @@ class RemoveTopic extends AbstractController
 	 *  - Accessed by ?action=deletemsg
 	 *  - Verifies the message exists and that they can see the message
 	 */
-	public function action_deletemsg()
+	public function action_deletemsg(): void
 	{
 		global $topic, $modSettings;
 
@@ -169,9 +169,9 @@ class RemoveTopic extends AbstractController
 
 		// Load the message details
 		$this->_topic_info = loadMessageDetails(
-			array('t.id_member_started'),
-			array('LEFT JOIN {db_prefix}topics AS t ON (m.id_topic = t.id_topic)'),
-			array('message_list' => $_msg)
+			['t.id_member_started'],
+			['LEFT JOIN {db_prefix}topics AS t ON (m.id_topic = t.id_topic)'],
+			['message_list' => $_msg]
 		);
 
 		// Can they see the message to remove it?
@@ -192,7 +192,7 @@ class RemoveTopic extends AbstractController
 	 *
 	 * - @uses isAllowedTo() which will end processing if user lacks proper permissions.
 	 */
-	private function _verifyDeletePermissions()
+	private function _verifyDeletePermissions(): void
 	{
 		global $modSettings;
 
@@ -233,7 +233,7 @@ class RemoveTopic extends AbstractController
 	 *
 	 * @param bool $full_topic if the entire topic was removed
 	 */
-	private function _redirectBack($full_topic)
+	private function _redirectBack($full_topic): void
 	{
 		global $topic, $board;
 
@@ -267,7 +267,7 @@ class RemoveTopic extends AbstractController
 	 * - Merges back the posts to the original as necessary.
 	 * - Accessed by ?action=restoretopic
 	 */
-	public function action_restoretopic()
+	public function action_restoretopic(): void
 	{
 		global $modSettings;
 
@@ -303,7 +303,7 @@ class RemoveTopic extends AbstractController
 		// Didn't find some things?
 		if ($restorer->unfoundRestoreMessages())
 		{
-			throw new Exception('restore_not_found', false, array('<ul><li>' . implode('</li><li>', $restorer->unfoundRestoreMessages(true)) . '</li></ul>'));
+			throw new Exception('restore_not_found', false, ['<ul><li>' . implode('</li><li>', $restorer->unfoundRestoreMessages(true)) . '</li></ul>']);
 		}
 
 		// Lets send them back somewhere that may make sense

@@ -121,7 +121,7 @@ class Questions implements ControlInterface
 	 *
 	 * @throws \Exception
 	 */
-	private function _refreshQuestionsCache()
+	private function _refreshQuestionsCache(): void
 	{
 		global $modSettings;
 
@@ -231,7 +231,7 @@ class Questions implements ControlInterface
 	 * @return array
 	 * @throws \Exception
 	 */
-	private function _loadAntispamQuestions()
+	private function _loadAntispamQuestions(): array
 	{
 		$db = database();
 
@@ -290,7 +290,7 @@ class Questions implements ControlInterface
 	 * @return bool
 	 * @throws \Exception
 	 */
-	private function _verifyAnswers($sessionVal)
+	private function _verifyAnswers($sessionVal): bool
 	{
 		$this->_filter = new ValuesContainer(['type' => 'id_question', 'value' => $sessionVal['q']]);
 
@@ -388,7 +388,7 @@ class Questions implements ControlInterface
 	 * @param array $save_language
 	 * @return int
 	 */
-	protected function _saveSettings($save_question, $save_answer, $save_language)
+	protected function _saveSettings($save_question, $save_answer, $save_language): int
 	{
 		global $language;
 
@@ -459,7 +459,7 @@ class Questions implements ControlInterface
 	 * @param int $id
 	 * @throws \ElkArte\Exceptions\Exception
 	 */
-	private function _delete($id)
+	private function _delete($id): void
 	{
 		$db = database();
 
@@ -481,7 +481,7 @@ class Questions implements ControlInterface
 	 * @param string $language
 	 * @throws \ElkArte\Exceptions\Exception
 	 */
-	private function _update($id, $question, $answers, $language)
+	private function _update($id, $question, $answers, $language): void
 	{
 		$db = database();
 
@@ -508,7 +508,7 @@ class Questions implements ControlInterface
 	 * @param array $questions
 	 * @throws \Exception
 	 */
-	private function _insert($questions)
+	private function _insert($questions): void
 	{
 		$db = database();
 

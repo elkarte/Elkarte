@@ -57,12 +57,12 @@ function messageDetails($id_msg, $id_topic = 0, $attachment_type = 0)
 			LEFT JOIN {db_prefix}log_actions AS log ON (m.id_topic = log.id_topic AND log.action = {string:announce_action})
 		WHERE m.id_msg = {int:id_msg}
 			AND m.id_topic = {int:current_topic}',
-		array(
+		[
 			'current_topic' => $id_topic,
 			'attachment_type' => $attachment_type,
 			'id_msg' => $id_msg,
 			'announce_action' => 'announce_topic',
-		)
+		]
 	)->fetch_all();
 
 	// The message they were trying to edit was most likely deleted.
@@ -87,7 +87,7 @@ function messageDetails($id_msg, $id_topic = 0, $attachment_type = 0)
 		ksort($temp);
 	}
 
-	return array('message' => $message_data[0], 'attachment_stuff' => $temp);
+	return ['message' => $message_data[0], 'attachment_stuff' => $temp];
 }
 
 /**
@@ -101,7 +101,7 @@ function messageDetails($id_msg, $id_topic = 0, $attachment_type = 0)
  * @param bool $detailed
  * @param bool $approved only return approved messages
  *
- * @return mixed[]|false array of message details or false if no message found.
+ * @return array|false array of message details or false if no message found.
  */
 function basicMessageInfo($id_msg, $override_permissions = false, $detailed = false, $approved = true)
 {
@@ -125,9 +125,9 @@ function basicMessageInfo($id_msg, $override_permissions = false, $detailed = fa
 		WHERE id_msg = {int:message}' . (empty($modSettings['postmod_active']) || allowedTo('approve_posts') || $approved === false ? '' : '
 			AND m.approved = 1') . '
 		LIMIT 1',
-		array(
+		[
 			'message' => $id_msg,
-		)
+		]
 	);
 	$messageInfo = $request->fetch_assoc();
 
@@ -169,12 +169,12 @@ function quoteMessageInfo($id_msg, $modify)
 		WHERE m.id_msg = {int:id_msg}' . ($modify || (!empty($moderate_boards) && $moderate_boards[0] == 0) ? '' : '
 			AND (t.locked = {int:not_locked}' . (empty($moderate_boards) ? '' : ' OR b.id_board IN ({array_int:moderation_board_list})') . ')') . '
 		LIMIT 1',
-		array(
+		[
 			'current_member' => User::$info->id,
 			'moderation_board_list' => $moderate_boards,
 			'id_msg' => $id_msg,
 			'not_locked' => 0,
-		)
+		]
 	);
 
 	return $request->fetch_assoc();
@@ -201,7 +201,8 @@ function checkMessagePermissions($message)
 		{
 			throw new \ElkArte\Exceptions\Exception('modify_post_time_passed', false);
 		}
-		elseif ($message['id_member_poster'] == User::$info->id && !allowedTo('modify_own'))
+
+		if ($message['id_member_poster'] == User::$info->id && !allowedTo('modify_own'))
 		{
 			isAllowedTo('modify_replies');
 		}
@@ -221,7 +222,7 @@ function checkMessagePermissions($message)
 
 	if ($context['can_announce'] && !empty($message['id_action']))
 	{
-		return array('topic_already_announced');
+		return ['topic_already_announced'];
 	}
 
 	return false;
@@ -233,7 +234,7 @@ function checkMessagePermissions($message)
  * What it does:
  * - Loads data from messageDetails into $context array
  *
- * @param mixed[] $message the message array
+ * @param array $message the message array
  */
 function prepareMessageContext($message)
 {
@@ -242,12 +243,12 @@ function prepareMessageContext($message)
 	// Load up 'em attachments!
 	foreach ($message['attachment_stuff'] as $attachment)
 	{
-		$context['attachments']['current'][] = array(
+		$context['attachments']['current'][] = [
 			'name' => htmlspecialchars($attachment['filename'], ENT_COMPAT, 'UTF-8'),
 			'size' => $attachment['filesize'],
 			'id' => $attachment['id_attach'],
 			'approved' => $attachment['attachment_approved'],
-		);
+		];
 	}
 
 	// Allow moderators to change names....
@@ -288,9 +289,9 @@ function removeNonTopicMessages($memID)
 			INNER JOIN {db_prefix}topics AS t ON (t.id_topic = m.id_topic
 				AND t.id_first_msg != m.id_msg)
 		WHERE m.id_member = {int:selected_member}',
-		array(
+		[
 			'selected_member' => $memID,
-		)
+		]
 	)->fetch_callback(
 		function ($row) {
 			// This could take a while... but ya know it's gonna be worth it in the end.
@@ -340,9 +341,9 @@ function associatedTopic($msg_id, $topicID = null)
 				id_topic
 			FROM {db_prefix}messages
 			WHERE id_msg = {int:msg}',
-			array(
+			[
 				'msg' => $msg_id,
-			)
+			]
 		);
 		if ($request->num_rows() !== 1)
 		{
@@ -356,19 +357,17 @@ function associatedTopic($msg_id, $topicID = null)
 
 		return $topic;
 	}
-	else
-	{
-		$db->query('', '
-			UPDATE {db_prefix}messages
-			SET 
-				id_topic = {int:topic}
-			WHERE id_msg = {int:msg}',
-			array(
-				'msg' => $msg_id,
-				'topic' => $topicID,
-			)
-		);
-	}
+
+	$db->query('', '
+		UPDATE {db_prefix}messages
+		SET 
+			id_topic = {int:topic}
+		WHERE id_msg = {int:msg}',
+		[
+			'msg' => $msg_id,
+			'topic' => $topicID,
+		]
+	);
 }
 
 /**
@@ -421,11 +420,11 @@ function messagePointer($id_msg, $id_topic, $next = true)
 		FROM {db_prefix}messages
 		WHERE id_topic = {int:current_topic}
 			AND id_msg {raw:strictly} {int:topic_msg_id}',
-		array(
+		[
 			'current_topic' => $id_topic,
 			'topic_msg_id' => $id_msg,
 			'strictly' => $next ? '>' : '<'
-		)
+		]
 	);
 	list ($msg) = $result->fetch_row();
 	$result->free_result();
@@ -464,7 +463,7 @@ function nextMessage($id_msg, $id_topic)
  *
  * @param int $start the offset of the message/s
  * @param int $id_topic the id of the topic
- * @param mixed[] $params an (optional) array of params, includes:
+ * @param array $params an (optional) array of params, includes:
  *      - 'not_in' => array - of messages to exclude
  *      - 'include' => array - of messages to explicitly include
  *      - 'only_approved' => true/false - include or exclude the unapproved messages
@@ -473,29 +472,29 @@ function nextMessage($id_msg, $id_topic)
  * @return array
  * @todo very similar to selectMessages in Topics.subs.php
  */
-function messageAt($start, $id_topic, $params = array())
+function messageAt($start, $id_topic, $params = [])
 {
 	$db = database();
 
 	$params = array_merge(
 	// Defaults
-		array(
+		[
 			'not_in' => false,
 			'include' => false,
 			'only_approved' => false,
 			'limit' => 1,
-		),
+		],
 		// Passed arguments
 		$params,
 		// Others
-		array(
+		[
 			'current_topic' => $id_topic,
 			'start' => $start,
 			'is_approved' => 1,
-		)
+		]
 	);
 
-	$msg = array();
+	$msg = [];
 	$db->fetchQuery('
 		SELECT 
 			id_msg
@@ -520,7 +519,7 @@ function messageAt($start, $id_topic, $params = array())
  * Finds an open report for a certain message if it exists and increase the
  * number of reports for that message, otherwise it creates one
  *
- * @param mixed[] $message array of several message details (id_msg, id_topic, etc.)
+ * @param array $message array of several message details (id_msg, id_topic, etc.)
  * @param string $poster_comment the comment made by the reporter
  *
  * @return bool
@@ -537,12 +536,12 @@ function recordReport($message, $poster_comment)
 			AND type = {string:type}
 			AND (closed = {int:not_closed} OR ignore_all = {int:ignored})
 		ORDER BY ignore_all DESC',
-		array(
+		[
 			'id_msg' => $message['id_msg'],
 			'type' => $message['type'] ?? 'msg',
 			'not_closed' => 0,
 			'ignored' => 1,
-		)
+		]
 	);
 	if ($request->num_rows() !== 0)
 	{
@@ -563,10 +562,10 @@ function recordReport($message, $poster_comment)
 			SET 
 				num_reports = num_reports + 1, time_updated = {int:current_time}
 			WHERE id_report = {int:id_report}',
-			array(
+			[
 				'current_time' => time(),
 				'id_report' => $id_report,
-			)
+			]
 		);
 	}
 	// Otherwise, we shall make one!
@@ -579,18 +578,18 @@ function recordReport($message, $poster_comment)
 
 		$db->insert('',
 			'{db_prefix}log_reported',
-			array(
+			[
 				'id_msg' => 'int', 'id_topic' => 'int', 'id_board' => 'int', 'id_member' => 'int', 'membername' => 'string',
 				'subject' => 'string', 'body' => 'string', 'time_started' => 'int', 'time_updated' => 'int',
 				'num_reports' => 'int', 'closed' => 'int',
 				'type' => 'string-5', 'time_message' => 'int'
-			),
-			array(
+			],
+			[
 				$message['id_msg'], $message['id_topic'], $message['id_board'], $message['id_poster'], $message['real_name'],
 				$message['subject'], $message['body'], time(), time(), 1, 0,
 				$message['type'], $message['time_message'] ?? 0
-			),
-			array('id_report')
+			],
+			['id_report']
 		);
 		$id_report = $db->insert_id('{db_prefix}log_reported');
 	}
@@ -600,15 +599,15 @@ function recordReport($message, $poster_comment)
 	{
 		$db->insert('',
 			'{db_prefix}log_reported_comments',
-			array(
+			[
 				'id_report' => 'int', 'id_member' => 'int', 'membername' => 'string', 'email_address' => 'string',
 				'member_ip' => 'string', 'comment' => 'string', 'time_sent' => 'int',
-			),
-			array(
+			],
+			[
 				$id_report, User::$info->id, User::$info->name, User::$info->email,
 				User::$info->ip, $poster_comment, time(),
-			),
-			array('id_comment')
+			],
+			['id_comment']
 		);
 	}
 
@@ -637,12 +636,12 @@ function countNewPosts($topic, $topicinfo, $timestamp)
 		WHERE poster_time < {int:timestamp}
 			AND id_topic = {int:current_topic}' . ($modSettings['postmod_active'] && $topicinfo['unapproved_posts'] && !allowedTo('approve_posts') ? '
 			AND (approved = {int:is_approved}' . (User::$info->is_guest ? '' : ' OR id_member = {int:current_member}') . ')' : ''),
-		array(
+		[
 			'current_topic' => $topic,
 			'current_member' => User::$info->id,
 			'is_approved' => 1,
 			'timestamp' => $timestamp,
-		)
+		]
 	);
 	list ($start) = $request->fetch_row();
 	$request->free_result();
@@ -655,12 +654,12 @@ function countNewPosts($topic, $topicinfo, $timestamp)
  *
  * @param string[] $msg_selects
  * @param string[] $msg_tables
- * @param mixed[] $msg_parameters
- * @param mixed[] $optional
+ * @param array $msg_parameters
+ * @param array $optional
  *
- * @return resource A request object
+ * @return mysqli_result A request object
  */
-function loadMessageRequest($msg_selects, $msg_tables, $msg_parameters, $optional = array())
+function loadMessageRequest($msg_selects, $msg_tables, $msg_parameters, $optional = [])
 {
 	$db = database();
 
@@ -686,16 +685,16 @@ function loadMessageRequest($msg_selects, $msg_tables, $msg_parameters, $optiona
  *
  * @param string[] $msg_selects
  * @param string[] $msg_tables
- * @param mixed[] $msg_parameters
- * @param mixed[] $optional
+ * @param array $msg_parameters
+ * @param array $optional
  * @return array
  */
-function loadMessageDetails($msg_selects, $msg_tables, $msg_parameters, $optional = array())
+function loadMessageDetails($msg_selects, $msg_tables, $msg_parameters, $optional = [])
 {
 	if (!is_array($msg_parameters['message_list']))
 	{
 		$single = true;
-		$msg_parameters['message_list'] = array($msg_parameters['message_list']);
+		$msg_parameters['message_list'] = [$msg_parameters['message_list']];
 	}
 	else
 	{
@@ -704,7 +703,7 @@ function loadMessageDetails($msg_selects, $msg_tables, $msg_parameters, $optiona
 
 	$request = loadMessageRequest($msg_selects, $msg_tables, $msg_parameters, $optional);
 
-	$return = array();
+	$return = [];
 	while (($row = $request->fetch_assoc()))
 	{
 		$return[] = $row;
@@ -715,10 +714,8 @@ function loadMessageDetails($msg_selects, $msg_tables, $msg_parameters, $optiona
 	{
 		return $return[0];
 	}
-	else
-	{
-		return $return;
-	}
+
+	return $return;
 }
 
 /**
@@ -734,7 +731,7 @@ function determineRemovableMessages($topic, $messages, $allowed_all)
 	$db = database();
 
 	// Allowed to remove which messages?
-	$messages_list = array();
+	$messages_list = [];
 	$db->fetchQuery('
 		SELECT 
 			id_msg, subject, id_member, poster_time
@@ -743,11 +740,11 @@ function determineRemovableMessages($topic, $messages, $allowed_all)
 			AND id_topic = {int:current_topic}' . (!$allowed_all ? '
 			AND id_member = {int:current_member}' : '') . '
 		LIMIT ' . count($messages),
-		array(
+		[
 			'current_member' => User::$info->id,
 			'current_topic' => $topic,
 			'message_list' => $messages,
-		)
+		]
 	)->fetch_callback(
 		function ($row) use (&$messages_list, $allowed_all) {
 			global $modSettings;
@@ -757,7 +754,7 @@ function determineRemovableMessages($topic, $messages, $allowed_all)
 				return;
 			}
 
-			$messages_list[$row['id_msg']] = array($row['subject'], $row['id_member']);
+			$messages_list[$row['id_msg']] = [$row['subject'], $row['id_member']];
 		}
 	);
 
@@ -773,22 +770,22 @@ function determineRemovableMessages($topic, $messages, $allowed_all)
  *
  * @return array
  */
-function countSplitMessages($topic, $include_unapproved, $selection = array())
+function countSplitMessages($topic, $include_unapproved, $selection = [])
 {
 	$db = database();
 
-	$return = array('not_selected' => 0, 'selected' => 0);
+	$return = ['not_selected' => 0, 'selected' => 0];
 	$db->fetchQuery('
 		SELECT ' . (empty($selection) ? '0' : 'm.id_msg IN ({array_int:split_msgs})') . ' AS is_selected, COUNT(*) AS num_messages
 		FROM {db_prefix}messages AS m
 		WHERE m.id_topic = {int:current_topic}' . ($include_unapproved ? '' : '
 			AND approved = {int:is_approved}') . (empty($selection) ? '' : '
 		GROUP BY is_selected'),
-		array(
+		[
 			'current_topic' => $topic,
 			'split_msgs' => $selection,
 			'is_approved' => 1,
-		)
+		]
 	)->fetch_callback(
 		function ($row) use (&$return) {
 			$return[empty($row['is_selected']) || $row['is_selected'] == 'f' ? 'not_selected' : 'selected'] = $row['num_messages'];
@@ -817,9 +814,9 @@ function mailFromMessage($id_msg)
 		FROM {db_prefix}messages AS m
 			LEFT JOIN {db_prefix}members AS mem ON (mem.id_member = m.id_member)
 		WHERE m.id_msg = {int:id_msg}',
-		array(
+		[
 			'id_msg' => $id_msg,
-		)
+		]
 	);
 	$row = $request->fetch_assoc();
 	$request->free_result();
@@ -843,7 +840,7 @@ function updateMessageStats($increment = null, $max_msg_id = null)
 
 	if ($increment === true && $max_msg_id !== null)
 	{
-		updateSettings(array('totalMessages' => true, 'maxMsgID' => $max_msg_id), true);
+		updateSettings(['totalMessages' => true, 'maxMsgID' => $max_msg_id], true);
 	}
 	else
 	{
@@ -854,18 +851,18 @@ function updateMessageStats($increment = null, $max_msg_id = null)
 			FROM {db_prefix}boards
 			WHERE redirect = {string:blank_redirect}' . (!empty($modSettings['recycle_enable']) && $modSettings['recycle_board'] > 0 ? '
 				AND id_board != {int:recycle_board}' : ''),
-			array(
+			[
 				'recycle_board' => $modSettings['recycle_board'] ?? 0,
 				'blank_redirect' => '',
-			)
+			]
 		);
 		$row = $request->fetch_assoc();
 		$request->free_result();
 
-		updateSettings(array(
+		updateSettings([
 			'totalMessages' => $row['total_messages'] ?? 0,
 			'maxMsgID' => $row['max_msg_id'] ?? 0
-		));
+		]);
 	}
 }
 
@@ -885,9 +882,9 @@ function updateSubjectStats($id_topic, $subject = null)
 	$db->query('', '
 		DELETE FROM {db_prefix}log_search_subjects
 		WHERE id_topic = {int:id_topic}',
-		array(
+		[
 			'id_topic' => (int) $id_topic,
-		)
+		]
 	);
 
 	// Insert the new subject.
@@ -896,19 +893,19 @@ function updateSubjectStats($id_topic, $subject = null)
 		$id_topic = (int) $id_topic;
 		$subject_words = text2words($subject);
 
-		$inserts = array();
+		$inserts = [];
 		foreach ($subject_words as $word)
 		{
-			$inserts[] = array($word, $id_topic);
+			$inserts[] = [$word, $id_topic];
 		}
 
 		if (!empty($inserts))
 		{
 			$db->insert('ignore',
 				'{db_prefix}log_search_subjects',
-				array('word' => 'string', 'id_topic' => 'int'),
+				['word' => 'string', 'id_topic' => 'int'],
 				$inserts,
-				array('word', 'id_topic')
+				['word', 'id_topic']
 			);
 		}
 	}

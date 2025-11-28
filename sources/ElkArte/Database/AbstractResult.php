@@ -32,7 +32,6 @@ abstract class AbstractResult
 	 *
 	 * @param $result Object
 	 * @param null $details
-	 * @param resource $result
 	 */
 	public function __construct(protected $result, $details = null)
 	{
@@ -81,7 +80,7 @@ abstract class AbstractResult
 	 *
 	 * @param array $details
 	 */
-	public function updateDetails($details)
+	public function updateDetails($details): void
 	{
 		foreach ($details as $key => $val)
 		{
@@ -92,7 +91,7 @@ abstract class AbstractResult
 	/**
 	 * Allows to check if the results obtained are valid.
 	 */
-	public function hasResults()
+	public function hasResults(): bool
 	{
 		return !empty($this->result);
 	}
@@ -151,12 +150,12 @@ abstract class AbstractResult
 	 * by the query from the database.
 	 *
 	 * @param callable|null|object|string $callback
-	 * @param array|null
+	 * @param array|null $seeds
 	 * @return array
 	 */
 	public function fetch_callback($callback, $seeds = null)
 	{
-		$results = $seeds !== null ? (array) $seeds : array();
+		$results = $seeds !== null ? (array) $seeds : [];
 
 		if (!is_bool($this->result))
 		{

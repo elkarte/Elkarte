@@ -105,18 +105,18 @@ class Recent extends AbstractController implements FrontpageInterface
 		require_once(SUBSDIR . '/Boards.subs.php');
 
 		// There might be - and are - different permissions between any and own.
-		$this->_permissions = array(
-			'own' => array(
+		$this->_permissions = [
+			'own' => [
 				'post_reply_own' => 'can_reply',
 				'delete_own' => 'can_delete',
-			),
-			'any' => array(
+			],
+			'any' => [
 				'post_reply_any' => 'can_reply',
 				'mark_any_notify' => 'can_mark_notify',
 				'delete_any' => 'can_delete',
 				'like_posts' => 'can_like'
-			)
-		);
+			]
+		];
 	}
 
 	/**
@@ -135,7 +135,7 @@ class Recent extends AbstractController implements FrontpageInterface
 	 *
 	 * Accessed by action=recent.
 	 */
-	public function action_recent()
+	public function action_recent(): void
 	{
 		global $txt, $context, $modSettings, $board;
 
@@ -189,7 +189,7 @@ class Recent extends AbstractController implements FrontpageInterface
 		// Nothing here... Or at least, nothing you can see...
 		if (!$this->_grabber->findRecentMessages($this->_start, $this->_num_per_page))
 		{
-			$context['posts'] = array();
+			$context['posts'] = [];
 		}
 		else
 		{
@@ -226,7 +226,7 @@ class Recent extends AbstractController implements FrontpageInterface
 	/**
 	 * Set up for getting recent posts on a category basis
 	 */
-	private function _recentPostsCategory()
+	private function _recentPostsCategory(): array
 	{
 		global $modSettings, $context;
 
@@ -249,7 +249,7 @@ class Recent extends AbstractController implements FrontpageInterface
 		}
 
 		// Find the number of posts in these category's, exclude the recycle board.
-		$boards_posts = boardsPosts(array(), $categories, false, false);
+		$boards_posts = boardsPosts([], $categories, false, false);
 		$this->_total_posts = (int) array_sum($boards_posts);
 		$boards = array_keys($boards_posts);
 
@@ -264,7 +264,7 @@ class Recent extends AbstractController implements FrontpageInterface
 		// If this category has a significant number of posts in it...
 		if ($this->_total_posts > 100 && $this->_total_posts > $modSettings['totalMessages'] / 15)
 		{
-			$this->_maxMsgID = array(400, 7);
+			$this->_maxMsgID = [400, 7];
 		}
 
 		$this->_base_url = '{scripturl}?action=recent;c=' . implode(',', $categories);
@@ -275,14 +275,14 @@ class Recent extends AbstractController implements FrontpageInterface
 	/**
 	 * Setup for finding recent posts based on a list of boards
 	 */
-	private function _recentPostsBoards()
+	private function _recentPostsBoards(): void
 	{
 		global $modSettings;
 
 		$this->_req->query->boards = array_map('intval', explode(',', $this->_req->query->boards));
 
 		// Fetch the number of posts for the supplied board IDs
-		$boards_posts = boardsPosts($this->_req->query->boards, array());
+		$boards_posts = boardsPosts($this->_req->query->boards, []);
 		$this->_total_posts = (int) array_sum($boards_posts);
 		$boards = array_keys($boards_posts);
 
@@ -298,7 +298,7 @@ class Recent extends AbstractController implements FrontpageInterface
 		// If these boards have a significant number of posts in them...
 		if ($this->_total_posts > 100 && $this->_total_posts > $modSettings['totalMessages'] / 12)
 		{
-			$this->_maxMsgID = array(500, 9);
+			$this->_maxMsgID = [500, 9];
 		}
 
 		$this->_base_url = '{scripturl}?action=recent;boards=' . implode(',', $this->_req->query->boards);
@@ -307,11 +307,11 @@ class Recent extends AbstractController implements FrontpageInterface
 	/**
 	 * Setup for finding recent posts for a single board
 	 */
-	private function _recentPostsBoard()
+	private function _recentPostsBoard(): void
 	{
 		global $modSettings, $board;
 
-		$board_data = fetchBoardsInfo(array('boards' => $board), array('selects' => 'posts'));
+		$board_data = fetchBoardsInfo(['boards' => $board], ['selects' => 'posts']);
 		$this->_total_posts = $board_data[(int) $board]['num_posts'];
 
 		$this->_grabber->setBoards($board);
@@ -319,7 +319,7 @@ class Recent extends AbstractController implements FrontpageInterface
 		// If this board has a significant number of posts in it...
 		if ($this->_total_posts > 80 && $this->_total_posts > $modSettings['totalMessages'] / $this->_num_per_page)
 		{
-			$this->_maxMsgID = array(600, 10);
+			$this->_maxMsgID = [600, 10];
 		}
 
 		$this->_base_url = '{scripturl}?action=recent;board=' . $board . '.%1$d';
@@ -329,7 +329,7 @@ class Recent extends AbstractController implements FrontpageInterface
 	/**
 	 * Setup to find all the recent posts across all boards and categories
 	 */
-	private function _recentPostsAll()
+	private function _recentPostsAll(): void
 	{
 		global $modSettings;
 
@@ -349,11 +349,11 @@ class Recent extends AbstractController implements FrontpageInterface
 	 * @return array|int[]
 	 * @throws \Exception
 	 */
-	private function _getLikes($messages)
+	private function _getLikes($messages): array
 	{
 		global $modSettings;
 
-		$likes = array();
+		$likes = [];
 
 		// Load in the likes for this group of messages
 		if (!empty($modSettings['likes_enabled']))
@@ -378,7 +378,7 @@ class Recent extends AbstractController implements FrontpageInterface
 	 * @param array $tests array holding true false values for various test keys, like can_quote;
 	 * @return array
 	 */
-	private function _addButtons($post, $tests)
+	private function _addButtons($post, $tests): array
 	{
 		global $txt;
 
@@ -451,7 +451,7 @@ class Recent extends AbstractController implements FrontpageInterface
 	 *
 	 * @see Action_Controller::action_index()
 	 */
-	public function action_recent_front()
+	public function action_recent_front(): void
 	{
 		global $modSettings;
 

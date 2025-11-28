@@ -121,7 +121,7 @@ class PersonalMessage extends AbstractController
 			applyRules();
 
 			require_once(SUBSDIR . '/Members.subs.php');
-			updateMemberData($this->user->id, array('new_pm' => 0));
+			updateMemberData($this->user->id, ['new_pm' => 0]);
 
 			// Turn the new PM's status off, for the popup alert, since they have entered the PM area
 			toggleNewPM($this->user->id);
@@ -155,7 +155,7 @@ class PersonalMessage extends AbstractController
 	/**
 	 * Load a members message limit and prepares the limit bar
 	 */
-	private function _loadMessageLimit()
+	private function _loadMessageLimit(): void
 	{
 		global $context, $txt;
 
@@ -166,20 +166,20 @@ class PersonalMessage extends AbstractController
 		{
 			$bar = ($this->user->messages * 100) / $context['message_limit'];
 
-			$context['limit_bar'] = array(
+			$context['limit_bar'] = [
 				'messages' => $this->user->messages,
 				'allowed' => $context['message_limit'],
 				'percent' => $bar,
 				'bar' => min(100, (int) $bar),
 				'text' => sprintf($txt['pm_currently_using'], $this->user->messages, round($bar, 1)),
-			);
+			];
 		}
 	}
 
 	/**
 	 * Loads the user defined label's for use in the template etc.
 	 */
-	private function _loadLabels()
+	private function _loadLabels(): void
 	{
 		global $context, $txt;
 
@@ -225,22 +225,22 @@ class PersonalMessage extends AbstractController
 		global $context;
 
 		// Finally all the things we know how to do
-		$subActions = array(
-			'manlabels' => array($this, 'action_manlabels', 'permission' => 'pm_read'),
-			'manrules' => array($this, 'action_manrules', 'permission' => 'pm_read'),
-			'markunread' => array($this, 'action_markunread', 'permission' => 'pm_read'),
-			'pmactions' => array($this, 'action_pmactions', 'permission' => 'pm_read'),
-			'prune' => array($this, 'action_prune', 'permission' => 'pm_read'),
-			'removeall' => array($this, 'action_removeall', 'permission' => 'pm_read'),
-			'removeall2' => array($this, 'action_removeall2', 'permission' => 'pm_read'),
-			'report' => array($this, 'action_report', 'permission' => 'pm_read'),
-			'search' => array($this, 'action_search', 'permission' => 'pm_read'),
-			'search2' => array($this, 'action_search2', 'permission' => 'pm_read'),
-			'send' => array($this, 'action_send', 'permission' => 'pm_read'),
-			'send2' => array($this, 'action_send2', 'permission' => 'pm_read'),
-			'settings' => array($this, 'action_settings', 'permission' => 'pm_read'),
-			'inbox' => array($this, 'action_folder', 'permission' => 'pm_read'),
-		);
+		$subActions = [
+			'manlabels' => [$this, 'action_manlabels', 'permission' => 'pm_read'],
+			'manrules' => [$this, 'action_manrules', 'permission' => 'pm_read'],
+			'markunread' => [$this, 'action_markunread', 'permission' => 'pm_read'],
+			'pmactions' => [$this, 'action_pmactions', 'permission' => 'pm_read'],
+			'prune' => [$this, 'action_prune', 'permission' => 'pm_read'],
+			'removeall' => [$this, 'action_removeall', 'permission' => 'pm_read'],
+			'removeall2' => [$this, 'action_removeall2', 'permission' => 'pm_read'],
+			'report' => [$this, 'action_report', 'permission' => 'pm_read'],
+			'search' => [$this, 'action_search', 'permission' => 'pm_read'],
+			'search2' => [$this, 'action_search2', 'permission' => 'pm_read'],
+			'send' => [$this, 'action_send', 'permission' => 'pm_read'],
+			'send2' => [$this, 'action_send2', 'permission' => 'pm_read'],
+			'settings' => [$this, 'action_settings', 'permission' => 'pm_read'],
+			'inbox' => [$this, 'action_folder', 'permission' => 'pm_read'],
+		];
 
 		// Set up our action array
 		$action = new Action('pm_index');
@@ -267,72 +267,72 @@ class PersonalMessage extends AbstractController
 	 *
 	 * @param string $area
 	 */
-	private function _messageIndexBar($area)
+	private function _messageIndexBar($area): void
 	{
 		global $txt, $context;
 
 		require_once(SUBSDIR . '/Menu.subs.php');
 
-		$pm_areas = array(
-			'folders' => array(
+		$pm_areas = [
+			'folders' => [
 				'title' => $txt['pm_messages'],
 				'counter' => 'unread_messages',
-				'areas' => array(
-					'inbox' => array(
+				'areas' => [
+					'inbox' => [
 						'label' => $txt['inbox'],
 						'custom_url' => getUrl('action', ['action' => 'pm']),
 						'counter' => 'unread_messages',
-					),
-					'send' => array(
+					],
+					'send' => [
 						'label' => $txt['new_message'],
 						'custom_url' => getUrl('action', ['action' => 'pm', 'sa' => 'send']),
 						'permission' => 'pm_send',
-					),
-					'sent' => array(
+					],
+					'sent' => [
 						'label' => $txt['sent_items'],
 						'custom_url' => getUrl('action', ['action' => 'pm', 'f' => 'sent']),
-					),
-				),
-			),
-			'labels' => array(
+					],
+				],
+			],
+			'labels' => [
 				'title' => $txt['pm_labels'],
 				'counter' => 'labels_unread_total',
-				'areas' => array(),
-			),
-			'actions' => array(
+				'areas' => [],
+			],
+			'actions' => [
 				'title' => $txt['pm_actions'],
-				'areas' => array(
-					'search' => array(
+				'areas' => [
+					'search' => [
 						'label' => $txt['pm_search_bar_title'],
 						'custom_url' => getUrl('action', ['action' => 'pm', 'sa' => 'search']),
-					),
-					'prune' => array(
+					],
+					'prune' => [
 						'label' => $txt['pm_prune'],
 						'custom_url' => getUrl('action', ['action' => 'pm', 'sa' => 'prune']),
-					),
-				),
-			),
-			'pref' => array(
+					],
+				],
+			],
+			'pref' => [
 				'title' => $txt['pm_preferences'],
-				'areas' => array(
-					'manlabels' => array(
+				'areas' => [
+					'manlabels' => [
 						'label' => $txt['pm_manage_labels'],
 						'custom_url' => getUrl('action', ['action' => 'pm', 'sa' => 'manlabels']),
-					),
-					'manrules' => array(
+					],
+					'manrules' => [
 						'label' => $txt['pm_manage_rules'],
 						'custom_url' => getUrl('action', ['action' => 'pm', 'sa' => 'manrules']),
-					),
-					'settings' => array(
+					],
+					'settings' => [
 						'label' => $txt['pm_settings'],
 						'custom_url' => getUrl('action', ['action' => 'pm', 'sa' => 'settings']),
-					),
-				),
-			),
-		);
+					],
+				],
+			],
+		];
 
 		// Handle labels.
-		$label_counters = array('unread_messages' => $context['labels'][-1]['unread_messages']);
+		$label_counters = ['unread_messages' => $context['labels'][-1]['unread_messages']];
 		if (empty($context['currently_using_labels']))
 		{
 			unset($pm_areas['labels']);
@@ -352,12 +352,12 @@ class PersonalMessage extends AbstractController
 				$label_counters['labels_unread_total'] += $label['unread_messages'];
 
 				// Add the label to the menu.
-				$pm_areas['labels']['areas']['label' . $label['id']] = array(
+				$pm_areas['labels']['areas']['label' . $label['id']] = [
 					'label' => $label['name'],
 					'custom_url' => getUrl('action', ['action' => 'pm', 'l' => $label['id']]),
 					'counter' => 'label' . $label['id'],
 					'messages' => $label['messages'],
-				);
+				];
 
 				$label_counters['label' . $label['id']] = $label['unread_messages'];
 			}
@@ -368,22 +368,22 @@ class PersonalMessage extends AbstractController
 		{
 			$bar = round(($this->user->messages * 100) / $context['message_limit'], 1);
 
-			$context['limit_bar'] = array(
+			$context['limit_bar'] = [
 				'messages' => $this->user->messages,
 				'allowed' => $context['message_limit'],
 				'percent' => $bar,
 				'bar' => $bar > 100 ? 100 : (int) $bar,
 				'text' => sprintf($txt['pm_currently_using'], $this->user->messages, $bar)
-			);
+			];
 		}
 
 		// Set a few options for the menu.
-		$menuOptions = array(
+		$menuOptions = [
 			'current_area' => $area,
 			'hook' => 'pm',
 			'disable_url_session_check' => true,
 			'counters' => empty($label_counters) ? 0 : $label_counters,
-		);
+		];
 
 		// Actually create the menu!
 		$pm_include_data = createMenu($pm_areas, $menuOptions);
@@ -413,7 +413,7 @@ class PersonalMessage extends AbstractController
 	 * @uses subject_list, pm template layers
 	 * @uses folder sub template
 	 */
-	public function action_folder()
+	public function action_folder(): void
 	{
 		global $txt, $scripturl, $modSettings, $context, $subjects_request, $messages_request, $options;
 
@@ -443,7 +443,7 @@ class PersonalMessage extends AbstractController
 		// Set up some basic template stuff.
 		$context['from_or_to'] = $context['folder'] !== 'sent' ? 'from' : 'to';
 		$context['signature_enabled'] = strpos($modSettings['signature_settings'], '1') === 0;
-		$context['disabled_fields'] = isset($modSettings['disabled_profile_fields']) ? array_flip(explode(',', $modSettings['disabled_profile_fields'])) : array();
+		$context['disabled_fields'] = isset($modSettings['disabled_profile_fields']) ? array_flip(explode(',', $modSettings['disabled_profile_fields'])) : [];
 
 		// Set the template layers we need
 		$template_layers = theme()->getLayers();
@@ -493,10 +493,10 @@ class PersonalMessage extends AbstractController
 		// Build it further if we also have a label.
 		if ($context['current_label_id'] !== -1)
 		{
-			$context['breadcrumbs'][] = array(
+			$context['breadcrumbs'][] = [
 				'url' => getUrl('action', ['action' => 'pm', 'f' => $context['folder'], 'l' => $context['current_label_id']]),
 				'name' => $txt['pm_current_label'] . ': ' . $context['current_label']
-			);
+			];
 		}
 
 		// Figure out how many messages there are.
@@ -590,7 +590,7 @@ class PersonalMessage extends AbstractController
 				$context['current_pm'] = 0;
 			}
 
-			$display_pms = $context['display_mode'] === self::DISPLAY_ALL_AT_ONCE ? $pms : array($lastData['id']);
+			$display_pms = $context['display_mode'] === self::DISPLAY_ALL_AT_ONCE ? $pms : [$lastData['id']];
 
 			// At this point we know the main id_pm's. But if we are looking at conversations we need
 			// the PMs that make up the conversation
@@ -663,7 +663,7 @@ class PersonalMessage extends AbstractController
 		}
 
 		// Initialize the subject and message render callbacks
-		$bodyParser = new Normal(array(), false);
+		$bodyParser = new Normal([], false);
 		$opt = new ValuesContainer(['recipients' => $recipients]);
 		$renderer = new PmRenderer($messages_request, $this->user, $bodyParser, $opt);
 		$subject_renderer = new PmRenderer($subjects_request ?? $messages_request, $this->user, $bodyParser, $opt);
@@ -710,14 +710,14 @@ class PersonalMessage extends AbstractController
 		// Build the conversation button array.
 		if ($context['display_mode'] === self::DISPLAY_AS_CONVERSATION && !empty($context['current_pm']))
 		{
-			$context['conversation_buttons'] = array(
-				'delete' => array(
+			$context['conversation_buttons'] = [
+				'delete' => [
 					'text' => 'delete_conversation',
 					'lang' => true,
 					'url' => $scripturl . '?action=pm;sa=pmactions;pm_actions%5B' . $context['current_pm'] . '%5D=delete;conversation;f=' . $context['folder'] . ';start=' . $context['start'] . ($context['current_label_id'] !== -1 ? ';l=' . $context['current_label_id'] : '') . ';' . $context['session_var'] . '=' . $context['session_id'],
 					'custom' => 'onclick="return confirm(\'' . addslashes($txt['remove_message']) . '?\');"'
-				),
-			);
+				],
+			];
 
 			// Allow mods to add additional buttons here
 			call_integration_hook('integrate_conversation_buttons');
@@ -729,7 +729,7 @@ class PersonalMessage extends AbstractController
 	 *
 	 * @throws Exception pm_not_yours
 	 */
-	public function action_send()
+	public function action_send(): void
 	{
 		global $txt, $modSettings, $context;
 
@@ -749,7 +749,7 @@ class PersonalMessage extends AbstractController
 
 		// Check whether we've gone over the limit of messages we can send per hour.
 		if (!empty($modSettings['pm_posts_per_hour'])
-			&& !allowedTo(array('admin_forum', 'moderate_forum', 'send_mail'))
+			&& !allowedTo(['admin_forum', 'moderate_forum', 'send_mail'])
 			&& $this->user->mod_cache['bq'] === '0=1'
 			&& $this->user->mod_cache['gq'] === '0=1')
 		{
@@ -758,13 +758,13 @@ class PersonalMessage extends AbstractController
 
 			if (!empty($pmCount) && $pmCount >= $modSettings['pm_posts_per_hour'])
 			{
-				throw new Exception('pm_too_many_per_hour', true, array($modSettings['pm_posts_per_hour']));
+				throw new Exception('pm_too_many_per_hour', true, [$modSettings['pm_posts_per_hour']]);
 			}
 		}
 
 		try
 		{
-			$this->_events->trigger('before_set_context', array('pmsg' => $this->_req->query->pmsg ?? ($this->_req->query->quote ?? 0)));
+			$this->_events->trigger('before_set_context', ['pmsg' => $this->_req->query->pmsg ?? ($this->_req->query->quote ?? 0)]);
 		}
 		catch (PmErrorException $pmErrorException)
 		{
@@ -843,22 +843,22 @@ class PersonalMessage extends AbstractController
 			$row_quoted['body'] = $bbc_parser->parsePM($row_quoted['body']);
 
 			// Set up the quoted message array.
-			$context['quoted_message'] = array(
+			$context['quoted_message'] = [
 				'id' => $row_quoted['id_pm'],
 				'pm_head' => $row_quoted['pm_head'],
-				'member' => array(
+				'member' => [
 					'name' => $row_quoted['real_name'],
 					'username' => $row_quoted['member_name'],
 					'id' => $row_quoted['id_member'],
 					'href' => empty($row_quoted['id_member']) ? '' : getUrl('profile', ['action' => 'profile', 'u' => $row_quoted['id_member']]),
 					'link' => empty($row_quoted['id_member']) ? $row_quoted['real_name'] : '<a href="' . getUrl('profile', ['action' => 'profile', 'u' => $row_quoted['id_member']]) . '">' . $row_quoted['real_name'] . '</a>',
-				),
+				],
 				'subject' => $row_quoted['subject'],
 				'time' => standardTime($row_quoted['msgtime']),
 				'html_time' => htmlTime($row_quoted['msgtime']),
 				'timestamp' => forum_time(true, $row_quoted['msgtime']),
 				'body' => $row_quoted['body']
-			);
+			];
 		}
 		// A new message it is then
 		else
@@ -869,10 +869,10 @@ class PersonalMessage extends AbstractController
 		}
 
 		// Start of like we don't know where this is going
-		$context['recipients'] = array(
-			'to' => array(),
-			'bcc' => array(),
-		);
+		$context['recipients'] = [
+			'to' => [],
+			'bcc' => [],
+		];
 
 		// Sending by ID?  Replying to all?  Fetch the real_name(s).
 		if (isset($this->_req->query->u))
@@ -883,14 +883,14 @@ class PersonalMessage extends AbstractController
 				// Firstly, to reply to all we clearly already have $row_quoted - so have the original member from.
 				if ($row_quoted['id_member'] != $this->user->id)
 				{
-					$context['recipients']['to'][] = array(
+					$context['recipients']['to'][] = [
 						'id' => $row_quoted['id_member'],
 						'name' => htmlspecialchars($row_quoted['real_name'], ENT_COMPAT),
-					);
+					];
 				}
 
 				// Now to get all the others.
-				$context['recipients']['to'] = array_merge($context['recipients']['to'], isset($pmsg) ? loadPMRecipientsAll($pmsg) : array());
+				$context['recipients']['to'] = array_merge($context['recipients']['to'], isset($pmsg) ? loadPMRecipientsAll($pmsg) : []);
 			}
 			else
 			{
@@ -903,15 +903,15 @@ class PersonalMessage extends AbstractController
 
 				foreach ($result as $row)
 				{
-					$context['recipients']['to'][] = array(
+					$context['recipients']['to'][] = [
 						'id' => $row['id_member'],
 						'name' => $row['real_name'],
-					);
+					];
 				}
 			}
 
 			// Get a literal name list in case the user has JavaScript disabled.
-			$names = array();
+			$names = [];
 			foreach ($context['recipients']['to'] as $to)
 			{
 				$names[] = $to['name'];
@@ -926,7 +926,7 @@ class PersonalMessage extends AbstractController
 
 		// Set the defaults...
 		$context['subject'] = $form_subject;
-		$context['message'] = str_replace(array('"', '<', '>', '&nbsp;'), array('&quot;', '&lt;', '&gt;', ' '), $form_message);
+		$context['message'] = str_replace(['"', '<', '>', '&nbsp;'], ['&quot;', '&lt;', '&gt;', ' '], $form_message);
 
 		// And build the link tree.
 		$context['breadcrumbs'][] = [
@@ -938,21 +938,21 @@ class PersonalMessage extends AbstractController
 		require_once(SUBSDIR . '/Editor.subs.php');
 
 		// Now create the editor.
-		$editorOptions = array(
+		$editorOptions = [
 			'id' => 'message',
 			'value' => $context['message'],
 			'height' => '250px',
 			'width' => '100%',
-			'labels' => array(
+			'labels' => [
 				'post_button' => $txt['send_message'],
-			),
+			],
 			'smiley_container' => 'smileyBox_message',
 			'bbc_container' => 'bbcBox_message',
 			'preview_type' => 2,
-		);
+		];
 
 		// Trigger the prepare_send_context PM event
-		$this->_events->trigger('prepare_send_context', array('editorOptions' => &$editorOptions));
+		$this->_events->trigger('prepare_send_context', ['editorOptions' => &$editorOptions]);
 
 		create_control_richedit($editorOptions);
 
@@ -972,7 +972,7 @@ class PersonalMessage extends AbstractController
 	 *
 	 * @throws Exception pm_not_yours
 	 */
-	public function messagePostError($named_recipients, $recipient_ids = array(), $msg_options = null)
+	public function messagePostError($named_recipients, $recipient_ids = [], $msg_options = null): void
 	{
 		global $txt, $context, $modSettings;
 
@@ -990,10 +990,10 @@ class PersonalMessage extends AbstractController
 		$error_types = ErrorContext::context('pm', 1);
 
 		// Got some known members?
-		$context['recipients'] = array(
-			'to' => array(),
-			'bcc' => array(),
-		);
+		$context['recipients'] = [
+			'to' => [],
+			'bcc' => [],
+		];
 
 		if (!empty($recipient_ids['to']) || !empty($recipient_ids['bcc']))
 		{
@@ -1006,10 +1006,10 @@ class PersonalMessage extends AbstractController
 			foreach ($result as $row)
 			{
 				$recipientType = in_array($row['id_member'], $recipient_ids['bcc']) ? 'bcc' : 'to';
-				$context['recipients'][$recipientType][] = array(
+				$context['recipients'][$recipientType][] = [
 					'id' => $row['id_member'],
 					'name' => $row['real_name'],
-				);
+				];
 			}
 		}
 
@@ -1023,7 +1023,7 @@ class PersonalMessage extends AbstractController
 		else
 		{
 			$context['subject'] = isset($this->_req->post->subject) ? Util::htmlspecialchars($this->_req->post->subject) : '';
-			$context['message'] = isset($this->_req->post->message) ? str_replace(array('  '), array('&nbsp; '), Util::htmlspecialchars($this->_req->post->message, ENT_QUOTES, 'UTF-8', true)) : '';
+			$context['message'] = isset($this->_req->post->message) ? str_replace(['  '], ['&nbsp; '], Util::htmlspecialchars($this->_req->post->message, ENT_QUOTES, 'UTF-8', true)) : '';
 			$context['reply'] = !empty($this->_req->post->replied_to);
 		}
 
@@ -1048,22 +1048,22 @@ class PersonalMessage extends AbstractController
 				$row_quoted['body'] = censor($row_quoted['body']);
 				$bbc_parser = ParserWrapper::instance();
 
-				$context['quoted_message'] = array(
+				$context['quoted_message'] = [
 					'id' => $row_quoted['id_pm'],
 					'pm_head' => $row_quoted['pm_head'],
-					'member' => array(
+					'member' => [
 						'name' => $row_quoted['real_name'],
 						'username' => $row_quoted['member_name'],
 						'id' => $row_quoted['id_member'],
 						'href' => empty($row_quoted['id_member']) ? '' : getUrl('profile', ['action' => 'profile', 'u' => $row_quoted['id_member']]),
 						'link' => empty($row_quoted['id_member']) ? $row_quoted['real_name'] : '<a href="' . getUrl('profile', ['action' => 'profile', 'u' => $row_quoted['id_member']]) . '">' . $row_quoted['real_name'] . '</a>',
-					),
+					],
 					'subject' => $row_quoted['subject'],
 					'time' => standardTime($row_quoted['msgtime']),
 					'html_time' => htmlTime($row_quoted['msgtime']),
 					'timestamp' => forum_time(true, $row_quoted['msgtime']),
 					'body' => $bbc_parser->parsePM($row_quoted['body']),
-				);
+				];
 			}
 		}
 
@@ -1074,31 +1074,31 @@ class PersonalMessage extends AbstractController
 		];
 
 		// Set each of the errors for the template.
-		$context['post_error'] = array(
+		$context['post_error'] = [
 			'errors' => $error_types->prepareErrors(),
 			'type' => $error_types->getErrorType() == 0 ? 'minor' : 'serious',
 			'title' => $txt['error_while_submitting'],
-		);
+		];
 
 		// We need to load the editor once more.
 		require_once(SUBSDIR . '/Editor.subs.php');
 
 		// Create it...
-		$editorOptions = array(
+		$editorOptions = [
 			'id' => 'message',
 			'value' => $context['message'],
 			'width' => '100%',
 			'height' => '250px',
-			'labels' => array(
+			'labels' => [
 				'post_button' => $txt['send_message'],
-			),
+			],
 			'smiley_container' => 'smileyBox_message',
 			'bbc_container' => 'bbcBox_message',
 			'preview_type' => 2,
-		);
+		];
 
 		// Trigger the prepare_send_context PM event
-		$this->_events->trigger('prepare_send_context', array('editorOptions' => &$editorOptions));
+		$this->_events->trigger('prepare_send_context', ['editorOptions' => &$editorOptions]);
 
 		create_control_richedit($editorOptions);
 
@@ -1106,9 +1106,9 @@ class PersonalMessage extends AbstractController
 		$context['require_verification'] = $this->user->is_admin === false && !empty($modSettings['pm_posts_verification']) && $this->user->posts < $modSettings['pm_posts_verification'];
 		if ($context['require_verification'] && $this->getApi() === false)
 		{
-			$verificationOptions = array(
+			$verificationOptions = [
 				'id' => 'pm',
-			);
+			];
 			$context['require_verification'] = VerificationControlsIntegrate::create($verificationOptions);
 			$context['visual_verification_id'] = $verificationOptions['id'];
 		}
@@ -1126,7 +1126,7 @@ class PersonalMessage extends AbstractController
 	/**
 	 * Send a personal message.
 	 */
-	public function action_send2()
+	public function action_send2(): bool
 	{
 		global $txt, $context, $modSettings;
 
@@ -1144,7 +1144,7 @@ class PersonalMessage extends AbstractController
 
 		// Check whether we've gone over the limit of messages we can send per hour - fatal error if fails!
 		if (!empty($modSettings['pm_posts_per_hour'])
-			&& !allowedTo(array('admin_forum', 'moderate_forum', 'send_mail'))
+			&& !allowedTo(['admin_forum', 'moderate_forum', 'send_mail'])
 			&& $this->user->mod_cache['bq'] === '0=1'
 			&& $this->user->mod_cache['gq'] === '0=1')
 		{
@@ -1155,7 +1155,7 @@ class PersonalMessage extends AbstractController
 			{
 				if ($this->getApi() === false)
 				{
-					throw new Exception('pm_too_many_per_hour', true, array($modSettings['pm_posts_per_hour']));
+					throw new Exception('pm_too_many_per_hour', true, [$modSettings['pm_posts_per_hour']]);
 				}
 
 				$post_errors->addError('pm_too_many_per_hour');
@@ -1168,7 +1168,7 @@ class PersonalMessage extends AbstractController
 			$post_errors->addError('session_timeout');
 		}
 
-		$this->_req->post->subject = isset($this->_req->post->subject) ? strtr(Util::htmltrim($this->_req->post->subject), array("\r" => '', "\n" => '', "\t" => '')) : '';
+		$this->_req->post->subject = isset($this->_req->post->subject) ? strtr(Util::htmltrim($this->_req->post->subject), ["\r" => '', "\n" => '', "\t" => '']) : '';
 		$this->_req->post->to = $this->_req->getPost('to', 'trim', empty($this->_req->query->to) ? '' : $this->_req->query->to);
 		$this->_req->post->bcc = $this->_req->getPost('bcc', 'trim', empty($this->_req->query->bcc) ? '' : $this->_req->query->bcc);
 
@@ -1198,7 +1198,7 @@ class PersonalMessage extends AbstractController
 			if (!empty($this->_req->post->{$recipientType}))
 			{
 				// We're going to take out the "s anyway ;).
-				$recipientString = strtr($this->_req->post->{$recipientType}, array('\\"' => '"'));
+				$recipientString = strtr($this->_req->post->{$recipientType}, ['\\"' => '"']);
 
 				preg_match_all('~"([^"]+)"~', $recipientString, $matches);
 				$namedRecipientList[$recipientType] = array_unique(array_merge($matches[1], explode(',', preg_replace('~"[^"]+"~', '', $recipientString))));
@@ -1227,11 +1227,11 @@ class PersonalMessage extends AbstractController
 					// Make sure we only have each member listed once, in case they did not use the select list
 					foreach ($foundMembers as $member)
 					{
-						$testNames = array(
+						$testNames = [
 							Util::strtolower($member['username']),
 							Util::strtolower($member['name']),
 							Util::strtolower($member['email']),
-						);
+						];
 
 						if (array_intersect($testNames, $namedRecipientList[$recipientType]) !== [])
 						{
@@ -1247,7 +1247,7 @@ class PersonalMessage extends AbstractController
 			// Selected a recipient to be deleted? Remove them now.
 			if (!empty($this->_req->post->delete_recipient))
 			{
-				$recipientList[$recipientType] = array_diff($recipientList[$recipientType], array((int) $this->_req->post->delete_recipient));
+				$recipientList[$recipientType] = array_diff($recipientList[$recipientType], [(int) $this->_req->post->delete_recipient]);
 			}
 
 			// Make sure we don't include the same name twice
@@ -1366,7 +1366,7 @@ class PersonalMessage extends AbstractController
 		// Adding a recipient cause javascript ain't working?
 		try
 		{
-			$this->_events->trigger('before_sending', array('namedRecipientList' => $namedRecipientList, 'recipientList' => $recipientList, 'namesNotFound' => $namesNotFound, 'post_errors' => $post_errors));
+			$this->_events->trigger('before_sending', ['namedRecipientList' => $namedRecipientList, 'recipientList' => $recipientList, 'namesNotFound' => $namesNotFound, 'post_errors' => $post_errors]);
 		}
 		catch (ControllerRedirectException)
 		{
@@ -1384,12 +1384,12 @@ class PersonalMessage extends AbstractController
 		}
 
 		// Before we send the PM, let's make sure we don't have an abuse of numbers.
-		if (!empty($modSettings['max_pm_recipients']) && count($recipientList['to']) + count($recipientList['bcc']) > $modSettings['max_pm_recipients'] && !allowedTo(array('moderate_forum', 'send_mail', 'admin_forum')))
+		if (!empty($modSettings['max_pm_recipients']) && count($recipientList['to']) + count($recipientList['bcc']) > $modSettings['max_pm_recipients'] && !allowedTo(['moderate_forum', 'send_mail', 'admin_forum']))
 		{
-			$context['send_log'] = array(
-				'sent' => array(),
-				'failed' => array(sprintf($txt['pm_too_many_recipients'], $modSettings['max_pm_recipients'])),
-			);
+			$context['send_log'] = [
+				'sent' => [],
+				'failed' => [sprintf($txt['pm_too_many_recipients'], $modSettings['max_pm_recipients'])],
+			];
 
 			$this->messagePostError($namedRecipientList, $recipientList);
 
@@ -1409,10 +1409,10 @@ class PersonalMessage extends AbstractController
 		}
 		else
 		{
-			$context['send_log'] = array(
-				'sent' => array(),
-				'failed' => array()
-			);
+			$context['send_log'] = [
+				'sent' => [],
+				'failed' => []
+			];
 		}
 
 		// Mark the message as "replied to".
@@ -1425,15 +1425,15 @@ class PersonalMessage extends AbstractController
 		}
 
 		$failed = !empty($context['send_log']['failed']);
-		$this->_events->trigger('message_sent', array('failed' => $failed));
+		$this->_events->trigger('message_sent', ['failed' => $failed]);
 
 		// If one or more of the recipients were invalid, go back to the post screen with the failed usernames.
 		if ($failed)
 		{
-			$this->messagePostError($namesNotFound, array(
+			$this->messagePostError($namesNotFound, [
 				'to' => array_intersect($recipientList['to'], $context['send_log']['failed']),
 				'bcc' => array_intersect($recipientList['bcc'], $context['send_log']['failed'])
-			));
+			]);
 
 			return false;
 		}
@@ -1451,7 +1451,7 @@ class PersonalMessage extends AbstractController
 	 * This function performs all additional actions including the deleting
 	 * and labeling of PM's
 	 */
-	public function action_pmactions()
+	public function action_pmactions(): void
 	{
 		global $context;
 
@@ -1469,7 +1469,7 @@ class PersonalMessage extends AbstractController
 			&& !empty($this->_req->post->pms)
 			&& is_array($this->_req->post->pms))
 		{
-			$pm_actions = array();
+			$pm_actions = [];
 			foreach ($this->_req->post->pms as $pm)
 			{
 				$pm_actions[(int) $pm] = $pm_action;
@@ -1500,9 +1500,9 @@ class PersonalMessage extends AbstractController
 		}
 
 		// Get to doing what we've been told
-		$to_delete = array();
-		$to_label = array();
-		$label_type = array();
+		$to_delete = [];
+		$to_label = [];
+		$label_type = [];
 		foreach ($pm_actions as $pm => $action)
 		{
 			// What are we doing with the selected messages, adding a label, removing, other?
@@ -1544,7 +1544,7 @@ class PersonalMessage extends AbstractController
 			// Any errors?
 			if (!empty($updateErrors))
 			{
-				throw new Exception('labels_too_many', true, array($updateErrors));
+				throw new Exception('labels_too_many', true, [$updateErrors]);
 			}
 		}
 
@@ -1556,7 +1556,7 @@ class PersonalMessage extends AbstractController
 	/**
 	 * Are you sure you want to PERMANENTLY (mostly) delete ALL your messages?
 	 */
-	public function action_removeall()
+	public function action_removeall(): void
 	{
 		global $txt, $context;
 
@@ -1572,7 +1572,7 @@ class PersonalMessage extends AbstractController
 	/**
 	 * Delete ALL the messages!
 	 */
-	public function action_removeall2()
+	public function action_removeall2(): void
 	{
 		global $context;
 
@@ -1596,7 +1596,7 @@ class PersonalMessage extends AbstractController
 	/**
 	 * This function allows the user to prune (delete) all messages older than a supplied duration.
 	 */
-	public function action_prune()
+	public function action_prune(): void
 	{
 		global $txt, $context;
 
@@ -1619,10 +1619,10 @@ class PersonalMessage extends AbstractController
 		}
 
 		// Build the link tree elements.
-		$context['breadcrumbs'][] = array(
+		$context['breadcrumbs'][] = [
 			'url' => getUrl('action', ['action' => 'pm', 'sa' => 'prune']),
 			'name' => $txt['pm_prune']
-		);
+		];
 		$context['sub_template'] = 'prune';
 		$context['page_title'] = $txt['pm_prune'];
 	}
@@ -1630,24 +1630,24 @@ class PersonalMessage extends AbstractController
 	/**
 	 * This function handles adding, deleting and editing labels on messages.
 	 */
-	public function action_manlabels()
+	public function action_manlabels(): void
 	{
 		global $txt, $context;
 
 		require_once(SUBSDIR . '/PersonalMessage.subs.php');
 
 		// Build the link tree elements...
-		$context['breadcrumbs'][] = array(
+		$context['breadcrumbs'][] = [
 			'url' => getUrl('action', ['action' => 'pm', 'sa' => 'manlabels']),
 			'name' => $txt['pm_manage_labels']
-		);
+		];
 
 		// Some things for the template
 		$context['page_title'] = $txt['pm_manage_labels'];
 		$context['sub_template'] = 'labels';
 
 		// Add all existing labels to the array to save, slashing them as necessary...
-		$the_labels = array();
+		$the_labels = [];
 		foreach ($context['labels'] as $label)
 		{
 			if ($label['id'] !== -1)
@@ -1662,9 +1662,9 @@ class PersonalMessage extends AbstractController
 			checkSession();
 
 			// This will be for updating messages.
-			$message_changes = array();
-			$new_labels = array();
-			$rule_changes = array();
+			$message_changes = [];
+			$new_labels = [];
+			$rule_changes = [];
 
 			// Will most likely need this.
 			loadRules();
@@ -1672,7 +1672,7 @@ class PersonalMessage extends AbstractController
 			// Adding a new label?
 			if (isset($this->_req->post->add))
 			{
-				$this->_req->post->label = strtr(Util::htmlspecialchars(trim($this->_req->post->label)), array(',' => '&#044;'));
+				$this->_req->post->label = strtr(Util::htmlspecialchars(trim($this->_req->post->label)), [',' => '&#044;']);
 
 				if (Util::strlen($this->_req->post->label) > 30)
 				{
@@ -1715,7 +1715,7 @@ class PersonalMessage extends AbstractController
 					if (isset($this->_req->post->label_name[$id]))
 					{
 						// Prepare the label name
-						$this->_req->post->label_name[$id] = trim(strtr(Util::htmlspecialchars($this->_req->post->label_name[$id]), array(',' => '&#044;')));
+						$this->_req->post->label_name[$id] = trim(strtr(Util::htmlspecialchars($this->_req->post->label_name[$id]), [',' => '&#044;']));
 
 						// Has to fit in the database as well
 						if (Util::strlen($this->_req->post->label_name[$id]) > 30)
@@ -1743,7 +1743,7 @@ class PersonalMessage extends AbstractController
 
 			// Save the label status.
 			require_once(SUBSDIR . '/Members.subs.php');
-			updateMemberData($this->user->id, array('message_labels' => implode(',', $the_labels)));
+			updateMemberData($this->user->id, ['message_labels' => implode(',', $the_labels)]);
 
 			// Update all the messages currently with any label changes in them!
 			if (!empty($message_changes))
@@ -1823,7 +1823,7 @@ class PersonalMessage extends AbstractController
 	 * @uses Profile template.
 	 * @uses Profile language file.
 	 */
-	public function action_settings()
+	public function action_settings(): void
 	{
 		global $txt, $context, $profile_vars, $cur_profile;
 
@@ -1898,7 +1898,7 @@ class PersonalMessage extends AbstractController
 	 *
 	 * @uses report_message sub-template.
 	 */
-	public function action_report()
+	public function action_report(): void
 	{
 		global $txt, $context, $language, $modSettings;
 
@@ -1925,7 +1925,7 @@ class PersonalMessage extends AbstractController
 		// If we're here, just send the user to the template, with a few useful context bits.
 		if (isset($this->_req->post->report))
 		{
-			$poster_comment = strtr(Util::htmlspecialchars($this->_req->post->reason), array("\r" => '', "\t" => ''));
+			$poster_comment = strtr(Util::htmlspecialchars($this->_req->post->reason), ["\r" => '', "\t" => '']);
 
 			if (Util::strlen($poster_comment) > 254)
 			{
@@ -1940,7 +1940,7 @@ class PersonalMessage extends AbstractController
 
 			require_once(SUBSDIR . '/Messages.subs.php');
 
-			recordReport(array(
+			recordReport([
 				'id_msg' => $pmsg,
 				'id_topic' => 0,
 				'id_board' => 0,
@@ -1951,12 +1951,12 @@ class PersonalMessage extends AbstractController
 				'subject' => $subject,
 				'body' => $body,
 				'time_message' => $time_message,
-			), $poster_comment);
+			], $poster_comment);
 
 			// Remove the line breaks...
 			$body = preg_replace('~<br ?/?>~i', "\n", $body);
 
-			$recipients = array();
+			$recipients = [];
 			$temp = loadPMRecipientsAll($context['pm_id'], true);
 			foreach ($temp as $recipient)
 			{
@@ -1975,7 +1975,7 @@ class PersonalMessage extends AbstractController
 			$memberFromName = un_htmlspecialchars($memberFromName);
 
 			// Prepare the message storage array.
-			$messagesToSend = array();
+			$messagesToSend = [];
 
 			// Loop through each admin, and add them to the right language pile...
 			foreach ($admins as $id_admin => $admin_info)
@@ -1990,7 +1990,7 @@ class PersonalMessage extends AbstractController
 					$lang->load('PersonalMessage', false);
 
 					// Make the body.
-					$report_body = str_replace(array('{REPORTER}', '{SENDER}'), array(un_htmlspecialchars($this->user->name), $memberFromName), $mtxt['pm_report_pm_user_sent']);
+					$report_body = str_replace(['{REPORTER}', '{SENDER}'], [un_htmlspecialchars($this->user->name), $memberFromName], $mtxt['pm_report_pm_user_sent']);
 					$report_body .= "\n" . '[b]' . $this->_req->post->reason . '[/b]' . "\n\n";
 					if (!empty($recipients))
 					{
@@ -2000,14 +2000,14 @@ class PersonalMessage extends AbstractController
 					$report_body .= $mtxt['pm_report_pm_unedited_below'] . "\n" . '[quote author=' . (empty($memberFromID) ? '&quot;' . $memberFromName . '&quot;' : $memberFromName . ' link=action=profile;u=' . $memberFromID . ' date=' . $time) . ']' . "\n" . un_htmlspecialchars($body) . '[/quote]';
 
 					// Plonk it in the array ;)
-					$messagesToSend[$cur_language] = array(
+					$messagesToSend[$cur_language] = [
 						'subject' => (Util::strpos($subject, $mtxt['pm_report_pm_subject']) === false ? $mtxt['pm_report_pm_subject'] : '') . un_htmlspecialchars($subject),
 						'body' => $report_body,
-						'recipients' => array(
-							'to' => array(),
-							'bcc' => array()
-						),
-					);
+						'recipients' => [
+							'to' => [],
+							'bcc' => []
+						],
+					];
 				}
 
 				// Add them to the list.
@@ -2036,7 +2036,7 @@ class PersonalMessage extends AbstractController
 	 *
 	 * @uses sub template rules
 	 */
-	public function action_manrules()
+	public function action_manrules(): void
 	{
 		global $txt, $context;
 
@@ -2105,7 +2105,7 @@ class PersonalMessage extends AbstractController
 			);
 
 			// Oh my, we have a lot of text strings for this
-			theme()->addJavascriptVar(array(
+			theme()->addJavascriptVar([
 				'groups' => $js_groups,
 				'labels' => $js_labels,
 				'rules' => $js_rules,
@@ -2128,13 +2128,13 @@ class PersonalMessage extends AbstractController
 				'txt_pm_rule_label' => $txt['pm_rule_label'],
 				'txt_pm_rule_delete' => $txt['pm_rule_delete'],
 				'txt_pm_rule_sel_label' => $txt['pm_rule_sel_label'],
-			), true);
+			], true);
 
 			// Current rule information...
 			if ($context['rid'])
 			{
 				$context['rule'] = $context['rules'][$context['rid']];
-				$members = array();
+				$members = [];
 
 				// Need to get member names!
 				foreach ($context['rule']['criteria'] as $k => $criteria)
@@ -2162,17 +2162,17 @@ class PersonalMessage extends AbstractController
 			}
 			else
 			{
-				$context['rule'] = array(
+				$context['rule'] = [
 					'id' => '',
 					'name' => '',
-					'criteria' => array(),
-					'actions' => array(),
+					'criteria' => [],
+					'actions' => [],
 					'logic' => 'and',
-				);
+				];
 			}
 
 			// Add a dummy criteria to allow expansion for none js users.
-			$context['rule']['criteria'][] = array('t' => '', 'v' => '');
+			$context['rule']['criteria'][] = ['t' => '', 'v' => ''];
 		}
 		// Saving?
 		elseif (isset($this->_req->query->save))
@@ -2195,7 +2195,7 @@ class PersonalMessage extends AbstractController
 			}
 
 			// Let's do the criteria first - it's also hardest!
-			$criteria = array();
+			$criteria = [];
 			foreach ($this->_req->post->ruletype as $ind => $type)
 			{
 				// Check everything is here...
@@ -2220,24 +2220,24 @@ class PersonalMessage extends AbstractController
 						continue;
 					}
 
-					$criteria[] = array('t' => 'mid', 'v' => $member['id_member']);
+					$criteria[] = ['t' => 'mid', 'v' => $member['id_member']];
 				}
 				elseif ($type === 'bud')
 				{
-					$criteria[] = array('t' => 'bud', 'v' => 1);
+					$criteria[] = ['t' => 'bud', 'v' => 1];
 				}
 				elseif ($type === 'gid')
 				{
-					$criteria[] = array('t' => 'gid', 'v' => (int) $this->_req->post->ruledefgroup[$ind]);
+					$criteria[] = ['t' => 'gid', 'v' => (int) $this->_req->post->ruledefgroup[$ind]];
 				}
-				elseif (in_array($type, array('sub', 'msg')) && trim($this->_req->post->ruledef[$ind]) !== '')
+				elseif (in_array($type, ['sub', 'msg']) && trim($this->_req->post->ruledef[$ind]) !== '')
 				{
-					$criteria[] = array('t' => $type, 'v' => Util::htmlspecialchars(trim($this->_req->post->ruledef[$ind])));
+					$criteria[] = ['t' => $type, 'v' => Util::htmlspecialchars(trim($this->_req->post->ruledef[$ind]))];
 				}
 			}
 
 			// Also do the actions!
-			$actions = array();
+			$actions = [];
 			$doDelete = 0;
 			$isOr = $this->_req->post->rule_logic === 'or' ? 1 : 0;
 			foreach ($this->_req->post->acttype as $ind => $type)
@@ -2255,7 +2255,7 @@ class PersonalMessage extends AbstractController
 				}
 				elseif ($type === 'lab')
 				{
-					$actions[] = array('t' => 'lab', 'v' => (int) $this->_req->post->labdef[$ind] - 1);
+					$actions[] = ['t' => 'lab', 'v' => (int) $this->_req->post->labdef[$ind] - 1];
 				}
 			}
 
@@ -2284,7 +2284,7 @@ class PersonalMessage extends AbstractController
 		elseif (isset($this->_req->post->delselected) && !empty($this->_req->post->delrule))
 		{
 			checkSession();
-			$toDelete = array();
+			$toDelete = [];
 			foreach ($this->_req->post->delrule as $k => $v)
 			{
 				$toDelete[] = (int) $k;
@@ -2309,7 +2309,7 @@ class PersonalMessage extends AbstractController
 	 * - uses the search_results sub template of the PersonalMessage template.
 	 * - show the results of the search query.
 	 */
-	public function action_search2()
+	public function action_search2(): ?bool
 	{
 		global $scripturl, $modSettings, $context, $txt;
 
@@ -2343,7 +2343,7 @@ class PersonalMessage extends AbstractController
 		$labelQuery = $this->_setLabelQuery();
 
 		// Unfortunately, searching for words like this is going to be slow, so we're blocking them.
-		$blocklist_words = array('quote', 'the', 'is', 'it', 'are', 'if', 'in');
+		$blocklist_words = ['quote', 'the', 'is', 'it', 'are', 'if', 'in'];
 
 		// What are we actually searching for?
 		$this->_search_params['search'] = empty($this->_search_params['search']) ? $this->_req->post->search ?? '' : ($this->_search_params['search']);
@@ -2369,7 +2369,7 @@ class PersonalMessage extends AbstractController
 		$wordArray = explode(' ', Util::htmlspecialchars(un_htmlspecialchars($wordArray), ENT_QUOTES));
 
 		// A minus sign in front of a word excludes the word.... so...
-		$excludedWords = array();
+		$excludedWords = [];
 
 		// Check for things like -"some words", but not "-some words".
 		foreach ($matches[1] as $index => $word)
@@ -2461,7 +2461,7 @@ class PersonalMessage extends AbstractController
 		$context['params'] = $this->_compileURLparams();
 
 		// Compile the subject query part.
-		$andQueryParts = array();
+		$andQueryParts = [];
 		foreach ($searchWords as $index => $word)
 		{
 			if ($word === '')
@@ -2478,7 +2478,7 @@ class PersonalMessage extends AbstractController
 				$andQueryParts[] = '(pm.subject' . (in_array($word, $excludedWords) ? ' NOT' : '') . ' LIKE {string:search_' . $index . '} ' . (in_array($word, $excludedWords) ? 'AND pm.body NOT' : 'OR pm.body') . ' LIKE {string:search_' . $index . '})';
 			}
 
-			$this->_searchq_parameters ['search_' . $index] = '%' . strtr($word, array('_' => '\\_', '%' => '\\%')) . '%';
+			$this->_searchq_parameters ['search_' . $index] = '%' . strtr($word, ['_' => '\\_', '%' => '\\%']) . '%';
 		}
 
 		$searchQuery = ' 1=1';
@@ -2531,15 +2531,15 @@ class PersonalMessage extends AbstractController
 		// Sort out the page index.
 		$context['page_index'] = constructPageIndex('{scripturl}?action=pm;sa=search2;params=' . $context['params'], $this->_req->query->start, $numResults, $modSettings['search_results_per_page'], false);
 
-		$context['message_labels'] = array();
-		$context['message_replied'] = array();
-		$context['personal_messages'] = array();
-		$context['first_label'] = array();
+		$context['message_labels'] = [];
+		$context['message_replied'] = [];
+		$context['personal_messages'] = [];
+		$context['first_label'] = [];
 
 		// If we have results, we have work to do!
 		if (!empty($foundMessages))
 		{
-			$recipients = array();
+			$recipients = [];
 			[$context['message_labels'], $context['message_replied'], $context['message_unread'], $context['first_label']] = loadPMRecipientInfo($foundMessages, $recipients, $context['folder'], true);
 
 			// Prepare for the callback!
@@ -2580,9 +2580,9 @@ class PersonalMessage extends AbstractController
 					// Fix the international characters in the keyword too.
 					$query = un_htmlspecialchars($query);
 					$query = trim($query, '\*+');
-					$query = strtr(Util::htmlspecialchars($query), array('\\\'' => "'"));
+					$query = strtr(Util::htmlspecialchars($query), ['\\\'' => "'"]);
 
-					$body_highlighted = preg_replace_callback('/((<[^>]*)|' . preg_quote(strtr($query, array("'" => '&#039;')), '/') . ')/iu',
+					$body_highlighted = preg_replace_callback('/((<[^>]*)|' . preg_quote(strtr($query, ["'" => '&#039;']), '/') . ')/iu',
 						fn($matches) => $this->_highlighted_callback($matches), $row['body']);
 					$subject_highlighted = preg_replace('/(' . preg_quote($query, '/') . ')/iu', '<strong class="highlight">$1</strong>', $row['subject']);
 				}
@@ -2618,6 +2618,8 @@ class PersonalMessage extends AbstractController
 			'url' => getUrl('action', ['action' => 'pm', 'sa' => 'search']),
 			'name' => $txt['pm_search_bar_title'],
 		];
+
+		return true;
 	}
 
 	/**
@@ -2627,7 +2629,7 @@ class PersonalMessage extends AbstractController
 	 * @param ValuesContainer $member member information
 	 * @return array[]
 	 */
-	private function _setSearchPmButtons($id, $member)
+	private function _setSearchPmButtons($id, $member): array
 	{
 		global $context;
 
@@ -2669,9 +2671,9 @@ class PersonalMessage extends AbstractController
 	 * - When paging search results, reads and decodes the passed parameters
 	 * - Places what it finds back in search_params
 	 */
-	private function _searchParamsFromString()
+	private function _searchParamsFromString(): array
 	{
-		$this->_search_params = array();
+		$this->_search_params = [];
 
 		if (isset($this->_req->query->params) || isset($this->_req->post->params))
 		{
@@ -2679,7 +2681,7 @@ class PersonalMessage extends AbstractController
 			$temp_params = $this->_req->query->params ?? $this->_req->post->params;
 
 			// Decode and replace the uri safe characters we added
-			$temp_params = base64_decode(str_replace(array('-', '_', '.'), array('+', '/', '='), $temp_params));
+			$temp_params = base64_decode(str_replace(['-', '_', '.'], ['+', '/', '='], $temp_params));
 
 			$temp_params = explode('|"|', $temp_params);
 			foreach ($temp_params as $data)
@@ -2700,7 +2702,7 @@ class PersonalMessage extends AbstractController
 	 * - Uses existing ones if coming from pagination or uses those passed from the search pm form
 	 * - Validates passed params are valid
 	 */
-	private function _prepareSearchParams()
+	private function _prepareSearchParams(): void
 	{
 		// Store whether simple search was used (needed if the user wants to do another query).
 		if (!isset($this->_search_params['advanced']))
@@ -2748,7 +2750,7 @@ class PersonalMessage extends AbstractController
 	 *
 	 * @return string
 	 */
-	private function _setUserQuery()
+	private function _setUserQuery(): string
 	{
 		global $context;
 
@@ -2762,15 +2764,15 @@ class PersonalMessage extends AbstractController
 		if (!empty($this->_search_params['userspec']))
 		{
 			// Set up, so we can search by username, wildcards, like, etc
-			$userString = strtr(Util::htmlspecialchars($this->_search_params['userspec'], ENT_QUOTES), array('&quot;' => '"'));
-			$userString = strtr($userString, array('%' => '\%', '_' => '\_', '*' => '%', '?' => '_'));
+			$userString = strtr(Util::htmlspecialchars($this->_search_params['userspec'], ENT_QUOTES), ['&quot;' => '"']);
+			$userString = strtr($userString, ['%' => '\%', '_' => '\_', '*' => '%', '?' => '_']);
 
 			preg_match_all('~"([^"]+)"~', $userString, $matches);
 			$possible_users = array_merge($matches[1], explode(',', preg_replace('~"[^"]+"~', '', $userString)));
 
 			// Who matches those criteria?
 			require_once(SUBSDIR . '/Members.subs.php');
-			$members = membersBy('member_names', array('member_names' => $possible_users));
+			$members = membersBy('member_names', ['member_names' => $possible_users]);
 
 			foreach ($possible_users as $key => $possible_user)
 			{
@@ -2786,7 +2788,7 @@ class PersonalMessage extends AbstractController
 			{
 				if ($context['folder'] === 'inbox')
 				{
-					$uq = array();
+					$uq = [];
 					$name = '{column_case_insensitive:pm.from_name}';
 					foreach (array_keys($possible_users) as $key)
 					{
@@ -2803,7 +2805,7 @@ class PersonalMessage extends AbstractController
 			}
 			else
 			{
-				$memberlist = array();
+				$memberlist = [];
 				foreach ($members as $id)
 				{
 					$memberlist[] = $id;
@@ -2812,7 +2814,7 @@ class PersonalMessage extends AbstractController
 				// Use the name as sent from or sent to
 				if ($context['folder'] === 'inbox')
 				{
-					$uq = array();
+					$uq = [];
 					$name = '{column_case_insensitive:pm.from_name}';
 
 					foreach (array_keys($possible_users) as $key)
@@ -2838,11 +2840,11 @@ class PersonalMessage extends AbstractController
 	/**
 	 * Read / Set the sort parameters for the results listing
 	 */
-	private function _setSortParams()
+	private function _setSortParams(): void
 	{
-		$sort_columns = array(
+		$sort_columns = [
 			'pm.id_pm',
-		);
+		];
 
 		if (empty($this->_search_params['sort']) && !empty($this->_req->post->sort))
 		{
@@ -2864,7 +2866,7 @@ class PersonalMessage extends AbstractController
 	 * @return string
 	 * @throws \Exception
 	 */
-	private function _setLabelQuery()
+	private function _setLabelQuery(): string
 	{
 		global $context;
 
@@ -2887,7 +2889,7 @@ class PersonalMessage extends AbstractController
 			}
 			else
 			{
-				$this->_req->post->searchlabel = array();
+				$this->_req->post->searchlabel = [];
 			}
 
 			// Now that everything is cleaned up a bit, make the labels a param.
@@ -2904,10 +2906,10 @@ class PersonalMessage extends AbstractController
 				$labelQuery = '
 				AND {raw:label_implode}';
 
-				$labelStatements = array();
+				$labelStatements = [];
 				foreach ($this->_req->post->searchlabel as $label)
 				{
-					$labelStatements[] = $db->quote('FIND_IN_SET({string:label}, pmr.labels) != 0', array('label' => $label,));
+					$labelStatements[] = $db->quote('FIND_IN_SET({string:label}, pmr.labels) != 0', ['label' => $label,]);
 				}
 
 				$this->_searchq_parameters ['label_implode'] = '(' . implode(' OR ', $labelStatements) . ')';
@@ -2922,9 +2924,9 @@ class PersonalMessage extends AbstractController
 	 *
 	 * @return string - the encoded string to be appended to the URL
 	 */
-	private function _compileURLparams()
+	private function _compileURLparams(): string
 	{
-		$encoded = array();
+		$encoded = [];
 
 		// Now we have all the parameters, combine them together for pagination and the like...
 		foreach ($this->_search_params as $k => $v)
@@ -2933,7 +2935,7 @@ class PersonalMessage extends AbstractController
 		}
 
 		// Base64 encode, then replace +/= with uri safe ones that can be reverted
-		return str_replace(array('+', '/', '='), array('-', '_', '.'), base64_encode(implode('|"|', $encoded)));
+		return str_replace(['+', '/', '='], ['-', '_', '.'], base64_encode(implode('|"|', $encoded)));
 	}
 
 	/**
@@ -2949,7 +2951,7 @@ class PersonalMessage extends AbstractController
 	 *
 	 * @uses search sub template
 	 */
-	public function action_search()
+	public function action_search(): void
 	{
 		global $context, $txt;
 
@@ -2992,15 +2994,15 @@ class PersonalMessage extends AbstractController
 		$context['search_params']['subject_only'] = !empty($context['search_params']['subject_only']);
 
 		// Create the array of labels to be searched.
-		$context['search_labels'] = array();
-		$searchedLabels = isset($context['search_params']['labels']) && $context['search_params']['labels'] != '' ? explode(',', $context['search_params']['labels']) : array();
+		$context['search_labels'] = [];
+		$searchedLabels = isset($context['search_params']['labels']) && $context['search_params']['labels'] != '' ? explode(',', $context['search_params']['labels']) : [];
 		foreach ($context['labels'] as $label)
 		{
-			$context['search_labels'][] = array(
+			$context['search_labels'][] = [
 				'id' => $label['id'],
 				'name' => $label['name'],
 				'checked' => empty($searchedLabels) || in_array($label['id'], $searchedLabels),
-			);
+			];
 		}
 
 		// Are all the labels checked?
@@ -3010,7 +3012,7 @@ class PersonalMessage extends AbstractController
 		if (!empty($context['search_errors']))
 		{
 			Txt::load('Errors');
-			$context['search_errors']['messages'] = array();
+			$context['search_errors']['messages'] = [];
 			foreach ($context['search_errors'] as $search_error => $dummy)
 			{
 				if ($search_error === 'messages')
@@ -3039,7 +3041,7 @@ class PersonalMessage extends AbstractController
 	 *
 	 * @return string
 	 */
-	private function _highlighted_callback($matches)
+	private function _highlighted_callback($matches): string
 	{
 		return isset($matches[2]) && $matches[2] === $matches[1] ? stripslashes($matches[1]) : '<strong class="highlight">' . $matches[1] . '</strong>';
 	}
@@ -3047,7 +3049,7 @@ class PersonalMessage extends AbstractController
 	/**
 	 * Allows the user to mark a personal message as unread, so they remember to come back to it
 	 */
-	public function action_markunread()
+	public function action_markunread(): void
 	{
 		global $context;
 

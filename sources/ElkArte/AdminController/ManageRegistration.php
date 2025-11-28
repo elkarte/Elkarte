@@ -62,33 +62,33 @@ class ManageRegistration extends AbstractController
 		theme()->getTemplates()->load('Register');
 		loadJavascriptFile('register.js');
 
-		$subActions = array(
-			'register' => array(
+		$subActions = [
+			'register' => [
 				'controller' => $this,
 				'function' => 'action_register',
 				'permission' => 'moderate_forum',
-			),
-			'agreement' => array(
+			],
+			'agreement' => [
 				'controller' => $this,
 				'function' => 'action_agreement',
 				'permission' => 'admin_forum',
-			),
-			'privacypol' => array(
+			],
+			'privacypol' => [
 				'controller' => $this,
 				'function' => 'action_privacypol',
 				'permission' => 'admin_forum',
-			),
-			'reservednames' => array(
+			],
+			'reservednames' => [
 				'controller' => $this,
 				'function' => 'action_reservednames',
 				'permission' => 'admin_forum',
-			),
-			'settings' => array(
+			],
+			'settings' => [
 				'controller' => $this,
 				'function' => 'action_registerSettings_display',
 				'permission' => 'admin_forum',
-			),
-		);
+			],
+		];
 
 		// Action controller
 		$action = new Action('manage_registrations');
@@ -137,7 +137,7 @@ class ManageRegistration extends AbstractController
 	 *
 	 * @uses Register template, admin_register sub-template.
 	 */
-	public function action_register()
+	public function action_register(): void
 	{
 		global $txt, $context;
 
@@ -151,7 +151,7 @@ class ManageRegistration extends AbstractController
 			{
 				if (!is_array($value))
 				{
-					$this->_req->post[$key] = Util::htmltrim__recursive(str_replace(array("\n", "\r"), '', $value));
+					$this->_req->post[$key] = Util::htmltrim__recursive(str_replace(["\n", "\r"], '', $value));
 				}
 			}
 
@@ -166,7 +166,7 @@ class ManageRegistration extends AbstractController
 				$password = $this->_req->post->password;
 			}
 
-			$regOptions = array(
+			$regOptions = [
 				'interface' => 'admin',
 				'username' => $this->_req->post->user,
 				'email' => $this->_req->post->email,
@@ -181,7 +181,7 @@ class ManageRegistration extends AbstractController
 				'ip' => '127.0.0.1',
 				'ip2' => '127.0.0.1',
 				'auth_method' => 'password',
-			);
+			];
 
 			require_once(SUBSDIR . '/Members.subs.php');
 			$reg_errors = ErrorContext::context('register', 0);
@@ -197,12 +197,12 @@ class ManageRegistration extends AbstractController
 
 			if (!empty($memberID))
 			{
-				$context['new_member'] = array(
+				$context['new_member'] = [
 					'id' => $memberID,
 					'name' => $this->_req->post->user,
 					'href' => getUrl('profile', ['action' => 'profile', 'u' => $memberID, 'name' => $this->_req->post->user]),
 					'link' => '<a href="' . getUrl('profile', ['action' => 'profile', 'u' => $memberID, 'name' => $this->_req->post->user]) . '">' . $this->_req->post->user . '</a>',
-				);
+				];
 				$context['registration_done'] = sprintf($txt['admin_register_done'], $context['new_member']['link']);
 			}
 		}
@@ -211,10 +211,10 @@ class ManageRegistration extends AbstractController
 		if (allowedTo('manage_membergroups'))
 		{
 			require_once(SUBSDIR . '/Membergroups.subs.php');
-			$includes = allowedTo('admin_forum') ? array('admin', 'globalmod', 'member') : array('globalmod', 'member', 'custom');
+			$includes = allowedTo('admin_forum') ? ['admin', 'globalmod', 'member'] : ['globalmod', 'member', 'custom'];
 
-			$groups = array();
-			$membergroups = getBasicMembergroupData($includes, array('hidden', 'protected'));
+			$groups = [];
+			$membergroups = getBasicMembergroupData($includes, ['hidden', 'protected']);
 			foreach ($membergroups as $membergroup)
 			{
 				$groups[$membergroup['id']] = $membergroup['name'];
@@ -224,7 +224,7 @@ class ManageRegistration extends AbstractController
 		}
 		else
 		{
-			$context['member_groups'] = array();
+			$context['member_groups'] = [];
 		}
 
 		// Basic stuff.
@@ -259,7 +259,7 @@ class ManageRegistration extends AbstractController
 	 *
 	 * @uses Admin template and the edit_agreement sub template.
 	 */
-	public function action_agreement()
+	public function action_agreement(): void
 	{
 		// I hereby agree not to be a lazy bum.
 		global $txt, $context, $modSettings;
@@ -268,7 +268,7 @@ class ManageRegistration extends AbstractController
 		$context['current_agreement'] = 'English';
 
 		// Is there more than one to edit?
-		$context['editable_agreements'] = array('' => $txt['admin_agreement_default']);
+		$context['editable_agreements'] = ['' => $txt['admin_agreement_default']];
 
 		// Get our languages.
 		$languages = getLanguages();
@@ -309,11 +309,11 @@ class ManageRegistration extends AbstractController
 				}
 				else
 				{
-					updateSettings(array('agreementRevision' => $success));
+					updateSettings(['agreementRevision' => $success]);
 				}
 			}
 
-			updateSettings(array('requireAgreement' => !empty($this->_req->post->requireAgreement), 'checkboxAgreement' => !empty($this->_req->post->checkboxAgreement)));
+			updateSettings(['requireAgreement' => !empty($this->_req->post->requireAgreement), 'checkboxAgreement' => !empty($this->_req->post->checkboxAgreement)]);
 		}
 
 		$context['agreement'] = Util::htmlspecialchars($agreement->getPlainText(false));
@@ -338,7 +338,7 @@ class ManageRegistration extends AbstractController
 	 *
 	 * @uses Admin template and the edit_agreement sub template.
 	 */
-	public function action_privacypol()
+	public function action_privacypol(): void
 	{
 		// I hereby agree not to be a lazy bum.
 		global $txt, $context, $modSettings;
@@ -347,7 +347,7 @@ class ManageRegistration extends AbstractController
 		$context['current_agreement'] = 'English';
 
 		// Is there more than one to edit?
-		$context['editable_agreements'] = array('' => $txt['admin_agreement_default']);
+		$context['editable_agreements'] = ['' => $txt['admin_agreement_default']];
 
 		// Get our installed languages.
 		$languages = getLanguages();
@@ -387,11 +387,11 @@ class ManageRegistration extends AbstractController
 				}
 				else
 				{
-					updateSettings(array('privacypolicyRevision' => $success));
+					updateSettings(['privacypolicyRevision' => $success]);
 				}
 			}
 
-			updateSettings(array('requirePrivacypolicy' => !empty($this->_req->post->requireAgreement)));
+			updateSettings(['requirePrivacypolicy' => !empty($this->_req->post->requireAgreement)]);
 		}
 
 		$context['agreement'] = Util::htmlspecialchars($privacypol->getPlainText(false));
@@ -417,7 +417,7 @@ class ManageRegistration extends AbstractController
 	 *
 	 * @uses Register template, reserved_words sub-template.
 	 */
-	public function action_reservednames()
+	public function action_reservednames(): void
 	{
 		global $txt, $context, $modSettings;
 
@@ -428,19 +428,19 @@ class ManageRegistration extends AbstractController
 			validateToken('admin-regr');
 
 			// Set all the options....
-			updateSettings(array(
+			updateSettings([
 				'reserveWord' => (isset($this->_req->post->matchword) ? '1' : '0'),
 				'reserveCase' => (isset($this->_req->post->matchcase) ? '1' : '0'),
 				'reserveUser' => (isset($this->_req->post->matchuser) ? '1' : '0'),
 				'reserveName' => (isset($this->_req->post->matchname) ? '1' : '0'),
 				'reserveNames' => str_replace("\r", '', $this->_req->post->reserved)
-			));
+			]);
 		}
 
 		// Get the reserved word options and words.
 		$modSettings['reserveNames'] = str_replace('\n', "\n", $modSettings['reserveNames']);
 		$context['reserved_words'] = explode("\n", $modSettings['reserveNames']);
-		$context['reserved_word_options'] = array();
+		$context['reserved_word_options'] = [];
 		$context['reserved_word_options']['match_word'] = $modSettings['reserveWord'] == '1';
 		$context['reserved_word_options']['match_case'] = $modSettings['reserveCase'] == '1';
 		$context['reserved_word_options']['match_user'] = $modSettings['reserveUser'] == '1';
@@ -462,7 +462,7 @@ class ManageRegistration extends AbstractController
 	 *
 	 * @event integrate_save_registration_settings
 	 */
-	public function action_registerSettings_display()
+	public function action_registerSettings_display(): void
 	{
 		global $txt, $context, $modSettings;
 
@@ -529,23 +529,23 @@ class ManageRegistration extends AbstractController
 	{
 		global $txt;
 
-		$config_vars = array(
-			array('select', 'registration_method', array($txt['setting_registration_standard'], $txt['setting_registration_activate'], $txt['setting_registration_approval'], $txt['setting_registration_disabled'])),
-			array('check', 'notify_new_registration'),
-			array('check', 'force_accept_agreement'),
-			array('check', 'force_accept_privacy_policy'),
-			array('check', 'send_welcomeEmail'),
-			array('check', 'show_DisplayNameOnRegistration'),
+		$config_vars = [
+			['select', 'registration_method', [$txt['setting_registration_standard'], $txt['setting_registration_activate'], $txt['setting_registration_approval'], $txt['setting_registration_disabled']]],
+			['check', 'notify_new_registration'],
+			['check', 'force_accept_agreement'],
+			['check', 'force_accept_privacy_policy'],
+			['check', 'send_welcomeEmail'],
+			['check', 'show_DisplayNameOnRegistration'],
 			'',
-			array('int', 'coppaAge', 'subtext' => $txt['setting_coppaAge_desc'], 'onchange' => 'checkCoppa();', 'onkeyup' => 'checkCoppa();'),
-			array('select', 'coppaType', array($txt['setting_coppaType_reject'], $txt['setting_coppaType_approval']), 'onchange' => 'checkCoppa();'),
-			array('large_text', 'coppaPost', 'subtext' => $txt['setting_coppaPost_desc']),
-			array('text', 'coppaFax'),
-			array('text', 'coppaPhone'),
-		);
+			['int', 'coppaAge', 'subtext' => $txt['setting_coppaAge_desc'], 'onchange' => 'checkCoppa();', 'onkeyup' => 'checkCoppa();'],
+			['select', 'coppaType', [$txt['setting_coppaType_reject'], $txt['setting_coppaType_approval']], 'onchange' => 'checkCoppa();'],
+			['large_text', 'coppaPost', 'subtext' => $txt['setting_coppaPost_desc']],
+			['text', 'coppaFax'],
+			['text', 'coppaPhone'],
+		];
 
 		// Add new settings with a nice hook, makes them available for admin settings search as well
-		call_integration_hook('integrate_modify_registration_settings', array(&$config_vars));
+		call_integration_hook('integrate_modify_registration_settings', [&$config_vars]);
 
 		return $config_vars;
 	}

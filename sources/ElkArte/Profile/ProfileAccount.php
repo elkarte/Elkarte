@@ -68,7 +68,7 @@ class ProfileAccount extends AbstractController
 	 * @uses Profile template
 	 * @uses template_issueWarning sub template in ProfileAccount
 	 */
-	public function action_issuewarning()
+	public function action_issuewarning(): void
 	{
 		global $txt, $scripturl, $modSettings, $mbname, $context, $cur_profile;
 
@@ -246,7 +246,7 @@ class ProfileAccount extends AbstractController
 	 * - Logs the action
 	 * - Updates the user data with the new warning level
 	 */
-	private function _save_warning()
+	private function _save_warning(): void
 	{
 		global $txt, $context, $cur_profile;
 
@@ -328,7 +328,7 @@ class ProfileAccount extends AbstractController
 	 * @return int
 	 * @throws Exception
 	 */
-	private function _issue_warning_pm()
+	private function _issue_warning_pm(): int
 	{
 		global $context, $modSettings;
 
@@ -367,7 +367,7 @@ class ProfileAccount extends AbstractController
 	/**
 	 * Prepares a warning preview
 	 */
-	private function _preview_warning()
+	private function _preview_warning(): void
 	{
 		global $context;
 
@@ -404,7 +404,7 @@ class ProfileAccount extends AbstractController
 	/**
 	 * Creates the listing of issued warnings
 	 */
-	private function _create_issued_warnings_list()
+	private function _create_issued_warnings_list(): void
 	{
 		global $txt, $modSettings;
 
@@ -503,7 +503,7 @@ class ProfileAccount extends AbstractController
 	 *
 	 * @return array
 	 */
-	public function list_getUserWarnings($start, $items_per_page, $sort)
+	public function list_getUserWarnings($start, $items_per_page, $sort): array
 	{
 		return list_getUserWarnings($start, $items_per_page, $sort, $this->_memID);
 	}
@@ -514,7 +514,7 @@ class ProfileAccount extends AbstractController
 	 *
 	 * @return int
 	 */
-	public function list_getUserWarningCount()
+	public function list_getUserWarningCount(): int
 	{
 		return list_getUserWarningCount($this->_memID);
 	}
@@ -522,7 +522,7 @@ class ProfileAccount extends AbstractController
 	/**
 	 * Present a screen to make sure the user wants to be deleted.
 	 */
-	public function action_deleteaccount()
+	public function action_deleteaccount(): void
 	{
 		global $txt, $context, $modSettings, $cur_profile;
 
@@ -550,7 +550,7 @@ class ProfileAccount extends AbstractController
 	/**
 	 * Actually delete an account.
 	 */
-	public function action_deleteaccount2()
+	public function action_deleteaccount2(): void
 	{
 		global $context, $cur_profile, $modSettings;
 
@@ -654,7 +654,7 @@ class ProfileAccount extends AbstractController
 	 *
 	 * - This function is called from the profile account actions area.
 	 */
-	public function action_activateaccount()
+	public function action_activateaccount(): void
 	{
 		global $context, $modSettings;
 

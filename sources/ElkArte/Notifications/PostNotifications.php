@@ -81,7 +81,7 @@ class PostNotifications extends AbstractModel
 	 * @param int[]|int $members_only = array() - restrict to only send the notification to this list, otherwise all
 	 * @param array $pbe = array() - PBE user_info if this is being run as a result of an email posting
 	 */
-	public function sendNotifications($topics, $type, $members_only = [], $pbe = [])
+	public function sendNotifications($topics, $type, $members_only = [], $pbe = []): void
 	{
 		global $txt;
 
@@ -169,7 +169,7 @@ class PostNotifications extends AbstractModel
 	 *
 	 * @return bool
 	 */
-	public function isUsingMailList()
+	public function isUsingMailList(): bool
 	{
 		return !empty($this->_modSettings['maillist_enabled']) && !empty($this->_modSettings['pbe_post_enabled']);
 	}
@@ -180,7 +180,7 @@ class PostNotifications extends AbstractModel
 	 * @param array $pbe
 	 * @return int
 	 */
-	private function _getUserID($pbe)
+	private function _getUserID($pbe): int
 	{
 		return (!empty($pbe['user_info']['id']) && !empty($this->_modSettings['maillist_enabled']))
 			? (int) $pbe['user_info']['id'] : User::$info->id;
@@ -192,7 +192,7 @@ class PostNotifications extends AbstractModel
 	 * @param array $pbe
 	 * @return string
 	 */
-	private function _getUserLanguage($pbe)
+	private function _getUserLanguage($pbe): string
 	{
 		return (!empty($pbe['user_info']['language']) && !empty($this->_modSettings['maillist_enabled']))
 			? $pbe['user_info']['language'] : User::$info->language;
@@ -207,7 +207,7 @@ class PostNotifications extends AbstractModel
 	 * @param string $type see Notify Types
 	 * @param int|int[] $members_only if only sending to a select list of members
 	 */
-	public function sendBoardTopicNotifications($topicData, $user_id, $boards_index, $type, $members_only)
+	public function sendBoardTopicNotifications($topicData, $user_id, $boards_index, $type, $members_only): void
 	{
 		global $language;
 
@@ -289,7 +289,7 @@ class PostNotifications extends AbstractModel
 	 * @param string $needed_language
 	 * @uses Post language file
 	 */
-	private function _checkLanguage($needed_language)
+	private function _checkLanguage($needed_language): void
 	{
 		global $txt;
 
@@ -309,7 +309,7 @@ class PostNotifications extends AbstractModel
 	 * @param array $notifyDatum
 	 * @return string
 	 */
-	private function setMessageTemplate($type, $notifyDatum)
+	private function setMessageTemplate($type, $notifyDatum): string
 	{
 		$message_type = 'notification_' . $type;
 
@@ -339,7 +339,7 @@ class PostNotifications extends AbstractModel
 	 * @param string $area topic or board, defines the unsubscribe link
 	 * @return array
 	 */
-	private function setTemplateReplacements($topicDatum, $notifyDatum, $id, $type = 'reply', $area = 'topic')
+	private function setTemplateReplacements($topicDatum, $notifyDatum, $id, $type = 'reply', $area = 'topic'): array
 	{
 		global $scripturl, $txt;
 
@@ -408,7 +408,7 @@ class PostNotifications extends AbstractModel
 	 * @param array $data
 	 * @return bool
 	 */
-	private function canSendPostBody($data)
+	private function canSendPostBody($data): bool
 	{
 		if (empty($data['notify_send_body']))
 		{
@@ -429,7 +429,7 @@ class PostNotifications extends AbstractModel
 	 * @param array $topicDatum
 	 * @return string
 	 */
-	private function _getEmailFrom($topicDatum)
+	private function _getEmailFrom($topicDatum): string
 	{
 		global $mbname;
 
@@ -454,7 +454,7 @@ class PostNotifications extends AbstractModel
 	 *
 	 * @return string
 	 */
-	private function _getFromWrapper()
+	private function _getFromWrapper(): string
 	{
 		global $webmaster_email;
 
@@ -480,7 +480,7 @@ class PostNotifications extends AbstractModel
 	 * @param string $type see Notify Types
 	 * @param int[] $members_only if only sending to a select list of members
 	 */
-	public function sendSiteNotifications($user_id, $topicData, $type, $members_only)
+	public function sendSiteNotifications($user_id, $topicData, $type, $members_only): void
 	{
 		// Find the members with watch notifications set for these topics.
 		$topics = array_keys($topicData);
@@ -521,7 +521,7 @@ class PostNotifications extends AbstractModel
 	 * @param string $type see Notify Types
 	 * @param int[] $members_only if only sending to a select list of members
 	 */
-	public function sendTopicNotifications($user_id, $topicData, $type, $members_only)
+	public function sendTopicNotifications($user_id, $topicData, $type, $members_only): void
 	{
 		global $language;
 
@@ -597,7 +597,7 @@ class PostNotifications extends AbstractModel
 	 *
 	 * @param array $topicData
 	 */
-	public function sendBoardNotifications(&$topicData)
+	public function sendBoardNotifications(&$topicData): void
 	{
 		global $txt;
 
@@ -655,7 +655,7 @@ class PostNotifications extends AbstractModel
 	 * @param $boards
 	 * @return void
 	 */
-	public function sendSiteBoardNotifications($topicData, $board_index, $boards)
+	public function sendSiteBoardNotifications($topicData, $board_index, $boards): void
 	{
 		// Find the members with onsite notifications set for these boards.
 		$boardNotifyData = fetchBoardNotifications(User::$info->id, $board_index, 'reply', [], 'onsite');
@@ -703,7 +703,7 @@ class PostNotifications extends AbstractModel
 	 * @param $boards
 	 * @return void
 	 */
-	public function sendEmailBoardNotifications($topicData, $board_index, $boards)
+	public function sendEmailBoardNotifications($topicData, $board_index, $boards): void
 	{
 		global $language, $txt;
 
@@ -783,10 +783,10 @@ class PostNotifications extends AbstractModel
 	 * PBE variants are appended back in the main flow
 	 *
 	 * @param array $data
-	 * @param boolean $sentOnceAlready
+	 * @param bool $sentOnceAlready
 	 * @return string
 	 */
-	public function setBoardTemplate($data, $sentOnceAlready)
+	public function setBoardTemplate($data, $sentOnceAlready): string
 	{
 		$email_type = '';
 
@@ -813,7 +813,7 @@ class PostNotifications extends AbstractModel
 	 *
 	 * @param array $topicData
 	 */
-	public function sendApprovalNotifications($topicData)
+	public function sendApprovalNotifications($topicData): void
 	{
 		global $language;
 

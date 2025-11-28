@@ -56,14 +56,14 @@ class Suggest extends AbstractController
 	 *
 	 * @uses template_generic_xml() in Xml.template
 	 */
-	public function action_suggest()
+	public function action_suggest(): void
 	{
 		global $context;
 
 		// These are all registered types.
-		$searchTypes = array(
-			'member' => array('class' => SuggestMember::class, 'function' => 'member'),
-		);
+		$searchTypes = [
+			'member' => ['class' => SuggestMember::class, 'function' => 'member'],
+		];
 
 		// Allow integration a way to register their own type
 		call_integration_hook('integrate_autosuggest', [&$searchTypes]);

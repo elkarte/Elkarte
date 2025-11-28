@@ -52,12 +52,12 @@ class ManageMail extends AbstractController
 
 		Txt::load('Help+ManageMail');
 
-		$subActions = array(
-			'browse' => array($this, 'action_browse', 'permission' => 'admin_forum'),
-			'clear' => array($this, 'action_clear', 'permission' => 'admin_forum'),
-			'settings' => array($this, 'action_mailSettings_display', 'permission' => 'admin_forum'),
-			'test' => array($this, 'action_test_email', 'permission' => 'admin_forum'),
-		);
+		$subActions = [
+			'browse' => [$this, 'action_browse', 'permission' => 'admin_forum'],
+			'clear' => [$this, 'action_clear', 'permission' => 'admin_forum'],
+			'settings' => [$this, 'action_mailSettings_display', 'permission' => 'admin_forum'],
+			'test' => [$this, 'action_test_email', 'permission' => 'admin_forum'],
+		];
 
 		// Action control
 		$action = new Action('manage_mail');
@@ -91,7 +91,7 @@ class ManageMail extends AbstractController
 	 * @event integrate_save_mail_settings
 	 * @uses show_settings sub template
 	 */
-	public function action_mailSettings_display()
+	public function action_mailSettings_display(): void
 	{
 		global $txt, $context, $txtBirthdayEmails;
 
@@ -107,7 +107,7 @@ class ManageMail extends AbstractController
 		$settingsForm->setConfigVars($config_vars);
 
 		// Piece of redundant code, for the javascript
-		$processedBirthdayEmails = array();
+		$processedBirthdayEmails = [];
 		foreach ($txtBirthdayEmails as $key => $value)
 		{
 			$index = substr($key, 0, strrpos($key, '_'));
@@ -203,8 +203,8 @@ class ManageMail extends AbstractController
 		$body = $txtBirthdayEmails[(empty($modSettings['birthday_email']) ? 'happy_birthday' : $modSettings['birthday_email']) . '_body'];
 		$subject = $txtBirthdayEmails[(empty($modSettings['birthday_email']) ? 'happy_birthday' : $modSettings['birthday_email']) . '_subject'];
 
-		$emails = array();
-		$processedBirthdayEmails = array();
+		$emails = [];
+		$processedBirthdayEmails = [];
 		foreach ($txtBirthdayEmails as $key => $value)
 		{
 			$index = substr($key, 0, strrpos($key, '_'));
@@ -217,28 +217,28 @@ class ManageMail extends AbstractController
 			$emails[$index] = $index;
 		}
 
-		$config_vars = array(
+		$config_vars = [
 			// Mail queue stuff, this rocks ;)
-			array('check', 'mail_queue'),
-			array('int', 'mail_period_limit'),
-			array('int', 'mail_batch_size'),
+			['check', 'mail_queue'],
+			['int', 'mail_period_limit'],
+			['int', 'mail_batch_size'],
 			'',
 			// SMTP stuff.
-			array('select', 'mail_type', array($txt['mail_type_default'], 'SMTP')),
-			array('text', 'smtp_host'),
-			array('text', 'smtp_client'),
-			array('text', 'smtp_port'),
-			array('check', 'smtp_starttls'),
-			array('text', 'smtp_username'),
-			array('password', 'smtp_password'),
+			['select', 'mail_type', [$txt['mail_type_default'], 'SMTP']],
+			['text', 'smtp_host'],
+			['text', 'smtp_client'],
+			['text', 'smtp_port'],
+			['check', 'smtp_starttls'],
+			['text', 'smtp_username'],
+			['password', 'smtp_password'],
 			'',
-			array('select', 'birthday_email', $emails, 'value' => array('subject' => $subject, 'body' => $body), 'javascript' => 'onchange="fetch_birthday_preview()"'),
-			'birthday_subject' => array('var_message', 'birthday_subject', 'message' => $processedBirthdayEmails[empty($modSettings['birthday_email']) ? 'happy_birthday' : $modSettings['birthday_email']]['subject'], 'disabled' => true, 'size' => strlen($subject) + 3),
-			'birthday_body' => array('var_message', 'birthday_body', 'message' => nl2br($body), 'disabled' => true, 'size' => ceil(strlen($body) / 25)),
-		);
+			['select', 'birthday_email', $emails, 'value' => ['subject' => $subject, 'body' => $body], 'javascript' => 'onchange="fetch_birthday_preview()"'],
+			'birthday_subject' => ['var_message', 'birthday_subject', 'message' => $processedBirthdayEmails[empty($modSettings['birthday_email']) ? 'happy_birthday' : $modSettings['birthday_email']]['subject'], 'disabled' => true, 'size' => strlen($subject) + 3],
+			'birthday_body' => ['var_message', 'birthday_body', 'message' => nl2br($body), 'disabled' => true, 'size' => ceil(strlen($body) / 25)],
+		];
 
 		// Add new settings with a nice hook, makes them available for admin settings search as well
-		call_integration_hook('integrate_modify_mail_settings', array(&$config_vars));
+		call_integration_hook('integrate_modify_mail_settings', [&$config_vars]);
 
 		return $config_vars;
 	}
@@ -283,7 +283,8 @@ class ManageMail extends AbstractController
 			$this->_pauseMailQueueClear($all_emails, $sent_emails);
 		}
 
-		return $this->action_browse();
+		$this->action_browse();
+		return null;
 	}
 
 	/**
@@ -292,7 +293,7 @@ class ManageMail extends AbstractController
 	 * @param int $all_emails total emails to be sent
 	 * @param int $sent_emails number of emails sent so far
 	 */
-	private function _pauseMailQueueClear($all_emails, $sent_emails)
+	private function _pauseMailQueueClear(int $all_emails, int $sent_emails): void
 	{
 		global $context, $txt, $time_start;
 
@@ -328,7 +329,7 @@ class ManageMail extends AbstractController
 	 *
 	 * @uses ManageMail template
 	 */
-	public function action_browse()
+	public function action_browse(): void
 	{
 		global $context, $txt;
 
@@ -349,56 +350,56 @@ class ManageMail extends AbstractController
 		$context['mail_queue_size'] = comma_format($status['mailQueueSize']);
 
 		// Build our display list
-		$listOptions = array(
+		$listOptions = [
 			'id' => 'mail_queue',
 			'title' => $txt['mailqueue_browse'],
 			'items_per_page' => 20,
 			'base_href' => getUrl('admin', ['action' => 'admin', 'area' => 'mailqueue']),
 			'default_sort_col' => 'age',
 			'no_items_label' => $txt['mailqueue_no_items'],
-			'get_items' => array(
+			'get_items' => [
 				'function' => 'list_getMailQueue',
-			),
-			'get_count' => array(
+			],
+			'get_count' => [
 				'function' => 'list_getMailQueueSize',
-			),
-			'columns' => array(
-				'subject' => array(
-					'header' => array(
+			],
+			'columns' => [
+				'subject' => [
+					'header' => [
 						'value' => $txt['mailqueue_subject'],
-					),
-					'data' => array(
+					],
+					'data' => [
 						'function' => static fn($rowData) => Util::shorten_text(Util::htmlspecialchars($rowData['subject'], 50)),
 						'class' => 'smalltext',
-					),
-					'sort' => array(
+					],
+					'sort' => [
 						'default' => 'subject',
 						'reverse' => 'subject DESC',
-					),
-				),
-				'recipient' => array(
-					'header' => array(
+					],
+				],
+				'recipient' => [
+					'header' => [
 						'value' => $txt['mailqueue_recipient'],
-					),
-					'data' => array(
-						'sprintf' => array(
+					],
+					'data' => [
+						'sprintf' => [
 							'format' => '<a href="mailto:%1$s">%1$s</a>',
-							'params' => array(
+							'params' => [
 								'recipient' => true,
-							),
-						),
-					),
-					'sort' => array(
+							],
+						],
+					],
+					'sort' => [
 						'default' => 'recipient',
 						'reverse' => 'recipient DESC',
-					),
-				),
-				'priority' => array(
-					'header' => array(
+					],
+				],
+				'priority' => [
+					'header' => [
 						'value' => $txt['mailqueue_priority'],
 						'class' => 'centertext',
-					),
-					'data' => array(
+					],
+					'data' => [
 						'function' => static function ($rowData) {
 							global $txt;
 
@@ -409,50 +410,50 @@ class ManageMail extends AbstractController
 							return $txt[$txtKey] ?? $txt['mq_mpriority_1'];
 						},
 						'class' => 'centertext smalltext',
-					),
-					'sort' => array(
+					],
+					'sort' => [
 						'default' => 'priority',
 						'reverse' => 'priority DESC',
-					),
-				),
-				'age' => array(
-					'header' => array(
+					],
+				],
+				'age' => [
+					'header' => [
 						'value' => $txt['mailqueue_age'],
-					),
-					'data' => array(
+					],
+					'data' => [
 						'function' => static fn($rowData) => time_since(time() - $rowData['time_sent']),
 						'class' => 'smalltext',
-					),
-					'sort' => array(
+					],
+					'sort' => [
 						'default' => 'time_sent',
 						'reverse' => 'time_sent DESC',
-					),
-				),
-				'check' => array(
-					'header' => array(
+					],
+				],
+				'check' => [
+					'header' => [
 						'value' => '<input type="checkbox" onclick="invertAll(this, this.form);" class="input_check" />',
-					),
-					'data' => array(
+					],
+					'data' => [
 						'function' => static fn($rowData) => '<input type="checkbox" name="delete[]" value="' . $rowData['id_mail'] . '" class="input_check" />',
 						'class' => 'centertext',
-					),
-				),
-			),
-			'form' => array(
+					],
+				],
+			],
+			'form' => [
 				'href' => getUrl('admin', ['action' => 'admin', 'area' => 'mailqueue']),
 				'include_start' => true,
 				'include_sort' => true,
-			),
-			'additional_rows' => array(
-				array(
+			],
+			'additional_rows' => [
+				[
 					'position' => 'bottom_of_list',
 					'class' => 'submitbutton',
 					'value' => '
 						<input type="submit" name="delete_redirects" value="' . $txt['quickmod_delete_selected'] . '" onclick="return confirm(\'' . $txt['quickmod_confirm'] . '\');" />
 						<a class="linkbutton" href="' . getUrl('admin', ['action' => 'admin', 'area' => 'mailqueue', 'sa' => 'clear', '{session_data}']) . '" onclick="return confirm(\'' . $txt['mailqueue_clear_list_warning'] . '\');">' . $txt['mailqueue_clear_list'] . '</a> ',
-				),
-			),
-		);
+				],
+			],
+		];
 
 		createList($listOptions);
 	}
@@ -460,7 +461,7 @@ class ManageMail extends AbstractController
 	/**
 	 * Test email action
 	 */
-	public function action_test_email()
+	public function action_test_email(): void
 	{
 		global $context, $txt;
 

@@ -72,14 +72,14 @@ class BoardsList
 	{
 		global $settings, $context, $modSettings;
 
-		$this->_options = array_merge(array(
+		$this->_options = array_merge([
 			'include_categories' => false,
 			'countChildPosts' => false,
 			'base_level' => 0,
 			'parent_id' => 0,
 			'set_latest_post' => false,
 			'get_moderators' => true,
-		), $options);
+		], $options);
 
 		$this->_options['avatars_on_indexes'] = !empty($settings['avatars_on_indexes']) && $settings['avatars_on_indexes'] !== 2;
 		$this->_images_url = $settings['images_url'] . '/' . $context['theme_variant_url'];
@@ -90,7 +90,7 @@ class BoardsList
 		}
 
 		$this->_user = User::$info;
-		$this->_user['mod_cache_ap'] = empty($this->_user->mod_cache['ap']) ? array() : $this->_user->mod_cache['ap'];
+		$this->_user['mod_cache_ap'] = empty($this->_user->mod_cache['ap']) ? [] : $this->_user->mod_cache['ap'];
 
 		$this->_db = database();
 
@@ -124,7 +124,7 @@ class BoardsList
 	 *
 	 * @return array
 	 */
-	public function getBoards()
+	public function getBoards(): array
 	{
 		global $txt, $modSettings;
 
@@ -152,12 +152,12 @@ class BoardsList
 			WHERE {query_see_board}' . (empty($this->_options['countChildPosts']) ? (empty($this->_options['base_level']) ? '' : '
 				AND b.child_level >= {int:child_level}') : '
 				AND b.child_level BETWEEN {int:child_level} AND {int:upper_level}'),
-			array(
+			[
 				'current_member' => $this->_user['id'],
 				'child_level' => $this->_options['base_level'],
 				'upper_level' => $this->_options['base_level'] + 1,
 				'blank_string' => '',
-			)
+			]
 		);
 
 		$result_boards = $request->fetch_all();
@@ -181,7 +181,7 @@ class BoardsList
 				if (empty($this->_categories[$row_board['id_cat']]))
 				{
 					$cat_name = $row_board['cat_name'];
-					$this->_categories[$row_board['id_cat']] = array(
+					$this->_categories[$row_board['id_cat']] = [
 						'id' => $row_board['id_cat'],
 						'name' => $row_board['cat_name'],
 						'order' => $row_board['cat_order'],
@@ -190,9 +190,9 @@ class BoardsList
 						'collapse_href' => isset($row_board['can_collapse']) ? getUrl('action', ['action' => 'collapse', 'c' => $row_board['id_cat'], 'sa' => $row_board['is_collapsed'] > 0 ? 'expand' : 'collapse', '{session_data}']) . '#c' . $row_board['id_cat'] : '',
 						'collapse_image' => isset($row_board['can_collapse']) ? '<img src="' . $this->_images_url . ($row_board['is_collapsed'] > 0 ? 'expand.png" alt="+"' : 'collapse.png" alt="-"') . ' />' : '',
 						'href' => getUrl('action', $modSettings['default_forum_action']) . '#c' . $row_board['id_cat'],
-						'boards' => array(),
+						'boards' => [],
 						'new' => false
-					);
+					];
 					$this->_categories[$row_board['id_cat']]['link'] = '<a id="c' . $row_board['id_cat'] . '"></a>' . ($this->_user['is_guest']
 							? $cat_name
 							: '<a href="' . getUrl('action', ['action' => 'unread', 'c' => $row_board['id_cat']]) . '" title="' . sprintf($txt['new_posts_in_category'], strip_tags($row_board['cat_name'])) . '">' . $cat_name . '</a>');
@@ -332,22 +332,22 @@ class BoardsList
 			$row_board['subject'] = censor($row_board['subject']);
 			$row_board['short_subject'] = Util::shorten_text($row_board['subject'], $this->_subject_length);
 			$poster_href = getUrl('profile', ['action' => 'profile', 'u' => $row_board['id_member'], 'name' => $row_board['real_name']]);
-			$this_last_post = array(
+			$this_last_post = [
 				'id' => (int) $row_board['id_msg'],
 				'time' => $row_board['poster_time'] > 0 ? standardTime($row_board['poster_time']) : $txt['not_applicable'],
 				'html_time' => $row_board['poster_time'] > 0 ? htmlTime($row_board['poster_time']) : $txt['not_applicable'],
 				'timestamp' => forum_time(true, $row_board['poster_time']),
 				'subject' => $row_board['short_subject'],
-				'member' => array(
+				'member' => [
 					'id' => (int) $row_board['id_member'],
 					'username' => $row_board['poster_name'] !== '' ? $row_board['poster_name'] : $txt['not_applicable'],
 					'name' => $row_board['real_name'],
 					'href' => $row_board['poster_name'] !== '' && !empty($row_board['id_member']) ? $poster_href : '',
 					'link' => $row_board['poster_name'] !== '' ? (empty($row_board['id_member']) ? $row_board['real_name'] : '<a href="' . $poster_href . '">' . $row_board['real_name'] . '</a>') : $txt['not_applicable'],
-				),
+				],
 				'start' => 'msg' . $row_board['new_from'],
 				'topic' => (int) $row_board['id_topic']
-			);
+			];
 
 			if ($this->_options['avatars_on_indexes'])
 			{
@@ -424,7 +424,7 @@ class BoardsList
 	/**
 	 * Fetches and adds to the results the board moderators for the current boards
 	 */
-	private function _getBoardModerators()
+	private function _getBoardModerators(): void
 	{
 		global $txt;
 
@@ -439,9 +439,9 @@ class BoardsList
 				FROM {db_prefix}moderators AS mods
 					LEFT JOIN {db_prefix}members AS mods_mem ON (mods_mem.id_member = mods.id_member)
 				WHERE mods.id_board IN ({array_int:id_boards})',
-				array(
+				[
 					'id_boards' => $boards,
-				)
+				]
 			);
 			$mod_cached = $request->fetch_all();
 
@@ -456,12 +456,12 @@ class BoardsList
 			}
 
 			$href = getUrl('profile', ['action' => 'profile', 'u' => $row_mods['id_moderator'], 'name' => $row_mods['mod_real_name']]);
-			$this->_current_boards[$row_mods['id_board']]['moderators'][$row_mods['id_moderator']] = array(
+			$this->_current_boards[$row_mods['id_board']]['moderators'][$row_mods['id_moderator']] = [
 				'id' => $row_mods['id_moderator'],
 				'name' => $row_mods['mod_real_name'],
 				'href' => $href,
 				'link' => '<a href="' . $href . '" title="' . $txt['board_moderator'] . '">' . $row_mods['mod_real_name'] . '</a>'
-			);
+			];
 			$this->_current_boards[$row_mods['id_board']]['link_moderators'][] = '<a href="' . $href . '" title="' . $txt['board_moderator'] . '">' . $row_mods['mod_real_name'] . '</a>';
 		}
 	}
@@ -471,7 +471,7 @@ class BoardsList
 	 *
 	 * @return array
 	 */
-	public function getLatestPost()
+	public function getLatestPost(): array
 	{
 		if (empty($this->_latest_post) || empty($this->_latest_post['link']))
 		{

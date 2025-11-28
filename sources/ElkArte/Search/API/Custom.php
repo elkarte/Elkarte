@@ -69,7 +69,7 @@ class Custom extends Standard
 	/**
 	 * If the settings don't exist we can't continue.
 	 */
-	public function isValid()
+	public function isValid(): bool
 	{
 		global $modSettings;
 
@@ -126,9 +126,8 @@ class Custom extends Standard
 	 * @param array $words An array of words
 	 * @param array $search_data An array of search data
 	 *
-	 * @return AbstractResult|boolean
 	 */
-	public function indexedWordQuery($words, $search_data)
+	public function indexedWordQuery(array $words, array $search_data)
 	{
 		global $modSettings;
 
@@ -202,7 +201,7 @@ class Custom extends Standard
 	 * @param array $topicOptions Not used in this API
 	 * @param array $posterOptions Not used in this API
 	 */
-	public function postCreated($msgOptions, $topicOptions, $posterOptions)
+	public function postCreated($msgOptions, $topicOptions, $posterOptions): void
 	{
 		$db = database();
 
@@ -230,7 +229,7 @@ class Custom extends Standard
 	 * @param array $topicOptions Not used in this API
 	 * @param array $posterOptions Not used in this API
 	 */
-	public function postModified($msgOptions, $topicOptions, $posterOptions)
+	public function postModified($msgOptions, $topicOptions, $posterOptions): void
 	{
 		global $modSettings;
 

@@ -28,7 +28,7 @@ class Util
 	 *
 	 * @return string
 	 */
-	public static function entity_fix($string)
+	public static function entity_fix($string): string
 	{
 		$num = $string[0] === 'x' ? hexdec(substr($string, 1)) : (int) $string;
 
@@ -50,9 +50,9 @@ class Util
 	 * @param string $charset only UTF-8 allowed
 	 * @param bool $double true will allow double encoding, false will not encode existing html entities,
 	 *
-	 * @return string
+	 * @return string|null
 	 */
-	public static function htmlspecialchars($string, $quote_style = ENT_COMPAT, $charset = 'UTF-8', $double = false)
+	public static function htmlspecialchars($string, $quote_style = ENT_COMPAT, $charset = 'UTF-8', $double = false): ?string
 	{
 		global $modSettings;
 
@@ -110,7 +110,7 @@ class Util
 	 *
 	 * @return string
 	 */
-	public static function htmltrim($string)
+	public static function htmltrim($string): string
 	{
 		global $modSettings;
 
@@ -140,7 +140,7 @@ class Util
 	 * @param array|string $var The string or array of strings to trim
 	 * @param int $level = 0 How deep we're at within the array (if called recursively)
 	 *
-	 * @return mixed[]|string The trimmed string or array of trimmed strings
+	 * @return array|string The trimmed string or array of trimmed strings
 	 */
 	public static function htmltrim__recursive($var, $level = 0)
 	{
@@ -169,7 +169,7 @@ class Util
 	 * @param int $offset where to start, assumed 0
 	 * @param bool $right set to true to mimic strrpos functions
 	 *
-	 * @return bool|mixed
+	 * @return bool|int
 	 */
 	public static function strpos($haystack, $needle, $offset = 0, $right = false)
 	{
@@ -223,7 +223,7 @@ class Util
 	 *
 	 * @return string
 	 */
-	public static function strtolower($string)
+	public static function strtolower($string): string
 	{
 		if (function_exists('mb_strtolower'))
 		{
@@ -248,7 +248,7 @@ class Util
 	 *
 	 * @return string
 	 */
-	public static function truncate($string, $length)
+	public static function truncate($string, $length): string
 	{
 		global $modSettings;
 
@@ -277,7 +277,7 @@ class Util
 	 *
 	 * @return int
 	 */
-	public static function strlen($string)
+	public static function strlen($string): int
 	{
 		global $modSettings;
 
@@ -327,9 +327,9 @@ class Util
 	 * @param bool $exact set true to include ellipsis in the allowed length, false will append instead
 	 * @param int $buffer maximum length underflow to allow when cutting on a word boundary
 	 *
-	 * @return string
+	 * @return string|null
 	 */
-	public static function shorten_text($string, $length = 384, $cutword = false, $ellipsis = '...', $exact = true, $buffer = 12)
+	public static function shorten_text($string, $length = 384, $cutword = false, $ellipsis = '...', $exact = true, $buffer = 12): ?string
 	{
 		// Does len include the ellipsis or are the ellipsis appended
 		$ending = !empty($ellipsis) && $exact ? self::strlen($ellipsis) : 0;
@@ -371,7 +371,7 @@ class Util
 	 *
 	 * @return string
 	 */
-	public static function substr($string, $start, $length = null)
+	public static function substr($string, $start, $length = null): string
 	{
 		global $modSettings;
 
@@ -399,7 +399,7 @@ class Util
 	 *
 	 * @return string Trimmed string.
 	 */
-	public static function shorten_html($string, $length = 384, $ellipsis = '...', $exact = true)
+	public static function shorten_html($string, $length = 384, $ellipsis = '...', $exact = true): string
 	{
 		// If its shorter than the maximum length, while accounting for html tags, simply return
 		if (self::strlen(preg_replace('~<.*?>~', '', $string)) <= $length)
@@ -409,7 +409,7 @@ class Util
 
 		// Start off empty
 		$total_length = $exact ? self::strlen($ellipsis) : 0;
-		$open_tags = array();
+		$open_tags = [];
 		$truncate = '';
 
 		// Group all html open and closing tags, [1] full tag with <> [2] basic tag name [3] tag content
@@ -452,12 +452,10 @@ class Util
 				$truncate .= self::substr($tag[3], 0, $remaining);
 				break;
 			}
+
 			// Still room to go so add the tag content and continue
-			else
-			{
-				$truncate .= $tag[3];
-				$total_length += $content_length;
-			}
+			$truncate .= $tag[3];
+			$total_length += $content_length;
 
 			// Are we there yet?
 			if ($total_length >= $length)
@@ -534,7 +532,7 @@ class Util
 	 *
 	 * @return string
 	 */
-	public static function ucwords($string)
+	public static function ucwords($string): string
 	{
 		$words = preg_split('~([\s\r\n\t]+)~', $string, -1, PREG_SPLIT_DELIM_CAPTURE);
 		for ($i = 0, $n = count($words); $i < $n; $i += 2)
@@ -552,7 +550,7 @@ class Util
 	 *
 	 * @return string
 	 */
-	public static function ucfirst($string)
+	public static function ucfirst($string): string
 	{
 		return self::strtoupper(self::substr($string, 0, 1)) . self::substr($string, 1);
 	}
@@ -566,7 +564,7 @@ class Util
 	 *
 	 * @return string
 	 */
-	public static function strtoupper($string)
+	public static function strtoupper($string): string
 	{
 		if (function_exists('mb_strtoupper'))
 		{
@@ -586,9 +584,9 @@ class Util
 	 * @param string $string The string to unserialize
 	 * @param string[] $options Optional.  Additionally, it doesn't allow to use the option:
 	 *                          allowed_classes => true, that is reverted to false.
-	 * @return mixed
+	 * @return mixed|false
 	 */
-	public static function unserialize($string, $options = array())
+	public static function unserialize($string, $options = [])
 	{
 		$options['allowed_classes'] = false;
 		if (self::is_serialized($string))
@@ -602,12 +600,12 @@ class Util
 	/**
 	 * Determine if a string is serialized
 	 *
-	 * - avoids the notice/warning it could raise
+	 * - Avoids the notice/warning it could raise
 	 *
 	 * @param string $string
 	 * @return bool
 	 */
-	public static function is_serialized($string)
+	public static function is_serialized($string): bool
 	{
 		$check = false;
 
@@ -657,7 +655,7 @@ class Util
 			$timestamp = time();
 		}
 
-		$date_equivalents = array(
+		$date_equivalents = [
 			'%a' => 'D',
 			'%A' => 'l',
 			'%d' => 'd',
@@ -705,7 +703,7 @@ class Util
 			'%n' => "\n",
 			'%t' => "\t",
 			'%%' => '%',
-		);
+		];
 
 		return preg_replace_callback(
 			'/%[A-Za-z]{1}/',
@@ -741,7 +739,7 @@ class Util
 	 * @param string $string
 	 * @return string
 	 */
-	public static function clean_4byte_chars($string)
+	public static function clean_4byte_chars($string): string
 	{
 		global $modSettings;
 
@@ -770,7 +768,7 @@ class Util
 				if ($ord1 >= 240 && $ord1 <= 247)
 				{
 					// Replace it with the corresponding html entity
-					$entity = self::uniord(chr($ord[$i]) . chr($ord[$i + 1]) . chr($ord[$i + 2]) . chr($ord[$i + 3]));
+					$entity = self::getUnicodeOrdinal(chr($ord[$i]) . chr($ord[$i + 1]) . chr($ord[$i + 2]) . chr($ord[$i + 3]));
 
 					if ($entity === false)
 					{
@@ -799,42 +797,42 @@ class Util
 	 * This function is derived from:
 	 * http://www.greywyvern.com/code/php/utf8_html
 	 *
-	 * @param string $c
-	 * @return integer|false
+	 * @param string $character
+	 * @return int|false
 	 */
-	public static function uniord($c)
+	public static function getUnicodeOrdinal($character)
 	{
-		if (ord($c[0]) >= 0 && ord($c[0]) <= 127)
+		if (ord($character[0]) <= 127)
 		{
-			return ord($c[0]);
+			return ord($character[0]);
 		}
 
-		if (ord($c[0]) >= 192 && ord($c[0]) <= 223)
+		if (ord($character[0]) >= 192 && ord($character[0]) <= 223)
 		{
-			return (ord($c[0]) - 192) * 64 + (ord($c[1]) - 128);
+			return (ord($character[0]) - 192) * 64 + (ord($character[1]) - 128);
 		}
 
-		if (ord($c[0]) >= 224 && ord($c[0]) <= 239)
+		if (ord($character[0]) >= 224 && ord($character[0]) <= 239)
 		{
-			return (ord($c[0]) - 224) * 4096 + (ord($c[1]) - 128) * 64 + (ord($c[2]) - 128);
+			return (ord($character[0]) - 224) * 4096 + (ord($character[1]) - 128) * 64 + (ord($character[2]) - 128);
 		}
 
-		if (ord($c[0]) >= 240 && ord($c[0]) <= 247)
+		if (ord($character[0]) >= 240 && ord($character[0]) <= 247)
 		{
-			return (ord($c[0]) - 240) * 262144 + (ord($c[1]) - 128) * 4096 + (ord($c[2]) - 128) * 64 + (ord($c[3]) - 128);
+			return (ord($character[0]) - 240) * 262144 + (ord($character[1]) - 128) * 4096 + (ord($character[2]) - 128) * 64 + (ord($character[3]) - 128);
 		}
 
-		if (ord($c[0]) >= 248 && ord($c[0]) <= 251)
+		if (ord($character[0]) >= 248 && ord($character[0]) <= 251)
 		{
-			return (ord($c[0]) - 248) * 16777216 + (ord($c[1]) - 128) * 262144 + (ord($c[2]) - 128) * 4096 + (ord($c[3]) - 128) * 64 + (ord($c[4]) - 128);
+			return (ord($character[0]) - 248) * 16777216 + (ord($character[1]) - 128) * 262144 + (ord($character[2]) - 128) * 4096 + (ord($character[3]) - 128) * 64 + (ord($character[4]) - 128);
 		}
 
-		if (ord($c[0]) >= 252 && ord($c[0]) <= 253)
+		if (ord($character[0]) >= 252 && ord($character[0]) <= 253)
 		{
-			return (ord($c[0]) - 252) * 1073741824 + (ord($c[1]) - 128) * 16777216 + (ord($c[2]) - 128) * 262144 + (ord($c[3]) - 128) * 4096 + (ord($c[4]) - 128) * 64 + (ord($c[5]) - 128);
+			return (ord($character[0]) - 252) * 1073741824 + (ord($character[1]) - 128) * 16777216 + (ord($character[2]) - 128) * 262144 + (ord($character[3]) - 128) * 4096 + (ord($character[4]) - 128) * 64 + (ord($character[5]) - 128);
 		}
 
-		if (ord($c[0]) >= 254 && ord($c[0]) <= 255)
+		if (ord($character[0]) >= 254 && ord($character[0]) <= 255)
 		{
 			return false;
 		}

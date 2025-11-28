@@ -189,7 +189,7 @@ $txt['recaptcha_verification'] = 'Verification ReCaptcha';
 $txt['recaptcha_site_key'] = 'ReCaptcha Site Key';
 $txt['recaptcha_secret_key'] = 'ReCaptcha Secret Key';
 
-$txt['hcaptcha_desc'] = 'To enable hCAPTHCA on your forum you must create a <a href="https://www.hcaptcha.com">Caotcha API key pair</a> for your site.';
+$txt['hcaptcha_desc'] = 'To enable hCAPTHCA on your forum you must create a <a href="https://www.hcaptcha.com">hCapthca API key pair</a> for your site.';
 $txt['hcaptcha_enable'] = 'Enable hCaptcha verification';
 $txt['hcaptcha_verification'] = 'Verification hCaptcha';
 $txt['hcaptcha_site_key'] = 'hCaptcha Site Key';

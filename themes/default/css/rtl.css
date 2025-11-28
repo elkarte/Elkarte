@@ -1252,10 +1252,10 @@ div.labels {
  * -------------------------------------------------------
  */
 
-/* This one does 800 screens at default font size.
+/* This one does 825 screens at default font size.
    -------------------------------------------------------------------------------------------*/
 
-@media screen and (max-width: 50em) {
+@media screen and (max-width: 51.5em) {
 	#main_menu .linklevel1 {
 		margin-right: 0;
 		margin-left: .4rem;

@@ -62,7 +62,7 @@ class EmailWeekly extends AbstractNotifier
 	 * @param NotificationsTask $task
 	 * @param array $bodies
 	 */
-	protected function _send_weekly_email(NotificationInterface $obj, NotificationsTask $task, $bodies)
+	protected function _send_weekly_email(NotificationInterface $obj, NotificationsTask $task, $bodies): void
 	{
 		foreach ($bodies as $body)
 		{
@@ -84,7 +84,7 @@ class EmailWeekly extends AbstractNotifier
 	 *
 	 * @param array $insert_array
 	 */
-	protected function _insert_delayed($insert_array)
+	protected function _insert_delayed($insert_array): void
 	{
 		$this->db->insert('ignore',
 			'{db_prefix}pending_notifications',

@@ -67,32 +67,32 @@ class Autolink
 	/**
 	 * Load the autolink regular expressions to be used in autoLink()
 	 */
-	protected function load()
+	protected function load(): void
 	{
-		$search_url = array(
+		$search_url = [
 			'~(?<=[\s>\.(;\'"]|^)((?:http|https)://[\w\-_%@:|]+(?:\.[\w\-_%]+)*(?::\d+)?(?:/[\p{L}\p{N}\-_\~%\.@!,\?&;=*#(){}+:\'\\\\]*)*[/\p{L}\p{N}\-_\~%@\?;=#}\\\\])~ui',
 			'~(?<=[\s>(\'<]|^)(www(?:\.[\w\-_]+)+(?::\d+)?(?:/[\p{L}\p{N}\-_\~%\.@!,\?&;=#(){}+:\'\\\\]*)*[/\p{L}\p{N}\-_\~%@\?;=#}\\\\])~ui'
-		);
-		$replace_url = array(
+		];
+		$replace_url = [
 			//'[url_auto=$1]$1[/url_auto]',
 			//'[url_auto=$1]$1[/url_auto]',
 			'[url]$1[/url]',
 			'[url=https://$1]$1[/url]',
-		);
+		];
 
-		$search_email = array(
+		$search_email = [
 			'~(?<=[\?\s\x{A0}\[\]()*\\\;>]|^)([\w\-\.]{1,80}@[\w\-]+\.[\w\-\.]+[\w\-])(?=[?,\s\x{A0}\[\]()*\\\]|$|<br />|&nbsp;|&gt;|&lt;|&quot;|&#039;|\.(?:\.|;|&nbsp;|\s|$|<br />))~u',
 			'~(?<=<br />)([\w\-\.]{1,80}@[\w\-]+\.[\w\-\.]+[\w\-])(?=[?\.,;\s\x{A0}\[\]()*\\\]|$|<br />|&nbsp;|&gt;|&lt;|&quot;|&#039;)~u',
-		);
-		$replace_email = array(
+		];
+		$replace_email = [
 			//'[email_auto]$1[/email_auto]',
 			//'[email_auto]$1[/email_auto]',
 			'[email]$1[/email]',
 			'[email]$1[/email]',
-		);
+		];
 
 		// Allow integration an option to add / remove linking code
-		call_integration_hook('integrate_autolink_load', array(&$search_url, &$replace_url, &$search_email, &$replace_email, $this->bbc));
+		call_integration_hook('integrate_autolink_load', [&$search_url, &$replace_url, &$search_email, &$replace_email, $this->bbc]);
 
 		// Load them to the class
 		$this->search = $search_url;
@@ -131,7 +131,7 @@ class Autolink
 			$data = $this->parseEmails($data);
 		}
 
-		call_integration_hook('integrate_autolink_area', array(&$data, $this->bbc));
+		call_integration_hook('integrate_autolink_area', [&$data, $this->bbc]);
 
 		return $data;
 	}
@@ -143,7 +143,7 @@ class Autolink
 	 *
 	 * @return bool
 	 */
-	public function hasLinks($data)
+	public function hasLinks($data): bool
 	{
 		return $this->hasPossibleLink() && (strpos($data, '://') !== false || strpos($data, 'www.') !== false);
 	}
@@ -153,7 +153,7 @@ class Autolink
 	 *
 	 * @return bool
 	 */
-	public function hasPossibleLink()
+	public function hasPossibleLink(): bool
 	{
 		return $this->possible_link;
 	}
@@ -167,10 +167,10 @@ class Autolink
 	 *
 	 * @return string
 	 */
-	public function parseLinks($data)
+	public function parseLinks($data): string
 	{
 		// Switch out quotes really quick because they can cause problems.
-		$data = strtr($data, array('&#039;' => "'", '&nbsp;' => "\xC2\xA0", '&quot;' => '>">', '"' => '<"<', '&lt;' => '<lt<'));
+		$data = strtr($data, ['&#039;' => "'", '&nbsp;' => "\xC2\xA0", '&quot;' => '>">', '"' => '<"<', '&lt;' => '<lt<']);
 
 		$result = preg_replace($this->search, $this->replace, $data);
 
@@ -181,7 +181,7 @@ class Autolink
 		}
 
 		// Switch those quotes back
-		return strtr($data, array("'" => '&#039;', "\xC2\xA0" => '&nbsp;', '>">' => '&quot;', '<"<' => '"', '<lt<' => '&lt;'));
+		return strtr($data, ["'" => '&#039;', "\xC2\xA0" => '&nbsp;', '>">' => '&quot;', '<"<' => '"', '<lt<' => '&lt;']);
 	}
 
 	/**
@@ -191,7 +191,7 @@ class Autolink
 	 *
 	 * @return bool
 	 */
-	public function hasEmails($data)
+	public function hasEmails($data): bool
 	{
 		return $this->hasPossibleEmail() && strpos($data, '@') !== false;
 	}
@@ -201,7 +201,7 @@ class Autolink
 	 *
 	 * @return bool
 	 */
-	public function hasPossibleEmail()
+	public function hasPossibleEmail(): bool
 	{
 		return $this->possible_email;
 	}
@@ -224,13 +224,13 @@ class Autolink
 	 *
 	 * @param string $message
 	 */
-	public function setPossibleAutolink($message)
+	public function setPossibleAutolink($message): void
 	{
 		$possible_link = $this->url_enabled && (strpos($message, '://') !== false || strpos($message, 'www.') !== false);
 		$possible_email = $this->email_enabled && strpos($message, '@') !== false;
 
 		// Your autolink integration might use something like tel.123456789.call. This makes that possible.
-		call_integration_hook('integrate_possible_autolink', array(&$possible_link, &$possible_email));
+		call_integration_hook('integrate_possible_autolink', [&$possible_link, &$possible_email]);
 
 		$this->possible_link = $possible_link;
 		$this->possible_email = $possible_email;
@@ -241,7 +241,7 @@ class Autolink
 	 *
 	 * @return bool
 	 */
-	public function hasPossible()
+	public function hasPossible(): bool
 	{
 		if ($this->hasPossibleLink())
 		{

@@ -61,7 +61,7 @@ class Display extends AbstractModule
 	/**
 	 * Loads up all the attachments.  Called from integrate_display_message_list
 	 */
-	public static function integrate_display_message_list(&$messages, &$posters)
+	public static function integrate_display_message_list(&$messages, &$posters): void
 	{
 		self::$attachments = new AttachmentsDisplay($messages, $posters, self::$includeUnapproved);
 	}
@@ -69,7 +69,7 @@ class Display extends AbstractModule
 	/**
 	 * Shows the attachments for the current message
 	 */
-	public static function integrate_prepare_display_context(&$output, &$this_message, $counter)
+	public static function integrate_prepare_display_context(&$output, &$this_message, $counter): void
 	{
 		[$output['attachment'], $output['ila']] = self::$attachments->loadAttachmentContext($this_message['id_msg']);
 	}

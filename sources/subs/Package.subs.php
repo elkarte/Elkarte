@@ -96,12 +96,10 @@ function read_tgz_data($data, $destination, $single_file = false, $overwrite = f
 	{
 		return $untgz->read_tgz_data();
 	}
-	else
-	{
-		unset($untgz);
 
-		return read_zip_data($data, $destination, $single_file, $overwrite, $files_to_extract);
-	}
+	unset($untgz);
+
+	return read_zip_data($data, $destination, $single_file, $overwrite, $files_to_extract);
 }
 
 /**
@@ -176,7 +174,7 @@ function loadInstalledPackages()
 				return;
 			}
 
-			$found[] = (int) $row['package_id'];
+			$found[] = $row['package_id'];
 
 			$installed[] = [
 				'id' => (int) $row['id_install'],
@@ -241,7 +239,7 @@ function getPackageInfo($gzFilename)
 	// Nothing?
 	if (empty($packageInfo))
 	{
-		// Perhaps they are trying to install a theme, lets tell them nicely this is the wrong function
+		// Perhaps they are trying to install a theme, tell them, nicely, this is the wrong function
 		$packageInfo = read_tgz_file(BOARDDIR . '/packages/' . $gzFilename, '*/theme_info.xml', true);
 		if (!empty($packageInfo))
 		{
@@ -546,7 +544,8 @@ function compareVersions($version1, $version2)
 			{
 				return $versions[1][$category] > $versions[2][$category] ? ($versions[1]['dev'] ? -1 : 1) : ($versions[2]['dev'] ? 1 : -1);
 			}
-			elseif ($category === 'dev')
+
+			if ($category === 'dev')
 			{
 				return $versions[1]['dev'] ? ($versions[2]['type'] === 'stable' ? -1 : 0) : ($versions[1]['type'] === 'stable' ? 1 : 0);
 			}
@@ -587,6 +586,7 @@ function parse_path($path)
 		'CONTROLLERDIR' => CONTROLLERDIR,
 		'EXTDIR' => EXTDIR,
 		'ADDONSDIR' => ADDONSDIR,
+		'ELKARTEDIR' => ELKARTEDIR,
 		'AVATARSDIR' => $modSettings['avatar_directory'],
 		'THEMEDIR' => $settings['default_theme_dir'],
 		'IMAGESDIR' => $settings['default_theme_dir'] . '/' . basename($settings['default_images_url']),
@@ -772,16 +772,14 @@ function mktree($strPath, $mode = true)
 		return $package_ftp->create_dir(setFtpName($strPath));
 	}
 	// Only one choice left and that is to try and make a directory with PHP
-	else
+
+	try
 	{
-		try
-		{
-			return $fileFunc->createDirectory($strPath, false);
-		}
-		catch (Exception $e)
-		{
-			return false;
-		}
+		return $fileFunc->createDirectory($strPath, false);
+	}
+	catch (Exception $e)
+	{
+		return false;
 	}
 }
 
@@ -1326,10 +1324,8 @@ function package_get_contents($filename)
 	{
 		return file_get_contents($filename);
 	}
-	else
-	{
-		return $package_cache[$filename];
-	}
+
+	return $package_cache[$filename];
 }
 
 /**
@@ -1404,7 +1400,7 @@ function package_put_contents($filename, $data, $testing = false)
 		$package_cache[$filename] = $data;
 
 		// Permission denied, eh?
-		$fp = @fopen($filename, 'r+');
+		$fp = @fopen($filename, 'rb+');
 		if (!$fp)
 		{
 			return false;
@@ -1462,7 +1458,7 @@ function package_flush_cache($trash = false)
 		if (!$trash && !$fileFunc->isDir($filename))
 		{
 			// Acid test, can we really open this file for writing?
-			$fp = ($result) ? fopen($filename, 'r+') : $result;
+			$fp = ($result) ? fopen($filename, 'rb+') : $result;
 			if (!$fp)
 			{
 				// We should have package_chmod()'d them before, no?!
@@ -1718,7 +1714,7 @@ function fetch_web_data($url, $post_data = '', $keep_alive = false, $redirection
 
 		// no errors and a 200 result, then we have a good dataset, well we at least have data ;)
 		$fetch_data->get_url_data($url, $post_data);
-		if ($fetch_data->result('code') == 200 && !$fetch_data->result('error'))
+		if ((int) $fetch_data->result('code') === 200 && !$fetch_data->result('error'))
 		{
 			return $fetch_data->result('body');
 		}
@@ -1732,7 +1728,7 @@ function fetch_web_data($url, $post_data = '', $keep_alive = false, $redirection
 /**
  * Checks if a package is installed or not
  *
- * - If installed returns an array of themes, db changes and versions associated with
+ * - If installed, returns an array of themes, db changes and versions associated with
  * the package id
  *
  * @param string $id of package to check

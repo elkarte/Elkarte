@@ -12,6 +12,7 @@
 
 namespace ElkArte\Search\API;
 
+use ElkArte\Database\AbstractResult;
 use ElkArte\Database\AbstractSearch;
 use ElkArte\Database\QueryInterface;
 use ElkArte\Helper\HttpReq;
@@ -110,7 +111,7 @@ abstract class AbstractAPI
 	 *
 	 * @return int
 	 */
-	protected function _getMinWordLength()
+	protected function _getMinWordLength(): int
 	{
 		return 3;
 	}
@@ -120,7 +121,7 @@ abstract class AbstractAPI
 	 *
 	 * @return bool
 	 */
-	public function isValid()
+	public function isValid(): bool
 	{
 		// Always fall back to the standard search method.
 		return in_array($this->_db->title(), $this->supported_databases, true);
@@ -131,7 +132,7 @@ abstract class AbstractAPI
 	 *
 	 * @param string[] $words An array of words to exclude
 	 */
-	public function setExcludedWords($words)
+	public function setExcludedWords($words): void
 	{
 		$this->_excludedWords = $words;
 	}
@@ -141,7 +142,7 @@ abstract class AbstractAPI
 	 *
 	 * @param string[] $phrases An array of phrases to exclude
 	 */
-	public function setExcludedPhrases($phrases)
+	public function setExcludedPhrases($phrases): void
 	{
 		$this->_excludedPhrases = $phrases;
 	}
@@ -151,7 +152,7 @@ abstract class AbstractAPI
 	 *
 	 * @param SearchArray $searchArray
 	 */
-	public function setSearchArray(SearchArray $searchArray)
+	public function setSearchArray(SearchArray $searchArray): void
 	{
 		$this->_searchArray = $searchArray;
 	}
@@ -161,7 +162,7 @@ abstract class AbstractAPI
 	 *
 	 * @param bool $use
 	 */
-	public function useTemporary($use = false)
+	public function useTemporary($use = false): void
 	{
 		$this->_createTemporary = $use;
 	}
@@ -171,7 +172,7 @@ abstract class AbstractAPI
 	 *
 	 * @param WeightFactors $weights
 	 */
-	public function setWeightFactors(WeightFactors $weights)
+	public function setWeightFactors(WeightFactors $weights): void
 	{
 		$this->_weight_factors = $weights->getFactors();
 
@@ -185,7 +186,7 @@ abstract class AbstractAPI
 	 *
 	 * @return int
 	 */
-	public function getNumResults()
+	public function getNumResults(): int
 	{
 		return $this->_num_results;
 	}
@@ -200,7 +201,7 @@ abstract class AbstractAPI
 	 * @param string $b Word B
 	 * @return int An integer indicating how the words should be sorted (-1, 0 1)
 	 */
-	public function searchSort($a, $b)
+	public function searchSort($a, $b): int
 	{
 		$x = Util::strlen($a) - (in_array($a, $this->_excludedWords, true) ? 1000 : 0);
 		$y = Util::strlen($b) - (in_array($b, $this->_excludedWords, true) ? 1000 : 0);
@@ -214,7 +215,7 @@ abstract class AbstractAPI
 	 * @param string $word
 	 * @param array $wordsSearch
 	 * @param array $wordsExclude
-	 * @param boolean $isExcluded
+	 * @param bool $isExcluded
 	 * @param string $excludedSubjectWords
 	 */
 	public function prepareIndexes($word, &$wordsSearch, &$wordsExclude, $isExcluded, $excludedSubjectWords)
@@ -223,11 +224,11 @@ abstract class AbstractAPI
 	}
 
 	/**
-	 * Returns if the API uses the extended query syntax (aka sphinx etc)
+	 * Returns if the API uses the extended query syntax (aka sphinx etc.)
 	 *
 	 * @return bool
 	 */
-	public function supportsExtended()
+	public function supportsExtended(): bool
 	{
 		return false;
 	}
@@ -244,10 +245,8 @@ abstract class AbstractAPI
 	 *
 	 * @param array $words An array of words
 	 * @param array $search_data An array of search data
-	 *
-	 * @return resource
 	 */
-	abstract public function indexedWordQuery($words, $search_data);
+	abstract public function indexedWordQuery(array $words, array $search_data);
 
 	/**
 	 * Escape words passed by the client
@@ -259,7 +258,7 @@ abstract class AbstractAPI
 	 *
 	 * @return string
 	 */
-	public function prepareWord($phrase, $no_regexp)
+	public function prepareWord($phrase, $no_regexp): string
 	{
 		global $modSettings;
 

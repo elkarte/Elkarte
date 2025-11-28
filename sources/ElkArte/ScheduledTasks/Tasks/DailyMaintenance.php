@@ -51,15 +51,15 @@ class DailyMaintenance implements ScheduledTaskInterface
 		if ($modSettings['warning_decrement'] !== '' && $modSettings['warning_decrement'] !== '0')
 		{
 			// Find every member who has a warning level...
-			$members = array();
+			$members = [];
 			$db->fetchQuery('
 				SELECT 
 					id_member, warning
 				FROM {db_prefix}members
 				WHERE warning > {int:no_warning}',
-				array(
+				[
 					'no_warning' => 0,
-				)
+				]
 			)->fetch_callback(
 				static function ($row) use (&$members) {
 					$members[$row['id_member']] = $row['warning'];
@@ -70,7 +70,7 @@ class DailyMaintenance implements ScheduledTaskInterface
 			if (!empty($members))
 			{
 				// Find out when they were last warned.
-				$member_changes = array();
+				$member_changes = [];
 				$db->fetchQuery('
 					SELECT 
 						id_recipient, MAX(log_time) AS last_warning
@@ -78,19 +78,19 @@ class DailyMaintenance implements ScheduledTaskInterface
 					WHERE id_recipient IN ({array_int:member_list})
 						AND comment_type = {string:warning}
 					GROUP BY id_recipient',
-					array(
+					[
 						'member_list' => array_keys($members),
 						'warning' => 'warning',
-					)
+					]
 				)->fetch_callback(
 					static function ($row) use (&$member_changes, $modSettings, $members) {
 						// More than 24 hours ago?
 						if ($row['last_warning'] <= time() - 86400)
 						{
-							$member_changes[] = array(
+							$member_changes[] = [
 								'id' => $row['id_recipient'],
 								'warning' => $members[$row['id_recipient']] >= $modSettings['warning_decrement'] ? $members[$row['id_recipient']] - $modSettings['warning_decrement'] : 0,
-							);
+							];
 						}
 					}
 				);
@@ -101,7 +101,7 @@ class DailyMaintenance implements ScheduledTaskInterface
 					require_once(SUBSDIR . '/Members.subs.php');
 					foreach ($member_changes as $change)
 					{
-						updateMemberData($change['id'], array('warning' => $change['warning']));
+						updateMemberData($change['id'], ['warning' => $change['warning']]);
 					}
 				}
 			}
@@ -119,9 +119,9 @@ class DailyMaintenance implements ScheduledTaskInterface
 		$db->query('', '
 			DELETE FROM {db_prefix}member_logins
 			WHERE time > {int:oldLogins}',
-			array(
+			[
 				'oldLogins' => empty($modSettings['loginHistoryDays']) ? 108000 : 60 * 60 * $modSettings['loginHistoryDays'],
-			));
+			]);
 
 		// Log we've done it...
 		return true;

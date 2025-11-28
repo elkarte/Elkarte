@@ -35,7 +35,7 @@ class ManageCalendarModule extends AbstractController
 	 *
 	 * @param array $core_features The core features array
 	 */
-	public static function addCoreFeature(&$core_features)
+	public static function addCoreFeature(array &$core_features): void
 	{
 		$core_features['cd'] = [
 			'url' => getUrl('admin', ['action' => 'admin', 'area' => 'managecalendar', '{session_data}']),
@@ -107,7 +107,7 @@ class ManageCalendarModule extends AbstractController
 	/**
 	 * The function that handles adding, and deleting holiday data
 	 */
-	public function action_holidays()
+	public function action_holidays(): void
 	{
 		global $txt, $context;
 
@@ -221,7 +221,7 @@ class ManageCalendarModule extends AbstractController
 	 *
 	 * @uses ManageCalendar template, edit_holiday sub template
 	 */
-	public function action_editholiday()
+	public function action_editholiday(): void
 	{
 		global $txt, $context, $modSettings;
 
@@ -300,7 +300,7 @@ class ManageCalendarModule extends AbstractController
 	 * @event integrate_save_calendar_settings
 	 * - The method uses a \ElkArte\SettingsForm\SettingsForm to do the work.
 	 */
-	public function action_calendarSettings_display()
+	public function action_calendarSettings_display(): void
 	{
 		global $txt, $context;
 

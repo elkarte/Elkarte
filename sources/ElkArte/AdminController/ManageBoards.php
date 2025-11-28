@@ -35,10 +35,10 @@ use ElkArte\SettingsForm\SettingsForm;
 class ManageBoards extends AbstractController
 {
 	/** @var int Category being worked on */
-	public $cat;
+	public int $cat;
 
 	/** @var int Current board id being modified */
-	public $boardid;
+	public int $boardid;
 
 	/**
 	 * The main dispatcher; delegates.
@@ -59,44 +59,44 @@ class ManageBoards extends AbstractController
 		Txt::load('ManageBoards');
 
 		// Format: 'sub-action' => array('controller', 'function', 'permission'=>'need')
-		$subActions = array(
-			'board' => array(
+		$subActions = [
+			'board' => [
 				'controller' => $this,
 				'function' => 'action_board',
-				'permission' => 'manage_boards'),
-			'board2' => array(
+				'permission' => 'manage_boards'],
+			'board2' => [
 				'controller' => $this,
 				'function' => 'action_board2',
-				'permission' => 'manage_boards'),
-			'cat' => array(
+				'permission' => 'manage_boards'],
+			'cat' => [
 				'controller' => $this,
 				'function' => 'action_cat',
-				'permission' => 'manage_boards'),
-			'cat2' => array(
+				'permission' => 'manage_boards'],
+			'cat2' => [
 				'controller' => $this,
 				'function' => 'action_cat2',
-				'permission' => 'manage_boards'),
-			'main' => array(
+				'permission' => 'manage_boards'],
+			'main' => [
 				'controller' => $this,
 				'function' => 'action_main',
-				'permission' => 'manage_boards'),
-			'move' => array(
+				'permission' => 'manage_boards'],
+			'move' => [
 				'controller' => $this,
 				'function' => 'action_main',
-				'permission' => 'manage_boards'),
-			'newcat' => array(
+				'permission' => 'manage_boards'],
+			'newcat' => [
 				'controller' => $this,
 				'function' => 'action_cat',
-				'permission' => 'manage_boards'),
-			'newboard' => array(
+				'permission' => 'manage_boards'],
+			'newboard' => [
 				'controller' => $this,
 				'function' => 'action_board',
-				'permission' => 'manage_boards'),
-			'settings' => array(
+				'permission' => 'manage_boards'],
+			'settings' => [
 				'controller' => $this,
 				'function' => 'action_boardSettings_display',
-				'permission' => 'admin_forum'),
-		);
+				'permission' => 'admin_forum'],
+		];
 
 		// You way will end here if you don't have permission.
 		$action = new Action('manage_boards');
@@ -128,7 +128,7 @@ class ManageBoards extends AbstractController
 	 * @event integrate_boards_main Used to access global board arrays before the template
 	 * @uses ManageBoards template, main sub-template.
 	 */
-	public function action_main()
+	public function action_main(): void
 	{
 		global $txt, $context;
 
@@ -138,7 +138,7 @@ class ManageBoards extends AbstractController
 
 		// Moving a board, child of, before, after, top
 		if ($this->_req->compareQuery('sa', 'move', 'trim|strval')
-			&& in_array($this->_req->query->move_to, array('child', 'before', 'after', 'top')))
+			&& in_array($this->_req->query->move_to, ['child', 'before', 'after', 'top']))
 		{
 			checkSession('get');
 			validateToken('admin-bm-' . (int) $this->_req->query->src_board, 'request');
@@ -146,20 +146,20 @@ class ManageBoards extends AbstractController
 			// Top is special, its the top!
 			if ($this->_req->query->move_to === 'top')
 			{
-				$boardOptions = array(
+				$boardOptions = [
 					'move_to' => $this->_req->query->move_to,
 					'target_category' => $this->_req->getQuery('target_cat', 'intval', 0),
 					'move_first_child' => true,
-				);
+				];
 			}
 			// Moving it after another board
 			else
 			{
-				$boardOptions = array(
+				$boardOptions = [
 					'move_to' => $this->_req->query->move_to,
 					'target_board' => $this->_req->getQuery('target_board', 'intval', 0),
 					'move_first_child' => true,
-				);
+				];
 			}
 
 			// Use modifyBoard to perform the action
@@ -178,26 +178,26 @@ class ManageBoards extends AbstractController
 		$bbc_parser = ParserWrapper::instance();
 		$cat_tree = $boardTree->getCategories();
 
-		$context['categories'] = array();
+		$context['categories'] = [];
 		foreach ($cat_tree as $catid => $tree)
 		{
-			$context['categories'][$catid] = array(
+			$context['categories'][$catid] = [
 				'name' => $tree['node']['name'],
 				'id' => $tree['node']['id'],
-				'boards' => array()
-			);
+				'boards' => []
+			];
 			$move_cat = !empty($context['move_board']) && $boards[$context['move_board']]['category'] === $catid;
 			foreach ($boardList[$catid] as $boardid)
 			{
 				$boards[$boardid]['description'] = $bbc_parser->parseBoard($boards[$boardid]['description']);
-				$context['categories'][$catid]['boards'][$boardid] = array(
+				$context['categories'][$catid]['boards'][$boardid] = [
 					'id' => $boards[$boardid]['id'],
 					'name' => $boards[$boardid]['name'],
 					'description' => $boards[$boardid]['description'],
 					'child_level' => $boards[$boardid]['level'],
 					'move' => $move_cat && ($boardid === $context['move_board'] || $boardTree->isChildOf($boardid, (int) $context['move_board'])),
 					'permission_profile' => $boards[$boardid]['profile'],
-				);
+				];
 			}
 		}
 
@@ -210,7 +210,7 @@ class ManageBoards extends AbstractController
 			{
 				$prev_child_level = 0;
 				$prev_board = 0;
-				$stack = array();
+				$stack = [];
 
 				// Just a shortcut, this is the same for all the urls
 				$security_token = $context['admin-bm-' . $context['move_board'] . '_token_var'] . '=' . $context['admin-bm-' . $context['move_board'] . '_token'];
@@ -218,27 +218,27 @@ class ManageBoards extends AbstractController
 				{
 					if (!isset($context['categories'][$catid]['move_link']))
 					{
-						$context['categories'][$catid]['move_link'] = array(
+						$context['categories'][$catid]['move_link'] = [
 							'child_level' => 0,
 							'label' => $txt['mboards_order_before'] . " '" . htmlspecialchars($boards[$boardid]['name'], ENT_COMPAT, 'UTF-8') . "'",
 							'href' => getUrl('admin', ['action' => 'admin', 'area' => 'manageboards', 'sa' => 'move', 'src_board' => $context['move_board'], 'target_board' => $boardid, 'move_to' => 'before', '{session_data}', $security_token]),
-						);
+						];
 					}
 
 					if (!$context['categories'][$catid]['boards'][$boardid]['move'])
 					{
-						$context['categories'][$catid]['boards'][$boardid]['move_links'] = array(
-							array(
+						$context['categories'][$catid]['boards'][$boardid]['move_links'] = [
+							[
 								'child_level' => $boards[$boardid]['level'],
 								'label' => $txt['mboards_order_after'] . "'" . htmlspecialchars($boards[$boardid]['name'], ENT_COMPAT, 'UTF-8') . "'",
 								'href' => getUrl('admin', ['action' => 'admin', 'area' => 'manageboards', 'sa' => 'move', 'src_board' => $context['move_board'], 'target_board' => $boardid, 'move_to' => 'after', '{session_data}', $security_token]),
-							),
-							array(
+							],
+							[
 								'child_level' => $boards[$boardid]['level'] + 1,
 								'label' => $txt['mboards_order_child_of'] . " '" . htmlspecialchars($boards[$boardid]['name'], ENT_COMPAT, 'UTF-8') . "'",
 								'href' => getUrl('admin', ['action' => 'admin', 'area' => 'manageboards', 'sa' => 'move', 'src_board' => $context['move_board'], 'target_board' => $boardid, 'move_to' => 'child', '{session_data}', $security_token]),
-							),
-						);
+							],
+						];
 					}
 
 					$difference = $boards[$boardid]['level'] - $prev_child_level;
@@ -250,7 +250,7 @@ class ManageBoards extends AbstractController
 					{
 						if (empty($context['categories'][$catid]['boards'][$prev_board]['move_links']))
 						{
-							$context['categories'][$catid]['boards'][$prev_board]['move_links'] = array();
+							$context['categories'][$catid]['boards'][$prev_board]['move_links'] = [];
 						}
 
 						for ($i = 0; $i < -$difference; $i++)
@@ -277,11 +277,11 @@ class ManageBoards extends AbstractController
 
 				if (empty($boardList[$catid]))
 				{
-					$context['categories'][$catid]['move_link'] = array(
+					$context['categories'][$catid]['move_link'] = [
 						'child_level' => 0,
 						'label' => $txt['mboards_order_before'] . " '" . htmlspecialchars($tree['node']['name'], ENT_COMPAT, 'UTF-8') . "'",
 						'href' => getUrl('admin', ['action' => 'admin', 'area' => 'manageboards', 'sa' => 'move', 'src_board' => $context['move_board'], 'target_cat' => $catid, 'move_to' => 'top', '{session_data}', $security_token]),
-					);
+					];
 				}
 			}
 		}
@@ -304,7 +304,7 @@ class ManageBoards extends AbstractController
 	 * - Called by ?action=admin;area=manageboards;sa=cat2
 	 * - Redirects to ?action=admin;area=manageboards.
 	 */
-	public function action_cat2()
+	public function action_cat2(): void
 	{
 		checkSession();
 		validateToken('admin-bc-' . $this->_req->post->cat);
@@ -316,7 +316,7 @@ class ManageBoards extends AbstractController
 		// Add a new category or modify an existing one..
 		if (isset($this->_req->post->edit) || isset($this->_req->post->add))
 		{
-			$catOptions = array();
+			$catOptions = [];
 
 			if (isset($this->_req->post->cat_order))
 			{
@@ -354,11 +354,11 @@ class ManageBoards extends AbstractController
 					throw new Exception('mboards_delete_error');
 				}
 
-				deleteCategories(array($this->cat), $this->_req->getPost('cat_to', 'intval'));
+				deleteCategories([$this->cat], $this->_req->getPost('cat_to', 'intval'));
 			}
 			else
 			{
-				deleteCategories(array($this->cat));
+				deleteCategories([$this->cat]);
 			}
 		}
 
@@ -378,7 +378,7 @@ class ManageBoards extends AbstractController
 	 * @event integrate_edit_category access category globals before the template
 	 * @uses ManageBoards template, modify_category sub-template.
 	 */
-	public function action_cat()
+	public function action_cat(): void
 	{
 		global $txt, $context;
 
@@ -391,26 +391,26 @@ class ManageBoards extends AbstractController
 		$this->cat = $this->_req->getQuery('cat', 'intval', 0);
 
 		// Start with one - "In first place".
-		$context['category_order'] = array(
-			array(
+		$context['category_order'] = [
+			[
 				'id' => 0,
 				'name' => $txt['mboards_order_first'],
 				'selected' => !empty($this->cat) && !empty($cat_tree[$this->cat]['is_first']),
 				'true_name' => ''
-			)
-		);
+			]
+		];
 
 		// If this is a new category set up some defaults.
 		if ($this->_req->compareQuery('sa', 'newcat', 'trim'))
 		{
-			$context['category'] = array(
+			$context['category'] = [
 				'id' => 0,
 				'name' => $txt['mboards_new_cat_name'],
 				'editable_name' => htmlspecialchars($txt['mboards_new_cat_name'], ENT_COMPAT, 'UTF-8'),
 				'can_collapse' => true,
 				'is_new' => true,
 				'is_empty' => true
-			);
+			];
 		}
 		// Category doesn't exist, man... sorry.
 		elseif ($boardTree->categoryExists($this->cat) === false)
@@ -419,14 +419,14 @@ class ManageBoards extends AbstractController
 		}
 		else
 		{
-			$context['category'] = array(
+			$context['category'] = [
 				'id' => $this->cat,
 				'name' => $cat_tree[$this->cat]['node']['name'],
 				'editable_name' => htmlspecialchars($cat_tree[$this->cat]['node']['name'], ENT_COMPAT, 'UTF-8'),
 				'can_collapse' => !empty($cat_tree[$this->cat]['node']['can_collapse']),
-				'children' => array(),
+				'children' => [],
 				'is_empty' => empty($cat_tree[$this->cat]['children'])
-			);
+			];
 
 			$boardCat = $boardTree->getBoardsInCat($this->cat);
 			$boards = $boardTree->getBoards();
@@ -445,12 +445,12 @@ class ManageBoards extends AbstractController
 			}
 			elseif ($catid !== $this->cat)
 			{
-				$context['category_order'][$catid] = array(
+				$context['category_order'][$catid] = [
 					'id' => $catid,
 					'name' => $txt['mboards_order_after'] . $tree['node']['name'],
 					'selected' => false,
 					'true_name' => $tree['node']['name']
-				);
+				];
 			}
 
 			$prevCat = $catid;
@@ -487,7 +487,7 @@ class ManageBoards extends AbstractController
 	 *
 	 * @event integrate_save_board
 	 */
-	public function action_board2()
+	public function action_board2(): void
 	{
 		global $context;
 
@@ -503,7 +503,7 @@ class ManageBoards extends AbstractController
 		// Mode: modify aka. don't delete.
 		if (isset($this->_req->post->edit) || isset($this->_req->post->add))
 		{
-			$boardOptions = array();
+			$boardOptions = [];
 
 			// Move this board to a new category?
 			if (!empty($this->_req->post->new_cat))
@@ -514,7 +514,7 @@ class ManageBoards extends AbstractController
 			// Change the boardorder of this board?
 			elseif (!empty($this->_req->post->placement) && !empty($this->_req->post->board_order))
 			{
-				if (!in_array($this->_req->post->placement, array('before', 'after', 'child')))
+				if (!in_array($this->_req->post->placement, ['before', 'after', 'child']))
 				{
 					throw new Exception('mangled_post', false);
 				}
@@ -528,8 +528,8 @@ class ManageBoards extends AbstractController
 			$boardOptions['old_posts'] = isset($this->_req->post->old_posts);
 			$boardOptions['override_theme'] = isset($this->_req->post->override_theme);
 			$boardOptions['board_theme'] = (int) $this->_req->post->boardtheme;
-			$boardOptions['access_groups'] = array();
-			$boardOptions['deny_groups'] = array();
+			$boardOptions['access_groups'] = [];
+			$boardOptions['deny_groups'] = [];
 
 			if (!empty($this->_req->post->groups))
 			{
@@ -563,7 +563,7 @@ class ManageBoards extends AbstractController
 
 			if (isset($this->_req->post->moderator_list) && is_array($this->_req->post->moderator_list))
 			{
-				$moderators = array();
+				$moderators = [];
 				foreach ($this->_req->post->moderator_list as $moderator)
 				{
 					$moderators[(int) $moderator] = (int) $moderator;
@@ -601,7 +601,7 @@ class ManageBoards extends AbstractController
 				}
 			}
 
-			call_integration_hook('integrate_save_board', array($board_id, &$boardOptions));
+			call_integration_hook('integrate_save_board', [$board_id, &$boardOptions]);
 
 			// Create a new board...
 			if (isset($this->_req->post->add))
@@ -651,11 +651,11 @@ class ManageBoards extends AbstractController
 				{
 					throw new Exception('mboards_delete_board_error');
 				}
-				$boardTree->deleteBoards(array($board_id), $this->_req->getPost('board_to', 'intval'));
+				$boardTree->deleteBoards([$board_id], $this->_req->getPost('board_to', 'intval'));
 			}
 			else
 			{
-				$boardTree->deleteBoards(array($board_id), 0);
+				$boardTree->deleteBoards([$board_id], 0);
 			}
 		}
 
@@ -682,7 +682,7 @@ class ManageBoards extends AbstractController
 	 * @uses the modify_board sub-template of the ManageBoards template.
 	 * @uses ManagePermissions language
 	 */
-	public function action_board()
+	public function action_board(): void
 	{
 		global $txt, $context, $modSettings;
 
@@ -715,13 +715,13 @@ class ManageBoards extends AbstractController
 			}
 
 			// Some things that need to be setup for a new board.
-			$curBoard = array(
-				'member_groups' => array(0, -1),
-				'deny_groups' => array(),
+			$curBoard = [
+				'member_groups' => [0, -1],
+				'deny_groups' => [],
 				'category' => $this->cat
-			);
-			$context['board_order'] = array();
-			$context['board'] = array(
+			];
+			$context['board_order'] = [];
+			$context['board'] = [
 				'is_new' => true,
 				'id' => 0,
 				'name' => $txt['mboards_new_board_name'],
@@ -736,14 +736,14 @@ class ManageBoards extends AbstractController
 				'redirect' => '',
 				'category' => $this->cat,
 				'no_children' => true,
-			);
+			];
 		}
 		else
 		{
 			// Just some easy shortcuts.
 			$curBoard = $boardTree->getBoardById($this->boardid);
 			$context['board'] = $curBoard;
-			$context['board']['name'] = htmlspecialchars(strtr($context['board']['name'], array('&amp;' => '&')), ENT_COMPAT, 'UTF-8');
+			$context['board']['name'] = htmlspecialchars(strtr($context['board']['name'], ['&amp;' => '&']), ENT_COMPAT, 'UTF-8');
 			$context['board']['description'] = un_preparsecode($context['board']['description']);
 			$context['board']['no_children'] = empty($curBoard['tree']['children']);
 			$context['board']['is_recycle'] = !empty($modSettings['recycle_enable']) && !empty($modSettings['recycle_board']) && $modSettings['recycle_board'] == $context['board']['id'];
@@ -756,22 +756,22 @@ class ManageBoards extends AbstractController
 		$context['can_manage_permissions'] = allowedTo('manage_permissions');
 
 		// Default membergroups.
-		$context['groups'] = array(
-			-1 => array(
+		$context['groups'] = [
+			-1 => [
 				'id' => '-1',
 				'name' => $txt['parent_guests_only'],
 				'allow' => in_array('-1', $curBoard['member_groups']),
 				'deny' => in_array('-1', $curBoard['deny_groups']),
 				'is_post_group' => false,
-			),
-			0 => array(
+			],
+			0 => [
 				'id' => '0',
 				'name' => $txt['parent_members_only'],
 				'allow' => in_array('0', $curBoard['member_groups']),
 				'deny' => in_array('0', $curBoard['deny_groups']),
 				'is_post_group' => false,
-			)
-		);
+			]
+		];
 
 		$context['groups'] += getOtherGroups($curBoard, $this->_req->compareQuery('sa', 'newboard'));
 
@@ -787,23 +787,23 @@ class ManageBoards extends AbstractController
 			$thisBoard = $boardTree->getBoardById($boardid);
 			if ($boardid === $this->boardid)
 			{
-				$context['board_order'][] = array(
+				$context['board_order'][] = [
 					'id' => $boardid,
 					'name' => str_repeat('-', $thisBoard['level']) . ' (' . $txt['mboards_current_position'] . ')',
 					'children' => $thisBoard['tree']['children'],
 					'no_children' => empty($thisBoard['tree']['children']),
 					'is_child' => false,
 					'selected' => true
-				);
+				];
 			}
 			else
 			{
-				$context['board_order'][] = array(
+				$context['board_order'][] = [
 					'id' => $boardid,
 					'name' => str_repeat('-', $thisBoard['level']) . ' ' . $thisBoard['name'],
 					'is_child' => !empty($this->boardid) && $boardTree->isChildOf($boardid, $this->boardid),
 					'selected' => false
-				);
+				];
 			}
 		}
 
@@ -829,15 +829,15 @@ class ManageBoards extends AbstractController
 		}
 
 		// Get other available categories.
-		$context['categories'] = array();
+		$context['categories'] = [];
 		$cat_tree = $boardTree->getCategories();
 		foreach ($cat_tree as $catID => $tree)
 		{
-			$context['categories'][] = array(
+			$context['categories'][] = [
 				'id' => $catID === $curBoard['category'] ? 0 : $catID,
 				'name' => $tree['node']['name'],
 				'selected' => $catID === $curBoard['category']
-			);
+			];
 		}
 
 		$context['board']['moderators'] = getBoardModerators($this->boardid);
@@ -854,7 +854,7 @@ class ManageBoards extends AbstractController
 		{
 			$context['sub_template'] = 'modify_board';
 			$context['page_title'] = $txt['boardsEdit'];
-			loadJavascriptFile('suggest.js', array('defer' => true));
+			loadJavascriptFile('suggest.js', ['defer' => true]);
 		}
 		else
 		{
@@ -874,7 +874,7 @@ class ManageBoards extends AbstractController
 	 * @event integrate_save_board_settings called during manage board settings
 	 * @uses modify_general_settings sub-template.
 	 */
-	public function action_boardSettings_display()
+	public function action_boardSettings_display(): void
 	{
 		global $context, $txt;
 
@@ -927,29 +927,29 @@ class ManageBoards extends AbstractController
 
 		// Load the boards list - for the recycle bin!
 		require_once(SUBSDIR . '/Boards.subs.php');
-		$boards = getBoardList(array('override_permissions' => true, 'not_redirection' => true), true);
-		$recycle_boards = array('');
+		$boards = getBoardList(['override_permissions' => true, 'not_redirection' => true], true);
+		$recycle_boards = [''];
 		foreach ($boards as $board)
 		{
 			$recycle_boards[$board['id_board']] = $board['cat_name'] . ' - ' . $board['board_name'];
 		}
 
 		// Here and the board settings...
-		$config_vars = array(
-			array('title', 'settings'),
+		$config_vars = [
+			['title', 'settings'],
 			// Inline permissions.
-			array('permissions', 'manage_boards', 'helptext' => $txt['permissionhelp_manage_boards'], 'collapsed' => true),
+			['permissions', 'manage_boards', 'helptext' => $txt['permissionhelp_manage_boards'], 'collapsed' => true],
 			'',
 			// Other board settings.
-			array('check', 'countChildPosts'),
-			array('check', 'recycle_enable', 'onclick' => "document.getElementById('recycle_board').disabled = !this.checked;"),
-			array('select', 'recycle_board', $recycle_boards),
-			array('check', 'allow_ignore_boards'),
-			array('check', 'deny_boards_access'),
-		);
+			['check', 'countChildPosts'],
+			['check', 'recycle_enable', 'onclick' => "document.getElementById('recycle_board').disabled = !this.checked;"],
+			['select', 'recycle_board', $recycle_boards],
+			['check', 'allow_ignore_boards'],
+			['check', 'deny_boards_access'],
+		];
 
 		// Add new settings with a nice hook, makes them available for admin settings search as well
-		call_integration_hook('integrate_modify_board_settings', array(&$config_vars));
+		call_integration_hook('integrate_modify_board_settings', [&$config_vars]);
 
 		return $config_vars;
 	}

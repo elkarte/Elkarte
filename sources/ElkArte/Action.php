@@ -22,7 +22,7 @@ use ElkArte\Helper\HttpReq;
  * right function or method handlers.
  *
  * Replaces the sub-actions arrays in every dispatching function.
- * (the $subActions = ... etc, and calls for $_REQUEST['sa'])
+ * (the $subActions = ... etc., and calls for $_REQUEST['sa'])
  *
  */
 class Action
@@ -135,6 +135,12 @@ class Action
 		// Start off by assuming that this is a callable of some kind.
 		$call = $subAction['function'] ?? $subAction;
 
+	// Why was this here? It ignores directory location if provided.
+	//	if (isset($subAction['file']))
+	//	{
+	//		require_once($subAction['file']);
+	//	}
+
 		// Calling a method within a controller?
 		if (isset($subAction['controller'], $subAction['function']))
 		{
@@ -146,7 +152,8 @@ class Action
 			else
 			{
 				// Pointer to a controller to load
-				$controller = new $subAction['controller'](new EventManager());
+				$controller = ($subAction['namespace'] ?? '') . $subAction['controller'];
+				$controller = new $controller(new EventManager());
 
 				// always set up the environment
 				$controller->getHook();

@@ -20,7 +20,7 @@ use ElkArte\XmlArray;
 
 class PackageParser extends AbstractModel
 {
-	/** @var \ElkArte\Helper\FileFunctions */
+	/** @var FileFunctions */
 	public $fileFunc;
 
 	/** @var array the results of our efforts */
@@ -116,7 +116,7 @@ class PackageParser extends AbstractModel
 		}
 
 		// This is the installation phase, where we try not to brick the forum
-		$this->not_done = array(['type' => '!']);
+		$this->not_done = [['type' => '!']];
 		$this->processingPhase();
 
 		return $this->not_done;
@@ -128,7 +128,7 @@ class PackageParser extends AbstractModel
 	 * @param XmlArray $actions
 	 * @return void
 	 */
-	public function testingPhase($actions)
+	public function testingPhase($actions): void
 	{
 		foreach ($actions as $action)
 		{
@@ -145,7 +145,7 @@ class PackageParser extends AbstractModel
 			}
 			elseif (in_array($actionType, ['hook', 'credits', 'requires', 'error']))
 			{
-				$this->_return[] = call_user_func(array($this, 'test' . ucfirst($actionType)), $actionType, $action);
+				$this->_return[] = call_user_func([$this, 'test' . ucfirst($actionType)], $actionType, $action);
 			}
 			elseif (in_array($actionType, ['require-file', 'remove-file', 'move-file', 'create-file',
 				'require-dir', 'remove-dir', 'move-dir', 'create-dir']))
@@ -153,7 +153,7 @@ class PackageParser extends AbstractModel
 				$this_action = $this->_testFileDir($actionType, $action);
 
 				$method = str_replace('-', '', ucfirst($actionType));
-				$this->_return[] = call_user_func(array($this, 'test' . $method), $action, $this_action);
+				$this->_return[] = call_user_func([$this, 'test' . $method], $action, $this_action);
 			}
 			else
 			{
@@ -167,7 +167,7 @@ class PackageParser extends AbstractModel
 	 *
 	 * @return void
 	 */
-	public function processingPhase()
+	public function processingPhase(): void
 	{
 		foreach ($this->_return as $action)
 		{
@@ -179,7 +179,7 @@ class PackageParser extends AbstractModel
 				'require-dir', 'remove-dir', 'move-dir', 'create-dir']))
 			{
 				$method = str_replace('-', '', ucfirst($action['type']));
-				$this->_return[] = call_user_func(array($this, 'process' . $method), $action);
+				$this->_return[] = call_user_func([$this, 'process' . $method], $action);
 			}
 		}
 	}
@@ -190,7 +190,7 @@ class PackageParser extends AbstractModel
 	 * @param array $action
 	 * @return void
 	 */
-	public function processRequirefile($action)
+	public function processRequirefile($action): void
 	{
 		global $context;
 
@@ -235,7 +235,7 @@ class PackageParser extends AbstractModel
 	 * @param $action
 	 * @return void
 	 */
-	public function processRemovefile($action)
+	public function processRemovefile($action): void
 	{
 		global $context;
 
@@ -243,7 +243,7 @@ class PackageParser extends AbstractModel
 		if ($this->fileFunc->fileExists($action['filename']))
 		{
 			$chmod_control = new PackageChmod();
-			$chmod_control->createChmodControl(array($action['filename']));
+			$chmod_control->createChmodControl([$action['filename']]);
 			$this->failure |= !$this->fileFunc->delete($action['filename']);
 		}
 		// The file that was supposed to be deleted couldn't be found.
@@ -275,7 +275,7 @@ class PackageParser extends AbstractModel
 	 * @param array $action
 	 * @return void
 	 */
-	public function processMovefile($action)
+	public function processMovefile($action): void
 	{
 		$this->_setDestination(dirname($action['destination']));
 
@@ -288,7 +288,7 @@ class PackageParser extends AbstractModel
 	 * @param $action
 	 * @return void
 	 */
-	public function processCreatefile($action)
+	public function processCreatefile($action): void
 	{
 		$this->_setDestination(dirname($action['destination']));
 
@@ -307,7 +307,7 @@ class PackageParser extends AbstractModel
 	 * @param $action
 	 * @return void
 	 */
-	public function processRequiredir($action)
+	public function processRequiredir($action): void
 	{
 		global $context;
 
@@ -335,7 +335,7 @@ class PackageParser extends AbstractModel
 	 * @param $action
 	 * @return void
 	 */
-	public function processRemovedir($action)
+	public function processRemovedir($action): void
 	{
 		global $context;
 
@@ -364,7 +364,7 @@ class PackageParser extends AbstractModel
 	 * @param $action
 	 * @return void
 	 */
-	public function processCreatedir($action)
+	public function processCreatedir($action): void
 	{
 		$this->_setDestination($action['destination']);
 	}
@@ -375,7 +375,7 @@ class PackageParser extends AbstractModel
 	 * @param $action
 	 * @return void
 	 */
-	public function processMovedir($action)
+	public function processMovedir($action): void
 	{
 		$this->_setDestination($action['destination']);
 
@@ -389,7 +389,7 @@ class PackageParser extends AbstractModel
 	 * @param object $action
 	 * @return array
 	 */
-	public function testText($actionType, $action)
+	public function testText($actionType, $action): array
 	{
 		global $language, $temp_path;
 
@@ -403,7 +403,7 @@ class PackageParser extends AbstractModel
 		{
 			$filename = $temp_path . '$auto_' . $this->temp_auto++ . (in_array($actionType, ['readme', 'redirect', 'license']) ? '.txt' : ($actionType === 'code' || $actionType === 'database' ? '.php' : '.mod'));
 			package_put_contents($filename, $action->fetch('.'));
-			$filename = strtr($filename, array($temp_path => ''));
+			$filename = strtr($filename, [$temp_path => '']);
 		}
 		else
 		{
@@ -431,7 +431,7 @@ class PackageParser extends AbstractModel
 	 * @param object $action
 	 * @return array
 	 */
-	public function testHook($actionType, $action)
+	public function testHook($actionType, $action): array
 	{
 		return [
 			'type' => $actionType,
@@ -450,13 +450,13 @@ class PackageParser extends AbstractModel
 	 * @param object $action
 	 * @return array
 	 */
-	public function testCredits($actionType, $action)
+	public function testCredits($actionType, $action): array
 	{
 		// Quick check of any supplied url
 		$url = $action->exists('@url') ? $action->fetch('@url') : '';
 		if (trim($url) !== '')
 		{
-			$url = addProtocol($url, array('http://', 'https://'));
+			$url = addProtocol($url, ['http://', 'https://']);
 			if (strlen($url) < 8)
 			{
 				$url = '';
@@ -480,7 +480,7 @@ class PackageParser extends AbstractModel
 	 * @param object $action
 	 * @return array
 	 */
-	public function testRequires($actionType, $action)
+	public function testRequires($actionType, $action): array
 	{
 		return [
 			'type' => $actionType,
@@ -497,11 +497,11 @@ class PackageParser extends AbstractModel
 	 * @param object $action
 	 * @return array
 	 */
-	public function testError($actionType, $action)
+	public function testError($actionType, $action): array
 	{
-		return array(
+		return [
 			'type' => 'error',
-		);
+		];
 	}
 
 	/**
@@ -511,7 +511,7 @@ class PackageParser extends AbstractModel
 	 * @param array $this_action
 	 * @return array
 	 */
-	public function testCreatedir($action, $this_action)
+	public function testCreatedir($action, $this_action): array
 	{
 		// See if the destination is writable
 		if (!dirTest($this_action['destination']))
@@ -534,7 +534,7 @@ class PackageParser extends AbstractModel
 	 * @param array $this_action
 	 * @return array
 	 */
-	public function testCreatefile($action, $this_action)
+	public function testCreatefile($action, $this_action): array
 	{
 		// Can we create a file in a known location
 		if (!dirTest(dirname($this_action['destination'])))
@@ -566,7 +566,7 @@ class PackageParser extends AbstractModel
 	 * @param array $this_action
 	 * @return array
 	 */
-	public function testRequiredir($action, $this_action)
+	public function testRequiredir($action, $this_action): array
 	{
 		if (!dirTest($this_action['destination']))
 		{
@@ -588,7 +588,7 @@ class PackageParser extends AbstractModel
 	 * @param array $this_action
 	 * @return array
 	 */
-	public function testRequirefile($action, $this_action)
+	public function testRequirefile($action, $this_action): array
 	{
 		if ($action->exists('@theme'))
 		{
@@ -605,7 +605,7 @@ class PackageParser extends AbstractModel
 	 * @param array $this_action
 	 * @return array
 	 */
-	public function testMovedir($action, $this_action)
+	public function testMovedir($action, $this_action): array
 	{
 		return $this->_getChmod($this_action);
 	}
@@ -617,7 +617,7 @@ class PackageParser extends AbstractModel
 	 * @param array $this_action
 	 * @return array
 	 */
-	public function testMovefile($action, $this_action)
+	public function testMovefile($action, $this_action): array
 	{
 		return $this->_getChmod($this_action);
 	}
@@ -629,7 +629,7 @@ class PackageParser extends AbstractModel
 	 * @param array $this_action
 	 * @return array
 	 */
-	public function testRemovedir($action, $this_action)
+	public function testRemovedir($action, $this_action): array
 	{
 		if (!$this->fileFunc->isWritable($this_action['filename'])
 			&& $this->fileFunc->isDir($this_action['filename']))
@@ -650,7 +650,7 @@ class PackageParser extends AbstractModel
 	 * @param array $this_action
 	 * @return array
 	 */
-	public function testRemovefile($action, $this_action)
+	public function testRemovefile($action, $this_action): array
 	{
 		if (!$this->fileFunc->isWritable($this_action['filename'])
 			&& $this->fileFunc->fileExists($this_action['filename']))
@@ -671,7 +671,7 @@ class PackageParser extends AbstractModel
 	 * @param array $action
 	 * @return array
 	 */
-	public function testTheRest($actionType, $action)
+	public function testTheRest($actionType, $action): array
 	{
 		return [
 			'type' => 'error',
@@ -686,7 +686,7 @@ class PackageParser extends AbstractModel
 	 * @param string $temp
 	 * @return string
 	 */
-	private function _getRoot($temp)
+	private function _getRoot($temp): string
 	{
 		while (!$this->fileFunc->isDir($temp) && strlen($temp) > 1)
 		{
@@ -702,7 +702,7 @@ class PackageParser extends AbstractModel
 	 * @param $this_action
 	 * @return array
 	 */
-	private function _getChmod($this_action)
+	private function _getChmod($this_action): array
 	{
 		if (!dirTest(dirname($this_action['destination'])))
 		{
@@ -733,7 +733,7 @@ class PackageParser extends AbstractModel
 	 * @param XmlArray $action
 	 * @return array
 	 */
-	private function _testFileDir($actionType, $action)
+	private function _testFileDir($actionType, $action): array
 	{
 		global $temp_path;
 
@@ -779,7 +779,7 @@ class PackageParser extends AbstractModel
 	 * @param string $area
 	 * @return void
 	 */
-	private function _setDestination($area)
+	private function _setDestination($area): void
 	{
 		if (!mktree($area) || !$this->fileFunc->isWritable($area))
 		{
@@ -790,9 +790,9 @@ class PackageParser extends AbstractModel
 	/**
 	 * Allow for translated readme and license files.
 	 *
-	 * @return boolean
+	 * @return bool
 	 */
-	private function _translation($actionType, $action)
+	private function _translation($actionType, $action): bool
 	{
 		global $context, $language;
 
@@ -843,7 +843,7 @@ class PackageParser extends AbstractModel
 	 *
 	 * @return void
 	 */
-	private function setRedirect()
+	private function setRedirect(): void
 	{
 		if (!$this->has_redirect)
 		{
@@ -866,7 +866,7 @@ class PackageParser extends AbstractModel
 	 * @param string $the_version
 	 * @return string
 	 */
-	private function setEmulation($the_version)
+	private function setEmulation($the_version): string
 	{
 		// Emulation support...
 		if (!empty($_SESSION['version_emulate']))

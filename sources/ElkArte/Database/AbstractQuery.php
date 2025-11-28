@@ -59,7 +59,7 @@ abstract class AbstractQuery implements QueryInterface
 	/** @var array This holds the "values" used in the replacement__callback method */
 	protected $_db_callback_values = [];
 
-	/** @var resource Holds the resource from the dBMS of the last query run */
+	/** @var bool|resource Holds the resource from the dBMS of the last query run */
 	protected $_db_last_result;
 
 	/** @var array Holds some values (time, file, line, delta) to debug performance of the queries. */
@@ -92,7 +92,7 @@ abstract class AbstractQuery implements QueryInterface
 	 * Constructor.
 	 *
 	 * @param string $_db_prefix Guess what? The tables prefix
-	 * @param resource|object $connection Obviously the database connection
+	 * @param \MySqli|resource|object $connection Obviously the database connection
 	 */
 	public function __construct(protected $_db_prefix, protected $connection)
 	{
@@ -120,7 +120,7 @@ abstract class AbstractQuery implements QueryInterface
 	 *
 	 * @param string $string
 	 */
-	public function setSeeBoard($string)
+	public function setSeeBoard($string): void
 	{
 		$this->query_see_board = $string;
 	}
@@ -130,7 +130,7 @@ abstract class AbstractQuery implements QueryInterface
 	 *
 	 * @param string $string
 	 */
-	public function setWannaSeeBoard($string)
+	public function setWannaSeeBoard($string): void
 	{
 		$this->query_wanna_see_board = $string;
 	}
@@ -151,7 +151,7 @@ abstract class AbstractQuery implements QueryInterface
 				fn($matches) => $this->replacement__callback($matches), $db_string);
 
 			// Clear this variables.
-			$this->_db_callback_values = array();
+			$this->_db_callback_values = [];
 		}
 
 		return $db_string;
@@ -160,7 +160,7 @@ abstract class AbstractQuery implements QueryInterface
 	/**
 	 * Callback for preg_replace_callback on the query.
 	 *
-	 * It allows to replace on the fly a few pre-defined strings, for convenience
+	 * It allows replacing on the fly a few pre-defined strings, for convenience
 	 * ('query_see_board', 'query_wanna_see_board'), with their current values from User::$info.
 	 *
 	 * In addition, it performs checks and sanitation on the values sent to the database.
@@ -253,7 +253,7 @@ abstract class AbstractQuery implements QueryInterface
 	 *
 	 * @return array
 	 */
-	protected function backtrace_message()
+	protected function backtrace_message(): array
 	{
 		$log_message = '';
 		$file = null;
@@ -261,7 +261,7 @@ abstract class AbstractQuery implements QueryInterface
 		foreach (debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS) as $step)
 		{
 			// Found it?
-			if (!method_exists($this, $step['function']) && !in_array(substr($step['function'], 0, 7), array('elk_db_', 'preg_re', 'db_erro', 'call_us')))
+			if (!method_exists($this, $step['function']) && !in_array(substr($step['function'], 0, 7), ['elk_db_', 'preg_re', 'db_erro', 'call_us']))
 			{
 				$log_message .= '<br />Function: ' . $step['function'];
 				break;
@@ -288,7 +288,7 @@ abstract class AbstractQuery implements QueryInterface
 	 *
 	 * @throws Exception
 	 */
-	protected function error_backtrace($error_message, $log_message = '', $error_type = false, $file_fallback = null, $line_fallback = null)
+	protected function error_backtrace($error_message, $log_message = '', $error_type = false, $file_fallback = null, $line_fallback = null): void
 	{
 		if (empty($log_message))
 		{
@@ -317,7 +317,7 @@ abstract class AbstractQuery implements QueryInterface
 	 * @return string
 	 * @throws Exception
 	 */
-	protected function _replaceInt($identifier, $replacement)
+	protected function _replaceInt($identifier, $replacement): string
 	{
 		if (!is_numeric($replacement) || (string) $replacement !== (string) (int) $replacement)
 		{
@@ -333,7 +333,7 @@ abstract class AbstractQuery implements QueryInterface
 	 * @param mixed $replacement
 	 * @return string
 	 */
-	protected function _replaceString($replacement)
+	protected function _replaceString($replacement): string
 	{
 		return sprintf('\'%1$s\'', $this->escape_string($replacement));
 	}
@@ -374,10 +374,10 @@ abstract class AbstractQuery implements QueryInterface
 	 * Tests and casts arrays of integers for replacement__callback.
 	 *
 	 * @param string $identifier
-	 * @param mixed[] $replacement
-	 * @return string
+	 * @param array $replacement
+	 * @return string|null
 	 */
-	protected function _replaceArrayInt($identifier, $replacement)
+	protected function _replaceArrayInt($identifier, $replacement): ?string
 	{
 		if (is_array($replacement))
 		{
@@ -407,9 +407,9 @@ abstract class AbstractQuery implements QueryInterface
 	 *
 	 * @param string $identifier
 	 * @param array $replacement
-	 * @return string
+	 * @return string|null
 	 */
-	protected function _replaceArrayString($identifier, $replacement)
+	protected function _replaceArrayString($identifier, $replacement): ?string
 	{
 		if (is_array($replacement))
 		{
@@ -434,10 +434,10 @@ abstract class AbstractQuery implements QueryInterface
 	 * for replacement__callback.
 	 *
 	 * @param string $identifier
-	 * @param mixed[] $replacement
-	 * @return string
+	 * @param array $replacement
+	 * @return string|null
 	 */
-	protected function _replaceArrayStringCaseInsensitive($identifier, $replacement)
+	protected function _replaceArrayStringCaseInsensitive($identifier, $replacement): ?string
 	{
 		if (is_array($replacement))
 		{
@@ -462,9 +462,9 @@ abstract class AbstractQuery implements QueryInterface
 	 *
 	 * @param mixed $identifier
 	 * @param mixed $replacement
-	 * @return string
+	 * @return string|null
 	 */
-	protected function _replaceDate($identifier, $replacement)
+	protected function _replaceDate($identifier, $replacement): ?string
 	{
 		if (preg_match('~^(\d{4})-([0-1]?\d)-([0-3]?\d)$~', $replacement, $date_matches) === 1)
 		{
@@ -481,7 +481,7 @@ abstract class AbstractQuery implements QueryInterface
 	 * @param mixed $replacement
 	 * @return string
 	 */
-	protected function _replaceFloat($identifier, $replacement)
+	protected function _replaceFloat($identifier, $replacement): string
 	{
 		if (!is_numeric($replacement))
 		{
@@ -510,7 +510,7 @@ abstract class AbstractQuery implements QueryInterface
 	/**
 	 * {@inheritDoc}
 	 */
-	public function fetchQuery($db_string, $db_values = array())
+	public function fetchQuery($db_string, $db_values = [])
 	{
 		return $this->query('', $db_string, $db_values);
 	}
@@ -518,7 +518,7 @@ abstract class AbstractQuery implements QueryInterface
 	/**
 	 * {@inheritDoc}
 	 */
-	public function query($identifier, $db_string, $db_values = array())
+	public function query($identifier, $db_string, $db_values = [])
 	{
 		// One more query....
 		$this->_query_count++;
@@ -568,8 +568,7 @@ abstract class AbstractQuery implements QueryInterface
 	abstract public function error($db_string);
 
 	/**
-	 * Prepares the strings to show the error to the user/admin and stop
-	 * the code execution
+	 * Prepares the strings to show the error to the user/admin and stop the code execution
 	 *
 	 * @param string $db_string
 	 * @param string $query_error
@@ -577,7 +576,7 @@ abstract class AbstractQuery implements QueryInterface
 	 * @param int $line
 	 * @throws Exception
 	 */
-	protected function throwError($db_string, $query_error, $file, $line)
+	protected function throwError($db_string, $query_error, $file, $line): void
 	{
 		global $context, $txt, $modSettings, $db_show_debug;
 
@@ -616,12 +615,12 @@ abstract class AbstractQuery implements QueryInterface
 	 * Prepares the data that will be later implode'd into the actual query string
 	 *
 	 * @param string $table
-	 * @param mixed[] $columns
-	 * @param mixed[] $data
-	 * @return mixed[]
+	 * @param array $columns
+	 * @param array $data
+	 * @return array
 	 * @throws \Exception
 	 */
-	protected function prepareInsert($table, $columns, $data)
+	protected function prepareInsert($table, $columns, $data): array
 	{
 		// With nothing to insert, simply return.
 		if (empty($data))
@@ -736,7 +735,7 @@ abstract class AbstractQuery implements QueryInterface
 	 *
 	 * @param bool $state
 	 */
-	public function setUnbuffered($state)
+	public function setUnbuffered($state): void
 	{
 		$this->_unbuffered = (bool) $state;
 	}
@@ -790,7 +789,7 @@ abstract class AbstractQuery implements QueryInterface
 	 *
 	 * @deprecated since 2.0
 	 */
-	public function fetch_row($result)
+	public function fetch_row($result): bool|array
 	{
 		// \ElkArte\Errors\Errors::instance()->log_deprecated('Query::fetch_row()', 'Result::fetch_row()');
 		if ($result === false)
@@ -806,7 +805,7 @@ abstract class AbstractQuery implements QueryInterface
 	 *
 	 * @deprecated since 2.0
 	 */
-	public function fetch_assoc($result)
+	public function fetch_assoc($result): array|bool
 	{
 		// \ElkArte\Errors\Errors::instance()->log_deprecated('Query::fetch_assoc()', 'Result::fetch_assoc()');
 		if ($result === false)
@@ -838,7 +837,7 @@ abstract class AbstractQuery implements QueryInterface
 	 *
 	 * @deprecated since 2.0
 	 */
-	public function affected_rows()
+	public function affected_rows(): int
 	{
 		// \ElkArte\Errors\Errors::instance()->log_deprecated('Query::affected_rows()', 'Result::affected_rows()');
 		return $this->result->affected_rows();
@@ -849,7 +848,7 @@ abstract class AbstractQuery implements QueryInterface
 	 *
 	 * @deprecated since 2.0
 	 */
-	public function num_rows($result)
+	public function num_rows($result): int
 	{
 		// \ElkArte\Errors\Errors::instance()->log_deprecated('Query::num_rows()', 'Result::num_rows()');
 		if ($result === false)
@@ -865,7 +864,7 @@ abstract class AbstractQuery implements QueryInterface
 	 *
 	 * @deprecated since 2.0
 	 */
-	public function num_fields($result)
+	public function num_fields($result): int
 	{
 		// \ElkArte\Errors\Errors::instance()->log_deprecated('Query::num_fields()', 'Result::num_fields()');
 		if ($result === false)
@@ -899,7 +898,7 @@ abstract class AbstractQuery implements QueryInterface
 	}
 
 	/**
-	 * Temporary function: I'm not sure this is the best place to have it, though it was
+	 * Temporary function: I'm not sure if this is the best place to have it, though it was
 	 * convenient while fixing other issues.
 	 *
 	 * @deprecated since 2.0
@@ -923,7 +922,7 @@ abstract class AbstractQuery implements QueryInterface
 	 * @param array $values
 	 * @return array
 	 */
-	protected function _array_combine($keys, $values)
+	protected function _array_combine($keys, $values): array
 	{
 		$is_numeric = array_filter(array_keys($values), 'is_numeric');
 
@@ -954,7 +953,7 @@ abstract class AbstractQuery implements QueryInterface
 	 * @param mixed $db_values
 	 * @return string
 	 */
-	protected function _prepareQuery($db_string, $db_values)
+	protected function _prepareQuery($db_string, $db_values): string
 	{
 		global $modSettings;
 
@@ -977,7 +976,7 @@ abstract class AbstractQuery implements QueryInterface
 			}
 
 			// No need for them any longer.
-			$this->_db_callback_values = array();
+			$this->_db_callback_values = [];
 		}
 
 		return $db_string;
@@ -998,7 +997,7 @@ abstract class AbstractQuery implements QueryInterface
 	 *
 	 * @param string $db_string
 	 */
-	protected function _preQueryDebug($db_string)
+	protected function _preQueryDebug($db_string): void
 	{
 		global $db_show_debug, $time_start;
 
@@ -1017,7 +1016,7 @@ abstract class AbstractQuery implements QueryInterface
 				$this->_debug->merge_db($_SESSION['debug_redirect']);
 				// @todo this may be off by 1
 				$this->_query_count += count($_SESSION['debug_redirect']);
-				$_SESSION['debug_redirect'] = array();
+				$_SESSION['debug_redirect'] = [];
 			}
 
 			// Don't overload it.
@@ -1034,7 +1033,7 @@ abstract class AbstractQuery implements QueryInterface
 	/**
 	 * Closes up the tracking and stores everything in the debug class.
 	 */
-	protected function _postQueryDebug()
+	protected function _postQueryDebug(): void
 	{
 		global $db_show_debug;
 
@@ -1052,7 +1051,7 @@ abstract class AbstractQuery implements QueryInterface
 	 *
 	 * @param string $db_string
 	 */
-	protected function _doSanityCheck($db_string)
+	protected function _doSanityCheck($db_string): void
 	{
 		global $modSettings;
 
@@ -1104,16 +1103,16 @@ abstract class AbstractQuery implements QueryInterface
 				$fail = true;
 			}
 			// Trying to change passwords, slow us down, or something?
-			elseif (strpos($clean, 'sleep') !== false && preg_match('~(^|[^a-z])sleep($|[^[_a-z])~', $clean) != 0)
+			elseif (strpos($clean, 'sleep') !== false && preg_match('~(^|[^a-z])sleep($|[^[_a-z])~', $clean) === 1)
 			{
 				$fail = true;
 			}
-			elseif (strpos($clean, 'benchmark') !== false && preg_match('~(^|[^a-z])benchmark($|[^[a-z])~', $clean) != 0)
+			elseif (strpos($clean, 'benchmark') !== false && preg_match('~(^|[^a-z])benchmark($|[^[a-z])~', $clean) === 1)
 			{
 				$fail = true;
 			}
 
-			if (!empty($fail) && class_exists(\ElkArte\Errors\Errors::class))
+			if (!empty($fail) && class_exists(Errors::class))
 			{
 				$this->error_backtrace('Hacking attempt...', 'Hacking attempt...' . "\n" . $db_string, E_USER_ERROR, __FILE__, __LINE__);
 			}

@@ -46,9 +46,9 @@ class AddonSettings extends AbstractController
 		Txt::load('Help+ManageSettings');
 
 		// Our tidy subActions array
-		$subActions = array(
-			'general' => array($this, 'action_addonSettings_display', 'permission' => 'admin_forum'),
-		);
+		$subActions = [
+			'general' => [$this, 'action_addonSettings_display', 'permission' => 'admin_forum'],
+		];
 
 		$context['page_title'] = $txt['admin_modifications'];
 		$context['sub_template'] = 'show_settings';
@@ -77,7 +77,7 @@ class AddonSettings extends AbstractController
 	 * @event integrate_save_general_mod_settings allows for special processing needs during save operations
 	 * for addons added to Addon Settings area
 	 */
-	public function action_addonSettings_display()
+	public function action_addonSettings_display(): void
 	{
 		global $context, $txt;
 
@@ -118,12 +118,12 @@ class AddonSettings extends AbstractController
 	 *
 	 * @event integrate_general_mod_settings allows adding new settings for addons in the generic Addons Settings
 	 */
-	private function _settings()
+	private function _settings(): array
 	{
-		$config_vars = array();
+		$config_vars = [];
 
 		// Add new settings with a nice hook.
-		call_integration_hook('integrate_general_mod_settings', array(&$config_vars));
+		call_integration_hook('integrate_general_mod_settings', [&$config_vars]);
 
 		return $config_vars;
 	}
@@ -131,7 +131,7 @@ class AddonSettings extends AbstractController
 	/**
 	 * Public method to return admin settings for search
 	 */
-	public function settings_search()
+	public function settings_search(): array
 	{
 		return $this->_settings();
 	}

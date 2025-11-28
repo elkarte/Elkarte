@@ -59,7 +59,7 @@ class BoardIndex extends AbstractController implements FrontpageInterface
 	 *
 	 * @uses the BoardIndex template, and main sub template
 	 */
-	public function action_boardindex()
+	public function action_boardindex(): void
 	{
 		global $txt, $modSettings, $context, $settings;
 
@@ -76,15 +76,15 @@ class BoardIndex extends AbstractController implements FrontpageInterface
 		}
 
 		// Retrieve the categories and boards.
-		$boardIndexOptions = array(
+		$boardIndexOptions = [
 			'include_categories' => true,
 			'base_level' => 0,
 			'parent_id' => 0,
 			'set_latest_post' => true,
 			'countChildPosts' => !empty($modSettings['countChildPosts']),
-		);
+		];
 
-		$this->_events->trigger('pre_load', array('boardIndexOptions' => &$boardIndexOptions));
+		$this->_events->trigger('pre_load', ['boardIndexOptions' => &$boardIndexOptions]);
 
 		$boardlist = new BoardsList($boardIndexOptions);
 		$context['categories'] = $boardlist->getBoards();
@@ -92,11 +92,11 @@ class BoardIndex extends AbstractController implements FrontpageInterface
 
 		// Get the user online list.
 		require_once(SUBSDIR . '/MembersOnline.subs.php');
-		$membersOnlineOptions = array(
+		$membersOnlineOptions = [
 			'show_hidden' => allowedTo('moderate_forum'),
 			'sort' => 'log_time',
 			'reverse_sort' => true,
-		);
+		];
 		$context += getMembersOnlineStats($membersOnlineOptions);
 
 		$context['show_buddies'] = !empty($this->user->buddies);
@@ -104,7 +104,7 @@ class BoardIndex extends AbstractController implements FrontpageInterface
 		// Are we showing all membergroups on the board index?
 		if (!empty($settings['show_group_key']))
 		{
-			$context['membergroups'] = Cache::instance()->quick_get('membergroup_list', 'subs/Membergroups.subs.php', 'cache_getMembergroupList', array());
+			$context['membergroups'] = Cache::instance()->quick_get('membergroup_list', 'subs/Membergroups.subs.php', 'cache_getMembergroupList', []);
 		}
 
 		// Track most online statistics? (subs/Members.subs.phpOnline.php)
@@ -116,17 +116,17 @@ class BoardIndex extends AbstractController implements FrontpageInterface
 		// Retrieve the latest posts if the theme settings require it.
 		if (isset($settings['number_recent_posts']) && $settings['number_recent_posts'] > 1)
 		{
-			$latestPostOptions = array(
+			$latestPostOptions = [
 				'number_posts' => $settings['number_recent_posts'],
 				'id_member' => $this->user->id,
-			);
+			];
 			if (empty($settings['recent_post_topics']))
 			{
-				$context['latest_posts'] = Cache::instance()->quick_get('boardindex-latest_posts:' . md5($this->user->query_wanna_see_board . $this->user->language), 'subs/Recent.subs.php', 'cache_getLastPosts', array($latestPostOptions));
+				$context['latest_posts'] = Cache::instance()->quick_get('boardindex-latest_posts:' . md5($this->user->query_wanna_see_board . $this->user->language), 'subs/Recent.subs.php', 'cache_getLastPosts', [$latestPostOptions]);
 			}
 			else
 			{
-				$context['latest_posts'] = Cache::instance()->quick_get('boardindex-latest_topics:' . md5($this->user->query_wanna_see_board . $this->user->language), 'subs/Recent.subs.php', 'cache_getLastTopics', array($latestPostOptions));
+				$context['latest_posts'] = Cache::instance()->quick_get('boardindex-latest_topics:' . md5($this->user->query_wanna_see_board . $this->user->language), 'subs/Recent.subs.php', 'cache_getLastTopics', [$latestPostOptions]);
 			}
 		}
 
@@ -152,21 +152,21 @@ class BoardIndex extends AbstractController implements FrontpageInterface
 
 		$context['info_center_callbacks'][] = 'show_users';
 
-		$this->_events->trigger('post_load', array('callbacks' => &$context['info_center_callbacks']));
+		$this->_events->trigger('post_load', ['callbacks' => &$context['info_center_callbacks']]);
 
-		theme()->addJavascriptVar(array(
+		theme()->addJavascriptVar([
 			'txt_mark_as_read_confirm' => $txt['mark_as_read_confirm']
-		), true);
+		], true);
 
 		// Mark read button
-		$context['mark_read_button'] = array(
-			'markread' => array(
+		$context['mark_read_button'] = [
+			'markread' => [
 				'text' => 'mark_as_read',
 				'lang' => true,
 				'custom' => 'onclick="return markallreadButton(this);"',
-				'url' => getUrl('action', array('action' => 'markasread', 'sa' => 'all', 'bi', '{session_data}'))
-			),
-		);
+				'url' => getUrl('action', ['action' => 'markasread', 'sa' => 'all', 'bi', '{session_data}'])
+			],
+		];
 
 		// Allow mods to add additional buttons here
 		call_integration_hook('integrate_mark_read_button');
@@ -178,7 +178,7 @@ class BoardIndex extends AbstractController implements FrontpageInterface
 	 *
 	 * - accessed by ?action=collapse
 	 */
-	public function action_collapse()
+	public function action_collapse(): void
 	{
 		global $context;
 
@@ -193,11 +193,11 @@ class BoardIndex extends AbstractController implements FrontpageInterface
 		}
 
 		// Check if the input values are correct.
-		if (isset($this->_req->query->c) && in_array($this->_req->query->sa, array('expand', 'collapse', 'toggle')))
+		if (isset($this->_req->query->c) && in_array($this->_req->query->sa, ['expand', 'collapse', 'toggle']))
 		{
 			// And collapse/expand/toggle the category.
 			require_once(SUBSDIR . '/Categories.subs.php');
-			collapseCategories(array((int) $this->_req->query->c), $this->_req->query->sa, array($this->user->id));
+			collapseCategories([(int) $this->_req->query->c], $this->_req->query->sa, [$this->user->id]);
 		}
 
 		// And go back to the board index.

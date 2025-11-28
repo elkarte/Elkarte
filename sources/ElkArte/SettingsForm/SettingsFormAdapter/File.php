@@ -176,7 +176,7 @@ class File extends Db
 	/**
 	 * For all known configuration values, ensures they are properly cast / escaped
 	 */
-	private function _cleanSettings()
+	private function _cleanSettings(): void
 	{
 		$this->_fixCookieName();
 		$this->_fixBoardUrl();
@@ -243,7 +243,7 @@ class File extends Db
 	/**
 	 * Fix the cookie name by removing invalid characters
 	 */
-	private function _fixCookieName()
+	private function _fixCookieName(): void
 	{
 		// Fix the darn stupid cookiename! (more may not be allowed, but these for sure!)
 		if (isset($this->configValues['cookiename']))
@@ -255,7 +255,7 @@ class File extends Db
 	/**
 	 * Fix the forum's URL if necessary so that it is a valid root url
 	 */
-	private function _fixBoardUrl()
+	private function _fixBoardUrl(): void
 	{
 		if (isset($this->configValues['boardurl']))
 		{
@@ -277,7 +277,7 @@ class File extends Db
 	 *
 	 * @param array $config_passwords The array of config passwords to clean
 	 */
-	public function cleanPasswords(array $config_passwords)
+	public function cleanPasswords(array $config_passwords): void
 	{
 		foreach ($config_passwords as $configVar)
 		{
@@ -314,7 +314,7 @@ class File extends Db
 	 * @param array $config_strs The configuration strings to clean
 	 * @param array $safe_strings The safe strings that should receive additional transformations
 	 */
-	public function cleanStrings(array $config_strs, array $safe_strings)
+	public function cleanStrings(array $config_strs, array $safe_strings): void
 	{
 		foreach ($config_strs as $configVar)
 		{
@@ -376,7 +376,7 @@ class File extends Db
 	 *
 	 * @return bool
 	 */
-	private function _array_value_exists__recursive($needle, $haystack)
+	private function _array_value_exists__recursive($needle, $haystack): bool
 	{
 		foreach ($haystack as $item)
 		{
@@ -404,7 +404,7 @@ class File extends Db
 
 		while ($it->valid())
 		{
-			if (((isset($index) && $it->key() === $index) || (!isset($index)))
+			if (((isset($index) && $it->key() === $index) || !isset($index))
 				&& $it->current() === $needle)
 			{
 				return $aIt->key();
@@ -424,7 +424,7 @@ class File extends Db
 	 * - Key/value pairs that did not exists are added at the end of the array.
 	 * - Ensures the completed array is valid for later output
 	 */
-	private function _prepareSettings()
+	private function _prepareSettings(): void
 	{
 		// Presumably, the file has to have stuff in it for this function to be called :P.
 		if (count($this->settingsArray) < 10)
@@ -505,7 +505,7 @@ class File extends Db
 	 * This function will add the variables passed to it in $this->new_settings,
 	 * to the Settings.php file.
 	 */
-	private function _updateSettingsFile()
+	private function _updateSettingsFile(): void
 	{
 		global $context;
 
@@ -580,7 +580,7 @@ class File extends Db
 	/**
 	 * Find and save the new database-based settings, if any
 	 */
-	private function _extractDbVars()
+	private function _extractDbVars(): void
 	{
 		// Now loop through the remaining (database-based) settings.
 		$this->configVars = array_map(

@@ -21,7 +21,7 @@ use ElkArte\Helper\ValuesContainer;
  */
 class UserInfo extends ValuesContainer
 {
-	public function isFirstLogin()
+	public function isFirstLogin(): bool
 	{
 		return $this->data['last_login'] === 0;
 	}
@@ -32,7 +32,7 @@ class UserInfo extends ValuesContainer
 	 * @param bool $postmodActive
 	 * @return bool
 	 */
-	public function canMod($postmodActive)
+	public function canMod($postmodActive): bool
 	{
 		return allowedTo('access_mod_center')
 			|| ($this->data['is_guest'] === false

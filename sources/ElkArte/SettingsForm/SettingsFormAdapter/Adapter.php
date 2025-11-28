@@ -30,7 +30,7 @@ abstract class Adapter implements AdapterInterface
 	protected $configValues;
 
 	/** @var array Computed values for the tempalte */
-	protected $context = array();
+	protected $context = [];
 
 	/**
 	 * @return array

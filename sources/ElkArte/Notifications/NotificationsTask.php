@@ -69,7 +69,7 @@ class NotificationsTask extends ValuesContainer
 	 *
 	 * @param int|int[] $members An array of member id
 	 */
-	public function setMembers($members)
+	public function setMembers($members): void
 	{
 		$this->data['source_data']['id_members'] = (array) $members;
 	}
@@ -79,7 +79,7 @@ class NotificationsTask extends ValuesContainer
 	 *
 	 * @return array
 	 */
-	public function getMembersData()
+	public function getMembersData(): array
 	{
 		if ($this->_members_data === null)
 		{
@@ -95,7 +95,7 @@ class NotificationsTask extends ValuesContainer
 	 *
 	 * @return int[] An array of member id
 	 */
-	public function getMembers()
+	public function getMembers(): array
 	{
 		return $this->data['source_data']['id_members'];
 	}
@@ -105,7 +105,7 @@ class NotificationsTask extends ValuesContainer
 	 *
 	 * @return array
 	 */
-	public function getNotifierData()
+	public function getNotifierData(): array
 	{
 		if ($this->_notifier_data === null)
 		{
@@ -121,7 +121,7 @@ class NotificationsTask extends ValuesContainer
 	 *
 	 * @return string The fully qualified class name for the notification type.
 	 */
-	public function getClass()
+	public function getClass(): string
 	{
 		return $this->data['namespace'] . ucfirst($this->data['notification_type']);
 	}

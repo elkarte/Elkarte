@@ -58,7 +58,7 @@ class ElkTestingSetup
 	protected $_boardurl;
 
 	/**
-	 * Runs the query's defined in the install files to the db
+	 * Runs the query's defined in the installation files to the db
 	 */
 	public function run_queries()
 	{
@@ -130,7 +130,7 @@ class ElkTestingSetup
 
 		foreach ($txt as $key => $value)
 		{
-			if (substr($key, 0, 8) == 'default_')
+			if (substr($key, 0, 8) === 'default_')
 			{
 				$replaces['{$' . $key . '}'] = $value;
 			}

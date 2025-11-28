@@ -21,14 +21,14 @@ class FileFunctions
 	private static $_instance;
 
 	/**
-	 * chmod control will attempt to make a file or directory writable
+	 * Chmod control will attempt to make a file or directory writable
 	 *
 	 * - Progressively attempts various chmod values until item is writable or failure
 	 *
 	 * @param string $item file or directory
 	 * @return bool
 	 */
-	public function chmod($item)
+	public function chmod($item): bool
 	{
 		$fileChmod = [0644, 0666];
 		$dirChmod = [0755, 0775, 0777];
@@ -66,7 +66,7 @@ class FileFunctions
 	 *
 	 * @return bool
 	 */
-	public function elk_chmod($item, $mode = '')
+	public function elk_chmod($item, $mode = ''): bool
 	{
 		$result = false;
 		$mode = trim($mode);
@@ -104,13 +104,13 @@ class FileFunctions
 	}
 
 	/**
-	 * is_dir() helper using spl functions.  is_dir can throw an exception if open_basedir
+	 * is_dir() helper using spl functions. is_dir can throw an exception if open_basedir
 	 * restrictions are in effect.
 	 *
 	 * @param string $dir
 	 * @return bool
 	 */
-	public function isDir($dir)
+	public function isDir($dir): bool
 	{
 		try
 		{
@@ -129,13 +129,13 @@ class FileFunctions
 	}
 
 	/**
-	 * file_exists() helper.  file_exists can throw an E_WARNING on failure.
+	 * file_exists() helper. file_exists can throw an E_WARNING on failure.
 	 * Returns true if the filename (not a directory or link) exists.
 	 *
 	 * @param string $item a file or directory location
 	 * @return bool
 	 */
-	public function fileExists($item)
+	public function fileExists($item): bool
 	{
 		try
 		{
@@ -154,7 +154,7 @@ class FileFunctions
 	}
 
 	/**
-	 * fileperms() helper using spl functions.  fileperms can throw an e-warning
+	 * fileperms() helper using spl functions. fileperms can throw an e-warning
 	 *
 	 * @param string $item
 	 * @return int|bool
@@ -206,7 +206,7 @@ class FileFunctions
 	 * @param string $item a file or directory location
 	 * @return bool
 	 */
-	public function isWritable($item)
+	public function isWritable($item): bool
 	{
 		try
 		{
@@ -225,6 +225,36 @@ class FileFunctions
 	}
 
 	/**
+	 * file_get_contents() helper using SPL to avoid PHP warnings.
+	 *
+	 * - Uses SplFileObject so failures throw RuntimeException which we catch.
+	 * - Consolidates error suppression for reading file contents.
+	 *
+	 * @param string $filename The file to read
+	 *
+	 * @return string|false The file contents on success, or false on failure
+	 */
+	public function fileGetContents($filename)
+	{
+		try
+		{
+			// Open using SPL so errors are exceptions we can catch
+			$file = new \SplFileObject($filename, 'rb');
+			$contents = '';
+			while (!$file->eof())
+			{
+				$contents .= $file->fread(1048576); // 1 MB chunks
+			}
+
+			return $contents;
+		}
+		catch (\RuntimeException)
+		{
+			return false;
+		}
+	}
+
+	/**
 	 * Creates a directory as defined by a supplied path
 	 *
 	 * What it does:
@@ -238,7 +268,7 @@ class FileFunctions
 	 * @return bool
 	 * @throws \Exception
 	 */
-	public function createDirectory($path, $makeSecure = true)
+	public function createDirectory($path, $makeSecure = true): bool
 	{
 		// Path already exists?
 		if (file_exists($path))
@@ -329,7 +359,7 @@ class FileFunctions
 	 * @param $path
 	 * @return bool
 	 */
-	public function delete($path)
+	public function delete($path): bool
 	{
 		if (!$this->fileExists($path) || !$this->isWritable($path))
 		{
@@ -348,7 +378,7 @@ class FileFunctions
 	 * @param bool $delete_dir if to remove the directory structure as well
 	 * @return bool
 	 */
-	public function rmDir($path, $delete_dir = true)
+	public function rmDir($path, $delete_dir = true): bool
 	{
 		// @todo build a list of excluded directories
 		if (!$this->isDir($path))
@@ -426,7 +456,7 @@ class FileFunctions
 	 * @param string $path
 	 * @return array
 	 */
-	public function listTree($path)
+	public function listTree($path): array
 	{
 		$tree = [];
 		if (!$this->isDir($path))
@@ -461,7 +491,7 @@ class FileFunctions
 	 *
 	 * @return FileFunctions An instance of the class.
 	 */
-	public static function instance()
+	public static function instance(): FileFunctions
 	{
 		if (self::$_instance === null)
 		{

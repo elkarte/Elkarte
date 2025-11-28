@@ -2,7 +2,7 @@
 
 /**
  * This file deals with low-level graphics operations performed on images,
- * specially as needed for the ImageMagick library
+ * specifically as needed for the ImageMagick library
  *
  * @package   ElkArte Forum
  * @copyright ElkArte Forum contributors
@@ -23,7 +23,7 @@ use ImagickPixel;
 /**
  * Class ImageMagick
  *
- * Note: This class will load and save an animated gif, however any manipulation will remove said animation.
+ * Note: This class will load and save an animated gif, however, any manipulation will remove said animation.
  * It currently only provides validation/inspection functions (should you want to keep the animation intact).
  *
  * @package ElkArte\Graphics
@@ -100,7 +100,7 @@ class ImageMagick extends AbstractManipulator
 	/**
 	 * Sets the image sizes.
 	 */
-	protected function _setImage()
+	protected function _setImage(): void
 	{
 		// Update the image size values
 		$this->_image->setFirstIterator();
@@ -427,7 +427,7 @@ class ImageMagick extends AbstractManipulator
 		}
 		catch (ImagickException)
 		{
-			$checkImage->destroy();
+			$checkImage->clear();
 
 			return true;
 		}
@@ -440,7 +440,7 @@ class ImageMagick extends AbstractManipulator
 			$transparent = $this->checkOpacityPixelInspection($checkImage);
 		}
 
-		$checkImage->destroy();
+		$checkImage->clear();
 
 		return $transparent;
 	}
@@ -455,7 +455,7 @@ class ImageMagick extends AbstractManipulator
 	 * @param Imagick $checkImage
 	 * @return bool
 	 */
-	public function checkOpacityPixelInspection($checkImage)
+	public function checkOpacityPixelInspection($checkImage): bool
 	{
 		$checkImage = $checkImage ?? clone $this->_image;
 
@@ -497,7 +497,7 @@ class ImageMagick extends AbstractManipulator
 	 * @param Imagick $checkImage
 	 * @return bool|null
 	 */
-	public function checkOpacityChannel($checkImage)
+	public function checkOpacityChannel($checkImage): ?bool
 	{
 		$checkImage = $checkImage ?? clone $this->_image;
 
@@ -578,7 +578,7 @@ class ImageMagick extends AbstractManipulator
 	 *
 	 * @return bool
 	 */
-	public function hasWebpSupport()
+	public function hasWebpSupport(): bool
 	{
 		$check = Imagick::queryformats();
 

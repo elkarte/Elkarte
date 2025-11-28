@@ -72,7 +72,7 @@ class MoveTopic extends AbstractController
 	 *
 	 * @uses template_move_topic() sub-template in MoveTopic.template.php
 	 */
-	public function action_movetopic()
+	public function action_movetopic(): void
 	{
 		global $context;
 
@@ -81,7 +81,7 @@ class MoveTopic extends AbstractController
 
 		// Get a list of boards this moderator can move to.
 		require_once(SUBSDIR . '/Boards.subs.php');
-		$context += getBoardList(array('not_redirection' => true));
+		$context += getBoardList(['not_redirection' => true]);
 
 		// No boards?
 		if (empty($context['categories']) || $context['num_boards'] == 1)
@@ -118,7 +118,7 @@ class MoveTopic extends AbstractController
 	 * - If the topic is not approved yet, must have approve permissions to move it
 	 * - If the member is the topic starter requires the move_own permission, otherwise the move_any permission.
 	 */
-	private function _check_access()
+	private function _check_access(): void
 	{
 		global $modSettings;
 
@@ -159,7 +159,7 @@ class MoveTopic extends AbstractController
 	/**
 	 * Prepares the content for use in the move topic template
 	 */
-	private function _prep_template()
+	private function _prep_template(): void
 	{
 		global $context, $txt, $language, $board;
 
@@ -213,7 +213,7 @@ class MoveTopic extends AbstractController
 	 *
 	 * @uses subs/Post.subs.php.
 	 */
-	public function action_movetopic2()
+	public function action_movetopic2(): void
 	{
 		global $board;
 
@@ -234,9 +234,9 @@ class MoveTopic extends AbstractController
 		}
 
 		// Remember this for later.
-		$_SESSION['move_to_topic'] = array(
+		$_SESSION['move_to_topic'] = [
 			'move_to' => $this->_toboard
-		);
+		];
 
 		// Rename the topic if needed
 		$this->_rename_topic();
@@ -253,7 +253,7 @@ class MoveTopic extends AbstractController
 		// Log that they moved this topic.
 		if (!allowedTo('move_own') || $this->_topic_info['id_member_started'] != $this->user->id)
 		{
-			logAction('move', array('topic' => $this->_topic, 'board_from' => $board, 'board_to' => $this->_toboard));
+			logAction('move', ['topic' => $this->_topic, 'board_from' => $board, 'board_to' => $this->_toboard]);
 		}
 
 		// Notify people that this topic has been moved?
@@ -284,7 +284,7 @@ class MoveTopic extends AbstractController
 	 * @return bool
 	 * @throws \ElkArte\Exceptions\Exception no_access
 	 */
-	private function _check_access_2()
+	private function _check_access_2(): bool
 	{
 		global $board;
 
@@ -348,14 +348,14 @@ class MoveTopic extends AbstractController
 	 * - Renames the moved topic with a new topic subject
 	 * - If enforce_subject is set, renames all posts withing the moved topic posts with a new subject
 	 */
-	private function _rename_topic()
+	private function _rename_topic(): void
 	{
 		global $context;
 
 		// Rename the topic...
 		if (isset($this->_req->post->reset_subject, $this->_req->post->custom_subject) && $this->_req->post->custom_subject != '')
 		{
-			$custom_subject = strtr(Util::htmltrim(Util::htmlspecialchars($this->_req->post->custom_subject)), array("\r" => '', "\n" => '', "\t" => ''));
+			$custom_subject = strtr(Util::htmltrim(Util::htmlspecialchars($this->_req->post->custom_subject)), ["\r" => '', "\n" => '', "\t" => '']);
 
 			// Keep checking the length.
 			if (Util::strlen($custom_subject) > 100)
@@ -395,7 +395,7 @@ class MoveTopic extends AbstractController
 	 * - If leaving a moved "where did it go" topic, validates the needed inputs
 	 * - Posts a new topic in the originating board of the topic to be moved.
 	 */
-	private function _post_redirect()
+	private function _post_redirect(): void
 	{
 		global $board, $language;
 
@@ -414,10 +414,10 @@ class MoveTopic extends AbstractController
 			preparsecode($reason);
 
 			// Add a URL onto the message.
-			$reason = strtr($reason, array(
+			$reason = strtr($reason, [
 				$mtxt['movetopic_auto_board'] => '[url=' . getUrl('board', ['board' => $this->_toboard, 'start' => 0, 'name' => $this->_board_info['name']]) . ']' . $this->_board_info['name'] . '[/url]',
 				$mtxt['movetopic_auto_topic'] => '[iurl=' . getUrl('topic', ['topic' => $this->_topic, 'start' => 0, 'subject' => $this->_board_info['subject_new'] ?? $this->_board_info['subject']]) . ']' . ($this->_board_info['subject_new'] ?? $this->_board_info['subject']) . '[/iurl]'
-			));
+			]);
 
 			// Auto remove this MOVED redirection topic in the future?
 			$redirect_expires = empty($this->_req->post->redirect_expires) ? 0 : (int) $this->_req->post->redirect_expires;
@@ -429,25 +429,25 @@ class MoveTopic extends AbstractController
 			$_SESSION['move_to_topic']['redirect_topic'] = $redirect_topic;
 			$_SESSION['move_to_topic']['redirect_expires'] = $redirect_expires;
 
-			$msgOptions = array(
+			$msgOptions = [
 				'subject' => $mtxt['moved'] . ': ' . $this->_board_info['subject'],
 				'body' => $reason,
 				'icon' => 'moved',
 				'smileys_enabled' => 1,
-			);
+			];
 
-			$topicOptions = array(
+			$topicOptions = [
 				'board' => $board,
 				'lock_mode' => 1,
 				'mark_as_read' => true,
 				'redirect_expires' => empty($redirect_expires) ? 0 : ($redirect_expires * 60) + time(),
 				'redirect_topic' => $redirect_topic,
-			);
+			];
 
-			$posterOptions = array(
+			$posterOptions = [
 				'id' => $this->user->id,
 				'update_post_count' => empty($this->_board_info['count_posts']),
-			);
+			];
 			createPost($msgOptions, $topicOptions, $posterOptions);
 		}
 	}
@@ -459,7 +459,7 @@ class MoveTopic extends AbstractController
 	 *
 	 * - Checks if a topic is being moved to/from a board that does/does'nt count posts.
 	 */
-	private function _count_update()
+	private function _count_update(): void
 	{
 		global $board;
 
@@ -474,12 +474,12 @@ class MoveTopic extends AbstractController
 				// The board we're moving from counted posts, but not to.
 				if (empty($board_from['count_posts']))
 				{
-					updateMemberData($id_member, array('posts' => 'posts - ' . $posts));
+					updateMemberData($id_member, ['posts' => 'posts - ' . $posts]);
 				}
 				// The reverse: from didn't, to did.
 				else
 				{
-					updateMemberData($id_member, array('posts' => 'posts + ' . $posts));
+					updateMemberData($id_member, ['posts' => 'posts + ' . $posts]);
 				}
 			}
 		}

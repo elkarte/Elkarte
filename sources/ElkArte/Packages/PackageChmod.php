@@ -17,6 +17,7 @@
 namespace ElkArte\Packages;
 
 use ElkArte\AbstractModel;
+use ElkArte\Exceptions\Exception;
 use ElkArte\Helper\FileFunctions;
 use ElkArte\Http\FtpConnection;
 
@@ -46,7 +47,7 @@ class PackageChmod extends AbstractModel
 	 * @return array|bool
 	 * @package Packages
 	 */
-	public function createChmodControl($chmodFiles = array(), $chmodOptions = array(), $restore_write_status = false)
+	public function createChmodControl($chmodFiles = [], $chmodOptions = [], $restore_write_status = false)
 	{
 		global $context, $package_ftp, $txt;
 
@@ -135,99 +136,99 @@ class PackageChmod extends AbstractModel
 	 *
 	 * @param bool $restore_write_status
 	 * @param array $chmodOptions
-	 * @return bool|void
+	 * @return bool|null
 	 */
-	public function showList($restore_write_status, $chmodOptions)
+	public function showList($restore_write_status, $chmodOptions): ?bool
 	{
 		global $context, $txt, $scripturl;
 
 		// If we're restoring the status of existing files prepare the data.
 		if ($restore_write_status && !empty($_SESSION['ftp_connection']['original_perms']))
 		{
-			$listOptions = array(
+			$listOptions = [
 				'id' => 'restore_file_permissions',
 				'title' => $txt['package_restore_permissions'],
-				'get_items' => array(
+				'get_items' => [
 					'function' => 'list_restoreFiles',
-					'params' => array(
+					'params' => [
 						!empty($this->_req->getPost('restore_perms')),
-					),
-				),
-				'columns' => array(
-					'path' => array(
-						'header' => array(
+					],
+				],
+				'columns' => [
+					'path' => [
+						'header' => [
 							'value' => $txt['package_restore_permissions_filename'],
-						),
-						'data' => array(
+						],
+						'data' => [
 							'db' => 'path',
 							'class' => 'smalltext',
-						),
-					),
-					'old_perms' => array(
-						'header' => array(
+						],
+					],
+					'old_perms' => [
+						'header' => [
 							'value' => $txt['package_restore_permissions_orig_status'],
-						),
-						'data' => array(
+						],
+						'data' => [
 							'db' => 'old_perms',
 							'class' => 'smalltext',
-						),
-					),
-					'cur_perms' => array(
-						'header' => array(
+						],
+					],
+					'cur_perms' => [
+						'header' => [
 							'value' => $txt['package_restore_permissions_cur_status'],
-						),
-						'data' => array(
+						],
+						'data' => [
 							'function' => static function ($rowData) {
 								global $txt;
 								$formatTxt = $rowData['result'] === '' || $rowData['result'] === 'skipped' ? $txt['package_restore_permissions_pre_change'] : $txt['package_restore_permissions_post_change'];
 								return sprintf($formatTxt, $rowData['cur_perms'], $rowData['new_perms'], $rowData['writable_message']);
 							},
 							'class' => 'smalltext',
-						),
-					),
-					'check' => array(
-						'header' => array(
+						],
+					],
+					'check' => [
+						'header' => [
 							'value' => '<input type="checkbox" onclick="invertAll(this, this.form);" class="input_check" />',
 							'class' => 'centertext',
-						),
-						'data' => array(
-							'sprintf' => array(
+						],
+						'data' => [
+							'sprintf' => [
 								'format' => '<input type="checkbox" name="restore_files[]" value="%1$s" class="input_check" />',
-								'params' => array(
+								'params' => [
 									'path' => false,
-								),
-							),
+								],
+							],
 							'class' => 'centertext',
-						),
-					),
-					'result' => array(
-						'header' => array(
+						],
+					],
+					'result' => [
+						'header' => [
 							'value' => $txt['package_restore_permissions_result'],
-						),
-						'data' => array(
+						],
+						'data' => [
 							'function' => static function ($rowData) {
 								global $txt;
 								return $txt['package_restore_permissions_action_' . $rowData['result']];
 							},
 							'class' => 'smalltext',
-						),
-					),
-				),
-				'form' => array(
+						],
+					],
+				],
+				'form' => [
 					'href' => empty($chmodOptions['destination_url']) ? $scripturl . '?action=admin;area=packages;sa=perms;restore;' . $context['session_var'] . '=' . $context['session_id'] : $chmodOptions['destination_url'],
-				),
-				'additional_rows' => array(
-					array(
+				],
+				'additional_rows' => [
+					[
 						'position' => 'below_table_data',
 						'value' => '<input type="submit" name="restore_perms" value="' . $txt['package_restore_permissions_restore'] . '" class="right_submit" />',
 						'class' => 'category_header',
-					),
-					array(
+					],
+					[
 						'position' => 'after_title',
 						'value' => '<span class="smalltext">' . $txt['package_restore_permissions_desc'] . '</span>',
-					),
-				),
-			);
+					],
+				],
+			];
 
 			// Work out what columns and the like to show.
 			if (!empty($this->_req->getPost('restore_perms')))
@@ -266,7 +267,7 @@ class PackageChmod extends AbstractModel
 	 * @param array $chmodOptions
 	 * @param array $return_data
 	 */
-	public function reportUnWritable($ftp, $chmodOptions, $return_data)
+	public function reportUnWritable($ftp, $chmodOptions, $return_data): void
 	{
 		global $context;
 
@@ -300,14 +301,14 @@ class PackageChmod extends AbstractModel
 		}
 
 		// Place some hopefully useful information in the form
-		$context['package_ftp'] = array(
+		$context['package_ftp'] = [
 			'server' => $ftp_server ?? ($this->_modSettings['package_server'] ?? 'localhost'),
 			'port' => $ftp_port ?? ($this->_modSettings['package_port'] ?? '21'),
 			'username' => $ftp_username ?? ($this->_modSettings['package_username'] ?? $username ?? ''),
 			'path' => $ftp_path ?? ($this->_modSettings['package_path'] ?? ''),
 			'error' => empty($ftp_error) ? null : $ftp_error,
 			'destination' => empty($chmodOptions['destination_url']) ? '' : $chmodOptions['destination_url'],
-		);
+		];
 
 		// Which files failed?
 		$context['notwritable_files'] = $context['notwritable_files'] ?? [];
@@ -320,7 +321,7 @@ class PackageChmod extends AbstractModel
 	 *
 	 * @return FtpConnection
 	 */
-	public function getFTPControl()
+	public function getFTPControl(): FtpConnection
 	{
 		global $package_ftp;
 
@@ -349,7 +350,7 @@ class PackageChmod extends AbstractModel
 			}
 
 			// A valid path was entered
-			if (!in_array($path, array('', '/'), true) && empty($ftp_error))
+			if (!in_array($path, ['', '/'], true) && empty($ftp_error))
 			{
 				$ftp_root = substr(BOARDDIR, 0, -strlen($path));
 
@@ -364,7 +365,7 @@ class PackageChmod extends AbstractModel
 				$ftp_root = BOARDDIR;
 			}
 
-			$_SESSION['ftp_connection'] = array(
+			$_SESSION['ftp_connection'] = [
 				'server' => $server,
 				'port' => $port,
 				'username' => $username,
@@ -373,7 +374,7 @@ class PackageChmod extends AbstractModel
 				'root' => rtrim($ftp_root, '\/'),
 				'connected' => true,
 				'error' => empty($ftp_error) ? null : $ftp_error,
-			);
+			];
 
 			if (!isset($this->_modSettings['package_path']) || $this->_modSettings['package_path'] !== $path)
 			{
@@ -396,7 +397,7 @@ class PackageChmod extends AbstractModel
 	 * @return bool True if it worked, false if it didn't
 	 * @package Packages
 	 */
-	public function pkgChmod($filename, $track_change = false)
+	public function pkgChmod($filename, $track_change = false): bool
 	{
 		global $package_ftp;
 
@@ -429,7 +430,7 @@ class PackageChmod extends AbstractModel
 	 * @param bool $track_change = false
 	 * @return bool True if it worked, false if it didn't
 	 */
-	public function chmodNoFTP($filename, $track_change)
+	public function chmodNoFTP($filename, $track_change): bool
 	{
 		$chmod_file = $filename;
 
@@ -494,7 +495,7 @@ class PackageChmod extends AbstractModel
 	 * @param bool $track_change = false
 	 * @return bool True if it worked, false if it didn't
 	 */
-	public function chmodWithFTP($filename, $track_change)
+	public function chmodWithFTP($filename, $track_change): bool
 	{
 		/** @var $package_ftp FtpConnection */
 		global $package_ftp;
@@ -556,7 +557,7 @@ class PackageChmod extends AbstractModel
 	 * @param $item
 	 * @return bool
 	 */
-	public function testAccess($item)
+	public function testAccess($item): bool
 	{
 		$fp = $this->fileFunc->isDir($item) ? @opendir($item) : @fopen($item, 'rb');
 		if ($this->fileFunc->isWritable($item) && $fp !== false)
@@ -587,7 +588,7 @@ class PackageChmod extends AbstractModel
 	 * @return string The encrypted password
 	 * @package Packages
 	 */
-	public function packageCrypt($pass)
+	public function packageCrypt($pass): string
 	{
 		$n = strlen($pass);
 

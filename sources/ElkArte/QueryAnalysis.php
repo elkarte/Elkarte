@@ -29,7 +29,7 @@ class QueryAnalysis
 	 * @param array $query_data array of information regarding the query
 	 * @return string[] - 'text', 'is_select', 'position_time'
 	 */
-	public function extractInfo($query_data)
+	public function extractInfo($query_data): array
 	{
 		global $txt;
 
@@ -42,11 +42,11 @@ class QueryAnalysis
 			$query_data['f'] = preg_replace('~^' . preg_quote(BOARDDIR, '~') . '~', '...', $query_data['f']);
 		}
 
-		$query_info = array(
+		$query_info = [
 			'text' => nl2br(str_replace("\t", '&nbsp;&nbsp;&nbsp;', htmlspecialchars($query_data['q'], ENT_COMPAT, 'UTF-8'))),
 			'is_select' => $this->_is_select_query($query_data['q']),
 			'position_time' => '',
-		);
+		];
 
 		if (!empty($query_data['f']) && !empty($query_data['l']))
 		{
@@ -72,7 +72,7 @@ class QueryAnalysis
 	 *
 	 * @return string
 	 */
-	protected function _normalize_query_indent($query_data)
+	protected function _normalize_query_indent($query_data): string
 	{
 		$query_data = ltrim(str_replace("\r", '', $query_data), "\n");
 		$query = explode("\n", $query_data);
@@ -125,7 +125,7 @@ class QueryAnalysis
 		// Temporary tables created in earlier queries are not explainable.
 		if ($is_select_query)
 		{
-			foreach (array('tmp_log_search_topics', 'tmp_log_search_messages') as $tmp)
+			foreach (['tmp_log_search_topics', 'tmp_log_search_messages'] as $tmp)
 			{
 				if (strpos($this->_select, $tmp) !== false)
 				{
@@ -158,11 +158,11 @@ class QueryAnalysis
 	 *
 	 * @throws \ElkArte\Exceptions\Exception
 	 */
-	public function doExplain()
+	public function doExplain(): array
 	{
 		if (empty($this->_select))
 		{
-			return array();
+			return [];
 		}
 
 		// db work...
@@ -170,23 +170,23 @@ class QueryAnalysis
 
 		$result = $db->query('', '
 			EXPLAIN ' . $this->_select,
-			array()
+			[]
 		);
 
 		if ($result->hasResults() === false)
 		{
-			$explain = array(
+			$explain = [
 				'is_error' => true,
 				'error_text' => $db->last_error(),
-			);
+			];
 		}
 		else
 		{
 			$row = $result->fetch_assoc();
-			$explain = array(
+			$explain = [
 				'headers' => array_keys($row),
-				'body' => array()
-			);
+				'body' => []
+			];
 
 			$result->data_seek(0);
 			while (($row = $result->fetch_assoc()))

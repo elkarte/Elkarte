@@ -36,19 +36,19 @@ use ElkArte\User;
 class Maintenance extends AbstractController
 {
 	/** @var int Maximum topic counter */
-	public $max_topics;
+	public int $max_topics;
 
 	/** @var int How many actions to take for a maintenance actions */
-	public $increment;
+	public int $increment;
 
 	/** @var int Total steps for a given maintenance action */
-	public $total_steps;
+	public int $total_steps;
 
 	/** @var int reStart pointer for paused maintenance actions */
-	public $start;
+	public int $start;
 
 	/** @var int Loop counter for paused maintenance actions */
-	public $step;
+	public int $step;
 
 	/**
 	 * Main dispatcher, the maintenance access point.
@@ -80,53 +80,52 @@ class Maintenance extends AbstractController
 		);
 
 		// So many things you can do - but frankly I won't let you - just these!
-		$subActions = array(
-			'routine' => array(
+		$subActions = [
+			'routine' => [
 				'controller' => $this,
 				'function' => 'action_routine',
-				'activities' => array(
-					'version' => 'action_version_display',
+				'activities' => [
 					'repair' => 'action_repair_display',
 					'recount' => 'action_recount_display',
 					'logs' => 'action_logs_display',
 					'cleancache' => 'action_cleancache_display',
-				),
-			),
-			'database' => array(
+				],
+			],
+			'database' => [
 				'controller' => $this,
 				'function' => 'action_database',
-				'activities' => array(
+				'activities' => [
 					'optimize' => 'action_optimize_display',
 					'backup' => 'action_backup_display',
 					'convertmsgbody' => 'action_convertmsgbody_display',
-				),
-			),
-			'members' => array(
+				],
+			],
+			'members' => [
 				'controller' => $this,
 				'function' => 'action_members',
-				'activities' => array(
+				'activities' => [
 					'reattribute' => 'action_reattribute_display',
 					'purgeinactive' => 'action_purgeinactive_display',
 					'recountposts' => 'action_recountposts_display',
-				),
-			),
-			'topics' => array(
+				],
+			],
+			'topics' => [
 				'controller' => $this,
 				'function' => 'action_topics',
-				'activities' => array(
+				'activities' => [
 					'massmove' => 'action_massmove_display',
 					'pruneold' => 'action_pruneold_display',
-				),
-			),
-			'hooks' => array(
+				],
+			],
+			'hooks' => [
 				'controller' => $this,
 				'function' => 'action_hooks',
-			),
-			'attachments' => array(
+			],
+			'attachments' => [
 				'controller' => ManageAttachments::class,
 				'function' => 'action_maintenance',
-			),
-		);
+			],
+		];
 
 		// Set up the action handler
 		$action = new Action('manage_maintenance');
@@ -142,7 +141,7 @@ class Maintenance extends AbstractController
 		$context['page_title'] = $txt['maintain_title'];
 		$context['sub_action'] = $subAction;
 
-		// Finally fall through to what we are doing.
+		// Finally, fall through to what we are doing.
 		$action->dispatch($subAction);
 
 		// Any special activity defined, then go to it.
@@ -178,7 +177,7 @@ class Maintenance extends AbstractController
 	 * addons to add more options
 	 * @uses Template Maintenance, sub template maintain_routine
 	 */
-	public function action_routine()
+	public function action_routine(): void
 	{
 		global $context, $txt;
 
@@ -189,82 +188,73 @@ class Maintenance extends AbstractController
 
 		// set up the sub-template
 		$context['sub_template'] = 'maintain_routine';
-		$context['routine_actions'] = array(
-			'version' => array(
-				'url' => getUrl('admin', ['action' => 'admin', 'area' => 'maintain', 'sa' => 'routine', 'activity' => 'version']),
-				'title' => $txt['maintain_version'],
-				'description' => $txt['maintain_version_info'],
-				'submit' => $txt['maintain_run_now'],
-				'hidden' => array(
-					'session_var' => 'session_id',
-				)
-			),
-			'repair' => array(
+		$context['routine_actions'] = [
+			'repair' => [
 				'url' => getUrl('admin', ['action' => 'admin', 'area' => 'repairboards']),
 				'title' => $txt['maintain_errors'],
 				'description' => $txt['maintain_errors_info'],
 				'submit' => $txt['maintain_run_now'],
-				'hidden' => array(
+				'hidden' => [
 					'session_var' => 'session_id',
 					'admin-maint_token_var' => 'admin-maint_token',
-				)
-			),
-			'recount' => array(
+				]
+			],
+			'recount' => [
 				'url' => getUrl('admin', ['action' => 'admin', 'area' => 'maintain', 'sa' => 'routine', 'activity' => 'recount']),
 				'title' => $txt['maintain_recount'],
 				'description' => $txt['maintain_recount_info'],
 				'submit' => $txt['maintain_run_now'],
-				'hidden' => array(
+				'hidden' => [
 					'session_var' => 'session_id',
 					'admin-maint_token_var' => 'admin-maint_token',
-				)
-			),
-			'logs' => array(
+				]
+			],
+			'logs' => [
 				'url' => getUrl('admin', ['action' => 'admin', 'area' => 'maintain', 'sa' => 'routine', 'activity' => 'logs']),
 				'title' => $txt['maintain_logs'],
 				'description' => $txt['maintain_logs_info'],
 				'submit' => $txt['maintain_run_now'],
-				'hidden' => array(
+				'hidden' => [
 					'session_var' => 'session_id',
 					'admin-maint_token_var' => 'admin-maint_token',
-				)
-			),
-			'cleancache' => array(
+				]
+			],
+			'cleancache' => [
 				'url' => getUrl('admin', ['action' => 'admin', 'area' => 'maintain', 'sa' => 'routine', 'activity' => 'cleancache']),
 				'title' => $txt['maintain_cache'],
 				'description' => $txt['maintain_cache_info'],
 				'submit' => $txt['maintain_run_now'],
-				'hidden' => array(
+				'hidden' => [
 					'session_var' => 'session_id',
 					'admin-maint_token_var' => 'admin-maint_token',
-				)
-			),
-		);
+				]
+			],
+		];
 
-		call_integration_hook('integrate_routine_maintenance', array(&$context['routine_actions']));
+		call_integration_hook('integrate_routine_maintenance', [&$context['routine_actions']]);
 	}
 
 	/**
 	 * Supporting function for the members maintenance area.
 	 */
-	public function action_members()
+	public function action_members(): void
 	{
 		global $context, $txt;
 
 		require_once(SUBSDIR . '/Membergroups.subs.php');
 
 		// Get all membergroups - for deleting members and the like.
-		$context['membergroups'] = getBasicMembergroupData(array('all'));
+		$context['membergroups'] = getBasicMembergroupData(['all']);
 
 		// Show that we completed this action
 		if ($this->_req->compareQuery('done', 'recountposts', 'trim|strval'))
 		{
-			$context['maintenance_finished'] = array(
-				'errors' => array(sprintf($txt['maintain_done'], $txt['maintain_recountposts'])),
-			);
+			$context['maintenance_finished'] = [
+				'errors' => [sprintf($txt['maintain_done'], $txt['maintain_recountposts'])],
+			];
 		}
 
-		loadJavascriptFile('suggest.js', array('defer' => true));
+		loadJavascriptFile('suggest.js', ['defer' => true]);
 
 		// Set up the sub-template
 		$context['sub_template'] = 'maintain_members';
@@ -277,14 +267,14 @@ class Maintenance extends AbstractController
 	 * to add additonal topic maintance functions
 	 * @uses GenericBoards template, sub template maintain_topics
 	 */
-	public function action_topics()
+	public function action_topics(): void
 	{
 		global $context, $txt;
 
 		require_once(SUBSDIR . '/Boards.subs.php');
 
 		// Let's load up the boards in case they are useful.
-		$context += getBoardList(array('not_redirection' => true));
+		$context += getBoardList(['not_redirection' => true]);
 
 		// Include a list of boards per category for easy toggling.
 		foreach ($context['categories'] as $cat => &$category)
@@ -298,42 +288,42 @@ class Maintenance extends AbstractController
 		$context['boards_check_all'] = true;
 		theme()->getTemplates()->load('GenericBoards');
 
-		$context['topics_actions'] = array(
-			'pruneold' => array(
+		$context['topics_actions'] = [
+			'pruneold' => [
 				'url' => getUrl('admin', ['action' => 'admin', 'area' => 'maintain', 'sa' => 'topics', 'activity' => 'pruneold']),
 				'title' => $txt['maintain_old'],
 				'submit' => $txt['maintain_old_remove'],
 				'confirm' => $txt['maintain_old_confirm'],
-				'hidden' => array(
+				'hidden' => [
 					'session_var' => 'session_id',
 					'admin-maint_token_var' => 'admin-maint_token',
-				)
-			),
-			'massmove' => array(
+				]
+			],
+			'massmove' => [
 				'url' => getUrl('admin', ['action' => 'admin', 'area' => 'maintain', 'sa' => 'topics', 'activity' => 'massmove']),
 				'title' => $txt['move_topics_maintenance'],
 				'submit' => $txt['move_topics_now'],
 				'confirm' => $txt['move_topics_confirm'],
-				'hidden' => array(
+				'hidden' => [
 					'session_var' => 'session_id',
 					'admin-maint_token_var' => 'admin-maint_token',
-				)
-			),
-		);
+				]
+			],
+		];
 
-		call_integration_hook('integrate_topics_maintenance', array(&$context['topics_actions']));
+		call_integration_hook('integrate_topics_maintenance', [&$context['topics_actions']]);
 
 		if ($this->_req->compareQuery('done', 'purgeold', 'trim|strval'))
 		{
-			$context['maintenance_finished'] = array(
-				'errors' => array(sprintf($txt['maintain_done'], $txt['maintain_old'])),
-			);
+			$context['maintenance_finished'] = [
+				'errors' => [sprintf($txt['maintain_done'], $txt['maintain_old'])],
+			];
 		}
 		elseif ($this->_req->compareQuery('done', 'massmove', 'trim|strval'))
 		{
-			$context['maintenance_finished'] = array(
-				'errors' => array(sprintf($txt['maintain_done'], $txt['move_topics_maintenance'])),
-			);
+			$context['maintenance_finished'] = [
+				'errors' => [sprintf($txt['maintain_done'], $txt['move_topics_maintenance'])],
+			];
 		}
 
 		// Set up the sub-template
@@ -345,7 +335,7 @@ class Maintenance extends AbstractController
 	 *
 	 * - Forwards to repair boards controller.
 	 */
-	public function action_repair_display()
+	public function action_repair_display(): void
 	{
 		// Honestly, this should be done in the sub function.
 		validateToken('admin-maint');
@@ -363,7 +353,7 @@ class Maintenance extends AbstractController
 	 * - This action, like other maintenance tasks, may be called automatically
 	 * by the task scheduler or manually by the admin in Maintenance area.
 	 */
-	public function action_cleancache_display()
+	public function action_cleancache_display(): void
 	{
 		global $context, $txt;
 
@@ -385,7 +375,7 @@ class Maintenance extends AbstractController
 	 * - This action may be called periodically, by the tasks scheduler,
 	 * or manually by the admin in Maintenance area.
 	 */
-	public function action_logs_display()
+	public function action_logs_display(): void
 	{
 		global $context, $txt;
 
@@ -399,7 +389,7 @@ class Maintenance extends AbstractController
 		// Apart from me, I mean.
 		flushLogTables();
 
-		updateSettings(array('search_pointer' => 0));
+		updateSettings(['search_pointer' => 0]);
 
 		$context['maintenance_finished'] = $txt['maintain_logs'];
 	}
@@ -419,7 +409,7 @@ class Maintenance extends AbstractController
 	 *
 	 * @uses the convert_msgbody sub template of the Admin template.
 	 */
-	public function action_convertmsgbody_display()
+	public function action_convertmsgbody_display(): void
 	{
 		global $context, $txt, $modSettings, $time_start;
 
@@ -496,7 +486,7 @@ class Maintenance extends AbstractController
 			$context['sub_template'] = 'not_done';
 
 			$increment = 500;
-			$id_msg_exceeding = isset($this->_req->post->id_msg_exceeding) ? explode(',', $this->_req->post->id_msg_exceeding) : array();
+			$id_msg_exceeding = isset($this->_req->post->id_msg_exceeding) ? explode(',', $this->_req->post->id_msg_exceeding) : [];
 			$max_msgs = countMessages();
 			$start = $this->_req->query->start;
 
@@ -554,7 +544,7 @@ class Maintenance extends AbstractController
 	 * - It is accessed from ?action=admin;area=maintain;sa=database;activity=optimize.
 	 * - It also updates the optimize scheduled task such that the tables are not automatically optimized again too soon.
 	 */
-	public function action_optimize_display()
+	public function action_optimize_display(): void
 	{
 		global $txt, $context;
 
@@ -581,7 +571,7 @@ class Maintenance extends AbstractController
 		}
 
 		// For each table....
-		$context['optimized_tables'] = array();
+		$context['optimized_tables'] = [];
 		$db_table = db_table();
 
 		foreach ($tables as $table)
@@ -591,10 +581,10 @@ class Maintenance extends AbstractController
 
 			if ($data_freed > 0)
 			{
-				$context['optimized_tables'][] = array(
+				$context['optimized_tables'][] = [
 					'name' => $table['table_name'],
 					'data_freed' => $data_freed,
-				);
+				];
 			}
 		}
 
@@ -625,7 +615,7 @@ class Maintenance extends AbstractController
 	 * - updates the last message posted in boards and children.
 	 * - updates member count, latest member, topic count, and message count.
 	 */
-	public function action_recount_display()
+	public function action_recount_display(): void
 	{
 		global $txt, $context, $modSettings, $time_start;
 
@@ -854,7 +844,7 @@ class Maintenance extends AbstractController
 	 * @param int $percent percent done
 	 * @param int $step step we are on
 	 */
-	private function _buildContinue($percent, $step)
+	private function _buildContinue(int $percent, int $step): void
 	{
 		global $context, $txt;
 
@@ -871,15 +861,15 @@ class Maintenance extends AbstractController
 	/**
 	 * Re-attribute posts to the user sent from the maintenance page.
 	 */
-	public function action_reattribute_display()
+	public function action_reattribute_display(): void
 	{
 		global $context, $txt;
 
 		checkSession();
 
 		$validator = new DataValidator();
-		$validator->sanitation_rules(array('posts' => 'empty', 'type' => 'trim', 'from_email' => 'trim', 'from_name' => 'trim', 'to' => 'trim'));
-		$validator->validation_rules(array('from_email' => 'valid_email', 'from_name' => 'required', 'to' => 'required', 'type' => 'contains[name,email]'));
+		$validator->sanitation_rules(['posts' => 'empty', 'type' => 'trim', 'from_email' => 'trim', 'from_name' => 'trim', 'to' => 'trim']);
+		$validator->validation_rules(['from_email' => 'valid_email', 'from_name' => 'required', 'to' => 'required', 'type' => 'contains[name,email]']);
 		$validator->validate($this->_req->post);
 
 		// Fetch the Mr. Clean values
@@ -908,26 +898,26 @@ class Maintenance extends AbstractController
 			require_once(SUBSDIR . '/Members.subs.php');
 			reattributePosts($memID, $email, $memberName, !$our_post['posts']);
 
-			$context['maintenance_finished'] = array(
-				'errors' => array(sprintf($txt['maintain_done'], $txt['maintain_reattribute_posts'])),
-			);
+			$context['maintenance_finished'] = [
+				'errors' => [sprintf($txt['maintain_done'], $txt['maintain_reattribute_posts'])],
+			];
 		}
 		else
 		{
 			// Show them the correct error
 			if ($our_post['type'] === 'name' && empty($our_post['from_name']))
 			{
-				$error = $validator->validation_errors(array('from_name', 'to'));
+				$error = $validator->validation_errors(['from_name', 'to']);
 			}
 			else
 			{
-				$error = $validator->validation_errors(array('from_email', 'to'));
+				$error = $validator->validation_errors(['from_email', 'to']);
 			}
 
-			$context['maintenance_finished'] = array(
+			$context['maintenance_finished'] = [
 				'errors' => $error,
 				'type' => 'minor',
-			);
+			];
 		}
 	}
 
@@ -937,7 +927,7 @@ class Maintenance extends AbstractController
 	 * - It requires an administrator and the session hash by post.
 	 * - This method simply forwards to DumpDatabase2().
 	 */
-	public function action_backup_display()
+	public function action_backup_display(): ?bool
 	{
 		validateToken('admin-maint');
 
@@ -952,15 +942,16 @@ class Maintenance extends AbstractController
 		// Validate access
 		if (!defined('I_KNOW_IT_MAY_BE_UNSAFE') && $this->_validate_access() === false)
 		{
-			return $this->action_database();
+			$this->action_database();
+			return null;
 		}
 
 		require_once(SUBSDIR . '/Admin.subs.php');
-		emailAdmins('admin_backup_database', array(
+		emailAdmins('admin_backup_database', [
 			'BAK_REALNAME' => $this->user->name
-		));
+		]);
 
-		logAction('database_backup', array('member' => $this->user->id), 'admin');
+		logAction('database_backup', ['member' => $this->user->id], 'admin');
 		require_once(SOURCEDIR . '/DumpDatabase.php');
 		DumpDatabase2();
 
@@ -973,7 +964,7 @@ class Maintenance extends AbstractController
 	 *
 	 * - Used as an extra layer of security when performing backups
 	 */
-	private function _validate_access()
+	private function _validate_access(): bool
 	{
 		global $context, $txt;
 
@@ -993,14 +984,14 @@ class Maintenance extends AbstractController
 			$ftp_error = $ftp->last_message ?? $txt['package_ftp_' . $ftp->error] ?? '';
 
 			// Fill the boxes for a FTP connection with data from the previous attempt
-			$context['package_ftp'] = array(
+			$context['package_ftp'] = [
 				'form_elements_only' => 1,
 				'server' => $this->_req->post->ftp_server,
 				'port' => $this->_req->post->ftp_port,
 				'username' => $this->_req->post->ftp_username,
 				'path' => $this->_req->post->ftp_path,
 				'error' => empty($ftp_error) ? null : $ftp_error,
-			);
+			];
 
 			return false;
 		}
@@ -1011,7 +1002,7 @@ class Maintenance extends AbstractController
 	/**
 	 * Supporting function for the database maintenance area.
 	 */
-	public function action_database()
+	public function action_database(): void
 	{
 		global $context, $modSettings, $maintenance;
 
@@ -1089,14 +1080,14 @@ class Maintenance extends AbstractController
 		// $context['package_ftp'] may be set action_backup_display when an error occur
 		if (!isset($context['package_ftp']))
 		{
-			$context['package_ftp'] = array(
+			$context['package_ftp'] = [
 				'form_elements_only' => true,
 				'server' => '',
 				'port' => '',
 				'username' => $modSettings['package_username'] ?? '',
 				'path' => '',
 				'error' => '',
-			);
+			];
 		}
 
 		$context['skip_security'] = defined('I_KNOW_IT_MAY_BE_UNSAFE');
@@ -1105,7 +1096,7 @@ class Maintenance extends AbstractController
 	/**
 	 * Removing old and inactive members.
 	 */
-	public function action_purgeinactive_display()
+	public function action_purgeinactive_display(): void
 	{
 		global $context, $txt;
 
@@ -1114,8 +1105,8 @@ class Maintenance extends AbstractController
 
 		// Start with checking and cleaning what was sent
 		$validator = new DataValidator();
-		$validator->sanitation_rules(array('maxdays' => 'intval'));
-		$validator->validation_rules(array('maxdays' => 'required', 'groups' => 'isarray', 'del_type' => 'required'));
+		$validator->sanitation_rules(['maxdays' => 'intval']);
+		$validator->validation_rules(['maxdays' => 'required', 'groups' => 'isarray', 'del_type' => 'required']);
 
 		// Validator says, you can pass or not
 		if ($validator->validate($this->_req->post))
@@ -1126,7 +1117,7 @@ class Maintenance extends AbstractController
 			require_once(SUBSDIR . '/Maintenance.subs.php');
 			require_once(SUBSDIR . '/Members.subs.php');
 
-			$groups = array();
+			$groups = [];
 			foreach ($our_post['groups'] as $id => $dummy)
 			{
 				$groups[] = (int) $id;
@@ -1136,16 +1127,16 @@ class Maintenance extends AbstractController
 			$members = purgeMembers($our_post['del_type'], $groups, $time_limit);
 			deleteMembers($members);
 
-			$context['maintenance_finished'] = array(
-				'errors' => array(sprintf($txt['maintain_done'], $txt['maintain_members'])),
-			);
+			$context['maintenance_finished'] = [
+				'errors' => [sprintf($txt['maintain_done'], $txt['maintain_members'])],
+			];
 		}
 		else
 		{
-			$context['maintenance_finished'] = array(
+			$context['maintenance_finished'] = [
 				'errors' => $validator->validation_errors(),
 				'type' => 'minor',
-			);
+			];
 		}
 	}
 
@@ -1153,7 +1144,7 @@ class Maintenance extends AbstractController
 	 * This method takes care of removal of old posts.
 	 * They're very very old, perhaps even older.
 	 */
-	public function action_pruneold_display()
+	public function action_pruneold_display(): void
 	{
 		validateToken('admin-maint');
 
@@ -1168,7 +1159,7 @@ class Maintenance extends AbstractController
 
 		$boards = array_keys($this->_req->post->boards);
 
-		if (!isset($this->_req->post->delete_type) || !in_array($this->_req->post->delete_type, array('moved', 'nothing', 'locked')))
+		if (!isset($this->_req->post->delete_type) || !in_array($this->_req->post->delete_type, ['moved', 'nothing', 'locked']))
 		{
 			$delete_type = 'nothing';
 		}
@@ -1186,7 +1177,7 @@ class Maintenance extends AbstractController
 		removeOldTopics($boards, $delete_type, $exclude_stickies, $older_than);
 
 		// Log an action into the moderation log.
-		logAction('pruned', array('days' => max($this->_req->getPost('maxdays', 'intval', 0), 1)));
+		logAction('pruned', ['days' => max($this->_req->getPost('maxdays', 'intval', 0), 1)]);
 
 		redirectexit('action=admin;area=maintain;sa=topics;done=purgeold');
 	}
@@ -1196,7 +1187,7 @@ class Maintenance extends AbstractController
 	 *
 	 * @uses not_done template to pause the process.
 	 */
-	public function action_massmove_display()
+	public function action_massmove_display(): void
 	{
 		global $context, $txt, $time_start;
 
@@ -1291,7 +1282,7 @@ class Maintenance extends AbstractController
 	 * - Accessed through ?action=admin;area=maintain;sa=hooks;
 	 * - Allows for removal or disabling of selected hooks
 	 */
-	public function action_hooks()
+	public function action_hooks(): void
 	{
 		global $context, $txt;
 
@@ -1308,37 +1299,37 @@ class Maintenance extends AbstractController
 			$context['current_filter'] = $this->_req->query->filter;
 		}
 
-		$list_options = array(
+		$list_options = [
 			'id' => 'list_integration_hooks',
 			'title' => $txt['maintain_sub_hooks_list'],
 			'items_per_page' => 20,
 			'base_href' => getUrl('admin', ['action' => 'admin', 'area' => 'maintain', 'sa' => 'hooks', $context['filter_url'], '{session_data}']),
 			'default_sort_col' => 'hook_name',
-			'get_items' => array(
+			'get_items' => [
 				'function' => fn($start, $items_per_page, $sort) => $this->list_getIntegrationHooks($start, $items_per_page, $sort),
-			),
-			'get_count' => array(
+			],
+			'get_count' => [
 				'function' => fn() => $this->list_getIntegrationHooksCount(),
-			),
+			],
 			'no_items_label' => $txt['hooks_no_hooks'],
-			'columns' => array(
-				'hook_name' => array(
-					'header' => array(
+			'columns' => [
+				'hook_name' => [
+					'header' => [
 						'value' => $txt['hooks_field_hook_name'],
-					),
-					'data' => array(
+					],
+					'data' => [
 						'db' => 'hook_name',
-					),
-					'sort' => array(
+					],
+					'sort' => [
 						'default' => 'hook_name',
 						'reverse' => 'hook_name DESC',
-					),
-				),
-				'function_name' => array(
-					'header' => array(
+					],
+				],
+				'function_name' => [
+					'header' => [
 						'value' => $txt['hooks_field_function_name'],
-					),
-					'data' => array(
+					],
+					'data' => [
 						'function' => static function ($data) {
 							global $txt;
 
@@ -1349,41 +1340,41 @@ class Maintenance extends AbstractController
 
 							return $data['real_function'];
 						},
-					),
-					'sort' => array(
+					],
+					'sort' => [
 						'default' => 'function_name',
 						'reverse' => 'function_name DESC',
-					),
-				),
-				'file_name' => array(
-					'header' => array(
+					],
+				],
+				'file_name' => [
+					'header' => [
 						'value' => $txt['hooks_field_file_name'],
-					),
-					'data' => array(
+					],
+					'data' => [
 						'db' => 'file_name',
-					),
-					'sort' => array(
+					],
+					'sort' => [
 						'default' => 'file_name',
 						'reverse' => 'file_name DESC',
-					),
-				),
-				'status' => array(
-					'header' => array(
+					],
+				],
+				'status' => [
+					'header' => [
 						'value' => $txt['hooks_field_hook_exists'],
 						'class' => 'nowrap',
-					),
-					'data' => array(
+					],
+					'data' => [
 						'function' => static fn($data) => '<i class="icon i-post_moderation_' . $data['status'] . '" title="' . $data['img_text'] . '"></i>',
 						'class' => 'centertext',
-					),
-					'sort' => array(
+					],
+					'sort' => [
 						'default' => 'status',
 						'reverse' => 'status DESC',
-					),
-				),
-			),
-			'additional_rows' => array(
-				array(
+					],
+				],
+			],
+			'additional_rows' => [
+				[
 					'position' => 'after_title',
 					'value' => $txt['hooks_disable_legend'] . ':
 					<ul>
@@ -1394,9 +1385,9 @@ class Maintenance extends AbstractController
 							<i class="icon i-post_moderation_deny col" title="' . $txt['hooks_missing'] . '"></i>' . $txt['hooks_disable_legend_missing'] . '
 						</li>
 					</ul>'
-				),
-			),
-		);
+				],
+			],
+		];
 
 		createList($list_options);
 
@@ -1414,7 +1405,7 @@ class Maintenance extends AbstractController
 	 *
 	 * @return array
 	 */
-	public function list_getIntegrationHooks($start, $items_per_page, $sort)
+	public function list_getIntegrationHooks(int $start, int $items_per_page, string $sort): array
 	{
 		return list_integration_hooks_data($start, $items_per_page, $sort);
 	}
@@ -1425,7 +1416,7 @@ class Maintenance extends AbstractController
 	 *
 	 * @return int
 	 */
-	public function list_getIntegrationHooksCount()
+	public function list_getIntegrationHooksCount(): int
 	{
 		global $context;
 
@@ -1450,7 +1441,7 @@ class Maintenance extends AbstractController
 	 * - Redirects back to action=admin;area=maintain;sa=members when complete.
 	 * - Accessed via ?action=admin;area=maintain;sa=members;activity=recountposts
 	 */
-	public function action_recountposts_display()
+	public function action_recountposts_display(): void
 	{
 		global $txt, $context;
 

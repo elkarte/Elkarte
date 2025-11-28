@@ -25,7 +25,7 @@ class EmojiIntegrate
 	 *
 	 * @return array
 	 */
-	public static function register()
+	public static function register(): array
 	{
 		// $hook, $function, $file
 		return [
@@ -43,7 +43,7 @@ class EmojiIntegrate
 	 *
 	 * @return array
 	 */
-	public static function settingsRegister()
+	public static function settingsRegister(): array
 	{
 		// $hook, $function, $file
 		return [
@@ -68,7 +68,7 @@ class EmojiIntegrate
 	 *
 	 * @param string $editor_id
 	 */
-	public static function integrate_editor_plugins($editor_id)
+	public static function integrate_editor_plugins($editor_id): void
 	{
 		global $context, $modSettings;
 

@@ -31,7 +31,7 @@ class QueueMail
 	 * @return bool
 	 * @package Mail
 	 */
-	public function reduceMailQueue($batch_size = false, $override_limit = false, $force_send = false)
+	public function reduceMailQueue($batch_size = false, $override_limit = false, $force_send = false): bool
 	{
 		global $modSettings;
 
@@ -140,7 +140,7 @@ class QueueMail
 	 * @param $batch_size
 	 * @return int
 	 */
-	public function setBatchSize($batch_size)
+	public function setBatchSize($batch_size): int
 	{
 		global $modSettings;
 
@@ -212,7 +212,7 @@ class QueueMail
 	 * @param int $delay
 	 * @return int
 	 */
-	public function adjustBatchSize($override_limit, $batch_size, $delay)
+	public function adjustBatchSize($override_limit, $batch_size, $delay): int
 	{
 		global $modSettings;
 
@@ -250,7 +250,7 @@ class QueueMail
 			}
 
 			// Reflect that we're about to send some, do it now to be safe.
-			updateSettings(array('mail_recent' => $mail_time . '|' . $mail_number));
+			updateSettings(['mail_recent' => $mail_time . '|' . $mail_number]);
 		}
 
 		return $batch_size;

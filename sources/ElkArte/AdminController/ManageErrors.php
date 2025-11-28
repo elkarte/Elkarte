@@ -27,8 +27,8 @@ use ElkArte\MembersList;
  */
 class ManageErrors extends AbstractController
 {
-	/** @var \ElkArte\Errors\Log */
-	private $errorLog;
+	/** @var Log */
+	private Log $errorLog;
 
 	/**
 	 * Calls the right handler.
@@ -69,7 +69,7 @@ class ManageErrors extends AbstractController
 	 * - The line number number is specified by $_REQUEST['line']...
 	 * - The function will try to get the 20 lines before and after the specified line.
 	 */
-	protected function action_viewfile()
+	protected function action_viewfile(): void
 	{
 		global $context;
 
@@ -119,7 +119,7 @@ class ManageErrors extends AbstractController
 	 *
 	 * @uses the Errors template and error_log sub template.
 	 */
-	protected function action_log()
+	protected function action_log(): void
 	{
 		global $txt, $context, $modSettings;
 
@@ -151,7 +151,7 @@ class ManageErrors extends AbstractController
 		}
 
 		$num_errors = $this->errorLog->numErrors($filter);
-		$members = array();
+		$members = [];
 
 		// If this filter is empty...
 		if ($num_errors === 0 && !empty($filter))
@@ -172,7 +172,7 @@ class ManageErrors extends AbstractController
 		$context['page_index'] = constructPageIndex('{scripturl}?action=admin;area=logs;sa=errorlog' . ($context['sort_direction'] === 'down' ? ';desc' : '') . $page_filter, $start, $num_errors, $modSettings['defaultMaxMessages']);
 		$context['start'] = $start;
 		$context['$page_filter'] = $page_filter;
-		$context['errors'] = array();
+		$context['errors'] = [];
 
 		$logdata = $this->errorLog->getErrorLogData($start, $context['sort_direction'], $filter);
 		if (!empty($logdata))
@@ -188,17 +188,17 @@ class ManageErrors extends AbstractController
 		$this->_applyFilter($filter);
 
 		// What type of errors do we have and how many do we have?
-		$context['error_types'] = array();
+		$context['error_types'] = [];
 		$context['error_types'] = $this->errorLog->fetchErrorsByType($filter, $context['sort_direction']);
 		$tmp = array_keys($context['error_types']);
 		$sum = (int) end($tmp);
 
-		$context['error_types']['all'] = array(
+		$context['error_types']['all'] = [
 			'label' => $txt['errortype_all'],
 			'description' => $txt['errortype_all_desc'] ?? '',
 			'url' => getUrl('admin', ['action' => 'admin', 'area' => 'logs', 'sa' => 'errorlog', $context['sort_direction'] === 'down' ? 'desc' : '']),
 			'is_selected' => empty($filter),
-		);
+		];
 
 		// Update the all errors tab with the total number of errors
 		$context['error_types']['all']['label'] .= ' (' . $sum . ')';
@@ -224,7 +224,7 @@ class ManageErrors extends AbstractController
 	/**
 	 * Setup any filtering the user may have selected
 	 */
-	private function _setupFiltering()
+	private function _setupFiltering(): array
 	{
 		global $txt;
 
@@ -232,7 +232,7 @@ class ManageErrors extends AbstractController
 		$db = database();
 
 		// You can filter by any of the following columns:
-		$filters = array(
+		$filters = [
 			'id_member' => $txt['username'],
 			'ip' => $txt['ip_address'],
 			'session' => $txt['session'],
@@ -241,23 +241,23 @@ class ManageErrors extends AbstractController
 			'error_type' => $txt['error_type'],
 			'file' => $txt['file'],
 			'line' => $txt['line'],
-		);
+		];
 
 		$filter = $this->_req->getQuery('filter', 'trim', null);
 		$value = $this->_req->getQuery('value', 'trim', null);
 		// Set up the filtering...
 		if (isset($value, $filters[$filter]))
 		{
-			return array(
+			return [
 				'variable' => $filter,
-				'value' => array(
-					'sql' => in_array($filter, array('message', 'url', 'file'))
-						? base64_decode(strtr($value, array(' ' => '+')))
+				'value' => [
+					'sql' => in_array($filter, ['message', 'url', 'file'])
+						? base64_decode(strtr($value, [' ' => '+']))
 						: $db->escape_wildcard_string($value),
-				),
+				],
 				'href' => ['filter' => $filter, 'value' => $value],
 				'entity' => $filters[$filter]
-			);
+			];
 		}
 
 		if (isset($filter, $value))
@@ -273,7 +273,7 @@ class ManageErrors extends AbstractController
 	 *
 	 * @param int[] $members
 	 */
-	private function _loadMemData($members)
+	private function _loadMemData(array $members): void
 	{
 		global $context, $txt;
 
@@ -281,7 +281,7 @@ class ManageErrors extends AbstractController
 		if (!empty($members))
 		{
 			require_once(SUBSDIR . '/Members.subs.php');
-			$members = getBasicMemberData($members, array('add_guest' => true));
+			$members = getBasicMemberData($members, ['add_guest' => true]);
 
 			// Go through each error and tack the data on.
 			foreach ($context['errors'] as $id => $dummy)
@@ -300,7 +300,7 @@ class ManageErrors extends AbstractController
 	 *
 	 * @param array $filter
 	 */
-	private function _applyFilter($filter)
+	private function _applyFilter(array $filter): void
 	{
 		global $context, $scripturl;
 
@@ -318,14 +318,14 @@ class ManageErrors extends AbstractController
 					$context['filter']['value']['html'] = '<a href="' . getUrl('profile', ['action' => 'profile', 'u' => $id, 'name' => $name]) . '">' . $name . '</a>';
 					break;
 				case 'url':
-					$context['filter']['value']['html'] = "'" . strtr(htmlspecialchars((substr($filter['value']['sql'], 0, 1) === '?' ? $scripturl : '') . $filter['value']['sql'], ENT_COMPAT, 'UTF-8'), array('\_' => '_')) . "'";
+					$context['filter']['value']['html'] = "'" . strtr(htmlspecialchars((substr($filter['value']['sql'], 0, 1) === '?' ? $scripturl : '') . $filter['value']['sql'], ENT_COMPAT, 'UTF-8'), ['\_' => '_']) . "'";
 					break;
 				case 'message':
-					$context['filter']['value']['html'] = "'" . strtr(htmlspecialchars($filter['value']['sql'], ENT_COMPAT, 'UTF-8'), array("\n" => '<br />', '&lt;br /&gt;' => '<br />', "\t" => '&nbsp;&nbsp;&nbsp;', '\_' => '_', '\\%' => '%', '\\\\' => '\\')) . "'";
+					$context['filter']['value']['html'] = "'" . strtr(htmlspecialchars($filter['value']['sql'], ENT_COMPAT, 'UTF-8'), ["\n" => '<br />', '&lt;br /&gt;' => '<br />', "\t" => '&nbsp;&nbsp;&nbsp;', '\_' => '_', '\\%' => '%', '\\\\' => '\\']) . "'";
 					$context['filter']['value']['html'] = preg_replace('~&amp;lt;span class=&amp;quot;remove&amp;quot;&amp;gt;(.+?)&amp;lt;/span&amp;gt;~', '$1', $context['filter']['value']['html']);
 					break;
 				case 'error_type':
-					$context['filter']['value']['html'] = "'" . strtr(htmlspecialchars($filter['value']['sql'], ENT_COMPAT, 'UTF-8'), array("\n" => '<br />', '&lt;br /&gt;' => '<br />', "\t" => '&nbsp;&nbsp;&nbsp;', '\_' => '_', '\\%' => '%', '\\\\' => '\\')) . "'";
+					$context['filter']['value']['html'] = "'" . strtr(htmlspecialchars($filter['value']['sql'], ENT_COMPAT, 'UTF-8'), ["\n" => '<br />', '&lt;br /&gt;' => '<br />', "\t" => '&nbsp;&nbsp;&nbsp;', '\_' => '_', '\\%' => '%', '\\\\' => '\\']) . "'";
 					break;
 				default:
 					$context['filter']['value']['html'] = &$filter['value']['sql'];

@@ -80,7 +80,7 @@ class MaillistPreview extends AbstractController
 	 *
 	 * @return EmailParse The parsed email message.
 	 */
-	private function loadEmailMessage($data)
+	private function loadEmailMessage($data): EmailParse
 	{
 		// Load the email parser and set some data to work with
 		$email_message = new EmailParse();
@@ -100,7 +100,7 @@ class MaillistPreview extends AbstractController
 	 * @param EmailParse $email_message The email message object.
 	 * @return string The count of attachments as a string. If there are no attachments, an empty string is returned.
 	 */
-	private function getAttachmentCount($email_message)
+	private function getAttachmentCount($email_message): string
 	{
 		global $modSettings, $txt;
 

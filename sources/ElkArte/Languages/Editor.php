@@ -99,7 +99,7 @@ class Editor
 	 *
 	 * @return void
 	 */
-	public function changePath($path)
+	public function changePath($path): void
 	{
 		$this->path = $path;
 	}
@@ -111,7 +111,7 @@ class Editor
 	 *
 	 * @return void
 	 */
-	public function load($file_name)
+	public function load($file_name): void
 	{
 		foreach (array_keys($this->loaders) as $k)
 		{
@@ -151,7 +151,7 @@ class Editor
 	 *               - 'value': The modified string value, HTML encoded.
 	 *               - 'rows': The number of rows needed for the editing textarea.
 	 */
-	public function getForEditing()
+	public function getForEditing(): array
 	{
 		$this->editingStrings = [];
 		foreach (array_keys($this->loaders) as $k)
@@ -186,7 +186,7 @@ class Editor
 	 *
 	 * @return void
 	 */
-	public function save($file_name, $txt)
+	public function save($file_name, $txt): void
 	{
 		if (in_array($file_name, self::IGNORE_FILES))
 		{

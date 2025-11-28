@@ -130,13 +130,13 @@ class BBCParser
 	/**
 	 * Reset the parser's properties for a new message
 	 */
-	public function resetParser()
+	public function resetParser(): void
 	{
 		$this->pos = -1;
 		$this->pos1 = null;
 		$this->pos2 = null;
 		$this->last_pos = null;
-		$this->open_tags = array();
+		$this->open_tags = [];
 		$this->inside_tag = null;
 		$this->lastAutoPos = 0;
 		$this->can_cache = true;
@@ -150,11 +150,11 @@ class BBCParser
 	 *
 	 * @return string
 	 */
-	public function parse($message)
+	public function parse($message): string
 	{
 		// Allow addons access before entering the main parse loop, formally
 		// called as integrate_pre_parsebbc
-		call_integration_hook('integrate_pre_bbc_parser', array(&$message, &$this->bbc));
+		call_integration_hook('integrate_pre_bbc_parser', [&$message, &$this->bbc]);
 
 		$this->message = (string) $message;
 
@@ -200,7 +200,7 @@ class BBCParser
 		}
 
 		// Allow addons access before entering the main parse loop
-		call_integration_hook('integrate_pre_bbc_parser_loop', array(&$this->message, &$this->bbc));
+		call_integration_hook('integrate_pre_bbc_parser_loop', [&$this->message, &$this->bbc]);
 
 		// This handles pretty much all the parsing. It is a separate method, so it is easier to override and profile.
 		$this->parse_loop();
@@ -218,7 +218,7 @@ class BBCParser
 		}
 
 		// Cleanup whitespace.
-		$this->message = str_replace(array('  ', '<br /> ', '&#13;'), array('&nbsp; ', '<br />&nbsp;', "\n"), $this->message);
+		$this->message = str_replace(['  ', '<br /> ', '&#13;'], ['&nbsp; ', '<br />&nbsp;', "\n"], $this->message);
 
 		// Finish footnotes if we have any.
 		if ($this->num_footnotes > 0)
@@ -229,7 +229,7 @@ class BBCParser
 		// Allow addons access to what the parser created, formally
 		// called as integrate_post_parsebbc
 		$message = $this->message;
-		call_integration_hook('integrate_post_bbc_parser', array(&$message));
+		call_integration_hook('integrate_post_bbc_parser', [&$message]);
 		$this->message = $message;
 
 		return $this->message;
@@ -240,7 +240,7 @@ class BBCParser
 	 *
 	 * Walks the string to parse, looking for BBC tags and passing items to the required translation functions
 	 */
-	protected function parse_loop()
+	protected function parse_loop(): void
 	{
 		while ($this->pos !== false)
 		{
@@ -290,7 +290,7 @@ class BBCParser
 			if (isset($this->message[$this->pos + 2]) && $this->isItemCode($next_char) && $this->message[$this->pos + 2] === ']' && !$this->bbc->isDisabled('list') && !$this->bbc->isDisabled('li'))
 			{
 				// Itemcodes cannot be 0 and must be proceeded by a semi-colon, space, tab, new line, or greater than sign
-				if (!($this->message[$this->pos + 1] === '0' && !in_array($this->message[$this->pos - 1], array(';', ' ', "\t", "\n", '>'))))
+				if (!($this->message[$this->pos + 1] === '0' && !in_array($this->message[$this->pos - 1], [';', ' ', "\t", "\n", '>'])))
 				{
 					// Item codes are complicated buggers... they are implicit [li]s and can make [list]s!
 					$this->handleItemCode();
@@ -358,7 +358,7 @@ class BBCParser
 	/**
 	 * Process a tag once the closing character / has been found
 	 */
-	protected function handleOpenTags()
+	protected function handleOpenTags(): void
 	{
 		// Next closing bracket after the first character
 		$this->pos2 = strpos($this->message, ']', $this->pos + 1);
@@ -371,7 +371,7 @@ class BBCParser
 
 		// Get everything between [/ and ]
 		$look_for = strtolower(substr($this->message, $this->pos + 2, $this->pos2 - $this->pos - 2));
-		$to_close = array();
+		$to_close = [];
 		$block_level = null;
 
 		do
@@ -488,7 +488,7 @@ class BBCParser
 	 * @param bool $toggle
 	 * @return BBCParser
 	 */
-	public function doSmileys($toggle)
+	public function doSmileys($toggle): BBCParser
 	{
 		$this->do_smileys = (bool) $toggle;
 
@@ -500,7 +500,7 @@ class BBCParser
 	 *
 	 * @return bool
 	 */
-	public function parsingEnabled()
+	public function parsingEnabled(): bool
 	{
 		return !empty($GLOBALS['modSettings']['enableBBC']);
 	}
@@ -508,10 +508,10 @@ class BBCParser
 	/**
 	 * Load the HTML parsing engine
 	 */
-	public function loadHtmlParser()
+	public function loadHtmlParser(): void
 	{
 		$parser = new HtmlParser();
-		call_integration_hook('integrate_bbc_load_html_parser', array(&$parser));
+		call_integration_hook('integrate_bbc_load_html_parser', [&$parser]);
 		$this->html_parser = $parser;
 	}
 
@@ -522,7 +522,7 @@ class BBCParser
 	 *
 	 * @return string
 	 */
-	protected function parseHTML($data)
+	protected function parseHTML($data): string
 	{
 		return $this->html_parser->parse($data);
 	}
@@ -530,7 +530,7 @@ class BBCParser
 	/**
 	 * Load the Markdown parsing engine
 	 */
-	public function loadMarkdownParser()
+	public function loadMarkdownParser(): void
 	{
 		$parser = new MarkdownParser();
 		call_integration_hook('integrate_bbc_load_markdown_parser', [&$parser]);
@@ -544,7 +544,7 @@ class BBCParser
 	 *
 	 * @return string
 	 */
-	protected function parseMarkdown($data)
+	protected function parseMarkdown($data): string
 	{
 		return $this->markdown_parser->parse($data);
 	}
@@ -581,7 +581,7 @@ class BBCParser
 	/**
 	 * Load the autolink regular expression to be used in autoLink()
 	 */
-	protected function loadAutolink()
+	protected function loadAutolink(): void
 	{
 		if ($this->autolinker === null)
 		{
@@ -596,7 +596,7 @@ class BBCParser
 	 *
 	 * @return null|array the tag that was found or null if no tag found
 	 */
-	protected function findTag(array $possible_codes)
+	protected function findTag(array $possible_codes): ?array
 	{
 		$tag = null;
 		$last_check = null;
@@ -671,7 +671,7 @@ class BBCParser
 	 *
 	 * @param array $tag
 	 */
-	protected function alternateQuoteStyle(array &$tag)
+	protected function alternateQuoteStyle(array &$tag): void
 	{
 		// Start with standard
 		$quote_alt = false;
@@ -716,7 +716,7 @@ class BBCParser
 	 * @param array $possible
 	 * @return array|null
 	 */
-	protected function checkCodeAttributes($next_c, array $possible)
+	protected function checkCodeAttributes($next_c, array $possible): ?array
 	{
 		// Do we want parameters?
 		if (!empty($possible[Codes::ATTR_PARAM]))
@@ -737,7 +737,7 @@ class BBCParser
 		else
 		{
 			// Do we need an equal sign?
-			if ($next_c !== '=' && in_array($possible[Codes::ATTR_TYPE], array(Codes::TYPE_UNPARSED_EQUALS, Codes::TYPE_UNPARSED_COMMAS, Codes::TYPE_UNPARSED_COMMAS_CONTENT, Codes::TYPE_UNPARSED_EQUALS_CONTENT, Codes::TYPE_PARSED_EQUALS)))
+			if ($next_c !== '=' && in_array($possible[Codes::ATTR_TYPE], [Codes::TYPE_UNPARSED_EQUALS, Codes::TYPE_UNPARSED_COMMAS, Codes::TYPE_UNPARSED_COMMAS_CONTENT, Codes::TYPE_UNPARSED_EQUALS_CONTENT, Codes::TYPE_PARSED_EQUALS]))
 			{
 				return null;
 			}
@@ -772,7 +772,7 @@ class BBCParser
 			}
 
 			// If this is in the list of disallowed child tags, don't parse it.
-			if (isset($this->inside_tag[Codes::ATTR_DISALLOW_CHILDREN]) && isset($this->inside_tag[Codes::ATTR_DISALLOW_CHILDREN][$possible[Codes::ATTR_TAG]]))
+			if (isset($this->inside_tag[Codes::ATTR_DISALLOW_CHILDREN][$possible[Codes::ATTR_TAG]]))
 			{
 				return null;
 			}
@@ -828,7 +828,7 @@ class BBCParser
 	 *
 	 * @return bool
 	 */
-	protected function handleTest(array $possible)
+	protected function handleTest(array $possible): bool
 	{
 		return preg_match('~^' . $possible[Codes::ATTR_TEST] . '\]$~', substr($this->message, $this->pos + 2 + $possible[Codes::ATTR_LENGTH], strpos($this->message, ']', $this->pos) - ($this->pos + 1 + $possible[Codes::ATTR_LENGTH]))) === 0;
 	}
@@ -836,7 +836,7 @@ class BBCParser
 	/**
 	 * Handles item codes by converting them to lists
 	 */
-	protected function handleItemCode()
+	protected function handleItemCode(): void
 	{
 		if (!isset($this->item_codes[$this->message[$this->pos + 1]]))
 		{
@@ -848,16 +848,16 @@ class BBCParser
 		// First let's set up the tree: it needs to be in a list, or after an li.
 		if ($this->inside_tag === null || (isset($this->inside_tag[Codes::ATTR_TAG]) && $this->inside_tag[Codes::ATTR_TAG] !== 'list' && $this->inside_tag[Codes::ATTR_TAG] !== 'li'))
 		{
-			$this->addOpenTag(array(
+			$this->addOpenTag([
 				Codes::ATTR_TAG => 'list',
 				Codes::ATTR_TYPE => Codes::TYPE_PARSED_CONTENT,
 				Codes::ATTR_AFTER => '</ul>',
 				Codes::ATTR_BLOCK_LEVEL => true,
-				Codes::ATTR_REQUIRE_CHILDREN => array('li' => 'li'),
+				Codes::ATTR_REQUIRE_CHILDREN => ['li' => 'li'],
 				Codes::ATTR_DISALLOW_CHILDREN => $this->inside_tag[Codes::ATTR_DISALLOW_CHILDREN] ?? null,
 				Codes::ATTR_LENGTH => 4,
 				Codes::ATTR_AUTOLINK => true,
-			));
+			]);
 
 			$code = '<ul class="bbc_list">';
 		}
@@ -873,7 +873,7 @@ class BBCParser
 		}
 
 		// Now we open a new tag.
-		$this->addOpenTag(array(
+		$this->addOpenTag([
 			Codes::ATTR_TAG => 'li',
 			Codes::ATTR_TYPE => Codes::TYPE_PARSED_CONTENT,
 			Codes::ATTR_AFTER => '</li>',
@@ -882,7 +882,7 @@ class BBCParser
 			Codes::ATTR_DISALLOW_CHILDREN => $this->inside_tag[Codes::ATTR_DISALLOW_CHILDREN] ?? null,
 			Codes::ATTR_AUTOLINK => true,
 			Codes::ATTR_LENGTH => 2,
-		));
+		]);
 
 		// First, open the tag...
 		$code .= '<li style="list-style-type: ' . $tag . '">';
@@ -923,7 +923,7 @@ class BBCParser
 	 *
 	 * @return bool
 	 */
-	protected function handleTypeParsedContext(array $tag)
+	protected function handleTypeParsedContext(array $tag): bool
 	{
 		// @todo Check for end tag first, so people can say "I like that [i] tag"?
 		$this->addOpenTag($tag);
@@ -941,7 +941,7 @@ class BBCParser
 	 *
 	 * @return bool
 	 */
-	protected function handleTypeUnparsedContext(array $tag)
+	protected function handleTypeUnparsedContext(array $tag): bool
 	{
 		// Find the next closer
 		$this->pos2 = stripos($this->message, '[/' . $tag[Codes::ATTR_TAG] . ']', $this->pos1);
@@ -967,7 +967,7 @@ class BBCParser
 			$this->filterData($tag, $data);
 		}
 
-		$code = strtr($tag[Codes::ATTR_CONTENT], array('$1' => $data));
+		$code = strtr($tag[Codes::ATTR_CONTENT], ['$1' => $data]);
 		$tmp = $this->noSmileys($code);
 		$this->message = substr_replace($this->message, $tmp, $this->pos, $this->pos2 + 3 + $tag[Codes::ATTR_LENGTH] - $this->pos);
 		$this->pos += strlen($tmp) - 1;
@@ -981,7 +981,7 @@ class BBCParser
 	 *  - [code][code]x[/code][/code]
 	 *  - [code][code]x[/code]<br />[/code]
 	 */
-	protected function handleUnparsedContentNesting($tag)
+	protected function handleUnparsedContentNesting($tag): void
 	{
 		$nest_advance = $this->pos2 + $tag[Codes::ATTR_LENGTH] + 3;
 
@@ -1007,7 +1007,7 @@ class BBCParser
 	 *
 	 * @return bool
 	 */
-	protected function handleUnparsedEqualsContext(array $tag)
+	protected function handleUnparsedEqualsContext(array $tag): bool
 	{
 		// The value may be quoted for some tags - check.
 		if (isset($tag[Codes::ATTR_QUOTED]))
@@ -1040,10 +1040,10 @@ class BBCParser
 			return true;
 		}
 
-		$data = array(
+		$data = [
 			substr($this->message, $this->pos2 + ($quoted ? 7 : 1), $this->pos3 - ($this->pos2 + ($quoted ? 7 : 1))),
 			substr($this->message, $this->pos1, $this->pos2 - $this->pos1)
-		);
+		];
 
 		if (!empty($tag[Codes::ATTR_BLOCK_LEVEL]) && substr_compare($data[0], '<br />', 0, 6) === 0)
 		{
@@ -1056,7 +1056,7 @@ class BBCParser
 			$this->filterData($tag, $data);
 		}
 
-		$code = strtr($tag[Codes::ATTR_CONTENT], array('$1' => $data[0], '$2' => $data[1]));
+		$code = strtr($tag[Codes::ATTR_CONTENT], ['$1' => $data[0], '$2' => $data[1]]);
 		$tmp = $this->noSmileys($code);
 		$this->message = substr_replace($this->message, $tmp, $this->pos, $this->pos3 + 3 + $tag[Codes::ATTR_LENGTH] - $this->pos);
 		$this->pos += strlen($tmp) - 1;
@@ -1071,7 +1071,7 @@ class BBCParser
 	 *
 	 * @return bool
 	 */
-	protected function handleTypeClosed(array $tag)
+	protected function handleTypeClosed(array $tag): bool
 	{
 		$this->pos2 = strpos($this->message, ']', $this->pos);
 		$tmp = $this->noSmileys($tag[Codes::ATTR_CONTENT]);
@@ -1088,7 +1088,7 @@ class BBCParser
 	 *
 	 * @return bool
 	 */
-	protected function handleUnparsedCommasContext(array $tag)
+	protected function handleUnparsedCommasContext(array $tag): bool
 	{
 		$this->pos2 = strpos($this->message, ']', $this->pos1);
 		if ($this->pos2 === false)
@@ -1114,7 +1114,7 @@ class BBCParser
 		$code = $tag[Codes::ATTR_CONTENT];
 		foreach ($data as $k => $d)
 		{
-			$code = strtr($code, array('$' . ($k + 1) => trim($d)));
+			$code = strtr($code, ['$' . ($k + 1) => trim($d)]);
 		}
 
 		$tmp = $this->noSmileys($code);
@@ -1131,7 +1131,7 @@ class BBCParser
 	 *
 	 * @return bool
 	 */
-	protected function handleUnparsedCommas(array $tag)
+	protected function handleUnparsedCommas(array $tag): bool
 	{
 		$this->pos2 = strpos($this->message, ']', $this->pos1);
 		if ($this->pos2 === false)
@@ -1149,7 +1149,7 @@ class BBCParser
 		// Fix after, for disabled code mainly.
 		foreach ($data as $k => $d)
 		{
-			$tag[Codes::ATTR_AFTER] = strtr($tag[Codes::ATTR_AFTER], array('$' . ($k + 1) => trim($d)));
+			$tag[Codes::ATTR_AFTER] = strtr($tag[Codes::ATTR_AFTER], ['$' . ($k + 1) => trim($d)]);
 		}
 
 		$this->addOpenTag($tag);
@@ -1158,7 +1158,7 @@ class BBCParser
 		$code = $tag[Codes::ATTR_BEFORE];
 		foreach ($data as $k => $d)
 		{
-			$code = strtr($code, array('$' . ($k + 1) => trim($d)));
+			$code = strtr($code, ['$' . ($k + 1) => trim($d)]);
 		}
 
 		$tmp = $this->noSmileys($code);
@@ -1175,7 +1175,7 @@ class BBCParser
 	 *
 	 * @return bool
 	 */
-	protected function handleEquals(array $tag)
+	protected function handleEquals(array $tag): bool
 	{
 		// The value may be quoted for some tags - check.
 		if (isset($tag[Codes::ATTR_QUOTED]))
@@ -1216,11 +1216,11 @@ class BBCParser
 			$data = $this->recursiveParser($data, $tag);
 		}
 
-		$tag[Codes::ATTR_AFTER] = strtr($tag[Codes::ATTR_AFTER], array('$1' => $data));
+		$tag[Codes::ATTR_AFTER] = strtr($tag[Codes::ATTR_AFTER], ['$1' => $data]);
 
 		$this->addOpenTag($tag);
 
-		$code = strtr($tag[Codes::ATTR_BEFORE], array('$1' => $data));
+		$code = strtr($tag[Codes::ATTR_BEFORE], ['$1' => $data]);
 		$tmp = $this->noSmileys($code);
 		$this->message = substr_replace($this->message, $tmp, $this->pos, $this->pos2 + ($quoted ? 7 : 1) - $this->pos);
 		$this->pos += strlen($tmp) - 1;
@@ -1235,7 +1235,7 @@ class BBCParser
 	 *
 	 * @return bool true if there was something wrong and the parser should advance
 	 */
-	protected function handleTag(array $tag)
+	protected function handleTag(array $tag): bool
 	{
 		return match ($tag[Codes::ATTR_TYPE])
 		{
@@ -1256,7 +1256,7 @@ class BBCParser
 	 *
 	 * @todo I don't know what else to call this. It's the area that isn't a tag.
 	 */
-	protected function betweenTags()
+	protected function betweenTags(): void
 	{
 		// Make sure the $this->last_pos is not negative.
 		$this->last_pos = max($this->last_pos, 0);
@@ -1307,15 +1307,15 @@ class BBCParser
 	/**
 	 * Handles special [footnote] tag processing as the tag is not rendered "inline"
 	 */
-	protected function handleFootnotes()
+	protected function handleFootnotes(): void
 	{
 		static $fn_total = 0;
 
 		// @todo temporary until we have nesting
-		$this->message = str_replace(array('[footnote]', '[/footnote]'), '', $this->message);
+		$this->message = str_replace(['[footnote]', '[/footnote]'], '', $this->message);
 
 		$this->fn_num = 0;
-		$this->fn_content = array();
+		$this->fn_content = [];
 		$this->fn_count = $fn_total;
 
 		// Replace our footnote text with a [1] link, save the text for use at the end of the message
@@ -1336,7 +1336,7 @@ class BBCParser
 	 *
 	 * @return string
 	 */
-	protected function footnoteCallback(array $matches)
+	protected function footnoteCallback(array $matches): string
 	{
 		$this->fn_num++;
 		$this->fn_content[] = '<div class="target" id="fn' . $this->fn_num . '_' . $this->fn_count . '"><sup>' . $this->fn_num . '&nbsp;</sup>' . $matches[2] . '<a class="footnote_return" href="#ref' . $this->fn_num . '_' . $this->fn_count . '">&crarr;</a></div>';
@@ -1349,7 +1349,7 @@ class BBCParser
 	 *
 	 * @param array $tag
 	 */
-	protected function handleDisabled(array &$tag)
+	protected function handleDisabled(array &$tag): void
 	{
 		if (!isset($tag[Codes::ATTR_DISABLED_BEFORE]) && !isset($tag[Codes::ATTR_DISABLED_AFTER]) && !isset($tag[Codes::ATTR_DISABLED_CONTENT]))
 		{
@@ -1375,13 +1375,13 @@ class BBCParser
 	 * @param array &$matches
 	 * @return bool
 	 */
-	protected function matchParameters(array &$possible, &$matches)
+	protected function matchParameters(array &$possible, &$matches): bool
 	{
 		if (!isset($possible['regex_cache']))
 		{
-			$possible['regex_cache'] = array();
-			$possible['param_check'] = array();
-			$possible['optionals'] = array();
+			$possible['regex_cache'] = [];
+			$possible['param_check'] = [];
+			$possible['optionals'] = [];
 
 			foreach ($possible[Codes::ATTR_PARAM] as $param => $info)
 			{
@@ -1437,9 +1437,9 @@ class BBCParser
 	 *
 	 * @return array
 	 */
-	private function setKeys()
+	private function setKeys(): array
 	{
-		$control_order = array();
+		$control_order = [];
 		$this->tag_possible['regex_keys'] = range(0, $this->tag_possible['regex_size']);
 
 		// Push optional params to the end of the stack but maintain current order of required ones
@@ -1469,7 +1469,7 @@ class BBCParser
 	 *
 	 * @param string $message_stub
 	 */
-	protected function optionalParam($message_stub)
+	protected function optionalParam($message_stub): void
 	{
 		// Set optional flag only if the param is optional and it was not used in this tag
 		foreach ($this->tag_possible['optionals'] as $index => $optional)
@@ -1502,7 +1502,7 @@ class BBCParser
 	 *
 	 * @return string
 	 */
-	protected function messageStub()
+	protected function messageStub(): string
 	{
 		// For parameter searching, swap in \n's to reduce any regex greediness
 		$message_stub = str_replace('<br />', "\n", substr($this->message, $this->pos1 - 1)) . "\n";
@@ -1525,7 +1525,7 @@ class BBCParser
 	 *
 	 * @return string
 	 */
-	protected function recursiveParser($data, array $tag)
+	protected function recursiveParser($data, array $tag): string
 	{
 		// @todo if parsed tags allowed is empty, return?
 		$bbc = clone $this->bbc;
@@ -1538,7 +1538,7 @@ class BBCParser
 		// Do not use $this->autolinker. For some reason it causes a recursive loop
 		$autolinker = null;
 		$html = null;
-		call_integration_hook('integrate_recursive_bbc_parser', array(&$autolinker, &$html));
+		call_integration_hook('integrate_recursive_bbc_parser', [&$autolinker, &$html]);
 
 		$parser = new BBCParser($bbc, $autolinker, $html);
 
@@ -1550,7 +1550,7 @@ class BBCParser
 	 *
 	 * @return array
 	 */
-	public function getBBC()
+	public function getBBC(): array
 	{
 		return $this->bbc_codes;
 	}
@@ -1562,7 +1562,7 @@ class BBCParser
 	 *
 	 * @return $this
 	 */
-	public function enableSmileys($enable = true)
+	public function enableSmileys($enable = true): self
 	{
 		$this->do_smileys = (bool) $enable;
 
@@ -1574,7 +1574,7 @@ class BBCParser
 	 *
 	 * @param array $tag
 	 */
-	protected function addOpenTag(array $tag)
+	protected function addOpenTag(array $tag): void
 	{
 		$this->open_tags[] = $tag;
 	}
@@ -1605,7 +1605,7 @@ class BBCParser
 	 *
 	 * @return bool
 	 */
-	protected function hasOpenTags()
+	protected function hasOpenTags(): bool
 	{
 		return !empty($this->open_tags);
 	}
@@ -1613,9 +1613,9 @@ class BBCParser
 	/**
 	 * Get the last opened tag
 	 *
-	 * @return string
+	 * @return array|string|bool
 	 */
-	protected function getLastOpenedTag()
+	protected function getLastOpenedTag(): array|string|bool
 	{
 		return end($this->open_tags);
 	}
@@ -1625,16 +1625,16 @@ class BBCParser
 	 *
 	 * @param bool|false $tags_only True if you want just the tag or false for the whole code
 	 *
-	 * @return array
+	 * @return array|string
 	 */
-	protected function getOpenedTags($tags_only = false)
+	protected function getOpenedTags($tags_only = false): array|string
 	{
 		if (!$tags_only)
 		{
 			return $this->open_tags;
 		}
 
-		$tags = array();
+		$tags = [];
 		foreach ($this->open_tags as $tag)
 		{
 			$tags[] = $tag[Codes::ATTR_TAG];
@@ -1648,7 +1648,7 @@ class BBCParser
 	 *
 	 * @param null|int $offset = null
 	 */
-	protected function trimWhiteSpace($offset = null)
+	protected function trimWhiteSpace($offset = null): void
 	{
 		if (preg_match('~(<br />|&nbsp;|\s)*~', $this->message, $matches, 0, $offset) === 0)
 		{
@@ -1675,16 +1675,16 @@ class BBCParser
 	 *
 	 * @return array
 	 */
-	protected function setupTagParameters(array $possible, array $matches)
+	protected function setupTagParameters(array $possible, array $matches): array
 	{
-		$params = array();
+		$params = [];
 		for ($i = 1, $n = count($matches); $i < $n; $i += 2)
 		{
 			$key = strtok(ltrim($matches[$i]), '=');
 
 			if (isset($possible[Codes::ATTR_PARAM][$key][Codes::PARAM_ATTR_VALUE]))
 			{
-				$params['{' . $key . '}'] = strtr($possible[Codes::ATTR_PARAM][$key][Codes::PARAM_ATTR_VALUE], array('$1' => $matches[$i + 1]));
+				$params['{' . $key . '}'] = strtr($possible[Codes::ATTR_PARAM][$key][Codes::PARAM_ATTR_VALUE], ['$1' => $matches[$i + 1]]);
 			}
 			elseif (isset($possible[Codes::ATTR_PARAM][$key][Codes::PARAM_ATTR_VALIDATE]))
 			{
@@ -1696,7 +1696,7 @@ class BBCParser
 			}
 
 			// Just to make sure: replace any $ or { so they can't interpolate wrongly.
-			$params['{' . $key . '}'] = str_replace(array('$', '{'), array('&#036;', '&#123;'), $params['{' . $key . '}']);
+			$params['{' . $key . '}'] = str_replace(['$', '{'], ['&#036;', '&#123;'], $params['{' . $key . '}']);
 		}
 
 		foreach ($possible[Codes::ATTR_PARAM] as $p => $info)
@@ -1738,7 +1738,7 @@ class BBCParser
 	 *
 	 * @return bool
 	 */
-	protected function isOpen($tag)
+	protected function isOpen($tag): bool
 	{
 		foreach ($this->open_tags as $open)
 		{
@@ -1758,7 +1758,7 @@ class BBCParser
 	 *
 	 * @return bool
 	 */
-	protected function isItemCode($char)
+	protected function isItemCode($char): bool
 	{
 		return isset($this->item_codes[$char]);
 	}
@@ -1767,7 +1767,7 @@ class BBCParser
 	 * Close any open codes that aren't block level.
 	 * Used before opening a code that *is* block level
 	 */
-	protected function closeNonBlockLevel()
+	protected function closeNonBlockLevel(): void
 	{
 		$n = count($this->open_tags) - 1;
 		while (empty($this->open_tags[$n][Codes::ATTR_BLOCK_LEVEL]) && $n >= 0)
@@ -1808,7 +1808,7 @@ class BBCParser
 	 *
 	 * @return string
 	 */
-	protected function noSmileys($string)
+	protected function noSmileys($string): string
 	{
 		return $this->smiley_marker . $string . $this->smiley_marker;
 	}
@@ -1818,7 +1818,7 @@ class BBCParser
 	 *
 	 * @return bool
 	 */
-	public function canCache()
+	public function canCache(): bool
 	{
 		return $this->can_cache;
 	}
@@ -1829,7 +1829,7 @@ class BBCParser
 	 * @param array $tag
 	 * @param $data
 	 */
-	protected function filterData(array &$tag, &$data)
+	protected function filterData(array &$tag, &$data): void
 	{
 		$tag[Codes::ATTR_VALIDATE]($data, $this->bbc->getDisabled(), $tag);
 	}

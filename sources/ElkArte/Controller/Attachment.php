@@ -44,6 +44,9 @@ use ElkArte\User;
  */
 class Attachment extends AbstractController
 {
+	/** @var int Maximum size of a file to compress */
+	private const SMALL_COMPRESS_THRESHOLD = 1048576;
+
 	/**
 	 * {@inheritDoc}
 	 */
@@ -85,13 +88,13 @@ class Attachment extends AbstractController
 	public function action_index()
 	{
 		// add a subaction array to act accordingly
-		$subActions = array(
-			'dlattach' => array($this, 'action_dlattach'),
-			'tmpattach' => array($this, 'action_tmpattach'),
-			'ulattach' => array($this, 'action_ulattach'),
-			'ulasync' => array($this, 'action_ulasync'),
-			'rmattach' => array($this, 'action_rmattach'),
-		);
+		$subActions = [
+			'dlattach' => [$this, 'action_dlattach'],
+			'tmpattach' => [$this, 'action_tmpattach'],
+			'ulattach' => [$this, 'action_ulattach'],
+			'ulasync' => [$this, 'action_ulasync'],
+			'rmattach' => [$this, 'action_rmattach'],
+		];
 
 		// Setup the action handler
 		$action = new Action('attachments');
@@ -104,13 +107,13 @@ class Attachment extends AbstractController
 	/**
 	 *  Method to upload attachments as fragments via ajax
 	 *
-	 * - Currently called by drag drop attachment functionality
+	 * - Currently called by post attachment functionality
 	 * - Passed the form data with session vars
 	 * - Responds back with errors or file data
 	 *
 	 * @return bool Returns false if there was an error, otherwise true.
 	 */
-	public function action_ulasync()
+	public function action_ulasync(): bool
 	{
 		global $context;
 
@@ -130,7 +133,7 @@ class Attachment extends AbstractController
 		$chunk = new TemporaryAttachmentChunk();
 		$resp_data = $chunk->action_async();
 
-		// If we have a PHP related upload error, set the error context
+		// If we have a PHP upload error, set the error context
 		if ($resp_data['result'] !== true)
 		{
 			$attach_errors = AttachmentErrorContext::context();
@@ -143,7 +146,7 @@ class Attachment extends AbstractController
 					$resp_data[] = $error;
 				}
 
-				$context['json_data'] = array('result' => false, 'data' => $resp_data);
+				$context['json_data'] = ['result' => false, 'data' => $resp_data];
 				return false;
 			}
 		}
@@ -164,7 +167,7 @@ class Attachment extends AbstractController
 	 *
 	 * @return void
 	 */
-	private function combineChunksAndProcess()
+	private function combineChunksAndProcess(): void
 	{
 		global $context;
 
@@ -193,13 +196,13 @@ class Attachment extends AbstractController
 	 *
 	 * @param bool $strict True if attachment processing should use move_uploaded_file, rename otherwise. Default is true.
 	 *
-	 * @return bool|void False if the session is invalid or an error occurred, void otherwise.
+	 * @return bool|null False if the session is invalid or an error occurred, void otherwise.
 	 */
-	public function action_ulattach($strict = true)
+	public function action_ulattach($strict = true): ?bool
 	{
 		global $context, $modSettings, $txt;
 
-		$resp_data = array();
+		$resp_data = [];
 		Txt::load('Errors');
 		$context['attachments']['can']['post'] = !empty($modSettings['attachmentEnable']) && (int) $modSettings['attachmentEnable'] === 1 && (allowedTo('post_attachment') || ($modSettings['postmod_active'] && allowedTo('post_unapproved_attachments')));
 
@@ -209,7 +212,7 @@ class Attachment extends AbstractController
 		// Make sure the session is still valid
 		if (checkSession('post', '', false) !== '')
 		{
-			$context['json_data'] = array('result' => false, 'data' => $txt['session_timeout_file_upload']);
+			$context['json_data'] = ['result' => false, 'data' => $txt['session_timeout_file_upload']];
 
 			return false;
 		}
@@ -240,7 +243,7 @@ class Attachment extends AbstractController
 					$resp_data[] = $error;
 				}
 
-				$context['json_data'] = array('result' => false, 'data' => $resp_data);
+				$context['json_data'] = ['result' => false, 'data' => $resp_data];
 			}
 			// No errors, lets get the details of what we have for our response back to the upload dialog
 			else
@@ -251,12 +254,12 @@ class Attachment extends AbstractController
 					// We need to grab the name anyhow
 					if (!empty($val['tmp_name']))
 					{
-						$resp_data = array(
+						$resp_data = [
 							'name' => $val['name'],
 							'attachid' => $val['public_attachid'],
 							'size' => $val['size'],
 							'resized' => !empty($val['resized']),
-						);
+						];
 					}
 				}
 
@@ -268,6 +271,8 @@ class Attachment extends AbstractController
 		{
 			$context['json_data'] = ['result' => false, 'data' => $txt['no_files_uploaded']];
 		}
+
+		return null;
 	}
 
 	/**
@@ -280,7 +285,7 @@ class Attachment extends AbstractController
 	 * - Requires file name and file path
 	 * - Responds back with success or error
 	 */
-	public function action_rmattach()
+	public function action_rmattach(): ?bool
 	{
 		global $context, $txt;
 
@@ -291,7 +296,7 @@ class Attachment extends AbstractController
 		if (checkSession('post', '', false) !== '')
 		{
 			Txt::load('Errors');
-			$context['json_data'] = array('result' => false, 'data' => $txt['session_timeout']);
+			$context['json_data'] = ['result' => false, 'data' => $txt['session_timeout']];
 
 			return false;
 		}
@@ -308,7 +313,7 @@ class Attachment extends AbstractController
 				try
 				{
 					$tmp_attachments->removeById($attachId);
-					$context['json_data'] = array('result' => true);
+					$context['json_data'] = ['result' => true];
 					$result = true;
 				}
 				catch (\Exception $e)
@@ -324,10 +329,10 @@ class Attachment extends AbstractController
 				$attachId = $this->_req->getPost('attachid', 'intval');
 				if (canRemoveAttachment($attachId, User::$info->id))
 				{
-					$result_tmp = removeAttachments(array('id_attach' => $attachId), '', true);
+					$result_tmp = removeAttachments(['id_attach' => $attachId], '', true);
 					if (!empty($result_tmp))
 					{
-						$context['json_data'] = array('result' => true);
+						$context['json_data'] = ['result' => true];
 						$result = true;
 					}
 					else
@@ -348,6 +353,8 @@ class Attachment extends AbstractController
 			Txt::load('Errors');
 			$context['json_data'] = ['result' => false, 'data' => $txt['attachment_not_found']];
 		}
+
+		return null;
 	}
 
 	/**
@@ -363,7 +370,7 @@ class Attachment extends AbstractController
 	 *
 	 * @throws Exception
 	 */
-	public function action_dlattach()
+	public function action_dlattach(): void
 	{
 		global $modSettings, $context, $topic, $board, $settings;
 
@@ -528,7 +535,7 @@ class Attachment extends AbstractController
 	 * @param bool $split If true will break text strings so all words are separated by newlines
 	 * @throws Exception
 	 */
-	public function action_text_to_image($text = null, $width = 200, $height = 75, $split = false)
+	public function action_text_to_image($text = null, $width = 200, $height = 75, $split = false): void
 	{
 		global $txt;
 
@@ -561,7 +568,7 @@ class Attachment extends AbstractController
 	 * @param string $mime_type
 	 * @return bool if we should compress the file
 	 */
-	public function useCompression($mime_type)
+	public function useCompression($mime_type): bool
 	{
 		global $modSettings;
 
@@ -587,7 +594,7 @@ class Attachment extends AbstractController
 	 * @param bool $do_cache Send a max-age header or not
 	 * @param bool $check_filename When false, any check on $filename is skipped
 	 */
-	public function prepare_headers($filename, $eTag, $mime_type, $disposition, $real_filename, $do_cache, $check_filename = true)
+	public function prepare_headers($filename, $eTag, $mime_type, $disposition, $real_filename, $do_cache, $check_filename = true): void
 	{
 		global $txt;
 
@@ -601,7 +608,7 @@ class Attachment extends AbstractController
 
 			$headers
 				->removeHeader('all')
-				->headerSpecial($protocol . ' 404 Not Found')
+				->httpCode(404)
 				->sendHeaders();
 
 			// We need to die like this *before* we send any anti-caching headers as below.
@@ -614,12 +621,12 @@ class Attachment extends AbstractController
 			[$modified_since] = explode(';', $this->_req->server->HTTP_IF_MODIFIED_SINCE);
 			if (!$check_filename || strtotime($modified_since) >= filemtime($filename))
 			{
-				@ob_end_clean();
+				$this->flush_buffers();
 
 				// Answer the question - no, it hasn't been modified ;).
 				$headers
 					->removeHeader('all')
-					->headerSpecial($protocol . ' 304 Not Modified')
+					->httpCode(304)
 					->sendHeaders();
 				exit;
 			}
@@ -628,11 +635,11 @@ class Attachment extends AbstractController
 		// Check whether the ETag was sent back, and cache based on that...
 		if (!empty($_SERVER['HTTP_IF_NONE_MATCH']) && strpos($_SERVER['HTTP_IF_NONE_MATCH'], $eTag) !== false)
 		{
-			@ob_end_clean();
+			$this->flush_buffers();
 
 			$headers
 				->removeHeader('all')
-				->headerSpecial($protocol . ' 304 Not Modified')
+				->httpCode(304)
 				->sendHeaders();
 			exit;
 		}
@@ -672,44 +679,66 @@ class Attachment extends AbstractController
 	 * @param string $filename
 	 * @param string $mime_type
 	 */
-	public function send_file($filename, $mime_type)
+	public function send_file($filename, $mime_type): void
 	{
 		$headers = Headers::instance();
-		$body = file_get_contents($filename);
-		$length = FileFunctions::instance()->fileSize($filename);
+		$fileFuncs = FileFunctions::instance();
+		$filesize = $fileFuncs->fileSize($filename);
 		$use_compression = $this->useCompression($mime_type);
 
-		// If we can/should compress this file
-		if ($use_compression && strlen($body) > 250)
+		// Flush any buffers that may be in place.
+		$this->flush_buffers();
+
+		// For small compressible files, compress in-memory and provide a compressed Content-Length
+		if ($use_compression && $filesize > 24 && $filesize <= self::SMALL_COMPRESS_THRESHOLD)
 		{
-			$body = gzencode($body, 2);
-			$length = strlen($body);
-			$headers
-				->header('Content-Encoding', 'gzip')
-				->header('Vary', 'Accept-Encoding');
+			$body = $fileFuncs->fileGetContents($filename);
+			if ($body !== false)
+			{
+				$body = gzencode($body, 4);
+				$length = strlen($body);
+				$headers
+					->header('Content-Encoding', 'gzip')
+					->header('Vary', 'Accept-Encoding')
+					->header('Content-Length', (string) $length);
+				$headers->send();
+				echo $body;
+			}
+
+			return;
 		}
 
-		if (!empty($length))
+		// Uncompressed streaming (default and fallback)
+		if (!empty($filesize))
 		{
-			$headers->header('Content-Length', $length);
+			$headers->header('Content-Length', (string) $filesize);
 		}
 
-		// Forcibly end any output buffering going on.
+		$headers->send();
+		readfile($filename);
+	}
+
+	/**
+	 * Flushes and clears all output buffers
+	 *
+	 * This method forcibly ends any ongoing output buffering to prevent issues such as double compression
+	 * and oversized output buffers by iterating through and clearing all active buffer levels.
+	 *
+	 * @return void
+	 */
+	public function flush_buffers(): void
+	{
 		while (ob_get_level() > 0)
 		{
 			@ob_end_clean();
 		}
-
-		// Someone is getting a present
-		$headers->send();
-		echo $body;
 	}
 
 	/**
 	 * "Simplified", cough, version of action_dlattach to send out thumbnails while creating
 	 * or editing a message.
 	 */
-	public function action_tmpattach()
+	public function action_tmpattach(): void
 	{
 		global $modSettings, $topic;
 

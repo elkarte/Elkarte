@@ -93,7 +93,7 @@ class Unread
 	 *
 	 * @param int|int[] $boards - the id of the boards
 	 */
-	public function setBoards($boards)
+	public function setBoards($boards): void
 	{
 		$this->_query_parameters['boards'] = is_array($boards) ? $boards : [$boards];
 	}
@@ -103,7 +103,7 @@ class Unread
 	 *
 	 * @param int $action - Unread::UNREAD, Unread::UNREADREPLIES
 	 */
-	public function setAction($action)
+	public function setAction($action): void
 	{
 		if (in_array($action, [self::UNREAD, self::UNREADREPLIES]))
 		{
@@ -116,7 +116,7 @@ class Unread
 	 *
 	 * @param int $msg_id - id of the earliest message to consider
 	 */
-	public function setEarliestMsg($msg_id)
+	public function setEarliestMsg($msg_id): void
 	{
 		$this->_earliest_msg = (int) $msg_id;
 	}
@@ -127,7 +127,7 @@ class Unread
 	 * @param string $query - The query to be used in the ORDER clause
 	 * @param bool|int $asc - If the sorting is ascending or not
 	 */
-	public function setSorting($query, $asc)
+	public function setSorting($query, $asc): void
 	{
 		$this->_sort_query = $query;
 		$this->_ascending = $asc;
@@ -138,7 +138,7 @@ class Unread
 	 *
 	 * @return bool
 	 */
-	public function isSortAsc()
+	public function isSortAsc(): bool
 	{
 		return $this->_ascending;
 	}
@@ -151,7 +151,7 @@ class Unread
 	 *                 If true it will return the entire body,
 	 *                 if 0 no preview will be generated.
 	 */
-	public function bodyPreview($chars)
+	public function bodyPreview($chars): void
 	{
 		$this->_preview_bodies = $chars === true ? 'all' : (int) $chars;
 	}
@@ -164,7 +164,7 @@ class Unread
 	 *
 	 * @return int
 	 */
-	public function numUnreads($first_login = false, $id_msg_last_visit = 0)
+	public function numUnreads($first_login = false, $id_msg_last_visit = 0): int
 	{
 		if ($this->_action === self::UNREAD)
 		{
@@ -186,7 +186,7 @@ class Unread
 	 *             once, then there is an $id_msg_last_visit
 	 * @param int $id_msg_last_visit - highest id_msg found during the last visit
 	 */
-	private function _countRecentTopics($is_first_login, $id_msg_last_visit = 0)
+	private function _countRecentTopics($is_first_login, $id_msg_last_visit = 0): void
 	{
 		$request = $this->_db->fetchQuery('
 			SELECT 
@@ -214,7 +214,7 @@ class Unread
 	/**
 	 * Counts unread replies
 	 */
-	private function _countUnreadReplies()
+	private function _countUnreadReplies(): void
 	{
 		$request = $this->_db->fetchQuery('
 			SELECT 
@@ -269,7 +269,7 @@ class Unread
 	 * @param bool|int $include_avatars - if avatars should be retrieved as well
 	 * @return array - see \ElkArte\TopicUtil::prepareContext
 	 */
-	private function _getUnreadTopics($join, $start, $limit, $include_avatars = false)
+	private function _getUnreadTopics($join, $start, $limit, $include_avatars = false): array
 	{
 		$body_query = $this->_setBodyQuery();
 
@@ -448,7 +448,7 @@ class Unread
 	 *
 	 * @return string
 	 */
-	private function _setBodyQuery()
+	private function _setBodyQuery(): string
 	{
 		if ($this->_preview_bodies === 'all')
 		{

@@ -71,9 +71,8 @@ final class ErrorHandler extends Errors
 	 * @param int $line
 	 *
 	 * @return bool
-	 * @throws Exception
 	 */
-	public function error_handler($error_level, $error_string, $file, $line)
+	public function error_handler($error_level, $error_string, $file, $line): bool
 	{
 		// Not using our custom error handler?
 		if (self::USE_DEFAULT)
@@ -103,7 +102,7 @@ final class ErrorHandler extends Errors
 	 *
 	 * @param Throwable $e
 	 */
-	public function exception_handler(Throwable $e)
+	public function exception_handler(Throwable $e): void
 	{
 		// Prepare the error details for the log
 		$isException = !$e instanceof ErrorException;

@@ -802,6 +802,7 @@ sup.bbc_footnotes, sup.bbc_footnotes a {
 	border-top-color: var(--menu_button_border_active_top);
 	background: var(--menu_button_active);
 	background-image: linear-gradient(to bottom, var(--menu_button_active_2), var(--menu_button_active));
+	background-origin: border-box;
 	box-shadow: var(--shadow-elevation-low);
 }
 
@@ -1166,7 +1167,7 @@ sup.bbc_footnotes, sup.bbc_footnotes a {
 }
 
 .topic_info {
-	border-right-color: var(--primary_border);
+	border-right-color: var(--transparent);
 }
 
 .topic_name h4 a {
@@ -2051,10 +2052,10 @@ ul.cf_icons {
 	}
 }
 
-/* This one does 800 screens at default font size.
+/* This one does 960 screens at default font size.
    -------------------------------------------------------------------------------------------*/
 
-@media screen and (max-width: 50em) {
+@media screen and (max-width: 60em) {
 	#main_menu .linklevel1.active, #main_menu .linklevel1.active:hover,
 	#main_menu .linklevel1:not(.panel_toggle):not(.panel_search):not(#quicksearch):not(#search_selection) {
 		border-color: var(--transparent);

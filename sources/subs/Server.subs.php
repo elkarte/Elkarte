@@ -21,7 +21,7 @@
  */
 function detectServerLoad()
 {
-	if (stristr(PHP_OS, 'win'))
+	if (stripos(PHP_OS, 'win') !== false)
 	{
 		return false;
 	}
@@ -36,22 +36,20 @@ function detectServerLoad()
 		return $sys_load[0] / $cores;
 	}
 	// Maybe someone has a custom compile
-	else
+
+	$load_average = @file_get_contents('/proc/loadavg');
+
+	if (!empty($load_average) && preg_match('~^([^ ]+?) ([^ ]+?) ([^ ]+)~', $load_average, $matches) != 0)
 	{
-		$load_average = @file_get_contents('/proc/loadavg');
-
-		if (!empty($load_average) && preg_match('~^([^ ]+?) ([^ ]+?) ([^ ]+)~', $load_average, $matches) != 0)
-		{
-			return (float) $matches[1] / $cores;
-		}
-
-		if (($load_average = @`uptime`) !== null && preg_match('~load average[s]?: (\d+\.\d+), (\d+\.\d+), (\d+\.\d+)~i', $load_average, $matches) != 0)
-		{
-			return (float) $matches[1] / $cores;
-		}
-
-		return false;
+		return (float) $matches[1] / $cores;
 	}
+
+	if (($load_average = @`uptime`) !== null && preg_match('~load average[s]?: (\d+\.\d+), (\d+\.\d+), (\d+\.\d+)~i', $load_average, $matches) != 0)
+	{
+		return (float) $matches[1] / $cores;
+	}
+
+	return false;
 }
 
 /**

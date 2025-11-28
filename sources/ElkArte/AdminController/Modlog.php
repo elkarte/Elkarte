@@ -47,7 +47,7 @@ class Modlog extends AbstractController
 	 *
 	 * @uses Modlog template, main sub-template.
 	 */
-	public function action_log()
+	public function action_log(): void
 	{
 		global $txt, $context;
 
@@ -107,17 +107,17 @@ class Modlog extends AbstractController
 
 		if (!empty($searchParams) && empty($isSearch))
 		{
-			$search_params = base64_decode(strtr($searchParams, array(' ' => '+')));
+			$search_params = base64_decode(strtr($searchParams, [' ' => '+']));
 			$search_params = @json_decode($search_params, true);
 		}
 
 		// This array houses all the valid quick search types.
-		$searchTypes = array(
-			'action' => array('sql' => 'lm.action', 'label' => $txt['modlog_action']),
-			'member' => array('sql' => 'mem.real_name', 'label' => $txt['modlog_member']),
-			'position' => array('sql' => 'mg.group_name', 'label' => $txt['modlog_position']),
-			'ip' => array('sql' => 'lm.ip', 'label' => $txt['modlog_ip'])
-		);
+		$searchTypes = [
+			'action' => ['sql' => 'lm.action', 'label' => $txt['modlog_action']],
+			'member' => ['sql' => 'mem.real_name', 'label' => $txt['modlog_member']],
+			'position' => ['sql' => 'mg.group_name', 'label' => $txt['modlog_position']],
+			'ip' => ['sql' => 'lm.ip', 'label' => $txt['modlog_ip']]
+		];
 
 		// Setup the allowed search
 		$context['order'] = isset($searchTypes[$sort]) ? $sort : 'member';
@@ -141,18 +141,18 @@ class Modlog extends AbstractController
 		}
 
 		$search_params_column = $searchTypes[$search_params_type]['sql'];
-		$search_params = array(
+		$search_params = [
 			'string' => $search_params_string,
 			'type' => $search_params_type,
-		);
+		];
 
 		// Setup the search context.
 		$context['search_params'] = empty($search_params['string']) ? '' : base64_encode(json_encode($search_params));
-		$context['search'] = array(
+		$context['search'] = [
 			'string' => $search_params['string'],
 			'type' => $search_params['type'],
 			'label' => $searchTypes[$search_params_type]['label'],
-		);
+		];
 
 		// If they are searching by action, then we must do some manual intervention to search in their language!
 		if ($search_params['type'] === 'action' && !empty($search_params['string']))
@@ -177,123 +177,123 @@ class Modlog extends AbstractController
 		}
 
 		// This is all the information required for a moderation/admin log listing.
-		$listOptions = array(
+		$listOptions = [
 			'id' => 'moderation_log_list',
 			'width' => '100%',
 			'items_per_page' => $context['displaypage'],
 			'no_items_label' => $txt['modlog_' . ($context['log_type'] == 3 ? 'admin_log_' : '') . 'no_entries_found'],
 			'base_href' => $context['url_start'],
 			'default_sort_col' => 'time',
-			'get_items' => array(
+			'get_items' => [
 				'function' => fn($start, $items_per_page, $sort, $query_string, $query_params, $log_type) => $this->getModLogEntries($start, $items_per_page, $sort, $query_string, $query_params, $log_type),
-				'params' => array(
+				'params' => [
 					(empty($search_params['string']) ? '' : ' INSTR({raw:sql_type}, {string:search_string})'),
-					array('sql_type' => $search_params_column, 'search_string' => $search_params['string']),
+					['sql_type' => $search_params_column, 'search_string' => $search_params['string']],
 					$context['log_type'],
-				),
-			),
-			'get_count' => array(
+				],
+			],
+			'get_count' => [
 				'function' => fn($query_string, $query_params, $log_type) => $this->getModLogEntryCount($query_string, $query_params, $log_type),
-				'params' => array(
+				'params' => [
 					(empty($search_params['string']) ? '' : ' INSTR({raw:sql_type}, {string:search_string})'),
-					array('sql_type' => $search_params_column, 'search_string' => $search_params['string']),
+					['sql_type' => $search_params_column, 'search_string' => $search_params['string']],
 					$context['log_type'],
-				),
-			),
-			'columns' => array(
-				'action' => array(
-					'header' => array(
+				],
+			],
+			'columns' => [
+				'action' => [
+					'header' => [
 						'value' => $txt['modlog_action'],
 						'class' => 'lefttext',
-					),
-					'data' => array(
+					],
+					'data' => [
 						'db' => 'action_text',
 						'class' => 'smalltext',
-					),
-					'sort' => array(
+					],
+					'sort' => [
 						'default' => 'lm.action',
 						'reverse' => 'lm.action DESC',
-					),
-				),
-				'time' => array(
-					'header' => array(
+					],
+				],
+				'time' => [
+					'header' => [
 						'value' => $txt['modlog_date'],
 						'class' => 'lefttext',
-					),
-					'data' => array(
+					],
+					'data' => [
 						'db' => 'time',
 						'class' => 'smalltext',
-					),
-					'sort' => array(
+					],
+					'sort' => [
 						'default' => 'lm.log_time DESC',
 						'reverse' => 'lm.log_time',
-					),
-				),
-				'moderator' => array(
-					'header' => array(
+					],
+				],
+				'moderator' => [
+					'header' => [
 						'value' => $txt['modlog_member'],
 						'class' => 'lefttext',
-					),
-					'data' => array(
+					],
+					'data' => [
 						'db' => 'moderator_link',
 						'class' => 'smalltext',
-					),
-					'sort' => array(
+					],
+					'sort' => [
 						'default' => 'mem.real_name',
 						'reverse' => 'mem.real_name DESC',
-					),
-				),
-				'position' => array(
-					'header' => array(
+					],
+				],
+				'position' => [
+					'header' => [
 						'value' => $txt['modlog_position'],
 						'class' => 'lefttext',
-					),
-					'data' => array(
+					],
+					'data' => [
 						'db' => 'position',
 						'class' => 'smalltext',
-					),
-					'sort' => array(
+					],
+					'sort' => [
 						'default' => 'mg.group_name',
 						'reverse' => 'mg.group_name DESC',
-					),
-				),
-				'ip' => array(
-					'header' => array(
+					],
+				],
+				'ip' => [
+					'header' => [
 						'value' => $txt['modlog_ip'],
 						'class' => 'lefttext',
-					),
-					'data' => array(
+					],
+					'data' => [
 						'db' => 'ip',
 						'class' => 'smalltext',
-					),
-					'sort' => array(
+					],
+					'sort' => [
 						'default' => 'lm.ip',
 						'reverse' => 'lm.ip DESC',
-					),
-				),
-				'delete' => array(
-					'header' => array(
+					],
+				],
+				'delete' => [
+					'header' => [
 						'value' => '<input type="checkbox" name="all" class="input_check" onclick="invertAll(this, this.form);" />',
 						'class' => 'centertext',
-					),
-					'data' => array(
+					],
+					'data' => [
 						'function' => static fn($entry) => '<input type="checkbox" name="delete[]" value="' . $entry['id'] . '"' . ($entry['editable'] ? '' : ' disabled="disabled"') . ' />',
 						'class' => 'centertext',
-					),
-				),
-			),
-			'form' => array(
+					],
+				],
+			],
+			'form' => [
 				'href' => $context['url_start'],
 				'include_sort' => true,
 				'include_start' => true,
-				'hidden_fields' => array(
+				'hidden_fields' => [
 					$context['session_var'] => $context['session_id'],
 					'params' => $context['search_params']
-				),
+				],
 				'token' => 'mod-ml',
-			),
-			'additional_rows' => array(
-				array(
+			],
+			'additional_rows' => [
+				[
 					'class' => 'submitbutton',
 					'position' => 'below_table_data',
 					'value' => '
@@ -303,9 +303,9 @@ class Modlog extends AbstractController
 						' . ($context['can_delete'] ? '|&nbsp;
 						<input type="submit" name="remove" value="' . $txt['modlog_remove'] . '" onclick="return confirm(\'' . $txt['modlog_remove_selected_confirm'] . '\');" />
 						<input type="submit" name="removeall" value="' . $txt['modlog_removeall'] . '" onclick="return confirm(\'' . $txt['modlog_remove_all_confirm'] . '\');"/>' : ''),
-				),
-			),
-		);
+				],
+			],
+		];
 
 		createToken('mod-ml');
 
@@ -330,7 +330,7 @@ class Modlog extends AbstractController
 	 *
 	 * @return array
 	 */
-	public function getModLogEntries($start, $items_per_page, $sort, $query_string, $query_params, $log_type)
+	public function getModLogEntries(int $start, int $items_per_page, string $sort, string $query_string, array $query_params, int $log_type): array
 	{
 		// Get all entries of $log_type
 		return list_getModLogEntries($start, $items_per_page, $sort, $query_string, $query_params, $log_type);
@@ -347,7 +347,7 @@ class Modlog extends AbstractController
 	 *
 	 * @return int number of entries
 	 */
-	public function getModLogEntryCount($query_string, $query_params, $log_type)
+	public function getModLogEntryCount(string $query_string, array $query_params, int $log_type): int
 	{
 		// Get the count of our solved topic entries
 		return list_getModLogEntryCount($query_string, $query_params, $log_type);

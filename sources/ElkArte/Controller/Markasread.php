@@ -62,12 +62,12 @@ class Markasread extends AbstractController
 	{
 		global $context;
 
-		$subActions = array(
-			'all' => array($this, 'action_markboards'),
-			'unreadreplies' => array($this, 'action_markreplies'),
-			'topic' => array($this, 'action_marktopic_unread'),
-			'markasread' => array($this, 'action_markasread')
-		);
+		$subActions = [
+			'all' => [$this, 'action_markboards'],
+			'unreadreplies' => [$this, 'action_markreplies'],
+			'topic' => [$this, 'action_marktopic_unread'],
+			'markasread' => [$this, 'action_markasread']
+		];
 
 		$action = new Action('markasread');
 		$subAction = $action->initialize($subActions, 'markasread');
@@ -87,7 +87,7 @@ class Markasread extends AbstractController
 	 *
 	 * @uses Xml template generic_xml_buttons sub template
 	 */
-	public function action_index_api($action, $subAction)
+	public function action_index_api($action, $subAction): ?string
 	{
 		global $context, $txt;
 
@@ -100,10 +100,10 @@ class Markasread extends AbstractController
 		if ($this->user->is_guest)
 		{
 			Txt::load('Errors');
-			$context['xml_data'] = array(
+			$context['xml_data'] = [
 				'error' => 1,
 				'text' => $txt['not_guests']
-			);
+			];
 
 			return '';
 		}
@@ -115,10 +115,10 @@ class Markasread extends AbstractController
 			if ($this->_req->getQuery('sa') === 'all')
 			{
 				Txt::load('Errors');
-				$context['xml_data'] = array(
+				$context['xml_data'] = [
 					'error' => 1,
 					'url' => getUrl('action', ['action' => 'markasread', 'sa' => 'all', '{session_data}']),
-				);
+				];
 
 				return '';
 			}
@@ -144,16 +144,17 @@ class Markasread extends AbstractController
 				$url_params += $this->_querystring_sort_limits;
 			}
 
-			$context['xml_data'] = array(
+			$context['xml_data'] = [
 				'text' => $txt['topic_alert_none'],
 				'body' => str_replace('{unread_all_url}', getUrl('action', $url_params), $txt['unread_topics_visit_none']),
-			);
+			];
 
 			return '';
 		}
 
 		// No need to output anything, just return to the button
 		obExit(false);
+		return null;
 	}
 
 	/**
@@ -161,7 +162,7 @@ class Markasread extends AbstractController
 	 *
 	 * - Accessed by action=markasread;sa=all
 	 */
-	public function action_markboards()
+	public function action_markboards(): ?string
 	{
 		global $modSettings;
 
@@ -185,7 +186,7 @@ class Markasread extends AbstractController
 
 		if (isset($_SESSION['topicseen_cache']))
 		{
-			$_SESSION['topicseen_cache'] = array();
+			$_SESSION['topicseen_cache'] = [];
 		}
 
 		if (!empty($modSettings['default_forum_action']) && $redirectAction === '')
@@ -198,7 +199,8 @@ class Markasread extends AbstractController
 			return '';
 		}
 
-		return redirectexit($redirectAction);
+		redirectexit($redirectAction);
+		return null;
 	}
 
 	/**
@@ -206,7 +208,7 @@ class Markasread extends AbstractController
 	 *
 	 * - Accessed by action=markasread;sa=unreadreplies
 	 */
-	public function action_markreplies()
+	public function action_markreplies(): ?string
 	{
 		global $modSettings;
 
@@ -216,17 +218,17 @@ class Markasread extends AbstractController
 		require_once(SUBSDIR . '/Topic.subs.php');
 		$logged_topics = getLoggedTopics($this->user->id, $topics);
 
-		$markRead = array();
+		$markRead = [];
 		foreach ($topics as $id_topic)
 		{
-			$markRead[] = array($this->user->id, (int) $id_topic, $modSettings['maxMsgID'], (int) !empty($logged_topics[$id_topic]));
+			$markRead[] = [$this->user->id, (int) $id_topic, $modSettings['maxMsgID'], (int) !empty($logged_topics[$id_topic])];
 		}
 
 		markTopicsRead($markRead, true);
 
 		if (isset($_SESSION['topicseen_cache']))
 		{
-			$_SESSION['topicseen_cache'] = array();
+			$_SESSION['topicseen_cache'] = [];
 		}
 
 		if ($this->api)
@@ -243,7 +245,7 @@ class Markasread extends AbstractController
 	 * - Accessed by action=markasread;sa=topic;topic=123;t=123
 	 * - Button URL set in Display.php Controller
 	 */
-	public function action_marktopic_unread()
+	public function action_marktopic_unread(): ?string
 	{
 		global $board, $topic;
 
@@ -283,7 +285,7 @@ class Markasread extends AbstractController
 		}
 
 		// Blam, unread!
-		markTopicsRead(array($this->user->id, $topic, $earlyMsg, $topicinfo['unwatched']), true);
+		markTopicsRead([$this->user->id, $topic, $earlyMsg, $topicinfo['unwatched']], true);
 
 		if ($this->api)
 		{
@@ -299,14 +301,14 @@ class Markasread extends AbstractController
 	 * - Accessed by action=markasread;sa=board;board=1.0;session
 	 * - Subactions: sa=topic, sa=all, sa=unreadreplies, sa=board
 	 */
-	public function action_markasread()
+	public function action_markasread(): ?string
 	{
 		global $board, $board_info;
 
 		require_once(SUBSDIR . '/Boards.subs.php');
 
-		$categories = array();
-		$boards = array();
+		$categories = [];
+		$boards = [];
 
 		if (isset($this->_req->query->c))
 		{
@@ -338,7 +340,8 @@ class Markasread extends AbstractController
 				return '';
 			}
 
-			return redirectexit();
+			redirectexit();
+			return null;
 		}
 
 		// Mark boards as read.
@@ -348,7 +351,7 @@ class Markasread extends AbstractController
 		{
 			if (isset($_SESSION['topicseen_cache'][$b]))
 			{
-				$_SESSION['topicseen_cache'][$b] = array();
+				$_SESSION['topicseen_cache'][$b] = [];
 			}
 		}
 
@@ -360,7 +363,8 @@ class Markasread extends AbstractController
 
 		if (empty($board_info['parent']) && !$this->api)
 		{
-			return redirectexit();
+			redirectexit();
+			return null;
 		}
 
 		if ($this->api)
@@ -368,13 +372,14 @@ class Markasread extends AbstractController
 			return '';
 		}
 
-		return redirectexit('board=' . $board_info['parent'] . '.0');
+		redirectexit('board=' . $board_info['parent'] . '.0');
+		return null;
 	}
 
 	/**
 	 * Sets the sorting parameters
 	 */
-	private function _setQuerystringSortLimits()
+	private function _setQuerystringSortLimits(): void
 	{
 		$sort_methods = [
 			'subject',
@@ -402,7 +407,7 @@ class Markasread extends AbstractController
 	 *
 	 * @param array $boards
 	 */
-	private function _markAsRead($boards)
+	private function _markAsRead($boards): ?string
 	{
 		global $board;
 
@@ -430,6 +435,7 @@ class Markasread extends AbstractController
 			return '';
 		}
 
-		return redirectexit($redirectAction);
+		redirectexit($redirectAction);
+		return null;
 	}
 }

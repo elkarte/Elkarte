@@ -19,6 +19,7 @@ namespace ElkArte\Modules\Drafts;
 use ElkArte\Controller\Draft;
 use ElkArte\EventManager;
 use ElkArte\Languages\Txt;
+use ElkArte\Menu\Menu;
 use ElkArte\Modules\AbstractModule;
 
 /**
@@ -50,13 +51,13 @@ class Profile extends AbstractModule
 	/**
 	 * If drafts are enabled, provides an interface to display them for the user
 	 *
-	 * @param \ElkArte\Menu\Menu $profile_areas
+	 * @param Menu $profile_areas
 	 */
 	public static function integrate_profile_areas($profile_areas)
 	{
 		global $txt, $context;
 
-		$new_areas['info'] = [
+		$new_area['info'] = [
 			'showdrafts' => [
 				'label' => $txt['drafts_show'],
 				'controller' => Draft::class,
@@ -69,7 +70,7 @@ class Profile extends AbstractModule
 			]
 		];
 
-		return $profile_areas->insertSection($new_areas, 'showposts');
+		return $profile_areas->insertArea($new_area, 'showlikes');
 	}
 
 	/**
@@ -77,7 +78,7 @@ class Profile extends AbstractModule
 	 *
 	 * @param array $post_errors
 	 */
-	public function pre_load($post_errors)
+	public function pre_load($post_errors): void
 	{
 		if (empty($post_errors))
 		{

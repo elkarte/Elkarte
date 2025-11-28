@@ -58,7 +58,7 @@ class Display extends AbstractModule
 	 * @param string[] $topic_selects
 	 * @param string[] $topic_tables
 	 */
-	public static function followup_topic_query(&$topic_selects, &$topic_tables)
+	public static function followup_topic_query(&$topic_selects, &$topic_tables): void
 	{
 		$topic_selects[] = 'fu.derived_from';
 		$topic_tables[] = 'LEFT JOIN {db_prefix}follow_ups AS fu ON (fu.follow_up = t.id_topic)';
@@ -69,7 +69,7 @@ class Display extends AbstractModule
 	 *
 	 * @param int[] $messages
 	 */
-	public static function followup_message_list($messages)
+	public static function followup_message_list($messages): void
 	{
 		global $context;
 
@@ -82,7 +82,7 @@ class Display extends AbstractModule
 	 *
 	 * @param int[] $messages
 	 */
-	public static function load_likes($messages)
+	public static function load_likes($messages): void
 	{
 		global $context;
 
@@ -101,7 +101,7 @@ class Display extends AbstractModule
 	 * @param int $topic
 	 * @param bool $includeUnapproved
 	 */
-	public function topicinfo($topicinfo, $topic, $includeUnapproved)
+	public function topicinfo($topicinfo, $topic, $includeUnapproved): void
 	{
 		global $context, $scripturl;
 
@@ -124,7 +124,7 @@ class Display extends AbstractModule
 	/**
 	 * Can we show the button?
 	 */
-	public function prepare_context()
+	public function prepare_context(): void
 	{
 		global $context;
 

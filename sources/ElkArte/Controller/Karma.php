@@ -57,7 +57,7 @@ class Karma extends AbstractController
 	 * - It depends on the karmaMode, karmaWaitTime, and karmaTimeRestrictAdmins settings.
 	 * - It is accessed via ?action=karma, sa=smite or sa=applaud.
 	 */
-	public function action_applaud()
+	public function action_applaud(): void
 	{
 		$id_target = $this->_req->getQuery('uid', 'intval', 0);
 
@@ -77,7 +77,7 @@ class Karma extends AbstractController
 	 * @return int
 	 * @throws Exception feature_disabled
 	 */
-	private function _prepare_karma($id_target)
+	private function _prepare_karma($id_target): int
 	{
 		global $modSettings;
 
@@ -101,7 +101,7 @@ class Karma extends AbstractController
 		// Should this apply to the member you are smiting/applauding?
 		if ($this->user->is_admin === false && $this->user->posts < $modSettings['karmaMinPosts'])
 		{
-			throw new Exception('not_enough_posts_karma', true, array($modSettings['karmaMinPosts']));
+			throw new Exception('not_enough_posts_karma', true, [$modSettings['karmaMinPosts']]);
 		}
 
 		// And you can't modify your own, punk! (use the profile if you need to.)
@@ -129,7 +129,7 @@ class Karma extends AbstractController
 	 *
 	 * @throws Exception karma_wait_time
 	 */
-	private function _give_karma($id_executor, $id_target, $action, $dir)
+	private function _give_karma($id_executor, $id_target, $action, $dir): void
 	{
 		global $modSettings, $txt;
 
@@ -143,7 +143,7 @@ class Karma extends AbstractController
 			// If you are gonna try to repeat.... don't allow it.
 			if ($action === $dir)
 			{
-				throw new Exception('karma_wait_time', false, array($modSettings['karmaWaitTime'], ($modSettings['karmaWaitTime'] == 1 ? strtolower($txt['hour']) : $txt['hours'])));
+				throw new Exception('karma_wait_time', false, [$modSettings['karmaWaitTime'], ($modSettings['karmaWaitTime'] == 1 ? strtolower($txt['hour']) : $txt['hours'])]);
 			}
 
 			updateKarma($id_executor, $id_target, $dir);
@@ -154,7 +154,7 @@ class Karma extends AbstractController
 	 * Done with the action, return to where we need to be, or make it up if we
 	 * can't figure it out.
 	 */
-	private function _redirect_karma()
+	private function _redirect_karma(): void
 	{
 		global $context, $topic;
 
@@ -189,7 +189,7 @@ class Karma extends AbstractController
 	/**
 	 * Smite a user.
 	 */
-	public function action_smite()
+	public function action_smite(): void
 	{
 		global $modSettings;
 

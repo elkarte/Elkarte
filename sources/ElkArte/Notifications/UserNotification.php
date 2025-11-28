@@ -59,7 +59,7 @@ class UserNotification extends AbstractModel
 	/**
 	 * Loads up the needed interfaces (favicon or desktop notifications).
 	 */
-	public function present()
+	public function present(): void
 	{
 		if (!empty($this->_modSettings['usernotif_favicon_enable']))
 		{
@@ -78,7 +78,7 @@ class UserNotification extends AbstractModel
 	 *
 	 * @param int $number the number to show
 	 */
-	protected function _addFaviconNumbers($number)
+	protected function _addFaviconNumbers($number): void
 	{
 		call_integration_hook('integrate_adjust_favicon_number', [&$number]);
 
@@ -117,7 +117,7 @@ class UserNotification extends AbstractModel
 	 *
 	 * @return bool
 	 */
-	protected function settingExists($key)
+	protected function settingExists($key): bool
 	{
 		return isset($this->_modSettings[$key]) && $this->_modSettings[$key] !== '';
 	}
@@ -126,7 +126,7 @@ class UserNotification extends AbstractModel
 	 * Prepares the javascript for desktop notifications.  The service worker is used on
 	 * mobile devices (at least chrome) and needs to be in the root for proper global access.
 	 */
-	protected function _addDesktopNotifications()
+	protected function _addDesktopNotifications(): void
 	{
 		loadJavascriptFile(['ext/push.min.js', 'desktop-notify.js'], ['defer' => true]);
 		theme()->addInlineJavascript('
@@ -156,7 +156,7 @@ class UserNotification extends AbstractModel
 	 *
 	 * @return array
 	 */
-	public function addConfig()
+	public function addConfig(): array
 	{
 		global $txt;
 

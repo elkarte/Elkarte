@@ -52,6 +52,7 @@ final class Hooks
 			'ADMINDIR' => ADMINDIR,
 			'CONTROLLERDIR' => CONTROLLERDIR,
 			'SUBSDIR' => SUBSDIR,
+			'ADDONSDIR' => ADDONSDIR,
 		];
 		$this->fileFunc = FileFunctions::instance();
 
@@ -66,7 +67,7 @@ final class Hooks
 	 *
 	 * @param string[]|string $path an array consisting of pairs "search" => "replace with"
 	 */
-	public function newPath($path)
+	public function newPath($path): void
 	{
 		$this->_path_replacements = array_merge($this->_path_replacements, (array) $path);
 	}
@@ -84,7 +85,7 @@ final class Hooks
 	 *
 	 * @return array the results of the functions
 	 */
-	public function hook($hook, $parameters = [])
+	public function hook($hook, $parameters = []): array
 	{
 		global $modSettings;
 
@@ -116,7 +117,7 @@ final class Hooks
 	 *
 	 * @return array
 	 */
-	protected function _prepare_hooks($hook_calls)
+	protected function _prepare_hooks($hook_calls): array
 	{
 		// Loop through each function.
 		$functions = explode(',', $hook_calls);
@@ -167,7 +168,7 @@ final class Hooks
 	 *
 	 * @param string $hook
 	 */
-	public function include_hook($hook)
+	public function include_hook($hook): void
 	{
 		global $modSettings;
 
@@ -195,7 +196,7 @@ final class Hooks
 	/**
 	 * Special hook call executed during obExit
 	 */
-	public function buffer_hook()
+	public function buffer_hook(): void
 	{
 		global $modSettings;
 
@@ -227,7 +228,7 @@ final class Hooks
 	 * @param string $file
 	 * @param bool $permanent = true if true, updates the value in settings table
 	 */
-	public function add($hook, $function, $file = '', $permanent = true)
+	public function add($hook, $function, $file = '', $permanent = true): void
 	{
 		global $modSettings;
 
@@ -261,7 +262,7 @@ final class Hooks
 	 * - verify it has a static method ::register, if so calls that method and adds any hooks
 	 * returned by that method
 	 */
-	public function loadIntegrations()
+	public function loadIntegrations(): void
 	{
 		$enabled = $this->_get_enabled_integrations();
 
@@ -293,7 +294,7 @@ final class Hooks
 	 * - verify it has a static method ::settingsRegister, if so calls that method and adds any hooks
 	 * returned by that method
 	 */
-	public function loadIntegrationsSettings()
+	public function loadIntegrationsSettings(): void
 	{
 		$enabled = $this->_get_enabled_integrations();
 
@@ -330,7 +331,7 @@ final class Hooks
 	 *
 	 * @return array
 	 */
-	public function discoverIntegrations($basepath, $ext = '.integrate.php')
+	public function discoverIntegrations($basepath, $ext = '.integrate.php'): array
 	{
 		$path = $basepath . '/*/*' . $ext;
 		$names = [];
@@ -353,7 +354,7 @@ final class Hooks
 				$composer_data = json_decode('{
     "name": "' . $name . '",
     "description": "' . $name . '",
-    "version": "1.0.0",
+    "version": "2.0.0",
     "type": "addon",
     "homepage": "https://www.elkarte.net",
     "time": "",
@@ -407,7 +408,7 @@ final class Hooks
 	 *
 	 * @param string $call A string consisting of "path/filenameIntegrate.php"
 	 */
-	public function enableIntegration($call)
+	public function enableIntegration($call): void
 	{
 		$existing = $this->_get_enabled_integrations();
 
@@ -421,7 +422,7 @@ final class Hooks
 	 *
 	 * @param string $call A string consisting of "path/filename.integrate.php"
 	 */
-	public function disableIntegration($call)
+	public function disableIntegration($call): void
 	{
 		$existing = $this->_get_enabled_integrations();
 
@@ -435,7 +436,7 @@ final class Hooks
 	 *
 	 * @return string[] An array of strings consisting of "path/filenameIntegrate.php"
 	 */
-	protected function _get_enabled_integrations()
+	protected function _get_enabled_integrations(): array
 	{
 		global $modSettings;
 
@@ -447,7 +448,7 @@ final class Hooks
 	 *
 	 * @param string[] $existing An array of strings consisting of "path/filenameIntegrate.php"
 	 */
-	protected function _store_autoload_integrate($existing)
+	protected function _store_autoload_integrate($existing): void
 	{
 		$existing = array_filter(array_unique($existing));
 		updateSettings(['autoload_integrate' => implode(',', $existing)]);
@@ -461,7 +462,7 @@ final class Hooks
 	 * @param string $hook
 	 * @param string $integration_call
 	 */
-	protected function _store($hook, $integration_call)
+	protected function _store($hook, $integration_call): void
 	{
 		$request = $this->_db->query('', '
 			SELECT 
@@ -505,7 +506,7 @@ final class Hooks
 	 * @param string $function
 	 * @param string $file
 	 */
-	public function remove($hook, $function, $file = '')
+	public function remove($hook, $function, $file = ''): void
 	{
 		global $modSettings;
 
@@ -559,7 +560,7 @@ final class Hooks
 	 * @param Debug|null $debug A class for debugging
 	 * @param string[]|null $paths An array of paths for replacement
 	 */
-	public static function init($db = null, $debug = null, $paths = null)
+	public static function init($db = null, $debug = null, $paths = null): void
 	{
 		if ($db === null)
 		{
@@ -583,7 +584,7 @@ final class Hooks
 	 *
 	 * @return Hooks An instance of the class.
 	 */
-	public static function instance($db = null, $debug = null, $paths = null)
+	public static function instance($db = null, $debug = null, $paths = null): Hooks
 	{
 		if (self::$_instance === null)
 		{

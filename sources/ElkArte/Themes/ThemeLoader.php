@@ -111,7 +111,7 @@ class ThemeLoader
 	/**
 	 * Initialize a theme for use
 	 */
-	private function initTheme()
+	private function initTheme(): void
 	{
 		global $settings, $options, $context;
 
@@ -137,12 +137,12 @@ class ThemeLoader
 			: ucfirst(basename($settings['theme_dir']));
 
 		$loader = new ClassLoader();
-		$loader->setPsr4('ElkArte\\Themes\\' . $themeName . '\\', $themeData[0]['default_theme_dir']);
+		$loader->setPsr4('\\ElkArte\\Themes\\' . $themeName . '\\', $themeData[0]['default_theme_dir']);
 		$loader->register();
 
 		// Setup the theme file.
 		require_once($settings['theme_dir'] . '/Theme.php');
-		$class = 'ElkArte\\Themes\\' . $themeName . '\\Theme';
+		$class = '\\ElkArte\\Themes\\' . $themeName . '\\Theme';
 
 		static::$dirs = new Directories($settings);
 		User::$info = User::$info ?? new UserInfo([]);
@@ -167,7 +167,7 @@ class ThemeLoader
 	 *
 	 * @return void Theme ID to load
 	 */
-	private function getThemeId()
+	private function getThemeId(): void
 	{
 		global $modSettings, $board_info;
 
@@ -194,7 +194,7 @@ class ThemeLoader
 	/**
 	 * Sets the chosen theme id
 	 */
-	private function _chooseTheme()
+	private function _chooseTheme(): void
 	{
 		$_req = HttpReq::instance();
 
@@ -225,7 +225,7 @@ class ThemeLoader
 	/**
 	 * Validates, and corrects for error, that the theme id is capable of being used.
 	 */
-	private function _validThemeID()
+	private function _validThemeID(): void
 	{
 		global $modSettings, $ssi_theme;
 
@@ -248,7 +248,7 @@ class ThemeLoader
 	 *
 	 * @return array
 	 */
-	private function getThemeData($member)
+	private function getThemeData($member): array
 	{
 		global $modSettings, $boardurl;
 
@@ -363,7 +363,7 @@ class ThemeLoader
 	 *  - Point to www.siteName.com if siteName.com is requested
 	 *  - Point to an proper address if this is an alias address
 	 */
-	private function loadThemeUrls()
+	private function loadThemeUrls(): void
 	{
 		global $scripturl, $boardurl;
 
@@ -410,7 +410,7 @@ class ThemeLoader
 	 *
 	 * @param string $detected_url The detected URL to check for redirection.
 	 */
-	private function checkWWWRedirect($detected_url)
+	private function checkWWWRedirect($detected_url): void
 	{
 		global $boardurl;
 
@@ -448,7 +448,7 @@ class ThemeLoader
 	 *
 	 * @return bool Returns true if the provided URL matches any of the forum alias URLs, otherwise false.
 	 */
-	private function checkAlias($detected_url)
+	private function checkAlias($detected_url): bool
 	{
 		global $modSettings;
 
@@ -476,7 +476,7 @@ class ThemeLoader
 	 *
 	 * @param string $detected_url
 	 */
-	private function fixThemeUrls($detected_url)
+	private function fixThemeUrls($detected_url): void
 	{
 		global $boardurl, $scripturl, $settings, $modSettings, $context, $board_info;
 
@@ -519,7 +519,7 @@ class ThemeLoader
 	/**
 	 * Sets the admin preferences for the current user.
 	 */
-	private function setAdminPreferences()
+	private function setAdminPreferences(): void
 	{
 		global $context, $options;
 
@@ -553,7 +553,7 @@ class ThemeLoader
 	 *
 	 * If the user is a guest and the `upshrink` cookie is set, the `minmax_preferences` array is set with the `upshrink` cookie value to prevent collapse jumping.
 	 */
-	private function setUserPreferences()
+	private function setUserPreferences(): void
 	{
 		global $context, $options;
 
@@ -592,7 +592,7 @@ class ThemeLoader
 	/**
 	 * Set up the context with necessary data.
 	 */
-	private function setupContext()
+	private function setupContext(): void
 	{
 		global $mbname, $context, $scripturl, $modSettings, $txt;
 
@@ -647,7 +647,7 @@ class ThemeLoader
 	/**
 	 * Loads various theme related settings into context and sets system-wide theme defaults
 	 */
-	private function loadThemeContext()
+	private function loadThemeContext(): void
 	{
 		global $context, $settings, $modSettings, $txt;
 
@@ -693,7 +693,7 @@ class ThemeLoader
 	 *
 	 * @return bool Returns `true` if the login bar should be shown for guest users, otherwise `false`.
 	 */
-	private function isGuestShowLoginBar()
+	private function isGuestShowLoginBar(): bool
 	{
 		global $modSettings;
 
@@ -703,7 +703,7 @@ class ThemeLoader
 	/**
 	 * Sets up the login bar.
 	 */
-	private function showLoginBar()
+	private function showLoginBar(): void
 	{
 		global $context;
 
@@ -716,7 +716,7 @@ class ThemeLoader
 	 *
 	 * This method initializes the theme settings and loads the basic layers.
 	 */
-	private function loadThemeSettings()
+	private function loadThemeSettings(): void
 	{
 		global $modSettings, $settings, $txt;
 
@@ -765,7 +765,7 @@ class ThemeLoader
 	 * - Loads RTL (right-to-left) CSS file for RTL languages.
 	 * - Loads RTL theme variant CSS file for RTL languages and if a theme variant is defined.
 	 */
-	private function loadThemeVariantAndCSS()
+	private function loadThemeVariantAndCSS(): void
 	{
 		global $context, $settings;
 
@@ -809,7 +809,7 @@ class ThemeLoader
 	 * - Clears the session variables for agreement acceptance.
 	 * - Sets the appropriate error messages in the context if an agreement has been accepted.
 	 */
-	public function processAgreements()
+	public function processAgreements(): void
 	{
 		global $context, $txt;
 
@@ -841,7 +841,7 @@ class ThemeLoader
 	 * - Includes any additional files specified by the 'integrate_theme_include' hook.
 	 * - Calls the 'integrate_load_theme' hook to load theme integration functions.
 	 */
-	private function callIntegrationHooks()
+	private function callIntegrationHooks(): void
 	{
 		global $settings;
 
@@ -860,7 +860,7 @@ class ThemeLoader
 	 * - Needed by scheduled tasks,
 	 * - Needed by any other code that needs language files before the forum (the theme) is loaded.
 	 */
-	public static function loadEssentialThemeData()
+	public static function loadEssentialThemeData(): void
 	{
 		global $settings, $modSettings, $mbname, $context;
 
@@ -940,7 +940,7 @@ class ThemeLoader
 		$lang = '',
 		$fatal = false, // @todo reset to true when appropriate
 		$force_reload = false
-	)
+	): string
 	{
 		return static::loadLanguageFiles(
 			explode('+', $template_name),
@@ -962,7 +962,7 @@ class ThemeLoader
 	 *
 	 * @return string The language actually loaded.
 	 */
-	public static function loadLanguageFiles(array $template_name, $lang = '', $fatal = true, $force_reload = false)
+	public static function loadLanguageFiles(array $template_name, $lang = '', $fatal = true, $force_reload = false): string
 	{
 		// Needed by the loaded files
 		global $language, $settings, $modSettings, $db_show_debug, $txt;
@@ -983,7 +983,7 @@ class ThemeLoader
 	/**
 	 * @return Theme the current theme
 	 */
-	public function getTheme()
+	public function getTheme(): Theme
 	{
 		return $this->theme;
 	}

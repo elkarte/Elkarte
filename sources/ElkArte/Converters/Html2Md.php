@@ -60,7 +60,7 @@ class Html2Md extends AbstractDomParser
 	 * Reads the html body and sends it to the parsing loop to convert all
 	 * DOM nodes to markup
 	 */
-	public function get_markdown()
+	public function get_markdown(): string
 	{
 		// For this html node, find all child elements and convert
 		$this->convertChildNodes($this->getDOMBodyNode());
@@ -83,7 +83,7 @@ class Html2Md extends AbstractDomParser
 	/**
 	 * Normalize any spacing and excess blank lines that may have been generated
 	 */
-	public function cleanMarkdown()
+	public function cleanMarkdown(): void
 	{
 		// We only want the content, no wrappers
 		$this->markdown = $this->getBodyText($this->markdown);
@@ -115,7 +115,7 @@ class Html2Md extends AbstractDomParser
 	 *
 	 * @param object $node
 	 */
-	public function convertChildNodes($node)
+	public function convertChildNodes($node): void
 	{
 		if (self::hasParentCode($node, $this->internalParser) && $this->getName($node) !== 'code')
 		{
@@ -144,7 +144,7 @@ class Html2Md extends AbstractDomParser
 	 *
 	 * @param object $node
 	 */
-	public function convertToMarkdown($node)
+	public function convertToMarkdown($node): void
 	{
 		// HTML tag we are dealing with
 		$tag = $this->getName($node);
@@ -279,7 +279,7 @@ class Html2Md extends AbstractDomParser
 	 * @param object $node
 	 * @return string
 	 */
-	private function _convertAbbr($node)
+	private function _convertAbbr($node): string
 	{
 		$title = $node->getAttribute('title');
 		$value = $this->getValue($node);
@@ -296,7 +296,7 @@ class Html2Md extends AbstractDomParser
 	 * @param object $node
 	 * @return string
 	 */
-	private function _convertAnchor($node)
+	private function _convertAnchor($node): string
 	{
 		global $txt;
 
@@ -346,7 +346,7 @@ class Html2Md extends AbstractDomParser
 	 * @param object $node
 	 * @return string
 	 */
-	private function _convertBlockquote($node)
+	private function _convertBlockquote($node): string
 	{
 		$markdown = '';
 
@@ -374,7 +374,7 @@ class Html2Md extends AbstractDomParser
 	 * @param object $node
 	 * @return string
 	 */
-	private function _convertCite($node)
+	private function _convertCite($node): string
 	{
 		// All the contents of this cite
 		$markdown = trim($this->getValue($node));
@@ -399,7 +399,7 @@ class Html2Md extends AbstractDomParser
 	 * @param object $node
 	 * @return string
 	 */
-	private function _convertCode($node)
+	private function _convertCode($node): string
 	{
 		// Get the code block
 		$value = $this->getInnerHTML($node);
@@ -477,7 +477,7 @@ class Html2Md extends AbstractDomParser
 	 * @param string $content
 	 * @return string
 	 */
-	private function _convertHeader($level, $content)
+	private function _convertHeader($level, $content): string
 	{
 		if ($this->config['heading'] === 'setext')
 		{
@@ -500,7 +500,7 @@ class Html2Md extends AbstractDomParser
 	 * @param object $node
 	 * @return string
 	 */
-	private function _convertImage($node)
+	private function _convertImage($node): string
 	{
 		$src = preg_replace('~;thumb$~', '', $node->getAttribute('src'));
 		$alt = $node->getAttribute('alt');
@@ -538,7 +538,7 @@ class Html2Md extends AbstractDomParser
 	 * @param object $node
 	 * @return string
 	 */
-	private function _convertList($node)
+	private function _convertList($node): string
 	{
 		$list_type = $this->getName($this->getParent($node));
 		$value = $this->getValue($node);
@@ -572,7 +572,7 @@ class Html2Md extends AbstractDomParser
 	 * @param object $node
 	 * @return string
 	 */
-	private function _convertSpan($node)
+	private function _convertSpan($node): string
 	{
 		$class = $node->getAttribute('class');
 
@@ -605,7 +605,7 @@ class Html2Md extends AbstractDomParser
 	 * @param object $node
 	 * @return string
 	 */
-	private function _convertTable($node)
+	private function _convertTable($node): string
 	{
 		$table_heading = $node->getElementsByTagName('th');
 		if ($this->getItem($table_heading, 0) === null)
@@ -712,7 +712,7 @@ class Html2Md extends AbstractDomParser
 	 * @param object $node
 	 * @return int
 	 */
-	private function _getListPosition($node)
+	private function _getListPosition($node): int
 	{
 		$position = 1;
 
@@ -745,7 +745,7 @@ class Html2Md extends AbstractDomParser
 	 * @param int $max
 	 * @return string
 	 */
-	private function _alignRowContent($align, $width, $content, $max)
+	private function _alignRowContent($align, $width, $content, $max): string
 	{
 		switch ($align)
 		{
@@ -776,7 +776,7 @@ class Html2Md extends AbstractDomParser
 	 * @param string $value
 	 * @return string
 	 */
-	private function _escapeText($value)
+	private function _escapeText($value): string
 	{
 		// Escape plain text areas, so it does not convert to Markdown
 		$textEscapeRegex = [
@@ -806,7 +806,7 @@ class Html2Md extends AbstractDomParser
 	 * @param string $value
 	 * @return string
 	 */
-	private function _hasBackticks($value)
+	private function _hasBackticks($value): string
 	{
 		$ticks = '';
 
@@ -840,7 +840,7 @@ class Html2Md extends AbstractDomParser
 	 * @param string $markdown
 	 * @param bool|int $buffer
 	 */
-	private function _setBodyWidth($markdown, $buffer = false)
+	private function _setBodyWidth($markdown, $buffer = false): void
 	{
 		// Off we do nothing
 		if ($this->body_width === 0)
@@ -865,7 +865,7 @@ class Html2Md extends AbstractDomParser
 	 *
 	 * @return string
 	 */
-	private function _convertPlaintxtLinks($text, $node)
+	private function _convertPlaintxtLinks($text, $node): string
 	{
 		if (in_array($this->getName($this->getParent($node)), ['a', 'code', 'pre']))
 		{
@@ -899,7 +899,7 @@ class Html2Md extends AbstractDomParser
 	 * @param string[] $matches
 	 * @return string
 	 */
-	private function _plaintxtCallback($matches)
+	private function _plaintxtCallback($matches): string
 	{
 		global $txt;
 
@@ -915,7 +915,7 @@ class Html2Md extends AbstractDomParser
 	 * @param $node
 	 * @return int
 	 */
-	private function getBuffer($node)
+	private function getBuffer($node): int
 	{
 		$cut = $this->getOuterHTML($node);
 		$parent = $this->getParent($node);

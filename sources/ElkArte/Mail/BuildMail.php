@@ -50,7 +50,7 @@ class BuildMail extends BaseMail
 	 * @return bool If the email was accepted properly.
 	 * @package Mail
 	 */
-	public function buildEmail($to, $subject, $message, $from = null, $message_id = null, $send_html = false, $priority = 3, $is_private = false, $from_wrapper = null, $reference = null)
+	public function buildEmail($to, $subject, $message, $from = null, $message_id = null, $send_html = false, $priority = 3, $is_private = false, $from_wrapper = null, $reference = null): bool
 	{
 		global $modSettings;
 
@@ -156,7 +156,7 @@ class BuildMail extends BaseMail
 	 * @param string $message
 	 * @return string
 	 */
-	public function setMessageLineBreak($message)
+	public function setMessageLineBreak($message): string
 	{
 		// Make the message use the proper line breaks.
 		return str_replace(["\r", "\n"], ['', $this->lineBreak], $message);
@@ -168,9 +168,9 @@ class BuildMail extends BaseMail
 	 *
 	 * @param string $from
 	 * @param string $from_wrapper
-	 * @return string
+	 * @return string|null
 	 */
-	public function setDMARCFrom($from, $from_wrapper)
+	public function setDMARCFrom($from, $from_wrapper): ?string
 	{
 		global $modSettings;
 
@@ -206,7 +206,7 @@ class BuildMail extends BaseMail
 	 * @param string $from
 	 * @return string
 	 */
-	public function setFromName($from)
+	public function setFromName($from): string
 	{
 		global $modSettings, $mbname;
 
@@ -235,7 +235,7 @@ class BuildMail extends BaseMail
 	 * @return string[] an array containing the converted string and the transport method.
 	 * @package Mail
 	 */
-	public function mimeSpecialChars($string)
+	public function mimeSpecialChars($string): array
 	{
 		// Ensure any HTML entities are in a valid range
 		$string = $this->getValidUTF8String($string);
@@ -259,7 +259,7 @@ class BuildMail extends BaseMail
 	 * @param $string
 	 * @return string
 	 */
-	public function getValidUTF8String($string)
+	public function getValidUTF8String($string): string
 	{
 		$string = preg_replace('/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]/', '', $string);
 
@@ -283,7 +283,7 @@ class BuildMail extends BaseMail
 	 * @param string|null $reference
 	 * @return void
 	 */
-	public function setFromHeaders($from, $from_name, $from_wrapper = null, $reference = null)
+	public function setFromHeaders($from, $from_name, $from_wrapper = null, $reference = null): void
 	{
 		global $webmaster_email, $context, $modSettings;
 
@@ -321,7 +321,7 @@ class BuildMail extends BaseMail
 	 *
 	 * @param int $priority
 	 */
-	public function setDigestHeaders($priority)
+	public function setDigestHeaders($priority): void
 	{
 		global $modSettings, $boardurl, $webmaster_email, $mbname;
 
@@ -374,7 +374,7 @@ class BuildMail extends BaseMail
 	 * @param string $subject
 	 * @return string
 	 */
-	public function getMessage($send_html, $mime_boundary, $orig_message, $subject)
+	public function getMessage($send_html, $mime_boundary, $orig_message, $subject): string
 	{
 		$plain_text = $send_html ? $this->getPlainFromHTML($orig_message) : $orig_message;
 		$ascii_message = $this->get7bitVersion($plain_text);
@@ -404,7 +404,7 @@ class BuildMail extends BaseMail
 	 * @param string $string
 	 * @return string
 	 */
-	public function get7bitVersion($string)
+	public function get7bitVersion($string): string
 	{
 		// Drop any control characters other than tab, lf and cr
 		$string = preg_replace('/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]/', '', $string);
@@ -420,7 +420,7 @@ class BuildMail extends BaseMail
 	 * @param string $string
 	 * @return string
 	 */
-	public function getPlainFromHTML($string)
+	public function getPlainFromHTML($string): string
 	{
 		// Remove any basic control characters, allowing only for tab, LF and CR
 		$string = preg_replace('/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]/', '', $string);
@@ -441,7 +441,7 @@ class BuildMail extends BaseMail
 	 * @param string $string
 	 * @return string
 	 */
-	public function getBase64Version($string)
+	public function getBase64Version($string): string
 	{
 		// Convert valid &#12345; HTML entities into UTF8 characters
 		$string = $this->getValidUTF8String($string);
@@ -461,7 +461,7 @@ class BuildMail extends BaseMail
 	 * @param string $string
 	 * @return string
 	 */
-	public function getQuotedPrintableVersion($string)
+	public function getQuotedPrintableVersion($string): string
 	{
 		// Get a pure UTF8 character string
 		$string = $this->getValidUTF8String($string);
@@ -479,7 +479,7 @@ class BuildMail extends BaseMail
 	 * @package Mail
 	 *
 	 */
-	public function mimespecialchars_callback($match)
+	public function mimespecialchars_callback($match): string
 	{
 		return chr($match[1]);
 	}
@@ -511,7 +511,7 @@ class BuildMail extends BaseMail
 	 *
 	 * @return string
 	 */
-	public function getEmailWrapper($message, $subject)
+	public function getEmailWrapper($message, $subject): string
 	{
 		global $settings;
 
@@ -531,7 +531,7 @@ class BuildMail extends BaseMail
 	 *
 	 * @param array $replacements
 	 */
-	public function setEmailReplacements($replacements)
+	public function setEmailReplacements($replacements): void
 	{
 		$this->replacements = $replacements;
 	}

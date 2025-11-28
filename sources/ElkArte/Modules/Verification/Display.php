@@ -51,7 +51,7 @@ class Display extends AbstractModule
 	/**
 	 * Prepare $context for the quick reply.
 	 */
-	public function topicinfo()
+	public function topicinfo(): void
 	{
 		global $context;
 

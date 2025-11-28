@@ -99,7 +99,7 @@ class DataValidator
 	 *
 	 * @return bool
 	 */
-	public static function is_valid(&$data = [], $validation_rules = [], $sanitation_rules = [])
+	public static function is_valid(&$data = [], $validation_rules = [], $sanitation_rules = []): bool
 	{
 		$validator = new DataValidator();
 
@@ -135,7 +135,7 @@ class DataValidator
 	 * @param array $rules associative array of field => rule|rule|rule
 	 * @param bool $strict
 	 */
-	public function sanitation_rules($rules = [], $strict = false)
+	public function sanitation_rules($rules = [], $strict = false): void
 	{
 		// If not an array, make it one
 		if (!is_array($rules))
@@ -154,7 +154,7 @@ class DataValidator
 	 *
 	 * @param array $rules associative array of field => rule|rule|rule
 	 */
-	public function validation_rules($rules = [])
+	public function validation_rules($rules = []): void
 	{
 		// If not an array, make it one
 		if (!is_array($rules))
@@ -173,7 +173,7 @@ class DataValidator
 	 *
 	 * @return bool
 	 */
-	public function validate($input)
+	public function validate($input): bool
 	{
 		// If an object, convert it to an array
 		if (is_object($input))
@@ -201,7 +201,7 @@ class DataValidator
 	 * @param array $ruleset
 	 * @return array
 	 */
-	private function _sanitize($input, $ruleset)
+	private function _sanitize($input, $ruleset): array
 	{
 		// For each field, run our set of rules against the data
 		foreach ($ruleset as $field => $rules)
@@ -349,7 +349,7 @@ class DataValidator
 	 *
 	 * @return bool
 	 */
-	private function _validate($input, $ruleset)
+	private function _validate($input, $ruleset): bool
 	{
 		// No errors ... yet ;)
 		$this->_validation_errors = [];
@@ -385,20 +385,20 @@ class DataValidator
 	/**
 	 * Used when a field contains csv or array of data
 	 *
-	 * -Will convert field to individual elements and run a separate validation on that group
+	 * - Converts field to individual elements and run a separate validation on that group
 	 * using the rules defined to the parent node
 	 *
 	 * @param array $input
 	 * @param string $field
 	 * @param string $rules
 	 *
-	 * @return bool|void
+	 * @return bool|null
 	 */
-	private function _validate_recursive($input, $field, $rules)
+	private function _validate_recursive($input, $field, $rules): ?bool
 	{
 		if (!isset($input[$field]))
 		{
-			return;
+			return null;
 		}
 
 		// Start a new instance of the validator to work on this sub data (csv/array)
@@ -551,7 +551,7 @@ class DataValidator
 	 * @param string $type
 	 * @return array
 	 */
-	private function _getRuleValues($rule, $type)
+	private function _getRuleValues($rule, $type): array
 	{
 		$details = [];
 		$details['parameters'] = null;
@@ -639,7 +639,7 @@ class DataValidator
 	 *
 	 * @param array $replacements associative array of field => txt string key
 	 */
-	public function text_replacements($replacements = [])
+	public function text_replacements($replacements = []): void
 	{
 		$this->_replacements = empty($replacements) ? $this->_replacements : $replacements;
 	}
@@ -649,7 +649,7 @@ class DataValidator
 	 *
 	 * @param string[] $datatype csv or array processing for the field
 	 */
-	public function input_processing($datatype = [])
+	public function input_processing($datatype = []): void
 	{
 		$this->_datatype = empty($datatype) ? $this->_datatype : $datatype;
 	}
@@ -662,7 +662,7 @@ class DataValidator
 	 * @param array|string $validation_parameters
 	 * @return array
 	 */
-	protected function setFailureArray($field, $input, $validation_parameters)
+	protected function setFailureArray($field, $input, $validation_parameters): array
 	{
 		// Get the calling function that failed
 		$dbt = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 2);
@@ -687,9 +687,9 @@ class DataValidator
 	 * @param array $input
 	 * @param string|null $validation_parameters array or null
 	 *
-	 * @return array|void
+	 * @return array|null
 	 */
-	protected function _validate_contains($field, $input, $validation_parameters = null)
+	protected function _validate_contains($field, $input, $validation_parameters = null): ?array
 	{
 		$validation_parameters = array_map('trim', explode(',', strtolower($validation_parameters)));
 		$input[$field] = $input[$field] ?? '';
@@ -699,6 +699,8 @@ class DataValidator
 		{
 			return $this->setFailureArray($field, $input, $validation_parameters);
 		}
+
+		return null;
 	}
 
 	/**
@@ -710,9 +712,9 @@ class DataValidator
 	 * @param array $input
 	 * @param string|null $validation_parameters array or null
 	 *
-	 * @return array|void
+	 * @return array|null
 	 */
-	protected function _validate_notequal($field, $input, $validation_parameters = null)
+	protected function _validate_notequal($field, $input, $validation_parameters = null): ?array
 	{
 		$validation_parameters = explode(',', strtolower(trim($validation_parameters)));
 		$input[$field] = $input[$field] ?? '';
@@ -722,6 +724,8 @@ class DataValidator
 		{
 			return $this->setFailureArray($field, $input, $validation_parameters);
 		}
+
+		return null;
 	}
 
 	/**
@@ -737,9 +741,9 @@ class DataValidator
 	 * @param array $input
 	 * @param array|string|null $validation_parameters array or null
 	 *
-	 * @return array|void
+	 * @return array|null
 	 */
-	protected function _validate_limits($field, $input, $validation_parameters = null)
+	protected function _validate_limits($field, $input, $validation_parameters = null): ?array
 	{
 		$validation_parameters = explode(',', $validation_parameters);
 		$validation_parameters = array_filter($validation_parameters, 'strlen');
@@ -764,6 +768,8 @@ class DataValidator
 		{
 			return $this->setFailureArray($field, $input, $validation_parameters);
 		}
+
+		return null;
 	}
 
 	/**
@@ -775,9 +781,9 @@ class DataValidator
 	 * @param array $input
 	 * @param string $validation_parameters
 	 *
-	 * @return array|void
+	 * @return array|null
 	 */
-	protected function _validate_without($field, $input, $validation_parameters = '')
+	protected function _validate_without($field, $input, $validation_parameters = ''): ?array
 	{
 		$parameters = explode(',', $validation_parameters);
 		$input[$field] = $input[$field] ?? '';
@@ -790,6 +796,8 @@ class DataValidator
 				return $this->setFailureArray($field, $input, $parameters);
 			}
 		}
+
+		return null;
 	}
 
 	/**
@@ -801,14 +809,16 @@ class DataValidator
 	 * @param array $input
 	 * @param array|null $validation_parameters array or null
 	 *
-	 * @return array|void
+	 * @return array|null
 	 */
-	protected function _validate_required($field, $input, $validation_parameters = null)
+	protected function _validate_required($field, $input, $validation_parameters = null): ?array
 	{
 		if (!isset($input[$field]) || trim($input[$field]) === '')
 		{
 			return $this->setFailureArray($field, $input, $validation_parameters);
 		}
+
+		return null;
 	}
 
 	/**
@@ -820,13 +830,13 @@ class DataValidator
 	 * @param array $input
 	 * @param array|null $validation_parameters array or null
 	 *
-	 * @return array|void
+	 * @return array|null
 	 */
-	protected function _validate_valid_email($field, $input, $validation_parameters = null)
+	protected function _validate_valid_email($field, $input, $validation_parameters = null): ?array
 	{
 		if (!isset($input[$field]))
 		{
-			return;
+			return null;
 		}
 
 		$valid = strrpos($input[$field], '@') !== false && filter_var($input[$field], FILTER_VALIDATE_EMAIL) !== false;
@@ -834,6 +844,8 @@ class DataValidator
 		{
 			return $this->setFailureArray($field, $input, $validation_parameters);
 		}
+
+		return null;
 	}
 
 	/**
@@ -845,19 +857,21 @@ class DataValidator
 	 * @param array $input
 	 * @param array|null $validation_parameters array or null
 	 *
-	 * @return array|void
+	 * @return array|null
 	 */
-	protected function _validate_max_length($field, $input, $validation_parameters = null)
+	protected function _validate_max_length($field, $input, $validation_parameters = null): ?array
 	{
 		if (!isset($input[$field]))
 		{
-			return;
+			return null;
 		}
 
 		if (Util::strlen($input[$field]) > (int) $validation_parameters)
 		{
 			return $this->setFailureArray($field, $input, $validation_parameters);
 		}
+
+		return null;
 	}
 
 	/**
@@ -869,19 +883,21 @@ class DataValidator
 	 * @param array $input
 	 * @param array|null $validation_parameters array or null
 	 *
-	 * @return array|void
+	 * @return array|null
 	 */
-	protected function _validate_min_length($field, $input, $validation_parameters = null)
+	protected function _validate_min_length($field, $input, $validation_parameters = null): ?array
 	{
 		if (!isset($input[$field]))
 		{
-			return;
+			return null;
 		}
 
 		if (Util::strlen($input[$field]) < (int) $validation_parameters)
 		{
 			return $this->setFailureArray($field, $input, $validation_parameters);
 		}
+
+		return null;
 	}
 
 	/**
@@ -893,19 +909,21 @@ class DataValidator
 	 * @param array $input
 	 * @param array|null $validation_parameters array or null
 	 *
-	 * @return array|void
+	 * @return array|null
 	 */
-	protected function _validate_length($field, $input, $validation_parameters = null)
+	protected function _validate_length($field, $input, $validation_parameters = null): ?array
 	{
 		if (!isset($input[$field]))
 		{
-			return;
+			return null;
 		}
 
 		if (Util::strlen($input[$field]) !== (int) $validation_parameters)
 		{
 			return $this->setFailureArray($field, $input, $validation_parameters);
 		}
+
+		return null;
 	}
 
 	/**
@@ -917,13 +935,13 @@ class DataValidator
 	 * @param array $input
 	 * @param array|null $validation_parameters array or null
 	 *
-	 * @return array|void
+	 * @return array|null
 	 */
-	protected function _validate_alpha($field, $input, $validation_parameters = null)
+	protected function _validate_alpha($field, $input, $validation_parameters = null): ?array
 	{
 		if (!isset($input[$field]))
 		{
-			return;
+			return null;
 		}
 
 		// A character with the Unicode property of letter (any kind of letter from any language)
@@ -931,6 +949,8 @@ class DataValidator
 		{
 			return $this->setFailureArray($field, $input, $validation_parameters);
 		}
+
+		return null;
 	}
 
 	/**
@@ -943,13 +963,13 @@ class DataValidator
 	 * @param array $input
 	 * @param array|null $validation_parameters array or null
 	 *
-	 * @return array|void
+	 * @return array|null
 	 */
-	protected function _validate_alpha_numeric($field, $input, $validation_parameters = null)
+	protected function _validate_alpha_numeric($field, $input, $validation_parameters = null): ?array
 	{
 		if (!isset($input[$field]))
 		{
-			return;
+			return null;
 		}
 
 		// A character with the Unicode property of letter or number (any kind of letter or numeric 0-9 from any language)
@@ -957,6 +977,8 @@ class DataValidator
 		{
 			return $this->setFailureArray($field, $input, $validation_parameters);
 		}
+
+		return null;
 	}
 
 	/**
@@ -968,19 +990,21 @@ class DataValidator
 	 * @param array $input
 	 * @param array|null $validation_parameters array or null
 	 *
-	 * @return array|void
+	 * @return array|null
 	 */
-	protected function _validate_alpha_dash($field, $input, $validation_parameters = null)
+	protected function _validate_alpha_dash($field, $input, $validation_parameters = null): ?array
 	{
 		if (!isset($input[$field]))
 		{
-			return;
+			return null;
 		}
 
 		if (!preg_match('~^([-_\p{L}])+$~iu', $input[$field]))
 		{
 			return $this->setFailureArray($field, $input, $validation_parameters);
 		}
+
+		return null;
 	}
 
 	/**
@@ -992,19 +1016,21 @@ class DataValidator
 	 * @param array $input
 	 * @param array|null $validation_parameters array or null
 	 *
-	 * @return array|void
+	 * @return array|null
 	 */
-	protected function _validate_isarray($field, $input, $validation_parameters = null)
+	protected function _validate_isarray($field, $input, $validation_parameters = null): ?array
 	{
 		if (!isset($input[$field]))
 		{
-			return;
+			return null;
 		}
 
 		if (!is_array($input[$field]))
 		{
 			return $this->setFailureArray($field, $input, $validation_parameters);
 		}
+
+		return null;
 	}
 
 	/**
@@ -1016,19 +1042,21 @@ class DataValidator
 	 * @param array $input
 	 * @param array|null $validation_parameters array or null
 	 *
-	 * @return array|void
+	 * @return array|null
 	 */
-	protected function _validate_numeric($field, $input, $validation_parameters = null)
+	protected function _validate_numeric($field, $input, $validation_parameters = null): ?array
 	{
 		if (!isset($input[$field]))
 		{
-			return;
+			return null;
 		}
 
 		if (!is_numeric($input[$field]))
 		{
 			return $this->setFailureArray($field, $input, $validation_parameters);
 		}
+
+		return null;
 	}
 
 	/**
@@ -1040,19 +1068,21 @@ class DataValidator
 	 * @param array $input
 	 * @param array|null $validation_parameters array or null
 	 *
-	 * @return array|void
+	 * @return array|null
 	 */
-	protected function _validate_integer($field, $input, $validation_parameters = null)
+	protected function _validate_integer($field, $input, $validation_parameters = null): ?array
 	{
 		if (!isset($input[$field]))
 		{
-			return;
+			return null;
 		}
 
 		if (filter_var($input[$field], FILTER_VALIDATE_INT) === false)
 		{
 			return $this->setFailureArray($field, $input, $validation_parameters);
 		}
+
+		return null;
 	}
 
 	/**
@@ -1064,13 +1094,13 @@ class DataValidator
 	 * @param array $input
 	 * @param array|null $validation_parameters array or null
 	 *
-	 * @return array|void
+	 * @return array|null
 	 */
-	protected function _validate_boolean($field, $input, $validation_parameters = null)
+	protected function _validate_boolean($field, $input, $validation_parameters = null): ?array
 	{
 		if (!isset($input[$field]))
 		{
-			return;
+			return null;
 		}
 
 		$filter = filter_var($input[$field], FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE);
@@ -1078,6 +1108,8 @@ class DataValidator
 		{
 			return $this->setFailureArray($field, $input, $validation_parameters);
 		}
+
+		return null;
 	}
 
 	/**
@@ -1089,19 +1121,21 @@ class DataValidator
 	 * @param array $input
 	 * @param array|null $validation_parameters array or null
 	 *
-	 * @return array|void
+	 * @return array|null
 	 */
-	protected function _validate_float($field, $input, $validation_parameters = null)
+	protected function _validate_float($field, $input, $validation_parameters = null): ?array
 	{
 		if (!isset($input[$field]))
 		{
-			return;
+			return null;
 		}
 
 		if (filter_var($input[$field], FILTER_VALIDATE_FLOAT) === false)
 		{
 			return $this->setFailureArray($field, $input, $validation_parameters);
 		}
+
+		return null;
 	}
 
 	/**
@@ -1113,19 +1147,21 @@ class DataValidator
 	 * @param array $input
 	 * @param array|null $validation_parameters array or null
 	 *
-	 * @return array|void
+	 * @return array|null
 	 */
-	protected function _validate_valid_url($field, $input, $validation_parameters = null)
+	protected function _validate_valid_url($field, $input, $validation_parameters = null): ?array
 	{
 		if (!isset($input[$field]))
 		{
-			return;
+			return null;
 		}
 
 		if (!preg_match('`^(https?:(//([a-z0-9\-._~%]+)(:\d+)?(/[a-z0-9\-._~%!$&\'()*+,;=:@]+)*/?))(\?[a-z0-9\-._~%!$&\'()*+,;=:@/?]*)?(\#[a-z0-9\-._~%!$&\'()*+,;=:@/?]*)?$`', $input[$field], $matches))
 		{
 			return $this->setFailureArray($field, $input, $validation_parameters);
 		}
+
+		return null;
 	}
 
 	/**
@@ -1137,19 +1173,21 @@ class DataValidator
 	 * @param array $input
 	 * @param array|null $validation_parameters array or null
 	 *
-	 * @return array|void
+	 * @return array|null
 	 */
-	protected function _validate_valid_ipv6($field, $input, $validation_parameters = null)
+	protected function _validate_valid_ipv6($field, $input, $validation_parameters = null): ?array
 	{
 		if (!isset($input[$field]))
 		{
-			return;
+			return null;
 		}
 
 		if (filter_var($input[$field], FILTER_VALIDATE_IP, FILTER_FLAG_IPV6) === false)
 		{
 			return $this->setFailureArray($field, $input, $validation_parameters);
 		}
+
+		return null;
 	}
 
 	/**
@@ -1161,19 +1199,21 @@ class DataValidator
 	 * @param array $input
 	 * @param array|null $validation_parameters array or null
 	 *
-	 * @return array|void
+	 * @return array|null
 	 */
-	protected function _validate_valid_ip($field, $input, $validation_parameters = null)
+	protected function _validate_valid_ip($field, $input, $validation_parameters = null): ?array
 	{
 		if (!isset($input[$field]))
 		{
-			return;
+			return null;
 		}
 
 		if (filter_var($input[$field], FILTER_VALIDATE_IP, FILTER_FLAG_IPV4) === false)
 		{
 			return $this->setFailureArray($field, $input, $validation_parameters);
 		}
+
+		return null;
 	}
 
 	/**
@@ -1187,14 +1227,14 @@ class DataValidator
 	 * @param array $input
 	 * @param array|null $validation_parameters array or null
 	 *
-	 * @return array|void
+	 * @return array|null
 	 * @uses ParseError
 	 */
-	protected function _validate_php_syntax($field, $input, $validation_parameters = null)
+	protected function _validate_php_syntax($field, $input, $validation_parameters = null): ?array
 	{
 		if (!isset($input[$field]))
 		{
-			return;
+			return null;
 		}
 
 		// Check the depth.
@@ -1251,6 +1291,8 @@ class DataValidator
 				'param' => $validation_parameters
 			];
 		}
+
+		return null;
 	}
 
 	/**
@@ -1262,13 +1304,13 @@ class DataValidator
 	 * @param array $input
 	 * @param array|null $validation_parameters array or null
 	 *
-	 * @return array|bool|void
+	 * @return array|bool|null
 	 */
 	protected function _validate_valid_color($field, $input, $validation_parameters = null)
 	{
 		if (!isset($input[$field]))
 		{
-			return;
+			return null;
 		}
 
 		// A color can be a name: there are 140 valid, but a similar list is too long, so let's just use the basic 17
@@ -1321,13 +1363,13 @@ class DataValidator
 	 *
 	 * @param string $input
 	 *
-	 * @return string|void
+	 * @return string|null
 	 */
-	protected function _sanitation_gmail_normalize($input)
+	protected function _sanitation_gmail_normalize($input): ?string
 	{
 		if (!isset($input))
 		{
-			return;
+			return null;
 		}
 
 		$at_index = strrpos($input, '@');
@@ -1357,13 +1399,13 @@ class DataValidator
 	 *
 	 * @param string $input
 	 *
-	 * @return void|string
+	 * @return string|null
 	 */
-	protected function _sanitation_cleanhtml($input)
+	protected function _sanitation_cleanhtml($input): ?string
 	{
 		if (!isset($input))
 		{
-			return;
+			return null;
 		}
 
 		return Util::htmlspecialchars($input);

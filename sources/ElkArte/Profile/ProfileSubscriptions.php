@@ -51,7 +51,7 @@ class ProfileSubscriptions extends AbstractController
 	/**
 	 * Method for doing all the paid subscription stuff - kinda.
 	 */
-	public function action_subscriptions()
+	public function action_subscriptions(): void
 	{
 		global $context, $txt;
 
@@ -121,7 +121,7 @@ class ProfileSubscriptions extends AbstractController
 	 *
 	 * - Invalid defined by missing cost or missing period
 	 */
-	private function _remove_invalid()
+	private function _remove_invalid(): void
 	{
 		global $context;
 
@@ -171,7 +171,7 @@ class ProfileSubscriptions extends AbstractController
 	 *
 	 * @param int $memID
 	 */
-	private function _orderDone($memID)
+	private function _orderDone($memID): void
 	{
 		global $context;
 
@@ -216,7 +216,7 @@ class ProfileSubscriptions extends AbstractController
 	 *
 	 * @throws Exception paid_sub_not_active
 	 */
-	private function _confirmOrder($memID)
+	private function _confirmOrder($memID): void
 	{
 		global $context, $modSettings, $txt;
 
@@ -316,7 +316,7 @@ class ProfileSubscriptions extends AbstractController
 	/**
 	 * Sets the value/cost/period/unit of the chosen order for use in templates
 	 */
-	private function _set_value_cost_context()
+	private function _set_value_cost_context(): void
 	{
 		global $context, $modSettings, $txt;
 
@@ -348,7 +348,7 @@ class ProfileSubscriptions extends AbstractController
 	 * @param int $memID The id of the member who is ordering
 	 * @param string $period xx for none or a value of time
 	 */
-	private function _set_payment_gatway_context($memID, $period)
+	private function _set_payment_gatway_context($memID, $period): void
 	{
 		global $context, $scripturl;
 

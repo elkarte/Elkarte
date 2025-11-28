@@ -24,7 +24,7 @@ function followupTopics($messages, $include_approved = false)
 {
 	$db = database();
 
-	$returns = array();
+	$returns = [];
 	$db->fetchQuery('
 		SELECT 
 			fu.derived_from, fu.follow_up, m.subject
@@ -34,10 +34,10 @@ function followupTopics($messages, $include_approved = false)
 			INNER JOIN {db_prefix}boards AS b ON (b.id_board = m.id_board AND {query_see_board})
 		WHERE fu.derived_from IN ({array_int:messages})' . ($include_approved ? '' : '
 			AND m.approved = {int:approved}'),
-		array(
+		[
 			'messages' => $messages,
 			'approved' => 1,
-		)
+		]
 	)->fetch_callback(
 		function ($row) use (&$returns) {
 			$returns[$row['derived_from']][] = $row;
@@ -59,7 +59,7 @@ function topicStartedHere($topic, $include_approved = false)
 {
 	$db = database();
 
-	$returns = array();
+	$returns = [];
 	$db->fetchQuery('
 		SELECT fu.derived_from, m.subject
 		FROM {db_prefix}follow_ups AS fu
@@ -68,10 +68,10 @@ function topicStartedHere($topic, $include_approved = false)
 		WHERE fu.follow_up = {int:original_topic}' . ($include_approved ? '' : '
 			AND m.approved = {int:approved}') . '
 		LIMIT 1',
-		array(
+		[
 			'original_topic' => $topic,
 			'approved' => 1,
-		)
+		]
 	)->fetch_callback(
 		function ($row) use (&$returns) {
 			$returns = $row;
@@ -93,9 +93,9 @@ function linkMessages($msg, $topic)
 
 	$db->insert('ignore',
 		'{db_prefix}follow_ups',
-		array('follow_up' => 'int', 'derived_from' => 'int'),
-		array($topic, $msg),
-		array('follow_up', 'derived_from')
+		['follow_up' => 'int', 'derived_from' => 'int'],
+		[$topic, $msg],
+		['follow_up', 'derived_from']
 	);
 }
 
@@ -116,10 +116,10 @@ function unlinkMessages($msg, $topic)
 		WHERE derived_from = {int:id_msg}
 			AND follow_up = {int:id_topic}
 		LIMIT 1',
-		array(
+		[
 			'id_msg' => $msg,
 			'id_topic' => $topic,
-		)
+		]
 	);
 }
 
@@ -135,9 +135,9 @@ function removeFollowUpsByTopic($topics)
 	$db->query('', '
 		DELETE FROM {db_prefix}follow_ups
 		WHERE follow_up IN ({array_int:id_topics})',
-		array(
-			'id_topics' => is_array($topics) ? $topics : array($topics),
-		)
+		[
+			'id_topics' => is_array($topics) ? $topics : [$topics],
+		]
 	);
 }
 
@@ -153,8 +153,8 @@ function removeFollowUpsByMessage($msgs)
 	$db->query('', '
 		DELETE FROM {db_prefix}follow_ups
 		WHERE derived_from IN ({array_int:id_msgs})',
-		array(
-			'id_msgs' => is_array($msgs) ? $msgs : array($msgs),
-		)
+		[
+			'id_msgs' => is_array($msgs) ? $msgs : [$msgs],
+		]
 	);
 }

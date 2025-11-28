@@ -40,7 +40,7 @@ class ScheduledTasks extends AbstractController
 	 *  - Runs next tasks
 	 *  - Update the database for the next round
 	 */
-	public function action_autotask()
+	public function action_autotask(): ?bool
 	{
 		// Include the ScheduledTasks subs worker.
 		require_once(SUBSDIR . '/ScheduledTasks.subs.php');
@@ -64,11 +64,11 @@ class ScheduledTasks extends AbstractController
 			// If there was none, update with defaults
 			if ($nextTime === false)
 			{
-				updateSettings(array('next_task_time' => time() + 86400));
+				updateSettings(['next_task_time' => time() + 86400]);
 			}
 			else
 			{
-				updateSettings(array('next_task_time' => $nextTime));
+				updateSettings(['next_task_time' => $nextTime]);
 			}
 		}
 
@@ -86,7 +86,7 @@ class ScheduledTasks extends AbstractController
 	/**
 	 * Reduce mail queue.
 	 */
-	public function action_reducemailqueue()
+	public function action_reducemailqueue(): void
 	{
 		// This does the hard work, it does.
 		(new QueueMail())->reduceMailQueue();

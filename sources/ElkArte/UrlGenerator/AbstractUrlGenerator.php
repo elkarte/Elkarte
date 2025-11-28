@@ -28,14 +28,14 @@ abstract class AbstractUrlGenerator
 	/**
 	 * The type of URLs this class supports
 	 */
-	protected $_types = array();
+	protected $_types = [];
 
 	/**
 	 * Allows to change the URL parameters separator
 	 *
 	 * @param string $separator The separator character
 	 */
-	public function setSeparator($separator)
+	public function setSeparator($separator): void
 	{
 		$this->_separator = $separator;
 	}
@@ -61,7 +61,7 @@ abstract class AbstractUrlGenerator
 	 * @param array $args
 	 * @return array
 	 */
-	public function getHash($args)
+	public function getHash($args): array
 	{
 		if (isset($args['hash']))
 		{

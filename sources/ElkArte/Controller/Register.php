@@ -84,15 +84,15 @@ class Register extends AbstractController
 	public function action_index()
 	{
 		// Add the sub-action array to dispatch accordingly
-		$subActions = array(
-			'register' => array($this, 'action_register'),
-			'register2' => array($this, 'action_register2'),
-			'usernamecheck' => array($this, 'action_registerCheckUsername'),
-			'activate' => array($this, 'action_activate'),
-			'agrelang' => array($this, 'action_agrelang'),
-			'privacypol' => array($this, 'action_privacypol'),
-			'agreement' => array($this, 'action_agreement'),
-		);
+		$subActions = [
+			'register' => [$this, 'action_register'],
+			'register2' => [$this, 'action_register2'],
+			'usernamecheck' => [$this, 'action_registerCheckUsername'],
+			'activate' => [$this, 'action_activate'],
+			'agrelang' => [$this, 'action_agrelang'],
+			'privacypol' => [$this, 'action_privacypol'],
+			'agreement' => [$this, 'action_agreement'],
+		];
 
 		// Setup the action handler
 		$action = new Action('register');
@@ -112,7 +112,7 @@ class Register extends AbstractController
 	 * @uses template_registration_agreement or template_registration_form sub template in Register.template,
 	 * @uses Login language file
 	 */
-	public function action_register()
+	public function action_register(): void
 	{
 		global $txt, $context, $modSettings, $scripturl;
 
@@ -179,7 +179,7 @@ class Register extends AbstractController
 				// Are they saying they're under age, while under age registration is disabled?
 				if (empty($modSettings['coppaType']) && empty($_SESSION['skip_coppa']))
 				{
-					throw new Exception('Login.under_age_registration_prohibited', false, array($modSettings['coppaAge']));
+					throw new Exception('Login.under_age_registration_prohibited', false, [$modSettings['coppaAge']]);
 				}
 			}
 		}
@@ -192,7 +192,7 @@ class Register extends AbstractController
 		// Show the user the right form.
 		$context['sub_template'] = $current_step === 1 ? 'registration_agreement' : 'registration_form';
 		$context['page_title'] = $current_step === 1 ? $txt['registration_agreement'] : $txt['registration_form'];
-		loadJavascriptFile(array('register.js', 'ext/mailcheck.min.js'));
+		loadJavascriptFile(['register.js', 'ext/mailcheck.min.js']);
 
 		// Add the register chain to the link tree.
 		$context['breadcrumbs'][] = [
@@ -203,11 +203,11 @@ class Register extends AbstractController
 		// Prepare the time gate! Done like this to allow later steps to reset the limit for any reason
 		if (!isset($_SESSION['register']))
 		{
-			$_SESSION['register'] = array(
+			$_SESSION['register'] = [
 				'timenow' => time(),
 				// minimum number of seconds required on this page for registration
 				'limit' => 8,
-			);
+			];
 		}
 		else
 		{
@@ -247,7 +247,7 @@ class Register extends AbstractController
 		$this->_load_profile_fields();
 
 		// Trigger the prepare_context event
-		$this->_events->trigger('prepare_context', array('current_step' => $current_step));
+		$this->_events->trigger('prepare_context', ['current_step' => $current_step]);
 
 		// See whether we have some pre-filled values.
 		$context['username'] = $this->_req->getPost('user', '\\ElkArte\\Helper\\Util::htmlspecialchars', '');
@@ -255,7 +255,7 @@ class Register extends AbstractController
 		$context['notify_announcements'] = (int) !empty($this->_req->post->notify_announcements);
 
 		// Were there any errors?
-		$context['registration_errors'] = array();
+		$context['registration_errors'] = [];
 		$reg_errors = ErrorContext::context('register', 0);
 		if ($reg_errors->hasErrors())
 		{
@@ -277,7 +277,7 @@ class Register extends AbstractController
 	 *
 	 * Accessed by ?action=register;sa=register2
 	 */
-	public function action_register2()
+	public function action_register2(): void
 	{
 		global $modSettings;
 
@@ -337,7 +337,7 @@ class Register extends AbstractController
 		// Are they under age, and under age users are banned?
 		if (!empty($modSettings['coppaAge']) && empty($modSettings['coppaType']) && empty($_SESSION['skip_coppa']))
 		{
-			throw new Exception('Login.under_age_registration_prohibited', false, array($modSettings['coppaAge']));
+			throw new Exception('Login.under_age_registration_prohibited', false, [$modSettings['coppaAge']]);
 		}
 
 		// Check the time gate for miscreants. First make sure they came from somewhere that actually set it up.
@@ -362,7 +362,7 @@ class Register extends AbstractController
 		}
 
 		// Trigger any events required before we complete registration, like captcha verification
-		$this->_events->trigger('before_complete_register', array('reg_errors' => $reg_errors));
+		$this->_events->trigger('before_complete_register', ['reg_errors' => $reg_errors]);
 
 		$this->do_register();
 	}
@@ -373,7 +373,7 @@ class Register extends AbstractController
 	 * - Called from Register controller
 	 * - Does the actual registration to the system
 	 */
-	public function do_register()
+	public function do_register(): ?bool
 	{
 		global $txt, $modSettings, $context;
 
@@ -385,7 +385,7 @@ class Register extends AbstractController
 		{
 			if (!is_array($value))
 			{
-				$this->_req->post->{$key} = Util::htmltrim__recursive(str_replace(array("\n", "\r"), '', $value));
+				$this->_req->post->{$key} = Util::htmltrim__recursive(str_replace(["\n", "\r"], '', $value));
 			}
 		}
 
@@ -442,7 +442,7 @@ class Register extends AbstractController
 		}
 
 		// Set the options needed for registration.
-		$regOptions = array(
+		$regOptions = [
 			'interface' => 'guest',
 			'username' => empty($this->_req->post->user) ? '' : $this->_req->post->user,
 			'email' => empty($this->_req->post->email) ? '' : $this->_req->post->email,
@@ -455,8 +455,8 @@ class Register extends AbstractController
 			'send_welcome_email' => !empty($modSettings['send_welcomeEmail']),
 			'require' => !empty($modSettings['coppaAge']) && empty($_SESSION['skip_coppa']) ? 'coppa' : (empty($modSettings['registration_method']) ? 'nothing' : ($modSettings['registration_method'] == 1 ? 'activation' : 'approval')),
 			'extra_register_vars' => $this->_extra_vars($has_real_name),
-			'theme_vars' => array(),
-		);
+			'theme_vars' => [],
+		];
 
 		// Registration options are always default options...
 		if (isset($this->_req->post->default_options))
@@ -464,14 +464,14 @@ class Register extends AbstractController
 			$this->_req->post->options = isset($this->_req->post->options) ? $this->_req->post->options + $this->_req->post->default_options : $this->_req->post->default_options;
 		}
 
-		$regOptions['theme_vars'] = isset($this->_req->post->options) && is_array($this->_req->post->options) ? $this->_req->post->options : array();
+		$regOptions['theme_vars'] = isset($this->_req->post->options) && is_array($this->_req->post->options) ? $this->_req->post->options : [];
 
 		// Make sure they are clean, dammit!
 		$regOptions['theme_vars'] = Util::htmlspecialchars__recursive($regOptions['theme_vars']);
 
 		// Check whether we have fields that simply MUST be displayed?
 		$profileFields = new \ElkArte\Profile\ProfileFields();
-		$profileFields->loadCustomFields(0, 'register', $this->_req->post->customfield ?? array());
+		$profileFields->loadCustomFields(0, 'register', $this->_req->post->customfield ?? []);
 
 		foreach ($context['custom_fields'] as $row)
 		{
@@ -485,25 +485,25 @@ class Register extends AbstractController
 			$value = isset($this->_req->post->customfield[$row['colname']]) ? trim($this->_req->post->customfield[$row['colname']]) : '';
 
 			// We only care for text fields as the others are valid to be empty.
-			if (!in_array($row['field_type'], array('check', 'select', 'radio')))
+			if (!in_array($row['field_type'], ['check', 'select', 'radio']))
 			{
 				$is_valid = isCustomFieldValid($row, $value);
 				if ($is_valid !== true)
 				{
-					$err_params = array($row['name']);
+					$err_params = [$row['name']];
 					if ($is_valid === 'custom_field_too_long')
 					{
 						$err_params[] = $row['field_length'];
 					}
 
-					$reg_errors->addError(array($is_valid, $err_params));
+					$reg_errors->addError([$is_valid, $err_params]);
 				}
 			}
 
 			// Is this required but not there?
 			if ($row['show_reg'] > 1 && trim($value) === '')
 			{
-				$reg_errors->addError(array('custom_field_empty', array($row['name'])));
+				$reg_errors->addError(['custom_field_empty', [$row['name']]]);
 			}
 		}
 
@@ -576,27 +576,29 @@ class Register extends AbstractController
 		{
 			theme()->getTemplates()->load('Register');
 
-			$context += array(
+			$context += [
 				'page_title' => $txt['register'],
 				'title' => $txt['registration_successful'],
 				'sub_template' => 'after',
 				'description' => $modSettings['registration_method'] == 2 ? $txt['approval_after_registration'] : $txt['activate_after_registration']
-			);
+			];
 		}
 		else
 		{
-			call_integration_hook('integrate_activate', array($regOptions['username'], 1, 1));
+			call_integration_hook('integrate_activate', [$regOptions['username'], 1, 1]);
 
 			setLoginCookie(60 * $modSettings['cookieTime'], $memberID, hash('sha256', $regOptions['register_vars']['passwd'] . $regOptions['register_vars']['password_salt']));
 
 			redirectexit('action=auth;sa=check;member=' . $memberID);
 		}
+
+		return null;
 	}
 
 	/**
 	 * Checks if registrations are enabled and the user didn't just register
 	 */
-	private function _can_register()
+	private function _can_register(): void
 	{
 		global $modSettings;
 
@@ -627,12 +629,12 @@ class Register extends AbstractController
 	 * @return array
 	 * @throws Exception
 	 */
-	private function _extra_vars($has_real_name)
+	private function _extra_vars($has_real_name): array
 	{
 		global $modSettings;
 
 		// Define the fields that may be enabled for registration
-		$possible_strings = array(
+		$possible_strings = [
 			'birthdate',
 			'time_format',
 			'buddy_list',
@@ -642,22 +644,22 @@ class Register extends AbstractController
 			'lngfile',
 			'secret_question', 'secret_answer',
 			'website_url', 'website_title',
-		);
+		];
 
-		$possible_ints = array(
+		$possible_ints = [
 			'pm_email_notify',
 			'notify_types',
 			'notify_from',
 			'id_theme',
-		);
+		];
 
-		$possible_floats = array(
+		$possible_floats = [
 			'time_offset',
-		);
+		];
 
-		$possible_bools = array(
+		$possible_bools = [
 			'notify_announcements', 'notify_regularity', 'notify_send_body', 'show_online',
-		);
+		];
 
 		if ($has_real_name && trim($this->_req->post->real_name) !== '' && !isReservedName($this->_req->post->real_name) && Util::strlen($this->_req->post->real_name) < 60)
 		{
@@ -675,7 +677,7 @@ class Register extends AbstractController
 			// Website is a little different
 			if (!in_array('website', $reg_fields))
 			{
-				$exclude_fields = array_merge($exclude_fields, array('website_url', 'website_title'));
+				$exclude_fields = array_merge($exclude_fields, ['website_url', 'website_title']);
 			}
 
 			// We used to accept signature on registration but it's being abused by spammers these days, so no more.
@@ -683,7 +685,7 @@ class Register extends AbstractController
 		}
 		else
 		{
-			$exclude_fields = array('signature', 'website_url', 'website_title');
+			$exclude_fields = ['signature', 'website_url', 'website_title'];
 		}
 
 		$possible_strings = array_diff($possible_strings, $exclude_fields);
@@ -691,7 +693,7 @@ class Register extends AbstractController
 		$possible_floats = array_diff($possible_floats, $exclude_fields);
 		$possible_bools = array_diff($possible_bools, $exclude_fields);
 
-		$extra_register_vars = array();
+		$extra_register_vars = [];
 
 		// Include the additional options that might have been filled in.
 		foreach ($possible_strings as $var)
@@ -740,7 +742,7 @@ class Register extends AbstractController
 	 *
 	 * @return bool true if the language was changed, false if not.
 	 */
-	private function _load_language_support()
+	private function _load_language_support(): bool
 	{
 		global $context, $modSettings, $language;
 
@@ -784,7 +786,7 @@ class Register extends AbstractController
 	 * @uses ProfileFields->loadCustomFields() Loads standard fields in to context
 	 * @uses setupProfileContext() Loads supplied fields in to context
 	 */
-	private function _load_profile_fields()
+	private function _load_profile_fields(): void
 	{
 		global $context, $modSettings, $cur_profile;
 
@@ -829,7 +831,7 @@ class Register extends AbstractController
 	 * - Checks if the user is already activate and if so does nothing
 	 * - Prevents a user from using an existing email
 	 */
-	public function action_activate()
+	public function action_activate(): void
 	{
 		global $context, $txt, $modSettings;
 
@@ -867,10 +869,10 @@ class Register extends AbstractController
 		$this->_row = findUser(empty($this->_req->query->u)
 			? 'member_name = {string:email_address} OR email_address = {string:email_address}'
 			: 'id_member = {int:id_member}',
-			array(
+			[
 				'id_member' => $this->_req->getQuery('u', 'intval', 0),
 				'email_address' => $this->_req->getPost('user', 'trim', ''),
-			), false
+			], false
 		);
 
 		// Does this user exist at all?
@@ -897,7 +899,7 @@ class Register extends AbstractController
 
 		// Validation complete - update the database!
 		require_once(SUBSDIR . '/Members.subs.php');
-		approveMembers(array('members' => array($this->_row['id_member']), 'activated_status' => $this->_row['is_activated']));
+		approveMembers(['members' => [$this->_row['id_member']], 'activated_status' => $this->_row['is_activated']]);
 
 		// Also do a proper member stat re-evaluation.
 		require_once(SUBSDIR . '/Members.subs.php');
@@ -909,14 +911,14 @@ class Register extends AbstractController
 			sendAdminNotifications('activation', $this->_row['id_member'], $this->_row['member_name']);
 		}
 
-		$context += array(
+		$context += [
 			'page_title' => $txt['registration_successful'],
 			'sub_template' => 'login',
 			'default_username' => $this->_row['member_name'],
 			'default_password' => '',
 			'never_expire' => false,
 			'description' => $txt['activate_success']
-		);
+		];
 	}
 
 	/**
@@ -927,7 +929,7 @@ class Register extends AbstractController
 	 * - Requires the user enter the id/password for the account
 	 * - The account must not be active 0 or awaiting reactivation 2
 	 */
-	private function _activate_change_email()
+	private function _activate_change_email(): bool
 	{
 		global $modSettings, $txt;
 
@@ -941,7 +943,7 @@ class Register extends AbstractController
 			}
 
 			// @todo Separate the sprintf?
-			if (!DataValidator::is_valid($this->_req->post, array('new_email' => 'valid_email|required|max_length[255]'), array('new_email' => 'trim')))
+			if (!DataValidator::is_valid($this->_req->post, ['new_email' => 'valid_email|required|max_length[255]'], ['new_email' => 'trim']))
 			{
 				throw new Exception(sprintf($txt['valid_email_needed'], htmlspecialchars($this->_req->post->new_email, ENT_COMPAT, 'UTF-8')), false);
 			}
@@ -953,11 +955,11 @@ class Register extends AbstractController
 			// @todo Separate the sprintf?
 			if (userByEmail($this->_req->post->new_email) === false)
 			{
-				throw new Exception('email_in_use', false, array(htmlspecialchars($this->_req->post->new_email, ENT_COMPAT, 'UTF-8')));
+				throw new Exception('email_in_use', false, [htmlspecialchars($this->_req->post->new_email, ENT_COMPAT, 'UTF-8')]);
 			}
 
 			require_once(SUBSDIR . '/Members.subs.php');
-			updateMemberData($this->_row['id_member'], array('email_address' => $this->_req->post->new_email));
+			updateMemberData($this->_row['id_member'], ['email_address' => $this->_req->post->new_email]);
 			$this->_row['email_address'] = $this->_req->post->new_email;
 
 			return true;
@@ -978,7 +980,7 @@ class Register extends AbstractController
 	 *
 	 * @throws Exception
 	 */
-	private function _activate_resend($email_change)
+	private function _activate_resend($email_change): void
 	{
 		global $scripturl, $modSettings, $language, $txt, $context;
 
@@ -993,16 +995,16 @@ class Register extends AbstractController
 			$this->_row['validation_code'] = substr(hash('sha256', $validation_code), 0, 10);
 
 			require_once(SUBSDIR . '/Members.subs.php');
-			updateMemberData($this->_row['id_member'], array('validation_code' => $this->_row['validation_code']));
+			updateMemberData($this->_row['id_member'], ['validation_code' => $this->_row['validation_code']]);
 
-			$replacements = array(
+			$replacements = [
 				'REALNAME' => $this->_row['real_name'],
 				'USERNAME' => $this->_row['member_name'],
 				'ACTIVATIONLINK' => $scripturl . '?action=register;sa=activate;u=' . $this->_row['id_member'] . ';code=' . $validation_code,
 				'ACTIVATIONLINKWITHOUTCODE' => $scripturl . '?action=register;sa=activate;u=' . $this->_row['id_member'],
 				'ACTIVATIONCODE' => $validation_code,
 				'FORGOTPASSWORDLINK' => $scripturl . '?action=reminder',
-			);
+			];
 
 			$emaildata = loadEmailTemplate('resend_activate_message', $replacements, empty($this->_row['lngfile']) || empty($modSettings['userLanguage']) ? $language : $this->_row['lngfile']);
 			sendmail($this->_row['email_address'], $emaildata['subject'], $emaildata['body'], null, null, false, 0);
@@ -1023,7 +1025,7 @@ class Register extends AbstractController
 	 *
 	 * @throws Exception already_activated, registration_not_approved
 	 */
-	private function _activate_validate_code()
+	private function _activate_validate_code(): bool
 	{
 		global $txt, $scripturl, $context;
 
@@ -1054,7 +1056,7 @@ class Register extends AbstractController
 	 *
 	 * - Used by registration template via xml request
 	 */
-	public function action_registerCheckUsername()
+	public function action_registerCheckUsername(): void
 	{
 		global $context;
 
@@ -1075,7 +1077,7 @@ class Register extends AbstractController
 		$context['valid_username'] = !$errors->hasErrors();
 	}
 
-	public function action_agreement()
+	public function action_agreement(): void
 	{
 		global $context, $modSettings, $txt;
 
@@ -1137,7 +1139,7 @@ class Register extends AbstractController
 	 *    - If the user declines the privacy policy, it redirects the user to the account deletion page.
 	 *    - If the user has not yet made a decision, it loads the registration agreement template for displaying the privacy policy.
 	 */
-	public function action_privacypol()
+	public function action_privacypol(): void
 	{
 		global $context, $modSettings, $txt;
 

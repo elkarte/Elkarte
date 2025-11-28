@@ -59,7 +59,7 @@ class Redis extends AbstractCacheMethod
 	 *
 	 * @return bool Returns true if the connection is active, false otherwise.
 	 */
-	public function isConnected()
+	public function isConnected(): bool
 	{
 		try
 		{
@@ -78,7 +78,7 @@ class Redis extends AbstractCacheMethod
 	 *
 	 * @return string|null
 	 */
-	private function _is_persist()
+	private function _is_persist(): ?string
 	{
 		global $db_persist;
 
@@ -88,7 +88,7 @@ class Redis extends AbstractCacheMethod
 	/**
 	 * {@inheritDoc}
 	 */
-	protected function setOptions()
+	protected function setOptions(): void
 	{
 		try
 		{
@@ -111,7 +111,7 @@ class Redis extends AbstractCacheMethod
 	/**
 	 * Returns the redis serializer value based on certain conditions.
 	 */
-	private function setSerializerValue()
+	private function setSerializerValue(): void
 	{
 		$serializer = $this->obj::SERIALIZER_PHP;
 		if (defined('Redis::SERIALIZER_IGBINARY') && extension_loaded('igbinary'))
@@ -134,7 +134,7 @@ class Redis extends AbstractCacheMethod
 	 *
 	 * @return bool True if there are servers in the daemon, false if not.
 	 */
-	protected function addServers()
+	protected function addServers(): bool
 	{
 		$retVal = false;
 
@@ -175,7 +175,7 @@ class Redis extends AbstractCacheMethod
 	 *
 	 * @return string A server name if we are attached.
 	 */
-	protected function getServers()
+	protected function getServers(): string
 	{
 		$server = '';
 
@@ -202,7 +202,7 @@ class Redis extends AbstractCacheMethod
 	 *
 	 * If the statistics cannot be obtained, an empty array is returned.
 	 */
-	public function getStats()
+	public function getStats(): array
 	{
 		$results = [];
 
@@ -273,7 +273,7 @@ class Redis extends AbstractCacheMethod
 	{
 		if (!$this->isConnected)
 		{
-			return false;
+			return null;
 		}
 
 		try

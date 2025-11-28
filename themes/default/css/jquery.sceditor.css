@@ -108,8 +108,8 @@
 	position: absolute;
 	z-index: 6;
 	/* 1/2 the diagonal length of this box) */
-	bottom: calc(100% - (1.4142 * var(--pointersize)) / 2 + .1rem);
-	left: 5%;
+	bottom: calc(100% - (1.4142 * var(--pointersize)) / 2 + .2rem);
+	left: 1.2rem;
 	display: block;
 	width: var(--pointersize);
 	height: var(--pointersize);
@@ -119,6 +119,8 @@
 	border-top-color: var(--secondary_border);
 	border-right-color: var(--secondary_border);
 	background: var(--content_background);
+	/* Clips the bottom of the rotated square so it does not bleed far into dropdown content */
+	clip-path: polygon(40% 60%, 0% 0%, 100% 0%, 100% 100%);
 	/* Simple variable to change if you want to change the size */
 	--pointersize: 1.2rem;
 }
@@ -459,7 +461,7 @@ a.sceditor-button-space, .sceditor-button-space div {
 
 /* Use larger buttons for targeting on the smaller screens
    -------------------------------------------------------------------------------------------*/
-@media screen and (max-width: 50em) {
+@media screen and (max-width: 51.5em) {
 	.sceditor-button div, .sceditor-button {
 		width: 3.6rem;
 		height: 3.6rem;

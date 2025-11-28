@@ -13,6 +13,7 @@ namespace ElkArte\AdminController;
 
 use ElkArte\AbstractController;
 use ElkArte\Cache\Cache;
+use ElkArte\Exceptions\Exception;
 use ElkArte\Helper\FileFunctions;
 use ElkArte\Helper\HttpReq;
 use ElkArte\Helper\UnZip;
@@ -34,7 +35,7 @@ abstract class ManageEmojiModule extends AbstractController
 	 *
 	 * @param array $config_vars
 	 */
-	public static function integrate_modify_smiley_settings(&$config_vars)
+	public static function integrate_modify_smiley_settings(array &$config_vars): void
 	{
 		global $txt;
 
@@ -58,7 +59,7 @@ abstract class ManageEmojiModule extends AbstractController
 	/**
 	 * Saves the ACP settings
 	 */
-	public static function integrate_save_smiley_settings()
+	public static function integrate_save_smiley_settings(): void
 	{
 		$req = HttpReq::instance();
 
@@ -81,8 +82,9 @@ abstract class ManageEmojiModule extends AbstractController
 	 * Unzips a selected Emoji set if it has not already been extracted
 	 *
 	 * @param HttpReq $req
+	 * @return bool
 	 */
-	private static function unZipEmoji($req)
+	private static function unZipEmoji(HttpReq $req): bool
 	{
 		$source = BOARDDIR . '/smileys/' . $req->post->emoji_selection . '/' . $req->post->emoji_selection . '.zip';
 		if (FileFunctions::instance()->fileExists($source))
@@ -103,7 +105,7 @@ abstract class ManageEmojiModule extends AbstractController
 	/**
 	 * If changing emoji sets, this simply removes the currently extracted set
 	 */
-	private static function removeEmoji($req)
+	private static function removeEmoji($req): bool
 	{
 		global $modSettings;
 
@@ -140,7 +142,7 @@ abstract class ManageEmojiModule extends AbstractController
 	 * @param $req
 	 * @return bool
 	 */
-	public static function copyEmojiToSmiley($req)
+	public static function copyEmojiToSmiley($req): bool
 	{
 		global $modSettings;
 

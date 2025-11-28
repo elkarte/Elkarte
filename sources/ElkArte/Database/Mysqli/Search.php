@@ -25,14 +25,14 @@ class Search extends AbstractSearch
 	 */
 	public function __construct($db)
 	{
-		$this->_supported_types = array('fulltext');
+		$this->_supported_types = ['fulltext'];
 		parent::__construct($db);
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
-	public function search_query($identifier, $db_string, $db_values = array(), $connection = null)
+	public function search_query($identifier, $db_string, $db_values = [], $connection = null)
 	{
 		// Simply delegate to the database adapter method.
 		return parent::search_query('', $db_string, $db_values);
@@ -45,7 +45,7 @@ class Search extends AbstractSearch
 	{
 		global $db_prefix;
 
-		$table_info = array();
+		$table_info = [];
 
 		if (preg_match('~^`(.+?)`\.(.+?)$~', $db_prefix, $match) !== 0)
 		{
@@ -53,10 +53,10 @@ class Search extends AbstractSearch
 				SHOW TABLE STATUS
 				FROM {string:database_name}
 				LIKE {string:table_name}',
-				array(
-					'database_name' => '`' . strtr($match[1], array('`' => '')) . '`',
+				[
+					'database_name' => '`' . strtr($match[1], ['`' => '']) . '`',
 					'table_name' => str_replace('_', '\_', $match[2]) . 'messages',
-				)
+				]
 			);
 		}
 		else
@@ -64,9 +64,9 @@ class Search extends AbstractSearch
 			$request = $this->_db->query('', '
 				SHOW TABLE STATUS
 				LIKE {string:table_name}',
-				array(
+				[
 					'table_name' => str_replace('_', '\_', $db_prefix) . 'messages',
-				)
+				]
 			);
 		}
 
@@ -87,10 +87,10 @@ class Search extends AbstractSearch
 				SHOW TABLE STATUS
 				FROM {string:database_name}
 				LIKE {string:table_name}',
-				array(
-					'database_name' => '`' . strtr($match[1], array('`' => '')) . '`',
+				[
+					'database_name' => '`' . strtr($match[1], ['`' => '']) . '`',
 					'table_name' => str_replace('_', '\_', $match[2]) . 'log_search_words',
-				)
+				]
 			);
 		}
 		else
@@ -98,9 +98,9 @@ class Search extends AbstractSearch
 			$request = $this->_db->query('', '
 				SHOW TABLE STATUS
 				LIKE {string:table_name}',
-				array(
+				[
 					'table_name' => str_replace('_', '\_', $db_prefix) . 'log_search_words',
-				)
+				]
 			);
 		}
 

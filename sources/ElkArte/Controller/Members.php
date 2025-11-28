@@ -38,10 +38,10 @@ class Members extends AbstractController
 		global $context;
 
 		// Little short on the list here
-		$subActions = array(
-			'add' => array($this, 'action_addbuddy', 'permission' => 'profile_identity_own'),
-			'remove' => array($this, 'action_removebuddy', 'permission' => 'profile_identity_own'),
-		);
+		$subActions = [
+			'add' => [$this, 'action_addbuddy', 'permission' => 'profile_identity_own'],
+			'remove' => [$this, 'action_removebuddy', 'permission' => 'profile_identity_own'],
+		];
 
 		// I don't think we know what to do... throw dies?
 		$action = new Action('members');
@@ -56,7 +56,7 @@ class Members extends AbstractController
 	 * - Called by ?action=buddy;u=x;session_id=y.
 	 * - Redirects to ?action=profile;u=x.
 	 */
-	public function action_addbuddy()
+	public function action_addbuddy(): void
 	{
 		global $modSettings;
 
@@ -72,7 +72,7 @@ class Members extends AbstractController
 			throw new Exception('no_access', false);
 		}
 
-		call_integration_hook('integrate_add_buddies', array($this->user->id, &$user));
+		call_integration_hook('integrate_add_buddies', [$this->user->id, &$user]);
 
 		// Add if it's not there (and not you).
 		if (!in_array($user, $this->user->buddies) && $this->user->id != $user)
@@ -87,14 +87,14 @@ class Members extends AbstractController
 					'buddy',
 					$user,
 					$this->user->id,
-					array('id_members' => array($user))
+					['id_members' => [$user]]
 				));
 			}
 		}
 
 		// Update the settings.
 		require_once(SUBSDIR . '/Members.subs.php');
-		updateMemberData($this->user->id, array('buddy_list' => implode(',', $this->user->buddies)));
+		updateMemberData($this->user->id, ['buddy_list' => implode(',', $this->user->buddies)]);
 
 		// Redirect back to the profile
 		redirectexit('action=profile;u=' . $user);
@@ -106,12 +106,12 @@ class Members extends AbstractController
 	 * - Called by ?action=buddy;u=x;session_id=y.
 	 * - Redirects to ?action=profile;u=x.
 	 */
-	public function action_removebuddy()
+	public function action_removebuddy(): void
 	{
 		checkSession('get');
 		is_not_guest();
 
-		call_integration_hook('integrate_remove_buddy', array($this->user->id));
+		call_integration_hook('integrate_remove_buddy', [$this->user->id]);
 
 		// Yeah, they are no longer cool
 		$user = $this->_req->getQuery('u', 'intval', '');
@@ -125,12 +125,12 @@ class Members extends AbstractController
 		// Remove this user, assuming we can find them
 		if (in_array($user, $this->user->buddies))
 		{
-			$this->user->buddies = array_diff($this->user->buddies, array($user));
+			$this->user->buddies = array_diff($this->user->buddies, [$user]);
 		}
 
 		// Update the settings.
 		require_once(SUBSDIR . '/Members.subs.php');
-		updateMemberData($this->user->id, array('buddy_list' => implode(',', $this->user->buddies)));
+		updateMemberData($this->user->id, ['buddy_list' => implode(',', $this->user->buddies)]);
 
 		// Redirect back to the profile
 		redirectexit('action=profile;u=' . $user);

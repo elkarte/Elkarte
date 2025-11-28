@@ -13,26 +13,28 @@
 
 namespace ElkArte\Attachments;
 
+use ElkArte\User;
+
 /**
  * Class AttachmentsDisplay
  */
 class AttachmentsDisplay
 {
 	/** @var array The good old attachments array */
-	protected $attachments = [];
+	public array $attachments = [];
 
 	/** @var array The message array */
-	protected $messages = [];
+	protected array $messages = [];
 
 	/** @var bool If unapproved posts/attachments should be shown */
-	protected $includeUnapproved = false;
+	protected bool $includeUnapproved = false;
 
 	/**
 	 * @param int[] $messages
 	 * @param int[] $posters
 	 * @param bool $includeUnapproved
 	 */
-	public function __construct($messages, $posters, $includeUnapproved)
+	public function __construct(array $messages, array $posters, bool $includeUnapproved)
 	{
 		$this->messages = $messages;
 		$this->includeUnapproved = $includeUnapproved;
@@ -52,7 +54,7 @@ class AttachmentsDisplay
 			$this->getAttachments(
 				$this->messages,
 				$this->includeUnapproved,
-				static fn($attachment_info, $all_posters) => !(!$attachment_info['approved'] && (!isset($all_posters[$attachment_info['id_msg']]) || $all_posters[$attachment_info['id_msg']] !== \ElkArte\User::$info->id)),
+				static fn($attachment_info, $all_posters) => !(!$attachment_info['approved'] && (!isset($all_posters[$attachment_info['id_msg']]) || $all_posters[$attachment_info['id_msg']] !== User::$info->id)),
 				$posters
 			);
 		}
@@ -66,18 +68,18 @@ class AttachmentsDisplay
 	 *
 	 * @param int[] $messages array of messages ids
 	 * @param bool $includeUnapproved = false
-	 * @param string|null $filter name of a callback function
+	 * @param callable|null $filter name of a callback function
 	 * @param array $all_posters
 	 *
 	 */
-	protected function getAttachments($messages, $includeUnapproved = false, $filter = null, $all_posters = array())
+	protected function getAttachments(array $messages, bool $includeUnapproved = false, callable $filter = null, array $all_posters = []): void
 	{
 		global $modSettings;
 
 		$db = database();
 
-		$attachments = array();
-		$temp = array();
+		$attachments = [];
+		$temp = [];
 		$db->fetchQuery('
 			SELECT
 				a.id_attach, a.id_folder, a.id_msg, a.filename, a.file_hash, COALESCE(a.size, 0) AS filesize, a.downloads, a.approved,
@@ -87,10 +89,10 @@ class AttachmentsDisplay
 				LEFT JOIN {db_prefix}attachments AS thumb ON (thumb.id_attach = a.id_thumb)') . '
 			WHERE a.id_msg IN ({array_int:message_list})
 				AND a.attachment_type = {int:attachment_type}',
-			array(
+			[
 				'message_list' => $messages,
 				'attachment_type' => 0,
-			)
+			]
 		)->fetch_callback(
 			static function ($row) use ($includeUnapproved, $filter, $all_posters, &$attachments, &$temp) {
 				if (!$row['approved'] && !$includeUnapproved
@@ -101,7 +103,7 @@ class AttachmentsDisplay
 				$temp[$row['id_attach']] = $row;
 				if (!isset($attachments[$row['id_msg']]))
 				{
-					$attachments[$row['id_msg']] = array();
+					$attachments[$row['id_msg']] = [];
 				}
 			}
 		);
@@ -132,7 +134,7 @@ class AttachmentsDisplay
 	 * @todo change this pre-condition, too fragile and error-prone.
 	 *
 	 */
-	public function loadAttachmentContext($id_msg)
+	public function loadAttachmentContext(int $id_msg): array
 	{
 		global $context, $modSettings, $scripturl, $topic;
 
@@ -145,7 +147,7 @@ class AttachmentsDisplay
 		{
 			foreach ($this->attachments[$id_msg] as $i => $attachment)
 			{
-				$attachmentData[$i] = array(
+				$attachmentData[$i] = [
 					'id' => $attachment['id_attach'],
 					'name' => preg_replace('~&amp;#(\\d{1,7}|x[0-9a-fA-F]{1,6});~', '&#\\1;', htmlspecialchars($attachment['filename'], ENT_COMPAT, 'UTF-8')),
 					'downloads' => $attachment['downloads'],
@@ -156,7 +158,7 @@ class AttachmentsDisplay
 					'is_image' => !empty($attachment['width']) && !empty($attachment['height']) && !empty($modSettings['attachmentShowImages']),
 					'is_approved' => $attachment['approved'],
 					'file_hash' => $attachment['file_hash'],
-				);
+				];
 
 				// If something is unapproved we'll note it so we can sort them.
 				if (!$attachment['approved'])
@@ -201,7 +203,7 @@ class AttachmentsDisplay
 	 * @param $id_msg
 	 * @return void
 	 */
-	public function prepareAttachmentImage(&$attachmentData, $attachment, $id_msg)
+	public function prepareAttachmentImage(&$attachmentData, $attachment, $id_msg): void
 	{
 		global $modSettings, $topic;
 
@@ -220,7 +222,6 @@ class AttachmentsDisplay
 			if (empty($attachment['id_thumb'])
 				|| $attachment['thumb_width'] > $modSettings['attachmentThumbWidth']
 				|| $attachment['thumb_height'] > $modSettings['attachmentThumbHeight'])
-				//|| ($attachment['thumb_width'] < $modSettings['attachmentThumbWidth'] && $attachment['thumb_height'] < $modSettings['attachmentThumbHeight']))
 			{
 				$filename = getAttachmentFilename($attachment['filename'], $attachment['id_attach'], $attachment['id_folder'], false, $attachment['file_hash']);
 				$attachment = array_merge($attachment, updateAttachmentThumbnail($filename, $attachment['id_attach'], $id_msg, $attachment['id_thumb'], $attachment['filename']));
@@ -237,10 +238,10 @@ class AttachmentsDisplay
 		// If we have a thumbnail, make note of it!
 		if (!empty($attachment['id_thumb']))
 		{
-			$attachmentData['thumbnail'] = array(
+			$attachmentData['thumbnail'] = [
 				'id' => $attachment['id_thumb'],
 				'href' => getUrl('action', ['action' => 'dlattach', 'topic' => $topic . '.0', 'attach' => $attachment['id_thumb'], 'image']),
-			);
+			];
 		}
 
 		$attachmentData['thumbnail']['has_thumb'] = !empty($attachment['id_thumb']);
@@ -269,5 +270,41 @@ class AttachmentsDisplay
 		{
 			$attachmentData['downloads']++;
 		}
+	}
+
+	/**
+	 * Returns the array of attachments produced from getAttachments())
+	 *
+	 * @return array An array of attachments indexed by message ID
+	 */
+	public function getAttachmentsArray(): array
+	{
+		return $this->attachments;
+	}
+
+	/**
+	 * Returns only the attachment data array for a given message
+	 *
+	 * @param int $id_msg message ID to load attachments for
+	 * @return array attachment data
+	 */
+	public function getAttachmentData(int $id_msg): array
+	{
+		[$attachmentData, ] = $this->loadAttachmentContext($id_msg);
+
+		return $attachmentData;
+	}
+
+	/**
+	 * Returns only the ILA (inline attachment) data array for a given message
+	 *
+	 * @param int $id_msg message ID to load attachments for
+	 * @return array ILA data
+	 */
+	public function getIlaData(int $id_msg): array
+	{
+		[, $ilaData] = $this->loadAttachmentContext($id_msg);
+
+		return $ilaData;
 	}
 }

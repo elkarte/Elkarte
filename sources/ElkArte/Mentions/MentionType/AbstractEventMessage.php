@@ -89,7 +89,7 @@ abstract class AbstractEventMessage implements EventInterface
 	 * @param string[] $row A text string on which replacements are done
 	 * @return string the input string with the placeholders replaced
 	 */
-	protected function _replaceMsg($row)
+	protected function _replaceMsg($row): string
 	{
 		global $txt, $scripturl, $context;
 

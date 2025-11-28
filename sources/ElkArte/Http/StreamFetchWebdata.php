@@ -71,7 +71,7 @@ class StreamFetchWebdata
 	 * @param string $url
 	 * @param string|string[] $post_data
 	 */
-	public function get_url_data($url, $post_data = '')
+	public function get_url_data($url, $post_data = ''): void
 	{
 		// Prepare any given post data
 		if (!empty($post_data))
@@ -101,7 +101,7 @@ class StreamFetchWebdata
 	 *
 	 * @return bool
 	 */
-	private function _openRequest($url)
+	private function _openRequest($url): bool
 	{
 		// Build the stream options array
 		$this->_setOptions($url);
@@ -129,7 +129,7 @@ class StreamFetchWebdata
 	 *
 	 * @param string $url
 	 */
-	private function _setOptions($url)
+	private function _setOptions($url): void
 	{
 		$this->_url = [];
 
@@ -185,7 +185,7 @@ class StreamFetchWebdata
 	 *
 	 * @return bool
 	 */
-	private function _makeRequest()
+	private function _makeRequest(): bool
 	{
 		try
 		{
@@ -205,11 +205,11 @@ class StreamFetchWebdata
 	/**
 	 * Fetch the headers and parse the meta data into the results we need
 	 */
-	private function _parseRequest()
+	private function _parseRequest(): void
 	{
 		// header information as well as meta data
 		$headers = stream_get_meta_data($this->_fp);
-		$this->_response['headers'] = array();
+		$this->_response['headers'] = [];
 		$this->_response['redirects'] = 0;
 		$this->_response['code'] = '???';
 
@@ -239,7 +239,7 @@ class StreamFetchWebdata
 			{
 				if (is_string($this->_response['headers'][$name]))
 				{
-					$this->_response['headers'][$name] = array($this->_response['headers'][$name]);
+					$this->_response['headers'][$name] = [$this->_response['headers'][$name]];
 				}
 
 				$this->_response['headers'][$name][] = $value;
@@ -254,7 +254,7 @@ class StreamFetchWebdata
 	/**
 	 * Read the response up to the end of the headers
 	 */
-	private function _processHeaders()
+	private function _processHeaders(): void
 	{
 		// Were we redirected, if so lets find out where
 		if (!empty($this->_response['headers']['location']))
@@ -271,7 +271,7 @@ class StreamFetchWebdata
 		}
 
 		// Provide a common "valid" return code to the caller
-		if (in_array($this->_response['code'], array(200, 201, 206)))
+		if (in_array($this->_response['code'], [200, 201, 206]))
 		{
 			$this->_response['code_orig'] = $this->_response['code'];
 			$this->_response['code'] = 200;

@@ -57,7 +57,7 @@ class Email extends AbstractNotifier
 	 * @param NotificationsTask $task
 	 * @param array $bodies
 	 */
-	protected function _send_email(NotificationInterface $obj, NotificationsTask $task, $bodies)
+	protected function _send_email(NotificationInterface $obj, NotificationsTask $task, $bodies): void
 	{
 		$last_id = $obj->getLastId();
 		foreach ($bodies as $body)

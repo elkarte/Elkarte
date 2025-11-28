@@ -83,7 +83,7 @@ class Cache
 	 *
 	 * @return $this
 	 */
-	public function enable($enable)
+	public function enable($enable): self
 	{
 		// Enable it if we can
 		if (!$this->enabled && $this->_cache_obj === null)
@@ -99,7 +99,7 @@ class Cache
 	/**
 	 * Initialize a cache class and call its initialization method
 	 */
-	protected function _init()
+	protected function _init(): void
 	{
 		$cache_class = '\\ElkArte\\Cache\\CacheMethod\\' . $this->_accelerator;
 
@@ -120,7 +120,7 @@ class Cache
 	/**
 	 * Set $_key_prefix to a "unique" value based on timestamp of a file
 	 */
-	protected function _build_prefix()
+	protected function _build_prefix(): void
 	{
 		global $boardurl;
 
@@ -137,7 +137,7 @@ class Cache
 	 *
 	 * @return bool
 	 */
-	public function isEnabled()
+	public function isEnabled(): bool
 	{
 		return $this->enabled;
 	}
@@ -147,7 +147,7 @@ class Cache
 	 *
 	 * @return AbstractCacheMethod|null
 	 */
-	public function getCacheEngine()
+	public function getCacheEngine(): ?AbstractCacheMethod
 	{
 		return $this->_cache_obj;
 	}
@@ -157,7 +157,7 @@ class Cache
 	 *
 	 * @return string
 	 */
-	public function getAccelerator()
+	public function getAccelerator(): string
 	{
 		return $this->_accelerator;
 	}
@@ -240,7 +240,14 @@ class Cache
 
 		call_integration_hook('cache_get_data', [$key, $ttl, $value]);
 
-		return empty($value) ? null : Util::unserialize($value);
+		if (!empty($value))
+		{
+			$cacheHit = Util::unserialize($value);
+			return ($cacheHit === false) ? null : $cacheHit;
+
+		}
+
+		return null;
 	}
 
 	/**
@@ -250,7 +257,7 @@ class Cache
 	 *
 	 * @return string
 	 */
-	protected function _key($key)
+	protected function _key($key): string
 	{
 		return $this->_key_prefix . $this->_cache_obj->fixkey($key);
 	}
@@ -271,7 +278,7 @@ class Cache
 	 * @param string|int|array|null $value
 	 * @param int $ttl = 120
 	 */
-	public function put($key, $value, $ttl = 120)
+	public function put($key, $value, $ttl = 120): void
 	{
 		global $db_show_debug;
 
@@ -320,7 +327,7 @@ class Cache
 	 *
 	 * @return array
 	 */
-	public function quick_get($key, $file, $function, $params, $level = 1)
+	public function quick_get($key, $file, $function, $params, $level = 1): array
 	{
 		call_integration_hook('pre_cache_quick_get', [&$key, &$file, &$function, &$params, &$level]);
 
@@ -367,7 +374,7 @@ class Cache
 	 *
 	 * @return null|bool if it was a hit
 	 */
-	public function getVar(&$var, $key, $ttl = 120)
+	public function getVar(&$var, $key, $ttl = 120): ?bool
 	{
 		$var = $this->get($key, $ttl);
 
@@ -377,9 +384,9 @@ class Cache
 	/**
 	 * @return bool If the result of the last get was a miss
 	 */
-	public function isMiss()
+	public function isMiss(): bool
 	{
-		return $this->isEnabled() ? $this->_cache_obj->isMiss() : true;
+		return !$this->isEnabled() || $this->_cache_obj->isMiss();
 	}
 
 	/**
@@ -394,7 +401,7 @@ class Cache
 	 *
 	 * @param string $type = ''
 	 */
-	public function clean($type = '')
+	public function clean($type = ''): void
 	{
 		if (!$this->isEnabled())
 		{
@@ -418,7 +425,7 @@ class Cache
 	 *
 	 * @return int The current level.
 	 */
-	public function getLevel()
+	public function getLevel(): int
 	{
 		return $this->level;
 	}
@@ -430,7 +437,7 @@ class Cache
 	 *
 	 * @return $this
 	 */
-	public function setLevel($level)
+	public function setLevel($level): self
 	{
 		$this->level = (int) $level;
 
@@ -450,7 +457,7 @@ class Cache
 	 *
 	 * @return bool
 	 */
-	public function levelHigherThan($level)
+	public function levelHigherThan($level): bool
 	{
 		return $this->isEnabled() && $this->level > $level;
 	}
@@ -464,7 +471,7 @@ class Cache
 	 *
 	 * @return bool
 	 */
-	public function levelLowerThan($level)
+	public function levelLowerThan($level): bool
 	{
 		if (!$this->isEnabled())
 		{
@@ -477,7 +484,7 @@ class Cache
 	/**
 	 * @param $key
 	 */
-	public function remove($key)
+	public function remove($key): void
 	{
 		if (!$this->isEnabled())
 		{
@@ -498,7 +505,7 @@ class Cache
 	 * @param string $delimiter The delimiter used by preg_match.
 	 * @param string $modifiers Any modifier required by the regexp.
 	 */
-	public function removeKeys($keys_match, $delimiter = '~', $modifiers = '')
+	public function removeKeys($keys_match, $delimiter = '~', $modifiers = ''): void
 	{
 		if (!$this->isEnabled())
 		{

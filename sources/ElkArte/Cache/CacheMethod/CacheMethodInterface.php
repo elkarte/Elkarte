@@ -43,6 +43,7 @@ interface CacheMethodInterface
 	 * @param string $key
 	 * @param string|int|array|null $value
 	 * @param int $ttl = 120
+	 * @return null|mixed
 	 */
 	public function put($key, $value, $ttl = 120);
 
@@ -52,7 +53,7 @@ interface CacheMethodInterface
 	 *
 	 * @param string $key
 	 * @param int $ttl = 120
-	 * @return null|array
+	 * @return null|mixed
 	 */
 	public function get($key, $ttl = 120);
 

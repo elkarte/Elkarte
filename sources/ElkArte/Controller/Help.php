@@ -49,7 +49,7 @@ class Help extends AbstractController
 	/**
 	 * Simply redirects to the ElkArte wiki
 	 */
-	public function action_help()
+	public function action_help(): void
 	{
 		redirectexit('https://github.com/elkarte/Elkarte/wiki');
 	}
@@ -66,7 +66,7 @@ class Help extends AbstractController
 	 * @uses ManagePermissions language file, if the help starts with permissionhelp.
 	 * @uses Help template, 'popup' sub-template.
 	 */
-	public function action_quickhelp()
+	public function action_quickhelp(): void
 	{
 		global $txt, $helptxt, $context;
 
@@ -77,7 +77,7 @@ class Help extends AbstractController
 
 		if (!isset($helptxt))
 		{
-			$helptxt = array();
+			$helptxt = [];
 		}
 
 		$help_str = Util::htmlspecialchars($this->_req->query->help);

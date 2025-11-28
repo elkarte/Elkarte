@@ -45,7 +45,7 @@ class ParseQuery extends AbstractParseQuery
 	 * @param string $query The semantic query
 	 * @return string $query The corresponding standard query
 	 */
-	protected function standard($query)
+	protected function standard($query): string
 	{
 		return $query;
 	}
@@ -56,7 +56,7 @@ class ParseQuery extends AbstractParseQuery
 	 * @param string $query The semantic query
 	 * @return string $query The corresponding standard query
 	 */
-	protected function board($query)
+	protected function board($query): string
 	{
 		return 'board=' . $this->process($query);
 	}
@@ -69,7 +69,7 @@ class ParseQuery extends AbstractParseQuery
 	 * @param string $query The semantic query
 	 * @return string $query The corresponding standard query
 	 */
-	protected function process($query)
+	protected function process($query): string
 	{
 		preg_match('~(?!board|topic),(\d+)\.([^\.]+)\.html(.*)~', $query, $parts);
 
@@ -82,7 +82,7 @@ class ParseQuery extends AbstractParseQuery
 	 * @param string $query The semantic query
 	 * @return string $query The corresponding standard query
 	 */
-	protected function topic($query)
+	protected function topic($query): string
 	{
 		return 'topic=' . $this->process($query);
 	}

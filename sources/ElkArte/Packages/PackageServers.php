@@ -126,7 +126,7 @@ class PackageServers extends AbstractController
 	 *
 	 * - Accessed by action=admin;area=packageservers;sa=servers
 	 */
-	public function action_list()
+	public function action_list(): void
 	{
 		global $txt, $context;
 
@@ -152,7 +152,7 @@ class PackageServers extends AbstractController
 	 * - It sets the $context['package_download_broken'] status for the template.
 	 * - Used by package servers pages.
 	 */
-	public function ftp_connect()
+	public function ftp_connect(): void
 	{
 		global $context, $modSettings, $txt;
 
@@ -254,7 +254,7 @@ class PackageServers extends AbstractController
 	 *
 	 * - Accessed by action=admin;area=packageservers;sa=browse
 	 */
-	public function action_browse()
+	public function action_browse(): void
 	{
 		global $txt, $context;
 
@@ -299,7 +299,7 @@ class PackageServers extends AbstractController
 	 *
 	 * @return array
 	 */
-	private function _package_server()
+	private function _package_server(): array
 	{
 		$modSettings['elkarte_addon_server'] = $modSettings['elkarte_addon_server'] ?? 'https://elkarte.github.io/addons/package.json';
 
@@ -320,7 +320,7 @@ class PackageServers extends AbstractController
 	 *
 	 * @return array
 	 */
-	private function _load_package_json($thisPackage, $packageSection)
+	private function _load_package_json($thisPackage, $packageSection): array
 	{
 		// Populate the package info from the fetched data
 		return [
@@ -357,7 +357,7 @@ class PackageServers extends AbstractController
 	 *
 	 * @return string[]
 	 */
-	private function _assume_id($thisPackage)
+	private function _assume_id($thisPackage): array
 	{
 		$under = str_replace(' ', '_', $thisPackage->title);
 		$none = str_replace(' ', '', $thisPackage->title);
@@ -385,7 +385,7 @@ class PackageServers extends AbstractController
 	 *
 	 * @return string
 	 */
-	private function _rename_master($name)
+	private function _rename_master($name): string
 	{
 		// Is this a "master" package from github or bitbucket?
 		if (preg_match('~^http(s)?://(www.)?(bitbucket\.org|github\.com)/(.+?(master(\.zip|\.tar\.gz)))$~', $name, $matches) === 1)
@@ -419,7 +419,7 @@ class PackageServers extends AbstractController
 	 *
 	 * @return int
 	 */
-	public function package_sort($a, $b)
+	public function package_sort($a, $b): int
 	{
 		return strcasecmp($a['name'], $b['name']);
 	}
@@ -437,7 +437,7 @@ class PackageServers extends AbstractController
 	 *     - github and bitbucket master files are renamed to repo name to avoid collisions
 	 * - Files are saved to the package directory and validate to be ElkArte packages
 	 */
-	public function action_download()
+	public function action_download(): void
 	{
 		global $txt, $context;
 
@@ -590,7 +590,7 @@ class PackageServers extends AbstractController
 	 *
 	 * - Accessed by action=admin;area=packageservers;sa=upload2
 	 */
-	public function action_upload2()
+	public function action_upload2(): void
 	{
 		global $txt, $context;
 
@@ -710,7 +710,7 @@ class PackageServers extends AbstractController
 	 *
 	 * @return string Returns an HTML link for the package action.
 	 */
-	public function getInstallLink($type, $filename, $action = 'install')
+	public function getInstallLink($type, $filename, $action = 'install'): string
 	{
 		global $txt;
 
@@ -726,7 +726,7 @@ class PackageServers extends AbstractController
 	 *
 	 * @return void
 	 */
-	public function ifWeReceivedData(mixed $packageListing, string $name, $mod_section_count)
+	public function ifWeReceivedData(mixed $packageListing, string $name, $mod_section_count): void
 	{
 		global $context;
 

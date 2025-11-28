@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This parses PHP server variables, and initializes its own checking variables for use
+ * This parses PHP server variables and initializes its own checking variables for use
  *
  * @package   ElkArte Forum
  * @copyright ElkArte Forum contributors
@@ -50,6 +50,9 @@ final class Request
 	/** @var string This is the pattern of a local (or unknown) IP address in both IPv4 and IPv6 */
 	private $_local_ip_pattern = '((0|10|172\.(1[6-9]|2[0-9]|3[01])|192\.168|255|127)\.|unknown|::1|fe80::|fc00::)';
 
+	/** @var string An IPv4-Mapped IPv6 address (i.e., a legacy IPv4 address is being sent in an IPv6 format) */
+	private $_ip4_mapped = '::ffff:(\d+\.\d+\.\d+\.\d+)';
+
 	/** @var string Local copy of the server query string */
 	private $_server_query_string;
 
@@ -93,7 +96,7 @@ final class Request
 	/**
 	 * Finds the claimed client IP for this connection
 	 */
-	private function _getClientIP()
+	private function _getClientIP(): void
 	{
 		// Client IP: REMOTE_ADDR, unless missing
 		if (!isset($_SERVER['REMOTE_ADDR']))
@@ -102,9 +105,10 @@ final class Request
 			$this->_client_ip = '';
 		}
 		// Perhaps we have a IPv6 address.
-		elseif (!isValidIPv6($_SERVER['REMOTE_ADDR']) || preg_match('~::ffff:\d+\.\d+\.\d+\.\d+~', $_SERVER['REMOTE_ADDR']) !== 0)
+		elseif (!isValidIPv6($_SERVER['REMOTE_ADDR']) || preg_match('~' . $this->_ip4_mapped . '~', $_SERVER['REMOTE_ADDR']) === 1)
 		{
-			$this->_client_ip = preg_replace('~^::ffff:(\d+\.\d+\.\d+\.\d+)~', '\1', $_SERVER['REMOTE_ADDR']);
+			// If really an ip4, extract it as such
+			$this->_client_ip = preg_replace('~^' . $this->_ip4_mapped . '~', '\1', $_SERVER['REMOTE_ADDR']);
 
 			// Just in case we have a legacy IPv4 address.
 			// @ TODO: Convert to IPv6.
@@ -128,52 +132,37 @@ final class Request
 	/**
 	 * Hunts in most request areas for connection IP's for use in banning
 	 */
-	private function _getBanIP()
+	private function _getBanIP(): void
 	{
 		// Start off the same as the client ip
 		$this->_ban_ip = $this->_client_ip;
 
-		// Forwarded, maybe?
-		if (!empty($_SERVER['HTTP_X_FORWARDED_FOR']) && !empty($_SERVER['HTTP_CLIENT_IP']) && (preg_match('~^' . $this->_local_ip_pattern . '~', $_SERVER['HTTP_CLIENT_IP']) !== 1 || preg_match('~^' . $this->_local_ip_pattern . '~', $this->_client_ip) === 1))
+		$IPheaders = ['HTTP_X_FORWARDED_FOR', 'HTTP_CLIENT_IP', 'HTTP_X_REAL_IP', 'HTTP_CF_CONNECTING_IP'];
+		foreach ($IPheaders as $IPheader)
 		{
-			// Check the first forwarded for as the block - only switch if it's better that way.
-			if (strtok($_SERVER['HTTP_X_FORWARDED_FOR'], '.') !== strtok($_SERVER['HTTP_CLIENT_IP'], '.')
-				&& '.' . strtok($_SERVER['HTTP_X_FORWARDED_FOR'], '.') === strrchr($_SERVER['HTTP_CLIENT_IP'], '.')
-				&& (preg_match('~^((0|10|172\.(1[6-9]|2\d|3[01])|192\.168|255|127)\.|unknown)~', $_SERVER['HTTP_X_FORWARDED_FOR']) !== 1 || preg_match('~^((0|10|172\.(1[6-9]|2\d|3[01])|192\.168|255|127)\.|unknown)~', $this->_client_ip) === 1))
+			if (!isset($_SERVER[$IPheader]))
 			{
-				$this->_ban_ip = implode('.', array_reverse(explode('.', $_SERVER['HTTP_CLIENT_IP'])));
+				continue;
 			}
-			else
-			{
-				$this->_ban_ip = $_SERVER['HTTP_CLIENT_IP'];
-			}
-		}
 
-		if (!empty($_SERVER['HTTP_CLIENT_IP']) && (preg_match('~^' . $this->_local_ip_pattern . '~', $_SERVER['HTTP_CLIENT_IP']) == 0 || preg_match('~^' . $this->_local_ip_pattern . '~', $this->_client_ip) != 0))
-		{
-			// Since they are in different blocks, it's probably reversed.
-			if (strtok($this->_client_ip, '.') !== strtok($_SERVER['HTTP_CLIENT_IP'], '.'))
+			// If there are commas, get the last one (probably).
+			if (strpos($_SERVER[$IPheader], ',') !== false)
 			{
-				$this->_ban_ip = implode('.', array_reverse(explode('.', $_SERVER['HTTP_CLIENT_IP'])));
-			}
-			else
-			{
-				$this->_ban_ip = $_SERVER['HTTP_CLIENT_IP'];
-			}
-		}
-		elseif (!empty($_SERVER['HTTP_X_FORWARDED_FOR']))
-		{
-			// If there are commas, get the last one.. probably.
-			if (strpos($_SERVER['HTTP_X_FORWARDED_FOR'], ',') !== false)
-			{
-				$ips = array_reverse(explode(', ', $_SERVER['HTTP_X_FORWARDED_FOR']));
+				$ips = array_reverse(explode(', ', $_SERVER[$IPheader]));
 
 				// Go through each IP...
 				foreach ($ips as $ip)
 				{
 					// Make sure it's in a valid range...
-					if (preg_match('~^' . $this->_local_ip_pattern . '~', $ip) != 0 && preg_match('~^' . $this->_local_ip_pattern . '~', $this->_client_ip) == 0)
+					if (preg_match('~^' . $this->_local_ip_pattern . '~', $ip) === 1
+						&& preg_match('~^' . $this->_local_ip_pattern . '~', $_SERVER['REMOTE_ADDR']) !== 1)
 					{
+						if (!isValidIPv6($_SERVER[$IPheader])
+							|| preg_match('~' .$this->_ip4_mapped . '~', $_SERVER[$IPheader]) === 1)
+						{
+							$_SERVER[$IPheader] = preg_replace('~^' . $this->_ip4_mapped . '~', '\1', $_SERVER[$IPheader]);
+						}
+
 						continue;
 					}
 
@@ -182,10 +171,16 @@ final class Request
 					break;
 				}
 			}
-			// Otherwise just use the only one.
-			elseif (preg_match('~^' . $this->_local_ip_pattern . '~', $_SERVER['HTTP_X_FORWARDED_FOR']) !== 1 || preg_match('~^' . $this->_local_ip_pattern . '~', $this->_client_ip) === 1)
+			// Otherwise use the only IP given.
+			elseif (preg_match('~^' . $this->_local_ip_pattern . '~', $_SERVER[$IPheader]) !== 1
+				|| preg_match('~^' . $this->_local_ip_pattern . '~', $_SERVER['REMOTE_ADDR']) === 1)
 			{
-				$this->_ban_ip = $_SERVER['HTTP_X_FORWARDED_FOR'];
+				$this->_ban_ip = $_SERVER[$IPheader];
+			}
+			elseif (!isValidIPv6($_SERVER[$IPheader])
+				|| preg_match('~' . $this->_ip4_mapped . '~', $_SERVER[$IPheader]) === 1)
+			{
+				$_SERVER[$IPheader] = preg_replace('~^' . $this->_ip4_mapped . '~', '\1', $_SERVER[$IPheader]);
 			}
 		}
 
@@ -208,7 +203,7 @@ final class Request
 	 *
 	 * @return Request
 	 */
-	public static function instance()
+	public static function instance(): Request
 	{
 		if (self::$_instance === null)
 		{
@@ -224,7 +219,7 @@ final class Request
 	 * - It can be identical with client IP (and many times it will be).
 	 * - If the secondary IP is empty, then the client IP is returned
 	 */
-	public function ban_ip()
+	public function ban_ip(): string
 	{
 		return empty($this->_ban_ip) ? $this->client_ip() : $this->_ban_ip;
 	}
@@ -232,7 +227,7 @@ final class Request
 	/**
 	 * Retrieves client IP
 	 */
-	public function client_ip()
+	public function client_ip(): string
 	{
 		return $this->_client_ip;
 	}
@@ -240,7 +235,7 @@ final class Request
 	/**
 	 * Return the HTTP scheme
 	 */
-	public function scheme()
+	public function scheme(): string
 	{
 		return $this->_scheme;
 	}
@@ -248,7 +243,7 @@ final class Request
 	/**
 	 * Return the user agent
 	 */
-	public function user_agent()
+	public function user_agent(): string
 	{
 		return $this->_user_agent;
 	}
@@ -256,7 +251,7 @@ final class Request
 	/**
 	 * Returns whether the request is XML
 	 */
-	public function is_xml()
+	public function is_xml(): bool
 	{
 		return $this->_xml;
 	}
@@ -281,7 +276,7 @@ final class Request
 	 * - Use with ->parseRequest() to clean and set up variables like $board or $_REQUEST['start'].
 	 * - Uses Request to try to determine client IPs for the current request.
 	 */
-	public function cleanRequest($parser)
+	public function cleanRequest($parser): void
 	{
 		// Live to die another day
 		$this->_checkExit();
@@ -327,11 +322,10 @@ final class Request
 	 * - No numeric keys in $_GET, $_POST or $_FILE
 	 * - No URL's appended to the query string
 	 */
-	private function _checkExit()
+	private function _checkExit(): void
 	{
 		// Save some memory.. (since we don't use these anyway.)
-		unset($GLOBALS['HTTP_POST_VARS'], $GLOBALS['HTTP_POST_VARS']);
-		unset($GLOBALS['HTTP_POST_FILES'], $GLOBALS['HTTP_POST_FILES']);
+		unset($GLOBALS['HTTP_POST_VARS'], $GLOBALS['HTTP_POST_VARS'], $GLOBALS['HTTP_POST_FILES'], $GLOBALS['HTTP_POST_FILES']);
 
 		// These keys shouldn't be set...ever.
 		$this->_checkNumericKeys();
@@ -347,7 +341,7 @@ final class Request
 		{
 			Headers::instance()
 				->removeHeader('all')
-				->headerSpecial('HTTP/1.1 400 Bad Request')
+				->httpCode(400)
 				->sendHeaders();
 			throw new Exceptions\Exception('', false);
 		}
@@ -365,7 +359,7 @@ final class Request
 	 *
 	 * @throws Exceptions\Exception
 	 */
-	private function _checkNumericKeys()
+	private function _checkNumericKeys(): void
 	{
 		if (isset($_REQUEST['GLOBALS']) || isset($_COOKIE['GLOBALS']))
 		{
@@ -394,20 +388,20 @@ final class Request
 	/**
 	 * Helper method used to clean $_GET arguments
 	 */
-	private function _cleanArg($parser)
+	private function _cleanArg($parser): void
 	{
 		// Are we going to need to parse the ; out?
 		if (!empty($this->_server_query_string) && strpos(ini_get('arg_separator.input'), ';') === false)
 		{
 			// Get rid of the old one! You don't know where it's been!
-			$_GET = array();
+			$_GET = [];
 
 			// Was this redirected? If so, get the REDIRECT_QUERY_STRING, but do not urldecode() the querystring
-			$this->_server_query_string = substr($this->_server_query_string, 0, 5) === 'url=/' ? $_SERVER['REDIRECT_QUERY_STRING'] : $this->_server_query_string;
+			$this->_server_query_string = strpos($this->_server_query_string, 'url=/') === 0 ? $_SERVER['REDIRECT_QUERY_STRING'] : $this->_server_query_string;
 			$this->_server_query_string = $parser->parse($this->_server_query_string);
 
 			// Replace ';' with '&' and '&something&' with '&something=&'.  (this is done for compatibility...)
-			parse_str(preg_replace('/&(\w+)(?=&|$)/', '&$1=', strtr($this->_server_query_string, array(';?' => '&', ';' => '&', '%00' => '', "\0" => ''))), $_GET);
+			parse_str(preg_replace('/&(\w+)(?=&|$)/', '&$1=', strtr($this->_server_query_string, [';?' => '&', ';' => '&', '%00' => '', "\0" => ''])), $_GET);
 
 			// reSet the global in case an addon grabs it
 			$_SERVER['SERVER_QUERY_STRING'] = $this->_server_query_string;
@@ -445,7 +439,7 @@ final class Request
 	/**
 	 * If a request URI is present, this will prepare it for use
 	 */
-	private function _cleanRequest()
+	private function _cleanRequest(): void
 	{
 		// There's no query string, but there is a URL... try to get the data from there.
 		if (!empty($_SERVER['REQUEST_URI']))
@@ -469,11 +463,11 @@ final class Request
 
 	/**
 	 * Parse the $_REQUEST, for always necessary data, such as 'action', 'board', 'topic', 'start'.
-	 * Also figures out if this is an xml request.
+	 * Also figures out if this is a xml request.
 	 *
 	 * - Parse the request for our dear globals, I know they're in there somewhere...
 	 */
-	public function parseRequest()
+	public function parseRequest(): void
 	{
 		global $board, $topic;
 
@@ -504,11 +498,11 @@ final class Request
 	}
 
 	/**
-	 * Finds and returns the board numeric if its been requested
+	 * Finds and returns the board numeric if it's been requested
 	 *
-	 * - helper function for parseRequest
+	 * - Helper function for parseRequest
 	 */
-	private function _checkBoard()
+	private function _checkBoard(): int
 	{
 		// We need *something*, and it'd better be a number
 		$board = 0;
@@ -541,11 +535,11 @@ final class Request
 	}
 
 	/**
-	 * Finds and returns the topic numeric if its been requested
+	 * Finds and returns the topic numeric if it's been requested
 	 *
-	 * - helper function for parseRequest
+	 * - Helper function for parseRequest
 	 */
-	private function _checkTopic()
+	private function _checkTopic(): int
 	{
 		// Set something, and that something is 0.
 		$topic = 0;

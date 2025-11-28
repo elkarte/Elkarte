@@ -44,7 +44,7 @@ class Admin extends AbstractModule
 	 *
 	 * @param array $admin_areas The admin menu array
 	 */
-	public function addMenu(&$admin_areas)
+	public function addMenu(&$admin_areas): void
 	{
 		global $txt, $modSettings;
 
@@ -69,7 +69,7 @@ class Admin extends AbstractModule
 	 * @param string[] $include_files
 	 * @param array $settings_search
 	 */
-	public function addSearch(&$language_files, &$include_files, &$settings_search)
+	public function addSearch(&$language_files, &$include_files, &$settings_search): void
 	{
 		$language_files[] = 'ManageCalendar';
 		$settings_search[] = ['settings_search', 'area=managecalendar;sa=settings', ManageCalendarModule::class];

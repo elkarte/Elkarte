@@ -25,23 +25,23 @@ class Search extends AbstractSearch
 	 */
 	public function __construct($db)
 	{
-		$this->_supported_types = array('custom');
+		$this->_supported_types = ['custom'];
 		parent::__construct($db);
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
-	public function search_query($identifier, $db_string, $db_values = array())
+	public function search_query($identifier, $db_string, $db_values = [])
 	{
-		$replacements = array(
-			'drop_tmp_log_search_topics' => array(
+		$replacements = [
+			'drop_tmp_log_search_topics' => [
 				'~IF\sEXISTS~i' => '',
-			),
-			'drop_tmp_log_search_messages' => array(
+			],
+			'drop_tmp_log_search_messages' => [
 				'~IF\sEXISTS~i' => '',
-			),
-		);
+			],
+		];
 
 		if (isset($replacements[$identifier]))
 		{
@@ -66,7 +66,7 @@ class Search extends AbstractSearch
 
 		$db_table = db_table();
 
-		$table_info = array();
+		$table_info = [];
 
 		// In order to report the sizes correctly we need to perform vacuum (optimize) on the tables we will be using.
 		$db_table->optimize('{db_prefix}messages');
@@ -82,10 +82,10 @@ class Search extends AbstractSearch
 			WHERE relname = {string:messages} 
 				OR relname = {string:log_search_words}
 			ORDER BY relpages DESC',
-			array(
+			[
 				'messages' => $db_prefix . 'messages',
 				'log_search_words' => $db_prefix . 'log_search_words',
-			)
+			]
 		);
 
 		if ($request !== false && $request->num_rows() > 0)
@@ -112,12 +112,12 @@ class Search extends AbstractSearch
 		else
 		{
 			// Didn't work for some reason...
-			$table_info = array(
+			$table_info = [
 				'data_length' => $txt['not_applicable'],
 				'index_length' => $txt['not_applicable'],
 				'fulltext_length' => $txt['not_applicable'],
 				'custom_index_length' => $txt['not_applicable'],
-			);
+			];
 		}
 
 		return $table_info;

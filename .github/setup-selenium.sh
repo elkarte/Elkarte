@@ -20,23 +20,22 @@ sudo mkdir -p $(dirname "$SELENIUM_JAR")
 sudo wget -nv -O "$SELENIUM_JAR" "$SELENIUM_DOWNLOAD_URL"
 sudo chmod 777 "$SELENIUM_JAR"
 
-# Install Chrome
-echo "Installing Browser"
+# 1. Install dependencies required for Chrome and JSON parsing
+sudo apt-get update
+sudo apt-get install -y libu2f-udev
 
-# Available Chrome Versions
+# 2. Download Chrome 123
 CHROME_VERSION='123.0.6312.58-1'
-wget https://dl.google.com/linux/chrome/deb/pool/main/g/google-chrome-stable/google-chrome-stable_${CHROME_VERSION}_amd64.deb -q
-sudo dpkg -i google-chrome-stable_${CHROME_VERSION}_amd64.deb
+wget https://mirror.cs.uchicago.edu/google-chrome/pool/main/g/google-chrome-stable/google-chrome-stable_${CHROME_VERSION}_amd64.deb -q
 
-# Download Chrome Driver
-# https://storage.googleapis.com/chrome-for-testing-public/123.0.6312.58/linux64/chromedriver-linux64.zip
-echo "Downloading chromedriver"
-CHROME_VERSION=$(google-chrome --version) \
-  && wget -nv -O "$CHROMEDRIVER_ZIP" "https://storage.googleapis.com/chrome-for-testing-public/123.0.6312.58/linux64/chromedriver-linux64.zip" \
-  && unzip "$CHROMEDRIVER_ZIP" \
-  && sudo mv chromedriver-linux64/chromedriver /usr/local/bin/chromedriver \
-  && sudo chmod +x /usr/local/bin/chromedriver \
-  && chromedriver --version
+# 3. Install with ALLOW DOWNGRADES
+sudo apt-get install -y ./google-chrome-stable_${CHROME_VERSION}_amd64.deb --allow-downgrades
+
+# 4. Download matching ChromeDriver 123
+wget -nv -O chromedriver.zip "https://storage.googleapis.com/chrome-for-testing-public/123.0.6312.58/linux64/chromedriver-linux64.zip"
+unzip chromedriver.zip
+sudo mv chromedriver-linux64/chromedriver /usr/local/bin/chromedriver
+sudo chmod +x /usr/local/bin/chromedriver
 
 # Start Selenium using default chosen webdriver
 export DISPLAY=:99.0

@@ -51,7 +51,7 @@ class Stats extends AbstractController
 	 * @uses Stats language file
 	 * @uses template_stats() sub template in Stats.template
 	 */
-	public function action_stats()
+	public function action_stats(): ?bool
 	{
 		global $txt, $modSettings, $context;
 
@@ -133,7 +133,7 @@ class Stats extends AbstractController
 	 *
 	 * @return array of year and month from expand / collapse link
 	 */
-	private function _expandedStats()
+	private function _expandedStats(): array
 	{
 		global $context;
 
@@ -171,7 +171,7 @@ class Stats extends AbstractController
 	/**
 	 * Load some general statistics of the forum
 	 */
-	public function loadGeneralStatistics()
+	public function loadGeneralStatistics(): void
 	{
 		global $modSettings, $context;
 
@@ -235,7 +235,7 @@ class Stats extends AbstractController
 	 * - Places results in to context
 	 * - Uses Top posters, topBoards, topTopicReplies, topTopicViews, topTopicStarter, topTimeOnline
 	 */
-	public function loadTopStatistics()
+	public function loadTopStatistics(): void
 	{
 		global $context;
 
@@ -261,7 +261,7 @@ class Stats extends AbstractController
 	/**
 	 * Load the huge table of activity by month
 	 */
-	public function loadMonthlyActivity()
+	public function loadMonthlyActivity(): bool
 	{
 		global $context;
 

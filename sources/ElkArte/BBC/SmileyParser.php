@@ -66,7 +66,7 @@ class SmileyParser
 	 *
 	 * @return SmileyParser
 	 */
-	public function setEnabled($toggle)
+	public function setEnabled($toggle): SmileyParser
 	{
 		$this->enabled = (bool) $toggle;
 
@@ -80,7 +80,7 @@ class SmileyParser
 	 *
 	 * @return $this
 	 */
-	public function setMarker($marker)
+	public function setMarker($marker): self
 	{
 		$this->marker = $marker;
 
@@ -94,7 +94,7 @@ class SmileyParser
 	 *
 	 * @return $this
 	 */
-	public function setPath($set)
+	public function setPath($set): self
 	{
 		$this->path = $GLOBALS['modSettings']['smileys_url'] . '/' . htmlspecialchars($set) . '/';
 		$this->dir = $GLOBALS['modSettings']['smileys_dir'] . '/' . $set . '/';
@@ -144,7 +144,7 @@ class SmileyParser
 	 *
 	 * @return string
 	 */
-	public function parseEmoji($message)
+	public function parseEmoji($message): string
 	{
 		// No Emoji set or message at all?!
 		if (!$this->enabled
@@ -163,7 +163,7 @@ class SmileyParser
 	 *
 	 * @return string
 	 */
-	public function parse($message)
+	public function parse($message): string
 	{
 		// Parse the smileys within the parts where it can be done safely.
 		if ($this->enabled && trim($message) !== '')
@@ -206,7 +206,7 @@ class SmileyParser
 	 * @param array $smileysTo
 	 * @param array $smileysDescriptions
 	 */
-	protected function setSearchReplace($smileysFrom, $smileysTo, $smileysDescriptions)
+	protected function setSearchReplace($smileysFrom, $smileysTo, $smileysDescriptions): void
 	{
 		$searchParts = [];
 		$fileFunc = FileFunctions::instance();
@@ -242,7 +242,7 @@ class SmileyParser
 	/**
 	 * Load in the enabled smileys, either default ones or from the DB
 	 */
-	protected function load()
+	protected function load(): void
 	{
 		[$smileysFrom, $smileysTo, $smileysDescriptions] = $this->getFromDB();
 
@@ -255,7 +255,7 @@ class SmileyParser
 	 *
 	 * @return array
 	 */
-	protected function getFromDB()
+	protected function getFromDB(): array
 	{
 		// Load the smileys in reverse order by length, so they don't get parsed wrong.
 		if (!Cache::instance()->getVar($temp, 'parsing_smileys', 600))

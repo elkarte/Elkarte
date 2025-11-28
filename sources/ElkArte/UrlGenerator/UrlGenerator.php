@@ -22,33 +22,17 @@ namespace ElkArte\UrlGenerator;
  */
 class UrlGenerator
 {
-	/**
-	 * Configuration parameters (for the moment script url and replacements)
-	 *
-	 * @var array
-	 */
-	protected $_config = array();
+	/** @var array Configuration parameters (for the moment script url and replacements) */
+	protected $_config = [];
 
-	/**
-	 * All the objects that create the queries
-	 *
-	 * @var array
-	 */
-	protected $_generators = array();
+	/** @var array All the objects that create the queries */
+	protected $_generators = [];
 
-	/**
-	 * Searching for in replacements
-	 *
-	 * @var array
-	 */
-	protected $_search = array();
+	/** @var array Searching for in replacements */
+	protected $_search = [];
 
-	/**
-	 * replacing with in replacements
-	 *
-	 * @var array
-	 */
-	protected $_replace = array();
+	/** @var array replacing with in replacements */
+	protected $_replace = [];
 
 	/**
 	 * The begin of all
@@ -57,10 +41,10 @@ class UrlGenerator
 	 */
 	public function __construct($options)
 	{
-		$this->_config = array_merge(array(
+		$this->_config = array_merge([
 			'scripturl' => '',
-			'replacements' => array(),
-		), $options);
+			'replacements' => [],
+		], $options);
 
 		$this->register('Standard');
 		$this->updateReplacements($this->_config['replacements']);
@@ -71,7 +55,7 @@ class UrlGenerator
 	 *
 	 * @param object|string $generator
 	 */
-	public function register($generator)
+	public function register($generator): void
 	{
 		$this->_initGen($generator);
 	}
@@ -82,7 +66,7 @@ class UrlGenerator
 	 *
 	 * @param object|string $name
 	 */
-	protected function _initGen($name)
+	protected function _initGen($name): void
 	{
 		if (is_object($name))
 		{
@@ -112,7 +96,7 @@ class UrlGenerator
 	 *
 	 * @param string[] $replacements
 	 */
-	public function updateReplacements($replacements)
+	public function updateReplacements($replacements): void
 	{
 		$this->_config['replacements'] = array_merge($this->_config['replacements'], $replacements);
 
@@ -123,9 +107,9 @@ class UrlGenerator
 	/**
 	 * Instantiate and return the query parser.
 	 *
-	 * @return \ElkArte\UrlGenerator\AbstractParseQuery
+	 * @return AbstractParseQuery
 	 */
-	public function getParser()
+	public function getParser(): AbstractParseQuery
 	{
 		$class = '\\ElkArte\\UrlGenerator\\' . $this->_config['generator'] . '\\ParseQuery';
 
@@ -140,7 +124,7 @@ class UrlGenerator
 	 *
 	 * @return string The whole URL
 	 */
-	public function get($type, $params)
+	public function get($type, $params): string
 	{
 		$url = $this->getQuery($type, $params);
 
@@ -156,7 +140,7 @@ class UrlGenerator
 	 *
 	 * @return string The query part of the URL
 	 */
-	public function getQuery($type, $params)
+	public function getQuery($type, $params): string
 	{
 		if (!isset($this->_generators[$type]))
 		{
@@ -173,7 +157,7 @@ class UrlGenerator
 	 *
 	 * @return string The whole URL
 	 */
-	protected function _append_base($args)
+	protected function _append_base($args): string
 	{
 		if (!empty($args))
 		{

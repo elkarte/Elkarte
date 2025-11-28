@@ -36,7 +36,7 @@ class MetadataIntegrate
 	 *
 	 * @return array
 	 */
-	public static function register()
+	public static function register(): array
 	{
 		global $modSettings;
 
@@ -46,14 +46,14 @@ class MetadataIntegrate
 		}
 
 		// Simply load context with our data which will be consumed by the theme's index.template (if supported)
-		return array(
+		return [
 			// Display
-			array('integrate_action_display_after', '\\ElkArte\\MetadataIntegrate::prepare_topic_metadata'),
+			['integrate_action_display_after', '\\ElkArte\\MetadataIntegrate::prepare_topic_metadata'],
 			// Board
-			array('integrate_action_boardindex_after', '\\ElkArte\\MetadataIntegrate::prepare_basic_metadata'),
+			['integrate_action_boardindex_after', '\\ElkArte\\MetadataIntegrate::prepare_basic_metadata'],
 			// MessageIndex
-			array('integrate_action_messageindex_after', '\\ElkArte\\MetadataIntegrate::prepare_basic_metadata'),
-		);
+			['integrate_action_messageindex_after', '\\ElkArte\\MetadataIntegrate::prepare_basic_metadata'],
+		];
 	}
 
 	/**
@@ -63,7 +63,7 @@ class MetadataIntegrate
 	 *
 	 * @param int $start
 	 */
-	public static function prepare_topic_metadata($start = -1)
+	public static function prepare_topic_metadata($start = -1): void
 	{
 		global $context;
 
@@ -83,7 +83,7 @@ class MetadataIntegrate
 	 * Prepares Open Graph and Schema data when viewing a message listing or the board index.
 	 * Currently, this consists of a simple organizational card and OG with description
 	 */
-	public static function prepare_basic_metadata()
+	public static function prepare_basic_metadata(): void
 	{
 		$meta = new self();
 
@@ -100,7 +100,7 @@ class MetadataIntegrate
 	 * </script>
 	 * OG data is an array of <meta> tags for implosion.
 	 */
-	private function setContext()
+	private function setContext(): void
 	{
 		global $context;
 
@@ -119,7 +119,7 @@ class MetadataIntegrate
 	 * @param int $start
 	 * @return array
 	 */
-	private function initPostData($start)
+	private function initPostData($start): array
 	{
 		global $context, $topic;
 
@@ -161,7 +161,7 @@ class MetadataIntegrate
 	 *
 	 * @return array
 	 */
-	public function getSiteSchema()
+	public function getSiteSchema(): array
 	{
 		global $context, $boardurl, $mbname, $settings;
 
@@ -191,7 +191,7 @@ class MetadataIntegrate
 	 *
 	 * @return array width, height and html safe logo url
 	 */
-	private function getLogo()
+	private function getLogo(): array
 	{
 		global $context, $boardurl;
 
@@ -217,7 +217,7 @@ class MetadataIntegrate
 	 *
 	 * @return array
 	 */
-	public function getPostSchema()
+	public function getPostSchema(): array
 	{
 		global $context, $boardurl, $mbname, $board_info;
 
@@ -297,7 +297,7 @@ class MetadataIntegrate
 	 *
 	 * @return array
 	 */
-	private function getAttachment()
+	private function getAttachment(): array
 	{
 		global $boardurl;
 
@@ -363,7 +363,7 @@ class MetadataIntegrate
 	 * @param string $description
 	 * @return string html safe title
 	 */
-	private function getPageTitle($description = '')
+	private function getPageTitle($description = ''): string
 	{
 		global $context;
 
@@ -393,7 +393,7 @@ class MetadataIntegrate
 	 *
 	 * @return string html safe description
 	 */
-	private function getDescription()
+	private function getDescription(): string
 	{
 		global $context, $settings, $mbname;
 
@@ -440,7 +440,7 @@ class MetadataIntegrate
 	 *
 	 * @return array
 	 */
-	public function getOgData()
+	public function getOgData(): array
 	{
 		global $context, $boardurl, $mbname, $topic;
 
@@ -477,7 +477,7 @@ class MetadataIntegrate
 	 *
 	 * @return int The total count of likes.
 	 */
-	public function getLikeCount()
+	public function getLikeCount(): int
 	{
 		global $context;
 

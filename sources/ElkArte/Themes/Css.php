@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Help class for Theme, handles CSS
+ * Helper class for Theme, handles CSS
  *
  * @package   ElkArte Forum
  * @copyright ElkArte Forum contributors
@@ -15,6 +15,12 @@ namespace ElkArte\Themes;
 
 use ElkArte\Helper\SiteCombiner;
 
+/**
+ * Class Css
+ *
+ * This class provides functionality for managing CSS files and inline CSS rules,
+ * including adding rules, combining files, minification, and output.
+ */
 class Css
 {
 	/** @var array Inline CSS */
@@ -46,7 +52,7 @@ class Css
 	 * What it does:
 	 *  - If the admin option to combine files is set, will use Combiner.class
 	 */
-	public function template_css()
+	public function template_css(): void
 	{
 		global $modSettings, $settings;
 
@@ -79,7 +85,7 @@ class Css
 	 * @param string $rules the CSS rule/s
 	 * @param null|string $media = null, the media query the rule belongs to
 	 */
-	public function addCSSRules($rules, $media = null)
+	public function addCSSRules($rules, $media = null): void
 	{
 		if (empty($rules))
 		{
@@ -101,7 +107,7 @@ class Css
 	/**
 	 * Output the inline-CSS in a style tag
 	 */
-	public function template_inlinecss()
+	public function template_inlinecss(): void
 	{
 		global $modSettings, $settings;
 

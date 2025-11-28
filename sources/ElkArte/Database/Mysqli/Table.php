@@ -82,12 +82,12 @@ class Table extends AbstractTable
 	/**
 	 * {@inheritDoc}
 	 */
-	public function add_column($table_name, $column_info, $parameters = array(), $if_exists = 'update')
+	public function add_column($table_name, $column_info, $parameters = [], $if_exists = 'update')
 	{
 		$table_name = str_replace('{db_prefix}', $this->_db_prefix, $table_name);
 
 		// Log that we will want to uninstall this!
-		$this->_package_log[] = array('remove_column', $table_name, $column_info['name']);
+		$this->_package_log[] = ['remove_column', $table_name, $column_info['name']];
 
 		// Does it exist - if so don't add it again!
 		if ($this->_get_column_info($table_name, $column_info['name']))
@@ -111,7 +111,7 @@ class Table extends AbstractTable
 	/**
 	 * {@inheritDoc}
 	 */
-	public function change_column($table_name, $old_column, $column_info, $parameters = array())
+	public function change_column($table_name, $old_column, $column_info, $parameters = [])
 	{
 		$table_name = str_replace('{db_prefix}', $this->_db_prefix, $table_name);
 
@@ -155,7 +155,7 @@ class Table extends AbstractTable
 			$column_info['size'] = $old_info['size'];
 		}
 
-		if (!isset($column_info['unsigned']) || !in_array($column_info['type'], array('int', 'tinyint', 'smallint', 'mediumint', 'bigint')))
+		if (!isset($column_info['unsigned']) || !in_array($column_info['type'], ['int', 'tinyint', 'smallint', 'mediumint', 'bigint']))
 		{
 			$column_info['unsigned'] = '';
 		}
@@ -174,7 +174,7 @@ class Table extends AbstractTable
 	 *
 	 * @return string
 	 */
-	protected function _db_create_query_column($column, $table_name)
+	protected function _db_create_query_column($column, $table_name): string
 	{
 		// Auto increment is easy here!
 		if (!empty($column['auto']))
@@ -195,7 +195,7 @@ class Table extends AbstractTable
 		[$type, $size] = $this->calculate_type($column['type'], $column['size']);
 
 		// Allow unsigned integers (mysql only)
-		$unsigned = in_array($type, array('int', 'tinyint', 'smallint', 'mediumint', 'bigint', 'float')) && !empty($column['unsigned']) ? 'unsigned ' : '';
+		$unsigned = in_array($type, ['int', 'tinyint', 'smallint', 'mediumint', 'bigint', 'float']) && !empty($column['unsigned']) ? 'unsigned ' : '';
 
 		if ($size !== null)
 		{
@@ -218,7 +218,7 @@ class Table extends AbstractTable
 	/**
 	 * {@inheritDoc}
 	 */
-	public function remove_column($table_name, $column_name, $parameters = array())
+	public function remove_column($table_name, $column_name, $parameters = [])
 	{
 		$table_name = str_replace('{db_prefix}', $this->_db_prefix, $table_name);
 
@@ -239,7 +239,7 @@ class Table extends AbstractTable
 	/**
 	 * {@inheritDoc}
 	 */
-	public function add_index($table_name, $index_info, $parameters = array(), $if_exists = 'update')
+	public function add_index($table_name, $index_info, $parameters = [], $if_exists = 'update')
 	{
 		$table_name = str_replace('{db_prefix}', $this->_db_prefix, $table_name);
 
@@ -266,7 +266,7 @@ class Table extends AbstractTable
 		}
 
 		// Log that we are going to want to remove this!
-		$this->_package_log[] = array('remove_index', $table_name, $index_info['name']);
+		$this->_package_log[] = ['remove_index', $table_name, $index_info['name']];
 
 		// Let's get all our indexes.
 		$indexes = $this->list_indexes($table_name, true);
@@ -304,18 +304,18 @@ class Table extends AbstractTable
 	/**
 	 * {@inheritDoc}
 	 */
-	public function list_indexes($table_name, $detail = false, $parameters = array())
+	public function list_indexes($table_name, $detail = false, $parameters = [])
 	{
 		$table_name = str_replace('{db_prefix}', $this->_db_prefix, $table_name);
 
 		$result = $this->_db->query('', '
 			SHOW KEYS
 			FROM {raw:table_name}',
-			array(
+			[
 				'table_name' => substr($table_name, 0, 1) === '`' ? $table_name : '`' . $table_name . '`',
-			)
+			]
 		);
-		$indexes = array();
+		$indexes = [];
 		while (($row = $result->fetch_assoc()))
 		{
 			if (!$detail)
@@ -345,11 +345,11 @@ class Table extends AbstractTable
 				// This is the first column we've seen?
 				if (empty($indexes[$row['Key_name']]))
 				{
-					$indexes[$row['Key_name']] = array(
+					$indexes[$row['Key_name']] = [
 						'name' => $row['Key_name'],
 						'type' => $type,
-						'columns' => array(),
-					);
+						'columns' => [],
+					];
 				}
 
 				// Is it a partial index?
@@ -372,7 +372,7 @@ class Table extends AbstractTable
 	/**
 	 * {@inheritDoc}
 	 */
-	public function remove_index($table_name, $index_name, $parameters = array())
+	public function remove_index($table_name, $index_name, $parameters = [])
 	{
 		$table_name = str_replace('{db_prefix}', $this->_db_prefix, $table_name);
 
@@ -412,28 +412,28 @@ class Table extends AbstractTable
 	{
 		$table_name = str_replace('{db_prefix}', $this->_db_prefix, $table_name);
 
-		return array(
+		return [
 			'name' => $table_name,
 			'columns' => $this->list_columns($table_name, true),
 			'indexes' => $this->list_indexes($table_name, true),
-		);
+		];
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
-	public function list_columns($table_name, $detail = false, $parameters = array())
+	public function list_columns($table_name, $detail = false, $parameters = [])
 	{
 		$table_name = str_replace('{db_prefix}', $this->_db_prefix, $table_name);
 
 		$result = $this->_db->query('', '
 			SHOW FIELDS
 			FROM {raw:table_name}',
-			array(
+			[
 				'table_name' => substr($table_name, 0, 1) === '`' ? $table_name : '`' . $table_name . '`',
-			)
+			]
 		);
-		$columns = array();
+		$columns = [];
 		while (($row = $result->fetch_assoc()))
 		{
 			if (!$detail)
@@ -461,14 +461,14 @@ class Table extends AbstractTable
 					$size = null;
 				}
 
-				$columns[$row['Field']] = array(
+				$columns[$row['Field']] = [
 					'name' => $row['Field'],
 					'null' => $row['Null'] === 'YES',
 					'default' => $row['Default'] ?? null,
 					'type' => $type,
 					'size' => $size,
 					'auto' => $auto,
-				);
+				];
 
 				if (isset($unsigned))
 				{
@@ -493,9 +493,9 @@ class Table extends AbstractTable
 		// Get how much overhead there is.
 		$request = $this->_db->fetchQuery('
 			SHOW TABLE STATUS LIKE {string:table_name}',
-			array(
+			[
 				'table_name' => str_replace('_', '\_', $table),
-			)
+			]
 		);
 		$row = $request->fetch_assoc();
 		$request->free_result();
@@ -506,9 +506,9 @@ class Table extends AbstractTable
 			$data_before = $row['Data_free'] ?? 0;
 			$request = $this->_db->query('', '
 			OPTIMIZE TABLE `{raw:table}`',
-				array(
+				[
 					'table' => $table,
-				)
+				]
 			);
 			if (!$request)
 			{
@@ -517,9 +517,9 @@ class Table extends AbstractTable
 			// How much left?
 			$request = $this->_db->fetchQuery('
 			SHOW TABLE STATUS LIKE {string:table}',
-				array(
+				[
 					'table' => str_replace('_', '\_', $table),
-				)
+				]
 			);
 			$row = $request->fetch_assoc();
 			$request->free_result();

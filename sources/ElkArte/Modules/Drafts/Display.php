@@ -70,7 +70,7 @@ class Display extends AbstractModule
 	 * @param array $editorOptions
 	 * @param int $board
 	 */
-	public function prepare_context($use_quick_reply, &$editorOptions, $board)
+	public function prepare_context($use_quick_reply, &$editorOptions, $board): void
 	{
 		global $context, $options, $txt;
 

@@ -12,7 +12,7 @@
  */
 
 /**
- * Simply invoke the constructor by calling new dragDropAttachment
+ * Invoke the constructor by calling new dragDropAttachment
  */
 (function() {
 	const dragDropAttachment = (function(params) {
@@ -234,7 +234,7 @@
 			/**
 			 * private function
 			 *
-			 * Updates the restrictions text line with current values
+			 * Updates the restriction / limits text with current values
 			 */
 			updateStatusText = function() {
 				let numberAllowed = document.getElementById('attachmentNumPerPostLimit'),
@@ -710,17 +710,27 @@
 				obj.style.opacity = '0.6';
 			});
 
-			// Rather click and select?
+			// Rather click and select? Use the existing input and trigger it from any select-link
 			const input = document.querySelector('#attachment_click');
-			const cloneElem = input.cloneNode(true);
 
-			document.querySelector('.drop_area_fileselect_text').appendChild(cloneElem);
-			cloneElem.addEventListener('change', function(e) {
+			// When files are selected, process them
+			input.addEventListener('change', function(e) {
 				e.preventDefault();
 				const files = this.files;
 				handleFileUpload(files, obj);
 				this.value = null;
 			});
+
+			// Attach click handler to all select-file text anchors (desktop and mobile)
+			document.querySelectorAll('.drop_area_fileselect_text').forEach(anchor => {
+				anchor.addEventListener('click', function(e) {
+					e.preventDefault();
+					// Trigger the file dialog on the original input, which we hide.
+					input.click();
+				});
+			});
+
+			// Hide the original input from view (programmatic click will still work)
 			input.style.display = 'none';
 		};
 

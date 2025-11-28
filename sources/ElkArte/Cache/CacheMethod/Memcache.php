@@ -87,7 +87,7 @@ class Memcache extends AbstractCacheMethod
 	 *
 	 * @return array A list of servers in the daemon.
 	 */
-	protected function getServers()
+	protected function getServers(): array
 	{
 		$servers = @$this->obj->getExtendedStats();
 
@@ -99,7 +99,7 @@ class Memcache extends AbstractCacheMethod
 	 *
 	 * @return bool
 	 */
-	private function _is_persist()
+	private function _is_persist(): bool
 	{
 		global $db_persist;
 
@@ -113,7 +113,7 @@ class Memcache extends AbstractCacheMethod
 	 * @param string $server
 	 * @param int $port
 	 */
-	protected function setOptions($server, $port)
+	protected function setOptions($server, $port): void
 	{
 		// host, port, timeout, retry_interval, status
 		$this->obj->setServerParams($server, $port, 1, 5, true);
@@ -133,7 +133,7 @@ class Memcache extends AbstractCacheMethod
 	 *
 	 *  If the statistics cannot be obtained, an empty array is returned.
      */
-	public function getStats()
+	public function getStats(): array
 	{
 		$results = [];
 

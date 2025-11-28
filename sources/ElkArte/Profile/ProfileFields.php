@@ -35,7 +35,7 @@ class ProfileFields
 	 * @param string $area = 'summary'
 	 * @param array $custom_fields = array()
 	 */
-	public function loadCustomFields($memID, $area = 'summary', array $custom_fields = [])
+	public function loadCustomFields($memID, $area = 'summary', array $custom_fields = []): void
 	{
 		global $context;
 
@@ -100,7 +100,7 @@ class ProfileFields
 	 *
 	 * @return array - An array containing the generated input HTML and the corresponding output HTML.
 	 */
-	private function generateFormFieldHtml($row, $value)
+	private function generateFormFieldHtml($row, $value): array
 	{
 		global $txt;
 
@@ -212,7 +212,7 @@ class ProfileFields
 	 *
 	 * @param bool $force_reload = false
 	 */
-	public function loadProfileFields($force_reload = false)
+	public function loadProfileFields($force_reload = false): void
 	{
 		global $context, $profile_fields, $txt, $scripturl, $modSettings, $cur_profile, $language, $settings;
 
@@ -300,9 +300,9 @@ class ProfileFields
 					if (isset($_POST['bday1']))
 					{
 						$date_parts = explode('-', $_POST['bday1']);
-						$bday3 = (int) $date_parts[0]; // Year
-						$bday1 = (int) $date_parts[1]; // Month
-						$bday2 = (int) $date_parts[2]; // Day
+						$bday3 = isset($date_parts[0]) ? (int) $date_parts[0] : 1; // Year
+						$bday1 = isset($date_parts[1]) ? (int) $date_parts[1] : 1; // Month
+						$bday2 = isset($date_parts[2]) ? (int) $date_parts[2] : 1; // Day
 
 						// Set to blank?
 						if ($bday3 === 1 && $bday2 === 1 && $bday1 === 1)
@@ -368,7 +368,7 @@ class ProfileFields
 						return false;
 					}
 
-					$isValid = self::profileValidateEmail($value, $context['id_member']);
+					$isValid = ProfileFields::profileValidateEmail($value, $context['id_member']);
 
 					// Do they need to re-validate? If so schedule the function!
 					if ($isValid === true && !empty($modSettings['send_validation_onChange']) && !allowedTo('moderate_forum'))
@@ -905,7 +905,7 @@ class ProfileFields
 	 * @param string[] $fields
 	 * @param string $hook
 	 */
-	public function saveProfileFields($fields, $hook)
+	public function saveProfileFields($fields, $hook): void
 	{
 		global $profile_fields, $profile_vars, $context, $old_profile, $post_errors, $cur_profile;
 
@@ -1086,7 +1086,7 @@ class ProfileFields
 	 *
 	 * @return bool|string
 	 */
-	public function profileValidateEmail($email, $memID = 0)
+	public static function profileValidateEmail($email, $memID = 0)
 	{
 		// Check the name and email for validity.
 		$check = [];
@@ -1151,7 +1151,7 @@ class ProfileFields
 	 *
 	 * @return string
 	 */
-	public function postProcessOutputHtml($row, $output_html, $key)
+	public function postProcessOutputHtml($row, $output_html, $key): string
 	{
 		global $scripturl, $settings;
 

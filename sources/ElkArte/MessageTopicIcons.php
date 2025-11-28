@@ -66,7 +66,7 @@ class MessageTopicIcons extends ValuesContainer
 	/**
 	 * Load in  site icons, default or custom message icons.
 	 */
-	private function _loadSiteIcons()
+	private function _loadSiteIcons(): void
 	{
 		global $board;
 
@@ -77,7 +77,7 @@ class MessageTopicIcons extends ValuesContainer
 	/**
 	 * This function merges in any passed custom icons with our site defined ones.
 	 */
-	private function _merge_all_icons()
+	private function _merge_all_icons(): void
 	{
 		// Merge in additional ones
 		$custom_icons = array_map(static fn($element) => $element['value'], $this->_custom_icons);
@@ -109,7 +109,7 @@ class MessageTopicIcons extends ValuesContainer
 	 * @param int|string $key
 	 * @return string
 	 */
-	public function getIconURL($key)
+	public function getIconURL($key): string
 	{
 		$this->_checkValue($key);
 
@@ -122,7 +122,7 @@ class MessageTopicIcons extends ValuesContainer
 	 * @param int|string $key
 	 * @return string
 	 */
-	public function getIconName($key)
+	public function getIconName($key): string
 	{
 		$this->_checkValue($key);
 
@@ -135,7 +135,7 @@ class MessageTopicIcons extends ValuesContainer
 	 * @param int|string $key
 	 * @return string
 	 */
-	public function getIconValue($key)
+	public function getIconValue($key): string
 	{
 		$this->_checkValue($key);
 
@@ -147,7 +147,7 @@ class MessageTopicIcons extends ValuesContainer
 	 *
 	 * @param $key
 	 */
-	private function _checkValue($key)
+	private function _checkValue($key): void
 	{
 		// Not a known topic icon, set the xx default
 		if (!isset($this->data[$key]))
@@ -160,7 +160,7 @@ class MessageTopicIcons extends ValuesContainer
 	/**
 	 * This simple function sets the message topic icon array.
 	 */
-	protected function _loadIcons()
+	protected function _loadIcons(): void
 	{
 		// Allow addons to add to the message icon array
 		call_integration_hook('integrate_messageindex_icons', [&$this->_icons]);
@@ -173,7 +173,7 @@ class MessageTopicIcons extends ValuesContainer
 	 *
 	 * @param string $icon
 	 */
-	protected function _setUrl($icon)
+	protected function _setUrl($icon): void
 	{
 		global $settings;
 

@@ -71,6 +71,6 @@ class Zend extends AbstractCacheMethod
 	 */
 	public function details()
 	{
-		return array('title' => $this->title, 'version' => zend_version());
+		return ['title' => $this->title, 'version' => zend_version()];
 	}
 }
