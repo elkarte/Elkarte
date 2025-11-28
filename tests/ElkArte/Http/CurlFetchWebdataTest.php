@@ -80,7 +80,7 @@ class CurlFetchWebdataTest extends TestCase
 			// Check for correct results
 			if (!empty($testcase[1]))
 			{
-				$this->assertEquals($testcase[1], $curl->result('code'), 'FetchCodeError:: ' . $curl->result('code'));
+				$this->assertEquals($testcase[1], (int) $curl->result('code'), 'FetchCodeError:: ' . $curl->result('code'));
 			}
 			if (!empty($testcase[2]))
 			{
@@ -103,12 +103,13 @@ class CurlFetchWebdataTest extends TestCase
 			$curl->get_url_data($testcase[0], $testcase[1]);
 
 			// Check for correct fetch
+			// Check for correct fetch
 			if (!empty($testcase[2]))
 			{
-				$this->assertContains($curl->result('code'), $testcase[2], 'FetchCodeError:: ' . $curl->result('code'));
+				$this->assertContains((int) $curl->result('code'), $testcase[2], 'FetchCodeError:: ' . $curl->result('code'));
 			}
 
-			if (!empty($testcase[3]) && $curl->result('code') == 200)
+			if (!empty($testcase[3]) && (int) $curl->result('code') === 200)
 			{
 				$this->assertStringContainsString($testcase[3], $curl->result('body'));
 			}
