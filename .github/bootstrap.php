@@ -50,6 +50,7 @@ if (!defined('ELK'))
 	define('CONTROLLERDIR', $sourcedir . '/controllers');
 	define('SUBSDIR', $sourcedir . '/subs');
 	define('ADDONSDIR', $sourcedir . '/addons');
+	DEFINE('ELKARTEDIR', $sourcedir . '/ElkArte');
 	define('PHPUNITBOOTSTRAP', true);
 }
 else

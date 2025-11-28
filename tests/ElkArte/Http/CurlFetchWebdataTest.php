@@ -47,7 +47,7 @@ class CurlFetchWebdataTest extends TestCase
 			array(
 				'https://developer.mozilla.org/en-US/',
 				200,
-				'Resources for <u>Developers</u>',
+				'MDN Web Docs',
 			),
 			array(
 				'http://www.google.com/elkarte',

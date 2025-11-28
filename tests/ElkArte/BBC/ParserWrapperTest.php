@@ -180,7 +180,7 @@ Should be an empty line in between.',
 			array(
 				'Test img 3',
 				'[img width=100]http://adomain.tld/an_image.png[/img]',
-				'<img src="http://adomain.tld/an_image.png" title="" alt="" style="width:100%;max-width:100px;" class="bbc_img resized" />',
+				'<img src="http://adomain.tld/an_image.png" title="" alt="" style="width:100%;max-width:100px;" class="bbc_img resized" data-bbcexpandimage="1" />',
 			),
 			array(
 				'Test img 4',

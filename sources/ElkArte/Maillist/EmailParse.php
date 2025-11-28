@@ -1044,6 +1044,7 @@ class EmailParse
 		}
 
 		/** Add non-header-based detection **/
+		return null;
 	}
 
 	/**

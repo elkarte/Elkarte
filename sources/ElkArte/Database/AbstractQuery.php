@@ -789,7 +789,7 @@ abstract class AbstractQuery implements QueryInterface
 	 *
 	 * @deprecated since 2.0
 	 */
-	public function fetch_row($result): bool
+	public function fetch_row($result): bool|array
 	{
 		// \ElkArte\Errors\Errors::instance()->log_deprecated('Query::fetch_row()', 'Result::fetch_row()');
 		if ($result === false)

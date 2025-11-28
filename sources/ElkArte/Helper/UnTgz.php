@@ -272,6 +272,8 @@ class UnTgz
 		{
 			$this->_offset += 2;
 		}
+
+		return null;
 	}
 
 	/**

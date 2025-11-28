@@ -291,5 +291,7 @@ class Emailmoderator extends AbstractController
 
 		// Back to the post we reported!
 		redirectexit('reportsent;topic=' . $topic . '.msg' . $msg_id . '#msg' . $msg_id);
+
+		return null;
 	}
 }

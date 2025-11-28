@@ -168,9 +168,9 @@ class BuildMail extends BaseMail
 	 *
 	 * @param string $from
 	 * @param string $from_wrapper
-	 * @return string
+	 * @return string|null
 	 */
-	public function setDMARCFrom($from, $from_wrapper): string
+	public function setDMARCFrom($from, $from_wrapper): ?string
 	{
 		global $modSettings;
 
