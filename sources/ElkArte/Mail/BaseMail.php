@@ -94,9 +94,9 @@ abstract class BaseMail
 	 * Message type is one of m = message, t = topic, p = private
 	 *
 	 * @param string $message_id
-	 * @return string cleaned message id
+	 * @return string|null cleaned message id
 	 */
-	public function setMessageType($message_id): string
+	public function setMessageType($message_id): ?string
 	{
 		$this->messageType = 'm';
 		if ($message_id !== null && isset($message_id[0]) && in_array($message_id[0], ['m', 'p', 't']))

@@ -271,6 +271,8 @@ class Attachment extends AbstractController
 		{
 			$context['json_data'] = ['result' => false, 'data' => $txt['no_files_uploaded']];
 		}
+
+		return null;
 	}
 
 	/**
@@ -351,6 +353,8 @@ class Attachment extends AbstractController
 			Txt::load('Errors');
 			$context['json_data'] = ['result' => false, 'data' => $txt['attachment_not_found']];
 		}
+
+		return null;
 	}
 
 	/**

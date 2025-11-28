@@ -121,9 +121,9 @@ class TemporaryAttachmentChunk
 	 */
 	private function extractPostData(): array
 	{
-		$chunkIndex = $this->req->getPost('elkchunkindex', 'intval');
-		$totalChunkCount = $this->req->getPost('elktotalchunkcount', 'intval');
-		$uuid = $this->req->getPost('elkuuid', 'intval');
+		$chunkIndex = $this->req->getPost('elkchunkindex', 'intval', 0);
+		$totalChunkCount = $this->req->getPost('elktotalchunkcount', 'intval', 0);
+		$uuid = $this->req->getPost('elkuuid', 'intval', 0);
 
 		if (!isset($chunkIndex, $totalChunkCount))
 		{
