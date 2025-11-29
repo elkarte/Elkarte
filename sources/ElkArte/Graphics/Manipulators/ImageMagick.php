@@ -199,6 +199,11 @@ class ImageMagick extends AbstractManipulator
 				{
 					$success = $this->_image->thumbnailImage($dst_width, $dst_height, true);
 				}
+				elseif ($this->_image->getNumberImages() > 1)
+				{
+					// Animated GIFs are a special case, they need to be resized individually
+					$success = $this->resizeGifImage($dst_width, $dst_height);
+				}
 				else
 				{
 					$success = $this->_image->resizeImage($dst_width, $dst_height, Imagick::FILTER_LANCZOS, .9891, true);
@@ -225,6 +230,31 @@ class ImageMagick extends AbstractManipulator
 			}
 
 		}
+
+		return $success;
+	}
+
+	/**
+	 * Resizes a GIF image to the specified dimensions, adjusting each frame individually.
+	 *
+	 * @param int $dst_width The desired width of the resized image.
+	 * @param int $dst_height The desired height of the resized image.
+	 * @return bool Indicates whether the resizing operation was successful for all frames.
+	 */
+	public function resizeGifImage($dst_width, $dst_height)
+	{
+		$success = true;
+
+		// Explode the gif so each frame is a full image
+		$this->_image = $this->_image->coalesceImages();
+
+		// Resize every frame individually
+		foreach ($this->_image as $frame)
+		{
+			$success .= $frame->resizeImage($dst_width, $dst_height, \Imagick::FILTER_LANCZOS, .9891, true);
+		}
+
+		$this->_image = $this->_image->deconstructImages();
 
 		return $success;
 	}

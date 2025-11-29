@@ -178,7 +178,7 @@ class Attachment extends AbstractController
 		if ($resp_data['result'] === true)
 		{
 			// Pass this off to action_ulattach just like it was a single file, set strict as false as we already have the
-			// combined chunks in the attachment directory and we don't need to verify it was a php upload any longer
+			// combined chunks in the attachment directory, and we don't need to verify it was a php upload any longer
 			$this->action_ulattach(false);
 		}
 		else

@@ -454,7 +454,7 @@ class PreparseCode
 					$this_tag = 'iurl';
 					$this_close = 'iurl';
 				}
-				elseif (strpos($replace, '//') === 0)
+				elseif (str_starts_with($replace, '//'))
 				{
 					$replace = $protocols[0] . ':' . $replace;
 				}

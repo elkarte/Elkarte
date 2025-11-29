@@ -145,7 +145,7 @@ class Autolink
 	 */
 	public function hasLinks($data): bool
 	{
-		return $this->hasPossibleLink() && (strpos($data, '://') !== false || strpos($data, 'www.') !== false);
+		return $this->hasPossibleLink() && (str_contains($data, '://') || str_contains($data, 'www.'));
 	}
 
 	/**
@@ -193,7 +193,7 @@ class Autolink
 	 */
 	public function hasEmails($data): bool
 	{
-		return $this->hasPossibleEmail() && strpos($data, '@') !== false;
+		return $this->hasPossibleEmail() && str_contains($data, '@');
 	}
 
 	/**
@@ -226,8 +226,8 @@ class Autolink
 	 */
 	public function setPossibleAutolink($message): void
 	{
-		$possible_link = $this->url_enabled && (strpos($message, '://') !== false || strpos($message, 'www.') !== false);
-		$possible_email = $this->email_enabled && strpos($message, '@') !== false;
+		$possible_link = $this->url_enabled && (str_contains($message, '://') || str_contains($message, 'www.'));
+		$possible_email = $this->email_enabled && str_contains($message, '@');
 
 		// Your autolink integration might use something like tel.123456789.call. This makes that possible.
 		call_integration_hook('integrate_possible_autolink', [&$possible_link, &$possible_email]);

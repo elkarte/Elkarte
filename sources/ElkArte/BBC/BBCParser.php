@@ -177,7 +177,7 @@ class BBCParser
 		// Check if the message might have a link or email to save a bunch of parsing in autolink()
 		$this->autolinker->setPossibleAutolink($this->message);
 
-		$this->possible_html = !empty($GLOBALS['modSettings']['enablePostHTML']) && strpos($message, '&lt;') !== false;
+		$this->possible_html = !empty($GLOBALS['modSettings']['enablePostHTML']) && str_contains($message, '&lt;');
 
 		// Don't load the HTML Parser unless we have to
 		if ($this->possible_html && $this->html_parser === null)
@@ -1272,7 +1272,7 @@ class BBCParser
 		}
 
 		// Take care of some HTML!
-		if ($this->possible_html && strpos($data, '&lt;') !== false)
+		if ($this->possible_html && str_contains($data, '&lt;'))
 		{
 			// @todo new \Parser\BBC\HTML;
 			$data = $this->parseHTML($data);

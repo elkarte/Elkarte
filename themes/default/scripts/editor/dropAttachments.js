@@ -64,7 +64,7 @@
 				individualSizeAllowed = params.individualSizeAllowed || 0;
 				numOfAttachmentAllowed = params.numOfAttachmentAllowed || 0;
 				totalAttachSizeUploaded = params.totalAttachSizeUploaded || 0;
-				attachmentChunkSize = params.totalAttachSizeUploaded || 250000;
+				attachmentChunkSize = params.chunkSize || 250000;
 				numAttachUploaded = params.numAttachUploaded || 0;
 				resizeImageEnabled = params.resizeImageEnabled;
 				filesUploadedSuccessfully = [];

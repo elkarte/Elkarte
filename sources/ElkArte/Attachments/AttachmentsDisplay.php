@@ -78,8 +78,14 @@ class AttachmentsDisplay
 
 		$db = database();
 
+		// Nothing to do
+		if ($messages === [])
+		{
+			$this->attachments = [];
+			return;
+		}
+
 		$attachments = [];
-		$temp = [];
 		$db->fetchQuery('
 			SELECT
 				a.id_attach, a.id_folder, a.id_msg, a.filename, a.file_hash, COALESCE(a.size, 0) AS filesize, a.downloads, a.approved,
@@ -88,33 +94,28 @@ class AttachmentsDisplay
 				FROM {db_prefix}attachments AS a' . (empty($modSettings['attachmentShowImages']) || empty($modSettings['attachmentThumbnails']) ? '' : '
 				LEFT JOIN {db_prefix}attachments AS thumb ON (thumb.id_attach = a.id_thumb)') . '
 			WHERE a.id_msg IN ({array_int:message_list})
-				AND a.attachment_type = {int:attachment_type}',
+				AND a.attachment_type = {int:attachment_type}
+			ORDER BY a.id_msg ASC, a.id_attach ASC',
 			[
 				'message_list' => $messages,
 				'attachment_type' => 0,
 			]
 		)->fetch_callback(
-			static function ($row) use ($includeUnapproved, $filter, $all_posters, &$attachments, &$temp) {
+			static function ($row) use ($includeUnapproved, $filter, $all_posters, &$attachments) {
 				if (!$row['approved'] && !$includeUnapproved
-					&& (empty($filter) || !call_user_func($filter, $row, $all_posters)))
+					&& (empty($filter) || !$filter($row, $all_posters)))
 				{
 					return;
 				}
-				$temp[$row['id_attach']] = $row;
+
 				if (!isset($attachments[$row['id_msg']]))
 				{
 					$attachments[$row['id_msg']] = [];
 				}
+
+				$attachments[$row['id_msg']][] = $row;
 			}
 		);
-
-		// This is better than sorting it with the query...
-		ksort($temp);
-
-		foreach ($temp as $row)
-		{
-			$attachments[$row['id_msg']][] = $row;
-		}
 
 		$this->attachments = $attachments;
 	}
@@ -290,7 +291,7 @@ class AttachmentsDisplay
 	 */
 	public function getAttachmentData(int $id_msg): array
 	{
-		[$attachmentData, ] = $this->loadAttachmentContext($id_msg);
+		[$attachmentData,] = $this->loadAttachmentContext($id_msg);
 
 		return $attachmentData;
 	}

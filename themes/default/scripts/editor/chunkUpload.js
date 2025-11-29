@@ -58,7 +58,7 @@ class chunkUpload
 		combineChunkForm.append('elkuuid', this.uuid);
 		combineChunkForm.append('elkchunkindex', this.chunkCount);
 		combineChunkForm.append('elktotalchunkcount', this.totalChunks);
-		combineChunkForm.append('filename', this.file.name.php_urlencode());
+		combineChunkForm.append('filename', this.file.name);
 		combineChunkForm.append('filesize', this.file.size);
 		combineChunkForm.append('filetype', this.file.type);
 		combineChunkForm.append(elk_session_var, elk_session_id);
@@ -200,7 +200,7 @@ class chunkUpload
 		chunkForm.append('elkchunkindex', this.chunkCount);
 		chunkForm.append('elktotalchunkcount', this.totalChunks);
 		chunkForm.append('elkuuid', this.uuid);
-		chunkForm.append('filename', this.file.name.php_urlencode());
+		chunkForm.append('filename', this.file.name);
 		chunkForm.append('filesize',  this.chunkData.size);
 		chunkForm.append('filetype', this.file.type);
 		chunkForm.append('attachment[]', this.chunkData);

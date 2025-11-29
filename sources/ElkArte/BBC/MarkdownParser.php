@@ -57,7 +57,7 @@ class MarkdownParser
 	 */
 	protected function quoteTags($data): string
 	{
-		if (strpos($data, '>') !== false)
+		if (str_contains($data, '>'))
 		{
 			// Much simpler to deal with newlines than breaks
 			$data = str_replace('<br />', "\n", $data);
@@ -80,12 +80,12 @@ class MarkdownParser
 	 */
 	protected function boldTags($data): string
 	{
-		if (strpos($data, '**') !== false)
+		if (str_contains($data, '**'))
 		{
 			$data = $this->doubleTagConvert('*', 'b', $data);
 		}
 
-		if (strpos($data, '__') !== false)
+		if (str_contains($data, '__'))
 		{
 			return $this->doubleTagConvert('_', 'b', $data);
 		}
@@ -102,12 +102,12 @@ class MarkdownParser
 	 */
 	protected function italicTags($data): string
 	{
-		if (strpos($data, '*') !== false)
+		if (str_contains($data, '*'))
 		{
 			$data = $this->tagConvert('*', 'i', $data);
 		}
 
-		if (strpos($data, '_') !== false)
+		if (str_contains($data, '_'))
 		{
 			return $this->tagConvert('_', 'i', $data);
 		}
@@ -124,7 +124,7 @@ class MarkdownParser
 	 */
 	protected function strikeTags($data): string
 	{
-		if (strpos($data, '~~') !== false)
+		if (str_contains($data, '~~'))
 		{
 			return $this->doubleTagConvert('~', 's', $data);
 		}
@@ -205,17 +205,17 @@ class MarkdownParser
 	public function inlineCodeTags($data): string
 	{
 		// code block
-		if (strpos($data, '```') !== false)
+		if (str_contains($data, '```'))
 		{
 			$data = preg_replace_callback('~(?<=\s|^|<br />)```\s*(?:\n|<br />)([\s\S]+?(?=(<br />|\n)```))(?:<br />|\n)```~u',
 				static fn($match) => '[code]' . strtr($match[1], ['[' => '&#91;', ']' => '&#93;']) . '[/code]', $data);
 		}
 
 		// icode line
-		if (strpos($data, '`') !== false)
+		if (str_contains($data, '`'))
 		{
 			return preg_replace_callback('~(?<=\W|^)`([^`]+)`(?=\W|$)~u', static function ($match) {
-				if (strpos($match[1], '<br />'))
+				if (str_contains($match[1], '<br />'))
 				{
 					return $match[0];
 				}
