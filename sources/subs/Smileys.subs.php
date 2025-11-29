@@ -518,17 +518,17 @@ function list_getSmileySets($start, $items_per_page, $sort)
 		$cols['ext'][] = $set_exts[$i];
 	}
 
-	$sort_flag = strpos($sort, 'DESC') === false ? SORT_ASC : SORT_DESC;
+	$sort_flag = !str_contains($sort, 'DESC') ? SORT_ASC : SORT_DESC;
 
-	if (strpos($sort, 'name') === 0)
+	if (str_starts_with($sort, 'name'))
 	{
 		array_multisort($cols['name'], $sort_flag, SORT_REGULAR, $cols['path'], $cols['selected'], $cols['id'], $cols['ext']);
 	}
-	elseif (strpos($sort, 'ext') === 0)
+	elseif (str_starts_with($sort, 'ext'))
 	{
 		array_multisort($cols['ext'], $sort_flag, SORT_REGULAR, $cols['name'], $cols['selected'], $cols['id'], $cols['path']);
 	}
-	elseif (strpos($sort, 'path') === 0)
+	elseif (str_starts_with($sort, 'path'))
 	{
 		array_multisort($cols['path'], $sort_flag, SORT_REGULAR, $cols['name'], $cols['selected'], $cols['id'], $cols['ext']);
 	}
@@ -726,7 +726,7 @@ function possibleSmileEmoji(&$row, $path = null, $ext = null)
 	$path = rtrim($path, '/\\') . DIRECTORY_SEPARATOR;
 
 	// At least 4 characters long, starts and ends with :  -- Marginally faster than preg_match
-	$possibleEmoji = isset($row['code'][3]) && $row['code'][0] === ':' && substr($row['code'], -1, 1) === ':';
+	$possibleEmoji = isset($row['code'][3]) && $row['code'][0] === ':' && str_ends_with($row['code'], ':');
 
 	// If this is possibly an emoji and the image does not exist in the smile set
 	if ($possibleEmoji && !FileFunctions::instance()->fileExists($path . $row['filename'] . '.' . $ext))

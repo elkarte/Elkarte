@@ -1006,7 +1006,7 @@ function updateBanMembers()
 			if ($row['email_address'])
 			{
 				// Does it have a wildcard - if so we can't do a IN on it.
-				if (strpos($row['email_address'], '%') !== false)
+				if (str_contains($row['email_address'], '%'))
 				{
 					$memberEmailWild[$row['email_address']] = $row['email_address'];
 				}
@@ -1705,7 +1705,7 @@ function banLogItems($ban_details)
 		if (!empty($row['ip_high1']))
 		{
 			$ip = range2ip([$row['ip_low1'], $row['ip_low2'], $row['ip_low3'], $row['ip_low4'], $row['ip_low5'], $row['ip_low6'], $row['ip_low7'], $row['ip_low8']], [$row['ip_high1'], $row['ip_high2'], $row['ip_high3'], $row['ip_high4'], $row['ip_high5'], $row['ip_high6'], $row['ip_high7'], $row['ip_high8']]);
-			$is_range = (strpos($ip, '-') !== false || strpos($ip, '*') !== false);
+			$is_range = (str_contains($ip, '-') || str_contains($ip, '*'));
 
 			$log_info[] = [
 				'bantype' => ($is_range ? 'ip_range' : 'main_ip'),

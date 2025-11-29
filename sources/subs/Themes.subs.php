@@ -88,7 +88,7 @@ function validateThemeName($indexes, $value_data)
 			// Find the right one.
 			foreach ($indexes as $index)
 			{
-				if (strpos($row['value'], $index) !== false)
+				if (str_contains($row['value'], $index))
 				{
 					$themes[$row['id_theme']] = $index;
 				}
@@ -824,7 +824,7 @@ function deleteVariants($id)
  * @param array $options
  * @param string[] $variables
  *
- * @return array|array
+ * @return array
  */
 function loadThemeOptionsInto($theme, $memID = null, $options = [], $variables = [])
 {

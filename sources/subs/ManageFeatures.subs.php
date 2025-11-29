@@ -477,7 +477,7 @@ function getProfileField($id_field)
 				'private' => $row['private'],
 				'can_search' => $row['can_search'],
 				'mask' => $row['mask'],
-				'regex' => strpos($row['mask'], 'regex') === 0 ? substr($row['mask'], 5) : '',
+				'regex' => str_starts_with($row['mask'], 'regex') ? substr($row['mask'], 5) : '',
 				'enclose' => $row['enclose'],
 				'placement' => $row['placement'],
 			];

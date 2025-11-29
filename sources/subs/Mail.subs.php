@@ -336,7 +336,7 @@ function loadEmailTemplate($template, $replacements = [], $lang = '', $html = fa
 	foreach ($replacements as $f => $r)
 	{
 		$find[] = '{' . $f . '}';
-		$replace[] = $html && strpos($r, 'http') === 0 ? '<a href="' . $r . '">' . $r . '</a>' : $r;
+		$replace[] = $html && str_starts_with($r, 'http') ? '<a href="' . $r . '">' . $r . '</a>' : $r;
 	}
 
 	// Do the variable replacements.

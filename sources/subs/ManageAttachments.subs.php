@@ -149,7 +149,7 @@ function removeAttachments($condition, $query_type = '', $return_affected_messag
 		foreach ($condition as $real_type => $restriction)
 		{
 			// Doing a NOT?
-			$is_not = substr($real_type, 0, 4) === 'not_';
+			$is_not = str_starts_with($real_type, 'not_');
 			$type = $is_not ? substr($real_type, 4) : $real_type;
 
 			switch ($type)

@@ -149,7 +149,7 @@ function list_getLanguagesList()
 		foreach ($lang_files as $file)
 		{
 			// Were we searching?
-			if (!empty($context['elk_search_term']) && strpos($file->fetch('name'), Util::strtolower($context['elk_search_term'])) === false)
+			if (!empty($context['elk_search_term']) && !str_contains($file->fetch('name'), Util::strtolower($context['elk_search_term'])))
 			{
 				continue;
 			}

@@ -281,7 +281,8 @@ function modifyBoard($board_id, &$boardOptions)
 			{
 				throw new \ElkArte\Exceptions\Exception('mboards_parent_own_child_error', false);
 			}
-			elseif ($id_parent == $board_id)
+
+			if ($id_parent == $board_id)
 			{
 				throw new \ElkArte\Exceptions\Exception('mboards_board_own_child_error', false);
 			}

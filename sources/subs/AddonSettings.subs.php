@@ -87,7 +87,7 @@ function list_integration_hooks_data($start, $items_per_page, $sort)
 				{
 					$hook_name = str_replace(']', '', $function_o);
 
-					if (strpos($hook_name, '::') !== false)
+					if (str_contains($hook_name, '::'))
 					{
 						[$class, $function] = explode('::', $hook_name);
 					}
@@ -101,7 +101,7 @@ function list_integration_hooks_data($start, $items_per_page, $sort)
 					$function = $function[0];
 
 					// If the hook is an include, we need to check if the file exists.
-					if (substr($hook, -8) === '_include')
+					if (str_ends_with($hook, '_include'))
 					{
 						$real_path = parse_path(trim($hook_name));
 
@@ -119,7 +119,7 @@ function list_integration_hooks_data($start, $items_per_page, $sort)
 						unset($temp_hooks[$hook][$function_o]);
 					}
 					// Perhaps we are dealing with a generic menu hook
-					elseif (substr($hook, -6) === '_areas')
+					elseif (str_ends_with($hook, '_areas'))
 					{
 						$menuPart = str_replace(['integrate_', '_areas'], '', $hook);
 						$regex = '~\'hook\'\s*=>\s*\'' . $menuPart . '\'[\s,]*~';
@@ -136,7 +136,7 @@ function list_integration_hooks_data($start, $items_per_page, $sort)
 						}
 					}
 					// Procedural functions are easy
-					elseif (empty($class) && strpos(str_replace(' (', '(', $fc), 'function ' . trim($function) . '(') !== false)
+					elseif (empty($class) && str_contains(str_replace(' (', '(', $fc), 'function ' . trim($function) . '('))
 					{
 						$hook_status[$hook][$hook_name]['exists'] = true;
 						$hook_status[$hook][$hook_name]['in_file'] = $file['name'];
@@ -190,7 +190,7 @@ function list_integration_hooks_data($start, $items_per_page, $sort)
 			$function = str_replace(']', '', $function);
 
 			// This is a not an include and the function is included in a certain file (if not it doesn't exists so don't care)
-			if (isset($hook_status[$hook][$function]['in_file']) && substr($hook, -8) !== '_include')
+			if (isset($hook_status[$hook][$function]['in_file']) && !str_ends_with($hook, '_include'))
 			{
 				$current_hook = $temp_data['include'][$hook_status[$hook][$function]['in_file']] ?? '';
 				$enabled = false;
@@ -199,7 +199,7 @@ function list_integration_hooks_data($start, $items_per_page, $sort)
 				// if any of them is enable then the file *must* be included and the integrate_*_include hook cannot be disabled
 				foreach ($temp_data['function'][$hook_status[$hook][$function]['in_file']] as $func)
 				{
-					$enabled = $enabled || strpos($func, ']') !== false;
+					$enabled = $enabled || str_contains($func, ']');
 				}
 
 				if (!$enabled && !empty($current_hook))
@@ -227,11 +227,11 @@ function list_integration_hooks_data($start, $items_per_page, $sort)
 		{
 			foreach ($functions as $function)
 			{
-				$enabled = strpos($function, ']') === false;
+				$enabled = !str_contains($function, ']');
 				$function = str_replace(']', '', $function);
 				$hook_exists = !empty($hook_status[$hook][$function]['exists']);
 
-				if (strpos($function, '::') !== false)
+				if (str_contains($function, '::'))
 				{
 					$function = explode('::', $function);
 					$function = $function[1];
@@ -330,7 +330,7 @@ function get_integration_hooks()
 		$integration_hooks = [];
 		foreach ($modSettings as $key => $value)
 		{
-			if (!empty($value) && strpos($key, 'integrate_') === 0)
+			if (!empty($value) && str_starts_with($key, 'integrate_'))
 			{
 				$integration_hooks[$key] = explode(',', $value);
 			}

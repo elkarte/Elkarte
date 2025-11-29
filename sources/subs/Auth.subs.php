@@ -164,7 +164,7 @@ function url_parts($local, $global)
 		$parsed_url['path'] = '';
 	}
 
-	if (!empty($modSettings['globalCookiesDomain']) && strpos($boardurl, $modSettings['globalCookiesDomain']) !== false)
+	if (!empty($modSettings['globalCookiesDomain']) && str_contains($boardurl, $modSettings['globalCookiesDomain']))
 	{
 		$parsed_url['host'] = $modSettings['globalCookiesDomain'];
 	}
@@ -182,7 +182,7 @@ function url_parts($local, $global)
 	}
 
 	// The host also shouldn't be set if there aren't any dots in it.
-	elseif (!isset($parsed_url['host']) || strpos($parsed_url['host'], '.') === false)
+	elseif (!isset($parsed_url['host']) || !str_contains($parsed_url['host'], '.'))
 	{
 		$parsed_url['host'] = '';
 	}
@@ -284,16 +284,14 @@ function adminLogin_outputPostVars($k, $v)
 		return '
 <input type="hidden" name="' . htmlspecialchars($k, ENT_COMPAT, 'UTF-8') . '" value="' . strtr($v, ['"' => '&quot;', '<' => '&lt;', '>' => '&gt;']) . '" />';
 	}
-	else
-	{
-		$ret = '';
-		foreach ($v as $k2 => $v2)
-		{
-			$ret .= adminLogin_outputPostVars($k . '[' . $k2 . ']', $v2);
-		}
 
-		return $ret;
+	$ret = '';
+	foreach ($v as $k2 => $v2)
+	{
+		$ret .= adminLogin_outputPostVars($k . '[' . $k2 . ']', $v2);
 	}
+
+	return $ret;
 }
 
 /**
@@ -374,7 +372,7 @@ function findMembers($names, $use_wildcards = false, $buddies_only = false, $max
 		// Trim, and fix wildcards for each name.
 		$names[$i] = trim(Util::strtolower($name));
 
-		$maybe_email |= strpos($name, '@') !== false;
+		$maybe_email |= str_contains($name, '@');
 
 		// Make it so standard wildcards will work. (* and ?)
 		if ($use_wildcards)
@@ -559,7 +557,7 @@ function validateUsername($memID, $username, $ErrorContext = 'register', $check_
 	}
 
 	// Only these characters are permitted.
-	if (in_array($username, ['_', '|']) || preg_match('~[<>&"\'=\\\\]~', preg_replace('~&#(?:\\d{1,7}|x[0-9a-fA-F]{1,6});~', '', $username)) != 0 || strpos($username, '[code') !== false || strpos($username, '[/code') !== false)
+	if (in_array($username, ['_', '|']) || preg_match('~[<>&"\'=\\\\]~', preg_replace('~&#(?:\\d{1,7}|x[0-9a-fA-F]{1,6});~', '', $username)) != 0 || str_contains($username, '[code') || str_contains($username, '[/code'))
 	{
 		$errors->addError('error_invalid_characters_username');
 	}
@@ -981,7 +979,7 @@ function loadExistingMember($name, $is_id = false)
 			]
 		);
 		// Didn't work. Try it as an email address.
-		if ($request->num_rows() === 0 && strpos($name, '@') !== false)
+		if ($request->num_rows() === 0 && str_contains($name, '@'))
 		{
 			$request->free_result();
 

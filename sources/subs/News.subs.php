@@ -402,7 +402,7 @@ function fix_possible_url($val)
 {
 	global $scripturl;
 
-	if (substr($val, 0, strlen($scripturl)) !== $scripturl)
+	if (!str_starts_with($val, $scripturl))
 	{
 		return $val;
 	}

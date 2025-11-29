@@ -72,7 +72,7 @@ function spiderCheck()
 	$req = Request::instance();
 
 	// Always attempt IPv6 first.
-	if (strpos($_SERVER['REMOTE_ADDR'], ':') !== false)
+	if (str_contains($_SERVER['REMOTE_ADDR'], ':'))
 	{
 		$ip_parts = convertIPv6toInts($_SERVER['REMOTE_ADDR']);
 	}
@@ -105,7 +105,7 @@ function spiderCheck()
 							break;
 						}
 
-						if (($key == 7 && strpos($_SERVER['REMOTE_ADDR'], ':') !== false) || ($key == 3 && strpos($_SERVER['REMOTE_ADDR'], ':') === false))
+						if (($key == 7 && str_contains($_SERVER['REMOTE_ADDR'], ':')) || ($key == 3 && !str_contains($_SERVER['REMOTE_ADDR'], ':')))
 						{
 							$_SESSION['id_robot'] = $spider['id_spider'];
 						}
@@ -141,7 +141,7 @@ function spiderQuickCheck()
 	$req = Request::instance();
 	$ci_user_agent = strtolower($req->user_agent());
 
-	return strpos($ci_user_agent, 'mozilla') === false || preg_match('~(googlebot|slurp|msnbot|yandex|bingbot|baidu|duckduckbot|sogou|exabot|facebo|ecosia|ia_archiver|megaindex)~u', $ci_user_agent) == 1;
+	return !str_contains($ci_user_agent, 'mozilla') || preg_match('~(googlebot|slurp|msnbot|yandex|bingbot|baidu|duckduckbot|sogou|exabot|facebo|ecosia|ia_archiver|megaindex)~u', $ci_user_agent) == 1;
 }
 
 /**

@@ -326,13 +326,13 @@ function pbe_email_quote_depth(&$string, $update = true)
 	while ($check)
 	{
 		// We have a quote marker, increase our depth and strip the line of that quote marker
-		if ($string === '>' || strpos($string, '> ') === 0)
+		if ($string === '>' || str_starts_with($string, '> '))
 		{
 			$level++;
 			$string = substr($string, 2);
 		}
 		// Maybe a poorly nested quote, with no spaces between the >'s or the > and the data with no space
-		elseif ((strpos($string, '>>') === 0) || (preg_match('~^>[a-z0-9<-]+~Ui', $string) === 1))
+		elseif ((str_starts_with($string, '>>')) || (preg_match('~^>[a-z0-9<-]+~Ui', $string) === 1))
 		{
 			$level++;
 			$string = substr($string, 1);
@@ -735,7 +735,7 @@ function pbe_emailError($error, $email_message)
 	{
 		// We don't have the message type (since we don't have a key)
 		// Attempt to see if it might be a PM so we handle it correctly
-		if (empty($message_type) && (strpos($email_message->subject, (string) $pm_subject_leader) !== false))
+		if (empty($message_type) && (str_contains($email_message->subject, (string) $pm_subject_leader)))
 		{
 			$message_type = 'p';
 		}
@@ -895,7 +895,7 @@ function pbe_email_attachments($pbe, $email_message)
 		foreach ($tmp_attachments as $attachID => $attachment)
 		{
 			// If there were any errors we just skip that file
-			if (strpos($attachID, (string) $prefix) === false || $attachment->hasErrors())
+			if (!str_contains($attachID, (string) $prefix) || $attachment->hasErrors())
 			{
 				$attachment->remove(false);
 				continue;
@@ -2040,7 +2040,7 @@ function pbe_create_post($pbe, $email_message, $topic_info)
 	// Setup the post variables.
 	$msgOptions = [
 		'id' => 0,
-		'subject' => strpos($topic_info['subject'], trim($pbe['response_prefix'])) === 0 ? $topic_info['subject'] : $pbe['response_prefix'] . $topic_info['subject'],
+		'subject' => str_starts_with($topic_info['subject'], trim($pbe['response_prefix'])) ? $topic_info['subject'] : $pbe['response_prefix'] . $topic_info['subject'],
 		'smileys_enabled' => true,
 		'body' => $text,
 		'attachments' => empty($attachIDs) ? [] : $attachIDs,
@@ -2137,7 +2137,7 @@ function pbe_create_pm($pbe, $email_message, $pm_info)
 		'username' => $pbe['profile']['member_name']
 	];
 
-	$pm_info['subject'] = strpos($pm_info['subject'], trim($pbe['response_prefix'])) === 0 ? $pm_info['subject'] : $pbe['response_prefix'] . $pm_info['subject'];
+	$pm_info['subject'] = str_starts_with($pm_info['subject'], trim($pbe['response_prefix'])) ? $pm_info['subject'] : $pbe['response_prefix'] . $pm_info['subject'];
 
 	// send/save the actual PM.
 	require_once(SUBSDIR . '/PersonalMessage.subs.php');
