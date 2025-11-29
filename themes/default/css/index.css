@@ -2083,13 +2083,15 @@ button[type="submit"].quick_quote_button.hide {
 .small_pagelinks li:first-child::before {
 	font-size: var(--font14);
 	font-family: "Apple Symbols", "Segoe UI Symbol", sans-serif;
-	content: "\2B9C";
+    content: "\27A4"; /* Was content: "\2B9C"; */
+    display: inline-block;
+    transform: rotate(180deg) translateY(-0.15rem);
 }
 
 .small_pagelinks li:last-child::after {
 	font-size: var(--font14);
 	font-family: "Apple Symbols", "Segoe UI Symbol", sans-serif;
-	content: "\2B9E";
+    content: "\27A4"; /* Was content: "\2B9E"; */
 }
 
 .small_pagelinks li {
@@ -3501,7 +3503,7 @@ aside.poster, #quickreplybox .poster, #quicktopicbox .poster {
 }
 
 #elk_lb_next, #elk_lb_prev, #elk_lb_expand {
-	line-height: .9;
+	line-height: 1.1;
 	position: absolute;
 	top: 50%;
 	right: -3%;
@@ -3520,7 +3522,7 @@ aside.poster, #quickreplybox .poster, #quicktopicbox .poster {
 }
 
 #elk_lb_expand {
-	top: -5%;
+	top: -3%;
 }
 
 #elk_lb_prev {
@@ -3530,20 +3532,23 @@ aside.poster, #quickreplybox .poster, #quicktopicbox .poster {
 #elk_lb_expand::before {
 	font-size: 3rem;
 	font-family: "Apple Symbols", "Segoe UI Symbol", sans-serif;
-	line-height: .85;
-	content: "\1F875";
+	content: "\2196"; /* Changed from \1F875 for older device support */
+    display: inline-block;
+    transform: rotate(90deg);
 }
 
 #elk_lb_next::before {
-	font-size: 3rem;
+	font-size: 2rem;
 	font-family: "Apple Symbols", "Segoe UI Symbol", sans-serif;
-	content: "\1F842";
+    line-height: 1.25;
+    content: "\25B6"; /* Changed from \1F842 for older device support */
 }
 
 #elk_lb_prev::before {
-	font-size: 3rem;
+	font-size: 2rem;
 	font-family: "Apple Symbols", "Segoe UI Symbol", sans-serif;
-	content: "\1F840";
+    line-height: 1.25;
+    content: "\25C0"; /* Changed from \1F840 for older device support */
 }
 
 .elk_lb_no_scrolling {
