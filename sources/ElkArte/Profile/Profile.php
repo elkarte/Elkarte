@@ -480,6 +480,8 @@ class Profile extends AbstractController
 						],
 					],
 					'activateaccount' => [
+						'label' => $txt['account_activate'],
+						'hidden' => true,
 						'controller' => ProfileAccount::class,
 						'function' => 'action_activateaccount',
 						'sc' => 'get',

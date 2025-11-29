@@ -673,7 +673,7 @@ class ProfileAccount extends AbstractController
 				redirectexit();
 			}
 
-			// Actually update this member now, as it guarantees the unapproved count can't get corrupted.
+			// Actually, update this member now, as it guarantees the unapproved count can't get corrupted.
 			approveMembers(['members' => [$context['id_member']], 'activated_status' => $this->_profile['is_activated']]);
 
 			// Log what we did?

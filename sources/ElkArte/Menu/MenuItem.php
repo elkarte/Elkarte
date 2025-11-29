@@ -43,7 +43,7 @@ abstract class MenuItem
 	 *
 	 * @return MenuItem
 	 */
-	public static function buildFromArray($arr, $sa = ''): MenuItem
+	public static function buildFromArray($arr, $sa = '')
 	{
 		$obj = new static();
 
@@ -73,7 +73,7 @@ abstract class MenuItem
 	 *
 	 * @return array
 	 */
-	private function camelCaseKeys($arr): array
+	private function camelCaseKeys($arr)
 	{
 		$keys = array_keys($arr);
 		foreach ($keys as $key)
@@ -94,7 +94,7 @@ abstract class MenuItem
 	 *
 	 * @return string
 	 */
-	public function getLabel(): string
+	public function getLabel()
 	{
 		return $this->label;
 	}
@@ -106,7 +106,7 @@ abstract class MenuItem
 	 *
 	 * @return MenuItem
 	 */
-	public function setLabel($label): MenuItem
+	public function setLabel($label)
 	{
 		$this->label = $label;
 
@@ -118,7 +118,7 @@ abstract class MenuItem
 	 *
 	 * @return string
 	 */
-	public function getCounter(): string
+	public function getCounter()
 	{
 		return $this->counter;
 	}
@@ -130,7 +130,7 @@ abstract class MenuItem
 	 *
 	 * @return MenuItem
 	 */
-	public function setCounter($counter): MenuItem
+	public function setCounter($counter)
 	{
 		$this->counter = $counter;
 
@@ -142,7 +142,7 @@ abstract class MenuItem
 	 *
 	 * @return string
 	 */
-	public function getUrl(): string
+	public function getUrl()
 	{
 		return $this->url;
 	}
@@ -154,7 +154,7 @@ abstract class MenuItem
 	 *
 	 * @return MenuItem
 	 */
-	public function setUrl($url): MenuItem
+	public function setUrl($url)
 	{
 		$this->url = $url;
 
@@ -166,7 +166,7 @@ abstract class MenuItem
 	 *
 	 * @return string[]
 	 */
-	public function getPermission(): array
+	public function getPermission()
 	{
 		return $this->permission;
 	}
@@ -178,7 +178,7 @@ abstract class MenuItem
 	 *
 	 * @return MenuItem
 	 */
-	public function setPermission($permission): MenuItem
+	public function setPermission($permission)
 	{
 		$this->permission = $permission;
 
@@ -190,7 +190,7 @@ abstract class MenuItem
 	 *
 	 * @return bool
 	 */
-	public function isEnabled(): bool
+	public function isEnabled()
 	{
 		return $this->enabled;
 	}
@@ -202,7 +202,7 @@ abstract class MenuItem
 	 *
 	 * @return MenuItem
 	 */
-	public function setEnabled($enabled): MenuItem
+	public function setEnabled($enabled)
 	{
 		$this->enabled = (bool) $enabled;
 
