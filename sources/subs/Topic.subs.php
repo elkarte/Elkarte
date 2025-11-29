@@ -1665,7 +1665,7 @@ function countMessagesBefore($id_topic, $id_msg, $include_current = false, $only
  * @param array $messages
  * @param bool $only_approved
  *
- * @return array|array
+ * @return array
  */
 function selectMessages($topic, $start, $items_per_page, $messages = [], $only_approved = false)
 {

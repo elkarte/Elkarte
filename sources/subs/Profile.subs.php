@@ -768,7 +768,7 @@ function isCustomFieldValid($field, $value)
 			return 'custom_field_not_number';
 		}
 
-		if (strpos($field['mask'], 'regex') === 0 && trim($value) !== '' && preg_match(substr($field['mask'], 5), $value) === 0)
+		if (str_starts_with($field['mask'], 'regex') && trim($value) !== '' && preg_match(substr($field['mask'], 5), $value) === 0)
 		{
 			return 'custom_field_inproper_format';
 		}

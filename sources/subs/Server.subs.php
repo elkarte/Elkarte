@@ -61,7 +61,7 @@ function detectServerLoad()
  */
 function detectServerCores()
 {
-	if (strpos(PHP_OS_FAMILY, 'Win') === 0)
+	if (str_starts_with(PHP_OS_FAMILY, 'Win'))
 	{
 		$cores = getenv("NUMBER_OF_PROCESSORS") + 0;
 
@@ -109,7 +109,7 @@ function detectDiskUsage()
  */
 function detectUpTime()
 {
-	if (strpos(PHP_OS_FAMILY, 'Win') === 0)
+	if (str_starts_with(PHP_OS_FAMILY, 'Win'))
 	{
 		return false;
 	}

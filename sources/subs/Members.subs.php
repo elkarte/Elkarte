@@ -962,7 +962,7 @@ function isReservedName($name, $current_ID_MEMBER = 0, $is_name = true, $fatal =
 	// Characters we just shouldn't allow, regardless.
 	foreach (['*'] as $char)
 	{
-		if (strpos($checkName, $char) !== false)
+		if (str_contains($checkName, $char))
 		{
 			if ($fatal)
 			{
@@ -1501,7 +1501,7 @@ function membersByIP($ip1, $match = 'exact', $ip2 = false)
 			foreach ($ip as $id_var => $ip_var)
 			{
 				$ip_var = str_replace('*', '%', $ip_var);
-				$ip_query[] = strpos($ip_var, '%') === false ? '= {string:ip_address_' . $id . '_' . $id_var . '}' : 'LIKE {string:ip_address_' . $id . '_' . $id_var . '}';
+				$ip_query[] = !str_contains($ip_var, '%') ? '= {string:ip_address_' . $id . '_' . $id_var . '}' : 'LIKE {string:ip_address_' . $id . '_' . $id_var . '}';
 				$ip_params['ip_address_' . $id . '_' . $id_var] = $ip_var;
 			}
 		}

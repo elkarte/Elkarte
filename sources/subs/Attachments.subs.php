@@ -432,7 +432,7 @@ function isAttachmentImage($id_attach)
 	)->fetch_callback(
 		function ($row) use (&$attachmentData) {
 			$attachmentData = $row;
-			$attachmentData['is_image'] = substr($attachmentData['mime_type'], 0, 5) === 'image';
+			$attachmentData['is_image'] = str_starts_with($attachmentData['mime_type'], 'image');
 			$attachmentData['size'] = byte_format($attachmentData['size']);
 			$attachmentData['is_approved'] = $row['approved'] === '1';
 		}
@@ -706,7 +706,7 @@ function getServerStoredAvatars($directory)
 			// Add a new directory
 			$result[] = [
 				'filename' => htmlspecialchars(basename($entry), ENT_COMPAT, 'UTF-8'),
-				'checked' => strpos($context['member']['avatar']['server_pic'], basename($entry) . '/') !== false,
+				'checked' => str_contains($context['member']['avatar']['server_pic'], basename($entry) . '/'),
 				'name' => '[' . htmlspecialchars(str_replace('_', ' ', basename($entry)), ENT_COMPAT, 'UTF-8') . ']',
 				'is_dir' => true,
 				'files' => []

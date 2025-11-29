@@ -42,7 +42,7 @@ use ElkArte\XmlArray;
 function read_tgz_file($gzfilename, $destination, $single_file = false, $overwrite = false, $files_to_extract = null)
 {
 	// From a web site
-	if (substr($gzfilename, 0, 7) === 'http://' || substr($gzfilename, 0, 8) === 'https://')
+	if (str_starts_with($gzfilename, 'http://') || str_starts_with($gzfilename, 'https://'))
 	{
 		$data = fetch_web_data($gzfilename);
 	}
@@ -410,13 +410,13 @@ function matchHighestPackageVersion($versions, $the_version, $reset = false)
 	foreach ($versions as $for)
 	{
 		// Adjust for those wild cards
-		if (strpos($for, '*') !== false)
+		if (str_contains($for, '*'))
 		{
 			$for = str_replace('*', '0', $for) . '-' . str_replace('*', '999', $for);
 		}
 
 		// If we have a range, grab the lower value, done this way so it looks normal-er to the user e.g. 1.0 vs 1.0.99
-		if (strpos($for, '-') !== false)
+		if (str_contains($for, '-'))
 		{
 			list ($for,) = explode('-', $for);
 		}
@@ -459,13 +459,13 @@ function matchPackageVersion($version, $versions)
 	foreach ($versions as $for)
 	{
 		// Wild card spotted?
-		if (strpos($for, '*') !== false)
+		if (str_contains($for, '*'))
 		{
 			$for = str_replace('*', '0dev0', $for) . '-' . str_replace('*', '999', $for);
 		}
 
 		// Do we have a range?
-		if (strpos($for, '-') !== false)
+		if (str_contains($for, '-'))
 		{
 			list ($lower, $upper) = explode('-', $for);
 
@@ -550,10 +550,8 @@ function compareVersions($version1, $version2)
 				return $versions[1]['dev'] ? ($versions[2]['type'] === 'stable' ? -1 : 0) : ($versions[1]['type'] === 'stable' ? 1 : 0);
 			}
 			// Otherwise a simple comparison.
-			else
-			{
-				return $versions[1][$category] > $versions[2][$category] ? 1 : -1;
-			}
+
+			return $versions[1][$category] > $versions[2][$category] ? 1 : -1;
 		}
 	}
 
@@ -601,7 +599,7 @@ function parse_path($path)
 	}
 
 	// Check if they are using some old software install paths
-	if (strpos($path, '$') === 0 && isset($dirs[strtoupper(substr($path, 1))]))
+	if (str_starts_with($path, '$') && isset($dirs[strtoupper(substr($path, 1))]))
 	{
 		$path = strtoupper(substr($path, 1));
 	}
@@ -940,12 +938,12 @@ function parseModification($file, $testing = true, $undo = false, $theme_paths =
 		{
 			// If this filename is relative, if so take a guess at what it should be.
 			$real_filename = $filename;
-			if (strpos($filename, 'themes') === 0)
+			if (str_starts_with($filename, 'themes'))
 			{
 				$real_filename = BOARDDIR . '/' . $filename;
 			}
 
-			if (strpos($real_filename, $theme['theme_dir']) === 0)
+			if (str_starts_with($real_filename, $theme['theme_dir']))
 			{
 				$template_changes[$id][] = substr($real_filename, strlen($theme['theme_dir']) + 1);
 				$long_changes[$id][] = $filename;
@@ -1310,7 +1308,7 @@ function package_get_contents($filename)
 		$mem_check = detectServer()->setMemoryLimit('128M');
 
 		// Windows doesn't seem to care about the memory_limit.
-		if (!empty($modSettings['package_disable_cache']) || $mem_check || strpos(PHP_OS_FAMILY, 'Win') !== false)
+		if (!empty($modSettings['package_disable_cache']) || $mem_check || str_contains(PHP_OS_FAMILY, 'Win'))
 		{
 			$package_cache = [];
 		}
@@ -1320,7 +1318,7 @@ function package_get_contents($filename)
 		}
 	}
 
-	if (strpos($filename, 'packages/') !== false || $package_cache === false || !isset($package_cache[$filename]))
+	if (str_contains($filename, 'packages/') || $package_cache === false || !isset($package_cache[$filename]))
 	{
 		return file_get_contents($filename);
 	}
@@ -1352,7 +1350,7 @@ function package_put_contents($filename, $data, $testing = false)
 		// Try to increase the memory limit - we don't want to run out of ram!
 		$mem_check = detectServer()->setMemoryLimit('128M');
 
-		if (!empty($modSettings['package_disable_cache']) || $mem_check || strpos(PHP_OS_FAMILY, 'Win') !== false)
+		if (!empty($modSettings['package_disable_cache']) || $mem_check || str_contains(PHP_OS_FAMILY, 'Win'))
 		{
 			$package_cache = [];
 		}
@@ -1377,7 +1375,7 @@ function package_put_contents($filename, $data, $testing = false)
 	$packageChmod = new PackageChmod();
 	$packageChmod->pkgChmod($filename);
 
-	if (!$testing && (strpos($filename, 'packages/') !== false || $package_cache === false))
+	if (!$testing && (str_contains($filename, 'packages/') || $package_cache === false))
 	{
 		$path_ext = pathinfo($filename, PATHINFO_EXTENSION);
 		$fp = @fopen($filename, in_array($path_ext, $text_filetypes) ? 'w' : 'wb');
@@ -1391,7 +1389,7 @@ function package_put_contents($filename, $data, $testing = false)
 		fwrite($fp, $data);
 		fclose($fp);
 	}
-	elseif (strpos($filename, 'packages/') !== false || $package_cache === false)
+	elseif (str_contains($filename, 'packages/') || $package_cache === false)
 	{
 		return strlen($data);
 	}

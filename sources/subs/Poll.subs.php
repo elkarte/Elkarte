@@ -870,7 +870,7 @@ function loadPollContext($poll_id)
 	// If this is a guest we need to do our best to work out if they have voted, and what they voted for.
 	if (User::$info->is_guest && $pollinfo['guest_vote'] && allowedTo('poll_vote'))
 	{
-		if (!empty($_COOKIE['guest_poll_vote']) && preg_match('~^[0-9,;]+$~', $_COOKIE['guest_poll_vote']) && strpos($_COOKIE['guest_poll_vote'], ';' . $poll_id . ',') !== false)
+		if (!empty($_COOKIE['guest_poll_vote']) && preg_match('~^[0-9,;]+$~', $_COOKIE['guest_poll_vote']) && str_contains($_COOKIE['guest_poll_vote'], ';' . $poll_id . ','))
 		{
 			// ;id,timestamp,[vote,vote...]; etc
 			$guestinfo = explode(';', $_COOKIE['guest_poll_vote']);

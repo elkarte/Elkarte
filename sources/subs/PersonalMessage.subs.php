@@ -682,8 +682,8 @@ function sendpm($recipients, $subject, $message, $store_outbox = true, $from = n
 			{
 				if (($criterium['t'] === 'mid' && $criterium['v'] == $from['id'])
 					|| ($criterium['t'] === 'gid' && in_array($criterium['v'], User::$info->groups))
-					|| ($criterium['t'] === 'sub' && strpos($subject, $criterium['v']) !== false)
-					|| ($criterium['t'] === 'msg' && strpos($message, $criterium['v']) !== false))
+					|| ($criterium['t'] === 'sub' && str_contains($subject, $criterium['v']))
+					|| ($criterium['t'] === 'msg' && str_contains($message, $criterium['v'])))
 				{
 					$delete = true;
 				}
@@ -1298,8 +1298,8 @@ function applyRules($all_messages = false)
 				{
 					if (($criterium['t'] === 'mid' && $criterium['v'] == $row['id_member_from'])
 						|| ($criterium['t'] === 'gid' && $criterium['v'] == $row['id_group'])
-						|| ($criterium['t'] === 'sub' && strpos($row['subject'], $criterium['v']) !== false)
-						|| ($criterium['t'] === 'msg' && strpos($row['body'], $criterium['v']) !== false))
+						|| ($criterium['t'] === 'sub' && str_contains($row['subject'], $criterium['v']))
+						|| ($criterium['t'] === 'msg' && str_contains($row['body'], $criterium['v'])))
 					{
 						$match = true;
 					}

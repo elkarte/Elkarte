@@ -484,7 +484,7 @@ function isModuleEnabled($module)
 	$module = strtolower($module);
 	foreach ($modSettings as $key => $val)
 	{
-		if (substr($key, 0, 8) === 'modules_')
+		if (str_starts_with($key, 'modules_'))
 		{
 			$modules = explode(',', $val);
 			if (in_array($module, $modules))
