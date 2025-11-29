@@ -84,7 +84,7 @@ class MenuArea extends MenuItem
 	/**
 	 * @return callable
 	 */
-	public function getFunction(): callable
+	public function getFunction()
 	{
 		return $this->function;
 	}
@@ -94,7 +94,7 @@ class MenuArea extends MenuItem
 	 *
 	 * @return MenuArea
 	 */
-	public function setFunction($function): MenuArea
+	public function setFunction($function)
 	{
 		$this->function = $function;
 
@@ -104,7 +104,7 @@ class MenuArea extends MenuItem
 	/**
 	 * @return string
 	 */
-	public function getIcon(): string
+	public function getIcon()
 	{
 		return $this->icon;
 	}
@@ -114,7 +114,7 @@ class MenuArea extends MenuItem
 	 *
 	 * @return MenuArea
 	 */
-	public function setIcon($icon): MenuArea
+	public function setIcon($icon)
 	{
 		$this->icon = $icon;
 
@@ -124,7 +124,7 @@ class MenuArea extends MenuItem
 	/**
 	 * @return string
 	 */
-	public function getController(): string
+	public function getController()
 	{
 		return $this->controller;
 	}
@@ -134,7 +134,7 @@ class MenuArea extends MenuItem
 	 *
 	 * @return MenuArea
 	 */
-	public function setController($controller): MenuArea
+	public function setController($controller)
 	{
 		$this->controller = $controller;
 
@@ -170,7 +170,7 @@ class MenuArea extends MenuItem
 	 *
 	 * @return MenuArea
 	 */
-	public function setSelect($select): MenuArea
+	public function setSelect($select)
 	{
 		$this->select = $select;
 
@@ -180,7 +180,7 @@ class MenuArea extends MenuItem
 	/**
 	 * @return string
 	 */
-	public function getClass(): string
+	public function getClass()
 	{
 		return $this->class;
 	}
@@ -190,7 +190,7 @@ class MenuArea extends MenuItem
 	 *
 	 * @return MenuArea
 	 */
-	public function setClass($class): MenuArea
+	public function setClass($class)
 	{
 		$this->class = $class;
 
@@ -204,7 +204,7 @@ class MenuArea extends MenuItem
 	 *
 	 * @return MenuItem
 	 */
-	public function setCustomUrl($url): MenuItem
+	public function setCustomUrl($url)
 	{
 		$this->customUrl = $url;
 
@@ -214,7 +214,7 @@ class MenuArea extends MenuItem
 	/**
 	 * @return bool
 	 */
-	public function isHidden(): bool
+	public function isHidden()
 	{
 		return $this->hidden;
 	}
@@ -224,7 +224,7 @@ class MenuArea extends MenuItem
 	 *
 	 * @return MenuArea
 	 */
-	public function setHidden($hidden): MenuArea
+	public function setHidden($hidden)
 	{
 		$this->hidden = (bool) $hidden;
 
@@ -234,7 +234,7 @@ class MenuArea extends MenuItem
 	/**
 	 * @return bool
 	 */
-	public function isPassword(): bool
+	public function isPassword()
 	{
 		return $this->password;
 	}
@@ -244,7 +244,7 @@ class MenuArea extends MenuItem
 	 *
 	 * @return MenuArea
 	 */
-	public function setPassword($password): MenuArea
+	public function setPassword($password)
 	{
 		$this->password = (bool) $password;
 
@@ -254,9 +254,9 @@ class MenuArea extends MenuItem
 	/**
 	 * Converts an object and any branches to an array, recursive.
 	 *
-	 * @param MenuArea $obj
+	 * @param mixed $obj
 	 *
-	 * @return array|MenuArea
+	 * @return array
 	 */
 	public function toArray($obj)
 	{
@@ -273,7 +273,7 @@ class MenuArea extends MenuItem
 	 *
 	 * @return array The array of subsections
 	 */
-	public function getSubsections(): array
+	public function getSubsections()
 	{
 		return $this->subsections;
 	}
@@ -283,7 +283,7 @@ class MenuArea extends MenuItem
 	 *
 	 * @return string The token for this instance
 	 */
-	public function getToken(): string
+	public function getToken()
 	{
 		return $this->token;
 	}
@@ -295,7 +295,7 @@ class MenuArea extends MenuItem
 	 *
 	 * @return MenuArea
 	 */
-	public function setToken($token): MenuArea
+	public function setToken($token)
 	{
 		$this->token = $token;
 
@@ -307,7 +307,7 @@ class MenuArea extends MenuItem
 	 *
 	 * @return string The token type.
 	 */
-	public function getTokenType(): string
+	public function getTokenType()
 	{
 		return $this->tokenType;
 	}
@@ -319,7 +319,7 @@ class MenuArea extends MenuItem
 	 *
 	 * @return MenuArea
 	 */
-	public function setTokenType($tokenType): MenuArea
+	public function setTokenType($tokenType)
 	{
 		$this->tokenType = $tokenType;
 
@@ -331,7 +331,7 @@ class MenuArea extends MenuItem
 	 *
 	 * @return string The value of sc
 	 */
-	public function getSc(): string
+	public function getSc()
 	{
 		return $this->sc;
 	}
@@ -343,7 +343,7 @@ class MenuArea extends MenuItem
 	 *
 	 * @return MenuArea
 	 */
-	public function setSc($sc): MenuArea
+	public function setSc($sc)
 	{
 		$this->sc = $sc;
 
@@ -358,7 +358,7 @@ class MenuArea extends MenuItem
 	 * @return MenuArea
 	 * @throws \Exception
 	 */
-	protected function buildMoreFromArray($arr): MenuArea
+	protected function buildMoreFromArray($arr)
 	{
 		$this->url = $this->customUrl ?: $this->url;
 
@@ -382,7 +382,7 @@ class MenuArea extends MenuItem
 	 *
 	 * @param array $arr
 	 */
-	private function anythingMissed($arr): void
+	private function anythingMissed($arr)
 	{
 		$missing = array_diff_key($arr, get_object_vars($this));
 		foreach ($missing as $key => $value)
@@ -403,7 +403,7 @@ class MenuArea extends MenuItem
 	 *
 	 * @return MenuArea Returns the current instance of MenuArea
 	 */
-	public function addSubsection($id, $subsection): MenuArea
+	public function addSubsection($id, $subsection)
 	{
 		$this->subsections[$id] = $subsection;
 

@@ -36,7 +36,7 @@ class MenuSection extends MenuItem
 	 *
 	 * @return array Returns an array of areas for the given object
 	 */
-	public function getAreas(): array
+	public function getAreas()
 	{
 		return $this->areas;
 	}
@@ -47,7 +47,7 @@ class MenuSection extends MenuItem
 	 * @param array $arr the array containing the menu item data
 	 * @return $this
 	 */
-	public function buildMoreFromArray($arr): self
+	public function buildMoreFromArray($arr)
 	{
 		if (isset($arr['title']))
 		{
@@ -73,7 +73,7 @@ class MenuSection extends MenuItem
 	 *
 	 * @return $this
 	 */
-	public function addArea($id, $area): self
+	public function addArea($id, $area)
 	{
 		$this->areas[$id] = $area;
 
@@ -89,7 +89,7 @@ class MenuSection extends MenuItem
 	 *
 	 * @return $this
 	 */
-	public function insertArea($id, $location, $area): self
+	public function insertArea($id, $location, $area)
 	{
 		$current = $this->getAreas();
 

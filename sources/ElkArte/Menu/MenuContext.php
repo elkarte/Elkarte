@@ -62,7 +62,7 @@ class MenuContext
 	 * - Saves them in the cache if it is available and on
 	 * - Places the results in $context
 	 */
-	public function setupMenuContext(): void
+	public function setupMenuContext()
 	{
 		global $context;
 
@@ -98,7 +98,7 @@ class MenuContext
 	/**
 	 * Sets up some core menu item permissions based on the user
 	 */
-	private function setupUserPermissions(): void
+	private function setupUserPermissions()
 	{
 		global $context, $modSettings;
 
@@ -116,7 +116,7 @@ class MenuContext
 	 *
 	 * @return void
 	 */
-	private function setupHeaderCallbacks(): void
+	private function setupHeaderCallbacks()
 	{
 		global $context;
 
@@ -136,7 +136,7 @@ class MenuContext
 	 *
 	 * @return void
 	 */
-	private function setUpMenuButtons($menu_count): void
+	private function setUpMenuButtons($menu_count)
 	{
 		global $context, $modSettings;
 
@@ -176,7 +176,7 @@ class MenuContext
 	 *
 	 * @return array The array of buttons with initialized properties.
 	 */
-	private function initializeButtonProperties($buttons, $menu_count): array
+	private function initializeButtonProperties($buttons, $menu_count)
 	{
 		$menu_buttons = [];
 		foreach ($buttons as $act => $button)
@@ -198,7 +198,7 @@ class MenuContext
 	 * @param array $menu_count The menu count data.
 	 * @return array The updated button.
 	 */
-	private function setButtonProperties($button, $menu_count): array
+	private function setButtonProperties($button, $menu_count)
 	{
 		$button['active_button'] = false;
 
@@ -214,7 +214,7 @@ class MenuContext
 	 * @param array $button The button that needs to be checked.
 	 * @return array The updated button.
 	 */
-	private function setButtonActionHook($button): array
+	private function setButtonActionHook($button)
 	{
 		if (isset($button['action_hook']))
 		{
@@ -231,7 +231,7 @@ class MenuContext
 	 * @param array $menu_count The menu count data.
 	 * @return array The updated button.
 	 */
-	private function setButtonCounter($button, $menu_count): array
+	private function setButtonCounter($button, $menu_count)
 	{
 		if (isset($button['counter']) && !empty($menu_count[$button['counter']]))
 		{
@@ -251,7 +251,7 @@ class MenuContext
 	 *
 	 * @return array The modified button with updated counters for sub buttons
 	 */
-	private function setSubButtonCounter($button, $menu_count): array
+	private function setSubButtonCounter($button, $menu_count)
 	{
 		if (isset($button['sub_buttons']))
 		{
@@ -287,7 +287,7 @@ class MenuContext
 	 *
 	 * @return array The updated button array with sub button counts set.
 	 */
-	private function setSubButtonCounts($button, $key, $subButton, $menu_count): array
+	private function setSubButtonCounts($button, $key, $subButton, $menu_count)
 	{
 		if (empty($subButton['sub_buttons']))
 		{
@@ -322,7 +322,7 @@ class MenuContext
 	 *
 	 * @return void Does not return anything.
 	 */
-	private function addCountsToTitle(&$title, $counts, $notice): void
+	private function addCountsToTitle(&$title, $counts, $notice)
 	{
 		global $settings;
 
@@ -339,7 +339,7 @@ class MenuContext
 	 * @global array $context The global context array.
 	 *
 	 */
-	private function setupCurrentAction(): void
+	private function setupCurrentAction()
 	{
 		global $context;
 

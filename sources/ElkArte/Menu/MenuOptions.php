@@ -81,7 +81,7 @@ class MenuOptions
 	 *
 	 * @return MenuOptions
 	 */
-	public static function buildFromArray($arr): MenuOptions
+	public static function buildFromArray($arr)
 	{
 		$obj = new self();
 
@@ -103,7 +103,7 @@ class MenuOptions
 	/**
 	 * Process the array of MenuOptions passed to the class
 	 */
-	protected function buildBaseUrl(): void
+	protected function buildBaseUrl()
 	{
 		global $context;
 
@@ -117,7 +117,7 @@ class MenuOptions
 	 *
 	 * @return string
 	 */
-	public function getAction(): string
+	public function getAction()
 	{
 		return $this->action;
 	}
@@ -127,7 +127,7 @@ class MenuOptions
 	 *
 	 * @param string $action
 	 */
-	private function setAction($action): void
+	private function setAction($action)
 	{
 		$this->action = $action;
 	}
@@ -137,7 +137,7 @@ class MenuOptions
 	 *
 	 * @return string
 	 */
-	public function getBaseUrl(): string
+	public function getBaseUrl()
 	{
 		return $this->baseUrl;
 	}
@@ -147,7 +147,7 @@ class MenuOptions
 	 *
 	 * @param string $baseUrl
 	 */
-	private function setBaseUrl($baseUrl): void
+	private function setBaseUrl($baseUrl)
 	{
 		$this->baseUrl = $baseUrl;
 	}
@@ -155,7 +155,7 @@ class MenuOptions
 	/**
 	 * The theme needs some love, too.
 	 */
-	private function buildTemplateVars(): void
+	private function buildTemplateVars()
 	{
 		global $options;
 
@@ -174,7 +174,7 @@ class MenuOptions
 	 *
 	 * @return string
 	 */
-	public function getMenuType(): string
+	public function getMenuType()
 	{
 		return $this->menuType;
 	}
@@ -184,7 +184,7 @@ class MenuOptions
 	 *
 	 * @param string $menuType
 	 */
-	private function setMenuType($menuType): void
+	private function setMenuType($menuType)
 	{
 		$this->menuType = $menuType;
 	}
@@ -192,7 +192,7 @@ class MenuOptions
 	/**
 	 * @return bool
 	 */
-	public function isDropDownToggleable(): bool
+	public function isDropDownToggleable()
 	{
 		return $this->canToggleDropDown;
 	}
@@ -202,7 +202,7 @@ class MenuOptions
 	 *
 	 * @param bool $canToggleDropDown
 	 */
-	private function setCanToggleDropDown($canToggleDropDown): void
+	private function setCanToggleDropDown($canToggleDropDown)
 	{
 		$this->canToggleDropDown = $canToggleDropDown;
 	}
@@ -212,7 +212,7 @@ class MenuOptions
 	 *
 	 * @return string
 	 */
-	public function getLayerName(): string
+	public function getLayerName()
 	{
 		return $this->layerName;
 	}
@@ -222,7 +222,7 @@ class MenuOptions
 	 *
 	 * @param string $layerName
 	 */
-	private function setLayerName($layerName): void
+	private function setLayerName($layerName)
 	{
 		$this->layerName = $layerName;
 	}
@@ -232,7 +232,7 @@ class MenuOptions
 	 *
 	 * @return string
 	 */
-	public function getCurrentArea(): string
+	public function getCurrentArea()
 	{
 		return $this->currentArea;
 	}
@@ -242,7 +242,7 @@ class MenuOptions
 	 *
 	 * @param string $currentArea
 	 */
-	private function setCurrentArea($currentArea): void
+	private function setCurrentArea($currentArea)
 	{
 		$this->currentArea = $currentArea;
 	}
@@ -252,7 +252,7 @@ class MenuOptions
 	 *
 	 * @return bool
 	 */
-	public function isUrlSessionCheckDisabled(): bool
+	public function isUrlSessionCheckDisabled()
 	{
 		return $this->disableUrlSessionCheck;
 	}
@@ -262,7 +262,7 @@ class MenuOptions
 	 *
 	 * @param bool $disableUrlSessionCheck
 	 */
-	private function setDisableUrlSessionCheck($disableUrlSessionCheck): void
+	private function setDisableUrlSessionCheck($disableUrlSessionCheck)
 	{
 		$this->disableUrlSessionCheck = $disableUrlSessionCheck;
 	}
@@ -272,7 +272,7 @@ class MenuOptions
 	 *
 	 * @return string
 	 */
-	public function getTemplateName(): string
+	public function getTemplateName()
 	{
 		return $this->templateName;
 	}
@@ -282,7 +282,7 @@ class MenuOptions
 	 *
 	 * @param string $templateName
 	 */
-	private function setTemplateName($templateName): void
+	private function setTemplateName($templateName)
 	{
 		$this->templateName = $templateName;
 	}
@@ -292,7 +292,7 @@ class MenuOptions
 	 *
 	 * @return array
 	 */
-	public function getCounters(): array
+	public function getCounters()
 	{
 		return $this->counters;
 	}
@@ -302,7 +302,7 @@ class MenuOptions
 	 *
 	 * @param array $counters
 	 */
-	private function setCounters($counters): void
+	private function setCounters($counters)
 	{
 		$this->counters = $counters;
 	}
@@ -312,7 +312,7 @@ class MenuOptions
 	 *
 	 * @return string
 	 */
-	public function buildAdditionalParams(): string
+	public function buildAdditionalParams()
 	{
 		global $context;
 
@@ -338,7 +338,7 @@ class MenuOptions
 	 *
 	 * @return array
 	 */
-	public function getExtraUrlParameters(): array
+	public function getExtraUrlParameters()
 	{
 		return $this->extraUrlParameters;
 	}
@@ -348,7 +348,7 @@ class MenuOptions
 	 *
 	 * @param array $extraUrlParameters
 	 */
-	private function setExtraUrlParameters($extraUrlParameters): void
+	private function setExtraUrlParameters($extraUrlParameters)
 	{
 		$this->extraUrlParameters = $extraUrlParameters;
 	}
@@ -358,7 +358,7 @@ class MenuOptions
 	 *
 	 * @return string
 	 */
-	public function getHook(): string
+	public function getHook()
 	{
 		return $this->hook;
 	}
@@ -368,7 +368,7 @@ class MenuOptions
 	 *
 	 * @param string $hook
 	 */
-	private function setHook($hook): void
+	private function setHook($hook)
 	{
 		$this->hook = 'integrate_' . $hook . '_areas';
 	}
