@@ -776,7 +776,10 @@ class AttachmentsDirectory
 	{
 		require_once(SUBSDIR . '/ManageAttachments.subs.php');
 		$current_dir = attachDirProperties($this->currentAttachmentUploadDir);
-		self::$dir_files = $current_dir['files'] + empty($tmp_attach_size) ? 0 : 1;
+
+		// Add 1 to file count only when a new file will be added
+		self::$dir_files = $current_dir['files'] + (empty($tmp_attach_size) ? 0 : 1);
+
 		self::$dir_size = $current_dir['size'] + $tmp_attach_size;
 	}
 
@@ -936,6 +939,9 @@ class AttachmentsDirectory
 		{
 			throw new Exception('attach_dir_no_remove');
 		}
+
+		// Default: nothing changed
+		return null;
 	}
 
 	/**

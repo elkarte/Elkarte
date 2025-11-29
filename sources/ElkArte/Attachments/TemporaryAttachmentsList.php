@@ -58,8 +58,12 @@ class TemporaryAttachmentsList extends ValuesContainer
 		{
 			if (strpos($attachID, (string) $prefix) !== false)
 			{
-				$this->remove($attachment['tmp_name']);
-				$this->remove($attachment['tmp_name'] . '_thumb');
+				$path = $attachment['tmp_name'] ?? '';
+				if ($path !== '')
+				{
+					$this->remove($path);
+					$this->remove($path . '_thumb');
+				}
 			}
 		}
 	}
@@ -73,6 +77,11 @@ class TemporaryAttachmentsList extends ValuesContainer
 	public function remove(string $file): bool
 	{
 		// Must exist and have edit permissions
+		if ($file === '')
+		{
+			return false;
+		}
+
 		return FileFunctions::instance()->delete($file);
 	}
 

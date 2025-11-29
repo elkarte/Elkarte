@@ -341,7 +341,12 @@ class TemporaryAttachmentChunk
 	private function writeChunkToFile(string $local_file): bool|string
 	{
 		$out = $this->attach_current_dir . '/' . $local_file;
-		$in = $_FILES['attachment']['tmp_name'][0];
+		$in = $_FILES['attachment']['tmp_name'][0] ?? '';
+
+		if ($in === '' || $local_file === '')
+		{
+			return 'not_found';
+		}
 
 		// Move the file to the attachment folder with a temp name for now.
 		set_error_handler(static function () { /* ignore warnings */ });
@@ -358,7 +363,8 @@ class TemporaryAttachmentChunk
 			restore_error_handler();
 		}
 
-		if (!$result || !FileFunctions::instance()->fileExists($out))
+		$fs = FileFunctions::instance();
+		if (!$result || !$fs->fileExists($out))
 		{
 			return 'not_found';
 		}
@@ -514,11 +520,18 @@ class TemporaryAttachmentChunk
 		foreach ($files as $file)
 		{
 			$fileInputPath = $this->attach_current_dir . '/' . $file->getFilename();
-			$writeResult = file_put_contents($this->combinedFilePath, file_get_contents($fileInputPath), LOCK_EX | FILE_APPEND);
-
-			if ($writeResult === false)
+			$data = @file_get_contents($fileInputPath);
+			if ($data === false)
 			{
 				$success = false;
+			}
+			else
+			{
+				$writeResult = @file_put_contents($this->combinedFilePath, $data, LOCK_EX | FILE_APPEND);
+				if ($writeResult === false)
+				{
+					$success = false;
+				}
 			}
 
 			@unlink($fileInputPath);

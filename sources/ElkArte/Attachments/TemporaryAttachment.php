@@ -61,9 +61,14 @@ class TemporaryAttachment extends ValuesContainer
 	 */
 	public function fileWritable(): bool
 	{
-		$fs = FileFunctions::instance();
+		$path = $this->data['tmp_name'] ?? '';
+		if ($path === '')
+		{
+			return false;
+		}
 
-		return $fs->fileExists($this->data['tmp_name']) && $fs->isWritable($this->data['tmp_name']);
+		$fs = FileFunctions::instance();
+		return $fs->fileExists($path) && $fs->isWritable($path);
 	}
 
 	/**
@@ -83,7 +88,56 @@ class TemporaryAttachment extends ValuesContainer
 	 */
 	public function setErrors($error): void
 	{
-		$this->data['errors'][] = array_merge($this->data['errors'], (array) $error);
+		// Normalize input to a flat list of error items where each item is an array:
+		// [code] or [code, [args]]
+		if ($error === null || $error === '')
+		{
+			return;
+		}
+
+		$append = function ($item) {
+			if ($item === null || $item === '')
+			{
+				return;
+			}
+
+			// If a string, wrap as [code]
+			if (!is_array($item))
+			{
+				$this->data['errors'][] = [$item];
+				return;
+			}
+
+			// If it looks like a single error tuple [code, [args]] or [code]
+			// keep as-is; otherwise, best-effort wrap
+			if (isset($item[0]) && (is_string($item[0]) || is_scalar($item[0])))
+			{
+				// If args present but not an array, wrap it
+				if (isset($item[1]) && !is_array($item[1]))
+				{
+					$item[1] = [$item[1]];
+				}
+
+				$this->data['errors'][] = $item;
+				return;
+			}
+
+			// Fallback: wrap whole structure as a single error payload
+			$this->data['errors'][] = [$item];
+		};
+
+		// If we received a list of errors (mixed strings and arrays), append each
+		if (is_array($error) && !(isset($error[0]) && is_string($error[0]) && (count($error) === 1 || (count($error) === 2 && isset($error[1]) && is_array($error[1])))))
+		{
+			foreach ($error as $e)
+			{
+				$append($e);
+			}
+		}
+		else
+		{
+			$append($error);
+		}
 	}
 
 	/**
@@ -131,7 +185,8 @@ class TemporaryAttachment extends ValuesContainer
 	 */
 	public function fileExists(): bool
 	{
-		return FileFunctions::instance()->fileExists($this->data['tmp_name']);
+		$path = $this->data['tmp_name'] ?? '';
+		return $path !== '' && FileFunctions::instance()->fileExists($path);
 	}
 
 	/**
@@ -141,8 +196,9 @@ class TemporaryAttachment extends ValuesContainer
 	 */
 	public function moveTo($file_path): void
 	{
-		rename($this->data['tmp_name'], $file_path . '/' . $this->data['attachid']);
-		$this->data['tmp_name'] = $file_path;
+		$destination = $file_path . '/' . $this->data['attachid'];
+		rename($this->data['tmp_name'], $destination);
+		$this->data['tmp_name'] = $destination;
 	}
 
 	/**
@@ -551,8 +607,16 @@ class TemporaryAttachment extends ValuesContainer
 				throw new \Exception('attachment_not_found');
 			}
 
-			FileFunctions::instance()->delete($this->data['tmp_name']);
-			FileFunctions::instance()->delete($this->data['tmp_name'] . '_thumb');
+			$fs = FileFunctions::instance();
+			$path = $this->data['tmp_name'];
+
+			// Best-effort deletes; ignore missing thumb
+			$fs->delete($path);
+			$thumb = $path . '_thumb';
+			if ($fs->fileExists($thumb))
+			{
+				$fs->delete($thumb);
+			}
 		}
 		catch (\Exception)
 		{
