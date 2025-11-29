@@ -198,6 +198,13 @@ String.prototype.php_urlencode = function() {
 };
 
 /**
+ * Simulate php's urldecode function
+ */
+String.prototype.php_urldecode = function() {
+	return decodeURIComponent(this.replace(/\+/g, '%20'));
+};
+
+/**
  * Simulate php htmlspecialchars function
  */
 String.prototype.php_htmlspecialchars = function() {
