@@ -267,7 +267,7 @@ class StreamFetchWebdata
 		if (!empty($this->_response['headers']['status']))
 		{
 			// Update with last status code found, its for this final navigated point
-			$this->_response['code'] = substr($this->_response['headers']['status'], 9, 3);
+			$this->_response['code'] = (int) substr($this->_response['headers']['status'], 9, 3);
 		}
 
 		// Provide a common "valid" return code to the caller

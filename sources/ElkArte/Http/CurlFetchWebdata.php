@@ -271,7 +271,7 @@ class CurlFetchWebdata
 		// Store this 'loops' data, someone may want all of these :O
 		$this->_response[] = [
 			'url' => $curl_info['url'],
-			'code' =>  $curl_info['http_code'],
+			'code' => (int) $curl_info['http_code'],
 			'error' => $error,
 			'size' => $curl_info['download_content_length'] ?: 0,
 			'headers' => $this->_headers ?: false,
