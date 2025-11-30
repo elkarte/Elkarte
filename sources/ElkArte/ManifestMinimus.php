@@ -57,7 +57,7 @@ class ManifestMinimus
 			->contentType('application/manifest+json')
 			->header('Expires', $expires . ' GMT')
 			->header('Last-Modified', $lastModified . ' GMT')
-			->header('Cache-Control', 'private, max-age=86400')
+			->header('Cache-Control', 'public, max-age=3600')
 			->send();
 	}
 

@@ -9,12 +9,13 @@
  */
 
 const OFFLINE = '/index.php?action=offline';
-const navigationPreload = true;
 
+// Navigation preload can be toggled via query param `nav_preload=0|1`
 let STATIC_CACHE_NAME = 'elk_sw_cache_static',
 	PAGES_CACHE_NAME = 'elk_sw_cache_pages',
 	IMAGES_CACHE_NAME = 'elk_sw_cache_images',
-	CACHE_ID = null;
+	CACHE_ID = null,
+	navigationPreload = true;
 
 // On sw installation cache some defined ASSETS and the OFFLINE page
 self.addEventListener('install', event => {
@@ -28,6 +29,13 @@ self.addEventListener('install', event => {
 	STATIC_CACHE_NAME += CACHE_ID;
 	PAGES_CACHE_NAME += CACHE_ID;
 	IMAGES_CACHE_NAME += CACHE_ID;
+
+	// Allow runtime toggle of Navigation Preload: nav_preload=0|1 (default 1)
+	const np = passedParam.searchParams.get('nav_preload');
+	if (np !== null)
+	{
+		navigationPreload = np === '1' || np.toLowerCase() === 'true';
+	}
 
 	const themeScope = passedParam.searchParams.get('theme_scope') || '/themes/default/',
 		defaultThemeScope = passedParam.searchParams.get('default_theme_scope') || '/themes/default/',
