@@ -658,7 +658,14 @@ function onDraftsReturned (oXMLDoc)
 function onPostSubmit ()
 {
 	let body = $editor_data[post_box_name].val().trim(),
-		subject = document.getElementById('post_subject').value.trim();
+		subjectElement = document.getElementById('post_subject'),
+		subject = subjectElement ? subjectElement.value.trim() : '';
+
+	// Mostly likely in Quick Reply so really nothing to do here.
+	if (!subjectElement)
+	{
+		return true;
+	}
 
 	let error = new errorbox_handler({
 		error_box_id: 'post_error',
