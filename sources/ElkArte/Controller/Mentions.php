@@ -121,6 +121,7 @@ class Mentions extends AbstractController
 		setJsonTemplate();
 
 		require_once(SUBSDIR . '/Mentions.subs.php');
+		require_once(SUBSDIR . '/PersonalMessage.subs.php');
 
 		$lastsent = $this->_req->getQuery('lastsent', 'intval', 0);
 		if (empty($lastsent) && !empty($_SESSION['notifications_lastseen']))
@@ -137,17 +138,24 @@ class Mentions extends AbstractController
 		if (!empty($modSettings['usernotif_favicon_enable']))
 		{
 			$context['json_data']['mentions'] = (int) $this->user->mentions;
+			$context['json_data']['pm_unread'] = (int) $this->user->unread_messages;
 		}
 
-		// Data to be supplied to Push via desktop-notify.js
+		// Data to be supplied to Push via desktop-notify.js, used to trigger desktop notifications
+		// on new mentions (like/quote/etc) and PMs.
 		if (!empty($modSettings['usernotif_desktop_enable']))
 		{
+			$new_mentions = getNewMentions($this->user->id, $lastsent);
+			$new_pms = getNewPMs($this->user->id, $lastsent);
+
 			$context['json_data']['desktop_notifications'] = [
-				'new_from_last' => getNewMentions($this->user->id, $lastsent),
+				'new_from_last' => $new_mentions + $new_pms,
 				'title' => sprintf($txt['forum_notification'], strip_tags(un_htmlspecialchars($context['forum_name']))),
 				'link' => '/index.php?action=mentions',
 			];
-			$context['json_data']['desktop_notifications']['message'] = sprintf($txt[$lastsent === 0 ? 'unread_notifications' : 'new_from_last_notifications'], $context['json_data']['desktop_notifications']['new_from_last']);
+			$context['json_data']['desktop_notifications']['message'] = sprintf(
+				$txt[$lastsent === 0 ? 'unread_notifications' : 'new_from_last_notifications'],
+				$context['json_data']['desktop_notifications']['new_from_last']);
 		}
 
 		$_SESSION['notifications_lastseen'] = $context['json_data']['timelast'];

@@ -239,6 +239,11 @@ class MenuContext
 			$this->addCountsToTitle($button['title'], $menu_count[$button['counter']], 0);
 			$button['indicator'] = true;
 		}
+		elseif (isset($button['counter']) && $menu_count[$button['counter']] === 0)
+		{
+			// If the counter is set but is zero, add a hidden indicator to simply ajax update the counter
+			$this->addCountsToTitle($button['title'], $menu_count[$button['counter']], -1);
+		}
 
 		return $button;
 	}

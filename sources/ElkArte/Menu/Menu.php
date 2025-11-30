@@ -467,6 +467,11 @@ class Menu
 				$this->menuOptions->getCounters()[$obj->getCounter()]
 			);
 		}
+		// Top level menu buttons get a hidden counter if count is 0
+		elseif ($idx === 0 && !empty($this->menuOptions->getCounters()['section']))
+		{
+			return $settings['menu_numeric_notice'][-1];
+		}
 
 		return '';
 	}
