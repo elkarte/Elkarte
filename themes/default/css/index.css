@@ -584,7 +584,6 @@ em, .em {
 
 .nosel {
 	-moz-user-select: none;
-	-ms-user-select: none;
 	-webkit-user-select: none;
 	user-select: none;
 }
@@ -816,8 +815,6 @@ input[type=checkbox].quote-show-more {
 	padding-top: 9rem;
 	cursor: pointer;
 	text-align: center;
-	-webkit-appearance: none;
-	-moz-appearance: none;
 	appearance: none;
 }
 
@@ -2080,18 +2077,22 @@ button[type="submit"].quick_quote_button.hide {
 }
 
 /* our buddies &laquo; &raquo; */
-.small_pagelinks li:first-child::before {
-	font-size: var(--font14);
-	font-family: "Apple Symbols", "Segoe UI Symbol", sans-serif;
-    content: "\27A4"; /* Was content: "\2B9C"; */
+.small_pagelinks li:first-child::before, .small_pagelinks li:last-child::after {
+    width: var(--font12);
+    height: var(--font12);
+    content: ""; /* Was \2B9E; and \2B9C; */
     display: inline-block;
-    transform: rotate(180deg) translateY(-0.15rem);
+    background-color: currentColor;
 }
 
 .small_pagelinks li:last-child::after {
-	font-size: var(--font14);
-	font-family: "Apple Symbols", "Segoe UI Symbol", sans-serif;
-    content: "\27A4"; /* Was content: "\2B9E"; */
+    -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M4 2l16 10L4 22l4-10z'/%3E%3C/svg%3E") no-repeat center / 100%;
+    mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 22'%3E%3Cpath d='M4 2l16 10L4 22l4-10z'/%3E%3C/svg%3E") no-repeat center / 100%;
+}
+
+.small_pagelinks li:first-child::before {
+    -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M20 2l-16 10L20 22l-4-10z'/%3E%3C/svg%3E") no-repeat center / 100%;
+    mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 22'%3E%3Cpath d='M20 2l-16 10L20 22l-4-10z'/%3E%3C/svg%3E") no-repeat center / 100%;
 }
 
 .small_pagelinks li {
@@ -2118,7 +2119,6 @@ button[type="submit"].quick_quote_button.hide {
 	border: 1px solid;
 	border-bottom: none;
 	border-radius: 0 2rem 0 0;
-	-webkit-backface-visibility: hidden;
 	backface-visibility: hidden;
 }
 
@@ -4356,7 +4356,6 @@ dl.merge_topic dd {
 .profileblock {
 	margin-top: .4rem;
 	padding: .4rem .8rem;
-	-webkit-hyphens: auto;
 	hyphens: auto;
 	overflow-wrap: break-word;
 }
@@ -4419,7 +4418,6 @@ ul.cf_icons li:not(:first-child)::before {
 	float: right;
 	width: 70%;
 	margin-top: 0;
-	-webkit-hyphens: auto;
 	hyphens: auto;
 	overflow-wrap: break-word;
 }

@@ -101,6 +101,8 @@ class Theme extends BaseTheme
 			 * style each menu level indicator as desired.
 			 */
 			'menu_numeric_notice' => [
+				// Empty top level menu entries
+				-1 => ' <span class="pm_indicator" style="display: none">0</span>',
 				// Top level menu entries
 				0 => ' <span class="pm_indicator">%1$s</span>',
 				// First dropdown

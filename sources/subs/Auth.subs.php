@@ -20,7 +20,6 @@ use ElkArte\Helper\Util;
 use ElkArte\Languages\Txt;
 use ElkArte\Request;
 use ElkArte\User;
-use JetBrains\PhpStorm\NoReturn;
 
 /**
  * Sets the login cookie and session based on the id_member and password passed.

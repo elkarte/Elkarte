@@ -27,7 +27,6 @@ use ElkArte\Languages\Loader;
 use ElkArte\Themes\ThemeLoader;
 use ElkArte\User;
 use ElkArte\UserInfo;
-use JetBrains\PhpStorm\NoReturn;
 
 /**
  * Class to handle all forum errors and exceptions

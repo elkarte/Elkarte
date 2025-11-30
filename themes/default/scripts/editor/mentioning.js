@@ -180,9 +180,9 @@ elk_mentions.prototype.attachAtWho = function () {
 				callback();
 			})
 			.catch((error) => {
-				if ('console' in window && console.info)
+				if ('console' in window && console.error)
 				{
-					console.info('Error:', error);
+					console.error('Error:', error);
 				}
 				callback();
 			});

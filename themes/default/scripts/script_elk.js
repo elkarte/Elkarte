@@ -150,9 +150,9 @@ function toggleButtonAJAX (btn, confirmation_msg_variable = '', onSuccessCallbac
 		})
 		.catch(error => {
 			// ajax failure code
-			if ('console' in window && console.info)
+			if ('console' in window && console.error)
 			{
-				console.info('Error:', error);
+				console.error('Error:', error);
 			}
 		})
 		.finally(() => {
@@ -228,9 +228,9 @@ function toggleHeaderAJAX (btn, container_id)
 		})
 		.catch((error) => {
 			// Handle any error
-			if ('console' in window && console.info)
+			if ('console' in window && console.error)
 			{
-				console.info('Error:', error);
+				console.error('Error:', error);
 			}
 		})
 		.finally(() => {
@@ -867,9 +867,9 @@ function disableAutoComplete ()
 					}
 				})
 				.catch(error => {
-					if ('console' in window && console.info)
+					if ('console' in window && console.error)
 					{
-						console.info('Error:', error);
+						console.error('Error:', error);
 					}
 				})
 				.finally(() => {

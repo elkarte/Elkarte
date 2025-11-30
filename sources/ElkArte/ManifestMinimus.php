@@ -57,7 +57,7 @@ class ManifestMinimus
 			->contentType('application/manifest+json')
 			->header('Expires', $expires . ' GMT')
 			->header('Last-Modified', $lastModified . ' GMT')
-			->header('Cache-Control', 'private, max-age=86400')
+			->header('Cache-Control', 'public, max-age=3600')
 			->send();
 	}
 
@@ -167,8 +167,10 @@ class ManifestMinimus
 
 		$icons = [];
 
-		$iconSmallUrl = $modSettings['pwa_small_icon'] ?? $settings['default_images_url'] . '\icon_pwa_small.png';
-		$iconUrlLarge = $modSettings['pwa_large_icon'] ?? $settings['default_images_url'] . '\icon_pwa_large.png';
+		// Ensure URL paths use forward slashes for web delivery
+		$base = rtrim($settings['default_images_url'], '/');
+		$iconSmallUrl = $modSettings['pwa_small_icon'] ?? $base . '/icon_pwa_small.png';
+		$iconUrlLarge = $modSettings['pwa_large_icon'] ?? $base . '/icon_pwa_large.png';
 
 		if ($iconSmallUrl)
 		{

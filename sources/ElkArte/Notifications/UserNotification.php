@@ -63,7 +63,7 @@ class UserNotification extends AbstractModel
 	{
 		if (!empty($this->_modSettings['usernotif_favicon_enable']))
 		{
-			$this->_addFaviconNumbers($this->user->mentions);
+			$this->_addFaviconNumbers($this->user->mentions, $this->user->unread_messages);
 		}
 
 		// Can only do this over secure connections
@@ -76,11 +76,13 @@ class UserNotification extends AbstractModel
 	/**
 	 * Prepares the javascript for adding the nice number to the favicon.
 	 *
-	 * @param int $number the number to show
+	 * @param int $mentions the number of unread mentions
+	 * @param int $pms the number of unread messages
 	 */
-	protected function _addFaviconNumbers($number): void
+	protected function _addFaviconNumbers($mentions, $pm_unread): void
 	{
-		call_integration_hook('integrate_adjust_favicon_number', [&$number]);
+		$total = $mentions + $pm_unread;
+		call_integration_hook('integrate_adjust_favicon_number', [&$total]);
 
 		loadJavascriptFile(['ext/favico.js', 'favicon-notify.js'], ['defer' => true]);
 
@@ -103,7 +105,9 @@ class UserNotification extends AbstractModel
 		theme()->addInlineJavascript('
 			document.addEventListener("DOMContentLoaded", function() {
 				ElkNotifier.add(new ElkFavicon({
-					number: ' . $number . ',
+					number: ' . $total . ',
+					mentions: ' . $mentions . ',
+					pm_unread: ' . $pm_unread . ',
 					fontStyle: "bolder",
 					animation: "none"' . (empty($notif_opt) ? '' : ',' . implode(',', $notif_opt)) . '
 				}));

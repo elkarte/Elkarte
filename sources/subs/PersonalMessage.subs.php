@@ -108,6 +108,58 @@ function loadPMLabels($labels)
 }
 
 /**
+ * Counts all unread personal messages received by a member after a certain time.
+ * If the timestamp is empty/zero, returns the total number of unread PMs.
+ *
+ * @param int $id_member
+ * @param int $timestamp
+ * @return int Number of new unread PMs since the timestamp
+ * @package PersonalMessage
+ */
+function getNewPMs($id_member, $timestamp)
+{
+    $db = database();
+
+    if (empty($timestamp))
+    {
+        $result = $db->fetchQuery('
+            SELECT 
+                COUNT(*) AS c
+            FROM {db_prefix}pm_recipients AS pr
+            WHERE pr.id_member = {int:member}
+                AND pr.deleted = {int:not_deleted}
+                AND (pr.is_read & 1) = {int:is_unread}',
+            [
+                'member' => (int) $id_member,
+                'not_deleted' => 0,
+                'is_unread' => 0,
+            ]
+        )->fetch_assoc();
+    }
+    else
+    {
+        $result = $db->fetchQuery('
+            SELECT 
+                COUNT(*) AS c
+            FROM {db_prefix}pm_recipients AS pr
+                INNER JOIN {db_prefix}personal_messages AS pm ON (pm.id_pm = pr.id_pm)
+            WHERE pr.id_member = {int:member}
+                AND pr.deleted = {int:not_deleted}
+                AND (pr.is_read & 1) = {int:is_unread}
+                AND pm.msgtime > {int:last_seen}',
+            [
+                'member' => (int) $id_member,
+                'not_deleted' => 0,
+                'is_unread' => 0,
+                'last_seen' => (int) $timestamp,
+            ]
+        )->fetch_assoc();
+    }
+
+    return (int) $result['c'];
+}
+
+/**
  * Get the number of PMs.
  *
  * @param bool $descending

@@ -2183,9 +2183,9 @@ function addAnotherOption (parent, oDtName, oDdName, oData)
 					data: postdata
 				})
 					.fail(function(jqXHR, textStatus, errorThrown) {
-						if ('console' in window && console.info)
+						if ('console' in window && console.error)
 						{
-							console.info(errorThrown);
+							console.error(errorThrown);
 						}
 
 						oSettings.infobar.isError();

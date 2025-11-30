@@ -246,9 +246,9 @@ var disableDrafts = false;
 					callback();
 				})
 				.catch(function (error) {
-					if ('console' in window && console.info)
+					if ('console' in window && console.error)
 					{
-						console.info('Error: ', error.message);
+						console.error('Error: ', error.message);
 					}
 					callback();
 				});

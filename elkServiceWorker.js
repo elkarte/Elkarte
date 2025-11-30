@@ -9,12 +9,13 @@
  */
 
 const OFFLINE = '/index.php?action=offline';
-const navigationPreload = true;
 
+// Navigation preload can be toggled via query param `nav_preload=0|1`
 let STATIC_CACHE_NAME = 'elk_sw_cache_static',
 	PAGES_CACHE_NAME = 'elk_sw_cache_pages',
 	IMAGES_CACHE_NAME = 'elk_sw_cache_images',
-	CACHE_ID = null;
+	CACHE_ID = null,
+	navigationPreload = true;
 
 // On sw installation cache some defined ASSETS and the OFFLINE page
 self.addEventListener('install', event => {
@@ -23,10 +24,18 @@ self.addEventListener('install', event => {
 	let passedParam = new URL(location);
 
 	// Use a cache id, so we can do pruning/resets from elk_pwa.js messages
-	CACHE_ID = '::' + passedParam.searchParams.get('cache_id') || 'elk20';
+	const cid = passedParam.searchParams.get('cache_id') || 'elk20';
+	CACHE_ID = '::' + cid;
 	STATIC_CACHE_NAME += CACHE_ID;
 	PAGES_CACHE_NAME += CACHE_ID;
 	IMAGES_CACHE_NAME += CACHE_ID;
+
+	// Allow runtime toggle of Navigation Preload: nav_preload=0|1 (default 1)
+	const np = passedParam.searchParams.get('nav_preload');
+	if (np !== null)
+	{
+		navigationPreload = np === '1' || np.toLowerCase() === 'true';
+	}
 
 	const themeScope = passedParam.searchParams.get('theme_scope') || '/themes/default/',
 		defaultThemeScope = passedParam.searchParams.get('default_theme_scope') || '/themes/default/',
@@ -171,20 +180,15 @@ self.addEventListener('message', function(event) {
  */
 function handleNavigationPreload (event)
 {
+	// Gracefully fall back to network when preload isn't available/enabled
 	if (!navigationPreload || !event.preloadResponse)
 	{
-		throw new Error('Navigation Preload not available');
+		return fetch(event.request);
 	}
 
-	return event.preloadResponse.then(preloadedResponse => {
-		if (!preloadedResponse)
-		{
-			throw new Error('No valid preload response');
-		}
-		return preloadedResponse;
-	}).catch(e => {
-		return fetch(event.request);
-	});
+	return event.preloadResponse
+		.then(preloadedResponse => preloadedResponse || fetch(event.request))
+		.catch(() => fetch(event.request));
 }
 
 /**
@@ -322,45 +326,49 @@ async function processNetworkFirstRequest (event, cache_name)
  */
 async function processStaleWhileRevalidateRequest (event, cache_name)
 {
-	async function fetchAndUpdate (event)
+	async function fetchAndUpdate ()
 	{
-		let networkResponse = null;
 		try
 		{
-			networkResponse = await fetch(event.request);
+			const networkResponse = await fetch(event.request);
 			const cache = await caches.open(cache_name);
 			cache.put(event.request, networkResponse.clone());
+			return networkResponse;
 		}
 		catch (error)
 		{
 			const offlineRequest = new Request(OFFLINE);
-			networkResponse = await cache.match(offlineRequest);
+			const cachedOffline = await caches.match(offlineRequest);
+			return cachedOffline || new Response('Sorry, you are offline. Please check your connection.');
 		}
-		return networkResponse || new Response('Sorry, you are offline. Please check your connection.');
 	}
 
-	event.waitUntil(fetchAndUpdate(event));
-
-	const cache = await caches.open(cache_name);
-	const cachedResponse = await cache.match(event.request);
-	// If cachedResponse is available, use it
-	if (cachedResponse)
-	{
-		return cachedResponse;
-	}
-	// If preloadResponse is usable, use it
-	if (event.preloadResponse)
-	{
-		const preloadResponse = await event.preloadResponse;
-		if (preloadResponse)
+	// Ensure we respond within the fetch event
+	event.respondWith((async() => {
+		const cache = await caches.open(cache_name);
+		const cachedResponse = await cache.match(event.request);
+		if (cachedResponse)
 		{
-			cache.put(event.request, preloadResponse.clone());
-			return preloadResponse;
+			// Update in background
+			event.waitUntil(fetchAndUpdate());
+			return cachedResponse;
 		}
-	}
 
-	// Lastly try networkResponse or failing that show offline
-	return fetchAndUpdate(event);
+		if (event.preloadResponse)
+		{
+			const preloadResponse = await event.preloadResponse;
+			if (preloadResponse)
+			{
+				cache.put(event.request, preloadResponse.clone());
+				// Also refresh in background
+				event.waitUntil(fetchAndUpdate());
+				return preloadResponse;
+			}
+		}
+
+		// Lastly try network or offline fallback
+		return fetchAndUpdate();
+	})());
 }
 
 /**
@@ -497,12 +505,15 @@ self.onnotificationclose = ({notification}) => {
 	runFunctionString(notification.data.onClose);
 
 	/* Tell Push to execute close callback */
-	self.client.postMessage(
-		JSON.stringify({
-			id: notification.data.id,
-			action: 'close'
-		})
-	);
+	if (self.client && self.client.postMessage)
+	{
+		self.client.postMessage(
+			JSON.stringify({
+				id: notification.data.id,
+				action: 'close'
+			})
+		);
+	}
 };
 
 self.onnotificationclick = event => {

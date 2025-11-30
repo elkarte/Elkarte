@@ -346,9 +346,9 @@
 						}
 					})
 					.catch(error => {
-						if ('console' in window && console.info)
+						if ('console' in window && console.error)
 						{
-							console.info('fail:', error.name);
+							console.error('fail:', error.name);
 						}
 					})
 					.finally(() => {

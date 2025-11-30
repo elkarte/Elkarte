@@ -30,10 +30,10 @@ function start_tabs ()
 			// Ajax call failed to retrieve content
 			ui.jqXHR.fail(function(jqXHR, textStatus, errorThrown) {
 				ui.panel.html('<div></div>');
-				if ('console' in window && console.info)
+				if ('console' in window && console.error)
 				{
-					console.info(textStatus);
-					console.info(errorThrown);
+					console.error(textStatus);
+					console.error(errorThrown);
 				}
 			});
 		}
@@ -230,9 +230,9 @@ function ajax_getSignaturePreview (showPreview)
 			return false;
 		})
 		.catch((error) => {
-			if ('console' in window && console.info)
+			if ('console' in window && console.error)
 			{
-				console.info('Error: ', error);
+				console.error('Error: ', error);
 			}
 		});
 
