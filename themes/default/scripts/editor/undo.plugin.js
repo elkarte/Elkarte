@@ -340,8 +340,8 @@
 				range.setEnd(positionsToNode(body, endPositions),
 					endPositions[0]);
 			} catch (e) {
-				if (console && console.warn) {
-					console.warn('[SCEditor] Undo plugin lost caret', e);
+				if (console && console.error) {
+					console.error('[SCEditor] Undo plugin lost caret', e);
 				}
 			}
 		}

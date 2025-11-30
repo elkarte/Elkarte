@@ -217,7 +217,7 @@
 				}
 				catch (error)
 				{
-					if (error instanceof TypeError && 'console' in window && console.info)
+					if (error instanceof TypeError && 'console' in window && console.error)
 					{
 						console.error('There was a TypeError:', error);
 					}
@@ -328,15 +328,15 @@
 							document.getElementById(attachid).remove();
 							updateStatusText();
 						}
-						else if ('console' in window && console.info)
+						else if ('console' in window && console.error)
 						{
-							console.info(resp.data);
+							console.error(resp.data);
 						}
 					})
 					.catch((error) => {
-						if ('console' in window && console.info)
+						if ('console' in window && console.error)
 						{
-							console.info('Error:', error.message);
+							console.error('Error:', error.message);
 						}
 					});
 			},

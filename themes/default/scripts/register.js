@@ -472,9 +472,9 @@ function registerAgreementLanguageLoad (event)
 			}
 		})
 		.catch(function(error) {
-			if ('console' in window && window.console.info)
+			if ('console' in window && window.console.error)
 			{
-				console.log('Error:', error);
+				console.error('Error:', error);
 			}
 		})
 		.finally(function() {

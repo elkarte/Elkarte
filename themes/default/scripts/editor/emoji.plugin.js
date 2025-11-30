@@ -144,9 +144,9 @@ var disableDrafts = false;
 					}
 					catch (_error)
 					{
-						if ('console' in window && console.info)
+						if ('console' in window && console.error)
 						{
-							console.info(_error);
+							console.error(_error);
 						}
 
 						return "";
@@ -349,9 +349,9 @@ var disableDrafts = false;
 					let inlineScript = document.createElement('script');
 					inlineScript.innerHTML = 'let custom = [];';
 					document.head.append(inlineScript);
-					if ('console' in window && console.info)
+					if ('console' in window && console.error)
 					{
-						console.info('custom_tags.js file missing or in error');
+						console.error('custom_tags.js file missing or in error');
 					}
 				}
 			})
@@ -381,9 +381,9 @@ var disableDrafts = false;
 				}
 			},
 			error => {
-				if ('console' in window && console.info)
+				if ('console' in window && console.error)
 				{
-					console.info(`Error: ${error.message}`);
+					console.error(`Error: ${error.message}`);
 				}
 			});
 		};

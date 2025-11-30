@@ -89,9 +89,9 @@ function fetchDocument (sUrl, funcCallback, sType = null, bHeader = true)
 			return data;
 		})
 		.catch(error => {
-			if ('console' in window && console.info)
+			if ('console' in window && console.error)
 			{
-				console.info(error);
+				console.error(error);
 			}
 		});
 }
