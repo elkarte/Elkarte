@@ -21,18 +21,10 @@ namespace ElkArte\UrlGenerator;
  */
 abstract class AbstractParseQuery
 {
-	/**
-	 * Holds the special types of URLs we know
-	 *
-	 * @var string[]
-	 */
+	/** @var string[] Holds the special types of URLs we know */
 	protected $parsers = ['b' => 'board', 't' => 'topic', 'p' => 'profile', 's' => 'standard'];
 
-	/**
-	 * The character to use as parameters separator
-	 *
-	 * @var string
-	 */
+	/** @var string The character to use as parameters separator */
 	protected $separator = ';';
 
 	/**

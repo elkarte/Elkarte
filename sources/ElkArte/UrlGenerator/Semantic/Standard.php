@@ -13,14 +13,12 @@
 
 namespace ElkArte\UrlGenerator\Semantic;
 
-use ElkArte\UrlGenerator\AbstractUrlGenerator;
-
 /**
  * Class Standard
  *
  * @package ElkArte\UrlGenerator\Semantic
  */
-class Standard extends AbstractUrlGenerator
+class Standard extends \ElkArte\UrlGenerator\Standard\Standard
 {
 	/**
 	 * {@inheritDoc}
@@ -32,34 +30,7 @@ class Standard extends AbstractUrlGenerator
 	 */
 	public function generate($params)
 	{
+		// Delegate to the parent implementation that includes proper encoding and token handling
 		return $this->generateQuery($params);
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	protected function generateQuery($params): string
-	{
-		$args = [];
-		foreach ($params as $k => $v)
-		{
-			if (is_int($k))
-			{
-				if ($v === '')
-				{
-					continue;
-				}
-
-				$args[$k] = $v;
-			}
-			else
-			{
-				$args[$k] = $k . '=' . $v;
-			}
-		}
-
-		$args = $this->getHash($args);
-
-		return implode($this->_separator, $args);
 	}
 }
