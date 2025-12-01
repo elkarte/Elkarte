@@ -122,41 +122,75 @@ function getNewPMs($id_member, $timestamp)
 
     if (empty($timestamp))
     {
-        $result = $db->fetchQuery('
-            SELECT 
-                COUNT(*) AS c
-            FROM {db_prefix}pm_recipients AS pr
-            WHERE pr.id_member = {int:member}
-                AND pr.deleted = {int:not_deleted}
-                AND (pr.is_read & 1) = {int:is_unread}',
-            [
-                'member' => (int) $id_member,
-                'not_deleted' => 0,
-                'is_unread' => 0,
-            ]
-        )->fetch_assoc();
+		$result = $db->fetchQuery('
+			SELECT 
+				COUNT(*) AS c
+			FROM {db_prefix}pm_recipients AS pr
+			WHERE pr.id_member = {int:member}
+				AND pr.deleted = {int:not_deleted}
+				AND (pr.is_read & 1) = {int:is_unread}',
+			[
+				'member' => (int) $id_member,
+				'not_deleted' => 0,
+				'is_unread' => 0,
+			]
+		)->fetch_assoc();
     }
     else
     {
-        $result = $db->fetchQuery('
-            SELECT 
-                COUNT(*) AS c
-            FROM {db_prefix}pm_recipients AS pr
-                INNER JOIN {db_prefix}personal_messages AS pm ON (pm.id_pm = pr.id_pm)
-            WHERE pr.id_member = {int:member}
-                AND pr.deleted = {int:not_deleted}
-                AND (pr.is_read & 1) = {int:is_unread}
-                AND pm.msgtime > {int:last_seen}',
-            [
-                'member' => (int) $id_member,
-                'not_deleted' => 0,
-                'is_unread' => 0,
-                'last_seen' => (int) $timestamp,
-            ]
-        )->fetch_assoc();
+	    $result = $db->fetchQuery('
+			SELECT
+				COUNT(*) AS c
+			FROM {db_prefix}pm_recipients AS pr
+				INNER JOIN {db_prefix}personal_messages AS pm ON (pm.id_pm = pr.id_pm)
+			WHERE pr.id_member = {int:member}
+				AND pr.deleted = {int:not_deleted}
+				AND (pr.is_read & 1) = {int:is_unread}
+				AND pm.msgtime > {int:last_seen}',
+			[
+				'member' => (int) $id_member,
+				'not_deleted' => 0,
+				'is_unread' => 0,
+				'last_seen' => (int) $timestamp,
+			]
+	    )->fetch_assoc();
     }
 
-    return (int) $result['c'];
+	return (int) $result['c'];
+}
+
+
+/**
+ * Fetch the latest timestamp of a personal message sent to a specific user.
+ *
+ * Sent to a user means messages where the member is a recipient (not the sender).
+ * Returns 0 if the member has no received messages.
+ *
+ * @param int $id_member The member id to check
+ * @return int Unix timestamp of the latest received PM or 0 if none
+ * @package PersonalMessage
+ */
+function getLastPMSentTime($id_member)
+{
+	$db = database();
+
+	$request = $db->fetchQuery('
+		SELECT
+			MAX(pm.msgtime) AS last_time
+		FROM {db_prefix}pm_recipients AS pr
+			INNER JOIN {db_prefix}personal_messages AS pm ON (pm.id_pm = pr.id_pm)
+		WHERE pr.id_member = {int:member}
+			AND pr.deleted = {int:not_deleted}',
+		[
+			'member' => (int) $id_member,
+			'not_deleted' => 0,
+		]
+	);
+
+	$row = $request->fetch_assoc();
+	$request->free_result();
+
+	return empty($row['last_time']) ? 0 : (int) $row['last_time'];
 }
 
 /**

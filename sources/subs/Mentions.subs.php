@@ -431,7 +431,7 @@ function getNewMentions($id_member, $timestamp)
 		)->fetch_assoc();
 	}
 
-	return $result['c'];
+	return (int) $result['c'];
 }
 
 /**
