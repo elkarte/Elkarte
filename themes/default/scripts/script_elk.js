@@ -794,7 +794,8 @@ function disableAutoComplete ()
 		opt = opt || {};
 		let _notifiers = [],
 			start = true,
-			lastTime = 0,
+			lastTimeMention = 0,
+			lastTimePm = 0,
 			_timerId = null,
 			_fetching = false;
 
@@ -843,7 +844,7 @@ function disableAutoComplete ()
 				_timerId = null;
 			}
 
-			let url = elk_prepareScriptUrl(elk_scripturl) + 'action=mentions;sa=fetch;api=json;lastsent=' + lastTime;
+			let url = elk_prepareScriptUrl(elk_scripturl) + 'action=mentions;sa=fetch;api=json;lastsentmention=' + lastTimeMention + ';lastsentpm=' + lastTimePm;
 			fetch(url, {
 				cache: 'no-store',
 				headers: {
@@ -863,7 +864,8 @@ function disableAutoComplete ()
 					{
 						// Trigger any updates
 						send(request);
-						lastTime = request.timelast;
+						lastTimeMention = request.lasttimemention;
+						lastTimePm = request.lasttimepm;
 					}
 				})
 				.catch(error => {

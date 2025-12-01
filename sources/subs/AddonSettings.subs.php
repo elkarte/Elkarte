@@ -316,11 +316,10 @@ function integration_hooks_count($filter = false)
 /**
  * Parses modSettings to find all registered integration hooks
  *
- * @return array
- * @package AddonSettings
  * @staticvar type $integration_hooks
+ * @return array|null
  */
-function get_integration_hooks()
+function get_integration_hooks(): ?array
 {
 	global $modSettings;
 	static $integration_hooks = null;

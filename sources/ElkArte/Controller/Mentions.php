@@ -123,15 +123,22 @@ class Mentions extends AbstractController
 		require_once(SUBSDIR . '/Mentions.subs.php');
 		require_once(SUBSDIR . '/PersonalMessage.subs.php');
 
-		$lastsent = $this->_req->getQuery('lastsent', 'intval', 0);
-		if (empty($lastsent) && !empty($_SESSION['notifications_lastseen']))
+		$lastsentmention = $this->_req->getQuery('lastsentmention', 'intval', 0);
+		$lastsentpm = $this->_req->getQuery('lastsentpm', 'intval', 0);
+
+		if (empty($lastsentmention) && !empty($_SESSION['notifications_lastsentmention']))
 		{
-			$lastsent = (int) $_SESSION['notifications_lastseen'];
+			$lastsentmention = (int) $_SESSION['notifications_lastsentmention'];
+		}
+		if (empty($lastsentpm) && !empty($_SESSION['notifications_lastsentpm']))
+		{
+			$lastsentpm = (int) $_SESSION['notifications_lastsentpm'];
 		}
 
 		// We only know AJAX for this particular action
 		$context['json_data'] = [
-			'timelast' => getTimeLastMention($this->user->id)
+			'lasttimemention' => getTimeLastMention($this->user->id),
+			'lasttimepm' => getLastPMSentTime($this->user->id)
 		];
 
 		// Data to be supplied to FavIco via favicon-notify.js
@@ -145,8 +152,8 @@ class Mentions extends AbstractController
 		// on new mentions (like/quote/etc) and PMs.
 		if (!empty($modSettings['usernotif_desktop_enable']))
 		{
-			$new_mentions = getNewMentions($this->user->id, $lastsent);
-			$new_pms = getNewPMs($this->user->id, $lastsent);
+			$new_mentions = getNewMentions($this->user->id, $lastsentmention);
+			$new_pms = getNewPMs($this->user->id, $lastsentpm);
 
 			$context['json_data']['desktop_notifications'] = [
 				'new_from_last' => $new_mentions + $new_pms,
@@ -154,11 +161,12 @@ class Mentions extends AbstractController
 				'link' => '/index.php?action=mentions',
 			];
 			$context['json_data']['desktop_notifications']['message'] = sprintf(
-				$txt[$lastsent === 0 ? 'unread_notifications' : 'new_from_last_notifications'],
+				$txt[$new_mentions + $new_pms === 0 ? 'unread_notifications' : 'new_from_last_notifications'],
 				$context['json_data']['desktop_notifications']['new_from_last']);
 		}
 
-		$_SESSION['notifications_lastseen'] = $context['json_data']['timelast'];
+		$_SESSION['notifications_lastsentmention'] = $context['json_data']['lasttimemention'];
+		$_SESSION['notifications_lastsentpm'] = $context['json_data']['lasttimepm'];
 	}
 
 	/**
