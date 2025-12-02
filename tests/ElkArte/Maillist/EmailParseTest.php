@@ -150,7 +150,8 @@ Regards, The ElkArte Community
 
 		// The plain and HTML messages
 		$this->assertStringContainsString('<strong>Testing</strong>', $email_message->body);
-		$this->assertRegExp('/Testing\n/', $email_message->plain_body);
+		//$this->assertRegExp('/Testing\n/', $email_message->plain_body);
+		$this->assertMatchesRegularExpression('/Testing\n/', $email_message->plain_body);
 
 		// The IP
 		$this->assertEquals('85.214.104.5', $email_message->load_ip());

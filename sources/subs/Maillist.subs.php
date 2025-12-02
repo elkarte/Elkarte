@@ -1,7 +1,7 @@
 <?php
 
 /**
- * All of the helper functions for use by the maillist controller
+ * All the helper functions for use by the maillist controller
  *
  * @package   ElkArte Forum
  * @copyright ElkArte Forum contributors
@@ -17,8 +17,8 @@ use ElkArte\User;
 /**
  * Loads failed emails from the database
  *
- * - If its a message or topic will build the link to that for viewing
- * - If supplied a specific ID will load only that failed email
+ * - If its message or topic builds the link to that for viewing
+ * - If supplied, a specific ID will load only that failed email
  *
  * @param int $id
  * @param int $start The item to start with (for pagination purposes)
@@ -102,7 +102,8 @@ function list_maillist_unapproved($id = 0, $start = 0, $items_per_page = 0, $sor
 			$postemail[$i]['language'] = empty($temp['user_info']['language']) ? '' : $temp['user_info']['language'];
 
 			// Build a link to the topic or message in case someone wants to take a look at that thread
-			switch ($row['message_type'])
+			$msg_type = trim($row['message_type']);
+			switch ($msg_type)
 			{
 				case 't':
 					$postemail[$i]['link'] = $boardurl . '?topic=' . $row['message_id'];
@@ -451,7 +452,7 @@ function log_email($sent)
 			'message_id' => 'string', 'time_sent' => 'int', 'email_to' => 'string'
 		],
 		$sent,
-		['id_email']
+		['message_key', 'message_type', 'message_id']
 	);
 }
 
