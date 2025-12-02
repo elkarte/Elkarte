@@ -452,7 +452,7 @@ function log_email($sent)
 			'message_id' => 'string', 'time_sent' => 'int', 'email_to' => 'string'
 		],
 		$sent,
-		['id_email']
+		['message_key', 'message_type', 'message_id']
 	);
 }
 
