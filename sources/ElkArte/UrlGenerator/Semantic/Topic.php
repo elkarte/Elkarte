@@ -37,9 +37,10 @@ class Topic extends Standard
 
 		$topic = isset($params['topic']) ? (int) $params['topic'] : 0;
 		$has_start = isset($params['start']) && $params['start'] !== '' && $params['start'] !== null;
-		$start = $has_start ? (int) $params['start'] : null;
+		$start = $has_start ? $params['start'] : null;
 
-		$url = 't/' . rawurlencode($slug) . '-' . $topic . ($has_start && $start !== 0 ? '/page-' . $start : '');
+		// Semantic pagination format is dot-appended after the id (e.g., t/slug-id.10)
+		$url = 't/' . rawurlencode($slug) . '-' . $topic . ($has_start && $start !== 0 ? '.' . $start : '');
 		unset($params['subject'], $params['topic'], $params['start']);
 
 		return $url . $this->generateQuery($params);

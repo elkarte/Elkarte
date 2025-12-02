@@ -298,7 +298,7 @@ class ConstructPageIndex extends AbstractModel
 		$pageindex = '';
 
 		// If they didn't enter an odd value, pretend they did.
-		$PageContiguous = (int) ($this->_modSettings['compactTopicPagesContiguous'] - ($this->_modSettings['compactTopicPagesContiguous'] % 2)) / 2;
+		$PageContiguous = ($this->_modSettings['compactTopicPagesContiguous'] - ($this->_modSettings['compactTopicPagesContiguous'] % 2)) / 2;
 
 		// Start with previous, if there is one
 		$pageindex .= $this->compactPreviousNavigation();

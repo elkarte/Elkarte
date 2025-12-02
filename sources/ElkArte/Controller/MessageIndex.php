@@ -408,7 +408,7 @@ class MessageIndex extends AbstractController implements FrontpageInterface
 	 */
 	private function setPageNavigation(): void
 	{
-		global $board, $modSettings, $context, $options, $board_info;
+		global $board, $modSettings, $context, $options, $board_info, $url_format;
 
 		// How many topics do we have in total?
 		$board_info['total_topics'] = $this->currentUserCanApprovePosts()
@@ -423,8 +423,17 @@ class MessageIndex extends AbstractController implements FrontpageInterface
 		$context['messages_per_page'] = empty($modSettings['disableCustomPerPage']) && !empty($options['messages_per_page']) ? $options['messages_per_page'] : $modSettings['defaultMaxMessages'];
 		$per_page = $all && !empty($modSettings['enableAllMessages']) ? $board_info['total_topics'] : $context['topics_per_page'];
 
-		// Make sure the starting place makes sense and construct the page index.
-		$context['page_index'] = constructPageIndex('{scripturl}?board=' . $board . '.%1$d' . $this->buildSortingString(), $start, $board_info['total_topics'], $per_page, true);
+		// Make sure the starting place makes sense based on the chosen URL style and construct the page index.
+		if ($url_format === 'queryless')
+		{
+			$context['page_index'] = constructPageIndex('{scripturl}?board,' . $board . '.%1$d.html' . $this->buildSortingString(), $start, $board_info['total_topics'], $per_page, true);
+		}
+		else
+		{
+			$base_url = getUrl('board', ['board' => $board_info['id'], 'name' => $board_info['name']]);
+			$base_url = str_replace('%', '%%', $base_url);
+			$context['page_index'] = constructPageIndex($base_url . '.%1$d' . $this->buildSortingString(), $start, $board_info['total_topics'], $per_page, true);
+		}
 
 		// Set a canonical URL for this page.
 		$context['canonical_url'] = getUrl('board', ['board' => $board, 'start' => $start, 'name' => $board_info['name']]);

@@ -33,7 +33,8 @@ class Board extends Standard
 		$has_start = isset($params['start']) && $params['start'] !== '' && $params['start'] !== null;
 		$start = $has_start ? (int) $params['start'] : null;
 
-		$url = 'b/' . rawurlencode($slug) . '-' . $board_id . ($has_start && $start !== 0 ? '/page-' . $start : '');
+		// Semantic pagination format is dot-appended after the id (e.g., b/slug-id.10)
+		$url = 'b/' . rawurlencode($slug) . '-' . $board_id . ($has_start && $start !== 0 ? '.' . $start : '');
 		unset($params['name'], $params['board'], $params['start']);
 
 		return $url . $this->generateQuery($params);

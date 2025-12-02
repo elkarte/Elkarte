@@ -364,7 +364,7 @@ class Display extends AbstractController
 	 */
 	public function setupShowAll($can_show_all, $total_visible_posts): void
 	{
-		global $scripturl, $topic, $context;
+		global $scripturl, $topic, $context, $url_format;
 
 		$all_requested = $this->_req->getQuery('all', 'trim', null);
 		if (isset($all_requested))
@@ -382,7 +382,16 @@ class Display extends AbstractController
 		}
 
 		// Construct the page index, allowing for the .START method...
-		$context['page_index'] = constructPageIndex($scripturl . '?topic=' . $topic . '.%1$d', $this->_start, $total_visible_posts, $this->messages_per_page, true, ['all' => $can_show_all, 'all_selected' => isset($all_requested)]);
+		if ($url_format === 'queryless')
+		{
+			$context['page_index'] = constructPageIndex($scripturl . '?topic,' . $topic . '.%1$d.html', $this->_start, $total_visible_posts, $this->messages_per_page, true, ['all' => $can_show_all, 'all_selected' => isset($all_requested)]);
+		}
+		else
+		{
+			$base_url = getUrl('topic', ['topic' => $topic, 'subject' => $this->topicinfo['subject']]);
+			$base_url = str_replace('%', '%%', $base_url);
+			$context['page_index'] = constructPageIndex($base_url . '.%1$d', $this->_start, $total_visible_posts, $this->messages_per_page, true, ['all' => $can_show_all, 'all_selected' => isset($all_requested)]);
+		}
 		$context['start'] = $this->_start;
 
 		// Figure out all the link to the next/prev

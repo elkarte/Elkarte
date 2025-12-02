@@ -15,9 +15,7 @@ namespace ElkArte\UrlGenerator\Queryless;
 
 class Topic extends Standard
 {
-	/**
-	 * {@inheritDoc}
-	 */
+	/** {@inheritDoc} */
 	protected $_types = ['topic'];
 
 	/**

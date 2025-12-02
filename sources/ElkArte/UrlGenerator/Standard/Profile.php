@@ -15,9 +15,7 @@ namespace ElkArte\UrlGenerator\Standard;
 
 class Profile extends Standard
 {
-	/**
-	 * {@inheritDoc}
-	 */
+	/** {@inheritDoc} */
 	protected $_types = ['profile'];
 
 	/**
