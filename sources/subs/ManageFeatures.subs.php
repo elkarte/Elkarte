@@ -467,7 +467,7 @@ function getProfileField($id_field)
 				'max_length' => $row['field_length'],
 				'rows' => $row['rows'],
 				'cols' => $row['cols'],
-				'bbc' => $row['bbc'] ? true : false,
+				'bbc' => (bool) $row['bbc'],
 				'default_check' => $row['field_type'] === 'check' && $row['default_value'],
 				'default_select' => $row['field_type'] === 'select' || $row['field_type'] === 'radio' ? $row['default_value'] : '',
 				'show_nodefault' => $row['field_type'] === 'select' || $row['field_type'] === 'radio',

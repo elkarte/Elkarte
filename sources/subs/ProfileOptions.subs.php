@@ -135,7 +135,7 @@ function loadMembergroupsJoin($current_groups, $memID)
 				'is_primary' => $row['id_group'] == $context['primary_group'],
 				'can_be_primary' => $row['hidden'] != 2,
 				// Anything more than this needs to be done through account settings for security.
-				'can_leave' => $row['id_group'] != 1 && $row['group_type'] > 1 ? true : false,
+				'can_leave' => $row['id_group'] != 1 && $row['group_type'] > 1,
 			];
 		}
 	);

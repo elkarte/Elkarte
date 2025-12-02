@@ -1533,7 +1533,7 @@ function package_create_backup($id = 'backup')
 
 	// Root directory where most of our files reside
 	$dirs = [
-		SOURCEDIR => $use_relative_paths ? 'sources/' : strtr(SOURCEDIR . '/', '\\', '/')
+		SOURCEDIR => $use_relative_paths ? 'sources/' : str_replace('\\', '/', SOURCEDIR . '/')
 	];
 
 	// Find all installed theme directories
@@ -1549,7 +1549,7 @@ function package_create_backup($id = 'backup')
 		]
 	)->fetch_callback(
 		function ($row) use (&$dirs, $use_relative_paths) {
-			$dirs[$row['value']] = $use_relative_paths ? 'themes/' . basename($row['value']) . '/' : strtr($row['value'] . '/', '\\', '/');
+			$dirs[$row['value']] = $use_relative_paths ? 'themes/' . basename($row['value']) . '/' : str_replace('\\', '/', $row['value'] . '/');
 		}
 	);
 

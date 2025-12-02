@@ -298,7 +298,7 @@ function determineActions($urls, $preferred_prefix = false)
 				$topic_ids[$topic][$k] = $txt['whotopic_' . $actions['action']];
 			}
 			// Viewable if and only if they can see the board...
-			elseif (isset($actions['sa']) && isset($txt['whotopic_' . $actions['action'] . '_' . $actions['sa']]))
+			elseif (isset($actions['sa'], $txt['whotopic_' . $actions['action'] . '_' . $actions['sa']]))
 			{
 				// Find out what topic they are accessing.
 				$topic = (int) ($actions['topic'] ?? ($actions['from'] ?? 0));
@@ -345,7 +345,7 @@ function determineActions($urls, $preferred_prefix = false)
 			{
 				if (allowedTo($allowedActions[$actions['action']]))
 				{
-					if (isset($actions['sa']) && isset($txt['whoallow_' . $actions['action'] . '_' . $actions['sa']]))
+					if (isset($actions['sa'], $txt['whoallow_' . $actions['action'] . '_' . $actions['sa']]))
 					{
 						$data[$k] = replaceBasicActionUrl($txt['whoallow_' . $actions['action'] . '_' . $actions['sa']]);
 					}

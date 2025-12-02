@@ -337,7 +337,7 @@ final class Request
 		}
 
 		// It seems that sticking a URL after the query string is mighty common, well, it's evil - don't.
-		if (strpos($_SERVER['QUERY_STRING'], 'http') === 0)
+		if (str_starts_with($_SERVER['QUERY_STRING'], 'http'))
 		{
 			Headers::instance()
 				->removeHeader('all')

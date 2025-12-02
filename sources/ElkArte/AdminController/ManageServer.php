@@ -179,6 +179,7 @@ class ManageServer extends AbstractController
 			'',
 			['enableCompressedOutput', $txt['enableCompressedOutput'], 'db', 'check', null, 'enableCompressedOutput'],
 			['disableHostnameLookup', $txt['disableHostnameLookup'], 'db', 'check', null, 'disableHostnameLookup'],
+			// This is not really a server setting, it's here for convenience so its saved in Settings.php
 			['url_format', $txt['url_format'], 'file', 'select', ['standard' => $txt['url_format_standard'], 'semantic' => $txt['url_format_semantic'], 'queryless' => $txt['url_format_queryless']]],
 		];
 

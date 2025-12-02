@@ -350,7 +350,7 @@ function printMemberListRows($request)
 	}
 
 	$members = [];
-	while (($row = $request->fetch_assoc($request)))
+	while (($row = $request->fetch_assoc()))
 	{
 		$members[] = $row['id_member'];
 	}

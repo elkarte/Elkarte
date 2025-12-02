@@ -342,11 +342,11 @@ function validateTriggers(&$triggers)
 				}
 				$request->free_result();
 
-				$value = substr(strtolower(str_replace('*', '%', $value)), 0, 255);
+				$value = strtolower(substr(str_replace('*', '%', $value), 0, 255));
 
 				$ban_triggers['email']['email_address'] = $value;
 			}
-			elseif ($key == 'user')
+			elseif ($key === 'user')
 			{
 				$user = preg_replace('~&amp;#(\d{4,5}|[2-9]\d{2,4}|1[2-9]\d);~', '&#$1;', Util::htmlspecialchars($value, ENT_QUOTES));
 

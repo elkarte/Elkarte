@@ -829,7 +829,7 @@ function checkSession($type = 'post', $from_action = '', $is_fatal = true)
 	$referrer = @parse_url($referrer_url);
 	if (!empty($referrer['host']))
 	{
-		if (strpos($_SERVER['HTTP_HOST'], ':') !== false)
+		if (str_contains($_SERVER['HTTP_HOST'], ':'))
 		{
 			$real_host = substr($_SERVER['HTTP_HOST'], 0, strpos($_SERVER['HTTP_HOST'], ':'));
 		}
@@ -1113,10 +1113,8 @@ function checkSubmitOnce($action, $is_fatal = false)
 		{
 			throw new \ElkArte\Exceptions\Exception('error_form_already_submitted', false);
 		}
-		else
-		{
-			return false;
-		}
+
+		return false;
 	}
 	// Don't check, just free the stack number.
 	elseif ($action === 'free' && isset($_REQUEST['seqnum']) && in_array($_REQUEST['seqnum'], $_SESSION['forms'], true))
@@ -1948,7 +1946,7 @@ function validLoginUrl($url, $match_board = false)
 		return false;
 	}
 
-	if (strpos($url, 'http://') !== 0 && strpos($url, 'https://') !== 0)
+	if (!str_starts_with($url, 'http://') && !str_starts_with($url, 'https://'))
 	{
 		return false;
 	}
@@ -1958,7 +1956,7 @@ function validLoginUrl($url, $match_board = false)
 
 	foreach ($invalid_strings as $invalid_string => $valid_match)
 	{
-		if (strpos($url, $invalid_string) !== false
+		if (str_contains($url, $invalid_string)
 			|| ($match_board === true && !empty($valid_match) && preg_match($valid_match, $url) !== 1))
 		{
 			return false;
