@@ -320,10 +320,10 @@ function standardTime($log_time, $show_today = true, $offset_type = false)
 		$now = @getdate($nowtime);
 
 		// Try to make something of a time format string...
-		$s = strpos(User::$info->time_format, '%S') === false ? '' : ':%S';
-		if (strpos(User::$info->time_format, '%H') === false && strpos(User::$info->time_format, '%T') === false)
+		$s = !str_contains(User::$info->time_format, '%S') ? '' : ':%S';
+		if (!str_contains(User::$info->time_format, '%H') && !str_contains(User::$info->time_format, '%T'))
 		{
-			$h = strpos(User::$info->time_format, '%l') === false ? '%I' : '%l';
+			$h = !str_contains(User::$info->time_format, '%l') ? '%I' : '%l';
 			$today_fmt = $h . ':%M' . $s . ' %p';
 		}
 		else
@@ -362,14 +362,14 @@ function standardTime($log_time, $show_today = true, $offset_type = false)
 			$non_twelve_hour = trim(Util::strftime('%p')) === '';
 		}
 
-		if ($non_twelve_hour && strpos($str, '%p') !== false)
+		if ($non_twelve_hour && str_contains($str, '%p'))
 		{
 			$str = str_replace('%p', (Util::strftime('%H', $time) < 12 ? $txt['time_am'] : $txt['time_pm']), $str);
 		}
 
 		foreach (['%a', '%A', '%b', '%B'] as $token)
 		{
-			if (strpos($str, $token) !== false)
+			if (str_contains($str, $token))
 			{
 				$str = str_replace($token, empty($txt['lang_capitalize_dates']) ? Util::strftime($token, $time) : Util::ucwords(Util::strftime($token, $time)), $str);
 			}
@@ -380,20 +380,20 @@ function standardTime($log_time, $show_today = true, $offset_type = false)
 		// Do-it-yourself time localization.  Fun.
 		foreach (['%a' => 'days_short', '%A' => 'days', '%b' => 'months_short', '%B' => 'months'] as $token => $text_label)
 		{
-			if (strpos($str, $token) !== false)
+			if (str_contains($str, $token))
 			{
 				$str = str_replace($token, $txt[$text_label][(int) Util::strftime($token === '%a' || $token === '%A' ? '%w' : '%m', $time)], $str);
 			}
 		}
 
-		if (strpos($str, '%p') !== false)
+		if (str_contains($str, '%p'))
 		{
 			$str = str_replace('%p', (Util::strftime('%H', $time) < 12 ? $txt['time_am'] : $txt['time_pm']), $str);
 		}
 	}
 
 	// Windows doesn't support %e; on some versions, strftime fails altogether if used, so let's prevent that.
-	if ($is_win && strpos($str, '%e') !== false)
+	if ($is_win && str_contains($str, '%e'))
 	{
 		$str = str_replace('%e', ltrim(Util::strftime('%d', $time), '0'), $str);
 	}
@@ -442,7 +442,7 @@ function htmlTime($timestamp)
  */
 function utcTime($timestamp, $userAdjust = false)
 {
-	global $user_info, $modSettings;
+	global $modSettings;
 
 	// Back out user time
 	if ($userAdjust === true && !empty(User::$info->time_offset))
@@ -744,7 +744,7 @@ function setOldUrl($index = 'old_url')
 	$make_old = true;
 	foreach ($invalid_old_url as $url)
 	{
-		if (strpos($_SERVER['REQUEST_URL'], $url) !== false)
+		if (str_contains($_SERVER['REQUEST_URL'], $url))
 		{
 			$make_old = false;
 			break;
@@ -1509,7 +1509,7 @@ function scheduleTaskImmediate($task)
 		require_once(SUBSDIR . '/ScheduledTasks.subs.php');
 
 		// Ensure the task is on
-		toggleTaskStatusByName($task, true);
+		toggleTaskStatusByName($task);
 
 		// Before trying to run it **NOW** :P
 		calculateNextTrigger($task, true);
@@ -1770,7 +1770,7 @@ function validateURLAllowList($checkUrl)
 
 	foreach ($allowList as $validDomain)
 	{
-		if (substr($parsed['host'], -strlen($validDomain)) === $validDomain)
+		if (str_ends_with($parsed['host'], $validDomain))
 		{
 			return true;
 		}
@@ -1967,7 +1967,7 @@ function setPWACacheStale($refresh = false)
  *
  * @param bool $expired Flag to determine if header Expires should be sent
  *
- * @return void
+ * @return never
  */
 function dieGif($expired = false): never
 {
@@ -2186,7 +2186,7 @@ function expandIPv6($addr, $strict_check = true)
 	}
 
 	// Check if there are segments missing, insert if necessary.
-	if (strpos($addr, '::') !== false)
+	if (str_contains($addr, '::'))
 	{
 		$part = explode('::', $addr);
 		$part[0] = explode(':', $part[0]);
@@ -2194,7 +2194,7 @@ function expandIPv6($addr, $strict_check = true)
 		$missing = [];
 
 		// Looks like this is an IPv4 address
-		if (isset($part[1][1]) && strpos($part[1][1], '.') !== false)
+		if (isset($part[1][1]) && str_contains($part[1][1], '.'))
 		{
 			$ipoct = explode('.', $part[1][1]);
 			$p1 = dechex($ipoct[0]) . dechex($ipoct[1]);

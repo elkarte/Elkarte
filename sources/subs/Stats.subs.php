@@ -136,7 +136,7 @@ function topPosters($limit = null)
 	// Otherwise, fingers crossed and let's grab what is asked
 	else
 	{
-		$limit = $limit === null ? 10 : $limit;
+		$limit = $limit ?? 10;
 	}
 
 	// Make the query to the x number of top posters
@@ -368,7 +368,7 @@ function topTopicViews($limit = null)
 	// Otherwise, fingers crossed and let's grab what is asked
 	else
 	{
-		$limit = $limit === null ? 10 : $limit;
+		$limit = $limit ?? 10;
 	}
 
 	// Large forums may need a bit more prodding..

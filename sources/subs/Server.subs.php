@@ -21,7 +21,7 @@
  */
 function detectServerLoad()
 {
-	if (stripos(PHP_OS, 'win') !== false)
+	if (PHP_OS_FAMILY === 'Windows')
 	{
 		return false;
 	}

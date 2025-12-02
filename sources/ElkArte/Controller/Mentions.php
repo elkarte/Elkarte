@@ -105,7 +105,8 @@ class Mentions extends AbstractController
 
 	/**
 	 * Fetches number of notifications and number of recently added ones for use
-	 * in favicon and desktop notifications.
+	 * in favicon and desktop notifications.  Triggered by URL request from
+	 * ElkNotifications
 	 *
 	 * @todo probably should be placed somewhere else.
 	 */
@@ -141,7 +142,7 @@ class Mentions extends AbstractController
 			'lasttimepm' => getLastPMSentTime($this->user->id)
 		];
 
-		// Data to be supplied to FavIco via favicon-notify.js
+		// Data to be supplied to Json template, consumed by favicon-notify.js
 		if (!empty($modSettings['usernotif_favicon_enable']))
 		{
 			$context['json_data']['mentions'] = (int) $this->user->mentions;

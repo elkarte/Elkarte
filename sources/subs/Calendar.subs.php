@@ -250,7 +250,7 @@ function getHolidayRange($low_date, $high_date)
 	$db = database();
 
 	// Get the lowest and highest dates for "all years".
-	if (substr($low_date, 0, 4) != substr($high_date, 0, 4))
+	if (!str_starts_with($low_date, substr($high_date, 0, 4)))
 	{
 		$allyear_part = 'event_date BETWEEN {date:all_year_low} AND {date:all_year_dec}
 			OR event_date BETWEEN {date:all_year_jan} AND {date:all_year_high}';
@@ -278,7 +278,7 @@ function getHolidayRange($low_date, $high_date)
 		]
 	)->fetch_callback(
 		function ($row) use (&$holidays, $low_date, $high_date) {
-			if (substr($low_date, 0, 4) != substr($high_date, 0, 4))
+			if (!str_starts_with($low_date, substr($high_date, 0, 4)))
 			{
 				$event_year = substr($row['event_date'], 5) < substr($high_date, 5) ? substr($high_date, 0, 4) : substr($low_date, 0, 4);
 			}

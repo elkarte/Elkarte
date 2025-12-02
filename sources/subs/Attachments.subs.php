@@ -886,7 +886,7 @@ function getLegacyAttachmentFilename($filename, $attachment_id, $dir = null, $ne
 	// Sorry, no spaces, dots, or anything else but letters allowed.
 	$clean_name = preg_replace(['/\s/', '/[^\w_\.\-]/'], ['_', ''], $clean_name);
 
-	$enc_name = $attachment_id . '_' . strtr($clean_name, '.', '_') . md5($clean_name);
+	$enc_name = $attachment_id . '_' . str_replace('.', '_', $clean_name) . md5($clean_name);
 	$clean_name = preg_replace('~\.[\.]+~', '.', $clean_name);
 
 	if (empty($attachment_id) || ($new && empty($modSettings['attachmentEncryptFilenames'])))

@@ -700,7 +700,7 @@ function loadPermissions()
  */
 function loadTheme($id_theme = 0, $initialize = true)
 {
-	Errors::instance()->log_deprecated('loadTheme()', \ElkArte\Themes\ThemeLoader::class);
+	Errors::instance()->log_deprecated('loadTheme()', ThemeLoader::class);
 	new ThemeLoader($id_theme, $initialize);
 }
 
@@ -1031,7 +1031,7 @@ function loadAssetFile($filenames, $params = [], $id = '')
 			$this_id = empty($id) ? str_replace('?', '_', basename($filename)) : $id;
 
 			// Is this a local file?
-			if (!empty($params['local']) || (strpos($filename, 'http') !== 0 && strpos($filename, '//') !== 0))
+			if (!empty($params['local']) || (!str_starts_with($filename, 'http') && !str_starts_with($filename, '//')))
 			{
 				$params['local'] = true;
 				$params['dir'] = $settings['theme_dir'] . $dir;

@@ -310,7 +310,7 @@ function construct_query_string($get)
 	$q = strpos($scripturl, '?');
 	if ($q !== false)
 	{
-		parse_str(preg_replace('/&(\w+)(?=&|$)/', '&$1=', strtr(substr($scripturl, $q + 1), ';', '&')), $temp);
+		parse_str(preg_replace('/&(\w+)(?=&|$)/', '&$1=', str_replace(';', '&', substr($scripturl, $q + 1))), $temp);
 
 		foreach ($get as $k => $v)
 		{

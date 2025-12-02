@@ -109,7 +109,6 @@ function prepareCreditsData()
 			'<a href="https://github.com/KDE/oxygen-icons">Oxygen Icons</a> | These icons are licensed under <a href="https://creativecommons.org/licenses/by-sa/3.0/">CC BY-SA 3.0</a>',
 			'<a href="https://github.com/twitter/twemoji">Twitter Emoji</a> | &copy; Twitter, Inc and other contributors | Licensed under <a href="https://github.com/twitter/twemoji/blob/master/LICENSE/">MIT</a>',],
 		'fonts' => [
-			'<a href="https://fontawesome.com/v4/get-started/">Font Awesome</a> | Created by Dave Gandy | This font is licensed under the SIL Open Font License, Version 1.1',
 			'<a href="https://www.fontsquirrel.com/fonts/open-sans">Open Sans</a> | &copy; Ascender Fonts | <a href="https://opensource.org/licenses/Apache-2.0">Apache License, Version 2.0',
 		],
 		'software' => [
