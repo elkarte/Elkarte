@@ -28,9 +28,18 @@ class Profile extends Standard
 	/**
 	 * {@inheritDoc}
 	 */
-	public function generate($params)
+    public function generate($params)
 	{
-		$url = 'p/' . urlencode(strtr($params['name'], ' ', '-')) . '-' . $params['u'];
+		// Safely build a slug from the display name; guard against null
+		$name = isset($params['name']) && $params['name'] !== null ? (string) $params['name'] : '';
+		$name = trim($name);
+		$slug = $name === '' ? 'member' : preg_replace('~\s+~u', '-', $name);
+		$slug = trim($slug, '-');
+
+		// Ensure member id is an integer
+		$uid = isset($params['u']) ? (int) $params['u'] : 0;
+
+		$url = 'p/' . rawurlencode($slug) . '-' . $uid;
 		unset($params['name'], $params['u'], $params['action']);
 
 		return $url . $this->_separator . $this->generateQuery($params);

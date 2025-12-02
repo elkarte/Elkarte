@@ -20,14 +20,10 @@ namespace ElkArte\UrlGenerator;
  */
 abstract class AbstractUrlGenerator
 {
-	/**
-	 * The piece of glue between different parameters of the URL
-	 */
+	/** @var string The piece of glue between different parameters of the URL */
 	protected $_separator = ';';
 
-	/**
-	 * The type of URLs this class supports
-	 */
+	/** @var string[] The type of URLs this class supports */
 	protected $_types = [];
 
 	/**
@@ -65,7 +61,14 @@ abstract class AbstractUrlGenerator
 	{
 		if (isset($args['hash']))
 		{
-			$args[] = str_replace(['=', 'hash'], '', $args['hash']);
+			$fragment = $args['hash'];
+			if ($fragment !== null && $fragment !== '')
+			{
+				// Process a hash argument by trimming and prefixing it with a '#'
+				$fragment = (string) $fragment;
+				$fragment = ltrim($fragment, '#');
+				$args[] = '#' . $fragment;
+			}
 			unset($args['hash']);
 		}
 

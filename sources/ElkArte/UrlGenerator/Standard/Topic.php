@@ -15,9 +15,7 @@ namespace ElkArte\UrlGenerator\Standard;
 
 class Topic extends Standard
 {
-	/**
-	 * {@inheritDoc}
-	 */
+	/** {@inheritDoc} */
 	protected $_types = ['topic'];
 
 	/**
@@ -25,7 +23,7 @@ class Topic extends Standard
 	 */
 	public function generate($params)
 	{
-		$params['topic'] = $params['topic'] . '.' . $params['start'];
+		$params['topic'] .= (empty($params['start']) ? '' : '.' . $params['start']);
 		unset($params['start'], $params['subject']);
 
 		return $this->generateQuery($params);

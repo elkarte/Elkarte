@@ -41,7 +41,7 @@ class TopicUtil
 	 */
 	public static function prepareContext($topics_info, $topic_seen = false, $preview_length = null): array
 	{
-		global $modSettings, $options, $txt, $settings;
+		global $modSettings, $options, $txt, $settings, $url_format;
 
 		$topics = [];
 		$preview_length = (int) $preview_length;
@@ -117,7 +117,17 @@ class TopicUtil
 				// We can't pass start by reference.
 				$start = -1;
 				$show_all = !empty($modSettings['enableAllMessages']) && $topic_length < $modSettings['enableAllMessages'];
-				$pages = constructPageIndex('{scripturl}?topic=' . $row['id_topic'] . '.%1$d' . $topicseen, $start, $topic_length, $messages_per_page, true, ['prev_next' => false, 'all' => $show_all]);
+
+				if ($url_format === 'queryless')
+				{
+					$pages = constructPageIndex('{scripturl}?topic,' . $row['id_topic'] . '.%1$d.html' . $topicseen, $start, $topic_length, $messages_per_page, true, ['prev_next' => false, 'all' => $show_all]);
+				}
+				else
+				{
+					$base_url = getUrl('topic', ['topic' => $row['id_topic'], 'subject' => $row['first_subject']]);
+					$base_url = str_replace('%', '%%', $base_url);
+					$pages = constructPageIndex($base_url . '.%1$d' . $topicseen, $start, $topic_length, $messages_per_page, true, ['prev_next' => false, 'all' => $show_all]);
+				}
 			}
 
 			$row['new_from'] = $row['new_from'] ?? 0;

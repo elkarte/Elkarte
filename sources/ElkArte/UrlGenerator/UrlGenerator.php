@@ -161,7 +161,7 @@ class UrlGenerator
 	{
 		if (!empty($args))
 		{
-			$args = '?' . $args;
+			$args = '?' . ltrim($args, ';');
 		}
 
 		return $this->_config['scripturl'] . $args;
