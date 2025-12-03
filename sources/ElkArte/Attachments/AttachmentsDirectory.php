@@ -113,9 +113,10 @@ class AttachmentsDirectory
 		if (empty($options['currentAttachmentUploadDir']))
 		{
 			$this->currentAttachmentUploadDir = 1;
+			$options['attachmentUploadDir'] = serialize([1 => $options['attachmentUploadDir']]);
 
 			updateSettings([
-				'attachmentUploadDir' => serialize([1 => $options['attachmentUploadDir']]),
+				'attachmentUploadDir' => $options['attachmentUploadDir'],
 				'currentAttachmentUploadDir' => 1,
 			]);
 		}
