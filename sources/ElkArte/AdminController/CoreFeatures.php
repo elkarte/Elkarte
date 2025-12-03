@@ -317,7 +317,7 @@ class CoreFeatures extends AbstractController
 	 * - Calls discoverIntegrations() to search ADDONSDIR for .integrate.php files for Core Feature inclusion.
 	 *
 	 * @param array $core_features Reference to an array that will be populated with core feature configurations
-	 *                              collected from the specified directories and integration hooks.
+	 *                             collected from the specified directories and integration hooks.
 	 * @return void
 	 */
 	protected function _discoverCoreFeatures(array &$core_features): void
@@ -339,7 +339,7 @@ class CoreFeatures extends AbstractController
 	 * @param array $core_features An associative array representing the core features to be updated with module data.
 	 * @return void
 	 */
-	public function _getModulesConfig(array $core_features): void
+	public function _getModulesConfig(array &$core_features): void
 	{
 		// Find appropriately named core feature files in the admin (\sources\ElkArte\AdminController) directory
 		$glob = new GlobIterator(ADMINDIR . '/Manage*Module.php', FilesystemIterator::SKIP_DOTS);
