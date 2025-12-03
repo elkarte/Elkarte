@@ -43,7 +43,7 @@ a:link, a:hover, a:visited {
 
 h1.forumtitle {
 	font-family: verdana, tahoma, serif;
-	font-size: 2em;
+    font-size: var(--font24);
 	padding: 0 0 0 1em;
 	color: #4B863C;
 	text-shadow: -1px -1px 0 var(--opacity30);
@@ -81,10 +81,11 @@ h1.forumtitle {
 }
 
 #main_steps ul {
-	line-height: 1.8;
+	line-height: 1.6;
 	margin: 0;
 	padding: 0 0.5em;
 	list-style: none;
+    column-count: 2;
 }
 
 #main_steps .stepdone {

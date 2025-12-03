@@ -5,6 +5,7 @@
  * The maintenance "mode"
  * Set to 1 to enable Maintenance Mode, 2 to make the forum untouchable. (you'll have to make it 0 again manually!)
  * 0 is default and disables maintenance mode.
+ * @var int 0, 1, 2
  * @global int $maintenance
  */
 $maintenance = 0;
@@ -24,41 +25,40 @@ $mmessage = 'Okay faithful users...we\'re attempting to restore an older backup 
 ########## Forum Info ##########
 /**
  * The name of your forum.
- * @global string $mbname
+ * @var string
  */
 $mbname = 'My Community';
 
 /**
  * The default language file set for the forum.
- * @global string $language
+ * @var string
  */
 $language = 'English';
 
 /**
  * URL to your forum's folder. (without the trailing /!)
- * @global string $boardurl
+ * @var string
  */
 $boardurl = 'http://127.0.0.1/elkarte';
 
 /**
  * Email address to send emails from. (like noreply@yourdomain.com.)
- * @global string $webmaster_email
+ * @var string
  */
 $webmaster_email = 'noreply@myserver.com';
 
 /**
  * Name of the cookie to set for authentication.
- * @global string $cookiename
+ * @var string
  */
-$cookiename = 'ElkArteCookie11';
+$cookiename = 'ElkArteCookie20';
 
 ########## Database Info ##########
 /**
- * The database type
- * Default options: mysql, sqlite, postgresql
+ * The database type. Options: mysqli, postgresql
  * @global string $db_type
  */
-$db_type = 'mysql';
+$db_type = 'mysqli';
 
 /**
  * The server to connect to (or a Unix socket)
@@ -91,6 +91,23 @@ $db_user = 'root';
 $db_passwd = '';
 
 /**
+ * A prefix to put in front of your table names. This helps to prevent conflicts
+ * @global string $db_prefix
+ */
+$db_prefix = 'elkarte_';
+
+/**
+ * Use a persistent database connection
+ * @global int|bool $db_persist
+ */
+$db_persist = 0;
+
+/**
+ * @global int|bool $db_error_send
+ */
+$db_error_send = 0;
+
+/**
  * Database user for when connecting with SSI
  * @global string $ssi_db_user
  */
@@ -103,29 +120,15 @@ $ssi_db_user = '';
 $ssi_db_passwd = '';
 
 /**
- * A prefix to put in front of your table names.
- * This helps to prevent conflicts
- * @global string $db_prefix
+ * The character set to use for the database connection, should be utf8.
+ * @global string $db_character_set
  */
-$db_prefix = 'elkarte_';
-
-/**
- * Use a persistent database connection
- * @global int|bool $db_persist
- */
-$db_persist = 0;
-
-/**
- *
- * @global int|bool $db_error_send
- */
-$db_error_send = 0;
+$db_character_set = 'utf8';
 
 ########## Cache Info ##########
 /**
  * Select a cache system. You want to leave this up to the cache area of the admin panel for
- * proper detection of apc, eaccelerator, memcache, mmcache, output_cache or filesystem-based
- * (you can add more with a mod).
+ * proper detection of apc, redis, memcache, or filesystem-based
  * @global string $cache_accelerator
  */
 $cache_accelerator = '';
@@ -137,52 +140,43 @@ $cache_accelerator = '';
 $cache_enable = 0;
 
 /**
- * This is only used for memcache / memcached / redis. Should be a string of 'server:port,server:port'
+ * This is only used for memcache / redis. Should be a string of 'server:port,server:port'
  * @global string $cache_servers
  */
 $cache_servers = '';
 
+########## Directories/Files ##########
 /**
- * This is only for the 'filebased' cache system. It is the path to the cache directory.
- * It is also recommended that you place this in /tmp/ if you are going to use this.
+ * This is for 'filebased' cache files. It is the path to the cache directory.
  * @global string $cachedir
  */
 $cachedir = __DIR__ . '/cache';
 
 /**
- * Cache accelerator userid / dbname, required by some engines
- * @global string $cache_uid
- */
-$cache_uid = '';
-
-/**
- * Cache accelerator password for connecting, required by somme engines
- * @global string $cache_password
- */
-$cache_password = '';
-
-########## Directories/Files ##########
-# Note: These directories do not have to be changed unless you move things.
-/**
  * The absolute path to the forum's folder. (not just '.'!)
  * @global string $boarddir
  */
-$boarddir = __DIR__;
+$boarddir =  __DIR__;
 
 /**
  * Path to the sources directory.
  * @global string $sourcedir
  */
-$sourcedir = __DIR__ . '/sources';
+$sourcedir =  __DIR__ . '/sources';
 
 /**
- * Path to the external resources' directory.
+ * Path to the external resource directory.
  * @global string $extdir
  */
-$extdir = __DIR__ . '/sources/ext';
+$extdir =  __DIR__ . '/sources/ext';
 
 /**
- * Path to the languages directory.
- * @global string
+ * Path to the language directory.
+ * @global string $languagedir
  */
 $languagedir = __DIR__ . '/sources/ElkArte/Languages';
+
+########## Misc Settings ##########
+$url_format = 'standard';
+$db_show_debug = false;
+$install_time = '0';

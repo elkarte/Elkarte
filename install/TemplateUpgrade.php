@@ -55,7 +55,7 @@ function template_chmod()
 	if (!empty($upcontext['chmod']['ftp_error']) && $upcontext['chmod']['ftp_error'] === 'total_mess')
 	{
 		echo '
-			<div class="error_message">
+			<div class="error_message" role="alert" aria-live="assertive">
 				<div style="color: red;">The following files need to be writable to continue the upgrade. Please ensure the Windows permissions are correctly set to allow this:</div>
 				<ul class="bbc_list">
 					<li>' . implode('</li>
@@ -89,10 +89,10 @@ function template_chmod()
 	if (!empty($upcontext['chmod']['ftp_error']))
 	{
 		echo '
-			<div class="error_message">
+			<div class="error_message" role="alert" aria-live="assertive">
 				<div class="error">
 					The following error was encountered when trying to connect:<br /><br />
-					<code>', $upcontext['chmod']['ftp_error'], '</code>
+					<code>', htmlspecialchars($upcontext['chmod']['ftp_error'], ENT_QUOTES, 'UTF-8'), '</code>
 				</div>
 			</div>
 			<br />';
@@ -113,34 +113,34 @@ function template_chmod()
 					<td>
 						<div style="float: right; margin-right: 1px;">
 							<label for="ftp_port" class="textbox"><strong>', $txt['ftp_port'], ':&nbsp;</strong></label>
- 							<input type="text" size="3" name="ftp_port" id="ftp_port" value="', $upcontext['chmod']['port'] ?? '21', '" class="input_text" />
+							<input type="text" size="3" name="ftp_port" id="ftp_port" value="', htmlspecialchars($upcontext['chmod']['port'] ?? '21', ENT_QUOTES, 'UTF-8'), '" class="input_text" aria-describedby="ftp_server_info" inputmode="numeric" pattern="[0-9]*" />
 						</div>
-						<input type="text" size="30" name="ftp_server" id="ftp_server" value="', $upcontext['chmod']['server'] ?? 'localhost', '" style="width: 70%;" class="input_text" />
-						<div style="font-size: smaller; margin-bottom: 2ex;">', $txt['ftp_server_info'], '</div>
+						<input type="text" size="30" name="ftp_server" id="ftp_server" value="', htmlspecialchars($upcontext['chmod']['server'] ?? 'localhost', ENT_QUOTES, 'UTF-8'), '" style="width: 70%;" class="input_text" aria-describedby="ftp_server_info" autocapitalize="none" spellcheck="false" />
+						<div class="notes" style="font-size: smaller; margin-bottom: 2ex;" id="ftp_server_info">', $txt['ftp_server_info'], '</div>
 					</td>
 				</tr><tr>
 					<td style="width: 26%; vertical-align: top;" class="textbox">
 						<label for="ftp_username">', $txt['ftp_username'], ':</label>
 					</td>
 					<td>
-						<input type="text" size="50" name="ftp_username" id="ftp_username" value="', $upcontext['chmod']['username'] ?? '', '" style="width: 99%;" class="input_text" />
-						<div style="font-size: smaller; margin-bottom: 2ex;">', $txt['ftp_username_info'], '</div>
+						<input type="text" size="50" name="ftp_username" id="ftp_username" value="', htmlspecialchars($upcontext['chmod']['username'] ?? '', ENT_QUOTES, 'UTF-8'), '" style="width: 99%;" class="input_text" aria-describedby="ftp_username_info" autocomplete="username" autocapitalize="none" spellcheck="false" />
+						<div class="notes" style="font-size: smaller; margin-bottom: 2ex;" id="ftp_username_info">', $txt['ftp_username_info'], '</div>
 					</td>
 				</tr><tr>
 					<td style="width: 26%; vertical-align: top;" class="textbox">
 						<label for="ftp_password">', $txt['ftp_password'], ':</label>
 					</td>
 					<td>
-						<input type="password" size="50" name="ftp_password" id="ftp_password" style="width: 99%;" class="input_password" />
-						<div style="font-size: smaller; margin-bottom: 3ex;">', $txt['ftp_password_info'], '</div>
+						<input type="password" size="50" name="ftp_password" id="ftp_password" style="width: 99%;" class="input_password" aria-describedby="ftp_password_info" autocomplete="current-password" />
+						<div class="notes" style="font-size: smaller; margin-bottom: 3ex;" id="ftp_password_info">', $txt['ftp_password_info'], '</div>
 					</td>
 				</tr><tr>
 					<td style="width: 26%; vertical-align: top;" class="textbox">
 						<label for="ftp_path">', $txt['ftp_path'], ':</label>
 					</td>
 					<td style="padding-bottom: 1ex;">
-						<input type="text" size="50" name="ftp_path" id="ftp_path" value="', $upcontext['chmod']['path'] ?? '', '" style="width: 99%;" class="input_text" />
-						<div style="font-size: smaller; margin-bottom: 2ex;">', empty($upcontext['chmod']['path']) ? $txt['ftp_path_info'] : $txt['ftp_path_found_info'], '</div>
+						<input type="text" size="50" name="ftp_path" id="ftp_path" value="', htmlspecialchars($upcontext['chmod']['path'] ?? '', ENT_QUOTES, 'UTF-8'), '" style="width: 99%;" class="input_text" aria-describedby="ftp_path_info" autocapitalize="none" spellcheck="false" />
+						<div class="notes" style="font-size: smaller; margin-bottom: 2ex;" id="ftp_path_info">', empty($upcontext['chmod']['path']) ? $txt['ftp_path_info'] : $txt['ftp_path_found_info'], '</div>
 					</td>
 				</tr>
 			</table>
@@ -175,7 +175,7 @@ function template_upgrade_above()
 		<link rel="stylesheet" href="', $settings['default_theme_url'], '/css/install.css?20RC1" />
 		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js" id="jquery"></script>
 		<script>
-			window.jQuery || document.write(\'<script src="', $settings['default_theme_url'], '/scripts/jquery-3.7.1.min.js"><\/script>\');
+			window.jQuery || document.write(\'<script src="', $settings['default_theme_url'], '/scripts/ext/jquery-3.7.1.min.js"><\/script>\');
 		</script>
 		<script src="', $settings['default_theme_url'], '/scripts/script.js"></script>
 		<script>
@@ -280,7 +280,7 @@ function template_upgrade_above()
 					<div id="substep_bar_div_2" class="', empty($upcontext['substep_progress']) ? ' hide' : '', '">
 						<div id="substep_progress" style="width: ', $upcontext['substep_progress'] ?? 0, '%;">&nbsp;</div>
 						<div id="substep_text" class="overall_progress">', $upcontext['substep_progress'] ?? '', '%</div>
-						<div id="substep_bar_div" class="overall_progress">', isset($upcontext['substep_progress_name']) ? trim(strtr($upcontext['substep_progress_name'], array('.' => ''))) : '', '</div>
+						<div id="substep_bar_div" class="overall_progress">', isset($upcontext['substep_progress_name']) ? trim(strtr($upcontext['substep_progress_name'], ['.' => ''])) : '', '</div>
 					</div>';
 
 	// How long have we been running this?
@@ -300,8 +300,8 @@ function template_upgrade_above()
 				</div>
 			</div>
 			<div id="main_screen" class="clear">
-				<h2>', $upcontext['page_title'], '</h2>
-				<div class="content">';
+				<h2 id="main-content" tabindex="-1">', $upcontext['page_title'], '</h2>
+				<div class="content" role="main" aria-labelledby="main-content">';
 }
 
 /**
@@ -352,7 +352,7 @@ function template_upgrade_below()
 		</div>
 		<div id="footer_section"><div class="frame" style="height: 40px;">
 			<div class="smalltext">
-				<a href="', SITE_SOFTWARE, '" title="ElkArte Community" target="_blank" class="new_win">ElkArte &copy; 2012 - 2021, ElkArte</a>
+				<a href="', SITE_SOFTWARE, '" title="ElkArte Community" target="_blank" class="new_win">ElkArte &copy; 2012 - 2026, ElkArte</a>
 			</div>
 		</div>
 	</body>
@@ -421,7 +421,7 @@ function template_error_message()
 	global $upcontext, $txt;
 
 	echo '
-	<div class="errorbox">
+	<div class="errorbox" role="alert" aria-live="assertive">
 		', $upcontext['error_msg'];
 
 	if (empty($upcontext['fatal']))
@@ -478,7 +478,7 @@ function template_welcome_message()
 	if ($upcontext['is_large_forum'])
 	{
 		echo '
-			<div class="warningbox">
+			<div class="warningbox" role="status" aria-live="polite">
 				<strong style="text-decoration: underline;">', $txt['upgrade_warning'], '</strong><br />
 				<div>
 					', $txt['upgrade_warning_lots_data'], '
@@ -490,7 +490,7 @@ function template_welcome_message()
 	if (!empty($upcontext['warning']))
 	{
 		echo '
-			<div class="warningbox">
+			<div class="warningbox" role="status" aria-live="polite">
 				<strong style="text-decoration: underline;">', $txt['upgrade_warning'], '</strong><br />
 				<div>
 					', $upcontext['warning'], '
@@ -701,7 +701,7 @@ function template_upgrade_options()
 				<table style="border-collapse:collapse; border-spacing: 1px; padding: 2px;">
 					<tr>
 						<td style="width: 2%;">
-							<input type="checkbox" name="backup" id="backup" value="1"', $db_type != 'mysql' && $db_type != 'postgresql' ? ' disabled="disabled"' : '', ' class="input_check" />
+							<input type="checkbox" name="backup" id="backup" value="1"', $db_type !== 'mysql' && $db_type !== 'postgresql' ? ' disabled="disabled"' : '', ' class="input_check" />
 						</td>
 						<td style="width: 100%;">
 							<label for="backup">Backup tables in your database with the prefix &quot;backup_' . $db_prefix . '&quot;.</label>', isset($modSettings['elkVersion']) ? '' : ' (recommended!)', '
@@ -712,13 +712,28 @@ function template_upgrade_options()
 							<input type="checkbox" name="maint" id="maint" value="1" checked="checked" class="input_check" />
 						</td>
 						<td style="width: 100%;">
-							<label for="maint">Put the forum into maintenance mode during upgrade.</label> <span class="smalltext">(<a href="#" onclick="document.getElementById(\'mainmess\').classList.remove(\'hide\');">Customize</a>)</span>
+ 							<label for="maint">Put the forum into maintenance mode during upgrade.</label> 
+ 							<span class="smalltext">(<button type="button" id="maint_customize" class="linkbutton" aria-controls="mainmess" aria-expanded="false">Customize</button>)</span>
 							<div id="mainmess" class="hide">
 								<strong class="smalltext">Maintenance Title: </strong><br />
-								<input type="text" name="maintitle" size="30" value="', htmlspecialchars($mtitle, ENT_COMPAT), '" class="input_text" /><br />
+								<input type="text" name="maintitle" size="30" value="', htmlspecialchars($mtitle, ENT_COMPAT), '" class="input_text" autocomplete="off" /><br />
 								<strong class="smalltext">Maintenance Message: </strong><br />
-								<textarea name="mainmessage" rows="3" cols="50">', htmlspecialchars($mmessage, ENT_COMPAT), '</textarea>
+								<textarea name="mainmessage" rows="3" cols="50" autocomplete="off">', htmlspecialchars($mmessage, ENT_COMPAT), '</textarea>
 							</div>
+							<script>
+								(function(){
+									let btn = document.getElementById("maint_customize");
+									let panel = document.getElementById("mainmess");
+									if (btn && panel)
+									{
+										btn.addEventListener("click", function(){
+											let expanded = this.getAttribute("aria-expanded") === "true";
+											this.setAttribute("aria-expanded", (!expanded).toString());
+											panel.classList.toggle("hide");
+										});
+									}
+								})();
+							</script>
 						</td>
 					</tr>
 					<tr>
@@ -940,7 +955,7 @@ function template_database_changes()
 		echo '
 		<script>
 			let lastItem = ', $upcontext['current_debug_item_num'], ',
-				sLastString = "', strtr($upcontext['current_debug_item_name'], array('"' => '&quot;')), '",
+				sLastString = "', strtr($upcontext['current_debug_item_name'], ['"' => '&quot;']), '",
 				iLastSubStepProgress = -1,
 				curFile = ', $upcontext['cur_file_num'], ',
 				totalItems = 0,

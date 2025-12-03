@@ -24,7 +24,6 @@ use ElkArte\Helper\TokenHash;
 use ElkArte\Hooks;
 use ElkArte\MembersList;
 use ElkArte\Request;
-use ElkArte\Server;
 use ElkArte\Themes\ThemeLoader;
 use ElkArte\User;
 
@@ -150,37 +149,29 @@ class Bootstrap
 		// Where the Settings.php file is located
 		$settings_loc = __DIR__ . '/Settings.php';
 
-		// First thing: if the installation dir exists, just send anybody there
-		// The IGNORE_INSTALL_DIR constant is for developers only. Do not add it on production sites
-		if (file_exists('install') && (file_exists('install/install.php') || file_exists('install/upgrade.php')))
+		// First thing: if the installation dir exists, consider sending users there
+		// The IGNORE_INSTALL_DIR constant is intended for development, bootstrapcompleted.lock will be added
+		// after a successful installation, so that the installer will not automatically be shown again.
+		if (defined('IGNORE_INSTALL_DIR') || file_exists(__DIR__ . '/bootstrapcompleted.lock'))
 		{
-			if (file_exists($settings_loc))
+			require_once($settings_loc);
+		}
+		elseif (file_exists('install') && (file_exists('install/install.php') || file_exists('install/upgrade.php')))
+		{
+			$hasSettings = file_exists($settings_loc);
+			if ($hasSettings)
 			{
 				require_once($settings_loc);
 			}
 
-			if (!defined('IGNORE_INSTALL_DIR'))
-			{
-				$redirec_file = file_exists($settings_loc) && empty($_SESSION['installing']) ? 'upgrade.php' : 'install.php';
+			$redirec_file = $hasSettings && empty($_SESSION['installing']) ? 'upgrade.php' : 'install.php';
 
-				// To early for constants or autoloader
-				require_once($boarddir . '/sources/ElkArte/Server.php');
-				$server = new Server($_SERVER);
+			// Build a safe, relative redirect to avoid host header issues
+			$version_running = defined('FORUM_VERSION') ? str_replace('ElkArte ', '', FORUM_VERSION) : '';
 
-				$version_running = str_replace('ElkArte ', '', FORUM_VERSION);
-				$location = $server->supportsSSL() ? 'https://' : 'http://';
-				$location .= $server->getHost();
-				$temp = preg_replace('~/' . preg_quote(basename($boardurl . '/index.php'), '~') . '(/.+)?$~', '', str_replace('\\', '/', dirname($_SERVER['PHP_SELF'])));
-				$location .= ($temp !== '/') ? $temp : '';
-
-				// Too early to use Headers class etc.
-				header('Location:' . $location . '/install/' . $redirec_file . '?v=' . $version_running);
-				die();
-			}
-		}
-		else
-		{
-			require_once($settings_loc);
+			// Too early to use Headers class etc.
+			header('Location: install/' . $redirec_file . '?v=' . $version_running);
+			die();
 		}
 	}
 
