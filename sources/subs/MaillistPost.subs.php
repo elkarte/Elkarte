@@ -326,7 +326,11 @@ function pbe_email_quote_depth(&$string, $update = true)
 	while ($check)
 	{
 		// We have a quote marker, increase our depth and strip the line of that quote marker
-		if ($string === '>' || str_starts_with($string, '> '))
+		if ($string === null)
+		{
+			$check = false;
+		}
+		elseif ($string === '>' || str_starts_with($string, '> '))
 		{
 			$level++;
 			$string = substr($string, 2);
