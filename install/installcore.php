@@ -13,7 +13,7 @@
 const CURRENT_VERSION = '2.0 dev';
 const CURRENT_LANG_VERSION = '2.0';
 const DB_SCRIPT_VERSION = '2-0';
-const REQUIRED_PHP_VERSION = '8.0.0';
+const REQUIRED_PHP_VERSION = '8.1.0';
 
 // String constants
 const SITE_SOFTWARE = 'https://www.elkarte.net';
