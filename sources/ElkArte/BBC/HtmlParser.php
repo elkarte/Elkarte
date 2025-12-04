@@ -169,11 +169,16 @@ class HtmlParser
 				}
 
 				// Check if the image is larger than allowed.
-				// @todo - We should seriously look at deprecating some of this in favour of CSS resizing.
 				if (!empty($modSettings['max_image_width']) && !empty($modSettings['max_image_height']))
 				{
 					// For images, we'll want this
 					[$width, $height] = url_image_size($imgtag);
+
+					if ($width === -1 || $height === -1)
+					{
+						$replaces[$matches[0][$match]] = '[img' . $alt . ']' . $imgtag . '[/img]';
+						continue;
+					}
 
 					if ($width > $modSettings['max_image_width'])
 					{
