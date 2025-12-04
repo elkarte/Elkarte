@@ -70,7 +70,7 @@ class DbTable_PostgreSQL_Install extends Table
  *
  * return int 0|1
  */
-class Elk_Testing_psql extends ElkTestingSetup
+class ElkTestingPsql extends ElkTestingSetup
 {
 	public function init()
 	{
@@ -112,6 +112,8 @@ class Elk_Testing_psql extends ElkTestingSetup
 		$this->load_queries(BOARDDIR . '/install/install_' . DB_SCRIPT_VERSION . '_postgresql.php');
 		$this->run_queries();
 		$modSettings['disableQueryCheck'] = 0;
+
+		echo "Installed Postgre Specific Queries";
 
 		// Now the rest normally
 		$this->load_queries(BOARDDIR . '/install/install_' . DB_SCRIPT_VERSION . '.php');

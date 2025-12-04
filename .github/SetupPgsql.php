@@ -15,8 +15,10 @@
 
 define('TESTDIR', __DIR__);
 
+// Call in the support
 require_once(TESTDIR . '/SetupDbUtil.php');
 require_once(TESTDIR . '/ElkTestingPsql.php');
 
-$setup = new Elk_Testing_psql();
+// Lets install the db
+$setup = new ElkTestingPsql();
 return $setup->init();

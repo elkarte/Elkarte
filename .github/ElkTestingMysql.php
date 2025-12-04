@@ -111,7 +111,6 @@ class ElkTestingMysql extends ElkTestingSetup
 
 		// Load the mysql install queries
 		$this->load_queries(BOARDDIR . '/install/install_' . DB_SCRIPT_VERSION . '.php');
-
 		$result = $this->run_queries();
 
 		if (empty($result))

@@ -13,7 +13,7 @@
  *
  */
 
-define('TESTDIR', dirname(__FILE__));
+define('TESTDIR', __DIR__);
 
 // Call in the support
 require_once(TESTDIR . '/SetupDbUtil.php');
