@@ -113,7 +113,7 @@ class ElkTestingPsql extends ElkTestingSetup
 		$this->run_queries();
 		$modSettings['disableQueryCheck'] = 0;
 
-		echo "Installed Postgre Specific Queries";
+		echo "Successfully installed Postgre specific queries";
 
 		// Now the rest normally
 		$this->load_queries(BOARDDIR . '/install/install_' . DB_SCRIPT_VERSION . '.php');

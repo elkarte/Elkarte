@@ -2456,14 +2456,10 @@ class InstallInstructions_install_2_0
 				array('karmaTimeRestrictAdmins', '1'),
 				array('enablePreviousNext', '1'),
 				array('pollMode', '1'),
-				array('modules_display', 'metadata,mentions,poll,verification,random,attachments,calendar,drafts'),
-				array('modules_post', 'mentions,poll,attachments,verification,random,calendar,drafts'),
-				array('modules_personalmessage', 'verification,drafts'),
+				array('modules_display', 'mentions,poll,verification,random,attachments'),
+				array('modules_post', 'mentions,poll,attachments,verification,random'),
+				array('modules_personalmessage', 'labels,verification'),
 				array('modules_register', 'verification'),
-				array('modules_boardindex', 'calendar'),
-				array('modules_profile', 'drafts'),
-				array('modules_admin', 'calendar,drafts'),
-				array('modules_messageindex', 'drafts'),
 				array('enableVBStyleLogin', '1'),
 				array('enableCompressedOutput', '{$enableCompressedOutput}'),
 				array('karmaWaitTime', '1'),
@@ -2471,13 +2467,13 @@ class InstallInstructions_install_2_0
 				array('karmaLabel', '{$default_karmaLabel}'),
 				array('karmaSmiteLabel', '{$default_karmaSmiteLabel}'),
 				array('karmaApplaudLabel', '{$default_karmaApplaudLabel}'),
-				array('attachmentSizeLimit', '256'),
-				array('attachmentPostLimit', '2048'),
-				array('attachmentNumPerPostLimit', '8'),
+				array('attachmentSizeLimit', '128'),
+				array('attachmentPostLimit', '192'),
+				array('attachmentNumPerPostLimit', '4'),
 				array('attachmentDirSizeLimit', '10240'),
 				array('attachmentDirFileLimit', '1000'),
 				array('attachmentUploadDir', '{BOARDDIR}/attachments'),
-				array('attachmentExtensions', 'doc,xls,bmp,gif,jpg,jpeg,webp,mpg,mp4,mp3,pdf,png,txt,zip'),
+				array('attachmentExtensions', 'doc,gif,jpg,mpg,pdf,png,txt,zip'),
 				array('attachmentCheckExtensions', '0'),
 				array('attachmentShowImages', '1'),
 				array('attachmentEnable', '1'),
@@ -2496,8 +2492,8 @@ class InstallInstructions_install_2_0
 				array('titlesEnable', '1'),
 				array('topicSummaryPosts', '15'),
 				array('enableErrorLogging', '1'),
-				array('max_image_width', '800'),
-				array('max_image_height', '800'),
+				array('max_image_width', '0'),
+				array('max_image_height', '0'),
 				array('onlineEnable', '0'),
 				array('cal_enabled', '0'),
 				array('cal_limityear', '10'),
@@ -2628,46 +2624,37 @@ class InstallInstructions_install_2_0
 				array('attachment_image_reencode', '1'),
 				array('attachment_image_paranoid', '0'),
 				array('attachment_webp_enable', '1'),
-				array('attachment_image_resize_enabled', '1'),
-				array('attachment_image_resize_width', '1500'),
-				array('attachment_image_resize_height', '1500'),
 				array('avatar_reencode', '1'),
 				array('avatar_paranoid', '0'),
 				array('enable_unwatch', '0'),
 				array('mentions_enabled', '1'),
 				array('mentions_buddy', '0'),
 				array('mentions_dont_notify_rlike', '0'),
-				array('enabled_mentions', 'buddy,likemsg,mentionmem,quotedmem,watchedboard,watchedtopic'),
+				array('enabled_mentions', 'buddy,likemsg,mentionmem,quotedmem'),
 				array('notification_methods', serialize([
 					'buddy' => [
-						'notification' => '1',
-						'email' => '1',
-						'emaildaily' => '1',
-						'emailweekly' => '1'
+						'notification' => "1",
+						'email' => "1",
+						'emaildaily' => "1",
+						'emailweekly' => "1"
 					],
 					'likemsg' => [
-						'notification' => '1'
+						'notification' => "1"
 					],
-					'mentionmem' => [
-						'notification' => '1',
-						'email' => '1',
-						'emaildaily' => '1',
-						'emailweekly' => '1',
+					"mentionmem" => [
+						"notification" => "1",
+						"email" => "1",
+						"emaildaily" => "1",
+						"emailweekly" => "1",
 					],
-					'quotedmem' => [
-						'notification' => '1',
-						'email' => '1',
-						'emaildaily' => '1',
-						'emailweekly' => '1'
-					],
-					'watchedboard' => [
-						'notification' => '1'
-					],
-					'watchedtopic' => [
-						'notification' => '1'
+					"quotedmem" => [
+						"notification" => "1",
+						"email" => "1",
+						"emaildaily" => "1",
+						"emailweekly" => "1"
 					]
 				])),
-				array('autoload_integrate', '\\ElkArte\\UserNotificationIntegrate,\\ElkArte\\IlaIntegrate,\\ElkArte\\VerificationControls\\VerificationControlsIntegrate,\\ElkArte\\EmojiIntegrate,\\ElkArte\\DraftsIntegrate,\\ElkArte\\MetadataIntegrate'),
+				array('autoload_integrate', '\\ElkArte\\UserNotificationIntegrate,\\ElkArte\\IlaIntegrate,\\ElkArte\\VerificationControls\\VerificationControlsIntegrate,\\ElkArte\\EmojiIntegrate'),
 				array('usernotif_favicon_bgColor', '#ff0000'),
 				array('usernotif_favicon_position', 'up'),
 				array('usernotif_favicon_textColor', '#ffff00'),
