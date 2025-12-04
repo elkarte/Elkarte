@@ -82,9 +82,9 @@ class DbWrapper
 			}
 		}
 
-		$this->db->insert(...$args);
+		$result = $this->db->insert(...$args);
 
-		return $this->db->affected_rows();
+		return $result->affected_rows();
 	}
 
 	/**
@@ -259,7 +259,7 @@ if (class_exists(Table::class))
 				return 'drop_column';
 			}
 
-			if (strpos($short, 'ADD `') === 0)
+			if (str_starts_with($short, 'ADD `'))
 			{
 				return 'add_column';
 			}
@@ -393,7 +393,7 @@ if (class_exists(\ElkArte\Database\Postgresql\Table::class))
 				return 'add_column';
 			}
 
-			if (in_array($short, ['ADD PRIM', 'CREATE U', 'CREATE I']) || substr($short, 0, 6) === 'CREATE ')
+			if (in_array($short, ['ADD PRIM', 'CREATE U', 'CREATE I']) || str_starts_with($short, 'CREATE '))
 			{
 				return 'add_index';
 			}
@@ -443,4 +443,5 @@ function sql_error_handler($errno, $errstr, $errfile, $errline)
 	}
 
 	echo 'Error: ' . $errstr . ' File: ' . $errfile . ' Line: ' . $errline;
+	return false;
 }
