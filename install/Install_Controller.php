@@ -200,6 +200,7 @@ class Install_Controller
 			$error = 'error_missing_files';
 		}
 		// Very simple check on the session.save_path for Windows.
+		// @todo Move this down later if they don't use database-driven sessions?
 		elseif (@ini_get('session.save_path') === '/tmp' && substr(__FILE__, 1, 2) === ':\\')
 		{
 			$error = 'error_session_save_path';
@@ -245,7 +246,7 @@ class Install_Controller
 
 		foreach ($exist_files as $orig => $file)
 		{
-			// First thing (for convenience’s sake) if they are not there yet,
+			// First thing (for convenience' sake) if they are not there yet,
 			// try to rename Settings and Settings_bak and db_last_error
 			if (!file_exists(TMP_BOARDDIR . '/' . $file))
 			{
@@ -293,7 +294,6 @@ class Install_Controller
 		$writable_files = [
 			'attachments',
 			'avatars',
-			'avatars_user',
 			'cache',
 			'packages',
 			'packages/installed.list',
@@ -303,7 +303,6 @@ class Install_Controller
 			'Settings.php',
 			'Settings_bak.php'
 		];
-
 		foreach ($incontext['detected_languages'] as $lang => $temp)
 		{
 			$extra_files[] = 'sources/ElkArte/Languages/Install/' . $lang;
@@ -391,16 +390,7 @@ class Install_Controller
 						<ul style="margin: 2.5ex; font-family: monospace;">
 							<li>' . implode('</li>
 							<li>', $failed_files) . '</li>
-						</ul>' .
-						'<div class="notes" style="margin-top: 1em;">
-							<strong>On Windows, try the following:</strong>
-							<ul>
-								<li>Right-click the forum folder → Properties → Uncheck "Read-only" and apply to all subfolders/files.</li>
-								<li>Ensure the web server user (e.g., IIS AppPool identity like <code>IIS AppPool\\DefaultAppPool</code> or <code>IUSR</code>/<code>NETWORK SERVICE</code>) has <em>Modify</em> permission on the forum directory and its subfolders.</li>
-								<li>If using Apache on Windows (XAMPP/WAMP), ensure the service account running Apache has Modify permission.</li>
-								<li>After adjusting permissions, reload this page.</li>
-							</ul>
-						</div>';
+						</ul>';
 
 			return false;
 		}
@@ -518,10 +508,7 @@ class Install_Controller
 	 */
 	private function action_databaseSettings()
 	{
-		global $txt, $databases, $incontext, $db_type, $db_connection, $modSettings, $db_name, $db_user, $db_prefix;
-
-		// These will be populated by the database settings form / Settings.php
-		global $db_persist, $db_server, $db_passwd;
+		global $txt, $databases, $incontext, $db_type, $db_connection, $modSettings, $db_server, $db_name, $db_user, $db_passwd;
 
 		$incontext['sub_template'] = 'database_settings';
 		$incontext['page_title'] = $txt['db_settings'];
@@ -591,6 +578,25 @@ class Install_Controller
 		// Are we submitting?
 		if (isset($_POST['db_type']))
 		{
+			if (isset($_POST['db_filename']))
+			{
+				// You better enter enter a database name for SQLite.
+				if (trim($_POST['db_filename']) == '')
+				{
+					$incontext['error'] = $txt['error_db_filename'];
+
+					return false;
+				}
+
+				// Duplicate name in the same dir?  Can't do that with SQLite.  Weird things happen.
+				if (file_exists($_POST['db_filename'] . (substr($_POST['db_filename'], -3) !== '.db' ? '.db' : '')))
+				{
+					$incontext['error'] = $txt['error_db_filename_exists'];
+
+					return false;
+				}
+			}
+
 			// What type are they trying?
 			$db_type = preg_replace('~[^A-Za-z0-9]~', '', $_POST['db_type']);
 			$db_prefix = $_POST['db_prefix'];
@@ -634,12 +640,13 @@ class Install_Controller
 			}
 
 			require_once(EXTDIR . '/ClassLoader.php');
+
 			$loader = new ClassLoader();
 			$loader->setPsr4('ElkArte\\', SOURCEDIR . '/ElkArte');
 			$loader->setPsr4('BBC\\', SOURCEDIR . '/ElkArte/BBC');
 			$loader->register();
-
 			require_once(TMP_BOARDDIR . '/install/DatabaseCode.php');
+
 			$type = strtolower($db_type);
 			$type = $type === 'mysql' ? 'mysqli' : $type;
 			$class = '\\ElkArte\\Database\\' . ucfirst($type) . '\\Connection';
@@ -656,8 +663,9 @@ class Install_Controller
 			define('ELK', 1);
 			$modSettings['disableQueryCheck'] = true;
 
-			// Attempt a connection.
 			require_once(SOURCEDIR . '/database/Database.subs.php');
+
+			// Attempt a connection.
 			$db = test_db_connection();
 
 			// No dice?  Let's try adding the prefix they specified, just in case they misread the instructions ;)
@@ -744,7 +752,7 @@ class Install_Controller
 	 */
 	private function action_forumSettings()
 	{
-		global $txt, $incontext, $databases, $db_type;
+		global $txt, $incontext, $databases, $db_type, $db_connection;
 
 		$incontext['sub_template'] = 'forum_settings';
 		$incontext['page_title'] = $txt['install_settings'];
@@ -775,16 +783,16 @@ class Install_Controller
 		// Submitting?
 		if (isset($_POST['boardurl']))
 		{
-			if (str_ends_with($_POST['boardurl'], '/index.php'))
+			if (substr($_POST['boardurl'], -10) === '/index.php')
 			{
 				$_POST['boardurl'] = substr($_POST['boardurl'], 0, -10);
 			}
-			elseif (str_ends_with($_POST['boardurl'], '/'))
+			elseif (substr($_POST['boardurl'], -1) === '/')
 			{
 				$_POST['boardurl'] = substr($_POST['boardurl'], 0, -1);
 			}
 
-			if (!str_starts_with($_POST['boardurl'], 'http://') && !str_starts_with($_POST['boardurl'], 'file://') && !str_starts_with($_POST['boardurl'], 'https://'))
+			if (substr($_POST['boardurl'], 0, 7) !== 'http://' && substr($_POST['boardurl'], 0, 7) !== 'file://' && substr($_POST['boardurl'], 0, 8) !== 'https://')
 			{
 				$_POST['boardurl'] = 'http://' . $_POST['boardurl'];
 			}
@@ -898,12 +906,12 @@ class Install_Controller
 			'{$databaseSession_enable}' => isset($_POST['dbsession']) ? '1' : '0',
 			'{$current_version}' => CURRENT_VERSION,
 			'{$current_time}' => time(),
-			'{$sched_task_offset}' => 82800 + random_int(0, 86399),
+			'{$sched_task_offset}' => 82800 + mt_rand(0, 86399),
 		];
 
 		foreach ($txt as $key => $value)
 		{
-			if (str_starts_with($key, 'default_'))
+			if (substr($key, 0, 8) === 'default_')
 			{
 				$replaces['{$' . $key . '}'] = $value;
 			}
@@ -955,7 +963,7 @@ class Install_Controller
 		);
 
 		// Maybe we can auto-detect better cookie settings?
-		preg_match('~^https?://([^.]+?)([^/]*?)(/.*)?$~', $boardurl, $matches);
+		preg_match('~^http[s]?://([^\.]+?)([^/]*?)(/.*)?$~', $boardurl, $matches);
 		if (!empty($matches))
 		{
 			// Default = both off.
@@ -963,13 +971,13 @@ class Install_Controller
 			$globalCookies = false;
 
 			// Okay... let's see.  Using a subdomain other than www.? (not a perfect check.)
-			if ($matches[2] !== '' && (!str_contains(substr($matches[2], 1), '.') || in_array($matches[1], ['forum', 'board', 'community', 'forums', 'support', 'chat', 'help', 'talk', 'boards', 'www'])))
+			if ($matches[2] !== '' && (strpos(substr($matches[2], 1), '.') === false || in_array($matches[1], ['forum', 'board', 'community', 'forums', 'support', 'chat', 'help', 'talk', 'boards', 'www'])))
 			{
 				$globalCookies = true;
 			}
 
 			// If there's a / in the middle of the path, or it starts with ~... we want local.
-			if (isset($matches[3]) && strlen($matches[3]) > 3 && (str_starts_with($matches[3], '/~') || str_contains(substr($matches[3], 1), '/')))
+			if (isset($matches[3]) && strlen($matches[3]) > 3 && (substr($matches[3], 0, 2) === '/~' || strpos(substr($matches[3], 1), '/') !== false))
 			{
 				$localCookies = true;
 			}
@@ -1015,15 +1023,27 @@ class Install_Controller
 			}
 		}
 
+		// Let's optimize those new tables.
+		$tables = $db->list_tables($db_name, $db_prefix . '%');
+		$db_table = db_table($db);
+		foreach ($tables as $table)
+		{
+			if ($db_table->optimize($table) === -1)
+			{
+				$incontext['failures'][-1] = $db->last_error();
+				break;
+			}
+		}
+
 		// Check for the ALTER privilege.
 		$db->skip_next_error();
-		$cannot_alter_table = $db->query('', '
+		$cannot_alter_table = $db->query('', "
 			ALTER TABLE {$db_prefix}log_digest
-			ORDER BY id_topic',
+			ORDER BY id_topic",
 				[
 					'security_override' => true
 				]
-			)->hasResults();
+			)->getResultObject() === false;
 
 		if (!empty($databases[$db_type]['alter_support']) && $cannot_alter_table)
 		{
@@ -1046,10 +1066,9 @@ class Install_Controller
 	 */
 	private function action_adminAccount()
 	{
-		global $txt, $databases, $incontext, $db_prefix, $db_passwd, $webmaster_email, $db_type;
-
-		// These will be set from the form submission / Settings.php inclusion.
-		global $db_persist, $db_server, $db_user, $db_port, $db_connection, $db_name, $mysql_set_mode;
+		global $txt, $db_type, $db_connection, $databases, $incontext, $db_prefix, $db_passwd, $webmaster_email;
+		global $db_persist, $db_server, $db_user, $db_port;
+		global $db_type, $db_name, $mysql_set_mode;
 
 		$incontext['sub_template'] = 'admin_account';
 		$incontext['page_title'] = $txt['user_settings'];
@@ -1064,7 +1083,7 @@ class Install_Controller
 
 		definePaths();
 
-		// These files may be or may not be included, better safe than sorry for now
+		// These files may be or may not be already included, better safe than sorry for now
 		require_once(SOURCEDIR . '/Subs.php');
 
 		$db = load_database();
@@ -1097,7 +1116,7 @@ class Install_Controller
 			]
 		);
 		// Skip the step if an admin already exists
-		if ($request->num_rows() !== 0)
+		if ($request->num_rows() != 0)
 		{
 			return true;
 		}
@@ -1179,7 +1198,7 @@ class Install_Controller
 				return false;
 			}
 
-			if ($invalid_characters || $_POST['username'] === '_' || $_POST['username'] === '|' || str_contains($_POST['username'], '[code') || str_contains($_POST['username'], '[/code'))
+			if ($invalid_characters || $_POST['username'] === '_' || $_POST['username'] === '|' || strpos($_POST['username'], '[code') !== false || strpos($_POST['username'], '[/code') !== false)
 			{
 				// Try the previous step again.
 				$incontext['error'] = $txt['error_invalid_characters_username'];
@@ -1254,10 +1273,11 @@ class Install_Controller
 	 */
 	private function action_deleteInstall()
 	{
-		global $txt, $incontext, $modSettings;
+		global $txt, $incontext, $db_character_set;
+		global $databases, $modSettings, $db_type;
 
 		// A few items we will load in from settings and make available.
-		global $boardurl, $db_prefix, $cookiename, $mbname, $language, $db_character_set, $databases, $db_type;
+		global $boardurl, $db_prefix, $cookiename, $mbname, $language;
 
 		$incontext['page_title'] = $txt['congratulations'];
 		$incontext['sub_template'] = 'delete_install';
@@ -1317,16 +1337,6 @@ class Install_Controller
 		// upgrade when pointing to index.php and the install directory is still there.
 		updateSettingsFile(['install_time' => time()]);
 
-		// Create a bootstrap completion lock to prevent accidental installer exposure.
-		$lock_file = dirname(__DIR__) . '/bootstrapcompleted.lock';
-		$lock_contents = 'Created: ' . gmdate('c') . "\nVersion: " . (defined('CURRENT_VERSION') ? CURRENT_VERSION : '') . "\n";
-		$lock_written = @file_put_contents($lock_file, $lock_contents) !== false;
-		if (!$lock_written)
-		{
-			$warn = 'Unable to create bootstrapcompleted.lock at ' . htmlspecialchars($lock_file) . '. Please create this file manually with contents like: ' . htmlspecialchars(str_replace("\n", ' | ', $lock_contents));
-			$incontext['warning'] = empty($incontext['warning']) ? $warn : ($incontext['warning'] . '<br />' . $warn);
-		}
-
 		// We're going to want our lovely $modSettings now.
 		$db->skip_next_error();
 		$request = $db->fetchQuery('
@@ -1342,7 +1352,7 @@ class Install_Controller
 		);
 
 		// Automatically log them in ;)
-		if (isset($incontext['member_id'], $incontext['member_salt']))
+		if (isset($incontext['member_id']) && isset($incontext['member_salt']))
 		{
 			setLoginCookie(3153600 * 60, $incontext['member_id'], hash('sha256', $incontext['passwd'] . $incontext['member_salt']));
 		}
