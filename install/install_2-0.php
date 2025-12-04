@@ -2851,7 +2851,9 @@ class InstallInstructions_install_2_0
 				array('Yandex (Images)', 'YandexImages', ''),
 				array('Yandex (Media)', 'YandexMedia', ''),
 				array('Yandex (Video)', 'YandexVideo', '')
-			);
+			),
+			array('id_spider')
+		);
 	}
 
 	public function table_subscriptions()
