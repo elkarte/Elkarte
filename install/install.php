@@ -298,37 +298,13 @@ function parseSqlLines($sql_file, $replaces)
 	$install_instance = new $class_name($db_wrapper, $db_table_wrapper);
 
 	// Each method is a separate installation step
-	// Build a deterministic order with lightweight caching per class
-	static $method_cache = [];
-
-	if (!isset($method_cache[$class_name]))
-	{
-		$methods = get_class_methods($install_instance);
-		$all_methods = array_flip($methods);
-
-		// Discover method buckets
-		$tables = array_values(array_filter($methods, static fn($m) => str_starts_with($m, 'table_')));
-		$inserts = array_values(array_filter($methods, static fn($m) => str_starts_with($m, 'insert_')));
-		$others = array_values(array_filter($methods, static fn($m) => !str_starts_with($m, '__') && !str_starts_with($m, 'insert_') && !str_starts_with($m, 'table_')));
-
-		// Baseline deterministic order
-		sort($tables);
-		sort($inserts);
-		sort($others);
-
-		$method_cache[$class_name] = [
-			'tables' => $tables,
-			'inserts' => $inserts,
-			'others' => $others,
-		];
-	}
-
-	$tables_order = $method_cache[$class_name]['tables'];
-	$inserts_order = $method_cache[$class_name]['inserts'];
-	$others_order = $method_cache[$class_name]['others'];
+	$methods = get_class_methods($install_instance);
+	$tables = array_filter($methods, static fn($method) => strpos($method, 'table_') === 0);
+	$inserts = array_filter($methods, static fn($method) => strpos($method, 'insert_') === 0);
+	$others = array_filter($methods, static fn($method) => strpos($method, '__') !== 0 && strpos($method, 'insert_') !== 0 && strpos($method, 'table_') !== 0);
 
 	// Create tables if they do not exist
-	foreach ($tables_order as $table_method)
+	foreach ($tables as $table_method)
 	{
 		$table_name = substr($table_method, 6);
 
@@ -362,7 +338,7 @@ function parseSqlLines($sql_file, $replaces)
 	}
 
 	// Now insert data into tables
-	foreach ($inserts_order as $insert_method)
+	foreach ($inserts as $insert_method)
 	{
 		$table_name = substr($insert_method, 6);
 
@@ -391,7 +367,7 @@ function parseSqlLines($sql_file, $replaces)
 	}
 
 	// Errors here are ignored
-	foreach ($others_order as $other_method)
+	foreach ($others as $other_method)
 	{
 		$install_instance->{$other_method}();
 	}
