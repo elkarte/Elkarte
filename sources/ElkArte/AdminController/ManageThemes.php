@@ -1351,7 +1351,7 @@ class ManageThemes extends AbstractController
 		$theme_values = loadThemeOptionsInto(1, 0, [], ['theme_templates', 'theme_layers']);
 
 		// Lets add a theme_info.xml to this theme.
-		write_theme_info($this->_req->post->copy, $modSettings['elkVersion'], $this->theme_dir, $theme_values);
+		write_theme_info($this->_req->post->copy, FORUM_VERSION, $this->theme_dir, $theme_values);
 
 		// Finish by setting the namespace
 		$theme = file_get_contents($this->theme_dir . '/Theme.php');

@@ -250,7 +250,7 @@ class ManageRegistration extends AbstractController
 	}
 
 	/**
-	 * Allows the administrator to edit the registration agreement, and choose whether
+	 * Allows the administrator to edit the registration agreement and choose whether
 	 * it should be shown or not.
 	 *
 	 * - It writes and saves the agreement to the appropriate file.
