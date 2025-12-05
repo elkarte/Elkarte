@@ -12,9 +12,21 @@
  *
  */
 
-require(__DIR__ . '/installcore.php');
-require(__DIR__ . '/CommonCode.php');
-require(__DIR__ . '/Install_Controller.php');
+require_once(__DIR__ . '/installcore.php');
+require_once(__DIR__ . '/CommonCode.php');
+require_once(__DIR__ . '/Install_Controller.php');
+require_once(__DIR__ . '/FTP-Install.php');
+
+// Prevent access to the installer when a bootstrap completion lock exists, unless explicitly overridden
+if (file_exists(dirname(__DIR__) . '/bootstrapcompleted.lock'))
+{
+	@header('Content-Type: text/html; charset=UTF-8');
+	echo '<!DOCTYPE html><html><head><meta charset="utf-8"><title>Already Installed</title></head><body>';
+	echo '<h1>ElkArte is already installed</h1>';
+	echo '<p>The installer is disabled because a bootstrap completion lock was found. If you need to run the installer again, remove the file <code>bootstrapcompleted.lock</code> from the forum root.</p>';
+	echo '</body></html>';
+	die;
+}
 
 // Don't have PHP support, do you?
 // ><html dir="ltr"><head><title>Error!</title></head><body>Sorry, this installer requires PHP!<div style="display: none;">
@@ -186,13 +198,15 @@ function loadLanguageFile()
 	// Make sure it exists, if it doesn't reset it.
 	if (!isset($_SESSION['installer_temp_lang']) || preg_match('~[^\\w_\\-.]~', $_SESSION['installer_temp_lang']) === 1 || !file_exists(TMP_BOARDDIR . '/sources/ElkArte/Languages/Install/' . $_SESSION['installer_temp_lang']))
 	{
-		// Use the first one...
-		[$_SESSION['installer_temp_lang']] = array_keys($incontext['detected_languages']);
-
-		// If we have english and some other language, use the other language.  We Americans hate english :P.
-		if ($_SESSION['installer_temp_lang'] === 'English.php' && count($incontext['detected_languages']) > 1)
+		// If English is available, use it
+		if (isset($incontext['detected_languages']['English.php']))
 		{
-			[, $_SESSION['installer_temp_lang']] = array_values($incontext['detected_languages']);
+			$_SESSION['installer_temp_lang'] = 'English.php';
+		}
+		// Otherwise use the first one...
+		else
+		{
+			$_SESSION['installer_temp_lang'] = array_key_first($incontext['detected_languages']);
 		}
 	}
 
@@ -283,14 +297,31 @@ function parseSqlLines($sql_file, $replaces)
 	$class_name = 'InstallInstructions_' . str_replace('-', '_', basename($sql_file, '.php'));
 	$install_instance = new $class_name($db_wrapper, $db_table_wrapper);
 
-	// Each method is a separate installation step
+	// Each method group (tables/insert/other) is a separate installation step
 	$methods = get_class_methods($install_instance);
-	$tables = array_filter($methods, static fn($method) => strpos($method, 'table_') === 0);
-	$inserts = array_filter($methods, static fn($method) => strpos($method, 'insert_') === 0);
-	$others = array_filter($methods, static fn($method) => strpos($method, '__') !== 0 && strpos($method, 'insert_') !== 0 && strpos($method, 'table_') !== 0);
+
+	// Discover method buckets
+	$tables = array_values(array_filter($methods, static fn($m) => str_starts_with($m, 'table_')));
+	$inserts = array_values(array_filter($methods, static fn($m) => str_starts_with($m, 'insert_')));
+	$others = array_values(array_filter($methods, static fn($m) => !str_starts_with($m, '__') && !str_starts_with($m, 'insert_') && !str_starts_with($m, 'table_')));
+
+	// Baseline deterministic order
+	sort($tables);
+	sort($inserts);
+	sort($others);
+
+	$method_cache[$class_name] = [
+		'tables' => $tables,
+		'inserts' => $inserts,
+		'others' => $others,
+	];
+
+	$tables_order = $method_cache[$class_name]['tables'];
+	$inserts_order = $method_cache[$class_name]['inserts'];
+	$others_order = $method_cache[$class_name]['others'];
 
 	// Create tables if they do not exist
-	foreach ($tables as $table_method)
+	foreach ($tables_order as $table_method)
 	{
 		$table_name = substr($table_method, 6);
 
@@ -324,7 +355,7 @@ function parseSqlLines($sql_file, $replaces)
 	}
 
 	// Now insert data into tables
-	foreach ($inserts as $insert_method)
+	foreach ($inserts_order as $insert_method)
 	{
 		$table_name = substr($insert_method, 6);
 
@@ -353,7 +384,7 @@ function parseSqlLines($sql_file, $replaces)
 	}
 
 	// Errors here are ignored
-	foreach ($others as $other_method)
+	foreach ($others_order as $other_method)
 	{
 		$install_instance->{$other_method}();
 	}
@@ -395,7 +426,7 @@ function fixModSecurity()
 		$current_htaccess = implode('', file(TMP_BOARDDIR . '/.htaccess'));
 
 		// Only change something if mod_security hasn't been addressed yet.
-		if (strpos($current_htaccess, '<IfModule mod_security.c>') === false)
+		if (!str_contains($current_htaccess, '<IfModule mod_security.c>'))
 		{
 			if ($ht_handle = fopen(TMP_BOARDDIR . '/.htaccess', 'ab'))
 			{
@@ -413,7 +444,7 @@ function fixModSecurity()
 
 	if (file_exists(TMP_BOARDDIR . '/.htaccess'))
 	{
-		return strpos(implode('', file(TMP_BOARDDIR . '/.htaccess')), '<IfModule mod_security.c>') !== false;
+		return str_contains(implode('', file(TMP_BOARDDIR . '/.htaccess')), '<IfModule mod_security.c>');
 	}
 
 	if (is_writable(TMP_BOARDDIR))

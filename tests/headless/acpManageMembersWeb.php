@@ -78,7 +78,7 @@ class SupportManageMembersController extends ElkArteWebSupport
 		$this->url('index.php?action=admin;area=viewmembers;sa=browse;type=' . $act);
 		$this->assertEquals('Manage Members', $this->title(), $this->source());
 
-		$this->assertStringContainsString($mname, $this->byCssSelector('#list_approve_list_0')->text());
+		$this->assertStringContainsString($mname, $this->byCssSelector('#list_approve_list_0 a')->text());
 		$this->clickit('#list_approve_list_0 input');
 
 		// Submit the form, catch the exception thrown (at least by chrome)
@@ -146,13 +146,10 @@ class SupportManageMembersController extends ElkArteWebSupport
 		}, 15000);
 
 		// Unselect Not Activated and Banned so we only see activated members
-		// These might be hidden?  In any case they fail to select.
-		//	$script = 'document.getElementById(\'#activated-1\').click();';
-		//	$this->execute(['script' => $script, 'args' => []]);
-		//	$script = 'document.getElementById(\'#activated-2\').click();';
-		//	$this->execute(['script' => $script, 'args' => []]);
-
-		$this->clickit('input[value=Search]');
+		// These might be hidden?  In any case they may fail to select.
+		$this->clickit('#activated-1');
+		$this->clickit('#activated-2');
+		$this->clickit('input[value="Search"]');
 		$this->assertStringContainsString('user1', $this->byId('member_list')->text());
 	}
 
@@ -164,7 +161,7 @@ class SupportManageMembersController extends ElkArteWebSupport
 		// Login the admin in to the ACP
 		$this->enterACP();
 
-		// Lets delete this request
+		// Lets delete this bum
 		$this->activateMember('user0', 'activate', 'delete');
 
 		// Should be gone.

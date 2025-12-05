@@ -199,17 +199,15 @@ $txt['error_mod_security_no_write'] = 'The installer has detected the mod_securi
 $txt['error_utf8_version'] = 'The current version of your database doesn\'t support the use of the UTF-8 character set. You can not install ElkArte';
 $txt['error_valid_email_needed'] = 'You have not entered a valid email address.';
 $txt['error_already_installed'] = 'The installer has detected that you already have ElkArte installed. It is strongly advised that you do <strong>not</strong> try to overwrite an existing installation - continuing with installation <strong>may result in the loss or corruption of existing data</strong>.<br /><br />If you have just finished installing your forum, please delete the install directory from your server. {try_delete}<br />If you wish to upgrade please use the <a href="./upgrade.php"><strong>upgrade script</strong></a>.<br />If you wish to overwrite your existing installation, including all data, it\'s recommended that you delete the existing database tables and replace Settings.php and try again.';
-$txt['error_no_settings'] = 'It looks like Settings.php and/or Settings_bak.php are missing from the default directory of your forum, ElkArte will try to rename the sample files provided with the installation. If this operation fails, please rename Settings.sample.php and Settings_bak.sample.php respectively to Settings.php and Setting_bak.php before running this script.';
-$txt['error_settings_do_not_exist'] = 'Elkarte is not able to find and create the file/s <strong>%1$s</strong>. Please use ftp to go to the directory of your forum and rename the sample files provided with the installation package as follows before running again this script: <ul>%2$s</ul> If any of the files do not exist, create an empty file with the same name.';
+$txt['error_no_settings'] = 'Settings.php and Settings_bak.php will be created in the default directory of your forum. The Installer will try to rename the sample files provided with the installation. If this operation fails, please rename Settings.sample.php and Settings_bak.sample.php respectively to Settings.php and Setting_bak.php before running this script.';
+$txt['error_settings_do_not_exist'] = 'The Installer was not able to find and create the file/s <strong>%1$s</strong>. Please use ftp to go to the directory of your forum and rename the sample files provided with the installation package as follows before running again this script: <ul>%2$s</ul> If any of the files do not exist, create an empty file with the same name.';
 $txt['error_warning_notice'] = 'Warning!';
 $txt['error_script_outdated'] = 'This install script is out of date! The current version of ElkArte is %1$s but this install script is for %2$s.<br />
 	It is recommended that you visit the <a href="https://www.elkarte.net/" target="_blank" class="new_win">ElkArte</a> website to ensure you are installing the latest version.';
-$txt['error_db_filename'] = 'You must enter a name for the database file name for SQLite.';
 $txt['error_db_prefix_numeric'] = 'The selected database type does not support the use of numeric prefixes.';
 $txt['error_invalid_characters_username'] = 'Invalid character used in user name.';
 $txt['error_username_too_long'] = 'User name must be less than 25 characters long.';
 $txt['error_username_left_empty'] = 'User name field was left empty.';
-$txt['error_db_filename_exists'] = 'The database that you are trying to create exists.  Please delete the current database file or enter another name.';
 $txt['error_db_prefix_reserved'] = 'The prefix that you entered is a reserved prefix.  Please enter another prefix.';
 
 $txt['upgrade_upgrade_utility'] = 'ElkArte Upgrade Utility';

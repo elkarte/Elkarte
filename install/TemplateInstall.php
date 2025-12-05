@@ -27,7 +27,7 @@ function template_install_above()
 		<link rel="stylesheet" href="../themes/default/css/install.css?20RC1" />
 		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js" id="jquery"></script>
 		<script>
-			window.jQuery || document.write(\'<script src="../themes/default/scripts/jquery-3.7.1.min.js"><\/script>\');
+			window.jQuery || document.write(\'<script src="../themes/default/scripts/ext/jquery-3.7.1.min.js"><\/script>\');
 			var elk_scripturl = ', JavaScriptEscape(str_replace('/install/install.php', '/index.php', $installurl)), ';
 		</script>
 		<script src="../themes/default/scripts/script.js"></script>
@@ -94,8 +94,8 @@ function template_install_above()
 				</div>
 			</div>	
 			<div id="main_screen">
-				<h2>', $incontext['page_title'], '</h2>
-				<div class="content">';
+				<h2 id="main-content" tabindex="-1">', $incontext['page_title'], '</h2>
+				<div class="content" role="main" aria-labelledby="main-content">';
 }
 
 function template_install_below()
@@ -136,7 +136,7 @@ function template_install_below()
 		</div>
 		<div id="footer_section">
 			<div class="frame copyright">
-				<a href="', SITE_SOFTWARE, '" title="ElkArte Community" target="_blank" class="new_win">ElkArte &copy; 2012 - 2022, ElkArte Community</a>
+				<a href="', SITE_SOFTWARE, '" title="ElkArte Community" target="_blank" class="new_win">ElkArte &copy; 2012 - 2026, ElkArte Community</a>
 			</div>
 		</div>
 	</body>
@@ -231,7 +231,7 @@ function template_warning_divs()
 	if (!empty($incontext['error']))
 	{
 		echo '
-		<div class="errorbox">
+		<div class="errorbox" role="alert" aria-live="assertive">
 			<strong style="text-decoration: underline;">', $txt['upgrade_critical_error'], '</strong>
 			<br />
 			<div>
@@ -244,7 +244,7 @@ function template_warning_divs()
 	if (!empty($incontext['warning']))
 	{
 		echo '
-		<div class="warningbox">
+		<div class="warningbox" role="status" aria-live="polite">
 			<strong style="text-decoration: underline;">', $txt['upgrade_warning'], '</strong>
 			<br />
 			<div>
@@ -345,7 +345,7 @@ function template_chmod_files()
 					</td>
 				</tr>
 			</table>
-			<div style="margin: 1ex; margin-top: 1ex; text-align: ', empty($txt['lang_rtl']) ? 'right' : 'left', ';"><input type="submit" value="', $txt['ftp_connect'], '" onclick="return submitThisOnce(this);" class="button_submit" /></div>
+			<div style="margin: 1ex;text-align: ', empty($txt['lang_rtl']) ? 'right' : 'left', ';"><input type="submit" value="', $txt['ftp_connect'], '" onclick="return submitThisOnce(this);" class="button_submit" /></div>
 		</form>
 		<a href="', $incontext['form_url'], '">', $txt['error_message_click'], '</a> ', $txt['ftp_setup_again'];
 }
@@ -359,7 +359,7 @@ function template_database_settings()
 
 	echo '
 	<form id="db_settings" action="', $incontext['form_url'], '" method="post">
-		<p class="infobox">', $txt['db_settings_info'], '</p>';
+		<p class="infobox" id="db_settings_info">', $txt['db_settings_info'], '</p>';
 
 	template_warning_divs();
 
@@ -375,7 +375,7 @@ function template_database_settings()
 					<label for="db_type_input">', $txt['db_settings_type'], ':</label>
 				</td>
 				<td>
-					<select name="db_type" id="db_type_input">';
+					<select name="db_type" id="db_type_input" aria-describedby="db_type_info">';
 
 		foreach ($incontext['supported_databases'] as $key => $db)
 		{
@@ -385,7 +385,7 @@ function template_database_settings()
 
 		echo '
 					</select>
-					<div class="notes">', $txt['db_settings_type_info'], '</div>
+					<div class="notes" id="db_type_info">', $txt['db_settings_type_info'], '</div>
 				</td>
 			</tr>';
 	}
@@ -405,9 +405,9 @@ function template_database_settings()
 					<label for="db_server_input">', $txt['db_settings_server'], ':</label>
 				</td>
 				<td>
-					<input type="text" name="db_server" id="db_server_input" value="', $incontext['db']['server'], '" size="30" class="input_text" />
+					<input type="text" name="db_server" id="db_server_input" value="', $incontext['db']['server'], '" size="30" class="input_text" aria-describedby="db_server_info" autocapitalize="none" spellcheck="false" />
 					<br />
-					<div class="notes">', $txt['db_settings_server_info'], '</div>
+					<div class="notes" id="db_server_info">', $txt['db_settings_server_info'], '</div>
 				</td>
 			</tr>
 			<tr id="db_user_contain">
@@ -415,9 +415,9 @@ function template_database_settings()
 					<label for="db_user_input">', $txt['db_settings_username'], ':</label>
 				</td>
 				<td>
-					<input type="text" name="db_user" id="db_user_input" value="', $incontext['db']['user'], '" size="30" class="input_text" />
+					<input type="text" name="db_user" id="db_user_input" value="', $incontext['db']['user'], '" size="30" class="input_text" aria-describedby="db_user_info" autocomplete="username" autocapitalize="none" spellcheck="false" />
 					<br />
-					<div class="notes">', $txt['db_settings_username_info'], '</div>
+					<div class="notes" id="db_user_info">', $txt['db_settings_username_info'], '</div>
 				</td>
 			</tr>
 			<tr id="db_passwd_contain">
@@ -425,9 +425,9 @@ function template_database_settings()
 					<label for="db_passwd_input">', $txt['db_settings_password'], ':</label>
 				</td>
 				<td>
-					<input type="password" name="db_passwd" id="db_passwd_input" value="', $incontext['db']['pass'], '" size="30" class="input_password" />
+					<input type="password" name="db_passwd" id="db_passwd_input" value="', $incontext['db']['pass'], '" size="30" class="input_password" aria-describedby="db_passwd_info" autocomplete="off" />
 					<br />
-					<div class="notes">', $txt['db_settings_password_info'], '</div>
+					<div class="notes" id="db_passwd_info">', $txt['db_settings_password_info'], '</div>
 				</td>
 			</tr>
 			<tr id="db_name_contain">
@@ -435,9 +435,9 @@ function template_database_settings()
 					<label for="db_name_input">', $txt['db_settings_database'], ':</label>
 				</td>
 				<td>
-					<input type="text" name="db_name" id="db_name_input" value="', empty($incontext['db']['name']) ? 'elkarte' : $incontext['db']['name'], '" size="30" class="input_text" />
+					<input type="text" name="db_name" id="db_name_input" value="', empty($incontext['db']['name']) ? 'elkarte' : $incontext['db']['name'], '" size="30" class="input_text" aria-describedby="db_name_info db_name_info_warning" autocapitalize="none" spellcheck="false" />
 					<br />
-					<div class="notes">', $txt['db_settings_database_info'], '
+					<div class="notes" id="db_name_info">', $txt['db_settings_database_info'], '
 						<span id="db_name_info_warning">', $txt['db_settings_database_info_note'], '</span>
 					</div>
 				</td>
@@ -447,9 +447,9 @@ function template_database_settings()
 					<label for="db_prefix_input">', $txt['db_settings_prefix'], ':</label>
 				</td>
 				<td>
-					<input type="text" name="db_prefix" id="db_prefix_input" value="', $incontext['db']['prefix'], '" size="30" class="input_text" />
+					<input type="text" name="db_prefix" id="db_prefix_input" value="', $incontext['db']['prefix'], '" size="30" class="input_text" aria-describedby="db_prefix_info" autocapitalize="none" spellcheck="false" />
 					<br />
-					<div class="notes">', $txt['db_settings_prefix_info'], '</div>
+					<div class="notes" id="db_prefix_info">', $txt['db_settings_prefix_info'], '</div>
 				</td>
 			</tr>
 		</table>';
@@ -461,7 +461,7 @@ function template_database_settings()
 		{
 			let dbtype = document.getElementById(\'db_type_input\');
 
-			if (dbtype !== null && dbtype.value == \'postgresql\')
+			if (dbtype !== null && dbtype.value === \'postgresql\')
 				document.getElementById(\'db_name_info_warning\').style.display = \'none\';
 			else
 				document.getElementById(\'db_name_info_warning\').style.display = \'\';
@@ -575,7 +575,7 @@ function template_admin_account()
 
 	echo '
 	<form id="admin_account" action="', $incontext['form_url'], '" method="post">
-		<p class="infobox">', $txt['user_settings_info'], '</p>';
+		<p class="infobox" id="admin_settings_info">', $txt['user_settings_info'], '</p>';
 
 	template_warning_divs();
 
@@ -586,8 +586,8 @@ function template_admin_account()
 					<label for="username">', $txt['user_settings_username'], ':</label>
 				</td>
 				<td>
-					<input type="text" name="username" id="username" value="', $incontext['username'], '" size="40" class="input_text" />
-					<div class="notes">', $txt['user_settings_username_info'], '</div>
+					<input type="text" name="username" id="username" value="', htmlspecialchars($incontext['username'] ?? '', ENT_QUOTES), '" size="40" class="input_text" autocomplete="username" aria-describedby="admin_username_note" autocapitalize="none" spellcheck="false" required autofocus />
+					<div class="notes" id="admin_username_note">', $txt['user_settings_username_info'], '</div>
 				</td>
 			</tr>
 			<tr>
@@ -595,8 +595,8 @@ function template_admin_account()
 					<label for="password1">', $txt['user_settings_password'], ':</label>
 				</td>
 				<td>
-					<input type="password" name="password1" id="password1" size="40" class="input_password" />
-					<div class="notes">', $txt['user_settings_password_info'], '</div>
+					<input type="password" name="password1" id="password1" size="40" class="input_password" autocomplete="new-password" aria-describedby="admin_password1_note" required />
+					<div class="notes" id="admin_password1_note">', $txt['user_settings_password_info'], '</div>
 				</td>
 			</tr>
 			<tr>
@@ -604,8 +604,8 @@ function template_admin_account()
 					<label for="password2">', $txt['user_settings_again'], ':</label>
 				</td>
 				<td>
-					<input type="password" name="password2" id="password2" size="40" class="input_password" />
-					<div class="notes">', $txt['user_settings_again_info'], '</div>
+					<input type="password" name="password2" id="password2" size="40" class="input_password" autocomplete="new-password" aria-describedby="admin_password2_note" required />
+					<div class="notes" id="admin_password2_note">', $txt['user_settings_again_info'], '</div>
 				</td>
 			</tr>
 			<tr>
@@ -613,8 +613,8 @@ function template_admin_account()
 					<label for="email">', $txt['user_settings_email'], ':</label>
 				</td>
 				<td>
-					<input type="email" name="email" id="email" value="', $incontext['email'], '" size="40" class="input_text" />
-					<div class="notes">', $txt['user_settings_email_info'], '</div>
+					<input type="email" name="email" id="email" value="', htmlspecialchars($incontext['email'] ?? '', ENT_QUOTES), '" size="40" class="input_text" autocomplete="email" aria-describedby="admin_email_note" autocapitalize="none" spellcheck="false" required />
+					<div class="notes" id="admin_email_note">', $txt['user_settings_email_info'], '</div>
 				</td>
 			</tr>
 		</table>';
@@ -626,7 +626,7 @@ function template_admin_account()
 		<p>', $txt['user_settings_database_info'], '</p>
 
 		<div style="padding-bottom: 2ex; padding-', empty($txt['lang_rtl']) ? 'left' : 'right', ': 50px;">
-			<input type="password" name="password3" size="30" class="input_password" />
+			<input type="password" name="password3" size="30" class="input_password" autocomplete="off" />
 		</div>';
 	}
 }

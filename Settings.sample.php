@@ -176,13 +176,32 @@ $boarddir = __DIR__;
 $sourcedir = __DIR__ . '/sources';
 
 /**
- * Path to the external resources' directory.
+ * Path to the external support directory.
  * @global string $extdir
  */
 $extdir = __DIR__ . '/sources/ext';
 
 /**
  * Path to the languages directory.
- * @global string
+ * @global string $languagedir
  */
 $languagedir = __DIR__ . '/sources/ElkArte/Languages';
+
+########## Misc Settings ##########
+/**
+ * How topic/board urls are displayed.
+ * @global string $url_format
+ */
+$url_format = 'standard';
+
+/**
+ * If extra debugging information should be shown on the screen. False for production.
+ * @global bool $db_show_debug
+ */
+$db_show_debug = false;
+
+/**
+ * The install time of the forum.
+ * @global string $install_time
+ */
+$install_time = '0';
