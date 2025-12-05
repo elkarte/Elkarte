@@ -1309,12 +1309,12 @@ class Install_Controller
 		updateSettingsFile(['install_time' => time()]);
 
 		// Create a bootstrap completion lock to prevent accidental installer exposure.
-		$lock_file = dirname(__DIR__) . '/bootstrapcompleted.lock';
+		$lock_file = dirname(__DIR__) . '/installed.lock';
 		$lock_contents = 'Created: ' . gmdate('c') . "\nVersion: " . (defined('CURRENT_VERSION') ? CURRENT_VERSION : '') . "\n";
 		$lock_written = @file_put_contents($lock_file, $lock_contents) !== false;
 		if (!$lock_written)
 		{
-			$warn = 'Unable to create bootstrapcompleted.lock at ' . htmlspecialchars($lock_file) . '. Please create this file manually with contents like: ' . htmlspecialchars(str_replace("\n", ' | ', $lock_contents));
+			$warn = 'Unable to create installed.lock at ' . htmlspecialchars($lock_file) . '. Please create this file manually with contents like: ' . htmlspecialchars(str_replace("\n", ' | ', $lock_contents));
 			$incontext['warning'] = empty($incontext['warning']) ? $warn : ($incontext['warning'] . '<br />' . $warn);
 		}
 

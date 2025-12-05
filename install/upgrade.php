@@ -12,6 +12,9 @@
  *
  */
 
+use ElkArte\ext\Composer\Autoload\ClassLoader;
+use ElkArte\User;
+
 require(__DIR__ . '/installcore.php');
 
 // General options for the script.
@@ -57,7 +60,7 @@ if (PHP_SAPI === 'cli' && !empty($_SERVER['argv']) && empty($_SERVER['REMOTE_ADD
 	{
 		if (preg_match('~^--path=(.+)$~', $_SERVER['argv'][$i], $match) === 1)
 		{
-			$upgrade_path = substr($match[1], -1) === '/' ? substr($match[1], 0, -1) : $match[1];
+			$upgrade_path = str_ends_with($match[1], '/') ? substr($match[1], 0, -1) : $match[1];
 		}
 	}
 }
@@ -66,9 +69,21 @@ define('TMP_BOARDDIR', $upgrade_path);
 
 // Call in our support staff
 require_once(__DIR__ . '/CommonCode.php');
+require_once(__DIR__ . '/FTP-Install.php');
 require_once(__DIR__ . '/LegacyCode.php');
 require_once(__DIR__ . '/ToRefactorCode.php');
 require_once(__DIR__ . '/TemplateUpgrade.php');
+
+// Prevent access to the upgrader when a installed completion lock exists
+if (file_exists(dirname(__DIR__) . '/installed.lock'))
+{
+	@header('Content-Type: text/html; charset=UTF-8');
+	echo '<!DOCTYPE html><html><head><meta charset="utf-8"><title>Upgrade Disabled</title></head><body>';
+	echo '<h1>ElkArte is already installed</h1>';
+	echo '<p>The upgrader is disabled because a install completion lock was found. If you need to run the upgrader, remove the file <code>installed.lock</code> from the forum root.</p>';
+	echo '</body></html>';
+	die;
+}
 
 // Are we from the client?
 $command_line = false;
@@ -84,7 +99,7 @@ require_once(TMP_BOARDDIR . '/Settings.php');
 $db_type = $db_type === 'mysql' ? 'mysqli' : $db_type;
 
 // Fix for using the current directory as a path.
-if (strpos($sourcedir, '.') === 0 && substr($sourcedir, 1, 1) !== '.')
+if (str_starts_with($sourcedir, '.') && substr($sourcedir, 1, 1) !== '.')
 {
 	$sourcedir = TMP_BOARDDIR . substr($sourcedir, 1);
 }
@@ -121,7 +136,7 @@ if ((empty($extdir) || !file_exists($extdir)) && file_exists($sourcedir . '/ext'
 	$extdir = $sourcedir . '/ext';
 }
 
-if ((empty($languagedir) || !file_exists($languagedir)) && file_exists($sourcedir . '/Languages'))
+if ((empty($languagedir) || !file_exists($languagedir)) && file_exists($sourcedir . '/ElkArte/Languages'))
 {
 	$languagedir = $sourcedir . '/ElkArte/Languages';
 }
@@ -176,7 +191,7 @@ loadEssentialData();
 // Are we going to be mimicking SSI at this point?
 if (isset($_GET['ssi']))
 {
-	loadUserSettings();
+	User::load(true);
 	loadPermissions();
 }
 
@@ -239,15 +254,15 @@ if (isset($_GET['data']))
 {
 	$upcontext['upgrade_status'] = unserialize(base64_decode($_GET['data']), ['allowed_classes' => false]);
 	$upcontext['current_step'] = $upcontext['upgrade_status']['curstep'];
-	$upcontext['language'] = ucfirst($upcontext['upgrade_status']['lang']);
+	$upcontext['language'] = ucfirst(strtolower($upcontext['upgrade_status']['lang']));
 	$upcontext['rid'] = $upcontext['upgrade_status']['rid'];
 	$is_debug = $upcontext['upgrade_status']['debug'];
 	$support_js = $upcontext['upgrade_status']['js'];
 
 	// Load the language.
-	if (file_exists($modSettings['theme_dir'] . '/languages/' . $upcontext['language'] . '/Install.' . $upcontext['language'] . '.php'))
+	if (file_exists(BOARDDIR . '/sources/ElkArte/Languages/Install/'. $upcontext['language'] . '.php'))
 	{
-		require_once($modSettings['theme_dir'] . '/languages/' . $upcontext['language'] . '/Install.' . $upcontext['language'] . '.php');
+		require_once(BOARDDIR . '/sources/ElkArte/Languages/Install/' . $upcontext['language'] . '.php');
 	}
 }
 // Set the defaults.
@@ -258,13 +273,13 @@ else
 	$upcontext['upgrade_status'] = [
 		'curstep' => 0,
 		// memo: .lng files were used by YaBB SE
-		'lang' => $_GET['lang'] ?? basename($language, '.lng'),
+		'lang' => isset($_GET['lang']) ? basename($language, '.lng') : 'English',
 		'rid' => $upcontext['rid'],
 		'pass' => 0,
 		'debug' => 0,
 		'js' => 0,
 	];
-	$upcontext['language'] = $upcontext['upgrade_status']['lang'];
+	$upcontext['language'] = ucfirst(strtolower($upcontext['upgrade_status']['lang']));
 }
 
 // If this isn't the first stage see whether they are logging in and resuming.
@@ -303,7 +318,7 @@ foreach ($upcontext['steps'] as $num => $step)
 			break;
 		}
 
-		// Call the step and if it returns false that means pause!
+		// Call the step, and if it returns false that means pause!
 		if (function_exists($step[2]) && $step[2]() === false)
 		{
 			break;
@@ -374,7 +389,7 @@ function upgradeExit($fallThrough = false)
 			$upcontext['get_data'] = [];
 			foreach ($_GET as $k => $v)
 			{
-				if (strpos($k, 'amp') === 0)
+				if (str_starts_with($k, 'amp'))
 				{
 					continue;
 				}
@@ -471,12 +486,6 @@ function loadEssentialData()
 {
 	global $db_character_set, $db_type, $modSettings;
 
-	// Do the non-SSI stuff...
-	if (function_exists('set_magic_quotes_runtime'))
-	{
-		@set_magic_quotes_runtime(0);
-	}
-
 	// Report all errors except for depreciation notices so users don't complain.
 	error_reporting(E_ALL & ~E_DEPRECATED);
 
@@ -501,15 +510,17 @@ function loadEssentialData()
 	if (file_exists(SOURCEDIR . '/database/Database.subs.php'))
 	{
 		require_once(SOURCEDIR . '/Subs.php');
-		require_once(SOURCEDIR . '/Errors.class.php');
 		require_once(SOURCEDIR . '/Logging.php');
 		require_once(SOURCEDIR . '/Load.php');
 		require_once(SUBSDIR . '/Cache.subs.php');
 		require_once(SOURCEDIR . '/Security.php');
-		require_once(SOURCEDIR . '/Autoloader.class.php');
-		$autoloder = Elk_Autoloader::instance();
-		$autoloder->setupAutoloader([SOURCEDIR, SUBSDIR, CONTROLLERDIR, ADMINDIR, ADDONSDIR]);
-		$autoloder->register(SOURCEDIR, '\\ElkArte');
+		require_once(EXTDIR . '/ClassLoader.php');
+
+		$loader = new ClassLoader();
+		$loader->setPsr4('ElkArte\\', SOURCEDIR . '/ElkArte');
+		$loader->setPsr4('BBC\\', SOURCEDIR . '/ElkArte/BBC');
+		$loader->register();
+
 		load_possible_databases($db_type);
 
 		$db = load_database();
@@ -625,13 +636,13 @@ function action_welcomeLogin()
 	// Check for some key files - one template, one language, and a new and an old source file.
 	$check = @file_exists($modSettings['theme_dir'] . '/index.template.php')
 		&& @file_exists(SOURCEDIR . '/QueryString.php')
-		&& @file_exists(SOURCEDIR . '/database/Db-' . $db_type . '.class.php')
+		&& @file_exists(SOURCEDIR . '/ElkArte/Database/' . ucfirst(strtolower($db_type)) . '/Connection.php')
 		&& @file_exists(__DIR__ . '/upgrade_' . DB_SCRIPT_VERSION . '.php');
 
 	// This needs to exist!
-	if (file_exists($modSettings['theme_dir'] . '/languages/' . $upcontext['language'] . '/Install.' . $upcontext['language'] . '.php'))
+	if (file_exists(BOARDDIR . '/sources/ElkArte/Languages/Install/'. $upcontext['language'] . '.php'))
 	{
-		require_once($modSettings['theme_dir'] . '/languages/' . $upcontext['language'] . '/Install.' . $upcontext['language'] . '.php');
+		require_once(BOARDDIR . '/sources/ElkArte/Languages/Install/' . $upcontext['language'] . '.php');
 	}
 	else
 	{
@@ -703,14 +714,14 @@ function action_welcomeLogin()
 		return throw_error('The cache directory could not be found.<br /><br />Please make sure you have a directory called &quot;cache&quot; in your forum directory before continuing.');
 	}
 
-	if (!file_exists($modSettings['theme_dir'] . '/languages/' . $upcontext['language'] . '/index.' . $upcontext['language'] . '.php') && !isset($modSettings['elkVersion']) && !isset($_GET['lang']))
+	if (!file_exists(BOARDDIR . '/sources/ElkArte/Languages/Install/'. $upcontext['language'] . '.php'))
 	{
 		return throw_error('The upgrader was unable to find language files for the language specified in Settings.php.<br />ElkArte will not work without the primary language files installed.<br /><br />Please either install them, or <a href="' . $upgradeurl . '?step=0;lang=english">use english instead</a>.');
 	}
 
 	if (!isset($_GET['skiplang']))
 	{
-		$temp = substr(@implode('', @file($modSettings['theme_dir'] . '/languages/' . $upcontext['language'] . '/index.' . $upcontext['language'] . '.php')), 0, 4096);
+		$temp = substr(@implode('', @file(BOARDDIR . '/sources/ElkArte/Languages/Index/' . $upcontext['language'] . '.php')), 0, 4096);
 		preg_match('~(?://|/\*)\s*Version:\s+(.+?);\s*index(?:[\s]{2}|\*/)~i', $temp, $match);
 
 		if (empty($match[1]) || $match[1] != CURRENT_LANG_VERSION)
@@ -836,7 +847,7 @@ function checkLogin()
 
 			if ($request->num_rows() !== 0)
 			{
-				[$id_member, $name, $password, $id_group, $addGroups, $user_language] = $request->fetch_row($request);
+				[$id_member, $name, $password, $id_group, $addGroups, $user_language] = $request->fetch_row();
 
 				// These will come in handy, if you want to login
 				require_once(SOURCEDIR . '/Security.php');
@@ -982,24 +993,24 @@ function checkLogin()
 			$upcontext['upgrade_status']['pass'] = $upcontext['user']['pass'];
 
 			// Set the language to that of the user?
-			if (isset($user_language) && $user_language !== $upcontext['language'] && file_exists($modSettings['theme_dir'] . '/languages/' . basename($user_language, '.lng') . '/index.' . basename($user_language, '.lng') . '.php'))
+			if (isset($user_language) && $user_language !== $upcontext['language'] && file_exists(BOARDDIR . 'sources/ElkArte/Languages/Index/' . basename($user_language, '.lng') . '.php'))
 			{
 				$user_language = basename($user_language, '.lng');
-				$temp = substr(@implode('', @file($modSettings['theme_dir'] . '/languages/' . $user_language . '/index.' . $user_language . '.php')), 0, 4096);
+				$temp = substr(@implode('', @file(BOARDDIR . '/sources/ElkArte/Languages/Index/' . $user_language . '.php')), 0, 4096);
 				preg_match('~(?://|/\*)\s*Version:\s+(.+?);\s*index(?:[\s]{2}|\*/)~i', $temp, $match);
 
 				if (empty($match[1]) || $match[1] != CURRENT_LANG_VERSION)
 				{
 					$upcontext['upgrade_options_warning'] = 'The language files for your selected language, ' . $user_language . ', have not been updated to the latest version. Upgrade will continue with the forum default, ' . $upcontext['language'] . '.';
 				}
-				elseif (file_exists($modSettings['theme_dir'] . '/languages/' . $user_language . '/Install.' . $user_language . '.php'))
+				elseif (file_exists(BOARDDIR . '/sources/ElkArte/Languages/Install/' . $user_language . '.php'))
 				{
 					// Set this as the new language.
 					$upcontext['language'] = $user_language;
 					$upcontext['upgrade_status']['lang'] = $upcontext['language'];
 
 					// Include the file.
-					require_once($modSettings['theme_dir'] . '/languages/' . $user_language . '/Install.' . $user_language . '.php');
+					require_once(BOARDDIR . '/sources/ElkArte/Languages/Install/' . $user_language . '.php');
 				}
 				else
 				{
@@ -1026,7 +1037,7 @@ function checkLogin()
  */
 function action_upgradeOptions()
 {
-	global $command_line, $modSettings, $is_debug, $maintenance, $upcontext, $db_type;
+	global $command_line, $is_debug, $maintenance, $upcontext, $db_type;
 
 	$upcontext['sub_template'] = 'upgrade_options';
 	$upcontext['page_title'] = 'Upgrade Options';
@@ -1072,7 +1083,7 @@ function action_upgradeOptions()
 	$changes = [];
 
 	// If we're overriding the language follow it through.
-	if (isset($_GET['lang']) && file_exists($modSettings['theme_dir'] . '/languages/' . $_GET['lang'] . '/index.' . $_GET['lang'] . '.php'))
+	if (isset($_GET['lang']) && file_exists(BOARDDIR . '/sources/ElkArte/Languages/Index/' . ucfirst(strtolower($_GET['lang'])) . '.php'))
 	{
 		$changes['language'] = "'" . $_GET['lang'] . "'";
 	}
@@ -1107,17 +1118,17 @@ function action_upgradeOptions()
 	copy(BOARDDIR . '/Settings.php', BOARDDIR . '/Settings_bak.php');
 
 	// Fix some old paths.
-	if (strpos(BOARDDIR, '.') === 0)
+	if (str_starts_with(BOARDDIR, '.'))
 	{
 		$changes['boarddir'] = "'" . fixRelativePath(BOARDDIR) . "'";
 	}
 
-	if (strpos(SOURCEDIR, '.') === 0)
+	if (str_starts_with(SOURCEDIR, '.'))
 	{
 		$changes['sourcedir'] = "'" . fixRelativePath(SOURCEDIR) . "'";
 	}
 
-	if (!defined('CACHEDIR') || strpos(CACHEDIR, '.') === 0)
+	if (!defined('CACHEDIR') || str_starts_with(CACHEDIR, '.'))
 	{
 		$changes['cachedir'] = "'" . fixRelativePath(BOARDDIR) . "/cache'";
 	}
@@ -1180,7 +1191,7 @@ function action_backupDatabase()
 	$table_names = [];
 	foreach ($tables as $table)
 	{
-		if (strpos($table, 'backup_') !== 0)
+		if (!str_starts_with($table, 'backup_'))
 		{
 			$table_names[] = $table;
 		}
@@ -1285,7 +1296,7 @@ function backupTable($table)
  */
 function action_databaseChanges()
 {
-	global $db_prefix, $modSettings, $command_line, $upcontext, $support_js;
+	global $modSettings, $command_line, $upcontext, $support_js;
 
 	$db = load_database();
 
@@ -1404,7 +1415,7 @@ function action_databaseChanges()
  */
 function action_deleteUpgrade()
 {
-	global $command_line, $language, $upcontext, $user_info, $maintenance, $db_type, $modSettings;
+	global $command_line, $language, $upcontext, $user_info, $maintenance, $modSettings;
 
 	// Now it's nice to have some basic source files.
 	if (!isset($_GET['ssi']) && !$command_line)
@@ -1418,7 +1429,7 @@ function action_deleteUpgrade()
 	$endl = $command_line ? "\n" : '<br />' . "\n";
 
 	$changes = [
-		'language' => "'" . (substr($language, -4) === '.lng' ? substr($language, 0, -4) : $language) . "'",
+		'language' => "'" . (str_ends_with($language, '.lng') ? substr($language, 0, -4) : $language) . "'",
 		'db_error_send' => '1',
 		'upgradeData' => '#remove#'
 	];
@@ -1449,6 +1460,23 @@ function action_deleteUpgrade()
 
 	// Clean any old cache files away.
 	clean_cache();
+
+	// Create a bootstrap completion lock to prevent accidental upgrader/installer exposure post-upgrade.
+	$lock_file = dirname(__DIR__) . '/installed.lock';
+	$lock_contents = 'Created: ' . gmdate('c') . "\nVersion: " . (defined('CURRENT_VERSION') ? CURRENT_VERSION : '') . "\n";
+	$lock_written = @file_put_contents($lock_file, $lock_contents) !== false;
+	if (!$lock_written)
+	{
+		$warn = 'Unable to create installed.lock at ' . htmlspecialchars($lock_file) . '. Please create this file manually with contents like: ' . htmlspecialchars(str_replace("\n", ' | ', $lock_contents));
+		if ($command_line)
+		{
+			echo $warn, $endl;
+		}
+		else
+		{
+			$upcontext['warning'] = empty($upcontext['warning']) ? $warn : ($upcontext['warning'] . '<br />' . $warn);
+		}
+	}
 
 	// Can we delete the file?
 	$upcontext['can_delete_script'] = is_writable(__DIR__) || is_writable(__FILE__);
@@ -1625,10 +1653,9 @@ function parse_sql($filename)
 	$install_instance = new $class_name($db_wrapper, $db_table_wrapper);
 
 	// All the methods (steps) in this upgrade file
-	$methods = array_filter(get_class_methods($install_instance), static fn($method) => strpos($method, '__') !== 0 && substr($method, -6) !== '_title');
+	$methods = array_filter(get_class_methods($install_instance), static fn($method) => !str_starts_with($method, '__') && !str_ends_with($method, '_title'));
 
 	$substep = 0;
-	$last_step = '';
 
 	// Count the total number of steps within this file - for the progress bar.
 	$file_steps = countSteps($install_instance, $methods);
@@ -1996,13 +2023,13 @@ Usage: /path/to/php -f ' . basename(__FILE__) . ' -- [OPTION]...
 		print_error('Error: Unable to obtain write access to "cache".', true);
 	}
 
-	if (!file_exists($modSettings['theme_dir'] . '/languages/' . $upcontext['language'] . '/index.' . $upcontext['language'] . '.php') && !isset($modSettings['elkVersion']) && !isset($_GET['lang']))
+	if (!file_exists(BOARDDIR . '/sources/ElkArte/Languages/Index/' . $upcontext['language'] . '.php') && !isset($modSettings['elkVersion']) && !isset($_GET['lang']))
 	{
 		print_error('Error: Unable to find language files!', true);
 	}
 	else
 	{
-		$temp = substr(@implode('', @file($modSettings['theme_dir'] . '/languages/' . $upcontext['language'] . '/index.' . $upcontext['language'] . '.php')), 0, 4096);
+		$temp = substr(@implode('', @file(BOARDDIR . '/sources/ElkArte/Languages/Index/' . $upcontext['language'] . '.php')), 0, 4096);
 		preg_match('~(?://|/\*)\s*Version:\s+(.+?);\s*index(?:[\s]{2}|\*/)~i', $temp, $match);
 
 		if (empty($match[1]) || $match[1] !== CURRENT_LANG_VERSION)
@@ -2010,13 +2037,13 @@ Usage: /path/to/php -f ' . basename(__FILE__) . ' -- [OPTION]...
 			print_error('Error: Language files out of date.', true);
 		}
 
-		if (!file_exists($modSettings['theme_dir'] . '/languages/' . $upcontext['language'] . '/Install.' . $upcontext['language'] . '.php'))
+		if (!file_exists(BOARDDIR . '/sources/ElkArte/Languages/Install/' . $upcontext['language'] . '.php'))
 		{
 			print_error('Error: Install language is missing for selected language.', true);
 		}
 
 		// Otherwise include it!
-		require_once($modSettings['theme_dir'] . '/languages/' . $upcontext['language'] . '/Install.' . $upcontext['language'] . '.php');
+		require_once(BOARDDIR . '/sources/ElkArte/Languages/Install/' . $upcontext['language'] . '.php');
 	}
 
 	// Make sure we skip the HTML for login.
@@ -2136,7 +2163,7 @@ function loadEssentialFunctions()
 			$dh = opendir(CACHEDIR);
 			while ($file = readdir($dh))
 			{
-				if ($file !== '.' && $file !== '..' && $file !== 'index.php' && $file !== '.htaccess' && (!$type || strpos($file, (string) $type) === 0))
+				if ($file !== '.' && $file !== '..' && $file !== 'index.php' && $file !== '.htaccess' && (!$type || str_starts_with($file, (string) $type)))
 				{
 					@unlink(CACHEDIR . '/' . $file);
 				}
@@ -2204,7 +2231,7 @@ function discoverCollation()
 			// Got something?
 			if ($request->num_rows() !== 0)
 			{
-				$collation_info = $db->fetch_assoc($request);
+				$collation_info = $request->fetch_assoc();
 			}
 
 			$request->free_result();
