@@ -147,36 +147,74 @@ class Bootstrap
 		global $db_show_debug, $url_format, $cachedir, $boarddir, $sourcedir, $extdir, $languagedir;
 
 		// Where the Settings.php file is located
-		$settings_loc = __DIR__ . '/Settings.php';
+		$settings_location = __DIR__ . '/Settings.php';
 
-		// First thing: if the installation dir exists, consider sending users there
-		// The IGNORE_INSTALL_DIR constant is intended for development, bootstrapcompleted.lock will be added
-		// after a successful installation, so that the installer will not automatically be shown again.
-		if (defined('IGNORE_INSTALL_DIR') || file_exists(__DIR__ . '/bootstrapcompleted.lock'))
-		{
-			require_once($settings_loc);
-			return;
-		}
+        // First thing: prefer the presence of a lock file to short-circuit any installer logic
+        // The IGNORE_INSTALL_DIR constant is intended for development only.
+        if (file_exists(__DIR__ . '/installed.lock'))
+        {
+            require_once($settings_location);
+            return;
+        }
 
-		if (file_exists('install') &&
-			(file_exists('install/install.php') || file_exists('install/upgrade.php')))
-		{
-			$hasSettings = file_exists($settings_loc);
-			if ($hasSettings)
-			{
-				require_once($settings_loc);
-			}
+        // No lock present: decide if we should redirect to install/upgrade or continue
+        $this->handleNoLockInstallState($settings_location);
+    }
 
-			$redirec_file = $hasSettings && empty($_SESSION['installing']) ? 'upgrade.php' : 'install.php';
+    /**
+     * Decides installation vs upgrade vs a normal load when no lock file is present.
+     *
+     * Rules:
+     * - If Settings.php exists and $install_time is set (not 0/empty) and installer exists → redirect to upgrade.php
+     * - If Settings.php exists and $install_time is 0/empty and installer exists → redirect to install.php
+     * - If Settings.php does not exist and installer exists → redirect to install.php
+     * - Otherwise, just continue (and Settings.php will be loaded by caller if present)
+     *
+     * @param string $settings_location Absolute path to Settings.php
+     */
+    private function handleNoLockInstallState($settings_location)
+    {
+        // Values defined in Settings
+	    global $maintenance, $mtitle, $msubject, $mmessage, $mbname, $language, $boardurl, $webmaster_email;
+	    global $cookiename, $db_type, $db_server, $db_port, $db_name, $db_user, $db_passwd;
+	    global $ssi_db_user, $ssi_db_passwd, $db_prefix, $db_persist, $db_error_send;
+	    global $cache_uid, $cache_password, $cache_enable, $cache_servers, $cache_accelerator;
+	    global $db_show_debug, $url_format, $cachedir, $boarddir, $sourcedir, $extdir, $languagedir;
 
-			// Build a safe, relative redirect to avoid host header issues
-			$version_running = defined('FORUM_VERSION') ? str_replace('ElkArte ', '', FORUM_VERSION) : '';
+        $hasInstallDir = is_dir(__DIR__ . '/install');
+        $hasInstall = $hasInstallDir && file_exists(__DIR__ . '/install/install.php');
+        $hasUpgrade = $hasInstallDir && file_exists(__DIR__ . '/install/upgrade.php');
+        $hasSettings = file_exists($settings_location);
 
-			// Too early to use Headers class etc.
-			header('Location: install/' . $redirec_file . '?v=' . $version_running);
-			die();
-		}
-	}
+        if ($hasSettings)
+        {
+            // Load to get $install_time and set the globals
+            require_once($settings_location);
+        }
+
+        // If we have an installer directory available, decide the proper entry
+        if (!defined('IGNORE_INSTALL_DIR') && ($hasInstall || $hasUpgrade))
+        {
+            $redirect_file = 'install.php';
+
+            if ($hasSettings)
+            {
+                // If install_time is non-empty and non-zero, prefer upgrade flow when available
+                $isInstalled = !empty($install_time) && $install_time !== '0';
+                if ($isInstalled && $hasUpgrade && empty($_SESSION['installing']))
+                {
+                    $redirect_file = 'upgrade.php';
+                }
+            }
+
+            // Build a safe, relative redirect to avoid host header issues
+            $version_running = defined('FORUM_VERSION') ? str_replace('ElkArte ', '', FORUM_VERSION) : '';
+            header('Location: install/' . $redirect_file . '?v=' . $version_running);
+            die();
+        }
+
+        // No installer available, nothing to redirect to; simply return
+    }
 
 	/**
 	 * Validate the paths set in Settings.php, correct as needed and move them to constants.
@@ -472,15 +510,15 @@ class Bootstrap
 	{
 		global $ssi_theme, $ssi_layers;
 
-		// Check on any hacking attempts.
-		if (
-			isset($_REQUEST['GLOBALS']) || isset($_COOKIE['GLOBALS'])
-			|| isset($_REQUEST['ssi_theme']) && (int) $_REQUEST['ssi_theme'] === (int) $ssi_theme
-			|| isset($_COOKIE['ssi_theme']) && (int) $_COOKIE['ssi_theme'] === (int) $ssi_theme
-			|| isset($_REQUEST['ssi_layers'], $ssi_layers) && $_REQUEST['ssi_layers'] == $ssi_layers
-			|| isset($_REQUEST['context']))
-		{
-			die('No access...');
-		}
+  // Check on any hacking attempts.
+  if (
+      isset($_REQUEST['GLOBALS']) || isset($_COOKIE['GLOBALS'])
+      || (isset($_REQUEST['ssi_theme']) && ((int) $_REQUEST['ssi_theme'] === (int) $ssi_theme))
+      || (isset($_COOKIE['ssi_theme']) && ((int) $_COOKIE['ssi_theme'] === (int) $ssi_theme))
+      || (isset($_REQUEST['ssi_layers'], $ssi_layers) && ($_REQUEST['ssi_layers'] == $ssi_layers))
+      || isset($_REQUEST['context']))
+  {
+      die('No access...');
+  }
 	}
 }
