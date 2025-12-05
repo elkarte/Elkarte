@@ -12,17 +12,20 @@
  *
  */
 
+use ElkArte\DraftsIntegrate;
+use ElkArte\EmojiIntegrate;
+use ElkArte\Hooks;
+use ElkArte\IlaIntegrate;
+
 /**
  * This class is the core of the upgrade system.
- * Methods starting with "__" (double underscore) are not executed.
- * Each method that contains one or more actions is paired with a method
- * with the same name plus "_title", for example:
+ *
+ * ○ Methods starting with "__" (double underscore) are not executed.
+ * ○ Each method that contains one or more actions is paired with a method with the same name plus "_title":
  *   - my_new_action
  *   - my_new_action_title
- * Methods whose name ends with "_title" are supposed to return a single
- * string representing the title of the step.
- * Methods containing the actions are supposed to return a multidimensional
- * array with the following structure:
+ * ○ Methods whose name ends with "_title" are supposed to return a single string representing the title of the step.
+ * ○ Methods containing the actions are supposed to return a multidimensional array with the following structure:
  * array(
  *     array(
  *         'debug_title' => 'A string representing a title shown when debugging',
@@ -45,14 +48,14 @@ class UpgradeInstructions_upgrade_2_0
 
 	public function migrate_notifications_to_types_title()
 	{
-		return 'Adapt notifications to 2.0...';
+		return 'Adapting notifications to 2.0...';
 	}
 
 	public function migrate_notifications_to_types()
 	{
 		return array(
 			array(
-				'debug_title' => 'Changing notifications levels to types...',
+				'debug_title' => 'Changing notifications levels to notification types...',
 				'function' => function () {
 					// Can only do this once
 					if ($this->table->column_exists('{db_prefix}notifications_pref', 'notification_level') === true)
@@ -61,12 +64,12 @@ class UpgradeInstructions_upgrade_2_0
 							array('name' => 'notification_type', 'type' => 'text')
 						);
 						foreach ([
-							         'none' => 0,
-							         'notification' => 1,
-							         'email' => 2,
-							         'emaildaily' => 3,
-							         'emailweekly' => 4
-						         ] as $type => $level)
+							'none' => 0,
+							'notification' => 1,
+							'email' => 2,
+							'emaildaily' => 3,
+							'emailweekly' => 4
+						] as $type => $level)
 						{
 							$this->db->fetchQuery('
 							UPDATE {db_prefix}notifications_pref
@@ -85,25 +88,31 @@ class UpgradeInstructions_upgrade_2_0
 					updateSettings(array(
 						'notification_methods' => serialize([
 							'buddy' => [
-								'notification' => "1",
-								'email' => "1",
-								'emaildaily' => "1",
-								'emailweekly' => "1"
+								'notification' => '1',
+								'email' => '1',
+								'emaildaily' => '1',
+								'emailweekly' => '1'
 							],
 							'likemsg' => [
-								'notification' => "1"
+								'notification' => '1'
 							],
 							"mentionmem" => [
-								"notification" => "1",
-								"email" => "1",
-								"emaildaily" => "1",
-								"emailweekly" => "1",
+								"notification" => '1',
+								"email" => '1',
+								"emaildaily" => '1',
+								"emailweekly" => '1',
 							],
 							"quotedmem" => [
-								"notification" => "1",
-								"email" => "1",
-								"emaildaily" => "1",
-								"emailweekly" => "1"
+								"notification" => '1',
+								"email" => '1',
+								"emaildaily" => '1',
+								"emailweekly" => '1'
+							],
+							'watchedboard' => [
+								'notification' => '1'
+							],
+							'watchedtopic' => [
+								'notification' => '1'
 							]
 						])));
 				}
@@ -113,25 +122,27 @@ class UpgradeInstructions_upgrade_2_0
 
 	public function tweak_modules_support_title()
 	{
-		return 'Tweak modules...';
+		return 'Update autoloaded modules...';
 	}
 
 	public function tweak_modules_support()
 	{
 		return array(
 			array(
-				'debug_title' => 'Converts settings to modules...',
+				'debug_title' => 'Converting settings to modules, adding new modules...',
 				'function' => static function () {
 					global $modSettings;
 					if (!empty($modSettings['drafts_enabled']))
 					{
 						require_once(SUBSDIR . '/Admin.subs.php');
 						enableModules('drafts', array('post', 'display', 'profile', 'personalmessage'));
-						\ElkArte\Hooks::instance()->enableIntegration(\ElkArte\DraftsIntegrate::class);
+						Hooks::instance()->enableIntegration('\\ElkArte\\DraftsIntegrate');
 					}
-					\ElkArte\Hooks::instance()->enableIntegration('\\ElkArte\\UserNotificationIntegrate');
-					\ElkArte\Hooks::instance()->enableIntegration(\ElkArte\IlaIntegrate::class);
-					\ElkArte\Hooks::instance()->enableIntegration(\ElkArte\EmojiIntegrate::class);
+					Hooks::instance()->enableIntegration('\\ElkArte\\UserNotificationIntegrate');
+					Hooks::instance()->enableIntegration('\\ElkArte\\IlaIntegrate');
+					Hooks::instance()->enableIntegration('\\ElkArte\\EmojiIntegrate');
+					Hooks::instance()->enableIntegration('\\ElkArte\\MetadataIntegrate');
+					Hooks::instance()->enableIntegration('\\ElkArte\\VerificationControls\\VerificationControlsIntegrate');
 				}
 			)
 		);
@@ -139,7 +150,7 @@ class UpgradeInstructions_upgrade_2_0
 
 	public function preparing_languages_title()
 	{
-		return 'Add support for language editing in the db...';
+		return 'Add support for language editing in the database...';
 	}
 
 	public function preparing_languages()
@@ -207,7 +218,7 @@ class UpgradeInstructions_upgrade_2_0
 
 	public function preparing_openid_title()
 	{
-		return 'Removing support for openid in the db...';
+		return 'Removing support for openid ...';
 	}
 
 	public function preparing_openid()
@@ -237,7 +248,7 @@ class UpgradeInstructions_upgrade_2_0
 
 	public function preparing_custom_search_title()
 	{
-		return 'Dropping the custom search Index...';
+		return 'Dropping old custom search index ...';
 	}
 
 	public function preparing_custom_search()
@@ -279,7 +290,7 @@ class UpgradeInstructions_upgrade_2_0
 
 	public function preparing_avatars_title()
 	{
-		return 'Moving attachment style avatars to custom avatars...';
+		return 'Moving attachment style avatars to custom avatars directory (avatars_user)...';
 	}
 
 	public function preparing_avatars()
@@ -363,7 +374,7 @@ class UpgradeInstructions_upgrade_2_0
 	{
 		return array(
 			array(
-				'debug_title' => 'Moving settings that are now site vs theme dependant...',
+				'debug_title' => 'Move settings that are now site vs theme dependant...',
 				'function' => function () {
 					$moved = array('show_modify', 'show_user_images', 'hide_post_group');
 
@@ -438,7 +449,7 @@ class UpgradeInstructions_upgrade_2_0
 
 	public function migrate_badbehavior_settings_title()
 	{
-		return 'Removing bad behavior log...';
+		return 'Removing old bad behavior settings ...';
 	}
 
 	public function migrate_badbehavior_settings()
@@ -464,7 +475,7 @@ class UpgradeInstructions_upgrade_2_0
 
 	public function preparing_board_oldposts_title()
 	{
-		return 'Adding old post warning by board functionality...';
+		return 'Adding old post warning to a per board functionality...';
 	}
 
 	public function preparing_board_oldposts()
