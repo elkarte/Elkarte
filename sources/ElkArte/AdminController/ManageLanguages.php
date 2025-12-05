@@ -342,7 +342,7 @@ class ManageLanguages extends AbstractController
 		$lang_dirs = glob($base_lang_dir . '/*', GLOB_ONLYDIR);
 
 		// Ignore Agreement and PrivacyPolicy
-		$lang_dirs = array_filter($lang_dirs, static function ($dir) {
+		$lang_dirs = array_filter($lang_dirs, static function($dir) {
 			return !in_array(basename($dir), ['Agreement', 'PrivacyPolicy']);
 		});
 
