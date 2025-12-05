@@ -53,15 +53,13 @@ class Loader
 	 */
 	public function __construct($lang, &$variable, QueryInterface $db, string $variable_name = 'txt')
 	{
-		if (!empty($lang))
-		{
-			$this->language = ucfirst($lang);
-		}
-
 		$this->path = LANGUAGEDIR . '/';
 		$this->db = $db;
 		$this->variable = &$variable;
 		$this->variableName = $variable_name;
+
+		// Normalize the language name
+		$this->language = ucfirst(basename((string) $lang, '.php'));
 
 		if (empty($this->variable))
 		{
@@ -107,6 +105,7 @@ class Loader
 			$this->handleFile(ucfirst($file), $fatal);
 		}
 
+		// Load custom strings from the database
 		$this->loadFromDb($file_names);
 
 		if ($fix_calendar_arrays)
@@ -267,7 +266,7 @@ class Loader
 	/**
 	 * Loads / Sets arrays for use in date display
 	 * This is here and not in a language file for two reasons:
-	 *  1. the structure is required by the code, so better be sure to have it the way we are supposed to have it
+	 *  1. The code requires the structure, so better be sure to have it the way we are supposed to have it
 	 *  2. Transifex (that we use for translating the strings) doesn't support array of arrays, so if we
 	 * move this to a language file we'd need to move away from Tx.
 	 */

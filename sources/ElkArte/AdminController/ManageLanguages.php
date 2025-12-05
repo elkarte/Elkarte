@@ -341,6 +341,11 @@ class ManageLanguages extends AbstractController
 		// This will be where we look
 		$lang_dirs = glob($base_lang_dir . '/*', GLOB_ONLYDIR);
 
+		// Ignore Agreement and PrivacyPolicy
+		$lang_dirs = array_filter($lang_dirs, static function ($dir) {
+			return !in_array(basename($dir), ['Agreement', 'PrivacyPolicy']);
+		});
+
 		// Now for every theme get all the files and stick them in context!
 		$context['possible_files'] = array_map(static fn($file) => [
 			'id' => basename($file, '.php'),
@@ -379,7 +384,7 @@ class ManageLanguages extends AbstractController
 		$context['file_entries'] = $edit_lang->getForEditing();
 
 		// Are we saving?
-		if (isset($this->_req->post->save_entries) && !empty($this->_req->post->entry))
+		if ($this->_req->getPost('save_entries') !== null)
 		{
 			checkSession();
 			validateToken('admin-mlang');

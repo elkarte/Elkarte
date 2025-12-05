@@ -76,7 +76,7 @@ class Editor
 
 		$this->loaders = [
 			'txt' => new Loader($lang, $this->txt, $this->db, 'txt'),
-			'editortxt' => new Loader($lang, $this->editorTxt, $this->db, 'editortxt'),
+			'editorTxt' => new Loader($lang, $this->editorTxt, $this->db, 'editortxt'),
 			'txtBirthdayEmails' => new Loader($lang, $this->txtBirthdayEmails, $this->db, 'txtBirthdayEmails'),
 		];
 
@@ -163,11 +163,11 @@ class Editor
 					continue;
 				}
 
-				$md5EntryKey = md5($key);
+				$indexEntryKey = hash('murmur3a', $key);
 				$editing_string = Util::htmlspecialchars(htmlentities($value));
 
-				$this->editingStrings[$md5EntryKey] = [
-					'key' => $md5EntryKey,
+				$this->editingStrings[$indexEntryKey] = [
+					'key' => $indexEntryKey,
 					'display_key' => $key,
 					'value' => $editing_string,
 					'rows' => (int) (strlen($editing_string) / 38) + substr_count($editing_string, "\n") + 1,
@@ -202,7 +202,7 @@ class Editor
 
 		foreach ($txt as $key => $val)
 		{
-			foreach (['txt', 'editortxt', 'txtBirthdayEmails'] as $var)
+			foreach (['txt', 'editorTxt', 'txtBirthdayEmails'] as $var)
 			{
 				$display_key = $this->editingStrings[$key]['display_key'] ?? null;
 				if (!isset($this->{$var}[$display_key]))
@@ -218,7 +218,7 @@ class Editor
 					$this->db->replace('{db_prefix}languages',
 						$columns,
 						[
-							'language' => $this->language,
+							'language' => ucfirst(basename($this->language, '.php')),
 							'file' => $file_name,
 							'language_key' => $display_key,
 							'value' => $val
