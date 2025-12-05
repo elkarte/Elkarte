@@ -1102,8 +1102,8 @@ function text2words($text, $encrypt = false)
 			if ($word !== '' && !in_array($word, $blocklist) && Util::strlen($word) > 2)
 			{
 				// Get a hex representation of this word using a database indexing hash
-				// designed to be fast while maintaining a very low collision rate
-				$encrypted = hash('FNV1A32', $word);
+				// designed to be fast while maintaining a low collision rate
+				$encrypted = hash('murmur3a', $word);
 
 				// Create an integer representation, the hash is an 8 char hex
 				// so the largest int will be 4294967295 which fits in db int(10)

@@ -17,13 +17,13 @@ require_once(__DIR__ . '/CommonCode.php');
 require_once(__DIR__ . '/Install_Controller.php');
 require_once(__DIR__ . '/FTP-Install.php');
 
-// Prevent access to the installer when a bootstrap completion lock exists, unless explicitly overridden
-if (file_exists(dirname(__DIR__) . '/bootstrapcompleted.lock'))
+// Prevent access to the installer when a installed completion lock exists
+if (file_exists(dirname(__DIR__) . '/installed.lock'))
 {
 	@header('Content-Type: text/html; charset=UTF-8');
 	echo '<!DOCTYPE html><html><head><meta charset="utf-8"><title>Already Installed</title></head><body>';
 	echo '<h1>ElkArte is already installed</h1>';
-	echo '<p>The installer is disabled because a bootstrap completion lock was found. If you need to run the installer again, remove the file <code>bootstrapcompleted.lock</code> from the forum root.</p>';
+	echo '<p>The installer is disabled because a install completion lock was found. If you need to run the installer again, remove the file <code>installed.lock</code> from the forum root.</p>';
 	echo '</body></html>';
 	die;
 }
