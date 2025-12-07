@@ -3529,26 +3529,29 @@ aside.poster, #quickreplybox .poster, #quicktopicbox .poster {
 	left: -3%;
 }
 
+#elk_lb_next::before, #elk_lb_prev::before, #elk_lb_expand::before {
+	display: inline-block;
+	width: 2.5rem;
+	height: 2.5rem;
+	content: "";
+	background-color: currentColor;
+	margin: .1rem .3rem 0 0;
+}
+
 #elk_lb_expand::before {
-	font-size: 3rem;
-	font-family: "Apple Symbols", "Segoe UI Symbol", sans-serif;
-	content: "\2196"; /* Changed from \1F875 for older device support */
-    display: inline-block;
-    transform: rotate(90deg);
+	-webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cpath fill='transparent' d='M0 0h100v100H0z'/%3E%3Cpath fill='%23000' d='M81.113 18.887v62.226L62.728 62.728 31.615 93.84 6.16 68.385l31.113-31.113-18.385-18.385Z'/%3E%3C/svg%3E") no-repeat center / 100%;
+    mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cpath fill='transparent' d='M0 0h100v100H0z'/%3E%3Cpath fill='%23000' d='M81.113 18.887v62.226L62.728 62.728 31.615 93.84 6.16 68.385l31.113-31.113-18.385-18.385Z'/%3E%3C/svg%3E") no-repeat center / 100%;
 }
 
 #elk_lb_next::before {
-	font-size: 2rem;
-	font-family: "Apple Symbols", "Segoe UI Symbol", sans-serif;
-    line-height: 1.25;
-    content: "\25B6"; /* Changed from \1F842 for older device support */
+	-webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M22 12 L12 2 L12 6 L8 6 L8 18 L12 18 L12 22 Z'/%3E%3C/svg%3E") no-repeat center / 100%;
+	mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M22 12 L12 2 L12 6 L8 6 L8 18 L12 18 L12 22 Z'/%3E%3C/svg%3E") no-repeat center / 100%;
 }
 
 #elk_lb_prev::before {
-	font-size: 2rem;
-	font-family: "Apple Symbols", "Segoe UI Symbol", sans-serif;
-    line-height: 1.25;
-    content: "\25C0"; /* Changed from \1F840 for older device support */
+	margin: .1rem 0 0 .3rem;
+	-webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M2 12 L12 2 L12 7 L17 7 L17 17 L12 17 L12 22 Z'/%3E%3C/svg%3E") no-repeat center / 100%;
+	mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M2 12 L12 2 L12 6 L16 6 L16 18 L12 18 L12 22 Z'/%3E%3C/svg%3E") no-repeat center / 100%;
 }
 
 .elk_lb_no_scrolling {
