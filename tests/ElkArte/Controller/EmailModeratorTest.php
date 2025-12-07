@@ -54,6 +54,8 @@ class EmailModeratorTest extends ElkArteCommonSetupTest
 	{
 		global $context, $modSettings;
 
+		$modSettings['spamWaitTime'] = 10;
+
 		$req = HttpReq::instance();
 		$req->query->msg = 1;
 		$req->post->msg = 1;

@@ -36,7 +36,7 @@ abstract class ElkArteCommonSetupTest extends TestCase
 		$userData = [
 			'id' => 1,
 			'ip' => long2ip(rand(0, 2147483647)),
-			'language' => 'english',
+			'language' => 'English',
 			'is_admin' => true,
 			'is_guest' => false,
 			'username' => 'testing',
@@ -107,5 +107,19 @@ abstract class ElkArteCommonSetupTest extends TestCase
 		{
 			unset($_SESSION['session_value'], $_SESSION['session_var'], $_SESSION['USER_AGENT'], $_SESSION['admin_time']);
 		}
+	}
+
+	/**
+	 * Test-only helper: reset the HttpReq singleton so tests can rebuild it after mutating
+	 * superglobals. Not loaded in production.  Generaly you can use
+	 * $req = HttpReq::instance() and $req->query->someitem = 1; but this method is useful for
+	 * odd cases.
+	 */
+	protected function resetHttpReq(): void
+	{
+		$rc = new \ReflectionClass(\ElkArte\Helper\HttpReq::class);
+		$prop = $rc->getProperty('instance');
+		$prop->setAccessible(true);
+		$prop->setValue(null, null);
 	}
 }
