@@ -361,10 +361,13 @@ class ProfileOptions extends AbstractController
 
 			if (isset($post_options) && is_array($post_options))
 			{
+				// Avoid indirect modification of overloaded element by working on a temp array
+				$temp_options = $context['member']['options'];
 				foreach ($post_options as $k => $v)
 				{
-					$context['member']['options'][$k] = $v;
+					$temp_options[$k] = $v;
 				}
+				$context['member']['options'] = $temp_options;
 			}
 		}
 		else
@@ -375,12 +378,15 @@ class ProfileOptions extends AbstractController
 				[-1, $this->_memID], $context['member']['options']
 			);
 
-			if (isset($post_options))
+			if (isset($post_options) && is_array($post_options))
 			{
+				// Avoid indirect modification of overloaded element by working on a temp array
+				$temp_options = $context['member']['options'];
 				foreach ($post_options as $var => $val)
 				{
-					$context['member']['options'][$var] = $val;
+					$temp_options[$var] = $val;
 				}
+				$context['member']['options'] = $temp_options;
 			}
 		}
 	}
