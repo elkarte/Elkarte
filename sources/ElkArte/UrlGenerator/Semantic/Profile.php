@@ -31,7 +31,7 @@ class Profile extends Standard
     public function generate($params)
 	{
 		// Safely build a slug from the display name; guard against null
-		$name = isset($params['name']) && $params['name'] !== null ? (string) $params['name'] : '';
+		$name = isset($params['name']) ? (string) $params['name'] : '';
 		$name = trim($name);
 		$slug = $name === '' ? 'member' : preg_replace('~\s+~u', '-', $name);
 		$slug = trim($slug, '-');
@@ -42,6 +42,6 @@ class Profile extends Standard
 		$url = 'p/' . rawurlencode($slug) . '-' . $uid;
 		unset($params['name'], $params['u'], $params['action']);
 
-		return $url . $this->_separator . $this->generateQuery($params);
+		return $url . $this->generateQuery($params);
 	}
 }
