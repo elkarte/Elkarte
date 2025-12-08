@@ -74,7 +74,7 @@ class ImageTest extends TestCase
 
 		foreach ($this->image_testcases as $image)
 		{
-			$current_image = new Image($image['url']);
+			$current_image = new Image($image['url'], true);
 			$success = $current_image->createThumbnail(100, 100, '/tmp/test', $image['format']);
 
 			// Check for correct results
@@ -84,7 +84,7 @@ class ImageTest extends TestCase
 
 	public function testText()
 	{
-		$images = new TextImage('test');
+		$images = new TextImage('test', true);
 		$success = $images->generate(100, 75, 'png');
 		$success = !empty($success);
 

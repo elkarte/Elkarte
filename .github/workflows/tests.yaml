@@ -59,7 +59,7 @@ jobs:
         uses: shivammathur/setup-php@v2
         with:
           php-version: ${{ matrix.php }}
-          extensions: dom, curl, libxml, mbstring, zip, mysqli, gd, exif, iconv, apcu, memcached
+          extensions: dom, curl, libxml, mbstring, zip, mysqli, gd, exif, iconv, apcu, memcached, imagick
           coverage: xdebug
           tools: composer:v2
           ini-values: error_log=/tmp/php_errors.log, error_reporting=E_ALL, allow_url_fopen=On, opcache.enable=0, auto_prepend_file="/usr/share/php/prepend.php", auto_append_file="/usr/share/php/append.php"
@@ -211,7 +211,7 @@ jobs:
         uses: shivammathur/setup-php@v2
         with:
           php-version: ${{ matrix.php }}
-          extensions: dom, curl, libxml, mbstring, zip, mysqli, gd, exif, iconv, apcu, memcached
+          extensions: dom, curl, libxml, mbstring, zip, mysqli, gd, exif, iconv, apcu, memcached, imagick
           coverage: xdebug
           tools: composer:v2
           ini-values: error_reporting=E_ALL, allow_url_fopen=On, opcache.enable=0, apc.enable_cli=1
@@ -298,7 +298,7 @@ jobs:
         uses: shivammathur/setup-php@v2
         with:
           php-version: ${{ matrix.php }}
-          extensions: dom, curl, libxml, mbstring, zip, pgsql, imagick, exif, iconv, apcu, memcached
+          extensions: dom, curl, libxml, mbstring, zip, pgsql, imagick, exif, iconv, apcu, memcached, imagick
           coverage: xdebug
           tools: composer:v2
           ini-values: error_reporting=E_ALL, allow_url_fopen=On, opcache.enable=0, apc.enable_cli=1
