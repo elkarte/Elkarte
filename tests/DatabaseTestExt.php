@@ -28,7 +28,7 @@ class TestDatabase extends TestCase
 		global $ssi_db_user, $ssi_db_passwd;
 
 		define('ELK', '1');
-		define('CACHE_STALE', '?R11B2');
+		define('CACHE_STALE', '?R20B1');
 
 		// Get the forum's settings for database and file paths.
 		require_once('Settings.php');

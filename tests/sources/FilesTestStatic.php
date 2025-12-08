@@ -137,7 +137,7 @@ class FilesTestStatic extends TestCase
  \* @copyright ElkArte Forum contributors
  \* @license\s{1,5}?BSD https?:\/\/opensource\.org\/licenses\/BSD-3-Clause \(see accompanying LICENSE\.txt file\)
  \*
- \* @version \d+\.\d+(?:\.\d+|\sdev|\s(beta|RC|Release Candidate)\s\d+)?
+ \* @version \d+\.\d+(?:\.\d+|\sdev|\s(Beta|RC|Release Candidate)\s\d+)?
 (?:(?: \*\n)?|(?: \*(?:\s.{0,200})?\n))+ \*\/',
 			// ElkArte 2 w/smf credit
 			'^<\?php
@@ -151,7 +151,7 @@ class FilesTestStatic extends TestCase
  \* copyright:\s+20\d\d Simple Machines (?:Forum )?\(http:\/\/www\.simplemachines\.org\)(
  \* copyright:\s+?2004-2011, GreyWyvern - All rights reserved\.)?
  \*
- \* @version \d+\.\d+(?:\.\d+|\sdev|\s(beta|RC|Release Candidate)\s\d+)?
+ \* @version \d+\.\d+(?:\.\d+|\sdev|\s(Beta|RC|Release Candidate)\s\d+)?
 (?:(?: \*\n)?|(?: \*(?:\s.{0,200})?\n))+ \*\/',
 			// Pure ElkArte 2 with php path
 			'^#!\/usr\/bin\/php -q
@@ -162,7 +162,7 @@ class FilesTestStatic extends TestCase
  \* @copyright ElkArte Forum contributors
  \* @license\s{1,5}?BSD https?:\/\/opensource\.org\/licenses\/BSD-3-Clause \(see accompanying LICENSE\.txt file\)
  \*
- \* @version \d+\.\d+(?:\.\d+|\sdev|\s(beta|RC|Release Candidate)\s\d+)?
+ \* @version \d+\.\d+(?:\.\d+|\sdev|\s(Beta|RC|Release Candidate)\s\d+)?
 (?:(?: \*\n)?|(?: \*(?:\s.{0,200})?\n))+ \*\/',
 			// Pure ElkArte 1.x
 			'^<\?php
@@ -172,7 +172,7 @@ class FilesTestStatic extends TestCase
  \* @copyright ElkArte Forum contributors
  \* @license\s+?BSD https?:\/\/opensource\.org\/licenses\/BSD-3-Clause
  \*
- \* @version\s+?\d+\.\d+(?:\.\d+|\sdev|\s(beta|RC|Release Candidate)\s\d+)?
+ \* @version\s+?\d+\.\d+(?:\.\d+|\sdev|\s(Beta|RC|Release Candidate)\s\d+)?
 (?:(?: \*\n)?|(?: \*(?:\s.{0,200})?\n))+ \*\/',
 			// Pure ElkArte 1.x with php path
 			'^#!\/usr\/bin\/php -q
@@ -183,7 +183,7 @@ class FilesTestStatic extends TestCase
  \* @copyright ElkArte Forum contributors
  \* @license\s+?BSD https?:\/\/opensource\.org\/licenses\/BSD-3-Clause
  \*
- \* @version\s+?\d+\.\d+(?:\.\d+|\sdev|\s(beta|RC|Release Candidate)\s\d+)?
+ \* @version\s+?\d+\.\d+(?:\.\d+|\sdev|\s(Beta|RC|Release Candidate)\s\d+)?
 (?:(?: \*\n)?|(?: \*(?:\s.{0,200})?\n))+ \*\/',
 			// SMF-derived
 			'^<\?php
@@ -200,7 +200,7 @@ class FilesTestStatic extends TestCase
  \* copyright:\s+?2004-2011, GreyWyvern - All rights reserved\.
  \* license:\s+?BSD, See included LICENSE.TXT for terms and conditions.)?
  \*
- \* @version\s+?\d+\.\d+(?:\.\d+|\sdev|\s(beta|RC|Release Candidate)\s\d+)?
+ \* @version\s+?\d+\.\d+(?:\.\d+|\sdev|\s(Beta|RC|Release Candidate)\s\d+)?
 (?:(?: \*\n)?|(?: \*(?:\s.{0,200})?\n))+ \*\/',
 		);
 		foreach ($this->_ourFiles as $file)
