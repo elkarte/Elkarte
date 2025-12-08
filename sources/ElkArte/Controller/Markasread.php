@@ -109,12 +109,14 @@ class Markasread extends AbstractController
 		}
 
 		// Best have a valid session
-		if (checkSession('get', '', false))
+		if (checkSession('get', '', false) !== '')
 		{
-			// Again, this is a special case, someone will deal with the others later :P
-			if ($this->_req->getQuery('sa') === 'all')
+			// Provide a redirect URL for AJAX handlers when the session is invalid
+			Txt::load('Errors');
+			$sa = $this->_req->getQuery('sa');
+
+			if ($sa === 'all')
 			{
-				Txt::load('Errors');
 				$context['xml_data'] = [
 					'error' => 1,
 					'url' => getUrl('action', ['action' => 'markasread', 'sa' => 'all', '{session_data}']),
@@ -123,7 +125,31 @@ class Markasread extends AbstractController
 				return '';
 			}
 
-			obExit(false);
+			// For board-level and other mark actions, send back a URL including a fresh session token
+			if ($sa === 'board')
+			{
+				$board_q = $this->_req->getQuery('board', 'trim', '');
+				$board_param = [];
+				if ($board_q !== '')
+				{
+					$board_param['board'] = $board_q;
+				}
+
+				$context['xml_data'] = [
+					'error' => 1,
+					'url' => getUrl('action', array_merge(['action' => 'markasread', 'sa' => 'board', '{session_data}'], $board_param)),
+				];
+
+				return '';
+			}
+
+			// Default: just output an error and let the generic handler redirect to a safe place
+			$context['xml_data'] = [
+				'error' => 1,
+				'url' => getUrl('action', ['action' => 'unread', '{session_data}']),
+			];
+
+			return '';
 		}
 
 		// Dispatch to the right method
