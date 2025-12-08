@@ -822,54 +822,56 @@ function checkSession($type = 'post', $from_action = '', $is_fatal = true)
 	// Make sure a page with session check requirement is not being prefetched.
 	stop_prefetching();
 
-	// Check the referring site - it should be the same server at least!
-
-	$referrer_url = $_SESSION['request_referer'] ?? ($_SERVER['HTTP_REFERER'] ?? '');
-
-	$referrer = @parse_url($referrer_url);
-	if (!empty($referrer['host']))
+	if (!isset($error))
 	{
-		if (str_contains($_SERVER['HTTP_HOST'], ':'))
-		{
-			$real_host = substr($_SERVER['HTTP_HOST'], 0, strpos($_SERVER['HTTP_HOST'], ':'));
-		}
-		else
-		{
-			$real_host = $_SERVER['HTTP_HOST'];
-		}
+		// Check the referring site - it should be the same server at least!
+		$referrer_url = $_SESSION['request_referer'] ?? ($_SERVER['HTTP_REFERER'] ?? '');
 
-		$parsed_url = parse_url($boardurl);
-
-		// Are global cookies on? If so, let's check them ;).
-		if (!empty($modSettings['globalCookies']))
+		$referrer = @parse_url($referrer_url);
+		if (!empty($referrer['host']))
 		{
-			if (preg_match('~(?:[^\.]+\.)?([^\.]{3,}\..+)\z~i', $parsed_url['host'], $parts) == 1)
+			if (str_contains($_SERVER['HTTP_HOST'], ':'))
 			{
-				$parsed_url['host'] = $parts[1];
+				$real_host = substr($_SERVER['HTTP_HOST'], 0, strpos($_SERVER['HTTP_HOST'], ':'));
+			}
+			else
+			{
+				$real_host = $_SERVER['HTTP_HOST'];
 			}
 
-			if (preg_match('~(?:[^\.]+\.)?([^\.]{3,}\..+)\z~i', $referrer['host'], $parts) == 1)
+			$parsed_url = parse_url($boardurl);
+
+			// Are global cookies on? If so, let's check them ;).
+			if (!empty($modSettings['globalCookies']))
 			{
-				$referrer['host'] = $parts[1];
+				if (preg_match('~(?:[^\.]+\.)?([^\.]{3,}\..+)\z~i', $parsed_url['host'], $parts) == 1)
+				{
+					$parsed_url['host'] = $parts[1];
+				}
+
+				if (preg_match('~(?:[^\.]+\.)?([^\.]{3,}\..+)\z~i', $referrer['host'], $parts) == 1)
+				{
+					$referrer['host'] = $parts[1];
+				}
+
+				if (preg_match('~(?:[^\.]+\.)?([^\.]{3,}\..+)\z~i', $real_host, $parts) == 1)
+				{
+					$real_host = $parts[1];
+				}
 			}
 
-			if (preg_match('~(?:[^\.]+\.)?([^\.]{3,}\..+)\z~i', $real_host, $parts) == 1)
+			// Okay: referrer must either match parsed_url or real_host.
+			if (isset($parsed_url['host']) && strtolower($referrer['host']) !== strtolower($parsed_url['host']) && strtolower($referrer['host']) !== strtolower($real_host))
 			{
-				$real_host = $parts[1];
+				$error = 'verify_url_fail';
+				$log_error = true;
+				$sprintf = [Util::htmlspecialchars($referrer_url)];
 			}
-		}
-
-		// Okay: referrer must either match parsed_url or real_host.
-		if (isset($parsed_url['host']) && strtolower($referrer['host']) !== strtolower($parsed_url['host']) && strtolower($referrer['host']) !== strtolower($real_host))
-		{
-			$error = 'verify_url_fail';
-			$log_error = true;
-			$sprintf = [Util::htmlspecialchars($referrer_url)];
 		}
 	}
 
 	// Well, first of all, if a from_action is specified you'd better have an old_url.
-	if (!empty($from_action) && (!isset($_SESSION['old_url']) || preg_match('~[?;&]action=' . $from_action . '([;&]|$)~', $_SESSION['old_url']) !== 1))
+	if (!isset($error) && !empty($from_action) && (!isset($_SESSION['old_url']) || preg_match('~[?;&]action=' . $from_action . '([;&]|$)~', $_SESSION['old_url']) !== 1))
 	{
 		$error = 'verify_url_fail';
 		$log_error = true;
