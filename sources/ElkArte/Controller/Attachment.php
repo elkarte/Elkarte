@@ -29,6 +29,7 @@ use ElkArte\Graphics\TextImage;
 use ElkArte\Helper\FileFunctions;
 use ElkArte\Http\Headers;
 use ElkArte\Languages\Txt;
+use ElkArte\Request;
 use ElkArte\Themes\ThemeLoader;
 use ElkArte\User;
 
@@ -50,7 +51,7 @@ class Attachment extends AbstractController
 	/**
 	 * {@inheritDoc}
 	 */
-	public function needTheme($action = '')
+	public function needTheme($action = ''): bool
 	{
 		global $modSettings, $maintenance;
 
@@ -76,7 +77,7 @@ class Attachment extends AbstractController
 	/**
 	 * {@inheritDoc}
 	 */
-	public function trackStats($action = '')
+	public function trackStats($action = ''): bool
 	{
 		return false;
 	}
@@ -85,7 +86,7 @@ class Attachment extends AbstractController
 	 * The default action is to download an attachment.
 	 * This allows ?action=attachment to be forwarded to action_dlattach()
 	 */
-	public function action_index()
+	public function action_index(): void
 	{
 		// add a subaction array to act accordingly
 		$subActions = [
@@ -398,7 +399,7 @@ class Attachment extends AbstractController
 		require_once(SUBSDIR . '/Attachments.subs.php');
 
 		// Temporary attachment, special case...
-		if (isset($this->_req->query->attach) && strpos($this->_req->query->attach, 'post_tmp_' . $this->user->id . '_') !== false)
+		if (isset($this->_req->query->attach) && str_contains($this->_req->query->attach, 'post_tmp_' . $this->user->id . '_'))
 		{
 			// Return via tmpattach, back presumably to the post form
 			$this->action_tmpattach();
@@ -458,7 +459,7 @@ class Attachment extends AbstractController
 					$filename = $attachmentsDir->getCurrent() . '/' . $attachment['filename'];
 				}
 
-				if (strpos(getMimeType($filename), 'image') !== 0)
+				if (!str_starts_with(getMimeType($filename), 'image'))
 				{
 					$attachment['fileext'] = 'png';
 					$attachment['mime_type'] = 'image/png';
@@ -500,12 +501,12 @@ class Attachment extends AbstractController
 			$filename = getAttachmentFilename($real_filename, $id_attach, $id_folder, false, $file_hash);
 		}
 
+		$possibleMobi = strpos(Request::instance()->user_agent(), 'Mobi');
 		$eTag = '"' . substr($id_attach . $real_filename . @filemtime($filename), 0, 64) . '"';
-		$disposition = isset($this->_req->query->image) ? 'inline' : 'attachment';
 		$do_cache = !(!isset($this->_req->query->image) && getValidMimeImageType($file_ext) !== '');
 
 		// Make sure the mime type warrants an inline display.
-		if (isset($this->_req->query->image) && !empty($mime_type) && strpos($mime_type, 'image/') !== 0)
+		if (isset($this->_req->query->image) && !empty($mime_type) && !str_starts_with($mime_type, 'image/'))
 		{
 			unset($this->_req->query->image);
 			$mime_type = '';
@@ -520,6 +521,8 @@ class Attachment extends AbstractController
 			}
 		}
 
+		// Show this content inline or download?
+		$disposition = (isset($this->_req->query->image) || ($possibleMobi && (str_starts_with($mime_type, 'audio/') || str_starts_with($mime_type, 'video/')))) ? 'inline' : 'attachment';
 		$this->prepare_headers($filename, $eTag, $mime_type, $disposition, $real_filename, $do_cache);
 		$this->send_file($filename, $mime_type);
 
@@ -574,7 +577,7 @@ class Attachment extends AbstractController
 
 		// Not compressible, or not supported / requested by client
 		if (!preg_match('~^(?:text/|application/(?:json|xml|rss\+xml)$)~i', $mime_type)
-			|| (!isset($_SERVER['HTTP_ACCEPT_ENCODING']) || strpos($_SERVER['HTTP_ACCEPT_ENCODING'], 'gzip') === false))
+			|| (!isset($_SERVER['HTTP_ACCEPT_ENCODING']) || !str_contains($_SERVER['HTTP_ACCEPT_ENCODING'], 'gzip')))
 		{
 			return false;
 		}
@@ -599,7 +602,6 @@ class Attachment extends AbstractController
 		global $txt;
 
 		$headers = Headers::instance();
-		$protocol = detectServer()->getProtocol();
 
 		// No point in a nicer message, because this is supposed to be an attachment anyway...
 		if ($check_filename && !FileFunctions::instance()->fileExists($filename))
@@ -633,7 +635,7 @@ class Attachment extends AbstractController
 		}
 
 		// Check whether the ETag was sent back, and cache based on that...
-		if (!empty($_SERVER['HTTP_IF_NONE_MATCH']) && strpos($_SERVER['HTTP_IF_NONE_MATCH'], $eTag) !== false)
+		if (!empty($_SERVER['HTTP_IF_NONE_MATCH']) && str_contains($_SERVER['HTTP_IF_NONE_MATCH'], $eTag))
 		{
 			$this->flush_buffers();
 
@@ -805,7 +807,7 @@ class Attachment extends AbstractController
 		$resize = true;
 
 		// Return mime type ala mimetype extension
-		if (strpos(getMimeType($filename), 'image') !== 0)
+		if (!str_starts_with(getMimeType($filename), 'image'))
 		{
 			$checkMime = returnMimeThumb($file_ext);
 			$mime_type = 'image/png';
