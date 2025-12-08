@@ -355,7 +355,7 @@ class PackageChmod extends AbstractModel
 				$ftp_root = substr(BOARDDIR, 0, -strlen($path));
 
 				// Avoid double//slash entries
-				if (substr($ftp_root, -1) === '/' && (substr($path, 0, 1) === '/'))
+				if (str_ends_with($ftp_root, '/') && (str_starts_with($path, '/')))
 				{
 					$ftp_root = substr($ftp_root, 0, -1);
 				}

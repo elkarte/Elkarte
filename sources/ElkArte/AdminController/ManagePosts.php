@@ -130,7 +130,7 @@ class ManagePosts extends AbstractController
 				{
 					foreach ($this->_req->post->censor_vulgar as $i => $value)
 					{
-						if (trim(strtr($value, '*', ' ')) === '')
+						if (trim(str_replace('*', ' ', $value)) === '')
 						{
 							unset($this->_req->post->censor_vulgar[$i], $this->_req->post->censor_proper[$i]);
 						}
@@ -184,7 +184,7 @@ class ManagePosts extends AbstractController
 			}
 
 			// Skip it, it's either spaces or stars only.
-			if (trim(strtr($censor_vulgar_i, '*', ' ')) === '')
+			if (trim(str_replace('*', ' ', $censor_vulgar_i)) === '')
 			{
 				continue;
 			}

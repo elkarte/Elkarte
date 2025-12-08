@@ -177,7 +177,7 @@ class Headers
 	public function setAttachmentFileParams($mime_type, $fileName, $disposition = 'attachment'): self
 	{
 		// If an image, set the content type to the image/type defined in the mime_type
-		if (!empty($mime_type) && strpos($mime_type, 'image/') === 0)
+		if (!empty($mime_type) && str_starts_with($mime_type, 'image/'))
 		{
 			$this->contentType($mime_type, '');
 		}

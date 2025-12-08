@@ -40,7 +40,7 @@ class Xml extends AbstractController
 	/**
 	 * Main dispatcher for action=xmlhttp.
 	 *
-	 * @see \ElkArte\AbstractController::action_index()
+	 * @see AbstractController::action_index
 	 */
 	public function action_index()
 	{
@@ -424,11 +424,12 @@ class Xml extends AbstractController
 							$board_previous_sibling = $board_tree[$i];
 							break;
 						}
-						// Don't go to another parent tree
-						elseif ($board_tree[$i]['parent'] == 0)
+
+						if ($board_tree[$i]['parent'] == 0)
 						{
 							break;
 						}
+						// Don't go to another parent tree
 					}
 					// Don't go to another category
 					else

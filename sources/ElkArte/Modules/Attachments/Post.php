@@ -181,7 +181,7 @@ class Post extends AbstractModule
 				foreach ($tmp_attachments as $attachID => $attachment)
 				{
 					// Initial errors (such as missing directory), we can recover
-					if ($attachID !== 'initial_error' && strpos($attachID, (string) $prefix) === false)
+					if ($attachID !== 'initial_error' && !str_contains($attachID, (string) $prefix))
 					{
 						continue;
 					}
@@ -414,7 +414,7 @@ class Post extends AbstractModule
 			{
 				$attachID = $tmp_attachments->getIdFromPublic($public_id);
 
-				if (strpos($attachID, (string) $prefix) !== false)
+				if (str_contains($attachID, (string) $prefix))
 				{
 					$keep_temp[] = $attachID;
 				}
@@ -474,7 +474,7 @@ class Post extends AbstractModule
 
 			foreach ($tmp_attachments->toArray() as $attachID => $attachment)
 			{
-				if ($attachID !== 'initial_error' && strpos($attachID, (string) $prefix) === false)
+				if ($attachID !== 'initial_error' && !str_contains($attachID, (string) $prefix))
 				{
 					continue;
 				}

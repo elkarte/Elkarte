@@ -206,6 +206,7 @@ abstract class AbstractNotificationMessage implements NotificationInterface
 	/**
 	 * Returns basic data about the members to be notified.
 	 *
+	 * @param array $members_to An array of member IDs to get data for.
 	 * @return array
 	 */
 	protected function getMembersData($members_to): array

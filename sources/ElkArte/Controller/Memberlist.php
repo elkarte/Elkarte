@@ -184,7 +184,7 @@ class Memberlist extends AbstractController
 		$context['disabled_fields'] = isset($modSettings['disabled_profile_fields']) ? array_flip(explode(',', $modSettings['disabled_profile_fields'])) : [];
 		foreach ($context['columns'] as $key => $column)
 		{
-			if (isset($context['disabled_fields'][$key]) || (isset($column['link_with']) && isset($context['disabled_fields'][$column['link_with']])))
+			if (isset($context['disabled_fields'][$key]) || (isset($column['link_with'], $context['disabled_fields'][$column['link_with']])))
 			{
 				unset($context['columns'][$key]);
 				continue;
@@ -310,7 +310,7 @@ class Memberlist extends AbstractController
 		}
 
 		// Set defaults for sort (real_name)
-		if (!isset($sort) || !isset($context['columns'][$sort]['sort']))
+		if (!isset($sort, $context['columns'][$sort]['sort']))
 		{
 			$sort = 'real_name';
 		}
@@ -570,7 +570,7 @@ class Memberlist extends AbstractController
 			foreach ($input_fields as $field)
 			{
 				$curField = substr($field, 5);
-				if (isset($context['custom_search_fields'][$curField]) && strpos($field, 'cust_') === 0)
+				if (isset($context['custom_search_fields'][$curField]) && str_starts_with($field, 'cust_'))
 				{
 					$customJoin[] = 'LEFT JOIN {db_prefix}custom_fields_data AS cfd' . $field . ' ON (cfd' . $field . '.variable = {string:cfd' . $field . '} AND cfd' . $field . '.id_member = mem.id_member)';
 					$query_parameters['cfd' . $field] = $curField;
@@ -581,7 +581,7 @@ class Memberlist extends AbstractController
 
 			$field = $sort;
 			$curField = substr($field, 5);
-			if (isset($context['custom_search_fields'][$curField]) && strpos($field, 'cust_') === 0)
+			if (isset($context['custom_search_fields'][$curField]) && str_starts_with($field, 'cust_'))
 			{
 				$customJoin[] = 'LEFT JOIN {db_prefix}custom_fields_data AS cfd' . $field . ' ON (cfd' . $field . '.variable = {string:cfd' . $field . '} AND cfd' . $field . '.id_member = mem.id_member)';
 				$query_parameters['cfd' . $field] = $curField;

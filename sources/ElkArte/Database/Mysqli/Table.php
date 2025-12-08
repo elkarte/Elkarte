@@ -312,7 +312,7 @@ class Table extends AbstractTable
 			SHOW KEYS
 			FROM {raw:table_name}',
 			[
-				'table_name' => substr($table_name, 0, 1) === '`' ? $table_name : '`' . $table_name . '`',
+				'table_name' => str_starts_with($table_name, '`') ? $table_name : '`' . $table_name . '`',
 			]
 		);
 		$indexes = [];
@@ -430,7 +430,7 @@ class Table extends AbstractTable
 			SHOW FIELDS
 			FROM {raw:table_name}',
 			[
-				'table_name' => substr($table_name, 0, 1) === '`' ? $table_name : '`' . $table_name . '`',
+				'table_name' => str_starts_with($table_name, '`') ? $table_name : '`' . $table_name . '`',
 			]
 		);
 		$columns = [];
@@ -443,7 +443,7 @@ class Table extends AbstractTable
 			else
 			{
 				// Is there an auto_increment?
-				$auto = strpos($row['Extra'], 'auto_increment') !== false;
+				$auto = str_contains($row['Extra'], 'auto_increment');
 
 				// Can we split out the size?
 				if (preg_match('~(.+?)\s*\((\d+)\)(?:(?:\s*)?(unsigned))?~i', $row['Type'], $matches) === 1)

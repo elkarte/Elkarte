@@ -149,7 +149,7 @@ class Quotedmem extends AbstractEventBoardAccess
 		[/quote]
 		[/quote]
 		*/
-		if (strpos($text, '[quote ') !== false)
+		if (str_contains($text, '[quote '))
 		{
 			$quoted = [];
 			$blocks = preg_split('~\[quote~', $text);
@@ -172,7 +172,7 @@ class Quotedmem extends AbstractEventBoardAccess
 					}
 				}
 
-				$skip_next = strpos($block, '[/quote]') === false;
+				$skip_next = !str_contains($block, '[/quote]');
 			}
 
 			return array_unique($quoted);

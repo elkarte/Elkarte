@@ -105,7 +105,7 @@ class ManageNews extends AbstractController
 		]);
 
 		// Force the right area...
-		if (strpos($subAction, 'mailing') === 0)
+		if (str_starts_with($subAction, 'mailing'))
 		{
 			$context[$context['admin_menu_name']]['current_subsection'] = 'mailingmembers';
 		}

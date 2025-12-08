@@ -191,11 +191,11 @@ class Giphy extends AbstractController
 	 *
 	 * @param string $path The API endpoint path.
 	 * @param array $params The additional parameters for the request (optional).
-	 * @param string|null $error A variable to hold any error message (optional).
+	 * @param bool|null $error A flag to indicate any error message (optional).
 	 *
 	 * @return array The response from the API as an associative array, or an empty array if there was an error.
 	 */
-	public function request(string $path, array $params = [], string &$error = null): array
+	public function request(string $path, array $params = [], bool|null &$error = null): array
 	{
 		$result = [];
 		$params = ['api_key' => $this->apiKey] + $params;

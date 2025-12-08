@@ -184,7 +184,7 @@ class keyCaptcha implements ControlInterface
 			return false;
 		}
 
-		if (strpos($kc_vars[2], 'http://') !== 0)
+		if (!str_starts_with($kc_vars[2], 'http://'))
 		{
 			return false;
 		}

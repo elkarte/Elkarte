@@ -282,7 +282,7 @@ class EmailParse
 		}
 
 		// Actually no headers in this boundary
-		if (empty($match[1]) || strpos($match[1], ':') === false)
+		if (empty($match[1]) || !str_contains($match[1], ':'))
 		{
 			$this->_header_block = '';
 			$this->body = $this->raw_message;
@@ -358,7 +358,7 @@ class EmailParse
 	private function _decode_header($val, $strict = false): string
 	{
 		// Check if this header even needs to be decoded.
-		if (strpos($val, '=?') === false || strpos($val, '?=') === false)
+		if (!str_contains($val, '=?') || !str_contains($val, '?='))
 		{
 			return trim($val);
 		}
@@ -369,7 +369,7 @@ class EmailParse
 			$decoded = iconv_mime_decode($val, $strict ? 1 : 2, 'UTF-8');
 
 			// Bad decode, or partial decode
-			if ($decoded !== false && strpos($decoded, '=?iso') === false)
+			if ($decoded !== false && !str_contains($decoded, '=?iso'))
 			{
 				return $decoded;
 			}
@@ -457,7 +457,7 @@ class EmailParse
 		elseif ($encoding === 'base64')
 		{
 			$string = base64_decode($string);
-			if (isset($this->headers['content-type']) && strpos($this->headers['content-type'], 'text/') === false)
+			if (isset($this->headers['content-type']) && !str_contains($this->headers['content-type'], 'text/'))
 			{
 				return $string;
 			}
@@ -878,7 +878,7 @@ class EmailParse
 			$type = '';
 			[$field, $rest] = array_pad(explode(':', $line), 2, '');
 
-			if (strpos($line, ';') !== false)
+			if (str_contains($line, ';'))
 			{
 				[$type, $val] = explode(';', $rest);
 			}
@@ -1272,7 +1272,7 @@ class EmailParse
 			if (!empty($matches[1]))
 			{
 				$matches[1] = $this->_decode_header($matches[1]);
-				if ($matches[1][0] === '"' && substr($matches[1], -1) === '"')
+				if ($matches[1][0] === '"' && str_ends_with($matches[1], '"'))
 				{
 					$this->_email_name = substr($matches[1], 1, -1);
 				}
@@ -1372,17 +1372,17 @@ class EmailParse
 	public function load_spam(): bool
 	{
 		// SpamAssassin (and others like rspamd)
-		if (isset($this->headers['x-spam-flag']) && strtolower(substr($this->headers['x-spam-flag'], 0, 3)) === 'yes')
+		if (isset($this->headers['x-spam-flag']) && stripos($this->headers['x-spam-flag'], 'yes') === 0)
 		{
 			$this->spam_found = true;
 		}
 		// SpamStopper and other variants
-		elseif (isset($this->headers['x-spam-status']) && strtolower(substr($this->headers['x-spam-status'], 0, 3)) === 'yes')
+		elseif (isset($this->headers['x-spam-status']) && stripos($this->headers['x-spam-status'], 'yes') === 0)
 		{
 			$this->spam_found = true;
 		}
 		// j-chkmail --  hi = likely spam lo = suspect ...
-		elseif (isset($this->headers['x-j-chkmail-status']) && strtolower(substr($this->headers['x-j-chkmail-status'], 0, 2)) === 'hi')
+		elseif (isset($this->headers['x-j-chkmail-status']) && stripos($this->headers['x-j-chkmail-status'], 'hi') === 0)
 		{
 			$this->spam_found = true;
 		}

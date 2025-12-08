@@ -593,7 +593,7 @@ class DataValidator
 		// Maybe even a custom function set up like a defined one, addons can do this.
 		elseif (is_callable($validation['function'])
 			&& isset($input[$field])
-			&& strpos($validation['function'], 'validate_') === 0)
+			&& str_starts_with($validation['function'], 'validate_'))
 		{
 			$result = call_user_func_array($validation['function'], array_merge((array) $field, (array) $input[$field], $validation['parameters_function']));
 		}
@@ -791,7 +791,7 @@ class DataValidator
 
 		foreach ($parameters as $check)
 		{
-			if (strpos($value, $check) !== false)
+			if (str_contains($value, $check))
 			{
 				return $this->setFailureArray($field, $input, $parameters);
 			}

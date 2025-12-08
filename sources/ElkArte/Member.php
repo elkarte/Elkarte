@@ -185,7 +185,7 @@ class Member extends ValuesContainer
 				],
 				'birth_date' => empty($this->data['birthdate']) || $this->data['birthdate'] === '0001-01-01'
 					? '0000-00-00'
-					: (strpos($this->data['birthdate'], '0004') === 0
+					: (str_starts_with($this->data['birthdate'], '0004')
 						? '0000' . substr($this->data['birthdate'], 4)
 						: $this->data['birthdate']),
 				'real_posts' => $this->data['posts'],

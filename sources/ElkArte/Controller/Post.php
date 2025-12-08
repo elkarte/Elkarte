@@ -1217,7 +1217,7 @@ class Post extends AbstractController
 			$bbc_parser = ParserWrapper::instance();
 
 			// Let's see if there's still some content left without the tags.
-			if (Util::htmltrim(strip_tags($bbc_parser->parseMessage($_POST['message'], false), '<img>')) === '' && (!allowedTo('admin_forum') || strpos($_POST['message'], '[html]') === false))
+			if (Util::htmltrim(strip_tags($bbc_parser->parseMessage($_POST['message'], false), '<img>')) === '' && (!allowedTo('admin_forum') || !str_contains($_POST['message'], '[html]')))
 			{
 				$this->_post_errors->addError('no_message');
 			}
@@ -1496,10 +1496,8 @@ class Post extends AbstractController
 				return null;
 			}
 			// A moderator-lock (1) can override a user-lock (2).
-			else
-			{
-				return allowedTo('lock_any') ? 1 : 2;
-			}
+
+			return allowedTo('lock_any') ? 1 : 2;
 		}
 		// Nothing changes to the lock status.
 		if ((empty($lock) && empty($topic_info['locked'])) || (!empty($lock) && !empty($topic_info['locked'])))

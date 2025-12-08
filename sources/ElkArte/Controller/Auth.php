@@ -364,6 +364,7 @@ class Auth extends AbstractController
 	 * - Used when a board is converted to see if the user credentials and a 3rd
 	 * party hash satisfy whats in the db passwd field
 	 *
+	 * @param string $posted_password
 	 * @param string $member_name
 	 * @param string $passwrd
 	 * @param string $password_salt
@@ -477,7 +478,7 @@ class Auth extends AbstractController
 		}
 
 		// ElkArte's sha1 function can give a funny result on Linux (Not our fault!). If we've now got the real one let the old one be valid!
-		if (strpos(PHP_OS_FAMILY, 'Win') !== 0)
+		if (!str_starts_with(PHP_OS_FAMILY, 'Win'))
 		{
 			$other_passwords[] = bin2hex(hash('sha1', strtolower($member_name) . un_htmlspecialchars($posted_password), true));
 		}
@@ -499,7 +500,7 @@ class Auth extends AbstractController
 	 *
 	 * @param bool $internal if true, it doesn't check the session
 	 * @param bool $redirect if true, redirect to the board index
-	 * @throws \ElkArte\Exceptions\Exception
+	 * @throws Exception
 	 */
 	public function action_logout($internal = false, $redirect = true): void
 	{
@@ -559,7 +560,7 @@ class Auth extends AbstractController
 			{
 				redirectexit();
 			}
-			elseif ((strpos($_SESSION['logout_url'], 'http://') !== 0 && strpos($_SESSION['logout_url'], 'https://') !== 0))
+			elseif ((!str_starts_with($_SESSION['logout_url'], 'http://') && !str_starts_with($_SESSION['logout_url'], 'https://')))
 			{
 				unset($_SESSION['logout_url']);
 				redirectexit();

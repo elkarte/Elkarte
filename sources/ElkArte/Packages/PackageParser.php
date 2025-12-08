@@ -746,7 +746,7 @@ class PackageParser extends AbstractModel
 		];
 
 		// If there is a destination, make sure it makes sense.
-		if (substr($actionType, 0, 6) !== 'remove')
+		if (!str_starts_with($actionType, 'remove'))
 		{
 			$this_action['unparsed_destination'] = $action->fetch('@destination');
 			$this_action['destination'] = parse_path($action->fetch('@destination')) . '/' . basename($this_action['filename']);
@@ -758,7 +758,7 @@ class PackageParser extends AbstractModel
 		}
 
 		// If we're moving or requiring (copying) a file.
-		if (substr($actionType, 0, 4) === 'move' || substr($actionType, 0, 7) === 'require')
+		if (str_starts_with($actionType, 'move') || str_starts_with($actionType, 'require'))
 		{
 			if ($action->exists('@from'))
 			{
@@ -789,6 +789,9 @@ class PackageParser extends AbstractModel
 
 	/**
 	 * Allow for translated readme and license files.
+	 *
+	 * @param string $actionType
+	 * @param XmlArray $action
 	 *
 	 * @return bool
 	 */

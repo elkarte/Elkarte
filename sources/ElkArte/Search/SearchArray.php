@@ -166,7 +166,7 @@ class SearchArray extends AbstractModel
 	{
 		foreach ($wordArray as $index => $word)
 		{
-			if (strpos(trim($word), '-') === 0)
+			if (str_starts_with(trim($word), '-'))
 			{
 				if (($word = trim($word, "-_' ")) !== '' && !in_array($word, $this->_blocklist_words))
 				{

@@ -252,7 +252,7 @@ class Reminder extends AbstractController
 		}
 
 		// Quit if this code is not right.
-		if (empty($code) || $member['validation_code'] !== substr(hash('sha256', $code), 0, 10))
+		if (empty($code) || !str_starts_with(hash('sha256', $code), $member['validation_code']))
 		{
 			// Stop brute force attacks like this.
 			validatePasswordFlood($member_id, $member['passwd_flood'], false);

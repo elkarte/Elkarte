@@ -205,7 +205,7 @@ class Markasread extends AbstractController
 
 		$_SESSION['id_msg_last_visit'] = $modSettings['maxMsgID'];
 		$redirectAction = '';
-		if (!empty($_SESSION['old_url']) && strpos($_SESSION['old_url'], 'action=unread') !== false)
+		if (!empty($_SESSION['old_url']) && str_contains($_SESSION['old_url'], 'action=unread'))
 		{
 			$redirectAction = 'action=unread';
 		}

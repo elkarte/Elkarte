@@ -75,7 +75,7 @@ class MaillistImap extends AbstractModel
 
 		// Values used for options
 		$this->_delete = (bool) $this->_modSettings->maillist_imap_delete;
-		$this->_is_gmail = strpos($this->_hostname, '.gmail.') !== false;
+		$this->_is_gmail = str_contains($this->_hostname, '.gmail.');
 	}
 
 	/**
@@ -139,7 +139,7 @@ class MaillistImap extends AbstractModel
 		{
 			// Based on the type selected get/set the additional connection details
 			$connection = $this->_port_type();
-			$this->_hostname .= (strpos($this->_hostname, ':') === false) ? ':' . $connection['port'] : '';
+			$this->_hostname .= (!str_contains($this->_hostname, ':')) ? ':' . $connection['port'] : '';
 			$this->_imap_server = '{' . $this->_hostname . '/' . $connection['protocol'] . $connection['flags'] . '}';
 			$this->_mailbox = $this->_imap_server . imap_utf7_encode($this->_mailbox);
 

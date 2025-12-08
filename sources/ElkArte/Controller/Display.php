@@ -554,12 +554,12 @@ class Display extends AbstractController
 			}
 
 			// Start from a certain time index, not a message.
-			if (strpos($start, 'from') === 0)
+			if (str_starts_with($start, 'from'))
 			{
 				$timestamp = (int) substr($start, 4);
 				$start = $timestamp === 0 ? 0 : countNewPosts($this->topicinfo['id_topic'], $this->topicinfo, $timestamp);
 			}
-			elseif (strpos($start, 'msg') === 0)
+			elseif (str_starts_with($start, 'msg'))
 			{
 				$this->_virtual_msg = (int) substr($start, 3);
 				if (!$this->topicinfo['unapproved_posts'] && $this->_virtual_msg >= $this->topicinfo['id_last_msg'])
@@ -618,7 +618,7 @@ class Display extends AbstractController
 		$context['oldTopicError'] = $this->warnOldTopic();
 
 		// Are we showing signatures - or disabled fields?
-		$context['signature_enabled'] = strpos($modSettings['signature_settings'], '1') === 0;
+		$context['signature_enabled'] = str_starts_with($modSettings['signature_settings'], '1');
 		$context['disabled_fields'] = isset($modSettings['disabled_profile_fields']) ? array_flip(explode(',', $modSettings['disabled_profile_fields'])) : [];
 
 		// Page title & description

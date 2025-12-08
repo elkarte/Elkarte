@@ -231,7 +231,7 @@ class Announce extends AbstractController
 	 *                 It must contain:
 	 *                  - subject: the subject of the topic
 	 *                  - body: the body of the topic
-	 * @throws \ElkArte\Exceptions\Exception
+	 * @throws Exception
 	 */
 	private function _send_announcement($member_info, $topic_info): void
 	{

@@ -69,7 +69,7 @@ class WeeklyMaintenance implements ScheduledTaskInterface
 		// Ok should we prune the logs?
 		if (!empty($modSettings['pruningOptions']))
 		{
-			if (!empty($modSettings['pruningOptions']) && strpos($modSettings['pruningOptions'], ',') !== false)
+			if (!empty($modSettings['pruningOptions']) && str_contains($modSettings['pruningOptions'], ','))
 			{
 				[$modSettings['pruneErrorLog'], $modSettings['pruneModLog'], $modSettings['pruneBanLog'], $modSettings['pruneReportLog'], $modSettings['pruneScheduledTaskLog'], $modSettings['pruneSpiderHitLog']] = explode(',', $modSettings['pruningOptions']);
 			}

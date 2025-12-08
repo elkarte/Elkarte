@@ -127,7 +127,7 @@ final class Hooks
 		{
 			$function = trim($function);
 
-			if (strpos($function, '|') !== false)
+			if (str_contains($function, '|'))
 			{
 				[$call, $file] = explode('|', $function);
 			}
@@ -138,7 +138,7 @@ final class Hooks
 			}
 
 			// OOP static method
-			if (strpos($call, '::') !== false)
+			if (str_contains($call, '::'))
 			{
 				$call = explode('::', $call);
 			}

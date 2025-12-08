@@ -361,7 +361,7 @@ class Templates
 					$e->getFile(),
 					[
 						BOARDDIR => '',
-						strtr(BOARDDIR, '\\', '/') => '',
+						str_replace('\\', '/', BOARDDIR) => '',
 					]
 				),
 				$boardurl,
@@ -375,7 +375,7 @@ class Templates
 				$error,
 				[
 					'<strong>' . BOARDDIR => '<strong>...',
-					'<strong>' . strtr(BOARDDIR, '\\', '/') => '<strong>...',
+					'<strong>' . str_replace('\\', '/', BOARDDIR) => '<strong>...',
 				]
 			)), '</span></div>';
 

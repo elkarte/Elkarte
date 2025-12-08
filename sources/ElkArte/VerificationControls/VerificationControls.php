@@ -128,7 +128,7 @@ class VerificationControls
 
 		foreach ($glob as $file)
 		{
-			if (strpos($file->getBasename('.php'), 'Interface') === false)
+			if (!str_contains($file->getBasename('.php'), 'Interface'))
 			{
 				$foundControls[] = $file->getBasename('.php');
 			}

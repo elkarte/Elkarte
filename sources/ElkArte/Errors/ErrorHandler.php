@@ -296,7 +296,7 @@ MSG;
 			if ($this->error_level % 255 !== E_ERROR)
 			{
 				$temporary = ob_get_contents();
-				if (substr($temporary, -2) === '="')
+				if (str_ends_with($temporary, '="'))
 				{
 					echo '"';
 				}

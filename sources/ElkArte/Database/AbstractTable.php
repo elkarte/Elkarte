@@ -151,7 +151,7 @@ abstract class AbstractTable
 		$table_query .= $this->_create_query_indexes($indexes, $table_name);
 
 		// No trailing commas!
-		if (substr($table_query, -1) === ',')
+		if (str_ends_with($table_query, ','))
 		{
 			$table_query = substr($table_query, 0, -1);
 		}

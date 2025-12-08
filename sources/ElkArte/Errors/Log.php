@@ -132,7 +132,7 @@ class Log extends AbstractModel
 					'html_time' => htmlTime($row['log_time']),
 					'timestamp' => forum_time(true, $row['log_time']),
 					'url' => [
-						'html' => htmlspecialchars((substr($row['url'], 0, 1) === '?' ? $scripturl : '') . $row['url'], ENT_COMPAT, 'UTF-8'),
+						'html' => htmlspecialchars((str_starts_with($row['url'], '?') ? $scripturl : '') . $row['url'], ENT_COMPAT, 'UTF-8'),
 						'href' => base64_encode($this->_db->escape_wildcard_string($row['url'])),
 					],
 					'message' => [

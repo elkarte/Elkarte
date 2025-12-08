@@ -158,8 +158,6 @@ class About extends AbstractController
 	 */
 	public function action_coppa(): void
 	{
-		global $context, $modSettings, $txt;
-
 		Txt::load('Login');
 		theme()->getTemplates()->load('About');
 

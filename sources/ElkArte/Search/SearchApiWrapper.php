@@ -179,6 +179,9 @@ class SearchApiWrapper
 	/**
 	 * Wrapper for prepareWord of the SearchAPI
 	 *
+	 * @param string $phrase
+	 * @param bool $no_regexp
+	 *
 	 * @return string
 	 */
 	public function prepareWord($phrase, $no_regexp): string

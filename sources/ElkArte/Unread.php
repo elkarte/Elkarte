@@ -350,8 +350,8 @@ class Unread
 			SELECT 
 				t.id_topic, ' . $this->_sort_query . '
 			FROM {db_prefix}topics AS t
-				INNER JOIN {db_prefix}messages AS m ON (m.id_topic = t.id_topic AND m.id_member = {int:current_member})' . (strpos($this->_sort_query, 'ms.') === false ? '' : '
-				INNER JOIN {db_prefix}messages AS ms ON (ms.id_msg = t.id_first_msg)') . (strpos($this->_sort_query, 'mems.') === false ? '' : '
+				INNER JOIN {db_prefix}messages AS m ON (m.id_topic = t.id_topic AND m.id_member = {int:current_member})' . (!str_contains($this->_sort_query, 'ms.') ? '' : '
+				INNER JOIN {db_prefix}messages AS ms ON (ms.id_msg = t.id_first_msg)') . (!str_contains($this->_sort_query, 'mems.') ? '' : '
 				LEFT JOIN {db_prefix}members AS mems ON (mems.id_member = ms.id_member)') . '
 				LEFT JOIN {db_prefix}log_topics AS lt ON (lt.id_topic = t.id_topic AND lt.id_member = {int:current_member})
 				LEFT JOIN {db_prefix}log_mark_read AS lmr ON (lmr.id_board = t.id_board AND lmr.id_member = {int:current_member})

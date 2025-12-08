@@ -86,7 +86,7 @@ class Help extends AbstractController
 		Txt::load('Help');
 
 		// Load permission specific help
-		if (substr($help_str, 0, 14) === 'permissionhelp')
+		if (str_starts_with($help_str, 'permissionhelp'))
 		{
 			Txt::load('ManagePermissions');
 		}

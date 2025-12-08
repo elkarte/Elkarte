@@ -1522,6 +1522,11 @@ class ManageThemes extends AbstractController
 				$minmax_preferences = [];
 			}
 
+			if (!is_array($minmax_preferences))
+			{
+				$minmax_preferences = [];
+			}
+
 			// New value for them
 			if (isset($this->_req->query->minmax_key) && strlen($this->_req->query->minmax_key) < 10)
 			{

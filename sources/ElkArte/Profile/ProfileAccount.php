@@ -201,7 +201,7 @@ class ProfileAccount extends AbstractController
 		foreach ($notification_templates as $row)
 		{
 			// If we're not warning for a message skip any that are.
-			if ($warning_for_message === false && strpos($row['body'], '{MESSAGE}') !== false)
+			if ($warning_for_message === false && str_contains($row['body'], '{MESSAGE}'))
 			{
 				continue;
 			}

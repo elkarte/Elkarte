@@ -139,8 +139,8 @@ class Query extends AbstractQuery
 	protected function initialChecks($db_string, $db_values, $identifier = '')
 	{
 		// Use "ORDER BY null" to prevent Mysql doing filesorts for Group By clauses without an Order By
-		if (strpos($db_string, 'GROUP BY') !== false
-			&& strpos($db_string, 'ORDER BY') === false
+		if (str_contains($db_string, 'GROUP BY')
+			&& !str_contains($db_string, 'ORDER BY')
 			&& preg_match('~^\s+SELECT~i', $db_string))
 		{
 			if (($pos = strpos($db_string, 'LIMIT ')) !== false)
@@ -370,9 +370,9 @@ class Query extends AbstractQuery
 		global $txt;
 
 		if ($query_errno === self::ERR_TABLE_HANDLER &&
-			(strpos($query_error, ' -1 ') !== false
-				|| strpos($query_error, ' 28 ') !== false
-				|| strpos($query_error, ' 12 ') !== false))
+			(str_contains($query_error, ' -1 ')
+				|| str_contains($query_error, ' 28 ')
+				|| str_contains($query_error, ' 12 ')))
 		{
 			if (!isset($txt))
 			{
@@ -402,7 +402,7 @@ class Query extends AbstractQuery
 	 */
 	private function getTablesToRepair($db_string, $query_errno, $query_error)
 	{
-		if ($query_errno === self::ERR_TABLE_HANDLER && strpos($query_error, ' 127 ') !== false)
+		if ($query_errno === self::ERR_TABLE_HANDLER && str_contains($query_error, ' 127 '))
 		{
 			preg_match_all('~(?:[\n\r]|^)[^\']+?(?:FROM|JOIN|UPDATE|TABLE) ((?:[^\n\r(]+?(?:, )?)*)~', $db_string, $matches);
 

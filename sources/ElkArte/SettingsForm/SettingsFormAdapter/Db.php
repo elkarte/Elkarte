@@ -209,7 +209,7 @@ class Db extends Adapter
 			if (!is_numeric($k))
 			{
 				// Any on events like onchange, onclick, onfocus ....
-				if (strpos($k, 'on') === 0)
+				if (str_starts_with($k, 'on'))
 				{
 					$this->context[$configVar[1]]['javascript'] .= ' ' . $k . '="' . $v . '"';
 				}

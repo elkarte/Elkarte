@@ -308,7 +308,7 @@ class FsockFetchWebdata
 			}
 
 			// Process single header at a time instead of concatenating
-			if (strpos($header, ':') !== false)
+			if (str_contains($header, ':'))
 			{
 				[$name, $value] = explode(':', $header, 2);
 				$name = strtolower(trim($name));

@@ -39,7 +39,7 @@ class Karma extends AbstractController
 	 * Default entry point, in case action methods are not directly
 	 * called. Simply forward to applaud.
 	 *
-	 * @see \ElkArte\AbstractController::action_index()
+	 * @see AbstractController::action_index
 	 */
 	public function action_index()
 	{

@@ -131,7 +131,7 @@ class Payment implements PaymentInterface
 		}
 
 		// Is this a subscription - and if so is it a secondary payment that we need to process?
-		if ($this->isSubscription() && (empty($_POST['item_number']) || strpos($_POST['item_number'], '+') === false))
+		if ($this->isSubscription() && (empty($_POST['item_number']) || !str_contains($_POST['item_number'], '+')))
 		{
 			// Calculate the subscription it relates to!
 			$this->_findSubscription();
@@ -263,7 +263,7 @@ class Payment implements PaymentInterface
 	 */
 	public function isSubscription()
 	{
-		return (strpos($_POST['txn_type'], 'subscr_payment') === 0 && $_POST['payment_status'] === 'Completed');
+		return (str_starts_with($_POST['txn_type'], 'subscr_payment') && $_POST['payment_status'] === 'Completed');
 	}
 
 	/**
@@ -364,7 +364,7 @@ class Payment implements PaymentInterface
 		//
 		// subscr_eot: This IPN response (txn_type) is sent ONLY when the subscription ends naturally/expires
 		//
-		return (substr($_POST['txn_type'], 0, 13) === 'subscr_cancel' || substr($_POST['txn_type'], 0, 10) === 'subscr_eot');
+		return (str_starts_with($_POST['txn_type'], 'subscr_cancel') || str_starts_with($_POST['txn_type'], 'subscr_eot'));
 	}
 
 	/**

@@ -232,7 +232,7 @@ class ProfileInfo extends AbstractController
 		$context['member']['id'] = $this->_memID;
 
 		// Is the signature even enabled on this forum?
-		$context['signature_enabled'] = strpos($modSettings['signature_settings'], "1") === 0;
+		$context['signature_enabled'] = str_starts_with($modSettings['signature_settings'], "1");
 	}
 
 	/**

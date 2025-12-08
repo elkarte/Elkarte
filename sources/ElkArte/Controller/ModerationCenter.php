@@ -1290,7 +1290,7 @@ class ModerationCenter extends AbstractController
 		];
 
 		// Setup the allowed quick search type
-		$context['order'] = isset($this->_req->query->sort) && isset($searchTypes[$this->_req->query->sort]) ? $this->_req->query->sort : 'member';
+		$context['order'] = isset($this->_req->query->sort, $searchTypes[$this->_req->query->sort]) ? $this->_req->query->sort : 'member';
 
 		if (!isset($search_params['string']) || (!empty($this->_req->post->search) && $search_params['string'] !== $this->_req->post->search))
 		{
@@ -1878,7 +1878,7 @@ class ModerationCenter extends AbstractController
 		global $context, $txt;
 
 		// Are we saving a note?
-		if (isset($this->_req->post->makenote) && isset($this->_req->post->new_note))
+		if (isset($this->_req->post->makenote, $this->_req->post->new_note))
 		{
 			checkSession();
 
@@ -1921,7 +1921,7 @@ class ModerationCenter extends AbstractController
 		$moderator_notes_total = countModeratorNotes();
 
 		// Grab the current notes. We can only use the cache for the first page of notes.
-		$offset = isset($this->_req->query->notes) && isset($this->_req->query->start) ? $this->_req->query->start : 0;
+		$offset = isset($this->_req->query->notes, $this->_req->query->start) ? $this->_req->query->start : 0;
 		$moderator_notes = moderatorNotes($offset);
 
 		// Lets construct a page index.

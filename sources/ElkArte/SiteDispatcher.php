@@ -518,7 +518,7 @@ class SiteDispatcher
 		if (!empty($this->_controller_name))
 		{
 			$action = strtolower(ltrim(strrchr($this->_controller_name, "\\"), "\\"));
-			$action = substr($action, -1) === "2" ? substr($action, 0, -1) : $action;
+			$action = str_ends_with($action, "2") ? substr($action, 0, -1) : $action;
 		}
 
 		return $action ?? $this->action;

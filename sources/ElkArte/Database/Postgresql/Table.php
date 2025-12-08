@@ -183,7 +183,7 @@ class Table extends AbstractTable
 			if (!$column_info['null'])
 			{
 				// We have to set it to something if we are making it NOT NULL. And we must comply with the current column format.
-				$setTo = $column_info['default'] ?? (strpos($old_info['type'], 'int') !== false ? 0 : '');
+				$setTo = $column_info['default'] ?? (str_contains($old_info['type'], 'int') ? 0 : '');
 				$this->_db->query('', '
 					UPDATE ' . $table_name . '
 					SET ' . $column_info['name'] . " = '" . $setTo . '\'
@@ -302,7 +302,7 @@ class Table extends AbstractTable
 		}
 
 		// Numbers don't have a size.
-		if (strpos($type_name, 'int') !== false)
+		if (str_contains($type_name, 'int'))
 		{
 			$type_size = null;
 		}
@@ -358,7 +358,7 @@ class Table extends AbstractTable
 		// MySQL supports a length argument, postgre no
 		foreach ($index_info['columns'] as $id => $col)
 		{
-			if (strpos($col, '(') !== false)
+			if (str_contains($col, '('))
 			{
 				$index_info['columns'][$id] = substr($col, 0, strpos($col, '('));
 			}
@@ -466,7 +466,7 @@ class Table extends AbstractTable
 			}
 
 			// Fix up the name to be consistent cross databases
-			if (substr($row['name'], -5) === '_pkey' && (int) $row['is_primary'] === 1)
+			if (str_ends_with($row['name'], '_pkey') && (int) $row['is_primary'] === 1)
 			{
 				$row['name'] = 'PRIMARY';
 			}
@@ -588,7 +588,7 @@ class Table extends AbstractTable
 				}
 				elseif (trim($row['column_default']) !== '')
 				{
-					$default = strpos($row['column_default'], '::') === false ? $row['column_default'] : substr($row['column_default'], 0, strpos($row['column_default'], '::'));
+					$default = !str_contains($row['column_default'], '::') ? $row['column_default'] : substr($row['column_default'], 0, strpos($row['column_default'], '::'));
 				}
 				else
 				{
@@ -715,7 +715,7 @@ class Table extends AbstractTable
 		// MySQL supports a length argument, postgre no
 		foreach ($columns as $id => $col)
 		{
-			if (strpos($col, '(') !== false)
+			if (str_contains($col, '('))
 			{
 				$columns[$id] = substr($col, 0, strpos($col, '('));
 			}

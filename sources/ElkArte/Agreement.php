@@ -114,6 +114,7 @@ class Agreement
 	 * then it may return the english version.
 	 *
 	 * @param bool $fallback if fallback to the English version (default true).
+	 * @param string|null $language the language of the agreement we want.
 	 *
 	 * @return string
 	 */

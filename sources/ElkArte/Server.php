@@ -23,7 +23,7 @@ namespace ElkArte;
  */
 class Server extends \ArrayObject
 {
-	/** @var array */
+	/** @var string|null */
 	public $SERVER_SOFTWARE;
 
 	/** @var array */
@@ -147,12 +147,12 @@ class Server extends \ArrayObject
 		return match ($server)
 		{
 			'apache' => $this->_is_web_server('Apache'),
-			'cgi' => $this->SERVER_SOFTWARE !== null && strpos(PHP_SAPI, 'cgi') !== false,
+			'cgi' => $this->SERVER_SOFTWARE !== null && str_contains(PHP_SAPI, 'cgi'),
 			'iis' => $this->_is_web_server('Microsoft-IIS'),
 			'lighttpd' => $this->_is_web_server('lighttpd'),
 			'litespeed' => $this->_is_web_server('LiteSpeed'),
 			'nginx' => $this->_is_web_server('nginx'),
-			'windows' => strpos(PHP_OS_FAMILY, 'WIN') === 0,
+			'windows' => str_starts_with(PHP_OS_FAMILY, 'WIN'),
 			default => false,
 		};
 	}
@@ -166,7 +166,7 @@ class Server extends \ArrayObject
 	 */
 	private function _is_web_server($type): bool
 	{
-		return $this->SERVER_SOFTWARE !== null && strpos($this->SERVER_SOFTWARE, $type) !== false;
+		return $this->SERVER_SOFTWARE !== null && str_contains($this->SERVER_SOFTWARE, $type);
 	}
 
 	/**
@@ -279,7 +279,7 @@ class Server extends \ArrayObject
 		if (!empty($this->SERVER_ADDR) && $fallback === '[127.0.0.1]')
 		{
 			// Set the address literal prefix
-			$prefix = strpos($this->SERVER_ADDR, ':') !== false ? 'IPv6:' : '';
+			$prefix = str_contains($this->SERVER_ADDR, ':') ? 'IPv6:' : '';
 
 			return '[' . $prefix . $this->SERVER_ADDR . ']';
 		}
@@ -295,7 +295,7 @@ class Server extends \ArrayObject
 	 */
 	private function _isValidFQDN($hostname): bool
 	{
-		if (empty($hostname) || strpos($hostname, '.') === false)
+		if (empty($hostname) || !str_contains($hostname, '.'))
 		{
 			return false;
 		}

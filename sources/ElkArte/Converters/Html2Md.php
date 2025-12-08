@@ -452,7 +452,7 @@ class Html2Md extends AbstractDomParser
 		if (!empty($ticks))
 		{
 			// If the ticks were at the start/end of the word space it off
-			if ($lines[0][0] === '`' || substr($lines[0], -1) === '`')
+			if ($lines[0][0] === '`' || str_ends_with($lines[0], '`'))
 			{
 				$lines[0] = ' ' . $lines[0] . ' ';
 			}
@@ -583,7 +583,7 @@ class Html2Md extends AbstractDomParser
 			if (!empty($ticks))
 			{
 				// If the ticks were at the start/end of the word space it off
-				if ($value[0] === '`' || substr($value[0], -1) === '`')
+				if ($value[0] === '`' || str_ends_with($value[0], '`'))
 				{
 					$value = ' ' . $value . ' ';
 				}
@@ -862,6 +862,9 @@ class Html2Md extends AbstractDomParser
 
 	/**
 	 * Helper function to find and wrap plain text links in MD format
+	 *
+	 * @param string $text
+	 * @param object $node
 	 *
 	 * @return string
 	 */

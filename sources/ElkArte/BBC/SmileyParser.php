@@ -217,7 +217,7 @@ class SmileyParser
 			$specialChars = htmlspecialchars($smileysFrom_i, ENT_QUOTES);
 
 			// If an :emoji: tag, from smiles ACP, does not have an img file, leave it for emoji parsing
-			$possibleEmoji = isset($smileysFrom_i[3]) && $smileysFrom_i[0] === ':' && substr($smileysFrom_i, -1, 1) === ':';
+			$possibleEmoji = isset($smileysFrom_i[3]) && $smileysFrom_i[0] === ':' && str_ends_with($smileysFrom_i, ':');
 			$filename = $this->dir . $smileysTo[$i] . '.' . $GLOBALS['context']['smiley_extension'];
 			if (!$possibleEmoji || $fileFunc->fileExists($filename))
 			{

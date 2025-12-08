@@ -114,7 +114,7 @@ class Emoji extends AbstractModel
 	private function _protectCodeBlocks($string): string
 	{
 		// Quick sniff, was that you? I thought so !
-		if (strpos($string, ':') === false
+		if (!str_contains($string, ':')
 			&& !preg_match(self::POSSIBLE_EMOJI, $string))
 		{
 			return $string;
@@ -127,6 +127,7 @@ class Emoji extends AbstractModel
 	/**
 	 * Replace any code tokens with the saved blocks
 	 *
+	 * @param string $string
 	 * @return string
 	 */
 	private function _restoreCodeBlocks($string): string
@@ -201,7 +202,7 @@ class Emoji extends AbstractModel
 		}
 
 		// Does it end in -fe0f / Variation Selector-16? Libraries differ in its use or not.
-		if (substr($hex, -5) !== '-fe0f')
+		if (!str_ends_with($hex, '-fe0f'))
 		{
 			return false;
 		}
@@ -371,7 +372,7 @@ class Emoji extends AbstractModel
 				$this->shortcode_replace[$name] = $key;
 
 				// Multipoint sequences use a unique, per key, regex to avoid collisions
-				if (strpos($key, '-') !== false)
+				if (str_contains($key, '-'))
 				{
 					$emoji_regex[] = '\x{' . implode('}\x{', explode('-', $key)) . '}';
 				}

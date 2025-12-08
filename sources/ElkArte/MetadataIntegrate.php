@@ -413,7 +413,7 @@ class MetadataIntegrate
 			$sitename = un_htmlspecialchars($mbname);
 
 			// Avoid if possible a description like sitename - Index
-			if (isset($context['page_title']) && strpos($context['page_title'], (string) $sitename) === 0)
+			if (isset($context['page_title']) && str_starts_with($context['page_title'], (string) $sitename))
 			{
 				$description = $settings['site_slogan'] ?? $context['page_title'];
 			}
