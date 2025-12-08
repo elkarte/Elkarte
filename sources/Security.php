@@ -819,13 +819,14 @@ function checkSession($type = 'post', $from_action = '', $is_fatal = true)
 	{
 		$referrer_url = $_SESSION['request_referer'] ?? ($_SERVER['HTTP_REFERER'] ?? '');
 		$ref_host = iri_host_ascii($referrer_url);
-		$real_host = iri_host_ascii((str_contains($_SERVER['HTTP_HOST'], ':'))
-			? substr($_SERVER['HTTP_HOST'], 0, strpos($_SERVER['HTTP_HOST'], ':'))
-			: $_SERVER['HTTP_HOST']);
 		$board_host = iri_host_ascii($boardurl);
 
 		if ($ref_host !== '')
 		{
+			$real_host = iri_host_ascii((str_contains($_SERVER['HTTP_HOST'], ':'))
+				? substr($_SERVER['HTTP_HOST'], 0, strpos($_SERVER['HTTP_HOST'], ':'))
+				: $_SERVER['HTTP_HOST']);
+
 			// If global cookies are on, trim to superdomain AFTER IDNA normalization.
 			if (!empty($modSettings['globalCookies']))
 			{
