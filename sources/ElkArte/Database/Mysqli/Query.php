@@ -11,7 +11,7 @@
  * copyright: 2011 Simple Machines (http://www.simplemachines.org)
  * copyright:    2004-2011, GreyWyvern - All rights reserved.
  *
- * @version 2.0 dev
+ * @version 2.0 Beta 1
  *
  */
 

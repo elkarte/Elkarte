@@ -8,7 +8,7 @@
  * This file contains code covered by:
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  *
- * @version 2.0 dev
+ * @version 2.0 Beta 1
  */
 
 use ElkArte\User;
@@ -39,7 +39,7 @@ template_ssi_above();
 ?>
 
 	<h2>SSI.php Functions</h2>
-	<p><strong>Current Version:</strong> 2.0 dev</p>
+	<p><strong>Current Version:</strong> 2.0 Beta 1</p>
 	<p>This file is used to demonstrate the capabilities of SSI.php using PHP include functions. The examples show the include tag, then the results of it.</p>
 
 	<h2>Include Code</h2>

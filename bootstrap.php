@@ -10,7 +10,7 @@
  * This file contains code covered by:
  * copyright: 2011 Simple Machines (http://www.simplemachines.org)
  *
- * @version 2.0 dev
+ * @version 2.0 Beta 1
  */
 
 use BBC\ParserWrapper;
@@ -105,10 +105,10 @@ class Bootstrap
 		define('ELKBOOT', '1');
 
 		// The software version
-		define('FORUM_VERSION', 'ElkArte 2.0 dev');
+		define('FORUM_VERSION', 'ElkArte 2.0 Beta 1');
 
 		// Shortcut for the browser cache stale
-		define('CACHE_STALE', '?20dev');
+		define('CACHE_STALE', '?R20B1');
 	}
 
 	/**

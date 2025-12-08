@@ -5,7 +5,7 @@
 # Command example:
 #  bash release_tools/build.sh development 2.0 beta
 #
-# @version 2.0 dev
+# @version 2.0 Beta 1
 
 # First things first: check dependencies
 command -v git >/dev/null 2>&1 || { echo >&2 "git is required but it's not installed.  Aborting."; exit 1; }
