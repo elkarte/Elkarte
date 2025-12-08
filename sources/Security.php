@@ -103,17 +103,10 @@ function validateSession($type = 'admin')
 	require_once(SUBSDIR . '/Auth.subs.php');
 
 	// Coming from the login screen
-	if (isset($_POST[$type . '_pass']) || isset($_POST[$type . '_hash_pass']))
+	if (isset($_POST[$type . '_pass']))
 	{
 		checkSession();
 		validateToken('admin-login');
-
-		// Hashed password, ahoy!
-		if (isset($_POST[$type . '_hash_pass']) && strlen($_POST[$type . '_hash_pass']) === 64
-			&& checkPassword($type, true))
-		{
-			return true;
-		}
 
 		// Posting the password... check it.
 		if (isset($_POST[$type . '_pass']) && str_replace('*', '', $_POST[$type . '_pass']) !== '' && checkPassword($type))
@@ -151,19 +144,18 @@ function validateSession($type = 'admin')
  *
  * @event integrate_verify_password allows integration to verify the password
  * @param string $type
- * @param bool $hash if the supplied password is in _hash_pass
  *
  * @return bool
  */
-function checkPassword($type, $hash = false)
+function checkPassword($type)
 {
-	$password = $_POST[$type . ($hash ? '_hash_pass' : '_pass')];
+	$password = $_POST[$type . '_pass'];
 
 	// Allow integration to verify the password
-	$good_password = in_array(true, call_integration_hook('integrate_verify_password', [User::$info->username, $password, $hash]), true);
+	$good_password = in_array(true, call_integration_hook('integrate_verify_password', [User::$info->username, $password]), true);
 
 	// Password correct?
-	if ($good_password || validateLoginPassword($password, User::$info->passwd, $hash ? '' : User::$info->username))
+	if ($good_password || validateLoginPassword($password, User::$info->passwd, User::$info->username))
 	{
 		$_SESSION[$type . '_time'] = time();
 		unset($_SESSION['request_referer']);
