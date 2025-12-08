@@ -1280,7 +1280,6 @@ class Maintenance extends AbstractController
 	 * Generates a list of integration hooks for display
 	 *
 	 * - Accessed through ?action=admin;area=maintain;sa=hooks;
-	 * - Allows for removal or disabling of selected hooks
 	 */
 	public function action_hooks(): void
 	{
