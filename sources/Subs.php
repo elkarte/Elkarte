@@ -2247,6 +2247,59 @@ function expandIPv6($addr, $strict_check = true)
 }
 
 /**
+ * Extracts and normalizes the host of a URL to ASCII (Punycode) for reliable comparisons.
+ * Returns "" if a host can’t be determined.
+ */
+function iri_host_ascii($url)
+{
+	if ($url === '')
+	{
+		return '';
+	}
+
+	// First attempt: normal parse
+	$host = parse_url($url, PHP_URL_HOST);
+
+	// If parse_url failed and the URL contains Unicode, try to salvage the authority
+	if ($host === null || $host === false || $host === '')
+	{
+		if (preg_match('~^[a-z][a-z0-9+.-]*://([^/?#]+)~iu', $url, $m))
+		{
+			$host = $m[1];
+		}
+	}
+
+	if ($host === null || $host === false || $host === '')
+	{
+		return '';
+	}
+
+	// Strip userinfo and port if present before IDNA
+	// e.g. user:pass@exämple.com:8080 -> exämple.com
+	if (str_contains($host, '@'))
+	{
+		$host = substr($host, strrpos($host, '@') + 1);
+	}
+
+	if (str_contains($host, ':'))
+	{
+		$host = substr($host, 0, strpos($host, ':'));
+	}
+
+	// Convert Unicode hostname to ASCII using UTS#46 (browser-compatible)
+	if (function_exists('idn_to_ascii'))
+	{
+		$ascii = idn_to_ascii($host, IDNA_DEFAULT, defined('INTL_IDNA_VARIANT_UTS46') ? INTL_IDNA_VARIANT_UTS46 : 0);
+		if ($ascii !== false && $ascii !== null)
+		{
+			$host = $ascii;
+		}
+	}
+
+	return strtolower($host);
+}
+
+/**
  * Removed in 2.0, always returns false.
  *
  * Logs the depreciation notice, returns false, sets context value such that

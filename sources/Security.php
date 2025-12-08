@@ -822,46 +822,35 @@ function checkSession($type = 'post', $from_action = '', $is_fatal = true)
 	// Make sure a page with session check requirement is not being prefetched.
 	stop_prefetching();
 
+	// If you have not already failed, Check the referring site - it should be the same server at least!
 	if (!isset($error))
 	{
-		// Check the referring site - it should be the same server at least!
 		$referrer_url = $_SESSION['request_referer'] ?? ($_SERVER['HTTP_REFERER'] ?? '');
+		$ref_host = iri_host_ascii($referrer_url);
+		$real_host = iri_host_ascii((str_contains($_SERVER['HTTP_HOST'], ':'))
+			? substr($_SERVER['HTTP_HOST'], 0, strpos($_SERVER['HTTP_HOST'], ':'))
+			: $_SERVER['HTTP_HOST']);
+		$board_host = iri_host_ascii($boardurl);
 
-		$referrer = @parse_url($referrer_url);
-		if (!empty($referrer['host']))
+		if ($ref_host !== '')
 		{
-			if (str_contains($_SERVER['HTTP_HOST'], ':'))
-			{
-				$real_host = substr($_SERVER['HTTP_HOST'], 0, strpos($_SERVER['HTTP_HOST'], ':'));
-			}
-			else
-			{
-				$real_host = $_SERVER['HTTP_HOST'];
-			}
-
-			$parsed_url = parse_url($boardurl);
-
-			// Are global cookies on? If so, let's check them ;).
+			// If global cookies are on, trim to superdomain AFTER IDNA normalization.
 			if (!empty($modSettings['globalCookies']))
 			{
-				if (preg_match('~(?:[^\.]+\.)?([^\.]{3,}\..+)\z~i', $parsed_url['host'], $parts) == 1)
-				{
-					$parsed_url['host'] = $parts[1];
-				}
+				$trim = static function (string $h): string {
+					if (preg_match('~(?:[^.]+\.)?([^.]{3,}\..+)\z~i', $h, $parts) === 1)
+					{
+						return $parts[1];
+					}
 
-				if (preg_match('~(?:[^\.]+\.)?([^\.]{3,}\..+)\z~i', $referrer['host'], $parts) == 1)
-				{
-					$referrer['host'] = $parts[1];
-				}
-
-				if (preg_match('~(?:[^\.]+\.)?([^\.]{3,}\..+)\z~i', $real_host, $parts) == 1)
-				{
-					$real_host = $parts[1];
-				}
+					return $h;
+				};
+				$board_host = $trim($board_host);
+				$ref_host = $trim($ref_host);
+				$real_host = $trim($real_host);
 			}
 
-			// Okay: referrer must either match parsed_url or real_host.
-			if (isset($parsed_url['host']) && strtolower($referrer['host']) !== strtolower($parsed_url['host']) && strtolower($referrer['host']) !== strtolower($real_host))
+			if ($ref_host !== $board_host && $ref_host !== $real_host)
 			{
 				$error = 'verify_url_fail';
 				$log_error = true;
