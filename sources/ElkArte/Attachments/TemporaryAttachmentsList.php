@@ -56,7 +56,7 @@ class TemporaryAttachmentsList extends ValuesContainer
 
 		foreach ($this->data as $attachID => $attachment)
 		{
-			if (strpos($attachID, (string) $prefix) !== false)
+			if (str_contains($attachID, (string) $prefix))
 			{
 				$path = $attachment['tmp_name'] ?? '';
 				if ($path !== '')
@@ -162,7 +162,7 @@ class TemporaryAttachmentsList extends ValuesContainer
 		/** @var TemporaryAttachment $attachment */
 		foreach ($this->data as $attachID => $attachment)
 		{
-			if (strpos($attachID, (string) $prefix) === false)
+			if (!str_contains($attachID, (string) $prefix))
 			{
 				continue;
 			}
@@ -192,7 +192,7 @@ class TemporaryAttachmentsList extends ValuesContainer
 		{
 			if ((isset($this->data['post']['files'], $attachment['name']) && in_array($attachment['name'], $this->data['post']['files'], true))
 				|| in_array($attachID, $keep)
-				|| strpos($attachID, (string) $prefix) === false)
+				|| !str_contains($attachID, (string) $prefix))
 			{
 				continue;
 			}
@@ -215,7 +215,7 @@ class TemporaryAttachmentsList extends ValuesContainer
 
 		foreach ($this->data as $attachID => $attachment)
 		{
-			if (strpos($attachID, (string) $prefix) !== false)
+			if (str_contains($attachID, (string) $prefix))
 			{
 				$this->data['post']['files'][] = $attachment->getName();
 			}
@@ -363,7 +363,7 @@ class TemporaryAttachmentsList extends ValuesContainer
 		$id_attach = preg_replace('~[^0-9a-zA-Z_]~', '', $attach_real_id);
 
 		// Permissions: only temporary attachments
-		if (substr($id_attach, 0, 8) !== 'post_tmp')
+		if (!str_starts_with($id_attach, 'post_tmp'))
 		{
 			throw new Exception('no_access');
 		}

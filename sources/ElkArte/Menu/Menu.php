@@ -578,10 +578,21 @@ class Menu
 	 */
 	private function setAreaUrl($sectionId, $areaId, $area)
 	{
-		$area->setUrl(
-			$this->menuContext['sections'][$sectionId]['areas'][$areaId]['url'] =
-				($area->getUrl() ?: $this->menuContext['base_url'] . ';area=' . $areaId) . $this->menuContext['extra_parameters']
-		);
+		if ($this->menuContext['current_action'] === 'profile')
+		{
+			// Profile area must run through the UrlGenerator
+			$area->setUrl(
+				$this->menuContext['sections'][$sectionId]['areas'][$areaId]['url'] =
+					($area->getUrl() ?: getUrl('profile', ['area' => $areaId]) . $this->menuContext['extra_parameters'])
+			);
+		}
+		else
+		{
+			$area->setUrl(
+				$this->menuContext['sections'][$sectionId]['areas'][$areaId]['url'] =
+					($area->getUrl() ?: $this->menuContext['base_url'] . ';area=' . $areaId) . $this->menuContext['extra_parameters']
+			);
+		}
 	}
 
 	/**
@@ -666,10 +677,21 @@ class Menu
 	 */
 	private function setSubsSectionUrl($sectionId, $areaId, $subId, $sub)
 	{
-		$sub->setUrl(
-			$this->menuContext['sections'][$sectionId]['areas'][$areaId]['subsections'][$subId]['url'] =
-				$sub->getUrl() ?: $this->menuContext['base_url'] . ';area=' . $areaId . ';sa=' . $subId . $this->menuContext['extra_parameters']
-		);
+		if ($this->menuContext['current_action'] === 'profile')
+		{
+			// Profile area must run through the UrlGenerator
+			$sub->setUrl(
+				$this->menuContext['sections'][$sectionId]['areas'][$areaId]['subsections'][$subId]['url'] =
+					($sub->getUrl() ?: getUrl('profile', ['area' => $areaId, 'sa' => $subId]) . $this->menuContext['extra_parameters'])
+			);
+		}
+		else
+		{
+			$sub->setUrl(
+				$this->menuContext['sections'][$sectionId]['areas'][$areaId]['subsections'][$subId]['url'] =
+					$sub->getUrl() ?: $this->menuContext['base_url'] . ';area=' . $areaId . ';sa=' . $subId . $this->menuContext['extra_parameters']
+			);
+		}
 	}
 
 	/**

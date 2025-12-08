@@ -256,7 +256,6 @@ function template_admin_login()
 				<input type="submit" value="', $txt['login'], '" />
 				<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
 				<input type="hidden" name="', $context['admin-login_token_var'], '" value="', $context['admin-login_token'], '" />
-				<input type="hidden" name="', $context['sessionCheckType'], '_hash_pass" value="" />
 			</div>';
 
 	// Make sure to output all the old post data.

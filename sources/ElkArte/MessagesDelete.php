@@ -18,7 +18,6 @@
 namespace ElkArte;
 
 use ElkArte\Exceptions\Exception;
-use ElkArte\Helper\ValuesContainer;
 
 /**
  * Class MessagesDelete
@@ -27,7 +26,7 @@ use ElkArte\Helper\ValuesContainer;
  */
 class MessagesDelete
 {
-	/** @var ValuesContainer The current user deleting something */
+	/** @var User The current user deleting something */
 	protected $user;
 
 	/** @var int[] Id of the messages not found. */
@@ -54,7 +53,7 @@ class MessagesDelete
 	}
 
 	/**
-	 * Restores a bunch of messages the recycle bin to the appropriate board.
+	 * Restores a bunch of messages in the recycle bin to the appropriate board.
 	 * If any "first message" is within the array, it is added to the list of
 	 * topics to restore (see MessagesDelete::restoreTopics)
 	 *
@@ -147,7 +146,6 @@ class MessagesDelete
 		// Load any previous topics to check they exist.
 		if (!empty($previous_topics))
 		{
-			$previous_topics = [];
 			$db->fetchQuery('
 				SELECT 
 					t.id_topic, t.id_board, m.subject
@@ -185,13 +183,16 @@ class MessagesDelete
 
 				// Log em.
 				logAction('restore_posts', ['topic' => $topic, 'subject' => $previous_topics[$topic]['subject'], 'board' => empty($data['previous_board']) ? $data['possible_prev_board'] : $data['previous_board']]);
-				$messages = array_merge(array_keys($data['msgs']), $messages);
+				foreach (array_keys($data['msgs']) as $m)
+				{
+					$messages[] = $m;
+				}
 			}
 			else
 			{
-				foreach ($data['msgs'] as $msg)
+				foreach ($data['msgs'] as $id => $subject)
 				{
-					$this->_unfound_messages[$msg['id']] = $msg['subject'];
+					$this->_unfound_messages[$id] = $subject;
 				}
 			}
 		}

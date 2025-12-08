@@ -34,8 +34,12 @@
 	    "ext-exif": "*",
 	    "michelf/php-markdown": "2.*",
         "ext-libxml": "*",
-        "ext-dom": "*",
-        "ext-imagick": "*"
+        "ext-dom": "*"
+    },
+    "soft-require": {
+    	"ext-intl": "*",
+    	"ext-iconv": "*",
+    	"ext-imagick": "*"
     },
 	"suggest": {
 		"ext-memcache": "*",
@@ -46,8 +50,7 @@
 		"ext-pgsql": "*",
 		"ext-imap": "*",
 		"ext-zend-opcache": "*",
-		"ext-mbstring": "*",
-		"ext-iconv": "*"
+		"ext-mbstring": "*"
     },
 	"require-dev": {
         "roave/security-advisories": "dev-latest",

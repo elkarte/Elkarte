@@ -214,17 +214,12 @@ function adminLogin($type = 'admin'): never
 	$type = in_array($type, $types) || $type === 'moderate' ? $type : 'admin';
 
 	// They used a wrong password, log it and unset that.
-	if (isset($_POST[$type . '_hash_pass']) || isset($_POST[$type . '_pass']))
+	if (isset($_POST[$type . '_pass']))
 	{
 		// log some info along with it! referer, user agent
 		$req = Request::instance();
 		$txt['security_wrong'] = sprintf($txt['security_wrong'], $_SERVER['HTTP_REFERER'] ?? $txt['unknown'], $req->user_agent(), User::$info->ip);
 		\ElkArte\Errors\Errors::instance()->log_error($txt['security_wrong'], 'critical');
-
-		if (isset($_POST[$type . '_hash_pass']))
-		{
-			unset($_POST[$type . '_hash_pass']);
-		}
 
 		if (isset($_POST[$type . '_pass']))
 		{

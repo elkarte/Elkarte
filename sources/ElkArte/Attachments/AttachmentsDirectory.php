@@ -227,7 +227,7 @@ class AttachmentsDirectory
 		$expected_dirs = 0;
 		foreach ($this->getPaths() as $sub)
 		{
-			if (strpos($sub, $dir . DIRECTORY_SEPARATOR) !== false)
+			if (str_contains($sub, $dir . DIRECTORY_SEPARATOR))
 			{
 				$expected_dirs++;
 			}
@@ -315,14 +315,14 @@ class AttachmentsDirectory
 				$use_subdirectories = 0;
 				foreach ($this->attachmentUploadDir as $base)
 				{
-					if (strpos($this->attachmentUploadDir[$dir_id], $base . DIRECTORY_SEPARATOR) !== false)
+					if (str_contains($this->attachmentUploadDir[$dir_id], $base . DIRECTORY_SEPARATOR))
 					{
 						$use_subdirectories = 1;
 						break;
 					}
 				}
 
-				if ($use_subdirectories == 0 && strpos($this->attachmentUploadDir[$dir_id], BOARDDIR . DIRECTORY_SEPARATOR) !== false)
+				if ($use_subdirectories == 0 && str_contains($this->attachmentUploadDir[$dir_id], BOARDDIR . DIRECTORY_SEPARATOR))
 				{
 					$bid = 0;
 				}
@@ -544,7 +544,7 @@ class AttachmentsDirectory
 		}
 		else
 		{
-			if (substr($this->attachmentUploadDir[1], 0, strlen(BOARDDIR)) != BOARDDIR)
+			if (!str_starts_with($this->attachmentUploadDir[1], BOARDDIR))
 			{
 				unset($file_tree[strtr(BOARDDIR, ['\\' => '/'])]['contents']['attachments']);
 			}
@@ -887,7 +887,7 @@ class AttachmentsDirectory
 			// Count any sub-folders.
 			foreach ($this->attachmentUploadDir as $sub)
 			{
-				if (strpos($sub, $real_path . DIRECTORY_SEPARATOR) !== false)
+				if (str_contains($sub, $real_path . DIRECTORY_SEPARATOR))
 				{
 					$num_attach++;
 				}

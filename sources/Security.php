@@ -103,17 +103,10 @@ function validateSession($type = 'admin')
 	require_once(SUBSDIR . '/Auth.subs.php');
 
 	// Coming from the login screen
-	if (isset($_POST[$type . '_pass']) || isset($_POST[$type . '_hash_pass']))
+	if (isset($_POST[$type . '_pass']))
 	{
 		checkSession();
 		validateToken('admin-login');
-
-		// Hashed password, ahoy!
-		if (isset($_POST[$type . '_hash_pass']) && strlen($_POST[$type . '_hash_pass']) === 64
-			&& checkPassword($type, true))
-		{
-			return true;
-		}
 
 		// Posting the password... check it.
 		if (isset($_POST[$type . '_pass']) && str_replace('*', '', $_POST[$type . '_pass']) !== '' && checkPassword($type))
@@ -151,19 +144,18 @@ function validateSession($type = 'admin')
  *
  * @event integrate_verify_password allows integration to verify the password
  * @param string $type
- * @param bool $hash if the supplied password is in _hash_pass
  *
  * @return bool
  */
-function checkPassword($type, $hash = false)
+function checkPassword($type)
 {
-	$password = $_POST[$type . ($hash ? '_hash_pass' : '_pass')];
+	$password = $_POST[$type . '_pass'];
 
 	// Allow integration to verify the password
-	$good_password = in_array(true, call_integration_hook('integrate_verify_password', [User::$info->username, $password, $hash]), true);
+	$good_password = in_array(true, call_integration_hook('integrate_verify_password', [User::$info->username, $password]), true);
 
 	// Password correct?
-	if ($good_password || validateLoginPassword($password, User::$info->passwd, $hash ? '' : User::$info->username))
+	if ($good_password || validateLoginPassword($password, User::$info->passwd, User::$info->username))
 	{
 		$_SESSION[$type . '_time'] = time();
 		unset($_SESSION['request_referer']);
@@ -822,54 +814,46 @@ function checkSession($type = 'post', $from_action = '', $is_fatal = true)
 	// Make sure a page with session check requirement is not being prefetched.
 	stop_prefetching();
 
-	// Check the referring site - it should be the same server at least!
-
-	$referrer_url = $_SESSION['request_referer'] ?? ($_SERVER['HTTP_REFERER'] ?? '');
-
-	$referrer = @parse_url($referrer_url);
-	if (!empty($referrer['host']))
+	// If you have not already failed, Check the referring site - it should be the same server at least!
+	if (!isset($error))
 	{
-		if (str_contains($_SERVER['HTTP_HOST'], ':'))
-		{
-			$real_host = substr($_SERVER['HTTP_HOST'], 0, strpos($_SERVER['HTTP_HOST'], ':'));
-		}
-		else
-		{
-			$real_host = $_SERVER['HTTP_HOST'];
-		}
+		$referrer_url = $_SESSION['request_referer'] ?? ($_SERVER['HTTP_REFERER'] ?? '');
+		$ref_host = iri_host_ascii($referrer_url);
+		$board_host = iri_host_ascii($boardurl);
 
-		$parsed_url = parse_url($boardurl);
-
-		// Are global cookies on? If so, let's check them ;).
-		if (!empty($modSettings['globalCookies']))
+		if ($ref_host !== '')
 		{
-			if (preg_match('~(?:[^\.]+\.)?([^\.]{3,}\..+)\z~i', $parsed_url['host'], $parts) == 1)
+			$real_host = iri_host_ascii((str_contains($_SERVER['HTTP_HOST'], ':'))
+				? substr($_SERVER['HTTP_HOST'], 0, strpos($_SERVER['HTTP_HOST'], ':'))
+				: $_SERVER['HTTP_HOST']);
+
+			// If global cookies are on, trim to superdomain AFTER IDNA normalization.
+			if (!empty($modSettings['globalCookies']))
 			{
-				$parsed_url['host'] = $parts[1];
+				$trim = static function (string $h): string {
+					if (preg_match('~(?:[^.]+\.)?([^.]{3,}\..+)\z~i', $h, $parts) === 1)
+					{
+						return $parts[1];
+					}
+
+					return $h;
+				};
+				$board_host = $trim($board_host);
+				$ref_host = $trim($ref_host);
+				$real_host = $trim($real_host);
 			}
 
-			if (preg_match('~(?:[^\.]+\.)?([^\.]{3,}\..+)\z~i', $referrer['host'], $parts) == 1)
+			if ($ref_host !== $board_host && $ref_host !== $real_host)
 			{
-				$referrer['host'] = $parts[1];
+				$error = 'verify_url_fail';
+				$log_error = true;
+				$sprintf = [Util::htmlspecialchars($referrer_url)];
 			}
-
-			if (preg_match('~(?:[^\.]+\.)?([^\.]{3,}\..+)\z~i', $real_host, $parts) == 1)
-			{
-				$real_host = $parts[1];
-			}
-		}
-
-		// Okay: referrer must either match parsed_url or real_host.
-		if (isset($parsed_url['host']) && strtolower($referrer['host']) !== strtolower($parsed_url['host']) && strtolower($referrer['host']) !== strtolower($real_host))
-		{
-			$error = 'verify_url_fail';
-			$log_error = true;
-			$sprintf = [Util::htmlspecialchars($referrer_url)];
 		}
 	}
 
 	// Well, first of all, if a from_action is specified you'd better have an old_url.
-	if (!empty($from_action) && (!isset($_SESSION['old_url']) || preg_match('~[?;&]action=' . $from_action . '([;&]|$)~', $_SESSION['old_url']) !== 1))
+	if (!isset($error) && !empty($from_action) && (!isset($_SESSION['old_url']) || preg_match('~[?;&]action=' . $from_action . '([;&]|$)~', $_SESSION['old_url']) !== 1))
 	{
 		$error = 'verify_url_fail';
 		$log_error = true;

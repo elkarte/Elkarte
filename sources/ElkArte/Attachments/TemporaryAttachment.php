@@ -581,7 +581,7 @@ class TemporaryAttachment extends ValuesContainer
 
 		// Want to correct for phone rotated photos, hell yeah ya do!
 		if (!empty($modSettings['attachment_autorotate'])
-			&& $this->hasErrors() === false && strpos($this->data['type'], 'image') === 0)
+			&& $this->hasErrors() === false && str_starts_with($this->data['type'], 'image'))
 		{
 			$image = new Image($this->data['tmp_name']);
 			if ($image->isImageLoaded() && $image->autoRotate())

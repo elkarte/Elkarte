@@ -1007,7 +1007,7 @@ function UserStatsPostingTime($memID)
 		$hours[$hour]++;
 	}
 	$result->free_result();
-	$maxPosts = max($hours);
+	$maxPosts = empty($hours) ? 0 : max($hours);
 	$totalPosts = array_sum($hours);
 
 	foreach ($hours as $hour => $num)

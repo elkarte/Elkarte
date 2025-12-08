@@ -92,7 +92,7 @@ class Apc extends AbstractCacheMethod
 		 */
 		if ($this->is_miss)
 		{
-			return;
+			return null;
 		}
 
 		return $result;
