@@ -302,7 +302,7 @@ class ManageServer extends AbstractController
 				unset($this->_req->post->globalCookies);
 			}
 
-			if (!empty($this->_req->post->globalCookiesDomain) && strpos($boardurl, (string) $this->_req->post->globalCookiesDomain) === false)
+			if (!empty($this->_req->post->globalCookiesDomain) && !str_contains($boardurl, (string) $this->_req->post->globalCookiesDomain))
 			{
 				throw new Exception('invalid_cookie_domain', false);
 			}
@@ -538,7 +538,7 @@ class ManageServer extends AbstractController
 			// Stupidity is not allowed.
 			foreach ($this->_req->post as $key => $value)
 			{
-				if (strpos($key, 'loadavg') === 0 || $key === 'loadavg_enable')
+				if (str_starts_with($key, 'loadavg') || $key === 'loadavg_enable')
 				{
 					continue;
 				}
@@ -583,7 +583,7 @@ class ManageServer extends AbstractController
 		$context['settings_message'] = $txt['loadavg_disabled_conf'];
 
 		// Don't say you're using that win-thing, no cookies for you :P
-		if (strpos(PHP_OS_FAMILY, 'Win') === 0)
+		if (str_starts_with(PHP_OS_FAMILY, 'Win'))
 		{
 			$context['settings_message'] = $txt['loadavg_disabled_windows'];
 		}
@@ -668,7 +668,7 @@ class ManageServer extends AbstractController
 			}
 
 			// New category?
-			if (strpos($line, '<h2>') !== false)
+			if (str_contains($line, '<h2>'))
 			{
 				$category = preg_match('~<h2>(.*)</h2>~', $line, $title) ? $title[1] : $category;
 			}

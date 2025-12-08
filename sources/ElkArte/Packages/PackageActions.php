@@ -471,7 +471,7 @@ class PackageActions extends AbstractController
 	private function _get_filename($mod_action, $key): void
 	{
 		// Lets get the last section of the file name.
-		if (isset($mod_action['filename']) && substr($mod_action['filename'], -13) !== '.template.php')
+		if (isset($mod_action['filename']) && !str_ends_with($mod_action['filename'], '.template.php'))
 		{
 			$this->_actual_filename = strtolower(substr(strrchr($mod_action['filename'], '/'), 1) . '||' . $this->_action['filename']);
 		}

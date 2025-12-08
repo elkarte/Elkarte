@@ -14,6 +14,7 @@
 namespace ElkArte\Mail;
 
 use ElkArte\Converters\Html2Md;
+use ElkArte\Exceptions\Exception;
 
 class BuildMail extends BaseMail
 {
@@ -306,7 +307,7 @@ class BuildMail extends BaseMail
 		{
 			// Standard ElkArte headers
 			$this->headers[] = 'From: ' . $from_name . ' <' . (empty($modSettings['maillist_mail_from']) ? $webmaster_email : $modSettings['maillist_mail_from']) . '>';
-			if ($from !== null && strpos($from, '@') !== false)
+			if ($from !== null && str_contains($from, '@'))
 			{
 				$this->headers[] = 'Reply-To: <' . $from . '>';
 			}
@@ -509,6 +510,8 @@ class BuildMail extends BaseMail
 	 * including WebKit, IE, MS Word, Blink plus clients will add their own styles "to help"
 	 * - In general, use tables over divs, CSS2, HTML4, HTML attributes instead of CSS, go old school
 	 *
+	 * @param string $message
+	 * @param string $subject
 	 * @return string
 	 */
 	public function getEmailWrapper($message, $subject): string

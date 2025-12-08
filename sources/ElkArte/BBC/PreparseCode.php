@@ -171,13 +171,13 @@ class PreparseCode
 	private function _trimTrailingQuotes(): void
 	{
 		// Trim off trailing quotes - these often happen by accident.
-		while (substr($this->message, -7) === '[quote]')
+		while (str_ends_with($this->message, '[quote]'))
 		{
 			$this->message = trim(substr($this->message, 0, -7));
 		}
 
 		// Trim off leading ones as well
-		while (substr($this->message, 0, 8) === '[/quote]')
+		while (str_starts_with($this->message, '[/quote]'))
 		{
 			$this->message = trim(substr($this->message, 8));
 		}
@@ -280,6 +280,7 @@ class PreparseCode
 	 * Protects code / icode blocks from preparse by replacing them with %%token%% values
 	 *
 	 * @param string $message
+	 * @param bool $html = false
 	 * @return string
 	 */
 	public function tokenizeCodeBlocks($message, $html = false): string
@@ -440,15 +441,15 @@ class PreparseCode
 			// Http url checking?
 			if (!$found && $protocols[0] === 'http')
 			{
-				if (substr($replace, 0, 1) === '/' && substr($replace, 0, 2) !== '//')
+				if (str_starts_with($replace, '/') && !str_starts_with($replace, '//'))
 				{
 					$replace = $domain_url . $replace;
 				}
-				elseif (substr($replace, 0, 1) === '?')
+				elseif (str_starts_with($replace, '?'))
 				{
 					$replace = $scripturl . $replace;
 				}
-				elseif (substr($replace, 0, 1) === '#' && $embeddedUrl)
+				elseif (str_starts_with($replace, '#') && $embeddedUrl)
 				{
 					$replace = '#' . preg_replace('~[^A-Za-z0-9_\-#]~', '', substr($replace, 1));
 					$this_tag = 'iurl';

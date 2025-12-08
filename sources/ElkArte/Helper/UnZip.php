@@ -320,7 +320,7 @@ class UnZip
 			$this->_file_info['data'] = substr($this->data, $this->_file_info['relative_offset']);
 
 			// Validate we are at a local file header '\x50\x4b\x03\x04'
-			if (strpos($this->_file_info['data'], "\x50\x4b\x03\x04") === 0)
+			if (str_starts_with($this->_file_info['data'], "\x50\x4b\x03\x04"))
 			{
 				$this->_read_local_header();
 			}
@@ -367,7 +367,7 @@ class UnZip
 			}
 
 			// Not a directory, add it to our results
-			if (substr($this->_filename, -1) !== '/')
+			if (!str_ends_with($this->_filename, '/'))
 			{
 				$this->return[] = [
 					'filename' => $this->_filename,
@@ -388,13 +388,13 @@ class UnZip
 	private function _determine_write_this(): void
 	{
 		// If this is a file, and it doesn't exist.... happy days!
-		if (substr($this->_filename, -1) !== '/'
+		if (!str_ends_with($this->_filename, '/')
 			&& !$this->fileFunc->fileExists($this->destination . '/' . $this->_filename))
 		{
 			$this->_write_this = true;
 		}
 		// If the file exists, we may not want to overwrite it.
-		elseif (substr($this->_filename, -1) !== '/')
+		elseif (!str_ends_with($this->_filename, '/'))
 		{
 			$this->_write_this = $this->overwrite;
 		}
@@ -486,7 +486,7 @@ class UnZip
 			$general_purpose = substr($this->_file_info['data'], 30 + $this->_file_info['filename_length'] + $this->_file_info['extra_field_length'] + $this->_file_info['compressed_size'], 16);
 
 			// The spec allows for an optional header in the general purpose record
-			if (strpos($general_purpose, "\x50\x4b\x07\x08") === 0)
+			if (str_starts_with($general_purpose, "\x50\x4b\x07\x08"))
 			{
 				$general_purpose = substr($general_purpose, 4);
 			}
@@ -511,7 +511,7 @@ class UnZip
 		$this->_found = false;
 
 		// A directory may need to be created
-		if ((strpos($this->_filename, '/') !== false && !$this->single_file)
+		if ((str_contains($this->_filename, '/') && !$this->single_file)
 			|| (!$this->single_file && !$this->fileFunc->isDir($this->_file_info['dir'])))
 		{
 			mktree($this->_file_info['dir']);

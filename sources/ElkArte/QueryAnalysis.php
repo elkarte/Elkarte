@@ -104,7 +104,7 @@ class QueryAnalysis
 	 */
 	protected function _is_select_query($query_data)
 	{
-		$is_select_query = substr(trim($query_data), 0, 6) == 'SELECT' || substr(trim($query_data), 0, 4) == 'WITH';
+		$is_select_query = str_starts_with(trim($query_data), 'SELECT') || str_starts_with(trim($query_data), 'WITH');
 		$this->_select = '';
 
 		if ($is_select_query)
@@ -127,7 +127,7 @@ class QueryAnalysis
 		{
 			foreach (['tmp_log_search_topics', 'tmp_log_search_messages'] as $tmp)
 			{
-				if (strpos($this->_select, $tmp) !== false)
+				if (str_contains($this->_select, $tmp))
 				{
 					$is_select_query = false;
 					break;

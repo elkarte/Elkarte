@@ -338,7 +338,7 @@ class ProfileFields
 					{
 						$value = $cur_profile['date_registered'];
 
-						return $txt['invalid_registration'] . ' ' . Util::strftime('%d %b %Y ' . (strpos(User::$info->time_format, '%H') !== false ? '%I:%M:%S %p' : '%H:%M:%S'), forum_time(false));
+						return $txt['invalid_registration'] . ' ' . Util::strftime('%d %b %Y ' . (str_contains(User::$info->time_format, '%H') ? '%I:%M:%S %p' : '%H:%M:%S'), forum_time(false));
 					}
 
 					// As long as it doesn't equal "N/A"...
@@ -748,7 +748,7 @@ class ProfileFields
 				'type' => 'callback',
 				'callback_func' => 'signature_modify',
 				'permission' => 'profile_extra',
-				'enabled' => strpos($modSettings['signature_settings'], (string) 1) === 0,
+				'enabled' => str_starts_with($modSettings['signature_settings'], (string) 1),
 				'preload' => 'profileLoadSignatureData',
 				'input_validate' => 'profileValidateSignature',
 			],

@@ -466,7 +466,7 @@ class ManagePaid extends AbstractController
 				$span = $this->_req->post->span_value . $this->_req->post->span_unit;
 
 				// Sort out the cost.
-				$cost = ['fixed' => sprintf('%01.2f', strtr($this->_req->post->cost, ',', '.'))];
+				$cost = ['fixed' => sprintf('%01.2f', str_replace(',', '.', $this->_req->post->cost))];
 
 				// There needs to be something.
 				if (empty($this->_req->post->span_value) || empty($this->_req->post->cost))
@@ -480,10 +480,10 @@ class ManagePaid extends AbstractController
 				$span = 'F';
 
 				$cost = [
-					'day' => sprintf('%01.2f', strtr($this->_req->post->cost_day, ',', '.')),
-					'week' => sprintf('%01.2f', strtr($this->_req->post->cost_week, ',', '.')),
-					'month' => sprintf('%01.2f', strtr($this->_req->post->cost_month, ',', '.')),
-					'year' => sprintf('%01.2f', strtr($this->_req->post->cost_year, ',', '.')),
+					'day' => sprintf('%01.2f', str_replace(',', '.', $this->_req->post->cost_day)),
+					'week' => sprintf('%01.2f', str_replace(',', '.', $this->_req->post->cost_week)),
+					'month' => sprintf('%01.2f', str_replace(',', '.', $this->_req->post->cost_month)),
+					'year' => sprintf('%01.2f', str_replace(',', '.', $this->_req->post->cost_year)),
 				];
 
 				if (empty($this->_req->post->cost_day) && empty($this->_req->post->cost_week) && empty($this->_req->post->cost_month) && empty($this->_req->post->cost_year))

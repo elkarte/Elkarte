@@ -442,7 +442,7 @@ class PersonalMessage extends AbstractController
 
 		// Set up some basic template stuff.
 		$context['from_or_to'] = $context['folder'] !== 'sent' ? 'from' : 'to';
-		$context['signature_enabled'] = strpos($modSettings['signature_settings'], '1') === 0;
+		$context['signature_enabled'] = str_starts_with($modSettings['signature_settings'], '1');
 		$context['disabled_fields'] = isset($modSettings['disabled_profile_fields']) ? array_flip(explode(',', $modSettings['disabled_profile_fields'])) : [];
 
 		// Set the template layers we need
@@ -1305,7 +1305,7 @@ class PersonalMessage extends AbstractController
 
 			// Make sure there's still some content left without the tags.
 			if (Util::htmltrim(strip_tags($bbc_parser->parsePM(Util::htmlspecialchars($message, ENT_QUOTES)), '<img>')) === ''
-				&& (!allowedTo('admin_forum') || strpos($message, '[html]') === false))
+				&& (!allowedTo('admin_forum') || !str_contains($message, '[html]')))
 			{
 				$post_errors->addError('no_message');
 			}
@@ -2388,7 +2388,7 @@ class PersonalMessage extends AbstractController
 		// Now we look for -test, etc
 		foreach ($wordArray as $index => $word)
 		{
-			if (strpos(trim($word), '-') === 0)
+			if (str_starts_with(trim($word), '-'))
 			{
 				if (($word = trim($word, "-_' ")) !== '' && !in_array($word, $blocklist_words))
 				{

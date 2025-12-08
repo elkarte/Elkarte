@@ -52,7 +52,7 @@ class RemoveTempAttachments implements ScheduledTaskInterface
 				$files = new \FilesystemIterator($attach_dir, \FilesystemIterator::SKIP_DOTS);
 				foreach ($files as $file)
 				{
-					if (strpos($file->getFilename(), 'post_tmp_') === false)
+					if (!str_contains($file->getFilename(), 'post_tmp_'))
 					{
 						continue;
 					}

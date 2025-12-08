@@ -303,7 +303,7 @@ class EmailFormat
 			}
 
 			// Long line in a sig ... but not a link then lets bail out might be a ps or something
-			if ($this->_found_sig && ($this->_body_array[$i]['length'] > $this->_sig_longline) && (substr($this->_body_array[$i]['content'], 0, 4) !== 'www.'))
+			if ($this->_found_sig && ($this->_body_array[$i]['length'] > $this->_sig_longline) && (!str_starts_with($this->_body_array[$i]['content'], 'www.')))
 			{
 				$this->_found_sig = false;
 			}
@@ -311,7 +311,7 @@ class EmailFormat
 			// Blank line, if its not two in a row and not the start of a bbc code then insert a newline
 			if ($this->_body_array[$i]['content'] === '')
 			{
-				if ((isset($this->_body_array[$i - 1])) && ($this->_body_array[$i - 1]['content'] !== "\n") && (substr($this->_body_array[$i - 1]['content'], 0, 1) !== '[') && ($this->_body_array[$i - 1]['length'] > $this->_maillist_short_line))
+				if ((isset($this->_body_array[$i - 1])) && ($this->_body_array[$i - 1]['content'] !== "\n") && (!str_starts_with($this->_body_array[$i - 1]['content'], '[')) && ($this->_body_array[$i - 1]['length'] > $this->_maillist_short_line))
 				{
 					$this->_body_array[$i]['content'] = "\n\n";
 				}
@@ -339,7 +339,7 @@ class EmailFormat
 				$this->_body_array[$i]['content'] = "\n" . $this->_body_array[$i]['content'];
 			}
 			// Previous line ended in a break already
-			elseif (isset($this->_body_array[$i - 1]['content']) && substr(trim($this->_body_array[$i - 1]['content']), -4) === '[br]')
+			elseif (isset($this->_body_array[$i - 1]['content']) && str_ends_with(trim($this->_body_array[$i - 1]['content']), '[br]'))
 			{
 				// Nothing to do then
 				$this->_body_array[$i]['content'] .= '';
@@ -356,7 +356,7 @@ class EmailFormat
 				{
 					// If the previous short line did not end in a period or it did and the next line does not start
 					// with a capital and passes para check then it wraps
-					if ((substr($this->_body_array[$i - 1]['content'], -1) !== '.') || (substr($this->_body_array[$i - 1]['content'], -1) === '.' && $para_check < $this->_para_check && ($this->_body_array[$i]['content'][0] !== strtoupper($this->_body_array[$i]['content'][0]))))
+					if ((!str_ends_with($this->_body_array[$i - 1]['content'], '.')) || (str_ends_with($this->_body_array[$i - 1]['content'], '.') && $para_check < $this->_para_check && ($this->_body_array[$i]['content'][0] !== strtoupper($this->_body_array[$i]['content'][0]))))
 					{
 						$this->_body_array[$i]['content'] .= '';
 					}

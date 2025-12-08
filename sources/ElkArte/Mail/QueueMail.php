@@ -94,7 +94,7 @@ class QueueMail
 			// Enable PBE processing if this is a maillist mailing
 			if (!empty($modSettings['maillist_enabled'])
 				&& $email['message_id'] !== null
-				&& strpos($email['headers'], 'List-Id:') !== false)
+				&& str_contains($email['headers'], 'List-Id:'))
 			{
 				$mail->mailList = true;
 			}

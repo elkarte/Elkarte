@@ -843,7 +843,7 @@ function addData(array $inc_data, int $custom_table = null)
 				'v' => empty($inc_data[$key]) ? $context['tables'][$table]['default_value'] : $inc_data[$key],
 			];
 			// Special "hack" the adding separators when doing data by column.
-			if (substr($key, 0, 5) === '#sep#')
+			if (str_starts_with($key, '#sep#'))
 			{
 				$data[$key]['separator'] = true;
 			}
@@ -858,7 +858,7 @@ function addData(array $inc_data, int $custom_table = null)
 				'v' => $value,
 			];
 
-			if (substr($key, 0, 5) === '#sep#')
+			if (str_starts_with($key, '#sep#'))
 			{
 				$data[$key]['separator'] = true;
 			}

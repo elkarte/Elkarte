@@ -468,7 +468,7 @@ class Notify extends AbstractController
 	 */
 	private function _unsubscribeToggle($member, $area, $extra): bool
 	{
-		global $user_info, $board, $topic;
+		global $board, $topic;
 
 		$baseAreas = ['topic', 'board', 'buddy', 'likemsg', 'mentionmem', 'quotedmem', 'rlikemsg'];
 

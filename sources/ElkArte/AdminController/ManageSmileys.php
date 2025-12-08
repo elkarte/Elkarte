@@ -1322,7 +1322,7 @@ class ManageSmileys extends AbstractController
 				$this->_req->query->icon = (int) $this->_req->query->icon;
 
 				// Do some preparation with the data... like check the icon exists *somewhere*
-				if (strpos($this->_req->post->icon_filename, '.png') !== false)
+				if (str_contains($this->_req->post->icon_filename, '.png'))
 				{
 					$this->_req->post->icon_filename = substr($this->_req->post->icon_filename, 0, -4);
 				}

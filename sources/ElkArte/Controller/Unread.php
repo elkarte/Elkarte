@@ -158,13 +158,15 @@ class Unread extends AbstractController
 		{
 			throw new Exception('loadavg_allunread_disabled', false);
 		}
-		elseif ($this->_action_unreadreplies
+
+		if ($this->_action_unreadreplies
 			&& !empty($modSettings['loadavg_unreadreplies'])
 			&& $modSettings['current_load'] >= $modSettings['loadavg_unreadreplies'])
 		{
 			throw new Exception('loadavg_unreadreplies_disabled', false);
 		}
-		elseif (!$context['showing_all_topics']
+
+		if (!$context['showing_all_topics']
 			&& $this->_action_unread && !empty($modSettings['loadavg_unread'])
 			&& $modSettings['current_load'] >= $modSettings['loadavg_unread'])
 		{
@@ -258,7 +260,7 @@ class Unread extends AbstractController
 		];
 
 		// The default is the most logical: newest first.
-		if (!isset($this->_req->query->sort) || !isset($sort_methods[$this->_req->query->sort]))
+		if (!isset($this->_req->query->sort, $sort_methods[$this->_req->query->sort]))
 		{
 			$context['sort_by'] = 'last_post';
 			$ascending = isset($this->_req->query->asc);

@@ -430,7 +430,7 @@ class FileFunctions
 		$directory = '';
 
 		// If on Windows servers the first part of the path is the drive (e.g. "C:")
-		if (strpos(PHP_OS_FAMILY, 'Win') === 0)
+		if (str_starts_with(PHP_OS_FAMILY, 'Win'))
 		{
 			// Better be sure that the first part of the path is actually a drive letter...
 			// ...even if, I should check this in the admin page...isn't it?

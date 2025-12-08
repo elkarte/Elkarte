@@ -535,7 +535,7 @@ class Avatars
 		$userPicPersonal = $this->req->getPost('userpicpersonal', 'trim', '');
 
 		return !empty($userPicPersonal)
-			&& strpos($userPicPersonal, 'http://') === 0
+			&& str_starts_with($userPicPersonal, 'http://')
 			&& strlen($userPicPersonal) > 7;
 	}
 
@@ -549,7 +549,7 @@ class Avatars
 		$userPicPersonal = $this->req->getPost('userpicpersonal', 'trim', '');
 
 		return !empty($userPicPersonal)
-			&& strpos($userPicPersonal, 'https://') === 0
+			&& str_starts_with($userPicPersonal, 'https://')
 			&& strlen($userPicPersonal) > 8;
 	}
 }

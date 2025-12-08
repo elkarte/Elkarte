@@ -160,7 +160,7 @@ class AdminLog extends AbstractController
 				$vals = [];
 				foreach ($config_vars as $index => $config_value)
 				{
-					if (!is_array($config_value) || $index === 'pruningOptions' || strpos($config_value[1], 'prune') !== 0)
+					if (!is_array($config_value) || $index === 'pruningOptions' || !str_starts_with($config_value[1], 'prune'))
 					{
 						continue;
 					}

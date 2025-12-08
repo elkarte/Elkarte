@@ -529,7 +529,7 @@ class News extends AbstractController
 				$data[] = [
 					'title' => $row['subject'],
 					'link' => $scripturl . '?topic=' . $row['id_topic'] . '.msg' . $row['id_msg'] . '#msg' . $row['id_msg'],
-					'description' => cdata_parse(strtr(un_htmlspecialchars($row['body']), '&', '&#x26;')),
+					'description' => cdata_parse(str_replace('&', '&#x26;', un_htmlspecialchars($row['body']))),
 					'author' => showEmailAddress($row['id_member']) ? $row['poster_email'] . ' (' . un_htmlspecialchars($row['poster_name']) . ')' : '<![CDATA[none@noreply.net (' . un_htmlspecialchars($row['poster_name']) . ')]]>',
 					'category' => cdata_parse($row['bname']),
 					'comments' => $scripturl . '?action=post;topic=' . $row['id_topic'] . '.0',
@@ -741,7 +741,7 @@ class News extends AbstractController
 				$data['email'] = $member['email'];
 			}
 
-			if (!empty($member['birth_date']) && strpos($member['birth_date'], '0000') !== 0)
+			if (!empty($member['birth_date']) && !str_starts_with($member['birth_date'], '0000'))
 			{
 				[$birth_year, $birth_month, $birth_day] = sscanf($member['birth_date'], '%d-%d-%d');
 				$datearray = getdate(forum_time());

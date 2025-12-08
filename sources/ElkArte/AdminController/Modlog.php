@@ -168,7 +168,7 @@ class Modlog extends AbstractController
 			// For the moment they can only search for ONE action!
 			foreach ($txt as $key => $text)
 			{
-				if (strpos($key, 'modlog_ac_') === 0 && preg_match('~' . $regex . '~i', $text))
+				if (str_starts_with($key, 'modlog_ac_') && preg_match('~' . $regex . '~i', $text))
 				{
 					$search_params['string'] = substr($key, 10);
 					break;

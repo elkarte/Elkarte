@@ -75,7 +75,7 @@ class AdminDebug extends AbstractController
 		{
 			$debug->toggleViewQueries();
 
-			if (strpos($_SESSION['old_url'], 'action=viewquery') !== false)
+			if (str_contains($_SESSION['old_url'], 'action=viewquery'))
 			{
 				redirectexit();
 			}

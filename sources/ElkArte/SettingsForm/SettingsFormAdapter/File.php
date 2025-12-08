@@ -155,11 +155,11 @@ class File extends Db
 		$settingsFile = trim(file_get_contents(BOARDDIR . '/Settings.php'));
 
 		// Break it up based on \r or \n, and then clean out extra characters.
-		if (strpos($settingsFile, "\n") !== false)
+		if (str_contains($settingsFile, "\n"))
 		{
 			$this->settingsArray = explode("\n", $settingsFile);
 		}
-		elseif (strpos($settingsFile, "\r") !== false)
+		elseif (str_contains($settingsFile, "\r"))
 		{
 			$this->settingsArray = explode("\r", $settingsFile);
 		}
@@ -259,11 +259,11 @@ class File extends Db
 	{
 		if (isset($this->configValues['boardurl']))
 		{
-			if (substr($this->configValues['boardurl'], -10) === '/index.php')
+			if (str_ends_with($this->configValues['boardurl'], '/index.php'))
 			{
 				$this->configValues['boardurl'] = substr($this->configValues['boardurl'], 0, -10);
 			}
-			elseif (substr($this->configValues['boardurl'], -1) === '/')
+			elseif (str_ends_with($this->configValues['boardurl'], '/'))
 			{
 				$this->configValues['boardurl'] = substr($this->configValues['boardurl'], 0, -1);
 			}
@@ -442,7 +442,7 @@ class File extends Db
 		for ($i = 0, $n = count($this->settingsArray); $i < $n; $i++)
 		{
 			// Don't trim or bother with it if it's not a variable.
-			if (substr($this->settingsArray[$i], 0, 1) !== '$')
+			if (!str_starts_with($this->settingsArray[$i], '$'))
 			{
 				continue;
 			}
@@ -463,7 +463,7 @@ class File extends Db
 			}
 
 			// End of the file ... maybe
-			if (strpos(trim($this->settingsArray[$i]), '?>') === 0)
+			if (str_starts_with(trim($this->settingsArray[$i]), '?>'))
 			{
 				$end = $i;
 			}

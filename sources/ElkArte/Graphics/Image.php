@@ -201,7 +201,7 @@ class Image
 	 */
 	protected function isWebAddress()
 	{
-		return strpos($this->_fileName, 'http://') === 0 || strpos($this->_fileName, 'https://') === 0;
+		return str_starts_with($this->_fileName, 'http://') || str_starts_with($this->_fileName, 'https://');
 	}
 
 	/**
@@ -239,7 +239,7 @@ class Image
 	 */
 	public function isImage()
 	{
-		return strpos($this->getMimeType(), 'image') === 0;
+		return str_starts_with($this->getMimeType(), 'image');
 	}
 
 	/**
@@ -474,6 +474,8 @@ class Image
 	 *  - 8 Bit (256 color) PNG's are not handled.
 	 *  - If png is flase, will instead check webp headers for transparency flag
 	 *  - If the alpha flag is set, will go pixel by pixel to validate true alpha pixels exist
+	 *
+	 * @param bool $png
 	 *
 	 * @return bool
 	 */

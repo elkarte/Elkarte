@@ -79,7 +79,7 @@ class Poll extends AbstractController
 				throw new Exception('guest_vote_disabled');
 			}
 			// Guest already voted?
-			if (!empty($_COOKIE['guest_poll_vote']) && preg_match('~^[0-9,;]+$~', $_COOKIE['guest_poll_vote']) && strpos($_COOKIE['guest_poll_vote'], ';' . $row['id_poll'] . ',') !== false)
+			if (!empty($_COOKIE['guest_poll_vote']) && preg_match('~^[0-9,;]+$~', $_COOKIE['guest_poll_vote']) && str_contains($_COOKIE['guest_poll_vote'], ';' . $row['id_poll'] . ','))
 			{
 				// ;id,timestamp,[vote,vote...]; etc
 				$guestinfo = explode(';', $_COOKIE['guest_poll_vote']);

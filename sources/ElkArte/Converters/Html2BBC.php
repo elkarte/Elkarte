@@ -343,7 +343,7 @@ class Html2BBC extends AbstractDomParser
 		}
 
 		// Maybe an email link
-		if (substr($href, 0, 7) === 'mailto:')
+		if (str_starts_with($href, 'mailto:'))
 		{
 			$href = $href !== 'mailto:' . ($modSettings['maillist_sitename_address'] ?? '') ? substr($href, 7) : '';
 
@@ -351,7 +351,7 @@ class Html2BBC extends AbstractDomParser
 		}
 
 		// FTP
-		if (strpos($href, 'ftp://') === 0)
+		if (str_starts_with($href, 'ftp://'))
 		{
 			return empty($value) ? '[ftp]' . $href . '[/ftp]' : '[ftp=' . $href . ']' . $value . '[/ftp]';
 		}
@@ -361,7 +361,7 @@ class Html2BBC extends AbstractDomParser
 		if (preg_match('~^https?://~i', $href) === 0 && is_array($parsedURL = parse_url($scripturl)) && isset($parsedURL['host']))
 		{
 			$baseURL = ($parsedURL['scheme'] ?? 'http') . '://' . $parsedURL['host'] . (empty($parsedURL['port']) ? '' : ':' . $parsedURL['port']);
-			if (substr($href, 0, 1) === '/')
+			if (str_starts_with($href, '/'))
 			{
 				$href = $baseURL . $href;
 			}
@@ -503,7 +503,7 @@ class Html2BBC extends AbstractDomParser
 			{
 				case 'font-family':
 					// Only get the first font if there's a list
-					if (strpos($styleValue, ',') !== false)
+					if (str_contains($styleValue, ','))
 					{
 						$styleValue = substr($styleValue, 0, strpos($styleValue, ','));
 					}
@@ -681,7 +681,7 @@ class Html2BBC extends AbstractDomParser
 		$size = '';
 
 		// First if this is an inline image, we don't support those, but will use any ALT found
-		if (strpos($src, 'cid:') === 0)
+		if (str_starts_with($src, 'cid:'))
 		{
 			return $alt;
 		}

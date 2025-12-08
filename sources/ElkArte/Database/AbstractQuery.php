@@ -141,7 +141,7 @@ abstract class AbstractQuery implements QueryInterface
 	public function quote($db_string, $db_values)
 	{
 		// Only bother if there's something to replace.
-		if (strpos($db_string, '{') !== false)
+		if (str_contains($db_string, '{'))
 		{
 			// This is needed by the callback function.
 			$this->_db_callback_values = $db_values;
@@ -643,7 +643,7 @@ abstract class AbstractQuery implements QueryInterface
 		foreach ($columns as $columnName => $type)
 		{
 			// Are we restricting the length?
-			if (strpos($type, 'string-') !== false)
+			if (str_contains($type, 'string-'))
 			{
 				$insertData .= sprintf('SUBSTRING({string:%1$s}, 1, ' . substr($type, 7) . '), ', $columnName);
 			}
@@ -957,12 +957,12 @@ abstract class AbstractQuery implements QueryInterface
 	{
 		global $modSettings;
 
-		if (empty($modSettings['disableQueryCheck']) && empty($db_values['security_override']) && strpos($db_string, "'") !== false)
+		if (empty($modSettings['disableQueryCheck']) && empty($db_values['security_override']) && str_contains($db_string, "'"))
 		{
 			$this->error_backtrace('Hacking attempt...', "Illegal character (') used in query...", true, __FILE__, __LINE__);
 		}
 
-		if (empty($db_values['security_override']) && (!empty($db_values) || strpos($db_string, '{db_prefix}') !== false))
+		if (empty($db_values['security_override']) && (!empty($db_values) || str_contains($db_string, '{db_prefix}')))
 		{
 			// Store these values for use in the callback function.
 			$this->_db_callback_values = $db_values;
@@ -1098,16 +1098,16 @@ abstract class AbstractQuery implements QueryInterface
 			$clean = strtolower(trim(preg_replace($this->allowed_comments['from'], $this->allowed_comments['to'], $clean)));
 
 			// Comments?  We don't use comments in our queries, we leave 'em outside!
-			if (strpos($clean, '/*') > 2 || strpos($clean, '--') !== false || strpos($clean, ';') !== false)
+			if (strpos($clean, '/*') > 2 || str_contains($clean, '--') || str_contains($clean, ';'))
 			{
 				$fail = true;
 			}
 			// Trying to change passwords, slow us down, or something?
-			elseif (strpos($clean, 'sleep') !== false && preg_match('~(^|[^a-z])sleep($|[^[_a-z])~', $clean) === 1)
+			elseif (str_contains($clean, 'sleep') && preg_match('~(^|[^a-z])sleep($|[^[_a-z])~', $clean) === 1)
 			{
 				$fail = true;
 			}
-			elseif (strpos($clean, 'benchmark') !== false && preg_match('~(^|[^a-z])benchmark($|[^[a-z])~', $clean) === 1)
+			elseif (str_contains($clean, 'benchmark') && preg_match('~(^|[^a-z])benchmark($|[^[a-z])~', $clean) === 1)
 			{
 				$fail = true;
 			}

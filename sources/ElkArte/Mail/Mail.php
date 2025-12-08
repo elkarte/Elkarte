@@ -292,7 +292,7 @@ class Mail extends BaseMail
 		if (!is_resource($socket))
 		{
 			// Maybe we can still save this?  The port might be wrong.
-			if ($smtp_port === 25 && strpos($smtp_host, 'ssl:') === 0)
+			if ($smtp_port === 25 && str_starts_with($smtp_host, 'ssl:'))
 			{
 				$socket = fsockopen($smtp_host, 465, $errno, $errstr, 3);
 				if (is_resource($socket))
@@ -357,7 +357,7 @@ class Mail extends BaseMail
 			return substr($server_response, 0, 3);
 		}
 
-		if (strpos($server_response, $response) !== 0)
+		if (!str_starts_with($server_response, $response))
 		{
 			Errors::instance()->log_error($txt['smtp_error'] . $server_response);
 

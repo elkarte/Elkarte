@@ -19,6 +19,7 @@ namespace ElkArte\Controller;
 
 use ElkArte\AbstractController;
 use ElkArte\CalendarEvent;
+use ElkArte\Errors\Errors;
 use ElkArte\EventManager;
 use ElkArte\Exceptions\Exception;
 use ElkArte\Helper\Util;
@@ -304,7 +305,7 @@ class Calendar extends AbstractController
 			catch (Exception $e)
 			{
 				// @todo This should really integrate into $post_errors.
-				$e->fatalLangError();
+				Errors::instance()->fatal_lang_error('calendar_post_error_' . $e->getMessage(), false);
 			}
 		}
 

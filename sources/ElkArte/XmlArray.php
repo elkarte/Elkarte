@@ -268,7 +268,7 @@ class XmlArray
 				if (!empty($inner_match))
 				{
 					// Parse the inner data.
-					if (strpos($inner_match, '<') !== false)
+					if (str_contains($inner_match, '<'))
 					{
 						$el += $this->_parse($inner_match);
 					}
@@ -419,13 +419,13 @@ class XmlArray
 		foreach ($path as $el)
 		{
 			// Deal with sets....
-			if (strpos($el, '[') !== false)
+			if (str_contains($el, '['))
 			{
 				$lvl = (int) substr($el, strpos($el, '[') + 1);
 				$el = substr($el, 0, strpos($el, '['));
 			}
 			// Find an attribute.
-			elseif (substr($el, 0, 1) === '@')
+			elseif (str_starts_with($el, '@'))
 			{
 				// It simplifies things if the attribute is already there ;).
 				if (isset($array[$el]))
@@ -459,7 +459,7 @@ class XmlArray
 		}
 
 		// Clean up after $lvl, for $return_full.
-		if ($return_full && (!isset($array['name']) || substr($array['name'], -1) !== ']'))
+		if ($return_full && (!isset($array['name']) || !str_ends_with($array['name'], ']')))
 		{
 			$array = ['name' => $el . '[]', $array];
 		}
@@ -585,7 +585,7 @@ class XmlArray
 			return $indentation . '<![CDATA[' . $array['value'] . ']]>';
 		}
 
-		if (substr($array['name'], -2) === '[]')
+		if (str_ends_with($array['name'], '[]'))
 		{
 			$array['name'] = substr($array['name'], 0, -2);
 		}
@@ -599,7 +599,7 @@ class XmlArray
 		// Run through and recursively output all the elements or attributes inside this.
 		foreach ($array as $k => $v)
 		{
-			if (substr($k, 0, 1) === '@')
+			if (str_starts_with($k, '@'))
 			{
 				$output .= ' ' . substr($k, 1) . '="' . $v . '"';
 			}
@@ -692,7 +692,7 @@ class XmlArray
 				$el = substr($el, 0, $el_strpos);
 			}
 			// Find an attribute.
-			elseif (substr($el, 0, 1) === '@')
+			elseif (str_starts_with($el, '@'))
 			{
 				return isset($array[$el]);
 			}

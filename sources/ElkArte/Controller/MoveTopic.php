@@ -282,7 +282,7 @@ class MoveTopic extends AbstractController
 	 * - If the member is the topic starter requires the move_own permission, otherwise the move_any permission.
 	 *
 	 * @return bool
-	 * @throws \ElkArte\Exceptions\Exception no_access
+	 * @throws Exception no_access
 	 */
 	private function _check_access_2(): bool
 	{

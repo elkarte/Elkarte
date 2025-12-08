@@ -207,7 +207,7 @@ class Dump extends AbstractDump
 
 		if ($new_table)
 		{
-			$limit = strpos($tableName, 'log_') !== false ? 500 : 250;
+			$limit = str_contains($tableName, 'log_') ? 500 : 250;
 			$start = 0;
 		}
 

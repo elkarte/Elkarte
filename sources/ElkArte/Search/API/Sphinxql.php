@@ -110,7 +110,13 @@ class Sphinxql extends AbstractAPI
 	}
 
 	/**
-	 * {@inheritDoc}
+	 * Wrapper for searchQuery of the SearchAPI
+	 *
+	 * @param string[] $search_words
+	 * @param string[] $excluded_words
+	 * @param bool[] $participants
+	 *
+	 * @return array
 	 */
 	public function searchQuery($search_words, $excluded_words, &$participants)
 	{
@@ -134,7 +140,7 @@ class Sphinxql extends AbstractAPI
 			// Nothing to search, return zero results
 			if (trim($where_match) === '')
 			{
-				return 0;
+				return [];
 			}
 
 			if ($this->_searchParams->subject_only)

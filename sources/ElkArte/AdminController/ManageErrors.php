@@ -318,7 +318,7 @@ class ManageErrors extends AbstractController
 					$context['filter']['value']['html'] = '<a href="' . getUrl('profile', ['action' => 'profile', 'u' => $id, 'name' => $name]) . '">' . $name . '</a>';
 					break;
 				case 'url':
-					$context['filter']['value']['html'] = "'" . strtr(htmlspecialchars((substr($filter['value']['sql'], 0, 1) === '?' ? $scripturl : '') . $filter['value']['sql'], ENT_COMPAT, 'UTF-8'), ['\_' => '_']) . "'";
+					$context['filter']['value']['html'] = "'" . strtr(htmlspecialchars((str_starts_with($filter['value']['sql'], '?') ? $scripturl : '') . $filter['value']['sql'], ENT_COMPAT, 'UTF-8'), ['\_' => '_']) . "'";
 					break;
 				case 'message':
 					$context['filter']['value']['html'] = "'" . strtr(htmlspecialchars($filter['value']['sql'], ENT_COMPAT, 'UTF-8'), ["\n" => '<br />', '&lt;br /&gt;' => '<br />', "\t" => '&nbsp;&nbsp;&nbsp;', '\_' => '_', '\\%' => '%', '\\\\' => '\\']) . "'";

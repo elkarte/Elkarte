@@ -146,7 +146,7 @@ final class Request
 			}
 
 			// If there are commas, get the last one (probably).
-			if (strpos($_SERVER[$IPheader], ',') !== false)
+			if (str_contains($_SERVER[$IPheader], ','))
 			{
 				$ips = array_reverse(explode(', ', $_SERVER[$IPheader]));
 
@@ -391,13 +391,13 @@ final class Request
 	private function _cleanArg($parser): void
 	{
 		// Are we going to need to parse the ; out?
-		if (!empty($this->_server_query_string) && strpos(ini_get('arg_separator.input'), ';') === false)
+		if (!empty($this->_server_query_string) && !str_contains(ini_get('arg_separator.input'), ';'))
 		{
 			// Get rid of the old one! You don't know where it's been!
 			$_GET = [];
 
 			// Was this redirected? If so, get the REDIRECT_QUERY_STRING, but do not urldecode() the querystring
-			$this->_server_query_string = strpos($this->_server_query_string, 'url=/') === 0 ? $_SERVER['REDIRECT_QUERY_STRING'] : $this->_server_query_string;
+			$this->_server_query_string = str_starts_with($this->_server_query_string, 'url=/') ? $_SERVER['REDIRECT_QUERY_STRING'] : $this->_server_query_string;
 			$this->_server_query_string = $parser->parse($this->_server_query_string);
 
 			// Replace ';' with '&' and '&something&' with '&something=&'.  (this is done for compatibility...)
@@ -406,12 +406,12 @@ final class Request
 			// reSet the global in case an addon grabs it
 			$_SERVER['SERVER_QUERY_STRING'] = $this->_server_query_string;
 		}
-		elseif (strpos(ini_get('arg_separator.input'), ';') !== false)
+		elseif (str_contains(ini_get('arg_separator.input'), ';'))
 		{
 			// Search engines will send action=profile%3Bu=1, which confuses PHP.
 			foreach ($_GET as $k => $v)
 			{
-				if ((string) $v === $v && strpos($k, ';') !== false)
+				if ((string) $v === $v && str_contains($k, ';'))
 				{
 					$temp = explode(';', $v);
 					$_GET[$k] = $temp[0];
@@ -427,7 +427,7 @@ final class Request
 				}
 
 				// This helps a lot with integration!
-				if (strpos($k, '?') === 0)
+				if (str_starts_with($k, '?'))
 				{
 					$_GET[substr($k, 1)] = $v;
 					unset($_GET[$k]);
@@ -453,9 +453,9 @@ final class Request
 			}
 
 			// Replace 'index.php/a,b,c/d/e,f' with 'a=b,c&d=&e=f' and parse it into $_GET.
-			if (strpos($request, basename($this->_scripturl) . '/') !== false)
+			if (str_contains($request, basename($this->_scripturl) . '/'))
 			{
-				parse_str(substr(preg_replace('/&(\w+)(?=&|$)/', '&$1=', strtr(preg_replace('~/([^,/]+),~', '/$1=', substr($request, strpos($request, basename($this->_scripturl)) + strlen(basename($this->_scripturl)))), '/', '&')), 1), $temp);
+				parse_str(substr(preg_replace('/&(\w+)(?=&|$)/', '&$1=', str_replace('/', '&', preg_replace('~/([^,/]+),~', '/$1=', substr($request, strpos($request, basename($this->_scripturl)) + strlen(basename($this->_scripturl)))))), 1), $temp);
 				$_GET += $temp;
 			}
 		}
@@ -513,12 +513,12 @@ final class Request
 			$_REQUEST['board'] = (string) $_REQUEST['board'];
 
 			// If we have ?board=3/10, that's... board=3, start=10! (old, compatible links.)
-			if (strpos($_REQUEST['board'], '/') !== false)
+			if (str_contains($_REQUEST['board'], '/'))
 			{
 				[$_REQUEST['board'], $_REQUEST['start']] = explode('/', $_REQUEST['board']);
 			}
 			// Or perhaps we have... ?board=1.0...
-			elseif (strpos($_REQUEST['board'], '.') !== false)
+			elseif (str_contains($_REQUEST['board'], '.'))
 			{
 				[$_REQUEST['board'], $_REQUEST['start']] = explode('.', $_REQUEST['board']);
 			}
@@ -556,12 +556,12 @@ final class Request
 			$_REQUEST['topic'] = (string) $_REQUEST['topic'];
 
 			// It might come as ?topic=1/15, from an old, SMF beta style link
-			if (strpos($_REQUEST['topic'], '/') !== false)
+			if (str_contains($_REQUEST['topic'], '/'))
 			{
 				[$_REQUEST['topic'], $_REQUEST['start']] = explode('/', $_REQUEST['topic']);
 			}
 			// Or it might come as ?topic=1.15.
-			elseif (strpos($_REQUEST['topic'], '.') !== false)
+			elseif (str_contains($_REQUEST['topic'], '.'))
 			{
 				[$_REQUEST['topic'], $_REQUEST['start']] = explode('.', $_REQUEST['topic']);
 			}

@@ -388,7 +388,7 @@ class IlaIntegrate
 	 */
 	public static function isPreview(&$data): bool
 	{
-		if (strpos($data, 'post_tmp_' . User::$info->id . '_') === false)
+		if (!str_contains($data, 'post_tmp_' . User::$info->id . '_'))
 		{
 			$data = (int) $data;
 			return false;

@@ -168,7 +168,7 @@ class FtpConnection
 		}
 
 		// No slash on the end, please...
-		if ($ftp_path !== '/' && substr($ftp_path, -1) === '/')
+		if ($ftp_path !== '/' && str_ends_with($ftp_path, '/'))
 		{
 			$ftp_path = substr($ftp_path, 0, -1);
 		}
@@ -409,7 +409,7 @@ class FtpConnection
 
 				$path = strtr($_SERVER['DOCUMENT_ROOT'], ['/home/' . $match[1] . '/' => '', '/home2/' . $match[1] . '/' => '']);
 
-				if (substr($path, -1) === '/')
+				if (str_ends_with($path, '/'))
 				{
 					$path = substr($path, 0, -1);
 				}
@@ -419,7 +419,7 @@ class FtpConnection
 					$path .= dirname($_SERVER['PHP_SELF']);
 				}
 			}
-			elseif (strpos($filesystem_path, '/var/www/') === 0)
+			elseif (str_starts_with($filesystem_path, '/var/www/'))
 			{
 				$path = substr($filesystem_path, 8);
 			}
@@ -551,7 +551,7 @@ class FtpConnection
 				return $listing[$i];
 			}
 
-			if (substr($file, -1) === '*' && substr($listing[$i], 0, strlen($file) - 1) === substr($file, 0, -1))
+			if (str_ends_with($file, '*') && str_starts_with($file, substr($listing[$i], 0, strlen($file) - 1)))
 			{
 				return $listing[$i];
 			}

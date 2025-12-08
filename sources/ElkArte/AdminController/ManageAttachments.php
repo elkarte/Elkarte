@@ -252,7 +252,7 @@ class ManageAttachments extends AbstractController
 			}
 
 			// Allow or not webp extensions.
-			if (!empty($this->_req->post->attachment_webp_enable) && strpos($this->_req->post->attachmentExtensions, 'webp') === false)
+			if (!empty($this->_req->post->attachment_webp_enable) && !str_contains($this->_req->post->attachmentExtensions, 'webp'))
 			{
 				$this->_req->post->attachmentExtensions .= ',webp';
 			}
@@ -1015,7 +1015,7 @@ class ManageAttachments extends AbstractController
 						if ($files_checked <= $current_check)
 						{
 							// Temporary file, get rid of it!
-							if (strpos($file->getFilename(), 'post_tmp_') !== false)
+							if (str_contains($file->getFilename(), 'post_tmp_'))
 							{
 								// Temp file is more than 5 hours old!
 								if ($file->getMTime() < time() - 18000)
@@ -1024,7 +1024,7 @@ class ManageAttachments extends AbstractController
 								}
 							}
 							// That should be an attachment, let's check if we have it in the database
-							elseif (strpos($file->getFilename(), '_') !== false)
+							elseif (str_contains($file->getFilename(), '_'))
 							{
 								$attachID = (int) substr($file->getFilename(), 0, strpos($file->getFilename(), '_'));
 								if ($attachID !== 0 && !validateAttachID($attachID))
@@ -1733,15 +1733,14 @@ class ManageAttachments extends AbstractController
 								$total_not_moved = 0;
 
 								$break = false;
-								break;
 							}
 							// Hmm, not in auto. Time to bail out then...
 							else
 							{
 								$results[] = $txt['attachment_transfer_no_room'];
 								$break = true;
-								break;
 							}
+							break;
 						}
 					}
 

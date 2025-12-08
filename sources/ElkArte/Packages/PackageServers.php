@@ -335,13 +335,13 @@ class PackageServers extends AbstractController
 			'license' => $thisPackage->license,
 			'hooks' => $thisPackage->allhooks,
 			'server' => [
-				'download' => (strpos($thisPackage->server[0]->download, 'http://') === 0 || strpos($thisPackage->server[0]->download, 'https://') === 0) && filter_var($thisPackage->server[0]->download, FILTER_VALIDATE_URL)
+				'download' => (str_starts_with($thisPackage->server[0]->download, 'http://') || str_starts_with($thisPackage->server[0]->download, 'https://')) && filter_var($thisPackage->server[0]->download, FILTER_VALIDATE_URL)
 					? $thisPackage->server[0]->download : '',
-				'support' => (strpos($thisPackage->server[0]->support, 'http://') === 0 || strpos($thisPackage->server[0]->support, 'https://') === 0) && filter_var($thisPackage->server[0]->support, FILTER_VALIDATE_URL)
+				'support' => (str_starts_with($thisPackage->server[0]->support, 'http://') || str_starts_with($thisPackage->server[0]->support, 'https://')) && filter_var($thisPackage->server[0]->support, FILTER_VALIDATE_URL)
 					? $thisPackage->server[0]->support : '',
-				'bugs' => (strpos($thisPackage->server[0]->bugs, 'http://') === 0 || strpos($thisPackage->server[0]->bugs, 'https://') === 0) && filter_var($thisPackage->server[0]->bugs, FILTER_VALIDATE_URL)
+				'bugs' => (str_starts_with($thisPackage->server[0]->bugs, 'http://') || str_starts_with($thisPackage->server[0]->bugs, 'https://')) && filter_var($thisPackage->server[0]->bugs, FILTER_VALIDATE_URL)
 					? $thisPackage->server[0]->bugs : '',
-				'link' => (strpos($thisPackage->server[0]->url, 'http://') === 0 || strpos($thisPackage->server[0]->url, 'https://') === 0) && filter_var($thisPackage->server[0]->url, FILTER_VALIDATE_URL)
+				'link' => (str_starts_with($thisPackage->server[0]->url, 'http://') || str_starts_with($thisPackage->server[0]->url, 'https://')) && filter_var($thisPackage->server[0]->url, FILTER_VALIDATE_URL)
 					? $thisPackage->server[0]->url : '',
 			],
 		];
@@ -791,7 +791,7 @@ class PackageServers extends AbstractController
 						if (!empty($thisPackage->elkversion) && isset($path_parts['extension']) && in_array($path_parts['extension'], ['zip', 'tar', 'gz', 'tar.gz']))
 						{
 							// No install range given, then set one, it will all work out in the end.
-							$for = strpos($thisPackage->elkversion, '-') === false ? $thisPackage->elkversion . '-' . $the_version : $thisPackage->elkversion;
+							$for = !str_contains($thisPackage->elkversion, '-') ? $thisPackage->elkversion . '-' . $the_version : $thisPackage->elkversion;
 							$package['can_install'] = matchPackageVersion($the_version, $for);
 						}
 					}

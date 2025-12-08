@@ -292,7 +292,7 @@ class ProfileHistory extends AbstractController
 		}
 
 		$ip_var = str_replace('*', '%', $context['ip']);
-		$ip_string = strpos($ip_var, '%') === false ? '= {string:ip_address}' : 'LIKE {string:ip_address}';
+		$ip_string = !str_contains($ip_var, '%') ? '= {string:ip_address}' : 'LIKE {string:ip_address}';
 
 		if (empty($context['history_area']))
 		{
@@ -480,7 +480,7 @@ class ProfileHistory extends AbstractController
 		// Create the error list.
 		createList($listOptions);
 
-		$context['single_ip'] = strpos($context['ip'], '*') === false;
+		$context['single_ip'] = !str_contains($context['ip'], '*');
 		if ($context['single_ip'])
 		{
 			$context['whois_servers'] = [

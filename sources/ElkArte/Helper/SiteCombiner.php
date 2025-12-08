@@ -217,7 +217,7 @@ class SiteCombiner
 			'basename' => $options['basename'],
 			'url' => $options['url'],
 			'filemtime' => filemtime($filename),
-			'minimized' => strpos($options['basename'], '.min.js') || strpos($options['basename'], '.min.css') !== false,
+			'minimized' => strpos($options['basename'], '.min.js') || str_contains($options['basename'], '.min.css'),
 		];
 
 		return true;
@@ -301,7 +301,7 @@ class SiteCombiner
 			}
 
 			$tempfile = trim(file_get_contents($file['file']));
-			$tempfile = (substr($tempfile, -3) === '}()') ? $tempfile . ';' : $tempfile;
+			$tempfile = (str_ends_with($tempfile, '}()')) ? $tempfile . ';' : $tempfile;
 			$this->_combine_files[$key]['content'] = $tempfile;
 
 			// CSS needs relative locations converted for the moved hive to work

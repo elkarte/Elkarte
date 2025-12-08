@@ -204,6 +204,8 @@ class Javascript
 	 * Inline JavaScript - Actually useful sometimes!
 	 *
 	 * @param bool $do_deferred if true outputs the inline JS that was marked as deferred.
+	 * @param int $tabs number of tabs to use for indentation
+	 *
 	 * @return void
 	 */
 	public function template_inline_javascript($do_deferred = false, $tabs = 3): void

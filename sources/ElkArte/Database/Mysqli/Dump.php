@@ -65,7 +65,7 @@ class Dump extends AbstractDump
 				{
 					// If this field is numeric the default needs no escaping.
 					$type = strtolower($row['Type']);
-					$isNumericColumn = strpos($type, 'int') !== false || strpos($type, 'bool') !== false || strpos($type, 'bit') !== false || strpos($type, 'float') !== false || strpos($type, 'double') !== false || strpos($type, 'decimal') !== false;
+					$isNumericColumn = str_contains($type, 'int') || str_contains($type, 'bool') || str_contains($type, 'bit') || str_contains($type, 'float') || str_contains($type, 'double') || str_contains($type, 'decimal');
 
 					$schema_create .= ' default ' . ($isNumericColumn ? $row['Default'] : "'" . $this->_db->escape_string($row['Default']) . "'");
 				}
@@ -235,7 +235,7 @@ class Dump extends AbstractDump
 			}
 
 			// For the engine type, see if we can work out what it is.
-			if (strpos($l, 'ENGINE') !== false || strpos($l, 'TYPE') !== false)
+			if (str_contains($l, 'ENGINE') || str_contains($l, 'TYPE'))
 			{
 				// Extract the engine type.
 				preg_match('~(ENGINE|TYPE)=(\w+)(\sDEFAULT)?(\sCHARSET=(\w+))?(\sCOLLATE=(\w+))?~', $l, $match);
@@ -262,7 +262,7 @@ class Dump extends AbstractDump
 			}
 
 			// Skip everything but keys...
-			if (strpos($l, 'KEY') === false)
+			if (!str_contains($l, 'KEY'))
 			{
 				unset($create[$k]);
 			}
@@ -289,7 +289,7 @@ class Dump extends AbstractDump
 
 		if ($auto_inc !== '')
 		{
-			if (preg_match('~\`(.+?)\`\s~', $auto_inc, $match) === 1 && substr($auto_inc, -1, 1) === ',')
+			if (preg_match('~\`(.+?)\`\s~', $auto_inc, $match) === 1 && str_ends_with($auto_inc, ','))
 			{
 				$auto_inc = substr($auto_inc, 0, -1);
 			}
@@ -317,7 +317,7 @@ class Dump extends AbstractDump
 
 		if ($new_table)
 		{
-			$limit = strpos($tableName, 'log_') !== false ? 500 : 250;
+			$limit = str_contains($tableName, 'log_') ? 500 : 250;
 			$start = 0;
 		}
 

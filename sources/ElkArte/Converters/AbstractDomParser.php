@@ -42,6 +42,7 @@ abstract class AbstractDomParser
 	 *  - Prevents converting anything that's inside a code block
 	 *
 	 * @param object $node
+	 * @param bool $internalParser
 	 *
 	 * @return bool
 	 */

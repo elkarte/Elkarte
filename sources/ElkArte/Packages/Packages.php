@@ -977,9 +977,9 @@ class Packages extends AbstractController
 
 		// Can't delete what's not there.
 		if ($this->fileFunc->fileExists(BOARDDIR . '/packages/' . $this->_req->query->package)
-			&& (substr($this->_req->query->package, -4) === '.zip'
-				|| substr($this->_req->query->package, -4) === '.tgz'
-				|| substr($this->_req->query->package, -7) === '.tar.gz'
+			&& (str_ends_with($this->_req->query->package, '.zip')
+				|| str_ends_with($this->_req->query->package, '.tgz')
+				|| str_ends_with($this->_req->query->package, '.tar.gz')
 				|| $this->fileFunc->isDir(BOARDDIR . '/packages/' . $this->_req->query->package))
 			&& $this->_req->query->package !== 'backups'
 			&& $this->_req->query->package[0] !== '.')

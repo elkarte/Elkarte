@@ -310,7 +310,7 @@ class ThemeLoader
 					// If this isn't set yet, is a theme option, or is not the default theme..
 					if (!isset($themeData[$row['id_member']][$row['variable']]) || (int) $row['id_theme'] !== 1)
 					{
-						$themeData[$row['id_member']][$row['variable']] = strpos($row['variable'], 'show_') === 0 ? (int) $row['value'] === 1 : $row['value'];
+						$themeData[$row['id_member']][$row['variable']] = str_starts_with($row['variable'], 'show_') ? (int) $row['value'] === 1 : $row['value'];
 					}
 				}
 			);

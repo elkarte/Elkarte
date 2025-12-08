@@ -336,7 +336,7 @@ class UnTgz
 			}
 
 			// If its a directory, lets make sure it ends in a /
-			if ($this->_current['type'] == 5 && substr($this->_current['filename'], -1) !== '/')
+			if ($this->_current['type'] == 5 && !str_ends_with($this->_current['filename'], '/'))
 			{
 				$this->_current['filename'] .= '/';
 			}
@@ -365,7 +365,7 @@ class UnTgz
 				}
 			}
 
-			if (substr($this->_current['filename'], -1) !== '/')
+			if (!str_ends_with($this->_current['filename'], '/'))
 			{
 				$this->return[] = [
 					'filename' => $this->_current['filename'],
@@ -442,12 +442,12 @@ class UnTgz
 	private function _determine_write_this(): void
 	{
 		// Not a directory and doesn't exist already...
-		if (substr($this->_current['filename'], -1) !== '/' && !$this->fileFunc->fileExists($this->destination . '/' . $this->_current['filename']))
+		if (!str_ends_with($this->_current['filename'], '/') && !$this->fileFunc->fileExists($this->destination . '/' . $this->_current['filename']))
 		{
 			$this->_write_this = true;
 		}
 		// File exists... check if it is newer.
-		elseif (substr($this->_current['filename'], -1) !== '/')
+		elseif (!str_ends_with($this->_current['filename'], '/'))
 		{
 			$this->_write_this = $this->overwrite || filemtime($this->destination . '/' . $this->_current['filename']) < $this->_current['mtime'];
 		}
@@ -482,7 +482,7 @@ class UnTgz
 		$this->_found = false;
 
 		// A directory may need to be created
-		if (!$this->single_file && strpos($this->_current['filename'], '/') !== false)
+		if (!$this->single_file && str_contains($this->_current['filename'], '/'))
 		{
 			mktree($this->destination . '/' . dirname($this->_current['filename']));
 		}
