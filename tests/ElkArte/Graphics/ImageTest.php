@@ -3,6 +3,7 @@
 namespace ElkArte\Graphics;
 
 use ElkArte\Graphics\Manipulators\Gd2;
+use ElkArte\Graphics\Manipulators\ImageMagick;
 use PHPUnit\Framework\TestCase;
 
 class ImageTest extends TestCase
@@ -72,9 +73,18 @@ class ImageTest extends TestCase
 		$success = Gd2::canUse();
 		$this->assertTrue($success, 'GD NOT INSTALLED');
 
+		$success = ImageMagick::canUse();
+		$this->assertTrue($success, 'Imagick NOT INSTALLED');
+
 		foreach ($this->image_testcases as $image)
 		{
 			$current_image = new Image($image['url'], true);
+			$success = $current_image->createThumbnail(100, 100, '/tmp/test', $image['format']);
+
+			// Check for correct results
+			$this->assertTrue($success !== false, $image['url']);
+
+			$current_image = new Image($image['url']);
 			$success = $current_image->createThumbnail(100, 100, '/tmp/test', $image['format']);
 
 			// Check for correct results
@@ -85,6 +95,12 @@ class ImageTest extends TestCase
 	public function testText()
 	{
 		$images = new TextImage('test', true);
+		$success = $images->generate(100, 75, 'png');
+		$success = !empty($success);
+
+		$this->assertTrue($success);
+
+		$images = new TextImage('test');
 		$success = $images->generate(100, 75, 'png');
 		$success = !empty($success);
 
