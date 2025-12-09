@@ -443,7 +443,7 @@ class Attachment extends AbstractController
 				$attachment['id_attach'] = 0;
 				$attachment['attachment_type'] = 0;
 				$attachment['approved'] = $full_attach['approved'] ?? 0;
-				$attachment['id_member'] = $full_attach['id_member'];
+				$attachment['id_member'] = $full_attach['id_member'] ?? 0;
 
 				// If it is a known extension, show a mimetype extension image
 				$check = returnMimeThumb(empty($full_attach['fileext']) ? 'default' : $full_attach['fileext']);
