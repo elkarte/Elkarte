@@ -30,16 +30,30 @@ class Profile extends Standard
 	 */
     public function generate($params)
 	{
-		// Safely build a slug from the display name; guard against null
-		$name = isset($params['name']) ? (string) $params['name'] : '';
-		$name = trim($name);
-		$slug = $name === '' ? 'member' : preg_replace('~\s+~u', '-', $name);
-		$slug = trim($slug, '-');
+		// Detect sprintf/substitution tokens so they survive for later sprintf()
+		$name = isset($params['name']) ? $params['name'] : '';
+		$u = isset($params['u']) ? $params['u'] : 0;
 
-		// Ensure member id is an integer
-		$uid = isset($params['u']) ? (int) $params['u'] : 0;
+		$isNameToken = is_string($name) && $name !== '' && $name[0] === '%' && preg_match('~^%\d\$s$~m', $name) === 1;
+		$isUidToken = is_string($u) && $u !== '' && $u[0] === '%' && preg_match('~^%\d\$d$~m', $u) === 1;
 
-		$url = 'p/' . rawurlencode($slug) . '-' . $uid;
+		if ($isNameToken)
+		{
+			$slug = $name; // keep token as-is (do NOT encode)
+		}
+		else
+		{
+			// Safely build a slug from the display name; guard against null
+			$name = (string) $name;
+			$name = trim($name);
+			$slug = $name === '' ? 'member' : preg_replace('~\s+~u', '-', $name);
+			$slug = trim($slug, '-');
+			$slug = rawurlencode($slug);
+		}
+
+		$uid = $isUidToken ? $u : (int) $u;
+
+		$url = 'p/' . $slug . '-' . $uid;
 		unset($params['name'], $params['u'], $params['action']);
 
 		return $url . $this->generateQuery($params);
