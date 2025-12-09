@@ -422,7 +422,7 @@ class PersonalMessage extends AbstractController
 		{
 			$context['display_mode'] = (int) $context['display_mode'] > 1 ? 0 : (int) $context['display_mode'] + 1;
 			require_once(SUBSDIR . '/Members.subs.php');
-			updateMemberData($this->user->id, ['pm_prefs' => (User::$settings['pm_prefs'] & 252) | $context['display_mode']]);
+			updateMemberData($this->user->id, ['pm_prefs' => (((int) User::$settings['pm_prefs']) & 252) | $context['display_mode']]);
 		}
 
 		// Make sure the starting location is valid.
@@ -632,19 +632,18 @@ class PersonalMessage extends AbstractController
 				MembersList::load($posters);
 			}
 
-			// If we're on grouped/restricted view get a restricted list of messages.
-			if ($context['display_mode'] !== self::DISPLAY_ALL_AT_ONCE)
+			// Always build the subject list request when we have PMs so the subject list
+			// renders in all modes (0: all-at-once, 1: one-at-a-time, 2: conversation).
+			// This also prevents sharing a DB result between subject and message renderers.
+			// Get the order right.
+			$orderBy = [];
+			foreach (array_reverse($pms) as $pm)
 			{
-				// Get the order right.
-				$orderBy = [];
-				foreach (array_reverse($pms) as $pm)
-				{
-					$orderBy[] = 'pm.id_pm = ' . $pm;
-				}
-
-				// Separate query for these bits, the callback will use it as required
-				$subjects_request = loadPMSubjectRequest($pms, $orderBy);
+				$orderBy[] = 'pm.id_pm = ' . $pm;
 			}
+
+			// Separate query for these bits, the callback will use it as required
+			$subjects_request = loadPMSubjectRequest($pms, $orderBy);
 
 			// Execute the load message query if a message has been chosen and let
 			// the callback fetch the results.  Otherwise, just show the pm selection list
