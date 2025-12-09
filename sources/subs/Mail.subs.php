@@ -274,11 +274,12 @@ function mail_insert_key($message, $unq_head, $line_break)
  */
 function loadEmailTemplate($template, $replacements = [], $lang = '', $html = false, $loadLang = true, $suffixes = [], $additional_files = [])
 {
-	global $txt, $mbname, $scripturl, $settings, $boardurl, $modSettings;
+	global $txt, $mbname, $scripturl, $settings, $boardurl, $modSettings, $language;
 
 	// First things first, load up the email templates language file, if we need to.
 	if ($loadLang)
 	{
+		$lang = $lang === '' ? $language : $lang;
 		$lang_loader = new LangLoader($lang, $txt, database());
 		$lang_loader->load('EmailTemplates+MaillistTemplates');
 

@@ -14,7 +14,6 @@
 namespace ElkArte\Mail;
 
 use ElkArte\Converters\Html2Md;
-use ElkArte\Exceptions\Exception;
 
 class BuildMail extends BaseMail
 {
@@ -117,7 +116,7 @@ class BuildMail extends BaseMail
 		// Now build our message with various encodings
 		$message = $this->getMessage($send_html, $mime_boundary, $message, $subject);
 
-		// Are we using the mail queue, if so this is where we butt in...
+		// Are we using the mail queue?, if so this is where we butt in...
 		if (!empty($modSettings['mail_queue']) && $priority !== 0)
 		{
 			return AddMailQueue(false, $to_array, $subject, $message, $headers, $send_html, $priority, $is_private, $message_id);
@@ -524,7 +523,7 @@ class BuildMail extends BaseMail
 			'EMAILCSS' => file_get_contents($settings['default_theme_dir'] . '/css/email.css'),
 		] + $this->replacements;
 
-		$emaildata = loadEmailTemplate('notify_html_email', $replacements);
+		$emaildata = loadEmailTemplate('notify_html_email', $replacements, $this->language);
 
 		return $emaildata['body'];
 	}

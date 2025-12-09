@@ -36,6 +36,9 @@ abstract class BaseMail
 	/** @var string Used to help bounce detection */
 	public $returnPath;
 
+	/** @var string The language to use for the email templates */
+	public $language;
+
 	/**
 	 * Constructor, use to set the transport and linebreak
 	 */
@@ -43,8 +46,25 @@ abstract class BaseMail
 	{
 		$this->setMailTransport();
 		$this->setLineBreak();
+		$this->setLanguage();
 
 		require_once(SUBSDIR . '/Mail.subs.php');
+	}
+
+	/**
+	 * Sets the language for the current instance. If no language is provided, the global default language is used.
+	 *
+	 * @param string $language The language to set. If empty, the global $language will be used.
+	 * @return void
+	 */
+	public function setLanguage($language = ''): void
+	{
+		if (empty($language))
+		{
+			$language = $GLOBALS['language'];
+		}
+
+		$this->language = $language;
 	}
 
 	/**
