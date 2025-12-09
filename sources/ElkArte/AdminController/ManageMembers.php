@@ -25,7 +25,7 @@ use ElkArte\User;
 
 /**
  * ManageMembers controller deals with members administration, approval,
- * admin-visible list and search in it.
+ * admin-visible list, and search in it.
  *
  * @package Members
  */

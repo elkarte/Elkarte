@@ -434,7 +434,7 @@ class Memberlist extends AbstractController
 	}
 
 	/**
-	 * Search for members, or display search results.
+	 * Search for members or display search results.
 	 *
 	 * - If variable $_REQUEST['search'] is empty displays search dialog box,
 	 * using the search sub-template.
@@ -451,7 +451,7 @@ class Memberlist extends AbstractController
 		if (isset($this->_req->query->search, $this->_req->query->fields)
 			|| isset($this->_req->post->search, $this->_req->post->fields))
 		{
-			// Some handy short cuts
+			// Some handy shortcuts
 			$start = $this->_req->getQuery('start', 'intval');
 			$desc = $this->_req->getQuery('desc', 'trim');
 			$sort = $this->_req->getQuery('sort', 'trim');

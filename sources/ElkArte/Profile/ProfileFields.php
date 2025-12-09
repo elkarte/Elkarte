@@ -462,7 +462,7 @@ class ProfileFields
 				'permission' => 'profile_identity',
 				'preload' => 'profileLoadLanguages',
 				'enabled' => !empty($modSettings['userLanguage']),
-				'value' => empty($cur_profile['lngfile']) ? $language : $cur_profile['lngfile'],
+				'value' => empty($cur_profile['lngfile']) ? Util::ucfirst($language) . '.php' : Util::ucfirst(basename($cur_profile['lngfile'], '.php')) . '.php',
 				'input_validate' => static function (&$value) {
 					global $context, $cur_profile;
 
