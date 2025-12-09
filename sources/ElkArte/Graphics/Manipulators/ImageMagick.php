@@ -282,7 +282,7 @@ class ImageMagick extends AbstractManipulator
 				$success = $this->_image->setImageFormat('gif');
 				break;
 			case IMAGETYPE_PNG:
-				// Save a few bytes the only way, realistically, we can
+				// Save a few bytes the only way, realistically, we can.  This also removes interlacing.
 				$this->_image->setOption('png:compression-level', '9');
 				$this->_image->setOption('png:exclude-chunk', 'all');
 				$success = $this->_image->setImageFormat('png');

@@ -64,7 +64,7 @@ class Editor
 	{
 		if ($lang !== null)
 		{
-			$this->language = ucfirst($lang);
+			$this->language = Util::ucfirst($lang);
 		}
 
 		$this->path = SOURCEDIR . '/ElkArte/Languages/';
@@ -218,7 +218,7 @@ class Editor
 					$this->db->replace('{db_prefix}languages',
 						$columns,
 						[
-							'language' => ucfirst(basename($this->language, '.php')),
+							'language' => Util::ucfirst(basename($this->language, '.php')),
 							'file' => $file_name,
 							'language_key' => $display_key,
 							'value' => $val

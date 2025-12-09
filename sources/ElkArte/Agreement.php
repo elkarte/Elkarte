@@ -54,7 +54,7 @@ class Agreement
 	public function __construct($language, $backup_dir = null)
 	{
 		$this->fileFunc = FileFunctions::instance();
-		$this->_language = ucfirst(strtr($language, ['.' => '']));
+		$this->_language = Util::ucfirst(strtr($language, ['.' => '']));
 
 		if ($backup_dir === null || !$this->fileFunc->fileExists($backup_dir))
 		{
