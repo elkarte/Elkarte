@@ -16,7 +16,7 @@
  */
 
 use ElkArte\Request;
-use Elkarte\User;
+use ElkArte\User;
 
 /**
  * Clean the request variables - add html entities to GET.

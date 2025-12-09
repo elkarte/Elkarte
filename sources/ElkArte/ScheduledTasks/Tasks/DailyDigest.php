@@ -249,6 +249,7 @@ class DailyDigest implements ScheduledTaskInterface
 		// Fix the last reply message so its suitable for previewing
 		if ($maillist && !empty($types['reply']))
 		{
+			require_once(SUBSDIR . '/MaillistPost.subs.php');
 			foreach ($types['reply'] as $id => $board)
 			{
 				foreach ($board['lines'] as $topic)

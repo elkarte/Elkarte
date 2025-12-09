@@ -188,8 +188,8 @@ class Reminder extends AbstractController
 		$context += [
 			'page_title' => $txt['reminder_set_password'],
 			'sub_template' => 'set_password',
-			'code' => Util::htmlspecialchars($this->_req->query->code),
-			'memID' => (int) $this->_req->query->u
+			'code' => $this->_req->getQuery('code', 'htmlspecialchars', ''),
+			'memID' => $this->_req->getQuery('u', 'intval' -1)
 		];
 
 		// Some extra js is needed
