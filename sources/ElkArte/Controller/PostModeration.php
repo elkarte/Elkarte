@@ -27,13 +27,12 @@ use ElkArte\Languages\Txt;
  */
 class PostModeration extends AbstractController
 {
-
 	/**
 	 * This is the entry point for all things post moderation.
 	 *
 	 * @uses ModerationCenter.template
 	 * @uses ModerationCenter language file
-	 * @see AbstractController::action_index
+	 * @see  AbstractController::action_index
 	 */
 	public function action_index()
 	{
@@ -112,14 +111,14 @@ class PostModeration extends AbstractController
 		$toAction = [];
 
 		// Check if we have something to do?
-		if (isset($this->_req->query->approve))
+		if ($this->_req->hasQuery('approve'))
 		{
-			$toAction[] = (int) $this->_req->query->approve;
+			$toAction[] = $this->_req->getQuery('approve', 'intval', 0);
 		}
 		// Just a deletion?
-		elseif (isset($this->_req->query->delete))
+		elseif ($this->_req->hasQuery('delete'))
 		{
-			$toAction[] = (int) $this->_req->query->delete;
+			$toAction[] = $this->_req->getQuery('delete', 'intval', 0);
 		}
 		// Lots of approvals?
 		elseif (isset($this->_req->post->item))
@@ -128,11 +127,11 @@ class PostModeration extends AbstractController
 		}
 
 		// What are we actually doing.
-		if (isset($this->_req->query->approve) || (isset($this->_req->post->do) && $this->_req->post->do === 'approve'))
+		if ($this->_req->hasQuery('approve') || (isset($this->_req->post->do) && $this->_req->post->do === 'approve'))
 		{
 			$curAction = 'approve';
 		}
-		elseif (isset($this->_req->query->delete) || (isset($this->_req->post->do) && $this->_req->post->do === 'delete'))
+		elseif ($this->_req->hasQuery('delete') || (isset($this->_req->post->do) && $this->_req->post->do === 'delete'))
 		{
 			$curAction = 'delete';
 		}
@@ -238,8 +237,9 @@ class PostModeration extends AbstractController
 
 		$context['total_unapproved_topics'] = $mod_count['topics'];
 		$context['total_unapproved_posts'] = $mod_count['posts'];
-		$context['page_index'] = constructPageIndex('{scripturl}?action=moderate;area=postmod;sa=' . $context['current_view'] . ($_brd !== null ? ';brd=' . $_brd : ''), $this->_req->query->start, $context['current_view'] === 'topics' ? $context['total_unapproved_topics'] : $context['total_unapproved_posts'], 10);
-		$context['start'] = $this->_req->query->start;
+		$start = $this->_req->getQuery('start', 'intval', 0);
+		$context['page_index'] = constructPageIndex('{scripturl}?action=moderate;area=postmod;sa=' . $context['current_view'] . ($_brd !== null ? ';brd=' . $_brd : ''), $start, $context['current_view'] === 'topics' ? $context['total_unapproved_topics'] : $context['total_unapproved_posts'], 10);
+		$context['start'] = $start;
 
 		// We have enough to make some pretty tabs!
 		$context[$context['moderation_menu_name']]['object']->prepareTabData([
@@ -317,13 +317,13 @@ class PostModeration extends AbstractController
 
 		// Get together the array of things to act on, if any.
 		$attachments = [];
-		if (isset($this->_req->query->approve))
+		if ($this->_req->hasQuery('approve'))
 		{
-			$attachments[] = (int) $this->_req->query->approve;
+			$attachments[] = $this->_req->getQuery('approve', 'intval', 0);
 		}
-		elseif (isset($this->_req->query->delete))
+		elseif ($this->_req->hasQuery('delete'))
 		{
-			$attachments[] = (int) $this->_req->query->delete;
+			$attachments[] = $this->_req->getQuery('delete', 'intval', 0);
 		}
 		elseif (isset($this->_req->post->item))
 		{
@@ -334,11 +334,11 @@ class PostModeration extends AbstractController
 		}
 
 		// Are we approving or deleting?
-		if (isset($this->_req->query->approve) || (isset($this->_req->post->do) && $this->_req->post->do === 'approve'))
+		if ($this->_req->hasQuery('approve') || (isset($this->_req->post->do) && $this->_req->post->do === 'approve'))
 		{
 			$curAction = 'approve';
 		}
-		elseif (isset($this->_req->query->delete) || (isset($this->_req->post->do) && $this->_req->post->do === 'delete'))
+		elseif ($this->_req->hasQuery('delete') || (isset($this->_req->post->do) && $this->_req->post->do === 'delete'))
 		{
 			$curAction = 'delete';
 		}

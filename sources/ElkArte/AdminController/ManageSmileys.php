@@ -95,11 +95,9 @@ class ManageSmileys extends AbstractController
 		$context['page_title'] = $txt['smileys_manage'];
 		$context['sub_action'] = $subAction;
 
-		// Some settings may not be enabled, disallow these from the tabs as appropriate.
-		if (empty($modSettings['messageIcons_enable']))
-		{
-			$context[$context['admin_menu_name']]['tab_data']['tabs']['editicons']['disabled'] = true;
-		}
+		// Note: the visibility of the edit icons tab is already governed by
+		// the 'enabled' flag in $subActions based on $modSettings['messageIcons_enable'].
+		// No further mutation of the tab structure is required here.
 
 		// Call the right function for this sub-action.
 		$action->dispatch($subAction);
@@ -143,7 +141,7 @@ class ManageSmileys extends AbstractController
 		$context['post_url'] = getUrl('admin', ['action' => 'admin', 'area' => 'smileys', 'save', 'sa' => 'settings']);
 
 		// Saving the settings?
-		if (isset($this->_req->query->save))
+		if ($this->_req->hasQuery('save'))
 		{
 			checkSession();
 
@@ -617,7 +615,7 @@ class ManageSmileys extends AbstractController
 			checkSession('get');
 			validateToken('admin-mss', 'request');
 
-			$set = (int) $this->_req->query->set;
+			$set = $this->_req->getQuery('set', 'intval', -1);
 
 			// Sanity check - then import.
 			if (isset($context['smiley_sets'][$set]))
@@ -1271,7 +1269,7 @@ class ManageSmileys extends AbstractController
 			// Get all possible filenames for the smileys.
 			$context['filenames'] = $this->getAllPossibleFilenamesForTheSmileys($context['smiley_sets']);
 
-			$thisSmiley = (int) $this->_req->query->smiley;
+			$thisSmiley = $this->_req->getQuery('smiley', 'intval', 0);
 			$context['current_smiley'] = getSmiley($thisSmiley);
 			$context['current_smiley']['code'] = htmlspecialchars($context['current_smiley']['code'], ENT_COMPAT, 'UTF-8');
 			$context['current_smiley']['filename'] = htmlspecialchars($context['current_smiley']['filename'], ENT_COMPAT, 'UTF-8');
@@ -1317,9 +1315,9 @@ class ManageSmileys extends AbstractController
 				deleteMessageIcons($deleteIcons);
 			}
 			// Editing/Adding an icon?
-			elseif ($context['sub_action'] === 'editicon' && isset($this->_req->query->icon))
+			elseif ($context['sub_action'] === 'editicon' && $this->_req->hasQuery('icon'))
 			{
-				$this->_req->query->icon = (int) $this->_req->query->icon;
+				$iconId = $this->_req->getQuery('icon', 'intval', 0);
 
 				// Do some preparation with the data... like check the icon exists *somewhere*
 				if (str_contains($this->_req->post->icon_filename, '.png'))
@@ -1338,15 +1336,15 @@ class ManageSmileys extends AbstractController
 					throw new Exception('icon_name_too_long', false);
 				}
 
-				if ($this->_req->post->icon_location === $this->_req->query->icon && $this->_req->query->icon !== 0)
+				if ((int) $this->_req->post->icon_location === $iconId && $iconId !== 0)
 				{
 					throw new Exception('icon_after_itself', false);
 				}
 
 				// First do the sorting... if this is an edit reduce the order of everything after it by one ;)
-				if ($this->_req->query->icon !== 0)
+				if ($iconId !== 0)
 				{
-					$oldOrder = $context['icons'][$this->_req->query->icon]['true_order'];
+					$oldOrder = $context['icons'][$iconId]['true_order'];
 					foreach ($context['icons'] as $id => $data)
 					{
 						if ($data['true_order'] > $oldOrder)
@@ -1357,9 +1355,9 @@ class ManageSmileys extends AbstractController
 				}
 
 				// If there are no existing icons and this is a new one, set the id to 1 (mainly for non-mysql)
-				if ($this->_req->query->icon === 0 && empty($context['icons']))
+				if ($iconId === 0 && empty($context['icons']))
 				{
-					$this->_req->query->icon = 1;
+					$iconId = 1;
 				}
 
 				// Get the new order.
@@ -1375,12 +1373,12 @@ class ManageSmileys extends AbstractController
 				}
 
 				// Finally set the current icon's position!
-				$context['icons'][$this->_req->query->icon]['true_order'] = $newOrder;
+				$context['icons'][$iconId]['true_order'] = $newOrder;
 
 				// Simply replace the existing data for the other bits.
-				$context['icons'][$this->_req->query->icon]['title'] = $this->_req->post->icon_description;
-				$context['icons'][$this->_req->query->icon]['filename'] = $this->_req->post->icon_filename;
-				$context['icons'][$this->_req->query->icon]['board_id'] = (int) $this->_req->post->icon_board;
+				$context['icons'][$iconId]['title'] = $this->_req->post->icon_description;
+				$context['icons'][$iconId]['filename'] = $this->_req->post->icon_filename;
+				$context['icons'][$iconId]['board_id'] = (int) $this->_req->post->icon_board;
 
 				// Do a huge replace ;)
 				$iconInsert = [];
@@ -1536,12 +1534,13 @@ class ManageSmileys extends AbstractController
 		{
 			// Force the sub_template just in case.
 			$context['sub_template'] = 'editicon';
-			$context['new_icon'] = !isset($this->_req->query->icon);
+			$context['new_icon'] = !$this->_req->hasQuery('icon');
 
 			// Get the properties of the current icon from the icon list.
 			if (!$context['new_icon'])
 			{
-				$context['icon'] = $context['icons'][$this->_req->query->icon];
+				$iconId = $this->_req->getQuery('icon', 'intval', 0);
+				$context['icon'] = $context['icons'][$iconId] ?? [];
 			}
 
 			// Get a list of boards needed for assigning this icon to a specific board.
@@ -1572,9 +1571,10 @@ class ManageSmileys extends AbstractController
 		$context['sub_template'] = 'setorder';
 
 		// Move smileys to another position.
-		if (isset($this->_req->query->reorder))
+		if ($this->_req->hasQuery('reorder'))
 		{
-			$location = empty($this->_req->query->location) || $this->_req->query->location !== 'popup' ? 0 : 2;
+			$locStr = $this->_req->getQuery('location', 'trim|strval', '');
+			$location = $locStr === 'popup' ? 2 : 0;
 			$source = $this->_req->getQuery('source', 'intval', 0);
 			$after = $this->_req->getQuery('after', 'intval', 0);
 			$row = $this->_req->getQuery('row', 'intval', 0);
@@ -1675,10 +1675,13 @@ class ManageSmileys extends AbstractController
 		$name = '';
 		$base_name = '';
 
-		if (isset($this->_req->query->set_gz))
+		$setGz = $this->_req->getQuery('set_gz', 'trim|strval', null);
+		$package = $this->_req->getQuery('package', 'trim|strval', null);
+
+		if ($setGz !== null)
 		{
-			$base_name = strtr(basename($this->_req->query->set_gz), ':/', '-_');
-			$name = Util::htmlspecialchars(strtok(basename($this->_req->query->set_gz), '.'));
+			$base_name = strtr(basename($setGz), ':/', '-_');
+			$name = Util::htmlspecialchars(strtok(basename($setGz), '.'));
 			$context['filename'] = $base_name;
 
 			$destination = BOARDDIR . '/packages/' . $base_name;
@@ -1689,16 +1692,16 @@ class ManageSmileys extends AbstractController
 			}
 
 			// Let's copy it to the packages directory
-			file_put_contents($destination, fetch_web_data($this->_req->query->set_gz));
+			file_put_contents($destination, fetch_web_data($setGz));
 			$testing = true;
 		}
-		elseif (isset($this->_req->query->package))
+		elseif ($package !== null)
 		{
-			$base_name = basename($this->_req->query->package);
-			$name = Util::htmlspecialchars(strtok(basename($this->_req->query->package), '.'));
+			$base_name = basename($package);
+			$name = Util::htmlspecialchars(strtok(basename($package), '.'));
 			$context['filename'] = $base_name;
 
-			$destination = BOARDDIR . '/packages/' . basename($this->_req->query->package);
+			$destination = BOARDDIR . '/packages/' . basename($package);
 		}
 
 		if (!$fileFunc->fileExists($destination))
@@ -1719,7 +1722,7 @@ class ManageSmileys extends AbstractController
 			$chmod_control->createChmodControl(
 				[BOARDDIR . '/packages/temp/delme.tmp'],
 				[
-					'destination_url' => $scripturl . '?action=admin;area=smileys;sa=install;set_gz=' . $this->_req->query->set_gz,
+					'destination_url' => $scripturl . '?action=admin;area=smileys;sa=install' . ($setGz !== null ? ';set_gz=' . $setGz : ''),
 					'crash_on_error' => true
 				]
 			);

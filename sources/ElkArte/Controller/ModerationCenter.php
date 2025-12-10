@@ -1904,12 +1904,16 @@ class ModerationCenter extends AbstractController
 		}
 
 		// Bye... bye...
-		if (isset($this->_req->query->notes, $this->_req->query->delete) && is_numeric($this->_req->query->delete))
+		if ($this->_req->hasQuery('notes') && $this->_req->hasQuery('delete'))
 		{
 			checkSession('get');
 
 			// Just checkin'!
-			$id_delete = (int) $this->_req->query->delete;
+			$id_delete = $this->_req->getQuery('delete', 'intval', 0);
+			if ($id_delete <= 0)
+			{
+				redirectexit('action=moderate');
+			}
 
 			// Lets delete it.
 			removeModeratorNote($id_delete);
@@ -1925,12 +1929,13 @@ class ModerationCenter extends AbstractController
 		$moderator_notes_total = countModeratorNotes();
 
 		// Grab the current notes. We can only use the cache for the first page of notes.
-		$offset = isset($this->_req->query->notes, $this->_req->query->start) ? $this->_req->query->start : 0;
+		$offset = ($this->_req->hasQuery('notes') && $this->_req->hasQuery('start')) ? $this->_req->getQuery('start', 'intval', 0) : 0;
 		$moderator_notes = moderatorNotes($offset);
 
 		// Lets construct a page index.
-		$context['page_index'] = constructPageIndex('{scripturl}?action=moderate;area=index;notes', $this->_req->query->start, $moderator_notes_total, 10);
-		$context['start'] = $this->_req->query->start;
+		$start = $this->_req->getQuery('start', 'intval', 0);
+		$context['page_index'] = constructPageIndex('{scripturl}?action=moderate;area=index;notes', $start, $moderator_notes_total, 10);
+		$context['start'] = $start;
 
 		$bbc_parser = ParserWrapper::instance();
 

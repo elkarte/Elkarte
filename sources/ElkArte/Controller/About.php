@@ -33,7 +33,7 @@ class About extends AbstractController
 	 * Default action of this class.
 	 * Accessed with ?action=about
 	 */
-	public function action_index() :void
+	public function action_index(): void
 	{
 		// Add an subaction array to act accordingly
 		$subActions = [
@@ -134,7 +134,7 @@ class About extends AbstractController
 		}
 
 		// Show the contact done form or the form itself
-		if (isset($this->_req->query->done))
+		if ($this->_req->hasQuery('done'))
 		{
 			$context['sub_template'] = 'contact_form_done';
 		}
@@ -162,14 +162,15 @@ class About extends AbstractController
 		theme()->getTemplates()->load('About');
 
 		// No User ID??
-		if (!isset($this->_req->query->member))
+		if (!$this->_req->hasQuery('member'))
 		{
 			throw new Exception('no_access', false);
 		}
 
 		// Get the user details...
 		require_once(SUBSDIR . '/Members.subs.php');
-		$member = getBasicMemberData((int) $this->_req->query->member, ['authentication' => true]);
+		$member_id = $this->_req->getQuery('member', 'intval', 0);
+		$member = getBasicMemberData($member_id, ['authentication' => true]);
 
 		// If doesn't exist or not pending coppa
 		if (empty($member) || (int) $member['is_activated'] !== self::STATUS_AWAITING_COPPA)
@@ -177,7 +178,7 @@ class About extends AbstractController
 			throw new Exception('no_access', false);
 		}
 
-		if (isset($this->_req->query->form))
+		if ($this->_req->hasQuery('form'))
 		{
 			$this->handleContactForm($member);
 		}
@@ -204,7 +205,7 @@ class About extends AbstractController
 		$context['forum_contacts'] = empty($context['forum_contacts']) ? '' : $context['forum_name_html_safe'] . '<br />' . $context['forum_contacts'];
 
 		// Showing template?
-		if (!isset($this->_req->query->dl))
+		if (!$this->_req->hasQuery('dl'))
 		{
 			// Shortcut for producing underlines.
 			$context['ul'] = '<span class="underline">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>';

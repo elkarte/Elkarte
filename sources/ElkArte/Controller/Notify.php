@@ -375,7 +375,8 @@ class Notify extends AbstractController
 		}
 
 		// Back to the topic.
-		redirectexit('topic=' . $topic . '.' . $this->_req->query->start);
+		$start = $this->_req->getQuery('start', 'intval', 0);
+		redirectexit('topic=' . $topic . '.' . $start);
 	}
 
 	/**
@@ -385,7 +386,8 @@ class Notify extends AbstractController
 	{
 		global $topic;
 
-		setTopicWatch($this->user->id, $topic, $this->_req->query->sa === 'on');
+		$sa = $this->_req->getQuery('sa', 'trim|strval', '');
+		setTopicWatch($this->user->id, $topic, $sa === 'on');
 	}
 
 	/**
