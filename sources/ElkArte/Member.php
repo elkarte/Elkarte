@@ -213,7 +213,7 @@ class Member extends ValuesContainer
 					'link' => '<a href="' . $send_pm_url . '">' . $txt[$online_status] . '</a>',
 					'label' => $txt[$online_status]
 				],
-				'language' => Util::ucwords(strtr(basename($this->data['lngfile'], '.php'), ['_' => ' '])),
+				'language' => Util::ucfirst(strtr(basename($this->data['lngfile'], '.php'), ['_' => ' '])),
 				'is_activated' => $this->data['is_activated'] ?? 1,
 				'is_banned' => isset($this->data['is_activated']) ? $this->data['is_activated'] >= 10 : 0,
 				'options' => $this->data['options'],

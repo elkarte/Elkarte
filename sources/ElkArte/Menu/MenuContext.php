@@ -239,9 +239,10 @@ class MenuContext
 			$this->addCountsToTitle($button['title'], $menu_count[$button['counter']], 0);
 			$button['indicator'] = true;
 		}
-		elseif (isset($button['counter']) && $menu_count[$button['counter']] === 0)
+		elseif (isset($button['counter'], $menu_count[$button['counter']]) && $menu_count[$button['counter']] === 0)
 		{
-			// If the counter is set but is zero, add a hidden indicator to simply ajax update the counter
+			$button['alttitle'] = $button['title'];
+			// If the counter is set but is zero, add a hidden indicator to simplify ajax update the counter
 			$this->addCountsToTitle($button['title'], $menu_count[$button['counter']], -1);
 		}
 
@@ -322,8 +323,8 @@ class MenuContext
 	 * Adds counts to the title.
 	 *
 	 * @param string $title The title to add counts to.
-	 * @param array $counts The array of counts.
-	 * @param string $notice The notice to use for formatting.
+	 * @param int $counts The array of counts.
+	 * @param int $notice The menu_numeric_notice index to use for formatting.
 	 *
 	 * @return void Does not return anything.
 	 */

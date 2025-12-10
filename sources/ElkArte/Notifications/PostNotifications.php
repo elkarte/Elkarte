@@ -260,6 +260,7 @@ class PostNotifications extends AbstractModel
 					$emaildata = loadEmailTemplate($template, $replacements, $needed_language, true);
 
 					$sendMail = new BuildMail();
+					$sendMail->setLanguage($needed_language);
 					$sendMail->setEmailReplacements($replacements);
 
 					// If using the maillist functions, we adjust who this is coming from
@@ -566,6 +567,7 @@ class PostNotifications extends AbstractModel
 				$emaildata = loadEmailTemplate($template, $replacements, $needed_language, true);
 
 				$sendMail = new BuildMail();
+				$sendMail->setLanguage($needed_language);
 				$sendMail->setEmailReplacements($replacements);
 
 				// Using the maillist functions? Then adjust the wrapper
@@ -754,6 +756,7 @@ class PostNotifications extends AbstractModel
 					$emaildata = loadEmailTemplate($template, $replacements, $langloaded, true);
 
 					$sendMail = new BuildMail();
+					$sendMail->setLanguage($langloaded);
 					$sendMail->setEmailReplacements($replacements);
 
 					// Maillist style?
@@ -873,6 +876,7 @@ class PostNotifications extends AbstractModel
 					$emaildata = loadEmailTemplate($template, $replacements, $needed_language, true);
 
 					$sendMail = new BuildMail();
+					$sendMail->setLanguage($needed_language);
 					$sendMail->setEmailReplacements($replacements);
 
 					// If using the maillist functions, we adjust who this is coming from

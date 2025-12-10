@@ -6249,6 +6249,7 @@ div.labels {
     }
 
 	#topic_header.category_header {
+		padding: .5rem .2rem;
 		grid-template-columns: 1fr;
 		grid-template-rows: [subject] 3rem [stats] auto [viewing] auto [navigation] auto;
 		grid-template-areas:
@@ -6562,6 +6563,7 @@ div.labels {
 
 	.pagesection .pagelinks {
 		margin-bottom: .4rem;
+		flex-wrap: nowrap;
 	}
 
 	.quick_quote_button {
@@ -6819,6 +6821,11 @@ div.labels {
 		width: 12rem;
 	}
 
+	.search_results_posts .topic_details {
+		padding: .5rem;
+		grid-column-end: 3;
+	}
+
 	#posting_icons, .table_list .stats, .table_list .lastpost, .table_grid .lastpost {
 		display: none;
 	}
@@ -6935,6 +6942,20 @@ div.labels {
 	.bbc_table_container {
 		overflow: auto;
 		max-width: 100%;
+	}
+
+	/* User profile Stats */
+	#popularposts, #popularactivity {
+		float: none;
+		width: 100%;
+	}
+
+	#popularposts div.content dt, #popularactivity div.content dt {
+		width: 67% !important;
+	}
+
+	#popularposts div.content dd, #popularactivity div.content dd {
+		width: 33% !important;
 	}
 }
 

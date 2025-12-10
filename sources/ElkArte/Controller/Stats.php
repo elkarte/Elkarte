@@ -126,6 +126,8 @@ class Stats extends AbstractController
 
 		// Custom stats (just add a template_layer or another callback to add it to the page!)
 		call_integration_hook('integrate_forum_stats');
+
+		return true;
 	}
 
 	/**

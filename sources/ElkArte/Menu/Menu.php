@@ -583,7 +583,7 @@ class Menu
 			// Profile area must run through the UrlGenerator
 			$area->setUrl(
 				$this->menuContext['sections'][$sectionId]['areas'][$areaId]['url'] =
-					($area->getUrl() ?: getUrl('profile', ['area' => $areaId]) . $this->menuContext['extra_parameters'])
+					($area->getUrl() ?: getUrl('profile', ['action' => 'profile', 'area' => $areaId]) . $this->menuContext['extra_parameters'])
 			);
 		}
 		else
@@ -682,7 +682,7 @@ class Menu
 			// Profile area must run through the UrlGenerator
 			$sub->setUrl(
 				$this->menuContext['sections'][$sectionId]['areas'][$areaId]['subsections'][$subId]['url'] =
-					($sub->getUrl() ?: getUrl('profile', ['area' => $areaId, 'sa' => $subId]) . $this->menuContext['extra_parameters'])
+					($sub->getUrl() ?: getUrl('profile', ['action' => 'profile', 'area' => $areaId, 'sa' => $subId]) . $this->menuContext['extra_parameters'])
 			);
 		}
 		else

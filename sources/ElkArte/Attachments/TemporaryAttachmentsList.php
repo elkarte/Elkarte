@@ -13,7 +13,7 @@
 
 namespace ElkArte\Attachments;
 
-use Elkarte\Exceptions\Exception;
+use ElkArte\Exceptions\Exception;
 use ElkArte\Helper\FileFunctions;
 use ElkArte\Helper\ValuesContainer;
 

@@ -142,8 +142,10 @@ class Errors extends AbstractModel
 	 *   - critical
 	 *   - database
 	 *   - undefined_vars
-	 *   - template
+	 *   - blocked
 	 *   - user
+	 *   - template
+	 *   - debug
 	 *   - deprecated
 	 *
 	 * filename and line should be __FILE__ and __LINE__, respectively.
@@ -514,9 +516,10 @@ class Errors extends AbstractModel
 	 * - Terminates program
 	 *
 	 * @param bool $log if to log the error to the system (user) log
-	 * @param string $message Optional message to show
+	 * @param string $message Optional blocked reason to show
+	 * @param bool $show if to show the user a page with the blocked message
 	 */
-	public function display_403_error($log = true, $message = ''): void
+	public function display_403_error($log = true, $message = 'access', $show = false): void
 	{
 		global $language;
 
@@ -524,7 +527,7 @@ class Errors extends AbstractModel
 			->httpCode(403)
 			->sendHeaders();
 
-		if (!empty($message))
+		if ($show === true)
 		{
 			echo '<!DOCTYPE html>
 	<html>
@@ -534,7 +537,7 @@ class Errors extends AbstractModel
 		</head>
 		<body>
 			<h3>Forbidden</h3>
-			', $message, '
+			You do not have permission to access this resource.
 		</body>
 	</html>';
 		}
@@ -545,7 +548,7 @@ class Errors extends AbstractModel
 			$lang = new Loader($language, $mtxt, database());
 			$lang->load('Errors');
 			$this->log_error(
-				sprintf($mtxt['invalid_access'], $_SERVER['REMOTE_ADDR']),
+				sprintf($mtxt['invalid_access'], $_SERVER['REMOTE_ADDR'], $message),
 				'blocked'
 			);
 		}

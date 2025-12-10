@@ -104,11 +104,12 @@ function elk_main()
 		if ($dispatcher->needTheme())
 		{
 			// Do our BadBehavior checking before we go any further
-			if (runBadBehavior())
+			$badActor = runBadBehavior();
+			if ($badActor !== false)
 			{
-				// Not much to say, 403 and gone
+				// Not much to say, waste some time and 403 and gone
 				sleep(10);
-				\ElkArte\Errors\Errors::instance()->display_403_error(true);
+				\ElkArte\Errors\Errors::instance()->display_403_error(true, $badActor);
 			}
 
 			new ThemeLoader();

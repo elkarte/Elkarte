@@ -274,11 +274,12 @@ function mail_insert_key($message, $unq_head, $line_break)
  */
 function loadEmailTemplate($template, $replacements = [], $lang = '', $html = false, $loadLang = true, $suffixes = [], $additional_files = [])
 {
-	global $txt, $mbname, $scripturl, $settings, $boardurl, $modSettings;
+	global $txt, $mbname, $scripturl, $settings, $boardurl, $modSettings, $language;
 
 	// First things first, load up the email templates language file, if we need to.
 	if ($loadLang)
 	{
+		$lang = $lang === '' ? $language : $lang;
 		$lang_loader = new LangLoader($lang, $txt, database());
 		$lang_loader->load('EmailTemplates+MaillistTemplates');
 
@@ -364,6 +365,8 @@ function loadEmailTemplate($template, $replacements = [], $lang = '', $html = fa
 function templateToHtml($string)
 {
 	$newString = preg_replace('~^-{3,40}$~m', '<hr />', $string);
+
+	$newString = preg_replace('~^<\*>~m', '&bull;', $newString);
 
 	$newString = str_replace("\n", '<br />', $newString);
 

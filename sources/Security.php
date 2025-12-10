@@ -1664,7 +1664,7 @@ function constructBanQueryIP($fullip)
  * - Returns true if Accept header is missing
  * - Check with project Honey Pot for known miscreants
  *
- * @return bool true if bad, false otherwise
+ * @return bool|string true if bad, false otherwise
  */
 function runBadBehavior()
 {
@@ -1679,7 +1679,7 @@ function runBadBehavior()
 	// Clients will have an "Accept" header, generally only bots or scrappers don't
 	if (!empty($modSettings['badbehavior_accept_header']) && !array_key_exists('HTTP_ACCEPT', $_SERVER))
 	{
-		return true;
+		return 'accept headers';
 	}
 
 	// Do not block private IP ranges 10.0.0.0/8, 172.16.0.0/12, 192.168.0.0/16 or 127.0.0.0/8
@@ -1712,7 +1712,7 @@ function runBadBehavior()
 			&& $result[2] >= $modSettings['badbehavior_httpbl_threat'] // Level
 			&& $result[1] <= $modSettings['badbehavior_httpbl_maxage']) // Age
 		{
-			return true;
+			return 'honey pot';
 		}
 	}
 
