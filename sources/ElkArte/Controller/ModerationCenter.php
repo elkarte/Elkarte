@@ -445,7 +445,7 @@ class ModerationCenter extends AbstractController
 		}
 
 		// Are they wanting to view a particular report?
-		if (!empty($this->_req->query->report))
+		if ($this->_req->hasQuery('report'))
 		{
 			$this->action_modReport();
 			return;
@@ -467,22 +467,24 @@ class ModerationCenter extends AbstractController
 		}
 
 		// Are we viewing open or closed reports?
-		$context['view_closed'] = $this->_req->getQuery('sa') === 'closed' ? 1 : 0;
+		$context['view_closed'] = $this->_req->getQuery('sa', 'trim|strval', '') === 'closed' ? 1 : 0;
 
 		// Are we doing any work?
-		if ((isset($this->_req->query->ignore) || isset($this->_req->query->close)) && isset($this->_req->query->rid))
+		if (($this->_req->hasQuery('ignore') || $this->_req->hasQuery('close')) && $this->_req->hasQuery('rid'))
 		{
 			checkSession('get');
-			$rid = $this->_req->getQuery('rid', 'intval');
+			$rid = $this->_req->getQuery('rid', 'intval', 0);
 
 			// Update the report...
-			if (isset($this->_req->query->ignore))
+			if ($this->_req->hasQuery('ignore'))
 			{
-				updateReportsStatus($rid, 'ignore', (int) $this->_req->query->ignore);
+				$ignoreVal = $this->_req->getQuery('ignore', 'intval', 0);
+				updateReportsStatus($rid, 'ignore', $ignoreVal);
 			}
-			elseif (isset($this->_req->query->close))
+			elseif ($this->_req->hasQuery('close'))
 			{
-				updateReportsStatus($rid, 'close', (int) $this->_req->query->close);
+				$closeVal = $this->_req->getQuery('close', 'intval', 0);
+				updateReportsStatus($rid, 'close', $closeVal);
 			}
 
 			// Time to update.
@@ -509,8 +511,9 @@ class ModerationCenter extends AbstractController
 		$context['total_reports'] = totalReports($context['view_closed'], $show_pms);
 
 		// So, that means we can page index, yes?
-		$context['page_index'] = constructPageIndex('{scripturl}?action=moderate;area=' . $context['admin_area'] . ($context['view_closed'] ? ';sa=closed' : ''), $this->_req->query->start, $context['total_reports'], 10);
-		$context['start'] = $this->_req->query->start;
+		$start = $this->_req->getQuery('start', 'intval', 0);
+		$context['page_index'] = constructPageIndex('{scripturl}?action=moderate;area=' . $context['admin_area'] . ($context['view_closed'] ? ';sa=closed' : ''), $start, $context['total_reports'], 10);
+		$context['start'] = $start;
 
 		// By George, that means we in a position to get the reports, golly good.
 		$context['reports'] = getModReports($context['view_closed'], $context['start'], 10, $show_pms);
@@ -987,7 +990,7 @@ class ModerationCenter extends AbstractController
 
 		// Some important context!
 		$context['page_title'] = $txt['mc_watched_users_title'];
-		$context['view_posts'] = isset($this->_req->query->sa) && $this->_req->query->sa === 'post';
+		$context['view_posts'] = $this->_req->getQuery('sa', 'trim|strval', '') === 'post';
 		$context['start'] = $this->_req->getQuery('start', 'intval', 0);
 
 		theme()->getTemplates()->load('ModerationCenter');
@@ -1002,15 +1005,15 @@ class ModerationCenter extends AbstractController
 		]);
 
 		// First off - are we deleting?
-		if (!empty($this->_req->query->delete) || !empty($this->_req->post->delete))
+		if ($this->_req->hasQuery('delete') || !empty($this->_req->post->delete))
 		{
-			checkSession(isset($this->_req->query->delete) ? 'get' : 'post');
+			checkSession($this->_req->hasQuery('delete') ? 'get' : 'post');
 
 			// Clicked on remove or using checkboxes to multi delete
 			$toDelete = [];
-			if (isset($this->_req->query->delete))
+			if ($this->_req->hasQuery('delete'))
 			{
-				$toDelete[] = (int) $this->_req->query->delete;
+				$toDelete[] = $this->_req->getQuery('delete', 'intval', 0);
 			}
 			else
 			{
@@ -1290,7 +1293,8 @@ class ModerationCenter extends AbstractController
 		];
 
 		// Setup the allowed quick search type
-		$context['order'] = isset($this->_req->query->sort, $searchTypes[$this->_req->query->sort]) ? $this->_req->query->sort : 'member';
+		$reqSort = $this->_req->getQuery('sort', 'trim|strval', null);
+		$context['order'] = ($reqSort !== null && isset($searchTypes[$reqSort])) ? $reqSort : 'member';
 
 		if (!isset($search_params['string']) || (!empty($this->_req->post->search) && $search_params['string'] !== $this->_req->post->search))
 		{

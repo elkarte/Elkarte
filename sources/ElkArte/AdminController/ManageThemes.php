@@ -95,7 +95,7 @@ class ManageThemes extends AbstractController
 	{
 		global $txt, $context;
 
-		if (isset($this->_req->query->api))
+		if ($this->_req->hasQuery('api'))
 		{
 			$this->action_index_api();
 
@@ -182,9 +182,10 @@ class ManageThemes extends AbstractController
 		];
 
 		// Follow the sa or just go to administration.
-		if (isset($this->_req->query->sa, $subActions[$this->_req->query->sa]) && $subActions[$this->_req->query->sa] !== '' && $subActions[$this->_req->query->sa] !== '0')
+		$sa = $this->_req->getQuery('sa', 'trim|strval', '');
+		if ($sa !== '' && $sa !== '0' && isset($subActions[$sa]))
 		{
-			$this->{$subActions[$this->_req->query->sa]}();
+			$this->{$subActions[$sa]}();
 		}
 		else
 		{
@@ -211,7 +212,7 @@ class ManageThemes extends AbstractController
 		Txt::load('Admin');
 		$fileFunc = FileFunctions::instance();
 
-		if (isset($this->_req->query->th))
+		if ($this->_req->hasQuery('th'))
 		{
 			$this->action_setthemesettings();
 			return;
@@ -750,7 +751,7 @@ class ManageThemes extends AbstractController
 		}
 
 		// Remove all members options and use the defaults
-		if (!empty($this->_req->query->who) && $who === 2)
+		if ($this->_req->hasQuery('who') && $who === 2)
 		{
 			checkSession('get');
 			validateToken('admin-stor', 'request');
@@ -780,7 +781,7 @@ class ManageThemes extends AbstractController
 		$context['theme_settings'] = $settings;
 
 		// Load the options for these theme
-		if (empty($this->_req->query->who))
+		if (!$this->_req->hasQuery('who'))
 		{
 			$context['theme_options'] = loadThemeOptionsInto([1, $theme], -1, $context['theme_options']);
 			$context['theme_options_reset'] = false;
@@ -1432,7 +1433,10 @@ class ManageThemes extends AbstractController
 		checkSession('get');
 
 		// This good-for-nothing pixel is being used to keep the session alive.
-		if (empty($this->_req->query->var) || !isset($this->_req->query->val))
+		$var = $this->_req->getQuery('var', 'trim|strval', null);
+		// Note: val could be a string or array depending on the option
+		$val = $this->_req->getQuery('val', null, null);
+		if ($var === null || $val === null)
 		{
 			redirectexit($settings['images_url'] . '/blank.png');
 		}
@@ -1464,13 +1468,13 @@ class ManageThemes extends AbstractController
 		];
 
 		// Can't change reserved vars.
-		if (in_array(strtolower($this->_req->query->var), $reservedVars))
+		if (in_array(strtolower($var), $reservedVars))
 		{
 			redirectexit($settings['images_url'] . '/blank.png');
 		}
 
 		// Use a specific theme?
-		if (isset($this->_req->query->th) || isset($this->_req->query->id))
+		if ($this->_req->hasQuery('th') || $this->_req->hasQuery('id'))
 		{
 			// Invalidate the current themes cache too.
 			Cache::instance()->remove('theme_settings-' . $settings['theme_id'] . ':' . $this->user->id);
@@ -1479,7 +1483,7 @@ class ManageThemes extends AbstractController
 		}
 
 		// If this is the admin preferences the passed value will just be an element of it.
-		if ($this->_req->query->var === 'admin_preferences')
+		if ($var === 'admin_preferences')
 		{
 			if (!empty($options['admin_preferences']))
 			{
@@ -1497,16 +1501,17 @@ class ManageThemes extends AbstractController
 			}
 
 			// New thingy...
-			if (isset($this->_req->query->admin_key) && strlen($this->_req->query->admin_key) < 5)
+			$admin_key = $this->_req->getQuery('admin_key', 'trim|strval', null);
+			if ($admin_key !== null && strlen($admin_key) < 5)
 			{
-				$options['admin_preferences'][$this->_req->query->admin_key] = $this->_req->query->val;
+				$options['admin_preferences'][$admin_key] = $val;
 			}
 
 			// Change the value to be something nice,
-			$this->_req->query->val = json_encode($options['admin_preferences']);
+			$val = json_encode($options['admin_preferences']);
 		}
 		// If this is the window min/max settings, the passed window name will just be an element of it.
-		elseif ($this->_req->query->var === 'minmax_preferences')
+		elseif ($var === 'minmax_preferences')
 		{
 			if (!empty($options['minmax_preferences']))
 			{
@@ -1527,18 +1532,19 @@ class ManageThemes extends AbstractController
 			}
 
 			// New value for them
-			if (isset($this->_req->query->minmax_key) && strlen($this->_req->query->minmax_key) < 10)
+			$minmax_key = $this->_req->getQuery('minmax_key', 'trim|strval', null);
+			if ($minmax_key !== null && strlen($minmax_key) < 10)
 			{
-				$minmax_preferences[$this->_req->query->minmax_key] = $this->_req->query->val;
+				$minmax_preferences[$minmax_key] = $val;
 			}
 
 			// Change the value to be something nice,
-			$this->_req->query->val = json_encode($minmax_preferences);
+			$val = json_encode($minmax_preferences);
 		}
 
 		// Update the option.
 		require_once(SUBSDIR . '/Themes.subs.php');
-		updateThemeOptions([$settings['theme_id'], $this->user->id, $this->_req->query->var, is_array($this->_req->query->val) ? implode(',', $this->_req->query->val) : $this->_req->query->val]);
+		updateThemeOptions([$settings['theme_id'], $this->user->id, $var, is_array($val) ? implode(',', $val) : $val]);
 
 		Cache::instance()->remove('theme_settings-' . $settings['theme_id'] . ':' . $this->user->id);
 

@@ -975,7 +975,7 @@ class PersonalMessage extends AbstractController
 	 *
 	 * @param array $named_recipients
 	 * @param array $recipient_ids array keys of [bbc] => int[] and [to] => int[]
-	 * @param array $msg_options body, subject and reply values
+	 * @param object $msg_options body, subject and reply values
 	 *
 	 * @throws Exception pm_not_yours
 	 */
