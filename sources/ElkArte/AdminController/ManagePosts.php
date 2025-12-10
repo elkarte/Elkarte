@@ -69,20 +69,20 @@ class ManagePosts extends AbstractController
 
 		// Tabs for browsing the different post functions.
 		$context[$context['admin_menu_name']]['object']->prepareTabData([
-			'title' => 'manageposts_title',
-			'help' => 'posts_and_topics',
-			'description' => 'manageposts_description',
-			'tabs' => [
-				'posts' => [
-					'description' => $txt['manageposts_settings_description'],
-				],
-				'censor' => [
-					'description' => $txt['admin_censored_desc'],
-				],
-				'topics' => [
-					'description' => $txt['manageposts_topic_settings_description'],
-				],
-			]]
+				'title' => 'manageposts_title',
+				'help' => 'posts_and_topics',
+				'description' => 'manageposts_description',
+				'tabs' => [
+					'posts' => [
+						'description' => $txt['manageposts_settings_description'],
+					],
+					'censor' => [
+						'description' => $txt['admin_censored_desc'],
+					],
+					'topics' => [
+						'description' => $txt['manageposts_topic_settings_description'],
+					],
+				]]
 		);
 
 		// Call the right function for this sub-action.
@@ -128,16 +128,20 @@ class ManagePosts extends AbstractController
 			{
 				if (is_array($this->_req->post->censor_vulgar))
 				{
-					foreach ($this->_req->post->censor_vulgar as $i => $value)
+					// Work on local copies to avoid mutating the request
+					$local_vulgar = (array) $this->_req->getPost('censor_vulgar', null, []);
+					$local_proper = (array) $this->_req->getPost('censor_proper', null, []);
+
+					foreach ($local_vulgar as $i => $value)
 					{
 						if (trim(str_replace('*', ' ', $value)) === '')
 						{
-							unset($this->_req->post->censor_vulgar[$i], $this->_req->post->censor_proper[$i]);
+							unset($local_vulgar[$i], $local_proper[$i]);
 						}
 					}
 
-					$censored_vulgar = $this->_req->post->censor_vulgar;
-					$censored_proper = $this->_req->post->censor_proper;
+					$censored_vulgar = $local_vulgar;
+					$censored_proper = $local_proper;
 				}
 				else
 				{

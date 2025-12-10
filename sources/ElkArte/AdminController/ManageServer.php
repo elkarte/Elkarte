@@ -300,7 +300,7 @@ class ManageServer extends AbstractController
 			// Its either local or global cookies
 			if (!empty($this->_req->post->localCookies) && !empty($this->_req->post->globalCookies))
 			{
-				unset($this->_req->post->globalCookies);
+				$this->_req->clearValue('globalCookies', 'post');
 			}
 
 			if (!empty($this->_req->post->globalCookiesDomain) && !str_contains($boardurl, (string) $this->_req->post->globalCookiesDomain))

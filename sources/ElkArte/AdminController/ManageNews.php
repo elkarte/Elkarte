@@ -160,21 +160,23 @@ class ManageNews extends AbstractController
 		{
 			checkSession();
 
-			foreach ($this->_req->post->news as $i => $news)
+			// Work on a local copy to avoid mutating the request object
+			$news_items = (array) $this->_req->getPost('news', null, []);
+			foreach ($news_items as $i => $news)
 			{
 				if (trim($news) === '')
 				{
-					unset($this->_req->post->news[$i]);
+					unset($news_items[$i]);
 				}
 				else
 				{
-					$this->_req->post->news[$i] = Util::htmlspecialchars($this->_req->post->news[$i], ENT_QUOTES);
-					preparsecode($this->_req->post->news[$i]);
+					$news_items[$i] = Util::htmlspecialchars($news_items[$i], ENT_QUOTES);
+					preparsecode($news_items[$i]);
 				}
 			}
 
 			// Send the new news to the database.
-			updateSettings(['news' => implode("\n", $this->_req->post->news)]);
+			updateSettings(['news' => implode("\n", $news_items)]);
 
 			// Log this into the moderation log.
 			logAction('news');

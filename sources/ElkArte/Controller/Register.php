@@ -433,12 +433,12 @@ class Register extends AbstractController
 			}
 			else
 			{
-				unset($this->_req->post->lngfile);
+				$this->_req->clearValue('lngfile', 'post');
 			}
 		}
 		elseif (isset($this->_req->post->lngfile))
 		{
-			unset($this->_req->post->lngfile);
+			$this->_req->clearValue('lngfile', 'post');
 		}
 
 		// Set the options needed for registration.
