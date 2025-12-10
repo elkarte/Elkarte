@@ -261,19 +261,22 @@ class Unread extends AbstractController
 			'last_post' => 't.id_last_msg'
 		];
 
+		// Read requested sort and direction flags
+		$requested_sort = $this->_req->getQuery('sort', 'trim|strval', null);
+
 		// The default is the most logical: newest first.
-		if (!isset($this->_req->query->sort, $sort_methods[$this->_req->query->sort]))
+		if ($requested_sort === null || !isset($sort_methods[$requested_sort]))
 		{
 			$context['sort_by'] = 'last_post';
-			$ascending = isset($this->_req->query->asc);
+			$ascending = $this->_req->hasQuery('asc');
 
 			$context['querystring_sort_limits'] = $ascending ? ';asc' : '';
 		}
 		// But, for other methods the default sort is ascending.
 		else
 		{
-			$context['sort_by'] = $this->_req->query->sort;
-			$ascending = !isset($this->_req->query->desc);
+			$context['sort_by'] = $requested_sort;
+			$ascending = !$this->_req->hasQuery('desc');
 
 			$context['querystring_sort_limits'] = ';sort=' . $context['sort_by'] . ($ascending ? '' : ';desc');
 		}
@@ -298,7 +301,7 @@ class Unread extends AbstractController
 					$sorticon = 'numeric';
 			}
 
-			$context['topics_headers'][$key] = ['url' => $scripturl . '?action=' . $this->_action . ($context['showing_all_topics'] ? ';all' : '') . sprintf($context['querystring_board_limits'], $this->_req->query->start) . ';sort=' . $key . ($context['sort_by'] == $key && $context['sort_direction'] === 'up' ? ';desc' : ''), 'sort_dir_img' => $context['sort_by'] == $key ? '<i class="icon icon-small i-sort-' . $sorticon . '-' . $context['sort_direction'] . '" title="' . $context['sort_title'] . '"></i>' : '',];
+			$context['topics_headers'][$key] = ['url' => $scripturl . '?action=' . $this->_action . ($context['showing_all_topics'] ? ';all' : '') . sprintf($context['querystring_board_limits'], $context['start']) . ';sort=' . $key . ($context['sort_by'] == $key && $context['sort_direction'] === 'up' ? ';desc' : ''), 'sort_dir_img' => $context['sort_by'] == $key ? '<i class="icon icon-small i-sort-' . $sorticon . '-' . $context['sort_direction'] . '" title="' . $context['sort_title'] . '"></i>' : '',];
 		}
 	}
 
@@ -357,12 +360,12 @@ class Unread extends AbstractController
 			}
 			else
 			{
-				$context['querystring_board_limits'] = sprintf($context['querystring_board_limits'], $this->_req->query->start);
+				$context['querystring_board_limits'] = sprintf($context['querystring_board_limits'], $context['start']);
 			}
 		}
 		else
 		{
-			$context['topics'] = $this->_grabber->getUnreads($type, $this->_req->query->start, $context['topics_per_page'], $settings['avatars_on_indexes']);
+			$context['topics'] = $this->_grabber->getUnreads($type, $context['start'], $context['topics_per_page'], $settings['avatars_on_indexes']);
 		}
 
 		$this->_exiting_unread();

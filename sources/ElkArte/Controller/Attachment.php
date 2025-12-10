@@ -380,15 +380,15 @@ class Attachment extends AbstractController
 		$filename = null;
 
 		// Make sure some attachment was requested!
-		if (!isset($this->_req->query->attach))
+		if (!$this->_req->hasQuery('attach'))
 		{
-			if (!isset($this->_req->query->id))
+			if (!$this->_req->hasQuery('id'))
 			{
 				// Give them the old can't find it image
 				$this->action_text_to_image('attachment_not_found');
 			}
 
-			if ($this->_req->query->id === 'ila')
+			if ($this->_req->getQuery('id', 'trim|strval', '') === 'ila')
 			{
 				// Give them the old can't touch this
 				$this->action_text_to_image(($this->user->is_guest ? 'not_applicable' : 'awaiting_approval'), 90, 90, true);
@@ -399,10 +399,14 @@ class Attachment extends AbstractController
 		require_once(SUBSDIR . '/Attachments.subs.php');
 
 		// Temporary attachment, special case...
-		if (isset($this->_req->query->attach) && str_contains($this->_req->query->attach, 'post_tmp_' . $this->user->id . '_'))
+		if ($this->_req->hasQuery('attach'))
 		{
-			// Return via tmpattach, back presumably to the post form
-			$this->action_tmpattach();
+			$attachParam = $this->_req->getQuery('attach', 'trim|strval', '');
+			if (str_contains($attachParam, 'post_tmp_' . $this->user->id . '_'))
+			{
+				// Return via tmpattach, back presumably to the post form
+				$this->action_tmpattach();
+			}
 		}
 
 		$id_attach = $this->_req->getQuery('attach', 'intval', $this->_req->getQuery('id', 'intval', 0));
@@ -426,13 +430,17 @@ class Attachment extends AbstractController
 
 		isAllowedTo('view_attachments', $id_board);
 
+		// Track if we should force inline display when a thumbnail is requested
+		$forceImage = false;
+
 		if ($this->_req->getQuery('thumb') === null)
 		{
 			$attachment = getAttachmentFromTopic($id_attach, $id_topic);
 		}
 		else
 		{
-			$this->_req->query->image = true;
+			// Requesting a thumbnail implies an image inline display
+			$forceImage = true;
 			$attachment = getAttachmentThumbFromTopic($id_attach, $id_topic);
 
 			// No file name, no thumbnail, no image.
@@ -504,17 +512,22 @@ class Attachment extends AbstractController
 		$possibleMobi = strpos(Request::instance()->user_agent(), 'Mobi');
 		$eTag = '"' . substr($id_attach . $real_filename . @filemtime($filename), 0, 64) . '"';
 		$reqQueryHasImage = $this->_req->hasQuery('image');
-		$do_cache = !(!$reqQueryHasImage && getValidMimeImageType($file_ext) !== '');
+		$imageRequested = $reqQueryHasImage || $forceImage;
+		$do_cache = !(!$imageRequested && getValidMimeImageType($file_ext) !== '');
 
 		// Make sure the mime type warrants an inline display.
-		if ($reqQueryHasImage && !empty($mime_type) && !str_starts_with($mime_type, 'image/'))
+		if ($imageRequested && !empty($mime_type) && !str_starts_with($mime_type, 'image/'))
 		{
-			$this->_req->clearValue('image', 'query');
+			if ($reqQueryHasImage)
+			{
+				$this->_req->clearValue('image', 'query');
+			}
 			$reqQueryHasImage = false;
+			$forceImage = false;
 			$mime_type = '';
 		}
 		// Does this have a mime type?
-		elseif (empty($mime_type) || (!$reqQueryHasImage && getValidMimeImageType($file_ext) !== ''))
+		elseif (empty($mime_type) || (!$imageRequested && getValidMimeImageType($file_ext) !== ''))
 		{
 			$mime_type = '';
 			if ($reqQueryHasImage)
@@ -522,10 +535,11 @@ class Attachment extends AbstractController
 				$this->_req->clearValue('image', 'query');
 				$reqQueryHasImage = false;
 			}
+			$forceImage = false;
 		}
 
 		// Show this content inline or download?
-		$disposition = ($reqQueryHasImage || ($possibleMobi && (str_starts_with($mime_type, 'audio/') || str_starts_with($mime_type, 'video/')))) ? 'inline' : 'attachment';
+		$disposition = (($reqQueryHasImage || $forceImage) || ($possibleMobi && (str_starts_with($mime_type, 'audio/') || str_starts_with($mime_type, 'video/')))) ? 'inline' : 'attachment';
 		$this->prepare_headers($filename, $eTag, $mime_type, $disposition, $real_filename, $do_cache);
 		$this->send_file($filename, $mime_type);
 

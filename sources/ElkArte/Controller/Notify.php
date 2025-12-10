@@ -430,9 +430,11 @@ class Notify extends AbstractController
 		if (checkSession('get', '', false))
 		{
 			Txt::load('Errors');
+			$sa = $this->_req->getQuery('sa', 'trim|strval', '');
+			$start = $this->_req->getQuery('start', 'intval', 0);
 			$context['xml_data'] = [
 				'error' => 1,
-				'url' => getUrl('action', ['action' => 'unwatchtopic', 'sa' => ($this->_req->query->sa === 'on' ? 'on' : 'off'), 'topic' => $topic . '.' . $this->_req->query->start, '{session_data}'])
+				'url' => getUrl('action', ['action' => 'unwatchtopic', 'sa' => ($sa === 'on' ? 'on' : 'off'), 'topic' => $topic . '.' . $start, '{session_data}'])
 			];
 
 			return;
@@ -440,12 +442,14 @@ class Notify extends AbstractController
 
 		$this->_toggle_topic_watch();
 
+		$sa = $this->_req->getQuery('sa', 'trim|strval', '');
+		$start = $this->_req->getQuery('start', 'intval', 0);
 		$context['xml_data'] = [
-			'text' => $this->_req->query->sa === 'on' ? $txt['watch'] : $txt['unwatch'],
-			'url' => getUrl('action', ['action' => 'unwatchtopic', 'sa' => ($this->_req->query->sa === 'on' ? 'off' : 'on'), 'topic' => $context['current_topic'] . '.' . $this->_req->query->start, '{session_data}', 'api' => '1'] + (isset($_REQUEST['json']) ? ['json'] : [])),
+			'text' => $sa === 'on' ? $txt['watch'] : $txt['unwatch'],
+			'url' => getUrl('action', ['action' => 'unwatchtopic', 'sa' => ($sa === 'on' ? 'off' : 'on'), 'topic' => $context['current_topic'] . '.' . $start, '{session_data}', 'api' => '1'] + (isset($_REQUEST['json']) ? ['json'] : [])),
 		];
 
-		setTopicWatch($this->user->id, $topic, $this->_req->query->sa === 'on');
+		setTopicWatch($this->user->id, $topic, $sa === 'on');
 	}
 
 	/**
