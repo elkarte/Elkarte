@@ -426,12 +426,12 @@ class PersonalMessage extends AbstractController
 		}
 
 		// Make sure the starting location is valid.
-		$start = $this->_req->getQuery('start', 'trim');
-		if (isset($start) && $start !== 'new')
+		$start_raw = $this->_req->getQuery('start', 'trim', null);
+		if ($start_raw !== null && $start_raw !== 'new')
 		{
-			$start = (int) $this->_req->query->start;
+			$start = $this->_req->getQuery('start', 'intval', 0);
 		}
-		elseif (!isset($start) && !empty($options['view_newest_pm_first']))
+		elseif ($start_raw === null && !empty($options['view_newest_pm_first']))
 		{
 			$start = 0;
 		}
@@ -454,14 +454,14 @@ class PersonalMessage extends AbstractController
 
 		// They didn't pick a sort, so we use the forum default.
 		$sort_by = $this->_req->getQuery('sort', 'trim', 'date');
-		$descending = isset($this->_req->query->desc);
+		$descending = $this->_req->hasQuery('desc');
 
 		// Set our sort by query
 		switch ($sort_by)
 		{
 			case 'date':
 				$sort_by_query = 'pm.id_pm';
-				if (!empty($options['view_newest_pm_first']) && !isset($this->_req->query->desc) && !isset($this->_req->query->asc))
+				if (!empty($options['view_newest_pm_first']) && !$this->_req->hasQuery('desc') && !$this->_req->hasQuery('asc'))
 				{
 					$descending = true;
 				}
@@ -686,7 +686,8 @@ class PersonalMessage extends AbstractController
 		}
 
 		// Set up the page index.
-		$context['page_index'] = constructPageIndex('{scripturl}?action=pm;f=' . $context['folder'] . (isset($this->_req->query->l) ? ';l=' . (int) $this->_req->query->l : '') . ';sort=' . $context['sort_by'] . ($descending ? ';desc' : ''), $start, $max_messages, $modSettings['defaultMaxMessages']);
+		$label_for_index = $this->_req->getQuery('l', 'intval', null);
+		$context['page_index'] = constructPageIndex('{scripturl}?action=pm;f=' . $context['folder'] . ($label_for_index !== null ? ';l=' . (int) $label_for_index : '') . ';sort=' . $context['sort_by'] . ($descending ? ';desc' : ''), $start, $max_messages, $modSettings['defaultMaxMessages']);
 		$context['start'] = $start;
 
 		$context['pm_form_url'] = $scripturl . '?action=pm;sa=pmactions;' . ($context['display_mode'] === self::DISPLAY_AS_CONVERSATION ? 'conversation;' : '') . 'f=' . $context['folder'] . ';start=' . $context['start'] . ($context['current_label_id'] !== -1 ? ';l=' . $context['current_label_id'] : '');
@@ -744,7 +745,7 @@ class PersonalMessage extends AbstractController
 
 		// Set up some items for the template
 		$context['page_title'] = $txt['send_message'];
-		$context['reply'] = isset($this->_req->query->pmsg) || isset($this->_req->query->quote);
+		$context['reply'] = $this->_req->hasQuery('pmsg') || $this->_req->hasQuery('quote');
 
 		// Check whether we've gone over the limit of messages we can send per hour.
 		if (!empty($modSettings['pm_posts_per_hour'])
@@ -763,7 +764,12 @@ class PersonalMessage extends AbstractController
 
 		try
 		{
-			$this->_events->trigger('before_set_context', ['pmsg' => $this->_req->query->pmsg ?? ($this->_req->query->quote ?? 0)]);
+			$pmsg_event = $this->_req->getQuery('pmsg', 'intval', null);
+			if ($pmsg_event === null)
+			{
+				$pmsg_event = $this->_req->getQuery('quote', 'intval', 0);
+			}
+			$this->_events->trigger('before_set_context', ['pmsg' => $pmsg_event]);
 		}
 		catch (PmErrorException $pmErrorException)
 		{
@@ -772,7 +778,7 @@ class PersonalMessage extends AbstractController
 		}
 
 		// Quoting / Replying to a message?
-		if (!empty($this->_req->query->pmsg))
+		if ($this->_req->hasQuery('pmsg'))
 		{
 			$pmsg = $this->_req->getQuery('pmsg', 'intval');
 
@@ -811,7 +817,7 @@ class PersonalMessage extends AbstractController
 			}
 
 			// If quoting, lets clean up some things and set the quote header for the pm body
-			if (isset($this->_req->query->quote))
+			if ($this->_req->hasQuery('quote'))
 			{
 				// Remove any nested quotes and <br />...
 				$form_message = preg_replace('~<br ?/?>~i', "\n", $row_quoted['body']);
@@ -874,10 +880,11 @@ class PersonalMessage extends AbstractController
 		];
 
 		// Sending by ID?  Replying to all?  Fetch the real_name(s).
-		if (isset($this->_req->query->u))
+		if ($this->_req->hasQuery('u'))
 		{
 			// If the user is replying to all, get all the other members this was sent to..
-			if ($this->_req->query->u === 'all' && isset($row_quoted))
+			$u_param = $this->_req->getQuery('u', 'trim|strval', '');
+			if ($u_param === 'all' && isset($row_quoted))
 			{
 				// Firstly, to reply to all we clearly already have $row_quoted - so have the original member from.
 				if ($row_quoted['id_member'] != $this->user->id)
@@ -893,7 +900,8 @@ class PersonalMessage extends AbstractController
 			}
 			else
 			{
-				$users = array_map('intval', explode(',', $this->_req->query->u));
+				$users_csv = $u_param;
+				$users = $users_csv === '' ? [] : array_map('intval', explode(',', $users_csv));
 				$users = array_unique($users);
 
 				// For all the member's this is going to, get their display name.
@@ -1484,7 +1492,7 @@ class PersonalMessage extends AbstractController
 		}
 
 		// If we are in conversation, we may need to apply this to every message in that conversation.
-		if ($context['display_mode'] === self::DISPLAY_AS_CONVERSATION && isset($this->_req->query->conversation))
+		if ($context['display_mode'] === self::DISPLAY_AS_CONVERSATION && $this->_req->hasQuery('conversation'))
 		{
 			$id_pms = array_map('intval', array_keys($pm_actions));
 			$pm_heads = getDiscussions($id_pms);
@@ -1564,7 +1572,8 @@ class PersonalMessage extends AbstractController
 		// Only have to set up the template....
 		$context['sub_template'] = 'ask_delete';
 		$context['page_title'] = $txt['delete_all'];
-		$context['delete_all'] = $this->_req->query->f === 'all';
+		$folder_flag = $this->_req->getQuery('f', 'trim|strval', '');
+		$context['delete_all'] = $folder_flag === 'all';
 
 		// And set the folder name...
 		$txt['delete_all'] = str_replace('PMBOX', $context['folder'] != 'sent' ? $txt['inbox'] : $txt['sent_items'], $txt['delete_all']);
@@ -1580,14 +1589,15 @@ class PersonalMessage extends AbstractController
 		checkSession('get');
 
 		// If all then delete all messages the user has.
-		if ($this->_req->query->f === 'all')
+		$folder_flag = $this->_req->getQuery('f', 'trim|strval', '');
+		if ($folder_flag === 'all')
 		{
 			deleteMessages(null);
 		}
 		// Otherwise just the selected folder.
 		else
 		{
-			deleteMessages(null, $this->_req->query->f != 'sent' ? 'inbox' : 'sent');
+			deleteMessages(null, $folder_flag !== 'sent' ? 'inbox' : 'sent');
 		}
 
 		// Done... all gone.
@@ -2060,7 +2070,7 @@ class PersonalMessage extends AbstractController
 		$context['groups'] = accessibleGroups();
 
 		// Applying all rules?
-		if (isset($this->_req->query->apply))
+		if ($this->_req->hasQuery('apply'))
 		{
 			checkSession('get');
 
@@ -2069,7 +2079,7 @@ class PersonalMessage extends AbstractController
 		}
 
 		// Editing a specific rule?
-		if (isset($this->_req->query->add))
+		if ($this->_req->hasQuery('add'))
 		{
 			$rid = $this->_req->getQuery('rid', 'intval', 0);
 			$context['rid'] = isset($context['rules'][$rid]) ? $rid : 0;
@@ -2100,8 +2110,8 @@ class PersonalMessage extends AbstractController
 			$js_groups = json_encode($context['groups']);
 
 			theme()->addJavascriptVar([
-				'criteriaNum' => 0,
-				'actionNum' => 0,
+					'criteriaNum' => 0,
+					'actionNum' => 0,
 				]
 			);
 
@@ -2176,7 +2186,7 @@ class PersonalMessage extends AbstractController
 			$context['rule']['criteria'][] = ['t' => '', 'v' => ''];
 		}
 		// Saving?
-		elseif (isset($this->_req->query->save))
+		elseif ($this->_req->hasQuery('save'))
 		{
 			checkSession();
 			$rid = $this->_req->getQuery('rid', 'intval', 0);
