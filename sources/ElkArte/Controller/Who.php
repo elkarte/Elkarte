@@ -210,17 +210,21 @@ class Who extends AbstractController
 		$spiderContext = [];
 		if (!empty($modSettings['show_spider_online']) && ($modSettings['show_spider_online'] == 2 || allowedTo('admin_forum')) && !empty($modSettings['spider_name_cache']))
 		{
-			foreach (unserialize($modSettings['spider_name_cache']) as $id => $name)
+			$spider_cache = Util::unserialize($modSettings['spider_name_cache']);
+			if (is_array($spider_cache))
 			{
-				$spiderContext[$id] = [
-					'id' => 0,
-					'name' => $name,
-					'group' => $txt['spiders'],
-					'href' => '',
-					'link' => $name,
-					'email' => $name,
-					'is_guest' => true
-				];
+				foreach ($spider_cache as $id => $name)
+				{
+					$spiderContext[$id] = [
+						'id' => 0,
+						'name' => $name,
+						'group' => $txt['spiders'],
+						'href' => '',
+						'link' => $name,
+						'email' => $name,
+						'is_guest' => true
+					];
+				}
 			}
 		}
 

@@ -52,20 +52,28 @@ class ModerateAttachments extends AbstractController
 		checkSession('get');
 
 		// Is it approve or delete?
-		$is_approve = !isset($this->_req->query->sa) || $this->_req->query->sa !== 'reject';
+		$sa = $this->_req->getQuery('sa', 'trim|strval', '');
+		$is_approve = $sa !== 'reject';
 
 		$attachments = [];
 		require_once(SUBSDIR . '/ManageAttachments.subs.php');
 
 		// If we are approving all ID's in a message, get the ID's.
-		if ($this->_req->query->sa === 'all' && !empty($this->_req->query->mid))
+		if ($sa === 'all' && $this->_req->hasQuery('mid'))
 		{
-			$id_msg = (int) $this->_req->query->mid;
-			$attachments = attachmentsOfMessage($id_msg);
+			$id_msg = $this->_req->getQuery('mid', 'intval', 0);
+			if (!empty($id_msg))
+			{
+				$attachments = attachmentsOfMessage($id_msg);
+			}
 		}
-		elseif (!empty($this->_req->query->aid))
+		elseif ($this->_req->hasQuery('aid'))
 		{
-			$attachments[] = (int) $this->_req->query->aid;
+			$aid = $this->_req->getQuery('aid', 'intval', 0);
+			if (!empty($aid))
+			{
+				$attachments[] = $aid;
+			}
 		}
 
 		if (empty($attachments))

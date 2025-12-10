@@ -289,15 +289,17 @@ class RemoveTopic extends AbstractController
 		$restorer = new MessagesDelete($modSettings['recycle_enable'], $modSettings['recycle_board']);
 
 		// Restoring messages?
-		if (!empty($this->_req->query->msgs))
+		$msgs_param = $this->_req->getQuery('msgs', 'trim|strval', '');
+		if ($msgs_param !== '')
 		{
-			$actioned_messages = $restorer->restoreMessages(array_map('intval', explode(',', $this->_req->query->msgs)));
+			$actioned_messages = $restorer->restoreMessages(array_map('intval', explode(',', $msgs_param)));
 		}
 
 		// Now any topics?
-		if (!empty($this->_req->query->topics))
+		$topics_param = $this->_req->getQuery('topics', 'trim|strval', '');
+		if ($topics_param !== '')
 		{
-			$topics_to_restore = array_map('intval', explode(',', $this->_req->query->topics));
+			$topics_to_restore = array_map('intval', explode(',', $topics_param));
 			$restorer->restoreTopics($topics_to_restore);
 		}
 

@@ -282,8 +282,8 @@ class MessageIndex extends AbstractController implements FrontpageInterface
 			}
 		}
 
-		return !empty($this->_req->query->start)
-			&& (!is_numeric($this->_req->query->start) || $this->_req->query->start % $modSettings['defaultMaxMessages'] !== 0);
+		$start = $this->_req->getQuery('start', 'intval', 0);
+		return $start !== 0 && ($start % $modSettings['defaultMaxMessages'] !== 0);
 	}
 
 	/**
@@ -1036,12 +1036,13 @@ class MessageIndex extends AbstractController implements FrontpageInterface
 				'approve_posts' => allowedTo('approve_posts') ? [$board] : [],
 			];
 
-			$redirect_url = 'board=' . $board . '.' . $this->_req->query->start;
+			$start = $this->_req->getQuery('start', 'intval', 0);
+			$redirect_url = 'board=' . $board . '.' . $start;
 		}
 		else
 		{
 			$boards_can = boardsAllowedTo(['make_sticky', 'move_any', 'move_own', 'remove_any', 'remove_own', 'lock_any', 'lock_own', 'merge_any', 'approve_posts'], true, false);
-			$redirect_url = $this->_req->post->redirect_url ?? ($_SESSION['old_url'] ?? getUrlQuery('action', $modSettings['default_forum_action']));
+			$redirect_url = $this->_req->getPost('redirect_url', 'trim|strval', $_SESSION['old_url'] ?? getUrlQuery('action', $modSettings['default_forum_action']));
 		}
 
 		// Just what actions can they do?, approve, move, remove, lock, sticky, lock, merge, mark read?
@@ -1242,6 +1243,7 @@ class MessageIndex extends AbstractController implements FrontpageInterface
 		}
 
 		redirectexit($redirect_url);
+		return null;
 	}
 
 	/**

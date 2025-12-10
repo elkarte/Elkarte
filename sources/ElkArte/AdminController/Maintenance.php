@@ -74,9 +74,9 @@ class Maintenance extends AbstractController
 		// This uses admin tabs - as it should!
 		// Create the tabs
 		$context[$context['admin_menu_name']]['object']->prepareTabData([
-			'title' => 'maintain_title',
-			'description' => 'maintain_info',
-			'class' => 'i-cog']
+				'title' => 'maintain_title',
+				'description' => 'maintain_info',
+				'class' => 'i-cog']
 		);
 
 		// So many things you can do - but frankly I won't let you - just these!
@@ -471,7 +471,7 @@ class Maintenance extends AbstractController
 		if (!isset($this->_req->post->do_conversion) || isset($this->_req->post->cont))
 		{
 			checkSession();
-			if (empty($this->_req->query->start))
+			if (!$this->_req->hasQuery('start'))
 			{
 				validateToken('admin-maint');
 			}
@@ -488,7 +488,7 @@ class Maintenance extends AbstractController
 			$increment = 500;
 			$id_msg_exceeding = isset($this->_req->post->id_msg_exceeding) ? explode(',', $this->_req->post->id_msg_exceeding) : [];
 			$max_msgs = countMessages();
-			$start = $this->_req->query->start;
+			$start = $this->_req->getQuery('start', 'intval', 0);
 
 			// Try for as much time as possible.
 			detectServer()->setTimeLimit(600);
@@ -803,7 +803,8 @@ class Maintenance extends AbstractController
 		{
 			while ($this->start < $modSettings['maxMsgID'])
 			{
-				updateMessagesBoardID($this->_req->query->start, $this->increment);
+				// Use the controller's start pointer, not raw request
+				updateMessagesBoardID($this->start, $this->increment);
 				$this->start += $this->increment;
 
 				if (microtime(true) - $time_start > 3)

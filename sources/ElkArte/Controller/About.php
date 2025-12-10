@@ -268,7 +268,7 @@ class About extends AbstractController
 			'post' => empty($modSettings['coppaPost']) ? '' : $modSettings['coppaPost'],
 			'fax' => empty($modSettings['coppaFax']) ? '' : $modSettings['coppaFax'],
 			'phone' => empty($modSettings['coppaPhone']) ? '' : str_replace('{PHONE_NUMBER}', $modSettings['coppaPhone'], $txt['coppa_send_by_phone']),
-			'id' => $this->_req->query->member,
+			'id' => $this->_req->getQuery('member', 'intval', 0),
 		];
 	}
 
