@@ -263,8 +263,8 @@ class ManageNews extends AbstractController
 
 		theme()->addJavascriptVar([
 			'last_preview' => 0,
-		    'txt_preview' => JavaScriptEscape($txt['preview']),
-		    'txt_news_error_no_news' => JavaScriptEscape($txt['news_error_no_news'])]);
+			'txt_preview' => JavaScriptEscape($txt['preview']),
+			'txt_news_error_no_news' => JavaScriptEscape($txt['news_error_no_news'])]);
 
 		// Create the request list.
 		createList($listOptions);
@@ -563,7 +563,7 @@ class ManageNews extends AbstractController
 		global $txt, $context, $scripturl, $modSettings;
 
 		// A nice successful screen if you did it
-		if (isset($this->_req->query->success))
+		if ($this->_req->hasQuery('success'))
 		{
 			$context['sub_template'] = 'email_members_succeeded';
 			theme()->getTemplates()->load('ManageNews');
@@ -978,7 +978,7 @@ class ManageNews extends AbstractController
 		$context['post_url'] = getUrl('admin', ['action' => 'admin', 'area' => 'news', 'save', 'sa' => 'settings']);
 
 		// Saving the settings?
-		if (isset($this->_req->query->save))
+		if ($this->_req->hasQuery('save'))
 		{
 			checkSession();
 

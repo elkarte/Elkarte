@@ -90,7 +90,7 @@ class Draft extends Post
 		$context['current_member'] = $this->_memID;
 
 		// If just deleting a draft, do it and then redirect back.
-		if (!empty($this->_req->query->delete) || !empty($this->_req->post->delete))
+		if ($this->_req->hasQuery('delete') || $this->_req->hasPost('delete'))
 		{
 			$this->_action_delete('action=profile;u=' . $this->_memID . ';area=showdrafts;start=' . $context['start']);
 		}
@@ -189,13 +189,14 @@ class Draft extends Post
 
 		// Lets see what we have been sent, one or many to delete
 		$toDelete = [];
-		if (!empty($this->_req->query->delete))
+		if ($this->_req->hasQuery('delete'))
 		{
-			$toDelete[] = (int) $this->_req->query->delete;
+			$toDelete[] = $this->_req->getQuery('delete', 'intval', 0);
 		}
 		else
 		{
-			$toDelete = array_map('intval', $this->_req->post->delete);
+			$delete_list = $this->_req->getPost('delete', null, []);
+			$toDelete = is_array($delete_list) ? array_map('intval', $delete_list) : [];
 		}
 
 		if (!empty($toDelete))
@@ -307,7 +308,7 @@ class Draft extends Post
 		$context['start'] = $this->_req->getQuery('start', 'intval', 0);
 
 		// If just deleting a draft, do it and then redirect back.
-		if (!empty($this->_req->query->delete) || !empty($this->_req->post->delete))
+		if ($this->_req->hasQuery('delete') || $this->_req->hasPost('delete'))
 		{
 			$this->_action_delete('action=pm;sa=showpmdrafts;start=' . $context['start']);
 			return;

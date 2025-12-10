@@ -96,7 +96,8 @@ class Reports extends AbstractController
 			];
 		}
 
-		$report_type = empty($this->_req->post->rt) ? (!empty($this->_req->query->rt) ? $this->_req->query->rt : null) : ($this->_req->post->rt);
+		// Read selected report type from either POST or GET without mutating the request
+		$report_type = $this->_req->getRequest('rt', 'trim|strval', null);
 
 		// If they haven't chosen a report type which is valid, send them off to the report type chooser!
 		if (empty($report_type) || !isset($context['report_types'][$report_type]))
@@ -120,7 +121,7 @@ class Reports extends AbstractController
 		];
 
 		// Specific template? Use that instead of main!
-		$set_template = $this->_req->query->st ?? null;
+		$set_template = $this->_req->getQuery('st', 'trim|strval', null);
 		if (isset($set_template, $reportTemplates[$set_template]))
 		{
 			$context['sub_template'] = $set_template;

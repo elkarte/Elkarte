@@ -44,7 +44,7 @@ class AdminLog extends AbstractController
 			'errorlog' => [
 				'function' => 'action_index',
 				'controller' => ManageErrors::class],
-			'disabled' => empty($modSettings['enableErrorLogging']),
+				'disabled' => empty($modSettings['enableErrorLogging']),
 			'adminlog' => [
 				'function' => 'action_log',
 				'controller' => Modlog::class],

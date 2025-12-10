@@ -83,20 +83,21 @@ class Emailmoderator extends AbstractController
 		];
 
 		// If they're posting, it should be processed by action_reporttm2.
-		if ((isset($this->_req->post->{$context['session_var']}) || isset($this->_req->post->save)) && !$report_errors->hasErrors())
+		// Note: keep the dynamic session var check
+		if ((isset($this->_req->post->{$context['session_var']}) || $this->_req->hasPost('save')) && !$report_errors->hasErrors())
 		{
 			$this->action_reporttm2();
 		}
 
-		// We need a message ID to check!
-		if (empty($this->_req->query->msg) && empty($this->_req->post->msg))
+		// Retrieve the message id from either GET or POST
+		$message_id = $this->_req->getRequest('msg', 'intval', 0);
+		if (empty($message_id))
 		{
 			throw new Exception('no_access', false);
 		}
 
 		// Check the message's ID - don't want anyone reporting a post that does not exist
 		require_once(SUBSDIR . '/Messages.subs.php');
-		$message_id = $this->_req->getPost('msg', 'intval', isset($this->_req->query->msg) ? (int) $this->_req->query->msg : 0);
 		if (basicMessageInfo($message_id, true, true) === false)
 		{
 			throw new Exception('no_board', false);
@@ -121,7 +122,7 @@ class Emailmoderator extends AbstractController
 		$context['email_address'] = $this->_req->getPost('email', 'trim', '');
 
 		// This is here so that the user could, in theory, be redirected back to the topic.
-		$context['start'] = $this->_req->query->start;
+		$context['start'] = $this->_req->getQuery('start', 'intval', 0);
 		$context['message_id'] = $message_id;
 		$context['page_title'] = $txt['report_to_mod'];
 		$context['sub_template'] = 'report';

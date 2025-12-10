@@ -82,10 +82,10 @@ class ManageSearch extends AbstractController
 
 		// Create the tabs
 		$context[$context['admin_menu_name']]['object']->prepareTabData([
-			'title' => 'manage_search',
-			'description' => 'search_settings_desc',
-			'prefix' => 'search',
-			'help' => 'search']
+				'title' => 'manage_search',
+				'description' => 'search_settings_desc',
+				'prefix' => 'search',
+				'help' => 'search']
 		);
 
 		// Call the right function for this sub-action.
@@ -118,9 +118,15 @@ class ManageSearch extends AbstractController
 		if (!empty($modSettings['additional_search_engines']))
 		{
 			$context['search_engines'] = Util::unserialize($modSettings['additional_search_engines']);
-			$context['search_engines'] = $context['search_engines'] === false ? [] : $context['search_engines'];
+			// Ensure we always have an array here; serialized empty string or other types are normalized.
+			if ($context['search_engines'] === false || !is_array($context['search_engines']))
+			{
+				$context['search_engines'] = [];
+			}
 		}
 
+		// Ensure it is an array before we append placeholders (avoid [] on strings)
+		$context['search_engines'] = (array) $context['search_engines'];
 		for ($count = 0; $count < 3; $count++)
 		{
 			$context['search_engines'][] = [
@@ -131,21 +137,27 @@ class ManageSearch extends AbstractController
 		}
 
 		// A form was submitted.
-		if (isset($this->_req->query->save))
+		if ($this->_req->hasQuery('save'))
 		{
 			checkSession();
 
 			call_integration_hook('integrate_save_search_settings');
 
-			if (empty($this->_req->post->search_results_per_page))
+			// Build a local copy of values to avoid mutating the request object.
+			$values = (array) $this->_req->post;
+			if (empty($values['search_results_per_page']))
 			{
-				$this->_req->post->search_results_per_page = empty($modSettings['search_results_per_page']) ? $modSettings['defaultMaxMessages'] : $modSettings['search_results_per_page'];
+				$values['search_results_per_page'] = empty($modSettings['search_results_per_page']) ? ($modSettings['defaultMaxMessages'] ?? 0) : $modSettings['search_results_per_page'];
 			}
 
 			$new_engines = [];
-			foreach ($this->_req->post->engine_name as $id => $searchengine)
+			$engine_names = $this->_req->getPost('engine_name', null, []);
+			$engine_urls = $this->_req->getPost('engine_url', null, []);
+			$engine_separators = $this->_req->getPost('engine_separator', null, []);
+			foreach ($engine_names as $id => $searchengine)
 			{
-				$url = trim(str_replace(['"', '<', '>'], ['&quot;', '&lt;', '&gt;'], $this->_req->post->engine_url[$id]));
+				$url_raw = $engine_urls[$id] ?? '';
+				$url = trim(str_replace(['"', '<', '>'], ['&quot;', '&lt;', '&gt;'], $url_raw));
 				// If no url, forget it
 				if (empty($searchengine))
 				{
@@ -165,7 +177,7 @@ class ManageSearch extends AbstractController
 				$new_engines[] = [
 					'name' => trim(Util::htmlspecialchars($searchengine, ENT_COMPAT)),
 					'url' => $url,
-					'separator' => trim(Util::htmlspecialchars(empty($this->_req->post->engine_separator[$id]) ? '+' : $this->_req->post->engine_separator[$id], ENT_COMPAT)),
+					'separator' => trim(Util::htmlspecialchars(empty($engine_separators[$id]) ? '+' : $engine_separators[$id], ENT_COMPAT)),
 				];
 			}
 
@@ -173,7 +185,7 @@ class ManageSearch extends AbstractController
 				'additional_search_engines' => $new_engines === [] ? '' : serialize($new_engines)
 			]);
 
-			$settingsForm->setConfigValues((array) $this->_req->post);
+			$settingsForm->setConfigValues($values);
 			$settingsForm->save();
 			redirectexit('action=admin;area=managesearch;sa=settings;' . $context['session_var'] . '=' . $context['session_id']);
 		}
@@ -256,7 +268,7 @@ class ManageSearch extends AbstractController
 		call_integration_hook('integrate_modify_search_weights', [&$factors]);
 
 		// A form was submitted.
-		if (isset($this->_req->post->save))
+		if ($this->_req->hasPost('save'))
 		{
 			checkSession();
 			validateToken('admin-msw');
@@ -266,7 +278,7 @@ class ManageSearch extends AbstractController
 			$changes = [];
 			foreach ($factors as $factor)
 			{
-				$changes[$factor] = (int) $this->_req->post->{$factor};
+				$changes[$factor] = $this->_req->getPost($factor, 'intval', 0);
 			}
 
 			updateSettings($changes);
@@ -368,15 +380,19 @@ class ManageSearch extends AbstractController
 				]);
 			}
 		}
-		elseif (isset($this->_req->post->save))
+		elseif ($this->_req->hasPost('save'))
 		{
 			checkSession();
 			validateToken('admin-msmpost');
 
+			$search_index = $this->_req->getPost('search_index', 'trim|strval', '');
+			$allowed_indexes = ['fulltext', 'custom'];
+			$valid_index = in_array($search_index, $allowed_indexes, true) || isset($context['search_apis'][$search_index]);
+
 			updateSettings([
-				'search_index' => empty($this->_req->post->search_index) || (!in_array($this->_req->post->search_index, ['fulltext', 'custom']) && !isset($context['search_apis'][$this->_req->post->search_index])) ? '' : $this->_req->post->search_index,
-				'search_force_index' => isset($this->_req->post->search_force_index) ? '1' : '0',
-				'search_match_words' => isset($this->_req->post->search_match_words) ? '1' : '0',
+				'search_index' => $valid_index ? $search_index : '',
+				'search_force_index' => $this->_req->hasPost('search_force_index') ? '1' : '0',
+				'search_match_words' => $this->_req->hasPost('search_match_words') ? '1' : '0',
 			]);
 		}
 
@@ -693,10 +709,10 @@ class ManageSearch extends AbstractController
 			}
 
 			// Try to connect
-			//if (empty($modSettings['search_index']) || $modSettings['search_index'] === 'Manticore')
-			//{
+			if (empty($modSettings['search_index']) || $modSettings['search_index'] === 'Manticore')
+			{
 				$this->connectManticore();
-			//}
+			}
 		}
 		elseif (isset($this->_req->post->createconfig))
 		{

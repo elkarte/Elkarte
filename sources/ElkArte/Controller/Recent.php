@@ -146,12 +146,12 @@ class Recent extends AbstractController implements FrontpageInterface
 		$this->_start = $this->_req->getQuery('start', 'intval', 0);
 
 		// Recent posts by category id's
-		if (!empty($this->_req->query->c) && empty($board))
+		if ($this->_req->hasQuery('c') && empty($board))
 		{
 			$categories = $this->_recentPostsCategory();
 		}
 		// Or recent posts by board id's?
-		elseif (!empty($this->_req->query->boards))
+		elseif ($this->_req->hasQuery('boards'))
 		{
 			$this->_recentPostsBoards();
 		}
@@ -230,7 +230,8 @@ class Recent extends AbstractController implements FrontpageInterface
 	{
 		global $modSettings, $context;
 
-		$categories = array_map('intval', explode(',', $this->_req->query->c));
+		$c_param = $this->_req->getQuery('c', 'trim|strval', '');
+		$categories = $c_param === '' ? [] : array_map('intval', explode(',', $c_param));
 
 		if (count($categories) === 1)
 		{
@@ -279,10 +280,11 @@ class Recent extends AbstractController implements FrontpageInterface
 	{
 		global $modSettings;
 
-		$this->_req->query->boards = array_map('intval', explode(',', $this->_req->query->boards));
+		$boards_param = $this->_req->getQuery('boards', 'trim|strval', '');
+		$boards_list = $boards_param === '' ? [] : array_map('intval', explode(',', $boards_param));
 
 		// Fetch the number of posts for the supplied board IDs
-		$boards_posts = boardsPosts($this->_req->query->boards, []);
+		$boards_posts = boardsPosts($boards_list, []);
 		$this->_total_posts = (int) array_sum($boards_posts);
 		$boards = array_keys($boards_posts);
 
@@ -301,7 +303,7 @@ class Recent extends AbstractController implements FrontpageInterface
 			$this->_maxMsgID = [500, 9];
 		}
 
-		$this->_base_url = '{scripturl}?action=recent;boards=' . implode(',', $this->_req->query->boards);
+		$this->_base_url = '{scripturl}?action=recent;boards=' . implode(',', $boards_list);
 	}
 
 	/**

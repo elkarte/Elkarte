@@ -153,9 +153,9 @@ class RemoveTopic extends AbstractController
 		$_msg = $this->_req->getQuery('msg', 'intval', null);
 
 		// Is $topic set?
-		if (empty($topic) && isset($this->_req->query->topic))
+		if (empty($topic) && $this->_req->hasQuery('topic'))
 		{
-			$topic = (int) $this->_req->query->topic;
+			$topic = $this->_req->getQuery('topic', 'intval', 0);
 		}
 
 		// Trying to mess around are we?
@@ -238,14 +238,16 @@ class RemoveTopic extends AbstractController
 		global $topic, $board;
 
 		// We want to redirect back to recent action.
-		if (isset($this->_req->query->recent))
+		if ($this->_req->hasQuery('recent'))
 		{
 			redirectexit('action=recent');
 		}
 		// Back to profile
-		elseif (isset($this->_req->query->profile, $this->_req->query->start, $this->_req->query->u))
+		elseif ($this->_req->hasQuery('profile') && $this->_req->hasQuery('start') && $this->_req->hasQuery('u'))
 		{
-			redirectexit('action=profile;u=' . $this->_req->query->u . ';area=showposts;start=' . $this->_req->query->start);
+			$u = $this->_req->getQuery('u', 'intval', 0);
+			$start = $this->_req->getQuery('start', 'intval', 0);
+			redirectexit('action=profile;u=' . $u . ';area=showposts;start=' . $start);
 		}
 		// Back to the board if the topic was removed
 		elseif ($full_topic)
@@ -255,7 +257,8 @@ class RemoveTopic extends AbstractController
 		// Back to the topic where the message was removed
 		else
 		{
-			redirectexit('topic=' . $topic . '.' . $this->_req->query->start);
+			$start = $this->_req->getQuery('start', 'intval', 0);
+			redirectexit('topic=' . $topic . '.' . $start);
 		}
 	}
 
