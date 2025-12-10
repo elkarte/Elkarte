@@ -503,26 +503,29 @@ class Attachment extends AbstractController
 
 		$possibleMobi = strpos(Request::instance()->user_agent(), 'Mobi');
 		$eTag = '"' . substr($id_attach . $real_filename . @filemtime($filename), 0, 64) . '"';
-		$do_cache = !(!isset($this->_req->query->image) && getValidMimeImageType($file_ext) !== '');
+		$reqQueryHasImage = $this->_req->hasQuery('image');
+		$do_cache = !(!$reqQueryHasImage && getValidMimeImageType($file_ext) !== '');
 
 		// Make sure the mime type warrants an inline display.
-		if (isset($this->_req->query->image) && !empty($mime_type) && !str_starts_with($mime_type, 'image/'))
+		if ($reqQueryHasImage && !empty($mime_type) && !str_starts_with($mime_type, 'image/'))
 		{
-			unset($this->_req->query->image);
+			$this->_req->clearValue('image', 'query');
+			$reqQueryHasImage = false;
 			$mime_type = '';
 		}
 		// Does this have a mime type?
-		elseif (empty($mime_type) || (!isset($this->_req->query->image) && getValidMimeImageType($file_ext) !== ''))
+		elseif (empty($mime_type) || (!$reqQueryHasImage && getValidMimeImageType($file_ext) !== ''))
 		{
 			$mime_type = '';
-			if (isset($this->_req->query->image))
+			if ($reqQueryHasImage)
 			{
-				unset($this->_req->query->image);
+				$this->_req->clearValue('image', 'query');
+				$reqQueryHasImage = false;
 			}
 		}
 
 		// Show this content inline or download?
-		$disposition = (isset($this->_req->query->image) || ($possibleMobi && (str_starts_with($mime_type, 'audio/') || str_starts_with($mime_type, 'video/')))) ? 'inline' : 'attachment';
+		$disposition = ($reqQueryHasImage || ($possibleMobi && (str_starts_with($mime_type, 'audio/') || str_starts_with($mime_type, 'video/')))) ? 'inline' : 'attachment';
 		$this->prepare_headers($filename, $eTag, $mime_type, $disposition, $real_filename, $do_cache);
 		$this->send_file($filename, $mime_type);
 

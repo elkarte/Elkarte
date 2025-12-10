@@ -1168,8 +1168,9 @@ class PersonalMessage extends AbstractController
 		}
 
 		$this->_req->post->subject = isset($this->_req->post->subject) ? strtr(Util::htmltrim($this->_req->post->subject), ["\r" => '', "\n" => '', "\t" => '']) : '';
-		$this->_req->post->to = $this->_req->getPost('to', 'trim', empty($this->_req->query->to) ? '' : $this->_req->query->to);
-		$this->_req->post->bcc = $this->_req->getPost('bcc', 'trim', empty($this->_req->query->bcc) ? '' : $this->_req->query->bcc);
+		// Read recipients from either GET or POST using helper
+		$this->_req->post->to = $this->_req->getRequest('to', 'trim', '');
+		$this->_req->post->bcc = $this->_req->getRequest('bcc', 'trim', '');
 
 		// Route the input from the 'u' parameter to the 'to'-list.
 		if (!empty($this->_req->post->u))
@@ -1244,9 +1245,10 @@ class PersonalMessage extends AbstractController
 			}
 
 			// Selected a recipient to be deleted? Remove them now.
-			if (!empty($this->_req->post->delete_recipient))
+			$delete_recipient = $this->_req->getPost('delete_recipient', 'intval', 0);
+			if (!empty($delete_recipient))
 			{
-				$recipientList[$recipientType] = array_diff($recipientList[$recipientType], [(int) $this->_req->post->delete_recipient]);
+				$recipientList[$recipientType] = array_diff($recipientList[$recipientType], [$delete_recipient]);
 			}
 
 			// Make sure we don't include the same name twice
@@ -1254,7 +1256,7 @@ class PersonalMessage extends AbstractController
 		}
 
 		// Are we changing the recipients somehow?
-		$is_recipient_change = !empty($this->_req->post->delete_recipient) || !empty($this->_req->post->to_submit) || !empty($this->_req->post->bcc_submit);
+		$is_recipient_change = $this->_req->hasPost('delete_recipient') || $this->_req->hasPost('to_submit') || $this->_req->hasPost('bcc_submit');
 
 		// Check if there's at least one recipient.
 		if (empty($recipientList['to']) && empty($recipientList['bcc']))
@@ -2674,11 +2676,10 @@ class PersonalMessage extends AbstractController
 	{
 		$this->_search_params = [];
 
-		if (isset($this->_req->query->params) || isset($this->_req->post->params))
+		// Read encoded params from either GET or POST using helper
+		$temp_params = $this->_req->getRequest('params', 'trim|strval', null);
+		if ($temp_params !== null && $temp_params !== '')
 		{
-			// Feed it
-			$temp_params = $this->_req->query->params ?? $this->_req->post->params;
-
 			// Decode and replace the uri safe characters we added
 			$temp_params = base64_decode(str_replace(['-', '_', '.'], ['+', '/', '='], $temp_params));
 
@@ -2706,37 +2707,41 @@ class PersonalMessage extends AbstractController
 		// Store whether simple search was used (needed if the user wants to do another query).
 		if (!isset($this->_search_params['advanced']))
 		{
-			$this->_search_params['advanced'] = empty($this->_req->post->advanced) ? 0 : 1;
+			$this->_search_params['advanced'] = $this->_req->hasPost('advanced') ? 1 : 0;
 		}
 
 		// 1 => 'allwords' (default, don't set as param),  2 => 'anywords'.
-		if (!empty($this->_search_params['searchtype']) || (!empty($this->_req->post->searchtype) && $this->_req->post->searchtype == 2))
+		$searchtypePost = $this->_req->getPost('searchtype', 'intval', 1);
+		if (!empty($this->_search_params['searchtype']) || $searchtypePost == 2)
 		{
 			$this->_search_params['searchtype'] = 2;
 		}
 
 		// Minimum age of messages. Default to zero (don't set param in that case).
-		if (!empty($this->_search_params['minage']) || (!empty($this->_req->post->minage) && $this->_req->post->minage > 0))
+		$minagePost = $this->_req->getPost('minage', 'intval', 0);
+		if (!empty($this->_search_params['minage']) || ($minagePost > 0))
 		{
-			$this->_search_params['minage'] = empty($this->_search_params['minage']) ? (int) $this->_req->post->minage : (int) $this->_search_params['minage'];
+			$this->_search_params['minage'] = empty($this->_search_params['minage']) ? $minagePost : (int) $this->_search_params['minage'];
 		}
 
 		// Maximum age of messages. Default to infinite (9999 days: param not set).
-		if (!empty($this->_search_params['maxage']) || (!empty($this->_req->post->maxage) && $this->_req->post->maxage < 9999))
+		$maxagePost = $this->_req->getPost('maxage', 'intval', 9999);
+		if (!empty($this->_search_params['maxage']) || ($maxagePost < 9999))
 		{
-			$this->_search_params['maxage'] = empty($this->_search_params['maxage']) ? (int) $this->_req->post->maxage : (int) $this->_search_params['maxage'];
+			$this->_search_params['maxage'] = empty($this->_search_params['maxage']) ? $maxagePost : (int) $this->_search_params['maxage'];
 		}
 
 		// Default the username to a wildcard matching every user (*).
-		if (!empty($this->_search_params['userspec']) || (!empty($this->_req->post->userspec) && $this->_req->post->userspec !== '*'))
+		$userspecPost = $this->_req->getPost('userspec', 'trim|strval', '*');
+		if (!empty($this->_search_params['userspec']) || ($userspecPost !== '*'))
 		{
-			$this->_search_params['userspec'] = $this->_search_params['userspec'] ?? $this->_req->post->userspec;
+			$this->_search_params['userspec'] = $this->_search_params['userspec'] ?? $userspecPost;
 		}
 
 		// Search modifiers
-		$this->_search_params['subject_only'] = !empty($this->_search_params['subject_only']) || !empty($this->_req->post->subject_only);
-		$this->_search_params['show_complete'] = !empty($this->_search_params['show_complete']) || !empty($this->_req->post->show_complete);
-		$this->_search_params['sent_only'] = !empty($this->_search_params['sent_only']) || !empty($this->_req->post->sent_only);
+		$this->_search_params['subject_only'] = !empty($this->_search_params['subject_only']) || $this->_req->hasPost('subject_only');
+		$this->_search_params['show_complete'] = !empty($this->_search_params['show_complete']) || $this->_req->hasPost('show_complete');
+		$this->_search_params['sent_only'] = !empty($this->_search_params['sent_only']) || $this->_req->hasPost('sent_only');
 	}
 
 	/**

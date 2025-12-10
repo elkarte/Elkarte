@@ -187,17 +187,19 @@ class BoardIndex extends AbstractController implements FrontpageInterface
 
 		checkSession('request');
 
-		if (!isset($this->_req->query->sa))
+		if (!$this->_req->hasQuery('sa'))
 		{
 			throw new Exception('no_access', false);
 		}
 
 		// Check if the input values are correct.
-		if (isset($this->_req->query->c) && in_array($this->_req->query->sa, ['expand', 'collapse', 'toggle']))
+		$sa = $this->_req->getQuery('sa', 'trim|strval', '');
+		if ($this->_req->hasQuery('c') && in_array($sa, ['expand', 'collapse', 'toggle']))
 		{
 			// And collapse/expand/toggle the category.
 			require_once(SUBSDIR . '/Categories.subs.php');
-			collapseCategories([(int) $this->_req->query->c], $this->_req->query->sa, [$this->user->id]);
+			$c = $this->_req->getQuery('c', 'intval', 0);
+			collapseCategories([$c], $sa, [$this->user->id]);
 		}
 
 		// And go back to the board index.

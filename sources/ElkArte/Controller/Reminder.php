@@ -179,7 +179,7 @@ class Reminder extends AbstractController
 		Txt::load('Login');
 
 		// You need a code!
-		if (!isset($this->_req->query->code))
+		if (!$this->_req->hasQuery('code'))
 		{
 			throw new Exception('no_access', false);
 		}
@@ -189,7 +189,7 @@ class Reminder extends AbstractController
 			'page_title' => $txt['reminder_set_password'],
 			'sub_template' => 'set_password',
 			'code' => $this->_req->getQuery('code', 'htmlspecialchars', ''),
-			'memID' => $this->_req->getQuery('u', 'intval' -1)
+			'memID' => $this->_req->getQuery('u', 'intval', -1)
 		];
 
 		// Some extra js is needed

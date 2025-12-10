@@ -167,7 +167,7 @@ class ManageAttachments extends AbstractController
 	toggleSubDir();', true);
 
 		// Saving settings?
-		if (isset($this->_req->query->save))
+		if ($this->_req->hasQuery('save'))
 		{
 			checkSession();
 
@@ -290,7 +290,7 @@ class ManageAttachments extends AbstractController
 		}
 
 		// If not set, show a default path for the base directory
-		if (!isset($this->_req->query->save) && empty($modSettings['basedirectory_for_attachments']))
+		if (!$this->_req->hasQuery('save') && empty($modSettings['basedirectory_for_attachments']))
 		{
 			$modSettings['basedirectory_for_attachments'] = $context['attachmentUploadDir'];
 		}
@@ -427,7 +427,7 @@ class ManageAttachments extends AbstractController
 		global $context, $txt, $modSettings;
 
 		// Attachments or avatars?
-		$context['browse_type'] = isset($this->_req->query->avatars) ? 'avatars' : (isset($this->_req->query->thumbs) ? 'thumbs' : 'attachments');
+		$context['browse_type'] = $this->_req->hasQuery('avatars') ? 'avatars' : ($this->_req->hasQuery('thumbs') ? 'thumbs' : 'attachments');
 		loadJavascriptFile('topic.js');
 
 		// Set the options for the list component.
@@ -786,7 +786,10 @@ class ManageAttachments extends AbstractController
 		}
 
 		$sort = $this->_req->getQuery('sort', 'trim|strval', 'date');
-		redirectexit('action=admin;area=manageattachments;sa=browse;' . $this->_req->query->type . ';sort=' . $sort . (isset($this->_req->query->desc) ? ';desc' : '') . ';start=' . $this->_req->query->start);
+		$type = $this->_req->getQuery('type', 'trim|strval', 'attachments');
+		$start = $this->_req->getQuery('start', 'intval', 0);
+		$desc = $this->_req->hasQuery('desc') ? ';desc' : '';
+		redirectexit('action=admin;area=manageattachments;sa=browse;' . $type . ';sort=' . $sort . $desc . ';start=' . $start);
 	}
 
 	/**
@@ -837,7 +840,7 @@ class ManageAttachments extends AbstractController
 		checkSession('get');
 
 		// If we choose cancel, redirect right back.
-		if (isset($this->_req->post->cancel))
+		if ($this->_req->hasPost('cancel'))
 		{
 			redirectexit('action=admin;area=manageattachments;sa=maintenance');
 		}
@@ -855,7 +858,7 @@ class ManageAttachments extends AbstractController
 			unset($_SESSION['attachments_to_fix'], $_SESSION['attachments_to_fix2']);
 
 			// If we're actually fixing stuff - work out what.
-			if (isset($this->_req->query->fixErrors))
+			if ($this->_req->hasQuery('fixErrors'))
 			{
 				// Nothing?
 				if (empty($this->_req->post->to_fix))
@@ -886,7 +889,7 @@ class ManageAttachments extends AbstractController
 
 		$to_fix = empty($_SESSION['attachments_to_fix']) ? [] : $_SESSION['attachments_to_fix'];
 		$context['repair_errors'] = $_SESSION['attachments_to_fix2'] ?? $context['repair_errors'];
-		$fix_errors = isset($this->_req->query->fixErrors);
+		$fix_errors = $this->_req->hasQuery('fixErrors');
 
 		// Get stranded thumbnails.
 		if ($this->step <= 0)
@@ -1116,7 +1119,7 @@ class ManageAttachments extends AbstractController
 			return;
 		}
 
-		$context['continue_get_data'] = '?action=admin;area=manageattachments;sa=repair' . (isset($this->_req->query->fixErrors) ? ';fixErrors' : '') . ';step=' . $this->step . ';substep=' . $this->substep . ';' . $context['session_var'] . '=' . $context['session_id'];
+		$context['continue_get_data'] = '?action=admin;area=manageattachments;sa=repair' . ($this->_req->hasQuery('fixErrors') ? ';fixErrors' : '') . ';step=' . $this->step . ';substep=' . $this->substep . ';' . $context['session_var'] . '=' . $context['session_id'];
 		$context['page_title'] = $txt['not_done_title'];
 		$context['continue_post_data'] = '';
 		$context['continue_countdown'] = '2';

@@ -1149,15 +1149,14 @@ class ManageThemes extends AbstractController
 		theme()->getTemplates()->load('ManageThemes');
 
 		// Passed an ID, then the install is complete, lets redirect and show them
-		if (isset($this->_req->query->theme_id))
+		$theme_id = $this->_req->getQuery('theme_id', 'intval');
+		if ($theme_id !== null)
 		{
-			$this->_req->query->theme_id = (int) $this->_req->query->theme_id;
-
 			$context['sub_template'] = 'installed';
 			$context['page_title'] = $txt['theme_installed'];
 			$context['installed_theme'] = [
-				'id' => $this->_req->query->theme_id,
-				'name' => getThemeName($this->_req->query->theme_id),
+				'id' => $theme_id,
+				'name' => getThemeName($theme_id),
 			];
 
 			return null;

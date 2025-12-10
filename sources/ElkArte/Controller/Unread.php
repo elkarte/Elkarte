@@ -45,7 +45,7 @@ class Unread extends AbstractController
 	/**
 	 * The object that will retrieve the data
 	 *
-	 * @var Unread
+	 * @var \ElkArte\Unread
 	 */
 	private $_grabber;
 
@@ -77,7 +77,7 @@ class Unread extends AbstractController
 
 		// Some goodies for template use
 		$context['showCheckboxes'] = !empty($options['display_quick_mod']) && $settings['show_mark_read'];
-		$context['showing_all_topics'] = isset($this->_req->query->all);
+		$context['showing_all_topics'] = $this->_req->hasQuery('all');
 		$context['start'] = $this->_req->getQuery('start', 'intval', 0);
 		$context['topics_per_page'] = (int) (empty($modSettings['disableCustomPerPage']) && !empty($options['topics_per_page']) ? $options['topics_per_page'] : $modSettings['defaultMaxTopics']);
 
@@ -101,13 +101,13 @@ class Unread extends AbstractController
 		$this->_wanted_boards();
 		$this->_sorting_conditions();
 
-		if (!empty($this->_req->query->c) && is_array($this->_req->query->c) && count($this->_req->query->c) === 1)
+		if (!empty($context['selected_categories_array']) && is_array($context['selected_categories_array']) && count($context['selected_categories_array']) === 1)
 		{
 			require_once(SUBSDIR . '/Categories.subs.php');
-			$name = categoryName((int) $this->_req->query->c[0]);
+			$name = categoryName((int) $context['selected_categories_array'][0]);
 
 			$context['breadcrumbs'][] = [
-				'url' => getUrl('action', $modSettings['default_forum_action']) . '#c' . (int) $this->_req->query->c[0],
+				'url' => getUrl('action', $modSettings['default_forum_action']) . '#c' . (int) $context['selected_categories_array'][0],
 				'name' => $name
 			];
 		}
@@ -181,13 +181,14 @@ class Unread extends AbstractController
 	{
 		global $board, $context;
 
-		if (isset($this->_req->query->children) && (!empty($board) || !empty($this->_req->query->boards)))
+		if ($this->_req->hasQuery('children') && (!empty($board) || $this->_req->hasQuery('boards')))
 		{
 			$this->_boards = [];
 
-			if (!empty($this->_req->query->boards))
+			if ($this->_req->hasQuery('boards'))
 			{
-				$this->_boards = array_map('intval', explode(',', $this->_req->query->boards));
+				$boards_csv = $this->_req->getQuery('boards', 'trim|strval', '');
+				$this->_boards = $boards_csv === '' ? [] : array_map('intval', explode(',', $boards_csv));
 			}
 
 			if (!empty($board))
@@ -206,23 +207,24 @@ class Unread extends AbstractController
 			$this->_boards = [$board];
 			$context['querystring_board_limits'] = ';board=' . $board . '.%1$d';
 		}
-		elseif (!empty($this->_req->query->boards))
+		elseif ($this->_req->hasQuery('boards'))
 		{
-			$selected_boards = array_map('intval', explode(',', $this->_req->query->boards));
+			$boards_csv = $this->_req->getQuery('boards', 'trim|strval', '');
+			$selected_boards = $boards_csv === '' ? [] : array_map('intval', explode(',', $boards_csv));
 
 			$this->_boards = accessibleBoards($selected_boards);
 
 			$context['querystring_board_limits'] = ';boards=' . implode(',', $this->_boards) . ';start=%1$d';
 		}
-		elseif (!empty($this->_req->query->c))
+		elseif ($this->_req->hasQuery('c'))
 		{
-			$categories = array_map('intval', explode(',', $this->_req->query->c));
+			$categories_csv = $this->_req->getQuery('c', 'trim|strval', '');
+			$categories = $categories_csv === '' ? [] : array_map('intval', explode(',', $categories_csv));
 
 			$this->_boards = array_keys(boardsPosts([], $categories, $this->_action_unread));
 
-			$context['querystring_board_limits'] = ';c=' . $this->_req->query->c . ';start=%1$d';
-
-			$this->_req->query->c = explode(',', $this->_req->query->c);
+			$context['querystring_board_limits'] = ';c=' . $categories_csv . ';start=%1$d';
+			$context['selected_categories_array'] = $categories;
 		}
 		else
 		{
