@@ -116,7 +116,7 @@ class ManageMail extends AbstractController
 		}
 
 		// Saving?
-		if (isset($this->_req->query->save))
+		if ($this->_req->hasQuery('save'))
 		{
 			// Make the SMTP password a little harder to see in a backup etc.
 			if (!empty($this->_req->post->smtp_password[1]))

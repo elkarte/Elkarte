@@ -146,7 +146,7 @@ class ManageMembers extends AbstractController
 					'label' => sprintf($txt['admin_browse_awaiting_activate'], $context['awaiting_activation']),
 					'description' => $txt['admin_browse_activate_desc'],
 					'url' => getUrl('admin', ['action' => 'admin', 'area' => 'viewmembers', 'sa' => 'browse', 'type' => 'activate']),
-					'disabled' => !$context['show_activate'] && ($subAction !== 'browse' || $this->_req->query->type !== 'activate'),
+					'disabled' => !$context['show_activate'] && ($subAction !== 'browse' || $this->_req->getQuery('type', 'trim|strval', '') !== 'activate'),
 					'selected' => $subAction === 'browse' && $this->_req->getQuery('type') === 'activate',
 				],
 			]
@@ -256,9 +256,10 @@ class ManageMembers extends AbstractController
 			call_integration_hook('integrate_view_members_params', [&$params]);
 
 			$search_params = [];
-			if ($context['sub_action'] === 'query' && !empty($this->_req->query->params) && empty($this->_req->post->types))
+			if ($context['sub_action'] === 'query' && $this->_req->getQuery('params', 'trim|strval', '') !== '' && empty($this->_req->post->types))
 			{
-				$search_params = @json_decode(base64_decode($this->_req->query->params), true);
+				$encoded = $this->_req->getQuery('params', 'trim|strval', '');
+				$search_params = @json_decode(base64_decode($encoded), true);
 			}
 			elseif (!empty($this->_req->post))
 			{
@@ -798,7 +799,7 @@ class ManageMembers extends AbstractController
 		// Not a lot here!
 		$context['page_title'] = $txt['admin_members'];
 		$context['sub_template'] = 'admin_browse';
-		$context['browse_type'] = $this->_req->query->type ?? (!empty($modSettings['registration_method']) && $modSettings['registration_method'] == 1 ? 'activate' : 'approve');
+		$context['browse_type'] = $this->_req->getQuery('type', 'trim|strval', (!empty($modSettings['registration_method']) && (int) $modSettings['registration_method'] === 1 ? 'activate' : 'approve'));
 
 		if (isset($context['tabs'][$context['browse_type']]))
 		{
@@ -807,7 +808,8 @@ class ManageMembers extends AbstractController
 
 		// Allowed filters are those we can have, in theory.
 		$context['allowed_filters'] = $context['browse_type'] === 'approve' ? [3, 4, 5] : [0, 2];
-		$context['current_filter'] = isset($this->_req->query->filter) && in_array($this->_req->query->filter, $context['allowed_filters']) && !empty($context['activation_numbers'][$this->_req->query->filter]) ? (int) $this->_req->query->filter : -1;
+		$filterQuery = $this->_req->hasQuery('filter') ? $this->_req->getQuery('filter', 'intval', null) : null;
+		$context['current_filter'] = ($filterQuery !== null && in_array($filterQuery, $context['allowed_filters'], true) && !empty($context['activation_numbers'][$filterQuery])) ? (int) $filterQuery : -1;
 
 		// Sort out the different sub areas that we can actually filter by.
 		$context['available_filters'] = [];
@@ -852,9 +854,9 @@ class ManageMembers extends AbstractController
 		];
 
 		// Are we showing duplicate information?
-		if (isset($this->_req->query->showdupes))
+		if ($this->_req->hasQuery('showdupes'))
 		{
-			$_SESSION['showdupes'] = (int) $this->_req->query->showdupes;
+			$_SESSION['showdupes'] = $this->_req->getQuery('showdupes', 'intval', 0);
 		}
 
 		$context['show_duplicates'] = !empty($_SESSION['showdupes']);
