@@ -138,7 +138,7 @@ class ManagePaid extends AbstractController
 		toggleCurrencyOther();', true);
 
 		// Saving the settings?
-		if (isset($this->_req->query->save))
+		if ($this->_req->hasQuery('save'))
 		{
 			checkSession();
 

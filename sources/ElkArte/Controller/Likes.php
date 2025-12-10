@@ -29,10 +29,10 @@ use ElkArte\User;
  */
 class Likes extends AbstractController
 {
-	/** @var array Holds the ajax response  */
+	/** @var array Holds the ajax response */
 	protected $_likes_response = [];
 
-	/** @var int The id of the message being liked  */
+	/** @var int The id of the message being liked */
 	protected $_id_liked;
 
 	/**
@@ -112,7 +112,8 @@ class Likes extends AbstractController
 	{
 		global $modSettings;
 
-		$this->_id_liked = $this->_req->getPost('msg', 'intval', (isset($this->_req->query->msg) ? (int) $this->_req->query->msg : 0));
+		// Accept msg id from POST (preferred) or GET as a fallback
+		$this->_id_liked = $this->_req->getRequest('msg', 'intval', 0);
 
 		// We like these
 		require_once(SUBSDIR . '/Likes.subs.php');
@@ -203,10 +204,11 @@ class Likes extends AbstractController
 		global $txt;
 
 		// An error if not possible to like.
-		if (!$this->_doLikePost('+', 'likemsg') && empty($this->_likes_response)) {
-      Txt::load('Errors');
-      $this->_likes_response = ['result' => false, 'data' => $txt['like_unlike_error']];
-  }
+		if (!$this->_doLikePost('+', 'likemsg') && empty($this->_likes_response))
+		{
+			Txt::load('Errors');
+			$this->_likes_response = ['result' => false, 'data' => $txt['like_unlike_error']];
+		}
 
 		$this->likeResponse();
 	}
@@ -227,7 +229,7 @@ class Likes extends AbstractController
 		{
 			$details = loadLikes($this->_id_liked, true);
 			$count = empty($details) ? 0 : $details[$this->_id_liked]['count'];
-			$youLiked = $count !== 0 && array_key_exists(User::$info->id , $details[$this->_id_liked]['member']);
+			$youLiked = $count !== 0 && array_key_exists(User::$info->id, $details[$this->_id_liked]['member']);
 			$text = $count !== 0 ? ($youLiked ? $txt['unlike_post'] : $txt['likes']) : $txt['like_post'];
 			$title = empty($details) ? '' : $txt['liked_by'] . ' ' . implode(', ', $details[$this->_id_liked]['member']);
 			$this->_likes_response = [
@@ -252,10 +254,11 @@ class Likes extends AbstractController
 		global $txt;
 
 		// An error if not possible to like.
-		if (!$this->_doLikePost('-', 'rlikemsg') && empty($this->_likes_response)) {
-      Txt::load('Errors');
-      $this->_likes_response = ['result' => false, 'data' => $txt['like_unlike_error']];
-  }
+		if (!$this->_doLikePost('-', 'rlikemsg') && empty($this->_likes_response))
+		{
+			Txt::load('Errors');
+			$this->_likes_response = ['result' => false, 'data' => $txt['like_unlike_error']];
+		}
 
 		$this->likeResponse();
 	}
@@ -382,9 +385,9 @@ class Likes extends AbstractController
 					],
 					'data' => [
 						'function' => static function ($row) {
-          global $txt;
-          return '<a href="' . $row['who'] . '" title="' . $txt['likes_show_who'] . '"><i class="icon i-users"></i></a>';
-      },
+							global $txt;
+							return '<a href="' . $row['who'] . '" title="' . $txt['likes_show_who'] . '"><i class="icon i-users"></i></a>';
+						},
 						'class' => 'centertext',
 						'style' => 'width: 10%',
 					],
@@ -515,9 +518,9 @@ class Likes extends AbstractController
 					],
 					'data' => [
 						'function' => static function ($row) {
-          global $txt;
-          return '<a href="' . $row['delete'] . '" onclick="return confirm(\'' . $txt['likes_confirm_delete'] . '\');" title="' . $txt['likes_delete'] . '"><i class="icon i-delete"></i></a>';
-      },
+							global $txt;
+							return '<a href="' . $row['delete'] . '" onclick="return confirm(\'' . $txt['likes_confirm_delete'] . '\');" title="' . $txt['likes_delete'] . '"><i class="icon i-delete"></i></a>';
+						},
 						'class' => 'centertext',
 						'style' => 'width: 10%',
 					],

@@ -46,7 +46,7 @@ class ManageServer extends AbstractController
 	 *
 	 * @event integrate_sa_server_settings
 	 * @uses edit_settings adminIndex.
-	 * @see AbstractController::action_index()
+	 * @see  AbstractController::action_index()
 	 */
 	public function action_index()
 	{
@@ -86,7 +86,8 @@ class ManageServer extends AbstractController
 		]);
 
 		// Any messages to speak of?
-		$context['settings_message'] = (isset($this->_req->query->msg, $txt[$this->_req->query->msg])) ? $txt[$this->_req->query->msg] : '';
+		$msg_key = $this->_req->getQuery('msg', 'trim|strval', '');
+		$context['settings_message'] = ($msg_key !== '' && isset($txt[$msg_key])) ? $txt[$msg_key] : '';
 
 		// Warn the user if there's any relevant information regarding Settings.php.
 		$settings_not_writable = !is_writable(BOARDDIR . '/Settings.php');
@@ -142,7 +143,7 @@ class ManageServer extends AbstractController
 		$context['settings_title'] = $txt['general_settings'];
 
 		// Saving settings?
-		if (isset($this->_req->query->save))
+		if ($this->_req->hasQuery('save'))
 		{
 			call_integration_hook('integrate_save_general_settings');
 
