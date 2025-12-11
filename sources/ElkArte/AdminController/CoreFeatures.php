@@ -77,7 +77,7 @@ class CoreFeatures extends AbstractController
 		$api = $this->getApi();
 
 		// Are we saving?
-		if (isset($this->_req->post->save))
+		if ($this->_req->hasPost('save'))
 		{
 			checkSession();
 

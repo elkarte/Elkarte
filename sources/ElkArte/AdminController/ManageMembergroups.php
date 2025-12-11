@@ -590,7 +590,7 @@ class ManageMembergroups extends AbstractController
 			redirectexit('action=admin;area=membergroups;');
 		}
 		// A form was submitted with the new membergroup settings.
-		elseif (isset($this->_req->post->save))
+		elseif ($this->_req->hasPost('save'))
 		{
 			// Validate the session.
 			checkSession();

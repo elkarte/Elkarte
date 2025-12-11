@@ -580,7 +580,7 @@ class ManageSearch extends AbstractController
 		global $txt, $context, $modSettings;
 
 		// Saving the settings
-		if (isset($this->_req->post->save))
+		if ($this->_req->hasPost('save'))
 		{
 			checkSession();
 			validateToken('admin-mssphinx');
@@ -689,7 +689,7 @@ class ManageSearch extends AbstractController
 		global $txt, $context, $modSettings;
 
 		// Saving the settings
-		if (isset($this->_req->post->save))
+		if ($this->_req->hasPost('save'))
 		{
 			checkSession();
 			validateToken('admin-msmanticore');

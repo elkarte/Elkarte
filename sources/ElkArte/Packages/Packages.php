@@ -1220,7 +1220,7 @@ class Packages extends AbstractController
 	{
 		global $txt, $context, $modSettings;
 
-		if (isset($this->_req->post->save))
+		if ($this->_req->hasPost('save'))
 		{
 			checkSession();
 

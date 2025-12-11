@@ -62,7 +62,7 @@ class Admin extends AbstractController
 		// No indexing evil stuff.
 		$context['robot_no_index'] = true;
 
-		// Need these to do much
+		// Need this to do much
 		require_once(SUBSDIR . '/Admin.subs.php');
 	}
 
@@ -73,7 +73,7 @@ class Admin extends AbstractController
 	 *
 	 * - It initializes all the basic context required for the admin center.
 	 * - It passes execution onto the relevant admin section.
-	 * - If the passed section is not found it shows the admin home page.
+	 * - If the passed section is not found, it shows the admin home page.
 	 * - Accessed by ?action=admin.
 	 */
 	public function action_index()

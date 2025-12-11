@@ -1924,7 +1924,7 @@ class ManageMaillist extends AbstractController
 		}
 
 		// Wait, we are saving?
-		if (isset($this->_req->post->save))
+		if ($this->_req->hasPost('save'))
 		{
 			checkSession('post');
 			validateToken('mod-mlt');

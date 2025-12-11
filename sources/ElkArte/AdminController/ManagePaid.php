@@ -447,7 +447,7 @@ class ManagePaid extends AbstractController
 		}
 
 		// Saving?
-		if (isset($this->_req->post->save))
+		if ($this->_req->hasPost('save'))
 		{
 			checkSession();
 			validateToken('admin-pms');

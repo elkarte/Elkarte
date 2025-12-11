@@ -1159,7 +1159,7 @@ class ManageAttachments extends AbstractController
 		$errors = [];
 
 		// Saving or changing attachment paths
-		if (isset($this->_req->post->save))
+		if ($this->_req->hasPost('save'))
 		{
 			$this->_savePaths($attachmentsDir);
 		}

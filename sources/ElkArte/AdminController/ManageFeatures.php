@@ -1056,7 +1056,7 @@ class ManageFeatures extends AbstractController
 		$context['fields_no_registration'] = ['posts', 'warning_status', 'date_registered', 'action'];
 
 		// Are we saving any standard field changes?
-		if (isset($this->_req->post->save))
+		if ($this->_req->hasPost('save'))
 		{
 			checkSession();
 			validateToken('admin-scp');
@@ -1430,7 +1430,7 @@ class ManageFeatures extends AbstractController
 			updateRenamedProfileStatus($enabled);
 		}
 		// Are we saving?
-		elseif (isset($this->_req->post->save))
+		elseif ($this->_req->hasPost('save'))
 		{
 			checkSession();
 			validateToken('admin-ecp');

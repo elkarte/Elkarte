@@ -219,7 +219,7 @@ class ManageThemes extends AbstractController
 		}
 
 		// Saving?
-		if (isset($this->_req->post->save))
+		if ($this->_req->hasPost('save'))
 		{
 			checkSession();
 			validateToken('admin-tl');
@@ -361,7 +361,7 @@ class ManageThemes extends AbstractController
 		}
 
 		// Submitting!
-		if (isset($this->_req->post->save))
+		if ($this->_req->hasPost('save'))
 		{
 			// Allowed?
 			checkSession();
@@ -522,7 +522,7 @@ class ManageThemes extends AbstractController
 		Txt::load('Admin');
 
 		// Saving?
-		if (isset($this->_req->post->save))
+		if ($this->_req->hasPost('save'))
 		{
 			checkSession();
 			validateToken('admin-tm');

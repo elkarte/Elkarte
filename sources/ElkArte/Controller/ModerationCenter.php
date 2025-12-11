@@ -915,7 +915,7 @@ class ModerationCenter extends AbstractController
 		}
 
 		// Are we saving?
-		if (isset($this->_req->post->save))
+		if ($this->_req->hasPost('save'))
 		{
 			checkSession('post');
 			validateToken('mod-set');
@@ -1643,7 +1643,7 @@ class ModerationCenter extends AbstractController
 		}
 
 		// Wait, we are saving?
-		if (isset($this->_req->post->save))
+		if ($this->_req->hasPost('save'))
 		{
 			checkSession('post');
 			validateToken('mod-wt');
