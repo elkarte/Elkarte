@@ -169,7 +169,7 @@ class Emoji extends AbstractModel
 			$replace = html_entity_decode($match[0], ENT_NOQUOTES | ENT_SUBSTITUTE | ENT_HTML401, 'UTF-8');
 
 			// The Fitzpatrick Scale modifiers are not (well) supported across all graphics sets.  For now
-			// drop it, allowing it to display the generic/cartoon color.  IF not things would render as the
+			// drop it, allowing it to display the generic/cartoon color.  IF not things would render as
 			// individual images such as 🤷 🏻 ♂️ instead of just 🤷🏽‍
 			$replace = preg_replace('~[\x{1F3FB}-\x{1F3FF}]~u', '', $replace);
 

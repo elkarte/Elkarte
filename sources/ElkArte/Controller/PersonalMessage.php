@@ -749,9 +749,9 @@ class PersonalMessage extends AbstractController
 
 		// Check whether we've gone over the limit of messages we can send per hour.
 		if (!empty($modSettings['pm_posts_per_hour'])
+			&& !allowedTo(['admin_forum', 'moderate_forum', 'send_mail'])
 			&& $this->user->mod_cache['bq'] === '0=1'
-			&& $this->user->mod_cache['gq'] === '0=1'
-			&& !allowedTo(['admin_forum', 'moderate_forum', 'send_mail']))
+			&& $this->user->mod_cache['gq'] === '0=1')
 		{
 			// How many messages have they sent this last hour?
 			$pmCount = pmCount($this->user->id, 3600);
@@ -1153,9 +1153,9 @@ class PersonalMessage extends AbstractController
 
 		// Check whether we've gone over the limit of messages we can send per hour - fatal error if fails!
 		if (!empty($modSettings['pm_posts_per_hour'])
+			&& !allowedTo(['admin_forum', 'moderate_forum', 'send_mail'])
 			&& $this->user->mod_cache['bq'] === '0=1'
-			&& $this->user->mod_cache['gq'] === '0=1'
-			&& !allowedTo(['admin_forum', 'moderate_forum', 'send_mail']))
+			&& $this->user->mod_cache['gq'] === '0=1')
 		{
 			// How many have they sent this last hour?
 			$pmCount = pmCount($this->user->id, 3600);
