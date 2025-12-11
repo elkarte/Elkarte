@@ -900,7 +900,7 @@ class ManageBoards extends AbstractController
 		$context['force_form_onsubmit'] = "if(document.getElementById('recycle_enable').checked && document.getElementById('recycle_board').value == 0) { return confirm('" . $txt['recycle_board_unselected_notice'] . "');} return true;";
 
 		// Doing a save?
-		if (isset($this->_req->query->save))
+		if ($this->_req->hasQuery('save'))
 		{
 			checkSession();
 

@@ -251,7 +251,7 @@ class ManagePosts extends AbstractController
 		$context['sub_template'] = 'show_settings';
 
 		// Are we saving them - are we??
-		if (isset($this->_req->query->save))
+		if ($this->_req->hasQuery('save'))
 		{
 			checkSession();
 			$db = database();

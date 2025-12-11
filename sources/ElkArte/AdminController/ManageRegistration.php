@@ -476,7 +476,7 @@ class ManageRegistration extends AbstractController
 		$context['sub_template'] = 'show_settings';
 		$context['page_title'] = $txt['registration_center'];
 
-		if (isset($this->_req->query->save))
+		if ($this->_req->hasQuery('save'))
 		{
 			checkSession();
 

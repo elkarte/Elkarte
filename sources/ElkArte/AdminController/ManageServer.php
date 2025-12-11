@@ -222,7 +222,7 @@ class ManageServer extends AbstractController
 		$context['save_disabled'] = $context['settings_not_writable'];
 
 		// Saving settings?
-		if (isset($this->_req->query->save))
+		if ($this->_req->hasQuery('save'))
 		{
 			call_integration_hook('integrate_save_database_settings');
 
@@ -293,7 +293,7 @@ class ManageServer extends AbstractController
 		$context['settings_title'] = $txt['cookies_sessions_settings'];
 
 		// Saving settings?
-		if (isset($this->_req->query->save))
+		if ($this->_req->hasQuery('save'))
 		{
 			call_integration_hook('integrate_save_cookie_settings');
 
@@ -403,7 +403,7 @@ class ManageServer extends AbstractController
 		$settingsForm->setConfigVars($this->_cacheSettings());
 
 		// Saving again?
-		if (isset($this->_req->query->save))
+		if ($this->_req->hasQuery('save'))
 		{
 			call_integration_hook('integrate_save_cache_settings');
 
@@ -534,7 +534,7 @@ class ManageServer extends AbstractController
 		$context['settings_title'] = $txt['loadavg_settings'];
 
 		// Saving?
-		if (isset($this->_req->query->save))
+		if ($this->_req->hasQuery('save'))
 		{
 			// Stupidity is not allowed.
 			foreach ($this->_req->post as $key => $value)

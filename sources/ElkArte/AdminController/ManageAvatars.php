@@ -86,7 +86,7 @@ class ManageAvatars extends AbstractController
 		$settingsForm->setConfigVars($this->_settings());
 
 		// Saving avatar settings?
-		if (isset($this->_req->query->save))
+		if ($this->_req->hasQuery('save'))
 		{
 			checkSession();
 

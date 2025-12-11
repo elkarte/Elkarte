@@ -183,7 +183,7 @@ class ManagePermissions extends AbstractController
 		$listOptions = [
 			'id' => 'regular_membergroups_list',
 			'title' => $txt['membergroups_regular'],
-			'base_href' => getUrl('admin', ['action' => 'admin', 'area' => 'permissions', 'sa' => 'index'] + (isset($this->_req->query->sort2) ? ['sort2' => $this->_req->query->sort2] : []) + ($this->_pid !== null ? ['pid' => $this->_pid] : [])),
+			'base_href' => getUrl('admin', ['action' => 'admin', 'area' => 'permissions', 'sa' => 'index'] + ($this->_req->hasQuery('sort2') ? ['sort2' => $this->_req->getQuery('sort2', 'trim')] : []) + ($this->_pid !== null ? ['pid' => $this->_pid] : [])),
 			'default_sort_col' => 'name',
 			'get_items' => [
 				'file' => SUBSDIR . '/Membergroups.subs.php',
@@ -332,7 +332,7 @@ class ManagePermissions extends AbstractController
 			$listOptions = [
 				'id' => 'post_count_membergroups_list',
 				'title' => $txt['membergroups_post'],
-				'base_href' => getUrl('admin', ['action' => 'admin', 'area' => 'permissions', 'sa' => 'index'] + (isset($this->_req->query->sort) ? ['sort' => $this->_req->query->sort] : []) + ($this->_pid !== null ? ['pid' => $this->_pid] : [])),
+				'base_href' => getUrl('admin', ['action' => 'admin', 'area' => 'permissions', 'sa' => 'index'] + ($this->_req->hasQuery('sort') ? ['sort' => $this->_req->getQuery('sort', 'trim')] : []) + ($this->_pid !== null ? ['pid' => $this->_pid] : [])),
 				'default_sort_col' => 'required_posts',
 				'request_vars' => [
 					'sort' => 'sort2',
@@ -978,7 +978,7 @@ class ManagePermissions extends AbstractController
 		$context['post_url'] = getUrl('admin', ['action' => 'admin', 'area' => 'permissions', 'save', 'sa' => 'settings']);
 
 		// Saving the settings?
-		if (isset($this->_req->query->save))
+		if ($this->_req->hasQuery('save'))
 		{
 			checkSession('post');
 			call_integration_hook('integrate_save_permission_settings');

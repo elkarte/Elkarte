@@ -886,13 +886,13 @@ class Packages extends AbstractController
 		global $txt, $context;
 
 		// No package?  Show him or her the door.
-		if (!isset($this->_req->query->package) || $this->_req->query->package == '')
+		if (!$this->_req->hasQuery('package') || $this->_req->query->package == '')
 		{
 			redirectexit('action=admin;area=packages');
 		}
 
 		// No file?  Show him or her the door.
-		if (!isset($this->_req->query->file) || $this->_req->query->file == '')
+		if (empty($this->_req->getQuery('file', 'trim', '')))
 		{
 			redirectexit('action=admin;area=packages');
 		}
@@ -900,7 +900,7 @@ class Packages extends AbstractController
 		$this->_req->query->package = preg_replace('~[.]+~', '.', strtr($this->_req->query->package, ['/' => '_', '\\' => '_']));
 		$this->_req->query->file = preg_replace('~[.]+~', '.', $this->_req->query->file);
 
-		if (isset($this->_req->query->raw))
+		if ($this->_req->hasQuery('raw'))
 		{
 			if (is_file(BOARDDIR . '/packages/' . $this->_req->query->package))
 			{
@@ -968,39 +968,40 @@ class Packages extends AbstractController
 		checkSession('get');
 
 		// Ack, don't allow deletion of arbitrary files here, could become a security hole somehow!
-		if (!isset($this->_req->query->package) || $this->_req->query->package === 'index.php' || $this->_req->query->package === 'installed.list' || $this->_req->query->package === 'backups')
+		$check = $this->_req->getQuery('package', 'trim', '');
+		if (empty($check) || $check === 'index.php' || $check === 'installed.list' || $check === 'backups')
 		{
 			redirectexit('action=admin;area=packages;sa=browse');
 		}
 
-		$this->_req->query->package = preg_replace('~[\.]+~', '.', strtr($this->_req->query->package, ['/' => '_', '\\' => '_']));
+		$check = preg_replace('~[\.]+~', '.', strtr($check, ['/' => '_', '\\' => '_']));
 
 		// Can't delete what's not there.
-		if ($this->fileFunc->fileExists(BOARDDIR . '/packages/' . $this->_req->query->package)
-			&& (str_ends_with($this->_req->query->package, '.zip')
-				|| str_ends_with($this->_req->query->package, '.tgz')
-				|| str_ends_with($this->_req->query->package, '.tar.gz')
-				|| $this->fileFunc->isDir(BOARDDIR . '/packages/' . $this->_req->query->package))
-			&& $this->_req->query->package !== 'backups'
-			&& $this->_req->query->package[0] !== '.')
+		if ($this->fileFunc->fileExists(BOARDDIR . '/packages/' . $check)
+			&& (str_ends_with($check, '.zip')
+				|| str_ends_with($check, '.tgz')
+				|| str_ends_with($check, '.tar.gz')
+				|| $this->fileFunc->isDir(BOARDDIR . '/packages/' . $check))
+			&& $check !== 'backups'
+			&& $check[0] !== '.')
 		{
 			$chmod_control = new PackageChmod();
 			$chmod_control->createChmodControl(
-				[BOARDDIR . '/packages/' . $this->_req->query->package],
+				[BOARDDIR . '/packages/' . $check],
 				[
-					'destination_url' => getUrl('admin', ['action' => 'admin', 'area' => 'packages', 'sa' => 'remove', 'package' => $this->_req->query->package]),
+					'destination_url' => getUrl('admin', ['action' => 'admin', 'area' => 'packages', 'sa' => 'remove', 'package' => $check]),
 					'crash_on_error' => true
 				]
 			);
 
-			if ($this->fileFunc->isDir(BOARDDIR . '/packages/' . $this->_req->query->package))
+			if ($this->fileFunc->isDir(BOARDDIR . '/packages/' . $check))
 			{
-				deltree(BOARDDIR . '/packages/' . $this->_req->query->package);
+				deltree(BOARDDIR . '/packages/' . $check);
 			}
 			else
 			{
-				$this->fileFunc->chmod(BOARDDIR . '/packages/' . $this->_req->query->package);
-				$this->fileFunc->delete(BOARDDIR . '/packages/' . $this->_req->query->package);
+				$this->fileFunc->chmod(BOARDDIR . '/packages/' . $check);
+				$this->fileFunc->delete(BOARDDIR . '/packages/' . $check);
 			}
 		}
 
@@ -1277,7 +1278,7 @@ class Packages extends AbstractController
 		require_once(SUBSDIR . '/Themes.subs.php');
 
 		// Uninstalling the mod?
-		$reverse = isset($this->_req->query->reverse);
+		$reverse = $this->_req->hasQuery('reverse');
 
 		// Get the base name.
 		$context['filename'] = preg_replace('~[\.]+~', '.', $package);
@@ -1398,20 +1399,20 @@ class Packages extends AbstractController
 		[$the_brand, $the_version] = explode(' ', FORUM_VERSION, 2);
 
 		// Here we have a little code to help those who class themselves as something of gods, version emulation ;)
-		if (isset($this->_req->query->version_emulate) && strtr($this->_req->query->version_emulate, [$the_brand => '']) === $the_version)
+		$checkEmulate = $this->_req->getQuery('version_emulate', 'trim', '');
+		if (!empty($checkEmulate) && strtr($checkEmulate, [$the_brand => '']) === $the_version)
 		{
 			unset($_SESSION['version_emulate']);
 		}
-		elseif (isset($this->_req->query->version_emulate))
+		elseif ($checkEmulate)
 		{
-			if (($this->_req->query->version_emulate === 0 || $this->_req->query->version_emulate === FORUM_VERSION)
-				&& isset($_SESSION['version_emulate']))
+			if (($checkEmulate === 0 || $checkEmulate === FORUM_VERSION) && isset($_SESSION['version_emulate']))
 			{
 				unset($_SESSION['version_emulate']);
 			}
-			elseif ($this->_req->query->version_emulate !== 0)
+			elseif ($checkEmulate !== 0)
 			{
-				$_SESSION['version_emulate'] = strtr($this->_req->query->version_emulate, ['-' => ' ', '+' => ' ', $the_brand . ' ' => '']);
+				$_SESSION['version_emulate'] = strtr($checkEmulate, ['-' => ' ', '+' => ' ', $the_brand . ' ' => '']);
 			}
 		}
 

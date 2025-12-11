@@ -627,7 +627,7 @@ class Maintenance extends AbstractController
 		require_once(SUBSDIR . '/Topic.subs.php');
 
 		// Validate the request or the loop
-		if (!isset($this->_req->query->step))
+		if (!$this->_req->hasQuery('step'))
 		{
 			validateToken('admin-maint');
 		}
@@ -1229,7 +1229,7 @@ class Maintenance extends AbstractController
 		}
 		else
 		{
-			$total_topics = (int) $this->_req->query->totaltopics;
+			$total_topics = $this->_req->getQuery('totaltopics', 'intval');
 			validateToken('admin_movetopics');
 		}
 
@@ -1293,10 +1293,11 @@ class Maintenance extends AbstractController
 
 		// Get the list of the current system hooks, filter them if needed
 		$currentHooks = get_integration_hooks();
-		if (isset($this->_req->query->filter) && array_key_exists($this->_req->query->filter, $currentHooks))
+		$filter = $this->_req->getQuery('filter', 'trim', '');
+		if (array_key_exists($filter, $currentHooks))
 		{
-			$context['filter_url'] = ';filter=' . $this->_req->query->filter;
-			$context['current_filter'] = $this->_req->query->filter;
+			$context['filter_url'] = ';filter=' . $filter;
+			$context['current_filter'] = $filter;
 		}
 
 		$list_options = [
