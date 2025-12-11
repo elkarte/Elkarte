@@ -421,12 +421,17 @@ class ManageSmileys extends AbstractController
 			validateToken('admin-mss', 'request');
 
 			// Delete selected smiley sets.
-			if (!empty($this->_req->post->delete_set) && !empty($this->_req->post->smiley_set))
+			$set = $this->_req->getPost('smiley_set', null, []);
+			if (!is_array($set))
+			{
+				$set = [$set];
+			}
+			if ( !empty($set) && $this->_req->hasPost('delete_set'))
 			{
 				$set_paths = explode(',', $modSettings['smiley_sets_known']);
 				$set_names = explode("\n", $modSettings['smiley_sets_names']);
 				$set_extensions = explode(',', $modSettings['smiley_sets_extensions']);
-				foreach ($this->_req->post->smiley_set as $id => $val)
+				foreach ($set as $id => $val)
 				{
 					if (!isset($set_paths[$id], $set_names[$id]))
 					{
@@ -448,19 +453,19 @@ class ManageSmileys extends AbstractController
 				]);
 			}
 			// Add a new smiley set.
-			elseif (!empty($this->_req->post->add))
+			elseif ($this->_req->hasPost('add'))
 			{
 				$context['sub_action'] = 'modifyset';
 			}
 			// Create or modify a smiley set.
-			elseif (isset($this->_req->post->set))
+			elseif ($this->_req->hasPost('set'))
 			{
 				$set = $this->_req->getPost('set', 'intval', 0);
 				$set_paths = explode(',', $modSettings['smiley_sets_known']);
 				$set_names = explode("\n", $modSettings['smiley_sets_names']);
 
 				// Create a new smiley set.
-				if ($set === -1 && isset($this->_req->post->smiley_sets_path))
+				if ($set === -1 && $this->_req->hasPost('smiley_sets_path'))
 				{
 					if (in_array($this->_req->post->smiley_sets_path, $set_paths, true))
 					{

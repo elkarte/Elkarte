@@ -107,7 +107,12 @@ class ManageScheduledTasks extends AbstractController
 
 			// Enable and disable as required.
 			$enablers = [0];
-			foreach ($this->_req->post->enable_task as $id => $enabled)
+			$enable = $this->_req->getPost('enable_task', null, []);
+			if (!is_array($enable))
+			{
+				$enable = [$enable];
+			}
+			foreach ($enable as $id => $enabled)
 			{
 				if ($enabled)
 				{
