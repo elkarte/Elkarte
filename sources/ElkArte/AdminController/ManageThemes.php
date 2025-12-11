@@ -1025,7 +1025,7 @@ class ManageThemes extends AbstractController
 		$id = $this->_req->getQuery('id', 'intval');
 		$save = $this->_req->getPost('save');
 		$themePicked = $this->_req->getQuery('th', 'intval');
-		$variant = $this->_req->getQuery('vrt', 'cleanhtml');
+		$variant = $this->_req->getQuery('vrt', 'Util::htmlspecialchars');
 
 		$context['default_theme_id'] = $modSettings['theme_default'];
 
@@ -1057,7 +1057,7 @@ class ManageThemes extends AbstractController
 			checkSession('get');
 
 			//$th = $this->_req->getQuery('th', 'intval');
-			//$vrt = $this->_req->getQuery('vrt', 'cleanhtml');
+			//$vrt = $this->_req->getQuery('vrt', 'Util::htmlspecialchars');
 
 			// If changing members or guests - and there's a variant - assume changing default variant.
 			if (!empty($variant) && ($u === 0 || $u === -1))

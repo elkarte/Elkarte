@@ -114,6 +114,11 @@ class Util
 	{
 		global $modSettings;
 
+		if (empty($string))
+		{
+			return '';
+		}
+
 		// Preg_replace for any kind of whitespace or invisible separator
 		// and invisible control characters and unused code points
 		$space_chars = '\p{Z}\p{C}';

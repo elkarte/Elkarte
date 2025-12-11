@@ -1395,7 +1395,10 @@ class DataValidator
 	}
 
 	/**
-	 * Uses \ElkArte\Helper\Util::htmlspecialchars to sanitize any html in the input
+	 * Uses \ElkArte\Helper\Util::htmlspecialchars to sanitize html in the input
+	 *
+	 * - Use this method in place of a standard getXXX('xx', 'Util::htmlspecialchars', '');
+	 * if you require ENT_QUOTES and double encoding
 	 *
 	 * @param string $input
 	 *
@@ -1403,11 +1406,6 @@ class DataValidator
 	 */
 	protected function _sanitation_cleanhtml($input): ?string
 	{
-		if (!isset($input))
-		{
-			return null;
-		}
-
-		return Util::htmlspecialchars($input);
+		return Util::htmlspecialchars($input, ENT_QUOTES, 'UTF-8', true);
 	}
 }

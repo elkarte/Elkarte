@@ -554,7 +554,7 @@ class ProfileOptions extends AbstractController
 		$save = $this->_req->getPost('save');
 		$u = $this->_req->getQuery('u', 'intval');
 		$themePicked = $this->_req->getQuery('th', 'intval');
-		$variant = $this->_req->getQuery('vrt', 'cleanhtml');
+		$variant = $this->_req->getQuery('vrt', 'Util::htmlspecialchars');
 
 		// Build the link tree
 		$context['breadcrumbs'][] = [
