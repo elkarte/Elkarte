@@ -161,7 +161,7 @@ class AttachmentsDirectory
 	{
 		if ($this->hasSizeLimit())
 		{
-			return max($this->sizeLimit - $current_dir_size, 0);
+			return max($this->sizeLimit * 1024 - $current_dir_size, 0);
 		}
 
 		return false;
@@ -966,7 +966,7 @@ class AttachmentsDirectory
 	 */
 	public function isCurrentDirectoryId(int $id): bool
 	{
-		return $this->currentAttachmentUploadDir == $id;
+		return $this->currentAttachmentUploadDir === $id;
 	}
 
 	/**
