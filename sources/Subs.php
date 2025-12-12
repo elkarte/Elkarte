@@ -730,15 +730,24 @@ function handleMaintenance()
 }
 
 /**
- * @param string $index
+ * Sets the old URL in the session for reference if certain conditions are met.
+ *
+ * This method tracks the current URL and stores it in the session under the provided index,
+ * unless the URL matches a set of invalid patterns. A hook allows customization of the
+ * invalid patterns.
+ *
+ * @param string $index The session index under which the URL will be stored. Defaults to 'old_url'.
+ * @return void
  */
-function setOldUrl($index = 'old_url')
+function setOldUrl($index = 'old_url'): void
 {
 	// Remember this URL in case someone doesn't like sending HTTP_REFERER.
 	$invalid_old_url = [
 		'action=dlattach',
 		'action=jsoption',
 		';api=xml',
+		';api=json',
+		'action=mentions',
 	];
 	call_integration_hook('integrate_invalid_old_url', [&$invalid_old_url]);
 	$make_old = true;
@@ -2266,6 +2275,16 @@ function iri_host_ascii($url)
 		if (preg_match('~^[a-z][a-z0-9+.-]*://([^/?#]+)~iu', $url, $m))
 		{
 			$host = $m[1];
+		}
+	}
+
+	// Fallback for plain hostnames or IPs without http[s]:// scheme
+	if ($host === null || $host === false || $host === '')
+	{
+		$parsed = parse_url('scheme://' . $url);
+		if (isset($parsed['host']))
+		{
+			$host = $parsed['host'];
 		}
 	}
 
