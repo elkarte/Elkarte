@@ -563,6 +563,16 @@ class PackageServers extends AbstractController
 			throw new Exception('package_cant_download', false);
 		}
 
+		// Ensure nested structures are arrays before assigning nested offsets
+		if (empty($context['package']['install']) || !is_array($context['package']['install']))
+		{
+			$context['package']['install'] = [];
+		}
+		if (empty($context['package']['list_files']) || !is_array($context['package']['list_files']))
+		{
+			$context['package']['list_files'] = [];
+		}
+
 		$context['package']['install']['link'] = '';
 		if ($context['package']['type'] === 'modification' || $context['package']['type'] === 'addon')
 		{
@@ -678,6 +688,16 @@ class PackageServers extends AbstractController
 		catch (UnexpectedValueException)
 		{
 			// @todo for now do nothing...
+		}
+
+		// Ensure nested structures are arrays before assigning nested offsets
+		if (empty($context['package']['install']) || !is_array($context['package']['install']))
+		{
+			$context['package']['install'] = [];
+		}
+		if (empty($context['package']['list_files']) || !is_array($context['package']['list_files']))
+		{
+			$context['package']['list_files'] = [];
 		}
 
 		$context['package']['install']['link'] = '';

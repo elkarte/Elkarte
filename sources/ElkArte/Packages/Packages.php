@@ -789,7 +789,14 @@ class Packages extends AbstractController
 
 		if (!empty($this->_req->post->custom_theme))
 		{
-			foreach ($this->_req->post->custom_theme as $tid)
+			// Normalize to array to avoid invalid foreach or string offset issues
+			$custom_theme = $this->_req->post->custom_theme;
+			if (!is_array($custom_theme))
+			{
+				$custom_theme = [$custom_theme];
+			}
+
+			foreach ($custom_theme as $tid)
 			{
 				if (in_array($tid, $known_themes, true))
 				{
@@ -821,7 +828,14 @@ class Packages extends AbstractController
 
 		if (!empty($this->_req->post->theme_changes))
 		{
-			foreach ($this->_req->post->theme_changes as $change)
+			// Normalize to array to avoid invalid foreach or string offset issues
+			$theme_changes = $this->_req->post->theme_changes;
+			if (!is_array($theme_changes))
+			{
+				$theme_changes = [$theme_changes];
+			}
+
+			foreach ($theme_changes as $change)
 			{
 				if (empty($change))
 				{
