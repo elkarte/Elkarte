@@ -171,7 +171,7 @@ class ManageAttachments extends AbstractController
 		{
 			checkSession();
 
-			if (!empty($this->_req->post->attachmentEnable))
+			if ($this->_req->hasPost('attachmentEnable'))
 			{
 				enableModules('attachments', ['post', 'display']);
 			}
@@ -180,33 +180,40 @@ class ManageAttachments extends AbstractController
 				disableModules('attachments', ['post', 'display']);
 			}
 
+			// Read posted values safely
+			$autoManage = $this->_req->getPost('automanage_attachments', 'intval', 0);
+			$useSubdirectories = $this->_req->getPost('use_subdirectories_for_attachments', 'intval', 0);
+			$baseDirPosted = $this->_req->getPost('basedirectory_for_attachments', 'trim');
+			$uploadDirPosted = $this->_req->getPost('attachmentUploadDir', 'trim');
+			$webpEnable = !empty($this->_req->getPost('attachment_webp_enable', null, ''));
+			$attachExtensions = $this->_req->getPost('attachmentExtensions', 'trim');
+
 			// Default/Manual implies no subdirectories
-			if (empty($this->_req->post->automanage_attachments))
+			if ($autoManage === 0)
 			{
-				$this->_req->post->use_subdirectories_for_attachments = 0;
+				$useSubdirectories = 0;
 			}
 
 			// Changing the attachment upload directory
-			if (isset($this->_req->post->attachmentUploadDir))
+			if ($uploadDirPosted !== null)
 			{
-				if (!empty($this->_req->post->attachmentUploadDir)
-					&& $modSettings['attachmentUploadDir'] !== $this->_req->post->attachmentUploadDir
+				if (!empty($uploadDirPosted)
+					&& $modSettings['attachmentUploadDir'] !== $uploadDirPosted
 					&& $this->file_functions->fileExists($modSettings['attachmentUploadDir']))
 				{
-					rename($modSettings['attachmentUploadDir'], $this->_req->post->attachmentUploadDir);
+					rename($modSettings['attachmentUploadDir'], $uploadDirPosted);
 				}
 
-				$modSettings['attachmentUploadDir'] = [1 => $this->_req->post->attachmentUploadDir];
-				$this->_req->post->attachmentUploadDir = serialize($modSettings['attachmentUploadDir']);
+				$modSettings['attachmentUploadDir'] = [1 => $uploadDirPosted];
 			}
 
 			// Adding / changing the sub directory's for attachments
-			if (!empty($this->_req->post->use_subdirectories_for_attachments))
+			if (!empty($useSubdirectories))
 			{
 				// Make sure we have a base directory defined
-				if (empty($this->_req->post->basedirectory_for_attachments))
+				if (empty($baseDirPosted))
 				{
-					$this->_req->post->basedirectory_for_attachments = (empty($modSettings['basedirectory_for_attachments']) ? (BOARDDIR) : $modSettings['basedirectory_for_attachments']);
+					$baseDirPosted = (empty($modSettings['basedirectory_for_attachments']) ? (BOARDDIR) : $modSettings['basedirectory_for_attachments']);
 				}
 
 				// The current base directories that we know
@@ -223,43 +230,58 @@ class ManageAttachments extends AbstractController
 				}
 
 				// Trying to use a nonexistent base directory
-				if (!empty($this->_req->post->basedirectory_for_attachments) && $attachmentsDir->isBaseDir($this->_req->post->basedirectory_for_attachments) === false)
+				if (!empty($baseDirPosted) && $attachmentsDir->isBaseDir($baseDirPosted) === false)
 				{
 					$currentAttachmentUploadDir = $attachmentsDir->currentDirectoryId();
 
 					// If this is a new directory being defined, attempt to create it
-					if ($attachmentsDir->directoryExists($this->_req->post->basedirectory_for_attachments) === false)
+					if ($attachmentsDir->directoryExists($baseDirPosted) === false)
 					{
 						try
 						{
-							$attachmentsDir->createDirectory($this->_req->post->basedirectory_for_attachments);
+							$attachmentsDir->createDirectory($baseDirPosted);
 						}
 						catch (Exception)
 						{
-							$this->_req->post->basedirectory_for_attachments = $modSettings['basedirectory_for_attachments'];
+							$baseDirPosted = $modSettings['basedirectory_for_attachments'];
 						}
 					}
 
 					// The base directory should be in our list of available bases
-					if (!in_array($this->_req->post->basedirectory_for_attachments, $modSettings['attachment_basedirectories']))
+					if (!in_array($baseDirPosted, $modSettings['attachment_basedirectories']))
 					{
-						$modSettings['attachment_basedirectories'][$modSettings['currentAttachmentUploadDir']] = $this->_req->post->basedirectory_for_attachments;
+						$modSettings['attachment_basedirectories'][$modSettings['currentAttachmentUploadDir']] = $baseDirPosted;
 						updateSettings(['attachment_basedirectories' => serialize($modSettings['attachment_basedirectories']), 'currentAttachmentUploadDir' => $currentAttachmentUploadDir,]);
-
-						$this->_req->post->attachmentUploadDir = serialize($modSettings['attachmentUploadDir']);
 					}
 				}
 			}
 
 			// Allow or not webp extensions.
-			if (!empty($this->_req->post->attachment_webp_enable) && !str_contains($this->_req->post->attachmentExtensions, 'webp'))
+			if (!empty($webpEnable) && $attachExtensions !== null && !str_contains((string) $attachExtensions, 'webp'))
 			{
-				$this->_req->post->attachmentExtensions .= ',webp';
+				$attachExtensions = rtrim((string) $attachExtensions, ',') . ',webp';
 			}
 
 			call_integration_hook('integrate_save_attachment_settings');
 
-			$settingsForm->setConfigValues((array) $this->_req->post);
+			// Build a config array from posted values and override with sanitized ones
+			$config = (array) $this->_req->post;
+			$config['automanage_attachments'] = $autoManage;
+			$config['use_subdirectories_for_attachments'] = $useSubdirectories;
+			if ($baseDirPosted !== null)
+			{
+				$config['basedirectory_for_attachments'] = $baseDirPosted;
+			}
+			if ($uploadDirPosted !== null)
+			{
+				$config['attachmentUploadDir'] = serialize($modSettings['attachmentUploadDir']);
+			}
+			if ($attachExtensions !== null)
+			{
+				$config['attachmentExtensions'] = $attachExtensions;
+			}
+
+			$settingsForm->setConfigValues($config);
 			$settingsForm->save();
 			redirectexit('action=admin;area=manageattachments;sa=attachments');
 		}
@@ -309,7 +331,6 @@ class ManageAttachments extends AbstractController
 		// A bit of razzle dazzle with the $txt strings. :)
 		$txt['basedirectory_for_attachments_warning'] = str_replace('{attach_repair_url}', getUrl('admin', ['action' => 'admin', 'area' => 'manageattachments', 'sa' => 'attachpaths']), $txt['basedirectory_for_attachments_warning']);
 		$txt['attach_current_dir_warning'] = str_replace('{attach_repair_url}', getUrl('admin', ['action' => 'admin', 'area' => 'manageattachments', 'sa' => 'attachpaths']), $txt['attach_current_dir_warning']);
-
 		$txt['attachment_path'] = $context['attachmentUploadDir'];
 		$txt['basedirectory_for_attachments_path'] = $modSettings['basedirectory_for_attachments'] ?? '';
 		$txt['use_subdirectories_for_attachments_note'] = empty($modSettings['attachment_basedirectories']) || empty($modSettings['use_subdirectories_for_attachments']) ? $txt['use_subdirectories_for_attachments_note'] : '';
@@ -667,7 +688,7 @@ class ManageAttachments extends AbstractController
 		// If they specified a limit only....
 		if ($attachmentDirectory->hasSizeLimit())
 		{
-			$context['attachment_space'] = comma_format($attachmentDirectory->remainingSpace($current_dir['size']), 2);
+			$context['attachment_space'] = byte_format($attachmentDirectory->remainingSpace($current_dir['size']));
 		}
 
 		if ($attachmentDirectory->hasNumFilesLimit())
@@ -694,8 +715,6 @@ class ManageAttachments extends AbstractController
 	 *
 	 * - Called from the maintenance screen by ?action=admin;area=manageattachments;sa=byAge.
 	 * - It optionally adds a certain text to the messages the attachments were removed from.
-	 *
-	 * @todo refactor this silly superglobals use...
 	 */
 	public function action_byAge(): void
 	{
@@ -703,22 +722,26 @@ class ManageAttachments extends AbstractController
 
 		// @todo Ignore messages in topics that are stickied?
 
+		// Inputs
+		$age = $this->_req->getPost('age', 'intval', 0);
+		$notice = $this->_req->getPost('notice', 'trim');
+
 		// Deleting an attachment?
 		if (!$this->_req->compareQuery('type', 'avatars', 'trim|strval'))
 		{
 			// Get rid of all the old attachments.
-			$messages = removeAttachments(['attachment_type' => 0, 'poster_time' => (time() - 24 * 60 * 60 * $this->_req->post->age)], 'messages', true);
+			$messages = removeAttachments(['attachment_type' => 0, 'poster_time' => (time() - 24 * 60 * 60 * $age)], 'messages', true);
 
 			// Update the messages to reflect the change.
-			if (!empty($messages) && !empty($this->_req->post->notice))
+			if (!empty($messages) && !empty($notice))
 			{
-				setRemovalNotice($messages, $this->_req->post->notice);
+				setRemovalNotice($messages, $notice);
 			}
 		}
 		// Remove all the old avatars.
 		else
 		{
-			removeAttachments(['not_id_member' => 0, 'last_login' => (time() - 24 * 60 * 60 * $this->_req->post->age)], 'members');
+			removeAttachments(['not_id_member' => 0, 'last_login' => (time() - 24 * 60 * 60 * $age)], 'members');
 		}
 
 		redirectexit('action=admin;area=manageattachments' . (empty($this->_req->query->avatars) ? ';sa=maintenance' : ';avatars'));
@@ -734,13 +757,16 @@ class ManageAttachments extends AbstractController
 	{
 		checkSession('post', 'admin');
 
+		$size = $this->_req->getPost('size', 'intval', 0);
+		$notice = $this->_req->getPost('notice', 'trim');
+
 		// Find humongous attachments.
-		$messages = removeAttachments(['attachment_type' => 0, 'size' => 1024 * $this->_req->post->size], 'messages', true);
+		$messages = removeAttachments(['attachment_type' => 0, 'size' => 1024 * $size], 'messages', true);
 
 		// And make a note on the post.
-		if (!empty($messages) && !empty($this->_req->post->notice))
+		if (!empty($messages) && !empty($notice))
 		{
-			setRemovalNotice($messages, $this->_req->post->notice);
+			setRemovalNotice($messages, $notice);
 		}
 
 		redirectexit('action=admin;area=manageattachments;sa=maintenance');
@@ -757,11 +783,12 @@ class ManageAttachments extends AbstractController
 
 		checkSession();
 
-		if (!empty($this->_req->post->remove))
+		$to_remove = $this->_req->getPost('remove', null, []);
+		if (!empty($to_remove) && is_array($to_remove))
 		{
 			// There must be a quicker way to pass this safety test??
 			$attachments = [];
-			foreach ($this->_req->post->remove as $removeID => $dummy)
+			foreach ($to_remove as $removeID => $dummy)
 			{
 				$attachments[] = (int) $removeID;
 			}
@@ -861,12 +888,13 @@ class ManageAttachments extends AbstractController
 			if ($this->_req->hasQuery('fixErrors'))
 			{
 				// Nothing?
-				if (empty($this->_req->post->to_fix))
+				$to_fix_post = $this->_req->getPost('to_fix', null, []);
+				if (empty($to_fix_post))
 				{
 					redirectexit('action=admin;area=manageattachments;sa=maintenance');
 				}
 
-				foreach ($this->_req->post->to_fix as $value)
+				foreach ((array) $to_fix_post as $value)
 				{
 					$_SESSION['attachments_to_fix'][] = $value;
 				}
@@ -1165,7 +1193,7 @@ class ManageAttachments extends AbstractController
 		}
 
 		// Saving a base directory?
-		if (isset($this->_req->post->save2))
+		if ($this->_req->hasPost('save2'))
 		{
 			$this->_saveBasePaths($attachmentsDir);
 		}
@@ -1221,7 +1249,7 @@ class ManageAttachments extends AbstractController
 					'data' => [
 						'function' => static fn($rowData) => '
 							<input type="hidden" name="dirs[' . $rowData['id'] . ']" value="' . $rowData['path'] . '" />
-							<input type="text" size="40" name="dirs[' . $rowData['id'] . ']" value="' . $rowData['path'] . '"' . (empty($rowData['disable_base_dir']) ? '' : ' disabled="disabled"') . ' class="input_text"/>',
+							<input type="text" size="40" name="dirs[' . $rowData['id'] . ']" value="' . $rowData['path'] . '"' . ((empty($rowData['disable_base_dir']) && empty($rowData['disable_current'])) ? '' : ' disabled="disabled"') . ' class="input_text"/>',
 						'class' => 'grid50',
 					],
 				],
@@ -1371,7 +1399,7 @@ class ManageAttachments extends AbstractController
 		checkSession();
 
 		$current_dir = $this->_req->getPost('current_dir', 'intval', 1);
-		$dirs = $this->_req->getPost('dirs');
+		$dirs = $this->_req->getPost('dirs', null, []);
 		$new_dirs = [];
 
 		// Can't use these directories for attachments
@@ -1607,8 +1635,9 @@ class ManageAttachments extends AbstractController
 		$this->from = $this->_req->getPost('from', 'intval');
 		$this->auto = $this->_req->getPost('auto', 'intval', 0);
 		$this->to = $this->_req->getPost('to', 'intval');
-		$start = empty($this->_req->post->empty_it) ? $modSettings['attachmentDirFileLimit'] : 0;
-		$_SESSION['checked'] = !empty($this->_req->post->empty_it);
+		$emptyIt = !empty($this->_req->getPost('empty_it', null, ''));
+		$start = $emptyIt ? 0 : (int) ($modSettings['attachmentDirFileLimit'] ?? 0);
+		$_SESSION['checked'] = $emptyIt;
 
 		// Prepare for the moving
 		$limit = 501;
