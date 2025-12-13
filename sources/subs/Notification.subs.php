@@ -548,11 +548,9 @@ function getTopicInfos($topics, $type)
 	$topicData = [];
 	$boards_index = [];
 
-	// Use a portable aggregate for comma-separated list of thumbnails
+	// Use a portable aggregate for comma-separated list of thumbnails as our compatability
+	// functions do not abstract this ATM.
 	$aggregateThumbs = $db->title() === 'PostgreSQL'
-		// On PostgreSQL, when using DISTINCT in an aggregate, ORDER BY expressions
-		// must appear in the aggregate argument list. Since the argument here is
-		// a.id_thumb::text, the ORDER BY must use the same expression.
 		? 'string_agg(DISTINCT a.id_thumb::text, {string:delim} ORDER BY a.id_thumb::text)'
 		: 'GROUP_CONCAT(DISTINCT a.id_thumb ORDER BY a.id_thumb SEPARATOR ",")';
 
