@@ -624,7 +624,9 @@ class UpgradeInstructions_upgrade_2_0
 						array(':partying_face', 'party', $txt['default_party_smiley'], 0, 2),
 						array(':zany_face:', 'zany', $txt['default_wild_smiley'], 0, 2),
 						array(':shushing_face:', 'shh', $txt['default_shh_smiley'], 0, 2),
-						array(':face_vomiting:', 'vomit', $txt['default_vomit_smiley'], 0, 2)
+						array(':face_vomiting:', 'vomit', $txt['default_vomit_smiley'], 0, 2),
+						array(':troll:', 'troll', $txt['default_troll_smiley'], 0, 1),
+						array(':elk:', 'Elk', $txt['default_elk_smiley'], 0, 1)
 					);
 					$codes = array();
 					$inserts = array();

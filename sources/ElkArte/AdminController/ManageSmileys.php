@@ -414,7 +414,7 @@ class ManageSmileys extends AbstractController
 	{
 		global $context, $modSettings;
 
-		if (isset($this->_req->post->smiley_save) || isset($this->_req->post->delete_set))
+		if ($this->_req->hasPost('smiley_save') || $this->_req->hasPost('delete_set'))
 		{
 			// Security first
 			checkSession();
@@ -467,16 +467,21 @@ class ManageSmileys extends AbstractController
 				// Create a new smiley set.
 				if ($set === -1 && $this->_req->hasPost('smiley_sets_path'))
 				{
-					if (in_array($this->_req->post->smiley_sets_path, $set_paths, true))
+					$setPath = $this->_req->getPost('smiley_sets_path', 'trim');
+					if (in_array($setPath, $set_paths, true))
 					{
 						throw new Exception('smiley_set_already_exists', false);
 					}
 
+					// Determine the set type
+					$setPath = $modSettings['smileys_dir'] . '/' . $setPath;
+					$ext = getFirstImageExtensionInDir($setPath);
+
 					updateSettings([
-						'smiley_sets_known' => $modSettings['smiley_sets_known'] . ',' . $this->_req->post->smiley_sets_path,
-						'smiley_sets_names' => $modSettings['smiley_sets_names'] . "\n" . $this->_req->post->smiley_sets_name,
-						'smiley_sets_extensions' => $modSettings['smiley_sets_extensions'] . ',' . $this->_req->post->smiley_sets_ext,
-						'smiley_sets_default' => empty($this->_req->post->smiley_sets_default) ? $modSettings['smiley_sets_default'] : $this->_req->post->smiley_sets_path,
+						'smiley_sets_known' => $modSettings['smiley_sets_known'] . ',' . $this->_req->getPost('smiley_sets_path', 'trim', ''),
+						'smiley_sets_names' => $modSettings['smiley_sets_names'] . "\n" . $this->_req->getpost('smiley_sets_name', 'trim', ''),
+						'smiley_sets_extensions' => $modSettings['smiley_sets_extensions'] . ',' . $ext ?? 'gif',
+						'smiley_sets_default' => empty($this->_req->post->smiley_sets_default) ? $modSettings['smiley_sets_default'] : $this->_req->getPost('smiley_sets_path', 'trim', ''),
 					]);
 				}
 				// Modify an existing smiley set.
@@ -691,9 +696,14 @@ class ManageSmileys extends AbstractController
 					if (!in_array($entry, $disallow, true)
 						&& $fileFunc->isDir($modSettings['smileys_dir'] . '/' . $entry))
 					{
+						// What kind of set are we dealing with?
+						$setPath = $modSettings['smileys_dir'] . '/' . $entry;
+						$ext = getFirstImageExtensionInDir($setPath);
+
 						$context['smiley_set_dirs'][] = [
 							'id' => $entry,
 							'path' => $modSettings['smileys_dir'] . '/' . $entry,
+							'ext' => $ext,
 							'selectable' => $entry === $context['current_set']['path'] || !in_array($entry, explode(',', $modSettings['smiley_sets_known']), true),
 							'current' => $entry === $context['current_set']['path'],
 						];

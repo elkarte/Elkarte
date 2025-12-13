@@ -89,6 +89,8 @@ $txt['default_clown_smiley'] = 'Clown';
 $txt['default_wild_smiley'] = 'Zany';
 $txt['default_shh_smiley'] = 'Quiet';
 $txt['default_vomit_smiley'] = 'Vomit';
+$txt['default_troll_smiley'] = 'Troll';
+$txt['default_elk_smiley'] = 'Elk';
 
 $txt['error_message_click'] = 'Click here';
 $txt['error_message_try_again'] = 'to try this step again.';

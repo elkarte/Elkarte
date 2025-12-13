@@ -658,6 +658,34 @@ function setSmileyExtensionArray()
 }
 
 /**
+ * Returns the extension (without dot) of the first matching image file found in $dir.
+ * Only checks the direct children of the directory (not recursive).
+ *
+ * @param string $dir Absolute directory path
+ * @return string|null Lowercase extension or null if none found
+ */
+function getFirstImageExtensionInDir(string $dir): ?string
+{
+	$allowed =  ['jpg', 'gif', 'jpeg', 'png', 'webp', 'svg'];
+	$extensionType = null;
+
+	$fileFunc = FileFunctions::instance();
+	$smiles = $fileFunc->listTree($dir);
+	foreach ($smiles as $smile)
+	{
+		$temp = pathinfo($smile['filename'], PATHINFO_EXTENSION);
+		if (in_array($temp, $allowed, true))
+		{
+			$extensionType = $temp;
+			break;
+		}
+	}
+
+	return $extensionType;
+}
+
+
+/**
  * Fetch and prepare the smileys for use in the post editor
  *
  * What it does:
