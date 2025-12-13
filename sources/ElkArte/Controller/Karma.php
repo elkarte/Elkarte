@@ -28,7 +28,7 @@ use ElkArte\Hooks;
 class Karma extends AbstractController
 {
 	/**
-	 * Pre Dispatch, called before other methods.  Loads integration hooks.
+	 * Pre-dispatch, called before other methods.  Loads integration hooks.
 	 */
 	public function pre_dispatch()
 	{

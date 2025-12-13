@@ -61,7 +61,7 @@ class ManageBans extends AbstractController
 		// Start up the controller
 		$action = new Action('manage_bans');
 
-		// Default the sub-action to 'view ban list'.
+		// Default the sub-action to 'view banlist'.
 		$subAction = $action->initialize($subActions, 'list');
 
 		// Make the call to integrate-manage_bans
@@ -149,7 +149,7 @@ class ManageBans extends AbstractController
 			$context['ban_time_format'] = $matches[0];
 		}
 
-		// Lets build a nice create list to show them the bans
+		// Let's build a nice "create list" to show them the bans
 		$listOptions = [
 			'id' => 'ban_list',
 			'title' => $txt['ban_title'],
@@ -311,9 +311,9 @@ class ManageBans extends AbstractController
 	 *  - uses the ban_edit sub template of the ManageBans template.
 	 *
 	 * Modifying existing bans:
-	 *  - is accessed by ?action=admin;area=ban;sa=edit;bg=x
-	 *  - uses the ban_edit sub template of the ManageBans template.
-	 *  - shows a list of ban triggers for the specified ban.
+	 *  - Is accessed by ?action=admin;area=ban;sa=edit;bg=x
+	 *  - Uses the ban_edit sub template of the ManageBans template.
+	 *  - Shows a list of ban triggers for the specified ban.
 	 *
 	 * @event integrate_list_ban_items
 	 */
@@ -333,12 +333,12 @@ class ManageBans extends AbstractController
 
 		$ban_group_id = $context['ban']['id'] ?? $this->_req->getQuery('bg', 'intval', 0);
 
-		// Template needs this to show errors using javascript
+		// Template needs this to show errors using JavaScript
 		Txt::load('Errors');
 		createToken('admin-bet');
 		$context['form_url'] = getUrl('admin', ['action' => 'admin', 'area' => 'ban', 'sa' => 'edit']);
 
-		// Prepare any errors found to the template to show
+		// Prepare any errors found in the template to show
 		$context['ban_errors'] = [
 			'errors' => $ban_errors->prepareErrors(),
 			'type' => $ban_errors->getErrorType() == 0 ? 'minor' : 'serious',
@@ -449,7 +449,7 @@ class ManageBans extends AbstractController
 				];
 				createList($listOptions);
 			}
-			// Not an existing one, then it's probably a new one.
+			// Not an existing one, then it's probably new.
 			else
 			{
 				$context['ban'] = [
@@ -526,12 +526,12 @@ class ManageBans extends AbstractController
 			'txt_ban_restriction_empty' => $txt['ban_restriction_empty']], true
 		);
 
-		// And a bit of javascript to enable/disable some fields
+		// And a bit of JavaScript to enable/disable some fields
 		theme()->addInlineJavascript('fUpdateStatus();', true);
 	}
 
 	/**
-	 * This function handles submitted forms that add, modify or remove ban triggers.
+	 * This function handles submitted forms that add, modify, or remove ban triggers.
 	 */
 	public function action_edit2(): void
 	{
@@ -660,14 +660,14 @@ class ManageBans extends AbstractController
 	}
 
 	/**
-	 * This handles the listing of ban log entries, and allows their deletion.
+	 * This handles the listing of ban log entries and allows their deletion.
 	 *
 	 * What it does:
 	 *
 	 * - Shows a list of logged access attempts by banned users.
 	 * - It is accessed by ?action=admin;area=ban;sa=log.
-	 * - allows sorting of several columns.
-	 * - also handles deletion of (a selection of) log entries.
+	 * - Allows sorting of several columns.
+	 * - Handles deletion of (a selection of) log entries.
 	 */
 	public function action_log(): void
 	{
@@ -866,7 +866,7 @@ class ManageBans extends AbstractController
 			redirectexit('action=admin;area=ban;sa=edit;bg=' . $ban_group);
 		}
 
-		// No id supplied, this must be a new trigger being added
+		// No id supplied; this must be a new trigger being added
 		if (empty($ban_id))
 		{
 			$context['ban_trigger'] = [
@@ -891,7 +891,7 @@ class ManageBans extends AbstractController
 				'is_new' => true,
 			];
 		}
-		// Otherwise its an existing trigger they want to edit
+		// Otherwise it is an existing trigger they want to edit
 		else
 		{
 			$ban_row = banDetails($ban_id, $ban_group);
@@ -942,7 +942,7 @@ class ManageBans extends AbstractController
 	 * What it does:
 	 *
 	 * - It is accessed by ?action=admin;area=ban;sa=browse
-	 * - It uses sub-tabs for browsing by IP, hostname, email or username.
+	 * - It uses sub-tabs for browsing by IP, hostname, email, or username.
 	 *
 	 * @uses ManageBans template, browse_triggers sub template.
 	 */

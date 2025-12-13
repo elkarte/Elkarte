@@ -29,7 +29,7 @@ use ElkArte\User;
 
 /**
  * Entry point class for all maintenance, routine, members, database,
- * attachments, topics and hooks
+ * attachments, topics, and hooks
  *
  * @package Maintenance
  */
@@ -38,7 +38,7 @@ class Maintenance extends AbstractController
 	/** @var int Maximum topic counter */
 	public int $max_topics;
 
-	/** @var int How many actions to take for a maintenance actions */
+	/** @var int How many actions to take for a maintenance action */
 	public int $increment;
 
 	/** @var int Total steps for a given maintenance action */
@@ -79,7 +79,7 @@ class Maintenance extends AbstractController
 				'class' => 'i-cog']
 		);
 
-		// So many things you can do - but frankly I won't let you - just these!
+		// So many things you can do - but frankly, I won't let you - just these!
 		$subActions = [
 			'routine' => [
 				'controller' => $this,
@@ -349,7 +349,7 @@ class Maintenance extends AbstractController
 	/**
 	 * Wipes the current cache entries as best it can.
 	 *
-	 * - This only applies to our own cache entries, opcache and data.
+	 * - This only applies to our own cache entries, opcache, and data.
 	 * - This action, like other maintenance tasks, may be called automatically
 	 * by the task scheduler or manually by the admin in Maintenance area.
 	 */
@@ -446,7 +446,7 @@ class Maintenance extends AbstractController
 			{
 				resizeMessageTableBody('mediumtext');
 			}
-			// Shorten the column so we can have a bit (literally per record) less space occupied
+			// Shorten the column so we can have (literally per record) less space occupied.
 			else
 			{
 				resizeMessageTableBody('text');
@@ -563,7 +563,7 @@ class Maintenance extends AbstractController
 
 		$tables = getElkTables();
 
-		// If there aren't any tables then I believe that would mean the world has exploded...
+		// If there aren't any tables, then I believe that would mean the world has exploded...
 		$context['num_tables'] = count($tables);
 		if ($context['num_tables'] === 0)
 		{
@@ -592,7 +592,7 @@ class Maintenance extends AbstractController
 		$txt['database_numb_tables'] = sprintf($txt['database_numb_tables'], $context['num_tables']);
 		$context['num_tables_optimized'] = count($context['optimized_tables']);
 
-		// Check that we don't auto optimise again too soon!
+		// Check that we don't auto-optimize again too soon!
 		require_once(SUBSDIR . '/ScheduledTasks.subs.php');
 		calculateNextTrigger('auto_optimize', true);
 	}
@@ -602,7 +602,7 @@ class Maintenance extends AbstractController
 	 *
 	 * What it does:
 	 *
-	 * - it requires the admin_forum permission.
+	 * - It requires the admin_forum permission.
 	 * - It shows the maintain_forum admin area.
 	 * - The function redirects back to ?action=admin;area=maintain when complete.
 	 * - It is accessed via ?action=admin;area=maintain;sa=database;activity=recount.
@@ -649,7 +649,7 @@ class Maintenance extends AbstractController
 		$this->max_topics = getMaxTopicID();
 		$this->increment = (int) min(max(50, ceil($this->max_topics / 4)), 2000);
 
-		// An 8 step process, should be 12 for the admin
+		// An 8-step process should be 12 for the admin
 		$this->total_steps = 8;
 		$this->start = $this->_req->getQuery('start', 'inval', 0);
 		$this->step = $this->_req->getQuery('step', 'intval', 0);
@@ -677,7 +677,7 @@ class Maintenance extends AbstractController
 			$this->start = 0;
 		}
 
-		// Update the post count of each board.
+		// Update the post-count of each board.
 		if ($this->step <= 1)
 		{
 			if (empty($this->start))
@@ -730,7 +730,7 @@ class Maintenance extends AbstractController
 			$this->start = 0;
 		}
 
-		// Update the unapproved post count of each board.
+		// Update the unapproved post-count of each board.
 		if ($this->step <= 3)
 		{
 			if (empty($this->start))
@@ -782,7 +782,7 @@ class Maintenance extends AbstractController
 			$this->start = 0;
 		}
 
-		// Get all members with wrong number of personal messages.
+		// Get all members with the wrong number of personal messages.
 		if ($this->step <= 5)
 		{
 			updatePersonalMessagesCounter();
@@ -803,7 +803,7 @@ class Maintenance extends AbstractController
 		{
 			while ($this->start < $modSettings['maxMsgID'])
 			{
-				// Use the controller's start pointer, not raw request
+				// Use the controller's start pointer, not the raw request
 				updateMessagesBoardID($this->start, $this->increment);
 				$this->start += $this->increment;
 
@@ -839,7 +839,7 @@ class Maintenance extends AbstractController
 	}
 
 	/**
-	 * Helper function for teh recount process, build the continue values for
+	 * Helper function for the recount process, build the continued values for
 	 * the template
 	 *
 	 * @param int $percent percent done
@@ -972,7 +972,7 @@ class Maintenance extends AbstractController
 		$ftp = new FtpConnection($this->_req->post->ftp_server, $this->_req->post->ftp_port, $this->_req->post->ftp_username, $this->_req->post->ftp_password);
 
 		// No errors on the connection, id/pass are good
-		// I know, I know... but a lot of people want to type /home/xyz/... which is wrong, but logical.
+		// I know, I know... but a lot of people want to type /home/xyz/... which is wrong but logical.
 		if ($ftp->error === false && !$ftp->chdir($this->_req->post->ftp_path))
 		{
 			$ftp->chdir(preg_replace('~^/home[2]?/[^/]+~', '', $this->_req->post->ftp_path));
@@ -984,7 +984,7 @@ class Maintenance extends AbstractController
 			Txt::load('Packages');
 			$ftp_error = $ftp->last_message ?? $txt['package_ftp_' . $ftp->error] ?? '';
 
-			// Fill the boxes for a FTP connection with data from the previous attempt
+			// Fill the boxes for an FTP connection with data from the previous attempt
 			$context['package_ftp'] = [
 				'form_elements_only' => 1,
 				'server' => $this->_req->post->ftp_server,
@@ -1007,7 +1007,7 @@ class Maintenance extends AbstractController
 	{
 		global $context, $modSettings, $maintenance;
 
-		// We need this, really..
+		// We need this, really...
 		require_once(SUBSDIR . '/Maintenance.subs.php');
 
 		// Set up the sub-template
@@ -1022,8 +1022,8 @@ class Maintenance extends AbstractController
 			$context['convert_to_suggest'] = ($body_type !== 'text' && !empty($modSettings['max_messageLength']) && $modSettings['max_messageLength'] < 65536);
 		}
 
-		// Check few things to give advices before make a backup
-		// If safe mod is enable the external tool is *always* the best (and probably the only) solution
+		// Check a few things to give advices before make a backup
+		// If safe mod is enabled, the external tool is *always* the best (and probably the only) solution
 		$context['safe_mode_enable'] = false;
 
 		// This is just a...guess
@@ -1034,16 +1034,16 @@ class Maintenance extends AbstractController
 		$memory_limit = memoryReturnBytes(ini_get('memory_limit')) / (1024 * 1024);
 
 		// Zip limit is set to more or less 1/4th the size of the available memory * 1500
-		// 1500 is an estimate of the number of messages that generates a database of 1 MB (yeah I know IT'S AN ESTIMATION!!!)
+		// 1500 is an estimate of the number of messages that generates a database of 1 MB (yeah, I know IT'S AN ESTIMATION!!!)
 		// Why that? Because the only reliable zip package is the one sent out the first time,
 		// so when the backup takes 1/5th (just to stay on the safe side) of the memory available
 		$zip_limit = $memory_limit * 1500 / 5;
 
 		// Here is more tricky: it depends on many factors, but the main idea is that
-		// if it takes "too long" the backup is not reliable. So, I know that on my computer it take
-		// 20 minutes to backup 2.5 GB, of course my computer is not representative, so I'll multiply by 4 the time.
+		// if it takes "too long" the backup is not reliable. So, I know that on my computer it takes
+		// 20 minutes to back up 2.5 GB; of course, my computer is not representative, so I'll multiply by 4 the time.
 		// I would consider "too long" 5 minutes (I know it can be a long time, but let's start with that):
-		// 80 minutes for a 2.5 GB and a 5 minutes limit means 160 MB approx
+		// 80 minutes for a 2.5 GB and a 5-minute limit means 160 MB approx
 		$plain_limit = 240000;
 
 		// Last thing: are we able to gain time?
@@ -1078,7 +1078,7 @@ class Maintenance extends AbstractController
 		theme()->getTemplates()->load('Packages');
 		Txt::load('Packages');
 
-		// $context['package_ftp'] may be set action_backup_display when an error occur
+		// $context['package_ftp'] may be set action_backup_display when an error occurs
 		if (!isset($context['package_ftp']))
 		{
 			$context['package_ftp'] = [
@@ -1143,7 +1143,7 @@ class Maintenance extends AbstractController
 
 	/**
 	 * This method takes care of removal of old posts.
-	 * They're very very old, perhaps even older.
+	 * They're very, very old, perhaps even older.
 	 */
 	public function action_pruneold_display(): void
 	{
@@ -1210,7 +1210,7 @@ class Maintenance extends AbstractController
 		$id_board_from = $this->_req->getPost('id_board_from', 'intval', $this->_req->getQuery('id_board_from', 'intval', 0));
 		$id_board_to = $this->_req->getPost('id_board_to', 'intval', $this->_req->getQuery('id_board_to', 'intval', 0));
 
-		// No boards then this is your stop.
+		// No boards, then this is your stop.
 		if (empty($id_board_from) || empty($id_board_to))
 		{
 			return;
@@ -1238,7 +1238,7 @@ class Maintenance extends AbstractController
 		{
 			while ($context['start'] <= $total_topics)
 			{
-				// Lets get the next 10 topics.
+				// Let's get the next 10 topics.
 				$topics = getTopicsToMove($id_board_from);
 
 				// Just return if we don't have any topics left to move.
@@ -1247,7 +1247,7 @@ class Maintenance extends AbstractController
 					break;
 				}
 
-				// Lets move them.
+				// Let's move them.
 				moveTopics($topics, $id_board_to);
 
 				// Increase the counter
@@ -1270,7 +1270,7 @@ class Maintenance extends AbstractController
 			}
 		}
 
-		// Don't confuse admins by having an out of date cache.
+		// Don't confuse admins by having an out-of-date cache.
 		Cache::instance()->remove('board-' . $id_board_from);
 		Cache::instance()->remove('board-' . $id_board_to);
 
@@ -1427,16 +1427,16 @@ class Maintenance extends AbstractController
 	}
 
 	/**
-	 * Recalculate all members post counts
+	 * Recalculate all members post-counts
 	 *
 	 * What it does:
 	 *
 	 * - It requires the admin_forum permission.
 	 * - Recounts all posts for members found in the message table
-	 * - Updates the members post count record in the members table
-	 * - Honors the boards post count flag
+	 * - Updates the members post-count record in the members table
+	 * - Honors the boards post-count flag
 	 * - Does not count posts in the recycle bin
-	 * - Zeros post counts for all members with no posts in the message table
+	 * - Zeros post-counts for all members with no posts in the message table
 	 * - Runs as a delayed loop to avoid server overload
 	 * - Uses the not_done template in Admin.template
 	 * - Redirects back to action=admin;area=maintain;sa=members when complete.
@@ -1479,8 +1479,8 @@ class Maintenance extends AbstractController
 			$total_members = $this->_req->session->total_members;
 		}
 
-		// Lets get the next group of members and determine their post count
-		// (from the boards that have post count enabled of course).
+		// Let's get the next group of members and determine their post-count
+		// (from the boards that have post-count enabled, of course).
 		$total_rows = updateMembersPostCount($start, $increment);
 
 		// Continue?

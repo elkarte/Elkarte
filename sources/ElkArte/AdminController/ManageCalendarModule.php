@@ -56,8 +56,8 @@ class ManageCalendarModule extends AbstractController
 	}
 
 	/**
-	 * The main controlling function doesn't have much to do... yet.
-	 * Just check permissions and delegate to the rest.
+	 * The main controlling function has little to do... yet.
+	 * Check permissions and delegate to the rest.
 	 *
 	 * @uses ManageCalendar language file.
 	 */
@@ -105,7 +105,7 @@ class ManageCalendarModule extends AbstractController
 	}
 
 	/**
-	 * The function that handles adding, and deleting holiday data
+	 * The function that handles adding and deleting holiday data
 	 */
 	public function action_holidays(): void
 	{
@@ -119,7 +119,7 @@ class ManageCalendarModule extends AbstractController
 
 			$to_remove = array_map('intval', array_keys($this->_req->post->holiday));
 
-			// Now the IDs are "safe" do the delete...
+			// Now that the IDs are "safe" do delete...
 			require_once(SUBSDIR . '/Calendar.subs.php');
 			removeHolidays($to_remove);
 		}
@@ -225,7 +225,7 @@ class ManageCalendarModule extends AbstractController
 	{
 		global $txt, $context, $modSettings;
 
-		//We need this, really..
+		// We need this, really...
 		require_once(SUBSDIR . '/Calendar.subs.php');
 
 		theme()->getTemplates()->load('ManageCalendar');
@@ -245,7 +245,7 @@ class ManageCalendarModule extends AbstractController
 		{
 			checkSession();
 
-			// Not too long good sir?
+			// Not too long, good sir?
 			$this->_req->post->title = Util::substr($this->_req->post->title, 0, 60);
 			$this->_req->post->holiday = $this->_req->getPost('holiday', 'intval', 0);
 
@@ -280,7 +280,7 @@ class ManageCalendarModule extends AbstractController
 				'title' => ''
 			];
 		}
-		// If it's not new load the data.
+		// If it's not new, load the data.
 		else
 		{
 			$context['holiday'] = getHoliday($holidayId);
@@ -295,7 +295,7 @@ class ManageCalendarModule extends AbstractController
 	}
 
 	/**
-	 * Show and allow to modify calendar settings.
+	 * Show and allow modifying calendar settings.
 	 *
 	 * @event integrate_save_calendar_settings
 	 * - The method uses a \ElkArte\SettingsForm\SettingsForm to do the work.

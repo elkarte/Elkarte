@@ -98,7 +98,7 @@ class ManageBoards extends AbstractController
 				'permission' => 'admin_forum'],
 		];
 
-		// You way will end here if you don't have permission.
+		// Your way will end here if you don't have permission.
 		$action = new Action('manage_boards');
 
 		// Default to sub-action 'main' or 'settings' depending on permissions.
@@ -145,7 +145,7 @@ class ManageBoards extends AbstractController
 			$src_board = $this->_req->getQuery('src_board', 'intval', 0);
 			validateToken('admin-bm-' . (int) $src_board, 'request');
 
-			// Top is special, its the top!
+			// Top is special, it is the top!
 			if ($move_to === 'top')
 			{
 				$boardOptions = [
@@ -300,7 +300,7 @@ class ManageBoards extends AbstractController
 	 *
 	 * What it does:
 	 *
-	 * - complete the modifications to a specific category.
+	 * - Complete the modifications to a specific category.
 	 * - It also handles deletion of a category.
 	 * - It requires manage_boards permission.
 	 * - Called by ?action=admin;area=manageboards;sa=cat2
@@ -315,7 +315,7 @@ class ManageBoards extends AbstractController
 
 		$this->cat = $this->_req->getPost('cat', 'intval');
 
-		// Add a new category or modify an existing one..
+		// Add a new category or modify an existing one...
 		if (isset($this->_req->post->edit) || isset($this->_req->post->add))
 		{
 			$catOptions = [];
@@ -372,8 +372,8 @@ class ManageBoards extends AbstractController
 	 *
 	 * What it does:
 	 *
-	 * - screen for editing and repositioning a category.
-	 * - Also used to show the confirm deletion of category screen
+	 * - Screen for editing and repositioning a category.
+	 * - Also used to show the confirmation deletion of category screen
 	 * - Called by ?action=admin;area=manageboards;sa=cat
 	 * - Requires manage_boards permission.
 	 *
@@ -389,10 +389,10 @@ class ManageBoards extends AbstractController
 		$boardTree = new BoardsTree(database());
 		$cat_tree = $boardTree->getCategories();
 
-		// id_cat must be a number.... if it exists.
+		// id_cat must be a number... if it exists.
 		$this->cat = $this->_req->getQuery('cat', 'intval', 0);
 
-		// Start with one - "In first place".
+		// Start with one - "In the first place".
 		$context['category_order'] = [
 			[
 				'id' => 0,
@@ -402,7 +402,7 @@ class ManageBoards extends AbstractController
 			]
 		];
 
-		// If this is a new category set up some defaults.
+		// If this is a new category, set up some defaults.
 		if ($this->_req->compareQuery('sa', 'newcat', 'trim'))
 		{
 			$context['category'] = [
@@ -481,7 +481,7 @@ class ManageBoards extends AbstractController
 	 *
 	 * What it does:
 	 *
-	 * - function for handling a submitted form saving the board.
+	 * - Function for handling a submitted form saving the board.
 	 * - It also handles deletion of a board.
 	 * - Called by ?action=admin;area=manageboards;sa=board2
 	 * - Redirects to ?action=admin;area=manageboards.
@@ -556,7 +556,7 @@ class ManageBoards extends AbstractController
 			// Change '1 & 2' to '1 &amp; 2', but not '&amp;' to '&amp;amp;'...
 			$boardOptions['board_name'] = preg_replace('~[&]([^;]{8}|[^;]{0,8}$)~', '&amp;$1', $this->_req->post->board_name);
 
-			// Convert any html to bbc
+			// Convert any HTML to bbc
 			$parser = new Html2BBC($this->_req->post->desc);
 			$boardOptions['board_description'] = Util::htmlspecialchars($parser->get_bbc());
 			preparsecode($boardOptions['board_description']);
@@ -581,12 +581,12 @@ class ManageBoards extends AbstractController
 			$boardOptions['profile'] = $this->_req->post->profile;
 			$boardOptions['inherit_permissions'] = (int) $this->_req->post->profile === -1;
 
-			// We need to know what used to be case in terms of redirection.
+			// We need to know what used to be the case in terms of redirection.
 			if (!empty($board_id))
 			{
 				$properties = getBoardProperties($board_id);
 
-				// If we're turning redirection on check the board doesn't have posts in it - if it does don't make it a redirection board.
+				// If we're turning redirection on, check the board doesn't have posts in it - if it does, don't make it a redirection board.
 				if ($boardOptions['redirect'] && empty($properties['oldRedirect']) && $properties['numPosts'])
 				{
 					unset($boardOptions['redirect']);
@@ -675,10 +675,10 @@ class ManageBoards extends AbstractController
 	 * Modify a specific board...
 	 *
 	 * What it does
-	 * - screen for editing and repositioning a board.
-	 * - called by ?action=admin;area=manageboards;sa=board
-	 * - also used to show the confirm deletion of category screen (sub-template confirm_board_delete).
-	 * - requires manage_boards permission.
+	 * - Screen for editing and repositioning a board.
+	 * - Called by ?action=admin;area=manageboards;sa=board
+	 * - Used to show the confirmation deletion of category screen (sub-template confirm_board_delete).
+	 * - Requires manage_boards permission.
 	 *
 	 * @event integrate_edit_board
 	 * @uses the modify_board sub-template of the ManageBoards template.
@@ -693,12 +693,12 @@ class ManageBoards extends AbstractController
 		require_once(SUBSDIR . '/Post.subs.php');
 		$boardTree = new BoardsTree(database());
 
-		// For editing the profile we'll need this.
+		// For editing the profile, we'll need this.
 		Txt::load('ManagePermissions');
 		require_once(SUBSDIR . '/ManagePermissions.subs.php');
 		loadPermissionProfiles();
 
-		// id_board must be a number....
+		// id_board must be a number...
 		$this->boardid = $this->_req->getQuery('boardid', 'intval', 0);
 		if ($boardTree->boardExists($this->boardid) === false)
 		{
@@ -716,7 +716,7 @@ class ManageBoards extends AbstractController
 				redirectexit('action=admin;area=manageboards');
 			}
 
-			// Some things that need to be setup for a new board.
+			// Some things that need to be set up for a new board.
 			$curBoard = [
 				'member_groups' => [0, -1],
 				'deny_groups' => [],
@@ -751,7 +751,7 @@ class ManageBoards extends AbstractController
 			$context['board']['is_recycle'] = !empty($modSettings['recycle_enable']) && !empty($modSettings['recycle_board']) && $modSettings['recycle_board'] == $context['board']['id'];
 		}
 
-		// As we may have come from the permissions screen keep track of where we should go on save.
+		// As we may have come from the permissions screen, keep track of where we should go on save.
 		$context['redirect_location'] = $this->_req->compareQuery('rid', 'permissions', 'trim') ? 'permissions' : 'boards';
 
 		// We might need this to hide links to certain areas.
@@ -809,7 +809,7 @@ class ManageBoards extends AbstractController
 			}
 		}
 
-		// Are there any places to move sub-boards to in the case where we are confirming a delete?
+		// Are there any places to move sub-boards to in the case where we are confirming delete?
 		if (!empty($this->boardid))
 		{
 			$context['can_move_children'] = false;
@@ -871,7 +871,7 @@ class ManageBoards extends AbstractController
 	}
 
 	/**
-	 * A screen to display and allow to set a few general board and category settings.
+	 * A screen to display and allow setting a few general board and category settings.
 	 *
 	 * @event integrate_save_board_settings called during manage board settings
 	 * @uses modify_general_settings sub-template.
@@ -886,11 +886,11 @@ class ManageBoards extends AbstractController
 		// Initialize it with our settings
 		$settingsForm->setConfigVars($this->_settings());
 
-		// Add some javascript stuff for the recycle box.
+		// Add some JavaScript stuff for the recycle box.
 		theme()->addInlineJavascript('
 				document.getElementById("recycle_board").disabled = !document.getElementById("recycle_enable").checked;', true);
 
-		// Get the needed template bits
+		// Get the necessary template bits
 		theme()->getTemplates()->load('ManageBoards');
 		$context['page_title'] = $txt['boards_and_cats'] . ' - ' . $txt['settings'];
 		$context['sub_template'] = 'show_settings';

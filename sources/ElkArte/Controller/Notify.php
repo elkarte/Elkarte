@@ -28,7 +28,7 @@ use ElkArte\Languages\Txt;
 class Notify extends AbstractController
 {
 	/**
-	 * Pre Dispatch, called before other methods, used to load common needs.
+	 * Pre-dispatch, called before other methods, used to load common needs.
 	 */
 	public function pre_dispatch()
 	{

@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This controller allows to choose features to activated and deactivate them.
+ * This controller allows choosing features to activate and deactivate them.
  *
  * @package   ElkArte Forum
  * @copyright ElkArte Forum contributors
@@ -57,7 +57,7 @@ class CoreFeatures extends AbstractController
 	 *    - title - Text title of this item (If standard string does not exist).
 	 *    - desc - Description of this feature (If standard string does not exist).
 	 *    - settings - Array of settings to change (For each name => value) on enable
-	 *      reverse is done for disabling. If value > 1 does not change value if set.
+	 *      reverse is done for disabling. If value > 1 does not change value, if set.
 	 *    - setting_callback - Function that returns an array of settings to save
 	 *      takes one parameter which is value for this feature.
 	 *    - save_callback - Function called on save, takes state as parameter.
@@ -185,8 +185,6 @@ class CoreFeatures extends AbstractController
 					'likes_enabled' => 1,
 				],
 				'setting_callback' => static function ($value) {
-					global $modSettings;
-
 					require_once(SUBSDIR . '/Mentions.subs.php');
 					require_once(SUBSDIR . '/Notification.subs.php');
 
@@ -224,7 +222,7 @@ class CoreFeatures extends AbstractController
 			'pm' => [
 				'url' => getUrl('admin', ['action' => 'admin', 'area' => 'permissions', 'sa' => 'postmod', '{session_data}']),
 				'setting_callback' => static function ($value) {
-					// Cannot use warning post moderation if disabled!
+					// Cannot use "warning post-moderation" if disabled!
 					if (!$value)
 					{
 						require_once(SUBSDIR . '/Moderation.subs.php');
@@ -293,6 +291,7 @@ class CoreFeatures extends AbstractController
 					{
 						return ['spider_group' => 0, 'show_spider_online' => 0, 'spider_no_guest' => 0];
 					}
+					return null;
 				},
 				'on_save' => static function () {
 					require_once(SUBSDIR . '/SearchEngines.subs.php');
@@ -310,7 +309,7 @@ class CoreFeatures extends AbstractController
 
 	/**
 	 * Retrieves configuration for all modules, including core features and addons, by scanning predefined directories
-	 * for relevant files and classes, and integrating their configurations.
+	 * for relevant files and classes and integrating their configurations.
 	 *
 	 * - Searches the ADMINDIR looking for XXXModule.php managers and loads the "Core Feature" if existing.
 	 * - Searches the ADDONSDIR looking for xxxIntegrate.php managers and loads the "Core Feature" if existing.
@@ -425,7 +424,7 @@ class CoreFeatures extends AbstractController
 	}
 
 	/**
-	 * This function makes sure the requested subaction does exists, if it
+	 * This function makes sure the requested subaction does exist, if it
 	 * doesn't, it sets a default action.
 	 *
 	 * @param array $subActions = array() An array containing all possible subactions.
@@ -442,7 +441,7 @@ class CoreFeatures extends AbstractController
 
 		$context['sub_template'] = 'show_settings';
 
-		// By default do the basic settings.
+		// By default, do the basic settings.
 		$subAction = $this->_req->getQuery('sa', 'trim|strval', $defaultAction);
 		if (empty($subAction) || empty($subActions[$subAction]))
 		{
@@ -452,7 +451,7 @@ class CoreFeatures extends AbstractController
 	}
 
 	/**
-	 * Takes care os saving the core features status (enabled/disabled)
+	 * Takes care of saving the core features status (enabled/disabled)
 	 *
 	 * @param array $core_features - The array of all the core features, as
 	 *                returned by $this->settings()

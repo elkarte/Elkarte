@@ -24,7 +24,7 @@ use ElkArte\SettingsForm\SettingsForm;
 
 /**
  * ManageSearchEngines admin controller. This class handles all search engines
- * pages in admin panel, forwards to display and allows to change options.
+ * pages in admin panel, forwards to display, and allows changing options.
  *
  * @package SearchEngines
  */
@@ -33,7 +33,7 @@ class ManageSearchEngines extends AbstractController
 	/**
 	 * Entry point for this section.
 	 *
-	 * @event integrate_sa_manage_search_engines add additonal search engine actions
+	 * @event integrate_sa_manage_search_engines add additional search engine actions
 	 * @see AbstractController::action_index()
 	 */
 	public function action_index()
@@ -98,7 +98,7 @@ class ManageSearchEngines extends AbstractController
 			$context['__override_spider_group'] = 0;
 		}
 
-		// Setup the template.
+		// Set up the template.
 		$context['page_title'] = $txt['settings'];
 		$context['sub_template'] = 'show_settings';
 
@@ -131,7 +131,7 @@ class ManageSearchEngines extends AbstractController
 		$context['post_url'] = getUrl('admin', ['action' => 'admin', 'area' => 'sengines', 'save', 'sa' => 'settings']);
 		$context['settings_title'] = $txt['settings'];
 
-		// Do some javascript.
+		// Do some JavaScript.
 		$javascript_function = '
 			function disableFields()
 			{
@@ -357,7 +357,7 @@ class ManageSearchEngines extends AbstractController
 	}
 
 	/**
-	 * Here we can add, and edit, spider info!
+	 * Here we can add and edit, spider info!
 	 */
 	public function action_editspiders(): void
 	{
@@ -576,7 +576,7 @@ class ManageSearchEngines extends AbstractController
 			removeSpiderOldStats($deleteTime);
 		}
 
-		// Prepare the dates for the drop down.
+		// Prepare the dates for the drop-down.
 		$date_choices = spidersStatsDates();
 		$max_date = array_key_last($date_choices);
 
@@ -609,7 +609,7 @@ class ManageSearchEngines extends AbstractController
 				<input type="submit" name="go" value="' . $txt['go'] . '" class="right_submit" />
 			</noscript>';
 
-		// If we manually jumped to a date work out the offset.
+		// If we manually jumped to a date, work out the offset.
 		if ($this->_req->hasPost('new_date'))
 		{
 			$date_query = sprintf('%04d-%02d-01', substr($current_date, 0, 4), substr($current_date, 4));

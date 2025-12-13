@@ -95,8 +95,8 @@ class ManageSmileys extends AbstractController
 		$context['page_title'] = $txt['smileys_manage'];
 		$context['sub_action'] = $subAction;
 
-		// Note: the visibility of the edit icons tab is already governed by
-		// the 'enabled' flag in $subActions based on $modSettings['messageIcons_enable'].
+		// Note: the 'enabled' flag already governs the visibility of the edit icons tab
+		// in $subActions based on $modSettings['messageIcons_enable'].
 		// No further mutation of the tab structure is required here.
 
 		// Call the right function for this sub-action.
@@ -204,7 +204,7 @@ class ManageSmileys extends AbstractController
 	}
 
 	/**
-	 * For any :emoji: codes in the current set, that have an image in the smile set directory,
+	 * For any :emoji: codes in the current set that have an image in the smile set directory,
 	 * write the information to custom_tags.js so the emoji selector reflects the new or replacement image
 	 *
 	 * @return void
@@ -678,7 +678,7 @@ class ManageSmileys extends AbstractController
 					$smileys = $this->_getUniqueSmileys($foundSmileys);
 					$context['current_set']['can_import'] = count($smileys);
 
-					// Setup this string to look nice.
+					// Set up this string to look nice.
 					$txt['smiley_set_import_multiple'] = sprintf($txt['smiley_set_import_multiple'], $context['current_set']['can_import']);
 				}
 			}
@@ -801,7 +801,7 @@ class ManageSmileys extends AbstractController
 					throw new Exception('smileys_upload_error_illegal');
 				}
 
-				// Check if the file already exists... and if not move it to EVERY smiley set directory.
+				// Check if the file already exists... and if not, move it to EVERY smiley set directory.
 				$i = 0;
 
 				// Keep going until we find a set the file doesn't exist in. (or maybe it exists in all of them?)
@@ -1014,7 +1014,7 @@ class ManageSmileys extends AbstractController
 			{
 				$this->_req->post->smiley = (int) $this->_req->post->smiley;
 
-				// Is it a delete?
+				// Is it a deletion?
 				if (!empty($this->_req->post->deletesmiley))
 				{
 					deleteSmileys([$this->_req->post->smiley]);
@@ -1063,14 +1063,14 @@ class ManageSmileys extends AbstractController
 		// Load all known smiley sets.
 		$this->loadSmileySets();
 
-		// Prepare overview of all (custom) smileys.
+		// Prepare an overview of all (custom) smileys.
 		if ($context['sub_action'] === 'editsmileys')
 		{
 			theme()->addJavascriptVar([
 				'txt_remove' => JavaScriptEscape($txt['smileys_confirm']),
 			]);
 
-			// Determine the language specific sort order of smiley locations.
+			// Determine the language-specific sort order of smiley locations.
 			$smiley_locations = [
 				$txt['smileys_location_form'],
 				$txt['smileys_location_hidden'],
@@ -1298,7 +1298,7 @@ class ManageSmileys extends AbstractController
 	}
 
 	/**
-	 * Allows to edit the message icons.
+	 * Allows editing the message icons.
 	 *
 	 * @event integrate_list_message_icon_list
 	 */
@@ -1356,7 +1356,7 @@ class ManageSmileys extends AbstractController
 					throw new Exception('icon_after_itself', false);
 				}
 
-				// First do the sorting... if this is an edit reduce the order of everything after it by one ;)
+				// First, do the sorting... if this is an edit, reduce the order of everything after it by one ;)
 				if ($iconId !== 0)
 				{
 					$oldOrder = $context['icons'][$iconId]['true_order'];
@@ -1369,7 +1369,7 @@ class ManageSmileys extends AbstractController
 					}
 				}
 
-				// If there are no existing icons and this is a new one, set the id to 1 (mainly for non-mysql)
+				// If there are no existing icons and this is a new, set the id to 1 (mainly for non-mysql)
 				if ($iconId === 0 && empty($context['icons']))
 				{
 					$iconId = 1;
@@ -1387,7 +1387,7 @@ class ManageSmileys extends AbstractController
 					}
 				}
 
-				// Finally set the current icon's position!
+				// Finally, set the current icon's position!
 				$context['icons'][$iconId]['true_order'] = $newOrder;
 
 				// Simply replace the existing data for the other bits.
@@ -1395,7 +1395,7 @@ class ManageSmileys extends AbstractController
 				$context['icons'][$iconId]['filename'] = $this->_req->post->icon_filename;
 				$context['icons'][$iconId]['board_id'] = (int) $this->_req->post->icon_board;
 
-				// Do a huge replace ;)
+				// Do a huge replacement ;)
 				$iconInsert = [];
 				$iconInsert_new = [];
 				foreach ($context['icons'] as $id => $icon)
@@ -1544,7 +1544,7 @@ class ManageSmileys extends AbstractController
 
 		createList($listOptions);
 
-		// If we're adding/editing an icon we'll need a list of boards
+		// If we're adding/editing an icon, we'll need a list of boards
 		if ($context['sub_action'] === 'editicon' || isset($this->_req->post->add))
 		{
 			// Force the sub_template just in case.
@@ -1576,7 +1576,7 @@ class ManageSmileys extends AbstractController
 	}
 
 	/**
-	 * Allows to edit smileys order.
+	 * Allows editing smileys order.
 	 */
 	public function action_setorder(): void
 	{
@@ -1724,7 +1724,7 @@ class ManageSmileys extends AbstractController
 			throw new Exception('package_no_file', false);
 		}
 
-		// Make sure temp directory exists and is empty.
+		// Make sure the temp directory exists and is empty.
 		if ($fileFunc->fileExists(BOARDDIR . '/packages/temp'))
 		{
 			deltree(BOARDDIR . '/packages/temp', false);
@@ -1788,7 +1788,7 @@ class ManageSmileys extends AbstractController
 			Errors::instance()->fatal_lang_error('package_installed_warning1');
 		}
 
-		// Everything is fine, now it's time to do something, first we test
+		// Everything is fine, now it's time to do something; first we test
 		$parser = new PackageParser();
 		$actions = $parser->parsePackageInfo($smileyInfo['xml'], true);
 
@@ -1871,7 +1871,7 @@ class ManageSmileys extends AbstractController
 			$context['package_name'] = $smileyInfo['name'];
 			theme()->getTemplates()->load('Packages');
 		}
-		// Do the actual install
+		// Do the actual installation
 		else
 		{
 			foreach ($context['actions'] as $action)
@@ -1946,7 +1946,7 @@ class ManageSmileys extends AbstractController
 	/**
 	 * Perhaps a longer name for the function would better describe what this does. So it will
 	 * search group of directories and return just the unique filenames, dis-regarding the extension.
-	 * this allows us to match by name across sets that have different extensions
+	 * This allows us to match by name across sets that have different extensions
 	 *
 	 * @param array $smiley_sets array of smiley sets (end directory names) to search
 	 * @return array of unique smiley names across one or many "sets"

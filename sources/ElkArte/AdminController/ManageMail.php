@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Handles mail configuration, displays the queue and allows for the removal of specific items
+ * Handles mail configuration, displays the queue, and allows for the removal of specific items
  *
  * @package   ElkArte Forum
  * @copyright ElkArte Forum contributors
@@ -30,7 +30,7 @@ use ElkArte\User;
  * What it does:
  *
  * - It handles mail configuration,
- * - It displays and allows to remove items from the mail queue.
+ * - It displays and allows removing items from the mail queue.
  * - It handles sending a test email
  *
  * @package Mail
@@ -86,7 +86,7 @@ class ManageMail extends AbstractController
 	}
 
 	/**
-	 * Allows to view and modify the mail settings.
+	 * Allows viewing and modify the mail settings.
 	 *
 	 * @event integrate_save_mail_settings
 	 * @uses show_settings sub template
@@ -106,7 +106,7 @@ class ManageMail extends AbstractController
 		$config_vars = $this->_settings();
 		$settingsForm->setConfigVars($config_vars);
 
-		// Piece of redundant code, for the javascript
+		// Piece of redundant code, for the JavaScript
 		$processedBirthdayEmails = [];
 		foreach ($txtBirthdayEmails as $key => $value)
 		{
@@ -133,7 +133,7 @@ class ManageMail extends AbstractController
 			$settingsForm->setConfigVars($config_vars);
 			call_integration_hook('integrate_save_mail_settings');
 
-			// You can not send more per page load than you can per minute
+			// You cannot send more per page load than you can per minute
 			if (!empty($this->_req->post->mail_batch_size))
 			{
 				$this->_req->post->mail_batch_size = min((int) $this->_req->post->mail_batch_size, (int) $this->_req->post->mail_period_limit);
@@ -256,7 +256,7 @@ class ManageMail extends AbstractController
 	 * This function clears the mail queue of all emails, and at the end redirects to browse.
 	 *
 	 * - Note force clearing the queue may cause a site to exceed hosting mail limit quotas
-	 * - Some hosts simple loose these excess emails, others queue them server side, up to a limit
+	 * - Some hosts simply lose these excess emails; others queue them server side, up to a limit
 	 */
 	public function action_clear()
 	{
@@ -298,7 +298,7 @@ class ManageMail extends AbstractController
 	{
 		global $context, $txt, $time_start;
 
-		// Try get more time...
+		// Try to get more time...
 		detectServer()->setTimeLimit(600);
 
 		// Have we already used our maximum time?
@@ -497,7 +497,6 @@ class ManageMail extends AbstractController
 
 		createToken('admin-mailtest');
 
-		$result = $this->_req->getQuery('result', 'trim', '');
-		$context['result'] = $result;
+		$context['result'] = $this->_req->getQuery('result', 'trim', '');
 	}
 }

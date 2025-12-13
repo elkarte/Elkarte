@@ -42,7 +42,7 @@ class ManageNews extends AbstractController
 	 *
 	 * - This is the entrance point for all News and Newsletter screens.
 	 * - Called by ?action=admin;area=news.
-	 * - It does the permission checks, and calls the appropriate function
+	 * - It does the permission checks and calls the appropriate function
 	 * based on the requested sub-action.
 	 *
 	 * @event integrate_sa_manage_news used to add new subactions
@@ -170,7 +170,7 @@ class ManageNews extends AbstractController
 				}
 				else
 				{
-					$news_items[$i] = Util::htmlspecialchars($news_items[$i], ENT_QUOTES);
+					$news_items[$i] = Util::htmlspecialchars($news, ENT_QUOTES);
 					preparsecode($news_items[$i]);
 				}
 			}
@@ -293,7 +293,7 @@ class ManageNews extends AbstractController
 		require_once(SUBSDIR . '/Membergroups.subs.php');
 		require_once(SUBSDIR . '/News.subs.php');
 
-		// Setup the template
+		// Set up the template
 		$context['page_title'] = $txt['admin_newsletters'];
 		$context['sub_template'] = 'email_members';
 		loadJavascriptFile('suggest.js', ['defer' => true]);
@@ -302,7 +302,7 @@ class ManageNews extends AbstractController
 		$allgroups = getBasicMembergroupData(['all'], [], null, true);
 		$groups = $allgroups['groups'];
 
-		// All of the members in post based and member based groups
+		// All the members in post-based and member-based groups
 		$pg = [];
 		foreach ($allgroups['postgroups'] as $postgroup)
 		{
@@ -370,7 +370,7 @@ class ManageNews extends AbstractController
 	{
 		global $txt, $context;
 
-		// Setup the template!
+		// Set up the template!
 		$context['page_title'] = $txt['admin_newsletters'];
 		$context['sub_template'] = 'email_members_compose';
 		$context['subject'] = empty($this->_req->post->subject) ? $context['forum_name'] . ': ' . htmlspecialchars($txt['subject'], ENT_COMPAT, 'UTF-8') : $this->_req->post->subject;
@@ -416,7 +416,7 @@ class ManageNews extends AbstractController
 		// Start by finding any manually entered members!
 		$this->_toClean();
 
-		// Add in any members chosen from the auto select dropdown.
+		// Add in any members chosen from the auto-select dropdown.
 		$this->_toAddOrExclude();
 
 		// Clean the other vars.
@@ -427,10 +427,10 @@ class ManageNews extends AbstractController
 		require_once(SUBSDIR . '/News.subs.php');
 
 		// Get a list of all full banned users.  Use their Username and email to find them.
-		// Only get the ones that can't login to turn off notification.
+		// Only get the ones that can't log in to turn off notification.
 		$context['recipients']['exclude_members'] = excludeBannedMembers();
 
-		// Did they select moderators - if so add them as specific members...
+		// Did they select moderators - if so, add them as specific members...
 		if ((!empty($context['recipients']['groups']) && in_array(3, $context['recipients']['groups'])) || (!empty($context['recipients']['exclude_groups']) && in_array(3, $context['recipients']['exclude_groups'])))
 		{
 			$mods = getModerators();
@@ -450,7 +450,7 @@ class ManageNews extends AbstractController
 
 		require_once(SUBSDIR . '/Members.subs.php');
 
-		// For progress bar!
+		// For the progress bar!
 		$context['total_emails'] = count($context['recipients']['emails']);
 		$context['max_id_member'] = maxMemberID();
 
@@ -466,8 +466,8 @@ class ManageNews extends AbstractController
 	}
 
 	/**
-	 * If they did not use auto select function on the include/exclude members then
-	 * we need to look them up from the supplied "one","two" string
+	 * If they did not use auto-select function on the include/exclude members, then
+	 * we need to look them up from the supplied "one", "two" string
 	 */
 	private function _toClean(): void
 	{
@@ -573,7 +573,7 @@ class ManageNews extends AbstractController
 			return;
 		}
 
-		// If just previewing we prepare a message and return it for viewing
+		// If just previewing, we prepare a message and return it for viewing
 		if (isset($this->_req->post->preview))
 		{
 			$context['preview'] = true;
@@ -612,7 +612,7 @@ class ManageNews extends AbstractController
 			'emails' => [],
 		];
 
-		// Have we any excluded members?
+		// Do we have any excluded members?
 		if (!empty($this->_req->post->exclude_members))
 		{
 			$members = explode(',', $this->_req->post->exclude_members);
@@ -686,7 +686,7 @@ class ManageNews extends AbstractController
 			}
 		}
 
-		// If we're only cleaning drop out here.
+		// If we're only cleaning, drop out here.
 		if ($clean_only)
 		{
 			return;
@@ -787,7 +787,7 @@ class ManageNews extends AbstractController
 				break;
 			}
 
-			// Don't sent it twice!
+			// Don't send it twice!
 			unset($context['recipients']['emails'][$k]);
 
 			// Dammit - can't PM emails!
@@ -845,7 +845,7 @@ class ManageNews extends AbstractController
 
 			$sendQuery .= ')';
 
-			// If we've not got a query then we must be done!
+			// If we've not got a query, then we must be done!
 			if ($sendQuery === '()')
 			{
 				redirectexit('action=admin');
@@ -929,7 +929,7 @@ class ManageNews extends AbstractController
 		{
 			$last_id_member = $context['start'] + $num_at_once;
 		}
-		// If we have no id_member then we're done.
+		// If we have no id_member, then we're done.
 		elseif (empty($last_id_member) && empty($context['recipients']['emails']))
 		{
 			// Log this into the admin log.
@@ -969,7 +969,7 @@ class ManageNews extends AbstractController
 		// Initialize it with our settings
 		$settingsForm->setConfigVars($this->_settings());
 
-		// Add some javascript at the bottom...
+		// Add some JavaScript at the bottom...
 		theme()->addInlineJavascript('
 			document.getElementById("xmlnews_maxle").disabled = !document.getElementById("xmlnews_enable").checked;
 			document.getElementById("xmlnews_limit").disabled = !document.getElementById("xmlnews_enable").checked;', true);

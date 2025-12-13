@@ -39,11 +39,11 @@ use ElkArte\SettingsForm\SettingsForm;
 class ManageFeatures extends AbstractController
 {
 	/**
-	 * Pre Dispatch, called before other methods.
+	 * Pre-dispatch, called before other methods.
 	 */
 	public function pre_dispatch()
 	{
-		// We need this in few places so it's easier to have it loaded here
+		// We need this in a few places, so it's easier to have it loaded here
 		require_once(SUBSDIR . '/ManageFeatures.subs.php');
 	}
 
@@ -199,7 +199,7 @@ class ManageFeatures extends AbstractController
 				Hooks::instance()->disableIntegration(MetadataIntegrate::class);
 			}
 
-			// If they have changed Hive settings, lets clear them to avoid issues
+			// If they have changed Hive settings, let's clear them to avoid issues
 			if (empty($modSettings['minify_css_js']) !== empty($this->_req->post->minify_css_js))
 			{
 				theme()->cleanHives();
@@ -219,7 +219,7 @@ class ManageFeatures extends AbstractController
 			setJsonTemplate();
 			$context['json_data'] = [
 				'success' => $clean_hives_result,
-				'response' => $clean_hives_result ? $txt['clean_hives_sucess'] : $txt['clean_hives_failed']
+				'response' => $clean_hives_result ? $txt['clean_hives_success'] : $txt['clean_hives_failed']
 			];
 
 			return;
@@ -248,7 +248,7 @@ class ManageFeatures extends AbstractController
 			['check', 'allow_hideOnline'],
 			['check', 'titlesEnable'],
 			'',
-			// Javascript and CSS options
+			// JavaScript and CSS options
 			['select', 'jquery_source', ['auto' => $txt['jquery_auto'], 'local' => $txt['jquery_local'], 'cdn' => $txt['jquery_cdn']]],
 			['check', 'minify_css_js', 'postinput' => '<a href="#" id="clean_hives" class="linkbutton">' . $txt['clean_hives'] . '</a>'],
 			'',
@@ -441,7 +441,7 @@ class ManageFeatures extends AbstractController
 
 			if (!$validator->validate($this->_req->post))
 			{
-				// Some input error, lets tell them what is wrong
+				// Some input error, let's tell them what is wrong
 				$context['error_type'] = 'minor';
 				$context['settings_message'] = [];
 				foreach ($validator->validation_errors() as $error)
@@ -549,7 +549,7 @@ class ManageFeatures extends AbstractController
 			// Karma - On or off?
 			['select', 'karmaMode', explode('|', $txt['karma_options'])],
 			'',
-			// Who can do it.... and who is restricted by time limits?
+			// Who can do it... and who is restricted by time limits?
 			['int', 'karmaMinPosts', 6, 'postinput' => $txt['manageposts_posts']],
 			['float', 'karmaWaitTime', 6, 'postinput' => $txt['hours']],
 			['check', 'karmaTimeRestrictAdmins'],
@@ -614,7 +614,7 @@ class ManageFeatures extends AbstractController
 			// Likes - On or off?
 			['check', 'likes_enabled'],
 			'',
-			// Who can do it.... and who is restricted by count limits?
+			// Who can do it... and who is restricted by count limits?
 			['int', 'likeMinPosts', 6, 'postinput' => $txt['manageposts_posts']],
 			['int', 'likeWaitTime', 6, 'postinput' => $txt['minutes']],
 			['int', 'likeWaitCount', 6],
@@ -741,10 +741,10 @@ class ManageFeatures extends AbstractController
 			{
 				if (!empty($toggles))
 				{
-					// The modules associated with the notification (mentionmem, likes, etc) area
+					// The modules associated with the notification (mentionmem, likes, etc.) area
 					$modules = getMentionsModules($toggles);
 
-					// The action will either be enable to disable
+					// The action will either be enabled to disable
 					$function = $action . 'Modules';
 
 					// Something like enableModule('mentions', array('post', 'display');
@@ -784,7 +784,7 @@ class ManageFeatures extends AbstractController
 			});', true);
 		loadCSSFile('multiselect.css');
 
-		// The mentions settings
+		// Mentions settings
 		$config_vars = [
 			['title', 'mentions_settings'],
 			['check', 'mentions_enabled'],
@@ -817,12 +817,12 @@ class ManageFeatures extends AbstractController
 			$default_values = [];
 			$is_default = [];
 
-			// If its enabled, show all the available ways, like email, notify, weekly ...
+			// If it is enabled, show all the available ways, like email, notify, weekly ...
 			foreach (array_keys($notification_methods) as $method_name)
 			{
 				$method_name = strtolower($method_name);
 
-				// Are they excluding any, like don't let mailfail be allowed to send email !
+				// Are they excluding any, like don't let mailfail be allowed to send email!
 				if ($class::isNotAllowed($method_name))
 				{
 					continue;
@@ -870,7 +870,7 @@ class ManageFeatures extends AbstractController
 		// Initialize it with our settings
 		$settingsForm->setConfigVars($this->_signatureSettings());
 
-		// Setup the template.
+		// Set up the template.
 		$context['page_title'] = $txt['signature_settings'];
 		$context['sub_template'] = 'show_settings';
 
@@ -963,12 +963,12 @@ class ManageFeatures extends AbstractController
 			// Build the combined signature settings string using locals (do not write back to request)
 			$signature_settings_local = implode(',', $sig_limits) . ':' . implode(',', array_diff($bbcTags, $signature_bbc_enabledTags_local));
 
-			// Even though we have practically no settings let's keep the convention going!
+			// Even though we have practically no settings, let's keep the convention going!
 			$save_vars = [];
 			$save_vars[] = ['text', 'signature_settings'];
 
 			$settingsForm->setConfigVars($save_vars);
-			// Start from posted values, but override with our local computed values
+			// Start from posted values but override with our local computed values
 			$config_values = (array) $this->_req->post;
 			$config_values['signature_bbc_enabledTags'] = $signature_bbc_enabledTags_local;
 			$config_values['signature_settings'] = $signature_settings_local;
@@ -1357,7 +1357,7 @@ class ManageFeatures extends AbstractController
 		$context['page_title'] = $context['fid'] ? $txt['custom_edit_title'] : $txt['custom_add_title'];
 		$context['sub_template'] = 'edit_profile_field';
 
-		// Any errors messages to show?
+		// Any error messages to show?
 		if ($this->_req->hasQuery('msg'))
 		{
 			Txt::load('Errors');
@@ -1371,13 +1371,13 @@ class ManageFeatures extends AbstractController
 		// Load the profile language for section names.
 		Txt::load('Profile');
 
-		// Load up the profile field, if one was supplied
+		// Load up the profile field if one was supplied
 		if ($context['fid'])
 		{
 			$context['field'] = getProfileField($context['fid']);
 		}
 
-		// Setup the default values as needed.
+		// Set up the default values as needed.
 		if (empty($context['field']))
 		{
 			$context['field'] = [
@@ -1407,7 +1407,7 @@ class ManageFeatures extends AbstractController
 			];
 		}
 
-		// All the javascript for this page... everything else is in admin.js
+		// All the JavaScript for this page... everything else is in admin.js
 		theme()->addJavascriptVar(['startOptID' => count($context['field']['options'])]);
 		theme()->addInlineJavascript('updateInputBoxes();', true);
 
@@ -1441,7 +1441,7 @@ class ManageFeatures extends AbstractController
 				redirectexit('action=admin;area=featuresettings;sa=profileedit;fid=' . (int) $context['fid'] . ';msg=need_name');
 			}
 
-			// Regex you say?  Do a very basic test to see if the pattern is valid
+			// Regex, you say?  Do a very basic test to see if the pattern is valid
 			if (!empty($this->_req->post->regex) && @preg_match($this->_req->post->regex, 'dummy') === false)
 			{
 				redirectexit('action=admin;area=featuresettings;sa=profileedit;fid=' . (int) $context['fid'] . ';msg=regex_error');

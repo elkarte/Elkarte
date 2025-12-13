@@ -39,7 +39,7 @@ class MoveTopic extends AbstractController
 	private $_toboard;
 
 	/**
-	 * Pre Dispatch, called before other methods.
+	 * Pre-dispatch, called before other methods.
 	 */
 	public function pre_dispatch()
 	{

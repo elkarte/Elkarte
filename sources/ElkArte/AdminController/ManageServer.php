@@ -70,7 +70,7 @@ class ManageServer extends AbstractController
 
 		$action = new Action('server_settings');
 
-		// By default we're editing the core settings, call integrate_sa_server_settings
+		// By default, we're editing the core settings, call integrate_sa_server_settings
 		$subAction = $action->initialize($subActions, 'general');
 
 		// Last things for the template
@@ -116,7 +116,7 @@ class ManageServer extends AbstractController
 	 * General forum settings - forum name, maintenance mode, etc.
 	 *
 	 * Practically, this shows an interface for the settings in Settings.php to
-	 * be changed. The method handles the display, allows to edit, and saves
+	 * be changed. The method handles the display, allows editing, and saves
 	 * the result for generalSettings form.
 	 *
 	 * What it does:
@@ -138,7 +138,7 @@ class ManageServer extends AbstractController
 		// Initialize it with our settings
 		$settingsForm->setConfigVars($this->_generalSettings());
 
-		// Setup the template stuff.
+		// Set up the template stuff.
 		$context['post_url'] = getUrl('admin', ['action' => 'admin', 'area' => 'serversettings', 'sa' => 'general', 'save']);
 		$context['settings_title'] = $txt['general_settings'];
 
@@ -147,7 +147,7 @@ class ManageServer extends AbstractController
 		{
 			call_integration_hook('integrate_save_general_settings');
 
-			// Reset this in the event the server has changed, it will get set again if needed.
+			// Reset this in the event the server has changed. It will get set again if needed.
 			updateSettings(['host_to_dis' => 0]);
 
 			$settingsForm->setConfigValues((array) $this->_req->post);
@@ -180,7 +180,7 @@ class ManageServer extends AbstractController
 			'',
 			['enableCompressedOutput', $txt['enableCompressedOutput'], 'db', 'check', null, 'enableCompressedOutput'],
 			['disableHostnameLookup', $txt['disableHostnameLookup'], 'db', 'check', null, 'disableHostnameLookup'],
-			// This is not really a server setting, it's here for convenience so its saved in Settings.php
+			// This is not really a server setting, it's here for convenience, so it's saved in Settings.php
 			['url_format', $txt['url_format'], 'file', 'select', ['standard' => $txt['url_format_standard'], 'semantic' => $txt['url_format_semantic'], 'queryless' => $txt['url_format_queryless']]],
 		];
 
@@ -193,7 +193,7 @@ class ManageServer extends AbstractController
 	/**
 	 * Basic database and paths settings - database name, host, etc.
 	 *
-	 * This method handles the display, allows to edit, and saves the results
+	 * This method handles the display, allows editing, and saves the results
 	 * for _databaseSettings.
 	 *
 	 * What it does:
@@ -216,7 +216,7 @@ class ManageServer extends AbstractController
 		// Initialize it with our settings
 		$settingsForm->setConfigVars($this->_databaseSettings());
 
-		// Setup the template stuff.
+		// Set up the template stuff.
 		$context['post_url'] = getUrl('admin', ['action' => 'admin', 'area' => 'serversettings', 'sa' => 'database', 'save']);
 		$context['settings_title'] = $txt['database_paths_settings'];
 		$context['save_disabled'] = $context['settings_not_writable'];
@@ -274,7 +274,7 @@ class ManageServer extends AbstractController
 	/**
 	 * Modify cookies settings.
 	 *
-	 * This method handles the display, allows to edit, and saves the result
+	 * This method handles the display, allows edit, and saves the result
 	 * for the _cookieSettings form.
 	 *
 	 * @event integrate_save_cookie_settings
@@ -297,7 +297,7 @@ class ManageServer extends AbstractController
 		{
 			call_integration_hook('integrate_save_cookie_settings');
 
-			// Its either local or global cookies
+			// It's either local or global cookies
 			if (!empty($this->_req->post->localCookies) && !empty($this->_req->post->globalCookies))
 			{
 				$this->_req->clearValue('globalCookies', 'post');
@@ -387,7 +387,7 @@ class ManageServer extends AbstractController
 	/**
 	 * Cache settings editing and submission.
 	 *
-	 * This method handles the display, allows to edit, and saves the result
+	 * This method handles the display, allows editing, and saves the result
 	 * for _cacheSettings form.
 	 *
 	 * @event integrate_save_cache_settings
@@ -428,7 +428,7 @@ class ManageServer extends AbstractController
 		createToken('admin-maint');
 		theme()->getLayers()->add('clean_cache_button');
 
-		// Some javascript to enable / disable certain settings if the option is not selected
+		// Some JavaScript to enable / disable certain settings if the option is not selected
 		theme()->addInlineJavascript('
 			let cache_type = document.getElementById(\'cache_accelerator\');
 
@@ -510,9 +510,9 @@ class ManageServer extends AbstractController
 	}
 
 	/**
-	 * Allows to edit load management settings.
+	 * Allows editing load management settings.
 	 *
-	 * This method handles the display, allows to edit, and saves the result
+	 * This method handles the display, allows editing, and saves the result
 	 * for the _loadavgSettings form.
 	 *
 	 * @event integrate_loadavg_settings
@@ -636,8 +636,8 @@ class ManageServer extends AbstractController
 	 *
 	 * What it does:
 	 *
-	 * - loads the settings into an array for display in a template
-	 * - drops cookie values just in case
+	 * - Loads the settings into an array for display in a template
+	 * - Drops cookie values just in case
 	 *
 	 * @uses sub-template php_info
 	 */

@@ -67,7 +67,7 @@ class ManagePosts extends AbstractController
 		$context['page_title'] = $txt['manageposts_title'];
 		$context['sub_action'] = $subAction;
 
-		// Tabs for browsing the different post functions.
+		// Tabs for browsing the different post-functions.
 		$context[$context['admin_menu_name']]['object']->prepareTabData([
 				'title' => 'manageposts_title',
 				'help' => 'posts_and_topics',
@@ -250,7 +250,7 @@ class ManagePosts extends AbstractController
 		// Initialize it with our settings
 		$settingsForm->setConfigVars($this->_settings());
 
-		// Setup the template.
+		// Set up the template.
 		$context['page_title'] = $txt['manageposts_settings'];
 		$context['sub_template'] = 'show_settings';
 
@@ -260,7 +260,7 @@ class ManagePosts extends AbstractController
 			checkSession();
 			$db = database();
 
-			// If we're changing the message length (and we are using MySQL) let's check the column is big enough.
+			// If we're changing the message length (and we are using MySQL), let's check the column is big enough.
 			$postedMaxLen = $this->_req->getPost('max_messageLength', 'intval');
 			if ($postedMaxLen !== null && $postedMaxLen !== (int) $modSettings['max_messageLength'] && $db->supportMediumtext())
 			{
@@ -280,7 +280,7 @@ class ManagePosts extends AbstractController
 				}
 			}
 
-			// If we're changing the post preview length let's check its valid
+			// If we're changing the post-preview length, let's check its valid
 			$preview_chars = $this->_req->getPost('preview_characters', 'intval');
 			if (!empty($preview_chars))
 			{
@@ -386,7 +386,7 @@ class ManagePosts extends AbstractController
 	}
 
 	/**
-	 * Return the post settings for use in admin search
+	 * Return the post-settings for use in admin search
 	 */
 	public function settings_search()
 	{

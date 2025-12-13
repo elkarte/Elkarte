@@ -30,7 +30,7 @@ class RemoveTopic extends AbstractController
 	private $_topic_info;
 
 	/**
-	 * Pre Dispatch, called before other methods.
+	 * Pre-dispatch, called before other methods.
 	 */
 	public function pre_dispatch()
 	{

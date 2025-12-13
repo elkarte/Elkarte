@@ -46,7 +46,7 @@ class Admin extends AbstractController
 		'zend', 'apc', 'memcache', 'memcached', 'opcache'];
 
 	/**
-	 * Pre Dispatch, called before other methods.
+	 * Pre-dispatch, called before other methods.
 	 *
 	 * - Loads integration hooks
 	 */

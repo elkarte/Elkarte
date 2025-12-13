@@ -67,7 +67,7 @@ class Packages extends AbstractController
 	private $fileFunc;
 
 	/**
-	 * Pre Dispatch, called before other methods.
+	 * Pre-dispatch, called before other methods.
 	 */
 	public function pre_dispatch()
 	{

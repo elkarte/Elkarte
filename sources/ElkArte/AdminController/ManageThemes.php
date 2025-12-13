@@ -19,17 +19,17 @@
  *
  * Creating and distributing theme packages:
  * There isn't that much required to package and distribute your own themes...
- * just do the following:
+ * Do the following:
  *
- *  - create a theme_info.xml file, with the root element theme-info.
- *  - its name should go in a name element, just like description.
- *  - your name should go in author. (email in the email attribute.)
- *  - any support website for the theme should be in website.
- *  - layers and templates (non-default) should go in those elements ;).
- *  - if the images dir isn't images, specify in the images element.
- *  - any extra rows for themes should go in extra, serialized. (as in array(variable => value).)
- *  - tar and gzip the directory - and you're done!
- *  - please include any special license in a license.txt file.
+ *  - Create a theme_info.xml file, with the root element theme-info.
+ *  - Its name should go in a name element, just like description.
+ *  - Your name should go in author. (email in the email attribute.)
+ *  - Any support website for the theme should be in website.
+ *  - Layers and templates (non-default) should go in those elements ;).
+ *  - If the images dir isn't images, specify in the images' element.
+ *  - Any extra rows for themes should go in extra, serialized. (as in array(variable => value).)
+ *  - Tar and gzip the directory - and you're done!
+ *  - Please include any special license in a license.txt file.
  */
 
 namespace ElkArte\AdminController;
@@ -138,7 +138,7 @@ class ManageThemes extends AbstractController
 		$context['page_title'] = $txt['themeadmin_title'];
 		$context['sub_action'] = $subAction;
 
-		// Go to the action, if you have permissions
+		// Go to the action if you have permissions
 		$action->dispatch($subAction);
 	}
 
@@ -255,7 +255,7 @@ class ManageThemes extends AbstractController
 
 		$context['themes'] = installedThemes();
 
-		// For each theme, make sure the directory exists, and try to fetch the theme version
+		// For each theme, make sure the directory exists and try to fetch the theme version
 		foreach ($context['themes'] as $i => $theme)
 		{
 			$context['themes'][$i]['theme_dir'] = realpath($context['themes'][$i]['theme_dir']);
@@ -402,7 +402,7 @@ class ManageThemes extends AbstractController
 				}
 			}
 
-			// Set up the sql query.
+			// Set up the SQL query.
 			$inserts = [];
 			foreach ($options['options'] as $opt => $val)
 			{
@@ -414,7 +414,7 @@ class ManageThemes extends AbstractController
 				$inserts[] = [1, 0, $opt, is_array($val) ? implode(',', $val) : $val];
 			}
 
-			// If we're actually inserting something..
+			// If we're actually inserting something...
 			if (!empty($inserts))
 			{
 				updateThemeOptions($inserts);
@@ -508,9 +508,9 @@ class ManageThemes extends AbstractController
 	 *
 	 * What it does:
 	 *
-	 * - sets the settings theme_allow, theme_guests, and knownThemes.
-	 * - requires the admin_forum permission.
-	 * - accessed with ?action=admin;area=theme;sa=admin.
+	 * - Sets the settings theme_allow, theme_guests, and knownThemes.
+	 * - Requires the admin_forum permission.
+	 * - Accessed with ?action=admin;area=theme;sa=admin.
 	 *
 	 * @uses Themes template
 	 * @uses Admin language file
@@ -579,7 +579,7 @@ class ManageThemes extends AbstractController
 			$context['can_create_new'] = $fileFunc->isWritable(BOARDDIR . '/themes');
 			$context['new_theme_dir'] = substr(realpath(BOARDDIR . '/themes/default'), 0, -7);
 
-			// Look for a nonexistent theme directory. (ie theme87.)
+			// Look for a nonexistent theme directory. (i.e., theme87.)
 			$theme_dir = BOARDDIR . '/themes/theme';
 			$i = 1;
 			while ($fileFunc->isDir($theme_dir . $i))
@@ -669,7 +669,7 @@ class ManageThemes extends AbstractController
 				$setValues[] = [1, -1, $opt, is_array($val) ? implode(',', $val) : $val];
 			}
 
-			// If we're actually inserting something..
+			// If we're actually inserting something...
 			if (!empty($setValues))
 			{
 				// Are there options in non-default themes set that should be cleared?
@@ -710,7 +710,7 @@ class ManageThemes extends AbstractController
 
 				if ($_default_options_master[$opt] == 1)
 				{
-					// Delete then insert for ease of database compatibility!
+					// Delete it then insert for ease of database compatibility!
 					removeThemeOptions('default', 'members', $opt);
 					addThemeOptions(1, $opt, $val);
 
@@ -737,7 +737,7 @@ class ManageThemes extends AbstractController
 
 				if ($_options_master[$opt] == 1)
 				{
-					// Delete then insert for ease of database compatibility - again!
+					// Delete it, then insert for ease of database compatibility - again!
 					removeThemeOptions($theme, 'non_default', $opt);
 					addThemeOptions($theme, $opt, $val);
 				}
@@ -780,7 +780,7 @@ class ManageThemes extends AbstractController
 		$context['options'] = $context['theme_options'];
 		$context['theme_settings'] = $settings;
 
-		// Load the options for these theme
+		// Load the options for these themes
 		if (!$this->_req->hasQuery('who'))
 		{
 			$context['theme_options'] = loadThemeOptionsInto([1, $theme], -1, $context['theme_options']);
@@ -865,7 +865,7 @@ class ManageThemes extends AbstractController
 			throw new Exception('no_access', false);
 		}
 
-		// Its no longer known
+		// It's no longer known
 		$known = $this->_knownTheme($theme);
 
 		// Remove it as an option everywhere
@@ -934,7 +934,7 @@ class ManageThemes extends AbstractController
 			return;
 		}
 
-		// Not just any John Smith can send in a api request
+		// Not just any John Smith can send in an api request
 		if (!allowedTo('admin_forum'))
 		{
 			Txt::load('Errors');
@@ -1059,7 +1059,7 @@ class ManageThemes extends AbstractController
 			//$th = $this->_req->getQuery('th', 'intval');
 			//$vrt = $this->_req->getQuery('vrt', 'Util::htmlspecialchars');
 
-			// If changing members or guests - and there's a variant - assume changing default variant.
+			// If changing members or guests - and there's a variant - assume changing the default variant.
 			if (!empty($variant) && ($u === 0 || $u === -1))
 			{
 				updateThemeOptions([$themePicked, 0, 'default_variant', $variant]);
@@ -1131,7 +1131,7 @@ class ManageThemes extends AbstractController
 	 * What it does:
 	 *
 	 * - Puts themes in $boardurl/themes.
-	 * - Assumes the gzip has a root directory in it. (ie default.)
+	 * - Assumes the gzip has a root directory in it. (i.e., default.)
 	 * - Requires admin_forum.
 	 * - Accessed with ?action=admin;area=theme;sa=install.
 	 *
@@ -1149,7 +1149,7 @@ class ManageThemes extends AbstractController
 
 		theme()->getTemplates()->load('ManageThemes');
 
-		// Passed an ID, then the install is complete, lets redirect and show them
+		// Passed an ID, then the installation is complete, let's redirect and show them
 		$theme_id = $this->_req->getQuery('theme_id', 'intval');
 		if ($theme_id !== null)
 		{
@@ -1299,6 +1299,8 @@ class ManageThemes extends AbstractController
 		}
 
 		redirectexit('action=admin;area=theme;sa=admin;' . $context['session_var'] . '=' . $context['session_id']);
+
+		return null;
 	}
 
 	/**
@@ -1306,11 +1308,11 @@ class ManageThemes extends AbstractController
 	 */
 	public function copyDefault(): void
 	{
-		global $boardurl, $modSettings, $settings;
+		global $boardurl, $settings;
 
 		$fileFunc = FileFunctions::instance();
 
-		// Hopefully the theme directory is writable, or we might have a problem.
+		// Hopefully, the theme directory is writable, or we might have a problem.
 		if (!$fileFunc->chmod(BOARDDIR . '/themes'))
 		{
 			throw new Exception('theme_install_write_error', 'critical');
@@ -1324,7 +1326,7 @@ class ManageThemes extends AbstractController
 		// Get some more time if we can
 		detectServer()->setTimeLimit(600);
 
-		// Create the subdirectories for css, javascript and font files.
+		// Create the subdirectories for CSS, JavaScript and font files.
 		$fileFunc->createDirectory($this->theme_dir . '/css', false);
 		$fileFunc->createDirectory($this->theme_dir . '/scripts', false);
 		$fileFunc->createDirectory($this->theme_dir . '/webfonts', false);
@@ -1337,7 +1339,7 @@ class ManageThemes extends AbstractController
 			$fileFunc->chmod($this->theme_dir . $file);
 		}
 
-		// And now the entire css, images and webfonts directories!
+		// And now the entire CSS, images and webfonts directories!
 		copytree($settings['default_theme_dir'] . '/css', $this->theme_dir . '/css');
 		copytree($settings['default_theme_dir'] . '/images', $this->theme_dir . '/images');
 		copytree($settings['default_theme_dir'] . '/webfonts', $this->theme_dir . '/webfonts');
@@ -1347,10 +1349,10 @@ class ManageThemes extends AbstractController
 		$this->images_url = $boardurl . '/themes/' . basename($this->theme_dir) . '/images';
 		$this->theme_dir = realpath($this->theme_dir);
 
-		// Lets get some data for the new theme (default theme (1), default settings (0)).
+		// Let's get some data for the new theme (default theme (1), default settings (0)).
 		$theme_values = loadThemeOptionsInto(1, 0, [], ['theme_templates', 'theme_layers']);
 
-		// Lets add a theme_info.xml to this theme.
+		// Let's add a theme_info.xml to this theme.
 		write_theme_info($this->_req->post->copy, FORUM_VERSION, $this->theme_dir, $theme_values);
 
 		// Finish by setting the namespace
@@ -1384,13 +1386,13 @@ class ManageThemes extends AbstractController
 	{
 		$fileFunc = FileFunctions::instance();
 
-		// Hopefully the theme directory is writable, or we might have a problem.
+		// Hopefully, the theme directory is writable, or we might have a problem.
 		if (!$fileFunc->chmod(BOARDDIR . '/themes'))
 		{
 			throw new Exception('theme_install_write_error', 'critical');
 		}
 
-		// This happens when the admin session is gone and the user has to login again
+		// This happens when the admin session is gone and the user has to log in again
 		if (empty($_FILES['theme_gz']) && empty($this->_req->post->theme_gz))
 		{
 			return;
@@ -1413,17 +1415,17 @@ class ManageThemes extends AbstractController
 	}
 
 	/**
-	 * Set a theme option via javascript.
+	 * Set a theme option via JavaScript.
 	 *
 	 * What it does:
 	 *
-	 * - sets a theme option without outputting anything.
-	 * - can be used with javascript, via a dummy image... (which doesn't require
+	 * - Sets a theme option without outputting anything.
+	 * - Can be used with JavaScript, via a dummy image... (which doesn't require
 	 *   the page to reload.)
-	 * - requires someone who is logged in.
-	 * - accessed via ?action=jsoption;var=variable;val=value;session_var=sess_id.
-	 * - optionally contains &th=theme id
-	 * - does not log access to the Who's Online log. (in index.php..)
+	 * - Requires someone who is logged in.
+	 * - Accessed via ?action=jsoption;var=variable;val=value;session_var=sess_id.
+	 * - Optionally contains &th=theme id
+	 * - Does not log access to the Who's Online log. (in index.php...)
 	 */
 	public function action_jsoption(): void
 	{
@@ -1441,7 +1443,7 @@ class ManageThemes extends AbstractController
 			redirectexit($settings['images_url'] . '/blank.png');
 		}
 
-		// Sorry, guests can't go any further than this..
+		// Sorry, guests can't go any further than this...
 		if ($this->user->is_guest || $this->user->id == 0)
 		{
 			obExit(false);
@@ -1482,7 +1484,7 @@ class ManageThemes extends AbstractController
 			$settings['theme_id'] = $this->_req->getQuery('th', 'intval', $this->_req->getQuery('id', 'intval'));
 		}
 
-		// If this is the admin preferences the passed value will just be an element of it.
+		// If this is the admin preferences, the passed value will just be an element of it.
 		if ($var === 'admin_preferences')
 		{
 			if (!empty($options['admin_preferences']))

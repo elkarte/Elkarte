@@ -2,7 +2,7 @@
 
 /**
  * Handles the Security and Moderation pages in the admin panel.  This includes
- * anti spam, security and moderation settings
+ * anti-spam, security, and moderation settings
  *
  * @package   ElkArte Forum
  * @copyright ElkArte Forum contributors
@@ -117,7 +117,7 @@ class ManageSecurity extends AbstractController
 	{
 		global $txt, $context, $modSettings;
 
-		// See if they supplied a valid looking http:BL API Key
+		// See if they supplied a valid-looking http:BL API Key
 		$context['invalid_badbehavior_httpbl_key'] = (!empty($modSettings['badbehavior_httpbl_key']) && (strlen($modSettings['badbehavior_httpbl_key']) !== 12));
 
 		// Set up the config array for use
@@ -132,7 +132,7 @@ class ManageSecurity extends AbstractController
 			'',
 			['check', 'enableOTP'],
 			'',
-			// Reactive on email, and approve on delete
+			// Reactive on email and approve on delete
 			['check', 'send_validation_onChange'],
 			['check', 'approveAccountDeletion'],
 			'',
@@ -290,7 +290,7 @@ class ManageSecurity extends AbstractController
 		$modSettings['guests_require_captcha'] = !empty($modSettings['posts_require_captcha']);
 		$modSettings['posts_require_captcha'] = !isset($modSettings['posts_require_captcha']) || $modSettings['posts_require_captcha'] == -1 ? 0 : $modSettings['posts_require_captcha'];
 
-		// Some minor javascript for the guest post setting.
+		// Some minor JavaScript for the guest post setting.
 		if ($modSettings['posts_require_captcha'])
 		{
 			theme()->addInlineJavascript("document.getElementById('guests_require_captcha').disabled = true;", true);
@@ -325,7 +325,7 @@ class ManageSecurity extends AbstractController
 			'pm3' => ['int', 'pm_posts_per_hour', 'postinput' => $txt['pm_posts_per_hour_note']],
 		];
 
-		// Cannot use moderation if post moderation is not enabled.
+		// Cannot use moderation if post-moderation is not enabled.
 		if (!$modSettings['postmod_active'])
 		{
 			unset($config_vars['moderate']);

@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This file is exclusively for generating reports to help assist forum
+ * This file is exclusively for generating reports to help forum
  * administrators keep track of their site configuration and state.
  *
  * The core report generation is done in two areas. Firstly, a report "generator"
@@ -96,7 +96,7 @@ class Reports extends AbstractController
 			];
 		}
 
-		// Read selected report type from either POST or GET without mutating the request
+		// Read the selected report type from either POST or GET without mutating the request
 		$report_type = $this->_req->getRequest('rt', 'trim|strval', null);
 
 		// If they haven't chosen a report type which is valid, send them off to the report type chooser!
@@ -126,7 +126,7 @@ class Reports extends AbstractController
 		{
 			$context['sub_template'] = $set_template;
 
-			// Are we disabling the other layers - print friendly for example?
+			// Are we disabling the other layers - print friendly, for example?
 			if ($reportTemplates[$set_template]['layers'] !== null)
 			{
 				$template_layers = theme()->getLayers();
@@ -237,7 +237,7 @@ class Reports extends AbstractController
 
 		foreach ($boards as $row)
 		{
-			// Each board has it's own table.
+			// Each board has its own table.
 			newTable($row['name'], '', 'left', 'auto', 'left', 200, 'left');
 
 			// First off, add in the side key.
@@ -294,7 +294,7 @@ class Reports extends AbstractController
 				$boardData['disallowed_groups'] = implode(', ', $disallowedGroups);
 			}
 
-			// Next add the main data.
+			// Next, add the main data.
 			addData($boardData);
 		}
 	}
@@ -319,7 +319,7 @@ class Reports extends AbstractController
 		require_once(SUBSDIR . '/Boards.subs.php');
 		require_once(SUBSDIR . '/Membergroups.subs.php');
 
-		// Lets get started
+		// Let's get started
 		$query_boards = [];
 
 		if (isset($this->_req->post->boards))
@@ -463,7 +463,7 @@ class Reports extends AbstractController
 	/**
 	 * Show what the membergroups are made of.
 	 *
-	 * - Functions ending with "Report" are responsible for generating data for reporting.
+	 * - Functions ending with "Report" are responsible for generating data for reporting,
 	 * they are all called from action_index.
 	 * - Never access the context directly, but use the data handling functions to do so.
 	 */
@@ -545,7 +545,7 @@ class Reports extends AbstractController
 	/**
 	 * Show the large variety of group permissions assigned to each membergroup.
 	 *
-	 * - Functions ending with "Report" are responsible for generating data for reporting.
+	 * - Functions ending with "Report" are responsible for generating data for reporting,
 	 * they are all called from action_index.
 	 * - Never access the context directly, but use the data handling
 	 * functions to do so.
@@ -601,7 +601,7 @@ class Reports extends AbstractController
 		$curData = [];
 		foreach ($perms as $row)
 		{
-			// If this is a new permission flush the last row.
+			// If this is a new permission, flush the last row.
 			if ($row['permission'] != $lastPermission)
 			{
 				// Send the data!
@@ -661,7 +661,7 @@ class Reports extends AbstractController
 			}
 		}
 
-		// Get a list of global moderators (i.e. members with moderation powers).
+		// Get a list of global moderators (i.e., members with moderation powers).
 		$global_mods = array_intersect(membersAllowedTo('moderate_board', 0), membersAllowedTo('approve_posts', 0), membersAllowedTo('remove_any', 0), membersAllowedTo('modify_any', 0));
 
 		// How about anyone else who is special?
@@ -670,7 +670,7 @@ class Reports extends AbstractController
 		// Make sure everyone is there once - no admin less important than any other!
 		$allStaff = array_unique($allStaff);
 
-		// This is a bit of a cop out - but we're protecting their forum, really!
+		// This is a bit of a cop-out - but we're protecting their forum, really!
 		if (count($allStaff) > 300)
 		{
 			throw new Exception('report_error_too_many_staff');
@@ -736,7 +736,7 @@ class Reports extends AbstractController
 				$staffData['moderates'] = '<em>' . $txt['report_staff_no_boards'] . '</em>';
 			}
 
-			// Next add the main data.
+			// Next, add the main data.
 			addData($staffData);
 		}
 	}
@@ -754,7 +754,7 @@ class Reports extends AbstractController
  *
  * @param string $title = '' Title to be displayed with this data table.
  * @param string $default_value = '' Value to be displayed if a key is missing from a row.
- * @param string $shading = 'all' Should the left, top or both (all) parts of the table beshaded?
+ * @param string $shading = 'all' Should the left, top, or both (all) parts of the table beshaded?
  * @param string $width_normal = 'auto' width of an unshaded column (auto means not defined).
  * @param string $align_normal = 'center' alignment of data in an unshaded column.
  * @param string $width_shaded = 'auto' width of a shaded column (auto means not defined).
@@ -802,13 +802,13 @@ function newTable(string $title = '', string $default_value = '', string $shadin
  *
  * - If there are no existing tables, will create one with default attributes.
  * - If custom_table isn't specified, it will use the last table created,
- * - If it is specified and doesn't exist the function will return false.
- * - If a set of keys have been specified, the function will check each
- * required key is present in the incoming data. If this data is missing
+ * - If it is specified and doesn't exist, the function will return false.
+ * - If a set of keys has been specified, the function will check each
+ * required key is present in the incoming data. If this data is missing,
  * the current tables default value will be used.
  * - If any key in the incoming data begins with '#sep#', the function
  * will add a separator across the table at this point.
- * once the incoming data has been sanitized, it is added to the table.
+ * Once the incoming data has been sanitized, it is added to the table.
  *
  * @param array $inc_data
  * @param int|null $custom_table = null
@@ -833,7 +833,7 @@ function addData(array $inc_data, int $custom_table = null)
 
 	$table = $custom_table ?? $context['current_table'];
 
-	// If we have keys, sanitise the data...
+	// If we have keys, sanitize the data...
 	$data = [];
 	if (!empty($context['keys']))
 	{
@@ -843,7 +843,7 @@ function addData(array $inc_data, int $custom_table = null)
 			$data[$key] = [
 				'v' => empty($inc_data[$key]) ? $context['tables'][$table]['default_value'] : $inc_data[$key],
 			];
-			// Special "hack" the adding separators when doing data by column.
+			// Special "hack" adding separators when doing data by column.
 			if (str_starts_with($key, '#sep#'))
 			{
 				$data[$key]['separator'] = true;
@@ -880,6 +880,8 @@ function addData(array $inc_data, int $custom_table = null)
 			$context['tables'][$table]['data'][$key][] = $item;
 		}
 	}
+
+	return null;
 }
 
 /**
@@ -915,6 +917,8 @@ function addSeparator(string $title = '', string $custom_table = null)
 			'v' => $title
 		]
 	];
+
+	return null;
 }
 
 /**
@@ -935,7 +939,7 @@ function finishTables()
 		return;
 	}
 
-	// Loop through each table counting up some basic values, to help with the templating.
+	// Loop through each table counting up some basic values to help with the templating.
 	foreach ($context['tables'] as $id => $table)
 	{
 		$context['tables'][$id]['id'] = $id;
@@ -964,14 +968,12 @@ function finishTables()
  *
  * What it does:
  *
- * - Sets the current set of "keys" expected in each data array passed to
- * addData.
+ * - Sets the current set of "keys" expected in each data array passed to addData.
  * - It also sets the way we are adding data to the data table.
- * - Method specifies whether the data passed to addData represents a new
- * column, or a new row.
+ * - Method specifies whether the data passed to addData represents a new column or a new row.
  * - Keys is an array whose keys are the keys for data being passed to addData().
  * - If reverse is set to true, then the values of the variable "keys"
- * are used as opposed to the keys(!
+ * are used as opposed to the keys!
  *
  * @param string $method = 'rows' rows or cols
  * @param array $keys = array()

@@ -59,8 +59,7 @@ class ManagePermissions extends AbstractController
 	{
 		global $txt, $context;
 
-		// Make sure they can't do certain things,
-		// unless they have the right permissions.
+		// Make sure they can't do certain things unless they have the right permissions.
 		$this->permissionsObject = new Permissions();
 		$this->illegal_permissions = $this->permissionsObject->getIllegalPermissions();
 		$this->illegal_guest_permissions = $this->permissionsObject->getIllegalGuestPermissions();
@@ -171,7 +170,7 @@ class ManagePermissions extends AbstractController
 		// pid = profile id
 		$this->_pid = $this->_req->getQuery('pid', 'intval', null);
 
-		// We can modify any permission set apart from the read only, reply only and no polls ones as they are redefined.
+		// We can modify any permission set apart from the read-only, reply only and no polls ones as they are redefined.
 		$context['can_modify'] = empty($this->_pid) || $this->_pid === 1 || $this->_pid > 4;
 
 		// Load all the permissions. We'll need them in the template.
@@ -326,7 +325,7 @@ class ManagePermissions extends AbstractController
 
 		createList($listOptions);
 
-		// The second list shows the post count based groups...if enabled
+		// The second list shows the post-count-based groups...if enabled
 		if (!empty($modSettings['permission_enable_postgroups']))
 		{
 			$listOptions = [
@@ -677,7 +676,7 @@ class ManagePermissions extends AbstractController
 			// Unpack two variables that were transported.
 			[$permissionType, $permission] = explode('/', $this->_req->post->permissions);
 
-			// Check whether our input is within expected range.
+			// Check whether our input is within the expected range.
 			if (!in_array($this->_req->post->add_remove, ['add', 'clear', 'deny']) || !in_array($permissionType, ['membergroup', 'board']))
 			{
 				redirectexit('action=admin;area=permissions;pid=' . $this->_pid);
@@ -786,7 +785,7 @@ class ManagePermissions extends AbstractController
 
 		$context['profile']['id'] = $this->_req->getQuery('pid', 'intval', 0);
 
-		// If this is a moderator and they are editing "no profile" then we only do boards.
+		// If this is a moderator, and they are editing "no profile," then we only do boards.
 		if ($context['group']['id'] == 3 && empty($context['profile']['id']))
 		{
 			// For sanity just check they have no general permissions.
@@ -798,7 +797,7 @@ class ManagePermissions extends AbstractController
 		$context['permission_type'] = empty($context['profile']['id']) ? 'membergroup' : 'board';
 		$context['profile']['can_modify'] = !$context['profile']['id'] || $context['profiles'][$context['profile']['id']]['can_modify'];
 
-		// Set up things a little nicer for board related stuff...
+		// Set up things a little nicer for board-related stuff...
 		if ($context['permission_type'] === 'board')
 		{
 			$context['profile']['name'] = $context['profiles'][$context['profile']['id']]['name'];
@@ -991,7 +990,7 @@ class ManagePermissions extends AbstractController
 				clearDenyPermissions();
 			}
 
-			// Make sure there are no postgroup based permissions left.
+			// Make sure there are no postgroup-based permissions left.
 			if (empty($modSettings['permission_enable_postgroups']))
 			{
 				clearPostgroupPermissions();
@@ -1047,11 +1046,11 @@ class ManagePermissions extends AbstractController
 
 		require_once(SUBSDIR . '/ManagePermissions.subs.php');
 
-		// Setup the template, first for fun.
+		// Set up the template, first for fun.
 		$context['page_title'] = $txt['permissions_profile_edit'];
 		$context['sub_template'] = 'edit_profiles';
 
-		// If we're creating a new one do it first.
+		// If we're creating a new one, do it first.
 		if (isset($this->_req->post->create) && trim($this->_req->post->profile_name) !== '')
 		{
 			checkSession();
@@ -1124,9 +1123,9 @@ class ManagePermissions extends AbstractController
 	}
 
 	/**
-	 * Present a nice way of applying post moderation.
+	 * Present a nice way of applying post-moderation.
 	 *
-	 * @event integrate_post_moderation_mapping passed $mappings to add other post moderation values
+	 * @event integrate_post_moderation_mapping passed $mappings to add other post-moderation values
 	 */
 	public function action_postmod(): void
 	{
@@ -1165,7 +1164,7 @@ class ManagePermissions extends AbstractController
 			$all_permissions = array_merge($all_permissions, $perm_set);
 		}
 
-		// If we're saving the changes then do just that - save them.
+		// If we're saving the changes, then do just that - save them.
 		if (!empty($this->_req->post->save_changes) && ($context['current_profile'] == 1 || $context['current_profile'] > 4))
 		{
 			validateToken('admin-mppm');
@@ -1228,7 +1227,7 @@ class ManagePermissions extends AbstractController
 					{
 						$context['profile_groups'][$id_group][$key] = 'allow';
 					}
-					// Otherwise only bother with moderate if not on allow.
+					// Otherwise only bother with moderate if not on an allow.
 					elseif ($context['profile_groups'][$id_group][$key] !== 'allow')
 					{
 						$context['profile_groups'][$id_group][$key] = 'moderate';

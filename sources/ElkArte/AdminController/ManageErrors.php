@@ -2,7 +2,7 @@
 
 /**
  * The main purpose of this file is to show a list of all errors that were
- * logged on the forum, and allow filtering and deleting them.
+ * logged on the forum and allow filtering and deleting them.
  *
  * @package   ElkArte Forum
  * @copyright ElkArte Forum contributors
@@ -66,7 +66,7 @@ class ManageErrors extends AbstractController
 	 *  - file must be readable,
 	 *  - full file path must be base64 encoded,
 	 *
-	 * - The line number number is specified by $_REQUEST['line']...
+	 * - The line number is specified by $_REQUEST['line']...
 	 * - The function will try to get the 20 lines before and after the specified line.
 	 */
 	protected function action_viewfile(): void
@@ -162,7 +162,7 @@ class ManageErrors extends AbstractController
 		// Clean up start.
 		$start = max($this->_req->getQuery('start', 'intval', 0), 0);
 
-		// Do we want to reverse error listing?
+		// Do we want to reverse the error listing?
 		$context['sort_direction'] = isset($this->_req->query->desc) ? 'down' : 'up';
 
 		// How about filter it?
@@ -188,7 +188,6 @@ class ManageErrors extends AbstractController
 		$this->_applyFilter($filter);
 
 		// What type of errors do we have and how many do we have?
-		$context['error_types'] = [];
 		$context['error_types'] = $this->errorLog->fetchErrorsByType($filter, $context['sort_direction']);
 		$tmp = array_keys($context['error_types']);
 		$sum = (int) end($tmp);
@@ -203,7 +202,7 @@ class ManageErrors extends AbstractController
 		// Update the all errors tab with the total number of errors
 		$context['error_types']['all']['label'] .= ' (' . $sum . ')';
 
-		// Finally, work out what is the last tab!
+		// Finally, work out what the last tab is!
 		if (isset($context['error_types'][$sum]))
 		{
 			$context['error_types'][$sum]['is_last'] = true;
@@ -222,7 +221,7 @@ class ManageErrors extends AbstractController
 	}
 
 	/**
-	 * Setup any filtering the user may have selected
+	 * Set up any filtering the user may have selected
 	 */
 	private function _setupFiltering(): array
 	{
@@ -284,7 +283,7 @@ class ManageErrors extends AbstractController
 			require_once(SUBSDIR . '/Members.subs.php');
 			$members = getBasicMemberData($members, ['add_guest' => true]);
 
-			// Go through each error and tack the data on.
+			// Go through each error and tac the data on.
 			foreach ($context['errors'] as $id => $dummy)
 			{
 				$memID = $context['errors'][$id]['member']['id'];

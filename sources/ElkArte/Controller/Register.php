@@ -54,7 +54,7 @@ class Register extends AbstractController
 	}
 
 	/**
-	 * Pre Dispatch, called before other methods.
+	 * Pre-dispatch, called before other methods.
 	 */
 	public function pre_dispatch()
 	{

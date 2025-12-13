@@ -42,7 +42,7 @@ class ManageTopics extends AbstractController
 		// Control for an action, why not!
 		$action = new Action('manage_topics');
 
-		// Only one option I'm afraid, but integrate_sa_manage_topics may add more
+		// Only one option, I'm afraid, but integrate_sa_manage_topics may add more
 		$subAction = $action->initialize($subActions, 'display');
 
 		// Page items for the template
@@ -74,7 +74,7 @@ class ManageTopics extends AbstractController
 		// Initialize it with our settings
 		$settingsForm->setConfigVars($this->_settings());
 
-		// Setup the template.
+		// Set up the template.
 		$context['sub_template'] = 'show_settings';
 
 		// Are we saving them - are we??
