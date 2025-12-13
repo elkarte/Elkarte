@@ -39,10 +39,10 @@ class BuildMail extends BaseMail
 	 * @param bool $send_html = false, if the message is HTML vs. plain text
 	 * @param int $priority = 3 Useful when the queue is enabled.
 	 *  - 0 will bypass any queue and send now,
-	 * - 4 (digest),
-	 * - 5 (newsletter) will bypass any PBE settings.
-	 * - 3 normal email,
-	 * - 1/2 registrations etc.
+	 *  - 4 (digest),
+	 *  - 5 (newsletter) will bypass any PBE settings.
+	 *  - 3 normal email,
+	 *  - 1/2 registrations etc.
 	 * @param bool $is_private redacts names from appearing in the mail queue
 	 * @param string|null $from_wrapper - used to provide envelope from wrapper based on if we share a
 	 * users display name
@@ -67,9 +67,6 @@ class BuildMail extends BaseMail
 
 		// Get rid of entities in the subject line
 		$subject = un_htmlspecialchars($subject);
-
-		// Make the message use the proper line breaks.
-		$message = str_replace(["\r", "\n"], ['', $this->lineBreak], $message);
 
 		// Support Basic DMARC Compliance when in MLM mode
 		$from = $this->setDMARCFrom($from, $from_wrapper);
@@ -105,7 +102,7 @@ class BuildMail extends BaseMail
 		// For strict compliance we keep this line to 78 charters, (one could flow the headers too)
 		$mime_boundary = 'ELK-' . substr(md5(uniqid(mt_rand(), true) . microtime()), 0, 28);
 
-		// Using mime, as it allows to send a plain unencoded alternative.
+		// Using mime, as it allows sending a plain unencoded alternative.
 		$this->headers[] = 'Mime-Version: 1.0';
 		$this->headers[] = 'Content-Type: multipart/alternative; boundary="' . $mime_boundary . '"';
 		$this->headers[] = 'Content-Transfer-Encoding: 7bit';
@@ -376,17 +373,22 @@ class BuildMail extends BaseMail
 	 */
 	public function getMessage($send_html, $mime_boundary, $orig_message, $subject): string
 	{
+		$boundary = '--' . $mime_boundary . $this->lineBreak;
+
 		$plain_text = $send_html ? $this->getPlainFromHTML($orig_message) : $orig_message;
 		$ascii_message = $this->get7bitVersion($plain_text);
 
 		// This is the plain text version.  Even if no one sees it, we need it for spam checkers.
-		$message = $ascii_message . $this->lineBreak . '--' . $mime_boundary . $this->lineBreak;
+		$message = $boundary;
+		$message .= 'Content-Type: text/plain; charset=us-ascii' . $this->lineBreak;
+		$message .= 'Content-Transfer-Encoding: 7bit' . $this->lineBreak . $this->lineBreak;
+		$message .= $ascii_message . $this->lineBreak . $boundary;
 
 		// This is base64 message, more accurate than plain as it true UTF-8
 		$mine_message = $this->getBase64Version($plain_text);
 		$message .= 'Content-Type: text/plain; charset=UTF-8' . $this->lineBreak;
 		$message .= 'Content-Transfer-Encoding: base64' . $this->lineBreak . $this->lineBreak;
-		$message .= $mine_message . $this->lineBreak . '--' . $mime_boundary . $this->lineBreak;
+		$message .= $mine_message . $this->lineBreak . $boundary;
 
 		// This is the actual HTML message, prim and proper.
 		$html_message = $send_html ? $this->getEmailWrapper($orig_message, $subject) : $orig_message;
@@ -409,6 +411,11 @@ class BuildMail extends BaseMail
 		// Drop any control characters other than tab, lf and cr
 		$string = preg_replace('/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]/', '', $string);
 
+		// <*> in templates was swapped to &#8226; by templateToHtml() but for plaintext we want [*]
+		$string = preg_replace('~(\n\s*?)•~mu', '$1[*]', $string);
+		$re = '~(\n)\\\\\[\\\\\*\\\\\]~m';
+		$string = preg_replace($re, '$1[*]', $string);
+
 		// Convert all 'special' characters (anything above 127) into HTML entities to maintain 7bit compliance
 		return preg_replace_callback('~([\x80-\x{10FFFF}])~u', 'entityConvert', $string);
 	}
@@ -424,6 +431,7 @@ class BuildMail extends BaseMail
 	{
 		// Remove any basic control characters, allowing only for tab, LF and CR
 		$string = preg_replace('/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]/', '', $string);
+		$string = preg_replace('~<br /><\*>~m', '<br />[*]', $string);
 
 		// Convert to markdown, provides some intent should the receiver only accept plain text
 		$mark_down = new Html2Md($string);
@@ -463,6 +471,9 @@ class BuildMail extends BaseMail
 	 */
 	public function getQuotedPrintableVersion($string): string
 	{
+		// This is for attachment notices we are appended to the body post template load
+		$string = preg_replace('~<br /><\*>~m', '<br />$1&#8226;', $string);
+
 		// Get a pure UTF8 character string
 		$string = $this->getValidUTF8String($string);
 

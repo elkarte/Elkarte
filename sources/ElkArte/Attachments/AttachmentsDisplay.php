@@ -139,7 +139,7 @@ class AttachmentsDisplay
 	{
 		global $context, $modSettings, $scripturl, $topic;
 
-		// Set up the attachment info - based on code by Meriadoc.
+		// Set up the attachment data
 		$attachmentData = [];
 		$ilaData = [];
 		$have_unapproved = false;

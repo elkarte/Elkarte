@@ -352,7 +352,7 @@ function loadEmailTemplate($template, $replacements = [], $lang = '', $html = fa
 	// If we want this template to be used as HTML,
 	$ret['body'] = $html ? templateToHtml($ret['body']) : $ret['body'];
 
-	// Finally return the email to the caller, so they can send it out.
+	// Finally, return the email to the caller, so they can send it out.
 	return $ret;
 }
 
@@ -366,7 +366,7 @@ function templateToHtml($string)
 {
 	$newString = preg_replace('~^-{3,40}$~m', '<hr />', $string);
 
-	$newString = preg_replace('~^<\*>~m', '&bull;', $newString);
+	$newString = preg_replace('~^(\s*?)<\*>~m', '$1&#8226;', $newString);
 
 	$newString = str_replace("\n", '<br />', $newString);
 

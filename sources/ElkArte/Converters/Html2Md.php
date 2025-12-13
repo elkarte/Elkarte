@@ -770,7 +770,7 @@ class Html2Md extends AbstractDomParser
 	/**
 	 * Escapes markup looking text in html to prevent accidental assignment
 	 *
-	 * <p>*stuff*</p> should not convert to *stuff* but \*stuff\* since its not to
+	 * <p>*stuff*</p> should not convert to *stuff* but \*stuff\* since it's not to
 	 * be converted by md to html as <strong>stuff</strong>
 	 *
 	 * @param string $value
@@ -848,7 +848,7 @@ class Html2Md extends AbstractDomParser
 			return;
 		}
 
-		// Some Lines can be very long and if we wrap them they break
+		// Some Lines can be very long, and if we wrap them, they break urls etc.
 		$lines = explode($this->line_end, $markdown);
 		foreach ($lines as $line)
 		{
@@ -887,7 +887,7 @@ class Html2Md extends AbstractDomParser
 		$text = preg_replace_callback($re,
 			fn($matches) => $this->_plaintxtCallback($matches), $text, -1, $count);
 
-		// If we made changes, lets protect that link from wrapping
+		// If we made changes, let's protect that link from wrapping
 		if ($count > 0)
 		{
 			$this->_setBodyWidth($text);
@@ -897,7 +897,7 @@ class Html2Md extends AbstractDomParser
 	}
 
 	/**
-	 * Callback function used by _convertPlaintxtLinks for plain link to MD
+	 * Callback function used by _convertPlaintxtLinks for a plain link to MD
 	 *
 	 * @param string[] $matches
 	 * @return string
