@@ -16,12 +16,13 @@ use ElkArte\Cache\Cache;
 use ElkArte\Helper\Util;
 
 /**
- * Used to add emoji images to text
+ * Class Emoji
  *
- * What it does:
- *
- * - Searches text for :tag: strings
- * - If tag is found to be a known emoji, replaces it with an image tag
+ * Provides functionality to handle emojis in texts, including:
+ * - Replacing emoji shortcodes (e.g., :smile:) with emoji images.
+ * - Handling HTML or Unicode encoded emojis.
+ * - Protecting and restoring emoji processing within code blocks.
+ * - Converting Unicode emoji points to images or identifying corresponding shortcodes.
  */
 class Emoji extends AbstractModel
 {
@@ -39,7 +40,7 @@ class Emoji extends AbstractModel
 	/** @var string used to find :emoji: style codes */
 	private const EMOJI_NAME = '~(?:\s?|^|]|<br />|<br>)(:([-+\w]+):\s?)~u';
 
-	/** @var null|Emoji holds the instance of this class */
+	/** @var Emoji holds the instance of this class */
 	private static $instance;
 
 	/** @var string holds the url of where the emojis are stored */
@@ -113,7 +114,7 @@ class Emoji extends AbstractModel
 	 */
 	private function _protectCodeBlocks($string): string
 	{
-		// Quick sniff, was that you? I thought so !
+		// Quick sniff, was that you? I thought so!
 		if (!str_contains($string, ':')
 			&& !preg_match(self::POSSIBLE_EMOJI, $string))
 		{
@@ -136,7 +137,7 @@ class Emoji extends AbstractModel
 	}
 
 	/**
-	 * Find emoji codes that are HTML &#xxx codes or pure 😀 codes. If found
+	 * Find emoji codes that are HTML &#xxx codes or pure 😀 codes. If found,
 	 * replace them with our SVG version.
 	 *
 	 * Given &#128512; or 😀, aka grinning face, will convert to 1f600
@@ -164,6 +165,8 @@ class Emoji extends AbstractModel
 	 */
 	public function emojiFromHTML($string): string
 	{
+		$string = strtolower($string);
+
 		// If there are 4byte encoded values &#x1f123, change those back to utf8 characters
 		return preg_replace_callback(self::POSSIBLE_HTML_EMOJI, static function ($match) {
 			$replace = html_entity_decode($match[0], ENT_NOQUOTES | ENT_SUBSTITUTE | ENT_HTML401, 'UTF-8');
@@ -188,12 +191,13 @@ class Emoji extends AbstractModel
 	 */
 	public function findEmojiByCode($hex)
 	{
-		$this->setSearchReplaceRegex();
-
 		if (empty($hex))
 		{
 			return false;
 		}
+
+		$hex = strtolower($hex);
+		$this->setSearchReplaceRegex();
 
 		// Is it one we have in our library?
 		if ($key = (array_search($hex, $this->shortcode_replace, true)))
@@ -218,8 +222,8 @@ class Emoji extends AbstractModel
 	/**
 	 * Takes a shortcode array and, if available, converts it to an <img> emoji
 	 *
-	 * - Uses input array of the form m[2] = 'doughnut' m[1]= ':doughnut:' m[0]= original
-	 * - If shortcode does not exist in the emoji returns m[0] the preg full match
+	 * - Uses an input array of the form m[2] = 'doughnut' m[1]= ':doughnut:' m[0]= original
+	 * - If shortcode does not exist in the emoji returns m[0] the full match
 	 *
 	 * @param array $m results from preg_replace_callback or other array
 	 * @return string
@@ -254,7 +258,7 @@ class Emoji extends AbstractModel
 	 *
 	 * We use [^\p{L}\x00-\x7F]+ which will match any non letter character including
 	 * symbols, currency signs, dingbats, box-drawing characters, etc. This is an
-	 * easier regex but with more "false" hits for what we want.  If this passes then the
+	 * easier regex but with more "false" hits for what we want.  If this passes, then the
 	 * full emoji regex will be used to precisely find supported codepoints
 	 *
 	 * @param $string
@@ -262,6 +266,7 @@ class Emoji extends AbstractModel
 	 */
 	public function emojiFromUni($string): string
 	{
+		$string = strtolower($string);
 		$this->setSearchReplaceRegex();
 
 		// Avoid the large regex if there is no emoji DNA
@@ -289,7 +294,7 @@ class Emoji extends AbstractModel
 	/**
 	 * Takes a shortcode array and, if available, converts it to a html unicode points emoji
 	 *
-	 * - Uses input array of the form m[2] = 'doughnut' m[1]= ':doughnut:' m[0]= original
+	 * - Uses an input array of the form m[2] = 'doughnut' m[1]= ':doughnut:' m[0]= original
 	 * - If shortcode does not exist in the emoji returns m[0] the preg full match
 	 *
 	 * - Given unicode 1f62e-200d-1f4a8 returns &#x1f62e;&#x200d;&#x1f4a8;
@@ -322,7 +327,7 @@ class Emoji extends AbstractModel
 	}
 
 	/**
-	 * Given a unicode character, convert to a Unicode number which can be
+	 * Given a Unicode character, convert to a Unicode number which can be
 	 * used for emoji array searching
 	 *
 	 * Given 😀 aka grinning face returns unicode 1f600
@@ -344,7 +349,7 @@ class Emoji extends AbstractModel
 	}
 
 	/**
-	 * Reads the base emoji tags file and load them to PHP array.
+	 * Reads the base emoji tags file and load them to a PHP array.
 	 *
 	 * Creates a regex to search text for known emoji sequences.  Uses generic search for
 	 * singleton emoji such as 1f600 as all multipoint ones would have already been found
@@ -367,8 +372,8 @@ class Emoji extends AbstractModel
 					continue;
 				}
 
-				$name = trim($match[1]);
-				$key = trim($match[2]);
+				$name = strtolower(trim($match[1]));
+				$key = strtolower(trim($match[2]));
 				$this->shortcode_replace[$name] = $key;
 
 				// Multipoint sequences use a unique, per key, regex to avoid collisions
