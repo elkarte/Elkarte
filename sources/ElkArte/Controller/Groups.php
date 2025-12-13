@@ -144,27 +144,27 @@ class Groups extends AbstractController
 					],
 					'data' => [
 						'function' => static function ($rowData) use ($base_type, $base_params) {
-          // Since the moderator group has no explicit members, no link is needed.
-          if ($rowData['id_group'] == 3)
-   							{
-   								$group_name = $rowData['group_name'];
-   							}
-   							else
-   							{
-   								$url = getUrl($base_type, array_merge($base_params, ['group' => $rowData['id_group']]));
-   								$group_name = sprintf('<a href="%1$s">%2$s</a>', $url, $rowData['group_name_color']);
-   							}
-          // Add a help option for moderator and administrator.
-          if ($rowData['id_group'] == 1)
-   							{
-   								$group_name .= ' (<a href="' . getUrl('action', ['action' => 'quickhelp', 'help' => 'membergroup_administrator']) . '" onclick="return reqOverlayDiv(this.href);" class="helpicon i-help"></a>)';
-   							}
-   							elseif ($rowData['id_group'] == 3)
-   							{
-   								$group_name .= ' (<a href="' . getUrl('action', ['action' => 'quickhelp', 'help' => 'membergroup_moderator']) . '" onclick="return reqOverlayDiv(this.href);" class="helpicon i-help"></a>)';
-   							}
-          return $group_name;
-      },
+							// Since the moderator group has no explicit members, no link is needed.
+							if ($rowData['id_group'] == 3)
+							{
+								$group_name = $rowData['group_name'];
+							}
+							else
+							{
+								$url = getUrl($base_type, array_merge($base_params, ['group' => $rowData['id_group']]));
+								$group_name = sprintf('<a href="%1$s">%2$s</a>', $url, $rowData['group_name_color']);
+							}
+							// Add a help option for moderator and administrator.
+							if ($rowData['id_group'] == 1)
+							{
+								$group_name .= ' (<a href="' . getUrl('action', ['action' => 'quickhelp', 'help' => 'membergroup_administrator']) . '" onclick="return reqOverlayDiv(this.href);" class="helpicon i-help"></a>)';
+							}
+							elseif ($rowData['id_group'] == 3)
+							{
+								$group_name .= ' (<a href="' . getUrl('action', ['action' => 'quickhelp', 'help' => 'membergroup_moderator']) . '" onclick="return reqOverlayDiv(this.href);" class="helpicon i-help"></a>)';
+							}
+							return $group_name;
+						},
 					],
 					'sort' => [
 						'default' => 'CASE WHEN mg.id_group < 4 THEN mg.id_group ELSE 4 END, mg.group_name',
@@ -177,15 +177,17 @@ class Groups extends AbstractController
 					],
 					'data' => [
 						'function' => static function ($rowData) {
-          global $settings;
-          if (empty($rowData['icons'][0])) {
-              return '';
-          }
-          if (empty($rowData['icons'][1])) {
-              return '';
-          }
-          return str_repeat('<img src="' . $settings['images_url'] . '/group_icons/' . $rowData['icons'][1] . '" alt="*" />', $rowData['icons'][0]);
-      },
+							global $settings;
+							if (empty($rowData['icons'][0]))
+							{
+								return '';
+							}
+							if (empty($rowData['icons'][1]))
+							{
+								return '';
+							}
+							return str_repeat('<img src="' . $settings['images_url'] . '/group_icons/' . $rowData['icons'][1] . '" alt="*" />', $rowData['icons'][0]);
+						},
 					],
 					'sort' => [
 						'default' => 'mg.icons',
@@ -198,9 +200,9 @@ class Groups extends AbstractController
 					],
 					'data' => [
 						'function' => static function ($group) {
-          global $txt;
-          return empty($group['moderators']) ? '<em>' . $txt['membergroups_new_copy_none'] . '</em>' : implode(', ', $group['moderators']);
-      },
+							global $txt;
+							return empty($group['moderators']) ? '<em>' . $txt['membergroups_new_copy_none'] . '</em>' : implode(', ', $group['moderators']);
+						},
 					],
 				],
 				'members' => [
@@ -209,10 +211,10 @@ class Groups extends AbstractController
 					],
 					'data' => [
 						'function' => static function ($rowData) {
-          global $txt;
-          // No explicit members for the moderator group.
-          return $rowData['id_group'] == 3 ? $txt['membergroups_guests_na'] : comma_format($rowData['num_members']);
-      },
+							global $txt;
+							// No explicit members for the moderator group.
+							return $rowData['id_group'] == 3 ? $txt['membergroups_guests_na'] : comma_format($rowData['num_members']);
+						},
 						'class' => 'centertext',
 					],
 					'sort' => [
@@ -278,8 +280,8 @@ class Groups extends AbstractController
 			'name' => $context['group']['name'],
 		];
 		$context['can_send_email'] = allowedTo('send_email_to_members');
-		$context['sort_direction'] = isset($this->_req->query->desc) ? 'down' : 'up';
-		$context['start'] = $this->_req->query->start;
+		$context['sort_direction'] = $this->_req->hasQuery('desc') ? 'down' : 'up';
+		$context['start'] = $this->_req->getQuery('start', 'intval', 0);
 		$context['can_moderate_forum'] = allowedTo('moderate_forum');
 
 		// @todo: use createList
@@ -293,13 +295,15 @@ class Groups extends AbstractController
 				'id' => $id_member,
 				'name' => $name
 			];
-   if ($this->user->id != $id_member) {
-       continue;
-   }
-   if ($context['group']['group_type'] == 1) {
-       continue;
-   }
-   $context['group']['can_moderate'] = true;
+			if ($this->user->id != $id_member)
+			{
+				continue;
+			}
+			if ($context['group']['group_type'] == 1)
+			{
+				continue;
+			}
+			$context['group']['can_moderate'] = true;
 		}
 
 		// If this group is hidden then it can only "exist" if the user can moderate it!
@@ -398,23 +402,24 @@ class Groups extends AbstractController
 		// Sort out the sorting!
 		$sort_methods = [
 			'name' => 'real_name',
-			'email' => allowedTo('moderate_forum') ? 'email_address' : ' ' . (isset($this->_req->query->desc) ? 'DESC' : 'ASC') . ', email_address',
+			'email' => allowedTo('moderate_forum') ? 'email_address' : ' ' . ($this->_req->hasQuery('desc') ? 'DESC' : 'ASC') . ', email_address',
 			'active' => 'last_login',
 			'registered' => 'date_registered',
 			'posts' => 'posts',
 		];
 
 		// They didn't pick one, or tried a wrong one, so default to by name..
-		if (!isset($this->_req->query->sort, $sort_methods[$this->_req->query->sort]))
+		$requested_sort = $this->_req->getQuery('sort', 'trim|strval', null);
+		if ($requested_sort === null || !isset($sort_methods[$requested_sort]))
 		{
 			$context['sort_by'] = 'name';
-			$querySort = 'real_name' . (isset($this->_req->query->desc) ? ' DESC' : ' ASC');
+			$querySort = 'real_name' . ($this->_req->hasQuery('desc') ? ' DESC' : ' ASC');
 		}
 		// Otherwise sort by what they asked
 		else
 		{
-			$context['sort_by'] = $this->_req->query->sort;
-			$querySort = $sort_methods[$this->_req->query->sort] . (isset($this->_req->query->desc) ? ' DESC' : ' ASC');
+			$context['sort_by'] = $requested_sort;
+			$querySort = $sort_methods[$requested_sort] . ($this->_req->hasQuery('desc') ? ' DESC' : ' ASC');
 		}
 
 		// The where on the query is interesting. Non-moderators should only see people who are in this group as primary.
@@ -432,10 +437,10 @@ class Groups extends AbstractController
 		$context['total_members'] = comma_format($context['total_members']);
 
 		// Create the page index.
-		$context['page_index'] = constructPageIndex('{scripturl}?action=' . ($context['group']['can_moderate'] ? 'moderate;area=viewgroups' : 'groups') . ';sa=members;group=' . $current_group . ';sort=' . $context['sort_by'] . (isset($this->_req->query->desc) ? ';desc' : ''), $this->_req->query->start, $context['total_members'], $modSettings['defaultMaxMembers']);
+		$context['page_index'] = constructPageIndex('{scripturl}?action=' . ($context['group']['can_moderate'] ? 'moderate;area=viewgroups' : 'groups') . ';sa=members;group=' . $current_group . ';sort=' . $context['sort_by'] . ($this->_req->hasQuery('desc') ? ';desc' : ''), $context['start'], $context['total_members'], $modSettings['defaultMaxMembers']);
 
 		// Fetch the members that meet the where criteria
-		$query_params = [$where => $current_group, 'order' => $querySort, 'start' => $this->_req->query->start, 'limit' => $modSettings['defaultMaxMembers']];
+		$query_params = [$where => $current_group, 'order' => $querySort, 'start' => $context['start'], 'limit' => $modSettings['defaultMaxMembers']];
 		$context['members'] = membersBy($where, $query_params, true);
 		foreach ($context['members'] as $id => $row)
 		{
@@ -486,13 +491,13 @@ class Groups extends AbstractController
 		]);
 
 		// Verify we can be here.
-		if ($this->user->mod_cache['gq'] == '0=1')
+		if ($this->user->mod_cache['gq'] === '0=1')
 		{
 			isAllowedTo('manage_membergroups');
 		}
 
 		// Normally, we act normally...
-		$where = $this->user->mod_cache['gq'] == '1=1' || $this->user->mod_cache['gq'] == '0=1' ? $this->user->mod_cache['gq'] : 'lgr.' . $this->user->mod_cache['gq'];
+		$where = $this->user->mod_cache['gq'] === '1=1' || $this->user->mod_cache['gq'] === '0=1' ? $this->user->mod_cache['gq'] : 'lgr.' . $this->user->mod_cache['gq'];
 		$where_parameters = [];
 
 		// We've submitted?

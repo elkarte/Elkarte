@@ -156,7 +156,7 @@ class Markasread extends AbstractController
 		$action->dispatch($subAction);
 
 		// For the time being this is a special case, but in BoardIndex no, we don't want it
-		if ($this->_req->getQuery('sa') === 'all' || ($this->_req->getQuery('sa') === 'board' && !isset($this->_req->query->bi)))
+		if ($this->_req->getQuery('sa') === 'all' || ($this->_req->getQuery('sa') === 'board' && !$this->_req->hasQuery('bi')))
 		{
 			$url_params = ['action' => 'unread', 'all', '{session_data}'];
 			if (!empty($this->_querystring_board_limits))
@@ -200,7 +200,7 @@ class Markasread extends AbstractController
 		// Mark boards as read
 		if (!empty($boards))
 		{
-			markBoardsRead($boards, isset($this->_req->query->unread), true);
+			markBoardsRead($boards, $this->_req->hasQuery('unread'), true);
 		}
 
 		$_SESSION['id_msg_last_visit'] = $modSettings['maxMsgID'];
@@ -239,7 +239,8 @@ class Markasread extends AbstractController
 		global $modSettings;
 
 		// Make sure all the topics are integers!
-		$topics = array_map('intval', explode('-', $this->_req->query->topics));
+		$topics_param = $this->_req->getQuery('topics', 'trim|strval', '');
+		$topics = $topics_param === '' ? [] : array_map('intval', explode('-', $topics_param));
 
 		require_once(SUBSDIR . '/Topic.subs.php');
 		$logged_topics = getLoggedTopics($this->user->id, $topics);
@@ -336,14 +337,16 @@ class Markasread extends AbstractController
 		$categories = [];
 		$boards = [];
 
-		if (isset($this->_req->query->c))
+		if ($this->_req->hasQuery('c'))
 		{
-			$categories = array_map('intval', explode(',', $this->_req->query->c));
+			$c_param = $this->_req->getQuery('c', 'trim|strval', '');
+			$categories = $c_param === '' ? [] : array_map('intval', explode(',', $c_param));
 		}
 
-		if (isset($this->_req->query->boards))
+		if ($this->_req->hasQuery('boards'))
 		{
-			$boards = array_map('intval', explode(',', $this->_req->query->boards));
+			$boards_param = $this->_req->getQuery('boards', 'trim|strval', '');
+			$boards = $boards_param === '' ? [] : array_map('intval', explode(',', $boards_param));
 		}
 
 		if (!empty($board))
@@ -351,7 +354,7 @@ class Markasread extends AbstractController
 			$boards[] = (int) $board;
 		}
 
-		if (isset($this->_req->query->children) && !empty($boards))
+		if ($this->_req->hasQuery('children') && !empty($boards))
 		{
 			// Mark all children of the boards we got (selected by the user).
 			$boards = addChildBoards($boards);
@@ -371,7 +374,7 @@ class Markasread extends AbstractController
 		}
 
 		// Mark boards as read.
-		markBoardsRead($boards, isset($this->_req->query->unread), true);
+		markBoardsRead($boards, $this->_req->hasQuery('unread'), true);
 
 		foreach ($boards as $b)
 		{
@@ -417,14 +420,15 @@ class Markasread extends AbstractController
 		];
 
 		// The default is the most logical: newest first.
-		if (!isset($this->_req->query->sort) || !in_array($this->_req->query->sort, $sort_methods))
+		$sort = $this->_req->getQuery('sort', 'trim|strval', null);
+		if ($sort === null || !in_array($sort, $sort_methods))
 		{
-			$this->_querystring_sort_limits = isset($this->_req->query->asc) ? ['asc'] : [];
+			$this->_querystring_sort_limits = $this->_req->hasQuery('asc') ? ['asc'] : [];
 		}
 		// But, for other methods the default sort is ascending.
 		else
 		{
-			$this->_querystring_sort_limits = ['sort' => $this->_req->query->sort, isset($this->_req->query->desc) ? 'desc' : ''];
+			$this->_querystring_sort_limits = ['sort' => $sort, $this->_req->hasQuery('desc') ? 'desc' : ''];
 		}
 	}
 

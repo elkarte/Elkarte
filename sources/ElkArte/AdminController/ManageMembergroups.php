@@ -45,7 +45,7 @@ class ManageMembergroups extends AbstractController
 	 * @event integrate_sa_manage_membergroups Used to add more sub actions
 	 * @uses ManageMembergroups template.
 	 * @uses ManageMembers language file.
-	 * @see AbstractController::action_index()
+	 * @see  AbstractController::action_index()
 	 */
 	public function action_index()
 	{
@@ -126,7 +126,7 @@ class ManageMembergroups extends AbstractController
 		$listOptions = [
 			'id' => 'regular_membergroups_list',
 			'title' => $txt['membergroups_regular'],
-			'base_href' => getUrl('admin', ['action' => 'admin', 'area' => 'membergroups'] + (isset($this->_req->query->sort2) ? ['sort2' => urlencode($this->_req->query->sort2)] : [])),
+			'base_href' => getUrl('admin', ['action' => 'admin', 'area' => 'membergroups'] + ($this->_req->hasQuery('sort2') ? ['sort2' => urlencode($this->_req->getQuery('sort2', 'trim'))] : [])),
 			'default_sort_col' => 'name',
 			'get_items' => [
 				'file' => SUBSDIR . '/Membergroups.subs.php',
@@ -243,7 +243,7 @@ class ManageMembergroups extends AbstractController
 		$listOptions = [
 			'id' => 'post_count_membergroups_list',
 			'title' => $txt['membergroups_post'],
-			'base_href' => getUrl('admin', ['action' => 'admin', 'area' => 'membergroups'] + (isset($this->_req->query->sort) ? ['sort' => urlencode($this->_req->query->sort)] : [])),
+			'base_href' => getUrl('admin', ['action' => 'admin', 'area' => 'membergroups'] + ($this->_req->hasQuery('sort') ? ['sort' => urlencode($this->_req->getQuery('sort', 'trim'))] : [])),
 			'default_sort_col' => 'required_posts',
 			'request_vars' => [
 				'sort' => 'sort2',
@@ -487,8 +487,8 @@ class ManageMembergroups extends AbstractController
 		// Just show the 'add membergroup' screen.
 		$context['page_title'] = $txt['membergroups_new_group'];
 		$context['sub_template'] = 'new_group';
-		$context['post_group'] = isset($this->_req->query->postgroup);
-		$context['undefined_group'] = !isset($this->_req->query->postgroup) && !isset($this->_req->query->generalgroup);
+		$context['post_group'] = $this->_req->hasQuery('postgroup');
+		$context['undefined_group'] = !$this->_req->hasQuery('postgroup') && !$this->_req->hasQuery('generalgroup');
 		$context['allow_protected'] = allowedTo('admin_forum');
 
 		if (!empty($modSettings['deny_boards_access']))
@@ -590,7 +590,7 @@ class ManageMembergroups extends AbstractController
 			redirectexit('action=admin;area=membergroups;');
 		}
 		// A form was submitted with the new membergroup settings.
-		elseif (isset($this->_req->post->save))
+		elseif ($this->_req->hasPost('save'))
 		{
 			// Validate the session.
 			checkSession();
@@ -876,7 +876,7 @@ class ManageMembergroups extends AbstractController
 		$settingsForm = new SettingsForm(SettingsForm::DB_ADAPTER);
 		$settingsForm->setConfigVars($this->_settings());
 
-		if (isset($this->_req->query->save))
+		if ($this->_req->hasQuery('save'))
 		{
 			checkSession();
 			call_integration_hook('integrate_save_membergroup_settings');

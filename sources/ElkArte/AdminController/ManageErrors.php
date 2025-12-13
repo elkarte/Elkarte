@@ -262,7 +262,8 @@ class ManageErrors extends AbstractController
 
 		if (isset($filter, $value))
 		{
-			unset($this->_req->query->filter, $this->_req->query->value);
+			$this->_req->clearValue('filter', 'query');
+			$this->_req->clearValue('value', 'query');
 		}
 
 		return [];

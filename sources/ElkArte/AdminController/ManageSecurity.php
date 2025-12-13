@@ -89,7 +89,7 @@ class ManageSecurity extends AbstractController
 		$settingsForm->setConfigVars($this->_securitySettings());
 
 		// Saving?
-		if (isset($this->_req->query->save))
+		if ($this->_req->hasQuery('save'))
 		{
 			checkSession();
 
@@ -173,7 +173,7 @@ class ManageSecurity extends AbstractController
 		$settingsForm->setConfigVars($config_vars);
 
 		// Saving?
-		if (isset($this->_req->query->save))
+		if ($this->_req->hasQuery('save'))
 		{
 			checkSession();
 
@@ -257,7 +257,7 @@ class ManageSecurity extends AbstractController
 		$settingsForm->setConfigVars($config_vars);
 
 		// Saving?
-		if (isset($this->_req->query->save))
+		if ($this->_req->hasQuery('save'))
 		{
 			checkSession();
 

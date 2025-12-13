@@ -84,7 +84,7 @@ class Elk_Testing_psql extends ElkTestingSetup
 		$db_passwd = $this->_db_passwd = 'postgres';
 		$db_prefix = $this->_db_prefix = 'elkarte_';
 
-		$link = pg_connect('host=' . $this->_db_server . ' dbname=' . $this->_db_name . ' user=\'' . $this->_db_user . '\' password=\'' . $this->_db_passwd . '\'');
+		$link = pg_connect('host=' . $this->_db_server . ' port=5432 dbname=' . $this->_db_name . ' user=\'' . $this->_db_user . '\' password=\'' . $this->_db_passwd . '\'');
 		if (!$link)
 		{
 			echo 'Could not connect: ' . pg_last_error($link);
@@ -92,7 +92,7 @@ class Elk_Testing_psql extends ElkTestingSetup
 		}
 
 		$v = pg_version($link);
-		printf("PostgreSQL server version: %s\n", $v['client']);
+		printf("PostgreSQL server version: %s\n", $v['server']);
 
 		// Start the database interface
 		try

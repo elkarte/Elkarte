@@ -67,16 +67,16 @@ class ManageScheduledTasks extends AbstractController
 
 		// Now for the lovely tabs. That we all love.
 		$context[$context['admin_menu_name']]['object']->prepareTabData([
-			'title' => 'scheduled_tasks_title',
-			'description' => 'maintain_info',
-			'tabs' => [
-				'tasks' => [
-					'description' => $txt['maintain_tasks_desc'],
-				],
-				'tasklog' => [
-					'description' => $txt['scheduled_log_desc'],
-				],
-			]]
+				'title' => 'scheduled_tasks_title',
+				'description' => 'maintain_info',
+				'tabs' => [
+					'tasks' => [
+						'description' => $txt['maintain_tasks_desc'],
+					],
+					'tasklog' => [
+						'description' => $txt['scheduled_log_desc'],
+					],
+				]]
 		);
 
 		// Call the right function for this sub-action.
@@ -107,7 +107,12 @@ class ManageScheduledTasks extends AbstractController
 
 			// Enable and disable as required.
 			$enablers = [0];
-			foreach ($this->_req->post->enable_task as $id => $enabled)
+			$enable = $this->_req->getPost('enable_task', null, []);
+			if (!is_array($enable))
+			{
+				$enable = [$enable];
+			}
+			foreach ($enable as $id => $enabled)
 			{
 				if ($enabled)
 				{
@@ -251,7 +256,7 @@ class ManageScheduledTasks extends AbstractController
 		createList($listOptions);
 
 		$context['sub_template'] = 'view_scheduled_tasks';
-		$context['tasks_were_run'] = isset($this->_req->query->done);
+		$context['tasks_were_run'] = $this->_req->hasQuery('done');
 
 		// If we had any errors, place them in context as well
 		if (isset($_SESSION['st_error']))
@@ -289,15 +294,19 @@ class ManageScheduledTasks extends AbstractController
 		require_once(SUBSDIR . '/ScheduledTasks.subs.php');
 
 		// Cleaning...
-		if (!isset($this->_req->query->tid))
+		if (!$this->_req->hasQuery('tid'))
 		{
 			throw new Exception('no_access', false);
 		}
 
-		$this->_req->query->tid = (int) $this->_req->query->tid;
+		$tid = $this->_req->getQuery('tid', 'intval', 0);
+		if ($tid === 0)
+		{
+			throw new Exception('no_access', false);
+		}
 
 		// Saving?
-		if (isset($this->_req->query->save))
+		if ($this->_req->hasQuery('save'))
 		{
 			checkSession();
 			validateToken('admin-st');
@@ -333,17 +342,17 @@ class ManageScheduledTasks extends AbstractController
 			$disabled = isset($this->_req->post->enabled) ? 0 : 1;
 
 			// Do the update!
-			updateTask($this->_req->query->tid, $disabled, $offset, $interval, $unit);
+			updateTask($tid, $disabled, $offset, $interval, $unit);
 
 			// Check the next event.
-			calculateNextTrigger($this->_req->query->tid, true);
+			calculateNextTrigger($tid, true);
 
 			// Return to the main list.
 			redirectexit('action=admin;area=scheduledtasks');
 		}
 
 		// Load the task, understand? Que? Que?
-		$context['task'] = loadTaskDetails($this->_req->query->tid);
+		$context['task'] = loadTaskDetails($tid);
 
 		createToken('admin-st');
 	}

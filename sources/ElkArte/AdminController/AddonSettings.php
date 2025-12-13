@@ -98,7 +98,7 @@ class AddonSettings extends AbstractController
 		$context['settings_title'] = $txt['mods_cat_modifications_misc'];
 
 		// Saving?
-		if (isset($this->_req->query->save))
+		if ($this->_req->hasQuery('save'))
 		{
 			checkSession();
 

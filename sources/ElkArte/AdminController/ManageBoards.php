@@ -137,17 +137,19 @@ class ManageBoards extends AbstractController
 		require_once(SUBSDIR . '/Boards.subs.php');
 
 		// Moving a board, child of, before, after, top
+		$move_to = $this->_req->getQuery('move_to', 'trim|strval', '');
 		if ($this->_req->compareQuery('sa', 'move', 'trim|strval')
-			&& in_array($this->_req->query->move_to, ['child', 'before', 'after', 'top']))
+			&& in_array($move_to, ['child', 'before', 'after', 'top']))
 		{
 			checkSession('get');
-			validateToken('admin-bm-' . (int) $this->_req->query->src_board, 'request');
+			$src_board = $this->_req->getQuery('src_board', 'intval', 0);
+			validateToken('admin-bm-' . (int) $src_board, 'request');
 
 			// Top is special, its the top!
-			if ($this->_req->query->move_to === 'top')
+			if ($move_to === 'top')
 			{
 				$boardOptions = [
-					'move_to' => $this->_req->query->move_to,
+					'move_to' => $move_to,
 					'target_category' => $this->_req->getQuery('target_cat', 'intval', 0),
 					'move_first_child' => true,
 				];
@@ -156,14 +158,14 @@ class ManageBoards extends AbstractController
 			else
 			{
 				$boardOptions = [
-					'move_to' => $this->_req->query->move_to,
+					'move_to' => $move_to,
 					'target_board' => $this->_req->getQuery('target_board', 'intval', 0),
 					'move_first_child' => true,
 				];
 			}
 
 			// Use modifyBoard to perform the action
-			modifyBoard((int) $this->_req->query->src_board, $boardOptions);
+			modifyBoard((int) $src_board, $boardOptions);
 			redirectexit('action=admin;area=manageboards');
 		}
 
@@ -898,7 +900,7 @@ class ManageBoards extends AbstractController
 		$context['force_form_onsubmit'] = "if(document.getElementById('recycle_enable').checked && document.getElementById('recycle_board').value == 0) { return confirm('" . $txt['recycle_board_unselected_notice'] . "');} return true;";
 
 		// Doing a save?
-		if (isset($this->_req->query->save))
+		if ($this->_req->hasQuery('save'))
 		{
 			checkSession();
 

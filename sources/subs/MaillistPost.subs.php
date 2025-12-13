@@ -1,8 +1,8 @@
 <?php
 
 /**
- * All the vital helper functions for use in email posting, formatting and conversion
- * and boy are there a bunch !
+ * All the vital helper functions for use in email posting, formatting and conversion,
+ * and boy are there a bunch!
  *
  * @package   ElkArte Forum
  * @copyright ElkArte Forum contributors
@@ -37,7 +37,7 @@ use ElkArte\Notifications\NotificationsTask;
  * - strips original message from the reply if possible
  * - If the email is html based, this will convert basic html tags to bbc tags
  * - If the email is plain text it will convert it to html based on markdown text
- * conventions and then that will be converted to bbc.
+ *  conventions, and then that will be converted to bbc.
  *
  * @param string $text plain or html text
  * @param bool $html

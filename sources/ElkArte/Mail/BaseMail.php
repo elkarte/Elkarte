@@ -92,7 +92,7 @@ abstract class BaseMail
 	}
 
 	/**
-	 * Sets flag if we are using maillist functionality
+	 * Sets a flag if we are using maillist functionality
 	 *
 	 * @param string $from_wrapper
 	 * @param string $message_id

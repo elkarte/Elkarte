@@ -295,4 +295,4 @@ The error I received while trying was: {ERROR}
 
 This is a permanent error; I\'ve given up. Sorry it didn\'t work out.
 
-{EMAILREGARDS}'; // redundant?
+{EMAILREGARDS}';

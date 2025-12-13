@@ -51,7 +51,7 @@ class ManageFeatures extends AbstractController
 	 * This function passes control through to the relevant tab.
 	 *
 	 * @event integrate_sa_modify_features Use to add new Configuration tabs
-	 * @see AbstractController::action_index()
+	 * @see  AbstractController::action_index()
 	 * @uses Help, ManageSettings languages
 	 * @uses sub_template show_settings
 	 */
@@ -177,7 +177,7 @@ class ManageFeatures extends AbstractController
 		theme()->addJavascriptVar(['txt_invalid_response' => $txt['ajax_bad_response']], true);
 
 		// Saving?
-		if (isset($this->_req->query->save))
+		if ($this->_req->hasQuery('save'))
 		{
 			checkSession();
 
@@ -313,7 +313,7 @@ class ManageFeatures extends AbstractController
 		$settingsForm->setConfigVars($this->_layoutSettings());
 
 		// Saving?
-		if (isset($this->_req->query->save))
+		if ($this->_req->hasQuery('save'))
 		{
 			// Setting a custom frontpage, set the hook to the FrontpageInterface of the controller
 			if (!empty($this->_req->post->front_page))
@@ -402,7 +402,7 @@ class ManageFeatures extends AbstractController
 		$settingsForm->setConfigVars($this->_pwaSettings());
 
 		// Saving, lots of checks then
-		if (isset($this->_req->query->save))
+		if ($this->_req->hasQuery('save'))
 		{
 			checkSession();
 
@@ -519,7 +519,7 @@ class ManageFeatures extends AbstractController
 		$settingsForm->setConfigVars($this->_karmaSettings());
 
 		// Saving?
-		if (isset($this->_req->query->save))
+		if ($this->_req->hasQuery('save'))
 		{
 			checkSession();
 
@@ -584,7 +584,7 @@ class ManageFeatures extends AbstractController
 		$settingsForm->setConfigVars($this->_likesSettings());
 
 		// Saving?
-		if (isset($this->_req->query->save))
+		if ($this->_req->hasQuery('save'))
 		{
 			checkSession();
 
@@ -654,7 +654,7 @@ class ManageFeatures extends AbstractController
 		$context['sub_template'] = 'show_settings';
 
 		// Saving the settings?
-		if (isset($this->_req->query->save))
+		if ($this->_req->hasQuery('save'))
 		{
 			checkSession();
 
@@ -887,7 +887,7 @@ class ManageFeatures extends AbstractController
 		$disabledTags[] = 'footnote';
 
 		// Applying to ALL signatures?!!
-		if (isset($this->_req->query->apply))
+		if ($this->_req->hasQuery('apply'))
 		{
 			// Security!
 			checkSession('get');
@@ -923,7 +923,7 @@ class ManageFeatures extends AbstractController
 		$modSettings['bbc_disabled_signature_bbc'] = $disabledTags;
 
 		// Saving?
-		if (isset($this->_req->query->save))
+		if ($this->_req->hasQuery('save'))
 		{
 			checkSession();
 
@@ -937,7 +937,8 @@ class ManageFeatures extends AbstractController
 				$signature_bbc_enabledTags = [$signature_bbc_enabledTags];
 			}
 
-			$this->_req->post->signature_bbc_enabledTags = $signature_bbc_enabledTags;
+			// Do not mutate the request; keep a local copy for settings persistence
+			$signature_bbc_enabledTags_local = $signature_bbc_enabledTags;
 
 			$sig_limits = [];
 			foreach (array_keys($context['signature_settings']) as $key)
@@ -959,14 +960,19 @@ class ManageFeatures extends AbstractController
 
 			call_integration_hook('integrate_save_signature_settings', [&$sig_limits, &$bbcTags]);
 
-			$this->_req->post->signature_settings = implode(',', $sig_limits) . ':' . implode(',', array_diff($bbcTags, $this->_req->post->signature_bbc_enabledTags));
+			// Build the combined signature settings string using locals (do not write back to request)
+			$signature_settings_local = implode(',', $sig_limits) . ':' . implode(',', array_diff($bbcTags, $signature_bbc_enabledTags_local));
 
 			// Even though we have practically no settings let's keep the convention going!
 			$save_vars = [];
 			$save_vars[] = ['text', 'signature_settings'];
 
 			$settingsForm->setConfigVars($save_vars);
-			$settingsForm->setConfigValues((array) $this->_req->post);
+			// Start from posted values, but override with our local computed values
+			$config_values = (array) $this->_req->post;
+			$config_values['signature_bbc_enabledTags'] = $signature_bbc_enabledTags_local;
+			$config_values['signature_settings'] = $signature_settings_local;
+			$settingsForm->setConfigValues($config_values);
 			$settingsForm->save();
 			redirectexit('action=admin;area=featuresettings;sa=sig');
 		}
@@ -1050,7 +1056,7 @@ class ManageFeatures extends AbstractController
 		$context['fields_no_registration'] = ['posts', 'warning_status', 'date_registered', 'action'];
 
 		// Are we saving any standard field changes?
-		if (isset($this->_req->post->save))
+		if ($this->_req->hasPost('save'))
 		{
 			checkSession();
 			validateToken('admin-scp');
@@ -1352,13 +1358,13 @@ class ManageFeatures extends AbstractController
 		$context['sub_template'] = 'edit_profile_field';
 
 		// Any errors messages to show?
-		if (isset($this->_req->query->msg))
+		if ($this->_req->hasQuery('msg'))
 		{
 			Txt::load('Errors');
-
-			if (isset($txt['custom_option_' . $this->_req->query->msg]))
+			$msg_key = $this->_req->getQuery('msg', 'trim|strval', '');
+			if (isset($txt['custom_option_' . $msg_key]))
 			{
-				$context['custom_option__error'] = $txt['custom_option_' . $this->_req->query->msg];
+				$context['custom_option__error'] = $txt['custom_option_' . $msg_key];
 			}
 		}
 
@@ -1424,7 +1430,7 @@ class ManageFeatures extends AbstractController
 			updateRenamedProfileStatus($enabled);
 		}
 		// Are we saving?
-		elseif (isset($this->_req->post->save))
+		elseif ($this->_req->hasPost('save'))
 		{
 			checkSession();
 			validateToken('admin-ecp');
@@ -1432,13 +1438,13 @@ class ManageFeatures extends AbstractController
 			// Everyone needs a name - even the (bracket) unknown...
 			if (trim($this->_req->post->field_name) === '')
 			{
-				redirectexit('action=admin;area=featuresettings;sa=profileedit;fid=' . $this->_req->query->fid . ';msg=need_name');
+				redirectexit('action=admin;area=featuresettings;sa=profileedit;fid=' . (int) $context['fid'] . ';msg=need_name');
 			}
 
 			// Regex you say?  Do a very basic test to see if the pattern is valid
 			if (!empty($this->_req->post->regex) && @preg_match($this->_req->post->regex, 'dummy') === false)
 			{
-				redirectexit('action=admin;area=featuresettings;sa=profileedit;fid=' . $this->_req->query->fid . ';msg=regex_error');
+				redirectexit('action=admin;area=featuresettings;sa=profileedit;fid=' . (int) $context['fid'] . ';msg=regex_error');
 			}
 
 			$this->_req->post->field_name = $this->_req->getPost('field_name', '\\ElkArte\\Helper\\Util::htmlspecialchars');
@@ -1712,7 +1718,7 @@ class ManageFeatures extends AbstractController
 		$context['pm_limits'] = loadPMLimits();
 
 		// Saving?
-		if (isset($this->_req->query->save))
+		if ($this->_req->hasQuery('save'))
 		{
 			checkSession();
 

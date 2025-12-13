@@ -43,7 +43,7 @@ class ManageLanguages extends AbstractController
 	 *
 	 * @event integrate_sa_manage_languages Used to add more sub actions
 	 * @uses ManageSettings language file
-	 * @see AbstractController::action_index()
+	 * @see  AbstractController::action_index()
 	 */
 	public function action_index()
 	{
@@ -328,7 +328,8 @@ class ManageLanguages extends AbstractController
 		$context['page_title'] = $txt['edit_languages'];
 		$context['sub_template'] = 'modify_language_entries';
 
-		$context['lang_id'] = $this->_req->query->lid;
+		// Read language id via helper and sanitize
+		$context['lang_id'] = $this->_req->getQuery('lid', 'trim|strval', '');
 		$file_id = empty($this->_req->post->tfid) ? '' : $this->_req->post->tfid;
 
 		// Clean the ID - just in case.
@@ -342,7 +343,7 @@ class ManageLanguages extends AbstractController
 		$lang_dirs = glob($base_lang_dir . '/*', GLOB_ONLYDIR);
 
 		// Ignore Agreement and PrivacyPolicy
-		$lang_dirs = array_filter($lang_dirs, static function($dir) {
+		$lang_dirs = array_filter($lang_dirs, static function ($dir) {
 			return !in_array(basename($dir), ['Agreement', 'PrivacyPolicy']);
 		});
 
@@ -422,7 +423,7 @@ class ManageLanguages extends AbstractController
 		$settings_backup_fail = !$fileFunc->isWritable(BOARDDIR . '/Settings_bak.php') || !@copy(BOARDDIR . '/Settings.php', BOARDDIR . '/Settings_bak.php');
 
 		// Saving settings?
-		if (isset($this->_req->query->save))
+		if ($this->_req->hasQuery('save'))
 		{
 			checkSession();
 

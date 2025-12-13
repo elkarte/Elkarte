@@ -68,41 +68,42 @@ class AdminLog extends AbstractController
 
 		// Setup the custom tabs.
 		$context[$context['admin_menu_name']]['object']->prepareTabData([
-			'title' => 'logs',
-			'description' => 'maintain_info',
-			'tabs' => [
-				'errorlog' => [
-					'url' => getUrl('admin', ['action' => 'admin', 'area' => 'logs', 'sa' => 'errorlog', 'desc']),
-					'description' => sprintf($txt['errlog_desc'], $txt['remove']),
-					'disabled' => empty($modSettings['enableErrorLogging']),
-				],
-				'adminlog' => [
-					'description' => $txt['admin_log_desc'],
-				],
-				'modlog' => [
-					'description' => $txt['moderation_log_desc'],
-					'disabled' => !featureEnabled('ml') || empty($modSettings['modlog_enabled']),
-				],
-				'banlog' => [
-					'description' => $txt['ban_log_description'],
-				],
-				'spiderlog' => [
-					'description' => $txt['spider_log_desc'],
-				],
-				'tasklog' => [
-					'description' => $txt['scheduled_log_desc'],
-				],
-				'pruning' => [
-					'description' => $txt['pruning_log_desc'],
-				],
-			]]
+				'title' => 'logs',
+				'description' => 'maintain_info',
+				'tabs' => [
+					'errorlog' => [
+						'url' => getUrl('admin', ['action' => 'admin', 'area' => 'logs', 'sa' => 'errorlog', 'desc']),
+						'description' => sprintf($txt['errlog_desc'], $txt['remove']),
+						'disabled' => empty($modSettings['enableErrorLogging']),
+					],
+					'adminlog' => [
+						'description' => $txt['admin_log_desc'],
+					],
+					'modlog' => [
+						'description' => $txt['moderation_log_desc'],
+						'disabled' => !featureEnabled('ml') || empty($modSettings['modlog_enabled']),
+					],
+					'banlog' => [
+						'description' => $txt['ban_log_description'],
+					],
+					'spiderlog' => [
+						'description' => $txt['spider_log_desc'],
+					],
+					'tasklog' => [
+						'description' => $txt['scheduled_log_desc'],
+					],
+					'pruning' => [
+						'description' => $txt['pruning_log_desc'],
+					],
+				]]
 		);
 
 		// If there is no sa set it must have come here for first time,
-		// pretend error log should be reversed.
-		if (!isset($this->_req->query->sa))
+		// redirect to the error log with reverse order by default instead of
+		// mutating the request object.
+		if (!$this->_req->hasQuery('sa') && !$this->_req->hasQuery('desc'))
 		{
-			$this->_req->query->desc = true;
+			redirectexit('action=admin;area=logs;sa=errorlog;desc');
 		}
 
 		// Set up the action control
@@ -141,7 +142,7 @@ class AdminLog extends AbstractController
 		call_integration_hook('integrate_prune_settings');
 
 		// Saving?
-		if (isset($this->_req->query->save))
+		if ($this->_req->hasQuery('save'))
 		{
 			checkSession();
 

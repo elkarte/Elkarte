@@ -101,7 +101,8 @@ class MergeTopics extends AbstractController
 		$topiccount = countTopicsByBoard($target_board, $onlyApproved);
 
 		// Make the page list.
-		$context['page_index'] = constructPageIndex('{scripturl}?action=mergetopics;from=' . $from . ';targetboard=' . $target_board . ';board=' . $board . '.%1$d', $this->_req->query->start, $topiccount, $modSettings['defaultMaxTopics'], true);
+		$start = $this->_req->getQuery('start', 'intval', 0);
+		$context['page_index'] = constructPageIndex('{scripturl}?action=mergetopics;from=' . $from . ';targetboard=' . $target_board . ';board=' . $board . '.%1$d', $start, $topiccount, $modSettings['defaultMaxTopics'], true);
 
 		// Get the topic's subject.
 		$topic_info = getTopicInfo($from, 'message');
@@ -150,7 +151,7 @@ class MergeTopics extends AbstractController
 		}
 
 		// Get some topics to merge it with.
-		$context['topics'] = mergeableTopics($target_board, $from, $onlyApproved, $this->_req->query->start);
+		$context['topics'] = mergeableTopics($target_board, $from, $onlyApproved, $start);
 
 		if (empty($context['topics']) && count($context['boards']) <= 1)
 		{
@@ -191,15 +192,21 @@ class MergeTopics extends AbstractController
 		require_once(SUBSDIR . '/Post.subs.php');
 
 		// Handle URLs from action_mergeIndex.
-		if (!empty($this->_req->query->from) && !empty($this->_req->query->to))
+		if ($this->_req->hasQuery('from') && $this->_req->hasQuery('to'))
 		{
-			$topics = [(int) $this->_req->query->from, (int) $this->_req->query->to];
+			$from = $this->_req->getQuery('from', 'intval', 0);
+			$to = $this->_req->getQuery('to', 'intval', 0);
+			if (!empty($from) && !empty($to))
+			{
+				$topics = [$from, $to];
+			}
 		}
 
 		// If we came from a form, the topic IDs came by post.
-		if (!empty($this->_req->post->topics) && is_array($this->_req->post->topics))
+		$posted_topics = $this->_req->getPost('topics', null, []);
+		if (!empty($posted_topics) && is_array($posted_topics))
 		{
-			$topics = $this->_req->post->topics;
+			$topics = $posted_topics;
 		}
 
 		// There's nothing to merge with just one topic...
@@ -267,7 +274,8 @@ class MergeTopics extends AbstractController
 			}
 		}
 
-		if (empty($this->_req->query->sa) || $this->_req->query->sa === 'options')
+		$sa = $this->_req->getQuery('sa', 'trim|strval', '');
+		if ($sa === '' || $sa === 'options')
 		{
 			$context['polls'] = $merger->getPolls();
 			$context['topics'] = $merger->topic_data;
@@ -317,8 +325,8 @@ class MergeTopics extends AbstractController
 		global $txt, $context;
 
 		// Make sure the template knows everything...
-		$context['target_board'] = (int) $this->_req->query->targetboard;
-		$context['target_topic'] = (int) $this->_req->query->to;
+		$context['target_board'] = $this->_req->getQuery('targetboard', 'intval', 0);
+		$context['target_topic'] = $this->_req->getQuery('to', 'intval', 0);
 
 		$context['page_title'] = $txt['merge'];
 		$context['sub_template'] = 'merge_done';

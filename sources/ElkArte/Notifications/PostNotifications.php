@@ -116,7 +116,7 @@ class PostNotifications extends AbstractModel
 			trigger_error('sendNotifications(): topics not found', E_USER_NOTICE);
 		}
 
-		// Just in case they've gone walkies, or trying to get to something they no longer can
+		// Just in case they've gone walkies, or were trying to get to something they no longer can
 		$topics = array_keys($topicData);
 		if (empty($topics))
 		{
@@ -233,7 +233,7 @@ class PostNotifications extends AbstractModel
 					continue;
 				}
 
-				// Don't if they don't have notification permissions
+				// Don't if they don't have notification or board permissions
 				$email_perm = true;
 				if (!validateNotificationAccess($notifyDatum, true, $email_perm))
 				{
@@ -332,6 +332,7 @@ class PostNotifications extends AbstractModel
 
 	/**
 	 * Creates the replacement strings for use in email templates
+	 * Will run this parsebbc if HTML is set
 	 *
 	 * @param array $topicDatum
 	 * @param array $notifyDatum
@@ -342,7 +343,7 @@ class PostNotifications extends AbstractModel
 	 */
 	private function setTemplateReplacements($topicDatum, $notifyDatum, $id, $type = 'reply', $area = 'topic'): array
 	{
-		global $scripturl, $txt;
+		global $scripturl, $txt, $modSettings;
 
 		$mailPreparse = new PreparseMail();
 
@@ -391,9 +392,19 @@ class PostNotifications extends AbstractModel
 		{
 			$body = $topicDatum['body'];
 
-			// Any attachments? if so lets make a big deal about them!
-			if (!empty($topicDatum['attachments']))
+			// Any attachments? if so, let's make a big deal about them!
+			if (!empty($topicDatum['attachments']) && !empty($modSettings['attachmentShowImages']) && !empty($modSettings['attachmentThumbnails']))
 			{
+				$id_thumbs = explode(',', $topicDatum['thumbs']);
+				$filtered = array_values(array_filter($id_thumbs));
+				$body .= "\n\n";
+
+				// Add a thumbnail image url (not linked) for each image attachment
+				foreach ($filtered as $id_thumb)
+				{
+					$body .= '<img src="' . $scripturl . '?action=dlattach;topic=' . $topicDatum['topic'] . ';attach=' . $id_thumb . ';image" alt="' . $txt['ila_opt_size_thumb'] . '" /> ';
+				}
+
 				$body .= "\n\n" . sprintf($txt['message_attachments'], $topicDatum['attachments'], $replacements['TOPICLINK']);
 			}
 

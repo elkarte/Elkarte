@@ -33,7 +33,7 @@ use ElkArte\User;
  * This class is the administration maillist controller.
  *
  *  - Handles maillist configuration
- *  - Handles the showing, repairing, deleting and bouncing failed emails
+ *  - Handles the showing, repairing, deleting, and bouncing failed emails
  *  - Handles the adding / editing / removing of both filters and parsers
  *
  * @package Maillist
@@ -46,7 +46,7 @@ class ManageMaillist extends AbstractController
 	 * This function checks permissions and passes control to the sub action.
 	 *
 	 * @event integrate_sa_manage_maillist Used to add more sub actions
-	 * @see AbstractController::action_index()
+	 * @see  AbstractController::action_index()
 	 * @uses Maillist template
 	 */
 	public function action_index()
@@ -530,7 +530,7 @@ class ManageMaillist extends AbstractController
 	{
 		global $context, $txt, $modSettings, $scripturl, $mbname;
 
-		if (isset($this->_req->query->bounce))
+		if ($this->_req->hasQuery('bounce'))
 		{
 			checkSession('get');
 			validateToken('admin-ml', 'get');
@@ -753,8 +753,8 @@ class ManageMaillist extends AbstractController
 			'additional_rows' => [
 				[
 					'position' => 'top_of_list',
-					'class' => isset($this->_req->query->saved) ? 'successbox' : '',
-					'value' => isset($this->_req->query->saved) ? $txt['saved'] : '',
+					'class' => $this->_req->hasQuery('saved') ? 'successbox' : '',
+					'value' => $this->_req->hasQuery('saved') ? $txt['saved'] : '',
 				],
 				[
 					'position' => 'below_table_data',
@@ -935,10 +935,10 @@ class ManageMaillist extends AbstractController
 		global $context, $txt, $modSettings;
 
 		// Editing an existing filter?
-		if (isset($this->_req->query->f_id))
+		if ($this->_req->hasQuery('f_id'))
 		{
 			// Needs to be an int!
-			$id = (int) $this->_req->query->f_id;
+			$id = $this->_req->getQuery('f_id', 'intval', 0);
 			if ($id <= 0)
 			{
 				throw new Exception('error_no_id_filter');
@@ -978,15 +978,17 @@ class ManageMaillist extends AbstractController
 		$settingsForm->setConfigVars($config_vars);
 
 		// Saving the new or edited entry?
-		if (isset($this->_req->query->save))
+		if ($this->_req->hasQuery('save'))
 		{
 			checkSession();
 
 			call_integration_hook('integrate_save_filter_settings');
 
 			// Editing an entry?
-			$editId = isset($this->_req->query->edit) && $this->_req->query->edit !== 'new' ? (int) $this->_req->query->edit : -1;
-			$editName = isset($this->_req->query->edit) && $this->_req->query->edit !== 'new' ? 'id_filter' : '';
+			$editRaw = $this->_req->getQuery('edit', 'trim|strval', '');
+			$isEdit = ($editRaw !== '' && $editRaw !== 'new');
+			$editId = $isEdit ? (int) $editRaw : -1;
+			$editName = $isEdit ? 'id_filter' : '';
 
 			// If its regex we do a quick check for validity
 			if ($this->_req->post->filter_type === 'regex')
@@ -1023,7 +1025,7 @@ class ManageMaillist extends AbstractController
 		}
 
 		// Prepare some final context for the template
-		$title = empty($this->_req->query->saved) ? ($context['editing'] === true ? 'edit_filter' : 'add_filter') : ('saved_filter');
+		$title = $this->_req->hasQuery('saved') ? 'saved_filter' : ($context['editing'] === true ? 'edit_filter' : 'add_filter');
 		$context['post_url'] = getUrl('admin', ['action' => 'admin', 'area' => 'maillist', 'sa' => 'editfilter', 'edit' => $context['editing'] ? $modSettings['id_filter'] : 'new', 'save']);
 		$context['settings_title'] = $txt[$title];
 		$context['breadcrumbs'][] = [
@@ -1085,10 +1087,10 @@ class ManageMaillist extends AbstractController
 	public function action_delete_filters(): void
 	{
 		// Removing the filter?
-		if (isset($this->_req->query->f_id))
+		if ($this->_req->hasQuery('f_id'))
 		{
 			checkSession('get');
-			$id = (int) $this->_req->query->f_id;
+			$id = $this->_req->getQuery('f_id', 'intval', 0);
 
 			maillist_delete_filter_parser($id);
 			redirectexit('action=admin;area=maillist;sa=emailfilters;deleted');
@@ -1206,15 +1208,15 @@ class ManageMaillist extends AbstractController
 			'additional_rows' => [
 				[
 					'position' => 'top_of_list',
-					'class' => isset($this->_req->query->saved) ? 'successbox' : '',
-					'value' => isset($this->_req->query->saved) ? $txt['saved'] : '',
+					'class' => $this->_req->hasQuery('saved') ? 'successbox' : '',
+					'value' => $this->_req->hasQuery('saved') ? $txt['saved'] : '',
 				],
 				[
 					'position' => 'below_table_data',
 					'class' => 'submitbutton',
 					'value' => '
-						<input type="submit" name="addparser" value="' . $txt['add_parser'] . '" />
-						<a class="linkbutton" href="' . getUrl('admin', ['action' => 'admin', 'area' => 'maillist', 'sa' => 'sortparsers']) . '">' . $txt['sort_parser'] . '</a>',
+                        <input type="submit" name="addparser" value="' . $txt['add_parser'] . '" />
+                        <a class="linkbutton" href="' . getUrl('admin', ['action' => 'admin', 'area' => 'maillist', 'sa' => 'sortparsers']) . '">' . $txt['sort_parser'] . '</a>',
 				],
 			],
 		];
@@ -1345,10 +1347,10 @@ class ManageMaillist extends AbstractController
 		global $context, $txt, $modSettings;
 
 		// Editing an existing filter?
-		if (isset($this->_req->query->f_id))
+		if ($this->_req->hasQuery('f_id'))
 		{
 			// Needs to be an int!
-			$id = (int) $this->_req->query->f_id;
+			$id = $this->_req->getQuery('f_id', 'intval', 0);
 			if ($id <= 0)
 			{
 				throw new Exception('error_no_id_filter');
@@ -1385,15 +1387,16 @@ class ManageMaillist extends AbstractController
 		$settingsForm->setConfigVars($config_vars);
 
 		// Check if they are saving the changes
-		if (isset($this->_req->query->save))
+		if ($this->_req->hasQuery('save'))
 		{
 			checkSession();
 
 			call_integration_hook('integrate_save_parser_settings');
 
 			// Editing a parser?
-			$editId = isset($this->_req->query->edit) && $this->_req->query->edit !== 'new' ? (int) $this->_req->query->edit : -1;
-			$editName = isset($this->_req->query->edit) && $this->_req->query->edit !== 'new' ? 'id_filter' : '';
+			$editRaw = $this->_req->hasQuery('edit') ? $this->_req->getQuery('edit', 'trim|strval', '') : '';
+			$editId = ($editRaw !== '' && $editRaw !== 'new') ? (int) $editRaw : -1;
+			$editName = ($editRaw !== '' && $editRaw !== 'new') ? 'id_filter' : '';
 
 			// Test the regex
 			if ($this->_req->post->filter_type === 'regex' && !empty($this->_req->post->filter_from))
@@ -1431,7 +1434,7 @@ class ManageMaillist extends AbstractController
 		}
 
 		// Prepare the context for viewing
-		$title = ((isset($this->_req->query->saved) && $this->_req->query->saved == '1') ? 'saved_parser' : ($context['editing'] === true ? 'edit_parser' : 'add_parser'));
+		$title = ($this->_req->hasQuery('saved') && $this->_req->getQuery('saved', 'trim|strval', '') == '1') ? 'saved_parser' : ($context['editing'] === true ? 'edit_parser' : 'add_parser');
 		$context['settings_title'] = $txt[$title];
 		$context['post_url'] = getUrl('admin', ['action' => 'admin', 'area' => 'maillist', 'sa' => 'editparser', 'edit' => $context['editing'] ? $modSettings['id_filter'] : 'new', 'save']);
 		$context['breadcrumbs'][] = [
@@ -1492,10 +1495,10 @@ class ManageMaillist extends AbstractController
 	public function action_delete_parsers(): void
 	{
 		// Removing the filter?
-		if (isset($this->_req->query->f_id))
+		if ($this->_req->hasQuery('f_id'))
 		{
 			checkSession('get');
-			$id = (int) $this->_req->query->f_id;
+			$id = $this->_req->getQuery('f_id', 'intval', 0);
 
 			maillist_delete_filter_parser($id);
 			redirectexit('action=admin;area=maillist;sa=emailparser;deleted');
@@ -1513,7 +1516,7 @@ class ManageMaillist extends AbstractController
 		global $context, $txt, $modSettings;
 
 		// Be nice, show them we did something
-		if (isset($this->_req->query->saved))
+		if ($this->_req->hasQuery('saved'))
 		{
 			$context['settings_message'] = $txt['saved'];
 		}
@@ -1542,7 +1545,7 @@ class ManageMaillist extends AbstractController
 		$settingsForm->setConfigVars($this->_settings());
 
 		// Saving settings?
-		if (isset($this->_req->query->save))
+		if ($this->_req->hasQuery('save'))
 		{
 			checkSession();
 
@@ -1773,7 +1776,7 @@ class ManageMaillist extends AbstractController
 		require_once(SUBSDIR . '/Moderation.subs.php');
 
 		// Submitting a new one or editing an existing one then pass this request off
-		if (isset($this->_req->post->add) || isset($this->_req->post->save) || isset($this->_req->query->tid))
+		if ($this->_req->hasPost('add') || $this->_req->hasPost('save') || $this->_req->hasQuery('tid'))
 		{
 			return $this->action_modify_bounce_templates();
 		}
@@ -1896,7 +1899,7 @@ class ManageMaillist extends AbstractController
 
 		require_once(SUBSDIR . '/Moderation.subs.php');
 
-		$context['id_template'] = isset($this->_req->query->tid) ? (int) $this->_req->query->tid : 0;
+		$context['id_template'] = $this->_req->getQuery('tid', 'intval', 0);
 		$context['is_edit'] = (bool) $context['id_template'];
 
 		// Standard template things, you know the drill
@@ -1921,7 +1924,7 @@ class ManageMaillist extends AbstractController
 		}
 
 		// Wait, we are saving?
-		if (isset($this->_req->post->save))
+		if ($this->_req->hasPost('save'))
 		{
 			checkSession('post');
 			validateToken('mod-mlt');

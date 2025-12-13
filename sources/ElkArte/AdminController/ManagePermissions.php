@@ -183,7 +183,7 @@ class ManagePermissions extends AbstractController
 		$listOptions = [
 			'id' => 'regular_membergroups_list',
 			'title' => $txt['membergroups_regular'],
-			'base_href' => getUrl('admin', ['action' => 'admin', 'area' => 'permissions', 'sa' => 'index'] + (isset($this->_req->query->sort2) ? ['sort2' => $this->_req->query->sort2] : []) + ($this->_pid !== null ? ['pid' => $this->_pid] : [])),
+			'base_href' => getUrl('admin', ['action' => 'admin', 'area' => 'permissions', 'sa' => 'index'] + ($this->_req->hasQuery('sort2') ? ['sort2' => $this->_req->getQuery('sort2', 'trim')] : []) + ($this->_pid !== null ? ['pid' => $this->_pid] : [])),
 			'default_sort_col' => 'name',
 			'get_items' => [
 				'file' => SUBSDIR . '/Membergroups.subs.php',
@@ -332,7 +332,7 @@ class ManagePermissions extends AbstractController
 			$listOptions = [
 				'id' => 'post_count_membergroups_list',
 				'title' => $txt['membergroups_post'],
-				'base_href' => getUrl('admin', ['action' => 'admin', 'area' => 'permissions', 'sa' => 'index'] + (isset($this->_req->query->sort) ? ['sort' => $this->_req->query->sort] : []) + ($this->_pid !== null ? ['pid' => $this->_pid] : [])),
+				'base_href' => getUrl('admin', ['action' => 'admin', 'area' => 'permissions', 'sa' => 'index'] + ($this->_req->hasQuery('sort') ? ['sort' => $this->_req->getQuery('sort', 'trim')] : []) + ($this->_pid !== null ? ['pid' => $this->_pid] : [])),
 				'default_sort_col' => 'required_posts',
 				'request_vars' => [
 					'sort' => 'sort2',
@@ -493,7 +493,7 @@ class ManagePermissions extends AbstractController
 		require_once(SUBSDIR . '/ManagePermissions.subs.php');
 
 		$context['page_title'] = $txt['permissions_boards'];
-		$context['edit_all'] = isset($this->_req->query->edit);
+		$context['edit_all'] = $this->_req->hasQuery('edit');
 
 		// Saving?
 		if (!empty($this->_req->post->save_changes) && !empty($this->_req->post->boardprofile))
@@ -744,16 +744,16 @@ class ManagePermissions extends AbstractController
 	{
 		global $context, $txt;
 
-		if (!isset($this->_req->query->group))
+		if (!$this->_req->hasQuery('group'))
 		{
 			throw new Exception('no_access', false);
 		}
 
 		require_once(SUBSDIR . '/ManagePermissions.subs.php');
-		$context['group']['id'] = (int) $this->_req->query->group;
+		$context['group']['id'] = $this->_req->getQuery('group', 'intval', 0);
 
 		// It's not likely you'd end up here with this setting disabled.
-		if ((int) $this->_req->query->group === 1)
+		if ($context['group']['id'] === 1)
 		{
 			redirectexit('action=admin;area=permissions');
 		}
@@ -814,7 +814,7 @@ class ManagePermissions extends AbstractController
 		// General permissions?
 		if ($context['permission_type'] === 'membergroup')
 		{
-			$permissions['membergroup'] = fetchPermissions($this->_req->query->group);
+			$permissions['membergroup'] = fetchPermissions($context['group']['id']);
 		}
 
 		// Fetch current board permissions...
@@ -978,7 +978,7 @@ class ManagePermissions extends AbstractController
 		$context['post_url'] = getUrl('admin', ['action' => 'admin', 'area' => 'permissions', 'save', 'sa' => 'settings']);
 
 		// Saving the settings?
-		if (isset($this->_req->query->save))
+		if ($this->_req->hasQuery('save'))
 		{
 			checkSession('post');
 			call_integration_hook('integrate_save_permission_settings');

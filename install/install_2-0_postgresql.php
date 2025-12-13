@@ -13,7 +13,7 @@
  */
 
 /**
- * Install script for PostgreSQL 8.3+
+ * Install script for PostgreSQL 9.0+
  *
  * Create PostgreSQL functions. Some taken from
  * https://www.xach.com/aolserver/mysql-functions.sql and

@@ -418,7 +418,7 @@ class HttpReq
 
 		if ($type === 'query' || $type === 'both')
 		{
-			unset($this->post->{$name});
+			unset($this->query->{$name});
 		}
 	}
 

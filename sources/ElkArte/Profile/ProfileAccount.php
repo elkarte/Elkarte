@@ -250,7 +250,7 @@ class ProfileAccount extends AbstractController
 	{
 		global $txt, $context, $cur_profile;
 
-		if (isset($this->_req->post->save))
+		if ($this->_req->hasPost('save'))
 		{
 			// Security is good here.
 			checkSession();

@@ -298,7 +298,7 @@ class Display extends AbstractController
 		}
 
 		// Did we report a post to a moderator just now?
-		if (isset($this->_req->query->reportsent))
+		if ($this->_req->hasQuery('reportsent'))
 		{
 			$this->_template_layers->add('report_sent');
 		}
@@ -491,14 +491,14 @@ class Display extends AbstractController
 		global $context;
 
 		// Need to send the user to the new location?
-		if (!empty($this->topicinfo['id_redirect_topic']) && !isset($this->_req->query->noredir))
+		if (!empty($this->topicinfo['id_redirect_topic']) && !$this->_req->hasQuery('noredir'))
 		{
 			markTopicsRead([$this->user->id, $this->topicinfo['id_topic'], $this->topicinfo['id_last_msg'], 0], $this->topicinfo['new_from'] !== 0);
 			redirectexit('topic=' . $this->topicinfo['id_redirect_topic'] . '.0;redirfrom=' . $this->topicinfo['id_topic']);
 		}
 
 		// Or are we here because we were redirected?
-		if (isset($this->_req->query->redirfrom))
+		if ($this->_req->hasQuery('redirfrom'))
 		{
 			$redirfrom = $this->_req->getQuery('redirfrom', 'intval');
 			$redir_topics = topicsList([$redirfrom]);
@@ -1073,12 +1073,12 @@ class Display extends AbstractController
 		$messages = array_map('intval', $this->_req->post->msgs);
 
 		// We are restoring messages. We handle this in another place.
-		if (isset($this->_req->query->restore_selected))
+		if ($this->_req->hasQuery('restore_selected'))
 		{
 			redirectexit('action=restoretopic;msgs=' . implode(',', $messages) . ';' . $context['session_var'] . '=' . $context['session_id']);
 		}
 
-		if (isset($this->_req->query->split_selection))
+		if ($this->_req->hasQuery('split_selection'))
 		{
 			$mgsOptions = basicMessageInfo(min($messages), true);
 

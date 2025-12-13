@@ -160,21 +160,23 @@ class ManageNews extends AbstractController
 		{
 			checkSession();
 
-			foreach ($this->_req->post->news as $i => $news)
+			// Work on a local copy to avoid mutating the request object
+			$news_items = (array) $this->_req->getPost('news', null, []);
+			foreach ($news_items as $i => $news)
 			{
 				if (trim($news) === '')
 				{
-					unset($this->_req->post->news[$i]);
+					unset($news_items[$i]);
 				}
 				else
 				{
-					$this->_req->post->news[$i] = Util::htmlspecialchars($this->_req->post->news[$i], ENT_QUOTES);
-					preparsecode($this->_req->post->news[$i]);
+					$news_items[$i] = Util::htmlspecialchars($news_items[$i], ENT_QUOTES);
+					preparsecode($news_items[$i]);
 				}
 			}
 
 			// Send the new news to the database.
-			updateSettings(['news' => implode("\n", $this->_req->post->news)]);
+			updateSettings(['news' => implode("\n", $news_items)]);
 
 			// Log this into the moderation log.
 			logAction('news');
@@ -263,8 +265,8 @@ class ManageNews extends AbstractController
 
 		theme()->addJavascriptVar([
 			'last_preview' => 0,
-		    'txt_preview' => JavaScriptEscape($txt['preview']),
-		    'txt_news_error_no_news' => JavaScriptEscape($txt['news_error_no_news'])]);
+			'txt_preview' => JavaScriptEscape($txt['preview']),
+			'txt_news_error_no_news' => JavaScriptEscape($txt['news_error_no_news'])]);
 
 		// Create the request list.
 		createList($listOptions);
@@ -563,7 +565,7 @@ class ManageNews extends AbstractController
 		global $txt, $context, $scripturl, $modSettings;
 
 		// A nice successful screen if you did it
-		if (isset($this->_req->query->success))
+		if ($this->_req->hasQuery('success'))
 		{
 			$context['sub_template'] = 'email_members_succeeded';
 			theme()->getTemplates()->load('ManageNews');
@@ -978,7 +980,7 @@ class ManageNews extends AbstractController
 		$context['post_url'] = getUrl('admin', ['action' => 'admin', 'area' => 'news', 'save', 'sa' => 'settings']);
 
 		// Saving the settings?
-		if (isset($this->_req->query->save))
+		if ($this->_req->hasQuery('save'))
 		{
 			checkSession();
 

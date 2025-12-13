@@ -108,7 +108,7 @@ class SplitTopics extends AbstractController
 		$splitAt = $this->_req->getQuery('at', 'intval', 0);
 
 		// Validate "at".
-		if (empty($this->_req->query->at))
+		if (!$this->_req->hasQuery('at'))
 		{
 			throw new Exception('numbers_one_to_nine', false);
 		}

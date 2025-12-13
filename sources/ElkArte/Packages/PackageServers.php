@@ -258,8 +258,8 @@ class PackageServers extends AbstractController
 	{
 		global $txt, $context;
 
-		// Want to browsing the packages from the addon server
-		if (isset($this->_req->query->server))
+		// Want to browse the packages from the addon server
+		if ($this->_req->hasQuery('server'))
 		{
 			[$name, $url] = $this->_package_server();
 		}
@@ -445,7 +445,7 @@ class PackageServers extends AbstractController
 		$context['sub_template'] = 'downloaded';
 
 		// Security is good...
-		checkSession(isset($this->_req->query->server) ? 'get' : '');
+		checkSession($this->_req->hasQuery('server') ? 'get' : '');
 
 		// To download something, we need either a valid server or url.
 		if (empty($this->_req->query->server)
@@ -459,7 +459,7 @@ class PackageServers extends AbstractController
 		$name = '';
 
 		// Download from a package server?
-		if (isset($this->_req->query->server))
+		if ($this->_req->hasQuery('server'))
 		{
 			[$name, $url] = $this->_package_server();
 
@@ -517,7 +517,7 @@ class PackageServers extends AbstractController
 		}
 
 		// Avoid over writing any existing package files of the same name
-		if (isset($this->_req->query->conflict) || (isset($this->_req->query->auto) && $this->fileFunc->fileExists(BOARDDIR . '/packages/' . $package_name)))
+		if ($this->_req->hasQuery('conflict') || ($this->_req->hasQuery('auto') && $this->fileFunc->fileExists(BOARDDIR . '/packages/' . $package_name)))
 		{
 			// Find the extension, change abc.tar.gz to abc_1.tar.gz...
 			$ext = '';
@@ -543,9 +543,9 @@ class PackageServers extends AbstractController
 			[BOARDDIR . '/packages/' . $package_name],
 			[
 				'destination_url' => getUrl('admin', ['action' => 'admin', 'area' => 'packageservers', 'sa' => 'download', 'package' => $package_id, '{session_data}']
-					+ (isset($this->_req->query->server) ? ['server' => $this->_req->query->server] : [])
-					+ (isset($this->_req->query->auto) ? ['auto' => ''] : [])
-					+ (isset($this->_req->query->conflict) ? ['conflict' => ''] : [])),
+					+ ($this->_req->hasQuery('server') ? ['server' => $this->_req->query->server] : [])
+					+ ($this->_req->hasQuery('auto') ? ['auto' => ''] : [])
+					+ ($this->_req->hasQuery('conflict') ? ['conflict' => ''] : [])),
 				'crash_on_error' => true
 			]
 		);
@@ -561,6 +561,16 @@ class PackageServers extends AbstractController
 		if (!is_array($context['package']))
 		{
 			throw new Exception('package_cant_download', false);
+		}
+
+		// Ensure nested structures are arrays before assigning nested offsets
+		if (empty($context['package']['install']) || !is_array($context['package']['install']))
+		{
+			$context['package']['install'] = [];
+		}
+		if (empty($context['package']['list_files']) || !is_array($context['package']['list_files']))
+		{
+			$context['package']['list_files'] = [];
 		}
 
 		$context['package']['install']['link'] = '';
@@ -678,6 +688,16 @@ class PackageServers extends AbstractController
 		catch (UnexpectedValueException)
 		{
 			// @todo for now do nothing...
+		}
+
+		// Ensure nested structures are arrays before assigning nested offsets
+		if (empty($context['package']['install']) || !is_array($context['package']['install']))
+		{
+			$context['package']['install'] = [];
+		}
+		if (empty($context['package']['list_files']) || !is_array($context['package']['list_files']))
+		{
+			$context['package']['list_files'] = [];
 		}
 
 		$context['package']['install']['link'] = '';

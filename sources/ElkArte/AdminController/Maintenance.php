@@ -74,9 +74,9 @@ class Maintenance extends AbstractController
 		// This uses admin tabs - as it should!
 		// Create the tabs
 		$context[$context['admin_menu_name']]['object']->prepareTabData([
-			'title' => 'maintain_title',
-			'description' => 'maintain_info',
-			'class' => 'i-cog']
+				'title' => 'maintain_title',
+				'description' => 'maintain_info',
+				'class' => 'i-cog']
 		);
 
 		// So many things you can do - but frankly I won't let you - just these!
@@ -471,7 +471,7 @@ class Maintenance extends AbstractController
 		if (!isset($this->_req->post->do_conversion) || isset($this->_req->post->cont))
 		{
 			checkSession();
-			if (empty($this->_req->query->start))
+			if (!$this->_req->hasQuery('start'))
 			{
 				validateToken('admin-maint');
 			}
@@ -488,7 +488,7 @@ class Maintenance extends AbstractController
 			$increment = 500;
 			$id_msg_exceeding = isset($this->_req->post->id_msg_exceeding) ? explode(',', $this->_req->post->id_msg_exceeding) : [];
 			$max_msgs = countMessages();
-			$start = $this->_req->query->start;
+			$start = $this->_req->getQuery('start', 'intval', 0);
 
 			// Try for as much time as possible.
 			detectServer()->setTimeLimit(600);
@@ -627,7 +627,7 @@ class Maintenance extends AbstractController
 		require_once(SUBSDIR . '/Topic.subs.php');
 
 		// Validate the request or the loop
-		if (!isset($this->_req->query->step))
+		if (!$this->_req->hasQuery('step'))
 		{
 			validateToken('admin-maint');
 		}
@@ -803,7 +803,8 @@ class Maintenance extends AbstractController
 		{
 			while ($this->start < $modSettings['maxMsgID'])
 			{
-				updateMessagesBoardID($this->_req->query->start, $this->increment);
+				// Use the controller's start pointer, not raw request
+				updateMessagesBoardID($this->start, $this->increment);
 				$this->start += $this->increment;
 
 				if (microtime(true) - $time_start > 3)
@@ -1228,7 +1229,7 @@ class Maintenance extends AbstractController
 		}
 		else
 		{
-			$total_topics = (int) $this->_req->query->totaltopics;
+			$total_topics = $this->_req->getQuery('totaltopics', 'intval');
 			validateToken('admin_movetopics');
 		}
 
@@ -1292,10 +1293,11 @@ class Maintenance extends AbstractController
 
 		// Get the list of the current system hooks, filter them if needed
 		$currentHooks = get_integration_hooks();
-		if (isset($this->_req->query->filter) && array_key_exists($this->_req->query->filter, $currentHooks))
+		$filter = $this->_req->getQuery('filter', 'trim', '');
+		if (array_key_exists($filter, $currentHooks))
 		{
-			$context['filter_url'] = ';filter=' . $this->_req->query->filter;
-			$context['current_filter'] = $this->_req->query->filter;
+			$context['filter_url'] = ';filter=' . $filter;
+			$context['current_filter'] = $filter;
 		}
 
 		$list_options = [

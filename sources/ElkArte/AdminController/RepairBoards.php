@@ -73,14 +73,14 @@ class RepairBoards extends AbstractController
 		]);
 
 		// Start displaying errors without fixing them.
-		if (isset($this->_req->query->fixErrors))
+		if ($this->_req->hasQuery('fixErrors'))
 		{
 			checkSession('get');
 		}
 
 		// Giant if/else. The first displays the forum errors if a variable is not set and asks
 		// if you would like to continue, the other fixes the errors.
-		if (!isset($this->_req->query->fixErrors))
+		if (!$this->_req->hasQuery('fixErrors'))
 		{
 			$context['error_search'] = true;
 			$context['repair_errors'] = [];

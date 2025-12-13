@@ -95,7 +95,7 @@ class Notify extends AbstractController
 		}
 
 		// What do we do?  Better ask if they didn't say..
-		if (empty($this->_req->query->sa))
+		if (!$this->_req->hasQuery('sa'))
 		{
 			// Load the template, but only if it is needed.
 			theme()->getTemplates()->load('Notify');
@@ -104,8 +104,9 @@ class Notify extends AbstractController
 			$context['notification_set'] = hasTopicNotification($this->user->id, $topic);
 
 			// Set the template variables...
-			$context['topic_href'] = getUrl('action', ['topic' => $topic . '.' . $this->_req->query->start]);
-			$context['start'] = $this->_req->query->start;
+			$start = $this->_req->getQuery('start', 'intval', 0);
+			$context['topic_href'] = getUrl('action', ['topic' => $topic . '.' . $start]);
+			$context['start'] = $start;
 			$context['page_title'] = $txt['notifications'];
 			$context['sub_template'] = 'notification_settings';
 
@@ -116,7 +117,8 @@ class Notify extends AbstractController
 		$this->_toggle_topic_notification();
 
 		// Send them back to the topic.
-		redirectexit('topic=' . $topic . '.' . $this->_req->query->start);
+		$start = $this->_req->getQuery('start', 'intval', 0);
+		redirectexit('topic=' . $topic . '.' . $start);
 
 		return true;
 	}
@@ -124,12 +126,13 @@ class Notify extends AbstractController
 	/**
 	 * Toggle a topic notification on/off
 	 */
-	private function _toggle_topic_notification($memID = null): void
+	private function _toggle_topic_notification($memID = null, $enable = null): void
 	{
 		global $topic;
 
 		// Attempt to turn notifications on/off.
-		setTopicNotification($memID ?? $this->user->id, $topic, $this->_req->query->sa === 'on');
+		$isOn = $enable !== null ? $enable : ($this->_req->getQuery('sa', 'trim|strval', '') === 'on');
+		setTopicNotification($memID ?? $this->user->id, $topic, $isOn);
 	}
 
 	/**
@@ -159,7 +162,7 @@ class Notify extends AbstractController
 		}
 
 		// And members still need the right permissions
-		if (!allowedTo('mark_any_notify') || empty($topic) || empty($this->_req->query->sa))
+		if (!allowedTo('mark_any_notify') || empty($topic) || !$this->_req->hasQuery('sa'))
 		{
 			Txt::load('Errors');
 			$context['xml_data'] = [
@@ -174,9 +177,11 @@ class Notify extends AbstractController
 		if (checkSession('get', '', false))
 		{
 			Txt::load('Errors');
+			$sa = $this->_req->getQuery('sa', 'trim|strval', '');
+			$start = $this->_req->getQuery('start', 'intval', 0);
 			$context['xml_data'] = [
 				'error' => 1,
-				'url' => getUrl('action', ['action' => 'notify', 'sa' => ($this->_req->query->sa === 'on' ? 'on' : 'off'), 'topic' => $topic . '.' . $this->_req->query->start, '{session_data}']),
+				'url' => getUrl('action', ['action' => 'notify', 'sa' => ($sa === 'on' ? 'on' : 'off'), 'topic' => $topic . '.' . $start, '{session_data}']),
 			];
 
 			return;
@@ -185,10 +190,12 @@ class Notify extends AbstractController
 		$this->_toggle_topic_notification();
 
 		// Return the results so the UI can be updated properly
+		$sa = $this->_req->getQuery('sa', 'trim|strval', '');
+		$start = $this->_req->getQuery('start', 'intval', 0);
 		$context['xml_data'] = [
-			'text' => $this->_req->query->sa === 'on' ? $txt['unnotify'] : $txt['notify'],
-			'url' => getUrl('action', ['action' => 'notify', 'sa' => ($this->_req->query->sa === 'on' ? 'off' : 'on'), 'topic' => $topic . '.' . $this->_req->query->start, '{session_data}', 'api' => '1']),
-			'confirm' => $this->_req->query->sa === 'on' ? $txt['notification_disable_topic'] : $txt['notification_enable_topic']
+			'text' => $sa === 'on' ? $txt['unnotify'] : $txt['notify'],
+			'url' => getUrl('action', ['action' => 'notify', 'sa' => ($sa === 'on' ? 'off' : 'on'), 'topic' => $topic . '.' . $start, '{session_data}', 'api' => '1']),
+			'confirm' => $sa === 'on' ? $txt['notification_disable_topic'] : $txt['notification_enable_topic']
 		];
 	}
 
@@ -227,7 +234,7 @@ class Notify extends AbstractController
 		}
 
 		// No subaction: find out what to do.
-		if (empty($this->_req->query->sa))
+		if (!$this->_req->hasQuery('sa'))
 		{
 			// We're gonna need the notify template...
 			theme()->getTemplates()->load('Notify');
@@ -236,8 +243,9 @@ class Notify extends AbstractController
 			$context['notification_set'] = hasBoardNotification($this->user->id, $board);
 
 			// Set the template variables...
-			$context['board_href'] = getUrl('action', ['board' => $board . '.' . $this->_req->query->start]);
-			$context['start'] = $this->_req->query->start;
+			$start = $this->_req->getQuery('start', 'intval', 0);
+			$context['board_href'] = getUrl('action', ['board' => $board . '.' . $start]);
+			$context['start'] = $start;
 			$context['page_title'] = $txt['notifications'];
 			$context['sub_template'] = 'notify_board';
 
@@ -250,7 +258,8 @@ class Notify extends AbstractController
 		$this->_toggle_board_notification();
 
 		// Back to the board!
-		redirectexit('board=' . $board . '.' . $this->_req->query->start);
+		$start = $this->_req->getQuery('start', 'intval', 0);
+		redirectexit('board=' . $board . '.' . $start);
 
 		return null;
 	}
@@ -258,7 +267,7 @@ class Notify extends AbstractController
 	/**
 	 * Toggle a board notification on/off
 	 */
-	private function _toggle_board_notification($memID = null): void
+	private function _toggle_board_notification($memID = null, $enable = null): void
 	{
 		global $board;
 
@@ -266,7 +275,8 @@ class Notify extends AbstractController
 		require_once(SUBSDIR . '/Boards.subs.php');
 
 		// Turn notification on/off for this board.
-		setBoardNotification($memID ?? $this->user->id, $board, $this->_req->query->sa === 'on');
+		$isOn = $enable !== null ? $enable : ($this->_req->getQuery('sa', 'trim|strval', '') === 'on');
+		setBoardNotification($memID ?? $this->user->id, $board, $isOn);
 	}
 
 	/**
@@ -297,7 +307,7 @@ class Notify extends AbstractController
 		}
 
 		// Have to have provided the right information
-		if (!allowedTo('mark_notify') || empty($board) || empty($this->_req->query->sa))
+		if (!allowedTo('mark_notify') || empty($board) || !$this->_req->hasQuery('sa'))
 		{
 			Txt::load('Errors');
 			$context['xml_data'] = [
@@ -312,9 +322,11 @@ class Notify extends AbstractController
 		if (checkSession('get', '', false))
 		{
 			Txt::load('Errors');
+			$sa = $this->_req->getQuery('sa', 'trim|strval', '');
+			$start = $this->_req->getQuery('start', 'intval', 0);
 			$context['xml_data'] = [
 				'error' => 1,
-				'url' => getUrl('action', ['action' => 'notifyboard', 'sa' => ($this->_req->query->sa === 'on' ? 'on' : 'off'), 'board' => $board . '.' . $this->_req->query->start, '{session_data}']),
+				'url' => getUrl('action', ['action' => 'notifyboard', 'sa' => ($sa === 'on' ? 'on' : 'off'), 'board' => $board . '.' . $start, '{session_data}']),
 			];
 
 			return;
@@ -322,10 +334,12 @@ class Notify extends AbstractController
 
 		$this->_toggle_board_notification();
 
+		$sa = $this->_req->getQuery('sa', 'trim|strval', '');
+		$start = $this->_req->getQuery('start', 'intval', 0);
 		$context['xml_data'] = [
-			'text' => $this->_req->query->sa === 'on' ? $txt['unnotify'] : $txt['notify'],
-			'url' => getUrl('action', ['action' => 'notifyboard', 'sa' => ($this->_req->query->sa === 'on' ? 'off' : 'on'), 'board' => $board . '.' . $this->_req->query->start, '{session_data}', 'api' => '1'] + (isset($_REQUEST['json']) ? ['json'] : [])),
-			'confirm' => $this->_req->query->sa === 'on' ? $txt['notification_disable_board'] : $txt['notification_enable_board']
+			'text' => $sa === 'on' ? $txt['unnotify'] : $txt['notify'],
+			'url' => getUrl('action', ['action' => 'notifyboard', 'sa' => ($sa === 'on' ? 'off' : 'on'), 'board' => $board . '.' . $start, '{session_data}', 'api' => '1'] + (isset($_REQUEST['json']) ? ['json'] : [])),
+			'confirm' => $sa === 'on' ? $txt['notification_disable_board'] : $txt['notification_enable_board']
 		];
 	}
 
@@ -361,7 +375,8 @@ class Notify extends AbstractController
 		}
 
 		// Back to the topic.
-		redirectexit('topic=' . $topic . '.' . $this->_req->query->start);
+		$start = $this->_req->getQuery('start', 'intval', 0);
+		redirectexit('topic=' . $topic . '.' . $start);
 	}
 
 	/**
@@ -371,7 +386,8 @@ class Notify extends AbstractController
 	{
 		global $topic;
 
-		setTopicWatch($this->user->id, $topic, $this->_req->query->sa === 'on');
+		$sa = $this->_req->getQuery('sa', 'trim|strval', '');
+		setTopicWatch($this->user->id, $topic, $sa === 'on');
 	}
 
 	/**
@@ -416,9 +432,11 @@ class Notify extends AbstractController
 		if (checkSession('get', '', false))
 		{
 			Txt::load('Errors');
+			$sa = $this->_req->getQuery('sa', 'trim|strval', '');
+			$start = $this->_req->getQuery('start', 'intval', 0);
 			$context['xml_data'] = [
 				'error' => 1,
-				'url' => getUrl('action', ['action' => 'unwatchtopic', 'sa' => ($this->_req->query->sa === 'on' ? 'on' : 'off'), 'topic' => $topic . '.' . $this->_req->query->start, '{session_data}'])
+				'url' => getUrl('action', ['action' => 'unwatchtopic', 'sa' => ($sa === 'on' ? 'on' : 'off'), 'topic' => $topic . '.' . $start, '{session_data}'])
 			];
 
 			return;
@@ -426,12 +444,14 @@ class Notify extends AbstractController
 
 		$this->_toggle_topic_watch();
 
+		$sa = $this->_req->getQuery('sa', 'trim|strval', '');
+		$start = $this->_req->getQuery('start', 'intval', 0);
 		$context['xml_data'] = [
-			'text' => $this->_req->query->sa === 'on' ? $txt['watch'] : $txt['unwatch'],
-			'url' => getUrl('action', ['action' => 'unwatchtopic', 'sa' => ($this->_req->query->sa === 'on' ? 'off' : 'on'), 'topic' => $context['current_topic'] . '.' . $this->_req->query->start, '{session_data}', 'api' => '1'] + (isset($_REQUEST['json']) ? ['json'] : [])),
+			'text' => $sa === 'on' ? $txt['watch'] : $txt['unwatch'],
+			'url' => getUrl('action', ['action' => 'unwatchtopic', 'sa' => ($sa === 'on' ? 'off' : 'on'), 'topic' => $context['current_topic'] . '.' . $start, '{session_data}', 'api' => '1'] + (isset($_REQUEST['json']) ? ['json'] : [])),
 		];
 
-		setTopicWatch($this->user->id, $topic, $this->_req->query->sa === 'on');
+		setTopicWatch($this->user->id, $topic, $sa === 'on');
 	}
 
 	/**
@@ -478,18 +498,18 @@ class Notify extends AbstractController
 			return $this->_unsubscribeModuleToggle($member, $area, $extra);
 		}
 
-		// Look away while we stuff the old ballet box, power to the people!
-		$this->_req->query->sa = 'off';
+		// Force-disable without mutating the request object
+		$forceDisable = false;
 
 		switch ($area)
 		{
 			case 'topic':
 				$topic = $extra;
-				$this->_toggle_topic_notification($member['id_member']);
+				$this->_toggle_topic_notification($member['id_member'], $forceDisable);
 				break;
 			case 'board':
 				$board = $extra;
-				$this->_toggle_board_notification($member['id_member']);
+				$this->_toggle_board_notification($member['id_member'], $forceDisable);
 				break;
 			case 'buddy':
 			case 'likemsg':

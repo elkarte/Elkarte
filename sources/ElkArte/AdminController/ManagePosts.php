@@ -69,20 +69,20 @@ class ManagePosts extends AbstractController
 
 		// Tabs for browsing the different post functions.
 		$context[$context['admin_menu_name']]['object']->prepareTabData([
-			'title' => 'manageposts_title',
-			'help' => 'posts_and_topics',
-			'description' => 'manageposts_description',
-			'tabs' => [
-				'posts' => [
-					'description' => $txt['manageposts_settings_description'],
-				],
-				'censor' => [
-					'description' => $txt['admin_censored_desc'],
-				],
-				'topics' => [
-					'description' => $txt['manageposts_topic_settings_description'],
-				],
-			]]
+				'title' => 'manageposts_title',
+				'help' => 'posts_and_topics',
+				'description' => 'manageposts_description',
+				'tabs' => [
+					'posts' => [
+						'description' => $txt['manageposts_settings_description'],
+					],
+					'censor' => [
+						'description' => $txt['admin_censored_desc'],
+					],
+					'topics' => [
+						'description' => $txt['manageposts_topic_settings_description'],
+					],
+				]]
 		);
 
 		// Call the right function for this sub-action.
@@ -105,7 +105,7 @@ class ManagePosts extends AbstractController
 	{
 		global $txt, $modSettings, $context;
 
-		if (!empty($this->_req->post->save_censor))
+		if ($this->_req->hasPost('save_censor'))
 		{
 			// Make sure censoring is something they can do.
 			checkSession();
@@ -115,34 +115,41 @@ class ManagePosts extends AbstractController
 			$censored_proper = [];
 
 			// Rip it apart, then split it into two arrays.
-			if (isset($this->_req->post->censortext))
+			if ($this->_req->hasPost('censortext'))
 			{
-				$this->_req->post->censortext = explode("\n", strtr($this->_req->post->censortext, ["\r" => '']));
-
-				foreach ($this->_req->post->censortext as $c)
+				$censorText = $this->_req->getPost('censortext', 'trim', '');
+				$censorText = explode("\n", strtr($censorText, ["\r" => '']));
+				foreach ($censorText as $c)
 				{
 					[$censored_vulgar[], $censored_proper[]] = array_pad(explode('=', trim($c)), 2, '');
 				}
 			}
-			elseif (isset($this->_req->post->censor_vulgar, $this->_req->post->censor_proper))
+			elseif ($this->_req->hasPost('censor_vulgar') && $this->_req->hasPost('censor_proper'))
 			{
-				if (is_array($this->_req->post->censor_vulgar))
+				$posted_vulgar = $this->_req->getPost('censor_vulgar', null, []);
+				if (is_array($posted_vulgar))
 				{
-					foreach ($this->_req->post->censor_vulgar as $i => $value)
+					// Work on local copies to avoid mutating the request
+					$local_vulgar = (array) $posted_vulgar;
+					$local_proper = (array) $this->_req->getPost('censor_proper', null, []);
+
+					foreach ($local_vulgar as $i => $value)
 					{
 						if (trim(str_replace('*', ' ', $value)) === '')
 						{
-							unset($this->_req->post->censor_vulgar[$i], $this->_req->post->censor_proper[$i]);
+							unset($local_vulgar[$i], $local_proper[$i]);
 						}
 					}
 
-					$censored_vulgar = $this->_req->post->censor_vulgar;
-					$censored_proper = $this->_req->post->censor_proper;
+					$censored_vulgar = $local_vulgar;
+					$censored_proper = $local_proper;
 				}
 				else
 				{
-					$censored_vulgar = explode("\n", strtr($this->_req->post->censor_vulgar, ["\r" => '']));
-					$censored_proper = explode("\n", strtr($this->_req->post->censor_proper, ["\r" => '']));
+					$vulgar_text = (string) $this->_req->getPost('censor_vulgar', null, '');
+					$proper_text = (string) $this->_req->getPost('censor_proper', null, '');
+					$censored_vulgar = explode("\n", strtr($vulgar_text, ["\r" => '']));
+					$censored_proper = explode("\n", strtr($proper_text, ["\r" => '']));
 				}
 			}
 
@@ -150,9 +157,9 @@ class ManagePosts extends AbstractController
 			$updates = [
 				'censor_vulgar' => implode("\n", $censored_vulgar),
 				'censor_proper' => implode("\n", $censored_proper),
-				'censorWholeWord' => empty($this->_req->post->censorWholeWord) ? '0' : '1',
-				'censorIgnoreCase' => empty($this->_req->post->censorIgnoreCase) ? '0' : '1',
-				'allow_no_censored' => empty($this->_req->post->allow_no_censored) ? '0' : '1',
+				'censorWholeWord' => empty($this->_req->getPost('censorWholeWord', null, '')) ? '0' : '1',
+				'censorIgnoreCase' => empty($this->_req->getPost('censorIgnoreCase', null, '')) ? '0' : '1',
+				'allow_no_censored' => empty($this->_req->getPost('allow_no_censored', null, '')) ? '0' : '1',
 			];
 
 			call_integration_hook('integrate_save_censors', [&$updates]);
@@ -162,10 +169,11 @@ class ManagePosts extends AbstractController
 
 		// Testing a word to see how it will be censored?
 		$pre_censor = '';
-		if (isset($this->_req->post->censortest))
+		if ($this->_req->hasPost('censortest'))
 		{
 			require_once(SUBSDIR . '/Post.subs.php');
-			$censorText = htmlspecialchars($this->_req->post->censortest, ENT_QUOTES, 'UTF-8');
+			$raw = (string) $this->_req->getPost('censortest', null, '');
+			$censorText = htmlspecialchars($raw, ENT_QUOTES, 'UTF-8');
 			preparsecode($censorText);
 			$pre_censor = $censorText;
 			$context['censor_test'] = strtr(censor($censorText), ['"' => '&quot;']);
@@ -198,7 +206,7 @@ class ManagePosts extends AbstractController
 		createToken('admin-censor');
 
 		// Using ajax?
-		if (isset($this->_req->post->censortest) && $this->getApi() === 'json')
+		if ($this->_req->hasPost('censortest') && $this->getApi() === 'json')
 		{
 			// Clear the templates
 			setJsonTemplate();
@@ -247,13 +255,14 @@ class ManagePosts extends AbstractController
 		$context['sub_template'] = 'show_settings';
 
 		// Are we saving them - are we??
-		if (isset($this->_req->query->save))
+		if ($this->_req->hasQuery('save'))
 		{
 			checkSession();
 			$db = database();
 
 			// If we're changing the message length (and we are using MySQL) let's check the column is big enough.
-			if (isset($this->_req->post->max_messageLength) && $this->_req->post->max_messageLength != $modSettings['max_messageLength'] && $db->supportMediumtext())
+			$postedMaxLen = $this->_req->getPost('max_messageLength', 'intval');
+			if ($postedMaxLen !== null && $postedMaxLen !== (int) $modSettings['max_messageLength'] && $db->supportMediumtext())
 			{
 				require_once(SUBSDIR . '/Maintenance.subs.php');
 				$colData = getMessageTableColumns();
@@ -265,31 +274,55 @@ class ManagePosts extends AbstractController
 					}
 				}
 
-				if (isset($body_type) && ($this->_req->post->max_messageLength > 65535 || $this->_req->post->max_messageLength == 0) && $body_type === 'text')
+				if (isset($body_type) && ($postedMaxLen > 65535 || $postedMaxLen === 0) && $body_type === 'text')
 				{
 					throw new Exception('convert_to_mediumtext', false, [getUrl('admin', ['action' => 'admin', 'area' => 'maintain', 'sa' => 'database'])]);
 				}
 			}
 
 			// If we're changing the post preview length let's check its valid
-			if (!empty($this->_req->post->preview_characters))
+			$preview_chars = $this->_req->getPost('preview_characters', 'intval');
+			if (!empty($preview_chars))
 			{
-				$this->_req->post->preview_characters = (int) min(max(0, $this->_req->post->preview_characters), 512);
+				$preview_chars = min(max(0, $preview_chars), 512);
 			}
 
 			// Set a min quote length of 3 lines of text (@ default font size)
-			if (!empty($this->_req->post->heightBeforeShowMore))
+			$heightBefore = $this->_req->getPost('heightBeforeShowMore', 'intval');
+			if (!empty($heightBefore))
 			{
-				$this->_req->post->heightBeforeShowMore = max((int) $this->_req->post->heightBeforeShowMore, 155);
+				$heightBefore = max($heightBefore, 155);
 			}
 
-			$allowList = array_unique(explode("\n", $this->_req->post['nofollow_allowlist']));
-			$allowList = array_filter(array_map('\ElkArte\Helper\Util::htmlspecialchars', array_map('trim', $allowList)));
-			$this->_req->post['nofollow_allowlist'] = json_encode($allowList);
+			$allowRaw = $this->_req->getPost('nofollow_allowlist', 'trim');
+			if ($allowRaw !== null)
+			{
+				$allowList = array_unique(explode("\n", $allowRaw));
+				$allowList = array_filter(array_map('\\ElkArte\\Helper\\Util::htmlspecialchars', array_map('trim', $allowList)));
+				$allowRaw = json_encode($allowList);
+			}
 
 			call_integration_hook('integrate_save_post_settings');
 
-			$settingsForm->setConfigValues((array) $this->_req->post);
+			$config = (array) $this->_req->post;
+			if ($postedMaxLen !== null)
+			{
+				$config['max_messageLength'] = $postedMaxLen;
+			}
+			if ($preview_chars !== null)
+			{
+				$config['preview_characters'] = $preview_chars;
+			}
+			if ($heightBefore !== null)
+			{
+				$config['heightBeforeShowMore'] = $heightBefore;
+			}
+			if ($allowRaw !== null)
+			{
+				$config['nofollow_allowlist'] = $allowRaw;
+			}
+
+			$settingsForm->setConfigValues($config);
 			$settingsForm->save();
 			redirectexit('action=admin;area=postsettings;sa=posts');
 		}

@@ -211,7 +211,7 @@ class Topic extends AbstractController
 		// Its not enabled, give them the boot
 		if (!empty($modSettings['disable_print_topic']))
 		{
-			unset($this->_req->query->action);
+			$this->_req->clearValue('action', 'query');
 			$context['theme_loaded'] = false;
 			throw new Exception('feature_disabled', false);
 		}
@@ -270,7 +270,7 @@ class Topic extends AbstractController
 		}
 
 		// Fetch attachments so we can print them if asked, enabled and allowed
-		if (isset($this->_req->query->images) && !empty($modSettings['attachmentEnable']) && allowedTo('view_attachments'))
+		if ($this->_req->hasQuery('images') && !empty($modSettings['attachmentEnable']) && allowedTo('view_attachments'))
 		{
 			require_once(SUBSDIR . '/Topic.subs.php');
 			$context['printattach'] = messagesAttachments(array_keys($context['posts']));

@@ -112,9 +112,10 @@ class Karma extends AbstractController
 
 		// Delete any older items from the log so we can get the go ahead or not
 		clearKarma($modSettings['karmaWaitTime']);
-  if (!empty($modSettings['karmaTimeRestrictAdmins']) || !allowedTo('moderate_forum')) {
-      return lastActionOn($this->user->id, $id_target);
-  }
+		if (!empty($modSettings['karmaTimeRestrictAdmins']) || !allowedTo('moderate_forum'))
+		{
+			return lastActionOn($this->user->id, $id_target);
+		}
 
 		return 0;
 	}
@@ -161,12 +162,18 @@ class Karma extends AbstractController
 		// Figure out where to go back to.... the topic?
 		if (!empty($topic))
 		{
-			redirectexit('topic=' . $topic . '.' . $this->_req->start . '#msg' . $this->_req->get('m', 'intval'));
+			$start = $this->_req->getRequest('start', 'intval', 0);
+			$msg_id = $this->_req->getRequest('m', 'intval', 0);
+			redirectexit('topic=' . $topic . '.' . $start . ($msg_id > 0 ? '#msg' . $msg_id : ''));
 		}
 		// Hrm... maybe a personal message?
-		elseif (isset($_REQUEST['f']))
+		elseif ($this->_req->getRequest('f', 'intval', null) !== null)
 		{
-			redirectexit('action=pm;f=' . $_REQUEST['f'] . ';start=' . $this->_req->start . (isset($_REQUEST['l']) ? ';l=' . $this->_req->get('l', 'intval') : '') . (isset($_REQUEST['pm']) ? '#' . $this->_req->get('pm', 'intval') : ''));
+			$f = $this->_req->getRequest('f', 'intval', 0);
+			$start = $this->_req->getRequest('start', 'intval', 0);
+			$l = $this->_req->getRequest('l', 'intval', null);
+			$pm = $this->_req->getRequest('pm', 'intval', null);
+			redirectexit('action=pm;f=' . $f . ';start=' . $start . ($l !== null ? ';l=' . $l : '') . ($pm !== null ? '#' . $pm : ''));
 		}
 		// JavaScript as a last resort.
 		else
@@ -206,7 +213,7 @@ class Karma extends AbstractController
 		$action = $this->_prepare_karma($id_target);
 
 		// Give em a wack and run away
-		$this->_give_karma($this->user->id, $this->_req->query->uid, $action, -1);
+		$this->_give_karma($this->user->id, $id_target, $action, -1);
 		$this->_redirect_karma();
 	}
 }

@@ -180,7 +180,7 @@ class MoveTopic extends AbstractController
 			'name' => $txt['move_topic'],
 		];
 
-		$context['back_to_topic'] = isset($this->_req->post->goback);
+		$context['back_to_topic'] = $this->_req->hasPost('goback');
 
 		// Ugly !
 		if ($this->user->language !== $language)
@@ -192,9 +192,10 @@ class MoveTopic extends AbstractController
 		}
 
 		// We will need this
-		if (isset($this->_req->query->current_board))
+		if ($this->_req->hasQuery('current_board'))
 		{
-			moveTopicConcurrence((int) $this->_req->query->current_board, $board, $this->_topic);
+			$current_board = $this->_req->getQuery('current_board', 'intval', 0);
+			moveTopicConcurrence($current_board, $board, $this->_topic);
 		}
 
 		// Register this form and get a sequence number in $context.
@@ -224,7 +225,7 @@ class MoveTopic extends AbstractController
 		require_once(SUBSDIR . '/Boards.subs.php');
 
 		// The destination board must be numeric.
-		$this->_toboard = (int) $this->_req->post->toboard;
+		$this->_toboard = $this->_req->getPost('toboard', 'intval', 0);
 
 		// Make sure they can see the board they are trying to move to (and get whether posts count in the target board).
 		$this->_board_info = boardInfo($this->_toboard, $this->_topic);
@@ -261,7 +262,7 @@ class MoveTopic extends AbstractController
 		sendNotifications($this->_topic, 'move');
 
 		// Why not go back to the original board in case they want to keep moving?
-		if (!isset($this->_req->post->goback))
+		if (!$this->_req->hasPost('goback'))
 		{
 			redirectexit('board=' . $board . '.0');
 		}
@@ -294,22 +295,23 @@ class MoveTopic extends AbstractController
 		}
 
 		// You can't choose to have a redirection topic and not provide a reason.
-		if (isset($this->_req->post->postRedirect) && $this->_req->getPost('reason', 'trim', '') === '')
+		if ($this->_req->hasPost('postRedirect') && $this->_req->getPost('reason', 'trim', '') === '')
 		{
 			throw new Exception('movetopic_no_reason', false);
 		}
 
 		// You have to tell us were you are moving to
-		if (!isset($this->_req->post->toboard))
+		if (!$this->_req->hasPost('toboard'))
 		{
 			throw new Exception('movetopic_no_board', false);
 		}
 
 		// We will need this
 		require_once(SUBSDIR . '/Topic.subs.php');
-		if (isset($this->_req->query->current_board))
+		if ($this->_req->hasQuery('current_board'))
 		{
-			moveTopicConcurrence((int) $this->_req->query->current_board, $board, $this->_topic);
+			$current_board = $this->_req->getQuery('current_board', 'intval', 0);
+			moveTopicConcurrence($current_board, $board, $this->_topic);
 		}
 
 		// Make sure this form hasn't been submitted before.
@@ -353,9 +355,10 @@ class MoveTopic extends AbstractController
 		global $context;
 
 		// Rename the topic...
-		if (isset($this->_req->post->reset_subject, $this->_req->post->custom_subject) && $this->_req->post->custom_subject != '')
+		$custom_subject = $this->_req->getPost('custom_subject', 'trim|strval', '');
+		if ($this->_req->hasPost('reset_subject') && $custom_subject !== '')
 		{
-			$custom_subject = strtr(Util::htmltrim(Util::htmlspecialchars($this->_req->post->custom_subject)), ["\r" => '', "\n" => '', "\t" => '']);
+			$custom_subject = strtr(Util::htmltrim(Util::htmlspecialchars($custom_subject)), ["\r" => '', "\n" => '', "\t" => '']);
 
 			// Keep checking the length.
 			if (Util::strlen($custom_subject) > 100)
@@ -367,7 +370,7 @@ class MoveTopic extends AbstractController
 			if ($custom_subject !== '')
 			{
 				$this->_board_info['subject_new'] = $custom_subject;
-				$all_messages = isset($this->_req->post->enforce_subject);
+				$all_messages = $this->_req->hasPost('enforce_subject');
 				if ($all_messages)
 				{
 					// Get a response prefix, but in the forum's default language.

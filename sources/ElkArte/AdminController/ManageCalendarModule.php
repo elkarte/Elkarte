@@ -83,17 +83,17 @@ class ManageCalendarModule extends AbstractController
 
 		// Set up the two tabs here...
 		$context[$context['admin_menu_name']]['object']->prepareTabData([
-			'title' => 'manage_calendar',
-			'description' => 'calendar_settings_desc',
-			'help' => 'calendar',
-			'tabs' => [
-				'holidays' => [
-					'description' => $txt['manage_holidays_desc'],
-				],
-				'settings' => [
-					'description' => $txt['calendar_settings_desc'],
-				],
-			]]
+				'title' => 'manage_calendar',
+				'description' => 'calendar_settings_desc',
+				'help' => 'calendar',
+				'tabs' => [
+					'holidays' => [
+						'description' => $txt['manage_holidays_desc'],
+					],
+					'settings' => [
+						'description' => $txt['calendar_settings_desc'],
+					],
+				]]
 		);
 
 		// Set up the default subaction, call integrate_sa_manage_calendar
@@ -231,14 +231,14 @@ class ManageCalendarModule extends AbstractController
 		theme()->getTemplates()->load('ManageCalendar');
 
 		$modSettings['cal_limityear'] = empty($modSettings['cal_limityear']) ? 20 : (int) $modSettings['cal_limityear'];
-		$context['is_new'] = !isset($this->_req->query->holiday);
+		$context['is_new'] = !$this->_req->hasQuery('holiday');
 		$context['cal_minyear'] = $modSettings['cal_minyear'];
 		$context['cal_maxyear'] = (int) date('Y') + $modSettings['cal_limityear'];
 		$context['page_title'] = $context['is_new'] ? $txt['holidays_add'] : $txt['holidays_edit'];
 		$context['sub_template'] = 'edit_holiday';
 
-		// Cast this for safety...
-		$this->_req->query->holiday = $this->_req->getQuery('holiday', 'intval');
+		// Read the holiday id safely (do not mutate the request object)
+		$holidayId = $this->_req->getQuery('holiday', 'intval', 0);
 
 		// Submitting?
 		if (isset($this->_req->post->delete) || ($this->_req->getPost('title', 'trim', '') !== ''))
@@ -283,7 +283,7 @@ class ManageCalendarModule extends AbstractController
 		// If it's not new load the data.
 		else
 		{
-			$context['holiday'] = getHoliday($this->_req->query->holiday);
+			$context['holiday'] = getHoliday($holidayId);
 		}
 
 		// Last day for the drop-down?
@@ -319,7 +319,7 @@ class ManageCalendarModule extends AbstractController
 		$context[$context['admin_menu_name']]['current_subsection'] = 'settings';
 
 		// Saving the settings?
-		if (isset($this->_req->query->save))
+		if ($this->_req->hasQuery('save'))
 		{
 			checkSession();
 			call_integration_hook('integrate_save_calendar_settings');

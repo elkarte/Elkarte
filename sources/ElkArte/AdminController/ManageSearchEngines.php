@@ -90,10 +90,12 @@ class ManageSearchEngines extends AbstractController
 		// Set up a message.
 		$context['settings_message'] = sprintf($txt['spider_settings_desc'], getUrl('admin', ['action' => 'admin', 'area' => 'logs', 'sa' => 'pruning', '{session_data}']));
 
-		// Make sure it's valid - note that regular members are given id_group = 1 which is reversed in Load.php - no admins here!
-		if (isset($this->_req->post->spider_group) && !isset($config_vars['spider_group'][2][$this->_req->post->spider_group]))
+		// Validate posted spider_group against allowed values (don't mutate the request object)
+		$posted_spider_group = $this->_req->getPost('spider_group', 'intval', null);
+		if ($posted_spider_group !== null && !isset($config_vars['spider_group'][2][$posted_spider_group]))
 		{
-			$this->_req->post->spider_group = 0;
+			// Force to 0 by passing a local value into the form processing later
+			$context['__override_spider_group'] = 0;
 		}
 
 		// Setup the template.
@@ -101,7 +103,7 @@ class ManageSearchEngines extends AbstractController
 		$context['sub_template'] = 'show_settings';
 
 		// Are we saving them - are we??
-		if (isset($this->_req->query->save))
+		if ($this->_req->hasQuery('save'))
 		{
 			// security checks
 			checkSession();
@@ -110,7 +112,12 @@ class ManageSearchEngines extends AbstractController
 			call_integration_hook('integrate_save_search_engine_settings');
 
 			// save the results!
-			$settingsForm->setConfigValues((array) $this->_req->post);
+			$values = (array) $this->_req->post;
+			if (isset($context['__override_spider_group']))
+			{
+				$values['spider_group'] = $context['__override_spider_group'];
+			}
+			$settingsForm->setConfigValues($values);
 			$settingsForm->save();
 
 			// make sure to rebuild the cache with updated results
@@ -217,20 +224,22 @@ class ManageSearchEngines extends AbstractController
 		}
 
 		// Are we adding a new one?
-		if (!empty($this->_req->post->addSpider))
+		if ($this->_req->hasPost('addSpider'))
 		{
 			$this->action_editspiders();
 			return;
 		}
 
 		// User pressed the 'remove selection button'.
-		if (!empty($this->_req->post->removeSpiders) && !empty($this->_req->post->remove) && is_array($this->_req->post->remove))
+		$removeSpiders = $this->_req->hasPost('removeSpiders');
+		$toRemovePost = $this->_req->getPost('remove', null, []);
+		if ($removeSpiders && !empty($toRemovePost) && is_array($toRemovePost))
 		{
 			checkSession();
 			validateToken('admin-ser');
 
 			// Make sure every entry is a proper integer.
-			$toRemove = array_map('intval', $this->_req->post->remove);
+			$toRemove = array_map('intval', $toRemovePost);
 
 			// Delete them all!
 			removeSpiders($toRemove);
@@ -361,14 +370,14 @@ class ManageSearchEngines extends AbstractController
 		require_once(SUBSDIR . '/SearchEngines.subs.php');
 
 		// Are we saving?
-		if (!empty($this->_req->post->save))
+		if ($this->_req->hasPost('save'))
 		{
 			checkSession();
 			validateToken('admin-ses');
 
 			// Check the IP range is valid.
 			$ips = [];
-			$ip_sets = explode(',', $this->_req->post->spider_ip);
+			$ip_sets = explode(',', $this->_req->getPost('spider_ip', 'trim', ''));
 			foreach ($ip_sets as $set)
 			{
 				$test = ip2range(trim($set));
@@ -381,7 +390,9 @@ class ManageSearchEngines extends AbstractController
 			$ips = implode(',', $ips);
 
 			// Goes in as it is...
-			updateSpider($context['id_spider'], $this->_req->post->spider_name, $this->_req->post->spider_agent, $ips);
+			$spider_name = $this->_req->getPost('spider_name', 'trim|strval', '');
+			$spider_agent = $this->_req->getPost('spider_agent', 'trim|strval', '');
+			updateSpider($context['id_spider'], $spider_name, $spider_agent, $ips);
 
 			Cache::instance()->remove('spider_search');
 			recacheSpiderNames();
@@ -420,12 +431,13 @@ class ManageSearchEngines extends AbstractController
 		theme()->getTemplates()->load('ManageSearch');
 
 		// Did they want to delete some or all entries?
-		if ((!empty($this->_req->post->delete_entries) && isset($this->_req->post->older)) || !empty($this->_req->post->removeAll))
+		$deleteEntries = $this->_req->hasPost('delete_entries');
+		$removeAll = $this->_req->hasPost('removeAll');
+		$since = $this->_req->getPost('older', 'intval', 0);
+		if (($deleteEntries && $since) || $removeAll)
 		{
 			checkSession();
 			validateToken('admin-sl');
-
-			$since = $this->_req->getPost('older', 'intval', 0);
 			$deleteTime = time() - ($since * 24 * 60 * 60);
 
 			// Delete the entries.
@@ -553,12 +565,12 @@ class ManageSearchEngines extends AbstractController
 		}
 
 		// Are we cleaning up some old stats?
-		if (!empty($this->_req->post->delete_entries) && isset($this->_req->post->older))
+		if ($this->_req->hasPost('delete_entries') && $this->_req->hasPost('older'))
 		{
 			checkSession();
 			validateToken('admin-ss');
-
-			$deleteTime = time() - (((int) $this->_req->post->older) * 24 * 60 * 60);
+			$older = $this->_req->getPost('older', 'intval', 0);
+			$deleteTime = time() - ($older * 24 * 60 * 60);
 
 			// Delete the entries.
 			removeSpiderOldStats($deleteTime);
@@ -569,7 +581,8 @@ class ManageSearchEngines extends AbstractController
 		$max_date = array_key_last($date_choices);
 
 		// What are we currently viewing?
-		$current_date = isset($this->_req->post->new_date, $date_choices[$this->_req->post->new_date]) ? $this->_req->post->new_date : $max_date;
+		$posted_date = $this->_req->getPost('new_date', 'trim|strval', null);
+		$current_date = ($posted_date !== null && isset($date_choices[$posted_date])) ? $posted_date : $max_date;
 
 		// Prepare the HTML.
 		$date_select = '
@@ -597,7 +610,7 @@ class ManageSearchEngines extends AbstractController
 			</noscript>';
 
 		// If we manually jumped to a date work out the offset.
-		if (isset($this->_req->post->new_date))
+		if ($this->_req->hasPost('new_date'))
 		{
 			$date_query = sprintf('%04d-%02d-01', substr($current_date, 0, 4), substr($current_date, 4));
 

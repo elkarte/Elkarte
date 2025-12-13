@@ -56,7 +56,7 @@ class Memberlist extends AbstractController
 
 		// These are handy later
 		$context['old_search_value'] = '';
-		$context['in_search'] = !empty($this->_req->post->search);
+		$context['in_search'] = $this->_req->hasPost('search');
 
 		foreach ($context['custom_search_fields'] as $field)
 		{
@@ -448,15 +448,24 @@ class Memberlist extends AbstractController
 		$context['can_moderate_forum'] = allowedTo('moderate_forum');
 
 		// They're searching..
-		if (isset($this->_req->query->search, $this->_req->query->fields)
-			|| isset($this->_req->post->search, $this->_req->post->fields))
+		if (($this->_req->hasQuery('search') && $this->_req->hasQuery('fields'))
+			|| ($this->_req->hasPost('search') && $this->_req->hasPost('fields')))
 		{
 			// Some handy shortcuts
-			$start = $this->_req->getQuery('start', 'intval');
-			$desc = $this->_req->getQuery('desc', 'trim');
-			$sort = $this->_req->getQuery('sort', 'trim');
-			$search = Util::htmlspecialchars(trim($this->_req->query->search ?? $this->_req->post->search), ENT_QUOTES);
-			$input_fields = isset($this->_req->query->fields) ? explode(',', $this->_req->query->fields) : $this->_req->post->fields;
+			$start = $this->_req->getQuery('start', 'intval', 0);
+			$has_desc = $this->_req->hasQuery('desc');
+			$sort = $this->_req->getQuery('sort', 'trim|strval', 'real_name');
+			$search = Util::htmlspecialchars($this->_req->getRequest('search', 'trim|strval', ''), ENT_QUOTES);
+			$input_fields = [];
+			if ($this->_req->hasQuery('fields'))
+			{
+				$fields_csv = $this->_req->getQuery('fields', 'trim|strval', '');
+				$input_fields = $fields_csv === '' ? [] : explode(',', $fields_csv);
+			}
+			elseif ( $this->_req->hasPost('fields'))
+			{
+				$input_fields = is_array($this->_req->post->fields) ? $this->_req->post->fields : [];
+			}
 
 			$fields_key = array_keys($this->_search_fields);
 			$context['search_defaults'] = [];
@@ -480,7 +489,7 @@ class Memberlist extends AbstractController
 			}
 
 			// Set defaults for how the results are sorted
-			if (!isset($sort, $context['columns'][$sort]))
+			if (!isset($context['columns'][$sort]))
 			{
 				$sort = 'real_name';
 			}
@@ -490,7 +499,7 @@ class Memberlist extends AbstractController
 			{
 				$context['columns'][$col]['href'] = $scripturl . '?action=memberlist;sa=search;start=0;sort=' . $col;
 
-				if ((!isset($desc) && $col === $sort) || ($col !== $sort && !empty($column_details['default_sort_rev'])))
+				if ((!$has_desc && $col === $sort) || ($col !== $sort && !empty($column_details['default_sort_rev'])))
 				{
 					$context['columns'][$col]['href'] .= ';desc';
 				}
@@ -501,7 +510,7 @@ class Memberlist extends AbstractController
 			}
 
 			// set up some things for use in the template
-			$context['sort_direction'] = isset($desc) ? 'down' : 'up';
+			$context['sort_direction'] = $has_desc ? 'down' : 'up';
 			$context['sort_by'] = $sort;
 			$context['memberlist_buttons'] = [
 				'view_all_members' => ['text' => 'view_all_members',

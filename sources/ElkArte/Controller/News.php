@@ -114,9 +114,10 @@ class News extends AbstractController
 		];
 
 		// Specifying specific categories only?
-		if (!empty($this->_req->query->c) && empty($board))
+		if ($this->_req->hasQuery('c') && empty($board))
 		{
-			$categories = array_map('intval', explode(',', $this->_req->query->c));
+			$c_param = $this->_req->getQuery('c', 'trim|strval', '');
+			$categories = $c_param === '' ? [] : array_map('intval', explode(',', $c_param));
 
 			if (count($categories) === 1)
 			{
@@ -142,10 +143,11 @@ class News extends AbstractController
 			}
 		}
 		// Maybe they only want to see feeds form some certain boards?
-		elseif (!empty($this->_req->query->boards))
+		elseif ($this->_req->hasQuery('boards'))
 		{
 			require_once(SUBSDIR . '/Boards.subs.php');
-			$query_boards = array_map('intval', explode(',', $this->_req->query->boards));
+			$boards_param = $this->_req->getQuery('boards', 'trim|strval', '');
+			$query_boards = $boards_param === '' ? [] : array_map('intval', explode(',', $boards_param));
 
 			$boards_data = fetchBoardsInfo(['boards' => $query_boards], ['selects' => 'detailed']);
 
@@ -221,12 +223,14 @@ class News extends AbstractController
 		$subAction = isset($subActions[$subAction]) ? $subAction : 'recent';
 
 		// We only want some information, not all of it.
-		$cachekey = [$xml_format, $this->_req->query->action, $this->_limit, $subAction];
+		$cache_action = $this->_req->getQuery('action', 'trim|strval', '');
+		$cachekey = [$xml_format, $cache_action, $this->_limit, $subAction];
 		foreach (['board', 'boards', 'c'] as $var)
 		{
-			if (isset($this->_req->query->{$var}))
+			$val = $this->_req->getQuery($var, 'trim|strval', null);
+			if ($val !== null)
 			{
-				$cachekey[] = $this->_req->query->{$var};
+				$cachekey[] = $val;
 			}
 		}
 
@@ -260,7 +264,7 @@ class News extends AbstractController
 
 		// This is an xml file....
 		$headers = Headers::instance();
-		if (isset($this->_req->query->debug))
+		if ($this->_req->hasQuery('debug'))
 		{
 			$headers->contentType('text/xml', 'UTF-8');
 		}
@@ -296,9 +300,10 @@ class News extends AbstractController
 			$url_parts = [];
 			foreach (['board', 'boards', 'c'] as $var)
 			{
-				if (isset($this->_req->query->{$var}))
+				$val = $this->_req->getQuery($var, 'trim|strval', null);
+				if ($val !== null)
 				{
-					$url_parts[] = $var . '=' . (is_array($this->_req->query->{$var}) ? implode(',', $this->_req->query->{$var}) : $this->_req->query->{$var});
+					$url_parts[] = $var . '=' . $val;
 				}
 			}
 

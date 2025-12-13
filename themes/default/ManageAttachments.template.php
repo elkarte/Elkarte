@@ -35,7 +35,7 @@ function template_maintenance()
 				<dt><label>', $txt['attachmentdir_size_current'], ':</label></dt>
 				<dd>', $context['attachment_current_size'], '</dd>
 				<dt><label>', $txt['attachment_space'], ':</label></dt>
-				<dd>', isset($context['attachment_space']) ? $context['attachment_space'] . ' ' . $txt['kilobyte'] : $txt['attachmentdir_size_not_set'], '</dd>
+				<dd>', isset($context['attachment_space']) ? $context['attachment_space'] : $txt['attachmentdir_size_not_set'], '</dd>
 				<dt><label>', $txt['attachmentdir_files_current'], ':</label></dt>
 				<dd>', $context['attachment_current_files'], '</dd>
 				<dt><label>', $txt['attachment_files'], ':</label></dt>
@@ -67,7 +67,7 @@ function template_maintenance()
 			</form>
 			<hr />
 			<form action="', getUrl('admin', ['action' => 'admin', 'area' => 'manageattachments']), '" method="post" accept-charset="UTF-8" onsubmit="return confirm(\'', $txt['attachment_pruning_warning'], '\');">
-				<label for="size">', sprintf($txt['attachment_remove_size'], ' <input type="text" name="size" id="size" value="100" size="4" class="input_text" /> '), '</label><br />
+				<label for="size">', sprintf($txt['attachment_remove_size'], ' <input type="text" name="size" id="size" value="1000" size="5" class="input_text" /> '), '</label><br />
 				<label for="size_notice">', $txt['attachment_pruning_message'], '</label>: <input type="text" id="size_notice" name="notice" value="', $txt['attachment_delete_admin'], '" size="40" class="input_text" /><br />
 				<div class="submitbutton">
 					<input type="submit" name="remove" value="', $txt['remove'], '" />

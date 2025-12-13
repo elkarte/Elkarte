@@ -101,8 +101,8 @@ class Announce extends AbstractController
 		$context['topic_subject'] = censor($context['topic_subject']);
 
 		// Prepare for the template
-		$context['move'] = isset($this->_req->query->move) ? 1 : 0;
-		$context['go_back'] = isset($this->_req->query->goback) ? 1 : 0;
+		$context['move'] = $this->_req->hasQuery('move') ? 1 : 0;
+		$context['go_back'] = $this->_req->hasQuery('goback') ? 1 : 0;
 		$context['sub_template'] = 'announce';
 	}
 
@@ -129,9 +129,9 @@ class Announce extends AbstractController
 		$groups = array_merge($board_info['groups'], [1]);
 		$who = [];
 
-		$_who = isset($this->_req->post->membergroups)
-			? explode(',', $this->_req->post->membergroups)
-			: $this->_req->post->who;
+		$_who = $this->_req->hasPost('membergroups')
+			? explode(',', (string) $this->_req->getPost('membergroups', 'trim|strval', ''))
+			: (array) $this->_req->getPost('who', null, []);
 
 		// Check that at least one membergroup was selected (set from announce sub template)
 		if (empty($_who))
@@ -180,11 +180,11 @@ class Announce extends AbstractController
 		{
 			logAction('announce_topic', ['topic' => $topic], 'user');
 
-			if (!empty($this->_req->post->move) && allowedTo('move_any'))
+			if ($this->_req->hasPost('move') && allowedTo('move_any'))
 			{
-				redirectexit('action=movetopic;topic=' . $topic . '.0' . (empty($this->_req->post->goback) ? '' : ';goback'));
+				redirectexit('action=movetopic;topic=' . $topic . '.0' . ($this->_req->hasPost('goback') ? ';goback' : ''));
 			}
-			elseif (!empty($this->_req->post->goback))
+			elseif ($this->_req->hasPost('goback'))
 			{
 				redirectexit('topic=' . $topic . '.new;boardseen#new');
 			}
@@ -207,8 +207,8 @@ class Announce extends AbstractController
 		}
 
 		// Prepare for the template
-		$context['move'] = empty($this->_req->post->move) ? 0 : 1;
-		$context['go_back'] = empty($this->_req->post->goback) ? 0 : 1;
+		$context['move'] = $this->_req->hasPost('move') ? 1 : 0;
+		$context['go_back'] = $this->_req->hasPost('goback') ? 1 : 0;
 		$context['membergroups'] = implode(',', $who);
 		$context['topic_subject'] = $topic_info['subject'];
 		$context['sub_template'] = 'announcement_send';

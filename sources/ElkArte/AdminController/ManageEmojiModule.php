@@ -173,7 +173,7 @@ abstract class ManageEmojiModule extends AbstractController
 			'1F6A8' => 'police', '1F910' => 'lipsrsealed', '1F913' => 'nerd', '1F914' => 'undecided',
 			'1F915' => 'clumsy', '1F921' => 'clown', '1F923' => 'laugh', '1F92A' => 'zany',
 			'1F92B' => 'shh', '1F92C' => 'angry', '1F92E' => 'vomit', '1F92F' => 'shocked',
-			'1f973' => 'party',
+			'1F973' => 'party',
 		];
 
 		// Copy / overwrite each codepoint to the common smiley name in the default smiley directory

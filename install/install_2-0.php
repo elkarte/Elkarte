@@ -2750,6 +2750,8 @@ class InstallInstructions_install_2_0
 				array(':))', 'laugh', '{$default_laugh_smiley}', 51, 1),
 				array('C:-)', 'police', '{$default_police_smiley}', 52, 1),
 				array('O:)', 'angel', '{$default_angel_smiley}', 53, 1),
+				array(':troll:', 'troll', '{$default_troll_smiley}', 54, 1),
+				array(':elk:', 'Elk', '{$default_elk_smiley}', 55, 1),
 			),
 			array('id_smiley')
 		);

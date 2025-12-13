@@ -480,9 +480,13 @@ class ManageBans extends AbstractController
 				];
 
 				// Overwrite some of the default form values if a user ID was given.
-				if (!empty($this->_req->query->u))
+				if ($this->_req->hasQuery('u'))
 				{
-					$context['ban_suggestions'] = array_merge($context['ban_suggestions'], getMemberData((int) $this->_req->query->u));
+					$uid = $this->_req->getQuery('u', 'intval', 0);
+					if ($uid > 0)
+					{
+						$context['ban_suggestions'] = array_merge($context['ban_suggestions'], getMemberData($uid));
+					}
 
 					if (!empty($context['ban_suggestions']['member']['id']))
 					{
@@ -591,18 +595,39 @@ class ManageBans extends AbstractController
 		// Something went wrong somewhere, ban info or triggers, ... Oh well, let's go back.
 		if ($ban_errors->hasErrors())
 		{
-			$context['ban_suggestions'] = empty($saved_triggers) ? '' : $saved_triggers;
+			// Ensure ban_suggestions is always an array to avoid string offset errors below.
+			if (!empty($saved_triggers) && is_array($saved_triggers))
+			{
+				$context['ban_suggestions'] = $saved_triggers;
+			}
+			else
+			{
+				$context['ban_suggestions'] = [
+					'main_ip' => '',
+					'hostname' => '',
+					'email' => '',
+					'member' => ['id' => 0],
+				];
+			}
 			$context['ban']['from_user'] = true;
 
 			// They may have entered a name not using the member select box
-			if (isset($this->_req->query->u))
+			if ($this->_req->hasQuery('u'))
 			{
-				$context['ban_suggestions'] = array_merge($context['ban_suggestions'], getMemberData((int) $this->_req->query->u));
+				$uid = $this->_req->getQuery('u', 'intval', 0);
+				if ($uid > 0)
+				{
+					$context['ban_suggestions'] = array_merge($context['ban_suggestions'], getMemberData($uid));
+				}
 			}
-			elseif (isset($this->_req->query->user))
+			elseif ($this->_req->hasQuery('user'))
 			{
 				$context['ban']['from_user'] = false;
 				$context['use_autosuggest'] = true;
+				if (!isset($context['ban_suggestions']['member']) || !is_array($context['ban_suggestions']['member']))
+				{
+					$context['ban_suggestions']['member'] = ['id' => 0];
+				}
 				$context['ban_suggestions']['member']['name'] = $this->_req->getQuery('user', 'trim|strval', '');
 			}
 

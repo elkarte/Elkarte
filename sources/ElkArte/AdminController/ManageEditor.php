@@ -86,7 +86,7 @@ class ManageEditor extends AbstractController
 		$modSettings['bbc_disabled_disabledBBC'] = empty($modSettings['disabledBBC']) ? [] : explode(',', $modSettings['disabledBBC']);
 
 		// Save page
-		if (isset($this->_req->query->save))
+		if ($this->_req->hasQuery('save'))
 		{
 			checkSession();
 

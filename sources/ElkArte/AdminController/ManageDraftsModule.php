@@ -225,7 +225,7 @@ class ManageDraftsModule extends AbstractController
 		]);
 
 		// Saving them ?
-		if (isset($this->_req->query->save))
+		if ($this->_req->hasQuery('save'))
 		{
 			checkSession();
 

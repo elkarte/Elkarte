@@ -116,14 +116,15 @@ class ManageMail extends AbstractController
 		}
 
 		// Saving?
-		if (isset($this->_req->query->save))
+		if ($this->_req->hasQuery('save'))
 		{
 			// Make the SMTP password a little harder to see in a backup etc.
-			if (!empty($this->_req->post->smtp_password[1]))
-			{
-				$this->_req->post->smtp_password[0] = base64_encode($this->_req->post->smtp_password[0]);
-				$this->_req->post->smtp_password[1] = base64_encode($this->_req->post->smtp_password[1]);
+			$smtpPassword = (array) ($this->_req->getPost('smtp_password', null, []));
+			if (!empty($smtpPassword[1])) {
+				$smtpPassword[0] = base64_encode($smtpPassword[0] ?? '');
+				$smtpPassword[1] = base64_encode($smtpPassword[1]);
 			}
+			$this->_req->post->smtp_password = $smtpPassword;
 
 			checkSession();
 

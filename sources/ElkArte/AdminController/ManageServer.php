@@ -46,7 +46,7 @@ class ManageServer extends AbstractController
 	 *
 	 * @event integrate_sa_server_settings
 	 * @uses edit_settings adminIndex.
-	 * @see AbstractController::action_index()
+	 * @see  AbstractController::action_index()
 	 */
 	public function action_index()
 	{
@@ -86,7 +86,8 @@ class ManageServer extends AbstractController
 		]);
 
 		// Any messages to speak of?
-		$context['settings_message'] = (isset($this->_req->query->msg, $txt[$this->_req->query->msg])) ? $txt[$this->_req->query->msg] : '';
+		$msg_key = $this->_req->getQuery('msg', 'trim|strval', '');
+		$context['settings_message'] = ($msg_key !== '' && isset($txt[$msg_key])) ? $txt[$msg_key] : '';
 
 		// Warn the user if there's any relevant information regarding Settings.php.
 		$settings_not_writable = !is_writable(BOARDDIR . '/Settings.php');
@@ -142,7 +143,7 @@ class ManageServer extends AbstractController
 		$context['settings_title'] = $txt['general_settings'];
 
 		// Saving settings?
-		if (isset($this->_req->query->save))
+		if ($this->_req->hasQuery('save'))
 		{
 			call_integration_hook('integrate_save_general_settings');
 
@@ -221,7 +222,7 @@ class ManageServer extends AbstractController
 		$context['save_disabled'] = $context['settings_not_writable'];
 
 		// Saving settings?
-		if (isset($this->_req->query->save))
+		if ($this->_req->hasQuery('save'))
 		{
 			call_integration_hook('integrate_save_database_settings');
 
@@ -292,14 +293,14 @@ class ManageServer extends AbstractController
 		$context['settings_title'] = $txt['cookies_sessions_settings'];
 
 		// Saving settings?
-		if (isset($this->_req->query->save))
+		if ($this->_req->hasQuery('save'))
 		{
 			call_integration_hook('integrate_save_cookie_settings');
 
 			// Its either local or global cookies
 			if (!empty($this->_req->post->localCookies) && !empty($this->_req->post->globalCookies))
 			{
-				unset($this->_req->post->globalCookies);
+				$this->_req->clearValue('globalCookies', 'post');
 			}
 
 			if (!empty($this->_req->post->globalCookiesDomain) && !str_contains($boardurl, (string) $this->_req->post->globalCookiesDomain))
@@ -367,7 +368,7 @@ class ManageServer extends AbstractController
 			['localCookies', $txt['localCookies'], 'subtext' => $txt['localCookies_note'], 'db', 'check', false, 'localCookies'],
 			['globalCookies', $txt['globalCookies'], 'subtext' => $txt['globalCookies_note'], 'db', 'check', false, 'globalCookies'],
 			['globalCookiesDomain', $txt['globalCookiesDomain'], 'subtext' => $txt['globalCookiesDomain_note'], 'db', 'text', false, 'globalCookiesDomain'],
-			['secureCookies', $txt['secureCookies'], 'subtext' => $txt['secureCookies_note'], 'db', 'check', false, 'secureCookies', 'disabled' => !isset($_SERVER['HTTPS']) || strtolower($_SERVER['HTTPS']) !== 'on' && strtolower($_SERVER['HTTPS']) != '1'],
+			['secureCookies', $txt['secureCookies'], 'subtext' => $txt['secureCookies_note'], 'db', 'check', false, 'secureCookies', 'disabled' => !isset($_SERVER['HTTPS']) || (strtolower($_SERVER['HTTPS']) !== 'on' && strtolower($_SERVER['HTTPS']) != '1')],
 			['httponlyCookies', $txt['httponlyCookies'], 'subtext' => $txt['httponlyCookies_note'], 'db', 'check', false, 'httponlyCookies'],
 			'',
 			// Sessions
@@ -402,7 +403,7 @@ class ManageServer extends AbstractController
 		$settingsForm->setConfigVars($this->_cacheSettings());
 
 		// Saving again?
-		if (isset($this->_req->query->save))
+		if ($this->_req->hasQuery('save'))
 		{
 			call_integration_hook('integrate_save_cache_settings');
 
@@ -533,7 +534,7 @@ class ManageServer extends AbstractController
 		$context['settings_title'] = $txt['loadavg_settings'];
 
 		// Saving?
-		if (isset($this->_req->query->save))
+		if ($this->_req->hasQuery('save'))
 		{
 			// Stupidity is not allowed.
 			foreach ($this->_req->post as $key => $value)
