@@ -366,8 +366,6 @@ function templateToHtml($string)
 {
 	$newString = preg_replace('~^-{3,40}$~m', '<hr />', $string);
 
-	$newString = preg_replace('~^(\s*?)<\*>~m', '$1&#8226;', $newString);
-
 	$newString = str_replace("\n", '<br />', $newString);
 
 	return $newString ?? $string;

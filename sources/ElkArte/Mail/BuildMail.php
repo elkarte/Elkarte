@@ -411,11 +411,6 @@ class BuildMail extends BaseMail
 		// Drop any control characters other than tab, lf and cr
 		$string = preg_replace('/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]/', '', $string);
 
-		// <*> in templates was swapped to &#8226; by templateToHtml() but for plaintext we want [*]
-		$string = preg_replace('~(\n\s*?)•~mu', '$1[*]', $string);
-		$re = '~(\n)\\\\\[\\\\\*\\\\\]~m';
-		$string = preg_replace($re, '$1[*]', $string);
-
 		// Convert all 'special' characters (anything above 127) into HTML entities to maintain 7bit compliance
 		return preg_replace_callback('~([\x80-\x{10FFFF}])~u', 'entityConvert', $string);
 	}
@@ -431,11 +426,17 @@ class BuildMail extends BaseMail
 	{
 		// Remove any basic control characters, allowing only for tab, LF and CR
 		$string = preg_replace('/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]/', '', $string);
+
+		// <*> is not valid html and will be stripped, so we need to swap it for [*]
 		$string = preg_replace('~<br /><\*>~m', '<br />[*]', $string);
 
 		// Convert to markdown, provides some intent should the receiver only accept plain text
 		$mark_down = new Html2Md($string);
 		$string = $mark_down->get_markdown();
+
+		// Html2Md will have escaped [*], now we need to swap it back
+		$re = '~(\n)\\\\\[\\\\\*\\\\\]~m';
+		$string = preg_replace($re, '$1[*]', $string);
 
 		// No html in plain text
 		return un_htmlspecialchars(strip_tags($string));
@@ -471,7 +472,7 @@ class BuildMail extends BaseMail
 	 */
 	public function getQuotedPrintableVersion($string): string
 	{
-		// This is for attachment notices we are appended to the body post template load
+		// This is for attachment notices and template bullets
 		$string = preg_replace('~<br /><\*>~m', '<br />$1&#8226;', $string);
 
 		// Get a pure UTF8 character string

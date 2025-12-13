@@ -398,12 +398,14 @@ class PostNotifications extends AbstractModel
 				$id_thumbs = explode(',', $topicDatum['thumbs']);
 				$filtered = array_values(array_filter($id_thumbs));
 				$body .= "\n\n";
+
+				// Add a thumbnail image url (not linked) for each image attachment
 				foreach ($filtered as $id_thumb)
 				{
 					$body .= '<img src="' . $scripturl . '?action=dlattach;topic=' . $topicDatum['topic'] . ';attach=' . $id_thumb . ';image" alt="' . $txt['ila_opt_size_thumb'] . '" /> ';
 				}
-				$body .= "\n\n" . sprintf($txt['message_attachments'], $topicDatum['attachments'], $replacements['TOPICLINK']);
 
+				$body .= "\n\n" . sprintf($txt['message_attachments'], $topicDatum['attachments'], $replacements['TOPICLINK']);
 			}
 
 			$replacements['MESSAGE'] = $mailPreparse->preparseHtml($body);
