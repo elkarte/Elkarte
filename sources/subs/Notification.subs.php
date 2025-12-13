@@ -525,7 +525,7 @@ function validateNotifierToken($memEmail, $memSalt, $area, $hash)
 		return false;
 	}
 
-	$blowfish_salt = '$2a$07$' . $memSalt . $modSettings['unsubscribe_site_salt']. '$';
+	$blowfish_salt = '$2a$07$' . $memSalt . $modSettings['unsubscribe_site_salt'] . '$';
 	$expected = substr($blowfish_salt, 0, 28) . $hash;
 	$check = crypt($area . $memEmail . $memSalt, $blowfish_salt);
 
@@ -548,12 +548,17 @@ function getTopicInfos($topics, $type)
 	$topicData = [];
 	$boards_index = [];
 
+	// Use a portable aggregate for comma-separated list of thumbnails
+	$aggregateThumbs = $db->title() === 'PostgreSQL'
+		? 'string_agg(DISTINCT a.id_thumb::text, {string:delim} ORDER BY a.id_thumb)'
+		: 'GROUP_CONCAT(DISTINCT a.id_thumb ORDER BY a.id_thumb SEPARATOR ",")';
+
 	$db->fetchQuery('
 		SELECT 
 			mf.subject, ml.body, ml.id_member, t.id_last_msg, t.id_topic, t.id_board, t.id_member_started,
 			mem.signature, COALESCE(mem.real_name, ml.poster_name) AS poster_name,
 			COUNT(a.id_attach) as num_attach,
-			GROUP_CONCAT(DISTINCT a.id_thumb ORDER BY a.id_thumb SEPARATOR ",") AS thumb_ids
+			' . $aggregateThumbs . ' AS thumb_ids
 		FROM {db_prefix}topics AS t
 			INNER JOIN {db_prefix}messages AS mf ON (mf.id_msg = t.id_first_msg)
 			INNER JOIN {db_prefix}messages AS ml ON (ml.id_msg = t.id_last_msg)
@@ -565,6 +570,7 @@ function getTopicInfos($topics, $type)
 			'topic_list' => $topics,
 			'attachment_type' => 0,
 			'approved' => 1,
+			'delim' => ',',
 		]
 	)->fetch_callback(
 		function ($row) use (&$topicData, &$boards_index, $type) {
@@ -616,7 +622,7 @@ function insertLogDigestQueue($digest_insert)
  *
  * What it does:
  * Finds board notifications that meet:
- * 	- Member has watch notifications on for the board
+ *  - Member has watch notifications on for the board
  *  - The notification type of reply and/or moderation notices
  *  - Notification regularity of instantly or first unread
  *  - Member is activated
@@ -701,7 +707,7 @@ function fetchBoardNotifications($user_id, $boards_index, $type, $members_only, 
  *
  * What it does:
  * Finds notifications that meet:
- * 	- Member has watch notifications on for these topics
+ *    - Member has watch notifications on for these topics
  *  - Member has set notification type of reply and/or moderation notices
  *      - ALL_MESSAGES = 1;
  *      - MODERATION_ONLY_IF_STARTED = 2;
@@ -780,7 +786,7 @@ function fetchTopicNotifications($user_id, $topics, $type, $members_only, $regul
 				'member_groups' => $row['member_groups'],
 				'board_name' => $row['name'],
 				'id_profile_board' => (int) $row['id_profile'],
-				'id_board' =>  (int) $row['id_board'],
+				'id_board' => (int) $row['id_board'],
 				'id_topic' => (int) $row['id_topic'],
 				'last_id' => (int) $row['id_last_msg'],
 				'sent' => (int) $row['sent'],
@@ -828,7 +834,7 @@ function updateLogNotify($user_id, $data, $board = false)
  *
  * What it does:
  * Finds notifications that meet:
- * 	- Members has watch notifications enabled for these topics
+ *    - Members has watch notifications enabled for these topics
  *  - The notification type is not none/off (all, replies+moderation, moderation only)
  *  - Notification regularity of instantly or first unread
  *  - Member is activated
@@ -885,7 +891,7 @@ function fetchApprovalNotifications($topics)
 				'member_groups' => $row['member_groups'],
 				'board_name' => $row['name'],
 				'id_profile_board' => (int) $row['id_profile'],
-				'id_board' =>  (int) $row['id_board'],
+				'id_board' => (int) $row['id_board'],
 				'id_topic' => (int) $row['id_topic'],
 				'sent' => (int) $row['sent'],
 			];
