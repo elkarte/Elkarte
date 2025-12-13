@@ -37,7 +37,7 @@ class PreparseMail extends BaseMail
 	 * - Pre-converts select bbc tags to html, so they are more generic
 	 * - Uses parse-bbc to convert remaining bbc to html
 	 *
-	 * @param string $message the post in glorious html format
+	 * @param string $message the post in glorious BBC format
 	 * @return string html text suitable for html2md or html output
 	 */
 	public function preparseHtml($message): string
@@ -157,7 +157,7 @@ class PreparseMail extends BaseMail
 	}
 
 	/**
-	 * You have some filthy mouth ! Censor the subject
+	 * You have some filthy mouth! Censor the subject
 	 *
 	 * @param $subject
 	 * @return string
@@ -169,7 +169,7 @@ class PreparseMail extends BaseMail
 	}
 
 	/**
-	 * Ugh, the signature.  Strip tags, adding in newlines where needed to maintain some
+	 * Ugh, the signature. Strip tags, adding in newlines where needed to maintain some
 	 * basic formatting.
 	 *
 	 * @param $signature

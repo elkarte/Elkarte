@@ -17,7 +17,6 @@ namespace ElkArte\MessagesCallback;
 use ElkArte\Helper\ValuesContainer;
 use ElkArte\MembersList;
 use ElkArte\MessagesCallback\BodyParser\BodyParserInterface;
-use ElkArte\EventManager;
 
 /**
  * Class Renderer
@@ -98,7 +97,7 @@ abstract class Renderer
 			$this->_counter = empty($context['start']) ? 0 : $context['start'];
 		}
 
-		// Start from the beginning, or get the next message
+		// Start from the beginning or get the next message
 		$this->_currentContext($reset);
 
 		if (empty($this->_this_message))
@@ -138,6 +137,9 @@ abstract class Renderer
 		// Compose the memory eat- I mean message array.
 		$output = $this->_buildOutputArray();
 
+		// Allow addons/modules/etc access to the message array. Importantly, this
+		// is how attachments are added to the message array via the CONTEXT_HOOK
+		// 'integrate_prepare_display_context'; in DisplayRenderer.php->AttachmentsDisplay.php
 		call_integration_hook(static::CONTEXT_HOOK, [&$output, &$this->_this_message, $this->_counter]);
 
 		$output['classes'] = implode(' ', $output['classes']);

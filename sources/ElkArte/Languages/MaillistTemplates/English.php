@@ -35,7 +35,7 @@ You can reply to this email and have it posted as a topic reply.
 
 {FORUMNAMESHORT} Links:
 
-<*> To visit {FORUMNAMESHORT} on the web, go to:
+<*> To visit {FORUMNAMESHORT} go to:
     {FORUMURL}
 
 <*> You can see this message by using this link:
@@ -73,7 +73,7 @@ You can reply to this email and have it posted as a reply.
 
 {FORUMNAMESHORT} Links:
 
-<*> To visit {FORUMNAMESHORT} on the web, go to:
+<*> To visit {FORUMNAMESHORT} go to:
     {FORUMURL}
 
 <*> You can see this message by using this link:
@@ -114,7 +114,7 @@ You can reply to this email and have it posted as a topic reply.
 
 {FORUMNAMESHORT} Links:
 
-<*> To visit {FORUMNAMESHORT} on the web, go to:
+<*> To visit {FORUMNAMESHORT} go to:
     {FORUMURL}
 
 <*> You can see this message by using this link:
@@ -163,7 +163,7 @@ You can reply to this email and have it posted as a reply.
 
 {FORUMNAMESHORT} Links:
 
-<*> To visit {FORUMNAMESHORT} on the web, go to:
+<*> To visit {FORUMNAMESHORT} go to:
     {FORUMURL}
 
 <*> You can see this message by using this link:
@@ -208,7 +208,7 @@ You can reply to this email and have it sent as a PM response to {SENDER}
 
 {FORUMNAMESHORT} Links:
 
-<*> To visit {FORUMNAMESHORT} on the web, go to:
+<*> To visit {FORUMNAMESHORT} go to:
     {FORUMURL}
 
 <*> Reply to this Personal Message here:
@@ -235,7 +235,7 @@ The group message they sent is:
 ------------------------------------
 {FORUMNAMESHORT} Links:
 
-<*> To visit {FORUMNAMESHORT} on the web, go to:
+<*> To visit {FORUMNAMESHORT} go to:
     {FORUMURL}
 
 <*> Reply to this Personal Message here:

@@ -28,7 +28,7 @@ class Display extends AbstractModule
 	/** @var int The mode of attachments (disabled/enabled/show only). */
 	protected static $attach_level = 0;
 
-	/** @var \AttachmentsDisplay The good old attachments array */
+	/** @var AttachmentsDisplay The good old attachments array */
 	protected static $attachments;
 
 	/** @var bool If unapproved posts/attachments should be shown */
@@ -50,9 +50,6 @@ class Display extends AbstractModule
 
 			add_integration_function('integrate_display_message_list', '\\ElkArte\\Modules\\Attachments\\Display::integrate_display_message_list', '', false);
 			add_integration_function('integrate_prepare_display_context', '\\ElkArte\\Modules\\Attachments\\Display::integrate_prepare_display_context', '', false);
-// 			return array(
-// 				array('prepare_context', array('\\ElkArte\\Modules\\Attachments\\Display', 'prepare_context'), array('post_errors')),
-// 			);
 		}
 
 		return [];

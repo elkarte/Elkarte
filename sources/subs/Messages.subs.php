@@ -657,7 +657,7 @@ function countNewPosts($topic, $topicinfo, $timestamp)
  * @param array $msg_parameters
  * @param array $optional
  *
- * @return mysqli_result A request object
+ * @return \ElkArte\Database\AbstractResult A request object
  */
 function loadMessageRequest($msg_selects, $msg_tables, $msg_parameters, $optional = [])
 {
