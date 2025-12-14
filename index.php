@@ -71,7 +71,9 @@ loadSession();
 elk_main();
 
 // Call obExit specially; we're coming from the main area ;).
-obExit(null, null, true);
+// @todo why is this still needed, its going to return and end here anyway?
+// obExit(null, null, false);
+obExit();
 
 /**
  * The main dispatcher.
