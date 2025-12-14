@@ -28,6 +28,7 @@ use ElkArte\Helper\DataValidator;
 use ElkArte\Helper\Util;
 use ElkArte\Languages\Txt;
 use ElkArte\PrivacyPolicy;
+use ElkArte\Profile\ProfileFields;
 use ElkArte\Profile\ProfileOptions;
 use ElkArte\Request;
 
@@ -250,8 +251,8 @@ class Register extends AbstractController
 		$this->_events->trigger('prepare_context', ['current_step' => $current_step]);
 
 		// See whether we have some pre-filled values.
-		$context['username'] = $this->_req->getPost('user', '\\ElkArte\\Helper\\Util::htmlspecialchars', '');
-		$context['email'] = $this->_req->getPost('email', '\\ElkArte\\Helper\\Util::htmlspecialchars', '');
+		$context['username'] = $this->_req->getPost('user', 'Util::htmlspecialchars', '');
+		$context['email'] = $this->_req->getPost('email', 'Util::htmlspecialchars', '');
 		$context['notify_announcements'] = (int) !empty($this->_req->post->notify_announcements);
 
 		// Were there any errors?
@@ -470,7 +471,7 @@ class Register extends AbstractController
 		$regOptions['theme_vars'] = Util::htmlspecialchars__recursive($regOptions['theme_vars']);
 
 		// Check whether we have fields that simply MUST be displayed?
-		$profileFields = new \ElkArte\Profile\ProfileFields();
+		$profileFields = new ProfileFields();
 		$profileFields->loadCustomFields(0, 'register', $this->_req->post->customfield ?? []);
 
 		foreach ($context['custom_fields'] as $row)
@@ -525,7 +526,7 @@ class Register extends AbstractController
 
 		$regOptions['ip'] = $this->user->ip;
 		$regOptions['ip2'] = $req->ban_ip();
-		$memberID = registerMember($regOptions, 'register');
+		$memberID = registerMember($regOptions);
 
 		// If there are "important" errors and you are not an admin: log the first error
 		// Otherwise grab all of them and don't log anything
@@ -791,7 +792,7 @@ class Register extends AbstractController
 		global $context, $modSettings, $cur_profile;
 
 		// Any custom fields to load?
-		$profileFields = new \ElkArte\Profile\ProfileFields();
+		$profileFields = new ProfileFields();
 		$profileFields->loadCustomFields(0, 'register');
 
 		// Or any standard ones?

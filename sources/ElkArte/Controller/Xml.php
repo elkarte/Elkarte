@@ -197,7 +197,7 @@ class Xml extends AbstractController
 						'value' => $feature_title,
 					];
 
-					createToken('admin-core', 'post');
+					createToken('admin-core');
 					$tokens = [
 						[
 							'value' => $context['admin-core_token'],
@@ -321,7 +321,7 @@ class Xml extends AbstractController
 		}
 
 		// New generic token for use
-		createToken('admin-sort', 'post');
+		createToken('admin-sort');
 		$tokens = [
 			[
 				'value' => $context['admin-sort_token'],
@@ -503,7 +503,7 @@ class Xml extends AbstractController
 		}
 
 		// New generic token for use
-		createToken('admin-sort', 'post');
+		createToken('admin-sort');
 		$tokens = [
 			[
 				'value' => $context['admin-sort_token'],
@@ -679,7 +679,7 @@ class Xml extends AbstractController
 		}
 
 		// New generic token for use
-		createToken('admin-sort', 'post');
+		createToken('admin-sort');
 		$tokens = [
 			[
 				'value' => $context['admin-sort_token'],
@@ -778,7 +778,7 @@ class Xml extends AbstractController
 		}
 
 		// New generic token for use
-		createToken('admin-sort', 'post');
+		createToken('admin-sort');
 		$tokens = [
 			[
 				'value' => $context['admin-sort_token'],
@@ -879,7 +879,7 @@ class Xml extends AbstractController
 		}
 
 		// New generic token for use
-		createToken('admin-sort', 'post');
+		createToken('admin-sort');
 		$tokens = [
 			[
 				'value' => $context['admin-sort_token'],

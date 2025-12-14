@@ -467,7 +467,7 @@ class FsockFetchWebdata
 	 *
 	 * @param string $area used to return an area such as body, header, error
 	 *
-	 * @return string|string[]
+	 * @return string|string[]|int
 	 */
 	public function result($area = '')
 	{

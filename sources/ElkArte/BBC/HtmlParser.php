@@ -100,7 +100,7 @@ class HtmlParser
 	}
 
 	/**
-	 * Converts self closing HTML to appropriate BBC tag
+	 * Converts self-closing HTML to appropriate BBC tag
 	 *
 	 * @param $data
 	 *

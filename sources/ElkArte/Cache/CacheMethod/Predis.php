@@ -83,6 +83,8 @@ class Predis extends AbstractCacheMethod
 				$this->obj = null;
 			}
 		}
+
+		return false;
 	}
 
 	/**
@@ -189,7 +191,7 @@ class Predis extends AbstractCacheMethod
 			return null;
 		}
 
-		// Clear it out, really invalidate whats there
+		// Clear it out, really invalidate what's there
 		$this->obj->flush();
 	}
 

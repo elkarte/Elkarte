@@ -80,6 +80,7 @@ class Markasread extends AbstractController
 		}
 
 		$action->dispatch($subAction);
+		return null;
 	}
 
 	/**
@@ -420,7 +421,7 @@ class Markasread extends AbstractController
 		];
 
 		// The default is the most logical: newest first.
-		$sort = $this->_req->getQuery('sort', 'trim|strval', null);
+		$sort = $this->_req->getQuery('sort', 'trim|strval');
 		if ($sort === null || !in_array($sort, $sort_methods))
 		{
 			$this->_querystring_sort_limits = $this->_req->hasQuery('asc') ? ['asc'] : [];

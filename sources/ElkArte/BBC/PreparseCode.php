@@ -25,7 +25,7 @@ use ElkArte\Helper\TokenHash;
  */
 class PreparseCode
 {
-	/** The regular expression non breaking space */
+	/** The regular expression non-breaking space */
 	public const NBS = '\x{A0}';
 
 	/** @var string the message to preparse */
@@ -94,7 +94,7 @@ class PreparseCode
 		// Remove \r's... they're evil!
 		$this->message = strtr($this->message, ["\r" => '']);
 
-		// You won't believe this - but too many periods upsets apache it seems!
+		// You won't believe this - but too many periods upset apache, it seems!
 		$this->message = preg_replace('~\.{100,}~', '...', $this->message);
 
 		// Remove Trailing Quotes
@@ -137,7 +137,7 @@ class PreparseCode
 		// Don't allow rel follow links if they don't have permissions
 		$this->_validateLinks();
 
-		// Allow integration to do further processing on protected code block message
+		// Allow integration to do further processing on a protected code block message
 		call_integration_hook('integrate_preparse_tokenized_code', [&$this->message, $previewing, $this->code_blocks]);
 
 		// Put it back together!
@@ -156,7 +156,7 @@ class PreparseCode
 			$this->message = strtr($this->message, ['  ' => '&nbsp; ', "\xC2\xA0" => '&nbsp;']);
 		}
 
-		// Now we're going to do full scale table checking...
+		// Now we're going to do full-scale table checking...
 		$this->_preparseTable();
 
 		// Quickly clean up things that will slow our parser (which are common in posted code.)
@@ -200,13 +200,13 @@ class PreparseCode
 				// Closing?
 				if ($match[1] === '/')
 				{
-					// If it's closing and we're not in a tag we need to open it...
+					// If it's closing, and we're not in a tag, we need to open it...
 					if (!$in_tag)
 					{
 						$code_open = true;
 					}
 
-					// Either way we ain't in one any more.
+					// Either way we ain't in one anymore.
 					$in_tag = false;
 				}
 				// Opening tag...
@@ -214,7 +214,7 @@ class PreparseCode
 				{
 					$had_tag = true;
 
-					// If we're in a tag don't do nought!
+					// If we're in a tag, don't do nought!
 					if (!$in_tag)
 					{
 						$in_tag = true;
@@ -272,7 +272,7 @@ class PreparseCode
 		// Put it back together
 		$this->message = implode("\n", $lines);
 
-		// Clear empty ones caused by linebreaks inside of icode tags.
+		// Clear empty ones caused by linebreaks inside icode tags.
 		$this->message = preg_replace('~(?<!\[icode\])\[icode\]\s*\[\/icode\]~i', '', $this->message);
 	}
 
@@ -307,7 +307,7 @@ class PreparseCode
 					// Save what is there [code]stuff[/code]
 					$this->code_blocks['%%' . $key . '%%'] = $parts[$i + 1] . $parts[$i + 2] . $parts[$i + 3];
 
-					// Replace the code block with %%$key%% so its protected from further preparsecode processing
+					// Replace the code block with %%$key%% so It's protected from further preparsecode processing
 					$parts[$i + 1] = '%%';
 					$parts[$i + 2] = $key;
 					$parts[$i + 3] = '%%';
@@ -322,7 +322,7 @@ class PreparseCode
 	}
 
 	/**
-	 * Fix any URLs posted - ie. remove 'javascript:'.
+	 * Fix any URLs posted - i.e., remove 'javascript:'.
 	 *
 	 * - Fix the img and url tags...
 	 * - Fixes links in message and returns nothing.
@@ -394,15 +394,15 @@ class PreparseCode
 	}
 
 	/**
-	 * Fix a specific class of tag - ie. url with =.
+	 * Fix a specific class of tag - i.e., url with =.
 	 *
 	 * - Used by fixTags, fixes a specific tag's links.
 	 *
 	 * @param string $myTag - the tag
-	 * @param string[] $protocols - http, https or ftp
+	 * @param string[] $protocols - http, https, or ftp
 	 * @param bool $embeddedUrl = false - whether it *can* be set to something
 	 * @param bool $hasEqualSign = false, whether it *is* set to something
-	 * @param bool $hasExtra = false - whether it can have extra cruft after the begin tag.
+	 * @param bool $hasExtra = false - whether it can have extra cruft after the beginning tag.
 	 */
 	private function _fixTag($myTag, $protocols, $embeddedUrl = false, $hasEqualSign = false, $hasExtra = false): void
 	{
@@ -474,7 +474,7 @@ class PreparseCode
 				$replace = $protocols[0] . '://' . $replace;
 			}
 
-			// Build a replacement array that is considered safe and proper
+			// Build a replacement array considered safe and proper
 			if ($hasEqualSign && $embeddedUrl)
 			{
 				$replaces[$matches[0][$k]] = '[' . $this_tag . '=' . $replace . ']' . (empty($matches[4][$k]) ? '' : $matches[3][$k] . '[/' . $this_close . ']');
@@ -684,7 +684,7 @@ class PreparseCode
 	}
 
 	/**
-	 * Replace our token-ized message with the saved code blocks
+	 * Replace our tokenized message with the saved code blocks
 	 *
 	 * @param string $message
 	 * @return string
@@ -703,10 +703,10 @@ class PreparseCode
 	 * Validates and corrects table structure
 	 *
 	 * What it does
-	 *   - Checks tables for correct tag order / nesting
+	 *   - Check tables for correct tag order / nesting
 	 *   - Adds in missing closing tags, removes excess closing tags
-	 *   - Although it prevents markup error, it can mess-up the intended (abiet wrong) layout
-	 * driving the post author in to a furious rage
+	 *   - Although it prevents markup error, it can mess up the intended (abet wrong) layout
+	 * driving the post-author in to a furious rage
 	 *
 	 */
 	private function _preparseTable(): void
@@ -723,7 +723,7 @@ class PreparseCode
 			'th' => [''],
 		];
 
-		// Find all closing tags (/table /tr /td etc)
+		// Find all closing tags (/table /tr /td etc.)
 		while (preg_match('~\[(/)*(table|tr|td|th)\]~', $table_check, $matches) === 1)
 		{
 			// Keep track of where this is.
@@ -733,7 +733,7 @@ class PreparseCode
 			// Is it opening?
 			if ($matches[1] !== '/')
 			{
-				// If the previous table tag isn't correct simply remove it.
+				// If the previous table tag isn't correct, simply remove it.
 				if ((!empty($table_array) && !in_array($matches[2], $table_order[$table_array[0]])) || (empty($table_array) && $matches[2] !== 'table'))
 				{
 					$remove_tag = true;
@@ -791,7 +791,7 @@ class PreparseCode
 		preg_match_all($regexFollow, $this->message, $matches);
 		if (isset($matches[1]) && is_array($matches[1]))
 		{
-			// Every [URL} code with follow= in them
+			// Every [URL] code with follow= in them
 			foreach ($matches[1] as $key => $followTerm)
 			{
 				// Flush out the actual URL and follow value
@@ -809,7 +809,7 @@ class PreparseCode
 				{
 					$this->message = str_replace($followTerm, 'follow=true', $this->message);
 				}
-				// Not allowed to use the function and the domain is not on the allowList
+				// Not allowed to use the function, and the domain is not on the allowList
 				else
 				{
 					$this->message = str_replace($followTerm, 'follow=false', $this->message);
@@ -819,7 +819,7 @@ class PreparseCode
 	}
 
 	/**
-	 * This is very simple, and just removes things done by preparsecode.
+	 * This is very simple and just removes things done by preparsecode.
 	 *
 	 * @param string $message
 	 *
@@ -841,7 +841,7 @@ class PreparseCode
 	}
 
 	/**
-	 * Ensure tags inside of nobbc do not get parsed by converting the markers to html entities
+	 * Ensure tags inside nobbc do not get parsed by converting the markers to HTML entities
 	 *
 	 * @param string[] $matches
 	 *
@@ -853,7 +853,7 @@ class PreparseCode
 	}
 
 	/**
-	 * Use only the primary (first) font face when multiple are supplied
+	 * Use only the primary (first) font face when multiples are supplied
 	 *
 	 * @param string[] $matches
 	 *

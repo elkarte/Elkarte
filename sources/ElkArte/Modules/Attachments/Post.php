@@ -158,7 +158,7 @@ class Post extends AbstractModule
 			// Hmm, coming in fresh and there are files in session.
 			elseif ($context['current_action'] !== 'post2' || !empty($this->_req->getPost('from_qr')))
 			{
-				$this->_determineExistingFate($tmp_attachments, $board, $topic);
+				$this->_determineExistingFate($tmp_attachments, (int) $board, (int) $topic);
 			}
 
 			// Process new attachments, skipping over existing

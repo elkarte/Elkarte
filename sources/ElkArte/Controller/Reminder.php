@@ -19,7 +19,6 @@ namespace ElkArte\Controller;
 use ElkArte\AbstractController;
 use ElkArte\Errors\Errors;
 use ElkArte\Exceptions\Exception;
-use ElkArte\Helper\Util;
 use ElkArte\Languages\Txt;
 use ElkArte\Profile\Profile;
 
@@ -78,16 +77,16 @@ class Reminder extends AbstractController
 		$where = '';
 
 		// Coming with a known ID?
-		if (!empty($this->_req->post->uid))
+		if ($this->_req->hasPost('uid'))
 		{
 			$where = 'id_member = {int:id_member}';
-			$where_params['id_member'] = (int) $this->_req->post->uid;
+			$where_params['id_member'] = $this->_req->getPost('uid', 'intval');
 		}
 		elseif ($this->_req->getPost('user') !== '')
 		{
 			$where = 'member_name = {string:member_name}';
-			$where_params['member_name'] = $this->_req->getPost('user', 'trim|\\ElkArte\\Helper\\Util::htmlspecialchars[ENT_QUOTES]');
-			$where_params['email_address'] = $this->_req->getPost('user', 'trim|\\ElkArte\\Helper\\Util::htmlspecialchars[ENT_QUOTES]');
+			$where_params['member_name'] = $this->_req->getPost('user', 'trim|Util::htmlspecialchars[ENT_QUOTES]');
+			$where_params['email_address'] = $this->_req->getPost('user', 'trim|Util::htmlspecialchars[ENT_QUOTES]');
 		}
 
 		// You must enter a username/email address.
@@ -165,6 +164,8 @@ class Reminder extends AbstractController
 			'id' => $member['id_member'],
 			'name' => $member['member_name'],
 		];
+
+		return null;
 	}
 
 	/**
@@ -255,7 +256,7 @@ class Reminder extends AbstractController
 		if (empty($code) || !str_starts_with(hash('sha256', $code), $member['validation_code']))
 		{
 			// Stop brute force attacks like this.
-			validatePasswordFlood($member_id, $member['passwd_flood'], false);
+			validatePasswordFlood($member_id, $member['passwd_flood']);
 
 			throw new Exception($txt['invalid_activation_code'], false);
 		}

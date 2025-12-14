@@ -96,7 +96,7 @@ class Draft extends Post
 		}
 
 		// Get things started
-		$msgCount = draftsCount($this->_memID, 0);
+		$msgCount = draftsCount($this->_memID);
 		$maxIndex = (int) $modSettings['defaultMaxMessages'];
 
 		// Make sure the starting place makes sense and construct our friend the page index.
@@ -337,7 +337,7 @@ class Draft extends Post
 		$context['posts'] = [];
 		foreach ($user_drafts as $row)
 		{
-			$this->_prepare_body_subject($row['body'], $row['subject'], $txt['no_subject'], true);
+			$this->_prepare_body_subject($row['body'], $row['subject'], $txt['no_subject']);
 
 			// Have they provided who this will go to?
 			$recipients = [

@@ -167,12 +167,12 @@ class Karma extends AbstractController
 			redirectexit('topic=' . $topic . '.' . $start . ($msg_id > 0 ? '#msg' . $msg_id : ''));
 		}
 		// Hrm... maybe a personal message?
-		elseif ($this->_req->getRequest('f', 'intval', null) !== null)
+		elseif ($this->_req->getRequest('f', 'intval') !== null)
 		{
 			$f = $this->_req->getRequest('f', 'intval', 0);
 			$start = $this->_req->getRequest('start', 'intval', 0);
-			$l = $this->_req->getRequest('l', 'intval', null);
-			$pm = $this->_req->getRequest('pm', 'intval', null);
+			$l = $this->_req->getRequest('l', 'intval');
+			$pm = $this->_req->getRequest('pm', 'intval');
 			redirectexit('action=pm;f=' . $f . ';start=' . $start . ($l !== null ? ';l=' . $l : '') . ($pm !== null ? '#' . $pm : ''));
 		}
 		// JavaScript as a last resort.

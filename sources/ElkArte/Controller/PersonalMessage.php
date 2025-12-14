@@ -426,7 +426,7 @@ class PersonalMessage extends AbstractController
 		}
 
 		// Make sure the starting location is valid.
-		$start_raw = $this->_req->getQuery('start', 'trim', null);
+		$start_raw = $this->_req->getQuery('start', 'trim');
 		if ($start_raw !== null && $start_raw !== 'new')
 		{
 			$start = (int) $start_raw;
@@ -686,7 +686,7 @@ class PersonalMessage extends AbstractController
 		}
 
 		// Set up the page index.
-		$label_for_index = $this->_req->getQuery('l', 'intval', null);
+		$label_for_index = $this->_req->getQuery('l', 'intval');
 		$context['page_index'] = constructPageIndex('{scripturl}?action=pm;f=' . $context['folder'] . ($label_for_index !== null ? ';l=' . (int) $label_for_index : '') . ';sort=' . $context['sort_by'] . ($descending ? ';desc' : ''), $start, $max_messages, $modSettings['defaultMaxMessages']);
 		$context['start'] = $start;
 
@@ -764,7 +764,7 @@ class PersonalMessage extends AbstractController
 
 		try
 		{
-			$pmsg_event = $this->_req->getQuery('pmsg', 'intval', null);
+			$pmsg_event = $this->_req->getQuery('pmsg', 'intval');
 			$pmsg_event_quote = $this->_req->getQuery('quote', 'trim', '');
 			if ($pmsg_event !== null)
 			{
@@ -2568,7 +2568,7 @@ class PersonalMessage extends AbstractController
 		}
 
 		// Sort out the page index.
-		$context['page_index'] = constructPageIndex('{scripturl}?action=pm;sa=search2;params=' . $context['params'], $context['start'], $numResults, $modSettings['search_results_per_page'], false);
+		$context['page_index'] = constructPageIndex('{scripturl}?action=pm;sa=search2;params=' . $context['params'], $context['start'], $numResults, $modSettings['search_results_per_page']);
 
 		$context['message_labels'] = [];
 		$context['message_replied'] = [];
@@ -2592,7 +2592,7 @@ class PersonalMessage extends AbstractController
 
 				// Load this poster context info, if not there, then fill in the essentials...
 				$member = MembersList::get($row['id_member_from']);
-				$member->loadContext(true);
+				$member->loadContext();
 				if ($member->isEmpty())
 				{
 					$member['name'] = $row['from_name'];
@@ -2715,7 +2715,7 @@ class PersonalMessage extends AbstractController
 		$this->_search_params = [];
 
 		// Read encoded params from either GET or POST using helper
-		$temp_params = $this->_req->getRequest('params', 'trim|strval', null);
+		$temp_params = $this->_req->getRequest('params', 'trim|strval');
 		if ($temp_params !== null && $temp_params !== '')
 		{
 			// Decode and replace the uri safe characters we added
@@ -3097,7 +3097,7 @@ class PersonalMessage extends AbstractController
 
 		checkSession('request');
 
-		$pmsg = $this->_req->getQuery('pmsg', 'intval', null);
+		$pmsg = $this->_req->getQuery('pmsg', 'intval');
 
 		// Marking a message as unread, we need a message that was sent to them
 		// Can't mark your own reply as unread, that would be weird

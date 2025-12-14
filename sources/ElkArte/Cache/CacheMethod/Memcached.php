@@ -67,7 +67,13 @@ class Memcached extends AbstractCacheMethod
 	}
 
 	/**
-	 * {@inheritDoc}
+	 * Configures multiple settings for the Memcached instance.
+	 *
+	 * This method sets various options for the Memcached client, including
+	 * connection timeout, distribution strategy, failure thresholds,
+	 * retry intervals, and handling of failed servers.
+	 *
+	 * @return void
 	 */
 	protected function setOptions(): void
 	{

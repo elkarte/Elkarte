@@ -213,7 +213,9 @@ class Image
 	{
 		clearstatcache(false, $this->_fileName);
 
-		return FileFunctions::instance()->fileSize($this->_fileName);
+		$size = FileFunctions::instance()->fileSize($this->_fileName);
+
+		return $size === false ? 0 : $size;
 	}
 
 	/**

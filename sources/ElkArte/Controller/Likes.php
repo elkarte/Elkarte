@@ -227,7 +227,7 @@ class Likes extends AbstractController
 		// No errors, build the new button tag
 		if (empty($this->_likes_response))
 		{
-			$details = loadLikes($this->_id_liked, true);
+			$details = loadLikes($this->_id_liked);
 			$count = empty($details) ? 0 : $details[$this->_id_liked]['count'];
 			$youLiked = $count !== 0 && array_key_exists(User::$info->id, $details[$this->_id_liked]['member']);
 			$text = $count !== 0 ? ($youLiked ? $txt['unlike_post'] : $txt['likes']) : $txt['like_post'];

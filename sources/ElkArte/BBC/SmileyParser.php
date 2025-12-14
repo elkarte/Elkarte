@@ -136,7 +136,7 @@ class SmileyParser
 	 * What it does:
 	 *   - The smiley parsing function which makes emoji appear :man_shrugging:
 	 *   - Replaces found tags with image from chosen set
-	 *   - Finds keyboard entered emoji text and converts to site image for constitent look
+	 *   - Finds keyboard entered emoji text and converts to site image for consistent look
 	 *   - Specifically not parsed in bbc/code tags [url=mailto:Dad@blah.com] (defined by BBC Parser)
 	 *   - Uses the emoji class to do the replacements
 	 *

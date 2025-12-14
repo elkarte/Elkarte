@@ -25,7 +25,7 @@ namespace ElkArte\Helper;
  * - Fetch cleaned values with $instance->getPost('keyname', 'sanitation needs', 'default value')
  *     - $this->-req->getPost('filename', 'trim|strval', '');
  *     - $this->-req->getQuery('filename', 'intval', 0);
- *     - Can use rules as 'htmlspecialchars[ENT_COMPAT]', '\\ElkArte\\Helper\\Util::htmlspecialchars[ENT_QUOTES]'
+ *     - Can use rules as 'htmlspecialchars[ENT_COMPAT]', 'Util::htmlspecialchars[ENT_QUOTES]'
  */
 class HttpReq
 {
@@ -166,7 +166,7 @@ class HttpReq
 	/**
 	 * Generic check to see if a property is set in one of the super globals
 	 *
-	 * - checks in order of param, get, post
+	 * - Checks in order of param, get, post
 	 *
 	 * @param string $key
 	 *

@@ -60,7 +60,7 @@ abstract class AbstractCacheMethod implements CacheMethodInterface
 	}
 
 	/**
-	 * Obtain the variables necessary to help build the final key for storage.
+	 * Get the variables necessary to help build the final key for storage.
 	 *
 	 * @param string $key
 	 * @return string
@@ -87,7 +87,7 @@ abstract class AbstractCacheMethod implements CacheMethodInterface
 	}
 
 	/**
-	 * {@inheritDoc}
+	 *
 	 */
 	public function settings(&$config_vars)
 	{

@@ -16,7 +16,7 @@
 namespace BBC;
 
 /**
- * Class MarkdownParser.  Converts markdown syntax to BBC codes.
+ * Class MarkdownParser.  Converts Markdown syntax to BBC codes.
  *
  * @package BBC
  */
@@ -149,10 +149,10 @@ class MarkdownParser
 	}
 
 	/**
-	 * Given a markdown tag, such as *, will search for exactly 2 '*'s, followed by text followed
-	 * by exactly 2 '*'s  *text* will not match **text** will match ***text*** will not match
+	 * Given a Markdown tag, such as *, will search for exactly 2 '*'s, followed by text followed
+	 * by exactly 2 '*'s *text* will not match **text** will match ***text*** will not match
 	 *
-	 * @param string $md markdown tag to search for, like *
+	 * @param string $md Markdown tag to search for, like *
 	 * @param string $bbc bbc tag to replace with
 	 * @param string $data the string to search / replace
 	 *
@@ -179,7 +179,7 @@ class MarkdownParser
 	/**
 	 * Same as doubleTagConvert but only allows for a single markdown character
 	 *
-	 * @param string $md markdown tag to search for, like *
+	 * @param string $md Markdown tag to search for, like *
 	 * @param string $bbc bbc tag to replace with
 	 * @param string $data the string to search / replace
 	 *

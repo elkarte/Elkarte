@@ -159,7 +159,7 @@ class Emailmoderator extends AbstractController
 		}
 
 		// Make sure we have a comment and it's clean.
-		if ($this->_req->getPost('comment', '\\ElkArte\\Helper\\Util::htmltrim', '') === '')
+		if ($this->_req->getPost('comment', 'Util::htmltrim', '') === '')
 		{
 			$report_errors->addError('no_comment');
 		}

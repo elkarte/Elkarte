@@ -111,7 +111,7 @@ class About extends AbstractController
 			$this->_req->post = new ArrayObject($validator->validation_data(), ArrayObject::ARRAY_AS_PROPS);
 
 			// Trigger the verify contact event for captcha checks
-			$this->_events->trigger('verify_contact', []);
+			$this->_events->trigger('verify_contact');
 
 			// No errors, then send the PM to the admins
 			if (empty($context['errors']))
@@ -145,7 +145,7 @@ class About extends AbstractController
 			$context['page_title'] = $txt['admin_contact_form'];
 
 			// Setup any contract form events, like validation
-			$this->_events->trigger('setup_contact', []);
+			$this->_events->trigger('setup_contact');
 		}
 
 		createToken('contact');

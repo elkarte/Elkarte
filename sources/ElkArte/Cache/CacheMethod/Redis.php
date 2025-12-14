@@ -86,7 +86,7 @@ class Redis extends AbstractCacheMethod
 	}
 
 	/**
-	 * {@inheritDoc}
+	 * Set the options for the redis connection.
 	 */
 	protected function setOptions(): void
 	{

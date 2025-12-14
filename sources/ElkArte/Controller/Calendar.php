@@ -227,10 +227,10 @@ class Calendar extends AbstractController
 		isAllowedTo('calendar_post');
 
 		// Cast this for safety...
-		$event_id = isset($_REQUEST['eventid']) ? (int) $_REQUEST['eventid'] : null;
+		$event_id = $this->_req->getRequest('eventid', 'intval');
 
 		// Submitting?
-		if (isset($_POST[$context['session_var']], $event_id))
+		if ($this->_req->hasPOST($context['session_var']) && isset($event_id))
 		{
 			return $this->action_save();
 		}
@@ -278,6 +278,8 @@ class Calendar extends AbstractController
 		$context['breadcrumbs'][] = [
 			'name' => $context['page_title'],
 		];
+
+		return null;
 	}
 
 	/**

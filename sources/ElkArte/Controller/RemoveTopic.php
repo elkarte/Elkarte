@@ -150,7 +150,7 @@ class RemoveTopic extends AbstractController
 		require_once(SUBSDIR . '/Messages.subs.php');
 
 		// Need a message to remove
-		$_msg = $this->_req->getQuery('msg', 'intval', null);
+		$_msg = $this->_req->getQuery('msg', 'intval');
 
 		// Is $topic set?
 		if (empty($topic) && $this->_req->hasQuery('topic'))

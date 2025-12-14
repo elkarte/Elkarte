@@ -175,7 +175,7 @@ class SplitTopics extends AbstractController
 		global $txt;
 
 		// Clean up the subject.
-		$subname = $this->_req->getPost('subname', 'trim', $this->_req->getQuery('subname', 'trim', null));
+		$subname = $this->_req->getPost('subname', 'trim', $this->_req->getQuery('subname', 'trim'));
 		if (isset($subname) && empty($this->_new_topic_subject))
 		{
 			$this->_new_topic_subject = Util::htmlspecialchars($subname);

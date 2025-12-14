@@ -583,9 +583,10 @@ function pc_next_permutation($p, $size)
  * @event integrate_redirect called before headers are sent
  * @param string $setLocation = '' The URL to redirect to
  *
- * @return void|string will return $setLocation string when run via the testbed
+ * Never returns.  However, it will return the $setLocation string when run via the testbed so that
+ * controller tests can complete.
  */
-function redirectexit($setLocation = '')
+function redirectexit($setLocation = ''): never
 {
 	global $db_show_debug;
 
@@ -623,7 +624,7 @@ function redirectexit($setLocation = '')
  * @param bool $from_fatal_error = false If we are exiting due to a fatal error
  * @throws \ElkArte\Exceptions\Exception
  */
-function obExit($header = null, $do_footer = null, $from_index = false, $from_fatal_error = false)
+function obExit($header = null, $do_footer = null, $from_index = false, $from_fatal_error = false): never
 {
 	global $context, $txt, $db_show_debug;
 
