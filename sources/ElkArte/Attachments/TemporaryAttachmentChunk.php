@@ -81,7 +81,7 @@ class TemporaryAttachmentChunk
 	/**
 	 * Process and save an asynchronously uploaded file chunk.
 	 *
-	 * This method handles the extraction and validation of post data,
+	 * This method handles the extraction and validation of post-data,
 	 * validation of the received file, writing the file chunk to a local temporary file,
 	 * and managing errors during these operations.
 	 *
@@ -114,7 +114,7 @@ class TemporaryAttachmentChunk
 	}
 
 	/**
-	 * Extract post data parameters from the request.
+	 * Extract post-data parameters from the request.
 	 *
 	 * @return array An array containing the UUID, chunk index, and total chunk count.
 	 * Defaults to [null, 0, 0] if values are not provided.
@@ -135,7 +135,7 @@ class TemporaryAttachmentChunk
 	}
 
 	/**
-	 * Validates the post data is complete and within the known bounds.
+	 * Validates the post-data is complete and within the known bounds.
 	 *
 	 * @param string $uuid The UUID of the data.
 	 * @param int $chunkIndex The index of the current chunk.
@@ -161,9 +161,9 @@ class TemporaryAttachmentChunk
 
 	/**
 	 * Validates
-	 * - the total number of chunks will fit within the maximum post size
-	 * - that the output directory is writable
-	 * - only does this on the first chuck
+	 * - The total number of chunks will fit within the maximum post-size
+	 * - That the output directory is writable
+	 * - Only does this on the first chuck
 	 *
 	 * @param int $totalChunkCount The total number of chunks.
 	 * @param int $chunkIndex The index of the current chunk.
@@ -436,7 +436,7 @@ class TemporaryAttachmentChunk
 	/**
 	 * Build the fileArray parameter for now combined file.
 	 *
-	 * This will then be used in action_ulattach as though it was uploaded as a single file,
+	 * This will then be used in action_ulattach as though it was uploaded as a single file
 	 * and now be subject to all the same tests and manipulations.  This will also be done as strict=false
 	 * as we have already verified these were php uploaded files.
 	 *
@@ -472,7 +472,7 @@ class TemporaryAttachmentChunk
 	}
 
 	/**
-	 * Get the combined file path and name based on the user identifier, UUID and some salt
+	 * Get the combined file path and name based on the user identifier, UUID, and some salt
 	 *
 	 * @param string $user_ident The user identifier.
 	 * @param string $uuid The unique identifier.
