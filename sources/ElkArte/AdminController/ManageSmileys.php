@@ -739,8 +739,8 @@ class ManageSmileys extends AbstractController
 			// Some useful arrays... types we allow - and ports we don't!
 			$disabledFiles = ['con', 'com1', 'com2', 'com3', 'com4', 'prn', 'aux', 'lpt1', '.htaccess', 'index.php'];
 
-			$this->_req->post->smiley_code = $this->_req->getPost('smiley_code', '\\ElkArte\\Helper\\Util::htmltrim', '');
-			$this->_req->post->smiley_filename = $this->_req->getPost('smiley_filename', '\\ElkArte\\Helper\\Util::htmltrim', '');
+			$this->_req->post->smiley_code = $this->_req->getPost('smiley_code', 'Util::htmltrim', '');
+			$this->_req->post->smiley_filename = $this->_req->getPost('smiley_filename', 'Util::htmltrim', '');
 			$this->_req->post->smiley_location = $this->_req->getPost('smiley_location', 'intval', 0);
 			$this->_req->post->smiley_location = min(max($this->_req->post->smiley_location, 0), 2);
 
@@ -1022,8 +1022,8 @@ class ManageSmileys extends AbstractController
 				// Otherwise an edit.
 				else
 				{
-					$this->_req->post->smiley_code = $this->_req->getPost('smiley_code', '\\ElkArte\\Helper\\Util::htmltrim', '');
-					$this->_req->post->smiley_filename = $this->_req->getPost('smiley_filename', '\\ElkArte\\Helper\\Util::htmltrim', '');
+					$this->_req->post->smiley_code = $this->_req->getPost('smiley_code', 'Util::htmltrim', '');
+					$this->_req->post->smiley_filename = $this->_req->getPost('smiley_filename', 'Util::htmltrim', '');
 					$this->_req->post->smiley_location = empty($this->_req->post->smiley_location)
 						|| $this->_req->post->smiley_location > 2
 						|| $this->_req->post->smiley_location < 0 ? 0 : (int) $this->_req->post->smiley_location;

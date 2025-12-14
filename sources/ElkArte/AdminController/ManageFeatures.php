@@ -1447,8 +1447,8 @@ class ManageFeatures extends AbstractController
 				redirectexit('action=admin;area=featuresettings;sa=profileedit;fid=' . (int) $context['fid'] . ';msg=regex_error');
 			}
 
-			$this->_req->post->field_name = $this->_req->getPost('field_name', '\\ElkArte\\Helper\\Util::htmlspecialchars');
-			$this->_req->post->field_desc = $this->_req->getPost('field_desc', '\\ElkArte\\Helper\\Util::htmlspecialchars');
+			$this->_req->post->field_name = $this->_req->getPost('field_name', 'Util::htmlspecialchars');
+			$this->_req->post->field_desc = $this->_req->getPost('field_desc', 'Util::htmlspecialchars');
 
 			$rows = isset($this->_req->post->rows) ? (int) $this->_req->post->rows : 4;
 			$cols = isset($this->_req->post->cols) ? (int) $this->_req->post->cols : 30;
