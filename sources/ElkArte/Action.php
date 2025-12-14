@@ -135,12 +135,6 @@ class Action
 		// Start off by assuming that this is a callable of some kind.
 		$call = $subAction['function'] ?? $subAction;
 
-	// Why was this here? It ignores directory location if provided.
-	//	if (isset($subAction['file']))
-	//	{
-	//		require_once($subAction['file']);
-	//	}
-
 		// Calling a method within a controller?
 		if (isset($subAction['controller'], $subAction['function']))
 		{
