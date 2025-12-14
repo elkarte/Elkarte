@@ -256,7 +256,7 @@ class ProfileAccount extends AbstractController
 			checkSession();
 
 			// There must be a reason, and use of flowery words is allowed.
-			$warn_reason = $this->_req->getPost('warn_reason', 'trim|\\ElkArte\\Helper\\Util::htmlspecialchars', '');
+			$warn_reason = $this->_req->getPost('warn_reason', 'trim|Util::htmlspecialchars', '');
 			if ($warn_reason === '' && !$context['user']['is_owner'])
 			{
 				$this->_issueErrors[] = 'warning_no_reason';
@@ -390,7 +390,7 @@ class ProfileAccount extends AbstractController
 			}
 
 			// Try to remember some bits.
-			$context['preview_subject'] = $this->_req->getPost('warn_sub', 'trim|\\ElkArte\\Helper\\Util::htmlspecialchars', '');
+			$context['preview_subject'] = $this->_req->getPost('warn_sub', 'trim|Util::htmlspecialchars', '');
 			$context['warning_data'] = [
 				'reason' => $this->_req->post->warn_reason,
 				'notify' => !empty($this->_req->post->warn_notify),

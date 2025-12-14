@@ -1239,9 +1239,9 @@ class Packages extends AbstractController
 			checkSession();
 
 			updateSettings([
-				'package_server' => $this->_req->getPost('pack_server', 'trim|\\ElkArte\\Helper\\Util::htmlspecialchars'),
-				'package_port' => $this->_req->getPost('pack_port', 'trim|\\ElkArte\\Helper\\Util::htmlspecialchars'),
-				'package_username' => $this->_req->getPost('pack_user', 'trim|\\ElkArte\\Helper\\Util::htmlspecialchars'),
+				'package_server' => $this->_req->getPost('pack_server', 'trim|Util::htmlspecialchars'),
+				'package_port' => $this->_req->getPost('pack_port', 'trim|Util::htmlspecialchars'),
+				'package_username' => $this->_req->getPost('pack_user', 'trim|Util::htmlspecialchars'),
 				'package_make_backups' => !empty($this->_req->post->package_make_backups),
 				'package_make_full_backups' => !empty($this->_req->post->package_make_full_backups)
 			]);

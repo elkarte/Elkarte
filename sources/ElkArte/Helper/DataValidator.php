@@ -32,6 +32,8 @@ use ParseError;
  *    $validation->sanitation_rules(array(
  *      'username' => 'trim|strtoupper',
  *      'email'    => 'trim|gmail_normalize'
+ *      'other'    => 'Util::htmlspecialchars[ENT_QUOTES] // pass parameters to the function'
+ *      'or        => 'Util::htmlspecialchars'
  *    ));
  *
  * Set optional variable name substitutions
@@ -235,10 +237,15 @@ class DataValidator
 					{
 						$input[$field] = $this->{$sanitation['method']}($input[$field], $sanitation['parameters']);
 					}
-					// One of our static methods or even a built in php function like strtoupper, intval, etc?
+					// A static method or a built in php function like strtoupper, intval, etc?
 					elseif (is_callable($sanitation['function']))
 					{
 						$input[$field] = call_user_func_array($sanitation['function'], array_merge((array) $input[$field], $sanitation['parameters_function']));
+					}
+					// Maybe one of our Util:: methods
+					elseif (is_callable('\\ElkArte\\Helper\\' . $sanitation['function']))
+					{
+						$input[$field] = call_user_func_array('\\ElkArte\\Helper\\' . $sanitation['function'], array_merge((array) $input[$field], $sanitation['parameters_function']));
 					}
 					// Or even a language construct?
 					elseif (in_array($sanitation['function'], ['empty', 'array', 'isset']))
@@ -558,7 +565,7 @@ class DataValidator
 		$details['parameters_function'] = [];
 
 		// Were any parameters provided for the rule, e.g. min_length[6]
-		if (preg_match('~(.*)\[(.*)\]~', $rule, $match))
+		if (preg_match('~(.*)\[(.*)]~', $rule, $match))
 		{
 			$details['method'] = $type . $match[1];
 			$details['parameters'] = $match[2];
@@ -1395,10 +1402,10 @@ class DataValidator
 	}
 
 	/**
-	 * Uses \ElkArte\Helper\Util::htmlspecialchars to sanitize html in the input
+	 * Uses \ElkArte\Helper\Util::htmlspecialchars to sanitize HTML in the input
 	 *
 	 * - Use this method in place of a standard getXXX('xx', 'Util::htmlspecialchars', '');
-	 * if you require ENT_QUOTES and double encoding
+	 * if you require ENT_QUOTES AND double encoding
 	 *
 	 * @param string $input
 	 *

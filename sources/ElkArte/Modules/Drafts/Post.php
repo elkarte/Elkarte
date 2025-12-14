@@ -341,7 +341,7 @@ class Post extends AbstractModule
 
 		// Prepare and clean the data, load the draft array
 		$icon = $req->getPost('icon', 'trim|strval', 'xx');
-		$subject = $req->getPost('subject', '\\ElkArte\\Helper\\Util::htmlspecialchars', '');
+		$subject = $req->getPost('subject', 'Util::htmlspecialchars', '');
 		$message = $req->getPost('message', 'trim', '');
 
 		$draft = [
