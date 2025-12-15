@@ -60,7 +60,7 @@ class Censor
 	}
 
 	/**
-	 * Loads options to the class, such as ignoring case, etc
+	 * Loads options to the class, such as ignoring case, etc.
 	 *
 	 * @param array $options
 	 */

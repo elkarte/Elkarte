@@ -27,7 +27,7 @@ use ElkArte\Languages\Txt;
  * - Destination can start with * and / to signify that the file may come from any directory.
  * - Destination should not begin with a / if single_file is true.
  * - Overwrites existing files with newer modification times if and only if overwrite is true.
- * - Creates the destination directory if it doesn't exist, and is is specified.
+ * - Creates the destination directory if it doesn't exist, and is specified.
  * - Requires zlib support be built into PHP.
  * - Returns an array of the files extracted on success
  */
@@ -36,7 +36,7 @@ class UnZip
 	/** @var array Holds the return array of files processed */
 	protected $return = [];
 
-	/** @var array Holds the data found in the end of central directory record */
+	/** @var array Holds the data found at the end of central directory record */
 	protected $_zip_info = [];
 
 	/** @var array Holds the information from the central directory for each file in the archive */
@@ -54,7 +54,7 @@ class UnZip
 	/** @var string Contains the central record string */
 	protected $_data_cdr = '';
 
-	/** @var bool If the file passes or fails crc check */
+	/** @var bool If the file passes or fails, crc check */
 	protected $_crc_check = false;
 
 	/** @var bool If we are going to write out the files processed */
@@ -114,7 +114,7 @@ class UnZip
 		require_once(SUBSDIR . '/Package.subs.php');
 		$this->fileFunc = FileFunctions::instance();
 
-		// The destination needs exist, and be writable, or we are doomed
+		// The destination needs to exist and be writable, or we are doomed
 		umask(0);
 		if ($this->destination === null)
 		{
@@ -168,7 +168,7 @@ class UnZip
 			return $this->_crc_check ? $this->_found : false;
 		}
 
-		// Wanted many files then we need to clean up
+		// Wanted many files than we need to clean up
 		if ($this->destination !== null && !$this->single_file)
 		{
 			package_flush_cache();
@@ -236,7 +236,7 @@ class UnZip
 	 *
 	 * What it does:
 	 *
-	 * - Is a repeated sequence of [file header] . . .  until the end of central dir record.
+	 * - Is a repeated sequence of [file header]... until the end of central dir record.
 	 * - Relative offset, used such that we can find the actual data entry for each file in the archive
 	 * - Validates the number of found files in the CDR matches what the ECDR record claims
 	 *
@@ -264,26 +264,26 @@ class UnZip
 		$pointer = 0;
 		$i = 0;
 
-		// Each header will be proceeded by the central directory file header signature which is always \x50\x4b\x01\x02
+		// Each header will be proceeded by the central directory file header signature, which is always \x50\x4b\x01\x02
 		while (substr($this->_data_cdr, $pointer, 4) === "\x50\x4b\x01\x02")
 		{
 			$i++;
 
-			// Extract all file standard length information for this record, its the 42 bytes following the signature
+			// Extract all file standard length information for this record; it's the 42 bytes following the signature
 			$temp = unpack('vversion/vversion_needed/vgeneral_purpose/vcompress_method/vfile_time/vfile_date/Vcrc/Vcompressed_size/Vsize/vfilename_length/vextra_field_length/vcomment_length/vdisk_number_start/vinternal_attributes/vexternal_attributes1/vexternal_attributes2/Vrelative_offset', substr($this->_data_cdr, $pointer + 4, 42));
 			if ($temp === false)
 			{
 				return false;
 			}
 
-			// Extract the variable length data, filename, etc
+			// Extract the variable length data, filename, etc.
 			$pointer += 46;
 			$temp['filename'] = substr($this->_data_cdr, $pointer, $temp['filename_length']);
 			$temp['extra_field'] = $temp['extra_field_length'] ? substr($this->_data_cdr, $pointer + $temp['filename_length'], $temp['extra_field_length']) : '';
 			$temp['file_comment'] = $temp['comment_length'] ? substr($this->_data_cdr, $pointer + $temp['filename_length'] + $temp['extra_field_length'], $temp['comment_length']) : '';
 			$temp['dir'] = $this->destination . '/' . dirname($temp['filename']);
 
-			// Save this file details
+			// Save this file detail
 			$this->_files_info[$temp['filename']] = $temp;
 
 			// Move to the next record
@@ -383,11 +383,11 @@ class UnZip
 	}
 
 	/**
-	 * Does what it says, determines if we are writing this file or not
+	 * Does what it says, determines if we are writing this file or not.
 	 */
 	private function _determine_write_this(): void
 	{
-		// If this is a file, and it doesn't exist.... happy days!
+		// If this is a file, and it doesn't exist... happy days!
 		if (!str_ends_with($this->_filename, '/')
 			&& !$this->fileFunc->fileExists($this->destination . '/' . $this->_filename))
 		{
@@ -443,7 +443,7 @@ class UnZip
 	 */
 	private function _read_local_header(): void
 	{
-		// The local header data is always the 26 bytes after the 4 byte signature
+		// The local header data is always the 26 bytes after the 4-byte signature
 		$local_file_data = unpack('vversion_needed/vgeneral_purpose/vcompress_method/vfile_time/vfile_date/Vcrc/Vcompressed_size/Vsize/vfilename_length/vextra_field_length', substr($this->_file_info['data'], 4, 26));
 
 		$this->_file_info['filename_length'] = $local_file_data['filename_length'];
@@ -457,23 +457,23 @@ class UnZip
 	 *
 	 * What it does:
 	 *
-	 * - If bit 1 is set the file is protected, so it returns an empty one
-	 * - If bit 3 is set then the data descriptor is read and processed
+	 * - If bit 1 is set, the file is protected, so it returns an empty one
+	 * - If bit 3 is set, then the data descriptor is read and processed
 	 *
 	 * The data descriptor, if it exists, is structured as
-	 * - Local header signature: 4 bytes, optional (0x08074b50)
-	 * - CRC-32: 4 bytes
-	 * - Compressed size: 4 bytes
-	 * - Uncompressed size: 4 bytes
+	 *   - Local header signature: 4 bytes, optional (0x08074b50)
+	 *   - CRC-32: 4 bytes
+	 *   - Compressed size: 4 bytes
+	 *   - Uncompressed size: 4 bytes
 	 *
 	 * This descriptor exists only if bit 3 of the general purpose bit flag is set.
-	 * It is byte aligned and immediately follows the last byte of compressed data.
+	 * It is byte-aligned and immediately follows the last byte of compressed data.
 	 * This descriptor is used only when it was not possible to seek in the output zip
-	 * file, e.g., when the output zip file was standard output or a non seekable device.
+	 * file, e.g., when the output zip file was standard output or a non-seekable device.
 	 */
 	private function _check_general_purpose_flag(): void
 	{
-		// If bit 1 is set the file is encrypted so empty it instead of writing out gibberish
+		// If bit 1 is set, the file is encrypted so empty it instead of writing out gibberish
 		if (($this->_file_info['general_purpose'] & 0x0001) !== 0)
 		{
 			$this->_file_info['data'] = '';
@@ -552,7 +552,7 @@ class UnZip
 	}
 
 	/**
-	 * Checks the saved vs calculated crc values
+	 * Checks the saved vs. calculated crc values
 	 */
 	private function _check_crc(): bool
 	{

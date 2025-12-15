@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Utility functions, such as to handle multi byte strings
+ * Utility functions, such as to handle multibyte strings
  *
  * @package   ElkArte Forum
  * @copyright ElkArte Forum contributors
@@ -14,7 +14,7 @@
 namespace ElkArte\Helper;
 
 /**
- * Utility functions, such as to handle multi byte strings
+ * Utility functions, such as to handle multibyte strings
  * Note: some of these might be deprecated or removed in the future.
  */
 class Util
@@ -32,7 +32,7 @@ class Util
 	{
 		$num = $string[0] === 'x' ? hexdec(substr($string, 1)) : (int) $string;
 
-		// We don't allow control characters, characters out of range, byte markers, etc
+		// We don't allow control characters, characters out of range, byte markers, etc.
 		if ($num < 0x20 || $num > 0x10FFFF || ($num >= 0xD800 && $num <= 0xDFFF) || $num === 0x202D || $num === 0x202E)
 		{
 			return '';
@@ -42,13 +42,13 @@ class Util
 	}
 
 	/**
-	 * Performs an htmlspecialchars on a string, using UTF-8 character set
+	 * Performs a htmlspecialchars on a string, using UTF-8 character set
 	 * Optionally performs an entity_fix to null any invalid character entities from the string
 	 *
 	 * @param string $string
 	 * @param int $quote_style integer or constant representation of one
 	 * @param string $charset only UTF-8 allowed
-	 * @param bool $double true will allow double encoding, false will not encode existing html entities,
+	 * @param bool $double true will allow double encoding, false will not encode existing HTML entities,
 	 *
 	 * @return string|null
 	 */
@@ -70,12 +70,12 @@ class Util
 	}
 
 	/**
-	 * Adds html entities to the array/variable.  Uses two underscores to guard against overloading.
+	 * Adds HTML entities to the array/variable.  Uses two underscores to guard against overloading.
 	 *
 	 * What it does:
 	 *
 	 * - Adds entities (&quot;, &lt;, &gt;) to the array or string var.
-	 * - Importantly, does not effect keys, only values.
+	 * - Importantly, does not affect keys, only values.
 	 * - Calls itself recursively if necessary.
 	 * - Does not go deeper than 25 to prevent loop exhaustion
 	 *
@@ -136,9 +136,9 @@ class Util
 	 *
 	 * What it does:
 	 *
-	 * - Trims a string or an array using html characters as well.
+	 * - Trims a string or an array using HTML characters as well.
 	 * - Remove spaces (32), tabs (9), returns (13, 10, and 11), nulls (0), and hard spaces. (160)
-	 * - Does not effect keys, only values.
+	 * - Does not affect keys, only values.
 	 * - May call itself recursively if needed.
 	 * - Does not go deeper than 25 to prevent loop exhaustion
 	 *
@@ -165,12 +165,12 @@ class Util
 	}
 
 	/**
-	 * Perform a strpos search on a multi-byte string
+	 * Perform a strpos search on a multibyte string
 	 *
 	 * - Optionally performs an entity_fix to null any invalid character entities from the string before the search
 	 *
 	 * @param string $haystack what to search in
-	 * @param string $needle what is being looked for
+	 * @param string $needle what is being searched for
 	 * @param int $offset where to start, assumed 0
 	 * @param bool $right set to true to mimic strrpos functions
 	 *
@@ -191,7 +191,7 @@ class Util
 			$count = count($haystack_arr) - 1;
 		}
 
-		// Single character search, lets go
+		// Single character search, let's go
 		if (strlen($needle) === 1)
 		{
 			$result = array_search($needle, array_slice($haystack_arr, $offset), true);
@@ -220,7 +220,7 @@ class Util
 	}
 
 	/**
-	 * Converts a multi-byte string to lowercase
+	 * Converts a multibyte string to lowercase
 	 *
 	 * - Prefers to use mb_ functions if available, otherwise will use charset substitution tables
 	 *
@@ -241,12 +241,11 @@ class Util
 	}
 
 	/**
-	 * Cuts off a multi-byte string at a certain length
+	 * Cuts off a multibyte string at a certain length
 	 *
-	 * - Optionally performs an entity_fix to null any invalid character entities from the string prior to the length
-	 * check
+	 * - Optionally performs an entity_fix to null any invalid character entities from the string prior to the length check
 	 * - Use this when the number of actual characters (&nbsp; = 6 not 1) must be <= length not the displayable,
-	 * for example db field compliance to avoid overflow
+	 * for example, db field compliance to avoid overflow
 	 *
 	 * @param string $string
 	 * @param int $length
@@ -276,7 +275,7 @@ class Util
 	}
 
 	/**
-	 * Returns the length of multi-byte string
+	 * Returns the length of multibyte string
 	 *
 	 * @param string $string
 	 *
@@ -316,14 +315,14 @@ class Util
 	 * What it does:
 	 *
 	 * - Shortens a text string to a given visual length
-	 * - Considers certain html entities as 1 in length, &amp; &nbsp; etc
+	 * - Considers certain HTML entities as 1 in length, &amp; &nbsp; etc.
 	 * - Optionally adds ending ellipsis that honor length or are appended
 	 * - Optionally attempts to break the string on a word boundary approximately at the allowed length
 	 * - If using cutword and the resulting length is < len minus buffer then it is truncated to length plus an
 	 * ellipsis.
-	 * - Respects internationalization characters, html spacing and entities as one character.
+	 * - Respects internationalization characters, HTML spacing, and entities as one character.
 	 * - Returns the shortened string.
-	 * - Does not account for html tags, ie <b>test</b> is 11 characters not 4
+	 * - Does not account for HTML tags, i.e. <b>test</b> is 11 characters not 4
 	 *
 	 * @param string $string The string to shorten
 	 * @param int $length The length to cut the string to
@@ -336,7 +335,7 @@ class Util
 	 */
 	public static function shorten_text($string, $length = 384, $cutword = false, $ellipsis = '...', $exact = true, $buffer = 12): ?string
 	{
-		// Does len include the ellipsis or are the ellipsis appended
+		// Does len include the ellipsis or is the ellipsis appended?
 		$ending = !empty($ellipsis) && $exact ? self::strlen($ellipsis) : 0;
 
 		// If its to long, cut it down to size
@@ -366,7 +365,7 @@ class Util
 	}
 
 	/**
-	 * Perform a substr operation on multi-byte strings
+	 * Perform a substr operation on multibyte strings
 	 *
 	 * - Optionally performs an entity_fix to null any invalid character entities from the string before the operation
 	 *
@@ -406,7 +405,7 @@ class Util
 	 */
 	public static function shorten_html($string, $length = 384, $ellipsis = '...', $exact = true): string
 	{
-		// If its shorter than the maximum length, while accounting for html tags, simply return
+		// If it's shorter than the maximum length, while accounting for HTML tags, simply return
 		if (self::strlen(preg_replace('~<.*?>~', '', $string)) <= $length)
 		{
 			return $string;
@@ -417,7 +416,7 @@ class Util
 		$open_tags = [];
 		$truncate = '';
 
-		// Group all html open and closing tags, [1] full tag with <> [2] basic tag name [3] tag content
+		// Group all HTML open and closing tags, [1] full tag with <> [2] basic tag name [3] tag content
 		preg_match_all('~(<\/?([\w+]+)[^>]*>)?([^<>]*)~', $string, $tags, PREG_SET_ORDER);
 
 		// Walk down the stack of tags
@@ -446,7 +445,7 @@ class Util
 			// Add this (opening or closing) tag to $truncate
 			$truncate .= $tag[1];
 
-			// Calculate the length of the actual tag content, accounts for html entities as a single characters
+			// Calculate the length of the actual tag content, accounts for html entities as a single character
 			$content_length = self::strlen($tag[3]);
 
 			// Have we exceeded the allowed length limit, only add in what we are allowed
@@ -458,7 +457,7 @@ class Util
 				break;
 			}
 
-			// Still room to go so add the tag content and continue
+			// Still room to go, so add the tag content and continue
 			$truncate .= $tag[3];
 			$total_length += $content_length;
 
@@ -480,7 +479,7 @@ class Util
 		$lastCloseTag = (int) self::strpos($truncate_check, '>', 0, true);
 		if ($lastOpenTag > $lastCloseTag)
 		{
-			// Find the last full open tag in our truncated string, its what was being cut
+			// Find the last full open tag in our truncated string, It's what was being cut
 			preg_match_all('~<[\w]+[^>]*>~', $truncate, $lastTagMatches);
 			$last_tag = array_pop($lastTagMatches[0]);
 
@@ -521,7 +520,7 @@ class Util
 		// Dot dot dot
 		$truncate .= $ellipsis;
 
-		// Finally close any html tags that were left open
+		// Finally, close any HTML tags that were left open
 		foreach ($open_tags as $tag)
 		{
 			$truncate .= '</' . $tag . '>';
@@ -531,7 +530,7 @@ class Util
 	}
 
 	/**
-	 * Converts the first character of each work in a multi-byte string to uppercase
+	 * Converts the first character of each work in a multibyte string to uppercase
 	 *
 	 * @param string $string
 	 *
@@ -549,7 +548,7 @@ class Util
 	}
 
 	/**
-	 * Converts the first character of a multi-byte string to uppercase
+	 * Converts the first character of a multibyte string to uppercase
 	 *
 	 * @param string $string
 	 *
@@ -561,7 +560,7 @@ class Util
 	}
 
 	/**
-	 * Converts a multi-byte string to uppercase
+	 * Converts a multibyte string to uppercase
 	 *
 	 * Prefers to use mb_ functions if available, otherwise will use charset substitution tables
 	 *
@@ -587,7 +586,7 @@ class Util
 	 * What it does:
 	 *
 	 * @param string $string The string to unserialize
-	 * @param string[] $options Optional.  Additionally, it doesn't allow to use the option:
+	 * @param string[] $options Optional.  Additionally, it doesn't allow using the option:
 	 *                          allowed_classes => true, that is reverted to false.
 	 * @return mixed|false
 	 */
@@ -678,7 +677,7 @@ class Util
 			'%h' => 'M',
 			'%m' => 'm',
 			// Year
-			'%C' => 'y', // Two digit representation of the century
+			'%C' => 'y', // Two-digit representation of the century
 			'%g' => 'y',
 			'%G' => 'y',
 			'%y' => 'y',
@@ -738,7 +737,7 @@ class Util
 	}
 
 	/**
-	 * Checks if the string contains any 4byte chars (emoji) and if so,
+	 * Checks if the string contains any 4-byte chars (emoji) and if so,
 	 * converts them into &#x...; HTML entities.
 	 *
 	 * @param string $string
@@ -764,7 +763,7 @@ class Util
 			$length = strlen($string);
 			$result = '';
 
-			// Look for a 4byte marker
+			// Look for a 4-byte marker
 			for ($i = 0; $i < $length; $i++)
 			{
 				// The first byte of a 4-byte character encoding starts with the bytes 0xF0-0xF4 (240 <-> 244)
@@ -772,7 +771,7 @@ class Util
 				$ord1 = $ord[$i];
 				if ($ord1 >= 240 && $ord1 <= 247)
 				{
-					// Replace it with the corresponding html entity
+					// Replace it with the corresponding HTML entity
 					$entity = self::getUnicodeOrdinal(chr($ord[$i]) . chr($ord[$i + 1]) . chr($ord[$i + 2]) . chr($ord[$i + 3]));
 
 					if ($entity === false)
@@ -797,7 +796,7 @@ class Util
 	}
 
 	/**
-	 * Converts a 4byte char into the corresponding HTML entity code.
+	 * Converts a 4-byte char into the corresponding HTML entity code.
 	 *
 	 * This function is derived from:
 	 * http://www.greywyvern.com/code/php/utf8_html

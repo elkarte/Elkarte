@@ -156,7 +156,7 @@ class ValuesContainer implements \ArrayAccess
 	}
 
 	/**
-	 * Returns the value associated to a certain offset.
+	 * Returns the value associated with a certain offset.
 	 *
 	 * @param string|int $offset
 	 * @return mixed

@@ -47,7 +47,7 @@ class HttpReq
 	/** @var HttpReq Sole private \ElkArte\Helper\HttpReq instance */
 	private static $instance;
 
-	/** @var array Used to hold processed (sanitised) values */
+	/** @var array Used to hold processed (sanitized) values */
 	private $_param;
 
 	/** @var DataValidator holds instance of the validator */
@@ -81,10 +81,10 @@ class HttpReq
 	}
 
 	/**
-	 * Certain variables are born in Request, others are sanitized, and stored in
-	 * $_REQUEST, its a awful mess really.
+	 * Certain variables were born in Request, others are sanitized and stored in
+	 * $_REQUEST, it's an awful mess really.
 	 *
-	 * Once that mess is cleaned up this should not be needed.  But the basis is due to
+	 * Once that mess is cleaned up, this should not be needed. But the basis is due to
 	 * what function cleanRequest() does.
 	 *
 	 * What it does:
@@ -116,11 +116,11 @@ class HttpReq
 	/**
 	 * Generic fetch access for values contained in the super globals
 	 *
-	 * - gets in order of param, get and post
-	 * - $instance->keyanme will check cleaned params, get then post for values
+	 * - Gets in order of param, get and post
+	 * - $instance->keyname will check cleaned params, get then post for values
 	 *     - $_POST['foo'] = 'bar', $_GET['bar'] = 'foo'
 	 *     - $this->req->post->foo is explicit and returns bar
-	 *     - $this->req->foo is loose and will trigger this method, return foo as its a found key in GET
+	 *     - $this->req->foo is loose and will trigger this method, return foo as it's a found key in GET
 	 *
 	 * @param string $key
 	 *
@@ -139,7 +139,7 @@ class HttpReq
 	/**
 	 * Alias to __get
 	 *
-	 * Allows lazy way to find and return a value from get or post key name
+	 * Allows lazy way to find and return a value from get or post-key name
 	 *
 	 * @param string $name The key name of the value to return
 	 * @param string|null $sanitize a comma separated list of sanitation rules to apply
@@ -218,8 +218,8 @@ class HttpReq
 	/**
 	 * Method to return a $_GET value
 	 *
-	 * - Uses any sanitize rule(s) that can be passed to the \ElkArte\Helper\DataValidator class
-	 * - Returned value will be the sanitized value or null of the key is not in $_GET
+	 * - Uses any sanitized rule(s) that can be passed to the \ElkArte\Helper\DataValidator class
+	 * - Returned value will be the sanitized value, or null of the key is not in $_GET
 	 * - If you just want a value back access it directly as $req->query->{$name}
 	 *
 	 * @param string $name The key name of the value to return
@@ -244,8 +244,8 @@ class HttpReq
 	/**
 	 * Method to return a $_POST value
 	 *
-	 * - Uses any sanitize rule(s) that can be passed to the \ElkArte\Helper\DataValidator class
-	 * - Returned value will be the sanitized value or null of the key is not in $_POST
+	 * - Uses any sanitized rule(s) that can be passed to the \ElkArte\Helper\DataValidator class
+	 * - Returned value will be the sanitized value, or null of the key is not in $_POST
 	 * - If you just want a value back access it directly as $req->post->{$name}
 	 *
 	 * @param string $name The key name of the value to return
@@ -270,10 +270,10 @@ class HttpReq
 	/**
 	 * Method to return a $_REQUEST value
 	 *
-	 * - Uses any sanitize rule(s) that can be passed to the \ElkArte\Helper\DataValidator class
+	 * - Uses any sanitized rule(s) that can be passed to the \ElkArte\Helper\DataValidator class
 	 * - Returned value will be the sanitized value or null if the key is not found in either $_GET
-	 * or $_POST (in that order).  Ideally you should know if something is in GET or POST and use
-	 * those get function directly.
+	 * or $_POST (in that order).  Ideally, you should know if something is in GET or POST and use
+	 * those get functions directly.
 	 *
 	 * @param string $name The key name of the value to return
 	 * @param string|null $sanitize a comma separated list of sanitation rules to apply
@@ -322,7 +322,7 @@ class HttpReq
 	 * if the value does not exist or if it does not equal the comparison value.
 	 *
 	 * @param string $name get value to fetch
-	 * @param mixed $compare value to compare the post value to
+	 * @param mixed $compare value to compare the post-value to
 	 * @param null|string $sanitize optional | delimited data for validator
 	 * @param null|mixed $default if no value exists, what to set it to (will also be used in the compare)
 	 *

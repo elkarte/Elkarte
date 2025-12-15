@@ -19,9 +19,9 @@ use ElkArte\Errors;
 /**
  * Class TokenHash
  *
- * Used to generate a high entropy random hash for use in one time use forms
+ * Used to generate a high-entropy random hash for use in one time use forms
  *
- * - Can return up to a 64 character alphanumeric hash A-Z a-z 0-9
+ * - Can return up to a 64-character alphanumeric hash A-Z a-z 0-9
  */
 class TokenHash
 {
@@ -46,9 +46,9 @@ class TokenHash
 	 * What it does:
 	 *  - Uses crypt to generate a hash value
 	 *  - Returns other than salt on failure
-	 *  - Returns a A-Z a-z 0-9 string of length characters on success
-	 *  - If supplying a salt it must be min 16 characters.  It will be wrapped to indicate
-	 * its a sha512 salt and cleaned to only contain word characters
+	 *  - Returns an A-Z a-z 0-9 string of length characters on success
+	 *  - If supplying a salt, it must be min 16 characters.  It will be wrapped to indicate
+	 * it's a sha512 salt and cleaned to only contain word characters
 	 *
 	 * @param int $length the number of characters to return
 	 * @param string $salt use a custom salt, leave empty to let the system generate a secure one
@@ -81,7 +81,7 @@ class TokenHash
 	 *
 	 * What it does:
 	 *  - Strips off the salt
-	 *  - removes non text characters, leaving just a-Z 0-9
+	 *  - Removes non-text characters, leaving just a-Z 0-9
 	 *  - May pad the result if for some reason we don't have enough characters
 	 *  to fulfill the request.
 	 *
@@ -95,10 +95,10 @@ class TokenHash
 		$ourHash = explode('$', $hash);
 		$token = array_pop($ourHash);
 
-		// For our purposes lets stay with alphanumeric values only
+		// For our purposes let's stay with alphanumeric values only
 		$token = preg_replace('~\W~', '', $token);
 
-		// This should never happen, but its better than vaping
+		// This should never happen, but it's better than vaping
 		$short = $length + 10 - strlen($token);
 		if ($short > 0)
 		{
@@ -124,7 +124,7 @@ class TokenHash
 		{
 			$this->_salt = $saltPrefix . $this->_private_salt($this->get_random_bytes(16)) . '$';
 		}
-		// Supplied a salt, make sure its valid
+		// Supplied a salt, make sure it's valid
 		else
 		{
 			// Prep it for crypt / etc

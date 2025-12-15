@@ -18,17 +18,17 @@ use ElkArte\Languages\Txt;
 /**
  * Utility class to un gzip + un tar package files
  *
- * if destination is null
- * - returns a list of files in the archive.
+ * If destination is null
+ *   - Returns a list of files in the archive.
  *
- * if single_file is true
- * - returns the contents of the file specified by destination, if it exists, or false.
- * - destination can start with * and / to signify that the file may come from any directory.
- * - destination should not begin with a / if single_file is true.
- * - overwrites existing files with newer modification times if and only if overwrite is true.
- * - creates the destination directory if it doesn't exist, and is is specified.
- * - requires zlib support be built into PHP.
- * - returns an array of the files extracted on success
+ * If single_file is true
+ *   - Returns the contents of the file specified by destination, if it exists, or false.
+ *   - Destination can start with * and / to signify that the file may come from any directory.
+ *   - Destination should not begin with a / if single_file is true.
+ *   - Overwrites existing files with newer modification times if and only if overwrite is true.
+ *   - Creates the destination directory if it doesn't exist, and is specified.
+ *   - Requires zlib support be built into PHP.
+ *   - Returns an array of the files extracted on success
  */
 class UnTgz
 {
@@ -41,7 +41,7 @@ class UnTgz
 	/** @var int Holds the file pointer, generally to the 512 block we are working on */
 	protected $_offset = 0;
 
-	/** @var bool If the file passes or fails crc check */
+	/** @var bool If the file passes or fails, crc check */
 	protected $_crc_check = false;
 
 	/** @var string|int The current crc value of the data */
@@ -113,7 +113,7 @@ class UnTgz
 		require_once(SUBSDIR . '/Package.subs.php');
 		$this->fileFunc = FileFunctions::instance();
 
-		// The destination needs exist, and be writable, or we are doomed
+		// The destination needs to exist and be writable, or we are doomed
 		umask(0);
 		if ($this->destination === null)
 		{
@@ -167,7 +167,7 @@ class UnTgz
 			return $this->_crc_check ? $this->_found : false;
 		}
 
-		// Wanted many files then we need to clean up
+		// Wanted many files than we need to clean up
 		if ($this->destination !== null && !$this->single_file)
 		{
 			package_flush_cache();
@@ -182,7 +182,7 @@ class UnTgz
 	}
 
 	/**
-	 * Loads the 10 byte header and validates its a tgz file
+	 * Loads the 10-byte header and validates it's a tgz file
 	 *
 	 * @return bool
 	 */
@@ -194,7 +194,7 @@ class UnTgz
 			return false;
 		}
 
-		// Unpack the 10 byte signature so we can see what we have
+		// Unpack the 10-byte signature so we can see what we have
 		$this->_header = unpack('H2a/H2b/Ct/Cf/Vmtime/Cxtra/Cos', substr($this->data, 0, 10));
 
 		// The IDentification number, gzip must be 1f8b
@@ -206,20 +206,20 @@ class UnTgz
 	 *
 	 * What it does:
 	 *
-	 * - validates that the file is a tar.gz
-	 * - validates that it is compressed with deflate
-	 * - processes header information such that we can set the start of archive data
-	 *    - archive comment
-	 *    - archive filename
-	 *    - header CRC
+	 * - Validates that the file is a tar.gz
+	 * - Validates that it is compressed with deflate
+	 * - Processes header information such that we can set the start of archive data
+	 *    - Archive comment
+	 *    - Archive filename
+	 *    - Header CRC
 	 *
 	 * Signature Definition:
-	 * - identification byte 1 and 2: 2 bytes, 0x1f 0x8b
-	 * - Compression Method: 1 byte
-	 * - Flags: 1 byte
-	 * - Last modification time Contains a POSIX timestamp, 4 bytes
-	 * - Compression flags (or extra flags): 1 byte
-	 * - Operating system, Value that indicates on which operating system file was created, 1 byte
+	 *   - Identification byte 1 and 2: 2 bytes, 0x1f 0x8b
+	 *   - Compression Method: 1 byte
+	 *   - Flags: 1 byte
+	 *   - Last modification time Contains a POSIX timestamp, 4 bytes
+	 *   - Compression flags (or extra flags): 1 byte
+	 *   - Operating system, Value that indicates on which operating system file was created, 1 byte
 	 */
 	private function _read_header_tgz(): ?bool
 	{
@@ -233,7 +233,7 @@ class UnTgz
 		// 0 fTEXT, 1 fHCRC, 2 fEXTRA, 3 fNAME, 4 fCOMMENT, 5 fENCRYPT, 6-7 reserved
 		$flags = $this->_header['f'];
 
-		// Start to read any data defined by the flags, its the data after the 10 byte header
+		// Start to read any data defined by the flags, it's the data after the 10-byte header
 		$this->_offset = 10;
 
 		// fEXTRA flag set we simply skip over its entry and the length of its data
@@ -255,7 +255,7 @@ class UnTgz
 			$this->_offset++;
 		}
 
-		// Read the comment, its also zero terminated
+		// Read the comment, it's also zero terminated
 		if (($flags & 16) !== 0)
 		{
 			$this->_header['comment'] = '';
@@ -282,12 +282,12 @@ class UnTgz
 	 */
 	public function _ungzip_data(): ?bool
 	{
-		// Unpack the crc and original size, its the trailing 8 bytes
+		// Unpack the crc and original size, it's the trailing 8 bytes
 		$check = unpack('Vcrc32/Visize', substr($this->data, strlen($this->data) - 8));
 		$this->_crc = $check['crc32'];
 		$this->_size = $check['isize'];
 
-		// Extract the data, in this case its the tarball
+		// Extract the data, in this case it's the tarball
 		$this->data = @gzinflate(substr($this->data, $this->_offset, strlen($this->data) - 8 - $this->_offset));
 
 		// Check the crc and the data size
@@ -300,7 +300,7 @@ class UnTgz
 	}
 
 	/**
-	 * Checks the saved vs calculated crc values
+	 * Checks the saved vs. calculated crc values
 	 */
 	private function _check_crc(): bool
 	{
@@ -315,11 +315,11 @@ class UnTgz
 	 * Does the work of un tarballing the now ungzip'ed tar file
 	 *
 	 * What it does
-	 * - Assumes its Ustar format
+	 * - Assume its Ustar format
 	 */
 	private function _process_files(): void
 	{
-		// Tar files are written in 512 byte chunks
+		// Tar files are written in 512-byte chunks
 		$blocks = strlen($this->data) / 512 - 1;
 		$this->_offset = 0;
 
@@ -335,7 +335,7 @@ class UnTgz
 				continue;
 			}
 
-			// If its a directory, lets make sure it ends in a /
+			// If it's a directory, let's make sure it ends in a /
 			if ($this->_current['type'] == 5 && !str_ends_with($this->_current['filename'], '/'))
 			{
 				$this->_current['filename'] .= '/';
@@ -381,7 +381,7 @@ class UnTgz
 	}
 
 	/**
-	 * Reads the tar file header block, its a 512 block and contains the following:
+	 * Reads the tar file header block, it's a 512 block and contains the following:
 	 *
 	 * Signature Definition:
 	 * - char filename[100]; File name
@@ -391,11 +391,11 @@ class UnTgz
 	 * - char size[12]; File size in bytes (octal base)
 	 * - char mtime[12]; Last modification time in numeric Unix time format (octal)
 	 * - char checksum[8]; Checksum for header record
-	 * - char type[1]; Link indicator (file type 0=normal, 1=hard, 2=symlink ... 5=directory ...
+	 * - char type[1]; Link indicator file type 0=normal, 1=hard, 2=symlink ... 5=directory ...
 	 * - char linkname[100]; Name of linked file
 	 * - char magic[6]; UStar indicator "ustar"
 	 * - char version[2]; UStar version "00"
-	 * - char uname[32]; Owner user name
+	 * - char uname[32]; Owner username
 	 * - char gname[32]; Owner group name
 	 * - char devmajor[8]; Device major number
 	 * - char devminor[8]; Device minor number
@@ -437,7 +437,7 @@ class UnTgz
 	}
 
 	/**
-	 * Does what it says, determines if we are writing this file or not
+	 * Does what it says determine if we are writing this file or not?
 	 */
 	private function _determine_write_this(): void
 	{
@@ -474,7 +474,7 @@ class UnTgz
 	 * Does the actual writing of the file
 	 *
 	 * - Writes the extracted file to disk or if we are extracting a single file
-	 * - it returns the extracted data
+	 * - It returns the extracted data
 	 */
 	private function _write_this_file(): void
 	{
@@ -524,7 +524,7 @@ class UnTgz
 	}
 
 	/**
-	 * Checks the saved vs calculated crc values
+	 * Checks the saved vs. calculated crc values
 	 */
 	private function _check_header_crc(): bool
 	{
