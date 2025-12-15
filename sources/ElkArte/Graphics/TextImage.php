@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This file deals with creating an image file based on supplied text.  For example
+ * This file deals with creating an image file based on supplied text.  For example,
  * the attachment not found image
  *
  * TrueType fonts supplied by www.LarabieFonts.com
@@ -19,14 +19,14 @@ namespace ElkArte\Graphics;
 /**
  * Class TextImage
  *
- * Base class for text to image functions
+ * Base class for text-to-image functions
  *
  * @package ElkArte\Graphics
  */
 class TextImage extends Image
 {
 	/**
-	 * Image constructor.
+	 * Image constructor.  It does not call the parent constructor as we don't need it.'
 	 *
 	 * @param string $_text
 	 * @param bool $force_gd
@@ -74,12 +74,12 @@ class TextImage extends Image
 
 	/**
 	 * Simple function to generate an image containing some text.
-	 * It uses preferentially ImageMagick if present, otherwise GD.
+	 * It preferentially uses ImageMagick if present, otherwise GD.
 	 * Font and size are fixed.
 	 *
 	 * @param int $width Width of the final image
 	 * @param int $height Height of the image
-	 * @param string $format Type of the image (valid types are png, jpeg, gif)
+	 * @param string $format Type of the image (valid types are PNG, JPEG, GIF)
 	 *
 	 * @return bool|string The image or false if neither ImageMagick nor GD are found
 	 */

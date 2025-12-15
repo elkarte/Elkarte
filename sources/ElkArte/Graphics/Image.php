@@ -2,7 +2,7 @@
 
 /**
  * This file deals with low-level graphics operations performed on images,
- * specially as needed for avatars (uploaded avatars), attachments, or
+ * specifically as needed for avatars (uploaded avatars), attachments, or
  * visual verification images.
  *
  * TrueType fonts supplied by www.LarabieFonts.com
@@ -50,7 +50,7 @@ class Image
 	/** @var bool if the image has been loaded into the manipulator */
 	protected $_image_loaded = false;
 
-	/** @var string what manipulator (GD, ImageMagick, etc) is in use */
+	/** @var string what manipulator (GD, ImageMagick, etc.) is in use */
 	protected $_current_manipulator = '';
 
 	/**
@@ -195,7 +195,7 @@ class Image
 	}
 
 	/**
-	 * Return if the source is actually a web address vs local file
+	 * Return if the source is actually a web address vs. local file
 	 *
 	 * @return bool
 	 */
@@ -225,7 +225,7 @@ class Image
 	 */
 	public function getMimeType(): string
 	{
-		// Try Exif which reads the file headers, most accurate for images
+		// Try Exif, which reads the file headers, most accurate for images
 		if (function_exists('exif_imagetype'))
 		{
 			return image_type_to_mime_type(exif_imagetype($this->_fileName));
@@ -247,7 +247,7 @@ class Image
 	/**
 	 * Creates a thumbnail from an image.
 	 *
-	 * - "recipe" function to create, rotate and save a thumbnail of a given image
+	 * - "Recipe" function to create, rotate, and save a thumbnail of a given image
 	 * - Thumbnail will be proportional to the original image
 	 * - Saves the thumbnail file
 	 *
@@ -292,7 +292,7 @@ class Image
 	 * Sets the best output format for a given image's thumbnail
 	 *
 	 * - If webP is available, use that as it gives the smallest size
-	 * - No webP then if the image has alpha, we preserve it
+	 * - No webP then, if the image has alpha, we preserve it
 	 * - Finally good ol' jpeg
 	 *
 	 * @return int
@@ -428,10 +428,10 @@ class Image
 	 *
 	 * What it does:
 	 *
-	 * - creates a copy of the file at the same location.
-	 * - the file would have the format preferred_format if possible, otherwise the default format is jpeg.
-	 * - strips the exif data
-	 * - the function makes sure that all non-essential image contents are disposed.
+	 * - Creates a copy of the file at the same location.
+	 * - The file would have the format preferred_format if possible, otherwise the default format is jpeg.
+	 * - Strips the exif data
+	 * - The function makes sure that all non-essential image contents are disposed of.
 	 *
 	 * @return bool
 	 */
@@ -445,10 +445,10 @@ class Image
 
 		// re-encode the image at the same size it is now, strip exif data.
 		$sizes = $this->getImageDimensions();
-		$success = $this->resizeImage(null, null, true, true);
+		$success = $this->resizeImage($sizes[0], $sizes[1], true);
 
-		// if all went well, and its valid, save it back in place
-		if ($success && !empty(Image::DEFAULT_FORMATS[$sizes[2]]))
+		// if all went well, and it's valid, save it back in place
+		if ($success && !empty(self::DEFAULT_FORMATS[$sizes[2]]))
 		{
 			// Write over the original file
 			$success = $this->saveImage($this->_fileName, $sizes[2]);
@@ -473,8 +473,8 @@ class Image
 	 * Checks for transparency in a PNG image
 	 *
 	 *  - Checks file header for saved with Alpha space flag
-	 *  - 8 Bit (256 color) PNG's are not handled.
-	 *  - If png is flase, will instead check webp headers for transparency flag
+	 *  - 8 Bit (256 color) PNGs are not handled.
+	 *  - If png is false, will instead check webp headers for transparency flag
 	 *  - If the alpha flag is set, will go pixel by pixel to validate true alpha pixels exist
 	 *
 	 * @param bool $png
@@ -486,7 +486,7 @@ class Image
 		// If it claims transparency, we do pixel inspection
 		$header = file_get_contents($this->_fileName, false, null, 0, 26);
 
-		// Does it even claim to have been saved with transparency
+		// Does it even claim to have been saved with transparency?
 		if ($png && ord($header[25]) & 4)
 		{
 			return $this->_manipulator->getTransparency();
@@ -512,7 +512,7 @@ class Image
 	 * - Basic search of an image file for potential web (php/script) infections
 	 *
 	 * @return bool
-	 * @throws \ElkArte\Exceptions\Exception
+	 * @throws Exception
 	 */
 	public function checkImageContents()
 	{

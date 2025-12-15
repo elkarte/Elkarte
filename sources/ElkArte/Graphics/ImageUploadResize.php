@@ -103,10 +103,10 @@ class ImageUploadResize
 	/**
 	 * Executes the call to resizeImage
 	 *
-	 * - Change an images WxH dimensions to those defined in the resize section of the ACP
+	 * - Change an images WxH dimension to those defined in the resize section of the ACP
 	 * - Optionally will change the format PNG->JPG, JPG->WebP, PNG->WebP
 	 *
-	 * @param bool $same_format if true will maintain the current image format
+	 * @param bool $same_format if true, will maintain the current image format
 	 * @return bool
 	 */
 	public function resize($same_format = true): bool
@@ -139,7 +139,7 @@ class ImageUploadResize
 
 		if (!$same_format)
 		{
-			// Your something else now
+			// You're something else now
 			$info = pathinfo($this->_fileName);
 			$type = $this->getWebP() ? ['image/webp', '.webp'] : ['image/jpeg', '.jpg'];
 			$update += [
@@ -176,14 +176,14 @@ class ImageUploadResize
 			return true;
 		}
 
-		// Already a JPEG and no WebP, out of options I'm afraid
+		// Already a JPEG and no WebP, out of options, I'm afraid
 		if ($this->_sizeCurrent[2] === IMAGETYPE_JPEG)
 		{
 			return false;
 		}
 
 		// A transparent PNG, no WebP, If converted would be destructive, so just no
-		// Others like bmp or gif maybe even tiff
+		// Others like BMP or GIF maybe even TIFF
 		return !($this->_sizeCurrent[2] === IMAGETYPE_PNG && $this->image->getTransparency());
 	}
 

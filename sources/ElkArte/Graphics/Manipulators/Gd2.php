@@ -50,7 +50,7 @@ class Gd2 extends AbstractManipulator
 	/**
 	 * Used to determine if the GD2 library is present.
 	 *
-	 * @return bool Whether or not GD is available.
+	 * @return bool Whether GD is available.
 	 */
 	public static function canUse()
 	{
@@ -216,7 +216,7 @@ class Gd2 extends AbstractManipulator
 	 */
 	protected function _createCanvas($dst_img): void
 	{
-		// Make a true color image, because it just looks better for resizing.
+		// Make a true color image because it just looks better for resizing.
 		imagesavealpha($dst_img, true);
 		$color = imagecolorallocatealpha($dst_img, 255, 255, 255, 127);
 		imagefill($dst_img, 0, 0, $color);
@@ -241,7 +241,7 @@ class Gd2 extends AbstractManipulator
 			return false;
 		}
 
-		// Save the image as ..
+		// Save the image as...
 		$output_name = empty($file_name) ? null : $file_name;
 		switch ($preferred_format)
 		{
@@ -307,7 +307,7 @@ class Gd2 extends AbstractManipulator
 	 *
 	 * What it does:
 	 *
-	 * - Checks exif data for orientation flag and rotates image so its proper
+	 * - Checks exif data for orientation flag and rotates the image, so it's proper
 	 * - Does not update the orientation flag as GD also removes EXIF data
 	 * - Only works with jpeg images, could add TIFF as well
 	 *
@@ -433,7 +433,7 @@ class Gd2 extends AbstractManipulator
 		if ($width > 1024 || $height > 1024)
 		{
 			// Single pass scale down, not looking for quality here
-			[$width, $height] = $this->imageScaleFactor(800);
+			[$width, $height] = $this->imageScaleFactor();
 			$image = imagescale($this->_image, $width, $height, IMG_NEAREST_NEIGHBOUR);
 		}
 
@@ -463,7 +463,7 @@ class Gd2 extends AbstractManipulator
 	 * @param string $text The text the image should contain
 	 * @param int $width Width of the final image
 	 * @param int $height Height of the image
-	 * @param string $format Type of the image (valid types are png, jpeg, gif)
+	 * @param string $format Type of the image (valid types are PNG, JPEG, GIF)
 	 *
 	 * @return string|bool The image
 	 */
@@ -473,7 +473,7 @@ class Gd2 extends AbstractManipulator
 
 		$create_function = 'image' . $format;
 
-		// Create a white filled box
+		// Create a white-filled box
 		try
 		{
 			$image = imagecreatetruecolor($width, $height);

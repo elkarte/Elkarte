@@ -23,7 +23,7 @@ use ImagickPixel;
 /**
  * Class ImageMagick
  *
- * Note: This class will load and save an animated gif, however, any manipulation will remove said animation.
+ * Note: This class will load and save an animated GIF, however, any manipulation will remove said animation.
  * It currently only provides validation/inspection functions (should you want to keep the animation intact).
  *
  * @package ElkArte\Graphics
@@ -245,7 +245,7 @@ class ImageMagick extends AbstractManipulator
 	{
 		$success = true;
 
-		// Explode the gif so each frame is a full image
+		// Explode the GIF so each frame is a full image
 		$this->_image = $this->_image->coalesceImages();
 
 		// Resize every frame individually
@@ -316,7 +316,7 @@ class ImageMagick extends AbstractManipulator
 				}
 				elseif ($preferred_format === IMAGETYPE_GIF && $this->_image->getNumberImages() !== 0)
 				{
-					// Write all animated gif frames
+					// Write all animated GIF frames
 					$success = $this->_image->writeImages($file_name, true);
 				}
 				else
@@ -346,7 +346,7 @@ class ImageMagick extends AbstractManipulator
 	 *
 	 * What it does:
 	 *
-	 * - Checks exif data for orientation flag and rotates image so its proper
+	 * - Checks exif data for orientation flag and rotates image, so it's proper
 	 * - Updates orientation flag if rotation was required
 	 *
 	 * @return bool
@@ -451,7 +451,7 @@ class ImageMagick extends AbstractManipulator
 			if ($this->_width > 1024 || $this->_height > 1024)
 			{
 				// This is only used to look for transparency, it is not intended to be a quality image.
-				$scaleValue = $this->imageScaleFactor(800);
+				$scaleValue = $this->imageScaleFactor();
 				$checkImage->scaleImage($scaleValue[0], $scaleValue[1], true);
 			}
 		}
@@ -521,7 +521,7 @@ class ImageMagick extends AbstractManipulator
 	/**
 	 * Attempts to use imagick getImageChannelMean to determine alpha/opacity channel statistics
 	 *
-	 * - An opaque image will have 0 standard deviation and a mean of 1 (65535)
+	 * - An opaque image will have 0 standard deviation and a mean of 1 (65,535)
 	 * - If failure returns null, otherwise bool
 	 *
 	 * @param Imagick $checkImage
@@ -536,7 +536,7 @@ class ImageMagick extends AbstractManipulator
 			$transparent = true;
 			$stats = $checkImage->getImageChannelMean(Imagick::CHANNEL_OPACITY);
 
-			// If mean = 65535 and std = 0, then its perfectly opaque.
+			// If mean = 65,535 and std = 0, then it's perfectly opaque.
 			$mean = (int) $stats['mean'];
 			if (($mean === 65535 || $mean === 0) && (int) $stats['standardDeviation'] === 0)
 			{
@@ -558,7 +558,7 @@ class ImageMagick extends AbstractManipulator
 	 * @param string $text The text the image should contain
 	 * @param int $width Width of the final image
 	 * @param int $height Height of the image
-	 * @param string $format Type of the image (valid types are png, jpeg, gif)
+	 * @param string $format Type of the image (valid types are PNG, JPEG, GIF)
 	 *
 	 * @return bool|string The image or false on error
 	 */
@@ -590,7 +590,7 @@ class ImageMagick extends AbstractManipulator
 				$text_width = (int) $metric['textWidth'];
 			} while ($text_width > $width && $font_size-- > 1);
 
-			// Place text in center of block
+			// Place text in the center of the block
 			$this->_image->annotateImage($draw, $width / 2, $height / 2 + $font_size / 4, 0, $text);
 			$image = $this->_image->getImageBlob();
 			$this->__destruct();
