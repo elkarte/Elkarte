@@ -1387,9 +1387,37 @@ function getTopicInfo($topic_parameters, $full = '', $selects = [], $tables = []
 		$topic_parameters
 	);
 	$topic_info = [];
-	if ($request !== false)
+	if ($request->hasResults())
 	{
 		$topic_info = $request->fetch_assoc();
+
+		// Casting
+		$standardIntKeys = [
+			'id_topic', 'is_sticky', 'id_board', 'id_first_msg', 'id_last_msg', 'locked',
+			'id_member_started', 'id_member_updated', 'id_poll', 'num_replies', 'num_views',
+			'num_likes', 'redirect_expires', 'id_redirect_topic', 'unapproved_posts', 'approved'
+		];
+		foreach ($standardIntKeys as $key) {
+			if (isset($topic_info[$key])) {
+				$topic_info[$key] = (int) $topic_info[$key];
+			}
+		}
+
+		// Optional items
+		$optionalIntKeys = ['new_from', 'id_previous_board', 'id_previous_topic', 'unwatched'];
+		foreach ($optionalIntKeys as $key) {
+			if (isset($topic_info[$key])) {
+				$topic_info[$key] = (int) $topic_info[$key];
+			}
+		}
+
+		if ($messages_table) {
+			foreach (['id_member', 'poster_time', 'msg_approved'] as $key) {
+				if (isset($topic_info[$key])) {
+					$topic_info[$key] = (int) $topic_info[$key];
+				}
+			}
+		}
 	}
 	$request->free_result();
 
@@ -1436,9 +1464,21 @@ function getTopicInfoByMsg($topic, $msg = null)
 		]
 	);
 	$topic_info = [];
-	if ($request !== false)
+	if ($request->hasResults())
 	{
 		$topic_info = $request->fetch_assoc();
+
+		$intKeys = [
+			'locked', 'num_replies', 'id_member_started', 'id_first_msg', 'id_msg', 'id_member',
+			'poster_time', 'smileys_enabled', 'modified_time', 'approved'
+		];
+		foreach ($intKeys as $key)
+		{
+			if (isset($topic_info[$key]))
+			{
+				$topic_info[$key] = (int) $topic_info[$key];
+			}
+		}
 	}
 	$request->free_result();
 
@@ -1617,7 +1657,7 @@ function countMessagesSince($id_topic, $id_msg, $include_current = false, $only_
 	list ($count) = $request->fetch_row();
 	$request->free_result();
 
-	return $count;
+	return (int) $count;
 }
 
 /**
@@ -1653,7 +1693,7 @@ function countMessagesBefore($id_topic, $id_msg, $include_current = false, $only
 	list ($count) = $request->fetch_row();
 	$request->free_result();
 
-	return $count;
+	return (int) $count;
 }
 
 /**
@@ -1713,14 +1753,14 @@ function selectMessages($topic, $start, $items_per_page, $messages = [], $only_a
 			$row['body'] = $parser->parseMessage($row['body'], (bool) $row['smileys_enabled']);
 
 			$returnMessages[$row['id_msg']] = [
-				'id' => $row['id_msg'],
+				'id' => (int) $row['id_msg'],
 				'subject' => $row['subject'],
 				'time' => standardTime($row['poster_time']),
 				'html_time' => htmlTime($row['poster_time']),
 				'timestamp' => forum_time(true, $row['poster_time']),
 				'body' => $row['body'],
 				'poster' => $row['real_name'],
-				'id_poster' => $row['id_member'],
+				'id_poster' => (int) $row['id_member'],
 			];
 		}
 	);
@@ -1776,7 +1816,7 @@ function topicMessages($topic, $render = 'print')
 				'html_time' => htmlTime($row['poster_time']),
 				'timestamp' => forum_time(true, $row['poster_time']),
 				'body' => $parser->parseMessage($row['body'], $render !== 'print'),
-				'id_msg' => $row['id_msg'],
+				'id_msg' => (int) $row['id_msg'],
 			];
 		}
 	);
@@ -1891,7 +1931,7 @@ function unapprovedPosts($id_topic, $id_member)
 	list ($myUnapprovedPosts) = $request->fetch_row();
 	$request->free_result();
 
-	return $myUnapprovedPosts;
+	return (int) $myUnapprovedPosts;
 }
 
 /**

@@ -129,7 +129,24 @@ function basicMessageInfo($id_msg, $override_permissions = false, $detailed = fa
 			'message' => $id_msg,
 		]
 	);
-	$messageInfo = $request->fetch_assoc();
+	if ($request->hasResults())
+	{
+		$messageInfo = $request->fetch_assoc();
+
+		$intKeys = ['id_member', 'id_topic', 'id_board', 'id_msg', 'poster_time', 'approved'];
+		if ($detailed !== false) {
+			$intKeys = array_merge($intKeys, ['id_first_msg', 'num_replies', 'unapproved_posts',
+				'id_last_msg', 'id_member_started', 'locked', 'topic_approved'
+			]);
+		}
+
+		foreach ($intKeys as $key) {
+			if (isset($messageInfo[$key])) {
+				$messageInfo[$key] = (int) $messageInfo[$key];
+			}
+		}
+	}
+	$request->free_result();
 
 	return empty($messageInfo) ? false : $messageInfo;
 }
@@ -176,8 +193,21 @@ function quoteMessageInfo($id_msg, $modify)
 			'not_locked' => 0,
 		]
 	);
+	if ($request->hasResults())
+	{
+		$quotedMessageInfo = $request->fetch_assoc();
+		$intKeys = ['poster_time', 'id_topic', 'id_board', 'id_member', 'approved'];
+		foreach ($intKeys as $key)
+		{
+			if (isset($quotedMessageInfo[$key]))
+			{
+				$quotedMessageInfo[$key] = (int) $quotedMessageInfo[$key];
+			}
+		}
+	}
+	$request->free_result();
 
-	return $request->fetch_assoc();
+	return empty($quotedMessageInfo) ? [] : $quotedMessageInfo;
 }
 
 /**

@@ -379,7 +379,7 @@ class Post extends AbstractController
 
 			if (!empty($context['new_replies']))
 			{
-				if ($context['new_replies'] == 1)
+				if ($context['new_replies'] === 1)
 				{
 					$txt['error_new_replies'] = isset($_GET['last_msg']) ? $txt['error_new_reply_reading'] : $txt['error_new_reply'];
 				}
@@ -957,7 +957,7 @@ class Post extends AbstractController
 			}
 
 			// Did this topic suddenly move? Just checking...
-			if ($topic_info['id_board'] != $board)
+			if ($topic_info['id_board'] !== $board)
 			{
 				throw new Exception('not_a_topic');
 			}
@@ -967,14 +967,14 @@ class Post extends AbstractController
 		if (!empty($topic) && !isset($_REQUEST['msg']))
 		{
 			// Don't allow a post if it's locked.
-			if ((int) $topic_info['locked'] !== 0 && !allowedTo('moderate_board'))
+			if ($topic_info['locked'] !== 0 && !allowedTo('moderate_board'))
 			{
 				throw new Exception('topic_locked', false);
 			}
 
 			// Do the permissions and approval stuff...
 			$becomesApproved = true;
-			if ($topic_info['id_member_started'] != $this->user->id)
+			if ($topic_info['id_member_started'] !== $this->user->id)
 			{
 				if ($modSettings['postmod_active'] && allowedTo('post_unapproved_replies_any') && !allowedTo('post_reply_any'))
 				{
@@ -1009,8 +1009,8 @@ class Post extends AbstractController
 			$lock = $req->hasPost('lock') ? $this->_checkLocked($req->getPost('lock', 'intval'), $topic_info) : null;
 
 			// So you wanna (un)sticky this...let's see.
-			$sticky = $req->getPost('sticky');
-			if ($sticky == $topic_info['is_sticky'] || !allowedTo('make_sticky'))
+			$sticky = $req->getPost('sticky', 'intval');
+			if ($sticky === $topic_info['is_sticky'] || !allowedTo('make_sticky'))
 			{
 				$sticky = null;
 			}
@@ -1050,7 +1050,7 @@ class Post extends AbstractController
 
 			$lock = $req->hasPost('lock') ? $this->_checkLocked($req->getPost('lock', 'intval')) : null;
 
-			$sticky = $req->getPost('sticky');
+			$sticky = $req->getPost('sticky', 'intval');
 			if ($sticky !== null && (empty($sticky) || !allowedTo('make_sticky')))
 			{
 				$sticky = null;
@@ -1081,19 +1081,19 @@ class Post extends AbstractController
 			$lock = $req->hasPost('lock') ? $this->_checkLocked($req->getPost('lock', 'intval'), $topic_info) : null;
 
 			// Change the sticky status of this topic?
-			$sticky = $req->getPost('sticky');
-			if ($sticky == $topic_info['is_sticky'] || !allowedTo('make_sticky'))
+			$sticky = $req->getPost('sticky', 'intval');
+			if ($sticky === $topic_info['is_sticky'] || !allowedTo('make_sticky'))
 			{
 				$sticky = null;
 			}
 
-			if ($msgInfo['id_member'] == $this->user->id && !allowedTo('modify_any'))
+			if ($msgInfo['id_member'] === $this->user->id && !allowedTo('modify_any'))
 			{
 				if ((!$modSettings['postmod_active'] || $msgInfo['approved']) && !empty($modSettings['edit_disable_time']) && $msgInfo['poster_time'] + ($modSettings['edit_disable_time'] + 5) * 60 < time())
 				{
 					throw new Exception('modify_post_time_passed', false);
 				}
-				if ($topic_info['id_member_started'] == $this->user->id && !allowedTo('modify_own'))
+				if ($topic_info['id_member_started'] === $this->user->id && !allowedTo('modify_own'))
 				{
 					isAllowedTo('modify_replies');
 				}
@@ -1102,7 +1102,7 @@ class Post extends AbstractController
 					isAllowedTo('modify_own');
 				}
 			}
-			elseif ($topic_info['id_member_started'] == $this->user->id && !allowedTo('modify_any'))
+			elseif ($topic_info['id_member_started'] === $this->user->id && !allowedTo('modify_any'))
 			{
 				isAllowedTo('modify_replies');
 
@@ -1114,7 +1114,7 @@ class Post extends AbstractController
 				isAllowedTo('modify_any');
 
 				// Log it, assuming you're not modifying your own post.
-				if ($msgInfo['id_member'] != $this->user->id)
+				if ($msgInfo['id_member'] !== $this->user->id)
 				{
 					$moderationAction = true;
 				}
@@ -1125,7 +1125,7 @@ class Post extends AbstractController
 			// Can they approve it?
 			$can_approve = allowedTo('approve_posts');
 			$becomesApproved = $modSettings['postmod_active'] ? ($can_approve && !$msgInfo['approved'] ? (empty($_REQUEST['approve']) ? 0 : 1) : $msgInfo['approved']) : 1;
-			$approve_has_changed = $msgInfo['approved'] != $becomesApproved;
+			$approve_has_changed = $msgInfo['approved'] !== $becomesApproved;
 
 			if (!allowedTo('moderate_forum') || !$posterIsGuest)
 			{
@@ -1138,7 +1138,7 @@ class Post extends AbstractController
 		if (!isset($_REQUEST['from_qr']) && allowedTo('approve_posts'))
 		{
 			$becomesApproved = !isset($_REQUEST['approve']) || !empty($_REQUEST['approve']) ? 1 : 0;
-			$approve_has_changed = isset($msgInfo['approved']) && $msgInfo['approved'] != $becomesApproved;
+			$approve_has_changed = isset($msgInfo['approved']) && $msgInfo['approved'] !== $becomesApproved;
 		}
 
 		// If the poster is a guest, evaluate the legality of name and email.
@@ -1301,7 +1301,7 @@ class Post extends AbstractController
 			'id' => $this->_req->getRequest('msg', 'intval', 0),
 			'subject' => $subject !== null ? trim($subject) : '',
 			'body' => $message !== null ? trim($message) : '',
-			'icon' => preg_replace('~[\./\\\\*:"\'<>]~', '', $this->_req->getPost('icon', 'trim')),
+			'icon' => preg_replace('~[./*:"\'<>]~', '', $this->_req->getPost('icon', 'trim')),
 			'smileys_enabled' => !$this->_req->hasPost('ns'),
 			'approved' => $becomesApproved,
 		];
@@ -1331,7 +1331,7 @@ class Post extends AbstractController
 			$posterOptions['id_starter'] = $msgInfo['id_member'] ?? $this->user->id;
 
 			// Have admins allowed people to hide their screwups?
-			if (time() - $msgInfo['poster_time'] > $modSettings['edit_wait_time'] || $this->user->id != $msgInfo['id_member'])
+			if (time() - $msgInfo['poster_time'] > $modSettings['edit_wait_time'] || $this->user->id !== $msgInfo['id_member'])
 			{
 				$msgOptions['modify_time'] = time();
 				$msgOptions['modify_name'] = $this->user->name;
@@ -1479,7 +1479,7 @@ class Post extends AbstractController
 	/**
 	 * Toggle a post-lock status
 	 *
-	 * @param int|null $lock
+	 * @param int $lock
 	 * @param string|null $topic_info
 	 *
 	 * @return int|null
@@ -1500,7 +1500,6 @@ class Post extends AbstractController
 				return null;
 			}
 			// A moderator-lock (1) can override a user-lock (2).
-
 			return allowedTo('lock_any') ? 1 : 2;
 		}
 		// Nothing changes to the lock status.
@@ -1509,7 +1508,7 @@ class Post extends AbstractController
 			return null;
 		}
 		// You're simply not allowed to (un)lock this.
-		if (!allowedTo(['lock_any', 'lock_own']) || (!allowedTo('lock_any') && $this->user->id != $topic_info['id_member_started']))
+		if (!allowedTo(['lock_any', 'lock_own']) || (!allowedTo('lock_any') && $this->user->id !== $topic_info['id_member_started']))
 		{
 			return null;
 		}
@@ -1555,7 +1554,7 @@ class Post extends AbstractController
 		$context['sub_template'] = 'quotefast';
 		if (!empty($row))
 		{
-			$can_view_post = $row['approved'] || ($row['id_member'] != 0 && $row['id_member'] == $this->user->id) || allowedTo('approve_posts', $row['id_board']);
+			$can_view_post = $row['approved'] || ($row['id_member'] !== 0 && $row['id_member'] === $this->user->id) || allowedTo('approve_posts', $row['id_board']);
 		}
 
 		if (!empty($can_view_post))
@@ -1642,13 +1641,13 @@ class Post extends AbstractController
 				isAllowedTo('moderate_board');
 			}
 
-			if ($row['id_member'] == $this->user->id && !allowedTo('modify_any'))
+			if ($row['id_member'] === $this->user->id && !allowedTo('modify_any'))
 			{
 				if ((!$modSettings['postmod_active'] || $row['approved']) && !empty($modSettings['edit_disable_time']) && $row['poster_time'] + ($modSettings['edit_disable_time'] + 5) * 60 < time())
 				{
 					throw new Exception('modify_post_time_passed', false);
 				}
-				if ($row['id_member_started'] == $this->user->id && !allowedTo('modify_own'))
+				if ($row['id_member_started'] === $this->user->id && !allowedTo('modify_own'))
 				{
 					isAllowedTo('modify_replies');
 				}
@@ -1657,7 +1656,7 @@ class Post extends AbstractController
 					isAllowedTo('modify_own');
 				}
 			}
-			elseif ($row['id_member_started'] == $this->user->id && !allowedTo('modify_any'))
+			elseif ($row['id_member_started'] === $this->user->id && !allowedTo('modify_any'))
 			{
 				isAllowedTo('modify_replies');
 			}
@@ -1667,7 +1666,7 @@ class Post extends AbstractController
 			}
 
 			// Only log this action if it wasn't your message.
-			$moderationAction = $row['id_member'] != $this->user->id;
+			$moderationAction = $row['id_member'] !== $this->user->id;
 		}
 
 		if (isset($_POST['subject']) && Util::htmltrim(Util::htmlspecialchars($_POST['subject'])) !== '')
@@ -1779,7 +1778,7 @@ class Post extends AbstractController
 			if ((isset($_POST['subject']) && $_POST['subject'] !== $row['subject']) || (isset($_POST['message']) && $_POST['message'] !== $row['body']) || (isset($_REQUEST['icon']) && $_REQUEST['icon'] !== $row['icon']))
 			{
 				// And even then only if the time has passed...
-				if (time() - $row['poster_time'] > $modSettings['edit_wait_time'] || $this->user->id != $row['id_member'])
+				if (time() - $row['poster_time'] > $modSettings['edit_wait_time'] || $this->user->id !== $row['id_member'])
 				{
 					$msgOptions['modify_time'] = time();
 					$msgOptions['modify_name'] = $this->user->name;
@@ -1801,7 +1800,7 @@ class Post extends AbstractController
 			}
 
 			// Changing the first subject updates other subjects to 'Re: new_subject'.
-			if (isset($_POST['subject'], $_REQUEST['change_all_subjects']) && $row['id_first_msg'] == $row['id_msg'] && !empty($row['num_replies']) && (allowedTo('modify_any') || ($row['id_member_started'] == $this->user->id && allowedTo('modify_replies'))))
+			if (isset($_POST['subject'], $_REQUEST['change_all_subjects']) && $row['id_first_msg'] === $row['id_msg'] && !empty($row['num_replies']) && (allowedTo('modify_any') || ($row['id_member_started'] === $this->user->id && allowedTo('modify_replies'))))
 			{
 				// Get the proper (default language) response prefix first.
 				$context['response_prefix'] = response_prefix();
@@ -1834,7 +1833,7 @@ class Post extends AbstractController
 						'name' => isset($msgOptions['modify_time']) ? $msgOptions['modify_name'] : '',
 					],
 					'subject' => $msgOptions['subject'],
-					'first_in_topic' => $row['id_msg'] == $row['id_first_msg'],
+					'first_in_topic' => $row['id_msg'] === $row['id_first_msg'],
 					'body' => strtr($msgOptions['body'], [']]>' => ']]]]><![CDATA[>']),
 				];
 
