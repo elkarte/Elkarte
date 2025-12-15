@@ -20,11 +20,11 @@ use ElkArte\Helper\Util;
  *
  * Initiate
  *    $bbc_converter = new \ElkArte\Html2BBC($html);
- *    where $html is a string of html we want to convert to bbc
+ *    where $html is a string of HTML we want to convert to BBC
  *
  * Override
  *    $bbc_converter->skip_tags(array())
- *    will prevent the conversion of certain html tags to bbc
+ *    will prevent the conversion of certain HTML tags to BBC
  *
  * Convert
  *    $bbc = $bbc_converter->get_bbc();
@@ -38,7 +38,7 @@ class Html2BBC extends AbstractDomParser
 	/** @var string[] Font numbers to pt size */
 	public $sizes_equivalence = [1 => '8px', '10px', '12px', '14px', '18px', '20px', '22px'];
 
-	/** @var string[] Html tags to skip that would normally be converted */
+	/** @var string[] HTML tags to skip that would normally be converted */
 	protected $_skip_tags = [];
 
 	/** @var string[] Style attributes to skip that would normally be converted */
@@ -47,12 +47,12 @@ class Html2BBC extends AbstractDomParser
 	/**
 	 * Gets everything started using the built-in or external parser
 	 *
-	 * @param string $html string of html to convert
+	 * @param string $html string of HTML to convert
 	 * @param bool $strip_newlines flag to strip newlines, true by default
 	 */
 	public function __construct($html, public $strip_newlines = true)
 	{
-		// Up front, remove whitespace between html tags
+		// Up front, remove whitespace between HTML tags
 		$html = preg_replace('/(?:(?<=>)|(?<=\/>))(\s+)(?=<\/?)/', '', $html);
 
 		// Replace invisible (except \n \t) characters with a space
@@ -105,7 +105,7 @@ class Html2BBC extends AbstractDomParser
 	}
 
 	/**
-	 * Loads the html body and sends it to the parsing loop to convert all
+	 * Loads the HTML body and sends it to the parsing loop to convert all
 	 * DOM nodes to BBC
 	 */
 	public function get_bbc(): string
@@ -316,8 +316,8 @@ class Html2BBC extends AbstractDomParser
 	/**
 	 * Converts <a> tags to bbc
 	 *
-	 * html: <a href='http://somesite.com' title='Title'>Awesome Site</a>
-	 * bbc: [url=http://somesite.com]Awesome Site[/url]
+	 * HTML: <a href='http://somesite.com' title='Title'>Awesome Site</a>
+	 * BBC: [url=http://somesite.com]Awesome Site[/url]
 	 *
 	 * @param \DOMNode|object $node
 	 *
@@ -356,7 +356,7 @@ class Html2BBC extends AbstractDomParser
 			return empty($value) ? '[ftp]' . $href . '[/ftp]' : '[ftp=' . $href . ']' . $value . '[/ftp]';
 		}
 
-		// Oh a link then
+		// Oh, a link then
 		// If No http(s), then attempt to fix this potential relative URL.
 		if (preg_match('~^https?://~i', $href) === 0 && is_array($parsedURL = parse_url($scripturl)) && isset($parsedURL['host']))
 		{
@@ -377,8 +377,8 @@ class Html2BBC extends AbstractDomParser
 	/**
 	 * Converts <abbr> tags to bbc
 	 *
-	 * html: <abbr title="Hyper Text Markup Language">HTML</abbr>
-	 * bbc:  [abbr=Hyper Text Markup Language]HTML[/abbr]
+	 * HTML: <abbr title="Hyper Text Markup Language">HTML</abbr>
+	 * BBC: [abbr=Hyper Text Markup Language]HTML[/abbr]
 	 *
 	 * @param \DOMNode|object $node
 	 *
@@ -395,8 +395,8 @@ class Html2BBC extends AbstractDomParser
 	/**
 	 * Converts <bdo> tags to bbc
 	 *
-	 * html: <bdo dir="rtl">Some text</bdo>
-	 * bbc: [bdo=rtl]Some Text[/bdo]
+	 * HTML: <bdo dir="rtl">Some text</bdo>
+	 * BBC: [bdo=rtl]Some Text[/bdo]
 	 *
 	 * @param \DOMNode|object $node
 	 *
@@ -435,7 +435,7 @@ class Html2BBC extends AbstractDomParser
 		$lines = preg_split('~\r\n|\r|\n~', $value);
 		$total = count($lines);
 
-		// If there's more than one line of code we clean it up a bit
+		// If there's more than one line of code, we clean it up a bit
 		if ($total > 1)
 		{
 			// Remove any leading and trailing blank lines
@@ -467,10 +467,10 @@ class Html2BBC extends AbstractDomParser
 	}
 
 	/**
-	 * Searches an inline tag for style attributes and if found converts them to basic bbc
+	 * Searches an inline tag for style attributes and if found, converts them to basic bbc
 	 *
-	 * html: <span style="font-weight: bold;">Some Text</span>
-	 * bbc: [b]Some Text[/b]
+	 * HTML: <span style="font-weight: bold;">Some Text</span>
+	 * BBC: [b]Some Text[/b]
 	 *
 	 * @param \DOMNode|object $node
 	 *
@@ -493,12 +493,12 @@ class Html2BBC extends AbstractDomParser
 		foreach ($styles as $tag => $styleValue)
 		{
 			// Skip any inline styles as needed
-			if (in_array($tag, $this->_skip_style))
+			if (in_array($tag, $this->_skip_style, true))
 			{
 				continue;
 			}
 
-			// Well this can be as long, complete and exhaustive as we want
+			// Well, this can be as long, complete and exhaustive as we want
 			switch ($tag)
 			{
 				case 'font-family':
@@ -601,8 +601,8 @@ class Html2BBC extends AbstractDomParser
 
 	/**
 	 * Convert font tags to the appropriate sequence of bbc tags
-	 * html: <font size="3" color="red">This is some text!</font>
-	 * bbc: [color=red][size=12pt]This is some text![/size][/color]
+	 * HTML: <font size="3" color="red">This is some text!</font>
+	 * BBC: [color=red][size=12pt]This is some text![/size][/color]
 	 *
 	 * @param \DOMNode|object $node
 	 *
@@ -641,8 +641,8 @@ class Html2BBC extends AbstractDomParser
 
 	/**
 	 * Converts <h1> ... <h7> headers to bbc size text,
-	 * html: <h1>header</h1>
-	 * bbc: [size=36pt]header[/size]
+	 * HTML: <h1>header</h1>
+	 * BBC: [size=36pt]header[/size]
 	 *
 	 * @param string $level
 	 * @param string $content
@@ -651,10 +651,17 @@ class Html2BBC extends AbstractDomParser
 	 */
 	private function _convertHeader($level, $content): string
 	{
-		$level = (int) trim($level, 'h');
+		if (!preg_match('/^h([1-7])$/i', (string) $level, $m))
+		{
+			$levelInt = 4;
+		}
+		else
+		{
+			$levelInt = (int) $m[1];
+		}
 		$hsize = [1 => 7, 2 => 6, 3 => 5, 4 => 4, 5 => 3, 6 => 2, 7 => 1];
 
-		$size = $this->sizes_equivalence[$hsize[$level]] ?? $this->sizes_equivalence[4];
+		$size = $this->sizes_equivalence[$hsize[$levelInt]];
 
 		return '[size=' . $size . ']' . $content . '[/size]';
 	}
@@ -662,8 +669,8 @@ class Html2BBC extends AbstractDomParser
 	/**
 	 * Converts <img> tags to bbc
 	 *
-	 * html: <img src='source' alt='alt' title='title' />
-	 * bbc: [img]src[/img]
+	 * HTML: <img src='source' alt='alt' title='title' />
+	 * BBC: [img]src[/img]
 	 *
 	 * @param \DOMNode|object $node
 	 *
@@ -680,7 +687,7 @@ class Html2BBC extends AbstractDomParser
 
 		$size = '';
 
-		// First if this is an inline image, we don't support those, but will use any ALT found
+		// First, if this is an inline image, we don't support those but will use any ALT found
 		if (str_starts_with($src, 'cid:'))
 		{
 			return $alt;
@@ -719,7 +726,7 @@ class Html2BBC extends AbstractDomParser
 			}
 		}
 
-		// Only use depreciated width/height tags if no css was supplied
+		// Only use depreciated width/height tags if no CSS was supplied
 		if (empty($size))
 		{
 			if (!empty($width))
@@ -742,11 +749,11 @@ class Html2BBC extends AbstractDomParser
 	}
 
 	/**
-	 * Checks if an td/th has colspan set, if so repeat those as a number of td's
-	 * Checks if there is an align attribute and adds the proper bbc tag
+	 * Checks if a td/th has colspan set, if so, repeat those as a number of td's
+	 * Checks if there is an aligned attribute and adds the proper bbc tag
 	 *
-	 * html: <td colspan="2">Some Text</td>
-	 * bbc: [td]Some Text[/td][td][/td]
+	 * HTML: <td colspan="2">Some Text</td>
+	 * BBC: [td]Some Text[/td][td][/td]
 	 *
 	 * @param \DOMNode|object $node
 	 *
@@ -784,7 +791,7 @@ class Html2BBC extends AbstractDomParser
 	}
 
 	/**
-	 * Looks for double html encoding items and continues to decode until fixed
+	 * Looks for double HTML encoding items and continues to decode until fixed
 	 *
 	 * @param string $text
 	 *
@@ -819,7 +826,7 @@ class Html2BBC extends AbstractDomParser
 		// Return protected tags
 		$bbc = strtr($bbc, ['&amp#91;' => '[', '&amp#93;' => ']']);
 
-		// Remove any html tags we left behind ( outside of code tags that is )
+		// Remove any HTML tags we left behind (outside of code tags that is)
 		$parts = preg_split('~(\[/code\]|\[code(?:=[^\]]+)?\])~i', $bbc, -1, PREG_SPLIT_DELIM_CAPTURE);
 		if ($parts !== false)
 		{

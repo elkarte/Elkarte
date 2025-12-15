@@ -24,20 +24,20 @@ class Html2Md extends AbstractDomParser
 	/** @var bool Strip remaining tags, set too false to leave them in */
 	public $strip_tags = true;
 
-	/** @var string[] various settings on how render certain markdown tags */
+	/** @var string[] various settings on how to render certain Markdown tags */
 	public $config = ['heading' => 'atx', 'bullet' => '*', 'em' => '_', 'strong' => '**'];
 
-	/** @var string The markdown equivalent to the  html string */
+	/** @var string The Markdown equivalent to the HTML string */
 	public $markdown;
 
 	/**
-	 * Prepares the passed string and sets the parser to utilize
+	 * Prepares the passed string and sets the parser to use
 	 *
-	 * @param string $html string of html to convert to MD text
+	 * @param string $html string of HTML to convert to MD text
 	 */
 	public function __construct($html)
 	{
-		// Up front, remove whitespace between html tags
+		// Up front, remove whitespace between HTML tags
 		$html = preg_replace('/(?:(?<=>)|(?<=\/>))(\s+)(?=<\/?)/', '', $html);
 
 		// Replace invisible (except \n \t) characters with a space
@@ -51,24 +51,24 @@ class Html2Md extends AbstractDomParser
 			'<?' => '&lt|?|'
 		]);
 
-		// Set a Parser then load the HTML
+		// Set a parser, then load the HTML
 		$this->setParser();
 		$this->loadHTML($html);
 	}
 
 	/**
-	 * Reads the html body and sends it to the parsing loop to convert all
+	 * Reads the HTML body and sends it to the parsing loop to convert all
 	 * DOM nodes to markup
 	 */
 	public function get_markdown(): string
 	{
-		// For this html node, find all child elements and convert
+		// For this HTML node, find all child elements and convert
 		$this->convertChildNodes($this->getDOMBodyNode());
 
 		// Done replacing HTML elements, now get the converted DOM tree back into a string
 		$this->markdown = $this->getHTML();
 
-		// Clean up any excess spacing etc
+		// Clean up any excess spacing etc.
 		$this->cleanMarkdown();
 
 		// Wordwrap?
@@ -133,14 +133,14 @@ class Html2Md extends AbstractDomParser
 			}
 		}
 
-		// At the root of this node, convert it to markdown
+		// At the root of this node, convert it to Markdown
 		$this->convertToMarkdown($node);
 	}
 
 	/**
-	 * Convert the supplied node into its markdown equivalent
+	 * Convert the supplied node into its Markdown equivalent
 	 *
-	 *  - Supports *some* markdown extra tags, namely: table, abbr & dl in a limited fashion
+	 *  - Supports *some* Markdown extra tags, namely: table, abbr & dl in a limited fashion
 	 *
 	 * @param object $node
 	 */
@@ -263,7 +263,7 @@ class Html2Md extends AbstractDomParser
 				$markdown = $this->getOuterHTML($node) . $this->line_end;
 		}
 
-		// Replace the node with our markdown replacement, or with the node itself if none was found
+		// Replace the node with our Markdown replacement, or with the node itself if none was found
 		if ($markdown !== '~`skip`~')
 		{
 			$this->setTextNode($node, $markdown);
@@ -271,10 +271,10 @@ class Html2Md extends AbstractDomParser
 	}
 
 	/**
-	 * Converts <abbr> tags to markdown (extra)
+	 * Converts <abbr> tags to Markdown (extra)
 	 *
-	 * html: <abbr title="Hyper Text Markup Language">HTML</abbr>
-	 * md:   *[HTML]: Hyper Text Markup Language
+	 * HTML: <abbr title="Hyper Text Markup Language">HTML</abbr>
+	 * MD: *[HTML]: Hyper Text Markup Language
 	 *
 	 * @param object $node
 	 * @return string
@@ -288,10 +288,10 @@ class Html2Md extends AbstractDomParser
 	}
 
 	/**
-	 * Converts <a> tags to markdown
+	 * Converts <a> tags to Markdown
 	 *
-	 * html: <a href='http://somesite.com' title='Title'>Awesome Site</a>
-	 * md: [Awesome Site](http://somesite.com 'Title')
+	 * HTML: <a href='http://somesite.com' title='Title'>Awesome Site</a>
+	 * MD: [Awesome Site](http://somesite.com 'Title')
 	 *
 	 * @param object $node
 	 * @return string
@@ -306,7 +306,7 @@ class Html2Md extends AbstractDomParser
 			return '~`skip`~';
 		}
 
-		// Links with _ would have been escaped ( '_' => '\_' ), undo that now
+		// Links with _ would have been escaped ('_' => '\_'), undo that now
 		$href = str_replace('\_', '_', htmlspecialchars_decode($node->getAttribute('href')));
 		$title = $node->getAttribute('title');
 		$class = $node->getAttribute('class');
@@ -338,10 +338,10 @@ class Html2Md extends AbstractDomParser
 	}
 
 	/**
-	 * Converts blockquotes to markdown > quote style
+	 * Converts blockquotes to Markdown > quote style
 	 *
-	 * html: <blockquote>quote</blockquote>
-	 * md: > quote
+	 * HTML: <blockquote>quote</blockquote>
+	 * MD: > quote
 	 *
 	 * @param object $node
 	 * @return string
@@ -366,10 +366,10 @@ class Html2Md extends AbstractDomParser
 	}
 
 	/**
-	 * Converts cites to markdown with the assumption that they are in a blockquote
+	 * Converts cites to Markdown with the assumption that they are in a blockquote
 	 *
-	 * html: <blockquote>quote</blockquote>
-	 * md: > quote
+	 * HTML: <blockquote>quote</blockquote>
+	 * MD: > quote
 	 *
 	 * @param object $node
 	 * @return string
@@ -389,12 +389,12 @@ class Html2Md extends AbstractDomParser
 	}
 
 	/**
-	 * Converts code tags to markdown span `code` or block fenced code
+	 * Converts code tags to Markdown span `code` or block fenced code
 	 * Converts single line code to inline tick mark
 	 * Converts multi line to ``` fenced ``` code
 	 *
-	 * html: <code>code</code>
-	 * md: `code`
+	 * HTML: <code>code</code>
+	 * MD: `code`
 	 *
 	 * @param object $node
 	 * @return string
@@ -414,7 +414,7 @@ class Html2Md extends AbstractDomParser
 		$this->strip_tags = false;
 		$this->body_width = 0;
 
-		// If we have a multi line code block, we are working outside to in, and need to convert the br's ourselves
+		// If we have a multi-line code block, we are working outside to in, and need to convert the br's ourselves
 		$value = preg_replace('~<br( /)?>~', $this->line_end, str_replace('&nbsp;', ' ', $value));
 
 		// Get the number of lines of code that we have
@@ -464,14 +464,14 @@ class Html2Md extends AbstractDomParser
 	}
 
 	/**
-	 * Converts <h1> ... <hx> headers to markdown-style headers in setext or atx style.
+	 * Converts <h1> ... <hx> headers to Markdown-style headers in setext or atx style.
 	 *
-	 * html: <h1>header</h1>
-	 * md: header
+	 * HTML: <h1>header</h1>
+	 * MD: header
 	 *     ======
 	 *
-	 * html: <h3>header</h3>
-	 * md: ### header
+	 * HTML: <h3>header</h3>
+	 * MD: ### header
 	 *
 	 * @param string $level
 	 * @param string $content
@@ -486,16 +486,23 @@ class Html2Md extends AbstractDomParser
 			return $this->line_end . $content . $this->line_end . str_repeat('=', $length) . $this->line_break;
 		}
 
-		$level = (int) ltrim($level, 'h');
+		if (!preg_match('/^h([1-5])$/i', (string) $level, $m))
+		{
+			$levelInt = 3;
+		}
+		else
+		{
+			$levelInt = (int) $m[1];
+		}
 
-		return $this->line_end . str_repeat('#', $level) . ' ' . $content . $this->line_break;
+		return $this->line_end . str_repeat('#', $levelInt) . ' ' . $content . $this->line_break;
 	}
 
 	/**
-	 * Converts <img> tags to markdown
+	 * Converts <img> tags to Markdown
 	 *
-	 * html: <img src='source' alt='alt' title='title' />
-	 * md: ![alt](source 'title')
+	 * HTML: <img src='source' alt='alt' title='title' />
+	 * MD: ![alt](source 'title')
 	 *
 	 * @param object $node
 	 * @return string
@@ -530,9 +537,9 @@ class Html2Md extends AbstractDomParser
 	}
 
 	/**
-	 * Converts ordered <li> and unordered <li> items to markdown syntax
+	 * Converts ordered <li> and unordered <li> items to Markdown syntax
 	 *
-	 * html: <ul><li>one</li></ul>
+	 * HTML: <ul><li>one</li></ul>
 	 * md * one
 	 *
 	 * @param object $node
@@ -547,7 +554,7 @@ class Html2Md extends AbstractDomParser
 		// Keep items that started with a newline for list spacing
 		$loose = $value[0] === $this->line_end ? $this->line_end : '';
 
-		// Keep multi line list items indented the same as the list depth
+		// Keep multi-line list items indented the same as the list depth
 		$indent = str_repeat('   ', $depth);
 		$value = rtrim(implode($this->line_end . $indent, explode($this->line_end, trim($value))));
 
@@ -598,9 +605,9 @@ class Html2Md extends AbstractDomParser
 	}
 
 	/**
-	 * Converts tables tags to markdown extra table syntax
+	 * Converts tables tags to Markdown extra table syntax
 	 *
-	 * - Have to build top down vs normal inside out due to needing col numbers and widths
+	 * - Have to build top down vs. normal inside out due to needing col numbers and widths
 	 *
 	 * @param object $node
 	 * @return string
@@ -615,7 +622,7 @@ class Html2Md extends AbstractDomParser
 
 		$th_parent = $this->getName($this->getParent($this->getItem($table_heading, 0)));
 
-		// Set up for a markdown table, then storm the castle
+		// Set up for a Markdown table, then storm the castle
 		$align = [];
 		$value = [];
 		$width = [];
@@ -631,7 +638,7 @@ class Html2Md extends AbstractDomParser
 
 			for ($col = 0; $col < $th_num; $col++)
 			{
-				// Get align and text for each th (html5 this is no longer valid)
+				// Get align and text for each th (HTML5 this is no longer valid)
 				$th = $this->getItem($table_heading, $col);
 				$align_value = ($th !== null) ? strtolower($th->getAttribute('align')) : false;
 				$align[0][$col] = $align_value === false ? 'left' : $align_value;
@@ -650,7 +657,7 @@ class Html2Md extends AbstractDomParser
 				// Start at row 1 and get all the td's in this row
 				$row_data = $this->getItem($table_rows, $row)->getElementsByTagName('td');
 
-				// Simply use the th count as the number of columns, if its not right its not markdown-able anyway
+				// Simply use the th count as the number of columns, if it's not right it's not Markdown-able anyway
 				for ($col = 0; $col < $th_num; $col++)
 				{
 					// Get align and text for each td in this row
@@ -674,7 +681,7 @@ class Html2Md extends AbstractDomParser
 				$temp = [];
 				for ($col = 0; $col < $th_num; $col++)
 				{
-					// Build the header row once
+					// Build the header row just once
 					if ($row === 0)
 					{
 						$header[] = str_repeat('-', $max[$col]);
@@ -768,10 +775,10 @@ class Html2Md extends AbstractDomParser
 	}
 
 	/**
-	 * Escapes markup looking text in html to prevent accidental assignment
+	 * Escapes markup looking text in HTML to prevent accidental assignment
 	 *
 	 * <p>*stuff*</p> should not convert to *stuff* but \*stuff\* since it's not to
-	 * be converted by md to html as <strong>stuff</strong>
+	 * be converted by md to HTML as <strong>stuff</strong>
 	 *
 	 * @param string $value
 	 * @return string
@@ -800,8 +807,8 @@ class Html2Md extends AbstractDomParser
 	}
 
 	/**
-	 * If inline code contains backticks ` as part of its content, we need to wrap them so
-	 * when markdown is run we don't interpret the ` as additional code blocks
+	 * If inline code contains backticks ` as part of its content, we need to wrap them, so
+	 * when Markdown is run, we don't interpret the ` as additional code blocks
 	 *
 	 * @param string $value
 	 * @return string
@@ -811,7 +818,7 @@ class Html2Md extends AbstractDomParser
 		$ticks = '';
 
 		// If we have backticks in code, then we back tick the ticks
-		// e.g. <code>`bla`</code> will become `` `bla` `` so markdown will deal with it properly
+		// e.g. <code>`bla`</code> will become `` `bla` `` so Markdown will deal with it properly
 		preg_match_all('~`+~', $value, $matches);
 		if (!empty($matches[0]))
 		{
@@ -819,7 +826,7 @@ class Html2Md extends AbstractDomParser
 			$ticks = '`';
 			rsort($matches[0]);
 
-			// Backtick as many as needed so markdown will work
+			// Backtick as many as needed so Markdown will work
 			while (true)
 			{
 				if (!in_array($ticks, $matches[0]))
@@ -835,7 +842,7 @@ class Html2Md extends AbstractDomParser
 	}
 
 	/**
-	 * Helper function to adjust wrapping width for long-ish links
+	 * Helper function to adjust wrapping width for longish links
 	 *
 	 * @param string $markdown
 	 * @param bool|int $buffer
@@ -881,7 +888,7 @@ class Html2Md extends AbstractDomParser
 			return $text;
 		}
 
-		// Link finding regex that will skip our markdown [link](xx) constructs
+		// Link finding regex that will skip our Markdown [link](xx) constructs
 		$re = '/((?<!\\\\\( |]\()https?:\/\/|(?<!\\\\\( |]\(|:\/\/)www)[-\p{L}0-9+&@#\/%?=~_|!:,.;]*[\p{L}0-9+&@#\/%=~_|]/ui';
 		$count = 0;
 		$text = preg_replace_callback($re,
@@ -911,9 +918,9 @@ class Html2Md extends AbstractDomParser
 	}
 
 	/**
-	 * Gets the length of html in front of a given node and its parent.
+	 * Gets the length of HTML in front of a given node and its parent.
 	 *
-	 * - Used to add needed buffer to adjust length wrapping
+	 * - Used to add necessary buffer to adjust length wrapping
 	 *
 	 * @param $node
 	 * @return int
