@@ -33,7 +33,9 @@ fi
 
 if [[ "$WEBSERVER" == "none" ]]
 then
-  # Provide a way to return from actions redirectexit & obexit, so we can get results for Unit Test
+  # Functions declared with ": never" cannot return; adjust signatures to allow testbed returns
+  sudo sed -i 's/): never/)/g' ./sources/Subs.php
+  # Provide a way to return from actions previous :never redirectexit & obexit, so we can get results for Unit Test
   sudo sed -i '/global $db_show_debug;/a \\n\tif (defined("PHPUNITBOOTSTRAP") && defined("STDIN")){return $setLocation;}' ./sources/Subs.php
   sudo sed -i '/call_integration_hook('"'"'integrate_exit'"'"', \[$do_footer\]);/a \\n\tif (defined("PHPUNITBOOTSTRAP") && defined("STDIN")){return;}' ./sources/Subs.php
   # Allow tests to proceed when a token fails
