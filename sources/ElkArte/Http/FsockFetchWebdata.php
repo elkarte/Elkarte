@@ -41,7 +41,7 @@ class FsockFetchWebdata
 	/** @var int how much we will read */
 	private $_content_length = 0;
 
-	/** @var array the parsed url with host, port, path, etc */
+	/** @var array the parsed url with host, port, path, etc. */
 	private $_url = [];
 
 	/** @var null|resource the fsockopen resource */
@@ -59,7 +59,7 @@ class FsockFetchWebdata
 	/** @var array() Holds the last header response to the request */
 	private $_headers = [];
 
-	/** @var string the HTTP response from the server 200/404/302 etc */
+	/** @var string the HTTP response from the server 200/404/302 etc. */
 	private $_server_response;
 
 	/** @var bool if the response body is transfer encoded chunked */
@@ -81,7 +81,7 @@ class FsockFetchWebdata
 	}
 
 	/**
-	 * Prepares any post data supplied and then makes the request for data
+	 * Prepares any post-data supplied and then makes the request for data
 	 *
 	 * @param string $url
 	 * @param string|string[] $post_data
@@ -149,7 +149,7 @@ class FsockFetchWebdata
 			// Make sure we ended up with a 200 OK.
 			if (in_array($this->_response['code'], [200, 201, 206], true))
 			{
-				// Provide a common valid 200 return code to the caller
+				// Provide a common valid 200-return code to the caller
 				$this->_response['code'] = 200;
 			}
 
@@ -166,7 +166,7 @@ class FsockFetchWebdata
 	}
 
 	/**
-	 * Parses an url into the components we need
+	 * Parses a url into the components we need
 	 *
 	 * @param string $url
 	 */
@@ -307,7 +307,7 @@ class FsockFetchWebdata
 				break;
 			}
 
-			// Process single header at a time instead of concatenating
+			// Process a single header at a time instead of concatenating
 			if (str_contains($header, ':'))
 			{
 				[$name, $value] = explode(':', $header, 2);
@@ -332,7 +332,7 @@ class FsockFetchWebdata
 
 
 	/**
-	 * Looks at the server response and header array to determine if we are redirecting
+	 * It looks at the server response and header array to determine if we are redirecting
 	 *
 	 * @return string
 	 */
@@ -403,7 +403,7 @@ class FsockFetchWebdata
 	 */
 	private function _processHeaders(): void
 	{
-		// If told to close the connection, do so
+		// If informed to close the connection, do so
 		if (isset($this->_headers['connection']) && $this->_headers['connection'] === 'close')
 		{
 			$this->_keep_alive_host = null;
@@ -435,7 +435,7 @@ class FsockFetchWebdata
 		$decoded_body = '';
 		while (trim($body))
 		{
-			// It only claimed to be chunked, but its not.
+			// It only claimed to be chunked, but it's not.
 			if (!preg_match('~^([\da-fA-F]+)[^\r\n]*\r\n~m', $body, $match))
 			{
 				$decoded_body = $body;

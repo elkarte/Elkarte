@@ -185,7 +185,7 @@ class FtpConnection
 	}
 
 	/**
-	 * Changes a files attributes (chmod)
+	 * Changes a files attribute (chmod)
 	 *
 	 * @param string $ftp_file The file to CHMOD
 	 * @param int $chmod The value for the CHMOD operation
@@ -462,7 +462,7 @@ class FtpConnection
 	 * Generates a directory listing for the current directory
 	 *
 	 * @param string $ftp_path The path to the directory
-	 * @param string|bool $search Whether or not to get a recursive directory listing
+	 * @param string|bool $search Whether to get a recursive directory listing
 	 * @return false|string The results of the command or false if unsuccessful
 	 */
 	public function list_dir($ftp_path = '', $search = false)
@@ -501,7 +501,7 @@ class FtpConnection
 
 		fclose($fp);
 
-		// Everything go okay?
+		// Everything went okay?
 		if (!$this->check_response(226))
 		{
 			$this->error = 'bad_response';

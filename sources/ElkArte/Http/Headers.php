@@ -216,7 +216,7 @@ class Headers
 	}
 
 	/**
-	 * Sets the content type and character set.  Replaces an existing one if called multiple times
+	 * Sets the content type and character set.  Replaces an existing one if called multiple times,
 	 * so the last call to this method will be what is output.
 	 *
 	 * @param string|null $contentType
@@ -287,12 +287,12 @@ class Headers
 
 		foreach ($this->headers as $header => $value)
 		{
-			header("$header: $value", true);
+			header("$header: $value");
 		}
 
 		foreach ($this->specialHeaders as $header)
 		{
-			header($header, true);
+			header($header);
 		}
 
 		if ($this->contentType)
