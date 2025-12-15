@@ -113,13 +113,13 @@ class BuildMail extends BaseMail
 		// Now build our message with various encodings
 		$message = $this->getMessage($send_html, $mime_boundary, $message, $subject);
 
-		// Are we using the mail queue?, if so this is where we butt in...
+		// Are we using the mail queue?, if so, this is where we butt in...
 		if (!empty($modSettings['mail_queue']) && $priority !== 0)
 		{
 			return AddMailQueue(false, $to_array, $subject, $message, $headers, $send_html, $priority, $is_private, $message_id);
 		}
 
-		// If it's a priority mail, send it now - note though that this should NOT be used for sending many at once.
+		// If it's priority mail, send it now - note though that this should NOT be used for sending many at once.
 		if (!empty($modSettings['mail_queue']) && !empty($modSettings['mail_period_limit']))
 		{
 			[$last_mail_time, $mails_this_minute] = @explode('|', $modSettings['mail_recent']);
@@ -143,7 +143,7 @@ class BuildMail extends BaseMail
 		// Clear out the stat cache.
 		trackStats();
 
-		// Everything go smoothly?
+		// Everything went smoothly?
 		return $mail_result;
 	}
 
@@ -177,7 +177,7 @@ class BuildMail extends BaseMail
 		// https://www.dmarc.org/supplemental/mailman-project-mlm-dmarc-reqs.html
 		if ($this->mailList && $from !== null && $from_wrapper !== null)
 		{
-			// Be sure there is never an email in the from name when using maillist styles
+			// Be sure there is never an email in the "from" name when using maillist styles
 			if (filter_var($dmarc_from, FILTER_VALIDATE_EMAIL))
 			{
 				$dmarc_from = str_replace(strstr($dmarc_from, '@'), '', $dmarc_from);
@@ -237,7 +237,7 @@ class BuildMail extends BaseMail
 		// Ensure any HTML entities are in a valid range
 		$string = $this->getValidUTF8String($string);
 
-		// We don't need to mess with the line if no special characters were in it..
+		// We don't need to mess with the line if no special characters were in it.
 		if (preg_match('~([^\x09\x0A\x0D\x20-\x7F])~', $string) === 1)
 		{
 			// Base64 encode.
@@ -272,7 +272,7 @@ class BuildMail extends BaseMail
 	/**
 	 * Sets both From: and Reply-To: headers
 	 *
-	 * - If passed $reference then a References: header will also be set
+	 * - If passed $reference, then a References: header will also be set
 	 *
 	 * @param string $from an email address
 	 * @param string $from_name a more common name for the address
@@ -288,7 +288,7 @@ class BuildMail extends BaseMail
 		{
 			$this->headers[] = 'From: ' . $from_name . ' <' . $from_wrapper . '>';
 
-			// If they reply where is it going to be sent?
+			// If they reply, where is it going to be sent?
 			$this->headers[] = 'Reply-To: "' . (empty($modSettings['maillist_sitename']) ? $context['forum_name'] : $modSettings['maillist_sitename']) . '" <' . (empty($modSettings['maillist_sitename_address']) ? (empty($modSettings['maillist_mail_from']) ? $webmaster_email : $modSettings['maillist_mail_from']) : ($modSettings['maillist_sitename_address'])) . '>';
 			if ($reference !== null)
 			{
@@ -313,7 +313,7 @@ class BuildMail extends BaseMail
 	/**
 	 * Sets a few specialized digest headers to
 	 *
-	 * - Prevent auto replying to notifications
+	 * - Prevent auto-replying to notifications
 	 * - Identify as a list server to help with anti-spam measures
 	 *
 	 * @param int $priority
@@ -357,12 +357,12 @@ class BuildMail extends BaseMail
 	/**
 	 * Creates 3 complete message sections
 	 *
-	 * - Plain Ascii text.  Characters >127 are converted to entities &#123; All control characters removed. Any
-	 * html tags are stripped.
+	 * - Plain Ascii text.  Characters >127 are converted to entities &#123; All control characters are removed. Any
+	 * HTML tags are stripped.
 	 * - Base64 encoded.  Control characters (<31) are dropped.  Entities are converted to utf-8 characters.
 	 * The result is base64-encoded and chunk split for email compliance.
 	 * - Quoted-Printable encoded.  Control characters (<31) are dropped.  Entities are converted
-	 * to utf-8 characters.  The result is then encoded with quoted printable which does the needed line
+	 * to utf-8 characters.  The result is then encoded with quoted printable which does the necessary line
 	 * flowing.  This will be marked as text/plain or text/html based on $send_html flag
 	 *
 	 * @param bool $send_html
@@ -384,7 +384,7 @@ class BuildMail extends BaseMail
 		$message .= 'Content-Transfer-Encoding: 7bit' . $this->lineBreak . $this->lineBreak;
 		$message .= $ascii_message . $this->lineBreak . $boundary;
 
-		// This is base64 message, more accurate than plain as it true UTF-8
+		// This is a base64 message, more accurate than plain as it true UTF-8
 		$mine_message = $this->getBase64Version($plain_text);
 		$message .= 'Content-Type: text/plain; charset=UTF-8' . $this->lineBreak;
 		$message .= 'Content-Transfer-Encoding: base64' . $this->lineBreak . $this->lineBreak;
@@ -427,10 +427,10 @@ class BuildMail extends BaseMail
 		// Remove any basic control characters, allowing only for tab, LF and CR
 		$string = preg_replace('/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]/', '', $string);
 
-		// <*> is not valid html and will be stripped, so we need to swap it for [*]
+		// <*> is not valid HTML and will be stripped, so we need to swap it for [*]
 		$string = preg_replace('~<br /><\*>~m', '<br />[*]', $string);
 
-		// Convert to markdown, provides some intent should the receiver only accept plain text
+		// Convert to Markdown, provides some intent should the receiver only accept plain text
 		$mark_down = new Html2Md($string);
 		$string = $mark_down->get_markdown();
 
@@ -438,7 +438,7 @@ class BuildMail extends BaseMail
 		$re = '~(\n)\\\\\[\\\\\*\\\\\]~m';
 		$string = preg_replace($re, '$1[*]', $string);
 
-		// No html in plain text
+		// No HTML in plain text
 		return un_htmlspecialchars(strip_tags($string));
 	}
 
@@ -515,10 +515,10 @@ class BuildMail extends BaseMail
 	 * Builds a body wrapper for the HTML message, because HTML Email design is in the dark ages.
 	 *
 	 * - Email clients provide inconsistent CSS support, that is why we have a special CSS style
-	 * and layout. Not all clients support all CSS properties, for example here is Gmail`s list
+	 * and layout. Not all clients support all CSS properties - for example, here is Gmail's list
 	 * https://developers.google.com/gmail/design/reference/supported_css
 	 * - Due to the numerous email clients and devices, the email will be rendered by a variety of engines
-	 * including WebKit, IE, MS Word, Blink plus clients will add their own styles "to help"
+	 * including WebKit, IE, MS Word, Blink, plus clients will add their own styles "to help"
 	 * - In general, use tables over divs, CSS2, HTML4, HTML attributes instead of CSS, go old school
 	 *
 	 * @param string $message

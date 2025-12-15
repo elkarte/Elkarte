@@ -31,14 +31,14 @@ class PreparseMail extends BaseMail
 
 	/**
 	 * Prepares a post/pm HTML, such that it is better suited for HTML email and
-	 * conversion to markdown / plain text
+	 * conversion to Markdown / plain text
 	 *
 	 * - Censors everything it will send
-	 * - Pre-converts select bbc tags to html, so they are more generic
-	 * - Uses parse-bbc to convert remaining bbc to html
+	 * - Pre-converts select bbc tags to HTML, so they are more generic
+	 * - Uses parse-bbc to convert remaining bbc to HTML
 	 *
 	 * @param string $message the post in glorious BBC format
-	 * @return string html text suitable for html2md or html output
+	 * @return string HTML text suitable for html2md or HTML output
 	 */
 	public function preparseHtml($message): string
 	{
@@ -60,23 +60,23 @@ class PreparseMail extends BaseMail
 		$emoji = Emoji::instance();
 		$message = $emoji->emojiNameToImage($message, true, false);
 
-		// Allow addons to account for their own unique bbc additions e.g. gallery's etc.
+		// Allow addons to account for their own unique bbc additions e.g., gallery's etc.
 		call_integration_hook('integrate_mailist_pre_parsebbc', [&$message]);
 
-		// Convert the remaining bbc to html
+		// Convert the remaining bbc to HTML
 		$bbc_wrapper = ParserWrapper::instance();
 		$message = $bbc_wrapper->parseMessage(trim($message), false);
 
-		// Drop quote-show-more input box
+		// Drop the quote-show-more input box
 		$message = str_replace('<input type="checkbox" title="show" class="quote-show-more">', '', $message);
 
 		// Change list style to something standard to make text conversion easier
 		$message = preg_replace('~<ul class="bbc_list" style="list-style-type: decimal;">(.*?)</ul>~si', '<ol>\\1</ol>', $message);
 
-		// Do we have any tables? if so we add in th's based on the number of cols.
+		// Do we have any tables? if so, we add in th's based on the number of cols.
 		$message = $this->preparseTables($message);
 
-		// Allow addons to account for their own unique bbc additions e.g. gallery's etc.
+		// Allow addons to account for their own unique bbc additions e.g., gallery's etc.
 		call_integration_hook('integrate_mailist_pre_markdown', [&$message]);
 
 		// Restore code blocks
@@ -89,7 +89,7 @@ class PreparseMail extends BaseMail
 	}
 
 	/**
-	 * Replace full bbc quote tags with html blockquote version where the cite line
+	 * Replace full bbc quote tags with HTML blockquote version where the cite line
 	 * is used as the first line of the quote.
 	 *
 	 * - Callback for preparseHtml
@@ -120,15 +120,15 @@ class PreparseMail extends BaseMail
 	}
 
 	/**
-	 * Checks if a table has the required <th> line, such that markdown will convert it properly.  If
-	 * it is missing it will add a simple numerical value for each col in the table.
+	 * Checks if a table has the required <th> line, such that Markdown will convert it properly.  If
+	 * it is missing, it will add a simple numerical value for each col in the table.
 	 *
 	 * @param string $message
 	 * @return string
 	 */
 	private function preparseTables($message): string
 	{
-		// Do we have any tables? if so we may need to add in th's based on the number of cols.
+		// Do we have any tables? if so, we may need to add in th's based on the number of cols.
 		$table_content = [];
 		if (preg_match_all('~<table class="bbc_table">(.*?)</tr>.*?</table>~si', $message, $table_content, PREG_SET_ORDER))
 		{
@@ -180,7 +180,7 @@ class PreparseMail extends BaseMail
 		// The signature goes as just plain text
 		if ($signature !== '')
 		{
-			// You would like to say that, but its spam, like most signatures
+			// You would like to say that, but it's spam, like most signatures
 			$signature = censor($signature);
 
 			call_integration_hook('integrate_mailist_pre_sig_parsebbc', [&$signature]);
@@ -188,7 +188,7 @@ class PreparseMail extends BaseMail
 			$bbc_wrapper = ParserWrapper::instance();
 			$signature = $bbc_wrapper->parseSignature($signature, false);
 
-			// No html in plain text, but insert some block level line breaks
+			// No HTML in plain text, but insert some block level line breaks
 			$trans = [
 				'</div>' => "\n",
 				'</tr>' => "\n",

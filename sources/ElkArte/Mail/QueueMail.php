@@ -49,7 +49,7 @@ class QueueMail
 
 		require_once(SUBSDIR . '/Mail.subs.php');
 
-		// How many emails can we send each time we are called in a period
+		// How many emails can we send each time we are called in a period?
 		$batch_size = $this->setBatchSize($batch_size);
 
 		// Set the delay / pause until the next sending
@@ -59,13 +59,13 @@ class QueueMail
 			return false;
 		}
 
-		// Make any needed adjustments based on quota remaining in this time period.
+		// Make any necessary adjustments based on the quota remaining in this time period.
 		$batch_size = $this->adjustBatchSize($override_limit, $batch_size, $delay);
 
 		// Now we know how many we're sending, let's send them.
 		[$ids, $emails] = emailsInfo($batch_size);
 
-		// Remove these from the queue .... Delete, delete, delete!!!
+		// Remove these from the queue... Delete, delete, delete!!!
 		if (!empty($ids))
 		{
 			deleteMailQueueItems($ids);
@@ -83,10 +83,10 @@ class QueueMail
 			return false;
 		}
 
-		// Prepare to send each email, and log that for future-proof.
+		// Prepare to send each email and log that for future-proof.
 		require_once(SUBSDIR . '/Maillist.subs.php');
 
-		// We have some to send, lets send them!
+		// We have some to send, let's send them!
 		$failed_emails = [];
 		$mail = new Mail();
 		foreach ($emails as $email)
@@ -134,7 +134,7 @@ class QueueMail
 	 * Sets the number of emails that we can release in the next pass
 	 *
 	 * - Uses value if set in the ACP
-	 * - Determines best value based on number per min allowed and no batch size
+	 * - Determines the best value based on the number per min allowed and no batch size
 	 * was set
 	 *
 	 * @param $batch_size
@@ -144,7 +144,7 @@ class QueueMail
 	{
 		global $modSettings;
 
-		// How many emails can we send each time we are called in a period
+		// How many emails can we send each time we are called in a period?
 		if (!$batch_size)
 		{
 			// Batch size has been set in the ACP, use it
@@ -204,7 +204,7 @@ class QueueMail
 	/**
 	 * Tracks what we have sent in this time period, ensuring we do not go over our
 	 * per minute quota.  If time limit is running out will adjust batch limit up
-	 * to fill the allowed quota.  This is necessary as we can not rely on the scheduled
+	 * to fill the allowed quota.  This is necessary as we cannot rely on the scheduled
 	 * task trigger period, it is based on traffic, not traffic, no trigger
 	 *
 	 * @param bool $override_limit
@@ -218,7 +218,7 @@ class QueueMail
 
 		if (!$override_limit && !empty($modSettings['mail_period_limit']))
 		{
-			// See if we have quota left to send another batch_size this minute or if we have to wait
+			// See if we have a quota left to send another batch_size this minute or if we have to wait
 			[$mail_time, $mail_number] = isset($modSettings['mail_recent']) ? explode('|', $modSettings['mail_recent']) : [0, 0];
 
 			// Nothing worth noting...
@@ -227,7 +227,7 @@ class QueueMail
 				$mail_time = time();
 				$mail_number = $batch_size;
 			}
-			// Otherwise, we may still have quota to send a few more?
+			// Otherwise, we may still have a quota to send a few more?
 			elseif ($mail_number < $modSettings['mail_period_limit'])
 			{
 				// If this is likely one of the last cycles for this period, then send any remaining quota
@@ -243,7 +243,7 @@ class QueueMail
 
 				$mail_number += $batch_size;
 			}
-			// No more I'm afraid, return!
+			// No more, I'm afraid, return!
 			else
 			{
 				return 0;

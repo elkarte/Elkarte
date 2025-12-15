@@ -54,7 +54,7 @@ class Mail extends BaseMail
 	 * @param string $message
 	 * @param string $headers
 	 * @param string $message_id
-	 * @return bool if the mail was accepted by the system
+	 * @return bool if the system accepted the mail
 	 */
 	public function sendPHP($mail_to_array, $subject, $message, $headers, $message_id): bool
 	{
@@ -113,7 +113,7 @@ class Mail extends BaseMail
 				}
 			}
 
-			// Wait, wait, I'm still sending here!
+			// Wait, wait, I'm still sending it here!
 			detectServer()->setTimeLimit(300);
 		}
 
@@ -166,7 +166,7 @@ class Mail extends BaseMail
 			return false;
 		}
 
-		// The server responded, now login our client
+		// The server responded, now log in our client
 		$login = $this->_loginSMTPClient($socket, $smtp_client);
 		if ($login === false)
 		{
@@ -321,7 +321,7 @@ class Mail extends BaseMail
 	/**
 	 * Parse a message to the SMTP server.
 	 *
-	 * - Sends the specified message to the server, and checks for the expected response.
+	 * - Sends the specified message to the server and checks for the expected response.
 	 *
 	 * @param string $message - the message to send
 	 * @param resource $socket - socket to send on

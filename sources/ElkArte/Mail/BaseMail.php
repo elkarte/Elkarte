@@ -78,12 +78,12 @@ abstract class BaseMail
 	}
 
 	/**
-	 * Based on OS or mail transport, sets the needed linebreak value
+	 * Based on OS or mail transport, sets the necessary linebreak value
 	 */
 	public function setLineBreak(): void
 	{
 		// If messages are not received while not using SMTP, then try using a LF (\n) only. Some Unix
-		// mail transfer agents (notably qmail) replace LF by CRLF automatically (which leads to doubling
+		// mail transfer agents (notably qmail) replace LF with CRLF automatically (which leads to doubling
 		// CR if CRLF is used). That should be a last resort.
 		$this->lineBreak = "\r\n";
 
@@ -102,7 +102,7 @@ abstract class BaseMail
 	{
 		global $modSettings;
 
-		// Using maillist styles and this message qualifies (priority 3 and below only (4 = digest, 5 = newsletter))
+		// Using maillist styles, and this message qualifies (priority 3 and below only (4 = digest, 5 = newsletter))
 		$this->mailList = !empty($modSettings['maillist_enabled'])
 			&& $from_wrapper !== null
 			&& $message_id !== null
@@ -131,7 +131,7 @@ abstract class BaseMail
 	/**
 	 * Sets the unique ID for the message id header and PBE emails
 	 *
-	 * If using maillist functions it will also insert the ID into the message body's as
+	 * If using maillist functions, it will also insert the ID into the message body as
 	 * some email clients strip, or do not return, proper headers to show what they are in replying to.
 	 * PBE functions depend on finding this key to match up reply's to a message and ensure the reply
 	 * was from a valid recipient.
@@ -145,7 +145,7 @@ abstract class BaseMail
 
 		$unq_head = '';
 
-		// If we are using the post by email functions, then we generate "reply to mail" security keys
+		// If we are using the post-by-email functions, then we generate "reply to mail" security keys
 		if ($this->mailList)
 		{
 			$this->unqPBEHead[0] = md5($boardurl . microtime() . mt_rand());
