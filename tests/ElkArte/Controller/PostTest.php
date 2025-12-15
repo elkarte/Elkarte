@@ -55,6 +55,9 @@ class PostTest extends ElkArteCommonSetupTest
 		$_POST['approve'] = 1;
 		$_REQUEST['approve'] = '1';
 
+		// Rebuild request wrapper after stuffing the superglobal
+		$this->resetHttpReq();
+
 		// Used for the test to see if we updated the topic
 		$topic_info = getTopicInfo($topic);
 		$check = (int) $topic_info['num_replies'];
@@ -90,6 +93,9 @@ class PostTest extends ElkArteCommonSetupTest
 		$_REQUEST['approve'] = '1';
 		$_POST['additonal_items'] = 0;
 
+		// Rebuild request wrapper after stuffing the superglobal
+		$this->resetHttpReq();
+
 		// Used for the test to see if we updated the topic
 		$check = (int) $board_info['num_topics'];
 
@@ -112,7 +118,7 @@ class PostTest extends ElkArteCommonSetupTest
 	 */
 	public function testModifyPost()
 	{
-		global $context, $board, $topic, $modSettings;
+		global $board, $topic;
 
 		require_once(SUBSDIR . '/Topic.subs.php');
 
@@ -131,6 +137,9 @@ class PostTest extends ElkArteCommonSetupTest
 		$_POST['approve'] = 1;
 		$_REQUEST['approve'] = '1';
 		$_POST['additonal_items'] = 0;
+
+		// Rebuild request wrapper after stuffing the superglobal
+		$this->resetHttpReq();
 
 		// Bypass spam protection
 		User::$info->ip = long2ip(rand(0, 2147483647));
