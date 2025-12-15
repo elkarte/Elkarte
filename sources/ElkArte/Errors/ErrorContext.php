@@ -59,7 +59,7 @@ final class ErrorContext
 		// Initialize severity levels... waiting for details!
 		$this->_severity_levels = [self::MINOR, self::SERIOUS];
 
-		// Initialize default severity (not sure this is needed)
+		// Initialize default severity (not sure if this is needed)
 		if ($default_severity === null || !in_array($default_severity, $this->_severity_levels))
 		{
 			$this->_default_severity = self::MINOR;
@@ -192,7 +192,9 @@ final class ErrorContext
 	 */
 	public function getErrors($severity = null)
 	{
-		if ($severity !== null && in_array($severity, $this->_severity_levels) && !empty($this->_errors[$severity]))
+		if ($severity !== null
+			&& in_array($severity, $this->_severity_levels)
+			&& !empty($this->_errors[$severity]))
 		{
 			return $this->_errors[$severity];
 		}
@@ -210,7 +212,7 @@ final class ErrorContext
 	 *
 	 * @param mixed|array $error error code
 	 *
-	 * @return null|mixed whatever the error is (string, object, array), noll if not found
+	 * @return null|mixed whatever the error is (string, object, array), null if not found
 	 */
 	public function getError($error = null)
 	{
@@ -291,7 +293,7 @@ final class ErrorContext
 	/**
 	 * Return an array containing the error strings
 	 *
-	 * - If severity is null the function returns all the errors
+	 * - If severity is null, the function returns all the errors
 	 *
 	 * @param string|null $severity the severity level wanted
 	 *
@@ -355,7 +357,7 @@ final class ErrorContext
 	 */
 	private function _loadLang(): void
 	{
-		// Errors is always needed
+		// Errors are always needed
 		Txt::load('Errors');
 
 		// Any custom one?

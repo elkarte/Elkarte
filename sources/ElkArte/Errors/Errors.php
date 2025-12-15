@@ -1,7 +1,7 @@
 <?php
 
 /**
- * The purpose of this file is... errors. (hard to guess, I guess?)  It takes
+ * The purpose of this file is... errors. (hard to guess, I guess?) It takes
  * care of logging, error messages, error handling, database errors, and
  * error log administration.
  *
@@ -50,8 +50,8 @@ class Errors extends AbstractModel
 	];
 
 	/**
-	 * In case of maintenance of very early errors, the database may not be available,
-	 * this __construct will feed AbstractModel with a value just to stop it
+	 * In case of maintenance of very early errors, the database may not be available;
+	 * This __construct will feed AbstractModel with a value just to stop it
 	 * from trying to initialize the database connection.
 	 *
 	 * @param QueryInterface|null $db
@@ -130,7 +130,7 @@ class Errors extends AbstractModel
 
 		$this->log_error($error_message, $error_type, $file, $line);
 
-		// Return the message to make things simpler.
+		// Return the message to simplify things.
 		return $error_message;
 	}
 
@@ -148,7 +148,7 @@ class Errors extends AbstractModel
 	 *   - debug
 	 *   - deprecated
 	 *
-	 * filename and line should be __FILE__ and __LINE__, respectively.
+	 * Filename and line should be __FILE__ and __LINE__, respectively.
 	 *
 	 * Example use:
 	 *   - die(Errors::instance()->log_error($msg));
@@ -173,21 +173,21 @@ class Errors extends AbstractModel
 		$error_message = strtr($error_message, ['&lt;br /&gt;' => '<br />', '&lt;b&gt;' => '<strong>', '&lt;/b&gt;' => '</strong>', "\n" => '<br />']);
 
 		// Add a file and line to the error message?
-		// Don't use the actual txt entries for file and line but instead use %1$s for file and %2$s for line
-		// Windows-style slashes don't play well, lets convert them to the unix style.
+		// Don't use the actual txt entries for file and line but instead use %1$s for a file and %2$s for line
+		// Windows-style slashes don't play well, let's convert them to the unix style.
 		$file = str_replace('\\', '/', $file);
 		$line = (int) $line;
 
 		// Find the best query string we can...
 		$query_string = $this->parseQueryString();
 
-		// Make sure the category that was specified is a valid one
+		// Make sure the category that was specified is valid
 		$error_type = in_array($error_type, $this->getErrorTypes(), true) && $error_type !== true ? $error_type : 'general';
 
 		// Insert the error into the database.
 		$this->insertLog($query_string, $error_message, $error_type, $file, $line);
 
-		// Return the message to make things simpler.
+		// Return the message to simplify things.
 		return $error_message;
 	}
 
@@ -445,7 +445,7 @@ class Errors extends AbstractModel
 			$db_last_error = max($db_last_error, $temp);
 		}
 
-		// Perhaps we want to notify by mail that there was a this->_db error
+		// Perhaps we want to notify by mail that a _db error occurred.
 		if ($db_last_error < time() - 3600 * 24 * 3 && empty($maintenance) && !empty($db_error_send))
 		{
 			// Try using shared memory if possible.
@@ -654,7 +654,7 @@ class Errors extends AbstractModel
 			}
 		}
 
-		// We want whatever for the header, and a footer. (footer includes sub template!)
+		// We want whatever for the header and a footer. (footer includes sub template!)
 		obExit(null, true, false, true);
 
 		/* DO NOT IGNORE:

@@ -27,7 +27,7 @@ class PmErrorException extends \Exception
 	 * Do note that parent::__construct() is NOT called.
 	 *
 	 * @param array $recipientList Array of members ID separated into 'to' and 'bcc'
-	 * @param \ElkArte\Helper\ValuesContainer $msgOptions Some values for common
+	 * @param ValuesContainer $msgOptions Some values for common
 	 * @param string[] $namedRecipientList Array of member names separated into 'to' and 'bcc'
 	 *  this argument is deprecated
 	 */

@@ -2,7 +2,7 @@
 
 /**
  * General exception handler. Has support for throwing errors that
- * are specifically targeted at users, and even placing multiple messages
+ * are specifically targeted at users and even placing multiple messages
  * in one exception.
  *
  * @package   ElkArte Forum
@@ -35,7 +35,7 @@ class Exception extends \Exception
 	 *
 	 * @param string|string[] $message index of $txt or message
 	 *  - If an array is used, then it can specify a custom language template to load.
-	 * @param bool|string $log type of error, defines under which "log" is it shown.
+	 * @param bool|string $log type of error, defines under which "log" is shown.
 	 *  - If false is used, the error is not logged.
 	 * @param string[] $sprintf optional array of values to use in vsprintf with the $txt
 	 * @param int $code
@@ -84,19 +84,19 @@ class Exception extends \Exception
 	/**
 	 * Cleans up the message param passed to the constructor.
 	 *
-	 * @param string|string[] $message Can be several different thing:
+	 * @param string|string[] $message Can be several different things:
 	 * - The index of $txt string
 	 * - A plain text message
 	 * - An array with the following structure:
-	 *        array(
-	 *            0 => language to load (use \ElkArte\Languages\Txt::load)
-	 *            1 => index of $txt
-	 *        )
+	 *   array(
+	 *       0 => language to load (use \ElkArte\Languages\Txt::load)
+	 *       1 => index of $txt
+	 *   )
 	 * - A namespaced index in the form:
 	 *     - language.index
-	 *   - a "language" followed by a "dot" followed by the "index"
-	 *   - "language" can be any character matched by \w
-	 *   - "index" can be anything
+	 *     - a "language" followed by a "dot" followed by the "index"
+	 *     - "language" can be any character matched by \w
+	 *     - "index" can be anything
 	 * - "language" is loaded by \ElkArte\Languages\Txt::load.
 	 *
 	 * @return array

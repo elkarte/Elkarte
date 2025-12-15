@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This does the job of handling attachment related errors
+ * This does the job of handling attachment-related errors
  *
  * @package   ElkArte Forum
  * @copyright ElkArte Forum contributors
@@ -213,7 +213,7 @@ class AttachmentErrorContext
 	 * Prepare the errors for display.
 	 *
 	 * - Return an array containing the error strings
-	 * - If severity is null the function returns all the errors
+	 * - If severity is null, the function returns all the errors
 	 *
 	 * @param int|null $severity = null the severity level wanted
 	 *

@@ -127,7 +127,7 @@ final class ErrorHandler extends Errors
 			);
 		}
 
-		// If this is an E_ERROR, E_USER_ERROR, E_WARNING, or E_USER_WARNING.... die.  Violently so.
+		// If this is an E_ERROR, E_USER_ERROR, E_WARNING, or E_USER_WARNING... die.  Violently so.
 		if ($this->error_level & $this->fatalErrors || $this->error_level % 255 === E_WARNING || $isException)
 		{
 			$this->_setup_fatal_ErrorContext($message, $this->error_level);
@@ -186,7 +186,7 @@ final class ErrorHandler extends Errors
 	{
 		global $db_show_debug;
 
-		// Showing the errors, lets make it look decent
+		// Showing the errors, let's make it look decent
 		if ($db_show_debug === true && allowedTo('admin_forum'))
 		{
 			$msg =
@@ -195,7 +195,7 @@ PHP Fatal error:  Uncaught exception '%s' with message '%s' in %s:%s<br />
 Stack trace:<br />%s<br />  thrown in %s on line %s
 MSG;
 
-			// write trace lines into main template
+			// write trace lines into the main template
 			return sprintf(
 				$msg,
 				$exception::class,
