@@ -80,7 +80,7 @@ class Result extends AbstractResult
 	 */
 	public function data_seek($counter)
 	{
-		// Delegate to native mysql function
+		// Delegate to a native mysql function
 		return mysqli_data_seek($this->result, $counter);
 	}
 

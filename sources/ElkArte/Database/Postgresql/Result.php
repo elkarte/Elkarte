@@ -137,7 +137,7 @@ class Result extends AbstractResult
 	{
 		if (is_resource($this->result) || $this->result instanceof \PgSql\Result)
 		{
-			$results = pg_fetch_all($this->result, PGSQL_ASSOC);
+			$results = pg_fetch_all($this->result);
 		}
 
 		return empty($results) ? [] : $results;

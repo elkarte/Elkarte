@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This interface is meant to be implemented by classes which offer database search extra-facilities.
+ * This interface is meant to be implemented by classes which offer database search extra facilities.
  *
  * @package   ElkArte Forum
  * @copyright ElkArte Forum contributors

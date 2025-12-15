@@ -23,7 +23,7 @@ use ElkArte\Exceptions\Exception;
 /**
  * Adds PostgreSQL table level functionality,
  * Table creation / dropping, column adding / removing
- * Most often used during install and Upgrades of the forum and addons
+ * Most often used during installation and upgrades of the forum and addons
  */
 class Table extends AbstractTable
 {
@@ -109,10 +109,10 @@ class Table extends AbstractTable
 		// Log that we will want to uninstall this!
 		$this->_package_log[] = ['remove_column', $table_name, $column_info['name']];
 
-		// Does it exist - if so don't add it again!
+		// Does it exist - if so, don't add it again!
 		if ($this->_get_column_info($table_name, $column_info['name']))
 		{
-			// If we're going to overwrite then use change column.
+			// If we're going to overwrite, then use change column.
 			if ($if_exists === 'update')
 			{
 				return $this->change_column($table_name, $column_info['name'], $column_info);
@@ -133,7 +133,7 @@ class Table extends AbstractTable
 		$this->_alter_table($table_name, '
 			ADD COLUMN ' . $column_info['name'] . ' ' . $type);
 
-		// If there's more attributes they need to be done via a change on PostgreSQL.
+		// If there are more attributes they need to be done via a change on PostgreSQL.
 		unset($column_info['type'], $column_info['size']);
 
 		if (count($column_info) !== 1)
@@ -369,7 +369,7 @@ class Table extends AbstractTable
 		// No name - make it up!
 		if (empty($index_info['name']))
 		{
-			// No need for primary.
+			// No need for a primary.
 			if (isset($index_info['type']) && $index_info['type'] === 'primary')
 			{
 				$index_info['name'] = '';
@@ -395,7 +395,7 @@ class Table extends AbstractTable
 		{
 			if ($index['name'] === $index_info['name'] || ($index['type'] === 'primary' && isset($index_info['type']) && $index_info['type'] === 'primary'))
 			{
-				// If we want to overwrite simply remove the current one then continue.
+				// If we want to overwrite, simply remove the current one, then continue.
 				if ($if_exists !== 'update' || $index['type'] === 'primary')
 				{
 					return false;
@@ -404,7 +404,7 @@ class Table extends AbstractTable
 			}
 		}
 
-		// If we're here we know we don't have the index - so just add it.
+		// If we're here, we know we don't have the index - so just add it.
 		if (!empty($index_info['type']) && $index_info['type'] === 'primary')
 		{
 			$this->_alter_table($table_name, '
@@ -447,8 +447,8 @@ class Table extends AbstractTable
 		$indexes = [];
 		while (($row = $result->fetch_assoc()))
 		{
-			// Try get the columns that make it up.
-			if (preg_match('~\(([^)]+?)\)~i', $row['inddef'], $matches) !== 1)
+			// Try to get the columns that make it up.
+			if (preg_match('~\(([^)]+?)\)~', $row['inddef'], $matches) !== 1)
 			{
 				continue;
 			}
@@ -465,7 +465,7 @@ class Table extends AbstractTable
 				$columns[$k] = trim($v);
 			}
 
-			// Fix up the name to be consistent cross databases
+			// Fix up the name to be consistent cross-databases
 			if (str_ends_with($row['name'], '_pkey') && (int) $row['is_primary'] === 1)
 			{
 				$row['name'] = 'PRIMARY';
@@ -510,7 +510,7 @@ class Table extends AbstractTable
 
 		foreach ($indexes as $index)
 		{
-			// If the name is primary we want the primary key!
+			// If the name is primary, we want the primary key!
 			if ($index['type'] === 'primary' && $index_name === 'primary')
 			{
 				// Dropping primary key is odd...
@@ -735,7 +735,7 @@ class Table extends AbstractTable
 	 */
 	protected function _db_create_query_column($column, $table_name): string
 	{
-		// If we have an auto increment do it!
+		// If we have an auto increment, do it!
 		if (!empty($column['auto']))
 		{
 			$this->_db->query('', '

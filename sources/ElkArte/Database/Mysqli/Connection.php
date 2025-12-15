@@ -44,19 +44,19 @@ class Connection implements ConnectionInterface
 			// This makes it possible to automatically change the sql_mode and autocommit if needed.
 			if (!empty($db_options['mysql_set_mode']))
 			{
-				$query->query('', "SET sql_mode = '', AUTOCOMMIT = 1", []);
+				$query->query('', "SET sql_mode = '', AUTOCOMMIT = 1");
 			}
 
 			// Few databases still have not set UTF-8 as their default input charset
-			$query->query('', 'SET NAMES UTF8', []);
+			$query->query('', 'SET NAMES UTF8');
 
 			// PHP 8.1 default is to throw exceptions, this reverts it to the <=php8 semantics
 			mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_INDEX & ~MYSQLI_REPORT_STRICT);
 		}
 		catch (\mysqli_sql_exception $e)
 		{
-			// Something's wrong, show an error if its fatal (which we assume it is)
-			// If the connection fails more than once (e.g. wrong password) the exception
+			// Something's wrong, show an error if it's fatal (which we assume it is)
+			// If the connection fails more than once (e.g., wrong password), the exception
 			// should be thrown only once.
 			self::$failed_once = true;
 

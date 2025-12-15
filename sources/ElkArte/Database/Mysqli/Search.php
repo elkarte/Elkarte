@@ -80,7 +80,7 @@ class Search extends AbstractSearch
 			$request->free_result();
 		}
 
-		// Now check the custom index table, if it exists at all.
+		// Now check the custom index table if it exists at all.
 		if (preg_match('~^`(.+?)`\.(.+?)$~', $db_prefix, $match) !== 0)
 		{
 			$request = $this->_db->query('', '

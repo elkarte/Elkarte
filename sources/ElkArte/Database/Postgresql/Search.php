@@ -68,7 +68,7 @@ class Search extends AbstractSearch
 
 		$table_info = [];
 
-		// In order to report the sizes correctly we need to perform vacuum (optimize) on the tables we will be using.
+		// To report the sizes correctly, we need to perform vacuum (optimize) on the tables we will be using.
 		$db_table->optimize('{db_prefix}messages');
 		if ($db_table->table_exists('{db_prefix}log_search_words'))
 		{

@@ -185,7 +185,7 @@ class Query extends AbstractQuery
 			$db_string = preg_replace(array_keys($replacements[$identifier]), array_values($replacements[$identifier]), $db_string);
 		}
 
-		// Limits need to be a little different, left in place for non conformance addons
+		// Limits need to be a little different, left in place for non-conformance addons
 		return preg_replace('~\sLIMIT\s(\d+|{int:.+}),\s*(\d+|{int:.+})(.*)~i', ' LIMIT $2 OFFSET $1 $3', $db_string);
 	}
 
@@ -237,7 +237,7 @@ class Query extends AbstractQuery
 
 		$this->skip_next_error();
 
-		// Try get the last ID for the auto increment field.
+		// Try to get the last ID for the auto increment field.
 		$request = $this->query('', '
 			SELECT CURRVAL(\'' . $table . "_seq') AS insertID",
 			['security_override' => true]
@@ -313,7 +313,7 @@ class Query extends AbstractQuery
 	 */
 	public function server_info()
 	{
-		// give info on client! we use it in install and upgrade and such things.
+		// give info on a client! we use it in installation and upgrade and such things.
 		$version = pg_version();
 
 		return $version['client'];
@@ -340,7 +340,7 @@ class Query extends AbstractQuery
 	}
 
 	/**
-	 * Returns the result resouce of the last query executed
+	 * Returns the result resource of the last query executed
 	 *
 	 * @return resource
 	 */

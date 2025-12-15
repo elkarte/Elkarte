@@ -38,8 +38,8 @@ class Connection implements ConnectionInterface
 			$connection = @pg_connect('host=' . $db_server . $db_port . ' dbname=' . $db_name . " user='" . $db_user . "' password='" . $db_passwd . "'");
 		}
 
-		// Something's wrong, show an error if its fatal (which we assume it is)
-		// If the connection fails more than once (e.g. wrong password) the exception
+		// Something's wrong, show an error if it's fatal (which we assume it is)
+		// If the connection fails more than once (e.g., wrong password), the exception
 		// should be thrown only once.
 		if (!$connection && !self::$failed_once)
 		{

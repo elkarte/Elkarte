@@ -117,7 +117,7 @@ class Dump extends AbstractDump
 		{
 			if ($row['is_primary'])
 			{
-				if (preg_match('~\(([^)]+?)\)~i', $row['inddef'], $matches) !== 1)
+				if (preg_match('~\(([^)]+?)\)~', $row['inddef'], $matches) !== 1)
 				{
 					continue;
 				}

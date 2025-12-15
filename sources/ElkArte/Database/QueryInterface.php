@@ -30,7 +30,7 @@ interface QueryInterface
 
 	/**
 	 * Callback for preg_replace_callback on the query.
-	 * It allows to replace on the fly a few pre-defined strings, for convenience ('query_see_board', 'query_wanna_see_board'), with
+	 * It allows replacing on the fly a few pre-defined strings, for convenience ('query_see_board', 'query_wanna_see_board'), with
 	 * their current values from User::$info.
 	 * In addition, it performs checks and sanitation on the values sent to the database.
 	 *
@@ -144,7 +144,7 @@ interface QueryInterface
 	 * Escape the LIKE wildcards so that they match the character and not the wildcard.
 	 *
 	 * @param string $string
-	 * @param bool $translate_human_wildcards = false, if true, turns human readable wildcards into SQL wildcards.
+	 * @param bool $translate_human_wildcards = false, if true, turns human-readable wildcards into SQL wildcards.
 	 *
 	 * @return string
 	 */
@@ -180,7 +180,7 @@ interface QueryInterface
 	public function title();
 
 	/**
-	 * Whether the database system is case sensitive.
+	 * Whether the database system is case-sensitive.
 	 *
 	 * @return bool
 	 */

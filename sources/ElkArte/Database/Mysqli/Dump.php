@@ -63,7 +63,7 @@ class Dump extends AbstractDump
 				// Text shouldn't have a default.
 				elseif ($row['Default'] !== null)
 				{
-					// If this field is numeric the default needs no escaping.
+					// If this field is numeric, the default needs no escaping.
 					$type = strtolower($row['Type']);
 					$isNumericColumn = str_contains($type, 'int') || str_contains($type, 'bool') || str_contains($type, 'bit') || str_contains($type, 'float') || str_contains($type, 'double') || str_contains($type, 'decimal');
 
@@ -100,7 +100,7 @@ class Dump extends AbstractDump
 				$indexes[$row['Key_name']] = [];
 			}
 
-			// A sub part, like only indexing 15 characters of a varchar.
+			// A subpart, like only indexing 15 characters of a varchar.
 			if (!empty($row['Sub_part']))
 			{
 				$indexes[$row['Key_name']][$row['Seq_in_index']] = '`' . $row['Column_name'] . '`(' . $row['Sub_part'] . ')';
@@ -133,7 +133,7 @@ class Dump extends AbstractDump
 		$row = $result->fetch_assoc();
 		$result->free_result();
 
-		// Probably MyISAM.... and it might have a comment.
+		// Probably MyISAM... and it might have a comment.
 		$schema_create .= $crlf . ') ENGINE=' . ($row['Type'] ?? $row['Engine']) . ($row['Comment'] != '' ? ' COMMENT="' . $row['Comment'] . '"' : '');
 
 		return $schema_create;

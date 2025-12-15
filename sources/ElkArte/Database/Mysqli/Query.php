@@ -191,25 +191,13 @@ class Query extends AbstractQuery
 		$query_errno = mysqli_errno($this->connection);
 
 		// See if there is a recovery we can attempt
-		switch ($query_errno)
+		$check = match ($query_errno)
 		{
-			case self::ERR_COMMAND_DENIED:
-				$check = $this->handleCommandDeniedError($db_string, $query_error, $file, $line);
-				break;
-			case self::ERR_TABLE_HANDLER:
-			case self::ERR_KEY_FILE:
-			case self::ERR_INCORRECT_KEY_FILE:
-			case self::ERR_OLD_KEY_FILE:
-				$check = $this->handleTableOrKeyFileError($db_string, $query_errno, $query_error);
-				break;
-			case self::ERR_SERVER_HAS_GONE_AWAY:
-			case self::ERR_LOST_CONNECTION_TO_SERVER:
-				$check = $this->handleConnectionError($db_string);
-				break;
-			default:
-				$check = null;
-				break;
-		}
+			self::ERR_COMMAND_DENIED => $this->handleCommandDeniedError($db_string, $query_error, $file, $line),
+			self::ERR_TABLE_HANDLER, self::ERR_KEY_FILE, self::ERR_INCORRECT_KEY_FILE, self::ERR_OLD_KEY_FILE => $this->handleTableOrKeyFileError($db_string, $query_errno, $query_error),
+			self::ERR_SERVER_HAS_GONE_AWAY, self::ERR_LOST_CONNECTION_TO_SERVER => $this->handleConnectionError($db_string),
+			default => null,
+		};
 
 		// Did we attempt to do a repair, return those results
 		if ($check !== null)
@@ -245,11 +233,11 @@ class Query extends AbstractQuery
 		$command = substr(trim($db_string), 0, 6);
 		if ($command === 'DELETE' || $command === 'UPDATE' || $command === 'INSERT')
 		{
-			// We can try to ignore it (warning the admin though it's a thing to do) \
+			// We can try to ignore it (warning the admin, though it's a thing to do) \
 			// and serve the page just SELECTing
 			$_SESSION['query_command_denied'][$command] = $query_error;
 
-			// Let the admin know there is a command denied issue
+			// Let the admin know there is a command-denied issue
 			Errors::instance()->log_error($txt['database_error'] . ': ' . $query_error . (empty($modSettings['enableErrorQueryLogging']) ? '' : "\n\n$db_string"), 'database', $file, $line);
 
 			return false;
@@ -290,7 +278,7 @@ class Query extends AbstractQuery
 				$db_last_error = max($db_last_error, $temp);
 			}
 
-			// Check for errors like 145... only fix it once every three days, and send an email. (can't use empty because it might not be set yet...)
+			// Check for errors like 145... only fix it once every three days and send an email. (can't use empty because it might not be set yet...)
 			if ($db_last_error < time() - 3600 * 24 * 3)
 			{
 				// We know there's a problem... but what?  Try to auto-detect.
@@ -320,7 +308,7 @@ class Query extends AbstractQuery
 		// Check for the "lost connection" or "deadlock found" errors - and try it just one more time.
 		$new_connection = false;
 
-		// Are we in SSI mode?  If so try that username and password first
+		// Are we in SSI mode?  If so, try that username and password first
 		if (ELK === 'SSI' && !empty($ssi_db_user) && !empty($ssi_db_passwd))
 		{
 			$new_connection = @mysqli_connect((empty($db_persist) ? '' : 'p:') . $db_server, $ssi_db_user, $ssi_db_passwd, $db_name, $db_port ?? null);
@@ -511,8 +499,7 @@ class Query extends AbstractQuery
 	public function server_version()
 	{
 		$request = $this->query('', '
-			SELECT VERSION()',
-			[]
+			SELECT VERSION()'
 		);
 		[$ver] = $request->fetch_row();
 		$request->free_result();
@@ -560,8 +547,7 @@ class Query extends AbstractQuery
 	public function client_version()
 	{
 		$request = $this->query('', '
-			SELECT VERSION()',
-			[]
+			SELECT VERSION()'
 		);
 		[$ver] = $request->fetch_row();
 		$request->free_result();
