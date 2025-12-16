@@ -114,7 +114,7 @@ class Util
 	{
 		global $modSettings;
 
-		if (empty($string))
+		if ($string === '' || $string === null)
 		{
 			return '';
 		}
