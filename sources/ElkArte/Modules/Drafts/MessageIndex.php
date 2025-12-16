@@ -64,7 +64,7 @@ class MessageIndex extends AbstractModule
 	 *
 	 * - Sets/checks the ability to save and autosave drafts for JS and button display
 	 * - Builds the list of drafts available to load
-	 * - Loads necessary Draft javascript functions
+	 * - Loads necessary Draft JavaScript functions
 	 *
 	 * @param bool $use_quick_reply
 	 * @param array $editorOptions
@@ -74,7 +74,7 @@ class MessageIndex extends AbstractModule
 	{
 		global $context, $options, $txt;
 
-		// Check if the draft functions are enabled and that they have permission to use them (for quick topic.)
+		// Check if the draft functions are enabled and that they have permission to use them (for "quick-topic".)
 		$context['drafts_save'] = $use_quick_reply && allowedTo('post_draft') && $context['can_post_new'];
 		$context['drafts_autosave'] = $context['drafts_save'] && self::$_autosave_enabled && allowedTo('post_autosave_draft') && !empty($options['drafts_autosave_enabled']);
 
@@ -109,7 +109,7 @@ class MessageIndex extends AbstractModule
 				loadJavascriptFile('editor/drafts.plugin.js', ['defer' => true]);
 			}
 
-			// Hide this for quick topic
+			// Hide this for "quick-topic"
 			$context['shortcuts_text'] = '';
 
 			$editorOptions['buttons'] = $editorOptions['buttons'] ?? [];

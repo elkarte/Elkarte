@@ -1,7 +1,8 @@
 <?php
 
 /**
- * This file contains several functions for retrieving and manipulating calendar events, birthdays and holidays.
+ * This file contains several functions for retrieving and manipulating calendar events,
+ * birthdays, and holidays.
  *
  * @package   ElkArte Forum
  * @copyright ElkArte Forum contributors
@@ -43,7 +44,7 @@ class BoardIndex extends AbstractModule
 	}
 
 	/**
-	 * Pre-load hooks as part of board index
+	 * Preload hooks as part of board index
 	 */
 	public function pre_load(): void
 	{
@@ -67,7 +68,7 @@ class BoardIndex extends AbstractModule
 	}
 
 	/**
-	 * post load functions, load calendar events for the board index as part of BoardIndex
+	 * post-load functions, load calendar events for the board index as part of BoardIndex
 	 *
 	 * @param array $callbacks
 	 */

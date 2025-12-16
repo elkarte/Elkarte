@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Integration system for attachments into Diplay controller
+ * Integration system for attachments into Display controller
  *
  * @package   ElkArte Forum
  * @copyright ElkArte Forum contributors

@@ -1,7 +1,8 @@
 <?php
 
 /**
- * This file contains several functions for retrieving and manipulating calendar events, birthdays and holidays.
+ * This file contains several functions for retrieving and manipulating calendar events,
+ * birthdays, and holidays.
  *
  * @package   ElkArte Forum
  * @copyright ElkArte Forum contributors
@@ -22,7 +23,7 @@ use ElkArte\Modules\AbstractModule;
 
 /**
  * This class's task is to bind the posting of a topic to a calendar event.
- * Used when from the calendar controller the poster is redirected to the post page.
+ * Used when from the calendar controller, the poster is redirected to the post-page.
  *
  * @package Calendar
  */

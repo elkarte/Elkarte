@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This file contains the post integration of mentions.
+ * This file contains the post-integration of mentions.
  *
  * @package   ElkArte Forum
  * @copyright ElkArte Forum contributors
