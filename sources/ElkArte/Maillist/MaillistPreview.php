@@ -86,7 +86,7 @@ class MaillistPreview extends AbstractController
 		$email_message = new EmailParse();
 		$email_message->read_data($data, BOARDDIR);
 
-		// Ask for an HTML version (if available) and some needed details
+		// Ask for an HTML version (if available) and some necessary details
 		$email_message->read_email(true, $email_message->raw_message);
 		$email_message->load_address();
 		$email_message->load_key();
@@ -107,7 +107,7 @@ class MaillistPreview extends AbstractController
 		$attachment_count = 0;
 		$text = '';
 
-		if (!empty($email_message->attachments) && !empty($modSettings['maillist_allow_attachments']) && !empty($modSettings['attachmentEnable']) && $modSettings['attachmentEnable'] == 1)
+		if (!empty($email_message->attachments) && !empty($modSettings['maillist_allow_attachments']) && !empty($modSettings['attachmentEnable']) && (int) $modSettings['attachmentEnable'] === 1)
 		{
 			if ($email_message->message_type === 'p')
 			{

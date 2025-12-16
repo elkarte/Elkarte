@@ -52,9 +52,9 @@ class MaillistImap extends AbstractModel
 	protected $_imap_server = '';
 
 	/**
-	 * The constructor, prepares few variables.
+	 * The constructor prepares few variables.
 	 *
-	 * $modSettings - May contain a few needed settings:
+	 * $modSettings - May contain a few necessary settings:
 	 *    - maillist_imap_host
 	 *    - maillist_imap_uid
 	 *    - maillist_imap_pass
@@ -79,7 +79,7 @@ class MaillistImap extends AbstractModel
 	}
 
 	/**
-	 * Does the actual processing of the inbox posting new emails as needed
+	 * Does the actual processing of the inbox post new emails as needed?
 	 */
 	public function process(): bool
 	{
@@ -137,7 +137,7 @@ class MaillistImap extends AbstractModel
 
 		if ($this->_inbox)
 		{
-			// Based on the type selected get/set the additional connection details
+			// Based on the type selected, get/set the additional connection details
 			$connection = $this->_port_type();
 			$this->_hostname .= (!str_contains($this->_hostname, ':')) ? ':' . $connection['port'] : '';
 			$this->_imap_server = '{' . $this->_hostname . '/' . $connection['protocol'] . $connection['flags'] . '}';
@@ -213,7 +213,7 @@ class MaillistImap extends AbstractModel
 				$flags = '/ssl/novalidate-cert';
 				break;
 			default:
-				// Somethings wrong, so use a standard POP3 mailbox.
+				// Something's wrong, so use a standard POP3 mailbox.
 				$protocol = 'POP3';
 				$port = 110;
 				$flags = '/novalidate-cert';
@@ -224,7 +224,7 @@ class MaillistImap extends AbstractModel
 	}
 
 	/**
-	 * Retrieves and composes and email (headers+message) from and imap inbox
+	 * Retrieves and composes an email (headers+message) from and imap inbox
 	 *
 	 * @param int $email_uid - The email id
 	 *
@@ -246,7 +246,7 @@ class MaillistImap extends AbstractModel
 	 */
 	protected function _delete_email($email_uid): void
 	{
-		// Gmail labels make this more complicated
+		// Gmail labels complicate this
 		if ($this->_is_gmail)
 		{
 			// If using gmail, we may need the trash bin name as well
@@ -273,7 +273,7 @@ class MaillistImap extends AbstractModel
 		// Get all the folders / labels
 		$mailBoxes = imap_list($this->_inbox, $this->_imap_server, '*');
 
-		// Check the names to see if one is known as a trashbin
+		// Check the names to see if one is known as a trash-bin
 		foreach ($mailBoxes as $mailbox)
 		{
 			$name = str_replace($this->_imap_server, '', $mailbox);
