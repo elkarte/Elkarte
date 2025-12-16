@@ -75,7 +75,7 @@ class MenuArea extends MenuItem
 	/** @var string $customUrl custom URL to use for this menu item. */
 	protected $customUrl;
 
-	/** @var bool $password is the user password required to make a change, profile only use? */
+	/** @var bool $password is the user password required to make a change, profile-only use? */
 	protected $password = false;
 
 	/** @var array $subsections Array of subsections from this area. */

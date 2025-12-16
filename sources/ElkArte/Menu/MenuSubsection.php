@@ -68,7 +68,7 @@ class MenuSubsection extends MenuItem
 	 * Get the value of the "active" property of the object.
 	 *
 	 * This method returns the value of the "active" property of the object.
-	 * Support for boolean here, wrong but has been used
+	 * Support for bool here, wrong but has been used
 	 *
 	 * @return string[]|bool
 	 */
@@ -104,10 +104,10 @@ class MenuSubsection extends MenuItem
 	 */
 	public function buildMoreFromArray($arr, $sa)
 	{
-		// These are special due to the non-named index so there is no generic setter
+		// These are special due to the non-named index, so there is no generic setter
 		$this->label = $arr[0];
 		$this->permission = isset($arr[1]) ? (array) $arr[1] : [];
-		$this->default = isset($arr[2]) && (bool) $arr[2];
+		$this->default = isset($arr[2]) && $arr[2];
 
 		// Support for boolean here, wrong but has been used
 		if ($this->getActive() === true)
