@@ -82,7 +82,7 @@ class Mentionmem extends AbstractEventBoardAccess
 	}
 
 	/**
-	 * Takes care of setting up the editor javascript.
+	 * Takes care of setting up the editor JavaScript.
 	 */
 	protected function _setup_editor(): void
 	{

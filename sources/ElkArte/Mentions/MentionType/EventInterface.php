@@ -46,7 +46,8 @@ interface EventInterface
  	public function view($type, &$mentions);
 
 	/**
-	 * Provides a list of notification methods (email, emaildaily, emailweekly, etc). that should NOT be used by this mention type.
+	 * Provides a list of notification methods (email, emaildaily, emailweekly, etc.). That
+	 * should NOT be used by this mentioned type.
 	 *
 	 * @param string $method the Notifier method that is being considered
 	 *
@@ -55,7 +56,7 @@ interface EventInterface
 	public static function isNotAllowed($method);
 
 	/**
-	 * If needed checks for permissions to use this specific notification
+	 * If needed, checks for permissions to use this specific notification
 	 *
 	 * @return bool
 	 */
