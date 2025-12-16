@@ -17,7 +17,6 @@
 namespace ElkArte\Packages;
 
 use ElkArte\AbstractModel;
-use ElkArte\Exceptions\Exception;
 use ElkArte\Helper\FileFunctions;
 use ElkArte\Http\FtpConnection;
 
@@ -51,7 +50,7 @@ class PackageChmod extends AbstractModel
 	{
 		global $context, $package_ftp, $txt;
 
-		// If we're restoring the status of existing files prepare the data.
+		// If we're restoring the status of existing files, prepare the data.
 		if ($restore_write_status && !empty($_SESSION['ftp_connection']['original_perms']))
 		{
 			$this->showList($restore_write_status, $chmodOptions);
@@ -113,7 +112,7 @@ class PackageChmod extends AbstractModel
 			}
 		}
 
-		// Have we still got nasty files which ain't writable? Dear me we need more FTP good sir.
+		// Have we still got nasty files which ain't writable? Dear me, we need more FTP good sir.
 		if (empty($package_ftp)
 			&& (!empty($return_data['files']['notwritable']) || !empty($chmodOptions['force_find_error'])))
 		{
@@ -142,7 +141,7 @@ class PackageChmod extends AbstractModel
 	{
 		global $context, $txt, $scripturl;
 
-		// If we're restoring the status of existing files prepare the data.
+		// If we're restoring the status of existing files, prepare the data.
 		if ($restore_write_status && !empty($_SESSION['ftp_connection']['original_perms']))
 		{
 			$listOptions = [
@@ -247,7 +246,7 @@ class PackageChmod extends AbstractModel
 			// Create the list for display.
 			createList($listOptions);
 
-			// If we just restored permissions then wherever we are, we are now done and dusted.
+			// If we just restored permissions, then wherever we are, we are now done and dusted.
 			if (!empty($this->_req->getPost('restore_perms')))
 			{
 				obExit();
@@ -258,6 +257,8 @@ class PackageChmod extends AbstractModel
 		{
 			return true;
 		}
+
+		return null;
 	}
 
 	/**
@@ -424,7 +425,7 @@ class PackageChmod extends AbstractModel
 	}
 
 	/**
-	 * Try to make a file writable using built in PHP SplFileInfo() functions
+	 * Try to make a file writable using built-in PHP SplFileInfo() functions
 	 *
 	 * @param string $filename
 	 * @param bool $track_change = false
@@ -484,7 +485,7 @@ class PackageChmod extends AbstractModel
 			}
 		}
 
-		// If we're here we're a failure.
+		// If we're here, we're a failure.
 		return false;
 	}
 
@@ -552,7 +553,7 @@ class PackageChmod extends AbstractModel
 	 * The ultimate writable test.
 	 *
 	 * Mind you, I'm not sure why this is needed if PHP says it is writable, but
-	 * sometimes you have to be a lemming. Plus windows ACL is not handled well.
+	 * sometimes you have to be a lemming. Plus, windows ACL is not handled well.
 	 *
 	 * @param $item
 	 * @return bool
@@ -581,7 +582,7 @@ class PackageChmod extends AbstractModel
 	 * Used to crypt the supplied ftp password in this session
 	 *
 	 * - Don't be fooled by the name, this is a reversing hash function.
-	 *  It will hash a password, and if supplied that hash will return the
+	 *  It will hash a password, and if supplied, that hash will return the
 	 *  original password.  Uses the session_id as salt
 	 *
 	 * @param string $pass

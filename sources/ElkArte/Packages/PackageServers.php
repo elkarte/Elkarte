@@ -117,7 +117,7 @@ class PackageServers extends AbstractController
 			],
 		]);
 
-		// Lets just do it!
+		// Let's just do it!
 		$action->dispatch($subAction);
 	}
 
@@ -137,7 +137,7 @@ class PackageServers extends AbstractController
 		// Load the addon server.
 		[$context['server']['name'], $context['server']['id']] = $this->_package_server();
 
-		// Check if we will be able to write new archives in /packages folder.
+		// Check if we will be able to write new archives in the /packages folder.
 		$context['package_download_broken'] = !$this->fileFunc->isWritable(BOARDDIR . '/packages') || !$this->fileFunc->isWritable(BOARDDIR . '/packages/installed.list');
 		if ($context['package_download_broken'])
 		{
@@ -146,9 +146,9 @@ class PackageServers extends AbstractController
 	}
 
 	/**
-	 * This method attempts to chmod packages and installed.list
+	 * This method attempts to chmod packages and installed list
 	 *
-	 * - uses FTP if necessary.
+	 * - Uses FTP if necessary.
 	 * - It sets the $context['package_download_broken'] status for the template.
 	 * - Used by package servers pages.
 	 */
@@ -188,7 +188,7 @@ class PackageServers extends AbstractController
 
 			$ftp = new FtpConnection($ftp_server, $ftp_port, $ftp_username, $ftp_password);
 
-			// I know, I know... but a lot of people want to type /home/xyz/... which is wrong, but logical.
+			// I know, I know... but a lot of people want to type /home/xyz/... which is wrong but logical.
 			if (($ftp->error === false) && !$ftp->chdir($ftp_path))
 			{
 				$ftp_error = $ftp->error;
@@ -224,7 +224,7 @@ class PackageServers extends AbstractController
 				$ftp_username = $modSettings['package_username'] ?? $username;
 			}
 
-			// Fill the boxes for a FTP connection with data from the previous attempt too, if any
+			// Fill the boxes for an FTP connection with data from the previous attempt too, if any
 			$context['package_ftp'] = [
 				'server' => $ftp_server ?? ($modSettings['package_server'] ?? 'localhost'),
 				'port' => $ftp_port ?? ($modSettings['package_port'] ?? '21'),
@@ -242,7 +242,7 @@ class PackageServers extends AbstractController
 			$context['package_download_broken'] = false;
 			$context['package_ftp']['connection'] = $txt['package_ftp_test_success'];
 
-			// Try to chmod packages folder and our list file.
+			// Try to chmod the packages folder and our list file.
 			$ftp->ftp_chmod('packages', [0755, 0775, 0777]);
 			$ftp->ftp_chmod('packages/installed.list', [0664, 0666]);
 			$ftp->close();
@@ -273,7 +273,7 @@ class PackageServers extends AbstractController
 		// Might take some time.
 		detectServer()->setTimeLimit(60);
 
-		// Fetch the package listing from the server and json decode
+		// Fetch the package listing from the server and JSON decode
 		$packageListing = json_decode(fetch_web_data($url));
 
 		// List out the packages...
@@ -287,7 +287,7 @@ class PackageServers extends AbstractController
 		// If we received data
 		$this->ifWeReceivedData($packageListing, $name, $txt['mod_section_count']);
 
-		// Good time to sort the categories, the packages inside each category will be by last modification date.
+		// Good time to sort the categories, the packages inside each category will be by the last modification date.
 		asort($context['package_list']);
 	}
 
@@ -311,9 +311,9 @@ class PackageServers extends AbstractController
 	}
 
 	/**
-	 * Returns a package array filled with the json information
+	 * Returns a package array filled with the JSON information
 	 *
-	 * - Uses the parsed json file from the selected package server
+	 * - Uses the parsed JSON file from the selected package server
 	 *
 	 * @param object $thisPackage
 	 * @param string $packageSection
@@ -375,7 +375,7 @@ class PackageServers extends AbstractController
 	}
 
 	/**
-	 * Determine the package file name so we can see if its been downloaded
+	 * Determine the package file name so we can see if it's been downloaded
 	 *
 	 * - Determines a unique package name given a master.xyz file
 	 * - Create the name based on the repo name
@@ -387,17 +387,17 @@ class PackageServers extends AbstractController
 	 */
 	private function _rename_master($name): string
 	{
-		// Is this a "master" package from github or bitbucket?
+		// Is this a "master" package from GitHub or BitBucket?
 		if (preg_match('~^http(s)?://(www.)?(bitbucket\.org|github\.com)/(.+?(master(\.zip|\.tar\.gz)))$~', $name, $matches) === 1)
 		{
-			// Name this master.zip based on repo name in the link
+			// Name this master.zip based on the repo name in the link
 			$path_parts = pathinfo($matches[4]);
 			[, $newname,] = explode('/', $path_parts['dirname']);
 
 			// Just to be safe, no invalid file characters
 			$invalid = array_merge(array_map('chr', range(0, 31)), ['<', '>', ':', '"', '/', '\\', '|', '?', '*']);
 
-			// We could read the package info and see if we have a duplicate id & version, however that is
+			// We could read the package info and see if we have a duplicate id & version, however, that is
 			// not always accurate, especially when dealing with repos.  So for now just put in no conflict mode
 			// and do the save.
 			if ($this->_req->getQuery('area') === 'packageservers' && $this->_req->getQuery('sa') === 'download')
@@ -430,12 +430,12 @@ class PackageServers extends AbstractController
 	 * What it does:
 	 *
 	 * - Accessed by action=admin;area=packageservers;sa=download
-	 * - If server is set, loads json file from package server
-	 *     - requires both section and num values to validate the file to download from the json file
+	 * - If server is set, loads JSON file from package server
+	 *     - requires both section and num values to validate the file to download from the JSON file
 	 * - If $_POST['byurl'] $_POST['filename'])) are set, will download a file from the url and save it as filename
 	 * - If just $_POST['byurl'] is set will fetch that file and save it
-	 *     - github and bitbucket master files are renamed to repo name to avoid collisions
-	 * - Files are saved to the package directory and validate to be ElkArte packages
+	 *     - GitHub and BitBucket master files are renamed to repo name to avoid collisions
+	 * - Files are saved to the package directory and validated to be ElkArte packages
 	 */
 	public function action_download(): void
 	{
@@ -491,7 +491,7 @@ class PackageServers extends AbstractController
 				throw new Exception('package_cant_download', false);
 			}
 		}
-		// Entered a url and optional filename
+		// Entered url and optional filename
 		elseif (isset($this->_req->post->byurl) && !empty($this->_req->post->filename))
 		{
 			$package_id = $this->_req->post->package;
@@ -516,7 +516,7 @@ class PackageServers extends AbstractController
 			$package_name = $this->_rename_master($packageInfo['name']) . '.zip';
 		}
 
-		// Avoid over writing any existing package files of the same name
+		// Avoid overwriting any existing package files of the same name
 		if ($this->_req->hasQuery('conflict') || ($this->_req->hasQuery('auto') && $this->fileFunc->fileExists(BOARDDIR . '/packages/' . $package_name)))
 		{
 			// Find the extension, change abc.tar.gz to abc_1.tar.gz...
@@ -604,7 +604,7 @@ class PackageServers extends AbstractController
 	{
 		global $txt, $context;
 
-		// Setup the correct template, even though I'll admit we ain't downloading ;)
+		// Set up the correct template, even though I'll admit we ain't downloading ;)
 		$context['sub_template'] = 'downloaded';
 
 		// @todo Use FTP if the packages directory is not writable.
@@ -630,7 +630,7 @@ class PackageServers extends AbstractController
 		// We only need the filename...
 		$packageName = basename($_FILES['package']['name']);
 
-		// Setup the destination and throw an error if the file is already there!
+		// Set up the destination and throw an error if the file is already there!
 		$destination = BOARDDIR . '/packages/' . $packageName;
 
 		// @todo Maybe just roll it like we do for downloads?
@@ -643,7 +643,7 @@ class PackageServers extends AbstractController
 		move_uploaded_file($_FILES['package']['tmp_name'], $destination);
 		$this->fileFunc->chmod($destination);
 
-		// If we got this far that should mean it's available.
+		// If we got this far, that should mean it's available.
 		$context['package'] = getPackageInfo($packageName);
 		$context['package_server'] = '';
 
@@ -677,7 +677,7 @@ class PackageServers extends AbstractController
 					continue;
 				}
 
-				// If it was already uploaded under another name don't upload it again.
+				// If it was already uploaded under another name, don't upload it again.
 				if ($packageInfo['id'] === $context['package']['id'] && compareVersions($packageInfo['version'], $context['package']['version']) == 0)
 				{
 					$this->fileFunc->delete($destination);
@@ -768,7 +768,7 @@ class PackageServers extends AbstractController
 				$the_version = $_SESSION['version_emulate'];
 			}
 
-			// Parse the json file, each section contains a category of addons
+			// Parse the JSON file, each section contains a category of addons
 			$packageNum = 0;
 			foreach ($packageListing as $packageSection => $section_items)
 			{
@@ -803,14 +803,14 @@ class PackageServers extends AbstractController
 					$base_name = $this->_rename_master($package['server']['download']);
 					$package['filename'] = basename($package['server']['download']);
 
-					// This package is either not installed, or installed but old.
+					// This package is either not installed or installed but old.
 					if (!$package['is_installed'] || (!$package['is_current'] && !$package['is_newer']))
 					{
 						// Does it claim to install on this version of ElkArte?
 						$path_parts = pathinfo($base_name);
 						if (!empty($thisPackage->elkversion) && isset($path_parts['extension']) && in_array($path_parts['extension'], ['zip', 'tar', 'gz', 'tar.gz']))
 						{
-							// No install range given, then set one, it will all work out in the end.
+							// No installation range given, then set one, it will all work out in the end.
 							$for = !str_contains($thisPackage->elkversion, '-') ? $thisPackage->elkversion . '-' . $the_version : $thisPackage->elkversion;
 							$package['can_install'] = matchPackageVersion($the_version, $for);
 						}
@@ -825,11 +825,11 @@ class PackageServers extends AbstractController
 					$package['is_downloaded'] = !$package['is_installed'] && (is_array($already_exists) && in_array($already_exists['id'], $package['possible_ids']));
 					if ($package['is_downloaded'])
 					{
-						// Is the available package newer than whats been downloaded?
+						// Is the available package newer than what's been downloaded?
 						$package['is_newer'] = compareVersions($package['version'], $already_exists['version']) > 0;
 					}
 
-					// Build the download to server link
+					// Build the download to the server link
 					$package['download']['href'] = getUrl('admin', ['action' => 'admin', 'area' => 'packageservers', 'sa' => 'download', 'server' => $name, 'section' => $packageSection, 'num' => $section_count, 'package' => $package['filename']] + ($package['download_conflict'] ? ['conflict'] : []) + ['{session_data}']);
 					$package['download']['link'] = '<a href="' . $package['download']['href'] . '">' . $package['name'] . '</a>';
 

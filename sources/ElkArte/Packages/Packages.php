@@ -33,13 +33,13 @@ use UnexpectedValueException;
 /**
  * This class is the administration package manager controller.
  * Its main job is to install/uninstall, allow to browse, packages.
- * In fact, just about everything related to addon packages, including FTP connections when necessary.
+ * In fact, just about everything is related to addon packages, including FTP connections when necessary.
  *
  * @package Packages
  */
 class Packages extends AbstractController
 {
-	/** @var array|bool listing of files in a packages */
+	/** @var array|bool listing of files in a package */
 	private $_extracted_files;
 
 	/** @var int The id from the DB or an installed package */
@@ -57,13 +57,13 @@ class Packages extends AbstractController
 	/** @var string Base path of the package */
 	private $_base_path;
 
-	/** @var bool If this is an un-install pass or not */
+	/** @var bool If this is an uninstallation pass or not */
 	private $_uninstalling;
 
 	/** @var bool If the package is installed, previously or not */
 	private $_is_installed;
 
-	/** @var \ElkArte\Helper\FileFunctions */
+	/** @var FileFunctions */
 	private $fileFunc;
 
 	/**
@@ -137,7 +137,7 @@ class Packages extends AbstractController
 		// Set up for the template
 		$context['sub_action'] = $subAction;
 
-		// Lets just do it!
+		// Let's just do it!
 		$action->dispatch($subAction);
 	}
 
@@ -155,7 +155,7 @@ class Packages extends AbstractController
 			redirectexit('action=admin;area=packages');
 		}
 
-		// What are we trying to do
+		// What are we trying to do?
 		$this->_filename = (string) preg_replace('~[.]+~', '.', $file);
 		$this->_uninstalling = $this->_req->query->sa === 'uninstall';
 
@@ -165,7 +165,7 @@ class Packages extends AbstractController
 			throw new Exception('package_no_file', false);
 		}
 
-		// Do we have an existing id, for uninstalls and the like.
+		// Do we have an existing id, for uninstallations and the like?
 		$this->install_id = $this->_req->getQuery('pid', 'intval', 0);
 
 		// This will be needed
@@ -200,7 +200,7 @@ class Packages extends AbstractController
 
 		$packageInfo['filename'] = $this->_filename;
 
-		// The addon isn't installed.... unless proven otherwise.
+		// The addon isn't installed... unless proven otherwise.
 		$this->_is_installed = false;
 
 		// See if it is installed?
@@ -243,7 +243,7 @@ class Packages extends AbstractController
 		$context['uninstalling'] = $this->_uninstalling;
 		$context['extract_type'] = $packageInfo['type'] ?? 'modification';
 
-		// Have we got some things which we might want to do "multi-theme"?
+		// Have we got some things that we might want to do "multi-theme"?
 		$this->_multi_theme($pka->themeFinds['candidates']);
 
 		// Trash the cache... which will also check permissions for us!
@@ -255,7 +255,7 @@ class Packages extends AbstractController
 			deltree(BOARDDIR . '/packages/temp');
 		}
 
-		// Will we require chmod permissions to pull this off
+		// Will we require chmod permissions to pull this off?
 		$this->chmod_files = empty($pka->chmod_files) ? [] : $pka->chmod_files;
 		if (!empty($this->chmod_files))
 		{
@@ -309,7 +309,7 @@ class Packages extends AbstractController
 	 */
 	private function _extract_files_temp(): void
 	{
-		// Is it a file in the package directory
+		// Is it a file in the package directory?
 		if (is_file(BOARDDIR . '/packages/' . $this->_filename))
 		{
 			// Unpack the files in to the packages/temp directory
@@ -333,7 +333,7 @@ class Packages extends AbstractController
 				$this->_base_path = '';
 			}
 		}
-		// Perhaps its a directory then, assumed to be extracted
+		// Perhaps it's a directory then, assumed to be extracted
 		elseif (!empty($this->_filename) && $this->fileFunc->isDir(BOARDDIR . '/packages/' . $this->_filename))
 		{
 			// Copy the directory to the temp directory
@@ -343,7 +343,7 @@ class Packages extends AbstractController
 			$this->_extracted_files = $this->fileFunc->listtree(BOARDDIR . '/packages/temp');
 			$this->_base_path = '';
 		}
-		// Well we don't know what it is then, so we stop
+		// Well, we don't know what it is then, so we stop
 		else
 		{
 			throw new Exception('no_access', false);
@@ -357,7 +357,7 @@ class Packages extends AbstractController
 	 *
 	 * @param array $package_installed
 	 * @param array $packageInfo Details for the package being tested/installed, set by getPackageInfo
-	 * @param bool $testing passed to parsePackageInfo, true for test install, false for real install
+	 * @param bool $testing passed to parsePackageInfo, true for test install, false for real installation
 	 *
 	 * @return array
 	 * @throws Exception package_cant_uninstall, package_uninstall_cannot
@@ -407,14 +407,14 @@ class Packages extends AbstractController
 				unset($this->theme_paths[$id]);
 			}
 		}
-		// Or is it already installed and you want to upgrade
+		// Or is it already installed and you want to upgrade?
 		elseif (isset($package_installed['old_version']) && $package_installed['old_version'] != $packageInfo['version'])
 		{
 			// Look for an upgrade...
 			$parser = new PackageParser();
 			$actions = $parser->parsePackageInfo($packageInfo['xml'], $testing, 'upgrade', $package_installed['old_version']);
 
-			// There was no upgrade....
+			// There was no upgrade...
 			if (empty($actions))
 			{
 				$this->_is_installed = true;
@@ -447,7 +447,7 @@ class Packages extends AbstractController
 		if (!isset($package_installed['old_version']) || $this->_is_installed)
 		{
 			$parser = new PackageParser();
-			$actions = $parser->parsePackageInfo($packageInfo['xml'], $testing, 'install');
+			$actions = $parser->parsePackageInfo($packageInfo['xml'], $testing);
 		}
 
 		return $actions;
@@ -488,7 +488,7 @@ class Packages extends AbstractController
 					$path .= '/' . basename($action_data['filename']);
 				}
 
-				// Loop through each custom theme to note it's candidacy!
+				// Loop through each custom theme to note its candidacy!
 				foreach ($this->theme_paths as $id => $theme_data)
 				{
 					$id = (int) $id;
@@ -571,7 +571,7 @@ class Packages extends AbstractController
 			redirectexit('action=admin;area=packages');
 		}
 
-		// And if the file does not exist there is a problem
+		// And if the file does not exist, there is a problem
 		if (!$this->fileFunc->fileExists(BOARDDIR . '/packages/' . $this->_filename))
 		{
 			throw new Exception('package_no_file', false);
@@ -594,7 +594,7 @@ class Packages extends AbstractController
 			]
 		);
 
-		// Make sure temp directory exists and is empty!
+		// Make sure the temp directory exists and is empty!
 		if ($this->fileFunc->isDir(BOARDDIR . '/packages/temp'))
 		{
 			deltree(BOARDDIR . '/packages/temp', false);
@@ -613,7 +613,7 @@ class Packages extends AbstractController
 		// Now load up the paths of the themes that we need to know about.
 		$this->theme_paths = getThemesPathbyID($custom_themes);
 
-		// Are there any theme copying that we want to take place?
+		// Is there any theme copying that we want to take place?
 		$themes_installed = $this->_installThemes();
 
 		// Get the package info...
@@ -636,7 +636,7 @@ class Packages extends AbstractController
 			package_create_backup(($this->_uninstalling ? 'backup_' : 'before_') . strtok($this->_filename, '.'));
 		}
 
-		// The addon isn't installed.... unless proven otherwise.
+		// The addon isn't installed... unless proven otherwise.
 		$this->_is_installed = false;
 
 		// Is it actually installed?
@@ -645,7 +645,7 @@ class Packages extends AbstractController
 		// Fetch the installation status and action log
 		$install_log = $this->_get_package_actions($package_installed, $packageInfo, false);
 
-		// Set up the details for the sub template, breadcrumbs, etc
+		// Set up the details for the sub template, breadcrumbs, etc.
 		$context['breadcrumbs'][count($context['breadcrumbs']) - 1] = [
 			'url' => getUrl('admin', ['action' => 'admin', 'area' => 'packages', 'sa' => 'browse']),
 			'name' => $this->_uninstalling ? $txt['uninstall'] : $txt['extracting']
@@ -698,7 +698,7 @@ class Packages extends AbstractController
 			// Assuming we're not uninstalling, add the entry.
 			if (!$this->_uninstalling)
 			{
-				// Any db changes from older version?
+				// Any db changes from an older version?
 				$table_log = $table_installer->package_log();
 
 				if (!empty($old_db_changes))
@@ -713,7 +713,7 @@ class Packages extends AbstractController
 				// If there are some database changes we might want to remove then filter them out.
 				if (!empty($db_package_log))
 				{
-					// We're really just checking for entries which are create table AND add columns (etc).
+					// We're really just checking for entries which are creating table AND add columns (etc.).
 					$tables = [];
 					usort($db_package_log, fn(array $a, array $b): int => $this->_sort_table_first($a, $b));
 					foreach ($db_package_log as $k => $log)
@@ -752,7 +752,7 @@ class Packages extends AbstractController
 			$context['install_finished'] = true;
 		}
 
-		// If there's database changes - and they want them removed - let's do it last!
+		// If there are database changes - and they want them removed - let's do it last!
 		$this->removeDatabaseChanges($package_installed, $table_installer);
 
 		// Clean house... get rid of the evidence ;).
@@ -939,7 +939,7 @@ class Packages extends AbstractController
 		$context['package'] = $this->_req->query->package;
 		$context['filename'] = $this->_req->query->file;
 
-		// Let the unpacker do the work.... but make sure we handle images properly.
+		// Let the unpacker do the work... but make sure we handle images properly.
 		if (in_array(strtolower(strrchr($this->_req->query->file, '.')), ['.bmp', '.gif', '.jpeg', '.jpg', '.png']))
 		{
 			$context['filedata'] = '<img src="' . getUrl('admin', ['action' => 'admin', 'area' => 'packages', 'sa' => 'examine', 'package' => $this->_req->query->package, 'file' => $this->_req->query->file, 'raw']) . '" alt="' . $this->_req->query->file . '" />';
@@ -1228,7 +1228,7 @@ class Packages extends AbstractController
 	}
 
 	/**
-	 * Used when a temp FTP access is needed to package functions
+	 * Used when temp FTP access is needed to package functions
 	 */
 	public function action_options(): void
 	{
@@ -1354,7 +1354,7 @@ class Packages extends AbstractController
 
 		$mod_actions = parseModification(@file_get_contents(BOARDDIR . '/packages/temp/' . $context['base_path'] . $this->_req->query->filename), true, $reverse, $theme_paths);
 
-		// Ok lets get the content of the file.
+		// Ok, let's get the content of the file.
 		$context['operations'] = [
 			'search' => strtr(htmlspecialchars($mod_actions[$operation_key]['search_original'], ENT_COMPAT), ['[' => '&#91;', ']' => '&#93;']),
 			'replace' => strtr(htmlspecialchars($mod_actions[$operation_key]['replace_original'], ENT_COMPAT), ['[' => '&#91;', ']' => '&#93;']),
@@ -1375,7 +1375,7 @@ class Packages extends AbstractController
 	/**
 	 * Get a listing of all the packages
 	 *
-	 * - Determines if the package is addon, smiley, avatar, language or unknown package
+	 * - Determines if the package is addon, smiley, avatar, language, or unknown package
 	 * - Determines if the package has been installed or not
 	 *
 	 * @param int $start The item to start with (for pagination purposes)
@@ -1541,7 +1541,7 @@ class Packages extends AbstractController
 				// This package is currently NOT installed.  Check if it can be.
 				if (!$packageInfo['is_installed'] && $packageInfo['xml']->exists('install'))
 				{
-					// Check if there's an install for *THIS* version
+					// Check if there's an installation for *THIS* version
 					$installs = $packageInfo['xml']->set('install');
 					$packageInfo['time_installed'] = 0;
 					foreach ($installs as $install)
@@ -1554,12 +1554,12 @@ class Packages extends AbstractController
 						}
 					}
 
-					// no install found for our version, lets see if one exists for another
+					// no install found for our version, let's see if one exists for another
 					if ($packageInfo['can_install'] === false && $install->exists('@for') && empty($_SESSION['version_emulate']))
 					{
 						$reset = true;
 
-						// Get the highest install version that is available from the package
+						// Get the highest installed version that is available from the package
 						foreach ($installs as $install)
 						{
 							$packageInfo['can_emulate_install'] = matchHighestPackageVersion($install->fetch('@for'), $the_version, $reset);
@@ -1572,7 +1572,7 @@ class Packages extends AbstractController
 				{
 					$upgrades = $packageInfo['xml']->set('upgrade');
 
-					// First go through, and check against the current version of ElkArte.
+					// First, go through and check against the current version of ElkArte.
 					foreach ($upgrades as $upgrade)
 					{
 						// Even if it is for this ElkArte, is it for the installed version of the mod?
@@ -1605,12 +1605,12 @@ class Packages extends AbstractController
 						}
 					}
 
-					// No uninstall found for this version, lets see if one exists for another
+					// No uninstall found for this version, let's see if one exists for another
 					if ($packageInfo['can_uninstall'] === false && $uninstall->exists('@for') && empty($_SESSION['version_emulate']))
 					{
 						$reset = true;
 
-						// Get the highest install version that is available from the package
+						// Get the highest installed version that is available from the package
 						foreach ($uninstalls as $uninstall)
 						{
 							$packageInfo['can_emulate_uninstall'] = matchHighestPackageVersion($uninstall->fetch('@for'), $the_version, $reset);
@@ -1683,7 +1683,7 @@ class Packages extends AbstractController
 	 */
 	public function removeDatabaseChanges($package_installed, $table_installer): void
 	{
-		// If there's database changes - and they want them removed - let's do it last!
+		// If there are database changes - and they want them removed - let's do it last!
 		if (empty($package_installed['db_changes']))
 		{
 			return;
