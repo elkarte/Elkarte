@@ -122,7 +122,7 @@ class ProfileOptions extends AbstractController
 		$context['sub_template'] = 'editBuddies';
 
 		// Use suggest.js to finding the right buddies
-		loadJavascriptFile('suggest.js', ['defer' => true]);
+		loadJavascriptFile('suggest.js', ['defer' => false]);
 
 		// For making changes!
 		$buddiesArray = array_map('intval', explode(',', $this->_profile['buddy_list']));
