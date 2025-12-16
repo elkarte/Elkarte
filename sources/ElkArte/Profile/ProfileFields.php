@@ -17,6 +17,7 @@ use BBC\ParserWrapper;
 use ElkArte\Errors\ErrorContext;
 use ElkArte\Exceptions\Exception;
 use ElkArte\Helper\DataValidator;
+use ElkArte\Helper\HttpReq;
 use ElkArte\Helper\Util;
 use ElkArte\Languages\Txt;
 use ElkArte\MembersList;
@@ -909,6 +910,9 @@ class ProfileFields
 	{
 		global $profile_fields, $profile_vars, $context, $old_profile, $post_errors, $cur_profile;
 
+		// Use HttpReq for all request data access
+		$req = HttpReq::instance();
+
 		if (!empty($hook))
 		{
 			call_integration_hook('integrate_' . $hook . '_profile_fields', [&$fields]);
@@ -941,7 +945,10 @@ class ProfileFields
 
 			$field = $profile_fields[$key];
 
-			if (!isset($_POST[$key]) || !empty($field['is_dummy']) || (isset($_POST['preview_signature']) && $key === 'signature'))
+			// Fetch the posted value (if any) using HttpReq, do not rely on $_POST
+			$has_value = $req->hasPost($key);
+			$preview_signature = $req->hasPost('preview_signature');
+			if (!$has_value || !empty($field['is_dummy']) || ($preview_signature && $key === 'signature'))
 			{
 				continue;
 			}
@@ -949,11 +956,14 @@ class ProfileFields
 			// What gets updated?
 			$db_key = $field['save_key'] ?? $key;
 
+			// Work on a local copy of the submitted value
+			$value = $req->post->{$key};
+
 			// Right - we have something that is enabled, we can act upon and has a value
 			// posted to it. Does it have a validation function?
 			if (isset($field['input_validate']))
 			{
-				$is_valid = $field['input_validate']($_POST[$key]);
+				$is_valid = $field['input_validate']($value);
 
 				// An error occurred - set it as such!
 				if ($is_valid !== true)
@@ -966,7 +976,7 @@ class ProfileFields
 					}
 
 					// Retain the old value.
-					$cur_profile[$key] = $_POST[$key];
+					$cur_profile[$key] = $value;
 					continue;
 				}
 			}
@@ -977,32 +987,32 @@ class ProfileFields
 			// Finally, clean up certain types.
 			if ($field['cast_type'] === 'int')
 			{
-				$_POST[$key] = (int) $_POST[$key];
+				$value = (int) $value;
 			}
 			elseif ($field['cast_type'] === 'float')
 			{
-				$_POST[$key] = (float) $_POST[$key];
+				$value = (float) $value;
 			}
 			elseif ($field['cast_type'] === 'check')
 			{
-				$_POST[$key] = empty($_POST[$key]) ? 0 : 1;
+				$value = empty($value) ? 0 : 1;
 			}
 
 			// If we got here, we're doing OK.
-			if ($field['type'] !== 'hidden' && (!isset($old_profile[$key]) || $_POST[$key] != $old_profile[$key]))
+			if ($field['type'] !== 'hidden' && (!isset($old_profile[$key]) || $value != $old_profile[$key]))
 			{
 				// Set the save variable.
-				$profile_vars[$db_key] = $_POST[$key];
+				$profile_vars[$db_key] = $value;
 
 				// And update the user profile.
-				$cur_profile[$key] = $_POST[$key];
+				$cur_profile[$key] = $value;
 
 				// Are we logging it?
 				if (!empty($field['log_change']) && isset($old_profile[$key]))
 				{
 					$context['log_changes'][$key] = [
 						'previous' => $old_profile[$key],
-						'new' => $_POST[$key],
+						'new' => $value,
 					];
 				}
 			}
@@ -1013,18 +1023,19 @@ class ProfileFields
 				profileLoadGroups();
 
 				// Any changes to a primary group?
-				if ((int) $_POST['id_group'] !== (int) $old_profile['id_group'])
+				$posted_id_group = $req->getPost('id_group', 'intval', $old_profile['id_group']);
+				if ((int) $posted_id_group !== (int) $old_profile['id_group'])
 				{
 					$context['log_changes']['id_group'] = [
 						'previous' => !empty($old_profile[$key]) && isset($context['member_groups'][$old_profile[$key]]) ? $context['member_groups'][$old_profile[$key]]['name'] : '',
-						'new' => !empty($_POST[$key]) && isset($context['member_groups'][$_POST[$key]]) ? $context['member_groups'][$_POST[$key]]['name'] : '',
+						'new' => !empty($posted_id_group) && isset($context['member_groups'][$posted_id_group]) ? $context['member_groups'][$posted_id_group]['name'] : '',
 					];
 				}
 
 				// Prepare additional groups for comparison.
 				$additional_groups = [
 					'previous' => empty($old_profile['additional_groups']) ? [] : explode(',', $old_profile['additional_groups']),
-					'new' => empty($_POST['additional_groups']) ? [] : array_diff($_POST['additional_groups'], [0]),
+					'new' => $req->hasPost('additional_groups') ? array_diff((array) $req->post->additional_groups, [0]) : [],
 				];
 
 				sort($additional_groups['previous']);
@@ -1067,10 +1078,15 @@ class ProfileFields
 
 		if ($changeOther && empty($post_errors))
 		{
-			makeThemeChanges($context['id_member'], isset($_POST['id_theme']) ? (int) $_POST['id_theme'] : $old_profile['id_theme']);
-			if (!empty($_REQUEST['sa']))
+			// Apply theme changes using HttpReq
+			$id_theme = $req->getPost('id_theme', 'intval', $old_profile['id_theme']);
+			makeThemeChanges($context['id_member'], (int) $id_theme);
+
+			// Apply custom field changes for the active subaction (usually in query string)
+			$sa = $req->getQuery('sa', null, '');
+			if (!empty($sa))
 			{
-				makeCustomFieldChanges($context['id_member'], $_REQUEST['sa'], false);
+				makeCustomFieldChanges($context['id_member'], $sa, false);
 			}
 		}
 

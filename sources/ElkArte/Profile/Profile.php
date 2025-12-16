@@ -665,9 +665,6 @@ class Profile extends AbstractController
 			}
 			elseif (in_array($this->_current_area, ['account', 'forumprofile', 'theme', 'contactprefs']))
 			{
-				// @todo yes this is ugly, but saveProfileFields needs to be updated first
-				$_POST = (array) $this->_req->post;
-
 				if ($this->_current_area === 'account' && !empty($modSettings['enableOTP']))
 				{
 					$fields = ProfileOptions::getFields('account_otp');

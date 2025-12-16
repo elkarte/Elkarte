@@ -1881,10 +1881,10 @@ class PersonalMessage extends AbstractController
 		{
 			checkSession();
 
-			// Mimic what profile would do.
-			// @todo fix this when Profile.subs is not dependant on this behavior
-			$_POST = Util::htmltrim__recursive((array) $this->_req->post);
-			$_POST = Util::htmlspecialchars__recursive($_POST);
+			// Mimic what Profile.php does.
+			$post = Util::htmltrim__recursive((array) $this->_req->post);
+			$post = Util::htmlspecialchars__recursive($post);
+			$this->_req->post = new \ArrayObject($post, \ArrayObject::ARRAY_AS_PROPS);
 
 			// Save the fields.
 			$profileFields = new ProfileFields();
