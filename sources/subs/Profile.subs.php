@@ -463,18 +463,20 @@ function makeNotificationChanges($memID)
 
 		foreach (getMemberNotificationsProfile($memID) as $mention => $data)
 		{
+			// If "use default" is checked, it takes precedence over any user selections
 			if (isset($_POST['notify'][$mention]) && !empty($_POST['notify'][$mention]['status']))
 			{
-				// When is not an array it means => use default => 0, so it's skipped on INSERT
-				if (!is_array($_POST['notify'][$mention]['status']))
-				{
-					$to_save[$mention] = 0;
-					continue;
-				}
+				// Use defaults for this mention type (no row inserted)
+				$to_save[$mention] = 0;
+				continue;
+			}
 
-				foreach ($_POST['notify'][$mention]['status'] as $method)
+			// Otherwise, look for user-specified methods under the dedicated 'user' key
+			if (isset($_POST['notify'][$mention]['user']) && is_array($_POST['notify'][$mention]['user']) && !empty($_POST['notify'][$mention]['user']))
+			{
+				foreach ($_POST['notify'][$mention]['user'] as $method)
 				{
-					// This ensures that the $method passed by the user is valid and safe to INSERT.
+					// Validate the method is allowed for this mention type
 					if (isset($data['data'][$method]))
 					{
 						if (!isset($to_save[$mention]))
@@ -484,19 +486,26 @@ function makeNotificationChanges($memID)
 						$to_save[$mention][] = $method;
 					}
 				}
+
+				// If after validation nothing remained, explicitly opt-out
+				if (!isset($to_save[$mention]))
+				{
+					$to_save[$mention] = [Notifications::DEFAULT_NONE];
+				}
 			}
 			else
 			{
+				// No defaults selected and no user options provided: explicit opt-out
 				$to_save[$mention] = [Notifications::DEFAULT_NONE];
+			}
 
-				// Shhh. ... Board/Topic onsite notifications are added as typical mentions on the fly
-				$to_save['watchedtopic'] = 0;
-				$to_save['watchedboard'] = 0;
-				if ((int) $_POST['notify_regularity'] === 4)
-				{
-					$to_save['watchedtopic'] = [0 => 'notification'];
-					$to_save['watchedboard'] = [0 => 'notification'];
-				}
+			// Shhh. ... Board/Topic onsite notifications are added as typical mentions on the fly
+			$to_save['watchedtopic'] = 0;
+			$to_save['watchedboard'] = 0;
+			if ((int) $_POST['notify_regularity'] === 4)
+			{
+				$to_save['watchedtopic'] = [0 => 'notification'];
+				$to_save['watchedboard'] = [0 => 'notification'];
 			}
 		}
 
@@ -2047,7 +2056,7 @@ function load_user_topics($memID, $start, $count, $range_limit = '', $reverse = 
 
 	$db = database();
 
-	$is_owner = $memID == User::$info->id;
+	$is_owner = (int) $memID === User::$info->id;
 	$user_topics = [];
 
 	// Find this user's topics.  The left join on categories somehow makes this faster, weird as it looks.
@@ -2159,9 +2168,9 @@ function getMemberGeneralPermissions($curGroups)
 			// Add the membergroup to either the denied or the allowed groups.
 			$general_permission[$row['permission']]['groups'][empty($row['add_deny'])
 				? 'denied'
-				: 'allowed'][] = $row['id_group'] == 0
-					? $txt['membergroups_members']
-					: $row['group_name'];
+				: 'allowed'][] = (int) $row['id_group'] === 0
+				? $txt['membergroups_members']
+				: $row['group_name'];
 
 			// Once denied is always denied.
 			$general_permission[$row['permission']]['is_denied'] |= empty($row['add_deny']);
@@ -2243,8 +2252,8 @@ function getMemberBoardPermissions($memID, $curGroups, $board = null)
 			$board_permission[$row['permission']]['groups'][empty($row['add_deny'])
 				? 'denied'
 				: 'allowed'][$row['id_group']] = $row['id_group'] == 0
-					? $txt['membergroups_members']
-					: $row['group_name'];
+				? $txt['membergroups_members']
+				: $row['group_name'];
 			$board_permission[$row['permission']]['is_denied'] |= empty($row['add_deny']);
 		}
 	);
@@ -2442,7 +2451,7 @@ function getMemberNotificationsProfile($member_id)
 				'id' => '',
 				'input_name' => 'notify[' . $type . '][' . $key . ']',
 				'text' => $txt['notify_' . $key],
-				'enabled' => in_array($key, $user_preferences[$member_id][$type] ?? [])
+				'enabled' => in_array($key, $user_preferences[$member_id][$type] ?? [], true)
 			];
 
 			if (empty($user_preferences[$member_id][$type]))
@@ -2509,7 +2518,8 @@ function getCustomFieldData($where, $area)
  *
  * @return bool Returns true if the email address is unique, false otherwise
  */
-function isUniqueEmail($memID, $email) {
+function isUniqueEmail($memID, $email)
+{
 	$db = database();
 
 	// Email addresses should be and stay unique.
@@ -2524,5 +2534,5 @@ function isUniqueEmail($memID, $email) {
 			'selected_member' => $memID,
 			'email_address' => $email,
 		]
-	)->num_rows();
+	)->hasResults();
 }
