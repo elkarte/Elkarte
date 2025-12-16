@@ -2,7 +2,7 @@
 
 /**
  * This file has the primary job of showing and editing people's profiles.
- * It also allows the user to change some of their or another preferences,
+ * It also allows the user to change some of their or other preferences,
  * and such things
  *
  * @package   ElkArte Forum
@@ -31,7 +31,7 @@ use ElkArte\MembersList;
  *
  * - Does the job of showing and editing people's profiles.
  * - Interface to buddy list, ignore list, notifications, authentication options, forum profile
- * account settings, etc
+ * account settings, etc.
  */
 class ProfileOptions extends AbstractController
 {
@@ -45,8 +45,8 @@ class ProfileOptions extends AbstractController
 	 * Called before all other methods when coming from the dispatcher or
 	 * action class.
 	 *
-	 * - If you initiate the class outside those methods, call this method.
-	 * or setup the class yourself else a horrible fate awaits you
+	 * - If you initiate the class outside those methods, call this method
+	 * or set up the class yourself else a horrible fate awaits you
 	 */
 	public function pre_dispatch()
 	{
@@ -55,7 +55,7 @@ class ProfileOptions extends AbstractController
 	}
 
 	/**
-	 * Default method, if another action is not called by the menu.
+	 * Default method, if the menu does not call another action.
 	 *
 	 * @see AbstractController::action_index()
 	 */
@@ -67,7 +67,7 @@ class ProfileOptions extends AbstractController
 	}
 
 	/**
-	 * Show all the users buddies, as well as a add/delete interface.
+	 * Show all the users buddies, as well as an add/delete interface.
 	 *
 	 * @throws Exception
 	 */
@@ -83,7 +83,7 @@ class ProfileOptions extends AbstractController
 
 		theme()->getTemplates()->load('ProfileOptions');
 
-		// Can we email the user direct?
+		// Can we email the user directly?
 		$context['can_moderate_forum'] = allowedTo('moderate_forum');
 		$context['can_send_email'] = allowedTo('send_email_to_members');
 
@@ -121,7 +121,7 @@ class ProfileOptions extends AbstractController
 		// We want to view what we're doing :P
 		$context['sub_template'] = 'editBuddies';
 
-		// Use suggest finding the right buddies
+		// Use suggest.js to finding the right buddies
 		loadJavascriptFile('suggest.js', ['defer' => true]);
 
 		// For making changes!
@@ -212,7 +212,7 @@ class ProfileOptions extends AbstractController
 	}
 
 	/**
-	 * Allows the user to view their ignore list,
+	 * Allows the user to view their ignore list
 	 *
 	 * - Provides the option to manage members on it.
 	 */
@@ -279,7 +279,7 @@ class ProfileOptions extends AbstractController
 			redirectexit('action=profile;area=lists;sa=ignore;u=' . $this->_memID);
 		}
 
-		// Initialise the list of members we're ignoring.
+		// Initialize the list of members we're ignoring.
 		$ignored = [];
 
 		if (!empty($ignoreArray))
@@ -361,7 +361,7 @@ class ProfileOptions extends AbstractController
 
 			if (isset($post_options) && is_array($post_options))
 			{
-				// Avoid indirect modification of overloaded element by working on a temp array
+				// Avoid indirect modification of an overloaded element by working on a temp array
 				$temp_options = $context['member']['options'];
 				foreach ($post_options as $k => $v)
 				{
@@ -380,7 +380,7 @@ class ProfileOptions extends AbstractController
 
 			if (isset($post_options) && is_array($post_options))
 			{
-				// Avoid indirect modification of overloaded element by working on a temp array
+				// Avoid indirect modification of an overloaded element by working on a temp array
 				$temp_options = $context['member']['options'];
 				foreach ($post_options as $var => $val)
 				{
@@ -523,7 +523,7 @@ class ProfileOptions extends AbstractController
 		$context['sub_template'] = 'edit_options';
 		$context['page_desc'] = $txt['theme_info'];
 
-		// Set up profile look and layout, call 'integrate_themepick_profile_fields' hook
+		// Set up the profile look and layout, call 'integrate_themepick_profile_fields' hook
 		$fields = self::getFields('theme');
 		setupProfileContext($fields['fields'], $fields['hook']);
 	}
@@ -548,7 +548,7 @@ class ProfileOptions extends AbstractController
 		theme()->getTemplates()->load('ProfileOptions');
 		require_once(SUBSDIR . '/Themes.subs.php');
 
-		// Note JS values will be in post via the form, JS enabled they will be in get via link button
+		// Note JS values will be in post via the form; JS enabled they will be in get via the link button
 		$_SESSION['theme'] = 0;
 		$_SESSION['id_variant'] = 0;
 		$save = $this->_req->getPost('save');
@@ -652,7 +652,7 @@ class ProfileOptions extends AbstractController
 	}
 
 	/**
-	 * Generate the users existing notification options and allow for updates
+	 * Generate the users' existing notification options and allow for updates
 	 */
 	public function action_editNotificationSettings(): void
 	{
@@ -664,16 +664,16 @@ class ProfileOptions extends AbstractController
 		// What options are set?
 		$context['member']['notify_announcements'] = $this->_profile['notify_announcements'];
 		$context['member']['notify_send_body'] = $this->_profile['notify_send_body'];
-		$context['member']['notify_types'] = $this->_profile['notify_types'];
-		$context['member']['notify_regularity'] = $this->_profile['notify_regularity'];
-		$context['member']['notify_from'] = $this->_profile['notify_from'];
+		$context['member']['notify_types'] = (int) $this->_profile['notify_types'];
+		$context['member']['notify_regularity'] = (int) $this->_profile['notify_regularity'];
+		$context['member']['notify_from'] = (int) $this->_profile['notify_from'];
 
 		$this->loadThemeOptions();
 	}
 
 	/**
-	 * Generate the users existing board notification list.
-	 * Loads data into $context to be displayed wth template_board_notification_list
+	 * Generate the users' existing board notification list.
+	 * Loads data into $context to be displayed with template_board_notification_list
 	 */
 	public function action_editNotificationBoards(): void
 	{
@@ -771,8 +771,8 @@ class ProfileOptions extends AbstractController
 	}
 
 	/**
-	 * Generate the users existing topic notification list.
-	 * Loads data into $context to be displayed wth template_topic_notification_list
+	 * Generate the users' existing topic notification list.
+	 * Loads data into $context to be displayed with template_topic_notification_list
 	 */
 	public function action_editNotificationTopics(): void
 	{
@@ -941,7 +941,7 @@ class ProfileOptions extends AbstractController
 	 *
 	 * - Retrieve topic notifications count.
 	 *
-	 * @param int $memID id_member the id of the member who's notifications we are loading
+	 * @param int $memID id_member the id of the member whose notifications we are loading
 	 * @return int
 	 */
 	public function list_getTopicNotificationCount($memID): int
@@ -1028,13 +1028,13 @@ class ProfileOptions extends AbstractController
 			'can_leave' => 0,
 		];
 
-		// No changing primary one unless you have enough groups!
+		// No changing the primary one unless you have enough groups!
 		if (count($context['groups']['member']) < 2)
 		{
 			$context['can_edit_primary'] = false;
 		}
 
-		// In the special case that someone is requesting membership of a group, setup some special context vars.
+		// In the special case that someone is requesting membership of a group, set up some special context vars.
 		$groupRequest = $this->_req->getQuery('request', 'intval');
 		if (!isset($groupRequest, $context['groups']['available'][$groupRequest]))
 		{
@@ -1065,7 +1065,7 @@ class ProfileOptions extends AbstractController
 			isAllowedTo('manage_membergroups');
 		}
 
-		$group_id = $this->_req->getPost('gid', 'intval', $this->_req->getQuery('gid', 'intval', null));
+		$group_id = $this->_req->getPost('gid', 'intval', $this->_req->getQuery('gid', 'intval'));
 
 		if (!isset($group_id) && !isset($this->_req->post->primary))
 		{
@@ -1096,7 +1096,7 @@ class ProfileOptions extends AbstractController
 			isAllowedTo('admin_forum');
 		}
 
-		// What ever we are doing, we need to determine if changing primary is possible!
+		// Whatever we are doing, we need to determine if changing primary is possible!
 		$groups_details = membergroupsById([$group_id, $this->_profile['id_group']], 0, true);
 
 		// Protected groups require proper permissions!
@@ -1143,7 +1143,7 @@ class ProfileOptions extends AbstractController
 				$canChangePrimary = true;
 			}
 
-			// If we are not doing a force primary move, don't do it automatically if current primary is not 0.
+			// If we are not doing a force primary move, don't do it automatically if the current primary is not 0.
 			if ($changeType !== 'primary' && $this->_profile['id_group'] !== 0)
 			{
 				$canChangePrimary = false;
@@ -1173,7 +1173,7 @@ class ProfileOptions extends AbstractController
 			}
 		}
 
-		// If we're requesting, add the note then return.
+		// If we're requesting, add the note, then return.
 		if ($changeType === 'request')
 		{
 			if (logMembergroupRequest($group_id, $this->_memID))

@@ -26,7 +26,7 @@ use ElkArte\Languages\Txt;
  */
 class ProfileSubscriptions extends AbstractController
 {
-	/** @var Holds the details of the subscription order */
+	/** @var array Holds the details of the subscription order */
 	private $_order;
 
 	/** @var array Holds all the available gateways so they can be initialized */
@@ -81,13 +81,13 @@ class ProfileSubscriptions extends AbstractController
 			}
 		}
 
-		// No gateways yet, no way to pay then, blame the admin !
+		// No gateways yet, no way to pay then, blame the admin!
 		if (empty($this->_gateways))
 		{
 			throw new Exception($txt['paid_admin_not_setup_gateway']);
 		}
 
-		// Get the members current subscriptions.
+		// Get the members' current subscriptions.
 		$context['current'] = loadMemberSubscriptions($memID, $context['subscriptions']);
 
 		// Find the active subscribed ones
@@ -109,7 +109,7 @@ class ProfileSubscriptions extends AbstractController
 		{
 			$this->_confirmOrder($memID);
 		}
-		// Show the users whats available and what they have
+		// Show the users what's available and what they have
 		else
 		{
 			$context['sub_template'] = 'user_subscription';
@@ -163,10 +163,10 @@ class ProfileSubscriptions extends AbstractController
 	}
 
 	/**
-	 * When the chosen payment gateway is done and it supports a receipt link url
+	 * When the chosen payment gateway is done, and it supports a receipt link url,
 	 * it will be set to come here.
 	 *
-	 * - This is NOT the same as the notify processing url which will point to subscriptions.php
+	 * - This is different from the notification processing url which will point to subscriptions.php
 	 * - Accessed by ?action=profile;u=123;area=subscriptions;sub_id=?;done
 	 *
 	 * @param int $memID
@@ -177,7 +177,7 @@ class ProfileSubscriptions extends AbstractController
 
 		$sub_id = (int) $this->_req->query->sub_id;
 
-		// Must exist but let's be sure...
+		// Must exist, but let's be sure...
 		if (isset($context['current'][$sub_id]))
 		{
 			// What are the pending details?
@@ -203,7 +203,7 @@ class ProfileSubscriptions extends AbstractController
 			}
 		}
 
-		// A simple thank you
+		// Say thank you
 		$context['sub_template'] = 'paid_done';
 	}
 
@@ -239,7 +239,8 @@ class ProfileSubscriptions extends AbstractController
 		$period = 'xx';
 		if ($this->_order['flexible'])
 		{
-			$period = isset($this->_req->post->cur[$this->_id_sub]) && isset($this->_order['costs'][$this->_req->post->cur[$this->_id_sub]]) ? $this->_req->post->cur[$this->_id_sub] : 'xx';
+			$cur = $this->_req->post->cur[$this->_id_sub];
+			$period = isset($cur, $this->_order['costs'][$cur]) ? $cur : 'xx';
 		}
 
 		// Check we have a valid cost.
@@ -255,8 +256,8 @@ class ProfileSubscriptions extends AbstractController
 		// Payment details based on one time or flex
 		$this->_set_value_cost_context();
 
-		// Setup the all the payment gateway context.
-		$this->_set_payment_gatway_context($memID, $period);
+		// Set up all the payment gateway context.
+		$this->_set_payment_gateway_context($memID, $period);
 
 		// No active payment gateways, then no way to pay, time to bail out, blame the admin
 		if (empty($context['gateways']))
@@ -293,7 +294,7 @@ class ProfileSubscriptions extends AbstractController
 				}
 			}
 
-			// If its already pending, don't increase the pending count
+			// If it's already pending, don't increase the pending count
 			if (!in_array($new_data, $current_pending))
 			{
 				$current_pending[] = $new_data;
@@ -326,7 +327,7 @@ class ProfileSubscriptions extends AbstractController
 			$context['value'] = $this->_order['costs'][$this->_req->post->cur[$this->_id_sub]];
 			$context['cost'] = sprintf($modSettings['paid_currency_symbol'], $context['value']) . '/' . $txt[$this->_req->post->cur[$this->_id_sub]];
 
-			// The period value for paypal.
+			// The period value for PayPal.
 			$context['paypal_period'] = strtoupper(substr($this->_req->post->cur[$this->_id_sub], 0, 1));
 		}
 		else
@@ -348,7 +349,7 @@ class ProfileSubscriptions extends AbstractController
 	 * @param int $memID The id of the member who is ordering
 	 * @param string $period xx for none or a value of time
 	 */
-	private function _set_payment_gatway_context($memID, $period): void
+	private function _set_payment_gateway_context($memID, $period): void
 	{
 		global $context, $scripturl;
 
@@ -361,7 +362,7 @@ class ProfileSubscriptions extends AbstractController
 			{
 				$context['gateways'][] = $fields;
 
-				// Does this gateway have any javascript?
+				// Does this gateway have any JavaScript?
 				if (!empty($fields['javascript']))
 				{
 					theme()->addInlineJavascript($fields['javascript'], true);

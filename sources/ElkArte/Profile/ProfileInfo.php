@@ -30,7 +30,7 @@ use ElkArte\MessagesDelete;
 
 /**
  * Access all profile summary areas for a user including overall summary,
- * post listing, attachment listing, user statistics user permissions, user warnings
+ * post-listing, attachment listing, user statistics, user permissions, user warnings
  */
 class ProfileInfo extends AbstractController
 {
@@ -47,8 +47,8 @@ class ProfileInfo extends AbstractController
 	 * Called before all other methods when coming from the dispatcher or
 	 * action class.
 	 *
-	 * - If you initiate the class outside of those methods, call this method.
-	 * or setup the class yourself or fall awaits.
+	 * - If you initiate the class outside of those methods, call this method
+	 * or set up the class yourself, or failure awaits.
 	 */
 	public function pre_dispatch()
 	{
@@ -95,7 +95,7 @@ class ProfileInfo extends AbstractController
 		// Action control
 		$action = new Action('profile_info');
 
-		// By default we want the summary
+		// By default, we want the summary
 		$subAction = $action->initialize($subActions, 'summary');
 
 		// Final bits
@@ -148,11 +148,11 @@ class ProfileInfo extends AbstractController
 	 *
 	 * What it does:
 	 *
-	 * - Tab information for use in the summary page
-	 * - Each tab template defines a div, the value of which are the template(s) to load in that div
-	 * - array(array(1, 2), array(3, 4)) <div>template 1, template 2</div><div>template 3 template 4</div>
-	 * - Templates are named template_profile_block_YOURNAME
-	 * - Tabs with href defined will not preload/create any page divs but instead be loaded via ajax
+	 * - Tab information for use in the summary page.
+	 * - Each tab template defines a div, the value of which is the template(s) to load in that div.
+	 * - array(array(1, 2), array(3, 4)) <div>template 1, template 2</div><div>template 3 template 4</div>.
+	 * - Templates are named template_profile_block_YOURNAME.
+	 * - Tabs with href defined will not preload/create any page divs but instead be loaded via ajax.
 	 */
 	private function _register_summarytabs(): void
 	{
@@ -185,11 +185,11 @@ class ProfileInfo extends AbstractController
 		// Let addons add or remove to the tabs array
 		call_integration_hook('integrate_profile_summary', [$this->_memID]);
 
-		// Go forward with whats left after integration adds or removes
+		// Go forward with what's left after integration adds or removes
 		$summary_areas = '';
 		foreach ($context['summarytabs'] as $id => $tab)
 		{
-			// If the tab is active we add it
+			// If the tab is active, we add it
 			if (!$tab['active'])
 			{
 				unset($context['summarytabs'][$id]);
@@ -315,7 +315,7 @@ class ProfileInfo extends AbstractController
 	}
 
 	/**
-	 * Show IP and hostname information for the users current IP of record.
+	 * Show IP and hostname information for the users' current IP of record.
 	 */
 	private function _determine_member_ip(): void
 	{
@@ -362,7 +362,7 @@ class ProfileInfo extends AbstractController
 	}
 
 	/**
-	 * Checks if hte member is activated
+	 * Checks if the member is activated
 	 *
 	 * - Creates a link if the viewing member can activate a user
 	 */
@@ -370,7 +370,7 @@ class ProfileInfo extends AbstractController
 	{
 		global $context, $txt;
 
-		// If the user is awaiting activation, and the viewer has permission - setup some activation context messages.
+		// If the user is awaiting activation, and the viewer has permission - set up some activation context messages.
 		if ($context['member']['is_activated'] % 10 !== 1 && allowedTo('moderate_forum'))
 		{
 			$context['activate_type'] = $context['member']['is_activated'];
@@ -421,7 +421,7 @@ class ProfileInfo extends AbstractController
 		$context['start'] = $this->_req->getQuery('start', 'intval', 0);
 		$context['current_member'] = $this->_memID;
 
-		// What are we viewing
+		// What are we viewing?
 		$action = $this->_req->getQuery('sa', 'trim', '');
 		$action_title = ['messages' => 'Messages', 'attach' => 'Attachments', 'topics' => 'Topics', 'unwatchedtopics' => 'Unwatched'];
 		$action_title = $action_title[$action] ?? 'Posts';
@@ -444,14 +444,14 @@ class ProfileInfo extends AbstractController
 			throw new Exception('loadavg_show_posts_disabled', false);
 		}
 
-		// If we're specifically dealing with attachments use that function!
+		// If we're specifically dealing with attachments, use that function!
 		if ($action === 'attach')
 		{
 			$this->action_showAttachments();
 			return;
 		}
 
-		// Instead, if we're dealing with unwatched topics (and the feature is enabled) use that other function.
+		// Instead, if we're dealing with unwatched topics (and the feature is enabled), use that other function.
 		if ($action === 'unwatchedtopics' && $modSettings['enable_unwatch'])
 		{
 			$this->action_showUnwatched();
@@ -608,7 +608,7 @@ class ProfileInfo extends AbstractController
 			$context['posts'] = array_reverse($context['posts'], true);
 		}
 
-		// These are all the permissions that are different from board to board..
+		// These are all the permissions that are different from board to board.
 		if ($context['is_topics'])
 		{
 			$permissions = [
@@ -687,7 +687,7 @@ class ProfileInfo extends AbstractController
 		// OBEY permissions!
 		$boardsAllowed = boardsAllowedTo('view_attachments');
 
-		// Make sure we can't actually see anything...
+		// Make sure we can't see anything...
 		if (empty($boardsAllowed))
 		{
 			$boardsAllowed = [-1];
@@ -841,7 +841,7 @@ class ProfileInfo extends AbstractController
 	{
 		global $txt, $modSettings, $context;
 
-		// Only the owner can see the list (if the function is enabled of course)
+		// Only the owner can see the list (if the function is enabled, of course)
 		if ($this->user->id != $this->_memID || !$modSettings['enable_unwatch'])
 		{
 			return;
@@ -1006,13 +1006,13 @@ class ProfileInfo extends AbstractController
 			'class' => 'i-poll'
 		]);
 
-		// Number of topics started.
+		// The number of topics started.
 		$context['num_topics'] = UserStatsTopicsStarted($this->_memID);
 
-		// Number of polls started.
+		// The number of polls started.
 		$context['num_polls'] = UserStatsPollsStarted($this->_memID);
 
-		// Number of polls voted in.
+		// The number of polls voted in.
 		$context['num_votes'] = UserStatsPollsVoted($this->_memID);
 
 		// Format the numbers...
@@ -1056,7 +1056,7 @@ class ProfileInfo extends AbstractController
 		$context['member']['name'] = $this->_profile['real_name'];
 
 		$context['page_title'] = $txt['showPermissions'];
-		$board = empty($board) ? 0 : (int) $board;
+		$board = empty($board) ? 0 : $board;
 		$context['board'] = $board;
 
 		$curGroups = empty($this->_profile['additional_groups']) ? [] : explode(',', $this->_profile['additional_groups']);
@@ -1293,7 +1293,7 @@ class ProfileInfo extends AbstractController
 		foreach ($this->user->buddies as $buddy)
 		{
 			$member = MembersList::get($buddy);
-			$member->loadContext(true);
+			$member->loadContext();
 
 			$context['buddies'][$buddy] = $member;
 		}
@@ -1425,7 +1425,7 @@ class ProfileInfo extends AbstractController
 				$maxIndex = 10;
 				$start = $this->_req->getQuery('start', 'intval', 0);
 
-				// If they are a frequent topic starter we guess the range to help the query
+				// If they are a frequent topic starter, we guess the range to help the query
 				if ($topicCount > 1000)
 				{
 					[$min_topic_member, $max_topic_member] = findMinMaxUserTopic($this->_memID);
@@ -1471,7 +1471,7 @@ class ProfileInfo extends AbstractController
 	}
 
 	/**
-	 * If they have made recent attachments, lets get a list of them to display
+	 * If they have made recent attachments, let's get a list of them to display
 	 */
 	private function _load_recent_attachments(): void
 	{
@@ -1518,7 +1518,7 @@ class ProfileInfo extends AbstractController
 					}
 					elseif (!empty($modSettings['attachmentThumbWidth']) && !empty($modSettings['attachmentThumbHeight']))
 					{
-						// No thumbnail available ... use html instead
+						// No thumbnail available ... use HTML instead
 						if ($attachment['width'] > $modSettings['attachmentThumbWidth'] || $attachment['height'] > $modSettings['attachmentThumbHeight'])
 						{
 							$context['thumbs'][$i]['img'] = '<img id="thumb_' . $attachment['id'] . '" src="' . getUrl('action', ['action' => 'dlattach', 'topic' => $attachment['topic'] . '.0', 'attach' => $attachment['id']]) . '" title="" alt="" width="' . $modSettings['attachmentThumbWidth'] . '" height="' . $modSettings['attachmentThumbHeight'] . '" loading="lazy" />';

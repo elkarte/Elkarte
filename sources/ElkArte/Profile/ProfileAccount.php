@@ -27,7 +27,7 @@ use ElkArte\MembersList;
 use ElkArte\User;
 
 /**
- * Processes user warnings, account activation and account deletion
+ * Processes user warnings, account activation, and account deletion
  */
 class ProfileAccount extends AbstractController
 {
@@ -37,7 +37,7 @@ class ProfileAccount extends AbstractController
 	/** @var Member The \ElkArte\Member object is stored here to avoid some global */
 	private $_profile;
 
-	/** @var array Holds any errors that were generated when issuing a warning */
+	/** @var array Holds any errors generated when issuing a warning */
 	private $_issueErrors = [];
 
 	/**
@@ -57,7 +57,7 @@ class ProfileAccount extends AbstractController
 	 */
 	public function action_index()
 	{
-		// figure out what action to do... if we're called directly
+		// figure out what action to do... if we're called directly,
 		// actions in this class are called from the Profile menu, though.
 	}
 
@@ -135,7 +135,7 @@ class ProfileAccount extends AbstractController
 		// Perhaps taking a look first? Good idea that one.
 		$this->_preview_warning();
 
-		// If we have errors, lets set them for the template
+		// If we have errors, let's set them for the template
 		if (!empty($this->_issueErrors))
 		{
 			// Fill in the suite of errors.
@@ -212,7 +212,7 @@ class ProfileAccount extends AbstractController
 			];
 		}
 
-		// Setup the "default" templates.
+		// Set up the "default" templates.
 		foreach (['spamming', 'offence', 'insulting'] as $type)
 		{
 			$context['notification_templates'][] = [
@@ -262,7 +262,7 @@ class ProfileAccount extends AbstractController
 				$this->_issueErrors[] = 'warning_no_reason';
 			}
 
-			// If the value hasn't changed it's either no JS or a real no change (Which this will pass)
+			// If the value hasn't changed, it's either no JS or a real no change (Which this will pass)
 			if ($warn_reason === 'SAME')
 			{
 				$this->_req->post->warning_level = $this->_req->post->warning_level_nojs;
@@ -554,7 +554,7 @@ class ProfileAccount extends AbstractController
 	{
 		global $context, $cur_profile, $modSettings;
 
-		// Try get more time...
+		// Try to get more time...
 		detectServer()->setTimeLimit(600);
 
 		// @todo Add a way to delete pms as well?
@@ -579,7 +579,7 @@ class ProfileAccount extends AbstractController
 		require_once(SUBSDIR . '/Members.subs.php');
 
 		// Too often, people remove/delete their own only administrative account.
-		if (in_array(1, array_map('intval', explode(',', $cur_profile['additional_groups'])), true) || (int) $cur_profile['id_group'] === 1)
+		if ((int) $cur_profile['id_group'] === 1 || in_array(1, array_map('intval', explode(',', $cur_profile['additional_groups'])), true))
 		{
 			// Are you allowed to administrate the forum, as they are?
 			isAllowedTo('admin_forum');
@@ -605,7 +605,7 @@ class ProfileAccount extends AbstractController
 				require_once(SUBSDIR . '/Topic.subs.php');
 				require_once(SUBSDIR . '/Messages.subs.php');
 
-				// First off we delete any topics the member has started - if they wanted topics being done.
+				// First off, we delete any topics the member has started - if they wanted topics being done.
 				if ($this->_req->post->remove_type === 'topics')
 				{
 					// Fetch all topics started by this user.
@@ -629,14 +629,14 @@ class ProfileAccount extends AbstractController
 		// Do they need approval to delete?
 		elseif (!empty($modSettings['approveAccountDeletion']) && !allowedTo('moderate_forum'))
 		{
-			// Setup their account for deletion ;)
+			// Set up their account for deletion ;)
 			require_once(SUBSDIR . '/Members.subs.php');
 			updateMemberData($this->_memID, ['is_activated' => 4]);
 
 			// Another account needs approval...
 			updateSettings(['unapprovedMembers' => true], true);
 		}
-		// Also check if you typed your password correctly.
+		// Also, check if you typed your password correctly.
 		else
 		{
 			deleteMembers($this->_memID);

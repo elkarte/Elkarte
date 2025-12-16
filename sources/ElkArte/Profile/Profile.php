@@ -118,7 +118,7 @@ class Profile extends AbstractController
 			$context['profile_updated'] = $txt['profile_updated_own'];
 		}
 
-		// If it said no permissions that meant it wasn't valid!
+		// If it said no permissions, that meant it wasn't valid!
 		if (empty($this->_profile_include_data['permission']))
 		{
 			throw new Exception('no_access', false);
@@ -152,7 +152,7 @@ class Profile extends AbstractController
 		// Need JS if we made it this far
 		loadJavascriptFile('profile.js');
 
-		// Right - are we saving - if so let's save the old data first.
+		// Right - are we saving - if so, let's save the old data first.
 		$this->_save_updates();
 
 		// Have some errors for some reason?
@@ -165,7 +165,7 @@ class Profile extends AbstractController
 				$context['modify_error'][$error_type] = true;
 			}
 		}
-		// If it's you then we should redirect upon save.
+		// If it's you, then we should redirect upon save.
 		elseif (!empty($profile_vars) && $context['user']['is_owner'] && !$context['do_preview'])
 		{
 			redirectexit('action=profile;area=' . $this->_current_area . (empty($this->_current_subsection) ? '' : ';sa=' . $this->_current_subsection) . ';updated');
@@ -196,7 +196,7 @@ class Profile extends AbstractController
 	 * Possible fields:
 	 *   For Section:
 	 *    - string $title: Section title.
-	 *    - array $areas:  Array of areas within this section.
+	 *    - array $areas: Array of areas within this section.
 	 *
 	 *   For Areas:
 	 *    - string $label:      Text string that will be used to show the area in the menu.
@@ -563,7 +563,7 @@ class Profile extends AbstractController
 	}
 
 	/**
-	 * Just builds the link tree based on where were are in the profile section
+	 * Just builds the link tree based on where we are in the profile section
 	 * and whose profile is being viewed, etc.
 	 */
 	private function _build_profile_breadcrumbs(): void
@@ -611,7 +611,7 @@ class Profile extends AbstractController
 	{
 		global $txt, $context, $modSettings, $post_errors, $profile_vars;
 
-		// All the subActions that require a user password in order to validate.
+		// All the subActions that require a user password to validate.
 		$check_password = $context['user']['is_owner'] && !empty($this->_profile_include_data['password']);
 		$context['require_password'] = $check_password;
 
@@ -662,14 +662,6 @@ class Profile extends AbstractController
 
 				// Whatever we've done, we have nothing else to do here...
 				redirectexit('action=profile' . ($context['user']['is_owner'] ? '' : ';u=' . $this->_memID) . ';area=groupmembership' . (empty($msg) ? '' : ';msg=' . $msg));
-			}
-			// Authentication changes?
-			elseif ($this->_current_area === 'authentication')
-			{
-				$controller = new ProfileOptions(new EventManager());
-				$controller->setUser(User::$info);
-				$controller->pre_dispatch();
-				$controller->action_authentication(true);
 			}
 			elseif (in_array($this->_current_area, ['account', 'forumprofile', 'theme', 'contactprefs']))
 			{
@@ -728,7 +720,7 @@ class Profile extends AbstractController
 					updateSettings(['memberlist_updated' => time()]);
 				}
 
-				// If the member changed his/her birth date, update calendar statistics.
+				// If the member changed his/her birthdate, update calendar statistics.
 				if (isset($profile_vars['birthdate']) || isset($profile_vars['real_name']))
 				{
 					updateSettings([
@@ -755,7 +747,7 @@ class Profile extends AbstractController
 					logActions($log_changes);
 				}
 
-				// Have we got any post save functions to execute?
+				// Have we got any post-save functions to execute?
 				if (!empty($context['profile_execute_on_save']))
 				{
 					foreach ($context['profile_execute_on_save'] as $saveFunc)
@@ -777,7 +769,7 @@ class Profile extends AbstractController
 	/**
 	 * If a password validation before a change is needed, this is the function to do it
 	 *
-	 * @param bool $check_password if this profile update requires a password verification
+	 * @param bool $check_password if this profile update requires password verification
 	 * @throws Exception
 	 */
 	private function _check_password($check_password): void
@@ -792,13 +784,13 @@ class Profile extends AbstractController
 				$post_errors[] = 'no_password';
 			}
 
-			// Since the password got modified due to all the $_POST cleaning, lets undo it so we can get the correct password
+			// Since the password got modified due to all the $_POST cleaning, let's undo it so we can get the correct password
 			$this->_req->post->oldpasswrd = un_htmlspecialchars($this->_req->post->oldpasswrd);
 
 			// Does the integration want to check passwords?
 			$good_password = in_array(true, call_integration_hook('integrate_verify_password', [$this->_profile['member_name'], $this->_req->post->oldpasswrd, false]), true);
 
-			// Start up the password checker, we have work to do
+			// Start up the password checker; we have work to do
 			require_once(SUBSDIR . '/Auth.subs.php');
 
 			// Bad password!!!
