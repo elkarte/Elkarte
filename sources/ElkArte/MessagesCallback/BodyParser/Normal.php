@@ -24,7 +24,7 @@ use BBC\ParserWrapper;
  *
  * Represents a normal body parser implementation.
  * Implementing the BodyParserInterface, this class does not provide functionality to highlight words in a message.
- * instead all it does is run censor and parser.
+ * Instead, all it does is run censor and parser.
  */
 class Normal implements BodyParserInterface
 {

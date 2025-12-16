@@ -95,7 +95,7 @@ class SearchRenderer extends Renderer
 		// Make sure we don't end up with a practically empty message body.
 		$this->_this_message['body'] = preg_replace('~^(?:&nbsp;)+$~', '', $this->_this_message['body']);
 
-		// Do we have quote tag enabled?
+		// Do we have a quote tag enabled?
 		$quote_enabled = empty($modSettings['disabledBBC']) || !in_array('quote', explode(',', $modSettings['disabledBBC']));
 
 		$output_pre = TopicUtil::prepareContext([$this->_this_message])[$this->_this_message['id_topic']];
@@ -225,14 +225,16 @@ class SearchRenderer extends Renderer
 					'url' => getUrl('action', ['action' => 'notify', 'topic' => $output['id'] . '.msg' . $this->_this_message['id_msg']]),
 					'text' => 'notify',
 					'icon' => 'envelope',
-					'enabled' => in_array($output['board']['id'], $this->_options['boards_can']['mark_any_notify']) || in_array(0, $this->_options['boards_can']['mark_any_notify']) && !$context['user']['is_guest'],
+					'enabled' => in_array($output['board']['id'], $this->_options['boards_can']['mark_any_notify'])
+						|| (in_array(0, $this->_options['boards_can']['mark_any_notify']) && !$context['user']['is_guest']),
 				],
 				// If they *can* reply?
 				'reply' => [
 					'url' => getUrl('action', ['action' => 'post', 'topic' => $output['id'] . '.msg' . $this->_this_message['id_msg']]),
 					'text' => 'reply',
 					'icon' => 'modify',
-					'enabled' => in_array($output['board']['id'], $this->_options['boards_can']['post_reply_any']) || in_array(0, $this->_options['boards_can']['post_reply_any']),
+					'enabled' => in_array($output['board']['id'], $this->_options['boards_can']['post_reply_any'])
+						|| in_array(0, $this->_options['boards_can']['post_reply_any']),
 				],
 				// If they *can* quote?
 				'quote' => [
@@ -245,16 +247,16 @@ class SearchRenderer extends Renderer
 		}
 
 		// Drop any non-enabled ones
-		return array_filter($searchButtons, static fn($button) => !isset($button['enabled']) || (bool) $button['enabled']);
+		return array_filter($searchButtons, static fn($button) => !isset($button['enabled']) || $button['enabled']);
 	}
 
 	/**
 	 * Used to highlight body text with strings that match the search term
 	 *
 	 * Callback function used in $body_highlighted.
-	 * match[2] would contain terms that start with <
-	 * match[1] would be a word in a word, and could be just the word
-	 * match[3] would be the search term as a full word
+	 *   - match[2] would contain terms that start with <
+	 *   - match[1] would be a word in a word, and could be just the word
+	 *   - match[3] would be the search term as a full word
 	 *
 	 * @param string[] $matches
 	 *
@@ -276,7 +278,7 @@ class SearchRenderer extends Renderer
 	}
 
 	/**
-	 * Can the item be locked
+	 * Can the item be locked?
 	 *
 	 * @param array $output
 	 * @param bool $started
@@ -291,7 +293,7 @@ class SearchRenderer extends Renderer
 	}
 
 	/**
-	 * Can the item be pinned
+	 * Can the item be pinned?
 	 *
 	 * @param array $output
 	 * @return bool
@@ -303,7 +305,7 @@ class SearchRenderer extends Renderer
 	}
 
 	/**
-	 * Can the item be moved
+	 * Can the item be moved?
 	 *
 	 * @param array $output
 	 * @param bool $started
@@ -319,7 +321,7 @@ class SearchRenderer extends Renderer
 	}
 
 	/**
-	 * Can the item be removed
+	 * Can the item be removed?
 	 *
 	 * @param array $output
 	 * @param bool $started

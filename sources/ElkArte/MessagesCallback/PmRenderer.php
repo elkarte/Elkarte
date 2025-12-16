@@ -208,7 +208,7 @@ class PmRenderer extends Renderer
 				'enabled' => empty($output['is_unread']) && $context['folder'] !== 'sent' && $output['member']['id'] != $this->user->id,
 				'submenu' => true,
 			],
-			// Can they report this message
+			// Can they report this message?
 			'warn_button' => [
 				'text' => 'pm_report_to_admin',
 				'url' => getUrl('action', ['action' => 'pm', 'sa' => 'report', 'l' => $context['current_label_id'], 'pmsg' => $output['id'], '{session_data}']),
@@ -229,7 +229,7 @@ class PmRenderer extends Renderer
 		];
 
 		// Drop any non-enabled ones
-		$pmButtons = array_filter($pmButtons, static fn($button) => !isset($button['enabled']) || (bool) $button['enabled']);
+		$pmButtons = array_filter($pmButtons, static fn($button) => !isset($button['enabled']) || $button['enabled']);
 
 		return ['pmbuttons' => $pmButtons];
 	}

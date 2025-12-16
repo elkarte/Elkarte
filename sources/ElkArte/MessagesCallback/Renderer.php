@@ -40,7 +40,7 @@ abstract class Renderer
 	/** @var int Position tracker, to know where we are into the request */
 	protected $_counter = 0;
 
-	/** @var bool Should we show the signature of this message? */
+	/** @var array Should we show the signature of this message? */
 	protected $_signature_shown;
 
 	/** @var array The current message being prepared */
@@ -50,7 +50,7 @@ abstract class Renderer
 	protected $_idx_mapper = [];
 
 	/**
-	 * Renderer constructor, starts everything.
+	 * Renderer constructor starts everything.
 	 *
 	 * @param Object $_dbRequest
 	 * @param Object $user
@@ -91,7 +91,7 @@ abstract class Renderer
 			return false;
 		}
 
-		// Remember which message this is.  (ie. reply #83)
+		// Remember which message this is.  (i.e., reply #83)
 		if ($this->_counter === 0 || $reset)
 		{
 			$this->_counter = empty($context['start']) ? 0 : $context['start'];
@@ -114,7 +114,7 @@ abstract class Renderer
 		$member_context = MembersList::get($id_member);
 		$member_context->loadContext();
 
-		// If it couldn't load, or the user was a guest.... someday may be done with a guest table.
+		// If it couldn't load, or the user was a guest... someday may be done with a guest table.
 		if ($member_context->isEmpty())
 		{
 			$this->_adjustGuestContext($member_context);
@@ -204,7 +204,7 @@ abstract class Renderer
 	{
 		global $txt;
 
-		// Notice this information isn't used anywhere else....
+		// Notice this information isn't used anywhere else...
 		$member_context['name'] = $this->_this_message[$this->_idx_mapper->name];
 		$member_context['id'] = 0;
 		$member_context['group'] = $txt['guest_title'];
@@ -259,13 +259,13 @@ abstract class Renderer
 	abstract protected function _adjustAllMembers($member_context);
 
 	/**
-	 * The most important bit that differentiate the various implementations.
+	 * The most important bit that differentiates the various implementations.
 	 * It is supposed to prepare the $output array with all the information
 	 * needed by the template to properly render the message.
 	 *
 	 * The method of the class extending this abstract may run
 	 * parent::_buildOutputArray()
-	 * as first statement in order to have a starting point and
+	 * as first statement to have a starting point and
 	 * some commonly used content for the array.
 	 *
 	 * @return array
