@@ -71,7 +71,7 @@ class UserAccessMentions implements ScheduledTaskInterface
 				// once for those he cannot access
 				foreach (['can', 'cannot'] as $can)
 				{
-					// Let's always start from the begin
+					// Let's always start from the beginning
 					$start = $begin;
 
 					while (true)

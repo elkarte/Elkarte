@@ -30,11 +30,11 @@ class AutoOptimize implements ScheduledTaskInterface
 	{
 		global $modSettings, $db_prefix;
 
-		// we're working with them databases but we shouldn't :P
+		// we're working with them databases, but we shouldn't :P
 		$db = database();
 		$db_table = db_table();
 
-		// By default do it now!
+		// By default, do it now!
 		$delay = false;
 
 		// As a kind of hack, if the server load is too great delay, but only by a bit!

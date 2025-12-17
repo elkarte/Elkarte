@@ -47,7 +47,7 @@ class RemoveOldDrafts implements ScheduledTaskInterface
 		// We need this for language items
 		ThemeLoader::loadEssentialThemeData();
 
-		// Find all of the old drafts
+		// Find all the old drafts
 		$request = $db->query('', '
 			SELECT 
 				id_draft

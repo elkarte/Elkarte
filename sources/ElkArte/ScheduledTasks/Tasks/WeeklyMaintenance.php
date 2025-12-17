@@ -123,7 +123,7 @@ class WeeklyMaintenance implements ScheduledTaskInterface
 				// Figure out when our cutoff time is.  1 day = 86400 seconds.
 				$t = time() - $modSettings['pruneReportLog'] * 86400;
 
-				// This one is more complex then the other logs.  First we need to figure out which reports are too old.
+				// This one is more complex than the other logs.  First we need to figure out which reports are too old.
 				$reports = [];
 				$db->fetchQuery('
 					SELECT 
