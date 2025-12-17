@@ -15,7 +15,7 @@ namespace ElkArte\VerificationControls\VerificationControl;
 
 /**
  * This class shows an anti-spam bot box in the form
- * The proper response is to leave the field empty, bots however will see this
+ * The proper response is to leave the field empty, bots, however, will see this
  * much like a session field and populate it with a value.
  *
  * Adding additional catch terms is recommended to keep bots from learning

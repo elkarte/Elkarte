@@ -41,9 +41,9 @@ class VerificationControls
 	protected $_sessionVal;
 
 	/**
-	 * Obviously the entry point of verification
+	 * The entry point of verification
 	 *
-	 * @param \ElkArte\Sessions\SessionIndex $sessionVal
+	 * @param SessionIndex $sessionVal
 	 * @param array $settings Basically $modSettings
 	 * @param array $verificationOptions
 	 * @param bool $isNew If the control was initialized before
@@ -119,7 +119,7 @@ class VerificationControls
 	}
 
 	/**
-	 * Simple function that find and returns all the verification controls known to Elk
+	 * Function that finds and returns all the verification controls known to Elk
 	 */
 	protected static function loadFSControls()
 	{
@@ -175,7 +175,7 @@ class VerificationControls
 			}
 		}
 
-		// Any errors means we refresh potentially.
+		// Any errors mean we refresh potentially.
 		if ($increase_error_count)
 		{
 			if (empty($this->_sessionVal['errors']))
@@ -188,7 +188,7 @@ class VerificationControls
 				$force_refresh = true;
 			}
 
-			// Keep a track of these.
+			// Keep track of these.
 			$count = $this->_sessionVal['errors'] + 1;
 			$this->_sessionVal['errors'] = $count;
 		}

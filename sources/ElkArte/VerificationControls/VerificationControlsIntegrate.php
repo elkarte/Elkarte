@@ -51,7 +51,7 @@ class VerificationControlsIntegrate
 	}
 
 	/**
-	 * Create a anti-bot verification control
+	 * Create an anti-bot verification control
 	 *
 	 * @param array $verificationOptions
 	 * @param bool $do_test = false If we are validating the input to a verification control
@@ -63,7 +63,7 @@ class VerificationControlsIntegrate
 	{
 		global $context, $modSettings;
 
-		// We need to remember this because when failing the page is reloaded and the
+		// We need to remember this because when failing, the page is reloaded and the
 		// code must remain the same (unless it has to change)
 		static $all_instances = [];
 
@@ -137,7 +137,7 @@ class VerificationControlsIntegrate
 			$sessionVal['did_pass'] = true;
 		}
 
-		// Say that everything went well chaps.
+		// Say that everything went well, chaps.
 		return true;
 	}
 }
