@@ -12,7 +12,6 @@
 
 namespace ElkArte\Helper;
 
-use tubalmartin\CssMin\Minifier as CSSmin;
 use Wikimedia\Minify\JavaScriptMinifier;
 
 /**
@@ -452,7 +451,7 @@ class SiteCombiner
 			$this->_archive_header = "/*\n *" . $this->_archive_filenames . "\n */\n";
 			$this->_combineFiles('css');
 
-			// Compress with CssMin
+			// Compress CSS
 			$this->_minified_cache = $this->_minify ? $this->cssMinify($this->_cache) : trim($this->_cache);
 
 			// Combine in any pre minimized CSS files to our string
@@ -470,35 +469,21 @@ class SiteCombiner
 	 *
 	 * What it does:
 	 *
-	 * - Attempt to use CssMin
-	 * - Failing that will return original uncompressed file
+	 * - Applies fast whitespace and comment removal
 	 *
 	 * @param string $css data to minify
-	 * @param bool $fast if true, only remove whitespace to minify
 	 * @return string Minified CSS data
 	 */
-	public function cssMinify($css = '', $fast = false): string
+	public function cssMinify(string $css = ''): string
 	{
-		if ($fast)
-		{
-			// Simple fast whitespace and comment removal
-			return trim(
-				str_replace(
-					['; ', ': ', ' {', '{ ', ', ', '} ', ';}', '( ', ' )', '[ ', ' ]'],
-					[';', ':', '{', '{', ',', '}', '}', '(', ')', '[', ']'],
-					preg_replace(['~\s+~', '~/\*.*?\*/~s'], [' ', ''], $css)
-				)
-			);
-		}
-
-		// Temporary manual loading of CSS min files
-		require_once(EXTDIR . '/CssMin/Minifier.php');
-		require_once(EXTDIR . '/CssMin/Colors.php');
-		require_once(EXTDIR . '/CssMin/Utils.php');
-		require_once(EXTDIR . '/CssMin/Command.php');
-
-		// CSSmin it to save some space
-		return (new CSSmin())->run($css);
+		// Simple fast whitespace and comment removal from Wikimedia CSSMin.php
+		return trim(
+			str_replace(
+				[ '; ', ': ', ' {', '{ ', ', ', '} ', ';}', '( ', ' )', '[ ', ' ]' ],
+				[ ';', ':', '{', '{', ',', '}', '}', '(', ')', '[', ']' ],
+				preg_replace( [ '/\s+/', '/\/\*.*?\*\//s' ], [ ' ', '' ], $css )
+			)
+		);
 	}
 
 	/**
