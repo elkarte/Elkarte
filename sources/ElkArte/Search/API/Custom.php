@@ -21,13 +21,13 @@ use ElkArte\Database\AbstractResult;
 use ElkArte\Helper\Util;
 
 /**
- * SearchAPI-Custom.class.php, Custom Search API class .. used when custom ElkArte index is used
+ * SearchAPI-Custom.class.php, Custom Search API class... used when custom ElkArte index is used
  *
  * @package Search
  */
 class Custom extends Standard
 {
-	/** @var string This is the last version of ElkArte that this was tested on, to protect against API changes. */
+	/** @var string This is the last version of ElkArte that this was tested on to protect against API changes. */
 	public $version_compatible = 'ElkArte 2.0';
 
 	/** @var string This won't work with versions of ElkArte less than this. */
@@ -67,7 +67,7 @@ class Custom extends Standard
 	}
 
 	/**
-	 * If the settings don't exist we can't continue.
+	 * If the settings don't exist, we can't continue.
 	 */
 	public function isValid(): bool
 	{
@@ -154,7 +154,7 @@ class Custom extends Standard
 			$query_params['complex_body_' . ($count++)] = $this->prepareWord($regularWord, $search_data['no_regexp']);
 		}
 
-		// Modifiers such as specific user or specific board.
+		// Modifiers such as a specific user or specific board.
 		$query_where = array_merge($query_where, $this->queryWhereModifiers($query_params));
 
 		// Modifiers to exclude words from the subject
@@ -197,7 +197,7 @@ class Custom extends Standard
 	/**
 	 * After a post is made, we update the search index database
 	 *
-	 * @param array $msgOptions Contains the post data
+	 * @param array $msgOptions Contains the post-data
 	 * @param array $topicOptions Not used in this API
 	 * @param array $posterOptions Not used in this API
 	 */
@@ -225,7 +225,7 @@ class Custom extends Standard
 	/**
 	 * After a post is modified, we update the search index database.
 	 *
-	 * @param array $msgOptions The post data
+	 * @param array $msgOptions The post-data
 	 * @param array $topicOptions Not used in this API
 	 * @param array $posterOptions Not used in this API
 	 */

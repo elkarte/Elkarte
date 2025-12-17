@@ -36,7 +36,7 @@ use mysqli;
  */
 class Manticore extends AbstractAPI
 {
-	/** @var string This is the last version of ElkArte that this was tested on, to protect against API changes. */
+	/** @var string This is the last version of ElkArte that this was tested on to protect against API changes. */
 	public $version_compatible = 'ElkArte 2.0 dev';
 
 	/** @var string This won't work with versions of ElkArte less than this. */
@@ -69,7 +69,7 @@ class Manticore extends AbstractAPI
 	}
 
 	/**
-	 * If the settings don't exist we can't continue.
+	 * If the settings don't exist, we can't continue.
 	 */
 	public function isValid(): bool
 	{
@@ -150,7 +150,7 @@ class Manticore extends AbstractAPI
 
 			$query .= " WHERE MATCH('" . $where_match . "')";
 
-			// Set the limits based on the search parameters, board, member, dates, etc
+			// Set the limits based on the search parameters, board, member, dates, etc.
 			$extra_where = $this->buildQueryLimits();
 			if (!empty($extra_where))
 			{
@@ -177,7 +177,7 @@ class Manticore extends AbstractAPI
 			// Set any options needed, like field weights.
 			// ranker is a modification of SPH_RANK_SPH04 sum((4*lcs+2*(min_hit_pos==1)+exact_hit)*user_weight)*1000+bm25
 			// Each term will return a 0-1000 range we include our acprel value for the final total and order.  Position
-			// is the relative reply # to a post, so the later a reply in a topic the less overall weight it is given
+			// is the relative reply # to a post, so the later a reply in a topic, the less overall weight it is given
 			// the calculated value of ranker is returned in WEIGHTS() which we name relevance in the query
 			$subject_weight = empty($modSettings['search_weight_subject']) ? 30 : $modSettings['search_weight_subject'];
 			$query .= '
@@ -191,7 +191,7 @@ class Manticore extends AbstractAPI
 			// Execute the search query.
 			$request = mysqli_query($myManticore, $query);
 
-			// Bad query, lets log the error and act like it's not our fault
+			// Bad query, let's log the error and act like it's not our fault
 			if ($request === false)
 			{
 				// Just log the error.
@@ -251,7 +251,7 @@ class Manticore extends AbstractAPI
 	}
 
 	/**
-	 * Connect to the Manticore server, on failure log error and exit
+	 * Connect to the Manticore server, on failure log error, and exit
 	 *
 	 * @return mysqli
 	 * @throws \ElkArte\Exceptions\Exception
@@ -292,7 +292,7 @@ class Manticore extends AbstractAPI
 	}
 
 	/**
-	 * Builds the query modifiers based on age, member, board etc
+	 * Builds the query modifiers based on age, member, board, etc
 	 *
 	 * @return array
 	 */

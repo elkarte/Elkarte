@@ -127,7 +127,7 @@ class WeightFactors
 
 		call_integration_hook('integrate_search_weights', [&$this->_weight_factors]);
 
-		// Set the weight factors for each area (frequency, age, etc) as defined in the ACP
+		// Set the weight factors for each area (frequency, age, etc.) as defined in the ACP
 		$this->_calculate_weights($this->_weight_factors, $this->_input_weights);
 
 		// Zero weight.  Weightless :P.
@@ -139,10 +139,10 @@ class WeightFactors
 				throw new Exception('search_invalid_weights');
 			}
 
-			// Even if users will get an answer, the admin should know something is broken
+			// Even if users get an answer, the admin should know something is broken
 			Errors::instance()->log_lang_error('search_invalid_weights');
 
-			// Instead is better to give normal users and guests some kind of result
+			// Instead, is better to give normal users and guests some kind of result
 			// using our defaults.
 			// Using a different variable here because it may be the hook is screwing
 			// things up

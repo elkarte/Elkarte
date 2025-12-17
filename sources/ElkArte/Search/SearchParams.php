@@ -83,7 +83,7 @@ class SearchParams extends ValuesContainer
 	 */
 	protected function prepare(): void
 	{
-		// Due to IE's 2083 character limit, we have to compress long search strings
+		// Due to IE's 2083-character limit, we have to compress long search strings
 		$temp_params = base64_decode(str_replace(['-', '_', '.'], ['+', '/', '='], $this->_search_string));
 
 		// Test for gzuncompress failing, our ErrorException will die on any E_WARNING with no
@@ -106,7 +106,7 @@ class SearchParams extends ValuesContainer
 	}
 
 	/**
-	 * Encodes search params ($this->_search_params) in an URL-compatible way
+	 * Encodes search params ($this->_search_params) in a URL-compatible way
 	 *
 	 * @param array $search build param index with specific search term (did you mean?)
 	 *
@@ -126,7 +126,7 @@ class SearchParams extends ValuesContainer
 		$encoded = json_encode($temp_params);
 
 		// Due to some potential browser/server limitations, attempt to compress
-		// old IE's 2083 character limit, we have to compress long search
+		// old IE's 2083-character limit; we have to compress long search
 		set_error_handler(static function () { /* ignore errors */ });
 		try
 		{
@@ -150,7 +150,7 @@ class SearchParams extends ValuesContainer
 	 *
 	 * @param array $params - An array of search parameters
 	 * @param int $recentPercentage - A coefficient to calculate the lowest message id to start search from
-	 * @param int $maxMembersToSearch - The maximum number of members to consider when multiple are found
+	 * @param int $maxMembersToSearch - The maximum number of members to consider when multiple is found
 	 */
 	public function merge($params, $recentPercentage, $maxMembersToSearch): void
 	{
@@ -324,7 +324,7 @@ class SearchParams extends ValuesContainer
 	 */
 	public function setTopic($params): void
 	{
-		// Searching a specific topic?
+		// Searching for a specific topic?
 		if (!empty($params['topic']) || (!empty($params['search_selection']) && $params['search_selection'] === 'topic'))
 		{
 			$this->_search_params['topic'] = empty($params['search_selection']) ? (int) $params['topic'] : ($params['sd_topic'] ?? '');
@@ -339,7 +339,7 @@ class SearchParams extends ValuesContainer
 	 */
 	public function setUser($params): void
 	{
-		// Default the user name to a wildcard matching every user (*).
+		// Default the username to a wildcard matching every user (*).
 		if (!empty($this->_search_params['userspec']) || (!empty($params['userspec']) && $params['userspec'] !== '*'))
 		{
 			$this->_search_params['userspec'] = $this->_search_params['userspec'] ?? $params['userspec'];
@@ -349,7 +349,7 @@ class SearchParams extends ValuesContainer
 	/**
 	 * So you want to search for items based on a specific user, or group of users or wildcard users?
 	 *
-	 * Will use real_name first and if nothing found, backup to member_name
+	 * Will use real_name first, and if nothing is found, back up to member_name
 	 *
 	 * @param int $maxMembersToSearch
 	 */
@@ -386,12 +386,12 @@ class SearchParams extends ValuesContainer
 			]
 		);
 
-		// Simply do nothing if there're too many members matching the criteria.
+		// Simply do nothing if there are too many members matching the criteria.
 		if ($request->num_rows() > $maxMembersToSearch)
 		{
 			$this->_userQuery = '';
 		}
-		// Nothing? lets try the poster name instead since that is what they go by
+		// Nothing? let's try the poster name instead since that is what they go by
 		elseif ($request->num_rows() === 0)
 		{
 			$this->_userQuery = $this->_db->quote(
@@ -506,7 +506,7 @@ class SearchParams extends ValuesContainer
 			]
 		));
 
-		// This error should pro'bly only happen for hackers.
+		// This error should probably only happen for hackers.
 		if (empty($brd))
 		{
 			$context['search_errors']['no_boards_selected'] = true;
