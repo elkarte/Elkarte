@@ -1,7 +1,10 @@
 <?php
 
 /**
- * This file contains those functions specific to the cached search results in session
+ * Class Session
+ *
+ * Manages search session caching, including search IDs, parameters, and results
+ * count, for efficient search queries.
  *
  * @package   ElkArte Forum
  * @copyright ElkArte Forum contributors
@@ -18,11 +21,14 @@ use ElkArte\Sessions\SessionIndex;
 /**
  * Class Session
  *
+ * This is the session-backed glue that tracks the current search id, total results count,
+ * and parameters so paginated views and follow-up requests can reuse cached search
+ * results efficiently.
+ *
  * @package ElkArte\Search\Cache
  */
 class Session
 {
-
 	/** @var int $_id_search The ID used for searching. */
 	protected $_id_search = 0;
 
@@ -116,6 +122,12 @@ class Session
 		return $this->_num_results;
 	}
 
+	/**
+	 * Sets the value of the number of results.
+	 *
+	 * @param int $num_results The number of results to be set. Defaults to 0 if not provided.
+	 * @return void
+	 */
 	public function setNumResults($num_results = 0): void
 	{
 		$this->_num_results = (int) $num_results;

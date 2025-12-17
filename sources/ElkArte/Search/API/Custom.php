@@ -17,7 +17,6 @@
 
 namespace ElkArte\Search\API;
 
-use ElkArte\Database\AbstractResult;
 use ElkArte\Helper\Util;
 
 /**
@@ -28,10 +27,10 @@ use ElkArte\Helper\Util;
 class Custom extends Standard
 {
 	/** @var string This is the last version of ElkArte that this was tested on to protect against API changes. */
-	public $version_compatible = 'ElkArte 2.0';
+	public $version_compatible = 'ElkArte 2.0 dev';
 
 	/** @var string This won't work with versions of ElkArte less than this. */
-	public $min_elk_version = 'ElkArte 1.0';
+	public $min_elk_version = 'ElkArte 2.0 Beta 1';
 
 	/** @var bool Is it supported? */
 	public $is_supported = true;
@@ -56,7 +55,7 @@ class Custom extends Standard
 			return;
 		}
 
-		if (empty($modSettings['search_custom_index_config']))
+		if (!$this->isValid())
 		{
 			return;
 		}

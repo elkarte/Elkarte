@@ -12,7 +12,6 @@
 
 namespace ElkArte\Search\API;
 
-use ElkArte\Database\AbstractResult;
 use ElkArte\Database\AbstractSearch;
 use ElkArte\Database\QueryInterface;
 use ElkArte\Helper\HttpReq;

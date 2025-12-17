@@ -17,7 +17,6 @@
 namespace ElkArte\Search\API;
 
 use ElkArte\Cache\Cache;
-use ElkArte\Database\AbstractResult;
 use ElkArte\Errors\Errors;
 use ElkArte\User;
 use Exception;
@@ -40,7 +39,7 @@ class Manticore extends AbstractAPI
 	public $version_compatible = 'ElkArte 2.0 dev';
 
 	/** @var string This won't work with versions of ElkArte less than this. */
-	public $min_elk_version = 'ElkArte 1.0 Beta 1';
+	public $min_elk_version = 'ElkArte 2.0 Beta 1';
 
 	/** @var bool Is it supported?  */
 	public $is_supported = true;

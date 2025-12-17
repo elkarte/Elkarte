@@ -16,7 +16,6 @@
 
 namespace ElkArte\Search\API;
 
-use ElkArte\Database\AbstractResult;
 use ElkArte\Search\Cache\Session;
 use Exception;
 
@@ -31,7 +30,7 @@ class Standard extends AbstractAPI
 	public $version_compatible = 'ElkArte 2.0 dev';
 
 	/** @var string This won't work with versions of ElkArte less than this. */
-	public $min_elk_version = 'ElkArte 1.0 Beta';
+	public $min_elk_version = 'ElkArte 2.0 Beta 1';
 
 	/** @var bool Standard search is supported by default. */
 	public $is_supported = true;
