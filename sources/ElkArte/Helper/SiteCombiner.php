@@ -332,12 +332,11 @@ class SiteCombiner
 	 *
 	 * What it does:
 	 *
-	 * - Attempt to use JavaScriptMinifier
+	 * - Use JavaScriptMinifier
 	 * - Failing that will return original uncompressed file
 	 */
 	public function jsMinify($js)
 	{
-		require_once(EXTDIR . '/JavaScriptMinifier.php');
 		$fetch_data = JavaScriptMinifier::minify($js);
 
 		// If we have nothing to return, use the original data

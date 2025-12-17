@@ -18,7 +18,6 @@ namespace ElkArte\Sessions\SessionHandler;
 
 use ElkArte\Database\QueryInterface;
 use ElkArte\Helper\ValuesContainer;
-use ReturnTypeWillChange;
 
 /**
  * Class DatabaseHandler

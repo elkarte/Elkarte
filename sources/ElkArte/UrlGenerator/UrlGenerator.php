@@ -35,7 +35,7 @@ class UrlGenerator
 	protected $_replace = [];
 
 	/**
-	 * The begin of all
+	 * The beginning of all
 	 *
 	 * @param array $options
 	 */
@@ -51,7 +51,7 @@ class UrlGenerator
 	}
 
 	/**
-	 * Adds a new UrlGenerator (e.g. standard, semantic, etc.)
+	 * Adds a new UrlGenerator (e.g., standard, semantic, etc.)
 	 *
 	 * @param object|string $generator
 	 */
@@ -61,7 +61,7 @@ class UrlGenerator
 	}
 
 	/**
-	 * Initialized the URL generator (i.e. instantiate the class if needed)
+	 * Initialized the URL generator (i.e., instantiate the class if needed)
 	 * and sets the generators according to the types they support.
 	 *
 	 * @param object|string $name

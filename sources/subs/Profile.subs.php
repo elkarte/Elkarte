@@ -1942,7 +1942,7 @@ function findMinMaxUserTopic($memID, $board = null)
 
 	$db = database();
 
-	$is_owner = $memID == User::$info->id;
+	$is_owner = (int) $memID === User::$info->id;
 
 	$request = $db->query('', '
 		SELECT 

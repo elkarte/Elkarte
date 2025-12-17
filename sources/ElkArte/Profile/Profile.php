@@ -461,7 +461,7 @@ class Profile extends AbstractController
 						'label' => $txt['subscriptions'],
 						'controller' => ProfileSubscriptions::class,
 						'function' => 'action_subscriptions',
-						'enabled' => !empty($modSettings['paid_enabled']),
+						'enabled' => !empty($modSettings['paid_enabled']) && (empty($modSettings['paidsubs_test'] && !$context['user']['is_admin'])),
 						'permission' => [
 							'own' => ['profile_view_own'],
 							'any' => ['moderate_forum'],

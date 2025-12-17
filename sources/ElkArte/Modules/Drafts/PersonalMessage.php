@@ -177,7 +177,7 @@ class PersonalMessage extends AbstractModule
 
 		// Load the draft and add it to an object container
 		$this->_loaded_draft = new ValuesContainer(loadDraft($id_draft, 1, true, true));
-		return true;
+		return null;
 	}
 
 	/**

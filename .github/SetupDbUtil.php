@@ -32,6 +32,10 @@ require_once(BOARDDIR . '/sources/ext/ClassLoader.php');
 $loader = new ClassLoader();
 $loader->setPsr4('ElkArte\\', BOARDDIR . '/sources/ElkArte');
 $loader->setPsr4('BBC\\', BOARDDIR . '/sources/ElkArte/BBC');
+// Not needed, just being completely safe
+$loader->setPsr4('Addons\\', BOARDDIR . '/Addons');
+$loader->setPsr4('Wikimedia\\Minify\\', EXTDIR . '/Wikimedia/Minify');
+$loader->setPsr4('Michelf\\', EXTDIR . '/Michelf');
 $loader->register();
 
 /**

@@ -23,11 +23,13 @@ use ElkArte\User;
  *
  * @param int[]|int $topics - represents the topics the action is happening to.
  * @param string $type - can be any of reply, sticky, lock, unlock, remove,
- *                       move, merge, and split.  An appropriate message will be sent for each.
+ * move, merge, and split.  An appropriate message will be sent for each.
  * @param int[]|int $exclude = array() - members in exclude array will not be
- *                             processed for the topic with the same key.
- * @param int[]|int $members_only = array() - are the only ones that will be sent the notification if they have it on.
- * @param array $pbe = array() - array containing user_info if this is being run as a result of an email posting
+ * processed for the topic with the same key.
+ * @param int[]|int $members_only = array() - are the only ones that will be sent the
+ * notification if they have it on.
+ * @param array $pbe = array() - array containing user_info if this is being run as a
+ * result of an email posting
  */
 function sendNotifications($topics, $type, $exclude = [], $members_only = [], $pbe = [])
 {
@@ -435,12 +437,18 @@ function filterNotificationMethods($possible_methods, $type)
 }
 
 /**
- * Returns all the enabled methods of notification for a specific
- * type of notification.
+ * Returns all the enabled methods of notification for a specific type of notification.
  *
- * @param string $type The type of notification (mentionmem, likemsg, etc.)
+ * @param string $type The type of notification (mentionmem, likemsg, etc.) Can use '*' for all
  *
- * @return array
+ * @return array with elements of the form
+ * [buddy] => Array(
+ *   [email] => 1
+ *   [emaildaily] => 1
+ *   [emailweekly] => 1
+ *   [notification] => 2
+ * )
+ * Values of 2 indicate a site default, 1 or 2 means the type is available and selectable.
  */
 function getConfiguredNotificationMethods($type = '*')
 {

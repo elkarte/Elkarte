@@ -289,7 +289,11 @@ class Bootstrap
 		$loader = new ClassLoader();
 		$loader->setPsr4('ElkArte\\', SOURCEDIR . '/ElkArte');
 		$loader->setPsr4('BBC\\', SOURCEDIR . '/ElkArte/BBC');
+		// Place for addons to install and minimize source mutation.
 		$loader->setPsr4('Addons\\', BOARDDIR . '/Addons');
+		// External libraries should use vendor, but hey, ho here we are.
+		$loader->setPsr4('Wikimedia\\Minify\\', EXTDIR . '/Wikimedia/Minify');
+		$loader->setPsr4('Michelf\\', EXTDIR . '/Michelf');
 		$loader->register();
 	}
 

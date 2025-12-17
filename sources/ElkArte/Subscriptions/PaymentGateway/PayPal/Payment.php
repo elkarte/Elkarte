@@ -325,7 +325,7 @@ class Payment implements PaymentInterface
 		$_POST['item_number'] = $member_id . '+' . $subscription_id;
 		$request->free_result();
 
-		return true;
+		return null;
 	}
 
 	/**

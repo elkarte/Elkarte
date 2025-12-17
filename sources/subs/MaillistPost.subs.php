@@ -27,6 +27,7 @@ use ElkArte\Maillist\EmailParse;
 use ElkArte\MembersList;
 use ElkArte\Notifications\Notifications;
 use ElkArte\Notifications\NotificationsTask;
+use Michelf\MarkdownExtra;
 
 /**
  * Converts text / HTML to BBC
@@ -44,7 +45,7 @@ use ElkArte\Notifications\NotificationsTask;
  *
  * @return string
  * @uses Html2BBC.class.php for the html to bbc conversion
- * @uses markdown.php for text to html conversions
+ * @uses Markdown.php for text to html conversions
  * @package Maillist
  */
 function pbe_email_to_bbc($text, $html)
@@ -76,10 +77,10 @@ function pbe_email_to_bbc($text, $html)
 		$text = str_replace(['[quote]', '[/quote]'], ['&gt;blockquote>', '&gt;/blockquote>'], $text);
 
 		// Convert this (markup) text to html
-		require_once(EXTDIR . '/markdown/markdown.php');
-
 		$text = preg_replace(array_keys($tags), array_values($tags), $text);
-		$text = Markdown($text);
+		$parser = new MarkdownExtra;
+		$parser->hashtag_protection = true;
+		$text = $parser->transform($text);
 		$text = str_replace(['&gt;blockquote>', '&gt;/blockquote>'], ['<blockquote>', '</blockquote>'], $text);
 	}
 

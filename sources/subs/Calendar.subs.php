@@ -1188,7 +1188,7 @@ function eventInfoForTopic($id_topic)
 }
 
 /**
- * Gets all of the holidays for the listing
+ * Gets all the holidays for the listing
  *
  * @param int $start The item to start with (for pagination purposes)
  * @param int $items_per_page The number of items to show per page

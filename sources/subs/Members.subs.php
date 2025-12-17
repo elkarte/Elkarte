@@ -2676,7 +2676,7 @@ function memberQuerySeeBoard($id_member)
  * - $data is an associative array of the columns to be updated and their respective values.
  * any string values updated should be quoted and slashed.
  * - The value of any column can be '+' or '-', which mean 'increment' and decrement, respectively.
- * - If the member's post number is updated, updates their post groups.
+ * - If the member's post-number is updated, updates their post groups.
  *
  * @param int[]|int $members An array of member ids
  * @param array $data An associative array of the columns to be updated and their respective values.
@@ -2717,7 +2717,7 @@ function updateMemberData($members, $data)
 
 	if (!empty($modSettings['integrate_change_member_data']))
 	{
-		// Only a few member variables are really interesting for integration.
+		// Only a few member variables are fascinating for integration.
 		$integration_vars = [
 			'member_name',
 			'real_name',
