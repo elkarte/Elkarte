@@ -97,7 +97,7 @@ class Display implements DisplayInterface
 		$return_data['hidden']['src'] = 1;
 		$return_data['hidden']['notify_url'] = $boardurl . '/subscriptions.php';
 
-		// Now stuff dependant on what we're doing.
+		// Now stuff depending on what we're doing.
 		if ($sub_data['flexible'])
 		{
 			$return_data['hidden']['p3'] = 1;
@@ -113,7 +113,7 @@ class Display implements DisplayInterface
 			$return_data['hidden']['t3'] = $period;
 		}
 
-		// If it's repeatable do some javascript to respect this idea.
+		// If it's repeatable, do some JavaScript to respect this idea.
 		if (!empty($sub_data['repeatable']))
 		{
 			$return_data['javascript'] = '

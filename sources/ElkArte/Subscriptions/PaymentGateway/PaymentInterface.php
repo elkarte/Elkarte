@@ -1,15 +1,14 @@
 <?php
 
 /**
- * Payment Gateway: TwoCheckOut
+ * Payment Gateway Interface
  *
- * @name      ElkArte Forum
+ * @package   ElkArte Forum
  * @copyright ElkArte Forum contributors
- * @license   BSD http://opensource.org/licenses/BSD-3-Clause
+ * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
  * This file contains code covered by:
  * copyright: 2011 Simple Machines (http://www.simplemachines.org)
- * license:    BSD, See included LICENSE.TXT for terms and conditions.
  *
  * @version 2.0 Beta 1
  *
@@ -36,7 +35,7 @@ interface PaymentInterface
 	/**
 	 * Validate this is valid for this transaction type.
 	 *
-	 * - If valid returns the subscription and member IDs we are going to process.
+	 * - If valid returns the subscription and member IDs, we are going to process.
 	 */
 	public function precheck();
 
@@ -56,7 +55,7 @@ interface PaymentInterface
 	public function isPayment();
 
 	/**
-	 * Returns if is this is a cancellation transaction
+	 * Returns if this is a cancellation transaction
 	 *
 	 * @return bool
 	 */
