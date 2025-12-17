@@ -46,7 +46,7 @@ class Db extends Adapter
 			}
 			else
 			{
-				// If it has no name it doesn't have any purpose!
+				// If it has no name, it doesn't have any purpose!
 				if (empty($configVar[1]))
 				{
 					continue;
@@ -89,7 +89,7 @@ class Db extends Adapter
 			}
 		}
 
-		// If we have inline permissions we need to prep them.
+		// If we have inline permissions, we need to prep them.
 		$this->init_inline_permissions();
 
 		// What about any BBC selection boxes?
@@ -99,7 +99,7 @@ class Db extends Adapter
 	}
 
 	/**
-	 * Simply create the config var label value
+	 * Create the config var label value
 	 *
 	 * @param array $configVar
 	 */
@@ -225,7 +225,7 @@ class Db extends Adapter
 			$this->context[$configVar[1]]['message'] = $txt[$configVar['message']];
 		}
 
-		// Is help available for this field based on its name
+		// Is help available for this field based on its name?
 		if (!isset($helptxt[$configVar[1]]))
 		{
 			return;
@@ -333,7 +333,7 @@ class Db extends Adapter
 			updateSettings($setArray);
 		}
 
-		// If we have inline permissions we need to save them.
+		// If we have inline permissions, we need to save them.
 		if (!empty($inlinePermissions) && allowedTo('manage_permissions'))
 		{
 			$permissionsForm = new InlinePermissions();

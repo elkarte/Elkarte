@@ -48,7 +48,7 @@ interface AdapterInterface
 	/**
 	 * This method saves the settings.
 	 *
-	 * It will put them in Settings.php or in the settings table.
+	 * It will put them in Settings.php (file) or in the settings table (db).
 	 *
 	 * What it does:
 	 *
