@@ -534,6 +534,7 @@ em, .em {
 }
 
 .clear {
+	display: block;
 	clear: both;
 }
 

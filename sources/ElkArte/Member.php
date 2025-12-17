@@ -75,7 +75,7 @@ class Member extends ValuesContainer
 	 * Similar in concept to pre 2.0 loadMemberContext()
 	 * $member = MembersList::get($mem);
 	 * $member->loadContext(true|false);
-	 * Data will be available as $member['name'] for example.
+	 * Data will be available as $member['name'], for example.
 	 *
 	 * @param bool $display_custom_fields
 	 * @return bool
@@ -109,7 +109,7 @@ class Member extends ValuesContainer
 	}
 
 	/**
-	 * Prepares signature, icons, and little basic stuff so it's presentable.
+	 * Prepares signature, icons, and little basic stuff, so it's presentable.
 	 */
 	protected function prepareBasics(): void
 	{

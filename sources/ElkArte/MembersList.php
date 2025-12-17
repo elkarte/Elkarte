@@ -84,7 +84,7 @@ class MembersList
 	}
 
 	/**
-	 * Loads a guest member (i.e. some standard data for guests)
+	 * Loads a guest member (i.e., some standard data for guests)
 	 */
 	public static function loadGuest(): void
 	{
@@ -141,7 +141,7 @@ class MembersList
 	}
 
 	/**
-	 * Unloads a \ElkArte\Member object from the list to allow to free some memory.
+	 * Unloads a \ElkArte\Member object from the list to allow freeing some memory.
 	 *
 	 * @param int $id id of the member
 	 */

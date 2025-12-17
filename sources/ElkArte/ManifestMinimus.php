@@ -19,7 +19,7 @@ use ElkArte\Http\Headers;
  * Class ManifestMinimus
  *
  * The manifest file contains the information needed to configure how the PWA
- * will look when it is added/installed to the home screen of the device, and configures how
+ * will look when it is added/installed to the home screen of the device and configures how
  * it will behave when launched.
  *
  * The minimal information needed is:

@@ -1,7 +1,7 @@
 <?php
 
 /**
- * The XmlArray class is an xml parser.
+ * The XmlArray class is an XML parser.
  *
  * @package   ElkArte Forum
  * @copyright ElkArte Forum contributors
@@ -17,14 +17,14 @@
 namespace ElkArte;
 
 /**
- * Class representing an xml array.
+ * Class representing an XML array.
  *
- * Reads in xml, allows you to access it simply.
+ * Reads in XML, allows you to access it simply.
  * Version 2.0 dev.
  */
 class XmlArray
 {
-	/** @var array Holds xml parsed results */
+	/** @var array Holds XML parsed results */
 	public $array;
 
 	/** @var int|null Holds debugging level */
@@ -34,19 +34,19 @@ class XmlArray
 	public $trim;
 
 	/**
-	 * Constructor for the xml parser.
+	 * Constructor for the XML parser.
 	 *
 	 * Example use:
 	 *   $xml = new \ElkArte\XmlArray(file('data.xml'));
 	 *
-	 * @param string $data the xml data or an array of, unless is_clone is true.
+	 * @param string $data the XML data or an array of, unless is_clone is true.
 	 * @param bool $auto_trim default false, used to automatically trim textual data.
 	 * @param int|null $level default null, the debug level, specifies whether notices should be generated for missing elements and attributes.
-	 * @param bool $is_clone default false. If is_clone is true, the  \ElkArte\XmlArray is cloned from another - used internally only.
+	 * @param bool $is_clone default false. If is_clone is true, the \ElkArte\XmlArray is cloned from another - used internally only.
 	 */
 	public function __construct($data, $auto_trim = false, $level = null, $is_clone = false)
 	{
-		// If we're using this try to get some more memory.
+		// If we're using this, try to get some more memory.
 		detectServer()->setMemoryLimit('128M');
 
 		// Set the debug level.
@@ -67,10 +67,10 @@ class XmlArray
 			$data = implode('', $data);
 		}
 
-		// Remove any xml declaration or doctype, and parse out comments and CDATA.
+		// Remove any XML declaration or doctype and parse out comments and CDATA.
 		$data = preg_replace('/<!--.*?-->/s', '', $this->_to_cdata(preg_replace(['/^<\?xml.+?\?' . '>/is', '/<!DOCTYPE[^>]+?' . '>/'], '', $data)));
 
-		// Now parse the xml!
+		// Now parse the XML!
 		$this->array = $this->_parse($data);
 	}
 
@@ -150,7 +150,7 @@ class XmlArray
 				$data = preg_replace('/' . preg_quote($match[0], '/') . '/s', '', $data, 1);
 			}
 
-			// Didn't find a tag?  Keep looping....
+			// Didn't find a tag?  Keep looping...
 			if (!isset($match[1]) || $match[1] === '')
 			{
 				// If there's no <, the rest is data.
@@ -238,13 +238,13 @@ class XmlArray
 					// Where is the next start tag?
 					$next_tag_start = strpos($data, '<' . $match[1], $offset);
 
-					// If the next start tag is after the last end tag then we've found the right close.
+					// If the next start tag is after the last end tag, then we've found the right close.
 					if ($next_tag_start === false || $next_tag_start > $last_tag_end)
 					{
 						break;
 					}
 
-					// If not then find the next ending tag.
+					// If not, then find the next ending tag.
 					$next_tag_end = strpos($data, '</' . $match[1] . '>', $offset);
 
 					// Didn't find one? Then just use the last and sod it.
@@ -375,7 +375,7 @@ class XmlArray
 		{
 			$temp = '';
 
-			// Use the _xml() function to get the xml data.
+			// Use the _xml() function to get the XML data.
 			foreach ($array->array as $val)
 			{
 				// Skip the name and any attributes.
@@ -397,7 +397,7 @@ class XmlArray
 	 * Get an element, returns a new \ElkArte\XmlArray.
 	 *
 	 * - It finds any elements that match the path specified.
-	 * - It will always return a set if there is more than one of the element
+	 * - It will always return a set if there is more than one of the elements
 	 * or return_set is true.
 	 *
 	 * Example use:
@@ -405,7 +405,7 @@ class XmlArray
 	 *
 	 * @param string $path - the path to the element to get
 	 * @param bool $return_full - always return full result set
-	 * @return \ElkArte\XmlArray|bool a new \ElkArte\XmlArray.
+	 * @return XmlArray|bool a new \ElkArte\XmlArray.
 	 */
 	public function path($path, $return_full = false)
 	{
@@ -444,7 +444,7 @@ class XmlArray
 				// Cause an error.
 				if (($this->debug_level & E_NOTICE) !== 0)
 				{
-					trigger_error('Undefined XML attribute: ' . substr($el, 1) . $debug, E_USER_NOTICE);
+					trigger_error('Undefined XML attribute: ' . substr($el, 1) . $debug);
 				}
 
 				return false;
@@ -477,7 +477,7 @@ class XmlArray
 	 * @param array $array An array of data
 	 * @param string $path The path
 	 * @param int $level How far deep into the array we should go
-	 * @param bool $no_error Whether or not to ignore errors
+	 * @param bool $no_error Whether to ignore errors
 	 *
 	 * @return array|bool
 	 */
@@ -538,7 +538,7 @@ class XmlArray
 			// Cause an error.
 			if ($this->debug_level & E_NOTICE && !$no_error)
 			{
-				trigger_error('Undefined XML element: ' . $path . $debug, E_USER_NOTICE);
+				trigger_error('Undefined XML element: ' . $path . $debug);
 			}
 
 			return false;
@@ -610,7 +610,7 @@ class XmlArray
 			}
 		}
 
-		// Indent, if necessary.... then close the tag.
+		// Indent, if necessary... then close the tag.
 		if ($inside_elements)
 		{
 			$output .= '>' . $output_el . $indentation . '</' . $array['name'] . '>';
@@ -772,7 +772,7 @@ class XmlArray
 	}
 
 	/**
-	 * Create an xml file from an \ElkArte\XmlArray, the specified path if any.
+	 * Create an XML file from an \ElkArte\XmlArray, the specified path if any.
 	 *
 	 * Example use:
 	 *   echo $this->create_xml();
@@ -801,12 +801,12 @@ class XmlArray
 			$path = $this->array;
 		}
 
-		// Add the xml declaration to the front.
+		// Add the XML declaration to the front.
 		return '<?xml version="1.0"?' . '>' . $this->_xml($path, 0);
 	}
 
 	/**
-	 * Output the xml in an array form.
+	 * Output the XML in an array form.
 	 *
 	 * Example use:
 	 *   print_r($xml->to_array());

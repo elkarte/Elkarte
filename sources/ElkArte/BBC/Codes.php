@@ -299,7 +299,7 @@ class Codes
 			[
 				self::ATTR_TAG => 'br',
 				self::ATTR_TYPE => self::TYPE_CLOSED,
-				self::ATTR_CONTENT => '<br />',
+				self::ATTR_CONTENT => '<br class="clear" />',
 				self::ATTR_BLOCK_LEVEL => false,
 				self::ATTR_AUTOLINK => false,
 				self::ATTR_LENGTH => 2,

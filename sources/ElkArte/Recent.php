@@ -32,7 +32,7 @@ class Recent
 	/** @var array All of hte recent messages */
 	private $_messages = [];
 
-	/** @var array All of the recent posts */
+	/** @var array All the recent posts */
 	private $_board_ids = [];
 
 	/** @var array */
@@ -76,7 +76,7 @@ class Recent
 	}
 
 	/**
-	 * Sets the lower message id to be taken in consideration
+	 * Sets the lower message id to be taken into consideration
 	 *
 	 * @param int $msg_id - id of the earliest message to consider
 	 */
@@ -120,7 +120,7 @@ class Recent
 	{
 		$cache = Cache\Cache::instance();
 		$key = 'recent-' . $this->_user_id . '-' . md5(serialize(array_diff_key($this->_query_parameters, ['max_id_msg' => 0]))) . '-' . $start . '-' . $limit;
-		$this->_messages = $cache->get($key, 120);
+		$this->_messages = $cache->get($key);
 
 		if ($cache->isMiss())
 		{
@@ -128,7 +128,7 @@ class Recent
 
 			if (!empty($this->_cache_results))
 			{
-				$cache->put($key, $this->_messages, 120);
+				$cache->put($key, $this->_messages);
 			}
 		}
 
@@ -166,7 +166,7 @@ class Recent
 				])
 			);
 
-			// If we don't have 10 results, try again with an unoptimized version covering all rows, and cache the result.
+			// If we don't have 10 results, try again with an unoptimized version covering all rows and cache the result.
 			if (isset($this->_query_parameters['max_id_msg']) && $request->num_rows() < $limit)
 			{
 				$request->free_result();
@@ -230,7 +230,7 @@ class Recent
 					$boards = array_keys($this->_board_ids[$type]);
 				}
 
-				// Go through the boards, and look for posts they can do this on.
+				// Go through the boards and look for posts they can do this on.
 				foreach ($boards as $board_id)
 				{
 					// Hmm, they have permission, but there are no topics from that board on this page.
@@ -239,7 +239,7 @@ class Recent
 						continue;
 					}
 
-					// Okay, looks like they can do it for these posts.
+					// Okay, it looks like they can do it for these posts.
 					foreach ($this->_board_ids[$type][$board_id] as $counter)
 					{
 						if ($type === 'any' || $this->_posts[$counter]['poster']['id'] == $this->_user_id)

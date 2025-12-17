@@ -1,7 +1,7 @@
 <?php
 
 /**
- * The purpose of this file is... errors. (hard to guess, I guess?)  It takes
+ * The purpose of this file is... errors. (hard to guess, I guess?) It takes
  * care of logging, error messages, error handling, database errors, and
  * error log administration.
  *

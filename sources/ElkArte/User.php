@@ -41,7 +41,7 @@ class User
 	/**
 	 * Load all the important user information.
 	 *
-	 * @param bool $compat_mode if true sets the deprecated $user_info global
+	 * @param bool $compat_mode if true, sets the deprecated $user_info global
 	 */
 	public static function load($compat_mode = false): void
 	{
@@ -138,8 +138,8 @@ class User
 	 * Reload all the important user information into the static variables
 	 * based on the \ElkArte\UserSettings object passed to it
 	 *
-	 * @param \ElkArte\UserSettingsLoader $user An user
-	 * @param bool $compat_mode if true sets the deprecated $user_info global
+	 * @param UserSettingsLoader $user An user
+	 * @param bool $compat_mode if true, sets the deprecated $user_info global
 	 */
 	public static function reloadByUser(UserSettingsLoader $user, $compat_mode = false): void
 	{

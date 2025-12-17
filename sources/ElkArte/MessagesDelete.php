@@ -169,7 +169,7 @@ class MessagesDelete
 		$messages = [];
 		foreach ($actioned_messages as $topic => $data)
 		{
-			// If we have topics we are going to restore the whole lot ignore them.
+			// If we have topics, we are going to restore the whole lot ignore them.
 			if (in_array($topic, $this->_topics_to_restore))
 			{
 				unset($actioned_messages[$topic]);
@@ -233,7 +233,7 @@ class MessagesDelete
 			$msgs = [$msgs];
 		}
 
-		// Lets make sure they are int.
+		// Let's make sure they are int.
 		$msgs = array_map(static fn($value) => (int) $value, $msgs);
 
 		// Get the source information.
@@ -264,10 +264,10 @@ class MessagesDelete
 		[$target_board, $target_first_msg, $target_replies, $target_unapproved_posts, $count_posts] = $request->fetch_row();
 		$request->free_result();
 
-		// Lets see if the board that we are returning to has post count enabled.
+		// Let's see if the board that we are returning to has post-count enabled.
 		if (empty($count_posts))
 		{
-			// Lets get the members that need their post count restored.
+			// Let's get the members that need their post-count restored.
 			require_once(SUBSDIR . '/Members.subs.php');
 			$db->fetchQuery('
 				SELECT id_member
@@ -337,14 +337,14 @@ class MessagesDelete
 			}
 		);
 
-		// We have a new post count for the board.
+		// We have a new post-count for the board.
 		require_once(SUBSDIR . '/Boards.subs.php');
 		incrementBoard($target_board, [
-			'num_posts' => $target_topic_data['num_replies'] - $target_replies, // Lets keep in mind that the first message in a topic counts towards num_replies in a board.
+			'num_posts' => $target_topic_data['num_replies'] - $target_replies, // Let's keep in mind that the first message in a topic counts towards num_replies in a board.
 			'unapproved_posts' => $target_topic_data['unapproved_posts'] - $target_unapproved_posts,
 		]);
 
-		// In some cases we merged the only post in a topic so the topic data is left behind in the topic table.
+		// In some cases we merged the only post in a topic, so the topic data is left behind in the topic table.
 		$request = $db->query('', '
 			SELECT 
 				id_topic
@@ -414,14 +414,14 @@ class MessagesDelete
 				'unapproved_posts' => $source_topic_data['unapproved_posts'],
 			]);
 
-			// We have a new post count for the source board.
+			// We have a new post-count for the source board.
 			incrementBoard($target_board, [
-				'num_posts' => $source_topic_data['num_replies'] - $from_replies, // Lets keep in mind that the first message in a topic counts towards num_replies in a board.
+				'num_posts' => $source_topic_data['num_replies'] - $from_replies, // Let's keep in mind that the first message in a topic counts towards num_replies in a board.
 				'unapproved_posts' => $source_topic_data['unapproved_posts'] - $from_unapproved_posts,
 			]);
 		}
 
-		// Finally get around to updating the destination topic, now all indexes etc on the source are fixed.
+		// Finally, get around to updating the destination topic, now all indexes etc. on the source are fixed.
 		setTopicAttribute($target_topic, [
 			'id_first_msg' => $target_topic_data['id_first_msg'],
 			'id_last_msg' => $target_topic_data['id_last_msg'],
@@ -502,7 +502,7 @@ class MessagesDelete
 
 		require_once(SUBSDIR . '/Boards.subs.php');
 
-		// Lets get the data for these topics.
+		// Let's get the data for these topics.
 		$request = $db->fetchQuery('
 			SELECT 
 				t.id_topic, t.id_previous_board, t.id_board, t.id_first_msg, m.subject
@@ -522,10 +522,10 @@ class MessagesDelete
 				continue;
 			}
 
-			// Ok we got here so me move them from here to there.
+			// Ok, we got here, so me move them from here to there.
 			moveTopics($row['id_topic'], $row['id_previous_board']);
 
-			// Lets remove the recycled icon.
+			// Let's remove the recycled icon.
 			$db->query('', '
 				UPDATE {db_prefix}messages
 				SET icon = {string:icon}
@@ -536,14 +536,14 @@ class MessagesDelete
 				]
 			);
 
-			// Lets see if the board that we are returning to has post count enabled.
+			// Let's see if the board that we are returning to has post-count enabled.
 			$board_data = boardInfo($row['id_previous_board']);
 
 			if (empty($board_data['count_posts']))
 			{
 				require_once(SUBSDIR . '/Members.subs.php');
 
-				// Lets get the members that need their post count restored.
+				// Let's get the members that need their post-count restored.
 				$db->fetchQuery('
 					SELECT
 						id_member, COUNT(id_msg) AS post_count
@@ -592,7 +592,7 @@ class MessagesDelete
 	 * - If $check_permissions is true, and it is the first and only message in a topic, removes the topic
 	 *
 	 * @param int $message The ID of the message to be removed
-	 * @param bool $decreasePostCount Whether to decrease the post count or not (default: true)
+	 * @param bool $decreasePostCount Whether to decrease the post-count or not (default: true)
 	 * @param bool $check_permissions Whether to check permissions or not (default: true) (may result in fatal
 	 *             errors or login screens)
 	 *
@@ -650,7 +650,7 @@ class MessagesDelete
 			}
 		}
 
-		// Deleting a recycled message can not lower anyone's post count.
+		// Deleting a recycled message cannot lower anyone's post-count.
 		if ($row['icon'] === 'recycled')
 		{
 			$decreasePostCount = false;
@@ -659,7 +659,7 @@ class MessagesDelete
 		// This is the last post, update the last post on the board.
 		if ((int) $row['id_last_msg'] === $message)
 		{
-			// Find the last message, set it, and decrease the post count.
+			// Find the last message, set it, and decrease the post-count.
 			$row2 = $db->fetchQuery('
 				SELECT 
 					id_msg, id_member
@@ -691,7 +691,7 @@ class MessagesDelete
 				]
 			);
 		}
-		// Only decrease post counts.
+		// Only decrease post-counts.
 		else
 		{
 			$db->query('', '
@@ -711,11 +711,11 @@ class MessagesDelete
 		// Default recycle to false.
 		$recycle = false;
 
-		// If recycle topics has been set, make a copy of this message in the recycle board.
+		// If recycle topics have been set, make a copy of this message in the recycle board.
 		// Make sure we're not recycling messages that are already on the recycle board.
 		if (!empty($this->_recycle_board) && $row['id_board'] != $this->_recycle_board && $row['icon'] !== 'recycled')
 		{
-			// Check if the recycle board exists and if so get the read status.
+			// Check if the recycle board exists, and if so, get the read status.
 			$request = $db->query('', '
 				SELECT 
 					(COALESCE(lb.id_msg, 0) >= b.id_msg_updated) AS is_seen, id_last_msg
@@ -817,7 +817,7 @@ class MessagesDelete
 					markTopicsRead([$this->user->id, $topicID, $modSettings['maxMsgID'], 0], true);
 				}
 
-				// Mark recycle board as seen, if it was marked as seen before.
+				// Mark the recycle board as seen, if it was marked as seen before.
 				if (!empty($isRead) && $this->user->is_guest === false)
 				{
 					require_once(SUBSDIR . '/Boards.subs.php');
@@ -839,7 +839,7 @@ class MessagesDelete
 					]
 				);
 
-				// Lets increase the num_replies, and the first/last message ID as appropriate.
+				// Let's increase the num_replies, and the first/last message ID as appropriate.
 				if (!empty($id_recycle_topic))
 				{
 					$db->query('', '
@@ -866,7 +866,7 @@ class MessagesDelete
 				updateSubjectStats($topicID, $row['subject']);
 			}
 
-			// If it wasn't approved don't keep it in the queue.
+			// If it wasn't approved, don't keep it in the queue.
 			if (!$row['approved'])
 			{
 				$db->query('', '
@@ -894,8 +894,8 @@ class MessagesDelete
 			]
 		);
 
-		// If the poster was registered and the board this message was on incremented
-		// the member's posts when it was posted, decrease his or her post count.
+		// If the poster was registered and the board, this message was on increased
+		// the member's posts when it was posted, decrease his or her post-count.
 		if (!empty($row['id_member']) && $decreasePostCount && empty($row['count_posts']) && $row['approved'])
 		{
 			require_once(SUBSDIR . '/Members.subs.php');
@@ -970,7 +970,7 @@ class MessagesDelete
 				);
 			}
 
-			// Allow mods to remove message related data of their own (likes, maybe?)
+			// Allow mods to remove message-related data of their own (likes, maybe?)
 			call_integration_hook('integrate_remove_message', [$message]);
 		}
 
@@ -997,7 +997,7 @@ class MessagesDelete
 		if ($updated_reports != 0)
 		{
 			updateSettings(['last_mod_report_action' => time()]);
-			recountOpenReports(true);
+			recountOpenReports();
 		}
 
 		// Add it to the mod log.
@@ -1017,7 +1017,7 @@ class MessagesDelete
 
 	/**
 	 * When a message is removed, we need to remove associated mentions and updated the member
-	 * mention count for anyone was mentioned in that message (like, quote, @, etc)
+	 * mention count for anyone was mentioned in that message (like, quote, @, etc.)
 	 *
 	 * @param int|int[] $messages
 	 * @param bool $recycle If recycle board is enabled, sets mentions as in_accessible, otherwise hard delete
@@ -1153,7 +1153,7 @@ class MessagesDelete
 				}
 			}
 
-			// Can't delete an unapproved message, if you can't see it!
+			// Can't delete an unapproved message if you can't see it!
 			if ($modSettings['postmod_active'] && !$row['approved'] && $row['id_member'] != $this->user->id && (!in_array(0, $delete_any) && !in_array($row['id_board'], $delete_any)))
 			{
 				$approve_posts = empty($this->user->mod_cache['ap']) ? boardsAllowedTo('approve_posts') : $this->user->mod_cache['ap'];

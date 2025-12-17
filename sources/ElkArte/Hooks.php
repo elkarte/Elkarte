@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This file has all the main functions in it that relate to adding removing, etc on hooks.
+ * This file has all the main functions in it that relate to adding removing, etc. on hooks.
  *
  * @package   ElkArte Forum
  * @copyright ElkArte Forum contributors
@@ -36,7 +36,7 @@ final class Hooks
 	protected $fileFunc;
 
 	/**
-	 * The class constructor, loads globals in to the class object
+	 * The class constructor loads globals in to the class object
 	 *
 	 * @param QueryInterface $_db
 	 * @param Debug $_debug
@@ -63,7 +63,7 @@ final class Hooks
 	}
 
 	/**
-	 * Allows to set a new replacement path.
+	 * Allows setting a new replacement path.
 	 *
 	 * @param string[]|string $path an array consisting of pairs "search" => "replace with"
 	 */
@@ -77,8 +77,8 @@ final class Hooks
 	 *
 	 * What it does:
 	 *
-	 * - calls all functions of the given hook.
-	 * - supports static class method calls.
+	 * - Calls all functions of the given hook.
+	 * - Supports static class method calls.
 	 *
 	 * @param string $hook
 	 * @param array $parameters = array()
@@ -164,7 +164,7 @@ final class Hooks
 	}
 
 	/**
-	 * Includes files for hooks that only do that (i.e. integrate_pre_include)
+	 * Includes files for hooks that only do that (i.e., integrate_pre_include)
 	 *
 	 * @param string $hook
 	 */
@@ -221,7 +221,7 @@ final class Hooks
 	/**
 	 * Add a function for integration hook.
 	 *
-	 * - does nothing if the function is already added.
+	 * - Does nothing if the function is already added.
 	 *
 	 * @param string $hook
 	 * @param string $function
@@ -243,7 +243,7 @@ final class Hooks
 		// Make current function list usable.
 		$functions = empty($modSettings[$hook]) ? [] : explode(',', $modSettings[$hook]);
 
-		// Do nothing, if it's already there.
+		// Do nothing if it's already there.
 		if (in_array($integration_call, $functions, true))
 		{
 			return;
@@ -254,12 +254,12 @@ final class Hooks
 	}
 
 	/**
-	 * Registers non ACP integration hooks for enabled integrations
+	 * Registers non-ACP integration hooks for enabled integrations
 	 *
 	 * What it does
-	 * - reads enabled integrations (those identified in autoload_integrate modsettings)
-	 * - verify the class exists
-	 * - verify it has a static method ::register, if so calls that method and adds any hooks
+	 * - Reads enabled integrations (those identified in autoload_integrate modsettings)
+	 * - Verify the class exists
+	 * - Verify it has a static method ::register, if so, calls that method and adds any hooks
 	 * returned by that method
 	 */
 	public function loadIntegrations(): void
@@ -289,9 +289,9 @@ final class Hooks
 	 * Loads ACP settings for enabled integrations
 	 *
 	 * What it does
-	 * - reads enabled integrations (those identified in autoload_integrate modsettings)
-	 * - verify the class exists
-	 * - verify it has a static method ::settingsRegister, if so calls that method and adds any hooks
+	 * - Reads enabled integrations (those identified in autoload_integrate modsettings)
+	 * - Verify the class exists
+	 * - Verify it has a static method ::settingsRegister, if so, calls that method and adds any hooks
 	 * returned by that method
 	 */
 	public function loadIntegrationsSettings(): void
@@ -457,7 +457,7 @@ final class Hooks
 	/**
 	 * Stores a function into the database.
 	 *
-	 * - does nothing if the function is already added.
+	 * - Does nothing if the function is already added.
 	 *
 	 * @param string $hook
 	 * @param string $integration_call

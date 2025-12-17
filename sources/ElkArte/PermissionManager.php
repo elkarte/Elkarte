@@ -86,7 +86,7 @@ class PermissionManager
 	 * Retrieves an array of permission groups categorized by membergroup and board.
 	 *
 	 * Note to Addon authors - you don't need to stick your permission group here if you don't
-	 * mind having it as the last group of the page.
+	 * mind having it as the last group on the page.
 	 *
 	 * @return array An associative array containing permission groups for membergroup and board,
 	 * where each group includes a list of specific permissions.
@@ -229,7 +229,7 @@ class PermissionManager
 	/**
 	 * Configures a list of permissions that should be hidden based on the current system settings
 	 * and enabled features. This method updates the hidden permissions array dynamically depending
-	 * on feature flags and system configurations such as calendar, warnings, post moderation, and attachments.
+	 * on feature flags and system configurations such as calendar, warnings, post-moderation, and attachments.
 	 *
 	 * @return void No value is returned. The method modifies the internal $hiddenPermissions property directly
 	 *              by adding or merging permissions that are determined to be unavailable or irrelevant.
@@ -289,7 +289,7 @@ class PermissionManager
 	}
 
 	/**
-	 * Configures relabeled permissions based on the post moderation setting.
+	 * Configures relabeled permissions based on the post-moderation setting.
 	 *
 	 * @return void
 	 */
@@ -297,7 +297,7 @@ class PermissionManager
 	{
 		if ($this->modSettings['postmod_active'])
 		{
-			// If we show them on classic view we change the name.
+			// If we show them on classic view, we change the name.
 			$this->relabelPermissions = [
 				'post_new' => 'auto_approve_topics',
 				'post_reply' => 'auto_approve_replies',
@@ -381,7 +381,7 @@ class PermissionManager
 	 */
 	private function shouldSkipGuestPermission(string $permission, array $illegalGuestPermissions): bool
 	{
-		// If this is a guest permission we don't do it if it's the guest group.
+		// If this is a guest permission, we don't do it if it's the guest group.
 		return isset($this->context['group']['id'])
 			&& $this->context['group']['id'] === -1
 			&& in_array($permission, $illegalGuestPermissions, true);
@@ -466,7 +466,7 @@ class PermissionManager
 	 */
 	private function getBothGroups(string $ownGroup): array
 	{
-		// Guests can only have any, registered users both
+		// Guests can only have any registered users both
 		if (!isset($this->context['group']['id']) || $this->context['group']['id'] !== -1)
 		{
 			return ['own' => $ownGroup];

@@ -53,7 +53,7 @@ class UserNotificationIntegrate
 	}
 
 	/**
-	 * Adds the relevant javascript code when loading the page.
+	 * Adds the relevant JavaScript code when loading the page.
 	 */
 	public static function integrate_load_theme(): void
 	{

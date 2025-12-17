@@ -2,7 +2,7 @@
 
 /**
  * This file contains functions for dealing with topics presentation.
- * Middle-level functions, those that "converts" raw queries into data
+ * Middle-level functions, those that "convert" raw queries into data
  * usable in the template or elsewhere.
  *
  * @package   ElkArte Forum
@@ -59,7 +59,11 @@ class TopicUtil
 
 		foreach ($topics_info as $row)
 		{
-			// Is there a body to preview? (If not the preview is disabled.)
+			$row['num_replies'] = (int) $row['num_replies'];
+			$row['id_first_msg'] = (int) $row['id_first_msg'];
+			$row['id_last_msg'] = (int) $row['id_last_msg'];
+
+			// Is there a body to preview? (If not, the preview is disabled.)
 			if (isset($row['first_body']))
 			{
 				// Limit them to $preview_length characters - do this FIRST because it's a lot of wasted censoring otherwise.
@@ -67,7 +71,7 @@ class TopicUtil
 				$row['first_body'] = Util::htmlspecialchars(Util::shorten_html($row['first_body'], $preview_length));
 
 				// No reply then they are the same, no need to process it again
-				if ($row['num_replies'] == 0)
+				if ($row['num_replies'] === 0)
 				{
 					$row['last_body'] = $row['first_body'];
 				}
@@ -82,7 +86,7 @@ class TopicUtil
 				$row['first_body'] = censor($row['first_body']);
 
 				// Don't censor them twice!
-				if ($row['id_first_msg'] == $row['id_last_msg'])
+				if ($row['id_first_msg'] === $row['id_last_msg'])
 				{
 					$row['last_subject'] = $row['first_subject'];
 					$row['last_body'] = $row['first_body'];
@@ -99,7 +103,7 @@ class TopicUtil
 				$row['last_body'] = '';
 				$row['first_subject'] = censor($row['first_subject']);
 
-				if ($row['id_first_msg'] == $row['id_last_msg'])
+				if ($row['id_first_msg'] === $row['id_last_msg'])
 				{
 					$row['last_subject'] = $row['first_subject'];
 				}
@@ -141,20 +145,20 @@ class TopicUtil
 			}
 			else
 			{
-				$topic_href = getUrl('topic', ['topic' => $row['id_topic'], 'start' => $row['num_replies'] == 0 ? '0' : ('msg' . $row['id_last_msg']), 'subject' => $row['first_subject'], $topicseen]) . '#new';
+				$topic_href = getUrl('topic', ['topic' => $row['id_topic'], 'start' => $row['num_replies'] === 0 ? '0' : ('msg' . $row['id_last_msg']), 'subject' => $row['first_subject'], $topicseen]) . '#new';
 			}
 
-			$href = getUrl('topic', ['topic' => $row['id_topic'], 'start' => $row['num_replies'] == 0 ? '0' : ('msg' . $row['new_from']), 'subject' => $row['first_subject'], $topicseen]) . $row['num_replies'] == 0 ? '' : '#new';
+			$href = getUrl('topic', ['topic' => $row['id_topic'], 'start' => $row['num_replies'] === 0 ? '0' : ('msg' . $row['new_from']), 'subject' => $row['first_subject'], $topicseen]) . ($row['num_replies'] === 0 ? '' : '#new');
 
 			// And build the array.
 			$topics[$row['id_topic']] = [
 				'id' => $row['id_topic'],
 				'first_post' => [
-					'id' => $row['id_first_msg'],
+					'id' => (int) $row['id_first_msg'],
 					'member' => [
 						'username' => $row['first_member_name'],
 						'name' => $row['first_display_name'],
-						'id' => $row['first_id_member'],
+						'id' => (int) $row['first_id_member'],
 						'href' => empty($row['first_id_member']) ? '' : $first_poster_href,
 						'link' => empty($row['first_id_member']) ? $row['first_display_name'] : '<a href="' . $first_poster_href . '" title="' . $txt['profile_of'] . ' ' . $row['first_display_name'] . '">' . $row['first_display_name'] . '</a>'
 					],
@@ -169,11 +173,11 @@ class TopicUtil
 					'link' => '<a href="' . $first_topic_href . '">' . $row['first_subject'] . '</a>'
 				],
 				'last_post' => [
-					'id' => $row['id_last_msg'],
+					'id' => (int) $row['id_last_msg'],
 					'member' => [
 						'username' => $row['last_member_name'],
 						'name' => $row['last_display_name'],
-						'id' => $row['last_id_member'],
+						'id' => (int) $row['last_id_member'],
 						'href' => empty($row['last_id_member']) ? '' : $last_poster_href,
 						'link' => empty($row['last_id_member']) ? $row['last_display_name'] : '<a href="' . $last_poster_href . '" title="' . $txt['profile_of'] . ' ' . $row['last_display_name'] . '">' . $row['last_display_name'] . '</a>'
 					],
@@ -185,9 +189,9 @@ class TopicUtil
 					'icon' => $icon_sources->getIconValue($row['last_icon']),
 					'icon_url' => $icon_sources->getIconURL($row['last_icon']),
 					'href' => $topic_href,
-					'link' => '<a href="' . $topic_href . '" ' . ($row['num_replies'] == 0 ? '' : 'rel="nofollow"') . '>' . $row['last_subject'] . '</a>',
+					'link' => '<a href="' . $topic_href . '" ' . ($row['num_replies'] === 0 ? '' : 'rel="nofollow"') . '>' . $row['last_subject'] . '</a>',
 				],
-				'default_preview' => trim($row[!empty($modSettings['message_index_preview']) && $modSettings['message_index_preview'] == 2 ? 'last_body' : 'first_body']),
+				'default_preview' => trim($row[!empty($modSettings['message_index_preview']) && (int) $modSettings['message_index_preview'] === 2 ? 'last_body' : 'first_body']),
 				'is_sticky' => !empty($row['is_sticky']),
 				'is_locked' => !empty($row['locked']),
 				'is_poll' => !empty($modSettings['pollMode']) && $row['id_poll'] > 0,
@@ -217,7 +221,7 @@ class TopicUtil
 			{
 				$board_href = getUrl('board', ['board' => $row['id_board'], 'start' => '0', 'name' => $row['bname']]);
 				$topics[$row['id_topic']]['board'] = [
-					'id' => $row['id_board'],
+					'id' => (int) $row['id_board'],
 					'name' => $row['bname'],
 					'href' => $board_href,
 					'link' => '<a href="' . $board_href . '.0">' . $row['bname'] . '</a>'

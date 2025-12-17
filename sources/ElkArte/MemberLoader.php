@@ -194,7 +194,7 @@ class MemberLoader
 		$select_columns = $this->base_select_columns;
 		$select_tables = $this->base_select_tables;
 
-		// We add or replace according to the set
+		// We add or replace, according to the set
 		switch ($this->set)
 		{
 			case MemberLoader::SET_NORMAL:
@@ -385,7 +385,7 @@ class MemberLoader
 	}
 
 	/**
-	 * Loads a guest member (i.e. some standard data for guests)
+	 * Loads a guest member (i.e., some standard data for guests)
 	 */
 	public function loadGuest(): void
 	{

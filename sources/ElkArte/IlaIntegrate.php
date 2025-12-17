@@ -19,7 +19,7 @@ use ElkArte\Helper\Util;
  */
 class IlaIntegrate
 {
-	/** @var string holds the rendered html from the bbc [attach] tag */
+	/** @var string holds the rendered HTML from the bbc [attach] tag */
 	public static $typeTag = '';
 
 	/**
@@ -32,7 +32,7 @@ class IlaIntegrate
 	 * Hooks::instance()->enableIntegration(\\ElkArte\\IlaIntegrate); to add your integration.
 	 * register() and settingsRegister() will both be called.
 	 * You can add and remove the name based on if your addon is enabled/disabled and not worry
-	 * about removing hooks (they do no use permanent)
+	 * about removing hooks (they do not use permanent)
 	 *
 	 * @return array
 	 */
@@ -101,7 +101,7 @@ class IlaIntegrate
 		$disabled = in_array('attach', $disabledBBC, true);
 		$disabledUrl = in_array('attachurl', $disabledBBC, true);
 
-		// Want to see them in quotes eh?
+		// Want to see them in quotes, eh?
 		if (!empty($modSettings['attachment_inline_quotes']))
 		{
 			unset($disallow['quote']);
@@ -109,7 +109,7 @@ class IlaIntegrate
 
 		// Add ILA codes
 		$additional_bbc = array_merge($additional_bbc, [
-			// Just a simple attach [attach][/attach]
+			// Just a basic attach [attach][/attach]
 			[
 				Codes::ATTR_TAG => 'attach',
 				Codes::ATTR_TYPE => Codes::TYPE_UNPARSED_CONTENT,
@@ -161,7 +161,7 @@ class IlaIntegrate
 					],
 					'align' => [
 						Codes::PARAM_ATTR_OPTIONAL => true,
-						Codes::PARAM_ATTR_VALUE => 'float$1;',
+						Codes::PARAM_ATTR_VALUE => 'float$1',
 						Codes::PARAM_ATTR_MATCH => '(right|left|center)',
 					],
 				],
@@ -175,7 +175,7 @@ class IlaIntegrate
 				Codes::ATTR_AUTOLINK => false,
 				Codes::ATTR_LENGTH => 6,
 			],
-			// Require a height with option width/align [attach height=300 align=??][/attach]
+			// Require a height with optional width/align [attach height=300 align=??][/attach]
 			[
 				Codes::ATTR_TAG => 'attach',
 				Codes::ATTR_TYPE => Codes::TYPE_UNPARSED_CONTENT,
@@ -205,7 +205,7 @@ class IlaIntegrate
 				Codes::ATTR_AUTOLINK => false,
 				Codes::ATTR_LENGTH => 6,
 			],
-			// Align with an optional a type? [attach align=right type=thumb][/attach]
+			// Align with an optional a type [attach align=right type=thumb][/attach]
 			[
 				Codes::ATTR_TAG => 'attach',
 				Codes::ATTR_TYPE => Codes::TYPE_UNPARSED_CONTENT,
@@ -247,14 +247,16 @@ class IlaIntegrate
 	}
 
 	/**
-	 * This provides for the control of returned tags.  The tag will be different base on
+	 * This provides for the control of returned tags.  The tag will be different based on
 	 * - Preview, Approval Y/N, Image Y/N, File mime type and width, height, align, type attributes
 	 *
-	 * - Determines if the ILA is an image or not
-	 * - Sets the lightbox attributes if an image is identified
-	 * - Sets a pending approval image if the attachment is not approved and not a preview
-	 * - Keeps track of attachment usage to prevent displaying below the post
-	 * - Sets self::$typeTag which is a reference to the tag content attribute
+	 * What it does:
+	 * - Determines if the ILA is an image or not.
+	 * - Sets the lightbox attributes if an image is identified.
+	 * - Sets a pending approval image if the attachment is not approved and not a preview.
+	 * - Keeps track of attachment usage to prevent displaying below the post.
+	 * - Sets self::$typeTag which is a reference to the tag content attribute.
+	 * - Called by BBCParser filterData() callback on ATTR_VALIDATE
 	 *
 	 * @return callable
 	 */
@@ -277,8 +279,14 @@ class IlaIntegrate
 			// Not a preview, then determine the actual type of attachment we are dealing with
 			if (!$preview)
 			{
-				require_once(SUBSDIR . '/Attachments.subs.php');
-				$attachment = isAttachmentImage($num);
+				// Memoize lookups per-request to avoid repeated work
+				static $attachCache = [];
+				if (!array_key_exists($num, $attachCache))
+				{
+					require_once(SUBSDIR . '/Attachments.subs.php');
+					$attachCache[$num] = isAttachmentImage($num);
+				}
+				$attachment = $attachCache[$num];
 			}
 
 			// Grab the tags content value, at this point it will have completed parameter exchange
@@ -328,7 +336,7 @@ class IlaIntegrate
 	}
 
 	/**
-	 * This prevents a little repetition and provides a some control for url tags
+	 * This prevents a little repetition and provides some control for url tags
 	 *
 	 * - Determines if the ILA is an image or not
 	 * - Keeps track of attachment usage to prevent displaying below the post
@@ -347,8 +355,14 @@ class IlaIntegrate
 			$preview = self::isPreview($num);
 			if (!$preview)
 			{
-				require_once(SUBSDIR . '/Attachments.subs.php');
-				$attachment = isAttachmentImage($num);
+				// Memoize lookups per-request to avoid repeated work
+				static $attachCache = [];
+				if (!array_key_exists($num, $attachCache))
+				{
+					require_once(SUBSDIR . '/Attachments.subs.php');
+					$attachCache[$num] = isAttachmentImage($num);
+				}
+				$attachment = $attachCache[$num];
 			}
 
 			// Not approved gets a bland message
@@ -362,9 +376,10 @@ class IlaIntegrate
 			// If we got the details ...
 			elseif ($attachment)
 			{
+				$name = Util::htmlspecialchars($attachment['filename'] ?? (string) $num);
 				$data = '
 				<a href="' . getUrl('action', ['action' => 'dlattach', 'attach' => $num]) . '">
-					<i class="icon icon-small i-paperclip"></i>&nbsp;' . $attachment['filename'] . '
+					<i class="icon icon-small i-paperclip"></i>&nbsp;' . $name . '
 				</a>&nbsp;(' . $attachment['size'] . ($attachment['is_image'] ? ' ' . $attachment['width'] . 'x' . $attachment['height'] : '') . ')';
 			}
 			else
@@ -406,8 +421,16 @@ class IlaIntegrate
 	{
 		global $context;
 
-		$context['ila_dont_show_attach_below'][] = $data;
-		$context['ila_dont_show_attach_below'] = array_unique($context['ila_dont_show_attach_below']);
+		if (!isset($context['ila_dont_show_attach_below']))
+		{
+			$context['ila_dont_show_attach_below'] = [];
+		}
+
+		// Preserve numeric array shape but avoid repeated values (and array_unique costs)
+		if (!in_array($data, $context['ila_dont_show_attach_below'], true))
+		{
+			$context['ila_dont_show_attach_below'][] = $data;
+		}
 	}
 
 	/**

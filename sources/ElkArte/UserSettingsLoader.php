@@ -173,7 +173,7 @@ class UserSettingsLoader
 
 		$this->initSettings($user_settings);
 
-		// If we no longer have the member maybe they're being all hackey, stop brute force!
+		// If we no longer have the member, maybe they're being all hackey, stop brute force!
 		if (empty($this->id))
 		{
 			validatePasswordFlood($this->settings->id_member($this->id), $this->settings->passwd_flood(false), $this->id != 0);
@@ -262,10 +262,10 @@ class UserSettingsLoader
 			$user_info['groups'][$k] = (int) $v;
 		}
 
-		// This is a logged in user, so definitely not a spider.
+		// This is a logged-in user, so definitely not a spider.
 		$user_info['possibly_robot'] = false;
 
-		// Lets upgrade the salt if needed.
+		// Let's upgrade the salt if needed.
 		if ($this->settings->fixSalt())
 		{
 			require_once(SUBSDIR . '/Members.subs.php');
@@ -360,8 +360,8 @@ class UserSettingsLoader
 		];
 		$user_info['groups'] = array_unique($user_info['groups']);
 
-		// Make sure that the last item in ignore boards array is valid.
-		//  If the list was too long it could have an ending comma that could cause problems.
+		// Make sure that the last item in the ignore boards array is valid.
+		//  If the list was too long, it could have an ending comma that could cause problems.
 		if (!empty($user_info['ignoreboards']) && empty($user_info['ignoreboards'][$tmp = count($user_info['ignoreboards']) - 1]))
 		{
 			unset($user_info['ignoreboards'][$tmp]);
@@ -383,12 +383,12 @@ class UserSettingsLoader
 		// Build the list of boards they WANT to see.
 		// This will take the place of query_see_boards in certain spots, so it better include the boards they can see also
 
-		// If they aren't ignoring any boards then they want to see all the boards they can see
+		// If they aren't ignoring any boards, then they want to see all the boards they can see
 		if (empty($user_info['ignoreboards']))
 		{
 			$user_info['query_wanna_see_board'] = $user_info['query_see_board'];
 		}
-		// Ok I guess they don't want to see all the boards
+		// Ok, I guess they don't want to see all the boards
 		else
 		{
 			$user_info['query_wanna_see_board'] = '(' . $user_info['query_see_board'] . ' AND b.id_board NOT IN (' . implode(',', $user_info['ignoreboards']) . '))';
@@ -401,7 +401,7 @@ class UserSettingsLoader
 
 	/**
 	 * Determines the language to be used.
-	 * Checks the current user setting, the $_GET['language'], the session and $modSettings
+	 * Checks the current user setting, the $_GET['language'], the session, and $modSettings
 	 *
 	 * @return string
 	 */
@@ -416,7 +416,7 @@ class UserSettingsLoader
 		{
 			$languages = getLanguages();
 
-			// Allow the user to change their language if its valid.
+			// Allow the user to change their language if it's valid.
 			if (!empty($modSettings['userLanguage']) && !empty($_GET['language']) && isset($languages[strtr($_GET['language'], './\\:', '____')]))
 			{
 				$user_lang = strtr($_GET['language'], './\\:', '____');
