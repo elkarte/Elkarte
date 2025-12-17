@@ -1,9 +1,11 @@
 <?php
 
-require_once dirname(__FILE__) . '/Michelf/MarkdownExtra.inc.php';
+use Michelf\MarkdownExtra;
+
+require_once __DIR__ . '/Michelf/MarkdownExtra.inc.php';
 
 function Markdown($text) {
-	$parser = new \Michelf\MarkdownExtra;
+	$parser = new MarkdownExtra;
 	$parser->hashtag_protection = true;
 
 	return $parser->transform($text);
