@@ -51,7 +51,7 @@ class DatabaseHandler extends \SessionHandler
 	public function destroy($sessionId): bool
 	{
 		// Better safe than sorry
-		if (preg_match('~^[A-Za-z0-9,-]{16,64}$~', $sessionId) == 0)
+		if (preg_match('~^[A-Za-z0-9,-]{16,64}$~', $sessionId) !== 1)
 		{
 			return false;
 		}
@@ -71,7 +71,6 @@ class DatabaseHandler extends \SessionHandler
 	/**
 	 * {@inheritDoc}
 	 */
-	#[\ReturnTypeWillChange]
 	public function gc($maxLifetime)
 	{
 		// Just set to the default or lower?  Ignore it for a higher value. (hopefully)
@@ -80,7 +79,7 @@ class DatabaseHandler extends \SessionHandler
 			$maxLifetime = max($this->_modSettings['databaseSession_lifetime'], 60);
 		}
 
-		// Clean up after yerself ;).
+		// Clean up after yourself.
 		$result = $this->_db->query('', '
 			DELETE FROM {db_prefix}sessions
 			WHERE last_update < {int:last_update}',
@@ -128,7 +127,7 @@ class DatabaseHandler extends \SessionHandler
 			return false;
 		}
 
-		// Update the session data, replace if necessary
+		// Update the session data, replace it if necessary
 		$this->_db->replace(
 			'{db_prefix}sessions',
 			['session_id' => 'string', 'data' => 'string', 'last_update' => 'int'],
