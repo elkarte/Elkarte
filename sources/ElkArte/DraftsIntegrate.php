@@ -30,13 +30,12 @@ class DraftsIntegrate
 	}
 
 	/**
-	 * Returns the config settings form the drafts module
+	 * Returns the config settings for the drafts module
 	 *
 	 * @return array
 	 */
 	public static function settingsRegister(): array
 	{
-		// $hook, $function, $file
 		return [
 			['integrate_load_permissions', '\\ElkArte\\AdminController\\ManageDraftsModule::integrate_load_permissions'],
 			['integrate_topics_maintenance', '\\ElkArte\\AdminController\\ManageDraftsModule::integrate_topics_maintenance'],

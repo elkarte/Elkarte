@@ -110,8 +110,8 @@ class Agreement
 	 * Retrieves the plain text version of the agreement directly from
 	 * the file that contains it.
 	 *
-	 * It uses the language, but if the localized version doesn't exist
-	 * then it may return the english version.
+	 * It uses the language, but if the localized version doesn't exist,
+	 * then it may return the English version.
 	 *
 	 * @param bool $fallback if fallback to the English version (default true).
 	 * @param string|null $language the language of the agreement we want.
@@ -140,8 +140,8 @@ class Agreement
 	/**
 	 * Retrieves the BBC-parsed version of the agreement.
 	 *
-	 * It uses the language, but if the localized version doesn't exist
-	 * then it may return the english version.
+	 * It uses the language, but if the localized version doesn't exist,
+	 * then it may return the English version.
 	 *
 	 * @param bool $fallback if fallback to the English version (default true).
 	 *
@@ -189,7 +189,7 @@ class Agreement
 			]
 		);
 
-		return !empty($accepted);
+		return $accepted->hasResults();
 	}
 
 	/**

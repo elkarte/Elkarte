@@ -51,9 +51,9 @@ class BoardsTree
 	 * Load a lot of useful information regarding the boards and categories.
 	 *
 	 * - The information retrieved is stored in globals:
-	 *   $this->boards:    properties of each board.
+	 *   $this->boards: properties of each board.
 	 *   $this->boardList: a list of boards grouped by category ID.
-	 *   $this->cat_tree:  properties of each category.
+	 *   $this->cat_tree: properties of each category.
 	 *
 	 * @param array $query
 	 *
@@ -113,7 +113,7 @@ class BoardsTree
 					'id' => $row['id_board'],
 					'category' => $row['id_cat'],
 					'parent' => (int) $row['id_parent'],
-					'level' => $row['child_level'],
+					'level' => (int) $row['child_level'],
 					'order' => (int) $row['board_order'],
 					'name' => $row['board_name'],
 					'member_groups' => array_map('intval', explode(',', $row['member_groups'])),
@@ -121,8 +121,8 @@ class BoardsTree
 					'description' => $row['description'],
 					'count_posts' => empty($row['count_posts']),
 					'old_posts' => empty($row['old_posts']),
-					'posts' => $row['num_posts'],
-					'topics' => $row['num_topics'],
+					'posts' => (int) $row['num_posts'],
+					'topics' => (int) $row['num_topics'],
 					'theme' => $row['id_theme'],
 					'override_theme' => $row['override_theme'],
 					'profile' => $row['id_profile'],
@@ -283,11 +283,11 @@ class BoardsTree
 	 *
 	 * @param int $id The id of the board.
 	 *
-	 * @return array|Board The board object with the specified id.
+	 * @return array The board object with the specified id.
 	 *
 	 * @throws Exception When the board id doesn't exist.
 	 */
-	public function getBoardById($id): array|Board
+	public function getBoardById($id): array
 	{
 		if (isset($this->boards[$id]))
 		{
@@ -323,12 +323,12 @@ class BoardsTree
 	/**
 	 * Remove one or more boards.
 	 *
-	 * - Allows to move the children of the board before deleting it
-	 * - if moveChildrenTo is set to null, the sub-boards will be deleted.
+	 * - Allows moving the children of the board before deleting it
+	 * - If moveChildrenTo is set to null, the sub-boards will be deleted.
 	 * - Deletes:
-	 *   - all topics that are on the given boards;
-	 *   - all information that's associated with the given boards;
-	 * - updates the statistics to reflect the new situation.
+	 *   - All topics that are on the given boards;
+	 *   - All information associated with the given boards;
+	 * - Updates the statistics to reflect the new situation.
 	 *
 	 * @param int[] $boards_to_remove
 	 * @param int|null $moveChildrenTo = null
@@ -449,7 +449,7 @@ class BoardsTree
 			]
 		);
 
-		// Latest message/topic might not be there anymore.
+		// The latest message / topic might not be there anymore.
 		require_once(SUBSDIR . '/Messages.subs.php');
 		updateMessageStats();
 
@@ -457,7 +457,7 @@ class BoardsTree
 		updateTopicStats();
 		updateSettings(['calendar_updated' => time()]);
 
-		// Plus reset the cache to stop people getting odd results.
+		// Plus, reset the cache to stop people getting odd results.
 		updateSettings(['settings_updated' => time()]);
 
 		// Clean the cache as well.
@@ -475,7 +475,7 @@ class BoardsTree
 	/**
 	 * Fixes the children of a board by setting their child_levels to new values.
 	 *
-	 * - Used when a board is deleted or moved, to affect its children.
+	 * - Used when a board is deleted or moved to affect its children.
 	 *
 	 * @param int $parent
 	 * @param int $newLevel

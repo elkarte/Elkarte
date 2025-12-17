@@ -18,7 +18,7 @@ use ElkArte\Helper\HttpReq;
 /**
  * Action class defines an action with its associated sub-actions.
  *
- * Object-oriented controllers (with sub-actions) use it to set their action-subaction arrays, and have it call the
+ * Object-oriented controllers (with sub-actions) use it to set their action-subaction arrays and have it call the
  * right function or method handlers.
  *
  * Replaces the sub-actions arrays in every dispatching function.
@@ -169,7 +169,7 @@ class Action
 
 	/**
 	 * Security check: verify that the user has the permission to perform the
-	 * given action, and throw an error otherwise.
+	 * given action and throw an error otherwise.
 	 *
 	 * @param string $sub_id The sub action
 	 */

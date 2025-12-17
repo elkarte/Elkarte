@@ -227,8 +227,8 @@ class Debug
 			foreach ($this->_cache_hits as $cache_hit)
 			{
 				$entries[] = $cache_hit['d'] . ' ' . $cache_hit['k'] . ': ' . sprintf($txt['debug_cache_seconds_bytes'], comma_format($cache_hit['t'], 5), $cache_hit['s']);
-				$total_t += $cache_hit['t'];
-				$total_s += $cache_hit['s'];
+				$total_t += (float) $cache_hit['t'];
+				$total_s += (float) $cache_hit['s'];
 			}
 
 			$expand_id[] = 'debug_cache_info';
@@ -237,7 +237,7 @@ class Debug
 				', $txt['debug_cache_hits'], $this->cache_count(), ': ', sprintf($txt['debug_cache_seconds_bytes_total'], comma_format($total_t, 5), comma_format($total_s)), ' (<a id="debug_cache_info" href="#">', $txt['debug_show'], '</a><span class="hide"><em>', implode('</em>, <em>', $entries), '</em></span>)<br />';
 		}
 
-		// Want to see the querys in a new windows?
+		// Want to see the querys in a new window?
 		echo '
 				<a href="', getUrl('action', ['action' => 'viewquery']), '" target="_blank" class="new_win">', sprintf($txt['debug_queries_used'], $this->_db_count), '</a><br />';
 
@@ -300,7 +300,7 @@ class Debug
 			$_SESSION['debug'] = $this->_db_cache;
 		}
 
-		// Compute some system info, if we can
+		// Compute some system info if we can
 		$this->_system['system_type'] = php_uname();
 		require_once(SUBSDIR . '/Server.subs.php');
 		$this->_system['server_load'] = detectServerLoad();
@@ -345,7 +345,7 @@ class Debug
 	}
 
 	/**
-	 * Adds a new getrusage value (by default two are added: one at the beginning
+	 * Adds a new getrusage value (by default, two are added: one at the beginning
 	 * of the script execution and one at the end)
 	 *
 	 * @param string $point can be end or start depending on when the function
@@ -397,7 +397,7 @@ class Debug
 					}
 				}
 			}
-			// But actual creation of the temporary tables are.
+			// But the actual creation of the temporary tables are.
 			elseif (preg_match('~^CREATE TEMPORARY TABLE .+?SELECT .+$~s', trim($qq['q'])) != 0)
 			{
 				$is_select = true;
