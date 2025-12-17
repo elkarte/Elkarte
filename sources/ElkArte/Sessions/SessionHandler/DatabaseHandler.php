@@ -18,6 +18,7 @@ namespace ElkArte\Sessions\SessionHandler;
 
 use ElkArte\Database\QueryInterface;
 use ElkArte\Helper\ValuesContainer;
+use ReturnTypeWillChange;
 
 /**
  * Class DatabaseHandler
@@ -71,7 +72,7 @@ class DatabaseHandler extends \SessionHandler
 	/**
 	 * {@inheritDoc}
 	 */
-	public function gc($maxLifetime)
+	public function gc($maxLifetime): int|false
 	{
 		// Just set to the default or lower?  Ignore it for a higher value. (hopefully)
 		if (!empty($this->_modSettings['databaseSession_lifetime']) && ($maxLifetime <= 1440 || $this->_modSettings['databaseSession_lifetime'] > $maxLifetime))
@@ -88,7 +89,7 @@ class DatabaseHandler extends \SessionHandler
 			]
 		);
 
-		return $result->affected_rows() !== 0;
+		return $result->affected_rows();
 	}
 
 	/**

@@ -794,7 +794,7 @@ class Standard extends AbstractAPI
 	 */
 	public function useWordIndex()
 	{
-		return true;
+		return false;
 	}
 
 	/**
