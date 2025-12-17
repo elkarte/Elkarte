@@ -53,7 +53,7 @@ class Directories
 	}
 
 	/**
-	 * Returns if theme directory's have been loaded
+	 * Returns if theme directory's has been loaded
 	 *
 	 * @return bool
 	 */
@@ -86,13 +86,13 @@ class Directories
 			$this->addDirectory($settings['theme_dir']);
 		}
 
-		// Based on theme (if there is one).
+		// Based on a theme (if there is one).
 		if (!empty($settings['base_theme_dir']))
 		{
 			$this->addDirectory($settings['base_theme_dir']);
 		}
 
-		// Lastly the default theme.
+		// Lastly, the default theme.
 		if ($settings['theme_dir'] !== $settings['default_theme_dir'])
 		{
 			$this->addDirectory($settings['default_theme_dir']);
@@ -100,21 +100,15 @@ class Directories
 	}
 
 	/**
-	 * Load the template/language file using eval or require? (with eval we can show an
-	 * error message!)
+	 * Includes a specified file, with an option to include it only once.
 	 *
-	 * What it does:
-	 * - Loads the template or language file specified by filename.
-	 * - Uses eval unless disableTemplateEval is enabled.
-	 * - Outputs a parse error if the file did not exist or contained errors.
-	 * - Attempts to detect the error and line, and show detailed information.
-	 *
-	 * @param string $filename
-	 * @param bool $once = false, if true only includes the file once (like include_once)
+	 * @param string $filename The path to the file to be included.
+	 * @param bool $once Optional. If true, the file will only be included once. Default is false.
+	 * @return void
 	 */
 	public function fileInclude($filename, $once = false): void
 	{
-		// Don't include the file more than once, if $once is true.
+		// Don't include the file more than once if $once is true.
 		if ($once && in_array($filename, $this->templates))
 		{
 			return;

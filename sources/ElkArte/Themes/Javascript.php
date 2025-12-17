@@ -15,10 +15,10 @@ namespace ElkArte\Themes;
 use ElkArte\Helper\SiteCombiner;
 
 /**
- * class Javascript
+ * Class Javascript
  *
  * Part of core Theme functions.  Responsible for the outputting JavaScript, including files,
- * inline and vars.  Will do simple compression if enabled in the ACP
+ * inline, and vars.  Will do simple compression if enabled in the ACP
  */
 class Javascript
 {
@@ -89,10 +89,10 @@ class Javascript
 			$this->templateJquery();
 		}
 
-		// Use this hook to work with JavaScript files and vars pre output
-		call_integration_hook('pre_javascript_output', []);
+		// Use this hook to work with JavaScript files and vars pre-output
+		call_integration_hook('pre_javascript_output');
 
-		// Load all the Javascript files
+		// Load all the JavaScript files
 		$this->templateJavascriptFiles();
 
 		// Output any <head> level inline JS
@@ -152,7 +152,7 @@ class Javascript
 	 *
 	 * - Will combine / minify the files if the option is set.
 	 * - Handles files that are output in template_html_above <head> section
-	 * - Clears all files from $this->js_files so that it can be called multiple times.  Current
+	 * - Clears all files from $this->js_files so that it can be called multiple times. Currently,
 	 * this is called from here and then again in index.template (for files added by templates)
 	 */
 	public function templateJavascriptFiles(): void
@@ -179,7 +179,7 @@ class Javascript
 	}
 
 	/**
-	 * Outputs script tags to the template with appropriate defer, async or void attributes
+	 * Outputs script tags to the template with appropriate defer, async, or void attributes
 	 *
 	 * Called from template_html_above to output JS defined in the *CONTROLLERS*
 	 * Called from template_html_below to output JS defined in the *TEMPLATES*.
@@ -189,7 +189,7 @@ class Javascript
 	 */
 	public function outputJavascriptFiles($files): void
 	{
-		// While we have Javascript files to place in the template
+		// While we have JavaScript files to place in the template
 		foreach ($files as $id => $js_file)
 		{
 			$async = empty($js_file['options']['async']) ? '' : ' async="async"';
@@ -203,7 +203,7 @@ class Javascript
 	/**
 	 * Inline JavaScript - Actually useful sometimes!
 	 *
-	 * @param bool $do_deferred if true outputs the inline JS that was marked as deferred.
+	 * @param bool $do_deferred if true, outputs the inline JS marked as deferred.
 	 * @param int $tabs number of tabs to use for indentation
 	 *
 	 * @return void
@@ -215,7 +215,7 @@ class Javascript
 			return;
 		}
 
-		// Deferred output waits until we are deferring !
+		// Deferred output waits until we are deferring!
 		if (!empty($this->js_inline['defer']) && $do_deferred)
 		{
 			$output = $this->formatInlineJS($this->js_inline['defer'], $tabs);
@@ -254,7 +254,7 @@ class Javascript
 		{
 			// Inline can have user prefs etc. so caching is not a viable option
 			// Benchmarked: at 0.01627s wall clock, 16.26ms for computations, 42% size reduction
-			// for large load, 10.3ms (.0104s) for normal sized inline.
+			// for a large load, 10.3ms (.0104s) for normal-sized inline.
 			$combiner = new SiteCombiner($settings['default_theme_cache_dir'], $settings['default_theme_cache_url'], true);
 			foreach ($files as $i => $js_block)
 			{
@@ -270,7 +270,7 @@ class Javascript
 			// Lines in this block
 			$lines = explode("\n", $js_block);
 
-			// One liner, just indent
+			// One-liner, just indent
 			if (count($lines) === 1)
 			{
 				$files[$i] = str_repeat("\t", $tabs) . ltrim($js_block);
@@ -297,10 +297,10 @@ class Javascript
 	}
 
 	/**
-	 * Adds a block of inline Javascript code to be executed later
+	 * Adds a block of inline JavaScript code to be executed later
 	 *
 	 * What it does:
-	 * - only use this if you have to, generally external JS files are better, but for very small scripts
+	 * - Only use this if you have to, generally external JS files are better, but for very small scripts
 	 *   or for scripts that require help from PHP/whatever, this can be useful.
 	 * - All code added with this function is added to the same <script> tag so do make sure your JS is clean!
 	 *
@@ -316,7 +316,7 @@ class Javascript
 	}
 
 	/**
-	 * Add a JavaScript variable for output later (for feeding text strings and similar to JS)
+	 * Add a JavaScript variable for output (for feeding text strings and similar to JS)
 	 *
 	 * @param array $vars array of vars to include in the output done as 'varname' => 'var value'
 	 * @param bool $escape = false, whether to escape the value

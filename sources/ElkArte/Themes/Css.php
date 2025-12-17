@@ -50,13 +50,13 @@ class Css
 	 * Output the CSS files
 	 *
 	 * What it does:
-	 *  - If the admin option to combine files is set, will use Combiner.class
+	 *  - If the admin option to combine files is set, will use the Combiner.class
 	 */
 	public function template_css(): void
 	{
 		global $modSettings, $settings;
 
-		// Use this hook to work with CSS files pre output
+		// Use this hook to work with CSS files pre-output
 		call_integration_hook('pre_css_output');
 
 		if (empty($this->css_files))
@@ -105,7 +105,13 @@ class Css
 	}
 
 	/**
-	 * Output the inline-CSS in a style tag
+	 * Generates inline CSS code based on predefined CSS rules and outputs it within a `<style>` tag.
+	 *
+	 * The method processes the available CSS rules, optionally combines and minifies them,
+	 * and outputs the result as inline CSS within the HTML document. It handles both general
+	 * CSS rules and media-specific rules, ensuring media are placed after general.
+	 *
+	 * @return void
 	 */
 	public function template_inlinecss(): void
 	{
@@ -139,7 +145,7 @@ class Css
 			if (!empty($modSettings['minify_css_js']))
 			{
 				$combiner = new SiteCombiner($settings['default_theme_cache_dir'], $settings['default_theme_cache_url'], true);
-				$style_tag = $combiner->cssMinify($style_tag, true);
+				$style_tag = $combiner->cssMinify($style_tag);
 			}
 
 			echo '

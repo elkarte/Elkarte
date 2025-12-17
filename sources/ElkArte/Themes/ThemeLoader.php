@@ -68,7 +68,7 @@ class ThemeLoader
 	 * - load the users theme settings and site settings into $options.
 	 * - prepares the list of folders to search for template loading.
 	 * - sets up $context['user']
-	 * - detects the users browser and sets a mobile friendly environment if needed
+	 * - detects the users browser and sets a mobile-friendly environment if needed
 	 * - loads default JS variables for use in every theme
 	 * - loads default JS scripts for use in every theme
 	 *
@@ -140,7 +140,7 @@ class ThemeLoader
 		$loader->setPsr4('\\ElkArte\\Themes\\' . $themeName . '\\', $themeData[0]['default_theme_dir']);
 		$loader->register();
 
-		// Setup the theme file.
+		// Set up the theme file.
 		require_once($settings['theme_dir'] . '/Theme.php');
 		$class = '\\ElkArte\\Themes\\' . $themeName . '\\Theme';
 
@@ -156,11 +156,11 @@ class ThemeLoader
 	 * Resolves the ID of a theme.
 	 *
 	 * The identifier can be specified in:
-	 * - a GET variable if theme selection is enabled
-	 * - the session
-	 * - user's preferences
-	 * - board
-	 * - forum default
+	 *  - a GET variable if theme selection is enabled
+	 *  - the session
+	 *  - user's preferences
+	 *  - board
+	 *  - forum default
 	 *
 	 * In addition, the ID is verified against a comma-separated list of
 	 * known good themes. This check is skipped if the user is an admin.
@@ -176,7 +176,7 @@ class ThemeLoader
 		{
 			$this->_chooseTheme();
 		}
-		// The theme was specified by the board.
+		// The board specified the theme.
 		elseif (!empty($board_info['theme']))
 		{
 			$this->id = $board_info['theme'];
@@ -187,7 +187,7 @@ class ThemeLoader
 			$this->id = $modSettings['theme_guests'];
 		}
 
-		// Whatever we found, make sure its valid
+		// Whatever we found, make sure it's valid
 		$this->_validThemeID();
 	}
 
@@ -198,7 +198,7 @@ class ThemeLoader
 	{
 		$_req = HttpReq::instance();
 
-		// The theme was previously set by th (ACP)
+		// The (ACP) previously set the theme
 		if (!empty($this->id) && !empty($_req->isSet('th')))
 		{
 			return;
@@ -210,7 +210,7 @@ class ThemeLoader
 			$this->id = $_req->get('theme');
 			$_SESSION['theme'] = $this->id;
 		}
-		// The theme was specified by REQUEST... previously.
+		// REQUEST specified the theme... previously.
 		elseif (!empty($_req->getSession('theme')))
 		{
 			$this->id = (int) $_req->getSession('theme');
@@ -254,7 +254,7 @@ class ThemeLoader
 
 		$cache = Cache::instance();
 
-		// Do we already have this members theme data and specific options loaded (for aggressive cache settings)
+		// Do we already have this members theme data and specific options loaded (for aggressive cache settings)?
 		$temp = [];
 		if ($cache->levelHigherThan(1)
 			&& $cache->getVar($temp, 'theme_settings-' . $this->id . ':' . $member, 60)
@@ -263,7 +263,7 @@ class ThemeLoader
 			$themeData = $temp;
 			$flag = true;
 		}
-		// Or do we just have the system wide theme settings cached
+		// Or do we just have the system-wide theme settings cached?
 		elseif ($cache->getVar($temp, 'theme_settings-' . $this->id, 90)
 			&& time() - 60 > $modSettings['settings_updated'])
 		{
@@ -307,7 +307,7 @@ class ThemeLoader
 						$themeData[0]['default_' . $row['variable']] = $row['value'];
 					}
 
-					// If this isn't set yet, is a theme option, or is not the default theme..
+					// If this isn't set yet, is a theme option, or is not the default theme.
 					if (!isset($themeData[$row['id_member']][$row['variable']]) || (int) $row['id_theme'] !== 1)
 					{
 						$themeData[$row['id_member']][$row['variable']] = str_starts_with($row['variable'], 'show_') ? (int) $row['value'] === 1 : $row['value'];
@@ -340,7 +340,7 @@ class ThemeLoader
 				}
 			}
 
-			// If being aggressive we save the site wide and member theme settings
+			// If being aggressive, we save the site wide and member theme settings
 			if ($cache->levelHigherThan(1))
 			{
 				$cache->put('theme_settings-' . $this->id . ':' . $member, $themeData, 60);
@@ -361,7 +361,7 @@ class ThemeLoader
 	 * Attempts to correct improper URL's
 	 *  - Point to httpS if http is requested
 	 *  - Point to www.siteName.com if siteName.com is requested
-	 *  - Point to an proper address if this is an alias address
+	 *  - Point to a proper address if this is an alias address
 	 */
 	private function loadThemeUrls(): void
 	{
@@ -382,7 +382,7 @@ class ThemeLoader
 			// Try #1 - check if it's in a list of alias addresses.
 			$do_fix = $this->checkAlias($detected_url);
 
-			// Hmm... check #2 - is it just different by a www?  Send them to the correct place!!
+			// Hmm... check #2 - is it just different from a www?  Send them to the correct place!!
 			if ($do_fix === false)
 			{
 				$this->checkWWWRedirect($detected_url);
@@ -394,9 +394,9 @@ class ThemeLoader
 				$do_fix = true;
 			}
 
-			// Okay, #4 - perhaps it's an IP address?  We're gonna want to use that one, then. (assuming it's the IP or something...)
+			// Okay, #4 - perhaps it's an IP address?  We're going to want to use that one, then. (assuming it's the IP or something...)
 			// Okay, #4a - The previous code had || preg_match('~^http[s]?://(?:[\d\.:]+|\[[\d:]+\](?::\d+)?)(?:$|/)~', $detected_url) === 1)
-			// however this has shown to replace valid site name with a ip address, leaving the site wrecked due to $_SERVER
+			// however, this has shown to replace valid site name with an ip address, leaving the site wrecked due to $_SERVER
 			// returning suspect info
 			if ($do_fix === true)
 			{
@@ -471,7 +471,7 @@ class ThemeLoader
 	}
 
 	/**
-	 * Called if the detected URL is not the same as boardurl but is a common
+	 * Called if the detected URL is different from boardurl but is a common
 	 * variation in which case it updates key system variables so it works.
 	 *
 	 * @param string $detected_url
@@ -540,7 +540,7 @@ class ThemeLoader
 
 			require_once(SUBSDIR . '/Admin.subs.php');
 
-			// Required by updateAdminPreferences
+			// Required for updateAdminPreferences to run
 			$context['admin_preferences'] = $array_form;
 			updateAdminPreferences();
 		});
@@ -645,7 +645,7 @@ class ThemeLoader
 	}
 
 	/**
-	 * Loads various theme related settings into context and sets system-wide theme defaults
+	 * Loads various theme-related settings into context and sets system-wide theme defaults
 	 */
 	private function loadThemeContext(): void
 	{
@@ -769,10 +769,10 @@ class ThemeLoader
 	{
 		global $context, $settings;
 
-		// Load icon SVG support file with fallback to default theme
+		// Load the icon SVG support file with fallback to default theme
 		loadCSSFile('icons_svg.css');
 
-		// We allow theme variants, because we're cool.
+		// We allow theme variants because we're cool.
 		if (!empty($settings['theme_variants']))
 		{
 			$this->theme->loadThemeVariant();
@@ -857,7 +857,7 @@ class ThemeLoader
 	/**
 	 * This loads the bare minimum data.
 	 *
-	 * - Needed by scheduled tasks,
+	 * - Needed by scheduled tasks.
 	 * - Needed by any other code that needs language files before the forum (the theme) is loaded.
 	 */
 	public static function loadEssentialThemeData(): void

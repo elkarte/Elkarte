@@ -222,7 +222,7 @@ abstract class Theme
 	}
 
 	/**
-	 * Setup guest context
+	 * Set up guest context
 	 *
 	 * What it does:
 	 *  - Initializes global variables for guest user context
@@ -431,7 +431,7 @@ abstract class Theme
 	}
 
 	/**
-	 * If video embedding is enabled, this loads the needed JS and vars
+	 * If video embedding is enabled, this loads the necessary JS and vars
 	 */
 	public function autoEmbedVideo(): void
 	{
@@ -482,7 +482,7 @@ abstract class Theme
 		]);
 		loadJavascriptFile('elk_pwa.js', ['defer' => false]);
 
-		// Not enabled, lets be sure to remove it should it exist
+		// Not enabled, let's be sure to remove it should it exist
 		if (empty($modSettings['pwa_enabled']))
 		{
 			$this->addInlineJavascript('
@@ -555,7 +555,7 @@ abstract class Theme
 	}
 
 	/**
-	 * Load a variant css file if found.  Fallback if not and it exists in this
+	 * Load a variant CSS file if found.  Fallback if not, and it exists in this
 	 * theme's directory
 	 *
 	 * @param string $cssFile
@@ -806,7 +806,7 @@ abstract class Theme
 	 * Makes the default layers and languages available
 	 *
 	 * - Loads index and addon language files as needed
-	 * - Loads xml, index or no templates as needed
+	 * - Loads XML, index, or no templates as needed
 	 * - Loads templates as defined by $settings['theme_templates']
 	 */
 	public function loadDefaultLayers(): void

@@ -70,7 +70,7 @@ class TemplateLayers extends Priority
 	{
 		$all_layers = $this->sort();
 
-		// If we are dealing with an error page (fatal_error) then we have to prune all the unwanted layers
+		// If we are dealing with an error page (fatal_error), then we have to prune all the unwanted layers
 		if ($this->_is_error)
 		{
 			$dummy = $all_layers;
@@ -89,7 +89,7 @@ class TemplateLayers extends Priority
 	/**
 	 * Check if at least one layer has been added
 	 *
-	 * @param bool $base if true will not consider body and html layers in result
+	 * @param bool $base if true will not consider body and HTML layers in result
 	 *
 	 * @return array|bool true if at least one layer has been added
 	 * @todo at that moment _all_after and _all_before are not considered because they may not be "forced"
@@ -120,7 +120,7 @@ class TemplateLayers extends Priority
 
 	/**
 	 * Retrieves all the currently loaded layers by combining various categories of layers.
-	 * The method merges general layers, begin layers, end layers, after layers, and before layers into a single array.
+	 * The method merges general layers, beginning layers, end layers, after layers, and before layers into a single array.
 	 *
 	 * @return array the combined list of all loaded layers
 	 */
