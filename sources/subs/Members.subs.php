@@ -568,7 +568,6 @@ function registerMember(&$regOptions, $ErrorContext = 'register')
 		}
 	}
 
-	// @todo move to controller
 	// You may not be allowed to register this email.
 	if (!empty($regOptions['check_email_ban']))
 	{

@@ -215,6 +215,16 @@ abstract class ElkArteWebSupport extends Selenium2TestCase
 	{
 		// Logout, if logged in
 		$this->url('index.php');
+		$this->waitUntil(function ($testCase) {
+			try
+			{
+				return $testCase->byId('menu_nav');
+			}
+			catch (PHPUnit\Extensions\Selenium2TestCase\WebDriverException $e)
+			{
+				return false;
+			}
+		}, 10000);
 		$check = $this->byId('menu_nav')->text();
 		$check = strpos($check, 'Admin');
 
@@ -223,6 +233,16 @@ abstract class ElkArteWebSupport extends Selenium2TestCase
 		{
 			$link = $this->byId('button_logout')->byCssSelector('a')->attribute('href');
 			$this->url($link);
+			$this->waitUntil(function ($testCase) {
+				try
+				{
+					return $testCase->byId('menu_nav');
+				}
+				catch (PHPUnit\Extensions\Selenium2TestCase\WebDriverException $e)
+				{
+					return false;
+				}
+			}, 10000);
 		}
 	}
 
