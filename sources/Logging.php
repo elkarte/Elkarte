@@ -153,7 +153,7 @@ function writeLog($force = false)
  * What it does:
  *
  * - Attempts to use the backup file first, to store the last database error
- * - only updates db_last_error.txt if the first was successful.
+ * - Only updates db_last_error.txt if the first was successful.
  */
 function logLastDatabaseError()
 {
@@ -165,7 +165,7 @@ function logLastDatabaseError()
 	// Save the old file before we do anything
 	$file = BOARDDIR . '/db_last_error.txt';
 	$dberror_backup_fail = !$fileFunc->isWritable(BOARDDIR . '/db_last_error_bak.txt') || !@copy($file, BOARDDIR . '/db_last_error_bak.txt');
-	$dberror_backup_fail = $dberror_backup_fail ? ($dberror_backup_fail) : !$fileFunc->fileExists(BOARDDIR . '/db_last_error_bak.txt') || filesize(BOARDDIR . '/db_last_error_bak.txt') === 0;
+	$dberror_backup_fail = $dberror_backup_fail ?: !$fileFunc->fileExists(BOARDDIR . '/db_last_error_bak.txt') || filesize(BOARDDIR . '/db_last_error_bak.txt') === 0;
 
 	clearstatcache();
 	if (filemtime(BOARDDIR . '/db_last_error.txt') === $last_db_error_change)
@@ -177,7 +177,7 @@ function logLastDatabaseError()
 		// Survey says ...
 		if ($written_bytes !== strlen($write_db_change) && !$dberror_backup_fail)
 		{
-			// Oops. maybe we have no more disk space left, or some other troubles, troubles...
+			// Oops. maybe we have no more disk space left or some other troubles, troubles...
 			// Copy the file back and run for your life!
 			@copy(BOARDDIR . '/db_last_error_bak.txt', BOARDDIR . '/db_last_error.txt');
 
@@ -197,7 +197,7 @@ function logLastDatabaseError()
  *
  * - Caches statistics changes, and flushes them if you pass nothing.
  * - If '+' is used as a value, it will be incremented.
- * - It does not actually commit the changes until the end of the page view.
+ * - It does not commit the changes until the end of the page view.
  * - It depends on the trackStats setting.
  *
  * @param array $stats = array() array of array => direction (+/-)
@@ -293,10 +293,10 @@ function logAction($action, $extra = [], $log_type = 'moderate')
  *
  * @event integrate_log_types allows adding additional log types for integrations
  * @param array $logs array of actions to log [] = array(action => log_type=> extra=>)
- *   - action => A code for the log
- *   - extra => An associated array of parameters for the item being logged.
+ *   - 'action' => A code for the log
+ *   - 'extra' => An associated array of parameters for the item being logged.
  *     This will include 'topic' for the topic id or message for the message id
- *   - log_type => A string reflecting the type of log, moderate for moderation actions,
+ *   - 'log_type' => A string reflecting the type of log, moderate for moderation actions,
  *     admin for administrative actions, user for user
  *
  * @return int the last logged ID
@@ -331,7 +331,7 @@ function logActions($logs)
 		// Do we have something to log here, after all?
 		if (!is_array($log['extra']))
 		{
-			trigger_error("logActions(): data is not an array with action '" . $log['action'] . "'", E_USER_NOTICE);
+			trigger_error("logActions(): data is not an array with action '" . $log['action'] . "'");
 		}
 
 		// Pull out the parts we want to store separately, but also make sure that the data is proper
@@ -339,7 +339,7 @@ function logActions($logs)
 		{
 			if (!is_numeric($log['extra']['topic']))
 			{
-				trigger_error("logActions(): data's topic is not a number", E_USER_NOTICE);
+				trigger_error("logActions(): data's topic is not a number");
 			}
 
 			$topic_id = empty($log['extra']['topic']) ? 0 : (int) $log['extra']['topic'];
@@ -354,7 +354,7 @@ function logActions($logs)
 		{
 			if (!is_numeric($log['extra']['message']))
 			{
-				trigger_error("logActions(): data's message is not a number", E_USER_NOTICE);
+				trigger_error("logActions(): data's message is not a number");
 			}
 
 			$msg_id = empty($log['extra']['message']) ? 0 : (int) $log['extra']['message'];

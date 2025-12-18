@@ -50,7 +50,7 @@ function loadSession()
 	{
 		$parsed_url = parse_url($boardurl);
 
-		if (preg_match('~^\d{1,3}(\.\d{1,3}){3}$~', $parsed_url['host']) == 0 && preg_match('~(?:[^\.]+\.)?([^\.]{2,}\..+)\z~i', $parsed_url['host'], $parts) == 1)
+		if (preg_match('~^\d{1,3}(\.\d{1,3}){3}$~', $parsed_url['host']) !== 1 && preg_match('~(?:[^\.]+\.)?([^\.]{2,}\..+)\z~i', $parsed_url['host'], $parts) === 1)
 		{
 			@ini_set('session.cookie_domain', '.' . $parts[1]);
 		}
@@ -58,7 +58,7 @@ function loadSession()
 
 	// @todo Set the session cookie path?
 	// If it's already been started... probably best to skip this.
-	if ((ini_get('session.auto_start') == 1 && !empty($modSettings['databaseSession_enable'])) || session_id() == '')
+	if ((ini_get('session.auto_start') == 1 && !empty($modSettings['databaseSession_enable'])) || session_id() === '')
 	{
 		// Attempt to end the already-started session.
 		if (ini_get('session.auto_start') == 1)
@@ -67,7 +67,7 @@ function loadSession()
 		}
 
 		// This is here to stop people from using bad junky PHPSESSIDs.
-		if (isset($_REQUEST[session_name()]) && preg_match('~^[A-Za-z0-9,-]{16,64}$~', $_REQUEST[session_name()]) == 0 && !isset($_COOKIE[session_name()]))
+		if (isset($_REQUEST[session_name()]) && preg_match('~^[A-Za-z0-9,-]{16,64}$~', $_REQUEST[session_name()]) !== 1 && !isset($_COOKIE[session_name()]))
 		{
 			$tokenizer = new TokenHash();
 			$session_id = hash('md5', hash('md5', 'elk_sess_' . time()) . $tokenizer->generate_hash(8));
@@ -93,7 +93,7 @@ function loadSession()
 			);
 
 			/*
-			 * Avoid unexpected side-effects from the way PHP
+			 * Avoid unexpected side effects from the way PHP
 			 * internally destroys objects on shutdown.
 			 *
 			 * See notes on http://php.net/manual/en/function.session-set-save-handler.php
@@ -104,7 +104,7 @@ function loadSession()
 		{
 			@ini_set('session.gc_maxlifetime', max($modSettings['databaseSession_lifetime'], 60));
 
-			// APC destroys static class members before sessions can be written.  To work around this we
+			// APC destroys static class members before sessions can be written.  To work around this, we
 			// explicitly call session_write_close on script end/exit bugs.php.net/bug.php?id=60657
 			if (extension_loaded('apc') && ini_get('apc.enabled') && !extension_loaded('apcu'))
 			{

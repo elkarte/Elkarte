@@ -23,8 +23,8 @@ use ElkArte\Http\Headers;
  * What it does:
  *
  * - It writes all the database to standard output.
- * - It uses gzip compression if compress is set in the URL/post data.
- * - It may possibly time out, and mess up badly if you were relying on it. :P
+ * - It uses gzip compression if compress is set in the URL/post-data.
+ * - It may time out, and mess up badly if you were relying on it. :P
  * - The data dumped depends on whether "struct" and "data" are passed.
  * - It is called from ManageMaintenance.controller.php.
  */
@@ -35,7 +35,7 @@ function DumpDatabase2()
 	// We'll need a db to dump :P
 	$database = database();
 
-	// We don't need debug when dumping the database
+	// We don't need to debug when dumping the database
 	$modSettings['disableQueryCheck'] = true;
 	$db_show_debug = false;
 
@@ -82,7 +82,7 @@ function DumpDatabase2()
 			@ob_end_clean();
 		}
 		// If we can, clean anything already sent from the output buffer...
-		elseif (ob_get_length() != 0)
+		elseif (ob_get_length() !== 0)
 		{
 			ob_clean();
 		}
@@ -108,7 +108,7 @@ function DumpDatabase2()
 		->header('Connection', 'close')
 		->sendHeaders();
 
-	// This makes things simpler when using it so very very often.
+	// This simplifies things when using it so very often.
 	$crlf = "\r\n";
 
 	// SQL Dump Header.
@@ -121,7 +121,7 @@ function DumpDatabase2()
 		'-- ==========================================================' . $crlf .
 		$crlf;
 
-	// Get all tables in the database....for our installation
+	// Get all tables in the database for our installation
 	$real_prefix = preg_match('~^(`?)(.+?)\\1\\.(.*?)$~', $db_prefix, $match) === 1 ? $match[3] : $db_prefix;
 	$tables = $database->list_tables(false, $real_prefix . '%');
 
@@ -139,14 +139,14 @@ function DumpDatabase2()
 				$crlf .
 				$database->table_sql($tableName) . ';' . $crlf;
 		}
-		// This is needed to speedup things later
+		// This is needed to speed up things later
 		else
 		{
 			$database->table_sql($tableName);
 		}
 
 		// How about the data?
-		if (!isset($_REQUEST['data']) || substr($tableName, -10) === 'log_errors')
+		if (!isset($_REQUEST['data']) || str_ends_with($tableName, 'log_errors'))
 		{
 			continue;
 		}

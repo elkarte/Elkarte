@@ -179,8 +179,8 @@ function constructPageIndex($base_url, &$start, $max_value, $num_per_page, $flex
  *
  * What it does:
  *
- * - Uses the format of number_format to decide how to format the number.
- *   for example, it might display "1 234,50".
+ * - Uses the format of number_format to decide how to format the number -
+ * for example, it might display "1 234,50".
  * - Caches the formatting data from the setting for optimization.
  *
  * @param float $number The float value to apply comma formatting
@@ -197,7 +197,7 @@ function comma_format($number, $override_decimal_count = false)
 	if ($decimal_separator === null)
 	{
 		// Not set for whatever reason?
-		if (empty($txt['number_format']) || preg_match('~^1([^\d]*)?234([^\d]*)(0*?)$~', $txt['number_format'], $matches) != 1)
+		if (empty($txt['number_format']) || preg_match('~^1([^\d]*)?234([^\d]*)(0*?)$~', $txt['number_format'], $matches) !== 1)
 		{
 			return $number;
 		}
@@ -275,7 +275,7 @@ function byte_format($number)
  * @param string|bool $show_today = true show "Today"/"Yesterday",
  *   false shows the date, a string can force a date format to use %b %d, %Y
  * @param string|bool $offset_type = false If false, uses both user time offset and forum offset.
- *   If 'forum', uses only the forum offset. Otherwise no offset is applied.
+ *   If 'forum', uses only the forum offset. Otherwise, no offset is applied.
  *
  * @return string
  */
@@ -337,7 +337,7 @@ function standardTime($log_time, $show_today = true, $offset_type = false)
 			return sprintf($txt['today'], standardTime($log_time, $today_fmt, $offset_type));
 		}
 
-		// Day-of-year is one less and same year, or it's the first of the year and that's the last of the year...
+		// Day-of-year is one less and the same year, or it's the first of the year and that's the last of the year...
 		if ((int) $modSettings['todayMod'] === 2
 			&& (($then['yday'] === $now['yday'] - 1 && $then['year'] === $now['year'])
 				|| (($now['yday'] === 0 && $then['year'] === $now['year'] - 1) && $then['mon'] === 12 && $then['mday'] === 31)))
@@ -398,7 +398,7 @@ function standardTime($log_time, $show_today = true, $offset_type = false)
 		$str = str_replace('%e', ltrim(Util::strftime('%d', $time), '0'), $str);
 	}
 
-	// Format any other characters..
+	// Format any other characters.
 	return Util::strftime($str, $time);
 }
 
@@ -498,7 +498,7 @@ function forum_time($use_user_offset = true, $timestamp = null)
  *
  * - Faster than html_entity_decode
  * - Removes the base entities ( &amp; &quot; &#039; &lt; and &gt;. ) from text with htmlspecialchars_decode
- * - Additionally converts &nbsp with str_replace
+ * - Additionally, converts &nbsp with str_replace
  *
  * @param string $string The string to apply htmlspecialchars_decode
  *
@@ -519,7 +519,7 @@ function un_htmlspecialchars($string)
 /**
  * Lexicographic permutation function.
  *
- * This is a special type of permutation which involves the order of the set. The next
+ * This is a special type of permutation that involves the order of the set. The next
  * lexicographic permutation of '32541' is '34125'. Numerically, it is simply the smallest
  * set larger than the current one.
  *
@@ -688,12 +688,12 @@ function obExit($header = null, $do_footer = null, $from_index = false, $from_fa
 		}
 	}
 
-	// Need user agent
+	// Need a user agent
 	$req = Request::instance();
 
 	setOldUrl();
 
-	// For session check verification.... don't switch browsers...
+	// For session check verification... don't switch browsers...
 	$_SESSION['USER_AGENT'] = $req->user_agent();
 
 	// Hand off the output to the portal, etc. we're integrated with.
@@ -703,10 +703,12 @@ function obExit($header = null, $do_footer = null, $from_index = false, $from_fa
 	//if (defined("PHPUNITBOOTSTRAP") && defined("STDIN")){return;}
 
 	// Don't exit if we're coming from index.php; that will pass through normally.
-	if (!$from_index)
-	{
-		exit;
-	}
+	//if (!$from_index)
+	//{
+	//	exit;
+	//}
+
+	exit;
 }
 
 /**
@@ -768,7 +770,7 @@ function setOldUrl($index = 'old_url'): void
 }
 
 /**
- * Sets the class of the current topic based on is_very_hot, veryhot, hot, etc
+ * Sets the class of the current topic based on is_very_hot, veryhot, hot, etc.
  *
  * @param array $topic_context array of topic information
  */
@@ -776,7 +778,7 @@ function determineTopicClass(&$topic_context)
 {
 	$topic_context['class'] = empty($topic_context['is_poll']) ? 'i-normal' : 'i-poll';
 
-	// Set topic class depending on locked status and number of replies.
+	// Set a topic class depending on locked status and number of replies.
 	if ($topic_context['is_very_hot'])
 	{
 		$topic_context['class'] = 'i-hot colorize-red';
@@ -878,7 +880,7 @@ function template_footer()
 }
 
 /**
- * Output the Javascript files
+ * Output the JavaScript files
  *
  * @depreciated since 2.0, only for old theme support
  * @return void
@@ -891,7 +893,7 @@ function template_javascript()
 /**
  * Output the CSS files
  *
- * @depreciated since 2.0, only for old theme suppot
+ * @depreciated since 2.0, only for old theme support
  * @return void
  */
 function template_css()
@@ -990,7 +992,7 @@ function ip2range($fullip)
 }
 
 /**
- * Lookup an IP; try shell_exec first because we can do a timeout on it.
+ * Look up an IP; try shell_exec first because we can do a timeout on it.
  *
  * @param string $ip A full dot notation IP address
  *
@@ -1027,7 +1029,7 @@ function host_from_ip($ip)
 
 			$test = $test ?? '';
 
-			// Did host say it didn't find anything?
+			// Did the host say it didn't find anything?
 			if (stripos($test, 'not found') !== false)
 			{
 				$host = '';
@@ -1038,7 +1040,7 @@ function host_from_ip($ip)
 				updateSettings(['host_to_dis' => 1]);
 			}
 			// Maybe it found something, after all?
-			elseif (preg_match('~\s([^\s]+?)\.\s~', $test, $match) == 1)
+			elseif (preg_match('~\s([^\s]+?)\.\s~', $test, $match) === 1)
 			{
 				$host = $match[1];
 			}
@@ -1079,8 +1081,8 @@ function host_from_ip($ip)
  * Chops a string into words and prepares them to be inserted into (or searched from) the database.
  *
  * @param string $text The string to process
- *     - if encrypt = true this is the maximum number of bytes to use in integer hashes (for searching)
- *     - if encrypt = false this is the maximum number of letters in each word
+ *     - If encrypt = true, this is the maximum number of bytes to use in integer hashes (for searching)
+ *     - If encrypt = false, this is the maximum number of letters in each word
  * @param bool $encrypt = false Used for custom search indexes to return an int[] array representing the words
  *
  * @return array
@@ -1115,7 +1117,7 @@ function text2words($text, $encrypt = false)
 				// designed to be fast while maintaining a low collision rate
 				$encrypted = hash('murmur3a', $word);
 
-				// Create an integer representation, the hash is an 8 char hex
+				// Create an integer representation, the hash is an 8-char hex,
 				// so the largest int will be 4294967295 which fits in db int(10)
 				$returned_ints[$word] = hexdec($encrypted);
 			}
@@ -1139,7 +1141,7 @@ function text2words($text, $encrypt = false)
 }
 
 /**
- * Get the block list from the search controller.
+ * Get the blocklist from the search controller.
  *
  * @return array
  */
@@ -1158,7 +1160,7 @@ function getBlocklist()
 }
 
 /**
- * Sets up all of the top menu buttons
+ * Sets up all the top menu buttons
  *
  * What it does:
  *
@@ -1191,7 +1193,7 @@ function call_integration_hook($hook, $parameters = [])
 }
 
 /**
- * Includes files for hooks that only do that (i.e. integrate_pre_include)
+ * Includes files for hooks that only do that (i.e., integrate_pre_include)
  *
  * @param string $hook The name to include
  */
@@ -1233,7 +1235,7 @@ function add_integration_function($hook, $function, $file = '', $permanent = tru
  *
  * @param string $hook The name of the hook to remove
  * @param string $function The name of the function
- * @param string $file The file its located in
+ * @param string $file The file is located in
  */
 function remove_integration_function($hook, $function, $file = '')
 {
@@ -1241,7 +1243,7 @@ function remove_integration_function($hook, $function, $file = '')
 }
 
 /**
- * Decode numeric html entities to their UTF8 equivalent character.
+ * Decode numeric HTML entities to their UTF8 equivalent character.
  *
  * What it does:
  *
@@ -1268,7 +1270,7 @@ function replaceEntities__callback($matches)
 		return '';
 	}
 
-	// Quote, Ampersand, Apostrophe, Less/Greater Than get html replaced
+	// Quote, Ampersand, Apostrophe, Less/Greater Than get HTML replaced
 	if (in_array($num, [0x22, 0x26, 0x27, 0x3C, 0x3E]))
 	{
 		return '&#' . $num . ';';
@@ -1304,7 +1306,7 @@ function replaceEntities__callback($matches)
 }
 
 /**
- * Converts html entities to utf8 equivalents
+ * Converts HTML entities to utf8 equivalents
  *
  * What it does:
  *
@@ -1355,12 +1357,12 @@ function fixchar__callback($matches)
 }
 
 /**
- * Strips out invalid html entities, replaces others with html style &#123; codes
+ * Strips out invalid HTML entities, replaces others with HTML style &#123; codes
  *
  * What it does:
  *
  * - Callback function used of preg_replace_callback in various $ent_checks,
- * - For example strpos, strlen, substr etc
+ * - For example, strpos, strlen, substr, etc.
  *
  * @param array $matches array of matches for a preg_match_all
  *
@@ -1385,7 +1387,7 @@ function entity_fix__callback($matches)
 }
 
 /**
- * Retrieve additional search engines, if there are any, as an array.
+ * Retrieve additional search engines if there are any, as an array.
  *
  * @return array array of engines
  */
@@ -1458,8 +1460,8 @@ function currentContext($messages_request, $reset = false)
  * @param string $key the key in the array that we are looking to find for the insert action
  * @param array $insert the actual data to insert before or after the key
  * @param string $where adding before or after
- * @param bool $assoc if the array is a assoc array with named keys or a basic index array
- * @param bool $strict search for identical elements, this means it will also check the types of the needle.
+ * @param bool $assoc if the array is an assoc array with named keys or a basic index array
+ * @param bool $strict search for identical elements; this means it will also check the types of the needle.
  *
  * @return array
  */
@@ -1510,7 +1512,7 @@ function scheduleTaskImmediate($task)
 		$scheduleTaskImmediate = Util::unserialize($modSettings['scheduleTaskImmediate']);
 	}
 
-	// If it has not been scheduled, the do so now
+	// If it has not been scheduled, they do so now
 	if (!isset($scheduleTaskImmediate[$task]))
 	{
 		$scheduleTaskImmediate[$task] = 0;
@@ -1537,7 +1539,7 @@ function removeScheduleTaskImmediate($task, $calculateNextTrigger = true)
 {
 	global $modSettings;
 
-	// Not on, bail
+	// Not on then bail
 	if (!isset($modSettings['scheduleTaskImmediate']))
 	{
 		return;
@@ -1563,7 +1565,7 @@ function removeScheduleTaskImmediate($task, $calculateNextTrigger = true)
 /**
  * Helper function to replace commonly used urls in text strings
  *
- * @event integrate_basic_url_replacement add additional place holder replacements
+ * @event integrate_basic_url_replacement add additional placeholder replacements
  * @param string $string the string to inject URLs into
  *
  * @return string the input string with the place-holders replaced with
@@ -1639,7 +1641,7 @@ function request()
  *
  * What it does:
  *
- * - Reads the file db_last_error.txt, if a time() is present returns it,
+ * - Reads the file db_last_error.txt, if a time() is present, returns it,
  * otherwise returns 0.
  */
 function db_last_error()
@@ -1715,7 +1717,7 @@ function isValidEmail($value)
 }
 
 /**
- * Adds a protocol (http/s, ftp/mailto) to the beginning of an url if missing
+ * Adds a protocol (http/s, ftp/mailto) to the beginning of a url if missing
  *
  * @param string $url - The url
  * @param string[] $protocols - A list of protocols to check, the first is
@@ -1877,14 +1879,14 @@ function removeBr($string)
 }
 
 /**
- * Replace all vulgar words with respective proper words. (substring or whole words..)
+ * Replace all vulgar words with respective proper words. (substring or whole words.)
  *
  * What it does:
- *  - it censors the passed string.
- *  - if the admin setting allow_no_censored is on it does not censor unless force is also set.
- *  - if the admin setting allow_no_censored is off will censor words unless the user has set
+ *  - It censors the passed string.
+ *  - If the admin setting allow_no_censored is on, it does not censor unless force is also set.
+ *  - If the admin setting allow_no_censored is off will censor words unless the user has set
  * it to not censor in their profile and force is off
- *  - it caches the list of censored words to reduce parsing.
+ *  - It caches the list of censored words to reduce parsing.
  *  - Returns the censored text
  *
  * @param string $text
@@ -2006,7 +2008,7 @@ function dieGif($expired = false): never
  */
 function obStart($use_compression = false)
 {
-	// This is done to clear any output that was made before now.
+	// This is done to clear any output made before now.
 	while (ob_get_level() > 0)
 	{
 		@ob_end_clean();
@@ -2051,7 +2053,7 @@ function getUrl($type, $params)
  *                     generator can act differently
  * @param array $params All the parameters of the URL
  *
- * @return string The query part of an URL
+ * @return string The query part of a URL
  */
 function getUrlQuery($type, $params)
 {
@@ -2118,7 +2120,7 @@ function featureEnabled($feature)
  *
  * What it does:
  *
- * - Removes invalid XML characters to assure the input string being parsed properly.
+ * - Removes invalid XML characters to ensure the input string being parsed properly.
  *
  * @param string $string The string to clean
  *
@@ -2134,7 +2136,7 @@ function cleanXml($string)
 }
 
 /**
- * Validates a IPv6 address. returns true if it is ipv6.
+ * Validates an IPv6 address. Returns true if it is ipv6.
  *
  * @param string $ip ip address to be validated
  *
@@ -2178,7 +2180,7 @@ function convertIPv6toInts($ip)
 }
 
 /**
- * Expands a IPv6 address to its full form.
+ * Expands an IPv6 address to its full form.
  *
  * @param string $addr ipv6 address string
  * @param bool $strict_check checks length to expanded address for compliance
@@ -2295,7 +2297,7 @@ function iri_host_ascii($url)
 	}
 
 	// Strip userinfo and port if present before IDNA
-	// e.g. user:pass@exämple.com:8080 -> exämple.com
+	// e.g., user:pass@exämple.com:8080 -> exämple.com
 	if (str_contains($host, '@'))
 	{
 		$host = substr($host, strrpos($host, '@') + 1);
@@ -2310,7 +2312,7 @@ function iri_host_ascii($url)
 	if (function_exists('idn_to_ascii'))
 	{
 		$ascii = idn_to_ascii($host, IDNA_DEFAULT, defined('INTL_IDNA_VARIANT_UTS46') ? INTL_IDNA_VARIANT_UTS46 : 0);
-		if ($ascii !== false && $ascii !== null)
+		if ($ascii !== false)
 		{
 			$host = $ascii;
 		}
