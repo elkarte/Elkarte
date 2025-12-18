@@ -31,11 +31,9 @@ if (!defined('ELK'))
 	// Need to keep the cli clean on return
 	exit(0);
 }
+
 // Or a scheduled task
-else
-{
-	postbyemail_imap();
-}
+postbyemail_imap();
 
 /**
  * postbyemail_imap()
@@ -53,6 +51,5 @@ function postbyemail_imap()
 		return false;
 	}
 
-	$pbe = new MaillistImap();
-	return $pbe->process();
+	return (new MaillistImap())->process();
 }

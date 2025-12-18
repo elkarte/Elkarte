@@ -2,7 +2,7 @@
 
 /**
  * This, as you have probably guessed, is the crux for all functions.
- * Everything should start here, so all the setup and security is done
+ * Everything should start here, so all the setup and security are done
  * properly.
  *
  * @package   ElkArte Forum
@@ -27,13 +27,13 @@ use ElkArte\User;
 require_once(__DIR__ . '/bootstrap.php');
 new Bootstrap(false);
 
-// Turn on output buffering if it isn't already on (via php.ini for example)
+// Turn on output buffering if it isn't already on (via php.ini, for example)
 if (!ob_get_level())
 {
 	ob_start();
 }
 
-// Before we get carried away, are we doing a scheduled task? If so save CPU cycles by jumping out!
+// Before we get carried away, are we doing a scheduled task? If so, save CPU cycles by jumping out!
 if (isset($_GET['scheduled']))
 {
 	// Don't make people wait on us if we can help it.
@@ -136,7 +136,7 @@ function elk_main()
 			}
 		}
 
-		// Show where we came from, and go
+		// Show where we came from and then go
 		$context['site_action'] = $dispatcher->site_action();
 	}
 

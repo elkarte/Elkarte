@@ -53,7 +53,7 @@ class Bootstrap
 			// We're going to set a few globals
 			global $time_start, $ssi_error_reporting, $db_show_debug;
 
-			// Your on the clock
+			// You're on the clock
 			$time_start = microtime(true);
 
 			// Unless settings.php tells us otherwise
@@ -162,13 +162,13 @@ class Bootstrap
 	}
 
 	/**
-	 * Decides installation vs upgrade vs a normal load when no lock file is present.
+	 * Decides installation vs. upgrade vs. a normal load when no lock file is present.
 	 *
 	 * Rules:
 	 * - If Settings.php exists and $install_time is set (not 0/empty) and installer exists → redirect to upgrade.php
 	 * - If Settings.php exists and $install_time is 0/empty and installer exists → redirect to install.php
 	 * - If Settings.php does not exist and installer exists → redirect to install.php
-	 * - Otherwise, just continue (and Settings.php will be loaded by caller if present)
+	 * - Otherwise, continue (and Settings.php will be loaded by caller if present)
 	 *
 	 * @param string $settings_location Absolute path to Settings.php
 	 */
@@ -217,7 +217,7 @@ class Bootstrap
 	}
 
 	/**
-	 * Validate the paths set in Settings.php, correct as needed and move them to constants.
+	 * Validate the paths set in Settings.php, correct as needed, and move them to constants.
 	 */
 	private function validatePaths()
 	{
@@ -291,14 +291,14 @@ class Bootstrap
 		$loader->setPsr4('BBC\\', SOURCEDIR . '/ElkArte/BBC');
 		// Place for addons to install and minimize source mutation.
 		$loader->setPsr4('Addons\\', BOARDDIR . '/Addons');
-		// External libraries should use vendor, but hey, ho here we are.
+		// External libraries should use vendor, but hey, ho, here we are.
 		$loader->setPsr4('Wikimedia\\Minify\\', EXTDIR . '/Wikimedia/Minify');
 		$loader->setPsr4('Michelf\\', EXTDIR . '/Michelf');
 		$loader->register();
 	}
 
 	/**
-	 * Check if we are in maintenance mode, if so end here.
+	 * Check if we are in maintenance mode, if so, end here.
 	 */
 	private function checkMaintance()
 	{
@@ -324,7 +324,7 @@ class Bootstrap
 	}
 
 	/**
-	 * If you like lots of debug information in error messages and below the footer
+	 * If you like lots of debug information in error messages and below the footer,
 	 * then set $db_show_debug to true in settings.  Don't do this on a production site.
 	 */
 	private function setDebug()
@@ -402,7 +402,7 @@ class Bootstrap
 		{
 			if (isset($_COOKIE[session_name()]) || isset($_REQUEST[session_name()]))
 			{
-				// Make a stab at it, but ignore the E_WARNINGs generated because we can't send headers.
+				// Make a stab at it but ignore the E_WARNINGs generated because we can't send headers.
 				$temp = error_reporting(error_reporting() & !E_WARNING);
 				loadSession();
 				error_reporting($temp);
@@ -429,7 +429,7 @@ class Bootstrap
 		User::load(true);
 		$context['user']['is_mod'] = User::$info->is_mod ?? false;
 
-		// Load the current user's permissions....
+		// Load the current user's permissions...
 		loadPermissions();
 
 		// Load the current or SSI theme. (just use $ssi_theme = id_theme;)
@@ -439,7 +439,7 @@ class Bootstrap
 		if (!defined('STDIN') && runBadBehavior() !== false)
 		{
 			// 403 and gone
-			Errors::instance()->display_403_error(true);
+			Errors::instance()->display_403_error();
 		}
 
 		// Take care of any banning that needs to be done.
@@ -484,7 +484,7 @@ class Bootstrap
 			setupThemeContext();
 		}
 
-		// We need to set up user agent, and make more checks on the request
+		// We need to set up a user agent and make more checks on the request
 		$req = Request::instance();
 
 		// Make sure they didn't muss around with the settings... but only if it's not cli.
@@ -493,7 +493,7 @@ class Bootstrap
 			trigger_error($txt['ssi_session_broken']);
 		}
 
-		// Without visiting the forum this session variable might not be set on submit.
+		// Without visiting the forum, this session variable might not be set on submit.
 		if (isset($_SESSION['USER_AGENT']))
 		{
 			return;
