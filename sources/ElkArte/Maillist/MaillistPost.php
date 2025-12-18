@@ -32,7 +32,7 @@ class MaillistPost extends AbstractController
 	/** @var array holds information on the PM being replied to */
 	public $pmInfo = [];
 
-	/** @var string easy to read constants */
+	/** @var string easy-to-read constants */
 	private const TOPIC_REPLY = 't';
 	private const MESSAGE_REPLY = 'm';
 	private const PM_REPLY = 'p';
@@ -49,7 +49,7 @@ class MaillistPost extends AbstractController
 	}
 
 	/**
-	 * Main email posting controller, reads, parses, checks and posts an email message or PM
+	 * Main email posting controller, reads, parses, checks, and posts an email message or PM
 	 *
 	 * What it does:
 	 *
@@ -119,7 +119,7 @@ class MaillistPost extends AbstractController
 		// Account for moderation actions
 		pbe_check_moderation($this->pbeUser);
 
-		// Maybe an addons wants to do additional spam / security checking
+		// Maybe an addon wants to do additional spam / security checking
 		call_integration_hook('integrate_mailist_checks_before', [$email_message, $this->pbeUser]);
 
 		// Load in the correct Re: for the language
@@ -143,7 +143,7 @@ class MaillistPost extends AbstractController
 			$result = pbe_create_pm($this->pbeUser, $email_message, $this->pmInfo);
 		}
 
-		// We have now posted or PM'ed .. lets do some database maintenance cause maintenance is fun :'(
+		// We have now posted or PM'ed... let's do some database maintenance cause maintenance is fun :'(
 		if (!empty($result))
 		{
 			query_key_maintenance($email_message);
@@ -184,7 +184,7 @@ class MaillistPost extends AbstractController
 		$email_message = new EmailParse();
 		$email_message->read_data($data, BOARDDIR);
 
-		// Ask for an HTML version (if available) and some needed details
+		// Ask for an HTML version (if available) and some necessary details
 		$email_message->read_email(true, $email_message->raw_message);
 		$email_message->load_address();
 		$email_message->load_key($key);
@@ -204,7 +204,7 @@ class MaillistPost extends AbstractController
 	{
 		global $modSettings;
 
-		// Check if it's a DSN, and handle it
+		// Check if it's a DSN and handle it
 		if ($email_message->_is_dsn)
 		{
 			if (!empty($modSettings['pbe_bounce_detect']))
@@ -213,7 +213,7 @@ class MaillistPost extends AbstractController
 
 				if (!empty($modSettings['pbe_bounce_record']))
 				{
-					// They can record the message anyway, if they so wish
+					// They can record the message anyway if they so wish
 					pbe_emailError('error_bounced', $email_message);
 					return 'error_bounced';
 				}
@@ -222,7 +222,7 @@ class MaillistPost extends AbstractController
 			}
 
 			// When the auto-disable function is not turned on, record the DSN
-			// In the failed email table for the admins to handle however
+			// In the failed email table for the admins to handle, however
 			pbe_emailError('error_bounced', $email_message);
 			return 'error_bounced';
 		}
@@ -252,7 +252,7 @@ class MaillistPost extends AbstractController
 			return 'error_not_find_member';
 		}
 
-		// Find the message security key, without it, we are not going anywhere ever
+		// Find the message security key; without it, we are not going anywhere ever
 		if (empty($email_message->message_key_id))
 		{
 			pbe_emailError('error_missing_key', $email_message);
@@ -328,7 +328,7 @@ class MaillistPost extends AbstractController
 		$this->pmInfo = query_load_message($email_message->message_type, $email_message->message_id, $this->pbeUser);
 		if (empty($this->pmInfo))
 		{
-			// Duh oh ... likely they deleted the PM on the site and are now
+			// Duh, oh ... likely they deleted the PM on the site and are now
 			// replying to the PM by email, the agony!
 			pbe_emailError('error_pm_not_found', $email_message);
 			return false;

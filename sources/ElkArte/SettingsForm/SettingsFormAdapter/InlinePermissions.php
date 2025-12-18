@@ -12,6 +12,7 @@
 
 namespace ElkArte\SettingsForm\SettingsFormAdapter;
 
+use ElkArte\Database\QueryInterface;
 use ElkArte\Languages\Txt;
 use ElkArte\Permissions;
 
@@ -35,10 +36,10 @@ class InlinePermissions extends Adapter
 	/** @var int[] */
 	private $excluded_groups = [];
 
-	/** @var \ElkArte\Permissions */
+	/** @var Permissions */
 	private $permissionsObject;
 
-	/** @var \ElkArte\Database\QueryInterface|null */
+	/** @var QueryInterface|null */
 	private $db;
 
 	/**
@@ -48,8 +49,7 @@ class InlinePermissions extends Adapter
 	{
 		$this->db = database();
 
-		// Make sure they can't do certain things,
-		// unless they have the right permissions.
+		// Make sure they can't do certain things unless they have the right permissions.
 		$this->permissionsObject = new Permissions();
 		$this->illegal_permissions = $this->permissionsObject->getIllegalPermissions();
 	}
@@ -148,7 +148,7 @@ class InlinePermissions extends Adapter
 
 	/**
 	 * Initialize a form with inline permissions settings.
-	 * It loads a context variables for each permission.
+	 * It loads context variables for each permission.
 	 * This function is used by several settings screens to set specific permissions.
 	 *
 	 * @uses ManagePermissions language

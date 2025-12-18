@@ -2,7 +2,7 @@
 
 /**
  * This file deals with low-level graphics operations performed on images,
- * specially as needed for avatars (uploaded avatars), attachments, or
+ * specifically as needed for avatars (uploaded avatars), attachments, or
  * visual verification images.
  *
  * @package   ElkArte Forum
@@ -85,7 +85,7 @@ abstract class AbstractManipulator
 	abstract public function generateTextImage($text, $width = 100, $height = 75, $format = 'png');
 
 	/**
-	 * Loads a image file into the image engine for processing
+	 * Loads an image file into the image engine for processing
 	 *
 	 * @return bool|mixed
 	 */
@@ -102,7 +102,7 @@ abstract class AbstractManipulator
 	 * Output the image resource to a file in a chosen format
 	 *
 	 * @param string $file_name where to save the image, if '' echos to screen/buffer
-	 * @param int $preferred_format the integer constant representing a type ... jpg,png,gif, etc
+	 * @param int $preferred_format the integer constant representing a type ... jpg,png,gif, etc.
 	 * @param int $quality the jpg image quality
 	 *
 	 * @return mixed
@@ -179,13 +179,13 @@ abstract class AbstractManipulator
 		}
 
 		// Determine the memory requirements for this image, note: if you want to use an image formula
-		// W x H x bits/8 x channels x Overhead factor
+		// W x H x bits/8 x channels x Overhead factor,
 		// You will need to account for single bit images as GD expands them to an 8 bit and will greatly
 		// overrun the calculated value.
 		// The 5 below is simply a shortcut of 8bpp, 3 channels, 1.66 overhead
 		$needed_memory = $this->_width * $this->_height * 5;
 
-		// If we need more, lets try to get it
+		// If we need more, let's try to get it
 		$success = detectServer()->setMemoryLimit($needed_memory, true);
 
 		if ($fatal && !$success)

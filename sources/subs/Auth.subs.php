@@ -26,10 +26,10 @@ use ElkArte\User;
  *
  * What it does:
  *
- * - password should be already encrypted with the cookie salt.
- * - logs the user out if id_member is zero.
- * - sets the cookie and session to last the number of seconds specified by cookie_length.
- * - when logging out, if the globalCookies setting is enabled, attempts to clear the subdomain's cookie too.
+ * - Password should be already encrypted with the cookie salt.
+ * - Logs the user out if id_member is zero.
+ * - Sets the cookie and session to last the number of seconds specified by cookie_length.
+ * - When logging out, if the globalCookies setting is enabled, attempts to clear the subdomain's cookie too.
  *
  * @param int $cookie_length
  * @param int $id The id of the member
@@ -46,7 +46,7 @@ function setLoginCookie($cookie_length, $id, $password = '')
 	// Let's be sure it is an int to simplify the regexp used to validate the cookie
 	$id = (int) $id;
 
-	// The cookie may already exist, and have been set with different options.
+	// The cookie may already exist and have been set with different options.
 	$cookie_state = (empty($modSettings['localCookies']) ? 0 : 1) | (empty($modSettings['globalCookies']) ? 0 : 2);
 
 	if (isset($_COOKIE[$cookiename]))
@@ -113,7 +113,7 @@ function setLoginCookie($cookie_length, $id, $password = '')
 		// We need to meddle with the session.
 		require_once(SOURCEDIR . '/Session.php');
 
-		// Backup the old session.
+		// Back up the old session.
 		$oldSessionData = $_SESSION;
 
 		// Remove the old session data and file / db entry
@@ -123,7 +123,7 @@ function setLoginCookie($cookie_length, $id, $password = '')
 		// Recreate and restore the new session.
 		loadSession();
 
-		// Get a new session id, and load it with the data
+		// Get a new session i d and load it with the data
 		session_regenerate_id();
 
 		// If we generated new session values, be sure to use them as well
@@ -140,8 +140,8 @@ function setLoginCookie($cookie_length, $id, $password = '')
  *
  * What it does:
  *
- * - normally, local and global should be the localCookies and globalCookies settings, respectively.
- * - uses boardurl to determine these two things.
+ * - Normally, local and global should be the localCookies and globalCookies settings, respectively.
+ * - Uses boardurl to determine these two things.
  *
  * @param bool $local
  * @param bool $global
@@ -157,7 +157,7 @@ function url_parts($local, $global)
 	// Parse the URL with PHP to make life easier.
 	$parsed_url = parse_url($boardurl);
 
-	// Is local cookies off?
+	// Are local cookies off?
 	if (empty($parsed_url['path']) || !$local)
 	{
 		$parsed_url['path'] = '';
@@ -194,8 +194,8 @@ function url_parts($local, $global)
  *
  * What it does:
  *
- * - loads Login.template.php and uses the admin_login sub template.
- * - sends data to template so the admin is sent on to the page they
+ * - Loads Login.template.php and uses the admin_login sub template.
+ * - Sends data to template so the admin is sent on to the page they
  *   wanted if their password is correct, otherwise they can try again.
  *
  * @param string $type = 'admin'
@@ -264,7 +264,7 @@ function adminLogin($type = 'admin'): never
  * Used by the adminLogin() function.
  *
  * What it does:
- *  - if 'value' is an array, the function is called recursively.
+ *  - If 'value' is an array, the function is called recursively.
  *
  * @param string $k key
  * @param string|bool $v value
@@ -338,8 +338,8 @@ function construct_query_string($get)
  *
  * What it does:
  *
- * - searches for members whose username, display name, or e-mail address match the given pattern of array names.
- * - searches only buddies if buddies_only is set.
+ * - Searches for members whose username, display name, or e-mail address match the given pattern of array names.
+ * - Searches only buddies if buddies_only is set.
  *
  * @param string[]|string $names
  * @param bool $use_wildcards = false, accepts wildcards ? and * in the pattern if true
@@ -363,7 +363,7 @@ function findMembers($names, $use_wildcards = false, $buddies_only = false, $max
 	$maybe_email = false;
 	foreach ($names as $i => $name)
 	{
-		// Trim, and fix wildcards for each name.
+		// Trim and fix wildcards for each name.
 		$names[$i] = trim(Util::strtolower($name));
 
 		$maybe_email |= str_contains($name, '@');
@@ -387,7 +387,7 @@ function findMembers($names, $use_wildcards = false, $buddies_only = false, $max
 	// Nothing found yet.
 	$results = [];
 
-	// This ensures you can't search someones email address if you can't see it.
+	// This ensures you can't search someone's email address if you can't see it.
 	$email_condition = allowedTo('moderate_forum') ? '' : '1=0 AND ';
 
 	if ($use_wildcards || $maybe_email)
@@ -440,11 +440,11 @@ function findMembers($names, $use_wildcards = false, $buddies_only = false, $max
  *
  * What it does:
  *
- * - called by ProfileOptions controller when changing someone's username.
- * - checks the validity of the new username.
- * - generates and sets a new password for the given user.
- * - mails the new password to the email address of the user.
- * - if username is not set, only a new password is generated and sent.
+ * - Called by ProfileOptions controller when changing someone's username.
+ * - Checks the validity of the new username.
+ * - Generates and sets a new password for the given user.
+ * - Mails the new password to the email address of the user.
+ * - If username is not set, only a new password is generated and sent.
  *
  * @param int $memID
  * @param string|null $username = null
@@ -490,7 +490,7 @@ function resetPassword($memID, $username = null)
 		$errors = ErrorContext::context('reset_pwd', 0);
 		validateUsername($memID, $user, 'reset_pwd');
 
-		// If there are "important" errors and you are not an admin: log the first error
+		// If there are "important" errors, and you are not an admin: log the first error
 		// Otherwise grab all of them and don't log anything
 		$error_severity = $errors->hasErrors(1) && User::$info->is_admin === false ? 1 : null;
 		foreach ($errors->prepareErrors($error_severity) as $error)
@@ -576,10 +576,10 @@ function validateUsername($memID, $username, $ErrorContext = 'register', $check_
  *
  * What it does:
  *
- * - called when registering/choosing a password.
- * - checks the password obeys the current forum settings for password strength.
- * - if password checking is enabled, will check that none of the words in restrict_in appear in the password.
- * - returns an error identifier if the password is invalid, or null.
+ * - Called when registering/choosing a password.
+ * - Checks the password obeys the current forum settings for password strength.
+ * - If password checking is enabled, will check that none of the words in restrict_in appear in the password.
+ * - Returns an error identifier if the password is invalid, or null.
  *
  * @param string $password
  * @param string $username
@@ -613,7 +613,7 @@ function validatePassword($password, $username, $restrict_in = [])
 		return null;
 	}
 
-	// Otherwise, perform the medium strength test - checking if password appears in the restricted string.
+	// Otherwise, perform the medium strength test - checking if the password appears in the restricted string.
 	if (preg_match('~\b' . preg_quote($password, '~') . '\b~', implode(' ', $restrict_in)) != 0)
 	{
 		return 'restricted_words';
@@ -642,13 +642,13 @@ function validatePassword($password, $username, $restrict_in = [])
  *
  * What it does:
  *
- * - called when logging in or whenever a password needs to be validated for a user
- * - used to generate a new hash for the db, used during registration or any password changes
- * - if a non SHA256 password is sent, will generate one with SHA256(user + password) and return it in password
+ * - Called when logging in or whenever a password needs to be validated for a user.
+ * - Used to generate a new hash for the db, used during registration or any password changes.
+ * - If a non SHA256 password is sent, will generate one with SHA256(user + password) and return it in password.
  *
- * @param string $password user password if not already 64 characters long will be SHA256 with the user name
+ * @param string $password user password, if not already 64 characters long, will be SHA256 with the username
  * @param string $hash hash as generated from a SHA256 password
- * @param string $user user name only required if creating a SHA-256 password
+ * @param string $user username only required if creating an SHA-256 password
  * @param bool $returnhash flag to determine if we are returning a hash suitable for the database
  *
  * @return bool|string
@@ -657,7 +657,7 @@ function validatePassword($password, $username, $restrict_in = [])
  */
 function validateLoginPassword(&$password, $hash, $user = '', $returnhash = false)
 {
-	// If the password is not 64 characters, lets make it a (SHA-256)
+	// If the password is not 64 characters, let's make it a (SHA-256)
 	if (strlen($password) !== 64)
 	{
 		$password = hash('sha256', Util::strtolower($user) . un_htmlspecialchars($password));
@@ -678,8 +678,8 @@ function validateLoginPassword(&$password, $hash, $user = '', $returnhash = fals
  *
  * What it does:
  *
- * - builds the moderator, group and board level querys for the user
- * - stores the information on the current users moderation powers in User::$info->mod_cache and $_SESSION['mc']
+ * - Builds the moderator, group, and board-level query for the user
+ * - Stores the information on the current users moderation powers in User::$info->mod_cache and $_SESSION['mc']
  *
  * @package Authorization
  */
@@ -733,7 +733,7 @@ function rebuildModCache()
 		'time' => time(),
 		// This looks a bit funny but protects against the login redirect.
 		'id' => User::$info->id && User::$info->name ? User::$info->id : 0,
-		// If you change the format of 'gq' and/or 'bq' make sure to adjust 'can_mod' in Load.php.
+		// If you change the format of 'gq' and/or 'bq', make sure to adjust 'can_mod' in Load.php.
 		'gq' => $group_query,
 		'bq' => $board_query,
 		'ap' => boardsAllowedTo('approve_posts'),
@@ -768,7 +768,7 @@ function elk_setcookie($name, $value = '', $expire = 0, $path = '', $domain = ''
 {
 	global $modSettings;
 
-	// In case a customization wants to override the default settings
+	// In case customization wants to override the default settings
 	if ($httponly === null)
 	{
 		$httponly = !empty($modSettings['httponlyCookies']);
@@ -804,7 +804,7 @@ function elk_setcookie($name, $value = '', $expire = 0, $path = '', $domain = ''
 }
 
 /**
- * This functions determines whether this is the first login of the given user.
+ * This function determines whether this is the first login of the given user.
  *
  * @param int $id_member the id of the member to check for
  * @return bool
@@ -826,7 +826,7 @@ function isFirstLogin($id_member)
  * Search for a member by given criteria
  *
  * @param string $where
- * @param array $where_params array of values to used in the where statement
+ * @param array $where_params array of values to use in the where statement
  * @param bool $fatal
  *
  * @return array|bool array of members data or false on failure
@@ -927,16 +927,14 @@ function userByEmail($email, $username = null)
  */
 function generateValidationCode($length = 10)
 {
-	$tokenizer = new TokenHash();
-
-	return $tokenizer->generate_hash((int) $length);
+	return (new TokenHash())->generate_hash((int) $length);
 }
 
 /**
  * This function loads many settings of a user given by name or email.
  *
  * @param string $name
- * @param bool $is_id if true it treats $name as a member ID and try to load the data for that ID
+ * @param bool $is_id if true, it treats $name as a member ID and tries to load the data for that ID
  * @return array|false false if nothing is found
  * @package Authorization
  */
@@ -991,7 +989,7 @@ function loadExistingMember($name, $is_id = false)
 		}
 	}
 
-	// Nothing? Ah the horror...
+	// Nothing? Ah, the horror...
 	if ($request->num_rows() === 0)
 	{
 		$user_auth_data = false;

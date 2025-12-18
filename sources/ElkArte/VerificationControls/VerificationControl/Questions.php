@@ -29,7 +29,7 @@ class Questions implements ControlInterface
 	/** @var array Holds any options passed to the class */
 	private $_options;
 
-	/** @var int[] array holding all available question id */
+	/** @var int[] array holding all available question ids */
 	private $_questionIDs;
 
 	/** @var int Number of challenge questions to use */
@@ -74,7 +74,7 @@ class Questions implements ControlInterface
 		{
 			$this->_number_questions = $this->_options['override_qs'] ?? (empty($modSettings['qa_verification_number']) ? 0 : (int) $modSettings['qa_verification_number']);
 
-			// If we want questions do we have a cache of all the IDs?
+			// If we want questions, do we have a cache of all the IDs?
 			if (!empty($this->_number_questions) && empty($modSettings['question_id_cache']))
 			{
 				$this->_refreshQuestionsCache();
@@ -183,7 +183,7 @@ class Questions implements ControlInterface
 
 		if (empty($this->_questionIDs) && !$refresh)
 		{
-			$this->createTest($sessionVal, true);
+			$this->createTest($sessionVal);
 		}
 	}
 
@@ -400,14 +400,14 @@ class Questions implements ControlInterface
 
 		foreach ($save_question as $id => $question)
 		{
-			$question = trim(Util::htmlspecialchars($question, ENT_COMPAT));
+			$question = trim(Util::htmlspecialchars($question));
 			$answers = [];
 			$question_lang = isset($save_language[$id], $languages[$save_language[$id]]) ? $save_language[$id] : $language;
 			if (!empty($save_answer[$id]))
 			{
 				foreach ($save_answer[$id] as $answer)
 				{
-					$answer = trim(Util::strtolower(Util::htmlspecialchars($answer, ENT_COMPAT)));
+					$answer = trim(Util::strtolower(Util::htmlspecialchars($answer)));
 					if ($answer !== '')
 					{
 						$answers[] = $answer;
@@ -457,7 +457,7 @@ class Questions implements ControlInterface
 	 * Remove a question by id
 	 *
 	 * @param int $id
-	 * @throws \ElkArte\Exceptions\Exception
+	 * @throws Exception
 	 */
 	private function _delete($id): void
 	{
@@ -479,7 +479,7 @@ class Questions implements ControlInterface
 	 * @param string $question
 	 * @param string[] $answers
 	 * @param string $language
-	 * @throws \ElkArte\Exceptions\Exception
+	 * @throws Exception
 	 */
 	private function _update($id, $question, $answers, $language): void
 	{

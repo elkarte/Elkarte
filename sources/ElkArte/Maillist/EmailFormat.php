@@ -25,7 +25,7 @@ use ElkArte\Helper\Util;
  * Joins lines back together, where needed, to undo the 78 - 80 char wrap in email
  *
  * Really this is built on a house of cards and should generally be viewed
- * as an unfortunate evil if you want a post to *not* look like its an email.
+ * as an unfortunate evil if you want a post to *not* look like it's an email.
  * It's always the innocent bystanders who suffer most.
  *
  * Load class
@@ -70,7 +70,7 @@ class EmailFormat
 	 * change with care, used to help figure out wrapping decisions */
 	private $_maillist_short_line;
 
-	/** @var string Extra items to removed, defined in the acp */
+	/** @var string Extra items to remove, defined in the acp */
 	private $_maillist_leftover_remove;
 
 	/** @var string Items that may indicate the start of a signature line, defined in the acp */
@@ -112,9 +112,9 @@ class EmailFormat
 	}
 
 	/**
-	 * Takes a string of data and creates a line by line array broken on newlines
+	 * Takes a string of data and creates a line-by-line array broken on newlines
 	 *
-	 * - Builds all needed details for each array element, including length, if its
+	 * - Builds all necessary details for each array element, including length, if it's
 	 * in a quote (&depth) code (&depth) or list (bbc or plain) etc.
 	 *
 	 * @param string $data
@@ -122,7 +122,7 @@ class EmailFormat
 	 */
 	private function _prep_data($data, $bbc_br): void
 	{
-		// Un-wordwrap the email, create a line by line array broken on the newlines
+		// Un-wordwrap the email, create a line-by-line array broken on the newlines
 		if ($bbc_br)
 		{
 			$data = str_replace('[br]', "\n", $data);
@@ -168,7 +168,7 @@ class EmailFormat
 	 *
 	 * - &nbsp; can be translated to 0xA0, or in UTF8 as chr(0xC2).chr(0xA0)
 	 * this function looks to remove all of those in any form.  Needed because
-	 * email is often has its character set mangled.
+	 * email is often having its character set mangled.
 	 *
 	 * @param string $value
 	 */
@@ -217,7 +217,7 @@ class EmailFormat
 		// In a quote?
 		if (preg_match('~\[quote( author=.*)?]?~', $var))
 		{
-			// Make sure it is not a single line quote
+			// Make sure it is not a single-line quote
 			if (!preg_match('~\[/quote]?~', $var))
 			{
 				$this->_in_quote++;
@@ -290,7 +290,7 @@ class EmailFormat
 			// We are already in a text list, and this current line does not start the next list item
 			if ($this->_in_list && !$this->_body_array[$i]['list_item'])
 			{
-				// Are we at the last known list item?, if so we can turn wrapping off
+				// Are we at the last known list item?, if so, we can turn wrapping off
 				if (isset($this->_body_array[$i + 1]) && $this->_in_list === $this->_in_plainlist)
 				{
 					$this->_body_array[$i - 1]['content'] .= "\n";
@@ -302,13 +302,13 @@ class EmailFormat
 				}
 			}
 
-			// Long line in a sig ... but not a link then lets bail out might be a ps or something
+			// Long line in a sig ... but not a link, then let's bail out might be a ps or something
 			if ($this->_found_sig && ($this->_body_array[$i]['length'] > $this->_sig_longline) && (!str_starts_with($this->_body_array[$i]['content'], 'www.')))
 			{
 				$this->_found_sig = false;
 			}
 
-			// Blank line, if its not two in a row and not the start of a bbc code then insert a newline
+			// Blank line, if it's not two in a row and not the start of a bbc code, then insert a newline
 			if ($this->_body_array[$i]['content'] === '')
 			{
 				if ((isset($this->_body_array[$i - 1])) && ($this->_body_array[$i - 1]['content'] !== "\n") && (!str_starts_with($this->_body_array[$i - 1]['content'], '[')) && ($this->_body_array[$i - 1]['length'] > $this->_maillist_short_line))
@@ -322,13 +322,13 @@ class EmailFormat
 				$this->_in_list++;
 				$this->_body_array[$i]['content'] = "\n" . $this->_body_array[$i]['content'];
 			}
-			// Signature line start as defined in the ACP, i.e. best, regards, thanks
+			// Signature line start as defined in the ACP, i.e., best, regards, thanks
 			elseif ($this->_in_sig($i))
 			{
 				$this->_body_array[$i]['content'] = "\n\n\n" . $this->_body_array[$i]['content'];
 				$this->_found_sig = true;
 			}
-			// Message stuff which should not be here any longer (as defined in the ACP) i.e. To: From: Subject:
+			// Message stuff which should not be here any longer (as defined in the ACP) i.e., To: From: Subject:
 			elseif (!empty($this->_maillist_leftover_remove) && preg_match('~^((\[b]){0,2}(' . $this->_maillist_leftover_remove . ')(\[/b]){0,2})~', $this->_body_array[$i]['content']))
 			{
 				$this->_body_array[$i]['content'] = $this->_in_quote !== 0 ? "\n" : $this->_body_array[$i]['content'] . "\n";
@@ -338,24 +338,24 @@ class EmailFormat
 			{
 				$this->_body_array[$i]['content'] = "\n" . $this->_body_array[$i]['content'];
 			}
-			// Previous line ended in a break already
+			// The previous line ended in a break already
 			elseif (isset($this->_body_array[$i - 1]['content']) && str_ends_with(trim($this->_body_array[$i - 1]['content']), '[br]'))
 			{
 				// Nothing to do then
 				$this->_body_array[$i]['content'] .= '';
 			}
-			// OK, we can't seem to think of other obvious reasons this should not be on the same line
+			// OK, we can't seem to think of other obvious reasons this should not be on the same line,
 			// and these numbers are quite frankly subjective, but so is how we got here, final "check"
 			else
 			{
-				// Its a wrap ... maybe
+				// It's a wrap ... maybe
 				$para_check = $i > 0 ? $this->_body_array[$i]['length'] - $this->_body_array[$i - 1]['length'] : 1;
 
-				// If this line is longer than the line above it we need to do some extra checks
+				// If this line is longer than the line above it, we need to do some extra checks
 				if (($i > 0) && ($this->_body_array[$i - 1]['length'] > $this->_maillist_short_line) && !$this->_found_sig && !$this->_in_code && !$this->_in_bbclist)
 				{
-					// If the previous short line did not end in a period or it did and the next line does not start
-					// with a capital and passes para check then it wraps
+					// If the previous short line did not end in a period, or it did, and the next line does not start
+					// with a capital and passes para check, then it wraps
 					if ((!str_ends_with($this->_body_array[$i - 1]['content'], '.')) || (str_ends_with($this->_body_array[$i - 1]['content'], '.') && $para_check < $this->_para_check && ($this->_body_array[$i]['content'][0] !== strtoupper($this->_body_array[$i]['content'][0]))))
 					{
 						$this->_body_array[$i]['content'] .= '';
@@ -369,7 +369,7 @@ class EmailFormat
 				{
 					$this->_body_array[$i]['content'] = "\n" . $this->_body_array[$i]['content'];
 				}
-				// A very short line (but not a empty one) followed by a very long line
+				// A very short line (but not an empty one) followed by a very long line
 				elseif (isset($this->_body_array[$i - 1]) && !empty($this->_body_array[$i - 1]['content']) && $para_check > $this->_sig_longline && $this->_body_array[$i - 1]['length'] < 3)
 				{
 					$this->_body_array[$i]['content'] .= '';
@@ -398,7 +398,7 @@ class EmailFormat
 	}
 
 	/**
-	 * Checks if a string is the potentially the start of a signature line
+	 * Checks if a string is potentially the start of a signature line
 	 *
 	 * @param int $i
 	 *
@@ -406,7 +406,7 @@ class EmailFormat
 	 */
 	private function _in_sig($i): bool
 	{
-		// Not in a sig yet, the line starts with a sig key as defined by the ACP, and its a short line of text
+		// Not in a sig yet, the line starts with a sig key as defined by the ACP, and it's a short line of text
 		if (!$this->_found_sig && !empty($this->_maillist_sig_keys) && (preg_match('~^(' . $this->_maillist_sig_keys . ')~i', $this->_body_array[$i]['content']) && ($this->_body_array[$i]['length'] < $this->_maillist_short_line)))
 		{
 			return true;
@@ -433,7 +433,7 @@ class EmailFormat
 		$tag = '(>([^a-zA-Z0-9_\[\s]){0,3}){1}';
 		$this->_body = preg_replace("~\n" . $tag . '~', "\n", $this->_body);
 
-		// Clean up double breaks found between bbc formatting tags, msoffice loves to do this
+		// Clean up double breaks found between bbc formatting tags; msoffice loves to do this
 		$this->_body = preg_replace('~]\s*\[br]\s*\[br]\s*\[~', '][br][', $this->_body);
 
 		// Repair the &nbsp; in its various states and any other chaff
@@ -445,15 +445,15 @@ class EmailFormat
 		// Any number of spaces (including none), followed by newlines, followed by any number of spaces (including none),
 		$this->_body = preg_replace("~(\s*[\n]\s*){2,}~", "\n\n", $this->_body);
 
-		// Whats with multiple commas ??
+		// What's with multiple commas ??
 		$this->_body = preg_replace('~(\s*[,]\s*){2,}~', ', ', $this->_body);
 
-		// commas ,in ,the ,wrong ,place? ... find a space then a word starting with a comma broken on word boundary's
+		// Commas, in ,the ,wrong ,place? ... find a space then a word starting with a comma broken on word boundary's
 		$this->_body = preg_replace('~(?:^|\s),(\w+)\b~', ', $1', $this->_body);
 
 		// Punctuation missing a space like about.This ... should be about. This or about,this should be about, this
-		// ... did no one go to school? OK it probably is from our parser :P ...
-		// Look for a word boundary, any number of word characters, a single lower case, a period a single uppercase
+		// ... did no one go to school? OK, it probably is from our parser :P ...
+		// Look for a word boundary, any number of word characters, a single lower case letter then a period and a single uppercase
 		// any number of word characters and a boundary
 		$this->_body = preg_replace('~(\b\w+[a-z])\.([A-Z]\w+)\b~', '$1. $2', $this->_body);
 		$this->_body = preg_replace('~(\b\w+[A-z]),([A-z]\w+)\b~', '$1, $2', $this->_body);
@@ -461,11 +461,11 @@ class EmailFormat
 		$this->_body = preg_replace('~(\b\w+[a-z]),([a-z]\w+)\b~', '$1, $2', $this->_body);
 		$this->_body = preg_replace('~(\b\w+[a-z])\s\.([A-Z]\w+)\b~', '$1. $2', $this->_body);
 
-		// Some tags often end up as just dummy tags, bla bla bla you have read this before yes?
+		// Some tags often end up as just dummy tags, bla bla bla you have read this before, yes?
 		$this->_body = preg_replace('~\[[bisu]]\s*\[/[bisu]]~', '', $this->_body);
 		$this->_body = preg_replace('~\[quote]\s*\[/quote]~', '', $this->_body);
 
-		// Make sure an email did not end up as the authors name .... [quote author=Joe Blow [email]joeblow@gmail.com[/email]]
+		// Make sure an email did not end up as the authors name... [quote author=Joe Blow [email]joeblow@gmail.com[/email]]
 		$this->_body = preg_replace('~\[quote (author=.*)\[email].*\[/email]]~', '[quote $1]', $this->_body);
 
 		// Any htmlenties that we want to remove, like ms smart ones?
@@ -480,7 +480,7 @@ class EmailFormat
 		// Convert other characters like MS "smart" quotes both uf8
 		$this->_body = strtr($this->_body, ["\xe2\x80\x98" => "'", "\xe2\x80\x99" => "'", "\xe2\x80\x9c" => '"', "\xe2\x80\x9d" => '"', "\xe2\x80\x93" => '-', "\xe2\x80\x94" => '--', "\xe2\x80\xa6" => '...']);
 
-		// And its 1252 variants
+		// And it's 1252 variants
 		if (strcasecmp($charset, 'UTF-8') !== 0)
 		{
 			$this->_body = strtr($this->_body, [chr(145) => "'", chr(146) => "'", chr(147) => '"', chr(148) => '"', chr(150) => '-', chr(151) => '--', chr(133) => '...']);

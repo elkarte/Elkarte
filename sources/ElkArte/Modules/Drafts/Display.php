@@ -64,7 +64,7 @@ class Display extends AbstractModule
 	 *
 	 * - Sets/checks the ability to save and autosave drafts for JS and button display
 	 * - Builds the list of drafts available to load
-	 * - Loads necessary Draft javascript functions for full editor or text area
+	 * - Loads necessary Draft JavaScript functions for full editor or text area
 	 *
 	 * @param bool $use_quick_reply
 	 * @param array $editorOptions
@@ -109,7 +109,7 @@ class Display extends AbstractModule
 				loadJavascriptFile('editor/drafts.plugin.js', ['defer' => true]);
 			}
 
-			// No need to show this on the quick reply area, normally set as $txt['shortcuts_drafts']
+			// No need to show this in the quick reply area, normally set as $txt['shortcuts_drafts']
 			$context['shortcuts_text'] = '';
 
 			$editorOptions['buttons'] = $editorOptions['buttons'] ?? [];

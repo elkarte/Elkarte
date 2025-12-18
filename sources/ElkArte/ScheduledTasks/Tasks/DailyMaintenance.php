@@ -46,7 +46,7 @@ class DailyMaintenance implements ScheduledTaskInterface
 		// First clean out the cache.
 		Cache::instance()->clean('data');
 
-		// If warning decrement is enabled and we have people who have not had a new warning in 24 hours, lower their warning level.
+		// If warning decrement is enabled, and we have people who have not had a new warning in 24 hours, lower their warning level.
 		[, , $modSettings['warning_decrement']] = explode(',', $modSettings['warning_settings']);
 		if ($modSettings['warning_decrement'] !== '' && $modSettings['warning_decrement'] !== '0')
 		{

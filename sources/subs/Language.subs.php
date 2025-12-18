@@ -106,7 +106,7 @@ function list_getLanguages()
 		}
 	);
 
-	// Restore the current users language.
+	// Restore the current users' language.
 	$txt = $old_txt;
 
 	// Return how many we have.

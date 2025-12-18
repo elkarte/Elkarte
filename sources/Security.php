@@ -34,7 +34,7 @@ use ElkArte\User;
  * - This function makes sure the user is who they claim to be by requiring a
  * password to be typed in every hour.
  * - This check can be turned on and off by the securityDisable setting.
- * - Uses the adminLogin() function of subs/Auth.subs.php if they need to login,
+ * - Uses the adminLogin() function of subs/Auth.subs.php if they need to log in,
  * which saves all request (POST and GET) data.
  *
  * @event integrate_validateSession Called at start of validateSession
@@ -66,7 +66,7 @@ function validateSession($type = 'admin')
 			$refreshTime = 5;
 		}
 
-		// A whole day should be more than enough..
+		// A whole day should be more than enough.
 		elseif ($modSettings['admin_session_lifetime'] > 14400)
 		{
 			$refreshTime = 14400;
@@ -79,7 +79,7 @@ function validateSession($type = 'admin')
 		}
 	}
 
-	// If we're using XML give an additional ten minutes grace as an admin can't log on in XML mode.
+	// If we're using XML, give an additional ten minutes grace as an admin can't log on in XML mode.
 	if (isset($_GET['api']) && $_GET['api'] === 'xml')
 	{
 		$refreshTime += 10;
@@ -171,8 +171,8 @@ function checkPassword($type)
  *
  * What it does:
  *
- * - Checks if the user is currently a guest, and if so asks them to login with a message telling them why.
- * - Message is what to tell them when asking them to login.
+ * - Checks if the user is currently a guest, and if so, asks them to log in with a message telling them why.
+ * - Message is what to tell them when asking them to log in.
  *
  * @param string $message = ''
  * @param bool $is_fatal = true
@@ -189,7 +189,7 @@ function is_not_guest($message = '', $is_fatal = true)
 		return true;
 	}
 
-	// People always worry when they see people doing things they aren't actually doing...
+	// People always worry when they see people doing things they aren't doing...
 	$_GET['action'] = '';
 	$_GET['board'] = '';
 	$_GET['topic'] = '';
@@ -216,7 +216,7 @@ function is_not_guest($message = '', $is_fatal = true)
 	// Load the Login template and language file.
 	Txt::load('Login');
 
-	// Apparently we're not in a position to handle this now. Let's go to a safer location for now.
+	// Apparently, we're not in a position to handle this now. Let's go to a safer location for now.
 	if (!theme()->getLayers()->hasLayers())
 	{
 		$_SESSION['login_url'] = $scripturl . '?' . $_SERVER['QUERY_STRING'];
@@ -241,7 +241,7 @@ function is_not_guest($message = '', $is_fatal = true)
 
 	obExit();
 
-	// We should never get to this point, but if we did we wouldn't know the user isn't a guest.
+	// We should never get to this point, but if we did, we wouldn't know the user isn't a guest.
 	trigger_error('Hacking attempt...', E_USER_ERROR);
 }
 
@@ -329,7 +329,7 @@ function is_not_banned($forceCheck = false)
 			$ban_query_vars['id_member'] = User::$info->id;
 		}
 
-		// Check the ban, if there's information.
+		// Check the ban if there's information.
 		if (!empty($ban_query))
 		{
 			$restrictions = [
@@ -457,7 +457,7 @@ function is_not_banned($forceCheck = false)
 		throw new \ElkArte\Exceptions\Exception(sprintf($txt['your_ban'], $old_name) . (empty($_SESSION['ban']['cannot_access']['reason']) ? '' : '<br />' . $_SESSION['ban']['cannot_access']['reason']) . '<br />' . (empty($_SESSION['ban']['expire_time']) ? $txt['your_ban_expires_never'] : sprintf($txt['your_ban_expires'], standardTime($_SESSION['ban']['expire_time'], false))), 'user');
 	}
 
-	// You're not allowed to log in but yet you are. Let's fix that.
+	// You're not allowed to log in, but yet you are. Let's fix that.
 	if (isset($_SESSION['ban']['cannot_login']) && User::$info->is_guest === false)
 	{
 		// We don't wanna see you!
@@ -585,7 +585,7 @@ function banPermissions()
 		rebuildModCache();
 	}
 
-	// Now that we have the mod cache taken care of lets setup a cache for the number of mod reports still open
+	// Now that we have the mod cache taken care of, let's set up a cache for the number of mod reports still open
 	if (isset($_SESSION['rc']) && $_SESSION['rc']['time'] > $modSettings['last_mod_report_action'] && $_SESSION['rc']['id'] == User::$info->id)
 	{
 		$context['open_mod_reports'] = $_SESSION['rc']['reports'];
@@ -664,7 +664,7 @@ function log_ban($ban_ids = [], $email = null)
  * What it does:
  *
  * - Check if a given email is banned.
- * - Performs an immediate ban if the turns turns out positive.
+ * - Performs an immediate ban if the check turns out positive.
  *
  * @param string $email
  * @param string $restriction
@@ -811,7 +811,7 @@ function checkSession($type = 'post', $from_action = '', $is_fatal = true)
 		$error = 'session_verify_fail';
 	}
 
-	// Make sure a page with session check requirement is not being prefetched.
+	// Make sure a page with a session check requirement is not being prefetched.
 	stop_prefetching();
 
 	// If you have not already failed, Check the referring site - it should be the same server at least!
@@ -852,7 +852,7 @@ function checkSession($type = 'post', $from_action = '', $is_fatal = true)
 		}
 	}
 
-	// Well, first of all, if a from_action is specified you'd better have an old_url.
+	// Well, first, if a from_action is specified, you'd better have an old_url.
 	if (!isset($error) && !empty($from_action) && (!isset($_SESSION['old_url']) || preg_match('~[?;&]action=' . $from_action . '([;&]|$)~', $_SESSION['old_url']) !== 1))
 	{
 		$error = 'verify_url_fail';
@@ -895,7 +895,7 @@ function checkSession($type = 'post', $from_action = '', $is_fatal = true)
  *
  * What it does:
  *
- * - Creates a one time use form token
+ * - Creates a one-time use form token
  *
  * @param string $action The specific site action that a token will be generated for
  * @param string $type = 'post' If the token will be returned via post or get
@@ -911,7 +911,7 @@ function createToken($action, $type = 'post')
 	$token_var = $tokenizer->generate_hash(rand(7, 12));
 	$token = $tokenizer->generate_hash(32);
 
-	// We need user agent and the client IP
+	// We need a user agent and the client IP
 	$req = Request::instance();
 	$csrf_hash = hash('sha1', $token . $req->client_ip() . $req->user_agent());
 
@@ -933,12 +933,12 @@ function createToken($action, $type = 'post')
  *  2. The {$type} variable should exist.
  *  3. We concatenate the variable we received with the user agent
  *  4. Match that result against what is in the session.
- *  5. If it matches, success, otherwise we fallout.
+ *  5. If it matches, success, otherwise we fall out.
  *
  * @param string $action
  * @param string $type = 'post' (get, request, or post)
  * @param bool $reset = true Reset the token on failure
- * @param bool $fatal if true a fatal_lang_error is issued for invalid tokens, otherwise false is returned
+ * @param bool $fatal if true, a fatal_lang_error is issued for invalid tokens, otherwise false is returned
  *
  * @return bool|string except for $action == 'login' where the token is returned
  * @throws \ElkArte\Exceptions\Exception token_verify_fail
@@ -948,7 +948,7 @@ function validateToken($action, $type = 'post', $reset = true, $fatal = true)
 	$type = ($type === 'get' || $type === 'request') ? $type : 'post';
 	$token_index = $type . '-' . $action;
 
-	// Logins are special: the token is used to have the password with javascript before POST it
+	// Logins are special: the token is used to have the password with JavaScript before POST it
 	if ($action === 'login')
 	{
 		if (isset($_SESSION['token'][$token_index]))
@@ -1017,7 +1017,7 @@ function validateToken($action, $type = 'post', $reset = true, $fatal = true)
  * What it does:
  *
  * - Defaults to 3 hours before a token is considered expired
- * - if $complete = true will remove all tokens
+ * - If $complete = true will remove all tokens
  *
  * @param bool $complete = false
  * @param string $suffix = false
@@ -1112,7 +1112,7 @@ function checkSubmitOnce($action, $is_fatal = false)
 }
 
 /**
- * This function checks whether the user is allowed to do permission. (ie. post_new.)
+ * This function checks whether the user is allowed to do permission. (i.e., post_new.)
  *
  * What it does:
  *
@@ -1399,7 +1399,7 @@ function boardsAllowedTo($permissions, $check_access = true, $simple = true)
  * What it does:
  *
  * Possible outcomes are:
- *  If it's your own profile yes.
+ *  If it's your own profile, yes.
  *  If you're a moderator with sufficient permissions: yes.
  *  Otherwise: no
  *
@@ -1434,7 +1434,7 @@ function showEmailAddress($userProfile_id)
  *
  * @event integrate_spam_protection Allows updating action wait timeOverrides
  * @param string $error_type used also as a $txt index. (not an actual string.)
- * @param bool $fatal is the spam check a fatal error on failure
+ * @param bool $fatal is the spam check a fatal error on failure?
  *
  * @return bool|int|mixed
  * @throws \ElkArte\Exceptions\Exception
@@ -1613,7 +1613,7 @@ else
  *
  * What it does:
  *
- * - Builds the query for ipv6, ipv4 or 255.255.255.255 depending on what's supplied
+ * - Builds the query for ipv6, ipv4, or 255.255.255.255 depending on what's supplied
  *
  * @param string $fullip An IP address either IPv6 or not
  *
@@ -1724,7 +1724,7 @@ function runBadBehavior()
  *
  * What it does:
  *
- * - Importantly, even if the password was right we DON'T TELL THEM!
+ * - Importantly, even if the password was correct, we DON'T TELL THEM!
  * - Allows 5 attempts every 10 seconds
  *
  * @param int $id_member
@@ -1784,7 +1784,7 @@ function validatePasswordFlood($id_member, $password_flood_value = false, $was_c
 		throw new \ElkArte\Exceptions\Exception('login_threshold_brute_fail', 'critical');
 	}
 
-	// Otherwise set the members data. If they correct on their first attempt then we actually clear it, otherwise we set it!
+	// Otherwise set the members' data. If they correct on their first attempt, then we actually clear it, otherwise we set it!
 	require_once(SUBSDIR . '/Members.subs.php');
 	updateMemberData($id_member, ['passwd_flood' => $was_correct && $number_tries == 1 ? '' : $time_stamp . '|' . $number_tries]);
 }
@@ -1815,7 +1815,7 @@ function frameOptionsHeader($override = null)
 		return;
 	}
 
-	// Finally set it.
+	// Finally, set it.
 	Headers::instance()->header('X-Frame-Options', $option);
 }
 
@@ -1828,7 +1828,7 @@ function frameOptionsHeader($override = null)
  * built into most recent web browsers. It's usually enabled by default, so the role of this
  * header is to re-enable the filter for this particular website if it was disabled by the user.
  * - X-Content-Type-Options header - It prevents the browser from doing MIME-type sniffing,
- * only IE and Chrome are honouring this header. This reduces exposure to drive-by download attacks
+ * only IE and Chrome are honoring this header. This reduces exposure to drive-by download attacks
  * and sites serving user uploaded content that could be treated as executable or dynamic HTML files.
  *
  * @param bool|null $override
@@ -1844,7 +1844,7 @@ function securityOptionsHeader($override = null)
 }
 
 /**
- * Stop some browsers pre fetching activity to reduce server load
+ * Stop some browsers pre-fetching activity to reduce server load
  */
 function stop_prefetching()
 {
@@ -1880,8 +1880,8 @@ function isAdminSessionActive()
  * Check if security files exist
  *
  * If files are found, populate $context['security_controls_files']:
- * * 'title'    - $txt['security_risk']
- * * 'errors'    - An array of strings with the key being the filename and the value an error with the filename in it
+ * * 'title' - $txt['security_risk']
+ * * 'errors' - An array of strings with the key being the filename and the value an error with the filename in it
  *
  * @event integrate_security_files Allows adding / modifying security files array
  *
@@ -1916,11 +1916,11 @@ function checkSecurityFiles()
 }
 
 /**
- * The login URL should not redirect to certain areas (attachments, js actions, etc)
+ * The login URL should not redirect to certain areas (attachments, js actions, etc.)
  * this function does these checks and return if the URL is valid or not.
  *
  * @param string $url - The URL to validate
- * @param bool $match_board - If true tries to match board|topic in the URL as well
+ * @param bool $match_board - If true, tries to match board|topic in the URL as well
  * @return bool
  */
 function validLoginUrl($url, $match_board = false)

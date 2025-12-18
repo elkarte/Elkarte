@@ -2,6 +2,7 @@
 
 namespace ElkArte\Converters;
 
+use Michelf\MarkdownExtra;
 use PHPUnit\Framework\TestCase;
 
 class MD2HTMLTest extends TestCase
@@ -16,8 +17,6 @@ class MD2HTMLTest extends TestCase
 	 */
 	protected function setUp(): void
 	{
-		require_once(EXTDIR . '/markdown/markdown.php');
-
 		$this->mdTestCases = [
 			[
 				'Test bold',
@@ -62,6 +61,9 @@ class MD2HTMLTest extends TestCase
 	 */
 	public function testToHTML()
 	{
+		$parser = new MarkdownExtra;
+		$parser->hashtag_protection = true;
+
 		foreach ($this->mdTestCases as $testcase)
 		{
 			$name = $testcase[0];
@@ -69,7 +71,7 @@ class MD2HTMLTest extends TestCase
 			$expected = $testcase[2];
 
 			// Convert HTML to MD
-			$result = trim(Markdown($test));
+			$result = trim($parser->transform($test));
 
 			// See if the result is what we expect
 			$this->assertEquals($expected, $result, $name);

@@ -31,7 +31,7 @@ interface BodyParserInterface
 	public function __construct($highlight, $use_partial_words);
 
 	/**
-	 * Parses a body (i.e. a text) and returns the HTML.
+	 * Parses a body (i.e., a text) and returns the HTML.
 	 *
 	 * @param string $body Text to parse.
 	 * @param bool $smileys_enabled If to convert smileys to images.

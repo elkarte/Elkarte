@@ -366,7 +366,7 @@ class Display extends AbstractController
 	{
 		global $scripturl, $topic, $context, $url_format;
 
-		$all_requested = $this->_req->getQuery('all', 'trim', null);
+		$all_requested = $this->_req->getQuery('all', 'trim');
 		if (isset($all_requested))
 		{
 			// If all is set, but not allowed... just unset it.
@@ -802,7 +802,7 @@ class Display extends AbstractController
 		if ($boardseen)
 		{
 			require_once(SUBSDIR . '/Boards.subs.php');
-			markBoardsRead($board, false, false);
+			markBoardsRead($board);
 		}
 	}
 

@@ -51,7 +51,7 @@ class Unread
 	private $_showing_all_topics;
 
 	/** @var int */
-	private $_user_id = 0;
+	private $_user_id;
 
 	/** @var bool */
 	private $_post_mod;
@@ -74,9 +74,9 @@ class Unread
 	 * Constructor
 	 *
 	 * @param int $user - ID of the user
-	 * @param bool|int $post_mod - if post moderation is active or not
-	 * @param bool|int $unwatch - if unwatch topics is active or not
-	 * @param bool|int $showing_all_topics - Is the user looking at all the unread replies, or the recent topics?
+	 * @param bool|int $post_mod - if post-moderation is active or not
+	 * @param bool|int $unwatch - if unwatch topics are active or not
+	 * @param bool|int $showing_all_topics - Is the user looking at all the unread replies or the recent topics?
 	 */
 	public function __construct($user, $post_mod, $unwatch, $showing_all_topics = false)
 	{
@@ -112,7 +112,7 @@ class Unread
 	}
 
 	/**
-	 * Sets the lower message id to be taken in consideration
+	 * Sets the lower message id to be taken into consideration
 	 *
 	 * @param int $msg_id - id of the earliest message to consider
 	 */
@@ -240,10 +240,10 @@ class Unread
 	/**
 	 * Retrieves unread topics or messages
 	 *
-	 * @param string $join - kind of "JOIN" to execute. If 'topic' JOINs boards on
+	 * @param string $join - Kind of "JOIN" to execute. If 'topic' JOINs boards on
 	 * the topics table, otherwise ('message') the JOIN is on the messages table
-	 * @param int $start - position to start the query
-	 * @param int $limit - number of entries to grab
+	 * @param int $start - Position to start the query
+	 * @param int $limit - Number of entries to grab
 	 * @param bool $include_avatars - if avatars should be retrieved as well
 	 * @return array - see \ElkArte\TopicUtil::prepareContext
 	 */

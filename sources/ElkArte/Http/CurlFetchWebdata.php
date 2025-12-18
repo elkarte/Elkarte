@@ -16,7 +16,7 @@ namespace ElkArte\Http;
 /**
  * Simple cURL class to fetch a web page
  * Properly redirects even with safe mode and basedir restrictions
- * Can provide simple post options to a page
+ * Can provide simple post-options to a page
  *
  * Load class
  * Initiate as
@@ -44,17 +44,17 @@ class CurlFetchWebdata
 	 * @var array
 	 */
 	private $default_options = [
-		CURLOPT_RETURNTRANSFER => true, // Get returned value as a string (don't output it)
+		CURLOPT_RETURNTRANSFER => true, // Get the returned value as a string (don't output it)
 		CURLOPT_HEADER => true, // We need the headers to do our own redirect
 		CURLOPT_FOLLOWLOCATION => false, // Don't follow, we will do it ourselves so safe mode and open_basedir will dig it
-		CURLOPT_USERAGENT => 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML like Gecko) Chrome/51.0.2704.79 Safari/537.36 Edge/14.14931', // set a normal looking user agent
+		CURLOPT_USERAGENT => 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML like Gecko) Chrome/51.0.2704.79 Safari/537.36 Edge/14.14931', // set a normal-looking user agent
 		CURLOPT_CONNECTTIMEOUT => 10, // Don't wait forever on a connection
 		CURLOPT_TIMEOUT => 20, // A page should load in this amount of time
 		CURLOPT_MAXREDIRS => 3, // stop after this many redirects
 		CURLOPT_ENCODING => 'gzip,deflate', // accept gzip and decode it
 		CURLOPT_SSL_VERIFYPEER => true, // Allow cURL to verify the peer's certificate
 		CURLOPT_SSL_VERIFYHOST => 2, // Allow cURL to verify the peer's host
-		CURLOPT_POST => false, // no post data unless its passed
+		CURLOPT_POST => false, // no post-data unless it's passed
 		CURLOPT_HTTPHEADER => ['Accept-Encoding: gzip,compress,identity'], // no special headers unless supplied
 	];
 
@@ -70,7 +70,7 @@ class CurlFetchWebdata
 	/** @var string Holds any data that will be posted to a form */
 	private $_post_data = '';
 
-	/** @var string[] Holds the response to the cURL request, headers, data, code, etc */
+	/** @var string[] Holds the response to the cURL request, headers, data, code, etc. */
 	private $_response = [];
 
 	/** @var array Holds response headers to the request */
@@ -100,12 +100,12 @@ class CurlFetchWebdata
 	 * What it does:
 	 *
 	 * - Will request the page data from a given $url
-	 * - Optionally will post data to the page form if post data is supplied
-	 * - Passed arrays will be converted to a post string joined with &'s
+	 * - Optionally will post data to the page form if post-data is supplied
+	 * - Passed arrays will be converted to a post-string joined with &'s
 	 * - Calls _setOptions to set the curl opts array values based on the defaults and user input
 	 *
 	 * @param string $url the site we are going to fetch
-	 * @param array|string $post_data data to send in the curl request as post data
+	 * @param array|string $post_data data to send in the curl request as post-data
 	 *
 	 * @return CurlFetchWebdata
 	 */
@@ -146,7 +146,7 @@ class CurlFetchWebdata
 		{
 			$post_vars = [];
 
-			// Build the post data, drop ones with leading @'s since those can be used to send files,
+			// Build the post-data, drop ones with leading @'s since those can be used to send files,
 			// we don't support that.
 			foreach ($post_data as $name => $value)
 			{
@@ -164,7 +164,7 @@ class CurlFetchWebdata
 	 *
 	 * What it does:
 	 *
-	 * - Overwrites our default values with user supplied ones or appends new user ones to what we have
+	 * - Overwrites our default values with user-supplied ones or appends new user ones to what we have
 	 * - Sets the callback function now that $this exists
 	 *
 	 * @uses _headerCallback()
@@ -186,7 +186,7 @@ class CurlFetchWebdata
 			$this->_options = $this->default_options;
 		}
 
-		// POST data options, here we don't allow any override
+		// POST-data options, here we don't allow any override
 		if (!empty($this->_post_data))
 		{
 			$this->_options[CURLOPT_POST] = 1;
@@ -309,7 +309,7 @@ class CurlFetchWebdata
 		$last_url_parse = parse_url($last_url);
 		$new_url_parse = parse_url($new_url);
 
-		// Redirect headers are often incomplete / relative so we need to make sure they are fully qualified
+		// Redirect headers are often incomplete / relative, so we need to make sure they are fully qualified
 		$new_url_parse['path'] = $new_url_parse['path'] ?? (isset($new_url_parse['host']) ? '' : $last_url_parse['path']);
 		$new_url_parse['scheme'] = $new_url_parse['scheme'] ?? $last_url_parse['scheme'];
 		$new_url_parse['host'] = $new_url_parse['host'] ?? $last_url_parse['host'];
@@ -320,7 +320,7 @@ class CurlFetchWebdata
 	}
 
 	/**
-	 * Called to initiate a redirect from a 301, 302 or 307 header
+	 * Called to initiate a redirect from a 301, 302, or 307 header
 	 *
 	 * What it does
 	 * - Resets the cURL options for the loop, sets the referrer flag
@@ -330,7 +330,7 @@ class CurlFetchWebdata
 	 */
 	private function _redirect($target_url, $referer_url): void
 	{
-		// No I last saw that over there ... really, 301, 302, 307
+		// No, I last saw that over there ... really, 301, 302, 307
 		$this->_setOptions();
 		$this->_options[CURLOPT_REFERER] = $referer_url;
 		$this->_curlRequest($target_url, true);
@@ -366,7 +366,7 @@ class CurlFetchWebdata
 	 *
 	 * What it does:
 	 *
-	 * - Can be called as ->result_raw(x) where x is a specific loop results.
+	 * - Can be called as ->result_raw(x) where x is a specific loop result.
 	 * - Call as ->result_raw() for everything.
 	 *
 	 * @param int|string $response_number

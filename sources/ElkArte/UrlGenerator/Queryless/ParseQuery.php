@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This class takes care of converting a Semantic URL into a Standard one, so that
+ * This class takes care of converting a Semantic URL into a Standard one so that
  * the request parser can do its work and explode everything into an array of values.
  *
  * @package   ElkArte Forum
@@ -38,9 +38,9 @@ class ParseQuery extends AbstractParseQuery
 	}
 
 	/**
-	 * The standard way to convert it (i.e. do nothing).
+	 * The standard way to convert it (i.e., do nothing).
 	 * This is used when the parse method cannot identify the type of URL
-	 * it is facing, so it assumes the URL is a standard one.
+	 * it is facing, so it assumes the URL is standard.
 	 *
 	 * @param string $query The semantic query
 	 * @return string $query The corresponding standard query

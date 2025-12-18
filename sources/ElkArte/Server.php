@@ -45,17 +45,17 @@ class Server extends \ArrayObject
 	}
 
 	/**
-	 * Helper function to set the system memory to a needed value
+	 * Helper function to set the system memory to a necessary value
 	 *
 	 * What it does:
 	 *
-	 * - If the needed memory is greater than current, will attempt to get more
+	 * - If the necessary memory is greater than current, will attempt to get more
 	 * - If in_use is set to true, will also try to take the current memory usage in to account
 	 *
 	 * @param string $needed The amount of memory to request, if needed, like 256M
 	 * @param bool $in_use Set to true to account for current memory usage of the script
 	 *
-	 * @return bool true if we have at least the needed memory
+	 * @return bool true if we have at least the necessary memory
 	 */
 	public function setMemoryLimit($needed, $in_use = false): bool
 	{
@@ -88,15 +88,15 @@ class Server extends \ArrayObject
 	 * When called, attempts to restart the timeout counter from zero.
 	 *
 	 * This sets the maximum time in seconds a script is allowed to run before it is terminated by the parser.
-	 * You can not change this setting with ini_set() when running in safe mode.
+	 * You cannot change this setting with ini_set() when running in safe mode.
 	 * Your web server can have other timeout configurations that may also interrupt PHP execution.
-	 * Apache has a Timeout directive and IIS has a CGI timeout function.
+	 * Apache has an Timeout directive and IIS has a CGI timeout function.
 	 * Security extension may also disable this function, such as Suhosin
 	 * Hosts may add this to the disabled_functions list in php.ini
 	 *
-	 * If the current time limit is not unlimited it is possible to decrease the
+	 * If the current time limit is not unlimited, it is possible to decrease the
 	 * total time limit if the sum of the new time limit and the current time spent
-	 * running the script is inferior to the original time limit. It is inherent to
+	 * running the script is inferior to the original time limit.  It is inherent to
 	 * the way set_time_limit() works, it should rather be called with an
 	 * appropriate value every time you need to allocate a certain amount of time
 	 * to execute a task than only once at the beginning of the script.
@@ -262,7 +262,7 @@ class Server extends \ArrayObject
 			return php_uname('n');
 		}
 
-		// This is likely a sitename vs host
+		// This is likely a sitename vs. host
 		if (!empty($this->SERVER_NAME) && $this->_isValidFQDN($this->SERVER_NAME))
 		{
 			return $this->SERVER_NAME;
@@ -310,7 +310,7 @@ class Server extends \ArrayObject
 	}
 
 	/**
-	 * Determine what HTTP protocol the server is using, if unknown default to HTTP/1.0
+	 * Determine what HTTP protocol the server is using, if unknown, default to HTTP/1.0
 	 *
 	 * @return string
 	 */

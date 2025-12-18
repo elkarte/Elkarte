@@ -33,13 +33,13 @@ class Post extends AbstractModule
 	/** @var int The mode of attachments (disabled/enabled/show only). */
 	protected static $_attach_level = 0;
 
-	/** @var AttachmentErrorContext The objects that keeps track of errors. */
+	/** @var AttachmentErrorContext The objects that keep track of errors. */
 	protected $_attach_errors;
 
 	/** @var int[] List of attachments ID already saved. */
 	protected $_saved_attach_id = [];
 
-	/** @var bool If it is a new message or if it is an existing one edited. */
+	/** @var bool If it is a new message, or if it is existing edited. */
 	protected $_is_new_message = false;
 
 	/** @var bool If temporary attachments should be ignored or not */
@@ -70,7 +70,7 @@ class Post extends AbstractModule
 	}
 
 	/**
-	 * Get the error handler ready for post attachments
+	 * Get the error handler ready for post-attachments
 	 */
 	public function prepare_post(): void
 	{
@@ -91,7 +91,7 @@ class Post extends AbstractModule
 	}
 
 	/**
-	 * Set up the errors for the template etc
+	 * Set up the errors for the template etc.
 	 *
 	 * @param ErrorContext $post_errors
 	 */
@@ -109,14 +109,14 @@ class Post extends AbstractModule
 	}
 
 	/**
-	 * This does lots of stuff, yes it does, in fact so much that trying to document a method like this
-	 * would be insane.  What needs to be done, is fix this bowl of spaghetti.
+	 * This does lots of stuff; yes it does, in fact, so much that trying to document a method like this
+	 * would be insane.  What needs to be done is to fix this bowl of spaghetti.
 	 *
 	 * What it does:
 	 *
 	 * - Infuriates anyone trying to read the code or follow the execution path
 	 * - Causes hallucinations and sleepless nights
-	 * - Known to induce binge drinking
+	 * - Known to induce binge-drinking
 	 *
 	 * @param bool $show_additional_options
 	 * @param int $board
@@ -158,7 +158,7 @@ class Post extends AbstractModule
 			// Hmm, coming in fresh and there are files in session.
 			elseif ($context['current_action'] !== 'post2' || !empty($this->_req->getPost('from_qr')))
 			{
-				$this->_determineExistingFate($tmp_attachments, $board, $topic);
+				$this->_determineExistingFate($tmp_attachments, (int) $board, (int) $topic);
 			}
 
 			// Process new attachments, skipping over existing
@@ -181,12 +181,12 @@ class Post extends AbstractModule
 				foreach ($tmp_attachments as $attachID => $attachment)
 				{
 					// Initial errors (such as missing directory), we can recover
-					if ($attachID !== 'initial_error' && !str_contains($attachID, (string) $prefix))
+					if ($attachID !== 'initial_error' && !str_contains($attachID, $prefix))
 					{
 						continue;
 					}
 
-					// Show any errors which might have occurred.
+					// Show any errors that might have occurred.
 					if ($attachment->hasErrors())
 					{
 						if ($context['current_action'] !== 'post2')
@@ -249,7 +249,7 @@ class Post extends AbstractModule
 		}
 
 		// If they've unchecked an attachment, they may still want to attach that many
-		// more files, but don't allow more than num_allowed_attachments.
+		// more files but don't allow more than num_allowed_attachments.
 		$context['attachments']['num_allowed'] = empty($modSettings['attachmentNumPerPostLimit']) ? 50 : min($modSettings['attachmentNumPerPostLimit'] - count($context['attachments']['current']), $modSettings['attachmentNumPerPostLimit']);
 		$context['attachments']['can']['post_unapproved'] = allowedTo('post_attachment');
 		$context['attachments']['total_size'] = $attachments['total_size'] ?? 0;
@@ -346,7 +346,7 @@ class Post extends AbstractModule
 		}
 		else
 		{
-			// Since, they don't belong here. Let's inform the user that they exist..
+			// Since, they don't belong here. Let's inform the user that they exist.
 			if (!empty($topic))
 			{
 				$delete_url = $scripturl . '?action=post' . (empty($msg) ? ('') : ';msg=' . $msg) . (empty($last_msg) ? ('') : ';last_msg=' . $last_msg) . ';topic=' . $topic . ';delete_temp';
@@ -367,7 +367,7 @@ class Post extends AbstractModule
 			}
 			else
 			{
-				// We have a message id, so we can link back to the old topic they were trying to edit..
+				// We have a message id, so we can link back to the old topic they were trying to edit.
 				$goback_url = $scripturl . '?action=post;msg=' . $tmp_attachments->getPostParam('msg') . ($tmp_attachments->getPostParam('last_msg') === null ? '' : ';last_msg=' . $tmp_attachments->getPostParam('last_msg')) . ';topic=' . $tmp_attachments->getPostParam('topic') . ';additionalOptions';
 				$this->_attach_errors->addError(['temp_attachments_found', [$delete_url, $goback_url, $file_list]]);
 			}
@@ -414,7 +414,7 @@ class Post extends AbstractModule
 			{
 				$attachID = $tmp_attachments->getIdFromPublic($public_id);
 
-				if (str_contains($attachID, (string) $prefix))
+				if (str_contains($attachID, $prefix))
 				{
 					$keep_temp[] = $attachID;
 				}
@@ -474,12 +474,12 @@ class Post extends AbstractModule
 
 			foreach ($tmp_attachments->toArray() as $attachID => $attachment)
 			{
-				if ($attachID !== 'initial_error' && !str_contains($attachID, (string) $prefix))
+				if ($attachID !== 'initial_error' && !str_contains($attachID, $prefix))
 				{
 					continue;
 				}
 
-				// If there was an initial error just show that message.
+				// If there was an initial error, just show that message.
 				if ($attachID === 'initial_error')
 				{
 					$tmp_attachments->unset();

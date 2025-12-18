@@ -22,7 +22,7 @@ use ElkArte\Languages\Txt;
 
 /**
  * Admin and moderation log controller.
- * Depending on permissions, this class will display and allow to act on the log
+ * Depending on permissions, this class will display and allow acting on the log
  * for administrators or for moderators.
  */
 class Modlog extends AbstractController
@@ -53,16 +53,16 @@ class Modlog extends AbstractController
 
 		require_once(SUBSDIR . '/Modlog.subs.php');
 
-		// Are we looking at the moderation log or the administration log.
+		// Are we looking at the moderation log or the administration log?
 		$context['log_type'] = $this->_req->compareQuery('sa', 'adminlog') ? 3 : 1;
 
-		// Trying to view the admin log, lets check you can.
+		// Trying to view the admin log, let's check you can.
 		if ($context['log_type'] === 3)
 		{
 			isAllowedTo('admin_forum');
 		}
 
-		// These change dependant on whether we are viewing the moderation or admin log.
+		// These change dependent on whether we are viewing the moderation or admin log.
 		if ($context['log_type'] === 3 || $this->_req->query->action === 'admin')
 		{
 			$context['url_start'] = getUrl('admin', ['action' => 'admin', 'area' => 'logs', 'sa' => ($context['log_type'] == 3 ? 'adminlog' : 'modlog'), 'type' => $context['log_type']]);
@@ -78,10 +78,10 @@ class Modlog extends AbstractController
 
 		$context['page_title'] = $context['log_type'] === 3 ? $txt['modlog_admin_log'] : $txt['modlog_view'];
 
-		// The number of entries to show per page of log file.
+		// The number of entries to show per page of a log file.
 		$context['displaypage'] = 30;
 
-		// Amount of hours that must pass before allowed to empty the file.
+		// Number of hours that must pass before allowed to empty the file.
 		$context['hoursdisable'] = 24;
 
 		// Handle deletion...
@@ -119,7 +119,7 @@ class Modlog extends AbstractController
 			'ip' => ['sql' => 'lm.ip', 'label' => $txt['modlog_ip']]
 		];
 
-		// Setup the allowed search
+		// Set up the allowed search
 		$context['order'] = isset($searchTypes[$sort]) ? $sort : 'member';
 
 		if (!isset($search_params['string']) || (!empty($search) && $search_params['string'] !== $search))
@@ -146,7 +146,7 @@ class Modlog extends AbstractController
 			'type' => $search_params_type,
 		];
 
-		// Setup the search context.
+		// Set up the search context.
 		$context['search_params'] = empty($search_params['string']) ? '' : base64_encode(json_encode($search_params));
 		$context['search'] = [
 			'string' => $search_params['string'],

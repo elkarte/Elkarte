@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Used to validate and transform user supplied data from forms etc
+ * Used to validate and transform user-supplied data from forms etc.
  *
  * @package   ElkArte Forum
  * @copyright ElkArte Forum contributors
@@ -13,6 +13,7 @@
 
 namespace ElkArte\Helper;
 
+use ElkArte\Errors\Errors;
 use ElkArte\Languages\Txt;
 use ParseError;
 
@@ -32,6 +33,8 @@ use ParseError;
  *    $validation->sanitation_rules(array(
  *      'username' => 'trim|strtoupper',
  *      'email'    => 'trim|gmail_normalize'
+ *      'other'    => 'Util::htmlspecialchars[ENT_QUOTES] // pass parameters to the function'
+ *      'or        => 'Util::htmlspecialchars'
  *    ));
  *
  * Set optional variable name substitutions
@@ -84,10 +87,10 @@ class DataValidator
 	/** @var array Holds our data */
 	protected $_data = [];
 
-	/** @var bool Strict data processing, if true drops data for which no sanitation rule was set */
+	/** @var bool Strict data processing, if true, drops data for which no sanitation rule was set */
 	protected $_strict = false;
 
-	/** @var string[] Holds any special processing that is required for certain fields csv or array */
+	/** @var string[] Holds any special processing required for certain fields csv or array */
 	protected $_datatype = [];
 
 	/**
@@ -235,10 +238,15 @@ class DataValidator
 					{
 						$input[$field] = $this->{$sanitation['method']}($input[$field], $sanitation['parameters']);
 					}
-					// One of our static methods or even a built in php function like strtoupper, intval, etc?
+					// A static method or a built in php function like strtoupper, intval, etc?
 					elseif (is_callable($sanitation['function']))
 					{
 						$input[$field] = call_user_func_array($sanitation['function'], array_merge((array) $input[$field], $sanitation['parameters_function']));
+					}
+					// Maybe one of our Util:: methods
+					elseif (is_callable('\\ElkArte\\Helper\\' . $sanitation['function']))
+					{
+						$input[$field] = call_user_func_array('\\ElkArte\\Helper\\' . $sanitation['function'], array_merge((array) $input[$field], $sanitation['parameters_function']));
 					}
 					// Or even a language construct?
 					elseif (in_array($sanitation['function'], ['empty', 'array', 'isset']))
@@ -259,8 +267,8 @@ class DataValidator
 					}
 					else
 					{
-						// @todo fatal_error or other ? being asked to do something we don't know?
 						// results in returning $input[$field] = $input[$field];
+						Errors::instance()->log_error('Unknown: data sanitizer function: ' . $sanitation['function'], 'undefined_vars');
 					}
 				}
 			}
@@ -416,7 +424,7 @@ class DataValidator
 				$fields[$key] = $value;
 			}
 		}
-		// CSV is much the same process as array
+		// CSV is much the same process as an array
 		elseif ($this->_datatype[$field] === 'csv')
 		{
 			// Blow it up!
@@ -454,10 +462,10 @@ class DataValidator
 	 * Return any errors found, either in the raw or nicely formatted
 	 *
 	 * @param array|string|bool $raw
-	 *    - true returns the raw error array,
-	 *    - array returns just error messages of those fields
-	 *    - string returns just that error message
-	 *    - default is all error message(s)
+	 *    - True returns the raw error array,
+	 *    - Array returns just error messages of those fields
+	 *    - String returns just that error message
+	 *    - Default is all error message(s)
 	 *
 	 * @return array|bool
 	 */
@@ -492,7 +500,7 @@ class DataValidator
 		Txt::load('Validation');
 		$result = [];
 
-		// Just want specific errors then it must be an array
+		// Just want specific errors, then it must be an array
 		if (!empty($keys) && !is_array($keys))
 		{
 			$keys = [$keys];
@@ -557,15 +565,15 @@ class DataValidator
 		$details['parameters'] = null;
 		$details['parameters_function'] = [];
 
-		// Were any parameters provided for the rule, e.g. min_length[6]
-		if (preg_match('~(.*)\[(.*)\]~', $rule, $match))
+		// Were any parameters provided for the rule, e.g., min_length[6]?
+		if (preg_match('~(.*)\[(.*)]~', $rule, $match))
 		{
 			$details['method'] = $type . $match[1];
 			$details['parameters'] = $match[2];
 			$details['function'] = $match[1];
 			$details['parameters_function'] = explode(',', defined($match[2]) ? constant($match[2]) : $match[2]);
 		}
-		// Or just a predefined rule e.g. valid_email
+		// Or just a predefined rule e.g., valid_email
 		else
 		{
 			$details['method'] = $type . $rule;
@@ -679,7 +687,7 @@ class DataValidator
 	}
 
 	/**
-	 * Contains ... Verify that a value is one of those provided (case insensitive)
+	 * Contains ... Verify that a value is one of those provided (case-insensitive)
 	 *
 	 * Usage: '[key]' => 'contains[value, value, value]'
 	 *
@@ -733,7 +741,7 @@ class DataValidator
 	 *
 	 * Usage: '[key]' => 'limits[min, max]'
 	 * >= min and <= max
-	 * Limits may be specified one sided
+	 * Limits may be specified one-sided
 	 *  - limits[,10] means <=10 with no lower bound check
 	 *  - limits[10,] means >= 10 with no upper bound
 	 *
@@ -750,14 +758,14 @@ class DataValidator
 		$input[$field] = $input[$field] ?? '';
 		$value = $input[$field];
 
-		// Lower bound ?
+		// Lower bound?
 		$passMin = true;
 		if (isset($validation_parameters[0]))
 		{
 			$passMin = $value >= $validation_parameters[0];
 		}
 
-		// Upper bound ?
+		// Upper bound?
 		$passMax = true;
 		if (isset($validation_parameters[1]))
 		{
@@ -801,7 +809,7 @@ class DataValidator
 	}
 
 	/**
-	 * required ... Check if the specified key is present and not empty
+	 * Required ... Check if the specified key is present and not empty
 	 *
 	 * Usage: '[key]' => 'required'
 	 *
@@ -944,7 +952,7 @@ class DataValidator
 			return null;
 		}
 
-		// A character with the Unicode property of letter (any kind of letter from any language)
+		// A character with the Unicode property of a letter (any kind of letter from any language)
 		if (!preg_match('~^(\p{L})+$~iu', $input[$field]))
 		{
 			return $this->setFailureArray($field, $input, $validation_parameters);
@@ -954,10 +962,10 @@ class DataValidator
 	}
 
 	/**
-	 * alpha_numeric ... Determine if the provided value contains only alpha-numeric characters
+	 * alpha_numeric ... Determine if the provided value contains only alphanumeric characters
 	 *
 	 * Usage: '[key]' => 'alpha_numeric'
-	 * Allows letters, numbers dash and underscore characters
+	 * Allows letters, numbers to dash and underscore characters
 	 *
 	 * @param string $field
 	 * @param array $input
@@ -1395,10 +1403,10 @@ class DataValidator
 	}
 
 	/**
-	 * Uses \ElkArte\Helper\Util::htmlspecialchars to sanitize html in the input
+	 * Uses \ElkArte\Helper\Util::htmlspecialchars to sanitize HTML in the input
 	 *
 	 * - Use this method in place of a standard getXXX('xx', 'Util::htmlspecialchars', '');
-	 * if you require ENT_QUOTES and double encoding
+	 * if you require ENT_QUOTES AND double encoding
 	 *
 	 * @param string $input
 	 *

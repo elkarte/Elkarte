@@ -2,7 +2,7 @@
 
 /**
  * This file contains functions for dealing with messages.
- * Low-level functions, i.e. database operations needed to perform.
+ * Low-level functions, i.e., database operations needed to perform.
  * These functions (probably) do NOT make permissions checks. (they assume
  * those were already made).
  *
@@ -31,26 +31,26 @@ function loadForumTests()
 	/**
 	 * This array is defined like so:
 	 *
-	 * string check_query: Query to be executed when testing if errors exist.
-	 * string check_type: Defines how it knows if a problem was found. If set to
+	 * String check_query: Query to be executed when testing if errors exist.
+	 * String check_type: Defines how it knows if a problem was found. If set to
 	 *                    count looks for the first variable from check_query
 	 *                    being > 0. Anything else it looks for some results.
 	 *                    If not set assumes you want results.
-	 * string fix_it_query: When doing fixes if an error was detected this query
+	 * String fix_it_query: When doing fixes, if an error was detected, this query
 	 *                      is executed to "fix" it.
-	 * string fix_query: The query to execute to get data when doing a fix.
-	 *                   If not set check_query is used again.
-	 * array fix_collect: This array is used if the fix is basically gathering
+	 * String fix_query: The query to execute to get data when doing a fix.
+	 *                   If not set, check_query is used again.
+	 * Array fix_collect: This array is used if the fix is basically gathering
 	 *                    all broken ids and then doing something with it.
 	 *                     - string index: The value returned from the main query
 	 *                                     and passed to the processing function.
 	 *                     - process: A function passed an array of ids to
 	 *                                execute the fix on.
-	 * function fix_processing: Function called for each row returned from fix_query
+	 * Function fix_processing: Function called for each row returned from fix_query
 	 *                          to execute whatever fixes are required.
-	 * function fix_full_processing: As above but does the while loop and everything
+	 * Function fix_full_processing: As above but does the while loop and everything
 	 *                               itself - except the freeing.
-	 * array force_fix: If this is set then the error types included within this
+	 * Array force_fix: If this is set, then the error types included within this
 	 *                  array will also be assumed broken.
 	 *                  Note: At the moment only processes these if they occur after
 	 *                  the primary error in the array.
@@ -58,7 +58,7 @@ function loadForumTests()
 
 	// This great array contains all of our error checks, fixes, etc etc etc.
 	return [
-		// Make a last-ditch-effort check to get rid of topics with zeros..
+		// Make a last-ditch-effort check to get rid of topics with zeros.
 		'zero_topics' => [
 			'check_query' => '
 				SELECT COUNT(*)
@@ -71,7 +71,7 @@ function loadForumTests()
 				WHERE id_topic = 0',
 			'message' => 'repair_zero_ids',
 		],
-		// ... and same with messages.
+		// ... and the same with messages.
 		'zero_messages' => [
 			'check_query' => '
 				SELECT COUNT(*)
@@ -431,16 +431,16 @@ function loadForumTests()
 			'message_function' => function ($row) {
 				global $txt, $context;
 
+				$row['my_num_replies'] = (int) $row['my_num_replies'];
+				$row['num_replies'] = (int) $row['num_replies'];
+
 				// Just joking?
-				if ($row['my_num_replies'] == $row['num_replies'])
+				if ($row['my_num_replies'] === $row['num_replies'])
 				{
 					return false;
 				}
 
-				if ($row['num_replies'] != $row['my_num_replies'])
-				{
-					$context['repair_errors'][] = sprintf($txt['repair_stats_topics_3'], $row['id_topic'], $row['num_replies']);
-				}
+				$context['repair_errors'][] = sprintf($txt['repair_stats_topics_3'], $row['id_topic'], $row['num_replies']);
 
 				return true;
 			},
@@ -580,7 +580,7 @@ function loadForumTests()
 					AND m.id_member != 0
 					AND m.id_msg BETWEEN {STEP_LOW} AND {STEP_HIGH}
 				ORDER BY m.id_msg',
-			// Last step-make sure all non-guest posters still exist.
+			// The last step, make sure all non-guest posters still exist.
 			'fix_collect' => [
 				'index' => 'id_msg',
 				'process' => function ($msgs) {
@@ -1269,8 +1269,8 @@ function loadForumTests()
 }
 
 /**
- * Create a salvage area for repair purposes, if one doesn't already exist.
- * Uses the forum's default language, and checks based on that name.
+ * Create a salvage area for repair purposes if one doesn't already exist.
+ * Uses the forum's default language and checks based on that name.
  *
  * @throws \ElkArte\Exceptions\Exception salvaged_board_error
  */
@@ -1333,8 +1333,8 @@ function createSalvageBoard()
 }
 
 /**
- * Create a salvage area for repair purposes, if one doesn't already exist.
- * Uses the forum's default language, and checks based on that name.
+ * Create a salvage area for repair purposes if one doesn't already exist.
+ * Uses the forum's default language and checks based on that name.
  *
  * @throws \ElkArte\Exceptions\Exception salvaged_category_error
  */
@@ -1457,11 +1457,11 @@ function pauseRepairProcess($to_fix, $current_step_description, $max_substep = 0
 }
 
 /**
- * Checks for errors in steps, until 5 seconds have passed.
+ * Checks for errors in steps until 5 seconds have passed.
  *
- * - It keeps track of the errors it did find, so that the actual repair
+ * - It keeps track of the errors it did find so that the actual repair
  * won't have to recheck everything.
- * - returns the errors found.
+ * - Returns the errors found.
  *
  * @param bool $do_fix
  * @return array
@@ -1505,7 +1505,7 @@ function findForumErrors($do_fix = false)
 			continue;
 		}
 
-		// If we're fixing it but it ain't broke why try?
+		// If we're fixing it, but it ain't broke, why try?
 		if ($do_fix && !in_array($error_type, $to_fix))
 		{
 			$_GET['step']++;
@@ -1526,7 +1526,7 @@ function findForumErrors($do_fix = false)
 			$request->free_result();
 		}
 
-		// We in theory keep doing this... the substeps.
+		// We, in theory, keep doing this... the substeps.
 		$done = false;
 		while (!$done)
 		{
@@ -1536,7 +1536,7 @@ function findForumErrors($do_fix = false)
 				break;
 			}
 
-			// What is the testing query (Changes if we are testing or fixing)
+			// What is the testing query (Changes if we are testing or fixing)?
 			if (!$do_fix)
 			{
 				$test_query = 'check_query';
@@ -1569,7 +1569,7 @@ function findForumErrors($do_fix = false)
 				// What about a message to the user?
 				if (!$do_fix)
 				{
-					// Assume need to fix.
+					// Assume need it to fix.
 					$found_errors = true;
 
 					if (isset($test['message']))
@@ -1634,7 +1634,7 @@ function findForumErrors($do_fix = false)
 						}
 					}
 
-					// Simply executing a fix it query?
+					// Simply executing a "fix it" query?
 					elseif (isset($test['fix_it_query']))
 					{
 						$db->query('',
@@ -1707,7 +1707,7 @@ function findForumErrors($do_fix = false)
 
 		$to_fix = array_unique($to_fix);
 
-		// If we're doing fixes and this needed a fix and we're all done then don't do it again.
+		// If we're doing fixes and this needed a fix, and we're all done, then don't do it again.
 		if ($do_fix)
 		{
 			$key = array_search($error_type, $to_fix);

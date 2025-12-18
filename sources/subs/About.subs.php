@@ -125,7 +125,6 @@ function prepareCreditsData()
 			'<a href="https://www.sceditor.com/">SCEditor</a> | &copy; Sam Clarke | Licensed under <a href="https://opensource.org/licenses/MIT">The MIT License (MIT)</a>',
 			'<a href="https://sourceforge.net/projects/simplehtmldom/">Simple HTML DOM</a> | Licensed under <a href="https://opensource.org/licenses/MIT">The MIT License (MIT)</a>',
 			'<a href="https://www.simplemachines.org/">Simple Machines</a> | &copy; Simple Machines | Licensed under <a href="https://www.simplemachines.org/about/smf/license.php">The BSD License</a>',
-			'<a href="https://github.com/tubalmartin/YUI-CSS-compressor-PHP-port">YUI-CSS compressor (PHP port)</a> | &copy; Yahoo! Inc | Licensed under <a href="https://opensource.org/licenses/BSD-3-Clause">The BSD License</a>',
 			'<a href="https://github.com/Frenzie/elk-quick-quote">Quick Quote</a> | &copy; Frans de Jonge | Licensed under <a href="https://opensource.org/licenses/BSD-3-Clause">The BSD License</a>',
 		],
 	];

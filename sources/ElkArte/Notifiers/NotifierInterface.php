@@ -25,7 +25,7 @@ use ElkArte\Notifications\NotificationsTask;
 interface NotifierInterface
 {
 	/**
-	 * Process a certain task in order to send out the notifications.
+	 * Process a certain task to send out the notifications.
 	 *
 	 * @param NotificationInterface $obj
 	 * @param NotificationsTask $task

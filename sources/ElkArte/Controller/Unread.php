@@ -262,7 +262,7 @@ class Unread extends AbstractController
 		];
 
 		// Read requested sort and direction flags
-		$requested_sort = $this->_req->getQuery('sort', 'trim|strval', null);
+		$requested_sort = $this->_req->getQuery('sort', 'trim|strval');
 
 		// The default is the most logical: newest first.
 		if ($requested_sort === null || !isset($sort_methods[$requested_sort]))
@@ -291,15 +291,11 @@ class Unread extends AbstractController
 
 		foreach (array_keys($sort_methods) as $key)
 		{
-			switch ($key)
+			$sorticon = match ($key)
 			{
-				case 'subject':
-				case 'starter':
-					$sorticon = 'alpha';
-					break;
-				default:
-					$sorticon = 'numeric';
-			}
+				'subject', 'starter' => 'alpha',
+				default => 'numeric',
+			};
 
 			$context['topics_headers'][$key] = ['url' => $scripturl . '?action=' . $this->_action . ($context['showing_all_topics'] ? ';all' : '') . sprintf($context['querystring_board_limits'], $context['start']) . ';sort=' . $key . ($context['sort_by'] == $key && $context['sort_direction'] === 'up' ? ';desc' : ''), 'sort_dir_img' => $context['sort_by'] == $key ? '<i class="icon icon-small i-sort-' . $sorticon . '-' . $context['sort_direction'] . '" title="' . $context['sort_title'] . '"></i>' : '',];
 		}

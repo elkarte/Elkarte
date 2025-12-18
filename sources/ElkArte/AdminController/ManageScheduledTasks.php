@@ -130,7 +130,7 @@ class ManageScheduledTasks extends AbstractController
 		// Want to run any of the tasks?
 		if (isset($this->_req->post->run, $this->_req->post->run_task))
 		{
-			// Lets figure out which ones they want to run.
+			// Let's figure out which ones they want to run.
 			$tasks = [];
 			foreach ($this->_req->post->run_task as $task => $dummy)
 			{
@@ -140,7 +140,7 @@ class ManageScheduledTasks extends AbstractController
 			// Load up the tasks.
 			$nextTasks = loadTasks($tasks);
 
-			// Lets get it on!
+			// Let's get it on!
 			ignore_user_abort(true);
 
 			foreach ($nextTasks as $task_id => $taskname)
@@ -148,7 +148,7 @@ class ManageScheduledTasks extends AbstractController
 				run_this_task($task_id, $taskname);
 			}
 
-			// Things go as expected?  If not save the error in session
+			// Things go as expected?  If not, save the error in session
 			if (!empty($context['scheduled_errors']))
 			{
 				$_SESSION['st_error'] = $context['scheduled_errors'];
@@ -314,7 +314,7 @@ class ManageScheduledTasks extends AbstractController
 			// Do we have a valid offset?
 			preg_match('~(\d{1,2}):(\d{1,2})~', $this->_req->post->offset, $matches);
 
-			// If a half is empty then assume zero offset!
+			// If a half is empty, then assume zero offset!
 			if (!isset($matches[2]) || $matches[2] > 59)
 			{
 				$matches[2] = 0;
@@ -325,14 +325,14 @@ class ManageScheduledTasks extends AbstractController
 				$matches[1] = 0;
 			}
 
-			// Now the offset is easy; easy peasy - except we need to offset by a few hours...
+			// Now the offset is easy; easy-peasy - except we need to offset by a few hours...
 			$offset = $matches[1] * 3600 + $matches[2] * 60 - date('Z');
 
 			// The other time bits are simple!
 			$interval = max((int) $this->_req->post->regularity, 1);
 			$unit = in_array(substr($this->_req->post->unit, 0, 1), ['m', 'h', 'd', 'w']) ? substr($this->_req->post->unit, 0, 1) : 'd';
 
-			// Don't allow one minute intervals.
+			// Don't allow one-minute intervals.
 			if ($interval === 1 && $unit === 'm')
 			{
 				$interval = 2;
@@ -368,7 +368,7 @@ class ManageScheduledTasks extends AbstractController
 
 		require_once(SUBSDIR . '/ScheduledTasks.subs.php');
 
-		// Lets load the language just in case we are outside the Scheduled area.
+		// Let's load the language just in case we are outside the Scheduled area.
 		Txt::load('ManageScheduled');
 
 		// Empty the log?
@@ -380,7 +380,7 @@ class ManageScheduledTasks extends AbstractController
 			emptyTaskLog();
 		}
 
-		// Setup the list.
+		// Set up the list.
 		$listOptions = [
 			'id' => 'task_log',
 			'items_per_page' => 30,

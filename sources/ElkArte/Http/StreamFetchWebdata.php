@@ -2,7 +2,7 @@
 
 /**
  * This will fetch a web resource http/https and return the headers and page data.  It is capable of following
- * redirects and interpreting chunked data, etc.  It will NOT work with ini allow_url_fopen off.
+ * redirects and interpreting chunked data, etc. It will NOT work with ini allow_url_fopen off.
  *
  * @package   ElkArte Forum
  * @copyright ElkArte Forum contributors
@@ -32,7 +32,7 @@ class StreamFetchWebdata
 	/** @var int how much we will read */
 	private $_content_length = 0;
 
-	/** @var array the parsed url with host, port, path, etc */
+	/** @var array the parsed url with host, port, path, etc. */
 	private $_url = [];
 
 	/** @var null|resource the fopen resource */
@@ -66,7 +66,7 @@ class StreamFetchWebdata
 	}
 
 	/**
-	 * Prepares any post data supplied and then makes the request for data
+	 * Prepares any post-data supplied and then makes the request for data
 	 *
 	 * @param string $url
 	 * @param string|string[] $post_data
@@ -203,11 +203,11 @@ class StreamFetchWebdata
 	}
 
 	/**
-	 * Fetch the headers and parse the meta data into the results we need
+	 * Fetch the headers and parse the meta-data into the results we need
 	 */
 	private function _parseRequest(): void
 	{
-		// header information as well as meta data
+		// header information as well as meta-data
 		$headers = stream_get_meta_data($this->_fp);
 		$this->_response['headers'] = [];
 		$this->_response['redirects'] = 0;
@@ -234,7 +234,7 @@ class StreamFetchWebdata
 			{
 				$this->_response['headers']['status'] = $name;
 			}
-			// If its already there overwrite with the new value, unless its a cookie
+			// If its already there overwrite with the new value, unless it's a cookie
 			elseif (isset($this->_response['headers'][$name]) && $name === 'set-cookie')
 			{
 				if (is_string($this->_response['headers'][$name]))
@@ -256,7 +256,7 @@ class StreamFetchWebdata
 	 */
 	private function _processHeaders(): void
 	{
-		// Were we redirected, if so lets find out where
+		// Were we redirected, if so, let's find out where
 		if (!empty($this->_response['headers']['location']))
 		{
 			// update $url with where we were ultimately redirected to
@@ -266,7 +266,7 @@ class StreamFetchWebdata
 		// What about our status code?
 		if (!empty($this->_response['headers']['status']))
 		{
-			// Update with last status code found, its for this final navigated point
+			// Update with last status code found, It's for this final navigated point
 			$this->_response['code'] = (int) substr($this->_response['headers']['status'], 9, 3);
 		}
 

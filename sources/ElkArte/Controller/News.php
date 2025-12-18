@@ -227,7 +227,7 @@ class News extends AbstractController
 		$cachekey = [$xml_format, $cache_action, $this->_limit, $subAction];
 		foreach (['board', 'boards', 'c'] as $var)
 		{
-			$val = $this->_req->getQuery($var, 'trim|strval', null);
+			$val = $this->_req->getQuery($var, 'trim|strval');
 			if ($val !== null)
 			{
 				$cachekey[] = $val;
@@ -300,7 +300,7 @@ class News extends AbstractController
 			$url_parts = [];
 			foreach (['board', 'boards', 'c'] as $var)
 			{
-				$val = $this->_req->getQuery($var, 'trim|strval', null);
+				$val = $this->_req->getQuery($var, 'trim|strval');
 				if ($val !== null)
 				{
 					$url_parts[] = $var . '=' . $val;

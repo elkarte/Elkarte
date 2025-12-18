@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Handles mentioning of members whose messages has been quoted.
+ * Handles mentioning of members whose messages have been quoted.
  *
  * @package   ElkArte Forum
  * @copyright ElkArte Forum contributors
@@ -86,7 +86,7 @@ class Quotedmem extends AbstractEventBoardAccess
 	}
 
 	/**
-	 * Checks if a message has been quoted and if so notifies the owner
+	 * Checks if a message has been quoted and if so, notifies the owner
 	 *
 	 * @param array $msgOptions The message options array
 	 * @param string $status
@@ -104,7 +104,7 @@ class Quotedmem extends AbstractEventBoardAccess
 
 		if (!empty($members_id))
 		{
-			// If the message was edited, attribute the quote to the starter not the modifier to prevent
+			// If the message was edited, attribute the quote to the starter, not the modifier to prevent
 			// the sending of another notification
 			$modified = (isset($posterOptions['id_starter']));
 
@@ -127,32 +127,10 @@ class Quotedmem extends AbstractEventBoardAccess
 	 */
 	protected function _findQuotedMembers($text)
 	{
-		/*
-		The following bbcode is for testing, to be moved to a test when ready.
-
-		[quote author=emanuele date=1430141592 link=msg=972]
-		[quote author=lele]test[/quote]
-		[/quote]
-
-		[quote author=lele non nested]test[/quote]
-
-		[quote author=lele full date=1430141592 link=msg=972]test[/quote]
-
-
-		[quote author=emanuele date=1430141592 link=msg=972]
-		[quote author=lele multi1]
-		[quote author=lele multi2]
-		[quote author=lele multi3]
-		[quote author=lele]test[/quote]
-		[/quote]
-		[/quote]
-		[/quote]
-		[/quote]
-		*/
 		if (str_contains($text, '[quote '))
 		{
 			$quoted = [];
-			$blocks = preg_split('~\[quote~', $text);
+			$blocks = explode("\[quote", $text);
 
 			$skip_next = false;
 			foreach ($blocks as $block)

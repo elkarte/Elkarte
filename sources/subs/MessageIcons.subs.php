@@ -144,7 +144,7 @@ function getMessageIcons($board_id)
 		return $icons;
 	}
 
-	// Custom or using the i-icon css?
+	// Custom or using the i-icon CSS?
 	if (empty($modSettings['messageIcons_enable']))
 	{
 		Txt::load('Post');
@@ -175,7 +175,7 @@ function getMessageIcons($board_id)
 			];
 		}
 	}
-	// Otherwise load the icons, and check we give the right image too...
+	// Otherwise load the icons and check we give the right image too...
 	else
 	{
 		$icon_data = $db->fetchQuery('

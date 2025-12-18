@@ -43,7 +43,7 @@ class RemoveTopicRedirect implements ScheduledTaskInterface
 		// We will need this for language files
 		ThemeLoader::loadEssentialThemeData();
 
-		// Find all of the old MOVE topic notices that were set to expire
+		// Find all the old MOVE topic notices that were set to expire
 		$db->fetchQuery('
 			SELECT 
 				id_topic

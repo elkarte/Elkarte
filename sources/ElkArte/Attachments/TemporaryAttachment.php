@@ -82,7 +82,7 @@ class TemporaryAttachment extends ValuesContainer
 	}
 
 	/**
-	 * Error setter, adds errors to the stack
+	 * Error setter adds errors to the stack
 	 *
 	 * @param $error
 	 */
@@ -122,7 +122,7 @@ class TemporaryAttachment extends ValuesContainer
 				return;
 			}
 
-			// Fallback: wrap whole structure as a single error payload
+			// Fallback: wrap the whole structure as a single error payload
 			$this->data['errors'][] = [$item];
 		};
 
@@ -301,7 +301,7 @@ class TemporaryAttachment extends ValuesContainer
 			return false;
 		}
 
-		// Allow addons to make their own pre checks / adjustments
+		// Allow addons to make their own pre-checks / adjustments
 		call_integration_hook('integrate_attachment_checks', [$this->data['attachid']]);
 
 		// Did you pack this bag yourself?
@@ -346,14 +346,14 @@ class TemporaryAttachment extends ValuesContainer
 	}
 
 	/**
-	 * If we have a valid image type, inspect to see if there is any
-	 * injected code fragments.  If found re encode to remove those fragments
+	 * If we have a valid image type, inspect to see if there are any
+	 * injected code fragments.  If found, re-encode to remove those fragments
 	 */
 	public function checkImageContents(): void
 	{
 		global $modSettings;
 
-		// First, the dreaded security check. Sorry folks, but this should't be avoided
+		// First, the dreaded security check. Sorry folks, but this shouldn't be avoided
 		$image = new Image($this->data['tmp_name']);
 		if ($image->isImageLoaded())
 		{
@@ -366,7 +366,7 @@ class TemporaryAttachment extends ValuesContainer
 					// It's bad. Last chance, maybe we can re-encode it?
 					if (empty($modSettings['attachment_image_reencode']) || (!$image->reEncodeImage()))
 					{
-						// Nothing to do: not allowed or not successful re-encoding it.
+						// Nothing to do: not allowed or not successfully re-encoding it.
 						$this->setErrors('bad_attachment');
 						$this->data['imagesize'] = [];
 					}
@@ -387,7 +387,7 @@ class TemporaryAttachment extends ValuesContainer
 
 	/**
 	 * If enabled, call the attachment image resizing functions.  These reduce the image WxH
-	 * and potentially change the format in order to reduce size.
+	 * and potentially change the format to reduce size.
 	 */
 	public function adjustImageSizeType(): void
 	{
@@ -446,7 +446,7 @@ class TemporaryAttachment extends ValuesContainer
 	}
 
 	/**
-	 * Is there room in the directory for this file
+	 * Is there room in the directory for this file?
 	 *
 	 * @param AttachmentsDirectory $attachmentDirectory
 	 */
@@ -463,7 +463,7 @@ class TemporaryAttachment extends ValuesContainer
 	}
 
 	/**
-	 * Is the file larger than we accept
+	 * Is the file larger than we accept?
 	 */
 	public function checkFileSize(): void
 	{
@@ -573,7 +573,7 @@ class TemporaryAttachment extends ValuesContainer
 	}
 
 	/**
-	 * Rotate an image top side up based on its EXIF data
+	 * Rotate an image topside up based on its EXIF data
 	 */
 	public function autoRotate(): void
 	{
@@ -593,7 +593,7 @@ class TemporaryAttachment extends ValuesContainer
 	}
 
 	/**
-	 * Checks if a file existence/permission and if granted will attempt
+	 * Checks if a file existence/permission and if granted, will attempt
 	 * to remove/unlink the file.
 	 *
 	 * @return bool

@@ -76,7 +76,7 @@ class MergeTopics extends AbstractController
 		global $txt, $board, $context, $modSettings;
 
 		// If we don't know where you are from we know where you go
-		$from = $this->_req->getQuery('from', 'intval', null);
+		$from = $this->_req->getQuery('from', 'intval');
 		if (!isset($from))
 		{
 			throw new Exception('no_access', false);

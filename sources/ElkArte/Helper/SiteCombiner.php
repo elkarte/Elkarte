@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Used to combine css and js files in to a single compressed file
+ * Used to combine CSS and JS files in to a single compressed file
  *
  * @package   ElkArte Forum
  * @copyright ElkArte Forum contributors
@@ -12,16 +12,15 @@
 
 namespace ElkArte\Helper;
 
-use tubalmartin\CssMin\Minifier as CSSmin;
 use Wikimedia\Minify\JavaScriptMinifier;
 
 /**
- * Used to combine css or js files in to a single file
+ * Used to combine CSS or JS files in to a single file
  *
  * What it does:
  *
- * - Checks if the files have changed, and if so rebuilds the amalgamation
- * - Calls minification classes to reduce size of css and js file saving bandwidth
+ * - Checks if the files have changed, and if so, rebuilds the amalgamation
+ * - Calls minification classes to reduce size of CSS and JS files, saving bandwidth
  */
 class SiteCombiner
 {
@@ -72,7 +71,7 @@ class SiteCombiner
 	}
 
 	/**
-	 * Combine javascript files in to a single file to save requests
+	 * Combine JavaScript files in to a single file to save requests
 	 *
 	 * @param array $files array created by loadJavascriptFile() function
 	 * @param bool $do_deferred true combines files with deferred tag, false combine other
@@ -186,7 +185,7 @@ class SiteCombiner
 	 *
 	 * What it does:
 	 *
-	 * - If the file has a 'stale' option defined it will be added to the
+	 * - If the file has a 'stale' option defined, it will be added to the
 	 *   $_stales array as well to be used later
 	 * - Tags any files that are pre-minimized by filename matching .min.js
 	 *
@@ -254,7 +253,7 @@ class SiteCombiner
 	/**
 	 * Determines if the existing combined file is stale
 	 *
-	 * - If any date of the files that make up the archive are newer than the archive, its considered stale
+	 * - If any date of the files that make up the archive is newer than the archive, it's considered stale
 	 */
 	private function _isStale(): bool
 	{
@@ -281,7 +280,7 @@ class SiteCombiner
 	 * - If the file is CSS will convert some common relative links to the
 	 * location of the hive
 	 *
-	 * @param string $type one of css or js
+	 * @param string $type one of CSS or JS
 	 */
 	private function _combineFiles($type): void
 	{
@@ -333,12 +332,11 @@ class SiteCombiner
 	 *
 	 * What it does:
 	 *
-	 * - Attempt to use JavaScriptMinifier
+	 * - Use JavaScriptMinifier
 	 * - Failing that will return original uncompressed file
 	 */
 	public function jsMinify($js)
 	{
-		require_once(EXTDIR . '/JavaScriptMinifier.php');
 		$fetch_data = JavaScriptMinifier::minify($js);
 
 		// If we have nothing to return, use the original data
@@ -374,7 +372,7 @@ class SiteCombiner
 			return $files;
 		}
 
-		// Build the cache filename's, check for changes, minify when requested
+		// Build the cache filename, check for changes, minify when requested
 		require_once(SUBSDIR . '/Package.subs.php');
 		foreach ($files as $id => $file)
 		{
@@ -411,7 +409,7 @@ class SiteCombiner
 	}
 
 	/**
-	 * Combine css files in to a single file
+	 * Combine CSS files in to a single file
 	 *
 	 * @param string[] $files
 	 *
@@ -443,19 +441,19 @@ class SiteCombiner
 			return true;
 		}
 
-		// Create the css archive name
+		// Create the CSS archive name
 		$this->_buildName('.css');
 
-		// No file, or a stale one, so we create a new css compilation
+		// No file, or a stale one, so we create a new CSS compilation
 		if ($this->_isStale())
 		{
 			$this->_archive_header = "/*\n *" . $this->_archive_filenames . "\n */\n";
 			$this->_combineFiles('css');
 
-			// Compress with CssMin
+			// Compress CSS
 			$this->_minified_cache = $this->_minify ? $this->cssMinify($this->_cache) : trim($this->_cache);
 
-			// Combine in any pre minimized css files to our string
+			// Combine in any pre minimized CSS files to our string
 			$this->_minified_cache .= "\n" . $this->_min_cache;
 
 			$this->_saveFiles();
@@ -466,39 +464,25 @@ class SiteCombiner
 	}
 
 	/**
-	 * Takes a css file and compresses it to save space
+	 * Takes a CSS file and compresses it to save space
 	 *
 	 * What it does:
 	 *
-	 * - Attempt to use CssMin
-	 * - Failing that will return original uncompressed file
+	 * - Applies fast whitespace and comment removal
 	 *
 	 * @param string $css data to minify
-	 * @param bool $fast if true, only remove whitespace to minify
 	 * @return string Minified CSS data
 	 */
-	public function cssMinify($css = '', $fast = false): string
+	public function cssMinify(string $css = ''): string
 	{
-		if ($fast)
-		{
-			// Simple fast whitespace and comment removal
-			return trim(
-				str_replace(
-					['; ', ': ', ' {', '{ ', ', ', '} ', ';}', '( ', ' )', '[ ', ' ]'],
-					[';', ':', '{', '{', ',', '}', '}', '(', ')', '[', ']'],
-					preg_replace(['~\s+~', '~/\*.*?\*/~s'], [' ', ''], $css)
-				)
-			);
-		}
-
-		// Temporary manual loading of css min files
-		require_once(EXTDIR . '/CssMin/Minifier.php');
-		require_once(EXTDIR . '/CssMin/Colors.php');
-		require_once(EXTDIR . '/CssMin/Utils.php');
-		require_once(EXTDIR . '/CssMin/Command.php');
-
-		// CSSmin it to save some space
-		return (new CSSmin())->run($css);
+		// Simple fast whitespace and comment removal from Wikimedia CSSMin.php
+		return trim(
+			str_replace(
+				[ '; ', ': ', ' {', '{ ', ', ', '} ', ';}', '( ', ' )', '[ ', ' ]' ],
+				[ ';', ':', '{', '{', ',', '}', '}', '(', ')', '[', ']' ],
+				preg_replace( [ '/\s+/', '/\/\*.*?\*\//s' ], [ ' ', '' ], $css )
+			)
+		);
 	}
 
 	/**
@@ -515,7 +499,7 @@ class SiteCombiner
 			return $files;
 		}
 
-		// Build the cache filename's, check for changes, minify when needed
+		// Build the cache filename, check for changes, minify when needed
 		foreach ($files as $id => $file)
 		{
 			// Clean start

@@ -21,7 +21,7 @@ use ElkArte\Helper\Util;
 
 /**
  * A class to handle the basics of calendar events.
- * Namely a certain kind of validation, inserting a new one, updating existing,
+ * Namely, a certain kind of validation, inserting a new one, updating existing,
  * deleting, etc.
  */
 class CalendarEvent
@@ -29,13 +29,13 @@ class CalendarEvent
 	/** @var null|int The id of the event. */
 	protected $_event_id;
 
-	/** @var array The general settings (in fact a copy of $modSettings). */
+	/** @var array The general settings (in fact, a copy of $modSettings). */
 	protected $_settings = [];
 
 	/**
 	 * Construct the object requires the id of the event and the settings
 	 *
-	 * @param null|int $event_id Obviously the id of the event. If null or -1 the event is considered new
+	 * @param null|int $event_id The id of the event. If null or -1, the event is considered new
 	 * @param array $settings An array of settings ($modSettings is the current one)
 	 * @see CalendarEvent::isNew
 	 */
@@ -173,7 +173,7 @@ class CalendarEvent
 	/**
 	 * Updates an existing event.
 	 * Some options are validated to be sure the data inserted into the
-	 * database are correct.
+	 * database is correct.
 	 *
 	 * @param array $options The options may come from a form
 	 */
@@ -192,7 +192,7 @@ class CalendarEvent
 		{
 			$span = 0;
 		}
-		elseif (empty($options['span']) || $options['span'] == 1)
+		elseif (empty($options['span']) || (int) $options['span'] === 1)
 		{
 			$span = 0;
 		}
@@ -218,7 +218,7 @@ class CalendarEvent
 
 	/**
 	 * Loads up the data of an event for the template.
-	 * If new the default values are loaded.
+	 * If new, the default values are loaded.
 	 *
 	 * @param array $options The options may come from a form. Used to set
 	 *              some of the defaults in case of new events.
@@ -241,13 +241,13 @@ class CalendarEvent
 				'board' => 0,
 				'new' => 1,
 				'eventid' => -1,
-				'year' => $options['year'] ?? $today['year'],
-				'month' => $options['month'] ?? $today['mon'],
-				'day' => $options['day'] ?? $today['mday'],
+				'year' => (int) ($options['year'] ?? $today['year']),
+				'month' => (int) ($options['month'] ?? $today['mon']),
+				'day' => (int) ($options['day'] ?? $today['mday']),
 				'title' => '',
 				'span' => 1,
 			];
-			$event['last_day'] = (int) Util::strftime('%d', mktime(0, 0, 0, $event['month'] == 12 ? 1 : $event['month'] + 1, 0, $event['month'] == 12 ? $event['year'] + 1 : $event['year']));
+			$event['last_day'] = (int) Util::strftime('%d', mktime(0, 0, 0, $event['month'] === 12 ? 1 : $event['month'] + 1, 0, $event['month'] === 12 ? $event['year'] + 1 : $event['year']));
 		}
 		else
 		{
@@ -268,7 +268,7 @@ class CalendarEvent
 			}
 
 			// Make sure the user is allowed to edit this event.
-			if ($event['member'] != $member_id)
+			if ($event['member'] !== (int) $member_id)
 			{
 				isAllowedTo('calendar_edit_any');
 			}
@@ -299,6 +299,6 @@ class CalendarEvent
 	 */
 	public function isStarter($member_id): bool
 	{
-		return !empty($member_id) && getEventPoster($this->_event_id) == $member_id;
+		return !empty($member_id) && getEventPoster($this->_event_id) === (int) $member_id;
 	}
 }

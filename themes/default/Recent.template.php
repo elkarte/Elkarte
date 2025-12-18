@@ -212,7 +212,7 @@ function template_unread()
 							', $txt['topic_alert_none'], '
 						</h2>
 						<div class="board_row infobox centertext">
-							', $context['showing_all_topics'] ? '<strong>' . $txt['find_no_results'] . '</strong>' : $txt['unread_topics_visit_none'], '
+							', $context['showing_all_topics'] ? '<strong>' . $txt['all_caught_up'] . '</strong>' : $txt['unread_topics_visit_none'], '
 						</div>
 					</div>';
 	}

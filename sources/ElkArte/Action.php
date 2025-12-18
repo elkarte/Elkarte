@@ -18,7 +18,7 @@ use ElkArte\Helper\HttpReq;
 /**
  * Action class defines an action with its associated sub-actions.
  *
- * Object-oriented controllers (with sub-actions) use it to set their action-subaction arrays, and have it call the
+ * Object-oriented controllers (with sub-actions) use it to set their action-subaction arrays and have it call the
  * right function or method handlers.
  *
  * Replaces the sub-actions arrays in every dispatching function.
@@ -135,12 +135,6 @@ class Action
 		// Start off by assuming that this is a callable of some kind.
 		$call = $subAction['function'] ?? $subAction;
 
-	// Why was this here? It ignores directory location if provided.
-	//	if (isset($subAction['file']))
-	//	{
-	//		require_once($subAction['file']);
-	//	}
-
 		// Calling a method within a controller?
 		if (isset($subAction['controller'], $subAction['function']))
 		{
@@ -175,7 +169,7 @@ class Action
 
 	/**
 	 * Security check: verify that the user has the permission to perform the
-	 * given action, and throw an error otherwise.
+	 * given action and throw an error otherwise.
 	 *
 	 * @param string $sub_id The sub action
 	 */

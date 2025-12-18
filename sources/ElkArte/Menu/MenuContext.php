@@ -56,11 +56,11 @@ class MenuContext
 	 *
 	 * What it does:
 	 *
-	 * - Defines every master item in the menu, as well as any sub-items
-	 * - Sets the counter for the menu items
-	 * - Ensures the chosen action is set so the menu is highlighted
-	 * - Saves them in the cache if it is available and on
-	 * - Places the results in $context
+	 * - Defines every master item in the menu, as well as any sub-items.
+	 * - Sets the counter for the menu items.
+	 * - Ensures the chosen action is set so the menu is highlighted.
+	 * - Saves them in the cache if it is available and on.
+	 * - Places the results in $context.
 	 */
 	public function setupMenuContext()
 	{
@@ -83,7 +83,7 @@ class MenuContext
 		$menu_count['unread_messages'] = $context['user']['unread_messages'];
 		$menu_count['mentions'] = $context['user']['mentions'];
 
-		// All the buttons we can possibly want and then some, try pulling the final list of buttons from cache first.
+		// All the buttons we can possibly want and then some, try pulling the final list of buttons from the cache first.
 		$this->setupMenuButtons($menu_count);
 
 		$this->setupCurrentAction();
@@ -125,7 +125,7 @@ class MenuContext
 			$context['theme_header_callbacks'] = elk_array_insert($context['theme_header_callbacks'], 'login_bar', ['search_bar'], 'after');
 		}
 
-		// Add in a top section notice callback
+		// Add in the top section notice callback
 		$context['theme_header_callbacks'][] = 'header_bar';
 	}
 
@@ -274,7 +274,7 @@ class MenuContext
 					$button['sub_buttons'][$key]['alttitle'] = $subButton['title'] . ' [' . $menu_count[$subButton['counter']] . ']';
 					$this->addCountsToTitle($button['sub_buttons'][$key]['title'], $menu_count[$subButton['counter']], 1);
 
-					// And any counter on its sub menu
+					// And any counter on its submenu
 					$button = $this->setSubButtonCounts($button, $key, $subButton, $menu_count);
 				}
 			}

@@ -104,7 +104,7 @@ class Register extends AbstractModule
 	{
 		global $context, $txt;
 
-		// How about any verification errors
+		// How about any verification errors?
 		$verificationOptions = [
 			'id' => 'contactform',
 		];

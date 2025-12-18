@@ -14,7 +14,7 @@
 namespace ElkArte\Cache\CacheMethod;
 
 /**
- * In order to work with ElkArte any caching method must implement this
+ * To work with ElkArte, any caching method must implement this
  * interface
  *
  */
@@ -23,7 +23,7 @@ interface CacheMethodInterface
 	/**
 	 * The class is initialized passing the settings of the cache
 	 *
-	 * allows to "initialize" the caching engine if needed
+	 * Allows "initializing" the caching engine if needed
 	 *
 	 * @param mixed $options
 	 */
@@ -61,7 +61,7 @@ interface CacheMethodInterface
 	 * Empty out the cache in use as best it can.
 	 *
 	 * It may only remove the files of a certain type (if the $type parameter is given)
-	 * Type can be user, data or left blank
+	 * Type can be user, data, or left blank
 	 *  - user clears out user data
 	 *  - data clears out system / opcode data
 	 *  - If no type is specified will perform a complete cache clearing
@@ -73,7 +73,7 @@ interface CacheMethodInterface
 	public function clean($type = '');
 
 	/**
-	 * Certain caching engines (e.g. filesystem) may require fixes to the cache key
+	 * Certain caching engines (e.g., filesystem) may require fixes to the cache key
 	 * this method is here to allow fixing the key appropriately.
 	 *
 	 * @param string $key
@@ -89,7 +89,7 @@ interface CacheMethodInterface
 	public function isAvailable();
 
 	/**
-	 * method to return available details on the server settings of the
+	 * Method to return available details on the server settings of the
 	 * cache engine (title and version).
 	 *
 	 * Returns an array with two indexes:
@@ -115,7 +115,7 @@ interface CacheMethodInterface
 	public function isMiss();
 
 	/**
-	 * Remove a item from the cache
+	 * Remove an item from the cache
 	 *
 	 * @param string $key
 	 * @return void

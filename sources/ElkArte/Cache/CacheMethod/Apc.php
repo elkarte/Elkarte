@@ -31,13 +31,13 @@ class Apc extends AbstractCacheMethod
 	 * Retrieves statistics about APCu cache.
 	 *
 	 * @return array An associative array containing the following cache statistics:
-	 *     - 'curr_items' : The number of items currently in the cache (default value is 0 if cache is not available).
-	 *     - 'get_hits' : The number of successful cache item fetches.
-	 *     - 'get_misses' : The number of cache item fetches that did not find a matching item.
-	 *     - 'curr_connections' : The current number of connections to APCu cache (always 1).
-	 *     - 'version' : The version of APCu extension installed.
-	 *     - 'hit_rate_user' : The user-defined hit rate, expressed as a percentage (rounded to two decimal places).
-	 *     - 'miss_rate_user' : The user-defined miss rate, expressed as a percentage (rounded to two decimal places).
+	 *     - 'curr_items': The number of items currently in the cache (default value is 0 if cache is not available).
+	 *     - 'get_hits': The number of successful cache item fetches.
+	 *     - 'get_misses': The number of cache item fetches that did not find a matching item.
+	 *     - 'curr_connections': The current number of connections to APCu cache (always 1).
+	 *     - 'version': The version of APCu extension installed.
+	 *     - 'hit_rate_user': The user-defined hit rate, expressed as a percentage (rounded to two decimal places).
+	 *     - 'miss_rate_user': The user-defined miss rate, expressed as a percentage (rounded to two decimal places).
 	 *
 	 *  If the statistics cannot be obtained, an empty array is returned.
      */
@@ -58,7 +58,7 @@ class Apc extends AbstractCacheMethod
 		$results['curr_connections'] = 1;
 		$results['version'] = phpversion('apcu');
 
-		// Seems start_time is really up_time, at least going by its value ?
+		// It seems start_time is really up_time, at least going by its value ?
 		$elapsed = max($cache['start_time'], 1)/ 60;
 		$results['hit_rate'] = sprintf("%.2f", $cache['num_hits'] / $elapsed);
 		$results['miss_rate'] = sprintf("%.2f", $cache['num_misses'] / $elapsed);

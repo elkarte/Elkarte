@@ -82,7 +82,7 @@ function approveAttachments($attachment_ids)
 		]
 	);
 
-	// In order to log the attachments, we really need their message and filename
+	// To log the attachments, we really need their message and filename
 	$db->fetchQuery('
 		SELECT 
 			m.id_msg, a.filename
@@ -123,7 +123,7 @@ function approveAttachments($attachment_ids)
  *
  * - Called by remove avatar/attachment functions.
  * - It removes attachments based that match the $condition.
- * - It allows query_types 'messages' and 'members', whichever is need by the
+ * - It allows query_types 'messages' and 'members', whichever is needed by the
  * $condition parameter.
  * - It does no permissions check.
  *
@@ -272,7 +272,7 @@ function removeAttachments($condition, $query_type = '', $return_affected_messag
 
 	if (!empty($do_logging))
 	{
-		// In order to log the attachments, we really need their message and filename
+		// To log the attachments, we really need their message and filename
 		$db->fetchQuery('
 			SELECT 
 				m.id_msg, a.filename
@@ -380,7 +380,7 @@ function getAttachmentCountByType($type = 'attachment')
 }
 
 /**
- * Simple function to remove the strictly needed of orphan attachments.
+ * Function to remove the strictly needed of orphan attachments.
  *
  * - This is used from attachments maintenance.
  * - It assumes the files have no message, no member information.
@@ -535,7 +535,7 @@ function maxNoThumb()
  *
  * - Checks in groups of 500
  * - Called by attachment maintenance
- * - If $fix_errors is set to true it will attempt to remove the thumbnail from disk
+ * - If $fix_errors is set to true, it will attempt to remove the thumbnail from disk
  *
  * @param int $start
  * @param bool $fix_errors
@@ -573,7 +573,7 @@ function findOrphanThumbnails($start, $fix_errors, $to_fix)
 			{
 				$to_remove[$row['id_attach']] = $row['id_attach'];
 
-				// If we are repairing remove the file from disk now.
+				// If we are repairing, remove the file from the disk now.
 				if ($fix_errors && in_array('missing_thumbnail_parent', $to_fix))
 				{
 					$filename = getAttachmentFilename($row['filename'], $row['id_attach'], $row['id_folder'], false, $row['file_hash']);
@@ -606,7 +606,7 @@ function findOrphanThumbnails($start, $fix_errors, $to_fix)
  *
  * - Checks in groups of 500
  * - Called by attachment maintenance
- * - If $fix_errors is set to true it will attempt to remove the thumbnail from disk
+ * - If $fix_errors is set to true, it will attempt to remove the thumbnail from disk
  *
  * @param int $start
  * @param bool $fix_errors
@@ -658,8 +658,8 @@ function findParentsOrphanThumbnails($start, $fix_errors, $to_fix)
  * Goes thought all the attachments and checks that they exist
  *
  * - Goes in increments of 250
- * - if $fix_errors is true will remove empty files, update wrong filesizes in the DB and
- * - remove DB entries if the file can not be found.
+ * - If $fix_errors is true will remove empty files, update wrong file sizes in the DB, and
+ * remove DB entries if the file cannot be found.
  *
  * @param int $start
  * @param bool $fix_errors
@@ -709,7 +709,7 @@ function repairAttachmentData($start, $fix_errors, $to_fix)
 		// File doesn't exist?
 		if (!file_exists($filename))
 		{
-			// If we're lucky it might just be in a different folder.
+			// If we're lucky, it might just be in a different folder.
 			if ($attachmentDirectory->hasMultiPaths())
 			{
 				// Get the attachment name without the folder.
@@ -764,7 +764,7 @@ function repairAttachmentData($start, $fix_errors, $to_fix)
 			$to_remove[] = $row['id_attach'];
 			$repair_errors['file_missing_on_disk']++;
 		}
-		// An empty file on disk?
+		// An empty file on the disk?
 		elseif (FileFunctions::instance()->fileSize($filename) === 0)
 		{
 			$repair_errors['file_size_of_zero']++;
@@ -838,7 +838,7 @@ function findOrphanAvatars($start, $fix_errors, $to_fix)
 		]
 	)->fetch_callback(
 		function ($row) use ($fix_errors, $to_fix, $modSettings) {
-			// If we are repairing remove the file from disk now.
+			// If we are repairing, remove the file from the disk now.
 			if ($fix_errors && in_array('avatar_no_member', $to_fix))
 			{
 				if ((int) $row['attachment_type'] === 1)
@@ -907,7 +907,7 @@ function findOrphanAttachments($start, $fix_errors, $to_fix)
 		]
 	)->fetch_callback(
 		function ($row) use ($fix_errors, $to_fix) {
-			// If we are repairing remove the file from disk now.
+			// If we are repairing, remove the file from the disk now.
 			if ($fix_errors && in_array('attachment_no_msg', $to_fix))
 			{
 				$filename = getAttachmentFilename($row['filename'], $row['id_attach'], $row['id_folder'], false, $row['file_hash']);
@@ -1073,7 +1073,7 @@ function validateAttachID($id_attach)
 /**
  * Callback function for action_unapproved_attachments
  *
- * - retrieve all the attachments waiting for approval the user can approve
+ * - Retrieve all the attachments waiting for approval the user can approve
  *
  * @param int $start The item to start with (for pagination purposes)
  * @param int $items_per_page The number of items to show per page
@@ -1158,7 +1158,7 @@ function list_getUnapprovedAttachments($start, $items_per_page, $sort, $approve_
 /**
  * Callback function for action_unapproved_attachments
  *
- * - count all the attachments waiting for approval that this user can approve
+ * - Count all the attachments waiting for approval that this user can approve
  *
  * @param string $approve_query additional restrictions based on the boards the user can see
  * @return int the number of unapproved attachments
@@ -1223,7 +1223,7 @@ function list_getAttachDirs()
 	$attachdirs = [];
 	foreach ($attachmentsDir->getPaths() as $id => $dir)
 	{
-		// If there aren't any attachments in this directory this won't exist.
+		// If there aren't any attachments in this directory, this won't exist.
 		if (!isset($expected_files[$id]))
 		{
 			$expected_files[$id] = 0;
@@ -1239,7 +1239,7 @@ function list_getAttachDirs()
 		{
 			$is_base_dir = $attachmentsDir->isBaseDir($dir);
 
-			// Count any sub-folders.
+			// Count any subfolders.
 			$sub_dirs = $attachmentsDir->countSubdirs($dir);
 			$expected_files[$id] += $sub_dirs;
 		}
@@ -1493,7 +1493,7 @@ function list_getFiles($start, $items_per_page, $sort, $browse_type)
 }
 
 /**
- * Calculates the overall size of all attachments, excluding avatars & thumbnails
+ * Calculates the overall size of all attachments, excluding avatars and thumbnails
  *
  * What it does:
  * - Retrieves the size of all attachments in the database.
@@ -1809,7 +1809,7 @@ function canRemoveAttachment($id_attach, $id_member_requesting)
  *
  *  - Iterates through each attachment directory specified in $modSettings['attachmentUploadDir'].
  *  - Counts the number of files in each directory, excluding dotfiles.
- *  - Returns the sum total of all files found.
+ *  - Returns the total of all files found.
  *
  * @return int The total number of attachments found on disk.
  */
@@ -1861,7 +1861,7 @@ function pauseAttachmentMaintenance($to_fix, $max_substep = 0, $starting_substep
 {
 	global $context, $txt, $time_start;
 
-	// Try get more time...
+	// Try to get more time...
 	detectServer()->setTimeLimit(600);
 
 	// Have we already used our maximum time?
@@ -1892,7 +1892,7 @@ function pauseAttachmentMaintenance($to_fix, $max_substep = 0, $starting_substep
 	// Never more than 100%!
 	$context['continue_percent'] = min($context['continue_percent'], 100);
 
-	// Save the needed information for the next loop
+	// Save the information for the next loop
 	$_SESSION['attachments_to_fix'] = $to_fix;
 	$_SESSION['attachments_to_fix2'] = $context['repair_errors'];
 

@@ -18,11 +18,11 @@ namespace ElkArte\Menu;
  *
  * This class will set and access the menu section options. The supported options are:
  *
- * The array is a unnamed index array interpreted as follows,
- *   - string $title      => Section title
- *   - bool $enabled      => Is the section enabled / shown
- *   - array $areas       => Array of areas within this menu section, each area option processed by MenuArea
- *   - array $permission  => Permission required to access the whole section
+ * The array is an unnamed index array interpreted as follows,
+ *   - string $title     => Section title
+ *   - bool $enabled     => Is the section enabled / shown
+ *   - array $areas      => Array of areas within this menu section, each area option processed by MenuArea
+ *   - array $permission => Permission required to access the whole section
  *
  * @package ElkArte\Menu
  */

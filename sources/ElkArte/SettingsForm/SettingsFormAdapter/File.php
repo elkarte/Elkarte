@@ -46,12 +46,12 @@ class File extends Db
 	 *
 	 * - The basic usage of the six numbered key fields are
 	 * - array(0 ,1, 2, 3, 4, 5
-	 *    0 variable name - the name of the saved variable
-	 *    1 label - the text to show on the settings page
-	 *    2 saveto - file or db, where to save the variable name - value pair
-	 *    3 type - type of data to display int, float, text, check, select, password
-	 *    4 size - false or field size, if type is select, this needs to be an array of select options
-	 *    5 help - '' or helptxt variable name
+	 *    0 variable name - the name of the saved variable.
+	 *    1 label - the text to show on the settings page.
+	 *    2 saveto - file or db, where to save the variable name - value pair.
+	 *    3 type - type of data to display int, float, text, check, select, password.
+	 *    4 size - false or field size, if type is select, this needs to be an array of select options.
+	 *    5 help - '' or helptxt variable name.
 	 *  )
 	 * - The following named keys are also permitted
 	 *    'disabled' =>
@@ -131,15 +131,15 @@ class File extends Db
 	 *
 	 * What it does:
 	 *
-	 * - updates the Settings.php file with the changes supplied in new_settings.
-	 * - expects new_settings to be an associative array, with the keys as the
+	 * - Updates the Settings.php file with the changes supplied in new_settings.
+	 * - Expects new_settings to be an associative array, with the keys as the
 	 *   variable names in Settings.php, and the values the variable values.
-	 * - does not escape or quote values.
-	 * - preserves case, formatting, and additional options in file.
-	 * - writes nothing if the resulting file would be less than 10 lines
+	 * - Does not escape or quote values.
+	 * - Preserves case, formatting, and additional options in file.
+	 * - Writes nothing if the resulting file is less than 10 lines
 	 *   in length (sanity check for read lock.)
-	 * - check for changes to db_last_error and passes those off to a separate handler
-	 * - attempts to create a backup file and will use it should the writing of the
+	 * - Check for changes to db_last_error and passes those off to a separate handler
+	 * - Attempts to create a backup file and will use it should the writing of the
 	 *   new settings file fail
 	 */
 	public function save()
@@ -227,7 +227,7 @@ class File extends Db
 			'maintenance',
 		];
 
-		// Now sort everything into a big array, and figure out arrays etc.
+		// Now sort everything into a big array and figure out arrays etc.
 		$this->cleanPasswords($config_passwords);
 
 		// Escape and update Setting strings
@@ -421,7 +421,7 @@ class File extends Db
 	 * Updates / Validates the Settings array for later output.
 	 *
 	 * - Updates any values that have been changed.
-	 * - Key/value pairs that did not exists are added at the end of the array.
+	 * - Key/value pairs that did not exist are added at the end of the array.
 	 * - Ensures the completed array is valid for later output
 	 */
 	private function _prepareSettings(): void
@@ -432,7 +432,7 @@ class File extends Db
 			return;
 		}
 
-		// remove any /r's that made there way in here
+		// remove any /r's that made their way in here
 		foreach ($this->settingsArray as $k => $dummy)
 		{
 			$this->settingsArray[$k] = strtr($dummy, ["\r" => '']) . "\n";
@@ -449,13 +449,13 @@ class File extends Db
 
 			$this->settingsArray[$i] = trim($this->settingsArray[$i]) . "\n";
 
-			// Look through the variables to set....
+			// Look through the variables to set...
 			foreach ($this->new_settings as $var => $val)
 			{
-				if (strncasecmp($this->settingsArray[$i], '$' . $var, 1 + strlen($var)) == 0)
+				if (strncasecmp($this->settingsArray[$i], '$' . $var, 1 + strlen($var)) === 0)
 				{
 					$comment = strstr(substr(un_htmlspecialchars($this->settingsArray[$i]), strpos(un_htmlspecialchars($this->settingsArray[$i]), ';')), '#');
-					$this->settingsArray[$i] = '$' . $var . ' = ' . $val . ';' . ($comment == '' ? '' : "\t\t" . rtrim($comment)) . "\n";
+					$this->settingsArray[$i] = '$' . $var . ' = ' . $val . ';' . ($comment === '' ? '' : "\t\t" . rtrim($comment)) . "\n";
 
 					// This one's been 'used', so to speak.
 					unset($this->new_settings[$var]);
@@ -475,7 +475,7 @@ class File extends Db
 			$end = count($this->settingsArray) - 1;
 		}
 
-		// Still more variables to go?  Then lets add them at the end.
+		// Still more variables to go?  Then let's add them at the end.
 		if (!empty($this->new_settings))
 		{
 			if (trim($this->settingsArray[$end]) === '?>')
@@ -519,7 +519,7 @@ class File extends Db
 		//  - like a possible race condition,
 		//  - or a failure to write at low diskspace
 		//
-		// Check before you act: if cache is enabled, we can do a simple write test
+		// Check before you act: if cache is enabled, we can do a simple writing test
 		// to validate that we even write things on this filesystem.
 		if ((!defined('CACHEDIR') || !$this->fileFunc->fileExists(CACHEDIR)) && $this->fileFunc->fileExists(BOARDDIR . '/cache'))
 		{
@@ -560,7 +560,7 @@ class File extends Db
 			// Survey says ...
 			if (!$settings_backup_fail && $written_bytes !== strlen($write_settings))
 			{
-				// Well this is not good at all, lets see if we can save this
+				// Well, this is not good at all, let's see if we can save this
 				$context['settings_message'] = 'settings_error';
 
 				if ($this->fileFunc->fileExists(BOARDDIR . '/Settings_bak.php'))

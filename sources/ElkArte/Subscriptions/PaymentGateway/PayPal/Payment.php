@@ -19,7 +19,7 @@ namespace ElkArte\Subscriptions\PaymentGateway\PayPal;
 use ElkArte\Subscriptions\PaymentGateway\PaymentInterface;
 
 /**
- * Class of functions to validate a IPN response and provide details of the payment
+ * Class of functions to validate an IPN response and provide details of the payment
  *
  * @package Subscriptions
  */
@@ -28,7 +28,7 @@ class Payment implements PaymentInterface
 	/** @var string|array Holds the IPN response data */
 	private $return_data;
 
-	/** @var string Data to send to paypal IPN */
+	/** @var string Data to send to PayPal IPN */
 	private $requestString;
 
 	/** @var bool If this is a test sandbox run or not */
@@ -66,14 +66,14 @@ class Payment implements PaymentInterface
 	}
 
 	/**
-	 * Post the IPN data received back to paypal for validation
+	 * Post the IPN data received back to PayPal for validation
 	 *
 	 * - Sends the complete unaltered message back to PayPal.
 	 * - The message must contain the same fields in the same order and be encoded in the same way as the original
 	 * message
 	 * - PayPal will respond back with a single word, which is either VERIFIED if the message originated with PayPal or
 	 * INVALID
-	 * - If valid returns the subscription and member IDs we are going to process if it passes
+	 * - If valid returns the subscription and member IDs, we are going to process if it passes
 	 *
 	 * @return array
 	 */
@@ -83,7 +83,7 @@ class Payment implements PaymentInterface
 
 		$my_post = [];
 
-		// Reading POSTed data directly from $_POST may causes serialization issues with array data
+		// Reading POSTed data directly from $_POST may cause serialization issues with array data
 		// in the POST. Instead, read raw POST data from the input stream.
 		$raw_post_data = file_get_contents('php://input');
 		$raw_post_array = explode('&', $raw_post_data);
@@ -117,20 +117,20 @@ class Payment implements PaymentInterface
 		$this->paidsubsTest = !empty($modSettings['paidsubs_test']);
 		$this->_fetchReturnResponse();
 
-		// If PayPal IPN does not return verified then give up...
+		// If PayPal IPN does not return verified, then give up...
 		if (strcmp(trim($this->return_data), 'VERIFIED') !== 0)
 		{
 			exit;
 		}
 
 		// Now that we have received a VERIFIED response from PayPal, we perform some checks
-		// before we assume that the IPN is legitimate. First check that this is intended for us.
+		// before we assume that the IPN is legitimate. First, check that this is intended for us.
 		if ($modSettings['paypal_email'] !== $_POST['business'] && (empty($modSettings['paypal_additional_emails']) || !in_array($_POST['business'], explode(',', $modSettings['paypal_additional_emails']))))
 		{
 			exit;
 		}
 
-		// Is this a subscription - and if so is it a secondary payment that we need to process?
+		// Is this a subscription - and if so, is it a secondary payment that we need to process?
 		if ($this->isSubscription() && (empty($_POST['item_number']) || !str_contains($_POST['item_number'], '+')))
 		{
 			// Calculate the subscription it relates to!
@@ -140,7 +140,7 @@ class Payment implements PaymentInterface
 		// Verify the currency!
 		if (strtolower(trim($_POST['mc_currency'])) !== strtolower($modSettings['paid_currency_code']))
 		{
-			generateSubscriptionError(sprintf($txt['paypal_currency_unkown'], $_POST['mc_currency'], $modSettings['paid_currency_code']));
+			generateSubscriptionError(sprintf($txt['paypal_currency_unknown'], $_POST['mc_currency'], $modSettings['paid_currency_code']));
 		}
 
 		// Can't exist if it doesn't contain anything.
@@ -154,8 +154,8 @@ class Payment implements PaymentInterface
 	}
 
 	/**
-	 * Makes the request to paypal and returns the response
-	 * Attempts curl first and if not available fsockopen
+	 * Makes the request to PayPal and returns the response
+	 * Attempts curl first and if not available, fsockopen
 	 */
 	private function _fetchReturnResponse(): void
 	{
@@ -172,17 +172,17 @@ class Payment implements PaymentInterface
 	}
 
 	/**
-	 * Get paypal response to our requestString using curl
+	 * Get PayPal response to our requestString using curl
 	 *
 	 * @param resource $curl
 	 */
 	private function _fetchReturnResponseCurl($curl): void
 	{
-		// Set the post data.
+		// Set the post-data.
 		curl_setopt($curl, CURLOPT_POST, true);
 		curl_setopt($curl, CURLOPT_POSTFIELDS, $this->requestString);
 
-		// Set up the headers so paypal will accept the post
+		// Set up the headers so PayPal will accept the post
 		curl_setopt($curl, CURLOPT_HTTP_VERSION, CURL_HTTP_VERSION_1_1);
 		curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, 1);
 		curl_setopt($curl, CURLOPT_SSL_VERIFYHOST, 2);
@@ -210,13 +210,13 @@ class Payment implements PaymentInterface
 	}
 
 	/**
-	 * Get paypal response to our requestString using curl
+	 * Get PayPal response to our requestString using curl
 	 */
 	private function _fetchReturnResponseFs(): void
 	{
 		global $txt;
 
-		// Setup the headers.
+		// Set up the headers.
 		$header = 'POST /cgi-bin/webscr HTTP/1.1' . "\r\n";
 		$header .= 'Content-Type: application/x-www-form-urlencoded' . "\r\n";
 		$header .= 'Host: ipnpb.' . ($this->paidsubsTest ? 'sandbox.' : '') . 'paypal.com' . "\r\n";
@@ -324,6 +324,8 @@ class Payment implements PaymentInterface
 		[$member_id, $subscription_id] = $request->fetch_row();
 		$_POST['item_number'] = $member_id . '+' . $subscription_id;
 		$request->free_result();
+
+		return null;
 	}
 
 	/**
@@ -357,9 +359,9 @@ class Payment implements PaymentInterface
 	public function isCancellation()
 	{
 		// subscr_cancel: This IPN response (txn_type) is sent only when the subscriber cancels his/her
-		// current subscription or the merchant cancels the subscribers subscription. In this event according
-		// to Paypal rules the subscr_eot (End of Term) IPN response is NEVER sent, and it is up to you to
-		// keep the subscription of the subscriber active for remaining days of subscription should they cancel
+		// current subscription or the merchant cancels the subscribers subscription. In this event, according
+		// to PayPal rules, the subscr_eot (End of Term) IPN response is NEVER sent. It is up to you to
+		// keep the subscription of the subscriber active for the remaining days of the subscription should they cancel
 		// their subscription in the middle of the subscription period.
 		//
 		// subscr_eot: This IPN response (txn_type) is sent ONLY when the subscription ends naturally/expires
@@ -374,7 +376,7 @@ class Payment implements PaymentInterface
 	 */
 	public function getCost()
 	{
-		return ($_POST['tax'] ?? 0) + $_POST['mc_gross'];
+		return (float) ($_POST['tax'] ?? 0) + (float) $_POST['mc_gross'];
 	}
 
 	/**

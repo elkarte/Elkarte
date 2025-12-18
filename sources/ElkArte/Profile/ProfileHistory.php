@@ -533,7 +533,7 @@ class ProfileHistory extends AbstractController
 	}
 
 	/**
-	 * count of messages from a matching IP
+	 * Count of messages from a matching IP
 	 *
 	 * Pass though to getIPMessageCount for createList() in TrackIP()
 	 *
@@ -551,7 +551,7 @@ class ProfileHistory extends AbstractController
 	/**
 	 * Tracks the logins of a given user.
 	 *
-	 * - Accessed by ?action=trackip and ?action=profile;area=history;sa=ip
+	 * - Accessed by ?action=trackip, and ?action=profile;area=history;sa=ip
 	 */
 	public function action_tracklogin(): void
 	{
@@ -629,7 +629,7 @@ class ProfileHistory extends AbstractController
 	/**
 	 * List of login history for a user
 	 *
-	 * Pass through to getLogins for trackLogins data.
+	 * Pass through to getLogins to trackLogins data.
 	 *
 	 * @param int $start The item to start with (for pagination purposes)
 	 * @param int $items_per_page The number of items to show per page

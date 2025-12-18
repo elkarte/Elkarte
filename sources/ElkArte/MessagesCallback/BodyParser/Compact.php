@@ -64,7 +64,7 @@ class Compact implements BodyParserInterface
 		// Prepare the message with censored words, parsed BBCodes, etc.
 		$body = $this->transformBody($body, $smileys_enabled);
 
-		// If result is long enough to warrant highlighting, get to work
+		// If a result is long enough to warrant highlighting, get to work
 		if (Util::strlen($body) > $charLimit)
 		{
 			$body = $this->highlightOrShortenBody($body, $charLimit);
@@ -139,7 +139,7 @@ class Compact implements BodyParserInterface
 			$matches = $this->getMatches($body, '/([^\s\W]{' . $charLimit . '}[\s\W]|[\s\W].{0,' . $charLimit . '}?[\s\W]|^)(' . $matchString . ')([\s\W].{0,' . $charLimit . '}[\s\W]|[\s\W][^\s\W]{0,' . $charLimit . '})/isu');
 		}
 
-		// Search term not found in the body, just show a short snip ...
+		// Search term aren't found in the body, just show a short snip ...
 		if (empty($matches[0]))
 		{
 			$body = Util::shorten_html($body, 500, '<strong>&hellip;&hellip;</strong>', false);

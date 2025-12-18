@@ -28,7 +28,7 @@ class NotificationsTask extends ValuesContainer
 	protected $_notifier_data;
 
 	/**
-	 * The constructor prepared the data array and fills some default values if needed.
+	 * The constructor prepared the data array and filled some default values if needed.
 	 *
 	 * @param string $type The notification type we are dealing with
 	 * @param int $id The id of the target (can be a message, a topic, a member, whatever)
@@ -91,7 +91,7 @@ class NotificationsTask extends ValuesContainer
 	}
 
 	/**
-	 * Returns the array of member that have to receive the notification.
+	 * Returns the array of member that has to receive the notification.
 	 *
 	 * @return int[] An array of member id
 	 */

@@ -238,8 +238,6 @@ function earliest_msg()
 				'current_member' => User::$info->id,
 			]
 		);
-		list ($earliest_msg) = $request->fetch_row();
-		$request->free_result();
 	}
 	else
 	{
@@ -253,11 +251,11 @@ function earliest_msg()
 				'current_member' => User::$info->id,
 			]
 		);
-		list ($earliest_msg) = $request->fetch_row();
-		$request->free_result();
 	}
+	list ($earliest_msg) = $request->fetch_row();
+	$request->free_result();
 
-	// This is needed in case of topics marked unread.
+	// This is needed in the case of topics marked unread.
 	if (empty($earliest_msg))
 	{
 		$earliest_msg = 0;
@@ -271,7 +269,7 @@ function earliest_msg()
 		}
 		else
 		{
-			// This query is pretty slow, but it's needed to ensure nothing crucial is ignored.
+			// This query is pretty slow, but it's necessary to ensure nothing crucial is ignored.
 			$request = $db->query('', '
 				SELECT 
 					MIN(id_msg)
@@ -284,7 +282,7 @@ function earliest_msg()
 			list ($earliest_msg2) = $request->fetch_row();
 			$request->free_result();
 
-			// In theory this could be zero, if the first ever post is unread, so fudge it ;)
+			// In theory this could be zero if the first ever post is unread, so fudge it ;)
 			if ($earliest_msg2 == 0)
 			{
 				$earliest_msg2 = -1;

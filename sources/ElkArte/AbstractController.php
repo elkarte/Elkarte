@@ -74,12 +74,12 @@ abstract class AbstractController
 	public function pre_dispatch()
 	{
 		// By default, do nothing.
-		// Sub-classes may implement their prerequisite loading,
+		// Subclasses may implement their prerequisite loading,
 		// such as load the template, load the language(s) file(s)
 	}
 
 	/**
-	 * Standard method to add an "home" button when using a custom action as forum index.
+	 * Standard method to add a "home" button when using a custom action as forum index.
 	 *
 	 * @param array $buttons
 	 */
@@ -139,7 +139,7 @@ abstract class AbstractController
 	 * Used to define the parameters the controller may need for the front page
 	 * action to work
 	 *
-	 * - e.g. specify a topic ID or a board listing
+	 * - e.g., specify a topic ID or a board listing
 	 */
 	public static function frontPageOptions()
 	{
@@ -150,8 +150,8 @@ abstract class AbstractController
 	 * Used to validate any parameters the controller may need for the front page
 	 * action to work
 	 *
-	 * - e.g. specify a topic ID
-	 * - should return true or false based on if its able to show the front page
+	 * - e.g., specify a topic ID
+	 * - Should return true or false based on if it's able to show the front page
 	 */
 	public static function validateFrontPageOptions($post)
 	{
@@ -202,7 +202,7 @@ abstract class AbstractController
 	{
 		if ($this->_hook === '')
 		{
-			// Use the base controller name for the hook, ie post
+			// Use the base controller name for the hook, i.e., post
 			$this->_hook = $this->getModuleClass();
 
 			// Initialize the events associated with this controller
@@ -217,7 +217,7 @@ abstract class AbstractController
 	 */
 	public function getModuleClass(): string
 	{
-		// Use the base controller name for the hook, ie post
+		// Use the base controller name for the hook, i.e., post
 		$module_class = explode('\\', trim(static::class, '\\'));
 		$module_class = end($module_class);
 
@@ -249,7 +249,7 @@ abstract class AbstractController
 	 * - Searches for modules registered against the module name
 	 * - Example
 	 *   - \ElkArte\Controller\Display results in searching for modules registered against modules_display
-	 *   - $modSettings['modules_display'] returns drafts,calendar,.....
+	 *   - $modSettings['modules_display'] returns drafts,calendar,...
 	 *   - Verifies classes Drafts_Display_Module, Calendar_Display_Module, ... exist
 	 *
 	 * @return string[] Valid Module Classes for this Controller
@@ -288,7 +288,7 @@ abstract class AbstractController
 	 * of the class.  Used by the EventManager to allow registered events to access
 	 * values of the class that triggered the event.
 	 *
-	 * If the property does not exist in the class, will also look in globals.
+	 * If the property does not exist in the class, it will also look in globals.
 	 *
 	 * @param string $dep - The name of the property the even wants
 	 * @param array $dependencies - the array that will be filled with the references to the dependencies

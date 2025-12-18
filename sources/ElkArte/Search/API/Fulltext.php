@@ -26,11 +26,11 @@ use ElkArte\Helper\Util;
  */
 class Fulltext extends Standard
 {
-	/** @var string This is the last version of ElkArte that this was tested on, to protect against API changes. */
-	public $version_compatible = 'ElkArte 2.0';
+	/** @var string This is the last version of ElkArte that this was tested on to protect against API changes. */
+	public $version_compatible = 'ElkArte 2.0 dev';
 
 	/** @var string This won't work with versions of ElkArte less than this. */
-	public $min_elk_version = 'ElkArte 1.0';
+	public $min_elk_version = 'ElkArte 2.0 Beta 1';
 
 	/** @var bool Is it supported? */
 	public $is_supported = true;
@@ -72,7 +72,7 @@ class Fulltext extends Standard
 	 */
 	protected function _getMinWordLength(): int
 	{
-		// Need some search specific database tricks
+		// Need some search-specific database tricks
 		$db_search = db_search();
 
 		// Try to determine the minimum number of letters for a fulltext search.
@@ -108,8 +108,8 @@ class Fulltext extends Standard
 
 		if (empty($modSettings['search_force_index']))
 		{
-			// A boolean capable search engine and not forced to only use an index, we may use a non indexed search
-			// this is harder on the server so we are restrictive here
+			// A boolean capable search engine and not forced to only use an index, we may use a non-indexed search
+			// this is harder on the server, so we are restrictive here
 			if (count($subwords) > 1 && preg_match('~[.:@$]~', $word))
 			{
 				// Using special characters that a full index would ignore and the remaining words are
@@ -187,7 +187,7 @@ class Fulltext extends Standard
 			}
 		}
 
-		// Modifiers such as specific user or specific board.
+		// Modifiers such as a specific user or specific board.
 		$query_where = array_merge($query_where, $this->queryWhereModifiers($query_params));
 
 		// Modifiers to exclude words from the subject

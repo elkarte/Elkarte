@@ -83,10 +83,10 @@ class GenericList
 		// Access to post/get data
 		$this->req = HttpReq::instance();
 
-		// First make sure the array is constructed properly.
+		// First, make sure the array is constructed properly.
 		$this->validateListOptions($listOptions);
 
-		// Now that we've done that, let's set it, we're gonna need it!
+		// Now that we've done that, let's set it; we're gonna need it!
 		$this->listOptions = $listOptions;
 
 		// Be ready for those pesky errors
@@ -174,16 +174,16 @@ class GenericList
 	 */
 	protected function calculatePages(): void
 	{
-		// In some cases the full list must be shown, regardless of the amount of items.
+		// In some cases the full list must be shown, regardless of the number of items.
 		if (empty($this->listOptions['items_per_page']))
 		{
 			$this->context['start'] = 0;
 			$this->context['items_per_page'] = 0;
 		}
-		// With items per page set, calculate total number of items and page index.
+		// With items per page set, calculate the total number of items and page index.
 		else
 		{
-			// First get an impression of how many items to expect.
+			// First, get an impression of how many items to expect.
 			if (isset($this->listOptions['get_count']['file']))
 			{
 				require_once($this->listOptions['get_count']['file']);
@@ -233,7 +233,7 @@ class GenericList
 	 */
 	protected function prepareColumns(): void
 	{
-		// We know the amount of columns, might be useful for the template.
+		// We know the number of columns might be useful for the template.
 		$this->context['num_columns'] = count($this->listOptions['columns']);
 		$this->context['width'] = $this->listOptions['width'] ?? '0';
 
@@ -258,7 +258,7 @@ class GenericList
 	 */
 	protected function loopItems(): void
 	{
-		// Loop through the list items to be shown and construct the data values.
+		// Loop through the list of items to be shown and construct the data values.
 		$this->context['rows'] = [];
 		foreach ($this->listItems as $item_id => $list_item)
 		{
@@ -412,7 +412,7 @@ class GenericList
 				$this->context['form']['hidden_fields'][$context[$this->listOptions['form']['token'] . '_token_var']] = $context[$this->listOptions['form']['token'] . '_token'];
 			}
 
-			// Include the starting page as hidden field?
+			// Include the starting page as a hidden field?
 			if (!empty($this->context['form']['include_start']) && !empty($this->context['start']))
 			{
 				$this->context['form']['hidden_fields'][$this->context['start_var_name']] = $this->context['start'];

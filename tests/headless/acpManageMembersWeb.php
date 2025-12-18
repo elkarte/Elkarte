@@ -75,6 +75,10 @@ class SupportManageMembersController extends ElkArteWebSupport
 	public function activateMember($mname, $act, $el)
 	{
 		// First, navigate to member management.
+		if ($act === 'approve')
+		{
+			$act = 'approve;filter=3';
+		}
 		$this->url('index.php?action=admin;area=viewmembers;sa=browse;type=' . $act);
 		$this->assertEquals('Manage Members', $this->title(), $this->source());
 
@@ -122,6 +126,7 @@ class SupportManageMembersController extends ElkArteWebSupport
 		$txt['regards_team'] = 'Regards';
 		$txt['guest_title'] = 'Guest';
 		$txt['mail_send_unable'] = 'No Mail';
+		$txt['theme_language_error'] = 'Unable to load the \'%1$s\' language file.';
 
 		// First, we register some members...
 		$this->registerMembers();

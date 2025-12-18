@@ -125,7 +125,7 @@ function prepareLikes($likes)
 	// Prepare this like page context for the user
 	foreach ($likes as $msg_id => $like)
 	{
-		// Did they like this message ?
+		// Did they like this message?
 		$you_liked = isset($like['member'][User::$info->id]);
 		if ($you_liked)
 		{
@@ -142,13 +142,13 @@ function prepareLikes($likes)
 			shuffle($likes[$msg_id]['member']);
 			$likes[$msg_id]['member'] = array_slice($likes[$msg_id]['member'], 0, $you_liked ? $limit - 1 : $limit);
 
-			// Trick, member id's below $limit will cause a wrong +x others due to the slice above
+			// Trick, member id's below $limit will cause a wrong +x other due to the slice above
 			if (User::$info->id <= $limit)
 			{
 				$like['count'] += 1;
 			}
 
-			// How many others liked this
+			// How many others liked this?
 			$likes[$msg_id]['member'][] = sprintf('%+d %s', ($like['count'] - $limit), $txt['liked_more']);
 		}
 
@@ -187,9 +187,9 @@ function clearLikes($likeWaitTime)
  * Checks if the member has exceeded the number of like actions they are
  * allowed in a given time period.
  *
- * - The log is maintained to the time period by the clearLikes function so
+ * - The log is maintained to the time period by the clearLikes function, so
  * the count is always current.
- * - returns true if they can like again, or false if they have to wait a bit
+ * - Returns true if they can like again, or false if they have to wait a bit
  *
  * @param int $id_liker
  *
@@ -261,7 +261,7 @@ function updateLike($id_liker, $liked_message, $direction)
 			['id_msg', 'id_member', 'id_poster']
 		);
 
-		// If we are liking the first message in a topic, we are de facto liking the topic
+		// If we like the first message in a topic, we de facto like the topic
 		if ($liked_message['id_msg'] === $liked_message['id_first_msg'])
 		{
 			increaseTopicLikes($liked_message['id_topic'], $direction);
@@ -343,7 +343,7 @@ function likesCount($memberID, $given = true)
 {
 	$db = database();
 
-	// Give is a given, received takes a query so its only the unique messages
+	// Give is a given, received takes a query so it's only the unique messages
 	if ($given)
 	{
 		$likes = MembersList::get($memberID)->likes_given;
@@ -569,7 +569,7 @@ function messageLikeCount($message)
 /**
  * Function to get most liked messages
  *
- * @param int $limit the number of top liked messages to fetch
+ * @param int $limit the number of top-liked messages to fetch
  *
  * @return array
  * @package Likes
@@ -665,7 +665,7 @@ function dbMostLikedMessage($limit = 10)
  *
  * What it does:
  *
- * - For a supplied topic gets the, default 5, posts that have been liked
+ * - For a supplied topic gets the default 5 posts that have been liked
  * - Returns the messages in descending order of likes
  *
  * @param int $topic the topic_id we are going to look for liked posts within
@@ -749,9 +749,9 @@ function dbMostLikedMessagesByTopic($topic, $limit = 5)
  * Function to get most liked topics.
  *
  *  - Rewards threads that generate distinct likers in fewer posts.  So if a thread generated 20 unique
- * likes in 3 posts vs 20 in 20 posts it would get more weight.
- * - The more unique members that like a thread the more popular it will be.
- * - Adds weight to threads which have posts with many likes vs threads with many posts with many single likes
+ * likes in 3 posts vs. 20 in 20 posts, it would get more weight.
+ * - The more unique members that like a thread, the more popular it will be.
+ * - Adds weight to threads which have posts with many likes vs. threads with many posts with many single likes
  * - Can still be gamed but what can you do
  *
  * @param null|int $board - An optional board id to find most liked topics in.
@@ -978,7 +978,7 @@ function dbMostLikedPostsByUser($id_member, $limit = 10)
 	$db = database();
 	$bbc_parser = ParserWrapper::instance();
 
-	// Lets fetch highest liked posts by this user
+	// Let's fetch highest liked posts by this user
 	return $db->fetchQuery('
 		SELECT
 			lp.id_msg, COUNT(lp.id_msg) AS like_count,
@@ -1091,7 +1091,7 @@ function dbMostLikesGivenUser($limit = 10)
 }
 
 /**
- * Returns posts that were recently liked by a given user
+ * Returns posts recently liked by a given user
  *
  * @param int $id_liker the userid to find recently liked posts
  * @param int $limit number of recently liked posts to fetch
@@ -1102,7 +1102,7 @@ function dbRecentlyLikedPostsGivenUser($id_liker, $limit = 5)
 	$db = database();
 	$bbc_parser = ParserWrapper::instance();
 
-	// Lets fetch the latest liked posts by this user
+	// Let's fetch the latest liked posts by this user
 	return $db->fetchQuery('
 		SELECT
 			m.id_msg, m.id_topic, m.subject, m.body, m.poster_time, m.smileys_enabled
@@ -1146,9 +1146,9 @@ function dbRecentlyLikedPostsGivenUser($id_liker, $limit = 5)
 /**
  * Utility function to decrease member like counts when a message is removed
  *
- * When a message is removed, we need update the like counts for those who liked the message
- * as well as those who posted the message
- *  - Members who liked the message have likes given decreased
+ * When a message is removed, we need to update the like counts for those who liked the message
+ * as well as those who posted the message.
+ *  - Members who liked the message have likes given decreased.
  *  - The member who posted has the likes received decreased by the number of likers
  * for that message.
  *

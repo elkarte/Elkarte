@@ -161,7 +161,7 @@ class AttachmentsDisplay
 					'file_hash' => $attachment['file_hash'],
 				];
 
-				// If something is unapproved we'll note it so we can sort them.
+				// If something is unapproved, we'll note it so we can sort them.
 				if (!$attachment['approved'])
 				{
 					$have_unapproved = true;
@@ -219,7 +219,7 @@ class AttachmentsDisplay
 			&& !empty($modSettings['attachmentThumbHeight'])
 			&& ($attachment['width'] > $modSettings['attachmentThumbWidth'] || $attachment['height'] > $modSettings['attachmentThumbHeight']) && strlen($attachment['filename']) < 249)
 		{
-			// A proper thumb doesn't exist yet? Create one! Or, it needs update.
+			// A proper thumb doesn't exist yet? Create one! Or, it needs an update.
 			if (empty($attachment['id_thumb'])
 				|| $attachment['thumb_width'] > $modSettings['attachmentThumbWidth']
 				|| $attachment['thumb_height'] > $modSettings['attachmentThumbHeight'])
@@ -236,7 +236,7 @@ class AttachmentsDisplay
 			}
 		}
 
-		// If we have a thumbnail, make note of it!
+		// If we have a thumbnail, make a note of it!
 		if (!empty($attachment['id_thumb']))
 		{
 			$attachmentData['thumbnail'] = [
@@ -274,7 +274,7 @@ class AttachmentsDisplay
 	}
 
 	/**
-	 * Returns the array of attachments produced from getAttachments())
+	 * Returns the array of attachments produced from getAttachments()
 	 *
 	 * @return array An array of attachments indexed by message ID
 	 */

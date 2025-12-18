@@ -36,8 +36,8 @@ class Post extends AbstractModule
 	{
 		global $modSettings;
 
-		// Using controls and this users is the lucky recipient of them?
-		if (User::$info->is_admin === false && User::$info->is_moderator === false && !empty($modSettings['posts_require_captcha']) && (User::$info->posts < $modSettings['posts_require_captcha'] || (User::$info->is_guest && $modSettings['posts_require_captcha'] == -1)))
+		// Using controls and these users is the lucky recipient of them?
+		if (User::$info->is_admin === false && User::$info->is_moderator === false && !empty($modSettings['posts_require_captcha']) && (User::$info->posts < $modSettings['posts_require_captcha'] || (User::$info->is_guest && (int) $modSettings['posts_require_captcha'] === -1)))
 		{
 			return [
 				['post_errors', [Post::class, 'post_errors'], ['_post_errors']],
@@ -49,7 +49,7 @@ class Post extends AbstractModule
 	}
 
 	/**
-	 * Prepare $context for the post page.
+	 * Prepare $context for the post-page.
 	 *
 	 * @param ErrorContext $_post_errors
 	 */
@@ -64,7 +64,7 @@ class Post extends AbstractModule
 		$context['require_verification'] = VerificationControlsIntegrate::create($verificationOptions);
 		$context['visual_verification_id'] = $verificationOptions['id'];
 
-		// If they came from quick reply, and have to enter verification details, give them some notice.
+		// If they came from quick reply and have to enter verification details, give them some notice.
 		if (empty($_REQUEST['from_qr']))
 		{
 			return;
@@ -79,7 +79,7 @@ class Post extends AbstractModule
 	}
 
 	/**
-	 * Checks the user passed the verifications on the post page.
+	 * Checks the user passed the verifications on the post-page.
 	 *
 	 * @param ErrorContext $_post_errors
 	 */

@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Primary site dispatch controller, sends the request to the function or method
+ * Primary site dispatch controller sends the request to the function or method
  * registered to handle it.
  *
  * @package   ElkArte Forum
@@ -64,7 +64,7 @@ class SiteDispatcher
 	/** @var string Function or method to call */
 	protected $_function_name;
 
-	/** @var string Class name, for object-oriented controllers */
+	/** @var string Class name for object-oriented controllers */
 	protected $_controller_name;
 
 	/** @var AbstractController The instance of the controller */
@@ -192,7 +192,7 @@ class SiteDispatcher
 			// Home page: board index
 			if (empty($board) && empty($topic))
 			{
-				// Was it, wasn't it....
+				// Was it, wasn't it...
 				if (empty($this->_function_name))
 				{
 					$this->_controller_name = $this->_default_action['controller'];
@@ -247,7 +247,7 @@ class SiteDispatcher
 			return;
 		}
 
-		// This should never happen, that's why its here :P
+		// This should never happen, that's why it's here :P
 		$this->setDefaultActionAndController();
 	}
 
@@ -286,8 +286,8 @@ class SiteDispatcher
 	 * - If the subAction is not set or the area is set, the action function will default to 'action_index'
 	 * - controller classes must be in the Controller directory or in the Addons directory
 	 * - action functions must be:
-	 *      - in the Controller directory
-	 *      - or in the Addons directory as a subdirectory named the same as the action
+	 *      - In the Controller directory
+	 *      - Or in the Addons directory as a subdirectory named the same as the action
 	 */
 	protected function setActionAndControllerFromNamingPatterns(): void
 	{
@@ -339,8 +339,10 @@ class SiteDispatcher
 	/**
 	 * Determines if the current API call should be handled separately.
 	 *
-	 *  - If the 'api' parameter is set in the request and its value is empty, it appends the '_api' suffix to the current function name.
-	 *  - This needs to be reviewed, all api calls really should be qualified as json, xml, html, etc
+	 *  - If the 'api' parameter is set in the request and its value is empty, it appends
+	 * the '_api' suffix to the current function name.
+	 *  - This needs to be reviewed; all api calls really should be qualified as
+	 * JSON, XML, HTML, etc.
 	 */
 	protected function handleApiCall(): void
 	{
@@ -373,7 +375,7 @@ class SiteDispatcher
 				return true;
 			}
 
-			// Maybe the default required by abstract method
+			// Maybe the default required by an abstract method
 			if ($this->_function_name !== 'action_index'
 				&& in_array('action_index', get_class_methods($this->_controller_name)))
 			{
@@ -401,12 +403,12 @@ class SiteDispatcher
 	 * What it does:
 	 *
 	 * - Calls a generic pre (_before) integration hook based on the controllers class name.
-	 *   - e.g. integrate_action_draft_before will be called before \ElkArte\Controller\Draft
+	 *   - e.g., integrate_action_draft_before will be called before \ElkArte\Controller\Draft
 	 * - Calls the controllers pre_dispatch method, provides increased flexibility over simple _constructor
 	 * - Calls the controllers selected method
 	 * - Calls generic post (_after) integration hook based on the controllers class name.
-	 *   - e.g. integrate_action_draft_after will be called after \ElkArte\Controller\Draft assuming it returns
-	 * normally from the controller (e.g. no fatal error, no redirect)
+	 *   - e.g., integrate_action_draft_after will be called after \ElkArte\Controller\Draft assuming it returns
+	 * normally from the controller (e.g., no fatal error, no redirect)
 	 *
 	 * @event integrate_action_xyz_before
 	 * @event integrate_action_xyz_after
@@ -416,7 +418,7 @@ class SiteDispatcher
 		// Fetch controllers generic hook name from the action controller
 		$hook = $this->_controller->getHook();
 
-		// Call the controllers pre dispatch method
+		// Call the controllers pre-dispatch method
 		$this->_controller->pre_dispatch();
 
 		// Call integrate_action_XYZ_before then XYZ_controller_>123 then integrate_action_XYZ_after
@@ -448,7 +450,7 @@ class SiteDispatcher
 		// Maintenance mode: you're out of here unless you're admin
 		if (!empty($maintenance) && !allowedTo('admin_forum'))
 		{
-			// You can only login
+			// You can only log in
 			if ($this->action === 'login2' || $this->action === 'logout')
 			{
 				$this->_controller_name = Auth::class;

@@ -44,7 +44,7 @@ class PersonalMessage extends AbstractModule
 	/** @var EventManager */
 	protected static $_eventsManager;
 
-	/** @var \ElkArte\Helper\ValuesContainer */
+	/** @var ValuesContainer */
 	protected $_loaded_draft;
 
 	/**
@@ -135,10 +135,10 @@ class PersonalMessage extends AbstractModule
 	{
 		global $context;
 
-		// If drafts are enabled, lets generate a list of drafts that they can load in to the editor
+		// If drafts are enabled, let's generate a list of drafts that they can load in to the editor
 		if (!empty($context['drafts_pm_save']))
 		{
-			// Has a specific draft has been selected?  Load it up if there is not already a message already in the editor
+			// Has a specific draft had been selected?  Load it up if there is not already a message already in the editor
 			if (isset($_REQUEST['id_draft']) && empty($_POST['subject']) && empty($_POST['message']))
 			{
 				$this->_loadDraft($this->user->id, (int) $_REQUEST['id_draft']);
@@ -175,8 +175,9 @@ class PersonalMessage extends AbstractModule
 		Txt::load('Drafts');
 		require_once(SUBSDIR . '/Drafts.subs.php');
 
-		// Load the draft and add it to a object container
+		// Load the draft and add it to an object container
 		$this->_loaded_draft = new ValuesContainer(loadDraft($id_draft, 1, true, true));
+		return null;
 	}
 
 	/**
@@ -219,6 +220,7 @@ class PersonalMessage extends AbstractModule
 			$short_subject = empty($draft['subject'])
 				? $txt['drafts_none']
 				: Util::shorten_text(stripslashes($draft['subject']), self::$_subject_length);
+
 			$context['drafts'][] = [
 				'subject' => censor($short_subject),
 				'poster_time' => standardTime($draft['poster_time']),
@@ -240,7 +242,7 @@ class PersonalMessage extends AbstractModule
 	{
 		global $context, $options, $txt;
 
-		// PM drafts enabled, then we need to tell the editor before it initialises
+		// PM drafts enabled, then we need to tell the editor before it initializes
 		if (!empty($context['drafts_pm_save']) && !empty($options['drafts_autosave_enabled']))
 		{
 			$editorOptions['plugin_addons'] = $editorOptions['plugin_addons'] ?? [];
@@ -337,7 +339,7 @@ class PersonalMessage extends AbstractModule
 	public function message_sent($failed): void
 	{
 		global $context;
-		// If we had a PM draft for this one, then its time to remove it since it was just sent
+		// If we had a PM draft for this one, then it's time to remove it since it was just sent
 		if ($failed)
 		{
 			return;

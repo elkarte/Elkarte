@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This file is the file which all subscription gateways should call
+ * This file is the file that all subscription gateways should call
  * when a payment has been received - it sorts out the user status.
  *
  * @package   ElkArte Forum
@@ -53,17 +53,17 @@ if (empty($modSettings['paid_enabled']))
 	exit;
 }
 
-// If we have some custom people who find out about problems load them here.
-$notify_users = array();
+// If we have some custom people who find out about problems, load them here.
+$notify_users = [];
 if (!empty($modSettings['paid_email_to']))
 {
 	foreach (explode(',', $modSettings['paid_email_to']) as $email)
 	{
-		$notify_users[] = array(
+		$notify_users[] = [
 			'email' => $email,
 			'name' => $txt['who_member'],
 			'id' => 0,
-		);
+		];
 	}
 }
 
@@ -116,9 +116,9 @@ $request = $db->query('', '
 		cost, length, name
 	FROM {db_prefix}subscriptions
 	WHERE id_subscribe = {int:current_subscription}',
-	array(
+	[
 		'current_subscription' => $subscription_id,
-	)
+	]
 );
 
 // Didn't find it?
@@ -138,10 +138,10 @@ $request = $db->query('', '
 	WHERE id_subscribe = {int:current_subscription}
 		AND id_member = {int:current_member}
 	LIMIT 1',
-	array(
+	[
 		'current_subscription' => $subscription_id,
 		'current_member' => $member_id,
-	)
+	]
 );
 if ($request->num_rows() === 0)
 {
@@ -159,13 +159,13 @@ if ($gatewayClass->isRefund())
 	// Receipt?
 	if (!empty($modSettings['paid_email']) && $modSettings['paid_email'] == 2)
 	{
-		$replacements = array(
+		$replacements = [
 			'NAME' => $subscription_info['name'],
 			'REFUNDNAME' => $member_info['member_name'],
 			'REFUNDUSER' => $member_info['real_name'],
 			'PROFILELINK' => getUrl('profile', ['action' => 'profile', 'u' => $member_id, 'name' => $member_info['real_name']]),
 			'DATE' => standardTime(time(), false),
-		);
+		];
 
 		emailAdmins('paid_subscription_refund', $replacements, $notify_users);
 	}
@@ -177,7 +177,7 @@ elseif ($gatewayClass->isPayment() || $gatewayClass->isSubscription())
 	$total_cost = $gatewayClass->getCost();
 	$notify = false;
 
-	// For one off's we want to only capture them once!
+	// For one-off's we want to only capture them once!
 	if (!$gatewayClass->isSubscription())
 	{
 		$real_details = Util::unserialize($subscription_info['pending_details']);
@@ -191,7 +191,7 @@ elseif ($gatewayClass->isPayment() || $gatewayClass->isSubscription())
 		foreach ($real_details as $id => $detail)
 		{
 			unset($real_details[$id]);
-			if ($detail[3] == 'payback' && $subscription_info['payments_pending'])
+			if ($detail[3] === 'payback' && $subscription_info['payments_pending'])
 			{
 				$subscription_info['payments_pending']--;
 			}
@@ -205,14 +205,14 @@ elseif ($gatewayClass->isPayment() || $gatewayClass->isSubscription())
 	}
 
 	// Is this flexible?
-	if ($subscription_info['length'] == 'F')
+	if ($subscription_info['length'] === 'F')
 	{
 		$found_duration = 0;
 
 		// This is a little harder, can we find the right duration?
 		foreach ($cost as $duration => $value)
 		{
-			if ($duration == 'fixed')
+			if ($duration === 'fixed')
 			{
 				continue;
 			}
@@ -223,7 +223,7 @@ elseif ($gatewayClass->isPayment() || $gatewayClass->isSubscription())
 			}
 		}
 
-		// If we have the duration then we're done.
+		// If we have the duration, then we're done.
 		if ($found_duration !== 0)
 		{
 			$notify = true;
@@ -246,7 +246,7 @@ elseif ($gatewayClass->isPayment() || $gatewayClass->isSubscription())
 	// Send a receipt?
 	if (!empty($modSettings['paid_email']) && $modSettings['paid_email'] == 2 && $notify)
 	{
-		$replacements = array(
+		$replacements = [
 			'NAME' => $subscription_info['name'],
 			'SUBNAME' => $member_info['member_name'],
 			'SUBUSER' => $member_info['real_name'],
@@ -254,7 +254,7 @@ elseif ($gatewayClass->isPayment() || $gatewayClass->isSubscription())
 			'PRICE' => sprintf($modSettings['paid_currency_symbol'], $total_cost),
 			'PROFILELINK' => getUrl('profile', ['action' => 'profile', 'u' => $member_id, 'name' => $member_info['real_name']]),
 			'DATE' => standardTime(time(), false),
-		);
+		];
 
 		emailAdmins('paid_subscription_new', $replacements, $notify_users);
 	}
@@ -273,7 +273,7 @@ else
 	//
 	// subscr_signup: This IPN response (txn_type) is sent only the first time the user signs up for a subscription.
 	// It then does not fire in any event later. This response is received somewhere before or after the first payment of
-	// subscription is received (txn_type=subscr_payment) which is what we do process
+	//  a subscription is received (txn_type=subscr_payment) which is what we do process
 	//
 	// Should we log any of these ...
 }
@@ -294,9 +294,9 @@ function generateSubscriptionError($text, $notify_users = [])
 	// Send an email?
 	if (!empty($modSettings['paid_email']))
 	{
-		$replacements = array(
+		$replacements = [
 			'ERROR' => $text,
-		);
+		];
 
 		emailAdmins('paid_subscription_error', $replacements, $notify_users);
 	}

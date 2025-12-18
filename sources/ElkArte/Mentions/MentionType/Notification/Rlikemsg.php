@@ -59,7 +59,7 @@ class Rlikemsg extends AbstractNotificationMessage
 	 * @param int $member_from the id of the member mentioning
 	 * @param int[] $members_to an array of ids of the members mentioned
 	 * @param int $target the id of the target involved in the mention
-	 * @param string|null $time optional value to set the time of the mention, defaults to now
+	 * @param string|null $time optional value to set the time of the mention, default is now
 	 * @param int|null $status status to change the mention to, if no notification, default is to set it as read (status = 1)
 	 * @param bool|null $is_accessible optional if the mention is accessible to the user
 	 * @return array|int[]
@@ -72,7 +72,7 @@ class Rlikemsg extends AbstractNotificationMessage
 			return parent::insert($member_from, $members_to, $target, $time, $status, $is_accessible);
 		}
 
-		// If this like is still unread then we mark it as read and decrease the counter
+		// If this like is still unread, then we mark it as read and decrease the counter
 		$this->_db->query('', '
 			UPDATE {db_prefix}log_mentions
 			SET status = {int:status}

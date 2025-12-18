@@ -54,7 +54,7 @@ function getNews()
  * Get a list of all full banned users.
  *
  * - Use their Username and email to find them.
- * - Only get the ones that can't login to turn off notification.
+ * - Only get the ones that can't log in to turn off notification.
  *
  * @return array
  * @package News
@@ -205,7 +205,7 @@ function getNewsletterRecipients($sendQuery, $sendParams, $start, $increment, $c
  * - can be seen by this user.
  * - are actually the latest posts.
  *
- * @param string $query_this_board passed to query, assumed raw and inserted as such
+ * @param string $query_this_board passed to query, assumed raw, and inserted as such
  * @param int $board
  * @param int $limit
  *
@@ -285,7 +285,7 @@ function getXMLNews($query_this_board, $board, $limit)
 /**
  * Get the recent topics to display.
  *
- * @param string $query_this_board passed to query, assumed raw and inserted as such
+ * @param string $query_this_board passed to query, assumed raw, and inserted as such
  * @param int $board
  * @param int $limit
  *
@@ -391,7 +391,7 @@ function getXMLRecent($query_this_board, $board, $limit)
 }
 
 /**
- * Called to convert data to xml
+ * Called to convert data to XML
  * Finds urls for local site and sanitizes them
  *
  * @param string $val
@@ -414,7 +414,7 @@ function fix_possible_url($val)
 
 /**
  * For highest feed compatibility, some special characters should be provided
- * as character entities and not html entities
+ * as character entities and not HTML entities
  *
  * @param string $data
  *
@@ -426,7 +426,7 @@ function encode_special($data)
 }
 
 /**
- * Ensures supplied data is properly encapsulated in cdata xml tags
+ * Ensures supplied data is properly encapsulated in cdata XML tags
  * Called from action_xmlprofile in News.controller.php
  *
  * @param string $data
@@ -507,7 +507,7 @@ function cdata_parse($data, $ns = '', $override = null)
 		elseif (Util::substr($data, $pos, 3) == ']]>')
 		{
 			$cdata .= ']]]]><![CDATA[>';
-			$pos = $pos + 3;
+			$pos += 3;
 		}
 		elseif (Util::substr($data, $pos, 1) === '&')
 		{

@@ -44,7 +44,7 @@ abstract class AbstractQuery implements QueryInterface
 	/** @var string String to match boards the user want to see.  Default is false, so that unless it is set, nothing is returned. */
 	protected $ilike = '';
 
-	/** @var string String that defines case insensitive not-like query operator */
+	/** @var string String that defines case-insensitive not-like query operator */
 	protected $not_ilike = '';
 
 	/** @var string String that defines regular-expression-like query operator */
@@ -53,7 +53,7 @@ abstract class AbstractQuery implements QueryInterface
 	/** @var string String that defines regular-expression-not-like query operator */
 	protected $not_rlike = '';
 
-	/** @var bool MySQL supports unbuffered queries, this remembers if we are running an unbuffered or not */
+	/** @var bool MySQL supports unbuffered queries; this remembers if we are running an unbuffered or not */
 	protected $_unbuffered = false;
 
 	/** @var array This holds the "values" used in the replacement__callback method */
@@ -92,7 +92,7 @@ abstract class AbstractQuery implements QueryInterface
 	 * Constructor.
 	 *
 	 * @param string $_db_prefix Guess what? The tables prefix
-	 * @param \MySqli|resource|object $connection Obviously the database connection
+	 * @param \MySqli|resource|object $connection The database connection
 	 */
 	public function __construct(protected $_db_prefix, protected $connection)
 	{
@@ -150,7 +150,7 @@ abstract class AbstractQuery implements QueryInterface
 			$db_string = preg_replace_callback('~{([a-z_]+)(?::([.a-zA-Z0-9_-]+))?}~',
 				fn($matches) => $this->replacement__callback($matches), $db_string);
 
-			// Clear this variables.
+			// Clear this variable.
 			$this->_db_callback_values = [];
 		}
 
@@ -349,7 +349,7 @@ abstract class AbstractQuery implements QueryInterface
 
 	/**
 	 * Casts values to string for replacement__callback and in the DBMS that
-	 * require this solution makes it so that the comparison will be case sensitive.
+	 * require this solution makes it so that the comparison will be case-sensitive.
 	 *
 	 * @param mixed $replacement
 	 * @return string
@@ -576,7 +576,7 @@ abstract class AbstractQuery implements QueryInterface
 	 * @param int $line
 	 * @throws Exception
 	 */
-	protected function throwError($db_string, $query_error, $file, $line): void
+	protected function throwError($db_string, $query_error, $file, $line): never
 	{
 		global $context, $txt, $modSettings, $db_show_debug;
 
@@ -590,7 +590,7 @@ abstract class AbstractQuery implements QueryInterface
 		$context['error_title'] = $txt['database_error'];
 		$message = $txt['try_again'];
 
-		// Add database version that we know of, for the admin to know. (and ask for support)
+		// Add a database version that we know of for the admin to know. (and ask for support)
 		if (allowedTo('admin_forum'))
 		{
 			$message = nl2br($query_error) . '<br />' . $txt['file'] . ': ' . $file . '<br />' . $txt['line'] . ': ' . $line .
@@ -612,7 +612,7 @@ abstract class AbstractQuery implements QueryInterface
 	abstract public function insert($method, $table, $columns, $data, $keys, $disable_trans = false);
 
 	/**
-	 * Prepares the data that will be later implode'd into the actual query string
+	 * Prepares the data that will be later imploded into the actual query string
 	 *
 	 * @param string $table
 	 * @param array $columns
@@ -725,8 +725,7 @@ abstract class AbstractQuery implements QueryInterface
 	public function truncate($table)
 	{
 		return $this->fetchQuery('
-			TRUNCATE ' . $table,
-			[]
+			TRUNCATE ' . $table
 		);
 	}
 
@@ -756,7 +755,7 @@ abstract class AbstractQuery implements QueryInterface
 	abstract public function server_info();
 
 	/**
-	 * Whether the database system is case sensitive.
+	 * Whether the database system is case-sensitive.
 	 *
 	 * @return bool
 	 */
@@ -826,7 +825,7 @@ abstract class AbstractQuery implements QueryInterface
 		// \ElkArte\Errors\Errors::instance()->log_deprecated('Query::free_result()', 'Result::free_result()');
 		if ($result === false)
 		{
-			return;
+			return false;
 		}
 
 		return $result->free_result();
@@ -947,7 +946,7 @@ abstract class AbstractQuery implements QueryInterface
 	/**
 	 * Checks for "illegal characters" and runs replacement__callback if not
 	 * overridden.
-	 * In case of problems, the method can ends up dying.
+	 * In case of problems, the method can end up dying.
 	 *
 	 * @param string $db_string
 	 * @param mixed $db_values
@@ -983,7 +982,7 @@ abstract class AbstractQuery implements QueryInterface
 	}
 
 	/**
-	 * Some initial checks and replacement of text insside the query string
+	 * Some initial checks and replacement of text inside the query string
 	 *
 	 * @param string $db_string
 	 * @param mixed $db_values
@@ -1047,7 +1046,7 @@ abstract class AbstractQuery implements QueryInterface
 
 	/**
 	 * Checks the query doesn't have nasty stuff in it.
-	 * In case of problems, the method can ends up dying.
+	 * In case of problems, the method can end up dying.
 	 *
 	 * @param string $db_string
 	 */

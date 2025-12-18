@@ -566,7 +566,7 @@ function fix_serialized_columns()
 			'delete' => 'delete',
 		]
 	);
-	while ($row = $db->fetch_assoc($request))
+	while ($row = $request->fetch_assoc())
 	{
 		if (@unserialize($row['extra']) === false && preg_match('~^(a:3:{s:5:"topic";i:\d+;s:7:"subject";s:)(\d+):"(.+)"(;s:6:"member";s:5:"\d+";})$~', $row['extra'], $matches) === 1)
 		{
@@ -581,7 +581,7 @@ function fix_serialized_columns()
 			);
 		}
 	}
-	$db->free_result($request);
+	$request->free_result();
 
 	// Refresh some cached data.
 	updateSettings([

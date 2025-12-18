@@ -23,7 +23,7 @@ use Exception;
 
 /**
  * Drafts administration controller.
- * This class allows to modify admin drafts settings for the forum.
+ * This class allows modifying admin drafts settings for the forum.
  *
  * @package Drafts
  */
@@ -173,7 +173,7 @@ class ManageDraftsModule extends AbstractController
 			deleteDrafts($drafts, -1, false);
 		}
 
-		// Errors?  no errors, only success !
+		// Errors?  no errors, only success!
 		$context['maintenance_finished'] = [
 			'errors' => [sprintf($txt['maintain_done'], $txt['maintain_old_drafts'])],
 		];
@@ -215,7 +215,7 @@ class ManageDraftsModule extends AbstractController
 		// Initialize it with our settings
 		$settingsForm->setConfigVars($this->_settings());
 
-		// Setup the template.
+		// Set up the template.
 		$context['page_title'] = $txt['managedrafts_settings'];
 		$context['sub_template'] = 'show_settings';
 
@@ -224,7 +224,7 @@ class ManageDraftsModule extends AbstractController
 			'description' => 'managedrafts_settings_description',
 		]);
 
-		// Saving them ?
+		// Saving them?
 		if ($this->_req->hasQuery('save'))
 		{
 			checkSession();
@@ -239,7 +239,7 @@ class ManageDraftsModule extends AbstractController
 			redirectexit('action=admin;area=managedrafts');
 		}
 
-		// Some javascript to enable / disable the frequency input box
+		// Some JavaScript to enable / disable the frequency input box
 		theme()->addInlineJavascript('
 			var autosave = document.getElementById(\'drafts_autosave_enabled\');
 

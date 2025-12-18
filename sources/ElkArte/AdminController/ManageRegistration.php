@@ -100,7 +100,7 @@ class ManageRegistration extends AbstractController
 		$context['page_title'] = $txt['maintain_title'];
 		$context['sub_action'] = $subAction;
 
-		// Next create the tabs for the template.
+		// Next, create the tabs for the template.
 		$context[$context['admin_menu_name']]['object']->prepareTabData([
 			'title' => 'registration_center',
 			'help' => 'registrations',
@@ -329,7 +329,7 @@ class ManageRegistration extends AbstractController
 	}
 
 	/**
-	 * Allows the administrator to edit the privacy policy, and choose whether
+	 * Allows the administrator to edit the privacy policy and choose whether
 	 * it should be shown or not.
 	 *
 	 * - It writes and saves the privacy policy to the appropriate privacy policy file.
@@ -343,7 +343,7 @@ class ManageRegistration extends AbstractController
 		// I hereby agree not to be a lazy bum.
 		global $txt, $context, $modSettings;
 
-		// By default we look at Languages/PrivacyPolicy/English.txt.
+		// By default, we look at Languages/PrivacyPolicy/English.txt.
 		$context['current_agreement'] = 'English';
 
 		// Is there more than one to edit?
@@ -427,7 +427,7 @@ class ManageRegistration extends AbstractController
 			checkSession();
 			validateToken('admin-regr');
 
-			// Set all the options....
+			// Set all the options...
 			updateSettings([
 				'reserveWord' => (isset($this->_req->post->matchword) ? '1' : '0'),
 				'reserveCase' => (isset($this->_req->post->matchcase) ? '1' : '0'),
@@ -454,7 +454,7 @@ class ManageRegistration extends AbstractController
 	}
 
 	/**
-	 * This function handles registration settings, and provides a few pretty stats too while it's at it.
+	 * This function handles registration settings and provides a few pretty stats too while it's at it.
 	 *
 	 * - General registration settings and Coppa compliance settings.
 	 * - Accessed by ?action=admin;area=regcenter;sa=settings.
@@ -472,7 +472,7 @@ class ManageRegistration extends AbstractController
 		// Initialize it with our settings
 		$settingsForm->setConfigVars($this->_settings());
 
-		// Setup the template
+		// Set up the template
 		$context['sub_template'] = 'show_settings';
 		$context['page_title'] = $txt['registration_center'];
 

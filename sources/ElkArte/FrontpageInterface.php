@@ -23,7 +23,7 @@ interface FrontpageInterface
 	/**
 	 * Used to attach integrate_action_frontpage hook, to change the default action.
 	 *
-	 * - e.g. \ElkArte\Hooks::instance()->add('integrate_action_frontpage', 'ControllerName::frontPageHook');
+	 * - e.g., \ElkArte\Hooks::instance()->add('integrate_action_frontpage', 'ControllerName::frontPageHook');
 	 *
 	 * @param string[] $default_action
 	 */
@@ -33,7 +33,7 @@ interface FrontpageInterface
 	 * Used to define the parameters the controller may need for the front page
 	 * action to work
 	 *
-	 * - e.g. specify a topic ID or a board listing
+	 * - e.g., specify a topic ID or a board listing
 	 *
 	 * @return array
 	 */
@@ -43,8 +43,8 @@ interface FrontpageInterface
 	 * Used to define the parameters the controller may need for the front page
 	 * action to work
 	 *
-	 * - e.g. specify a topic ID
-	 * - should return true or false based on if its able to show the front page
+	 * - e.g., specify a topic ID
+	 * - Should return true or false based on if it's able to show the front page
 	 *
 	 * @param Object $post
 	 */

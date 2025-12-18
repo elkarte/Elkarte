@@ -91,7 +91,7 @@ class Memcache extends AbstractCacheMethod
 	{
 		$servers = @$this->obj->getExtendedStats();
 
-		return empty($servers) ? [] : array_keys((array) $servers);
+		return empty($servers) ? [] : array_keys($servers);
 	}
 
 	/**
@@ -107,7 +107,7 @@ class Memcache extends AbstractCacheMethod
 	}
 
 	/**
-	 * Set a few server specific options.  Could be done as part of setServer
+	 * Set a few server-specific options.  Could be done as part of setServer
 	 * but left here for convenience
 	 *
 	 * @param string $server
@@ -201,6 +201,8 @@ class Memcache extends AbstractCacheMethod
 		}
 
 		$this->obj->set($key, $value, MEMCACHE_COMPRESSED, $ttl);
+
+		return true;
 	}
 
 	/**
@@ -213,8 +215,10 @@ class Memcache extends AbstractCacheMethod
 			return false;
 		}
 
-		// Clear it out, really invalidate whats there
+		// Clear it out, really invalidate what's there
 		$this->obj->flush();
+
+		return true;
 	}
 
 	/**

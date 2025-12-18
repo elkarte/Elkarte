@@ -107,7 +107,7 @@ class Who extends AbstractController
 		}
 
 		// Does the user prefer a different sort method?
-		$sort_param = $this->_req->getQuery('sort', 'trim|strval', null);
+		$sort_param = $this->_req->getQuery('sort', 'trim|strval');
 		if ($sort_param !== null && isset($sort_methods[$sort_param]))
 		{
 			$context['sort_by'] = $_SESSION['who_online_sort_by'] = $sort_param;
@@ -138,11 +138,11 @@ class Who extends AbstractController
 		$show_local = null;
 		if ($this->_req->hasPost('submit_top'))
 		{
-			$show_local = $this->_req->getPost('show_top', 'trim|strval', null);
+			$show_local = $this->_req->getPost('show_top', 'trim|strval');
 		}
 
 		// Does the user wish to apply a filter?
-		$show_param = $show_local !== null ? $show_local : $this->_req->getPost('show', 'trim|strval', null);
+		$show_param = $show_local !== null ? $show_local : $this->_req->getPost('show', 'trim|strval');
 		if ($show_param !== null && isset($show_methods[$show_param]))
 		{
 			$context['show_by'] = $_SESSION['who_online_filter'] = $show_param;
@@ -189,7 +189,7 @@ class Who extends AbstractController
 				'id' => $row['id_member'],
 				'ip' => allowedTo('moderate_forum') ? $row['ip'] : '',
 				// It is *going* to be today or yesterday, so why keep that information in there?
-				'time' => standardTime($row['log_time'], true),
+				'time' => standardTime($row['log_time']),
 				'html_time' => htmlTime($row['log_time']),
 				'timestamp' => forum_time(true, $row['log_time']),
 				'query' => $actions,

@@ -73,7 +73,7 @@ interface NotificationInterface
 	 * @param int $member_from the id of the member mentioning
 	 * @param int[] $members_to an array of ids of the members mentioned
 	 * @param int $target the id of the target involved in the mention
-	 * @param string|null $time optional value to set the time of the mention, defaults to now
+	 * @param string|null $time optional value to set the time of the mention, defaults is now
 	 * @param int|null $status optional value to set a status, defaults to 0
 	 * @param bool|int|null $is_accessible optional if the mention is accessible to the user
 	 *
@@ -92,7 +92,7 @@ interface NotificationInterface
 	public static function isNotAllowed($method);
 
 	/**
-	 * If needed checks for permissions to use this specific notification
+	 * If needed, checks for permissions to use this specific notification
 	 *
 	 * @return bool
 	 */

@@ -62,7 +62,7 @@ class ManageLanguages extends AbstractController
 		// Get ready for action
 		$action = new Action('manage_languages');
 
-		// By default we're managing languages, call integrate_sa_manage_languages
+		// By default, we're managing languages, call integrate_sa_manage_languages
 		$subAction = $action->initialize($subActions, 'edit');
 
 		// Some final bits
@@ -190,7 +190,7 @@ class ManageLanguages extends AbstractController
 			}
 		}
 
-		// Create another one time token here.
+		// Create another single use token.
 		createToken('admin-lang');
 		createToken('admin-ssc');
 
@@ -369,7 +369,7 @@ class ManageLanguages extends AbstractController
 		$new_lang = new LangLoader($context['lang_id'], $mtxt, database());
 		$new_lang->load('Index', true);
 
-		// Setup the primary settings context.
+		// Set up the primary settings context.
 		$context['primary_settings'] = [
 			'name' => Util::ucwords(strtr($context['lang_id'], ['_' => ' ', '-utf8' => ''])),
 			'locale' => $mtxt['lang_locale'],
@@ -399,7 +399,7 @@ class ManageLanguages extends AbstractController
 	}
 
 	/**
-	 * Edit language related settings.
+	 * Edit language-related settings.
 	 *
 	 * - Accessed by ?action=admin;area=languages;sa=settings
 	 * - This method handles the display, allows editing, and saves the result
@@ -434,7 +434,7 @@ class ManageLanguages extends AbstractController
 			redirectexit('action=admin;area=languages;sa=settings');
 		}
 
-		// Setup the template stuff.
+		// Set up the template stuff.
 		$context['post_url'] = getUrl('admin', ['action' => 'admin', 'area' => 'languages', 'sa' => 'settings', 'save']);
 		$context['settings_title'] = $txt['language_settings'];
 		$context['save_disabled'] = $settings_not_writable;

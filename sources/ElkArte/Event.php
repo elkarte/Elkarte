@@ -2,7 +2,7 @@
 
 /**
  * An event.
- * In fact a container that holds a list of classes to be called when an event
+ * In fact, a container that holds a list of classes to be called when an event
  * is triggered
  *
  * @package   ElkArte Forum
@@ -17,7 +17,7 @@ namespace ElkArte;
 
 /**
  * An event.
- * In fact a container that holds a list of classes to be called when an event
+ * In fact, a container that holds a list of classes to be called when an event
  * is triggered
  */
 class Event

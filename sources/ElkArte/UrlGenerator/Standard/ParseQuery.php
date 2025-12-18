@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This class takes care of converting a Semantic URL into a Standard one, so that
+ * This class takes care of converting a Semantic URL into a Standard one so that
  * the request parser can do its work and explode everything into an array of values.
  *
  * @package   ElkArte Forum

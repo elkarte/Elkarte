@@ -4,7 +4,7 @@
  * This is the base class for DbTable functionality.
  * It contains abstract methods to be implemented for the specific database system,
  * related to a table structure.
- * Add-ons will need this, to change the database for their needs.
+ * Add-ons will need this to change the database for their needs.
  *
  * @package   ElkArte Forum
  * @copyright ElkArte Forum contributors
@@ -27,7 +27,7 @@ abstract class AbstractTable
 	/** @var array Array of table names we don't allow to be removed by addons. */
 	protected $_reservedTables;
 
-	/** @var array Keeps a (reverse) log of changes to the table structure, to be undone.
+	/** @var array Keeps a (reverse) log of changes to the table structure to be undone.
 	 * This is used by Packages admin installation/uninstalling/upgrade. */
 	protected $_package_log;
 
@@ -75,7 +75,7 @@ abstract class AbstractTable
 	 *    - 'auto' => Set to true to make it an auto incrementing column. Set to a numerical value to set from what
 	 *      it should begin counting.
 	 *  - Adds indexes as specified within indexes parameter. Each index should be a member of $indexes. Values are:
-	 *    - 'name' => Index name (If left empty it will be generated).
+	 *    - 'name' => Index name (If left empty, it will be generated).
 	 *    - 'type' => Type of index. Choose from 'primary', 'unique' or 'index'. If not set will default to 'index'.
 	 *    - 'columns' => Array containing columns that form part of key - in the order the index is to be created.
 	 *  - parameters: (None yet)
@@ -110,7 +110,7 @@ abstract class AbstractTable
 			return false;
 		}
 
-		// Log that we'll want to remove this on uninstall.
+		// Log that we'll want to remove this during uninstallation.
 		$this->_package_log[] = ['remove_table', $table_name];
 
 		// This... my friends... is a function in a half - let's start by checking if the table exists!
@@ -347,7 +347,7 @@ abstract class AbstractTable
 	abstract public function list_columns($table_name, $detail = false, $parameters = []);
 
 	/**
-	 * Returns name, columns and indexes of a table
+	 * Returns name, columns, and indexes of a table
 	 *
 	 * @param string $table_name
 	 * @return array
@@ -374,7 +374,7 @@ abstract class AbstractTable
 	abstract public function list_indexes($table_name, $detail = false, $parameters = []);
 
 	/**
-	 * Clean the indexes strings (e.g. PostgreSQL doesn't support max length)
+	 * Clean the indexes strings (e.g., PostgreSQL doesn't support max length)
 	 *
 	 * @param string[] $columns
 	 * @return string[]

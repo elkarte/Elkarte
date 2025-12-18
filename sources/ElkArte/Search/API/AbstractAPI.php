@@ -12,7 +12,6 @@
 
 namespace ElkArte\Search\API;
 
-use ElkArte\Database\AbstractResult;
 use ElkArte\Database\AbstractSearch;
 use ElkArte\Database\QueryInterface;
 use ElkArte\Helper\HttpReq;
@@ -30,7 +29,7 @@ use ElkArte\Search\WeightFactors;
  */
 abstract class AbstractAPI
 {
-	/** @var string This is the last version of ElkArte that this was tested on, to protect against API changes. */
+	/** @var string This is the last version of ElkArte that this was tested on to protect against API changes. */
 	public $version_compatible;
 
 	/** @var string This won't work with versions of ElkArte less than this. */
@@ -51,10 +50,10 @@ abstract class AbstractAPI
 	/** @var int What is the minimum word length? */
 	protected $min_word_length;
 
-	/** @var array The weights to associate to various areas for relevancy */
+	/** @var array The weights to associate with various areas for relevancy */
 	protected $_weight_factors = [];
 
-	/** @var array Weighing factor each area, ie frequency, age, sticky, etc */
+	/** @var array Weighing factor is each area, i.e., frequency, age, sticky, etc. */
 	protected $_weight = [];
 
 	/** @var int The sum of the _weight_factors, normally but not always 100 */
@@ -117,7 +116,7 @@ abstract class AbstractAPI
 	}
 
 	/**
-	 * If the settings don't exist we can't continue.
+	 * If the settings don't exist, we can't continue.
 	 *
 	 * @return bool
 	 */

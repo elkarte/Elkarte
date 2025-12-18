@@ -69,7 +69,7 @@ class Suggest extends AbstractController
 		call_integration_hook('integrate_autosuggest', [&$searchTypes]);
 
 		// Good old session check
-		checkSession('post');
+		checkSession();
 
 		// This requires the XML template
 		theme()->getTemplates()->load('Xml');

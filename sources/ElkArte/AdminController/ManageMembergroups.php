@@ -84,7 +84,7 @@ class ManageMembergroups extends AbstractController
 
 		$action = new Action('manage_membergroups');
 
-		// Setup the admin tabs.
+		// Set up the admin tabs.
 		$context[$context['admin_menu_name']]['object']->prepareTabData([
 			'title' => 'membergroups_title',
 			'description' => 'membergroups_description',
@@ -109,7 +109,7 @@ class ManageMembergroups extends AbstractController
 	 *
 	 * - Called by ?action=admin;area=membergroups.
 	 * - Requires the manage_membergroups permission.
-	 * - Splits the membergroups in regular ones and post count based groups.
+	 * - Splits the membergroups in regular ones and post-count-based groups.
 	 * - It also counts the number of members part of each membergroup.
 	 *
 	 * @event integrate_list_regular_membergroups_list
@@ -239,7 +239,7 @@ class ManageMembergroups extends AbstractController
 
 		createList($listOptions);
 
-		// The second list shows the post count based groups.
+		// The second list shows the post-count-based groups.
 		$listOptions = [
 			'id' => 'post_count_membergroups_list',
 			'title' => $txt['membergroups_post'],
@@ -355,7 +355,7 @@ class ManageMembergroups extends AbstractController
 	 *
 	 * - Called by ?action=admin;area=membergroups;sa=add.
 	 * - It requires the manage_membergroups permission.
-	 * - Allows to use a predefined permission profile or copy one from another group.
+	 * - Allows using a predefined permission profile or copying one from another group.
 	 * - Redirects to action=admin;area=membergroups;sa=edit;group=x.
 	 *
 	 * @event integrate_add_membergroup passed $id_group and $postCountBasedGroup
@@ -387,14 +387,14 @@ class ManageMembergroups extends AbstractController
 
 			call_integration_hook('integrate_add_membergroup', [$id_group, $postCountBasedGroup]);
 
-			// Update the post groups now, if this is a post group!
+			// Update the post-groups now if this is a post group!
 			if (isset($this->_req->post->min_posts))
 			{
 				require_once(SUBSDIR . '/Membergroups.subs.php');
 				updatePostGroupStats();
 			}
 
-			// You cannot set permissions for post groups if they are disabled.
+			// You cannot set permissions for post-groups if they are disabled.
 			if ($postCountBasedGroup && empty($modSettings['permission_enable_postgroups']))
 			{
 				$this->_req->post->perm_type = '';
@@ -402,7 +402,7 @@ class ManageMembergroups extends AbstractController
 
 			if ($this->_req->post->perm_type === 'predefined')
 			{
-				// Set default permission level.
+				// Set the default permission level.
 				require_once(SUBSDIR . '/ManagePermissions.subs.php');
 				setPermissionLevel($this->_req->post->level, $id_group, null);
 			}
@@ -466,7 +466,7 @@ class ManageMembergroups extends AbstractController
 				assignGroupToBoards($id_group, $changed_boards, $board_action);
 			}
 
-			// If this is joinable then set it to show group membership in people's profiles.
+			// If this is joinable, then set it to show group membership in people's profiles.
 			if (empty($modSettings['show_group_membership']) && $group_type > 1)
 			{
 				updateSettings(['show_group_membership' => 1]);
@@ -573,7 +573,7 @@ class ManageMembergroups extends AbstractController
 			throw new Exception('membergroup_does_not_exist', false);
 		}
 
-		// The delete this membergroup button was pressed.
+		// Delete this membergroup button was pressed.
 		if (isset($this->_req->post->delete))
 		{
 			checkSession();
@@ -608,17 +608,17 @@ class ManageMembergroups extends AbstractController
 
 			$validator = new DataValidator();
 
-			// Cleanup the inputs! :D
+			// Clean up the inputs! :D
 			$validator->sanitation_rules([
 				'max_messages' => 'intval',
 				'min_posts' => 'intval|abs',
 				'group_type' => 'intval',
-				'group_desc' => 'trim|\\ElkArte\\Helper\\Util::htmlspecialchars',
-				'group_name' => 'trim|\\ElkArte\\Helper\\Util::htmlspecialchars',
+				'group_desc' => 'trim|Util::htmlspecialchars',
+				'group_name' => 'trim|Util::htmlspecialchars',
 				'group_hidden' => 'intval',
 				'group_inherit' => 'intval',
 				'icon_count' => 'intval',
-				'icon_image' => 'trim|\\ElkArte\\Helper\\Util::htmlspecialchars',
+				'icon_image' => 'trim|Util::htmlspecialchars',
 				'online_color' => 'trim|valid_color',
 			]);
 			$validator->input_processing([
@@ -705,7 +705,7 @@ class ManageMembergroups extends AbstractController
 			}
 			elseif ($current_group['id_group'] != 3)
 			{
-				// Making it a hidden group? If so remove everyone with it as primary group (Actually, just make them additional).
+				// Making it a hidden group? If so, remove everyone with it as a primary group (Actually, just make them additional).
 				if ($our_post['group_hidden'] == 2)
 				{
 					setGroupToHidden($current_group['id_group']);
@@ -769,7 +769,7 @@ class ManageMembergroups extends AbstractController
 				}
 			}
 
-			// There might have been some post group changes.
+			// There might have been some post-group changes.
 			require_once(SUBSDIR . '/Membergroups.subs.php');
 			updatePostGroupStats();
 
@@ -836,7 +836,7 @@ class ManageMembergroups extends AbstractController
 			}
 		}
 
-		// Finally, get all the groups this could be inherited off.
+		// Finally, get all the groups that could be inherited off.
 		$context['inheritable_groups'] = getInheritableGroups($row['id_group']);
 
 		call_integration_hook('integrate_view_membergroup');

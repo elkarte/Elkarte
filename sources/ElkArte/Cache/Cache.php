@@ -61,7 +61,7 @@ class Cache
 	{
 		$this->_options = $options;
 
-		// Default to file based, so we can slow everything down :P
+		// Default to file-based, so we can slow everything down :P
 		if (empty($accelerator))
 		{
 			$accelerator = 'filebased';
@@ -287,7 +287,7 @@ class Cache
 			return;
 		}
 
-		// If we are showing debug information we have some data to collect
+		// If we are showing debug information, we have some data to collect
 		if ($db_show_debug === true)
 		{
 			$cache_hit = [
@@ -336,7 +336,7 @@ class Cache
 			2. The cache level isn't high enough.
 			3. The item has not been cached or the cached item expired.
 			4. The cached item has a custom expiration condition evaluating to true.
-			5. The expire time set in the cache item has passed (needed for Zend).
+			5. The expiry time set in the cache item has passed (needed for Zend).
 		*/
 		$cache_block = $this->get($key, 3600);
 		if ($this->level < $level
@@ -393,7 +393,7 @@ class Cache
 	 * Empty out the cache in use as best it can
 	 *
 	 * It may only remove the files of a certain type (if the $type parameter is given)
-	 * Type can be user, data or left blank
+	 * Type can be user, data, or left blank
 	 *  - user clears out user data
 	 *  - data clears out system / opcode data
 	 *  - If no type is specified will perform a complete cache clearing
@@ -500,7 +500,7 @@ class Cache
 	 *
 	 * Supports the preg_match syntax.
 	 *
-	 * @param string|string[] $keys_match The regulat expression/s to match
+	 * @param string|string[] $keys_match The regular expression/s to match
 	 *                        the key to remove from the cache.
 	 * @param string $delimiter The delimiter used by preg_match.
 	 * @param string $modifiers Any modifier required by the regexp.

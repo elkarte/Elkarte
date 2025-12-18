@@ -17,6 +17,8 @@ global $txt;
 
 define('BOARDDIR', __DIR__ . '/..');
 define('CACHEDIR', BOARDDIR . '/cache');
+define('EXTDIR', BOARDDIR . '/sources/ext');
+
 define('ELK', '1');
 
 // Lots of needs
@@ -26,12 +28,16 @@ require_once(BOARDDIR . '/sources/database/Database.subs.php');
 require_once(BOARDDIR . '/install/installcore.php');
 
 // Autoloader
-require_once(BOARDDIR . '/sources/ext/ClassLoader.php');
+require_once(EXTDIR . '/ClassLoader.php');
 
 // Register our paths to the loader
 $loader = new ClassLoader();
 $loader->setPsr4('ElkArte\\', BOARDDIR . '/sources/ElkArte');
 $loader->setPsr4('BBC\\', BOARDDIR . '/sources/ElkArte/BBC');
+// Not needed, just being complete
+$loader->setPsr4('Addons\\', BOARDDIR . '/Addons');
+$loader->setPsr4('Wikimedia\\Minify\\', EXTDIR . '/Wikimedia/Minify');
+$loader->setPsr4('Michelf\\', EXTDIR . '/Michelf');
 $loader->register();
 
 /**

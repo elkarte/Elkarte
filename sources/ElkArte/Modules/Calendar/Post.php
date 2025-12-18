@@ -1,7 +1,8 @@
 <?php
 
 /**
- * This file contains several functions for retrieving and manipulating calendar events, birthdays and holidays.
+ * This file contains several functions for retrieving and manipulating calendar events,
+ * birthdays, and holidays.
  *
  * @package   ElkArte Forum
  * @copyright ElkArte Forum contributors
@@ -28,7 +29,7 @@ use ElkArte\Modules\AbstractModule;
 
 /**
  * This class's task is to bind the posting of a topic to a calendar event.
- * Used when from the calendar controller the poster is redirected to the post page.
+ * Used when from the calendar controller, the poster is redirected to the post-page.
  *
  * @package Calendar
  */
@@ -67,7 +68,7 @@ class Post extends AbstractModule
 	}
 
 	/**
-	 * Prepare post event, add the make event template layer
+	 * Prepare post-event, add the make event template layer
 	 */
 	public function prepare_post(): void
 	{
@@ -116,6 +117,7 @@ class Post extends AbstractModule
 		}
 		catch (\Exception $exception)
 		{
+			// @todo why catch to just throw it?
 			throw $exception;
 		}
 
@@ -136,7 +138,7 @@ class Post extends AbstractModule
 				$event_poster = getEventPoster($eventid);
 
 				// Silly hacker, Trix are for kids. ...probably trademarked somewhere, this is FAIR USE! (parody...)
-				isAllowedTo('calendar_edit_' . ($event_poster == $this->user->id ? 'own' : 'any'));
+				isAllowedTo('calendar_edit_' . ((int) $event_poster === $this->user->id ? 'own' : 'any'));
 			}
 
 			// Delete it?
@@ -275,7 +277,7 @@ class Post extends AbstractModule
 		}
 
 		// Find the last day of the month.
-		$context['event']['last_day'] = (int) Util::strftime('%d', mktime(0, 0, 0, $context['event']['month'] == 12 ? 1 : $context['event']['month'] + 1, 0, $context['event']['month'] == 12 ? $context['event']['year'] + 1 : $context['event']['year']));
+		$context['event']['last_day'] = (int) Util::strftime('%d', mktime(0, 0, 0, (int) $context['event']['month'] === 12 ? 1 : $context['event']['month'] + 1, 0, (int) $context['event']['month'] === 12 ? $context['event']['year'] + 1 : $context['event']['year']));
 
 		$context['event']['board'] = empty($board) ? $modSettings['cal_defaultboard'] : $board;
 	}

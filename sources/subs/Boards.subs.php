@@ -391,7 +391,7 @@ function modifyBoard($board_id, &$boardOptions)
 		$boardUpdateParameters['id_theme'] = (int) $boardOptions['board_theme'];
 	}
 
-	// Should the board theme override the user preferred theme?
+	// Should the board theme override the user's preferred theme?
 	if (isset($boardOptions['override_theme']))
 	{
 		$boardUpdates[] = 'override_theme = {int:override_theme}';
@@ -405,7 +405,7 @@ function modifyBoard($board_id, &$boardOptions)
 		$boardUpdateParameters['member_groups'] = implode(',', $boardOptions['access_groups']);
 	}
 
-	// And who isn't.
+	// And who isn't?
 	if (isset($boardOptions['deny_groups']))
 	{
 		$boardUpdates[] = 'deny_member_groups = {string:deny_groups}';
@@ -652,7 +652,7 @@ function createBoard($boardOptions)
  * - Executes the query and returns the list
  *
  * @param array $boardListOptions
- * @param bool $simple if true a simple array is returned containing some basic
+ * @param bool $simple if true, a simple array is returned containing some basic
  *                information regarding the board (id_board, board_name, child_level, id_cat, cat_name)
  *                if false the boards are returned in an array subdivided by categories including also
  *                additional data like the number of boards
@@ -682,7 +682,7 @@ function getBoardList($boardListOptions = [], $simple = false)
 		$where_parameters['excluded_boards'] = $boardListOptions['excluded_boards'];
 	}
 
-	// Get list of boards to which they have specific permissions
+	// Get a list of boards to which they have specific permissions
 	if (isset($boardListOptions['allowed_to']))
 	{
 		$boardListOptions['included_boards'] = boardsAllowedTo($boardListOptions['allowed_to']);
@@ -715,7 +715,7 @@ function getBoardList($boardListOptions = [], $simple = false)
 		$where_parameters['ignore_boards'] = $boardListOptions['ignore'];
 	}
 
-	// Want to check if the member is a moderators for any boards
+	// Want to check if the member is a moderator for any boards
 	if (isset($boardListOptions['moderator']))
 	{
 		$join[] = '
@@ -766,7 +766,7 @@ function getBoardList($boardListOptions = [], $simple = false)
 				'child_level' => (int) $row['child_level'],
 			];
 
-			// Do we want access information?
+			// Do we want to access information?
 			if (isset($boardListOptions['access']) && $boardListOptions['access'] !== false)
 			{
 				$return_value[$row['id_board']]['allow'] = !(empty($row['can_access']) || $row['can_access'] === 'f');
@@ -794,7 +794,7 @@ function getBoardList($boardListOptions = [], $simple = false)
 		];
 		while (($row = $request->fetch_assoc()))
 		{
-			// This category hasn't been set up yet..
+			// This category hasn't been set up yet...
 			if (!isset($return_value['categories'][$row['id_cat']]))
 			{
 				$return_value['categories'][$row['id_cat']] = [
@@ -815,7 +815,7 @@ function getBoardList($boardListOptions = [], $simple = false)
 				'deny' => false,
 				'selected' => isset($boardListOptions['selected_board']) && $boardListOptions['selected_board'] == $row['id_board'],
 			];
-			// Do we want access information?
+			// Do we want to access information?
 
 			if (!empty($boardListOptions['access']))
 			{
@@ -948,7 +948,7 @@ function setBoardNotification($id_member, $id_board, $on = false)
  *
  * This function returns a boolean equivalent with hasBoardNotification().
  * This is unexpected, but it's done this way to avoid any extra-query is executed on MessageIndex::action_messageindex().
- * Just ignore the return value for normal use.
+ * Ignore the return value for normal use.
  *
  * @param int $id_member
  * @param int $id_board
@@ -984,7 +984,7 @@ function resetSentBoardNotification($id_member, $id_board, $check = true)
 		$sent = $request->fetch_row();
 		$request->free_result();
 
-		// not sent already? No need to stay around then
+		// not sent yet? No need to stay around then
 		if (empty($sent))
 		{
 			return true;
@@ -1145,10 +1145,10 @@ function wantedBoards($see_board, $hide_recycle = true)
 }
 
 /**
- * Returns the post count and name of a board
+ * Returns the post-count and name of a board
  *
- * - if supplied a topic id will also return the message subject
- * - honors query_see_board to ensure a user can see the information
+ * - If supplied a topic id will also return the message subject
+ * - Honors query_see_board to ensure a user can see the information
  *
  * @param int $board_id
  * @param int|null $topic_id
@@ -1395,7 +1395,7 @@ function getAllThemes()
 }
 
 /**
- * Gets redirect infos and post count from a selected board.
+ * Gets redirect info and post-count from a selected board.
  *
  * @param int $idboard
  * @return array
@@ -1428,7 +1428,7 @@ function getBoardProperties($idboard)
  * @param int[]|null $boards an array of board IDs
  * @param int[]|null $categories an array of category IDs
  * @param bool $wanna_see_board if true uses {query_wanna_see_board}, otherwise {query_see_board}
- * @param bool $include_recycle if false excludes any results from the recycle board (if enabled)
+ * @param bool $include_recycle if false, excludes any results from the recycle board (if enabled)
  *
  * @return array
  * @package Boards
@@ -1518,14 +1518,14 @@ function sumRecentPosts()
  *              'categories' => an array of category IDs (it accepts a single ID too)
  *              'boards' => an array of board IDs (it accepts a single ID too)
  *              if conditions is set to 'all' (not an array) all the boards are queried
- * @param array $params is an optional array that allows to control the results returned:
+ * @param array $params is an optional array that allows control of the results returned:
  *              'sort_by' => (string) defines the sorting of the results (allowed: id_board, name)
  *              'selects' => (string) determines what information are retrieved and returned
  *                           Allowed values: 'name', 'posts', 'detailed', 'permissions', 'reports';
  *                           default: 'name';
  *                           see the function for details on the fields associated to each value
- *              'override_permissions' => (bool) if true doesn't use neither {query_wanna_see_board} nor
- *     {query_see_board} (default false)
+ *              'override_permissions' => (bool) if true doesn't use either {query_wanna_see_board} nor
+ *                            {query_see_board} (default false)
  *              'wanna_see_board' => (bool) if true uses {query_wanna_see_board}, otherwise {query_see_board}
  *              'include_recycle' => (bool) recycle board is included (default true)
  *              'include_redirects' => (bool) redirects are included (default true)
@@ -1578,7 +1578,7 @@ function fetchBoardsInfo($conditions = 'all', $params = [])
 	$select = $known_selects[empty($params['selects']) || !isset($known_selects[$params['selects']]) ? 'name' : $params['selects']];
 
 	// If $conditions wasn't set or is 'all', get all boards
-	if (!is_array($conditions) && $conditions === 'all')
+	if ($conditions === 'all')
 	{
 		// id_board, name, id_profile => used in admin/Reports.controller.php
 		$request = $db->query('', '
@@ -1644,11 +1644,11 @@ function fetchBoardsInfo($conditions = 'all', $params = [])
 }
 
 /**
- * Retrieve the all the sub-boards of an array of boards and add the ids to the same array
+ * Retrieve all the sub-boards of an array of boards and add the ids to the same array
  *
  * @param int[]|int $boards an array of board IDs (it accepts a single board too).
  * NOTE: the $boards param is deprecated since 1.1 - The param is passed by ref in 1.0 and the result
- * is returned through the param itself, starting from 1.1 the expected behaviour
+ * is returned through the param itself, starting from 1.1 the expected behavior
  * is that the result is returned.
  * @return bool|int[]
  * @package Boards
@@ -1693,7 +1693,7 @@ function addChildBoards($boards)
 }
 
 /**
- * Increment a board stat field, for example num_posts.
+ * Increment a board stat field, for example, num_posts.
  *
  * @param int $id_board
  * @param array|string $values an array of index => value of a string representing the index to increment
@@ -1739,7 +1739,7 @@ function incrementBoard($id_board, $values)
 }
 
 /**
- * Decrement a board stat field, for example num_posts.
+ * Decrement a board stat field, for example, num_posts.
  *
  * @param int $id_board
  * @param array|string $values an array of index => value of a string representing the index to decrement
@@ -1787,9 +1787,9 @@ function decrementBoard($id_board, $values)
 /**
  * Retrieve all the boards the user can see and their notification status:
  *
- * - if they're subscribed to notifications for new topics in each of them
+ * - If they're subscribed to notifications for new topics in each of them,
  * or they're not.
- * - (used by createList() callbacks)
+ * - Used by createList() callbacks
  *
  * @param string $sort A string indicating how to sort the results
  * @param int $memID id_member
@@ -1833,7 +1833,7 @@ function boardNotifications($sort, $memID)
 		}
 	);
 
-	// and all the boards that you can see but don't have notify turned on for
+	// and all the boards that you can see but don't have notifications turned on
 	$db->fetchQuery('
 		SELECT 
 			b.id_board, b.name, COALESCE(lb.id_msg, 0) AS board_read, b.id_msg_updated
@@ -1873,7 +1873,7 @@ function boardNotifications($sort, $memID)
  *              'categories' => an array of category IDs (it accepts a single ID too)
  *              'boards' => an array of board IDs (it accepts a single ID too)
  *              if conditions is set to 'all' (not an array) all the boards are queried
- * @param array|null $params is an optional array that allows to control the results returned if $conditions is not set to 'all':
+ * @param array|null $params is an optional array that allows control the results returned if $conditions is not set to 'all':
  *              'wanna_see_board' => (bool) if true uses {query_wanna_see_board}, otherwise {query_see_board}
  *              'include_recycle' => (bool) recycle board is included (default true)
  *              'include_redirects' => (bool) redirects are included (default true)
@@ -1893,7 +1893,7 @@ function countBoards($conditions = 'all', $params = [])
 	$clauseParameters = [];
 
 	// if $conditions wasn't set or is 'all', get all boards
-	if (!is_array($conditions) && $conditions === 'all')
+	if ($conditions === 'all')
 	{
 		// id_board, name, id_profile => used in admin/Reports.controller.php
 		$request = $db->query('', '

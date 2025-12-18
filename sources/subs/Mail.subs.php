@@ -34,7 +34,7 @@ use ElkArte\User;
  * @param string|null $message_id = null - if specified, it will be used as local part of the Message-ID header.
  * @param bool $send_html = false, whether the message is HTML vs. plain text
  * @param int $priority = 3 Primarily used for queue priority.  0 = send now, >3 = no PBE
- * @param bool|null $hotmail_fix = null  ** No longer used, left only for old function calls **
+ * @param bool|null $hotmail_fix = null ** No longer used, left only for old function calls **
  * @param bool $is_private - Hides to/from names when viewing the mail queue
  * @param string|null $from_wrapper - used to provide envelope from wrapper based on if we share users display name
  * @param int|null $reference - The parent topic id for use in a References header
@@ -97,7 +97,7 @@ function AddMailQueue($flush = false, $to_array = [], $subject = '', $message = 
 		$context['flush_mail'] = false;
 	}
 
-	// If we're flushing we're done.
+	// If we're flushing, we're done.
 	if ($flush)
 	{
 		$nextSendTime = time() + 10;
@@ -150,7 +150,7 @@ function AddMailQueue($flush = false, $to_array = [], $subject = '', $message = 
 		$cur_insert_len += $this_insert_len;
 	}
 
-	// If they are using SSI there is a good chance obExit will never be called.  So lets be nice and flush it for them.
+	// If they are using SSI, there is a good chance obExit will never be called.  So let's be nice and flush it for them.
 	if (ELK === 'SSI')
 	{
 		return AddMailQueue(true);
@@ -185,7 +185,7 @@ function entityConvert($match)
 		return $c;
 	}
 
-	// Drop 2 byte control characters in the  U+0080 <> U+00A0 range
+	// Drop 2 byte control characters in the U+0080 <> U+00A0 range
 	if ($c_strlen === 2 && $c_ord === 0xC2 && ord($c[1]) <= 0xA0)
 	{
 		return '';
@@ -233,7 +233,7 @@ function mail_insert_key($message, $unq_head, $line_break)
 	// Append the key to the bottom of the plain section, it is always the first one
 	$message = preg_replace($regex['plain'], "$1{$line_break}{$line_break}[{$unq_head}]{$line_break}$2", $message);
 
-	// Quoted Printable section, add the key in background color so the html message looks good
+	// Quoted Printable section, add the key in background color so the HTML message looks good
 	if (preg_match($regex['qp'], $message, $match))
 	{
 		$qp_message = quoted_printable_decode($match[2]);
@@ -276,7 +276,7 @@ function loadEmailTemplate($template, $replacements = [], $lang = '', $html = fa
 {
 	global $txt, $mbname, $scripturl, $settings, $boardurl, $modSettings, $language;
 
-	// First things first, load up the email templates language file, if we need to.
+	// First things first, load up the email templates language file if we need to.
 	if ($loadLang)
 	{
 		$lang = $lang === '' ? $language : $lang;
@@ -357,7 +357,7 @@ function loadEmailTemplate($template, $replacements = [], $lang = '', $html = fa
 }
 
 /**
- * Used to preserve the Pre formatted look of txt template's when sending HTML
+ * Used to preserve the Pre formatted look of txt templates when sending HTML
  *
  * @param $string
  * @return string
@@ -423,7 +423,7 @@ function prepareMailingForPreview()
 
 		preparsecode($context[$key]);
 
-		// Sending as html then we convert any bbc
+		// Sending as HTML then we convert any bbc
 		if ($html)
 		{
 			$enablePostHTML = $modSettings['enablePostHTML'];
@@ -464,7 +464,7 @@ function user_info_callback($matches)
 
 	foreach (explode('.', $matches[1]) as $index)
 	{
-		if ($use_ref && isset($ref[$index]))
+		if (isset($ref[$index]))
 		{
 			$ref = &$ref[$index];
 		}
@@ -605,7 +605,7 @@ function updateFailedQueue($failed_emails)
 		['variable']
 	);
 
-	// If we have failed to many times, tell mail to wait a bit and try again.
+	// If we have failed too many times, tell mail to wait a bit and try again.
 	if ($modSettings['mail_failed_attempts'] > 5)
 	{
 		$db->query('', '
@@ -653,7 +653,7 @@ function updateSuccessQueue()
 }
 
 /**
- * Reset to 0 the next send time for emails queue.
+ * Reset to 0 the next sent time for emails queue.
  */
 function resetNextSendTime()
 {
@@ -767,7 +767,7 @@ function emailsInfo($number)
  * - If batch size is not set, will determine a size such that it sends in 1/2 the period (buffer)
  *
  * @param int|bool $batch_size = false the number to send each loop
- * @param bool $override_limit = false bypassing our limit flaf
+ * @param bool $override_limit = false bypassing our limit flag
  * @param bool $force_send = false
  * @return bool
  * @package Mail

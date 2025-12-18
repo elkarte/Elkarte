@@ -40,11 +40,6 @@ class Mailfail extends AbstractNotificationMessage
 	public static function isNotAllowed($method)
 	{
 		// Don't let mailfail be allowed to send email.
-		if ($method === 'email' || $method === 'emaildaily' || $method === 'emailweekly')
-		{
-			return true;
-		}
-
-		return false;
+		return $method === 'email' || $method === 'emaildaily' || $method === 'emailweekly';
 	}
 }

@@ -602,7 +602,7 @@ function createSearchIndex($start, $messages_per_batch)
 				]
 			)->fetch_callback(
 				function ($row) use (&$forced_break, &$number_processed, &$inserts, $stop) {
-					// In theory it's possible for one of these to take friggin ages so add more timeout protection.
+					// In theory, it's possible for one of these to take friggin ages so add more timeout protection.
 					if ($stop < time() || $forced_break)
 					{
 						$forced_break = true;
@@ -672,7 +672,7 @@ function removeCommonWordsFromIndex($start)
 
 	while (time() < $stop)
 	{
-		// Find indexed words that appear to often
+		// Find indexed words that appear too often
 		$db->fetchQuery('
 			SELECT
 				id_word, COUNT(id_word) AS num_words, id_msg
@@ -691,7 +691,7 @@ function removeCommonWordsFromIndex($start)
 			}
 		);
 
-		// Add them to the stopwords list since we are removing them as to common
+		// Add them to the stopwords list since we are removing them as common
 		updateSettings(['search_stopwords' => implode(',', $stop_words)]);
 
 		// Pfft ... commoners

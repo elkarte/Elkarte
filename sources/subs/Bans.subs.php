@@ -212,7 +212,7 @@ function removeBanGroups($group_ids)
  *
  * What it does:
  *
- * - By default (no id's passed) truncate the table
+ * - By default (no id's passed), truncate the table
  * - Doesn't clean the inputs
  *
  * @param int[]|int|null $ids (optional)
@@ -278,7 +278,7 @@ function validateTriggers(&$triggers)
 	$ban_triggers = [];
 	$log_info = [];
 
-	// Go through each trigger and make sure its valid
+	// Go through each trigger and make sure it's valid
 	foreach ($triggers as $key => $value)
 	{
 		if (!empty($value))
@@ -310,7 +310,7 @@ function validateTriggers(&$triggers)
 				}
 				else
 				{
-					// Replace the * wildcard by a MySQL wildcard %.
+					// Replace the * wildcard with a MySQL wildcard %.
 					$value = substr(str_replace('*', '%', $value), 0, 255);
 
 					$ban_triggers['hostname']['hostname'] = $value;
@@ -530,7 +530,7 @@ function addTriggers($group_id = 0, $triggers = [], $logs = [])
 		['id_ban']
 	);
 
-	logTriggersUpdates($logs, true);
+	logTriggersUpdates($logs);
 
 	return true;
 }
@@ -624,10 +624,10 @@ function updateTriggers($ban_item = 0, $group_id = 0, $trigger = [], $logs = [])
  * A small function to unify logging of triggers (updates and new)
  *
  * @param array $logs an array of logs, each log contains the following keys:
- * - bantype: a known type of ban (ip_range, hostname, email, user, main_ip)
- * - value: the value of the bantype (e.g. the IP or the email address banned)
+ *   - bantype: a known type of ban (ip_range, hostname, email, user, main_ip)
+ *   - value: the value of the bantype (e.g., the IP or the email address banned)
  * @param bool|string $new type of trigger
- * - if the trigger is new (true), an update (false), or a removal ('remove') of an existing one
+ *   - If the trigger is new (true), an update (false), or a removal ('remove') of an existing one
  * @package Bans
  */
 function logTriggersUpdates($logs, $new = true)
@@ -659,7 +659,7 @@ function logTriggersUpdates($logs, $new = true)
 /**
  * Updates an existing ban group
  *
- * - If the name doesn't exists a new one is created
+ * - If the name doesn't exist, a new one is created
  *
  * @param array $ban_info
  * @return int|bool
@@ -669,7 +669,7 @@ function updateBanGroup($ban_info = [])
 {
 	$db = database();
 
-	// Lets check for errors first
+	// Let's check for errors first
 	$ban_errors = ErrorContext::context('ban', 1);
 
 	if (empty($ban_info['name']))
@@ -687,7 +687,7 @@ function updateBanGroup($ban_info = [])
 		return false;
 	}
 
-	// No problems found, so lets add this to the ban list
+	// No problems found, so let's add this to the banlist
 	$request = $db->query('', '
 		SELECT id_ban_group
 		FROM {db_prefix}ban_groups
@@ -738,7 +738,7 @@ function updateBanGroup($ban_info = [])
  *
  * What it does:
  *
- * - If a ban group with the same name already exists or the group s successfully created the ID is returned
+ * - If a ban group with the same name already exists or the group s successfully created, the ID is returned
  * - On error the error code is returned or false
  *
  * @param array $ban_info
@@ -812,7 +812,7 @@ function insertBanGroup($ban_info = [])
 }
 
 /**
- * Convert a range of given IP number into a single string.
+ * Convert a range of given IP numbers into a single string.
  *
  * - It's practically the reverse function of ip2range().
  *
@@ -965,7 +965,7 @@ function validateIPBan($ip_array, $fullip = '')
 }
 
 /**
- * As it says... this tries to review the list of banned members, to match new bans.
+ * As it says... this tries to review the list of banned members to match new bans.
  *
  * - Note: is_activated >= 10: a member is banned.
  *
@@ -1005,7 +1005,7 @@ function updateBanMembers()
 			}
 			if ($row['email_address'])
 			{
-				// Does it have a wildcard - if so we can't do a IN on it.
+				// Does it have a wildcard - if so, we can't do an IN on it.
 				if (str_contains($row['email_address'], '%'))
 				{
 					$memberEmailWild[$row['email_address']] = $row['email_address'];
@@ -1069,7 +1069,7 @@ function updateBanMembers()
 	if (!empty($newMembers))
 	{
 		require_once(SUBSDIR . '/Logging.subs.php');
-		logOnline($newMembers, false);
+		logOnline($newMembers);
 	}
 
 	// Find members that are wrongfully marked as banned.
@@ -1182,7 +1182,7 @@ function list_getBanTriggers($start, $items_per_page, $sort, $trigger_type)
 /**
  * Used to see if a user is banned
  *
- * - Checks banning by ip, hostname, email or member id
+ * - Checks banning by ip, hostname, email, or member id
  *
  * @param int $memID
  * @param string $hostname
@@ -1311,7 +1311,7 @@ function list_getNumBanTriggers($trigger_type)
 /**
  * Load a list of ban log entries from the database.
  *
- * - no permissions checks are done
+ * - No permissions checks are done
  *
  * @param int $start The item to start with (for pagination purposes)
  * @param int $items_per_page The number of items to show per page
@@ -1359,7 +1359,7 @@ function list_getNumBanLogEntries()
 }
 
 /**
- * Get the total number of ban from the ban group table
+ * Get the total number of bans from the ban group table
  *
  * @return int
  * @package Bans
@@ -1685,7 +1685,7 @@ function banDetails($ban_ids, $ban_group = false)
 }
 
 /**
- * When removing a ban trigger, this will return the specifics of whats being
+ * When removing a ban trigger, this will return the specifics of what's being
  * removed so it can be logged
  *
  * @param array $ban_details

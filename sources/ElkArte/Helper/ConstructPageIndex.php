@@ -22,7 +22,7 @@ use ElkArte\AbstractModel;
  *
  * What it does:
  *
- * - Builds the page list, e.g. 1 ... 6 7 [8] 9 10 ... 15.
+ * - Builds the page list, e.g., 1 ... 6 7 [8] 9 10 ... 15.
  * - Flexible_start causes it to use "url.page" instead of "url;start=page".
  * - Very importantly, cleans up the start value passed, and forces it to
  *   be a multiple of num_per_page.
@@ -41,8 +41,7 @@ use ElkArte\AbstractModel;
  * @param array $show associative array of option => boolean paris
  *
  * @return string
- * @example $pageindex = constructPageIndex({scripturl} . '?board=' . $board, $_REQUEST['start'], $num_messages,
- *     $maxindex, true);
+ * @example $pageindex = constructPageIndex({scripturl} . '?board=' . $board, $_REQUEST['start'], $num_messages, $maxindex, true);
  */
 class ConstructPageIndex extends AbstractModel
 {
@@ -124,7 +123,7 @@ class ConstructPageIndex extends AbstractModel
 		}
 		elseif (empty($this->_modSettings['compactTopicPagesEnable']))
 		{
-			$pageindex = $this->simplelLinks();
+			$pageindex = $this->simpleLinks();
 		}
 		else
 		{
@@ -177,7 +176,7 @@ class ConstructPageIndex extends AbstractModel
 
 	/**
 	 * Sets the base url that navigation will start from.
-	 * will replace {base_link} and {scripturl} as needed.
+	 * Will replace {base_link} and {scripturl} as needed.
 	 * Uses ['page_index_template']['base_link'] template
 	 */
 	private function setBaseLink(): void
@@ -208,7 +207,7 @@ class ConstructPageIndex extends AbstractModel
 	 *
 	 * @return string
 	 */
-	private function simplelLinks(): string
+	private function simpleLinks(): string
 	{
 		$pageindex = $this->setLeftNavigation();
 		$pageindex .= $this->setAll();
@@ -288,7 +287,7 @@ class ConstructPageIndex extends AbstractModel
 	}
 
 	/**
-	 * Compact links, good for displaying a many available pages bar
+	 * Compact links, good for displaying many available pages bar
 	 * prev page >1< ... 6 7 [8] 9 10 ... 15)
 	 *
 	 * @return string
@@ -300,7 +299,7 @@ class ConstructPageIndex extends AbstractModel
 		// If they didn't enter an odd value, pretend they did.
 		$PageContiguous = ($this->_modSettings['compactTopicPagesContiguous'] - ($this->_modSettings['compactTopicPagesContiguous'] % 2)) / 2;
 
-		// Start with previous, if there is one
+		// Start with previous if there is one
 		$pageindex .= $this->compactPreviousNavigation();
 
 		// Show the first page. (prev page >1< ... 6 7 [8] 9 10 ... 15)
@@ -503,7 +502,7 @@ class ConstructPageIndex extends AbstractModel
 	}
 
 	/**
-	 * The show all button if requested/
+	 * The show-all button if requested/
 	 * Uses 'page_index_template']['current_page'] template
 	 *
 	 * @param $pageindex

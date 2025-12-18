@@ -211,7 +211,7 @@ function updateAllSignatures($applied_sigs)
 						// Too many images?
 						if (!empty($sig_limits[3]) && $img_count > $sig_limits[3])
 						{
-							// If we've already had this before we only want to remove the excess.
+							// If we've already had this before, we only want to remove the excess.
 							if (isset($image_count_holder[$image]))
 							{
 								$img_offset = -1;
@@ -301,7 +301,7 @@ function updateAllSignatures($applied_sigs)
 							}
 						}
 
-						// Did we come up with some changes? If so remake the string.
+						// Did we come up with some changes? If so, remake the string.
 						if ($width != -1 || $height != -1)
 						{
 							$replaces[$image] = '[img' . ($width != -1 ? ' width=' . round($width) : '') . ($height != -1 ? ' height=' . round($height) : '') . ']' . $matches[7][$key] . '[/img]';
@@ -442,7 +442,7 @@ function getProfileField($id_field)
 
 	$field = [];
 
-	// The fully-qualified name for rows is here because it's a reserved word in Mariadb 10.2.4+ and quoting would be different for MySQL/Mariadb and PSQL
+	// The fully qualified name for rows is here because it's a reserved word in Mariadb 10.2.4+ and quoting would be different for MySQL/Mariadb and PSQL
 	$db->fetchQuery('
 		SELECT
 			id_field, col_name, field_name, field_desc, field_type, field_length, field_options,
@@ -580,7 +580,7 @@ function updateProfileField($field_data)
 {
 	$db = database();
 
-	// The fully-qualified name for rows is here because it's a reserved word in Mariadb 10.2.4+ and quoting would be different for MySQL/Mariadb and PSQL
+	// The fully qualified name for rows is here because it's a reserved word in Mariadb 10.2.4+ and quoting would be different for MySQL/Mariadb and PSQL
 	$db->query('', '
 		UPDATE {db_prefix}custom_fields
 		SET
@@ -623,7 +623,7 @@ function updateProfileField($field_data)
  * Updates the viewing order for profile fields
  * Done as a CASE WHEN one two three ELSE 0 END in place of many updates
  *
- * @param string $replace constructed as WHEN fieldname=value THEN new viewvalue WHEN .....
+ * @param string $replace constructed as WHEN fieldname=value THEN new viewvalue WHEN...
  */
 function updateProfileFieldOrder($replace)
 {
@@ -822,7 +822,7 @@ function getAvailableNotifications()
  *
  * What it does:
  *
- * - Calls each modules static function ::getModules
+ * - Calls each module static function ::getModules
  * - Called from ManageFeatures as part of notification settings
  *
  * @param string[] $enabled_mentions
@@ -922,7 +922,7 @@ function scanFileSystemForControllers($iterator, $namespace = '')
 }
 
 /**
- * Just pause the signature applying thing.
+ * Pause the signature applying thing.
  *
  * @param int $applied_sigs
  * @param int $sig_start
@@ -935,7 +935,7 @@ function pauseSignatureApplySettings($applied_sigs, $sig_start)
 {
 	global $context, $txt;
 
-	// Try get more time...
+	// Try to get more time...
 	detectServer()->setTimeLimit(600);
 
 	// Have we exhausted all the time we allowed?

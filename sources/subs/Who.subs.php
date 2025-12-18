@@ -17,7 +17,7 @@ use ElkArte\Languages\Txt;
 use ElkArte\User;
 
 /**
- * Checks, who is viewing a topic or board
+ * Checks who is viewing a topic or board
  *
  * @param int $id
  * @param string $session
@@ -60,7 +60,7 @@ function formatViewers($id, $type)
 {
 	global $context;
 
-	// Lets say there's no one around. (what? could happen!)
+	// Let's say there's no one around. (what? could happen!)
 	$context['view_members'] = [];
 	$context['view_members_list'] = [];
 	$context['view_num_hidden'] = 0;
@@ -130,13 +130,13 @@ function formatViewers($id, $type)
  *
  * Adding actions to the Who's Online list:
  * Adding actions to this list is actually relatively easy...
- * - for actions anyone should be able to see, just add a string named whoall_ACTION.
+ * - For actions anyone should be able to see, just add a string named whoall_ACTION.
  *   (where ACTION is the action used in index.php.)
- * - for actions that have a subaction which should be represented differently, use whoall_ACTION_SUBACTION.
- * - for actions that include a topic, and should be restricted, use whotopic_ACTION.
- * - for actions that use a message, by msg or quote, use whopost_ACTION.
- * - for administrator-only actions, use whoadmin_ACTION.
- * - for actions that should be viewable only with certain permissions, use whoallow_ACTION and
+ * - For actions that have a subaction which should be represented differently, use whoall_ACTION_SUBACTION.
+ * - For actions that include a topic and should be restricted, use whotopic_ACTION.
+ * - For actions that use a message, by msg or quote, use whopost_ACTION.
+ * - For administrator-only actions, use whoadmin_ACTION.
+ * - For actions that should be viewable only with certain permissions, use whoallow_ACTION and
  * add a list of possible permissions to the $allowedActions array, using ACTION as the key.
  *
  * @param array|string $urls a single url (string) or an array of arrays, each inner array being (serialized request data, id_member)
@@ -199,7 +199,7 @@ function determineActions($urls, $preferred_prefix = false)
 	$data = [];
 	foreach ($url_list as $k => $url)
 	{
-		// Get the request parameters..
+		// Get the request parameters.
 		$actions = Util::unserialize($url[0]);
 		if ($actions === false)
 		{
@@ -218,7 +218,7 @@ function determineActions($urls, $preferred_prefix = false)
 			// It's a topic!  Must be!
 			if (isset($actions['topic']))
 			{
-				// Assume they can't view it, and queue it up for later.
+				// Assume they can't view it and queue it up for later.
 				$data[$k] = $txt['who_hidden'];
 				$topic_ids[(int) $actions['topic']][$k] = $txt['who_topic'];
 			}
@@ -335,7 +335,7 @@ function determineActions($urls, $preferred_prefix = false)
 					$data[$k] = $txt['who_hidden'];
 				}
 			}
-			// Viewable only by administrators.. (if it starts with whoadmin, it's admin only!)
+			// Viewable only by administrators. (if it starts with whoadmin, it's admin only!)
 			elseif (allowedTo('moderate_forum') && isset($txt['whoadmin_' . $actions['action']]))
 			{
 				$data[$k] = $txt['whoadmin_' . $actions['action']];

@@ -791,6 +791,7 @@ $txt['find_username'] = 'Name, username, or email address';
 $txt['find_buddies'] = 'Show Buddies Only?';
 $txt['find_wildcards'] = 'Allowed Wildcards: *, ?';
 $txt['find_no_results'] = 'No results found';
+$txt['all_caught_up'] = 'Your all caught up!';
 $txt['find_results'] = 'Results';
 $txt['find_close'] = 'Close';
 

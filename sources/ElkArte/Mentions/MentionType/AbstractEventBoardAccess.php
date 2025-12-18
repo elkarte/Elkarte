@@ -37,7 +37,7 @@ abstract class AbstractEventBoardAccess extends AbstractEventMessage
 				continue;
 			}
 
-			// These things are associated to message and require permission checks
+			// These things are associated with a message and require permission checks
 			if (empty($row['id_board']))
 			{
 				$unset_keys[] = $key;
@@ -50,7 +50,7 @@ abstract class AbstractEventBoardAccess extends AbstractEventMessage
 			$mentions[$key]['message'] = $this->_replaceMsg($row);
 		}
 
-		// Drop those where they can't actually see the mention
+		// Drop those where they can't see the mention
 		if (!empty($boards))
 		{
 			$this->_validateAccess($boards, $mentions, $unset_keys);

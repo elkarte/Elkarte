@@ -25,7 +25,7 @@ class ValuesContainerReadOnly extends ValuesContainer
 {
 	/**
 	 * Dummy setter.
-	 * In order to make the array read-only this method does nothing.
+	 * To make the array, read-only this method does nothing.
 	 *
 	 * @param string|int $key
 	 * @param mixed $val
@@ -36,7 +36,7 @@ class ValuesContainerReadOnly extends ValuesContainer
 
 	/**
 	 * Dummy setter.
-	 * In order to make the array read-only this method does nothing.
+	 * To make the array read-only, this method does nothing.
 	 *
 	 * @param mixed|array $offset
 	 * @param string $value
@@ -47,7 +47,7 @@ class ValuesContainerReadOnly extends ValuesContainer
 
 	/**
 	 * Dummy unset.
-	 * In order to make the array read-only this method does nothing.
+	 * To make the array read-only, this method does nothing.
 	 *
 	 * @param string|int $offset
 	 */
@@ -57,7 +57,7 @@ class ValuesContainerReadOnly extends ValuesContainer
 
 	/**
 	 * Dummy merger.
-	 * In order to make the array read-only this method does nothing.
+	 * To make the array read-only, this method does nothing.
 	 *
 	 * @param array $new_data
 	 */

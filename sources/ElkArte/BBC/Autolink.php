@@ -39,16 +39,16 @@ class Autolink
 	/** @var bool */
 	protected $possible_email;
 
-	/** @var array of search regex for urls */
+	/** @var array search regex for urls */
 	protected $search;
 
-	/** @var array of bbc url coded links */
+	/** @var array bbc url coded links */
 	protected $replace;
 
-	/** @var array of search regex for email */
+	/** @var array search regex for email */
 	protected $email_search;
 
-	/** @var array of bbc email coded links */
+	/** @var array bbc email coded links */
 	protected $email_replace;
 
 	/**
@@ -169,7 +169,7 @@ class Autolink
 	 */
 	public function parseLinks($data): string
 	{
-		// Switch out quotes really quick because they can cause problems.
+		// Switch out quotes really quickly because they can cause problems.
 		$data = strtr($data, ['&#039;' => "'", '&nbsp;' => "\xC2\xA0", '&quot;' => '>">', '"' => '<"<', '&lt;' => '<lt<']);
 
 		$result = preg_replace($this->search, $this->replace, $data);
@@ -185,7 +185,7 @@ class Autolink
 	}
 
 	/**
-	 * Validates if the data contains email address that need to be parsed
+	 * Validates if the data contains email address that needs to be parsed
 	 *
 	 * @param string $data
 	 *

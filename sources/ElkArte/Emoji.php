@@ -26,12 +26,12 @@ use ElkArte\Helper\Util;
  */
 class Emoji extends AbstractModel
 {
-	/** @var string ranges that emoji may be found, not all points in the range are emoji, this is
-	 * used to check whether any char in the text is potentially in a unicode emoji range */
+	/** @var string ranges that emoji may be found; not all points in the range are emoji, this is
+	 * used to check whether any char in the text is potentially in a Unicode emoji range */
 	private const EMOJI_RANGES = '[\x{203C}-\x{3299}\x{1F004}-\x{1F251}\x{1F300}-\x{1FAF6}](?![\x{200d}\x{FE0F}])';
 
-	/** @var string regex to find 4byte html as &#x1f937;‍️
-	 * This is how 4byte characters are stored in the utf-8 db. */
+	/** @var string regex to find 4-byte HTML as &#x1f937;‍️
+	 * This is how 4-byte characters are stored in the utf-8 db. */
 	private const POSSIBLE_HTML_EMOJI = '~(&#x[a-fA-F\d]{5,6};|&#\d{5,6};)~';
 
 	/** @var string regex to check if any none letter characters appear in the string */
@@ -97,7 +97,7 @@ class Emoji extends AbstractModel
 		{
 			$string = preg_replace_callback(self::EMOJI_NAME, static fn(array $m): string => $emoji->emojiToImage($m), $string);
 
-			// Check for any embedded html / hex emoji
+			// Check for any embedded HTML / hex emoji
 			$string = $this->keyboardEmojiToImage($string);
 		}
 
@@ -106,8 +106,8 @@ class Emoji extends AbstractModel
 
 	/**
 	 * Replace [code] and [icode] blocks with tokens.  Both may exist on a page, as such you
-	 * can't search for one and process and then the next. i.e. [code]bla[/code] xx [icode]bla[/icode]
-	 * would process whats outside of code tags, which is an icode !
+	 * can't search for one and process and then the next. i.e., [code]bla[/code] xx [icode]bla[/icode]
+	 * would process what's outside code tags, which is an icode!
 	 *
 	 * @param string $string
 	 * @return string
@@ -158,7 +158,7 @@ class Emoji extends AbstractModel
 	 * Search and replace on &#xHEX; &#DEC; style emoji
 	 *
 	 * Given &#128512;; aka 😀 grinning face, will search on 1f600 and
-	 * if found return as <img /> string pointing to SVG
+	 * if found, return as <img /> string pointing to SVG
 	 *
 	 * @param string $string
 	 * @return string
@@ -167,12 +167,12 @@ class Emoji extends AbstractModel
 	{
 		$string = strtolower($string);
 
-		// If there are 4byte encoded values &#x1f123, change those back to utf8 characters
+		// If there are 4-byte encoded values &#x1f123, change those back to utf8 characters
 		return preg_replace_callback(self::POSSIBLE_HTML_EMOJI, static function ($match) {
 			$replace = html_entity_decode($match[0], ENT_NOQUOTES | ENT_SUBSTITUTE | ENT_HTML401, 'UTF-8');
 
 			// The Fitzpatrick Scale modifiers are not (well) supported across all graphics sets.  For now
-			// drop it, allowing it to display the generic/cartoon color.  IF not things would render as
+			// drop it, allowing it to display the generic/cartoon color.  IF not, things would render as
 			// individual images such as 🤷 🏻 ♂️ instead of just 🤷🏽‍
 			$replace = preg_replace('~[\x{1F3FB}-\x{1F3FF}]~u', '', $replace);
 
@@ -181,10 +181,10 @@ class Emoji extends AbstractModel
 	}
 
 	/**
-	 * Search the Emoji array by unicode number
+	 * Search the Emoji array by Unicode number
 	 *
-	 * Given unicode 1f600, aka 😀 grinning face, returns grinning
-	 * Given unicode 1f6e9 or 1f6e9-fe0f, aka 🛩️ small airplane, returns small_airplane
+	 * Given Unicode 1f600, aka 😀 grinning face, returns grinning
+	 * Given Unicode 1f6e9 or 1f6e9-fe0f, aka 🛩️ small airplane, returns small_airplane
 	 *
 	 * @param $hex
 	 * @return string|false
@@ -225,7 +225,7 @@ class Emoji extends AbstractModel
 	 * - Uses an input array of the form m[2] = 'doughnut' m[1]= ':doughnut:' m[0]= original
 	 * - If shortcode does not exist in the emoji returns m[0] the full match
 	 *
-	 * @param array $m results from preg_replace_callback or other array
+	 * @param array $m results from preg_replace_callback or another array
 	 * @return string
 	 */
 	public function emojiToImage($m): string
@@ -254,9 +254,9 @@ class Emoji extends AbstractModel
 	}
 
 	/**
-	 * Searches a string for unicode points and replaces them with emoji <img> tags
+	 * Searches a string for Unicode points and replaces them with emoji <img> tags
 	 *
-	 * We use [^\p{L}\x00-\x7F]+ which will match any non letter character including
+	 * We use [^\p{L}\x00-\x7F]+ which will match any non-letter character including
 	 * symbols, currency signs, dingbats, box-drawing characters, etc. This is an
 	 * easier regex but with more "false" hits for what we want.  If this passes, then the
 	 * full emoji regex will be used to precisely find supported codepoints
@@ -279,7 +279,7 @@ class Emoji extends AbstractModel
 			$hex_str = $this->unicodeCharacterToNumber($match[0]);
 			$found = $this->findEmojiByCode($hex_str);
 
-			// Hey I know you, your :space_invader:
+			// Hey, I know you, your :space_invader:
 			if ($found !== false)
 			{
 				return $this->emojiToImage([$match[0], ':' . $found . ':', $found]);
@@ -292,14 +292,14 @@ class Emoji extends AbstractModel
 	}
 
 	/**
-	 * Takes a shortcode array and, if available, converts it to a html unicode points emoji
+	 * Takes a shortcode array and, if available, converts it to an HTML Unicode points emoji
 	 *
 	 * - Uses an input array of the form m[2] = 'doughnut' m[1]= ':doughnut:' m[0]= original
-	 * - If shortcode does not exist in the emoji returns m[0] the preg full match
+	 * - If shortcode does not exist in the emoji returns m[0] the full preg match
 	 *
-	 * - Given unicode 1f62e-200d-1f4a8 returns &#x1f62e;&#x200d;&#x1f4a8;
+	 * - Given Unicode 1f62e-200d-1f4a8 returns &#x1f62e;&#x200d;&#x1f4a8;
 	 *
-	 * @param array $m results from preg_replace_callback or other array
+	 * @param array $m results from preg_replace_callback or another array
 	 * @return string
 	 */
 	public function emojiToUni($m): string
@@ -330,8 +330,8 @@ class Emoji extends AbstractModel
 	 * Given a Unicode character, convert to a Unicode number which can be
 	 * used for emoji array searching
 	 *
-	 * Given 😀 aka grinning face returns unicode 1f600
-	 * Given 😮‍💨 aka face exhaling returns unicode 1f62e-200d-1f4a8
+	 * Given 😀 aka grinning face returns Unicode 1f600
+	 * Given 😮‍💨 aka face exhaling returns Unicode 1f62e-200d-1f4a8
 	 *
 	 * @param string $code
 	 * @return string
@@ -388,7 +388,7 @@ class Emoji extends AbstractModel
 			// Longest to shortest to avoid any partial matches due to sequences
 			usort($emoji_regex, static fn($a, $b) => strlen($b) <=> strlen($a));
 
-			// Build out the regex, append the single point search at end.
+			// Build out the regex, append the single point search at the end.
 			$this->emoji_regex = '~' . implode('|', $emoji_regex) . '|' . self::EMOJI_RANGES . '~u';
 			unset($emoji_regex);
 

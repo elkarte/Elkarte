@@ -115,7 +115,7 @@ class ManageMaillist extends AbstractController
 	 *
 	 * - Shows the sender, key and subject of the email
 	 * - Will show the found key if it was missing or possible sender if it was wrong
-	 * - Icons/Actions to view, bounce, delete or approve a failure
+	 * - Icons/Actions to view, bounce, delete, or approve a failure
 	 * - Accessed by ?action=admin;area=maillist;sa=emaillist
 	 *
 	 * @event integrate_list_view_email_errors
@@ -403,7 +403,7 @@ class ManageMaillist extends AbstractController
 	 * What it does:
 	 *
 	 * - Flushes the moderator menu to-do numbers so the menu numbers update
-	 * - Accessed by ?action=admin;area=maillist;sa=delete;item=?'
+	 * - Accessed by ?action=admin;area=maillist;sa=delete;item=?
 	 * - Redirects to ?action=admin;area=maillist;sa=emaillist
 	 */
 	public function action_delete_email(): void
@@ -433,9 +433,9 @@ class ManageMaillist extends AbstractController
 	 *
 	 * - Reviews the data to see if the email error function fixed typical issues like key and wrong id
 	 * - Submits the fixed email to the main function which will post it or fail it again
-	 * - If successful will remove the entry from the failed log
-	 * - Accessed by ?action=admin;area=maillist;sa=approve;item=?'
-	 * - Redirects to action=admin;area=maillist;sa=emaillist
+	 * - If successful will remove the entry from the failed log.
+	 * - Accessed by ?action=admin;area=maillist;sa=approve;item=?
+	 * - Redirects to action=admin;area=maillist;sa=emaillist.
 	 */
 	public function action_approve_email(): void
 	{
@@ -453,7 +453,7 @@ class ManageMaillist extends AbstractController
 			$temp_email = list_maillist_unapproved($id);
 			if (!empty($temp_email))
 			{
-				// Do we have the needed data to approve this, after all it failed for a reason yes?
+				// Do we have the necessary data to approve this; after all, it failed for a reason yes?
 				if (!empty($temp_email[0]['key']) && (!in_array($temp_email[0]['error_code'], ['error_no_message', 'error_not_find_board', 'error_topic_gone'])))
 				{
 					// Set up the details needed to get this posted
@@ -463,7 +463,7 @@ class ManageMaillist extends AbstractController
 					// Unknown from email?  Update the message ONLY if we found an appropriate one during the error checking process
 					if (in_array($temp_email[0]['error_code'], ['error_not_find_member', 'error_key_sender_match']))
 					{
-						// did we actually find a potential correct name, if so we post from the valid member
+						// did we actually find a potential correct name, if so we post from the valid member?
 						$check_emails = array_pad(explode('=>', $temp_email[0]['from']), 2, '');
 
 						if (!empty($check_emails[1]))
@@ -518,11 +518,11 @@ class ManageMaillist extends AbstractController
 	 * What it does:
 	 *
 	 * - Uses the selected template to send a bounce notification with
-	 * details as specified by the template
-	 * - Accessed by ?action=admin;area=maillist;sa=bounce;item=?'
+	 * details as specified by the template.
+	 * - Accessed by ?action=admin;area=maillist;sa=bounce;item=?
 	 * - Redirects to action=admin;area=maillist;sa=bounced
 	 * - Provides {MEMBER}, {SCRIPTURL}, {FORUMNAME}, {REGARDS}, {SUBJECT}, {ERROR},
-	 * {FORUMNAMESHORT}, {EMAILREGARDS} replaceable values to the template
+	 * {FORUMNAMESHORT}, {EMAILREGARDS} replaceable values to the template.
 	 *
 	 * @uses bounce_email sub-template
 	 */
@@ -542,7 +542,7 @@ class ManageMaillist extends AbstractController
 		$id = $this->_req->get('item', 'intval');
 		if (!empty($id))
 		{
-			// Load up the email details, no funny biz yall ;)
+			// Load up the email details, no funny biz y'all ;)
 			$temp_email = list_maillist_unapproved($id);
 
 			if (!empty($temp_email))
@@ -609,7 +609,7 @@ class ManageMaillist extends AbstractController
 				}
 				else
 				{
-					// Time for someone to get a we're so sorry message!
+					// Time for someone to get a "we're so sorry" message!
 					$mark_down = new Html2Md($body);
 					$body = $mark_down->get_markdown();
 					sendmail($to, $subject, $body, null, null, false, 5);
@@ -622,7 +622,7 @@ class ManageMaillist extends AbstractController
 		createToken('admin-ml');
 		$context['warning_data'] = ['notify' => '', 'notify_subject' => '', 'notify_body' => ''];
 		$context['body'] = isset($fullerrortext) ? ParserWrapper::instance()->parseEmail($fullerrortext) : '';
-		$context['item'] = $this->_req->post->item ?? '';
+		$context['item'] = $this->_req->hasPost('item') ?? '';
 		$context['notice_to'] = $txt['to'] . ' ' . isset($temp_email[0]['from']) !== '' ? $temp_email[0]['from'] : '';
 		$context['page_title'] = $txt['bounce_title'];
 		$context['sub_template'] = 'bounce_email';
@@ -633,9 +633,9 @@ class ManageMaillist extends AbstractController
 	 *
 	 * What it does:
 	 *
-	 * - Allows to add/edit or delete filters
-	 * - Filters are used to alter text in a post, to remove crud that comes with emails
-	 * - Filters can be defined as regex, the system will check it for valid syntax
+	 * - Allows adding/editing or deleting filters.
+	 * - Filters are used to alter text in a post, to remove crud that comes with emails.
+	 * - Filters can be defined as regex, the system will check it for valid syntax.
 	 * - Accessed by ?action=admin;area=maillist;sa=emailfilters;
 	 *
 	 * @event integrate_list_email_filter
@@ -895,7 +895,7 @@ class ManageMaillist extends AbstractController
 	 * - Callback for createList()
 	 *
 	 * @param int $id 0 for all of a certain style
-	 * @param string $style one of filter or parser
+	 * @param string $style either filter or parser
 	 *
 	 * @return int
 	 */
@@ -925,7 +925,7 @@ class ManageMaillist extends AbstractController
 	/**
 	 * Edit or Add a filter
 	 *
-	 * - If regex will check for proper syntax before saving to the database
+	 * - If regex checks for proper syntax before saving to the database
 	 *
 	 * @event integrate_save_filter_settings
 	 *
@@ -959,7 +959,7 @@ class ManageMaillist extends AbstractController
 		}
 		else
 		{
-			// Setup placeholders for adding a new one instead
+			// Set up placeholders for adding a new one instead
 			$modSettings['filter_type'] = '';
 			$modSettings['filter_to'] = '';
 			$modSettings['filter_from'] = '';
@@ -996,7 +996,7 @@ class ManageMaillist extends AbstractController
 				$valid = @preg_replace($this->_req->post->filter_from, $this->_req->post->filter_to, 'ElkArte') !== null;
 				if (!$valid)
 				{
-					// Seems to be bad ... reload the form, set the message
+					// Seems bad ... reload the form, set the message
 					$context['error_type'] = 'notice';
 					$context['settings_message'][] = $txt['regex_invalid'];
 					$modSettings['filter_type'] = $this->_req->post->filter_type;
@@ -1015,7 +1015,7 @@ class ManageMaillist extends AbstractController
 			// if we are good to save, so save it ;)
 			if (empty($context['settings_message']))
 			{
-				// And ... its a filter
+				// And ... it's a filter
 				$config_vars[] = ['text', 'filter_style'];
 				$this->_req->post->filter_style = 'filter';
 
@@ -1102,7 +1102,7 @@ class ManageMaillist extends AbstractController
 	 *
 	 * What it does:
 	 *
-	 * - Allows to add/edit or delete parsers
+	 * - Allows adding/editing or deleting parsers
 	 * - Parsers are used to split a message at a line of text
 	 * - Parsers can only be defined as regex, the system will check it for valid syntax
 	 * - Accessed by ?action=admin;area=maillist;sa=emailparser;
@@ -1369,7 +1369,7 @@ class ManageMaillist extends AbstractController
 		}
 		else
 		{
-			// Setup placeholders for adding a new one instead
+			// Set up placeholders for adding a new one instead
 			$modSettings['filter_type'] = '';
 			$modSettings['filter_name'] = '';
 			$modSettings['filter_from'] = '';
@@ -1404,7 +1404,7 @@ class ManageMaillist extends AbstractController
 				$valid = preg_replace($this->_req->post->filter_from, '', 'ElkArte') !== null;
 				if (!$valid)
 				{
-					// Regex did not compute .. Danger, Will Robinson
+					// Regex did not compute ... Danger, Will Robinson
 					$context['settings_message'] = $txt['regex_invalid'];
 					$context['error_type'] = 'notice';
 
@@ -1423,7 +1423,7 @@ class ManageMaillist extends AbstractController
 			// All clear to save?
 			if (empty($context['settings_message']))
 			{
-				// Shhh ... its really a parser
+				// Shhh ... it's really a parser
 				$config_vars[] = ['text', 'filter_style'];
 				$this->_req->post->filter_style = 'parser';
 
@@ -1571,7 +1571,7 @@ class ManageMaillist extends AbstractController
 				$email_error = $this->_req->post->maillist_mail_from;
 			}
 
-			// Inbound email set up then we need to check for both valid email and valid board
+			// Inbound email set up, then we need to check for both valid email and valid board
 			if (!$email_error && !empty($this->_req->post->emailfrom))
 			{
 				// Get the board ids for a quick check
@@ -1607,7 +1607,7 @@ class ManageMaillist extends AbstractController
 			// Enable or disable the fake cron
 			enable_maillist_imap_cron(!empty($this->_req->post->maillist_imap_cron));
 
-			// Check and set any errors or give the go ahead to save
+			// Check and set any errors or give the go-ahead to save
 			if ($email_error)
 			{
 				$context['settings_message'] = sprintf($txt['email_not_valid'], $email_error);
@@ -1621,7 +1621,7 @@ class ManageMaillist extends AbstractController
 				// Clear the moderation count cache
 				Cache::instance()->remove('num_menu_errors');
 
-				// Should be off if mail posting is on, we ignore it anyway but this at least updates the ACP
+				// Should be off if mail posting is on, we ignore it anyway, but this at least updates the ACP
 				if (!empty($this->_req->post->maillist_enabled))
 				{
 					updateSettings(['disallow_sendBody' => '']);
@@ -1635,7 +1635,7 @@ class ManageMaillist extends AbstractController
 			}
 		}
 
-		// Javascript vars for the "add more" buttons in the receive_email callback
+		// JavaScript vars for the "add more" buttons in the receive_email callback
 		$board_list = maillist_board_list();
 		$script = '';
 		$i = 0;
@@ -1772,7 +1772,7 @@ class ManageMaillist extends AbstractController
 	{
 		global $modSettings, $context, $txt;
 
-		// We'll need this, because bounce templates are stored with warning templates.
+		// We'll need this because bounce templates are stored with warning templates.
 		require_once(SUBSDIR . '/Moderation.subs.php');
 
 		// Submitting a new one or editing an existing one then pass this request off
@@ -1889,7 +1889,7 @@ class ManageMaillist extends AbstractController
 	}
 
 	/**
-	 * Edit a 'it bounced' template.
+	 * Edit the 'it bounced' template.
 	 *
 	 * @uses bounce_template sub template
 	 */
@@ -1917,7 +1917,7 @@ class ManageMaillist extends AbstractController
 			'can_edit_personal' => true,
 		];
 
-		// If it's an edit load it.
+		// If it's an edit, load it.
 		if ($context['is_edit'])
 		{
 			modLoadTemplate($context['id_template'], 'bnctpl');
@@ -1932,7 +1932,7 @@ class ManageMaillist extends AbstractController
 			// To check the BBC is good...
 			require_once(SUBSDIR . '/Post.subs.php');
 
-			// Bit of cleaning!
+			// A bit of cleaning!
 			$template_body = trim($this->_req->post->template_body);
 			$template_title = trim($this->_req->post->template_title);
 
@@ -1957,12 +1957,12 @@ class ManageMaillist extends AbstractController
 					// Simple update...
 					modAddUpdateTemplate($recipient_id, $template_title, $template_body, $context['id_template'], true, 'bnctpl');
 
-					// If it wasn't visible and now is they've effectively added it.
+					// If it wasn't visible and now is, they've effectively added it.
 					if ($context['template_data']['personal'] && !$recipient_id)
 					{
 						logAction('add_bounce_template', ['template' => $template_title]);
 					}
-					// Conversely if they made it personal it's a delete.
+					// Conversely, if they made it personal, then delete.
 					elseif (!$context['template_data']['personal'] && $recipient_id)
 					{
 						logAction('delete_bounce_template', ['template' => $template_title]);

@@ -37,10 +37,10 @@ class ManagePaid extends AbstractController
 	 *
 	 * What it does:
 	 *
-	 * - calling the right function based on the given sub-action.
+	 * - Calling the right function based on the given sub-action.
 	 * - It defaults to sub-action 'view'.
 	 * - Accessed from ?action=admin;area=paidsubscribe.
-	 * - It requires admin_forum permission for admin based actions.
+	 * - It requires admin_forum permission for admin-based actions.
 	 *
 	 * @event integrate_sa_manage_subscriptions
 	 * @see AbstractController::action_index
@@ -103,9 +103,9 @@ class ManagePaid extends AbstractController
 	}
 
 	/**
-	 * Set any setting related to paid subscriptions,
+	 * Set any setting related to paid subscriptions.
 	 *
-	 * - i.e. modify which payment methods are to be used.
+	 * - I.e., modify which payment methods are to be used.
 	 * - It requires the moderate_forum permission
 	 * - Accessed from ?action=admin;area=paidsubscribe;sa=settings.
 	 *
@@ -133,7 +133,7 @@ class ManagePaid extends AbstractController
 		$context['post_url'] = getUrl('admin', ['action' => 'admin', 'area' => 'paidsubscribe', 'save', 'sa' => 'settings']);
 		$context['settings_title'] = $txt['settings'];
 
-		// We want javascript for our currency options.
+		// We want JavaScript for our currency options.
 		theme()->addInlineJavascript('
 		toggleCurrencyOther();', true);
 
@@ -161,7 +161,7 @@ class ManagePaid extends AbstractController
 				}
 				else
 				{
-					// That's not an email, lets set it back in the form to be fixed and let them know its wrong
+					// That's not an email, let's set it back in the form to be fixed and let them know it's wrong
 					$modSettings['paid_email_to'] = $this->_req->post->paid_email_to;
 					$context['error_type'] = 'minor';
 					$context['settings_message'] = [];
@@ -205,7 +205,7 @@ class ManagePaid extends AbstractController
 	{
 		global $modSettings, $txt;
 
-		// If the currency is set to something different then we need to set it to other for this to work and set it back shortly.
+		// If the currency is set to something different, then we need to set it to other for this to work and set it back shortly.
 		$modSettings['paid_currency'] = empty($modSettings['paid_currency_code']) ? '' : $modSettings['paid_currency_code'];
 		if (!empty($modSettings['paid_currency_code']) && !in_array($modSettings['paid_currency_code'], ['usd', 'eur', 'gbp']))
 		{
@@ -413,7 +413,7 @@ class ManagePaid extends AbstractController
 	}
 
 	/**
-	 * Adding, editing and deleting subscriptions.
+	 * Adding, editing, and deleting subscriptions.
 	 *
 	 * - Accessed from ?action=admin;area=paidsubscribe;sa=modify.
 	 *
@@ -429,7 +429,7 @@ class ManagePaid extends AbstractController
 		$context['sub_id'] = isset($this->_req->query->sid) ? (int) $this->_req->query->sid : 0;
 		$context['action_type'] = $context['sub_id'] !== 0 ? (isset($this->_req->query->delete) ? 'delete' : 'edit') : 'add';
 
-		// Setup the template.
+		// Set up the template.
 		$context['sub_template'] = $context['action_type'] === 'delete' ? 'delete_subscription' : 'modify_subscription';
 		$context['page_title'] = $txt['paid_' . $context['action_type'] . '_subscription'];
 
@@ -459,7 +459,7 @@ class ManagePaid extends AbstractController
 			$reminder = max($this->_req->getPost('reminder', 'intval', 0), 1);
 			$emailComplete = strlen($this->_req->post->emailcomplete) > 10 ? trim($this->_req->post->emailcomplete) : '';
 
-			// Is this a fixed one?
+			// Is this fixed?
 			if ($this->_req->post->duration_type === 'fixed')
 			{
 				// Clean the span.
@@ -609,12 +609,12 @@ class ManagePaid extends AbstractController
 		$context['sub_id'] = $this->_req->getQuery('sid', 'intval', 0);
 		$context['action_type'] = $context['log_id'] ? 'edit' : 'add';
 
-		// Setup the template.
+		// Set up the template.
 		$context['sub_template'] = 'modify_user_subscription';
 		$context['page_title'] = $txt[$context['action_type'] . '_subscriber'];
 		loadJavascriptFile('suggest.js', ['defer' => true]);
 
-		// If we haven't been passed the subscription ID get it.
+		// If we haven't been passed the subscription, ID get it.
 		if ($context['log_id'] && !$context['sub_id'])
 		{
 			$context['sub_id'] = validateSubscriptionID($context['log_id']);
@@ -790,7 +790,7 @@ class ManagePaid extends AbstractController
 				$pending_details = Util::unserialize($row['pending_details']);
 				foreach ($pending_details as $id => $pending)
 				{
-					// Only this type need be displayed.
+					// Only this type needs to be displayed.
 					if ($pending[3] === 'payback')
 					{
 						// Work out what the options were.
@@ -883,6 +883,8 @@ class ManagePaid extends AbstractController
 			$context['sub']['start']['last_day'] = (int) Util::strftime('%d', mktime(0, 0, 0, $context['sub']['start']['month'] == 12 ? 1 : $context['sub']['start']['month'] + 1, 0, $context['sub']['start']['month'] == 12 ? $context['sub']['start']['year'] + 1 : $context['sub']['start']['year']));
 			$context['sub']['end']['last_day'] = (int) Util::strftime('%d', mktime(0, 0, 0, $context['sub']['end']['month'] == 12 ? 1 : $context['sub']['end']['month'] + 1, 0, $context['sub']['end']['month'] == 12 ? $context['sub']['end']['year'] + 1 : $context['sub']['end']['year']));
 		}
+
+		return null;
 	}
 
 	/**
@@ -902,7 +904,7 @@ class ManagePaid extends AbstractController
 
 		require_once(SUBSDIR . '/PaidSubscriptions.subs.php');
 
-		// Setup the template.
+		// Set up the template.
 		$context['page_title'] = $txt['viewing_users_subscribed'];
 
 		// ID of the subscription.

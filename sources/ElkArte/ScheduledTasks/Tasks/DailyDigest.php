@@ -40,14 +40,14 @@ class DailyDigest implements ScheduledTaskInterface
 	}
 
 	/**
-	 * Send out a email of all subscribed topics, to members.
+	 * Send out an email of all subscribed topics, to members.
 	 *
 	 * What it does:
 	 *
 	 * - Builds email body's of topics and messages per user as defined by their notification settings
 	 * - If weekly builds the weekly abridged digest
 	 *
-	 * @param bool $is_weekly
+	 * @param bool|int $is_weekly
 	 *
 	 * @return bool
 	 */
@@ -197,7 +197,7 @@ class DailyDigest implements ScheduledTaskInterface
 			{
 				if ($maillist)
 				{
-					// Convert to markdown markup e.g. text ;)
+					// Convert to Markdown markup e.g. text ;)
 					pbe_prepare_text($row['body']);
 					$row['body'] = Util::shorten_text($row['body'], empty($modSettings['digest_preview_length']) ? 375 : $modSettings['digest_preview_length'], true);
 					$row['body'] = preg_replace("~\n~", "\n  ", $row['body']);
@@ -246,7 +246,7 @@ class DailyDigest implements ScheduledTaskInterface
 			return true;
 		}
 
-		// Fix the last reply message so its suitable for previewing
+		// Fix the last reply message so it's suitable for previewing
 		if ($maillist && !empty($types['reply']))
 		{
 			require_once(SUBSDIR . '/MaillistPost.subs.php');

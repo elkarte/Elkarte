@@ -69,7 +69,7 @@ class PostModeration extends AbstractController
 		// Work out what boards we can work in!
 		$approve_boards = empty($this->user->mod_cache['ap']) ? boardsAllowedTo('approve_posts') : $this->user->mod_cache['ap'];
 
-		$_brd = $this->_req->getPost('brd', 'intval', $this->_req->getQuery('brd', 'intval', null));
+		$_brd = $this->_req->getPost('brd', 'intval', $this->_req->getQuery('brd', 'intval'));
 
 		// If we filtered by board remove ones outside of this board.
 		// @todo Put a message saying we're filtered?
@@ -264,7 +264,7 @@ class PostModeration extends AbstractController
 			'delete_own_boards' => $delete_own_boards,
 			'delete_any_boards' => $delete_any_boards,
 			'delete_own_replies' => $delete_own_replies,
-		], $context['start'], 10);
+		], $context['start']);
 
 		foreach ($context['unapproved_items'] as $key => $item)
 		{

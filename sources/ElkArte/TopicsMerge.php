@@ -16,6 +16,7 @@
 
 namespace ElkArte;
 
+use ElkArte\Exceptions\Exception;
 use ElkArte\Helper\Util;
 
 /**
@@ -79,7 +80,7 @@ class TopicsMerge
 
 	/**
 	 * Grabs all the details of the topics involved in the merge process and loads
-	 * then in $this->topic_data
+	 * them in $this->topic_data
 	 */
 	protected function _loadTopicDetails(): bool
 	{
@@ -197,7 +198,7 @@ class TopicsMerge
 
 		$this->boards = array_map('intval', array_values(array_unique($this->boards)));
 
-		// If we didn't get any topics then they've been messing with unapproved stuff.
+		// If we didn't get any topics, then they've been messing with unapproved stuff.
 		if (empty($this->topic_data))
 		{
 			$this->_errors[] = ['no_topic_id', true];
@@ -285,7 +286,7 @@ class TopicsMerge
 		// Just to be sure, here we should not have any error around
 		$this->_errors = [];
 
-		// Determine target board.
+		// Determine a target board.
 		$target_board = count($this->boards) > 1 ? (int) $details['board'] : $this->boards[0];
 		if (!in_array($target_board, $details['accessible_boards']))
 		{
@@ -333,7 +334,7 @@ class TopicsMerge
 			$target_subject = $this->topic_data[$this->firstTopic]['subject'];
 		}
 
-		// Get the first and last message and the number of messages....
+		// Get the first and last message and the number of messages...
 		$topic_approved = 1;
 		$first_msg = 0;
 		$num_replies = 0;
@@ -349,7 +350,7 @@ class TopicsMerge
 			]
 		)->fetch_callback(
 			static function ($row) use (&$topic_approved, &$first_msg, &$num_replies, &$last_msg, &$num_unapproved) {
-				// If this is approved, or is fully unapproved.
+				// If this is approved or is fully unapproved.
 				if ($row['approved'] || !isset($first_msg))
 				{
 					$first_msg = $row['first_msg'];
@@ -368,7 +369,7 @@ class TopicsMerge
 				}
 				else
 				{
-					// If this has a lower first_msg then the first post is not approved and hence the number of replies was wrong!
+					// If this has a lower first_msg, then the first post is not approved, and hence the number of replies was wrong!
 					if ($first_msg > $row['first_msg'])
 					{
 						$first_msg = $row['first_msg'];
@@ -421,7 +422,7 @@ class TopicsMerge
 		[$member_started] = $request->fetch_row();
 		[$member_updated] = $request->fetch_row();
 
-		// First and last message are the same, so only row was returned.
+		// The first and last message is the same, so only row was returned.
 		if ($member_updated === null)
 		{
 			$member_updated = $member_started;
@@ -429,7 +430,7 @@ class TopicsMerge
 
 		$request->free_result();
 
-		// Obtain all the message ids we are going to affect.
+		// Get all the message ids we are going to affect.
 		$affected_msgs = messagesInTopics($this->_topics);
 
 		// Assign the first topic ID to be the merged topic.
@@ -475,7 +476,7 @@ class TopicsMerge
 	 * @param int $id_topic
 	 * @param string $target_subject
 	 * @param bool $enforce_subject
-	 * @throws \ElkArte\Exceptions\Exception
+	 * @throws Exception
 	 */
 	protected function _updateStats($affected_msgs, $id_topic, $target_subject, $enforce_subject): void
 	{

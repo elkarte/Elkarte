@@ -19,7 +19,7 @@ use ElkArte\Request;
 use ElkArte\User;
 
 /**
- * Clean the request variables - add html entities to GET.
+ * Clean the request variables - add HTML entities to GET.
  *
  * What it does:
  *
@@ -46,7 +46,7 @@ function cleanRequest()
 }
 
 /**
- * Escapes (replaces) characters in strings to make them safe for use in javascript
+ * Escapes (replaces) characters in strings to make them safe for use in JavaScript
  *
  * @param string $string The string to escape
  *

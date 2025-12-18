@@ -473,7 +473,7 @@ function getOldDrafts($days)
 {
 	$db = database();
 
-	// Find all of the old drafts
+	// Find all the old drafts
 	return $db->fetchQuery('
 		SELECT
 			id_draft

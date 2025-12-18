@@ -154,7 +154,7 @@ abstract class AbstractNotificationMessage implements NotificationInterface
 
 		foreach ($members_to as $id_member)
 		{
-			// If the notification can not be sent, mark it as not accessible and read
+			// If the notification cannot be sent, mark it as not accessible and read
 			if (!$this->_validateMemberRelationship($member_from, $id_member))
 			{
 				$is_accessible = 0;

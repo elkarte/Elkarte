@@ -74,7 +74,7 @@ class Templates
 	 */
 	public function load($template_name, $style_sheets = [], $fatal = true): ?bool
 	{
-		// If we don't know yet the default theme directory, let's wait a bit.
+		// If we don't know the default theme directory yet, let's wait a bit.
 		if ($this->dirs->hasDirectories() === false)
 		{
 			$this->delayed[] = [
@@ -466,9 +466,9 @@ class Templates
 	 * Load a sub-template.
 	 *
 	 * What it does:
-	 * - loads the sub template specified by sub_template_name, which must be in an
+	 * - Loads the sub template specified by sub_template_name, which must be in an
 	 * already-loaded template.
-	 * - if ?debug is in the query string, shows administrators a marker after every sub
+	 * - If ?debug is in the query string, shows administrators a marker after every sub
 	 * template for debugging purposes.
 	 *
 	 * @param string $sub_template_name
@@ -530,7 +530,7 @@ class Templates
 	}
 
 	/**
-	 * Are we showing debugging for templates?  Just make sure not to do it before the doctype...
+	 * Are we showing debugging for templates?  Make sure not to do it before the doctype...
 	 *
 	 * @param bool $start
 	 * @param string $sub_template_name

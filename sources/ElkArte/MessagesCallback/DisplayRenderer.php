@@ -131,9 +131,9 @@ class DisplayRenderer extends Renderer
 	/**
 	 * Generates the available button array suitable for consumption by template_button_strip
 	 *
-	 * @param array $output The output array containing post details.
+	 * @param array $output The output array containing post-details.
 	 *
-	 * @return array The array containing all the post buttons.
+	 * @return array The array containing all the post-buttons.
 	 */
 	protected function _buildPostButtons($output): array
 	{
@@ -149,7 +149,7 @@ class DisplayRenderer extends Renderer
 				'icon' => 'quote',
 				'enabled' => !empty($context['can_quote']),
 			],
-			// Can the user quick modify the contents of this post?  Show the quick (inline) modify button.
+			// Can the user "quick-modify" the contents of this post?  Show the quick (inline) modify button.
 			'quick_edit' => [
 				'text' => 'quick_edit',
 				'url' => 'javascript:void(0);',
@@ -157,7 +157,7 @@ class DisplayRenderer extends Renderer
 				'icon' => 'modify',
 				'enabled' => $output['can_modify'],
 			],
-			// Can they like/unlike or just view counts
+			// Can they like/unlike or just view counts?
 			'react' => [
 				'text' => 'like_post',
 				'url' => 'javascript:void(0);',
@@ -278,7 +278,7 @@ class DisplayRenderer extends Renderer
 		];
 
 		// Drop any non-enabled ones
-		$postButtons = array_filter($postButtons, static fn($button) => !isset($button['enabled']) || (bool) $button['enabled']);
+		$postButtons = array_filter($postButtons, static fn($button) => !isset($button['enabled']) || $button['enabled']);
 
 		return ['postbuttons' => $postButtons];
 	}

@@ -40,7 +40,7 @@ class MessageTopicIcons extends ValuesContainer
 	protected $_icons = [];
 
 	/**
-	 * This simple function returns the message topic icon array.
+	 * This function returns the message topic icon array.
 	 *
 	 * @param bool|false $icon_check
 	 * @param string $theme_dir
@@ -64,7 +64,7 @@ class MessageTopicIcons extends ValuesContainer
 	}
 
 	/**
-	 * Load in  site icons, default or custom message icons.
+	 * Load in site icons, default or custom message icons.
 	 */
 	private function _loadSiteIcons(): void
 	{
@@ -75,7 +75,7 @@ class MessageTopicIcons extends ValuesContainer
 	}
 
 	/**
-	 * This function merges in any passed custom icons with our site defined ones.
+	 * This function merges in any passed custom icons with our site-defined ones.
 	 */
 	private function _merge_all_icons(): void
 	{
@@ -158,7 +158,7 @@ class MessageTopicIcons extends ValuesContainer
 	}
 
 	/**
-	 * This simple function sets the message topic icon array.
+	 * This function sets the message topic icon array.
 	 */
 	protected function _loadIcons(): void
 	{

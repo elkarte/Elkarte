@@ -189,14 +189,15 @@ function list_integration_hooks_data($start, $items_per_page, $sort)
 		{
 			$function = str_replace(']', '', $function);
 
-			// This is a not an include and the function is included in a certain file (if not it doesn't exists so don't care)
+			// This is a not an include and the function is included in a certain file (if not it doesn't exist so don't care)
 			if (isset($hook_status[$hook][$function]['in_file']) && !str_ends_with($hook, '_include'))
 			{
 				$current_hook = $temp_data['include'][$hook_status[$hook][$function]['in_file']] ?? '';
 				$enabled = false;
 
 				// Checking all the functions within this particular file
-				// if any of them is enable then the file *must* be included and the integrate_*_include hook cannot be disabled
+				// if any of them is enabled then the file *must* be included and
+				// the integrate_*_include hook cannot be disabled
 				foreach ($temp_data['function'][$hook_status[$hook][$function]['in_file']] as $func)
 				{
 					$enabled = $enabled || str_contains($func, ']');

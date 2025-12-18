@@ -49,7 +49,7 @@ class Menu
 	/** @var HttpReq */
 	protected $req;
 
-	/** @var array Will hold the selected menu data that is returned to the caller */
+	/** @var array Will hold the selected menu data returned to the caller */
 	private $includeData = [];
 
 	/** @var int Unique menu number */
@@ -61,7 +61,7 @@ class Menu
 	/** @var array  Holds menu definition structure set by addSection */
 	private $menuData = [];
 
-	/** @var array Holds the first accessible menu section/area if any */
+	/** @var array Holds the first accessible menu section/ area, if any */
 	private $firstAreaCurrent = [];
 
 	/**
@@ -136,7 +136,7 @@ class Menu
 			$newAreas = ['areas' => []];
 			foreach ($section['areas'] as $area_id => $area)
 			{
-				// subsections are deeper menus inside a area (3rd level menu)
+				// subsections are deeper menus inside an area (3rd level menu)
 				$newSubsections = ['subsections' => []];
 				if (!empty($area['subsections']))
 				{
@@ -198,7 +198,7 @@ class Menu
 			$section_id = $data['id'];
 			$newSection = $data['section'];
 
-			// If location is specified, insert after that location
+			// If a location is specified, insert after that location
 			if (!empty($location) && isset($this->menuData[$location]))
 			{
 				$tempMenu = [];
@@ -303,7 +303,7 @@ class Menu
 	 */
 	public function prepareMenu()
 	{
-		// If options set a hook, give it call
+		// If options set a hook, give it a call
 		$this->callHook();
 
 		// Build URLs first.
@@ -368,7 +368,7 @@ class Menu
 	 */
 	protected function processMenuData()
 	{
-		// Now setup the context correctly.
+		// Now set up the context correctly.
 		foreach ($this->menuData as $sectionId => $section)
 		{
 			// Is this section enabled? and do they have permissions?
@@ -467,12 +467,13 @@ class Menu
 				$this->menuOptions->getCounters()[$obj->getCounter()]
 			);
 		}
-		// Top level menu buttons get a hidden counter if count is 0
-		elseif ($idx === 0 && !empty($this->menuOptions->getCounters()['section']))
+
+		if ($idx === 0 && !empty($this->menuOptions->getCounters()['section']))
 		{
 			return $settings['menu_numeric_notice'][-1];
 		}
 
+		// Top level menu buttons get a hidden counter when the count is 0
 		return '';
 	}
 
@@ -487,13 +488,13 @@ class Menu
 		// Now we cycle through the sections to pick the right area.
 		foreach ($section->getAreas() as $areaId => $area)
 		{
-			// Is the area enabled, Does the user have permission and it has some form of a name
+			// Is the area enabled, Does the user have permission, and it has some form of a name?
 			if ($area->isEnabled() && $this->checkPermissions($area) && $this->areaHasLabel($areaId, $area))
 			{
 				// Make sure we have a valid current area
 				$this->setFirstAreaCurrent($sectionId, $areaId, $area);
 
-				// If this is hidden from view don't do the rest.
+				// If this is hidden from view, don't do the rest.
 				if (!$area->isHidden())
 				{
 					// First time this section?
@@ -534,7 +535,7 @@ class Menu
 	}
 
 	/**
-	 * Set the current area, or pick it for them
+	 * Set the current area or pick it for them
 	 *
 	 * @param string $sectionId
 	 * @param string $areaId
@@ -596,7 +597,7 @@ class Menu
 	}
 
 	/**
-	 * Set the menu icon from a class name if using pseudo elements
+	 * Set the menu icon from a class name if using pseudo-elements
 	 * of class and icon if using that method
 	 *
 	 * @param string $sectionId
@@ -769,7 +770,7 @@ class Menu
 	}
 
 	/**
-	 * The top level section gets its url from the first valid area under it.  Its
+	 * The top level section gets its url from the first valid area under it.  It's
 	 * done here to avoid setting it to an invalid area.
 	 *
 	 * @param string $sectionId
@@ -811,7 +812,7 @@ class Menu
 	 */
 	private function setActiveButtons()
 	{
-		// If there are sections, quickly goes through them to check if the base menu has an url
+		// If there are sections, quickly goes through them to check if the base menu has a url
 		if (!empty($this->menuContext['current_section']))
 		{
 			$this->menuContext['sections'][$this->menuContext['current_section']]['selected'] = true;
@@ -872,7 +873,7 @@ class Menu
 	 *
 	 * This should be called after the menu area is dispatched, because areas are usually in their
 	 * own controller file. Those files, once dispatched to, hold data for the tabs (descriptions,
-	 * disabled, extra tabs, etc), which must be combined with subaction data for everything to work properly.
+	 * disabled, extra tabs, etc.), which must be combined with subaction data for everything to work properly.
 	 *
 	 * Seems complicated, yes.
 	 *

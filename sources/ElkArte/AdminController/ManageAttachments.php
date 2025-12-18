@@ -62,7 +62,7 @@ class ManageAttachments extends AbstractController
 	public FileFunctions $file_functions;
 
 	/**
-	 * Pre dispatch, load functions needed by all methods
+	 * Pre-dispatch, load functions needed by all methods
 	 */
 	public function pre_dispatch()
 	{
@@ -77,7 +77,7 @@ class ManageAttachments extends AbstractController
 	 *
 	 * What it does:
 	 *
-	 * - This method is the entry point for index.php?action=admin;area=manageattachments
+	 * - This method is the entry point for index.php?action=admin;area=manageattachments,
 	 * and it calls a function based on the sub-action.
 	 * - It requires the manage_attachments permission.
 	 *
@@ -95,7 +95,7 @@ class ManageAttachments extends AbstractController
 		// You have to be able to moderate the forum to do this.
 		isAllowedTo('manage_attachments');
 
-		// Setup the template stuff we'll probably need.
+		// Set up the template stuff we'll probably need.
 		theme()->getTemplates()->load('ManageAttachments');
 
 		// All the things we can do with attachments
@@ -118,7 +118,7 @@ class ManageAttachments extends AbstractController
 		// Get ready for some action
 		$action = new Action('manage_attachments');
 
-		// Default page title is good.
+		// The default page title is good.
 		$context['page_title'] = $txt['attachments_avatars'];
 
 		// Get the subAction, call integrate_sa_manage_attachments
@@ -207,7 +207,7 @@ class ManageAttachments extends AbstractController
 				$modSettings['attachmentUploadDir'] = [1 => $uploadDirPosted];
 			}
 
-			// Adding / changing the sub directory's for attachments
+			// Adding / changing the subdirectory's for attachments
 			if (!empty($useSubdirectories))
 			{
 				// Make sure we have a base directory defined
@@ -328,7 +328,7 @@ class ManageAttachments extends AbstractController
 			$context['valid_basedirectory'] = true;
 		}
 
-		// A bit of razzle dazzle with the $txt strings. :)
+		// A bit of razzle-dazzle with the $txt strings. :)
 		$txt['basedirectory_for_attachments_warning'] = str_replace('{attach_repair_url}', getUrl('admin', ['action' => 'admin', 'area' => 'manageattachments', 'sa' => 'attachpaths']), $txt['basedirectory_for_attachments_warning']);
 		$txt['attach_current_dir_warning'] = str_replace('{attach_repair_url}', getUrl('admin', ['action' => 'admin', 'area' => 'manageattachments', 'sa' => 'attachpaths']), $txt['attach_current_dir_warning']);
 		$txt['attachment_path'] = $context['attachmentUploadDir'];
@@ -438,14 +438,14 @@ class ManageAttachments extends AbstractController
 	 *     ?action=admin;area=manageattachments;sa=browse for attachments
 	 *     ?action=admin;area=manageattachments;sa=browse;avatars for avatars.
 	 *     ?action=admin;area=manageattachments;sa=browse;thumbs for thumbnails.
-	 * - Allows sorting by name, date, size and member.
+	 * - Allows sorting by name, date, size, and member.
 	 * - Paginates results.
 	 *
 	 * @uses the 'browse' sub template
 	 */
 	public function action_browse(): void
 	{
-		global $context, $txt, $modSettings;
+		global $context, $txt;
 
 		// Attachments or avatars?
 		$context['browse_type'] = $this->_req->hasQuery('avatars') ? 'avatars' : ($this->_req->hasQuery('thumbs') ? 'thumbs' : 'attachments');
@@ -482,7 +482,7 @@ class ManageAttachments extends AbstractController
 							global $modSettings, $context;
 
 							$link = '<a href="';
-							// In case of a custom avatar URL attachments have a fixed directory.
+							// In the case of a custom avatar, URL attachments have a fixed directory.
 							if ((int) $rowData['attachment_type'] === 1)
 							{
 								$link .= sprintf('%1$s/%2$s', $modSettings['custom_avatar_url'], $rowData['filename']);
@@ -499,7 +499,7 @@ class ManageAttachments extends AbstractController
 							}
 							$link .= '"';
 
-							// Show a popup on click if it's a picture and we know its dimensions (use rand message to prevent navigation)
+							// Show a popup on click if it's a picture, and we know its dimensions (use a rand message to prevent navigation)
 							if (!empty($rowData['width']) && !empty($rowData['height']))
 							{
 								$link .= 'id="link_' . $rowData['id_attach'] . '" data-lightboxmessage="' . random_int(0, 100000) . '" data-lightboximage="' . $rowData['id_attach'] . '"';
@@ -685,7 +685,7 @@ class ManageAttachments extends AbstractController
 		// Total size and files from the current attachment dir.
 		$current_dir = currentAttachDirProperties();
 
-		// If they specified a limit only....
+		// If they specified a limit only...
 		if ($attachmentDirectory->hasSizeLimit())
 		{
 			$context['attachment_space'] = byte_format($attachmentDirectory->remainingSpace($current_dir['size']));
@@ -834,7 +834,7 @@ class ManageAttachments extends AbstractController
 
 		$notice = $this->_req->getPost('notice', 'trim|strval', $txt['attachment_delete_admin']);
 
-		// Add the notice on the end of the changed messages.
+		// Add the notice at the end of the changed messages.
 		if (!empty($messages))
 		{
 			setRemovalNotice($messages, $notice);
@@ -866,13 +866,13 @@ class ManageAttachments extends AbstractController
 
 		checkSession('get');
 
-		// If we choose cancel, redirect right back.
+		// If we choose to cancel, redirect right back.
 		if ($this->_req->hasPost('cancel'))
 		{
 			redirectexit('action=admin;area=manageattachments;sa=maintenance');
 		}
 
-		// Try give us a while to sort this out...
+		// Try to give us a while to sort this out...
 		detectServer()->setTimeLimit(600);
 
 		$this->step = $this->_req->getQuery('step', 'intval', 0);
@@ -938,7 +938,7 @@ class ManageAttachments extends AbstractController
 			pauseAttachmentMaintenance($to_fix, 0, $this->starting_substep, $this->substep, $this->step, $fix_errors);
 		}
 
-		// Find parents which think they have thumbnails, but actually, don't.
+		// Find parents who think they have thumbnails, but actually, don't.
 		if ($this->step <= 1)
 		{
 			$thumbnails = maxNoThumb();
@@ -957,7 +957,7 @@ class ManageAttachments extends AbstractController
 			pauseAttachmentMaintenance($to_fix, 0, $this->starting_substep, $this->substep, $this->step, $fix_errors);
 		}
 
-		// This may take forever I'm afraid, but life sucks... recount EVERY attachments!
+		// This may take forever, I'm afraid, but life sucks... recount EVERY attachment!
 		if ($this->step <= 2)
 		{
 			$thumbnails = maxAttachment();
@@ -1016,7 +1016,7 @@ class ManageAttachments extends AbstractController
 			pauseAttachmentMaintenance($to_fix, 0, $this->starting_substep, $this->substep, $this->step, $fix_errors);
 		}
 
-		// What about files who are not recorded in the database?
+		// What about files that are not recorded in the database?
 		if ($this->step <= 5)
 		{
 			// Just use the current path for temp files.
@@ -1138,7 +1138,7 @@ class ManageAttachments extends AbstractController
 	{
 		global $context, $txt, $time_start;
 
-		// Try get more time...
+		// Try to get more time...
 		detectServer()->setTimeLimit(600);
 
 		// Have we already used our maximum time?
@@ -1153,7 +1153,7 @@ class ManageAttachments extends AbstractController
 		$context['continue_countdown'] = '2';
 		$context['sub_template'] = 'not_done';
 
-		// Specific stuff to not break this template!
+		// Specific items to not break this template!
 		$context[$context['admin_menu_name']]['current_subsection'] = 'maintenance';
 
 		// Change these two if more steps are added!
@@ -1169,7 +1169,7 @@ class ManageAttachments extends AbstractController
 		// Never more than 100%!
 		$context['continue_percent'] = min($context['continue_percent'], 100);
 
-		// Save the needed information for the next look
+		// Save the necessary information for the next look
 		$_SESSION['attachments_to_fix'] = $to_fix;
 		$_SESSION['attachments_to_fix2'] = $context['repair_errors'];
 
@@ -1464,7 +1464,7 @@ class ManageAttachments extends AbstractController
 				}
 				elseif ($attachmentsDir->delete($id, $real_path) === true)
 				{
-					// Don't add it back, its now gone!
+					// Don't add it back, it's now gone!
 					continue;
 				}
 			}
@@ -1673,7 +1673,7 @@ class ManageAttachments extends AbstractController
 			}
 		}
 
-		// Nothing to move (no files in source or below the max limit)
+		// Nothing to move (no files in a source or below the max limit)
 		if (empty($results))
 		{
 			// Moving them automatically?
@@ -1682,11 +1682,11 @@ class ManageAttachments extends AbstractController
 				$modSettings['automanage_attachments'] = 1;
 				$tmpattachmentUploadDir = Util::unserialize($modSettings['attachmentUploadDir']);
 
-				// Create sub directory's off the root or from an attachment directory?
+				// Create a subdirectory off the root or from an attachment directory?
 				$modSettings['use_subdirectories_for_attachments'] = $this->auto == -1 ? 0 : 1;
 				$modSettings['basedirectory_for_attachments'] = serialize($this->auto > 0 ? $tmpattachmentUploadDir[$this->auto] : [1 => $modSettings['basedirectory_for_attachments']]);
 
-				// Finally, where do they need to go
+				// Finally, where do they need to go?
 				$attachmentDirectory = new AttachmentsDirectory($modSettings, database());
 				$attachmentDirectory->automanage_attachments_check_directory(true);
 				$new_dir = $attachmentDirectory->currentDirectoryId();
@@ -1725,7 +1725,7 @@ class ManageAttachments extends AbstractController
 					break;
 				}
 
-				// No more to move after this batch then set the finished flag.
+				// No more to move after this batch than set the finished flag.
 				if ($tomove_count < $limit)
 				{
 					$break = true;

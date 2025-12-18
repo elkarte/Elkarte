@@ -33,7 +33,7 @@ class UserSettings extends ValuesContainerReadOnly
 
 	/**
 	 * Changes the password to the provided one in $this->settings
-	 * Doesn't actually change the database.
+	 * Doesn't change the database.
 	 *
 	 * @param string $password The hashed password
 	 */
@@ -58,7 +58,7 @@ class UserSettings extends ValuesContainerReadOnly
 	/**
 	 * Fixes the password salt if not present or if it needs to be changed
 	 *
-	 * @param bool $force - If true the salt is changed no matter what
+	 * @param bool $force - If true, the salt is changed no matter what
 	 */
 	public function fixSalt($force = false): bool
 	{
@@ -94,7 +94,7 @@ class UserSettings extends ValuesContainerReadOnly
 	 */
 	public function rehashPassword($password): ?bool
 	{
-		// If the password is not already 64 characters, lets make it a (SHA-256)
+		// If the password is not already 64 characters, let's make it a (SHA-256)
 		if (strlen($password) !== 64)
 		{
 			$password = hash('sha256', Util::strtolower($this->member_name) . un_htmlspecialchars($password));
@@ -102,7 +102,7 @@ class UserSettings extends ValuesContainerReadOnly
 
 		$passhash = password_hash($password, PASSWORD_BCRYPT, ['cost' => 10]);
 
-		// Something is not right
+		// Nothing is right
 		if ($passhash === false)
 		{
 			// @todo here we should throw an exception
@@ -110,6 +110,8 @@ class UserSettings extends ValuesContainerReadOnly
 		}
 
 		$this->updatePassword($passhash);
+
+		return null;
 	}
 
 	/**
@@ -117,17 +119,17 @@ class UserSettings extends ValuesContainerReadOnly
 	 *
 	 * What it does:
 	 *
-	 * - called when registering/choosing a password.
-	 * - checks the password obeys the current forum settings for password strength.
-	 * - if password checking is enabled, will check that none of the words in restrict_in appear in the password.
-	 * - returns an error identifier if the password is invalid.
+	 * - Called when registering/choosing a password.
+	 * - Checks the password obeys the current forum settings for password strength.
+	 * - If password checking is enabled, will check that none of the words in restrict_in appear in the password.
+	 * - Returns an error identifier if the password is invalid.
 	 *
 	 * @param string $password
 	 * @return bool
 	 */
 	public function validatePassword($password): bool
 	{
-		// If the password is not 64 characters, lets make it a (SHA-256)
+		// If the password is not 64 characters, let's make it a (SHA-256)
 		if (strlen($password) !== 64)
 		{
 			$password = hash('sha256', Util::strtolower($this->member_name) . un_htmlspecialchars($password));

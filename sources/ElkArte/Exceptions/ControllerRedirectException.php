@@ -17,9 +17,9 @@ use ElkArte\EventManager;
 use ElkArte\User;
 
 /**
- * In certain cases a module of a controller my want to "redirect" to another
- * controller (e.g. from Calendar to Post).
- * This exception class catches these "redirects", then instantiate a new controller
+ * In certain cases a module of a controller may want to "redirect" to another
+ * controller (e.g., from Calendar to Post).
+ * This exception class catches these "redirects", then instantiates a new controller
  * taking into account loading of addons and pre_dispatch and returns.
  */
 class ControllerRedirectException extends \Exception
@@ -29,7 +29,7 @@ class ControllerRedirectException extends \Exception
 	 * Do note that parent::__construct() is not called.
 	 *
 	 * @param string $_controller Is the name of controller (lowercase and with namespace,
-	 *                 for example 'post', or 'calendar') that should be instantiated
+	 * for example 'post', or 'calendar') that should be instantiated
 	 * @param string $_method The method to call.
 	 */
 	public function __construct(protected $_controller, protected $_method)

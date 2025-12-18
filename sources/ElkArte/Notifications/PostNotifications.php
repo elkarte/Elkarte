@@ -46,13 +46,13 @@ class PostNotifications extends AbstractModel
 	private const REGULARITY_WEEKLY_DIGEST = 3;
 	private const REGULARITY_ONSITE_FIRST_UNREAD_MSG = 4;
 
-	/** @var int how many emails were sent */
+	/** @var int how many emails were sent? */
 	protected $sent = 0;
 
 	/** @var array If the topic was sent via a board notification to prevent double sending */
 	protected $boards = [];
 
-	/** @var string Humm could it be the current language? */
+	/** @var string Humm, could it be the current language? */
 	protected $current_language = '';
 
 	/**
@@ -69,8 +69,8 @@ class PostNotifications extends AbstractModel
 	}
 
 	/**
-	 * The function automatically finds the subject and its board, and then
-	 * checks permissions for each member who is "signed up" for notifications.
+	 * The function automatically finds the subject and its board and then
+	 * checks permissions for each member "signed up" for notifications.
 	 *
 	 * It will not send 'reply' notifications more than once in a row.  It will send new replies to topics on
 	 * subscribed boards and/or subscribed (watched) topics.
@@ -85,7 +85,7 @@ class PostNotifications extends AbstractModel
 	{
 		global $txt;
 
-		// Can't do it if there's no topics.
+		// Can't do it if there are no topics.
 		if (empty($topics))
 		{
 			return;
@@ -113,7 +113,7 @@ class PostNotifications extends AbstractModel
 		// Nada?
 		if (empty($topicData))
 		{
-			trigger_error('sendNotifications(): topics not found', E_USER_NOTICE);
+			trigger_error('sendNotifications(): topics not found');
 		}
 
 		// Just in case they've gone walkies, or were trying to get to something they no longer can
@@ -141,7 +141,7 @@ class PostNotifications extends AbstractModel
 			$this->sendBoardTopicNotifications($topicData, $user_id, $boards_index, $type, $members_only);
 		}
 
-		// Find the members with watch notifications set for this topic, it will skip any sent via board notifications
+		// Find the members with watch notifications set for this topic; it will skip any sent via board notifications
 		$this->sendTopicNotifications($user_id, $topicData, $type, $members_only);
 
 		if (!empty($this->current_language) && $this->current_language !== $user_language)
@@ -285,7 +285,7 @@ class PostNotifications extends AbstractModel
 	}
 
 	/**
-	 * Checks if the language in use is what the user needs and if not loads the right one
+	 * Checks if the language in use is what the user needs and if not, loads the right one
 	 *
 	 * @param string $needed_language
 	 * @uses Post language file
@@ -415,7 +415,7 @@ class PostNotifications extends AbstractModel
 	}
 
 	/**
-	 * Returns if we are to send the post text/body in the email
+	 * Returns if we are to send the post-text/body in the email
 	 *
 	 * @param array $data
 	 * @return bool
@@ -436,7 +436,7 @@ class PostNotifications extends AbstractModel
 	}
 
 	/**
-	 * Who the email "envelope: is from which depends on the mode set
+	 * Who the email envelope is from which depends on the mode set
 	 *
 	 * @param array $topicDatum
 	 * @return string
@@ -445,7 +445,7 @@ class PostNotifications extends AbstractModel
 	{
 		global $mbname;
 
-		// In group mode like google groups or yahoo groups, the mail is from the poster
+		// In group mode the mail is from the poster
 		if (!empty($this->_modSettings['maillist_group_mode']))
 		{
 			return un_htmlspecialchars($topicDatum['name'] ?? 'N/A');
@@ -462,7 +462,7 @@ class PostNotifications extends AbstractModel
 	}
 
 	/**
-	 * The actual sender of the email, needs to be correct, or it will bounce
+	 * The actual sender of the email needs to be correct, or it will bounce
 	 *
 	 * @return string
 	 */
@@ -570,7 +570,7 @@ class PostNotifications extends AbstractModel
 			$message_type = $this->setMessageTemplate($type, $notifyDatum);
 			$replacements = $this->setTemplateReplacements($topicData[$notifyDatum['id_topic']], $notifyDatum, $notifyDatum['id_topic'], $type);
 
-			// Send if a moderation notice, or they want everything, or it has not been sent (first new message)
+			// Send it if a moderation notice, or they want everything, or it has not been sent (first new message)
 			if ($type !== self::NOTIFY_REPLY || empty($notifyDatum['notify_regularity']) || empty($notifyDatum['sent']))
 			{
 				// Use the pbe template when appropriate
@@ -605,8 +605,9 @@ class PostNotifications extends AbstractModel
 	 *
 	 * What it does:
 	 * - Receives data on the topics to send out notifications to the passed in array.
-	 * - Only sends notifications to those who can *currently* see the topic (it doesn't matter if they could when they requested notification.)
-	 *  -Loads the Post language file multiple times for each language if the userLanguage setting is set.
+	 * - Only sends notifications to those who can *currently* see the topic.  It doesn't matter if they
+	 * could when they requested notification.
+	 *  Loads the Post language file multiple times for each language if the userLanguage setting is set.
 	 *
 	 * @param array $topicData
 	 */
@@ -723,7 +724,7 @@ class PostNotifications extends AbstractModel
 		$maillist = $this->isUsingMailList();
 
 		// Find the members with email notification on for these boards.
-		$boardNotifyData = fetchBoardNotifications(User::$info->id, $board_index, 'reply', [], 'email');
+		$boardNotifyData = fetchBoardNotifications(User::$info->id, $board_index, 'reply', []);
 		foreach ($boardNotifyData as $notifyDatum)
 		{
 			// No access, no notification, easy
@@ -755,7 +756,7 @@ class PostNotifications extends AbstractModel
 					continue;
 				}
 
-				// Set the string for adding the body to the message, if a user wants it.
+				// Set the string for adding the body to the message if a user wants it.
 				$replacements = $this->setTemplateReplacements($topicData[$key], $notifyDatum, $topicData[$key]['topic'], 'reply', 'board');
 
 				// Figure out which email to send
@@ -880,7 +881,7 @@ class PostNotifications extends AbstractModel
 				$message_type = $this->setMessageTemplate('reply', $notifyDatum);
 				$replacements = $this->setTemplateReplacements($msg, $notifyDatum, $notifyDatum['id_topic']);
 
-				// Send only if once
+				// Send it only if once
 				if (empty($notifyDatum['notify_regularity']) || (empty($notifyDatum['sent']) && !$sent_this_time))
 				{
 					$template = ($email_perm && $this->canSendPostBody($notifyDatum) ? 'pbe_' : '') . $message_type;

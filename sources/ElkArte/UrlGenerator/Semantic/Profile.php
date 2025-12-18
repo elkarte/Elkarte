@@ -31,8 +31,8 @@ class Profile extends Standard
     public function generate($params)
 	{
 		// Detect sprintf/substitution tokens so they survive for later sprintf()
-		$name = isset($params['name']) ? $params['name'] : '';
-		$u = isset($params['u']) ? $params['u'] : 0;
+		$name = $params['name'] ?? '';
+		$u = $params['u'] ?? 0;
 
 		$isNameToken = is_string($name) && $name !== '' && $name[0] === '%' && preg_match('~^%\d\$s$~m', $name) === 1;
 		$isUidToken = is_string($u) && $u !== '' && $u[0] === '%' && preg_match('~^%\d\$d$~m', $u) === 1;

@@ -39,7 +39,7 @@ function preparsecode(&$message, $previewing = false)
 }
 
 /**
- * This is very simple, and just removes things done by preparsecode.
+ * This is very simple and just removes things done by preparsecode.
  *
  * @param string $message
  *
@@ -49,9 +49,7 @@ function preparsecode(&$message, $previewing = false)
  */
 function un_preparsecode($message)
 {
-	$un_preparse = PreparseCode::instance(User::$info->name);
-
-	return $un_preparse->un_preparsecode($message);
+	return PreparseCode::instance(User::$info->name)->un_preparsecode($message);
 }
 
 /**
@@ -103,7 +101,7 @@ function createPost(&$msgOptions, &$topicOptions, &$posterOptions)
 		$topicOptions['is_approved'] = !empty($is_approved['approved']);
 	}
 
-	// If nothing was filled in as name/email address, try the member table.
+	// If nothing was filled in as a name / email address, try the member table.
 	if (!isset($posterOptions['name']) || $posterOptions['name'] == '' || (empty($posterOptions['email']) && !empty($posterOptions['id'])))
 	{
 		if (empty($posterOptions['id']))
@@ -119,7 +117,7 @@ function createPost(&$msgOptions, &$topicOptions, &$posterOptions)
 			// Couldn't find the current poster?
 			if (empty($result))
 			{
-				trigger_error('createPost(): Invalid member id ' . $posterOptions['id'], E_USER_NOTICE);
+				trigger_error('createPost(): Invalid member id ' . $posterOptions['id']);
 				$posterOptions['id'] = 0;
 				$posterOptions['name'] = $txt['guest_title'];
 				$posterOptions['email'] = '';
@@ -137,7 +135,7 @@ function createPost(&$msgOptions, &$topicOptions, &$posterOptions)
 		}
 	}
 
-	// It's do or die time: forget any user aborts!
+	// It's do-or-die time: forget any user aborts!
 	$previous_ignore_user_abort = ignore_user_abort(true);
 
 	$new_topic = empty($topicOptions['id']);
@@ -393,7 +391,7 @@ function createPost(&$msgOptions, &$topicOptions, &$posterOptions)
 		if (empty($flag))
 		{
 			require_once(SUBSDIR . '/Topic.subs.php');
-			markTopicsRead([$posterOptions['id'], $topicOptions['id'], $msgOptions['id'], 0], false);
+			markTopicsRead([$posterOptions['id'], $topicOptions['id'], $msgOptions['id'], 0]);
 		}
 	}
 
@@ -401,7 +399,7 @@ function createPost(&$msgOptions, &$topicOptions, &$posterOptions)
 	$searchAPI = new SearchApiWrapper(!empty($modSettings['search_index']) ? $modSettings['search_index'] : '');
 	$searchAPI->postCreated($msgOptions, $topicOptions, $posterOptions);
 
-	// Increase the post counter for the user that created the post.
+	// Increase the post-counter for the user that created the post.
 	if (!empty($posterOptions['update_post_count']) && !empty($posterOptions['id']) && $msgOptions['approved'])
 	{
 		// Are you the one that happened to create this post?
@@ -487,7 +485,7 @@ function modifyPost(&$msgOptions, &$topicOptions, &$posterOptions)
 	{
 		$messages_columns['body'] = $msgOptions['body'];
 
-		// using a custom search index, then lets get the old message so we can update our index as needed
+		// using a custom search index, then let's get the old message so we can update our index as needed
 		if (!empty($modSettings['search_custom_index_config']))
 		{
 			require_once(SUBSDIR . '/Messages.subs.php');
@@ -578,7 +576,7 @@ function modifyPost(&$msgOptions, &$topicOptions, &$posterOptions)
 		if (empty($flag))
 		{
 			require_once(SUBSDIR . '/Topic.subs.php');
-			markTopicsRead([User::$info->id, $topicOptions['id'], $modSettings['maxMsgID'], 0], false);
+			markTopicsRead([User::$info->id, $topicOptions['id'], $modSettings['maxMsgID'], 0]);
 		}
 	}
 
@@ -607,7 +605,7 @@ function modifyPost(&$msgOptions, &$topicOptions, &$posterOptions)
 		$request->free_result();
 	}
 
-	// Finally, if we are setting the approved state we need to do much more work :(
+	// Finally, if we are setting the approved state, we need to do much more work :(
 	if ($modSettings['postmod_active'] && isset($msgOptions['approved']))
 	{
 		approvePosts($msgOptions['id'], $msgOptions['approved']);
@@ -692,7 +690,7 @@ function approvePosts($msgs, $approve = true)
 			];
 		}
 
-		// If it's the first message then the topic state changes!
+		// If it's the first message, then the topic state changes!
 		if ($row['id_msg'] === $row['id_first_msg'])
 		{
 			$topic_changes[$row['id_topic']]['approved'] = $approve ? 1 : 0;
@@ -730,14 +728,14 @@ function approvePosts($msgs, $approve = true)
 			}
 		}
 
-		// If this is being approved and id_msg is higher than the current id_last_msg then it changes.
+		// If this is being approved and id_msg is higher than the current id_last_msg, then it changes.
 		if ($approve && $row['id_msg'] > $topic_changes[$row['id_topic']]['id_last_msg'])
 		{
 			$topic_changes[$row['id_topic']]['id_last_msg'] = $row['id_msg'];
 		}
-		// If this is being unapproved, and it's equal to the id_last_msg we need to find a new one!
+		// If this is being unapproved, and it's equal to the id_last_msg, we need to find a new one!
 		elseif (!$approve)
-			// Default to the first message and then we'll override in a bit ;)
+			// Default to the first message, and then we'll override in a bit ;)
 		{
 			$topic_changes[$row['id_topic']]['id_last_msg'] = $row['id_first_msg'];
 		}
@@ -770,7 +768,7 @@ function approvePosts($msgs, $approve = true)
 		]
 	);
 
-	// If we were un-approving find the last msg in the topics...
+	// If we were unapproving, find the last msg in the topics...
 	if (!$approve)
 	{
 		$db->fetchQuery('
@@ -858,7 +856,7 @@ function approvePosts($msgs, $approve = true)
 			]
 		);
 	}
-	// If un-approving add to the approval queue!
+	// If unapproving, add to the approval queue!
 	else
 	{
 		$msgInserts = [];
@@ -902,7 +900,7 @@ function approvePosts($msgs, $approve = true)
  *
  * - If the board has a parent, that parent board is also automatically updated.
  * - The columns updated are id_last_msg and last_updated.
- * - Note that id_last_msg should always be updated using this function,
+ * - Note that id_last_msg should always be updated using this function
  * and is not automatically updated upon other changes.
  *
  * @param int[]|int $setboards
@@ -931,7 +929,7 @@ function updateLastMessages($setboards, $id_msg = 0)
 
 	$lastMsg = [];
 
-	// If we don't know the id_msg we need to find it.
+	// If we don't know the id_msg, we need to find it.
 	if (!$id_msg)
 	{
 		// Find the latest message on this board (highest id_msg.)
@@ -963,10 +961,10 @@ function updateLastMessages($setboards, $id_msg = 0)
 
 	$parent_boards = [];
 
-	// Keep track of last modified dates.
+	// Keep track of the last modified dates.
 	$lastModified = $lastMsg;
 
-	// Get all the sub-boards for the parents, if they have some...
+	// Get all the sub-boards for the parents if they have some...
 	foreach ($setboards as $id_board)
 	{
 		if (!isset($lastMsg[$id_board]))
@@ -1002,12 +1000,12 @@ function updateLastMessages($setboards, $id_msg = 0)
 		}
 	}
 
-	// Note to help understand what is happening here. For parents we update the timestamp of the last message for determining
-	// whether there are sub-boards which have not been read. For the boards themselves we update both this and id_last_msg.
+	// Note to help understand what is happening here. For parents, we update the timestamp of the last message to determine
+	// whether there are sub-boards that have not been read. For the boards themselves we update both this and id_last_msg.
 	$board_updates = [];
 	$parent_updates = [];
 
-	// Finally, to save on queries make the changes...
+	// Finally, to save on queries, make the changes...
 	foreach ($parent_boards as $id => $msg)
 	{
 		if (!isset($parent_updates[$msg]))
@@ -1068,7 +1066,7 @@ function updateLastMessages($setboards, $id_msg = 0)
 /**
  * Get the latest post made on the system
  *
- * - respects approved, recycled, and board permissions
+ * - Respects approved, recycled, and board permissions
  *
  * @return array
  * @package Posts
@@ -1131,8 +1129,8 @@ function lastPost()
  *
  * What it does:
  *
- * - Will add the appropriate Re: to the post subject if its a reply to an existing post
- * - If quoting a post, or editing a post, this function also prepares the message body
+ * - Will add the appropriate Re: to the post-subject if it's a reply to an existing post
+ * - If quoting a post or editing a post, this function also prepares the message body
  * - returns array($subject, $message) or false on error
  *
  * @param int $editing
@@ -1178,7 +1176,7 @@ function getFormMsgSubject($editing, $topic, $first_subject = '', $msg_id = 0)
 			return $message;
 		// Posting a quoted reply?
 		case 2:
-			// Make sure they _can_ quote this post, and if so get it.
+			// Make sure they _can_ quote this post, and if so, get it.
 			$request = $db->query('', '
 				SELECT
 					m.subject, COALESCE(mem.real_name, m.poster_name) AS poster_name, m.poster_time, m.body

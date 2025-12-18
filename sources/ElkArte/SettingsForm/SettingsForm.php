@@ -15,17 +15,15 @@
  *
  * Adding options to one of the setting screens isn't hard.
  *
- * Call prepareDBSettingsContext;
- * The basic format for a checkbox is:
- *    array('check', 'nameInModSettingsAndSQL'),
- * And for a text box:
- *    array('text', 'nameInModSettingsAndSQL')
+ * Call prepareDBSettingsContext
+ *   - For a checkbox is: array('check', 'nameInModSettingsAndSQL'),
+ *   - For a text box: array('text', 'nameInModSettingsAndSQL')
  * (NOTE: You have to add an entry for this at the bottom!)
  *
  * In the above examples, it will look for $txt['nameInModSettingsAndSQL'] as the description,
  * and $helptxt['nameInModSettingsAndSQL'] as the help popup description.
  *
- * Here's a quick explanation of how to add a new item:
+ * Here's a quick explanation of how to add new items:
  *
  * - A text input box.  For textual values.
  *     array('text', 'nameInModSettingsAndSQL', 'OptionalInputBoxWidth'),
@@ -52,7 +50,7 @@
  *      array(one of 'url', 'search', 'date', 'email', 'color') will act like an input with type=xyz
  *
  * For each option:
- *  - type (see above), variable name, size/possible values.
+ *  - Type (see above), variable name, size/possible values.
  *    OR make type '' for an empty string for a horizontal rule.
  *  - SET preinput - to put some HTML prior to the input box.
  *  - SET postinput - to put some HTML following the input box.
@@ -61,7 +59,7 @@
  *  - SET disabled - to disable the field from entry
  *  - SET helptext - add a (?) icon with help text (done automatically if var is in $helptxt)
  *
- *  - PLUS you can override label and help parameters by forcing their keys in the array, for example:
+ *  - PLUS you can override label and help parameters by forcing their keys in the array, for example,
  *    array('text', 'invalid label', 3, 'label' => 'Actual Label')
  *  - force_div_id => 'xyz' to set a field input to a specific id, great for JS targeting
  */

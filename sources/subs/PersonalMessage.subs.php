@@ -3,7 +3,7 @@
 /**
  * This file handles tasks related to personal messages. It performs all
  * the necessary (database updates, statistics updates) to add, delete, mark
- * etc personal messages.
+ * etc., personal messages.
  *
  * The functions in this file do NOT check permissions.
  *
@@ -19,6 +19,7 @@
  */
 
 use ElkArte\Cache\Cache;
+use ElkArte\Database\AbstractResult;
 use ElkArte\Helper\Util;
 use ElkArte\Languages\Txt;
 use ElkArte\Mail\BuildMail;
@@ -26,7 +27,7 @@ use ElkArte\Mail\PreparseMail;
 use ElkArte\User;
 
 /**
- * Loads information about the users personal message limit.
+ * Loads information about the users' personal message limit.
  *
  * @package PersonalMessage
  */
@@ -37,9 +38,10 @@ function loadMessageLimit()
 	$message_limit = 0;
 	if (User::$info->is_admin)
 	{
-		$message_limit = 0;
+		return $message_limit;
 	}
-	elseif (!Cache::instance()->getVar($message_limit, 'msgLimit:' . User::$info->id, 360))
+
+	if (!Cache::instance()->getVar($message_limit, 'msgLimit:' . User::$info->id, 360))
 	{
 		$db->fetchQuery('
 			SELECT
@@ -63,7 +65,7 @@ function loadMessageLimit()
 }
 
 /**
- * Loads the count of messages on a per label basis.
+ * Loads the count of messages on a per-label basis.
  *
  * @param $labels array array of labels that we are calculating the message count
  *
@@ -101,7 +103,7 @@ function loadPMLabels($labels)
 		}
 	);
 
-	// Store it please!
+	// Store it, please!
 	Cache::instance()->put('labelCounts:' . User::$info->id, $labels, 720);
 
 	return $labels;
@@ -109,7 +111,7 @@ function loadPMLabels($labels)
 
 /**
  * Counts all unread personal messages received by a member after a certain time.
- * If the timestamp is empty/zero, returns the total number of unread PMs.
+ * If the timestamp is empty/zero, it returns the total number of unread PMs.
  *
  * @param int $id_member
  * @param int $timestamp
@@ -340,7 +342,7 @@ function deleteMessages($personal_messages, $folder = null, $owner = null)
 					updateMemberData($row['id_member'], ['personal_messages' => $where === '' ? 0 : 'personal_messages - ' . $row['num_deleted_messages'], 'unread_messages' => $where === '' ? 0 : 'unread_messages - ' . $row['num_deleted_messages']]);
 				}
 
-				// If this is the current member we need to make their message count correct.
+				// If this is the current member, we need to make their message count correct.
 				if (User::$info->id == $row['id_member'])
 				{
 					User::$info->messages -= $row['num_deleted_messages'];
@@ -620,8 +622,8 @@ function isAccessiblePM($pmID, $validFor = 'in_or_outbox')
  * ($from defaults to the user)
  *
  * @param array $recipients - an array containing the arrays 'to' and 'bcc', both containing id_member's.
- * @param string $subject - should have no slashes and no html entities
- * @param string $message - should have no slashes and no html entities
+ * @param string $subject - should have no slashes and no HTML entities
+ * @param string $message - should have no slashes and no HTML entities
  * @param bool $store_outbox
  * @param array|null $from - an array with the id, name, and username of the member.
  * @param int $pm_head - the ID of the chain being replied to - if any.
@@ -773,7 +775,7 @@ function sendpm($recipients, $subject, $message, $store_outbox = true, $from = n
 				{
 					$delete = true;
 				}
-				// If we're adding and one criteria don't match then we stop!
+				// If we're adding and one criteria don't match, then we stop!
 				elseif (!$row['is_or'])
 				{
 					$delete = false;
@@ -864,7 +866,7 @@ function sendpm($recipients, $subject, $message, $store_outbox = true, $from = n
 			continue;
 		}
 
-		// We need to know this members groups.
+		// We need to know this members group.
 		$groups = array_merge([$row['id_group'], $row['id_post_group']], (empty($row['additional_groups']) ? [] : explode(',', $row['additional_groups'])));
 
 		$message_limit = -1;
@@ -953,7 +955,7 @@ function sendpm($recipients, $subject, $message, $store_outbox = true, $from = n
 	$to_list = [];
 	if (!empty($id_pm))
 	{
-		// If this is new we need to set it part of it's own conversation.
+		// If this is new, we need to set it as part of its own conversation.
 		if (empty($pm_head))
 		{
 			$db->query('', '
@@ -967,7 +969,7 @@ function sendpm($recipients, $subject, $message, $store_outbox = true, $from = n
 			);
 		}
 
-		// Some people think manually deleting personal_messages is fun... it's not. We protect against it though :)
+		// Some people think manually deleting personal_messages is fun... it's not. We protect against it, though :)
 		$db->query('', '
 			DELETE FROM {db_prefix}pm_recipients
 			WHERE id_pm = {int:id_pm}',
@@ -1124,14 +1126,14 @@ function query_sender_wrapper($from)
  * Load personal messages.
  *
  * This function loads messages considering the options given, an array of:
- * - 'display_mode' - the PMs display mode (i.e. conversation, all)
- * - 'is_postgres' - (temporary) boolean to allow choice of PostgreSQL-specific sorting query
- * - 'sort_by_query' - query to sort by
- * - 'descending' - whether to sort descending
- * - 'sort_by' - field to sort by
- * - 'pmgs' - personal message id (if any). Note: it may not be set.
- * - 'label_query' - query by labels
- * - 'start' - start id, if any
+ *   - 'display_mode' - the PMs display mode (i.e., conversation, all)
+ *   - 'is_postgres' - (temporary) boolean to allow choice of PostgreSQL-specific sorting query
+ *   - 'sort_by_query' - query to sort by
+ *   - 'descending' - whether to sort descending
+ *   - 'sort_by' - field to sort by
+ *   - 'pmgs' - personal message id (if any). Note: it may not be set.
+ *   - 'label_query' - query by labels
+ *   - 'start' - start id, if any
  *
  * @param array $pm_options options for loading
  * @param int $id_member id member
@@ -1145,11 +1147,11 @@ function loadPMs($pm_options, $id_member)
 
 	$db = database();
 
-	// First work out what messages we need to see - if grouped is a little trickier...
+	// First, work out what messages we need to see - if grouped is a little trickier...
 	// Conversation mode
 	if ($pm_options['display_mode'] === 2)
 	{
-		// On a non-default sort, when using PostgreSQL we have to do a harder sort.
+		// On a non-default sort, when using PostgreSQL, we have to do a harder sort.
 		if ($db->title() === 'PostgreSQL' && $pm_options['sort_by_query'] !== 'pm.id_pm')
 		{
 			$sub_pms = [];
@@ -1334,7 +1336,7 @@ function pmCount($id_member, $time)
 /**
  * This will apply rules to all unread messages.
  *
- * - If all_messages is set will, clearly, do it to all!
+ * - If all_messages is set will, do it to all!
  *
  * @param bool $all_messages = false
  * @package PersonalMessage
@@ -1389,7 +1391,7 @@ function applyRules($all_messages = false)
 					{
 						$match = true;
 					}
-					// If we're adding and one criteria don't match then we stop!
+					// If we're adding and one criteria don't match, then we stop!
 					elseif ($rule['logic'] === 'and')
 					{
 						$match = false;
@@ -1397,7 +1399,7 @@ function applyRules($all_messages = false)
 					}
 				}
 
-				// If we have a match the rule must be true - act!
+				// If we have a match, the rule must be true - act!
 				if ($match)
 				{
 					if ($rule['delete'])
@@ -2084,7 +2086,7 @@ function loadConversationUnreadStatus($pms)
 {
 	$db = database();
 
-	// Make it an array if its not
+	// Make it an array if it's not
 	if (!is_array($pms))
 	{
 		$pms = [$pms];
@@ -2140,7 +2142,7 @@ function loadConversationUnreadStatus($pms)
  * - Will not include bcc-recipients for an inbox
  * - Keeps track if a message has been replied / read
  * - Tracks any message labels in use
- * - If optional search parameter is set to true will return message first label, useful for linking
+ * - If optional search parameter is set to true will return message-first label, useful for linking
  *
  * @param int[] $all_pms
  * @param array $recipients
@@ -2186,10 +2188,10 @@ function loadPMRecipientInfo($all_pms, &$recipients, $folder = '', $search = fal
 			$recipients[$row['id_pm']][empty($row['bcc']) ? 'to' : 'bcc'][] = empty($row['id_member_to']) ? $txt['guest_title'] : '<a href="' . $scripturl . '?action=profile;u=' . $row['id_member_to'] . '">' . $row['to_name'] . '</a>';
 		}
 
-		// Don't include bcc-recipients if its your inbox, you're not supposed to know :P
+		// Don't include bcc-recipients if it's your inbox, you're not supposed to know :P
 		if ($row['id_member_to'] == User::$info->id && $folder !== 'sent')
 		{
-			// Read and replied to status for this message
+			// Read and replied to the status for this message
 			$message_replied[$row['id_pm']] = $row['is_read'] & 2;
 			$message_unread[$row['id_pm']] = $row['is_read'] == 0;
 			$message_labels[$row['id_pm']] = [];
@@ -2222,7 +2224,7 @@ function loadPMRecipientInfo($all_pms, &$recipients, $folder = '', $search = fal
  *
  * @param int[] $pms array of PM ids to fetch
  * @param string[] $orderBy raw query defining how to order the results
- * @return bool|\ElkArte\Database\AbstractResult
+ * @return AbstractResult
  * @package PersonalMessage
  */
 function loadPMSubjectRequest($pms, $orderBy)
@@ -2257,10 +2259,10 @@ function loadPMSubjectRequest($pms, $orderBy)
  * @param int[] $display_pms list of PM's to fetch
  * @param string $sort_by_query raw query used in the sorting option
  * @param string $sort_by used to signal when addition joins are needed
- * @param bool $descending if true descending order of display
- * @param int|string $display_mode how are they being viewed, all, conversation, etc
+ * @param bool $descending if true, descending order of display
+ * @param int|string $display_mode how are they being viewed, all, conversation, etc.
  * @param string $folder current pm folder
- * @return bool|\ElkArte\Database\AbstractResult
+ * @return bool|AbstractResult
  * @package PersonalMessage
  */
 function loadPMMessageRequest($display_pms, $sort_by_query, $sort_by, $descending, $display_mode = '', $folder = '')
@@ -2317,7 +2319,7 @@ function checkPMReceived($pmsg)
 }
 
 /**
- * Loads a pm by ID for use as a quoted pm in a new message
+ * Loads a PM by ID for use as a quoted PM in a new message
  *
  * @param int $pmsg
  * @param bool $isReceived
@@ -2355,7 +2357,7 @@ function loadPMQuote($pmsg, $isReceived)
 }
 
 /**
- * For a given PM ID, loads all "other" recipients, (excludes the current member)
+ * For a given PM ID, loads all "other" recipients (excludes the current member)
  *
  * - Will optionally count the number of bcc recipients and return that count
  *
@@ -2388,7 +2390,7 @@ function loadPMRecipientsAll($pmsg, $bcc_count = false)
 		]
 	)->fetch_callback(
 		function ($row) use (&$recipients, &$hidden_recipients, $bcc_count, $scripturl) {
-			// If it's hidden we still don't reveal their names
+			// If it's hidden, we still don't reveal their names
 			if ($bcc_count && $row['bcc'])
 			{
 				$hidden_recipients++;
@@ -2418,7 +2420,7 @@ function loadPMRecipientsAll($pmsg, $bcc_count = false)
 /**
  * Simply loads a personal message by ID
  *
- * - Supplied ID must have been sent to the user id requesting it and it must not have been deleted
+ * - Supplied ID must have been sent to the user id requesting it, and it must not have been deleted
  *
  * @param int $pm_id
  *
@@ -2431,7 +2433,7 @@ function loadPersonalMessage($pm_id)
 {
 	$db = database();
 
-	// First, pull out the message contents, and verify it actually went to them!
+	// First, pull out the message contents and verify it actually went to them!
 	$request = $db->fetchQuery('
 		SELECT
 			pm.subject, pm.body, pm.msgtime, pm.id_member_from,
@@ -2478,7 +2480,7 @@ function numPMSeachResults($userQuery, $labelQuery, $timeQuery, $searchQuery, $s
 
 	$db = database();
 
-	// Get the amount of results.
+	// Get the number of results.
 	$request = $db->fetchQuery('
 		SELECT
 			COUNT(*)
@@ -2503,7 +2505,7 @@ function numPMSeachResults($userQuery, $labelQuery, $timeQuery, $searchQuery, $s
 }
 
 /**
- * Gets all the matching message ids, senders and head pm nodes, using standard search only (No caching and the like!)
+ * Gets all the matching message ids, senders, and head pm nodes, using standard search only (No caching and the like!)
  *
  * @param string $userQuery raw query, used if we are searching for specific users
  * @param string $labelQuery raw query, used if we are searching only specific labels

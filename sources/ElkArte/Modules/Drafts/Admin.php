@@ -1,7 +1,8 @@
 <?php
 
 /**
- * This file contains several functions for retrieving and manipulating calendar events, birthdays and holidays.
+ * This file contains several functions for retrieving and manipulating calendar events,
+ * birthdays, and holidays.
  *
  * @package   ElkArte Forum
  * @copyright ElkArte Forum contributors
@@ -23,7 +24,7 @@ use ElkArte\Modules\AbstractModule;
 /**
  * Class \ElkArte\Modules\Drafts\Admin
  *
- * Events and functions for post based drafts
+ * Events and functions for post-based drafts
  */
 class Admin extends AbstractModule
 {

@@ -89,7 +89,7 @@ class Display extends AbstractModule
 		if (!empty($messages))
 		{
 			require_once(SUBSDIR . '/Likes.subs.php');
-			$context['likes'] = loadLikes($messages, true);
+			$context['likes'] = loadLikes($messages);
 			theme()->getLayers()->addBefore('load_likes_button', 'body');
 		}
 	}

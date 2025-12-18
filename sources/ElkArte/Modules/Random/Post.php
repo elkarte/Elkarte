@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Random module is a collection of small stuff not worth it's own module.
+ * Random module is a collection of small stuff not worth its own module.
  *
  * @package   ElkArte Forum
  * @copyright ElkArte Forum contributors

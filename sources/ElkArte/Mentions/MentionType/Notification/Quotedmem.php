@@ -18,7 +18,7 @@ use ElkArte\Mentions\MentionType\AbstractNotificationMessage;
 /**
  * Class Quotedmem
  *
- * Handles mentioning of members whose messages has been quoted
+ * Handles mentioning of members whose messages have been quoted
  */
 class Quotedmem extends AbstractNotificationMessage
 {

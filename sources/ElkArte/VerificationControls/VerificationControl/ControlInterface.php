@@ -17,6 +17,8 @@
 
 namespace ElkArte\VerificationControls\VerificationControl;
 
+use ElkArte\Sessions\SessionIndex;
+
 /**
  * A simple interface that defines all the methods any "Control_Verification"
  * class MUST have because they are used in the process of creating the verification
@@ -26,7 +28,7 @@ interface ControlInterface
 	/**
 	 * Used to build the control and return if it should be shown or not
 	 *
-	 * @param \ElkArte\Sessions\SessionIndex $sessionVal
+	 * @param SessionIndex $sessionVal
 	 * @param bool $isNew
 	 * @param bool $force_refresh
 	 *
@@ -37,7 +39,7 @@ interface ControlInterface
 	/**
 	 * Create the actual test that will be used
 	 *
-	 * @param \ElkArte\Sessions\SessionIndex $sessionVal
+	 * @param SessionIndex $sessionVal
 	 * @param bool $refresh
 	 *
 	 * @return void
@@ -48,10 +50,10 @@ interface ControlInterface
 	 * Prepare the context for use in the template.
 	 *
 	 * Required keys template => string, values => []
-	 * Template function must exist in VerificationControls,template
-	 * Will called as template_verification_control_' . 'template('id', 'values')
+	 * Template function must exist in VerificationControls.template
+	 * Will be called as template_verification_control_' . 'template('id', 'values')
 	 *
-	 * @param \ElkArte\Sessions\SessionIndex $sessionVal
+	 * @param SessionIndex $sessionVal
 	 *
 	 * @return void
 	 */
@@ -60,14 +62,14 @@ interface ControlInterface
 	/**
 	 * Run the test, return if it passed or not
 	 *
-	 * @param \ElkArte\Sessions\SessionIndex $sessionVal
+	 * @param SessionIndex $sessionVal
 	 *
 	 * @return string|bool
 	 */
 	public function doTest($sessionVal);
 
 	/**
-	 * If the control has a visible location on the template or if its hidden
+	 * If the control has a visible location on the template or if it's hidden
 	 *
 	 * @return bool
 	 */

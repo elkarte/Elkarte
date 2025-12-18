@@ -73,7 +73,7 @@ class Mentioning extends AbstractModel
 	 * Inserts a new mention.
 	 *
 	 * @param NotificationInterface $mention_obj The object that knows how to store the mention in the database
-	 * @param array $data must contain uid, type and msg at a minimum
+	 * @param array $data must contain uid, type, and msg at a minimum
 	 *
 	 * @return int[]
 	 */
@@ -109,7 +109,7 @@ class Mentioning extends AbstractModel
 	/**
 	 * Prepares the data sent to Mentioning::create to be ready for the actual insert.
 	 *
-	 * @param array $data must contain uid, type and msg at a minimum
+	 * @param array $data must contain uid, type, and msg at a minimum
 	 *
 	 * @return array
 	 */
@@ -187,7 +187,7 @@ class Mentioning extends AbstractModel
 	}
 
 	/**
-	 * Updates the mention count as a result of an action, read, new, delete, etc
+	 * Updates the mention count as a result of an action, read, new, delete, etc.
 	 *
 	 * @param int $status
 	 * @param int $member_id
@@ -207,7 +207,7 @@ class Mentioning extends AbstractModel
 		{
 			updateMemberData($member_id, ['mentions' => '-']);
 		}
-		// Deleting or un-approving may have been read or not, so a count is required
+		// Deleting or unapproving may have been read or not, so a count is required
 		else
 		{
 			countUserMentions(false, '', $member_id);
@@ -217,7 +217,7 @@ class Mentioning extends AbstractModel
 	/**
 	 * Did you read the mention? Then let's move it to the graveyard.
 	 * Used in Display.controller.php, it may be merged to action_updatestatus
-	 * though that would require to add an optional parameter to avoid the redirect
+	 * though that would require adding an optional parameter to avoid the redirect
 	 *
 	 * @param int|int[] $mention_id
 	 * @return bool if successfully changed or not
@@ -245,7 +245,7 @@ class Mentioning extends AbstractModel
 			{
 				case 'read':
 				case 'readall':
-					return $this->_changeStatus($own_id, 'read');
+					return $this->_changeStatus($own_id);
 				case 'unread':
 					return $this->_changeStatus($own_id, 'new');
 				case 'delete':
@@ -293,9 +293,9 @@ class Mentioning extends AbstractModel
 	/**
 	 * Changes a specific mention status for a member.
 	 *
-	 * - Can be used to mark as read, new, deleted, etc
-	 * - note that delete is a "soft-delete" because otherwise anyway we have to remember
-	 * - when a user was already mentioned for a certain message (e.g. in case of editing)
+	 * - Can be used to mark as read, new, deleted, etc.
+	 * - Note that delete is a "soft-delete" because otherwise anyway we have to remember
+	 * - When a user was already mentioned for a certain message (e.g., in case of editing)
 	 *
 	 * @param int|int[] $id_mentions the mention(s) id in the db
 	 * @param string $status status to update, 'new', 'read', 'deleted', 'unapproved'

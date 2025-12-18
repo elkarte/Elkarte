@@ -39,7 +39,7 @@ abstract class AbstractDomParser
 	/**
 	 * For a given node, checks if it is anywhere nested inside a code block
 	 *
-	 *  - Prevents converting anything that's inside a code block
+	 *  - Prevents converting anything inside a code block
 	 *
 	 * @param object $node
 	 * @param bool $internalParser
@@ -104,7 +104,7 @@ abstract class AbstractDomParser
 			libxml_use_internal_errors($current);
 			libxml_clear_errors();
 		}
-		// Or using the external simple html parser
+		// Or using the external simple HTML parser
 		else
 		{
 			$this->document = str_get_html($html, true, true, 'UTF-8', false);
@@ -112,7 +112,7 @@ abstract class AbstractDomParser
 	}
 
 	/**
-	 * Returns just the body of a html document such that we are not dealing with head
+	 * Returns just the body of a HTML document such that we are not dealing with head
 	 * and any above head markup.  multipart/mixed may have multiple sections that we concatenate
 	 *
 	 * @param $text
@@ -131,7 +131,7 @@ abstract class AbstractDomParser
 			return implode("\n", $bodies[1]);
 		}
 
-		// Parsers may have clipped the ending body or html tag off with the quote/signature
+		// Parsers may have clipped the ending body or HTML tag off with the quote/signature
 		if (preg_match('~<body[^>]*?>(.*)~su', $text, $bodies))
 		{
 			return $bodies[1];
@@ -148,7 +148,7 @@ abstract class AbstractDomParser
 	 */
 	public function getDOMBodyNode()
 	{
-		// First remove any head node
+		// First, remove any head node
 		$this->_removeHeadNode();
 
 		// The body of the HTML is where it's at.
@@ -190,7 +190,7 @@ abstract class AbstractDomParser
 	}
 
 	/**
-	 * Breaks a string up so its no more than width characters long
+	 * Breaks a string up so it's no more than width characters long
 	 *
 	 * - Will break at word boundaries
 	 * - If no natural space is found will break mid-word
@@ -220,14 +220,14 @@ abstract class AbstractDomParser
 
 			while (!empty($string))
 			{
-				// Get the next #width characters before a break (space, punctuation tab etc.)
+				// Get the next #width characters before a break (space, punctuation tab, etc.)
 				if (preg_match('~^(.{1,' . $width . '})(?:\s|$|,|\.)~u', $string, $matches))
 				{
 					// Add the #width to the output and set up for the next pass
 					$lines[] = ($in_quote && $matches[1][0] !== '>' ? '> ' : '') . $matches[1];
 					$string = Util::substr($string, Util::strlen($matches[1]));
 				}
-				// Humm just a long word with no place to break, so we simply cut it after width characters
+				// Hum, just a long word with no place to break, so we simply cut it after width characters
 				else
 				{
 					$lines[] = ($in_quote && $string[0] !== '>' ? '> ' : '') . Util::substr($string, 0, $width);
@@ -236,7 +236,7 @@ abstract class AbstractDomParser
 			}
 		}
 
-		// Join it all the shortened sections up on our break characters
+		// Join it all the shortened sections on our break characters
 		return implode($break, $lines);
 	}
 
@@ -412,7 +412,7 @@ abstract class AbstractDomParser
 	}
 
 	/**
-	 * Gets the inner html of a node
+	 * Gets the inner HTML of a node
 	 *
 	 * @param \DOMNode|object $node
 	 * @return string
@@ -434,7 +434,7 @@ abstract class AbstractDomParser
 	}
 
 	/**
-	 * Gets the outer html of a node
+	 * Gets the outer HTML of a node
 	 *
 	 * @param \DOMNode|object $node
 	 * @return string
@@ -445,7 +445,7 @@ abstract class AbstractDomParser
 	}
 
 	/**
-	 * Gets the inner html of a node
+	 * Gets the inner HTML of a node
 	 *
 	 * @param \DOMNode|object $node
 	 * @return string

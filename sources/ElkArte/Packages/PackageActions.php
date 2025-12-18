@@ -42,19 +42,19 @@ class PackageActions extends AbstractController
 	/** @var array The actions that must be completed to install a package */
 	public $ourActions = [];
 
-	/** @var bool If any of the steps will fail to complete */
+	/** @var bool If any of the steps fail to complete */
 	public $has_failure = false;
 
 	/** @var string Details of what the failure entails */
 	public $failure_details;
 
-	/** @var array Available during the install phase, holds what when wrong and where */
+	/** @var array Available during the installation phase, holds what when wrong and where */
 	public $failed_steps = [];
 
 	/** @var array Other themes found that this addon can be installed in */
 	public $themeFinds;
 
-	/** @var array Created during install for use in addPackageLog */
+	/** @var array Created during installation for use in addPackageLog */
 	public $credits_tag = [];
 
 	/** @var array Passed actions from parsePackageInfo */
@@ -63,7 +63,7 @@ class PackageActions extends AbstractController
 	/** @var string Passed base path value for the package location within the temp directory */
 	protected $_base_path;
 
-	/** @var bool Passed value to indicate if this is an install or uninstall pass */
+	/** @var bool Passed value to indicate if this is an installation or uninstall pass */
 	protected $_uninstalling;
 
 	/** @var array Passed array of theme paths */
@@ -116,10 +116,10 @@ class PackageActions extends AbstractController
 		$this->_base_path = $base_path;
 		$this->_theme_paths = $theme_paths;
 
-		// Run the test install, looking for problems
+		// Run the test installation, looking for problems
 		$this->action_test();
 
-		// Cleanup the chmod array
+		// Clean up the chmod array
 		$this->chmod_files = array_unique($this->chmod_files);
 		$this->chmod_files = array_values(array_filter($this->chmod_files));
 	}
@@ -135,7 +135,7 @@ class PackageActions extends AbstractController
 		// Generic subs for this controller
 		require_once(SUBSDIR . '/Package.subs.php');
 
-		// Oh my
+		// Oh, my
 		$subActions = [
 			'chmod' => [$this, 'action_chmod'],
 			'license' => [$this, 'action_readme'],
@@ -177,7 +177,7 @@ class PackageActions extends AbstractController
 
 			$subAction = $action->initialize($subActions, $this->_action['type'], '');
 
-			// Lets just do it!
+			// Let's just do it!
 			$action->dispatch($subAction);
 
 			// Loop collector
@@ -186,7 +186,7 @@ class PackageActions extends AbstractController
 	}
 
 	/**
-	 * Test install loop collector
+	 * Test installation loop collector
 	 */
 	private function _action_our_actions(): void
 	{
@@ -236,7 +236,7 @@ class PackageActions extends AbstractController
 			}
 		}
 
-		// Over-write existing description if we have an error
+		// Overwrite the existing description if we have an error
 		if (empty($this->thisAction['description']))
 		{
 			$this->thisAction['description'] = $this->_action['description'] ?? '';
@@ -246,7 +246,7 @@ class PackageActions extends AbstractController
 	}
 
 	/**
-	 * Called from the packages.controller as part of the "install" phase
+	 * Called from the packages controller as part of the "install" phase
 	 *
 	 * @param array $actions set of actions as defined by parsePackageInfo
 	 * @param bool $uninstalling Yea or Nay
@@ -308,7 +308,7 @@ class PackageActions extends AbstractController
 
 			$subAction = $action->initialize($subActions, $this->_action['type'], '');
 
-			// Lets just do it!
+			// Let's just do it!
 			$action->dispatch($subAction);
 		}
 	}
@@ -360,7 +360,7 @@ class PackageActions extends AbstractController
 	}
 
 	/**
-	 * Noted for test, handled in the real install
+	 * Noted for test, handled in the real installation
 	 */
 	public function action_redirect(): void
 	{
@@ -402,7 +402,7 @@ class PackageActions extends AbstractController
 	{
 		global $context, $txt;
 
-		// Can't find the file, thats a failure !
+		// Can't find the file, that's a failure!
 		if (!$this->fileFunc->fileExists(BOARDDIR . '/packages/temp/' . $this->_base_path . $this->_action['filename']))
 		{
 			$this->has_failure = true;
@@ -470,7 +470,7 @@ class PackageActions extends AbstractController
 	 */
 	private function _get_filename($mod_action, $key): void
 	{
-		// Lets get the last section of the file name.
+		// Let's get the last section of the file name.
 		if (isset($mod_action['filename']) && !str_ends_with($mod_action['filename'], '.template.php'))
 		{
 			$this->_actual_filename = strtolower(substr(strrchr($mod_action['filename'], '/'), 1) . '||' . $this->_action['filename']);
@@ -581,10 +581,10 @@ class PackageActions extends AbstractController
 	}
 
 	/**
-	 * A code file that needs to be run during the install phase
+	 * A code file that needs to be run during the installation phase
 	 *
 	 * <code></code> or <code /> (for use with type="file" only)
-	 * Filename of a php file to be required.
+	 * Filename of a PHP file to be required.
 	 */
 	public function action_code(): void
 	{
@@ -597,7 +597,7 @@ class PackageActions extends AbstractController
 	}
 
 	/**
-	 * Database actions that need to occur during the install phase
+	 * Database actions that need to occur during the installation phase
 	 *
 	 * <database></database> or <database /> (for use with type="file" only)
 	 * Filename of a database code to be executed.
@@ -647,7 +647,7 @@ class PackageActions extends AbstractController
 	}
 
 	/**
-	 * Credits that will be added to the about area
+	 * Credits that will be added to the "about" area
 	 */
 	public function action_credits(): void
 	{
@@ -660,9 +660,9 @@ class PackageActions extends AbstractController
 	}
 
 	/**
-	 * Checks if this addon relies on other addons to be installed
+	 * Checks if this addon relies on other addons to be installed requires
 	 */
-	public function action_requries(): void
+	public function action_requires(): void
 	{
 		global $txt;
 
@@ -707,7 +707,7 @@ class PackageActions extends AbstractController
 			'action' => Util::htmlspecialchars(strtr($this->_action['destination'], [BOARDDIR => '.']))
 		];
 
-		// Could this be theme related?
+		// Could this be theme-related?
 		if (!empty($this->_action['unparsed_destination']))
 		{
 			$this->_check_theme_actions($this->_action['unparsed_destination']);
@@ -733,12 +733,12 @@ class PackageActions extends AbstractController
 				$this->_action['unparsed_destination'] = $this->_action['unparsed_filename'];
 			}
 
-			// If it's not auto do we think we have something we can act upon?
+			// If it's not auto, do we think we have something we can act upon?
 			if ($theme_action !== 'auto' && !in_array($matches[1], ['languagedir', 'languages_dir', 'imagesdir', 'themedir']))
 			{
 				$theme_action = '';
 			}
-			// ... or if it's auto do we even want to do anything?
+			// ... or if it's an auto, do we even want to do anything?
 			elseif ($theme_action === 'auto' && $matches[1] !== 'imagesdir')
 			{
 				$theme_action = '';
@@ -786,7 +786,7 @@ class PackageActions extends AbstractController
 			'action' => Util::htmlspecialchars(strtr($this->_action['filename'], [BOARDDIR => '.']))
 		];
 
-		// Could this be theme related?
+		// Could this be theme-related?
 		if (!empty($this->_action['unparsed_filename']))
 		{
 			$this->_check_theme_actions($this->_action['unparsed_filename'], true);
@@ -826,7 +826,7 @@ class PackageActions extends AbstractController
 	}
 
 	/**
-	 * Runs a code file that was supplied with the addon
+	 * Runs a code file supplied with the addon
 	 */
 	public function action_code2(): void
 	{
@@ -860,7 +860,7 @@ class PackageActions extends AbstractController
 	}
 
 	/**
-	 * Do the actual add or removal of hooks
+	 * Do the actual adding or removal of hooks
 	 */
 	public function action_hook2(): void
 	{
@@ -882,7 +882,7 @@ class PackageActions extends AbstractController
 	 */
 	public function action_database2(): void
 	{
-		// Only do the database changes on uninstall if requested.
+		// Only do the database changes on uninstallation if requested.
 		if (!empty($this->_action['filename']) && (!$this->_uninstalling || !empty(HttpReq::instance()->post->do_db_changes)))
 		{
 			// These can also be there for database changes.

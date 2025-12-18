@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Standard non full index, non custom index search
+ * Standard non-full index, non-custom index search
  *
  * @package   ElkArte Forum
  * @copyright ElkArte Forum contributors
@@ -16,7 +16,6 @@
 
 namespace ElkArte\Search\API;
 
-use ElkArte\Database\AbstractResult;
 use ElkArte\Search\Cache\Session;
 use Exception;
 
@@ -31,7 +30,7 @@ class Standard extends AbstractAPI
 	public $version_compatible = 'ElkArte 2.0 dev';
 
 	/** @var string This won't work with versions of ElkArte less than this. */
-	public $min_elk_version = 'ElkArte 1.0 Beta';
+	public $min_elk_version = 'ElkArte 2.0 Beta 1';
 
 	/** @var bool Standard search is supported by default. */
 	public $is_supported = true;
@@ -253,7 +252,7 @@ class Standard extends AbstractAPI
 	/**
 	 * Build the search relevance query
 	 *
-	 * @param null|array $factors - is factors are specified that array will
+	 * @param null|array $factors - if factors are specified, that array will
 	 * be used to build the relevance value, otherwise the function will use
 	 * $this->_weight_factors
 	 *
@@ -312,7 +311,7 @@ class Standard extends AbstractAPI
 	 *        'group_by' => string[] - the fields to group by
 	 *        'parameters' => mixed[] - any parameter required by the query
 	 * @param string $query_identifier - a string to identify the query
-	 * @param bool $use_old_ids - if true the topic ids retrieved by a previous
+	 * @param bool $use_old_ids - if true, the topic ids retrieved by a previous
 	 * call to this function will be used to identify duplicates
 	 *
 	 * @return int - the number of rows affected by the query
@@ -338,7 +337,7 @@ class Standard extends AbstractAPI
 			$main_query['parameters']
 		);
 
-		// If the database doesn't support IGNORE to make this fast we need to do some tracking.
+		// If the database doesn't support IGNORE to make this fast, we need to do some tracking.
 		if (!$this->_db->support_ignore())
 		{
 			$inserts = [];
@@ -368,11 +367,9 @@ class Standard extends AbstractAPI
 			// Now put them in!
 			if (!empty($inserts))
 			{
-				$query_columns = [];
-				foreach ($main_query['select'] as $k => $v)
-				{
-					$query_columns[$k] = 'int';
-				}
+				$query_columns = array_map(static function () {
+					return 'int';
+				}, $main_query['select']);
 
 				$this->_db->insert('',
 					'{db_prefix}log_search_results',
@@ -476,7 +473,7 @@ class Standard extends AbstractAPI
 			}
 		}
 
-		// We building an index?
+		// Are we building an index?
 		if ($this->useWordIndex())
 		{
 			$indexedResults = $this->_prepare_word_index($id_search);
@@ -561,7 +558,7 @@ class Standard extends AbstractAPI
 
 		call_integration_hook('integrate_main_search_query', [&$main_query]);
 
-		// Did we either get some indexed results, or otherwise did not do an indexed query?
+		// Did we either get some indexed results or otherwise did not do an indexed query?
 		if (!empty($indexedResults) || !$this->useWordIndex())
 		{
 			$main_query['select']['relevance'] = $this->_build_relevance($main_query['weights']);
@@ -790,7 +787,7 @@ class Standard extends AbstractAPI
 	}
 
 	/**
-	 * Determine whether or not to use the word index for search query
+	 * Determine whether to use the word index for search query
 	 *
 	 * @return bool Return true if word index should be used, otherwise false
 	 */
@@ -939,7 +936,7 @@ class Standard extends AbstractAPI
 				'num_matches' => $row['num_matches'],
 				'matches' => [],
 			];
-			// By default they didn't participate in the topic!
+			// By default, they didn't participate in the topic!
 			$participants[$row['id_topic']] = false;
 		}
 

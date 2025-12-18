@@ -61,7 +61,7 @@ final class Request
 
 	/**
 	 * Private constructor.
-	 * It parses PHP server variables, and initializes its variables.
+	 * It parses PHP server variables and initializes its variables.
 	 */
 	private function __construct()
 	{
@@ -70,7 +70,7 @@ final class Request
 		// Client IP: REMOTE_ADDR, unless missing
 		$this->_getClientIP();
 
-		// Second IP, guesswork it is, try to get the best IP we can, when using proxies or such
+		// Second IP, guesswork it is, try to get the best IP we can when using proxies or such
 		$this->_getBanIP();
 
 		// Keep compatibility with the uses of $_SERVER['REMOTE_ADDR']...
@@ -265,7 +265,7 @@ final class Request
 	}
 
 	/**
-	 * Clean the request variables - add html entities to GET.
+	 * Clean the request variables - add HTML entities to GET.
 	 *
 	 * What it does:
 	 *
@@ -302,7 +302,7 @@ final class Request
 		{
 			$_SERVER['REQUEST_URL'] = $this->_scripturl . (empty($this->_server_query_string) ? '' : '?' . $this->_server_query_string);
 		}
-		elseif (preg_match('~^([^/]+//[^/]+)~', $this->_scripturl, $match) == 1)
+		elseif (preg_match('~^([^/]+//[^/]+)~', $this->_scripturl, $match) === 1)
 		{
 			$_SERVER['REQUEST_URL'] = $match[1] . $_SERVER['REQUEST_URI'];
 		}
@@ -319,12 +319,12 @@ final class Request
 	 *
 	 * - No magic quotes allowed
 	 * - Don't try to set a GLOBALS key in globals
-	 * - No numeric keys in $_GET, $_POST or $_FILE
+	 * - No numeric keys in $_GET, $_POST, or $_FILE
 	 * - No URL's appended to the query string
 	 */
 	private function _checkExit(): void
 	{
-		// Save some memory.. (since we don't use these anyway.)
+		// Save some memory... (since we don't use these anyway.)
 		unset($GLOBALS['HTTP_POST_VARS'], $GLOBALS['HTTP_POST_VARS'], $GLOBALS['HTTP_POST_FILES'], $GLOBALS['HTTP_POST_FILES']);
 
 		// These keys shouldn't be set...ever.
@@ -336,7 +336,7 @@ final class Request
 			$_SERVER['QUERY_STRING'] = getenv('QUERY_STRING');
 		}
 
-		// It seems that sticking a URL after the query string is mighty common, well, it's evil - don't.
+		// It seems that sticking a URL after the query string is mighty common; well, it's evil - don't.
 		if (str_starts_with($_SERVER['QUERY_STRING'], 'http'))
 		{
 			Headers::instance()
@@ -366,7 +366,7 @@ final class Request
 			throw new Exceptions\Exception('Invalid request variable.', false);
 		}
 
-		// Same goes for numeric keys.
+		// The same goes for numeric keys.
 		foreach (array_merge(array_keys($_POST), array_keys($_GET), array_keys($_FILES)) as $key)
 		{
 			if (is_numeric($key))
@@ -463,9 +463,9 @@ final class Request
 
 	/**
 	 * Parse the $_REQUEST, for always necessary data, such as 'action', 'board', 'topic', 'start'.
-	 * Also figures out if this is a xml request.
+	 * Also figures out if this is an XML request.
 	 *
-	 * - Parse the request for our dear globals, I know they're in there somewhere...
+	 * - Parse the request for our dear globals; I know they're in there somewhere...
 	 */
 	public function parseRequest(): void
 	{

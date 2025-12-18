@@ -541,17 +541,17 @@ function countConfiguredMemberOptions()
  * Deletes all outdated options from the themes table
  *
  * @param int|string $theme : if int to remove option from a specific theme,
- *              if string it can be:
+ *              If string it can be:
  *               - 'default' => to remove from the default theme
  *               - 'custom' => to remove from all the custom themes
  *               - 'all' => to remove from both default and custom
  * @param int|string $membergroups : if int a specific member
- *              if string a "group" of members and it can assume the following values:
+ *              If string a "group" of members, and it can assume the following values:
  *               - 'guests' => obviously guests,
- *               - 'members' => all members with custom settings (i.e. id_member > 0)
- *               - 'non_default' => guests and members with custom settings (i.e. id_member != 0)
+ *               - 'members' => all members with custom settings (i.e., id_member > 0)
+ *               - 'non_default' => guests and members with custom settings (i.e., id_member != 0)
  *               - 'all' => any record
- * @param string[]|string $old_settings can be a string or an array of strings. If empty deletes all settings.
+ * @param string[]|string $old_settings can be a string or an array of strings. If empty, deletes all settings.
  */
 function removeThemeOptions($theme, $membergroups, $old_settings = '')
 {
@@ -586,7 +586,7 @@ function removeThemeOptions($theme, $membergroups, $old_settings = '')
 	{
 		$query_param += ['member_operator' => '>', 'member' => 0];
 	}
-	// Non default settings id_member != 0 (that is different from id_member > 0)
+	// Non-default settings id_member != 0 (that is different from id_member > 0)
 	elseif ($membergroups === 'non_default')
 	{
 		$query_param += ['member_operator' => '!=', 'member' => 0];
@@ -611,7 +611,7 @@ function removeThemeOptions($theme, $membergroups, $old_settings = '')
 	{
 		$var = 'variable = {string:old_settings}';
 	}
-	// If empty then means any setting
+	// If empty, then means any setting
 	else
 	{
 		$var = '1=1';
@@ -742,7 +742,7 @@ function nextTheme()
 	list ($id_theme) = $result->fetch_row();
 	$result->free_result();
 
-	// This will be theme number...
+	// This will be the theme number...
 	$id_theme++;
 
 	return $id_theme;
@@ -817,7 +817,7 @@ function deleteVariants($id)
 
 /**
  * Loads all the theme variable/value pairs for a member or group of members
- * If supplied a variable array it will only load / return those values
+ * If supplied a variable array, it will only load / return those values
  *
  * @param int|int[] $theme
  * @param int|int[]|null $memID
@@ -860,11 +860,11 @@ function loadThemeOptionsInto($theme, $memID = null, $options = [], $variables =
 }
 
 /**
- * Used when installing a theme that is based off an existing theme (an therefore is dependant on)
- * Returns based-on theme directory values needed by the install function in ManageThemes.controller
+ * Used when installing a theme that is based off an existing theme (and therefore is dependent on)
+ * Returns based-on theme directory values needed by the installation function in ManageThemes.controller
  *
  * @param string $based_on name of theme this is based on, will do a LIKE search
- * @param bool $explicit_images Don't worry its not like it sounds !
+ * @param bool $explicit_images Don't worry, it's not like it sounds!
  * @return array
  * @todo may be merged with something else?
  */

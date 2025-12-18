@@ -46,7 +46,7 @@ class Admin extends AbstractController
 		'zend', 'apc', 'memcache', 'memcached', 'opcache'];
 
 	/**
-	 * Pre Dispatch, called before other methods.
+	 * Pre-dispatch, called before other methods.
 	 *
 	 * - Loads integration hooks
 	 */
@@ -754,7 +754,7 @@ class Admin extends AbstractController
 
 		// Setup for the template
 		$context['search_type'] = $subAction;
-		$context['search_term'] = $this->_req->getPost('search_term', 'trim|\\ElkArte\\Helper\\Util::htmlspecialchars[ENT_QUOTES]');
+		$context['search_term'] = $this->_req->getPost('search_term', 'trim|Util::htmlspecialchars[ENT_QUOTES]');
 		$context['sub_template'] = 'admin_search_results';
 		$context['page_title'] = $txt['admin_search_results'];
 

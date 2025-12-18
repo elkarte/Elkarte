@@ -14,7 +14,6 @@ namespace ElkArte;
 use BBC\ParserWrapper;
 use ElkArte\Cache\Cache;
 use ElkArte\Database\QueryInterface;
-use ElkArte\Exceptions\Exception;
 use ElkArte\Helper\Util;
 use ElkArte\Helper\ValuesContainer;
 
@@ -85,7 +84,7 @@ class MembersList
 	}
 
 	/**
-	 * Loads a guest member (i.e. some standard data for guests)
+	 * Loads a guest member (i.e., some standard data for guests)
 	 */
 	public static function loadGuest(): void
 	{
@@ -99,6 +98,10 @@ class MembersList
 
 	/**
 	 * Returns the Member object of the requested (numeric) $id
+	 *
+	 * Important: get() always returns something. If the ID isn’t
+	 * found in the already-loaded member list, it returns a
+	 * fallback “empty” object rather than null/false.
 	 *
 	 * @param int $id Member id to retrieve and return
 	 * @return ValuesContainer
@@ -138,7 +141,7 @@ class MembersList
 	}
 
 	/**
-	 * Unloads a \ElkArte\Member object from the list to allow to free some memory.
+	 * Unloads a \ElkArte\Member object from the list to allow freeing some memory.
 	 *
 	 * @param int $id id of the member
 	 */

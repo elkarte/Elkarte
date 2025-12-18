@@ -22,7 +22,7 @@ use ElkArte\Helper\Util;
  */
 class MetadataIntegrate
 {
-	/** @var array data from the post renderer */
+	/** @var array data from the post-renderer */
 	public $data;
 
 	/** @var array attachment data from AttachmentsDisplay Controller */
@@ -70,7 +70,7 @@ class MetadataIntegrate
 		$meta = new self();
 		$start = $context['start'] ?? $start;
 
-		// Load in the post data if available
+		// Load in the post-data if available
 		$meta->data = $meta->initPostData($start);
 		$meta->attachments = $meta->data['attachments'] ?? [];
 		$meta->ila = $meta->data['ila'] ?? [];
@@ -125,7 +125,7 @@ class MetadataIntegrate
 
 		$smd = [];
 
-		// If this is a topic, and we are on the first page (so we can get first post data)
+		// If this is a topic, and we are on the first page (so we can get first post-data)
 		if (!empty($topic)
 			&& $start === 0
 			&& (!empty($context['get_message'][0]) && is_object($context['get_message'][0])))
@@ -137,7 +137,7 @@ class MetadataIntegrate
 			// Tell the template to reset, or it will miss the first post!
 			$context['reset_renderer'] = true;
 
-			// Create a short body, leaving some very basic html
+			// Create a short body, leaving some very basic HTML
 			$smd['raw_body'] = trim(strip_tags($smd['body']));
 			$smd['html_body'] = trim(strip_tags($smd['body'], '<br><strong><em><blockquote>'));
 			$smd['html_body'] = str_replace(["\n", "\t"], '', $smd['html_body']);
@@ -189,7 +189,7 @@ class MetadataIntegrate
 	/**
 	 * Function to return the sites logo url
 	 *
-	 * @return array width, height and html safe logo url
+	 * @return array width, height, and HTML safe logo url
 	 */
 	private function getLogo(): array
 	{
@@ -213,7 +213,7 @@ class MetadataIntegrate
 	}
 
 	/**
-	 * Build and return the article schema.  This is intended for use when displaying  a topic.
+	 * Build and return the article schema. This is intended for use when displaying a topic.
 	 *
 	 * @return array
 	 */
@@ -293,7 +293,7 @@ class MetadataIntegrate
 
 	/**
 	 * Checks the post for any attachments to use as an image.  Will use the
-	 * first below post attachment, failing that the first ILA, failing that nothing
+	 * first below post-attachment, failing that the first ILA, failing that nothing
 	 *
 	 * @return array
 	 */
@@ -429,7 +429,7 @@ class MetadataIntegrate
 	/**
 	 * Basic OG Metadata to insert in to the <head></head> element.  See https://ogp.me
 	 *
-	 * This will generate *basic* og metadata, suitable for FB/Meta website/post sharing.
+	 * This will generate *basic* og metadata, suitable for FB/Meta website/post-sharing.
 	 *
 	 * og:title - The title of your article without any branding (site name)
 	 * og:type - The type of your object, e.g., "website".
@@ -449,7 +449,7 @@ class MetadataIntegrate
 		$logo = $this->getLogo();
 		$attach = $this->getAttachment();
 
-		// If on a post page, with attachments, use it vs a site logo
+		// If on a post page, with attachments, use it vs. a site logo
 		if (isset($attach['url']))
 		{
 			$logo[2] = $attach['url'];

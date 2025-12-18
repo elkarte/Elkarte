@@ -24,7 +24,7 @@ namespace BBC;
  */
 class BBCParser
 {
-	/** The max number of iterations to perform while solving for out of order attributes */
+	/** The max number of iterations to perform while solving for out-of-order attributes */
 	public const MAX_PERMUTE_ITERATIONS = 5040;
 
 	/** @var string */
@@ -253,7 +253,7 @@ class BBCParser
 				$this->pos = strlen($this->message) + 1;
 			}
 
-			// Can't have a one letter smiley, URL, or email! (sorry.)
+			// Can't have a one-letter smiley, URL, or email! (sorry.)
 			if ($this->last_pos < $this->pos - 1)
 			{
 				$this->betweenTags();
@@ -279,7 +279,7 @@ class BBCParser
 				continue;
 			}
 
-			// No tags for this character, so just keep going (fastest possible course.)
+			// No tags for this character, so just keep going (the fastest possible course.)
 			if (!isset($this->bbc_codes[$next_char]))
 			{
 				continue;
@@ -289,7 +289,7 @@ class BBCParser
 
 			if (isset($this->message[$this->pos + 2]) && $this->isItemCode($next_char) && $this->message[$this->pos + 2] === ']' && !$this->bbc->isDisabled('list') && !$this->bbc->isDisabled('li'))
 			{
-				// Itemcodes cannot be 0 and must be proceeded by a semi-colon, space, tab, new line, or greater than sign
+				// Itemcodes cannot be 0 and must be proceeded by a semicolon, space, tab, new line, or greater than sign
 				if (!($this->message[$this->pos + 1] === '0' && !in_array($this->message[$this->pos - 1], [';', ' ', "\t", "\n", '>'])))
 				{
 					// Item codes are complicated buggers... they are implicit [li]s and can make [list]s!
@@ -563,7 +563,7 @@ class BBCParser
 			return $data;
 		}
 
-		// Are we inside tags that should be auto linked?
+		// Are we inside tags that should be auto-linked?
 		if ($this->hasOpenTags())
 		{
 			foreach ($this->getOpenedTags() as $open_tag)
@@ -618,7 +618,7 @@ class BBCParser
 				break;
 			}
 
-			// The next character must be one of these or it's not a tag
+			// The next character must be one of these, or it's not a tag
 			if ($next_c !== ' ' && $next_c !== ']' && $next_c !== '=' && $next_c !== '/')
 			{
 				$last_check = $possible[Codes::ATTR_TAG];
@@ -653,7 +653,7 @@ class BBCParser
 			$this->can_cache = empty($tag[Codes::ATTR_NO_CACHE]);
 		}
 
-		// If its a footnote, keep track of the number
+		// If it's a footnote, keep track of the number
 		if (isset($tag[Codes::ATTR_TAG]) && $tag[Codes::ATTR_TAG] === 'footnote')
 		{
 			$this->num_footnotes++;
@@ -673,7 +673,7 @@ class BBCParser
 	 */
 	protected function alternateQuoteStyle(array &$tag): void
 	{
-		// Start with standard
+		// Start with a standard
 		$quote_alt = false;
 		$first_quote = 0;
 
@@ -687,13 +687,13 @@ class BBCParser
 			}
 		}
 
-		// First quote (of nested or single) receives a wrapper so its markup will be:
+		// The first quote (of nested or single) receives a wrapper, so its markup will be:
 		// <div class="quote-read-more"> .. relative
 		//		<input type="checkbox" class="quote-show-more">.. absolute over the below blockquote
 		//		<blockquote class="bbc_quote">
 		//			<cite>Peter Parker says</cite>
 		//			No man can win every battle, but no man should fall without a struggle.
-		//		</blockquote> .. with a max height that is removed on input click
+		//		</blockquote> .. with a max height removed on input click
 		// </div>
 		if ($first_quote === 0)
 		{
@@ -845,7 +845,7 @@ class BBCParser
 
 		$tag = $this->item_codes[$this->message[$this->pos + 1]];
 
-		// First let's set up the tree: it needs to be in a list, or after an li.
+		// First, let's set up the tree: it needs to be in a list, or after a li.
 		if ($this->inside_tag === null || (isset($this->inside_tag[Codes::ATTR_TAG]) && $this->inside_tag[Codes::ATTR_TAG] !== 'list' && $this->inside_tag[Codes::ATTR_TAG] !== 'li'))
 		{
 			$this->addOpenTag([
@@ -890,7 +890,7 @@ class BBCParser
 		$this->message = substr_replace($this->message, $tmp, $this->pos, 3);
 		$this->pos += strlen($tmp) - 1;
 
-		// Next, find the next break (if any.)  If there's more itemcode after it, keep it going - otherwise close!
+		// Next, find the next break (if any.) If there's more itemcode after it, keep it going - otherwise close!
 		$this->pos2 = strpos($this->message, '<br />', $this->pos);
 		$this->pos3 = strpos($this->message, '[/', $this->pos);
 
@@ -907,7 +907,7 @@ class BBCParser
 			$this->message = substr_replace($this->message, $replacement, $this->pos2, 0);
 			$this->open_tags[$num_open_tags - 2][Codes::ATTR_AFTER] = '</ul>';
 		}
-		// Tell the [list] that it needs to close specially.
+		// Tell the [list] that it needs to close specifically.
 		else
 		{
 			// Move the li over, because we're not sure what we'll hit.
@@ -1265,7 +1265,7 @@ class BBCParser
 		$data = substr($this->message, $this->last_pos, $this->pos - $this->last_pos);
 
 		// This happens when the pos is > last_pos and there is a trailing \n from one of the tags having "AFTER"
-		// In micro-optimization tests, using substr() here doesn't prove to be slower. This is much easier to read so leave it.
+		// In micro-optimization tests, using substr() here doesn't prove to be slower. This is much easier to read, so leave it.
 		if ($data === $this->smiley_marker)
 		{
 			return;
@@ -1397,14 +1397,14 @@ class BBCParser
 		// Tag setup for this loop
 		$this->tag_possible = $possible;
 
-		// Okay, this may look ugly and it is, but it's not going to happen much and it is the best way
+		// Okay, this may look ugly, and it is, but it's not going to happen much, and it is the best way
 		// of allowing any order of parameters but still parsing them right.
 		$message_stub = $this->messageStub();
 
 		// Set regex optional flags only if the param *is* optional and it *was not used* in this tag
 		$this->optionalParam($message_stub);
 
-		// If an addon adds many parameters we can exceed max_execution time, lets prevent that
+		// If an addon adds many parameters, we can exceed max_execution time, let's prevent that
 		// 5040 = 7, 40,320 = 8, (N!) etc
 		$max_iterations = self::MAX_PERMUTE_ITERATIONS;
 
@@ -1432,7 +1432,7 @@ class BBCParser
 	/**
 	 * Sorts the params so they are in a required to optional order.
 	 *
-	 * Supports the assumption that the params as defined in CODES is the preferred / common
+	 * Supports the assumption that the params as defined in CODES are the preferred / common
 	 * order they are found in, and inserted by, the editor toolbar.
 	 *
 	 * @return array
@@ -1442,7 +1442,7 @@ class BBCParser
 		$control_order = [];
 		$this->tag_possible['regex_keys'] = range(0, $this->tag_possible['regex_size']);
 
-		// Push optional params to the end of the stack but maintain current order of required ones
+		// Push optional params to the end of the stack but maintain the current order of required ones
 		foreach (array_keys($this->tag_possible['regex_keys']) as $index)
 		{
 			$control_order[$index] = $index;
@@ -1463,15 +1463,15 @@ class BBCParser
 	 *
 	 * What it does:
 	 *
-	 * - Sets the optional ()? flag only for optional params that were not actually used
+	 * - Sets the optional ()? flag only for optional params that were not used
 	 * - This makes the permutation function match all required *and* passed parameters
-	 * - Returns false if an non optional tag was not found
+	 * - Returns false if a non optional tag was not found
 	 *
 	 * @param string $message_stub
 	 */
 	protected function optionalParam($message_stub): void
 	{
-		// Set optional flag only if the param is optional and it was not used in this tag
+		// Set an optional flag only if the param is optional and it was not used in this tag
 		foreach ($this->tag_possible['optionals'] as $index => $optional)
 		{
 			// @todo more robust, and slower, check would be a preg_match on $possible['regex_cache'][$index]
@@ -1497,8 +1497,8 @@ class BBCParser
 	 *
 	 * What it does:
 	 *
-	 * - Given ' width=100 height=100 alt=image]....[/img]more text and [tags]...'
-	 * - Returns ' width=100 height=100 alt=image]....[/img]'
+	 * - Given ' width=100 height=100 alt=image]...[/img]more text and [tags]...'
+	 * - Returns ' width=100 height=100 alt=image]...[/img]'
 	 *
 	 * @return string
 	 */
@@ -1580,7 +1580,7 @@ class BBCParser
 	}
 
 	/**
-	 * @param string|bool $tag = false False closes the last open tag. Anything else finds that tag LIFO
+	 * @param string|bool $tag = false closes the last open tag. Anything else finds that tag LIFO
 	 *
 	 * @return mixed
 	 */
@@ -1598,6 +1598,8 @@ class BBCParser
 
 			return $return;
 		}
+
+		return null;
 	}
 
 	/**
@@ -1668,7 +1670,7 @@ class BBCParser
 
 	/**
 	 * Substitutes parameter attribute values in to the tag context
-	 * e.g. tag width={width} => tag width=300px
+	 * e.g., tag width={width} => tag width=300px
 	 *
 	 * @param array $possible
 	 * @param array $matches
@@ -1775,7 +1777,7 @@ class BBCParser
 			$n--;
 		}
 
-		// Close all the non block level tags so this tag isn't surrounded by them.
+		// Close all the non-block level tags so they don't surround this tag.
 		for ($i = count($this->open_tags) - 1; $i > $n; $i--)
 		{
 			$tmp = isset($this->open_tags[$i][Codes::ATTR_AFTER])
@@ -1786,7 +1788,7 @@ class BBCParser
 			$this->pos += $ot_strlen;
 			$this->pos1 += $ot_strlen;
 
-			// Trim or eat trailing stuff... see comment at the end of the big loop.
+			// Trim or eat trailing stuff... see the comment at the end of the big loop.
 			if (!empty($this->open_tags[$i][Codes::ATTR_BLOCK_LEVEL]) && substr_compare($this->message, '<br />', $this->pos, 6) === 0)
 			{
 				$this->message = substr_replace($this->message, '', $this->pos, 6);

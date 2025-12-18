@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This class provides many common file and directory functions such as creating directories, checking existence etc.
+ * This class provides many common file and directory functions such as creating directories, checking existence, etc.
  *
  * @package   ElkArte Forum
  * @copyright ElkArte Forum contributors
@@ -76,13 +76,13 @@ class FileFunctions
 			$mode = $this->isDir($item) ? 0755 : 0644;
 		}
 
-		// Make sure we have a form of 0777 or '777' or '0777' so its safe for intval '8'
+		// Make sure we have a form of 0777 or '777' or '0777' so it's safe for intval '8'
 		if (($mode % 10) >= 8)
 		{
 			$mode = decoct($mode);
 		}
 
-		// All numbers and outside octal range, safely convert to octal
+		// All numbers and outside the octal range, safely convert to octal
 		if (ctype_digit((string) $mode) && preg_match('~[8-9]~', $mode))
 		{
 			$mode = decoct($mode);
@@ -309,7 +309,7 @@ class FileFunctions
 		for ($i = $count - 1; $i >= 0; $i--)
 		{
 			$partialTree = $directory . DIRECTORY_SEPARATOR . implode('/', array_slice($tree, 0, $i + 1));
-			// If this exists, lets ensure it is a directory
+			// If this exists, let's ensure it is a directory
 			if (file_exists($partialTree))
 			{
 				if (!is_dir($partialTree))
@@ -372,7 +372,7 @@ class FileFunctions
 
 	/**
 	 * Recursively removes a directory and all files and subdirectories contained within.
-	 * Use with *caution*, it is thorough, destructive and irreversible.
+	 * Use with *caution*, it is thorough, destructive, and irreversible.
 	 *
 	 * @param string $path
 	 * @param bool $delete_dir if to remove the directory structure as well
@@ -429,11 +429,11 @@ class FileFunctions
 	{
 		$directory = '';
 
-		// If on Windows servers the first part of the path is the drive (e.g. "C:")
+		// If on Windows servers, the first part of the path is the drive (e.g. "C:")
 		if (str_starts_with(PHP_OS_FAMILY, 'Win'))
 		{
 			// Better be sure that the first part of the path is actually a drive letter...
-			// ...even if, I should check this in the admin page...isn't it?
+			// ...even if I should check this in the admin page...isn't it?
 			// ...NHAAA Let's leave space for users' complains! :P
 			if (preg_match('/^[a-z]:$/i', $tree[0]))
 			{

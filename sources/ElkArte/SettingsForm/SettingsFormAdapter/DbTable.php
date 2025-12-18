@@ -17,7 +17,17 @@ namespace ElkArte\SettingsForm\SettingsFormAdapter;
 /**
  * Class DbTable
  *
- * @package ElkArte\SettingsForm\SettingsFormAdapter
+ *  Saves settings data to a specified database table (insert new rows or replace existing ones).
+ *
+ *  <code>
+ *  // Example: insert a new row
+ *  $adapter = new DbTable();
+ *  $adapter->setTableName('my_settings_table');
+ *  $adapter->setIndexes(['id_setting']); // primary/unique key(s) for the table
+ *  $adapter->setEditId(-1); // -1 means "add a row"
+  *  // Set the values (e.g., via config vars), the key names of the vars are the table cols
+ *  $adapter->save();
+ *  </code>
  */
 class DbTable extends Db
 {
@@ -85,7 +95,7 @@ class DbTable extends Db
 		[$insertValues, $insertVars] = $this->sanitizeVars();
 		$update = false;
 
-		// Everything is now set so is this a new row or an edit?
+		// Everything is now set, so is this a new row or an edit?
 		if ($this->editId !== -1 && !empty($this->editName))
 		{
 			// Time to edit, add in the id col name, assumed to be primary/unique!

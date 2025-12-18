@@ -191,7 +191,7 @@ class SupportRegisterController extends ElkArteWebSupport
 		$_SESSION['just_registered'] = 0;
 
 		// Select login from the main page
-		$this->url('index.php');
+		$this->adminLogout();
 		$this->clickit('#button_login > a');
 		$this->assertEquals('Log in', $this->title());
 

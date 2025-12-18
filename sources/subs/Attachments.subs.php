@@ -36,8 +36,7 @@ use ElkArte\Themes\ThemeLoader;
  */
 function processAttachments($id_msg = 0)
 {
-	$processAttachments = new TemporaryAttachmentProcess();
-	return $processAttachments->processAttachments($id_msg);
+	return (new TemporaryAttachmentProcess())->processAttachments($id_msg);
 }
 
 /**
@@ -45,8 +44,8 @@ function processAttachments($id_msg = 0)
  *
  * What it does:
  *
- * - Checks for error codes in the error segment of the file array that is
- * created by PHP during the file upload.
+ * - Checks for error codes in the error segment of the file array that PHP
+ * creates during the file upload.
  *
  * @param int $attachID
  *
@@ -88,13 +87,13 @@ function doPHPUploadChecks($attachID)
 }
 
 /**
- * Create an attachment, with the given array of parameters.
+ * Create an attachment with the given array of parameters.
  *
  * What it does:
  *
  * - Adds any additional or missing parameters to $attachmentOptions.
  * - Renames the temporary file.
- * - Creates a thumbnail if the file is an image and the option enabled.
+ * - Creates a thumbnail if the file is an image and the option is enabled.
  *
  * @param array $attachmentOptions associative array of options
  *
@@ -109,7 +108,7 @@ function createAttachment(&$attachmentOptions)
 
 	$image = new Image($attachmentOptions['tmp_name']);
 
-	// If this is an image we need to set a few additional parameters.
+	// If this is an image, we need to set a few additional parameters.
 	$is_image = $image->isImageLoaded();
 	$size = $is_image ? $image->getImageDimensions() : [0, 0, 0];
 	list ($attachmentOptions['width'], $attachmentOptions['height']) = $size;
@@ -134,7 +133,7 @@ function createAttachment(&$attachmentOptions)
 		$attachmentOptions['file_hash'] = getAttachmentFilename($attachmentOptions['name'], 0, null, true);
 	}
 
-	// Assuming no-one set the extension let's take a look at it.
+	// Assuming no-one set the extension, let's take a look at it.
 	if (empty($attachmentOptions['fileext']))
 	{
 		$attachmentOptions['fileext'] = strtolower(strrpos($attachmentOptions['name'], '.') !== false ? substr($attachmentOptions['name'], strrpos($attachmentOptions['name'], '.') + 1) : '');
@@ -173,7 +172,7 @@ function createAttachment(&$attachmentOptions)
 		return false;
 	}
 
-	// Now that we have the attach id, let's rename this and finish up.
+	// Now that we have the attach_id, let's rename this and finish up.
 	$attachmentOptions['destination'] = getAttachmentFilename(basename($attachmentOptions['name']), $attachmentOptions['id'], $attachmentOptions['id_folder'], false, $attachmentOptions['file_hash']);
 	if (rename($attachmentOptions['tmp_name'], $attachmentOptions['destination']) && $is_image)
 	{
@@ -272,7 +271,7 @@ function createAttachment(&$attachmentOptions)
  * What it does:
  *
  * - This includes a check of the topic
- * - it only returns the attachment if it's indeed attached to a message in the topic given as parameter, and
+ * - It only returns the attachment if it's indeed attached to a message in the topic given as parameter, and
  * query_see_board...
  * - Must return the same array keys as getAvatar() and getAttachmentThumbFromTopic()
  *
@@ -320,7 +319,7 @@ function getAttachmentFromTopic($id_attach, $id_topic)
  * What it does:
  *
  * - This includes a check of the topic
- * - it only returns the attachment if it's indeed attached to a message in the topic given as parameter, and
+ * - It only returns the attachment if it's indeed attached to a message in the topic given as parameter, and
  * query_see_board...
  * - Must return the same array keys as getAvatar() & getAttachmentFromTopic
  *
@@ -360,7 +359,7 @@ function getAttachmentThumbFromTopic($id_attach, $id_topic)
 	{
 		$row = $request->fetch_assoc();
 
-		// If there is a hash then the thumbnail exists
+		// If there is a hash, then the thumbnail exists
 		if (!empty($row['file_hash']))
 		{
 			$attachmentData = [
@@ -469,17 +468,17 @@ function increaseDownloadCounter($id_attach)
  *
  * What it does:
  *
- * - supports input of GIF, JPG, PNG, BMP, WEBP and WBMP formats
- * - outputs png, jpg or webp based on best choice
- * - uses createThumbnail() to resize to max_width by max_height, and saves the result to a file.
- * - updates the database info for the member's avatar.
- * - returns whether the download and resize was successful.
+ * - Supports input of GIF, JPG, PNG, BMP, WEBP, and WBMP formats
+ * - Outputs png, jpg, or webp based on best choice
+ * - Uses createThumbnail() to resize to max_width by max_height, and saves the result to a file.
+ * - Updates the database info for the member's avatar.
+ * - Returns whether the download and resize were successful.
  *
  * @param string $temporary_path the full path to the temporary file
  * @param int $memID member ID
  * @param int $max_width
  * @param int $max_height
- * @return bool whether the download and resize was successful.
+ * @return bool whether the download and resize were successful.
  */
 function saveAvatar($temporary_path, $memID, $max_width, $max_height)
 {
@@ -569,7 +568,7 @@ function saveAvatar($temporary_path, $memID, $max_width, $max_height)
 		return true;
 	}
 
-	// Having a problem with image manipulation, rotation, resize, etc
+	// Having a problem with image manipulation, rotation, resize, etc.
 	$db->query('', '
 		DELETE FROM {db_prefix}attachments
 		WHERE id_attach = {int:current_attachment}',
@@ -596,7 +595,7 @@ function saveAvatar($temporary_path, $memID, $max_width, $max_height)
  */
 function url_image_size($url)
 {
-	// Can we pull this from the cache... please please?
+	// Can we pull this from the cache... please, please?
 	$temp = [];
 	if (Cache::instance()->getVar($temp, 'url_image_size-' . md5($url), 3600))
 	{
@@ -607,54 +606,37 @@ function url_image_size($url)
 	$extension = pathinfo($url_path, PATHINFO_EXTENSION);
 
 	// Set a RANGE to read
-	switch ($extension)
+	$range = match ($extension)
 	{
-		case 'jpg':
-		case 'jpeg':
-			// Size location block is variable, so we fetch a meaningful chunk
-			$range = 32768;
-			break;
-		case 'png':
-			// Size will be in the first 24 bytes
-			$range = 1024;
-			break;
-		case 'gif':
-			// Size will be in the first 10 bytes
-			$range = 1024;
-			break;
-		case 'bmp':
-			// Size will be in the first 32 bytes
-			$range = 1024;
-			break;
-		default:
-			// Read the entire file then, webp for example might have the exif at the end
-			$range = 0;
-	}
+		'jpg', 'jpeg' => 32768,
+		'png', 'gif', 'bmp' => 1024,
+		default => 0,
+	};
 
 	$image = new FsockFetchWebdata(['max_length' => $range]);
 	$image->get_url_data($url);
 
-	// The server may not understand Range: so lets try to fetch the entire thing
+	// The server may not understand Range: so let's try to fetch the entire thing
 	// assuming we were not simply turned away and did not already try
-	if ($range !== 0 && $image->result('code') != 200 && $image->result('code') != 403)
+	if ($range !== 0 && $image->result('code') !== 200 && $image->result('code') !== 403)
 	{
 		$image = new FsockFetchWebdata([]);
 		$image->get_url_data($url);
 	}
 
-	// Here is the data, getimagesizefromstring does not care if its a complete image, it only
+	// Here is the data, getimagesizefromstring does not care if it's a complete image, it only
 	// searches for size headers in a given data set.
 	$data = $image->result('body');
 	unset($image);
 	$size = empty($data) ? elk_getimagesize($url) : getimagesizefromstring($data);
 
 	// Well, ok, umm, fail!
-	if ($size === false || $data === false)
+	if ($size === false || empty($data))
 	{
 		$size = [-1, -1, -1];
 	}
 
-	// Save this for 1hour, its not like the image size is going to change, and if we
+	// Save this for 1-hour, it's not like the image size is going to change, and if we
 	// failed, no sense trying again and again!
 	Cache::instance()->put('url_image_size-' . md5($url), $size, 3600);
 
@@ -735,7 +717,7 @@ function getServerStoredAvatars($directory)
 				'is_dir' => false
 			];
 
-			if (dirname($entry->getPath(), 1) === $modSettings['avatar_directory'])
+			if (dirname($entry->getPath()) === $modSettings['avatar_directory'])
 			{
 				$context['avatar_list'][] = str_replace($modSettings['avatar_directory'] . '/', '', $entry->getPathname());
 			}
@@ -749,7 +731,7 @@ function getServerStoredAvatars($directory)
  * Update an attachment's thumbnail
  *
  * @param string $filename the actual name of the file
- * @param int $id_attach the numeric attach id
+ * @param int $id_attach the numeric attach_id
  * @param int $id_msg the numeric message the attachment is associated with
  * @param int $old_id_thumb = 0 id of thumbnail to remove, such as from our post form
  * @param string $real_filename the fully qualified hash name of where the file is
@@ -789,7 +771,7 @@ function updateAttachmentThumbnail($filename, $id_attach, $id_msg, $old_id_thumb
 		$db->insert('',
 			'{db_prefix}attachments',
 			['id_folder' => 'int', 'id_msg' => 'int', 'attachment_type' => 'int', 'filename' => 'string-255', 'file_hash' => 'string-40', 'size' => 'int', 'width' => 'int', 'height' => 'int', 'fileext' => 'string-8', 'mime_type' => 'string-255'],
-			[$id_folder_thumb, $id_msg, 3, $thumb_filename, $thumb_hash, (int) $thumb_size, (int) $attachment['thumb_width'], (int) $attachment['thumb_height'], $thumb_ext, $thumb_mime],
+			[$id_folder_thumb, $id_msg, 3, $thumb_filename, $thumb_hash, $thumb_size, (int) $attachment['thumb_width'], (int) $attachment['thumb_height'], $thumb_ext, $thumb_mime],
 			['id_attach']
 		);
 
@@ -829,7 +811,7 @@ function updateAttachmentThumbnail($filename, $id_attach, $id_msg, $old_id_thumb
  *
  * @param int $id_msg
  * @param bool $include_count = true if true, it also returns the attachments count
- * @return mixed
+ * @return int[]|int
  */
 function attachmentsSizeForMessage($id_msg, $include_count = true)
 {
@@ -864,7 +846,11 @@ function attachmentsSizeForMessage($id_msg, $include_count = true)
 		);
 	}
 
-	return $request->fetch_row();
+	$row = $request->fetch_row();
+
+	return array_map(static function ($v) {
+		return $v === null ? 0 : (int) $v;
+	}, $row);
 }
 
 /**
@@ -936,7 +922,7 @@ function bindMessageAttachments($id_msg, $attachment_ids)
  * @param string $filename The name of the file
  * @param int|null $attachment_id The ID of the attachment
  * @param string|null $dir Which directory it should be in (null to use current)
- * @param bool $new If this is a new attachment, if so just returns a hash
+ * @param bool $new If this is a new attachment, if so, just returns a hash
  * @param string $file_hash The file hash
  *
  * @return string
@@ -952,12 +938,10 @@ function getAttachmentFilename($filename, $attachment_id, $dir = null, $new = fa
 	// Just make up a nice hash...
 	if ($new)
 	{
-		$tokenizer = new TokenHash();
-
-		return $tokenizer->generate_hash(32);
+		return (new TokenHash())->generate_hash(32);
 	}
 
-	// In case of files from the old system, do a legacy call.
+	// In the case of files from the old system, do a legacy call.
 	if (empty($file_hash))
 	{
 		return getLegacyAttachmentFilename($filename, $attachment_id, $dir, $new);
@@ -1012,7 +996,7 @@ function getAttachmentPosition($id_attach)
  * @param string $file
  * @param string|bool $error return array or false on error
  *
- * @return array|bool
+ * @return array|false
  */
 function elk_getimagesize($file, $error = 'array')
 {
@@ -1028,12 +1012,11 @@ function elk_getimagesize($file, $error = 'array')
 }
 
 /**
- * Checks if we have a known and support mime-type for which we have a thumbnail image
+ * Returns the path or URL of the MIME type thumbnail image based on the file extension.
  *
- * @param string $file_ext
- * @param bool $url
- *
- * @return bool|string
+ * @param string $file_ext The file extension used to determine the MIME type thumbnail.
+ * @param bool $url Optional. If true, returns the URL to the thumbnail; otherwise, returns the filesystem path.
+ * @return string The path or URL of the corresponding MIME type thumbnail image.
  */
 function returnMimeThumb($file_ext, $url = false)
 {
@@ -1137,7 +1120,7 @@ function getMimeType($filename)
 		$mimeType = finfo_file($finfo, $filename);
 		finfo_close($finfo);
 	}
-	// No finfo? What? lets try the old mime_content_type
+	// No finfo? What? let's try the old mime_content_type
 	elseif (function_exists('mime_content_type'))
 	{
 		$mimeType = mime_content_type($filename);

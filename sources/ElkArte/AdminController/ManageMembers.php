@@ -117,7 +117,7 @@ class ManageMembers extends AbstractController
 		// What about approval?
 		$context['show_approve'] = (!empty($modSettings['registration_method']) && $modSettings['registration_method'] == 2) || !empty($context['awaiting_approval']) || !empty($modSettings['approveAccountDeletion']);
 
-		// Setup the admin tabs.
+		// Set up the admin tabs.
 		$context[$context['admin_menu_name']]['object']->prepareTabData([
 			'title' => 'admin_members',
 			'help' => 'view_members',
@@ -160,7 +160,7 @@ class ManageMembers extends AbstractController
 	}
 
 	/**
-	 * View all members list. It allows sorting on several columns, and deletion of
+	 * View all members list. It allows sorting on several columns and deletion of
 	 * selected members.
 	 *
 	 * - It also handles the search query sent by ?action=admin;area=viewmembers;sa=search.
@@ -396,7 +396,7 @@ class ManageMembers extends AbstractController
 				$query_parts[] = '(' . implode(' OR ', $mg_query_parts) . ')';
 			}
 
-			// Get all selected post count related membergroups.
+			// Get all selected post-count-related membergroups.
 			if (!empty($search_params['postgroups']) && count($search_params['postgroups']) !== count($context['postgroups']))
 			{
 				$query_parts[] = 'id_post_group IN ({array_int:post_groups})';
@@ -415,7 +415,7 @@ class ManageMembers extends AbstractController
 		// Construct the additional URL part with the query info in it.
 		$context['params_url'] = $context['sub_action'] === 'query' ? ['sa' => 'query', 'params' => $search_url_params] : [];
 
-		// Get the title and sub template ready..
+		// Get the title and sub template ready.
 		$context['page_title'] = $txt['admin_members'];
 		$where_params = $where_params ?? [];
 
@@ -534,7 +534,7 @@ class ManageMembers extends AbstractController
 
 							require_once(SUBSDIR . '/Members.subs.php');
 
-							// Calculate number of days since last online.
+							// Calculate the number of days since last online.
 							$difference = empty($rowData['last_login']) ? $txt['never'] : htmlTime($rowData['last_login']);
 
 							// Show it in italics if they're not activated...
@@ -635,7 +635,7 @@ class ManageMembers extends AbstractController
 			return;
 		}
 
-		// Are we performing a delete?
+		// Are we performing a deletion?
 		if ($this->_req->post->maction === 'delete' && allowedTo('profile_remove_any'))
 		{
 			// Delete all the selected members.
@@ -734,7 +734,7 @@ class ManageMembers extends AbstractController
 
 		$member_groups = getGroupsList();
 
-		// Better remove admin membergroup...and set it to a "remove all"
+		// Better remove the admin membergroup...and set it to a "remove all"
 		$member_groups[1] = [
 			'id' => -1,
 			'name' => $txt['remove_groups'],
@@ -811,7 +811,7 @@ class ManageMembers extends AbstractController
 		$filterQuery = $this->_req->hasQuery('filter') ? $this->_req->getQuery('filter', 'intval', null) : null;
 		$context['current_filter'] = ($filterQuery !== null && in_array($filterQuery, $context['allowed_filters'], true) && !empty($context['activation_numbers'][$filterQuery])) ? (int) $filterQuery : -1;
 
-		// Sort out the different sub areas that we can actually filter by.
+		// Sort out the different subareas that we can actually filter by.
 		$context['available_filters'] = [];
 		foreach ($context['activation_numbers'] as $type => $amount)
 		{
@@ -865,7 +865,7 @@ class ManageMembers extends AbstractController
 		$context['allowed_actions'] = [];
 		if ($context['browse_type'] === 'approve')
 		{
-			// If we are approving deleted accounts we have a slightly different list... actually a mirror ;)
+			// If we are approving deleted accounts, we have a slightly different list... actually a mirror ;)
 			if ($context['current_filter'] == 4)
 			{
 				$context['allowed_actions'] = [
@@ -906,7 +906,7 @@ class ManageMembers extends AbstractController
 				<option value="' . $key . '">' . '&#10148;&nbsp;' . $desc . '</option>';
 		}
 
-		// Setup the Javascript function for selecting an action for the list.
+		// Set up the JavaScript function for selecting an action for the list.
 		$javascript = '
 			function onSelectChange()
 			{
@@ -1166,7 +1166,7 @@ class ManageMembers extends AbstractController
 	}
 
 	/**
-	 * This function handles the approval, rejection, activation or deletion of members.
+	 * This function handles the approval, rejection, activation, or deletion of members.
 	 *
 	 * What it does:
 	 *
@@ -1203,7 +1203,7 @@ class ManageMembers extends AbstractController
 		$time_passed = $this->_req->getPost('$time_passed', 'intval');
 		$todo = $this->_req->getPost('todo', 'trim');
 
-		// If we are applying a filter do just that - then redirect.
+		// If we are applying a filter, do just that - then redirect.
 		if (isset($filter) && $filter !== $original_filter)
 		{
 			redirectexit('action=admin;area=viewmembers;sa=browse;type=' . $type . ';sort=' . $sort . ';filter=' . $filter . ';start=' . $start);
@@ -1256,7 +1256,7 @@ class ManageMembers extends AbstractController
 			case 'rejectemail':
 				$this->_rejectMember();
 				break;
-			// A simple delete?
+			// A simple deletion?
 			case 'delete':
 			case 'deleteemail':
 				$this->_deleteMember();
@@ -1284,11 +1284,11 @@ class ManageMembers extends AbstractController
 			updateSettings(['unapprovedMembers' => ($modSettings['unapprovedMembers'] > $data['member_count'] ? $modSettings['unapprovedMembers'] - $data['member_count'] : 0)]);
 		}
 
-		// Update the member's stats. (but, we know the member didn't change their name.)
+		// Update the member's stats. (but we know the member didn't change their name.)
 		require_once(SUBSDIR . '/Members.subs.php');
 		updateMemberStats();
 
-		// If they haven't been deleted, update the post group statistics on them...
+		// If they haven't been deleted, update the post-group statistics on them...
 		if (!in_array($todo, ['delete', 'deleteemail', 'reject', 'rejectemail', 'remind']))
 		{
 			require_once(SUBSDIR . '/Membergroups.subs.php');
@@ -1323,7 +1323,7 @@ class ManageMembers extends AbstractController
 			}
 		}
 
-		// Update the menu action cache so its forced to refresh
+		// Update the menu action cache so it's forced to refresh
 		Cache::instance()->remove('num_menu_errors');
 	}
 
@@ -1334,7 +1334,7 @@ class ManageMembers extends AbstractController
 	{
 		require_once(SUBSDIR . '/Auth.subs.php');
 
-		// We have to do this for each member I'm afraid.
+		// We have to do this for each member, I'm afraid.
 		foreach ($this->member_info as $member)
 		{
 			$this->conditions['selected_member'] = $member['id'];
@@ -1342,7 +1342,7 @@ class ManageMembers extends AbstractController
 			// Generate a random activation code.
 			$this->conditions['validation_code'] = generateValidationCode(14);
 
-			// Set these members for activation - I know this includes two id_member checks but it's safer than bodging $condition ;).
+			// Set these members for activation - I know this includes two id_member checks, but it's safer than bodging $condition ;).
 			enforceReactivation($this->conditions);
 
 			$replacements = [
@@ -1364,7 +1364,7 @@ class ManageMembers extends AbstractController
 	{
 		deleteMembers($this->conditions['members']);
 
-		// Send email telling them they aren't welcome?
+		// Send the email telling them they aren't welcome?
 		if ($this->_req->post->todo === 'rejectemail')
 		{
 			foreach ($this->member_info as $member)
@@ -1394,7 +1394,7 @@ class ManageMembers extends AbstractController
 	{
 		deleteMembers($this->conditions['members']);
 
-		// Send email telling them they aren't welcome?
+		// Send the email telling them they aren't welcome?
 		if ($this->_req->post->todo === 'deleteemail')
 		{
 			foreach ($this->member_info as $member)

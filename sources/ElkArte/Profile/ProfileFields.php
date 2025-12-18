@@ -17,6 +17,7 @@ use BBC\ParserWrapper;
 use ElkArte\Errors\ErrorContext;
 use ElkArte\Exceptions\Exception;
 use ElkArte\Helper\DataValidator;
+use ElkArte\Helper\HttpReq;
 use ElkArte\Helper\Util;
 use ElkArte\Languages\Txt;
 use ElkArte\MembersList;
@@ -29,7 +30,7 @@ class ProfileFields
 {
 	/**
 	 * Load any custom fields for this area.
-	 * No area means load all, 'summary' loads all public ones.
+	 * No area means load all; 'summary' loads all public ones.
 	 *
 	 * @param int $memID
 	 * @param string $area = 'summary'
@@ -51,7 +52,7 @@ class ProfileFields
 			$options = MembersList::get($memID)->options;
 			$value = $options[$row['col_name']] ?? $row['default_value'];
 
-			// If this was submitted already then make the value the posted version.
+			// If this was submitted already, then make the value the posted version.
 			if (!empty($custom_fields) && isset($custom_fields[$row['col_name']]))
 			{
 				$value = Util::htmlspecialchars($custom_fields[$row['col_name']]);
@@ -224,13 +225,13 @@ class ProfileFields
 
 		/**
 		 * This horrific array defines all the profile fields in the whole world!
-		 * In general each "field" has one array - the key of which is the database
+		 * In general, each "field" has one array - the key of which is the database
 		 * column name associated with said field.
 		 *
 		 * Each item can have the following attributes:
 		 *
 		 * string $type: The type of field this is - valid types are:
-		 *   - callback: This is a field which has its own callback mechanism for templating.
+		 *   - callback: This is a field that has its own callback mechanism for templating.
 		 *   - check:    A simple checkbox.
 		 *   - hidden:   This doesn't have any visual aspects but may have some validity.
 		 *   - password: A password box.
@@ -252,7 +253,7 @@ class ProfileFields
 		 *   - a text string: An error occurred - this is the error message.
 		 *
 		 * function $preload: A function that is used to load data required for this element to be displayed. Must return
-		 *                    true to be displayed at all.
+		 *                    true to be completely displayed.
 		 *
 		 * string $cast_type: If set casts the element to a certain type. Valid types (bool, int, float).
 		 * string $save_key:  If the index of this element isn't the database column name it can be overridden with this string.
@@ -262,10 +263,10 @@ class ProfileFields
 		 *
 		 * string $js_submit: javascript to add inside the function checkProfileSubmit() in the template
 		 * string $js:        javascript to add to the page in general
-		 * string $js_load:   filename of js to be loaded with loadJavasciptFile
+		 * string $js_load:   filename of js to be loaded with "loadJavasciptFile"
 		 *
 		 * Note that all elements that have a custom input_validate must ensure they set the value of $cur_profile correct to enable
-		 * the changes to be displayed correctly on submit of the form.
+		 * the changes to be displayed correctly on submitting of the form.
 		 */
 
 		$profile_fields = [
@@ -284,7 +285,7 @@ class ProfileFields
 				'preload' => static function () {
 					global $cur_profile, $context;
 
-					// Split up the birth date....
+					// Split up the birthdate...
 					[$uyear, $umonth, $uday] = explode('-', empty($cur_profile['birthdate']) || $cur_profile['birthdate'] === '0001-01-01' ? '0000-00-00' : $cur_profile['birthdate']);
 					$context['member']['birth_date'] = [
 						'year' => $uyear === '0004' ? '0000' : $uyear,
@@ -370,7 +371,7 @@ class ProfileFields
 
 					$isValid = ProfileFields::profileValidateEmail($value, $context['id_member']);
 
-					// Do they need to re-validate? If so schedule the function!
+					// Do they need to re-validate? If so, schedule the function!
 					if ($isValid === true && !empty($modSettings['send_validation_onChange']) && !allowedTo('moderate_forum'))
 					{
 						require_once(SUBSDIR . '/Auth.subs.php');
@@ -384,7 +385,7 @@ class ProfileFields
 					return $isValid;
 				},
 			],
-			// Selecting group membership is a complicated one, so we treat it separate!
+			// Selecting group membership is complicated, so we treat it separately!
 			'id_group' => [
 				'type' => 'callback',
 				'callback_func' => 'group_manage',
@@ -551,7 +552,7 @@ class ProfileFields
 				'input_validate' => static function (&$value) {
 					global $cur_profile;
 
-					// If we didn't try it then ignore it!
+					// If we didn't try it, then ignore it!
 					if ($value === '')
 					{
 						return false;
@@ -735,7 +736,7 @@ class ProfileFields
 						// There is a previous secret answer to the secret question, so let\'s put it back in the db...
 						$value = $member['secret_answer'];
 
-						// We have to tell the code is an error otherwise an empty value will go into the db
+						// We have to tell the code is an error, otherwise an empty value will go into the db
 						return false;
 					}
 
@@ -748,7 +749,7 @@ class ProfileFields
 				'type' => 'callback',
 				'callback_func' => 'signature_modify',
 				'permission' => 'profile_extra',
-				'enabled' => str_starts_with($modSettings['signature_settings'], (string) 1),
+				'enabled' => str_starts_with($modSettings['signature_settings'], "1"),
 				'preload' => 'profileLoadSignatureData',
 				'input_validate' => 'profileValidateSignature',
 			],
@@ -909,6 +910,9 @@ class ProfileFields
 	{
 		global $profile_fields, $profile_vars, $context, $old_profile, $post_errors, $cur_profile;
 
+		// Use HttpReq for all request data access
+		$req = HttpReq::instance();
+
 		if (!empty($hook))
 		{
 			call_integration_hook('integrate_' . $hook . '_profile_fields', [&$fields]);
@@ -921,7 +925,7 @@ class ProfileFields
 		$old_profile = $cur_profile;
 
 		// This allows variables to call activities when they save
-		// - by default just to reload their settings
+		// - by default, just to reload their settings
 		$context['profile_execute_on_save'] = [];
 		if ($context['user']['is_owner'])
 		{
@@ -941,7 +945,10 @@ class ProfileFields
 
 			$field = $profile_fields[$key];
 
-			if (!isset($_POST[$key]) || !empty($field['is_dummy']) || (isset($_POST['preview_signature']) && $key === 'signature'))
+			// Fetch the posted value (if any) using HttpReq, do not rely on $_POST
+			$has_value = $req->hasPost($key);
+			$preview_signature = $req->hasPost('preview_signature');
+			if (!$has_value || !empty($field['is_dummy']) || ($preview_signature && $key === 'signature'))
 			{
 				continue;
 			}
@@ -949,11 +956,14 @@ class ProfileFields
 			// What gets updated?
 			$db_key = $field['save_key'] ?? $key;
 
+			// Work on a local copy of the submitted value
+			$value = $req->post->{$key};
+
 			// Right - we have something that is enabled, we can act upon and has a value
 			// posted to it. Does it have a validation function?
 			if (isset($field['input_validate']))
 			{
-				$is_valid = $field['input_validate']($_POST[$key]);
+				$is_valid = $field['input_validate']($value);
 
 				// An error occurred - set it as such!
 				if ($is_valid !== true)
@@ -966,7 +976,7 @@ class ProfileFields
 					}
 
 					// Retain the old value.
-					$cur_profile[$key] = $_POST[$key];
+					$cur_profile[$key] = $value;
 					continue;
 				}
 			}
@@ -977,32 +987,32 @@ class ProfileFields
 			// Finally, clean up certain types.
 			if ($field['cast_type'] === 'int')
 			{
-				$_POST[$key] = (int) $_POST[$key];
+				$value = (int) $value;
 			}
 			elseif ($field['cast_type'] === 'float')
 			{
-				$_POST[$key] = (float) $_POST[$key];
+				$value = (float) $value;
 			}
 			elseif ($field['cast_type'] === 'check')
 			{
-				$_POST[$key] = empty($_POST[$key]) ? 0 : 1;
+				$value = empty($value) ? 0 : 1;
 			}
 
-			// If we got here we're doing OK.
-			if ($field['type'] !== 'hidden' && (!isset($old_profile[$key]) || $_POST[$key] != $old_profile[$key]))
+			// If we got here, we're doing OK.
+			if ($field['type'] !== 'hidden' && (!isset($old_profile[$key]) || $value != $old_profile[$key]))
 			{
 				// Set the save variable.
-				$profile_vars[$db_key] = $_POST[$key];
+				$profile_vars[$db_key] = $value;
 
 				// And update the user profile.
-				$cur_profile[$key] = $_POST[$key];
+				$cur_profile[$key] = $value;
 
 				// Are we logging it?
 				if (!empty($field['log_change']) && isset($old_profile[$key]))
 				{
 					$context['log_changes'][$key] = [
 						'previous' => $old_profile[$key],
-						'new' => $_POST[$key],
+						'new' => $value,
 					];
 				}
 			}
@@ -1012,19 +1022,20 @@ class ProfileFields
 			{
 				profileLoadGroups();
 
-				// Any changes to primary group?
-				if ((int) $_POST['id_group'] !== (int) $old_profile['id_group'])
+				// Any changes to a primary group?
+				$posted_id_group = $req->getPost('id_group', 'intval', $old_profile['id_group']);
+				if ((int) $posted_id_group !== (int) $old_profile['id_group'])
 				{
 					$context['log_changes']['id_group'] = [
 						'previous' => !empty($old_profile[$key]) && isset($context['member_groups'][$old_profile[$key]]) ? $context['member_groups'][$old_profile[$key]]['name'] : '',
-						'new' => !empty($_POST[$key]) && isset($context['member_groups'][$_POST[$key]]) ? $context['member_groups'][$_POST[$key]]['name'] : '',
+						'new' => !empty($posted_id_group) && isset($context['member_groups'][$posted_id_group]) ? $context['member_groups'][$posted_id_group]['name'] : '',
 					];
 				}
 
 				// Prepare additional groups for comparison.
 				$additional_groups = [
 					'previous' => empty($old_profile['additional_groups']) ? [] : explode(',', $old_profile['additional_groups']),
-					'new' => empty($_POST['additional_groups']) ? [] : array_diff($_POST['additional_groups'], [0]),
+					'new' => $req->hasPost('additional_groups') ? array_diff((array) $req->post->additional_groups, [0]) : [],
 				];
 
 				sort($additional_groups['previous']);
@@ -1067,10 +1078,15 @@ class ProfileFields
 
 		if ($changeOther && empty($post_errors))
 		{
-			makeThemeChanges($context['id_member'], isset($_POST['id_theme']) ? (int) $_POST['id_theme'] : $old_profile['id_theme']);
-			if (!empty($_REQUEST['sa']))
+			// Apply theme changes using HttpReq
+			$id_theme = $req->getPost('id_theme', 'intval', $old_profile['id_theme']);
+			makeThemeChanges($context['id_member'], (int) $id_theme);
+
+			// Apply custom field changes for the active subaction (usually in query string)
+			$sa = $req->getQuery('sa', null, '');
+			if (!empty($sa))
 			{
-				makeCustomFieldChanges($context['id_member'], $_REQUEST['sa'], false);
+				makeCustomFieldChanges($context['id_member'], $sa, false);
 			}
 		}
 
@@ -1119,7 +1135,7 @@ class ProfileFields
 		$where = 'active = 1';
 		if ($area !== 'register' && !allowedTo('admin_forum'))
 		{
-			// If it's the owner they can see two types of private fields, regardless.
+			// If it's the owner, they can see two types of private fields, regardless.
 			if ($memID === User::$info->id)
 			{
 				$where .= $area === 'summary' ? ' AND private < 3' : ' AND (private = 0 OR private = 2)';
@@ -1147,7 +1163,7 @@ class ProfileFields
 	 *
 	 * @param array $row
 	 * @param string $output_html
-	 * @param string $key
+	 * @param int|null $key
 	 *
 	 * @return string
 	 */

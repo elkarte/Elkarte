@@ -364,7 +364,7 @@ class Recent extends AbstractController implements FrontpageInterface
 			$messages = array_column($messages, 'id');
 
 			require_once(SUBSDIR . '/Likes.subs.php');
-			$likes = loadLikes($messages, true);
+			$likes = loadLikes($messages);
 
 			theme()->getLayers()->addBefore('load_likes_button', 'body');
 		}

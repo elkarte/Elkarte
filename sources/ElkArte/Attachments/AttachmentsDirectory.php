@@ -79,7 +79,7 @@ class AttachmentsDirectory
 	protected mixed $last_dirs = [];
 
 	/**
-	 * The constructor for attachment directories, controls where to add files
+	 * The constructor for attachment directories, controls where to add files,
 	 * and monitors directory health
 	 *
 	 * @param array $options all the stuff
@@ -744,11 +744,11 @@ class AttachmentsDirectory
 			updateSettings(['attachment_full_notified' => 1]);
 		}
 
-		// No room left.... What to do now???
+		// No room left... What to do now???
 		if ((!empty($this->numFilesLimit) && self::$dir_files + 2 > $this->numFilesLimit)
 			|| (!empty($this->sizeLimit) && self::$dir_size > $this->sizeLimit * 1024))
 		{
-			// If we are managing the directories space automatically, lets get to it
+			// If we are managing the directories space automatically, let's get to it
 			if ($this->autoManageIsLevel(self::AUTO_SEQUENCE))
 			{
 				// Move it to the new folder if we can. (Throws Exception if it fails)
@@ -778,7 +778,7 @@ class AttachmentsDirectory
 		require_once(SUBSDIR . '/ManageAttachments.subs.php');
 		$current_dir = attachDirProperties($this->currentAttachmentUploadDir);
 
-		// Add 1 to file count only when a new file will be added
+		// Add 1 to the file count only when a new file is added
 		self::$dir_files = $current_dir['files'] + (empty($tmp_attach_size) ? 0 : 1);
 
 		self::$dir_size = $current_dir['size'] + $tmp_attach_size;
@@ -792,9 +792,9 @@ class AttachmentsDirectory
 	 * @return string
 	 * @todo not really true at the moment
 	 *  - BOARDDIR . '/attachments', if nothing is set yet.
-	 *  - if the forum is using multiple attachments directories,
+	 *  - If the forum is using multiple attachments directories,
 	 *    then the current path is stored as unserialize($modSettings['attachmentUploadDir'])[$modSettings['currentAttachmentUploadDir']]
-	 *  - otherwise, the current path is $modSettings['attachmentUploadDir'].
+	 *  - Otherwise, the current path is $modSettings['attachmentUploadDir'].
 	 *
 	 */
 	public function getCurrent(): string
@@ -849,7 +849,7 @@ class AttachmentsDirectory
 	}
 
 	/**
-	 * Remove a directory if its empty (not counting .htaccess or index.php)
+	 * Remove a directory if it's empty (not counting .htaccess or index.php)
 	 *
 	 * @param $id
 	 * @param $real_path
@@ -884,7 +884,7 @@ class AttachmentsDirectory
 		// A check to see if it's a used base dir.
 		if ($num_attach === 0 && !empty($this->baseDirectories))
 		{
-			// Count any sub-folders.
+			// Count any subfolders.
 			foreach ($this->attachmentUploadDir as $sub)
 			{
 				if (str_contains($sub, $real_path . DIRECTORY_SEPARATOR))

@@ -17,9 +17,9 @@ use ElkArte\Helper\HttpReq;
 /**
  * Handle events in controller and classes
  *
- * High level overview:
+ * High-level overview:
  *
- * - Register your modules against a class in which it will be triggered with
+ * - Register your modules against a class in which it will be triggered
  *      - enableModules($moduleName, $class) e.g. enableModules('Mymodule', ['display','post'])
  * - You can create a core feature
  *     - Add a file ADMINDIR/ManageMymoduleModule.php containing a static class of addCoreFeature.
@@ -28,7 +28,7 @@ use ElkArte\Helper\HttpReq;
  *     - The file and class will be auto discovered and called.
  * - Place your module files in ElkArte/Modules as a directory like
  *     - /Mymodule/Display.php and /Mymodule/Post.php
- * - In Mymodules Display.php and Post.php create `public static function hooks` which returns an array of actions
+ * - In Mymodules Display.php and Post.php create `public static function hooks` which return an array of actions
  * to call when triggered
  *     - ['prepare_context', ['\\ElkArte\\Modules\\Mymodule\\Display', 'do_something'], ['attachments', 'start']
  *     - Will call the do_something() method in Display.php of the Mymodule directory and pass params
@@ -50,7 +50,7 @@ class EventManager
 	/** @var string[] List of classes already registered. */
 	protected $_classes = [];
 
-	/** @var null|string[] List of classes declared, kept here just to avoid call get_declared_classes at each trigger */
+	/** @var null|string[] List of classes declared, kept here just to avoid calling get_declared_classes at each trigger */
 	protected $_declared_classes;
 
 	/**
@@ -61,7 +61,7 @@ class EventManager
 	}
 
 	/**
-	 * Allows to set the object that instantiated the \ElkArte\EventManager.
+	 * Allows setting the object that instantiated the \ElkArte\EventManager.
 	 *
 	 * - Necessary to be able to provide the dependencies later on, allows
 	 * one to access the calling class properties in the registered event
@@ -250,8 +250,8 @@ class EventManager
 	 *        name of the variables the method requires.
 	 *        The variables can be from:
 	 *          - the default list of variables passed to the trigger
-	 *          - properties (private, protected, or public) of the object that instantiate the \ElkArte\EventManager
-	 *            (i.e. the controller)
+	 *          - properties (private, protected, or public) of the object that instantiates the \ElkArte\EventManager
+	 *            (i.e., the controller)
 	 *          - globals
 	 * @param int $priority Defines the order the method is called.
 	 */
@@ -284,7 +284,7 @@ class EventManager
 	 * Reflects a specific class method to see what parameters are needed
 	 *
 	 * Currently, only checks on the number required can be expanded to make use of
-	 * $params = $r->getParameters() and then $param-> getName isOptional etc
+	 * $params = $r->getParameters() and then $param-> getName isOptional etc.
 	 * to ensure required named are being passed.
 	 *
 	 * @param string $class_name
@@ -293,7 +293,7 @@ class EventManager
 	 */
 	protected function _checkParameters($class_name, $method_name, &$dependencies): void
 	{
-		// Lets check on the actual methods parameters
+		// Let's check on the actual methods parameters
 		try
 		{
 			$r = new \ReflectionMethod($class_name, $method_name);

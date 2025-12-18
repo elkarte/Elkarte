@@ -1,7 +1,8 @@
 <?php
 
 /**
- * This file contains several functions for retrieving and manipulating calendar events, birthdays and holidays.
+ * This file contains several functions for retrieving and manipulating calendar events,
+ * birthdays, and holidays.
  *
  * @package   ElkArte Forum
  * @copyright ElkArte Forum contributors
@@ -20,7 +21,7 @@ use ElkArte\EventManager;
 use ElkArte\Modules\AbstractModule;
 
 /**
- * We like to show events associated to the topics.
+ * We like to show events associated with the topics.
  *
  * @package Calendar
  */
@@ -70,7 +71,7 @@ class Display extends AbstractModule
 	 * @param array $topicinfo
 	 * @param int $topic
 	 */
-	public function topicinfo(&$topicinfo, $topic): void
+	public function topicinfo($topicinfo, $topic): void
 	{
 		global $context;
 
@@ -80,7 +81,7 @@ class Display extends AbstractModule
 			// We need events details and all that jazz
 			require_once(SUBSDIR . '/Calendar.subs.php');
 
-			// First, try create a better time format, ignoring the "time" elements.
+			// First, try to create a better time format, ignoring the "time" elements.
 			if (preg_match('~%[AaBbCcDdeGghjmuYy](?:[^%]*%[AaBbCcDdeGghjmuYy])*~', $this->user->time_format, $matches) !== 1 || empty($matches[0]))
 			{
 				$date_string = $this->user->time_format;
@@ -105,9 +106,9 @@ class Display extends AbstractModule
 				$context['linked_calendar_events'][] = [
 					'id' => $event['id_event'],
 					'title' => $event['title'],
-					'can_edit' => allowedTo('calendar_edit_any') || ($event['id_member'] == $this->user->id && allowedTo('calendar_edit_own')),
+					'can_edit' => allowedTo('calendar_edit_any') || ((int) $event['id_member'] === $this->user->id && allowedTo('calendar_edit_own')),
 					'modify_href' => getUrl('action', ['action' => 'post', 'msg' => $topicinfo['id_first_msg'], 'topic' => $topic . '.0', 'calendar', 'eventid' => $event['id_event'] . '{session_data}']),
-					'can_export' => allowedTo('calendar_edit_any') || ($event['id_member'] == $this->user->id && allowedTo('calendar_edit_own')),
+					'can_export' => allowedTo('calendar_edit_any') || ((int) $event['id_member'] === $this->user->id && allowedTo('calendar_edit_own')),
 					'export_href' => getUrl('action', ['action' => 'calendar', 'sa' => 'ical', 'eventid' => $event['id_event'], '{session_data}']),
 					'start_date' => standardTime($start_date, $date_string, 'none'),
 					'start_timestamp' => $start_date,

@@ -79,9 +79,7 @@ function flushLogTables()
  */
 function getMessageTableColumns()
 {
-	$table = db_table();
-
-	return $table->list_columns('{db_prefix}messages', true);
+	return db_table()->list_columns('{db_prefix}messages', true);
 }
 
 /**
@@ -119,7 +117,7 @@ function resizeMessageTableBody($type)
 }
 
 /**
- * Detects messages, which exceed the max message size
+ * Detects messages which exceed the max message size
  *
  * @param int $start The item to start with (for pagination purposes)
  * @param int $increment
@@ -150,9 +148,9 @@ function detectExceedingMessages($start, $increment)
 }
 
 /**
- * loads messages, which exceed the length that will fit in the col field
+ * Loads messages, which exceed the length that will fit in the col field
  *
- * - Used by maintenance when convert the column "body" of the table from TEXT
+ * - Used by maintenance when converting the column "body" of the table from TEXT
  * to MEDIUMTEXT and vice versa.
  *
  * @param int[] $msg
@@ -300,7 +298,7 @@ function recountUnapprovedMessages($start, $increment)
 }
 
 /**
- * Reset the boards table's counter for posts, topics, unapproved posts and
+ * Reset the boards table's counter for posts, topics, unapproved posts, and
  * unapproved topics
  *
  * - Allowed parameters: num_posts, num_topics, unapproved_posts, unapproved_topics
@@ -467,7 +465,7 @@ function updateBoardsCounter($type, $start, $increment)
 			break;
 
 		default:
-			trigger_error('updateBoardsCounter(): Invalid counter type \'' . $type . '\'', E_USER_NOTICE);
+			trigger_error('updateBoardsCounter(): Invalid counter type \'' . $type . '\'');
 	}
 }
 
@@ -682,7 +680,7 @@ function getTopicsToMove($id_board)
 {
 	$db = database();
 
-	// Lets get the topics.
+	// Let's get the topics.
 	return $db->fetchQuery('
 		SELECT 
 			id_topic
@@ -727,7 +725,7 @@ function countContributors()
 }
 
 /**
- * Recount the members posts.
+ * Recount the members' posts.
  *
  * @param int $start The item to start with (for pagination purposes)
  * @param int $increment
@@ -759,7 +757,7 @@ function updateMembersPostCount($start, $increment)
 		]
 	);
 	$total_rows = $request->num_rows();
-	// Update the post count for this group
+	// Update the post-count for this group
 	while (($row = $request->fetch_assoc()))
 	{
 		updateMemberData($row['id_member'], ['posts' => $row['posts']]);
@@ -770,7 +768,7 @@ function updateMembersPostCount($start, $increment)
 }
 
 /**
- * Used to find members who have a post count >0 that should not.
+ * Used to find members who have a post-count >0 that should not.
  *
  * @package Maintenance
  */
@@ -780,9 +778,9 @@ function updateZeroPostMembers()
 
 	$db = database();
 
-	// Sub select all member ids that have posts on post count enabled boards and
-	// right join the members table on that result with members who have a non zero
-	// post count.  result set will be members who do not exist in the sub select group.
+	// Sub select all member ids that have posts on post-count enabled boards and
+	// right join the members table on that result with members who have a non-zero
+	// post-count.  Result set will be members who do not exist in the sub select group.
 	$members = $db->fetchQuery('
 		SELECT 
 			mem.id_member, mem.posts
@@ -805,7 +803,7 @@ function updateZeroPostMembers()
 		]
 	)->fetch_callback(
 		function ($row) {
-			// Set the post count to zero for any delinquents we may have found
+			// Set the post-count to zero for any delinquents we may have found
 			return $row['id_member'];
 		}
 	);
@@ -869,7 +867,7 @@ function purgeMembers($type, $groups, $time_limit)
 		}
 	);
 
-	// If we have ungrouped unselected we need to avoid those guys.
+	// If we have ungrouped unselected, we need to avoid those guys.
 	if (!in_array(0, $groups))
 	{
 		$where .= ' AND (mem.id_group != 0 OR mem.additional_groups != {string:blank_add_groups})';

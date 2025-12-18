@@ -37,7 +37,7 @@ class SearchArray extends AbstractModel
 	/** @var bool If search words were found on the blocklist */
 	private $_foundBlockListedWords = false;
 
-	/** @var array Holds words that will not be search on to inform the user they were skipped */
+	/** @var array Holds words that will not be searched on to inform the user they were skipped */
 	private $_ignored = [];
 
 	/**
@@ -78,7 +78,7 @@ class SearchArray extends AbstractModel
 
 		$this->_no_regexp = preg_match('~&#(?:\d{1,7}|x[0-9a-fA-F]{1,6});~', $stripped_query) === 1;
 
-		// Extract phrase parts first (e.g. some words "this is a phrase" some more words.)
+		// Extract phrase parts first (e.g., some words "this is a phrase" some more words.)
 		preg_match_all('/(?:^|\s)([-]?)"([^"]+)"(?:$|\s)/', $stripped_query, $matches, PREG_PATTERN_ORDER);
 		$phraseArray = $matches[2];
 
@@ -198,7 +198,7 @@ class SearchArray extends AbstractModel
 			return $this->_searchArray[] = '';
 		}
 
-		// First we split our string into included and excluded words and phrases
+		// First, we split our string into included and excluded words and phrases
 		$or_part = false;
 		foreach ($tokens as $token)
 		{
@@ -272,11 +272,11 @@ class SearchArray extends AbstractModel
 	}
 
 	/**
-	 * Cleans a string of everything but alphanumeric characters and certain
-	 * special characters ",-,_  so -movie or "animal farm" are preserved
+	 * Cleans a string of everything but alphanumeric characters, and certain
+	 * special characters ",-,_ so -movie or "animal farm" are preserved
 	 *
 	 * @param string $string A string to clean
-	 * @return string A cleaned up string
+	 * @return string A cleaned-up string
 	 */
 	public function cleanString($string): string
 	{
@@ -324,7 +324,7 @@ class SearchArray extends AbstractModel
 	}
 
 	/**
-	 * Returns if block listed words are found
+	 * Returns if blocklisted words are found
 	 *
 	 * @return bool
 	 */

@@ -30,13 +30,13 @@ function spiderCheck()
 
 	$db = database();
 
-	// Feature not enabled, best guess then
+	// Feature isn't enabled, the best guess then
 	if (empty($modSettings['spider_mode']))
 	{
 		return spiderQuickCheck();
 	}
 
-	// Use the last data if its not stale (5 min)
+	// Use the last data if it's not stale (5 min)
 	if (isset($_SESSION['robot_check']) && $_SESSION['robot_check'] > time() - 300)
 	{
 		return !empty($_SESSION['id_robot']);
@@ -120,8 +120,8 @@ function spiderCheck()
 		}
 	}
 
-	// If this is low server tracking then log the spider here as opposed to the main logging function.
-	if (!empty($modSettings['spider_mode']) && $modSettings['spider_mode'] == 1 && !empty($_SESSION['id_robot']))
+	// If this is low server tracking, then log the spider here as opposed to the main logging function.
+	if ((int) $modSettings['spider_mode'] === 1 && !empty($_SESSION['id_robot']))
 	{
 		logSpider();
 	}
@@ -130,7 +130,7 @@ function spiderCheck()
 }
 
 /**
- * If we haven't turned on proper spider hunts then have a guess!
+ * If we haven't turned on proper spider hunts, then have a guess!
  *
  * @return bool
  * @package SearchEngines
@@ -487,7 +487,7 @@ function getSpiderStats($start, $items_per_page, $sort)
  * Get the number of spider stat rows from the log spider stats table
  * (used by createList() callbacks)
  *
- * @param int|null $time (optional) if specified counts only the entries before that date
+ * @param int|null $time (optional) if specified, counts only the entries before that date
  * @return int The number of rows in the log_spider_stats table
  * @package SearchEngines
  */
@@ -634,7 +634,7 @@ function spidersStatsDates()
 	$min_month = (int) substr($min_date, 5, 2);
 	$max_month = (int) substr($max_date, 5, 2);
 
-	// Prepare the dates for the drop down.
+	// Prepare the dates for the drop-down.
 	$date_choices = [];
 	for ($y = $min_year; $y <= $max_year; $y++)
 	{

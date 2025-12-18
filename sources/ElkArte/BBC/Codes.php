@@ -66,8 +66,8 @@ class Codes
 	/** Used in place of after when disabled. Defaults to '</div>' if block_level, '' if not. */
 	public const ATTR_DISABLED_AFTER = 10;
 
-	/** Set to true the tag is a "block level" tag, similar to HTML.
-	    Block level tags cannot be nested inside tags that are not block level, and will not be implicitly closed as easily.
+	/** Set to true, the tag is a "block level" tag, similar to HTML.
+	    Block level tags cannot be nested inside tags that are not block level and will not be implicitly closed as easily.
 	    One break following a block level tag may also be removed. */
 	public const ATTR_BLOCK_LEVEL = 11;
 
@@ -89,15 +89,15 @@ class Codes
 	    If set, the enclosing tag *must* be one of the listed tags, or parsing won't occur. */
 	public const ATTR_REQUIRE_PARENTS = 15;
 
-	/** similar to require_parents, if set children won't be parsed if they are not in the list. */
+	/** similar to require_parents, if set children aren't parsed if they are not in the list. */
 	public const ATTR_REQUIRE_CHILDREN = 16;
 
 	/** Similar to, but very different from, require_parents.
-	    If it is set the listed tags will not be parsed inside the tag. */
+	    If it is set, the listed tags will not be parsed inside the tag. */
 	public const ATTR_DISALLOW_PARENTS = 17;
 
 	/** Similar to, but very different from, require_children.
-	   If it is set the listed tags will not be parsed inside the tag. */
+	   If it is set, the listed tags will not be parsed inside the tag. */
 	public const ATTR_DISALLOW_CHILDREN = 18;
 
 	/** When ATTR_DISALLOW_PARENTS is used, this gets put before the tag. */
@@ -299,7 +299,7 @@ class Codes
 			[
 				self::ATTR_TAG => 'br',
 				self::ATTR_TYPE => self::TYPE_CLOSED,
-				self::ATTR_CONTENT => '<br />',
+				self::ATTR_CONTENT => '<br class="clear" />',
 				self::ATTR_BLOCK_LEVEL => false,
 				self::ATTR_AUTOLINK => false,
 				self::ATTR_LENGTH => 2,
@@ -915,7 +915,7 @@ class Codes
 			'O' => 'circle',
 		];
 
-		// Want to add some more ?
+		// Want to add some more?
 		call_integration_hook('integrate_item_codes', [&$item_codes]);
 
 		return $item_codes;
@@ -932,7 +932,7 @@ class Codes
 	}
 
 	/**
-	 * Returns an array of installed bbc codes grouped by attr type e.g. quote[0], quote[1]
+	 * Returns an array of installed bbc codes grouped by attr type e.g., quote[0], quote[1]
 	 *
 	 * @return array
 	 */
@@ -971,7 +971,7 @@ class Codes
 	/**
 	 * @return array
 	 * @todo besides the itemcodes (just add a arg $with_itemcodes), this way should be standard and saved like that.
-	 * Even, just remove the itemcodes when needed
+	 * Even, remove the itemcodes when needed
 	 *
 	 */
 	public function getForParsing(): array
@@ -1020,7 +1020,7 @@ class Codes
 	}
 
 	/**
-	 * Return if the found code [X is possibly a valid one by checking
+	 * Return if the found code [X is possibly valid by checking
 	 * if we have a code that begins with X
 	 *
 	 * @param $char

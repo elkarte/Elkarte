@@ -27,7 +27,7 @@ $txt['paid_email_desc'] = 'Inform the admin when a subscription automatically ch
 $txt['paid_email_to'] = 'Email for Correspondence';
 $txt['paid_email_to_desc'] = 'Comma-separated list of addresses to email notifications to in addition to forum admins.';
 $txt['paidsubs_test'] = 'Enable test mode';
-$txt['paidsubs_test_desc'] = 'This puts the paid subscriptions into &quot;test&quot; mode, which will, wherever possible, use sandbox payment methods in PayPal, Authorize.net etc. Do not enable unless you know what you are doing!';
+$txt['paidsubs_test_desc'] = 'This puts the paid subscriptions into &quot;test&quot; mode, which will, wherever possible, use sandbox payment methods. Do not enable unless you know what you are doing!';
 $txt['paidsubs_test_confirm'] = 'Are you sure you want to enable test mode?';
 $txt['paid_email_no'] = 'Do not send any notifications';
 $txt['paid_email_error'] = 'Inform when subscription fails';
@@ -173,7 +173,7 @@ $txt['paid_all_freq_blank'] = 'You must enter a cost for at least one of the fou
 $txt['paid_no_data'] = 'No valid data was sent to the script.';
 
 $txt['paypal_could_not_connect'] = 'Could not connect to PayPal server';
-$txt['paypal_currency_unkown'] = 'The currency code from PayPal (%1$s) does not match the code in your settings (%2$s)';
+$txt['paypal_currency_unknown'] = 'The currency code from PayPal (%1$s) does not match the code in your settings (%2$s)';
 $txt['paid_sub_not_active'] = 'That subscription is not taking any new users.';
 $txt['paid_disabled'] = 'Paid subscriptions are currently disabled.';
 $txt['paid_unknown_transaction_type'] = 'Unknown Paid Subscriptions transaction type.';

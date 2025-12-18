@@ -68,7 +68,7 @@ class ParserWrapperTest extends TestCase
 			array(
 				'Test br',
 				'First line[br]Second line',
-				'First line<br />Second line',
+				'First line<br class="clear" />Second line',
 			),
 			array(
 				'Test center',

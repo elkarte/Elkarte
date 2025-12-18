@@ -30,7 +30,7 @@ use ElkArte\User;
  * Find the ID of the "current" member
  *
  * @param bool $fatal if the function ends in a fatal error in case of problems (default true)
- * @param bool $reload_id if true the already set value is ignored (default false)
+ * @param bool $reload_id if true, the already set value is ignored (default false)
  *
  * @return int if no error.  May return false in case of problems only if $fatal is set to false
  * @throws \ElkArte\Exceptions\Exception not_a_user
@@ -45,7 +45,7 @@ function currentMemberID($fatal = true, $reload_id = false)
 		return (int) $memID;
 	}
 
-	// Did we get the user by name...
+	// Did we get the user by name?
 	if (isset($_REQUEST['user']))
 	{
 		$memberResult = MembersList::load($_REQUEST['user'], true, 'profile');
@@ -78,7 +78,7 @@ function currentMemberID($fatal = true, $reload_id = false)
 	// If all went well, we have a valid member ID!
 	list ($memID) = $memberResult;
 
-	// Cast here is probably not needed, but don't trust yet !
+	// Cast here is probably not needed, but don't trust yet!
 	return (int) $memID;
 }
 
@@ -101,7 +101,7 @@ function setupProfileContext($fields, $hook = '')
 	$profileFields = new ProfileFields();
 	$profileFields->loadProfileFields(true);
 
-	// First check for any linked sets.
+	// First, check for any linked sets.
 	foreach ($profile_fields as $key => $field)
 	{
 		if (isset($field['link_with']) && in_array($field['link_with'], $fields, true))
@@ -130,7 +130,7 @@ function setupProfileContext($fields, $hook = '')
 				continue;
 			}
 
-			// If this is anything but complex we need to do more cleaning!
+			// If this is anything but complex, we need to do more cleaning!
 			if ($cur_field['type'] !== 'callback' && $cur_field['type'] !== 'hidden')
 			{
 				if (!isset($cur_field['label']))
@@ -154,7 +154,7 @@ function setupProfileContext($fields, $hook = '')
 				$cur_field['is_error'] = true;
 			}
 
-			// Any javascript stuff?
+			// Any JavaScript stuff?
 			if (!empty($cur_field['js_submit']))
 			{
 				$context['profile_onsubmit_javascript'] .= $cur_field['js_submit'];
@@ -207,7 +207,7 @@ function saveProfileChanges(&$profile_vars, $memID)
 {
 	global $context;
 
-	// These make life easier....
+	// These make life easier...
 	$old_id_theme = MembersList::get($memID)->id_theme;
 
 	// Permissions...
@@ -463,18 +463,20 @@ function makeNotificationChanges($memID)
 
 		foreach (getMemberNotificationsProfile($memID) as $mention => $data)
 		{
+			// If "use default" is checked, it takes precedence over any user selections
 			if (isset($_POST['notify'][$mention]) && !empty($_POST['notify'][$mention]['status']))
 			{
-				// When is not an array it means => use default => 0, so it's skipped on INSERT
-				if (!is_array($_POST['notify'][$mention]['status']))
-				{
-					$to_save[$mention] = 0;
-					continue;
-				}
+				// Use defaults for this mention type (no row inserted)
+				$to_save[$mention] = 0;
+				continue;
+			}
 
-				foreach ($_POST['notify'][$mention]['status'] as $method)
+			// Otherwise, look for user-specified methods under the dedicated 'user' key
+			if (isset($_POST['notify'][$mention]['user']) && is_array($_POST['notify'][$mention]['user']) && !empty($_POST['notify'][$mention]['user']))
+			{
+				foreach ($_POST['notify'][$mention]['user'] as $method)
 				{
-					// This ensures that the $method passed by the user is valid and safe to INSERT.
+					// Validate the method is allowed for this mention type
 					if (isset($data['data'][$method]))
 					{
 						if (!isset($to_save[$mention]))
@@ -484,19 +486,26 @@ function makeNotificationChanges($memID)
 						$to_save[$mention][] = $method;
 					}
 				}
+
+				// If after validation nothing remained, explicitly opt-out
+				if (!isset($to_save[$mention]))
+				{
+					$to_save[$mention] = [Notifications::DEFAULT_NONE];
+				}
 			}
 			else
 			{
+				// No defaults selected and no user options provided: explicit opt-out
 				$to_save[$mention] = [Notifications::DEFAULT_NONE];
+			}
 
-				// Shhh. ... Board/Topic onsite notifications are added as typical mentions on the fly
-				$to_save['watchedtopic'] = 0;
-				$to_save['watchedboard'] = 0;
-				if ((int) $_POST['notify_regularity'] === 4)
-				{
-					$to_save['watchedtopic'] = [0 => 'notification'];
-					$to_save['watchedboard'] = [0 => 'notification'];
-				}
+			// Shhh. ... Board/Topic onsite notifications are added as typical mentions on the fly
+			$to_save['watchedtopic'] = 0;
+			$to_save['watchedboard'] = 0;
+			if ((int) $_POST['notify_regularity'] === 4)
+			{
+				$to_save['watchedtopic'] = [0 => 'notification'];
+				$to_save['watchedboard'] = [0 => 'notification'];
 			}
 		}
 
@@ -520,7 +529,7 @@ function makeNotificationChanges($memID)
 		// id_board = 0 is reserved for topic notifications only
 		$notification_wanted = array_diff($_POST['notify_boards'], [0]);
 
-		// Gather up any any existing board notifications.
+		// Gather any existing board notifications.
 		$notification_current = [];
 		$db->fetchQuery('
 			SELECT 
@@ -573,11 +582,9 @@ function makeNotificationChanges($memID)
 	// We are editing topic notifications......
 	elseif (isset($_POST['edit_notify_topics']) && !empty($_POST['notify_topics']))
 	{
-		$edit_notify_topics = [];
-		foreach ($_POST['notify_topics'] as $index => $id)
-		{
-			$edit_notify_topics[$index] = (int) $id;
-		}
+		$edit_notify_topics = array_map(static function ($id) {
+			return (int) $id;
+		}, $_POST['notify_topics']);
 
 		// Make sure there are no zeros left.
 		$edit_notify_topics = array_diff($edit_notify_topics, [0]);
@@ -614,7 +621,7 @@ function makeCustomFieldChanges($memID, $area, $sanitize = true)
 
 	$where = $area === 'register' ? 'show_reg != 0' : 'show_profile = {string:area}';
 
-	// Load the fields we are saving too - make sure we save valid data (etc).
+	// Load the fields we are saving too - make sure we save valid data (etc.).
 	$request = $db->query('', '
 		SELECT 
 			col_name, field_name, field_desc, field_type, field_length, field_options, default_value, show_reg, mask, private
@@ -703,14 +710,11 @@ function makeCustomFieldChanges($memID, $area, $sanitize = true)
 			];
 
 			$changes[] = [$row['col_name'], $value, $memID];
+			$options[$row['col_name']] = $value;
+
 			if (in_array($row['field_type'], ['radio', 'select']))
 			{
-				$options[$row['col_name']] = $value;
 				$options[$row['col_name'] . '_key'] = $row['col_name'] . '_' . ($key ?? 0);
-			}
-			else
-			{
-				$options[$row['col_name']] = $value;
 			}
 		}
 	}
@@ -738,14 +742,12 @@ function makeCustomFieldChanges($memID, $area, $sanitize = true)
 /**
  * Validates the value of a custom field
  *
- * @param array $field - An array describing the field. It consists of the
- *                indexes:
- *                  - type; if different from 'text', only the length is checked
- *                  - mask; if empty or equal to 'none', only the length is
- *                          checked, possible masks are: email, number, regex
- *                  - field_length; maximum length of the field
- * @param string|int $value - The value that we want to validate
- * @return string|bool - A string representing the type of error, or true
+ * @param array $field - An array describing the field. It consists of the indexes:
+ *   - 'type'; if different from 'text', only the length is checked
+ *   - 'mask'; if empty or equal to 'none', only the length is checked, possible masks are: email, number, regex
+ *   - 'field_length'; maximum length of the field
+ * @param string|int $value The value that we want to validate
+ * @return string|bool A string representing the type of error, or true
  */
 function isCustomFieldValid($field, $value)
 {
@@ -804,7 +806,7 @@ function profileSendActivation()
 
 	// Log the user out.
 	require_once(SUBSDIR . '/Logging.subs.php');
-	logOnline($context['id_member'], false);
+	logOnline($context['id_member']);
 	$_SESSION['log_time'] = 0;
 	$_SESSION['login_' . $cookiename] = serialize([0, '', 0]);
 
@@ -1022,7 +1024,7 @@ function profileLoadGroups()
 	foreach ($context['member_groups'] as $id_group => $row)
 	{
 		$id_group = (int) $id_group;
-		// Registered member was already taken care before
+		// Registered member was already taken care of before
 		if ($id_group === 0)
 		{
 			continue;
@@ -1070,7 +1072,7 @@ function profileReloadUser()
 {
 	global $modSettings, $context, $cur_profile;
 
-	// Log them back in - using the verify password as they must have matched and this one doesn't get changed by anyone!
+	// Log them back in - using the verified password as they must have matched, and this one doesn't get changed by anyone!
 	if (isset($_POST['passwrd2']) && $_POST['passwrd2'] !== '')
 	{
 		require_once(SUBSDIR . '/Auth.subs.php');
@@ -1124,7 +1126,7 @@ function profileValidateSignature(&$value)
 			return 'signature_max_image_count';
 		}
 
-		// What about too many smileys!
+		// What about too many smileys?
 		$smiley_parsed = $unparsed_signature;
 		$wrapper = ParserWrapper::instance();
 		$parser = $wrapper->getSmileyParser();
@@ -1188,7 +1190,7 @@ function profileValidateSignature(&$value)
 			}
 		}
 
-		// The difficult one - image sizes! Don't error on this - just fix it.
+		// The challenging one - image sizes! Don't error on this - just fix it.
 		if ((!empty($sig_limits[5]) || !empty($sig_limits[6])))
 		{
 			// Get all BBC tags...
@@ -1284,7 +1286,7 @@ function profileValidateSignature(&$value)
 						}
 					}
 
-					// Did we come up with some changes? If so remake the string.
+					// Did we come up with some changes? If so, remake the string.
 					if ($width != -1 || $height != -1)
 					{
 						$replaces[$image] = '[img' . ($width != -1 ? ' width=' . round($width) : '') . ($height != -1 ? ' height=' . round($height) : '') . ']' . $matches[7][$key] . '[/img]';
@@ -1365,7 +1367,7 @@ function profileSaveAvatarData($value)
 		return $result;
 	}
 
-	// Setup the profile variables so it shows things right on display!
+	// Set up the profile variables so it shows things right on display!
 	$cur_profile['avatar'] = $profile_vars['avatar'];
 
 	return false;
@@ -1411,7 +1413,7 @@ function profileSaveGroups(&$value)
 	{
 		$value = (int) $value;
 	}
-	// ... otherwise it's the old group sir.
+	// ... otherwise it's the old group, sir.
 	else
 	{
 		$value = $old_profile['id_group'];
@@ -1447,12 +1449,12 @@ function profileSaveGroups(&$value)
 		}
 	}
 
-	// Too often, people remove delete their own account, or something.
+	// Too often, people remove delete their own account or something.
 	if (in_array(1, explode(',', $old_profile['additional_groups'])) || $old_profile['id_group'] == 1)
 	{
 		$stillAdmin = $value == 1 || (isset($additional_groups) && in_array(1, $additional_groups));
 
-		// If they would no longer be an admin, look for any other...
+		// If they no longer are an admin, look for any other...
 		if (!$stillAdmin)
 		{
 			$request = $db->query('', '
@@ -1477,7 +1479,7 @@ function profileSaveGroups(&$value)
 		}
 	}
 
-	// If we are changing group status, update permission cache as necessary.
+	// If we are changing group status, update the permission cache as necessary.
 	if ($value != $old_profile['id_group'] || isset($profile_vars['additional_groups']))
 	{
 		if ($context['user']['is_owner'])
@@ -1933,7 +1935,7 @@ function findMinMaxUserTopic($memID, $board = null)
 
 	$db = database();
 
-	$is_owner = $memID == User::$info->id;
+	$is_owner = (int) $memID === User::$info->id;
 
 	$request = $db->query('', '
 		SELECT 
@@ -2006,7 +2008,7 @@ function load_user_posts($memID, $start, $count, $range_limit = '', $reverse = f
 			]
 		);
 
-		// Did we get what we wanted, if so stop looking
+		// Did we get what we wanted, if so, stop looking
 		if ($request->num_rows() === $count || empty($range_limit))
 		{
 			break;
@@ -2015,7 +2017,7 @@ function load_user_posts($memID, $start, $count, $range_limit = '', $reverse = f
 		$range_limit = '';
 	}
 
-	// Place them in the post array
+	// Place them in the post-array
 	while (($row = $request->fetch_assoc()))
 	{
 		$user_posts[] = $row;
@@ -2029,7 +2031,7 @@ function load_user_posts($memID, $start, $count, $range_limit = '', $reverse = f
  * Used to load all the topics of a user
  *
  * - Can limit to just the posts of a particular board
- * - If range_limit 'guess' is supplied, will check if count results were returned, if not
+ * - If range_limit 'guess' is supplied, will check if count results were returned, if not,
  * it will drop the guessed limit and try again.
  *
  * @param int $memID
@@ -2047,7 +2049,7 @@ function load_user_topics($memID, $start, $count, $range_limit = '', $reverse = 
 
 	$db = database();
 
-	$is_owner = $memID == User::$info->id;
+	$is_owner = (int) $memID === User::$info->id;
 	$user_topics = [];
 
 	// Find this user's topics.  The left join on categories somehow makes this faster, weird as it looks.
@@ -2077,7 +2079,7 @@ function load_user_topics($memID, $start, $count, $range_limit = '', $reverse = 
 			]
 		);
 
-		// Did we get what we wanted, if so stop looking
+		// Did we get what we wanted, if so, stop looking
 		if ($request->num_rows() === $count || empty($range_limit))
 		{
 			break;
@@ -2159,9 +2161,9 @@ function getMemberGeneralPermissions($curGroups)
 			// Add the membergroup to either the denied or the allowed groups.
 			$general_permission[$row['permission']]['groups'][empty($row['add_deny'])
 				? 'denied'
-				: 'allowed'][] = $row['id_group'] == 0
-					? $txt['membergroups_members']
-					: $row['group_name'];
+				: 'allowed'][] = (int) $row['id_group'] === 0
+				? $txt['membergroups_members']
+				: $row['group_name'];
 
 			// Once denied is always denied.
 			$general_permission[$row['permission']]['is_denied'] |= empty($row['add_deny']);
@@ -2215,7 +2217,7 @@ function getMemberBoardPermissions($memID, $curGroups, $board = null)
 				return;
 			}
 
-			// The name of the permission using the format 'permission name' - 'own/any topic/event/etc.'.
+			// The name of the permission using the format 'permission name' - 'own/any topic/event/etc.'
 			if (in_array(substr($row['permission'], -4), ['_own', '_any']) && isset($txt['permissionname_' . substr($row['permission'], 0, -4)]))
 			{
 				$name = $txt['permissionname_' . substr($row['permission'], 0, -4)] . ' - ' . $txt['permissionname_' . $row['permission']];
@@ -2243,8 +2245,8 @@ function getMemberBoardPermissions($memID, $curGroups, $board = null)
 			$board_permission[$row['permission']]['groups'][empty($row['add_deny'])
 				? 'denied'
 				: 'allowed'][$row['id_group']] = $row['id_group'] == 0
-					? $txt['membergroups_members']
-					: $row['group_name'];
+				? $txt['membergroups_members']
+				: $row['group_name'];
 			$board_permission[$row['permission']]['is_denied'] |= empty($row['add_deny']);
 		}
 	);
@@ -2346,7 +2348,7 @@ function getMembersInRange($ips, $memID)
 	$message_members = [];
 	$members_in_range = [];
 
-	// Get member ID's which are in messages...
+	// Get member IDs which are in messages...
 	$db->fetchQuery('
 		SELECT DISTINCT mem.id_member
 		FROM {db_prefix}messages AS m
@@ -2419,7 +2421,7 @@ function getMemberNotificationsProfile($member_id)
 	$enabled_mentions = getEnabledNotifications();
 	$user_preferences = getUsersNotificationsPreferences($enabled_mentions, $member_id);
 	$mention_types = [];
-	$defaults = getConfiguredNotificationMethods('*');
+	$defaults = getConfiguredNotificationMethods();
 
 	foreach ($enabled_mentions as $type)
 	{
@@ -2442,7 +2444,7 @@ function getMemberNotificationsProfile($member_id)
 				'id' => '',
 				'input_name' => 'notify[' . $type . '][' . $key . ']',
 				'text' => $txt['notify_' . $key],
-				'enabled' => in_array($key, $user_preferences[$member_id][$type] ?? [])
+				'enabled' => in_array($key, $user_preferences[$member_id][$type] ?? [], true)
 			];
 
 			if (empty($user_preferences[$member_id][$type]))
@@ -2451,7 +2453,7 @@ function getMemberNotificationsProfile($member_id)
 			}
 		}
 
-		// In theory data should never be empty.
+		// In theory, data should never be empty.
 		if (!empty($data))
 		{
 			$mention_types[$type] = [
@@ -2478,8 +2480,8 @@ function getCustomFieldData($where, $area)
 {
 	$db = database();
 
-	// Load all the relevant fields - and data.
-	// The fully-qualified name for rows is here because it's a reserved word in Mariadb
+	// Load all the relevant fields and data.
+	// The fully qualified name for rows is here because it's a reserved word in Mariadb
 	// 10.2.4+ and quoting would be different for MySQL/Mariadb and PSQL
 	$request = $db->query('', '
 		SELECT
@@ -2509,7 +2511,8 @@ function getCustomFieldData($where, $area)
  *
  * @return bool Returns true if the email address is unique, false otherwise
  */
-function isUniqueEmail($memID, $email) {
+function isUniqueEmail($memID, $email)
+{
 	$db = database();
 
 	// Email addresses should be and stay unique.
@@ -2524,5 +2527,5 @@ function isUniqueEmail($memID, $email) {
 			'selected_member' => $memID,
 			'email_address' => $email,
 		]
-	)->num_rows();
+	)->hasResults();
 }

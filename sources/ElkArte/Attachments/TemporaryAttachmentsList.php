@@ -56,7 +56,7 @@ class TemporaryAttachmentsList extends ValuesContainer
 
 		foreach ($this->data as $attachID => $attachment)
 		{
-			if (str_contains($attachID, (string) $prefix))
+			if (str_contains($attachID, $prefix))
 			{
 				$path = $attachment['tmp_name'] ?? '';
 				if ($path !== '')
@@ -147,7 +147,7 @@ class TemporaryAttachmentsList extends ValuesContainer
 	 */
 	public function belongToBoard(int $board): bool
 	{
-		return empty($this->data['post']['msg']) && (int) $this->data['post']['board'] === (int) $board;
+		return empty($this->data['post']['msg']) && (int) $this->data['post']['board'] === $board;
 	}
 
 	/**
@@ -162,7 +162,7 @@ class TemporaryAttachmentsList extends ValuesContainer
 		/** @var TemporaryAttachment $attachment */
 		foreach ($this->data as $attachID => $attachment)
 		{
-			if (!str_contains($attachID, (string) $prefix))
+			if (!str_contains($attachID, $prefix))
 			{
 				continue;
 			}
@@ -192,7 +192,7 @@ class TemporaryAttachmentsList extends ValuesContainer
 		{
 			if ((isset($this->data['post']['files'], $attachment['name']) && in_array($attachment['name'], $this->data['post']['files'], true))
 				|| in_array($attachID, $keep)
-				|| !str_contains($attachID, (string) $prefix))
+				|| !str_contains($attachID, $prefix))
 			{
 				continue;
 			}
@@ -215,7 +215,7 @@ class TemporaryAttachmentsList extends ValuesContainer
 
 		foreach ($this->data as $attachID => $attachment)
 		{
-			if (str_contains($attachID, (string) $prefix))
+			if (str_contains($attachID, $prefix))
 			{
 				$this->data['post']['files'][] = $attachment->getName();
 			}
@@ -237,7 +237,7 @@ class TemporaryAttachmentsList extends ValuesContainer
 	}
 
 	/**
-	 * If there is any post data available
+	 * If there is any post-data available
 	 *
 	 * @return bool
 	 */
@@ -277,7 +277,7 @@ class TemporaryAttachmentsList extends ValuesContainer
 	}
 
 	/**
-	 * Return a post parameter like files, last_msg, topic, msg
+	 * Return a post-parameter like files, last_msg, topic, msg
 	 *
 	 * @param $idx
 	 * @return mixed|null
@@ -288,7 +288,7 @@ class TemporaryAttachmentsList extends ValuesContainer
 	}
 
 	/**
-	 * Add post values to the data array in the post key
+	 * Add post-values to the data array in the post-key
 	 *
 	 * @param array $vals
 	 */
@@ -310,7 +310,7 @@ class TemporaryAttachmentsList extends ValuesContainer
 	 */
 	public function belongToMsg(int $msg): bool
 	{
-		return (int) $this->data['post']['msg'] === (int) $msg;
+		return (int) $this->data['post']['msg'] === $msg;
 	}
 
 	/**

@@ -175,7 +175,7 @@ class SplitTopics extends AbstractController
 		global $txt;
 
 		// Clean up the subject.
-		$subname = $this->_req->getPost('subname', 'trim', $this->_req->getQuery('subname', 'trim', null));
+		$subname = $this->_req->getPost('subname', 'trim', $this->_req->getQuery('subname', 'trim'));
 		if (isset($subname) && empty($this->_new_topic_subject))
 		{
 			$this->_new_topic_subject = Util::htmlspecialchars($subname);
@@ -186,12 +186,12 @@ class SplitTopics extends AbstractController
 			$this->_new_topic_subject = $txt['new_topic'];
 		}
 
-		// Save in session so its available across all the form pages
+		// Save in session so it's available across all the form pages
 		if (empty($_SESSION['move_to_board']))
 		{
-			$_SESSION['move_to_board'] = (!empty($this->_req->post->move_new_topic) && !empty($this->_req->post->move_to_board)) ? (int) $this->_req->post->move_to_board : 0;
-			$_SESSION['reason'] = empty($this->_req->post->reason) ? '' : trim(Util::htmlspecialchars($this->_req->post->reason, ENT_QUOTES));
-			$_SESSION['messageRedirect'] = !empty($this->_req->post->messageRedirect);
+			$_SESSION['move_to_board'] = ($this->_req->hasPost('move_new_topic') && $this->_req->hasPost('move_to_board')) ? $this->_req->getPost('move_to_board', 'intval') : 0;
+			$_SESSION['reason'] = $this->_req->getPost('reason', 'trim|Util::htmlspecialchars[ENT_QUOTES]', '');
+			$_SESSION['messageRedirect'] = $this->_req->getPost('messageRedirect') !== null;
 			$_SESSION['new_topic_subject'] = $this->_new_topic_subject;
 		}
 	}
@@ -476,7 +476,7 @@ class SplitTopics extends AbstractController
 		$context['page_title'] = $txt['split_topic'];
 		$context['sub_template'] = 'split_successful';
 
-		splitAttemptMove($boards, $context['new_topic']);
+		$boards['destination'] = splitAttemptMove($boards, $context['new_topic']);
 
 		// Create a link to this in the old topic.
 		// @todo Does this make sense if the topic was unapproved before? We are not yet sure if the resulting topic is unapproved.
@@ -539,7 +539,7 @@ class SplitTopics extends AbstractController
 		$context['page_title'] = $txt['split_topic'];
 		$context['sub_template'] = 'split_successful';
 
-		splitAttemptMove($boards, $context['new_topic']);
+		$boards['destination'] = splitAttemptMove($boards, $context['new_topic']);
 
 		// Create a link to this in the old topic.
 		// @todo Does this make sense if the topic was unapproved before? We are not yet sure if the resulting topic is unapproved.

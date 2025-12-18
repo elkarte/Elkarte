@@ -52,7 +52,7 @@ class Priority
 	/**
 	 * Add a new entity to the pile
 	 *
-	 * @param string $entity name of a entity
+	 * @param string $entity name of an entity
 	 * @param int|null $priority an integer defining the priority of the entity.
 	 */
 	public function add($entity, $priority = null): void
@@ -66,7 +66,7 @@ class Priority
 	/**
 	 * Add an entity to the pile before another existing entity
 	 *
-	 * @param string $entity the name of a entity
+	 * @param string $entity the name of an entity
 	 * @param string $following the name of the entity before which $entity must be added
 	 */
 	public function addBefore($entity, $following): void
@@ -75,9 +75,9 @@ class Priority
 	}
 
 	/**
-	 * Add a entity to the pile after another existing entity
+	 * Add an entity to the pile after another existing entity
 	 *
-	 * @param string $entity the name of a entity
+	 * @param string $entity the name of an entity
 	 * @param string $previous the name of the entity after which $entity must be added
 	 */
 	public function addAfter($entity, $previous): void
@@ -86,9 +86,9 @@ class Priority
 	}
 
 	/**
-	 * Add a entity at the end of the pile
+	 * Add an entity at the end of the pile
 	 *
-	 * @param string $entity name of a entity
+	 * @param string $entity name of an entity
 	 * @param int|null $priority an integer defining the priority of the entity.
 	 */
 	public function addEnd($entity, $priority = null): void
@@ -100,9 +100,9 @@ class Priority
 	}
 
 	/**
-	 * Add a entity at the beginning of the pile
+	 * Add an entity at the beginning of the pile
 	 *
-	 * @param string $entity name of a entity
+	 * @param string $entity name of an entity
 	 * @param int|null $priority an integer defining the priority of the entity.
 	 */
 	public function addBegin($entity, $priority = null): void
@@ -114,9 +114,9 @@ class Priority
 	}
 
 	/**
-	 * Remove a entity by name
+	 * Remove an entity by name
 	 *
-	 * @param string $entity the name of a entity
+	 * @param string $entity the name of an entity
 	 */
 	public function remove($entity): void
 	{
@@ -199,7 +199,7 @@ class Priority
 		}
 
 		// This is not terribly optimized, though it shouldn't loop over too many things (hopefully)
-		// 2.0 I've made things a bit more efficient, although maybe harder to read !
+		// 2.0 I've made things a bit more efficient, although maybe harder to read!
 		// It "iteratively" adds all the after/before entities shifting priority
 		// of all the other entities to ensure each one has a different value
 		while (!empty($all['after']) || !empty($all['before']))

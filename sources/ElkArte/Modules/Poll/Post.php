@@ -26,7 +26,7 @@ use ElkArte\Themes\TemplateLayers;
 /**
  * Class Poll_Post_Module
  *
- * This class contains all matter of things related to creating polls
+ * This class contains all matters of things related to creating polls
  */
 class Post extends AbstractModule
 {
@@ -67,7 +67,7 @@ class Post extends AbstractModule
 	}
 
 	/**
-	 * Validates post data to ensure no one tried to reply with a poll
+	 * Validates post-data to ensure no one tried to reply with a poll
 	 *
 	 * @param int $topic
 	 * @param array $topic_attributes
@@ -160,7 +160,7 @@ class Post extends AbstractModule
 				'poll_add' => $txt['add_poll']], true);
 		}
 
-		// Check the users permissions - is the user allowed to add or post a poll?
+		// Check the users' permissions - is the user allowed to add or post a poll?
 		if (self::$_make_poll)
 		{
 			// New topic, new poll.
@@ -266,7 +266,7 @@ class Post extends AbstractModule
 	{
 		global $txt, $context;
 
-		// There may be situations where the module is started but the poll is not to be created (cheating)
+		// There may be situations where the module is started, but the poll is not to be created (cheating)
 		if (self::$_make_poll)
 		{
 			$destination .= ';poll';
@@ -334,7 +334,7 @@ class Post extends AbstractModule
 			isAllowedTo('poll_post');
 		}
 		// Can you add to your own topics?
-		elseif ($this->user->id == $topic_info['id_member_started'] && !allowedTo('poll_add_any'))
+		elseif ($this->user->id === $topic_info['id_member_started'] && !allowedTo('poll_add_any'))
 		{
 			isAllowedTo('poll_add_own');
 		}
@@ -397,7 +397,7 @@ class Post extends AbstractModule
 	{
 		global $board;
 
-		// Make sure that the user has not entered a ridiculous number of options..
+		// Make sure that the user has not entered a ridiculous number of options.
 		if (empty($options['poll_max_votes']) || $options['poll_max_votes'] <= 0)
 		{
 			$poll_max_votes = 1;
@@ -438,7 +438,7 @@ class Post extends AbstractModule
 			throw new Exception('poll_range_error', false);
 		}
 
-		// Don't allow them to select option 2 for hidden results if it's not time limited.
+		// Don't allow them to select option 2 for hidden results if it's not time-limited.
 		if (empty($poll_expire) && $poll_hide === 2)
 		{
 			$poll_hide = 1;

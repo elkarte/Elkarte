@@ -142,7 +142,7 @@ final class ParserWrapper
 			'markdown' => false,
 		];
 
-		// First see if any hooks set a parser.
+		// First, see if any hooks set a parser.
 		foreach ($parsers as $parser_type => &$parser)
 		{
 			call_integration_hook('integrate_' . $area . '_' . $parser_type . '_parser', [&$parser, $this]);

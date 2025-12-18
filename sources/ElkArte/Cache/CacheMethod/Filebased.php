@@ -17,7 +17,7 @@ use UnexpectedValueException;
 
 /**
  * Filebased caching is the fallback if nothing else is available, it simply
- * uses the filesystem to store queries results in order to try to reduce the
+ * uses the filesystem to store queries results to try to reduce the
  * number of queries per time period.
  *
  * The performance gain may or may not exist depending on many factors.
@@ -36,7 +36,7 @@ class Filebased extends AbstractCacheMethod
 	protected $ext = 'php';
 
 	/**
-	 * Obtain from the parent class the variables necessary
+	 * Get from the parent class the variables necessary
 	 * to help the tests stay running smoothly.
 	 *
 	 * @param string $key
@@ -73,7 +73,7 @@ class Filebased extends AbstractCacheMethod
 		{
 			$cache_data = "<?php '" . json_encode(['expiration' => time() + $ttl, 'data' => $value]) . "';";
 
-			// Write out the cache file, check that the cache write was successful; all the data must be written
+			// Write out the cache file, check that the cache writing was successful; all the data must be written
 			// If it fails due to low diskspace, or other, remove the cache file
 			if (file_put_contents(CACHEDIR . '/' . $fName, $cache_data, LOCK_EX) !== strlen($cache_data))
 			{

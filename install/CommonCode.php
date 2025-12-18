@@ -78,6 +78,10 @@ function load_database($force = false)
 			$loader = new ClassLoader();
 			$loader->setPsr4('ElkArte\\', SOURCEDIR . '/ElkArte');
 			$loader->setPsr4('BBC\\', SOURCEDIR . '/ElkArte/BBC');
+			// Not needed, but for consistency
+			$loader->setPsr4('Addons\\', BOARDDIR . '/Addons');
+			$loader->setPsr4('Wikimedia\\Minify\\', EXTDIR . '/Wikimedia/Minify');
+			$loader->setPsr4('Michelf\\', EXTDIR . '/Michelf');
 			$loader->register();
 
 			require_once(SOURCEDIR . '/database/Database.subs.php');

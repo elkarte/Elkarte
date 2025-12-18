@@ -1,7 +1,7 @@
 <?php
 
 /**
- * A class to analyse and extract information from queries
+ * A class to analyze and extract information from queries
  *
  * @package   ElkArte Forum
  * @copyright ElkArte Forum contributors
@@ -12,6 +12,8 @@
  */
 
 namespace ElkArte;
+
+use ElkArte\Exceptions\Exception;
 
 /**
  * Class QueryAnalysis
@@ -96,7 +98,7 @@ class QueryAnalysis
 	}
 
 	/**
-	 * Determines if the query has a SELECT statement and if so it is returned
+	 * Determines if the query has a SELECT statement and if so, it is returned
 	 *
 	 * @param string $query_data - The query string
 	 * @return false|string false if the query doesn't have a SELECT, otherwise
@@ -142,7 +144,7 @@ class QueryAnalysis
 	 * Does the EXPLAIN of a query
 	 *
 	 * @return string[] an array with the results of the EXPLAIN with two
-	 * possible structures depending if the EXPLAIN is successful or fails.
+	 * possible structures depending on if the EXPLAIN is successful or fails.
 	 *  - If successful:
 	 *      array(
 	 *        'headers' => array( ..list of headers.. )
@@ -156,7 +158,7 @@ class QueryAnalysis
 	 *        'error_text' => the error message
 	 *     )
 	 *
-	 * @throws \ElkArte\Exceptions\Exception
+	 * @throws Exception
 	 */
 	public function doExplain(): array
 	{

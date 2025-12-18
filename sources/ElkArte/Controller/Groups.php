@@ -409,7 +409,7 @@ class Groups extends AbstractController
 		];
 
 		// They didn't pick one, or tried a wrong one, so default to by name..
-		$requested_sort = $this->_req->getQuery('sort', 'trim|strval', null);
+		$requested_sort = $this->_req->getQuery('sort', 'trim|strval');
 		if ($requested_sort === null || !isset($sort_methods[$requested_sort]))
 		{
 			$context['sort_by'] = 'name';
@@ -505,7 +505,7 @@ class Groups extends AbstractController
 			&& !empty($this->_req->post->groupr)
 			&& !empty($this->_req->post->req_action))
 		{
-			checkSession('post');
+			checkSession();
 			validateToken('mod-gr');
 
 			require_once(SUBSDIR . '/Membergroups.subs.php');

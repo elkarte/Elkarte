@@ -54,7 +54,7 @@ class Watchedboard extends AbstractNotificationMessage
 	}
 
 	/**
-	 * There is no interface for this, its always available as an on-site mention and members set
+	 * There is no interface for this, it's always available as an on-site mention and members set
 	 * from profile options notifications
 	 *
 	 * @return true

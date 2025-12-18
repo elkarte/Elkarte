@@ -534,6 +534,7 @@ em, .em {
 }
 
 .clear {
+	display: block;
 	clear: both;
 }
 
@@ -702,6 +703,7 @@ h2.hdicon {
 
 /* Styles used by the auto suggest control. */
 .auto_suggest_div {
+	font-size: var(--font14);
 	position: absolute;
 	z-index: 100;
 	visibility: hidden;

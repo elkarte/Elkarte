@@ -45,7 +45,7 @@ function getServerVersions($checkFor)
 		$conn = $db->connection();
 		if (empty($conn))
 		{
-			trigger_error('getServerVersions(): you need to be connected to the database in order to get its server version', E_USER_NOTICE);
+			trigger_error('getServerVersions(): you need to be connected to the database in order to get its server version');
 		}
 		else
 		{

@@ -206,7 +206,7 @@ function deleteMembergroups($groups)
 		);
 	}
 
-	// Recalculate the post groups, as they likely changed.
+	// Recalculate the post-groups, as they likely changed.
 	updatePostGroupStats();
 
 	// Make a note of the fact that the cache may be wrong.
@@ -230,7 +230,7 @@ function deleteMembergroups($groups)
  * Remove one or more members from one or more membergroups.
  *
  * - Requires the manage_membergroups permission.
- * - Function includes a protection against removing from implicit groups.
+ * - Function includes protection against removing from implicit groups.
  * - Non-admins are not able to remove members from the admin group.
  *
  * @param int[]|int $members
@@ -338,7 +338,7 @@ function removeMembersFromGroups($members, $groups = null, $permissionCheckDone 
 	$group_details = membergroupsById($groups, 0, true);
 	foreach ($group_details as $key => $row)
 	{
-		if ($row['min_posts'] != -1)
+		if ((int) $row['min_posts'] !== -1)
 		{
 			$implicitGroups[] = $row['id_group'];
 		}
@@ -351,7 +351,7 @@ function removeMembersFromGroups($members, $groups = null, $permissionCheckDone 
 	// Now get rid of those groups.
 	$groups = array_diff($groups, $implicitGroups);
 
-	// Don't forget the protected groups.
+	// Remember the protected groups.
 	if (!allowedTo('admin_forum'))
 	{
 		$protected_groups = [1];
@@ -408,7 +408,7 @@ function removeMembersFromGroups($members, $groups = null, $permissionCheckDone 
 		]
 	);
 
-	// Those who have it as part of their additional group must be updated the long way... sadly.
+	// Those who have it as part of their additional group must be updated a long way... sadly.
 	$updates = [];
 	$db->fetchQuery('
 		SELECT 
@@ -422,7 +422,7 @@ function removeMembersFromGroups($members, $groups = null, $permissionCheckDone 
 			'additional_groups_implode' => implode(', additional_groups) != 0 OR FIND_IN_SET(', $groups),
 		]
 	)->fetch_callback(
-		function ($row) use (&$updates, $groups, $group_names) {
+		function ($row) use (&$updates, &$log_inserts, $groups, $group_names) {
 			// What log entries must we make for this one, eh?
 			foreach (explode(',', $row['additional_groups']) as $group)
 			{
@@ -445,7 +445,7 @@ function removeMembersFromGroups($members, $groups = null, $permissionCheckDone 
 		updateMemberData($memberArray, ['additional_groups' => implode(',', array_diff(explode(',', $additional_groups), $groups))]);
 	}
 
-	// Their post groups may have changed now...
+	// Their post-groups may have changed now...
 	updatePostGroupStats($members);
 
 	// Do the log.
@@ -489,7 +489,7 @@ function addMembersToGroup($members, $group, $type = 'auto', $permissionCheckDon
 {
 	$db = database();
 
-	// Show your licence, but only if it hasn't been done yet.
+	// Show your license, but only if it hasn't been done yet.
 	if (!$permissionCheckDone)
 	{
 		isAllowedTo('manage_membergroups');
@@ -693,10 +693,10 @@ function cache_getMembergroupList()
  * @param int $start not used
  * @param int $items_per_page not used
  * @param string $sort An SQL query indicating how to sort the results
- * @param string $membergroup_type Should be 'post_count' for post groups or 'regular' for other groups
+ * @param string $membergroup_type Should be 'post_count' for post-groups or 'regular' for other groups
  * @param int $user_id id of the member making the request
- * @param bool $include_hidden If true includes hidden groups if the user has permission
- * @param bool $include_all If true includes all groups the user can see
+ * @param bool $include_hidden If true, includes hidden groups if the user has permission
+ * @param bool $include_all If true, includes all groups the user can see
  * @param bool $aggregate
  * @param bool $count_permissions
  * @param int|null $pid - profile id
@@ -720,7 +720,7 @@ function list_getMembergroups($start, $items_per_page, $sort, $membergroup_type,
 	if ($membergroup_type === 'all')
 	{
 		// Determine the number of ungrouped members.
-		$num_members = countMembersInGroup(0);
+		$num_members = countMembersInGroup();
 
 		// Fill the context variable with 'Guests' and 'Regular Members'.
 		$groups = [
@@ -830,7 +830,7 @@ function list_getMembergroups($start, $items_per_page, $sort, $membergroup_type,
 		}
 	);
 
-	// If we found any membergroups, get the amount of members in them.
+	// If we found any membergroups, get the number of members in them.
 	if (!empty($group_ids))
 	{
 		if ($membergroup_type === 'post_count')
@@ -928,8 +928,8 @@ function list_getMembergroups($start, $items_per_page, $sort, $membergroup_type,
 /**
  * Count the number of members in specific groups
  *
- * @param int[] $postGroups an array of post-based groups id.
- * @param int[] $normalGroups = array() an array of normal groups id.
+ * @param int[] $postGroups an array of post-based groups' id.
+ * @param int[] $normalGroups = array() an array of normal groups' id.
  * @param bool $include_hidden if true, includes hidden groups in the count (default false).
  * @param bool $include_moderators if true, includes board moderators too (default false).
  * @param bool $include_non_active if true, includes non active members (default false).
@@ -942,7 +942,7 @@ function membersInGroups($postGroups, $normalGroups = [], $include_hidden = fals
 
 	$groups = [];
 
-	// If we have post groups, let's count the number of members...
+	// If we have post-groups, let's count the number of members...
 	if (!empty($postGroups))
 	{
 		$db->fetchQuery('
@@ -986,7 +986,7 @@ function membersInGroups($postGroups, $normalGroups = [], $include_hidden = fals
 		// Only do additional groups if we can moderate...
 		if ($include_hidden)
 		{
-			// Also do those who have it as an additional membergroup - this ones more yucky...
+			// Also do those who have it as an additional membergroup - this one more yucky...
 			$db->fetchQuery('
 				SELECT 
 					mg.id_group, COUNT(*) AS member_count
@@ -1038,8 +1038,8 @@ function membersInGroups($postGroups, $normalGroups = [], $include_hidden = fals
  * Returns details of membergroups based on the id
  *
  * @param int[]|int $group_ids the IDs of the groups.
- * @param int $limit = 1 the number of results returned (default 1, if null/false/0 returns all).
- * @param bool $detailed = false if true then it returns more fields (default false).
+ * @param int $limit = 1 the number of results returned (default 1 if null/false/0 returns all).
+ * @param bool $detailed = false if true, then it returns more fields (default false).
  *     false returns: id_group, group_name, group_type.
  *     true adds to above: description, min_posts, online_color, max_messages, icons, hidden, id_parent.
  * @param bool $assignable = false determine if the group is assignable or not and return that information.
@@ -1159,7 +1159,7 @@ function getBasicMembergroupData($includes = [], $excludes = [], $sort_order = n
 	$where = '';
 	$sort_order = $sort_order ?? 'min_posts, CASE WHEN id_group < {int:newbie_group} THEN id_group ELSE 4 END, group_name';
 
-	// Do we need the post based membergroups?
+	// Do we need the post-based membergroups?
 	$where .= !empty($modSettings['permission_enable_postgroups']) || in_array('postgroups', $includes) ? '' : 'AND min_posts = {int:min_posts}';
 	// Include protected groups?
 	$where .= allowedTo('admin_forum') || in_array('protected', $includes) ? '' : ' AND group_type != {int:is_protected}';
@@ -1169,14 +1169,14 @@ function getBasicMembergroupData($includes = [], $excludes = [], $sort_order = n
 	$where .= in_array('admin', $includes) ? '' : ' AND id_group != {int:admin_group}';
 	// Local Moderators?
 	$where .= in_array('mod', $includes) ? '' : ' AND id_group != {int:moderator_group}';
-	// Ignore the first post based group?
+	// Ignore the first post-based group?
 	$where .= !in_array('newbie', $excludes) ? '' : ' AND id_group != {int:newbie_group}';
 	// Exclude custom groups?
 	$where .= !in_array('custom', $excludes) ? '' : ' AND id_group < {int:newbie_group}';
 	// Exclude hidden?
 	$where .= !in_array('hidden', $excludes) ? '' : ' AND hidden != {int:hidden_group}';
 
-	// Only the post based membergroups? We can safely overwrite the $where.
+	// Only the post-based membergroups? We can safely overwrite the $where.
 	if (in_array('membergroups', $excludes))
 	{
 		$where = ' AND min_posts != {int:min_posts}';
@@ -1482,7 +1482,7 @@ function updateCopiedGroup($id_group, $copy_from)
 }
 
 /**
- * Updates the properties of a inherited membergroup.
+ * Updates the properties of an inherited membergroup.
  *
  * @param int $id_group
  * @param int $copy_id
@@ -1535,14 +1535,11 @@ function updateMembergroupProperties($properties)
 		if (isset($known_properties[$name]))
 		{
 			$updates[] = $name . '={' . $known_properties[$name]['type'] . ':subs_' . $name . '}';
-			switch ($known_properties[$name]['type'])
+			$values['subs_' . $name] = match ($known_properties[$name]['type'])
 			{
-				case 'string':
-					$values['subs_' . $name] = Util::htmlspecialchars((string) $value);
-					break;
-				default:
-					$values['subs_' . $name] = (int) $value;
-			}
+				'string' => Util::htmlspecialchars((string) $value),
+				default => (int) $value,
+			};
 		}
 	}
 
@@ -1851,9 +1848,9 @@ function getGroupModerators($id_group)
 }
 
 /**
- * Lists all groups which inherit permission profiles from the given group.
+ * Lists all groups that inherit permission profiles from the given group.
  *
- * - If no group is specified it will list any group that can be used
+ * - If no group is specified, it will list any group that can be used
  *
  * @param int|bool $id_group
  * @return array
@@ -1893,7 +1890,7 @@ function getInheritableGroups($id_group = false)
 }
 
 /**
- * List all membergroups and prepares them to assign permissions to..
+ * List all membergroups and prepares them to assign permissions to.
  *
  * @return array
  * @package Membergroups
@@ -1971,7 +1968,7 @@ function prepareMembergroupPermissions()
  *
  * @param int $id_member the id of a member
  * @param bool $show_hidden true if hidden groups (that the user can moderate) should be loaded (default false)
- * @param int $min_posts minimum number of posts for the group (-1 for non-post based groups)
+ * @param int $min_posts minimum number of posts for the group (-1 for non-post-based groups)
  *
  * @return array
  * @package Membergroups
@@ -2014,8 +2011,8 @@ function loadGroups($id_member, $show_hidden = false, $min_posts = -1)
 /**
  * Returns the groups that the current user can see.
  *
- * - uses User::$info and allowedTo().
- * - does not include post count based groups
+ * - Uses User::$info and allowedTo().
+ * - Does not include post-count based groups
  *
  * @return array
  * @package Membergroups
@@ -2187,19 +2184,19 @@ function updatePostGroupStats($members = null, $parameter2 = null)
 			}
 		);
 
-		// Sort them this way because if it's done with MySQL it causes a filesort :(.
+		// Sort them this way because if it's done with MySQL, it causes a filesort :(.
 		arsort($postgroups);
 
 		Cache::instance()->put('updatePostGroupStats', $postgroups, 360);
 	}
 
-	// Oh great, they've screwed their post groups.
+	// Oh great, they've screwed their post-groups.
 	if (empty($postgroups))
 	{
 		return;
 	}
 
-	// Set all membergroups from most posts to the least posts.
+	// Set all membergroups from most posts to the least post.
 	$conditions = '';
 	$lastMin = 0;
 	foreach ($postgroups as $id => $min_posts)

@@ -32,7 +32,7 @@ use ElkArte\SettingsForm\SettingsFormAdapter\DbTable;
 class MaillistSettings extends SettingsForm\SettingsForm
 {
 	/**
-	 * static function saveTableSettings, now part of the Settings Form class
+	 * Static function saveTableSettings, now part of the Settings Form class
 	 *
 	 * @param array $configVars the key names of the vars are the table cols
 	 * @param string $tableName name of the table the values will be saved in

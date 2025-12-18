@@ -36,7 +36,7 @@ class Notifications extends AbstractModel
 	/** @var string Where the notifiers are stored */
 	public const NOTIFIERS_PATH = SOURCEDIR . '/ElkArte/Notifiers/Methods';
 
-	/** @var string Since we have to call them dynamically we need to know both path and namespace... */
+	/** @var string Since we have to call them dynamically, we need to know both path and namespace... */
 	public const NOTIFIERS_NAMESPACE = '\\ElkArte\\Notifiers\\Methods';
 
 	/** @var int When in settings is stored with this value, it means it's the default for users that have no specific setting */
@@ -81,7 +81,7 @@ class Notifications extends AbstractModel
 	}
 
 	/**
-	 * Function to register any new notification method, and instantiates it.  The default methods
+	 * Function to register any new notification method and instantiates it.  The default methods
 	 * are Email, EmailDaily, EmailWeekly, and Notification
 	 *
 	 * @param string $class_name the name of a class
@@ -155,7 +155,7 @@ class Notifications extends AbstractModel
 	}
 
 	/**
-	 * Process a certain task in order to send out the notifications.
+	 * Process a certain task to send out the notifications.
 	 *
 	 * @param NotificationsTask $task
 	 */
@@ -172,14 +172,14 @@ class Notifications extends AbstractModel
 		require_once(SUBSDIR . '/Notification.subs.php');
 		$active_notifiers = filterNotificationMethods(array_keys($this->_notifiers), $class::getType());
 
-		// Cleanup the list of members to notify,
+		// Clean up the list of members to notify;
 		// in certain cases it may differ from the list passed (if any)
 		$obj->setUsersToNotify();
 
-		// How do these members actually want to be notified
+		// How do these members actually want to be notified?
 		$notif_prefs = $this->_getNotificationPreferences($active_notifiers, $task->notification_type, $task->getMembers());
 
-		// For each notification method enabled for this (on site, email etc)
+		// For each notification method enabled for this (on site, email, etc.)
 		foreach ($notif_prefs as $notifier => $members)
 		{
 			// No members signed up for this combo
@@ -247,7 +247,7 @@ class Notifications extends AbstractModel
 	}
 
 	/**
-	 * Returns the notifications in the system, daily, weekly, etc
+	 * Returns the notifications in the system, daily, weekly, etc.
 	 *
 	 * @return string[]
 	 */

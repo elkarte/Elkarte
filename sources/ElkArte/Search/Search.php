@@ -55,7 +55,7 @@ class Search
 	/** @var array Phrases not to be found in the search results (-"some phrase") */
 	private $_excludedPhrases = [];
 
-	/** @var WeightFactors The weights to associate to various areas for relevancy */
+	/** @var WeightFactors The weights to associate with various areas for relevancy */
 	private $_weightFactors = [];
 
 	/** @var bool If we are creating a tmp db table */
@@ -176,7 +176,7 @@ class Search
 	}
 
 	/**
-	 * If any block-listed word has been found
+	 * If any blocklisted word has been found
 	 *
 	 * @return bool
 	 */
@@ -186,7 +186,7 @@ class Search
 	}
 
 	/**
-	 * Returns the block-listed word array
+	 * Returns the blocklisted word array
 	 *
 	 * @return array
 	 */
@@ -201,11 +201,11 @@ class Search
 	}
 
 	/**
-	 * Sets the block-listed word array
+	 * Sets the blocklisted word array
 	 */
 	public function setBlockListedWords(): void
 	{
-		// Unfortunately, searching for words like these is going to result in to many hits,
+		// Unfortunately, searching for words like these is going to result in too many hits,
 		// so we're blocking them.
 		$blocklist_words = ['img', 'url', 'quote', 'www', 'http', 'the', 'is', 'it', 'are', 'if', 'in'];
 		call_integration_hook('integrate_search_blocklist_words', [&$blocklist_words]);

@@ -493,7 +493,7 @@ class ModerationCenter extends AbstractController
 		}
 		elseif (isset($this->_req->post->close, $this->_req->post->close_selected))
 		{
-			checkSession('post');
+			checkSession();
 
 			// All the ones to update...
 			$toClose = array_map('intval', $this->_req->post->close);
@@ -917,7 +917,7 @@ class ModerationCenter extends AbstractController
 		// Are we saving?
 		if ($this->_req->hasPost('save'))
 		{
-			checkSession('post');
+			checkSession();
 			validateToken('mod-set');
 
 			/* Current format of mod_prefs is:
@@ -1293,7 +1293,7 @@ class ModerationCenter extends AbstractController
 		];
 
 		// Setup the allowed quick search type
-		$reqSort = $this->_req->getQuery('sort', 'trim|strval', null);
+		$reqSort = $this->_req->getQuery('sort', 'trim|strval');
 		$context['order'] = ($reqSort !== null && isset($searchTypes[$reqSort])) ? $reqSort : 'member';
 
 		if (!isset($search_params['string']) || (!empty($this->_req->post->search) && $search_params['string'] !== $this->_req->post->search))
@@ -1507,7 +1507,7 @@ class ModerationCenter extends AbstractController
 		// Deleting and existing one
 		if (isset($this->_req->post->delete) && !empty($this->_req->post->deltpl))
 		{
-			checkSession('post');
+			checkSession();
 			validateToken('mod-wt');
 			removeWarningTemplate($this->_req->post->deltpl);
 		}
@@ -1645,7 +1645,7 @@ class ModerationCenter extends AbstractController
 		// Wait, we are saving?
 		if ($this->_req->hasPost('save'))
 		{
-			checkSession('post');
+			checkSession();
 			validateToken('mod-wt');
 
 			// To check the BBC is pretty good...
@@ -1972,7 +1972,7 @@ class ModerationCenter extends AbstractController
 
 		$context['reported_posts'] = [];
 
-		$reported_posts = reportedPosts(false);
+		$reported_posts = reportedPosts();
 		foreach ($reported_posts as $row)
 		{
 			$context['reported_posts'][] = [

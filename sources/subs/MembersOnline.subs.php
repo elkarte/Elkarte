@@ -55,7 +55,7 @@ function getMembersOnlineStats($membersOnlineOptions)
 	// Not allowed sort method? Bang! Error!
 	elseif (!in_array($membersOnlineOptions['sort'], $allowed_sort_options))
 	{
-		trigger_error('Sort method for getMembersOnlineStats() function is not allowed', E_USER_NOTICE);
+		trigger_error('Sort method for getMembersOnlineStats() function is not allowed');
 	}
 
 	// Get it from the cache and send it back.
@@ -166,7 +166,7 @@ function getMembersOnlineStats($membersOnlineOptions)
 	}
 	$request->free_result();
 
-	// If there are spiders only and we're showing the detail, add them to the online list - at the bottom.
+	// If there are spiders only, and we're showing the detail, add them to the online list - at the bottom.
 	if (!empty($spider_finds) && $modSettings['show_spider_online'] > 1)
 	{
 		$sort = $membersOnlineOptions['sort'] === 'log_time' && $membersOnlineOptions['reverse_sort'] ? 0 : 'zzz_';

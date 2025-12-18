@@ -45,7 +45,7 @@ class UserNotification extends AbstractModel
 	];
 
 	/**
-	 * Construct, Load the language file and make db/user info available to the class
+	 * Construct, Load the language file, and make db/user info available to the class
 	 *
 	 * @param QueryInterface $db
 	 * @param UserInfo|ValuesContainer $user
@@ -57,7 +57,7 @@ class UserNotification extends AbstractModel
 	}
 
 	/**
-	 * Loads up the needed interfaces (favicon or desktop notifications).
+	 * Loads up the necessary interfaces (favicon or desktop notifications).
 	 */
 	public function present(): void
 	{
@@ -74,10 +74,10 @@ class UserNotification extends AbstractModel
 	}
 
 	/**
-	 * Prepares the javascript for adding the nice number to the favicon.
+	 * Prepares the JavaScript for adding the nice number to the favicon.
 	 *
 	 * @param int $mentions the number of unread mentions
-	 * @param int $pms the number of unread messages
+	 * @param int $pm_unread the number of unread messages
 	 */
 	protected function _addFaviconNumbers($mentions, $pm_unread): void
 	{
@@ -127,7 +127,7 @@ class UserNotification extends AbstractModel
 	}
 
 	/**
-	 * Prepares the javascript for desktop notifications.  The service worker is used on
+	 * Prepares the JavaScript for desktop notifications.  The service worker is used on
 	 * mobile devices (at least chrome) and needs to be in the root for proper global access.
 	 */
 	protected function _addDesktopNotifications(): void
@@ -204,7 +204,7 @@ class UserNotification extends AbstractModel
 			'usernotif_favicon_position' => 'contains[' . implode(',', $this->_valid_positions) . ']',
 		];
 
-		// Cleanup the inputs! :D
+		// Clean up the inputs! :D
 		$validator->validation_rules($validation_rules);
 		$validator->validate($post);
 		foreach (array_keys($validation_rules) as $key)

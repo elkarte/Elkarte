@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Takes the actions defined in the package info xml file and then tests it for actionability and
+ * Takes the actions defined in the package info XML file and then tests it for actionability and
  * if its passes will perform those actions
  *
  * @package   ElkArte Forum
@@ -56,8 +56,8 @@ class PackageParser extends AbstractModel
 	 * What it does:
 	 *
 	 * - Package should be an \ElkArte\XmlArray with package-info as its base.
-	 * - Testing_only should be true if the package should not actually be applied.
-	 * - Method can be upgrade, install, or uninstall.  Its default is install.
+	 * - Testing_only should be true if the package should not be applied.
+	 * - Method can be upgrade, install, or uninstall.  Its default is installed.
 	 * - Previous_version should be set to the previous installed version of this package, if any.
 	 * - Does not handle failure terribly well; testing first is always better.
 	 *
@@ -103,7 +103,7 @@ class PackageParser extends AbstractModel
 		// This is the testing phase... nothing shall be done yet.
 		$this->testingPhase($actions);
 
-		// Do we have to supply a redirect action or was one given
+		// Do we have to supply a redirect action or was one given?
 		$this->setRedirect();
 
 		// Housekeeping
@@ -246,7 +246,7 @@ class PackageParser extends AbstractModel
 			$chmod_control->createChmodControl([$action['filename']]);
 			$this->failure |= !$this->fileFunc->delete($action['filename']);
 		}
-		// The file that was supposed to be deleted couldn't be found.
+		// The file to be deleted couldn't be found.
 		else
 		{
 			$this->failure = true;
@@ -505,7 +505,7 @@ class PackageParser extends AbstractModel
 	}
 
 	/**
-	 * Sets create file values, checks if chmod control will be needed
+	 * Sets create file values, checks if chmod control is needed
 	 *
 	 * @param object $action
 	 * @param array $this_action
@@ -528,7 +528,7 @@ class PackageParser extends AbstractModel
 	}
 
 	/**
-	 * Sets create file values, checks if chmod control will be needed
+	 * Sets create file values, checks if chmod control is needed
 	 *
 	 * @param object $action
 	 * @param array $this_action
@@ -536,7 +536,7 @@ class PackageParser extends AbstractModel
 	 */
 	public function testCreatefile($action, $this_action): array
 	{
-		// Can we create a file in a known location
+		// Can we create a file in a known location?
 		if (!dirTest(dirname($this_action['destination'])))
 		{
 			$temp = dirname($this_action['destination']);
@@ -560,7 +560,7 @@ class PackageParser extends AbstractModel
 	}
 
 	/**
-	 * Sets required dir values, checks if chmod control will be needed
+	 * Sets required dir values, checks if chmod control is needed
 	 *
 	 * @param object $action
 	 * @param array $this_action
@@ -582,7 +582,7 @@ class PackageParser extends AbstractModel
 	}
 
 	/**
-	 * Sets required file values, checks if chmod control will be needed
+	 * Sets required file values, checks if chmod control is needed
 	 *
 	 * @param object $action
 	 * @param array $this_action
@@ -599,7 +599,7 @@ class PackageParser extends AbstractModel
 	}
 
 	/**
-	 * Sets move dir values, checks if chmod control will be needed
+	 * Sets move dir values, checks if chmod control is needed
 	 *
 	 * @param object $action
 	 * @param array $this_action
@@ -611,7 +611,7 @@ class PackageParser extends AbstractModel
 	}
 
 	/**
-	 * Sets move file values, checks if chmod control will be needed
+	 * Sets move file values, checks if chmod control is needed
 	 *
 	 * @param object $action
 	 * @param array $this_action
@@ -623,7 +623,7 @@ class PackageParser extends AbstractModel
 	}
 
 	/**
-	 * Sets remove dir values, checks if chmod control will be needed
+	 * Sets remove dir values, checks if chmod control is needed
 	 *
 	 * @param object $action
 	 * @param array $this_action
@@ -644,7 +644,7 @@ class PackageParser extends AbstractModel
 	}
 
 	/**
-	 * Sets remove file values, checks if chmod control will be needed
+	 * Sets remove file values, checks if chmod control is needed
 	 *
 	 * @param object $action
 	 * @param array $this_action
@@ -905,7 +905,7 @@ class PackageParser extends AbstractModel
 	{
 		$script = false;
 
-		// All the possible methods, like install for 1.1.1-1.1.99 etc
+		// All the possible methods, like installation for 1.1.1-1.1.99 etc.
 		$these_methods = $packageXML->set($method);
 
 		// See if one of the methods matches our version, so we know which script to follow

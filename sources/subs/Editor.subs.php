@@ -48,7 +48,7 @@ function create_control_richedit($editorOptions)
 	// Load the Post language file... for the moment at least.
 	Txt::load('Post');
 
-	// Every control must have a ID!
+	// Every control must have an ID!
 	assert(isset($editorOptions['id']));
 	assert(isset($editorOptions['value']));
 
@@ -122,7 +122,7 @@ function create_control_richedit($editorOptions)
 		'hidden_fields' => !empty($editorOptions['hidden_fields']) ? $editorOptions['hidden_fields'] : [],
 	];
 
-	// Allow addons an easy way to add plugins, initialization objects, etc to the editor control
+	// Allow addons an easy way to add plugins, initialization objects, etc. to the editor control
 	call_integration_hook('integrate_editor_plugins', [$editorOptions['id']]);
 
 	// Switch between default images and back... mostly in case you don't have a PersonalMessage template, but do have a Post template.
@@ -139,7 +139,7 @@ function create_control_richedit($editorOptions)
 		$settings['theme_dir'] = $settings['default_theme_dir'];
 	}
 
-	// Setup the toolbar, smileys, plugins
+	// Set up the toolbar, smileys, plugins
 	$context['bbc_toolbar'] = loadEditorToolbar();
 	$context['editor_bbc_toolbar'] = buildBBCToolbar($context['bbc_box_name']);
 	$context['smileys'] = empty($editorOptions['disable_smiley_box']) ? loadEditorSmileys($context['controls']['richedit'][$editorOptions['id']]) : '';
@@ -153,7 +153,7 @@ function create_control_richedit($editorOptions)
 		list($settings['theme_url'], $settings['images_url'], $settings['theme_dir']) = $temp;
 	}
 
-	// Provide some dynamic error checking (no subject, no body, no service!)
+	// Provide some dynamic error checking (no subject, no message, no service!)
 	if (!empty($editorOptions['live_errors']))
 	{
 		Txt::load('Errors');

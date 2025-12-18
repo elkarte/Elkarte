@@ -32,7 +32,7 @@ class ManageEditor extends AbstractController
 	 *
 	 * - This method is the entry point for index.php?action=admin;area=editor
 	 * - It calls a function based on the sub-action, here only display.
-	 * - requires admin_forum permissions
+	 * - Requires admin_forum permissions
 	 *
 	 * @event integrate_sa_manage_editor Used to add more sub actions
 	 * @see AbstractController::action_index()
@@ -51,7 +51,7 @@ class ManageEditor extends AbstractController
 		// Set up
 		$action = new Action('manage_editor');
 
-		// Only one option I'm afraid, but integrate_sa_manage_editor can add more
+		// Only one option, I'm afraid, but integrate_sa_manage_editor can add more
 		$subAction = $action->initialize($subActions, 'display');
 		$context['sub_action'] = $subAction;
 		$context['page_title'] = $txt['manageposts_editor_settings_title'];
@@ -78,7 +78,7 @@ class ManageEditor extends AbstractController
 		// Initialize it with our settings
 		$settingsForm->setConfigVars($this->_settings());
 
-		// Make sure a nifty javascript will enable/disable checkboxes, according to BBC globally set or not.
+		// Make sure a nifty JavaScript will enable/disable checkboxes, according to BBC, globally set or not.
 		theme()->addInlineJavascript('
 			toggleBBCDisabled(\'disabledBBC\', ' . (empty($modSettings['enableBBC']) ? 'true' : 'false') . ');', true);
 

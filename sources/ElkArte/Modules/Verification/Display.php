@@ -38,7 +38,7 @@ class Display extends AbstractModule
 		if (User::$info->is_admin === false
 			&& User::$info->is_moderator === false
 			&& !empty($modSettings['posts_require_captcha'])
-			&& (User::$info->posts < $modSettings['posts_require_captcha'] || (User::$info->is_guest && $modSettings['posts_require_captcha'] == -1)))
+			&& (User::$info->posts < $modSettings['posts_require_captcha'] || (User::$info->is_guest && (int) $modSettings['posts_require_captcha'] === -1)))
 		{
 			return [
 				['topicinfo', [Display::class, 'topicinfo'], []],

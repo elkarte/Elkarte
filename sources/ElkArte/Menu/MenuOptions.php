@@ -48,7 +48,7 @@ class MenuOptions
 	/** @var array $extraUrlParameters an array or pairs or parameters to be added to the url */
 	private $extraUrlParameters = [];
 
-	/** @var bool $disableUrlSessionCheck if true the session var/id are omitted from the url */
+	/** @var bool $disableUrlSessionCheck if true, the session var/id are omitted from the url */
 	private $disableUrlSessionCheck = false;
 
 	/** @var string $baseUrl an alternative base url */

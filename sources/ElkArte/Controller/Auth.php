@@ -528,7 +528,7 @@ class Auth extends AbstractController
 
 			// If you log out, you aren't online anymore :P.
 			require_once(SUBSDIR . '/Logging.subs.php');
-			logOnline(User::$info['id'], false);
+			logOnline(User::$info['id']);
 		}
 
 		// Logout? Let's kill the admin/moderate/other sessions, too.

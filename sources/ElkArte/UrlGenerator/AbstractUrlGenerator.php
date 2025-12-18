@@ -1,7 +1,7 @@
 <?php
 
 /**
- * The base class that defines the methods needed to build an URL
+ * The base class that defines the methods needed to build a URL
  *
  * @package   ElkArte Forum
  * @copyright ElkArte Forum contributors
@@ -27,7 +27,7 @@ abstract class AbstractUrlGenerator
 	protected $_types = [];
 
 	/**
-	 * Allows to change the URL parameters separator
+	 * Allows changing the URL parameters separator
 	 *
 	 * @param string $separator The separator character
 	 */
@@ -45,14 +45,14 @@ abstract class AbstractUrlGenerator
 	}
 
 	/**
-	 * Actually builds the URL (only the query part.
+	 * Actually builds the URL (only the query part).
 	 *
 	 * @param array $params The parameters of the URL
 	 */
 	abstract public function generate($params);
 
 	/**
-	 * If a hash #key is defined, ensures its at the end of the url
+	 * If a hash #key is defined, ensures it's at the end of the url
 	 *
 	 * @param array $args
 	 * @return array

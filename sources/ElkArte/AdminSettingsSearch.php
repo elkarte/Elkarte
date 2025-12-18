@@ -65,7 +65,7 @@ class AdminSettingsSearch
 	 * it's possible to specify an array of arrays instead of an array of strings,
 	 * in that case the index 0 is the directory of the file, while the 1 is the file name.
 	 *
-	 * If a directory is not specified it will default to the value of the constant ADMINDIR e.g.
+	 * If a directory is not specified, it will default to the value of the constant ADMINDIR e.g.,
 	 * $include_files = array('file_name.controller', 'file_name2.controller', array('dir_name', 'file_name3.controller'))
 	 */
 	protected function _include_files($include_files): void
@@ -74,8 +74,7 @@ class AdminSettingsSearch
 		{
 			if (is_array($file))
 			{
-				$dir = $file[0];
-				$file = $file[1];
+				[$dir, $file] = $file;
 			}
 			else
 			{
@@ -145,7 +144,7 @@ class AdminSettingsSearch
 	{
 		global $txt;
 
-		// Special case for file and db which go var, label, db, etc
+		// Special case for a file and db which go var, label, db, etc.
 		if (isset($var[2]) && in_array($var[2], ['file', 'db']))
 		{
 			$save = $var[1];

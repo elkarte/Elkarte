@@ -23,13 +23,13 @@ namespace ElkArte\SettingsForm\SettingsFormAdapter;
  */
 abstract class Adapter implements AdapterInterface
 {
-	/** @var array Configuration variables and values for this settings form. */
+	/** @var array Configuration variables and values for the settings form. */
 	protected $configVars;
 
 	/** @var array Post variables and values for this settings form. */
 	protected $configValues;
 
-	/** @var array Computed values for the tempalte */
+	/** @var array Computed values for the template */
 	protected $context = [];
 
 	/**
