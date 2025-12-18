@@ -165,7 +165,7 @@ function list_maillist_count_unapproved()
 }
 
 /**
- * Removes an single entry from the postby_emails_error table
+ * Removes a single entry from the postby_emails_error table
  *
  * @param int $id
  * @package Maillist

@@ -32,7 +32,7 @@ function list_getSubscribedUserCount($id_sub, $search_string, $search_vars = [])
 {
 	$db = database();
 
-	// Get the total amount of users.
+	// Get the total number of users.
 	$request = $db->query('', '
 		SELECT
 			COUNT(*) AS total_subs
@@ -53,7 +53,7 @@ function list_getSubscribedUserCount($id_sub, $search_string, $search_vars = [])
 }
 
 /**
- * Return the subscribed users list, for the given parameters.
+ * Return the subscribed users list for the given parameters.
  *
  * @param int $start The item to start with (for pagination purposes)
  * @param int $items_per_page The number of items to show per page
@@ -215,7 +215,7 @@ function addSubscription($id_subscribe, $id_member, $renewal = '', $forceStartTi
 	// Grab the duration.
 	$duration = $curSub['num_length'];
 
-	// If this is a renewal change the duration to be correct.
+	// If this is a renewal change, the duration to be correct.
 	if (!empty($renewal))
 	{
 		switch ($renewal)
@@ -237,7 +237,7 @@ function addSubscription($id_subscribe, $id_member, $renewal = '', $forceStartTi
 		}
 	}
 
-	// Firstly, see whether it exists, and is active. If so then this is merely an extension.
+	// Firstly, see whether it exists and is active. If so, then this is merely an extension.
 	$request = $db->query('', '
 		SELECT
 			id_sublog, end_time, start_time
@@ -418,9 +418,9 @@ function addSubscription($id_subscribe, $id_member, $renewal = '', $forceStartTi
  *
  * What it does:
  *
- * - Checks the Sources directory for any files fitting the format of a payment gateway,
- * - Loads each file to check it's valid, includes each file and returns the
- * - Function name and whether it should work with this version of the software.
+ * - Checks the Sources directory for any files fitting the format of a payment gateway.
+ * - Loads each file to check it's valid, includes each file, and returns the
+ * function name and whether it should work with this version of the software.
  *
  * @return array
  */
@@ -587,7 +587,7 @@ function loadSubscriptions()
 }
 
 /**
- * Loads all of the members subscriptions from those that are active
+ * Loads all the members subscriptions from those that are active
  *
  * @param int $memID id of the member
  * @param array $active_subscriptions array of active subscriptions they can have
@@ -689,7 +689,7 @@ function deleteSubscription($id)
 {
 	$db = database();
 
-	// Removing it, first lets see if anyone is subscribed
+	// Removing it, first let's see if anyone is subscribed
 	$members = loadAllSubsctiptions($id);
 	if (!empty($members))
 	{
@@ -727,7 +727,7 @@ function deleteSubscription($id)
 			}
 		}
 
-		// Apply the group changes, if there are any
+		// Apply the group changes if there are any
 		if (!empty($changes))
 		{
 			require_once(SUBSDIR . '/Members.subs.php');
@@ -946,7 +946,7 @@ function validateSubscriptionID($id)
 	list ($sub_id) = $request->fetch_row();
 	$request->free_result();
 
-	// Humm this should not happen, if it does, boom
+	// Humm, this should not happen if it does, boom
 	if ($sub_id === null)
 	{
 		throw new \ElkArte\Exceptions\Exception('no_access', false);
@@ -1024,7 +1024,7 @@ function getSubscriptionStatus($log_id)
 }
 
 /**
- * Somebody paid again? we need to log that.
+ * Somebody paid again? We need to log that.
  *
  * @param int[] $item
  */
@@ -1048,7 +1048,7 @@ function updateSubscriptionItem($item)
 
 /**
  * When a refund is processed, this either removes it or sets a new end time to
- * reflect its no longer re-occurring
+ * reflect it's no longer re-occurring
  *
  * @param array $subscription_info the subscription information array
  * @param int $member_id
@@ -1058,7 +1058,7 @@ function handleRefund($subscription_info, $member_id, $time)
 {
 	$db = database();
 
-	// If the end time subtracted by current time is not greater than the duration
+	// If the end time subtracted by the current time is not greater than the duration
 	// (length of subscription), then we close it.
 	if ($subscription_info['end_time'] - time() < $subscription_info['length'])
 	{
@@ -1244,8 +1244,8 @@ function updatePendingSubscriptionCount($pending_count, $sub_id, $memID, $detail
 /**
  * Update a pending payment for a member
  * Generally used to change the status from prepay to payback to indicate that the user completed
- * the order screen and was redirected to the thank you screen (from the gateway).
- * Note the payment is still pending until the gateway posts to subscriptions.php and its validated
+ * the order screen and was redirected to the thank-you screen (from the gateway).
+ * Note the payment is still pending until the gateway posts to subscriptions.php and it's validated
  *
  * @param int $sub_id
  * @param int $memID
@@ -1309,7 +1309,7 @@ function removeSubscription($id_subscribe, $id_member, $delete = false)
 	$member['id_group'] = 0;
 	$new_id_group = -1;
 
-	// Get all of the subscriptions for this user that are active - it will be necessary!
+	// Get all the subscriptions for this user that are active - it will be necessary!
 	$db->fetchQuery('
 		SELECT
 			id_subscribe, old_id_group
@@ -1353,7 +1353,7 @@ function removeSubscription($id_subscribe, $id_member, $delete = false)
 		}
 	);
 
-	// Now, for everything we are removing check they definitely are not allowed it.
+	// Now, for everything we are removing check, they definitely are not allowed it.
 	$existingGroups = explode(',', $member_info['additional_groups']);
 	foreach ($existingGroups as $key => $group)
 	{
@@ -1366,7 +1366,7 @@ function removeSubscription($id_subscribe, $id_member, $delete = false)
 	// Finally, do something with the current primary group.
 	if (in_array($member_info['id_group'], $removals))
 	{
-		// If this primary group is actually allowed keep it.
+		// If this primary group is actually allowed to keep it.
 		if (in_array($member_info['id_group'], $allowed))
 		{
 			$existingGroups[] = $member_info['id_group'];
@@ -1375,7 +1375,7 @@ function removeSubscription($id_subscribe, $id_member, $delete = false)
 		// Either way, change the id_group back.
 		if ($new_id_group < 1)
 		{
-			// If we revert to the old id-group we need to ensure it wasn't from a subscription.
+			// If we revert to the old id-group, we need to ensure it wasn't from a subscription.
 			foreach ($context['subscriptions'] as $id => $group)
 				// It was? Make them a regular member then!
 			{

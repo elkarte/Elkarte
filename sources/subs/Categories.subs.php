@@ -18,8 +18,9 @@ use ElkArte\BoardsTree;
 
 /**
  * Edit the position and properties of a category.
- * general function to modify the settings and position of a category.
- * used by ManageBoards.controller.php to change the settings of a category.
+ *
+ * - General function to modify the settings and position of a category.
+ * - Used by ManageBoards.controller.php to change the settings of a category.
  *
  * @param int $category_id
  * @param array $catOptions
@@ -58,7 +59,7 @@ function modifyCategory($category_id, $catOptions)
 			function ($row) use (&$cat_order, &$cats, $category_id, $catOptions) {
 				if ($row['id_cat'] != $category_id)
 				{
-					$cats[] = $row['id_cat'];
+					$cats[] = (int) $row['id_cat'];
 				}
 
 				if ($row['id_cat'] == $catOptions['move_after'])
@@ -106,7 +107,6 @@ function modifyCategory($category_id, $catOptions)
 		$catParameters['is_collapsible'] = $catOptions['is_collapsible'] ? 1 : 0;
 	}
 
-	$cat_id = $category_id;
 	call_integration_hook('integrate_modify_category', [$cat_id, &$catUpdates, &$catParameters]);
 
 	// Do the updates (if any).
@@ -132,9 +132,10 @@ function modifyCategory($category_id, $catOptions)
 
 /**
  * Create a new category.
- * general function to create a new category and set its position.
- * allows (almost) the same options as the modifyCat() function.
- * returns the ID of the newly created category.
+ *
+ * - General function to create a new category and set its position.
+ * - Allows (almost) the same options as the modifyCat() function.
+ * - Returns the ID of the newly created category.
  *
  * @param array $catOptions
  */
@@ -192,11 +193,12 @@ function createCategory($catOptions)
 
 /**
  * Remove one or more categories.
- * general function to delete one or more categories.
- * allows to move all boards in the categories to a different category before deleting them.
- * if moveBoardsTo is set to null, all boards inside the given categories will be deleted.
- * deletes all information that's associated with the given categories.
- * updates the statistics to reflect the new situation.
+ *
+ * - General function to delete one or more categories.
+ * - Allows to move all boards in the categories to a different category before deleting them.
+ * - If moveBoardsTo is set to null, all boards inside the given categories will be deleted.
+ * - Deletes all information that's associated with the given categories.
+ * - Updates the statistics to reflect the new situation.
  *
  * @param int[] $categories
  * @param int|null $moveBoardsTo = null
@@ -218,7 +220,7 @@ function deleteCategories($categories, $moveBoardsTo = null)
 
 		if (!empty($boards_inside))
 		{
-			$boardTree->deleteBoards($boards_inside, null);
+			$boardTree->deleteBoards($boards_inside);
 		}
 	}
 	// Make sure the safe category is really safe.
@@ -270,10 +272,11 @@ function deleteCategories($categories, $moveBoardsTo = null)
 }
 
 /**
- * Collapse, expand or toggle one or more categories for one or more members.
- * if members is null, the category is collapsed/expanded for all members.
- * allows three changes to the status: 'expand', 'collapse' and 'toggle'.
- * if check_collapsable is set, only category allowed to be collapsed, will be collapsed.
+ * Collapse, expand, or toggle one or more categories for one or more members.
+ *
+ * - If members is null, the category is collapsed/expanded for all members.
+ * - Allows three changes to the status: 'expand', 'collapse' and 'toggle'.
+ * - If check_collapsable is set, only category allowed to be collapsed, will be collapsed.
  *
  * @param int[] $categories
  * @param string $new_status

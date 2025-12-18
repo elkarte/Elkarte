@@ -77,7 +77,7 @@ function list_getModLogEntries($start, $items_per_page, $sort, $query_string = '
 
 	$modlog_query = allowedTo('admin_forum') || User::$info->mod_cache['bq'] == '1=1' ? '1=1' : (User::$info->mod_cache['bq'] == '0=1' ? 'lm.id_board = 0 AND lm.id_topic = 0' : (strtr(User::$info->mod_cache['bq'], ['id_board' => 'b.id_board']) . ' AND ' . strtr(User::$info->mod_cache['bq'], ['id_board' => 't.id_board'])));
 
-	// Do a little bit of self protection.
+	// Do a little bit of self-protection.
 	if (!isset($context['hoursdisable']))
 	{
 		$context['hoursdisable'] = 24;
@@ -386,7 +386,7 @@ function list_getModLogEntries($start, $items_per_page, $sort, $query_string = '
 	$callback->entries = $entries;
 	foreach ($entries as $k => $entry)
 	{
-		// Make any message info links so its easier to go find that message.
+		// Make any message info links so it's easier to go find that message.
 		if (isset($entry['extra']['message']) && (empty($entry['message']) || empty($entry['message']['id'])))
 		{
 			$entries[$k]['extra']['message'] = '<a href="' . $scripturl . '?msg=' . $entry['extra']['message'] . '">' . $entry['extra']['message'] . '</a>';

@@ -331,7 +331,7 @@ function updateSmileyRow($id, $row, $location)
 }
 
 /**
- * Set an new order for the given smiley.
+ * Set a new order for the given smiley.
  *
  * @param int $id
  * @param int $order
@@ -355,7 +355,7 @@ function updateSmileyOrder($id, $order)
 /**
  * Get a list of all visible smileys.
  *
- * hidden = 0 is post form, 1 is hidden, 2 is popup,
+ * Hidden = 0 is post form, 1 is hidden, 2 is popup.
  */
 function getSmileys()
 {
@@ -407,7 +407,7 @@ function getSmileys()
 }
 
 /**
- * Validates, if a smiley set was properly installed.
+ * Validates if a smiley set was properly installed.
  *
  * @param string $set name of smiley set to check
  * @return bool
@@ -620,7 +620,7 @@ function list_getNumSmileys()
 }
 
 /**
- * Reads all smiley directories, and sets the image type for the set(s).  Saves this information
+ * Reads all smiley directories and sets the image type for the set(s).  Saves this information
  * in modSettings.
  *
  * @return string a csv string in the same order as smiley_sets_known
@@ -639,7 +639,7 @@ function setSmileyExtensionArray()
 	{
 		$smiles = $fileFunc->listTree($smileys_dir . '/' . $set);
 
-		// What type of set is this, svg, gif, png
+		// What type of set is this, SVG, GIF, PNG
 		foreach ($smiles as $smile)
 		{
 			$temp = pathinfo($smile['filename'], PATHINFO_EXTENSION);
@@ -686,10 +686,10 @@ function getFirstImageExtensionInDir(string $dir): ?string
 
 
 /**
- * Fetch and prepare the smileys for use in the post editor
+ * Fetch and prepare the smileys for use in the post-editor
  *
  * What it does:
- * - Old smiles as :) are processed as normal, requiring an image file in its smile set directory
+ * - Old smiles as :) are processed normally, requiring an image file in its smile set directory
  * - Emoji :smile:
  *   - first checked if the image file exists in the smile set directory
  *   - if not found it will use the emoji class to check if the code exists in the emoji code list and if found
@@ -736,14 +736,14 @@ function getEditorSmileys()
  * Checks if a defined smiley code as :smile: exists
  *
  * What it does:
- * - Looks in the smile directory for example, smile.png.
+ * - Looks in the smile directory, for example, smile.png.
  * - If not found, checks if :smile: is a legitimate emoji short code.
  * - If so, sets an ['emoji'] row to the proper utf8 value.
  *
  * @param array $row
  * @param string $path
  * @param string $ext
- * @return bool if the code is a legitimate emoji short code and no image exists in the smile/smile_set directory
+ * @return bool if the code is a legitimate emoji short code, and no image exists in the smile/smile_set directory
  */
 function possibleSmileEmoji(&$row, $path = null, $ext = null)
 {

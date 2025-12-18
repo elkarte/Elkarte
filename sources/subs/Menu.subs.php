@@ -33,7 +33,7 @@ use ElkArte\Menu\Menu;
  *     - array $areas        => Array of areas within this menu section, see below
  *     - array $permission   => Permission required to access the whole section
  *
- *  - $areas sub array from above, named indexes as follows:
+ *  - $areas subarray from above, named indexes as follows:
  *     - array $permission  => Array of permissions to determine who can access this area
  *     - string $label      => Optional text string for link (Otherwise $txt[$index] will be used)
  *     - string $controller => Name of controller required for this area
@@ -149,7 +149,7 @@ function callMenu($selectedMenu)
 	$action = new Action();
 	$action->initialize(['action' => $selectedMenu]);
 	$action->dispatch('action');
-	/** @var \ElkArte\Menu\Menu */
+	/** @var Menu $context */
 	$context['menu_data_' . $context['max_menu_id']]['object']->prepareTabData();
 }
 
@@ -386,8 +386,8 @@ function loadDefaultMenuButtons()
 			'data-icon' => ($context['user']['mentions'] ? 'i-menu-mentions-on' : 'i-menu-mentions-off'),
 			'show' => User::$info->is_guest === false && !empty($modSettings['mentions_enabled']),
 		],
-		// The old language string made no sense, and was too long.
-		// "New posts" is better, because there are probably a pile
+		// The old language string made no sense and was too long.
+		// "New posts" is better because there is probably a pile
 		// of old unread posts, and they won't be reached from this button.
 		'unread' => [
 			'title' => $txt['view_unread_category'],
@@ -395,8 +395,8 @@ function loadDefaultMenuButtons()
 			'data-icon' => 'i-menu-unread',
 			'show' => User::$info->is_guest === false,
 		],
-		// The old language string made no sense, and was too long.
-		// "New replies" is better, because there are "updated topics"
+		// The old language string made no sense and was too long.
+		// "New replies" is better because there are "updated topics"
 		// that the user has never posted in and doesn't care about.
 		'unreadreplies' => [
 			'title' => $txt['view_replies_category'],

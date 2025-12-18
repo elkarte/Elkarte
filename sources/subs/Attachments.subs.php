@@ -717,7 +717,7 @@ function getServerStoredAvatars($directory)
 				'is_dir' => false
 			];
 
-			if (dirname($entry->getPath(), 1) === $modSettings['avatar_directory'])
+			if (dirname($entry->getPath()) === $modSettings['avatar_directory'])
 			{
 				$context['avatar_list'][] = str_replace($modSettings['avatar_directory'] . '/', '', $entry->getPathname());
 			}

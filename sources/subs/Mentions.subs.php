@@ -204,8 +204,8 @@ function toggleMentionsApproval($msgs, $approved)
 /**
  * Toggles a mention visibility on/off
  *
- * - if off is restored to visible,
- * - if on is switched to invisible for all the users
+ * - If off is restored to visible,
+ * - If on is switched to invisible for all the users
  *
  * @param string $type type of the mention that you want to toggle
  * @param bool $enable if true enables the mentions, otherwise disables them
@@ -438,7 +438,7 @@ function getNewMentions($id_member, $timestamp)
  * Get the available mention types for a user.
  *
  * @param int|null $user The user ID. If null, User::$info->id will be used.
- * @param string $type The type of mentions.  "user" will return only those that the user has enabled and set
+ * @param string $type The type of mentions. "user" will return only those that the user has enabled and set
  * as on site notification.
  *
  * By default, will filter out notification types with a method set to none, e.g. the user has disabled that
@@ -541,9 +541,9 @@ function markNotificationsRead($messages)
  *
  * Updates the status of mentions in the database. Also updates the mentions count for the member.
  *
- *  - Can be used to mark as read, new, deleted, etc a group of mention id's
+ *  - Can be used to mark as read, new, deleted, etc. a group of mention id's
  *  - Note that delete is a "soft-delete" because otherwise anyway we have to remember
- *  - When a user was already mentioned for a certain message (e.g. in case of editing)
+ *  - When a user was already mentioned for a certain message (e.g., in case of editing)
  *
  * @param int|int[] $id_mentions The id(s) of the mentions to update
  * @param int $member_id The id of the member

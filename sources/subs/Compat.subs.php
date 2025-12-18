@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This file provides compatibility functions such as missing extensions, etc
+ * This file provides compatibility functions such as missing extensions, etc.
  * It is only included for when the respective extension or function cannot be found.
  *
  * @package   ElkArte Forum

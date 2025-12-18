@@ -33,14 +33,14 @@ use ElkArte\User;
  * - Non-admins cannot delete admins.
  *
  * What id does
- * - Changes author of messages, topics and polls to guest authors.
+ * - Changes author of messages, topics, and polls to guest authors.
  * - Removes all log entries concerning the deleted members, except the
- * error logs, ban logs and moderation logs.
+ * error logs, ban logs, and moderation logs.
  * - Removes these members' personal messages (only the inbox)
  * - Removes avatars, ban entries, theme settings, moderator positions, poll votes,
  * likes, mentions, notifications
  * - Removes custom field data associated with them
- * - Updates member statistics afterwards.
+ * - Updates member statistics afterward.
  *
  * @param int[]|int $users
  * @param bool $check_not_admin = false
@@ -52,7 +52,7 @@ function deleteMembers($users, $check_not_admin = false)
 
 	$db = database();
 
-	// Try give us a while to sort this out...
+	// Try to give us a while to sort this out...
 	detectServer()->setTimeLimit(600);
 
 	// Try to get some more memory.
@@ -182,7 +182,7 @@ function deleteMembers($users, $check_not_admin = false)
 		]
 	);
 
-	// Make these peoples' posts guest first posts and last posts.
+	// Make these peoples' posts guest-first posts and last posts.
 	$db->query('', '
 		UPDATE {db_prefix}topics
 		SET 
@@ -378,7 +378,7 @@ function deleteMembers($users, $check_not_admin = false)
 			'users' => $users,
 		]
 	);
-	// And null all those that were added by him
+	// And null all those that he added
 	$db->query('', '
 		UPDATE {db_prefix}log_mentions
 		SET 
@@ -434,7 +434,7 @@ function deleteMembers($users, $check_not_admin = false)
 		]
 	);
 
-	// If you don't exist we can't ban you.
+	// If you don't exist, we can't ban you.
 	$db->query('', '
 		DELETE FROM {db_prefix}ban_items
 		WHERE id_member IN ({array_int:users})',
@@ -492,7 +492,7 @@ function deleteMembers($users, $check_not_admin = false)
  * - Allows two types of interface: 'guest' and 'admin'. The first
  * - includes hammering protection, the latter can perform the registration silently.
  * - The strings used in the options array are assumed to be escaped.
- * - Allows to perform several checks on the input, e.g. reserved names.
+ * - Allows performing several checks on the input, e.g., reserved names.
  * - The function will adjust member statistics.
  * - If an error is detected will fatal error on all errors unless return_errors is true.
  *
@@ -584,7 +584,7 @@ function registerMember(&$regOptions, $ErrorContext = 'register')
 	// Perhaps someone else wants to check this user
 	call_integration_hook('integrate_register_check', [&$regOptions, &$reg_errors]);
 
-	// If there's any errors left return them at once!
+	// If there are any errors left, return them at once!
 	if ($reg_errors->hasErrors())
 	{
 		return false;
@@ -627,7 +627,7 @@ function registerMember(&$regOptions, $ErrorContext = 'register')
 		'member_name' => $regOptions['username'],
 		'email_address' => $regOptions['email'],
 		'passwd' => validateLoginPassword($password, '', $regOptions['username'], true),
-		'password_salt' => $tokenizer->generate_hash(10),
+		'password_salt' => $tokenizer->generate_hash(),
 		'posts' => 0,
 		'date_registered' => !empty($regOptions['time']) ? $regOptions['time'] : time(),
 		'member_ip' => $regOptions['interface'] === 'admin' ? '127.0.0.1' : $regOptions['ip'],
@@ -654,7 +654,7 @@ function registerMember(&$regOptions, $ErrorContext = 'register')
 		'notify_announcements' => (!empty($regOptions['notify_announcements']) ? 1 : 0),
 	];
 
-	// Setup the activation status on this new account so it is correct - firstly is it an under age account?
+	// Set up the activation status on this new account so it is correct - firstly, is it an underage account?
 	if ($regOptions['require'] === 'coppa')
 	{
 		$regOptions['register_vars']['is_activated'] = 5;
@@ -681,7 +681,7 @@ function registerMember(&$regOptions, $ErrorContext = 'register')
 	{
 		require_once(SUBSDIR . '/Membergroups.subs.php');
 
-		// Make sure the id_group will be valid, if this is an administrator.
+		// Make sure the id_group will be valid if this is an administrator.
 		$regOptions['register_vars']['id_group'] = $regOptions['memberGroup'] == 1 && !allowedTo('admin_forum') ? 0 : $regOptions['memberGroup'];
 
 		// Check if this group is assignable.
@@ -712,7 +712,7 @@ function registerMember(&$regOptions, $ErrorContext = 'register')
 		}
 	}
 
-	// Right, now let's prepare for insertion.
+	// Now let's prepare for insertion.
 	$knownInts = [
 		'date_registered', 'posts', 'id_group', 'last_login', 'personal_messages', 'unread_messages', 'notifications',
 		'new_pm', 'pm_prefs', 'show_online', 'pm_email_notify', 'karma_good', 'karma_bad',
@@ -887,9 +887,9 @@ function registerMember(&$regOptions, $ErrorContext = 'register')
 /**
  * Check if a name is in the reserved words list. (name, current member id, name/username?.)
  *
- * - checks if name is a reserved name or username.
- * - if is_name is false, the name is assumed to be a username.
- * - the id_member variable is used to ignore duplicate matches with the current member.
+ * - Checks if name is a reserved name or username.
+ * - If is_name is false, the name is assumed to be a username.
+ * - The id_member variable is used to ignore duplicate matches with the current member.
  *
  * @param string $name
  * @param int $current_ID_MEMBER
@@ -911,11 +911,13 @@ function isReservedName($name, $current_ID_MEMBER = 0, $is_name = true, $fatal =
 	$checkName = Util::strtolower($name);
 
 	// Administrators are never restricted ;).
-	if (!allowedTo('admin_forum') && ((!empty($modSettings['reserveName']) && $is_name) || !empty($modSettings['reserveUser']) && !$is_name))
+	if (!allowedTo('admin_forum')
+		&& ((!empty($modSettings['reserveName']) && $is_name)
+			|| (!empty($modSettings['reserveUser']) && !$is_name)))
 	{
 		$reservedNames = explode("\n", $modSettings['reserveNames']);
 
-		// Case sensitive check?
+		// Case-sensitive check?
 		$checkMe = empty($modSettings['reserveCase']) ? $checkName : $name;
 
 		// Check each name in the list...
@@ -929,13 +931,13 @@ function isReservedName($name, $current_ID_MEMBER = 0, $is_name = true, $fatal =
 			// The admin might've used entities too, level the playing field.
 			$reservedCheck = preg_replace_callback('~(&#(\d{1,7}|x[0-9a-fA-F]{1,6});)~', 'replaceEntities__callback', $reserved);
 
-			// Case sensitive name?
+			// Case-sensitive name?
 			if (empty($modSettings['reserveCase']))
 			{
 				$reservedCheck = Util::strtolower($reservedCheck);
 			}
 
-			// If it's not just entire word, check for it in there somewhere...
+			// If it's not just the entire word, check for it in there somewhere...
 			if ($checkMe === $reservedCheck || (Util::strpos($checkMe, $reservedCheck) !== false && empty($modSettings['reserveWord'])))
 			{
 				if ($fatal)
@@ -996,7 +998,7 @@ function isReservedName($name, $current_ID_MEMBER = 0, $is_name = true, $fatal =
 		return true;
 	}
 
-	// Does name case insensitive match a member group name?
+	// Does name case-insensitive match a member group name?
 	$request = $db->query('', '
 		SELECT 
 			id_group
@@ -1066,7 +1068,7 @@ function groupsAllowedTo($permission, $board_id = null)
 	// Otherwise it's time to look at the board.
 	else
 	{
-		// First get the profile of the given board.
+		// First, get the profile of the given board.
 		if (isset($board_info['id']) && (int) $board_info['id'] === (int) $board_id)
 		{
 			$profile_id = (int) $board_info['profile'];
@@ -1161,7 +1163,7 @@ function membersAllowedTo($permission, $board_id = null)
  *
  * - Re-attribute guest posts to a specified member.
  * - Does not check for any permissions.
- * - If add_to_post_count is set, the member's post count is increased.
+ * - If add_to_post_count is set, the member's post-count is increased.
  *
  * @param int $memID
  * @param bool|false|string $email = false
@@ -1174,7 +1176,7 @@ function reattributePosts($memID, $email = false, $membername = false, $post_cou
 {
 	$db = database();
 
-	// Firstly, if email and username aren't passed find out the members email address and name.
+	// Firstly, if email and username aren't passed, find out the members email address and name.
 	if ($email === false && $membername === false)
 	{
 		require_once(SUBSDIR . '/Members.subs.php');
@@ -1183,7 +1185,7 @@ function reattributePosts($memID, $email = false, $membername = false, $post_cou
 		$membername = $result['member_name'];
 	}
 
-	// If they want the post count restored then we need to do some research.
+	// If they want the post-count restored, then we need to do some research.
 	if ($post_count)
 	{
 		$request = $db->query('', '
@@ -1249,7 +1251,7 @@ function reattributePosts($memID, $email = false, $membername = false, $post_cou
 		]
 	);
 
-	// Allow mods with their own post tables to re-attribute posts as well :)
+	// Allow mods with their own post-tables to re-attribute posts as well :)
 	call_integration_hook('integrate_reattribute_posts', [$memID, $email, $membername, $post_count]);
 }
 
@@ -1287,7 +1289,7 @@ function list_getMembers($start, $items_per_page, $sort, $where, $where_params =
 		])
 	)->fetch_all();
 
-	// If we want duplicates pass the members array off.
+	// If we want duplicates, pass the members array off.
 	if ($get_duplicates)
 	{
 		populateDuplicateMembers($members);
@@ -1450,7 +1452,7 @@ function populateDuplicateMembers(&$members)
 				$members[$key]['duplicate_members'] = array_merge($member['duplicate_members'], $duplicate_members[$member['member_ip2']]);
 			}
 
-			// Check we don't have lots of the same member.
+			// Check we don't have lots of the same members.
 			$member_track = [$member['id_member']];
 			foreach ($members[$key]['duplicate_members'] as $duplicate_id_member => $duplicate_member)
 			{
@@ -1467,7 +1469,7 @@ function populateDuplicateMembers(&$members)
 }
 
 /**
- * Find members with a given IP (first, second, exact or "relaxed")
+ * Find members with a given IP (first, second, exact, or "relaxed")
  *
  * @param string|string[] $ip1 An IP or an array of IPs
  * @param string $match (optional, default 'exact') if the match should be exact
@@ -1571,8 +1573,8 @@ function isAnotherAdmin($memberID)
  *
  * @param array|string $query see prepareMembersByQuery
  * @param array $query_params see prepareMembersByQuery
- * @param bool $details if true returns additional member details (name, email, ip, etc.)
- *             false will only return an array of member id's that match the conditions
+ * @param bool $details if true, returns additional member details (name, email, ip, etc.)
+ *             false will only return an array of member id's that matches the conditions
  * @param bool $only_active see prepareMembersByQuery
  *
  * @return array
@@ -1585,7 +1587,7 @@ function membersBy($query, $query_params, $details = false, $only_active = true)
 
 	$query_where = prepareMembersByQuery($query, $query_params, $only_active);
 
-	// Lets see who we can find that meets the built up conditions
+	// Let's see who we can find that meets the built-up conditions
 	$members = [];
 	$db->fetchQuery('
 		SELECT
@@ -1604,7 +1606,7 @@ function membersBy($query, $query_params, $details = false, $only_active = true)
 				$row['id_member'] = (int) $row['id_member'];
 				$members[$row['id_member']] = $row;
 			}
-			// Or just a int[] of found member id's
+			// Or just an int[] of found member id's
 			else
 			{
 				$members[] = (int) $row['id_member'];
@@ -1684,7 +1686,7 @@ function prepareMembersByQuery($query, &$query_params, $only_active = true)
 		'in_group_no_add' => '(id_group = {int:in_group_no_add} AND FIND_IN_SET({int:in_group_no_add}, additional_groups) = 0)',
 	];
 
-	// Are there multiple parts to this query
+	// Are there multiple parts to this query?
 	if (is_array($query))
 	{
 		$query_parts = ['or' => [], 'and' => []];
@@ -1721,7 +1723,7 @@ function prepareMembersByQuery($query, &$query_params, $only_active = true)
 
 		$query_where = implode("\n\t\t\tAND ", $query_parts['and']);
 	}
-	// Is it one of our predefined querys like member_ids, member_names, etc
+	// Is it one of our predefined querys like member_ids, member_names, etc.
 	elseif (isset($allowed_conditions[$query]))
 	{
 		$query_where = $query === 'member_names' ? $allowed_conditions[$query]($query_params) : $allowed_conditions[$query];
@@ -1812,7 +1814,7 @@ function maxMemberID()
  * Load some basic member information
  *
  * @param int[]|int $member_ids an array of member IDs or a single ID
- * @param array $options an array of possible little alternatives, can be:
+ * @param array $options an array of possible little alternatives can be:
  *  - 'add_guest' (bool) to add a guest user to the returned array
  *  - 'limit' int if set overrides the default query limit
  *  - 'sort' (string) a column to sort the results
@@ -1941,7 +1943,7 @@ function countInactiveMembers()
 /**
  * Get member data by name
  *
- * Retrieves the details of a member by their real name or username. The search is case-insensitive by default,
+ * Retrieves the details of a member by their real name or username. The search is case-insensitive by default
  * but can be made flexible by setting the $flexible parameter to true.
  *
  * @param string $name The name to search for
@@ -2201,13 +2203,13 @@ function approveMembers($conditions)
 /**
  * Set these members for activation
  *
- * @param array $conditions associative array holding the conditions for the  WHERE clause of the query.
+ * @param array $conditions associative array holding the conditions for the WHERE clause of the query.
  * Possible keys:
- * - selected_member (integer) must be present
- * - activated_status (boolean) must be present
- * - validation_code (string) must be present
- * - members (array of integers)
- * - time_before (integer)
+ *  - selected_member (integer) must be present
+ *  - activated_status (boolean) must be present
+ *  - validation_code (string) must be present
+ *  - members (array of integers)
+ *  - time_before (integer)
  * @package Members
  */
 function enforceReactivation($conditions)
@@ -2277,7 +2279,7 @@ function countMembersInGroup($id_group = 0)
 }
 
 /**
- * Get the total amount of members online.
+ * Get the total number of members online.
  *
  * @param string[] $conditions
  * @return int
@@ -2413,7 +2415,7 @@ function getConcernedMembers($groups, $where, $change_groups = false)
 
 			$row['lngfile'] = empty($row['lngfile']) || empty($modSettings['userLanguage']) ? $language : $row['lngfile'];
 
-			// If we are approving work out what their new group is.
+			// If we are approving, work out what their new group is.
 			if ($change_groups)
 			{
 				// For people with more than one request at once.
@@ -2574,7 +2576,7 @@ function updateMemberStats($id_member = null, $real_name = null)
 		// Are we using registration approval?
 		if ((!empty($modSettings['registration_method']) && $modSettings['registration_method'] == 2) || !empty($modSettings['approveAccountDeletion']))
 		{
-			// Update the amount of members awaiting approval - ignoring COPPA accounts, as you can't approve them until you get permission.
+			// Update the number of members awaiting approval - ignoring COPPA accounts, as you can't approve them until you get permission.
 			$request = $db->query('', '
 				SELECT 
 					COUNT(*)
@@ -2673,10 +2675,10 @@ function memberQuerySeeBoard($id_member)
  *
  * - Assumes the data has been htmlspecialchar'd, no sanitation is performed on the data.
  * - This function should be used whenever member data needs to be updated in place of an UPDATE query.
- * - $data is an associative array of the columns to be updated and their respective values.
+ * - $data is an associative array of the columns to be updated and their respective values,
  * any string values updated should be quoted and slashed.
  * - The value of any column can be '+' or '-', which mean 'increment' and decrement, respectively.
- * - If the member's post-number is updated, updates their post groups.
+ * - If the member's post-number is updated, updates their post-groups.
  *
  * @param int[]|int $members An array of member ids
  * @param array $data An associative array of the columns to be updated and their respective values.
@@ -2875,7 +2877,7 @@ function loadMembersIPs($ip_string, $ip_var)
 }
 
 /**
- * Logs when teh user accepted the site agreement
+ * Logs when the user accepted the site agreement
  *
  * @param int $id_member
  * @param string $ip

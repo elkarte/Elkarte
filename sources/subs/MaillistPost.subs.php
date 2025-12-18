@@ -1,7 +1,7 @@
 <?php
 
 /**
- * All the vital helper functions for use in email posting, formatting and conversion,
+ * All the vital helper functions for use in email posting, formatting, and conversion,
  * and boy are there a bunch!
  *
  * @package   ElkArte Forum
@@ -34,23 +34,23 @@ use Michelf\MarkdownExtra;
  *
  * What it does:
  *
- * - protects certain tags from conversion
- * - strips original message from the reply if possible
- * - If the email is html based, this will convert basic html tags to bbc tags
- * - If the email is plain text it will convert it to html based on markdown text
- *  conventions, and then that will be converted to bbc.
+ * - Protects certain tags from conversion
+ * - Strips original message from the reply if possible
+ * - If the email is HTML-based, then this will convert basic HTML tags to BBC tags
+ * - If the email is plain text, it will convert it to HTML based on Markdown text
+ *  conventions, and then that will be converted to BBC.
  *
- * @param string $text plain or html text
+ * @param string $text plain or HTML text
  * @param bool $html
  *
  * @return string
- * @uses Html2BBC.class.php for the html to bbc conversion
- * @uses Markdown.php for text to html conversions
+ * @uses Html2BBC.class.php for the HTML to BBC conversion
+ * @uses Markdown.php for text to HTML conversions
  * @package Maillist
  */
 function pbe_email_to_bbc($text, $html)
 {
-	// Define some things that need to be converted/modified, outside normal html or markup
+	// Define some things that need to be converted/modified, outside normal HTML or Markdown
 	$tags = [
 		'~\*\*\s?(.*?)\*\*~is' => '**$1**', // set as markup bold
 		'~<\*>~' => '&lt;*&gt;', // <*> as set in default Mailist Templates
@@ -66,17 +66,17 @@ function pbe_email_to_bbc($text, $html)
 		// upfront pre-process $tags, mostly for the email template strings
 		$text = preg_replace(array_keys($tags), array_values($tags), $text);
 	}
-	// Starting with plain text, possibly even markdown style ;)
+	// Starting with plain text, possibly even Markdown style ;)
 	else
 	{
 		// Set a gmail flag for special quote processing since its quotes are strange
 		$gmail = (bool) preg_match('~<div class="gmail_quote">~i', $text);
 
-		// Attempt to fix textual ('>') quotes so we also fix wrapping issues first!
+		// Attempt to fix textual ('>') quotes, so we also fix wrapping issues first!
 		$text = pbe_fix_email_quotes($text, $gmail);
 		$text = str_replace(['[quote]', '[/quote]'], ['&gt;blockquote>', '&gt;/blockquote>'], $text);
 
-		// Convert this (markup) text to html
+		// Convert this (Markdown) text to HTML
 		$text = preg_replace(array_keys($tags), array_values($tags), $text);
 		$parser = new MarkdownExtra;
 		$parser->hashtag_protection = true;
@@ -104,7 +104,7 @@ function pbe_email_to_bbc($text, $html)
 
 /**
  * Runs the ACP email parsers
- *   - returns cut email or original if the cut results in a blank message
+ *   - Returns cut email or original if the cut results in a blank message
  *
  * @param string $text
  * @return string
@@ -122,7 +122,7 @@ function pbe_run_parsers($text)
 
 	// If we have no message left after running the parser, then they may have replied
 	// below and/or inside the original message. People like this should not be allowed
-	// to use the net, or be forced to read their own messed up emails
+	// to use the net or be forced to read their own messed up emails
 	if (empty($result) || (trim(strip_tags(pbe_filter_email_message($text))) === ''))
 	{
 		return $text_save;
@@ -188,7 +188,7 @@ function pbe_fix_email_body($body, $real_name = '', $charset = 'UTF-8')
  * - Uses quote depth function
  * - Works with nested quotes of many forms >, > >, >>, >asd
  * - Bypassed for gmail as it only block quotes the outer layer and then plain
- * text > quotes the inner which is confusing to all
+ * text > quotes the inner, which is confusing to all
  *
  * @param string $body
  * @param bool $html
@@ -198,7 +198,7 @@ function pbe_fix_email_body($body, $real_name = '', $charset = 'UTF-8')
  */
 function pbe_fix_email_quotes($body, $html)
 {
-	// Coming from HTML then remove lines that start with > and are inside [quote] ... [/quote] blocks
+	// Coming from HTML, then remove lines that start with > and are inside [quote] ... [/quote] blocks
 	if ($html)
 	{
 		$quotes = [];
@@ -212,7 +212,7 @@ function pbe_fix_email_quotes($body, $html)
 		}
 	}
 
-	// Create a line by line array broken on the newlines
+	// Create a line-by-line array broken on the newlines
 	$body_array = explode("\n", $body);
 	$original = $body_array;
 
@@ -236,7 +236,7 @@ function pbe_fix_email_quotes($body, $html)
 			$level_next = pbe_email_quote_depth($original[$i + 1], false);
 
 			// A line between two = quote or descending quote levels,
-			// probably an email break so join (wrap) it back up and continue
+			// probably an email break, so join (wrap) it back up and continue
 			if (($level_prev !== 0) && ($level_prev >= $level_next && $level_next !== 0))
 			{
 				$body_array[$i - 1] .= ' ' . $body_array[$i];
@@ -251,7 +251,7 @@ function pbe_fix_email_quotes($body, $html)
 			continue;
 		}
 
-		// Deeper than we were so add a quote
+		// Deeper than we were, so add a quote
 		if ($level > $current_quote)
 		{
 			$qin_temp = '';
@@ -291,7 +291,7 @@ function pbe_fix_email_quotes($body, $html)
 		}
 	}
 
-	// No more lines, lets just make sure we did not leave ourselves any open quotes
+	// No more lines, let's just make sure we did not leave ourselves any open quotes
 	while (!empty($current_quote))
 	{
 		$quote_done .= '[/quote]' . "\n";
@@ -400,10 +400,10 @@ function pbe_parse_email_message(&$body)
 			? preg_split($expression['parser'], $body)
 			: explode($expression['parser'], $body, 2);
 
-		// If an expression was matched our fine work is done
+		// If an expression was matched, our fine work is done
 		if (!empty($split[1]))
 		{
-			// If we had a hit then we clip off the mail and return above the split text
+			// If we had a hit, then we clip off the mail and return above the split text
 			$body = $split[0];
 			return true;
 		}
@@ -520,7 +520,7 @@ function pbe_clean_email_subject($text, $check = false)
 		$text = substr($text, 0, $fwd) . substr($text, $fwd + strlen($txt['FWD:']), strlen($text));
 	}
 
-	// if not done then call ourselves again, we like the sound of our name
+	// if not done, then call ourselves again; we like the sound of our name
 	if (stripos($text, (string) $txt['RE:']) || stripos($text, $txt['FW:']) || stripos($text, $txt['FWD:']) || strpos($text, '[' . $sitename . ']'))
 	{
 		$text = pbe_clean_email_subject($text);
@@ -538,7 +538,7 @@ function pbe_clean_email_subject($text, $check = false)
 /**
  * Used if the original email could not be removed from the message (top of post)
  *
- * - Tries to quote the original message instead by using a loose original message search
+ * - Tries to quote the original message instead of using a loose original message search
  * - Looks for email client original message tags and converts them to bbc quotes
  *
  * @param string $body
@@ -555,7 +555,7 @@ function pbe_fix_client_quotes($body)
 	// @todo ACP for this? ... not sure
 	$regex = [];
 
-	// On mon, jan 12, 2020 at 10:10 AM, John Smith wrote: [quote]
+	// On sun, jan 12, 2020 at 10:10 AM, John Smith wrote: [quote]
 	$regex[] = '~(?:' . $txt['email_on'] . ')?\w{3}, \w{3} \d{1,2},\s?\d{4} ' . $txt['email_at'] . ' \d{1,2}:\d{1,2} [AP]M,(.*)?' . $txt['email_wrote'] . ':\s?\s{1,4}\[quote\]~i';
 	// [quote] on: mon jan 12, 2004 John Smith wrote:
 	$regex[] = '~\[quote\]\s?' . $txt['email_on'] . ': \w{3} \w{3} \d{1,2}, \d{4} (.*)?' . $txt['email_wrote'] . ':\s~i';
@@ -576,7 +576,7 @@ function pbe_fix_client_quotes($body)
 	// --- In [email]something[/email] "someone" wrote:
 	$regex[] = '~---\s.*?\[email=.*?/email\],?\s"?(.*?)"?\s' . $txt['email_wrote'] . ':?~iu';
 
-	// For each one see if we can do a nice [quote author=john smith]
+	// For each one see if we can do nice [quote author=john smith]
 	foreach ($regex as $reg)
 	{
 		if (preg_match_all($reg, $body, $matches, PREG_SET_ORDER))
@@ -622,7 +622,7 @@ function pbe_str_replace_once($needle, $replace, $haystack)
 }
 
 /**
- * Does a moderation check on a given user (global)
+ * Does moderation check on a given user (global)
  *
  * - Removes permissions of PBE concern that a given moderated level denies
  *
@@ -680,8 +680,8 @@ function pbe_check_moderation(&$pbe)
 /**
  * Creates a failed email entry in the postby_emails_error table
  *
- * - Attempts an auto-correct for common errors so the admin / moderator
- * - can choose to approve the email with the corrections
+ * - Attempts autocorrect for common errors so the admin / moderator
+ * - Can choose to approve the email with the corrections
  *
  * @param string $error
  * @param EmailParse $email_message
@@ -712,14 +712,14 @@ function pbe_emailError($error, $email_message)
 	$message_id = $email_message->message_id;
 	$board_id = -1;
 
-	// First up is the old, wrong email address, lets see who this should have come from if
+	// First up is the old, wrong email address, let's see who this should have come from if
 	// it is not a new topic request
 	if ($error === 'error_not_find_member' && $email_message->message_type !== 'x')
 	{
 		$key_owner = query_key_owner($email_message);
 		if (!empty($key_owner))
 		{
-			// Valid key so show who should have sent this key in? email aggravaters :P often mess this up
+			// Valid key so show who should have sent this key in? email aggravaters :P often messes this up
 			$email_message->email['from'] .= ' => ' . $key_owner;
 		}
 	}
@@ -735,11 +735,11 @@ function pbe_emailError($error, $email_message)
 		}
 	}
 
-	// No key? We should at a minimum have who its from and a subject, so use that
+	// No key? We should at a minimum have who it's from and a subject, so use that
 	if ($email_message->message_type !== 'x' && (empty($message_key) || $error === 'error_pm_not_found'))
 	{
 		// We don't have the message type (since we don't have a key)
-		// Attempt to see if it might be a PM so we handle it correctly
+		// Attempt to see if it might be a PM, so we handle it correctly
 		if (empty($message_type) && (str_contains($email_message->subject, (string) $pm_subject_leader)))
 		{
 			$message_type = 'p';
@@ -755,9 +755,9 @@ function pbe_emailError($error, $email_message)
 			$type = $user_key['message_type'];
 			$message = $user_key['message_id'];
 
-			// If we know/suspect its a "m,t or p" then use that to avoid a match on a wrong type, that would be bad ;)
-			// Look up this message/topic/pm and see if the subjects match ... if they do then tada!
-			if (((!empty($message_type) && $message_type === $type) || empty($message_type) && $type !== 'p')
+			// If we know/suspect it's an "m,t or p", then use that to avoid a match on a wrong type; that would be bad ;)
+			// Look up this message/topic/pm and see if the subjects match ... if they do, then tada!
+			if (((!empty($message_type) && $message_type === $type) || (empty($message_type) && $type !== 'p'))
 				&& query_load_subject($message, $type, $email_message->email['from']) === $subject)
 			{
 				// This email has a subject that matches the subject of a message that was sent to them
@@ -790,7 +790,7 @@ function pbe_emailError($error, $email_message)
 		['id_email']
 	);
 
-	// Flush the moderator error number cache, if we are here it likely just changed.
+	// Flush the moderator error number cache, if we are here, it likely just changed.
 	Cache::instance()->remove('num_menu_errors');
 
 	// If not running from the cli, then go back to the form
@@ -809,11 +809,11 @@ function pbe_emailError($error, $email_message)
  *
  * What it does:
  *
- * - populates TemporaryAttachmentsList with the email attachments
- * - does all the checks to validate them
- * - skips ones flagged with errors
- * - adds valid ones to attachmentOptions
- * - calls createAttachment to store them
+ * - Populates TemporaryAttachmentsList with the email attachments
+ * - Does all the checks to validate them
+ * - Skips ones flagged with errors
+ * - Adds valid ones to attachmentOptions
+ * - Calls createAttachment to store them
  *
  * @param array $pbe
  * @param EmailParse $email_message
@@ -824,7 +824,7 @@ function pbe_emailError($error, $email_message)
  */
 function pbe_email_attachments($pbe, $email_message)
 {
-	// Trying to attach a file with this post ....
+	// Trying to attach a file with this post...
 	global $modSettings, $context, $txt;
 
 	// Init
@@ -881,7 +881,7 @@ function pbe_email_attachments($pbe, $email_message)
 				'id_folder' => $attachmentDirectory->currentDirectoryId(),
 			]);
 
-			// Make sure its valid
+			// Make sure it's valid
 			$temp_file->doChecks($attachmentDirectory);
 			$tmp_attachments->addAttachment($temp_file);
 		}
@@ -899,7 +899,7 @@ function pbe_email_attachments($pbe, $email_message)
 		// Get the results from attachmentChecks and see if it is suitable for posting
 		foreach ($tmp_attachments as $attachID => $attachment)
 		{
-			// If there were any errors we just skip that file
+			// If there were any errors, we just skip that file
 			if (!str_contains($attachID, (string) $prefix) || $attachment->hasErrors())
 			{
 				$attachment->remove(false);
@@ -928,7 +928,7 @@ function pbe_email_attachments($pbe, $email_message)
 					$attachIDs[] = $attachmentOptions['thumb'];
 				}
 			}
-			// We had a problem so simply remove it
+			// We had a problem, so simply remove it
 			else
 			{
 				$tmp_attachments->removeById($attachID, false);
@@ -982,13 +982,13 @@ function pbe_find_board_number($email_address)
 }
 
 /**
- * Converts a post/pm to text (markdown) for sending in an email
+ * Converts a post/pm to text (Markdown) for sending in an email
  *
- * - censors everything it will send
- * - pre-converts select bbc tags to html, so they can be markdowned properly
- * - uses parse-bbc to convert remaining bbc to html
- * - uses html2markdown to convert html into Markdown text suitable for email
- * - if someone wants to write a direct bbc->markdown conversion tool, I'm listening!
+ * - Censors everything it will send
+ * - Pre-converts select bbc tags to HTML, so they can be Markdown properly
+ * - Uses parse-bbc to convert remaining BBC to HTML
+ * - Uses html2markdown to convert HTML into Markdown text suitable for email
+ * - If someone wants to write a direct BBC->Markdown conversion tool, I'm listening!
  *
  * @param string $message
  * @param string $subject
@@ -1002,7 +1002,7 @@ function pbe_prepare_text(&$message, &$subject = '', &$signature = '')
 	$subject = $mailPreparse->preparseSubject($subject);
 	$signature = $mailPreparse->preparseSignature($signature);
 
-	// Convert this to text (markdown)
+	// Convert this to text (Markdown)
 	$mark_down = new Html2Md($message);
 	$message = $mark_down->get_markdown();
 }
@@ -1079,7 +1079,7 @@ function pbe_disable_user_notify($email_message)
 }
 
 /**
- * Replace full bbc quote tags with html blockquote version where the cite line
+ * Replace full BBC quote tags with HTML blockquote version where the cite line
  * is used as the first line of the quote.
  *
  * - Callback for pbe_prepare_text
@@ -1115,8 +1115,8 @@ function quote_callback($matches)
  *
  * - Similar to \ElkArte\MembersList::load, loadPermissions, loadUserSettings, but only loads a
  * subset of that data, enough to validate that a user can make a post to a given board.
- * - Done this way to avoid over-writing user_info etc for those who are running
- * this function (on behalf of the email owner, similar to profile views etc)
+ * - Done this way to avoid overwriting user_info etc. for those who are running
+ * this function (on behalf of the email owner, similar to profile views etc.)
  *
  * Sets:
  * - pbe['profile']
@@ -1220,7 +1220,7 @@ function query_load_user_info($email)
 }
 
 /**
- * Load the users permissions either general or board specific
+ * Load the users permissions either general or board-specific
  *
  * - Similar to the functions in loadPermissions()
  *
@@ -1337,7 +1337,7 @@ function query_key_owner($email_message)
 /**
  * For a given type, t m or p, query the appropriate table for a given message id
  *
- * - If found returns the message subject
+ * - If found, returns the message subject
  *
  * @param int $message_id
  * @param string $message_type
@@ -1582,7 +1582,7 @@ function query_load_board_details($board_id, $pbe)
 /**
  * Loads the theme settings for the theme this user is using
  *
- * - Mainly used to determine a users notify settings
+ * - Mainly used to determine a users notify setting
  *
  * @param int $id_member
  * @param int $id_theme
@@ -1601,7 +1601,7 @@ function query_get_theme($id_member, $id_theme, $board_info)
 	$id_theme = (int) $id_theme;
 
 	// Verify the id_theme...
-	// Allow the board specific theme, if they are overriding.
+	// Allow the board-specific theme if they are overriding.
 	if (!empty($board_info['id_theme']) && $board_info['override_theme'])
 	{
 		$id_theme = (int) $board_info['id_theme'];
@@ -1649,7 +1649,7 @@ function query_notifications($id_member, $id_board, $id_topic, $auto_notify, $pe
 {
 	$db = database();
 
-	// First see if they have a board notification on for this board,
+	// First, see if they have a board notification on for this board,
 	// so we don't set both board and individual topic notifications
 	$board_notify = false;
 	$request = $db->query('', '
@@ -1670,7 +1670,7 @@ function query_notifications($id_member, $id_board, $id_topic, $auto_notify, $pe
 
 	$request->free_result();
 
-	// If they have topic notification on and not board notification then
+	// If they have topic notification on and not board notification, then
 	// add this post to the notification log
 	if (!empty($auto_notify) && (in_array('mark_any_notify', $permissions)) && !$board_notify)
 	{
@@ -1766,7 +1766,7 @@ function query_mark_pms($email_message, $pbe)
 }
 
 /**
- * Once a key has been used it is removed and can not be used again
+ * Once a key has been used, it is removed and cannot be used again
  *
  * - Also removes any old keys to minimize security issues
  *
@@ -1783,7 +1783,7 @@ function query_key_maintenance($email_message)
 	$days = (empty($modSettings['maillist_key_active'])) ? 21 : $modSettings['maillist_key_active'];
 	$delete_old = time() - ($days * 24 * 60 * 60);
 
-	// Consume the database key that was just used .. one reply per key,
+	// Consume the database key that was just used ... one reply per key,
 	// but we let PM's slide, they often seem to be re re re replied to
 	if ($email_message->message_type !== 'p')
 	{
@@ -1800,7 +1800,7 @@ function query_key_maintenance($email_message)
 		);
 	}
 
-	// Since we are here lets delete any items older than delete_old days,
+	// Since we are here, let's delete any items older than delete_old days
 	// if they have not responded in that time tuff
 	$db->query('', '
 		DELETE FROM {db_prefix}postby_emails
@@ -1815,7 +1815,7 @@ function query_key_maintenance($email_message)
  * After an email post has been made, this updates the user information just like
  * they are on the site to perform the given action.
  *
- * - Updates time on line
+ * - Updates time online
  * - Updates last active
  * - Updates the who's online list with the member and action
  *
@@ -1835,12 +1835,12 @@ function query_update_member_stats($pbe, $email_message, $topic_info = [])
 	// If they were active in the last 15 min, we don't want to run up their time
 	if (!empty($pbe['profile']['last_login']) && $pbe['profile']['last_login'] < (time() - (60 * 15)))
 	{
-		// not recently active so add some time to their login ....
+		// Not recently active, so add some time to their login.
 		$do_delete = true;
 		$total_time_logged_in += 60 * 10;
 	}
 
-	// Update the members total time logged in data
+	// Update the members' total time logged-in data
 	require_once(SUBSDIR . '/Members.subs.php');
 	updateMemberData($pbe['profile']['id_member'], ['total_time_logged_in' => $total_time_logged_in, 'last_login' => $last_login]);
 
@@ -1870,7 +1870,7 @@ function query_update_member_stats($pbe, $email_message, $topic_info = [])
 		];
 	}
 
-	// Place the entry in to the online log so the who's online can use it
+	// Place the entry in to the online log so who's online can use it
 	$serialized = serialize($get_temp);
 	$session_id = 'ip' . $pbe['profile']['member_ip'];
 	$member_ip = empty($pbe['profile']['member_ip']) ? 0 : $pbe['profile']['member_ip'];
@@ -1887,7 +1887,7 @@ function query_update_member_stats($pbe, $email_message, $topic_info = [])
  *
  * What it does:
  *
- * - Converts an email response (text or html) to a BBC equivalent via pbe_Email_to_bbc
+ * - Converts an email response (text or HTML) to a BBC equivalent via pbe_Email_to_bbc
  * - Formats the email response such that it looks structured and not chopped up (via pbe_fix_email_body)
  *
  * @param EmailParse $email_message
@@ -1928,8 +1928,8 @@ function pbe_load_text($email_message, $pbe)
 }
 
 /**
- * Checks and removes role=presentation tables.  If to many tables remain, returns the plain text
- * version of the email as converting too many html tables to bbc simply will not look good
+ * Checks and removes role=presentation tables.  If too many tables remain, returns the plain text
+ * version of the email as converting too many HTML tables to BBC simply will not look good
  *
  * @param EmailParse $email_message
  * @param bool $html
@@ -1946,7 +1946,7 @@ function pbe_load_html($email_message, &$html)
 	// If we are dealing with tables ....
 	if (preg_match('~<table.*?>~i', $text))
 	{
-		// Try and strip out purely presentational ones, for example how we send html emails
+		// Try and strip out purely presentational ones, for example, how we send HTML emails
 		$text = preg_replace_callback('~(<table[^>].*?role="presentation".*?>.*?</table>)~s',
 			static function ($matches) {
 				$result = preg_replace('~<table[^>].*?role="presentation".*?>~', '', $matches[0]);
@@ -2042,7 +2042,7 @@ function pbe_create_post($pbe, $email_message, $topic_info)
 		}
 	}
 
-	// Setup the post variables.
+	// Set up the post-variables.
 	$msgOptions = [
 		'id' => 0,
 		'subject' => str_starts_with($topic_info['subject'], trim($pbe['response_prefix'])) ? $topic_info['subject'] : $pbe['response_prefix'] . $topic_info['subject'],
@@ -2070,13 +2070,13 @@ function pbe_create_post($pbe, $email_message, $topic_info)
 	// Make the post.
 	createPost($msgOptions, $topicOptions, $posterOptions);
 
-	// Bind any attachments that may be included to this new message
+	// Bind any attachments that may be included in this new message
 	if (!empty($attachIDs) && !empty($msgOptions['id']))
 	{
 		bindMessageAttachments($msgOptions['id'], $attachIDs);
 	}
 
-	// We need the auto_notify setting, it may be theme based so pass the theme in use
+	// We need the auto_notify setting, it may be theme-based so pass the theme in use
 	$theme_settings = query_get_theme($pbe['profile']['id_member'], $pbe['profile']['id_theme'], $topic_info);
 	$auto_notify = $theme_settings['auto_notify'] ?? 0;
 
@@ -2129,7 +2129,7 @@ function pbe_create_pm($pbe, $email_message, $pm_info)
 		return pbe_emailError('error_no_message', $email_message);
 	}
 
-	// If they tried to attach a file, just say sorry
+	// If they tried to attach a file, just say, sorry
 	if (!empty($email_message->attachments) && !empty($modSettings['maillist_allow_attachments']) && !empty($modSettings['attachmentEnable']) && $modSettings['attachmentEnable'] == 1)
 	{
 		$text .= "\n\n" . $txt['error_no_pm_attach'] . "\n";
@@ -2162,12 +2162,12 @@ function pbe_create_pm($pbe, $email_message, $pm_info)
  *
  * What it does:
  *
- * - Called by pbe_topic to create a new topic or by pbe_main to create a new topic via a subject change
- * - checks posting permissions, but requires all email validation checks are complete
- * - Calls pbe_load_text to prepare text for the post
- * - Calls sendNotifications to announce the new post
- * - Calls query_update_member_stats to show they did something
- * - Requires the pbe, email_message and board_info arrays to be populated.
+ * - Called by pbe_topic to create a new topic or by pbe_main to create a new topic via a subject change.
+ * - checks posting permissions, but requires all email validation checks are complete.
+ * - Calls pbe_load_text to prepare text for the post.
+ * - Calls sendNotifications to announce the new post.
+ * - Calls query_update_member_stats to show they did something.
+ * - Requires the pbe, email_message, and board_info arrays to be populated.
  *
  * @param array $pbe array of pbe 'user_info' values
  * @param EmailParse $email_message
@@ -2188,7 +2188,7 @@ function pbe_create_topic($pbe, $email_message, $board_info)
 		return false;
 	}
 
-	// We have the board info, and their permissions - do they have a right to start a new topic?
+	// We have the board info and their permissions - do they have a right to start a new topic?
 	$becomesApproved = true;
 	if (!$pbe['user_info']['is_admin'])
 	{
@@ -2217,7 +2217,7 @@ function pbe_create_topic($pbe, $email_message, $board_info)
 	$subject = pbe_clean_email_subject($email_message->subject);
 	$subject = strtr(Util::htmlspecialchars($subject), ["\r" => '', "\n" => '', "\t" => '']);
 
-	// Not to long not to short
+	// Not too long, not too short
 	if (Util::strlen($subject) > 100)
 	{
 		$subject = Util::substr($subject, 0, 100);
@@ -2248,10 +2248,10 @@ function pbe_create_topic($pbe, $email_message, $board_info)
 		}
 	}
 
-	// If we get to this point ... then its time to play, lets start a topic !
+	// If we get to this point ... then it's time to play, let's start a topic!
 	require_once(SUBSDIR . '/Post.subs.php');
 
-	// Setup the topic variables.
+	// Set up the topic variables.
 	$msgOptions = [
 		'id' => 0,
 		'subject' => $subject,
@@ -2291,7 +2291,7 @@ function pbe_create_topic($pbe, $email_message, $board_info)
 	// Notifications on or off
 	query_notifications($pbe['profile']['id_member'], $board_info['id_board'], $topicOptions['id'], $auto_notify, $pbe['user_info']['permissions']);
 
-	// Notify members who have notification turned on for this, (if it's approved)
+	// Notify members who have notification turned on for this (if it's approved)
 	if ($becomesApproved)
 	{
 		require_once(SUBSDIR . '/Notification.subs.php');

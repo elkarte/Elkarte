@@ -148,7 +148,7 @@ function loadCacheEngines($supported_only = true)
 				'cache_password' => empty($cache_password) ? '' : $cache_password,
 			];
 
-			// Use the current Cache object if its been enabled
+			// Use the current Cache object if it's been enabled
 			if ($engine_name === $current)
 			{
 				$obj = $cache->getCacheEngine();

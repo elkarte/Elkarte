@@ -74,7 +74,7 @@ function calculateNextTrigger($tasks = [], $forceUpdate = false)
 			$next_time = next_time($row['time_regularity'], $row['time_unit'], $row['time_offset']);
 		}
 
-		// Only bother moving the task if it's out of place or we're forcing it!
+		// Only bother moving the task if it's out of place, or we're forcing it!
 		if ($forceUpdate || $next_time < $row['next_time'] || $row['next_time'] < time())
 		{
 			$tasks[$row['id_task']] = $next_time;
@@ -107,7 +107,7 @@ function calculateNextTrigger($tasks = [], $forceUpdate = false)
 		);
 	}
 
-	// If the next task is now different update.
+	// If the next task is now a different update.
 	if ($modSettings['next_task_time'] != $nextTaskTime)
 	{
 		updateSettings(['next_task_time' => $nextTaskTime]);
@@ -139,12 +139,12 @@ function next_time($regularity, $unit, $offset, $immediate = false)
 	{
 		$next_time = time() + 10;
 	}
-	// If the unit is minutes only check regularity in minutes.
+	// If the unit is minutes, only check regularity in minutes.
 	elseif ($unit === 'm')
 	{
 		$off = date('i', $offset);
 
-		// If it's now just pretend it ain't,
+		// If it's now, just pretend it ain't,
 		if ($off == $curMin)
 		{
 			$next_time = time() + $regularity;
@@ -163,7 +163,7 @@ function next_time($regularity, $unit, $offset, $immediate = false)
 			$next_time = time() + 60 * ($off - $curMin);
 		}
 	}
-	// Otherwise, work out what the offset would be with todays date.
+	// Otherwise, work out what the offset would be with today's date.
 	else
 	{
 		$next_time = mktime(date('H', $offset), date('i', $offset), 0, date('m'), date('d'), date('Y'));
@@ -174,7 +174,7 @@ function next_time($regularity, $unit, $offset, $immediate = false)
 			$next_time -= 86400;
 		}
 
-		// Default we'll jump in hours.
+		// Default is jump in hours.
 		$applyOffset = 3600;
 
 		// 24 hours = 1 day.
@@ -234,7 +234,7 @@ function loadTasks($tasks)
 /**
  * Logs a task.
  *
- * @param int $id_log the id of the log entry of the task just run. If empty it is considered a new log entry
+ * @param int $id_log the id of the log entry of the task that just ran. If empty it is considered a new log entry
  * @param int $task_id the id of the task run (from the table scheduled_tasks)
  * @param int|null $total_time How long the task took to finish. If NULL (default value) -1 will be used
  * @return int the id_log value
@@ -292,10 +292,10 @@ function updateTaskStatus($enablers)
 }
 
 /**
- * Sets the task status to enabled / disabled by task name (i.e. function)
+ * Sets the task status to enabled / disabled by task name (i.e., function)
  *
  * @param string $enabler the name (the function) of a task
- * @param bool $enable is if the tasks should be enabled or disabled
+ * @param bool $enable if the tasks should be enabled or disabled
  * @package ScheduledTasks
  */
 function toggleTaskStatusByName($enabler, $enable = true)
@@ -454,7 +454,7 @@ function scheduledTasks()
 }
 
 /**
- * Return task log entries, within the passed limits.
+ * Return task log entries within the passed limits.
  *
  * - Used by createList() callbacks.
  *
@@ -486,7 +486,7 @@ function getTaskLogEntries($start, $items_per_page, $sort)
 				'id' => $row['id_log'],
 				'name' => $txt['scheduled_task_' . $row['task']] ?? $row['task'],
 				'time_run' => $row['time_run'],
-				// -1 means failed task, but in order to look better in the UI we switch it to 0
+				// -1 means failed task, but to look better in the UI we switch it to 0
 				'time_taken' => $row['time_taken'] == -1 ? 0 : $row['time_taken'],
 				'task_completed' => $row['time_taken'] != -1,
 			];
@@ -580,7 +580,7 @@ function processNextTasks($ts = 0)
 				break;
 		}
 
-		// If we were really late running this task actually skip the next one.
+		// If we were really late running this task, actually skip the next one.
 		if (time() + ($duration / 2) > $next_time)
 		{
 			$next_time += $duration;

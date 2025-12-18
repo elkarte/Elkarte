@@ -26,7 +26,7 @@ class QueueMail
 	 * - Handles using a cron job and another script to send the emails ("mail_queue_use_cron" setting)
 	 *
 	 * @param int|bool $batch_size = false the number to send each loop
-	 * @param bool $override_limit = false bypassing our limit flaf
+	 * @param bool $override_limit = false bypassing our limit flag
 	 * @param bool $force_send = false
 	 * @return bool
 	 * @package Mail

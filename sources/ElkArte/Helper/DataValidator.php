@@ -13,6 +13,7 @@
 
 namespace ElkArte\Helper;
 
+use ElkArte\Errors\Errors;
 use ElkArte\Languages\Txt;
 use ParseError;
 
@@ -266,8 +267,8 @@ class DataValidator
 					}
 					else
 					{
-						// @todo fatal_error or other ? being asked to do something we don't know?
 						// results in returning $input[$field] = $input[$field];
+						Errors::instance()->log_error('Unknown: data sanitizer function: ' . $sanitation['function'], 'undefined_vars');
 					}
 				}
 			}

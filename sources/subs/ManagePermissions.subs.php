@@ -69,7 +69,7 @@ function setPermissionLevel($level, $group = null, $profile = null)
 		'report_any',
 	];
 
-	// Standard - ie. members.  They can do anything Restrictive can.
+	// Standard - i.e., members.  They can do anything Restrictive can.
 	$groupLevels['global']['standard'] = array_merge($groupLevels['global']['restrict'], [
 		'view_mlist',
 		'karma_edit',
@@ -95,7 +95,7 @@ function setPermissionLevel($level, $group = null, $profile = null)
 		'view_attachments',
 	]);
 
-	// Moderator - ie. moderators :P.  They can do what standard can, and more.
+	// Moderator - i.e., moderators :P. They can do what standard can, and more.
 	$groupLevels['global']['moderator'] = array_merge($groupLevels['global']['standard'], [
 		'calendar_post',
 		'calendar_edit_own',
@@ -517,7 +517,7 @@ function assignPermissionProfileToBoard($profile, $board)
 }
 
 /**
- * Copy a set of permissions from one group to another..
+ * Copy a set of permissions from one group to another.
  *
  * @param int $copy_from
  * @param int[] $groups
@@ -530,7 +530,7 @@ function copyPermission($copy_from, $groups, $illegal_permissions, $non_guest_pe
 {
 	$db = database();
 
-	// Retrieve current permissions of group.
+	// Retrieve current permissions of a group.
 	$target_perm = [];
 	$db->fetchQuery('
 		SELECT 
@@ -551,7 +551,7 @@ function copyPermission($copy_from, $groups, $illegal_permissions, $non_guest_pe
 	{
 		foreach ($target_perm as $perm => $add_deny)
 		{
-			// No dodgy permissions please!
+			// No dodgy permissions, please!
 			if (!empty($illegal_permissions) && in_array($perm, $illegal_permissions))
 			{
 				continue;
@@ -582,14 +582,14 @@ function copyPermission($copy_from, $groups, $illegal_permissions, $non_guest_pe
 
 	if (!empty($inserts))
 	{
-		// ..and insert the new ones.
+		// ...and insert the new ones.
 		require_once(SUBSDIR . '/ManagePermissions.subs.php');
 		replacePermission($inserts);
 	}
 }
 
 /**
- * Copy a set of board permissions from one group to another..
+ * Copy a set of board permissions from one group to another.
  *
  * @param int $copy_from
  * @param int[] $groups The target groups
@@ -894,7 +894,7 @@ function clearDenyPermissions()
 }
 
 /**
- * Permissions for post based groups disabled? We need to clean the permission
+ * Permissions for post-based groups disabled? We need to clean the permission
  * tables, too.
  *
  * @package Permissions
@@ -1050,7 +1050,7 @@ function deletePermissionProfiles($profiles)
 	}
 	$request->free_result();
 
-	// Oh well, delete.
+	// Oh well, delete it.
 	$db->query('', '
 		DELETE FROM {db_prefix}permission_profiles
 		WHERE id_profile IN ({array_int:profile_list})',
@@ -1061,7 +1061,7 @@ function deletePermissionProfiles($profiles)
 }
 
 /**
- * Checks, if a permission profile is in use.
+ * Checks if a permission profile is in use.
  *
  * @param int[] $profiles
  *

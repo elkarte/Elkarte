@@ -16,8 +16,8 @@ use BBC\ParserWrapper;
 use ElkArte\User;
 
 /**
- * This function deals with the poll ID associated to a topic.
- * It allows to retrieve or update the poll ID associated with this topic ID.
+ * This function deals with the poll ID associated with a topic.
+ * It allows retrieving or update the poll ID associated with this topic ID.
  *
  * If $pollID is not passed, the current poll ID of the topic, if any, is returned.
  * If $pollID is passed, the topic is updated to point to the new poll.
@@ -128,7 +128,7 @@ function resetVotes($pollID)
  * - Only returns info on the poll, not its options.
  *
  * @param int $id_poll The id of the poll to load
- * @param bool $ignore_permissions if true permissions are not checked.
+ * @param bool $ignore_permissions if true, permissions are not checked.
  *             If false, {query_see_board} boardsAllowedTo('poll_view') and
  *             $modSettings['postmod_active'] will be considered in the query.
  *             This param is currently used only in SSI, it may be useful in any
@@ -200,7 +200,7 @@ function pollInfo($id_poll, $ignore_permissions = true)
 }
 
 /**
- * Retrieve poll information, for the poll associated
+ * Retrieve poll information for the poll associated
  * to topic $topicID.
  *
  * @param int $topicID the topic with an associated poll.
@@ -211,7 +211,7 @@ function pollInfoForTopic($topicID)
 {
 	$db = database();
 
-	// Check if a poll currently exists on this topic, and get the id, question and starter.
+	// Check if a poll currently exists on this topic and get the id, question and starter.
 	$request = $db->query('', '
 		SELECT
 			t.id_member_started, p.id_poll, p.voting_locked, p.question,
@@ -241,7 +241,7 @@ function pollInfoForTopic($topicID)
 }
 
 /**
- * Retrieve the id of the topic associated to a poll
+ * Retrieve the id of the topic associated with a poll
  *
  * @param int $pollID the topic with an associated poll.
  * @return array the topic id and the board id, false if no topics found
@@ -250,7 +250,7 @@ function topicFromPoll($pollID)
 {
 	$db = database();
 
-	// Check if a poll currently exists on this topic, and get the id, question and starter.
+	// Check if a poll currently exists on this topic and get the id, question and starter.
 	$request = $db->query('', '
 		SELECT
 			t.id_topic, b.id_board
@@ -706,8 +706,8 @@ function increaseGuestVote($id_poll)
 /**
  * Determines who voted what.
  *
- * @param int $id_member id of the member who's vote choice we want
- * @param int $id_poll id fo the poll the member voted in
+ * @param int $id_member id of the member whose vote choice we want
+ * @param int $id_poll id of the poll the member voted in
  *
  * @return int[]
  */
@@ -855,7 +855,7 @@ function loadPollContext($poll_id)
 	// Get the question and if it's locked.
 	$pollinfo = pollInfo($poll_id);
 
-	// Get all the options, and calculate the total votes.
+	// Get all the options and calculate the total votes.
 	$pollOptions = pollOptionsForMember($poll_id, User::$info->id);
 
 	// Compute total votes.
@@ -867,7 +867,7 @@ function loadPollContext($poll_id)
 		$pollinfo['has_voted'] |= $choice['voted_this'] != -1;
 	}
 
-	// If this is a guest we need to do our best to work out if they have voted, and what they voted for.
+	// If this is a guest, we need to do our best to work out if they have voted and what they voted for.
 	if (User::$info->is_guest && $pollinfo['guest_vote'] && allowedTo('poll_vote'))
 	{
 		if (!empty($_COOKIE['guest_poll_vote']) && preg_match('~^[0-9,;]+$~', $_COOKIE['guest_poll_vote']) && str_contains($_COOKIE['guest_poll_vote'], ';' . $poll_id . ','))
@@ -949,8 +949,8 @@ function loadPollContext($poll_id)
 	// 2. you're either not a guest OR guest voting is enabled... and
 	// 3. you're not trying to view the results, and
 	// 4. the poll is not locked, and
-	// 5. you have the proper permissions, and
-	// 6. you haven't already voted before.
+	// 5. you have the proper permission, and
+	// 6. you haven't yet voted.
 	$context['allow_vote'] = !$context['poll']['is_expired'] && (User::$info->is_guest === false || ($pollinfo['guest_vote'] && allowedTo('poll_vote'))) && empty($pollinfo['voting_locked']) && allowedTo('poll_vote') && !$context['poll']['has_voted'];
 
 	// You're allowed to view the results if:

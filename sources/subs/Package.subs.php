@@ -29,7 +29,7 @@ use ElkArte\XmlArray;
 
 /**
  * Reads a .tar.gz file, filename, in and extracts file(s) from it.
- * essentially just a shortcut for read_tgz_data().
+ * Essentially just a shortcut for read_tgz_data().
  *
  * @param string $gzfilename
  * @param string $destination
@@ -41,7 +41,7 @@ use ElkArte\XmlArray;
  */
 function read_tgz_file($gzfilename, $destination, $single_file = false, $overwrite = false, $files_to_extract = null)
 {
-	// From a web site
+	// From a website
 	if (str_starts_with($gzfilename, 'http://') || str_starts_with($gzfilename, 'https://'))
 	{
 		$data = fetch_web_data($gzfilename);
@@ -63,21 +63,21 @@ function read_tgz_file($gzfilename, $destination, $single_file = false, $overwri
 /**
  * Extracts a file or files from the .tar.gz contained in data.
  *
- * - Detects if the file is really a .zip file, and if so returns the result of read_zip_data
+ * - Detects if the file is really a .zip file, and if so, returns the result of read_zip_data
  *
- * if destination is null
- * - returns a list of files in the archive.
+ * If destination is null
+ *   - Returns a list of files in the archive.
  *
- * if single_file is true
- * - returns the contents of the file specified by destination, if it exists, or false.
- * - destination can start with * and / to signify that the file may come from any directory.
- * - destination should not begin with a / if single_file is true.
+ * If single_file is true
+ *   - Returns the contents of the file specified by destination, if it exists, or false.
+ *   - Destination can start with * and / to signify that the file may come from any directory.
+ *   - Destination should not begin with a / if single_file is true.
  *
- * - existing files with newer modification times if and only if overwrite is true.
- * - creates the destination directory if it doesn't exist, and is is specified.
- * - requires zlib support be built into PHP.
- * - returns an array of the files extracted on success
- * - if files_to_extract is not equal to null only extracts the files within this array.
+ * - Existing files with newer modification times if and only if overwrite is true.
+ * - Creates the destination directory if it doesn't exist and is specified.
+ * - Requires zlib support be built into PHP.
+ * - Returns an array of the files extracted on success
+ * - If files_to_extract is not equal to null only extracts the files within this array.
  *
  * @param string $data
  * @param string $destination
@@ -154,7 +154,7 @@ function loadInstalledPackages()
 	}
 
 	// Load the packages from the database - note this is ordered by installation time to ensure
-	// latest package uninstalled first.
+	// the latest package uninstalled first.
 	$installed = [];
 	$found = [];
 	$db->fetchQuery('
@@ -168,7 +168,7 @@ function loadInstalledPackages()
 		]
 	)->fetch_callback(
 		function ($row) use (&$found, &$installed) {
-			// Already found this? If so don't add it twice!
+			// Already found this? If so, don't add it twice!
 			if (in_array((int) $row['package_id'], $found, true))
 			{
 				return;
@@ -194,7 +194,7 @@ function loadInstalledPackages()
  * Loads a package's information and returns a representative array.
  *
  * - Expects the file to be a package in packages/.
- * - Returns a error string if the package-info is invalid.
+ * - Returns an error string if the package-info is invalid.
  * - Otherwise returns a basic array of id, version, filename, and similar information.
  * - An \ElkArte\XmlArray is available in 'xml'.
  *
@@ -208,7 +208,7 @@ function getPackageInfo($gzFilename)
 	$gzFilename = trim($gzFilename);
 	$fileFunc = FileFunctions::instance();
 
-	// Extract package-info.xml from downloaded file. (*/ is used because it could be in any directory.)
+	// Extract package-info.xml from a downloaded file. (*/ is used because it could be in any directory.)
 	if (preg_match('~^https?://~i', $gzFilename) === 1)
 	{
 		$packageInfo = read_tgz_data(fetch_web_data($gzFilename, '', true), '*/package-info.xml', true);
@@ -285,9 +285,7 @@ function getPackageInfo($gzFilename)
  */
 function create_chmod_control($chmodFiles = [], $chmodOptions = [], $restore_write_status = false)
 {
-	$create_chmod_control = new PackageChmod();
-
-	return $create_chmod_control->createChmodControl($chmodFiles, $chmodOptions, $restore_write_status);
+	return (new PackageChmod())->createChmodControl($chmodFiles, $chmodOptions, $restore_write_status);
 }
 
 /**
@@ -309,7 +307,7 @@ function list_restoreFiles($dummy1, $dummy2, $dummy3, $do_change)
 
 	foreach ($_SESSION['ftp_connection']['original_perms'] as $file => $perms)
 	{
-		// Check the file still exists, and the permissions were indeed different than now.
+		// Check the file still exists, and the permissions were indeed different from now.
 		$file_permissions = $fileFunc->filePerms($file);
 		if (!$fileFunc->fileExists($file) || $file_permissions === $perms)
 		{
@@ -370,14 +368,13 @@ function list_restoreFiles($dummy1, $dummy2, $dummy3, $do_change)
  */
 function parsePackageInfo(&$packageXML, $testing_only = true, $method = 'install', $previous_version = '')
 {
-	$parser = new PackageParser();
-	return $parser->parsePackageInfo($packageXML, $testing_only, $method, $previous_version);
+	return (new PackageParser())->parsePackageInfo($packageXML, $testing_only, $method, $previous_version);
 }
 
 /**
  * Checks if version matches any of the versions in versions.
  *
- * - Supports comma separated version numbers, with or without whitespace.
+ * - Supports comma-separated version numbers, with or without whitespace.
  * - Supports lower and upper bounds. (1.0-1.2)
  * - Returns true if the version matched.
  *
@@ -415,13 +412,14 @@ function matchHighestPackageVersion($versions, $the_version, $reset = false)
 			$for = str_replace('*', '0', $for) . '-' . str_replace('*', '999', $for);
 		}
 
-		// If we have a range, grab the lower value, done this way so it looks normal-er to the user e.g. 1.0 vs 1.0.99
+		// If we have a range, grab the lower value, done this way so
+		// it looks normal-er to the user e.g., 1.0 vs. 1.0.99
 		if (str_contains($for, '-'))
 		{
 			list ($for,) = explode('-', $for);
 		}
 
-		// Do the compare, if the for is greater, than what we have but not greater than what we are running .....
+		// Do the comparison if the for is greater than what we have but not greater than what we are running .....
 		if (compareVersions($near_version, $for) === -1 && compareVersions($for, $the_version) !== 1)
 		{
 			$near_version = $for;
@@ -432,9 +430,9 @@ function matchHighestPackageVersion($versions, $the_version, $reset = false)
 }
 
 /**
- * Checks if the forum version matches any of the available versions from the package install xml.
+ * Checks if the forum version matches any of the available versions from the package install XML.
  *
- * - Supports comma separated version numbers, with or without whitespace.
+ * - Supports comma-separated version numbers, with or without whitespace.
  * - Supports lower and upper bounds. (1.0-1.2)
  * - Returns true if the version matched.
  *
@@ -486,7 +484,7 @@ function matchPackageVersion($version, $versions)
 }
 
 /**
- * Compares two versions and determines if one is newer, older or the same, returns
+ * Compares two versions and determines if one is newer, older, or the same, returns
  *
  * - (-1) if version1 is lower than version2
  * - (0) if version1 is equal to version2
@@ -535,7 +533,7 @@ function compareVersions($version1, $version2)
 	// Loop through each category.
 	foreach ($categories as $category)
 	{
-		// Is there something for us to calculate?
+		// Is there anything for us to calculate?
 		if ($versions[1][$category] !== $versions[2][$category])
 		{
 			// Dev builds are a problematic exception.
@@ -608,12 +606,12 @@ function parse_path($path)
 }
 
 /**
- * Deletes all the files in a directory, and all the files in sub directories inside it.
+ * Deletes all the files in a directory, and all the files in subdirectories inside it.
  *
  * What it does:
  *
  * - Requires access to delete these files.
- * - Recursively goes in to all sub directories looking for files to delete
+ * - Recursively goes in to all subdirectories looking for files to delete
  * - Optionally removes the directory as well, otherwise will leave an empty tree behind
  *
  * @param string $dir
@@ -745,7 +743,7 @@ function mktree($strPath, $mode = true)
 		return false;
 	}
 
-	// Is the dir writable and do we have permission to attempt to make it so
+	// Is the dir writable, and do we have permission to attempt to make it so?
 	if (!$fileFunc->isWritable(dirname($strPath)) && $mode !== false)
 	{
 		if (isset($package_ftp))
@@ -759,7 +757,7 @@ function mktree($strPath, $mode = true)
 		}
 	}
 
-	// Can't change the mode so just return the current availability
+	// Can't change the mode, so just return the current availability
 	if ($mode === false)
 	{
 		return test_access($strPath);
@@ -769,7 +767,7 @@ function mktree($strPath, $mode = true)
 	{
 		return $package_ftp->create_dir(setFtpName($strPath));
 	}
-	// Only one choice left and that is to try and make a directory with PHP
+	// Only one choice left, and that is to try and make a directory with PHP
 
 	try
 	{
@@ -798,7 +796,7 @@ function dirTest($strPath)
 		return test_access($strPath);
 	}
 
-	// Is this an invalid path ?
+	// Is this an invalid path?
 	if ($strPath === dirname($strPath) || !dirTest(dirname($strPath)))
 	{
 		return false;
@@ -888,10 +886,10 @@ function copytree($source, $destination)
 }
 
 /**
- * Parses a xml-style modification file (file).
+ * Parses an xml-style modification file (file).
  *
  * @param string $file
- * @param bool $testing = true means modifications shouldn't actually be saved.
+ * @param bool $testing = true means modifications shouldn't be saved.
  * @param bool $undo = false specifies that the modifications the file requests should be undone; this doesn't work with everything (regular expressions.)
  * @param array $theme_paths = array()
  * @return array an array of those changes made.
@@ -936,7 +934,7 @@ function parseModification($file, $testing = true, $undo = false, $theme_paths =
 		// Now, we need to work out whether this is even a template file...
 		foreach ($theme_paths as $id => $theme)
 		{
-			// If this filename is relative, if so take a guess at what it should be.
+			// If this filename is relative, if so, take a guess at what it should be.
 			$real_filename = $filename;
 			if (str_starts_with($filename, 'themes'))
 			{
@@ -968,7 +966,7 @@ function parseModification($file, $testing = true, $undo = false, $theme_paths =
 			// For every template, do we want it? Yea, no, maybe?
 			foreach ($template_changes[1] as $index => $template_file)
 			{
-				// What, it exists and we haven't already got it?! Lordy, get it in!
+				// What, it exists, and we haven't yet got it?! Lordy, get it in!
 				if (file_exists($theme['theme_dir'] . '/' . $template_file) && (!isset($template_changes[$id]) || !in_array($template_file, $template_changes[$id])))
 				{
 					// Now let's add it to the "todo" list.
@@ -985,7 +983,7 @@ function parseModification($file, $testing = true, $undo = false, $theme_paths =
 			1 => parse_path(trim($file->fetch('@name'))),
 		];
 
-		// Sometimes though, we have some additional files for other themes, if we have add them to the mix.
+		// Sometimes, though, we have some additional files for other themes if we have added them to the mix.
 		if (isset($custom_themes_add[$files_to_change[1]]))
 		{
 			$files_to_change += $custom_themes_add[$files_to_change[1]];
@@ -1043,7 +1041,7 @@ function parseModification($file, $testing = true, $undo = false, $theme_paths =
 			$operations = $file->exists('operation') ? $file->set('operation') : [];
 			foreach ($operations as $operation)
 			{
-				// Convert operation to an array.
+				// Convert an operation to an array.
 				$actual_operation = [
 					'searches' => [],
 					'error' => $operation->exists('@error') && in_array(trim($operation->fetch('@error')), ['ignore', 'fatal', 'required']) ? trim($operation->fetch('@error')) : 'fatal',
@@ -1086,7 +1084,7 @@ function parseModification($file, $testing = true, $undo = false, $theme_paths =
 				{
 					foreach ($actual_operation['searches'] as $i => $search)
 					{
-						// Reverse modification of regular expressions are not allowed.
+						// Reverse modification of regular expressions is not allowed.
 						if ($search['is_reg_exp'])
 						{
 							if ($actual_operation['error'] === 'fatal')
@@ -1128,7 +1126,7 @@ function parseModification($file, $testing = true, $undo = false, $theme_paths =
 					}
 				}
 
-				// Sort the search list so the replaces come before the add before/after's.
+				// Sort the search list so the replacements come before the added before/after's.
 				if (count($actual_operation['searches']) !== 1)
 				{
 					$replacements = [];
@@ -1147,7 +1145,7 @@ function parseModification($file, $testing = true, $undo = false, $theme_paths =
 				// Create regular expression replacements from each search.
 				foreach ($actual_operation['searches'] as $i => $search)
 				{
-					// Not much needed if the search subject is already a regexp.
+					// Little needed if the search subject is already a regexp.
 					if ($search['is_reg_exp'])
 					{
 						$actual_operation['searches'][$i]['preg_search'] = $search['search'];
@@ -1157,7 +1155,7 @@ function parseModification($file, $testing = true, $undo = false, $theme_paths =
 						// Make the search subject fit into a regular expression.
 						$actual_operation['searches'][$i]['preg_search'] = preg_quote($search['search'], '~');
 
-						// Using 'loose', a random amount of tabs and spaces may be used.
+						// Using 'loose', a random number of tabs and spaces may be used.
 						if ($search['loose_whitespace'])
 						{
 							$actual_operation['searches'][$i]['preg_search'] = preg_replace('~[ \t]+~', '[ \t]+', $actual_operation['searches'][$i]['preg_search']);
@@ -1198,7 +1196,7 @@ function parseModification($file, $testing = true, $undo = false, $theme_paths =
 					// Testing 1, 2, 3...
 					$failed = preg_match('~' . $actual_operation['searches'][$i]['preg_search'] . '~s', $working_data) === 0;
 
-					// Nope, search pattern not found, or Found, but in this case, that means failure!
+					// Nope, a search pattern isn't found, or Found, but in this case, that means failure!
 					if (($failed && $actual_operation['error'] === 'fatal')
 						|| (!$failed && $actual_operation['error'] === 'required'))
 					{
@@ -1329,9 +1327,9 @@ function package_get_contents($filename)
 /**
  * Writes data to a file, almost exactly like the file_put_contents() function.
  *
- * - uses FTP to create/chmod the file when necessary and available.
- * - uses text mode for text mode file extensions.
- * - returns the number of bytes written.
+ * - Uses FTP to create/chmod the file when necessary and available.
+ * - Uses text mode for text mode file extensions.
+ * - Returns the number of bytes written.
  *
  * @param string $filename
  * @param string $data
@@ -1452,7 +1450,7 @@ function package_flush_cache($trash = false)
 		$packageChmod = new PackageChmod();
 		$result = $packageChmod->pkgChmod($filename);
 
-		// If we are not doing our test pass, then lets do a full write check
+		// If we are not doing our test pass, then let's do a full writing check
 		if (!$trash && !$fileFunc->isDir($filename))
 		{
 			// Acid test, can we really open this file for writing?
@@ -1500,8 +1498,7 @@ function package_flush_cache($trash = false)
  */
 function package_chmod($filename, $track_change = false)
 {
-	$packageChmod = new PackageChmod();
-	return $packageChmod->pkgChmod($filename, $track_change);
+	return (new PackageChmod())->pkgChmod($filename, $track_change);
 }
 
 /**
@@ -1579,7 +1576,7 @@ function package_create_backup($id = 'backup')
 			}
 		}
 
-		// Make sure we have a backup directory and its writable
+		// Make sure we have a backup directory and it's writable
 		if (!$fileFunc->fileExists(BOARDDIR . '/packages/backups'))
 		{
 			$fileFunc->createDirectory(BOARDDIR . '/packages/backups');
@@ -1636,9 +1633,9 @@ function package_create_backup($id = 'backup')
 /**
  * Get the contents of a URL, irrespective of allow_url_fopen.
  *
- * - reads the contents of http or ftp addresses and returns the page in a string
- * - will accept up to (3) redirections (redirection_level in the function call is private)
- * - if post_data is supplied, the value and length is posted to the given url as form data
+ * - Reads the contents of http or ftp addresses and returns the page in a string.
+ * - Will accept up to (3) redirections (redirection_level in the function call is private).
+ * - If post_data is supplied, the value and length are posted to the given url as form data.
  * - URL must be supplied in lowercase
  *
  * @param string $url
@@ -1710,7 +1707,7 @@ function fetch_web_data($url, $post_data = '', $keep_alive = false, $redirection
 			$fetch_data = new FsockFetchWebdata([], $redirection_level, $keep_alive);
 		}
 
-		// no errors and a 200 result, then we have a good dataset, well we at least have data ;)
+		// no errors and a 200 result, then we have a good dataset, well, we at least have data ;)
 		$fetch_data->get_url_data($url, $post_data);
 		if ((int) $fetch_data->result('code') === 200 && !$fetch_data->result('error'))
 		{
@@ -1726,7 +1723,7 @@ function fetch_web_data($url, $post_data = '', $keep_alive = false, $redirection
 /**
  * Checks if a package is installed or not
  *
- * - If installed, returns an array of themes, db changes and versions associated with
+ * - If installed, returns an array of themes, db changes, and versions associated with
  * the package id
  *
  * @param string $id of package to check
@@ -1812,7 +1809,7 @@ function setPackageState($id, $install_id)
 }
 
 /**
- * Checks if a package is installed, and if so returns its version level
+ * Checks if a package is installed, and if so, returns its version level
  *
  * @param string $id
  *
@@ -1927,7 +1924,7 @@ function test_access($item)
 
 /**
  * Sets the base pathname as required by the FTP root (chrooted) directory
- * e.g. /var/www/clients/client1/web1/webs/somefile.txt => /web1/webs/somefile.txt
+ * e.g., /var/www/clients/client1/web1/webs/somefile.txt => /web1/webs/somefile.txt
  *
  * @param string $item
  * @return string

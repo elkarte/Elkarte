@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This file contains several functions for retrieving and manipulating calendar events, birthdays and holidays.
+ * This file contains several functions for retrieving and manipulating calendar events, birthdays, and holidays.
  *
  * @package   ElkArte Forum
  * @copyright ElkArte Forum contributors
@@ -23,8 +23,8 @@ use ElkArte\User;
  *
  * What it does:
  *
- * - finds all the birthdays in the specified range of days.
- * - works with birthdays set for no year, or any other year, and respects month and year boundaries.
+ * - Finds all the birthdays in the specified range of days.
+ * - Works with birthdays set for no year, or any other year, and respects month and year boundaries.
  *
  * @param string $low_date inclusive, YYYY-MM-DD
  * @param string $high_date inclusive, YYYY-MM-DD
@@ -35,11 +35,11 @@ function getBirthdayRange($low_date, $high_date)
 {
 	$db = database();
 
-	// We need to search for any birthday in this range, and whatever year that birthday is on.
+	// We need to search for any birthday in this range, and whatever year that birthday is in.
 	$year_low = (int) substr($low_date, 0, 4);
 	$year_high = (int) substr($high_date, 0, 4);
 
-	// Collect all of the birthdays for this month.  I know, it's a painful query.
+	// Collect all the birthdays for this month.  I know it's a painful query.
 	$result = $db->fetchQuery('
 		SELECT 
 			id_member, real_name, YEAR(birthdate) AS birth_year, birthdate
@@ -100,10 +100,10 @@ function getBirthdayRange($low_date, $high_date)
  *
  * What it does:
  *
- * - finds all the posted calendar events within a date range.
- * - both the earliest_date and latest_date should be in the standard YYYY-MM-DD format.
- * - censors the posted event titles.
- * - uses the current user's permissions if use_permissions is true, otherwise it does nothing "permission specific"
+ * - Finds all the posted calendar events within a date range.
+ * - Both the earliest_date and latest_date should be in the standard YYYY-MM-DD format.
+ * - Censors the posted event titles.
+ * - Uses the current user's permissions if use_permissions is true, otherwise it does nothing "permission-specific"
  *
  * @param string $low_date
  * @param string $high_date
@@ -146,13 +146,13 @@ function getEventRange($low_date, $high_date, $use_permissions = true, $limit = 
 	$events = [];
 	while (($row = $result->fetch_assoc()))
 	{
-		// If the attached topic is not approved then for the moment pretend it doesn't exist
+		// If the attached topic is not approved, then for the moment pretend it doesn't exist
 		if (!empty($row['id_first_msg']) && $modSettings['postmod_active'] && !$row['approved'])
 		{
 			continue;
 		}
 
-		// Force a censor of the title - as often these are used by others.
+		// Force a censor of the title - as often others use these.
 		$row['title'] = censor($row['title'], !$use_permissions);
 
 		$start_date = sscanf($row['start_date'], '%04d-%02d-%02d');
@@ -200,7 +200,7 @@ function getEventRange($low_date, $high_date, $use_permissions = true, $limit = 
 					'export_href' => getUrl('action', ['action' => 'calendar', 'sa' => 'ical', 'eventid' => $row['id_event'], '{session_data}']),
 				];
 			}
-			// Otherwise, this is going to be cached and the VIEWER'S permissions should apply... just put together some info.
+			// Otherwise, this is going to be cached, and the VIEWER'S permissions should apply... just put together some info.
 			else
 			{
 				$events[Util::strftime('%Y-%m-%d', $date)][] = [
@@ -295,14 +295,14 @@ function getHolidayRange($low_date, $high_date)
 }
 
 /**
- * Does permission checks to see if an event can be linked to a board/topic.
+ * Does permission check to see if an event can be linked to a board/topic.
  *
  * What it does:
  *
- * - checks if the current user can link the current topic to the calendar, permissions et al.
- * - this requires the calendar_post permission, a forum moderator, or a topic starter.
- * - expects the $topic and $board variables to be set.
- * - if the user doesn't have proper permissions, an error will be shown.
+ * - Checks if the current user can link the current topic to the calendar, permissions et al.
+ * - This requires the calendar_post permission, a forum moderator, or a topic starter.
+ * - Expects the $topic and $board variables to be set.
+ * - If the user doesn't have proper permissions, an error will be shown.
  *
  * @package Calendar
  * @todo pass $board, $topic and User::$info->id as arguments with fallback for 1.1
@@ -350,8 +350,8 @@ function canLinkEvent()
 /**
  * Returns date information about 'today' relative to the users time offset.
  *
- * - returns an array with the current date, day, month, and year.
- * takes the users time offset into account.
+ * - Returns an array with the current date, day, month, and year.
+ * - Takes the users' time offset into account.
  *
  * @package Calendar
  */
@@ -404,7 +404,7 @@ function getCalendarGrid($month, $year, $calendarOptions)
 		'size' => $calendarOptions['size'] ?? 'large',
 	];
 
-	// Get todays date.
+	// Get today's date.
 	$today = getTodayInfo();
 
 	// Get information about this month.
@@ -474,8 +474,8 @@ function getCalendarGrid($month, $year, $calendarOptions)
 		}
 		// If we are viewing the weeks, with a starting date other than Sunday,
 		// then things get complicated! Basically, as PHP is calculating the
-		// weeks with a Sunday starting date, we need to take this into account
-		// and offset the whole year dependant on whether the first day in the
+		// weeks with a Sunday starting date. We need to take this into account
+		// and offset the whole year dependent on whether the first day in the
 		// year is above or below our starting date. Note that we offset by
 		// two, as some of this will get undone quite quickly by the statement
 		// below.
@@ -559,10 +559,10 @@ function getCalendarWeek($month, $year, $day, $calendarOptions)
 {
 	global $modSettings;
 
-	// Get todays date.
+	// Get today's date.
 	$today = getTodayInfo();
 
-	// What is the actual "start date" for the passed day.
+	// What is the actual "start date" for the passed day?
 	$calendarOptions['start_day'] = empty($calendarOptions['start_day']) ? 0 : (int) $calendarOptions['start_day'];
 	$day_of_week = (int) Util::strftime('%w', mktime(0, 0, 0, $month, $day, $year));
 	if ($day_of_week != $calendarOptions['start_day'])
@@ -582,7 +582,7 @@ function getCalendarWeek($month, $year, $day, $calendarOptions)
 	// Now start filling in the calendar grid.
 	$calendarGrid = [
 		'show_next_prev' => !empty($calendarOptions['show_next_prev']),
-		// Previous week is easy - just step back one day.
+		// The previous week is easy - just step back one day.
 		'previous_week' => [
 			'year' => $day == 1 ? ($month == 1 ? $year - 1 : $year) : $year,
 			'month' => $day == 1 ? ($month == 1 ? 12 : $month - 1) : $month,
@@ -590,7 +590,7 @@ function getCalendarWeek($month, $year, $day, $calendarOptions)
 			'disabled' => $day < 7 && $modSettings['cal_minyear'] > ($month == 1 ? $year - 1 : $year),
 		],
 		'next_week' => [
-			'disabled' => $day > 25 && date('Y') + $modSettings['cal_limityear'] < ($month == 12 ? $year + 1 : $year),
+			'disabled' => $day > 25 && (int) date('Y') + (int) $modSettings['cal_limityear'] < ($month == 12 ? $year + 1 : $year),
 		],
 	];
 
@@ -619,7 +619,7 @@ function getCalendarWeek($month, $year, $day, $calendarOptions)
 		// All this is as getCalendarGrid.
 		if ($calendarOptions['start_day'] === 0)
 		{
-			$nWeekAdjust = $first_day_of_year === 0 && $first_day_of_year > 3 ? 0 : 1;
+			$nWeekAdjust = $first_day_of_year === 0 ? 0 : 1;
 		}
 		else
 		{
@@ -628,7 +628,7 @@ function getCalendarWeek($month, $year, $day, $calendarOptions)
 
 		$calendarGrid['week_number'] = (int) Util::strftime('%U', mktime(0, 0, 0, $month, $day, $year)) + $nWeekAdjust;
 
-		// If this crosses a year boundary and includes january it should be week one.
+		// If this crosses a year boundary and includes January, it should be week one.
 		if ((int) Util::strftime('%Y', $curTimestamp + 518400) != $year && $calendarGrid['week_number'] > 53 && $first_day_of_next_year < 5)
 		{
 			$calendarGrid['week_number'] = 1;
@@ -654,7 +654,7 @@ function getCalendarWeek($month, $year, $day, $calendarOptions)
 			];
 		}
 
-		// Add todays information to the pile!
+		// Add today's information to the pile!
 		$date = sprintf('%04d-%02d-%02d', $curYear, $curMonth, $curDay);
 
 		$calendarGrid['months'][$curMonth]['days'][$curDay] = [
@@ -688,9 +688,9 @@ function getCalendarWeek($month, $year, $day, $calendarOptions)
  *
  * What it does:
  *
- * - cache callback function used to retrieve the birthdays, holidays, and events between now and now + days_to_index.
- * - widens the search range by an extra 24 hours to support time offset shifts.
- * - used by the cache_getRecentEvents function to get the information needed to calculate the events taking the users time offset into account.
+ * - Cache callback function used to retrieve the birthdays, holidays, and events between now and now + days_to_index.
+ * - Widens the search range by an extra 24 hours to support time offset shifts.
+ * - Used by the cache_getRecentEvents function to get the information needed to calculate the events taking the users' time offset into account.
  *
  * @param int $days_to_index
  * @return array
@@ -714,10 +714,10 @@ function cache_getOffsetIndependentEvents($days_to_index)
 
 /**
  * cache callback function used to retrieve the upcoming birthdays, holidays, and events
- * within the given period, taking into account the users time offset.
+ * within the given period, taking into account the users' time offset.
  *
  * - Called from the BoardIndex to display the current day's events on the board index
- * - used by the board index and SSI to show the upcoming events.
+ * - Used by the board index and SSI to show the upcoming events.
  *
  * @param array $eventOptions
  * @return array
@@ -728,7 +728,7 @@ function cache_getRecentEvents($eventOptions)
 	// With the 'static' cached data we can calculate the user-specific data.
 	$cached_data = Cache::instance()->quick_get('calendar_index', 'subs/Calendar.subs.php', 'cache_getOffsetIndependentEvents', [$eventOptions['num_days_shown']]);
 
-	// Get the information about today (from user perspective).
+	// Get the information about today (from the user perspective).
 	$today = getTodayInfo();
 
 	$return_data = [
@@ -793,7 +793,7 @@ function cache_getRecentEvents($eventOptions)
 
 			$duplicates[$this_event['topic'] . $this_event['title']] = true;
 
-			// Might be set to true afterwards, depending on the permissions.
+			// Might be set to true afterward, depending on the permissions.
 			$this_event['can_edit'] = false;
 			$this_event['is_today'] = $loop_date === $today['date'];
 			$this_event['date'] = $loop_date;
@@ -926,9 +926,9 @@ function getEventPoster($event_id)
  * What it does:
  *
  * - Consolidating the various INSERT statements into this function.
- * - inserts the passed event information into the calendar table.
- * - allows to either set a time span (in days) or an end_date.
- * - does not check any permissions of any sort.
+ * - Inserts the passed event information into the calendar table.
+ * - Allows either setting a time span (in days) or an end_date.
+ * - Does not check any permissions of any sort.
  *
  * @param array $eventOptions
  * @package Calendar
@@ -981,7 +981,7 @@ function insertEvent(&$eventOptions)
 		['id_event']
 	);
 
-	// Store the just inserted id_event for future reference.
+	// Store just inserted id_event for future reference.
 	$eventOptions['id'] = $db->insert_id('{db_prefix}calendar');
 
 	// Update the settings to show something calendarish was updated.
@@ -993,8 +993,8 @@ function insertEvent(&$eventOptions)
 /**
  * Modifies an event.
  *
- * - allows to either set a time span (in days) or an end_date.
- * - does not check any permissions of any sort.
+ * - Allows either set a time span (in days) or an end_date.
+ * - Does not check any permissions of any sort.
  *
  * @param int $event_id
  * @param array $eventOptions
@@ -1067,7 +1067,7 @@ function modifyEvent($event_id, &$eventOptions)
 /**
  * Remove an event
  *
- * - does no permission checks.
+ * - Does no permission checks.
  *
  * @param int $event_id
  * @package Calendar
@@ -1387,7 +1387,7 @@ function build_ical_content($event)
 	$datestamp = date('Ymd\THis\Z', time());
 	$datestart = $event['year'] . ($event['month'] < 10 ? '0' . $event['month'] : $event['month']) . ($event['day'] < 10 ? '0' . $event['day'] : $event['day']);
 
-	// Do we have a event that spans several days?
+	// Do we have an event that spans several days?
 	if ($event['span'] > 1)
 	{
 		$dateend = strtotime($event['year'] . '-' . ($event['month'] < 10 ? '0' . $event['month'] : $event['month']) . '-' . ($event['day'] < 10 ? '0' . $event['day'] : $event['day']));

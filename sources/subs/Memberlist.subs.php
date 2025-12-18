@@ -19,7 +19,7 @@ use ElkArte\Helper\Util;
 use ElkArte\MembersList;
 
 /**
- * Reads the custom profile fields table and gets all items that were defined
+ * Reads the custom profile fields table and gets all items defined
  * as being shown on the memberlist
  *  - Loads the fields in to $context['custom_profile_fields']
  *  - Defines the sort querys for the custom columns
@@ -65,7 +65,7 @@ function ml_CustomProfile()
 				'field_options' => explode(',', $row['field_options']),
 			];
 
-			// Have they selected to sort on a custom column? .., then we build the query
+			// Have they selected to sort on a custom column? Then we build the query
 			if (isset($_REQUEST['sort']) && $_REQUEST['sort'] === $curField)
 			{
 				// Build the sort queries.
@@ -108,7 +108,7 @@ function ml_memberCache($cache_step_size)
 	// Get hold of our database
 	$db = database();
 
-	// Get all of the activated members
+	// Get all the activated members
 	$request = $db->query('', '
 		SELECT 
 			real_name
@@ -167,7 +167,7 @@ function ml_memberCount()
 }
 
 /**
- * Get all all the members who's name starts below a given letter
+ * Get all the members whose name starts below a given letter
  *
  * @param string $start single letter to start with
  *
@@ -275,7 +275,7 @@ function ml_searchMembers($query_parameters, $customJoin = '', $where = '', $lim
 		$query_parameters
 	);
 
-	// Place everything context so the template can use it
+	// Place everything in context so the template can use it
 	printMemberListRows($request);
 	$request->free_result();
 
@@ -283,7 +283,7 @@ function ml_searchMembers($query_parameters, $customJoin = '', $where = '', $lim
 }
 
 /**
- * Finds custom profile fields that were defined as searchable
+ * Finds custom profile fields defined as searchable
  */
 function ml_findSearchableCustomFields()
 {
@@ -333,7 +333,7 @@ function printMemberListRows($request)
 
 	$db = database();
 
-	// Get the max post number for the bar graph
+	// Get the max post-number for the bar graph
 	$result = $db->query('', '
 		SELECT 
 			MAX(posts)
@@ -364,7 +364,7 @@ function printMemberListRows($request)
 	foreach ($members as $member)
 	{
 		$member_context = MembersList::get($member);
-		$member_context->loadContext(true);
+		$member_context->loadContext();
 		if ($member_context->isEmpty())
 		{
 			continue;

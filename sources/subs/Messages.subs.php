@@ -2,7 +2,7 @@
 
 /**
  * This file contains functions for dealing with messages.
- * Low-level functions, i.e. database operations needed to perform.
+ * Low-level functions, i.e., database operations needed to perform.
  * These functions (probably) do NOT make permissions checks. (they assume
  * those were already made).
  *
@@ -17,14 +17,15 @@
  *
  */
 
+use ElkArte\Database\AbstractResult;
 use ElkArte\MessagesDelete;
 use ElkArte\User;
 
 /**
- * Get message and attachments data, for a message ID. The function returns the data in an array.
+ * Get message and attachments data for a message ID. The function returns the data in an array.
  *
  * What it does:
- * - 'message' => array with all message data, body, subject, etc
+ * - 'message' => array with all message data, body, subject, etc.
  * - 'attachment_stuff' => array with attachments ordered by attachment id as keys
  *
  * @param int $id_msg
@@ -281,7 +282,7 @@ function prepareMessageContext($message)
 		];
 	}
 
-	// Allow moderators to change names....
+	// Allow moderators to change names...
 	if (allowedTo('moderate_forum') && empty($message['message']['id_member']))
 	{
 		$context['name'] = htmlspecialchars($message['message']['poster_name'], ENT_COMPAT, 'UTF-8');
@@ -335,29 +336,29 @@ function removeNonTopicMessages($memID)
  * Remove a specific message.
  * !! This includes permission checks.
  *
- * - normally, local and global should be the localCookies and globalCookies settings, respectively.
- * - uses boardurl to determine these two things.
+ * - Normally, local and global should be the localCookies and globalCookies settings, respectively.
+ * - Uses boardurl to determine these two things.
  *
  * @param int $message The message id
- * @param bool $decreasePostCount if true users' post count will be reduced
+ * @param bool $decreasePostCount if true, users' post-count will be reduced
  */
 function removeMessage($message, $decreasePostCount = true)
 {
 	global $modSettings;
 
 	$remover = new MessagesDelete($modSettings['recycle_enable'], $modSettings['recycle_board']);
-	$remover->removeMessage($message, $decreasePostCount, true);
+	$remover->removeMessage($message, $decreasePostCount);
 }
 
 /**
- * This function deals with the topic associated to a message.
+ * This function deals with the topic associated with a message.
  * It allows retrieving or updating the topic to which the message belongs.
  *
  * If $topicID is not passed, the current topic ID of the message is returned.
  * If $topicID is passed, the message is updated to point to the new topic.
  *
  * @param int $msg_id message ID
- * @param int|null $topicID = null topic ID, if null is passed the ID of the topic is retrieved and returned
+ * @param int|null $topicID = null topic ID, if null is passed, the ID of the topic is retrieved and returned
  * @return int|false int topic ID if any, or false
  */
 function associatedTopic($msg_id, $topicID = null)
@@ -421,7 +422,7 @@ function canAccessMessage($id_msg, $check_approval = true)
 	// Check for approval status?
 	if ($check_approval)
 	{
-		// The user can access this message if it's approved or they're owner
+		// The user can access this message if it's approved, or they're owner
 		return (!empty($message_info['approved']) || $message_info['id_member'] == User::$info->id);
 	}
 
@@ -493,7 +494,7 @@ function nextMessage($id_msg, $id_topic)
  *
  * @param int $start the offset of the message/s
  * @param int $id_topic the id of the topic
- * @param array $params an (optional) array of params, includes:
+ * @param array $params an (optional) array of params includes:
  *      - 'not_in' => array - of messages to exclude
  *      - 'include' => array - of messages to explicitly include
  *      - 'only_approved' => true/false - include or exclude the unapproved messages
@@ -658,7 +659,7 @@ function countNewPosts($topic, $topicinfo, $timestamp)
 
 	$db = database();
 
-	// Find the number of messages posted before said time...
+	// Find the number of messages posted before the said time...
 	$request = $db->query('', '
 		SELECT 
 			COUNT(*)
@@ -687,7 +688,7 @@ function countNewPosts($topic, $topicinfo, $timestamp)
  * @param array $msg_parameters
  * @param array $optional
  *
- * @return \ElkArte\Database\AbstractResult A request object
+ * @return AbstractResult A request object
  */
 function loadMessageRequest($msg_selects, $msg_tables, $msg_parameters, $optional = [])
 {
@@ -749,7 +750,7 @@ function loadMessageDetails($msg_selects, $msg_tables, $msg_parameters, $optiona
 }
 
 /**
- * Checks, which messages can be removed from a certain member.
+ * Checks which messages can be removed from a certain member.
  *
  * @param int $topic
  * @param int[] $messages
@@ -827,7 +828,7 @@ function countSplitMessages($topic, $include_unapproved, $selection = [])
 
 /**
  * Returns an email (and few other things) associated with a message,
- * either the member's email or the poster_email (for example in case of guests)
+ * either the member's email or the poster_email (for example, in case of guests)
  *
  * @param int $id_msg the id of a message
  * @return array
@@ -859,7 +860,7 @@ function mailFromMessage($id_msg)
  * and the highest message id by id_msg - which can be
  * parameters 1 and 2, respectively.
  *
- * @param bool|null $increment = null If true and $max_msg_id != null, then increment the total messages by one, otherwise recount all messages and get the max message id
+ * @param bool|null $increment = null If true and $max_msg_id != null, then increment the total messages by one, otherwise recount all messages, and get the max message id
  * @param int|null $max_msg_id = null, Only used if $increment === true
  */
 function updateMessageStats($increment = null, $max_msg_id = null)
@@ -898,7 +899,7 @@ function updateMessageStats($increment = null, $max_msg_id = null)
 
 /**
  * This function updates the log_search_subjects in the event of a topic being
- * moved, removed or split. It is being sent the topic id, and optionally
+ * moved, removed, or split. It is being sent the topic id and optionally
  * the new subject.
  *
  * @param int $id_topic

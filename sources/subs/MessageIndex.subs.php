@@ -12,8 +12,8 @@
  */
 
 /**
- * Builds the message index with the supplied parameters
- * creates all you ever wanted on message index, returns the data in array
+ * Builds the message index with the supplied parameters.
+ * Creates all you ever wanted on message index, returns the data in array
  *
  * @param int $id_board board to build the topic listing for
  * @param int $id_member who we are building it for so we don't show unapproved topics
@@ -22,13 +22,13 @@
  * @param string $sort_by how to sort the results asc/desc
  * @param string $sort_column which value we sort by
  * @param array $indexOptions
- *     'include_sticky' => if on, loads sticky topics as additional
- *     'only_approved' => if on, only load approved topics
- *     'previews' => if on, loads in a substring of the first/last message text for use in previews
- *     'include_avatars' => if on loads the last message posters avatar
- *     'ascending' => ASC or DESC for the sort
+ *     'include_sticky' => if on, loads sticky topics as additional.
+ *     'only_approved' => if on, only load approved topics.
+ *     'previews' => if on, loads in a substring of the first/last message text for use in previews.
+ *     'include_avatars' => if on loads the last message posters avatar.
+ *     'ascending' => ASC or DESC for the sort.
  *     'fake_ascending' =>
- *     'custom_selects' => loads additional values from the tables used in the query, for addon use
+ *     'custom_selects' => loads additional values from the tables used in the query, for addon use.
  *
  * @return array
  */
@@ -48,7 +48,7 @@ function messageIndexTopics($id_board, $id_member, $start, $items_per_page, $sor
 		'custom_joins' => [],
 	], $indexOptions);
 
-	// Fetch topic list in the order we want.
+	// Fetch the topic list in the order we want.
 	$db->fetchQuery('
 		SELECT 
 			t.id_topic
@@ -127,7 +127,7 @@ function messageIndexTopics($id_board, $id_member, $start, $items_per_page, $sor
 				'topic_list' => $topics === [] ? [0] : array_keys($topics),
 			]
 		);
-		// Now we fill the above array, maintaining index association.
+		// Now we fill the above array, maintaining the index association.
 		while (($row = $request->fetch_assoc()))
 		{
 			$topics[$row['id_topic']] = $row;
@@ -139,7 +139,7 @@ function messageIndexTopics($id_board, $id_member, $start, $items_per_page, $sor
 }
 
 /**
- * This simple function returns the sort methods for message index in an array.
+ * This function returns the sort methods for message index in an array.
  */
 function messageIndexSort()
 {

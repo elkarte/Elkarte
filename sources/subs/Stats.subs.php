@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This file is holds low-level database work used by the Stats.
+ * This file holds low-level database work used by the Stats.
  * Some functions/queries (or all :P) might be duplicate, along Elk.
  * They'll be here to avoid including many files in action_stats, and
  * perhaps for use of addons in a similar way they were using some
@@ -23,7 +23,7 @@ use ElkArte\MembersList;
 use ElkArte\User;
 
 /**
- * Return the number of currently online members.
+ * Return the current number of online members.
  *
  * @return double
  */
@@ -117,7 +117,7 @@ function mostOnline($date)
 /**
  * Loads a list of top x posters
  *
- * - x is configurable via $modSettings['stats_limit'].
+ * - X is configurable via $modSettings['stats_limit'].
  *
  * @param int|null $limit if empty defaults to 10
  * @return array
@@ -186,7 +186,7 @@ function topPosters($limit = null)
 /**
  * Loads a list of top x boards with number of board posts and board topics
  *
- * - x is configurable via $modSettings['stats_limit'].
+ * - X is configurable via $modSettings['stats_limit'].
  *
  * @param int|null $limit if not supplied, defaults to 10
  * @param bool $read_status
@@ -232,7 +232,7 @@ function topBoards($limit = null, $read_status = false)
 		function ($row) use (&$top_boards, &$max_num_posts, $read_status) {
 			$href = getUrl('board', ['board' => $row['id_board'], 'start' => '0', 'name' => $row['name']]);
 
-			// Load the boards info, number of posts, topics etc
+			// Load the boards info, number of posts, topics, etc.
 			$top_boards[$row['id_board']] = [
 				'id' => $row['id_board'],
 				'name' => $row['name'],
@@ -253,7 +253,7 @@ function topBoards($limit = null, $read_status = false)
 		}
 	);
 
-	// Determine the post percentages for the boards, then format the numbers
+	// Determine the post-percentages for the boards, then format the numbers
 	foreach ($top_boards as $i => $board)
 	{
 		$top_boards[$i]['post_percent'] = round(($board['num_posts'] * 100) / $max_num_posts);
@@ -268,7 +268,7 @@ function topBoards($limit = null, $read_status = false)
 /**
  * Loads a list of top x topics by replies
  *
- * - x is configurable via $modSettings['stats_limit'].
+ * - X is configurable via $modSettings['stats_limit'].
  *
  * @param int $limit if not supplied, defaults to 10
  * @return array
@@ -324,7 +324,7 @@ function topTopicReplies($limit = 10)
 		function ($row) use (&$top_topics_replies, &$max_num_replies) {
 			$href = getUrl('topic', ['topic' => $row['id_topic'], 'start' => '0', 'subject' => $row['subject']]);
 
-			// Build out this topics details for controller use
+			// Build out these topics details for controller use
 			$top_topics_replies[$row['id_topic']] = [
 				'id' => $row['id_topic'],
 				'subject' => censor($row['subject']),
@@ -349,7 +349,7 @@ function topTopicReplies($limit = 10)
 /**
  * Loads a list of top x topics by number of views
  *
- * - x is configurable via $modSettings['stats_limit'].
+ * - X is configurable via $modSettings['stats_limit'].
  *
  * @param int|null $limit if not supplied, defaults to 10
  * @return array
@@ -371,7 +371,7 @@ function topTopicViews($limit = null)
 		$limit = $limit ?? 10;
 	}
 
-	// Large forums may need a bit more prodding..
+	// Large forums may need a bit more prodding.
 	$topic_ids = [];
 	if ($modSettings['totalMessages'] > 100000)
 	{
@@ -455,7 +455,7 @@ function topTopicViews($limit = null)
 /**
  * Loads a list of top x topic starters
  *
- * - x is configurable via $modSettings['stats_limit'].
+ * - X is configurable via $modSettings['stats_limit'].
  *
  * @return array
  */
@@ -467,7 +467,7 @@ function topTopicStarter()
 	$members = [];
 	$top_starters = [];
 
-	// Try to cache this when possible, because it's a little unavoidably slow.
+	// Try to cache this when possible because it's a little unavoidably slow.
 	if (!Cache::instance()->getVar($members, 'stats_top_starters', 360) || empty($members))
 	{
 		$db->fetchQuery('
@@ -513,7 +513,7 @@ function topTopicStarter()
 		function ($row) use (&$top_starters, $members, $max_num_topics) {
 			$href = getUrl('profile', ['action' => 'profile', 'u' => $row['id_member'], 'name' => $row['real_name']]);
 
-			// Our array of spammers, er topic starters !
+			// Our array of spammers, er topic starters!
 			$top_starters[$row['id_member']] = [
 				'name' => $row['real_name'],
 				'id' => $row['id_member'],
@@ -537,7 +537,7 @@ function topTopicStarter()
 /**
  * Loads a list of top users by online time
  *
- * - x is configurable via $modSettings['stats_limit'], defaults to 10
+ * - X is configurable via $modSettings['stats_limit'], defaults to 10
  *
  * @return array
  */
@@ -596,7 +596,7 @@ function topTimeOnline()
 
 		$href = getUrl('profile', ['action' => 'profile', 'u' => $row['id_member'], 'name' => $row['real_name']]);
 
-		// Finally add it to the stats array
+		// Finally, add it to the stats array
 		$top_time_online[] = [
 			'id' => $row['id_member'],
 			'name' => $row['real_name'],
@@ -613,7 +613,7 @@ function topTimeOnline()
 	}
 	$result->free_result();
 
-	// As always percentages are next
+	// As always, percentages are next
 	foreach ($top_time_online as $i => $member)
 	{
 		$top_time_online[$i]['time_percent'] = round(($member['seconds_online'] * 100) / $max_time_online);
@@ -632,7 +632,7 @@ function topTimeOnline()
 /**
  * Loads the monthly statistics and returns them in $context
  *
- * - page views, new registrations, topics posts, most on etc
+ * - Page views, new registrations, topics posts, most on, etc.
  *
  */
 function monthlyActivity()
@@ -705,7 +705,7 @@ function monthlyActivity()
 /**
  * Loads the statistics on a daily basis in $context.
  *
- * - called by action_stats().
+ * - Called by action_stats().
  *
  * @param string $condition_string
  * @param array $condition_parameters = array()
@@ -742,7 +742,7 @@ function getDailyStats($condition_string, $condition_parameters = [])
 
 /**
  * Returns the number of topics a user has started, including ones on boards
- * they may no longer have access on.
+ * they may no longer have access to.
  *
  * - Does not count topics that are in the recycle board
  *
@@ -756,7 +756,7 @@ function UserStatsTopicsStarted($memID)
 
 	$db = database();
 
-	// Number of topics started.
+	// A number of topics started.
 	$result = $db->query('', '
 		SELECT 
 			COUNT(*)
@@ -776,7 +776,7 @@ function UserStatsTopicsStarted($memID)
 
 /**
  * Returns the number of polls a user has started, including ones on boards
- * they may no longer have access on.
+ * they may no longer have access to.
  *
  * - Does not count topics that are in the recycle board
  *
@@ -812,7 +812,7 @@ function UserStatsPollsStarted($memID)
 
 /**
  * Returns the number of polls a user has voted in, including ones on boards
- * they may no longer have access on.
+ * they may no longer have access to.
  *
  * @param int $memID
  *
@@ -822,7 +822,7 @@ function UserStatsPollsVoted($memID)
 {
 	$db = database();
 
-	// Number polls voted in.
+	// Number of polls voted in.
 	$result = $db->fetchQuery('
 		SELECT 
 			COUNT(DISTINCT id_poll)
@@ -841,7 +841,7 @@ function UserStatsPollsVoted($memID)
 /**
  * Finds the 1-N list of boards that a user posts in most often
  *
- * - Returns array with some basic stats of post percent per board
+ * - Returns array with some basic stats of post-percent per board
  *
  * @param int $memID
  * @param int $limit
@@ -896,7 +896,7 @@ function UserStatsMostPostedBoard($memID, $limit = 10)
 /**
  * Finds the 1-N list of boards that a user participates in most often
  *
- * - Returns array with some basic stats of post percent per board as a percent of board activity
+ * - Returns array with some basic stats of post-percent per board as a percentage of board activity
  *
  * @param int $memID
  * @param int $limit
@@ -929,10 +929,10 @@ function UserStatsMostActiveBoard($memID, $limit = 10)
 	{
 		$href = getUrl('board', ['board' => $row['id_board'], 'start' => '0', 'name' => $row['name']]);
 
-		// min/max take care of cases when b.num_posts is broken for wwhatever reason
+		// min/max take care of cases when b.num_posts is broken for whatever reason
 		$percentage = min($row['message_count'] / max(1, $row['max_posts_per_board']), 1) * 100;
 
-		// What have they been doing in this board
+		// What have they been doing in this board?
 		$board_activity[$row['id_board']] = [
 			'id' => $row['id_board'],
 			'posts' => $row['message_count'],
@@ -956,7 +956,7 @@ function UserStatsMostActiveBoard($memID, $limit = 10)
 /**
  * Finds the users posting activity by time of day
  *
- * - Returns array with some basic stats of post percent per hour
+ * - Returns array with some basic stats of post-percent per hour
  *
  * @param int $memID
  *
@@ -982,7 +982,7 @@ function UserStatsPostingTime($memID)
 
 	$db = database();
 
-	// Find the times when the users posts
+	// Find the times when the users make posts
 	$result = $db->query('', '
 		SELECT
 			poster_time

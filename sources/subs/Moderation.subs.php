@@ -21,14 +21,14 @@ use ElkArte\User;
 
 /**
  * How many open reports do we have?
- *  - if flush is true will clear the moderator menu count
- *  - returns the number of open reports
- *  - sets $context['open_mod_reports'] for template use
+ *  - If flush is true will clear the moderator menu count
+ *  - Returns the number of open reports
+ *  - Sets $context['open_mod_reports'] for template use
  *
  * @param bool $flush = true if moderator menu count will be cleared
- * @param bool $count_pms Default false, if false returns the number of message
- *                           reports, if true sets $context['open_pm_reports'] and
- *                           returns the both number of open PM and message reports
+ * @param bool $count_pms Default false,
+ *   - If false, returns the number of message reports.
+ *   - If true, sets $context['open_pm_reports'] and returns the both number of open PM and message reports
  *
  * @return array
  */
@@ -74,7 +74,7 @@ function recountOpenReports($flush = true, $count_pms = false)
 		'pm_reports' => $open_reports['pm'],
 	];
 
-	// Safety net, even though this (and the above)  should not be done here at all.
+	// Safety net, even though this (and the above) should not be done here at all.
 	$context['open_mod_reports'] = $open_reports['msg'];
 	$context['open_pm_reports'] = $open_reports['pm'];
 
@@ -90,7 +90,7 @@ function recountOpenReports($flush = true, $count_pms = false)
  * How many unapproved posts and topics do we have?
  *  - Sets $context['total_unapproved_topics']
  *  - Sets $context['total_unapproved_posts']
- *  - approve_query is set to list of boards they can see
+ *  - 'approve_query' is set to list of boards they can see
  *
  * @param string|null $approve_query
  * @return array of values
@@ -248,8 +248,8 @@ function updateReportsStatus($reports_id, $property = 'close', $status = 0)
 
 /**
  * Loads the number of items awaiting moderation attention
- *  - Only loads the value a given permission level can see
- *  - If supplied a board number will load the values only for that board
+ *  - Only loads the value a given permission level can see.
+ *  - If supplied, a board number will load the values only for that board.
  *  - Unapproved posts
  *  - Unapproved topics
  *  - Unapproved attachments
@@ -299,7 +299,7 @@ function loadModeratorMenuCounts($brd = null)
 		return $menu_errors[$cache_key];
 	}
 
-	// If its been cached, guess what, that's right use it!
+	// If it's been cached, guess what, that's right use it!
 	$temp = Cache::instance()->get('num_menu_errors', 900);
 
 	if ($temp === null || !isset($temp[$cache_key]))
@@ -391,7 +391,7 @@ function loadModeratorMenuCounts($brd = null)
 	}
 	else
 	{
-		$menu_errors = $temp ?? [];
+		$menu_errors = [];
 	}
 
 	return $menu_errors[$cache_key];
@@ -1039,7 +1039,7 @@ function watchedUsers($start, $items_per_page, $sort)
 
 	if (!empty($members))
 	{
-		// First get the latest messages from these users.
+		// First, get the latest messages from these users.
 		$latest_posts = [];
 		$db->fetchQuery('
 			SELECT 
@@ -1393,7 +1393,7 @@ function countModeratorNotes()
 /**
  * Adds a moderation note to the moderation center "shoutbox"
  *
- * @param int $id_poster who is posting the add
+ * @param int $id_poster who is posting the note
  * @param string $poster_name a name to show
  * @param string $contents what they are posting
  */
@@ -1520,7 +1520,7 @@ function moderatorNotice($id_notice)
 }
 
 /**
- * Make sure the "current user" (uses User::$info) cannot go outside of the limit for the day.
+ * Make sure the "current user" (uses User::$info) cannot go outside the limit for the day.
  *
  * @param int $member The member we are going to issue the warning to
  *
@@ -1552,19 +1552,17 @@ function warningDailyLimit($member)
 }
 
 /**
- * Make sure the "current user" (uses User::$info) cannot go outside of the limit for the day.
+ * Make sure the "current user" (uses User::$info) cannot go outside the limit for the day.
  *
  * @param string $approve_query additional condition for the query
- * @param string $current_view defined whether return the topics (first
- *                messages) or the messages. If set to 'topics' it returns
- *                the topics, otherwise the messages
+ * @param string $current_view defined whether to return the topics (first messages)
+ * or the messages. If set to 'topics' it returns the topics, otherwise the messages
  * @param array $boards_allowed array of arrays, it must contain three
- *                 indexes:
- *                  - delete_own_boards
- *                  - delete_any_boards
- *                  - delete_own_replies
- *                 each of which must be an array of boards the user is allowed
- *                 to perform a certain action (return of boardsAllowedTo)
+ * indexes:
+ *   - delete_own_boards
+ *   - delete_any_boards
+ *   - delete_own_replies
+ * each of which must be an array of boards the user is allowed to perform a certain action (return of boardsAllowedTo)
  * @param int $start start of the query LIMIT
  * @param int $limit number of elements to return (default 10)
  *
