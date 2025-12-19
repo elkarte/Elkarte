@@ -27,8 +27,8 @@ function optimizeBoardsSubdivision($categories, $total_boards)
 {
 	$num_groups = 2;
 	$optimal_boards = round($total_boards / $num_groups);
-	$groups = array(0 => array());
-	$group_totals = array(0 => 0, 1 => 0);
+	$groups = [0 => []];
+	$group_totals = [0 => 0, 1 => 0];
 	$current_streak = 0;
 	$current_group = 0;
 
@@ -45,7 +45,7 @@ function optimizeBoardsSubdivision($categories, $total_boards)
 		{
 			$current_streak = 0;
 			$current_group++;
-			$groups[$current_group] = array();
+			$groups[$current_group] = [];
 			$group_totals[$current_group] = 0;
 		}
 	}
@@ -199,11 +199,11 @@ function template_list_boards(array $boards, $id)
 							', comma_format($board['posts']), ' ', $board['is_redirect'] ? $txt['redirects'] : $txt['posts'], $board['is_redirect'] ? '' : '<br /> ' . comma_format($board['topics']) . ' ' . $txt['board_topics'], '
 					</div>';
 
-		// Show the "Sub-boards: ". (there's a link_children but we're going to bold the new ones...)
+		// Show the "Sub-boards: ". (there's a link_children, but we're going to bold the new ones...)
 		if (!empty($board['children']))
 		{
 			// Sort the links into an array with new boards bold so it can be imploded.
-			$children = array();
+			$children = [];
 
 			// Each child in each board's children has:
 			// id, name, description, new (is it new?), topics (#), posts (#), href, link, and last_post.
@@ -254,7 +254,7 @@ function template_list_boards(array $boards, $id)
  *
  * @param string $form_name The name of the form that contains the list
  * @param string $input_names Name that should be assigned to the inputs
- * @param bool $select_all if true the a "select all" option is shown
+ * @param bool $select_all if true, a "select all" option is shown
  */
 function template_pick_boards($form_name, $input_names = 'brd', $select_all = true)
 {

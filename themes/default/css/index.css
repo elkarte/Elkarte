@@ -297,7 +297,7 @@ input[type="submit"]:focus-visible, button:focus-visible, .linkbutton:focus-visi
 	outline: 2px dashed #222222;
 }
 
-/* Focusing with a mouse or touch will not change its indication. */
+/* Focusing with a mouse or touch will not change it's indication. */
 input:focus:not(:focus-visible), input.input_text:focus, button:focus:not(:focus-visible) {
 	outline: none;
 }
@@ -1573,7 +1573,7 @@ a.bbc_link {
 	opacity: 1;
 }
 
-/* Classes selected, un_selected and open are added by javascript.  Here its a
+/* Classes selected, un_selected and open are added by javascript.  Here it's a
    click menu, with no hover intent ambiguity, so we speed up the reveal / rollup */
 .listlevel1 .menulevel2.selected,
 .listlevel2 .menulevel3.selected,
@@ -1595,7 +1595,7 @@ a.bbc_link {
 }
 
 /* Level 3: drop menu positioning, move flyout position to the right of
-   its disclose arrow */
+   it's disclose arrow */
 .menulevel3 {
 	min-width: 20ch;
 	margin: -3rem 0 0 calc(100% - .4rem);
@@ -1795,7 +1795,7 @@ a.bbc_link {
 	width: var(--arrow);
 	height: var(--arrow);
 	content: "";
-	/* Scale the rotated square based on its diagonal length */
+	/* Scale the rotated square based on it's diagonal length */
 	transform: scale(0.7071) rotate(45deg);
 	/* 50px (5rem) seems to help prevent hover glitches caused by the border shadow a.k.a why is it doing this? */
 	border-radius: 0 .2rem 0 5rem;
@@ -2180,7 +2180,7 @@ button[type="submit"].quick_quote_button.hide {
 	text-align: center;
 }
 
-/* Its either this level of targeting, or the use of !important
+/* it's either this level of targeting, or the use of !important
    most tables want the checkbox vertically centered */
 #admin_form_wrapper .table_grid thead th > input[type="checkbox"],
 #admin_form_wrapper .table_grid tbody td > input[type="checkbox"] {
@@ -2566,7 +2566,7 @@ button[type="submit"].quick_quote_button.hide {
 	vertical-align: text-top
 }
 
-/* Sort topics dropdown, flyout to the left, positioned directly under its control */
+/* Sort topics dropdown, flyout to the left, positioned directly under it's control */
 .no_js .listlevel1:hover #sortby {
 	transform: translateX(50%) rotateX(0deg);
 }
@@ -2618,7 +2618,7 @@ button[type="submit"].quick_quote_button.hide {
 	width: 100%;
 }
 
-/* Each li defined as a grid, since its single line could use flex here as well */
+/* Each li defined as a grid, since it's single line could use flex here as well */
 .topic_listing > li {
 	display: grid;
 	border: 1px solid;
@@ -2627,7 +2627,7 @@ button[type="submit"].quick_quote_button.hide {
 	grid-template-rows: auto;
 }
 
-/* The quick topic area is like the topic listing, its sits at the top */
+/* The quick topic area is like the topic listing, it's sits at the top */
 #quicktopic > li {
 	display: grid;
 	align-content: center;
@@ -2962,7 +2962,7 @@ aside.poster, #quickreplybox .poster, #quicktopicbox .poster {
 
 }
 
-/* to overcome the PM indicator when its on */
+/* to overcome the PM indicator when it's on */
 .poster li.listlevel1:hover {
 	z-index: 20;
 }
@@ -4754,7 +4754,7 @@ ul.cf_icons li:not(:first-child)::before {
  * -------------------------------------------------------
  */
 
-/* This is the wrapper around the PM new message form, that is why its called folder */
+/* This is the wrapper around the PM new message form, that is why it's called folder */
 #pmFolder {
 	border-radius: .4rem .4rem 0 0;
 }
@@ -5933,7 +5933,7 @@ div.labels {
  *
  * If, for whatever reason (eyesight, pixel pitch, workstation arrangement, etc.)
  * a user requires text 50% larger than theme default, then their screen is
- * effectively a lot smaller than its nominal resolution would indicate.
+ * effectively a lot smaller than it's nominal resolution would indicate.
  * If the break points are set in em, suddenly the media queries become equally
  * responsive for all users, without any extra code being required.
  *
@@ -6042,7 +6042,7 @@ div.labels {
 }
 
 /* At approximately 960px we change to menu icons, if you do not ADD any top menu items (portal/gallery/etc.)
-   this can be delayed for a smaller screen.  Its seperated out to allow easy modification, be sure to
+   this can be delayed for a smaller screen.  it's seperated out to allow easy modification, be sure to
    check your color variant as well.
    -------------------------------------------------------------------------------------------*/
 @media screen and (max-width: 60em) {

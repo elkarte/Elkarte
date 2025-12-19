@@ -154,7 +154,7 @@
 				youtube: 'data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'-100 -100 661 661\'%3E%3Cpath d=\'M365.257 67.393H95.744C42.866 67.393 0 110.259 0 163.137v134.728c0 52.878 42.866 95.744 95.744 95.744h269.513c52.878 0 95.744-42.866 95.744-95.744V163.137c0-52.878-42.866-95.744-95.744-95.744zm-64.751 169.663-126.06 60.123c-3.359 1.602-7.239-.847-7.239-4.568V168.607c0-3.774 3.982-6.22 7.348-4.514l126.06 63.881c3.748 1.899 3.683 7.274-.109 9.082z\' style=\'fill:%23f61c0d\'/%3E%3C/svg%3E',
 			};
 
-		// Get a Youtube video thumbnail
+		// Get a YouTube video thumbnail
 		imgHandlers.getYoutubeIMG = function(eURL, callback) {
 			fetchDocument(eURL, ytResponse, 'json');
 
@@ -247,7 +247,7 @@
 
 			// There are two types of YouTube timestamped links
 			// http://youtu.be/lLOE3fBZcUU?t=1m37s when you click share underneath the video
-			// http://youtu.be/lLOE3fBZcUU?t=97 when you right click on a video and choose "Copy video URL at current time"
+			// http://youtu.be/lLOE3fBZcUU?t=97 when you right-click on a video and choose "Copy video URL at current time"
 			// For embedding, you need to use "?start=97" instead, so we have to convert t=1m37s to seconds while also supporting t=97
 			let startAt = path.match(/t=(?:([1-9]{1,2})h)?(?:([1-9]{1,2})m)?(?:([1-9]+)s?)/),
 				startAtPar = '';
@@ -546,7 +546,7 @@
 						}
 					});
 
-					// Once a link is found, lets not try that one again.
+					// Once a link is found, let's not try that one again.
 					if (found)
 					{
 						videoLinks = document.querySelectorAll('a[data-video_embed]');

@@ -504,7 +504,7 @@ function template_modify_group()
 
 	echo '
 			<h2 class="category_header">';
-	if ($context['permission_type'] == 'board')
+	if ($context['permission_type'] === 'board')
 	{
 		echo '
 				', $txt['permissions_local_for'], ' &quot;', $context['group']['name'], '&quot; ', $txt['permissions_on'], ' &quot;', $context['profile']['name'], '&quot;';
@@ -512,7 +512,7 @@ function template_modify_group()
 	else
 	{
 		echo '
-				', $context['permission_type'] == 'membergroup' ? $txt['permissions_general'] : $txt['permissions_board'], ' - &quot;', $context['group']['name'], '&quot;';
+				', $context['permission_type'] === 'membergroup' ? $txt['permissions_general'] : $txt['permissions_board'], ' - &quot;', $context['group']['name'], '&quot;';
 	}
 
 	echo '
@@ -526,7 +526,7 @@ function template_modify_group()
 			</div>';
 
 	// If this is general permissions also show the default profile.
-	if ($context['permission_type'] == 'membergroup')
+	if ($context['permission_type'] === 'membergroup')
 	{
 		echo '
 			<br />
@@ -640,16 +640,16 @@ function template_modify_group_classic($type)
 						if ($context['group']['id'] != -1)
 						{
 							echo '
-								<input type="hidden" name="perm[', $permission_type['id'], '][', $permission['own']['id'], ']" value="', $permission['own']['select'] == 'denied' && !empty($modSettings['permission_enable_deny']) ? 'deny' : $permission['own']['select'], '" />';
+								<input type="hidden" name="perm[', $permission_type['id'], '][', $permission['own']['id'], ']" value="', $permission['own']['select'] === 'denied' && !empty($modSettings['permission_enable_deny']) ? 'deny' : $permission['own']['select'], '" />';
 						}
 
 						echo '
-								<input type="hidden" name="perm[', $permission_type['id'], '][', $permission['any']['id'], ']" value="', $permission['any']['select'] == 'denied' && !empty($modSettings['permission_enable_deny']) ? 'deny' : $permission['any']['select'], '" />';
+								<input type="hidden" name="perm[', $permission_type['id'], '][', $permission['any']['id'], ']" value="', $permission['any']['select'] === 'denied' && !empty($modSettings['permission_enable_deny']) ? 'deny' : $permission['any']['select'], '" />';
 					}
 					else
 					{
 						echo '
-								<input type="hidden" name="perm[', $permission_type['id'], '][', $permission['id'], ']" value="', $permission['select'] == 'denied' && !empty($modSettings['permission_enable_deny']) ? 'deny' : $permission['select'], '" />';
+								<input type="hidden" name="perm[', $permission_type['id'], '][', $permission['id'], ']" value="', $permission['select'] === 'denied' && !empty($modSettings['permission_enable_deny']) ? 'deny' : $permission['select'], '" />';
 					}
 
 					echo '
@@ -682,20 +682,20 @@ function template_modify_group_classic($type)
 							{
 								echo '
 							<td colspan="3">
-								<input type="checkbox" name="perm[', $permission_type['id'], '][', $permission['own']['id'], ']"', $permission['own']['select'] == 'on' ? ' checked="checked"' : '', ' value="on" id="', $permission['own']['id'], '_on" ', $disable_field, '/>
+								<input type="checkbox" name="perm[', $permission_type['id'], '][', $permission['own']['id'], ']"', $permission['own']['select'] === 'on' ? ' checked="checked"' : '', ' value="on" id="', $permission['own']['id'], '_on" ', $disable_field, '/>
 							</td>';
 							}
 							else
 							{
 								echo '
 							<td style="width: 10px;">
-								<input type="radio" name="perm[', $permission_type['id'], '][', $permission['own']['id'], ']"', $permission['own']['select'] == 'on' ? ' checked="checked"' : '', ' value="on" id="', $permission['own']['id'], '_on" ', $disable_field, '/>
+								<input type="radio" name="perm[', $permission_type['id'], '][', $permission['own']['id'], ']"', $permission['own']['select'] === 'on' ? ' checked="checked"' : '', ' value="on" id="', $permission['own']['id'], '_on" ', $disable_field, '/>
 							</td>
 							<td style="width: 10px;">
-								<input type="radio" name="perm[', $permission_type['id'], '][', $permission['own']['id'], ']"', $permission['own']['select'] == 'off' ? ' checked="checked"' : '', ' value="off" ', $disable_field, '/>
+								<input type="radio" name="perm[', $permission_type['id'], '][', $permission['own']['id'], ']"', $permission['own']['select'] === 'off' ? ' checked="checked"' : '', ' value="off" ', $disable_field, '/>
 							</td>
 							<td style="width: 10px;">
-								<input type="radio" name="perm[', $permission_type['id'], '][', $permission['own']['id'], ']"', $permission['own']['select'] == 'denied' ? ' checked="checked"' : '', ' value="deny" ', $disable_field, '/>
+								<input type="radio" name="perm[', $permission_type['id'], '][', $permission['own']['id'], ']"', $permission['own']['select'] === 'denied' ? ' checked="checked"' : '', ' value="deny" ', $disable_field, '/>
 							</td>';
 							}
 
@@ -712,20 +712,20 @@ function template_modify_group_classic($type)
 						{
 							echo '
 							<td colspan="3">
-								<input type="checkbox" name="perm[', $permission_type['id'], '][', $permission['any']['id'], ']"', $permission['any']['select'] == 'on' ? ' checked="checked"' : '', ' value="on" ', $disable_field, '/>
+								<input type="checkbox" name="perm[', $permission_type['id'], '][', $permission['any']['id'], ']"', $permission['any']['select'] === 'on' ? ' checked="checked"' : '', ' value="on" ', $disable_field, '/>
 							</td>';
 						}
 						else
 						{
 							echo '
 							<td>
-								<input type="radio" name="perm[', $permission_type['id'], '][', $permission['any']['id'], ']"', $permission['any']['select'] == 'on' ? ' checked="checked"' : '', ' value="on" onclick="document.forms.permissionForm.', $permission['own']['id'], '_on.checked = true;" ', $disable_field, '/>
+								<input type="radio" name="perm[', $permission_type['id'], '][', $permission['any']['id'], ']"', $permission['any']['select'] === 'on' ? ' checked="checked"' : '', ' value="on" onclick="document.forms.permissionForm.', $permission['own']['id'], '_on.checked = true;" ', $disable_field, '/>
 							</td>
 							<td>
-								<input type="radio" name="perm[', $permission_type['id'], '][', $permission['any']['id'], ']"', $permission['any']['select'] == 'off' ? ' checked="checked"' : '', ' value="off" ', $disable_field, '/>
+								<input type="radio" name="perm[', $permission_type['id'], '][', $permission['any']['id'], ']"', $permission['any']['select'] === 'off' ? ' checked="checked"' : '', ' value="off" ', $disable_field, '/>
 							</td>
 							<td>
-								<input type="radio" name="perm[', $permission_type['id'], '][', $permission['any']['id'], ']"', $permission['any']['select'] == 'denied' ? ' checked="checked"' : '', ' value="deny" id="', $permission['any']['id'], '_deny" onclick="window.elk_usedDeny = true;" ', $disable_field, '/>
+								<input type="radio" name="perm[', $permission_type['id'], '][', $permission['any']['id'], ']"', $permission['any']['select'] === 'denied' ? ' checked="checked"' : '', ' value="deny" id="', $permission['any']['id'], '_deny" onclick="window.elk_usedDeny = true;" ', $disable_field, '/>
 							</td>';
 						}
 
@@ -741,20 +741,20 @@ function template_modify_group_classic($type)
 						{
 							echo '
 							<td colspan="3">
-								<input type="checkbox" name="perm[', $permission_type['id'], '][', $permission['id'], ']"', $permission['select'] == 'on' ? ' checked="checked"' : '', ' value="on" ', $disable_field, '/>
+								<input type="checkbox" name="perm[', $permission_type['id'], '][', $permission['id'], ']"', $permission['select'] === 'on' ? ' checked="checked"' : '', ' value="on" ', $disable_field, '/>
 							</td>';
 						}
 						else
 						{
 							echo '
 							<td>
-								<input type="radio" name="perm[', $permission_type['id'], '][', $permission['id'], ']"', $permission['select'] == 'on' ? ' checked="checked"' : '', ' value="on" ', $disable_field, '/>
+								<input type="radio" name="perm[', $permission_type['id'], '][', $permission['id'], ']"', $permission['select'] === 'on' ? ' checked="checked"' : '', ' value="on" ', $disable_field, '/>
 							</td>
 							<td>
-								<input type="radio" name="perm[', $permission_type['id'], '][', $permission['id'], ']"', $permission['select'] == 'off' ? ' checked="checked"' : '', ' value="off" ', $disable_field, '/>
+								<input type="radio" name="perm[', $permission_type['id'], '][', $permission['id'], ']"', $permission['select'] === 'off' ? ' checked="checked"' : '', ' value="off" ', $disable_field, '/>
 							</td>
 							<td>
-								<input type="radio" name="perm[', $permission_type['id'], '][', $permission['id'], ']"', $permission['select'] == 'denied' ? ' checked="checked"' : '', ' value="deny" onclick="window.elk_usedDeny = true;" ', $disable_field, '/>
+								<input type="radio" name="perm[', $permission_type['id'], '][', $permission['id'], ']"', $permission['select'] === 'denied' ? ' checked="checked"' : '', ' value="deny" onclick="window.elk_usedDeny = true;" ', $disable_field, '/>
 							</td>';
 						}
 
@@ -837,14 +837,14 @@ function template_inline_permissions($permission, $collapsed)
 		if (empty($modSettings['permission_enable_deny']))
 		{
 			echo '
-					<input type="checkbox" name="', $permission, '[', $group['id'], ']" value="on"', $group['status'] == 'on' ? ' checked="checked"' : '', ' />';
+					<input type="checkbox" name="', $permission, '[', $group['id'], ']" value="on"', $group['status'] === 'on' ? ' checked="checked"' : '', ' />';
 		}
 		else
 		{
 			echo '
-					<span class="perms"><input type="radio" name="', $permission, '[', $group['id'], ']" value="on"', $group['status'] == 'on' ? ' checked="checked"' : '', ' /></span>
-					<span class="perms"><input type="radio" name="', $permission, '[', $group['id'], ']" value="off"', $group['status'] == 'off' ? ' checked="checked"' : '', ' /></span>
-					<span class="perms"><input type="radio" name="', $permission, '[', $group['id'], ']" value="deny"', $group['status'] == 'deny' ? ' checked="checked"' : '', ' /></span>';
+					<span class="perms"><input type="radio" name="', $permission, '[', $group['id'], ']" value="on"', $group['status'] === 'on' ? ' checked="checked"' : '', ' /></span>
+					<span class="perms"><input type="radio" name="', $permission, '[', $group['id'], ']" value="off"', $group['status'] === 'off' ? ' checked="checked"' : '', ' /></span>
+					<span class="perms"><input type="radio" name="', $permission, '[', $group['id'], ']" value="deny"', $group['status'] === 'deny' ? ' checked="checked"' : '', ' /></span>';
 		}
 
 		if (!empty($modSettings['permission_enable_deny']))
@@ -967,18 +967,18 @@ function template_postmod_permissions()
 
 		echo '
 						</td>
-						<td class="centertext"><input type="radio" name="new_topic[', $group['id'], ']" value="allow" ', $group['new_topic'] == 'allow' ? 'checked="checked"' : '', ' /></td>
-						<td class="centertext"><input type="radio" name="new_topic[', $group['id'], ']" value="moderate" ', $group['new_topic'] == 'moderate' ? 'checked="checked"' : '', ' /></td>
-						<td class="centertext"><input type="radio" name="new_topic[', $group['id'], ']" value="disallow" ', $group['new_topic'] == 'disallow' ? 'checked="checked"' : '', ' /></td>
-						<td class="centertext"><input type="radio" name="replies_own[', $group['id'], ']" value="allow" ', $group['replies_own'] == 'allow' ? 'checked="checked"' : '', ' /></td>
-						<td class="centertext"><input type="radio" name="replies_own[', $group['id'], ']" value="moderate" ', $group['replies_own'] == 'moderate' ? 'checked="checked"' : '', ' /></td>
-						<td class="centertext"><input type="radio" name="replies_own[', $group['id'], ']" value="disallow" ', $group['replies_own'] == 'disallow' ? 'checked="checked"' : '', ' /></td>
-						<td class="centertext"><input type="radio" name="replies_any[', $group['id'], ']" value="allow" ', $group['replies_any'] == 'allow' ? 'checked="checked"' : '', ' /></td>
-						<td class="centertext"><input type="radio" name="replies_any[', $group['id'], ']" value="moderate" ', $group['replies_any'] == 'moderate' ? 'checked="checked"' : '', ' /></td>
-						<td class="centertext"><input type="radio" name="replies_any[', $group['id'], ']" value="disallow" ', $group['replies_any'] == 'disallow' ? 'checked="checked"' : '', ' /></td>
-						<td class="centertext"><input type="radio" name="attachment[', $group['id'], ']" value="allow" ', $group['attachment'] == 'allow' ? 'checked="checked"' : '', ' /></td>
-						<td class="centertext"><input type="radio" name="attachment[', $group['id'], ']" value="moderate" ', $group['attachment'] == 'moderate' ? 'checked="checked"' : '', ' /></td>
-						<td class="centertext"><input type="radio" name="attachment[', $group['id'], ']" value="disallow" ', $group['attachment'] == 'disallow' ? 'checked="checked"' : '', ' /></td>
+						<td class="centertext"><input type="radio" name="new_topic[', $group['id'], ']" value="allow" ', $group['new_topic'] === 'allow' ? 'checked="checked"' : '', ' /></td>
+						<td class="centertext"><input type="radio" name="new_topic[', $group['id'], ']" value="moderate" ', $group['new_topic'] === 'moderate' ? 'checked="checked"' : '', ' /></td>
+						<td class="centertext"><input type="radio" name="new_topic[', $group['id'], ']" value="disallow" ', $group['new_topic'] === 'disallow' ? 'checked="checked"' : '', ' /></td>
+						<td class="centertext"><input type="radio" name="replies_own[', $group['id'], ']" value="allow" ', $group['replies_own'] === 'allow' ? 'checked="checked"' : '', ' /></td>
+						<td class="centertext"><input type="radio" name="replies_own[', $group['id'], ']" value="moderate" ', $group['replies_own'] === 'moderate' ? 'checked="checked"' : '', ' /></td>
+						<td class="centertext"><input type="radio" name="replies_own[', $group['id'], ']" value="disallow" ', $group['replies_own'] === 'disallow' ? 'checked="checked"' : '', ' /></td>
+						<td class="centertext"><input type="radio" name="replies_any[', $group['id'], ']" value="allow" ', $group['replies_any'] === 'allow' ? 'checked="checked"' : '', ' /></td>
+						<td class="centertext"><input type="radio" name="replies_any[', $group['id'], ']" value="moderate" ', $group['replies_any'] === 'moderate' ? 'checked="checked"' : '', ' /></td>
+						<td class="centertext"><input type="radio" name="replies_any[', $group['id'], ']" value="disallow" ', $group['replies_any'] === 'disallow' ? 'checked="checked"' : '', ' /></td>
+						<td class="centertext"><input type="radio" name="attachment[', $group['id'], ']" value="allow" ', $group['attachment'] === 'allow' ? 'checked="checked"' : '', ' /></td>
+						<td class="centertext"><input type="radio" name="attachment[', $group['id'], ']" value="moderate" ', $group['attachment'] === 'moderate' ? 'checked="checked"' : '', ' /></td>
+						<td class="centertext"><input type="radio" name="attachment[', $group['id'], ']" value="disallow" ', $group['attachment'] === 'disallow' ? 'checked="checked"' : '', ' /></td>
 					</tr>';
 	}
 

@@ -13,7 +13,7 @@
  */
 
 /**
- * Simply invoke the constructor by calling likePosts with init method
+ * Invoke the constructor by calling likePosts with init method
  */
 (function() {
 	function likePosts ()
@@ -68,7 +68,7 @@
 					subAction = 'likepost';
 				}
 
-				// Need to know what we are liking of course
+				// Need to know what we like, of course
 				let values = {
 					'topic': topicId,
 					'msg': messageId,
@@ -137,7 +137,7 @@
 				params.event.classList.add(nextClass);
 				params.text = icon + params.text;
 
-				// Update the count bubble and like list line if it exists
+				// Update the count bubble and like the list line if it exists
 				if (params.count !== 0)
 				{
 					params.event.innerHTML = '<span class="button_indicator">' + params.count + '</span><span class="breaking_space">' + params.text;
@@ -186,7 +186,7 @@
 	/**
 	 * Class for like posts stats
 	 *
-	 * Simply invoke the constructor by calling likePostStats with init method
+	 * Invoke the constructor by calling likePostStats with init method
 	 */
 	function likePostStats ()
 	{
@@ -199,7 +199,7 @@
 			defaultHash = 'messagestats',
 			txtStrings = {},
 
-			// Initialize, load in text strings, etc
+			// Initialize, load in text strings, etc.
 			init = function(params) {
 				txtStrings = Object.assign({}, params.txtStrings);
 				allowedUrls = {
@@ -370,7 +370,7 @@
 				like_post_message_data.innerHTML = '';
 				like_post_message_data.style.display = 'none';
 
-				// Build the new html to add to the page
+				// Build the new HTML to add to the page
 				data.forEach((point) => {
 					messageUrl = elk_prepareScriptUrl(elk_scripturl) + 'topic=' + point.id_topic + '.msg' + point.id_msg + '#new';
 
@@ -414,7 +414,7 @@
 				hideSpinnerOverlay();
 			},
 
-			// The most liked Topics !
+			// The most liked Topics!
 			showTopicStats = function() {
 				let data = tabsVisitedCurrentSession[currentUrlFrag],
 					topicUrl = '',
@@ -520,7 +520,7 @@
 					'   </p>' +
 					'</div>';
 
-				// And show some of the topics from it
+				// And show some topics from it
 				data.topic_data.forEach((data_topic) => {
 					let topicUrl = elk_prepareScriptUrl(elk_scripturl) + 'topic=' + data_topic.id_topic;
 
@@ -548,7 +548,7 @@
 				hideSpinnerOverlay();
 			},
 
-			// Data for all the narcissists out there !
+			// Data for all the narcissists out there!
 			showMostLikesReceivedUserStats = function(response) {
 				let data = tabsVisitedCurrentSession[currentUrlFrag],
 					msgUrl = '',
@@ -625,7 +625,7 @@
 				hideSpinnerOverlay();
 			},
 
-			// Data for all the +1, me too, etc users as well
+			// Data for all the +1, me too, etc. users as well
 			showMostLikesGivenUserStats = function(response) {
 				let data = tabsVisitedCurrentSession[currentUrlFrag],
 					htmlContent = '',

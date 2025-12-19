@@ -355,7 +355,7 @@ function template_edit_group()
 					</dt>
 					<dd>';
 
-		template_add_edit_group_boards_list('groupForm', true);
+		template_add_edit_group_boards_list('groupForm');
 
 		echo '
 					</dd>';
@@ -557,7 +557,7 @@ function template_add_edit_group_boards_list($form_id, $collapse = true)
 								</div>';
 	}
 
-	// select_all_box is hidden and it's made available only if js is enabled
+	// select_all_box is hidden, and it's made available only if js is enabled
 	echo '
 							</fieldset>
 							<script>
@@ -612,7 +612,7 @@ function template_group_members()
 	// Any group moderators to show?
 	if (!empty($context['group']['moderators']))
 	{
-		$moderators = array();
+		$moderators = [];
 		foreach ($context['group']['moderators'] as $moderator)
 		{
 			$moderators[] = '<a href="' . $scripturl . '?action=profile;u=' . $moderator['id'] . '">' . $moderator['name'] . '</a>';
@@ -710,7 +710,7 @@ function template_group_members()
 				</tbody>
 			</table>';
 
-			template_pagesection(false, '', array('extra' => '<div class="flow_flex_right"><input type="submit" name="remove" value="' . $txt['membergroups_members_remove'] . '" /></div>'));
+			template_pagesection(false, '', ['extra' => '<div class="flow_flex_right"><input type="submit" name="remove" value="' . $txt['membergroups_members_remove'] . '" /></div>']);
 
 	if (!empty($context['group']['assignable']))
 	{

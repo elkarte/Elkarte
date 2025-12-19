@@ -45,7 +45,8 @@ class Exception extends \Exception
 	{
 		$this->sprintf = is_array($sprintf) ? $sprintf : (array) $sprintf;
 
-		// Make sure everything is assigned properly
+		// Make sure everything is assigned properly, this will route through the exception_handler
+		// in the Errors class.
 		parent::__construct($this->loadMessage($message), $code, $previous);
 	}
 
@@ -93,11 +94,10 @@ class Exception extends \Exception
 	 *       1 => index of $txt
 	 *   )
 	 * - A namespaced index in the form:
-	 *     - language.index
-	 *     - a "language" followed by a "dot" followed by the "index"
-	 *     - "language" can be any character matched by \w
-	 *     - "index" can be anything
-	 * - "language" is loaded by \ElkArte\Languages\Txt::load.
+	 *     - lexicon.index
+	 *     - a txt language file followed by a "dot" followed by the "index"
+	 *     - e.g., Post.attach_timeout
+	 * - "lexicon" is loaded by \ElkArte\Languages\Txt::load.
 	 *
 	 * @return array
 	 */
@@ -123,10 +123,10 @@ class Exception extends \Exception
 	 * Loads the language file specified in \ElkArte\Exceptions\Exception::parseMessage()
 	 * and replaces the index received in the constructor.  Logs the message if needed.
 	 *
-	 * @param string $msg
-	 * @param string $lang
+	 * @param string $msg the message to log
+	 * @param string $lexicon the language file to load
 	 */
-	protected function logMessage($msg, $lang): void
+	protected function logMessage($msg, $lexicon): void
 	{
 		global $language, $txt;
 
@@ -134,7 +134,7 @@ class Exception extends \Exception
 		// the forum share the same language.
 		if (!isset($language) || $language !== User::$info->language)
 		{
-			Txt::load($lang, $language);
+			Txt::load($lexicon, $language);
 		}
 
 		if ($this->log !== false)
@@ -149,7 +149,7 @@ class Exception extends \Exception
 	 *
 	 * @deprecated since 2.0, use Errors::instance()->fatal_lang_error directly
 	 */
-	public function fatalLangError(): void
+	public function fatalLangError(): never
 	{
 		Errors::instance()->fatal_lang_error($this->message, $this->log, $this->sprintf);
 	}

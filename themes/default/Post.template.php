@@ -101,7 +101,7 @@ function template_postarea_above()
 						<dl id="post_header">';
 
 	// Guests have to put in their name and email...
-	if (isset($context['name']) && isset($context['email']))
+	if (isset($context['name'], $context['email']))
 	{
 		echo '
 							<dt>
@@ -137,7 +137,7 @@ function template_postarea_above()
 							<dd>
 								<select name="icon" id="icon" tabindex="', $context['tabindex']++, '" onchange="showimage()">';
 
-	// Loop through each message icon allowed, adding it to the drop down list.
+	// Loop through each message icon allowed, adding it to the drop-down list.
 	foreach ($context['icons'] as $icon)
 	{
 		echo '
@@ -370,7 +370,7 @@ function template_additional_options_below()
 		$context['attachments']['template']();
 	}
 
-	// Display the check boxes for all the standard options - if they are available to the user!
+	// Display the checkboxes for all the standard options - if they are available to the user!
 	echo '
 						<div id="postMoreOptions" class="smalltext">
 							<ul class="post_options">
@@ -791,8 +791,8 @@ function template_topic_replies_below()
 
 /**
  * The area below the editor
- * Typically holds our action buttons, save, preview, drafts, etc
- * Oh and lots of JS ;)
+ * Typically holds our action buttons, save, preview, drafts, etc.
+ * Oh, and lots of JS ;)
  */
 function template_postarea_below()
 {

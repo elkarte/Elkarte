@@ -7,7 +7,7 @@
  */
 
 /**
- * This file contains javascript utility functions specific to ElkArte
+ * This file contains JavaScript utility functions specific to ElkArte
  */
 
 /**
@@ -44,7 +44,7 @@ function elk_codefix ()
 
 /**
  * Removes the read more overlay from quote blocks that do not need them, and for
- * ones that do, hides so the read more input can expand it out.
+ * ones that do, hides, so the read more input can expand it out.
  */
 function elk_quotefix ()
 {
@@ -487,7 +487,7 @@ function add_elk_mention (selector, oOptions)
 		return;
 	}
 
-	// No options means its attached to the plain text box
+	// No options mean it's attached to the plain text box
 	if (typeof oOptions === 'undefined')
 	{
 		oOptions = {};
@@ -709,7 +709,7 @@ function toggle_mlsearch_opt ()
 {
 	let mlsearch = document.getElementById('mlsearch_options');
 
-	// If the box is already visible just forget about it
+	// If the box is already visible, just forget about it
 	if (window.getComputedStyle(mlsearch).display !== 'none')
 	{
 		return;
@@ -742,7 +742,7 @@ function mlsearch_opt_hide ()
 }
 
 /**
- * Attempt to prevent browsers from auto completing fields
+ * Attempt to prevent browsers from auto-completing fields
  *
  * - when viewing/editing other members profiles
  * - when registering new member
@@ -784,11 +784,7 @@ function disableAutoComplete ()
  *
  */
 (function() {
-	/**
-	 * ElkNotifications is a module that allows sending notifications to multiple notifiers.
-	 * @returns {Object} - The ElkNotifications module.
-	 */
-	const ElkNotifications = (function(opt) {
+	this.ElkNotifications = (function(opt) {
 		'use strict';
 
 		opt = opt || {};
@@ -889,8 +885,6 @@ function disableAutoComplete ()
 			update: function() { fetchData(); }
 		};
 	});
-
-	this.ElkNotifications = ElkNotifications;
 })();
 
 const ElkNotifier = new window.ElkNotifications({});
@@ -899,7 +893,7 @@ const ElkNotifier = new window.ElkNotifications({});
  * Initialize the ajax info-bar
  */
 (function() {
-	let ElkInfoBar = (function(elem_id, opt = {}) {
+	this.ElkInfoBar = (function(elem_id, opt = {}) {
 		let defaults = {
 			text: '',
 			class: 'ajax_infobar',
@@ -960,7 +954,7 @@ const ElkNotifier = new window.ElkNotifications({});
 				addClass(settings.success_class);
 			},
 			hide = function() {
-				// Short delay to avoid removing opacity while it is still be added
+				// Short delay to avoid removing opacity while it is still being added
 				window.setTimeout(function() {
 					elem.fadeOut(300);
 				}, 300);
@@ -982,8 +976,6 @@ const ElkNotifier = new window.ElkNotifications({});
 			hide: hide
 		};
 	});
-
-	this.ElkInfoBar = ElkInfoBar;
 })();
 
 /**
@@ -1019,7 +1011,7 @@ function Elk_NewsFader (element, options)
 
 			// Fade out current news item
 			currentNews.fadeOut(settings.iFadeSpeed, function() {
-				// Fade in next news item
+				// Fade in the next news item
 				nextNews.fadeIn(settings.iFadeSpeed);
 			});
 
@@ -1050,12 +1042,7 @@ async function isFunctionLoaded (selector, limit)
 		retries++;
 	}
 
-	if (retries < MAX_RETRIES)
-	{
-		return true;
-	}
-
-	return false;
+	return retries < MAX_RETRIES;
 }
 
 /**
@@ -1310,7 +1297,7 @@ function _s2 (element, duration, callback, isOut)
 		else
 		{
 			// Animation complete
-			element.style.opacity = finalOpacity;
+			element.style.opacity = String(finalOpacity);
 
 			if (isOut)
 			{

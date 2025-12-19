@@ -643,7 +643,7 @@ Elk_QuickQuote.prototype.executeQuickQuote = function(event) {
 };
 
 /**
- * Extracts the cite data and places them in the blockquote data- attributes
+ * Extracts the cite data and places them in the blockquote data-attributes
  *
  * @param {Element} selectionAncestor
  */

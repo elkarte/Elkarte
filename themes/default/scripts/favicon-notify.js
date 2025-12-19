@@ -5,12 +5,12 @@
  *
  * @version 2.0 Beta 1
  *
- * This bits acts as middle-man between the Favico and the ElkNotifications providing the interface
+ * These bits act as middle-man between the Favico and the ElkNotifications providing the interface
  * required by the latter.  It also handles the menu badge indicators.
  */
 
 (function() {
-	const ElkFavicon = (function(opt) {
+	this.ElkFavicon = (function(opt) {
 
 		opt = (opt) ? opt : {};
 
@@ -99,6 +99,4 @@
 			send: send
 		};
 	});
-
-	this.ElkFavicon = ElkFavicon;
 })();

@@ -465,7 +465,7 @@ function template_show_settings()
 	{
 		if (!is_array($context['settings_message']))
 		{
-			$context['settings_message'] = array($context['settings_message']);
+			$context['settings_message'] = [$context['settings_message']];
 		}
 
 		echo '
@@ -557,7 +557,7 @@ function template_show_settings()
 		if (is_array($config_var))
 		{
 			// First off, is this a span like a message?
-			if (in_array($config_var['type'], array('message', 'warning')))
+			if (in_array($config_var['type'], ['message', 'warning']))
 			{
 				echo '
 					<dt></dt>
@@ -1227,7 +1227,7 @@ function template_callback_external_search_engines()
 }
 
 /**
- * Used to show all of the pm message limits each group allows
+ * Used to show all the pm message limits each group allows
  */
 function template_callback_pm_limits()
 {

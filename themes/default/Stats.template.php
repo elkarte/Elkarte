@@ -126,7 +126,7 @@ function template_top_statistics()
 			</script>';
 
 	// Top Posters
-	[$data, $labels, $tooltips] = getChartData($context['top']['posters'], 'num_posts');
+	[$data, $labels, $tooltips] = getChartData($context['top']['posters']);
 	echo '
 			<li class="flow_hidden">
 				<h2 class="category_header floatleft hdicon i-user-plus">
@@ -139,7 +139,7 @@ function template_top_statistics()
 	showBarChart("topPoster", $data, $labels, $tooltips);
 
 	// Top Boards
-	[$data, $labels, $tooltips] = getChartData($context['top']['boards'], 'num_posts');
+	[$data, $labels, $tooltips] = getChartData($context['top']['boards']);
 	echo '
 				<h2 class="category_header hdicon i-directory">
 					', $txt['top_boards'], '
@@ -500,23 +500,23 @@ function setYearData()
 		return;
 	}
 
-	$yearChart = array(
+	$yearChart = [
 		'axis_labels' => [],
 		'hits' => [],
 		'new_posts' => [],
 		'most_members_online' => [],
 		'new_topics' => [],
 		'new_members' => [],
-	);
+	];
 
-	$monthChart = array(
+	$monthChart = [
 		'axis_labels' => [],
 		'hits' => [],
 		'new_posts' => [],
 		'most_members_online' => [],
 		'new_topics' => [],
 		'new_members' => [],
-	);
+	];
 
 	// Low to high looks best on a chart
 	$yearly = array_reverse($context['yearly'], true);
@@ -544,22 +544,22 @@ function setYearData()
 	}
 
 	// Colors for the line charts
-	$colors = array(
+	$colors = [
 		'new_topics' => '55,187,89',
 		'new_members' => '187,55,89',
 		'new_posts' => '89,55,187',
 		'most_members_online' => '187,89,55',
 		'hits' => '55,89,187',
-	);
+	];
 
 	// Chart title so you remember what you are looking at
-	$titles = array(
+	$titles = [
 		'new_topics' => $txt['stats_new_topics'],
 		'new_members' => $txt['stats_new_members'],
 		'new_posts' => $txt['stats_new_posts'],
 		'most_members_online' => $txt['most_time_online'],
 		'hits' => $txt['page_views'],
-	);
+	];
 
 	// Now dump it out in JS objects
 	echo '

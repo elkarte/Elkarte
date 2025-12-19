@@ -35,7 +35,7 @@ function template_maintenance()
 				<dt><label>', $txt['attachmentdir_size_current'], ':</label></dt>
 				<dd>', $context['attachment_current_size'], '</dd>
 				<dt><label>', $txt['attachment_space'], ':</label></dt>
-				<dd>', isset($context['attachment_space']) ? $context['attachment_space'] : $txt['attachmentdir_size_not_set'], '</dd>
+				<dd>', $context['attachment_space'] ?? $txt['attachmentdir_size_not_set'], '</dd>
 				<dt><label>', $txt['attachmentdir_files_current'], ':</label></dt>
 				<dd>', $context['attachment_current_files'], '</dd>
 				<dt><label>', $txt['attachment_files'], ':</label></dt>

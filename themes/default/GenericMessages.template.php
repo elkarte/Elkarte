@@ -15,9 +15,9 @@
 use ElkArte\Languages\Txt;
 
 /**
- * Builds the poster area, avatar, group icons, pulldown information menu, etc
+ * Builds the poster area, avatar, group icons, pulldown information menu, etc.
  *
- * @param mixed[] $message
+ * @param array $message
  * @param bool $ignoring
  *
  * @return string
@@ -262,7 +262,7 @@ function template_build_poster_div($message, $ignoring = false)
 								<a class="linklevel2 help" title="' . $message['member']['ip'] . '" href="' . $scripturl . '?action=' . (empty($message['member']['is_guest']) ? 'profile;area=history;sa=ip;u=' . $message['member']['id'] . ';searchip=' . $message['member']['ip'] : 'trackip') . '">' . $message['member']['ip'] . '</a>
 							</li>';
 	}
-	// Or, should we show it because this, is you?
+	// Or, should we show it because this is you?
 	elseif (!empty($message['can_see_ip']) && !empty($message['member']['ip']))
 	{
 		$poster_div .= '
@@ -323,7 +323,7 @@ function template_build_poster_div($message, $ignoring = false)
 							<li class="listlevel1 membergroup">' . $message['member']['group'] . '</li>';
 		}
 
-		// Show the member's custom title, if they have one.
+		// Show the member's custom title if they have one.
 		if (!empty($message['member']['title']))
 		{
 			$poster_div .= '
@@ -331,11 +331,11 @@ function template_build_poster_div($message, $ignoring = false)
 		}
 
 		// Show online and offline buttons? PHP could do with a little bit of cleaning up here for brevity, but it works.
-		// The plan is to make these buttons act sensibly, and link to your own inbox in your own posts (with new PM notification).
-		// Still has a little bit of hard-coded text. This may be a place where translators should be able to write inclusive strings,
-		// instead of dealing with $txt['by'] etc in the markup. Must be brief to work, anyway. Cannot ramble on at all.
+		// The plan is to make these buttons act sensibly and link to your own inbox in your own posts (with new PM notification).
+		// Still has a little bit of hard-coded text. This may be a place where translators should be able to write inclusive strings
+		// instead of dealing with $txt['by'] etc. in the markup. Must be brief to work, anyway. Cannot ramble on at all.
 
-		// We start with their own..
+		// We start with their own.
 		if ($context['can_send_pm'] && $message['is_message_author'])
 		{
 			$poster_div .= '
@@ -343,7 +343,7 @@ function template_build_poster_div($message, $ignoring = false)
 								<a class="linklevel1' . ($context['user']['unread_messages'] > 0 ? ' new_pm' : '') . '" href="' . $scripturl . '?action=pm">' . $txt['pm_short'] . ' ' . ($context['user']['unread_messages'] > 0 ? '<span class="pm_indicator">' . $context['user']['unread_messages'] . '</span>' : '') . '</a>
 							</li>';
 		}
-		// Allowed to send PMs and the message is not their own and not from a guest.
+		// Allowed to send PMs, and the message is not their own and not from a guest.
 		elseif ($context['can_send_pm'] && !$message['is_message_author'] && !$message['member']['is_guest'])
 		{
 			if (!empty($modSettings['onlineEnable']))
@@ -383,16 +383,16 @@ function template_build_poster_div($message, $ignoring = false)
 }
 
 /**
- * Formats a very simple message view (for example search results, list of
+ * Formats a very simple message view (for example, search results, list of
  * posts and topics in profile, unapproved, etc.)
  *
- * @param mixed[] $msg associative array containing the data to output:
+ * @param array $msg associative array containing the data to output:
  * - class => a class name (mandatory)
  * - counter => Usually a number used as counter next to the subject
  * - title => Usually the subject of the topic (mandatory)
  * - date => frequently the "posted on", but can be anything
  * - body => message body (mandatory)
- * - buttons => an associative array that allows to create a "quickbutton" strip
+ * - buttons => an associative array that allows creating a "quickbutton" strip
  *  (see template_button_strip for details on the parameters)
  */
 function template_simple_message($msg)
@@ -425,7 +425,7 @@ function template_load_likes_button_above()
 	global $txt;
 
 	// Ajax controller for likes
-	loadJavascriptFile('like_posts.js', array('defer' => true));
+	loadJavascriptFile('like_posts.js', ['defer' => true]);
 
 	// This one is needed to have some strings handy for likes errors
 	Txt::load('Errors');

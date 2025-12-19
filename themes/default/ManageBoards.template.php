@@ -42,7 +42,7 @@ function template_manage_boards()
 	}
 
 	// Loop through every category, listing the boards in each as we go.
-	$sortables = array();
+	$sortables = [];
 	foreach ($context['categories'] as $category)
 	{
 		$sortables[] = '#category_' . $category['id'];
@@ -351,7 +351,7 @@ function template_confirm_category_delete()
 }
 
 /**
- * Below is the template for adding/editing an board on the forum.
+ * Below is the template for adding/editing a board on the forum.
  */
 function template_modify_board()
 {

@@ -75,7 +75,7 @@ elk_mentions.prototype.attachAtWho = function () {
 					return _self.cached_names[query];
 				}
 
-				// Fine then, you really do need a list so lets request one
+				// Fine then, you really do need a list so let's request one
 				if (elk_formSubmitted)
 				{
 					return [];

@@ -104,7 +104,7 @@ function template_download_language()
 						<span style="color: ', ($file['writable'] ? 'green' : 'red'), ';">', ($file['writable'] ? $txt['yes'] : $txt['no']), '</span>
 					</td>
 					<td>
-						', $file['exists'] ? ($file['exists'] == 'same' ? $txt['languages_download_exists_same'] : $txt['languages_download_exists_different']) : $txt['no'], '
+						', $file['exists'] ? ($file['exists'] === 'same' ? $txt['languages_download_exists_same'] : $txt['languages_download_exists_different']) : $txt['no'], '
 					</td>
 					<td class="centertext">
 						<input type="checkbox" name="copy_file[]" value="', $file['generaldest'], '"', ($file['default_copy'] ? ' checked="checked"' : ''), ' />
@@ -134,7 +134,7 @@ function template_download_language()
 		</form>
 	</div>';
 
-	// The javascript for expand and collapse of sections.
+	// The JavaScript for expand and collapse of sections.
 	echo '
 	<script>';
 

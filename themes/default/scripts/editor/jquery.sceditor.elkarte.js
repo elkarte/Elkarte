@@ -155,7 +155,7 @@ const itemCodes = ["*:disc", "@:disc", "+:square", "x:square", "#:decimal", "0:d
 
 			$(".sceditor-toolbar").append(content);
 
-			// Show the more button on the editor if we have more
+			// Show the more button in the editor if we have more
 			if (typeof moreButton !== 'undefined')
 			{
 				line.append(moreButton);
@@ -187,7 +187,7 @@ const itemCodes = ["*:disc", "@:disc", "+:square", "x:square", "#:decimal", "0:d
 					r1 = right.indexOf("[" + tag + "]"),
 					r2 = right.indexOf("[/" + tag + "]");
 
-				// Inside ot the [tag]your are here[/tag]
+				// Inside ot the [tag]you are here[/tag]
 				if ((l1 > -1 && l1 > l2) || (r2 > -1 && (r1 === -1 || (r1 > r2))))
 				{
 					return 1;
@@ -202,7 +202,7 @@ const itemCodes = ["*:disc", "@:disc", "+:square", "x:square", "#:decimal", "0:d
 		 *
 		 * @param nodeName the name of the node such as tt or pre
 		 * @param nodeClass the specific class name of the nodeName like bbc_tt
-		 * @param insertElement what you want to insert to END the tag e.g. span, p (inline/block)
+		 * @param insertElement what you want to insert to END the tag e.g., span, p (inline/block)
 		 */
 		toggleTagStartEnd: function(nodeName, nodeClass, insertElement)
 		{
@@ -341,7 +341,7 @@ const itemCodes = ["*:disc", "@:disc", "+:square", "x:square", "#:decimal", "0:d
 				let $_placefinder = $(placefinder),
 					iframeDocument = editor.getContentAreaContainer().contentDocument;
 
-				// Determine its Location in the iframe
+				// Determine it's Location in the iframe
 				offset = $_placefinder.offset();
 
 				// If we have scrolled, then we also need to account for those offsets
@@ -385,14 +385,14 @@ const itemCodes = ["*:disc", "@:disc", "+:square", "x:square", "#:decimal", "0:d
 })(jQuery);
 
 /**
- * ElkArte unique commands to add to the toolbar, when a button
+ * ElkArte unique commands to add to the toolbar.  When a button
  * with the same name is selected, it will trigger these definitions
  *
- * tooltip - the hover text, this is the name in the editors.(language).php file
+ * tooltip - the hover text, this is the name in the editors.(language).php file.
  * txtExec - this is the text to insert before and after the cursor or selected text
- *           when in the plain text part of the editor
- * exec - this is called when in the wizzy part of the editor to insert text or html tags
- * state - this is used to determine if a button should be shown as active or not
+ *           when in the plain text part of the editor.
+ * exec - this is called when in the wizzy part of the editor to insert text or HTML tags.
+ * state - this is used to determine if a button should be shown as active.
  *
  * Adds Tt, Pre, Spoiler, Footnote commands
  */
@@ -626,7 +626,7 @@ sceditor.formats.bbcode
 		format: function (element, content)
 		{
 			/**
-			 * This function is not used because no specific html tag is associated,
+			 * This function is not used because no specific HTML tag is associated,
 			 * instead the 'img'.format takes care of finding the ILA images and process
 			 * them accordingly to return the [attach] tag.
 			 */
@@ -822,7 +822,7 @@ sceditor.formats.bbcode
 				sAuthor = '<a href="' + sLink + '">' + bbc_quote_from + ': ' + sLink + '</a>';
 			}
 
-			// Links could be in the form: link=topic=71.msg201#msg201 that would fool javascript, so we need a workaround
+			// Links could be in the form: link=topic=71.msg201#msg201 that would fool JavaScript, so we need a workaround
 			for (let key in attrs)
 			{
 				if (key.substring(0, 4) === 'link' && attrs.hasOwnProperty(key))
@@ -893,7 +893,7 @@ sceditor.formats.bbcode
 				return content;
 			}
 
-			// check if this is an ILA ?
+			// Check if this is an ILA?
 			if (element.hasAttribute('data-ila'))
 			{
 				params(['width', 'height', 'align', 'type']);

@@ -203,7 +203,7 @@ h1.forumtitle {
 	color: var(--menu_button_active_hover);
 }
 
-/* Lets get their attention */
+/* let's get their attention */
 .content .errorbox, .content .warningbox {
 	font-size: var(--font15);
 	margin-top: 1em;

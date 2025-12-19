@@ -13,7 +13,7 @@
  *
  * @param {object} bar_data
  * @param {array} tooltips
- * @returns {{data, options: {indexAxis: string, plugins: {legend: {display: boolean}, tooltip: {callbacks: {label: (function(*): *)}}, title: {display: boolean}}, elements: {bar: {borderWidth: number}}, responsive: boolean, scales: {yAxis: {ticks: {font: {size: number}}, grid: {display: boolean}, afterFit: options.scales.yAxis.afterFit}, xAxis: {ticks: {display: boolean, stepSize: number}}}, categoryPercentage: string}, type: string}}
+ * @returns {{data, options: {indexAxis: string, plugins: {legend: {display: boolean}, tooltip: {callbacks: {label: (function(*): *)}}, title: {display: boolean}}, elements: {bar: {borderWidth: number}}, responsive: boolean, scales: {yAxis: {ticks: {font: {size: number}}, grid: {display: boolean}, afterFit: {options.scales.yAxis.afterFit}, xAxis: {ticks: {display: boolean, stepSize: number}}}, categoryPercentage: string}, type: string}}
  */
 function barConfig (bar_data, tooltips)
 {

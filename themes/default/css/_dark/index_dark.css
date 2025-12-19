@@ -2052,7 +2052,7 @@ ul.cf_icons {
  *
  * If, for whatever reason (eyesight, pixel pitch, workstation arrangement, etc)
  * a user requires text 50% larger than theme default, then their screen is
- * effectively a lot smaller than its nominal resolution would indicate.
+ * effectively a lot smaller than it's nominal resolution would indicate.
  * If the break points are set in em, suddenly the media queries become equally
  * responsive for all users, without any extra code being required.
  *

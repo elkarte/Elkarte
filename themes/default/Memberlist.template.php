@@ -43,7 +43,7 @@ function template_mlsearch_above()
 		</ul>
 	</form>';
 
-	template_pagesection('memberlist_buttons', 'right', array('extra' => $extra));
+	template_pagesection('memberlist_buttons', 'right', ['extra' => $extra]);
 
 	echo '
 	<script type="module">
@@ -79,15 +79,11 @@ function template_memberlist()
 	// Display each of the column headers of the table.
 	foreach ($context['columns'] as $key => $column)
 	{
-		switch ($key)
+		$sorticon = match ($key)
 		{
-			case 'posts':
-			case 'date_registered':
-				$sorticon = 'numeric';
-				break;
-			default:
-				$sorticon = 'alpha';
-		}
+			'posts', 'date_registered' => 'numeric',
+			default => 'alpha',
+		};
 
 		// This is a selected column, so underline it or some such.
 		if ($column['selected'])
@@ -134,11 +130,11 @@ function template_memberlist()
 					echo '
 					<div class="' . $values['class'] . '">';
 
-					if ($column == 'online')
+					if ($column === 'online')
 					{
 						echo template_member_online($member);
 					}
-					elseif ($column == 'email_address')
+					elseif ($column === 'email_address')
 					{
 						echo template_member_email($member);
 					}

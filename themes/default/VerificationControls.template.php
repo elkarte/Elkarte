@@ -61,7 +61,7 @@ function template_verification_controls($verify_id, $before = '', $after = '')
  * Used to show a verification question
  *
  * @param int $verify_id
- * @param mixed[] $verify_context
+ * @param array $verify_context
  */
 function template_verification_control_questions($verify_id, $verify_context)
 {
@@ -81,13 +81,13 @@ function template_verification_control_questions($verify_id, $verify_context)
  * Display the empty field verification
  *
  * @param int $verify_id
- * @param mixed[] $verify_context
+ * @param array $verify_context
  */
 function template_verification_control_emptyfield($verify_id, $verify_context)
 {
 	global $context, $txt;
 
-	// Display an empty field verification
+	// Display empty field verification
 	echo '
 			<div class="verification_control_valid">
 				<label for="', $verify_context['field_name'], '">', $txt['visual_verification_hidden'], '</label>:

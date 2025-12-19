@@ -221,7 +221,7 @@ function template_results()
 		</div>';
 	}
 
-	// Or perhaps they made a spelling error, lets give them a hint
+	// Or perhaps they made a spelling error, let's give them a hint
 	if (!empty($context['did_you_mean']) || empty($context['topics']))
 	{
 		echo '

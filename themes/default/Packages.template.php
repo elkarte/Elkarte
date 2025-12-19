@@ -37,7 +37,7 @@ function template_view_package()
 	echo $txt['package_installed_warning3'], '
 		</div>';
 
-	// Do errors exist in the install? If so light them up like a Christmas tree.
+	// Do errors exist in the installation? If so light them up like a Christmas tree.
 	if ($context['has_failure'])
 	{
 		echo '
@@ -158,7 +158,7 @@ function template_view_package()
 
 		$i = 1;
 		$action_num = 1;
-		$js_operations = array();
+		$js_operations = [];
 		foreach ($context['actions'] as $packageaction)
 		{
 			// Did we pass or fail?  Need to know for later on.
@@ -234,7 +234,7 @@ function template_view_package()
 				</div>
 				<table class="table_grid">';
 
-			// Loop through each theme and display it's name, and then it's details.
+			// Loop through each theme and display its name, and then it's details.
 			foreach ($context['theme_actions'] as $id => $theme)
 			{
 				// Pass?
@@ -586,7 +586,7 @@ function template_browse()
 }
 
 /**
- * Show the install options
+ * Show the installation options
  */
 function template_install_options()
 {

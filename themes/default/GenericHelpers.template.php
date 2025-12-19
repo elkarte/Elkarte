@@ -38,7 +38,7 @@ function template_list_groups_collapsible($group = 'default_groups_list')
 		$all_selected &= $group['status'] === 'on';
 		echo '
 				<li>
-					<input type="checkbox" id="', $current_group_list['id'], '_', $group['id'], '" name="', $current_group_list['id'], '[', $group['id'], ']" value="on"', $group['status'] == 'on' ? ' checked="checked"' : '', ' />
+					<input type="checkbox" id="', $current_group_list['id'], '_', $group['id'], '" name="', $current_group_list['id'], '[', $group['id'], ']" value="on"', $group['status'] === 'on' ? ' checked="checked"' : '', ' />
 					<label for="', $current_group_list['id'], '_', $group['id'], '"', $group['is_postgroup'] ? ' class="em"' : '', '>', $group['name'], '</label> <em>(', $group['member_count'], ')</em>
 				</li>';
 	}
@@ -60,7 +60,7 @@ function template_list_groups_collapsible($group = 'default_groups_list')
  * @param string $extra
  * @param bool $all
  *
- * @return string as echoed output
+ * @return void an echoed output
  */
 function template_select_boards($name, $label = '', $extra = '', $all = false)
 {
@@ -238,7 +238,7 @@ function template_button_strip($button_strip, $class = '', $strip_options = [])
  *        the page index code is not in the first level of $context
  *     - 'extra' (string) used to add html markup at the end of the template
  *
- * @return string as echoed content
+ * @return void an echoed content
  */
 function template_pagesection($button_strip = false, $strip_direction = '', $options = [])
 {
@@ -301,7 +301,7 @@ function template_pagesection($button_strip = false, $strip_direction = '', $opt
  * @depreciated since 2.0, use improved template_button_strip
  * @return void echos a string of buttons
  */
-function template_quickbutton_strip($strip, $tests = array())
+function template_quickbutton_strip($strip, $tests = [])
 {
 	global $options;
 

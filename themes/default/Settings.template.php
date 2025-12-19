@@ -19,111 +19,111 @@ function template_options()
 {
 	global $context, $txt;
 
-	$context['theme_options'] = array(
-		array(
+	$context['theme_options'] = [
+		[
 			'id' => 'use_sidebar_menu',
 			'label' => $txt['use_sidebar_menu'],
 			'default' => true,
-		),
-		array(
+		],
+		[
 			'id' => 'show_no_avatars',
 			'label' => $txt['show_no_avatars'],
 			'default' => true,
-		),
-		array(
+		],
+		[
 			'id' => 'show_no_smileys',
 			'label' => $txt['show_no_smileys'],
 			'default' => true,
-		),
-		array(
+		],
+		[
 			'id' => 'hide_poster_area',
 			'label' => $txt['hide_poster_area'],
 			'default' => true,
-		),
-		array(
+		],
+		[
 			'id' => 'show_no_signatures',
 			'label' => $txt['show_no_signatures'],
 			'default' => true,
-		),
-		array(
+		],
+		[
 			'id' => 'return_to_post',
 			'label' => $txt['return_to_post'],
 			'default' => true,
-		),
-		array(
+		],
+		[
 			'id' => 'no_new_reply_warning',
 			'label' => $txt['no_new_reply_warning'],
 			'default' => true,
-		),
-		array(
+		],
+		[
 			'id' => 'view_newest_pm_first',
 			'label' => $txt['recent_pms_at_top'],
 			'default' => true,
-		),
-		array(
+		],
+		[
 			'id' => 'wysiwyg_default',
 			'label' => $txt['wysiwyg_default'],
 			'default' => false,
-		),
-		array(
+		],
+		[
 			'id' => 'popup_messages',
 			'label' => $txt['popup_messages'],
 			'default' => true,
-		),
-		array(
+		],
+		[
 			'id' => 'pm_remove_inbox_label',
 			'label' => $txt['pm_remove_inbox_label'],
 			'default' => true,
-		),
-		array(
+		],
+		[
 			'id' => 'auto_notify',
 			'label' => $txt['auto_notify'],
 			'default' => true,
-		),
-		array(
+		],
+		[
 			'id' => 'topics_per_page',
 			'label' => $txt['topics_per_page'],
-			'options' => array(
+			'options' => [
 				0 => $txt['per_page_default'],
 				5 => 5,
 				10 => 10,
 				25 => 25,
 				50 => 50,
-			),
+			],
 			'default' => true,
-		),
-		array(
+		],
+		[
 			'id' => 'messages_per_page',
 			'label' => $txt['messages_per_page'],
-			'options' => array(
+			'options' => [
 				0 => $txt['per_page_default'],
 				5 => 5,
 				10 => 10,
 				25 => 25,
 				50 => 50,
-			),
+			],
 			'default' => true,
-		),		array(
+		],		[
 			'id' => 'calendar_start_day',
 			'label' => $txt['calendar_start_day'],
-			'options' => array(
+			'options' => [
 				0 => $txt['days'][0],
 				1 => $txt['days'][1],
 				6 => $txt['days'][6],
-			),
+			],
 			'default' => true,
-		),
-		array(
+		],
+		[
 			'id' => 'display_quick_reply',
 			'label' => $txt['display_quick_reply'],
 			'default' => true,
-		),
-		array(
+		],
+		[
 			'id' => 'display_quick_mod',
 			'label' => $txt['display_quick_mod'],
 			'default' => true,
-		),
-	);
+		],
+	];
 }
 
 /**
@@ -133,128 +133,128 @@ function template_settings()
 {
 	global $context, $txt;
 
-	$context['theme_settings'] = array(
-		array(
+	$context['theme_settings'] = [
+		[
 			'id' => 'header_logo_url',
 			'label' => $txt['header_logo_url'],
 			'description' => $txt['header_logo_url_desc'],
 			'type' => 'text',
-		),
-		array(
+		],
+		[
 			'id' => 'site_slogan',
 			'label' => $txt['site_slogan'],
 			'description' => $txt['site_slogan_desc'],
 			'type' => 'text',
-		),
-		array(
+		],
+		[
 			'id' => 'header_layout',
 			'label' => $txt['header_layout'],
-			'options' => array(
+			'options' => [
 				0 => $txt['header_layout_default'],
 				1 => $txt['header_layout_logo_only'],
 				2 => $txt['header_layout_inverted'],
-			),
-			'description' => array(
+			],
+			'description' => [
 				'main' => $txt['header_layout_desc'],
-				'options' => array(
-					0 => array('header_layout_default_name', 'header_layout_default_desc'),
-					1 => array('header_layout_logo_only_name', 'header_layout_logo_only_desc'),
-					2 => array('header_layout_inverted_name', 'header_layout_inverted_desc'),
-				)
-			),
+				'options' => [
+					0 => ['header_layout_default_name', 'header_layout_default_desc'],
+					1 => ['header_layout_logo_only_name', 'header_layout_logo_only_desc'],
+					2 => ['header_layout_inverted_name', 'header_layout_inverted_desc'],
+				]
+			],
 			'type' => 'select',
-		),
+		],
 		'',
-		array(
+		[
 			'id' => 'smiley_sets_default',
 			'label' => $txt['smileys_default_set_for_theme'],
 			'options' => $context['smiley_sets'],
 			'type' => 'text',
-		),
-		array(
+		],
+		[
 			'id' => 'forum_width',
 			'label' => $txt['forum_width'],
 			'description' => $txt['forum_width_desc'],
 			'type' => 'text',
 			'size' => 8,
-		),
+		],
 		'',
-		array(
+		[
 			'id' => 'show_mark_read',
 			'label' => $txt['enable_mark_as_read'],
-		),
+		],
 		'',
-		array(
+		[
 			'id' => 'enable_news',
 			'label' => $txt['enable_news'],
-			'options' => array(
+			'options' => [
 				0 => $txt['enable_news_off'],
 				1 => $txt['enable_news_random'],
 				2 => $txt['enable_news_fader'],
-			),
+			],
 			'type' => 'number',
-			'description' => array(
+			'description' => [
 				'main' => '',
-				'options' => array(
-					0 => array('enable_news_off_name', 'enable_news_off_desc'),
-					1 => array('enable_news_random_name', 'enable_news_random_desc'),
-					2 => array('enable_news_fader_name', 'enable_news_fader_desc'),
-				)
-			),
-		),
-		array(
+				'options' => [
+					0 => ['enable_news_off_name', 'enable_news_off_desc'],
+					1 => ['enable_news_random_name', 'enable_news_random_desc'],
+					2 => ['enable_news_fader_name', 'enable_news_fader_desc'],
+				]
+			],
+		],
+		[
 			'id' => 'newsfader_time',
 			'label' => $txt['admin_fader_delay'],
 			'type' => 'number',
-		),
+		],
 		'',
-		array(
+		[
 			'id' => 'recent_post_topics',
 			'label' => $txt['recent_post_topics'],
-			'options' => array(
+			'options' => [
 				0 => $txt['show_recent_posts'],
 				1 => $txt['show_recent_topics'],
-			),
+			],
 			'type' => 'number',
-		),
-		array(
+		],
+		[
 			'id' => 'number_recent_posts',
 			'label' => $txt['number_recent_posts'],
 			'description' => $txt['number_recent_posts_desc'],
 			'type' => 'number',
-		),
-		array(
+		],
+		[
 			'id' => 'show_stats_index',
 			'label' => $txt['show_stats_index'],
-		),
-		array(
+		],
+		[
 			'id' => 'show_latest_member',
 			'label' => $txt['latest_members'],
-		),
-		array(
+		],
+		[
 			'id' => 'show_group_key',
 			'label' => $txt['show_group_key'],
-		),
-		array(
+		],
+		[
 			'id' => 'display_who_viewing',
 			'label' => $txt['who_display_viewing'],
-			'options' => array(
+			'options' => [
 				0 => $txt['who_display_viewing_off'],
 				1 => $txt['who_display_viewing_numbers'],
 				2 => $txt['who_display_viewing_names'],
-			),
+			],
 			'type' => 'number',
-		),
+		],
 		'',
-		array(
+		[
 			'id' => 'additional_options_collapsible',
 			'label' => $txt['additional_options_collapsible'],
-		),
-		array(
+		],
+		[
 			'id' => 'show_keyinfo_above',
 			'label' => $txt['show_keyinfo_above'],
-		),
-	);
+		],
+	];
 
 	// This is a special case as theme settings will trigger new ThemeLoader() which essentially clears inline JS
 	$context['html_headers'] = '

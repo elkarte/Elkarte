@@ -100,7 +100,7 @@ function template_show_list($list_id = null)
 			<div class="flow_flex">';
 		}
 
-		template_pagesection(false, '', array('page_index_markup' => $cur_list['page_index']));
+		template_pagesection(false, '', ['page_index_markup' => $cur_list['page_index']]);
 		$close_div = true;
 	}
 
@@ -193,7 +193,7 @@ function template_show_list($list_id = null)
 		// Show the page index (if this list doesn't intend to show all items).
 		if (!empty($cur_list['items_per_page']) && !empty($cur_list['page_index']))
 		{
-			template_pagesection(false, '', array('page_index_markup' => $cur_list['page_index']));
+			template_pagesection(false, '', ['page_index_markup' => $cur_list['page_index']]);
 		}
 
 		if (isset($cur_list['additional_rows']['below_table_data']))
@@ -240,9 +240,9 @@ function template_show_list($list_id = null)
  * Generic template used to show additional rows of data (above/below)
  *
  * @param int $row_position
- * @param mixed[] $cur_list
+ * @param array $cur_list
  *
- * @return string as echoed output
+ * @return void an echoed output
  */
 function template_additional_rows($row_position, $cur_list)
 {
@@ -267,13 +267,13 @@ function template_additional_rows($row_position, $cur_list)
  *        // The name that you want to appear for the link.
  *        'label' => $txt['name'],
  *        // If we use tabs instead of buttons we highlight the current tab.
- *        // Must use conditions to determine if its selected or not.
+ *        // Must use conditions to determine if it's selected or not.
  *        'is_selected' => isset($_REQUEST['name']),
  *      ),
  *    ),
  * );
  *
- * @param mixed[] $list_menu
+ * @param array $list_menu
  */
 function template_create_list_menu($list_menu)
 {

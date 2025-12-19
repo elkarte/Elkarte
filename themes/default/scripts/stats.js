@@ -10,7 +10,7 @@
  */
 
 /**
- * This file contains javascript associated with the displaying statistics and the like
+ * This file contains JavaScript associated with the displaying statistics and the like
  */
 
 /**
@@ -54,7 +54,7 @@ elk_StatsCenter.prototype.init = function() {
 			// The id is part of the pattern match.
 			sYearId = aResults[1];
 
-			// Setup the object that'll have the state information of the year.
+			// Set up the object that'll have the state information of the year.
 			this.oYears[sYearId] = {
 				oCollapseImage: document.getElementById(this.opt.sYearImageIdPrefix + sYearId),
 				oMonths: {}
@@ -66,7 +66,7 @@ elk_StatsCenter.prototype.init = function() {
 			// Use the collapse image to determine the current state.
 			oCurYear.bIsCollapsed = oCurYear.oCollapseImage.src.indexOf(this.opt.sYearImageCollapsed) >= 0;
 
-			// Setup the toggle element for the year.
+			// Set up the toggle element for the year.
 			oCurYear.oToggle = new elk_Toggle({
 				bToggleEnabled: true,
 				bCurrentlyCollapsed: oCurYear.bIsCollapsed,
@@ -108,12 +108,12 @@ elk_StatsCenter.prototype.init = function() {
 			// Create a shortcut to the current month.
 			oCurMonth = oCurYear.oMonths[sMonthId];
 
-			// Determine whether the month is currently collapsed or expanded..
+			// Determine whether the month is currently collapsed or expanded.
 			oCurMonth.bIsCollapsed = oCurMonth.oCollapseImage.src.indexOf(this.opt.sMonthImageCollapsed) >= 0;
 
 			let sLinkText = document.getElementById(this.opt.sMonthLinkIdPrefix + sMonthId).innerHTML;
 
-			// Setup the toggle element for the month.
+			// Set up the toggle element for the month.
 			oCurMonth.oToggle = new elk_Toggle({
 				bToggleEnabled: true,
 				bCurrentlyCollapsed: oCurMonth.bIsCollapsed,
@@ -182,7 +182,7 @@ elk_StatsCenter.prototype.onBeforeCollapseMonth = function(oToggle) {
 
 		// Remove the month rows from the year toggle.
 		let aNewContainers = [],
-			oYearToggle = this.oYears[oToggle.opt.sMonthId.substr(0, 4)].oToggle;
+			oYearToggle = this.oYears[oToggle.opt.sMonthId.substring(0, 4)].oToggle;
 
 		for (let i = 0, n = oYearToggle.opt.aSwappableContainers.length; i < n; i++)
 		{
@@ -243,7 +243,7 @@ elk_StatsCenter.prototype.onDocReceived = function(oXMLDoc) {
 	{
 		sMonthId = aMonthNodes[iMonthIndex].getAttribute('id');
 		iStart = document.getElementById('tr_month_' + sMonthId).rowIndex + 1;
-		sYearId = sMonthId.substr(0, 4);
+		sYearId = sMonthId.substring(0, 4);
 
 		// Within the current months, check out all the days.
 		aDayNodes = aMonthNodes[iMonthIndex].getElementsByTagName('day');

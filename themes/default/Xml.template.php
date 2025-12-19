@@ -169,7 +169,7 @@ function template_generic_preview()
 		<subject><![CDATA[', empty($context['preview_subject']) ? $txt['not_applicable'] : $context['preview_subject'], ']]></subject>
 		<body><![CDATA[', $context['preview_message'], ']]></body>
 	</preview>
-	<errors serious="', empty($context['error_type']) || $context['error_type'] != 'serious' ? '0' : '1', '">';
+	<errors serious="', empty($context['error_type']) || $context['error_type'] !== 'serious' ? '0' : '1', '">';
 
 	if (!empty($context['post_error']['errors']))
 	{
@@ -412,7 +412,7 @@ function template_generic_xml_buttons()
 }
 
 /**
- * This prints XML in it's most generic form.
+ * This prints XML in its most generic form.
  */
 function template_generic_xml()
 {
@@ -471,7 +471,7 @@ function template_generic_xml_recursive($xml_data, $parent_ident, $child_ident, 
  * Additionally, formats data based on the specific format passed.
  * This function is recursively called to handle sub arrays of data.
  *
- * @param mixed[] $data the array to output as xml data
+ * @param array $data the array to output as xml data
  * @param int $i the amount of indentation to use.
  * @param string|null $tag if specified, it will be used instead of the keys of data.
  * @param string $xml_format one of rss, rss2, rdf, atom
@@ -536,7 +536,7 @@ function template_xml_news($data, $i, $tag = null, $xml_format = 'rss')
 				echo "\n", str_repeat("\t", $i), '</', $key, '>';
 			}
 			// A string with returns in it.... show this as a multiline element.
-			elseif (strpos($val, "\n") !== false || strpos($val, '<br />') !== false)
+			elseif (str_contains($val, "\n") || str_contains($val, '<br />'))
 			{
 				echo "\n", fix_possible_url($val), "\n", str_repeat("\t", $i), '</', $key, '>';
 			}
@@ -601,7 +601,7 @@ function template_feedatom()
 
 		<updated>', Util::gmstrftime('%Y-%m-%dT%H:%M:%SZ'), '</updated>
 		<subtitle><![CDATA[', strip_tags(un_htmlspecialchars($txt['xml_rss_desc'])), ']]></subtitle>
-		<generator uri="https://www.elkarte.net" version="', strtr(FORUM_VERSION, array('ElkArte' => '')), '">ElkArte</generator>
+		<generator uri="https://www.elkarte.net" version="', strtr(FORUM_VERSION, ['ElkArte' => '']), '">ElkArte</generator>
 		<author>
 			<name>', strip_tags(un_htmlspecialchars($context['forum_name'])), '</name>
 		</author>';
@@ -633,7 +633,7 @@ function template_feedrss()
 				<link>', $scripturl, '</link>
 			</image>';
 
-	// Output all of the associative array, start indenting with 2 tabs, and name everything "item".
+	// Output all the associative array, start indenting with 2 tabs, and name everything "item".
 	template_xml_news($context['recent_posts_data'], 2, 'item', $context['xml_format']);
 
 	// Output the footer of the xml.

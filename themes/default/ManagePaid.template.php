@@ -243,7 +243,7 @@ function template_modify_user_subscription()
 				<dl class="settings">';
 
 	// Do we need a username?
-	if ($context['action_type'] == 'add')
+	if ($context['action_type'] === 'add')
 	{
 		echo '
 					<dt>

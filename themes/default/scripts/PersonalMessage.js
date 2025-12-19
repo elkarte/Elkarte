@@ -21,7 +21,7 @@
  * sSessionVar:
  * sTextDeleteItem: text string to show when
  * sToControlId: id of the to auto suggest input
- * aToRecipients: array of members its going to
+ * aToRecipients: array of members it's going to
  * aBccRecipients: array of member to BCC
  * sBccControlId: id of the bcc auto suggest input
  * sBccDivId: container holding the bbc input
@@ -244,7 +244,7 @@ function rebuildRuleDesc ()
 
 	for (var i = 0; i < document.forms.addrule.elements.length; i++)
 	{
-		if (document.forms.addrule.elements[i].id.substr(0, 8) === 'ruletype')
+		if (document.forms.addrule.elements[i].id.substring(0, 8) === 'ruletype')
 		{
 			if (foundCriteria)
 			{
@@ -297,7 +297,7 @@ function rebuildRuleDesc ()
 			}
 		}
 
-		if (document.forms.addrule.elements[i].id.substr(0, 7) === 'acttype')
+		if (document.forms.addrule.elements[i].id.substring(0, 7) === 'acttype')
 		{
 			if (foundAction)
 			{
@@ -553,7 +553,7 @@ function addActionOption ()
 	{
 		for (let i = 0; i < document.forms.addrule.elements.length; i++)
 		{
-			if (document.forms.addrule.elements[i].id.substr(0, 7) === 'acttype')
+			if (document.forms.addrule.elements[i].id.substring(0, 7) === 'acttype')
 			{
 				actionNum++;
 			}

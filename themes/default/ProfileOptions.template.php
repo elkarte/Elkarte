@@ -88,7 +88,7 @@ function template_editBuddies()
 		}
 
 		//  Any custom profile (with icon) fields to show
-		$im = array();
+		$im = [];
 		if (!empty($buddy['custom_fields']))
 		{
 
@@ -479,14 +479,14 @@ function template_profile_options()
 						', $field['value'];
 			}
 			// Maybe it's a text box - very likely!
-			elseif (in_array($field['type'], array('int', 'float', 'text', 'password')))
+			elseif (in_array($field['type'], ['int', 'float', 'text', 'password']))
 			{
 				echo '
 				
 						<input type="', $field['type'] === 'password' ? 'password' : 'text', '" name="', $key, '" id="', $key, '" size="', empty($field['size']) ? 30 : $field['size'], '" value="', $field['value'], '" tabindex="', $context['tabindex']++, '" ', $field['input_attr'], ' class="input_', $field['type'] === 'password' ? 'password' : 'text', '" />';
 			}
-			// Maybe it's an html5 input
-			elseif (in_array($field['type'], array('url', 'search', 'date', 'email', 'color')))
+			// Maybe it's a HTML5 input
+			elseif (in_array($field['type'], ['url', 'search', 'date', 'email', 'color']))
 			{
 				echo '
 						<input type="', $field['type'], '" name="', $key, '" id="', $key, '" size="', empty($field['size']) ? 30 : $field['size'], '" value="', $field['value'], '" ', $field['input_attr'], ' class="input_', $field['type'] == 'password' ? 'password' : 'text', '" />';
@@ -1245,7 +1245,7 @@ function template_profile_group_manage()
 }
 
 /**
- * Callback function for entering a birth date!
+ * Callback function for entering a birthdate!
  */
 function template_profile_birthdate()
 {
@@ -1435,7 +1435,7 @@ function template_profile_avatar_select()
 									<input type="file" name="attachment" id="avatar_upload_box" class="input_file" accept="image/*" onchange="previewUploadedAvatar(this)"/>
 									', ($context['member']['avatar']['id_attach'] > 0 ? '
 									<br /><br />
-									<img id="current_avatar" class="avatar avatarresize" src="' . $context['member']['avatar']['href'] . (strpos($context['member']['avatar']['href'], '?') === false ? '?' : '&') . 'time=' . time() . '" alt="" />
+									<img id="current_avatar" class="avatar avatarresize" src="' . $context['member']['avatar']['href'] . (!str_contains($context['member']['avatar']['href'], '?') ? '?' : '&') . 'time=' . time() . '" alt="" />
 									<div id="current_avatar_new" class="hide">
 										<img id="current_avatar_new_preview" class="avatar avatarresize border_error" style="vertical-align: middle" alt="" src="" />
 										<span>' . $txt['preview'] . '</span>
@@ -1563,7 +1563,7 @@ function template_profile_theme_pick()
 }
 
 /**
- * Interface to allow the member to change the way they login to the forum.
+ * Interface to allow the member to change the way they log in to the forum.
  */
 function template_authentication_method()
 {

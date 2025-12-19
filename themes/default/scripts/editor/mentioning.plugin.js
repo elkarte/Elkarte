@@ -10,7 +10,7 @@
 
 /**
  * This file contains javascript associated with the @mentions function as it
- * relates to an sceditor invocation
+ * relates to a sceditor invocation
  */
 var disableDrafts = false;
 
@@ -62,7 +62,7 @@ var disableDrafts = false;
 
 					return items;
 				},
-				// Well then lets make a find member suggest call
+				// Well then let's make a find member suggest call
 				remoteFilter: function (query, callback)
 				{
 					// Let be easy-ish on the server, don't go looking until we have at least two characters
@@ -289,7 +289,7 @@ var disableDrafts = false;
 
 		base.init = function ()
 		{
-			// Grab this instance for use use in oMentions
+			// Grab this instance for use in oMentions
 			editor = this;
 		};
 
@@ -309,7 +309,7 @@ var disableDrafts = false;
 			add_elk_mention(oMentions.opts.editor_id, {isPlugin: true});
 			oMentions.attachAtWho($(sceditor_textarea), {});
 
-			// Using wysiwyg, then lets attach atwho to it
+			// Using wysiwyg, then let's attach atwho to it
 			if (!instance.opts.runWithoutWysiwygSupport)
 			{
 				// We need to monitor the iframe window and body to text input

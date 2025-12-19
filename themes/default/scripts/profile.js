@@ -65,7 +65,7 @@ function autoDetectTimeOffset (currentTime)
 		return 0;
 	}
 
-	// Get the difference between the two, set it up so that the sign will tell us who is ahead of who.
+	// Get the difference between the two, set it up so that the sign will tell us who is ahead of whom.
 	let diff = Math.round((localTime.getTime() - serverTime.getTime()) / 3600000);
 
 	// Make sure we are limiting this to one day's difference.
@@ -131,7 +131,7 @@ function calcCharLeft (init, event = {})
 		}
 	}
 
-	document.getElementById('signatureLeft').innerHTML = maxLength - currentChars;
+	document.getElementById('signatureLeft').innerHTML = String(maxLength - currentChars);
 }
 
 /**

@@ -302,7 +302,7 @@ function template_reported_posts()
 		$report['title'] = '<strong>' . (empty($report['board_name']) ? '' : '<a href="' . $scripturl . '?board=' . $report['board'] . '.0">' . $report['board_name'] . '</a> / ') . '<a href="' . $report['topic_href'] . '">' . $report['subject'] . '</a></strong> ' . $txt['mc_reportedp_by'] . ' <strong>' . $report['author']['link'] . '</strong>';
 
 		// Prepare the comments...
-		$comments = array();
+		$comments = [];
 		foreach ($report['comments'] as $comment)
 		{
 			$comments[$comment['member']['id']] = $comment['member']['link'];
@@ -322,7 +322,7 @@ function template_reported_posts()
 	}
 	else
 	{
-		template_pagesection(false, '', array('extra' => !$context['view_closed'] && !empty($options['display_quick_mod']) ? '<input type="submit" name="close_selected" value="' . $txt['mc_reportedp_close_selected'] . '" class="right_submit" />' : ''));
+		template_pagesection(false, '', ['extra' => !$context['view_closed'] && !empty($options['display_quick_mod']) ? '<input type="submit" name="close_selected" value="' . $txt['mc_reportedp_close_selected'] . '" class="right_submit" />' : '']);
 	}
 
 	echo '
@@ -388,7 +388,7 @@ function template_unapproved_posts()
 
 	if (!empty($context['unapproved_items']))
 	{
-		template_pagesection(false, '', array('extra' => $quick_mod));
+		template_pagesection(false, '', ['extra' => $quick_mod]);
 	}
 
 	echo '
@@ -464,7 +464,7 @@ function template_viewmodreport()
 /**
  * Callback function for showing a watched users post in the table.
  *
- * @param mixed[] $post
+ * @param array $post
  */
 function template_user_watch_post_callback($post)
 {
