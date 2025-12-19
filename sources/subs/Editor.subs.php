@@ -213,6 +213,13 @@ function loadEditorPlugins($editor_context)
 		$neededCSS[] = 'sceditor.giphy.css';
 	}
 
+	if (!empty($modSettings['enableTenor']))
+	{
+		$plugins[] = 'tenor';
+		$neededJS[] = 'editor/tenor.plugin.js';
+		$neededCSS[] = 'sceditor.tenor.css';
+	}
+
 	if (!empty($neededJS))
 	{
 		loadJavascriptFile($neededJS, ['defer' => true]);
@@ -384,7 +391,7 @@ function loadToolbarDefaults()
 	$bbc_tags['row1'] = [
 		['bold', 'italic', 'underline', 'strike'],
 		['left', 'center', 'right', 'pre'],
-		['image', 'link', 'giphy'],
+		['image', 'link', 'giphy', 'tenor'],
 		['bulletlist', 'orderedlist'],
 		['source', 'expand'],
 	];

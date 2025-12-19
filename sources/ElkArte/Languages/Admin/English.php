@@ -669,6 +669,12 @@ $txt['giphyRating'] = 'Permitted Giphy rating';
 $txt['giphyLanguage'] = 'Giphy language code, defaults to en';
 $txt['giphyLanguageURL'] = '<a href="https://developers.giphy.com/docs/optional-settings/#language-support">Language Codes</a>';
 $txt['giphyApiURL'] = '<a href="https://support.giphy.com/hc/en-us/articles/360020283431-Request-A-GIPHY-API-Key">Request API Key</a>';
+$txt['enableTenor'] = 'Enable the Tenor plugin';
+$txt['tenorApiKey'] = 'Enter you Tenor API key';
+$txt['tenorRating'] = 'Permitted Tenor content filter';
+$txt['tenorLanguage'] = 'Tenor language code, defaults to en';
+$txt['tenorLanguageURL'] = '<a href="https://developers.google.com/tenor/guides/languages">Language Codes</a>';
+$txt['tenorApiURL'] = '<a href="https://developers.google.com/tenor/guides/quickstart#setup">Request API Key</a>';
 
 $txt['nofollow_allowlist'] = 'Allow listed domains without nofollow attribute';
 $txt['nofollow_allowlist_desc'] = 'The domains listed here (one per line) will always be presented without the nofollow attribute';
