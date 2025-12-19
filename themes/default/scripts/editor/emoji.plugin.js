@@ -21,7 +21,7 @@ var disableDrafts = false;
 	// Editor instance
 	let editor;
 
-	// Populated with unicode key, file type and location when shortname is found in emojis array
+	// Populated with Unicode key, file type and location when shortname is found in emojis array
 	let emojiskey,
 		emojistype,
 		emojisurl;
@@ -179,7 +179,7 @@ var disableDrafts = false;
 			}
 		});
 
-		// Don't save a draft due to a emoji window open/close
+		// Don't save a draft due to an emoji window open/close
 		if (Object.keys(oIframeWindow).length)
 		{
 			$(oIframeWindow).on("shown.atwho", function (event, offset)
@@ -227,7 +227,7 @@ var disableDrafts = false;
 		str = instance.getWysiwygEditorValue(false);
 
 		// Only convert emoji outside <code> tags.  *Note* if you have both icode and code tags in the
-		// same message and they both have emoji, this may process one or both, but its wizzy so it is
+		// same message and they both have emoji, this may process one or both, but it's wizzy so it is
 		// not actually supposed to be correct :P  Post will be correct.
 		code_regex.forEach((split_regex) =>
 		{
@@ -369,7 +369,7 @@ var disableDrafts = false;
 				// Attach atwho to the editors source textarea
 				oEmoji.attachAtWho($(sceditor_textarea), {});
 
-				// Using wysiwyg, then lets attach atwho to the wysiwyg container as well
+				// Using wysiwyg, then let's attach atwho to the wysiwyg container as well
 				if (!instance.opts.runWithoutWysiwygSupport)
 				{
 					// We need to monitor the iframe window and body to text input

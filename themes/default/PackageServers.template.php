@@ -195,7 +195,7 @@ function template_package_list()
 							<a class="linkbutton" href="', $package['download']['href'], '">', $txt['download'], '</a>&nbsp;',
 					sprintf($txt['package_update'], '<i class="icon i-warning " title="' . $txt['package_installed_old'] . '"></i>', $txt['package_downloaded']);
 				}
-				// Downloaded, and its current
+				// Downloaded, and it's current
 				elseif ($package['is_downloaded'])
 				{
 					echo '
@@ -242,7 +242,7 @@ function template_package_list()
 				}
 
 				// Nothing but hooks ?
-				if ($package['hooks'] !== '' && in_array($package['hooks'], array('yes', 'true')))
+				if ($package['hooks'] !== '' && in_array($package['hooks'], ['yes', 'true']))
 				{
 					echo '
 								<li>', $txt['mod_hooks'], ' <i class="icon i-check"></i></li>';

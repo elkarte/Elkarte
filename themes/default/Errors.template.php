@@ -13,9 +13,9 @@
  */
 
 /**
- * Show an error message.....
+ * Show an error message...
  *
- * It is shown when an error occurs, and should show at least a back
+ * It is shown when a fatal error occurs and should show at least a back
  * button and $context['error_message'].
  */
 function template_fatal_error()
@@ -26,7 +26,7 @@ function template_fatal_error()
 	<div id="fatal_error">
 		<h2 class="category_header">', $context['error_title'], '</h2>
 		<div class="generic_list_wrapper">
-			<div class="errorbox" ', $context['error_code'], '>', $context['error_message'], '</div>
+			<div class="', ($context['error_class'] ?? 'errorbox') . '" ', $context['error_code'], '>', $context['error_message'], '</div>
 		</div>
 	</div>
 	<div class="centertext">
@@ -35,7 +35,7 @@ function template_fatal_error()
 }
 
 /**
- * Shows the forum error log in all its detail
+ * Shows the forum error log in all it's detail
  * Supports filtering for viewing all errors of a 'type'
  */
 function template_error_log()
@@ -64,7 +64,7 @@ function template_error_log()
 					<td colspan="3">
 						&nbsp;&nbsp;', $txt['apply_filter_of_type'], ':';
 
-	$error_types = array();
+	$error_types = [];
 	foreach ($context['error_types'] as $details)
 	{
 		$error_types[] = ($details['is_selected'] ? '<img src="' . $settings['images_url'] . '/selected.png" alt="" /> ' : '') . '<a href="' . $details['url'] . '" ' . ($details['is_selected'] ? 'class="selected"' : '') . ' title="' . $details['description'] . '">' . $details['label'] . '</a>';

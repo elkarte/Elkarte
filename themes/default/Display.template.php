@@ -102,7 +102,7 @@ function template_messages_informations_above()
 }
 
 /**
- * The main template for displaying a topic, does it all, its the king, the bomb, the real deal
+ * The main template for displaying a topic, does it all, it's the king, the bomb, the real deal
  */
 function template_messages()
 {
@@ -390,7 +390,7 @@ function template_quickreply_below()
 		if (empty($options['hide_poster_area']))
 		{
 			echo '
-				<ul class="poster no_js">', template_build_poster_div($context['thisMember'], false), '</ul>';
+				<ul class="poster no_js">', template_build_poster_div($context['thisMember']), '</ul>';
 		}
 
 		// Make a postarea similar to post
@@ -753,7 +753,7 @@ function template_moderation_buttons_below()
 				<i class="icon icon-lg i-menu hamburger_30" data-id="moderationbuttons"></i>';
 	}
 
-	template_button_strip($context['mod_buttons'], '', array('id' => 'moderationbuttons_strip'));
+	template_button_strip($context['mod_buttons'], '', ['id' => 'moderationbuttons_strip']);
 
 	// Show the jump-to box, or actually...let Javascript do it.
 	echo '

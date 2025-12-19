@@ -228,12 +228,12 @@ function template_maintain_members()
 		<form action="', $scripturl, '?action=admin;area=maintain;sa=members;activity=purgeinactive" method="post" accept-charset="UTF-8" id="membersForm">
 			<div class="content">
 				<a id="membersLink"></a>',
-				str_replace(array('{select_conditions}', '{num_days}'), array('
+				str_replace(['{select_conditions}', '{num_days}'], ['
 					<select name="del_type">
 						<option value="activated" selected="selected">' . $txt['maintain_members_activated'] . '</option>
 						<option value="logged">' . $txt['maintain_members_logged_in'] . '</option>
 					</select>', ' <input type="text" name="maxdays" value="30" size="3" class="input_text" />'
-				),
+				],
 				$txt['maintain_members_since']), '
 			</div>';
 

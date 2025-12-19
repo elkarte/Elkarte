@@ -36,7 +36,7 @@ function elkMenu (menuRef)
 }
 
 /**
- * Setup the menu to work with click / keyboard events instead of :hover
+ * Set up the menu to work with click / keyboard events instead of :hover
  */
 elkMenu.prototype.initMenu = function() {
 	// Setup enter/spacebar keys to trigger a click on the "Skip to main content" link
@@ -73,12 +73,12 @@ elkMenu.prototype.initMenu = function() {
 		this.docClick();
 	}
 
-	// Setup the subMenus (menulevel2, menulevel3) to open when clicked
+	// Set up the subMenus (menulevel2, menulevel3) to open when clicked
 	this.submenuReveal(subMenu);
 };
 
 /**
- * CLose menu when clicked outside its structure
+ * CLose menu when clicked outside it's structure
  */
 elkMenu.prototype.docClick = function() {
     document.body.addEventListener('click', function(e) {
@@ -153,7 +153,7 @@ elkMenu.prototype.submenuReveal = function(subMenu) {
 			// Reset all sublinks in this menu
 			this.resetSubLinks(subLink);
 
-			// If its not open, lets show it as selected
+			// If it's not open, let's show it as selected
 			if (!e.currentTarget.classList.contains('open'))
 			{
 				// Don't follow the menuLink (if any) when first opening the submenu

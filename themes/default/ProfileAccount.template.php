@@ -55,7 +55,7 @@ function template_issueWarning()
 
 	foreach ($context['notification_templates'] as $limit => $type)
 	{
-		echo $limit, ' :"', strtr($type['body'], array('"' => "'", "\n" => '\\n', "\r" => '')), '", ';
+		echo $limit, ' :"', strtr($type['body'], ['"' => "'", "\n" => '\\n', "\r" => '']), '", ';
 	}
 
 	echo '};

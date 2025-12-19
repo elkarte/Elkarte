@@ -314,7 +314,7 @@ h2 a.collapse {
 }
 
 /* Level 3: drop menu positioning, move to a a flyout position to the left of
-   its disclose arrow */
+   it's disclose arrow */
 .menulevel3 {
 	margin: -2.4rem calc(100% - .6rem) 0 0;
 }

@@ -43,7 +43,7 @@ function template_whos_selection_above()
 				</noscript>
 			</div>';
 
-	template_pagesection(false, '', array('extra' => $extra));
+	template_pagesection(false, '', ['extra' => $extra]);
 }
 
 /**
@@ -58,10 +58,10 @@ function template_whos_online()
 				<dl class="whos_online', empty($context['members']) ? ' no_members' : '', '">
 					<dt class="table_head">
 						<div class="online_member">
-							<a href="', $scripturl, '?action=who;start=', $context['start'], ';show=', $context['show_by'], ';sort=user', $context['sort_direction'] != 'down' && $context['sort_by'] == 'user' ? '' : ';asc', '" rel="nofollow">', $txt['who_user'], $context['sort_by'] == 'user' ? '<i class="icon i-sort-alpha-' . $context['sort_direction'] . ' icon-small"></i>' : '', '</a>
+							<a href="', $scripturl, '?action=who;start=', $context['start'], ';show=', $context['show_by'], ';sort=user', $context['sort_direction'] !== 'down' && $context['sort_by'] === 'user' ? '' : ';asc', '" rel="nofollow">', $txt['who_user'], $context['sort_by'] === 'user' ? '<i class="icon i-sort-alpha-' . $context['sort_direction'] . ' icon-small"></i>' : '', '</a>
 						</div>
 						<div class="online_time">
-							<a href="', $scripturl, '?action=who;start=', $context['start'], ';show=', $context['show_by'], ';sort=time', $context['sort_direction'] == 'down' && $context['sort_by'] == 'time' ? ';asc' : '', '" rel="nofollow">', $txt['who_time'], $context['sort_by'] == 'time' ? '<i class="icon i-sort-numeric-' . $context['sort_direction'] . ' icon-small"></i>' : '', '</a>
+							<a href="', $scripturl, '?action=who;start=', $context['start'], ';show=', $context['show_by'], ';sort=time', $context['sort_direction'] === 'down' && $context['sort_by'] === 'time' ? ';asc' : '', '" rel="nofollow">', $txt['who_time'], $context['sort_by'] === 'time' ? '<i class="icon i-sort-numeric-' . $context['sort_direction'] . ' icon-small"></i>' : '', '</a>
 						</div>
 						<div class="online_action">', $txt['who_action'], '</div>
 					</dt>';
@@ -97,7 +97,7 @@ function template_whos_online()
 	{
 		echo '
 				<div class="well centertext">
-					', $txt['who_no_online_' . ($context['show_by'] == 'guests' || $context['show_by'] == 'spiders' ? $context['show_by'] : 'members')], '
+					', $txt['who_no_online_' . ($context['show_by'] === 'guests' || $context['show_by'] === 'spiders' ? $context['show_by'] : 'members')], '
 				</div>';
 	}
 
@@ -130,7 +130,7 @@ function template_whos_selection_below()
 				</noscript>
 			</div>';
 
-	template_pagesection(false, '', array('extra' => $extra));
+	template_pagesection(false, '', ['extra' => $extra]);
 
 	echo '
 		</form>

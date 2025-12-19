@@ -50,7 +50,7 @@
 
 		this.opts = Object.assign({}, this.defaults, options || {});
 
-		// Setup our event listeners, onscroll, keyup and click
+		// Set up our event listeners, onscroll, keyup and click
 		const self = this;
 		this.opts.dropDown.querySelector('#giphy_results').onscroll = (event) => {
 			self.scrolling(event.target);
@@ -211,7 +211,7 @@
 	};
 
 	/**
-	 * Displays a spinner overlay on the Elk_Giphy instance's container element while its fetching results
+	 * Displays a spinner overlay on the Elk_Giphy instance's container element while it's fetching results
 	 */
 	Elk_Giphy.prototype.showSpinnerOverlay = function () {
 		let parentDiv = document.getElementById('giphy_results');
@@ -266,7 +266,7 @@
 			// Grab this instance for use in Giphy
 			editor = this;
 
-			oGiphy = new Elk_Giphy();
+			oGiphy = new Elk_Giphy({});
 			oGiphy.editor = editor;
 
 			// Add the command, will also show our toolbar button

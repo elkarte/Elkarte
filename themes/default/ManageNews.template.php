@@ -332,7 +332,7 @@ function template_email_members_send()
 	foreach ($context['recipients'] as $key => $values)
 	{
 		echo '
-					<input type="hidden" name="', $key, '" value="', implode(($key == 'emails' ? ';' : ','), $values), '" />';
+					<input type="hidden" name="', $key, '" value="', implode(($key === 'emails' ? ';' : ','), $values), '" />';
 	}
 
 	echo '

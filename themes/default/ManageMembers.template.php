@@ -234,7 +234,7 @@ function template_admin_browse()
 
 	template_show_list('approve_list');
 
-	// If we have lots of outstanding members try and make the admin's life easier.
+	// If we have lots of outstanding members, try and make the admin's life easier.
 	if ($context['approve_list']['total_num_items'] > 10)
 	{
 		echo '
@@ -255,7 +255,7 @@ function template_admin_browse()
 					else if (document.forms.postFormOutstanding.todo.value === "remind")
 						message = "', $txt['admin_browse_w_remind'], '";
 					else
-						message = "', $context['browse_type'] == 'approve' ? $txt['admin_browse_w_approve'] : $txt['admin_browse_w_activate'], '";
+						message = "', $context['browse_type'] === 'approve' ? $txt['admin_browse_w_approve'] : $txt['admin_browse_w_activate'], '";
 
 					if (confirm(message + " ', $txt['admin_browse_outstanding_warn'], '"))
 						return true;
@@ -277,14 +277,14 @@ function template_admin_browse()
 					</dt>
 					<dd>
 						<select id="todo" name="todo">
-							', $context['browse_type'] == 'activate' ? '
+							', $context['browse_type'] === 'activate' ? '
 							<option value="ok">' . $txt['admin_browse_w_activate'] . '</option>' : '', '
-							<option value="okemail">', $context['browse_type'] == 'approve' ? $txt['admin_browse_w_approve'] : $txt['admin_browse_w_activate'], ' ', $txt['admin_browse_w_email'], '</option>', $context['browse_type'] == 'activate' ? '' : '
+							<option value="okemail">', $context['browse_type'] === 'approve' ? $txt['admin_browse_w_approve'] : $txt['admin_browse_w_activate'], ' ', $txt['admin_browse_w_email'], '</option>', $context['browse_type'] === 'activate' ? '' : '
 							<option value="require_activation">' . $txt['admin_browse_w_approve_require_activate'] . '</option>', '
 							<option value="reject">', $txt['admin_browse_w_reject'], '</option>
 							<option value="rejectemail">', $txt['admin_browse_w_reject'], ' ', $txt['admin_browse_w_email'], '</option>
 							<option value="delete">', $txt['admin_browse_w_delete'], '</option>
-							<option value="deleteemail">', $txt['admin_browse_w_delete'], ' ', $txt['admin_browse_w_email'], '</option>', $context['browse_type'] == 'activate' ? '
+							<option value="deleteemail">', $txt['admin_browse_w_delete'], ' ', $txt['admin_browse_w_email'], '</option>', $context['browse_type'] === 'activate' ? '
 							<option value="remind">' . $txt['admin_browse_w_remind'] . '</option>' : '', '
 						</select>
 					</dd>
@@ -308,7 +308,7 @@ function template_admin_browse()
 }
 
 /**
- * Generate membergroup actions pull down form
+ * Generate membergroup actions pull-down form
  *
  * @param array $groups
  *

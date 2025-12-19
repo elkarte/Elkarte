@@ -86,25 +86,29 @@ const elkPwa = (opt) => {
 
 	function removeServiceWorker()
 	{
-		// Remove service worker if found
-		if ('serviceWorker' in navigator)
+		// Remove a service worker if found
+		function removeServiceWorker ()
 		{
-			navigator.serviceWorker.getRegistrations()
-				.then(allRegistrations => {
-					let scope = getScope();
+			// Remove service worker if found
+			if ('serviceWorker' in navigator)
+			{
+				navigator.serviceWorker.getRegistrations()
+					.then(allRegistrations => {
+						let scope = getScope();
 
-					Object.values(allRegistrations).forEach(registration => {
-						if (getScope(registration.scope) === scope)
-						{
-							sendMessage('clearAllCache');
-							registration.unregister();
-							if ('console' in window && console.info)
+						Object.values(allRegistrations).forEach(async registration => {
+							if (getScope(registration.scope) === scope)
 							{
-								console.info('[Info] Service worker removed: ', registration.scope);
+								sendMessage('clearAllCache');
+								await registration.unregister();
+								if ('console' in window && console.info)
+								{
+									console.info('[Info] Service worker removed: ', registration.scope);
+								}
 							}
-						}
+						});
 					});
-				});
+			}
 		}
 	}
 

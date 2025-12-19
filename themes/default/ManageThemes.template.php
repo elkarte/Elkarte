@@ -86,7 +86,7 @@ function template_manage_themes()
 								<option value="-1" selected="selected">', $txt['theme_nochange'], '</option>
 								<option value="0">', $txt['theme_forum_default'], '</option>';
 
-	// Same thing, this time for changing the theme of everyone.
+	// The same thing, this time for changing the theme of everyone.
 	foreach ($context['themes'] as $theme)
 	{
 		echo '
@@ -185,7 +185,7 @@ function template_list_themes()
 
 		<form id="admin_form_wrapper" action="', $scripturl, '?action=admin;area=theme;', $context['session_var'], '=', $context['session_id'], ';sa=list" method="post" accept-charset="UTF-8">';
 
-	// Show each theme.... with X for delete and a link to settings.
+	// Show each theme... with X for delete and a link to settings.
 	foreach ($context['themes'] as $theme)
 	{
 		echo '
@@ -317,7 +317,7 @@ function template_set_options()
 		echo '
 					<dt>';
 
-		// Show the change option box ?
+		// Show the change option box?
 		if ($context['theme_options_reset'])
 		{
 			echo '
@@ -329,7 +329,7 @@ function template_set_options()
 		}
 
 		// Display checkbox options
-		if ($setting['type'] == 'checkbox')
+		if ($setting['type'] === 'checkbox')
 		{
 			echo '
 						<label for="options_', $setting['id'], '">', $setting['label'], '</label>';
@@ -345,8 +345,8 @@ function template_set_options()
 						<input type="hidden" name="' . (empty($setting['default']) ? '' : 'default_') . 'options[' . $setting['id'] . ']" value="0" />
 						<input type="checkbox" name="', empty($setting['default']) ? '' : 'default_', 'options[', $setting['id'], ']" id="options_', $setting['id'], '"', empty($setting['value']) ? '' : ' checked="checked"', $context['theme_options_reset'] ? ' disabled="disabled"' : '', ' value="1" class="input_check floatleft" />';
 		}
-		// How about selection lists, we all love them
-		elseif ($setting['type'] == 'list')
+		// How about selection lists, we all love them!
+		elseif ($setting['type'] === 'list')
 		{
 			echo '
 						<label for="options_', $setting['id'], '">', $setting['label'], '</label>';
@@ -386,7 +386,7 @@ function template_set_options()
 			echo '
 					</dt>
 					<dd>
-						<input type="text" name="', empty($setting['default']) ? '' : 'default_', 'options[', $setting['id'], ']" id="options_', $setting['id'], '" value="', $setting['value'], '"', $setting['type'] == 'number' ? ' size="5"' : '', $context['theme_options_reset'] ? ' disabled="disabled"' : '', ' class="input_text" />';
+						<input type="text" name="', empty($setting['default']) ? '' : 'default_', 'options[', $setting['id'], ']" id="options_', $setting['id'], '" value="', $setting['value'], '"', $setting['type'] === 'number' ? ' size="5"' : '', $context['theme_options_reset'] ? ' disabled="disabled"' : '', ' class="input_text" />';
 		}
 
 		// End of this definition
@@ -408,7 +408,7 @@ function template_set_options()
 }
 
 /**
- * Allows to set settings for a theme.
+ * Allows setting settings for a theme.
  */
 function template_set_settings()
 {
@@ -609,7 +609,7 @@ function template_set_settings()
 			echo '
 					</dt>
 					<dd id="dd_', $setting['id'], '">
-						<input type="text" name="', empty($setting['default']) ? '' : 'default_', 'options[', $setting['id'], ']" id="', $setting['id'], '" value="', $setting['value'], '"', $setting['type'] == 'number' ? ' size="5"' : (empty($setting['size']) ? ' size="40"' : ' size="' . $setting['size'] . '"'), ' class="input_text" />
+						<input type="text" name="', empty($setting['default']) ? '' : 'default_', 'options[', $setting['id'], ']" id="', $setting['id'], '" value="', $setting['value'], '"', $setting['type'] === 'number' ? ' size="5"' : (empty($setting['size']) ? ' size="40"' : ' size="' . $setting['size'] . '"'), ' class="input_text" />
 					</dd>';
 		}
 	}

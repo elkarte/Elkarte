@@ -26,13 +26,13 @@ var ua = navigator.userAgent.toLowerCase(),
  * Load a document using fetch API.
  *
  * It will validate the server returned an `ok` response
- * It will parse out the data as XML, JSON or Plain based on passed
+ * It will parse out the data as XML, JSON, or Plain based on passed
  * sType, defaulting to XML for historical reasons.
  *
  * @callback Callback
  * @param {string} sUrl
  * @param {function} funcCallback
- * @param {string} sType xml, json, html, defaults to xml
+ * @param {string} sType XML, JSON, HTML, defaults to XML
  * @param {boolean} bHeader true sends X-Requested-With, expected by elkarte
  */
 function fetchDocument (sUrl, funcCallback, sType = null, bHeader = true)
@@ -55,7 +55,7 @@ function fetchDocument (sUrl, funcCallback, sType = null, bHeader = true)
 
 	fetch(sUrl, init)
 		.then(response => {
-			// Process the response as xml, json or plain text
+			// Process the response as XML, JSON or plain text
 			const contentType = response.headers.get('content-type');
 
 			if (!response.ok || response.status !== 200 || !contentType)
@@ -402,7 +402,7 @@ function isEmptyText (theField)
 {
 	let theValue;
 
-	// Copy the value so changes can be made..
+	// Copy the value so changes can be made.
 	if (typeof (theField) === 'string')
 	{
 		theValue = theField;
@@ -445,7 +445,7 @@ function submitThisOnce (oControl, bReadOnly)
 		aTextareas[i].readOnly = bReadOnly;
 	}
 	// If in a second the form is not gone, there may be a problem somewhere
-	// (e.g. HTML5 required attribute), so release the textarea
+	// (e.g., HTML5 required attribute), so release the textarea
 	window.setTimeout(function() {
 		submitThisOnce(oControl, false);
 	}, 1000);
@@ -607,7 +607,7 @@ window.setTimeout(function() {
  *
  * @param {string} option name being set
  * @param {string} value of the option
- * @param {string|null} theme its being set or null for all
+ * @param {string|null} theme it's being set or null for all
  * @param {string|null} additional_vars to use in the url request that will be sent
  */
 function elk_setThemeOption (option, value, theme, additional_vars)
@@ -675,9 +675,9 @@ Elk_Cookie.prototype.set = function(sKey, sValue) {
 /**
  * elk_Toggle class.
  *
- * Collapses a section of the page
- * Swaps the collapsed section class or image to indicate the state
- * Updates links to indicate state and allow reversal of the action
+ * Collapses a section of the page.
+ * Swaps the collapsed section class or image to indicate the state.
+ * Updates links to indicate state and allow reversal of the action.
  * Saves state in a cookie and/or in a theme setting option so the last state
  * is remembered for the user.
  *
@@ -744,7 +744,7 @@ elk_Toggle.prototype.init = function() {
 				};
 				oImage.style.cursor = 'pointer';
 
-				// Pre-load the collapsed image.
+				// Preload the collapsed image.
 				smc_preCacheImage(this.opt.aSwapImages[i].srcCollapsed);
 			}
 		}
@@ -858,7 +858,7 @@ elk_Toggle.prototype.changeState = function(bCollapse, bInit) {
 			{
 				// Only (re)load the image if it's changed.
 				let sTargetSource = bCollapse ? this.opt.aSwapImages[i].srcCollapsed : this.opt.aSwapImages[i].srcExpanded;
-				if (oImage.src != sTargetSource)
+				if (oImage.src !== sTargetSource)
 				{
 					oImage.src = sTargetSource;
 				}
@@ -978,8 +978,8 @@ function ajax_indicator (turn_on)
 }
 
 /**
- * Creates and event listener object for a given object
- * Object events can then be added with addEventListener
+ * Creates an event listener object for a given object.
+ * Object events can then be added with addEventListener.
  *
  * @param {HTMLElement} oTarget
  */
@@ -1055,7 +1055,7 @@ function onJumpReceived (oXMLDoc)
  * Passed object of options can contain:
  * sContainerId: container id to place the list in
  * sClassName: class name to assign items added to the dropdown
- * sJumpToTemplate: html template to wrap the %dropdown_list%
+ * sJumpToTemplate: HTML template to wrap the %dropdown_list%
  * iCurBoardId: id of the board current active
  * iCurBoardChildLevel: child level of the currently active board
  * sCurBoardName: name of the currently active board
@@ -1080,7 +1080,7 @@ function JumpTo (oJumpToOptions)
 	this.dropdownList = null;
 	this.showSelect();
 
-	// No need to wait until a mouse event, poor usability, page jump, etc
+	// No need to wait until a mouse event, poor usability, page jump, etc.
 	if (this.opt.bOnLoad)
 	{
 		window.addEventListener('load', grabJumpToContent);
@@ -1190,12 +1190,12 @@ JumpTo.prototype.fillSelect = function(aBoardsAndCategories) {
 		this.dropdownList.onchange = function() {
 			if (this.selectedIndex >= 0 && this.options[this.selectedIndex].value)
 			{
-				window.location.href = elk_scripturl + this.options[this.selectedIndex].value.substr(elk_scripturl.indexOf('?') === -1 || this.options[this.selectedIndex].value.substr(0, 1) !== '?' ? 0 : 1);
+				window.location.href = elk_scripturl + this.options[this.selectedIndex].value.substring(elk_scripturl.indexOf('?') === -1 || this.options[this.selectedIndex].value.substring(0, 1) !== '?' ? 0 : 1);
 			}
 		};
 	}
 
-	// Handle custom function hook before showing the new select.
+	// Handle a custom function hook before showing the new select.
 	if ('funcOnBeforeCollapse' in this.opt)
 	{
 		this.tmpMethod = this.opt.funcOnBeforeCollapse;
@@ -1207,9 +1207,9 @@ JumpTo.prototype.fillSelect = function(aBoardsAndCategories) {
 /**
  * IconList object.
  *
- * Allows clicking on a icon to expand out the available options to change
- * Change is done via ajax
- * Used for topic icon and member group icon selections
+ * Allows clicking on an icon to expand out the available options to change.
+ * Change is done via ajax.
+ * Used for topic icon and member group icon selections.
  *
  * Available options
  *	sBackReference:
@@ -1296,7 +1296,7 @@ IconList.prototype.openPopup = function(oDiv, iMessageId) {
 	document.body.addEventListener('mousedown', this.onWindowMouseDown, false);
 };
 
-// Setup the list of icons once it is received through xmlHTTP.
+// Set up the list of icons once it is received through xmlHTTP.
 IconList.prototype.onIconsReceived = function(oXMLDoc) {
 	let icons = oXMLDoc.getElementsByTagName('elk')[0].getElementsByTagName('icon'),
 		sItems = '';
@@ -1402,7 +1402,7 @@ IconList.prototype.collapseList = function() {
 
 /**
  * Short function for finding the actual screen position of an item.
- * Used for example to position the suggest member name box
+ * Used, for example, to position the suggested member name box
  *
  * @param {object} itemHandle
  */
@@ -1452,7 +1452,7 @@ function elkSelectText (oCurElement, bActOnElement)
 {
 	let oCodeArea;
 
-	// The place we're looking for is one div up, and next door - if it's auto detect.
+	// The place we're looking for is one div up, and next door - if it's auto-detect.
 	if (typeof (bActOnElement) === 'boolean' && bActOnElement)
 	{
 		oCodeArea = document.getElementById(oCurElement);
@@ -1594,7 +1594,7 @@ function toggleLinked (form)
 }
 
 /**
- * load event for search for and PM search, un escapes any existing search
+ * load event for search for and PM search, unescapes any existing search
  * value for back button or change search etc.
  */
 function initSearch ()

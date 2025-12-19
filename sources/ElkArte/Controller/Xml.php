@@ -191,7 +191,7 @@ class Xml extends AbstractController
 				{
 					$feature = $context['features'][$id];
 					$feature_id = 'feature_' . $id;
-					$is_checked = $this->_req->hasPost($feature_id);
+					$is_checked = $this->_req->getPost($feature_id, 'intval', 0);
 					$feature_title = ($is_checked && $feature['url'] ? '<a href="' . $feature['url'] . '">' . $feature['title'] . '</a>' : $feature['title']);
 					$returns[] = [
 						'value' => $feature_title,
@@ -230,7 +230,7 @@ class Xml extends AbstractController
 		$context['sub_template'] = 'generic_xml';
 		theme()->addJavascriptVar(['core_settings_generic_error' => $txt['core_settings_generic_error']], true);
 
-		$message = str_replace('{core_feature}', $feature_title, !empty($feature_id) && $this->_req->hasPost($feature_id) ? $txt['core_settings_activation_message'] : $txt['core_settings_deactivation_message']);
+		$message = str_replace('{core_feature}', $feature_title, !empty($feature_id) && $this->_req->getPost($feature_id, 'intval', 0) === 1 ? $txt['core_settings_activation_message'] : $txt['core_settings_deactivation_message']);
 		$context['xml_data'] = [
 			'corefeatures' => [
 				'identifier' => 'corefeature',

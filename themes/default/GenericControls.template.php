@@ -13,7 +13,7 @@
  */
 
 /**
- * This function displays all the goodies you get with a richedit box - BBC, smileys etc.
+ * This function displays all the goodies you get with a richedit box - BBC, smileys, etc.
  *
  * @param string $editor_id
  *
@@ -80,7 +80,7 @@ function template_control_richedit($editor_id)
 }
 
 /**
- * Shows the buttons that the user can see .. preview, post, draft etc
+ * Shows the buttons that the user can see ... preview, post, draft, etc
  *
  * @param string $editor_id
  *

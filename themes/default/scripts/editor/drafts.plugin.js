@@ -10,7 +10,7 @@
 
 /**
  * This file contains javascript associated with the drafts auto function as it
- * relates to an sceditor invocation
+ * relates to a sceditor invocation
  */
 
 (function (sceditor) {
@@ -70,12 +70,12 @@
 
 		let inputSaveDraft = document.createElement('input');
 		inputSaveDraft.setAttribute('name', 'save_draft');
-		inputSaveDraft.value = 1;
+		inputSaveDraft.value = "1";
 		oForm.appendChild(inputSaveDraft);
 
 		let inputAutosave = document.createElement('input');
 		inputAutosave.setAttribute('name', 'autosave');
-		inputAutosave.value = 1;
+		inputAutosave.value = "1";
 		oForm.appendChild(inputAutosave);
 
 		let inputMessageMode = document.createElement('input');
@@ -184,7 +184,7 @@
 	 * - turns off _bInDraftMode so another save request can fire
 	 *
 	 * @type {xmlCallback}
-	 * @param {string[]} post
+	 * @param {string|string[]} post
 	 * @param {string} action
 	 */
 	Elk_Drafts.prototype.draftAjax = function (post, action)
@@ -308,7 +308,7 @@
 	/**
 	 * Signals that one of the post/pm/qr form buttons was pressed
 	 *
-	 * - Used to prevent saving an auto draft on input button (post, save, etc)
+	 * - Used to prevent saving an auto draft on input button (post, save, etc.)
 	 */
 	Elk_Drafts.prototype.formCheck = function ()
 	{
@@ -409,7 +409,7 @@
 			}
 			else
 			{
-				// Lets save the draft then
+				// let's save the draft then
 				if (oDrafts.opts.bPM)
 				{
 					oDrafts.draftPMSave();

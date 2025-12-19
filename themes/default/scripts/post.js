@@ -26,7 +26,7 @@ var bPost;
 
 function previewControl ()
 {
-	// Lets make a background preview request
+	// let's make a background preview request
 	bPost = false;
 
 	// call the needed preview function
@@ -465,7 +465,7 @@ function addAttachment ()
 /**
  * A function used to clear the attachments on post page.  For security reasons
  * browsers don't let you set the value of a file input, even to an empty string
- * so this work around lets the user clear a choice.
+ * so this workaround lets the user clear a choice.
  *
  * @param {string} idElement
  */

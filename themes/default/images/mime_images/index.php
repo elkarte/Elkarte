@@ -11,4 +11,6 @@ if (file_exists(dirname(__FILE__, 3) . '/Settings.php'))
 }
 // Can't find it... just forget it.
 else
+{
 	exit;
+}

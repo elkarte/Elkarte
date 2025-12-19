@@ -268,7 +268,7 @@ class Theme extends BaseTheme
 		.wrapper {width: ' . $settings['forum_width'] . ';}');
 		}
 
-		// Localization for the show more quote and its container height
+		// Localization for the show more quote and it's container height
 		$quote_height = empty($modSettings['heightBeforeShowMore']) ? 'none' : $modSettings['heightBeforeShowMore'] . 'px';
 		$this->css->addCSSRules('
 		input[type=checkbox].quote-show-more:after {content: "' . $txt['quote_expand'] . '";}

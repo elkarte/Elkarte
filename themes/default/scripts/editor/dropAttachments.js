@@ -15,7 +15,7 @@
  * Invoke the constructor by calling new dragDropAttachment
  */
 (function() {
-	const dragDropAttachment = (function(params) {
+	this.dragDropAttachment = (function(params) {
 		// Few internal global vars
 		let allowedExtensions = [],
 			curFileNum = 0,
@@ -115,8 +115,6 @@
 			 *
 			 * @param {object} formData current file with data to upload
 			 * @param {object} status current progress bar UI instance
-			 * @param {int} fileSize current progress bar UI instance
-			 * @param {string} fileName current progress bar UI instance
 			 */
 			sendFileToServer = function(formData, status) {
 				const abortController = new AbortController();
@@ -138,7 +136,7 @@
 							}
 						})
 						.on('done', (resp) => {
-							// Well it is done, lets make sure the server says so as well
+							// Well it is done, let's make sure the server says so as well
 							if (resp.detail.result)
 							{
 								let curFileNum = filesUploadedSuccessfully.length,
@@ -539,7 +537,7 @@
 						totalAttachSizeUploaded -= fileSize;
 					}
 
-					// No errors, so update the counters (number, total size, etc)
+					// No errors, so update the counters (number, total size, etc.)
 					// and add this file to the processing queue
 					if (errorFlag === false)
 					{
@@ -704,7 +702,7 @@
 				handleFileUpload(files, obj);
 			});
 
-			// Wait, where are you going?  Lets show you are outside the zone
+			// Wait, where are you going?  let's show you are outside the zone
 			obj.addEventListener('dragexit', function(e) {
 				e.preventDefault();
 				obj.style.opacity = '0.6';
@@ -741,6 +739,4 @@
 			handleFileUpload: handleFileUpload
 		};
 	});
-
-	this.dragDropAttachment = dragDropAttachment;
 }());

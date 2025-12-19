@@ -10,7 +10,7 @@
  */
 
 (function() {
-	const ElkDesktop = (function(opt) {
+	this.ElkDesktop = (function(opt) {
 
 		opt = (opt) ? opt : {};
 
@@ -58,6 +58,4 @@
 			send: send
 		};
 	});
-
-	this.ElkDesktop = ElkDesktop;
 })();

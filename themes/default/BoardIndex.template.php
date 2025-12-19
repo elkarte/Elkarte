@@ -33,7 +33,7 @@ function template_boards_list()
 	// and boards. (see below.)
 	foreach ($context['categories'] as $category)
 	{
-		// If there are no parent boards we can see, avoid showing an empty category (unless its collapsed).
+		// If there are no parent boards we can see, avoid showing an empty category (unless it's collapsed).
 		if (empty($category['boards']) && !$category['is_collapsed'])
 		{
 			continue;
@@ -344,7 +344,7 @@ function template_ic_show_users()
 					', comma_format($context['num_guests']), ' ', $context['num_guests'] == 1 ? $txt['guest'] : $txt['guests'], ', ', comma_format($context['num_users_online']), ' ', $context['num_users_online'] == 1 ? $txt['user'] : $txt['users'];
 
 	// Handle hidden users and buddies.
-	$bracketList = array();
+	$bracketList = [];
 	if ($context['show_buddies'])
 	{
 		$bracketList[] = comma_format($context['num_buddies']) . ' ' . ($context['num_buddies'] == 1 ? $txt['buddy'] : $txt['buddies']);

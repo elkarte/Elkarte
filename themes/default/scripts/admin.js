@@ -42,7 +42,7 @@ function Elk_AdminIndex (oOptions = {})
 	this.init();
 }
 
-// Initialize the admin index to handle announcement, current version and updates
+// Initialize the admin index to handle an announcement, current version and updates
 Elk_AdminIndex.prototype.init = function() {
 	window.adminIndexInstanceRef = this;
 
@@ -72,7 +72,7 @@ Elk_AdminIndex.prototype.setAnnouncement = function(announcement) {
 
 	announcement.body = announcement.body.replace('\r\n\r\n', '\n');
 
-	// Some markup to html conversion
+	// Some markup to HTML conversion
 	let re = new RegExp('^#{1,4}(.*)$', 'ugm');
 	announcement.body = announcement.body.replace(re, '<strong>$1</strong>');
 
@@ -85,7 +85,7 @@ Elk_AdminIndex.prototype.setAnnouncement = function(announcement) {
 	re = new RegExp('^ {0,1}- (.*)$', 'ugm');
 	announcement.body = announcement.body.replace(re, '&#x2022; $1');
 
-	sMessage = this.opt.sAnnouncementMessageTemplate.replace('%href%', announcement.html_url).replace('%subject%', announcement.name).replace('%time%', announcement.published_at.replace(/[TZ]/g, ' ')).replace('%message%', announcement.body).replace(/\n/g, '<br />').replace(/\r/g, '');
+	let sMessage = this.opt.sAnnouncementMessageTemplate.replace('%href%', announcement.html_url).replace('%subject%', announcement.name).replace('%time%', announcement.published_at.replace(/[TZ]/g, ' ')).replace('%message%', announcement.body).replace(/\n/g, '<br />').replace(/\r/g, '');
 
 	oElem.innerHTML = sMessages + this.opt.sAnnouncementTemplate.replace('%content%', sMessage);
 	this.init_news = true;
@@ -236,7 +236,7 @@ Elk_AdminIndex.prototype.normalizeVersion = function(sVersion) {
 		// If we have passed a "beta" or an "RC" string, no need to go further
 		if (prerelease)
 		{
-			// Only numbers and dots means a number
+			// Only numbers and dots mean a number
 			if (splitVersion[i].replace(/[\d.]/g, '') === '')
 			{
 				normalVersion.nano = parseFloat(splitVersion[i]);
@@ -251,7 +251,7 @@ Elk_AdminIndex.prototype.normalizeVersion = function(sVersion) {
 			splitVersion[i] = splitVersion[i].substring(1);
 		}
 
-		// Only numbers and dots means a number
+		// Only numbers and dots mean a number
 		if (splitVersion[i].replace(/[\d\.]/g, '') === '')
 		{
 			let ver = splitVersion[i].split('.');
@@ -263,7 +263,7 @@ Elk_AdminIndex.prototype.normalizeVersion = function(sVersion) {
 	return normalVersion;
 };
 
-// Checks if a new version of ElkArte is available and if so updates the admin info box
+// Checks if a new version of ElkArte is available, and if so, updates the admin info box
 Elk_AdminIndex.prototype.checkUpdateAvailable = function() {
 	if (!('ourUpdatePackage' in window))
 	{
@@ -336,7 +336,7 @@ Elk_ViewVersions.prototype.compareVersions = function(sCurrent, sTarget) {
 	// Loop through each category.
 	for (let i = 0; i < 7; i++)
 	{
-		// Is there something for us to calculate?
+		// Is there anything for us to calculate?
 		if (aVersions[0][i] !== aVersions[1][i])
 		{
 			// Dev builds are a problematic exception.
@@ -439,7 +439,7 @@ function updateInputBoxes ()
 	document.getElementById('can_search_dt').style.display = bIsText || bIsSelect ? '' : 'none';
 	document.getElementById('can_search_dd').style.display = bIsText || bIsSelect ? '' : 'none';
 
-	// Moving to a non searchable field, be sure searchable is unselected.
+	// Moving to a non-searchable field, be sure searchable is unselected.
 	if (!bIsText && !bIsSelect)
 	{
 		document.getElementById('can_search_dd').checked = false;
@@ -482,7 +482,7 @@ function addAnotherQuestion ()
 }
 
 /**
- * Every question should have an answer, even if its a lie
+ * Every question should have an answer, even if it's a lie
  *
  * @param {HTMLElement} elem
  * @param {string} question_name
@@ -678,7 +678,7 @@ function calculateNewValues ()
 		total += parseInt(document.getElementById('weight' + i + '_val').value);
 	}
 
-	document.getElementById('weighttotal').innerHTML = total;
+	document.getElementById('weighttotal').innerHTML = String(total);
 	for (let i = 1; i <= 7; i++)
 	{
 		document.getElementById('weight' + i).innerHTML = (Math.round(1000 * parseInt(document.getElementById('weight' + i + '_val').value) / total) / 10) + '%';
@@ -704,7 +704,7 @@ function swapUploads ()
 }
 
 /**
- * Close the options that should not be visible for adding a smiley
+ * Close the options that should not be visible by adding a smiley
  *
  * @param {string} element
  */
@@ -973,7 +973,7 @@ function toggleCache ()
 		showHideCacheOption(cacheServers, (cache_type.value.substring(0, 8) === 'memcache' || cache_type.value === 'redis' || cache_type.value === 'predis'));
 	}
 
-	// Don't show the directory if its not filebased
+	// Don't show the directory if it's not filebased
 	if (cache_type.value === 'filebased')
 	{
 		showHideCacheOption(cacheDir, cache_type.value === 'filebased');
@@ -995,9 +995,9 @@ function toggleCache ()
 }
 
 /**
- * Toggles the visibility of a cache option element and its previous sibling element.
+ * Toggles the visibility of a cache option element, and it's previous sibling element.
  *
- * @param {Element} elem - The cache option element to toggle.
+ * @param {ParentNode} elem - The cache option element to toggle.
  * @param {boolean} show - Determines whether to show or hide the cache option element.
  *
  * @return {undefined}
@@ -1154,7 +1154,7 @@ function checkAttributeValidity ()
 
 		warningMessage = warningMessage.replace(/%type%/, '', reattribute_confirm_email).replace(/%find%/, document.getElementById('from_email').value);
 	}
-	// Or the user name
+	// Or the username
 	else
 	{
 		if (!document.getElementById('from_name').value)
@@ -1192,7 +1192,7 @@ function transferAttachOptions ()
 }
 
 /**
- * Updates the move confirmation text so its descriptive for the current items
+ * Updates the move confirmation text so it's descriptive for the current items
  * being moved.
  *
  * @param {string} confirmText
@@ -1917,7 +1917,7 @@ function coreFeatures ()
 						// Enable to disable the link to the feature
 						document.getElementById('feature_link_' + cf).innerHTML = xmlDoc.getElementsByTagName('corefeatures')[0].getElementsByTagName('corefeature')[0].textContent;
 
-						// Toggle the switch and its hover text
+						// Toggle the switch and it's hover text
 						cc.classList.toggle('i-switch-on');
 						cc.classList.toggle('i-switch-off');
 						cc.setAttribute('title', new_state ? feature_on_text : feature_off_text);
@@ -1965,7 +1965,7 @@ function confirmAgreement (text)
  * - If oData is supplied, will create a select list, populated with that data
  * otherwise a standard input box.
  *
- * @param {string} parent id of the parent "add more button: we will place this before
+ * @param {string} parent id of the parent "add more button:" we will place this before
  * @param {object} oDtName object of dt element options (type, class, size)
  * @param {object} oDdName object of the dd element options (type, class size)
  * @param {object} [oData] optional select box object, 1:{id:value,name:display name}, ...
@@ -1992,7 +1992,7 @@ function addAnotherOption (parent, oDtName, oDdName, oData)
 	newInput.size = oDtName.size;
 	newDT.appendChild(newInput);
 
-	// And its matching <dd>
+	// And it's matching <dd>
 	let newDD = document.createElement('dd');
 
 	// If we have data for this field make it a select
@@ -2011,7 +2011,7 @@ function addAnotherOption (parent, oDtName, oDdName, oData)
 	newInput.setAttribute('class', oDdName['class']);
 	newDD.appendChild(newInput);
 
-	// If its a select box we add in the options
+	// If it's a select box we add in the options
 	if (oData !== '')
 	{
 		// The options are children of the newInput select box
@@ -2056,7 +2056,7 @@ function addAnotherOption (parent, oDtName, oDdName, oData)
 			tolerance: 'intersect', // mode to use for testing whether the item is hovering over another item.
 			setorder: 'serialize', // how to return the data, really only supports serialize and inorder
 			placeholder: '', // css class used to style the landing zone
-			preprocess: '', // This function is called at the start of the update event (when the item is dropped) must in in global space
+			preprocess: '', // This function is called at the start of the update event (when the item is dropped) must in global space
 			tag: '#table_grid_sortable', // ID(s) of the container to work with, single or comma separated
 			connect: '', // Use to group all related containers with a common CSS class
 			sa: '', // Subaction that the xmlcontroller should know about
@@ -2098,16 +2098,14 @@ function addAnotherOption (parent, oDtName, oDdName, oData)
 
 				// Replace the helper elements with spans, normally this is a <td> -> <span>
 				// Done to make this container agnostic.
-				$helper.children().each(function() {
-					$(this).replaceWith(function() {
-						return $('<span />', {html: $(this).html()});
-					});
-				});
-
-				// Set the width of each helper cell span to be the width of the original cells
 				$helper.children().each(function(index) {
-					// Set helper cell sizes to match the original sizes
-					return $(this).width($originals.eq(index).width()).css('display', 'inline-block');
+					const $originalCell = $originals.eq(index);
+					$(this).replaceWith(function() {
+						return $('<span />', {
+							html: $(this).html()
+						}).width($originalCell.width())
+							.css('display', 'inline-block');
+					});
 				});
 
 				// Next to overcome an issue where page scrolling does not work, we add the new agnostic helper
@@ -2132,7 +2130,7 @@ function addAnotherOption (parent, oDtName, oDdName, oData)
 					order = [],
 					receiver = ui.item.parent().attr('id');
 
-				// Calling a pre processing function?
+				// Calling a pre-processing function?
 				if (oSettings.preprocess !== '')
 				{
 					window[oSettings.preprocess]();
@@ -2175,7 +2173,7 @@ function addAnotherOption (parent, oDtName, oDdName, oData)
 					postdata += '&' + oSettings.token.token_var + '=' + oSettings.token.token_id;
 				}
 
-				// And with the post data prepared, lets make the ajax request
+				// And with the post data prepared, let's make the ajax request
 				$.ajax({
 					type: 'POST',
 					url: elk_prepareScriptUrl(elk_scripturl) + 'action=xmlhttp;sa=' + oSettings.sa + ';api=xml',
@@ -2286,7 +2284,7 @@ function setBoardIds ()
 			var parentList = $(this).parent('li').attr('id'),
 				pli = 0;
 
-			// No parent, then its a base node 0, else its a child-of this node
+			// No parent, then it's a base node 0, else it's a child-of this node
 			if (typeof (parentList) !== 'undefined')
 			{
 				pli = parentList.split(',');

@@ -10,8 +10,8 @@
  */
 
 /**
- * Just a simple template for now to output json
- * used to output the json formatted data for ajax calls
+ * Just a simple template for now to output JSON
+ * used to output the JSON formatted data for ajax calls
  */
 function template_send_json()
 {
@@ -21,8 +21,8 @@ function template_send_json()
 }
 
 /**
- * Just a simple template for now to output json
- * used to output the json formatted data for ajax calls
+ * Just a simple template for now to output JSON
+ * used to output the JSON formatted data for ajax calls
  */
 function template_send_json_raw()
 {

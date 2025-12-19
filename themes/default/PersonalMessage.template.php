@@ -27,7 +27,7 @@ function template_pm_above()
 {
 	global $context, $txt;
 
-	// The every helpful javascript!
+	// The every helpful JavaScript!
 	echo '
 					<script>
 						var allLabels = {},
@@ -135,7 +135,7 @@ function template_folder()
 		echo '
 										<span class="name">', $txt['sent_to'], ': </span>';
 
-		// People it was sent directly to....
+		// People it was sent directly to...
 		if (!empty($message['recipients']['to']))
 		{
 			echo
@@ -190,7 +190,7 @@ function template_folder()
 										<option value="">', $txt['pm_msg_label_title'], ':</option>
 										<option value="" disabled="disabled">' . str_repeat('&#8212;', strlen($txt['pm_msg_label_title'])) . '</option>';
 
-				// Are there any labels which can be added to this?
+				// Are there any labels that can be added to this?
 				if (!$message['fully_labeled'])
 				{
 					echo '
@@ -313,7 +313,7 @@ function template_pm_pages_and_buttons_below()
 
 	if (empty($context['display_mode']))
 	{
-		template_pagesection(false, '', array('extra' => '<span class="flow_flex_right"><input type="submit" name="del_selected" value="' . $txt['quickmod_delete_selected'] . '" style="font-weight: normal;" onclick="if (!confirm(\'' . $txt['delete_selected_confirm'] . '\')) return false;" /></span>'));
+		template_pagesection(false, '', ['extra' => '<span class="flow_flex_right"><input type="submit" name="del_selected" value="' . $txt['quickmod_delete_selected'] . '" style="font-weight: normal;" onclick="if (!confirm(\'' . $txt['delete_selected_confirm'] . '\')) return false;" /></span>']);
 	}
 	// Show a few buttons if we are in conversation mode and outputting the first message.
 	elseif ($context['display_mode'] == 2 && isset($context['conversation_buttons']))
@@ -323,14 +323,14 @@ function template_pm_pages_and_buttons_below()
 }
 
 /**
- * Just list all the personal message subjects - to make templates easier.
- * Unfortunately a bit ugly at the moment
+ * List all the personal message subjects - to make templates easier.
+ * Unfortunately, a bit ugly at the moment
  */
 function template_subject_list_above()
 {
 	global $context;
 
-	// If we are not in single display mode show the subjects on the top!
+	// If we are not in single display mode, show the subjects on the top!
 	if ($context['display_mode'] != 1)
 	{
 		template_subject_list();
@@ -404,7 +404,7 @@ function template_subject_list()
 	$controller = $context['get_psubject'][0];
 	while ($message = $controller->{$context['get_psubject'][1]}())
 	{
-		$discussion_url = $context['display_mode'] == 0 || $context['current_pm'] == $message['id'] ? '' : ($scripturl . '?action=pm;pmid=' . $message['id'] . ';kstart;f=' . $context['folder'] . ';start=' . $context['start'] . ';sort=' . $context['sort_by'] . ($context['sort_direction'] == 'up' ? ';asc' : ';desc') . ($context['current_label_id'] !== "-1" ? ';l=' . $context['current_label_id'] : ''));
+		$discussion_url = $context['display_mode'] == 0 || $context['current_pm'] == $message['id'] ? '' : ($scripturl . '?action=pm;pmid=' . $message['id'] . ';kstart;f=' . $context['folder'] . ';start=' . $context['start'] . ';sort=' . $context['sort_by'] . ($context['sort_direction'] === 'up' ? ';asc' : ';desc') . ($context['current_label_id'] !== "-1" ? ';l=' . $context['current_label_id'] : ''));
 
 		echo '
 							<tr class="standard_row">
@@ -498,7 +498,7 @@ function template_subject_list()
 	$extra .= '
 					</ul>';
 
-	template_pagesection(false, '', array('extra' => $extra));
+	template_pagesection(false, '', ['extra' => $extra]);
 }
 
 /**
@@ -530,7 +530,7 @@ function template_search()
 				<input type="submit" name="pm_search" value="', $txt['pm_search_go'], '" />
 			</div>';
 
-	// Now all the advanced options, hidden or shown by JS based on the users minmax choices
+	// Now all the advanced options, hidden or shown by JS based on the users' minmax choices
 	echo '
 			<div id="advanced_search">
 				<dl id="search_options">
@@ -588,7 +588,7 @@ function template_search()
 			<input id="advanced" type="hidden" name="advanced" value="1" />
 		</fieldset>';
 
-	// Do we have some labels setup? If so offer to search by them!
+	// Do we have some labels' setup? If so, offer to search for them!
 	if ($context['currently_using_labels'])
 	{
 		echo '
@@ -620,7 +620,7 @@ function template_search()
 			</div>
 		</fieldset>';
 
-		// And now some javascript for the advanced label toggling
+		// And now some JavaScript for the advanced label toggling
 		theme()->addInlineJavascript('
 			createEventListener(window);
 			window.addEventListener("load", initSearch, false);
@@ -803,7 +803,7 @@ function template_search_results()
 			</table>';
 	}
 
-	// If we have results show a page index
+	// If we have results, show a page index
 	if (!empty($context['personal_messages']))
 	{
 		template_pagesection();
@@ -894,12 +894,12 @@ function template_send()
 						<label for="to_control"', (isset($context['post_error']['no_to']) || isset($context['post_error']['bad_to']) ? ' class="error"' : ''), ' id="caption_to">', $txt['pm_to'], ':</label>
 					</dt>';
 
-	// Autosuggest will be added by the javascript later on.
+	// Autosuggest will be added by the JavaScript later on.
 	echo '
 					<dd id="pm_to" class="clear_right">
 						<input type="text" name="to" id="to_control" value="', $context['to_value'], '" tabindex="', $context['tabindex']++, '" size="40" style="width: 130px;" class="input_text" />';
 
-	// A link to add BCC, only visible with javascript enabled.
+	// A link to add BCC, only visible with JavaScript enabled.
 	echo '
 						<span id="bcc_link_container" class="smalltext hide"></span>';
 
@@ -910,7 +910,7 @@ function template_send()
 	echo '
 					</dd>';
 
-	// This BCC row will be hidden by default if javascript is enabled.
+	// This BCC row will be hidden by default if JavaScript is enabled.
 	echo '
 					<dt id="bcc_div" class="clear_left" >
 						<label for="bcc_control"', (isset($context['post_error']['no_to']) || isset($context['post_error']['bad_bcc']) ? ' class="error"' : ''), ' id="caption_bbc">', $txt['pm_bcc'], ':</label>
@@ -952,7 +952,7 @@ function template_send()
 	echo '
 				</div>';
 
-	// Show the draft last saved on area
+	// Show the draft last saved on the area
 	echo '
 	        <div class="draftautosave">
 				<span id="throbber" class="hide"><i class="icon i-oval"></i>&nbsp;</span>
@@ -1151,7 +1151,7 @@ function template_prune()
 }
 
 /**
- * Here we allow the user to setup labels, remove labels and change rules for labels (i.e, do quite a bit)
+ * Here we allow the user to set up labels, remove labels, and change rules for labels (i.e., do quite a bit)
  */
 function template_labels()
 {
@@ -1418,7 +1418,7 @@ function template_add_rule()
 
 		echo '
 					</select>
-					<span id="defdiv', $k, '" ', in_array($criteria['t'], array('gid', 'bud')) ? 'class="hide"' : '', '>
+					<span id="defdiv', $k, '" ', in_array($criteria['t'], ['gid', 'bud']) ? 'class="hide"' : '', '>
 						<input type="text" name="ruledef[', $k, ']" id="ruledef', $k, '" value="', in_array($criteria['t'], ['mid', 'sub', 'msg']) ? $criteria['v'] : '', '" />
 					</span>
 					<span id="defseldiv', $k, '" ', $criteria['t'] === 'gid' ? '' : 'class="hide"', '>
@@ -1435,7 +1435,7 @@ function template_add_rule()
 						</select>
 					</span>';
 
-		// If this is the dummy we add a means to hide for non js users.
+		// If this is the dummy, we add a means to hide for non js users.
 		if ($isFirst)
 		{
 			$isFirst = false;
@@ -1529,13 +1529,13 @@ function template_add_rule()
 		</div>
 	</form>';
 
-	// Now setup all the bits!
+	// Now set up all the bits!
 	theme()->addInlineJavascript('initUpdateRulesActions();', true);
 
 	echo '
 	<script>';
 
-	// If this isn't a new rule, and we have JS enabled remove the JS compatibility stuff.
+	// If this isn't a new rule, and we have JS enabled, remove the JS compatibility stuff.
 	if ($context['rid'])
 	{
 		echo '
@@ -1574,7 +1574,7 @@ function template_showPMDrafts()
 	}
 	else
 	{
-		// For every draft to be displayed, give it its own div, and show the important details of the draft.
+		// For every draft to be displayed, give it a div, and show the important details of the draft.
 		foreach ($context['drafts'] as $draft)
 		{
 			echo '

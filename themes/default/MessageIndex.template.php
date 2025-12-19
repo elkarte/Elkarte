@@ -525,7 +525,7 @@ function template_quicktopic_above()
 		if (empty($options['hide_poster_area']))
 		{
 			echo '
-						<ul class="poster no_js">', template_build_poster_div($context['thisMember'], false), '</ul>';
+						<ul class="poster no_js">', template_build_poster_div($context['thisMember']), '</ul>';
 		}
 
 		echo '

@@ -10,7 +10,7 @@
  */
 
 /**
-* The offline sub-template, just says sorry bub
+* The offline subtemplate just says sorry bub
 */
 function template_offline()
 {

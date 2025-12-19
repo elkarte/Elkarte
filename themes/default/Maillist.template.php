@@ -44,7 +44,7 @@ function template_show_email()
 }
 
 /**
- * Used to select a bounce template and send a failed message to a email sender
+ * Used to select a bounce template and send a failed message to an email sender
  */
 function template_bounce_email()
 {
@@ -76,8 +76,8 @@ function template_bounce_email()
 		echo '
 			if (index == ', $k, ')
 			{
-				document.getElementById(\'warn_body\').value = "', strtr($type['body'], array('"' => "'", "\n" => '\\n', "\r" => '')), '";
-				document.getElementById(\'warn_sub\').value = "', strtr($type['subject'], array('"' => "'", "\n" => '\\n', "\r" => '')), '";
+				document.getElementById(\'warn_body\').value = "', strtr($type['body'], ['"' => "'", "\n" => '\\n', "\r" => '']), '";
+				document.getElementById(\'warn_sub\').value = "', strtr($type['subject'], ['"' => "'", "\n" => '\\n', "\r" => '']), '";
 			}';
 	}
 

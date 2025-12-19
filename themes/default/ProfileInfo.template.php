@@ -47,7 +47,7 @@ function template_action_summary()
 		$tabs = array_keys($context['summarytabs']);
 		$tab_num = 0;
 
-		// Start with the navigation ul, its converted to the tab navigation by jqueryUI
+		// Start with the navigation ul, it's converted to the tab navigation by jqueryUI
 		echo '
 			<div class="profile_center">
 				<div id="tabs">
@@ -143,7 +143,7 @@ function template_action_showPosts()
 	}
 	else
 	{
-		// For every post to be displayed, give it its own div, and show the important details of the post.
+		// For every post to be displayed, give it a div, and show the important details of the post.
 		foreach ($context['posts'] as $post)
 		{
 			$post['title'] = '<strong>' . $post['board']['link'] . ' / ' . $post['topic']['link'] . '</strong>';
@@ -389,7 +389,7 @@ function template_action_statPanel()
 			</h2>
 			<div class="content content_noframe">';
 
-	// If they haven't post at all, don't draw the graph.
+	// If they haven't posted at all, don't draw the graph.
 	if (empty($context['posts_by_time']))
 	{
 		echo '
@@ -498,7 +498,7 @@ function template_action_statPanel()
 function template_pieHole($value, $segmentWidth = 10)
 {
 	$radius = 100 / (2 * M_PI);
-	$segment = round($value, 0);
+	$segment = round($value);
 	$remainder = 100 - $segment;
 
 	return '
@@ -613,7 +613,7 @@ function template_profile_block_summary()
 						<dd>', $context['member']['title'], '</dd>';
 	}
 
-	// If karma is enabled show the members karma.
+	// If karma is enabled show the members' karma.
 	if ($modSettings['karmaMode'] == '1')
 	{
 		echo '
@@ -684,7 +684,7 @@ function template_profile_block_user_info()
 					<dt>', $txt['age'], ':</dt>
 					<dd>', $context['member']['age'] . ($context['member']['today_is_birthday'] ? ' &nbsp; <img src="' . $settings['images_url'] . '/cake.png" alt="" />' : ''), '</dd>';
 
-	// How long have they been a member, and when were they last on line?
+	// How long have they been a member, and when were they last online?
 	echo '
 					<dt>', $txt['date_registered'], ':</dt>
 					<dd>', $context['member']['registered'], '</dd>
@@ -731,7 +731,7 @@ function template_profile_block_user_info()
 						<dd>', $context['member']['action'], '</dd>';
 	}
 
-	// nuff about them, lets get back to me!
+	// nuff about them, let's get back to me!
 	echo '
 				</dl>
 			</div>
@@ -743,7 +743,7 @@ function template_profile_block_user_info()
  * Show information on how to contact a member
  * Allows the adding or removal of buddies
  * Provides a PM link
- * Provides a Email link
+ * Provides an Email link
  * Shows any profile website information
  * Shows custom profile fields of placement type '1', "with icons"
  */
@@ -774,7 +774,7 @@ function template_profile_block_contact()
 					</dd>';
 	}
 
-	// PM's are nice to send, to others, not to your self
+	// PMs are nice to send, to others, not to your self
 	if (!$context['user']['is_owner'] && $context['can_send_pm'])
 	{
 		$ci_empty = false;
@@ -898,7 +898,7 @@ function template_profile_block_other_info()
 		}
 	}
 
-	// Show the users signature.
+	// Show the users' signature.
 	if ($context['signature_enabled'] && !empty($context['member']['signature']))
 	{
 		if (empty($shown))
@@ -1125,7 +1125,7 @@ function template_profile_block_buddies()
 				// Other contact info from custom profile fields?
 				if (isset($data['custom_fields']))
 				{
-					$im = array();
+					$im = [];
 
 					foreach ($data['custom_fields'] as $cpf)
 					{
@@ -1343,13 +1343,13 @@ function setHourData($data)
 		return;
 	}
 
-	$hourData = array(
+	$hourData = [
 		'axis_labels' => [],
 		'relative_percent' => [],
 		'posts' => [],
 		'hour_format' => [],
 		'posts_percent' => [],
-	);
+	];
 
 	// Low to high looks best on a chart
 	foreach ($data as $time)
@@ -1362,19 +1362,19 @@ function setHourData($data)
 	}
 
 	// Colors for the line charts
-	$colors = array(
+	$colors = [
 		'relative_percent' => '55,187,89',
 		'posts' => '61,110,50',
 		'posts_percent' => '89,55,187',
-	);
+	];
 
 	// Chart title so you remember what you are looking at
-	$titles = array(
+	$titles = [
 		'relative_percent' => $txt['statPanel_activityTime'],
 		'posts' => $txt['statPanel_activityTime'],
 		'posts_percent' => $txt['statPanel_activityTime'],
 		'posts_text' => $txt['posts']
-	);
+	];
 
 	// Now dump it out in JS objects
 	echo '

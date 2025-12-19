@@ -85,10 +85,10 @@ function template_edit_scheduled_tasks()
 						<select name="unit">
 							<option value="0">', $txt['scheduled_task_edit_pick_unit'], '</option>
 							<option value="0" disabled="disabled">', str_repeat('&#8212;', strlen($txt['scheduled_task_edit_pick_unit'])), '</option>
-							<option value="m" ', empty($context['task']['unit']) || $context['task']['unit'] == 'm' ? 'selected="selected"' : '', '>', $txt['scheduled_task_reg_unit_m'], '</option>
-							<option value="h" ', $context['task']['unit'] == 'h' ? 'selected="selected"' : '', '>', $txt['scheduled_task_reg_unit_h'], '</option>
-							<option value="d" ', $context['task']['unit'] == 'd' ? 'selected="selected"' : '', '>', $txt['scheduled_task_reg_unit_d'], '</option>
-							<option value="w" ', $context['task']['unit'] == 'w' ? 'selected="selected"' : '', '>', $txt['scheduled_task_reg_unit_w'], '</option>
+							<option value="m" ', empty($context['task']['unit']) || $context['task']['unit'] === 'm' ? 'selected="selected"' : '', '>', $txt['scheduled_task_reg_unit_m'], '</option>
+							<option value="h" ', $context['task']['unit'] === 'h' ? 'selected="selected"' : '', '>', $txt['scheduled_task_reg_unit_h'], '</option>
+							<option value="d" ', $context['task']['unit'] === 'd' ? 'selected="selected"' : '', '>', $txt['scheduled_task_reg_unit_d'], '</option>
+							<option value="w" ', $context['task']['unit'] === 'w' ? 'selected="selected"' : '', '>', $txt['scheduled_task_reg_unit_w'], '</option>
 						</select>
 					</dd>
 					<dt>

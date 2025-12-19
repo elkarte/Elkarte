@@ -47,7 +47,7 @@ class chunkUpload
 	}
 
 	/**
-	 * Sends a finalize request to the server.
+	 * Sends a finalized request to the server.
 	 * It appends necessary data to FormData and sends a POST request to the specified URL.
 	 * Throws an error in case of a network error.
 	 */
@@ -55,9 +55,9 @@ class chunkUpload
 	{
 		const combineChunkForm = new FormData();
 
-		combineChunkForm.append('elkuuid', this.uuid);
-		combineChunkForm.append('elkchunkindex', this.chunkCount);
-		combineChunkForm.append('elktotalchunkcount', this.totalChunks);
+		combineChunkForm.append('elkuuid', String(this.uuid));
+		combineChunkForm.append('elkchunkindex', String(this.chunkCount));
+		combineChunkForm.append('elktotalchunkcount', String(this.totalChunks));
 		combineChunkForm.append('filename', this.file.name);
 		combineChunkForm.append('filesize', this.file.size);
 		combineChunkForm.append('filetype', this.file.type);
@@ -197,11 +197,11 @@ class chunkUpload
 		const chunkForm = new FormData();
 
 		// Load the form with useful data
-		chunkForm.append('elkchunkindex', this.chunkCount);
-		chunkForm.append('elktotalchunkcount', this.totalChunks);
-		chunkForm.append('elkuuid', this.uuid);
+		chunkForm.append('elkchunkindex', String(this.chunkCount));
+		chunkForm.append('elktotalchunkcount', String(this.totalChunks));
+		chunkForm.append('elkuuid', String(this.uuid));
 		chunkForm.append('filename', this.file.name);
-		chunkForm.append('filesize',  this.chunkData.size);
+		chunkForm.append('filesize',  String(this.chunkData.size));
 		chunkForm.append('filetype', this.file.type);
 		chunkForm.append('attachment[]', this.chunkData);
 		chunkForm.append(elk_session_var, elk_session_id);

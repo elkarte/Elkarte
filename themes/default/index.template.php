@@ -275,7 +275,7 @@ function template_body_above()
 }
 
 /**
- * More or less a place holder for now, sits at the very page top.
+ * More or less a placeholder for now, sits at the very page top.
  * The maintenance mode warning for admins is an obvious one, but this could also be used for moderation notifications.
  * I also assumed this would be an obvious place for sites to put a string of icons to link to their FB, Twitter, etc.
  * This could still be done via conditional, so that administration and moderation notices were still active when
@@ -391,7 +391,7 @@ function template_uc_news_fader()
 {
 	global $settings, $context, $txt;
 
-	// Display either news fader and random news lines (not both). These now run most of the same mark up and CSS. Less complication = happier n00bz. :)
+	// Display either news fader and random news lines (not both). These now run most of the same markup and CSS. Less complication = happier n00bz. :)
 	if (!empty($settings['enable_news']) && !empty($context['random_news_line']))
 	{
 		echo '
@@ -489,7 +489,7 @@ function template_html_below()
 
 /**
  * Show breadcrumbs. This is that thing that shows
- * "My Community | General Category | General Discussion"..
+ * "My Community | General Category | General Discussion"...
  *
  * @param string $default a string representing the index in $context where
  *               the breadcrumbs are stored (default value is 'breadcrumbs')
@@ -725,7 +725,7 @@ function template_show_error($error_id)
 		return;
 	}
 
-	$error = $context[$error_id] ?? array();
+	$error = $context[$error_id] ?? [];
 
 	echo '
 					<div id="', $error_id, '" class="', (isset($error['type']) ? ($error['type'] === 'serious' ? 'errorbox' : 'warningbox') : 'successbox'), empty($error['errors']) ? ' hide"' : '"', '>';

@@ -165,8 +165,6 @@ class Emoji extends AbstractModel
 	 */
 	public function emojiFromHTML($string): string
 	{
-		$string = strtolower($string);
-
 		// If there are 4-byte encoded values &#x1f123, change those back to utf8 characters
 		return preg_replace_callback(self::POSSIBLE_HTML_EMOJI, static function ($match) {
 			$replace = html_entity_decode($match[0], ENT_NOQUOTES | ENT_SUBSTITUTE | ENT_HTML401, 'UTF-8');
@@ -266,7 +264,6 @@ class Emoji extends AbstractModel
 	 */
 	public function emojiFromUni($string): string
 	{
-		$string = strtolower($string);
 		$this->setSearchReplaceRegex();
 
 		// Avoid the large regex if there is no emoji DNA

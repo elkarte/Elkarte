@@ -110,12 +110,12 @@ function template_showDrafts()
 	// Show page numbers
 	if (!empty($context['drafts']))
 	{
-			template_pagesection(false, '', array('extra' => '
+			template_pagesection(false, '', ['extra' => '
 			<div class="flow_flex_additional_row">
 				<input type="submit" name="delete_selected" value="' . $txt['quick_mod_remove'] . '" class="right_submit" onclick="return confirm(' . JavaScriptEscape($txt['draft_remove_selected'] . '?') . ');" />
 				<input type="hidden" name="' . $context['session_var'] . '" value="' . $context['session_id'] . '" />
 			</div>'
-		));
+			]);
 	}
 
 	echo '
@@ -213,13 +213,13 @@ function template_load_warning_variables()
 
 	$context['warningBarWidth'] = 200;
 
-	// Setup the colors - this is a little messy for theming.
-	$context['colors'] = array(
+	// Set up the colors - this is a little messy for theming.
+	$context['colors'] = [
 		0 => 'green',
 		$modSettings['warning_watch'] => 'green',
 		$modSettings['warning_moderate'] => 'orange',
 		$modSettings['warning_mute'] => 'red',
-	);
+	];
 
 	// Work out the starting color.
 	$context['current_color'] = $context['colors'][0];

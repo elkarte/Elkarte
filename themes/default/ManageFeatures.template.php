@@ -43,7 +43,7 @@ function template_edit_profile_field()
 {
 	global $context, $txt, $scripturl;
 
-	// any errors messages to show?
+	// any errors message to show?
 	if (!empty($context['custom_option__error']))
 	{
 		echo '
@@ -78,10 +78,10 @@ function template_edit_profile_field()
 						</dt>
 						<dd>
 							<select name="profile_area" id="profile_area">
-								<option value="none"', $context['field']['profile_area'] == 'none' ? ' selected="selected"' : '', '>', $txt['custom_edit_profile_none'], '</option>
-								<option value="account"', $context['field']['profile_area'] == 'account' ? ' selected="selected"' : '', '>', $txt['account'], '</option>
-								<option value="forumprofile"', $context['field']['profile_area'] == 'forumprofile' ? ' selected="selected"' : '', '>', $txt['forumprofile'], '</option>
-								<option value="theme"', $context['field']['profile_area'] == 'theme' ? ' selected="selected"' : '', '>', $txt['theme'], '</option>
+								<option value="none"', $context['field']['profile_area'] === 'none' ? ' selected="selected"' : '', '>', $txt['custom_edit_profile_none'], '</option>
+								<option value="account"', $context['field']['profile_area'] === 'account' ? ' selected="selected"' : '', '>', $txt['account'], '</option>
+								<option value="forumprofile"', $context['field']['profile_area'] === 'forumprofile' ? ' selected="selected"' : '', '>', $txt['forumprofile'], '</option>
+								<option value="theme"', $context['field']['profile_area'] === 'theme' ? ' selected="selected"' : '', '>', $txt['theme'], '</option>
 							</select>
 						</dd>
 						<dt>
@@ -135,15 +135,15 @@ function template_edit_profile_field()
 						</dt>
 						<dd>
 							<select name="field_type" id="field_type" onchange="updateInputBoxes();">
-								<option value="text"', $context['field']['type'] == 'text' ? ' selected="selected"' : '', '>', $txt['custom_profile_type_text'], '</option>
-								<option value="email"', $context['field']['type'] == 'email' ? ' selected="selected"' : '', '>', $txt['custom_profile_type_email'], '</option>
-								<option value="url"', $context['field']['type'] == 'url' ? ' selected="selected"' : '', '>', $txt['custom_profile_type_url'], '</option>
-								<option value="date"', $context['field']['type'] == 'date' ? ' selected="selected"' : '', '>', $txt['custom_profile_type_date'], '</option>
-								<option value="color"', $context['field']['type'] == 'color' ? ' selected="selected"' : '', '>', $txt['custom_profile_type_color'], '</option>
-								<option value="textarea"', $context['field']['type'] == 'textarea' ? ' selected="selected"' : '', '>', $txt['custom_profile_type_textarea'], '</option>
-								<option value="select"', $context['field']['type'] == 'select' ? ' selected="selected"' : '', '>', $txt['custom_profile_type_select'], '</option>
-								<option value="radio"', $context['field']['type'] == 'radio' ? ' selected="selected"' : '', '>', $txt['custom_profile_type_radio'], '</option>
-								<option value="check"', $context['field']['type'] == 'check' ? ' selected="selected"' : '', '>', $txt['custom_profile_type_check'], '</option>
+								<option value="text"', $context['field']['type'] === 'text' ? ' selected="selected"' : '', '>', $txt['custom_profile_type_text'], '</option>
+								<option value="email"', $context['field']['type'] === 'email' ? ' selected="selected"' : '', '>', $txt['custom_profile_type_email'], '</option>
+								<option value="url"', $context['field']['type'] === 'url' ? ' selected="selected"' : '', '>', $txt['custom_profile_type_url'], '</option>
+								<option value="date"', $context['field']['type'] === 'date' ? ' selected="selected"' : '', '>', $txt['custom_profile_type_date'], '</option>
+								<option value="color"', $context['field']['type'] === 'color' ? ' selected="selected"' : '', '>', $txt['custom_profile_type_color'], '</option>
+								<option value="textarea"', $context['field']['type'] === 'textarea' ? ' selected="selected"' : '', '>', $txt['custom_profile_type_textarea'], '</option>
+								<option value="select"', $context['field']['type'] === 'select' ? ' selected="selected"' : '', '>', $txt['custom_profile_type_select'], '</option>
+								<option value="radio"', $context['field']['type'] === 'radio' ? ' selected="selected"' : '', '>', $txt['custom_profile_type_radio'], '</option>
+								<option value="check"', $context['field']['type'] === 'check' ? ' selected="selected"' : '', '>', $txt['custom_profile_type_check'], '</option>
 							</select>
 						</dd>
 						<dt id="max_length_dt">
@@ -183,7 +183,7 @@ function template_edit_profile_field()
 	if (!empty($context['field']['show_nodefault']))
 	{
 		echo '
-								<input type="radio" name="default_select" value="no_default"', $context['field']['default_select'] == 'no_default' ? ' checked="checked"' : '', ' class="input_radio" /><label>' . $txt['custom_edit_options_no_default'] . '</label><br />';
+								<input type="radio" name="default_select" value="no_default"', $context['field']['default_select'] === 'no_default' ? ' checked="checked"' : '', ' class="input_radio" /><label>' . $txt['custom_edit_options_no_default'] . '</label><br />';
 	}
 
 	foreach ($context['field']['options'] as $k => $option)
@@ -215,10 +215,10 @@ function template_edit_profile_field()
 						</dt>
 						<dd>
 							<select name="mask" id="mask" onchange="updateInputBoxes();">
-								<option value="nohtml"', $context['field']['mask'] == 'nohtml' ? ' selected="selected"' : '', '>', $txt['custom_edit_mask_nohtml'], '</option>
-								<option value="email"', $context['field']['mask'] == 'email' ? ' selected="selected"' : '', '>', $txt['custom_edit_mask_email'], '</option>
-								<option value="number"', $context['field']['mask'] == 'number' ? ' selected="selected"' : '', '>', $txt['custom_edit_mask_number'], '</option>
-								<option value="regex"', strpos($context['field']['mask'], 'regex') === 0 ? ' selected="selected"' : '', '>', $txt['custom_edit_mask_regex'], '</option>
+								<option value="nohtml"', $context['field']['mask'] === 'nohtml' ? ' selected="selected"' : '', '>', $txt['custom_edit_mask_nohtml'], '</option>
+								<option value="email"', $context['field']['mask'] === 'email' ? ' selected="selected"' : '', '>', $txt['custom_edit_mask_email'], '</option>
+								<option value="number"', $context['field']['mask'] === 'number' ? ' selected="selected"' : '', '>', $txt['custom_edit_mask_number'], '</option>
+								<option value="regex"', str_starts_with($context['field']['mask'], 'regex') ? ' selected="selected"' : '', '>', $txt['custom_edit_mask_regex'], '</option>
 							</select>
 							<br />
 							<span id="regex_div">
@@ -270,7 +270,7 @@ function template_edit_profile_field()
 		</form>
 	</div>';
 
-	// Get the javascript bits right!
+	// Get the JavaScript bits right!
 	echo '
 	<script>
 		updateInputBoxes();

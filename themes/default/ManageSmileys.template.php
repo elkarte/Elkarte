@@ -40,7 +40,7 @@ function template_modifyset()
 			', $context['current_set']['is_new'] ? $txt['smiley_set_new'] : $txt['smiley_set_modify_existing'], '
 			</h2>';
 
-	// If this is an existing set, and there are still un-added smileys - offer an import opportunity.
+	// If this is an existing set, and there are still unadded smileys - offer an import opportunity.
 	if (!empty($context['current_set']['can_import']))
 	{
 		echo '
@@ -100,7 +100,7 @@ function template_modifyset()
 						<input type="checkbox" name="smiley_sets_default" id="smiley_sets_default" value="1"', $context['current_set']['selected'] ? ' checked="checked"' : '', ' />
 					</dd>';
 
-	// If this is a new smiley set they have the option to import smileys already in the directory.
+	// If this is a new smiley set, they can import smileys already in the directory.
 	if ($context['current_set']['is_new'])
 	{
 		echo '

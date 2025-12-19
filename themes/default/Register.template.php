@@ -190,7 +190,7 @@ function template_registration_form()
 						</span>
 					</div>';
 
-	if ($context['insert_display_name'] == true)
+	if ($context['insert_display_name'])
 	{
 		echo '
 					<div class="form_field w_icon">
@@ -244,7 +244,7 @@ function template_registration_form()
 				}, $field['input_html']);
 
 				// Fieldsets already have a legend
-				if (strpos($field['input_html'], 'fieldset') === false)
+				if (!str_contains($field['input_html'], 'fieldset'))
 				{
 					echo '	
 						<label ', empty($field['is_error']) ? '' : ' class="error"', ' for="', $field['colname'], '">', $field['name'], '</label>';

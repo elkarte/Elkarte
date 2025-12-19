@@ -10,8 +10,8 @@
  */
 
 /**
- * This file contains javascript associated with the topic viewing including
- * Quick Modify, Quick Reply, In Topic Moderation, thumbnail expansion etc
+ * This file contains JavaScript associated with the topic viewing including
+ * Quick Modify, Quick Reply, In Topic Moderation, thumbnail expansion, etc.
  */
 
 /**
@@ -36,9 +36,9 @@ function QuickModifyTopic (oOptions)
 	this.init();
 }
 
-// Used to initialise the object event handlers
+// Used to initialize the object event handlers
 QuickModifyTopic.prototype.init = function() {
-	// Detect and act on keypress
+	// Detect and act on the keypress
 	this.oTopicModHandle.onkeydown = this.modify_topic_keypress.bind(this);
 
 	// Used to detect when we've stopped editing.
@@ -70,7 +70,7 @@ QuickModifyTopic.prototype.modify_topic = function(topic_id, first_msg_id) {
 
 // Callback function from the modify_topic ajax call
 QuickModifyTopic.prototype.onDocReceived_modify_topic = function(XMLDoc) {
-	// If it is not valid then clean up
+	// If it is not valid, then clean up
 	if (!XMLDoc || !XMLDoc.getElementsByTagName('message'))
 	{
 		this.modify_topic_cancel();
@@ -137,7 +137,7 @@ QuickModifyTopic.prototype.modify_topic_show_edit = function(subject) {
 	this.oCurSubjectDiv.onmouseover = this.modify_topic_mouseover.bind(this);
 };
 
-// Yup that's right, save it
+// Yup, that's right, save it
 QuickModifyTopic.prototype.modify_topic_save = function(cur_session_id, cur_session_var) {
 	if (!this.bInEditMode)
 	{
@@ -152,11 +152,11 @@ QuickModifyTopic.prototype.modify_topic_save = function(cur_session_id, cur_sess
 	return false;
 };
 
-// Done with the edit, if all went well show the new topic title
+// Done with the edit, if all went well, show the new topic title
 QuickModifyTopic.prototype.modify_topic_done = function(XMLDoc) {
 	ajax_indicator(false);
 
-	// If it is not valid then clean up
+	// If it is not valid, then clean up
 	if (!XMLDoc || !XMLDoc.getElementsByTagName('subject'))
 	{
 		this.modify_topic_cancel();
@@ -186,7 +186,7 @@ QuickModifyTopic.prototype.modify_topic_done = function(XMLDoc) {
 	return false;
 };
 
-// Done with the edit, put in new subject and link.
+// Done with the edit, put in a new subject and link.
 QuickModifyTopic.prototype.modify_topic_hide_edit = function(subject) {
 	// Re-template the subject!
 	this.oCurSubjectDiv.innerHTML = '<a href="' + elk_scripturl + '?topic=' + this.iCurTopicId + '.0">' + subject + '<' + '/a>';
@@ -267,7 +267,7 @@ QuickReply.prototype.quote = function(iMessageId, xDeprecated) {
 	// Collapsed on a quote, then simply got to the full post screen
 	if (this.bCollapsed)
 	{
-		// Instead of going to full post screen, lets expand the collapsed QR
+		// Instead of going to full post screen, let's expand the collapsed QR
 		this.swap(false, false);
 
 		//window.location.href = elk_prepareScriptUrl(this.opt.sScriptUrl) + 'action=post;quote=' + iMessageId + ';topic=' + this.opt.iTopicId + '.' + this.opt.iStart;
@@ -321,7 +321,7 @@ QuickReply.prototype.swap = function(bInit, bSavestate) {
 	else
 	{
 		document.getElementById(this.opt.sContainerId).slideDown(250, function() {
-			// Force the editor to a min height, otherwise its just 2 lines
+			// Force the editor to a min height, otherwise it's just 2 lines
 			let instance = sceditor.instance(document.getElementById(sEditorId));
 			if (instance)
 			{
@@ -336,7 +336,7 @@ QuickReply.prototype.swap = function(bInit, bSavestate) {
 		this.oCookie.set(this.opt.oCookieOptions.sCookieName, this.bCollapsed ? '1' : '0');
 	}
 
-	// Save the expand /collapse preference
+	// Save the expand/collapse preference
 	if (!bInit && bSavestate && 'oThemeOptions' in this.opt && this.opt.oThemeOptions.bUseThemeSettings)
 	{
 		elk_setThemeOption(this.opt.oThemeOptions.sOptionName, this.bCollapsed ? '1' : '0', 'sThemeId' in this.opt.oThemeOptions ? this.opt.oThemeOptions.sThemeId : null, 'sAdditionalVars' in this.opt.oThemeOptions ? this.opt.oThemeOptions.sAdditionalVars : null);
@@ -390,7 +390,7 @@ QuickModify.prototype.modifyMsg = function(iMessageId) {
 		}
 	}
 
-	// First cancel if there's another message still being edited.
+	// First, cancel if there's another message still being edited.
 	if (this.bInEditMode)
 	{
 		this.modifyCancel();
@@ -415,7 +415,7 @@ QuickModify.prototype.onMessageReceived = function(XMLDoc) {
 	// Grab the message ID.
 	this.sCurMessageId = XMLDoc.getElementsByTagName('message')[0].getAttribute('id');
 
-	// Show the message icon if it was hidden and its set
+	// Show the message icon if it was hidden and it's set
 	if (this.opt.sIconHide !== null)
 	{
 		this.oMsgIcon = document.getElementById('messageicon_' + this.sCurMessageId.replace('msg_', ''));
@@ -425,7 +425,7 @@ QuickModify.prototype.onMessageReceived = function(XMLDoc) {
 		}
 	}
 
-	// If this is not valid then simply give up.
+	// If this is not valid, then simply give up.
 	if (!document.getElementById(this.sCurMessageId))
 	{
 		if ('console' in window && console.error)
@@ -474,7 +474,7 @@ QuickModify.prototype.onMessageReceived = function(XMLDoc) {
 	// Position the editor in the window
 	document.getElementById('info_' + this.sCurMessageId.substring(this.sCurMessageId.lastIndexOf('_') + 1)).scrollIntoView();
 
-	// Handle custom function hook before showing the new select.
+	// Handle a custom function hook before showing the new select.
 	if ('funcOnAfterCreate' in this.opt)
 	{
 		this.tmpMethod = this.opt.funcOnAfterCreate;
@@ -615,7 +615,7 @@ QuickModify.prototype.onModifyDone = function(XMLDoc) {
 		this.sMessageBuffer = this.opt.sTemplateBodyNormal.replace(/%body%/, bodyText);
 		this.oCurMessageDiv.innerHTML = this.sMessageBuffer;
 
-		// Show new subject div, update in case it changed
+		// Show a new subject div, update in case it changed
 		let sSubjectText = oSubject.childNodes[0].nodeValue;
 
 		this.sSubjectBuffer = this.opt.sTemplateSubjectNormal.replace(/%subject%/, sSubjectText);
@@ -884,7 +884,7 @@ InTopicModeration.prototype.handleSubmit = function(sSubmitType) {
 };
 
 /**
- * Expands an attachment thumbnail when its clicked
+ * Expands an attachment thumbnail when it's clicked
  *
  * @param {string} thumbID
  * @param {string} messageID
@@ -974,7 +974,7 @@ function expandThumbLB (thumbID, messageID)
 			expandLightbox();
 		},
 		expandLightbox = function() {
-			// Add an expand the image to full size when the expand icon is clicked
+			// Add and expand the image to full size when the expand icon is clicked
 			$elk_expand_icon.on('click', function() {
 				$('#elk_lb_content').addClass('expand').css({
 					'height': Math.floor(window.innerHeight * 0.95) + 'px',
@@ -1084,13 +1084,13 @@ function expandThumbLB (thumbID, messageID)
 
 	// Swipe navigation left / right detection
 	$(window).on('touchmove.lb', function(event) {
-		// No known start point ?
+		// No known start point?
 		if (!xDown || !yDown)
 		{
 			return;
 		}
 
-		// Where are we now
+		// Where are we now?
 		var xUp = event.originalEvent.touches[0].clientX,
 			yUp = event.originalEvent.touches[0].clientY,
 			xDiff = xDown - xUp,
@@ -1180,7 +1180,7 @@ function onTopicSplitReceived (XMLDoc)
 	{
 		pageIndex = XMLDoc.getElementsByTagName('pageIndex')[i];
 
-		// Update the page container with our xml response
+		// Update the page container with our XML response
 		document.getElementById('pageindex_' + pageIndex.getAttribute('section')).innerHTML = pageIndex.firstChild.nodeValue;
 		start[i] = pageIndex.getAttribute('startFrom');
 	}
@@ -1265,18 +1265,18 @@ function onTopicSplitReceived (XMLDoc)
  * Quick Moderation for the message listing
  *
  * @param {type} oOptions
- *      - aQmActions: array of possible actions restore, markread, merge, etc
+ *      - aQmActions: array of possible actions restore, markread, merge, etc.
  * 	    - sButtonStrip: string identifying the button container, typically moderationbuttons
  * 		- sButtonStripDisplay: string of ID to attach to UL if creating, typically moderationbuttons_strip
  *      - bUseImageButton: If to show an icon on the button when selected
  * 		- sFormId: The id of the QM form, which we will submit on a button (link) click
- * 	    - bHideStrip: boolean If to initially hide the button strip
+ * 	    - bHideStrip: boolean. If to initially hide the button strip.
  * 	Button Definitions are (remove shown as example)
  * 	    - bCanRemove: boolean, if this button can be shown at all
- * 		- aActionRemove: optional array of specific topic id's that increase the counter (remove in this example)
+ * 		- aActionRemove: optional array of specific topic id's that increases the counter (remove in this example)
  * 		- sRemoveButtonLabel: Button text
- * 		- sRemoveButtonImage: svg icon name from css, like "i-delete",
- * 		- sRemoveButtonConfirm: optional, text to show in a confirm dialog
+ * 		- sRemoveButtonImage: svg icon name from CSS, like "i-delete",
+ * 		- sRemoveButtonConfirm: optional, text to show in a confirmation dialog
  */
 function InTopicListModeration (oOptions)
 {
@@ -1350,7 +1350,7 @@ InTopicListModeration.prototype.handleClick = function(oCheckbox) {
 			{
 				indicator = this.iNumSelected;
 			}
-			// Availability array, can this be done here (e.g. can approve)
+			// Availability array, can this be done here (e.g., can approve)
 			else
 			{
 				let filteredArray = thisTopics.filter(value => aCurrentlySelected.includes(value));

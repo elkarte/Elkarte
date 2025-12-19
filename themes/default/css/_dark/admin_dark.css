@@ -245,7 +245,7 @@
 
 /* This is the drag/drop placeholder, normally not visible */
 .ui-state-highlight {
-	border-color: var(--pure_green) !important;
+	border-color: var(--success) !important;
 	background-color: var(--content_background) !important;
 }
 

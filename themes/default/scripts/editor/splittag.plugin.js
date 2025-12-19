@@ -40,7 +40,7 @@
 			// "this" will be set to the instance of the editor calling it
 			editor = this;
 
-			// Add handler for a ctrl+enter key press, this is our keystroke cue to split the tag(s)
+			// Add handler for a ctrl+enter key press.  This is our keystroke cue to split the tag(s)
 			editor.addShortcut('ctrl+enter', base.split);
 
 			// Add the command for editor button use
@@ -57,8 +57,8 @@
 		/**
 		 * "Splits" the text at the caret position
 		 *
-		 * - Closes any open bbc tags in front of the caret position
-		 * - re-opens them past the caret position,
+		 * - Closes any open bbc tags in front of the caret position.
+		 * - re-opens them past the caret position.
 		 * - Example | represents the caret
 		 * [quote]ElkArte is |cool[/quote] => [quote]ElkArte is [/quote]|[quote]cool[/quote]
 		 */
@@ -94,7 +94,7 @@
 					tagTextEnd += '[' + tagStack[i].name + tagStack[i].attributes + "]";
 				}
 
-				// Did someone select text that they expect to be wrapped in tags as well?
+				// Did anyone select text that they expect to be wrapped in tags as well?
 				if (caret.start !== caret.end)
 				{
 					return editor.insertText(tagTextStart + tagTextEnd, tagTextStart + tagTextEnd);
@@ -108,7 +108,7 @@
 		/**
 		 * Search a string for open bbc tags (ahead of the iPos in the string) and returns them
 		 *
-		 * It does no checking to verify that a tag has a matching closing tag in the stack, its a simple
+		 * It does no checking to verify that a tag has a matching closing tag in the stack, it's a simple
 		 * queue stack.  It also does not check if the tag is valid child of any tag before it. etc.
 		 *
 		 * [quote]this[b]is[i]a te|st[/i][/b][/quote] (| = caret pos) Returns: [i][b][quote]
@@ -150,12 +150,12 @@
 		/**
 		 * Initial attempt at quote splitting in wysiwyg mode
 		 *
-		 * - Finds first block quote tag before the cursor
-		 * - Extracts the contents from the caret to the end of the above block quote
-		 * - Collapses the remaining quote range
-		 * - Inserts extracted content as sibling
-		 * - Copy attributes to the new sibling
-		 * - Positions cursor between the two quotes for text entry
+		 * - Finds first block quote tag before the cursor.
+		 * - Extracts the contents from the caret to the end of the above block quote.
+		 * - Collapses the remaining quote range.
+		 * - Inserts extracted content as sibling.
+		 * - Copy attributes to the new sibling.
+		 * - Positions cursor between the two quotes for text entry.
 		 * - Does not currently build the cite tag for display, but does copy the
 		 * attributes so toggle and post work as expected.
 		 */
@@ -210,7 +210,7 @@
 				// Collapse the block quote range, we want to insert after this.
 				range.collapse(quote);
 
-				// If we need to split/insert inside of a quote
+				// If we need to split/insert the inside of a quote
 				// range.selectNodeContents(quote);
 				// range.collapse(false);
 
