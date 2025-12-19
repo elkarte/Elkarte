@@ -185,8 +185,8 @@ class CalendarEvent
 			$eventProperties = getEventProperties($this->_event_id, true);
 		}
 
-		$id_board = $eventProperties['id_board'] ?? (isset($options['id_board']) ? $options['board'] : 0);
-		$id_topic = $eventProperties['id_topic'] ?? (isset($options['id_topic']) ? $options['topic'] : 0);
+		$id_board = $eventProperties['id_board'] ?? ($options['id_board'] ?? 0);
+		$id_topic = $eventProperties['id_topic'] ?? ($options['id_topic'] ?? 0);
 
 		if (empty($this->_settings['cal_allowspan']))
 		{
