@@ -127,8 +127,12 @@ final class ErrorHandler extends Errors
 			);
 		}
 
-		// If this is an E_ERROR, E_USER_ERROR, E_WARNING, or E_USER_WARNING... die.  Violently so.
-		if ($this->error_level & $this->fatalErrors || $this->error_level % 255 === E_WARNING || $isException)
+		// If this is an E_ERROR, E_USER_ERROR, E_COMPILE_ERROR, E_CORE_ERROR, E_PARSE ... die. Violently so.
+		// If this is an E_WARNING or E_USER_WARNING via % 255 ... die. Violently so.
+		// If this is an uncaught Exception ... die. Violently so.
+		if ($this->error_level & $this->fatalErrors
+			|| $this->error_level % 255 === E_WARNING
+			|| $isException)
 		{
 			$this->_setup_fatal_ErrorContext($message, $this->error_level);
 		}

@@ -318,7 +318,7 @@ class Errors extends AbstractModel
 	 *
 	 * @throws Exception
 	 */
-	public function fatal_lang_error($error, $log = 'general', $sprintf = []): void
+	public function fatal_lang_error($error, $log = 'general', $sprintf = []): never
 	{
 		throw new Exception($error, $log, $sprintf);
 	}
@@ -629,6 +629,7 @@ class Errors extends AbstractModel
 		$context['error_message'] = $context['error_message'] ?? $error_message;
 		$context['error_code'] = isset($error_code) ? 'id="' . htmlspecialchars($error_code) . '" ' : '';
 		$context['page_title'] = empty($context['page_title']) ? $context['error_title'] : $context['page_title'];
+		$context['error_class'] = (isset($error_code) && $error_code === 0) ? 'infobox' : 'errorbox';
 
 		// Load the template and set the sub template.
 		theme()->getTemplates()->load('Errors');
