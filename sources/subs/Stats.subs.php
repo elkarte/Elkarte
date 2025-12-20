@@ -489,7 +489,8 @@ function topTopicStarter()
 		);
 
 		// The cache might return null if it's expired or not set
-		$members = $members === null ? [0 => 0] : arsort($members);
+		$members = $members ?? [0 => 0];
+		arsort($members);
 		$members = array_slice($members, 0, $modSettings['stats_limit'] ?? 10, true);
 
 		Cache::instance()->put('stats_top_starters', $members, 360);
