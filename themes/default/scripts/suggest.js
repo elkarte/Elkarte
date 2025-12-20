@@ -12,7 +12,7 @@
 /** global: elk_session_var, elk_session_id, elk_scripturl */
 
 /**
- * This file contains javascript associated with an auto suggest control.
+ * This file contains JavaScript associated with an auto suggest control.
  */
 
 /**
@@ -63,7 +63,7 @@ function elk_AutoSuggest (oOptions)
 }
 
 /**
- * Initialize our auto suggest object, adds events and containers to the element we monitor
+ * Initialize our auto-suggest object, adds events and containers to the element we monitor
  */
 elk_AutoSuggest.prototype.init = function() {
 	// Create a div that'll contain the results later on.

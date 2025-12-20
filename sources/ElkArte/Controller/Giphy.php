@@ -37,7 +37,7 @@ class Giphy extends AbstractController
 	];
 
 	/**
-	 * pre_dispatch, called before all other methods.  Sets the Giphy API key for the Dispatch class.
+	 * Pre-dispatch, called before all other methods.  Sets the Giphy API key for the Dispatch class.
 	 *
 	 * This method retrieves the Giphy API key from the global $modSettings variable
 	 * @return void
@@ -46,8 +46,9 @@ class Giphy extends AbstractController
 	{
 		global $modSettings;
 
-		// The default is a rate limited 42 search requests an hour and 1000 search requests a day
-		$this->apiKey = $modSettings['giphyApiKey'] ?? 'fpjXDpZ1cJ0qoqol3BVZz76YHZlv1uB2';
+		// The default is a rate limited. 42 search requests an hour and 1000 search requests a day
+		// For testing via chatgpt: fpjXDpZ1cJ0qoqol3BVZz76YHZlv1uB2
+		$this->apiKey = $modSettings['giphyApiKey'] ?? '';
 	}
 
 	/**

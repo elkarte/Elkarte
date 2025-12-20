@@ -68,7 +68,7 @@
 	}
 
 	/**
-	 * Perform a debounce search for GIFs using the Giphy API.
+	 * Perform a debounced search for GIFs using the Giphy API.
 	 *
 	 * @param {string} query - The search query.
 	 * @returns {Promise<Array<string>>} - A promise that resolves to an array of GIF URLs.

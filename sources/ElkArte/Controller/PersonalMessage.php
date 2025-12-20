@@ -2340,10 +2340,10 @@ class PersonalMessage extends AbstractController
 	 *
 	 * What it does:
 	 *
-	 * - accessed with ?action=pm;sa=search2
-	 * - checks user input and searches the pm table for messages matching the query.
-	 * - uses the search_results sub template of the PersonalMessage template.
-	 * - show the results of the search query.
+	 * - Accessed with ?action=pm;sa=search2
+	 * - Checks user input and searches the pm table for messages matching the query.
+	 * - Uses the search_results sub template of the PersonalMessage template.
+	 * - Show the results of the search query.
 	 */
 	public function action_search2(): ?bool
 	{

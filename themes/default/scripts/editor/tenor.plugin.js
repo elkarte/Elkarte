@@ -66,7 +66,7 @@
 	}
 
 	/**
-	 * Perform a debounce search for GIFs using the Tenor API.
+	 * Perform a debounced search for GIFs using the Tenor API.
 	 *
 	 * @param {string} query - The search query.
 	 */
