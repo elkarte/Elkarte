@@ -32,7 +32,7 @@ class StreamFetchWebdataTest extends TestCase
 				'https://www.elkarte.net/community/index.php?action=search;sa=results',
 				array('search' => 'stuff', 'search_selection' => 'all', 'advanced' => 0),
 				[200, 403],
-				'let you access this section',
+				'Session verification failed',
 			),
 		);
 
