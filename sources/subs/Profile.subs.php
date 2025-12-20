@@ -2419,7 +2419,7 @@ function getMemberNotificationsProfile($member_id)
 
 	$notifiers = Notifications::instance()->getNotifiers();
 	$enabled_mentions = getEnabledNotifications();
-	$user_preferences = getUsersNotificationsPreferences($enabled_mentions, $member_id);
+	$user_preferences = getUsersNotificationsPreferences($enabled_mentions, $member_id, false);
 	$mention_types = [];
 	$defaults = getConfiguredNotificationMethods();
 

@@ -277,7 +277,7 @@ function getEnabledNotifications()
  *
  * @return array
  */
-function getUsersNotificationsPreferences($notification_types, $members)
+function getUsersNotificationsPreferences($notification_types, $members, $with_defaults = true)
 {
 	$db = database();
 
@@ -289,7 +289,7 @@ function getUsersNotificationsPreferences($notification_types, $members)
 		$return = [];
 		foreach ($methods as $k => $level)
 		{
-			if ($level == Notifications::DEFAULT_LEVEL)
+			if ((int) $level === Notifications::DEFAULT_LEVEL)
 			{
 				$return[] = $k;
 			}
@@ -319,24 +319,23 @@ function getUsersNotificationsPreferences($notification_types, $members)
 		}
 	);
 
-	// Set the defaults
-	foreach ($query_members as $member)
+	// Use the site defaults if that is what the member chooses.  They would not have any preference
+	// set in notifications_pref = use defaults vs 'none' for nothing selected.
+	if ($with_defaults)
 	{
-		foreach ($notification_types as $type)
+		foreach ($query_members as $member)
 		{
-			if (empty($results[$member]) && !empty($defaults[$type]))
+			foreach ($notification_types as $type)
 			{
-				if (!isset($results[$member]))
+				if (!isset($results[$member][$type]) && !empty($defaults[$type]))
 				{
-					$results[$member] = [];
-				}
+					if (!isset($results[$member]))
+					{
+						$results[$member] = [];
+					}
 
-				if (!isset($results[$member][$type]))
-				{
-					$results[$member][$type] = [];
+					$results[$member][$type] = $defaults[$type];
 				}
-
-				$results[$member][$type] = $defaults[$type];
 			}
 		}
 	}

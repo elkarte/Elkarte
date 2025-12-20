@@ -461,7 +461,7 @@ class Mentions extends AbstractController
 
 			$round++;
 
-			// If nothing has been removed OR there are not enough
+			// If nothing has been removed OR, there is not enough
 			if (($totalMentions - $start < $limit) || count($mentions) !== $count_possible || count($mentions) === $limit)
 			{
 				break;
