@@ -218,7 +218,7 @@ class SearchRenderer extends Renderer
 					'value' => $output['id'],
 					'checkbox' => 'always',
 					'name' => 'topics',
-					'enabled' => $context['can_quick_mod'],
+					'enabled' => isset($context['can_quick_mod']) && $context['can_quick_mod'],
 				],
 				// Can we request notification of topics?
 				'notify' => [

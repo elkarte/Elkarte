@@ -110,7 +110,8 @@ abstract class AbstractEventMessage implements EventInterface
 				$row['subject'],
 				'<a href="' . $scripturl . '?topic=' . $row['id_topic'] . ';mentionread;mark=read;' . $context['session_var'] . '=' . $context['session_id'] . ';item=' . $row['id_mention'] . '#new">' . $row['subject'] . '</a>',
 				$board['name'] ?? '',
-		],
-			$txt['mention_' . $row['mention_type']]);
+			],
+			$txt['mention_' . $row['mention_type']]
+		);
 	}
 }

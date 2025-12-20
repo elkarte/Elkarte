@@ -225,8 +225,9 @@ class Draft extends Post
 		$reverse = $start > $msgCount / 2;
 		if ($reverse)
 		{
-			$maxIndex = $msgCount < $context['start'] + $modSettings['defaultMaxMessages'] + 1 && $msgCount > $context['start'] ? $msgCount - $context['start'] : (int) $modSettings['defaultMaxMessages'];
-			$start = $msgCount < $context['start'] + $modSettings['defaultMaxMessages'] + 1 || $msgCount < $context['start'] + $modSettings['defaultMaxMessages'] ? 0 : $msgCount - $context['start'] - $modSettings['defaultMaxMessages'];
+			$start = ($start >= $msgCount) ? $msgCount - $maxIndex : $start;
+			$maxIndex = $msgCount < $start + $modSettings['defaultMaxMessages'] + 1 && $msgCount > $start ? $msgCount - $start : (int) $modSettings['defaultMaxMessages'];
+			$start = $msgCount < $start + $modSettings['defaultMaxMessages'] + 1 || $msgCount < $start + $modSettings['defaultMaxMessages'] ? 0 : $msgCount - $start - $modSettings['defaultMaxMessages'];
 		}
 
 		// Find this user's drafts

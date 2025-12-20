@@ -146,6 +146,7 @@ class Display extends AbstractController
 
 		if ($start >= $total_visible_posts / 2 && $this->messages_per_page !== -1)
 		{
+			$start = ($start >= $total_visible_posts) ? $total_visible_posts - $limit : $start;
 			$ascending = false;
 			$limit = $total_visible_posts <= $start + $limit ? $total_visible_posts - $start : $limit;
 			$start = $total_visible_posts <= $start + $limit ? 0 : $total_visible_posts - $start - $limit;

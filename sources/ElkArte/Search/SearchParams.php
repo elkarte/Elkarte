@@ -205,6 +205,8 @@ class SearchParams extends ValuesContainer
 	 */
 	public function cleanParams(&$params): void
 	{
+		checkSession('get');
+
 		$validator = new DataValidator();
 
 		// Convert dates to days between now and ...
@@ -590,7 +592,9 @@ class SearchParams extends ValuesContainer
 			return $this->_search_params['search'];
 		}
 
-		return $this->_req->getRequest('search', 'un_htmlspecialchars', '');
+		$search = $this->_req->getRequest('search', 'un_htmlspecialchars', '');
+
+		return is_scalar($search) ? $search : '';
 	}
 
 	/**

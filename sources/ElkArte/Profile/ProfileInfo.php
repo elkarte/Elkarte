@@ -489,6 +489,7 @@ class ProfileInfo extends AbstractController
 		$reverse = $this->_req->getQuery('start', 'intval', 0) > $msgCount / 2;
 		if ($reverse)
 		{
+			$context['start'] = ($context['start'] >= $msgCount) ? $msgCount - $maxIndex : $context['start'];
 			$maxIndex = $msgCount < $context['start'] + $modSettings['defaultMaxMessages'] + 1 && $msgCount > $context['start'] ? $msgCount - $context['start'] : (int) $modSettings['defaultMaxMessages'];
 			$start = $msgCount < $context['start'] + $modSettings['defaultMaxMessages'] + 1 || $msgCount < $context['start'] + $modSettings['defaultMaxMessages'] ? 0 : $msgCount - $context['start'] - $modSettings['defaultMaxMessages'];
 		}

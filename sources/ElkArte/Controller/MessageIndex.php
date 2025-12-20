@@ -634,6 +634,8 @@ class MessageIndex extends AbstractController implements FrontpageInterface
 		$fake_ascending = false;
 		if ($start > ($board_info['total_topics'] - 1) / 2)
 		{
+			// Rolled off the end?
+			$start = ($start >= $board_info['total_topics']) ? $board_info['total_topics'] - $per_page : $start;
 			$this->ascending = !$this->ascending;
 			$fake_ascending = true;
 			$per_page = $board_info['total_topics'] < $start + $per_page + 1 ? $board_info['total_topics'] - $start : $per_page;

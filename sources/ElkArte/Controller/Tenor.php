@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Functions to interact with the Giphy API and return JSON results to the giphy plugin
+ * Functions to interact with the Tenor API and return JSON results to the tenor plugin
  *
  * @package   ElkArte Forum
  * @copyright ElkArte Forum contributors
@@ -18,49 +18,47 @@ use ElkArte\Action;
 use ElkArte\Errors\Errors;
 
 /**
- * Functions to interact with the Giphy API and return JSON results to the giphy plugin
+ * Functions to interact with the Tenor API and return JSON results to the tenor plugin
  */
-class Giphy extends AbstractController
+class Tenor extends AbstractController
 {
-	/** @var string $baseApiUrl The base API URL for Giphy. */
-	protected $baseApiUrl = 'https://api.giphy.com/v1/';
+	/** @var string $baseApiUrl The base API URL for Tenor v2. */
+	protected $baseApiUrl = 'https://tenor.googleapis.com/v2/';
 
 	/** @var string The API key used for authentication. */
 	protected $apiKey;
 
-	/** @var array default values to pass to the Giphy API */
+	/** @var array default values to pass to the Tenor API */
 	protected $config = [
-		'random_id' => null,
-		'rating' => 'g',
-		'lang' => 'en',
-		'limit' => 28,
+		'client_key' => 'elkarte',
+		'contentfilter' => 'medium',
+		'locale' => 'en',
+		'limit' => 20,
 	];
 
 	/**
-	 * Pre-dispatch, called before all other methods.  Sets the Giphy API key for the Dispatch class.
+	 * Pre-dispatch, called before all other methods.  Sets the Tenor API key for the Dispatch class.
 	 *
-	 * This method retrieves the Giphy API key from the global $modSettings variable
+	 * This method retrieves the Tenor API key from the global $modSettings variable
 	 * @return void
 	 */
-	public function pre_dispatch()
+	public function pre_dispatch(): void
 	{
 		global $modSettings;
 
-		// The default is a rate limited. 42 search requests an hour and 1000 search requests a day
-		// For testing via chatgpt: fpjXDpZ1cJ0qoqol3BVZz76YHZlv1uB2
-		$this->apiKey = $modSettings['giphyApiKey'] ?? '';
+		$this->apiKey = $modSettings['tenorApiKey'] ?? '';
 	}
 
 	/**
-	 * Index action, based on the SA sends control to the right method.
+	 * Index action, based on the SA, sends control to the right method.
 	 *
 	 * @return void
 	 */
-	public function action_index()
+	public function action_index(): void
 	{
 		global $context, $modSettings;
 
-		if (empty($modSettings['enableGiphy']))
+		if (empty($modSettings['enableTenor']) || empty($this->apiKey))
 		{
 			return;
 		}
@@ -69,10 +67,10 @@ class Giphy extends AbstractController
 
 		$subActions = [
 			'search' => [$this, 'action_getSearchResults'],
-			'trending' => [$this, 'action_getTrending'],
+			'trending' => [$this, 'action_getFeatured'],
 		];
 
-		$action = new Action('giphy');
+		$action = new Action('tenor');
 		$subAction = $action->initialize($subActions, 'trending');
 		$context['sub_action'] = $subAction;
 		$action->dispatch($subAction);
@@ -88,8 +86,8 @@ class Giphy extends AbstractController
 		global $modSettings;
 
 		$config = [
-			'rating' => $modSettings['giphyRating'] ?? 'g',
-			'lang' => $modSettings['giphyLanguage'] ?? 'en',
+			'contentfilter' => $modSettings['tenorRating'] ?? 'medium',
+			'locale' => $modSettings['tenorLanguage'] ?? 'en',
 		];
 
 		$this->config = array_replace($this->config, $config);
@@ -102,27 +100,26 @@ class Giphy extends AbstractController
 	 *
 	 * @return bool Returns false indicating that the statistics tracking is not needed
 	 */
-	public function trackStats($action = '')
+	public function trackStats($action = ''): bool
 	{
 		return false;
 	}
 
 	/**
-	 * Retrieves trending GIFs.
+	 * Retrieves featured GIFs (trending).
 	 *
-	 * @return bool The trending GIFs and pagination information.
+	 * @return bool The featured GIFs and pagination information.
 	 */
-	public function action_getTrending(): bool
+	public function action_getFeatured(): bool
 	{
 		checkSession('get');
 
 		is_not_guest();
 
-		$result = $this->request('gifs/trending', [
-			'random_id' => $this->config['random_id'],
-			'rating' => $this->config['rating'],
+		$result = $this->request('featured', [
+			'contentfilter' => $this->config['contentfilter'],
 			'limit' => $this->config['limit'],
-			'offset' => $this->_req->getQuery('offset', 'intval', 0)
+			'pos' => $this->_req->getQuery('pos', 'trim', '')
 		], $error);
 
 		if ($error)
@@ -131,7 +128,6 @@ class Giphy extends AbstractController
 		}
 
 		$images = $this->prepareImageResults($result);
-		$result['pagination']['limit'] = $this->config['limit'];
 
 		return $this->sendResults($images, $result);
 	}
@@ -147,12 +143,11 @@ class Giphy extends AbstractController
 
 		is_not_guest();
 
-		$result = $this->request('gifs/search', [
+		$result = $this->request('search', [
 			'q' => $this->_req->getQuery('q', 'trim', ''),
-			'random_id' => $this->config['random_id'],
-			'rating' => $this->config['rating'],
+			'contentfilter' => $this->config['contentfilter'],
 			'limit' => $this->config['limit'],
-			'offset' => $this->_req->getQuery('offset', 'intval', 0)
+			'pos' => $this->_req->getQuery('pos', 'trim', '')
 		], $error);
 
 		if ($error)
@@ -161,16 +156,15 @@ class Giphy extends AbstractController
 		}
 
 		$images =  $this->prepareImageResults($result);
-		$result['pagination']['limit'] = $this->config['limit'];
 
-		return $this->sendResults($images,$result);
+		return $this->sendResults($images, $result);
 	}
 
 	/**
 	 * Sets the results in context so the JSON template can deliver them.
 	 *
-	 * @param array $images An array of trending GIFs.
-	 * @param array $result The pagination and meta information.
+	 * @param array $images An array of GIFs.
+	 * @param array $result The pagination and meta-information.
 	 *
 	 * @return bool Returns true after sending the results.
 	 */
@@ -180,7 +174,7 @@ class Giphy extends AbstractController
 
 		setJsonTemplate();
 		$context['json_data'] = [
-			'giphy' => $images,
+			'tenor' => $images,
 			'data' => $result
 		];
 
@@ -188,7 +182,7 @@ class Giphy extends AbstractController
 	}
 
 	/**
-	 * Sends a request to the GIPHY API.
+	 * Sends a request to the Tenor API.
 	 *
 	 * @param string $path The API endpoint path.
 	 * @param array $params The additional parameters for the request (optional).
@@ -199,8 +193,8 @@ class Giphy extends AbstractController
 	public function request(string $path, array $params = [], bool|null &$error = null): array
 	{
 		$result = [];
-		$params = ['api_key' => $this->apiKey] + $params;
-		$path .= '?' . http_build_query($params, '','&');
+		$params = ['key' => $this->apiKey, 'client_key' => $this->config['client_key']] + $params;
+		$path .= '?' . http_build_query($params, '', '&');
 
 		require_once(SUBSDIR . '/Package.subs.php');
 		$body = fetch_web_data($this->baseApiUrl . $path);
@@ -212,7 +206,7 @@ class Giphy extends AbstractController
 		}
 
 		$error = true;
-		Errors::instance()->log_error('GIPHY API error');
+		Errors::instance()->log_error('Tenor API error');
 
 		return $result;
 	}
@@ -227,38 +221,23 @@ class Giphy extends AbstractController
 	{
 		$images = [];
 
-		if (is_array($result))
+		if (is_array($result) && isset($result['results']))
 		{
-			foreach ($result['data'] as $data)
+			foreach ($result['results'] as $data)
 			{
-				$fixedHeight = $data['images']['fixed_height']['url'];
-				$fixedHeightStill = $data['images']['fixed_height_still']['url'];
-
-				$fixedHeightSmall = $data['images']['fixed_height_small']['url'] ?? $fixedHeight;
-				$fixedHeightSmallStill = $data['images']['fixed_height_small_still']['url'] ?? $fixedHeightStill;
+				// Tenor v2 response structure:
+				// media_formats -> tinygif, gif, etc.
+				$media = $data['media_formats'];
 
 				$images[$data['id']] = [
 					'title' => $data['title'],
-					'insert' => $this->normalizeUrl($fixedHeight),
-					'src' => $this->normalizeUrl($fixedHeightSmall),
-					'thumbnail' => $this->normalizeUrl($fixedHeightSmallStill),
+					'insert' => $media['gif']['url'],
+					'src' => $media['tinygif']['url'],
+					'thumbnail' => $media['tinygif']['url'],
 				];
 			}
 		}
 
 		return $images;
-	}
-
-	/**
-	 * Normalizes a given URL.
-	 *
-	 * @param string $url The URL to be normalized.
-	 * @return string The normalized URL without query parameters or fragments.
-	 */
-	protected function normalizeUrl($url): string
-	{
-		$parts = parse_url($url);
-
-		return sprintf('%s://%s%s', $parts['scheme'], $parts['host'], $parts['path']);
 	}
 }

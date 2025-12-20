@@ -231,6 +231,11 @@ class DataValidator
 				$rules = explode('|', $rules);
 				foreach ($rules as $rule)
 				{
+					if (empty($rule))
+					{
+						continue;
+					}
+
 					$sanitation = $this->_getRuleValues($rule, $type = '_sanitation_');
 
 					// Defined method to use?
@@ -268,7 +273,7 @@ class DataValidator
 					else
 					{
 						// results in returning $input[$field] = $input[$field];
-						Errors::instance()->log_error('Unknown: data sanitizer function: ' . $sanitation['function'], 'undefined_vars');
+						Errors::instance()->log_error('Unknown: data sanitizer rule: ' . $rule . ' function: ' . $sanitation['function'] . ' method: ' . $sanitation['method'], 'undefined_vars');
 					}
 				}
 			}

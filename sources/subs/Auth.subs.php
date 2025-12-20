@@ -551,7 +551,7 @@ function validateUsername($memID, $username, $ErrorContext = 'register', $check_
 	}
 
 	// Only these characters are permitted.
-	if (in_array($username, ['_', '|']) || preg_match('~[<>&"\'=\\\\]~', preg_replace('~&#(?:\\d{1,7}|x[0-9a-fA-F]{1,6});~', '', $username)) != 0 || str_contains($username, '[code') || str_contains($username, '[/code'))
+	if (in_array($username, ['_', '|']) || preg_match('~[<>&"\'=\\\\]~', preg_replace('~&#(?:\\d{1,7}|x[0-9a-fA-F]{1,6});~', '', $username)) === 1 || str_contains($username, '[code') || str_contains($username, '[/code'))
 	{
 		$errors->addError('error_invalid_characters_username');
 	}

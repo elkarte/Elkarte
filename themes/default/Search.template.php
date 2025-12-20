@@ -28,7 +28,7 @@ function template_searchform()
 	global $context, $settings, $txt, $scripturl, $modSettings;
 
 	echo '
-				<form id="searchform" action="', $scripturl, '?action=search;sa=results" method="post" accept-charset="UTF-8" name="searchform">
+				<form id="searchform" action="', $scripturl, '?action=search;sa=results;' . $context['session_var'] . '=' . $context['session_id'] . '" method="post" accept-charset="UTF-8" name="searchform">
 					<h2 class="category_header', empty($settings['use_buttons']) ? '' : ' hdicon i-search', '">
 						', $txt['set_parameters'], '
 					</h2>';
@@ -233,11 +233,11 @@ function template_results()
 		if (isset($context['did_you_mean']))
 		{
 			echo '
-					<p>', $txt['search_did_you_mean'], ' <a href="', $scripturl, '?action=search;sa=results;params=', $context['did_you_mean_params'], '">', $context['did_you_mean'], '</a>.</p>';
+					<p>', $txt['search_did_you_mean'], ' <a href="', $scripturl, '?action=search;sa=results;' . $context['session_var'] . '=' . $context['session_id'] . ';params=', $context['did_you_mean_params'], '">', $context['did_you_mean'], '</a>.</p>';
 		}
 
 		echo '
-					<form action="', $scripturl, '?action=search;sa=results" method="post" accept-charset="UTF-8">
+					<form action="', $scripturl, '?action=search;sa=results;' . $context['session_var'] . '=' . $context['session_id'] . '" method="post" accept-charset="UTF-8">
 						<dl class="settings">
 							<dt class="righttext">
 								<label for="search"><strong>', $txt['search_for'], ':</strong></label>
@@ -413,7 +413,7 @@ function template_results()
 
 		echo '
 					<input type="hidden" name="qaction" id="qaction" value="na" />
-					<input type="hidden" name="redirect_url" value="', $scripturl . '?action=search;sa=results;params=' . $context['params'], '" />
+					<input type="hidden" name="redirect_url" value="', $scripturl . '?action=search;sa=results;' . $context['session_var'] . '=' . $context['session_id'] . ';params=' . $context['params'], '" />
 					<input type="hidden" name="' . $context['session_var'] . '" value="' . $context['session_id'] . '" />
 				</div>
 			</form>';

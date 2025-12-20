@@ -298,7 +298,7 @@ function template_search_form()
 	global $context, $modSettings, $txt;
 
 	echo '
-			<form id="search_form_menu" action="', getUrl('action', ['action' => 'search', 'sa' => 'results']), '" method="post" role="search" accept-charset="UTF-8">';
+			<form id="search_form_menu" action="', getUrl('action', ['action' => 'search', 'sa' => 'results',  '{session_data}']), '" method="post" role="search" accept-charset="UTF-8">';
 
 	// Using the quick search dropdown?
 	if (!empty($modSettings['search_dropdown']))

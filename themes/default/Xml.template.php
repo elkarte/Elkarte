@@ -467,9 +467,9 @@ function template_generic_xml_recursive($xml_data, $parent_ident, $child_ident, 
 }
 
 /**
- * Formats data retrieved in other functions into xml format.
+ * Formats data retrieved in other functions into XML format.
  * Additionally, formats data based on the specific format passed.
- * This function is recursively called to handle sub arrays of data.
+ * This function is recursively called to handle subarrays of data.
  *
  * @param array $data the array to output as xml data
  * @param int $i the amount of indentation to use.
@@ -643,7 +643,7 @@ function template_feedrss()
 }
 
 /**
- * Returns xml response to a draft autosave request
+ * Returns XML response to a draft autosave request
  * provides the id of the draft saved and the time it was saved in the response
  */
 function template_xml_draft()
@@ -657,7 +657,7 @@ function template_xml_draft()
 }
 
 /**
- * Returns xml response to a draft load request
+ * Returns XML response to a draft load request
  * provides the subject of the draft saved and the link to load
  */
 function template_xml_load_draft()
@@ -678,4 +678,13 @@ function template_xml_load_draft()
 
 	echo '
 </drafts>';
+}
+
+/**
+ * Returns an empty XML response
+ */
+function template_empty_xml()
+{
+	echo '<?xml version="1.0" encoding="UTF-8"?>
+<elk />';
 }

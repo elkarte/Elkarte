@@ -61,6 +61,10 @@ class Search extends AbstractController
 		// Coming from quick search box and going to some custom place?
 		$search_selection = $this->_req->getRequest('search_selection', 'trim');
 		$search = $this->_req->getRequest('search', 'trim');
+
+		$search_selection = is_scalar($search_selection) ? $search_selection : 'NA';
+		$search = is_scalar($search) ? $search : '';
+
 		if (isset($search_selection) && !empty($modSettings['additional_search_engines']))
 		{
 			$engines = prepareSearchEngines();
@@ -71,11 +75,12 @@ class Search extends AbstractController
 			}
 		}
 
-		// If coming from the quick search box, and we want to search on members, well we need to do that ;)
+		// If coming from the quick search box, and we want to search on members, well, we need to do that ;)
 		if (isset($search_selection) && $search_selection === 'members')
 		{
 			redirectexit('action=memberlist;sa=search;fields=name,email;search=' . urlencode($search));
 		}
+
 		// If load management is on and the load is high, no need to even show the form.
 		if (!empty($modSettings['loadavg_search']) && $modSettings['current_load'] >= $modSettings['loadavg_search'])
 		{
@@ -537,7 +542,7 @@ class Search extends AbstractController
 
 		// Now that we know how many results to expect we can start calculating the page numbers.
 		$start = $this->_req->getRequest('start', 'intval', 0);
-		$context['page_index'] = constructPageIndex('{scripturl}?action=search;sa=results;params=' . $context['params'], $start, $this->_search->getNumResults(), $modSettings['search_results_per_page']);
+		$context['page_index'] = constructPageIndex('{scripturl}?action=search;sa=results;' . $context['session_var'] . '=' . $context['session_id'] . ';params=' . $context['params'], $start, $this->_search->getNumResults(), $modSettings['search_results_per_page']);
 
 		// Consider the search complete!
 		Cache::instance()->remove('search_start:' . ($this->user->is_guest ? $this->user->ip : $this->user->id));

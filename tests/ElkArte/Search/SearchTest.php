@@ -7,12 +7,12 @@ use ElkArte\Helper\HttpReq;
 use ElkArte\Helper\ValuesContainer;
 use ElkArte\User;
 use ElkArte\UserSettingsLoader;
-use PHPUnit\Framework\TestCase;
+use tests\ElkArteCommonSetupTest;
 
 /**
  * Class TestSearchclass
  */
-class SearchTest extends TestCase
+class SearchTest extends ElkArteCommonSetupTest
 {
 	protected $backupGlobalsExcludeList = ['user_info'];
 	protected $member_full_access;
@@ -164,6 +164,8 @@ class SearchTest extends TestCase
 
 		$this->member_full_access = userByEmail('search@email1.tld');
 		$this->member_limited_access = userByEmail('search@email2.tld');
+
+		$this->setSession();
 	}
 
 	/**

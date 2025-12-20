@@ -1553,7 +1553,7 @@ function ssi_pollVote()
  */
 function ssi_quickSearch($output_method = 'echo')
 {
-	global $scripturl, $txt;
+	global $scripturl, $txt, $context;
 
 	if (!allowedTo('search_posts'))
 	{
@@ -1566,7 +1566,7 @@ function ssi_quickSearch($output_method = 'echo')
 	}
 
 	echo '
-		<form action="', $scripturl, '?action=search;sa=results" method="post" accept-charset="UTF-8">
+		<form action="', $scripturl, '?action=search;sa=results;' . $context['session_var'] . '=' . $context['session_id'] . '" method="post" accept-charset="UTF-8">
 			<input type="hidden" name="advanced" value="0" />
 			<input type="text" name="search" size="30" class="input_text" />
 			<input type="submit" value="', $txt['search'], '" />

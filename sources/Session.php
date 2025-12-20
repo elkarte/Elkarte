@@ -58,10 +58,10 @@ function loadSession()
 
 	// @todo Set the session cookie path?
 	// If it's already been started... probably best to skip this.
-	if ((ini_get('session.auto_start') == 1 && !empty($modSettings['databaseSession_enable'])) || session_id() === '')
+	if ((ini_get('session.auto_start') === '1' && !empty($modSettings['databaseSession_enable'])) || session_id() === '')
 	{
 		// Attempt to end the already-started session.
-		if (ini_get('session.auto_start') == 1)
+		if (ini_get('session.auto_start') === '1')
 		{
 			session_write_close();
 		}
