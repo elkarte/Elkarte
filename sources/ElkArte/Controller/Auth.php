@@ -216,7 +216,7 @@ class Auth extends AbstractController
 		}
 
 		// No funky symbols either.
-		if (preg_match('~[<>&"\'=\\\]~', preg_replace('~(&#(\\d{1,7}|x[0-9a-fA-F]{1,6});)~', '', $_POST['user'])) != 0)
+		if (preg_match('~[<>&"\'=\\\]~', preg_replace('~(&#(\\d{1,7}|x[0-9a-fA-F]{1,6});)~', '', $_POST['user'])) === 1)
 		{
 			$context['login_errors'] = [$txt['error_invalid_characters_username']];
 
