@@ -80,9 +80,9 @@ class Reminder extends AbstractController
 		if ($this->_req->hasPost('uid'))
 		{
 			$where = 'id_member = {int:id_member}';
-			$where_params['id_member'] = $this->_req->getPost('uid', 'intval');
+			$where_params['id_member'] = $this->_req->getPost('uid', 'intval', -1);
 		}
-		elseif ($this->_req->getPost('user') !== '')
+		elseif ($this->_req->getPost('user', 'trim') !== '')
 		{
 			$where = 'member_name = {string:member_name}';
 			$where_params['member_name'] = $this->_req->getPost('user', 'trim|Util::htmlspecialchars[ENT_QUOTES]');
