@@ -212,8 +212,8 @@ function createPost(&$msgOptions, &$topicOptions, &$posterOptions)
 			'id_member_updated' => $posterOptions['id'],
 			'id_first_msg' => $msgOptions['id'],
 			'id_last_msg' => $msgOptions['id'],
-			'locked' => $topicOptions['lock_mode'] ?? 0,
-			'is_sticky' => $topicOptions['sticky_mode'] ?? 0,
+			'locked' => (int) ($topicOptions['lock_mode'] ?? 0),
+			'is_sticky' => (int) ($topicOptions['sticky_mode'] ?? 0),
 			'num_views' => 0,
 			'id_poll' => $topicOptions['poll'] ?? 0,
 			'unapproved_posts' => $msgOptions['approved'] ? 0 : 1,
@@ -275,8 +275,8 @@ function createPost(&$msgOptions, &$topicOptions, &$posterOptions)
 		$update_parameters = [
 			'poster_id' => $posterOptions['id'],
 			'id_msg' => $msgOptions['id'],
-			'locked' => $topicOptions['lock_mode'],
-			'is_sticky' => $topicOptions['sticky_mode'],
+			'locked' => (int) ($topicOptions['lock_mode'] ?? 0),
+			'is_sticky' => (int) ($topicOptions['sticky_mode'] ?? 0),
 			'id_topic' => $topicOptions['id'],
 			'counter_increment' => 1,
 		];
@@ -538,12 +538,12 @@ function modifyPost(&$msgOptions, &$topicOptions, &$posterOptions)
 	// Lock and or sticky the post.
 	if ($topicOptions['sticky_mode'] !== null)
 	{
-		$attributes['is_sticky'] = $topicOptions['sticky_mode'];
+		$attributes['is_sticky'] = (int) $topicOptions['sticky_mode'];
 	}
 
 	if ($topicOptions['lock_mode'] !== null)
 	{
-		$attributes['locked'] = $topicOptions['lock_mode'];
+		$attributes['locked'] = (int) $topicOptions['lock_mode'];
 	}
 
 	if ($topicOptions['poll'] !== null)
@@ -987,7 +987,7 @@ function updateLastMessages($setboards, $id_msg = 0)
 		{
 			if ($parent['level'] != 0)
 			{
-				// If we're already doing this one as a board, is this a higher last modified?
+				// If we're already doing this one as a board, is this a higher last modifier?
 				if (isset($lastModified[$id]) && $lastModified[$id_board] > $lastModified[$id])
 				{
 					$lastModified[$id] = $lastModified[$id_board];
@@ -1061,6 +1061,8 @@ function updateLastMessages($setboards, $id_msg = 0)
 			]
 		);
 	}
+
+	return true;
 }
 
 /**
