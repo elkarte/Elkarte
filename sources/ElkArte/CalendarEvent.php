@@ -17,6 +17,7 @@
 namespace ElkArte;
 
 use ElkArte\Exceptions\Exception;
+use ElkArte\Helper\DataValidator;
 use ElkArte\Helper\Util;
 
 /**
@@ -61,6 +62,19 @@ class CalendarEvent
 	{
 		// Make sure they're allowed to post...
 		isAllowedTo('calendar_post');
+
+		// Standardize the $event data
+		$validator = new DataValidator();
+		$validator->sanitation_rules([
+			'span' => 'intval',
+			'month' => 'intval',
+			'year' => 'intval',
+			'day' => 'intval',
+			'evtitle' => 'Util::htmltrim',
+			'subject' => 'Util::htmltrim',
+		]);
+		$validator->validate($event);
+		$event = array_merge($event, $validator->validation_data());
 
 		if (isset($event['span']))
 		{
