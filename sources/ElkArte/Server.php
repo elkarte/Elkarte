@@ -90,7 +90,7 @@ class Server extends \ArrayObject
 	 * This sets the maximum time in seconds a script is allowed to run before it is terminated by the parser.
 	 * You cannot change this setting with ini_set() when running in safe mode.
 	 * Your web server can have other timeout configurations that may also interrupt PHP execution.
-	 * Apache has an Timeout directive and IIS has a CGI timeout function.
+	 * Apache has a Timeout directive and IIS has a CGI timeout function.
 	 * Security extension may also disable this function, such as Suhosin
 	 * Hosts may add this to the disabled_functions list in php.ini
 	 *
@@ -132,7 +132,7 @@ class Server extends \ArrayObject
 			@apache_reset_timeout();
 		}
 
-		return ini_get('max_execution_time');
+		return (int) ini_get('max_execution_time');
 	}
 
 	/**
@@ -176,7 +176,7 @@ class Server extends \ArrayObject
 	 */
 	public function supportRewrite(): bool
 	{
-		return (!$this->is('cgi') || ini_get('cgi.fix_pathinfo') == 1 || @get_cfg_var('cgi.fix_pathinfo') == 1)
+		return (!$this->is('cgi') || (int) ini_get('cgi.fix_pathinfo') == 1 || @get_cfg_var('cgi.fix_pathinfo') == 1)
 			&& ($this->is('apache') || $this->is('nginx') || $this->is('lighttpd') || $this->is('litespeed'));
 	}
 
