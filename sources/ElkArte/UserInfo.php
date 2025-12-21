@@ -35,7 +35,7 @@ class UserInfo extends ValuesContainer
 	public function canMod($postmodActive): bool
 	{
 		return allowedTo('access_mod_center')
-			|| ($this->data['is_guest'] === false
+			|| ((isset($this->data['is_guest']) && $this->data['is_guest'] === false)
 				&& !empty($this->data['mod_cache'])
 				&& ($this->data['mod_cache']['gq'] !== '0=1'
 					|| $this->data['mod_cache']['bq'] !== '0=1'

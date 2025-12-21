@@ -287,7 +287,7 @@ final class ErrorContext
 			}
 		}
 
-		return $level;
+		return (int) $level;
 	}
 
 	/**
