@@ -57,7 +57,7 @@ class Emailmoderator extends AbstractController
 	/**
 	 * Report a post to the moderator... ask for a comment.
 	 *
-	 * what is does:
+	 * What is does:
 	 * - Gathers data from the user to report abuse to the moderator(s).
 	 * - Uses the ReportToModerator template, main sub template.
 	 * - Requires the report_any permission.
@@ -70,7 +70,7 @@ class Emailmoderator extends AbstractController
 
 		$context['robot_no_index'] = true;
 
-		// You can't use this if it's off or you are not allowed to do it.
+		// You can't use this if it's off, or you are not allowed to do it.
 		isAllowedTo('report_any');
 
 		// No errors, yet.
@@ -79,7 +79,7 @@ class Emailmoderator extends AbstractController
 		// ...or maybe some.
 		$context['report_error'] = [
 			'errors' => $report_errors->prepareErrors(),
-			'type' => $report_errors->getErrorType() == 0 ? 'minor' : 'serious',
+			'type' => $report_errors->getErrorType() === 0 ? 'minor' : 'serious',
 		];
 
 		// If they're posting, it should be processed by action_reporttm2.
@@ -118,8 +118,8 @@ class Emailmoderator extends AbstractController
 		Txt::load('Post');
 		Txt::load('Errors');
 
-		$context['comment_body'] = $this->_req->getPost('comment', 'trim', '');
-		$context['email_address'] = $this->_req->getPost('email', 'trim', '');
+		$context['comment_body'] = $this->_req->getPost('comment', 'trim|Util::htmlspecialchars[ENT_QUOTES]', '');
+		$context['email_address'] = $this->_req->getPost('email', 'trim|addslashes|Util::htmlspecialchars', '');
 
 		// This is here so that the user could, in theory, be redirected back to the topic.
 		$context['start'] = $this->_req->getQuery('start', 'intval', 0);
@@ -153,7 +153,7 @@ class Emailmoderator extends AbstractController
 		$report_errors = ErrorContext::context('report', 1);
 
 		// Check their session.
-		if (checkSession('post', '', false) != '')
+		if (checkSession('post', '', false) !== '')
 		{
 			$report_errors->addError('session_timeout');
 		}
@@ -209,7 +209,7 @@ class Emailmoderator extends AbstractController
 			return true;
 		}
 
-		// Get the basic topic information, and make sure they can see it.
+		// Get the basic topic information and make sure they can see it.
 		$msg_id = (int) $this->_req->post->msg;
 		$message = posterDetails($msg_id, $topic);
 
@@ -219,7 +219,7 @@ class Emailmoderator extends AbstractController
 		}
 
 		$poster_name = un_htmlspecialchars($message['real_name']) . ($message['real_name'] !== $message['poster_name'] ? ' (' . $message['poster_name'] . ')' : '');
-		$reporterName = un_htmlspecialchars($this->user->name) . ($this->user->name !== $this->user->username && $this->user->username != '' ? ' (' . $this->user->username . ')' : '');
+		$reporterName = un_htmlspecialchars($this->user->name) . ($this->user->name !== $this->user->username && $this->user->username !== '' ? ' (' . $this->user->username . ')' : '');
 		$subject = un_htmlspecialchars($message['subject']);
 
 		// Get a list of members with the moderate_board permission.
@@ -292,7 +292,5 @@ class Emailmoderator extends AbstractController
 
 		// Back to the post we reported!
 		redirectexit('reportsent;topic=' . $topic . '.msg' . $msg_id . '#msg' . $msg_id);
-
-		return null;
 	}
 }
