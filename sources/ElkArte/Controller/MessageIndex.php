@@ -141,7 +141,7 @@ class MessageIndex extends AbstractController implements FrontpageInterface
 	 */
 	public function action_index()
 	{
-		// Forward to message index, it's not like we know much more :P
+		// Forward to the message index, it's not like we know much more :P
 		$this->action_messageindex();
 	}
 
@@ -154,7 +154,7 @@ class MessageIndex extends AbstractController implements FrontpageInterface
 	{
 		global $txt, $context, $board_info;
 
-		// Check for redirection board, and if found, head off
+		// Check for the redirection board, and if found, head off
 		if ($board_info['redirect'])
 		{
 			$this->handleRedirectBoard();
@@ -184,7 +184,7 @@ class MessageIndex extends AbstractController implements FrontpageInterface
 		// Load basic information about the boards children, aka sub boards
 		$this->prepareSubBoardsForDisplay();
 
-		// Who else is taking a look
+		// Who else is taking a look?
 		$this->prepareWhoViewing();
 
 		// Setup topic sort icons/options for template use
@@ -210,10 +210,10 @@ class MessageIndex extends AbstractController implements FrontpageInterface
 
 		theme()->addJavascriptVar(['notification_board_notice' => $this->is_marked_notify ? $txt['notification_disable_board'] : $txt['notification_enable_board']], true);
 
-		// Is Quick Topic available
+		// Is Quick Topic available?
 		$this->quickTopic();
 
-		// Finally action buttons like start new topic, notify, mark read ...
+		// Finally, action buttons like start a new topic, notify, mark read ...
 		$this->buildBoardButtons();
 	}
 
@@ -225,7 +225,7 @@ class MessageIndex extends AbstractController implements FrontpageInterface
 	{
 		global $board, $board_info;
 
-		// If this is a redirection board head off.
+		// If this is a redirection board, head off.
 		require_once(SUBSDIR . '/Boards.subs.php');
 
 		incrementBoard($board, 'num_posts');
@@ -755,7 +755,7 @@ class MessageIndex extends AbstractController implements FrontpageInterface
 		$keys = array_keys($quickMod);
 		foreach (['move', 'lock', 'remove', 'approve'] as $area)
 		{
-			// e.g. get topic id's where this quick_mod action xxx value is valid
+			// e.g., get topic ids where this quick_mod action xxx value is valid
 			$temp = array_combine($keys, array_column($quickMod, $area));
 			$context['allow_qm']['can_' . $area] = array_keys($temp, true);
 			${'show_' . $area} = !empty($context['allow_qm']['can_' . $area]);
@@ -814,7 +814,7 @@ class MessageIndex extends AbstractController implements FrontpageInterface
 			],
 		];
 
-		// Restore a topic, maybe even some doxing !
+		// Restore a topic, maybe even some doxing!
 		if ($context['can_restore'])
 		{
 			$context['mod_buttons']['restore'] = [
@@ -867,7 +867,7 @@ class MessageIndex extends AbstractController implements FrontpageInterface
 				'width' => '100%',
 				'smiley_container' => 'smileyBox_message',
 				'bbc_container' => 'bbcBox_message',
-				// We submit/switch to full post page for the preview
+				// We submit/switch to the full post page for the preview
 				'preview_type' => 1,
 				'buttons' => [
 					'more' => [
@@ -897,7 +897,15 @@ class MessageIndex extends AbstractController implements FrontpageInterface
 
 		if (empty($options['hide_poster_area']) && $options['display_quick_reply'])
 		{
-			MembersList::load(User::$info->id);
+			if ($this->user->is_guest)
+			{
+				MembersList::loadGuest();
+			}
+			else
+			{
+				MembersList::load(User::$info->id);
+			}
+
 			$thisUser = MembersList::get(User::$info->id);
 			$thisUser->loadContext();
 
@@ -993,7 +1001,7 @@ class MessageIndex extends AbstractController implements FrontpageInterface
 		$selected_topics = $validator->topics;
 		$selected_qaction = $validator->qaction;
 
-		// Lets go straight to the restore area.
+		// Let's go straight to the restore area.
 		if ($selected_qaction === 'restore' && !empty($selected_topics))
 		{
 			redirectexit('action=restoretopic;topics=' . implode(',', $selected_topics) . ';' . $context['session_var'] . '=' . $context['session_id']);
@@ -1078,7 +1086,7 @@ class MessageIndex extends AbstractController implements FrontpageInterface
 				return $controller->action_mergeExecute($selected_topics);
 			}
 
-			// Just convert to the other method, to make it easier.
+			// Just convert to the other method to make it easier.
 			foreach ($selected_topics as $topic)
 			{
 				$actions[$topic] = $selected_qaction;
@@ -1189,7 +1197,7 @@ class MessageIndex extends AbstractController implements FrontpageInterface
 			}
 		}
 
-		$affectedBoards = empty($board) ? [] : [(int) $board => [0, 0]];
+		$affectedBoards = empty($board) ? [] : [$board => [0, 0]];
 
 		// Do all the stickies...
 		if (!empty($stickyCache))
@@ -1245,13 +1253,12 @@ class MessageIndex extends AbstractController implements FrontpageInterface
 		}
 
 		redirectexit($redirect_url);
-		return null;
 	}
 
 	/**
-	 * Just what actions can they perform on this board
+	 * Just what actions can they perform on this board?
 	 *
-	 * Checks if they can markread, sticky, move, remove, lock or merge
+	 * Checks if they can markread, sticky, move, remove, lock, or merge
 	 *
 	 * @param array $boards_can
 	 * @return array
@@ -1299,7 +1306,7 @@ class MessageIndex extends AbstractController implements FrontpageInterface
 	}
 
 	/**
-	 * Can they sticky a topic
+	 * Can they sticky a topic?
 	 *
 	 * @param array $boards_can
 	 * @param array $row
@@ -1312,7 +1319,7 @@ class MessageIndex extends AbstractController implements FrontpageInterface
 	}
 
 	/**
-	 * Can they move a topic
+	 * Can they move a topic?
 	 *
 	 * @param array $boards_can
 	 * @param array $row
@@ -1327,7 +1334,7 @@ class MessageIndex extends AbstractController implements FrontpageInterface
 	}
 
 	/**
-	 * Can they remove a topic
+	 * Can they remove a topic?
 	 *
 	 * @param array $boards_can
 	 * @param array $row
@@ -1343,7 +1350,7 @@ class MessageIndex extends AbstractController implements FrontpageInterface
 	}
 
 	/**
-	 * Can they lock a topic
+	 * Can they lock a topic?
 	 *
 	 * @param array $boards_can
 	 * @param array $row
