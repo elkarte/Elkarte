@@ -137,7 +137,7 @@ class Emailmoderator extends AbstractController
 	 * - Called by action_reporttm(), and thus has the same permission and setting requirements as it does.
 	 * - Accessed through ?action=reporttm when posting.
 	 */
-	public function action_reporttm2(): ?bool
+	public function action_reporttm2()
 	{
 		global $txt, $topic, $board, $modSettings, $language, $context;
 
