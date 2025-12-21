@@ -226,7 +226,7 @@ function getMaxTopicID()
 	list ($id_topic) = $request->fetch_row();
 	$request->free_result();
 
-	return $id_topic;
+	return $id_topic ?? 0;
 }
 
 /**
