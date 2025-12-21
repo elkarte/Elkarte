@@ -46,7 +46,7 @@ class ManageServer extends AbstractController
 	 *
 	 * @event integrate_sa_server_settings
 	 * @uses edit_settings adminIndex.
-	 * @see  AbstractController::action_index()
+	 * @see AbstractController::action_index()
 	 */
 	public function action_index()
 	{

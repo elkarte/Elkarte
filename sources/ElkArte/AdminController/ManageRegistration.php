@@ -51,7 +51,7 @@ class ManageRegistration extends AbstractController
 	 * @event integrate_sa_manage_registrations add new registration sub actions
 	 * @uses Login language file
 	 * @uses Register template.
-	 * @see  AbstractController::action_index()
+	 * @see AbstractController::action_index()
 	 */
 	public function action_index()
 	{
