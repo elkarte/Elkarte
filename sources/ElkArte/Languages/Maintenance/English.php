@@ -106,6 +106,8 @@ $txt['error_type'] = 'Type of error';
 $txt['filter_only_type'] = 'Only show the errors of this type';
 $txt['filter_only_file'] = 'Only show the errors from this file';
 $txt['apply_filter_of_type'] = 'Apply filter of type';
+$txt['error_backtrace'] = 'Backtrace';
+$txt['backtrace_info'] = '<b>#%1$d</b>: %2$s()<br>Called from: %3$s line: %4$d';
 
 $txt['errortype_all'] = 'All errors';
 $txt['errortype_general'] = 'General';
@@ -124,6 +126,10 @@ $txt['errortype_deprecated'] = 'Deprecated';
 $txt['errortype_deprecated_desc'] = 'Deprecation messages usually mean that some code is calling a method which is discouraged and will be removed in a future version.';
 $txt['errortype_blocked'] = 'Blocked';
 $txt['errortype_template_desc'] = 'Notices related to server 403 blocks implemented by HoneyPot / Access Header checks.';
+$txt['errortype_login'] = 'Logins';
+$txt['errortype_login_desc'] = 'Errors caused by failed login attempts.';
+$txt['errortype_paidsubs'] = 'Paid Subs';
+$txt['errortype_paidsubs_desc'] = 'Errors resulting from paid subscriptions and payment system failures.';
 
 $txt['maintain_recount'] = 'Recount all forum totals and statistics';
 $txt['maintain_recount_info'] = 'Should the total replies of a topic or the number of PMs in your inbox be incorrect: this function will recount all saved counts and statistics for you.';

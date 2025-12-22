@@ -1235,6 +1235,7 @@ class InstallInstructions_install_2_0
 				array('name' => 'error_type', 'type' => 'char', 'size' => 15, 'default' => 'general'),
 				array('name' => 'file', 'type' => 'varchar', 'size' => 255, 'default' => ''),
 				array('name' => 'line', 'type' => 'mediumint', 'size' => 8, 'unsigned' => true, 'default' => 0),
+				array('name' => 'backtrace', 'type' => 'varchar', 'size' => 10000, 'default' => ''),
 			),
 			array(
 				array('name' => 'id_error', 'columns' => array('id_error'), 'type' => 'primary'),

@@ -829,4 +829,30 @@ class UpgradeInstructions_upgrade_2_0
 			)
 		);
 	}
+
+	public function preparing_errorlog_backtrace_title()
+	{
+		return 'Adding backtrace column to the log_errors table...';
+	}
+
+	public function preparing_member_notify_from()
+	{
+		return array(
+			array(
+				'debug_title' => 'Adding new backtrace to log_errors table...',
+				'function' => function () {
+					$this->table->add_column('{db_prefix}log_errors',
+						array(
+							'name' => 'backtrace',
+							'type' => 'varchar',
+							'size' => 10000,
+							'default' => ''
+						),
+						array(),
+						'ignore'
+					);
+				}
+			)
+		);
+	}
 }
