@@ -743,7 +743,7 @@ class Admin extends AbstractController
 		$subAction = $action->initialize($subActions, 'internal');
 
 		// Keep track of what the admin wants in terms of advanced or not
-		if (empty($context['admin_preferences']['sb']) || $context['admin_preferences']['sb'] != $subAction)
+		if (empty($context['admin_preferences']['sb']) || $context['admin_preferences']['sb'] !== $subAction)
 		{
 			$context['admin_preferences']['sb'] = $subAction;
 
@@ -758,7 +758,7 @@ class Admin extends AbstractController
 		$context['sub_template'] = 'admin_search_results';
 		$context['page_title'] = $txt['admin_search_results'];
 
-		// You did remember to enter something to search for, otherwise its easy
+		// You did remember to enter something to search for, otherwise it's easy
 		if ($context['search_term'] === '')
 		{
 			$context['search_results'] = [];
@@ -774,11 +774,11 @@ class Admin extends AbstractController
 	 *
 	 * What it does:
 	 *
-	 * - Can be accessed with /index.php?action=admin;sa=search;search_term=x) or from the admin search form ("Task/Setting" option)
-	 * - Polls the controllers for their configuration settings
-	 * - Calls integrate_admin_search to allow addons to add search configs
-	 * - Loads up the "Help" language file and all "Manage" language files
-	 * - Loads up information about each item it found for the template
+	 * - Can be accessed with /index.php?action=admin;sa=search;search_term=x) or from the admin search form ("Task/Setting" option).
+	 * - Polls the controllers for their configuration settings.
+	 * - Calls integrate_admin_search to allow addons to add search configs.
+	 * - Loads up the "Help" language file and all "Manage" language files.
+	 * - Loads up information about each item it found for the template.
 	 *
 	 * @event integrate_admin_search Allows integration to add areas to the internal admin search
 	 * @event search Allows active modules registered to search to add settings for internal search
@@ -864,7 +864,7 @@ class Admin extends AbstractController
 	}
 
 	/**
-	 * All this does is pass through to manage members.
+	 * All this does is pass-through to manage members.
 	 */
 	public function action_search_member(): void
 	{
@@ -888,7 +888,7 @@ class Admin extends AbstractController
 	 * This file allows the user to search the wiki documentation for a little help.
 	 *
 	 * What it does:
-	 *   - Creates an exception since GitHub does not yet support API wiki searches so the connection
+	 *   - Creates an exception since GitHub does not yet support API wiki searches, so the connection
 	 * will fail.
 	 */
 	public function action_search_doc(): void
@@ -916,7 +916,7 @@ class Admin extends AbstractController
 		// https://github.com/elkarte/Elkarte/wiki/api.php?action=query&list=search&srprop=timestamp|snippet&format=xml&srwhat=text&srsearch=template+eval
 		$search_results = fetch_web_data($context['doc_apiurl'] . '?action=query&list=search&srprop=timestamp|snippet&format=xml&srwhat=text&srsearch=' . $postVars);
 
-		// If we didn't get any xml back we are in trouble - perhaps the doc site is overloaded?
+		// If we didn't get any XML back, we are in trouble - perhaps the doc site is overloaded?
 		if (!$search_results || preg_match('~<\?xml\sversion="\d+\.\d+"\?>\s*(<api>.+?</api>)~is', $search_results, $matches) !== 1)
 		{
 			throw new Exception('cannot_connect_doc_site');
@@ -953,7 +953,7 @@ class Admin extends AbstractController
 	}
 
 	/**
-	 * This ends a admin session, requiring authentication to access the ACP again.
+	 * This ends an admin session, requiring authentication to access the ACP again.
 	 */
 	public function action_endsession(): void
 	{
