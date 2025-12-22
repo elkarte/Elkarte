@@ -835,7 +835,7 @@ class UpgradeInstructions_upgrade_2_0
 		return 'Adding backtrace column to the log_errors table...';
 	}
 
-	public function preparing_member_notify_from()
+	public function preparing_errorlog_backtrace()
 	{
 		return array(
 			array(
