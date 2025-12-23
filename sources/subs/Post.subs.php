@@ -1202,7 +1202,7 @@ function getFormMsgSubject($editing, $topic, $first_subject = '', $msg_id = 0)
 
 			// Add 'Re: ' to the front of the quoted subject.
 			$response_prefix = response_prefix();
-			if (trim($response_prefix) != '' && Util::strpos($form_subject, trim($response_prefix)) !== 0)
+			if (trim($response_prefix) !== '' && Util::strpos($form_subject, trim($response_prefix)) !== 0)
 			{
 				$form_subject = $response_prefix . $form_subject;
 			}
