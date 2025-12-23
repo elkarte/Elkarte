@@ -62,6 +62,11 @@ class Exception extends \Exception
 	{
 		global $txt;
 
+		if (empty($message))
+		{
+			Errors::instance()->display_minimal_error('');
+		}
+
 		$msg = '';
 		$lang = false;
 		try
@@ -130,9 +135,15 @@ class Exception extends \Exception
 	{
 		global $language, $txt;
 
+		if (empty($msg))
+		{
+			$this->log = false;
+			return;
+		}
+
 		// Don't need to reload the language file if both the user and
 		// the forum share the same language.
-		if (!isset($language) || $language !== User::$info->language)
+		if (!isset($language) || (isset(User::$info->language) && $language !== User::$info->language))
 		{
 			Txt::load($lexicon, $language);
 		}
