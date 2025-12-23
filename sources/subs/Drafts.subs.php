@@ -132,8 +132,8 @@ function create_post_draft($draft)
 		$draft['smileys_enabled'],
 		$draft['body'],
 		$draft['icon'],
-		$draft['locked'],
-		$draft['sticky'],
+		(int) $draft['locked'],
+		(int) $draft['sticky'],
 		$draft['is_usersaved']
 	];
 	$db->insert('',
@@ -181,8 +181,8 @@ function modify_post_draft($draft)
 			'smileys_enabled' => (int) $draft['smileys_enabled'],
 			'body' => $draft['body'],
 			'icon' => $draft['icon'],
-			'locked' => $draft['locked'],
-			'is_sticky' => $draft['sticky'],
+			'locked' => (int) $draft['locked'],
+			'is_sticky' => (int) $draft['sticky'],
 			'id_draft' => $draft['id_draft'],
 			'is_usersaved' => $draft['is_usersaved'],
 		]
@@ -383,6 +383,8 @@ function deleteDrafts($id_draft, $member_id = -1, $check = true)
 			'id_member' => $member_id,
 		]
 	);
+
+	return true;
 }
 
 /**
@@ -662,7 +664,7 @@ function prepareDraft(&$draft, $draft_info)
 		$draft['is_usersaved'] = 0;
 	}
 
-	if (isset($draft_info['is_usersaved']) && $draft_info['is_usersaved'] == 1)
+	if (isset($draft_info['is_usersaved']) && (int) $draft_info['is_usersaved'] === 1)
 	{
 		$draft['is_usersaved'] = 1;
 	}

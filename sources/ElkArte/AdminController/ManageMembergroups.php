@@ -45,7 +45,7 @@ class ManageMembergroups extends AbstractController
 	 * @event integrate_sa_manage_membergroups Used to add more sub actions
 	 * @uses ManageMembergroups template.
 	 * @uses ManageMembers language file.
-	 * @see  AbstractController::action_index()
+	 * @see AbstractController::action_index()
 	 */
 	public function action_index()
 	{

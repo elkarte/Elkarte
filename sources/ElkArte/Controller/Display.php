@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This controls topic display, with all related functions, its is the forum
+ * This controls topic display, with all related functions. It is the forum
  *
  * @package   ElkArte Forum
  * @copyright ElkArte Forum contributors
@@ -58,7 +58,7 @@ class Display extends AbstractController
 	protected $start_from;
 
 	/**
-	 * Default action handler for this controller, if its called directly
+	 * Default action handler for this controller, if it's called directly
 	 */
 	public function action_index()
 	{
@@ -74,7 +74,7 @@ class Display extends AbstractController
 	 * - This function loads the posts in a topic, so they can be displayed.
 	 * - It requires a topic, and can go to the previous or next topic from it.
 	 * - It jumps to the correct post depending on a number/time/IS_MSG passed.
-	 * - It depends on the messages_per_page, defaultMaxMessages and enableAllMessages settings.
+	 * - It depends on the messages_per_page, defaultMaxMessages, and enableAllMessages settings.
 	 * - It is accessed by ?topic=id_topic.START.
 	 *
 	 * @uses the main sub template of the Display template.
@@ -153,7 +153,7 @@ class Display extends AbstractController
 			$firstIndex = $limit - 1;
 		}
 
-		// Taking care of member specific settings
+		// Taking care of member-specific settings
 		$limit_settings = [
 			'messages_per_page' => $this->messages_per_page,
 			'start' => $start,
@@ -169,7 +169,7 @@ class Display extends AbstractController
 		$all_posters = $topic_details['all_posters'];
 		unset($topic_details);
 
-		// Default this topic to not marked for notifications... of course...
+		// Default this topic to not mark for notifications... of course...
 		$context['is_marked_notify'] = false;
 
 		$messages_request = false;
@@ -178,7 +178,7 @@ class Display extends AbstractController
 
 		call_integration_hook('integrate_display_message_list', [&$messages, &$all_posters]);
 
-		// If there _are_ messages here... (probably an error otherwise :!)
+		// If there _are_ messages here... (probably an error otherwise!)
 		if (!empty($messages))
 		{
 			// Mark the board as read or not ... calls updateReadNotificationsFor() sets $context['is_marked_notify']
@@ -212,7 +212,7 @@ class Display extends AbstractController
 				$context['start_from'] = $this->start_from;
 			}
 
-			// Since the anchor information is needed on the top of the page we load these variables beforehand.
+			// Since the anchor information is needed on the top of the page, we load these variables beforehand.
 			$context['first_message'] = $messages[$firstIndex] ?? $messages[0];
 			$context['first_new_message'] = (int) $this->_start === (int) $this->start_from;
 		}
@@ -248,7 +248,7 @@ class Display extends AbstractController
 			'width' => '100%',
 			'smiley_container' => 'smileyBox_message',
 			'bbc_container' => 'bbcBox_message',
-			// We submit/switch to full post page for the preview
+			// We submit/switch to the full post page for the preview
 			'preview_type' => 1,
 			'buttons' => [
 				'more' => [
@@ -285,7 +285,7 @@ class Display extends AbstractController
 
 		theme()->addJavascriptVar(['notification_topic_notice' => $context['is_marked_notify'] ? $txt['notification_disable_topic'] : $txt['notification_enable_topic']], true);
 
-		// Build the common to all buttons like Reply Notify Mark ....
+		// Build the common to all buttons like Reply Notify Mark...
 		$this->buildNormalButtons();
 
 		// Build specialized buttons, like moderation
@@ -342,7 +342,7 @@ class Display extends AbstractController
 	}
 
 	/**
-	 * Return if we allow showing ALL messages for a topic vs pagination
+	 * Return if we allow showing ALL messages for a topic vs. pagination
 	 *
 	 * @param int $total_visible_posts
 	 * @return bool
@@ -357,7 +357,7 @@ class Display extends AbstractController
 	}
 
 	/**
-	 * If show all is requested, and allowed, setup to do just that
+	 * If show all is requested and allowed, setup to do just that
 	 *
 	 * @param bool $can_show_all
 	 * @param int $total_visible_posts
@@ -407,7 +407,7 @@ class Display extends AbstractController
 			// No limit! (actually, there is a limit, but...)
 			$this->messages_per_page = -1;
 
-			// Set start back to 0...
+			// Set the start back to 0...
 			$this->_start = 0;
 		}
 	}
@@ -441,7 +441,7 @@ class Display extends AbstractController
 	}
 
 	/**
-	 * Add one for the stats
+	 * Add one to the stats
 	 * @param $topic
 	 */
 	public function increaseTopicViews($topic): void
@@ -512,7 +512,7 @@ class Display extends AbstractController
 	}
 
 	/**
-	 * Number of posts that this user can see.  Will included unapproved for those with access
+	 * Number of posts that this user can see.  Will include unapproved for those with access
 	 *
 	 * @param int $num_replies
 	 * @return int
@@ -535,7 +535,7 @@ class Display extends AbstractController
 	}
 
 	/**
-	 * The start value from get can contain all manner of information on what to do.
+	 * The start value from get can contain all manners of information on what to do.
 	 * This converts new, from, msg into something useful, most times.
 	 *
 	 * @param int $total_visible_posts
@@ -608,7 +608,7 @@ class Display extends AbstractController
 		$context['user']['started'] = $this->didThisUserStart();
 		$context['topic_starter_id'] = $this->topicinfo['id_member_started'];
 
-		// Add up unapproved replies to get real number of replies...
+		// Add up unapproved replies to get the real number of replies...
 		$context['real_num_replies'] = $this->topicinfo['num_replies'];
 		if ($modSettings['postmod_active'] && allowedTo('approve_posts'))
 		{
@@ -653,7 +653,7 @@ class Display extends AbstractController
 		$context['is_hot'] = $this->topicinfo['num_replies'] >= $modSettings['hotTopicPosts'];
 		$context['is_approved'] = $this->topicinfo['approved'];
 
-		// Set the class of the current topic,  Hot, not so hot, locked, sticky
+		// Set the class of the current topic, Hot, not so hot, locked, sticky
 		determineTopicClass($context);
 
 		// Set the topic's information for the template.
@@ -750,7 +750,7 @@ class Display extends AbstractController
 			$mark_at_msg = $modSettings['maxMsgID'];
 		}
 
-		// If there are new messages "in view", lets mark any notification for them as read
+		// If there are new messages "in view", let's mark any notification for them as read
 		if ($mark_at_msg >= $this->topicinfo['new_from'])
 		{
 			require_once(SUBSDIR . '/Mentions.subs.php');
@@ -799,7 +799,7 @@ class Display extends AbstractController
 
 		updateReadNotificationsFor($this->topicinfo['id_topic'], $board);
 
-		// Mark board as seen if we came using last post link from BoardIndex. (or other places...)
+		// Mark the board as seen if we came using the last post link from BoardIndex. (or other places...)
 		if ($boardseen)
 		{
 			require_once(SUBSDIR . '/Boards.subs.php');
@@ -817,7 +817,12 @@ class Display extends AbstractController
 
 		if (empty($options['hide_poster_area']) && $options['display_quick_reply'])
 		{
-			// First lets load the profile array
+			if (User::$info->is_guest)
+			{
+				MembersList::loadGuest();
+			}
+
+			// First, let's load the profile array
 			$thisUser = MembersList::get(User::$info->id);
 			$thisUser->loadContext();
 			$context['thisMember'] = [
@@ -889,7 +894,7 @@ class Display extends AbstractController
 			$context[$contextual] = allowedTo($perm . '_any') || ($this->didThisUserStart() && allowedTo($perm . '_own'));
 		}
 
-		// Cleanup all the permissions with extra stuff...
+		// Clean up all the permissions with extra stuff...
 		$context['can_mark_notify'] = $context['can_mark_notify'] && !$context['user']['is_guest'];
 		$context['can_reply'] = $context['can_reply'] && (empty($this->topicinfo['locked']) || allowedTo('moderate_board'));
 		$context['can_reply_unapproved'] = $context['can_reply_unapproved'] && $modSettings['postmod_active'] && (empty($this->topicinfo['locked']) || allowedTo('moderate_board'));
@@ -905,7 +910,7 @@ class Display extends AbstractController
 		}
 
 		$context['can_reply'] = $context['can_reply'] || $context['can_reply_unapproved'];
-		$context['can_quote'] = $context['can_reply'] && (empty($modSettings['disabledBBC']) || !in_array('quote', explode(',', $modSettings['disabledBBC'])));
+		$context['can_quote'] = $context['can_reply'] && (empty($modSettings['disabledBBC']) || !in_array('quote', explode(',', $modSettings['disabledBBC']), true));
 		$context['can_mark_unread'] = $this->user->is_guest === false && $settings['show_mark_read'];
 		$context['can_unwatch'] = $this->user->is_guest === false && $modSettings['enable_unwatch'];
 		$context['can_print'] = empty($modSettings['disable_print_topic']);
@@ -913,9 +918,9 @@ class Display extends AbstractController
 		// Start this off for quick moderation - it will be or'd for each post.
 		$context['can_remove_post'] = allowedTo('delete_any') || (allowedTo('delete_replies') && $this->didThisUserStart());
 
-		// Can restore topic?  That's if the topic is in the recycle board and has a previous restore state.
-		$context['can_restore_topic'] = $context['can_restore_topic'] && !empty($modSettings['recycle_enable']) && $modSettings['recycle_board'] == $board && !empty($this->topicinfo['id_previous_board']);
-		$context['can_restore_msg'] = $context['can_restore_msg'] && !empty($modSettings['recycle_enable']) && $modSettings['recycle_board'] == $board && !empty($this->topicinfo['id_previous_topic']);
+		// Can restore a topic?  That's if the topic is in the recycle board and has a previous restore state.
+		$context['can_restore_topic'] = $context['can_restore_topic'] && !empty($modSettings['recycle_enable']) && (int) $modSettings['recycle_board'] === $board && !empty($this->topicinfo['id_previous_board']);
+		$context['can_restore_msg'] = $context['can_restore_msg'] && !empty($modSettings['recycle_enable']) && (int) $modSettings['recycle_board'] === $board && !empty($this->topicinfo['id_previous_topic']);
 	}
 
 	/**
@@ -1029,7 +1034,7 @@ class Display extends AbstractController
 	}
 
 	/**
-	 * If we are in a topic and don't have permission to approve it then duck out now.
+	 * If we are in a topic and don't have permission to approve it, then duck out now.
 	 * This is an abuse of the method, but it's easier that way.
 	 *
 	 * @param string $action the function name of the current action
@@ -1043,7 +1048,7 @@ class Display extends AbstractController
 
 		if (!empty($topic)
 			&& empty($board_info['cur_topic_approved'])
-			&& ($this->user->id != $board_info['cur_topic_starter'] || $this->user->is_guest)
+			&& ($this->user->id !== (int) $board_info['cur_topic_starter'] || $this->user->is_guest)
 			&& !allowedTo('approve_posts'))
 		{
 			throw new Exception('not_a_topic', false);
@@ -1118,7 +1123,7 @@ class Display extends AbstractController
 				continue;
 			}
 
-			// If the first message is going then don't bother going back to the topic as we're effectively deleting it.
+			// If the first message is going, then don't bother going back to the topic as we're effectively deleting it.
 			if ($message === $first_message)
 			{
 				$topicGone = true;

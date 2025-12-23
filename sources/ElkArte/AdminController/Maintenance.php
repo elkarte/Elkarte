@@ -1056,7 +1056,7 @@ class Maintenance extends AbstractController
 		// External tool if:
 		//  * cannot change the execution time OR
 		//  * cannot reset timeout
-		if (empty($new_time_limit) || ($current_time_limit == $new_time_limit && !function_exists('apache_reset_timeout')))
+		if (empty($new_time_limit) || ($current_time_limit === $new_time_limit && !function_exists('apache_reset_timeout')))
 		{
 			$context['suggested_method'] = 'use_external_tool';
 		}

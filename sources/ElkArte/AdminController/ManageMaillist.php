@@ -46,7 +46,7 @@ class ManageMaillist extends AbstractController
 	 * This function checks permissions and passes control to the sub action.
 	 *
 	 * @event integrate_sa_manage_maillist Used to add more sub actions
-	 * @see  AbstractController::action_index()
+	 * @see AbstractController::action_index()
 	 * @uses Maillist template
 	 */
 	public function action_index()

@@ -43,7 +43,7 @@ class ManageLanguages extends AbstractController
 	 *
 	 * @event integrate_sa_manage_languages Used to add more sub actions
 	 * @uses ManageSettings language file
-	 * @see  AbstractController::action_index()
+	 * @see AbstractController::action_index()
 	 */
 	public function action_index()
 	{

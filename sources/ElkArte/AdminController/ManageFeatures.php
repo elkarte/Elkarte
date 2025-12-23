@@ -51,7 +51,7 @@ class ManageFeatures extends AbstractController
 	 * This function passes control through to the relevant tab.
 	 *
 	 * @event integrate_sa_modify_features Use to add new Configuration tabs
-	 * @see  AbstractController::action_index()
+	 * @see AbstractController::action_index()
 	 * @uses Help, ManageSettings languages
 	 * @uses sub_template show_settings
 	 */

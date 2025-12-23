@@ -47,6 +47,8 @@ class Errors extends AbstractModel
 		'template',
 		'debug',
 		'deprecated',
+		'paidsubs',
+		'login',
 	];
 
 	/**
@@ -137,17 +139,6 @@ class Errors extends AbstractModel
 	/**
 	 * Log an error to the error log if the error logging is enabled.
 	 *
-	 * Available error types:
-	 *   - general
-	 *   - critical
-	 *   - database
-	 *   - undefined_vars
-	 *   - blocked
-	 *   - user
-	 *   - template
-	 *   - debug
-	 *   - deprecated
-	 *
 	 * Filename and line should be __FILE__ and __LINE__, respectively.
 	 *
 	 * Example use:
@@ -175,8 +166,10 @@ class Errors extends AbstractModel
 		// Add a file and line to the error message?
 		// Don't use the actual txt entries for file and line but instead use %1$s for a file and %2$s for line
 		// Windows-style slashes don't play well, let's convert them to the unix style.
-		$file = str_replace('\\', '/', $file);
-		$line = (int) $line;
+		$file = $file === null ? '' : str_replace('\\', '/', $file);
+		$line = $line === null ? 0 : (int) $line;
+
+		$backtrace = $this->getBacktrace();
 
 		// Find the best query string we can...
 		$query_string = $this->parseQueryString();
@@ -185,7 +178,7 @@ class Errors extends AbstractModel
 		$error_type = in_array($error_type, $this->getErrorTypes(), true) && $error_type !== true ? $error_type : 'general';
 
 		// Insert the error into the database.
-		$this->insertLog($query_string, $error_message, $error_type, $file, $line);
+		$this->insertLog($query_string, $error_message, $error_type, $file, $line, $backtrace);
 
 		// Return the message to simplify things.
 		return $error_message;
@@ -249,6 +242,35 @@ class Errors extends AbstractModel
 	}
 
 	/**
+	 * Retrieves the debug backtrace as a JSON-encoded string.
+	 * If global debug display is disabled, arguments in the backtrace are ignored.
+	 *
+	 * @return string|false Returns the JSON-encoded backtrace string on success, or false on failure.
+	 */
+	public function getBacktrace(): string|false
+	{
+		if (!isset($GLOBALS['db_show_debug']) || $GLOBALS['db_show_debug'] === false)
+		{
+			$backtrace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS);
+		}
+		else
+		{
+			$backtrace = debug_backtrace();
+		}
+
+		// Cut off the calls to log_error and get getBacktrace
+		array_splice($backtrace, 0, 2);
+
+		// Remove any top elements that are the exception or error handlers
+		while (isset($backtrace[0]['function']) && in_array($backtrace[0]['function'], ['exception_handler', 'error_handler'], true))
+		{
+			array_shift($backtrace);
+		}
+
+		return json_encode($backtrace, JSON_THROW_ON_ERROR);
+	}
+
+	/**
 	 * Insert an error entry in to the log_errors table
 	 *
 	 * @param string $query_string
@@ -256,8 +278,9 @@ class Errors extends AbstractModel
 	 * @param string|bool $error_type
 	 * @param string $file
 	 * @param int $line
+	 * @param string|false $backtrace
 	 */
-	private function insertLog($query_string, $error_message, $error_type, $file, $line): void
+	private function insertLog($query_string, $error_message, $error_type, $file, $line, $backtrace): void
 	{
 		global $last_error;
 
@@ -266,16 +289,16 @@ class Errors extends AbstractModel
 		// Just in case there's no id_member or IP set yet.
 		$user_id = $this->user->id ?? 0;
 		$user_ip = $this->user->ip ?? '';
+		$session_value = isset($_SESSION['session_value']) ? (string) $_SESSION['session_value'] : 'no_session_data';
 
 		// Don't log the same error countless times, as we can get in a cycle of depression...
-		$error_info = [$user_id, time(), $user_ip, $query_string, $error_message, isset($_SESSION['session_value']) ? (string) $_SESSION['session_value'] : 'no_session_data', $error_type, $file, $line];
+		$error_info = [$user_id, time(), $user_ip, $query_string, $error_message, $session_value,  $error_type, $file, $line, $backtrace];
 		if (empty($last_error) || $last_error != $error_info)
 		{
 			// Insert the error into the database.
-			$this->_db->insert(
-				'',
+			$this->_db->insert('',
 				'{db_prefix}log_errors',
-				['id_member' => 'int', 'log_time' => 'int', 'ip' => 'string-16', 'url' => 'string-65534', 'message' => 'string-65534', 'session' => 'string', 'error_type' => 'string', 'file' => 'string-255', 'line' => 'int'],
+				['id_member' => 'int', 'log_time' => 'int', 'ip' => 'string-16', 'url' => 'string-65534', 'message' => 'string-65534', 'session' => 'string', 'error_type' => 'string', 'file' => 'string-255', 'line' => 'int', 'backtrace' => 'string-65534'],
 				$error_info,
 				['id_error']
 			);

@@ -94,7 +94,7 @@ function template_error_log()
 				</tr>';
 
 	// No errors, then show a message
-	if (count($context['errors']) == 0)
+	if (count($context['errors']) === 0)
 	{
 		echo '
 				<tr>
@@ -126,8 +126,15 @@ function template_error_log()
 			echo '
 						<div>
 							<a class="scope" href="', $scripturl, '?action=admin;area=logs;sa=errorlog', $context['sort_direction'] === 'down' ? ';desc' : '', ';filter=file;value=', $error['file']['search'], '" title="', $txt['apply_filter'], ': ', $txt['filter_only_file'], '" class="nosel icon i-search"></a>
-							', $txt['file'], ': ', $error['file']['link'], '<br />
-							', $txt['line'], ': ', $error['file']['line'], '
+							<i class="icon i-eye"></i> ', $txt['file'], ': ', $error['file']['link'];
+
+			if (!empty($error['backtrace']))
+			{
+				echo '
+							<i class="icon i-bug"></i>', $error['backtrace']['link'];
+			}
+
+			echo '
 						</div>';
 		}
 
@@ -261,4 +268,60 @@ function template_attachment_errors()
 	echo '
 		</div>
 	</div>';
+}
+
+/**
+ * This template shows an error log backtrace
+ */
+function template_show_backtrace()
+{
+	global $context, $txt;
+
+	echo '<!DOCTYPE html>
+<html ', $context['right_to_left'] ? 'dir="rtl"' : '', '>
+	<head>
+		<title>', $context['backtrace_data']['file'], '</title>
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+		<style>
+			body {
+				color: #222;
+				background-color: #FAFAFA;
+				font-family: SFMono-Regular, ui-monospace, Menlo, Monaco, Consolas, "DejaVu Sans Mono", "Liberation Mono", "Courier New", monospace;
+				font-variant-numeric: tabular-nums;
+				font-size: small;
+			}
+		</style>
+	</head>
+	<body>
+		<h3 class="category_header">
+			', $context['backtrace_data']['message'], '
+		</h3>
+		<ul style="list-style: none;">';
+
+	if (!empty($context['backtrace_data']['contents']))
+	{
+		foreach ($context['backtrace_data']['contents'] as $line => $content)
+		{
+			// Check for existing
+			if (!property_exists($content, 'file') || empty($content->file))
+			{
+				$content->file = $txt['unknown'];
+			}
+
+			if (!property_exists($content, 'line') || empty($content->line))
+			{
+				$content->line = -1;
+			}
+
+			echo '
+				<li>', sprintf($txt['backtrace_info'], $line, $content->function, $content->file, $content->line), '</li>';
+		}
+
+		echo '
+			</ul>';
+	}
+
+	echo '
+	</body>
+</html>';
 }

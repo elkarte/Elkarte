@@ -16,6 +16,7 @@ namespace ElkArte\Languages;
 use ElkArte\Database\QueryInterface;
 use ElkArte\Debug;
 use ElkArte\Errors;
+use ElkArte\User;
 
 /**
  * This class takes care of loading language files
@@ -53,12 +54,15 @@ class Loader
 	 */
 	public function __construct($lang, &$variable, QueryInterface $db, string $variable_name = 'txt')
 	{
+		global $language;
+
 		$this->path = LANGUAGEDIR . '/';
 		$this->db = $db;
 		$this->variable = &$variable;
 		$this->variableName = $variable_name;
 
 		// Normalize the language name
+		$lang = $lang ?? User::$info->language ?? $language ?? 'English';
 		$this->language = ucfirst(basename((string) $lang, '.php'));
 
 		if (empty($this->variable))
@@ -88,11 +92,11 @@ class Loader
 	}
 
 	/**
-	 * Does the real work of looking for, then the loading the area files.  Will
+	 * Does the real work of looking for, then loading the area files.  Will
 	 * implement a language fallback if enabled.
 	 *
 	 * @param string $file_name area language file to load, separate multiple with a +
-	 * @param bool $fatal what to do if we can not load the requested area
+	 * @param bool $fatal what to do if we cannot load the requested area
 	 * @param bool $fix_calendar_arrays if to update the calendar [] as well
 	 */
 	public function load($file_name, $fatal = true, $fix_calendar_arrays = false): void
@@ -169,7 +173,7 @@ class Loader
 	}
 
 	/**
-	 * Logs an language loading error and throws an exception if necessary.
+	 * Logs a language loading error and throws an exception if necessary.
 	 *
 	 * @param string $file The file name.
 	 * @param bool $found_fallback Whether a fallback was found or not.
@@ -268,7 +272,7 @@ class Loader
 	 * This is here and not in a language file for two reasons:
 	 *  1. The code requires the structure, so better be sure to have it the way we are supposed to have it
 	 *  2. Transifex (that we use for translating the strings) doesn't support array of arrays, so if we
-	 * move this to a language file we'd need to move away from Tx.
+	 * move this to a language file, we'd need to move away from Tx.
 	 */
 	protected function fix_calendar_text(): void
 	{

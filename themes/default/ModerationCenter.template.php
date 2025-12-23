@@ -426,6 +426,7 @@ function template_viewmodreport()
 		echo '
 							<div class="content">
 								<p class="smalltext">', sprintf($txt['mc_modreport_whoreported_data'], $comment['member']['link'] . (empty($comment['member']['id']) && !empty($comment['member']['ip']) ? ' (' . $comment['member']['ip'] . ')' : ''), $comment['time']), '</p>
+								<hr>
 								<p>', $comment['message'], '</p>
 							</div>';
 	}

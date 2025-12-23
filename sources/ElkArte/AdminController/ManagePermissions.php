@@ -53,7 +53,7 @@ class ManagePermissions extends AbstractController
 	 *
 	 * @event integrate_sa_manage_permissions used to add new subactions
 	 * @uses ManagePermissions language file.
-	 * @see  AbstractController::action_index()
+	 * @see AbstractController::action_index()
 	 */
 	public function action_index()
 	{

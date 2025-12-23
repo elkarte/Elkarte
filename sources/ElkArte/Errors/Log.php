@@ -104,7 +104,7 @@ class Log extends AbstractModel
 		$log = [];
 		$this->_db->fetchQuery('
 			SELECT 
-				id_error, id_member, ip, url, log_time, message, session, error_type, file, line
+				id_error, id_member, ip, url, log_time, message, session, error_type, file, line, backtrace
 			FROM {db_prefix}log_errors' . (empty($filter) ? '' : '
 			WHERE ' . $filter['variable'] . ' LIKE {string:filter}') . '
 			ORDER BY id_error ' . ($sort_direction === 'down' ? 'DESC' : '') . '
@@ -115,7 +115,7 @@ class Log extends AbstractModel
 		)->fetch_callback(
 			function ($row) use (&$log, $filter, $scripturl, $txt) {
 				$search_message = preg_replace('~&lt;span class=&quot;remove&quot;&gt;(.+?)&lt;/span&gt;~', '%', $this->_db->escape_wildcard_string($row['message']));
-				if (!empty($filter) && $search_message == $filter['value']['sql'])
+				if (!empty($filter) && $search_message === $filter['value']['sql'])
 				{
 					$search_message = $this->_db->escape_wildcard_string($row['message']);
 				}
@@ -153,8 +153,20 @@ class Log extends AbstractModel
 						'file' => $row['file'],
 						'line' => $row['line'],
 						'href' => getUrl('admin', ['action' => 'admin', 'area' => 'logs', 'sa' => 'errorlog', 'activity' => 'file', 'err' => $row['id_error']]),
-						'link' => '<a href="' . getUrl('admin', ['action' => 'admin', 'area' => 'logs', 'sa' => 'errorlog', 'activity' => 'file', 'err' => $row['id_error']]) . '" onclick="return reqWin(this.href, 600, 480, false);">' . $row['file'] . '</a>',
+						'link' => '<a href="' . getUrl('admin', ['action' => 'admin', 'area' => 'logs', 'sa' => 'errorlog', 'activity' => 'file', 'err' => $row['id_error']]) . '" onclick="return reqWin(this.href, 600, 480, false);">' . $row['file'] . '&mdash;' . $txt['line'] . ':' . $row['line'] . '</a>',
 						'search' => base64_encode($row['file']),
+					];
+				}
+
+				if (!empty($row['backtrace']))
+				{
+					$log['errors'][$row['id_error']]['backtrace'] = [
+						'message' => $show_message,
+						'file' => $row['file'],
+						'line' => $row['line'],
+						'backtrace' => $row['backtrace'],
+						'href' => getUrl('admin', ['action' => 'admin', 'area' => 'logs', 'sa' => 'errorlog', 'activity' => 'backtrace', 'err' => $row['id_error']]),
+						'link' => '<a href="' . getUrl('admin', ['action' => 'admin', 'area' => 'logs', 'sa' => 'errorlog', 'activity' => 'backtrace', 'err' => $row['id_error']]) . '" onclick="return reqWin(this.href, 800, 600, false);">' . $txt['error_backtrace'] . '</a>',
 					];
 				}
 
@@ -200,7 +212,7 @@ class Log extends AbstractModel
 					'label' => ($txt['errortype_' . $row['error_type']] ?? $row['error_type']) . ' (' . $row['num_errors'] . ')',
 					'description' => $txt['errortype_' . $row['error_type'] . '_desc'] ?? '',
 					'url' => getUrl('admin', ['action' => 'admin', 'area' => 'logs', 'sa' => 'errorlog'] + ($sort === null || $sort === 'down' ? ['desc'] : []) + ['filter' => 'error_type', 'value' => $row['error_type']]),
-					'is_selected' => !empty($filter) && $filter['value']['sql'] == $this->_db->escape_wildcard_string($row['error_type']),
+					'is_selected' => !empty($filter) && $filter['value']['sql'] === $this->_db->escape_wildcard_string($row['error_type']),
 				];
 			}
 		);

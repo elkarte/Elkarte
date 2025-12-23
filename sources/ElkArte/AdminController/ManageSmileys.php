@@ -46,7 +46,7 @@ class ManageSmileys extends AbstractController
 	 *
 	 * @uses ManageSmileys language
 	 * @uses ManageSmileys template
-	 * @see  AbstractController::action_index()
+	 * @see AbstractController::action_index()
 	 */
 	public function action_index()
 	{

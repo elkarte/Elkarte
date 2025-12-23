@@ -43,14 +43,18 @@ class ManageErrors extends AbstractController
 
 		$this->errorLog = new Log(database());
 
-		// The error log. View the list or view a file?
+		// The error log. View the list, view a file or backtrace?
 		$activity = $this->_req->getQuery('activity', 'strval');
 
-		// Some code redundancy... and we only take this!
 		if (isset($activity) && $activity === 'file')
 		{
 			// View the file with the error
 			$this->action_viewfile();
+		}
+		elseif (isset($activity) && $activity === 'backtrace')
+		{
+			// View the error backtrace
+		 	$this->action_backtrace();
 		}
 		else
 		{
@@ -62,27 +66,27 @@ class ManageErrors extends AbstractController
 	/**
 	 * View a file specified in $_REQUEST['file'], with php highlighting on it
 	 *
-	 * Preconditions:
-	 *  - file must be readable,
-	 *  - full file path must be base64 encoded,
-	 *
-	 * - The line number is specified by $_REQUEST['line']...
-	 * - The function will try to get the 20 lines before and after the specified line.
+	 * What it does:
+	 *  - File must be readable,
+	 *  - Full file path must be base64 encoded,
+	 *  - The line number is specified by $_REQUEST['line']...
+	 *  - The function will try to get the 20 lines before and after the specified line.
 	 */
 	protected function action_viewfile(): void
 	{
 		global $context;
 
+		$err = $this->_req->getQuery('err', 'intval');
 		$error_details = $this->errorLog->getErrorLogData(
 			0,
 			'down',
 			[
 				'variable' => 'id_error',
 				'value' => [
-					'sql' => $this->_req->query->err,
+					'sql' => $err,
 				],
 			]
-		)['errors'][$this->_req->query->err]['file'];
+		)['errors'][$err]['file'];
 
 		$data = iterator_to_array(
 			theme()->getTemplates()->getHighlightedLinesFromFile(
@@ -106,6 +110,42 @@ class ManageErrors extends AbstractController
 		theme()->getTemplates()->load('Errors');
 		theme()->getLayers()->removeAll();
 		$context['sub_template'] = 'show_file';
+	}
+
+	/**
+	 * View a debug backtrace
+	 *
+	 * What it does:
+	 *  - Backtrace must exist,
+	 *  - The error is specified by $_GET['err']...
+	 */
+	protected function action_backtrace(): void
+	{
+		global $context;
+
+		Txt::load('Maintenance');
+		$err = $this->_req->getQuery('err', 'intval');
+		$error_details = $this->errorLog->getErrorLogData(
+			0,
+			'down',
+			[
+				'variable' => 'id_error',
+				'value' => [
+					'sql' => $err,
+				],
+			]
+		)['errors'][$err]['backtrace'];
+
+		$context['backtrace_data'] = [
+			'contents' => json_decode($error_details['backtrace']),
+			'file' => strtr($error_details['file'], ['"' => '\\"']),
+			'line' => $error_details['line'],
+			'message' => $error_details['message'] ?? ''
+		];
+
+		theme()->getTemplates()->load('Errors');
+		theme()->getLayers()->removeAll();
+		$context['sub_template'] = 'show_backtrace';
 	}
 
 	/**
@@ -242,9 +282,9 @@ class ManageErrors extends AbstractController
 			'line' => $txt['line'],
 		];
 
-		$filter = $this->_req->getQuery('filter', 'trim', null);
-		$value = $this->_req->getQuery('value', 'trim', null);
 		// Set up the filtering...
+		$filter = $this->_req->getQuery('filter', 'trim');
+		$value = $this->_req->getQuery('value', 'trim');
 		if (isset($value, $filters[$filter]))
 		{
 			return [

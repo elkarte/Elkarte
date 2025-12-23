@@ -49,7 +49,7 @@ class ManageSearch extends AbstractController
 	 * @event integrate_sa_manage_search add new search actions
 	 * @uses ManageSearch template.
 	 * @uses Search language file.
-	 * @see  AbstractController::action_index()
+	 * @see AbstractController::action_index()
 	 */
 	public function action_index()
 	{

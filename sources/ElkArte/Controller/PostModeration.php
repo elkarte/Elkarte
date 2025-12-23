@@ -32,7 +32,7 @@ class PostModeration extends AbstractController
 	 *
 	 * @uses ModerationCenter.template
 	 * @uses ModerationCenter language file
-	 * @see  AbstractController::action_index
+	 * @see AbstractController::action_index
 	 */
 	public function action_index()
 	{

@@ -229,7 +229,7 @@ class Memberlist extends AbstractController
 		call_integration_hook('integrate_memberlist_buttons');
 
 		// Drop columns they do not have permissions to see/search
-		if (!$context['can_send_email'] )
+		if (!$context['can_send_email'])
 		{
 			unset($context['columns']['email_address']);
 		}
@@ -270,15 +270,15 @@ class Memberlist extends AbstractController
 
 		require_once(SUBSDIR . '/Memberlist.subs.php');
 
-		// Some handy short cuts
+		// Some handy shortcuts
 		$start = $this->_req->getQuery('start', 'intval');
 		$desc = $this->_req->getQuery('desc', 'trim');
 		$sort = $this->_req->getQuery('sort', 'trim');
 
 		// Only use caching if:
-		// 1. there are at least 2k members,
-		// 2. the default sorting method (real_name) is being used,
-		// 3. the page shown is high enough to make a DB file sort unprofitable.
+		// 1. There are at least 2k members.
+		// 2. The default sorting method (real_name) is being used.
+		// 3. The page shown is high enough to make a DB file sort unprofitable.
 		$use_cache = $modSettings['totalMembers'] > 2000
 			&& (!isset($sort) || $sort === 'real_name')
 			&& isset($start)
@@ -303,7 +303,7 @@ class Memberlist extends AbstractController
 
 			$context['num_members'] = $memberlist_cache['num_members'];
 		}
-		// Without cache we need an extra query to get the amount of members.
+		// Without cache, we need an extra query to get the number of members.
 		else
 		{
 			$context['num_members'] = ml_memberCount();
@@ -352,7 +352,7 @@ class Memberlist extends AbstractController
 			}
 		}
 
-		// Are we sorting the results
+		// Are we sorting the results?
 		$context['sort_by'] = $sort;
 		$context['sort_direction'] = isset($desc) ? 'down' : 'up';
 
@@ -378,7 +378,7 @@ class Memberlist extends AbstractController
 			'sort' => $context['columns'][$sort]['sort'][$context['sort_direction']],
 		];
 
-		// Using cache allows to narrow down the list to be retrieved.
+		// Using cache allows narrowing down the list to be retrieved.
 		if ($use_cache && $sort === 'real_name' && !isset($desc))
 		{
 			$first_offset = $start - ($start % $cache_step_size);
@@ -436,7 +436,7 @@ class Memberlist extends AbstractController
 	/**
 	 * Search for members or display search results.
 	 *
-	 * - If variable $_REQUEST['search'] is empty displays search dialog box,
+	 * - If variable $_REQUEST['search'] is empty, displays a search dialog box,
 	 * using the search sub-template.
 	 * - Calls printMemberListRows to retrieve the results of the query.
 	 */
@@ -462,7 +462,7 @@ class Memberlist extends AbstractController
 				$fields_csv = $this->_req->getQuery('fields', 'trim|strval', '');
 				$input_fields = $fields_csv === '' ? [] : explode(',', $fields_csv);
 			}
-			elseif ( $this->_req->hasPost('fields'))
+			elseif ($this->_req->hasPost('fields'))
 			{
 				$input_fields = is_array($this->_req->post->fields) ? $this->_req->post->fields : [];
 			}
@@ -489,7 +489,7 @@ class Memberlist extends AbstractController
 			}
 
 			// Set defaults for how the results are sorted
-			if (!isset($context['columns'][$sort]))
+			if (!isset($context['columns'][$sort]['sort']))
 			{
 				$sort = 'real_name';
 			}
@@ -528,7 +528,7 @@ class Memberlist extends AbstractController
 			];
 
 			// Search for a name
-			if (in_array('name', $input_fields))
+			if (in_array('name', $input_fields, true))
 			{
 				$fields = allowedTo('moderate_forum') ? ['member_name', 'real_name'] : ['real_name'];
 			}
@@ -538,21 +538,21 @@ class Memberlist extends AbstractController
 			}
 
 			// Search for websites.
-			if (in_array('website', $input_fields))
+			if (in_array('website', $input_fields, true))
 			{
 				$fields += [7 => 'website_title', 'website_url'];
 			}
 
 			// Search for groups.
-			if (in_array('group', $input_fields))
+			if (in_array('group', $input_fields, true))
 			{
 				$fields += [9 => 'COALESCE(group_name, {string:blank_string})'];
 			}
 
 			// Search for an email address?
-			if (in_array('email', $input_fields))
+			if (in_array('email', $input_fields, true))
 			{
-				$fields += [2 => $context['can_send_email']  ? 'email_address' : ''];
+				$fields += [2 => $context['can_send_email'] ? 'email_address' : ''];
 				$condition = allowedTo('moderate_forum') ? '' : ')';
 			}
 			else

@@ -550,6 +550,7 @@ class Post extends AbstractController
 			// Posting a reply without a quote?
 			elseif (!empty($topic) && empty($quote))
 			{
+				$subject = strtr(Util::htmlspecialchars($subject), ["\r" => '', "\n" => '', "\t" => '']);
 				$this->_topic_attributes['subject'] = $subject;
 				$case = 3;
 			}
@@ -851,7 +852,7 @@ class Post extends AbstractController
 		{
 			$context['breadcrumbs'][] = [
 				'url' => $scripturl . '?topic=' . $topic . '.' . $_REQUEST['start'],
-				'name' => $this->_form_subject,
+				'name' => strtr(Util::htmlspecialchars($this->_form_subject), ["\r" => '', "\n" => '', "\t" => '']),
 				'extra_before' => '<span><strong class="nav">' . $context['page_title'] . ' ( </strong></span>',
 				'extra_after' => '<span><strong class="nav"> )</strong></span>'
 			];

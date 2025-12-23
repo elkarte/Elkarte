@@ -840,7 +840,7 @@ function template_member_email($member, $text = false)
 	{
 		if ($text)
 		{
-			if ($member !== false && $member['show_email'])
+			if ($member !== false && !empty($member['show_email']))
 			{
 				return '<a class="linkbutton" href="mailto:' . $member['email'] . '" rel="nofollow">' . $txt['email'] . '</a>';
 			}
@@ -848,7 +848,7 @@ function template_member_email($member, $text = false)
 			return $txt['hidden'];
 		}
 
-		if ($member !== false && $member['show_email'])
+		if ($member !== false && !empty($member['show_email']))
 		{
 			return '<a href="mailto:' . $member['email'] . '" rel="nofollow" class="icon i-envelope-o' . ($member['online']['is_online'] ? '' : '-blank') . '" title="' . $txt['email'] . ' ' . $member['name'] . '"><s>' . $txt['email'] . ' ' . $member['name'] . '</s></a>';
 		}

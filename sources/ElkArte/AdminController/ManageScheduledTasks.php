@@ -40,7 +40,7 @@ class ManageScheduledTasks extends AbstractController
 	 * @uses ManageScheduledTasks template file
 	 * @uses ManageScheduledTasks language file
 	 *
-	 * @see  AbstractController::action_index()
+	 * @see AbstractController::action_index()
 	 */
 	public function action_index(): void
 	{
