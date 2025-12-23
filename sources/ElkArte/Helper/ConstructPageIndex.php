@@ -154,6 +154,12 @@ class ConstructPageIndex extends AbstractModel
 		// Save whether $start was less than 0 or not.
 		$this->start_invalid = $this->start < 0;
 
+		// Make sure we have a valid number per page to avoid division by zero
+		if ($this->num_per_page <= 0)
+		{
+			return $this->start = 0;
+		}
+
 		// Make sure $start is a proper variable - not less than 0.
 		if ($this->start_invalid)
 		{
