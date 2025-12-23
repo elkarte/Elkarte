@@ -734,7 +734,7 @@ class ManageFeatures extends AbstractController
 
 			// Let's just keep it active, there are too many reasons it should be.
 			require_once(SUBSDIR . '/ScheduledTasks.subs.php');
-			toggleTaskStatusByName('user_access_mentions', true);
+			toggleTaskStatusByName('user_access_mentions');
 
 			// Disable or enable modules as needed
 			foreach ($modules_toggle as $action => $toggles)

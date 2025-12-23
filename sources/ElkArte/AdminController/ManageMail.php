@@ -340,7 +340,7 @@ class ManageMail extends AbstractController
 		// First, are we deleting something from the queue?
 		if (isset($this->_req->post->delete))
 		{
-			checkSession('post');
+			checkSession();
 			deleteMailQueueItems($this->_req->post->delete);
 		}
 

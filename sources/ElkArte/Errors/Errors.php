@@ -414,7 +414,8 @@ class Errors extends AbstractModel
 	 * What it does:
 	 *
 	 * - It shows a complete page independent of language files or themes.
-	 * - It is used only if $maintenance = 2 in Settings.php.
+	 * - It is used if $maintenance = 2 in Settings.php.
+	 * - It is used if an exception is thrown during the execution loadMessage() in exceptions.
 	 * - It stops further execution of the script.
 	 */
 	public function display_minimal_error($message): void

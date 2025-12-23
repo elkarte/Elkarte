@@ -168,7 +168,7 @@ class ManagePermissions extends AbstractController
 		$context['page_title'] = $txt['permissions_title'];
 
 		// pid = profile id
-		$this->_pid = $this->_req->getQuery('pid', 'intval', null);
+		$this->_pid = $this->_req->getQuery('pid', 'intval');
 
 		// We can modify any permission set apart from the read-only, reply only and no polls ones as they are redefined.
 		$context['can_modify'] = empty($this->_pid) || $this->_pid === 1 || $this->_pid > 4;
@@ -979,7 +979,7 @@ class ManagePermissions extends AbstractController
 		// Saving the settings?
 		if ($this->_req->hasQuery('save'))
 		{
-			checkSession('post');
+			checkSession();
 			call_integration_hook('integrate_save_permission_settings');
 			$settingsForm->setConfigValues((array) $this->_req->post);
 			$settingsForm->save();
@@ -1079,7 +1079,7 @@ class ManagePermissions extends AbstractController
 		// Deleting?
 		elseif (isset($this->_req->post->delete) && !empty($this->_req->post->delete_profile))
 		{
-			checkSession('post');
+			checkSession();
 			validateToken('admin-mpp');
 
 			$profiles = [];

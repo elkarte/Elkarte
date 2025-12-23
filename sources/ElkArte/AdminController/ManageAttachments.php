@@ -1801,7 +1801,7 @@ class ManageAttachments extends AbstractController
 				// @todo why was this done this way?
 				if (!$break)
 				{
-					$percent_done = min(round($current_progress / $total_progress * 100, 0), 100);
+					$percent_done = min(round($current_progress / $total_progress * 100), 100);
 					$progressBar = '
 						<div class="progress_bar">
 							<div class="green_percent" style="width: ' . $percent_done . '%;">' . $percent_done . '%</div>

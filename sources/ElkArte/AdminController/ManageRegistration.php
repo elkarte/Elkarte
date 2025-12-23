@@ -185,7 +185,7 @@ class ManageRegistration extends AbstractController
 
 			require_once(SUBSDIR . '/Members.subs.php');
 			$reg_errors = ErrorContext::context('register', 0);
-			$memberID = registerMember($regOptions, 'register');
+			$memberID = registerMember($regOptions);
 
 			// If there are "important" errors, and you are not an admin: log the first error
 			// Otherwise grab all of them and don't log anything

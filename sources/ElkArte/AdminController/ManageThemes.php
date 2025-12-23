@@ -1435,9 +1435,9 @@ class ManageThemes extends AbstractController
 		checkSession('get');
 
 		// This good-for-nothing pixel is being used to keep the session alive.
-		$var = $this->_req->getQuery('var', 'trim|strval', null);
+		$var = $this->_req->getQuery('var', 'trim|strval');
 		// Note: val could be a string or array depending on the option
-		$val = $this->_req->getQuery('val', null, null);
+		$val = $this->_req->getQuery('val');
 		if ($var === null || $val === null)
 		{
 			redirectexit($settings['images_url'] . '/blank.png');
@@ -1503,7 +1503,7 @@ class ManageThemes extends AbstractController
 			}
 
 			// New thingy...
-			$admin_key = $this->_req->getQuery('admin_key', 'trim|strval', null);
+			$admin_key = $this->_req->getQuery('admin_key', 'trim|strval');
 			if ($admin_key !== null && strlen($admin_key) < 5)
 			{
 				$options['admin_preferences'][$admin_key] = $val;
@@ -1534,7 +1534,7 @@ class ManageThemes extends AbstractController
 			}
 
 			// New value for them
-			$minmax_key = $this->_req->getQuery('minmax_key', 'trim|strval', null);
+			$minmax_key = $this->_req->getQuery('minmax_key', 'trim|strval');
 			if ($minmax_key !== null && strlen($minmax_key) < 10)
 			{
 				$minmax_preferences[$minmax_key] = $val;
