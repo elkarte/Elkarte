@@ -1134,8 +1134,8 @@ class PersonalMessage extends AbstractController
 
 	/**
 	 * Send a personal message.
-	 */
-	public function action_send2(): bool
+ 	 */
+	public function action_send2()
 	{
 		global $txt, $context, $modSettings;
 
