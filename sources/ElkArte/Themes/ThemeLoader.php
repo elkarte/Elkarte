@@ -147,7 +147,7 @@ class ThemeLoader
 		static::$dirs = new Directories($settings);
 		User::$info = User::$info ?? new UserInfo([]);
 
-		// Initialize Theme.php, from the default or if it exists from the custom theme
+		// Initialize Theme.php from the default or if it exists from the custom theme
 		$this->theme = new $class($this->id, User::$info, static::$dirs);
 		$context['theme_instance'] = $this->theme;
 	}
@@ -156,11 +156,11 @@ class ThemeLoader
 	 * Resolves the ID of a theme.
 	 *
 	 * The identifier can be specified in:
-	 *  - a GET variable if theme selection is enabled
-	 *  - the session
-	 *  - user's preferences
-	 *  - board
-	 *  - forum default
+	 *  - A GET variable if theme selection is enabled
+	 *  - The session
+	 *  - User's preferences
+	 *  - Board
+	 *  - Forum default
 	 *
 	 * In addition, the ID is verified against a comma-separated list of
 	 * known good themes. This check is skipped if the user is an admin.
@@ -560,7 +560,7 @@ class ThemeLoader
 		$context['minmax_preferences'] = [];
 
 		// Update the option.
-		if (($this->user->is_guest === false) && !empty($options['minmax_preferences']))
+		if ((isset($this->user) && $this->user->is_guest === false) && !empty($options['minmax_preferences']))
 		{
 			$context['minmax_preferences'] = serializeToJson($options['minmax_preferences'], static function ($array_form) {
 				global $settings;
@@ -576,7 +576,7 @@ class ThemeLoader
 		}
 
 		// Guest may have collapsed the header, check the cookie to prevent collapse jumping
-		if (!$this->user->is_guest)
+		if (!isset($this->user) || !$this->user->is_guest)
 		{
 			return;
 		}
@@ -697,7 +697,7 @@ class ThemeLoader
 	{
 		global $modSettings;
 
-		return $this->user->is_guest && $modSettings['enableVBStyleLogin'];
+		return (!isset($this->user) || $this->user->is_guest) && $modSettings['enableVBStyleLogin'];
 	}
 
 	/**
