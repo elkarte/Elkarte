@@ -1759,7 +1759,7 @@ function updateLabelsToPM($searchArray, $new_labels, $user_id)
 			{
 				if (in_array($value, $searchArray))
 				{
-					if (isset($searchArray[$value]))
+					if (isset($searchArray[$value], $new_labels[$value]))
 					{
 						$toChange[$key] = $new_labels[$value];
 					}
