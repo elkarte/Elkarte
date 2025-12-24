@@ -93,6 +93,11 @@ function loadPMLabels($labels)
 			$this_labels = explode(',', $row['labels']);
 			foreach ($this_labels as $this_label)
 			{
+				if (!isset($labels[(int) $this_label]))
+				{
+					continue;
+				}
+
 				$labels[(int) $this_label]['messages'] += $row['num'];
 
 				if (!($row['is_read'] & 1))
@@ -1627,6 +1632,12 @@ function getPmsFromDiscussion($pm_heads)
 	$db = database();
 
 	$pms = [];
+
+	if (empty($pm_heads))
+	{
+		return $pms;
+	}
+
 	$db->fetchQuery('
 		SELECT
 			id_pm, id_pm_head
