@@ -348,7 +348,7 @@ class ManageMaillist extends AbstractController
 		checkSession('get');
 		validateToken('admin-ml', 'get');
 
-		$id = $this->_req->getQuery('item', 'intval', null);
+		$id = $this->_req->getQuery('item', 'intval');
 		if (!empty($id))
 		{
 			// Load up the email details, no funny biz ;)
@@ -411,7 +411,7 @@ class ManageMaillist extends AbstractController
 		checkSession('get');
 		validateToken('admin-ml', 'get');
 
-		$id = $this->_req->getQuery('item', 'intval', null);
+		$id = $this->_req->getQuery('item', 'intval');
 
 		// Remove this entry
 		if (!empty($id))
@@ -445,7 +445,7 @@ class ManageMaillist extends AbstractController
 		validateToken('admin-ml', 'get');
 
 		// Get the id to approve
-		$id = $this->_req->getQuery('item', 'intval', null);
+		$id = $this->_req->getQuery('item', 'intval');
 
 		if (!empty($id) && $id !== -1)
 		{
@@ -591,7 +591,7 @@ class ManageMaillist extends AbstractController
 		// Check if they are sending the notice
 		if (isset($this->_req->post->bounce, $temp_email))
 		{
-			checkSession('post');
+			checkSession();
 			validateToken('admin-ml');
 
 			// They did check the box, how else could they have posted
@@ -1784,7 +1784,7 @@ class ManageMaillist extends AbstractController
 		// Deleting and existing one
 		if (isset($this->_req->post->delete) && !empty($this->_req->post->deltpl))
 		{
-			checkSession('post');
+			checkSession();
 			validateToken('mod-mlt');
 			removeWarningTemplate($this->_req->post->deltpl, 'bnctpl');
 		}
@@ -1926,7 +1926,7 @@ class ManageMaillist extends AbstractController
 		// Wait, we are saving?
 		if ($this->_req->hasPost('save'))
 		{
-			checkSession('post');
+			checkSession();
 			validateToken('mod-mlt');
 
 			// To check the BBC is good...

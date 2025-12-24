@@ -408,7 +408,7 @@ class ManageScheduledTasks extends AbstractController
 						'value' => $txt['scheduled_log_time_run'],
 					],
 					'data' => [
-						'function' => static fn($rowData) => standardTime($rowData['time_run'], true),
+						'function' => static fn($rowData) => standardTime($rowData['time_run']),
 					],
 					'sort' => [
 						'default' => 'lst.id_log DESC',

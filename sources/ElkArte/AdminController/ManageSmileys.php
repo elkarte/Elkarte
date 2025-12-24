@@ -1690,8 +1690,8 @@ class ManageSmileys extends AbstractController
 		$name = '';
 		$base_name = '';
 
-		$setGz = $this->_req->getQuery('set_gz', 'trim|strval', null);
-		$package = $this->_req->getQuery('package', 'trim|strval', null);
+		$setGz = $this->_req->getQuery('set_gz', 'trim|strval');
+		$package = $this->_req->getQuery('package', 'trim|strval');
 
 		if ($setGz !== null)
 		{
@@ -1790,7 +1790,7 @@ class ManageSmileys extends AbstractController
 
 		// Everything is fine, now it's time to do something; first we test
 		$parser = new PackageParser();
-		$actions = $parser->parsePackageInfo($smileyInfo['xml'], true);
+		$actions = $parser->parsePackageInfo($smileyInfo['xml']);
 
 		$context['post_url'] = getUrl('admin', ['action' => 'admin', 'area' => 'smileys', 'sa' => 'install', 'package' => $base_name]);
 		$context['has_failure'] = false;
@@ -1986,7 +1986,7 @@ class ManageSmileys extends AbstractController
 				}
 
 				$filenames[strtolower($key)] = [
-					'id' => Util::htmlspecialchars($key, ENT_COMPAT, 'UTF-8'),
+					'id' => Util::htmlspecialchars($key),
 					'selected' => false,
 				];
 			}

@@ -103,7 +103,7 @@ class Modlog extends AbstractController
 		$searchParams = $this->_req->getPost('params', 'trim', '');
 		$sort = $this->_req->getQuery('sort', 'trim', 'member');
 		$search = $this->_req->getPost('search', 'trim', '');
-		$searchType = $this->_req->getPost('search_type', 'trim', null);
+		$searchType = $this->_req->getPost('search_type', 'trim');
 
 		if (!empty($searchParams) && empty($isSearch))
 		{

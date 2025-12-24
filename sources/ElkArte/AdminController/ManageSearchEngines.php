@@ -91,7 +91,7 @@ class ManageSearchEngines extends AbstractController
 		$context['settings_message'] = sprintf($txt['spider_settings_desc'], getUrl('admin', ['action' => 'admin', 'area' => 'logs', 'sa' => 'pruning', '{session_data}']));
 
 		// Validate posted spider_group against allowed values (don't mutate the request object)
-		$posted_spider_group = $this->_req->getPost('spider_group', 'intval', null);
+		$posted_spider_group = $this->_req->getPost('spider_group', 'intval');
 		if ($posted_spider_group !== null && !isset($config_vars['spider_group'][2][$posted_spider_group]))
 		{
 			// Force to 0 by passing a local value into the form processing later
@@ -581,7 +581,7 @@ class ManageSearchEngines extends AbstractController
 		$max_date = array_key_last($date_choices);
 
 		// What are we currently viewing?
-		$posted_date = $this->_req->getPost('new_date', 'trim|strval', null);
+		$posted_date = $this->_req->getPost('new_date', 'trim|strval');
 		$current_date = ($posted_date !== null && isset($date_choices[$posted_date])) ? $posted_date : $max_date;
 
 		// Prepare the HTML.

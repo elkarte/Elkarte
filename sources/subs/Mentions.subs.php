@@ -204,8 +204,8 @@ function toggleMentionsApproval($msgs, $approved)
 /**
  * Toggles a mention visibility on/off
  *
- * - If off is restored to visible,
- * - If on is switched to invisible for all the users
+ * - If off, restored to visible.
+ * - If on, switched to invisible for all the users
  *
  * @param string $type type of the mention that you want to toggle
  * @param bool $enable if true enables the mentions, otherwise disables them
@@ -246,7 +246,7 @@ function toggleMentionsVisibility($type, $enable)
  * Toggles a bunch of mentions accessibility on/off
  *
  * @param int[] $mentions an array of mention id
- * @param bool $access if true make the mentions accessible (if visible and other things), otherwise marks them as inaccessible
+ * @param bool $access if true, make the mentions accessible (if visible and other things), otherwise marks them as inaccessible
  * @package Mentions
  */
 function toggleMentionsAccessibility($mentions, $access)
@@ -297,7 +297,7 @@ function validate_own_mention($field, $input, $validation_parameters = null)
 }
 
 /**
- * Provided a mentions id and a member id, checks if the mentions belongs to that user
+ * Provided a mentions id and a member id, checks if the mentions belong to that user
  *
  * @param int $id_mention the id of an existing mention
  * @param int $id_member id of a member
@@ -327,7 +327,7 @@ function findMemberMention($id_mention, $id_member)
 }
 
 /**
- * Updates the mention count as a result of an action, read, new, delete, etc
+ * Updates the mention count as a result of an action, read, new, delete, etc.
  *
  * @param int|null $status
  * @param int $member_id
@@ -347,7 +347,7 @@ function updateMentionMenuCount($status, $member_id)
 	{
 		updateMemberData($member_id, ['mentions' => '-']);
 	}
-	// Deleting or un-approving may have been read or not, so a count is required
+	// Deleting or unapproving may have been read or not, so a count is required
 	else
 	{
 		countUserMentions(false, '', $member_id);
@@ -378,7 +378,7 @@ function getTimeLastMention($id_member)
 			'member' => $id_member
 		]
 	);
-	list ($log_time) = $request->fetch_row();
+	[$log_time] = $request->fetch_row();
 	$request->free_result();
 
 	return empty($log_time) ? 0 : $log_time;
@@ -441,7 +441,7 @@ function getNewMentions($id_member, $timestamp)
  * @param string $type The type of mentions. "user" will return only those that the user has enabled and set
  * as on site notification.
  *
- * By default, will filter out notification types with a method set to none, e.g. the user has disabled that
+ * By default, will filter out notification types with a method set to none, e.g., the user has disabled that
  * type of mention.  Use type "system" to return everything, or type "user" to return only those
  * that they want on-site notifications.
  *
@@ -455,6 +455,7 @@ function getMentionTypes($user, $type = 'user')
 
 	$enabled = getEnabledNotifications();
 
+	// Just want the enabled system level notifications
 	if ($type !== 'user')
 	{
 		sort($enabled);
@@ -472,15 +473,19 @@ function getMentionTypes($user, $type = 'user')
 		}
 	}
 
-	// Filter the remaining as requested
-	foreach ($userAllEnabled[$user] as $notificationType => $allowedMethods)
+	// It could be they only use the defaults.
+	if (!empty($userAllEnabled[$user]))
 	{
-		if (!in_array('notification', $allowedMethods, true))
+		// Filter the remaining as requested
+		foreach ($userAllEnabled[$user] as $notificationType => $allowedMethods)
 		{
-			$key = array_search($notificationType, $enabled, true);
-			if ($key !== false)
+			if (!in_array('notification', $allowedMethods, true))
 			{
-				unset($enabled[$key]);
+				$key = array_search($notificationType, $enabled, true);
+				if ($key !== false)
+				{
+					unset($enabled[$key]);
+				}
 			}
 		}
 	}
@@ -526,9 +531,9 @@ function markNotificationsRead($messages)
 			'mention_types' => $mentionTypes,
 		]
 	)->fetch_callback(
-	function ($row) use (&$changes) {
-		$changes[] = (int) $row['id_mention'];
-	});
+		function ($row) use (&$changes) {
+			$changes[] = (int) $row['id_mention'];
+		});
 
 	if (!empty($changes))
 	{
@@ -541,7 +546,7 @@ function markNotificationsRead($messages)
  *
  * Updates the status of mentions in the database. Also updates the mentions count for the member.
  *
- *  - Can be used to mark as read, new, deleted, etc. a group of mention id's
+ *  - Can be used to mark as read, new, deleted, etc. a group of mention ids
  *  - Note that delete is a "soft-delete" because otherwise anyway we have to remember
  *  - When a user was already mentioned for a certain message (e.g., in case of editing)
  *
@@ -563,11 +568,11 @@ function changeStatus($id_mentions, $member_id, $status = 1, $update = true)
 		UPDATE {db_prefix}log_mentions
 		SET status = {int:status}
 		WHERE id_mention IN ({array_int:id_mentions})',
-		[
-			'id_mentions' => $id_mentions,
-			'status' => $status,
-		]
-	)->affected_rows() !== 0;
+			[
+				'id_mentions' => $id_mentions,
+				'status' => $status,
+			]
+		)->affected_rows() !== 0;
 
 	// Update the mentions count
 	if ($success && $update)

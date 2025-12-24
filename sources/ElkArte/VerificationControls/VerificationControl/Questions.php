@@ -19,6 +19,7 @@ use ElkArte\Exceptions\Exception;
 use ElkArte\Helper\HttpReq;
 use ElkArte\Helper\Util;
 use ElkArte\Helper\ValuesContainer;
+use ElkArte\Languages\Txt;
 use ElkArte\User;
 
 /**
@@ -370,6 +371,7 @@ class Questions implements ControlInterface
 		}
 
 		$context['question_answers'] = $this->_loadAntispamQuestions();
+		Txt::load('ManageSettings');
 
 		return [
 			// Clever Thomas, who is looking sheepy now? Not I, the mighty sword swinger did say.

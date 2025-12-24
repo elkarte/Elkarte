@@ -404,7 +404,7 @@ class ManageMembergroups extends AbstractController
 			{
 				// Set the default permission level.
 				require_once(SUBSDIR . '/ManagePermissions.subs.php');
-				setPermissionLevel($this->_req->post->level, $id_group, null);
+				setPermissionLevel($this->_req->post->level, $id_group);
 			}
 			// Copy or inherit the permissions!
 			elseif ($this->_req->post->perm_type === 'copy' || $this->_req->post->perm_type === 'inherit')

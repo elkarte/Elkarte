@@ -175,9 +175,9 @@ class ManageSearch extends AbstractController
 				}
 
 				$new_engines[] = [
-					'name' => trim(Util::htmlspecialchars($searchengine, ENT_COMPAT)),
+					'name' => trim(Util::htmlspecialchars($searchengine)),
 					'url' => $url,
-					'separator' => trim(Util::htmlspecialchars(empty($engine_separators[$id]) ? '+' : $engine_separators[$id], ENT_COMPAT)),
+					'separator' => trim(Util::htmlspecialchars(empty($engine_separators[$id]) ? '+' : $engine_separators[$id])),
 				];
 			}
 

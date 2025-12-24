@@ -232,6 +232,10 @@ function is_not_guest($message = '', $is_fatal = true)
 		createToken('login');
 		$context['sub_template'] = 'kick_guest';
 		$context['robot_no_index'] = true;
+
+		// This is intended to clear any menu dropdowns that may have been created.
+		theme()->getLayers()->remove('generic_menu_dropdown');
+		theme()->getLayers()->remove('generic_menu_sidebar');
 	}
 
 	// Use the kick_guest sub template...

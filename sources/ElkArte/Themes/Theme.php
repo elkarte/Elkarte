@@ -161,12 +161,17 @@ abstract class Theme
 	 *
 	 * What it does:
 	 *  - Retrieves the value of the 'api' parameter from the request.
+	 *  - Requires that the request was made via AJAX. Validated by checking for
+	 * 'HTTP_X_REQUESTED_WITH' header which much be set in fetch API and/or XMLHttpRequest with
+	 * setRequestHeader('X-Requested-With', automatically set by jQuery requests.
 	 *
-	 * @return string The value of the 'api' parameter from the request, trimmed.
+	 * @return string|false The value of the 'api' parameter from the request, trimmed.
 	 */
-	public function getRequestAPI(): string
+	public function getRequestAPI(): string|false
 	{
-		return $this->_req->getRequest('api', 'trim', '');
+		$api = $this->_req->getRequest('api', 'trim', '');
+
+		return in_array($api, ['xml', 'json', 'html']) && !empty($_SERVER['HTTP_X_REQUESTED_WITH']) ? $api : false;
 	}
 
 	/**
@@ -821,11 +826,12 @@ abstract class Theme
 
 		call_integration_hook('integrate_simple_actions', [&$simpleActions]);
 
-		// Output is fully XML
+		// Output is fully XML and sent by our JavaScript
 		$api = $this->_req->getRequest('api', 'trim', '');
+		$valid = !empty($_SERVER['HTTP_X_REQUESTED_WITH']);
 		$action = $this->_req->getRequest('action', 'trim', '');
 
-		if ($api === 'xml')
+		if ($valid && $api === 'xml')
 		{
 			Txt::load('index+Addons');
 			$this->getLayers()->removeAll();

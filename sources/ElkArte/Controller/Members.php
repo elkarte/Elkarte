@@ -51,7 +51,7 @@ class Members extends AbstractController
 	}
 
 	/**
-	 * This simple function adds the passed user from the current users buddy list.
+	 * This function adds the passed user from the current users buddy list.
 	 *
 	 * - Called by ?action=buddy;u=x;session_id=y.
 	 * - Redirects to ?action=profile;u=x.
@@ -75,9 +75,11 @@ class Members extends AbstractController
 		call_integration_hook('integrate_add_buddies', [$this->user->id, &$user]);
 
 		// Add if it's not there (and not you).
-		if (!in_array($user, $this->user->buddies) && $this->user->id != $user)
+		if (!in_array($user, $this->user->buddies) && $this->user->id !== $user)
 		{
-			$this->user->buddies[] = $user;
+			$buddies = $this->user->buddies;
+			$buddies[] = $user;
+			$this->user->buddies = $buddies;
 
 			// Do we want a mention for our newly added buddy?
 			if (!empty($modSettings['mentions_enabled']))

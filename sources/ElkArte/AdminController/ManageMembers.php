@@ -808,7 +808,7 @@ class ManageMembers extends AbstractController
 
 		// Allowed filters are those we can have, in theory.
 		$context['allowed_filters'] = $context['browse_type'] === 'approve' ? [3, 4, 5] : [0, 2];
-		$filterQuery = $this->_req->hasQuery('filter') ? $this->_req->getQuery('filter', 'intval', null) : null;
+		$filterQuery = $this->_req->hasQuery('filter') ? $this->_req->getQuery('filter', 'intval') : null;
 		$context['current_filter'] = ($filterQuery !== null && in_array($filterQuery, $context['allowed_filters'], true) && !empty($context['activation_numbers'][$filterQuery])) ? (int) $filterQuery : -1;
 
 		// Sort out the different subareas that we can actually filter by.
@@ -1192,11 +1192,11 @@ class ManageMembers extends AbstractController
 		$this->conditions = [];
 
 		// Sort out where we are going...
-		$original_filter = $this->_req->getPost('orig_filter', 'intval', null);
+		$original_filter = $this->_req->getPost('orig_filter', 'intval');
 		$current_filter = $this->conditions['activated_status'] = $original_filter;
 
 		$type = $this->_req->getQuery('type', 'trim', '');
-		$filter = $this->_req->getPost('filter', 'trim', null);
+		$filter = $this->_req->getPost('filter', 'trim');
 		$sort = $this->_req->getRequest('sort', 'trim', '');
 		$start = $this->_req->getRequest('start', 'intval', 0);
 		$todoAction = $this->_req->getPost('todoAction');

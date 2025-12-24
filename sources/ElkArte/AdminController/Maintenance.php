@@ -551,7 +551,7 @@ class Maintenance extends AbstractController
 		isAllowedTo('admin_forum');
 
 		// Some validation
-		checkSession('post');
+		checkSession();
 		validateToken('admin-maint');
 
 		ignore_user_abort(true);
@@ -938,7 +938,7 @@ class Maintenance extends AbstractController
 			throw new Exception('no_dump_database', 'critical');
 		}
 
-		checkSession('post');
+		checkSession();
 
 		// Validate access
 		if (!defined('I_KNOW_IT_MAY_BE_UNSAFE') && $this->_validate_access() === false)

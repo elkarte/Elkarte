@@ -90,7 +90,7 @@ class Reminder extends AbstractController
 		}
 
 		// You must enter a username/email address.
-		if (empty($where))
+		if (empty($where) || (!empty($where_params) && count(array_filter($where_params, fn($val) => $val !== null)) === 0))
 		{
 			throw new Exception('username_no_exist', false);
 		}

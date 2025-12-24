@@ -1258,6 +1258,12 @@ class ProfileInfo extends AbstractController
 			$this->_load_buddies();
 			$context['sub_template'] = 'profile_block_buddies';
 		}
+		else
+		{
+			// Give them a blank look :/ vs. unable to load the main template
+			theme()->getTemplates()->load('Xml');
+			$context['sub_template'] = 'empty_xml';
+		}
 	}
 
 	/**

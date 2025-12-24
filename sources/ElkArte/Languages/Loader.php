@@ -62,7 +62,7 @@ class Loader
 		$this->variableName = $variable_name;
 
 		// Normalize the language name
-		$lang = $lang ?? User::$info->language ?? $language ?? 'English';
+		$lang = $lang ?: User::$info?->language ?: $language ?: 'English';
 		$this->language = ucfirst(basename((string) $lang, '.php'));
 
 		if (empty($this->variable))
@@ -190,9 +190,11 @@ class Loader
 
 		if ($file !== 'Addons')
 		{
+			// Could have failed to load the index language file!
+			$message = $txt['theme_language_error'] ?? 'Unable to load the \'%1$s\' language file.';
 			Errors::instance()->log_error(
 				sprintf(
-					$txt['theme_language_error'],
+					$message,
 					$file . '.' . $this->language,
 					'template'
 				)

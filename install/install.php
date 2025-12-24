@@ -411,9 +411,14 @@ function fixModSecurity()
 {
 	$htaccess_addition = '
 <IfModule mod_security.c>
-	# Turn off mod_security filtering. 
+	# ModSecurity 1.x
 	SecFilterEngine Off
 	SecFilterScanPOST Off
+</IfModule>
+
+<IfModule mod_security2.c>
+	# ModSecurity 2.x/3.x
+	SecRuleEngine Off
 </IfModule>';
 
 	if (!function_exists('apache_get_modules') || !in_array('mod_security', apache_get_modules(), true))
@@ -426,7 +431,7 @@ function fixModSecurity()
 		$current_htaccess = implode('', file(TMP_BOARDDIR . '/.htaccess'));
 
 		// Only change something if mod_security hasn't been addressed yet.
-		if (!str_contains($current_htaccess, '<IfModule mod_security.c>'))
+		if (!str_contains($current_htaccess, 'mod_security'))
 		{
 			if ($ht_handle = fopen(TMP_BOARDDIR . '/.htaccess', 'ab'))
 			{
@@ -444,7 +449,7 @@ function fixModSecurity()
 
 	if (file_exists(TMP_BOARDDIR . '/.htaccess'))
 	{
-		return str_contains(implode('', file(TMP_BOARDDIR . '/.htaccess')), '<IfModule mod_security.c>');
+		return str_contains(implode('', file(TMP_BOARDDIR . '/.htaccess')), 'mod_security>');
 	}
 
 	if (is_writable(TMP_BOARDDIR))
