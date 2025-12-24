@@ -379,7 +379,7 @@ class Post extends AbstractModule
 	 */
 	public function pre_save_post(&$topicOptions): void
 	{
-		$id_poll = self::$_make_poll ? $this->_createPoll($_POST, $_POST['guestname']) : 0;
+		$id_poll = self::$_make_poll ? $this->_createPoll($_POST, $_POST['guestname'] ?? 'Guest') : 0;
 
 		$topicOptions['poll'] = self::$_make_poll ? $id_poll : null;
 	}
