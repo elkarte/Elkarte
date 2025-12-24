@@ -62,7 +62,7 @@ class Loader
 		$this->variableName = $variable_name;
 
 		// Normalize the language name
-		$lang = ($lang ?: User::$info->language ?: $language) ?: 'English';
+		$lang = $lang ?: User::$info?->language ?: $language ?: 'English';
 		$this->language = ucfirst(basename((string) $lang, '.php'));
 
 		if (empty($this->variable))

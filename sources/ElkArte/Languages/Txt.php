@@ -38,7 +38,7 @@ class Txt
 		if (self::$loader === null)
 		{
 			$txt = $txt ?? [];
-			$lang = User::$info->language ?? $language;
+			$lang = User::$info?->language ?? $language ?? 'English';
 			self::$loader = new Loader($lang, $txt, database());
 			self::$loader->setFallback(empty($modSettings['disable_language_fallback']));
 		}
