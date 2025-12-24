@@ -525,11 +525,10 @@ class ThemeLoader
 
 		$context['admin_preferences'] = [];
 		// Update the option.
-		if ($this->user->is_guest !== false)
+		if (!isset($this->user) || $this->user->is_guest === true)
 		{
 			return;
 		}
-
 		if (empty($options['admin_preferences']))
 		{
 			return;
