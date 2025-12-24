@@ -195,7 +195,7 @@ abstract class AbstractController
 		return empty($this->_req->getRequest('api', 'trim', false));
 	}
 
-	/**
+	/**-
 	 * Public function to return the controllers generic hook name
 	 */
 	public function getHook(): string
@@ -331,6 +331,10 @@ abstract class AbstractController
 
 	/**
 	 * Helper function to see if a request is asking for api processing
+	 *
+	 * - Returns the api type, XML, JSON, HTML
+	 * - Validates request by checking for a 'HTTP_X_REQUESTED_WITH' header which much be set
+	 * in your JavaScript fetch API and/or XMLHttpRequest calls
 	 *
 	 * @return string|false
 	 */
