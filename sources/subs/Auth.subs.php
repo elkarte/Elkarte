@@ -94,7 +94,7 @@ function setLoginCookie($cookie_length, $id, $password = '')
 
 			$cookie_url = url_parts(!empty($modSettings['localCookies']), !empty($modSettings['globalCookies']));
 
-			if ($cookie_url[0] == '')
+			if ($cookie_url[0] === '')
 			{
 				$cookie_url[0] = strtok($alias, '/');
 			}
@@ -169,7 +169,7 @@ function url_parts($local, $global)
 	}
 
 	// Globalize cookies across domains (filter out IP-addresses)?
-	elseif ($global && preg_match('~^\d{1,3}(\.\d{1,3}){3}$~', $parsed_url['host']) == 0 && preg_match('~(?:[^\.]+\.)?([^\.]{2,}\..+)\z~i', $parsed_url['host'], $parts) == 1)
+	elseif ($global && preg_match('~^\d{1,3}(\.\d{1,3}){3}$~', $parsed_url['host']) !== 1 && preg_match('~(?:[^\.]+\.)?([^\.]{2,}\..+)\z~i', $parsed_url['host'], $parts) === 1)
 	{
 		$parsed_url['host'] = '.' . $parts[1];
 	}
@@ -211,7 +211,7 @@ function adminLogin($type = 'admin'): never
 	// Validate what type of session check this is.
 	$types = [];
 	call_integration_hook('integrate_validateSession', [&$types]);
-	$type = in_array($type, $types) || $type === 'moderate' ? $type : 'admin';
+	$type = in_array($type, $types, true) || $type === 'moderate' ? $type : 'admin';
 
 	// They used a wrong password, log it and unset that.
 	if (isset($_POST[$type . '_pass']))
@@ -529,7 +529,7 @@ function resetPassword($memID, $username = null)
  * @param string $ErrorContext
  * @param bool $check_reserved_name
  * @param bool $fatal pass through to isReservedName
- * @return string
+ * @return void loads errors into the ErrorContext
  * @package Authorization
  */
 function validateUsername($memID, $username, $ErrorContext = 'register', $check_reserved_name = true, $fatal = true)
@@ -614,7 +614,7 @@ function validatePassword($password, $username, $restrict_in = [])
 	}
 
 	// Otherwise, perform the medium strength test - checking if the password appears in the restricted string.
-	if (preg_match('~\b' . preg_quote($password, '~') . '\b~', implode(' ', $restrict_in)) != 0)
+	if (preg_match('~\b' . preg_quote($password, '~') . '\b~', implode(' ', $restrict_in)) === 1)
 	{
 		return 'restricted_words';
 	}
@@ -625,7 +625,7 @@ function validatePassword($password, $username, $restrict_in = [])
 	}
 
 	// If just medium, we're done.
-	if ($modSettings['password_strength'] == 1)
+	if ((int) $modSettings['password_strength'] === 1)
 	{
 		return null;
 	}
@@ -819,7 +819,7 @@ function isFirstLogin($id_member)
 	require_once(SUBSDIR . '/Members.subs.php');
 	$member = getBasicMemberData($id_member, ['moderation' => true]);
 
-	return !empty($member) && $member['last_login'] == 0;
+	return !empty($member) && (int) $member['last_login'] === 0;
 }
 
 /**
