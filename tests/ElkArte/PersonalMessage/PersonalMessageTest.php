@@ -7,7 +7,7 @@
  * them local if you need to keep your data untouched!
  */
 
-namespace ElkArte\Controller;
+namespace ElkArte\PersonalMessage;
 
 use ElkArte;
 use ElkArte\EventManager;
@@ -29,7 +29,7 @@ class PersonalMessageTest extends ElkArteCommonSetupTest
 
 		// Load in the common items so the system thinks we have an active login
 		parent::setUp();
-		parent::setSession();
+		$this->setSession();
 
 		new ElkArte\Themes\ThemeLoader();
 		$lang = new Loader('english', $txt, database());
