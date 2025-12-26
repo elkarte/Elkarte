@@ -105,7 +105,6 @@ class Rules extends AbstractController
 	{
 		global $context;
 
-		require_once(SUBSDIR . '/PersonalMessage.subs.php');
 		loadRules();
 
 		require_once(SUBSDIR . '/Membergroups.subs.php');
@@ -234,7 +233,6 @@ class Rules extends AbstractController
 
 		checkSession();
 
-		require_once(SUBSDIR . '/PersonalMessage.subs.php');
 		loadRules();
 
 		$rid = $this->_req->getQuery('rid', 'intval', 0);
@@ -392,7 +390,6 @@ class Rules extends AbstractController
 
 		$toDelete = array_map('intval', array_keys($delrule));
 
-		require_once(SUBSDIR . '/PersonalMessage.subs.php');
 		deletePMRules($this->user->id, $toDelete);
 
 		redirectexit('action=pm;sa=manrules');
