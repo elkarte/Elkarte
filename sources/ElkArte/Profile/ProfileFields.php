@@ -22,6 +22,7 @@ use ElkArte\Helper\Util;
 use ElkArte\Languages\Txt;
 use ElkArte\MembersList;
 use ElkArte\User;
+use ElkArte\PersonalMessage\PmHelper;
 
 /**
  * The ProfileFields class is responsible for loading and rendering profile fields.
@@ -637,7 +638,7 @@ class ProfileFields
 				'preload' => static function () {
 					global $context, $cur_profile;
 
-					$context['display_mode'] = $cur_profile['pm_prefs'] & 3;
+					$context['display_mode'] = (int) $cur_profile['pm_prefs'] & 3;
 					$context['send_email'] = $cur_profile['pm_email_notify'];
 
 					return true;

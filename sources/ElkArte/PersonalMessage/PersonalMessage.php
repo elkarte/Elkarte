@@ -16,53 +16,36 @@
  *
  */
 
-namespace ElkArte\Controller;
+namespace ElkArte\PersonalMessage;
 
 use BBC\ParserWrapper;
 use ElkArte\AbstractController;
 use ElkArte\Action;
 use ElkArte\Cache\Cache;
 use ElkArte\Errors\ErrorContext;
-use ElkArte\EventManager;
 use ElkArte\Exceptions\ControllerRedirectException;
 use ElkArte\Exceptions\Exception;
 use ElkArte\Exceptions\PmErrorException;
 use ElkArte\Helper\Util;
 use ElkArte\Helper\ValuesContainer;
-use ElkArte\Languages\Loader;
 use ElkArte\Languages\Txt;
 use ElkArte\MembersList;
 use ElkArte\MessagesCallback\BodyParser\Normal;
 use ElkArte\MessagesCallback\PmRenderer;
 use ElkArte\Profile\Profile;
-use ElkArte\Profile\ProfileFields;
 use ElkArte\Profile\ProfileOptions;
 use ElkArte\User;
 use ElkArte\VerificationControls\VerificationControlsIntegrate;
 
 /**
  * Class PersonalMessage
+ *
  * It allows viewing, sending, deleting, and marking personal messages
  *
- * @package ElkArte\Controller
+ * @package ElkArte\PersonalMessage
  */
 class PersonalMessage extends AbstractController
 {
-	/**
-	 * @var array $_search_params Will carry all settings that differ from the default
-	 * search parameters. That way, the URLs involved in a search page will
-	 * be kept as short as possible.
-	 */
-	private $_search_params = [];
-
-	/** @var array $_searchq_parameters will carry all the values needed by S_search_params */
-	private $_searchq_parameters = [];
-
-	/** @var int display_mode key is as follows */
-	private const DISPLAY_ALL_AT_ONCE = 0;
-	private const DISPLAY_ONE_AT_TIME = 1;
-	private const DISPLAY_AS_CONVERSATION = 2;
-
 	/**
 	 * This method is executed before any other in this file (when the class is
 	 * loaded by the dispatcher).
@@ -85,7 +68,7 @@ class PersonalMessage extends AbstractController
 		// This file contains PM functions such as mark, send, delete
 		require_once(SUBSDIR . '/PersonalMessage.subs.php');
 
-		// Templates, language, javascripts
+		// Templates, language, javascript
 		Txt::load('PersonalMessage');
 		loadJavascriptFile(['suggest.js', 'PersonalMessage.js']);
 
@@ -149,7 +132,7 @@ class PersonalMessage extends AbstractController
 		];
 
 		// Preferences...
-		$context['display_mode'] = (int) User::$settings['pm_prefs'] & 3;
+		$context['display_mode'] = PmHelper::getDisplayMode();
 	}
 
 	/**
@@ -576,7 +559,7 @@ class PersonalMessage extends AbstractController
 		], $this->user->id);
 
 		// Make sure that we have been given a correct head pm id if we are in conversation mode
-		if ($context['display_mode'] === self::DISPLAY_AS_CONVERSATION && !empty($pmID) && $pmID != $lastData['id'])
+		if ($context['display_mode'] === PmHelper::DISPLAY_AS_CONVERSATION && !empty($pmID) && $pmID != $lastData['id'])
 		{
 			throw new Exception('no_access', false);
 		}
@@ -590,11 +573,11 @@ class PersonalMessage extends AbstractController
 				$context['current_pm'] = 0;
 			}
 
-			$display_pms = $context['display_mode'] === self::DISPLAY_ALL_AT_ONCE ? $pms : [$lastData['id']];
+			$display_pms = $context['display_mode'] === PmHelper::DISPLAY_ALL_AT_ONCE ? $pms : [$lastData['id']];
 
 			// At this point we know the main id_pm's. But if we are looking at conversations, we need
 			// the PMs that make up the conversation
-			if ($context['display_mode'] === self::DISPLAY_AS_CONVERSATION)
+			if ($context['display_mode'] === PmHelper::DISPLAY_AS_CONVERSATION)
 			{
 				[$display_pms, $posters] = loadConversationList($lastData['head'], $recipients, $context['folder']);
 
@@ -614,7 +597,7 @@ class PersonalMessage extends AbstractController
 			[$context['message_labels'], $context['message_replied'], $context['message_unread']] = loadPMRecipientInfo($all_pms, $recipients, $context['folder']);
 
 			// Make sure we don't load any unnecessary data for one at a time mode
-			if ($context['display_mode'] === self::DISPLAY_ONE_AT_TIME)
+			if ($context['display_mode'] === PmHelper::DISPLAY_ONE_AT_TIME)
 			{
 				foreach ($posters as $pm_key => $sender)
 				{
@@ -647,7 +630,7 @@ class PersonalMessage extends AbstractController
 
 			// Execute the load message query if a message has been chosen and let
 			// the callback fetch the results.  Otherwise, just show the pm selection list
-			if (empty($pmsg) && empty($pmID) && $context['display_mode'] !== self::DISPLAY_ALL_AT_ONCE)
+			if (empty($pmsg) && empty($pmID) && $context['display_mode'] !== PmHelper::DISPLAY_ALL_AT_ONCE)
 			{
 				$messages_request = false;
 			}
@@ -690,13 +673,13 @@ class PersonalMessage extends AbstractController
 		$context['page_index'] = constructPageIndex('{scripturl}?action=pm;f=' . $context['folder'] . ($label_for_index !== null ? ';l=' . (int) $label_for_index : '') . ';sort=' . $context['sort_by'] . ($descending ? ';desc' : ''), $start, $max_messages, $modSettings['defaultMaxMessages']);
 		$context['start'] = $start;
 
-		$context['pm_form_url'] = $scripturl . '?action=pm;sa=pmactions;' . ($context['display_mode'] === self::DISPLAY_AS_CONVERSATION ? 'conversation;' : '') . 'f=' . $context['folder'] . ';start=' . $context['start'] . ($context['current_label_id'] !== -1 ? ';l=' . $context['current_label_id'] : '');
+		$context['pm_form_url'] = $scripturl . '?action=pm;sa=pmactions;' . ($context['display_mode'] === PmHelper::DISPLAY_AS_CONVERSATION ? 'conversation;' : '') . 'f=' . $context['folder'] . ';start=' . $context['start'] . ($context['current_label_id'] !== -1 ? ';l=' . $context['current_label_id'] : '');
 
 		// Finally, mark the relevant messages as read.
 		if ($context['folder'] !== 'sent' && !empty($context['labels'][(int) $context['current_label_id']]['unread_messages']))
 		{
 			// If the display mode is "old sk00l" do them all...
-			if ($context['display_mode'] === self::DISPLAY_ALL_AT_ONCE)
+			if ($context['display_mode'] === PmHelper::DISPLAY_ALL_AT_ONCE)
 			{
 				markMessages(null, $context['current_label_id']);
 			}
@@ -708,7 +691,7 @@ class PersonalMessage extends AbstractController
 		}
 
 		// Build the conversation button array.
-		if ($context['display_mode'] === self::DISPLAY_AS_CONVERSATION && !empty($context['current_pm']))
+		if ($context['display_mode'] === PmHelper::DISPLAY_AS_CONVERSATION && !empty($context['current_pm']))
 		{
 			$context['conversation_buttons'] = [
 				'delete' => [
@@ -1498,7 +1481,7 @@ class PersonalMessage extends AbstractController
 		}
 
 		// If we are in conversation, we may need to apply this to every message in that conversation.
-		if ($context['display_mode'] === self::DISPLAY_AS_CONVERSATION && $this->_req->hasQuery('conversation'))
+		if ($context['display_mode'] === PmHelper::DISPLAY_AS_CONVERSATION && $this->_req->hasQuery('conversation'))
 		{
 			$id_pms = array_map('intval', array_keys($pm_actions));
 			$pm_heads = getDiscussions($id_pms);
@@ -1548,7 +1531,7 @@ class PersonalMessage extends AbstractController
 		// Deleting, it looks like?
 		if (!empty($to_delete))
 		{
-			deleteMessages($to_delete, $context['display_mode'] === self::DISPLAY_AS_CONVERSATION ? null : $context['folder']);
+			deleteMessages($to_delete, $context['display_mode'] === PmHelper::DISPLAY_AS_CONVERSATION ? null : $context['folder']);
 		}
 
 		// Are we labeling anything?
@@ -1650,191 +1633,9 @@ class PersonalMessage extends AbstractController
 	 */
 	public function action_manlabels(): void
 	{
-		global $txt, $context;
-
-		require_once(SUBSDIR . '/PersonalMessage.subs.php');
-
-		// Build the link tree elements...
-		$context['breadcrumbs'][] = [
-			'url' => getUrl('action', ['action' => 'pm', 'sa' => 'manlabels']),
-			'name' => $txt['pm_manage_labels']
-		];
-
-		// Some things for the template
-		$context['page_title'] = $txt['pm_manage_labels'];
-		$context['sub_template'] = 'labels';
-
-		// Add all existing labels to the array to save, slashing them as necessary...
-		$the_labels = [];
-		foreach ($context['labels'] as $label)
-		{
-			if ($label['id'] !== -1)
-			{
-				$the_labels[$label['id']] = $label['name'];
-			}
-		}
-
-		// Submitting changes?
-		if ($this->_req->hasPost('add') || $this->_req->hasPost('delete') || $this->_req->hasPost('save'))
-		{
-			checkSession();
-
-			// This will be for updating messages.
-			$message_changes = [];
-			$new_labels = [];
-			$rule_changes = [];
-
-			// Will most likely need this.
-			loadRules();
-
-			// Adding a new label?
-			if ($this->_req->hasPost('add'))
-			{
-				$label = $this->_req->getPost('label', 'trim|strval', '');
-				$label = strtr(Util::htmlspecialchars($label), [',' => '&#044;']);
-
-				if (Util::strlen($label) > 30)
-				{
-					$label = Util::substr($label, 0, 30);
-				}
-
-				if ($label !== '')
-				{
-					$the_labels[] = $label;
-				}
-			}
-			// Deleting an existing label?
-			elseif ($this->_req->hasPost('delete') && $this->_req->hasPost('delete_label'))
-			{
-				$delete_label = $this->_req->getPost('delete_label', null, []);
-				$i = 0;
-				foreach (array_keys($the_labels) as $id)
-				{
-					if (isset($delete_label[$id]))
-					{
-						unset($the_labels[$id]);
-						$message_changes[$id] = true;
-					}
-					else
-					{
-						$new_labels[$id] = $i++;
-					}
-				}
-			}
-			// The hardest one to deal with... changes.
-			elseif ($this->_req->hasPost('save'))
-			{
-				$label_name = $this->_req->getPost('label_name', null, []);
-				$i = 0;
-				foreach (array_keys($the_labels) as $id)
-				{
-					if ($id === -1)
-					{
-						continue;
-					}
-
-					if (isset($label_name[$id]))
-					{
-						// Prepare the label name
-						$prepared = trim(strtr(Util::htmlspecialchars($label_name[$id]), [',' => '&#044;']));
-
-						// Has to fit in the database as well
-						if (Util::strlen($prepared) > 30)
-						{
-							$prepared = Util::substr($prepared, 0, 30);
-						}
-
-						if ($prepared !== '')
-						{
-							$the_labels[(int) $id] = $prepared;
-							$new_labels[$id] = $i++;
-						}
-						else
-						{
-							unset($the_labels[(int) $id]);
-							$message_changes[(int) $id] = true;
-						}
-					}
-					else
-					{
-						$new_labels[$id] = $i++;
-					}
-				}
-			}
-
-			// Save the label status.
-			require_once(SUBSDIR . '/Members.subs.php');
-			updateMemberData($this->user->id, ['message_labels' => implode(',', $the_labels)]);
-
-			// Update all the messages currently with any label changes in them!
-			if (!empty($message_changes))
-			{
-				$searchArray = array_keys($message_changes);
-
-				if (!empty($new_labels))
-				{
-					for ($i = max($searchArray) + 1, $n = max(array_keys($new_labels)); $i <= $n; $i++)
-					{
-						$searchArray[] = $i;
-					}
-				}
-
-				updateLabelsToPM($searchArray, $new_labels, $this->user->id);
-
-				// Now do the same the rules - check through each rule.
-				foreach ($context['rules'] as $k => $rule)
-				{
-					// Each action...
-					foreach ($rule['actions'] as $k2 => $action)
-					{
-						if ($action['t'] !== 'lab' || !in_array($action['v'], $searchArray))
-						{
-							continue;
-						}
-
-						$rule_changes[] = $rule['id'];
-
-						// If we're here, we have a label which is either changed or gone...
-						if (isset($new_labels[$action['v']]))
-						{
-							$context['rules'][$k]['actions'][$k2]['v'] = $new_labels[$action['v']];
-						}
-						else
-						{
-							unset($context['rules'][$k]['actions'][$k2]);
-						}
-					}
-				}
-			}
-
-			// If we have rules to change, do so now.
-			if (!empty($rule_changes))
-			{
-				$rule_changes = array_unique($rule_changes);
-
-				// Update/delete as appropriate.
-				foreach ($rule_changes as $k => $id)
-				{
-					if (!empty($context['rules'][$id]['actions']))
-					{
-						updatePMRuleAction($id, $this->user->id, $context['rules'][$id]['actions']);
-						unset($rule_changes[$k]);
-					}
-				}
-
-				// Anything left here means it's lost all actions...
-				if (!empty($rule_changes))
-				{
-					deletePMRules($this->user->id, $rule_changes);
-				}
-			}
-
-			// Make sure we're not caching this!
-			Cache::instance()->remove('labelCounts:' . $this->user->id);
-
-			// To make the changes appear right away, redirect.
-			redirectexit('action=pm;sa=manlabels');
-		}
+		$controller = new Labels($this->_events);
+		$controller->setUser($this->user);
+		$controller->action_manlabels();
 	}
 
 	/**
@@ -1846,66 +1647,9 @@ class PersonalMessage extends AbstractController
 	 */
 	public function action_settings(): void
 	{
-		global $txt, $context, $profile_vars, $cur_profile;
-
-		require_once(SUBSDIR . '/Profile.subs.php');
-
-		// Load the member data for editing
-		MembersList::load($this->user->id, false, 'profile');
-		$cur_profile = MembersList::get($this->user->id);
-
-		// Load up the profile template, It's where PM settings are located
-		Txt::load('Profile');
-		theme()->getTemplates()->load('Profile');
-
-		// We want them to submit back to here.
-		$context['profile_custom_submit_url'] = getUrl('action', ['action' => 'pm', 'sa' => 'settings', 'save']);
-
-		$context['page_title'] = $txt['pm_settings'];
-		$context['user']['is_owner'] = true;
-		$context['id_member'] = $this->user->id;
-		$context['require_password'] = false;
-		$context['menu_item_selected'] = 'settings';
-		$context['submit_button_text'] = $txt['pm_settings'];
-
-		// Add our position to the breadcrumbs.
-		$context['breadcrumbs'][] = [
-			'url' => getUrl('action', ['action' => 'pm', 'sa' => 'settings']),
-			'name' => $txt['pm_settings']
-		];
-
-		// Are they saving?
-		if ($this->_req->hasPost('save'))
-		{
-			checkSession();
-
-			// Mimic what Profile.php does.
-			$post = Util::htmltrim__recursive((array) $this->_req->post);
-			$post = Util::htmlspecialchars__recursive($post);
-			$this->_req->post = new \ArrayObject($post, \ArrayObject::ARRAY_AS_PROPS);
-
-			// Save the fields.
-			$profileFields = new ProfileFields();
-			$fields = ProfileOptions::getFields('contactprefs');
-			$profileFields->saveProfileFields($fields['fields'], $fields['hook']);
-
-			if (!empty($profile_vars))
-			{
-				require_once(SUBSDIR . '/Members.subs.php');
-				updateMemberData($this->user->id, $profile_vars);
-			}
-
-			// Invalidate any cached data and reload so we show the saved values
-			Cache::instance()->remove('member_data-profile-' . $this->user->id);
-			MembersList::load($this->user->id, false, 'profile');
-			$cur_profile = MembersList::get($this->user->id);
-		}
-
-		// Load up the fields.
-		$controller = new ProfileOptions(new EventManager());
-		$controller->setUser(User::$info);
-		$controller->pre_dispatch();
-		$controller->action_pmprefs();
+		$controller = new Settings($this->_events);
+		$controller->setUser($this->user);
+		$controller->action_settings();
 	}
 
 	/**
@@ -1921,416 +1665,21 @@ class PersonalMessage extends AbstractController
 	 */
 	public function action_report(): void
 	{
-		global $txt, $context, $language, $modSettings;
-
-		// Check that this feature is even enabled!
-		if (empty($modSettings['enableReportPM']) || empty($this->_req->getPost('pmsg', 'intval', $this->_req->getQuery('pmsg', 'intval', 0))))
-		{
-			throw new Exception('no_access', false);
-		}
-
-		$pmsg = $this->_req->getQuery('pmsg', 'intval', $this->_req->getPost('pmsg', 'intval', 0));
-
-		if (!isAccessiblePM($pmsg, 'inbox'))
-		{
-			throw new Exception('no_access', false);
-		}
-
-		$context['pm_id'] = $pmsg;
-		$context['page_title'] = $txt['pm_report_title'];
-		$context['sub_template'] = 'report_message';
-
-		// We'll query some members, we will.
-		require_once(SUBSDIR . '/Members.subs.php');
-
-		// If we're here, just send the user to the template, with a few useful context bits.
-		if ($this->_req->hasPost('report'))
-		{
-			$reason = $this->_req->getPost('reason', 'trim|strval', '');
-			$poster_comment = strtr(Util::htmlspecialchars($reason), ["\r" => '', "\t" => '']);
-
-			if (Util::strlen($poster_comment) > 254)
-			{
-				throw new Exception('post_too_long', false);
-			}
-
-			// Check the session before proceeding any further!
-			checkSession();
-
-			// First, load up the message they want to file a complaint against and verify it actually went to them!
-			[$subject, $body, $time, $memberFromID, $memberFromName, $poster_name, $time_message] = loadPersonalMessage($pmsg);
-
-			require_once(SUBSDIR . '/Messages.subs.php');
-
-			recordReport([
-				'id_msg' => $pmsg,
-				'id_topic' => 0,
-				'id_board' => 0,
-				'type' => 'pm',
-				'id_poster' => $memberFromID,
-				'real_name' => $memberFromName,
-				'poster_name' => $poster_name,
-				'subject' => $subject,
-				'body' => $body,
-				'time_message' => $time_message,
-			], $poster_comment);
-
-			// Remove the line breaks...
-			$body = preg_replace('~<br ?/?>~i', "\n", $body);
-
-			$recipients = [];
-			$temp = loadPMRecipientsAll($context['pm_id'], true);
-			foreach ($temp as $recipient)
-			{
-				$recipients[] = $recipient['link'];
-			}
-
-			// Now let's get out and loop through the admins.
-			$admins = admins($this->_req->getPost('id_admin', 'intval', 0));
-
-			// Maybe we shouldn't advertise this?
-			if (empty($admins))
-			{
-				throw new Exception('no_access', false);
-			}
-
-			$memberFromName = un_htmlspecialchars($memberFromName);
-
-			// Prepare the message storage array.
-			$messagesToSend = [];
-
-			// Loop through each admin and add them to the right language pile...
-			foreach ($admins as $id_admin => $admin_info)
-			{
-				// Need to send in the correct language!
-				$cur_language = empty($admin_info['lngfile']) || empty($modSettings['userLanguage']) ? $language : $admin_info['lngfile'];
-
-				if (!isset($messagesToSend[$cur_language]))
-				{
-					$mtxt = [];
-					$lang = new Loader($cur_language, $mtxt, database());
-					$lang->load('PersonalMessage', false);
-
-					// Make the body.
-					$report_body = str_replace(['{REPORTER}', '{SENDER}'], [un_htmlspecialchars($this->user->name), $memberFromName], $mtxt['pm_report_pm_user_sent']);
-					$report_body .= "\n" . '[b]' . $reason . '[/b]' . "\n\n";
-					if (!empty($recipients))
-					{
-						$report_body .= $mtxt['pm_report_pm_other_recipients'] . ' ' . implode(', ', $recipients) . "\n\n";
-					}
-
-					$report_body .= $mtxt['pm_report_pm_unedited_below'] . "\n" . '[quote author=' . (empty($memberFromID) ? '&quot;' . $memberFromName . '&quot;' : $memberFromName . ' link=action=profile;u=' . $memberFromID . ' date=' . $time) . ']' . "\n" . un_htmlspecialchars($body) . '[/quote]';
-
-					// Plonk it in the array ;)
-					$messagesToSend[$cur_language] = [
-						'subject' => (Util::strpos($subject, $mtxt['pm_report_pm_subject']) === false ? $mtxt['pm_report_pm_subject'] : '') . un_htmlspecialchars($subject),
-						'body' => $report_body,
-						'recipients' => [
-							'to' => [],
-							'bcc' => []
-						],
-					];
-				}
-
-				// Add them to the list.
-				$messagesToSend[$cur_language]['recipients']['to'][$id_admin] = $id_admin;
-			}
-
-			// Send a different email for each language.
-			foreach ($messagesToSend as $message)
-			{
-				sendpm($message['recipients'], $message['subject'], $message['body']);
-			}
-
-			// Leave them with a template.
-			$context['sub_template'] = 'report_message_complete';
-		}
+		$controller = new Report($this->_events);
+		$controller->setUser($this->user);
+		$controller->action_report();
 	}
 
 	/**
-	 * List and allow adding/entering all man rules, such as
-	 *
-	 * What it does:
-	 *
-	 * - If it itches, it will be scratched.
-	 * - Yes or No are perfectly acceptable answers to almost every question.
-	 * - Men see in only 16 colors; Peach, for example, is a fruit, not a color.
+	 * List and allow adding/entering all man rules
 	 *
 	 * @uses sub template rules
 	 */
 	public function action_manrules(): void
 	{
-		global $txt, $context;
-
-		require_once(SUBSDIR . '/PersonalMessage.subs.php');
-
-		// The link tree - gotta have this :o
-		$context['breadcrumbs'][] = [
-			'url' => getUrl('action', ['action' => 'pm', 'sa' => 'manrules']),
-			'name' => $txt['pm_manage_rules']
-		];
-
-		$context['page_title'] = $txt['pm_manage_rules'];
-		$context['sub_template'] = 'rules';
-
-		// Load them... load them!!
-		loadRules();
-
-		// Likely to need all the groups!
-		require_once(SUBSDIR . '/Membergroups.subs.php');
-		$context['groups'] = accessibleGroups();
-
-		// Applying all rules?
-		if ($this->_req->hasQuery('apply'))
-		{
-			checkSession('get');
-
-			applyRules(true);
-			redirectexit('action=pm;sa=manrules');
-		}
-
-		// Editing a specific rule?
-		if ($this->_req->hasQuery('add'))
-		{
-			$rid = $this->_req->getQuery('rid', 'intval', 0);
-			$context['rid'] = isset($context['rules'][$rid]) ? $rid : 0;
-			$context['sub_template'] = 'add_rule';
-
-			// Any known rule
-			$js_rules = [];
-			foreach ($context['known_rules'] as $rule)
-			{
-				$js_rules[$rule] = $txt['pm_rule_' . $rule];
-			}
-
-			$js_rules = json_encode($js_rules);
-
-			// Any known label
-			$js_labels = [];
-			foreach ($context['labels'] as $label)
-			{
-				if ($label['id'] !== -1)
-				{
-					$js_labels[$label['id'] + 1] = $label['name'];
-				}
-			}
-
-			$js_labels = json_encode($js_labels);
-
-			// And all the groups as well
-			$js_groups = json_encode($context['groups']);
-
-			theme()->addJavascriptVar([
-					'criteriaNum' => 0,
-					'actionNum' => 0,
-				]
-			);
-
-			// Oh my, we have a lot of text strings for this
-			theme()->addJavascriptVar([
-				'groups' => $js_groups,
-				'labels' => $js_labels,
-				'rules' => $js_rules,
-				'txt_pm_readable_and' => $txt['pm_readable_and'],
-				'txt_pm_readable_or' => $txt['pm_readable_or'],
-				'txt_pm_readable_member' => $txt['pm_readable_member'],
-				'txt_pm_readable_group' => $txt['pm_readable_group'],
-				'txt_pm_readable_subject ' => $txt['pm_readable_subject'],
-				'txt_pm_readable_body' => $txt['pm_readable_body'],
-				'txt_pm_readable_buddy' => $txt['pm_readable_buddy'],
-				'txt_pm_readable_label' => $txt['pm_readable_label'],
-				'txt_pm_readable_delete' => $txt['pm_readable_delete'],
-				'txt_pm_readable_start' => $txt['pm_readable_start'],
-				'txt_pm_readable_end' => $txt['pm_readable_end'],
-				'txt_pm_readable_then' => $txt['pm_readable_then'],
-				'txt_pm_rule_not_defined' => $txt['pm_rule_not_defined'],
-				'txt_pm_rule_criteria_pick' => $txt['pm_rule_criteria_pick'],
-				'txt_pm_rule_sel_group' => $txt['pm_rule_sel_group'],
-				'txt_pm_rule_sel_action' => $txt['pm_rule_sel_action'],
-				'txt_pm_rule_label' => $txt['pm_rule_label'],
-				'txt_pm_rule_delete' => $txt['pm_rule_delete'],
-				'txt_pm_rule_sel_label' => $txt['pm_rule_sel_label'],
-			], true);
-
-			// Current rule information...
-			if ($context['rid'])
-			{
-				$context['rule'] = $context['rules'][$context['rid']];
-				$members = [];
-
-				// Need to get member names!
-				foreach ($context['rule']['criteria'] as $k => $criteria)
-				{
-					if ($criteria['t'] !== 'mid')
-					{
-						continue;
-					}
-					if (empty($criteria['v']))
-					{
-						continue;
-					}
-					$members[(int) $criteria['v']] = $k;
-				}
-
-				if (!empty($members))
-				{
-					require_once(SUBSDIR . '/Members.subs.php');
-					$result = getBasicMemberData(array_keys($members));
-					foreach ($result as $row)
-					{
-						$context['rule']['criteria'][$members[$row['id_member']]]['v'] = $row['member_name'];
-					}
-				}
-			}
-			else
-			{
-				$context['rule'] = [
-					'id' => '',
-					'name' => '',
-					'criteria' => [],
-					'actions' => [],
-					'logic' => 'and',
-				];
-			}
-
-			// Add a dummy criteria to allow expansion for none js users.
-			$context['rule']['criteria'][] = ['t' => '', 'v' => ''];
-		}
-		// Saving?
-		elseif ($this->_req->hasQuery('save'))
-		{
-			checkSession();
-			$rid = $this->_req->getQuery('rid', 'intval', 0);
-			$context['rid'] = isset($context['rules'][$rid]) ? $rid : 0;
-
-			// Name is easy!
-			$ruleName = $this->_req->getPost('rule_name', 'trim|Util::htmlspecialchars', '');
-			if (empty($ruleName))
-			{
-				throw new Exception('pm_rule_no_name', false);
-			}
-
-			// Read posted arrays (types/defs/actions)
-			$ruletype = $this->_req->getPost('ruletype', null, []);
-			$acttype = $this->_req->getPost('acttype', null, []);
-			$ruledefgroup = $this->_req->getPost('ruledefgroup', null, []);
-			$ruledef = $this->_req->getPost('ruledef', null, []);
-
-			// Sanity check...
-			if (empty($ruletype) || empty($acttype))
-			{
-				throw new Exception('pm_rule_no_criteria', false);
-			}
-
-			// Let's do the criteria first - it's also hardest!
-			$criteria = [];
-			foreach ($ruletype as $ind => $type)
-			{
-				// Check everything is here...
-				if ($type === 'gid' && (!isset($ruledefgroup[$ind], $context['groups'][$ruledefgroup[$ind]])))
-				{
-					continue;
-				}
-
-				if ($type !== 'bud' && !isset($ruledef[$ind]))
-				{
-					continue;
-				}
-
-				// Members need to be found.
-				if ($type === 'mid')
-				{
-					require_once(SUBSDIR . '/Members.subs.php');
-					$name = trim((string) ($ruledef[$ind] ?? ''));
-					$member = getMemberByName($name, true);
-					if (empty($member))
-					{
-						continue;
-					}
-
-					$criteria[] = ['t' => 'mid', 'v' => $member['id_member']];
-				}
-				elseif ($type === 'bud')
-				{
-					$criteria[] = ['t' => 'bud', 'v' => 1];
-				}
-				elseif ($type === 'gid')
-				{
-					$criteria[] = ['t' => 'gid', 'v' => (int) $ruledefgroup[$ind]];
-				}
-				elseif (in_array($type, ['sub', 'msg']) && trim((string) ($ruledef[$ind] ?? '')) !== '')
-				{
-					$criteria[] = ['t' => $type, 'v' => Util::htmlspecialchars(trim((string) $ruledef[$ind]))];
-				}
-			}
-
-			// Also do the actions!
-			$actions = [];
-			$doDelete = 0;
-			$rule_logic = $this->_req->getPost('rule_logic', 'trim|strval', '');
-			$isOr = $rule_logic === 'or' ? 1 : 0;
-			$labdef = $this->_req->getPost('labdef', null, []);
-			foreach ($acttype as $ind => $type)
-			{
-				// Picking a valid label?
-				if ($type === 'lab' && (!isset($labdef[$ind], $context['labels'][(int) $labdef[$ind] - 1])))
-				{
-					continue;
-				}
-
-				// Record what we're doing.
-				if ($type === 'del')
-				{
-					$doDelete = 1;
-				}
-				elseif ($type === 'lab')
-				{
-					$actions[] = ['t' => 'lab', 'v' => (int) $labdef[$ind] - 1];
-				}
-			}
-
-			if (empty($criteria) || (empty($actions) && !$doDelete))
-			{
-				throw new Exception('pm_rule_no_criteria', false);
-			}
-
-			// What are we storing?
-			$criteria = serialize($criteria);
-			$actions = serialize($actions);
-
-			// Create the rule?
-			if (empty($context['rid']))
-			{
-				addPMRule($this->user->id, $ruleName, $criteria, $actions, $doDelete, $isOr);
-			}
-			else
-			{
-				updatePMRule($this->user->id, $context['rid'], $ruleName, $criteria, $actions, $doDelete, $isOr);
-			}
-
-			redirectexit('action=pm;sa=manrules');
-		}
-		// Deleting?
-		elseif ($this->_req->hasPost('delselected'))
-		{
-			checkSession();
-			$toDelete = [];
-			$delrule = $this->_req->getPost('delrule', null, []);
-			if (!empty($delrule))
-			{
-				foreach ($delrule as $k => $_v)
-				{
-					$toDelete[] = (int) $k;
-				}
-			}
-
-			if (!empty($toDelete))
-			{
-				deletePMRules($this->user->id, $toDelete);
-			}
-
-			redirectexit('action=pm;sa=manrules');
-		}
+		$controller = new Rules($this->_events);
+		$controller->setUser($this->user);
+		$controller->action_manrules();
 	}
 
 	/**
@@ -2345,638 +1694,12 @@ class PersonalMessage extends AbstractController
 	 */
 	public function action_search2(): ?bool
 	{
-		global $scripturl, $modSettings, $context, $txt;
+		$controller = new Search($this->_events);
+		$controller->setUser($this->user);
 
-		// Make sure the server is able to do this right now
-		if (!empty($modSettings['loadavg_search']) && $modSettings['current_load'] >= $modSettings['loadavg_search'])
-		{
-			throw new Exception('loadavg_search_disabled', false);
-		}
-
-		// Some useful general permissions.
-		$context['can_send_pm'] = allowedTo('pm_send');
-
-		// Extract all the search parameters if coming in from pagination, etc.
-		$this->_searchParamsFromString();
-
-		// Set a start for pagination
-		$context['start'] = $this->_req->getQuery('start', 'intval', 0);
-
-		// Set/clean search criteria
-		$this->_prepareSearchParams();
-
-		$context['folder'] = empty($this->_search_params['sent_only']) ? 'inbox' : 'sent';
-
-		// Searching for specific members
-		$userQuery = $this->_setUserQuery();
-
-		// Set up the sorting variables...
-		$this->_setSortParams();
-
-		// Sort out any labels we may be searching for.
-		$labelQuery = $this->_setLabelQuery();
-
-		// Unfortunately, searching for words like this is going to be slow, so we're blocking them.
-		$blocklist_words = ['quote', 'the', 'is', 'it', 'are', 'if', 'in'];
-
-		// What are we actually searching for?
-		if (empty($this->_search_params['search']))
-		{
-			$this->_search_params['search'] = $this->_req->getPost('search', 'trim|strval', '');
-		}
-
-		// If nothing is left to search on - we set an error!
-		if (!isset($this->_search_params['search']) || $this->_search_params['search'] === '')
-		{
-			$context['search_errors']['invalid_search_string'] = true;
-		}
-
-		// Change non-word characters into spaces.
-		$stripped_query = preg_replace('~(?:[\x0B\0\x{A0}\t\r\s\n(){}\\[\\]<>!@$%^*.,:+=`\~\?/\\\\]+|&(?:amp|lt|gt|quot);)+~u', ' ', $this->_search_params['search']);
-
-		// Make the query lower case since it will case-insensitive anyway.
-		$stripped_query = un_htmlspecialchars(Util::strtolower($stripped_query));
-
-		// Extract phrase parts first (e.g., some words "this is a phrase" some more words.)
-		preg_match_all('/(?:^|\s)([-]?)"([^"]+)"(?:$|\s)/', $stripped_query, $matches, PREG_PATTERN_ORDER);
-		$phraseArray = $matches[2];
-
-		// Remove the phrase parts and extract the words.
-		$wordArray = preg_replace('~(?:^|\s)(?:[-]?)"(?:[^"]+)"(?:$|\s)~u', ' ', $this->_search_params['search']);
-		$wordArray = explode(' ', Util::htmlspecialchars(un_htmlspecialchars($wordArray), ENT_QUOTES));
-
-		// A minus sign in front of a word excludes the word.... so...
-		$excludedWords = [];
-
-		// Check for things like -"some words", but not "-some words".
-		foreach ($matches[1] as $index => $word)
-		{
-			if ($word === '-')
-			{
-				if (($word = trim($phraseArray[$index], "-_' ")) !== '' && !in_array($word, $blocklist_words))
-				{
-					$excludedWords[] = $word;
-				}
-
-				unset($phraseArray[$index]);
-			}
-		}
-
-		// Now we look for -test, etc.
-		foreach ($wordArray as $index => $word)
-		{
-			if (str_starts_with(trim($word), '-'))
-			{
-				if (($word = trim($word, "-_' ")) !== '' && !in_array($word, $blocklist_words))
-				{
-					$excludedWords[] = $word;
-				}
-
-				unset($wordArray[$index]);
-			}
-		}
-
-		// The remaining words and phrases are all included.
-		$searchArray = array_merge($phraseArray, $wordArray);
-
-		// Trim everything and make sure there are no words that are the same.
-		foreach ($searchArray as $index => $value)
-		{
-			// Skip anything that's close to empty.
-			if (($searchArray[$index] = trim($value, "-_' ")) === '')
-			{
-				unset($searchArray[$index]);
-			}
-			// Skip blocked words. Make sure to note we skipped them as well
-			elseif (in_array($searchArray[$index], $blocklist_words))
-			{
-				$foundBlockListedWords = true;
-				unset($searchArray[$index]);
-
-			}
-
-			if (isset($searchArray[$index]))
-			{
-				$searchArray[$index] = Util::strtolower(trim($value));
-
-				if ($searchArray[$index] === '')
-				{
-					unset($searchArray[$index]);
-				}
-				else
-				{
-					// Sort out entities first.
-					$searchArray[$index] = Util::htmlspecialchars($searchArray[$index]);
-				}
-			}
-		}
-
-		$searchArray = array_slice(array_unique($searchArray), 0, 10);
-
-		// This contains *everything*
-		$searchWords = array_merge($searchArray, $excludedWords);
-
-		// Make sure at least one word is being searched for.
-		if (empty($searchArray))
-		{
-			$context['search_errors']['invalid_search_string' . (empty($foundBlockListedWords) ? '' : '_blocklist')] = true;
-		}
-
-		// Sort out the search query so the user can edit it - if they want.
-		$context['search_params'] = $this->_search_params;
-		if (isset($context['search_params']['search']))
-		{
-			$context['search_params']['search'] = Util::htmlspecialchars($context['search_params']['search']);
-		}
-
-		if (isset($context['search_params']['userspec']))
-		{
-			$context['search_params']['userspec'] = Util::htmlspecialchars($context['search_params']['userspec']);
-		}
-
-		// Now we have all the parameters, combine them together for pagination and the like...
-		$context['params'] = $this->_compileURLparams();
-
-		// Compile the subject query part.
-		$andQueryParts = [];
-		foreach ($searchWords as $index => $word)
-		{
-			if ($word === '')
-			{
-				continue;
-			}
-
-			if ($this->_search_params['subject_only'])
-			{
-				$andQueryParts[] = 'pm.subject' . (in_array($word, $excludedWords) ? ' NOT' : '') . ' LIKE {string:search_' . $index . '}';
-			}
-			else
-			{
-				$andQueryParts[] = '(pm.subject' . (in_array($word, $excludedWords) ? ' NOT' : '') . ' LIKE {string:search_' . $index . '} ' . (in_array($word, $excludedWords) ? 'AND pm.body NOT' : 'OR pm.body') . ' LIKE {string:search_' . $index . '})';
-			}
-
-			$this->_searchq_parameters ['search_' . $index] = '%' . strtr($word, ['_' => '\\_', '%' => '\\%']) . '%';
-		}
-
-		$searchQuery = ' 1=1';
-		if (!empty($andQueryParts))
-		{
-			$searchQuery = implode(!empty($this->_search_params['searchtype']) && $this->_search_params['searchtype'] == 2 ? ' OR ' : ' AND ', $andQueryParts);
-		}
-
-		// Age limits?
-		$timeQuery = '';
-		if (!empty($this->_search_params['minage']))
-		{
-			$timeQuery .= ' AND pm.msgtime < ' . (time() - $this->_search_params['minage'] * 86400);
-		}
-
-		if (!empty($this->_search_params['maxage']))
-		{
-			$timeQuery .= ' AND pm.msgtime > ' . (time() - $this->_search_params['maxage'] * 86400);
-		}
-
-		// If we have errors - return back to the first screen...
-		if (!empty($context['search_errors']))
-		{
-			$this->_req->post->params = $context['params'];
-
-			$this->action_search();
-
-			return false;
-		}
-
-		// Get the number of results.
-		$numResults = numPMSeachResults($userQuery, $labelQuery, $timeQuery, $searchQuery, $this->_searchq_parameters);
-
-		// Get all the matching message ids, senders and head pm nodes
-		[$foundMessages, $posters, $head_pms] = loadPMSearchMessages($userQuery, $labelQuery, $timeQuery, $searchQuery, $this->_searchq_parameters, $this->_search_params);
-
-		// Find the real head pm when in the conversation view
-		if ($context['display_mode'] === self::DISPLAY_AS_CONVERSATION && !empty($head_pms))
-		{
-			$real_pm_ids = loadPMSearchHeads($head_pms);
-		}
-
-		// Load the found user data
-		$posters = array_unique($posters);
-		if (!empty($posters))
-		{
-			MembersList::load($posters);
-		}
-
-		// Sort out the page index.
-		$context['page_index'] = constructPageIndex('{scripturl}?action=pm;sa=search2;params=' . $context['params'], $context['start'], $numResults, $modSettings['search_results_per_page']);
-
-		$context['message_labels'] = [];
-		$context['message_replied'] = [];
-		$context['personal_messages'] = [];
-		$context['first_label'] = [];
-
-		// If we have results, we have work to do!
-		if (!empty($foundMessages))
-		{
-			$recipients = [];
-			[$context['message_labels'], $context['message_replied'], $context['message_unread'], $context['first_label']] = loadPMRecipientInfo($foundMessages, $recipients, $context['folder'], true);
-
-			// Prepare for the callback!
-			$search_results = loadPMSearchResults($foundMessages, $this->_search_params);
-			$counter = 0;
-			$bbc_parser = ParserWrapper::instance();
-			foreach ($search_results as $row)
-			{
-				// If there's no subject, use the default.
-				$row['subject'] = $row['subject'] === '' ? $txt['no_subject'] : $row['subject'];
-
-				// Load this poster context info, if not there, then fill in the essentials...
-				$member = MembersList::get($row['id_member_from']);
-				$member->loadContext();
-				if ($member->isEmpty())
-				{
-					$member['name'] = $row['from_name'];
-					$member['id'] = 0;
-					$member['group'] = $txt['guest_title'];
-					$member['link'] = $row['from_name'];
-					$member['email'] = '';
-					$member['show_email'] = showEmailAddress(0);
-					$member['is_guest'] = true;
-				}
-
-				// Censor anything we don't want to see...
-				$row['body'] = censor($row['body']);
-				$row['subject'] = censor($row['subject']);
-
-				// Parse out any BBC...
-				$row['body'] = $bbc_parser->parsePM($row['body']);
-
-				// Highlight the hits
-				$body_highlighted = '';
-				$subject_highlighted = '';
-				foreach ($searchArray as $query)
-				{
-					// Fix the international characters in the keyword too.
-					$query = un_htmlspecialchars($query);
-					$query = trim($query, '\*+');
-					$query = strtr(Util::htmlspecialchars($query), ['\\\'' => "'"]);
-
-					$body_highlighted = preg_replace_callback('/((<[^>]*)|' . preg_quote(strtr($query, ["'" => '&#039;']), '/') . ')/iu',
-						fn($matches) => $this->_highlighted_callback($matches), $row['body']);
-					$subject_highlighted = preg_replace('/(' . preg_quote($query, '/') . ')/iu', '<strong class="highlight">$1</strong>', $row['subject']);
-				}
-
-				// Set a link using the first label information
-				$href = $scripturl . '?action=pm;f=' . $context['folder'] . (isset($context['first_label'][$row['id_pm']]) ? ';l=' . $context['first_label'][$row['id_pm']] : '') . ';pmid=' . ($context['display_mode'] === self::DISPLAY_AS_CONVERSATION && isset($real_pm_ids[$head_pms[$row['id_pm']]]) && $context['folder'] === 'inbox' ? $real_pm_ids[$head_pms[$row['id_pm']]] : $row['id_pm']) . '#msg_' . $row['id_pm'];
-
-				$context['personal_messages'][] = [
-					'id' => $row['id_pm'],
-					'member' => $member,
-					'subject' => $subject_highlighted,
-					'body' => $body_highlighted,
-					'time' => standardTime($row['msgtime']),
-					'html_time' => htmlTime($row['msgtime']),
-					'timestamp' => forum_time(true, $row['msgtime']),
-					'recipients' => &$recipients[$row['id_pm']],
-					'labels' => &$context['message_labels'][$row['id_pm']],
-					'fully_labeled' => (empty($context['message_labels'][$row['id_pm']]) ? 0 : count($context['message_labels'][$row['id_pm']])) === count($context['labels']),
-					'is_replied_to' => &$context['message_replied'][$row['id_pm']],
-					'href' => $href,
-					'link' => '<a href="' . $href . '">' . $subject_highlighted . '</a>',
-					'counter' => ++$counter,
-					'pmbuttons' => $this->_setSearchPmButtons($row['id_pm'], $member),
-				];
-			}
-		}
-
-		// Finish off the context.
-		$context['page_title'] = $txt['pm_search_title'];
-		$context['sub_template'] = 'search_results';
-		$context['menu_data_' . $context['pm_menu_id']]['current_area'] = 'search';
-		$context['breadcrumbs'][] = [
-			'url' => getUrl('action', ['action' => 'pm', 'sa' => 'search']),
-			'name' => $txt['pm_search_bar_title'],
-		];
-
-		return true;
+		return $controller->action_search2();
 	}
 
-	/**
-	 * Return buttons for search results, used when viewing full message as result
-	 *
-	 * @param int $id of the PM
-	 * @param ValuesContainer $member member information
-	 * @return array[]
-	 */
-	private function _setSearchPmButtons($id, $member): array
-	{
-		global $context;
-
-		$pmButtons = [
-			// Reply, Quote
-			'reply_button' => [
-				'text' => 'reply',
-				'url' => getUrl('action', ['action' => 'pm', 'sa' => 'send', 'f' => $context['folder'], 'pmsg' => $id, 'u' => $member['id']]) . ($context['current_label_id'] !== "-1" ? ';l=' . $context['current_label_id'] : ''),
-				'class' => 'reply_button',
-				'icon' => 'modify',
-				'enabled' => !$member['is_guest'] && $context['can_send_pm'],
-			],
-			'quote_button' => [
-				'text' => 'quote',
-				'url' => getUrl('action', ['action' => 'pm', 'sa' => 'send', 'f' => $context['folder'], 'pmsg' => $id, 'quote' => '']) . ($context['current_label_id'] !== "-1" ? ';l=' . $context['current_label_id'] : '') . ($context['folder'] === 'sent' ? '' : ';u=' . $member['id']),
-				'class' => 'quote_button',
-				'icon' => 'quote',
-				'enabled' => !$member['is_guest'] && $context['can_send_pm'],
-			],
-			// This is for "forwarding" - even if the member is gone.
-			'reply_quote_button' => [
-				'text' => 'reply_quote',
-				'url' => getUrl('action', ['action' => 'pm', 'sa' => 'send', 'f' => $context['folder'], 'pmsg' => $id, 'quote' => '']) . ($context['current_label_id'] !== "-1" ? ';l=' . $context['current_label_id'] : ''),
-				'class' => 'reply_button',
-				'icon' => 'modify',
-				'enabled' => $member['is_guest'] && $context['can_send_pm'],
-			]
-		];
-
-		// Drop any non-enabled ones
-		return array_filter($pmButtons, static fn($button) => !isset($button['enabled']) || (bool) $button['enabled']);
-	}
-
-	/**
-	 * Extract search params from a string
-	 *
-	 * What it does:
-	 *
-	 * - When paging search results, reads and decodes the passed parameters
-	 * - Places what it finds back in search_params
-	 */
-	private function _searchParamsFromString(): array
-	{
-		$this->_search_params = [];
-
-		// Read encoded params from either GET or POST using helper
-		$temp_params = $this->_req->getRequest('params', 'trim|strval');
-		if ($temp_params !== null && $temp_params !== '')
-		{
-			// Decode and replace the uri safe characters we added
-			$temp_params = base64_decode(str_replace(['-', '_', '.'], ['+', '/', '='], $temp_params));
-
-			$temp_params = explode('|"|', $temp_params);
-			foreach ($temp_params as $data)
-			{
-				[$k, $v] = array_pad(explode("|'|", $data), 2, '');
-				$this->_search_params[$k] = $v;
-			}
-		}
-
-		return $this->_search_params;
-	}
-
-	/**
-	 * Sets the search params for the query
-	 *
-	 * What it does:
-	 *
-	 * - Uses existing ones if coming from pagination or uses those passed from the search pm form
-	 * - Validates passed params are valid
-	 */
-	private function _prepareSearchParams(): void
-	{
-		// Store whether simple search was used (needed if the user wants to do another query).
-		if (!isset($this->_search_params['advanced']))
-		{
-			$this->_search_params['advanced'] = $this->_req->hasPost('advanced') ? 1 : 0;
-		}
-
-		// 1 => 'allwords' (default, don't set as param), 2 => 'anywords'.
-		$searchtypePost = $this->_req->getPost('searchtype', 'intval', 1);
-		if (!empty($this->_search_params['searchtype']) || $searchtypePost == 2)
-		{
-			$this->_search_params['searchtype'] = 2;
-		}
-
-		// Minimum age of messages. Default to zero (don't set param in that case).
-		$minagePost = $this->_req->getPost('minage', 'intval', 0);
-		if (!empty($this->_search_params['minage']) || ($minagePost > 0))
-		{
-			$this->_search_params['minage'] = empty($this->_search_params['minage']) ? $minagePost : (int) $this->_search_params['minage'];
-		}
-
-		// Maximum age of messages. Default to infinite (9999 days: param not set).
-		$maxagePost = $this->_req->getPost('maxage', 'intval', 9999);
-		if (!empty($this->_search_params['maxage']) || ($maxagePost < 9999))
-		{
-			$this->_search_params['maxage'] = empty($this->_search_params['maxage']) ? $maxagePost : (int) $this->_search_params['maxage'];
-		}
-
-		// Default the username to a wildcard matching every user (*).
-		$userspecPost = $this->_req->getPost('userspec', 'trim|strval', '*');
-		if (!empty($this->_search_params['userspec']) || ($userspecPost !== '*'))
-		{
-			$this->_search_params['userspec'] = $this->_search_params['userspec'] ?? $userspecPost;
-		}
-
-		// Search modifiers
-		$this->_search_params['subject_only'] = !empty($this->_search_params['subject_only']) || $this->_req->hasPost('subject_only');
-		$this->_search_params['show_complete'] = !empty($this->_search_params['show_complete']) || $this->_req->hasPost('show_complete');
-		$this->_search_params['sent_only'] = !empty($this->_search_params['sent_only']) || $this->_req->hasPost('sent_only');
-	}
-
-	/**
-	 * Handles the parameters when searching for specific users
-	 *
-	 * What it does:
-	 *
-	 * - Returns the user query for use in the main search query
-	 * - Sets the parameters for use in the query
-	 *
-	 * @return string
-	 */
-	private function _setUserQuery(): string
-	{
-		global $context;
-
-		// Hardcoded variables that can be tweaked if required.
-		$maxMembersToSearch = 500;
-
-		// Init to not be searching based on members
-		$userQuery = '';
-
-		// If there's no specific user, then don't mention it in the main query.
-		if (!empty($this->_search_params['userspec']))
-		{
-			// Set up, so we can search by username, wildcards, like, etc.
-			$userString = strtr(Util::htmlspecialchars($this->_search_params['userspec'], ENT_QUOTES), ['&quot;' => '"']);
-			$userString = strtr($userString, ['%' => '\%', '_' => '\_', '*' => '%', '?' => '_']);
-
-			preg_match_all('~"([^"]+)"~', $userString, $matches);
-			$possible_users = array_merge($matches[1], explode(',', preg_replace('~"[^"]+"~', '', $userString)));
-
-			// Who matches those criteria?
-			require_once(SUBSDIR . '/Members.subs.php');
-			$members = membersBy('member_names', ['member_names' => $possible_users]);
-
-			foreach ($possible_users as $key => $possible_user)
-			{
-				$this->_searchq_parameters['guest_user_name_implode_' . $key] = '{string_case_insensitive:' . $possible_user . '}';
-			}
-
-			// Simply do nothing if there are too many members matching the criteria.
-			if (count($members) > $maxMembersToSearch)
-			{
-				$userQuery = '';
-			}
-			elseif (count($members) === 0)
-			{
-				if ($context['folder'] === 'inbox')
-				{
-					$uq = [];
-					$name = '{column_case_insensitive:pm.from_name}';
-					foreach (array_keys($possible_users) as $key)
-					{
-						$uq[] = 'AND pm.id_member_from = 0 AND (' . $name . ' LIKE {string:guest_user_name_implode_' . $key . '})';
-					}
-
-					$userQuery = implode(' ', $uq);
-					$this->_searchq_parameters['pm_from_name'] = $name;
-				}
-				else
-				{
-					$userQuery = '';
-				}
-			}
-			else
-			{
-				$memberlist = [];
-				foreach ($members as $id)
-				{
-					$memberlist[] = $id;
-				}
-
-				// Use the name as sent from or sent to
-				if ($context['folder'] === 'inbox')
-				{
-					$uq = [];
-					$name = '{column_case_insensitive:pm.from_name}';
-
-					foreach (array_keys($possible_users) as $key)
-					{
-						$uq[] = 'AND (pm.id_member_from IN ({array_int:member_list}) OR (pm.id_member_from = 0 AND (' . $name . ' LIKE {string:guest_user_name_implode_' . $key . '})))';
-					}
-
-					$userQuery = implode(' ', $uq);
-				}
-				else
-				{
-					$userQuery = 'AND (pmr.id_member IN ({array_int:member_list}))';
-				}
-
-				$this->_searchq_parameters['pm_from_name'] = '{column_case_insensitive:pm.from_name}';
-				$this->_searchq_parameters['member_list'] = $memberlist;
-			}
-		}
-
-		return $userQuery;
-	}
-
-	/**
-	 * Read / Set the sort parameters for the results listing
-	 */
-	private function _setSortParams(): void
-	{
-		$sort_columns = [
-			'pm.id_pm',
-		];
-
-		if (empty($this->_search_params['sort']) && !empty($this->_req->post->sort))
-		{
-			[$this->_search_params['sort'], $this->_search_params['sort_dir']] = array_pad(explode('|', $this->_req->post->sort), 2, '');
-		}
-
-		$this->_search_params['sort'] = !empty($this->_search_params['sort']) && in_array($this->_search_params['sort'], $sort_columns) ? $this->_search_params['sort'] : 'pm.id_pm';
-		$this->_search_params['sort_dir'] = !empty($this->_search_params['sort_dir']) && $this->_search_params['sort_dir'] === 'asc' ? 'asc' : 'desc';
-	}
-
-	/**
-	 * Handles the parameters when searching for specific labels
-	 *
-	 * What it does:
-	 *
-	 * - Returns the label query for use in the main search query
-	 * - Sets the parameters for use in the query
-	 *
-	 * @return string
-	 * @throws \Exception
-	 */
-	private function _setLabelQuery(): string
-	{
-		global $context;
-
-		$db = database();
-
-		$labelQuery = '';
-
-		if ($context['folder'] === 'inbox' && !empty($this->_search_params['advanced']) && $context['currently_using_labels'])
-		{
-			// Came here from pagination?  Put them back into $_REQUEST for sanitation.
-			if (isset($this->_search_params['labels']))
-			{
-				$this->_req->post->searchlabel = explode(',', $this->_search_params['labels']);
-			}
-
-			// Assuming we have some labels - make them all integers.
-			if (!empty($this->_req->post->searchlabel) && is_array($this->_req->post->searchlabel))
-			{
-				$this->_req->post->searchlabel = array_map('intval', $this->_req->post->searchlabel);
-			}
-			else
-			{
-				$this->_req->post->searchlabel = [];
-			}
-
-			// Now that everything is cleaned up a bit, make the labels a param.
-			$this->_search_params['labels'] = implode(',', $this->_req->post->searchlabel);
-
-			// No labels selected? That must be an error!
-			if (empty($this->_req->post->searchlabel))
-			{
-				$context['search_errors']['no_labels_selected'] = true;
-			}
-			// Otherwise prepare the query!
-			elseif (count($this->_req->post->searchlabel) !== count($context['labels']))
-			{
-				$labelQuery = '
-				AND {raw:label_implode}';
-
-				$labelStatements = [];
-				foreach ($this->_req->post->searchlabel as $label)
-				{
-					$labelStatements[] = $db->quote('FIND_IN_SET({string:label}, pmr.labels) != 0', ['label' => $label,]);
-				}
-
-				$this->_searchq_parameters ['label_implode'] = '(' . implode(' OR ', $labelStatements) . ')';
-			}
-		}
-
-		return $labelQuery;
-	}
-
-	/**
-	 * Encodes search params in a URL-compatible way
-	 *
-	 * @return string - the encoded string to be appended to the URL
-	 */
-	private function _compileURLparams(): string
-	{
-		$encoded = [];
-
-		// Now we have all the parameters, combine them together for pagination and the like...
-		foreach ($this->_search_params as $k => $v)
-		{
-			$encoded[] = $k . "|'|" . $v;
-		}
-
-		// Base64 encode, then replace +/= with uri safe ones that can be reverted
-		return str_replace(['+', '/', '='], ['-', '_', '.'], base64_encode(implode('|"|', $encoded)));
-	}
 
 	/**
 	 * Allows searching personal messages.
@@ -2993,98 +1716,11 @@ class PersonalMessage extends AbstractController
 	 */
 	public function action_search(): void
 	{
-		global $context, $txt;
-
-		// If they provided some search parameters, we need to extract them
-		if ($this->_req->hasPost('params'))
-		{
-			$context['search_params'] = $this->_searchParamsFromString();
-		}
-
-		// Set up the search criteria, type, what, age, etc.
-		if ($this->_req->hasPost('search'))
-		{
-			$context['search_params']['search'] = un_htmlspecialchars($this->_req->getPost('search', 'trim', ''));
-			$context['search_params']['search'] = htmlspecialchars($context['search_params']['search'], ENT_COMPAT);
-		}
-
-		if (isset($context['search_params']['userspec']))
-		{
-			$context['search_params']['userspec'] = htmlspecialchars($context['search_params']['userspec'], ENT_COMPAT);
-		}
-
-		// 1 => 'allwords' / 2 => 'anywords'.
-		if (!empty($context['search_params']['searchtype']))
-		{
-			$context['search_params']['searchtype'] = 2;
-		}
-
-		// Minimum and Maximum age of the message
-		if (!empty($context['search_params']['minage']))
-		{
-			$context['search_params']['minage'] = (int) $context['search_params']['minage'];
-		}
-
-		if (!empty($context['search_params']['maxage']))
-		{
-			$context['search_params']['maxage'] = (int) $context['search_params']['maxage'];
-		}
-
-		$context['search_params']['show_complete'] = !empty($context['search_params']['show_complete']);
-		$context['search_params']['subject_only'] = !empty($context['search_params']['subject_only']);
-
-		// Create the array of labels to be searched.
-		$context['search_labels'] = [];
-		$searchedLabels = isset($context['search_params']['labels']) && $context['search_params']['labels'] != '' ? explode(',', $context['search_params']['labels']) : [];
-		foreach ($context['labels'] as $label)
-		{
-			$context['search_labels'][] = [
-				'id' => $label['id'],
-				'name' => $label['name'],
-				'checked' => empty($searchedLabels) || in_array($label['id'], $searchedLabels),
-			];
-		}
-
-		// Are all the labels checked?
-		$context['check_all'] = empty($searchedLabels) || count($context['search_labels']) === count($searchedLabels);
-
-		// Load the error text strings if there were errors in the search.
-		if (!empty($context['search_errors']))
-		{
-			Txt::load('Errors');
-			$context['search_errors']['messages'] = [];
-			foreach ($context['search_errors'] as $search_error => $dummy)
-			{
-				if ($search_error === 'messages')
-				{
-					continue;
-				}
-
-				$context['search_errors']['messages'][] = $txt['error_' . $search_error];
-			}
-		}
-
-		$context['page_title'] = $txt['pm_search_title'];
-		$context['sub_template'] = 'search';
-		$context['breadcrumbs'][] = [
-			'url' => getUrl('action', ['action' => 'pm', 'sa' => 'search']),
-			'name' => $txt['pm_search_bar_title'],
-		];
+		$controller = new Search($this->_events);
+		$controller->setUser($this->user);
+		$controller->action_search();
 	}
 
-	/**
-	 * Used to highlight body text with strings that match the search term
-	 *
-	 * - Callback function used in $body_highlighted
-	 *
-	 * @param string[] $matches
-	 *
-	 * @return string
-	 */
-	private function _highlighted_callback($matches): string
-	{
-		return isset($matches[2]) && $matches[2] === $matches[1] ? stripslashes($matches[1]) : '<strong class="highlight">' . $matches[1] . '</strong>';
-	}
 
 	/**
 	 * Allows the user to mark a personal message as unread, so they remember to come back to it
