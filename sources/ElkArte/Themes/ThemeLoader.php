@@ -779,7 +779,7 @@ class ThemeLoader
 
 		// A bit lonely maybe, though I think it should be set up *after* the theme variants detection
 		$context['header_logo_url_html_safe'] = empty($settings['header_logo_url'])
-			? $settings['images_url'] . '/' . $context['theme_variant_url'] . 'logo_elk.png'
+			? $settings['images_url'] . '/' . $context['theme_variant_url'] . 'logo.png'
 			: Util::htmlspecialchars($settings['header_logo_url']);
 
 		// RTL languages require an additional stylesheet.

@@ -202,7 +202,7 @@ class MetadataIntegrate
 		}
 		else
 		{
-			$logo = $boardurl . '/mobile.png';
+			$logo = $boardurl . '/themes/default/images/logos/mobile.png';
 		}
 
 		// This will also cache these values for us

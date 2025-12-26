@@ -89,7 +89,7 @@ class AttachmentSubsTest extends ElkArteCommonSetupTest
 
 	public function testGetUtlImageSize()
 	{
-		$result = url_image_size('https://www.elkarte.net/community/themes/default/images/logo.png');
+		$result = url_image_size('https://www.elkarte.net/community/themes/default/images/logos/logo.png');
 		$this->assertEquals(145, $result[0]);
 	}
 

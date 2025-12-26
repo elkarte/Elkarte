@@ -169,8 +169,8 @@ class ManifestMinimus
 
 		// Ensure URL paths use forward slashes for web delivery
 		$base = rtrim($settings['default_images_url'], '/');
-		$iconSmallUrl = $modSettings['pwa_small_icon'] ?? $base . '/icon_pwa_small.png';
-		$iconUrlLarge = $modSettings['pwa_large_icon'] ?? $base . '/icon_pwa_large.png';
+		$iconSmallUrl = $modSettings['pwa_small_icon'] ?? $base . '/logos/icon_pwa_small.png';
+		$iconUrlLarge = $modSettings['pwa_large_icon'] ?? $base . '/logos/icon_pwa_large.png';
 
 		if ($iconSmallUrl)
 		{

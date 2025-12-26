@@ -20,7 +20,7 @@ class MetadataIntegrateTest extends ElkArteCommonSetupTest
         $context['forum_name'] = $mbname;
         $context['page_title'] = 'A Topic Title';
         $context['canonical_url'] = $boardurl . '/index.php?topic=1.0';
-        $context['header_logo_url_html_safe'] = $boardurl . '/mobile.png';
+        $context['header_logo_url_html_safe'] = $boardurl . '/themes/default/images/logos/mobile.png';
 
         // Optional slogan
         $settings['site_slogan'] = 'Just a Test Forum';
