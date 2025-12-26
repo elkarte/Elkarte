@@ -682,7 +682,7 @@ function template_profile_block_user_info()
 	// And how old are we, oh my!
 	echo '
 					<dt>', $txt['age'], ':</dt>
-					<dd>', $context['member']['age'] . ($context['member']['today_is_birthday'] ? ' &nbsp; <img src="' . $settings['images_url'] . '/cake.png" alt="" />' : ''), '</dd>';
+					<dd>', $context['member']['age'] . ($context['member']['today_is_birthday'] ? ' &nbsp; <i class="icon icon-lg i-cake"></i>' : ''), '</dd>';
 
 	// How long have they been a member, and when were they last online?
 	echo '

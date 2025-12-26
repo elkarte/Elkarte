@@ -446,7 +446,7 @@ function availableThemes($current_theme, $current_member)
 
 		// The thumbnail needs the correct path.
 		$settings['images_url'] = &$theme_data['images_url'];
-		$theme_thumbnail_href = $theme_data['images_url'] . '/thumbnail.png';
+		$theme_thumbnail_href = $theme_data['images_url'] . '/theme/thumbnail.png';
 
 		$txt['theme_description'] = '';
 		$lang = new LangLoader(null, $txt, $db);
@@ -475,7 +475,7 @@ function availableThemes($current_theme, $current_member)
 				{
 					$available_themes[$id_theme]['variants'][$variant] = [
 						'label' => $txt['variant_' . $variant] ?? $variant,
-						'thumbnail' => !file_exists($theme_data['theme_dir'] . '/images/thumbnail.png') || file_exists($theme_data['theme_dir'] . '/images/thumbnail_' . $variant . '.png') ? $theme_data['images_url'] . '/thumbnail_' . $variant . '.png' : ($theme_data['images_url'] . '/thumbnail.png'),
+						'thumbnail' => !file_exists($theme_data['theme_dir'] . '/images/theme/thumbnail.png') || file_exists($theme_data['theme_dir'] . '/images/theme/thumbnail_' . $variant . '.png') ? $theme_data['images_url'] . '/theme/thumbnail_' . $variant . '.png' : ($theme_data['images_url'] . '/theme/thumbnail.png'),
 					];
 				}
 
