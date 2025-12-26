@@ -31,7 +31,7 @@ use ElkArte\Controller\ModerationCenter;
 use ElkArte\Controller\MoveTopic;
 use ElkArte\Controller\News;
 use ElkArte\Controller\Notify;
-use ElkArte\Controller\PersonalMessage;
+use ElkArte\PersonalMessage\PersonalMessage;
 use ElkArte\Controller\Poll;
 use ElkArte\Controller\Post;
 use ElkArte\Controller\RemoveTopic;

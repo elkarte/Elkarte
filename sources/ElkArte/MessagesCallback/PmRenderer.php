@@ -25,7 +25,7 @@ use ElkArte\MessagesCallback\BodyParser\BodyParserInterface;
 /**
  * PmRenderer
  *
- * Used by the \ElkArte\Controller\PersonalMessage to prepare both the subjects (for
+ * Used by the \ElkArte\PersonalMessage\PersonalMessage to prepare both the subjects (for
  * the list of messages in the index) and the bodies of the PMs.
  */
 class PmRenderer extends Renderer
