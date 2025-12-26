@@ -4,6 +4,8 @@ namespace ElkArte\PersonalMessage;
 
 use ElkArte\EventManager;
 use ElkArte\Helper\HttpReq;
+use ElkArte\Languages\Loader;
+use ElkArte\Themes\ThemeLoader;
 use ElkArte\User;
 use tests\ElkArteCommonSetupTest;
 
@@ -13,8 +15,14 @@ class ReportTest extends ElkArteCommonSetupTest
 
 	protected function setUp(): void
 	{
+		global $txt;
+
 		parent::setUp();
 		$this->setSession();
+
+		new ThemeLoader();
+		$lang = new Loader('english', $txt, database());
+		$lang->load('PersonalMessage');
 	}
 
 	public function testActionReportInitial()

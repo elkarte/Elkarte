@@ -433,7 +433,7 @@ class PersonalMessage extends AbstractController
 		$template_layers->addAfter('subject_list', 'pm');
 
 		$labelQuery = $context['folder'] !== 'sent' ? '
-				AND FIND_IN_SET(' . $context['current_label_id'] . ', pmr.labels) != 0' : '';
+			AND FIND_IN_SET(' . $context['current_label_id'] . ', pmr.labels) != 0' : '';
 
 		// They didn't pick a sort, so we use the forum by default.
 		$sort_by = $this->_req->getQuery('sort', 'trim', 'date');
@@ -448,7 +448,6 @@ class PersonalMessage extends AbstractController
 				{
 					$descending = true;
 				}
-
 				break;
 			case 'name':
 				$sort_by_query = "COALESCE(mem.real_name, '')";

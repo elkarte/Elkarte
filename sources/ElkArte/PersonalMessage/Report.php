@@ -47,7 +47,7 @@ class Report extends AbstractController
 	 */
 	public function action_report(): void
 	{
-		global $txt, $context, $modSettings;
+		global $txt, $context;
 
 		// Check that this feature is even enabled and we have a PM!
 		$pmsg = $this->_validateRequest();

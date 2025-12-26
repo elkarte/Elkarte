@@ -5,6 +5,8 @@ namespace ElkArte\PersonalMessage;
 use ElkArte\EventManager;
 use ElkArte\Helper\HttpReq;
 use ElkArte\Languages\Loader;
+use ElkArte\Themes\ThemeLoader;
+use ElkArte\User;
 use tests\ElkArteCommonSetupTest;
 
 class RulesTest extends ElkArteCommonSetupTest
@@ -19,9 +21,9 @@ class RulesTest extends ElkArteCommonSetupTest
 		global $txt;
 
 		parent::setUp();
-		parent::setSession();
+		$this->setSession();
 
-		new \ElkArte\Themes\ThemeLoader();
+		new ThemeLoader();
 		$lang = new Loader('english', $txt, database());
 		$lang->load('PersonalMessage');
 	}
@@ -33,11 +35,13 @@ class RulesTest extends ElkArteCommonSetupTest
 	{
 		global $context;
 
+		$context['labels'] = [];
+
 		$req = HttpReq::instance();
 		$req->query->sa = 'addrule';
 
 		$controller = new Rules(new EventManager());
-		$controller->setUser(\ElkArte\User::$info);
+		$controller->setUser(User::$info);
 		$controller->pre_dispatch();
 		$controller->action_addRule();
 

@@ -25,7 +25,7 @@ class PersonalMessageTest extends ElkArteCommonSetupTest
 	 */
 	protected function setUp(): void
 	{
-		global $context, $txt;
+		global $txt;
 
 		// Load in the common items so the system thinks we have an active login
 		parent::setUp();
@@ -34,7 +34,6 @@ class PersonalMessageTest extends ElkArteCommonSetupTest
 		new ElkArte\Themes\ThemeLoader();
 		$lang = new Loader('english', $txt, database());
 		$lang->load('PersonalMessage+Post');
-
 	}
 
 	/**
@@ -46,6 +45,7 @@ class PersonalMessageTest extends ElkArteCommonSetupTest
 
 		$req = HttpReq::instance();
 		$req->query->area = 'index';
+		$req->query->sa = 'inbox';
 
 		// Get the controller, call index
 		$controller = new PersonalMessage(new EventManager());
@@ -57,8 +57,9 @@ class PersonalMessageTest extends ElkArteCommonSetupTest
 		$this->assertEquals(0, $context['message_limit']);
 		$this->assertNotEmpty($context['labels'][-1]);
 
-		// We should be ready to show the pm inbox, its empty right now
-		$this->assertEquals($context['page_title'], $txt['pm_inbox']);
+		// We should be ready to show the pm inbox, it's empty right now
+		$this->assertEquals('folder', $context['sub_template']);
+		$this->assertEquals($txt['pm_inbox'], $context['page_title']);
 	}
 
 	public function testActionSendPM()
@@ -79,7 +80,7 @@ class PersonalMessageTest extends ElkArteCommonSetupTest
 		$this->assertFalse($context['quoted_message']);
 		$this->assertEquals('', $context['subject']);
 
-		// Lets try and send it now
+		// Let's try and send it now
 		$modSettings['pm_spam_settings'] = "100, 100, 0";
 		$req->query->sa = 'send2';
 		$req->post->subject = 'Yo';
