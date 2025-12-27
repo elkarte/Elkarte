@@ -798,7 +798,7 @@ function template_ssi_above()
 			<div id="header" class="wrapper">
 				<h1 id="forumtitle">ElkArte SSI (Server Side Includes) Examples
 					<span id="logobox">
-						<img id="logo" src="themes/default/images/logo.png" alt="ElkArte Logo" title="ElkArte Community" />
+						<img id="logo" src="themes/default/images/logos/logo.png" alt="ElkArte Logo" title="ElkArte Community" />
 					</span>
 				</h1>
 			</div>

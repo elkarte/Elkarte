@@ -30,7 +30,7 @@ class Rules extends AbstractController
 	 */
 	public function action_index()
 	{
-		$this->action_manrules();
+		$this->action_rules();
 	}
 
 	/**
@@ -38,7 +38,7 @@ class Rules extends AbstractController
 	 *
 	 * @uses sub template rules
 	 */
-	public function action_manrules(): void
+	public function action_rules(): void
 	{
 		global $txt, $context;
 

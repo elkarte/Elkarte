@@ -1678,7 +1678,7 @@ class PersonalMessage extends AbstractController
 	{
 		$controller = new Rules($this->_events);
 		$controller->setUser($this->user);
-		$controller->action_manrules();
+		$controller->action_rules();
 	}
 
 	/**

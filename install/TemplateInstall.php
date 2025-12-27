@@ -36,7 +36,7 @@ function template_install_above()
 		<div id="header">
 			<div class="frame">
 				<h1 class="forumtitle">', $txt['installer'], '</h1>
-				<img id="logo" src="../themes/default/images/logo.png" alt="ElkArte Community" title="ElkArte Community" />
+				<img id="logo" src="../themes/default/images/logos/logo.png" alt="ElkArte Community" title="ElkArte Community" />
 			</div>
 		</div>
 		<div id="wrapper" class="wrapper">

@@ -712,7 +712,7 @@ abstract class Theme
 		$context['page_title'] = $context['page_title'] ?? $mbname;
 		$context['page_title_html_safe'] = Util::htmlspecialchars(un_htmlspecialchars($context['page_title'])) . (empty($context['current_page']) ? '' : ' - ' . $txt['page'] . (' ' . ($context['current_page'] + 1)));
 		$context['favicon'] = $boardurl . '/favicon.ico';
-		$context['apple_touch'] = $boardurl . '/themes/default/images/apple-touch-icon.png';
+		$context['apple_touch'] = $boardurl . '/themes/default/images/logos/apple-touch-icon.png';
 		$context['html_headers'] = $context['html_headers'] ?? '';
 		$context['theme-color'] = $modSettings['pwa_theme-color'] ?? '#3d6e32';
 		$context['pwa_manifest_enabled'] = !empty($modSettings['pwa_manifest_enabled']);

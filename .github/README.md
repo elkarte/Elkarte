@@ -1,4 +1,4 @@
-[![ElkArte](https://raw.github.com/elkarte/Elkarte/master/themes/default/images/logo.png "ElkArte")](https://www.elkarte.net "ElkArte")
+[![ElkArte](https://raw.github.com/elkarte/Elkarte/master/themes/default/images/logos/logo.png "ElkArte")](https://www.elkarte.net "ElkArte")
 
 This is the **ElkArte Development** repository.  If you are looking for the currently released branch go
 [here](https://github.com/elkarte/Elkarte/tree/master)

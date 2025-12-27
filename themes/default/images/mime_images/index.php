@@ -1,15 +1,10 @@
 <?php
 
-// This file is here solely to protect your generic_images directory.
-
-// Look for Settings.php....
-if (file_exists(dirname(__FILE__, 3) . '/Settings.php'))
+// Try to handle it with the upper level index.php. (it should know what to do.)
+if (file_exists(dirname(__FILE__, 5) . '/index.php'))
 {
-	// Found it!
-	require(dirname(__FILE__, 3) . '/Settings.php');
-	header('Location: ' . $boardurl);
+	include(dirname(__FILE__, 5) . '/index.php');
 }
-// Can't find it... just forget it.
 else
 {
 	exit;

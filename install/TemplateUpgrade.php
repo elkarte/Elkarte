@@ -208,7 +208,7 @@ function template_upgrade_above()
 		<div id="header">
 			<div class="frame">
 				<h1 class="forumtitle">', $txt['upgrade_upgrade_utility'], '</h1>
-				<img id="logo" src="', $settings['default_theme_url'], '/images/logo.png" alt="ElkArte Community" title="ElkArte Community" />
+				<img id="logo" src="', $settings['default_theme_url'], '/images/logos/logo.png" alt="ElkArte Community" title="ElkArte Community" />
 			</div>
 		</div>
 		<div id="wrapper" class="wrapper">

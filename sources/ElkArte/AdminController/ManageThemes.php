@@ -481,7 +481,7 @@ class ManageThemes extends AbstractController
 				// Have any text, old chap?
 				$context['theme_variants'][$variant] = [
 					'label' => $txt['variant_' . $variant] ?? $variant,
-					'thumbnail' => !$fileFunc->fileExists($settings['theme_dir'] . '/images/thumbnail.png') || $fileFunc->fileExists($settings['theme_dir'] . '/images/thumbnail_' . $variant . '.png') ? $settings['images_url'] . '/thumbnail_' . $variant . '.png' : ($settings['images_url'] . '/thumbnail.png'),
+					'thumbnail' => !$fileFunc->fileExists($settings['theme_dir'] . '/images/theme/thumbnail.png') || $fileFunc->fileExists($settings['theme_dir'] . '/images/themes/thumbnail_' . $variant . '.png') ? $settings['images_url'] . '/thumbnail_' . $variant . '.png' : ($settings['images_url'] . '/thumbnail.png'),
 				];
 			}
 
