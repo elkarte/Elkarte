@@ -1723,6 +1723,12 @@ class PersonalMessage extends AbstractController
 
 	/**
 	 * Allows the user to mark a personal message as unread, so they remember to come back to it
+	 *
+	 *  The is_read bit determines whether a message is read or unread:
+	 *  - `0`: Unread, not replied to.
+	 *  - `1`: Read, not replied to.
+	 *  - `2`: Unread, replied to (rare, but possible if marked unread after replying).
+	 *  - `3`: Read and replied to.
 	 */
 	public function action_markunread(): void
 	{
