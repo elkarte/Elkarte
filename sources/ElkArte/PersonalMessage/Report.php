@@ -62,6 +62,11 @@ class Report extends AbstractController
 			// Check the session before proceeding any further!
 			checkSession();
 
+			// Going to need these.
+			require_once(SUBSDIR . '/PersonalMessage.subs.php');
+			require_once(SUBSDIR . '/Messages.subs.php');
+			require_once(SUBSDIR . '/Members.subs.php');
+
 			$reason = $this->_getReportReason();
 
 			// First, load up the message they want to file a complaint against and verify it actually went to them!
@@ -153,8 +158,6 @@ class Report extends AbstractController
 	 */
 	protected function _recordReport(int $pmsg, array $pmData, string $comment): void
 	{
-		require_once(SUBSDIR . '/Messages.subs.php');
-
 		recordReport([
 			'id_msg' => $pmsg,
 			'id_topic' => 0,
