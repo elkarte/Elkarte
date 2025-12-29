@@ -230,7 +230,7 @@ class SiteDispatcher
 		{
 			$this->setActionAndControllerFromActionArray();
 		}
-		// Fall back to naming patterns, addons can use any of them, and it should Just Work (tm).
+		// Fall back to naming patterns, Addons can use any of them, and it should Just Work (tm).
 		elseif (preg_match('~^[a-zA-Z_\\-]+\d*$~', $this->action))
 		{
 			$this->setActionAndControllerFromNamingPatterns();
@@ -296,10 +296,11 @@ class SiteDispatcher
 
 		if (!class_exists($this->_controller_name))
 		{
-			// Try the addons directory
+			// Try the Addons directory
 			$this->_controller_name = '\\Addons\\' . ucfirst($this->action) . '\\' . ucfirst($this->action);
 		}
 
+		// Now try to find the action function
 		if ($this->subAction !== null && empty($this->area) && preg_match('~^\w+$~', $this->subAction))
 		{
 			$this->_function_name = 'action_' . $this->subAction;
@@ -339,6 +340,7 @@ class SiteDispatcher
 	/**
 	 * Determines if the current API call should be handled separately.
 	 *
+	 * What it does:
 	 *  - If the 'api' parameter is set in the request and its value is empty, it appends
 	 * the '_api' suffix to the current function name.
 	 *  - This needs to be reviewed; all api calls really should be qualified as
@@ -360,26 +362,37 @@ class SiteDispatcher
 	}
 
 	/**
-	 * Check if the specified controller and action exist.
+	 * Checks if the specified controller and its requested method exist and can be called.
 	 *
-	 * @return bool Returns true if both the controller and action exist, false otherwise.
+	 * What it does:
+	 *  - The method verifies whether the controller's class exists and determines if the
+	 * specified function is callable within that class.
+	 *  - If the requested sa is not "action_index" and the controller is an AbstractController,
+	 * the method will revert to "action_index" so the sa is dispatched by the class to
+	 * ensure permissions etc. are checked.
+	 *
+	 * @return bool Returns true if the controller and method exist and are callable, otherwise false.
 	 */
 	protected function checkIfControllerExists(): bool
 	{
 		// 3, 2, ... and go
 		if (class_exists($this->_controller_name))
 		{
-			// Method requested is in the list of its callable methods
-			if (in_array($this->_function_name, get_class_methods($this->_controller_name), true))
+			// Maybe the default requires an abstract method
+			if ($this->_function_name !== 'action_index'
+				&& in_array('action_index', get_class_methods($this->_controller_name), true)
+				&& is_subclass_of($this->_controller_name, AbstractController::class))
 			{
+				// Calling a sa directly on an abstract class?  This should be dispatched by the
+				// class itself ($action->dispatch($subAction) to ensure permissions
+				// etc. are checked.
+				$this->_function_name = 'action_index';
 				return true;
 			}
 
-			// Maybe the default required by an abstract method
-			if ($this->_function_name !== 'action_index'
-				&& in_array('action_index', get_class_methods($this->_controller_name)))
+			// Method requested is in the list of its callable methods
+			if (in_array($this->_function_name, get_class_methods($this->_controller_name), true))
 			{
-				$this->_function_name = 'action_index';
 				return true;
 			}
 		}
