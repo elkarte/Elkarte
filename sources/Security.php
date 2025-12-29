@@ -564,13 +564,13 @@ function banPermissions()
 		call_integration_hook('integrate_warn_permissions', [&$permission_change]);
 		foreach ($permission_change as $old => $new)
 		{
-			if (!in_array($old, User::$info->permissions))
+			if (!in_array($old, User::$info->permissions, true))
 			{
 				unset($permission_change[$old]);
 			}
 			else
 			{
-				User::$info->permissions = array_merge((array) User::$info->permissions, $new);
+				User::$info->permissions = array_unique(array_merge((array) User::$info->permissions, [$new]));
 			}
 		}
 
