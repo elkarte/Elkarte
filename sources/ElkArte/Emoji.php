@@ -26,10 +26,6 @@ use ElkArte\Helper\Util;
  */
 class Emoji extends AbstractModel
 {
-	/** @var string ranges that emoji may be found; not all points in the range are emoji, this is
-	 * used to check whether any char in the text is potentially in a Unicode emoji range */
-	private const EMOJI_RANGES = '[\x{203C}-\x{3299}\x{1F004}-\x{1F251}\x{1F300}-\x{1FAF6}](?![\x{200d}\x{FE0F}])';
-
 	/** @var string regex to find 4-byte HTML as &#x1f937;‍️
 	 * This is how 4-byte characters are stored in the utf-8 db. */
 	private const POSSIBLE_HTML_EMOJI = '~(&#x[a-fA-F\d]{5,6};|&#\d{5,6};)~';
@@ -49,8 +45,8 @@ class Emoji extends AbstractModel
 	/** @var string[] Array of keys with known emoji names */
 	public $shortcode_replace = [];
 
-	/** @var string Supported emoji -> image regex */
-	public $emoji_regex = '';
+	/** @var string Supported emoji -> image regex 8.1+ only */
+	public $emoji_regex = '~\x{1F1E6}[\x{1F1E6}-\x{1F1FF}]|(?:\p{Extended_Pictographic}(?:\x{FE0F})?(?:[\x{1F3FB}-\x{1F3FF}])?)(?:\x{200D}(?:\p{Extended_Pictographic}(?:\x{FE0F})?(?:[\x{1F3FB}-\x{1F3FF}])?))*~u';
 
 	/**
 	 * Emoji constructor.
@@ -203,12 +199,18 @@ class Emoji extends AbstractModel
 			return $key;
 		}
 
-		// Does it end in -fe0f / Variation Selector-16? Libraries differ in its use or not.
+		// If it does not end in -fe0f / Variation Selector-16, then give that a try.
 		if (!str_ends_with($hex, '-fe0f'))
 		{
+			if ($key = (array_search($hex . '-fe0f', $this->shortcode_replace, true)))
+			{
+				return $key;
+			}
+
 			return false;
 		}
 
+		// Try it w/o any trailing -fe0f and see if we get a match
 		if (!($key = (array_search(substr($hex, 0, -5), $this->shortcode_replace, true))))
 		{
 			return false;
@@ -337,6 +339,9 @@ class Emoji extends AbstractModel
 	{
 		$points = [];
 
+		// Strip skin tones as none of the libraries support them
+		$code = preg_replace('/[\x{1F3FB}\x{1F3FC}\x{1F3FD}\x{1F3FE}\x{1F3FF}]/u', '', $code);
+
 		for ($i = 0; $i < Util::strlen($code); $i++)
 		{
 			$points[] = str_pad(strtolower(dechex(Util::getUnicodeOrdinal(Util::substr($code, $i, 1)))), 4, '0', STR_PAD_LEFT);
@@ -372,26 +377,12 @@ class Emoji extends AbstractModel
 				$name = strtolower(trim($match[1]));
 				$key = strtolower(trim($match[2]));
 				$this->shortcode_replace[$name] = $key;
-
-				// Multipoint sequences use a unique, per key, regex to avoid collisions
-				if (str_contains($key, '-'))
-				{
-					$emoji_regex[] = '\x{' . implode('}\x{', explode('-', $key)) . '}';
-				}
 			}
 
 			call_integration_hook('integrate_custom_emoji', [&$this->shortcode_replace]);
 
-			// Longest to shortest to avoid any partial matches due to sequences
-			usort($emoji_regex, static fn($a, $b) => strlen($b) <=> strlen($a));
-
-			// Build out the regex, append the single point search at the end.
-			$this->emoji_regex = '~' . implode('|', $emoji_regex) . '|' . self::EMOJI_RANGES . '~u';
-			unset($emoji_regex);
-
-			// Stash for an hour, not like this is going to change
-			Cache::instance()->put('shortcode_replace', $this->shortcode_replace, 3600);
-			Cache::instance()->put('emoji_regex', $this->emoji_regex, 3600);
+			// Stash for two hours, not like this is going to change
+			Cache::instance()->put('shortcode_replace', $this->shortcode_replace, 7200);
 		}
 	}
 
@@ -405,11 +396,6 @@ class Emoji extends AbstractModel
 		if (empty($this->shortcode_replace))
 		{
 			Cache::instance()->getVar($this->shortcode_replace, 'shortcode_replace', 3600);
-		}
-
-		if (empty($this->emoji_regex))
-		{
-			Cache::instance()->getVar($this->emoji_regex, 'emoji_regex', 3600);
 		}
 	}
 
