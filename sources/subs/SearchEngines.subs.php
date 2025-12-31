@@ -105,7 +105,7 @@ function spiderCheck()
 							break;
 						}
 
-						if (($key == 7 && str_contains($_SERVER['REMOTE_ADDR'], ':')) || ($key == 3 && !str_contains($_SERVER['REMOTE_ADDR'], ':')))
+						if (($key === 7 && str_contains($_SERVER['REMOTE_ADDR'], ':')) || ($key === 3 && !str_contains($_SERVER['REMOTE_ADDR'], ':')))
 						{
 							$_SESSION['id_robot'] = $spider['id_spider'];
 						}
@@ -141,7 +141,7 @@ function spiderQuickCheck()
 	$req = Request::instance();
 	$ci_user_agent = strtolower($req->user_agent());
 
-	return !str_contains($ci_user_agent, 'mozilla') || preg_match('~(googlebot|slurp|msnbot|yandex|bingbot|baidu|duckduckbot|sogou|exabot|facebo|ecosia|ia_archiver|megaindex)~u', $ci_user_agent) == 1;
+	return !str_contains($ci_user_agent, 'mozilla') || preg_match('~(googlebot|bingbot|yandex|baidu|duckduckbot|slurp|msnbot|applebot|petalbot|facebo|ia_archiver|gptbot|claudebot)~u', $ci_user_agent) === 1;
 }
 
 /**
@@ -177,7 +177,7 @@ function logSpider()
 			]
 		);
 		// Nothing updated?
-		if ($result->affected_rows() == 0)
+		if ($result->affected_rows() === 0)
 		{
 			$db->insert('ignore',
 				'{db_prefix}log_spider_stats',
@@ -400,7 +400,7 @@ function getNumSpiders()
 		FROM {db_prefix}spiders',
 		[]
 	);
-	list ($numSpiders) = $request->fetch_row();
+	[$numSpiders] = $request->fetch_row();
 	$request->free_result();
 
 	return $numSpiders;
@@ -449,7 +449,7 @@ function getNumSpiderLogs()
 		FROM {db_prefix}log_spider_hits',
 		[]
 	);
-	list ($numLogs) = $request->fetch_row();
+	[$numLogs] = $request->fetch_row();
 	$request->free_result();
 
 	return $numLogs;
@@ -504,7 +504,7 @@ function getNumSpiderStats($time = null)
 			'date_being_viewed' => $time,
 		]
 	);
-	list ($numStats) = $request->fetch_row();
+	[$numStats] = $request->fetch_row();
 	$request->free_result();
 
 	return $numStats;
@@ -626,8 +626,13 @@ function spidersStatsDates()
 		FROM {db_prefix}log_spider_stats',
 		[]
 	);
-	list ($min_date, $max_date) = $request->fetch_row();
+	[$min_date, $max_date] = $request->fetch_row();
 	$request->free_result();
+
+	if (empty($min_date) || empty($max_date))
+	{
+		return [];
+	}
 
 	$min_year = (int) substr($min_date, 0, 4);
 	$max_year = (int) substr($max_date, 0, 4);
