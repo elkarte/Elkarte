@@ -214,22 +214,31 @@ class SmileyParser
 
 		foreach ($smileysFrom as $i => $smileysFrom_i)
 		{
-			$specialChars = htmlspecialchars($smileysFrom_i, ENT_QUOTES);
-
 			// If an :emoji: tag, from smiles ACP, does not have an img file, leave it for emoji parsing
 			$possibleEmoji = isset($smileysFrom_i[3]) && $smileysFrom_i[0] === ':' && str_ends_with($smileysFrom_i, ':');
 			$filename = $this->dir . $smileysTo[$i] . '.' . $GLOBALS['context']['smiley_extension'];
 			if (!$possibleEmoji || $fileFunc->fileExists($filename))
 			{
+				$specialChars = htmlspecialchars($smileysFrom_i, ENT_QUOTES);
+
 				// Either a smiley :) or emoji :smile: with a defined image
 				$smileyCode = '<img src="' . $this->path . $smileysTo[$i] . '.' . $GLOBALS['context']['smiley_extension'] . '" alt="' . strtr($specialChars, $replace) . '" title="' . strtr(htmlspecialchars($smileysDescriptions[$i]), $replace) . '" class="smiley" />';
 				$this->replace[$smileysFrom_i] = $smileyCode;
 
-				$searchParts[] = preg_quote($smileysFrom_i, '~');
-				if ($smileysFrom_i !== $specialChars)
+				// An annoyance where test???? or test ???? would render ??? with a dangling '?'
+				if ($smileysFrom_i === '???')
 				{
-					$this->replace[$specialChars] = $smileyCode;
-					$searchParts[] = preg_quote($specialChars, '~');
+					// Look for ??? not preceded by or followed by another '?'
+					$searchParts[] = '(?<!\?)\?\?\?(?!\?)';
+				}
+				else
+				{
+					$searchParts[] = preg_quote($smileysFrom_i, '~');
+					if ($smileysFrom_i !== $specialChars)
+					{
+						$this->replace[$specialChars] = $smileyCode;
+						$searchParts[] = preg_quote($specialChars, '~');
+					}
 				}
 			}
 		}
