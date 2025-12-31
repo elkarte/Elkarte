@@ -236,7 +236,7 @@ class SmileyParser
 
 		// This smiley regex makes sure it doesn't parse smileys within bbc tags
 		// (so [url=mailto:David@bla.com] doesn't parse the :D smiley)
-		$this->search = '~(?<=[>:\?\.\s\x{A0}[\]()*\\\;]|^)(' . implode('|', $searchParts) . ')(?=[^[:alpha:]0-9]|$)~';
+		$this->search = '~(?<=[>:\?\.\s\x{A0}[\]()*\\\;]|^)(' . implode('|', $searchParts) . ')(?=[^[:alpha:]0-9:]|$)~';
 	}
 
 	/**
