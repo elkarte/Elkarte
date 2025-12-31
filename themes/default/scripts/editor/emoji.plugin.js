@@ -84,7 +84,7 @@ var disableDrafts = false;
 			emoji_group = this.opts.emoji_group,
 			corrected_offset = {};
 
-		// Create the emoji select list and insert choice in to the editor
+		// Create the emoji select list and insert the choice in to the editor
 		$element.atwho({
 			at: ":",
 			data: emojis,
@@ -97,7 +97,7 @@ var disableDrafts = false;
 				filter: function (query, items, search_key)
 				{
 					// Don't show the list until they have entered at least two characters
-					if (typeof query === 'undefined' || query.length < 2 || query.length > 25)
+					if (typeof query === 'undefined' || query.length < 1 || query.length > 25)
 					{
 						return [];
 					}

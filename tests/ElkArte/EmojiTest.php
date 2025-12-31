@@ -72,7 +72,7 @@ class EmojiTest extends ElkArteCommonSetupTest
 		$result = $emoji->emojiNameToImage(':smiley:');
 
 		// Let us see that beautiful smile (this should be tw-emoji but a previous instance is out there
-		$this->assertEquals('<img class="smiley emoji tw-emoji" src="http://127.0.0.1/smileys/tw-emoji/1f642.svg" alt="&#58;smiley&#58;" title="Smiley" data-emoji-name="&#58;smiley&#58;" data-emoji-code="1f642" />', $result);
+		$this->assertEquals('<img class="smiley emoji tw-emoji" src="http://127.0.0.1/smileys/tw-emoji/1f603.svg" alt="&#58;smiley&#58;" title="Smiley" data-emoji-name="&#58;smiley&#58;" data-emoji-code="1f603" />', $result);
 
 		$result = $emoji->emojiNameToImage(':face_exhaling:', true);
 

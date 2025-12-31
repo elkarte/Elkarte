@@ -176,6 +176,16 @@ class DispatcherTest extends TestCase
 					'controller_name' => RemoveTopic::class,
 				),
 			),
+			// An existing one, not in the action array, naming patterns, defer to action_index
+			array(
+				'test_name' => 'action from naming pattern not in actionarray',
+				'action' => 'about',
+				'sa' => 'contact',
+				'result' => array(
+					'function_name' => 'action_index',
+					'controller_name' => About::class,
+				),
+			),
 		);
 
 		foreach ($tests as $test)
@@ -186,7 +196,7 @@ class DispatcherTest extends TestCase
 
 			$req = HttpReq::instance();
 			$req->query->action = $test['action'] ?? null;
-			$req->query->sa = $test['action'] ?? null;
+			$req->query->sa = $test['sa'] ?? null;
 
 			// Start a new dispatcher every time (the dispatching is done on __construct)
 			$dispatcher = New SiteDispatcher_Tester($req);

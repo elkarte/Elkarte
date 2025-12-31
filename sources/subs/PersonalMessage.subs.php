@@ -2193,6 +2193,8 @@ function loadPMRecipientInfo($all_pms, &$recipients, $folder = '', $search = fal
 	);
 	while (($row = $request->fetch_assoc()))
 	{
+		$row['id_pm'] = (int) $row['id_pm'];
+
 		// Sent folder recipients
 		if ($folder === 'sent' || empty($row['bcc']))
 		{
@@ -2200,11 +2202,16 @@ function loadPMRecipientInfo($all_pms, &$recipients, $folder = '', $search = fal
 		}
 
 		// Don't include bcc-recipients if it's your inbox, you're not supposed to know :P
-		if ($row['id_member_to'] == User::$info->id && $folder !== 'sent')
+		if ((int) $row['id_member_to'] === User::$info->id && $folder !== 'sent')
 		{
+			// The is_read bit is used to determine whether a message is read or unread:
+			// - `0`: 00 Unread, not replied to.
+			// - `1`: 01 Read, not replied to.
+			// - `2`: 10 Unread, replied to (marked unread after replying).
+			// - `3`: 11 Read and replied to.
 			// Read and replied to the status for this message
-			$message_replied[$row['id_pm']] = $row['is_read'] & 2;
-			$message_unread[$row['id_pm']] = $row['is_read'] == 0;
+			$message_replied[$row['id_pm']] = $row['is_read'] & 2; // bit 2 is set
+			$message_unread[$row['id_pm']] = !($row['is_read'] & 1); // bit 1 is not set
 			$message_labels[$row['id_pm']] = [];
 
 			$row['labels'] = $row['labels'] === '' ? [] : explode(',', $row['labels']);

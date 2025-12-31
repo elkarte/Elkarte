@@ -647,12 +647,12 @@ function loadPermissions()
 		);
 	}
 
-	User::$info->permissions = $permissions;
+	User::$info->permissions = array_unique($permissions);
 
 	// Remove all the permissions they shouldn't have ;).
 	if (!empty($modSettings['permission_enable_deny']))
 	{
-		User::$info->permissions = array_diff(User::$info->permissions, $removals);
+		User::$info->permissions = array_diff(User::$info->permissions, array_unique($removals));
 	}
 
 	if (isset($cache_board_key) && !empty($board) && $cache->levelHigherThan(1))

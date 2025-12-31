@@ -11,6 +11,8 @@ if (file_exists(dirname(__FILE__, 2) . '/Settings.php'))
 	require(dirname(__FILE__, 2) . '/Settings.php');
 	header('Location: ' . $boardurl);
 }
-
-// Can't find it... just forget it.
-exit;
+else
+{
+	// Can't find it... just forget it.
+	exit;
+}
