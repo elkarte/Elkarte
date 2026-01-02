@@ -180,6 +180,20 @@ class ManageDraftsModule extends AbstractController
 	}
 
 	/**
+	 * Drafts settings integration hook
+	 *
+	 * @param array $subActions
+	 */
+	public static function integrate_sa_manage_posts(array &$subActions): void
+	{
+		$subActions['drafts'] = [
+			'function' => 'action_index',
+			'controller' => ManageDraftsModule::class,
+			'permission' => 'admin_forum',
+		];
+	}
+
+	/**
 	 * Default method.
 	 * Requires admin_forum permissions
 	 *

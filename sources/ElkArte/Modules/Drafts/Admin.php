@@ -42,20 +42,22 @@ class Admin extends AbstractModule
 	/**
 	 * Used to add the Drafts entry to the admin menu.
 	 *
+	 * It defines a subsection in the admin menu post and topic section for draft settings.
+	 * DraftsIntegration has the hook to integrate_sa_manage_posts so that ManagePosts
+	 * controller knows how to dispatch to the draft settings section.
+	 *
 	 * @param array $admin_areas The admin menu array
 	 */
 	public function addMenu(&$admin_areas): void
 	{
 		global $txt;
 
-		$admin_areas['layout']['areas']['managedrafts'] = [
-			'label' => $txt['manage_drafts'],
-			'controller' => ManageDraftsModule::class,
-			'function' => 'action_index',
-			'class' => 'i-bookmark i-admin',
-			'permission' => ['admin_forum'],
+		$admin_areas['forum']['areas']['postsettings']['subsections']['drafts'] = [
+			$txt['managedrafts_settings'],
 			'enabled' => featureEnabled('dr'),
 		];
+
+		uksort($admin_areas['forum']['areas']['postsettings']['subsections'], 'strnatcasecmp');
 	}
 
 	/**

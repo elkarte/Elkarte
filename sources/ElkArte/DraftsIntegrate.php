@@ -42,6 +42,7 @@ class DraftsIntegrate
 			['integrate_sa_manage_maintenance', '\\ElkArte\\AdminController\\ManageDraftsModule::integrate_sa_manage_maintenance'],
 			['integrate_delete_members', '\\ElkArte\\AdminController\\ManageDraftsModule::integrate_delete_members'],
 			['integrate_load_illegal_guest_permissions', '\\ElkArte\\AdminController\\ManageDraftsModule::integrate_load_illegal_guest_permissions'],
+			['integrate_sa_manage_posts', '\\ElkArte\\AdminController\\ManageDraftsModule::integrate_sa_manage_posts'],
 		];
 	}
 }

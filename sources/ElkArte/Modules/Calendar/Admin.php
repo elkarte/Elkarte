@@ -49,7 +49,7 @@ class Admin extends AbstractModule
 	{
 		global $txt, $modSettings;
 
-		$admin_areas['layout']['areas']['managecalendar'] = [
+		$admin_areas['forum']['areas']['managecalendar'] = [
 			'label' => $txt['manage_calendar'],
 			'controller' => ManageCalendarModule::class,
 			'function' => 'action_index',
