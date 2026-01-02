@@ -98,8 +98,6 @@ class Search extends AbstractController
 	 */
 	public function action_index()
 	{
-		global $context, $txt, $settings;
-
 		$subActions = [
 			'search' => [$this, 'action_search'],
 			'results' => [$this, 'action_results'],
