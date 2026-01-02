@@ -257,9 +257,29 @@ function template_credits()
 	}
 
 	echo '
+							</div>';
+
+	// Other software and graphics
+	if (!empty($context['credits_software_graphics']))
+	{
+		echo '
+							<h2 class="category_header">', $txt['credits_software_graphics'], '</h2>
+							<div class="content">';
+
+		foreach ($context['credits_software_graphics'] as $section => $credits)
+		{
+			echo '
+								<dl>
+									<dt>
+										<strong>', $txt['credits_' . $section], '</strong>
+									</dt>
+									<dd>', implode('</dd><dd>', $credits), '</dd>
+								</dl>';
+		}
+	}
+	echo '
 							</div>
-						</div>
-					</div>';
+						</div>';
 
 	// This makes all the support information available to the support script...
 	echo '
@@ -287,7 +307,7 @@ function template_credits()
 	// This sets the latest support stuff.
 	echo '
 					<script>
-						var oAdminCenter = new Elk_AdminIndex({
+						let oAdminCenter = new Elk_AdminIndex({
 							bLoadVersions: true,
 							slatestVersionContainerId: \'latestVersion\',
 							sinstalledVersionContainerId: \'installedVersion\',
