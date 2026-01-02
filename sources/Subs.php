@@ -702,12 +702,6 @@ function obExit($header = null, $do_footer = null, $from_index = false, $from_fa
 	// Note to developers.  The testbed will add the following, allowing phpunit test returns
 	//if (defined("PHPUNITBOOTSTRAP") && defined("STDIN")){return;}
 
-	// Don't exit if we're coming from index.php; that will pass through normally.
-	//if (!$from_index)
-	//{
-	//	exit;
-	//}
-
 	exit;
 }
 
