@@ -208,7 +208,7 @@ class ManageSecurity extends AbstractController
 		[$modSettings['warning_enable'], $modSettings['user_limit'], $modSettings['warning_decrement']] = explode(',', $modSettings['warning_settings']);
 
 		$context['post_url'] = getUrl('admin', ['action' => 'admin', 'area' => 'securitysettings', 'save', 'sa' => 'moderation']);
-		$context['settings_title'] = $txt['moderation_settings'];
+		$context['settings_title'] = $txt['moderation_warning_short'];
 		$context['settings_message'] = $txt['warning_enable'];
 
 		$settingsForm->prepare();

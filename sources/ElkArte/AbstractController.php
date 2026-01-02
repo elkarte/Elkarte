@@ -28,7 +28,7 @@ use ElkArte\Helper\ValuesContainer;
  */
 abstract class AbstractController
 {
-	/** @var object The event manager. */
+	/** @var EventManager The event manager. */
 	protected $_events;
 
 	/** @var string The current hook. */

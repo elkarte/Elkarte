@@ -37,7 +37,7 @@ class Action
 	protected $_name;
 
 	/** @var HttpReq Access to post/get data */
-	protected $req;
+	protected $_req;
 
 	/**
 	 * Constructor!
@@ -48,7 +48,7 @@ class Action
 	public function __construct(string $name = null, $req = null)
 	{
 		$this->_name = $name;
-		$this->req = $req ?: HttpReq::instance();
+		$this->_req = $req ?: HttpReq::instance();
 	}
 
 	/**
@@ -113,7 +113,7 @@ class Action
 
 		$this->_default = $default ?: key($this->_subActions);
 
-		$subAction = $this->req->getRequest($requestParam, 'trim|strval', $this->_default);
+		$subAction = $this->_req->getRequest($requestParam, 'trim|strval', $this->_default);
 
 		return isset($this->_subActions[$subAction]) ? $subAction : $this->_default;
 	}
